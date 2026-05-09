@@ -6271,7 +6271,6 @@ export const anatomyQuestions: Question[] = [
     "sourceType": "AI_GENERATED",
     "difficulty": "hard"
   },
-  null,
   {
     "id": "MOEX-100140-1101-Q001",
     "subject": "解剖學",
