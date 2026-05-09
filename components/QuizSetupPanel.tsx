@@ -62,7 +62,7 @@ export function QuizSetupPanel({ stats }: QuizSetupPanelProps) {
 
   function handleStart() {
     saveQuizSettings(settings);
-    router.push("/quiz");
+    router.push("/quiz?new=1");
   }
 
   function handleQuickWeakness() {
@@ -73,7 +73,7 @@ export function QuizSetupPanel({ stats }: QuizSetupPanelProps) {
       section: weakestSection?.section
     };
     saveQuizSettings(nextSettings);
-    router.push("/quiz");
+    router.push("/quiz?new=1");
   }
 
   return (

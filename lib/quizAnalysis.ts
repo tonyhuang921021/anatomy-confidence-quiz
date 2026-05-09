@@ -566,7 +566,7 @@ function buildQuestionScoreMap(
   );
   const historyMap = buildQuestionHistoryMap(allSessions);
 
-  return questions.map((question) => {
+  return shuffle(questions).map((question) => {
     const sectionStats = completionMap.get(`${question.chapter}__${question.section}`);
     const history = historyMap.get(question.id);
     const completionPenalty = 100 - (sectionStats?.completionRate ?? 0);
@@ -576,6 +576,7 @@ function buildQuestionScoreMap(
     const overconfidenceWeight = (history?.overconfidence ?? 0) * 20;
     const unseenBonus = history ? 0 : 26;
     const seenPenalty = history ? 60 : 0;
+    const pastExamBonus = question.sourceType === "MOEX_PAST_EXAM" ? 8 : 0;
     const chapterMatchBonus = settings.chapter && settings.chapter === question.chapter ? 18 : 0;
     const sectionMatchBonus = settings.section && settings.section === question.section ? 28 : 0;
     const reviewBonus = settings.mode === "review" && history && history.wrong > 0 ? 48 : 0;
@@ -590,6 +591,7 @@ function buildQuestionScoreMap(
         lowConfidenceWeight +
         overconfidenceWeight +
         unseenBonus +
+        pastExamBonus +
         chapterMatchBonus +
         sectionMatchBonus +
         reviewBonus -

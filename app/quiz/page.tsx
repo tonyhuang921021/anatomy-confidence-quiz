@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { ConfidenceSelector } from "@/components/ConfidenceSelector";
 import { ErrorTypeSelector } from "@/components/ErrorTypeSelector";
 import { QuestionCard } from "@/components/QuestionCard";
@@ -14,6 +14,7 @@ import {
   getModeLabel
 } from "@/lib/quizAnalysis";
 import {
+  clearCurrentSession,
   loadCompletedSessions,
   loadCurrentSession,
   loadQuizSettings,
@@ -96,6 +97,7 @@ function getQuestionByOrder(session: QuizSession) {
 
 export default function QuizPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [mounted, setMounted] = useState(false);
   const [session, setSession] = useState<QuizSession | null>(null);
   const [selectedAnswer, setSelectedAnswer] = useState<OptionKey | undefined>();
@@ -114,10 +116,19 @@ export default function QuizPage() {
     const existing = loadCurrentSession();
     const savedSettings = loadQuizSettings() ?? DEFAULT_QUIZ_SETTINGS;
     const completedSessions = loadCompletedSessions();
-    const nextSession =
-      existing && !existing.completedAt
-        ? existing
-        : createSession(anatomyQuestions, completedSessions, savedSettings);
+    const shouldForceNewSession = searchParams.get("new") === "1";
+    const shouldReuseExisting =
+      !shouldForceNewSession &&
+      existing &&
+      !existing.completedAt &&
+      (existing.questionOrder?.length ?? 0) > 0;
+    const nextSession = shouldReuseExisting
+      ? existing
+      : createSession(anatomyQuestions, completedSessions, savedSettings);
+
+    if (!shouldReuseExisting) {
+      clearCurrentSession();
+    }
 
     setSession(nextSession);
     saveCurrentSession(nextSession);
@@ -134,7 +145,7 @@ export default function QuizPage() {
     }
 
     setMounted(true);
-  }, []);
+  }, [searchParams]);
 
   useEffect(() => {
     async function loadHealth() {
