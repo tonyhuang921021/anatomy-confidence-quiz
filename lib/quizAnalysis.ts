@@ -509,13 +509,50 @@ function shuffle<T>(items: T[]) {
   return [...items].sort(() => Math.random() - 0.5);
 }
 
-function pickShuffledTop<T extends { score: number }>(
+function diversifyBySection<T extends { question: Question; score: number }>(
   items: T[],
   count: number,
-  candidateMultiplier = 3
+  candidateMultiplier = 4
 ) {
-  const candidateCount = Math.min(items.length, Math.max(count, count * candidateMultiplier));
-  return shuffle(items.slice(0, candidateCount)).slice(0, count);
+  const candidateCount = Math.min(items.length, Math.max(count * candidateMultiplier, count));
+  const candidatePool = shuffle(items.slice(0, candidateCount));
+  const sectionBuckets = new Map<string, T[]>();
+
+  candidatePool.forEach((item) => {
+    const key = `${item.question.chapter}__${item.question.section}`;
+    const bucket = sectionBuckets.get(key) ?? [];
+    bucket.push(item);
+    sectionBuckets.set(key, bucket);
+  });
+
+  const result: T[] = [];
+
+  while (result.length < count && sectionBuckets.size > 0) {
+    const sectionKeys = shuffle(Array.from(sectionBuckets.keys()));
+
+    for (const key of sectionKeys) {
+      const bucket = sectionBuckets.get(key);
+      if (!bucket || bucket.length === 0) {
+        sectionBuckets.delete(key);
+        continue;
+      }
+
+      const nextItem = bucket.shift();
+      if (nextItem) {
+        result.push(nextItem);
+      }
+
+      if (bucket.length === 0) {
+        sectionBuckets.delete(key);
+      }
+
+      if (result.length >= count) {
+        break;
+      }
+    }
+  }
+
+  return result;
 }
 
 function buildQuestionScoreMap(
@@ -596,15 +633,15 @@ export function createQuestionOrder(
       .filter((item) => !reviewFirst.some((reviewItem) => reviewItem.question.id === item.question.id))
       .sort((a, b) => b.score - a.score);
 
-    return [...pickShuffledTop(reviewFirst, count, 2), ...pickShuffledTop(fallback, count, 2)]
+    return [...diversifyBySection(reviewFirst, count, 3), ...diversifyBySection(fallback, count, 3)]
       .slice(0, count)
       .map((item) => item.question.id);
   }
 
-  return pickShuffledTop(
+  return diversifyBySection(
     scored.sort((a, b) => b.score - a.score),
     count,
-    3
+    4
   ).map((item) => item.question.id);
 }
 

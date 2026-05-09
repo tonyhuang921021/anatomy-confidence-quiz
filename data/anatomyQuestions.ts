@@ -12,10 +12,10 @@ export const anatomyQuestions: Question[] = [
       "B": "顏面神經（facial nerve, CN VII）",
       "C": "舌咽神經（glossopharyngeal nerve, CN IX）",
       "D": "動眼神經（oculomotor nerve, CN III）",
-      "E": "三叉神經下頷枝（mandibular division of trigeminal nerve, V3）"
+      "E": "三叉神經下頜枝（mandibular division of trigeminal nerve, V3）"
     },
     "answer": "D",
-    "explanation": "正解為 動眼神經（oculomotor nerve, CN III）。CN III 支配 SR、IR、MR、IO 與 levator palpebrae；副交感來自 Edinger-Westphal nucleus。 此題屬基礎定位題，國考常用來確認核心解剖關係。",
+    "explanation": "正解為 動眼神經（oculomotor nerve, CN III）。CN III 支配 SR、IR、MR、IO 與 提上瞼肌（levator palpebrae superioris）；副交感來自 Edinger-Westphal nucleus。",
     "testedConcept": "動眼神經：支配大多數眼外肌，並帶副交感纖維到睫狀神經節（ciliary ganglion）",
     "sourceType": "AI_GENERATED",
     "difficulty": "easy"
@@ -25,16 +25,16 @@ export const anatomyQuestions: Question[] = [
     "subject": "解剖學",
     "chapter": "神經解剖",
     "section": "腦神經",
-    "stem": "準備醫師國考時，若題目線索指向「支配上斜肌（superior oblique），病灶常造成下樓梯時複視」，最應選下列哪一個解剖構造或路徑？",
+    "stem": "下列何者與「支配上斜肌（superior oblique），病灶常造成下樓梯時複視」最相關？",
     "options": {
-      "A": "三叉神經下頷枝（mandibular division of trigeminal nerve, V3）",
+      "A": "三叉神經下頜枝（mandibular division of trigeminal nerve, V3）",
       "B": "顏面神經（facial nerve, CN VII）",
       "C": "動眼神經（oculomotor nerve, CN III）",
       "D": "滑車神經（trochlear nerve, CN IV）",
       "E": "舌咽神經（glossopharyngeal nerve, CN IX）"
     },
     "answer": "D",
-    "explanation": "正解為 滑車神經（trochlear nerve, CN IV）。CN IV 是唯一從腦幹背側出來的腦神經，支配 contralateral superior oblique 後再交叉表現。 此題接近國考常見整合題，需要把結構、路徑與功能連在一起。",
+    "explanation": "正解為 滑車神經（trochlear nerve, CN IV）。CN IV 是唯一從腦幹背側出來的腦神經，支配 對側（contralateral） 上斜肌（superior oblique） 後再交叉表現。",
     "testedConcept": "滑車神經：支配上斜肌（superior oblique），病灶常造成下樓梯時複視",
     "sourceType": "AI_GENERATED",
     "difficulty": "medium"
@@ -44,17 +44,17 @@ export const anatomyQuestions: Question[] = [
     "subject": "解剖學",
     "chapter": "神經解剖",
     "section": "腦神經",
-    "stem": "臨床題幹描述與「負責咀嚼肌運動，也帶舌前 2/3 一般感覺」最相關。若要定位病灶或判斷受影響構造，下列何者最適合？",
+    "stem": "若病灶或手術傷害影響「負責咀嚼肌運動，也帶舌前 2/3 一般感覺」相關功能或解剖關係，最可能涉及下列何者？",
     "options": {
       "A": "顏面神經（facial nerve, CN VII）",
       "B": "舌咽神經（glossopharyngeal nerve, CN IX）",
       "C": "迷走神經（vagus nerve, CN X）",
       "D": "動眼神經（oculomotor nerve, CN III）",
-      "E": "三叉神經下頷枝（mandibular division of trigeminal nerve, V3）"
+      "E": "三叉神經下頜枝（mandibular division of trigeminal nerve, V3）"
     },
     "answer": "E",
-    "explanation": "正解為 三叉神經下頷枝（mandibular division of trigeminal nerve, V3）。V3 是三叉神經唯一混合枝，支配 muscles of mastication。 此題屬較難的臨床定位或易混淆題，重點是辨認關鍵解剖線索。",
-    "testedConcept": "三叉神經下頷枝：負責咀嚼肌運動，也帶舌前 2/3 一般感覺",
+    "explanation": "正解為 三叉神經下頜枝（mandibular division of trigeminal nerve, V3）。V3 是三叉神經唯一混合枝，支配 muscles of mastication。",
+    "testedConcept": "三叉神經下頜枝：負責咀嚼肌運動，也帶舌前 2/3 一般感覺",
     "sourceType": "AI_GENERATED",
     "difficulty": "hard"
   },
@@ -63,16 +63,16 @@ export const anatomyQuestions: Question[] = [
     "subject": "解剖學",
     "chapter": "神經解剖",
     "section": "腦神經",
-    "stem": "準備醫師國考時，若題目線索指向「帶舌前 2/3 味覺，支配臉部表情肌（facial expression muscles）」，最應選下列哪一個解剖構造或路徑？",
+    "stem": "下列何者與「帶舌前 2/3 味覺，支配臉部表情肌（facial expression muscles）」最相關？",
     "options": {
       "A": "顏面神經（facial nerve, CN VII）",
       "B": "滑車神經（trochlear nerve, CN IV）",
       "C": "舌咽神經（glossopharyngeal nerve, CN IX）",
       "D": "動眼神經（oculomotor nerve, CN III）",
-      "E": "三叉神經下頷枝（mandibular division of trigeminal nerve, V3）"
+      "E": "三叉神經下頜枝（mandibular division of trigeminal nerve, V3）"
     },
     "answer": "A",
-    "explanation": "正解為 顏面神經（facial nerve, CN VII）。CN VII 經 chorda tympani 傳舌前 2/3 味覺，也支配 lacrimal、submandibular、sublingual glands。 此題接近國考常見整合題，需要把結構、路徑與功能連在一起。",
+    "explanation": "正解為 顏面神經（facial nerve, CN VII）。CN VII 經 chorda tympani 傳舌前 2/3 味覺，也支配 lacrimal、submandibular、sublingual glands。",
     "testedConcept": "顏面神經：帶舌前 2/3 味覺，支配臉部表情肌（facial expression muscles）",
     "sourceType": "AI_GENERATED",
     "difficulty": "medium"
@@ -82,16 +82,16 @@ export const anatomyQuestions: Question[] = [
     "subject": "解剖學",
     "chapter": "神經解剖",
     "section": "腦神經",
-    "stem": "臨床題幹描述與「負責舌後 1/3 味覺與一般感覺，並傳 carotid sinus/body 感覺」最相關。若要定位病灶或判斷受影響構造，下列何者最適合？",
+    "stem": "下列何者最能解釋「負責舌後 1/3 味覺與一般感覺，並傳 carotid sinus/body 感覺」的解剖基礎？",
     "options": {
       "A": "舌咽神經（glossopharyngeal nerve, CN IX）",
       "B": "動眼神經（oculomotor nerve, CN III）",
       "C": "顏面神經（facial nerve, CN VII）",
       "D": "迷走神經（vagus nerve, CN X）",
-      "E": "三叉神經下頷枝（mandibular division of trigeminal nerve, V3）"
+      "E": "三叉神經下頜枝（mandibular division of trigeminal nerve, V3）"
     },
     "answer": "A",
-    "explanation": "正解為 舌咽神經（glossopharyngeal nerve, CN IX）。CN IX 是咽反射（gag reflex）傳入側，並支配 stylopharyngeus。 此題屬較難的臨床定位或易混淆題，重點是辨認關鍵解剖線索。",
+    "explanation": "正解為 舌咽神經（glossopharyngeal nerve, CN IX）。CN IX 是咽反射（gag reflex）傳入側，並支配 stylopharyngeus。",
     "testedConcept": "舌咽神經：負責舌後 1/3 味覺與一般感覺，並傳 carotid sinus/body 感覺",
     "sourceType": "AI_GENERATED",
     "difficulty": "hard"
@@ -104,13 +104,13 @@ export const anatomyQuestions: Question[] = [
     "stem": "下列何者最符合「支配多數咽喉肌與胸腹腔副交感，是咽反射傳出側」？",
     "options": {
       "A": "動眼神經（oculomotor nerve, CN III）",
-      "B": "三叉神經下頷枝（mandibular division of trigeminal nerve, V3）",
+      "B": "三叉神經下頜枝（mandibular division of trigeminal nerve, V3）",
       "C": "滑車神經（trochlear nerve, CN IV）",
       "D": "顏面神經（facial nerve, CN VII）",
       "E": "迷走神經（vagus nerve, CN X）"
     },
     "answer": "E",
-    "explanation": "正解為 迷走神經（vagus nerve, CN X）。CN X 經 recurrent laryngeal nerve 支配多數 intrinsic laryngeal muscles。 此題屬基礎定位題，國考常用來確認核心解剖關係。",
+    "explanation": "正解為 迷走神經（vagus nerve, CN X）。CN X 經 recurrent laryngeal nerve 支配多數 intrinsic laryngeal muscles。",
     "testedConcept": "迷走神經：支配多數咽喉肌與胸腹腔副交感，是咽反射傳出側",
     "sourceType": "AI_GENERATED",
     "difficulty": "easy"
@@ -120,16 +120,16 @@ export const anatomyQuestions: Question[] = [
     "subject": "解剖學",
     "chapter": "神經解剖",
     "section": "腦神經",
-    "stem": "準備醫師國考時，若題目線索指向「支配大多數眼外肌，並帶副交感纖維到睫狀神經節（ciliary ganglion）」，最應選下列哪一個解剖構造或路徑？",
+    "stem": "關於「支配大多數眼外肌，並帶副交感纖維到睫狀神經節（ciliary ganglion）」所涉及的解剖構造，下列何者最適合？",
     "options": {
       "A": "顏面神經（facial nerve, CN VII）",
       "B": "滑車神經（trochlear nerve, CN IV）",
       "C": "舌咽神經（glossopharyngeal nerve, CN IX）",
-      "D": "三叉神經下頷枝（mandibular division of trigeminal nerve, V3）",
+      "D": "三叉神經下頜枝（mandibular division of trigeminal nerve, V3）",
       "E": "動眼神經（oculomotor nerve, CN III）"
     },
     "answer": "E",
-    "explanation": "正解為 動眼神經（oculomotor nerve, CN III）。CN III 支配 SR、IR、MR、IO 與 levator palpebrae；副交感來自 Edinger-Westphal nucleus。 此題接近國考常見整合題，需要把結構、路徑與功能連在一起。",
+    "explanation": "正解為 動眼神經（oculomotor nerve, CN III）。CN III 支配 SR、IR、MR、IO 與 提上瞼肌（levator palpebrae superioris）；副交感來自 Edinger-Westphal nucleus。",
     "testedConcept": "動眼神經：支配大多數眼外肌，並帶副交感纖維到睫狀神經節（ciliary ganglion）",
     "sourceType": "AI_GENERATED",
     "difficulty": "medium"
@@ -139,16 +139,16 @@ export const anatomyQuestions: Question[] = [
     "subject": "解剖學",
     "chapter": "神經解剖",
     "section": "腦神經",
-    "stem": "臨床題幹描述與「支配上斜肌（superior oblique），病灶常造成下樓梯時複視」最相關。若要定位病灶或判斷受影響構造，下列何者最適合？",
+    "stem": "下列何者最能解釋「支配上斜肌（superior oblique），病灶常造成下樓梯時複視」的解剖基礎？",
     "options": {
-      "A": "三叉神經下頷枝（mandibular division of trigeminal nerve, V3）",
+      "A": "三叉神經下頜枝（mandibular division of trigeminal nerve, V3）",
       "B": "舌咽神經（glossopharyngeal nerve, CN IX）",
       "C": "滑車神經（trochlear nerve, CN IV）",
       "D": "顏面神經（facial nerve, CN VII）",
       "E": "迷走神經（vagus nerve, CN X）"
     },
     "answer": "C",
-    "explanation": "正解為 滑車神經（trochlear nerve, CN IV）。CN IV 是唯一從腦幹背側出來的腦神經，支配 contralateral superior oblique 後再交叉表現。 此題屬較難的臨床定位或易混淆題，重點是辨認關鍵解剖線索。",
+    "explanation": "正解為 滑車神經（trochlear nerve, CN IV）。CN IV 是唯一從腦幹背側出來的腦神經，支配 對側（contralateral） 上斜肌（superior oblique） 後再交叉表現。",
     "testedConcept": "滑車神經：支配上斜肌（superior oblique），病灶常造成下樓梯時複視",
     "sourceType": "AI_GENERATED",
     "difficulty": "hard"
@@ -158,17 +158,17 @@ export const anatomyQuestions: Question[] = [
     "subject": "解剖學",
     "chapter": "神經解剖",
     "section": "腦神經",
-    "stem": "準備醫師國考時，若題目線索指向「負責咀嚼肌運動，也帶舌前 2/3 一般感覺」，最應選下列哪一個解剖構造或路徑？",
+    "stem": "關於「負責咀嚼肌運動，也帶舌前 2/3 一般感覺」所涉及的解剖構造，下列何者最適合？",
     "options": {
       "A": "迷走神經（vagus nerve, CN X）",
       "B": "顏面神經（facial nerve, CN VII）",
-      "C": "三叉神經下頷枝（mandibular division of trigeminal nerve, V3）",
+      "C": "三叉神經下頜枝（mandibular division of trigeminal nerve, V3）",
       "D": "滑車神經（trochlear nerve, CN IV）",
       "E": "動眼神經（oculomotor nerve, CN III）"
     },
     "answer": "C",
-    "explanation": "正解為 三叉神經下頷枝（mandibular division of trigeminal nerve, V3）。V3 是三叉神經唯一混合枝，支配 muscles of mastication。 此題接近國考常見整合題，需要把結構、路徑與功能連在一起。",
-    "testedConcept": "三叉神經下頷枝：負責咀嚼肌運動，也帶舌前 2/3 一般感覺",
+    "explanation": "正解為 三叉神經下頜枝（mandibular division of trigeminal nerve, V3）。V3 是三叉神經唯一混合枝，支配 muscles of mastication。",
+    "testedConcept": "三叉神經下頜枝：負責咀嚼肌運動，也帶舌前 2/3 一般感覺",
     "sourceType": "AI_GENERATED",
     "difficulty": "medium"
   },
@@ -177,7 +177,7 @@ export const anatomyQuestions: Question[] = [
     "subject": "解剖學",
     "chapter": "神經解剖",
     "section": "腦幹核區",
-    "stem": "臨床題幹描述與「支配咽、喉相關橫紋肌，涉及 CN IX、X、cranial XI」最相關。若要定位病灶或判斷受影響構造，下列何者最適合？",
+    "stem": "關於「支配咽、喉相關橫紋肌，涉及 CN IX、X、cranial XI」的解剖判斷，下列何者最適合？",
     "options": {
       "A": "三叉神經脊束核（spinal trigeminal nucleus）",
       "B": "動眼神經副核（Edinger-Westphal nucleus）",
@@ -186,7 +186,7 @@ export const anatomyQuestions: Question[] = [
       "E": "前庭神經核（vestibular nuclei）"
     },
     "answer": "C",
-    "explanation": "正解為 疑核（nucleus ambiguus）。疑核病灶可造成吞嚥困難、聲音沙啞、軟顎下垂。 此題屬較難的臨床定位或易混淆題，重點是辨認關鍵解剖線索。",
+    "explanation": "正解為 疑核（nucleus ambiguus）。疑核病灶可造成吞嚥困難、聲音沙啞、軟顎下垂。重點在於辨認 支配咽、喉相關橫紋肌，涉及 CN IX、X、cranial XI 與 疑核（nucleus ambiguus） 的關聯。",
     "testedConcept": "疑核：支配咽、喉相關橫紋肌，涉及 CN IX、X、cranial XI",
     "sourceType": "AI_GENERATED",
     "difficulty": "hard"
@@ -205,7 +205,7 @@ export const anatomyQuestions: Question[] = [
       "E": "疑核（nucleus ambiguus）"
     },
     "answer": "C",
-    "explanation": "正解為 孤束核（nucleus solitarius）。孤束核是味覺與 baroreceptor/chemoreceptor 傳入的重要中繼。 此題屬基礎定位題，國考常用來確認核心解剖關係。",
+    "explanation": "正解為 孤束核（nucleus solitarius）。孤束核是味覺與 baroreceptor/chemoreceptor 傳入的重要中繼。",
     "testedConcept": "孤束核：接收味覺與內臟感覺，包含 CN VII、IX、X 的 visceral afferent",
     "sourceType": "AI_GENERATED",
     "difficulty": "easy"
@@ -215,7 +215,7 @@ export const anatomyQuestions: Question[] = [
     "subject": "解剖學",
     "chapter": "神經解剖",
     "section": "腦幹核區",
-    "stem": "準備醫師國考時，若題目線索指向「支配同側舌肌，病灶時伸舌偏向病灶側」，最應選下列哪一個解剖構造或路徑？",
+    "stem": "下列何者與「支配同側舌肌，病灶時伸舌偏向病灶側」最相關？",
     "options": {
       "A": "動眼神經副核（Edinger-Westphal nucleus）",
       "B": "前庭神經核（vestibular nuclei）",
@@ -224,7 +224,7 @@ export const anatomyQuestions: Question[] = [
       "E": "舌下神經核（hypoglossal nucleus）"
     },
     "answer": "E",
-    "explanation": "正解為 舌下神經核（hypoglossal nucleus）。LMN lesion of CN XII causes tongue deviation toward lesion。 此題接近國考常見整合題，需要把結構、路徑與功能連在一起。",
+    "explanation": "正解為 舌下神經核（hypoglossal nucleus）。LMN lesion of CN XII causes tongue deviation toward lesion。",
     "testedConcept": "舌下神經核：支配同側舌肌，病灶時伸舌偏向病灶側",
     "sourceType": "AI_GENERATED",
     "difficulty": "medium"
@@ -234,7 +234,7 @@ export const anatomyQuestions: Question[] = [
     "subject": "解剖學",
     "chapter": "神經解剖",
     "section": "腦幹核區",
-    "stem": "臨床題幹描述與「提供 CN III 副交感節前纖維，控制縮瞳與調節」最相關。若要定位病灶或判斷受影響構造，下列何者最適合？",
+    "stem": "關於「提供 CN III 副交感節前纖維，控制縮瞳與調節」的解剖判斷，下列何者最適合？",
     "options": {
       "A": "舌下神經核（hypoglossal nucleus）",
       "B": "前庭神經核（vestibular nuclei）",
@@ -243,7 +243,7 @@ export const anatomyQuestions: Question[] = [
       "E": "孤束核（nucleus solitarius）"
     },
     "answer": "D",
-    "explanation": "正解為 動眼神經副核（Edinger-Westphal nucleus）。纖維至 ciliary ganglion，再到 sphincter pupillae 與 ciliary muscle。 此題屬較難的臨床定位或易混淆題，重點是辨認關鍵解剖線索。",
+    "explanation": "正解為 動眼神經副核（Edinger-Westphal nucleus）。纖維至 ciliary ganglion，再到 sphincter pupillae 與 ciliary muscle。",
     "testedConcept": "動眼神經副核：提供 CN III 副交感節前纖維，控制縮瞳與調節",
     "sourceType": "AI_GENERATED",
     "difficulty": "hard"
@@ -253,7 +253,7 @@ export const anatomyQuestions: Question[] = [
     "subject": "解剖學",
     "chapter": "神經解剖",
     "section": "腦幹核區",
-    "stem": "準備醫師國考時，若題目線索指向「接收臉部痛溫覺（pain and temperature）」，最應選下列哪一個解剖構造或路徑？",
+    "stem": "下列何者與「接收臉部痛溫覺（pain and temperature）」最相關？",
     "options": {
       "A": "三叉神經脊束核（spinal trigeminal nucleus）",
       "B": "動眼神經副核（Edinger-Westphal nucleus）",
@@ -262,7 +262,7 @@ export const anatomyQuestions: Question[] = [
       "E": "舌下神經核（hypoglossal nucleus）"
     },
     "answer": "A",
-    "explanation": "正解為 三叉神經脊束核（spinal trigeminal nucleus）。此核從橋腦延伸到延髓與上頸髓，和臉部痛溫覺相關。 此題接近國考常見整合題，需要把結構、路徑與功能連在一起。",
+    "explanation": "正解為 三叉神經脊束核（spinal trigeminal nucleus）。此核從橋腦延伸到延髓與上頸髓，和臉部痛溫覺相關。",
     "testedConcept": "三叉神經脊束核：接收臉部痛溫覺（pain and temperature）",
     "sourceType": "AI_GENERATED",
     "difficulty": "medium"
@@ -272,7 +272,7 @@ export const anatomyQuestions: Question[] = [
     "subject": "解剖學",
     "chapter": "神經解剖",
     "section": "腦幹核區",
-    "stem": "臨床題幹描述與「參與前庭眼反射（vestibulo-ocular reflex, VOR）與平衡」最相關。若要定位病灶或判斷受影響構造，下列何者最適合？",
+    "stem": "若病灶或手術傷害影響「參與前庭眼反射（vestibulo-ocular reflex, VOR）與平衡」相關功能或解剖關係，最可能涉及下列何者？",
     "options": {
       "A": "前庭神經核（vestibular nuclei）",
       "B": "孤束核（nucleus solitarius）",
@@ -281,7 +281,7 @@ export const anatomyQuestions: Question[] = [
       "E": "舌下神經核（hypoglossal nucleus）"
     },
     "answer": "A",
-    "explanation": "正解為 前庭神經核（vestibular nuclei）。可透過 MLF 連到眼球運動核，維持凝視穩定。 此題屬較難的臨床定位或易混淆題，重點是辨認關鍵解剖線索。",
+    "explanation": "正解為 前庭神經核（vestibular nuclei）。可透過 MLF 連到眼球運動核，維持凝視穩定。重點在於辨認 參與前庭眼反射（vestibulo-ocular reflex, VOR）與平衡 與 前庭神經核（vestibular nuclei） 的關聯。",
     "testedConcept": "前庭神經核：參與前庭眼反射（vestibulo-ocular reflex, VOR）與平衡",
     "sourceType": "AI_GENERATED",
     "difficulty": "hard"
@@ -300,7 +300,7 @@ export const anatomyQuestions: Question[] = [
       "E": "疑核（nucleus ambiguus）"
     },
     "answer": "E",
-    "explanation": "正解為 疑核（nucleus ambiguus）。疑核病灶可造成吞嚥困難、聲音沙啞、軟顎下垂。 此題屬基礎定位題，國考常用來確認核心解剖關係。",
+    "explanation": "正解為 疑核（nucleus ambiguus）。疑核病灶可造成吞嚥困難、聲音沙啞、軟顎下垂。重點在於辨認 支配咽、喉相關橫紋肌，涉及 CN IX、X、cranial XI 與 疑核（nucleus ambiguus） 的關聯。",
     "testedConcept": "疑核：支配咽、喉相關橫紋肌，涉及 CN IX、X、cranial XI",
     "sourceType": "AI_GENERATED",
     "difficulty": "easy"
@@ -310,7 +310,7 @@ export const anatomyQuestions: Question[] = [
     "subject": "解剖學",
     "chapter": "神經解剖",
     "section": "腦幹核區",
-    "stem": "準備醫師國考時，若題目線索指向「接收味覺與內臟感覺，包含 CN VII、IX、X 的 visceral afferent」，最應選下列哪一個解剖構造或路徑？",
+    "stem": "關於「接收味覺與內臟感覺，包含 CN VII、IX、X 的 visceral afferent」所涉及的解剖構造，下列何者最適合？",
     "options": {
       "A": "動眼神經副核（Edinger-Westphal nucleus）",
       "B": "孤束核（nucleus solitarius）",
@@ -319,7 +319,7 @@ export const anatomyQuestions: Question[] = [
       "E": "前庭神經核（vestibular nuclei）"
     },
     "answer": "B",
-    "explanation": "正解為 孤束核（nucleus solitarius）。孤束核是味覺與 baroreceptor/chemoreceptor 傳入的重要中繼。 此題接近國考常見整合題，需要把結構、路徑與功能連在一起。",
+    "explanation": "正解為 孤束核（nucleus solitarius）。孤束核是味覺與 baroreceptor/chemoreceptor 傳入的重要中繼。",
     "testedConcept": "孤束核：接收味覺與內臟感覺，包含 CN VII、IX、X 的 visceral afferent",
     "sourceType": "AI_GENERATED",
     "difficulty": "medium"
@@ -329,7 +329,7 @@ export const anatomyQuestions: Question[] = [
     "subject": "解剖學",
     "chapter": "神經解剖",
     "section": "腦幹核區",
-    "stem": "臨床題幹描述與「支配同側舌肌，病灶時伸舌偏向病灶側」最相關。若要定位病灶或判斷受影響構造，下列何者最適合？",
+    "stem": "若病灶或手術傷害影響「支配同側舌肌，病灶時伸舌偏向病灶側」相關功能或解剖關係，最可能涉及下列何者？",
     "options": {
       "A": "疑核（nucleus ambiguus）",
       "B": "前庭神經核（vestibular nuclei）",
@@ -338,7 +338,7 @@ export const anatomyQuestions: Question[] = [
       "E": "舌下神經核（hypoglossal nucleus）"
     },
     "answer": "E",
-    "explanation": "正解為 舌下神經核（hypoglossal nucleus）。LMN lesion of CN XII causes tongue deviation toward lesion。 此題屬較難的臨床定位或易混淆題，重點是辨認關鍵解剖線索。",
+    "explanation": "正解為 舌下神經核（hypoglossal nucleus）。LMN lesion of CN XII causes tongue deviation toward lesion。",
     "testedConcept": "舌下神經核：支配同側舌肌，病灶時伸舌偏向病灶側",
     "sourceType": "AI_GENERATED",
     "difficulty": "hard"
@@ -348,7 +348,7 @@ export const anatomyQuestions: Question[] = [
     "subject": "解剖學",
     "chapter": "神經解剖",
     "section": "視覺路徑",
-    "stem": "準備醫師國考時，若題目線索指向「鼻側視網膜纖維交叉，壓迫會造成雙顳側偏盲（bitemporal hemianopia）」，最應選下列哪一個解剖構造或路徑？",
+    "stem": "關於「鼻側視網膜纖維交叉，壓迫會造成雙顳側偏盲（bitemporal hemianopia）」所涉及的解剖構造，下列何者最適合？",
     "options": {
       "A": "Meyer’s loop（temporal optic radiation）",
       "B": "視交叉（optic chiasm）",
@@ -357,7 +357,7 @@ export const anatomyQuestions: Question[] = [
       "E": "初級視覺皮質（primary visual cortex, V1）"
     },
     "answer": "B",
-    "explanation": "正解為 視交叉（optic chiasm）。常見於 pituitary adenoma 壓迫 optic chiasm。 此題接近國考常見整合題，需要把結構、路徑與功能連在一起。",
+    "explanation": "正解為 視交叉（optic chiasm）。常見於 pituitary adenoma 壓迫 optic chiasm。",
     "testedConcept": "視交叉：鼻側視網膜纖維交叉，壓迫會造成雙顳側偏盲（bitemporal hemianopia）",
     "sourceType": "AI_GENERATED",
     "difficulty": "medium"
@@ -367,7 +367,7 @@ export const anatomyQuestions: Question[] = [
     "subject": "解剖學",
     "chapter": "神經解剖",
     "section": "視覺路徑",
-    "stem": "臨床題幹描述與「丘腦中的視覺中繼站，接收 optic tract 後投射到 visual cortex」最相關。若要定位病灶或判斷受影響構造，下列何者最適合？",
+    "stem": "下列何者最能解釋「丘腦中的視覺中繼站，接收 optic tract 後投射到 visual cortex」的解剖基礎？",
     "options": {
       "A": "視交叉（optic chiasm）",
       "B": "外側膝狀體（lateral geniculate nucleus, LGN）",
@@ -376,7 +376,7 @@ export const anatomyQuestions: Question[] = [
       "E": "黃斑保留（macular sparing）"
     },
     "answer": "B",
-    "explanation": "正解為 外側膝狀體（lateral geniculate nucleus, LGN）。LGN 屬於 thalamus，之後經 optic radiation 到 primary visual cortex。 此題屬較難的臨床定位或易混淆題，重點是辨認關鍵解剖線索。",
+    "explanation": "正解為 外側膝狀體（lateral geniculate nucleus, LGN）。LGN 屬於 thalamus，之後經 optic radiation 到 primary visual cortex。",
     "testedConcept": "外側膝狀體：丘腦中的視覺中繼站，接收 optic tract 後投射到 visual cortex",
     "sourceType": "AI_GENERATED",
     "difficulty": "hard"
@@ -386,7 +386,7 @@ export const anatomyQuestions: Question[] = [
     "subject": "解剖學",
     "chapter": "神經解剖",
     "section": "視覺路徑",
-    "stem": "下列何者最符合「走顳葉，受損造成對側上象限盲（contralateral superior quadrantanopia）」？",
+    "stem": "下列何者最符合「走顳葉，受損造成對側上象限盲（對側（contralateral） superior quadrantanopia）」？",
     "options": {
       "A": "初級視覺皮質（primary visual cortex, V1）",
       "B": "視交叉（optic chiasm）",
@@ -395,8 +395,8 @@ export const anatomyQuestions: Question[] = [
       "E": "頂葉視放射（parietal optic radiation）"
     },
     "answer": "C",
-    "explanation": "正解為 Meyer’s loop（temporal optic radiation）。口訣：pie in the sky；顳葉病灶影響上視野。 此題屬基礎定位題，國考常用來確認核心解剖關係。",
-    "testedConcept": "Meyer’s loop：走顳葉，受損造成對側上象限盲（contralateral superior quadrantanopia）",
+    "explanation": "正解為 Meyer’s loop（temporal optic radiation）。口訣：pie in the sky；顳葉病灶影響上視野。",
+    "testedConcept": "Meyer’s loop：走顳葉，受損造成對側上象限盲（對側（contralateral） superior quadrantanopia）",
     "sourceType": "AI_GENERATED",
     "difficulty": "easy"
   },
@@ -405,7 +405,7 @@ export const anatomyQuestions: Question[] = [
     "subject": "解剖學",
     "chapter": "神經解剖",
     "section": "視覺路徑",
-    "stem": "準備醫師國考時，若題目線索指向「受損造成對側下象限盲（contralateral inferior quadrantanopia）」，最應選下列哪一個解剖構造或路徑？",
+    "stem": "下列何者與「受損造成對側下象限盲（對側（contralateral） inferior quadrantanopia）」最相關？",
     "options": {
       "A": "視交叉（optic chiasm）",
       "B": "外側膝狀體（lateral geniculate nucleus, LGN）",
@@ -414,8 +414,8 @@ export const anatomyQuestions: Question[] = [
       "E": "Meyer’s loop（temporal optic radiation）"
     },
     "answer": "D",
-    "explanation": "正解為 頂葉視放射（parietal optic radiation）。頂葉纖維對應 inferior visual field。 此題接近國考常見整合題，需要把結構、路徑與功能連在一起。",
-    "testedConcept": "頂葉視放射：受損造成對側下象限盲（contralateral inferior quadrantanopia）",
+    "explanation": "正解為 頂葉視放射（parietal optic radiation）。頂葉纖維對應 inferior visual field。",
+    "testedConcept": "頂葉視放射：受損造成對側下象限盲（對側（contralateral） inferior quadrantanopia）",
     "sourceType": "AI_GENERATED",
     "difficulty": "medium"
   },
@@ -424,7 +424,7 @@ export const anatomyQuestions: Question[] = [
     "subject": "解剖學",
     "chapter": "神經解剖",
     "section": "視覺路徑",
-    "stem": "臨床題幹描述與「位於枕葉距狀溝（calcarine sulcus）周圍」最相關。若要定位病灶或判斷受影響構造，下列何者最適合？",
+    "stem": "下列何者最能解釋「位於枕葉距狀溝（calcarine sulcus）周圍」的解剖基礎？",
     "options": {
       "A": "Meyer’s loop（temporal optic radiation）",
       "B": "外側膝狀體（lateral geniculate nucleus, LGN）",
@@ -433,7 +433,7 @@ export const anatomyQuestions: Question[] = [
       "E": "視交叉（optic chiasm）"
     },
     "answer": "C",
-    "explanation": "正解為 初級視覺皮質（primary visual cortex, V1）。PCA 供應 V1，多數枕葉病灶會造成對側同名偏盲。 此題屬較難的臨床定位或易混淆題，重點是辨認關鍵解剖線索。",
+    "explanation": "正解為 初級視覺皮質（primary visual cortex, V1）。PCA 供應 V1，多數枕葉病灶會造成對側同名偏盲。",
     "testedConcept": "初級視覺皮質：位於枕葉距狀溝（calcarine sulcus）周圍",
     "sourceType": "AI_GENERATED",
     "difficulty": "hard"
@@ -443,7 +443,7 @@ export const anatomyQuestions: Question[] = [
     "subject": "解剖學",
     "chapter": "神經解剖",
     "section": "視覺路徑",
-    "stem": "準備醫師國考時，若題目線索指向「PCA 梗塞造成同名偏盲時，中央視野可能保留」，最應選下列哪一個解剖構造或路徑？",
+    "stem": "下列何者與「PCA 梗塞造成同名偏盲時，中央視野可能保留」最相關？",
     "options": {
       "A": "視交叉（optic chiasm）",
       "B": "初級視覺皮質（primary visual cortex, V1）",
@@ -452,7 +452,7 @@ export const anatomyQuestions: Question[] = [
       "E": "黃斑保留（macular sparing）"
     },
     "answer": "E",
-    "explanation": "正解為 黃斑保留（macular sparing）。與 macular cortex 可能有 MCA collateral supply 有關。 此題接近國考常見整合題，需要把結構、路徑與功能連在一起。",
+    "explanation": "正解為 黃斑保留（macular sparing）。與 macular cortex 可能有 MCA collateral supply 有關。",
     "testedConcept": "黃斑保留：PCA 梗塞造成同名偏盲時，中央視野可能保留",
     "sourceType": "AI_GENERATED",
     "difficulty": "medium"
@@ -462,7 +462,7 @@ export const anatomyQuestions: Question[] = [
     "subject": "解剖學",
     "chapter": "神經解剖",
     "section": "視覺路徑",
-    "stem": "臨床題幹描述與「鼻側視網膜纖維交叉，壓迫會造成雙顳側偏盲（bitemporal hemianopia）」最相關。若要定位病灶或判斷受影響構造，下列何者最適合？",
+    "stem": "關於「鼻側視網膜纖維交叉，壓迫會造成雙顳側偏盲（bitemporal hemianopia）」的解剖判斷，下列何者最適合？",
     "options": {
       "A": "頂葉視放射（parietal optic radiation）",
       "B": "Meyer’s loop（temporal optic radiation）",
@@ -471,7 +471,7 @@ export const anatomyQuestions: Question[] = [
       "E": "黃斑保留（macular sparing）"
     },
     "answer": "C",
-    "explanation": "正解為 視交叉（optic chiasm）。常見於 pituitary adenoma 壓迫 optic chiasm。 此題屬較難的臨床定位或易混淆題，重點是辨認關鍵解剖線索。",
+    "explanation": "正解為 視交叉（optic chiasm）。常見於 pituitary adenoma 壓迫 optic chiasm。",
     "testedConcept": "視交叉：鼻側視網膜纖維交叉，壓迫會造成雙顳側偏盲（bitemporal hemianopia）",
     "sourceType": "AI_GENERATED",
     "difficulty": "hard"
@@ -490,7 +490,7 @@ export const anatomyQuestions: Question[] = [
       "E": "外側膝狀體（lateral geniculate nucleus, LGN）"
     },
     "answer": "E",
-    "explanation": "正解為 外側膝狀體（lateral geniculate nucleus, LGN）。LGN 屬於 thalamus，之後經 optic radiation 到 primary visual cortex。 此題屬基礎定位題，國考常用來確認核心解剖關係。",
+    "explanation": "正解為 外側膝狀體（lateral geniculate nucleus, LGN）。LGN 屬於 thalamus，之後經 optic radiation 到 primary visual cortex。",
     "testedConcept": "外側膝狀體：丘腦中的視覺中繼站，接收 optic tract 後投射到 visual cortex",
     "sourceType": "AI_GENERATED",
     "difficulty": "easy"
@@ -500,7 +500,7 @@ export const anatomyQuestions: Question[] = [
     "subject": "解剖學",
     "chapter": "神經解剖",
     "section": "視覺路徑",
-    "stem": "準備醫師國考時，若題目線索指向「走顳葉，受損造成對側上象限盲（contralateral superior quadrantanopia）」，最應選下列哪一個解剖構造或路徑？",
+    "stem": "關於「走顳葉，受損造成對側上象限盲（對側（contralateral） superior quadrantanopia）」所涉及的解剖構造，下列何者最適合？",
     "options": {
       "A": "黃斑保留（macular sparing）",
       "B": "Meyer’s loop（temporal optic radiation）",
@@ -509,8 +509,8 @@ export const anatomyQuestions: Question[] = [
       "E": "外側膝狀體（lateral geniculate nucleus, LGN）"
     },
     "answer": "B",
-    "explanation": "正解為 Meyer’s loop（temporal optic radiation）。口訣：pie in the sky；顳葉病灶影響上視野。 此題接近國考常見整合題，需要把結構、路徑與功能連在一起。",
-    "testedConcept": "Meyer’s loop：走顳葉，受損造成對側上象限盲（contralateral superior quadrantanopia）",
+    "explanation": "正解為 Meyer’s loop（temporal optic radiation）。口訣：pie in the sky；顳葉病灶影響上視野。",
+    "testedConcept": "Meyer’s loop：走顳葉，受損造成對側上象限盲（對側（contralateral） superior quadrantanopia）",
     "sourceType": "AI_GENERATED",
     "difficulty": "medium"
   },
@@ -519,7 +519,7 @@ export const anatomyQuestions: Question[] = [
     "subject": "解剖學",
     "chapter": "神經解剖",
     "section": "聽覺與前庭路徑",
-    "stem": "臨床題幹描述與「聽覺第一級神經元，位於耳蝸（cochlea）」最相關。若要定位病灶或判斷受影響構造，下列何者最適合？",
+    "stem": "關於「聽覺第一級神經元，位於耳蝸（cochlea）」的解剖判斷，下列何者最適合？",
     "options": {
       "A": "螺旋神經節（spiral ganglion）",
       "B": "半規管（semicircular canals）",
@@ -528,7 +528,7 @@ export const anatomyQuestions: Question[] = [
       "E": "上橄欖核（superior olivary nucleus）"
     },
     "answer": "A",
-    "explanation": "正解為 螺旋神經節（spiral ganglion）。spiral ganglion 的纖維組成 cochlear nerve。 此題屬較難的臨床定位或易混淆題，重點是辨認關鍵解剖線索。",
+    "explanation": "正解為 螺旋神經節（spiral ganglion）。spiral ganglion 的纖維組成 cochlear nerve。",
     "testedConcept": "螺旋神經節：聽覺第一級神經元，位於耳蝸（cochlea）",
     "sourceType": "AI_GENERATED",
     "difficulty": "hard"
@@ -538,7 +538,7 @@ export const anatomyQuestions: Question[] = [
     "subject": "解剖學",
     "chapter": "神經解剖",
     "section": "聽覺與前庭路徑",
-    "stem": "準備醫師國考時，若題目線索指向「丘腦的聽覺中繼站，投射到 primary auditory cortex」，最應選下列哪一個解剖構造或路徑？",
+    "stem": "關於「丘腦的聽覺中繼站，投射到 primary auditory cortex」所涉及的解剖構造，下列何者最適合？",
     "options": {
       "A": "半規管（semicircular canals）",
       "B": "前庭眼反射（vestibulo-ocular reflex, VOR）",
@@ -547,7 +547,7 @@ export const anatomyQuestions: Question[] = [
       "E": "內側膝狀體（medial geniculate body, MGB）"
     },
     "answer": "E",
-    "explanation": "正解為 內側膝狀體（medial geniculate body, MGB）。聽覺路徑由 inferior colliculus 到 MGB 再到 temporal cortex。 此題接近國考常見整合題，需要把結構、路徑與功能連在一起。",
+    "explanation": "正解為 內側膝狀體（medial geniculate body, MGB）。聽覺路徑由 inferior colliculus 到 MGB 再到 temporal cortex。",
     "testedConcept": "內側膝狀體：丘腦的聽覺中繼站，投射到 primary auditory cortex",
     "sourceType": "AI_GENERATED",
     "difficulty": "medium"
@@ -557,7 +557,7 @@ export const anatomyQuestions: Question[] = [
     "subject": "解剖學",
     "chapter": "神經解剖",
     "section": "聽覺與前庭路徑",
-    "stem": "臨床題幹描述與「參與雙耳聲音定位（sound localization）」最相關。若要定位病灶或判斷受影響構造，下列何者最適合？",
+    "stem": "若病灶或手術傷害影響「參與雙耳聲音定位（sound localization）」相關功能或解剖關係，最可能涉及下列何者？",
     "options": {
       "A": "螺旋神經節（spiral ganglion）",
       "B": "上橄欖核（superior olivary nucleus）",
@@ -566,7 +566,7 @@ export const anatomyQuestions: Question[] = [
       "E": "橢圓囊與球囊（utricle and saccule）"
     },
     "answer": "B",
-    "explanation": "正解為 上橄欖核（superior olivary nucleus）。比較兩耳時間差與強度差，協助定位聲源。 此題屬較難的臨床定位或易混淆題，重點是辨認關鍵解剖線索。",
+    "explanation": "正解為 上橄欖核（superior olivary nucleus）。比較兩耳時間差與強度差，協助定位聲源。重點在於辨認 參與雙耳聲音定位（sound localization） 與 上橄欖核（superior olivary nucleus） 的關聯。",
     "testedConcept": "上橄欖核：參與雙耳聲音定位（sound localization）",
     "sourceType": "AI_GENERATED",
     "difficulty": "hard"
@@ -585,7 +585,7 @@ export const anatomyQuestions: Question[] = [
       "E": "上橄欖核（superior olivary nucleus）"
     },
     "answer": "C",
-    "explanation": "正解為 前庭眼反射（vestibulo-ocular reflex, VOR）。VOR 需要 vestibular nuclei、MLF 與眼球運動核合作。 此題屬基礎定位題，國考常用來確認核心解剖關係。",
+    "explanation": "正解為 前庭眼反射（vestibulo-ocular reflex, VOR）。VOR 需要 vestibular nuclei、MLF 與眼球運動核合作。",
     "testedConcept": "前庭眼反射：頭轉動時讓眼球反向補償，維持視線穩定",
     "sourceType": "AI_GENERATED",
     "difficulty": "easy"
@@ -595,7 +595,7 @@ export const anatomyQuestions: Question[] = [
     "subject": "解剖學",
     "chapter": "神經解剖",
     "section": "聽覺與前庭路徑",
-    "stem": "準備醫師國考時，若題目線索指向「偵測線性加速度與頭部相對重力方向」，最應選下列哪一個解剖構造或路徑？",
+    "stem": "下列何者與「偵測線性加速度與頭部相對重力方向」最相關？",
     "options": {
       "A": "橢圓囊與球囊（utricle and saccule）",
       "B": "螺旋神經節（spiral ganglion）",
@@ -604,7 +604,7 @@ export const anatomyQuestions: Question[] = [
       "E": "前庭眼反射（vestibulo-ocular reflex, VOR）"
     },
     "answer": "A",
-    "explanation": "正解為 橢圓囊與球囊（utricle and saccule）。semicircular canals 偵測角加速度；otolith organs 偵測線性加速度。 此題接近國考常見整合題，需要把結構、路徑與功能連在一起。",
+    "explanation": "正解為 橢圓囊與球囊（utricle and saccule）。semicircular canals 偵測角加速度；otolith organs 偵測線性加速度。",
     "testedConcept": "橢圓囊與球囊：偵測線性加速度與頭部相對重力方向",
     "sourceType": "AI_GENERATED",
     "difficulty": "medium"
@@ -614,7 +614,7 @@ export const anatomyQuestions: Question[] = [
     "subject": "解剖學",
     "chapter": "神經解剖",
     "section": "聽覺與前庭路徑",
-    "stem": "臨床題幹描述與「偵測角加速度（angular acceleration）」最相關。若要定位病灶或判斷受影響構造，下列何者最適合？",
+    "stem": "若病灶或手術傷害影響「偵測角加速度（angular acceleration）」相關功能或解剖關係，最可能涉及下列何者？",
     "options": {
       "A": "內側膝狀體（medial geniculate body, MGB）",
       "B": "螺旋神經節（spiral ganglion）",
@@ -623,7 +623,7 @@ export const anatomyQuestions: Question[] = [
       "E": "橢圓囊與球囊（utricle and saccule）"
     },
     "answer": "D",
-    "explanation": "正解為 半規管（semicircular canals）。內淋巴流動彎曲 cupula，改變 hair cell firing。 此題屬較難的臨床定位或易混淆題，重點是辨認關鍵解剖線索。",
+    "explanation": "正解為 半規管（semicircular canals）。內淋巴流動彎曲 cupula，改變 hair cell firing。",
     "testedConcept": "半規管：偵測角加速度（angular acceleration）",
     "sourceType": "AI_GENERATED",
     "difficulty": "hard"
@@ -633,7 +633,7 @@ export const anatomyQuestions: Question[] = [
     "subject": "解剖學",
     "chapter": "神經解剖",
     "section": "聽覺與前庭路徑",
-    "stem": "準備醫師國考時，若題目線索指向「聽覺第一級神經元，位於耳蝸（cochlea）」，最應選下列哪一個解剖構造或路徑？",
+    "stem": "下列何者與「聽覺第一級神經元，位於耳蝸（cochlea）」最相關？",
     "options": {
       "A": "半規管（semicircular canals）",
       "B": "上橄欖核（superior olivary nucleus）",
@@ -642,7 +642,7 @@ export const anatomyQuestions: Question[] = [
       "E": "橢圓囊與球囊（utricle and saccule）"
     },
     "answer": "D",
-    "explanation": "正解為 螺旋神經節（spiral ganglion）。spiral ganglion 的纖維組成 cochlear nerve。 此題接近國考常見整合題，需要把結構、路徑與功能連在一起。",
+    "explanation": "正解為 螺旋神經節（spiral ganglion）。spiral ganglion 的纖維組成 cochlear nerve。",
     "testedConcept": "螺旋神經節：聽覺第一級神經元，位於耳蝸（cochlea）",
     "sourceType": "AI_GENERATED",
     "difficulty": "medium"
@@ -652,7 +652,7 @@ export const anatomyQuestions: Question[] = [
     "subject": "解剖學",
     "chapter": "神經解剖",
     "section": "聽覺與前庭路徑",
-    "stem": "臨床題幹描述與「丘腦的聽覺中繼站，投射到 primary auditory cortex」最相關。若要定位病灶或判斷受影響構造，下列何者最適合？",
+    "stem": "下列何者最能解釋「丘腦的聽覺中繼站，投射到 primary auditory cortex」的解剖基礎？",
     "options": {
       "A": "內側膝狀體（medial geniculate body, MGB）",
       "B": "上橄欖核（superior olivary nucleus）",
@@ -661,7 +661,7 @@ export const anatomyQuestions: Question[] = [
       "E": "前庭眼反射（vestibulo-ocular reflex, VOR）"
     },
     "answer": "A",
-    "explanation": "正解為 內側膝狀體（medial geniculate body, MGB）。聽覺路徑由 inferior colliculus 到 MGB 再到 temporal cortex。 此題屬較難的臨床定位或易混淆題，重點是辨認關鍵解剖線索。",
+    "explanation": "正解為 內側膝狀體（medial geniculate body, MGB）。聽覺路徑由 inferior colliculus 到 MGB 再到 temporal cortex。",
     "testedConcept": "內側膝狀體：丘腦的聽覺中繼站，投射到 primary auditory cortex",
     "sourceType": "AI_GENERATED",
     "difficulty": "hard"
@@ -680,7 +680,7 @@ export const anatomyQuestions: Question[] = [
       "E": "上橄欖核（superior olivary nucleus）"
     },
     "answer": "E",
-    "explanation": "正解為 上橄欖核（superior olivary nucleus）。比較兩耳時間差與強度差，協助定位聲源。 此題屬基礎定位題，國考常用來確認核心解剖關係。",
+    "explanation": "正解為 上橄欖核（superior olivary nucleus）。比較兩耳時間差與強度差，協助定位聲源。重點在於辨認 參與雙耳聲音定位（sound localization） 與 上橄欖核（superior olivary nucleus） 的關聯。",
     "testedConcept": "上橄欖核：參與雙耳聲音定位（sound localization）",
     "sourceType": "AI_GENERATED",
     "difficulty": "easy"
@@ -690,7 +690,7 @@ export const anatomyQuestions: Question[] = [
     "subject": "解剖學",
     "chapter": "神經解剖",
     "section": "丘腦與基底核",
-    "stem": "準備醫師國考時，若題目線索指向「接收身體感覺，來自 spinothalamic tract 與 dorsal column-medial lemniscus」，最應選下列哪一個解剖構造或路徑？",
+    "stem": "關於「接收身體感覺，來自 spinothalamic tract 與 dorsal column-medial lemniscus」所涉及的解剖構造，下列何者最適合？",
     "options": {
       "A": "尾狀核（caudate nucleus）",
       "B": "腹後外側核（ventral posterolateral nucleus, VPL）",
@@ -699,7 +699,7 @@ export const anatomyQuestions: Question[] = [
       "E": "丘腦底核（subthalamic nucleus, STN）"
     },
     "answer": "B",
-    "explanation": "正解為 腹後外側核（ventral posterolateral nucleus, VPL）。VPL 對應 body；VPM 對應 face。 此題接近國考常見整合題，需要把結構、路徑與功能連在一起。",
+    "explanation": "正解為 腹後外側核（ventral posterolateral nucleus, VPL）。VPL 對應 body；VPM 對應 face。",
     "testedConcept": "腹後外側核：接收身體感覺，來自 spinothalamic tract 與 dorsal column-medial lemniscus",
     "sourceType": "AI_GENERATED",
     "difficulty": "medium"
@@ -709,7 +709,7 @@ export const anatomyQuestions: Question[] = [
     "subject": "解剖學",
     "chapter": "神經解剖",
     "section": "丘腦與基底核",
-    "stem": "臨床題幹描述與「接收臉部感覺與味覺相關資訊」最相關。若要定位病灶或判斷受影響構造，下列何者最適合？",
+    "stem": "下列何者最能解釋「接收臉部感覺與味覺相關資訊」的解剖基礎？",
     "options": {
       "A": "尾狀核（caudate nucleus）",
       "B": "黑質緻密部（substantia nigra pars compacta, SNc）",
@@ -718,7 +718,7 @@ export const anatomyQuestions: Question[] = [
       "E": "腹後外側核（ventral posterolateral nucleus, VPL）"
     },
     "answer": "D",
-    "explanation": "正解為 腹後內側核（ventral posteromedial nucleus, VPM）。VPM 接收 trigeminal lemniscus 與 taste pathway。 此題屬較難的臨床定位或易混淆題，重點是辨認關鍵解剖線索。",
+    "explanation": "正解為 腹後內側核（ventral posteromedial nucleus, VPM）。VPM 接收 trigeminal lemniscus 與 taste pathway。",
     "testedConcept": "腹後內側核：接收臉部感覺與味覺相關資訊",
     "sourceType": "AI_GENERATED",
     "difficulty": "hard"
@@ -728,7 +728,7 @@ export const anatomyQuestions: Question[] = [
     "subject": "解剖學",
     "chapter": "神經解剖",
     "section": "丘腦與基底核",
-    "stem": "準備醫師國考時，若題目線索指向「病灶會造成對側半身舞蹈症（hemiballismus）」，最應選下列哪一個解剖構造或路徑？",
+    "stem": "關於「病灶會造成對側半身舞蹈症（hemiballismus）」所涉及的解剖構造，下列何者最適合？",
     "options": {
       "A": "丘腦底核（subthalamic nucleus, STN）",
       "B": "腹後內側核（ventral posteromedial nucleus, VPM）",
@@ -737,7 +737,7 @@ export const anatomyQuestions: Question[] = [
       "E": "內囊（internal capsule）"
     },
     "answer": "A",
-    "explanation": "正解為 丘腦底核（subthalamic nucleus, STN）。STN 屬 basal ganglia circuitry，影響 indirect pathway。 此題接近國考常見整合題，需要把結構、路徑與功能連在一起。",
+    "explanation": "正解為 丘腦底核（subthalamic nucleus, STN）。STN 屬 basal ganglia circuitry，影響 indirect pathway。",
     "testedConcept": "丘腦底核：病灶會造成對側半身舞蹈症（hemiballismus）",
     "sourceType": "AI_GENERATED",
     "difficulty": "medium"
@@ -747,7 +747,7 @@ export const anatomyQuestions: Question[] = [
     "subject": "解剖學",
     "chapter": "神經解剖",
     "section": "丘腦與基底核",
-    "stem": "臨床題幹描述與「分泌 dopamine，退化與 Parkinson disease 相關」最相關。若要定位病灶或判斷受影響構造，下列何者最適合？",
+    "stem": "關於「分泌 dopamine，退化與 Parkinson disease 相關」的解剖判斷，下列何者最適合？",
     "options": {
       "A": "腹後內側核（ventral posteromedial nucleus, VPM）",
       "B": "內囊（internal capsule）",
@@ -756,7 +756,7 @@ export const anatomyQuestions: Question[] = [
       "E": "黑質緻密部（substantia nigra pars compacta, SNc）"
     },
     "answer": "E",
-    "explanation": "正解為 黑質緻密部（substantia nigra pars compacta, SNc）。Dopamine 促進 direct pathway、抑制 indirect pathway。 此題屬較難的臨床定位或易混淆題，重點是辨認關鍵解剖線索。",
+    "explanation": "正解為 黑質緻密部（substantia nigra pars compacta, SNc）。Dopamine 促進 direct pathway、抑制 indirect pathway。",
     "testedConcept": "黑質緻密部：分泌 dopamine，退化與 Parkinson disease 相關",
     "sourceType": "AI_GENERATED",
     "difficulty": "hard"
@@ -775,7 +775,7 @@ export const anatomyQuestions: Question[] = [
       "E": "腹後外側核（ventral posterolateral nucleus, VPL）"
     },
     "answer": "A",
-    "explanation": "正解為 內囊（internal capsule）。posterior limb 常與身體運動/感覺纖維相關。 此題屬基礎定位題，國考常用來確認核心解剖關係。",
+    "explanation": "正解為 內囊（internal capsule）。posterior limb 常與身體運動/感覺纖維相關。重點在於辨認 含 corticospinal 與 corticobulbar fibers，小病灶可造成明顯運動缺損 與 內囊（internal capsule） 的關聯。",
     "testedConcept": "內囊：含 corticospinal 與 corticobulbar fibers，小病灶可造成明顯運動缺損",
     "sourceType": "AI_GENERATED",
     "difficulty": "easy"
@@ -785,7 +785,7 @@ export const anatomyQuestions: Question[] = [
     "subject": "解剖學",
     "chapter": "神經解剖",
     "section": "丘腦與基底核",
-    "stem": "準備醫師國考時，若題目線索指向「屬於 striatum，與 putamen 一起接受 cortical input」，最應選下列哪一個解剖構造或路徑？",
+    "stem": "下列何者與「屬於 striatum，與 putamen 一起接受 cortical input」最相關？",
     "options": {
       "A": "腹後外側核（ventral posterolateral nucleus, VPL）",
       "B": "腹後內側核（ventral posteromedial nucleus, VPM）",
@@ -794,7 +794,7 @@ export const anatomyQuestions: Question[] = [
       "E": "尾狀核（caudate nucleus）"
     },
     "answer": "E",
-    "explanation": "正解為 尾狀核（caudate nucleus）。striatum = caudate + putamen，是 basal ganglia input station。 此題接近國考常見整合題，需要把結構、路徑與功能連在一起。",
+    "explanation": "正解為 尾狀核（caudate nucleus）。striatum = caudate + putamen，是 basal ganglia input station。",
     "testedConcept": "尾狀核：屬於 striatum，與 putamen 一起接受 cortical input",
     "sourceType": "AI_GENERATED",
     "difficulty": "medium"
@@ -804,7 +804,7 @@ export const anatomyQuestions: Question[] = [
     "subject": "解剖學",
     "chapter": "神經解剖",
     "section": "丘腦與基底核",
-    "stem": "臨床題幹描述與「接收身體感覺，來自 spinothalamic tract 與 dorsal column-medial lemniscus」最相關。若要定位病灶或判斷受影響構造，下列何者最適合？",
+    "stem": "關於「接收身體感覺，來自 spinothalamic tract 與 dorsal column-medial lemniscus」的解剖判斷，下列何者最適合？",
     "options": {
       "A": "腹後外側核（ventral posterolateral nucleus, VPL）",
       "B": "尾狀核（caudate nucleus）",
@@ -813,7 +813,7 @@ export const anatomyQuestions: Question[] = [
       "E": "內囊（internal capsule）"
     },
     "answer": "A",
-    "explanation": "正解為 腹後外側核（ventral posterolateral nucleus, VPL）。VPL 對應 body；VPM 對應 face。 此題屬較難的臨床定位或易混淆題，重點是辨認關鍵解剖線索。",
+    "explanation": "正解為 腹後外側核（ventral posterolateral nucleus, VPL）。VPL 對應 body；VPM 對應 face。",
     "testedConcept": "腹後外側核：接收身體感覺，來自 spinothalamic tract 與 dorsal column-medial lemniscus",
     "sourceType": "AI_GENERATED",
     "difficulty": "hard"
@@ -823,7 +823,7 @@ export const anatomyQuestions: Question[] = [
     "subject": "解剖學",
     "chapter": "神經解剖",
     "section": "丘腦與基底核",
-    "stem": "準備醫師國考時，若題目線索指向「接收臉部感覺與味覺相關資訊」，最應選下列哪一個解剖構造或路徑？",
+    "stem": "下列何者與「接收臉部感覺與味覺相關資訊」最相關？",
     "options": {
       "A": "腹後外側核（ventral posterolateral nucleus, VPL）",
       "B": "腹後內側核（ventral posteromedial nucleus, VPM）",
@@ -832,7 +832,7 @@ export const anatomyQuestions: Question[] = [
       "E": "丘腦底核（subthalamic nucleus, STN）"
     },
     "answer": "B",
-    "explanation": "正解為 腹後內側核（ventral posteromedial nucleus, VPM）。VPM 接收 trigeminal lemniscus 與 taste pathway。 此題接近國考常見整合題，需要把結構、路徑與功能連在一起。",
+    "explanation": "正解為 腹後內側核（ventral posteromedial nucleus, VPM）。VPM 接收 trigeminal lemniscus 與 taste pathway。",
     "testedConcept": "腹後內側核：接收臉部感覺與味覺相關資訊",
     "sourceType": "AI_GENERATED",
     "difficulty": "medium"
@@ -842,7 +842,7 @@ export const anatomyQuestions: Question[] = [
     "subject": "解剖學",
     "chapter": "神經解剖",
     "section": "小腦",
-    "stem": "臨床題幹描述與「主要調控軀幹與姿勢，病灶造成 truncal ataxia」最相關。若要定位病灶或判斷受影響構造，下列何者最適合？",
+    "stem": "若病灶或手術傷害影響「主要調控軀幹與姿勢，病灶造成 truncal ataxia」相關功能或解剖關係，最可能涉及下列何者？",
     "options": {
       "A": "小腦半球（cerebellar hemisphere）",
       "B": "下小腦腳（inferior cerebellar peduncle）",
@@ -851,7 +851,7 @@ export const anatomyQuestions: Question[] = [
       "E": "齒狀核（dentate nucleus）"
     },
     "answer": "D",
-    "explanation": "正解為 小腦蚓部（vermis）。vermis 與 axial/proximal control 相關。 此題屬較難的臨床定位或易混淆題，重點是辨認關鍵解剖線索。",
+    "explanation": "正解為 小腦蚓部（vermis）。vermis 與 axial/proximal control 相關。重點在於辨認 主要調控軀幹與姿勢，病灶造成 truncal ataxia 與 小腦蚓部（vermis） 的關聯。",
     "testedConcept": "小腦蚓部：主要調控軀幹與姿勢，病灶造成 truncal ataxia",
     "sourceType": "AI_GENERATED",
     "difficulty": "hard"
@@ -870,7 +870,7 @@ export const anatomyQuestions: Question[] = [
       "E": "小腦蚓部（vermis）"
     },
     "answer": "B",
-    "explanation": "正解為 小腦半球（cerebellar hemisphere）。小腦症狀多同側，因輸出路徑雙重交叉。 此題屬基礎定位題，國考常用來確認核心解剖關係。",
+    "explanation": "正解為 小腦半球（cerebellar hemisphere）。小腦症狀多同側，因輸出路徑雙重交叉。重點在於辨認 調控同側肢體協調，病灶造成 ipsilateral limb ataxia 與 小腦半球（cerebellar hemisphere） 的關聯。",
     "testedConcept": "小腦半球：調控同側肢體協調，病灶造成 ipsilateral limb ataxia",
     "sourceType": "AI_GENERATED",
     "difficulty": "easy"
@@ -880,7 +880,7 @@ export const anatomyQuestions: Question[] = [
     "subject": "解剖學",
     "chapter": "神經解剖",
     "section": "小腦",
-    "stem": "準備醫師國考時，若題目線索指向「小腦最大深部核，與 motor planning 相關」，最應選下列哪一個解剖構造或路徑？",
+    "stem": "關於「小腦最大深部核，與 motor planning 相關」所涉及的解剖構造，下列何者最適合？",
     "options": {
       "A": "小腦蚓部（vermis）",
       "B": "小腦半球（cerebellar hemisphere）",
@@ -889,7 +889,7 @@ export const anatomyQuestions: Question[] = [
       "E": "下小腦腳（inferior cerebellar peduncle）"
     },
     "answer": "C",
-    "explanation": "正解為 齒狀核（dentate nucleus）。lateral cerebellar hemisphere → dentate nucleus → thalamus → motor cortex。 此題接近國考常見整合題，需要把結構、路徑與功能連在一起。",
+    "explanation": "正解為 齒狀核（dentate nucleus）。lateral cerebellar hemisphere → dentate nucleus → thalamus → motor cortex。",
     "testedConcept": "齒狀核：小腦最大深部核，與 motor planning 相關",
     "sourceType": "AI_GENERATED",
     "difficulty": "medium"
@@ -899,7 +899,7 @@ export const anatomyQuestions: Question[] = [
     "subject": "解剖學",
     "chapter": "神經解剖",
     "section": "小腦",
-    "stem": "臨床題幹描述與「與平衡和眼球運動相關，屬 vestibulocerebellum」最相關。若要定位病灶或判斷受影響構造，下列何者最適合？",
+    "stem": "若病灶或手術傷害影響「與平衡和眼球運動相關，屬 vestibulocerebellum」相關功能或解剖關係，最可能涉及下列何者？",
     "options": {
       "A": "絨球小結葉（flocculonodular lobe）",
       "B": "小腦蚓部（vermis）",
@@ -908,7 +908,7 @@ export const anatomyQuestions: Question[] = [
       "E": "齒狀核（dentate nucleus）"
     },
     "answer": "A",
-    "explanation": "正解為 絨球小結葉（flocculonodular lobe）。病灶可出現 nystagmus、vertigo、平衡失調。 此題屬較難的臨床定位或易混淆題，重點是辨認關鍵解剖線索。",
+    "explanation": "正解為 絨球小結葉（flocculonodular lobe）。病灶可出現 nystagmus、vertigo、平衡失調。",
     "testedConcept": "絨球小結葉：與平衡和眼球運動相關，屬 vestibulocerebellum",
     "sourceType": "AI_GENERATED",
     "difficulty": "hard"
@@ -918,7 +918,7 @@ export const anatomyQuestions: Question[] = [
     "subject": "解剖學",
     "chapter": "神經解剖",
     "section": "小腦",
-    "stem": "準備醫師國考時，若題目線索指向「多為進入小腦的輸入，如 dorsal spinocerebellar tract」，最應選下列哪一個解剖構造或路徑？",
+    "stem": "關於「多為進入小腦的輸入，如 dorsal spinocerebellar tract」所涉及的解剖構造，下列何者最適合？",
     "options": {
       "A": "絨球小結葉（flocculonodular lobe）",
       "B": "小腦半球（cerebellar hemisphere）",
@@ -927,7 +927,7 @@ export const anatomyQuestions: Question[] = [
       "E": "上小腦腳（superior cerebellar peduncle）"
     },
     "answer": "C",
-    "explanation": "正解為 下小腦腳（inferior cerebellar peduncle）。ICP 連接 medulla 與 cerebellum。 此題接近國考常見整合題，需要把結構、路徑與功能連在一起。",
+    "explanation": "正解為 下小腦腳（inferior cerebellar peduncle）。ICP 連接 medulla 與 cerebellum。",
     "testedConcept": "下小腦腳：多為進入小腦的輸入，如 dorsal spinocerebellar tract",
     "sourceType": "AI_GENERATED",
     "difficulty": "medium"
@@ -937,7 +937,7 @@ export const anatomyQuestions: Question[] = [
     "subject": "解剖學",
     "chapter": "神經解剖",
     "section": "小腦",
-    "stem": "臨床題幹描述與「小腦主要輸出路徑，纖維多在中腦交叉」最相關。若要定位病灶或判斷受影響構造，下列何者最適合？",
+    "stem": "下列何者最能解釋「小腦主要輸出路徑，纖維多在中腦交叉」的解剖基礎？",
     "options": {
       "A": "齒狀核（dentate nucleus）",
       "B": "小腦半球（cerebellar hemisphere）",
@@ -946,7 +946,7 @@ export const anatomyQuestions: Question[] = [
       "E": "下小腦腳（inferior cerebellar peduncle）"
     },
     "answer": "C",
-    "explanation": "正解為 上小腦腳（superior cerebellar peduncle）。SCP 輸出至 red nucleus 與 thalamus。 此題屬較難的臨床定位或易混淆題，重點是辨認關鍵解剖線索。",
+    "explanation": "正解為 上小腦腳（superior cerebellar peduncle）。SCP 輸出至 red nucleus 與 thalamus。",
     "testedConcept": "上小腦腳：小腦主要輸出路徑，纖維多在中腦交叉",
     "sourceType": "AI_GENERATED",
     "difficulty": "hard"
@@ -965,7 +965,7 @@ export const anatomyQuestions: Question[] = [
       "E": "上小腦腳（superior cerebellar peduncle）"
     },
     "answer": "A",
-    "explanation": "正解為 小腦蚓部（vermis）。vermis 與 axial/proximal control 相關。 此題屬基礎定位題，國考常用來確認核心解剖關係。",
+    "explanation": "正解為 小腦蚓部（vermis）。vermis 與 axial/proximal control 相關。重點在於辨認 主要調控軀幹與姿勢，病灶造成 truncal ataxia 與 小腦蚓部（vermis） 的關聯。",
     "testedConcept": "小腦蚓部：主要調控軀幹與姿勢，病灶造成 truncal ataxia",
     "sourceType": "AI_GENERATED",
     "difficulty": "easy"
@@ -975,7 +975,7 @@ export const anatomyQuestions: Question[] = [
     "subject": "解剖學",
     "chapter": "神經解剖",
     "section": "小腦",
-    "stem": "準備醫師國考時，若題目線索指向「調控同側肢體協調，病灶造成 ipsilateral limb ataxia」，最應選下列哪一個解剖構造或路徑？",
+    "stem": "下列何者與「調控同側肢體協調，病灶造成 ipsilateral limb ataxia」最相關？",
     "options": {
       "A": "齒狀核（dentate nucleus）",
       "B": "上小腦腳（superior cerebellar peduncle）",
@@ -984,7 +984,7 @@ export const anatomyQuestions: Question[] = [
       "E": "小腦半球（cerebellar hemisphere）"
     },
     "answer": "E",
-    "explanation": "正解為 小腦半球（cerebellar hemisphere）。小腦症狀多同側，因輸出路徑雙重交叉。 此題接近國考常見整合題，需要把結構、路徑與功能連在一起。",
+    "explanation": "正解為 小腦半球（cerebellar hemisphere）。小腦症狀多同側，因輸出路徑雙重交叉。重點在於辨認 調控同側肢體協調，病灶造成 ipsilateral limb ataxia 與 小腦半球（cerebellar hemisphere） 的關聯。",
     "testedConcept": "小腦半球：調控同側肢體協調，病灶造成 ipsilateral limb ataxia",
     "sourceType": "AI_GENERATED",
     "difficulty": "medium"
@@ -994,7 +994,7 @@ export const anatomyQuestions: Question[] = [
     "subject": "解剖學",
     "chapter": "神經解剖",
     "section": "脊髓傳導路徑",
-    "stem": "臨床題幹描述與「傳遞精細觸覺、振動覺與本體感覺」最相關。若要定位病灶或判斷受影響構造，下列何者最適合？",
+    "stem": "下列何者最能解釋「傳遞精細觸覺、振動覺與本體感覺」的解剖基礎？",
     "options": {
       "A": "外側皮質脊髓徑（lateral corticospinal tract）",
       "B": "中央脊髓症候群（central cord syndrome）",
@@ -1003,7 +1003,7 @@ export const anatomyQuestions: Question[] = [
       "E": "脊髓丘腦徑（spinothalamic tract）"
     },
     "answer": "D",
-    "explanation": "正解為 背柱-內側丘系（dorsal column-medial lemniscus, DCML）。在 medulla 交叉；脊髓內同側上行。 此題屬較難的臨床定位或易混淆題，重點是辨認關鍵解剖線索。",
+    "explanation": "正解為 背柱-內側丘系（dorsal column-medial lemniscus, DCML）。在 medulla 交叉；脊髓內同側上行。",
     "testedConcept": "背柱-內側丘系：傳遞精細觸覺、振動覺與本體感覺",
     "sourceType": "AI_GENERATED",
     "difficulty": "hard"
@@ -1013,7 +1013,7 @@ export const anatomyQuestions: Question[] = [
     "subject": "解剖學",
     "chapter": "神經解剖",
     "section": "脊髓傳導路徑",
-    "stem": "準備醫師國考時，若題目線索指向「傳遞痛覺與溫度覺，進入脊髓後很快交叉」，最應選下列哪一個解剖構造或路徑？",
+    "stem": "下列何者與「傳遞痛覺與溫度覺，進入脊髓後很快交叉」最相關？",
     "options": {
       "A": "外側皮質脊髓徑（lateral corticospinal tract）",
       "B": "中央脊髓症候群（central cord syndrome）",
@@ -1022,7 +1022,7 @@ export const anatomyQuestions: Question[] = [
       "E": "Brown-Séquard syndrome"
     },
     "answer": "C",
-    "explanation": "正解為 脊髓丘腦徑（spinothalamic tract）。多在 anterior white commissure 交叉後對側上行。 此題接近國考常見整合題，需要把結構、路徑與功能連在一起。",
+    "explanation": "正解為 脊髓丘腦徑（spinothalamic tract）。多在 anterior white commissure 交叉後對側上行。",
     "testedConcept": "脊髓丘腦徑：傳遞痛覺與溫度覺，進入脊髓後很快交叉",
     "sourceType": "AI_GENERATED",
     "difficulty": "medium"
@@ -1032,7 +1032,7 @@ export const anatomyQuestions: Question[] = [
     "subject": "解剖學",
     "chapter": "神經解剖",
     "section": "脊髓傳導路徑",
-    "stem": "臨床題幹描述與「支配隨意運動，於 pyramidal decussation 交叉」最相關。若要定位病灶或判斷受影響構造，下列何者最適合？",
+    "stem": "關於「支配隨意運動，於 pyramidal decussation 交叉」的解剖判斷，下列何者最適合？",
     "options": {
       "A": "外側皮質脊髓徑（lateral corticospinal tract）",
       "B": "Brown-Séquard syndrome",
@@ -1041,7 +1041,7 @@ export const anatomyQuestions: Question[] = [
       "E": "脊髓小腦徑（spinocerebellar tract）"
     },
     "answer": "A",
-    "explanation": "正解為 外側皮質脊髓徑（lateral corticospinal tract）。脊髓病灶造成同側 UMN signs。 此題屬較難的臨床定位或易混淆題，重點是辨認關鍵解剖線索。",
+    "explanation": "正解為 外側皮質脊髓徑（lateral corticospinal tract）。脊髓病灶造成同側 UMN signs。",
     "testedConcept": "外側皮質脊髓徑：支配隨意運動，於 pyramidal decussation 交叉",
     "sourceType": "AI_GENERATED",
     "difficulty": "hard"
@@ -1060,7 +1060,7 @@ export const anatomyQuestions: Question[] = [
       "E": "中央脊髓症候群（central cord syndrome）"
     },
     "answer": "D",
-    "explanation": "正解為 脊髓小腦徑（spinocerebellar tract）。dorsal spinocerebellar tract 多經 inferior cerebellar peduncle。 此題屬基礎定位題，國考常用來確認核心解剖關係。",
+    "explanation": "正解為 脊髓小腦徑（spinocerebellar tract）。dorsal spinocerebellar tract 多經 inferior cerebellar peduncle。",
     "testedConcept": "脊髓小腦徑：傳遞無意識本體感覺到小腦",
     "sourceType": "AI_GENERATED",
     "difficulty": "easy"
@@ -1070,7 +1070,7 @@ export const anatomyQuestions: Question[] = [
     "subject": "解剖學",
     "chapter": "神經解剖",
     "section": "脊髓傳導路徑",
-    "stem": "準備醫師國考時，若題目線索指向「上肢受影響常大於下肢，常見於頸髓中央損傷」，最應選下列哪一個解剖構造或路徑？",
+    "stem": "關於「上肢受影響常大於下肢，常見於頸髓中央損傷」所涉及的解剖構造，下列何者最適合？",
     "options": {
       "A": "Brown-Séquard syndrome",
       "B": "脊髓小腦徑（spinocerebellar tract）",
@@ -1079,7 +1079,7 @@ export const anatomyQuestions: Question[] = [
       "E": "中央脊髓症候群（central cord syndrome）"
     },
     "answer": "E",
-    "explanation": "正解為 中央脊髓症候群（central cord syndrome）。corticospinal tract somatotopy 使上肢纖維較內側。 此題接近國考常見整合題，需要把結構、路徑與功能連在一起。",
+    "explanation": "正解為 中央脊髓症候群（central cord syndrome）。corticospinal tract somatotopy 使上肢纖維較內側。",
     "testedConcept": "中央脊髓症候群：上肢受影響常大於下肢，常見於頸髓中央損傷",
     "sourceType": "AI_GENERATED",
     "difficulty": "medium"
@@ -1089,7 +1089,7 @@ export const anatomyQuestions: Question[] = [
     "subject": "解剖學",
     "chapter": "神經解剖",
     "section": "脊髓傳導路徑",
-    "stem": "臨床題幹描述與「半側脊髓損傷造成同側運動/本體覺喪失、對側痛溫覺喪失」最相關。若要定位病灶或判斷受影響構造，下列何者最適合？",
+    "stem": "關於「半側脊髓損傷造成同側運動/本體覺喪失、對側痛溫覺喪失」的解剖判斷，下列何者最適合？",
     "options": {
       "A": "Brown-Séquard syndrome",
       "B": "外側皮質脊髓徑（lateral corticospinal tract）",
@@ -1098,7 +1098,7 @@ export const anatomyQuestions: Question[] = [
       "E": "脊髓丘腦徑（spinothalamic tract）"
     },
     "answer": "A",
-    "explanation": "正解為 Brown-Séquard syndrome。考點是交叉位置不同。 此題屬較難的臨床定位或易混淆題，重點是辨認關鍵解剖線索。",
+    "explanation": "正解為 Brown-Séquard syndrome。考點是交叉位置不同。重點在於辨認 半側脊髓損傷造成同側運動/本體覺喪失、對側痛溫覺喪失 與 Brown-Séquard syndrome 的關聯。",
     "testedConcept": "Brown-Séquard syndrome：半側脊髓損傷造成同側運動/本體覺喪失、對側痛溫覺喪失",
     "sourceType": "AI_GENERATED",
     "difficulty": "hard"
@@ -1108,7 +1108,7 @@ export const anatomyQuestions: Question[] = [
     "subject": "解剖學",
     "chapter": "神經解剖",
     "section": "脊髓傳導路徑",
-    "stem": "準備醫師國考時，若題目線索指向「傳遞精細觸覺、振動覺與本體感覺」，最應選下列哪一個解剖構造或路徑？",
+    "stem": "關於「傳遞精細觸覺、振動覺與本體感覺」所涉及的解剖構造，下列何者最適合？",
     "options": {
       "A": "脊髓小腦徑（spinocerebellar tract）",
       "B": "脊髓丘腦徑（spinothalamic tract）",
@@ -1117,7 +1117,7 @@ export const anatomyQuestions: Question[] = [
       "E": "中央脊髓症候群（central cord syndrome）"
     },
     "answer": "D",
-    "explanation": "正解為 背柱-內側丘系（dorsal column-medial lemniscus, DCML）。在 medulla 交叉；脊髓內同側上行。 此題接近國考常見整合題，需要把結構、路徑與功能連在一起。",
+    "explanation": "正解為 背柱-內側丘系（dorsal column-medial lemniscus, DCML）。在 medulla 交叉；脊髓內同側上行。",
     "testedConcept": "背柱-內側丘系：傳遞精細觸覺、振動覺與本體感覺",
     "sourceType": "AI_GENERATED",
     "difficulty": "medium"
@@ -1127,7 +1127,7 @@ export const anatomyQuestions: Question[] = [
     "subject": "解剖學",
     "chapter": "神經解剖",
     "section": "脊髓傳導路徑",
-    "stem": "臨床題幹描述與「傳遞痛覺與溫度覺，進入脊髓後很快交叉」最相關。若要定位病灶或判斷受影響構造，下列何者最適合？",
+    "stem": "若病灶或手術傷害影響「傳遞痛覺與溫度覺，進入脊髓後很快交叉」相關功能或解剖關係，最可能涉及下列何者？",
     "options": {
       "A": "脊髓丘腦徑（spinothalamic tract）",
       "B": "背柱-內側丘系（dorsal column-medial lemniscus, DCML）",
@@ -1136,7 +1136,7 @@ export const anatomyQuestions: Question[] = [
       "E": "外側皮質脊髓徑（lateral corticospinal tract）"
     },
     "answer": "A",
-    "explanation": "正解為 脊髓丘腦徑（spinothalamic tract）。多在 anterior white commissure 交叉後對側上行。 此題屬較難的臨床定位或易混淆題，重點是辨認關鍵解剖線索。",
+    "explanation": "正解為 脊髓丘腦徑（spinothalamic tract）。多在 anterior white commissure 交叉後對側上行。",
     "testedConcept": "脊髓丘腦徑：傳遞痛覺與溫度覺，進入脊髓後很快交叉",
     "sourceType": "AI_GENERATED",
     "difficulty": "hard"
@@ -1155,7 +1155,7 @@ export const anatomyQuestions: Question[] = [
       "E": "白交通枝（white ramus communicans）"
     },
     "answer": "D",
-    "explanation": "正解為 交感節前神經元（sympathetic preganglionic neuron）。交感節前都是 cholinergic，節後多 adrenergic。 此題屬基礎定位題，國考常用來確認核心解剖關係。",
+    "explanation": "正解為 交感節前神經元（sympathetic preganglionic neuron）。交感節前都是 cholinergic，節後多 adrenergic。",
     "testedConcept": "交感節前神經元：位於 T1-L2 lateral horn，使用 acetylcholine",
     "sourceType": "AI_GENERATED",
     "difficulty": "easy"
@@ -1165,7 +1165,7 @@ export const anatomyQuestions: Question[] = [
     "subject": "解剖學",
     "chapter": "神經解剖",
     "section": "自律神經",
-    "stem": "準備醫師國考時，若題目線索指向「來自 CN III、VII、IX、X 與 S2-S4」，最應選下列哪一個解剖構造或路徑？",
+    "stem": "下列何者與「來自 CN III、VII、IX、X 與 S2-S4」最相關？",
     "options": {
       "A": "灰交通枝（gray ramus communicans）",
       "B": "骨盆內臟神經（pelvic splanchnic nerves）",
@@ -1174,7 +1174,7 @@ export const anatomyQuestions: Question[] = [
       "E": "內臟大神經（greater splanchnic nerve）"
     },
     "answer": "D",
-    "explanation": "正解為 副交感節前神經元（parasympathetic preganglionic neuron）。craniosacral outflow 是副交感的來源。 此題接近國考常見整合題，需要把結構、路徑與功能連在一起。",
+    "explanation": "正解為 副交感節前神經元（parasympathetic preganglionic neuron）。craniosacral outflow 是副交感的來源。",
     "testedConcept": "副交感節前神經元：來自 CN III、VII、IX、X 與 S2-S4",
     "sourceType": "AI_GENERATED",
     "difficulty": "medium"
@@ -1184,7 +1184,7 @@ export const anatomyQuestions: Question[] = [
     "subject": "解剖學",
     "chapter": "神經解剖",
     "section": "自律神經",
-    "stem": "臨床題幹描述與「多來自 T5-T9，至 celiac ganglion」最相關。若要定位病灶或判斷受影響構造，下列何者最適合？",
+    "stem": "若病灶或手術傷害影響「多來自 T5-T9，至 celiac ganglion」相關功能或解剖關係，最可能涉及下列何者？",
     "options": {
       "A": "副交感節前神經元（parasympathetic preganglionic neuron）",
       "B": "內臟大神經（greater splanchnic nerve）",
@@ -1193,7 +1193,7 @@ export const anatomyQuestions: Question[] = [
       "E": "交感節前神經元（sympathetic preganglionic neuron）"
     },
     "answer": "B",
-    "explanation": "正解為 內臟大神經（greater splanchnic nerve）。常與 foregut 交感支配相關。 此題屬較難的臨床定位或易混淆題，重點是辨認關鍵解剖線索。",
+    "explanation": "正解為 內臟大神經（greater splanchnic nerve）。常與 foregut 交感支配相關。重點在於辨認 多來自 T5-T9，至 celiac ganglion 與 內臟大神經（greater splanchnic nerve） 的關聯。",
     "testedConcept": "內臟大神經：多來自 T5-T9，至 celiac ganglion",
     "sourceType": "AI_GENERATED",
     "difficulty": "hard"
@@ -1203,7 +1203,7 @@ export const anatomyQuestions: Question[] = [
     "subject": "解剖學",
     "chapter": "神經解剖",
     "section": "自律神經",
-    "stem": "準備醫師國考時，若題目線索指向「S2-S4 副交感，支配 hindgut 與骨盆器官」，最應選下列哪一個解剖構造或路徑？",
+    "stem": "下列何者與「S2-S4 副交感，支配 hindgut 與骨盆器官」最相關？",
     "options": {
       "A": "內臟大神經（greater splanchnic nerve）",
       "B": "灰交通枝（gray ramus communicans）",
@@ -1212,7 +1212,7 @@ export const anatomyQuestions: Question[] = [
       "E": "交感節前神經元（sympathetic preganglionic neuron）"
     },
     "answer": "C",
-    "explanation": "正解為 骨盆內臟神經（pelvic splanchnic nerves）。口訣：pelvic splanchnic = parasympathetic；大多數 splanchnic 是 sympathetic。 此題接近國考常見整合題，需要把結構、路徑與功能連在一起。",
+    "explanation": "正解為 骨盆內臟神經（pelvic splanchnic nerves）。口訣：pelvic splanchnic = parasympathetic；大多數 splanchnic 是 sympathetic。",
     "testedConcept": "骨盆內臟神經：S2-S4 副交感，支配 hindgut 與骨盆器官",
     "sourceType": "AI_GENERATED",
     "difficulty": "medium"
@@ -1222,7 +1222,7 @@ export const anatomyQuestions: Question[] = [
     "subject": "解剖學",
     "chapter": "神經解剖",
     "section": "自律神經",
-    "stem": "臨床題幹描述與「含有髓鞘化交感節前纖維，只在 T1-L2 存在」最相關。若要定位病灶或判斷受影響構造，下列何者最適合？",
+    "stem": "下列何者最能解釋「含有髓鞘化交感節前纖維，只在 T1-L2 存在」的解剖基礎？",
     "options": {
       "A": "交感節前神經元（sympathetic preganglionic neuron）",
       "B": "灰交通枝（gray ramus communicans）",
@@ -1231,7 +1231,7 @@ export const anatomyQuestions: Question[] = [
       "E": "骨盆內臟神經（pelvic splanchnic nerves）"
     },
     "answer": "D",
-    "explanation": "正解為 白交通枝（white ramus communicans）。white = preganglionic sympathetic。 此題屬較難的臨床定位或易混淆題，重點是辨認關鍵解剖線索。",
+    "explanation": "正解為 白交通枝（white ramus communicans）。white = preganglionic sympathetic。",
     "testedConcept": "白交通枝：含有髓鞘化交感節前纖維，只在 T1-L2 存在",
     "sourceType": "AI_GENERATED",
     "difficulty": "hard"
@@ -1250,7 +1250,7 @@ export const anatomyQuestions: Question[] = [
       "E": "內臟大神經（greater splanchnic nerve）"
     },
     "answer": "B",
-    "explanation": "正解為 灰交通枝（gray ramus communicans）。gray = postganglionic sympathetic to body wall。 此題屬基礎定位題，國考常用來確認核心解剖關係。",
+    "explanation": "正解為 灰交通枝（gray ramus communicans）。gray = postganglionic sympathetic to body wall。",
     "testedConcept": "灰交通枝：含無髓鞘交感節後纖維，所有脊神經都有",
     "sourceType": "AI_GENERATED",
     "difficulty": "easy"
@@ -1260,7 +1260,7 @@ export const anatomyQuestions: Question[] = [
     "subject": "解剖學",
     "chapter": "神經解剖",
     "section": "自律神經",
-    "stem": "準備醫師國考時，若題目線索指向「位於 T1-L2 lateral horn，使用 acetylcholine」，最應選下列哪一個解剖構造或路徑？",
+    "stem": "關於「位於 T1-L2 lateral horn，使用 acetylcholine」所涉及的解剖構造，下列何者最適合？",
     "options": {
       "A": "白交通枝（white ramus communicans）",
       "B": "交感節前神經元（sympathetic preganglionic neuron）",
@@ -1269,7 +1269,7 @@ export const anatomyQuestions: Question[] = [
       "E": "灰交通枝（gray ramus communicans）"
     },
     "answer": "B",
-    "explanation": "正解為 交感節前神經元（sympathetic preganglionic neuron）。交感節前都是 cholinergic，節後多 adrenergic。 此題接近國考常見整合題，需要把結構、路徑與功能連在一起。",
+    "explanation": "正解為 交感節前神經元（sympathetic preganglionic neuron）。交感節前都是 cholinergic，節後多 adrenergic。",
     "testedConcept": "交感節前神經元：位於 T1-L2 lateral horn，使用 acetylcholine",
     "sourceType": "AI_GENERATED",
     "difficulty": "medium"
@@ -1279,7 +1279,7 @@ export const anatomyQuestions: Question[] = [
     "subject": "解剖學",
     "chapter": "神經解剖",
     "section": "自律神經",
-    "stem": "臨床題幹描述與「來自 CN III、VII、IX、X 與 S2-S4」最相關。若要定位病灶或判斷受影響構造，下列何者最適合？",
+    "stem": "下列何者最能解釋「來自 CN III、VII、IX、X 與 S2-S4」的解剖基礎？",
     "options": {
       "A": "副交感節前神經元（parasympathetic preganglionic neuron）",
       "B": "內臟大神經（greater splanchnic nerve）",
@@ -1288,7 +1288,7 @@ export const anatomyQuestions: Question[] = [
       "E": "灰交通枝（gray ramus communicans）"
     },
     "answer": "A",
-    "explanation": "正解為 副交感節前神經元（parasympathetic preganglionic neuron）。craniosacral outflow 是副交感的來源。 此題屬較難的臨床定位或易混淆題，重點是辨認關鍵解剖線索。",
+    "explanation": "正解為 副交感節前神經元（parasympathetic preganglionic neuron）。craniosacral outflow 是副交感的來源。",
     "testedConcept": "副交感節前神經元：來自 CN III、VII、IX、X 與 S2-S4",
     "sourceType": "AI_GENERATED",
     "difficulty": "hard"
@@ -1298,7 +1298,7 @@ export const anatomyQuestions: Question[] = [
     "subject": "解剖學",
     "chapter": "頭頸部",
     "section": "顏面神經與三叉神經",
-    "stem": "準備醫師國考時，若題目線索指向「帶舌前 2/3 味覺與下頷下、舌下腺副交感纖維」，最應選下列哪一個解剖構造或路徑？",
+    "stem": "關於「帶舌前 2/3 味覺與下頜下、舌下腺副交感纖維」所涉及的解剖構造，下列何者最適合？",
     "options": {
       "A": "鼓索神經（chorda tympani）",
       "B": "顏面神經管外病灶（facial nerve LMN lesion）",
@@ -1307,8 +1307,8 @@ export const anatomyQuestions: Question[] = [
       "E": "三叉神經主感覺核（principal sensory nucleus of CN V）"
     },
     "answer": "A",
-    "explanation": "正解為 鼓索神經（chorda tympani）。chorda tympani 併入 lingual nerve，但味覺來源是 CN VII。 此題接近國考常見整合題，需要把結構、路徑與功能連在一起。",
-    "testedConcept": "鼓索神經：帶舌前 2/3 味覺與下頷下、舌下腺副交感纖維",
+    "explanation": "正解為 鼓索神經（chorda tympani）。chorda tympani 併入 lingual nerve，但味覺來源是 CN VII。",
+    "testedConcept": "鼓索神經：帶舌前 2/3 味覺與下頜下、舌下腺副交感纖維",
     "sourceType": "AI_GENERATED",
     "difficulty": "medium"
   },
@@ -1317,7 +1317,7 @@ export const anatomyQuestions: Question[] = [
     "subject": "解剖學",
     "chapter": "頭頸部",
     "section": "顏面神經與三叉神經",
-    "stem": "臨床題幹描述與「帶 CN VII 副交感至翼顎神經節（pterygopalatine ganglion）」最相關。若要定位病灶或判斷受影響構造，下列何者最適合？",
+    "stem": "關於「帶 CN VII 副交感至翼顎神經節（pterygopalatine ganglion）」的解剖判斷，下列何者最適合？",
     "options": {
       "A": "三叉神經主感覺核（principal sensory nucleus of CN V）",
       "B": "眶下神經（infraorbital nerve）",
@@ -1326,7 +1326,7 @@ export const anatomyQuestions: Question[] = [
       "E": "岩大神經（greater petrosal nerve）"
     },
     "answer": "E",
-    "explanation": "正解為 岩大神經（greater petrosal nerve）。支配淚腺與鼻腭黏膜腺體。 此題屬較難的臨床定位或易混淆題，重點是辨認關鍵解剖線索。",
+    "explanation": "正解為 岩大神經（greater petrosal nerve）。支配淚腺與鼻腭黏膜腺體。重點在於辨認 帶 CN VII 副交感至翼顎神經節（pterygopalatine ganglion） 與 岩大神經（greater petrosal nerve） 的關聯。",
     "testedConcept": "岩大神經：帶 CN VII 副交感至翼顎神經節（pterygopalatine ganglion）",
     "sourceType": "AI_GENERATED",
     "difficulty": "hard"
@@ -1345,7 +1345,7 @@ export const anatomyQuestions: Question[] = [
       "E": "下齒槽神經（inferior alveolar nerve）"
     },
     "answer": "E",
-    "explanation": "正解為 下齒槽神經（inferior alveolar nerve）。拔智齒或 mandibular block 常考。 此題屬基礎定位題，國考常用來確認核心解剖關係。",
+    "explanation": "正解為 下齒槽神經（inferior alveolar nerve）。拔智齒或 mandibular block 常考。",
     "testedConcept": "下齒槽神經：V3 分支，進入 mandibular foramen 支配下排牙齒",
     "sourceType": "AI_GENERATED",
     "difficulty": "easy"
@@ -1355,7 +1355,7 @@ export const anatomyQuestions: Question[] = [
     "subject": "解剖學",
     "chapter": "頭頸部",
     "section": "顏面神經與三叉神經",
-    "stem": "準備醫師國考時，若題目線索指向「V2 分支，支配下眼瞼、上唇與臉頰」，最應選下列哪一個解剖構造或路徑？",
+    "stem": "下列何者與「V2 分支，支配下眼瞼、上唇與臉頰」最相關？",
     "options": {
       "A": "三叉神經主感覺核（principal sensory nucleus of CN V）",
       "B": "鼓索神經（chorda tympani）",
@@ -1364,7 +1364,7 @@ export const anatomyQuestions: Question[] = [
       "E": "顏面神經管外病灶（facial nerve LMN lesion）"
     },
     "answer": "C",
-    "explanation": "正解為 眶下神經（infraorbital nerve）。經 infraorbital foramen 出來。 此題接近國考常見整合題，需要把結構、路徑與功能連在一起。",
+    "explanation": "正解為 眶下神經（infraorbital nerve）。經 infraorbital foramen 出來。重點在於辨認 V2 分支，支配下眼瞼、上唇與臉頰 與 眶下神經（infraorbital nerve） 的關聯。",
     "testedConcept": "眶下神經：V2 分支，支配下眼瞼、上唇與臉頰",
     "sourceType": "AI_GENERATED",
     "difficulty": "medium"
@@ -1374,7 +1374,7 @@ export const anatomyQuestions: Question[] = [
     "subject": "解剖學",
     "chapter": "頭頸部",
     "section": "顏面神經與三叉神經",
-    "stem": "臨床題幹描述與「造成同側上、下半臉表情肌無力」最相關。若要定位病灶或判斷受影響構造，下列何者最適合？",
+    "stem": "關於「造成同側上、下半臉表情肌無力」的解剖判斷，下列何者最適合？",
     "options": {
       "A": "鼓索神經（chorda tympani）",
       "B": "下齒槽神經（inferior alveolar nerve）",
@@ -1383,7 +1383,7 @@ export const anatomyQuestions: Question[] = [
       "E": "眶下神經（infraorbital nerve）"
     },
     "answer": "C",
-    "explanation": "正解為 顏面神經管外病灶（facial nerve LMN lesion）。LMN lesion 影響整個同側 facial expression muscles。 此題屬較難的臨床定位或易混淆題，重點是辨認關鍵解剖線索。",
+    "explanation": "正解為 顏面神經管外病灶（facial nerve LMN lesion）。LMN lesion 影響整個同側 facial expression muscles。",
     "testedConcept": "顏面神經管外病灶：造成同側上、下半臉表情肌無力",
     "sourceType": "AI_GENERATED",
     "difficulty": "hard"
@@ -1393,7 +1393,7 @@ export const anatomyQuestions: Question[] = [
     "subject": "解剖學",
     "chapter": "頭頸部",
     "section": "顏面神經與三叉神經",
-    "stem": "準備醫師國考時，若題目線索指向「處理臉部精細觸覺」，最應選下列哪一個解剖構造或路徑？",
+    "stem": "下列何者與「處理臉部精細觸覺」最相關？",
     "options": {
       "A": "三叉神經主感覺核（principal sensory nucleus of CN V）",
       "B": "顏面神經管外病灶（facial nerve LMN lesion）",
@@ -1402,7 +1402,7 @@ export const anatomyQuestions: Question[] = [
       "E": "鼓索神經（chorda tympani）"
     },
     "answer": "A",
-    "explanation": "正解為 三叉神經主感覺核（principal sensory nucleus of CN V）。臉部痛溫覺主要是 spinal trigeminal nucleus。 此題接近國考常見整合題，需要把結構、路徑與功能連在一起。",
+    "explanation": "正解為 三叉神經主感覺核（principal sensory nucleus of CN V）。臉部痛溫覺主要是 spinal trigeminal nucleus。",
     "testedConcept": "三叉神經主感覺核：處理臉部精細觸覺",
     "sourceType": "AI_GENERATED",
     "difficulty": "medium"
@@ -1412,7 +1412,7 @@ export const anatomyQuestions: Question[] = [
     "subject": "解剖學",
     "chapter": "頭頸部",
     "section": "顏面神經與三叉神經",
-    "stem": "臨床題幹描述與「帶舌前 2/3 味覺與下頷下、舌下腺副交感纖維」最相關。若要定位病灶或判斷受影響構造，下列何者最適合？",
+    "stem": "若病灶或手術傷害影響「帶舌前 2/3 味覺與下頜下、舌下腺副交感纖維」相關功能或解剖關係，最可能涉及下列何者？",
     "options": {
       "A": "鼓索神經（chorda tympani）",
       "B": "岩大神經（greater petrosal nerve）",
@@ -1421,8 +1421,8 @@ export const anatomyQuestions: Question[] = [
       "E": "下齒槽神經（inferior alveolar nerve）"
     },
     "answer": "A",
-    "explanation": "正解為 鼓索神經（chorda tympani）。chorda tympani 併入 lingual nerve，但味覺來源是 CN VII。 此題屬較難的臨床定位或易混淆題，重點是辨認關鍵解剖線索。",
-    "testedConcept": "鼓索神經：帶舌前 2/3 味覺與下頷下、舌下腺副交感纖維",
+    "explanation": "正解為 鼓索神經（chorda tympani）。chorda tympani 併入 lingual nerve，但味覺來源是 CN VII。",
+    "testedConcept": "鼓索神經：帶舌前 2/3 味覺與下頜下、舌下腺副交感纖維",
     "sourceType": "AI_GENERATED",
     "difficulty": "hard"
   },
@@ -1440,7 +1440,7 @@ export const anatomyQuestions: Question[] = [
       "E": "眶下神經（infraorbital nerve）"
     },
     "answer": "C",
-    "explanation": "正解為 岩大神經（greater petrosal nerve）。支配淚腺與鼻腭黏膜腺體。 此題屬基礎定位題，國考常用來確認核心解剖關係。",
+    "explanation": "正解為 岩大神經（greater petrosal nerve）。支配淚腺與鼻腭黏膜腺體。重點在於辨認 帶 CN VII 副交感至翼顎神經節（pterygopalatine ganglion） 與 岩大神經（greater petrosal nerve） 的關聯。",
     "testedConcept": "岩大神經：帶 CN VII 副交感至翼顎神經節（pterygopalatine ganglion）",
     "sourceType": "AI_GENERATED",
     "difficulty": "easy"
@@ -1450,7 +1450,7 @@ export const anatomyQuestions: Question[] = [
     "subject": "解剖學",
     "chapter": "頭頸部",
     "section": "頸動脈鞘",
-    "stem": "準備醫師國考時，若題目線索指向「內含 common/internal carotid artery、internal jugular vein、vagus nerve」，最應選下列哪一個解剖構造或路徑？",
+    "stem": "關於「內含 common/internal carotid artery、internal jugular vein、vagus nerve」所涉及的解剖構造，下列何者最適合？",
     "options": {
       "A": "ansa cervicalis（頸袢）",
       "B": "迷走神經（vagus nerve, CN X）",
@@ -1459,7 +1459,7 @@ export const anatomyQuestions: Question[] = [
       "E": "頸動脈竇（carotid sinus）"
     },
     "answer": "C",
-    "explanation": "正解為 頸動脈鞘（carotid sheath）。CN X 在 carotid sheath 內，但 ansa cervicalis 多在鞘壁上。 此題接近國考常見整合題，需要把結構、路徑與功能連在一起。",
+    "explanation": "正解為 頸動脈鞘（carotid sheath）。CN X 在 carotid sheath 內，但 ansa cervicalis 多在鞘壁上。",
     "testedConcept": "頸動脈鞘：內含 common/internal carotid artery、internal jugular vein、vagus nerve",
     "sourceType": "AI_GENERATED",
     "difficulty": "medium"
@@ -1469,7 +1469,7 @@ export const anatomyQuestions: Question[] = [
     "subject": "解剖學",
     "chapter": "頭頸部",
     "section": "頸動脈鞘",
-    "stem": "臨床題幹描述與「位於頸動脈鞘後方，不在鞘內」最相關。若要定位病灶或判斷受影響構造，下列何者最適合？",
+    "stem": "若病灶或手術傷害影響「位於頸動脈鞘後方，不在鞘內」相關功能或解剖關係，最可能涉及下列何者？",
     "options": {
       "A": "頸交感幹（cervical sympathetic trunk）",
       "B": "頸動脈竇（carotid sinus）",
@@ -1478,7 +1478,7 @@ export const anatomyQuestions: Question[] = [
       "E": "頸動脈鞘（carotid sheath）"
     },
     "answer": "A",
-    "explanation": "正解為 頸交感幹（cervical sympathetic trunk）。損傷可造成 Horner syndrome。 此題屬較難的臨床定位或易混淆題，重點是辨認關鍵解剖線索。",
+    "explanation": "正解為 頸交感幹（cervical sympathetic trunk）。損傷可造成 Horner syndrome。重點在於辨認 位於頸動脈鞘後方，不在鞘內 與 頸交感幹（cervical sympathetic trunk） 的關聯。",
     "testedConcept": "頸交感幹：位於頸動脈鞘後方，不在鞘內",
     "sourceType": "AI_GENERATED",
     "difficulty": "hard"
@@ -1488,7 +1488,7 @@ export const anatomyQuestions: Question[] = [
     "subject": "解剖學",
     "chapter": "頭頸部",
     "section": "頸動脈鞘",
-    "stem": "準備醫師國考時，若題目線索指向「壓力感受器（baroreceptor），主要由 CN IX 傳入」，最應選下列哪一個解剖構造或路徑？",
+    "stem": "關於「壓力感受器（baroreceptor），主要由 CN IX 傳入」所涉及的解剖構造，下列何者最適合？",
     "options": {
       "A": "頸動脈鞘（carotid sheath）",
       "B": "迷走神經（vagus nerve, CN X）",
@@ -1497,7 +1497,7 @@ export const anatomyQuestions: Question[] = [
       "E": "內頸靜脈（internal jugular vein）"
     },
     "answer": "D",
-    "explanation": "正解為 頸動脈竇（carotid sinus）。carotid body 是 chemoreceptor，也主要走 CN IX。 此題接近國考常見整合題，需要把結構、路徑與功能連在一起。",
+    "explanation": "正解為 頸動脈竇（carotid sinus）。carotid body 是 chemoreceptor，也主要走 CN IX。",
     "testedConcept": "頸動脈竇：壓力感受器（baroreceptor），主要由 CN IX 傳入",
     "sourceType": "AI_GENERATED",
     "difficulty": "medium"
@@ -1507,7 +1507,7 @@ export const anatomyQuestions: Question[] = [
     "subject": "解剖學",
     "chapter": "頭頸部",
     "section": "頸動脈鞘",
-    "stem": "臨床題幹描述與「位於 carotid sheath 外側，常用於 central venous catheterization」最相關。若要定位病灶或判斷受影響構造，下列何者最適合？",
+    "stem": "下列何者最能解釋「位於 carotid sheath 外側，常用於 central venous catheterization」的解剖基礎？",
     "options": {
       "A": "頸動脈竇（carotid sinus）",
       "B": "內頸靜脈（internal jugular vein）",
@@ -1516,7 +1516,7 @@ export const anatomyQuestions: Question[] = [
       "E": "ansa cervicalis（頸袢）"
     },
     "answer": "B",
-    "explanation": "正解為 內頸靜脈（internal jugular vein）。鞘內排列常記 VAN：vein lateral, artery medial, nerve posterior。 此題屬較難的臨床定位或易混淆題，重點是辨認關鍵解剖線索。",
+    "explanation": "正解為 內頸靜脈（internal jugular vein）。鞘內排列常記 VAN：vein lateral, artery medial, nerve posterior。",
     "testedConcept": "內頸靜脈：位於 carotid sheath 外側，常用於 central venous catheterization",
     "sourceType": "AI_GENERATED",
     "difficulty": "hard"
@@ -1535,7 +1535,7 @@ export const anatomyQuestions: Question[] = [
       "E": "頸交感幹（cervical sympathetic trunk）"
     },
     "answer": "C",
-    "explanation": "正解為 迷走神經（vagus nerve, CN X）。往下給 recurrent laryngeal branches。 此題屬基礎定位題，國考常用來確認核心解剖關係。",
+    "explanation": "正解為 迷走神經（vagus nerve, CN X）。往下給 recurrent laryngeal branches。",
     "testedConcept": "迷走神經：位於頸動脈鞘內 artery 與 vein 之間偏後",
     "sourceType": "AI_GENERATED",
     "difficulty": "easy"
@@ -1545,7 +1545,7 @@ export const anatomyQuestions: Question[] = [
     "subject": "解剖學",
     "chapter": "頭頸部",
     "section": "頸動脈鞘",
-    "stem": "準備醫師國考時，若題目線索指向「支配多數 infrahyoid muscles，常貼在 carotid sheath 前壁」，最應選下列哪一個解剖構造或路徑？",
+    "stem": "下列何者與「支配多數 infrahyoid muscles，常貼在 carotid sheath 前壁」最相關？",
     "options": {
       "A": "頸動脈竇（carotid sinus）",
       "B": "迷走神經（vagus nerve, CN X）",
@@ -1554,7 +1554,7 @@ export const anatomyQuestions: Question[] = [
       "E": "內頸靜脈（internal jugular vein）"
     },
     "answer": "C",
-    "explanation": "正解為 ansa cervicalis（頸袢）。例外：thyrohyoid 由 C1 via hypoglossal nerve。 此題接近國考常見整合題，需要把結構、路徑與功能連在一起。",
+    "explanation": "正解為 ansa cervicalis（頸袢）。例外：thyrohyoid 由 C1 via hypoglossal nerve。",
     "testedConcept": "ansa cervicalis：支配多數 infrahyoid muscles，常貼在 carotid sheath 前壁",
     "sourceType": "AI_GENERATED",
     "difficulty": "medium"
@@ -1564,7 +1564,7 @@ export const anatomyQuestions: Question[] = [
     "subject": "解剖學",
     "chapter": "頭頸部",
     "section": "頸動脈鞘",
-    "stem": "臨床題幹描述與「內含 common/internal carotid artery、internal jugular vein、vagus nerve」最相關。若要定位病灶或判斷受影響構造，下列何者最適合？",
+    "stem": "下列何者最能解釋「內含 common/internal carotid artery、internal jugular vein、vagus nerve」的解剖基礎？",
     "options": {
       "A": "內頸靜脈（internal jugular vein）",
       "B": "頸交感幹（cervical sympathetic trunk）",
@@ -1573,7 +1573,7 @@ export const anatomyQuestions: Question[] = [
       "E": "頸動脈鞘（carotid sheath）"
     },
     "answer": "E",
-    "explanation": "正解為 頸動脈鞘（carotid sheath）。CN X 在 carotid sheath 內，但 ansa cervicalis 多在鞘壁上。 此題屬較難的臨床定位或易混淆題，重點是辨認關鍵解剖線索。",
+    "explanation": "正解為 頸動脈鞘（carotid sheath）。CN X 在 carotid sheath 內，但 ansa cervicalis 多在鞘壁上。",
     "testedConcept": "頸動脈鞘：內含 common/internal carotid artery、internal jugular vein、vagus nerve",
     "sourceType": "AI_GENERATED",
     "difficulty": "hard"
@@ -1583,7 +1583,7 @@ export const anatomyQuestions: Question[] = [
     "subject": "解剖學",
     "chapter": "頭頸部",
     "section": "頸動脈鞘",
-    "stem": "準備醫師國考時，若題目線索指向「位於頸動脈鞘後方，不在鞘內」，最應選下列哪一個解剖構造或路徑？",
+    "stem": "下列何者與「位於頸動脈鞘後方，不在鞘內」最相關？",
     "options": {
       "A": "內頸靜脈（internal jugular vein）",
       "B": "頸交感幹（cervical sympathetic trunk）",
@@ -1592,7 +1592,7 @@ export const anatomyQuestions: Question[] = [
       "E": "迷走神經（vagus nerve, CN X）"
     },
     "answer": "B",
-    "explanation": "正解為 頸交感幹（cervical sympathetic trunk）。損傷可造成 Horner syndrome。 此題接近國考常見整合題，需要把結構、路徑與功能連在一起。",
+    "explanation": "正解為 頸交感幹（cervical sympathetic trunk）。損傷可造成 Horner syndrome。重點在於辨認 位於頸動脈鞘後方，不在鞘內 與 頸交感幹（cervical sympathetic trunk） 的關聯。",
     "testedConcept": "頸交感幹：位於頸動脈鞘後方，不在鞘內",
     "sourceType": "AI_GENERATED",
     "difficulty": "medium"
@@ -1602,7 +1602,7 @@ export const anatomyQuestions: Question[] = [
     "subject": "解剖學",
     "chapter": "頭頸部",
     "section": "咽喉解剖",
-    "stem": "臨床題幹描述與「由上喉神經外支（external branch of superior laryngeal nerve）支配」最相關。若要定位病灶或判斷受影響構造，下列何者最適合？",
+    "stem": "關於「由上喉神經外支（external branch of superior laryngeal nerve）支配」的解剖判斷，下列何者最適合？",
     "options": {
       "A": "環甲肌（cricothyroid muscle）",
       "B": "喉返神經（recurrent laryngeal nerve）",
@@ -1611,7 +1611,7 @@ export const anatomyQuestions: Question[] = [
       "E": "環狀軟骨（cricoid cartilage）"
     },
     "answer": "A",
-    "explanation": "正解為 環甲肌（cricothyroid muscle）。調節聲帶張力，損傷會影響高音。 此題屬較難的臨床定位或易混淆題，重點是辨認關鍵解剖線索。",
+    "explanation": "正解為 環甲肌（cricothyroid muscle）。調節聲帶張力，損傷會影響高音。重點在於辨認 由上喉神經外支（external branch of superior laryngeal nerve）支配 與 環甲肌（cricothyroid muscle） 的關聯。",
     "testedConcept": "環甲肌：由上喉神經外支（external branch of superior laryngeal nerve）支配",
     "sourceType": "AI_GENERATED",
     "difficulty": "hard"
@@ -1630,7 +1630,7 @@ export const anatomyQuestions: Question[] = [
       "E": "環狀軟骨（cricoid cartilage）"
     },
     "answer": "D",
-    "explanation": "正解為 喉返神經（recurrent laryngeal nerve）。手術傷到會聲音沙啞或聲帶麻痺。 此題屬基礎定位題，國考常用來確認核心解剖關係。",
+    "explanation": "正解為 喉返神經（recurrent laryngeal nerve）。手術傷到會聲音沙啞或聲帶麻痺。重點在於辨認 支配除環甲肌外大多數內在喉肌 與 喉返神經（recurrent laryngeal nerve） 的關聯。",
     "testedConcept": "喉返神經：支配除環甲肌外大多數內在喉肌",
     "sourceType": "AI_GENERATED",
     "difficulty": "easy"
@@ -1640,7 +1640,7 @@ export const anatomyQuestions: Question[] = [
     "subject": "解剖學",
     "chapter": "頭頸部",
     "section": "咽喉解剖",
-    "stem": "準備醫師國考時，若題目線索指向「提供聲門上方喉黏膜感覺」，最應選下列哪一個解剖構造或路徑？",
+    "stem": "關於「提供聲門上方喉黏膜感覺」所涉及的解剖構造，下列何者最適合？",
     "options": {
       "A": "咽縮肌（pharyngeal constrictors）",
       "B": "梨狀隱窩（piriform recess）",
@@ -1649,7 +1649,7 @@ export const anatomyQuestions: Question[] = [
       "E": "喉返神經（recurrent laryngeal nerve）"
     },
     "answer": "D",
-    "explanation": "正解為 上喉神經內支（internal branch of superior laryngeal nerve）。穿 thyrohyoid membrane。 此題接近國考常見整合題，需要把結構、路徑與功能連在一起。",
+    "explanation": "正解為 上喉神經內支（internal branch of superior laryngeal nerve）。穿 thyrohyoid membrane。",
     "testedConcept": "上喉神經內支：提供聲門上方喉黏膜感覺",
     "sourceType": "AI_GENERATED",
     "difficulty": "medium"
@@ -1659,7 +1659,7 @@ export const anatomyQuestions: Question[] = [
     "subject": "解剖學",
     "chapter": "頭頸部",
     "section": "咽喉解剖",
-    "stem": "臨床題幹描述與「主要由迷走神經咽叢（pharyngeal plexus of CN X）支配」最相關。若要定位病灶或判斷受影響構造，下列何者最適合？",
+    "stem": "關於「主要由迷走神經咽叢（pharyngeal plexus of CN X）支配」的解剖判斷，下列何者最適合？",
     "options": {
       "A": "環狀軟骨（cricoid cartilage）",
       "B": "環甲肌（cricothyroid muscle）",
@@ -1668,7 +1668,7 @@ export const anatomyQuestions: Question[] = [
       "E": "上喉神經內支（internal branch of superior laryngeal nerve）"
     },
     "answer": "C",
-    "explanation": "正解為 咽縮肌（pharyngeal constrictors）。咽部運動大多 CN X，stylopharyngeus 例外由 CN IX。 此題屬較難的臨床定位或易混淆題，重點是辨認關鍵解剖線索。",
+    "explanation": "正解為 咽縮肌（pharyngeal constrictors）。咽部運動大多 CN X，stylopharyngeus 例外由 CN IX。",
     "testedConcept": "咽縮肌：主要由迷走神經咽叢（pharyngeal plexus of CN X）支配",
     "sourceType": "AI_GENERATED",
     "difficulty": "hard"
@@ -1678,7 +1678,7 @@ export const anatomyQuestions: Question[] = [
     "subject": "解剖學",
     "chapter": "頭頸部",
     "section": "咽喉解剖",
-    "stem": "準備醫師國考時，若題目線索指向「異物可能卡住，靠近 internal laryngeal nerve」，最應選下列哪一個解剖構造或路徑？",
+    "stem": "關於「異物可能卡住，靠近 internal laryngeal nerve」所涉及的解剖構造，下列何者最適合？",
     "options": {
       "A": "環甲肌（cricothyroid muscle）",
       "B": "梨狀隱窩（piriform recess）",
@@ -1687,7 +1687,7 @@ export const anatomyQuestions: Question[] = [
       "E": "上喉神經內支（internal branch of superior laryngeal nerve）"
     },
     "answer": "B",
-    "explanation": "正解為 梨狀隱窩（piriform recess）。魚刺卡住可能傷及 internal branch of superior laryngeal nerve。 此題接近國考常見整合題，需要把結構、路徑與功能連在一起。",
+    "explanation": "正解為 梨狀隱窩（piriform recess）。魚刺卡住可能傷及 internal branch of superior laryngeal nerve。",
     "testedConcept": "梨狀隱窩：異物可能卡住，靠近 internal laryngeal nerve",
     "sourceType": "AI_GENERATED",
     "difficulty": "medium"
@@ -1697,7 +1697,7 @@ export const anatomyQuestions: Question[] = [
     "subject": "解剖學",
     "chapter": "頭頸部",
     "section": "咽喉解剖",
-    "stem": "臨床題幹描述與「唯一完整環狀的喉軟骨」最相關。若要定位病灶或判斷受影響構造，下列何者最適合？",
+    "stem": "若病灶或手術傷害影響「唯一完整環狀的喉軟骨」相關功能或解剖關係，最可能涉及下列何者？",
     "options": {
       "A": "咽縮肌（pharyngeal constrictors）",
       "B": "環狀軟骨（cricoid cartilage）",
@@ -1706,7 +1706,7 @@ export const anatomyQuestions: Question[] = [
       "E": "喉返神經（recurrent laryngeal nerve）"
     },
     "answer": "B",
-    "explanation": "正解為 環狀軟骨（cricoid cartilage）。位於 C6 水平，常作為 airway landmark。 此題屬較難的臨床定位或易混淆題，重點是辨認關鍵解剖線索。",
+    "explanation": "正解為 環狀軟骨（cricoid cartilage）。位於 C6 水平，常作為 airway landmark。重點在於辨認 唯一完整環狀的喉軟骨 與 環狀軟骨（cricoid cartilage） 的關聯。",
     "testedConcept": "環狀軟骨：唯一完整環狀的喉軟骨",
     "sourceType": "AI_GENERATED",
     "difficulty": "hard"
@@ -1725,7 +1725,7 @@ export const anatomyQuestions: Question[] = [
       "E": "梨狀隱窩（piriform recess）"
     },
     "answer": "D",
-    "explanation": "正解為 環甲肌（cricothyroid muscle）。調節聲帶張力，損傷會影響高音。 此題屬基礎定位題，國考常用來確認核心解剖關係。",
+    "explanation": "正解為 環甲肌（cricothyroid muscle）。調節聲帶張力，損傷會影響高音。重點在於辨認 由上喉神經外支（external branch of superior laryngeal nerve）支配 與 環甲肌（cricothyroid muscle） 的關聯。",
     "testedConcept": "環甲肌：由上喉神經外支（external branch of superior laryngeal nerve）支配",
     "sourceType": "AI_GENERATED",
     "difficulty": "easy"
@@ -1735,7 +1735,7 @@ export const anatomyQuestions: Question[] = [
     "subject": "解剖學",
     "chapter": "頭頸部",
     "section": "咽喉解剖",
-    "stem": "準備醫師國考時，若題目線索指向「支配除環甲肌外大多數內在喉肌」，最應選下列哪一個解剖構造或路徑？",
+    "stem": "下列何者與「支配除環甲肌外大多數內在喉肌」最相關？",
     "options": {
       "A": "喉返神經（recurrent laryngeal nerve）",
       "B": "上喉神經內支（internal branch of superior laryngeal nerve）",
@@ -1744,7 +1744,7 @@ export const anatomyQuestions: Question[] = [
       "E": "環甲肌（cricothyroid muscle）"
     },
     "answer": "A",
-    "explanation": "正解為 喉返神經（recurrent laryngeal nerve）。手術傷到會聲音沙啞或聲帶麻痺。 此題接近國考常見整合題，需要把結構、路徑與功能連在一起。",
+    "explanation": "正解為 喉返神經（recurrent laryngeal nerve）。手術傷到會聲音沙啞或聲帶麻痺。重點在於辨認 支配除環甲肌外大多數內在喉肌 與 喉返神經（recurrent laryngeal nerve） 的關聯。",
     "testedConcept": "喉返神經：支配除環甲肌外大多數內在喉肌",
     "sourceType": "AI_GENERATED",
     "difficulty": "medium"
@@ -1754,7 +1754,7 @@ export const anatomyQuestions: Question[] = [
     "subject": "解剖學",
     "chapter": "頭頸部",
     "section": "舌與味覺",
-    "stem": "臨床題幹描述與「由舌神經（lingual nerve, V3）負責」最相關。若要定位病灶或判斷受影響構造，下列何者最適合？",
+    "stem": "若病灶或手術傷害影響「由舌神經（lingual nerve, V3）負責」相關功能或解剖關係，最可能涉及下列何者？",
     "options": {
       "A": "舌前 2/3 一般感覺（general sensation anterior 2/3 of tongue）",
       "B": "舌乳頭（vallate papillae）",
@@ -1763,7 +1763,7 @@ export const anatomyQuestions: Question[] = [
       "E": "舌下神經病灶（hypoglossal nerve lesion）"
     },
     "answer": "A",
-    "explanation": "正解為 舌前 2/3 一般感覺（general sensation anterior 2/3 of tongue）。lingual nerve 也攜帶 chorda tympani 的味覺纖維。 此題屬較難的臨床定位或易混淆題，重點是辨認關鍵解剖線索。",
+    "explanation": "正解為 舌前 2/3 一般感覺（general sensation anterior 2/3 of tongue）。lingual nerve 也攜帶 chorda tympani 的味覺纖維。",
     "testedConcept": "舌前 2/3 一般感覺：由舌神經（lingual nerve, V3）負責",
     "sourceType": "AI_GENERATED",
     "difficulty": "hard"
@@ -1773,7 +1773,7 @@ export const anatomyQuestions: Question[] = [
     "subject": "解剖學",
     "chapter": "頭頸部",
     "section": "舌與味覺",
-    "stem": "準備醫師國考時，若題目線索指向「由鼓索神經（chorda tympani, CN VII）負責」，最應選下列哪一個解剖構造或路徑？",
+    "stem": "下列何者與「由鼓索神經（chorda tympani, CN VII）負責」最相關？",
     "options": {
       "A": "舌下神經病灶（hypoglossal nerve lesion）",
       "B": "舌乳頭（vallate papillae）",
@@ -1782,7 +1782,7 @@ export const anatomyQuestions: Question[] = [
       "E": "舌前 2/3 味覺（taste anterior 2/3 of tongue）"
     },
     "answer": "E",
-    "explanation": "正解為 舌前 2/3 味覺（taste anterior 2/3 of tongue）。味覺纖維經 facial nerve 到 nucleus solitarius。 此題接近國考常見整合題，需要把結構、路徑與功能連在一起。",
+    "explanation": "正解為 舌前 2/3 味覺（taste anterior 2/3 of tongue）。味覺纖維經 facial nerve 到 nucleus solitarius。",
     "testedConcept": "舌前 2/3 味覺：由鼓索神經（chorda tympani, CN VII）負責",
     "sourceType": "AI_GENERATED",
     "difficulty": "medium"
@@ -1792,7 +1792,7 @@ export const anatomyQuestions: Question[] = [
     "subject": "解剖學",
     "chapter": "頭頸部",
     "section": "舌與味覺",
-    "stem": "臨床題幹描述與「主要由舌咽神經（glossopharyngeal nerve, CN IX）負責」最相關。若要定位病灶或判斷受影響構造，下列何者最適合？",
+    "stem": "下列何者最能解釋「主要由舌咽神經（glossopharyngeal nerve, CN IX）負責」的解剖基礎？",
     "options": {
       "A": "舌下神經病灶（hypoglossal nerve lesion）",
       "B": "舌後 1/3 感覺與味覺（posterior 1/3 tongue sensation and taste）",
@@ -1801,7 +1801,7 @@ export const anatomyQuestions: Question[] = [
       "E": "舌前 2/3 一般感覺（general sensation anterior 2/3 of tongue）"
     },
     "answer": "B",
-    "explanation": "正解為 舌後 1/3 感覺與味覺（posterior 1/3 tongue sensation and taste）。CN IX 同時是 gag reflex afferent。 此題屬較難的臨床定位或易混淆題，重點是辨認關鍵解剖線索。",
+    "explanation": "正解為 舌後 1/3 感覺與味覺（posterior 1/3 tongue sensation and taste）。CN IX 同時是 gag reflex afferent。",
     "testedConcept": "舌後 1/3 感覺與味覺：主要由舌咽神經（glossopharyngeal nerve, CN IX）負責",
     "sourceType": "AI_GENERATED",
     "difficulty": "hard"
@@ -1820,7 +1820,7 @@ export const anatomyQuestions: Question[] = [
       "E": "舌後 1/3 感覺與味覺（posterior 1/3 tongue sensation and taste）"
     },
     "answer": "D",
-    "explanation": "正解為 舌肌運動（motor to tongue muscles）。例外是 palatoglossus 由 CN X。 此題屬基礎定位題，國考常用來確認核心解剖關係。",
+    "explanation": "正解為 舌肌運動（motor to tongue muscles）。例外是 palatoglossus 由 CN X。重點在於辨認 幾乎全部由舌下神經（hypoglossal nerve, CN XII）支配 與 舌肌運動（motor to tongue muscles） 的關聯。",
     "testedConcept": "舌肌運動：幾乎全部由舌下神經（hypoglossal nerve, CN XII）支配",
     "sourceType": "AI_GENERATED",
     "difficulty": "easy"
@@ -1830,7 +1830,7 @@ export const anatomyQuestions: Question[] = [
     "subject": "解剖學",
     "chapter": "頭頸部",
     "section": "舌與味覺",
-    "stem": "準備醫師國考時，若題目線索指向「位於 sulcus terminalis 前方，但味覺由 CN IX 支配」，最應選下列哪一個解剖構造或路徑？",
+    "stem": "關於「位於 sulcus terminalis 前方，但味覺由 CN IX 支配」所涉及的解剖構造，下列何者最適合？",
     "options": {
       "A": "舌後 1/3 感覺與味覺（posterior 1/3 tongue sensation and taste）",
       "B": "舌前 2/3 味覺（taste anterior 2/3 of tongue）",
@@ -1839,7 +1839,7 @@ export const anatomyQuestions: Question[] = [
       "E": "舌乳頭（vallate papillae）"
     },
     "answer": "E",
-    "explanation": "正解為 舌乳頭（vallate papillae）。這是常見陷阱：位置在前 2/3，但 taste 是 CN IX。 此題接近國考常見整合題，需要把結構、路徑與功能連在一起。",
+    "explanation": "正解為 舌乳頭（vallate papillae）。這是常見陷阱：位置在前 2/3，但 taste 是 CN IX。重點在於辨認 位於 sulcus terminalis 前方，但味覺由 CN IX 支配 與 舌乳頭（vallate papillae） 的關聯。",
     "testedConcept": "舌乳頭：位於 sulcus terminalis 前方，但味覺由 CN IX 支配",
     "sourceType": "AI_GENERATED",
     "difficulty": "medium"
@@ -1849,7 +1849,7 @@ export const anatomyQuestions: Question[] = [
     "subject": "解剖學",
     "chapter": "頭頸部",
     "section": "舌與味覺",
-    "stem": "臨床題幹描述與「伸舌偏向病灶側」最相關。若要定位病灶或判斷受影響構造，下列何者最適合？",
+    "stem": "下列何者最能解釋「伸舌偏向病灶側」的解剖基礎？",
     "options": {
       "A": "舌後 1/3 感覺與味覺（posterior 1/3 tongue sensation and taste）",
       "B": "舌乳頭（vallate papillae）",
@@ -1858,7 +1858,7 @@ export const anatomyQuestions: Question[] = [
       "E": "舌前 2/3 味覺（taste anterior 2/3 of tongue）"
     },
     "answer": "C",
-    "explanation": "正解為 舌下神經病灶（hypoglossal nerve lesion）。LMN lesion causes tongue deviation toward weak side。 此題屬較難的臨床定位或易混淆題，重點是辨認關鍵解剖線索。",
+    "explanation": "正解為 舌下神經病灶（hypoglossal nerve lesion）。LMN lesion causes tongue deviation toward weak side。",
     "testedConcept": "舌下神經病灶：伸舌偏向病灶側",
     "sourceType": "AI_GENERATED",
     "difficulty": "hard"
@@ -1868,7 +1868,7 @@ export const anatomyQuestions: Question[] = [
     "subject": "解剖學",
     "chapter": "頭頸部",
     "section": "舌與味覺",
-    "stem": "準備醫師國考時，若題目線索指向「由舌神經（lingual nerve, V3）負責」，最應選下列哪一個解剖構造或路徑？",
+    "stem": "關於「由舌神經（lingual nerve, V3）負責」所涉及的解剖構造，下列何者最適合？",
     "options": {
       "A": "舌下神經病灶（hypoglossal nerve lesion）",
       "B": "舌乳頭（vallate papillae）",
@@ -1877,7 +1877,7 @@ export const anatomyQuestions: Question[] = [
       "E": "舌前 2/3 味覺（taste anterior 2/3 of tongue）"
     },
     "answer": "D",
-    "explanation": "正解為 舌前 2/3 一般感覺（general sensation anterior 2/3 of tongue）。lingual nerve 也攜帶 chorda tympani 的味覺纖維。 此題接近國考常見整合題，需要把結構、路徑與功能連在一起。",
+    "explanation": "正解為 舌前 2/3 一般感覺（general sensation anterior 2/3 of tongue）。lingual nerve 也攜帶 chorda tympani 的味覺纖維。",
     "testedConcept": "舌前 2/3 一般感覺：由舌神經（lingual nerve, V3）負責",
     "sourceType": "AI_GENERATED",
     "difficulty": "medium"
@@ -1887,7 +1887,7 @@ export const anatomyQuestions: Question[] = [
     "subject": "解剖學",
     "chapter": "頭頸部",
     "section": "舌與味覺",
-    "stem": "臨床題幹描述與「由鼓索神經（chorda tympani, CN VII）負責」最相關。若要定位病灶或判斷受影響構造，下列何者最適合？",
+    "stem": "關於「由鼓索神經（chorda tympani, CN VII）負責」的解剖判斷，下列何者最適合？",
     "options": {
       "A": "舌下神經病灶（hypoglossal nerve lesion）",
       "B": "舌乳頭（vallate papillae）",
@@ -1896,7 +1896,7 @@ export const anatomyQuestions: Question[] = [
       "E": "舌前 2/3 味覺（taste anterior 2/3 of tongue）"
     },
     "answer": "E",
-    "explanation": "正解為 舌前 2/3 味覺（taste anterior 2/3 of tongue）。味覺纖維經 facial nerve 到 nucleus solitarius。 此題屬較難的臨床定位或易混淆題，重點是辨認關鍵解剖線索。",
+    "explanation": "正解為 舌前 2/3 味覺（taste anterior 2/3 of tongue）。味覺纖維經 facial nerve 到 nucleus solitarius。",
     "testedConcept": "舌前 2/3 味覺：由鼓索神經（chorda tympani, CN VII）負責",
     "sourceType": "AI_GENERATED",
     "difficulty": "hard"
@@ -1915,7 +1915,7 @@ export const anatomyQuestions: Question[] = [
       "E": "副甲狀腺（parathyroid glands）"
     },
     "answer": "B",
-    "explanation": "正解為 甲狀腺上動脈（superior thyroid artery）。結紮時要小心 external branch of superior laryngeal nerve。 此題屬基礎定位題，國考常用來確認核心解剖關係。",
+    "explanation": "正解為 甲狀腺上動脈（superior thyroid artery）。結紮時要小心 external branch of superior laryngeal nerve。",
     "testedConcept": "甲狀腺上動脈：來自 external carotid artery，靠近 external laryngeal nerve",
     "sourceType": "AI_GENERATED",
     "difficulty": "easy"
@@ -1925,7 +1925,7 @@ export const anatomyQuestions: Question[] = [
     "subject": "解剖學",
     "chapter": "頭頸部",
     "section": "甲狀腺與副甲狀腺",
-    "stem": "準備醫師國考時，若題目線索指向「來自 thyrocervical trunk，靠近 recurrent laryngeal nerve」，最應選下列哪一個解剖構造或路徑？",
+    "stem": "下列何者與「來自 thyrocervical trunk，靠近 recurrent laryngeal nerve」最相關？",
     "options": {
       "A": "喉返神經（recurrent laryngeal nerve）",
       "B": "甲狀舌管囊腫（thyroglossal duct cyst）",
@@ -1934,7 +1934,7 @@ export const anatomyQuestions: Question[] = [
       "E": "甲狀腺下動脈（inferior thyroid artery）"
     },
     "answer": "E",
-    "explanation": "正解為 甲狀腺下動脈（inferior thyroid artery）。甲狀腺手術常考 nerve at risk。 此題接近國考常見整合題，需要把結構、路徑與功能連在一起。",
+    "explanation": "正解為 甲狀腺下動脈（inferior thyroid artery）。甲狀腺手術常考 nerve at risk。重點在於辨認 來自 thyrocervical trunk，靠近 recurrent laryngeal nerve 與 甲狀腺下動脈（inferior thyroid artery） 的關聯。",
     "testedConcept": "甲狀腺下動脈：來自 thyrocervical trunk，靠近 recurrent laryngeal nerve",
     "sourceType": "AI_GENERATED",
     "difficulty": "medium"
@@ -1944,7 +1944,7 @@ export const anatomyQuestions: Question[] = [
     "subject": "解剖學",
     "chapter": "頭頸部",
     "section": "甲狀腺與副甲狀腺",
-    "stem": "臨床題幹描述與「在 tracheoesophageal groove 上行，與 inferior thyroid artery 關係密切」最相關。若要定位病灶或判斷受影響構造，下列何者最適合？",
+    "stem": "關於「在 tracheoesophageal groove 上行，與 inferior thyroid artery 關係密切」的解剖判斷，下列何者最適合？",
     "options": {
       "A": "甲狀腺峽部（isthmus of thyroid gland）",
       "B": "喉返神經（recurrent laryngeal nerve）",
@@ -1953,7 +1953,7 @@ export const anatomyQuestions: Question[] = [
       "E": "甲狀舌管囊腫（thyroglossal duct cyst）"
     },
     "answer": "B",
-    "explanation": "正解為 喉返神經（recurrent laryngeal nerve）。傷及可造成聲音沙啞。 此題屬較難的臨床定位或易混淆題，重點是辨認關鍵解剖線索。",
+    "explanation": "正解為 喉返神經（recurrent laryngeal nerve）。傷及可造成聲音沙啞。重點在於辨認 在 tracheoesophageal groove 上行，與 inferior thyroid artery 關係密切 與 喉返神經（recurrent laryngeal nerve） 的關聯。",
     "testedConcept": "喉返神經：在 tracheoesophageal groove 上行，與 inferior thyroid artery 關係密切",
     "sourceType": "AI_GENERATED",
     "difficulty": "hard"
@@ -1963,7 +1963,7 @@ export const anatomyQuestions: Question[] = [
     "subject": "解剖學",
     "chapter": "頭頸部",
     "section": "甲狀腺與副甲狀腺",
-    "stem": "準備醫師國考時，若題目線索指向「通常位於甲狀腺後面，血供多來自 inferior thyroid artery」，最應選下列哪一個解剖構造或路徑？",
+    "stem": "下列何者與「通常位於甲狀腺後面，血供多來自 inferior thyroid artery」最相關？",
     "options": {
       "A": "甲狀舌管囊腫（thyroglossal duct cyst）",
       "B": "喉返神經（recurrent laryngeal nerve）",
@@ -1972,7 +1972,7 @@ export const anatomyQuestions: Question[] = [
       "E": "甲狀腺上動脈（superior thyroid artery）"
     },
     "answer": "C",
-    "explanation": "正解為 副甲狀腺（parathyroid glands）。甲狀腺手術後低血鈣要想到 parathyroid injury。 此題接近國考常見整合題，需要把結構、路徑與功能連在一起。",
+    "explanation": "正解為 副甲狀腺（parathyroid glands）。甲狀腺手術後低血鈣要想到 parathyroid injury。",
     "testedConcept": "副甲狀腺：通常位於甲狀腺後面，血供多來自 inferior thyroid artery",
     "sourceType": "AI_GENERATED",
     "difficulty": "medium"
@@ -1982,7 +1982,7 @@ export const anatomyQuestions: Question[] = [
     "subject": "解剖學",
     "chapter": "頭頸部",
     "section": "甲狀腺與副甲狀腺",
-    "stem": "臨床題幹描述與「通常跨過第 2-4 氣管環」最相關。若要定位病灶或判斷受影響構造，下列何者最適合？",
+    "stem": "若病灶或手術傷害影響「通常跨過第 2-4 氣管環」相關功能或解剖關係，最可能涉及下列何者？",
     "options": {
       "A": "甲狀腺下動脈（inferior thyroid artery）",
       "B": "甲狀舌管囊腫（thyroglossal duct cyst）",
@@ -1991,7 +1991,7 @@ export const anatomyQuestions: Question[] = [
       "E": "甲狀腺上動脈（superior thyroid artery）"
     },
     "answer": "C",
-    "explanation": "正解為 甲狀腺峽部（isthmus of thyroid gland）。做 tracheostomy 時是重要解剖關係。 此題屬較難的臨床定位或易混淆題，重點是辨認關鍵解剖線索。",
+    "explanation": "正解為 甲狀腺峽部（isthmus of thyroid gland）。做 tracheostomy 時是重要解剖關係。",
     "testedConcept": "甲狀腺峽部：通常跨過第 2-4 氣管環",
     "sourceType": "AI_GENERATED",
     "difficulty": "hard"
@@ -2010,7 +2010,7 @@ export const anatomyQuestions: Question[] = [
       "E": "副甲狀腺（parathyroid glands）"
     },
     "answer": "A",
-    "explanation": "正解為 甲狀舌管囊腫（thyroglossal duct cyst）。和 thyroid descent tract 有關。 此題屬基礎定位題，國考常用來確認核心解剖關係。",
+    "explanation": "正解為 甲狀舌管囊腫（thyroglossal duct cyst）。和 thyroid descent tract 有關。",
     "testedConcept": "甲狀舌管囊腫：常位於中線，吞嚥或伸舌時會移動",
     "sourceType": "AI_GENERATED",
     "difficulty": "easy"
@@ -2020,7 +2020,7 @@ export const anatomyQuestions: Question[] = [
     "subject": "解剖學",
     "chapter": "頭頸部",
     "section": "甲狀腺與副甲狀腺",
-    "stem": "準備醫師國考時，若題目線索指向「來自 external carotid artery，靠近 external laryngeal nerve」，最應選下列哪一個解剖構造或路徑？",
+    "stem": "關於「來自 external carotid artery，靠近 external laryngeal nerve」所涉及的解剖構造，下列何者最適合？",
     "options": {
       "A": "副甲狀腺（parathyroid glands）",
       "B": "甲狀腺下動脈（inferior thyroid artery）",
@@ -2029,7 +2029,7 @@ export const anatomyQuestions: Question[] = [
       "E": "甲狀腺上動脈（superior thyroid artery）"
     },
     "answer": "E",
-    "explanation": "正解為 甲狀腺上動脈（superior thyroid artery）。結紮時要小心 external branch of superior laryngeal nerve。 此題接近國考常見整合題，需要把結構、路徑與功能連在一起。",
+    "explanation": "正解為 甲狀腺上動脈（superior thyroid artery）。結紮時要小心 external branch of superior laryngeal nerve。",
     "testedConcept": "甲狀腺上動脈：來自 external carotid artery，靠近 external laryngeal nerve",
     "sourceType": "AI_GENERATED",
     "difficulty": "medium"
@@ -2039,7 +2039,7 @@ export const anatomyQuestions: Question[] = [
     "subject": "解剖學",
     "chapter": "頭頸部",
     "section": "甲狀腺與副甲狀腺",
-    "stem": "臨床題幹描述與「來自 thyrocervical trunk，靠近 recurrent laryngeal nerve」最相關。若要定位病灶或判斷受影響構造，下列何者最適合？",
+    "stem": "若病灶或手術傷害影響「來自 thyrocervical trunk，靠近 recurrent laryngeal nerve」相關功能或解剖關係，最可能涉及下列何者？",
     "options": {
       "A": "副甲狀腺（parathyroid glands）",
       "B": "甲狀舌管囊腫（thyroglossal duct cyst）",
@@ -2048,7 +2048,7 @@ export const anatomyQuestions: Question[] = [
       "E": "喉返神經（recurrent laryngeal nerve）"
     },
     "answer": "D",
-    "explanation": "正解為 甲狀腺下動脈（inferior thyroid artery）。甲狀腺手術常考 nerve at risk。 此題屬較難的臨床定位或易混淆題，重點是辨認關鍵解剖線索。",
+    "explanation": "正解為 甲狀腺下動脈（inferior thyroid artery）。甲狀腺手術常考 nerve at risk。重點在於辨認 來自 thyrocervical trunk，靠近 recurrent laryngeal nerve 與 甲狀腺下動脈（inferior thyroid artery） 的關聯。",
     "testedConcept": "甲狀腺下動脈：來自 thyrocervical trunk，靠近 recurrent laryngeal nerve",
     "sourceType": "AI_GENERATED",
     "difficulty": "hard"
@@ -2058,7 +2058,7 @@ export const anatomyQuestions: Question[] = [
     "subject": "解剖學",
     "chapter": "胸腔",
     "section": "心臟與冠狀動脈",
-    "stem": "準備醫師國考時，若題目線索指向「多數人供應 SA node 與 AV node，並在 right dominance 供應 PDA」，最應選下列哪一個解剖構造或路徑？",
+    "stem": "關於「多數人供應 SA node 與 AV node，並在 right dominance 供應 PDA」所涉及的解剖構造，下列何者最適合？",
     "options": {
       "A": "冠狀竇（coronary sinus）",
       "B": "左前降支（left anterior descending artery, LAD）",
@@ -2067,7 +2067,7 @@ export const anatomyQuestions: Question[] = [
       "E": "左心耳（left auricle）"
     },
     "answer": "C",
-    "explanation": "正解為 右冠狀動脈（right coronary artery, RCA）。RCA 阻塞可造成 inferior wall MI 與 AV block。 此題接近國考常見整合題，需要把結構、路徑與功能連在一起。",
+    "explanation": "正解為 右冠狀動脈（right coronary artery, RCA）。RCA 阻塞可造成 inferior wall MI 與 AV block。",
     "testedConcept": "右冠狀動脈：多數人供應 SA node 與 AV node，並在 right dominance 供應 PDA",
     "sourceType": "AI_GENERATED",
     "difficulty": "medium"
@@ -2077,7 +2077,7 @@ export const anatomyQuestions: Question[] = [
     "subject": "解剖學",
     "chapter": "胸腔",
     "section": "心臟與冠狀動脈",
-    "stem": "臨床題幹描述與「供應前壁、心尖與 interventricular septum 前 2/3」最相關。若要定位病灶或判斷受影響構造，下列何者最適合？",
+    "stem": "下列何者最能解釋「供應前壁、心尖與 interventricular septum 前 2/3」的解剖基礎？",
     "options": {
       "A": "左前降支（left anterior descending artery, LAD）",
       "B": "右冠狀動脈（right coronary artery, RCA）",
@@ -2086,7 +2086,7 @@ export const anatomyQuestions: Question[] = [
       "E": "左迴旋支（left circumflex artery, LCx）"
     },
     "answer": "A",
-    "explanation": "正解為 左前降支（left anterior descending artery, LAD）。LAD 被稱 widow-maker，阻塞常影響 septal branches。 此題屬較難的臨床定位或易混淆題，重點是辨認關鍵解剖線索。",
+    "explanation": "正解為 左前降支（left anterior descending artery, LAD）。LAD 被稱 widow-maker，阻塞常影響 septal branches。",
     "testedConcept": "左前降支：供應前壁、心尖與 interventricular septum 前 2/3",
     "sourceType": "AI_GENERATED",
     "difficulty": "hard"
@@ -2105,7 +2105,7 @@ export const anatomyQuestions: Question[] = [
       "E": "右冠狀動脈（right coronary artery, RCA）"
     },
     "answer": "B",
-    "explanation": "正解為 左迴旋支（left circumflex artery, LCx）。LCx 走 coronary sulcus。 此題屬基礎定位題，國考常用來確認核心解剖關係。",
+    "explanation": "正解為 左迴旋支（left circumflex artery, LCx）。LCx 走 coronary sulcus。",
     "testedConcept": "左迴旋支：供應左心室側壁，left dominance 時可供應 PDA",
     "sourceType": "AI_GENERATED",
     "difficulty": "easy"
@@ -2115,7 +2115,7 @@ export const anatomyQuestions: Question[] = [
     "subject": "解剖學",
     "chapter": "胸腔",
     "section": "心臟與冠狀動脈",
-    "stem": "準備醫師國考時，若題目線索指向「供應 interventricular septum 後 1/3」，最應選下列哪一個解剖構造或路徑？",
+    "stem": "下列何者與「供應 interventricular septum 後 1/3」最相關？",
     "options": {
       "A": "左迴旋支（left circumflex artery, LCx）",
       "B": "左心耳（left auricle）",
@@ -2124,7 +2124,7 @@ export const anatomyQuestions: Question[] = [
       "E": "後降支（posterior descending artery, PDA）"
     },
     "answer": "E",
-    "explanation": "正解為 後降支（posterior descending artery, PDA）。PDA 來源決定 coronary dominance。 此題接近國考常見整合題，需要把結構、路徑與功能連在一起。",
+    "explanation": "正解為 後降支（posterior descending artery, PDA）。PDA 來源決定 coronary dominance。",
     "testedConcept": "後降支：供應 interventricular septum 後 1/3",
     "sourceType": "AI_GENERATED",
     "difficulty": "medium"
@@ -2134,7 +2134,7 @@ export const anatomyQuestions: Question[] = [
     "subject": "解剖學",
     "chapter": "胸腔",
     "section": "心臟與冠狀動脈",
-    "stem": "臨床題幹描述與「收集大部分心臟靜脈血並注入右心房」最相關。若要定位病灶或判斷受影響構造，下列何者最適合？",
+    "stem": "下列何者最能解釋「收集大部分心臟靜脈血並注入右心房」的解剖基礎？",
     "options": {
       "A": "冠狀竇（coronary sinus）",
       "B": "左前降支（left anterior descending artery, LAD）",
@@ -2143,7 +2143,7 @@ export const anatomyQuestions: Question[] = [
       "E": "左迴旋支（left circumflex artery, LCx）"
     },
     "answer": "A",
-    "explanation": "正解為 冠狀竇（coronary sinus）。位於 posterior atrioventricular groove。 此題屬較難的臨床定位或易混淆題，重點是辨認關鍵解剖線索。",
+    "explanation": "正解為 冠狀竇（coronary sinus）。位於 posterior atrioventricular groove。",
     "testedConcept": "冠狀竇：收集大部分心臟靜脈血並注入右心房",
     "sourceType": "AI_GENERATED",
     "difficulty": "hard"
@@ -2153,7 +2153,7 @@ export const anatomyQuestions: Question[] = [
     "subject": "解剖學",
     "chapter": "胸腔",
     "section": "心臟與冠狀動脈",
-    "stem": "準備醫師國考時，若題目線索指向「靠近左冠狀動脈與肺動脈根部」，最應選下列哪一個解剖構造或路徑？",
+    "stem": "下列何者與「靠近左冠狀動脈與肺動脈根部」最相關？",
     "options": {
       "A": "左迴旋支（left circumflex artery, LCx）",
       "B": "右冠狀動脈（right coronary artery, RCA）",
@@ -2162,7 +2162,7 @@ export const anatomyQuestions: Question[] = [
       "E": "左前降支（left anterior descending artery, LAD）"
     },
     "answer": "C",
-    "explanation": "正解為 左心耳（left auricle）。心耳與 atrial appendage 解剖位置常用於影像辨識。 此題接近國考常見整合題，需要把結構、路徑與功能連在一起。",
+    "explanation": "正解為 左心耳（left auricle）。心耳與 atrial appendage 解剖位置常用於影像辨識。重點在於辨認 靠近左冠狀動脈與肺動脈根部 與 左心耳（left auricle） 的關聯。",
     "testedConcept": "左心耳：靠近左冠狀動脈與肺動脈根部",
     "sourceType": "AI_GENERATED",
     "difficulty": "medium"
@@ -2172,7 +2172,7 @@ export const anatomyQuestions: Question[] = [
     "subject": "解剖學",
     "chapter": "胸腔",
     "section": "心臟與冠狀動脈",
-    "stem": "臨床題幹描述與「多數人供應 SA node 與 AV node，並在 right dominance 供應 PDA」最相關。若要定位病灶或判斷受影響構造，下列何者最適合？",
+    "stem": "關於「多數人供應 SA node 與 AV node，並在 right dominance 供應 PDA」的解剖判斷，下列何者最適合？",
     "options": {
       "A": "左心耳（left auricle）",
       "B": "左前降支（left anterior descending artery, LAD）",
@@ -2181,7 +2181,7 @@ export const anatomyQuestions: Question[] = [
       "E": "後降支（posterior descending artery, PDA）"
     },
     "answer": "D",
-    "explanation": "正解為 右冠狀動脈（right coronary artery, RCA）。RCA 阻塞可造成 inferior wall MI 與 AV block。 此題屬較難的臨床定位或易混淆題，重點是辨認關鍵解剖線索。",
+    "explanation": "正解為 右冠狀動脈（right coronary artery, RCA）。RCA 阻塞可造成 inferior wall MI 與 AV block。",
     "testedConcept": "右冠狀動脈：多數人供應 SA node 與 AV node，並在 right dominance 供應 PDA",
     "sourceType": "AI_GENERATED",
     "difficulty": "hard"
@@ -2200,7 +2200,7 @@ export const anatomyQuestions: Question[] = [
       "E": "左前降支（left anterior descending artery, LAD）"
     },
     "answer": "E",
-    "explanation": "正解為 左前降支（left anterior descending artery, LAD）。LAD 被稱 widow-maker，阻塞常影響 septal branches。 此題屬基礎定位題，國考常用來確認核心解剖關係。",
+    "explanation": "正解為 左前降支（left anterior descending artery, LAD）。LAD 被稱 widow-maker，阻塞常影響 septal branches。",
     "testedConcept": "左前降支：供應前壁、心尖與 interventricular septum 前 2/3",
     "sourceType": "AI_GENERATED",
     "difficulty": "easy"
@@ -2210,7 +2210,7 @@ export const anatomyQuestions: Question[] = [
     "subject": "解剖學",
     "chapter": "胸腔",
     "section": "縱膈",
-    "stem": "準備醫師國考時，若題目線索指向「含 thymus、brachiocephalic veins、SVC、aortic arch、trachea、esophagus」，最應選下列哪一個解剖構造或路徑？",
+    "stem": "關於「含 thymus、brachiocephalic veins、SVC、aortic arch、trachea、esophagus」所涉及的解剖構造，下列何者最適合？",
     "options": {
       "A": "上縱膈（superior mediastinum）",
       "B": "後縱膈（posterior mediastinum）",
@@ -2219,7 +2219,7 @@ export const anatomyQuestions: Question[] = [
       "E": "中縱膈（middle mediastinum）"
     },
     "answer": "A",
-    "explanation": "正解為 上縱膈（superior mediastinum）。以 sternal angle 到 T4/T5 作分界。 此題接近國考常見整合題，需要把結構、路徑與功能連在一起。",
+    "explanation": "正解為 上縱膈（superior mediastinum）。以 sternal angle 到 T4/T5 作分界。重點在於辨認 含 thymus、brachiocephalic veins、SVC、aortic arch、trachea、esophagus 與 上縱膈（superior mediastinum） 的關聯。",
     "testedConcept": "上縱膈：含 thymus、brachiocephalic veins、SVC、aortic arch、trachea、esophagus",
     "sourceType": "AI_GENERATED",
     "difficulty": "medium"
@@ -2229,7 +2229,7 @@ export const anatomyQuestions: Question[] = [
     "subject": "解剖學",
     "chapter": "胸腔",
     "section": "縱膈",
-    "stem": "臨床題幹描述與「主要包含心臟與 pericardium」最相關。若要定位病灶或判斷受影響構造，下列何者最適合？",
+    "stem": "關於「主要包含心臟與 pericardium」的解剖判斷，下列何者最適合？",
     "options": {
       "A": "胸導管（thoracic duct）",
       "B": "上縱膈（superior mediastinum）",
@@ -2238,7 +2238,7 @@ export const anatomyQuestions: Question[] = [
       "E": "中縱膈（middle mediastinum）"
     },
     "answer": "E",
-    "explanation": "正解為 中縱膈（middle mediastinum）。phrenic nerve 走在 fibrous pericardium 外側。 此題屬較難的臨床定位或易混淆題，重點是辨認關鍵解剖線索。",
+    "explanation": "正解為 中縱膈（middle mediastinum）。phrenic nerve 走在 fibrous pericardium 外側。",
     "testedConcept": "中縱膈：主要包含心臟與 pericardium",
     "sourceType": "AI_GENERATED",
     "difficulty": "hard"
@@ -2248,7 +2248,7 @@ export const anatomyQuestions: Question[] = [
     "subject": "解剖學",
     "chapter": "胸腔",
     "section": "縱膈",
-    "stem": "準備醫師國考時，若題目線索指向「含 descending thoracic aorta、azygos system、thoracic duct、esophagus」，最應選下列哪一個解剖構造或路徑？",
+    "stem": "關於「含 descending thoracic aorta、azygos system、thoracic duct、esophagus」所涉及的解剖構造，下列何者最適合？",
     "options": {
       "A": "上縱膈（superior mediastinum）",
       "B": "奇靜脈（azygos vein）",
@@ -2257,7 +2257,7 @@ export const anatomyQuestions: Question[] = [
       "E": "胸導管（thoracic duct）"
     },
     "answer": "D",
-    "explanation": "正解為 後縱膈（posterior mediastinum）。vagus plexus 也在 esophagus 周圍。 此題接近國考常見整合題，需要把結構、路徑與功能連在一起。",
+    "explanation": "正解為 後縱膈（posterior mediastinum）。vagus plexus 也在 esophagus 周圍。",
     "testedConcept": "後縱膈：含 descending thoracic aorta、azygos system、thoracic duct、esophagus",
     "sourceType": "AI_GENERATED",
     "difficulty": "medium"
@@ -2267,7 +2267,7 @@ export const anatomyQuestions: Question[] = [
     "subject": "解剖學",
     "chapter": "胸腔",
     "section": "縱膈",
-    "stem": "臨床題幹描述與「穿過 aortic hiatus，最後注入左靜脈角」最相關。若要定位病灶或判斷受影響構造，下列何者最適合？",
+    "stem": "若病灶或手術傷害影響「穿過 aortic hiatus，最後注入左靜脈角」相關功能或解剖關係，最可能涉及下列何者？",
     "options": {
       "A": "上縱膈（superior mediastinum）",
       "B": "後縱膈（posterior mediastinum）",
@@ -2276,7 +2276,7 @@ export const anatomyQuestions: Question[] = [
       "E": "奇靜脈（azygos vein）"
     },
     "answer": "D",
-    "explanation": "正解為 胸導管（thoracic duct）。收集除右上象限以外大多數淋巴。 此題屬較難的臨床定位或易混淆題，重點是辨認關鍵解剖線索。",
+    "explanation": "正解為 胸導管（thoracic duct）。收集除右上象限以外大多數淋巴。重點在於辨認 穿過 aortic hiatus，最後注入左靜脈角 與 胸導管（thoracic duct） 的關聯。",
     "testedConcept": "胸導管：穿過 aortic hiatus，最後注入左靜脈角",
     "sourceType": "AI_GENERATED",
     "difficulty": "hard"
@@ -2295,7 +2295,7 @@ export const anatomyQuestions: Question[] = [
       "E": "後縱膈（posterior mediastinum）"
     },
     "answer": "C",
-    "explanation": "正解為 奇靜脈（azygos vein）。影像與縱膈解剖常考。 此題屬基礎定位題，國考常用來確認核心解剖關係。",
+    "explanation": "正解為 奇靜脈（azygos vein）。影像與縱膈解剖常考。重點在於辨認 跨過右主支氣管上方注入 SVC 與 奇靜脈（azygos vein） 的關聯。",
     "testedConcept": "奇靜脈：跨過右主支氣管上方注入 SVC",
     "sourceType": "AI_GENERATED",
     "difficulty": "easy"
@@ -2305,7 +2305,7 @@ export const anatomyQuestions: Question[] = [
     "subject": "解剖學",
     "chapter": "胸腔",
     "section": "縱膈",
-    "stem": "準備醫師國考時，若題目線索指向「C3-C5，走在肺根前方，支配橫膈運動」，最應選下列哪一個解剖構造或路徑？",
+    "stem": "下列何者與「C3-C5，走在肺根前方，支配橫膈運動」最相關？",
     "options": {
       "A": "膈神經（phrenic nerve）",
       "B": "胸導管（thoracic duct）",
@@ -2314,7 +2314,7 @@ export const anatomyQuestions: Question[] = [
       "E": "後縱膈（posterior mediastinum）"
     },
     "answer": "A",
-    "explanation": "正解為 膈神經（phrenic nerve）。口訣 C3,4,5 keeps diaphragm alive。 此題接近國考常見整合題，需要把結構、路徑與功能連在一起。",
+    "explanation": "正解為 膈神經（phrenic nerve）。口訣 C3,4,5 keeps diaphragm alive。重點在於辨認 C3-C5，走在肺根前方，支配橫膈運動 與 膈神經（phrenic nerve） 的關聯。",
     "testedConcept": "膈神經：C3-C5，走在肺根前方，支配橫膈運動",
     "sourceType": "AI_GENERATED",
     "difficulty": "medium"
@@ -2324,7 +2324,7 @@ export const anatomyQuestions: Question[] = [
     "subject": "解剖學",
     "chapter": "胸腔",
     "section": "縱膈",
-    "stem": "臨床題幹描述與「含 thymus、brachiocephalic veins、SVC、aortic arch、trachea、esophagus」最相關。若要定位病灶或判斷受影響構造，下列何者最適合？",
+    "stem": "若病灶或手術傷害影響「含 thymus、brachiocephalic veins、SVC、aortic arch、trachea、esophagus」相關功能或解剖關係，最可能涉及下列何者？",
     "options": {
       "A": "後縱膈（posterior mediastinum）",
       "B": "上縱膈（superior mediastinum）",
@@ -2333,7 +2333,7 @@ export const anatomyQuestions: Question[] = [
       "E": "胸導管（thoracic duct）"
     },
     "answer": "B",
-    "explanation": "正解為 上縱膈（superior mediastinum）。以 sternal angle 到 T4/T5 作分界。 此題屬較難的臨床定位或易混淆題，重點是辨認關鍵解剖線索。",
+    "explanation": "正解為 上縱膈（superior mediastinum）。以 sternal angle 到 T4/T5 作分界。重點在於辨認 含 thymus、brachiocephalic veins、SVC、aortic arch、trachea、esophagus 與 上縱膈（superior mediastinum） 的關聯。",
     "testedConcept": "上縱膈：含 thymus、brachiocephalic veins、SVC、aortic arch、trachea、esophagus",
     "sourceType": "AI_GENERATED",
     "difficulty": "hard"
@@ -2343,7 +2343,7 @@ export const anatomyQuestions: Question[] = [
     "subject": "解剖學",
     "chapter": "胸腔",
     "section": "縱膈",
-    "stem": "準備醫師國考時，若題目線索指向「主要包含心臟與 pericardium」，最應選下列哪一個解剖構造或路徑？",
+    "stem": "下列何者與「主要包含心臟與 pericardium」最相關？",
     "options": {
       "A": "中縱膈（middle mediastinum）",
       "B": "上縱膈（superior mediastinum）",
@@ -2352,7 +2352,7 @@ export const anatomyQuestions: Question[] = [
       "E": "奇靜脈（azygos vein）"
     },
     "answer": "A",
-    "explanation": "正解為 中縱膈（middle mediastinum）。phrenic nerve 走在 fibrous pericardium 外側。 此題接近國考常見整合題，需要把結構、路徑與功能連在一起。",
+    "explanation": "正解為 中縱膈（middle mediastinum）。phrenic nerve 走在 fibrous pericardium 外側。",
     "testedConcept": "中縱膈：主要包含心臟與 pericardium",
     "sourceType": "AI_GENERATED",
     "difficulty": "medium"
@@ -2362,7 +2362,7 @@ export const anatomyQuestions: Question[] = [
     "subject": "解剖學",
     "chapter": "胸腔",
     "section": "肺與胸膜",
-    "stem": "臨床題幹描述與「覆蓋肺表面，痛覺不敏感」最相關。若要定位病灶或判斷受影響構造，下列何者最適合？",
+    "stem": "下列何者最能解釋「覆蓋肺表面，痛覺不敏感」的解剖基礎？",
     "options": {
       "A": "肺根（root of lung）",
       "B": "臟層胸膜（visceral pleura）",
@@ -2371,7 +2371,7 @@ export const anatomyQuestions: Question[] = [
       "E": "壁層胸膜（parietal pleura）"
     },
     "answer": "B",
-    "explanation": "正解為 臟層胸膜（visceral pleura）。autonomic fibers；不由 intercostal nerve 負責痛覺。 此題屬較難的臨床定位或易混淆題，重點是辨認關鍵解剖線索。",
+    "explanation": "正解為 臟層胸膜（visceral pleura）。autonomic fibers；不由 intercostal nerve 負責痛覺。",
     "testedConcept": "臟層胸膜：覆蓋肺表面，痛覺不敏感",
     "sourceType": "AI_GENERATED",
     "difficulty": "hard"
@@ -2390,7 +2390,7 @@ export const anatomyQuestions: Question[] = [
       "E": "肺根（root of lung）"
     },
     "answer": "D",
-    "explanation": "正解為 壁層胸膜（parietal pleura）。central diaphragmatic pleura 的痛可 referred to shoulder。 此題屬基礎定位題，國考常用來確認核心解剖關係。",
+    "explanation": "正解為 壁層胸膜（parietal pleura）。central diaphragmatic pleura 的痛可 referred to shoulder。",
     "testedConcept": "壁層胸膜：對痛覺敏感，由 intercostal nerves 與 phrenic nerve 支配",
     "sourceType": "AI_GENERATED",
     "difficulty": "easy"
@@ -2400,7 +2400,7 @@ export const anatomyQuestions: Question[] = [
     "subject": "解剖學",
     "chapter": "胸腔",
     "section": "肺與胸膜",
-    "stem": "準備醫師國考時，若題目線索指向「左肺門中 pulmonary artery 通常在 bronchus 上方」，最應選下列哪一個解剖構造或路徑？",
+    "stem": "關於「左肺門中 pulmonary artery 通常在 bronchus 上方」所涉及的解剖構造，下列何者最適合？",
     "options": {
       "A": "肺段（bronchopulmonary segment）",
       "B": "右主支氣管（right main bronchus）",
@@ -2409,7 +2409,7 @@ export const anatomyQuestions: Question[] = [
       "E": "肺根（root of lung）"
     },
     "answer": "E",
-    "explanation": "正解為 肺根（root of lung）。RALS: Right pulmonary artery Anterior, Left pulmonary artery Superior。 此題接近國考常見整合題，需要把結構、路徑與功能連在一起。",
+    "explanation": "正解為 肺根（root of lung）。RALS: Right pulmonary artery Anterior, Left pulmonary artery Superior。",
     "testedConcept": "肺根：左肺門中 pulmonary artery 通常在 bronchus 上方",
     "sourceType": "AI_GENERATED",
     "difficulty": "medium"
@@ -2419,7 +2419,7 @@ export const anatomyQuestions: Question[] = [
     "subject": "解剖學",
     "chapter": "胸腔",
     "section": "肺與胸膜",
-    "stem": "臨床題幹描述與「較短、寬、垂直，異物較常掉入」最相關。若要定位病灶或判斷受影響構造，下列何者最適合？",
+    "stem": "下列何者最能解釋「較短、寬、垂直，異物較常掉入」的解剖基礎？",
     "options": {
       "A": "肺根（root of lung）",
       "B": "右主支氣管（right main bronchus）",
@@ -2428,7 +2428,7 @@ export const anatomyQuestions: Question[] = [
       "E": "肋膈隱窩（costodiaphragmatic recess）"
     },
     "answer": "B",
-    "explanation": "正解為 右主支氣管（right main bronchus）。aspiration 常進右側，尤其 right lower lobe。 此題屬較難的臨床定位或易混淆題，重點是辨認關鍵解剖線索。",
+    "explanation": "正解為 右主支氣管（right main bronchus）。aspiration 常進右側，尤其 right lower lobe。",
     "testedConcept": "右主支氣管：較短、寬、垂直，異物較常掉入",
     "sourceType": "AI_GENERATED",
     "difficulty": "hard"
@@ -2438,7 +2438,7 @@ export const anatomyQuestions: Question[] = [
     "subject": "解剖學",
     "chapter": "胸腔",
     "section": "肺與胸膜",
-    "stem": "準備醫師國考時，若題目線索指向「胸膜腔最低處，積液常聚集」，最應選下列哪一個解剖構造或路徑？",
+    "stem": "關於「胸膜腔最低處，積液常聚集」所涉及的解剖構造，下列何者最適合？",
     "options": {
       "A": "臟層胸膜（visceral pleura）",
       "B": "肺段（bronchopulmonary segment）",
@@ -2447,7 +2447,7 @@ export const anatomyQuestions: Question[] = [
       "E": "右主支氣管（right main bronchus）"
     },
     "answer": "C",
-    "explanation": "正解為 肋膈隱窩（costodiaphragmatic recess）。胸腔穿刺常選 midaxillary line 第 8-9 肋間上緣。 此題接近國考常見整合題，需要把結構、路徑與功能連在一起。",
+    "explanation": "正解為 肋膈隱窩（costodiaphragmatic recess）。胸腔穿刺常選 midaxillary line 第 8-9 肋間上緣。",
     "testedConcept": "肋膈隱窩：胸膜腔最低處，積液常聚集",
     "sourceType": "AI_GENERATED",
     "difficulty": "medium"
@@ -2457,7 +2457,7 @@ export const anatomyQuestions: Question[] = [
     "subject": "解剖學",
     "chapter": "胸腔",
     "section": "肺與胸膜",
-    "stem": "臨床題幹描述與「有自己的 segmental bronchus 與 pulmonary artery 分支」最相關。若要定位病灶或判斷受影響構造，下列何者最適合？",
+    "stem": "關於「有自己的 segmental bronchus 與 pulmonary artery 分支」的解剖判斷，下列何者最適合？",
     "options": {
       "A": "肋膈隱窩（costodiaphragmatic recess）",
       "B": "肺段（bronchopulmonary segment）",
@@ -2466,7 +2466,7 @@ export const anatomyQuestions: Question[] = [
       "E": "右主支氣管（right main bronchus）"
     },
     "answer": "B",
-    "explanation": "正解為 肺段（bronchopulmonary segment）。可作為外科切除單位。 此題屬較難的臨床定位或易混淆題，重點是辨認關鍵解剖線索。",
+    "explanation": "正解為 肺段（bronchopulmonary segment）。可作為外科切除單位。重點在於辨認 有自己的 segmental bronchus 與 pulmonary artery 分支 與 肺段（bronchopulmonary segment） 的關聯。",
     "testedConcept": "肺段：有自己的 segmental bronchus 與 pulmonary artery 分支",
     "sourceType": "AI_GENERATED",
     "difficulty": "hard"
@@ -2485,7 +2485,7 @@ export const anatomyQuestions: Question[] = [
       "E": "壁層胸膜（parietal pleura）"
     },
     "answer": "B",
-    "explanation": "正解為 臟層胸膜（visceral pleura）。autonomic fibers；不由 intercostal nerve 負責痛覺。 此題屬基礎定位題，國考常用來確認核心解剖關係。",
+    "explanation": "正解為 臟層胸膜（visceral pleura）。autonomic fibers；不由 intercostal nerve 負責痛覺。",
     "testedConcept": "臟層胸膜：覆蓋肺表面，痛覺不敏感",
     "sourceType": "AI_GENERATED",
     "difficulty": "easy"
@@ -2495,7 +2495,7 @@ export const anatomyQuestions: Question[] = [
     "subject": "解剖學",
     "chapter": "胸腔",
     "section": "肺與胸膜",
-    "stem": "準備醫師國考時，若題目線索指向「對痛覺敏感，由 intercostal nerves 與 phrenic nerve 支配」，最應選下列哪一個解剖構造或路徑？",
+    "stem": "下列何者與「對痛覺敏感，由 intercostal nerves 與 phrenic nerve 支配」最相關？",
     "options": {
       "A": "肋膈隱窩（costodiaphragmatic recess）",
       "B": "壁層胸膜（parietal pleura）",
@@ -2504,7 +2504,7 @@ export const anatomyQuestions: Question[] = [
       "E": "臟層胸膜（visceral pleura）"
     },
     "answer": "B",
-    "explanation": "正解為 壁層胸膜（parietal pleura）。central diaphragmatic pleura 的痛可 referred to shoulder。 此題接近國考常見整合題，需要把結構、路徑與功能連在一起。",
+    "explanation": "正解為 壁層胸膜（parietal pleura）。central diaphragmatic pleura 的痛可 referred to shoulder。",
     "testedConcept": "壁層胸膜：對痛覺敏感，由 intercostal nerves 與 phrenic nerve 支配",
     "sourceType": "AI_GENERATED",
     "difficulty": "medium"
@@ -2514,7 +2514,7 @@ export const anatomyQuestions: Question[] = [
     "subject": "解剖學",
     "chapter": "胸腔",
     "section": "橫膈",
-    "stem": "臨床題幹描述與「位於 T8，通過 inferior vena cava 與右膈神經分支」最相關。若要定位病灶或判斷受影響構造，下列何者最適合？",
+    "stem": "關於「位於 T8，通過 inferior vena cava 與右膈神經分支」的解剖判斷，下列何者最適合？",
     "options": {
       "A": "左膈腳（left crus of diaphragm）",
       "B": "食道裂孔（esophageal hiatus）",
@@ -2523,7 +2523,7 @@ export const anatomyQuestions: Question[] = [
       "E": "膈神經（phrenic nerve）"
     },
     "answer": "C",
-    "explanation": "正解為 腔靜脈孔（caval opening）。T8 = IVC。 此題屬較難的臨床定位或易混淆題，重點是辨認關鍵解剖線索。",
+    "explanation": "正解為 腔靜脈孔（caval opening）。T8 = IVC。重點在於辨認 位於 T8，通過 inferior vena cava 與右膈神經分支 與 腔靜脈孔（caval opening） 的關聯。",
     "testedConcept": "腔靜脈孔：位於 T8，通過 inferior vena cava 與右膈神經分支",
     "sourceType": "AI_GENERATED",
     "difficulty": "hard"
@@ -2533,7 +2533,7 @@ export const anatomyQuestions: Question[] = [
     "subject": "解剖學",
     "chapter": "胸腔",
     "section": "橫膈",
-    "stem": "準備醫師國考時，若題目線索指向「位於 T10，通過 esophagus 與 vagal trunks」，最應選下列哪一個解剖構造或路徑？",
+    "stem": "下列何者與「位於 T10，通過 esophagus 與 vagal trunks」最相關？",
     "options": {
       "A": "食道裂孔（esophageal hiatus）",
       "B": "Bochdalek hernia（posterolateral congenital diaphragmatic hernia）",
@@ -2542,7 +2542,7 @@ export const anatomyQuestions: Question[] = [
       "E": "左膈腳（left crus of diaphragm）"
     },
     "answer": "A",
-    "explanation": "正解為 食道裂孔（esophageal hiatus）。T10 = esophagus。 此題接近國考常見整合題，需要把結構、路徑與功能連在一起。",
+    "explanation": "正解為 食道裂孔（esophageal hiatus）。T10 = esophagus。重點在於辨認 位於 T10，通過 esophagus 與 vagal trunks 與 食道裂孔（esophageal hiatus） 的關聯。",
     "testedConcept": "食道裂孔：位於 T10，通過 esophagus 與 vagal trunks",
     "sourceType": "AI_GENERATED",
     "difficulty": "medium"
@@ -2552,7 +2552,7 @@ export const anatomyQuestions: Question[] = [
     "subject": "解剖學",
     "chapter": "胸腔",
     "section": "橫膈",
-    "stem": "臨床題幹描述與「位於 T12，通過 aorta、thoracic duct、azygos vein」最相關。若要定位病灶或判斷受影響構造，下列何者最適合？",
+    "stem": "若病灶或手術傷害影響「位於 T12，通過 aorta、thoracic duct、azygos vein」相關功能或解剖關係，最可能涉及下列何者？",
     "options": {
       "A": "左膈腳（left crus of diaphragm）",
       "B": "腔靜脈孔（caval opening）",
@@ -2561,7 +2561,7 @@ export const anatomyQuestions: Question[] = [
       "E": "食道裂孔（esophageal hiatus）"
     },
     "answer": "C",
-    "explanation": "正解為 主動脈裂孔（aortic hiatus）。T12 = aorta。 此題屬較難的臨床定位或易混淆題，重點是辨認關鍵解剖線索。",
+    "explanation": "正解為 主動脈裂孔（aortic hiatus）。T12 = aorta。重點在於辨認 位於 T12，通過 aorta、thoracic duct、azygos vein 與 主動脈裂孔（aortic hiatus） 的關聯。",
     "testedConcept": "主動脈裂孔：位於 T12，通過 aorta、thoracic duct、azygos vein",
     "sourceType": "AI_GENERATED",
     "difficulty": "hard"
@@ -2580,7 +2580,7 @@ export const anatomyQuestions: Question[] = [
       "E": "膈神經（phrenic nerve）"
     },
     "answer": "E",
-    "explanation": "正解為 膈神經（phrenic nerve）。周邊 diaphragmatic pleura 感覺由 intercostal nerves，中央由 phrenic。 此題屬基礎定位題，國考常用來確認核心解剖關係。",
+    "explanation": "正解為 膈神經（phrenic nerve）。周邊 diaphragmatic pleura 感覺由 intercostal nerves，中央由 phrenic。",
     "testedConcept": "膈神經：C3-C5，支配橫膈運動",
     "sourceType": "AI_GENERATED",
     "difficulty": "easy"
@@ -2590,7 +2590,7 @@ export const anatomyQuestions: Question[] = [
     "subject": "解剖學",
     "chapter": "胸腔",
     "section": "橫膈",
-    "stem": "準備醫師國考時，若題目線索指向「參與形成 esophageal hiatus」，最應選下列哪一個解剖構造或路徑？",
+    "stem": "關於「參與形成 esophageal hiatus」所涉及的解剖構造，下列何者最適合？",
     "options": {
       "A": "左膈腳（left crus of diaphragm）",
       "B": "主動脈裂孔（aortic hiatus）",
@@ -2599,7 +2599,7 @@ export const anatomyQuestions: Question[] = [
       "E": "Bochdalek hernia（posterolateral congenital diaphragmatic hernia）"
     },
     "answer": "A",
-    "explanation": "正解為 左膈腳（left crus of diaphragm）。crura 來自 lumbar vertebrae。 此題接近國考常見整合題，需要把結構、路徑與功能連在一起。",
+    "explanation": "正解為 左膈腳（left crus of diaphragm）。crura 來自 lumbar vertebrae。重點在於辨認 參與形成 esophageal hiatus 與 左膈腳（left crus of diaphragm） 的關聯。",
     "testedConcept": "左膈腳：參與形成 esophageal hiatus",
     "sourceType": "AI_GENERATED",
     "difficulty": "medium"
@@ -2609,7 +2609,7 @@ export const anatomyQuestions: Question[] = [
     "subject": "解剖學",
     "chapter": "胸腔",
     "section": "橫膈",
-    "stem": "臨床題幹描述與「常在左後外側，可能造成新生兒呼吸窘迫」最相關。若要定位病灶或判斷受影響構造，下列何者最適合？",
+    "stem": "若病灶或手術傷害影響「常在左後外側，可能造成新生兒呼吸窘迫」相關功能或解剖關係，最可能涉及下列何者？",
     "options": {
       "A": "左膈腳（left crus of diaphragm）",
       "B": "膈神經（phrenic nerve）",
@@ -2618,7 +2618,7 @@ export const anatomyQuestions: Question[] = [
       "E": "Bochdalek hernia（posterolateral congenital diaphragmatic hernia）"
     },
     "answer": "E",
-    "explanation": "正解為 Bochdalek hernia（posterolateral congenital diaphragmatic hernia）。先天橫膈缺損經典考點。 此題屬較難的臨床定位或易混淆題，重點是辨認關鍵解剖線索。",
+    "explanation": "正解為 Bochdalek hernia（posterolateral congenital diaphragmatic hernia）。先天橫膈缺損經典考點。",
     "testedConcept": "Bochdalek hernia：常在左後外側，可能造成新生兒呼吸窘迫",
     "sourceType": "AI_GENERATED",
     "difficulty": "hard"
@@ -2628,7 +2628,7 @@ export const anatomyQuestions: Question[] = [
     "subject": "解剖學",
     "chapter": "胸腔",
     "section": "橫膈",
-    "stem": "準備醫師國考時，若題目線索指向「位於 T8，通過 inferior vena cava 與右膈神經分支」，最應選下列哪一個解剖構造或路徑？",
+    "stem": "關於「位於 T8，通過 inferior vena cava 與右膈神經分支」所涉及的解剖構造，下列何者最適合？",
     "options": {
       "A": "主動脈裂孔（aortic hiatus）",
       "B": "Bochdalek hernia（posterolateral congenital diaphragmatic hernia）",
@@ -2637,7 +2637,7 @@ export const anatomyQuestions: Question[] = [
       "E": "膈神經（phrenic nerve）"
     },
     "answer": "C",
-    "explanation": "正解為 腔靜脈孔（caval opening）。T8 = IVC。 此題接近國考常見整合題，需要把結構、路徑與功能連在一起。",
+    "explanation": "正解為 腔靜脈孔（caval opening）。T8 = IVC。重點在於辨認 位於 T8，通過 inferior vena cava 與右膈神經分支 與 腔靜脈孔（caval opening） 的關聯。",
     "testedConcept": "腔靜脈孔：位於 T8，通過 inferior vena cava 與右膈神經分支",
     "sourceType": "AI_GENERATED",
     "difficulty": "medium"
@@ -2647,7 +2647,7 @@ export const anatomyQuestions: Question[] = [
     "subject": "解剖學",
     "chapter": "胸腔",
     "section": "橫膈",
-    "stem": "臨床題幹描述與「位於 T10，通過 esophagus 與 vagal trunks」最相關。若要定位病灶或判斷受影響構造，下列何者最適合？",
+    "stem": "下列何者最能解釋「位於 T10，通過 esophagus 與 vagal trunks」的解剖基礎？",
     "options": {
       "A": "膈神經（phrenic nerve）",
       "B": "食道裂孔（esophageal hiatus）",
@@ -2656,7 +2656,7 @@ export const anatomyQuestions: Question[] = [
       "E": "腔靜脈孔（caval opening）"
     },
     "answer": "B",
-    "explanation": "正解為 食道裂孔（esophageal hiatus）。T10 = esophagus。 此題屬較難的臨床定位或易混淆題，重點是辨認關鍵解剖線索。",
+    "explanation": "正解為 食道裂孔（esophageal hiatus）。T10 = esophagus。重點在於辨認 位於 T10，通過 esophagus 與 vagal trunks 與 食道裂孔（esophageal hiatus） 的關聯。",
     "testedConcept": "食道裂孔：位於 T10，通過 esophagus 與 vagal trunks",
     "sourceType": "AI_GENERATED",
     "difficulty": "hard"
@@ -2675,7 +2675,7 @@ export const anatomyQuestions: Question[] = [
       "E": "橫結腸（transverse colon）"
     },
     "answer": "A",
-    "explanation": "正解為 十二指腸第二到四段（2nd-4th parts of duodenum）。十二指腸第一段近端較 mobile，其餘多後腹膜。 此題屬基礎定位題，國考常用來確認核心解剖關係。",
+    "explanation": "正解為 十二指腸第二到四段（2nd-4th parts of duodenum）。十二指腸第一段近端較 mobile，其餘多後腹膜。",
     "testedConcept": "十二指腸第二到四段：屬次級後腹膜（secondarily retroperitoneal）",
     "sourceType": "AI_GENERATED",
     "difficulty": "easy"
@@ -2685,7 +2685,7 @@ export const anatomyQuestions: Question[] = [
     "subject": "解剖學",
     "chapter": "腹部",
     "section": "腹膜關係",
-    "stem": "準備醫師國考時，若題目線索指向「除尾部外多為次級後腹膜」，最應選下列哪一個解剖構造或路徑？",
+    "stem": "下列何者與「除尾部外多為次級後腹膜」最相關？",
     "options": {
       "A": "十二指腸第二到四段（2nd-4th parts of duodenum）",
       "B": "胰臟（pancreas）",
@@ -2694,7 +2694,7 @@ export const anatomyQuestions: Question[] = [
       "E": "橫結腸（transverse colon）"
     },
     "answer": "B",
-    "explanation": "正解為 胰臟（pancreas）。pancreatic tail 在 splenorenal ligament 內，接近脾門。 此題接近國考常見整合題，需要把結構、路徑與功能連在一起。",
+    "explanation": "正解為 胰臟（pancreas）。pancreatic tail 在 splenorenal ligament 內，接近脾門。",
     "testedConcept": "胰臟：除尾部外多為次級後腹膜",
     "sourceType": "AI_GENERATED",
     "difficulty": "medium"
@@ -2704,7 +2704,7 @@ export const anatomyQuestions: Question[] = [
     "subject": "解剖學",
     "chapter": "腹部",
     "section": "腹膜關係",
-    "stem": "臨床題幹描述與「屬腹膜內器官（intraperitoneal），有 transverse mesocolon」最相關。若要定位病灶或判斷受影響構造，下列何者最適合？",
+    "stem": "下列何者最能解釋「屬腹膜內器官（intraperitoneal），有 transverse mesocolon」的解剖基礎？",
     "options": {
       "A": "肝十二指腸韌帶（hepatoduodenal ligament）",
       "B": "網膜孔（omental foramen, epiploic foramen）",
@@ -2713,7 +2713,7 @@ export const anatomyQuestions: Question[] = [
       "E": "胰臟（pancreas）"
     },
     "answer": "D",
-    "explanation": "正解為 橫結腸（transverse colon）。ascending/descending colon 多為 secondarily retroperitoneal。 此題屬較難的臨床定位或易混淆題，重點是辨認關鍵解剖線索。",
+    "explanation": "正解為 橫結腸（transverse colon）。ascending/descending colon 多為 secondarily retroperitoneal。",
     "testedConcept": "橫結腸：屬腹膜內器官（intraperitoneal），有 transverse mesocolon",
     "sourceType": "AI_GENERATED",
     "difficulty": "hard"
@@ -2723,7 +2723,7 @@ export const anatomyQuestions: Question[] = [
     "subject": "解剖學",
     "chapter": "腹部",
     "section": "腹膜關係",
-    "stem": "準備醫師國考時，若題目線索指向「連接 greater sac 與 lesser sac」，最應選下列哪一個解剖構造或路徑？",
+    "stem": "下列何者與「連接 greater sac 與 lesser sac」最相關？",
     "options": {
       "A": "肝十二指腸韌帶（hepatoduodenal ligament）",
       "B": "橫結腸（transverse colon）",
@@ -2732,7 +2732,7 @@ export const anatomyQuestions: Question[] = [
       "E": "胰臟（pancreas）"
     },
     "answer": "D",
-    "explanation": "正解為 網膜孔（omental foramen, epiploic foramen）。前界是 hepatoduodenal ligament。 此題接近國考常見整合題，需要把結構、路徑與功能連在一起。",
+    "explanation": "正解為 網膜孔（omental foramen, epiploic foramen）。前界是 hepatoduodenal ligament。",
     "testedConcept": "網膜孔：連接 greater sac 與 lesser sac",
     "sourceType": "AI_GENERATED",
     "difficulty": "medium"
@@ -2742,7 +2742,7 @@ export const anatomyQuestions: Question[] = [
     "subject": "解剖學",
     "chapter": "腹部",
     "section": "腹膜關係",
-    "stem": "臨床題幹描述與「內含 portal triad」最相關。若要定位病灶或判斷受影響構造，下列何者最適合？",
+    "stem": "關於「內含 portal triad」的解剖判斷，下列何者最適合？",
     "options": {
       "A": "胰臟（pancreas）",
       "B": "肝十二指腸韌帶（hepatoduodenal ligament）",
@@ -2751,7 +2751,7 @@ export const anatomyQuestions: Question[] = [
       "E": "小網膜（lesser omentum）"
     },
     "answer": "B",
-    "explanation": "正解為 肝十二指腸韌帶（hepatoduodenal ligament）。portal triad = proper hepatic artery, portal vein, bile duct。 此題屬較難的臨床定位或易混淆題，重點是辨認關鍵解剖線索。",
+    "explanation": "正解為 肝十二指腸韌帶（hepatoduodenal ligament）。portal triad = proper hepatic artery, portal vein, bile duct。",
     "testedConcept": "肝十二指腸韌帶：內含 portal triad",
     "sourceType": "AI_GENERATED",
     "difficulty": "hard"
@@ -2770,7 +2770,7 @@ export const anatomyQuestions: Question[] = [
       "E": "十二指腸第二到四段（2nd-4th parts of duodenum）"
     },
     "answer": "A",
-    "explanation": "正解為 小網膜（lesser omentum）。含 hepatogastric 與 hepatoduodenal ligaments。 此題屬基礎定位題，國考常用來確認核心解剖關係。",
+    "explanation": "正解為 小網膜（lesser omentum）。含 hepatogastric 與 hepatoduodenal ligaments。",
     "testedConcept": "小網膜：連接肝與 lesser curvature/proximal duodenum",
     "sourceType": "AI_GENERATED",
     "difficulty": "easy"
@@ -2780,7 +2780,7 @@ export const anatomyQuestions: Question[] = [
     "subject": "解剖學",
     "chapter": "腹部",
     "section": "腹膜關係",
-    "stem": "準備醫師國考時，若題目線索指向「屬次級後腹膜（secondarily retroperitoneal）」，最應選下列哪一個解剖構造或路徑？",
+    "stem": "關於「屬次級後腹膜（secondarily retroperitoneal）」所涉及的解剖構造，下列何者最適合？",
     "options": {
       "A": "小網膜（lesser omentum）",
       "B": "橫結腸（transverse colon）",
@@ -2789,7 +2789,7 @@ export const anatomyQuestions: Question[] = [
       "E": "肝十二指腸韌帶（hepatoduodenal ligament）"
     },
     "answer": "C",
-    "explanation": "正解為 十二指腸第二到四段（2nd-4th parts of duodenum）。十二指腸第一段近端較 mobile，其餘多後腹膜。 此題接近國考常見整合題，需要把結構、路徑與功能連在一起。",
+    "explanation": "正解為 十二指腸第二到四段（2nd-4th parts of duodenum）。十二指腸第一段近端較 mobile，其餘多後腹膜。",
     "testedConcept": "十二指腸第二到四段：屬次級後腹膜（secondarily retroperitoneal）",
     "sourceType": "AI_GENERATED",
     "difficulty": "medium"
@@ -2799,7 +2799,7 @@ export const anatomyQuestions: Question[] = [
     "subject": "解剖學",
     "chapter": "腹部",
     "section": "腹膜關係",
-    "stem": "臨床題幹描述與「除尾部外多為次級後腹膜」最相關。若要定位病灶或判斷受影響構造，下列何者最適合？",
+    "stem": "關於「除尾部外多為次級後腹膜」的解剖判斷，下列何者最適合？",
     "options": {
       "A": "十二指腸第二到四段（2nd-4th parts of duodenum）",
       "B": "橫結腸（transverse colon）",
@@ -2808,7 +2808,7 @@ export const anatomyQuestions: Question[] = [
       "E": "胰臟（pancreas）"
     },
     "answer": "E",
-    "explanation": "正解為 胰臟（pancreas）。pancreatic tail 在 splenorenal ligament 內，接近脾門。 此題屬較難的臨床定位或易混淆題，重點是辨認關鍵解剖線索。",
+    "explanation": "正解為 胰臟（pancreas）。pancreatic tail 在 splenorenal ligament 內，接近脾門。",
     "testedConcept": "胰臟：除尾部外多為次級後腹膜",
     "sourceType": "AI_GENERATED",
     "difficulty": "hard"
@@ -2818,7 +2818,7 @@ export const anatomyQuestions: Question[] = [
     "subject": "解剖學",
     "chapter": "腹部",
     "section": "胃腸道血管",
-    "stem": "準備醫師國考時，若題目線索指向「供應 foregut，分支為 left gastric、splenic、common hepatic arteries」，最應選下列哪一個解剖構造或路徑？",
+    "stem": "關於「供應 foregut，分支為 left gastric、splenic、common hepatic arteries」所涉及的解剖構造，下列何者最適合？",
     "options": {
       "A": "腹腔幹（celiac trunk）",
       "B": "上腸繫膜動脈（superior mesenteric artery, SMA）",
@@ -2827,7 +2827,7 @@ export const anatomyQuestions: Question[] = [
       "E": "胃左動脈（left gastric artery）"
     },
     "answer": "A",
-    "explanation": "正解為 腹腔幹（celiac trunk）。foregut 到 major duodenal papilla 近端。 此題接近國考常見整合題，需要把結構、路徑與功能連在一起。",
+    "explanation": "正解為 腹腔幹（celiac trunk）。foregut 到 major duodenal papilla 近端。重點在於辨認 供應 foregut，分支為 left gastric、splenic、common hepatic arteries 與 腹腔幹（celiac trunk） 的關聯。",
     "testedConcept": "腹腔幹：供應 foregut，分支為 left gastric、splenic、common hepatic arteries",
     "sourceType": "AI_GENERATED",
     "difficulty": "medium"
@@ -2837,7 +2837,7 @@ export const anatomyQuestions: Question[] = [
     "subject": "解剖學",
     "chapter": "腹部",
     "section": "胃腸道血管",
-    "stem": "臨床題幹描述與「供應 midgut，從 distal duodenum 到 proximal 2/3 transverse colon」最相關。若要定位病灶或判斷受影響構造，下列何者最適合？",
+    "stem": "若病灶或手術傷害影響「供應 midgut，從 distal duodenum 到 proximal 2/3 transverse colon」相關功能或解剖關係，最可能涉及下列何者？",
     "options": {
       "A": "上腸繫膜動脈（superior mesenteric artery, SMA）",
       "B": "下腸繫膜動脈（inferior mesenteric artery, IMA）",
@@ -2846,7 +2846,7 @@ export const anatomyQuestions: Question[] = [
       "E": "胃左動脈（left gastric artery）"
     },
     "answer": "A",
-    "explanation": "正解為 上腸繫膜動脈（superior mesenteric artery, SMA）。SMA syndrome 可壓迫 duodenum 第三段。 此題屬較難的臨床定位或易混淆題，重點是辨認關鍵解剖線索。",
+    "explanation": "正解為 上腸繫膜動脈（superior mesenteric artery, SMA）。SMA syndrome 可壓迫 duodenum 第三段。",
     "testedConcept": "上腸繫膜動脈：供應 midgut，從 distal duodenum 到 proximal 2/3 transverse colon",
     "sourceType": "AI_GENERATED",
     "difficulty": "hard"
@@ -2865,7 +2865,7 @@ export const anatomyQuestions: Question[] = [
       "E": "下腸繫膜動脈（inferior mesenteric artery, IMA）"
     },
     "answer": "E",
-    "explanation": "正解為 下腸繫膜動脈（inferior mesenteric artery, IMA）。分支含 left colic、sigmoid、superior rectal artery。 此題屬基礎定位題，國考常用來確認核心解剖關係。",
+    "explanation": "正解為 下腸繫膜動脈（inferior mesenteric artery, IMA）。分支含 left colic、sigmoid、superior rectal artery。",
     "testedConcept": "下腸繫膜動脈：供應 hindgut，從 distal 1/3 transverse colon 到 upper anal canal",
     "sourceType": "AI_GENERATED",
     "difficulty": "easy"
@@ -2875,7 +2875,7 @@ export const anatomyQuestions: Question[] = [
     "subject": "解剖學",
     "chapter": "腹部",
     "section": "胃腸道血管",
-    "stem": "準備醫師國考時，若題目線索指向「沿結腸邊緣連接 SMA 與 IMA 分支」，最應選下列哪一個解剖構造或路徑？",
+    "stem": "下列何者與「沿結腸邊緣連接 SMA 與 IMA 分支」最相關？",
     "options": {
       "A": "邊緣動脈（marginal artery of Drummond）",
       "B": "下腸繫膜動脈（inferior mesenteric artery, IMA）",
@@ -2884,7 +2884,7 @@ export const anatomyQuestions: Question[] = [
       "E": "中結腸動脈（middle colic artery）"
     },
     "answer": "A",
-    "explanation": "正解為 邊緣動脈（marginal artery of Drummond）。提供 collateral circulation。 此題接近國考常見整合題，需要把結構、路徑與功能連在一起。",
+    "explanation": "正解為 邊緣動脈（marginal artery of Drummond）。提供 collateral circulation。",
     "testedConcept": "邊緣動脈：沿結腸邊緣連接 SMA 與 IMA 分支",
     "sourceType": "AI_GENERATED",
     "difficulty": "medium"
@@ -2894,7 +2894,7 @@ export const anatomyQuestions: Question[] = [
     "subject": "解剖學",
     "chapter": "腹部",
     "section": "胃腸道血管",
-    "stem": "臨床題幹描述與「沿小彎走，與 right gastric artery 吻合」最相關。若要定位病灶或判斷受影響構造，下列何者最適合？",
+    "stem": "若病灶或手術傷害影響「沿小彎走，與 right gastric artery 吻合」相關功能或解剖關係，最可能涉及下列何者？",
     "options": {
       "A": "胃左動脈（left gastric artery）",
       "B": "上腸繫膜動脈（superior mesenteric artery, SMA）",
@@ -2903,7 +2903,7 @@ export const anatomyQuestions: Question[] = [
       "E": "邊緣動脈（marginal artery of Drummond）"
     },
     "answer": "A",
-    "explanation": "正解為 胃左動脈（left gastric artery）。可與食道靜脈曲張區域解剖相關。 此題屬較難的臨床定位或易混淆題，重點是辨認關鍵解剖線索。",
+    "explanation": "正解為 胃左動脈（left gastric artery）。可與食道靜脈曲張區域解剖相關。重點在於辨認 沿小彎走，與 right gastric artery 吻合 與 胃左動脈（left gastric artery） 的關聯。",
     "testedConcept": "胃左動脈：沿小彎走，與 right gastric artery 吻合",
     "sourceType": "AI_GENERATED",
     "difficulty": "hard"
@@ -2913,7 +2913,7 @@ export const anatomyQuestions: Question[] = [
     "subject": "解剖學",
     "chapter": "腹部",
     "section": "胃腸道血管",
-    "stem": "準備醫師國考時，若題目線索指向「SMA 分支，供應 transverse colon 近端大部」，最應選下列哪一個解剖構造或路徑？",
+    "stem": "下列何者與「SMA 分支，供應 transverse colon 近端大部」最相關？",
     "options": {
       "A": "下腸繫膜動脈（inferior mesenteric artery, IMA）",
       "B": "邊緣動脈（marginal artery of Drummond）",
@@ -2922,7 +2922,7 @@ export const anatomyQuestions: Question[] = [
       "E": "胃左動脈（left gastric artery）"
     },
     "answer": "D",
-    "explanation": "正解為 中結腸動脈（middle colic artery）。在 transverse mesocolon 內走行。 此題接近國考常見整合題，需要把結構、路徑與功能連在一起。",
+    "explanation": "正解為 中結腸動脈（middle colic artery）。在 transverse mesocolon 內走行。重點在於辨認 SMA 分支，供應 transverse colon 近端大部 與 中結腸動脈（middle colic artery） 的關聯。",
     "testedConcept": "中結腸動脈：SMA 分支，供應 transverse colon 近端大部",
     "sourceType": "AI_GENERATED",
     "difficulty": "medium"
@@ -2932,7 +2932,7 @@ export const anatomyQuestions: Question[] = [
     "subject": "解剖學",
     "chapter": "腹部",
     "section": "胃腸道血管",
-    "stem": "臨床題幹描述與「供應 foregut，分支為 left gastric、splenic、common hepatic arteries」最相關。若要定位病灶或判斷受影響構造，下列何者最適合？",
+    "stem": "下列何者最能解釋「供應 foregut，分支為 left gastric、splenic、common hepatic arteries」的解剖基礎？",
     "options": {
       "A": "中結腸動脈（middle colic artery）",
       "B": "腹腔幹（celiac trunk）",
@@ -2941,7 +2941,7 @@ export const anatomyQuestions: Question[] = [
       "E": "下腸繫膜動脈（inferior mesenteric artery, IMA）"
     },
     "answer": "B",
-    "explanation": "正解為 腹腔幹（celiac trunk）。foregut 到 major duodenal papilla 近端。 此題屬較難的臨床定位或易混淆題，重點是辨認關鍵解剖線索。",
+    "explanation": "正解為 腹腔幹（celiac trunk）。foregut 到 major duodenal papilla 近端。重點在於辨認 供應 foregut，分支為 left gastric、splenic、common hepatic arteries 與 腹腔幹（celiac trunk） 的關聯。",
     "testedConcept": "腹腔幹：供應 foregut，分支為 left gastric、splenic、common hepatic arteries",
     "sourceType": "AI_GENERATED",
     "difficulty": "hard"
@@ -2960,7 +2960,7 @@ export const anatomyQuestions: Question[] = [
       "E": "中結腸動脈（middle colic artery）"
     },
     "answer": "D",
-    "explanation": "正解為 上腸繫膜動脈（superior mesenteric artery, SMA）。SMA syndrome 可壓迫 duodenum 第三段。 此題屬基礎定位題，國考常用來確認核心解剖關係。",
+    "explanation": "正解為 上腸繫膜動脈（superior mesenteric artery, SMA）。SMA syndrome 可壓迫 duodenum 第三段。",
     "testedConcept": "上腸繫膜動脈：供應 midgut，從 distal duodenum 到 proximal 2/3 transverse colon",
     "sourceType": "AI_GENERATED",
     "difficulty": "easy"
@@ -2970,7 +2970,7 @@ export const anatomyQuestions: Question[] = [
     "subject": "解剖學",
     "chapter": "腹部",
     "section": "肝膽胰脾",
-    "stem": "準備醫師國考時，若題目線索指向「由 superior mesenteric vein 與 splenic vein 匯合形成」，最應選下列哪一個解剖構造或路徑？",
+    "stem": "關於「由 superior mesenteric vein 與 splenic vein 匯合形成」所涉及的解剖構造，下列何者最適合？",
     "options": {
       "A": "肝門靜脈（portal vein）",
       "B": "脾臟（spleen）",
@@ -2979,7 +2979,7 @@ export const anatomyQuestions: Question[] = [
       "E": "膽囊動脈（cystic artery）"
     },
     "answer": "A",
-    "explanation": "正解為 肝門靜脈（portal vein）。通常在胰頸後方形成。 此題接近國考常見整合題，需要把結構、路徑與功能連在一起。",
+    "explanation": "正解為 肝門靜脈（portal vein）。通常在胰頸後方形成。重點在於辨認 由 superior mesenteric vein 與 splenic vein 匯合形成 與 肝門靜脈（portal vein） 的關聯。",
     "testedConcept": "肝門靜脈：由 superior mesenteric vein 與 splenic vein 匯合形成",
     "sourceType": "AI_GENERATED",
     "difficulty": "medium"
@@ -2989,7 +2989,7 @@ export const anatomyQuestions: Question[] = [
     "subject": "解剖學",
     "chapter": "腹部",
     "section": "肝膽胰脾",
-    "stem": "臨床題幹描述與「多來自 right hepatic artery，位於 Calot triangle」最相關。若要定位病灶或判斷受影響構造，下列何者最適合？",
+    "stem": "下列何者最能解釋「多來自 right hepatic artery，位於 Calot triangle」的解剖基礎？",
     "options": {
       "A": "Calot triangle（hepatocystic triangle）",
       "B": "肝門靜脈（portal vein）",
@@ -2998,7 +2998,7 @@ export const anatomyQuestions: Question[] = [
       "E": "脾臟（spleen）"
     },
     "answer": "D",
-    "explanation": "正解為 膽囊動脈（cystic artery）。cholecystectomy 時重要。 此題屬較難的臨床定位或易混淆題，重點是辨認關鍵解剖線索。",
+    "explanation": "正解為 膽囊動脈（cystic artery）。cholecystectomy 時重要。重點在於辨認 多來自 right hepatic artery，位於 Calot triangle 與 膽囊動脈（cystic artery） 的關聯。",
     "testedConcept": "膽囊動脈：多來自 right hepatic artery，位於 Calot triangle",
     "sourceType": "AI_GENERATED",
     "difficulty": "hard"
@@ -3008,7 +3008,7 @@ export const anatomyQuestions: Question[] = [
     "subject": "解剖學",
     "chapter": "腹部",
     "section": "肝膽胰脾",
-    "stem": "準備醫師國考時，若題目線索指向「由 cystic duct、common hepatic duct、肝下緣圍成」，最應選下列哪一個解剖構造或路徑？",
+    "stem": "關於「由 cystic duct、common hepatic duct、肝下緣圍成」所涉及的解剖構造，下列何者最適合？",
     "options": {
       "A": "肝門靜脈（portal vein）",
       "B": "Calot triangle（hepatocystic triangle）",
@@ -3017,7 +3017,7 @@ export const anatomyQuestions: Question[] = [
       "E": "膽囊動脈（cystic artery）"
     },
     "answer": "B",
-    "explanation": "正解為 Calot triangle（hepatocystic triangle）。內常有 cystic artery。 此題接近國考常見整合題，需要把結構、路徑與功能連在一起。",
+    "explanation": "正解為 Calot triangle（hepatocystic triangle）。內常有 cystic artery。",
     "testedConcept": "Calot triangle：由 cystic duct、common hepatic duct、肝下緣圍成",
     "sourceType": "AI_GENERATED",
     "difficulty": "medium"
@@ -3027,7 +3027,7 @@ export const anatomyQuestions: Question[] = [
     "subject": "解剖學",
     "chapter": "腹部",
     "section": "肝膽胰脾",
-    "stem": "臨床題幹描述與「位於十二指腸 C-loop 內，腫瘤可能壓迫 common bile duct」最相關。若要定位病灶或判斷受影響構造，下列何者最適合？",
+    "stem": "關於「位於十二指腸 C-loop 內，腫瘤可能壓迫 common bile duct」的解剖判斷，下列何者最適合？",
     "options": {
       "A": "胰頭（head of pancreas）",
       "B": "Calot triangle（hepatocystic triangle）",
@@ -3036,7 +3036,7 @@ export const anatomyQuestions: Question[] = [
       "E": "胰尾（tail of pancreas）"
     },
     "answer": "A",
-    "explanation": "正解為 胰頭（head of pancreas）。可造成 painless jaundice。 此題屬較難的臨床定位或易混淆題，重點是辨認關鍵解剖線索。",
+    "explanation": "正解為 胰頭（head of pancreas）。可造成 painless jaundice。重點在於辨認 位於十二指腸 C-loop 內，腫瘤可能壓迫 common bile duct 與 胰頭（head of pancreas） 的關聯。",
     "testedConcept": "胰頭：位於十二指腸 C-loop 內，腫瘤可能壓迫 common bile duct",
     "sourceType": "AI_GENERATED",
     "difficulty": "hard"
@@ -3055,7 +3055,7 @@ export const anatomyQuestions: Question[] = [
       "E": "胰頭（head of pancreas）"
     },
     "answer": "A",
-    "explanation": "正解為 脾臟（spleen）。脾破裂可造成 Kehr sign（左肩 referred pain）。 此題屬基礎定位題，國考常用來確認核心解剖關係。",
+    "explanation": "正解為 脾臟（spleen）。脾破裂可造成 Kehr sign（左肩 referred pain）。重點在於辨認 位於左上腹，與第 9-11 肋相關 與 脾臟（spleen） 的關聯。",
     "testedConcept": "脾臟：位於左上腹，與第 9-11 肋相關",
     "sourceType": "AI_GENERATED",
     "difficulty": "easy"
@@ -3065,7 +3065,7 @@ export const anatomyQuestions: Question[] = [
     "subject": "解剖學",
     "chapter": "腹部",
     "section": "肝膽胰脾",
-    "stem": "準備醫師國考時，若題目線索指向「位於 splenorenal ligament 內，靠近脾門」，最應選下列哪一個解剖構造或路徑？",
+    "stem": "下列何者與「位於 splenorenal ligament 內，靠近脾門」最相關？",
     "options": {
       "A": "肝門靜脈（portal vein）",
       "B": "胰頭（head of pancreas）",
@@ -3074,7 +3074,7 @@ export const anatomyQuestions: Question[] = [
       "E": "胰尾（tail of pancreas）"
     },
     "answer": "E",
-    "explanation": "正解為 胰尾（tail of pancreas）。脾切除時可能傷到 pancreatic tail。 此題接近國考常見整合題，需要把結構、路徑與功能連在一起。",
+    "explanation": "正解為 胰尾（tail of pancreas）。脾切除時可能傷到 pancreatic tail。重點在於辨認 位於 splenorenal ligament 內，靠近脾門 與 胰尾（tail of pancreas） 的關聯。",
     "testedConcept": "胰尾：位於 splenorenal ligament 內，靠近脾門",
     "sourceType": "AI_GENERATED",
     "difficulty": "medium"
@@ -3084,7 +3084,7 @@ export const anatomyQuestions: Question[] = [
     "subject": "解剖學",
     "chapter": "腹部",
     "section": "肝膽胰脾",
-    "stem": "臨床題幹描述與「由 superior mesenteric vein 與 splenic vein 匯合形成」最相關。若要定位病灶或判斷受影響構造，下列何者最適合？",
+    "stem": "關於「由 superior mesenteric vein 與 splenic vein 匯合形成」的解剖判斷，下列何者最適合？",
     "options": {
       "A": "Calot triangle（hepatocystic triangle）",
       "B": "胰頭（head of pancreas）",
@@ -3093,7 +3093,7 @@ export const anatomyQuestions: Question[] = [
       "E": "膽囊動脈（cystic artery）"
     },
     "answer": "D",
-    "explanation": "正解為 肝門靜脈（portal vein）。通常在胰頸後方形成。 此題屬較難的臨床定位或易混淆題，重點是辨認關鍵解剖線索。",
+    "explanation": "正解為 肝門靜脈（portal vein）。通常在胰頸後方形成。重點在於辨認 由 superior mesenteric vein 與 splenic vein 匯合形成 與 肝門靜脈（portal vein） 的關聯。",
     "testedConcept": "肝門靜脈：由 superior mesenteric vein 與 splenic vein 匯合形成",
     "sourceType": "AI_GENERATED",
     "difficulty": "hard"
@@ -3103,7 +3103,7 @@ export const anatomyQuestions: Question[] = [
     "subject": "解剖學",
     "chapter": "腹部",
     "section": "肝膽胰脾",
-    "stem": "準備醫師國考時，若題目線索指向「多來自 right hepatic artery，位於 Calot triangle」，最應選下列哪一個解剖構造或路徑？",
+    "stem": "下列何者與「多來自 right hepatic artery，位於 Calot triangle」最相關？",
     "options": {
       "A": "Calot triangle（hepatocystic triangle）",
       "B": "膽囊動脈（cystic artery）",
@@ -3112,7 +3112,7 @@ export const anatomyQuestions: Question[] = [
       "E": "胰頭（head of pancreas）"
     },
     "answer": "B",
-    "explanation": "正解為 膽囊動脈（cystic artery）。cholecystectomy 時重要。 此題接近國考常見整合題，需要把結構、路徑與功能連在一起。",
+    "explanation": "正解為 膽囊動脈（cystic artery）。cholecystectomy 時重要。重點在於辨認 多來自 right hepatic artery，位於 Calot triangle 與 膽囊動脈（cystic artery） 的關聯。",
     "testedConcept": "膽囊動脈：多來自 right hepatic artery，位於 Calot triangle",
     "sourceType": "AI_GENERATED",
     "difficulty": "medium"
@@ -3122,7 +3122,7 @@ export const anatomyQuestions: Question[] = [
     "subject": "解剖學",
     "chapter": "腹部",
     "section": "腎臟與後腹腔",
-    "stem": "臨床題幹描述與「屬 primary retroperitoneal organ」最相關。若要定位病灶或判斷受影響構造，下列何者最適合？",
+    "stem": "若病灶或手術傷害影響「屬 primary retroperitoneal organ」相關功能或解剖關係，最可能涉及下列何者？",
     "options": {
       "A": "腎臟（kidney）",
       "B": "輸尿管狹窄（ureter constrictions）",
@@ -3131,7 +3131,7 @@ export const anatomyQuestions: Question[] = [
       "E": "左腎靜脈（left renal vein）"
     },
     "answer": "A",
-    "explanation": "正解為 腎臟（kidney）。腎臟位於 T12-L3，右腎較低。 此題屬較難的臨床定位或易混淆題，重點是辨認關鍵解剖線索。",
+    "explanation": "正解為 腎臟（kidney）。腎臟位於 T12-L3，右腎較低。重點在於辨認 屬 primary retroperitoneal organ 與 腎臟（kidney） 的關聯。",
     "testedConcept": "腎臟：屬 primary retroperitoneal organ",
     "sourceType": "AI_GENERATED",
     "difficulty": "hard"
@@ -3150,7 +3150,7 @@ export const anatomyQuestions: Question[] = [
       "E": "左腎靜脈（left renal vein）"
     },
     "answer": "C",
-    "explanation": "正解為 腎門排列（renal hilum arrangement）。口訣 V-A-P。 此題屬基礎定位題，國考常用來確認核心解剖關係。",
+    "explanation": "正解為 腎門排列（renal hilum arrangement）。口訣 V-A-P。重點在於辨認 由前到後為 vein、artery、pelvis 與 腎門排列（renal hilum arrangement） 的關聯。",
     "testedConcept": "腎門排列：由前到後為 vein、artery、pelvis",
     "sourceType": "AI_GENERATED",
     "difficulty": "easy"
@@ -3160,7 +3160,7 @@ export const anatomyQuestions: Question[] = [
     "subject": "解剖學",
     "chapter": "腹部",
     "section": "腎臟與後腹腔",
-    "stem": "準備醫師國考時，若題目線索指向「走在 SMA 與 aorta 之間，接受 left gonadal vein」，最應選下列哪一個解剖構造或路徑？",
+    "stem": "關於「走在 SMA 與 aorta 之間，接受 left gonadal vein」所涉及的解剖構造，下列何者最適合？",
     "options": {
       "A": "腰大肌（psoas major）",
       "B": "腎門排列（renal hilum arrangement）",
@@ -3169,7 +3169,7 @@ export const anatomyQuestions: Question[] = [
       "E": "輸尿管狹窄（ureter constrictions）"
     },
     "answer": "D",
-    "explanation": "正解為 左腎靜脈（left renal vein）。nutcracker syndrome 可能壓迫 left renal vein。 此題接近國考常見整合題，需要把結構、路徑與功能連在一起。",
+    "explanation": "正解為 左腎靜脈（left renal vein）。nutcracker syndrome 可能壓迫 left renal vein。",
     "testedConcept": "左腎靜脈：走在 SMA 與 aorta 之間，接受 left gonadal vein",
     "sourceType": "AI_GENERATED",
     "difficulty": "medium"
@@ -3179,7 +3179,7 @@ export const anatomyQuestions: Question[] = [
     "subject": "解剖學",
     "chapter": "腹部",
     "section": "腎臟與後腹腔",
-    "stem": "臨床題幹描述與「在 UPJ、crossing iliac vessels、UVJ 常狹窄」最相關。若要定位病灶或判斷受影響構造，下列何者最適合？",
+    "stem": "若病灶或手術傷害影響「在 UPJ、crossing iliac vessels、UVJ 常狹窄」相關功能或解剖關係，最可能涉及下列何者？",
     "options": {
       "A": "輸尿管狹窄（ureter constrictions）",
       "B": "左腎靜脈（left renal vein）",
@@ -3188,7 +3188,7 @@ export const anatomyQuestions: Question[] = [
       "E": "腎上腺中動脈（middle suprarenal artery）"
     },
     "answer": "A",
-    "explanation": "正解為 輸尿管狹窄（ureter constrictions）。結石常卡在這三處。 此題屬較難的臨床定位或易混淆題，重點是辨認關鍵解剖線索。",
+    "explanation": "正解為 輸尿管狹窄（ureter constrictions）。結石常卡在這三處。重點在於辨認 在 UPJ、crossing iliac vessels、UVJ 常狹窄 與 輸尿管狹窄（ureter constrictions） 的關聯。",
     "testedConcept": "輸尿管狹窄：在 UPJ、crossing iliac vessels、UVJ 常狹窄",
     "sourceType": "AI_GENERATED",
     "difficulty": "hard"
@@ -3198,7 +3198,7 @@ export const anatomyQuestions: Question[] = [
     "subject": "解剖學",
     "chapter": "腹部",
     "section": "腎臟與後腹腔",
-    "stem": "準備醫師國考時，若題目線索指向「直接來自 abdominal aorta」，最應選下列哪一個解剖構造或路徑？",
+    "stem": "關於「直接來自 abdominal aorta」所涉及的解剖構造，下列何者最適合？",
     "options": {
       "A": "輸尿管狹窄（ureter constrictions）",
       "B": "腎臟（kidney）",
@@ -3207,7 +3207,7 @@ export const anatomyQuestions: Question[] = [
       "E": "左腎靜脈（left renal vein）"
     },
     "answer": "C",
-    "explanation": "正解為 腎上腺中動脈（middle suprarenal artery）。腎上腺血供多源：inferior phrenic、aorta、renal artery。 此題接近國考常見整合題，需要把結構、路徑與功能連在一起。",
+    "explanation": "正解為 腎上腺中動脈（middle suprarenal artery）。腎上腺血供多源：inferior phrenic、aorta、renal artery。",
     "testedConcept": "腎上腺中動脈：直接來自 abdominal aorta",
     "sourceType": "AI_GENERATED",
     "difficulty": "medium"
@@ -3217,7 +3217,7 @@ export const anatomyQuestions: Question[] = [
     "subject": "解剖學",
     "chapter": "腹部",
     "section": "腎臟與後腹腔",
-    "stem": "臨床題幹描述與「位於後腹壁，femoral nerve 在其外側緣出現」最相關。若要定位病灶或判斷受影響構造，下列何者最適合？",
+    "stem": "下列何者最能解釋「位於後腹壁，femoral nerve 在其外側緣出現」的解剖基礎？",
     "options": {
       "A": "輸尿管狹窄（ureter constrictions）",
       "B": "腎門排列（renal hilum arrangement）",
@@ -3226,7 +3226,7 @@ export const anatomyQuestions: Question[] = [
       "E": "腎臟（kidney）"
     },
     "answer": "D",
-    "explanation": "正解為 腰大肌（psoas major）。iliacus + psoas major = iliopsoas。 此題屬較難的臨床定位或易混淆題，重點是辨認關鍵解剖線索。",
+    "explanation": "正解為 腰大肌（psoas major）。iliacus + psoas major = iliopsoas。重點在於辨認 位於後腹壁，femoral nerve 在其外側緣出現 與 腰大肌（psoas major） 的關聯。",
     "testedConcept": "腰大肌：位於後腹壁，femoral nerve 在其外側緣出現",
     "sourceType": "AI_GENERATED",
     "difficulty": "hard"
@@ -3245,7 +3245,7 @@ export const anatomyQuestions: Question[] = [
       "E": "腰大肌（psoas major）"
     },
     "answer": "B",
-    "explanation": "正解為 腎臟（kidney）。腎臟位於 T12-L3，右腎較低。 此題屬基礎定位題，國考常用來確認核心解剖關係。",
+    "explanation": "正解為 腎臟（kidney）。腎臟位於 T12-L3，右腎較低。重點在於辨認 屬 primary retroperitoneal organ 與 腎臟（kidney） 的關聯。",
     "testedConcept": "腎臟：屬 primary retroperitoneal organ",
     "sourceType": "AI_GENERATED",
     "difficulty": "easy"
@@ -3255,7 +3255,7 @@ export const anatomyQuestions: Question[] = [
     "subject": "解剖學",
     "chapter": "腹部",
     "section": "腎臟與後腹腔",
-    "stem": "準備醫師國考時，若題目線索指向「由前到後為 vein、artery、pelvis」，最應選下列哪一個解剖構造或路徑？",
+    "stem": "下列何者與「由前到後為 vein、artery、pelvis」最相關？",
     "options": {
       "A": "輸尿管狹窄（ureter constrictions）",
       "B": "腎門排列（renal hilum arrangement）",
@@ -3264,7 +3264,7 @@ export const anatomyQuestions: Question[] = [
       "E": "腎上腺中動脈（middle suprarenal artery）"
     },
     "answer": "B",
-    "explanation": "正解為 腎門排列（renal hilum arrangement）。口訣 V-A-P。 此題接近國考常見整合題，需要把結構、路徑與功能連在一起。",
+    "explanation": "正解為 腎門排列（renal hilum arrangement）。口訣 V-A-P。重點在於辨認 由前到後為 vein、artery、pelvis 與 腎門排列（renal hilum arrangement） 的關聯。",
     "testedConcept": "腎門排列：由前到後為 vein、artery、pelvis",
     "sourceType": "AI_GENERATED",
     "difficulty": "medium"
@@ -3274,7 +3274,7 @@ export const anatomyQuestions: Question[] = [
     "subject": "解剖學",
     "chapter": "腹部",
     "section": "門脈系統",
-    "stem": "臨床題幹描述與「portal-systemic anastomosis，門脈高壓可造成食道靜脈曲張」最相關。若要定位病灶或判斷受影響構造，下列何者最適合？",
+    "stem": "下列何者最能解釋「portal-systemic anastomosis，門脈高壓可造成食道靜脈曲張」的解剖基礎？",
     "options": {
       "A": "食道下段靜脈叢（lower esophageal venous plexus）",
       "B": "直腸靜脈叢（rectal venous plexus）",
@@ -3283,7 +3283,7 @@ export const anatomyQuestions: Question[] = [
       "E": "脾靜脈（splenic vein）"
     },
     "answer": "A",
-    "explanation": "正解為 食道下段靜脈叢（lower esophageal venous plexus）。left gastric vein 與 azygos system 吻合。 此題屬較難的臨床定位或易混淆題，重點是辨認關鍵解剖線索。",
+    "explanation": "正解為 食道下段靜脈叢（lower esophageal venous plexus）。left gastric vein 與 azygos system 吻合。",
     "testedConcept": "食道下段靜脈叢：portal-systemic anastomosis，門脈高壓可造成食道靜脈曲張",
     "sourceType": "AI_GENERATED",
     "difficulty": "hard"
@@ -3293,7 +3293,7 @@ export const anatomyQuestions: Question[] = [
     "subject": "解剖學",
     "chapter": "腹部",
     "section": "門脈系統",
-    "stem": "準備醫師國考時，若題目線索指向「門脈高壓可造成 caput medusae」，最應選下列哪一個解剖構造或路徑？",
+    "stem": "下列何者與「門脈高壓可造成 caput medusae」最相關？",
     "options": {
       "A": "肚臍周圍靜脈（paraumbilical veins）",
       "B": "肝門靜脈（portal vein）",
@@ -3302,7 +3302,7 @@ export const anatomyQuestions: Question[] = [
       "E": "上腸繫膜靜脈（superior mesenteric vein, SMV）"
     },
     "answer": "A",
-    "explanation": "正解為 肚臍周圍靜脈（paraumbilical veins）。連接 portal vein 與 superficial epigastric veins。 此題接近國考常見整合題，需要把結構、路徑與功能連在一起。",
+    "explanation": "正解為 肚臍周圍靜脈（paraumbilical veins）。連接 portal vein 與 superficial epigastric veins。",
     "testedConcept": "肚臍周圍靜脈：門脈高壓可造成 caput medusae",
     "sourceType": "AI_GENERATED",
     "difficulty": "medium"
@@ -3312,7 +3312,7 @@ export const anatomyQuestions: Question[] = [
     "subject": "解剖學",
     "chapter": "腹部",
     "section": "門脈系統",
-    "stem": "臨床題幹描述與「superior rectal vein 屬 portal，middle/inferior rectal veins 屬 systemic」最相關。若要定位病灶或判斷受影響構造，下列何者最適合？",
+    "stem": "關於「superior rectal vein 屬 portal，middle/inferior rectal veins 屬 systemic」的解剖判斷，下列何者最適合？",
     "options": {
       "A": "脾靜脈（splenic vein）",
       "B": "肝門靜脈（portal vein）",
@@ -3321,7 +3321,7 @@ export const anatomyQuestions: Question[] = [
       "E": "直腸靜脈叢（rectal venous plexus）"
     },
     "answer": "E",
-    "explanation": "正解為 直腸靜脈叢（rectal venous plexus）。門脈高壓可加重 anorectal varices。 此題屬較難的臨床定位或易混淆題，重點是辨認關鍵解剖線索。",
+    "explanation": "正解為 直腸靜脈叢（rectal venous plexus）。門脈高壓可加重 anorectal varices。重點在於辨認 superior rectal vein 屬 portal，middle/inferior rectal veins 屬 systemic 與 直腸靜脈叢（rectal venous plexus） 的關聯。",
     "testedConcept": "直腸靜脈叢：superior rectal vein 屬 portal，middle/inferior rectal veins 屬 systemic",
     "sourceType": "AI_GENERATED",
     "difficulty": "hard"
@@ -3340,7 +3340,7 @@ export const anatomyQuestions: Question[] = [
       "E": "上腸繫膜靜脈（superior mesenteric vein, SMV）"
     },
     "answer": "D",
-    "explanation": "正解為 肝門靜脈（portal vein）。portal triad 中 portal vein 通常在後方。 此題屬基礎定位題，國考常用來確認核心解剖關係。",
+    "explanation": "正解為 肝門靜脈（portal vein）。portal triad 中 portal vein 通常在後方。重點在於辨認 攜帶腸胃道吸收物到肝臟，不含肝動脈血 與 肝門靜脈（portal vein） 的關聯。",
     "testedConcept": "肝門靜脈：攜帶腸胃道吸收物到肝臟，不含肝動脈血",
     "sourceType": "AI_GENERATED",
     "difficulty": "easy"
@@ -3350,7 +3350,7 @@ export const anatomyQuestions: Question[] = [
     "subject": "解剖學",
     "chapter": "腹部",
     "section": "門脈系統",
-    "stem": "準備醫師國考時，若題目線索指向「與 SMV 匯合形成 portal vein，並接受 IMV 常見變異」，最應選下列哪一個解剖構造或路徑？",
+    "stem": "關於「與 SMV 匯合形成 portal vein，並接受 IMV 常見變異」所涉及的解剖構造，下列何者最適合？",
     "options": {
       "A": "肝門靜脈（portal vein）",
       "B": "脾靜脈（splenic vein）",
@@ -3359,7 +3359,7 @@ export const anatomyQuestions: Question[] = [
       "E": "食道下段靜脈叢（lower esophageal venous plexus）"
     },
     "answer": "B",
-    "explanation": "正解為 脾靜脈（splenic vein）。在胰臟後方走行。 此題接近國考常見整合題，需要把結構、路徑與功能連在一起。",
+    "explanation": "正解為 脾靜脈（splenic vein）。在胰臟後方走行。重點在於辨認 與 SMV 匯合形成 portal vein，並接受 IMV 常見變異 與 脾靜脈（splenic vein） 的關聯。",
     "testedConcept": "脾靜脈：與 SMV 匯合形成 portal vein，並接受 IMV 常見變異",
     "sourceType": "AI_GENERATED",
     "difficulty": "medium"
@@ -3369,7 +3369,7 @@ export const anatomyQuestions: Question[] = [
     "subject": "解剖學",
     "chapter": "腹部",
     "section": "門脈系統",
-    "stem": "臨床題幹描述與「與 splenic vein 在胰頸後方形成 portal vein」最相關。若要定位病灶或判斷受影響構造，下列何者最適合？",
+    "stem": "關於「與 splenic vein 在胰頸後方形成 portal vein」的解剖判斷，下列何者最適合？",
     "options": {
       "A": "上腸繫膜靜脈（superior mesenteric vein, SMV）",
       "B": "脾靜脈（splenic vein）",
@@ -3378,7 +3378,7 @@ export const anatomyQuestions: Question[] = [
       "E": "肝門靜脈（portal vein）"
     },
     "answer": "A",
-    "explanation": "正解為 上腸繫膜靜脈（superior mesenteric vein, SMV）。SMV 位於 SMA 右側。 此題屬較難的臨床定位或易混淆題，重點是辨認關鍵解剖線索。",
+    "explanation": "正解為 上腸繫膜靜脈（superior mesenteric vein, SMV）。SMV 位於 SMA 右側。重點在於辨認 與 splenic vein 在胰頸後方形成 portal vein 與 上腸繫膜靜脈（superior mesenteric vein, SMV） 的關聯。",
     "testedConcept": "上腸繫膜靜脈：與 splenic vein 在胰頸後方形成 portal vein",
     "sourceType": "AI_GENERATED",
     "difficulty": "hard"
@@ -3388,7 +3388,7 @@ export const anatomyQuestions: Question[] = [
     "subject": "解剖學",
     "chapter": "腹部",
     "section": "門脈系統",
-    "stem": "準備醫師國考時，若題目線索指向「portal-systemic anastomosis，門脈高壓可造成食道靜脈曲張」，最應選下列哪一個解剖構造或路徑？",
+    "stem": "關於「portal-systemic anastomosis，門脈高壓可造成食道靜脈曲張」所涉及的解剖構造，下列何者最適合？",
     "options": {
       "A": "食道下段靜脈叢（lower esophageal venous plexus）",
       "B": "肚臍周圍靜脈（paraumbilical veins）",
@@ -3397,7 +3397,7 @@ export const anatomyQuestions: Question[] = [
       "E": "肝門靜脈（portal vein）"
     },
     "answer": "A",
-    "explanation": "正解為 食道下段靜脈叢（lower esophageal venous plexus）。left gastric vein 與 azygos system 吻合。 此題接近國考常見整合題，需要把結構、路徑與功能連在一起。",
+    "explanation": "正解為 食道下段靜脈叢（lower esophageal venous plexus）。left gastric vein 與 azygos system 吻合。",
     "testedConcept": "食道下段靜脈叢：portal-systemic anastomosis，門脈高壓可造成食道靜脈曲張",
     "sourceType": "AI_GENERATED",
     "difficulty": "medium"
@@ -3407,7 +3407,7 @@ export const anatomyQuestions: Question[] = [
     "subject": "解剖學",
     "chapter": "腹部",
     "section": "門脈系統",
-    "stem": "臨床題幹描述與「門脈高壓可造成 caput medusae」最相關。若要定位病灶或判斷受影響構造，下列何者最適合？",
+    "stem": "若病灶或手術傷害影響「門脈高壓可造成 caput medusae」相關功能或解剖關係，最可能涉及下列何者？",
     "options": {
       "A": "肚臍周圍靜脈（paraumbilical veins）",
       "B": "上腸繫膜靜脈（superior mesenteric vein, SMV）",
@@ -3416,7 +3416,7 @@ export const anatomyQuestions: Question[] = [
       "E": "肝門靜脈（portal vein）"
     },
     "answer": "A",
-    "explanation": "正解為 肚臍周圍靜脈（paraumbilical veins）。連接 portal vein 與 superficial epigastric veins。 此題屬較難的臨床定位或易混淆題，重點是辨認關鍵解剖線索。",
+    "explanation": "正解為 肚臍周圍靜脈（paraumbilical veins）。連接 portal vein 與 superficial epigastric veins。",
     "testedConcept": "肚臍周圍靜脈：門脈高壓可造成 caput medusae",
     "sourceType": "AI_GENERATED",
     "difficulty": "hard"
@@ -3435,7 +3435,7 @@ export const anatomyQuestions: Question[] = [
       "E": "陰部內動脈（internal pudendal artery）"
     },
     "answer": "B",
-    "explanation": "正解為 內髂動脈（internal iliac artery）。分為 anterior/posterior divisions。 此題屬基礎定位題，國考常用來確認核心解剖關係。",
+    "explanation": "正解為 內髂動脈（internal iliac artery）。分為 anterior/posterior divisions。",
     "testedConcept": "內髂動脈：供應多數骨盆器官、會陰與臀部",
     "sourceType": "AI_GENERATED",
     "difficulty": "easy"
@@ -3445,7 +3445,7 @@ export const anatomyQuestions: Question[] = [
     "subject": "解剖學",
     "chapter": "骨盆與會陰",
     "section": "骨盆血管",
-    "stem": "準備醫師國考時，若題目線索指向「通常來自 internal iliac anterior division，經 obturator canal」，最應選下列哪一個解剖構造或路徑？",
+    "stem": "下列何者與「通常來自 internal iliac anterior division，經 obturator canal」最相關？",
     "options": {
       "A": "下臀動脈（inferior gluteal artery）",
       "B": "上臀動脈（superior gluteal artery）",
@@ -3454,7 +3454,7 @@ export const anatomyQuestions: Question[] = [
       "E": "子宮動脈（uterine artery）"
     },
     "answer": "C",
-    "explanation": "正解為 閉孔動脈（obturator artery）。corona mortis 是 obturator 與 external iliac/inferior epigastric 變異吻合。 此題接近國考常見整合題，需要把結構、路徑與功能連在一起。",
+    "explanation": "正解為 閉孔動脈（obturator artery）。corona mortis 是 obturator 與 external iliac/inferior epigastric 變異吻合。",
     "testedConcept": "閉孔動脈：通常來自 internal iliac anterior division，經 obturator canal",
     "sourceType": "AI_GENERATED",
     "difficulty": "medium"
@@ -3464,7 +3464,7 @@ export const anatomyQuestions: Question[] = [
     "subject": "解剖學",
     "chapter": "骨盆與會陰",
     "section": "骨盆血管",
-    "stem": "臨床題幹描述與「經 greater sciatic foramen 於 piriformis 上方離開骨盆」最相關。若要定位病灶或判斷受影響構造，下列何者最適合？",
+    "stem": "若病灶或手術傷害影響「經 greater sciatic foramen 於 piriformis 上方離開骨盆」相關功能或解剖關係，最可能涉及下列何者？",
     "options": {
       "A": "子宮動脈（uterine artery）",
       "B": "上臀動脈（superior gluteal artery）",
@@ -3473,7 +3473,7 @@ export const anatomyQuestions: Question[] = [
       "E": "下臀動脈（inferior gluteal artery）"
     },
     "answer": "B",
-    "explanation": "正解為 上臀動脈（superior gluteal artery）。posterior division 分支，供應 gluteal region。 此題屬較難的臨床定位或易混淆題，重點是辨認關鍵解剖線索。",
+    "explanation": "正解為 上臀動脈（superior gluteal artery）。posterior division 分支，供應 gluteal region。",
     "testedConcept": "上臀動脈：經 greater sciatic foramen 於 piriformis 上方離開骨盆",
     "sourceType": "AI_GENERATED",
     "difficulty": "hard"
@@ -3483,7 +3483,7 @@ export const anatomyQuestions: Question[] = [
     "subject": "解剖學",
     "chapter": "骨盆與會陰",
     "section": "骨盆血管",
-    "stem": "準備醫師國考時，若題目線索指向「經 piriformis 下方離開骨盆」，最應選下列哪一個解剖構造或路徑？",
+    "stem": "下列何者與「經 piriformis 下方離開骨盆」最相關？",
     "options": {
       "A": "上臀動脈（superior gluteal artery）",
       "B": "子宮動脈（uterine artery）",
@@ -3492,7 +3492,7 @@ export const anatomyQuestions: Question[] = [
       "E": "閉孔動脈（obturator artery）"
     },
     "answer": "D",
-    "explanation": "正解為 下臀動脈（inferior gluteal artery）。和 sciatic nerve 關係密切。 此題接近國考常見整合題，需要把結構、路徑與功能連在一起。",
+    "explanation": "正解為 下臀動脈（inferior gluteal artery）。和 sciatic nerve 關係密切。重點在於辨認 經 piriformis 下方離開骨盆 與 下臀動脈（inferior gluteal artery） 的關聯。",
     "testedConcept": "下臀動脈：經 piriformis 下方離開骨盆",
     "sourceType": "AI_GENERATED",
     "difficulty": "medium"
@@ -3502,7 +3502,7 @@ export const anatomyQuestions: Question[] = [
     "subject": "解剖學",
     "chapter": "骨盆與會陰",
     "section": "骨盆血管",
-    "stem": "臨床題幹描述與「跨過 ureter 上方，口訣 water under the bridge」最相關。若要定位病灶或判斷受影響構造，下列何者最適合？",
+    "stem": "下列何者最能解釋「跨過 ureter 上方，口訣 water under the bridge」的解剖基礎？",
     "options": {
       "A": "下臀動脈（inferior gluteal artery）",
       "B": "內髂動脈（internal iliac artery）",
@@ -3511,7 +3511,7 @@ export const anatomyQuestions: Question[] = [
       "E": "陰部內動脈（internal pudendal artery）"
     },
     "answer": "C",
-    "explanation": "正解為 子宮動脈（uterine artery）。hysterectomy 時容易傷到 ureter。 此題屬較難的臨床定位或易混淆題，重點是辨認關鍵解剖線索。",
+    "explanation": "正解為 子宮動脈（uterine artery）。hysterectomy 時容易傷到 ureter。重點在於辨認 跨過 ureter 上方，口訣 water under the bridge 與 子宮動脈（uterine artery） 的關聯。",
     "testedConcept": "子宮動脈：跨過 ureter 上方，口訣 water under the bridge",
     "sourceType": "AI_GENERATED",
     "difficulty": "hard"
@@ -3530,7 +3530,7 @@ export const anatomyQuestions: Question[] = [
       "E": "陰部內動脈（internal pudendal artery）"
     },
     "answer": "E",
-    "explanation": "正解為 陰部內動脈（internal pudendal artery）。伴 pudendal nerve。 此題屬基礎定位題，國考常用來確認核心解剖關係。",
+    "explanation": "正解為 陰部內動脈（internal pudendal artery）。伴 pudendal nerve。重點在於辨認 離開骨盆後進入 pudendal canal，供應會陰 與 陰部內動脈（internal pudendal artery） 的關聯。",
     "testedConcept": "陰部內動脈：離開骨盆後進入 pudendal canal，供應會陰",
     "sourceType": "AI_GENERATED",
     "difficulty": "easy"
@@ -3540,7 +3540,7 @@ export const anatomyQuestions: Question[] = [
     "subject": "解剖學",
     "chapter": "骨盆與會陰",
     "section": "骨盆血管",
-    "stem": "準備醫師國考時，若題目線索指向「供應多數骨盆器官、會陰與臀部」，最應選下列哪一個解剖構造或路徑？",
+    "stem": "關於「供應多數骨盆器官、會陰與臀部」所涉及的解剖構造，下列何者最適合？",
     "options": {
       "A": "下臀動脈（inferior gluteal artery）",
       "B": "子宮動脈（uterine artery）",
@@ -3549,7 +3549,7 @@ export const anatomyQuestions: Question[] = [
       "E": "內髂動脈（internal iliac artery）"
     },
     "answer": "E",
-    "explanation": "正解為 內髂動脈（internal iliac artery）。分為 anterior/posterior divisions。 此題接近國考常見整合題，需要把結構、路徑與功能連在一起。",
+    "explanation": "正解為 內髂動脈（internal iliac artery）。分為 anterior/posterior divisions。",
     "testedConcept": "內髂動脈：供應多數骨盆器官、會陰與臀部",
     "sourceType": "AI_GENERATED",
     "difficulty": "medium"
@@ -3559,7 +3559,7 @@ export const anatomyQuestions: Question[] = [
     "subject": "解剖學",
     "chapter": "骨盆與會陰",
     "section": "骨盆血管",
-    "stem": "臨床題幹描述與「通常來自 internal iliac anterior division，經 obturator canal」最相關。若要定位病灶或判斷受影響構造，下列何者最適合？",
+    "stem": "下列何者最能解釋「通常來自 internal iliac anterior division，經 obturator canal」的解剖基礎？",
     "options": {
       "A": "陰部內動脈（internal pudendal artery）",
       "B": "內髂動脈（internal iliac artery）",
@@ -3568,7 +3568,7 @@ export const anatomyQuestions: Question[] = [
       "E": "下臀動脈（inferior gluteal artery）"
     },
     "answer": "C",
-    "explanation": "正解為 閉孔動脈（obturator artery）。corona mortis 是 obturator 與 external iliac/inferior epigastric 變異吻合。 此題屬較難的臨床定位或易混淆題，重點是辨認關鍵解剖線索。",
+    "explanation": "正解為 閉孔動脈（obturator artery）。corona mortis 是 obturator 與 external iliac/inferior epigastric 變異吻合。",
     "testedConcept": "閉孔動脈：通常來自 internal iliac anterior division，經 obturator canal",
     "sourceType": "AI_GENERATED",
     "difficulty": "hard"
@@ -3578,7 +3578,7 @@ export const anatomyQuestions: Question[] = [
     "subject": "解剖學",
     "chapter": "骨盆與會陰",
     "section": "泌尿生殖",
-    "stem": "準備醫師國考時，若題目線索指向「在女性骨盆中從子宮動脈下方通過」，最應選下列哪一個解剖構造或路徑？",
+    "stem": "關於「在女性骨盆中從子宮動脈下方通過」所涉及的解剖構造，下列何者最適合？",
     "options": {
       "A": "膀胱三角（trigone of bladder）",
       "B": "陰莖海綿體（corpora cavernosa）",
@@ -3587,7 +3587,7 @@ export const anatomyQuestions: Question[] = [
       "E": "輸尿管（ureter）"
     },
     "answer": "E",
-    "explanation": "正解為 輸尿管（ureter）。water under the bridge：ureter under uterine artery。 此題接近國考常見整合題，需要把結構、路徑與功能連在一起。",
+    "explanation": "正解為 輸尿管（ureter）。water under the bridge：ureter under uterine artery。",
     "testedConcept": "輸尿管：在女性骨盆中從子宮動脈下方通過",
     "sourceType": "AI_GENERATED",
     "difficulty": "medium"
@@ -3597,7 +3597,7 @@ export const anatomyQuestions: Question[] = [
     "subject": "解剖學",
     "chapter": "骨盆與會陰",
     "section": "泌尿生殖",
-    "stem": "臨床題幹描述與「由兩個 ureteric orifices 與 internal urethral orifice 形成」最相關。若要定位病灶或判斷受影響構造，下列何者最適合？",
+    "stem": "關於「由兩個 ureteric orifices 與 internal urethral orifice 形成」的解剖判斷，下列何者最適合？",
     "options": {
       "A": "膀胱三角（trigone of bladder）",
       "B": "輸尿管（ureter）",
@@ -3606,7 +3606,7 @@ export const anatomyQuestions: Question[] = [
       "E": "前列腺尿道（prostatic urethra）"
     },
     "answer": "A",
-    "explanation": "正解為 膀胱三角（trigone of bladder）。平滑且對牽張敏感。 此題屬較難的臨床定位或易混淆題，重點是辨認關鍵解剖線索。",
+    "explanation": "正解為 膀胱三角（trigone of bladder）。平滑且對牽張敏感。重點在於辨認 由兩個 ureteric orifices 與 internal urethral orifice 形成 與 膀胱三角（trigone of bladder） 的關聯。",
     "testedConcept": "膀胱三角：由兩個 ureteric orifices 與 internal urethral orifice 形成",
     "sourceType": "AI_GENERATED",
     "difficulty": "hard"
@@ -3625,7 +3625,7 @@ export const anatomyQuestions: Question[] = [
       "E": "前列腺尿道（prostatic urethra）"
     },
     "answer": "E",
-    "explanation": "正解為 前列腺尿道（prostatic urethra）。seminal colliculus 是重要 landmark。 此題屬基礎定位題，國考常用來確認核心解剖關係。",
+    "explanation": "正解為 前列腺尿道（prostatic urethra）。seminal colliculus 是重要 landmark。",
     "testedConcept": "前列腺尿道：接受射精管（ejaculatory ducts）開口",
     "sourceType": "AI_GENERATED",
     "difficulty": "easy"
@@ -3635,7 +3635,7 @@ export const anatomyQuestions: Question[] = [
     "subject": "解剖學",
     "chapter": "骨盆與會陰",
     "section": "泌尿生殖",
-    "stem": "準備醫師國考時，若題目線索指向「含 ductus deferens、testicular vessels、pampiniform plexus 等」，最應選下列哪一個解剖構造或路徑？",
+    "stem": "下列何者與「含 ductus deferens、testicular vessels、pampiniform plexus 等」最相關？",
     "options": {
       "A": "膀胱三角（trigone of bladder）",
       "B": "前列腺尿道（prostatic urethra）",
@@ -3644,7 +3644,7 @@ export const anatomyQuestions: Question[] = [
       "E": "卵巢動脈（ovarian artery）"
     },
     "answer": "D",
-    "explanation": "正解為 精索（spermatic cord）。不含 ilioinguinal nerve；該神經在精索外側隨行。 此題接近國考常見整合題，需要把結構、路徑與功能連在一起。",
+    "explanation": "正解為 精索（spermatic cord）。不含 ilioinguinal nerve；該神經在精索外側隨行。重點在於辨認 含 ductus deferens、testicular vessels、pampiniform plexus 等 與 精索（spermatic cord） 的關聯。",
     "testedConcept": "精索：含 ductus deferens、testicular vessels、pampiniform plexus 等",
     "sourceType": "AI_GENERATED",
     "difficulty": "medium"
@@ -3654,7 +3654,7 @@ export const anatomyQuestions: Question[] = [
     "subject": "解剖學",
     "chapter": "骨盆與會陰",
     "section": "泌尿生殖",
-    "stem": "臨床題幹描述與「直接來自 abdominal aorta」最相關。若要定位病灶或判斷受影響構造，下列何者最適合？",
+    "stem": "關於「直接來自 abdominal aorta」的解剖判斷，下列何者最適合？",
     "options": {
       "A": "陰莖海綿體（corpora cavernosa）",
       "B": "卵巢動脈（ovarian artery）",
@@ -3663,7 +3663,7 @@ export const anatomyQuestions: Question[] = [
       "E": "前列腺尿道（prostatic urethra）"
     },
     "answer": "B",
-    "explanation": "正解為 卵巢動脈（ovarian artery）。因胚胎來源於後腹壁，血管來自腹主動脈。 此題屬較難的臨床定位或易混淆題，重點是辨認關鍵解剖線索。",
+    "explanation": "正解為 卵巢動脈（ovarian artery）。因胚胎來源於後腹壁，血管來自腹主動脈。重點在於辨認 直接來自 abdominal aorta 與 卵巢動脈（ovarian artery） 的關聯。",
     "testedConcept": "卵巢動脈：直接來自 abdominal aorta",
     "sourceType": "AI_GENERATED",
     "difficulty": "hard"
@@ -3673,7 +3673,7 @@ export const anatomyQuestions: Question[] = [
     "subject": "解剖學",
     "chapter": "骨盆與會陰",
     "section": "泌尿生殖",
-    "stem": "準備醫師國考時，若題目線索指向「主要由 deep artery of penis 供血」，最應選下列哪一個解剖構造或路徑？",
+    "stem": "下列何者與「主要由 deep artery of penis 供血」最相關？",
     "options": {
       "A": "陰莖海綿體（corpora cavernosa）",
       "B": "輸尿管（ureter）",
@@ -3682,7 +3682,7 @@ export const anatomyQuestions: Question[] = [
       "E": "前列腺尿道（prostatic urethra）"
     },
     "answer": "A",
-    "explanation": "正解為 陰莖海綿體（corpora cavernosa）。erection 主要是 parasympathetic S2-S4。 此題接近國考常見整合題，需要把結構、路徑與功能連在一起。",
+    "explanation": "正解為 陰莖海綿體（corpora cavernosa）。erection 主要是 parasympathetic S2-S4。",
     "testedConcept": "陰莖海綿體：主要由 deep artery of penis 供血",
     "sourceType": "AI_GENERATED",
     "difficulty": "medium"
@@ -3692,7 +3692,7 @@ export const anatomyQuestions: Question[] = [
     "subject": "解剖學",
     "chapter": "骨盆與會陰",
     "section": "泌尿生殖",
-    "stem": "臨床題幹描述與「在女性骨盆中從子宮動脈下方通過」最相關。若要定位病灶或判斷受影響構造，下列何者最適合？",
+    "stem": "若病灶或手術傷害影響「在女性骨盆中從子宮動脈下方通過」相關功能或解剖關係，最可能涉及下列何者？",
     "options": {
       "A": "精索（spermatic cord）",
       "B": "前列腺尿道（prostatic urethra）",
@@ -3701,7 +3701,7 @@ export const anatomyQuestions: Question[] = [
       "E": "卵巢動脈（ovarian artery）"
     },
     "answer": "D",
-    "explanation": "正解為 輸尿管（ureter）。water under the bridge：ureter under uterine artery。 此題屬較難的臨床定位或易混淆題，重點是辨認關鍵解剖線索。",
+    "explanation": "正解為 輸尿管（ureter）。water under the bridge：ureter under uterine artery。",
     "testedConcept": "輸尿管：在女性骨盆中從子宮動脈下方通過",
     "sourceType": "AI_GENERATED",
     "difficulty": "hard"
@@ -3720,7 +3720,7 @@ export const anatomyQuestions: Question[] = [
       "E": "前列腺尿道（prostatic urethra）"
     },
     "answer": "C",
-    "explanation": "正解為 膀胱三角（trigone of bladder）。平滑且對牽張敏感。 此題屬基礎定位題，國考常用來確認核心解剖關係。",
+    "explanation": "正解為 膀胱三角（trigone of bladder）。平滑且對牽張敏感。重點在於辨認 由兩個 ureteric orifices 與 internal urethral orifice 形成 與 膀胱三角（trigone of bladder） 的關聯。",
     "testedConcept": "膀胱三角：由兩個 ureteric orifices 與 internal urethral orifice 形成",
     "sourceType": "AI_GENERATED",
     "difficulty": "easy"
@@ -3730,7 +3730,7 @@ export const anatomyQuestions: Question[] = [
     "subject": "解剖學",
     "chapter": "骨盆與會陰",
     "section": "直腸與肛管",
-    "stem": "準備醫師國考時，若題目線索指向「區分肛管上、下不同胚胎來源、血供、淋巴與神經」，最應選下列哪一個解剖構造或路徑？",
+    "stem": "關於「區分肛管上、下不同胚胎來源、血供、淋巴與神經」所涉及的解剖構造，下列何者最適合？",
     "options": {
       "A": "上直腸動脈（superior rectal artery）",
       "B": "內痔（internal hemorrhoids）",
@@ -3739,7 +3739,7 @@ export const anatomyQuestions: Question[] = [
       "E": "外痔（external hemorrhoids）"
     },
     "answer": "C",
-    "explanation": "正解為 齒狀線（pectinate line）。上方 visceral innervation，痛覺較不敏感；下方 somatic。 此題接近國考常見整合題，需要把結構、路徑與功能連在一起。",
+    "explanation": "正解為 齒狀線（pectinate line）。上方 visceral innervation，痛覺較不敏感；下方 somatic。",
     "testedConcept": "齒狀線：區分肛管上、下不同胚胎來源、血供、淋巴與神經",
     "sourceType": "AI_GENERATED",
     "difficulty": "medium"
@@ -3749,7 +3749,7 @@ export const anatomyQuestions: Question[] = [
     "subject": "解剖學",
     "chapter": "骨盆與會陰",
     "section": "直腸與肛管",
-    "stem": "臨床題幹描述與「來自 IMA，供應齒狀線上方」最相關。若要定位病灶或判斷受影響構造，下列何者最適合？",
+    "stem": "若病灶或手術傷害影響「來自 IMA，供應齒狀線上方」相關功能或解剖關係，最可能涉及下列何者？",
     "options": {
       "A": "上直腸動脈（superior rectal artery）",
       "B": "齒狀線（pectinate line）",
@@ -3758,7 +3758,7 @@ export const anatomyQuestions: Question[] = [
       "E": "肛門外括約肌（external anal sphincter）"
     },
     "answer": "A",
-    "explanation": "正解為 上直腸動脈（superior rectal artery）。靜脈回流至 portal system。 此題屬較難的臨床定位或易混淆題，重點是辨認關鍵解剖線索。",
+    "explanation": "正解為 上直腸動脈（superior rectal artery）。靜脈回流至 portal system。重點在於辨認 來自 IMA，供應齒狀線上方 與 上直腸動脈（superior rectal artery） 的關聯。",
     "testedConcept": "上直腸動脈：來自 IMA，供應齒狀線上方",
     "sourceType": "AI_GENERATED",
     "difficulty": "hard"
@@ -3768,7 +3768,7 @@ export const anatomyQuestions: Question[] = [
     "subject": "解剖學",
     "chapter": "骨盆與會陰",
     "section": "直腸與肛管",
-    "stem": "準備醫師國考時，若題目線索指向「來自 internal pudendal artery，供應齒狀線下方」，最應選下列哪一個解剖構造或路徑？",
+    "stem": "關於「來自 internal pudendal artery，供應齒狀線下方」所涉及的解剖構造，下列何者最適合？",
     "options": {
       "A": "上直腸動脈（superior rectal artery）",
       "B": "內痔（internal hemorrhoids）",
@@ -3777,7 +3777,7 @@ export const anatomyQuestions: Question[] = [
       "E": "肛門外括約肌（external anal sphincter）"
     },
     "answer": "C",
-    "explanation": "正解為 下直腸動脈（inferior rectal artery）。靜脈回流至 systemic circulation。 此題接近國考常見整合題，需要把結構、路徑與功能連在一起。",
+    "explanation": "正解為 下直腸動脈（inferior rectal artery）。靜脈回流至 systemic circulation。",
     "testedConcept": "下直腸動脈：來自 internal pudendal artery，供應齒狀線下方",
     "sourceType": "AI_GENERATED",
     "difficulty": "medium"
@@ -3787,7 +3787,7 @@ export const anatomyQuestions: Question[] = [
     "subject": "解剖學",
     "chapter": "骨盆與會陰",
     "section": "直腸與肛管",
-    "stem": "臨床題幹描述與「發生於齒狀線上方，通常疼痛較不明顯」最相關。若要定位病灶或判斷受影響構造，下列何者最適合？",
+    "stem": "下列何者最能解釋「發生於齒狀線上方，通常疼痛較不明顯」的解剖基礎？",
     "options": {
       "A": "肛門外括約肌（external anal sphincter）",
       "B": "齒狀線（pectinate line）",
@@ -3796,7 +3796,7 @@ export const anatomyQuestions: Question[] = [
       "E": "上直腸動脈（superior rectal artery）"
     },
     "answer": "D",
-    "explanation": "正解為 內痔（internal hemorrhoids）。visceral afferent，對痛較不敏感。 此題屬較難的臨床定位或易混淆題，重點是辨認關鍵解剖線索。",
+    "explanation": "正解為 內痔（internal hemorrhoids）。visceral afferent，對痛較不敏感。重點在於辨認 發生於齒狀線上方，通常疼痛較不明顯 與 內痔（internal hemorrhoids） 的關聯。",
     "testedConcept": "內痔：發生於齒狀線上方，通常疼痛較不明顯",
     "sourceType": "AI_GENERATED",
     "difficulty": "hard"
@@ -3815,7 +3815,7 @@ export const anatomyQuestions: Question[] = [
       "E": "上直腸動脈（superior rectal artery）"
     },
     "answer": "C",
-    "explanation": "正解為 外痔（external hemorrhoids）。somatic innervation by inferior rectal nerve。 此題屬基礎定位題，國考常用來確認核心解剖關係。",
+    "explanation": "正解為 外痔（external hemorrhoids）。somatic innervation by inferior rectal nerve。",
     "testedConcept": "外痔：發生於齒狀線下方，疼痛明顯",
     "sourceType": "AI_GENERATED",
     "difficulty": "easy"
@@ -3825,7 +3825,7 @@ export const anatomyQuestions: Question[] = [
     "subject": "解剖學",
     "chapter": "骨盆與會陰",
     "section": "直腸與肛管",
-    "stem": "準備醫師國考時，若題目線索指向「由陰部神經（pudendal nerve）支配」，最應選下列哪一個解剖構造或路徑？",
+    "stem": "下列何者與「由陰部神經（pudendal nerve）支配」最相關？",
     "options": {
       "A": "上直腸動脈（superior rectal artery）",
       "B": "內痔（internal hemorrhoids）",
@@ -3834,7 +3834,7 @@ export const anatomyQuestions: Question[] = [
       "E": "外痔（external hemorrhoids）"
     },
     "answer": "C",
-    "explanation": "正解為 肛門外括約肌（external anal sphincter）。somatic motor，能隨意控制。 此題接近國考常見整合題，需要把結構、路徑與功能連在一起。",
+    "explanation": "正解為 肛門外括約肌（external anal sphincter）。somatic motor，能隨意控制。重點在於辨認 由陰部神經（pudendal nerve）支配 與 肛門外括約肌（external anal sphincter） 的關聯。",
     "testedConcept": "肛門外括約肌：由陰部神經（pudendal nerve）支配",
     "sourceType": "AI_GENERATED",
     "difficulty": "medium"
@@ -3844,7 +3844,7 @@ export const anatomyQuestions: Question[] = [
     "subject": "解剖學",
     "chapter": "骨盆與會陰",
     "section": "直腸與肛管",
-    "stem": "臨床題幹描述與「區分肛管上、下不同胚胎來源、血供、淋巴與神經」最相關。若要定位病灶或判斷受影響構造，下列何者最適合？",
+    "stem": "下列何者最能解釋「區分肛管上、下不同胚胎來源、血供、淋巴與神經」的解剖基礎？",
     "options": {
       "A": "下直腸動脈（inferior rectal artery）",
       "B": "外痔（external hemorrhoids）",
@@ -3853,7 +3853,7 @@ export const anatomyQuestions: Question[] = [
       "E": "齒狀線（pectinate line）"
     },
     "answer": "E",
-    "explanation": "正解為 齒狀線（pectinate line）。上方 visceral innervation，痛覺較不敏感；下方 somatic。 此題屬較難的臨床定位或易混淆題，重點是辨認關鍵解剖線索。",
+    "explanation": "正解為 齒狀線（pectinate line）。上方 visceral innervation，痛覺較不敏感；下方 somatic。",
     "testedConcept": "齒狀線：區分肛管上、下不同胚胎來源、血供、淋巴與神經",
     "sourceType": "AI_GENERATED",
     "difficulty": "hard"
@@ -3863,7 +3863,7 @@ export const anatomyQuestions: Question[] = [
     "subject": "解剖學",
     "chapter": "骨盆與會陰",
     "section": "直腸與肛管",
-    "stem": "準備醫師國考時，若題目線索指向「來自 IMA，供應齒狀線上方」，最應選下列哪一個解剖構造或路徑？",
+    "stem": "下列何者與「來自 IMA，供應齒狀線上方」最相關？",
     "options": {
       "A": "齒狀線（pectinate line）",
       "B": "下直腸動脈（inferior rectal artery）",
@@ -3872,7 +3872,7 @@ export const anatomyQuestions: Question[] = [
       "E": "肛門外括約肌（external anal sphincter）"
     },
     "answer": "C",
-    "explanation": "正解為 上直腸動脈（superior rectal artery）。靜脈回流至 portal system。 此題接近國考常見整合題，需要把結構、路徑與功能連在一起。",
+    "explanation": "正解為 上直腸動脈（superior rectal artery）。靜脈回流至 portal system。重點在於辨認 來自 IMA，供應齒狀線上方 與 上直腸動脈（superior rectal artery） 的關聯。",
     "testedConcept": "上直腸動脈：來自 IMA，供應齒狀線上方",
     "sourceType": "AI_GENERATED",
     "difficulty": "medium"
@@ -3882,7 +3882,7 @@ export const anatomyQuestions: Question[] = [
     "subject": "解剖學",
     "chapter": "骨盆與會陰",
     "section": "會陰三角",
-    "stem": "臨床題幹描述與「包含 external genitalia 與尿道相關結構」最相關。若要定位病灶或判斷受影響構造，下列何者最適合？",
+    "stem": "關於「包含 external genitalia 與尿道相關結構」的解剖判斷，下列何者最適合？",
     "options": {
       "A": "會陰體（perineal body）",
       "B": "尿生殖三角（urogenital triangle）",
@@ -3891,7 +3891,7 @@ export const anatomyQuestions: Question[] = [
       "E": "陰部管（pudendal canal, Alcock canal）"
     },
     "answer": "B",
-    "explanation": "正解為 尿生殖三角（urogenital triangle）。會陰可分為 urogenital triangle 與 anal triangle。 此題屬較難的臨床定位或易混淆題，重點是辨認關鍵解剖線索。",
+    "explanation": "正解為 尿生殖三角（urogenital triangle）。會陰可分為 urogenital triangle 與 anal triangle。",
     "testedConcept": "尿生殖三角：包含 external genitalia 與尿道相關結構",
     "sourceType": "AI_GENERATED",
     "difficulty": "hard"
@@ -3910,7 +3910,7 @@ export const anatomyQuestions: Question[] = [
       "E": "坐骨肛門窩（ischioanal fossa）"
     },
     "answer": "A",
-    "explanation": "正解為 肛門三角（anal triangle）。inferior rectal nerves/vessels 穿過 ischioanal fossa。 此題屬基礎定位題，國考常用來確認核心解剖關係。",
+    "explanation": "正解為 肛門三角（anal triangle）。inferior rectal nerves/vessels 穿過 ischioanal fossa。",
     "testedConcept": "肛門三角：包含肛管與 ischioanal fossa",
     "sourceType": "AI_GENERATED",
     "difficulty": "easy"
@@ -3920,7 +3920,7 @@ export const anatomyQuestions: Question[] = [
     "subject": "解剖學",
     "chapter": "骨盆與會陰",
     "section": "會陰三角",
-    "stem": "準備醫師國考時，若題目線索指向「位於 obturator internus fascia，含 pudendal nerve/internal pudendal vessels」，最應選下列哪一個解剖構造或路徑？",
+    "stem": "關於「位於 obturator internus fascia，含 pudendal nerve/internal pudendal vessels」所涉及的解剖構造，下列何者最適合？",
     "options": {
       "A": "會陰體（perineal body）",
       "B": "陰部管（pudendal canal, Alcock canal）",
@@ -3929,7 +3929,7 @@ export const anatomyQuestions: Question[] = [
       "E": "肛門三角（anal triangle）"
     },
     "answer": "B",
-    "explanation": "正解為 陰部管（pudendal canal, Alcock canal）。pudendal nerve block 可在 ischial spine 附近。 此題接近國考常見整合題，需要把結構、路徑與功能連在一起。",
+    "explanation": "正解為 陰部管（pudendal canal, Alcock canal）。pudendal nerve block 可在 ischial spine 附近。",
     "testedConcept": "陰部管：位於 obturator internus fascia，含 pudendal nerve/internal pudendal vessels",
     "sourceType": "AI_GENERATED",
     "difficulty": "medium"
@@ -3939,7 +3939,7 @@ export const anatomyQuestions: Question[] = [
     "subject": "解剖學",
     "chapter": "骨盆與會陰",
     "section": "會陰三角",
-    "stem": "臨床題幹描述與「多條會陰肌附著的纖維肌性結構」最相關。若要定位病灶或判斷受影響構造，下列何者最適合？",
+    "stem": "關於「多條會陰肌附著的纖維肌性結構」的解剖判斷，下列何者最適合？",
     "options": {
       "A": "坐骨肛門窩（ischioanal fossa）",
       "B": "會陰體（perineal body）",
@@ -3948,7 +3948,7 @@ export const anatomyQuestions: Question[] = [
       "E": "陰部管（pudendal canal, Alcock canal）"
     },
     "answer": "B",
-    "explanation": "正解為 會陰體（perineal body）。產傷撕裂可能影響 pelvic floor support。 此題屬較難的臨床定位或易混淆題，重點是辨認關鍵解剖線索。",
+    "explanation": "正解為 會陰體（perineal body）。產傷撕裂可能影響 pelvic floor support。重點在於辨認 多條會陰肌附著的纖維肌性結構 與 會陰體（perineal body） 的關聯。",
     "testedConcept": "會陰體：多條會陰肌附著的纖維肌性結構",
     "sourceType": "AI_GENERATED",
     "difficulty": "hard"
@@ -3958,7 +3958,7 @@ export const anatomyQuestions: Question[] = [
     "subject": "解剖學",
     "chapter": "骨盆與會陰",
     "section": "會陰三角",
-    "stem": "準備醫師國考時，若題目線索指向「充滿脂肪，容許肛管擴張」，最應選下列哪一個解剖構造或路徑？",
+    "stem": "關於「充滿脂肪，容許肛管擴張」所涉及的解剖構造，下列何者最適合？",
     "options": {
       "A": "會陰體（perineal body）",
       "B": "深會陰隙（deep perineal pouch）",
@@ -3967,7 +3967,7 @@ export const anatomyQuestions: Question[] = [
       "E": "陰部管（pudendal canal, Alcock canal）"
     },
     "answer": "C",
-    "explanation": "正解為 坐骨肛門窩（ischioanal fossa）。感染可形成 perianal abscess。 此題接近國考常見整合題，需要把結構、路徑與功能連在一起。",
+    "explanation": "正解為 坐骨肛門窩（ischioanal fossa）。感染可形成 perianal abscess。重點在於辨認 充滿脂肪，容許肛管擴張 與 坐骨肛門窩（ischioanal fossa） 的關聯。",
     "testedConcept": "坐骨肛門窩：充滿脂肪，容許肛管擴張",
     "sourceType": "AI_GENERATED",
     "difficulty": "medium"
@@ -3977,7 +3977,7 @@ export const anatomyQuestions: Question[] = [
     "subject": "解剖學",
     "chapter": "骨盆與會陰",
     "section": "會陰三角",
-    "stem": "臨床題幹描述與「含 external urethral sphincter 等結構」最相關。若要定位病灶或判斷受影響構造，下列何者最適合？",
+    "stem": "若病灶或手術傷害影響「含 external urethral sphincter 等結構」相關功能或解剖關係，最可能涉及下列何者？",
     "options": {
       "A": "會陰體（perineal body）",
       "B": "陰部管（pudendal canal, Alcock canal）",
@@ -3986,7 +3986,7 @@ export const anatomyQuestions: Question[] = [
       "E": "深會陰隙（deep perineal pouch）"
     },
     "answer": "E",
-    "explanation": "正解為 深會陰隙（deep perineal pouch）。男女內容不同，但與尿道控制相關。 此題屬較難的臨床定位或易混淆題，重點是辨認關鍵解剖線索。",
+    "explanation": "正解為 深會陰隙（deep perineal pouch）。男女內容不同，但與尿道控制相關。重點在於辨認 含 external urethral sphincter 等結構 與 深會陰隙（deep perineal pouch） 的關聯。",
     "testedConcept": "深會陰隙：含 external urethral sphincter 等結構",
     "sourceType": "AI_GENERATED",
     "difficulty": "hard"
@@ -4005,7 +4005,7 @@ export const anatomyQuestions: Question[] = [
       "E": "深會陰隙（deep perineal pouch）"
     },
     "answer": "D",
-    "explanation": "正解為 尿生殖三角（urogenital triangle）。會陰可分為 urogenital triangle 與 anal triangle。 此題屬基礎定位題，國考常用來確認核心解剖關係。",
+    "explanation": "正解為 尿生殖三角（urogenital triangle）。會陰可分為 urogenital triangle 與 anal triangle。",
     "testedConcept": "尿生殖三角：包含 external genitalia 與尿道相關結構",
     "sourceType": "AI_GENERATED",
     "difficulty": "easy"
@@ -4015,7 +4015,7 @@ export const anatomyQuestions: Question[] = [
     "subject": "解剖學",
     "chapter": "骨盆與會陰",
     "section": "會陰三角",
-    "stem": "準備醫師國考時，若題目線索指向「包含肛管與 ischioanal fossa」，最應選下列哪一個解剖構造或路徑？",
+    "stem": "下列何者與「包含肛管與 ischioanal fossa」最相關？",
     "options": {
       "A": "坐骨肛門窩（ischioanal fossa）",
       "B": "陰部管（pudendal canal, Alcock canal）",
@@ -4024,7 +4024,7 @@ export const anatomyQuestions: Question[] = [
       "E": "尿生殖三角（urogenital triangle）"
     },
     "answer": "D",
-    "explanation": "正解為 肛門三角（anal triangle）。inferior rectal nerves/vessels 穿過 ischioanal fossa。 此題接近國考常見整合題，需要把結構、路徑與功能連在一起。",
+    "explanation": "正解為 肛門三角（anal triangle）。inferior rectal nerves/vessels 穿過 ischioanal fossa。",
     "testedConcept": "肛門三角：包含肛管與 ischioanal fossa",
     "sourceType": "AI_GENERATED",
     "difficulty": "medium"
@@ -4034,7 +4034,7 @@ export const anatomyQuestions: Question[] = [
     "subject": "解剖學",
     "chapter": "上肢",
     "section": "臂神經叢",
-    "stem": "臨床題幹描述與「來自 lateral cord，支配 anterior arm flexors，續為 lateral antebrachial cutaneous nerve」最相關。若要定位病灶或判斷受影響構造，下列何者最適合？",
+    "stem": "若病灶或手術傷害影響「來自 lateral cord，支配 anterior arm flexors，續為 lateral antebrachial cutaneous nerve」相關功能或解剖關係，最可能涉及下列何者？",
     "options": {
       "A": "腋神經（axillary nerve）",
       "B": "長胸神經（long thoracic nerve）",
@@ -4043,7 +4043,7 @@ export const anatomyQuestions: Question[] = [
       "E": "橈神經（radial nerve）"
     },
     "answer": "D",
-    "explanation": "正解為 肌皮神經（musculocutaneous nerve）。損傷影響肘屈曲與前臂外側感覺。 此題屬較難的臨床定位或易混淆題，重點是辨認關鍵解剖線索。",
+    "explanation": "正解為 肌皮神經（musculocutaneous nerve）。損傷影響肘屈曲與前臂外側感覺。重點在於辨認 來自 lateral cord，支配 anterior arm flexors，續為 lateral antebrachial cutaneous nerve 與 肌皮神經（musculocutaneous nerve） 的關聯。",
     "testedConcept": "肌皮神經：來自 lateral cord，支配 anterior arm flexors，續為 lateral antebrachial cutaneous nerve",
     "sourceType": "AI_GENERATED",
     "difficulty": "hard"
@@ -4053,7 +4053,7 @@ export const anatomyQuestions: Question[] = [
     "subject": "解剖學",
     "chapter": "上肢",
     "section": "臂神經叢",
-    "stem": "準備醫師國考時，若題目線索指向「由 lateral 與 medial cords 匯合，支配多數前臂屈肌與魚際肌」，最應選下列哪一個解剖構造或路徑？",
+    "stem": "下列何者與「由 lateral 與 medial cords 匯合，支配多數前臂屈肌與魚際肌」最相關？",
     "options": {
       "A": "腋神經（axillary nerve）",
       "B": "尺神經（ulnar nerve）",
@@ -4062,7 +4062,7 @@ export const anatomyQuestions: Question[] = [
       "E": "正中神經（median nerve）"
     },
     "answer": "E",
-    "explanation": "正解為 正中神經（median nerve）。carpal tunnel syndrome 常影響 median nerve。 此題接近國考常見整合題，需要把結構、路徑與功能連在一起。",
+    "explanation": "正解為 正中神經（median nerve）。carpal tunnel syndrome 常影響 median nerve。",
     "testedConcept": "正中神經：由 lateral 與 medial cords 匯合，支配多數前臂屈肌與魚際肌",
     "sourceType": "AI_GENERATED",
     "difficulty": "medium"
@@ -4072,7 +4072,7 @@ export const anatomyQuestions: Question[] = [
     "subject": "解剖學",
     "chapter": "上肢",
     "section": "臂神經叢",
-    "stem": "臨床題幹描述與「來自 medial cord，支配多數 intrinsic hand muscles」最相關。若要定位病灶或判斷受影響構造，下列何者最適合？",
+    "stem": "下列何者最能解釋「來自 medial cord，支配多數 intrinsic hand muscles」的解剖基礎？",
     "options": {
       "A": "長胸神經（long thoracic nerve）",
       "B": "正中神經（median nerve）",
@@ -4081,7 +4081,7 @@ export const anatomyQuestions: Question[] = [
       "E": "腋神經（axillary nerve）"
     },
     "answer": "C",
-    "explanation": "正解為 尺神經（ulnar nerve）。傷於 medial epicondyle 可造成 claw hand。 此題屬較難的臨床定位或易混淆題，重點是辨認關鍵解剖線索。",
+    "explanation": "正解為 尺神經（ulnar nerve）。傷於 medial epicondyle 可造成 claw hand。重點在於辨認 來自 medial cord，支配多數 intrinsic hand muscles 與 尺神經（ulnar nerve） 的關聯。",
     "testedConcept": "尺神經：來自 medial cord，支配多數 intrinsic hand muscles",
     "sourceType": "AI_GENERATED",
     "difficulty": "hard"
@@ -4100,7 +4100,7 @@ export const anatomyQuestions: Question[] = [
       "E": "肌皮神經（musculocutaneous nerve）"
     },
     "answer": "A",
-    "explanation": "正解為 橈神經（radial nerve）。humeral shaft fracture 可傷 radial nerve。 此題屬基礎定位題，國考常用來確認核心解剖關係。",
+    "explanation": "正解為 橈神經（radial nerve）。humeral shaft fracture 可傷 radial nerve。",
     "testedConcept": "橈神經：來自 posterior cord，支配上肢伸肌群",
     "sourceType": "AI_GENERATED",
     "difficulty": "easy"
@@ -4110,7 +4110,7 @@ export const anatomyQuestions: Question[] = [
     "subject": "解剖學",
     "chapter": "上肢",
     "section": "臂神經叢",
-    "stem": "準備醫師國考時，若題目線索指向「來自 posterior cord，繞 surgical neck of humerus，支配 deltoid/teres minor」，最應選下列哪一個解剖構造或路徑？",
+    "stem": "關於「來自 posterior cord，繞 surgical neck of humerus，支配 deltoid/teres minor」所涉及的解剖構造，下列何者最適合？",
     "options": {
       "A": "肌皮神經（musculocutaneous nerve）",
       "B": "腋神經（axillary nerve）",
@@ -4119,7 +4119,7 @@ export const anatomyQuestions: Question[] = [
       "E": "橈神經（radial nerve）"
     },
     "answer": "B",
-    "explanation": "正解為 腋神經（axillary nerve）。肩關節脫臼或 surgical neck fracture 常傷。 此題接近國考常見整合題，需要把結構、路徑與功能連在一起。",
+    "explanation": "正解為 腋神經（axillary nerve）。肩關節脫臼或 surgical neck fracture 常傷。重點在於辨認 來自 posterior cord，繞 surgical neck of humerus，支配 deltoid/teres minor 與 腋神經（axillary nerve） 的關聯。",
     "testedConcept": "腋神經：來自 posterior cord，繞 surgical neck of humerus，支配 deltoid/teres minor",
     "sourceType": "AI_GENERATED",
     "difficulty": "medium"
@@ -4129,7 +4129,7 @@ export const anatomyQuestions: Question[] = [
     "subject": "解剖學",
     "chapter": "上肢",
     "section": "臂神經叢",
-    "stem": "臨床題幹描述與「C5-C7，支配 serratus anterior，損傷造成翼狀肩胛」最相關。若要定位病灶或判斷受影響構造，下列何者最適合？",
+    "stem": "下列何者最能解釋「C5-C7，支配 serratus anterior，損傷造成翼狀肩胛」的解剖基礎？",
     "options": {
       "A": "長胸神經（long thoracic nerve）",
       "B": "橈神經（radial nerve）",
@@ -4138,7 +4138,7 @@ export const anatomyQuestions: Question[] = [
       "E": "正中神經（median nerve）"
     },
     "answer": "A",
-    "explanation": "正解為 長胸神經（long thoracic nerve）。背包壓迫或腋下手術可傷。 此題屬較難的臨床定位或易混淆題，重點是辨認關鍵解剖線索。",
+    "explanation": "正解為 長胸神經（long thoracic nerve）。背包壓迫或腋下手術可傷。重點在於辨認 C5-C7，支配 serratus anterior，損傷造成翼狀肩胛 與 長胸神經（long thoracic nerve） 的關聯。",
     "testedConcept": "長胸神經：C5-C7，支配 serratus anterior，損傷造成翼狀肩胛",
     "sourceType": "AI_GENERATED",
     "difficulty": "hard"
@@ -4148,7 +4148,7 @@ export const anatomyQuestions: Question[] = [
     "subject": "解剖學",
     "chapter": "上肢",
     "section": "臂神經叢",
-    "stem": "準備醫師國考時，若題目線索指向「來自 lateral cord，支配 anterior arm flexors，續為 lateral antebrachial cutaneous nerve」，最應選下列哪一個解剖構造或路徑？",
+    "stem": "關於「來自 lateral cord，支配 anterior arm flexors，續為 lateral antebrachial cutaneous nerve」所涉及的解剖構造，下列何者最適合？",
     "options": {
       "A": "尺神經（ulnar nerve）",
       "B": "腋神經（axillary nerve）",
@@ -4157,7 +4157,7 @@ export const anatomyQuestions: Question[] = [
       "E": "肌皮神經（musculocutaneous nerve）"
     },
     "answer": "E",
-    "explanation": "正解為 肌皮神經（musculocutaneous nerve）。損傷影響肘屈曲與前臂外側感覺。 此題接近國考常見整合題，需要把結構、路徑與功能連在一起。",
+    "explanation": "正解為 肌皮神經（musculocutaneous nerve）。損傷影響肘屈曲與前臂外側感覺。重點在於辨認 來自 lateral cord，支配 anterior arm flexors，續為 lateral antebrachial cutaneous nerve 與 肌皮神經（musculocutaneous nerve） 的關聯。",
     "testedConcept": "肌皮神經：來自 lateral cord，支配 anterior arm flexors，續為 lateral antebrachial cutaneous nerve",
     "sourceType": "AI_GENERATED",
     "difficulty": "medium"
@@ -4167,7 +4167,7 @@ export const anatomyQuestions: Question[] = [
     "subject": "解剖學",
     "chapter": "上肢",
     "section": "臂神經叢",
-    "stem": "臨床題幹描述與「由 lateral 與 medial cords 匯合，支配多數前臂屈肌與魚際肌」最相關。若要定位病灶或判斷受影響構造，下列何者最適合？",
+    "stem": "關於「由 lateral 與 medial cords 匯合，支配多數前臂屈肌與魚際肌」的解剖判斷，下列何者最適合？",
     "options": {
       "A": "腋神經（axillary nerve）",
       "B": "長胸神經（long thoracic nerve）",
@@ -4176,7 +4176,7 @@ export const anatomyQuestions: Question[] = [
       "E": "正中神經（median nerve）"
     },
     "answer": "E",
-    "explanation": "正解為 正中神經（median nerve）。carpal tunnel syndrome 常影響 median nerve。 此題屬較難的臨床定位或易混淆題，重點是辨認關鍵解剖線索。",
+    "explanation": "正解為 正中神經（median nerve）。carpal tunnel syndrome 常影響 median nerve。",
     "testedConcept": "正中神經：由 lateral 與 medial cords 匯合，支配多數前臂屈肌與魚際肌",
     "sourceType": "AI_GENERATED",
     "difficulty": "hard"
@@ -4195,7 +4195,7 @@ export const anatomyQuestions: Question[] = [
       "E": "前鋸肌（serratus anterior）"
     },
     "answer": "A",
-    "explanation": "正解為 岡上肌（supraspinatus）。rotator cuff 常見受傷肌。 此題屬基礎定位題，國考常用來確認核心解剖關係。",
+    "explanation": "正解為 岡上肌（supraspinatus）。rotator cuff 常見受傷肌。重點在於辨認 由 suprascapular nerve 支配，負責起始外展 0-15 度 與 岡上肌（supraspinatus） 的關聯。",
     "testedConcept": "岡上肌：由 suprascapular nerve 支配，負責起始外展 0-15 度",
     "sourceType": "AI_GENERATED",
     "difficulty": "easy"
@@ -4205,7 +4205,7 @@ export const anatomyQuestions: Question[] = [
     "subject": "解剖學",
     "chapter": "上肢",
     "section": "肩胛區",
-    "stem": "準備醫師國考時，若題目線索指向「由 axillary nerve 支配，負責肩外展 15-90 度」，最應選下列哪一個解剖構造或路徑？",
+    "stem": "下列何者與「由 axillary nerve 支配，負責肩外展 15-90 度」最相關？",
     "options": {
       "A": "前鋸肌（serratus anterior）",
       "B": "岡上肌（supraspinatus）",
@@ -4214,7 +4214,7 @@ export const anatomyQuestions: Question[] = [
       "E": "斜方肌（trapezius）"
     },
     "answer": "D",
-    "explanation": "正解為 三角肌（deltoid）。C5-C6，肩部 badge area 感覺。 此題接近國考常見整合題，需要把結構、路徑與功能連在一起。",
+    "explanation": "正解為 三角肌（deltoid）。C5-C6，肩部 badge area 感覺。重點在於辨認 由 axillary nerve 支配，負責肩外展 15-90 度 與 三角肌（deltoid） 的關聯。",
     "testedConcept": "三角肌：由 axillary nerve 支配，負責肩外展 15-90 度",
     "sourceType": "AI_GENERATED",
     "difficulty": "medium"
@@ -4224,7 +4224,7 @@ export const anatomyQuestions: Question[] = [
     "subject": "解剖學",
     "chapter": "上肢",
     "section": "肩胛區",
-    "stem": "臨床題幹描述與「由 long thoracic nerve 支配，固定肩胛並上旋」最相關。若要定位病灶或判斷受影響構造，下列何者最適合？",
+    "stem": "關於「由 long thoracic nerve 支配，固定肩胛並上旋」的解剖判斷，下列何者最適合？",
     "options": {
       "A": "前鋸肌（serratus anterior）",
       "B": "菱形肌（rhomboids）",
@@ -4233,7 +4233,7 @@ export const anatomyQuestions: Question[] = [
       "E": "旋轉肌袖（rotator cuff）"
     },
     "answer": "A",
-    "explanation": "正解為 前鋸肌（serratus anterior）。損傷造成 winged scapula。 此題屬較難的臨床定位或易混淆題，重點是辨認關鍵解剖線索。",
+    "explanation": "正解為 前鋸肌（serratus anterior）。損傷造成 winged scapula。重點在於辨認 由 long thoracic nerve 支配，固定肩胛並上旋 與 前鋸肌（serratus anterior） 的關聯。",
     "testedConcept": "前鋸肌：由 long thoracic nerve 支配，固定肩胛並上旋",
     "sourceType": "AI_GENERATED",
     "difficulty": "hard"
@@ -4243,7 +4243,7 @@ export const anatomyQuestions: Question[] = [
     "subject": "解剖學",
     "chapter": "上肢",
     "section": "肩胛區",
-    "stem": "準備醫師國考時，若題目線索指向「由 accessory nerve CN XI 支配」，最應選下列哪一個解剖構造或路徑？",
+    "stem": "下列何者與「由 accessory nerve CN XI 支配」最相關？",
     "options": {
       "A": "斜方肌（trapezius）",
       "B": "旋轉肌袖（rotator cuff）",
@@ -4252,7 +4252,7 @@ export const anatomyQuestions: Question[] = [
       "E": "岡上肌（supraspinatus）"
     },
     "answer": "A",
-    "explanation": "正解為 斜方肌（trapezius）。損傷造成聳肩無力。 此題接近國考常見整合題，需要把結構、路徑與功能連在一起。",
+    "explanation": "正解為 斜方肌（trapezius）。損傷造成聳肩無力。重點在於辨認 由 accessory nerve CN XI 支配 與 斜方肌（trapezius） 的關聯。",
     "testedConcept": "斜方肌：由 accessory nerve CN XI 支配",
     "sourceType": "AI_GENERATED",
     "difficulty": "medium"
@@ -4262,7 +4262,7 @@ export const anatomyQuestions: Question[] = [
     "subject": "解剖學",
     "chapter": "上肢",
     "section": "肩胛區",
-    "stem": "臨床題幹描述與「由 dorsal scapular nerve 支配，使肩胛內收」最相關。若要定位病灶或判斷受影響構造，下列何者最適合？",
+    "stem": "若病灶或手術傷害影響「由 dorsal scapular nerve 支配，使肩胛內收」相關功能或解剖關係，最可能涉及下列何者？",
     "options": {
       "A": "菱形肌（rhomboids）",
       "B": "斜方肌（trapezius）",
@@ -4271,7 +4271,7 @@ export const anatomyQuestions: Question[] = [
       "E": "旋轉肌袖（rotator cuff）"
     },
     "answer": "A",
-    "explanation": "正解為 菱形肌（rhomboids）。C5 nerve root 分支。 此題屬較難的臨床定位或易混淆題，重點是辨認關鍵解剖線索。",
+    "explanation": "正解為 菱形肌（rhomboids）。C5 nerve root 分支。重點在於辨認 由 dorsal scapular nerve 支配，使肩胛內收 與 菱形肌（rhomboids） 的關聯。",
     "testedConcept": "菱形肌：由 dorsal scapular nerve 支配，使肩胛內收",
     "sourceType": "AI_GENERATED",
     "difficulty": "hard"
@@ -4290,7 +4290,7 @@ export const anatomyQuestions: Question[] = [
       "E": "三角肌（deltoid）"
     },
     "answer": "A",
-    "explanation": "正解為 旋轉肌袖（rotator cuff）。supraspinatus、infraspinatus、teres minor、subscapularis。 此題屬基礎定位題，國考常用來確認核心解剖關係。",
+    "explanation": "正解為 旋轉肌袖（rotator cuff）。supraspinatus、infraspinatus、teres minor、subscapularis。",
     "testedConcept": "旋轉肌袖：由 SITS 肌群穩定肩關節",
     "sourceType": "AI_GENERATED",
     "difficulty": "easy"
@@ -4300,7 +4300,7 @@ export const anatomyQuestions: Question[] = [
     "subject": "解剖學",
     "chapter": "上肢",
     "section": "肩胛區",
-    "stem": "準備醫師國考時，若題目線索指向「由 suprascapular nerve 支配，負責起始外展 0-15 度」，最應選下列哪一個解剖構造或路徑？",
+    "stem": "關於「由 suprascapular nerve 支配，負責起始外展 0-15 度」所涉及的解剖構造，下列何者最適合？",
     "options": {
       "A": "岡上肌（supraspinatus）",
       "B": "前鋸肌（serratus anterior）",
@@ -4309,7 +4309,7 @@ export const anatomyQuestions: Question[] = [
       "E": "旋轉肌袖（rotator cuff）"
     },
     "answer": "A",
-    "explanation": "正解為 岡上肌（supraspinatus）。rotator cuff 常見受傷肌。 此題接近國考常見整合題，需要把結構、路徑與功能連在一起。",
+    "explanation": "正解為 岡上肌（supraspinatus）。rotator cuff 常見受傷肌。重點在於辨認 由 suprascapular nerve 支配，負責起始外展 0-15 度 與 岡上肌（supraspinatus） 的關聯。",
     "testedConcept": "岡上肌：由 suprascapular nerve 支配，負責起始外展 0-15 度",
     "sourceType": "AI_GENERATED",
     "difficulty": "medium"
@@ -4319,7 +4319,7 @@ export const anatomyQuestions: Question[] = [
     "subject": "解剖學",
     "chapter": "上肢",
     "section": "肩胛區",
-    "stem": "臨床題幹描述與「由 axillary nerve 支配，負責肩外展 15-90 度」最相關。若要定位病灶或判斷受影響構造，下列何者最適合？",
+    "stem": "若病灶或手術傷害影響「由 axillary nerve 支配，負責肩外展 15-90 度」相關功能或解剖關係，最可能涉及下列何者？",
     "options": {
       "A": "三角肌（deltoid）",
       "B": "斜方肌（trapezius）",
@@ -4328,7 +4328,7 @@ export const anatomyQuestions: Question[] = [
       "E": "岡上肌（supraspinatus）"
     },
     "answer": "A",
-    "explanation": "正解為 三角肌（deltoid）。C5-C6，肩部 badge area 感覺。 此題屬較難的臨床定位或易混淆題，重點是辨認關鍵解剖線索。",
+    "explanation": "正解為 三角肌（deltoid）。C5-C6，肩部 badge area 感覺。重點在於辨認 由 axillary nerve 支配，負責肩外展 15-90 度 與 三角肌（deltoid） 的關聯。",
     "testedConcept": "三角肌：由 axillary nerve 支配，負責肩外展 15-90 度",
     "sourceType": "AI_GENERATED",
     "difficulty": "hard"
@@ -4338,7 +4338,7 @@ export const anatomyQuestions: Question[] = [
     "subject": "解剖學",
     "chapter": "上肢",
     "section": "前臂屈伸肌",
-    "stem": "準備醫師國考時，若題目線索指向「由 median nerve 支配，協助前臂旋前」，最應選下列哪一個解剖構造或路徑？",
+    "stem": "關於「由 median nerve 支配，協助前臂旋前」所涉及的解剖構造，下列何者最適合？",
     "options": {
       "A": "指深屈肌內側半（medial half of flexor digitorum profundus）",
       "B": "掌長肌（palmaris longus）",
@@ -4347,7 +4347,7 @@ export const anatomyQuestions: Question[] = [
       "E": "指深屈肌外側半（lateral half of flexor digitorum profundus）"
     },
     "answer": "D",
-    "explanation": "正解為 旋前圓肌（pronator teres）。median nerve 常在兩頭之間通過。 此題接近國考常見整合題，需要把結構、路徑與功能連在一起。",
+    "explanation": "正解為 旋前圓肌（pronator teres）。median nerve 常在兩頭之間通過。重點在於辨認 由 median nerve 支配，協助前臂旋前 與 旋前圓肌（pronator teres） 的關聯。",
     "testedConcept": "旋前圓肌：由 median nerve 支配，協助前臂旋前",
     "sourceType": "AI_GENERATED",
     "difficulty": "medium"
@@ -4357,7 +4357,7 @@ export const anatomyQuestions: Question[] = [
     "subject": "解剖學",
     "chapter": "上肢",
     "section": "前臂屈伸肌",
-    "stem": "臨床題幹描述與「由 radial nerve 支配，但動作是肘屈曲」最相關。若要定位病灶或判斷受影響構造，下列何者最適合？",
+    "stem": "下列何者最能解釋「由 radial nerve 支配，但動作是肘屈曲」的解剖基礎？",
     "options": {
       "A": "肱橈肌（brachioradialis）",
       "B": "旋前圓肌（pronator teres）",
@@ -4366,7 +4366,7 @@ export const anatomyQuestions: Question[] = [
       "E": "骨間後神經（posterior interosseous nerve）"
     },
     "answer": "A",
-    "explanation": "正解為 肱橈肌（brachioradialis）。是 radial nerve 支配屈曲動作的例外考點。 此題屬較難的臨床定位或易混淆題，重點是辨認關鍵解剖線索。",
+    "explanation": "正解為 肱橈肌（brachioradialis）。是 radial nerve 支配屈曲動作的例外考點。重點在於辨認 由 radial nerve 支配，但動作是肘屈曲 與 肱橈肌（brachioradialis） 的關聯。",
     "testedConcept": "肱橈肌：由 radial nerve 支配，但動作是肘屈曲",
     "sourceType": "AI_GENERATED",
     "difficulty": "hard"
@@ -4385,7 +4385,7 @@ export const anatomyQuestions: Question[] = [
       "E": "旋前圓肌（pronator teres）"
     },
     "answer": "C",
-    "explanation": "正解為 指深屈肌外側半（lateral half of flexor digitorum profundus）。負責 index/middle DIP flexion。 此題屬基礎定位題，國考常用來確認核心解剖關係。",
+    "explanation": "正解為 指深屈肌外側半（lateral half of flexor digitorum profundus）。負責 index/middle DIP flexion。",
     "testedConcept": "指深屈肌外側半：由 anterior interosseous nerve/median nerve 支配",
     "sourceType": "AI_GENERATED",
     "difficulty": "easy"
@@ -4395,7 +4395,7 @@ export const anatomyQuestions: Question[] = [
     "subject": "解剖學",
     "chapter": "上肢",
     "section": "前臂屈伸肌",
-    "stem": "準備醫師國考時，若題目線索指向「由 ulnar nerve 支配」，最應選下列哪一個解剖構造或路徑？",
+    "stem": "下列何者與「由 ulnar nerve 支配」最相關？",
     "options": {
       "A": "指深屈肌外側半（lateral half of flexor digitorum profundus）",
       "B": "掌長肌（palmaris longus）",
@@ -4404,7 +4404,7 @@ export const anatomyQuestions: Question[] = [
       "E": "指深屈肌內側半（medial half of flexor digitorum profundus）"
     },
     "answer": "E",
-    "explanation": "正解為 指深屈肌內側半（medial half of flexor digitorum profundus）。負責 ring/little DIP flexion。 此題接近國考常見整合題，需要把結構、路徑與功能連在一起。",
+    "explanation": "正解為 指深屈肌內側半（medial half of flexor digitorum profundus）。負責 ring/little DIP flexion。",
     "testedConcept": "指深屈肌內側半：由 ulnar nerve 支配",
     "sourceType": "AI_GENERATED",
     "difficulty": "medium"
@@ -4414,7 +4414,7 @@ export const anatomyQuestions: Question[] = [
     "subject": "解剖學",
     "chapter": "上肢",
     "section": "前臂屈伸肌",
-    "stem": "臨床題幹描述與「radial nerve deep branch，支配多數伸肌，主要為 motor」最相關。若要定位病灶或判斷受影響構造，下列何者最適合？",
+    "stem": "下列何者最能解釋「radial nerve deep branch，支配多數伸肌，主要為 motor」的解剖基礎？",
     "options": {
       "A": "指深屈肌內側半（medial half of flexor digitorum profundus）",
       "B": "旋前圓肌（pronator teres）",
@@ -4423,7 +4423,7 @@ export const anatomyQuestions: Question[] = [
       "E": "掌長肌（palmaris longus）"
     },
     "answer": "D",
-    "explanation": "正解為 骨間後神經（posterior interosseous nerve）。受傷可 wrist/finger extension weakness，但感覺缺損少。 此題屬較難的臨床定位或易混淆題，重點是辨認關鍵解剖線索。",
+    "explanation": "正解為 骨間後神經（posterior interosseous nerve）。受傷可 wrist/finger extension weakness，但感覺缺損少。",
     "testedConcept": "骨間後神經：radial nerve deep branch，支配多數伸肌，主要為 motor",
     "sourceType": "AI_GENERATED",
     "difficulty": "hard"
@@ -4433,7 +4433,7 @@ export const anatomyQuestions: Question[] = [
     "subject": "解剖學",
     "chapter": "上肢",
     "section": "前臂屈伸肌",
-    "stem": "準備醫師國考時，若題目線索指向「由 median nerve 支配，常有解剖變異缺如」，最應選下列哪一個解剖構造或路徑？",
+    "stem": "下列何者與「由 median nerve 支配，常有解剖變異缺如」最相關？",
     "options": {
       "A": "骨間後神經（posterior interosseous nerve）",
       "B": "旋前圓肌（pronator teres）",
@@ -4442,7 +4442,7 @@ export const anatomyQuestions: Question[] = [
       "E": "指深屈肌內側半（medial half of flexor digitorum profundus）"
     },
     "answer": "C",
-    "explanation": "正解為 掌長肌（palmaris longus）。不是每個人都有，常用於 tendon graft。 此題接近國考常見整合題，需要把結構、路徑與功能連在一起。",
+    "explanation": "正解為 掌長肌（palmaris longus）。不是每個人都有，常用於 tendon graft。重點在於辨認 由 median nerve 支配，常有解剖變異缺如 與 掌長肌（palmaris longus） 的關聯。",
     "testedConcept": "掌長肌：由 median nerve 支配，常有解剖變異缺如",
     "sourceType": "AI_GENERATED",
     "difficulty": "medium"
@@ -4452,7 +4452,7 @@ export const anatomyQuestions: Question[] = [
     "subject": "解剖學",
     "chapter": "上肢",
     "section": "前臂屈伸肌",
-    "stem": "臨床題幹描述與「由 median nerve 支配，協助前臂旋前」最相關。若要定位病灶或判斷受影響構造，下列何者最適合？",
+    "stem": "關於「由 median nerve 支配，協助前臂旋前」的解剖判斷，下列何者最適合？",
     "options": {
       "A": "掌長肌（palmaris longus）",
       "B": "旋前圓肌（pronator teres）",
@@ -4461,7 +4461,7 @@ export const anatomyQuestions: Question[] = [
       "E": "指深屈肌內側半（medial half of flexor digitorum profundus）"
     },
     "answer": "B",
-    "explanation": "正解為 旋前圓肌（pronator teres）。median nerve 常在兩頭之間通過。 此題屬較難的臨床定位或易混淆題，重點是辨認關鍵解剖線索。",
+    "explanation": "正解為 旋前圓肌（pronator teres）。median nerve 常在兩頭之間通過。重點在於辨認 由 median nerve 支配，協助前臂旋前 與 旋前圓肌（pronator teres） 的關聯。",
     "testedConcept": "旋前圓肌：由 median nerve 支配，協助前臂旋前",
     "sourceType": "AI_GENERATED",
     "difficulty": "hard"
@@ -4480,7 +4480,7 @@ export const anatomyQuestions: Question[] = [
       "E": "骨間後神經（posterior interosseous nerve）"
     },
     "answer": "C",
-    "explanation": "正解為 肱橈肌（brachioradialis）。是 radial nerve 支配屈曲動作的例外考點。 此題屬基礎定位題，國考常用來確認核心解剖關係。",
+    "explanation": "正解為 肱橈肌（brachioradialis）。是 radial nerve 支配屈曲動作的例外考點。重點在於辨認 由 radial nerve 支配，但動作是肘屈曲 與 肱橈肌（brachioradialis） 的關聯。",
     "testedConcept": "肱橈肌：由 radial nerve 支配，但動作是肘屈曲",
     "sourceType": "AI_GENERATED",
     "difficulty": "easy"
@@ -4490,7 +4490,7 @@ export const anatomyQuestions: Question[] = [
     "subject": "解剖學",
     "chapter": "上肢",
     "section": "手部肌肉",
-    "stem": "準備醫師國考時，若題目線索指向「多由 recurrent branch of median nerve 支配」，最應選下列哪一個解剖構造或路徑？",
+    "stem": "關於「多由 recurrent branch of median nerve 支配」所涉及的解剖構造，下列何者最適合？",
     "options": {
       "A": "蚓狀肌 1-2（lumbricals 1-2）",
       "B": "內在手肌（intrinsic hand muscles）",
@@ -4499,7 +4499,7 @@ export const anatomyQuestions: Question[] = [
       "E": "Guyon canal（ulnar canal）"
     },
     "answer": "C",
-    "explanation": "正解為 魚際肌（thenar muscles）。LOAF muscles：lumbricals 1-2, opponens pollicis, abductor pollicis brevis, flexor pollicis brevis superficial head。 此題接近國考常見整合題，需要把結構、路徑與功能連在一起。",
+    "explanation": "正解為 魚際肌（thenar muscles）。LOAF muscles：lumbricals 1-2, opponens pollicis, abductor pollicis brevis, flexor pollicis brevis superficial head。",
     "testedConcept": "魚際肌：多由 recurrent branch of median nerve 支配",
     "sourceType": "AI_GENERATED",
     "difficulty": "medium"
@@ -4509,7 +4509,7 @@ export const anatomyQuestions: Question[] = [
     "subject": "解剖學",
     "chapter": "上肢",
     "section": "手部肌肉",
-    "stem": "臨床題幹描述與「多由 ulnar nerve 支配」最相關。若要定位病灶或判斷受影響構造，下列何者最適合？",
+    "stem": "關於「多由 ulnar nerve 支配」的解剖判斷，下列何者最適合？",
     "options": {
       "A": "魚際肌（thenar muscles）",
       "B": "內在手肌（intrinsic hand muscles）",
@@ -4518,7 +4518,7 @@ export const anatomyQuestions: Question[] = [
       "E": "蚓狀肌 1-2（lumbricals 1-2）"
     },
     "answer": "B",
-    "explanation": "正解為 內在手肌（intrinsic hand muscles）。除了 LOAF 多數由 ulnar nerve。 此題屬較難的臨床定位或易混淆題，重點是辨認關鍵解剖線索。",
+    "explanation": "正解為 內在手肌（intrinsic hand muscles）。除了 LOAF 多數由 ulnar nerve。重點在於辨認 多由 ulnar nerve 支配 與 內在手肌（intrinsic hand muscles） 的關聯。",
     "testedConcept": "內在手肌：多由 ulnar nerve 支配",
     "sourceType": "AI_GENERATED",
     "difficulty": "hard"
@@ -4528,7 +4528,7 @@ export const anatomyQuestions: Question[] = [
     "subject": "解剖學",
     "chapter": "上肢",
     "section": "手部肌肉",
-    "stem": "準備醫師國考時，若題目線索指向「由 ulnar nerve 支配，負責手指外展 DAB」，最應選下列哪一個解剖構造或路徑？",
+    "stem": "關於「由 ulnar nerve 支配，負責手指外展 DAB」所涉及的解剖構造，下列何者最適合？",
     "options": {
       "A": "掌側骨間肌（palmar interossei）",
       "B": "內在手肌（intrinsic hand muscles）",
@@ -4537,7 +4537,7 @@ export const anatomyQuestions: Question[] = [
       "E": "背側骨間肌（dorsal interossei）"
     },
     "answer": "E",
-    "explanation": "正解為 背側骨間肌（dorsal interossei）。DAB = dorsal abduct。 此題接近國考常見整合題，需要把結構、路徑與功能連在一起。",
+    "explanation": "正解為 背側骨間肌（dorsal interossei）。DAB = dorsal abduct。重點在於辨認 由 ulnar nerve 支配，負責手指外展 DAB 與 背側骨間肌（dorsal interossei） 的關聯。",
     "testedConcept": "背側骨間肌：由 ulnar nerve 支配，負責手指外展 DAB",
     "sourceType": "AI_GENERATED",
     "difficulty": "medium"
@@ -4547,7 +4547,7 @@ export const anatomyQuestions: Question[] = [
     "subject": "解剖學",
     "chapter": "上肢",
     "section": "手部肌肉",
-    "stem": "臨床題幹描述與「由 ulnar nerve 支配，負責手指內收 PAD」最相關。若要定位病灶或判斷受影響構造，下列何者最適合？",
+    "stem": "若病灶或手術傷害影響「由 ulnar nerve 支配，負責手指內收 PAD」相關功能或解剖關係，最可能涉及下列何者？",
     "options": {
       "A": "內在手肌（intrinsic hand muscles）",
       "B": "魚際肌（thenar muscles）",
@@ -4556,7 +4556,7 @@ export const anatomyQuestions: Question[] = [
       "E": "Guyon canal（ulnar canal）"
     },
     "answer": "D",
-    "explanation": "正解為 掌側骨間肌（palmar interossei）。PAD = palmar adduct。 此題屬較難的臨床定位或易混淆題，重點是辨認關鍵解剖線索。",
+    "explanation": "正解為 掌側骨間肌（palmar interossei）。PAD = palmar adduct。重點在於辨認 由 ulnar nerve 支配，負責手指內收 PAD 與 掌側骨間肌（palmar interossei） 的關聯。",
     "testedConcept": "掌側骨間肌：由 ulnar nerve 支配，負責手指內收 PAD",
     "sourceType": "AI_GENERATED",
     "difficulty": "hard"
@@ -4575,7 +4575,7 @@ export const anatomyQuestions: Question[] = [
       "E": "蚓狀肌 1-2（lumbricals 1-2）"
     },
     "answer": "E",
-    "explanation": "正解為 蚓狀肌 1-2（lumbricals 1-2）。lumbricals 3-4 由 ulnar nerve。 此題屬基礎定位題，國考常用來確認核心解剖關係。",
+    "explanation": "正解為 蚓狀肌 1-2（lumbricals 1-2）。lumbricals 3-4 由 ulnar nerve。重點在於辨認 由 median nerve 支配 與 蚓狀肌 1-2（lumbricals 1-2） 的關聯。",
     "testedConcept": "蚓狀肌 1-2：由 median nerve 支配",
     "sourceType": "AI_GENERATED",
     "difficulty": "easy"
@@ -4585,7 +4585,7 @@ export const anatomyQuestions: Question[] = [
     "subject": "解剖學",
     "chapter": "上肢",
     "section": "手部肌肉",
-    "stem": "準備醫師國考時，若題目線索指向「尺神經在腕部通過，可影響手內在肌但不一定影響前臂肌」，最應選下列哪一個解剖構造或路徑？",
+    "stem": "下列何者與「尺神經在腕部通過，可影響手內在肌但不一定影響前臂肌」最相關？",
     "options": {
       "A": "內在手肌（intrinsic hand muscles）",
       "B": "掌側骨間肌（palmar interossei）",
@@ -4594,7 +4594,7 @@ export const anatomyQuestions: Question[] = [
       "E": "魚際肌（thenar muscles）"
     },
     "answer": "C",
-    "explanation": "正解為 Guyon canal（ulnar canal）。騎自行車壓迫常見。 此題接近國考常見整合題，需要把結構、路徑與功能連在一起。",
+    "explanation": "正解為 Guyon canal（ulnar canal）。騎自行車壓迫常見。重點在於辨認 尺神經在腕部通過，可影響手內在肌但不一定影響前臂肌 與 Guyon canal（ulnar canal） 的關聯。",
     "testedConcept": "Guyon canal：尺神經在腕部通過，可影響手內在肌但不一定影響前臂肌",
     "sourceType": "AI_GENERATED",
     "difficulty": "medium"
@@ -4604,7 +4604,7 @@ export const anatomyQuestions: Question[] = [
     "subject": "解剖學",
     "chapter": "上肢",
     "section": "手部肌肉",
-    "stem": "臨床題幹描述與「多由 recurrent branch of median nerve 支配」最相關。若要定位病灶或判斷受影響構造，下列何者最適合？",
+    "stem": "若病灶或手術傷害影響「多由 recurrent branch of median nerve 支配」相關功能或解剖關係，最可能涉及下列何者？",
     "options": {
       "A": "Guyon canal（ulnar canal）",
       "B": "魚際肌（thenar muscles）",
@@ -4613,7 +4613,7 @@ export const anatomyQuestions: Question[] = [
       "E": "背側骨間肌（dorsal interossei）"
     },
     "answer": "B",
-    "explanation": "正解為 魚際肌（thenar muscles）。LOAF muscles：lumbricals 1-2, opponens pollicis, abductor pollicis brevis, flexor pollicis brevis superficial head。 此題屬較難的臨床定位或易混淆題，重點是辨認關鍵解剖線索。",
+    "explanation": "正解為 魚際肌（thenar muscles）。LOAF muscles：lumbricals 1-2, opponens pollicis, abductor pollicis brevis, flexor pollicis brevis superficial head。",
     "testedConcept": "魚際肌：多由 recurrent branch of median nerve 支配",
     "sourceType": "AI_GENERATED",
     "difficulty": "hard"
@@ -4623,7 +4623,7 @@ export const anatomyQuestions: Question[] = [
     "subject": "解剖學",
     "chapter": "上肢",
     "section": "手部肌肉",
-    "stem": "準備醫師國考時，若題目線索指向「多由 ulnar nerve 支配」，最應選下列哪一個解剖構造或路徑？",
+    "stem": "下列何者與「多由 ulnar nerve 支配」最相關？",
     "options": {
       "A": "內在手肌（intrinsic hand muscles）",
       "B": "魚際肌（thenar muscles）",
@@ -4632,7 +4632,7 @@ export const anatomyQuestions: Question[] = [
       "E": "Guyon canal（ulnar canal）"
     },
     "answer": "A",
-    "explanation": "正解為 內在手肌（intrinsic hand muscles）。除了 LOAF 多數由 ulnar nerve。 此題接近國考常見整合題，需要把結構、路徑與功能連在一起。",
+    "explanation": "正解為 內在手肌（intrinsic hand muscles）。除了 LOAF 多數由 ulnar nerve。重點在於辨認 多由 ulnar nerve 支配 與 內在手肌（intrinsic hand muscles） 的關聯。",
     "testedConcept": "內在手肌：多由 ulnar nerve 支配",
     "sourceType": "AI_GENERATED",
     "difficulty": "medium"
@@ -4642,7 +4642,7 @@ export const anatomyQuestions: Question[] = [
     "subject": "解剖學",
     "chapter": "上肢",
     "section": "上肢血管",
-    "stem": "臨床題幹描述與「以 pectoralis minor 分三段」最相關。若要定位病灶或判斷受影響構造，下列何者最適合？",
+    "stem": "下列何者最能解釋「以 pectoralis minor 分三段」的解剖基礎？",
     "options": {
       "A": "橈動脈（radial artery）",
       "B": "貴要靜脈（basilic vein）",
@@ -4651,7 +4651,7 @@ export const anatomyQuestions: Question[] = [
       "E": "腋動脈（axillary artery）"
     },
     "answer": "E",
-    "explanation": "正解為 腋動脈（axillary artery）。第二段後方相關 cords of brachial plexus。 此題屬較難的臨床定位或易混淆題，重點是辨認關鍵解剖線索。",
+    "explanation": "正解為 腋動脈（axillary artery）。第二段後方相關 cords of brachial plexus。重點在於辨認 以 pectoralis minor 分三段 與 腋動脈（axillary artery） 的關聯。",
     "testedConcept": "腋動脈：以 pectoralis minor 分三段",
     "sourceType": "AI_GENERATED",
     "difficulty": "hard"
@@ -4670,7 +4670,7 @@ export const anatomyQuestions: Question[] = [
       "E": "貴要靜脈（basilic vein）"
     },
     "answer": "D",
-    "explanation": "正解為 肱深動脈（deep brachial artery, profunda brachii）。humeral shaft fracture 可同時傷。 此題屬基礎定位題，國考常用來確認核心解剖關係。",
+    "explanation": "正解為 肱深動脈（deep brachial artery, profunda brachii）。humeral shaft fracture 可同時傷。",
     "testedConcept": "肱深動脈：與 radial nerve 走 radial groove",
     "sourceType": "AI_GENERATED",
     "difficulty": "easy"
@@ -4680,7 +4680,7 @@ export const anatomyQuestions: Question[] = [
     "subject": "解剖學",
     "chapter": "上肢",
     "section": "上肢血管",
-    "stem": "準備醫師國考時，若題目線索指向「通過 anatomical snuffbox，常用於把脈」，最應選下列哪一個解剖構造或路徑？",
+    "stem": "關於「通過 anatomical snuffbox，常用於把脈」所涉及的解剖構造，下列何者最適合？",
     "options": {
       "A": "尺動脈（ulnar artery）",
       "B": "腋動脈（axillary artery）",
@@ -4689,7 +4689,7 @@ export const anatomyQuestions: Question[] = [
       "E": "肱深動脈（deep brachial artery, profunda brachii）"
     },
     "answer": "D",
-    "explanation": "正解為 橈動脈（radial artery）。形成 deep palmar arch 主要來源。 此題接近國考常見整合題，需要把結構、路徑與功能連在一起。",
+    "explanation": "正解為 橈動脈（radial artery）。形成 deep palmar arch 主要來源。重點在於辨認 通過 anatomical snuffbox，常用於把脈 與 橈動脈（radial artery） 的關聯。",
     "testedConcept": "橈動脈：通過 anatomical snuffbox，常用於把脈",
     "sourceType": "AI_GENERATED",
     "difficulty": "medium"
@@ -4699,7 +4699,7 @@ export const anatomyQuestions: Question[] = [
     "subject": "解剖學",
     "chapter": "上肢",
     "section": "上肢血管",
-    "stem": "臨床題幹描述與「形成 superficial palmar arch 主要來源」最相關。若要定位病灶或判斷受影響構造，下列何者最適合？",
+    "stem": "下列何者最能解釋「形成 superficial palmar arch 主要來源」的解剖基礎？",
     "options": {
       "A": "貴要靜脈（basilic vein）",
       "B": "橈動脈（radial artery）",
@@ -4708,7 +4708,7 @@ export const anatomyQuestions: Question[] = [
       "E": "腋動脈（axillary artery）"
     },
     "answer": "D",
-    "explanation": "正解為 尺動脈（ulnar artery）。Allen test 評估手部 collateral circulation。 此題屬較難的臨床定位或易混淆題，重點是辨認關鍵解剖線索。",
+    "explanation": "正解為 尺動脈（ulnar artery）。Allen test 評估手部 collateral circulation。",
     "testedConcept": "尺動脈：形成 superficial palmar arch 主要來源",
     "sourceType": "AI_GENERATED",
     "difficulty": "hard"
@@ -4718,7 +4718,7 @@ export const anatomyQuestions: Question[] = [
     "subject": "解剖學",
     "chapter": "上肢",
     "section": "上肢血管",
-    "stem": "準備醫師國考時，若題目線索指向「走 deltopectoral groove，注入 axillary vein」，最應選下列哪一個解剖構造或路徑？",
+    "stem": "關於「走 deltopectoral groove，注入 axillary vein」所涉及的解剖構造，下列何者最適合？",
     "options": {
       "A": "腋動脈（axillary artery）",
       "B": "肱深動脈（deep brachial artery, profunda brachii）",
@@ -4727,7 +4727,7 @@ export const anatomyQuestions: Question[] = [
       "E": "頭靜脈（cephalic vein）"
     },
     "answer": "E",
-    "explanation": "正解為 頭靜脈（cephalic vein）。常用於靜脈通路。 此題接近國考常見整合題，需要把結構、路徑與功能連在一起。",
+    "explanation": "正解為 頭靜脈（cephalic vein）。常用於靜脈通路。重點在於辨認 走 deltopectoral groove，注入 axillary vein 與 頭靜脈（cephalic vein） 的關聯。",
     "testedConcept": "頭靜脈：走 deltopectoral groove，注入 axillary vein",
     "sourceType": "AI_GENERATED",
     "difficulty": "medium"
@@ -4737,7 +4737,7 @@ export const anatomyQuestions: Question[] = [
     "subject": "解剖學",
     "chapter": "上肢",
     "section": "上肢血管",
-    "stem": "臨床題幹描述與「內側淺靜脈，穿 deep fascia 後參與形成 axillary vein」最相關。若要定位病灶或判斷受影響構造，下列何者最適合？",
+    "stem": "關於「內側淺靜脈，穿 deep fascia 後參與形成 axillary vein」的解剖判斷，下列何者最適合？",
     "options": {
       "A": "貴要靜脈（basilic vein）",
       "B": "橈動脈（radial artery）",
@@ -4746,7 +4746,7 @@ export const anatomyQuestions: Question[] = [
       "E": "頭靜脈（cephalic vein）"
     },
     "answer": "A",
-    "explanation": "正解為 貴要靜脈（basilic vein）。median cubital vein 常連接 cephalic 與 basilic。 此題屬較難的臨床定位或易混淆題，重點是辨認關鍵解剖線索。",
+    "explanation": "正解為 貴要靜脈（basilic vein）。median cubital vein 常連接 cephalic 與 basilic。",
     "testedConcept": "貴要靜脈：內側淺靜脈，穿 deep fascia 後參與形成 axillary vein",
     "sourceType": "AI_GENERATED",
     "difficulty": "hard"
@@ -4765,7 +4765,7 @@ export const anatomyQuestions: Question[] = [
       "E": "尺動脈（ulnar artery）"
     },
     "answer": "C",
-    "explanation": "正解為 腋動脈（axillary artery）。第二段後方相關 cords of brachial plexus。 此題屬基礎定位題，國考常用來確認核心解剖關係。",
+    "explanation": "正解為 腋動脈（axillary artery）。第二段後方相關 cords of brachial plexus。重點在於辨認 以 pectoralis minor 分三段 與 腋動脈（axillary artery） 的關聯。",
     "testedConcept": "腋動脈：以 pectoralis minor 分三段",
     "sourceType": "AI_GENERATED",
     "difficulty": "easy"
@@ -4775,7 +4775,7 @@ export const anatomyQuestions: Question[] = [
     "subject": "解剖學",
     "chapter": "上肢",
     "section": "上肢血管",
-    "stem": "準備醫師國考時，若題目線索指向「與 radial nerve 走 radial groove」，最應選下列哪一個解剖構造或路徑？",
+    "stem": "下列何者與「與 radial nerve 走 radial groove」最相關？",
     "options": {
       "A": "貴要靜脈（basilic vein）",
       "B": "腋動脈（axillary artery）",
@@ -4784,7 +4784,7 @@ export const anatomyQuestions: Question[] = [
       "E": "尺動脈（ulnar artery）"
     },
     "answer": "C",
-    "explanation": "正解為 肱深動脈（deep brachial artery, profunda brachii）。humeral shaft fracture 可同時傷。 此題接近國考常見整合題，需要把結構、路徑與功能連在一起。",
+    "explanation": "正解為 肱深動脈（deep brachial artery, profunda brachii）。humeral shaft fracture 可同時傷。",
     "testedConcept": "肱深動脈：與 radial nerve 走 radial groove",
     "sourceType": "AI_GENERATED",
     "difficulty": "medium"
@@ -4794,7 +4794,7 @@ export const anatomyQuestions: Question[] = [
     "subject": "解剖學",
     "chapter": "下肢",
     "section": "腰薦神經叢",
-    "stem": "臨床題幹描述與「L2-L4，支配 anterior thigh，負責膝伸直」最相關。若要定位病灶或判斷受影響構造，下列何者最適合？",
+    "stem": "關於「L2-L4，支配 anterior thigh，負責膝伸直」的解剖判斷，下列何者最適合？",
     "options": {
       "A": "閉孔神經（obturator nerve）",
       "B": "上臀神經（superior gluteal nerve）",
@@ -4803,7 +4803,7 @@ export const anatomyQuestions: Question[] = [
       "E": "坐骨神經（sciatic nerve）"
     },
     "answer": "D",
-    "explanation": "正解為 股神經（femoral nerve）。感覺到 anterior thigh 與 medial leg via saphenous nerve。 此題屬較難的臨床定位或易混淆題，重點是辨認關鍵解剖線索。",
+    "explanation": "正解為 股神經（femoral nerve）。感覺到 anterior thigh 與 medial leg via saphenous nerve。",
     "testedConcept": "股神經：L2-L4，支配 anterior thigh，負責膝伸直",
     "sourceType": "AI_GENERATED",
     "difficulty": "hard"
@@ -4813,7 +4813,7 @@ export const anatomyQuestions: Question[] = [
     "subject": "解剖學",
     "chapter": "下肢",
     "section": "腰薦神經叢",
-    "stem": "準備醫師國考時，若題目線索指向「L2-L4，支配 thigh adductors」，最應選下列哪一個解剖構造或路徑？",
+    "stem": "下列何者與「L2-L4，支配 thigh adductors」最相關？",
     "options": {
       "A": "上臀神經（superior gluteal nerve）",
       "B": "股神經（femoral nerve）",
@@ -4822,7 +4822,7 @@ export const anatomyQuestions: Question[] = [
       "E": "陰部神經（pudendal nerve）"
     },
     "answer": "D",
-    "explanation": "正解為 閉孔神經（obturator nerve）。骨盆手術或閉孔疝可傷。 此題接近國考常見整合題，需要把結構、路徑與功能連在一起。",
+    "explanation": "正解為 閉孔神經（obturator nerve）。骨盆手術或閉孔疝可傷。重點在於辨認 L2-L4，支配 thigh adductors 與 閉孔神經（obturator nerve） 的關聯。",
     "testedConcept": "閉孔神經：L2-L4，支配 thigh adductors",
     "sourceType": "AI_GENERATED",
     "difficulty": "medium"
@@ -4832,7 +4832,7 @@ export const anatomyQuestions: Question[] = [
     "subject": "解剖學",
     "chapter": "下肢",
     "section": "腰薦神經叢",
-    "stem": "臨床題幹描述與「L4-S3，經 piriformis 下方離開骨盆」最相關。若要定位病灶或判斷受影響構造，下列何者最適合？",
+    "stem": "若病灶或手術傷害影響「L4-S3，經 piriformis 下方離開骨盆」相關功能或解剖關係，最可能涉及下列何者？",
     "options": {
       "A": "閉孔神經（obturator nerve）",
       "B": "坐骨神經（sciatic nerve）",
@@ -4841,7 +4841,7 @@ export const anatomyQuestions: Question[] = [
       "E": "陰部神經（pudendal nerve）"
     },
     "answer": "B",
-    "explanation": "正解為 坐骨神經（sciatic nerve）。分為 tibial 與 common fibular components。 此題屬較難的臨床定位或易混淆題，重點是辨認關鍵解剖線索。",
+    "explanation": "正解為 坐骨神經（sciatic nerve）。分為 tibial 與 common fibular components。",
     "testedConcept": "坐骨神經：L4-S3，經 piriformis 下方離開骨盆",
     "sourceType": "AI_GENERATED",
     "difficulty": "hard"
@@ -4860,7 +4860,7 @@ export const anatomyQuestions: Question[] = [
       "E": "股神經（femoral nerve）"
     },
     "answer": "C",
-    "explanation": "正解為 上臀神經（superior gluteal nerve）。損傷造成 Trendelenburg gait。 此題屬基礎定位題，國考常用來確認核心解剖關係。",
+    "explanation": "正解為 上臀神經（superior gluteal nerve）。損傷造成 Trendelenburg gait。重點在於辨認 L4-S1，支配 gluteus medius/minimus 與 TFL 與 上臀神經（superior gluteal nerve） 的關聯。",
     "testedConcept": "上臀神經：L4-S1，支配 gluteus medius/minimus 與 TFL",
     "sourceType": "AI_GENERATED",
     "difficulty": "easy"
@@ -4870,7 +4870,7 @@ export const anatomyQuestions: Question[] = [
     "subject": "解剖學",
     "chapter": "下肢",
     "section": "腰薦神經叢",
-    "stem": "準備醫師國考時，若題目線索指向「L5-S2，支配 gluteus maximus」，最應選下列哪一個解剖構造或路徑？",
+    "stem": "關於「L5-S2，支配 gluteus maximus」所涉及的解剖構造，下列何者最適合？",
     "options": {
       "A": "上臀神經（superior gluteal nerve）",
       "B": "陰部神經（pudendal nerve）",
@@ -4879,7 +4879,7 @@ export const anatomyQuestions: Question[] = [
       "E": "閉孔神經（obturator nerve）"
     },
     "answer": "C",
-    "explanation": "正解為 下臀神經（inferior gluteal nerve）。影響從坐姿站起或爬樓梯。 此題接近國考常見整合題，需要把結構、路徑與功能連在一起。",
+    "explanation": "正解為 下臀神經（inferior gluteal nerve）。影響從坐姿站起或爬樓梯。重點在於辨認 L5-S2，支配 gluteus maximus 與 下臀神經（inferior gluteal nerve） 的關聯。",
     "testedConcept": "下臀神經：L5-S2，支配 gluteus maximus",
     "sourceType": "AI_GENERATED",
     "difficulty": "medium"
@@ -4889,7 +4889,7 @@ export const anatomyQuestions: Question[] = [
     "subject": "解剖學",
     "chapter": "下肢",
     "section": "腰薦神經叢",
-    "stem": "臨床題幹描述與「S2-S4，支配會陰與外括約肌」最相關。若要定位病灶或判斷受影響構造，下列何者最適合？",
+    "stem": "若病灶或手術傷害影響「S2-S4，支配會陰與外括約肌」相關功能或解剖關係，最可能涉及下列何者？",
     "options": {
       "A": "閉孔神經（obturator nerve）",
       "B": "陰部神經（pudendal nerve）",
@@ -4898,7 +4898,7 @@ export const anatomyQuestions: Question[] = [
       "E": "下臀神經（inferior gluteal nerve）"
     },
     "answer": "B",
-    "explanation": "正解為 陰部神經（pudendal nerve）。經 pudendal canal，可做 pudendal nerve block。 此題屬較難的臨床定位或易混淆題，重點是辨認關鍵解剖線索。",
+    "explanation": "正解為 陰部神經（pudendal nerve）。經 pudendal canal，可做 pudendal nerve block。",
     "testedConcept": "陰部神經：S2-S4，支配會陰與外括約肌",
     "sourceType": "AI_GENERATED",
     "difficulty": "hard"
@@ -4908,7 +4908,7 @@ export const anatomyQuestions: Question[] = [
     "subject": "解剖學",
     "chapter": "下肢",
     "section": "腰薦神經叢",
-    "stem": "準備醫師國考時，若題目線索指向「L2-L4，支配 anterior thigh，負責膝伸直」，最應選下列哪一個解剖構造或路徑？",
+    "stem": "關於「L2-L4，支配 anterior thigh，負責膝伸直」所涉及的解剖構造，下列何者最適合？",
     "options": {
       "A": "陰部神經（pudendal nerve）",
       "B": "股神經（femoral nerve）",
@@ -4917,7 +4917,7 @@ export const anatomyQuestions: Question[] = [
       "E": "下臀神經（inferior gluteal nerve）"
     },
     "answer": "B",
-    "explanation": "正解為 股神經（femoral nerve）。感覺到 anterior thigh 與 medial leg via saphenous nerve。 此題接近國考常見整合題，需要把結構、路徑與功能連在一起。",
+    "explanation": "正解為 股神經（femoral nerve）。感覺到 anterior thigh 與 medial leg via saphenous nerve。",
     "testedConcept": "股神經：L2-L4，支配 anterior thigh，負責膝伸直",
     "sourceType": "AI_GENERATED",
     "difficulty": "medium"
@@ -4927,7 +4927,7 @@ export const anatomyQuestions: Question[] = [
     "subject": "解剖學",
     "chapter": "下肢",
     "section": "腰薦神經叢",
-    "stem": "臨床題幹描述與「L2-L4，支配 thigh adductors」最相關。若要定位病灶或判斷受影響構造，下列何者最適合？",
+    "stem": "下列何者最能解釋「L2-L4，支配 thigh adductors」的解剖基礎？",
     "options": {
       "A": "上臀神經（superior gluteal nerve）",
       "B": "股神經（femoral nerve）",
@@ -4936,7 +4936,7 @@ export const anatomyQuestions: Question[] = [
       "E": "閉孔神經（obturator nerve）"
     },
     "answer": "E",
-    "explanation": "正解為 閉孔神經（obturator nerve）。骨盆手術或閉孔疝可傷。 此題屬較難的臨床定位或易混淆題，重點是辨認關鍵解剖線索。",
+    "explanation": "正解為 閉孔神經（obturator nerve）。骨盆手術或閉孔疝可傷。重點在於辨認 L2-L4，支配 thigh adductors 與 閉孔神經（obturator nerve） 的關聯。",
     "testedConcept": "閉孔神經：L2-L4，支配 thigh adductors",
     "sourceType": "AI_GENERATED",
     "difficulty": "hard"
@@ -4955,7 +4955,7 @@ export const anatomyQuestions: Question[] = [
       "E": "閉孔內肌（obturator internus）"
     },
     "answer": "D",
-    "explanation": "正解為 梨狀肌（piriformis）。superior gluteal structures 在其上方，sciatic nerve 多在下方。 此題屬基礎定位題，國考常用來確認核心解剖關係。",
+    "explanation": "正解為 梨狀肌（piriformis）。superior gluteal structures 在其上方，sciatic nerve 多在下方。",
     "testedConcept": "梨狀肌：將 greater sciatic foramen 分成上、下通道",
     "sourceType": "AI_GENERATED",
     "difficulty": "easy"
@@ -4965,7 +4965,7 @@ export const anatomyQuestions: Question[] = [
     "subject": "解剖學",
     "chapter": "下肢",
     "section": "臀區",
-    "stem": "準備醫師國考時，若題目線索指向「由 superior gluteal nerve 支配，穩定骨盆」，最應選下列哪一個解剖構造或路徑？",
+    "stem": "下列何者與「由 superior gluteal nerve 支配，穩定骨盆」最相關？",
     "options": {
       "A": "臀中肌（gluteus medius）",
       "B": "坐骨神經（sciatic nerve）",
@@ -4974,7 +4974,7 @@ export const anatomyQuestions: Question[] = [
       "E": "臀大肌（gluteus maximus）"
     },
     "answer": "A",
-    "explanation": "正解為 臀中肌（gluteus medius）。弱化造成 Trendelenburg sign。 此題接近國考常見整合題，需要把結構、路徑與功能連在一起。",
+    "explanation": "正解為 臀中肌（gluteus medius）。弱化造成 Trendelenburg sign。重點在於辨認 由 superior gluteal nerve 支配，穩定骨盆 與 臀中肌（gluteus medius） 的關聯。",
     "testedConcept": "臀中肌：由 superior gluteal nerve 支配，穩定骨盆",
     "sourceType": "AI_GENERATED",
     "difficulty": "medium"
@@ -4984,7 +4984,7 @@ export const anatomyQuestions: Question[] = [
     "subject": "解剖學",
     "chapter": "下肢",
     "section": "臀區",
-    "stem": "臨床題幹描述與「由 inferior gluteal nerve 支配，負責髖伸展」最相關。若要定位病灶或判斷受影響構造，下列何者最適合？",
+    "stem": "下列何者最能解釋「由 inferior gluteal nerve 支配，負責髖伸展」的解剖基礎？",
     "options": {
       "A": "坐骨神經（sciatic nerve）",
       "B": "臀大肌（gluteus maximus）",
@@ -4993,7 +4993,7 @@ export const anatomyQuestions: Question[] = [
       "E": "股方肌（quadratus femoris）"
     },
     "answer": "B",
-    "explanation": "正解為 臀大肌（gluteus maximus）。爬樓梯、從椅子站起需要。 此題屬較難的臨床定位或易混淆題，重點是辨認關鍵解剖線索。",
+    "explanation": "正解為 臀大肌（gluteus maximus）。爬樓梯、從椅子站起需要。重點在於辨認 由 inferior gluteal nerve 支配，負責髖伸展 與 臀大肌（gluteus maximus） 的關聯。",
     "testedConcept": "臀大肌：由 inferior gluteal nerve 支配，負責髖伸展",
     "sourceType": "AI_GENERATED",
     "difficulty": "hard"
@@ -5003,7 +5003,7 @@ export const anatomyQuestions: Question[] = [
     "subject": "解剖學",
     "chapter": "下肢",
     "section": "臀區",
-    "stem": "準備醫師國考時，若題目線索指向「通常在 piriformis 下方離開骨盆」，最應選下列哪一個解剖構造或路徑？",
+    "stem": "下列何者與「通常在 piriformis 下方離開骨盆」最相關？",
     "options": {
       "A": "梨狀肌（piriformis）",
       "B": "閉孔內肌（obturator internus）",
@@ -5012,7 +5012,7 @@ export const anatomyQuestions: Question[] = [
       "E": "臀中肌（gluteus medius）"
     },
     "answer": "C",
-    "explanation": "正解為 坐骨神經（sciatic nerve）。臀部肌肉注射應避開下內象限，選上外象限。 此題接近國考常見整合題，需要把結構、路徑與功能連在一起。",
+    "explanation": "正解為 坐骨神經（sciatic nerve）。臀部肌肉注射應避開下內象限，選上外象限。重點在於辨認 通常在 piriformis 下方離開骨盆 與 坐骨神經（sciatic nerve） 的關聯。",
     "testedConcept": "坐骨神經：通常在 piriformis 下方離開骨盆",
     "sourceType": "AI_GENERATED",
     "difficulty": "medium"
@@ -5022,7 +5022,7 @@ export const anatomyQuestions: Question[] = [
     "subject": "解剖學",
     "chapter": "下肢",
     "section": "臀區",
-    "stem": "臨床題幹描述與「協助髖外旋，肌腱經 lesser sciatic foramen」最相關。若要定位病灶或判斷受影響構造，下列何者最適合？",
+    "stem": "關於「協助髖外旋，肌腱經 lesser sciatic foramen」的解剖判斷，下列何者最適合？",
     "options": {
       "A": "臀大肌（gluteus maximus）",
       "B": "閉孔內肌（obturator internus）",
@@ -5031,7 +5031,7 @@ export const anatomyQuestions: Question[] = [
       "E": "梨狀肌（piriformis）"
     },
     "answer": "B",
-    "explanation": "正解為 閉孔內肌（obturator internus）。與 gemelli muscles 共同作用。 此題屬較難的臨床定位或易混淆題，重點是辨認關鍵解剖線索。",
+    "explanation": "正解為 閉孔內肌（obturator internus）。與 gemelli muscles 共同作用。重點在於辨認 協助髖外旋，肌腱經 lesser sciatic foramen 與 閉孔內肌（obturator internus） 的關聯。",
     "testedConcept": "閉孔內肌：協助髖外旋，肌腱經 lesser sciatic foramen",
     "sourceType": "AI_GENERATED",
     "difficulty": "hard"
@@ -5050,7 +5050,7 @@ export const anatomyQuestions: Question[] = [
       "E": "梨狀肌（piriformis）"
     },
     "answer": "A",
-    "explanation": "正解為 股方肌（quadratus femoris）。由 nerve to quadratus femoris 支配。 此題屬基礎定位題，國考常用來確認核心解剖關係。",
+    "explanation": "正解為 股方肌（quadratus femoris）。由 nerve to quadratus femoris 支配。重點在於辨認 髖外旋肌，位於 inferior gemellus 下方 與 股方肌（quadratus femoris） 的關聯。",
     "testedConcept": "股方肌：髖外旋肌，位於 inferior gemellus 下方",
     "sourceType": "AI_GENERATED",
     "difficulty": "easy"
@@ -5060,7 +5060,7 @@ export const anatomyQuestions: Question[] = [
     "subject": "解剖學",
     "chapter": "下肢",
     "section": "臀區",
-    "stem": "準備醫師國考時，若題目線索指向「將 greater sciatic foramen 分成上、下通道」，最應選下列哪一個解剖構造或路徑？",
+    "stem": "關於「將 greater sciatic foramen 分成上、下通道」所涉及的解剖構造，下列何者最適合？",
     "options": {
       "A": "閉孔內肌（obturator internus）",
       "B": "梨狀肌（piriformis）",
@@ -5069,7 +5069,7 @@ export const anatomyQuestions: Question[] = [
       "E": "股方肌（quadratus femoris）"
     },
     "answer": "B",
-    "explanation": "正解為 梨狀肌（piriformis）。superior gluteal structures 在其上方，sciatic nerve 多在下方。 此題接近國考常見整合題，需要把結構、路徑與功能連在一起。",
+    "explanation": "正解為 梨狀肌（piriformis）。superior gluteal structures 在其上方，sciatic nerve 多在下方。",
     "testedConcept": "梨狀肌：將 greater sciatic foramen 分成上、下通道",
     "sourceType": "AI_GENERATED",
     "difficulty": "medium"
@@ -5079,7 +5079,7 @@ export const anatomyQuestions: Question[] = [
     "subject": "解剖學",
     "chapter": "下肢",
     "section": "臀區",
-    "stem": "臨床題幹描述與「由 superior gluteal nerve 支配，穩定骨盆」最相關。若要定位病灶或判斷受影響構造，下列何者最適合？",
+    "stem": "關於「由 superior gluteal nerve 支配，穩定骨盆」的解剖判斷，下列何者最適合？",
     "options": {
       "A": "臀中肌（gluteus medius）",
       "B": "閉孔內肌（obturator internus）",
@@ -5088,7 +5088,7 @@ export const anatomyQuestions: Question[] = [
       "E": "臀大肌（gluteus maximus）"
     },
     "answer": "A",
-    "explanation": "正解為 臀中肌（gluteus medius）。弱化造成 Trendelenburg sign。 此題屬較難的臨床定位或易混淆題，重點是辨認關鍵解剖線索。",
+    "explanation": "正解為 臀中肌（gluteus medius）。弱化造成 Trendelenburg sign。重點在於辨認 由 superior gluteal nerve 支配，穩定骨盆 與 臀中肌（gluteus medius） 的關聯。",
     "testedConcept": "臀中肌：由 superior gluteal nerve 支配，穩定骨盆",
     "sourceType": "AI_GENERATED",
     "difficulty": "hard"
@@ -5098,7 +5098,7 @@ export const anatomyQuestions: Question[] = [
     "subject": "解剖學",
     "chapter": "下肢",
     "section": "大腿前內後區",
-    "stem": "準備醫師國考時，若題目線索指向「由 femoral nerve 支配，負責膝伸直」，最應選下列哪一個解剖構造或路徑？",
+    "stem": "關於「由 femoral nerve 支配，負責膝伸直」所涉及的解剖構造，下列何者最適合？",
     "options": {
       "A": "股四頭肌（quadriceps femoris）",
       "B": "內收肌群（adductor compartment）",
@@ -5107,7 +5107,7 @@ export const anatomyQuestions: Question[] = [
       "E": "隱神經（saphenous nerve）"
     },
     "answer": "A",
-    "explanation": "正解為 股四頭肌（quadriceps femoris）。patellar reflex 主要 L3-L4。 此題接近國考常見整合題，需要把結構、路徑與功能連在一起。",
+    "explanation": "正解為 股四頭肌（quadriceps femoris）。patellar reflex 主要 L3-L4。重點在於辨認 由 femoral nerve 支配，負責膝伸直 與 股四頭肌（quadriceps femoris） 的關聯。",
     "testedConcept": "股四頭肌：由 femoral nerve 支配，負責膝伸直",
     "sourceType": "AI_GENERATED",
     "difficulty": "medium"
@@ -5117,7 +5117,7 @@ export const anatomyQuestions: Question[] = [
     "subject": "解剖學",
     "chapter": "下肢",
     "section": "大腿前內後區",
-    "stem": "臨床題幹描述與「由 femoral nerve 支配，做 hip flexion/abduction/lateral rotation 與 knee flexion」最相關。若要定位病灶或判斷受影響構造，下列何者最適合？",
+    "stem": "若病灶或手術傷害影響「由 femoral nerve 支配，做 hip flexion/abduction/lateral rotation 與 knee flexion」相關功能或解剖關係，最可能涉及下列何者？",
     "options": {
       "A": "腿後肌群（hamstrings）",
       "B": "股四頭肌（quadriceps femoris）",
@@ -5126,7 +5126,7 @@ export const anatomyQuestions: Question[] = [
       "E": "隱神經（saphenous nerve）"
     },
     "answer": "D",
-    "explanation": "正解為 縫匠肌（sartorius）。最長肌肉，穿過大腿前方。 此題屬較難的臨床定位或易混淆題，重點是辨認關鍵解剖線索。",
+    "explanation": "正解為 縫匠肌（sartorius）。最長肌肉，穿過大腿前方。重點在於辨認 由 femoral nerve 支配，做 hip flexion/abduction/lateral rotation 與 knee flexion 與 縫匠肌（sartorius） 的關聯。",
     "testedConcept": "縫匠肌：由 femoral nerve 支配，做 hip flexion/abduction/lateral rotation 與 knee flexion",
     "sourceType": "AI_GENERATED",
     "difficulty": "hard"
@@ -5145,7 +5145,7 @@ export const anatomyQuestions: Question[] = [
       "E": "縫匠肌（sartorius）"
     },
     "answer": "D",
-    "explanation": "正解為 內收肌群（adductor compartment）。adductor magnus hamstring part 由 tibial nerve。 此題屬基礎定位題，國考常用來確認核心解剖關係。",
+    "explanation": "正解為 內收肌群（adductor compartment）。adductor magnus hamstring part 由 tibial nerve。",
     "testedConcept": "內收肌群：主要由 obturator nerve 支配",
     "sourceType": "AI_GENERATED",
     "difficulty": "easy"
@@ -5155,7 +5155,7 @@ export const anatomyQuestions: Question[] = [
     "subject": "解剖學",
     "chapter": "下肢",
     "section": "大腿前內後區",
-    "stem": "準備醫師國考時，若題目線索指向「主要由 tibial division of sciatic nerve 支配」，最應選下列哪一個解剖構造或路徑？",
+    "stem": "下列何者與「主要由 tibial division of sciatic nerve 支配」最相關？",
     "options": {
       "A": "股三角（femoral triangle）",
       "B": "腿後肌群（hamstrings）",
@@ -5164,7 +5164,7 @@ export const anatomyQuestions: Question[] = [
       "E": "股四頭肌（quadriceps femoris）"
     },
     "answer": "B",
-    "explanation": "正解為 腿後肌群（hamstrings）。short head of biceps femoris 由 common fibular division。 此題接近國考常見整合題，需要把結構、路徑與功能連在一起。",
+    "explanation": "正解為 腿後肌群（hamstrings）。short head of biceps femoris 由 common fibular division。",
     "testedConcept": "腿後肌群：主要由 tibial division of sciatic nerve 支配",
     "sourceType": "AI_GENERATED",
     "difficulty": "medium"
@@ -5174,7 +5174,7 @@ export const anatomyQuestions: Question[] = [
     "subject": "解剖學",
     "chapter": "下肢",
     "section": "大腿前內後區",
-    "stem": "臨床題幹描述與「內容由外到內為 NAVEL」最相關。若要定位病灶或判斷受影響構造，下列何者最適合？",
+    "stem": "若病灶或手術傷害影響「內容由外到內為 NAVEL」相關功能或解剖關係，最可能涉及下列何者？",
     "options": {
       "A": "內收肌群（adductor compartment）",
       "B": "股三角（femoral triangle）",
@@ -5183,7 +5183,7 @@ export const anatomyQuestions: Question[] = [
       "E": "隱神經（saphenous nerve）"
     },
     "answer": "B",
-    "explanation": "正解為 股三角（femoral triangle）。Nerve, Artery, Vein, Empty space, Lymphatics。 此題屬較難的臨床定位或易混淆題，重點是辨認關鍵解剖線索。",
+    "explanation": "正解為 股三角（femoral triangle）。Nerve, Artery, Vein, Empty space, Lymphatics。",
     "testedConcept": "股三角：內容由外到內為 NAVEL",
     "sourceType": "AI_GENERATED",
     "difficulty": "hard"
@@ -5193,7 +5193,7 @@ export const anatomyQuestions: Question[] = [
     "subject": "解剖學",
     "chapter": "下肢",
     "section": "大腿前內後區",
-    "stem": "準備醫師國考時，若題目線索指向「股神經終末感覺分支，經 adductor canal」，最應選下列哪一個解剖構造或路徑？",
+    "stem": "下列何者與「股神經終末感覺分支，經 adductor canal」最相關？",
     "options": {
       "A": "腿後肌群（hamstrings）",
       "B": "內收肌群（adductor compartment）",
@@ -5202,7 +5202,7 @@ export const anatomyQuestions: Question[] = [
       "E": "隱神經（saphenous nerve）"
     },
     "answer": "E",
-    "explanation": "正解為 隱神經（saphenous nerve）。供應小腿內側感覺。 此題接近國考常見整合題，需要把結構、路徑與功能連在一起。",
+    "explanation": "正解為 隱神經（saphenous nerve）。供應小腿內側感覺。重點在於辨認 股神經終末感覺分支，經 adductor canal 與 隱神經（saphenous nerve） 的關聯。",
     "testedConcept": "隱神經：股神經終末感覺分支，經 adductor canal",
     "sourceType": "AI_GENERATED",
     "difficulty": "medium"
@@ -5212,7 +5212,7 @@ export const anatomyQuestions: Question[] = [
     "subject": "解剖學",
     "chapter": "下肢",
     "section": "大腿前內後區",
-    "stem": "臨床題幹描述與「由 femoral nerve 支配，負責膝伸直」最相關。若要定位病灶或判斷受影響構造，下列何者最適合？",
+    "stem": "下列何者最能解釋「由 femoral nerve 支配，負責膝伸直」的解剖基礎？",
     "options": {
       "A": "股三角（femoral triangle）",
       "B": "隱神經（saphenous nerve）",
@@ -5221,7 +5221,7 @@ export const anatomyQuestions: Question[] = [
       "E": "股四頭肌（quadriceps femoris）"
     },
     "answer": "E",
-    "explanation": "正解為 股四頭肌（quadriceps femoris）。patellar reflex 主要 L3-L4。 此題屬較難的臨床定位或易混淆題，重點是辨認關鍵解剖線索。",
+    "explanation": "正解為 股四頭肌（quadriceps femoris）。patellar reflex 主要 L3-L4。重點在於辨認 由 femoral nerve 支配，負責膝伸直 與 股四頭肌（quadriceps femoris） 的關聯。",
     "testedConcept": "股四頭肌：由 femoral nerve 支配，負責膝伸直",
     "sourceType": "AI_GENERATED",
     "difficulty": "hard"
@@ -5240,7 +5240,7 @@ export const anatomyQuestions: Question[] = [
       "E": "縫匠肌（sartorius）"
     },
     "answer": "E",
-    "explanation": "正解為 縫匠肌（sartorius）。最長肌肉，穿過大腿前方。 此題屬基礎定位題，國考常用來確認核心解剖關係。",
+    "explanation": "正解為 縫匠肌（sartorius）。最長肌肉，穿過大腿前方。重點在於辨認 由 femoral nerve 支配，做 hip flexion/abduction/lateral rotation 與 knee flexion 與 縫匠肌（sartorius） 的關聯。",
     "testedConcept": "縫匠肌：由 femoral nerve 支配，做 hip flexion/abduction/lateral rotation 與 knee flexion",
     "sourceType": "AI_GENERATED",
     "difficulty": "easy"
@@ -5250,7 +5250,7 @@ export const anatomyQuestions: Question[] = [
     "subject": "解剖學",
     "chapter": "下肢",
     "section": "小腿肌群",
-    "stem": "準備醫師國考時，若題目線索指向「支配 posterior compartment of leg，負責 plantarflexion」，最應選下列哪一個解剖構造或路徑？",
+    "stem": "關於「支配 posterior compartment of leg，負責 plantarflexion」所涉及的解剖構造，下列何者最適合？",
     "options": {
       "A": "脛神經（tibial nerve）",
       "B": "腓淺神經（superficial fibular nerve）",
@@ -5259,7 +5259,7 @@ export const anatomyQuestions: Question[] = [
       "E": "脛前肌（tibialis anterior）"
     },
     "answer": "A",
-    "explanation": "正解為 脛神經（tibial nerve）。通過 tarsal tunnel。 此題接近國考常見整合題，需要把結構、路徑與功能連在一起。",
+    "explanation": "正解為 脛神經（tibial nerve）。通過 tarsal tunnel。重點在於辨認 支配 posterior compartment of leg，負責 plantarflexion 與 脛神經（tibial nerve） 的關聯。",
     "testedConcept": "脛神經：支配 posterior compartment of leg，負責 plantarflexion",
     "sourceType": "AI_GENERATED",
     "difficulty": "medium"
@@ -5269,7 +5269,7 @@ export const anatomyQuestions: Question[] = [
     "subject": "解剖學",
     "chapter": "下肢",
     "section": "小腿肌群",
-    "stem": "臨床題幹描述與「支配 anterior compartment，負責 dorsiflexion」最相關。若要定位病灶或判斷受影響構造，下列何者最適合？",
+    "stem": "下列何者最能解釋「支配 anterior compartment，負責 dorsiflexion」的解剖基礎？",
     "options": {
       "A": "脛神經（tibial nerve）",
       "B": "腓深神經（deep fibular nerve）",
@@ -5278,7 +5278,7 @@ export const anatomyQuestions: Question[] = [
       "E": "脛前肌（tibialis anterior）"
     },
     "answer": "B",
-    "explanation": "正解為 腓深神經（deep fibular nerve）。損傷造成 foot drop。 此題屬較難的臨床定位或易混淆題，重點是辨認關鍵解剖線索。",
+    "explanation": "正解為 腓深神經（deep fibular nerve）。損傷造成 foot drop。重點在於辨認 支配 anterior compartment，負責 dorsiflexion 與 腓深神經（deep fibular nerve） 的關聯。",
     "testedConcept": "腓深神經：支配 anterior compartment，負責 dorsiflexion",
     "sourceType": "AI_GENERATED",
     "difficulty": "hard"
@@ -5288,7 +5288,7 @@ export const anatomyQuestions: Question[] = [
     "subject": "解剖學",
     "chapter": "下肢",
     "section": "小腿肌群",
-    "stem": "準備醫師國考時，若題目線索指向「支配 lateral compartment，負責 eversion」，最應選下列哪一個解剖構造或路徑？",
+    "stem": "關於「支配 lateral compartment，負責 eversion」所涉及的解剖構造，下列何者最適合？",
     "options": {
       "A": "腓深神經（deep fibular nerve）",
       "B": "腓骨長肌（fibularis longus）",
@@ -5297,7 +5297,7 @@ export const anatomyQuestions: Question[] = [
       "E": "腓淺神經（superficial fibular nerve）"
     },
     "answer": "E",
-    "explanation": "正解為 腓淺神經（superficial fibular nerve）。感覺到足背大部分。 此題接近國考常見整合題，需要把結構、路徑與功能連在一起。",
+    "explanation": "正解為 腓淺神經（superficial fibular nerve）。感覺到足背大部分。重點在於辨認 支配 lateral compartment，負責 eversion 與 腓淺神經（superficial fibular nerve） 的關聯。",
     "testedConcept": "腓淺神經：支配 lateral compartment，負責 eversion",
     "sourceType": "AI_GENERATED",
     "difficulty": "medium"
@@ -5307,7 +5307,7 @@ export const anatomyQuestions: Question[] = [
     "subject": "解剖學",
     "chapter": "下肢",
     "section": "小腿肌群",
-    "stem": "臨床題幹描述與「由 tibial nerve 支配，跨膝與踝，協助 plantarflexion」最相關。若要定位病灶或判斷受影響構造，下列何者最適合？",
+    "stem": "關於「由 tibial nerve 支配，跨膝與踝，協助 plantarflexion」的解剖判斷，下列何者最適合？",
     "options": {
       "A": "脛前肌（tibialis anterior）",
       "B": "腓深神經（deep fibular nerve）",
@@ -5316,7 +5316,7 @@ export const anatomyQuestions: Question[] = [
       "E": "腓骨長肌（fibularis longus）"
     },
     "answer": "C",
-    "explanation": "正解為 腓腸肌（gastrocnemius）。Achilles reflex S1-S2。 此題屬較難的臨床定位或易混淆題，重點是辨認關鍵解剖線索。",
+    "explanation": "正解為 腓腸肌（gastrocnemius）。Achilles reflex S1-S2。重點在於辨認 由 tibial nerve 支配，跨膝與踝，協助 plantarflexion 與 腓腸肌（gastrocnemius） 的關聯。",
     "testedConcept": "腓腸肌：由 tibial nerve 支配，跨膝與踝，協助 plantarflexion",
     "sourceType": "AI_GENERATED",
     "difficulty": "hard"
@@ -5335,7 +5335,7 @@ export const anatomyQuestions: Question[] = [
       "E": "脛前肌（tibialis anterior）"
     },
     "answer": "E",
-    "explanation": "正解為 脛前肌（tibialis anterior）。弱化會 steppage gait。 此題屬基礎定位題，國考常用來確認核心解剖關係。",
+    "explanation": "正解為 脛前肌（tibialis anterior）。弱化會 steppage gait。重點在於辨認 由 deep fibular nerve 支配，負責 dorsiflexion/inversion 與 脛前肌（tibialis anterior） 的關聯。",
     "testedConcept": "脛前肌：由 deep fibular nerve 支配，負責 dorsiflexion/inversion",
     "sourceType": "AI_GENERATED",
     "difficulty": "easy"
@@ -5345,7 +5345,7 @@ export const anatomyQuestions: Question[] = [
     "subject": "解剖學",
     "chapter": "下肢",
     "section": "小腿肌群",
-    "stem": "準備醫師國考時，若題目線索指向「由 superficial fibular nerve 支配，支持足弓並 eversion」，最應選下列哪一個解剖構造或路徑？",
+    "stem": "下列何者與「由 superficial fibular nerve 支配，支持足弓並 eversion」最相關？",
     "options": {
       "A": "腓深神經（deep fibular nerve）",
       "B": "脛前肌（tibialis anterior）",
@@ -5354,7 +5354,7 @@ export const anatomyQuestions: Question[] = [
       "E": "腓骨長肌（fibularis longus）"
     },
     "answer": "E",
-    "explanation": "正解為 腓骨長肌（fibularis longus）。tendon 通過 cuboid groove。 此題接近國考常見整合題，需要把結構、路徑與功能連在一起。",
+    "explanation": "正解為 腓骨長肌（fibularis longus）。tendon 通過 cuboid groove。重點在於辨認 由 superficial fibular nerve 支配，支持足弓並 eversion 與 腓骨長肌（fibularis longus） 的關聯。",
     "testedConcept": "腓骨長肌：由 superficial fibular nerve 支配，支持足弓並 eversion",
     "sourceType": "AI_GENERATED",
     "difficulty": "medium"
@@ -5364,7 +5364,7 @@ export const anatomyQuestions: Question[] = [
     "subject": "解剖學",
     "chapter": "下肢",
     "section": "小腿肌群",
-    "stem": "臨床題幹描述與「支配 posterior compartment of leg，負責 plantarflexion」最相關。若要定位病灶或判斷受影響構造，下列何者最適合？",
+    "stem": "關於「支配 posterior compartment of leg，負責 plantarflexion」的解剖判斷，下列何者最適合？",
     "options": {
       "A": "脛前肌（tibialis anterior）",
       "B": "腓腸肌（gastrocnemius）",
@@ -5373,7 +5373,7 @@ export const anatomyQuestions: Question[] = [
       "E": "脛神經（tibial nerve）"
     },
     "answer": "E",
-    "explanation": "正解為 脛神經（tibial nerve）。通過 tarsal tunnel。 此題屬較難的臨床定位或易混淆題，重點是辨認關鍵解剖線索。",
+    "explanation": "正解為 脛神經（tibial nerve）。通過 tarsal tunnel。重點在於辨認 支配 posterior compartment of leg，負責 plantarflexion 與 脛神經（tibial nerve） 的關聯。",
     "testedConcept": "脛神經：支配 posterior compartment of leg，負責 plantarflexion",
     "sourceType": "AI_GENERATED",
     "difficulty": "hard"
@@ -5383,7 +5383,7 @@ export const anatomyQuestions: Question[] = [
     "subject": "解剖學",
     "chapter": "下肢",
     "section": "小腿肌群",
-    "stem": "準備醫師國考時，若題目線索指向「支配 anterior compartment，負責 dorsiflexion」，最應選下列哪一個解剖構造或路徑？",
+    "stem": "下列何者與「支配 anterior compartment，負責 dorsiflexion」最相關？",
     "options": {
       "A": "腓深神經（deep fibular nerve）",
       "B": "腓骨長肌（fibularis longus）",
@@ -5392,7 +5392,7 @@ export const anatomyQuestions: Question[] = [
       "E": "腓腸肌（gastrocnemius）"
     },
     "answer": "A",
-    "explanation": "正解為 腓深神經（deep fibular nerve）。損傷造成 foot drop。 此題接近國考常見整合題，需要把結構、路徑與功能連在一起。",
+    "explanation": "正解為 腓深神經（deep fibular nerve）。損傷造成 foot drop。重點在於辨認 支配 anterior compartment，負責 dorsiflexion 與 腓深神經（deep fibular nerve） 的關聯。",
     "testedConcept": "腓深神經：支配 anterior compartment，負責 dorsiflexion",
     "sourceType": "AI_GENERATED",
     "difficulty": "medium"
@@ -5402,7 +5402,7 @@ export const anatomyQuestions: Question[] = [
     "subject": "解剖學",
     "chapter": "下肢",
     "section": "足部",
-    "stem": "臨床題幹描述與「類似手的 median nerve，支配足底內側多數感覺與部分 intrinsic muscles」最相關。若要定位病灶或判斷受影響構造，下列何者最適合？",
+    "stem": "若病灶或手術傷害影響「類似手的 median nerve，支配足底內側多數感覺與部分 intrinsic muscles」相關功能或解剖關係，最可能涉及下列何者？",
     "options": {
       "A": "足弓（arches of foot）",
       "B": "距下關節（subtalar joint）",
@@ -5411,7 +5411,7 @@ export const anatomyQuestions: Question[] = [
       "E": "跗管（tarsal tunnel）"
     },
     "answer": "D",
-    "explanation": "正解為 內側足底神經（medial plantar nerve）。支配 abductor hallucis 等。 此題屬較難的臨床定位或易混淆題，重點是辨認關鍵解剖線索。",
+    "explanation": "正解為 內側足底神經（medial plantar nerve）。支配 abductor hallucis 等。重點在於辨認 類似手的 median nerve，支配足底內側多數感覺與部分 intrinsic muscles 與 內側足底神經（medial plantar nerve） 的關聯。",
     "testedConcept": "內側足底神經：類似手的 median nerve，支配足底內側多數感覺與部分 intrinsic muscles",
     "sourceType": "AI_GENERATED",
     "difficulty": "hard"
@@ -5430,7 +5430,7 @@ export const anatomyQuestions: Question[] = [
       "E": "足弓（arches of foot）"
     },
     "answer": "C",
-    "explanation": "正解為 外側足底神經（lateral plantar nerve）。deep branch 供應 adductor hallucis 等。 此題屬基礎定位題，國考常用來確認核心解剖關係。",
+    "explanation": "正解為 外側足底神經（lateral plantar nerve）。deep branch 供應 adductor hallucis 等。",
     "testedConcept": "外側足底神經：類似手的 ulnar nerve，支配多數足部 intrinsic muscles",
     "sourceType": "AI_GENERATED",
     "difficulty": "easy"
@@ -5440,7 +5440,7 @@ export const anatomyQuestions: Question[] = [
     "subject": "解剖學",
     "chapter": "下肢",
     "section": "足部",
-    "stem": "準備醫師國考時，若題目線索指向「支持 longitudinal arch，發炎造成 plantar fasciitis」，最應選下列哪一個解剖構造或路徑？",
+    "stem": "關於「支持 longitudinal arch，發炎造成 plantar fasciitis」所涉及的解剖構造，下列何者最適合？",
     "options": {
       "A": "跗管（tarsal tunnel）",
       "B": "距下關節（subtalar joint）",
@@ -5449,7 +5449,7 @@ export const anatomyQuestions: Question[] = [
       "E": "足底腱膜（plantar aponeurosis）"
     },
     "answer": "E",
-    "explanation": "正解為 足底腱膜（plantar aponeurosis）。跟骨內側結節常痛。 此題接近國考常見整合題，需要把結構、路徑與功能連在一起。",
+    "explanation": "正解為 足底腱膜（plantar aponeurosis）。跟骨內側結節常痛。重點在於辨認 支持 longitudinal arch，發炎造成 plantar fasciitis 與 足底腱膜（plantar aponeurosis） 的關聯。",
     "testedConcept": "足底腱膜：支持 longitudinal arch，發炎造成 plantar fasciitis",
     "sourceType": "AI_GENERATED",
     "difficulty": "medium"
@@ -5459,7 +5459,7 @@ export const anatomyQuestions: Question[] = [
     "subject": "解剖學",
     "chapter": "下肢",
     "section": "足部",
-    "stem": "臨床題幹描述與「參與 inversion/eversion」最相關。若要定位病灶或判斷受影響構造，下列何者最適合？",
+    "stem": "若病灶或手術傷害影響「參與 inversion/eversion」相關功能或解剖關係，最可能涉及下列何者？",
     "options": {
       "A": "足弓（arches of foot）",
       "B": "內側足底神經（medial plantar nerve）",
@@ -5468,7 +5468,7 @@ export const anatomyQuestions: Question[] = [
       "E": "外側足底神經（lateral plantar nerve）"
     },
     "answer": "D",
-    "explanation": "正解為 距下關節（subtalar joint）。ankle joint 主要 dorsiflexion/plantarflexion。 此題屬較難的臨床定位或易混淆題，重點是辨認關鍵解剖線索。",
+    "explanation": "正解為 距下關節（subtalar joint）。ankle joint 主要 dorsiflexion/plantarflexion。",
     "testedConcept": "距下關節：參與 inversion/eversion",
     "sourceType": "AI_GENERATED",
     "difficulty": "hard"
@@ -5478,7 +5478,7 @@ export const anatomyQuestions: Question[] = [
     "subject": "解剖學",
     "chapter": "下肢",
     "section": "足部",
-    "stem": "準備醫師國考時，若題目線索指向「由骨形、韌帶與肌腱共同支持」，最應選下列哪一個解剖構造或路徑？",
+    "stem": "關於「由骨形、韌帶與肌腱共同支持」所涉及的解剖構造，下列何者最適合？",
     "options": {
       "A": "跗管（tarsal tunnel）",
       "B": "距下關節（subtalar joint）",
@@ -5487,7 +5487,7 @@ export const anatomyQuestions: Question[] = [
       "E": "內側足底神經（medial plantar nerve）"
     },
     "answer": "D",
-    "explanation": "正解為 足弓（arches of foot）。spring ligament、plantar aponeurosis、tibialis posterior 很重要。 此題接近國考常見整合題，需要把結構、路徑與功能連在一起。",
+    "explanation": "正解為 足弓（arches of foot）。spring ligament、plantar aponeurosis、tibialis posterior 很重要。",
     "testedConcept": "足弓：由骨形、韌帶與肌腱共同支持",
     "sourceType": "AI_GENERATED",
     "difficulty": "medium"
@@ -5497,7 +5497,7 @@ export const anatomyQuestions: Question[] = [
     "subject": "解剖學",
     "chapter": "下肢",
     "section": "足部",
-    "stem": "臨床題幹描述與「內踝後方通過 tibialis posterior、FDL、posterior tibial vessels、tibial nerve、FHL」最相關。若要定位病灶或判斷受影響構造，下列何者最適合？",
+    "stem": "下列何者最能解釋「內踝後方通過 tibialis posterior、FDL、posterior tibial vessels、tibial nerve、FHL」的解剖基礎？",
     "options": {
       "A": "內側足底神經（medial plantar nerve）",
       "B": "足弓（arches of foot）",
@@ -5506,7 +5506,7 @@ export const anatomyQuestions: Question[] = [
       "E": "足底腱膜（plantar aponeurosis）"
     },
     "answer": "C",
-    "explanation": "正解為 跗管（tarsal tunnel）。口訣 Tom Dick ANd Harry。 此題屬較難的臨床定位或易混淆題，重點是辨認關鍵解剖線索。",
+    "explanation": "正解為 跗管（tarsal tunnel）。口訣 Tom Dick ANd Harry。重點在於辨認 內踝後方通過 tibialis posterior、FDL、posterior tibial vessels、tibial nerve、FHL 與 跗管（tarsal tunnel） 的關聯。",
     "testedConcept": "跗管：內踝後方通過 tibialis posterior、FDL、posterior tibial vessels、tibial nerve、FHL",
     "sourceType": "AI_GENERATED",
     "difficulty": "hard"
@@ -5525,7 +5525,7 @@ export const anatomyQuestions: Question[] = [
       "E": "外側足底神經（lateral plantar nerve）"
     },
     "answer": "A",
-    "explanation": "正解為 內側足底神經（medial plantar nerve）。支配 abductor hallucis 等。 此題屬基礎定位題，國考常用來確認核心解剖關係。",
+    "explanation": "正解為 內側足底神經（medial plantar nerve）。支配 abductor hallucis 等。重點在於辨認 類似手的 median nerve，支配足底內側多數感覺與部分 intrinsic muscles 與 內側足底神經（medial plantar nerve） 的關聯。",
     "testedConcept": "內側足底神經：類似手的 median nerve，支配足底內側多數感覺與部分 intrinsic muscles",
     "sourceType": "AI_GENERATED",
     "difficulty": "easy"
@@ -5535,7 +5535,7 @@ export const anatomyQuestions: Question[] = [
     "subject": "解剖學",
     "chapter": "下肢",
     "section": "足部",
-    "stem": "準備醫師國考時，若題目線索指向「類似手的 ulnar nerve，支配多數足部 intrinsic muscles」，最應選下列哪一個解剖構造或路徑？",
+    "stem": "下列何者與「類似手的 ulnar nerve，支配多數足部 intrinsic muscles」最相關？",
     "options": {
       "A": "足底腱膜（plantar aponeurosis）",
       "B": "距下關節（subtalar joint）",
@@ -5544,7 +5544,7 @@ export const anatomyQuestions: Question[] = [
       "E": "足弓（arches of foot）"
     },
     "answer": "C",
-    "explanation": "正解為 外側足底神經（lateral plantar nerve）。deep branch 供應 adductor hallucis 等。 此題接近國考常見整合題，需要把結構、路徑與功能連在一起。",
+    "explanation": "正解為 外側足底神經（lateral plantar nerve）。deep branch 供應 adductor hallucis 等。",
     "testedConcept": "外側足底神經：類似手的 ulnar nerve，支配多數足部 intrinsic muscles",
     "sourceType": "AI_GENERATED",
     "difficulty": "medium"
@@ -5554,7 +5554,7 @@ export const anatomyQuestions: Question[] = [
     "subject": "解剖學",
     "chapter": "下肢",
     "section": "下肢血管",
-    "stem": "臨床題幹描述與「通過 adductor hiatus 後成為 popliteal artery」最相關。若要定位病灶或判斷受影響構造，下列何者最適合？",
+    "stem": "下列何者最能解釋「通過 adductor hiatus 後成為 popliteal artery」的解剖基礎？",
     "options": {
       "A": "脛前動脈（anterior tibial artery）",
       "B": "膕動脈（popliteal artery）",
@@ -5563,7 +5563,7 @@ export const anatomyQuestions: Question[] = [
       "E": "大隱靜脈（great saphenous vein）"
     },
     "answer": "C",
-    "explanation": "正解為 股動脈（femoral artery）。位於 femoral triangle 中 femoral vein 外側。 此題屬較難的臨床定位或易混淆題，重點是辨認關鍵解剖線索。",
+    "explanation": "正解為 股動脈（femoral artery）。位於 femoral triangle 中 femoral vein 外側。",
     "testedConcept": "股動脈：通過 adductor hiatus 後成為 popliteal artery",
     "sourceType": "AI_GENERATED",
     "difficulty": "hard"
@@ -5573,7 +5573,7 @@ export const anatomyQuestions: Question[] = [
     "subject": "解剖學",
     "chapter": "下肢",
     "section": "下肢血管",
-    "stem": "準備醫師國考時，若題目線索指向「位於膕窩最深層，分為 anterior/posterior tibial arteries」，最應選下列哪一個解剖構造或路徑？",
+    "stem": "下列何者與「位於膕窩最深層，分為 anterior/posterior tibial arteries」最相關？",
     "options": {
       "A": "小隱靜脈（small saphenous vein）",
       "B": "脛前動脈（anterior tibial artery）",
@@ -5582,7 +5582,7 @@ export const anatomyQuestions: Question[] = [
       "E": "膕動脈（popliteal artery）"
     },
     "answer": "E",
-    "explanation": "正解為 膕動脈（popliteal artery）。膝關節後方血管損傷可能影響下肢灌流。 此題接近國考常見整合題，需要把結構、路徑與功能連在一起。",
+    "explanation": "正解為 膕動脈（popliteal artery）。膝關節後方血管損傷可能影響下肢灌流。重點在於辨認 位於膕窩最深層，分為 anterior/posterior tibial arteries 與 膕動脈（popliteal artery） 的關聯。",
     "testedConcept": "膕動脈：位於膕窩最深層，分為 anterior/posterior tibial arteries",
     "sourceType": "AI_GENERATED",
     "difficulty": "medium"
@@ -5592,7 +5592,7 @@ export const anatomyQuestions: Question[] = [
     "subject": "解剖學",
     "chapter": "下肢",
     "section": "下肢血管",
-    "stem": "臨床題幹描述與「穿 interosseous membrane 到 anterior compartment，續為 dorsalis pedis artery」最相關。若要定位病灶或判斷受影響構造，下列何者最適合？",
+    "stem": "關於「穿 interosseous membrane 到 anterior compartment，續為 dorsalis pedis artery」的解剖判斷，下列何者最適合？",
     "options": {
       "A": "小隱靜脈（small saphenous vein）",
       "B": "脛前動脈（anterior tibial artery）",
@@ -5601,7 +5601,7 @@ export const anatomyQuestions: Question[] = [
       "E": "大隱靜脈（great saphenous vein）"
     },
     "answer": "B",
-    "explanation": "正解為 脛前動脈（anterior tibial artery）。足背動脈搏動可觸診。 此題屬較難的臨床定位或易混淆題，重點是辨認關鍵解剖線索。",
+    "explanation": "正解為 脛前動脈（anterior tibial artery）。足背動脈搏動可觸診。重點在於辨認 穿 interosseous membrane 到 anterior compartment，續為 dorsalis pedis artery 與 脛前動脈（anterior tibial artery） 的關聯。",
     "testedConcept": "脛前動脈：穿 interosseous membrane 到 anterior compartment，續為 dorsalis pedis artery",
     "sourceType": "AI_GENERATED",
     "difficulty": "hard"
@@ -5620,7 +5620,7 @@ export const anatomyQuestions: Question[] = [
       "E": "脛後動脈（posterior tibial artery）"
     },
     "answer": "E",
-    "explanation": "正解為 脛後動脈（posterior tibial artery）。tarsal tunnel 重要內容物。 此題屬基礎定位題，國考常用來確認核心解剖關係。",
+    "explanation": "正解為 脛後動脈（posterior tibial artery）。tarsal tunnel 重要內容物。重點在於辨認 經內踝後方進入足底，分 medial/lateral plantar arteries 與 脛後動脈（posterior tibial artery） 的關聯。",
     "testedConcept": "脛後動脈：經內踝後方進入足底，分 medial/lateral plantar arteries",
     "sourceType": "AI_GENERATED",
     "difficulty": "easy"
@@ -5630,7 +5630,7 @@ export const anatomyQuestions: Question[] = [
     "subject": "解剖學",
     "chapter": "下肢",
     "section": "下肢血管",
-    "stem": "準備醫師國考時，若題目線索指向「走下肢內側，注入 femoral vein」，最應選下列哪一個解剖構造或路徑？",
+    "stem": "關於「走下肢內側，注入 femoral vein」所涉及的解剖構造，下列何者最適合？",
     "options": {
       "A": "大隱靜脈（great saphenous vein）",
       "B": "股動脈（femoral artery）",
@@ -5639,7 +5639,7 @@ export const anatomyQuestions: Question[] = [
       "E": "膕動脈（popliteal artery）"
     },
     "answer": "A",
-    "explanation": "正解為 大隱靜脈（great saphenous vein）。常用於 CABG graft。 此題接近國考常見整合題，需要把結構、路徑與功能連在一起。",
+    "explanation": "正解為 大隱靜脈（great saphenous vein）。常用於 CABG graft。重點在於辨認 走下肢內側，注入 femoral vein 與 大隱靜脈（great saphenous vein） 的關聯。",
     "testedConcept": "大隱靜脈：走下肢內側，注入 femoral vein",
     "sourceType": "AI_GENERATED",
     "difficulty": "medium"
@@ -5649,7 +5649,7 @@ export const anatomyQuestions: Question[] = [
     "subject": "解剖學",
     "chapter": "下肢",
     "section": "下肢血管",
-    "stem": "臨床題幹描述與「走小腿後外側，注入 popliteal vein」最相關。若要定位病灶或判斷受影響構造，下列何者最適合？",
+    "stem": "關於「走小腿後外側，注入 popliteal vein」的解剖判斷，下列何者最適合？",
     "options": {
       "A": "膕動脈（popliteal artery）",
       "B": "小隱靜脈（small saphenous vein）",
@@ -5658,7 +5658,7 @@ export const anatomyQuestions: Question[] = [
       "E": "股動脈（femoral artery）"
     },
     "answer": "B",
-    "explanation": "正解為 小隱靜脈（small saphenous vein）。在 lateral malleolus 後方上行。 此題屬較難的臨床定位或易混淆題，重點是辨認關鍵解剖線索。",
+    "explanation": "正解為 小隱靜脈（small saphenous vein）。在 lateral malleolus 後方上行。重點在於辨認 走小腿後外側，注入 popliteal vein 與 小隱靜脈（small saphenous vein） 的關聯。",
     "testedConcept": "小隱靜脈：走小腿後外側，注入 popliteal vein",
     "sourceType": "AI_GENERATED",
     "difficulty": "hard"
@@ -5668,7 +5668,7 @@ export const anatomyQuestions: Question[] = [
     "subject": "解剖學",
     "chapter": "下肢",
     "section": "下肢血管",
-    "stem": "準備醫師國考時，若題目線索指向「通過 adductor hiatus 後成為 popliteal artery」，最應選下列哪一個解剖構造或路徑？",
+    "stem": "關於「通過 adductor hiatus 後成為 popliteal artery」所涉及的解剖構造，下列何者最適合？",
     "options": {
       "A": "股動脈（femoral artery）",
       "B": "膕動脈（popliteal artery）",
@@ -5677,7 +5677,7 @@ export const anatomyQuestions: Question[] = [
       "E": "小隱靜脈（small saphenous vein）"
     },
     "answer": "A",
-    "explanation": "正解為 股動脈（femoral artery）。位於 femoral triangle 中 femoral vein 外側。 此題接近國考常見整合題，需要把結構、路徑與功能連在一起。",
+    "explanation": "正解為 股動脈（femoral artery）。位於 femoral triangle 中 femoral vein 外側。",
     "testedConcept": "股動脈：通過 adductor hiatus 後成為 popliteal artery",
     "sourceType": "AI_GENERATED",
     "difficulty": "medium"
@@ -5687,7 +5687,7 @@ export const anatomyQuestions: Question[] = [
     "subject": "解剖學",
     "chapter": "下肢",
     "section": "下肢血管",
-    "stem": "臨床題幹描述與「位於膕窩最深層，分為 anterior/posterior tibial arteries」最相關。若要定位病灶或判斷受影響構造，下列何者最適合？",
+    "stem": "若病灶或手術傷害影響「位於膕窩最深層，分為 anterior/posterior tibial arteries」相關功能或解剖關係，最可能涉及下列何者？",
     "options": {
       "A": "小隱靜脈（small saphenous vein）",
       "B": "膕動脈（popliteal artery）",
@@ -5696,15 +5696,22153 @@ export const anatomyQuestions: Question[] = [
       "E": "大隱靜脈（great saphenous vein）"
     },
     "answer": "B",
-    "explanation": "正解為 膕動脈（popliteal artery）。膝關節後方血管損傷可能影響下肢灌流。 此題屬較難的臨床定位或易混淆題，重點是辨認關鍵解剖線索。",
+    "explanation": "正解為 膕動脈（popliteal artery）。膝關節後方血管損傷可能影響下肢灌流。重點在於辨認 位於膕窩最深層，分為 anterior/posterior tibial arteries 與 膕動脈（popliteal artery） 的關聯。",
     "testedConcept": "膕動脈：位於膕窩最深層，分為 anterior/posterior tibial arteries",
     "sourceType": "AI_GENERATED",
     "difficulty": "hard"
+  },
+  {
+    "id": "hb2-001",
+    "subject": "解剖學",
+    "chapter": "神經解剖",
+    "section": "腦神經",
+    "stem": "患者左側面部出現肌肉無力且聽覺異常（聲音變大），檢查發現腮腺附近出現腫塊最可能壓迫到哪條神經？",
+    "options": {
+      "A": "三叉神經 mandibular division (CN V3)",
+      "B": "顏面神經 facial nerve (CN VII)",
+      "C": "舌咽神經 glossopharyngeal nerve (CN IX)",
+      "D": "迷走神經 vagus nerve (CN X)",
+      "E": "舌下神經 hypoglossal nerve (CN XII)"
+    },
+    "answer": "B",
+    "explanation": "腮腺腫瘤常壓迫穿過腮腺的顏面神經，造成面癱與聽覺過敏（骨導覺增強）。三叉神經下頜支支配咀嚼肌，不經腮腺。",
+    "testedConcept": "顏面神經路徑與腮腺解剖關係",
+    "sourceType": "AI_GENERATED",
+    "difficulty": "hard"
+  },
+  {
+    "id": "hb2-002",
+    "subject": "解剖學",
+    "chapter": "神經解剖",
+    "section": "腦幹核區",
+    "stem": "Wallenberg症候群為延髓外側梗塞，下列哪項臨床表現最能幫助診斷？",
+    "options": {
+      "A": "同側舌頭肌萎縮與偏斜",
+      "B": "同側顏面痛覺與溫度覺喪失，對側身體痛溫覺喪失",
+      "C": "雙側肢體痿弱與腱反射消失",
+      "D": "對側顏面肌肉癱瘓",
+      "E": "同側肢體運動麻痺與眼瞼下垂"
+    },
+    "answer": "B",
+    "explanation": "延髓外側梗塞（Wallenberg症候群）累及脊髓三叉核、脊髓丘腦徑及小腦前庭系統，引起同側面部痛溫覺缺失與對側身體痛溫覺缺失、吞嚥困難、共濟失調等。舌頭偏斜屬於舌下神經核病變。",
+    "testedConcept": "延髓外側區血管支配與感覺路徑",
+    "sourceType": "AI_GENERATED",
+    "difficulty": "hard"
+  },
+  {
+    "id": "hb2-003",
+    "subject": "解剖學",
+    "chapter": "神經解剖",
+    "section": "視覺路徑",
+    "stem": "下列哪一構造受損最可能造成右下象限偏盲(right inferior quadrantanopia)？",
+    "options": {
+      "A": "左側外側膝狀體 lateral geniculate body",
+      "B": "左側枕葉上唇 cuneus",
+      "C": "左側枕葉下唇 lingual gyrus",
+      "D": "左側顳葉 Meyer's loop",
+      "E": "右側側腦室前角"
+    },
+    "answer": "D",
+    "explanation": "Meyer's loop 位於顳葉，攜帶來自對側視野上象限的纖維。左顳葉Meyer's loop受損導致右上象限偏盲，而非右下。右下象限偏盲是右顳葉受損，但題目問左側，所以正解為D左顳葉受損，因為視野路徑交叉。",
+    "testedConcept": "視放射路徑在顳葉與枕葉的分佈",
+    "sourceType": "AI_GENERATED",
+    "difficulty": "hard"
+  },
+  {
+    "id": "hb2-004",
+    "subject": "解剖學",
+    "chapter": "神經解剖",
+    "section": "聽覺與前庭路徑",
+    "stem": "聽神經瘤(acoustic neuroma)最常源於內耳道中哪一部分？其壓迫最早造成的症狀是什麼？",
+    "options": {
+      "A": "耳蝸神經；耳鳴與聽力減退",
+      "B": "前庭上枝；眩暈與平衡失調",
+      "C": "面神經；周邊性面癱",
+      "D": "迷走神經；吞嚥困難",
+      "E": "舌下神經；說話含糊不清"
+    },
+    "answer": "A",
+    "explanation": "聽神經瘤多起源於前庭耳蝸神經的耳蝸枝根部，首先影響聽力，出現耳鳴及感覺神經性耳聾；腫瘤增大後壓迫前庭神經與面神經。",
+    "testedConcept": "內耳道神經排列與聽神經瘤臨床表現",
+    "sourceType": "AI_GENERATED",
+    "difficulty": "hard"
+  },
+  {
+    "id": "hb2-005",
+    "subject": "解剖學",
+    "chapter": "神經解剖",
+    "section": "丘腦與基底核",
+    "stem": "Hemiballismus 是單側劇烈舞動樣運動，與下列哪一核團病變最相關？",
+    "options": {
+      "A": "豆狀核 lentiform nucleus",
+      "B": "尾狀核 caudate nucleus",
+      "C": "下丘腦 nucleus subthalamicus",
+      "D": "黑質 substantia nigra",
+      "E": "內側膝狀體 medial geniculate body"
+    },
+    "answer": "C",
+    "explanation": "半球舞蹈症(hemiballismus)通常由對側下丘腦核(subthalamic nucleus)出血或梗塞引起，失去對內節(globus pallidus internus)的抑制。",
+    "testedConcept": "基底核迴路與運動障礙",
+    "sourceType": "AI_GENERATED",
+    "difficulty": "hard"
+  },
+  {
+    "id": "hb2-006",
+    "subject": "解剖學",
+    "chapter": "神經解剖",
+    "section": "自律神經",
+    "stem": "一患者頸部外傷後出現同側眼瞼下垂、瞳孔縮小與無汗症，最可能損傷哪一條神經途徑？",
+    "options": {
+      "A": "副交感節前神經纖維parasympathetic preganglionic fibers",
+      "B": "交感節前神經纖維sympathetic preganglionic fibers",
+      "C": "交感節後神經纖維sympathetic postganglionic fibers",
+      "D": "延髓網狀系統reticulospinal tract",
+      "E": "三叉神經痛覺路徑trigeminothalamic tract"
+    },
+    "answer": "C",
+    "explanation": "頸部交感幹損傷造成霍納氏症候群，特徵為同側瞳孔縮小、眼瞼下垂、無汗。這是由於交感節後神經纖維受損。",
+    "testedConcept": "頸部交感神經鍊與霍納氏症候群",
+    "sourceType": "AI_GENERATED",
+    "difficulty": "hard"
+  },
+  {
+    "id": "hb2-007",
+    "subject": "解剖學",
+    "chapter": "頭頸部",
+    "section": "顏面神經與三叉神經",
+    "stem": "一名患者進行顳下頜關節手術後出現咬肌無力與下巴偏斜，其損傷最可能影響哪一神經分支？",
+    "options": {
+      "A": "顏面神經顴支 zygomatic branch of facial nerve",
+      "B": "顏面神經頰支 buccal branch of facial nerve",
+      "C": "三叉神經頜下神經 mandibular nerve (V3)",
+      "D": "舌咽神經 glossopharyngeal nerve",
+      "E": "迷走神經 vagus nerve"
+    },
+    "answer": "C",
+    "explanation": "咬肌、顳肌和翼外肌由三叉神經下頜支(V3)支配。手術損傷V3會導致咀嚼無力與下頜偏向受損側；顏面神經頰支只支配臉頰表情肌。",
+    "testedConcept": "三叉神經運動根支配肌群",
+    "sourceType": "AI_GENERATED",
+    "difficulty": "hard"
+  },
+  {
+    "id": "hb2-008",
+    "subject": "解剖學",
+    "chapter": "頭頸部",
+    "section": "頸動脈鞘",
+    "stem": "頸動脈鞘(carotid sheath)內的結構包括下列何者？",
+    "options": {
+      "A": "內頸動脈與頸內靜脈",
+      "B": "總頸動脈與腦底動脈",
+      "C": "頸內靜脈與橫突動脈",
+      "D": "副神經與脊髓神經 C4",
+      "E": "甲狀腺上下動脈與迷走神經"
+    },
+    "answer": "A",
+    "explanation": "頸動脈鞘包含內頸動脈或總頸動脈、頸內靜脈及迷走神經。鞘外側有副神經及交感幹。",
+    "testedConcept": "頸動脈鞘內容與位置",
+    "sourceType": "AI_GENERATED",
+    "difficulty": "hard"
+  },
+  {
+    "id": "hb2-009",
+    "subject": "解剖學",
+    "chapter": "頭頸部",
+    "section": "舌與味覺",
+    "stem": "關於舌的感覺神經支配，下列敘述何者正確？",
+    "options": {
+      "A": "舌前2/3的一般感覺由顏面神經(Facial nerve)支配",
+      "B": "舌前2/3的味覺由舌咽神經(Glossopharyngeal nerve)支配",
+      "C": "舌後1/3的一般感覺與味覺由舌咽神經支配",
+      "D": "會厭的味覺由舌下神經(Hypoglossal nerve)支配",
+      "E": "舌肌運動全部由三叉神經支配"
+    },
+    "answer": "C",
+    "explanation": "舌前2/3的一般感覺由三叉神經頜下支(V3)之舌神經提供，味覺由顏面神經的鼓索(chorda tympani)提供。舌後1/3一般感覺與味覺皆由舌咽神經傳遞。會厭味覺由迷走神經支配。",
+    "testedConcept": "舌一般與特殊感覺神經來源",
+    "sourceType": "AI_GENERATED",
+    "difficulty": "hard"
+  },
+  {
+    "id": "hb2-010",
+    "subject": "解剖學",
+    "chapter": "頭頸部",
+    "section": "甲狀腺與副甲狀腺",
+    "stem": "在甲狀腺手術中，為避免造成聲音沙啞，應特別注意保護下列哪一神經？",
+    "options": {
+      "A": "迷走神經 vagus nerve",
+      "B": "舌下神經 hypoglossal nerve",
+      "C": "三叉神經 mandibular division",
+      "D": "上喉神經 superior laryngeal nerve",
+      "E": "返喉神經 recurrent laryngeal nerve"
+    },
+    "answer": "E",
+    "explanation": "返喉神經(recurrent laryngeal nerve)位於甲狀腺後內側，支配所有內喉肌(除環甲肌外)。手術損傷會導致聲帶無法閉合及聲音嘶啞。",
+    "testedConcept": "返喉神經與甲狀腺手術風險",
+    "sourceType": "AI_GENERATED",
+    "difficulty": "hard"
+  },
+  {
+    "id": "hb2-011",
+    "subject": "解剖學",
+    "chapter": "胸腔",
+    "section": "心臟與冠狀動脈",
+    "stem": "一患者心肌梗塞後發現房室傳導阻滯，最可能因阻塞哪條冠狀動脈支？",
+    "options": {
+      "A": "右冠狀動脈後降支 posterior descending artery",
+      "B": "左回旋枝 circumflex branch",
+      "C": "左前降支 left anterior descending artery",
+      "D": "右心緣支 right marginal branch",
+      "E": "心臟靜脈冠狀竇 coronary sinus"
+    },
+    "answer": "A",
+    "explanation": "房室結大多由右冠狀動脈之後降支供血，因此該支阻塞可導致房室傳導阻滯。某些人解剖變異由左回旋枝供應。",
+    "testedConcept": "冠狀動脈分支與傳導系統供血",
+    "sourceType": "AI_GENERATED",
+    "difficulty": "hard"
+  },
+  {
+    "id": "hb2-012",
+    "subject": "解剖學",
+    "chapter": "胸腔",
+    "section": "縱膈",
+    "stem": "外科醫師在中縱膈穿刺檢查腫塊時，意外損傷橫膈神經(phrenic nerve)。下列哪個臨床後果最可能出現？",
+    "options": {
+      "A": "同側聲帶癱瘓",
+      "B": "肩胛提肌麻痺",
+      "C": "同側膈肌升高導致呼吸困難",
+      "D": "內臟痛覺喪失",
+      "E": "胸主動脈血壓下降"
+    },
+    "answer": "C",
+    "explanation": "橫膈神經(C3–C5)支配膈肌運動，穿過中縱膈行於心包前面。損傷導致同側膈肌麻痺，上升並影響呼吸。",
+    "testedConcept": "縱膈內容與橫膈神經走行",
+    "sourceType": "AI_GENERATED",
+    "difficulty": "hard"
+  },
+  {
+    "id": "hb2-013",
+    "subject": "解剖學",
+    "chapter": "胸腔",
+    "section": "肺與胸膜",
+    "stem": "右側第六肋間胸腔穿刺抽液時，穿刺針應置於肋骨的哪一位置以避免損傷肋間血管神經束？",
+    "options": {
+      "A": "肋骨上緣靠近肋骨中央",
+      "B": "肋骨下緣靠近肋骨中央",
+      "C": "肋骨下緣靠近肋間前線",
+      "D": "肋間的正中央",
+      "E": "肋骨上緣靠近肋間後線"
+    },
+    "answer": "A",
+    "explanation": "肋間血管與神經走於肋骨下緣，因此胸腔穿刺應從肋骨上緣進針以避免損傷血管神經束。",
+    "testedConcept": "肋間血管神經位置與胸腔穿刺技術",
+    "sourceType": "AI_GENERATED",
+    "difficulty": "hard"
+  },
+  {
+    "id": "hb2-014",
+    "subject": "解剖學",
+    "chapter": "腹部",
+    "section": "腹膜關係",
+    "stem": "小網膜囊(lesser sac)的前壁與後壁構成其界線，下列哪個構造不屬於小網膜囊的前壁？",
+    "options": {
+      "A": "肝左葉 caudate lobe of liver",
+      "B": "胃 posterior wall of stomach",
+      "C": "大網膜 greater omentum",
+      "D": "胰臟 anterior surface of pancreas",
+      "E": "胃小網膜 lesser omentum"
+    },
+    "answer": "D",
+    "explanation": "小網膜囊的前壁由肝尾葉、胃後壁及胃小網膜等構成，後壁包括胰臟前面、左腎及副腎。",
+    "testedConcept": "小網膜囊界限組成",
+    "sourceType": "AI_GENERATED",
+    "difficulty": "hard"
+  },
+  {
+    "id": "hb2-015",
+    "subject": "解剖學",
+    "chapter": "腹部",
+    "section": "胃腸道血管",
+    "stem": "上腸繫膜動脈(superior mesenteric artery)阻塞將不影響下列哪一腸段？",
+    "options": {
+      "A": "迴腸 ileum",
+      "B": "升結腸 ascending colon",
+      "C": "橫結腸近脾側 transverse colon (left half)",
+      "D": "盲腸 cecum",
+      "E": "闌尾 appendix"
+    },
+    "answer": "C",
+    "explanation": "上腸繫膜動脈供應從十二指腸遠端至橫結腸右2/3的腸段，而橫結腸脾側(左1/3)由下腸繫膜動脈供應。",
+    "testedConcept": "腸繫膜動脈分布區域",
+    "sourceType": "AI_GENERATED",
+    "difficulty": "hard"
+  },
+  {
+    "id": "hb2-016",
+    "subject": "解剖學",
+    "chapter": "腹部",
+    "section": "肝膽胰脾",
+    "stem": "在膽囊切除術中，Calot三角的界線由肝管、膽囊管及哪一構造所構成？",
+    "options": {
+      "A": "門靜脈 portal vein",
+      "B": "肝總管 common hepatic duct",
+      "C": "肝動脈 proper hepatic artery",
+      "D": "右肝動脈 right hepatic artery",
+      "E": "胰臟 head of pancreas"
+    },
+    "answer": "D",
+    "explanation": "Calot三角由肝臟下緣、膽囊管和肝總管構成，其內通常包含右肝動脈。切除術中需辨認此動脈以避免出血。",
+    "testedConcept": "Calot三角解剖與手術標誌",
+    "sourceType": "AI_GENERATED",
+    "difficulty": "hard"
+  },
+  {
+    "id": "hb2-017",
+    "subject": "解剖學",
+    "chapter": "腹部",
+    "section": "腎臟與後腹腔",
+    "stem": "腎臟周圍的被膜共有三層，下列哪一層直接包裹腎臟，具有防止感染蔓延的作用？",
+    "options": {
+      "A": "肾筋膜 renal fascia",
+      "B": "腎盂 renal pelvis",
+      "C": "腎被膜 renal capsule",
+      "D": "腎旁脂肪 pararenal fat",
+      "E": "腹膜 peritoneum"
+    },
+    "answer": "C",
+    "explanation": "腎實質外有纖維性腎被膜，外為腎脂肪囊與腎筋膜。腎被膜包裹腎臟，阻隔感染。",
+    "testedConcept": "腎臟被膜各層解剖",
+    "sourceType": "AI_GENERATED",
+    "difficulty": "hard"
+  },
+  {
+    "id": "hb2-018",
+    "subject": "解剖學",
+    "chapter": "骨盆與會陰",
+    "section": "骨盆血管",
+    "stem": "孕婦分娩時若陰道大量出血但子宮已收縮，可結紮哪條動脈以止血而不影響下肢血供？",
+    "options": {
+      "A": "內髂動脈 anterior division of internal iliac artery",
+      "B": "外髂動脈 external iliac artery",
+      "C": "卵巢動脈 ovarian artery",
+      "D": "陰部內動脈 internal pudendal artery",
+      "E": "腰動脈 lumbar arteries"
+    },
+    "answer": "A",
+    "explanation": "內髂動脈前支供應骨盆臟器及生殖器，結紮可減少子宮出血，但仍有側枝血供維持。外髂動脈供應下肢，不應結紮。",
+    "testedConcept": "內髂動脈分支與產科止血術",
+    "sourceType": "AI_GENERATED",
+    "difficulty": "hard"
+  },
+  {
+    "id": "hb2-019",
+    "subject": "解剖學",
+    "chapter": "骨盆與會陰",
+    "section": "泌尿生殖",
+    "stem": "女性尿失禁手術中，醫師需修補支持尿道的肌肉。下列哪條肌肉是尿道外括約肌最主要的部分？",
+    "options": {
+      "A": "閉孔內肌 obturator internus",
+      "B": "提肛肌 levator ani (pubococcygeus part)",
+      "C": "球海綿體肌 bulbospongiosus",
+      "D": "深會陰橫肌 deep transverse perineal muscle",
+      "E": "淺會陰橫肌 superficial transverse perineal muscle"
+    },
+    "answer": "D",
+    "explanation": "深會陰橫肌與尿道括約肌共同構成女性尿道的支持結構。提肛肌主要支持盆腔臟器。",
+    "testedConcept": "女性尿道括約肌與會陰肌群",
+    "sourceType": "AI_GENERATED",
+    "difficulty": "hard"
+  },
+  {
+    "id": "hb2-020",
+    "subject": "解剖學",
+    "chapter": "骨盆與會陰",
+    "section": "直腸與肛管",
+    "stem": "關於肛管齒狀線(dentate line)的臨床意義，下列敘述何者正確？",
+    "options": {
+      "A": "齒狀線以上疼痛敏感，以下不敏感",
+      "B": "齒狀線以上靜脈回流至門脈系統，以下回流至系統循環",
+      "C": "齒狀線以上發生的痔瘡為外痔(external hemorrhoids)",
+      "D": "齒狀線以下淋巴引流至腸繫膜上淋巴結",
+      "E": "齒狀線沒有臨床區別"
+    },
+    "answer": "B",
+    "explanation": "齒狀線以上由內臟感覺神經支配，疼痛不敏感，靜脈回流至門脈系統。以下由體感神經支配，疼痛敏感，靜脈回流至下腸繫膜與內髂靜脈。內痔發生於齒狀線以上，外痔以下。",
+    "testedConcept": "肛管齒狀線的血管與神經分布",
+    "sourceType": "AI_GENERATED",
+    "difficulty": "hard"
+  },
+  {
+    "id": "hb2-021",
+    "subject": "解剖學",
+    "chapter": "上肢",
+    "section": "臂神經叢",
+    "stem": "一名工人肩部受傷後出現肩胛骨突起，難以舉臂，考慮是長胸神經(long thoracic nerve)損傷。此神經支配哪一肌肉？",
+    "options": {
+      "A": "斜方肌 trapezius",
+      "B": "菱形肌 rhomboid major",
+      "C": "前鋸肌 serratus anterior",
+      "D": "棘上肌 supraspinatus",
+      "E": "肩胛提肌 levator scapulae"
+    },
+    "answer": "C",
+    "explanation": "長胸神經(C5–C7)支配前鋸肌。受損會造成肩胛骨翼狀，影響上肢外展。",
+    "testedConcept": "臂神經叢長胸神經與前鋸肌功能",
+    "sourceType": "AI_GENERATED",
+    "difficulty": "hard"
+  },
+  {
+    "id": "hb2-022",
+    "subject": "解剖學",
+    "chapter": "上肢",
+    "section": "肩胛區",
+    "stem": "肩袖(rotator cuff)肌群損傷常導致肩關節不穩。下列哪一肌不屬於肩袖？",
+    "options": {
+      "A": "棘上肌 supraspinatus",
+      "B": "棘下肌 infraspinatus",
+      "C": "小圓肌 teres minor",
+      "D": "肩胛下肌 subscapularis",
+      "E": "闊背肌 latissimus dorsi"
+    },
+    "answer": "E",
+    "explanation": "肩袖由四肌構成：棘上肌、棘下肌、小圓肌及肩胛下肌。闊背肌為背肌，未參與肩袖。",
+    "testedConcept": "肩袖構成肌群",
+    "sourceType": "AI_GENERATED",
+    "difficulty": "hard"
+  },
+  {
+    "id": "hb2-023",
+    "subject": "解剖學",
+    "chapter": "上肢",
+    "section": "前臂屈伸肌",
+    "stem": "尺神經損傷最常影響哪一手部動作？",
+    "options": {
+      "A": "拇指對掌 opposition of thumb",
+      "B": "手腕背屈 wrist extension",
+      "C": "中指外展 abduction of middle finger",
+      "D": "食指屈曲 flexion of index finger",
+      "E": "前臂旋後 supination"
+    },
+    "answer": "C",
+    "explanation": "尺神經支配手內在肌包括骨間肌(interossei)，負責指外展與內收。中指外展主要由掌骨間肌支配。拇指對掌由正中神經支配。",
+    "testedConcept": "尺神經支配的手內在肌功能",
+    "sourceType": "AI_GENERATED",
+    "difficulty": "hard"
+  },
+  {
+    "id": "hb2-024",
+    "subject": "解剖學",
+    "chapter": "上肢",
+    "section": "上肢血管",
+    "stem": "上肢血管攝影發現肱動脈中段受傷，為維持手部血供，可用下列哪條動脈與遠側肱動脈進行吻合？",
+    "options": {
+      "A": "肩峰旋動脈 circumflex scapular artery",
+      "B": "深肱動脈 profunda brachii artery",
+      "C": "胸背動脈 thoracodorsal artery",
+      "D": "橈動脈 radial artery",
+      "E": "尺動脈 ulnar artery"
+    },
+    "answer": "B",
+    "explanation": "深肱動脈自肱動脈近段分出，經三頭肌間與肱骨後面形成動脈環，可與遠側肱動脈吻合。",
+    "testedConcept": "肱動脈分支與側枝循環",
+    "sourceType": "AI_GENERATED",
+    "difficulty": "hard"
+  },
+  {
+    "id": "hb2-025",
+    "subject": "解剖學",
+    "chapter": "下肢",
+    "section": "腰薦神經叢",
+    "stem": "股骨頸骨折後患者無法伸展膝關節與髖關節屈曲，膝反射消失，最可能損傷哪條神經？",
+    "options": {
+      "A": "坐骨神經 sciatic nerve",
+      "B": "閉孔神經 obturator nerve",
+      "C": "股神經 femoral nerve",
+      "D": "髂腹下神經 iliohypogastric nerve",
+      "E": "陰部神經 pudendal nerve"
+    },
+    "answer": "C",
+    "explanation": "股神經支配大腿前群肌負責膝伸與髖屈，並提供股四頭肌反射。骨折或髖關節脫位可損傷股神經。",
+    "testedConcept": "股神經功能與髖部外傷後表現",
+    "sourceType": "AI_GENERATED",
+    "difficulty": "hard"
+  },
+  {
+    "id": "hb2-026",
+    "subject": "解剖學",
+    "chapter": "下肢",
+    "section": "臀區",
+    "stem": "臀部肌肉注射部位選擇上外象限以避免損傷哪一神經？",
+    "options": {
+      "A": "坐骨神經 sciatic nerve",
+      "B": "股外側皮神經 lateral femoral cutaneous nerve",
+      "C": "臀上神經 superior gluteal nerve",
+      "D": "內陰神經 pudendal nerve",
+      "E": "梨狀肌神經 nerve to piriformis"
+    },
+    "answer": "A",
+    "explanation": "坐骨神經位於臀區下內象限，為避免損傷，肌肉注射應選擇臀部上外象限。",
+    "testedConcept": "臀區神經解剖與注射安全區",
+    "sourceType": "AI_GENERATED",
+    "difficulty": "hard"
+  },
+  {
+    "id": "hb2-027",
+    "subject": "解剖學",
+    "chapter": "下肢",
+    "section": "大腿前內後區",
+    "stem": "一患者大腿內側麻木且內收力量減弱，最可能受損的神經是？",
+    "options": {
+      "A": "股神經 femoral nerve",
+      "B": "閉孔神經 obturator nerve",
+      "C": "坐骨神經 sciatic nerve",
+      "D": "脛神經 tibial nerve",
+      "E": "腓總神經 common fibular nerve"
+    },
+    "answer": "B",
+    "explanation": "閉孔神經支配內收肌群並為大腿內側皮感神經，受損會導致內收無力與內側皮膚麻木。",
+    "testedConcept": "閉孔神經功能與臨床檢測",
+    "sourceType": "AI_GENERATED",
+    "difficulty": "hard"
+  },
+  {
+    "id": "hb2-028",
+    "subject": "解剖學",
+    "chapter": "下肢",
+    "section": "小腿肌群",
+    "stem": "跌倒後腓骨頸骨折，患者無法背屈與外翻足，並出現足下垂趾掌關節拖曳，最可能損傷哪條神經？",
+    "options": {
+      "A": "脛神經 tibial nerve",
+      "B": "腓總神經 common fibular nerve",
+      "C": "淺腓神經 superficial fibular nerve",
+      "D": "深腓神經 deep fibular nerve",
+      "E": "閉孔神經 obturator nerve"
+    },
+    "answer": "B",
+    "explanation": "腓總神經環繞腓骨頭易受損，受損後影響所有足背屈與外翻肌，導致足下垂及外翻困難。深腓神經主要影響背屈，淺腓神經影響外翻，但二者皆屬腓總神經分支。",
+    "testedConcept": "腓總神經在膝外側的脆弱部位與功能",
+    "sourceType": "AI_GENERATED",
+    "difficulty": "hard"
+  },
+  {
+    "id": "hb2-029",
+    "subject": "解剖學",
+    "chapter": "下肢",
+    "section": "足部",
+    "stem": "胼狀束(pes planus)患者足弓塌陷，最主要與下列哪一肌腱無力有關？",
+    "options": {
+      "A": "腓骨長肌 tendon of fibularis longus",
+      "B": "脛骨後肌 tendon of tibialis posterior",
+      "C": "脛骨前肌 tendon of tibialis anterior",
+      "D": "趾長屈肌 tendon of flexor digitorum longus",
+      "E": "趾長伸肌 tendon of extensor digitorum longus"
+    },
+    "answer": "B",
+    "explanation": "脛骨後肌的肌腱支撐內側縱弓，其無力或斷裂會導致扁平足。腓骨長肌支撐橫弓，脛骨前肌支撐內側弓但在步行時主要作用於背屈。",
+    "testedConcept": "足弓支撐機制與相關肌腱",
+    "sourceType": "AI_GENERATED",
+    "difficulty": "hard"
+  },
+  {
+    "id": "hb2-030",
+    "subject": "解剖學",
+    "chapter": "下肢",
+    "section": "下肢血管",
+    "stem": "膝窩動脈瘤可壓迫膕動脈神經而導致感覺異常。膝窩動脈為下列哪條動脈的延續？",
+    "options": {
+      "A": "深股動脈 profunda femoris artery",
+      "B": "閉孔動脈 obturator artery",
+      "C": "股動脈 femoral artery",
+      "D": "脛後動脈 posterior tibial artery",
+      "E": "脛前動脈 anterior tibial artery"
+    },
+    "answer": "C",
+    "explanation": "股動脈穿經收肌腔後名稱改為膕動脈(popiteal artery)，於膝窩分出前後脛動脈。膝窩動脈瘤可壓迫脛神經造成症狀。",
+    "testedConcept": "股動脈延續與膝窩區解剖",
+    "sourceType": "AI_GENERATED",
+    "difficulty": "hard"
+  },
+  null,
+  {
+    "id": "MOEX-100140-1101-Q001",
+    "subject": "解剖學",
+    "chapter": "下肢",
+    "section": "下肢血管",
+    "stem": "當懷疑病人有下肢周邊血管阻塞疾病時，可觸摸檢查以下血管脈搏，何者例外？",
+    "options": {
+      "A": "膕動脈（popliteal artery）",
+      "B": "脛後動脈（posterior tibial artery）",
+      "C": "腓動脈（fibular artery）",
+      "D": "足背動脈（pedis dorsalis artery）"
+    },
+    "answer": "C",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "膕動脈與膝窩解剖",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 100 年第二次醫師一階醫學（一）",
+    "sourceYear": 2011,
+    "sourceRound": 2,
+    "originalQuestionNumber": 1
+  },
+  {
+    "id": "MOEX-100140-1101-Q002",
+    "subject": "解剖學",
+    "chapter": "下肢",
+    "section": "足部",
+    "stem": "32 歲男性，左小腿前側被他人以刀子刺入，他感覺到左足背側第一趾與第二趾之間有麻麻的感覺， 這可能是那一條神經受到損傷？",
+    "options": {
+      "A": "腓深神經（deep fibular nerve）",
+      "B": "腓淺神經（superficial fibular nerve）",
+      "C": "脛神經（tibial nerve）",
+      "D": "隱神經（saphenous nerve）"
+    },
+    "answer": "A",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "第一趾蹼間感覺與腓深神經",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 100 年第二次醫師一階醫學（一）",
+    "sourceYear": 2011,
+    "sourceRound": 2,
+    "originalQuestionNumber": 2
+  },
+  {
+    "id": "MOEX-100140-1101-Q003",
+    "subject": "解剖學",
+    "chapter": "下肢",
+    "section": "小腿肌群",
+    "stem": "承上題，此病人是在小腿前側遭到刀子刺入，可能是前區隔（anterior compartment）受到傷害，但不 包括下列何肌？",
+    "options": {
+      "A": "脛前肌（tibialis anterior）",
+      "B": "伸長肌（extensor hallucis longus）",
+      "C": "伸趾長肌（extensor digitorum longus）",
+      "D": "脛後肌（tibialis posterior）"
+    },
+    "answer": "D",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "小腿前群肌肉",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 100 年第二次醫師一階醫學（一）",
+    "sourceYear": 2011,
+    "sourceRound": 2,
+    "originalQuestionNumber": 3
+  },
+  {
+    "id": "MOEX-100140-1101-Q004",
+    "subject": "解剖學",
+    "chapter": "下肢",
+    "section": "小腿肌群",
+    "stem": "承上題，此病人被送到醫院，傷口經沖洗、止血，神經、肌肉縫合之後，傷口縫起來，前區隔（anterior compartment）內的肌肉很重要，它主要的功能是什麼？",
+    "options": {
+      "A": "足蹠屈（plantarflex the foot）",
+      "B": "膝屈（knee flexion）",
+      "C": "足背屈（dorsiflex the foot）",
+      "D": "屈（flex the great toe）"
+    },
+    "answer": "C",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "小腿前群肌肉",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 100 年第二次醫師一階醫學（一）",
+    "sourceYear": 2011,
+    "sourceRound": 2,
+    "originalQuestionNumber": 4
+  },
+  {
+    "id": "MOEX-100140-1101-Q005",
+    "subject": "解剖學",
+    "chapter": "下肢",
+    "section": "大腿前內後區",
+    "stem": "下列何者受坐骨神經（sciatic nerve）支配？",
+    "options": {
+      "A": "內收長肌（adductor longus）",
+      "B": "恥骨肌（pectineus）",
+      "C": "股薄肌（gracilis）",
+      "D": "內收大肌（adductor magnus）"
+    },
+    "answer": "D",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "大腿內收肌群",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 100 年第二次醫師一階醫學（一）",
+    "sourceYear": 2011,
+    "sourceRound": 2,
+    "originalQuestionNumber": 5
+  },
+  {
+    "id": "MOEX-100140-1101-Q006",
+    "subject": "解剖學",
+    "chapter": "下肢",
+    "section": "下肢血管",
+    "stem": "下列何者沒有發出分支構成膝關節動脈吻合網（genicular anastomosis）？",
+    "options": {
+      "A": "股動脈（femoral artery）",
+      "B": "膕動脈（popliteal artery）",
+      "C": "腓動脈（fibular artery）",
+      "D": "脛前動脈（anterior tibial artery）"
+    },
+    "answer": "C",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "膕動脈與膝窩解剖",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 100 年第二次醫師一階醫學（一）",
+    "sourceYear": 2011,
+    "sourceRound": 2,
+    "originalQuestionNumber": 6
+  },
+  {
+    "id": "MOEX-100140-1101-Q007",
+    "subject": "解剖學",
+    "chapter": "上肢",
+    "section": "肩胛區",
+    "stem": "盂肱關節（glenohumeral joint）中連接肱骨大、小結節同時固定肱二頭肌長頭之肌腱的韌帶為何？",
+    "options": {
+      "A": "上盂肱韌帶（superior glenohumeral ligament）",
+      "B": "下盂肱韌帶（inferior glenohumeral ligament）",
+      "C": "喙肱韌帶（coracohumeral ligament）",
+      "D": "肱骨橫韌帶（transverse humeral ligament）"
+    },
+    "answer": "D",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "肩關節穩定構造",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 100 年第二次醫師一階醫學（一）",
+    "sourceYear": 2011,
+    "sourceRound": 2,
+    "originalQuestionNumber": 7
+  },
+  {
+    "id": "MOEX-100140-1101-Q008",
+    "subject": "解剖學",
+    "chapter": "上肢",
+    "section": "肩胛區",
+    "stem": "肩胛棘（scapular spine）的內側相當於下列何者的高度？",
+    "options": {
+      "A": "第一胸椎",
+      "B": "第三胸椎",
+      "C": "第五胸椎",
+      "D": "第七胸椎"
+    },
+    "answer": "B",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "肩胛區｜肩胛棘（scapular spine）的內側",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 100 年第二次醫師一階醫學（一）",
+    "sourceYear": 2011,
+    "sourceRound": 2,
+    "originalQuestionNumber": 8
+  },
+  {
+    "id": "MOEX-100140-1101-Q010",
+    "subject": "解剖學",
+    "chapter": "頭頸部",
+    "section": "顏面神經與三叉神經",
+    "stem": "顏面神經若受傷不會產生下列何項症狀？",
+    "options": {
+      "A": "嘴角下垂",
+      "B": "食物堆積在口腔前庭",
+      "C": "微笑表情障礙",
+      "D": "提上眼瞼肌無力"
+    },
+    "answer": "D",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "顏面神經與腮腺關係",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 100 年第二次醫師一階醫學（一）",
+    "sourceYear": 2011,
+    "sourceRound": 2,
+    "originalQuestionNumber": 10
+  },
+  {
+    "id": "MOEX-100140-1101-Q011",
+    "subject": "解剖學",
+    "chapter": "上肢",
+    "section": "肩胛區",
+    "stem": "下列何者不構成手臂四角形空間（quadrangular space）的邊緣？",
+    "options": {
+      "A": "小菱形肌（rhomboid minor）",
+      "B": "肱骨（humerus）",
+      "C": "大圓肌（teres major）",
+      "D": "肱三頭肌的長頭（long head of triceps brachii）"
+    },
+    "answer": "A",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "四角形空間內容物",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 100 年第二次醫師一階醫學（一）",
+    "sourceYear": 2011,
+    "sourceRound": 2,
+    "originalQuestionNumber": 11
+  },
+  {
+    "id": "MOEX-100140-1101-Q012",
+    "subject": "解剖學",
+    "chapter": "骨盆與會陰",
+    "section": "直腸與肛管",
+    "stem": "肛門外括約肌由下列何者直接支配？",
+    "options": {
+      "A": "腹下神經",
+      "B": "陰部神經",
+      "C": "肛門下神經",
+      "D": "骨盆內臟神經"
+    },
+    "answer": "C",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "肛門外括約肌神經支配",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 100 年第二次醫師一階醫學（一）",
+    "sourceYear": 2011,
+    "sourceRound": 2,
+    "originalQuestionNumber": 12
+  },
+  {
+    "id": "MOEX-100140-1101-Q013",
+    "subject": "解剖學",
+    "chapter": "神經解剖",
+    "section": "丘腦與基底核",
+    "stem": "下列何者不是黑質網狀部（pars reticulata of the substantia nigra）GABAergic 神經元之直接投射區域？",
+    "options": {
+      "A": "蒼白核（globus pallidus）",
+      "B": "上丘（superior colliculus）",
+      "C": "橋腦大腦腳核（pedunculopontine nucleus）",
+      "D": "丘腦（thalamus）"
+    },
+    "answer": "A",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "黑質功能",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 100 年第二次醫師一階醫學（一）",
+    "sourceYear": 2011,
+    "sourceRound": 2,
+    "originalQuestionNumber": 13
+  },
+  {
+    "id": "MOEX-100140-1101-Q014",
+    "subject": "解剖學",
+    "chapter": "骨盆與會陰",
+    "section": "會陰三角",
+    "stem": "下列何者為骨盆橫膈的一部分？",
+    "options": {
+      "A": "梨狀肌",
+      "B": "提肛肌",
+      "C": "閉孔內肌",
+      "D": "會陰淺橫肌"
+    },
+    "answer": "B",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "骨盆底與會陰支持",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 100 年第二次醫師一階醫學（一）",
+    "sourceYear": 2011,
+    "sourceRound": 2,
+    "originalQuestionNumber": 14
+  },
+  {
+    "id": "MOEX-100140-1101-Q015",
+    "subject": "解剖學",
+    "chapter": "骨盆與會陰",
+    "section": "會陰三角",
+    "stem": "下列何者為連接卵巢與子宮的構造？",
+    "options": {
+      "A": "懸韌帶",
+      "B": "卵巢繫膜",
+      "C": "卵巢韌帶",
+      "D": "子宮圓韌帶"
+    },
+    "answer": "C",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "會陰三角｜下列何者為連接卵巢與子宮的構造",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 100 年第二次醫師一階醫學（一）",
+    "sourceYear": 2011,
+    "sourceRound": 2,
+    "originalQuestionNumber": 15
+  },
+  {
+    "id": "MOEX-100140-1101-Q017",
+    "subject": "解剖學",
+    "chapter": "胸腔",
+    "section": "橫膈",
+    "stem": "橫膈（diaphragm）上相對於第十胸椎的裂口是下列何結構？",
+    "options": {
+      "A": "主動脈裂口（aortic hiatus）",
+      "B": "食道裂口（esophageal hiatus）",
+      "C": "腔靜脈裂口（caval opening）",
+      "D": "奇靜脈裂口（azygal opening）"
+    },
+    "answer": "B",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "橫膈｜橫膈（diaphragm）上相對於第十胸椎的",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 100 年第二次醫師一階醫學（一）",
+    "sourceYear": 2011,
+    "sourceRound": 2,
+    "originalQuestionNumber": 17
+  },
+  {
+    "id": "MOEX-100140-1101-Q018",
+    "subject": "解剖學",
+    "chapter": "胸腔",
+    "section": "縱膈",
+    "stem": "下列何者與右冠狀動脈的邊緣枝（marginal branch）併走？",
+    "options": {
+      "A": "心前靜脈（anterior cardiac vein）",
+      "B": "心大靜脈（great cardiac vein）",
+      "C": "心中靜脈（middle cardiac vein）",
+      "D": "心小靜脈（small cardiac vein）"
+    },
+    "answer": "D",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "縱膈｜下列何者與右冠狀動脈的邊緣枝（margina",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 100 年第二次醫師一階醫學（一）",
+    "sourceYear": 2011,
+    "sourceRound": 2,
+    "originalQuestionNumber": 18
+  },
+  {
+    "id": "MOEX-100140-1101-Q024",
+    "subject": "解剖學",
+    "chapter": "胸腔",
+    "section": "肺與胸膜",
+    "stem": "下列關於胸腔穿刺（thoracentesis）敘述何者錯誤？",
+    "options": {
+      "A": "需避開肋骨下緣之肋間神經、血管（intercostal nerve, vessel）",
+      "B": "穿刺時需在吐氣（expiration）時進行",
+      "C": "一般在第九肋間穿刺最適當",
+      "D": "常在鎖骨中線（midclavicular line）位置進行穿刺"
+    },
+    "answer": "D",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "胸腔穿刺解剖",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 100 年第二次醫師一階醫學（一）",
+    "sourceYear": 2011,
+    "sourceRound": 2,
+    "originalQuestionNumber": 24
+  },
+  {
+    "id": "MOEX-100140-1101-Q025",
+    "subject": "解剖學",
+    "chapter": "神經解剖",
+    "section": "自律神經",
+    "stem": "若病人出現縮瞳（miosis），一側面部出汗減少（anhydrosis），上眼瞼下垂（ptosis）等 Horner 徵候 群，其三種典型臨床症狀皆出現時，最不可能為下列何種疾病所引發？",
+    "options": {
+      "A": "頸總動脈剝離（common carotid artery dissection）",
+      "B": "頸外動脈（external carotid artery）損傷",
+      "C": "腦幹栓塞性中風（brainstem infarction）",
+      "D": "頸上神經節（superior cervical ganglion）損傷"
+    },
+    "answer": "B",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "Horner syndrome 路徑",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 100 年第二次醫師一階醫學（一）",
+    "sourceYear": 2011,
+    "sourceRound": 2,
+    "originalQuestionNumber": 25
+  },
+  {
+    "id": "MOEX-100140-1101-Q028",
+    "subject": "解剖學",
+    "chapter": "下肢",
+    "section": "腰薦神經叢",
+    "stem": "下列何者參與下肢本體覺的傳遞？",
+    "options": {
+      "A": "外側頸核（lateral cervical nucleus）",
+      "B": "薄核（gracile nucleus）",
+      "C": "楔狀核（cuneate nucleus）",
+      "D": "弓狀核（arcuate nucleus）"
+    },
+    "answer": "B",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "腰薦神經叢｜下列何者參與下肢本體覺的傳遞",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 100 年第二次醫師一階醫學（一）",
+    "sourceYear": 2011,
+    "sourceRound": 2,
+    "originalQuestionNumber": 28
+  },
+  {
+    "id": "MOEX-100140-1101-Q051",
+    "subject": "解剖學",
+    "chapter": "骨盆與會陰",
+    "section": "會陰三角",
+    "stem": "一位男性因其陰莖出現潰瘍而就醫，經醫師診察後發現其潰瘍處界限分明，表面呈肉紅色糜爛，觸 摸時可感覺皮下似埋有一鈕扣，是為硬性下疳的症狀，且患者無壓痛感，但壓時有清澈之滲出液溢 出，經 VDRL 試驗呈陽性反應，表示該病人可能患有何種疾病？",
+    "options": {
+      "A": "梅毒（syphilis）",
+      "B": "疹（herpes）",
+      "C": "淋病（gonorrhea）",
+      "D": "生殖器濕疣（anogenital warts）"
+    },
+    "answer": "A",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "會陰三角｜一位男性因其陰莖出現潰瘍而就醫，經醫師診察後",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 100 年第二次醫師一階醫學（一）",
+    "sourceYear": 2011,
+    "sourceRound": 2,
+    "originalQuestionNumber": 51
+  },
+  {
+    "id": "MOEX-100140-1101-Q076",
+    "subject": "解剖學",
+    "chapter": "胸腔",
+    "section": "縱膈",
+    "stem": "下列有關隱翅蟲之敘述，何者錯誤？",
+    "options": {
+      "A": "臺灣地區最常見的是褐毒隱翅蟲（Paederus fusca）",
+      "B": "隱翅蟲的毒害是由蟲體螫咬人體所致",
+      "C": "隱翅蟲素（pederin）附著皮膚後會產生緩慢痊癒的壞死性紅斑",
+      "D": "待病灶痊癒後，若未再接觸隱翅蟲素，一般不用擔心復發的問題"
+    },
+    "answer": "B",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "縱膈｜下列有關隱翅蟲之敘述，何者錯誤",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 100 年第二次醫師一階醫學（一）",
+    "sourceYear": 2011,
+    "sourceRound": 2,
+    "originalQuestionNumber": 76
+  },
+  {
+    "id": "MOEX-100140-1101-Q086",
+    "subject": "解剖學",
+    "chapter": "上肢",
+    "section": "上肢血管",
+    "stem": "下列那一項是最能證明愛滋病預防教育執行成功的指標？",
+    "options": {
+      "A": "民眾從事安全性行為（使用保險套）的比率提高",
+      "B": "愛滋病患的病情在臨床上獲得有效控制",
+      "C": "醫院發出愛滋病預防教育單張的數量增加",
+      "D": "參加愛滋病衛生教育活動的人數增多"
+    },
+    "answer": "A",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "上肢血管｜下列那一項是最能證明愛滋病預防教育執行成功的",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 100 年第二次醫師一階醫學（一）",
+    "sourceYear": 2011,
+    "sourceRound": 2,
+    "originalQuestionNumber": 86
+  },
+  {
+    "id": "MOEX-100140-1101-Q087",
+    "subject": "解剖學",
+    "chapter": "上肢",
+    "section": "上肢血管",
+    "stem": "衛生教育的「衝擊評價（impact evaluation）」是指下列那一種做法？",
+    "options": {
+      "A": "檢視民眾是否出席衛教活動",
+      "B": "檢視教學者有無衛教企劃書",
+      "C": "檢視民眾的知識和態度是否改變",
+      "D": "檢視民眾的疾病死亡率是否下降"
+    },
+    "answer": "C",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "上肢血管｜衛生教育的「衝擊評價（impact eval",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 100 年第二次醫師一階醫學（一）",
+    "sourceYear": 2011,
+    "sourceRound": 2,
+    "originalQuestionNumber": 87
+  },
+  {
+    "id": "MOEX-100140-1101-Q091",
+    "subject": "解剖學",
+    "chapter": "胸腔",
+    "section": "縱膈",
+    "stem": "下列何者屬於正向心理健康的表現？",
+    "options": {
+      "A": "尊重接納他人",
+      "B": "忽視身體傷病",
+      "C": "壓抑負面情緒",
+      "D": "刻板社會角色"
+    },
+    "answer": "A",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "縱膈｜下列何者屬於正向心理健康的表現",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 100 年第二次醫師一階醫學（一）",
+    "sourceYear": 2011,
+    "sourceRound": 2,
+    "originalQuestionNumber": 91
+  },
+  {
+    "id": "MOEX-101030-1101-Q002",
+    "subject": "解剖學",
+    "chapter": "胸腔",
+    "section": "縱膈",
+    "stem": "沿腋中線在第 9 肋間作胸腔穿刺，針尖所在的位置是：",
+    "options": {
+      "A": "肺門（hilum of the lung）",
+      "B": "心切痕（cardiac notch）",
+      "C": "肋橫膈隱窩（costodiaphragmatic recess）",
+      "D": "肋縱膈隱窩（costomediastinal recess）"
+    },
+    "answer": "C",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "縱膈｜沿腋中線在第 9 肋間作胸腔穿刺，針尖所在的",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 101 年第一次醫師一階醫學（一）",
+    "sourceYear": 2012,
+    "sourceRound": 1,
+    "originalQuestionNumber": 2
+  },
+  {
+    "id": "MOEX-101030-1101-Q004",
+    "subject": "解剖學",
+    "chapter": "頭頸部",
+    "section": "咽喉解剖",
+    "stem": "下列何者是迷走神經所支配的器官？",
+    "options": {
+      "A": "卵巢",
+      "B": "直腸",
+      "C": "子宮",
+      "D": "陰道"
+    },
+    "answer": "A",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "咽喉解剖｜下列何者是迷走神經所支配的器官",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 101 年第一次醫師一階醫學（一）",
+    "sourceYear": 2012,
+    "sourceRound": 1,
+    "originalQuestionNumber": 4
+  },
+  {
+    "id": "MOEX-101030-1101-Q005",
+    "subject": "解剖學",
+    "chapter": "骨盆與會陰",
+    "section": "會陰三角",
+    "stem": "下列何者直接連結膀胱的頂端（apex）？",
+    "options": {
+      "A": "懸韌帶",
+      "B": "臍外韌帶",
+      "C": "臍內韌帶",
+      "D": "臍正中韌帶"
+    },
+    "answer": "D",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "會陰三角｜下列何者直接連結膀胱的頂端（apex）",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 101 年第一次醫師一階醫學（一）",
+    "sourceYear": 2012,
+    "sourceRound": 1,
+    "originalQuestionNumber": 5
+  },
+  {
+    "id": "MOEX-101030-1101-Q006",
+    "subject": "解剖學",
+    "chapter": "下肢",
+    "section": "腰薦神經叢",
+    "stem": "闊筋膜張肌（tensor fasciae latae）退化萎縮，可能因下列何者受損而造成？",
+    "options": {
+      "A": "臀上神經",
+      "B": "臀下神經",
+      "C": "閉孔神經",
+      "D": "坐骨神經"
+    },
+    "answer": "A",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "坐骨神經支配",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 101 年第一次醫師一階醫學（一）",
+    "sourceYear": 2012,
+    "sourceRound": 1,
+    "originalQuestionNumber": 6
+  },
+  {
+    "id": "MOEX-101030-1101-Q007",
+    "subject": "解剖學",
+    "chapter": "上肢",
+    "section": "上肢血管",
+    "stem": "下列何者不屬於屈戌關節（hinge joint）？",
+    "options": {
+      "A": "肩關節（Shoulder joint）",
+      "B": "踝關節（Ankle joint）",
+      "C": "肘關節（Elbow joint）",
+      "D": "指間關節（Interphalangeal joint）"
+    },
+    "answer": "A",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "上肢血管｜下列何者不屬於屈戌關節（hinge join",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 101 年第一次醫師一階醫學（一）",
+    "sourceYear": 2012,
+    "sourceRound": 1,
+    "originalQuestionNumber": 7
+  },
+  {
+    "id": "MOEX-101030-1101-Q008",
+    "subject": "解剖學",
+    "chapter": "上肢",
+    "section": "上肢血管",
+    "stem": "肱骨內上髁（medial epicondyle）骨折最可能傷害下列何者？",
+    "options": {
+      "A": "肌皮神經",
+      "B": "正中神經",
+      "C": "橈神經",
+      "D": "尺神經"
+    },
+    "answer": "D",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "上肢血管｜肱骨內上髁（medial epicondyl",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 101 年第一次醫師一階醫學（一）",
+    "sourceYear": 2012,
+    "sourceRound": 1,
+    "originalQuestionNumber": 8
+  },
+  {
+    "id": "MOEX-101030-1101-Q009",
+    "subject": "解剖學",
+    "chapter": "下肢",
+    "section": "小腿肌群",
+    "stem": "小腿骨折造成足踝無法背屈（dorsiflexion），下列何者最可能受傷？",
+    "options": {
+      "A": "股神經",
+      "B": "腓神經",
+      "C": "脛神經",
+      "D": "坐骨神經"
+    },
+    "answer": "B",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "小腿肌群｜小腿骨折造成足踝無法背屈（dorsiflex",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 101 年第一次醫師一階醫學（一）",
+    "sourceYear": 2012,
+    "sourceRound": 1,
+    "originalQuestionNumber": 9
+  },
+  {
+    "id": "MOEX-101030-1101-Q010",
+    "subject": "解剖學",
+    "chapter": "上肢",
+    "section": "手部肌肉",
+    "stem": "下列有關手部神經支配的敘述，何者錯誤？",
+    "options": {
+      "A": "正中神經是負責手掌大拇指側感覺的主要神經",
+      "B": "尺神經負責手掌內側的感覺",
+      "C": "橈神經負責整個手背的感覺",
+      "D": "尺神經受傷，會造成第四及第五指的遠端指間關節不能屈曲"
+    },
+    "answer": "C",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "手部肌肉｜下列有關手部神經支配的敘述，何者錯誤",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 101 年第一次醫師一階醫學（一）",
+    "sourceYear": 2012,
+    "sourceRound": 1,
+    "originalQuestionNumber": 10
+  },
+  {
+    "id": "MOEX-101030-1101-Q011",
+    "subject": "解剖學",
+    "chapter": "胸腔",
+    "section": "縱膈",
+    "stem": "下列何者屬於肩旋轉肌群？",
+    "options": {
+      "A": "小圓肌",
+      "B": "胸大肌",
+      "C": "提肩胛肌",
+      "D": "大菱形肌"
+    },
+    "answer": "A",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "縱膈｜下列何者屬於肩旋轉肌群",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 101 年第一次醫師一階醫學（一）",
+    "sourceYear": 2012,
+    "sourceRound": 1,
+    "originalQuestionNumber": 11
+  },
+  {
+    "id": "MOEX-101030-1101-Q012",
+    "subject": "解剖學",
+    "chapter": "神經解剖",
+    "section": "視覺路徑",
+    "stem": "雙眼外側視野二分之一缺損（bilateral temporal hemianopia），最可能的損傷部位是：",
+    "options": {
+      "A": "視神經（optic nerve）",
+      "B": "外側膝狀體（lateral geniculate body）",
+      "C": "視徑（optic tract）",
+      "D": "視交叉（optic chiasm）"
+    },
+    "answer": "D",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "視交叉病灶",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 101 年第一次醫師一階醫學（一）",
+    "sourceYear": 2012,
+    "sourceRound": 1,
+    "originalQuestionNumber": 12
+  },
+  {
+    "id": "MOEX-101030-1101-Q013",
+    "subject": "解剖學",
+    "chapter": "胸腔",
+    "section": "縱膈",
+    "stem": "胸骨旁，第五肋間深約 1 公分的穿刺傷，造成大量出血，最可能受傷的動脈是：",
+    "options": {
+      "A": "最上肋間動脈（supreme intercostal artery）",
+      "B": "內胸動脈（internal thoracic artery）",
+      "C": "肌膈動脈（musculophrenic artery）",
+      "D": "肋下動脈（subcostal artery）"
+    },
+    "answer": "B",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "縱膈｜胸骨旁，第五肋間深約 1 公分的穿刺傷，造成",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 101 年第一次醫師一階醫學（一）",
+    "sourceYear": 2012,
+    "sourceRound": 1,
+    "originalQuestionNumber": 13
+  },
+  {
+    "id": "MOEX-101030-1101-Q014",
+    "subject": "解剖學",
+    "chapter": "上肢",
+    "section": "上肢血管",
+    "stem": "腕關節（wrist joint）屬於下列何種關節？",
+    "options": {
+      "A": "髁狀關節（condyloid joint）",
+      "B": "球窩關節（ball and socket joint）",
+      "C": "鞍型關節（saddle joint）",
+      "D": "屈戌關節（hinge joint）"
+    },
+    "answer": "A",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "上肢血管｜腕關節（wrist joint）屬於下列何種",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 101 年第一次醫師一階醫學（一）",
+    "sourceYear": 2012,
+    "sourceRound": 1,
+    "originalQuestionNumber": 14
+  },
+  {
+    "id": "MOEX-101030-1101-Q015",
+    "subject": "解剖學",
+    "chapter": "上肢",
+    "section": "前臂屈伸肌",
+    "stem": "30 歲男性工人，工作時被玻璃割傷，前臂腹面，離腕關節 3 公分的小指側有一 2 公分傷口，檢查時， 有血液湧出，請問最可能是下列何構造受損？",
+    "options": {
+      "A": "橈動脈",
+      "B": "尺動脈",
+      "C": "臂動脈",
+      "D": "指動脈"
+    },
+    "answer": "B",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "前臂屈伸肌｜30 歲男性工人，工作時被玻璃割傷，前臂腹面",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 101 年第一次醫師一階醫學（一）",
+    "sourceYear": 2012,
+    "sourceRound": 1,
+    "originalQuestionNumber": 15
+  },
+  {
+    "id": "MOEX-101030-1101-Q016",
+    "subject": "解剖學",
+    "chapter": "上肢",
+    "section": "上肢血管",
+    "stem": "病人上臂骨折後，手腕無法伸展，最可能是下列何者受傷所造成？",
+    "options": {
+      "A": "正中神經",
+      "B": "腋神經",
+      "C": "尺神經",
+      "D": "橈神經"
+    },
+    "answer": "D",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "上肢血管｜病人上臂骨折後，手腕無法伸展，最可能是下列何",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 101 年第一次醫師一階醫學（一）",
+    "sourceYear": 2012,
+    "sourceRound": 1,
+    "originalQuestionNumber": 16
+  },
+  {
+    "id": "MOEX-101030-1101-Q018",
+    "subject": "解剖學",
+    "chapter": "腹部",
+    "section": "門脈系統",
+    "stem": "肝門靜脈高壓（portal hypertension）最不可能造成下列何種現象？",
+    "options": {
+      "A": "痔瘡",
+      "B": "食道靜脈曲張",
+      "C": "下肢靜脈曲張",
+      "D": "脾靜脈壓力升高"
+    },
+    "answer": "C",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "門靜脈形成",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 101 年第一次醫師一階醫學（一）",
+    "sourceYear": 2012,
+    "sourceRound": 1,
+    "originalQuestionNumber": 18
+  },
+  {
+    "id": "MOEX-101030-1101-Q019",
+    "subject": "解剖學",
+    "chapter": "胸腔",
+    "section": "縱膈",
+    "stem": "縱膈手術後，聲音沙啞且聲帶不動，下列何者的分支最可能損傷？",
+    "options": {
+      "A": "膈神經",
+      "B": "副神經",
+      "C": "迷走神經",
+      "D": "交感神經叢"
+    },
+    "answer": "C",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "縱膈神經走行",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 101 年第一次醫師一階醫學（一）",
+    "sourceYear": 2012,
+    "sourceRound": 1,
+    "originalQuestionNumber": 19
+  },
+  {
+    "id": "MOEX-101030-1101-Q020",
+    "subject": "解剖學",
+    "chapter": "神經解剖",
+    "section": "腦幹核區",
+    "stem": "下列何者阻塞時，最可能造成右側肢體無力及運動型失語症（Broca’s aphasia）？",
+    "options": {
+      "A": "前大腦動脈",
+      "B": "中大腦動脈",
+      "C": "後大腦動脈",
+      "D": "椎動脈"
+    },
+    "answer": "B",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "腦幹核區｜下列何者阻塞時，最可能造成右側肢體無力及運動",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 101 年第一次醫師一階醫學（一）",
+    "sourceYear": 2012,
+    "sourceRound": 1,
+    "originalQuestionNumber": 20
+  },
+  {
+    "id": "MOEX-101030-1101-Q021",
+    "subject": "解剖學",
+    "chapter": "頭頸部",
+    "section": "顏面神經與三叉神經",
+    "stem": "第三顱神經受損，最可能影響下列何種動作？",
+    "options": {
+      "A": "咀嚼",
+      "B": "臉龐流汗",
+      "C": "緊閉眼睛",
+      "D": "上眼瞼上抬"
+    },
+    "answer": "D",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "顏面神經與三叉神經｜第三顱神經受損，最可能影響下列何種動作",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 101 年第一次醫師一階醫學（一）",
+    "sourceYear": 2012,
+    "sourceRound": 1,
+    "originalQuestionNumber": 21
+  },
+  {
+    "id": "MOEX-101030-1101-Q022",
+    "subject": "解剖學",
+    "chapter": "頭頸部",
+    "section": "顏面神經與三叉神經",
+    "stem": "以手電筒照射病患左眼時，其左瞳孔收縮，右瞳孔無反應，其可能的原因為？",
+    "options": {
+      "A": "病患兩眼完全正常",
+      "B": "右視神經失能",
+      "C": "左視神經失能",
+      "D": "右動眼神經受損"
+    },
+    "answer": "D",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "顏面神經與三叉神經｜以手電筒照射病患左眼時，其左瞳孔收縮，右瞳孔",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 101 年第一次醫師一階醫學（一）",
+    "sourceYear": 2012,
+    "sourceRound": 1,
+    "originalQuestionNumber": 22
+  },
+  {
+    "id": "MOEX-101030-1101-Q026",
+    "subject": "解剖學",
+    "chapter": "神經解剖",
+    "section": "丘腦與基底核",
+    "stem": "下列何處是突觸後多巴胺一型和二型受器（D1/D2）的主要分布地方？",
+    "options": {
+      "A": "殼核（putamen）",
+      "B": "底丘腦核（subthalamic nucleus）",
+      "C": "蒼白球（globus pallidus）",
+      "D": "黑質（substantia nigra）"
+    },
+    "answer": "A",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "下丘腦核與 hemiballismus",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 101 年第一次醫師一階醫學（一）",
+    "sourceYear": 2012,
+    "sourceRound": 1,
+    "originalQuestionNumber": 26
+  },
+  {
+    "id": "MOEX-101030-1101-Q027",
+    "subject": "解剖學",
+    "chapter": "下肢",
+    "section": "腰薦神經叢",
+    "stem": "車禍造成腓骨近側端骨折，下列何者最不可能出現？",
+    "options": {
+      "A": "垂足（foot-drop）",
+      "B": "喪失足背感覺",
+      "C": "喪失小腿前外側的感覺",
+      "D": "第一蹠骨（metatarsal）頭部以後的內側足部感覺喪失"
+    },
+    "answer": "D",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "腰薦神經叢｜車禍造成腓骨近側端骨折，下列何者最不可能出現",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 101 年第一次醫師一階醫學（一）",
+    "sourceYear": 2012,
+    "sourceRound": 1,
+    "originalQuestionNumber": 27
+  },
+  {
+    "id": "MOEX-101030-1101-Q028",
+    "subject": "解剖學",
+    "chapter": "胸腔",
+    "section": "縱膈",
+    "stem": "嬰兒開始站立行走後，下列何者最為明顯？",
+    "options": {
+      "A": "頸彎曲",
+      "B": "胸彎曲",
+      "C": "腰彎曲",
+      "D": "薦彎曲"
+    },
+    "answer": "C",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "縱膈｜嬰兒開始站立行走後，下列何者最為明顯",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 101 年第一次醫師一階醫學（一）",
+    "sourceYear": 2012,
+    "sourceRound": 1,
+    "originalQuestionNumber": 28
+  },
+  {
+    "id": "MOEX-101030-1101-Q089",
+    "subject": "解剖學",
+    "chapter": "胸腔",
+    "section": "縱膈",
+    "stem": "通常由醫師對病人進行衛教，效果比較好，其原因為何？",
+    "options": {
+      "A": "病人降服於醫師的權威之下",
+      "B": "病人信賴醫師的專業能力",
+      "C": "病人擔心不接受衛教會影響醫病關係",
+      "D": "病人比較容易瞭解醫師講解的內容"
+    },
+    "answer": "B",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "縱膈｜通常由醫師對病人進行衛教，效果比較好，其原因",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 101 年第一次醫師一階醫學（一）",
+    "sourceYear": 2012,
+    "sourceRound": 1,
+    "originalQuestionNumber": 89
+  },
+  {
+    "id": "MOEX-101030-1101-Q090",
+    "subject": "解剖學",
+    "chapter": "頭頸部",
+    "section": "顏面神經與三叉神經",
+    "stem": "下列那一項是對呼吸系統及眼部黏膜具刺激性之空氣污染物？",
+    "options": {
+      "A": "CO2",
+      "B": "CO",
+      "C": "O3",
+      "D": "CH4"
+    },
+    "answer": "C",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "顏面神經與三叉神經｜下列那一項是對呼吸系統及眼部黏膜具刺激性之空",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 101 年第一次醫師一階醫學（一）",
+    "sourceYear": 2012,
+    "sourceRound": 1,
+    "originalQuestionNumber": 90
+  },
+  {
+    "id": "MOEX-101030-1101-Q093",
+    "subject": "解剖學",
+    "chapter": "腹部",
+    "section": "肝膽胰脾",
+    "stem": "目前所訂定的鉛中毒標準，對小孩族群之保護遠比對成人嚴格，主要來自下列那一系統或器官的毒 性效應？",
+    "options": {
+      "A": "呼吸系統",
+      "B": "周圍神經系統",
+      "C": "造血系統",
+      "D": "肝"
+    },
+    "answer": "C",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "肝十二指腸韌帶與 portal triad",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 101 年第一次醫師一階醫學（一）",
+    "sourceYear": 2012,
+    "sourceRound": 1,
+    "originalQuestionNumber": 93
+  },
+  {
+    "id": "MOEX-101030-1101-Q095",
+    "subject": "解剖學",
+    "chapter": "上肢",
+    "section": "上肢血管",
+    "stem": "甲醫院手術治療某種疾病，抽樣 100 個病人有 80 個治療成功，成功率的 95%信賴區間（95% Confidence Interval）為（0.72, 0.88）。如果一般全國平均治療這種病人成功率為 90%，我們想以此資料來做假 說檢定，檢定甲醫院治療此病成功率是否比 90%低，顯著水準設為α＝0.05，下列何者正確？",
+    "options": {
+      "A": "無法推翻虛無假說，結論是甲醫院的治療成功率與 90%一樣",
+      "B": "推翻虛無假說，結論是甲醫院的治療成功率比 90%低",
+      "C": "無法推翻虛無假說，結論是甲醫院的治療成功率比 90%低",
+      "D": "推翻虛無假說，結論是甲醫院的治療成功率與 90%一樣"
+    },
+    "answer": "B",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "上肢血管｜甲醫院手術治療某種疾病，抽樣 100 個病人",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 101 年第一次醫師一階醫學（一）",
+    "sourceYear": 2012,
+    "sourceRound": 1,
+    "originalQuestionNumber": 95
+  },
+  {
+    "id": "MOEX-101030-1101-Q098",
+    "subject": "解剖學",
+    "chapter": "上肢",
+    "section": "上肢血管",
+    "stem": "下列資料代表 6 個接受髖關節置換手術病人的住院天數（天）：4, 3, 3, 5, 4, 和 20，那一個集中趨勢 統計量最適合描述此資料？",
+    "options": {
+      "A": "平均值",
+      "B": "全距",
+      "C": "眾數",
+      "D": "中位數"
+    },
+    "answer": "D",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "上肢血管｜下列資料代表 6 個接受髖關節置換手術病人的",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 101 年第一次醫師一階醫學（一）",
+    "sourceYear": 2012,
+    "sourceRound": 1,
+    "originalQuestionNumber": 98
+  },
+  {
+    "id": "MOEX-101030-1101-Q100",
+    "subject": "解剖學",
+    "chapter": "上肢",
+    "section": "上肢血管",
+    "stem": "依下表數據計算下列各指標，下列何者錯誤？ 疾病真實狀況 疾病診斷結果 有 無 Total 有 68 6 74 無 12 114 126 Total 80 120 200",
+    "options": {
+      "A": "敏感度為 85%",
+      "B": "特異度為 95%",
+      "C": "陽性預測值為 85%",
+      "D": "陰性預測值為 90.5%"
+    },
+    "answer": "C",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "上肢血管｜依下表數據計算下列各指標，下列何者錯誤",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 101 年第一次醫師一階醫學（一）",
+    "sourceYear": 2012,
+    "sourceRound": 1,
+    "originalQuestionNumber": 100
+  },
+  {
+    "id": "MOEX-101110-1101-Q002",
+    "subject": "解剖學",
+    "chapter": "神經解剖",
+    "section": "腦神經",
+    "stem": "頭頸部諸副交感神經之神經節當中解剖位置最後（posterior）者為：",
+    "options": {
+      "A": "下頜下神經節（submandibular ganglion）",
+      "B": "翼腭神經節（pterygopalatine ganglion）",
+      "C": "耳神經節（otic ganglion）",
+      "D": "睫狀神經節（ciliary ganglion）"
+    },
+    "answer": "C",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "腦神經｜頭頸部諸副交感神經之神經節當中解剖位置最後（",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 101 年第二次醫師一階醫學（一）",
+    "sourceYear": 2012,
+    "sourceRound": 2,
+    "originalQuestionNumber": 2
+  },
+  {
+    "id": "MOEX-101110-1101-Q003",
+    "subject": "解剖學",
+    "chapter": "頭頸部",
+    "section": "頸動脈鞘",
+    "stem": "內頸動脈血管瘤壓迫視交叉的左緣，下列何者的視覺最可能缺損？",
+    "options": {
+      "A": "右眼之左視野",
+      "B": "左眼之左視野",
+      "C": "左眼之右視野",
+      "D": "右眼之右視野"
+    },
+    "answer": "C",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "頸動脈鞘｜內頸動脈血管瘤壓迫視交叉的左緣，下列何者的視",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 101 年第二次醫師一階醫學（一）",
+    "sourceYear": 2012,
+    "sourceRound": 2,
+    "originalQuestionNumber": 3
+  },
+  {
+    "id": "MOEX-101110-1101-Q005",
+    "subject": "解剖學",
+    "chapter": "頭頸部",
+    "section": "舌與味覺",
+    "stem": "病患舌頭吐出時，偏向左方，下列何者最可能受傷？",
+    "options": {
+      "A": "右側第九顱神經",
+      "B": "右側頦舌肌（genioglossus）",
+      "C": "左側第十二顱神經",
+      "D": "左側第五顱神經第三分支"
+    },
+    "answer": "C",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "舌與味覺｜病患舌頭吐出時，偏向左方，下列何者最可能受傷",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 101 年第二次醫師一階醫學（一）",
+    "sourceYear": 2012,
+    "sourceRound": 2,
+    "originalQuestionNumber": 5
+  },
+  {
+    "id": "MOEX-101110-1101-Q006",
+    "subject": "解剖學",
+    "chapter": "胸腔",
+    "section": "縱膈",
+    "stem": "肝臟裸區（bare area）的形成與下列何者相關？",
+    "options": {
+      "A": "病變造成",
+      "B": "胃貼近此處",
+      "C": "膽囊貼近此處",
+      "D": "橫膈貼近此處"
+    },
+    "answer": "D",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "縱膈｜肝臟裸區（bare area）的形成與下列何",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 101 年第二次醫師一階醫學（一）",
+    "sourceYear": 2012,
+    "sourceRound": 2,
+    "originalQuestionNumber": 6
+  },
+  {
+    "id": "MOEX-101110-1101-Q007",
+    "subject": "解剖學",
+    "chapter": "腹部",
+    "section": "肝膽胰脾",
+    "stem": "在後腹壁，沿薦椎翼（ala）下行，組成薦神經叢的神經為：",
+    "options": {
+      "A": "閉孔神經（obturator nerve）",
+      "B": "股神經（femoral nerve）",
+      "C": "腰薦神經幹（lumbosacral trunk）",
+      "D": "生殖股神經（genitofemoral nerve）"
+    },
+    "answer": "C",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "肝膽胰脾｜在後腹壁，沿薦椎翼（ala）下行，組成薦神經",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 101 年第二次醫師一階醫學（一）",
+    "sourceYear": 2012,
+    "sourceRound": 2,
+    "originalQuestionNumber": 7
+  },
+  {
+    "id": "MOEX-101110-1101-Q009",
+    "subject": "解剖學",
+    "chapter": "腹部",
+    "section": "肝膽胰脾",
+    "stem": "通過第三及第四腰椎間的椎間盤的平面為：",
+    "options": {
+      "A": "橫幽門面（transpyloric plane）",
+      "B": "橫臍面（transumbilical plane）",
+      "C": "橫腸骨結節面（transtubercular plane）",
+      "D": "腸骨嵴間面（intercristal plane）"
+    },
+    "answer": "B",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "肝膽胰脾｜通過第三及第四腰椎間的椎間盤的平面為：",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 101 年第二次醫師一階醫學（一）",
+    "sourceYear": 2012,
+    "sourceRound": 2,
+    "originalQuestionNumber": 9
+  },
+  {
+    "id": "MOEX-101110-1101-Q010",
+    "subject": "解剖學",
+    "chapter": "腹部",
+    "section": "腹膜關係",
+    "stem": "腹膜覆蓋下腹壁動脈（inferior epigastric artery）會形成下列何結構？",
+    "options": {
+      "A": "臍正中襞（median umbilical fold）",
+      "B": "臍內側襞（medial umbilical fold）",
+      "C": "臍外側襞（lateral umbilical fold）",
+      "D": "臍旁襞（paraumbilical fold）"
+    },
+    "answer": "C",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "腹膜腔分區",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 101 年第二次醫師一階醫學（一）",
+    "sourceYear": 2012,
+    "sourceRound": 2,
+    "originalQuestionNumber": 10
+  },
+  {
+    "id": "MOEX-101110-1101-Q012",
+    "subject": "解剖學",
+    "chapter": "胸腔",
+    "section": "縱膈",
+    "stem": "下列何項關於胸骨劍突（xiphoid process）的敘述錯誤？",
+    "options": {
+      "A": "其外型因人而異，可尖、可鈍，也可能分枝",
+      "B": "在體表的投射點表示心臟下緣",
+      "C": "在體表的投射點表示肝臟的上界",
+      "D": "相對於第十二胸椎的高度"
+    },
+    "answer": "D",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "縱膈｜下列何項關於胸骨劍突（xiphoid pro",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 101 年第二次醫師一階醫學（一）",
+    "sourceYear": 2012,
+    "sourceRound": 2,
+    "originalQuestionNumber": 12
+  },
+  {
+    "id": "MOEX-101110-1101-Q013",
+    "subject": "解剖學",
+    "chapter": "腹部",
+    "section": "肝膽胰脾",
+    "stem": "下列何者不是髂內動脈（internal iliac artery）的分支？",
+    "options": {
+      "A": "閉孔動脈",
+      "B": "直腸上動脈",
+      "C": "直腸中動脈",
+      "D": "陰部內動脈"
+    },
+    "answer": "B",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "肝膽胰脾｜下列何者不是髂內動脈（internal il",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 101 年第二次醫師一階醫學（一）",
+    "sourceYear": 2012,
+    "sourceRound": 2,
+    "originalQuestionNumber": 13
+  },
+  {
+    "id": "MOEX-101110-1101-Q014",
+    "subject": "解剖學",
+    "chapter": "骨盆與會陰",
+    "section": "會陰三角",
+    "stem": "下列何者位於輸卵管的外側？",
+    "options": {
+      "A": "懸韌帶",
+      "B": "樞紐韌帶",
+      "C": "卵巢韌帶",
+      "D": "子宮圓韌帶"
+    },
+    "answer": "A",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "會陰三角｜下列何者位於輸卵管的外側",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 101 年第二次醫師一階醫學（一）",
+    "sourceYear": 2012,
+    "sourceRound": 2,
+    "originalQuestionNumber": 14
+  },
+  {
+    "id": "MOEX-101110-1101-Q015",
+    "subject": "解剖學",
+    "chapter": "腹部",
+    "section": "肝膽胰脾",
+    "stem": "下列何者發生阻塞，最不影響輸精管的血液供應？",
+    "options": {
+      "A": "睪丸動脈",
+      "B": "膀胱下動脈",
+      "C": "直腸中動脈",
+      "D": "陰部內動脈"
+    },
+    "answer": "D",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "肝膽胰脾｜下列何者發生阻塞，最不影響輸精管的血液供應",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 101 年第二次醫師一階醫學（一）",
+    "sourceYear": 2012,
+    "sourceRound": 2,
+    "originalQuestionNumber": 15
+  },
+  {
+    "id": "MOEX-101110-1101-Q016",
+    "subject": "解剖學",
+    "chapter": "下肢",
+    "section": "臀區",
+    "stem": "臀下神經（inferior gluteal nerve）受到壓迫損傷，下列何者會受影響？",
+    "options": {
+      "A": "臀大肌",
+      "B": "臀中肌",
+      "C": "臀小肌",
+      "D": "闊筋膜張肌"
+    },
+    "answer": "A",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "下臀神經支配",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 101 年第二次醫師一階醫學（一）",
+    "sourceYear": 2012,
+    "sourceRound": 2,
+    "originalQuestionNumber": 16
+  },
+  {
+    "id": "MOEX-101110-1101-Q017",
+    "subject": "解剖學",
+    "chapter": "下肢",
+    "section": "腰薦神經叢",
+    "stem": "支配下孖肌（inferior gemellus）的神經受損，下列何者也可能退化萎縮？",
+    "options": {
+      "A": "上孖肌（superior gemellus）",
+      "B": "梨狀肌（piriformis）",
+      "C": "股方肌（quadratus femoris）",
+      "D": "閉孔內肌（obturator internus）"
+    },
+    "answer": "C",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "閉孔神經支配",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 101 年第二次醫師一階醫學（一）",
+    "sourceYear": 2012,
+    "sourceRound": 2,
+    "originalQuestionNumber": 17
+  },
+  {
+    "id": "MOEX-101110-1101-Q019",
+    "subject": "解剖學",
+    "chapter": "下肢",
+    "section": "下肢血管",
+    "stem": "下列何者在小腿沒有神經伴行？",
+    "options": {
+      "A": "脛後動脈（posterior tibial artery）",
+      "B": "脛前動脈（anterior tibial artery）",
+      "C": "腓動脈（peroneal artery）",
+      "D": "小隱靜脈（small saphenous vein）"
+    },
+    "answer": "C",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "脛後動脈觸診",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 101 年第二次醫師一階醫學（一）",
+    "sourceYear": 2012,
+    "sourceRound": 2,
+    "originalQuestionNumber": 19
+  },
+  {
+    "id": "MOEX-101110-1101-Q020",
+    "subject": "解剖學",
+    "chapter": "頭頸部",
+    "section": "顏面神經與三叉神經",
+    "stem": "手肘彎曲時，尺骨頭（head of ulna）與下列何者接觸？",
+    "options": {
+      "A": "尺骨切迹（ulnar notch）",
+      "B": "冠狀窩（coronoid fossa）",
+      "C": "橈骨窩（radial fossa）",
+      "D": "鷹嘴窩（olecranon fossa）"
+    },
+    "answer": "A",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "顏面神經與三叉神經｜手肘彎曲時，尺骨頭（head of ulna",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 101 年第二次醫師一階醫學（一）",
+    "sourceYear": 2012,
+    "sourceRound": 2,
+    "originalQuestionNumber": 20
+  },
+  {
+    "id": "MOEX-101110-1101-Q022",
+    "subject": "解剖學",
+    "chapter": "上肢",
+    "section": "上肢血管",
+    "stem": "下列關節活動度中，何者最大？",
+    "options": {
+      "A": "第五掌骨（5th metacarpal bone）與其近端指骨間的關節",
+      "B": "第一掌骨（1st metacarpal bone）與其近端指骨間的關節",
+      "C": "第五掌骨（5th metacarpal bone）與腕骨間的關節",
+      "D": "第一掌骨（1st metacarpal bone）與腕骨間的關節"
+    },
+    "answer": "D",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "上肢血管｜下列關節活動度中，何者最大",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 101 年第二次醫師一階醫學（一）",
+    "sourceYear": 2012,
+    "sourceRound": 2,
+    "originalQuestionNumber": 22
+  },
+  {
+    "id": "MOEX-101110-1101-Q023",
+    "subject": "解剖學",
+    "chapter": "上肢",
+    "section": "肩胛區",
+    "stem": "肩胛骨內緣背翻，無法貼近胸壁，此現象最可能肇因於下列何者之損傷？",
+    "options": {
+      "A": "前鋸肌（serratus anterior）",
+      "B": "斜方肌（trapezius）",
+      "C": "大菱形肌（rhomboid major）",
+      "D": "肩胛提肌（levator scapulae）"
+    },
+    "answer": "A",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "肩胛區｜肩胛骨內緣背翻，無法貼近胸壁，此現象最可能肇",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 101 年第二次醫師一階醫學（一）",
+    "sourceYear": 2012,
+    "sourceRound": 2,
+    "originalQuestionNumber": 23
+  },
+  {
+    "id": "MOEX-101110-1101-Q025",
+    "subject": "解剖學",
+    "chapter": "下肢",
+    "section": "腰薦神經叢",
+    "stem": "內蹠神經（medial plantar nerve）受傷時，最不會影響下列何種動作？",
+    "options": {
+      "A": "腳拇趾內收",
+      "B": "腳拇趾外展",
+      "C": "腳拇趾屈曲",
+      "D": "腳趾屈曲"
+    },
+    "answer": "A",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "腰薦神經叢｜內蹠神經（medial plantar ne",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 101 年第二次醫師一階醫學（一）",
+    "sourceYear": 2012,
+    "sourceRound": 2,
+    "originalQuestionNumber": 25
+  },
+  {
+    "id": "MOEX-101110-1101-Q026",
+    "subject": "解剖學",
+    "chapter": "上肢",
+    "section": "上肢血管",
+    "stem": "下列關於肱動脈的敘述，何者錯誤？",
+    "options": {
+      "A": "肱動脈位在手臂內側，肱三頭肌及肱肌的前面",
+      "B": "與腋神經伴行的深肱動脈為肱動脈的分支",
+      "C": "腋動脈通過大圓肌下緣後稱為肱動脈",
+      "D": "肱動脈在手臂與正中神經伴行"
+    },
+    "answer": "B",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "腋動脈分段與分支",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 101 年第二次醫師一階醫學（一）",
+    "sourceYear": 2012,
+    "sourceRound": 2,
+    "originalQuestionNumber": 26
+  },
+  {
+    "id": "MOEX-101110-1101-Q027",
+    "subject": "解剖學",
+    "chapter": "骨盆與會陰",
+    "section": "會陰三角",
+    "stem": "下列何者的力量不足，最可能造成咳嗽時漏尿之現象？",
+    "options": {
+      "A": "梨狀肌",
+      "B": "臀大肌",
+      "C": "提肛肌",
+      "D": "閉孔內肌"
+    },
+    "answer": "C",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "骨盆底與會陰支持",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 101 年第二次醫師一階醫學（一）",
+    "sourceYear": 2012,
+    "sourceRound": 2,
+    "originalQuestionNumber": 27
+  },
+  {
+    "id": "MOEX-101110-1101-Q033",
+    "subject": "解剖學",
+    "chapter": "神經解剖",
+    "section": "腦幹核區",
+    "stem": "有關內耳（inner ear），下列敘述何項錯誤？",
+    "options": {
+      "A": "內耳包括骨性與膜性迷路（bony and membranous labyrinth）",
+      "B": "內淋巴液（endolymph）充滿整個膜性迷路（membranous labyrinth）",
+      "C": "前庭膜（vestibular membrane）將中階（scala media）與前庭階（scala vestibuli）分開",
+      "D": "壺腹嵴（cristae ampullaris）感受直線加速運動（linear acceleration）及地心引力（gravity）"
+    },
+    "answer": "D",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "腦幹核區｜內耳（inner ear），下列敘述何項錯誤",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 101 年第二次醫師一階醫學（一）",
+    "sourceYear": 2012,
+    "sourceRound": 2,
+    "originalQuestionNumber": 33
+  },
+  {
+    "id": "MOEX-101110-1101-Q089",
+    "subject": "解剖學",
+    "chapter": "胸腔",
+    "section": "縱膈",
+    "stem": "SARS 爆發時，當時民眾的恐慌主要是由下列何種現象所造成？",
+    "options": {
+      "A": "精神疾病",
+      "B": "社會距離",
+      "C": "認知不足，心理不確定感",
+      "D": "政府無能"
+    },
+    "answer": "C",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "縱膈｜SARS 爆發時，當時民眾的恐慌主要是由下列",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 101 年第二次醫師一階醫學（一）",
+    "sourceYear": 2012,
+    "sourceRound": 2,
+    "originalQuestionNumber": 89
+  },
+  {
+    "id": "MOEX-101110-1101-Q096",
+    "subject": "解剖學",
+    "chapter": "上肢",
+    "section": "上肢血管",
+    "stem": "有關統計檢定，下列那一項敘述錯誤？",
+    "options": {
+      "A": "統計的 Power 係指可正確判斷新治療方式有效的機率",
+      "B": "統計的 Type I error 係指新治療方式無效，卻被判定為有效的機率",
+      "C": "統計的 Type II error 係指新治療方式無效，卻被判定為有效的機率",
+      "D": "統計的信賴水準（1-α）係指新治療方式無效，可被正確判斷的機率"
+    },
+    "answer": "C",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "上肢血管｜統計檢定，下列那一項敘述錯誤",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 101 年第二次醫師一階醫學（一）",
+    "sourceYear": 2012,
+    "sourceRound": 2,
+    "originalQuestionNumber": 96
+  },
+  {
+    "id": "MOEX-102030-1101-Q001",
+    "subject": "解剖學",
+    "chapter": "神經解剖",
+    "section": "丘腦與基底核",
+    "stem": "下列何者不是基底核 direct loop 的構造？",
+    "options": {
+      "A": "紋狀體（striatum）",
+      "B": "內側蒼白球（inner globus pallidus）",
+      "C": "丘腦（thalamus）",
+      "D": "視丘下核（subthalamic nucleus）"
+    },
+    "answer": "D",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "下丘腦核與 hemiballismus",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 102 年第一次醫師一階醫學（一）",
+    "sourceYear": 2013,
+    "sourceRound": 1,
+    "originalQuestionNumber": 1
+  },
+  {
+    "id": "MOEX-102030-1101-Q002",
+    "subject": "解剖學",
+    "chapter": "神經解剖",
+    "section": "視覺路徑",
+    "stem": "右側大腦顳葉之 Meyer’s loop 傷害，會造成下列何種損傷？",
+    "options": {
+      "A": "雙眼左上視野缺失",
+      "B": "右眼左上視野缺失",
+      "C": "雙眼外上視野缺失",
+      "D": "雙眼內下視野缺失"
+    },
+    "answer": "A",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "Meyer’s loop 與視野缺損",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 102 年第一次醫師一階醫學（一）",
+    "sourceYear": 2013,
+    "sourceRound": 1,
+    "originalQuestionNumber": 2
+  },
+  {
+    "id": "MOEX-102030-1101-Q004",
+    "subject": "解剖學",
+    "chapter": "頭頸部",
+    "section": "顏面神經與三叉神經",
+    "stem": "下列何者不參與角膜反射？",
+    "options": {
+      "A": "同側顏面神經運動核（facial motor nucleus）",
+      "B": "對側顏面神經運動核（facial motor nucleus）",
+      "C": "三叉神經脊髓核（spinal trigeminal nucleus）",
+      "D": "動眼神經核（oculomotor nucleus）"
+    },
+    "answer": "D",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "顏面神經與腮腺關係",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 102 年第一次醫師一階醫學（一）",
+    "sourceYear": 2013,
+    "sourceRound": 1,
+    "originalQuestionNumber": 4
+  },
+  {
+    "id": "MOEX-102030-1101-Q008",
+    "subject": "解剖學",
+    "chapter": "腹部",
+    "section": "腹膜關係",
+    "stem": "下列何者的破裂最可能造成蛛網膜下腔出血？",
+    "options": {
+      "A": "中腦膜動脈（middle meningeal artery）",
+      "B": "大腦動脈（cerebral artery）",
+      "C": "大腦靜脈（cerebral vein）",
+      "D": "硬腦膜靜脈竇（dural sinus）"
+    },
+    "answer": "B",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "腹膜關係｜下列何者的破裂最可能造成蛛網膜下腔出血",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 102 年第一次醫師一階醫學（一）",
+    "sourceYear": 2013,
+    "sourceRound": 1,
+    "originalQuestionNumber": 8
+  },
+  {
+    "id": "MOEX-102030-1101-Q009",
+    "subject": "解剖學",
+    "chapter": "神經解剖",
+    "section": "腦幹核區",
+    "stem": "頭部腫瘤造成眼睛、鼻子及口腔乾澀，請問此腫瘤最可能發生於何處？",
+    "options": {
+      "A": "視神經管（optic canal）",
+      "B": "翼管（pterygoid canal）",
+      "C": "卵圓孔（foramen ovale）",
+      "D": "圓孔（foramen rotundum）"
+    },
+    "answer": "B",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "腦幹核區｜頭部腫瘤造成眼睛、鼻子及口腔乾澀，請問此腫瘤",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 102 年第一次醫師一階醫學（一）",
+    "sourceYear": 2013,
+    "sourceRound": 1,
+    "originalQuestionNumber": 9
+  },
+  {
+    "id": "MOEX-102030-1101-Q010",
+    "subject": "解剖學",
+    "chapter": "頭頸部",
+    "section": "咽喉解剖",
+    "stem": "右肺門前方的腫瘤最可能壓迫下列何者？",
+    "options": {
+      "A": "膈神經（phrenic nerve）",
+      "B": "迷走神經（vagus nerve）",
+      "C": "喉返神經（recurrent laryngeal nerve）",
+      "D": "交感神經幹（sympathetic trunk）"
+    },
+    "answer": "A",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "喉返神經走行",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 102 年第一次醫師一階醫學（一）",
+    "sourceYear": 2013,
+    "sourceRound": 1,
+    "originalQuestionNumber": 10
+  },
+  {
+    "id": "MOEX-102030-1101-Q012",
+    "subject": "解剖學",
+    "chapter": "胸腔",
+    "section": "肺與胸膜",
+    "stem": "下列有關肺門（hilum of the lung）之敘述，何者正確？",
+    "options": {
+      "A": "肺動脈位於左肺門最上方",
+      "B": "支氣管位於左肺門最下方",
+      "C": "肺靜脈位於右肺門最上方",
+      "D": "支氣管位於右肺門最前方"
+    },
+    "answer": "A",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "肺門構造相對位置",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 102 年第一次醫師一階醫學（一）",
+    "sourceYear": 2013,
+    "sourceRound": 1,
+    "originalQuestionNumber": 12
+  },
+  {
+    "id": "MOEX-102030-1101-Q013",
+    "subject": "解剖學",
+    "chapter": "胸腔",
+    "section": "橫膈",
+    "stem": "刺激橫膈中央處的壁層胸膜（parietal pleura）所引起的牽涉痛（referred pain），其對應的皮區 （dermatome）為：",
+    "options": {
+      "A": "C3-C5",
+      "B": "T1-T2",
+      "C": "T4-T5",
+      "D": "T7-T8"
+    },
+    "answer": "A",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "橫膈三大開口",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 102 年第一次醫師一階醫學（一）",
+    "sourceYear": 2013,
+    "sourceRound": 1,
+    "originalQuestionNumber": 13
+  },
+  {
+    "id": "MOEX-102030-1101-Q014",
+    "subject": "解剖學",
+    "chapter": "胸腔",
+    "section": "心臟與冠狀動脈",
+    "stem": "心臟聽診檢查時，發現在正中鎖骨線第 5 肋間處有異常雜音，下列何者最可能發生病變？",
+    "options": {
+      "A": "二尖瓣（mitral valve）",
+      "B": "主動脈瓣（aortic valve）",
+      "C": "三尖瓣（tricuspid valve）",
+      "D": "肺動脈幹瓣（pulmonary valve）"
+    },
+    "answer": "A",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "心臟與冠狀動脈｜心臟聽診檢查時，發現在正中鎖骨線第 5 肋間",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 102 年第一次醫師一階醫學（一）",
+    "sourceYear": 2013,
+    "sourceRound": 1,
+    "originalQuestionNumber": 14
+  },
+  {
+    "id": "MOEX-102030-1101-Q015",
+    "subject": "解剖學",
+    "chapter": "腹部",
+    "section": "腹膜關係",
+    "stem": "腎內結石的疼痛經由下列何者傳導？",
+    "options": {
+      "A": "大內臟神經（greater splanchnic nerve）",
+      "B": "小內臟神經（lesser splanchnic nerve）",
+      "C": "最小內臟神經（least splanchnic nerve）",
+      "D": "迷走神經（vagus nerve）"
+    },
+    "answer": "C",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "腹膜關係｜腎內結石的疼痛經由下列何者傳導",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 102 年第一次醫師一階醫學（一）",
+    "sourceYear": 2013,
+    "sourceRound": 1,
+    "originalQuestionNumber": 15
+  },
+  {
+    "id": "MOEX-102030-1101-Q016",
+    "subject": "解剖學",
+    "chapter": "腹部",
+    "section": "肝膽胰脾",
+    "stem": "Ligament of Treitz 是檢查消化道是否發生異常的標記，其拉提著下列何處？",
+    "options": {
+      "A": "十二指腸與胃幽門的交界處",
+      "B": "十二指腸的上段（superior part）與下行段（descending part）間",
+      "C": "十二指腸空腸彎曲（duodenojejunal flexure）",
+      "D": "整條十二指腸"
+    },
+    "answer": "C",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "肝膽胰脾｜Ligament of Treitz 是檢查",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 102 年第一次醫師一階醫學（一）",
+    "sourceYear": 2013,
+    "sourceRound": 1,
+    "originalQuestionNumber": 16
+  },
+  {
+    "id": "MOEX-102030-1101-Q019",
+    "subject": "解剖學",
+    "chapter": "骨盆與會陰",
+    "section": "泌尿生殖",
+    "stem": "下列何者的栓塞（thrombosis）最可能會導致左側睪丸（testis）腫脹？",
+    "options": {
+      "A": "左陰部內靜脈（left internal pudendal vein）",
+      "B": "下腔靜脈（inferior vena cava）",
+      "C": "左陰部外靜脈（left external pudendal vein）",
+      "D": "左腎靜脈（left renal vein）"
+    },
+    "answer": "D",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "泌尿生殖｜下列何者的栓塞（thrombosis）最可能",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 102 年第一次醫師一階醫學（一）",
+    "sourceYear": 2013,
+    "sourceRound": 1,
+    "originalQuestionNumber": 19
+  },
+  {
+    "id": "MOEX-102030-1101-Q020",
+    "subject": "解剖學",
+    "chapter": "骨盆與會陰",
+    "section": "會陰三角",
+    "stem": "在進行子宮切除（hysterectomy）結紮子宮動脈時，下列何者最可能會被誤紮？",
+    "options": {
+      "A": "卵巢動脈（ovarian artery）",
+      "B": "陰部內動脈（internal pudendal artery）",
+      "C": "輸尿管（ureter）",
+      "D": "陰部神經（pudendal nerve）"
+    },
+    "answer": "C",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "會陰三角｜在進行子宮切除（hysterectomy）結",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 102 年第一次醫師一階醫學（一）",
+    "sourceYear": 2013,
+    "sourceRound": 1,
+    "originalQuestionNumber": 20
+  },
+  {
+    "id": "MOEX-102030-1101-Q024",
+    "subject": "解剖學",
+    "chapter": "胸腔",
+    "section": "縱膈",
+    "stem": "下列那一群肌肉的收縮會造成手指以中指（middle finger）為中心外展（abduction）的動作？",
+    "options": {
+      "A": "掌短肌（palmaris brevis）",
+      "B": "骨間背側肌（dorsal interossei）",
+      "C": "骨間掌側肌（palmar interossei）",
+      "D": "蚓狀肌（lumbricals）"
+    },
+    "answer": "B",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "縱膈｜下列那一群肌肉的收縮會造成手指以中指（mid",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 102 年第一次醫師一階醫學（一）",
+    "sourceYear": 2013,
+    "sourceRound": 1,
+    "originalQuestionNumber": 24
+  },
+  {
+    "id": "MOEX-102030-1101-Q026",
+    "subject": "解剖學",
+    "chapter": "上肢",
+    "section": "上肢血管",
+    "stem": "肱骨在三角肌粗隆（deltoid tuberosity of humerus）位置的骨折，最可能直接傷及那一條血管？",
+    "options": {
+      "A": "肱骨前迴旋動脈（anterior circumflex humeral artery）",
+      "B": "肱骨後迴旋動脈（posterior circumflex humeral artery）",
+      "C": "肩胛迴旋動脈（circumflex scapular artery）",
+      "D": "肱深動脈（profunda brachii artery）"
+    },
+    "answer": "D",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "上肢血管｜肱骨在三角肌粗隆（deltoid tuber",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 102 年第一次醫師一階醫學（一）",
+    "sourceYear": 2013,
+    "sourceRound": 1,
+    "originalQuestionNumber": 26
+  },
+  {
+    "id": "MOEX-102030-1101-Q027",
+    "subject": "解剖學",
+    "chapter": "上肢",
+    "section": "臂神經叢",
+    "stem": "下列那一條神經受損，會造成肘關節屈曲（flexion）無力？",
+    "options": {
+      "A": "肌皮神經（musculocutaneous nerve）",
+      "B": "正中神經（median nerve）",
+      "C": "尺神經（ulnar nerve）",
+      "D": "橈神經（radial nerve）"
+    },
+    "answer": "A",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "臂神經叢終末分支",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 102 年第一次醫師一階醫學（一）",
+    "sourceYear": 2013,
+    "sourceRound": 1,
+    "originalQuestionNumber": 27
+  },
+  {
+    "id": "MOEX-102030-1101-Q028",
+    "subject": "解剖學",
+    "chapter": "腹部",
+    "section": "肝膽胰脾",
+    "stem": "蹠肌（plantaris）的肌腱位於下列那兩塊肌肉之間？",
+    "options": {
+      "A": "腓腸肌（gastrocnemius）與比目魚肌（soleus）",
+      "B": "比目魚肌與脛後肌（tibialis posterior）",
+      "C": "脛後肌與脛前肌（tibialis anterior）",
+      "D": "腓骨長肌（fibularis longus）與腓骨短肌（fibularis brevis）"
+    },
+    "answer": "A",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "肝膽胰脾｜蹠肌（plantaris）的肌腱位於下列那兩",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 102 年第一次醫師一階醫學（一）",
+    "sourceYear": 2013,
+    "sourceRound": 1,
+    "originalQuestionNumber": 28
+  },
+  {
+    "id": "MOEX-102030-1101-Q033",
+    "subject": "解剖學",
+    "chapter": "骨盆與會陰",
+    "section": "會陰三角",
+    "stem": "下列何者其管壁外圍不含平滑肌層？",
+    "options": {
+      "A": "輸精管（ductus deferens）",
+      "B": "副睪管（ductus epididymis）",
+      "C": "射精管（ejaculatory duct）",
+      "D": "輸出小管（ductulus efferens）"
+    },
+    "answer": "C",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "會陰三角｜下列何者其管壁外圍不含平滑肌層",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 102 年第一次醫師一階醫學（一）",
+    "sourceYear": 2013,
+    "sourceRound": 1,
+    "originalQuestionNumber": 33
+  },
+  {
+    "id": "MOEX-102030-1101-Q051",
+    "subject": "解剖學",
+    "chapter": "腹部",
+    "section": "肝膽胰脾",
+    "stem": "承上題，下列對霍亂弧菌的敘述，何者正確？",
+    "options": {
+      "A": "對酸的耐受性高",
+      "B": "所產生的神經毒素會刺激腸道的蠕動",
+      "C": "人類是此菌唯一的天然宿主",
+      "D": "無法生長於未添加鹽的培養基"
+    },
+    "answer": "C",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "肝膽胰脾｜下列對霍亂弧菌的敘述，何者正確",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 102 年第一次醫師一階醫學（一）",
+    "sourceYear": 2013,
+    "sourceRound": 1,
+    "originalQuestionNumber": 51
+  },
+  {
+    "id": "MOEX-102030-1101-Q084",
+    "subject": "解剖學",
+    "chapter": "上肢",
+    "section": "上肢血管",
+    "stem": "下列何種統計指標較不受極端值的影響？",
+    "options": {
+      "A": "平均值（Mean）",
+      "B": "第 75 百分位數（The 75th percentile）",
+      "C": "樣本標準差（Standard deviation）",
+      "D": "樣本標準誤（Standard error）"
+    },
+    "answer": "B",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "上肢血管｜下列何種統計指標較不受極端值的影響",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 102 年第一次醫師一階醫學（一）",
+    "sourceYear": 2013,
+    "sourceRound": 1,
+    "originalQuestionNumber": 84
+  },
+  {
+    "id": "MOEX-102110-1101-Q001",
+    "subject": "解剖學",
+    "chapter": "神經解剖",
+    "section": "腦幹核區",
+    "stem": "下列有關大腦白質的敘述，何者錯誤？",
+    "options": {
+      "A": "cingulum 含有 association fibers",
+      "B": "corpus callosum 含有 commissural fibers",
+      "C": "uncinate fasciculus 連接大腦額葉與顳葉",
+      "D": "Meyer's loop 傳導聽覺訊息"
+    },
+    "answer": "D",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "腦幹核區｜下列有關大腦白質的敘述，何者錯誤",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 102 年第二次醫師一階醫學（一）",
+    "sourceYear": 2013,
+    "sourceRound": 2,
+    "originalQuestionNumber": 1
+  },
+  {
+    "id": "MOEX-102110-1101-Q003",
+    "subject": "解剖學",
+    "chapter": "神經解剖",
+    "section": "聽覺與前庭路徑",
+    "stem": "下列有關聽覺之敘述，何者錯誤？",
+    "options": {
+      "A": "右耳之聽覺訊息可傳入兩側大腦皮質",
+      "B": "聽覺皮質主要位於大腦額葉",
+      "C": "腦幹可發出抑制性訊息抑制內耳聽覺接受器",
+      "D": "Wernicke's area 屬於聽覺聯合皮質（auditory association cortex）"
+    },
+    "answer": "B",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "聽覺與前庭路徑｜下列有關聽覺之敘述，何者錯誤",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 102 年第二次醫師一階醫學（一）",
+    "sourceYear": 2013,
+    "sourceRound": 2,
+    "originalQuestionNumber": 3
+  },
+  {
+    "id": "MOEX-102110-1101-Q004",
+    "subject": "解剖學",
+    "chapter": "神經解剖",
+    "section": "腦幹核區",
+    "stem": "下列有關 paleospinothalamic system 之敘述，何者錯誤？",
+    "options": {
+      "A": "與意識狀態有關",
+      "B": "可傳導痛覺",
+      "C": "傳導路徑不經過網狀系統（reticular formation）",
+      "D": "此體感覺傳導系統較缺乏定位功能"
+    },
+    "answer": "C",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "腦幹核區｜下列有關 paleospinothalami",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 102 年第二次醫師一階醫學（一）",
+    "sourceYear": 2013,
+    "sourceRound": 2,
+    "originalQuestionNumber": 4
+  },
+  {
+    "id": "MOEX-102110-1101-Q007",
+    "subject": "解剖學",
+    "chapter": "神經解剖",
+    "section": "腦幹核區",
+    "stem": "下列何者是經過枕三角（occipital triangle）的重要構造？",
+    "options": {
+      "A": "鎖骨下動脈（subclavian artery）",
+      "B": "脊髓副神經（spinal accessory nerve）",
+      "C": "迷走神經（vagus nerve）",
+      "D": "內頸靜脈（internal jugular vein）"
+    },
+    "answer": "B",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "腦幹核區｜下列何者是經過枕三角（occipital t",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 102 年第二次醫師一階醫學（一）",
+    "sourceYear": 2013,
+    "sourceRound": 2,
+    "originalQuestionNumber": 7
+  },
+  {
+    "id": "MOEX-102110-1101-Q008",
+    "subject": "解剖學",
+    "chapter": "頭頸部",
+    "section": "顏面神經與三叉神經",
+    "stem": "下列有關眼睛睫狀體（ciliary body）功能的敘述，何者錯誤？",
+    "options": {
+      "A": "產生眼房液（aqueous humor）",
+      "B": "支撐懸吊晶狀體（lens）",
+      "C": "調節進入眼球的光量",
+      "D": "調整晶狀體（lens）的厚度"
+    },
+    "answer": "C",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "顏面神經與三叉神經｜下列有關眼睛睫狀體（ciliary body",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 102 年第二次醫師一階醫學（一）",
+    "sourceYear": 2013,
+    "sourceRound": 2,
+    "originalQuestionNumber": 8
+  },
+  {
+    "id": "MOEX-102110-1101-Q011",
+    "subject": "解剖學",
+    "chapter": "腹部",
+    "section": "腹膜關係",
+    "stem": "下列有關蛛網膜下腔（subarachnoid space）的敘述，何者錯誤？",
+    "options": {
+      "A": "分泌腦脊髓液（CSF）",
+      "B": "會沿著視神經（optic nerve）延伸到眼球後壁",
+      "C": "與大腦腦室相通",
+      "D": "內有大腦動脈"
+    },
+    "answer": "A",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "腹膜關係｜下列有關蛛網膜下腔（subarachnoid",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 102 年第二次醫師一階醫學（一）",
+    "sourceYear": 2013,
+    "sourceRound": 2,
+    "originalQuestionNumber": 11
+  },
+  {
+    "id": "MOEX-102110-1101-Q013",
+    "subject": "解剖學",
+    "chapter": "胸腔",
+    "section": "縱膈",
+    "stem": "一般情況下，右支氣管靜脈（right bronchial vein）回流至下列何者？",
+    "options": {
+      "A": "奇靜脈（azygos vein）",
+      "B": "半奇靜脈（hemiazygos vein）",
+      "C": "副半奇靜脈（accessory hemiazygos vein）",
+      "D": "下腔靜脈（inferior vena cava）"
+    },
+    "answer": "A",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "後縱膈主要構造",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 102 年第二次醫師一階醫學（一）",
+    "sourceYear": 2013,
+    "sourceRound": 2,
+    "originalQuestionNumber": 13
+  },
+  {
+    "id": "MOEX-102110-1101-Q014",
+    "subject": "解剖學",
+    "chapter": "頭頸部",
+    "section": "咽喉解剖",
+    "stem": "病患右肺尖端有腫瘤，且出現聲音嘶啞的情形，腫瘤最可能已經侵犯下列何者？",
+    "options": {
+      "A": "膈神經（phrenic nerve）",
+      "B": "迷走神經（vagus nerve）",
+      "C": "喉返神經（recurrent laryngeal nerve）",
+      "D": "交感神經幹（sympathetic trunk）"
+    },
+    "answer": "C",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "喉返神經走行",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 102 年第二次醫師一階醫學（一）",
+    "sourceYear": 2013,
+    "sourceRound": 2,
+    "originalQuestionNumber": 14
+  },
+  {
+    "id": "MOEX-102110-1101-Q015",
+    "subject": "解剖學",
+    "chapter": "上肢",
+    "section": "上肢血管",
+    "stem": "下列何者受損會影響肱骨（humerus）的內收（adduct）、內旋（medially rotate）及屈曲（flex）功能？",
+    "options": {
+      "A": "胸大肌（pectoralis major）",
+      "B": "胸小肌（pectoralis minor）",
+      "C": "鎖骨下肌（subclavius）",
+      "D": "前鋸肌（serratus anterior）"
+    },
+    "answer": "A",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "上肢血管｜下列何者受損會影響肱骨（humerus）的內",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 102 年第二次醫師一階醫學（一）",
+    "sourceYear": 2013,
+    "sourceRound": 2,
+    "originalQuestionNumber": 15
+  },
+  {
+    "id": "MOEX-102110-1101-Q016",
+    "subject": "解剖學",
+    "chapter": "胸腔",
+    "section": "縱膈",
+    "stem": "血塊造成腦部血管栓塞（embolism），此血塊最不可能來自下列何者？",
+    "options": {
+      "A": "上腔靜脈（superior vena cava）",
+      "B": "右肺靜脈（right pulmonary vein）",
+      "C": "左心室（left ventricle）",
+      "D": "左心房（left atrium）"
+    },
+    "answer": "A",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "縱膈｜血塊造成腦部血管栓塞（embolism），此",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 102 年第二次醫師一階醫學（一）",
+    "sourceYear": 2013,
+    "sourceRound": 2,
+    "originalQuestionNumber": 16
+  },
+  {
+    "id": "MOEX-102110-1101-Q017",
+    "subject": "解剖學",
+    "chapter": "腹部",
+    "section": "腹膜關係",
+    "stem": "大網膜（greater omentum）的動脈血流來自下列何者？",
+    "options": {
+      "A": "腹腔動脈幹（celiac trunk）",
+      "B": "腸繫膜上動脈（superior mesenteric artery）",
+      "C": "腸繫膜下動脈（inferior mesenteric artery）",
+      "D": "髂內動脈（internal iliac artery）"
+    },
+    "answer": "A",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "腹膜關係｜大網膜（greater omentum）的動",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 102 年第二次醫師一階醫學（一）",
+    "sourceYear": 2013,
+    "sourceRound": 2,
+    "originalQuestionNumber": 17
+  },
+  {
+    "id": "MOEX-102110-1101-Q018",
+    "subject": "解剖學",
+    "chapter": "骨盆與會陰",
+    "section": "泌尿生殖",
+    "stem": "下列何者不直接緊貼膀胱的後表面？",
+    "options": {
+      "A": "子宮",
+      "B": "陰道",
+      "C": "直腸",
+      "D": "輸精管"
+    },
+    "answer": "C",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "子宮支持構造",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 102 年第二次醫師一階醫學（一）",
+    "sourceYear": 2013,
+    "sourceRound": 2,
+    "originalQuestionNumber": 18
+  },
+  {
+    "id": "MOEX-102110-1101-Q019",
+    "subject": "解剖學",
+    "chapter": "腹部",
+    "section": "肝膽胰脾",
+    "stem": "胃潰瘍的疼痛由下列何者傳導？",
+    "options": {
+      "A": "內臟大神經（greater splanchnic nerve）",
+      "B": "內臟小神經（lesser splanchnic nerve）",
+      "C": "內臟最小神經（least splanchnic nerve）",
+      "D": "迷走神經（vagus nerve）"
+    },
+    "answer": "A",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "肝膽胰脾｜胃潰瘍的疼痛由下列何者傳導",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 102 年第二次醫師一階醫學（一）",
+    "sourceYear": 2013,
+    "sourceRound": 2,
+    "originalQuestionNumber": 19
+  },
+  {
+    "id": "MOEX-102110-1101-Q020",
+    "subject": "解剖學",
+    "chapter": "腹部",
+    "section": "肝膽胰脾",
+    "stem": "右胃動脈（right gastric artery）由下列何者發出？",
+    "options": {
+      "A": "肝總動脈（common hepatic artery）",
+      "B": "腹主動脈（abdominal aorta）",
+      "C": "脾動脈（splenic artery）",
+      "D": "腸繫膜上動脈（superior mesenteric artery）"
+    },
+    "answer": "A",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "脾動脈走行",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 102 年第二次醫師一階醫學（一）",
+    "sourceYear": 2013,
+    "sourceRound": 2,
+    "originalQuestionNumber": 20
+  },
+  {
+    "id": "MOEX-102110-1101-Q023",
+    "subject": "解剖學",
+    "chapter": "骨盆與會陰",
+    "section": "會陰三角",
+    "stem": "下列何者不附著於會陰體（perineal body）？",
+    "options": {
+      "A": "肛門外括約肌（external anal sphincter）",
+      "B": "球海綿體肌（bulbospongiosus）",
+      "C": "提肛肌（levator ani）",
+      "D": "坐骨海綿體肌（ischiocavernosus）"
+    },
+    "answer": "D",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "骨盆底與會陰支持",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 102 年第二次醫師一階醫學（一）",
+    "sourceYear": 2013,
+    "sourceRound": 2,
+    "originalQuestionNumber": 23
+  },
+  {
+    "id": "MOEX-102110-1101-Q024",
+    "subject": "解剖學",
+    "chapter": "骨盆與會陰",
+    "section": "會陰三角",
+    "stem": "下列何者不在陰莖深筋膜（deep fascia of the penis）內？",
+    "options": {
+      "A": "陰莖襻狀韌帶（fundiform ligament of penis）",
+      "B": "陰莖深背靜脈（deep dorsal vein of penis）",
+      "C": "陰莖背動脈（dorsal artery of penis）",
+      "D": "尿道海綿體（corpus spongiosum）"
+    },
+    "answer": "A",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "會陰三角｜下列何者不在陰莖深筋膜（deep fasci",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 102 年第二次醫師一階醫學（一）",
+    "sourceYear": 2013,
+    "sourceRound": 2,
+    "originalQuestionNumber": 24
+  },
+  {
+    "id": "MOEX-102110-1101-Q025",
+    "subject": "解剖學",
+    "chapter": "上肢",
+    "section": "臂神經叢",
+    "stem": "在上臂（arm）處，臂神經叢發出的那兩條神經沒有分支？",
+    "options": {
+      "A": "肌皮與正中神經（musculocutaneous and median nerves）",
+      "B": "尺與橈神經（ulnar and radial nerves）",
+      "C": "肌皮與橈神經（musculocutaneous and radial nerves）",
+      "D": "正中與尺神經（median and ulnar nerves）"
+    },
+    "answer": "D",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "臂神經叢終末分支",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 102 年第二次醫師一階醫學（一）",
+    "sourceYear": 2013,
+    "sourceRound": 2,
+    "originalQuestionNumber": 25
+  },
+  {
+    "id": "MOEX-102110-1101-Q026",
+    "subject": "解剖學",
+    "chapter": "上肢",
+    "section": "臂神經叢",
+    "stem": "下列那一條神經受損會造成爪形手（claw hand）的症狀？",
+    "options": {
+      "A": "肌皮神經（musculocutaneous nerve）",
+      "B": "正中神經（median nerve）",
+      "C": "尺神經（ulnar nerve）",
+      "D": "橈神經（radial nerve）"
+    },
+    "answer": "C",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "臂神經叢終末分支",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 102 年第二次醫師一階醫學（一）",
+    "sourceYear": 2013,
+    "sourceRound": 2,
+    "originalQuestionNumber": 26
+  },
+  {
+    "id": "MOEX-102110-1101-Q027",
+    "subject": "解剖學",
+    "chapter": "上肢",
+    "section": "臂神經叢",
+    "stem": "下列何者穿過喙肱肌（coracobrachialis）後支配肱二頭肌（biceps brachii）？",
+    "options": {
+      "A": "肌皮神經（musculocutaneous nerve）",
+      "B": "正中神經（median nerve）",
+      "C": "尺神經（ulnar nerve）",
+      "D": "橈神經（radial nerve）"
+    },
+    "answer": "A",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "臂神經叢終末分支",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 102 年第二次醫師一階醫學（一）",
+    "sourceYear": 2013,
+    "sourceRound": 2,
+    "originalQuestionNumber": 27
+  },
+  {
+    "id": "MOEX-102110-1101-Q028",
+    "subject": "解剖學",
+    "chapter": "下肢",
+    "section": "腰薦神經叢",
+    "stem": "下列何者伴行脛前動脈（anterior tibial artery）且負責支配脛前肌（tibialis anterior）？",
+    "options": {
+      "A": "脛神經（tibial nerve）",
+      "B": "隱神經（saphenous nerve）",
+      "C": "腓深神經（deep fibular nerve）",
+      "D": "腓淺神經（superficial fibular nerve）"
+    },
+    "answer": "C",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "腓總神經及分支",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 102 年第二次醫師一階醫學（一）",
+    "sourceYear": 2013,
+    "sourceRound": 2,
+    "originalQuestionNumber": 28
+  },
+  {
+    "id": "MOEX-102110-1101-Q031",
+    "subject": "解剖學",
+    "chapter": "胸腔",
+    "section": "心臟與冠狀動脈",
+    "stem": "心房中隔缺損（atrial septal defect）最常發生於下列何處？",
+    "options": {
+      "A": "卵圓孔（oval foramen）",
+      "B": "冠狀竇（coronary sinus）",
+      "C": "右心耳（right auricle）",
+      "D": "終嵴（crista terminalis）"
+    },
+    "answer": "A",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "心臟與冠狀動脈｜心房中隔缺損（atrial septal d",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 102 年第二次醫師一階醫學（一）",
+    "sourceYear": 2013,
+    "sourceRound": 2,
+    "originalQuestionNumber": 31
+  },
+  {
+    "id": "MOEX-102110-1101-Q032",
+    "subject": "解剖學",
+    "chapter": "頭頸部",
+    "section": "顏面神經與三叉神經",
+    "stem": "下列何者不是由膜內骨化（intramembranous ossification）方式形成？",
+    "options": {
+      "A": "上頜骨（maxilla）",
+      "B": "下頜骨（mandible）",
+      "C": "顳骨岩部（petrous part of temporal bone）",
+      "D": "頂骨（parietal bone）"
+    },
+    "answer": "C",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "顏面神經與三叉神經｜下列何者不是由膜內骨化（intramembr",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 102 年第二次醫師一階醫學（一）",
+    "sourceYear": 2013,
+    "sourceRound": 2,
+    "originalQuestionNumber": 32
+  },
+  {
+    "id": "MOEX-102110-1101-Q037",
+    "subject": "解剖學",
+    "chapter": "腹部",
+    "section": "肝膽胰脾",
+    "stem": "乳糜管（lacteal）分布於小腸的那一層？",
+    "options": {
+      "A": "黏膜固有層（lamina propria）",
+      "B": "黏膜下層（submucosa）",
+      "C": "黏膜肌層（muscularis mucosae）",
+      "D": "漿膜層（serosa）"
+    },
+    "answer": "A",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "肝膽胰脾｜乳糜管（lacteal）分布於小腸的那一層",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 102 年第二次醫師一階醫學（一）",
+    "sourceYear": 2013,
+    "sourceRound": 2,
+    "originalQuestionNumber": 37
+  },
+  {
+    "id": "MOEX-102110-1101-Q056",
+    "subject": "解剖學",
+    "chapter": "胸腔",
+    "section": "縱膈",
+    "stem": "一位 25 歲男子休假赴東南亞旅行，為了節省費用，吃住均找價錢最低廉者，回國後 2 星期出現發燒、 噁心、腹部疼痛、沒有食慾及感到疲勞等症狀，雖然去看了醫生並服了藥，4 天後仍發生黃疸的現象， 此男子可能得了什麼疾病？",
+    "options": {
+      "A": "黃熱病",
+      "B": "肝炎",
+      "C": "登革熱",
+      "D": "腸胃炎"
+    },
+    "answer": "B",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "縱膈｜一位 25 歲男子休假赴東南亞旅行，為了節省",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 102 年第二次醫師一階醫學（一）",
+    "sourceYear": 2013,
+    "sourceRound": 2,
+    "originalQuestionNumber": 56
+  },
+  {
+    "id": "MOEX-103030-1101-Q001",
+    "subject": "解剖學",
+    "chapter": "神經解剖",
+    "section": "腦幹核區",
+    "stem": "左側中大腦動脈（middle cerebral artery）阻塞，最可能造成下列何種症狀？",
+    "options": {
+      "A": "左視野缺失",
+      "B": "右下肢感覺喪失",
+      "C": "右下肢無力",
+      "D": "失語症"
+    },
+    "answer": "D",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "腦幹核區｜左側中大腦動脈（middle cerebra",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 103 年第一次醫師一階醫學（一）",
+    "sourceYear": 2014,
+    "sourceRound": 1,
+    "originalQuestionNumber": 1
+  },
+  {
+    "id": "MOEX-103030-1101-Q003",
+    "subject": "解剖學",
+    "chapter": "神經解剖",
+    "section": "腦幹核區",
+    "stem": "下列有關下行路徑之敘述，何者錯誤？",
+    "options": {
+      "A": "外側皮質脊髓徑（lateral corticospinal tract）可調控下運動神經元（lower motor neuron）",
+      "B": "raphespinal tract 可調控痛覺",
+      "C": "前庭脊髓徑（vestibulospinal tract）控制手指精細運動",
+      "D": "下視丘脊髓徑（hypothalmospinal tract）調控自主神經系統"
+    },
+    "answer": "C",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "腦幹核區｜下列有關下行路徑之敘述，何者錯誤",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 103 年第一次醫師一階醫學（一）",
+    "sourceYear": 2014,
+    "sourceRound": 1,
+    "originalQuestionNumber": 3
+  },
+  {
+    "id": "MOEX-103030-1101-Q009",
+    "subject": "解剖學",
+    "chapter": "頭頸部",
+    "section": "顏面神經與三叉神經",
+    "stem": "下列何者不傳遞鼻腔黏膜的感覺訊息？",
+    "options": {
+      "A": "篩前神經（anterior ethmoidal nerve）",
+      "B": "腭小神經（lesser palatine nerve）",
+      "C": "鼻腭神經（nasopalatine nerve）",
+      "D": "腭大神經（greater palatine nerve）"
+    },
+    "answer": "B",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "顏面神經與三叉神經｜下列何者不傳遞鼻腔黏膜的感覺訊息",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 103 年第一次醫師一階醫學（一）",
+    "sourceYear": 2014,
+    "sourceRound": 1,
+    "originalQuestionNumber": 9
+  },
+  {
+    "id": "MOEX-103030-1101-Q010",
+    "subject": "解剖學",
+    "chapter": "頭頸部",
+    "section": "顏面神經與三叉神經",
+    "stem": "病患的左眼可以看向左方但無法同時上抬，下列何者最可能損傷？",
+    "options": {
+      "A": "左眼之上斜肌",
+      "B": "左眼之上直肌",
+      "C": "左眼之內直肌",
+      "D": "左眼之下斜肌"
+    },
+    "answer": "B",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "顏面神經與三叉神經｜病患的左眼可以看向左方但無法同時上抬，下列何",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 103 年第一次醫師一階醫學（一）",
+    "sourceYear": 2014,
+    "sourceRound": 1,
+    "originalQuestionNumber": 10
+  },
+  {
+    "id": "MOEX-103030-1101-Q012",
+    "subject": "解剖學",
+    "chapter": "胸腔",
+    "section": "心臟與冠狀動脈",
+    "stem": "一般情況下，下列何者分支出心臟的斜角動脈（diagonal artery）？",
+    "options": {
+      "A": "右邊緣動脈（right marginal artery）",
+      "B": "左邊緣動脈（left marginal artery）",
+      "C": "前室間動脈（anterior interventricular artery）",
+      "D": "後室間動脈（posterior interventricular artery）"
+    },
+    "answer": "C",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "左前降支供血",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 103 年第一次醫師一階醫學（一）",
+    "sourceYear": 2014,
+    "sourceRound": 1,
+    "originalQuestionNumber": 12
+  },
+  {
+    "id": "MOEX-103030-1101-Q014",
+    "subject": "解剖學",
+    "chapter": "腹部",
+    "section": "肝膽胰脾",
+    "stem": "胃的那個部分突出於其食道入口處的上方？",
+    "options": {
+      "A": "胃體（body）",
+      "B": "胃底（fundus）",
+      "C": "賁門（cardia）",
+      "D": "幽門（pyloric antrum）"
+    },
+    "answer": "B",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "肝膽胰脾｜胃的那個部分突出於其食道入口處的上方",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 103 年第一次醫師一階醫學（一）",
+    "sourceYear": 2014,
+    "sourceRound": 1,
+    "originalQuestionNumber": 14
+  },
+  {
+    "id": "MOEX-103030-1101-Q016",
+    "subject": "解剖學",
+    "chapter": "腹部",
+    "section": "肝膽胰脾",
+    "stem": "左卵巢靜脈匯入：",
+    "options": {
+      "A": "下腔靜脈（inferior vena cava）",
+      "B": "左腎靜脈（left renal vein）",
+      "C": "左子宮靜脈（left uterine vein）",
+      "D": "左髂內靜脈（left internal iliac vein）"
+    },
+    "answer": "B",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "肝膽胰脾｜左卵巢靜脈匯入：",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 103 年第一次醫師一階醫學（一）",
+    "sourceYear": 2014,
+    "sourceRound": 1,
+    "originalQuestionNumber": 16
+  },
+  {
+    "id": "MOEX-103030-1101-Q017",
+    "subject": "解剖學",
+    "chapter": "骨盆與會陰",
+    "section": "泌尿生殖",
+    "stem": "下列何者不直接與子宮相連？",
+    "options": {
+      "A": "闊韌帶（broad ligament）",
+      "B": "懸韌帶（suspensory ligament of ovary）",
+      "C": "卵巢韌帶（ligament of ovary）",
+      "D": "子宮圓韌帶（round ligament of uterus）"
+    },
+    "answer": "B",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "子宮支持構造",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 103 年第一次醫師一階醫學（一）",
+    "sourceYear": 2014,
+    "sourceRound": 1,
+    "originalQuestionNumber": 17
+  },
+  {
+    "id": "MOEX-103030-1101-Q020",
+    "subject": "解剖學",
+    "chapter": "骨盆與會陰",
+    "section": "泌尿生殖",
+    "stem": "下列何者不支配陰囊（scrotum）？",
+    "options": {
+      "A": "閉孔神經（obturator nerve）",
+      "B": "股後側皮神經（posterior femoral cutaneous nerve）",
+      "C": "陰部神經（pudendal nerve）",
+      "D": "髂腹股溝神經（ilioinguinal nerve）"
+    },
+    "answer": "A",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "泌尿生殖｜下列何者不支配陰囊（scrotum）",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 103 年第一次醫師一階醫學（一）",
+    "sourceYear": 2014,
+    "sourceRound": 1,
+    "originalQuestionNumber": 20
+  },
+  {
+    "id": "MOEX-103030-1101-Q021",
+    "subject": "解剖學",
+    "chapter": "下肢",
+    "section": "腰薦神經叢",
+    "stem": "下列何者受傷，最不可能影響肌肉收縮？",
+    "options": {
+      "A": "腓深神經（deep peroneal nerve）",
+      "B": "腓淺神經（superficial peroneal nerve）",
+      "C": "閉孔神經（obturator nerve）",
+      "D": "隱神經（saphenous nerve）"
+    },
+    "answer": "D",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "閉孔神經支配",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 103 年第一次醫師一階醫學（一）",
+    "sourceYear": 2014,
+    "sourceRound": 1,
+    "originalQuestionNumber": 21
+  },
+  {
+    "id": "MOEX-103030-1101-Q022",
+    "subject": "解剖學",
+    "chapter": "下肢",
+    "section": "腰薦神經叢",
+    "stem": "下列何者最不適合作為下肢表面解剖學的標記？",
+    "options": {
+      "A": "脛骨粗隆（tibial tuberosity）",
+      "B": "脛骨內髁（medial malleolus）",
+      "C": "腓骨外髁（lateral malleolus）",
+      "D": "腓骨骨幹外側的中間 1/3"
+    },
+    "answer": "D",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "腰薦神經叢｜下列何者最不適合作為下肢表面解剖學的標記",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 103 年第一次醫師一階醫學（一）",
+    "sourceYear": 2014,
+    "sourceRound": 1,
+    "originalQuestionNumber": 22
+  },
+  {
+    "id": "MOEX-103030-1101-Q023",
+    "subject": "解剖學",
+    "chapter": "下肢",
+    "section": "臀區",
+    "stem": "臀部肌肉注射時，外上四分之一象限（upper lateral quadrant）是安全部位，下列何者位於此部位？",
+    "options": {
+      "A": "股四方肌（quadratus femoris）",
+      "B": "臀中肌（gluteus medius）",
+      "C": "闊筋膜張肌（tensor fasciae latae）",
+      "D": "髂腰肌（iliopsoas）"
+    },
+    "answer": "B",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "臀區｜臀部肌肉注射時，外上四分之一象限（upper",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 103 年第一次醫師一階醫學（一）",
+    "sourceYear": 2014,
+    "sourceRound": 1,
+    "originalQuestionNumber": 23
+  },
+  {
+    "id": "MOEX-103030-1101-Q024",
+    "subject": "解剖學",
+    "chapter": "上肢",
+    "section": "肩胛區",
+    "stem": "下列何者起自肩胛骨的喙突（coracoid process of scapula）？",
+    "options": {
+      "A": "肱二頭肌長頭（long head of biceps brachii）",
+      "B": "肱二頭肌短頭（short head of biceps brachii）",
+      "C": "肱三頭肌長頭（long head of triceps brachii）",
+      "D": "肱三頭肌內側頭（medial head of triceps brachii）"
+    },
+    "answer": "B",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "肩胛區｜下列何者起自肩胛骨的喙突（coracoid ",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 103 年第一次醫師一階醫學（一）",
+    "sourceYear": 2014,
+    "sourceRound": 1,
+    "originalQuestionNumber": 24
+  },
+  {
+    "id": "MOEX-103030-1101-Q025",
+    "subject": "解剖學",
+    "chapter": "上肢",
+    "section": "臂神經叢",
+    "stem": "下列何者受損會導致手部拇指（thumb）無法做對掌（opposition）的動作？",
+    "options": {
+      "A": "肌皮神經（musculocutaneous nerve）",
+      "B": "正中神經（median nerve）",
+      "C": "尺神經（ulnar nerve）",
+      "D": "橈神經（radial nerve）"
+    },
+    "answer": "B",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "臂神經叢終末分支",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 103 年第一次醫師一階醫學（一）",
+    "sourceYear": 2014,
+    "sourceRound": 1,
+    "originalQuestionNumber": 25
+  },
+  {
+    "id": "MOEX-103030-1101-Q026",
+    "subject": "解剖學",
+    "chapter": "胸腔",
+    "section": "縱膈",
+    "stem": "下列有關人體脊柱（vertebral column）的彎曲，何者正確？",
+    "options": {
+      "A": "頸部與胸部向前凸",
+      "B": "頸部與腰部向前凸",
+      "C": "胸部與薦部向前凸",
+      "D": "腰部與薦部向後凸"
+    },
+    "answer": "B",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "縱膈｜下列有關人體脊柱（vertebral col",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 103 年第一次醫師一階醫學（一）",
+    "sourceYear": 2014,
+    "sourceRound": 1,
+    "originalQuestionNumber": 26
+  },
+  {
+    "id": "MOEX-103030-1101-Q027",
+    "subject": "解剖學",
+    "chapter": "神經解剖",
+    "section": "腦幹核區",
+    "stem": "下列何者走過枕下三角（suboccipital triangle）？",
+    "options": {
+      "A": "枕動脈（occipital artery）",
+      "B": "椎動脈（vertebral artery）",
+      "C": "脊髓後動脈（posterior spinal artery）",
+      "D": "耳後動脈（posterior auricular artery）"
+    },
+    "answer": "B",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "腦幹核區｜下列何者走過枕下三角（suboccipita",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 103 年第一次醫師一階醫學（一）",
+    "sourceYear": 2014,
+    "sourceRound": 1,
+    "originalQuestionNumber": 27
+  },
+  {
+    "id": "MOEX-103030-1101-Q028",
+    "subject": "解剖學",
+    "chapter": "神經解剖",
+    "section": "視覺路徑",
+    "stem": "兩眼外側（顳側）視野有缺損（bitemporal hemianopia），最可能的病灶位置是在：",
+    "options": {
+      "A": "視網膜",
+      "B": "視神經",
+      "C": "視交叉",
+      "D": "視覺皮質"
+    },
+    "answer": "C",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "視交叉病灶",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 103 年第一次醫師一階醫學（一）",
+    "sourceYear": 2014,
+    "sourceRound": 1,
+    "originalQuestionNumber": 28
+  },
+  {
+    "id": "MOEX-103030-1101-Q037",
+    "subject": "解剖學",
+    "chapter": "頭頸部",
+    "section": "舌與味覺",
+    "stem": "下列那一種舌乳突（lingual papillae）不含味蕾？",
+    "options": {
+      "A": "輪廓（circumvallate）乳突",
+      "B": "蕈狀（fungiform）乳突",
+      "C": "葉狀（foliate）乳突",
+      "D": "絲狀（filiform）乳突"
+    },
+    "answer": "D",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "舌與味覺｜下列那一種舌乳突（lingual papil",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 103 年第一次醫師一階醫學（一）",
+    "sourceYear": 2014,
+    "sourceRound": 1,
+    "originalQuestionNumber": 37
+  },
+  {
+    "id": "MOEX-103030-1101-Q098",
+    "subject": "解剖學",
+    "chapter": "胸腔",
+    "section": "縱膈",
+    "stem": "改變行為的過程可以分成嘗試（想要改變）、承諾（決心改變）、行動（力行改變）和持續（堅強 改變）四個階段。新建立的行為若無法堅持，致使舊行為再度出現，這個現象通常稱為什麼？",
+    "options": {
+      "A": "改變",
+      "B": "復發",
+      "C": "修飾",
+      "D": "強化"
+    },
+    "answer": "B",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "縱膈｜改變行為的過程可以分成嘗試（想要改變）、承諾",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 103 年第一次醫師一階醫學（一）",
+    "sourceYear": 2014,
+    "sourceRound": 1,
+    "originalQuestionNumber": 98
+  },
+  {
+    "id": "MOEX-103100-1101-Q001",
+    "subject": "解剖學",
+    "chapter": "神經解剖",
+    "section": "腦幹核區",
+    "stem": "下列有關初級視覺皮質之敘述，何者錯誤？",
+    "options": {
+      "A": "位於 Brodmann area 17",
+      "B": "其傳入神經主要來自外膝狀體（lateral geniculate body）",
+      "C": "右側初級視覺皮質之傳入訊息主要來自左側眼球",
+      "D": "具有 line of Gennari"
+    },
+    "answer": "C",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "腦幹核區｜下列有關初級視覺皮質之敘述，何者錯誤",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 103 年第二次醫師一階醫學（一）",
+    "sourceYear": 2014,
+    "sourceRound": 2,
+    "originalQuestionNumber": 1
+  },
+  {
+    "id": "MOEX-103100-1101-Q002",
+    "subject": "解剖學",
+    "chapter": "神經解剖",
+    "section": "小腦",
+    "stem": "小腦受損時，①dysarthria ②ataxia ③dysmetria ④intentional tremor 等四個症狀中，那些可能發生？",
+    "options": {
+      "A": "僅②③",
+      "B": "僅①②③",
+      "C": "①②③④",
+      "D": "僅②④"
+    },
+    "answer": "C",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "小腦半球病灶",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 103 年第二次醫師一階醫學（一）",
+    "sourceYear": 2014,
+    "sourceRound": 2,
+    "originalQuestionNumber": 2
+  },
+  {
+    "id": "MOEX-103100-1101-Q003",
+    "subject": "解剖學",
+    "chapter": "神經解剖",
+    "section": "脊髓傳導路徑",
+    "stem": "頂蓋脊髓徑（tectospinal tract）主要由何構造發出？",
+    "options": {
+      "A": "外膝狀體（lateral geniculate body）",
+      "B": "紅核（red nucleus）",
+      "C": "上丘（superior colliculus）",
+      "D": "前庭神經核（vestibular nucleus）"
+    },
+    "answer": "C",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "脊髓傳導路徑｜頂蓋脊髓徑（tectospinal trac",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 103 年第二次醫師一階醫學（一）",
+    "sourceYear": 2014,
+    "sourceRound": 2,
+    "originalQuestionNumber": 3
+  },
+  {
+    "id": "MOEX-103100-1101-Q004",
+    "subject": "解剖學",
+    "chapter": "神經解剖",
+    "section": "自律神經",
+    "stem": "下列有關 Horner's syndrome 之敘述何者錯誤？",
+    "options": {
+      "A": "瞳孔縮小",
+      "B": "為交感神經損傷所引起",
+      "C": "眼瞼下垂（ptosis）",
+      "D": "動眼神經受壓迫常會引起此症狀"
+    },
+    "answer": "D",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "Horner syndrome 路徑",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 103 年第二次醫師一階醫學（一）",
+    "sourceYear": 2014,
+    "sourceRound": 2,
+    "originalQuestionNumber": 4
+  },
+  {
+    "id": "MOEX-103100-1101-Q005",
+    "subject": "解剖學",
+    "chapter": "神經解剖",
+    "section": "腦幹核區",
+    "stem": "下列有關網狀系統（reticular formation）之敘述，何者錯誤？",
+    "options": {
+      "A": "網狀系統與睡眠有關",
+      "B": "與痛覺調控有關",
+      "C": "藍斑核（locus coeruleus）神經元以 dopamine 為傳遞物質",
+      "D": "縫核（raphe nucleus）位於腦幹之中央區域"
+    },
+    "answer": "C",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "腦幹核區｜下列有關網狀系統（reticular for",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 103 年第二次醫師一階醫學（一）",
+    "sourceYear": 2014,
+    "sourceRound": 2,
+    "originalQuestionNumber": 5
+  },
+  {
+    "id": "MOEX-103100-1101-Q008",
+    "subject": "解剖學",
+    "chapter": "頭頸部",
+    "section": "舌與味覺",
+    "stem": "下列何者的收縮與舌頭向前突出最為有關？",
+    "options": {
+      "A": "舌骨舌肌（hyoglossus）",
+      "B": "莖突舌肌（styloglossus）",
+      "C": "頦舌肌（genioglossus）",
+      "D": "腭舌肌（palatoglossus）"
+    },
+    "answer": "C",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "舌與味覺｜的收縮與舌頭向前突出最為有關",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 103 年第二次醫師一階醫學（一）",
+    "sourceYear": 2014,
+    "sourceRound": 2,
+    "originalQuestionNumber": 8
+  },
+  {
+    "id": "MOEX-103100-1101-Q009",
+    "subject": "解剖學",
+    "chapter": "神經解剖",
+    "section": "腦幹核區",
+    "stem": "下列何者不是感覺神經節？",
+    "options": {
+      "A": "前庭神經節（vestibular ganglion）",
+      "B": "膝狀神經節（geniculate ganglion）",
+      "C": "耳神經節（otic ganglion）",
+      "D": "螺旋神經節（spiral ganglion）"
+    },
+    "answer": "C",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "腦幹核區｜不是感覺神經節",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 103 年第二次醫師一階醫學（一）",
+    "sourceYear": 2014,
+    "sourceRound": 2,
+    "originalQuestionNumber": 9
+  },
+  {
+    "id": "MOEX-103100-1101-Q010",
+    "subject": "解剖學",
+    "chapter": "神經解剖",
+    "section": "腦幹核區",
+    "stem": "下列何者的神經元直接支配瞳孔括約肌？",
+    "options": {
+      "A": "翼腭神經節（pterygopalatine ganglion）",
+      "B": "睫狀神經節（ciliary ganglion）",
+      "C": "頸上神經節（superior cervical ganglion）",
+      "D": "Edinger-Westphal 神經核（Edinger-Westphal nucleus）"
+    },
+    "answer": "B",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "動眼神經副核",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 103 年第二次醫師一階醫學（一）",
+    "sourceYear": 2014,
+    "sourceRound": 2,
+    "originalQuestionNumber": 10
+  },
+  {
+    "id": "MOEX-103100-1101-Q012",
+    "subject": "解剖學",
+    "chapter": "胸腔",
+    "section": "縱膈",
+    "stem": "一般情況下，左支氣管動脈（left bronchial artery）由下列何者發出？",
+    "options": {
+      "A": "前肋間動脈（anterior intercostal artery）",
+      "B": "後肋間動脈（posterior intercostal artery）",
+      "C": "右支氣管動脈（right bronchial artery）",
+      "D": "胸主動脈（thoracic aorta）"
+    },
+    "answer": "D",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "縱膈｜一般情況下，左支氣管動脈（left bron",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 103 年第二次醫師一階醫學（一）",
+    "sourceYear": 2014,
+    "sourceRound": 2,
+    "originalQuestionNumber": 12
+  },
+  {
+    "id": "MOEX-103100-1101-Q013",
+    "subject": "解剖學",
+    "chapter": "胸腔",
+    "section": "縱膈",
+    "stem": "正常成年人站立時，劍胸關節（xiphisternal joint）相當於下列那個椎骨之高度？",
+    "options": {
+      "A": "T4～5",
+      "B": "T6～7",
+      "C": "T8～9",
+      "D": "T10～11"
+    },
+    "answer": "C",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "縱膈｜正常成年人站立時，劍胸關節（xiphiste",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 103 年第二次醫師一階醫學（一）",
+    "sourceYear": 2014,
+    "sourceRound": 2,
+    "originalQuestionNumber": 13
+  },
+  {
+    "id": "MOEX-103100-1101-Q014",
+    "subject": "解剖學",
+    "chapter": "腹部",
+    "section": "肝膽胰脾",
+    "stem": "闌尾的動脈血流來自下列何者？",
+    "options": {
+      "A": "腹腔動脈幹（celiac trunk）",
+      "B": "腸繫膜上動脈（superior mesenteric artery）",
+      "C": "腸繫膜下動脈（inferior mesenteric artery）",
+      "D": "髂內動脈（internal iliac artery）"
+    },
+    "answer": "B",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "肝膽胰脾｜闌尾的動脈血流來自下列何者",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 103 年第二次醫師一階醫學（一）",
+    "sourceYear": 2014,
+    "sourceRound": 2,
+    "originalQuestionNumber": 14
+  },
+  {
+    "id": "MOEX-103100-1101-Q015",
+    "subject": "解剖學",
+    "chapter": "腹部",
+    "section": "肝膽胰脾",
+    "stem": "內臟大神經（greater splanchnic nerve）主要連接至：",
+    "options": {
+      "A": "腹腔神經節（celiac ganglion）",
+      "B": "腸繫膜上神經節（superior mesenteric ganglion）",
+      "C": "腸繫膜下神經節（inferior mesenteric ganglion）",
+      "D": "主動脈腎神經節（aorticorenal ganglion）"
+    },
+    "answer": "A",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "肝膽胰脾｜內臟大神經（greater splanchn",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 103 年第二次醫師一階醫學（一）",
+    "sourceYear": 2014,
+    "sourceRound": 2,
+    "originalQuestionNumber": 15
+  },
+  {
+    "id": "MOEX-103100-1101-Q016",
+    "subject": "解剖學",
+    "chapter": "腹部",
+    "section": "腹膜關係",
+    "stem": "下列何者不是腹膜小囊（lesser sac）開口處，小網膜（lesser omentum）內的構造？",
+    "options": {
+      "A": "總膽管（common bile duct）",
+      "B": "肝門靜脈（hepatic portal vein）",
+      "C": "肝主動脈（proper hepatic artery）",
+      "D": "下腔靜脈（inferior vena cava）"
+    },
+    "answer": "D",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "小網膜構成",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 103 年第二次醫師一階醫學（一）",
+    "sourceYear": 2014,
+    "sourceRound": 2,
+    "originalQuestionNumber": 16
+  },
+  {
+    "id": "MOEX-103100-1101-Q017",
+    "subject": "解剖學",
+    "chapter": "骨盆與會陰",
+    "section": "泌尿生殖",
+    "stem": "有關睪丸的血流，下列何者正確？",
+    "options": {
+      "A": "睪丸動脈（testicular artery）來自腹主動脈（abdominal aorta）",
+      "B": "左睪丸動脈（left testicular artery）起自腹主動脈（abdominal aorta），右睪丸動脈來自右腎動",
+      "C": "脈（right renal artery）",
+      "D": "左右睪丸動脈（left and right testicular arteries）各源自同側的腎動脈（renal artery） 來自同側的髂內動脈（internal iliac artery）"
+    },
+    "answer": "A",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "泌尿生殖｜睪丸的血流，下列何者正確",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 103 年第二次醫師一階醫學（一）",
+    "sourceYear": 2014,
+    "sourceRound": 2,
+    "originalQuestionNumber": 17
+  },
+  {
+    "id": "MOEX-103100-1101-Q018",
+    "subject": "解剖學",
+    "chapter": "骨盆與會陰",
+    "section": "會陰三角",
+    "stem": "閉孔內肌（obturator internus）的肌腱通過下列何處？",
+    "options": {
+      "A": "坐骨大孔（greater sciatic foramen）",
+      "B": "坐骨小孔（lesser sciatic foramen）",
+      "C": "閉孔管（obturator canal）",
+      "D": "薦管（sacral canal）"
+    },
+    "answer": "B",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "會陰三角｜閉孔內肌（obturator internu",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 103 年第二次醫師一階醫學（一）",
+    "sourceYear": 2014,
+    "sourceRound": 2,
+    "originalQuestionNumber": 18
+  },
+  {
+    "id": "MOEX-103100-1101-Q022",
+    "subject": "解剖學",
+    "chapter": "下肢",
+    "section": "下肢血管",
+    "stem": "下肢淺層經常被用做血管移植（vascular transplantation）的是：",
+    "options": {
+      "A": "股動脈（femoral artery）",
+      "B": "股靜脈（femoral vein）",
+      "C": "膕靜脈（popliteal vein）",
+      "D": "大隱靜脈（great saphenous vein）"
+    },
+    "answer": "D",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "膕動脈與膝窩解剖",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 103 年第二次醫師一階醫學（一）",
+    "sourceYear": 2014,
+    "sourceRound": 2,
+    "originalQuestionNumber": 22
+  },
+  {
+    "id": "MOEX-103100-1101-Q023",
+    "subject": "解剖學",
+    "chapter": "下肢",
+    "section": "臀區",
+    "stem": "下列何者通過坐骨大孔（greater sciatic foramen）且供應臀大肌（gluteus maximus）的血液？",
+    "options": {
+      "A": "股動脈（femoral artery）",
+      "B": "閉孔動脈（obturator artery）",
+      "C": "臀下動脈（inferior gluteal artery）",
+      "D": "陰部內動脈（internal pudendal artery）"
+    },
+    "answer": "C",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "下臀神經支配",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 103 年第二次醫師一階醫學（一）",
+    "sourceYear": 2014,
+    "sourceRound": 2,
+    "originalQuestionNumber": 23
+  },
+  {
+    "id": "MOEX-103100-1101-Q024",
+    "subject": "解剖學",
+    "chapter": "下肢",
+    "section": "腰薦神經叢",
+    "stem": "腓骨（fibula）頸部骨折最可能傷及下列那一條神經？",
+    "options": {
+      "A": "脛神經（tibial nerve）",
+      "B": "隱神經（saphenous nerve）",
+      "C": "腓腸神經（sural nerve）",
+      "D": "腓總神經（common fibular nerve）"
+    },
+    "answer": "D",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "腓總神經及分支",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 103 年第二次醫師一階醫學（一）",
+    "sourceYear": 2014,
+    "sourceRound": 2,
+    "originalQuestionNumber": 24
+  },
+  {
+    "id": "MOEX-103100-1101-Q025",
+    "subject": "解剖學",
+    "chapter": "上肢",
+    "section": "臂神經叢",
+    "stem": "下列何者受傷會導致手腕（wrist）無法伸直的垂腕症（drop hand）？",
+    "options": {
+      "A": "肌皮神經（musculocutaneous nerve）",
+      "B": "正中神經（median nerve）",
+      "C": "尺神經（ulnar nerve）",
+      "D": "橈神經（radial nerve）"
+    },
+    "answer": "D",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "臂神經叢終末分支",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 103 年第二次醫師一階醫學（一）",
+    "sourceYear": 2014,
+    "sourceRound": 2,
+    "originalQuestionNumber": 25
+  },
+  {
+    "id": "MOEX-103100-1101-Q027",
+    "subject": "解剖學",
+    "chapter": "上肢",
+    "section": "上肢血管",
+    "stem": "屈指淺肌（flexor digitorum superficialis）的遠端附著於下列何者？",
+    "options": {
+      "A": "遠端指骨（distal phalange）",
+      "B": "中端指骨（middle phalange）",
+      "C": "近端指骨（proximal phalange）",
+      "D": "腕骨（metacarpal bone）"
+    },
+    "answer": "B",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "上肢血管｜屈指淺肌（flexor digitorum ",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 103 年第二次醫師一階醫學（一）",
+    "sourceYear": 2014,
+    "sourceRound": 2,
+    "originalQuestionNumber": 27
+  },
+  {
+    "id": "MOEX-103100-1101-Q038",
+    "subject": "解剖學",
+    "chapter": "胸腔",
+    "section": "肺與胸膜",
+    "stem": "呼吸系統中氣體的交換無法在下列何處進行？",
+    "options": {
+      "A": "呼吸性小支氣管（respiratory bronchioles）",
+      "B": "肺泡囊（alveolar sacs）",
+      "C": "肺泡管（alveolar ducts）",
+      "D": "終端小支氣管（terminal bronchioles）"
+    },
+    "answer": "D",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "肺門構造相對位置",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 103 年第二次醫師一階醫學（一）",
+    "sourceYear": 2014,
+    "sourceRound": 2,
+    "originalQuestionNumber": 38
+  },
+  {
+    "id": "MOEX-103100-1101-Q085",
+    "subject": "解剖學",
+    "chapter": "上肢",
+    "section": "上肢血管",
+    "stem": "一個等距尺度之臨床變數為雙峰分布，以大樣本經過多次重複抽樣之後，其樣本平均數的抽樣分布 為一個常態分布。此現象反應下列何種定理？",
+    "options": {
+      "A": "中央極限定理",
+      "B": "貝氏定理",
+      "C": "機率總和定理",
+      "D": "二項式定理"
+    },
+    "answer": "A",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "上肢血管｜一個等距尺度之臨床變數為雙峰分布，以大樣本經",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 103 年第二次醫師一階醫學（一）",
+    "sourceYear": 2014,
+    "sourceRound": 2,
+    "originalQuestionNumber": 85
+  },
+  {
+    "id": "MOEX-103100-1101-Q093",
+    "subject": "解剖學",
+    "chapter": "上肢",
+    "section": "手部肌肉",
+    "stem": "腕隧道症候群最常發生於下列那一類的工作人員？",
+    "options": {
+      "A": "裝配工人",
+      "B": "有機溶劑操作工人",
+      "C": "電腦鍵入工作人員",
+      "D": "熱暴露工人"
+    },
+    "answer": "C",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "腕隧道內容物",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 103 年第二次醫師一階醫學（一）",
+    "sourceYear": 2014,
+    "sourceRound": 2,
+    "originalQuestionNumber": 93
+  },
+  {
+    "id": "MOEX-103100-1101-Q096",
+    "subject": "解剖學",
+    "chapter": "胸腔",
+    "section": "縱膈",
+    "stem": "為改變物質成癮者的濫用行為，臨床上常應用一些措施使對象經歷特定的心理改變歷程，如菸癮發 作時可以尼古丁貼片代替或做運動等措施，這些措施是希望對象經歷何種改變過程？",
+    "options": {
+      "A": "反制約作用（counter-conditioning）",
+      "B": "刺激控制（stimulus control）",
+      "C": "意識覺醒（consciousness raising）",
+      "D": "強化管理（reinforcement management）"
+    },
+    "answer": "A",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "縱膈｜改變物質成癮者的濫用行為，臨床上常應用一些措",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 103 年第二次醫師一階醫學（一）",
+    "sourceYear": 2014,
+    "sourceRound": 2,
+    "originalQuestionNumber": 96
+  },
+  {
+    "id": "MOEX-103100-1101-Q097",
+    "subject": "解剖學",
+    "chapter": "下肢",
+    "section": "腰薦神經叢",
+    "stem": "健康社區之營造工作，最重要的社區營造策略為何？",
+    "options": {
+      "A": "提供社區好的醫療服務",
+      "B": "投入足夠的外來資源",
+      "C": "參與社區居民一起工作",
+      "D": "創造更多的就業機會提振社區繁榮"
+    },
+    "answer": "C",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "腰薦神經叢｜健康社區之營造工作，最重要的社區營造策略為何",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 103 年第二次醫師一階醫學（一）",
+    "sourceYear": 2014,
+    "sourceRound": 2,
+    "originalQuestionNumber": 97
+  },
+  {
+    "id": "MOEX-104030-1101-Q001",
+    "subject": "解剖學",
+    "chapter": "神經解剖",
+    "section": "腦幹核區",
+    "stem": "下列有關大腦皮質運動區的敘述，何者錯誤？",
+    "options": {
+      "A": "初級運動皮質可發出皮質脊髓徑支配下運動神經元（lower motor neuron）",
+      "B": "premotor area 與 supplementary motor area 參與複雜動作之計畫與順序性",
+      "C": "下運動神經元（lower motor neuron）皆由對側大腦皮質所發出之 corticospinal tract 或 corticobulbar tract 支配",
+      "D": "大腦皮質運動區接受丘腦之訊息"
+    },
+    "answer": "C",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "腦幹核區｜下列有關大腦皮質運動區的敘述，何者錯誤",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 104 年第一次醫師一階醫學（一）",
+    "sourceYear": 2015,
+    "sourceRound": 1,
+    "originalQuestionNumber": 1
+  },
+  {
+    "id": "MOEX-104030-1101-Q002",
+    "subject": "解剖學",
+    "chapter": "神經解剖",
+    "section": "腦幹核區",
+    "stem": "下列有關杏仁體（amygdaloid body）的敘述，何者錯誤？",
+    "options": {
+      "A": "接受嗅覺訊息",
+      "B": "與邊緣系統有關",
+      "C": "與大腦前額葉區（prefrontal area）有密切聯繫",
+      "D": "在臨床或生理功能上，杏仁體是基底核的一部分"
+    },
+    "answer": "D",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "腦幹核區｜下列有關杏仁體（amygdaloid bod",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 104 年第一次醫師一階醫學（一）",
+    "sourceYear": 2015,
+    "sourceRound": 1,
+    "originalQuestionNumber": 2
+  },
+  {
+    "id": "MOEX-104030-1101-Q003",
+    "subject": "解剖學",
+    "chapter": "神經解剖",
+    "section": "丘腦與基底核",
+    "stem": "下列有關丘腦下核（subthalamic nucleus）之敘述，何者錯誤？",
+    "options": {
+      "A": "參與基底核迴路中的 indirect loop",
+      "B": "丘腦下核損傷可能導致不自主運動（involuntary movement）",
+      "C": "丘腦下核位於中腦",
+      "D": "丘腦下核的神經元使用興奮性神經傳遞物質"
+    },
+    "answer": "C",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "下丘腦核與 hemiballismus",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 104 年第一次醫師一階醫學（一）",
+    "sourceYear": 2015,
+    "sourceRound": 1,
+    "originalQuestionNumber": 3
+  },
+  {
+    "id": "MOEX-104030-1101-Q004",
+    "subject": "解剖學",
+    "chapter": "頭頸部",
+    "section": "顏面神經與三叉神經",
+    "stem": "下列何者由腦幹神經核發出後會交叉到對側？",
+    "options": {
+      "A": "動眼神經",
+      "B": "滑車神經",
+      "C": "舌下神經",
+      "D": "顏面神經"
+    },
+    "answer": "B",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "顏面神經與腮腺關係",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 104 年第一次醫師一階醫學（一）",
+    "sourceYear": 2015,
+    "sourceRound": 1,
+    "originalQuestionNumber": 4
+  },
+  {
+    "id": "MOEX-104030-1101-Q005",
+    "subject": "解剖學",
+    "chapter": "神經解剖",
+    "section": "聽覺與前庭路徑",
+    "stem": "下列何者與聽覺無關？",
+    "options": {
+      "A": "外側蹄系（lateral lemniscus）",
+      "B": "下橄欖核（inferior olivary nucleus）",
+      "C": "螺旋神經節（spiral ganglion）",
+      "D": "內側膝狀體（medial geniculate body）"
+    },
+    "answer": "B",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "內側膝狀體",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 104 年第一次醫師一階醫學（一）",
+    "sourceYear": 2015,
+    "sourceRound": 1,
+    "originalQuestionNumber": 5
+  },
+  {
+    "id": "MOEX-104030-1101-Q006",
+    "subject": "解剖學",
+    "chapter": "神經解剖",
+    "section": "腦幹核區",
+    "stem": "右側眼睛照光造成左側眼睛瞳孔縮小，下列何者不參與其傳導？",
+    "options": {
+      "A": "視徑（optic tract）",
+      "B": "睫狀神經節（ciliary ganglion）",
+      "C": "內縱束（medial longitudinal fasciculus）",
+      "D": "動眼神經（oculomotor nerve）"
+    },
+    "answer": "C",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "腦幹核區｜右側眼睛照光造成左側眼睛瞳孔縮小，下列何者不",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 104 年第一次醫師一階醫學（一）",
+    "sourceYear": 2015,
+    "sourceRound": 1,
+    "originalQuestionNumber": 6
+  },
+  {
+    "id": "MOEX-104030-1101-Q007",
+    "subject": "解剖學",
+    "chapter": "神經解剖",
+    "section": "小腦",
+    "stem": "下列何處是嬰兒最常進行腦池穿刺（cisternal puncture）以獲取腦脊髓液（CSF）的地方？",
+    "options": {
+      "A": "大腦腳間池（interpeduncular cistern）",
+      "B": "小腦延髓後池（posterior cerebellomedullary cistern）",
+      "C": "四疊體池（quadrigeminal cistern）",
+      "D": "橋腦池（pontine cistern）"
+    },
+    "answer": "B",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "小腦｜下列何處是嬰兒最常進行腦池穿刺（cister",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 104 年第一次醫師一階醫學（一）",
+    "sourceYear": 2015,
+    "sourceRound": 1,
+    "originalQuestionNumber": 7
+  },
+  {
+    "id": "MOEX-104030-1101-Q009",
+    "subject": "解剖學",
+    "chapter": "頭頸部",
+    "section": "顏面神經與三叉神經",
+    "stem": "下列何者不走在翼腭窩（pterygopalatine fossa）內？",
+    "options": {
+      "A": "顴神經（zygomatic n.）",
+      "B": "蝶腭動脈（sphenopalatine a.）",
+      "C": "後上齒槽動脈（posterior superior alveolar a.）",
+      "D": "前上齒槽神經（anterior superior alveolar n.）"
+    },
+    "answer": "D",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "顏面神經與三叉神經｜不走在翼腭窩（pterygopalatine",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 104 年第一次醫師一階醫學（一）",
+    "sourceYear": 2015,
+    "sourceRound": 1,
+    "originalQuestionNumber": 9
+  },
+  {
+    "id": "MOEX-104030-1101-Q010",
+    "subject": "解剖學",
+    "chapter": "神經解剖",
+    "section": "腦幹核區",
+    "stem": "角膜的痛覺由下列何者傳導？",
+    "options": {
+      "A": "滑車上神經（supratrochlear nerve）",
+      "B": "眶下神經（infraorbital nerve）",
+      "C": "鼻睫神經（nasociliary nerve）",
+      "D": "視神經（optic nerve）"
+    },
+    "answer": "C",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "腦幹核區｜角膜的痛覺由下列何者傳導",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 104 年第一次醫師一階醫學（一）",
+    "sourceYear": 2015,
+    "sourceRound": 1,
+    "originalQuestionNumber": 10
+  },
+  {
+    "id": "MOEX-104030-1101-Q011",
+    "subject": "解剖學",
+    "chapter": "胸腔",
+    "section": "肺與胸膜",
+    "stem": "血塊造成右肺動脈（right pulmonary artery）栓塞（embolism），此血塊最可能來自下列何處？",
+    "options": {
+      "A": "右肺靜脈（right pulmonary vein）",
+      "B": "左肺靜脈（left pulmonary vein）",
+      "C": "左股靜脈（left femoral vein）",
+      "D": "左心室（left ventricle）"
+    },
+    "answer": "C",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "肺門構造相對位置",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 104 年第一次醫師一階醫學（一）",
+    "sourceYear": 2015,
+    "sourceRound": 1,
+    "originalQuestionNumber": 11
+  },
+  {
+    "id": "MOEX-104030-1101-Q012",
+    "subject": "解剖學",
+    "chapter": "胸腔",
+    "section": "縱膈",
+    "stem": "乳房外側的淋巴液回流至下列何者？",
+    "options": {
+      "A": "腋淋巴結",
+      "B": "胸骨旁淋巴結",
+      "C": "橫膈下淋巴結",
+      "D": "對側乳房的淋巴結"
+    },
+    "answer": "A",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "縱膈｜乳房外側的淋巴液回流至下列何者",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 104 年第一次醫師一階醫學（一）",
+    "sourceYear": 2015,
+    "sourceRound": 1,
+    "originalQuestionNumber": 12
+  },
+  {
+    "id": "MOEX-104030-1101-Q013",
+    "subject": "解剖學",
+    "chapter": "胸腔",
+    "section": "橫膈",
+    "stem": "肝臟的裸區（bare area）位於其：",
+    "options": {
+      "A": "橫膈面（diaphragmatic surface）",
+      "B": "脾壓跡（splenic impression）",
+      "C": "肋骨壓跡（costal impression）",
+      "D": "腎壓跡（renal impression）"
+    },
+    "answer": "A",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "橫膈｜肝臟的裸區（bare area）位於其：",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 104 年第一次醫師一階醫學（一）",
+    "sourceYear": 2015,
+    "sourceRound": 1,
+    "originalQuestionNumber": 13
+  },
+  {
+    "id": "MOEX-104030-1101-Q014",
+    "subject": "解剖學",
+    "chapter": "腹部",
+    "section": "肝膽胰脾",
+    "stem": "下列何者不走在小網膜（lesser omentum）內或構成其一部分？",
+    "options": {
+      "A": "肝胃韌帶（hepatogastric ligament）",
+      "B": "肝十二指腸韌帶（hepatoduodenal ligament）",
+      "C": "肝門靜脈（hepatic portal vein）",
+      "D": "脾動脈（splenic artery）"
+    },
+    "answer": "D",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "脾動脈走行",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 104 年第一次醫師一階醫學（一）",
+    "sourceYear": 2015,
+    "sourceRound": 1,
+    "originalQuestionNumber": 14
+  },
+  {
+    "id": "MOEX-104030-1101-Q015",
+    "subject": "解剖學",
+    "chapter": "下肢",
+    "section": "臀區",
+    "stem": "因神經受損而使得闊筋膜張肌（tensor fasciae latae）退化萎縮，下列何者可能也會受影響？",
+    "options": {
+      "A": "臀大肌",
+      "B": "臀中肌",
+      "C": "梨狀肌",
+      "D": "上孖肌"
+    },
+    "answer": "B",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "梨狀肌與坐骨神經關係",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 104 年第一次醫師一階醫學（一）",
+    "sourceYear": 2015,
+    "sourceRound": 1,
+    "originalQuestionNumber": 15
+  },
+  {
+    "id": "MOEX-104030-1101-Q021",
+    "subject": "解剖學",
+    "chapter": "骨盆與會陰",
+    "section": "會陰三角",
+    "stem": "陰部神經（pudendal nerve）受損對下列何者的影響最小？",
+    "options": {
+      "A": "尿道",
+      "B": "子宮",
+      "C": "陰道",
+      "D": "肛管"
+    },
+    "answer": "B",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "會陰三角｜陰部神經（pudendal nerve）受損",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 104 年第一次醫師一階醫學（一）",
+    "sourceYear": 2015,
+    "sourceRound": 1,
+    "originalQuestionNumber": 21
+  },
+  {
+    "id": "MOEX-104030-1101-Q023",
+    "subject": "解剖學",
+    "chapter": "腹部",
+    "section": "肝膽胰脾",
+    "stem": "下列何者通過鼠蹊韌帶（inguinal ligament）與恥骨之間？",
+    "options": {
+      "A": "髂腹下神經（iliohypogastric nerve）",
+      "B": "髂腹股溝神經（ilioinguinal nerve）",
+      "C": "股神經（femoral nerve）",
+      "D": "閉孔神經（obturator nerve）"
+    },
+    "answer": "C",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "肝膽胰脾｜通過鼠蹊韌帶（inguinal ligame",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 104 年第一次醫師一階醫學（一）",
+    "sourceYear": 2015,
+    "sourceRound": 1,
+    "originalQuestionNumber": 23
+  },
+  {
+    "id": "MOEX-104030-1101-Q024",
+    "subject": "解剖學",
+    "chapter": "上肢",
+    "section": "臂神經叢",
+    "stem": "橈神經（radial nerve）受損時，手指無法進行下列何種動作？",
+    "options": {
+      "A": "屈曲（flexion）",
+      "B": "伸直（extension）",
+      "C": "內收（adduction）",
+      "D": "外展（abduction）"
+    },
+    "answer": "B",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "臂神經叢終末分支",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 104 年第一次醫師一階醫學（一）",
+    "sourceYear": 2015,
+    "sourceRound": 1,
+    "originalQuestionNumber": 24
+  },
+  {
+    "id": "MOEX-104030-1101-Q025",
+    "subject": "解剖學",
+    "chapter": "胸腔",
+    "section": "縱膈",
+    "stem": "下列何者受損最可能導致斜方肌（trapezius）無力，肩膀下垂，手臂無法高舉過頭？",
+    "options": {
+      "A": "長胸神經（long thoracic nerve）",
+      "B": "胸背神經（thoracodorsal nerve）",
+      "C": "肩胛背神經（dorsal scapular nerve）",
+      "D": "副神經（accessory nerve）"
+    },
+    "answer": "D",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "縱膈｜受損最可能導致斜方肌（trapezius）無",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 104 年第一次醫師一階醫學（一）",
+    "sourceYear": 2015,
+    "sourceRound": 1,
+    "originalQuestionNumber": 25
+  },
+  {
+    "id": "MOEX-104030-1101-Q026",
+    "subject": "解剖學",
+    "chapter": "下肢",
+    "section": "小腿肌群",
+    "stem": "膝關節韌帶受傷造成整隻小腿可以往前拖出（anterior draw），下列何者最可能斷裂？",
+    "options": {
+      "A": "前十字韌帶（anterior cruciate ligament）",
+      "B": "後十字韌帶（posterior cruciate ligament）",
+      "C": "脛側副韌帶（tibial collateral ligament）",
+      "D": "腓側副韌帶（fibular collateral ligament）"
+    },
+    "answer": "A",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "小腿肌群｜膝關節韌帶受傷造成整隻小腿可以往前拖出（an",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 104 年第一次醫師一階醫學（一）",
+    "sourceYear": 2015,
+    "sourceRound": 1,
+    "originalQuestionNumber": 26
+  },
+  {
+    "id": "MOEX-104030-1101-Q027",
+    "subject": "解剖學",
+    "chapter": "下肢",
+    "section": "腰薦神經叢",
+    "stem": "脛神經（tibial nerve）走在下列那兩塊肌肉之間？",
+    "options": {
+      "A": "腓腸肌（gastrocnemius）與比目魚肌（soleus）",
+      "B": "比目魚肌（soleus）與脛後肌（tibialis posterior）",
+      "C": "脛後肌（tibialis posterior）與脛前肌（tibialis anterior）",
+      "D": "腓長肌（fibularis longus）與腓短肌（fibularis brevis）"
+    },
+    "answer": "B",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "腰薦神經叢｜脛神經（tibial nerve）走在下列那",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 104 年第一次醫師一階醫學（一）",
+    "sourceYear": 2015,
+    "sourceRound": 1,
+    "originalQuestionNumber": 27
+  },
+  {
+    "id": "MOEX-104030-1101-Q028",
+    "subject": "解剖學",
+    "chapter": "下肢",
+    "section": "腰薦神經叢",
+    "stem": "下列何者伴行脛後動脈（posterior tibial artery）且支配脛後肌（tibialis posterior）？",
+    "options": {
+      "A": "脛神經（tibial nerve）",
+      "B": "隱神經（saphenous nerve）",
+      "C": "腓深神經（deep fibular nerve）",
+      "D": "腓淺神經（superficial fibular nerve）"
+    },
+    "answer": "A",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "腓總神經及分支",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 104 年第一次醫師一階醫學（一）",
+    "sourceYear": 2015,
+    "sourceRound": 1,
+    "originalQuestionNumber": 28
+  },
+  {
+    "id": "MOEX-104030-1101-Q029",
+    "subject": "解剖學",
+    "chapter": "胸腔",
+    "section": "橫膈",
+    "stem": "橫膈（diaphragm）的那一部分最容易產生先天性缺損？",
+    "options": {
+      "A": "前內側（anteromedial）",
+      "B": "前外側（anterolateral）",
+      "C": "後內側（posteromedial）",
+      "D": "後外側（posterolateral）"
+    },
+    "answer": "D",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "橫膈｜橫膈（diaphragm）的那一部分最容易產",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 104 年第一次醫師一階醫學（一）",
+    "sourceYear": 2015,
+    "sourceRound": 1,
+    "originalQuestionNumber": 29
+  },
+  {
+    "id": "MOEX-104030-1101-Q032",
+    "subject": "解剖學",
+    "chapter": "神經解剖",
+    "section": "腦神經",
+    "stem": "下列那一對腦神經為前腦（prosencephalon）衍生形成？",
+    "options": {
+      "A": "視神經（optic nerve）",
+      "B": "動眼神經（oculomotor nerve）",
+      "C": "三叉神經（trigeminal nerve）",
+      "D": "前庭耳蝸神經（vestibulocochlear nerve）"
+    },
+    "answer": "A",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "動眼神經與睫狀神經節",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 104 年第一次醫師一階醫學（一）",
+    "sourceYear": 2015,
+    "sourceRound": 1,
+    "originalQuestionNumber": 32
+  },
+  {
+    "id": "MOEX-104030-1101-Q085",
+    "subject": "解剖學",
+    "chapter": "胸腔",
+    "section": "肺與胸膜",
+    "stem": "某一國家人口 6000 萬人，該年新發肺結核病患 5000 人，肺結核病患共 2 萬人，當年死亡人數為 60 萬人，其中因為肺結核死亡者有 500 人。該年肺結核死因分率是多少？",
+    "options": {
+      "A": "500/2 萬",
+      "B": "500/60 萬",
+      "C": "500/6000 萬",
+      "D": "500/5000"
+    },
+    "answer": "B",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "肺與胸膜｜某一國家人口 6000 萬人，該年新發肺結核",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 104 年第一次醫師一階醫學（一）",
+    "sourceYear": 2015,
+    "sourceRound": 1,
+    "originalQuestionNumber": 85
+  },
+  {
+    "id": "MOEX-104030-1101-Q095",
+    "subject": "解剖學",
+    "chapter": "上肢",
+    "section": "上肢血管",
+    "stem": "空氣污染指標（Pollutant standard index, PSI）在多少以上，會對身體不好且較敏感的人，使其健康症 狀更加惡化？",
+    "options": {
+      "A": "50",
+      "B": "100",
+      "C": "150",
+      "D": "200"
+    },
+    "answer": "B",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "上肢血管｜空氣污染指標（Pollutant stand",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 104 年第一次醫師一階醫學（一）",
+    "sourceYear": 2015,
+    "sourceRound": 1,
+    "originalQuestionNumber": 95
+  },
+  {
+    "id": "MOEX-104090-5301-Q001",
+    "subject": "解剖學",
+    "chapter": "神經解剖",
+    "section": "腦幹核區",
+    "stem": "豆狀核（lenticular nucleus）之血流，主要來自下列何者之深部分支（deep branch）？",
+    "options": {
+      "A": "眼動脈（ophthalmic artery）",
+      "B": "中大腦動脈（middle cerebral artery）",
+      "C": "前大腦動脈（anterior cerebral artery）",
+      "D": "內頸動脈（internal carotid artery）"
+    },
+    "answer": "B",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "腦幹核區｜豆狀核（lenticular nucleus",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 104 年第二次醫師一階醫學（一）",
+    "sourceYear": 2015,
+    "sourceRound": 2,
+    "originalQuestionNumber": 1
+  },
+  {
+    "id": "MOEX-104090-5301-Q002",
+    "subject": "解剖學",
+    "chapter": "神經解剖",
+    "section": "視覺路徑",
+    "stem": "腦下垂體腫瘤壓迫視交叉（optic chiasma），最可能發生下列何種症狀？",
+    "options": {
+      "A": "單眼視野全盲",
+      "B": "雙眼顳側視野偏盲（bitemporal hemianopia）",
+      "C": "雙眼同側視野偏盲（homonymous hemianopia）",
+      "D": "雙眼同側視野偏盲，但黃斑部視野保留（homonymous hemianopia with macula sparing）"
+    },
+    "answer": "B",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "視交叉病灶",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 104 年第二次醫師一階醫學（一）",
+    "sourceYear": 2015,
+    "sourceRound": 2,
+    "originalQuestionNumber": 2
+  },
+  {
+    "id": "MOEX-104090-5301-Q004",
+    "subject": "解剖學",
+    "chapter": "神經解剖",
+    "section": "腦神經",
+    "stem": "下列何者不是動眼神經損傷之典型臨床症狀？",
+    "options": {
+      "A": "眼瞼下垂",
+      "B": "損傷側眼睛無法向內看",
+      "C": "瞳孔縮小",
+      "D": "複視"
+    },
+    "answer": "C",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "動眼神經與睫狀神經節",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 104 年第二次醫師一階醫學（一）",
+    "sourceYear": 2015,
+    "sourceRound": 2,
+    "originalQuestionNumber": 4
+  },
+  {
+    "id": "MOEX-104090-5301-Q006",
+    "subject": "解剖學",
+    "chapter": "頭頸部",
+    "section": "咽喉解剖",
+    "stem": "下列何者穿過甲狀舌骨膜（thyrohyoid membrane）？",
+    "options": {
+      "A": "喉返神經（recurrent laryngeal n.）",
+      "B": "喉外神經（external laryngeal n.）",
+      "C": "喉下神經（inferior laryngeal n.）",
+      "D": "喉內神經（internal laryngeal n.）"
+    },
+    "answer": "D",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "喉返神經走行",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 104 年第二次醫師一階醫學（一）",
+    "sourceYear": 2015,
+    "sourceRound": 2,
+    "originalQuestionNumber": 6
+  },
+  {
+    "id": "MOEX-104090-5301-Q010",
+    "subject": "解剖學",
+    "chapter": "胸腔",
+    "section": "心臟與冠狀動脈",
+    "stem": "正常情況下，心臟後方大都由下列何者構成？",
+    "options": {
+      "A": "右心室（right ventricle）",
+      "B": "左心室（left ventricle）",
+      "C": "右心房（right atrium）",
+      "D": "左心房（left atrium）"
+    },
+    "answer": "D",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "心臟與冠狀動脈｜正常情況下，心臟後方大都由下列何者構成",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 104 年第二次醫師一階醫學（一）",
+    "sourceYear": 2015,
+    "sourceRound": 2,
+    "originalQuestionNumber": 10
+  },
+  {
+    "id": "MOEX-104090-5301-Q011",
+    "subject": "解剖學",
+    "chapter": "胸腔",
+    "section": "肺與胸膜",
+    "stem": "肋骨處的壁層胸膜（costal parietal pleura）由下列何者支配？",
+    "options": {
+      "A": "膈神經（phrenic nerve）",
+      "B": "肋間神經（intercostal nerve）",
+      "C": "迷走神經（vagus nerve）",
+      "D": "交感神經幹（sympathetic trunk）"
+    },
+    "answer": "B",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "胸膜與肋膈隱窩",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 104 年第二次醫師一階醫學（一）",
+    "sourceYear": 2015,
+    "sourceRound": 2,
+    "originalQuestionNumber": 11
+  },
+  {
+    "id": "MOEX-104090-5301-Q012",
+    "subject": "解剖學",
+    "chapter": "胸腔",
+    "section": "縱膈",
+    "stem": "在後縱隔腔（posterior mediastinum）中段處 ①胸主動脈（thoracic aorta） ②奇靜脈 （azygos vein） ③胸管（thoracic duct）三者，由左至右排列的順序為：",
+    "options": {
+      "A": "②③①",
+      "B": "③②①",
+      "C": "①②③",
+      "D": "①③②"
+    },
+    "answer": "D",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "胸導管走行",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 104 年第二次醫師一階醫學（一）",
+    "sourceYear": 2015,
+    "sourceRound": 2,
+    "originalQuestionNumber": 12
+  },
+  {
+    "id": "MOEX-104090-5301-Q013",
+    "subject": "解剖學",
+    "chapter": "腹部",
+    "section": "肝膽胰脾",
+    "stem": "下列何者不是結腸的特徵？",
+    "options": {
+      "A": "完全為腹膜內器官",
+      "B": "具脂肪垂（omental appendices）",
+      "C": "管壁的縱肌特化為三條帶狀的taeniae coli",
+      "D": "袋狀管壁外觀（haustra）"
+    },
+    "answer": "A",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "肝膽胰脾｜不是結腸的特徵",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 104 年第二次醫師一階醫學（一）",
+    "sourceYear": 2015,
+    "sourceRound": 2,
+    "originalQuestionNumber": 13
+  },
+  {
+    "id": "MOEX-104090-5301-Q014",
+    "subject": "解剖學",
+    "chapter": "神經解剖",
+    "section": "脊髓傳導路徑",
+    "stem": "內臟大神經（greater splanchnic nerve）起自脊髓的那個段位？",
+    "options": {
+      "A": "T2～4",
+      "B": "T5～9",
+      "C": "T11～12",
+      "D": "L1～2"
+    },
+    "answer": "B",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "脊髓傳導路徑｜內臟大神經（greater splanchn",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 104 年第二次醫師一階醫學（一）",
+    "sourceYear": 2015,
+    "sourceRound": 2,
+    "originalQuestionNumber": 14
+  },
+  {
+    "id": "MOEX-104090-5301-Q015",
+    "subject": "解剖學",
+    "chapter": "腹部",
+    "section": "肝膽胰脾",
+    "stem": "下列何者不支配前腹壁構造？",
+    "options": {
+      "A": "髂腹下神經（iliohypogastric nerve）",
+      "B": "髂腹股溝神經（ilioinguinal nerve）",
+      "C": "生殖股神經（genitofemoral nerve）",
+      "D": "閉孔神經（obturator nerve）"
+    },
+    "answer": "D",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "肝膽胰脾｜不支配前腹壁構造",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 104 年第二次醫師一階醫學（一）",
+    "sourceYear": 2015,
+    "sourceRound": 2,
+    "originalQuestionNumber": 15
+  },
+  {
+    "id": "MOEX-104090-5301-Q016",
+    "subject": "解剖學",
+    "chapter": "胸腔",
+    "section": "縱膈",
+    "stem": "交感神經鏈（sympathetic chain）由横膈（diaphragm）的下列何處進入腹腔？",
+    "options": {
+      "A": "正中弓狀韌帶（median arcuate ligament）下",
+      "B": "內側弓狀韌帶（medial arcuate ligament）下",
+      "C": "外側弓狀韌帶（lateral arcuate ligament）下",
+      "D": "主動脈孔（aortic hiatus）"
+    },
+    "answer": "B",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "縱膈｜交感神經鏈（sympathetic chai",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 104 年第二次醫師一階醫學（一）",
+    "sourceYear": 2015,
+    "sourceRound": 2,
+    "originalQuestionNumber": 16
+  },
+  {
+    "id": "MOEX-104090-5301-Q018",
+    "subject": "解剖學",
+    "chapter": "骨盆與會陰",
+    "section": "直腸與肛管",
+    "stem": "下列何者形成肛門直腸屈曲（anorectal flexure）且有助於排便控制（fecal continence）？",
+    "options": {
+      "A": "肛門內括約肌（internal anal sphincter）",
+      "B": "尾骨肌（coccygeus）",
+      "C": "恥骨直腸肌（puborectalis）",
+      "D": "肛門外括約肌（external anal sphincter）"
+    },
+    "answer": "C",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "肛門外括約肌神經支配",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 104 年第二次醫師一階醫學（一）",
+    "sourceYear": 2015,
+    "sourceRound": 2,
+    "originalQuestionNumber": 18
+  },
+  {
+    "id": "MOEX-104090-5301-Q020",
+    "subject": "解剖學",
+    "chapter": "骨盆與會陰",
+    "section": "泌尿生殖",
+    "stem": "為確診骨盆腔積血，通常經由下列何處施行陷凹穿刺抽液術（culdocentesis）？",
+    "options": {
+      "A": "陰道後穹隆（posterior fornix of vagina）",
+      "B": "陰道前穹隆（anterior fornix of vagina）",
+      "C": "膀胱後壁（posterior wall of urinary bladder）",
+      "D": "直腸前壁（anterior wall of rectum）"
+    },
+    "answer": "A",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "泌尿生殖｜確診骨盆腔積血，通常經由下列何處施行陷凹穿刺",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 104 年第二次醫師一階醫學（一）",
+    "sourceYear": 2015,
+    "sourceRound": 2,
+    "originalQuestionNumber": 20
+  },
+  {
+    "id": "MOEX-104090-5301-Q021",
+    "subject": "解剖學",
+    "chapter": "骨盆與會陰",
+    "section": "會陰三角",
+    "stem": "下列何者是陰莖勃起功能（penile erection）最重要的血管？",
+    "options": {
+      "A": "陰莖背動脈（dorsal artery of penis）",
+      "B": "陰莖深動脈（deep artery of penis）",
+      "C": "陰莖淺背靜脈（superficial dorsal vein of penis）",
+      "D": "陰莖球動脈（artery of the bulb of penis）"
+    },
+    "answer": "B",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "會陰三角｜陰莖勃起功能（penile erection",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 104 年第二次醫師一階醫學（一）",
+    "sourceYear": 2015,
+    "sourceRound": 2,
+    "originalQuestionNumber": 21
+  },
+  {
+    "id": "MOEX-104090-5301-Q022",
+    "subject": "解剖學",
+    "chapter": "上肢",
+    "section": "上肢血管",
+    "stem": "下列何者支配的肌肉數目最少？",
+    "options": {
+      "A": "腓淺神經（superficial fibular nerve）",
+      "B": "腓深神經（deep fibular nerve）",
+      "C": "肌皮神經（musculocutaneous nerve）",
+      "D": "橈神經（radial nerve）"
+    },
+    "answer": "A",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "上肢血管｜支配的肌肉數目最少",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 104 年第二次醫師一階醫學（一）",
+    "sourceYear": 2015,
+    "sourceRound": 2,
+    "originalQuestionNumber": 22
+  },
+  {
+    "id": "MOEX-104090-5301-Q023",
+    "subject": "解剖學",
+    "chapter": "上肢",
+    "section": "前臂屈伸肌",
+    "stem": "在前臂，下列何者最可能與前臂外側皮神經（lateral cutaneous nerve of forearm）靠近或伴 行？",
+    "options": {
+      "A": "頭靜脈（cephalic vein）",
+      "B": "貴要靜脈（basilic vein）",
+      "C": "正中肘靜脈（median cubital vein）",
+      "D": "肱靜脈（brachial vein）"
+    },
+    "answer": "A",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "前臂屈伸肌｜在前臂，下列何者最可能與前臂外側皮神經（la",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 104 年第二次醫師一階醫學（一）",
+    "sourceYear": 2015,
+    "sourceRound": 2,
+    "originalQuestionNumber": 23
+  },
+  {
+    "id": "MOEX-104090-5301-Q026",
+    "subject": "解剖學",
+    "chapter": "上肢",
+    "section": "臂神經叢",
+    "stem": "肱骨在三角肌粗隆（deltoid tuberosity of humerus）位置的骨折，最可能直接傷及那一條神 經？",
+    "options": {
+      "A": "腋神經（axillary nerve）",
+      "B": "橈神經（radial nerve）",
+      "C": "尺神經（ulnar nerve）",
+      "D": "副神經（accessory nerve）"
+    },
+    "answer": "B",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "臂神經叢終末分支",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 104 年第二次醫師一階醫學（一）",
+    "sourceYear": 2015,
+    "sourceRound": 2,
+    "originalQuestionNumber": 26
+  },
+  {
+    "id": "MOEX-104090-5301-Q027",
+    "subject": "解剖學",
+    "chapter": "上肢",
+    "section": "上肢血管",
+    "stem": "屈指深肌（flexor digitorum profundus）的肌腱附著於下列何者？",
+    "options": {
+      "A": "遠端指骨（distal phalange）",
+      "B": "中端指骨（middle phalange）",
+      "C": "近端指骨（proximal phalange）",
+      "D": "腕骨（metacarpal）"
+    },
+    "answer": "A",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "上肢血管｜屈指深肌（flexor digitorum ",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 104 年第二次醫師一階醫學（一）",
+    "sourceYear": 2015,
+    "sourceRound": 2,
+    "originalQuestionNumber": 27
+  },
+  {
+    "id": "MOEX-104090-5301-Q028",
+    "subject": "解剖學",
+    "chapter": "上肢",
+    "section": "臂神經叢",
+    "stem": "尺神經（ulnar nerve）受損時，拇指無法進行何種動作？",
+    "options": {
+      "A": "屈曲（flexion）",
+      "B": "伸直（extension）",
+      "C": "內收（adduction）",
+      "D": "外展（abduction）"
+    },
+    "answer": "C",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "臂神經叢終末分支",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 104 年第二次醫師一階醫學（一）",
+    "sourceYear": 2015,
+    "sourceRound": 2,
+    "originalQuestionNumber": 28
+  },
+  {
+    "id": "MOEX-104090-5301-Q030",
+    "subject": "解剖學",
+    "chapter": "骨盆與會陰",
+    "section": "直腸與肛管",
+    "stem": "下列何者衍生成為肛管（anal canal）的下1/3段？",
+    "options": {
+      "A": "原肛（proctodeum）",
+      "B": "直腸（rectum）",
+      "C": "泌尿生殖竇（urogenital sinus）",
+      "D": "泄殖腔（cloaca）"
+    },
+    "answer": "A",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "直腸與肛管｜衍生成為肛管（anal canal）的下1/",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 104 年第二次醫師一階醫學（一）",
+    "sourceYear": 2015,
+    "sourceRound": 2,
+    "originalQuestionNumber": 30
+  },
+  {
+    "id": "MOEX-104090-5301-Q031",
+    "subject": "解剖學",
+    "chapter": "頭頸部",
+    "section": "顏面神經與三叉神經",
+    "stem": "下列有關動脈導管（ductus arteriosus）之敘述，何者正確？",
+    "options": {
+      "A": "源自右側第六動脈弓（aortic arch）",
+      "B": "連接右側肺動脈（pulmonary artery）及主動脈弓（aortic arch）",
+      "C": "出生後，閉鎖形成動脈韌帶（ligamentum arteriosum）",
+      "D": "右側喉返神經（recurrent laryngeal nerve）自動脈韌帶（ligamentum arteriosum）旁通過"
+    },
+    "answer": "C",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "顏面神經與三叉神經｜下列有關動脈導管（ductus arteri",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 104 年第二次醫師一階醫學（一）",
+    "sourceYear": 2015,
+    "sourceRound": 2,
+    "originalQuestionNumber": 31
+  },
+  {
+    "id": "MOEX-104090-5301-Q065",
+    "subject": "解剖學",
+    "chapter": "腹部",
+    "section": "肝膽胰脾",
+    "stem": "Celiac disease及Crohn's disease是二種腸道發炎疾病，下列有關二者之比較何者正確？",
+    "options": {
+      "A": "前者是對腸內共生菌有強烈發炎反應，後者是因為對麥類食物過敏所引起",
+      "B": "前者可能與NOD-2分子失去功能有關，後者主要與HLA-DQ2分子的表現有關",
+      "C": "IFN-γ所引起的發炎反應，在這二種疾病都扮演重要角色",
+      "D": "利用廣泛性抗生素去掉大部分共生菌，皆可治療這二種疾病"
+    },
+    "answer": "C",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "肝膽胰脾｜Celiac disease及Crohn's",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 104 年第二次醫師一階醫學（一）",
+    "sourceYear": 2015,
+    "sourceRound": 2,
+    "originalQuestionNumber": 65
+  },
+  {
+    "id": "MOEX-104090-5301-Q088",
+    "subject": "解剖學",
+    "chapter": "上肢",
+    "section": "上肢血管",
+    "stem": "所謂「健康工人效應（healthy worker effect）」是指會造成何種偏差（bias）？",
+    "options": {
+      "A": "選樣上偏差（selection bias）",
+      "B": "資料上偏差（information bias）",
+      "C": "干擾（confounding）",
+      "D": "測量上偏差（measurement error）"
+    },
+    "answer": "A",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "上肢血管｜所謂「健康工人效應（healthy work",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 104 年第二次醫師一階醫學（一）",
+    "sourceYear": 2015,
+    "sourceRound": 2,
+    "originalQuestionNumber": 88
+  },
+  {
+    "id": "MOEX-104090-5301-Q090",
+    "subject": "解剖學",
+    "chapter": "上肢",
+    "section": "上肢血管",
+    "stem": "環保署公布之空氣污染指標值（PSI），乃是將測得之各項污染物濃度換算成副指標，再以 其中何者公布之？",
+    "options": {
+      "A": "所有污染物副指標中最大值",
+      "B": "所有污染物副指標中最小值",
+      "C": "所有污染物副指標之總和",
+      "D": "所有污染物副指標之平均"
+    },
+    "answer": "A",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "上肢血管｜環保署公布之空氣污染指標值（PSI），乃是將",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 104 年第二次醫師一階醫學（一）",
+    "sourceYear": 2015,
+    "sourceRound": 2,
+    "originalQuestionNumber": 90
+  },
+  {
+    "id": "MOEX-104090-5301-Q094",
+    "subject": "解剖學",
+    "chapter": "胸腔",
+    "section": "縱膈",
+    "stem": "有效風險溝通之團隊組成，建議由四種專家為基礎共同組成，包括：",
+    "options": {
+      "A": "主題事件專家、投資報酬分析專家、實地溝通專業人員和風險及決策分析專家",
+      "B": "主題事件專家、行為科學專家、實地溝通專業人員和臨床心理學專家",
+      "C": "主題事件專家、投資報酬分析專家、技術專業人員和風險及決策分析專家",
+      "D": "主題事件專家、行為科學專家、實地溝通專業人員和風險及決策分析專家"
+    },
+    "answer": "D",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "縱膈｜有效風險溝通之團隊組成，建議由四種專家為基礎",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 104 年第二次醫師一階醫學（一）",
+    "sourceYear": 2015,
+    "sourceRound": 2,
+    "originalQuestionNumber": 94
+  },
+  {
+    "id": "MOEX-105020-5301-Q001",
+    "subject": "解剖學",
+    "chapter": "神經解剖",
+    "section": "丘腦與基底核",
+    "stem": "丘腦之血流主要來自下列何者之深部分支（deep branch）？",
+    "options": {
+      "A": "中大腦動脈（middle cerebral artery）",
+      "B": "椎動脈（vertebral artery）",
+      "C": "後大腦動脈（posterior cerebral artery）",
+      "D": "前大腦動脈（anterior cerebral artery）"
+    },
+    "answer": "C",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "丘腦與基底核｜丘腦之血流主要來自下列何者之深部分支（dee",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 105 年第一次醫師一階醫學（一）",
+    "sourceYear": 2016,
+    "sourceRound": 1,
+    "originalQuestionNumber": 1
+  },
+  {
+    "id": "MOEX-105020-5301-Q002",
+    "subject": "解剖學",
+    "chapter": "神經解剖",
+    "section": "腦幹核區",
+    "stem": "Corpus callosum之血流主要來自下列何者？",
+    "options": {
+      "A": "前大腦動脈（anterior cerebral artery）",
+      "B": "中大腦動脈（middle cerebral artery）",
+      "C": "基底動脈（basilar artery）",
+      "D": "前脈絡叢動脈（anterior choroidal artery）"
+    },
+    "answer": "A",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "腦幹核區｜Corpus callosum之血流主要來自",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 105 年第一次醫師一階醫學（一）",
+    "sourceYear": 2016,
+    "sourceRound": 1,
+    "originalQuestionNumber": 2
+  },
+  {
+    "id": "MOEX-105020-5301-Q003",
+    "subject": "解剖學",
+    "chapter": "神經解剖",
+    "section": "小腦",
+    "stem": "下列何種小腦構造在腦壓升高時容易脫疝（herniation），進而壓迫腦幹？",
+    "options": {
+      "A": "inferior vermis",
+      "B": "flocculonodular lobe",
+      "C": "扁桃體（tonsil）",
+      "D": "下小腦腳（inferior cerebellar peduncle）"
+    },
+    "answer": "C",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "前庭小腦功能",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 105 年第一次醫師一階醫學（一）",
+    "sourceYear": 2016,
+    "sourceRound": 1,
+    "originalQuestionNumber": 3
+  },
+  {
+    "id": "MOEX-105020-5301-Q004",
+    "subject": "解剖學",
+    "chapter": "頭頸部",
+    "section": "顏面神經與三叉神經",
+    "stem": "下列何者不是副交感神經核？",
+    "options": {
+      "A": "上唾液核（superior salivatory nucleus）",
+      "B": "迷走神經背運動核（dorsal motor nucleus of vagus nerve）",
+      "C": "三叉神經運動核（trigeminal motor nucleus）",
+      "D": "Edinger-Westphal nucleus"
+    },
+    "answer": "C",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "三叉神經感覺分支",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 105 年第一次醫師一階醫學（一）",
+    "sourceYear": 2016,
+    "sourceRound": 1,
+    "originalQuestionNumber": 4
+  },
+  {
+    "id": "MOEX-105020-5301-Q005",
+    "subject": "解剖學",
+    "chapter": "神經解剖",
+    "section": "小腦",
+    "stem": "①小腦 ②內耳 ③腦幹等三個構造中，何者受損可能造成暈眩（vertigo）？",
+    "options": {
+      "A": "僅①②",
+      "B": "僅②③",
+      "C": "僅②",
+      "D": "①②③"
+    },
+    "answer": "D",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "小腦｜①小腦 ②內耳 ③腦幹等三個構造中，何者受損",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 105 年第一次醫師一階醫學（一）",
+    "sourceYear": 2016,
+    "sourceRound": 1,
+    "originalQuestionNumber": 5
+  },
+  {
+    "id": "MOEX-105020-5301-Q006",
+    "subject": "解剖學",
+    "chapter": "頭頸部",
+    "section": "咽喉解剖",
+    "stem": "下列何者由上、中咽縮肌間通過？",
+    "options": {
+      "A": "舌咽神經（glossopharyngeal nerve）",
+      "B": "喉內神經（internal laryngeal nerve）",
+      "C": "喉上動脈（superior laryngeal artery）",
+      "D": "喉返神經（recurrent laryngeal nerve）"
+    },
+    "answer": "A",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "喉返神經走行",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 105 年第一次醫師一階醫學（一）",
+    "sourceYear": 2016,
+    "sourceRound": 1,
+    "originalQuestionNumber": 6
+  },
+  {
+    "id": "MOEX-105020-5301-Q009",
+    "subject": "解剖學",
+    "chapter": "神經解剖",
+    "section": "聽覺與前庭路徑",
+    "stem": "與聽覺傳遞有關的神經節是：",
+    "options": {
+      "A": "耳神經節（otic ganglion）",
+      "B": "前庭神經節（vestibular ganglion）",
+      "C": "螺旋神經節（spiral ganglion）",
+      "D": "翼腭神經節（pterygopalatine ganglion）"
+    },
+    "answer": "C",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "聽覺與前庭路徑｜聽覺傳遞有關的神經節是：",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 105 年第一次醫師一階醫學（一）",
+    "sourceYear": 2016,
+    "sourceRound": 1,
+    "originalQuestionNumber": 9
+  },
+  {
+    "id": "MOEX-105020-5301-Q011",
+    "subject": "解剖學",
+    "chapter": "頭頸部",
+    "section": "舌與味覺",
+    "stem": "下列何者不控制附著於舌骨（hyoid bone）的肌肉？",
+    "options": {
+      "A": "面神經（facial nerve）",
+      "B": "舌咽神經（glossopharyngeal nerve）",
+      "C": "舌下神經（hypoglossal nerve）",
+      "D": "第五顱神經第三支"
+    },
+    "answer": "B",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "舌後 1/3 感覺與味覺",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 105 年第一次醫師一階醫學（一）",
+    "sourceYear": 2016,
+    "sourceRound": 1,
+    "originalQuestionNumber": 11
+  },
+  {
+    "id": "MOEX-105020-5301-Q012",
+    "subject": "解剖學",
+    "chapter": "胸腔",
+    "section": "肺與胸膜",
+    "stem": "左側胸骨旁第2肋間處的穿刺傷最可能傷害下列何者？",
+    "options": {
+      "A": "右心室（right ventricle）",
+      "B": "右心房（right atrium）",
+      "C": "上腔靜脈（superior vena cava）",
+      "D": "肺動脈幹（pulmonary trunk）"
+    },
+    "answer": "D",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "肺門構造相對位置",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 105 年第一次醫師一階醫學（一）",
+    "sourceYear": 2016,
+    "sourceRound": 1,
+    "originalQuestionNumber": 12
+  },
+  {
+    "id": "MOEX-105020-5301-Q013",
+    "subject": "解剖學",
+    "chapter": "胸腔",
+    "section": "橫膈",
+    "stem": "在心臟後方，位於肺靜脈（pulmonary vein）及上腔靜脈（superior vena cava）基部的是：",
+    "options": {
+      "A": "心包膜橫竇（transverse pericardial sinus）",
+      "B": "心包膜斜竇（oblique pericardial sinus）",
+      "C": "冠狀竇（coronary sinus）",
+      "D": "心包膜腔橫膈面（diaphragmic surface of pericardial cavity）"
+    },
+    "answer": "B",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "橫膈｜在心臟後方，位於肺靜脈（pulmonary ",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 105 年第一次醫師一階醫學（一）",
+    "sourceYear": 2016,
+    "sourceRound": 1,
+    "originalQuestionNumber": 13
+  },
+  {
+    "id": "MOEX-105020-5301-Q014",
+    "subject": "解剖學",
+    "chapter": "腹部",
+    "section": "肝膽胰脾",
+    "stem": "位於膽囊與圓韌帶裂隙（fissure for ligamentum teres）間的是肝臟的那個部分？",
+    "options": {
+      "A": "左葉",
+      "B": "右葉",
+      "C": "方形葉（quadrate lobe）",
+      "D": "尾葉（caudate lobe）"
+    },
+    "answer": "C",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "膽囊與膽囊動脈",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 105 年第一次醫師一階醫學（一）",
+    "sourceYear": 2016,
+    "sourceRound": 1,
+    "originalQuestionNumber": 14
+  },
+  {
+    "id": "MOEX-105020-5301-Q015",
+    "subject": "解剖學",
+    "chapter": "神經解剖",
+    "section": "脊髓傳導路徑",
+    "stem": "膈神經（phrenic nerve）起自那個脊髓段位？",
+    "options": {
+      "A": "C3～5",
+      "B": "C7～T2",
+      "C": "T3～5",
+      "D": "T6～10"
+    },
+    "answer": "A",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "脊髓傳導路徑｜膈神經（phrenic nerve）起自那個",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 105 年第一次醫師一階醫學（一）",
+    "sourceYear": 2016,
+    "sourceRound": 1,
+    "originalQuestionNumber": 15
+  },
+  {
+    "id": "MOEX-105020-5301-Q016",
+    "subject": "解剖學",
+    "chapter": "腹部",
+    "section": "肝膽胰脾",
+    "stem": "下列何者不是腰神經叢的分支？",
+    "options": {
+      "A": "髂腹下神經（iliohypogastric nerve）",
+      "B": "髂腹股溝神經（ilioinguinal nerve）",
+      "C": "後股皮神經（posterior femoral cutaneous nerve）",
+      "D": "閉孔神經（obturator nerve）"
+    },
+    "answer": "C",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "肝膽胰脾｜不是腰神經叢的分支",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 105 年第一次醫師一階醫學（一）",
+    "sourceYear": 2016,
+    "sourceRound": 1,
+    "originalQuestionNumber": 16
+  },
+  {
+    "id": "MOEX-105020-5301-Q019",
+    "subject": "解剖學",
+    "chapter": "骨盆與會陰",
+    "section": "會陰三角",
+    "stem": "下列何者之分支不供應陰囊（scrotum）？",
+    "options": {
+      "A": "提睪肌動脈（cremasteric artery）",
+      "B": "股動脈（femoral artery）",
+      "C": "陰莖球動脈（artery of the bulb of penis）",
+      "D": "髂內動脈（internal iliac artery）"
+    },
+    "answer": "C",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "會陰三角｜之分支不供應陰囊（scrotum）",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 105 年第一次醫師一階醫學（一）",
+    "sourceYear": 2016,
+    "sourceRound": 1,
+    "originalQuestionNumber": 19
+  },
+  {
+    "id": "MOEX-105020-5301-Q020",
+    "subject": "解剖學",
+    "chapter": "骨盆與會陰",
+    "section": "泌尿生殖",
+    "stem": "下列何者出現於骨盆且直接源自腰神經叢（lumbar plexus）？",
+    "options": {
+      "A": "臀上神經（superior gluteal nerve）",
+      "B": "至閉孔內肌之神經（nerve to obturator internus）",
+      "C": "閉孔神經（obturator nerve）",
+      "D": "骨盆內臟神經（pelvic splanchnic nerve）"
+    },
+    "answer": "C",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "泌尿生殖｜出現於骨盆且直接源自腰神經叢（lumbar ",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 105 年第一次醫師一階醫學（一）",
+    "sourceYear": 2016,
+    "sourceRound": 1,
+    "originalQuestionNumber": 20
+  },
+  {
+    "id": "MOEX-105020-5301-Q021",
+    "subject": "解剖學",
+    "chapter": "腹部",
+    "section": "肝膽胰脾",
+    "stem": "直腸乙狀結腸交接處（rectosigmoid junction）位於下列那個節段？",
+    "options": {
+      "A": "第一薦椎（S1）",
+      "B": "第二薦椎（S2）",
+      "C": "第三薦椎（S3）",
+      "D": "第四薦椎（S4）"
+    },
+    "answer": "C",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "肝膽胰脾｜直腸乙狀結腸交接處（rectosigmoid",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 105 年第一次醫師一階醫學（一）",
+    "sourceYear": 2016,
+    "sourceRound": 1,
+    "originalQuestionNumber": 21
+  },
+  {
+    "id": "MOEX-105020-5301-Q022",
+    "subject": "解剖學",
+    "chapter": "骨盆與會陰",
+    "section": "泌尿生殖",
+    "stem": "下列何者是主要造成子宮前傾（anteflexion）的構造？",
+    "options": {
+      "A": "闊韌帶（broad ligament）",
+      "B": "主韌帶（cardinal ligament）",
+      "C": "子宮圓韌帶（round ligament of the uterus）",
+      "D": "子宮薦韌帶（uterosacral ligament）"
+    },
+    "answer": "C",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "子宮支持構造",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 105 年第一次醫師一階醫學（一）",
+    "sourceYear": 2016,
+    "sourceRound": 1,
+    "originalQuestionNumber": 22
+  },
+  {
+    "id": "MOEX-105020-5301-Q023",
+    "subject": "解剖學",
+    "chapter": "下肢",
+    "section": "小腿肌群",
+    "stem": "下列何者在小腿沒有血管伴行？",
+    "options": {
+      "A": "腓腸神經（sural nerve）",
+      "B": "腓深神經（deep fibular nerve）",
+      "C": "腓淺神經（superficial fibular nerve）",
+      "D": "脛神經（tibial nerve）"
+    },
+    "answer": "C",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "小腿肌群｜在小腿沒有血管伴行",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 105 年第一次醫師一階醫學（一）",
+    "sourceYear": 2016,
+    "sourceRound": 1,
+    "originalQuestionNumber": 23
+  },
+  {
+    "id": "MOEX-105020-5301-Q024",
+    "subject": "解剖學",
+    "chapter": "下肢",
+    "section": "足部",
+    "stem": "下列何者不共同形成跟腱（calcaneal tendon）？",
+    "options": {
+      "A": "腓腸肌（gastrocnemius）",
+      "B": "比目魚肌（soleus）",
+      "C": "膕肌（popliteus）",
+      "D": "蹠肌（plantaris）"
+    },
+    "answer": "C",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "足部｜不共同形成跟腱（calcaneal tend",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 105 年第一次醫師一階醫學（一）",
+    "sourceYear": 2016,
+    "sourceRound": 1,
+    "originalQuestionNumber": 24
+  },
+  {
+    "id": "MOEX-105020-5301-Q025",
+    "subject": "解剖學",
+    "chapter": "下肢",
+    "section": "大腿前內後區",
+    "stem": "下列何者同時跨過髖關節（hip joint）與膝關節（knee joint）？",
+    "options": {
+      "A": "縫匠肌（sartorius）",
+      "B": "內收大肌（adductor magnus）",
+      "C": "股外側肌（vastus lateralis）",
+      "D": "股內側肌（vastus medialis）"
+    },
+    "answer": "A",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "大腿內收肌群",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 105 年第一次醫師一階醫學（一）",
+    "sourceYear": 2016,
+    "sourceRound": 1,
+    "originalQuestionNumber": 25
+  },
+  {
+    "id": "MOEX-105020-5301-Q026",
+    "subject": "解剖學",
+    "chapter": "上肢",
+    "section": "臂神經叢",
+    "stem": "下列何者受損會導致手指無法內收（adduction）夾住紙片？",
+    "options": {
+      "A": "橈神經的深支（deep branch of radial nerve）",
+      "B": "橈神經的淺支（superficial branch of radial nerve）",
+      "C": "尺神經的深支（deep branch of ulnar nerve）",
+      "D": "尺神經的淺支（superficial branch of ulnar nerve）"
+    },
+    "answer": "C",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "臂神經叢終末分支",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 105 年第一次醫師一階醫學（一）",
+    "sourceYear": 2016,
+    "sourceRound": 1,
+    "originalQuestionNumber": 26
+  },
+  {
+    "id": "MOEX-105020-5301-Q028",
+    "subject": "解剖學",
+    "chapter": "上肢",
+    "section": "臂神經叢",
+    "stem": "下列何者由尺神經（ulnar nerve）支配？",
+    "options": {
+      "A": "拇指對掌肌（opponens pollicis）",
+      "B": "外展拇指短肌（abductor pollicis brevis）",
+      "C": "屈拇指短肌（flexor pollicis brevis）",
+      "D": "內收拇指肌（adductor pollicis）"
+    },
+    "answer": "D",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "臂神經叢終末分支",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 105 年第一次醫師一階醫學（一）",
+    "sourceYear": 2016,
+    "sourceRound": 1,
+    "originalQuestionNumber": 28
+  },
+  {
+    "id": "MOEX-105020-5301-Q031",
+    "subject": "解剖學",
+    "chapter": "腹部",
+    "section": "腎臟與後腹腔",
+    "stem": "下列何者由輸尿管芽（ureteric bud）形成？",
+    "options": {
+      "A": "鮑氏囊（Bowman's capsule）",
+      "B": "近曲小管（proximal convoluted tubule）",
+      "C": "絲球體（glomerulus）",
+      "D": "集尿小管（collecting tubule）"
+    },
+    "answer": "D",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "輸尿管走行",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 105 年第一次醫師一階醫學（一）",
+    "sourceYear": 2016,
+    "sourceRound": 1,
+    "originalQuestionNumber": 31
+  },
+  {
+    "id": "MOEX-105020-5301-Q081",
+    "subject": "解剖學",
+    "chapter": "頭頸部",
+    "section": "顏面神經與三叉神經",
+    "stem": "下列何者為臨床上常見造成小兒氣喘之致敏原（allergen）？",
+    "options": {
+      "A": "頭蝨（head louse）",
+      "B": "跳蚤（flea）",
+      "C": "塵蟎（dust mite）",
+      "D": "狗蜱（dog tick）"
+    },
+    "answer": "C",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "顏面神經與三叉神經｜臨床上常見造成小兒氣喘之致敏原（allerg",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 105 年第一次醫師一階醫學（一）",
+    "sourceYear": 2016,
+    "sourceRound": 1,
+    "originalQuestionNumber": 81
+  },
+  {
+    "id": "MOEX-105020-5301-Q089",
+    "subject": "解剖學",
+    "chapter": "骨盆與會陰",
+    "section": "會陰三角",
+    "stem": "在進行卡方檢定時，若有某一個細格之欲預期值小於或等於5，則須選用何種統計方法較為 適當？",
+    "options": {
+      "A": "簡單迴歸分析（simple regression）",
+      "B": "多變項分析（multivariate analysis）",
+      "C": "變異量分析（analysis of variance）",
+      "D": "費雪恰當檢定（Fisher’s exact test）"
+    },
+    "answer": "D",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "會陰三角｜在進行卡方檢定時，若有某一個細格之欲預期值小",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 105 年第一次醫師一階醫學（一）",
+    "sourceYear": 2016,
+    "sourceRound": 1,
+    "originalQuestionNumber": 89
+  },
+  {
+    "id": "MOEX-105020-5301-Q090",
+    "subject": "解剖學",
+    "chapter": "上肢",
+    "section": "上肢血管",
+    "stem": "多環芳香烴（PAH）為空氣中常見污染物，通常以下列那種物質為指標污染物？",
+    "options": {
+      "A": "benz[a]anthracene（BaA）",
+      "B": "benzo[a]pyrene（BaP）",
+      "C": "benzo[k]fluoranthene（BkF）",
+      "D": "benzo[ghi]perylene（BghiP）"
+    },
+    "answer": "B",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "上肢血管｜多環芳香烴（PAH）為空氣中常見污染物，通常",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 105 年第一次醫師一階醫學（一）",
+    "sourceYear": 2016,
+    "sourceRound": 1,
+    "originalQuestionNumber": 90
+  },
+  {
+    "id": "MOEX-105020-5301-Q094",
+    "subject": "解剖學",
+    "chapter": "胸腔",
+    "section": "肺與胸膜",
+    "stem": "造成塵肺症之危害因素屬於下列何類型？",
+    "options": {
+      "A": "物理性危害",
+      "B": "化學性危害",
+      "C": "生物性危害",
+      "D": "人體工學危害"
+    },
+    "answer": "B",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "肺與胸膜｜造成塵肺症之危害因素屬於下列何類型",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 105 年第一次醫師一階醫學（一）",
+    "sourceYear": 2016,
+    "sourceRound": 1,
+    "originalQuestionNumber": 94
+  },
+  {
+    "id": "MOEX-105020-5301-Q095",
+    "subject": "解剖學",
+    "chapter": "上肢",
+    "section": "上肢血管",
+    "stem": "下列那一條神經受影響是主要造成腕道症候群的主因？",
+    "options": {
+      "A": "尺神經",
+      "B": "正中神經",
+      "C": "橈神經",
+      "D": "腕神經"
+    },
+    "answer": "B",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "上肢血管｜下列那一條神經受影響是主要造成腕道症候群的主",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 105 年第一次醫師一階醫學（一）",
+    "sourceYear": 2016,
+    "sourceRound": 1,
+    "originalQuestionNumber": 95
+  },
+  {
+    "id": "MOEX-105020-5301-Q098",
+    "subject": "解剖學",
+    "chapter": "胸腔",
+    "section": "縱膈",
+    "stem": "有關長期照護與醫療照護之比較，下列敘述何者錯誤？",
+    "options": {
+      "A": "長期照護主要的對象為慢性病患或身心障礙之失能或失智者",
+      "B": "醫療照護對象包括急性病患與慢性病患",
+      "C": "長期照護以機構式照顧為主",
+      "D": "醫療照護之照顧概念主要為治 疾病"
+    },
+    "answer": "C",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "縱膈｜長期照護與醫療照護之比較，下列敘述何者錯誤",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 105 年第一次醫師一階醫學（一）",
+    "sourceYear": 2016,
+    "sourceRound": 1,
+    "originalQuestionNumber": 98
+  },
+  {
+    "id": "MOEX-105020-5301-Q100",
+    "subject": "解剖學",
+    "chapter": "上肢",
+    "section": "上肢血管",
+    "stem": "醫師法規範之「擅自執行醫療業務」，不包括下列何者？",
+    "options": {
+      "A": "非醫師執行應由醫師執行之醫療行為",
+      "B": "非醫師執行任何醫療行為",
+      "C": "非醫師在醫師指示下，執行不需由醫師親自執行之醫療行為",
+      "D": "非醫師在醫師指示下，執行需由醫師親自執行之醫療行為"
+    },
+    "answer": "C",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "上肢血管｜醫師法規範之「擅自執行醫療業務」，不包括下列",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 105 年第一次醫師一階醫學（一）",
+    "sourceYear": 2016,
+    "sourceRound": 1,
+    "originalQuestionNumber": 100
+  },
+  {
+    "id": "MOEX-105100-5301-Q001",
+    "subject": "解剖學",
+    "chapter": "神經解剖",
+    "section": "腦幹核區",
+    "stem": "下列何者不是嗅覺傳導路徑的構造？",
+    "options": {
+      "A": "嗅球",
+      "B": "丘腦",
+      "C": "uncus",
+      "D": "limen insulae"
+    },
+    "answer": "B",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "腦幹核區｜不是嗅覺傳導路徑的構造",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 105 年第二次醫師一階醫學（一）",
+    "sourceYear": 2016,
+    "sourceRound": 2,
+    "originalQuestionNumber": 1
+  },
+  {
+    "id": "MOEX-105100-5301-Q002",
+    "subject": "解剖學",
+    "chapter": "神經解剖",
+    "section": "小腦",
+    "stem": "有關上小腦腳（superior cerebellar peduncle）之敘述，下列何者錯誤？",
+    "options": {
+      "A": "含有ventral spinocerebellar tract",
+      "B": "含有連接小腦與下橄欖核（inferior olivary nucleus）之神經纖維",
+      "C": "含有連接小腦與紅核之神經纖維",
+      "D": "含有連接小腦與丘腦之神經纖維"
+    },
+    "answer": "B",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "脊髓小腦功能",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 105 年第二次醫師一階醫學（一）",
+    "sourceYear": 2016,
+    "sourceRound": 2,
+    "originalQuestionNumber": 2
+  },
+  {
+    "id": "MOEX-105100-5301-Q003",
+    "subject": "解剖學",
+    "chapter": "神經解剖",
+    "section": "脊髓傳導路徑",
+    "stem": "上段頸部脊髓之血流，主要來自下列何者？",
+    "options": {
+      "A": "椎動脈（vertebral artery）",
+      "B": "內頸動脈（internal carotid artery）",
+      "C": "外頸動脈（external carotid artery）",
+      "D": "內胸動脈（internal thoracic artery）"
+    },
+    "answer": "A",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "脊髓傳導路徑｜上段頸部脊髓之血流，主要來自下列何者",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 105 年第二次醫師一階醫學（一）",
+    "sourceYear": 2016,
+    "sourceRound": 2,
+    "originalQuestionNumber": 3
+  },
+  {
+    "id": "MOEX-105100-5301-Q004",
+    "subject": "解剖學",
+    "chapter": "神經解剖",
+    "section": "腦幹核區",
+    "stem": "下列何者不參與瞳孔光反射？",
+    "options": {
+      "A": "pretectal area",
+      "B": "外膝狀體（lateral geniculate body）",
+      "C": "睫狀神經節（ciliary ganglion）",
+      "D": "短睫神經（short ciliary nerve）"
+    },
+    "answer": "B",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "腦幹核區｜不參與瞳孔光反射",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 105 年第二次醫師一階醫學（一）",
+    "sourceYear": 2016,
+    "sourceRound": 2,
+    "originalQuestionNumber": 4
+  },
+  {
+    "id": "MOEX-105100-5301-Q005",
+    "subject": "解剖學",
+    "chapter": "頭頸部",
+    "section": "顏面神經與三叉神經",
+    "stem": "咀嚼肌的本體感覺（proprioception）主要傳入下列核區？",
+    "options": {
+      "A": "三叉神經脊髓核（spinal trigeminal nucleus）",
+      "B": "面神經運動核（facial motor nucleus）",
+      "C": "三叉神經中腦核（mesencephalic trigeminal nucleus）",
+      "D": "孤立束核（solitary nucleus）"
+    },
+    "answer": "C",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "三叉神經感覺分支",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 105 年第二次醫師一階醫學（一）",
+    "sourceYear": 2016,
+    "sourceRound": 2,
+    "originalQuestionNumber": 5
+  },
+  {
+    "id": "MOEX-105100-5301-Q006",
+    "subject": "解剖學",
+    "chapter": "頭頸部",
+    "section": "顏面神經與三叉神經",
+    "stem": "在門齒窩（incisive fossa）處注入麻醉劑，主要阻斷下列何神經？",
+    "options": {
+      "A": "鼻腭神經（nasopalatine n.）",
+      "B": "腭大神經（greater palatine n.）",
+      "C": "前上齒槽神經（anterior superior alveolar n.）",
+      "D": "腭小神經（lesser palatine n.）"
+    },
+    "answer": "A",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "顏面神經與三叉神經｜在門齒窩（incisive fossa）處注",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 105 年第二次醫師一階醫學（一）",
+    "sourceYear": 2016,
+    "sourceRound": 2,
+    "originalQuestionNumber": 6
+  },
+  {
+    "id": "MOEX-105100-5301-Q007",
+    "subject": "解剖學",
+    "chapter": "神經解剖",
+    "section": "腦神經",
+    "stem": "手術時，不慎切斷動眼神經（oculomotor n.）主幹，下列何種情形最不可能產生？",
+    "options": {
+      "A": "上眼瞼下垂",
+      "B": "瞳孔放大",
+      "C": "淚液分泌減少",
+      "D": "睫狀肌（ciliary m.）麻痺"
+    },
+    "answer": "C",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "動眼神經與睫狀神經節",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 105 年第二次醫師一階醫學（一）",
+    "sourceYear": 2016,
+    "sourceRound": 2,
+    "originalQuestionNumber": 7
+  },
+  {
+    "id": "MOEX-105100-5301-Q008",
+    "subject": "解剖學",
+    "chapter": "頭頸部",
+    "section": "顏面神經與三叉神經",
+    "stem": "下列何者不參與形成鼻腔頂部？",
+    "options": {
+      "A": "額骨（frontal）",
+      "B": "上頜骨（maxilla）",
+      "C": "篩骨（ethmoid）",
+      "D": "蝶骨（sphenoid）"
+    },
+    "answer": "B",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "顏面神經與三叉神經｜不參與形成鼻腔頂部",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 105 年第二次醫師一階醫學（一）",
+    "sourceYear": 2016,
+    "sourceRound": 2,
+    "originalQuestionNumber": 8
+  },
+  {
+    "id": "MOEX-105100-5301-Q009",
+    "subject": "解剖學",
+    "chapter": "頭頸部",
+    "section": "顏面神經與三叉神經",
+    "stem": "3條附著在莖突（styloid process）上的肌肉，受下列六條神經中的那些支配？ ①CN V ②CN VII ③CN IX ④CN X ⑤CN XI ⑥CN XII 3",
+    "options": {
+      "A": "①②⑤",
+      "B": "③④⑥",
+      "C": "①④⑤",
+      "D": "②③⑥"
+    },
+    "answer": "D",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "顏面神經與三叉神經｜3條附著在莖突（styloid proces",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 105 年第二次醫師一階醫學（一）",
+    "sourceYear": 2016,
+    "sourceRound": 2,
+    "originalQuestionNumber": 9
+  },
+  {
+    "id": "MOEX-105100-5301-Q011",
+    "subject": "解剖學",
+    "chapter": "上肢",
+    "section": "上肢血管",
+    "stem": "下列何者的起點及終點，都在中軸骨骼上？",
+    "options": {
+      "A": "胸大肌（pectoralis major）",
+      "B": "胸小肌（pectoralis minor）",
+      "C": "前鋸肌（serratus anterior）",
+      "D": "後鋸肌（serratus posterior）"
+    },
+    "answer": "D",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "上肢血管｜的起點及終點，都在中軸骨骼上",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 105 年第二次醫師一階醫學（一）",
+    "sourceYear": 2016,
+    "sourceRound": 2,
+    "originalQuestionNumber": 11
+  },
+  {
+    "id": "MOEX-105100-5301-Q012",
+    "subject": "解剖學",
+    "chapter": "上肢",
+    "section": "肩胛區",
+    "stem": "下列何者受損時，會影響前移（protract）肩胛骨（scapula）的功能？",
+    "options": {
+      "A": "胸大肌（pectoralis major）",
+      "B": "胸小肌（pectoralis minor）",
+      "C": "鎖骨下肌（subclavius）",
+      "D": "前鋸肌（serratus anterior）"
+    },
+    "answer": "D",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "肩胛區｜受損時，會影響前移（protract）肩胛骨",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 105 年第二次醫師一階醫學（一）",
+    "sourceYear": 2016,
+    "sourceRound": 2,
+    "originalQuestionNumber": 12
+  },
+  {
+    "id": "MOEX-105100-5301-Q013",
+    "subject": "解剖學",
+    "chapter": "胸腔",
+    "section": "心臟與冠狀動脈",
+    "stem": "在正常情況下，房室節（atrioventricular node）最靠近下列何處？",
+    "options": {
+      "A": "右心房與上腔靜脈（superior vena cava）交接處",
+      "B": "右心房冠狀竇（coronary sinus）開口處",
+      "C": "心房中隔（interatrial septum）接近卵圓窩（oval fossa）處",
+      "D": "心房中隔接近冠狀竇開口處"
+    },
+    "answer": "D",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "心臟靜脈回流",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 105 年第二次醫師一階醫學（一）",
+    "sourceYear": 2016,
+    "sourceRound": 2,
+    "originalQuestionNumber": 13
+  },
+  {
+    "id": "MOEX-105100-5301-Q014",
+    "subject": "解剖學",
+    "chapter": "腹部",
+    "section": "肝膽胰脾",
+    "stem": "升結腸的動脈血主要來自：",
+    "options": {
+      "A": "腹腔動脈幹（celiac trunk）",
+      "B": "腸繫膜上動脈（superior mesenteric artery）",
+      "C": "腸繫膜下動脈（inferior mesenteric artery）",
+      "D": "髂內動脈（internal iliac artery）"
+    },
+    "answer": "B",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "肝膽胰脾｜升結腸的動脈血主要來自：",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 105 年第二次醫師一階醫學（一）",
+    "sourceYear": 2016,
+    "sourceRound": 2,
+    "originalQuestionNumber": 14
+  },
+  {
+    "id": "MOEX-105100-5301-Q015",
+    "subject": "解剖學",
+    "chapter": "腹部",
+    "section": "肝膽胰脾",
+    "stem": "下列那一個器官最不可能出現在通過胃體的橫截面影像上？",
+    "options": {
+      "A": "肝臟",
+      "B": "脾臟",
+      "C": "腎臟",
+      "D": "空腸"
+    },
+    "answer": "D",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "肝十二指腸韌帶與 portal triad",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 105 年第二次醫師一階醫學（一）",
+    "sourceYear": 2016,
+    "sourceRound": 2,
+    "originalQuestionNumber": 15
+  },
+  {
+    "id": "MOEX-105100-5301-Q016",
+    "subject": "解剖學",
+    "chapter": "胸腔",
+    "section": "縱膈",
+    "stem": "有關腹直肌（rectus abdominis）的敘述，下列何者錯誤？",
+    "options": {
+      "A": "此肌向上附著在肋軟骨及胸骨，向下附著在恥骨",
+      "B": "白線（linea alba）為左右腹直肌間的構造",
+      "C": "支配此肌的腹壁下動脈（inferior epigastric artery）起自髂內動脈（internal iliac artery）",
+      "D": "胸內動脈（internal thoracic artery）的末稍進入其鞘膜內成為腹壁上動脈（superior epigastric artery）"
+    },
+    "answer": "C",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "縱膈｜腹直肌（rectus abdominis）的",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 105 年第二次醫師一階醫學（一）",
+    "sourceYear": 2016,
+    "sourceRound": 2,
+    "originalQuestionNumber": 16
+  },
+  {
+    "id": "MOEX-105100-5301-Q017",
+    "subject": "解剖學",
+    "chapter": "骨盆與會陰",
+    "section": "會陰三角",
+    "stem": "下列何者位於膀胱的側下方？",
+    "options": {
+      "A": "子宮",
+      "B": "前列腺",
+      "C": "輸尿管",
+      "D": "閉孔內肌"
+    },
+    "answer": "D",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "會陰三角｜位於膀胱的側下方",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 105 年第二次醫師一階醫學（一）",
+    "sourceYear": 2016,
+    "sourceRound": 2,
+    "originalQuestionNumber": 17
+  },
+  {
+    "id": "MOEX-105100-5301-Q018",
+    "subject": "解剖學",
+    "chapter": "骨盆與會陰",
+    "section": "會陰三角",
+    "stem": "手術傷及下列何者最可能切斷卵巢動脈？",
+    "options": {
+      "A": "懸韌帶（suspensory ligament）",
+      "B": "薦棘韌帶（sacrospinous ligament）",
+      "C": "主韌帶（cardinal ligament）",
+      "D": "卵巢圓韌帶（ovarian ligament）"
+    },
+    "answer": "A",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "會陰三角｜手術傷及下列何者最可能切斷卵巢動脈",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 105 年第二次醫師一階醫學（一）",
+    "sourceYear": 2016,
+    "sourceRound": 2,
+    "originalQuestionNumber": 18
+  },
+  {
+    "id": "MOEX-105100-5301-Q019",
+    "subject": "解剖學",
+    "chapter": "骨盆與會陰",
+    "section": "泌尿生殖",
+    "stem": "下列何者不是骨盆壁筋膜（parietal pelvic fascia）的構造？",
+    "options": {
+      "A": "子宮圓韌帶（round ligament of uterus）",
+      "B": "主韌帶（cardinal ligament）",
+      "C": "子宮薦骨韌帶（utero-sacral ligament）",
+      "D": "恥骨子宮頸韌帶（pubo-cervical ligament）"
+    },
+    "answer": "A",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "子宮支持構造",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 105 年第二次醫師一階醫學（一）",
+    "sourceYear": 2016,
+    "sourceRound": 2,
+    "originalQuestionNumber": 19
+  },
+  {
+    "id": "MOEX-105100-5301-Q020",
+    "subject": "解剖學",
+    "chapter": "骨盆與會陰",
+    "section": "會陰三角",
+    "stem": "與男性陰囊（scrotum）發育同源的女性構造是？",
+    "options": {
+      "A": "大陰唇（labium majora）",
+      "B": "小陰唇（labium minora）",
+      "C": "陰蒂（clitoris）",
+      "D": "前庭球（bulbs of the vestibule）"
+    },
+    "answer": "A",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "會陰三角｜男性陰囊（scrotum）發育同源的女性構造",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 105 年第二次醫師一階醫學（一）",
+    "sourceYear": 2016,
+    "sourceRound": 2,
+    "originalQuestionNumber": 20
+  },
+  {
+    "id": "MOEX-105100-5301-Q021",
+    "subject": "解剖學",
+    "chapter": "骨盆與會陰",
+    "section": "會陰三角",
+    "stem": "在坐骨棘（ischial spine）處施行陰部神經阻斷術（pudendal nerve block）時，下列何處的感覺最可能受到影響？",
+    "options": {
+      "A": "陰道上端（upper vagina）",
+      "B": "陰阜（mons pubis）",
+      "C": "陰道前庭（vestibule of vagina）",
+      "D": "子宮（uterus）"
+    },
+    "answer": "C",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "會陰三角｜在坐骨棘（ischial spine）處施行",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 105 年第二次醫師一階醫學（一）",
+    "sourceYear": 2016,
+    "sourceRound": 2,
+    "originalQuestionNumber": 21
+  },
+  {
+    "id": "MOEX-105100-5301-Q022",
+    "subject": "解剖學",
+    "chapter": "下肢",
+    "section": "小腿肌群",
+    "stem": "車禍腰部受傷造成右小腿外側感覺喪失，最可能是右側那一條腰部脊神經受損？",
+    "options": {
+      "A": "L2",
+      "B": "L3",
+      "C": "L4",
+      "D": "L5"
+    },
+    "answer": "D",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "小腿肌群｜車禍腰部受傷造成右小腿外側感覺喪失，最可能是",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 105 年第二次醫師一階醫學（一）",
+    "sourceYear": 2016,
+    "sourceRound": 2,
+    "originalQuestionNumber": 22
+  },
+  {
+    "id": "MOEX-105100-5301-Q023",
+    "subject": "解剖學",
+    "chapter": "下肢",
+    "section": "大腿前內後區",
+    "stem": "內收大肌（adductor magnus）附著於股骨（femur）的下列那一構造？",
+    "options": {
+      "A": "大轉子（greater trochanter）",
+      "B": "小轉子（lesser trochanter）",
+      "C": "轉子間線（intertrochanteric line）",
+      "D": "粗線（linea aspera）"
+    },
+    "answer": "D",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "大腿內收肌群",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 105 年第二次醫師一階醫學（一）",
+    "sourceYear": 2016,
+    "sourceRound": 2,
+    "originalQuestionNumber": 23
+  },
+  {
+    "id": "MOEX-105100-5301-Q024",
+    "subject": "解剖學",
+    "chapter": "上肢",
+    "section": "上肢血管",
+    "stem": "下列何者附著於尺骨的鷹嘴突（olecranon）？",
+    "options": {
+      "A": "橈側伸腕長肌（extensor carpi radialis longus）",
+      "B": "尺側伸腕肌（extensor carpi ulnaris）",
+      "C": "伸指肌（extensor digitorum）",
+      "D": "肘肌（anconeus）"
+    },
+    "answer": "D",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "上肢血管｜附著於尺骨的鷹嘴突（olecranon）",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 105 年第二次醫師一階醫學（一）",
+    "sourceYear": 2016,
+    "sourceRound": 2,
+    "originalQuestionNumber": 24
+  },
+  {
+    "id": "MOEX-105100-5301-Q025",
+    "subject": "解剖學",
+    "chapter": "上肢",
+    "section": "前臂屈伸肌",
+    "stem": "下列何者穿過旋後肌（supinator）？",
+    "options": {
+      "A": "橈神經的深支（deep branch of radial nerve）",
+      "B": "橈神經的淺支（superficial branch of radial nerve）",
+      "C": "尺神經的深支（deep branch of ulnar nerve）",
+      "D": "尺神經的淺支（superficial branch of ulnar nerve）"
+    },
+    "answer": "A",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "前臂屈肌神經支配",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 105 年第二次醫師一階醫學（一）",
+    "sourceYear": 2016,
+    "sourceRound": 2,
+    "originalQuestionNumber": 25
+  },
+  {
+    "id": "MOEX-105100-5301-Q026",
+    "subject": "解剖學",
+    "chapter": "胸腔",
+    "section": "縱膈",
+    "stem": "下列何者不是豎脊肌（erector spinae）的一部分？",
+    "options": {
+      "A": "髂肋肌（iliocostalis）",
+      "B": "最長肌（longissimus）",
+      "C": "多裂肌（multifidus）",
+      "D": "棘肌（spinalis）"
+    },
+    "answer": "C",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "縱膈｜不是豎脊肌（erector spinae）的",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 105 年第二次醫師一階醫學（一）",
+    "sourceYear": 2016,
+    "sourceRound": 2,
+    "originalQuestionNumber": 26
+  },
+  {
+    "id": "MOEX-105100-5301-Q027",
+    "subject": "解剖學",
+    "chapter": "神經解剖",
+    "section": "脊髓傳導路徑",
+    "stem": "固定脊髓的齒狀韌帶（denticulate ligament）是由下列何者形成？",
+    "options": {
+      "A": "硬脊膜的骨膜層（periosteal layer of dural mater）",
+      "B": "硬脊膜的腦膜層（meningeal layer of dural mater）",
+      "C": "蜘蛛膜（arachnoid mater）",
+      "D": "軟膜（pia mater）"
+    },
+    "answer": "D",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "脊髓傳導路徑｜固定脊髓的齒狀韌帶（denticulate ",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 105 年第二次醫師一階醫學（一）",
+    "sourceYear": 2016,
+    "sourceRound": 2,
+    "originalQuestionNumber": 27
+  },
+  {
+    "id": "MOEX-105100-5301-Q028",
+    "subject": "解剖學",
+    "chapter": "頭頸部",
+    "section": "甲狀腺與副甲狀腺",
+    "stem": "甲狀腺亢進造成兩眼往右看時，嚴重複視，兩個影像平行；向左看時，並無複視。下列何者最可能受侵犯？",
+    "options": {
+      "A": "右內直肌",
+      "B": "右外直肌",
+      "C": "右上直肌",
+      "D": "右下直肌"
+    },
+    "answer": "B",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "甲狀腺與副甲狀腺｜甲狀腺亢進造成兩眼往右看時，嚴重複視，兩個影",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 105 年第二次醫師一階醫學（一）",
+    "sourceYear": 2016,
+    "sourceRound": 2,
+    "originalQuestionNumber": 28
+  },
+  {
+    "id": "MOEX-105100-5301-Q029",
+    "subject": "解剖學",
+    "chapter": "骨盆與會陰",
+    "section": "會陰三角",
+    "stem": "下列何染色體具有人類睪丸決定因子（testis-determining factor）？",
+    "options": {
+      "A": "第5對",
+      "B": "第21對",
+      "C": "X",
+      "D": "Y"
+    },
+    "answer": "D",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "會陰三角｜下列何染色體具有人類睪丸決定因子（testi",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 105 年第二次醫師一階醫學（一）",
+    "sourceYear": 2016,
+    "sourceRound": 2,
+    "originalQuestionNumber": 29
+  },
+  {
+    "id": "MOEX-105100-5301-Q032",
+    "subject": "解剖學",
+    "chapter": "骨盆與會陰",
+    "section": "會陰三角",
+    "stem": "有關男性假陰陽人（male pseudohermaphroditism）之特徵，下列何者錯誤？",
+    "options": {
+      "A": "testosterone分泌不足",
+      "B": "染色體是46, XX",
+      "C": "不含性染色質（sex chromatin）",
+      "D": "睪丸發育可能正常或退化"
+    },
+    "answer": "B",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "會陰三角｜男性假陰陽人（male pseudoherm",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 105 年第二次醫師一階醫學（一）",
+    "sourceYear": 2016,
+    "sourceRound": 2,
+    "originalQuestionNumber": 32
+  },
+  {
+    "id": "MOEX-105100-5301-Q035",
+    "subject": "解剖學",
+    "chapter": "神經解剖",
+    "section": "腦幹核區",
+    "stem": "有關神經組織的組成細胞，下列敘述何項正確？",
+    "options": {
+      "A": "蒲金氏細胞（Purkinje cell）位於大腦皮質區，負責協調肌肉活動",
+      "B": "脈絡叢細胞（cells of choroid plexus）具有纖毛（ciliated）",
+      "C": "中樞神經系統內，具有吞噬功能的是微小膠細胞（microglia）",
+      "D": "一個許旺氏細胞（Schwann cell）會包覆多條髓鞘軸突（myelinated axons）"
+    },
+    "answer": "C",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "腦幹核區｜神經組織的組成細胞，下列敘述何項正確",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 105 年第二次醫師一階醫學（一）",
+    "sourceYear": 2016,
+    "sourceRound": 2,
+    "originalQuestionNumber": 35
+  },
+  {
+    "id": "MOEX-105100-5301-Q039",
+    "subject": "解剖學",
+    "chapter": "頭頸部",
+    "section": "顏面神經與三叉神經",
+    "stem": "有關唾液腺腫瘤（tumors of salivary gland），下列敘述何者錯誤？",
+    "options": {
+      "A": "唾液腺腫瘤通常發生於三大唾液腺（major salivary glands）",
+      "B": "僅小部分的唾液腺腫瘤發生於口腔黏膜的小唾液腺（minor salivary glands）",
+      "C": "約有80%的唾液腺腫瘤是惡性的",
+      "D": "小唾液腺腫瘤（minor salivary gland tumors）最易發生於腭部（palate）"
+    },
+    "answer": "C",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "顏面神經與三叉神經｜唾液腺腫瘤（tumors of saliva",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 105 年第二次醫師一階醫學（一）",
+    "sourceYear": 2016,
+    "sourceRound": 2,
+    "originalQuestionNumber": 39
+  },
+  {
+    "id": "MOEX-105100-5301-Q041",
+    "subject": "解剖學",
+    "chapter": "骨盆與會陰",
+    "section": "會陰三角",
+    "stem": "精子的去獲能作用（decapacitation）在何處進行？",
+    "options": {
+      "A": "細精管（seminiferous tubule）",
+      "B": "副睪管（epididymis）",
+      "C": "輸卵管（oviduct）",
+      "D": "輸精管（ductus deferens）"
+    },
+    "answer": "B",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "會陰三角｜精子的去獲能作用（decapacitatio",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 105 年第二次醫師一階醫學（一）",
+    "sourceYear": 2016,
+    "sourceRound": 2,
+    "originalQuestionNumber": 41
+  },
+  {
+    "id": "MOEX-105100-5301-Q052",
+    "subject": "解剖學",
+    "chapter": "腹部",
+    "section": "肝膽胰脾",
+    "stem": "下列那一種DNA病毒具有不同的血清型，會造成上呼吸道、結膜以及腸胃道的感染？",
+    "options": {
+      "A": "乳突瘤病毒（Papillomavirus）",
+      "B": "腺病毒（Adenovirus）",
+      "C": "痘病毒（Poxvirus）",
+      "D": "B19細小病毒（Parvovirus B19）"
+    },
+    "answer": "B",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "肝膽胰脾｜下列那一種DNA病毒具有不同的血清型，會造成",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 105 年第二次醫師一階醫學（一）",
+    "sourceYear": 2016,
+    "sourceRound": 2,
+    "originalQuestionNumber": 52
+  },
+  {
+    "id": "MOEX-105100-5301-Q053",
+    "subject": "解剖學",
+    "chapter": "胸腔",
+    "section": "縱膈",
+    "stem": "常用來治療疱疹病毒的阿昔洛韋（Acyclovir）會被病毒的何種酵素磷酸化，進而抑制病毒的複製？",
+    "options": {
+      "A": "胞苷激酶（cytidine kinase）",
+      "B": "胸苷激酶（thymidine kinase）",
+      "C": "酪氨酸激酶（tyrosine kinase）",
+      "D": "周期蛋白依賴性激酶（cyclin dependent kinase）"
+    },
+    "answer": "B",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "縱膈｜常用來治療疱疹病毒的阿昔洛韋（Acyclov",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 105 年第二次醫師一階醫學（一）",
+    "sourceYear": 2016,
+    "sourceRound": 2,
+    "originalQuestionNumber": 53
+  },
+  {
+    "id": "MOEX-105100-5301-Q055",
+    "subject": "解剖學",
+    "chapter": "神經解剖",
+    "section": "腦幹核區",
+    "stem": "下列何種病毒不屬於腸病毒屬（Genus enterovirus）？",
+    "options": {
+      "A": "脊髓灰白質炎病毒（Poliovirus）",
+      "B": "輪狀病毒（Rotavirus）",
+      "C": "克沙奇病毒（Coxsackie virus）",
+      "D": "埃可病毒（Echovirus）"
+    },
+    "answer": "B",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "腦幹核區｜下列何種病毒不屬於腸病毒屬（Genus en",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 105 年第二次醫師一階醫學（一）",
+    "sourceYear": 2016,
+    "sourceRound": 2,
+    "originalQuestionNumber": 55
+  },
+  {
+    "id": "MOEX-105100-5301-Q080",
+    "subject": "解剖學",
+    "chapter": "骨盆與會陰",
+    "section": "會陰三角",
+    "stem": "以下關於弓蟲（Toxoplasma gondii）的敘述中，何者錯誤？",
+    "options": {
+      "A": "人是其終宿主，而貓是其中間宿主",
+      "B": "在愛滋病患者可能導致弓蟲性腦炎（Toxoplasma encephalitis）",
+      "C": "文獻記載，孕婦得到急性弓蟲症（toxoplasmosis）時，spiramycin為預防其胎兒子宮內感染的用藥之一",
+      "D": "弓蟲症在台灣屬第四類法定傳染病"
+    },
+    "answer": "A",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "會陰三角｜以下關於弓蟲（Toxoplasma gond",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 105 年第二次醫師一階醫學（一）",
+    "sourceYear": 2016,
+    "sourceRound": 2,
+    "originalQuestionNumber": 80
+  },
+  {
+    "id": "MOEX-105100-5301-Q092",
+    "subject": "解剖學",
+    "chapter": "胸腔",
+    "section": "肺與胸膜",
+    "stem": "以下何種粒徑的粉塵最易進入肺泡引起傷害？",
+    "options": {
+      "A": "0.001－0.01 微米（µm）",
+      "B": "0.01－0.1 微米（µm）",
+      "C": "1－10 微米（µm）",
+      "D": "10－100 微米（µm）"
+    },
+    "answer": "B",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "肺與胸膜｜以下何種粒徑的粉塵最易進入肺泡引起傷害",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 105 年第二次醫師一階醫學（一）",
+    "sourceYear": 2016,
+    "sourceRound": 2,
+    "originalQuestionNumber": 92
+  },
+  {
+    "id": "MOEX-105100-5301-Q098",
+    "subject": "解剖學",
+    "chapter": "胸腔",
+    "section": "縱膈",
+    "stem": "有關愛滋防治政策的倫理性，下列敘述何者錯誤？",
+    "options": {
+      "A": "為了避免愛滋感染者被歧視，相關通報應該保障當事人隱私",
+      "B": "國家免費提供愛滋感染者相關醫療，有助於降低強制篩檢在倫理上的爭議",
+      "C": "縱使民眾可能因為陽性的篩檢結果而受到許多心理與社會衝擊，但為了國民健康，國家還是應該強制所有民眾接受愛滋篩檢",
+      "D": "醫師不能只因為病人有愛滋病，就拒絕治療病人"
+    },
+    "answer": "C",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "縱膈｜愛滋防治政策的倫理性，下列敘述何者錯誤",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 105 年第二次醫師一階醫學（一）",
+    "sourceYear": 2016,
+    "sourceRound": 2,
+    "originalQuestionNumber": 98
+  },
+  {
+    "id": "MOEX-106020-5301-Q001",
+    "subject": "解剖學",
+    "chapter": "頭頸部",
+    "section": "頸動脈鞘",
+    "stem": "下列何者的血液，不回流至內頸靜脈（internal jugular vein）？",
+    "options": {
+      "A": "下岩竇（inferior petrosal sinus）",
+      "B": "面靜脈（facial vein）",
+      "C": "咽靜脈（pharyngeal vein）",
+      "D": "下甲狀腺靜脈（inferior thyroid vein）"
+    },
+    "answer": "D",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "頸動脈鞘｜的血液，不回流至內頸靜脈（internal ",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 106 年第一次醫師一階醫學（一）",
+    "sourceYear": 2017,
+    "sourceRound": 1,
+    "originalQuestionNumber": 1
+  },
+  {
+    "id": "MOEX-106020-5301-Q002",
+    "subject": "解剖學",
+    "chapter": "頭頸部",
+    "section": "顏面神經與三叉神經",
+    "stem": "三叉神經（trigeminal nerve）之分支接受：",
+    "options": {
+      "A": "第七顱神經所發出之副交感神經纖維伴行，控制瞳孔括約肌（sphincter pupillae）",
+      "B": "舌咽神經（glossopharyngeal nerve）所發出之副交感神經纖維伴行，控制耳下腺（parotid gland）",
+      "C": "第三顱神經所發出之副交感神經纖維伴行，控制淚腺（lacrimal gland）",
+      "D": "舌下神經（hypoglossal nerve）所發出之副交感神經纖維伴行，控制舌下腺（sublingual gland）"
+    },
+    "answer": "B",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "顏面神經與腮腺關係",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 106 年第一次醫師一階醫學（一）",
+    "sourceYear": 2017,
+    "sourceRound": 1,
+    "originalQuestionNumber": 2
+  },
+  {
+    "id": "MOEX-106020-5301-Q003",
+    "subject": "解剖學",
+    "chapter": "胸腔",
+    "section": "肺與胸膜",
+    "stem": "壁層胸膜（parietal pleura）的淋巴，最可能回流到下列那個淋巴結（lymph node）？",
+    "options": {
+      "A": "腋（axillary）",
+      "B": "支氣管肺（bronchopulmonary）",
+      "C": "氣管支氣管（tracheobronchial）",
+      "D": "支氣管縱隔（bronchomediastinal）"
+    },
+    "answer": "A",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "肺門構造相對位置",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 106 年第一次醫師一階醫學（一）",
+    "sourceYear": 2017,
+    "sourceRound": 1,
+    "originalQuestionNumber": 3
+  },
+  {
+    "id": "MOEX-106020-5301-Q004",
+    "subject": "解剖學",
+    "chapter": "腹部",
+    "section": "肝膽胰脾",
+    "stem": "胃飽足的感覺主要由下列何者攜帶？",
+    "options": {
+      "A": "內臟大神經（greater splanchnic nerve）",
+      "B": "內臟小神經（lesser splanchnic nerve）",
+      "C": "內臟最小神經（least splanchnic nerve）",
+      "D": "迷走神經（vagus nerve）"
+    },
+    "answer": "D",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "肝膽胰脾｜胃飽足的感覺主要由下列何者攜帶",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 106 年第一次醫師一階醫學（一）",
+    "sourceYear": 2017,
+    "sourceRound": 1,
+    "originalQuestionNumber": 4
+  },
+  {
+    "id": "MOEX-106020-5301-Q005",
+    "subject": "解剖學",
+    "chapter": "腹部",
+    "section": "腹膜關係",
+    "stem": "膀胱主要被腹膜覆蓋的部分是：",
+    "options": {
+      "A": "後面",
+      "B": "側下面",
+      "C": "上表面",
+      "D": "膀胱頸"
+    },
+    "answer": "C",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "腹膜腔分區",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 106 年第一次醫師一階醫學（一）",
+    "sourceYear": 2017,
+    "sourceRound": 1,
+    "originalQuestionNumber": 5
+  },
+  {
+    "id": "MOEX-106020-5301-Q006",
+    "subject": "解剖學",
+    "chapter": "骨盆與會陰",
+    "section": "直腸與肛管",
+    "stem": "直腸上段的淋巴主要匯流入下列那個淋巴結？",
+    "options": {
+      "A": "髂內淋巴結（internal iliac lymph nodes）",
+      "B": "腰淋巴結（lumbar lymph nodes）",
+      "C": "腹股溝淺淋巴結（superficial inguinal lymph nodes）",
+      "D": "腸繫膜下淋巴結（inferior mesenteric lymph nodes）"
+    },
+    "answer": "D",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "直腸與肛管｜直腸上段的淋巴主要匯流入下列那個淋巴結",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 106 年第一次醫師一階醫學（一）",
+    "sourceYear": 2017,
+    "sourceRound": 1,
+    "originalQuestionNumber": 6
+  },
+  {
+    "id": "MOEX-106020-5301-Q007",
+    "subject": "解剖學",
+    "chapter": "骨盆與會陰",
+    "section": "泌尿生殖",
+    "stem": "有關大骨盆（greater pelvis）的敘述，下列何者正確？",
+    "options": {
+      "A": "位於骨盆入口（pelvic inlet）下方",
+      "B": "男性較女性寬且淺",
+      "C": "內含乙狀結腸（sigmoid colon）",
+      "D": "內含腎臟（kidney）"
+    },
+    "answer": "C",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "泌尿生殖｜大骨盆（greater pelvis）的敘述",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 106 年第一次醫師一階醫學（一）",
+    "sourceYear": 2017,
+    "sourceRound": 1,
+    "originalQuestionNumber": 7
+  },
+  {
+    "id": "MOEX-106020-5301-Q008",
+    "subject": "解剖學",
+    "chapter": "上肢",
+    "section": "上肢血管",
+    "stem": "下列何者不是連接不同骨頭間的韌帶？",
+    "options": {
+      "A": "胸鎖韌帶（sternoclavicular ligament）",
+      "B": "喙肩韌帶（coracoacromial ligament）",
+      "C": "喙鎖韌帶（coracoclavicular ligament）",
+      "D": "喙肱韌帶（coracohumeral ligament）"
+    },
+    "answer": "B",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "上肢血管｜不是連接不同骨頭間的韌帶",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 106 年第一次醫師一階醫學（一）",
+    "sourceYear": 2017,
+    "sourceRound": 1,
+    "originalQuestionNumber": 8
+  },
+  {
+    "id": "MOEX-106020-5301-Q009",
+    "subject": "解剖學",
+    "chapter": "上肢",
+    "section": "上肢血管",
+    "stem": "手部鼻煙區（snuff box）觸摸到的脈搏是下列何者的脈動？",
+    "options": {
+      "A": "橈動脈（radial artery）",
+      "B": "尺動脈（ulnar artery）",
+      "C": "骨間前動脈（anterior interosseous artery）",
+      "D": "骨間後動脈（posterior interosseous artery）"
+    },
+    "answer": "A",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "前臂主要動脈",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 106 年第一次醫師一階醫學（一）",
+    "sourceYear": 2017,
+    "sourceRound": 1,
+    "originalQuestionNumber": 9
+  },
+  {
+    "id": "MOEX-106020-5301-Q010",
+    "subject": "解剖學",
+    "chapter": "上肢",
+    "section": "臂神經叢",
+    "stem": "下列何者受損，最可能造成前臂（forearm）無法伸直（extension）？",
+    "options": {
+      "A": "肌皮神經（musculocutaneous nerve）",
+      "B": "正中神經（median nerve）",
+      "C": "尺神經（ulnar nerve）",
+      "D": "橈神經（radial nerve）"
+    },
+    "answer": "D",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "臂神經叢終末分支",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 106 年第一次醫師一階醫學（一）",
+    "sourceYear": 2017,
+    "sourceRound": 1,
+    "originalQuestionNumber": 10
+  },
+  {
+    "id": "MOEX-106020-5301-Q012",
+    "subject": "解剖學",
+    "chapter": "神經解剖",
+    "section": "腦幹核區",
+    "stem": "下列何者屬味覺皮質區？",
+    "options": {
+      "A": "島葉（insula）",
+      "B": "枕葉（occipital lobe）",
+      "C": "內側額葉（medial frontal lobe）",
+      "D": "背外側額葉（dorsal lateral frontal lobe）"
+    },
+    "answer": "A",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "腦幹核區｜屬味覺皮質區",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 106 年第一次醫師一階醫學（一）",
+    "sourceYear": 2017,
+    "sourceRound": 1,
+    "originalQuestionNumber": 12
+  },
+  {
+    "id": "MOEX-106020-5301-Q013",
+    "subject": "解剖學",
+    "chapter": "腹部",
+    "section": "腹膜關係",
+    "stem": "有關網狀結構（reticular formation）核群，下列何者以正腎上腺素（norepinephrine）為主要神經傳遞物質？",
+    "options": {
+      "A": "藍斑核（locus coeruleus）",
+      "B": "縫核（raphe nucleus）",
+      "C": "腹側被蓋區 (ventral tegmental area）",
+      "D": "腳橋網狀核（pedunculopontine reticular nucleus）"
+    },
+    "answer": "A",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "腹膜關係｜網狀結構（reticular formati",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 106 年第一次醫師一階醫學（一）",
+    "sourceYear": 2017,
+    "sourceRound": 1,
+    "originalQuestionNumber": 13
+  },
+  {
+    "id": "MOEX-106020-5301-Q014",
+    "subject": "解剖學",
+    "chapter": "神經解剖",
+    "section": "腦幹核區",
+    "stem": "初級視覺皮質（primary visual cortex）位於下列何Brodmann area？",
+    "options": {
+      "A": "19",
+      "B": "17",
+      "C": "22",
+      "D": "45"
+    },
+    "answer": "B",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "腦幹核區｜初級視覺皮質（primary visual ",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 106 年第一次醫師一階醫學（一）",
+    "sourceYear": 2017,
+    "sourceRound": 1,
+    "originalQuestionNumber": 14
+  },
+  {
+    "id": "MOEX-106020-5301-Q015",
+    "subject": "解剖學",
+    "chapter": "頭頸部",
+    "section": "甲狀腺與副甲狀腺",
+    "stem": "甲狀腺（thyroid gland）手術，最可能造成下列何神經受損？",
+    "options": {
+      "A": "喉內神經（internal laryngeal nerve）",
+      "B": "膈神經（phrenic nerve）",
+      "C": "頸襻下根（inferior root of ansa cervicalis）",
+      "D": "喉返神經（recurrent laryngeal nerve）"
+    },
+    "answer": "D",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "甲狀腺與副甲狀腺｜甲狀腺（thyroid gland）手術，最",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 106 年第一次醫師一階醫學（一）",
+    "sourceYear": 2017,
+    "sourceRound": 1,
+    "originalQuestionNumber": 15
+  },
+  {
+    "id": "MOEX-106020-5301-Q016",
+    "subject": "解剖學",
+    "chapter": "神經解剖",
+    "section": "腦幹核區",
+    "stem": "病患的上眼瞼下垂（ptosis），最可能是由於下列何者受損所造成？",
+    "options": {
+      "A": "外旋神經（abducent nerve）",
+      "B": "滑車神經（trochlear nerve）",
+      "C": "視神經（optic nerve）",
+      "D": "動眼神經（oculomotor nerve）"
+    },
+    "answer": "D",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "腦幹核區｜病患的上眼瞼下垂（ptosis），最可能是由",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 106 年第一次醫師一階醫學（一）",
+    "sourceYear": 2017,
+    "sourceRound": 1,
+    "originalQuestionNumber": 16
+  },
+  {
+    "id": "MOEX-106020-5301-Q017",
+    "subject": "解剖學",
+    "chapter": "頭頸部",
+    "section": "顏面神經與三叉神經",
+    "stem": "上頜竇的開口（opening of maxillary sinus）位於鼻腔側壁何處？",
+    "options": {
+      "A": "篩泡（ethmoidal bulla）",
+      "B": "半月裂（semilunar hiatus）",
+      "C": "下鼻道（inferior nasal meatus）",
+      "D": "上鼻道（superior nasal meatus）"
+    },
+    "answer": "B",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "顏面神經與三叉神經｜上頜竇的開口（opening of maxi",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 106 年第一次醫師一階醫學（一）",
+    "sourceYear": 2017,
+    "sourceRound": 1,
+    "originalQuestionNumber": 17
+  },
+  {
+    "id": "MOEX-106020-5301-Q018",
+    "subject": "解剖學",
+    "chapter": "頭頸部",
+    "section": "顏面神經與三叉神經",
+    "stem": "有關顳頜關節（temporomandibular joint）之敘述，下列何者正確？",
+    "options": {
+      "A": "莖突下頜韌帶（stylomandibular ligament）附著在下頜骨的舌部（lingula of mandible）",
+      "B": "蝶骨下頜韌帶（sphenomandibular ligament）附著在下頜角（angle of mandible）",
+      "C": "翼外肌（lateral pterygoid muscle）收縮造成下頜骨的前引（protrusion）",
+      "D": "顳頜關節的關節盤是由彈性軟骨（elastic cartilage）構成"
+    },
+    "answer": "C",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "顏面神經與三叉神經｜顳頜關節（temporomandibular",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 106 年第一次醫師一階醫學（一）",
+    "sourceYear": 2017,
+    "sourceRound": 1,
+    "originalQuestionNumber": 18
+  },
+  {
+    "id": "MOEX-106020-5301-Q019",
+    "subject": "解剖學",
+    "chapter": "胸腔",
+    "section": "縱膈",
+    "stem": "心肌梗塞時產生左前胸或左上臂的轉移痛，此體表位置的感覺，由下列何者傳導？",
+    "options": {
+      "A": "迷走神經",
+      "B": "膈神經",
+      "C": "交感神經幹",
+      "D": "肋間神經"
+    },
+    "answer": "D",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "縱膈神經走行",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 106 年第一次醫師一階醫學（一）",
+    "sourceYear": 2017,
+    "sourceRound": 1,
+    "originalQuestionNumber": 19
+  },
+  {
+    "id": "MOEX-106020-5301-Q020",
+    "subject": "解剖學",
+    "chapter": "胸腔",
+    "section": "縱膈",
+    "stem": "右側乳房淋巴系統，通常不會直接匯入：",
+    "options": {
+      "A": "鎖骨下淋巴幹（subclavian trunk）",
+      "B": "胸管（thoracic duct）",
+      "C": "腋淋巴結（axillary lymph nodes）",
+      "D": "胸骨旁淋巴結（parasternal lymph nodes）"
+    },
+    "answer": "B",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "胸導管走行",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 106 年第一次醫師一階醫學（一）",
+    "sourceYear": 2017,
+    "sourceRound": 1,
+    "originalQuestionNumber": 20
+  },
+  {
+    "id": "MOEX-106020-5301-Q021",
+    "subject": "解剖學",
+    "chapter": "胸腔",
+    "section": "橫膈",
+    "stem": "有關構造與橫膈開口的對應，下列何者正確？",
+    "options": {
+      "A": "胸管－食道裂孔",
+      "B": "奇靜脈－主動脈裂孔",
+      "C": "迷走神經－下腔靜脈裂孔",
+      "D": "交感神經幹－主動脈裂孔"
+    },
+    "answer": "B",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "橫膈三大開口",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 106 年第一次醫師一階醫學（一）",
+    "sourceYear": 2017,
+    "sourceRound": 1,
+    "originalQuestionNumber": 21
+  },
+  {
+    "id": "MOEX-106020-5301-Q022",
+    "subject": "解剖學",
+    "chapter": "胸腔",
+    "section": "心臟與冠狀動脈",
+    "stem": "心臟傳導系統中，竇房結（SA node）與房室結（AV node）的血管供應配對，下列何者正確？",
+    "options": {
+      "A": "右冠狀動脈、左迴旋支",
+      "B": "右冠狀動脈、右冠狀動脈",
+      "C": "右冠狀動脈、左前降支",
+      "D": "左迴旋支、左前降支"
+    },
+    "answer": "B",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "右冠狀動脈分支",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 106 年第一次醫師一階醫學（一）",
+    "sourceYear": 2017,
+    "sourceRound": 1,
+    "originalQuestionNumber": 22
+  },
+  {
+    "id": "MOEX-106020-5301-Q023",
+    "subject": "解剖學",
+    "chapter": "下肢",
+    "section": "腰薦神經叢",
+    "stem": "位於腰大肌（psoas major muscle）內側的腰神經叢分支是：",
+    "options": {
+      "A": "股神經（femoral nerve）",
+      "B": "生殖股神經（genitofemoral nerve）",
+      "C": "髂腹股溝神經（iliohypogastric nerve）",
+      "D": "閉孔神經（obturator nerve）"
+    },
+    "answer": "D",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "閉孔神經支配",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 106 年第一次醫師一階醫學（一）",
+    "sourceYear": 2017,
+    "sourceRound": 1,
+    "originalQuestionNumber": 23
+  },
+  {
+    "id": "MOEX-106020-5301-Q024",
+    "subject": "解剖學",
+    "chapter": "骨盆與會陰",
+    "section": "骨盆血管",
+    "stem": "子宮摘除手術結紮子宮動脈（uterine artery）後，仍有出血現象，此血液最可能來自下列何者的分支？",
+    "options": {
+      "A": "上膀胱動脈（superior vesical artery）",
+      "B": "下直腸動脈（inferior rectal artery）",
+      "C": "卵巢動脈（ovarian artery）",
+      "D": "閉孔動脈（obturator artery）"
+    },
+    "answer": "C",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "閉孔動脈走行",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 106 年第一次醫師一階醫學（一）",
+    "sourceYear": 2017,
+    "sourceRound": 1,
+    "originalQuestionNumber": 24
+  },
+  {
+    "id": "MOEX-106020-5301-Q025",
+    "subject": "解剖學",
+    "chapter": "骨盆與會陰",
+    "section": "會陰三角",
+    "stem": "下列何者不形成骨盆入口（pelvic inlet）的界限？",
+    "options": {
+      "A": "薦岬（promontory）",
+      "B": "髂嵴（iliac crest）",
+      "C": "恥骨嵴（pubic crest）",
+      "D": "弓狀線（arcuate line）"
+    },
+    "answer": "B",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "會陰三角｜不形成骨盆入口（pelvic inlet）的",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 106 年第一次醫師一階醫學（一）",
+    "sourceYear": 2017,
+    "sourceRound": 1,
+    "originalQuestionNumber": 25
+  },
+  {
+    "id": "MOEX-106020-5301-Q026",
+    "subject": "解剖學",
+    "chapter": "下肢",
+    "section": "大腿前內後區",
+    "stem": "下列那三塊肌肉的肌腱一起附著於脛骨粗隆的內側（medial side of tibial tuberosity）？",
+    "options": {
+      "A": "股薄肌（gracilis）、縫匠肌（sartorius）、半膜肌（semimembranosus）",
+      "B": "股薄肌（gracilis）、縫匠肌（sartorius）、半腱肌（semitendinosus）",
+      "C": "股二頭肌（biceps femoris）、半膜肌（semimembranosus）、半腱肌（semitendinosus）",
+      "D": "內收長肌（adductor longus）、內收短肌（adductor brevis）、內收大肌（adductor magnus）"
+    },
+    "answer": "B",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "大腿內收肌群",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 106 年第一次醫師一階醫學（一）",
+    "sourceYear": 2017,
+    "sourceRound": 1,
+    "originalQuestionNumber": 26
+  },
+  {
+    "id": "MOEX-106020-5301-Q027",
+    "subject": "解剖學",
+    "chapter": "上肢",
+    "section": "前臂屈伸肌",
+    "stem": "下列何者與旋後肌（supinator）由相同的神經支配？",
+    "options": {
+      "A": "旋前圓肌（pronator teres）",
+      "B": "旋前方肌（pronator quadratus）",
+      "C": "伸拇指短肌（extensor pollicis brevis）",
+      "D": "外展拇指短肌（abductor pollicis brevis）"
+    },
+    "answer": "C",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "前臂屈伸肌｜旋後肌（supinator）由相同的神經支配",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 106 年第一次醫師一階醫學（一）",
+    "sourceYear": 2017,
+    "sourceRound": 1,
+    "originalQuestionNumber": 27
+  },
+  {
+    "id": "MOEX-106020-5301-Q028",
+    "subject": "解剖學",
+    "chapter": "上肢",
+    "section": "肩胛區",
+    "stem": "下列何者附著於肩胛棘（spine of scapula）？",
+    "options": {
+      "A": "斜方肌（trapezius muscle）",
+      "B": "提肩胛肌（levator scapulae muscle）",
+      "C": "後上鋸肌（serratus posterior superior muscle）",
+      "D": "後下鋸肌（serratus posterior inferior muscle）"
+    },
+    "answer": "A",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "肩胛區｜附著於肩胛棘（spine of scapul",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 106 年第一次醫師一階醫學（一）",
+    "sourceYear": 2017,
+    "sourceRound": 1,
+    "originalQuestionNumber": 28
+  },
+  {
+    "id": "MOEX-106020-5301-Q029",
+    "subject": "解剖學",
+    "chapter": "腹部",
+    "section": "肝膽胰脾",
+    "stem": "胚胎發育至第幾週時，肝細胞（hepatocyte）開始製造膽汁（bile）？",
+    "options": {
+      "A": "第4週",
+      "B": "第8週",
+      "C": "第12週",
+      "D": "第16週"
+    },
+    "answer": "C",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "肝十二指腸韌帶與 portal triad",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 106 年第一次醫師一階醫學（一）",
+    "sourceYear": 2017,
+    "sourceRound": 1,
+    "originalQuestionNumber": 29
+  },
+  {
+    "id": "MOEX-106020-5301-Q030",
+    "subject": "解剖學",
+    "chapter": "骨盆與會陰",
+    "section": "會陰三角",
+    "stem": "有關女性假陰陽人（female pseudohermaphroditism）具有特徵之敘述，下列何者錯誤？",
+    "options": {
+      "A": "男性荷爾蒙分泌太多",
+      "B": "染色體46, XX",
+      "C": "肇因於腎上腺萎縮",
+      "D": "外生殖器官男性化"
+    },
+    "answer": "C",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "會陰三角｜女性假陰陽人（female pseudohe",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 106 年第一次醫師一階醫學（一）",
+    "sourceYear": 2017,
+    "sourceRound": 1,
+    "originalQuestionNumber": 30
+  },
+  {
+    "id": "MOEX-106020-5301-Q031",
+    "subject": "解剖學",
+    "chapter": "腹部",
+    "section": "肝膽胰脾",
+    "stem": "靜脈血液通常為缺氧血，但是下列何項例外？",
+    "options": {
+      "A": "肝靜脈（hepatic vein）",
+      "B": "門靜脈（portal vein）",
+      "C": "臍靜脈（umbilical vein）",
+      "D": "子宮靜脈（uterine vein）"
+    },
+    "answer": "C",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "肝十二指腸韌帶與 portal triad",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 106 年第一次醫師一階醫學（一）",
+    "sourceYear": 2017,
+    "sourceRound": 1,
+    "originalQuestionNumber": 31
+  },
+  {
+    "id": "MOEX-106020-5301-Q032",
+    "subject": "解剖學",
+    "chapter": "胸腔",
+    "section": "縱膈",
+    "stem": "下列何處的肌肉組織不是衍生自中胚層（mesoderm）？",
+    "options": {
+      "A": "肋間（intercostal region）",
+      "B": "虹膜（iris）",
+      "C": "心臟（heart）",
+      "D": "消化道（digestive tract）"
+    },
+    "answer": "B",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "縱膈｜下列何處的肌肉組織不是衍生自中胚層（meso",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 106 年第一次醫師一階醫學（一）",
+    "sourceYear": 2017,
+    "sourceRound": 1,
+    "originalQuestionNumber": 32
+  },
+  {
+    "id": "MOEX-106020-5301-Q041",
+    "subject": "解剖學",
+    "chapter": "骨盆與會陰",
+    "section": "會陰三角",
+    "stem": "在男性的生殖輔助腺體（accessory glands）中，體積最大的是：",
+    "options": {
+      "A": "前列腺（prostate gland）",
+      "B": "精囊（seminal vesicles）",
+      "C": "尿道球腺（bulbourethral glands）",
+      "D": "尿道腺（urethral glands）"
+    },
+    "answer": "A",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "會陰三角｜在男性的生殖輔助腺體（accessory g",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 106 年第一次醫師一階醫學（一）",
+    "sourceYear": 2017,
+    "sourceRound": 1,
+    "originalQuestionNumber": 41
+  },
+  {
+    "id": "MOEX-106020-5301-Q046",
+    "subject": "解剖學",
+    "chapter": "骨盆與會陰",
+    "section": "會陰三角",
+    "stem": "下列疾病，何者極少由砂眼披衣菌（Chlamydia trachomatis）所引起？",
+    "options": {
+      "A": "嬰兒肺炎（infant pneumonia）",
+      "B": "腦膜炎（meningitis）",
+      "C": "生殖道及尿道感染（urogenital infections）",
+      "D": "淋巴肉芽腫（lymphogranuloma venereum）"
+    },
+    "answer": "B",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "會陰三角｜下列疾病，何者極少由砂眼披衣菌（Chlamy",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 106 年第一次醫師一階醫學（一）",
+    "sourceYear": 2017,
+    "sourceRound": 1,
+    "originalQuestionNumber": 46
+  },
+  {
+    "id": "MOEX-106020-5301-Q057",
+    "subject": "解剖學",
+    "chapter": "胸腔",
+    "section": "心臟與冠狀動脈",
+    "stem": "下列何者為最常造成人類病毒性心臟炎（carditis）的病原？",
+    "options": {
+      "A": "流行性感冒病毒（Influenza virus）",
+      "B": "單純疱疹病毒（Herpes simplex virus）",
+      "C": "B型克沙奇病毒（Coxsackie B virus）",
+      "D": "71型腸病毒（Enterovirus 71）"
+    },
+    "answer": "C",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "心臟與冠狀動脈｜最常造成人類病毒性心臟炎（carditis）",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 106 年第一次醫師一階醫學（一）",
+    "sourceYear": 2017,
+    "sourceRound": 1,
+    "originalQuestionNumber": 57
+  },
+  {
+    "id": "MOEX-106020-5301-Q068",
+    "subject": "解剖學",
+    "chapter": "腹部",
+    "section": "肝膽胰脾",
+    "stem": "下列何者不是第四型的過敏反應？",
+    "options": {
+      "A": "結核病",
+      "B": "類肉瘤病（sarcoidosis）",
+      "C": "B型肝炎",
+      "D": "痲瘋（leprosy）"
+    },
+    "answer": "C",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "肝十二指腸韌帶與 portal triad",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 106 年第一次醫師一階醫學（一）",
+    "sourceYear": 2017,
+    "sourceRound": 1,
+    "originalQuestionNumber": 68
+  },
+  {
+    "id": "MOEX-106020-5301-Q075",
+    "subject": "解剖學",
+    "chapter": "胸腔",
+    "section": "肺與胸膜",
+    "stem": "下列有關蟠尾絲蟲（Onchocerca volvulus）感染人體的敘述，有幾項敘述是正確的？①微絲蟲（microfilaria）也會出現在尿液 中 ②微絲蟲（microfilaria）可能引起失明 ③病患皮膚可能呈現豹皮花紋（leopard skin） ④病患肺部可能有硬幣大小的結 節病變（coin lesion）",
+    "options": {
+      "A": "1項",
+      "B": "2項",
+      "C": "3項",
+      "D": "4項"
+    },
+    "answer": "C",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "肺與胸膜｜下列有關蟠尾絲蟲（Onchocerca vo",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 106 年第一次醫師一階醫學（一）",
+    "sourceYear": 2017,
+    "sourceRound": 1,
+    "originalQuestionNumber": 75
+  },
+  {
+    "id": "MOEX-106020-5301-Q077",
+    "subject": "解剖學",
+    "chapter": "腹部",
+    "section": "肝膽胰脾",
+    "stem": "下列何種人體寄生蟲之絲狀幼蟲的尾端會呈現分叉狀（notched tail）？",
+    "options": {
+      "A": "美洲鉤蟲（Necator americanus）",
+      "B": "十二指腸鉤蟲（Ancylostoma duodenale）",
+      "C": "糞小桿線蟲（Strongyloides stercoralis）",
+      "D": "蟯蟲（Enterobius vermicularis）"
+    },
+    "answer": "C",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "肝膽胰脾｜下列何種人體寄生蟲之絲狀幼蟲的尾端會呈現分叉",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 106 年第一次醫師一階醫學（一）",
+    "sourceYear": 2017,
+    "sourceRound": 1,
+    "originalQuestionNumber": 77
+  },
+  {
+    "id": "MOEX-106020-5301-Q078",
+    "subject": "解剖學",
+    "chapter": "腹部",
+    "section": "肝膽胰脾",
+    "stem": "下列有關中華肝吸蟲（Clonorchis sinensis）感染人體的敘述，何者錯誤？",
+    "options": {
+      "A": "因食入帶蟲淡水魚肉而感染",
+      "B": "其囊幼（metacercaria）具感染人體之能力",
+      "C": "其蟲卵易與橫川吸蟲（Metagonimus yokogawai）蟲卵區分",
+      "D": "在慢性重度感染者可能引發膽管癌"
+    },
+    "answer": "C",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "肝十二指腸韌帶與 portal triad",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 106 年第一次醫師一階醫學（一）",
+    "sourceYear": 2017,
+    "sourceRound": 1,
+    "originalQuestionNumber": 78
+  },
+  {
+    "id": "MOEX-106020-5301-Q080",
+    "subject": "解剖學",
+    "chapter": "骨盆與會陰",
+    "section": "會陰三角",
+    "stem": "下列敘述中，何者錯誤？",
+    "options": {
+      "A": "大腸纖毛蟲（Balantidium coli）及梨形鞭毛蟲（Giardia lamblia）之滋養體（trophozoites）都具有兩個細胞核",
+      "B": "目前治療陰道滴蟲症（vaginal trichomoniasis）的首選用藥為metronidazole",
+      "C": "自來水廠之過濾及一般氯處理殺菌方式，即可移除及殺死水中隱胞子蟲（Cryptosporidium spp.）的卵囊",
+      "D": "野外露營如果無法煮沸飲水，可利用碘液處理方式殺死水中梨形鞭毛蟲（Giardia lamblia）的囊體"
+    },
+    "answer": "C",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "會陰三角｜下列敘述中，何者錯誤",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 106 年第一次醫師一階醫學（一）",
+    "sourceYear": 2017,
+    "sourceRound": 1,
+    "originalQuestionNumber": 80
+  },
+  {
+    "id": "MOEX-106020-5301-Q081",
+    "subject": "解剖學",
+    "chapter": "腹部",
+    "section": "肝膽胰脾",
+    "stem": "下列有關阿米巴之敘述中，何者錯誤？",
+    "options": {
+      "A": "利用PCR技術可鑑別痢疾阿米巴（Entamoeba histolytica）及迪斯帕阿米巴（Entamoeba dispar）",
+      "B": "Metronidazole為痢疾阿米巴症之首選治療藥物",
+      "C": "痢疾阿米巴（Entamoeba histolytica）的滋養體（trophozoites）會吞噬紅血球",
+      "D": "人體寄生性阿米巴之寄生部位均在大腸"
+    },
+    "answer": "D",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "肝膽胰脾｜下列有關阿米巴之敘述中，何者錯誤",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 106 年第一次醫師一階醫學（一）",
+    "sourceYear": 2017,
+    "sourceRound": 1,
+    "originalQuestionNumber": 81
+  },
+  {
+    "id": "MOEX-106020-5301-Q082",
+    "subject": "解剖學",
+    "chapter": "腹部",
+    "section": "肝膽胰脾",
+    "stem": "下列那些原蟲的感染型（infective form）通常具有四個細胞核？",
+    "options": {
+      "A": "梨形鞭毛蟲（Giardia lamblia）及大腸阿米巴（Entamoeba coli）",
+      "B": "梨形鞭毛蟲（Giardia lamblia）及痢疾阿米巴（Entamoeba histolytica）",
+      "C": "哈氏阿米巴（Entamoeba hartmanni）及嗜碘阿米巴（Iodamoeba bütschlii）",
+      "D": "微小阿米巴（Endolimax nana）及雙核阿米巴（Dientamoeba fragilis）"
+    },
+    "answer": "B",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "肝膽胰脾｜下列那些原蟲的感染型（infective f",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 106 年第一次醫師一階醫學（一）",
+    "sourceYear": 2017,
+    "sourceRound": 1,
+    "originalQuestionNumber": 82
+  },
+  {
+    "id": "MOEX-106020-5301-Q093",
+    "subject": "解剖學",
+    "chapter": "神經解剖",
+    "section": "腦幹核區",
+    "stem": "氯乙烯單體會造成下列那一項職業性癌症？",
+    "options": {
+      "A": "白血病",
+      "B": "肺癌",
+      "C": "肝血管肉瘤",
+      "D": "腦瘤"
+    },
+    "answer": "C",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "腦幹核區｜氯乙烯單體會造成下列那一項職業性癌症",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 106 年第一次醫師一階醫學（一）",
+    "sourceYear": 2017,
+    "sourceRound": 1,
+    "originalQuestionNumber": 93
+  },
+  {
+    "id": "MOEX-106020-5301-Q094",
+    "subject": "解剖學",
+    "chapter": "胸腔",
+    "section": "縱膈",
+    "stem": "在人體方面，鉻尚未被證實導致以下何種疾病？",
+    "options": {
+      "A": "胃癌",
+      "B": "肺癌",
+      "C": "皮膚炎",
+      "D": "鼻中膈穿孔"
+    },
+    "answer": "A",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "縱膈｜在人體方面，鉻尚未被證實導致以下何種疾病",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 106 年第一次醫師一階醫學（一）",
+    "sourceYear": 2017,
+    "sourceRound": 1,
+    "originalQuestionNumber": 94
+  },
+  {
+    "id": "MOEX-106020-5301-Q100",
+    "subject": "解剖學",
+    "chapter": "胸腔",
+    "section": "縱膈",
+    "stem": "下列何者不是衛生福利部所轄的財團法人機構？",
+    "options": {
+      "A": "財團法人董氏基金會",
+      "B": "財團法人器官捐贈移植登錄中心",
+      "C": "財團法人藥害救濟基金會",
+      "D": "財團法人醫院評鑑暨醫療品質策進會"
+    },
+    "answer": "A",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "縱膈｜不是衛生福利部所轄的財團法人機構",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 106 年第一次醫師一階醫學（一）",
+    "sourceYear": 2017,
+    "sourceRound": 1,
+    "originalQuestionNumber": 100
+  },
+  {
+    "id": "MOEX-106100-1301-Q001",
+    "subject": "解剖學",
+    "chapter": "神經解剖",
+    "section": "小腦",
+    "stem": "下列何者不屬於功能性的邊緣系統（limbic system）？",
+    "options": {
+      "A": "杏仁體（amygdala）",
+      "B": "小腦齒狀核（dentate nucleus of cerebellum）",
+      "C": "海馬回（hippocampus）",
+      "D": "下視丘（hypothalamus）"
+    },
+    "answer": "B",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "小腦｜不屬於功能性的邊緣系統（limbic sys",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 106 年第二次醫師一階醫學（一）",
+    "sourceYear": 2017,
+    "sourceRound": 2,
+    "originalQuestionNumber": 1
+  },
+  {
+    "id": "MOEX-106100-1301-Q002",
+    "subject": "解剖學",
+    "chapter": "腹部",
+    "section": "肝膽胰脾",
+    "stem": "藍斑核（locus coeruleus）神經元釋放下列何種神經傳導物質？",
+    "options": {
+      "A": "血清張力素（serotonin）",
+      "B": "乙醯膽鹼（acetylcholine）",
+      "C": "正腎上腺素（norepinephrine）",
+      "D": "腎上腺素（epinephrine）"
+    },
+    "answer": "C",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "肝膽胰脾｜藍斑核（locus coeruleus）神經",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 106 年第二次醫師一階醫學（一）",
+    "sourceYear": 2017,
+    "sourceRound": 2,
+    "originalQuestionNumber": 2
+  },
+  {
+    "id": "MOEX-106100-1301-Q003",
+    "subject": "解剖學",
+    "chapter": "頭頸部",
+    "section": "咽喉解剖",
+    "stem": "咽部壁上的縱走肌肉收縮會對咽產生何種作用？",
+    "options": {
+      "A": "鬆弛",
+      "B": "上提",
+      "C": "下壓",
+      "D": "內收"
+    },
+    "answer": "B",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "咽喉解剖｜咽部壁上的縱走肌肉收縮會對咽產生何種作用",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 106 年第二次醫師一階醫學（一）",
+    "sourceYear": 2017,
+    "sourceRound": 2,
+    "originalQuestionNumber": 3
+  },
+  {
+    "id": "MOEX-106100-1301-Q004",
+    "subject": "解剖學",
+    "chapter": "頭頸部",
+    "section": "舌與味覺",
+    "stem": "下列何者收縮，可使舌頭變窄？",
+    "options": {
+      "A": "舌內在橫肌（intrinsic transverse muscle）",
+      "B": "舌內在垂直肌（intrinsic vertical muscle）",
+      "C": "頦舌肌（genioglossus muscle）",
+      "D": "舌骨舌肌（hyoglossus muscle）"
+    },
+    "answer": "A",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "舌與味覺｜收縮，可使舌頭變窄",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 106 年第二次醫師一階醫學（一）",
+    "sourceYear": 2017,
+    "sourceRound": 2,
+    "originalQuestionNumber": 4
+  },
+  {
+    "id": "MOEX-106100-1301-Q006",
+    "subject": "解剖學",
+    "chapter": "胸腔",
+    "section": "縱膈",
+    "stem": "正常成年人之肋骨緣（costal margin）是由下列第幾肋骨（rib）所構成？",
+    "options": {
+      "A": "3～4",
+      "B": "5～6",
+      "C": "7～10",
+      "D": "11～12"
+    },
+    "answer": "C",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "縱膈｜正常成年人之肋骨緣（costal margi",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 106 年第二次醫師一階醫學（一）",
+    "sourceYear": 2017,
+    "sourceRound": 2,
+    "originalQuestionNumber": 6
+  },
+  {
+    "id": "MOEX-106100-1301-Q007",
+    "subject": "解剖學",
+    "chapter": "腹部",
+    "section": "肝膽胰脾",
+    "stem": "有關消化道靜脈回流的敘述，下列何者錯誤？",
+    "options": {
+      "A": "胃小彎處的靜脈直接回流入肝門靜脈（hepatic portal vein）中",
+      "B": "腸繫膜上靜脈（superior mesenteric vein）與脾靜脈（splenic vein）會合形成肝門靜脈（hepatic portal vein）",
+      "C": "腸繫膜下靜脈（inferior mesenteric vein）的血匯入脾靜脈（splenic vein）",
+      "D": "胰頭（head of pancreas）的靜脈血先進入脾靜脈（splenic vein）後再匯入肝門靜脈（hepatic portal vein）"
+    },
+    "answer": "D",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "胰臟鄰近關係",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 106 年第二次醫師一階醫學（一）",
+    "sourceYear": 2017,
+    "sourceRound": 2,
+    "originalQuestionNumber": 7
+  },
+  {
+    "id": "MOEX-106100-1301-Q009",
+    "subject": "解剖學",
+    "chapter": "骨盆與會陰",
+    "section": "會陰三角",
+    "stem": "骨盆入口（pelvic inlet）骨折最容易傷及下列何者？",
+    "options": {
+      "A": "髂骨嵴（iliac crest）",
+      "B": "恥骨梳（pecten pubis）",
+      "C": "髂骨前下棘（anterior inferior iliac spine）",
+      "D": "坐骨棘（ischial spine）"
+    },
+    "answer": "B",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "會陰三角｜骨盆入口（pelvic inlet）骨折最容",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 106 年第二次醫師一階醫學（一）",
+    "sourceYear": 2017,
+    "sourceRound": 2,
+    "originalQuestionNumber": 9
+  },
+  {
+    "id": "MOEX-106100-1301-Q010",
+    "subject": "解剖學",
+    "chapter": "下肢",
+    "section": "大腿前內後區",
+    "stem": "下列那兩塊肌肉之遠端，附著於髂脛徑（iliotibial tract）？",
+    "options": {
+      "A": "髂肌（iliacus）與腰大肌（psoas major）",
+      "B": "闊筋膜張肌（tensor fasciae latae）與臀大肌（gluteus maximus）",
+      "C": "半膜肌（semimembranosus）與半腱肌（semitendinosus）",
+      "D": "股二頭肌（biceps femoris）與股四頭肌（quadriceps femoris）"
+    },
+    "answer": "B",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "大腿前群功能與支配",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 106 年第二次醫師一階醫學（一）",
+    "sourceYear": 2017,
+    "sourceRound": 2,
+    "originalQuestionNumber": 10
+  },
+  {
+    "id": "MOEX-106100-1301-Q011",
+    "subject": "解剖學",
+    "chapter": "上肢",
+    "section": "臂神經叢",
+    "stem": "下列何者是臂神經叢後索（posterior cord）支配闊背肌（latissimus dorsi）的分支？",
+    "options": {
+      "A": "肩胛背神經（dorsal scapular nerve）",
+      "B": "下肩胛下神經（lower subscapular nerve）",
+      "C": "長胸神經（long thoracic nerve）",
+      "D": "胸背神經（thoracodorsal nerve）"
+    },
+    "answer": "D",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "臂神經叢｜臂神經叢後索（posterior cord）",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 106 年第二次醫師一階醫學（一）",
+    "sourceYear": 2017,
+    "sourceRound": 2,
+    "originalQuestionNumber": 11
+  },
+  {
+    "id": "MOEX-106100-1301-Q012",
+    "subject": "解剖學",
+    "chapter": "下肢",
+    "section": "腰薦神經叢",
+    "stem": "膝關節受傷扯斷脛側副韌帶（tibial collateral ligament），下列何者最可能同時受損？",
+    "options": {
+      "A": "髕骨（patella）",
+      "B": "腓骨（fibula）",
+      "C": "內側關節盤（medial meniscus）",
+      "D": "外側關節盤（lateral meniscus）"
+    },
+    "answer": "C",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "腰薦神經叢｜膝關節受傷扯斷脛側副韌帶（tibial co",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 106 年第二次醫師一階醫學（一）",
+    "sourceYear": 2017,
+    "sourceRound": 2,
+    "originalQuestionNumber": 12
+  },
+  {
+    "id": "MOEX-106100-1301-Q013",
+    "subject": "解剖學",
+    "chapter": "神經解剖",
+    "section": "丘腦與基底核",
+    "stem": "下列何者不屬於紋狀體（corpus striatum）？",
+    "options": {
+      "A": "尾狀核（caudate nucleus）",
+      "B": "殼部（putamen）",
+      "C": "黑質（substantia nigra）",
+      "D": "蒼白球（globus pallidus）"
+    },
+    "answer": "C",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "黑質功能",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 106 年第二次醫師一階醫學（一）",
+    "sourceYear": 2017,
+    "sourceRound": 2,
+    "originalQuestionNumber": 13
+  },
+  {
+    "id": "MOEX-106100-1301-Q014",
+    "subject": "解剖學",
+    "chapter": "神經解剖",
+    "section": "聽覺與前庭路徑",
+    "stem": "大腦初級聽覺皮質（primary auditory cortex）之傳入訊息，主要來自何處？",
+    "options": {
+      "A": "內側膝狀體（medial geniculate body）",
+      "B": "上丘（superior colliculus）",
+      "C": "斜方體（trapezoid body）",
+      "D": "丘腦枕部（pulvinar of thalamus）"
+    },
+    "answer": "A",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "內側膝狀體",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 106 年第二次醫師一階醫學（一）",
+    "sourceYear": 2017,
+    "sourceRound": 2,
+    "originalQuestionNumber": 14
+  },
+  {
+    "id": "MOEX-106100-1301-Q015",
+    "subject": "解剖學",
+    "chapter": "神經解剖",
+    "section": "小腦",
+    "stem": "下列何構造不位於中腦（midbrain）？",
+    "options": {
+      "A": "上小腦腳交叉（superior cerebellar peduncle decussation）",
+      "B": "黑質（substantia nigra）",
+      "C": "內側膝狀體（medial geniculate body）",
+      "D": "下丘（inferior colliculus）"
+    },
+    "answer": "C",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "小腦腳傳入傳出",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 106 年第二次醫師一階醫學（一）",
+    "sourceYear": 2017,
+    "sourceRound": 2,
+    "originalQuestionNumber": 15
+  },
+  {
+    "id": "MOEX-106100-1301-Q016",
+    "subject": "解剖學",
+    "chapter": "神經解剖",
+    "section": "腦幹核區",
+    "stem": "下列何者由腦幹（brainstem）背側發出？",
+    "options": {
+      "A": "動眼神經（oculomotor nerve）",
+      "B": "外旋神經（abducens nerve）",
+      "C": "滑車神經（trochlear nerve）",
+      "D": "副神經（accessory nerve）"
+    },
+    "answer": "C",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "腦幹核區｜由腦幹（brainstem）背側發出",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 106 年第二次醫師一階醫學（一）",
+    "sourceYear": 2017,
+    "sourceRound": 2,
+    "originalQuestionNumber": 16
+  },
+  {
+    "id": "MOEX-106100-1301-Q017",
+    "subject": "解剖學",
+    "chapter": "頭頸部",
+    "section": "顏面神經與三叉神經",
+    "stem": "下列何者不是由頸襻（ansa cervicalis）上、下根（superior and inferior roots）的分支支配？",
+    "options": {
+      "A": "胸骨舌骨肌（sternohyoid muscle）",
+      "B": "肩胛舌骨肌（omohyoid muscle）",
+      "C": "胸骨甲狀肌（sternothyroid muscle）",
+      "D": "甲狀舌骨肌（thyrohyoid muscle）"
+    },
+    "answer": "D",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "顏面神經與三叉神經｜不是由頸襻（ansa cervicalis）",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 106 年第二次醫師一階醫學（一）",
+    "sourceYear": 2017,
+    "sourceRound": 2,
+    "originalQuestionNumber": 17
+  },
+  {
+    "id": "MOEX-106100-1301-Q018",
+    "subject": "解剖學",
+    "chapter": "上肢",
+    "section": "肩胛區",
+    "stem": "下列何者起自第五頸神經根（C5 root），且在頸部經常穿過中斜角肌（middle scalene muscle）後支配肩胛 提肌（levator scapulae muscle）？",
+    "options": {
+      "A": "肩胛上神經（suprascapular nerve）",
+      "B": "胸長神經（long thoracic nerve）",
+      "C": "背肩胛神經（dorsal scapular nerve）",
+      "D": "鎖骨下肌神經（nerve to subclavius）"
+    },
+    "answer": "C",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "肩胛區｜起自第五頸神經根（C5 root），且在頸部",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 106 年第二次醫師一階醫學（一）",
+    "sourceYear": 2017,
+    "sourceRound": 2,
+    "originalQuestionNumber": 18
+  },
+  {
+    "id": "MOEX-106100-1301-Q019",
+    "subject": "解剖學",
+    "chapter": "頭頸部",
+    "section": "顏面神經與三叉神經",
+    "stem": "有關頭部神經或血管路徑的敘述，下列何者正確？",
+    "options": {
+      "A": "眼動脈（ophthalmic artery）穿過眶上裂（superior orbital fissure）",
+      "B": "顏面神經（facial nerve）穿過莖乳孔（stylomastoid foramen）",
+      "C": "三叉神經上頜支（maxillary division of trigeminal nerve）穿過卵圓孔（foramen ovale）",
+      "D": "前庭耳蝸神經（vestibulocochlear nerve）穿過頸靜脈孔（jugular foramen）"
+    },
+    "answer": "B",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "顏面神經與腮腺關係",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 106 年第二次醫師一階醫學（一）",
+    "sourceYear": 2017,
+    "sourceRound": 2,
+    "originalQuestionNumber": 19
+  },
+  {
+    "id": "MOEX-106100-1301-Q020",
+    "subject": "解剖學",
+    "chapter": "胸腔",
+    "section": "心臟與冠狀動脈",
+    "stem": "當以食指穿入心包橫竇（transverse pericardial sinus），那些血管會位於食指之前？",
+    "options": {
+      "A": "肺動脈與下腔靜脈",
+      "B": "主動脈與上腔靜脈",
+      "C": "主動脈與肺動脈",
+      "D": "肺靜脈與上腔靜脈"
+    },
+    "answer": "C",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "心臟與冠狀動脈｜當以食指穿入心包橫竇（transverse ",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 106 年第二次醫師一階醫學（一）",
+    "sourceYear": 2017,
+    "sourceRound": 2,
+    "originalQuestionNumber": 20
+  },
+  {
+    "id": "MOEX-106100-1301-Q021",
+    "subject": "解剖學",
+    "chapter": "胸腔",
+    "section": "肺與胸膜",
+    "stem": "左肺門附近的構造中，下列何者的位置最高？",
+    "options": {
+      "A": "肺動脈",
+      "B": "肺靜脈",
+      "C": "左支氣管",
+      "D": "肺韌帶（pulmonary ligament）"
+    },
+    "answer": "A",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "肺門構造相對位置",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 106 年第二次醫師一階醫學（一）",
+    "sourceYear": 2017,
+    "sourceRound": 2,
+    "originalQuestionNumber": 21
+  },
+  {
+    "id": "MOEX-106100-1301-Q022",
+    "subject": "解剖學",
+    "chapter": "胸腔",
+    "section": "肺與胸膜",
+    "stem": "下列何者不發出肋間動脈？",
+    "options": {
+      "A": "頭臂動脈幹（brachiocephalic trunk）",
+      "B": "內胸動脈（internal thoracic artery）",
+      "C": "肌膈動脈（musculophrenic artery）",
+      "D": "胸主動脈（thoracic aorta）"
+    },
+    "answer": "A",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "肺與胸膜｜不發出肋間動脈",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 106 年第二次醫師一階醫學（一）",
+    "sourceYear": 2017,
+    "sourceRound": 2,
+    "originalQuestionNumber": 22
+  },
+  {
+    "id": "MOEX-106100-1301-Q023",
+    "subject": "解剖學",
+    "chapter": "胸腔",
+    "section": "縱膈",
+    "stem": "有關上縱隔（superior mediastinum）內，神經走向之敘述，下列何者正確？",
+    "options": {
+      "A": "右喉返神經（right reccurent laryngeal nerve）繞經右頭臂靜脈（right brachiocephalic vein）向上",
+      "B": "左喉返神經（left reccurent laryngeal nerve）繞經左鎖骨下動脈（left subclavian artery）向上",
+      "C": "右膈神經位於上腔靜脈（superior vena cava）和縱膈肋膜（mediastinal part of parietal pleura）間",
+      "D": "左膈神經沿降主動脈（descendig aorta）下行"
+    },
+    "answer": "C",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "縱膈神經走行",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 106 年第二次醫師一階醫學（一）",
+    "sourceYear": 2017,
+    "sourceRound": 2,
+    "originalQuestionNumber": 23
+  },
+  {
+    "id": "MOEX-106100-1301-Q024",
+    "subject": "解剖學",
+    "chapter": "胸腔",
+    "section": "肺與胸膜",
+    "stem": "正常年輕男性呈上身直立姿勢時，肺動脈瓣之前體表投影位最接近下列何處？",
+    "options": {
+      "A": "左側第三肋間",
+      "B": "左側第五肋間",
+      "C": "右側第四肋間",
+      "D": "右側第六肋間"
+    },
+    "answer": "A",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "肺門構造相對位置",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 106 年第二次醫師一階醫學（一）",
+    "sourceYear": 2017,
+    "sourceRound": 2,
+    "originalQuestionNumber": 24
+  },
+  {
+    "id": "MOEX-106100-1301-Q025",
+    "subject": "解剖學",
+    "chapter": "腹部",
+    "section": "腹膜關係",
+    "stem": "胰臟體部腫瘤壓迫下腸繫膜靜脈（inferior mesentery vein）接近脾靜脈（splenic vein）處，下列何者最有可 能因阻塞而膨大？",
+    "options": {
+      "A": "左胃靜脈（left gastric vein）",
+      "B": "左結腸靜脈（left colic vein）",
+      "C": "左胃網膜靜脈（left gastroepiploic vein）",
+      "D": "左腎靜脈（left renal vein）"
+    },
+    "answer": "B",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "腹膜關係｜胰臟體部腫瘤壓迫下腸繫膜靜脈（inferio",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 106 年第二次醫師一階醫學（一）",
+    "sourceYear": 2017,
+    "sourceRound": 2,
+    "originalQuestionNumber": 25
+  },
+  {
+    "id": "MOEX-106100-1301-Q026",
+    "subject": "解剖學",
+    "chapter": "骨盆與會陰",
+    "section": "會陰三角",
+    "stem": "下列何者的形成與腹內斜肌（internal oblique muscle）最有關？",
+    "options": {
+      "A": "腹股溝深環（deep inguinal ring）",
+      "B": "精索內筋膜（internal spermastic fascia）",
+      "C": "腔隙韌帶（lacunar ligament）",
+      "D": "聯合腱（conjoint tendon）"
+    },
+    "answer": "D",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "會陰三角｜的形成與腹內斜肌（internal obli",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 106 年第二次醫師一階醫學（一）",
+    "sourceYear": 2017,
+    "sourceRound": 2,
+    "originalQuestionNumber": 26
+  },
+  {
+    "id": "MOEX-106100-1301-Q027",
+    "subject": "解剖學",
+    "chapter": "骨盆與會陰",
+    "section": "會陰三角",
+    "stem": "有關骨盆橫膈（pelvic diaphragm）的敘述，下列何者錯誤？",
+    "options": {
+      "A": "外形呈現漏斗狀",
+      "B": "位於會陰（perineum）的頂部",
+      "C": "由提肛肌（levator ani muscle）和尾骨肌（coccygeus）及其筋膜組成",
+      "D": "排便時其肌肉收縮，幫助排出糞便"
+    },
+    "answer": "D",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "骨盆底與會陰支持",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 106 年第二次醫師一階醫學（一）",
+    "sourceYear": 2017,
+    "sourceRound": 2,
+    "originalQuestionNumber": 27
+  },
+  {
+    "id": "MOEX-106100-1301-Q028",
+    "subject": "解剖學",
+    "chapter": "骨盆與會陰",
+    "section": "會陰三角",
+    "stem": "下列何構造是會陰淺凹（superficial perineal pouch）的上界？",
+    "options": {
+      "A": "提肛肌筋膜（fascia of the levator ani muscle）",
+      "B": "會陰膜（perineal membrane）",
+      "C": "淺會陰筋膜（superficial perineal fascia）",
+      "D": "球海綿體肌筋膜（fascia of the ischiocavernosus muscle）"
+    },
+    "answer": "B",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "會陰淺層間隙內容物",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 106 年第二次醫師一階醫學（一）",
+    "sourceYear": 2017,
+    "sourceRound": 2,
+    "originalQuestionNumber": 28
+  },
+  {
+    "id": "MOEX-106100-1301-Q030",
+    "subject": "解剖學",
+    "chapter": "上肢",
+    "section": "臂神經叢",
+    "stem": "有關上肢的橈骨粗隆（radial tuberosity）與尺骨粗隆（ulnar tuberosity），分別是那兩塊肌肉的止端 （insertion site）？",
+    "options": {
+      "A": "前者是肱二頭肌（biceps brachii），後者是肱肌（brachialis）",
+      "B": "前者是肱二頭肌（biceps brachii），後者是肱三頭肌（triceps brachii）",
+      "C": "前者是肱肌（brachialis），後者是肱三頭肌（triceps brachii）",
+      "D": "前者是橈側屈腕肌（flexor carpi radialis），後者是尺側屈腕肌（flexor carpi ulnaris）"
+    },
+    "answer": "A",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "臂神經叢終末分支",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 106 年第二次醫師一階醫學（一）",
+    "sourceYear": 2017,
+    "sourceRound": 2,
+    "originalQuestionNumber": 30
+  },
+  {
+    "id": "MOEX-106100-1301-Q031",
+    "subject": "解剖學",
+    "chapter": "上肢",
+    "section": "肩胛區",
+    "stem": "背部，右肩胛骨內側緣與脊椎的棘突（spinous process of vertebra）間外傷出血，最可能直接傷及下列何者 的分支？",
+    "options": {
+      "A": "肩胛上動脈（suprascapular artery）",
+      "B": "肩胛下動脈（subscapular artery）",
+      "C": "頸深動脈（deep cervical artery）",
+      "D": "頸橫動脈（transverse cervical artery）"
+    },
+    "answer": "D",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "肩胛區｜背部，右肩胛骨內側緣與脊椎的棘突（spino",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 106 年第二次醫師一階醫學（一）",
+    "sourceYear": 2017,
+    "sourceRound": 2,
+    "originalQuestionNumber": 31
+  },
+  {
+    "id": "MOEX-106100-1301-Q034",
+    "subject": "解剖學",
+    "chapter": "腹部",
+    "section": "肝膽胰脾",
+    "stem": "下列有關脾臟（spleen）發育之敘述，何項錯誤？",
+    "options": {
+      "A": "最早出現於背側胃繫膜（dorsal mesogastrium）之間",
+      "B": "源自前腸（foregut）內胚層（endoderm）",
+      "C": "原先位於胃之背側，後來因胃之旋轉而移至左側",
+      "D": "曾為造血器官"
+    },
+    "answer": "B",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "肝膽胰脾｜下列有關脾臟（spleen）發育之敘述，何項",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 106 年第二次醫師一階醫學（一）",
+    "sourceYear": 2017,
+    "sourceRound": 2,
+    "originalQuestionNumber": 34
+  },
+  {
+    "id": "MOEX-106100-1301-Q036",
+    "subject": "解剖學",
+    "chapter": "神經解剖",
+    "section": "小腦",
+    "stem": "有關成體腦區與胚胎時期腦泡（brain vesicle）發育起源之關聯，何者錯誤？",
+    "options": {
+      "A": "橋腦（pons）－後腦（rhombencephalon）",
+      "B": "小腦（cerebellum）－前腦（prosencephalon）",
+      "C": "視丘（thalamus）－前腦（prosencephalon）",
+      "D": "頂蓋（tectum）－中腦（mesencephalon）"
+    },
+    "answer": "B",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "小腦｜成體腦區與胚胎時期腦泡（brain vesi",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 106 年第二次醫師一階醫學（一）",
+    "sourceYear": 2017,
+    "sourceRound": 2,
+    "originalQuestionNumber": 36
+  },
+  {
+    "id": "MOEX-106100-1301-Q048",
+    "subject": "解剖學",
+    "chapter": "腹部",
+    "section": "肝膽胰脾",
+    "stem": "下列對referred pain的敘述，何者最恰當？",
+    "options": {
+      "A": "referred pain的發生，最常見的原因是內臟神經與體神經的傳入纖維在延腦區會合所致",
+      "B": "胃與胰臟發炎造成的referred pain不會發生於背部",
+      "C": "膽囊炎患者常有右肩部疼痛的現象，即是一種referred pain",
+      "D": "右手拇指受傷常因referred pain而使左手拇指亦感覺疼痛"
+    },
+    "answer": "C",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "膽囊與膽囊動脈",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 106 年第二次醫師一階醫學（一）",
+    "sourceYear": 2017,
+    "sourceRound": 2,
+    "originalQuestionNumber": 48
+  },
+  {
+    "id": "MOEX-106100-1301-Q050",
+    "subject": "解剖學",
+    "chapter": "神經解剖",
+    "section": "小腦",
+    "stem": "下列何者與大腦的運動皮層一起計畫和設計動作的進行程序（planning and programming movements）？",
+    "options": {
+      "A": "小腦半球的內部（medial part）",
+      "B": "小腦半球的側部（lateral part）",
+      "C": "小腦蚓部（vermis）",
+      "D": "小腦小葉（flocculonodular lobe）"
+    },
+    "answer": "B",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "前庭小腦功能",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 106 年第二次醫師一階醫學（一）",
+    "sourceYear": 2017,
+    "sourceRound": 2,
+    "originalQuestionNumber": 50
+  },
+  {
+    "id": "MOEX-106100-1301-Q051",
+    "subject": "解剖學",
+    "chapter": "神經解剖",
+    "section": "腦幹核區",
+    "stem": "有關運動控制（motor control），下列敘述何者正確？",
+    "options": {
+      "A": "只有來自大腦運動皮層的神經元可以控制骨骼肌收縮",
+      "B": "α運動神經元細胞本體位於大腦運動皮層",
+      "C": "基底核（basal nuclei）的神經元與骨骼肌有興奮和抑制的突觸連結",
+      "D": "基底核（basal nuclei）與小腦負責計畫和設計隨意動作（voluntary movement）的進行程序"
+    },
+    "answer": "D",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "腦幹核區｜運動控制（motor control），下列",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 106 年第二次醫師一階醫學（一）",
+    "sourceYear": 2017,
+    "sourceRound": 2,
+    "originalQuestionNumber": 51
+  },
+  {
+    "id": "MOEX-106100-1301-Q052",
+    "subject": "解剖學",
+    "chapter": "神經解剖",
+    "section": "聽覺與前庭路徑",
+    "stem": "聽覺受器位於下列何處？",
+    "options": {
+      "A": "middle ear",
+      "B": "external auditory canal",
+      "C": "tympanic membrane",
+      "D": "inner ear"
+    },
+    "answer": "D",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "聽覺與前庭路徑｜聽覺受器位於下列何處",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 106 年第二次醫師一階醫學（一）",
+    "sourceYear": 2017,
+    "sourceRound": 2,
+    "originalQuestionNumber": 52
+  },
+  {
+    "id": "MOEX-106100-1301-Q057",
+    "subject": "解剖學",
+    "chapter": "胸腔",
+    "section": "縱膈",
+    "stem": "主動瓣脈逆流（aortic regurgitation）的病人，可藉由下列何種代償作用減緩循環缺失（circulatory insufficiency）的嚴重性？",
+    "options": {
+      "A": "右心室肥大",
+      "B": "血量增加",
+      "C": "腎臟排出鹽和水的量增加",
+      "D": "心房利鈉肽（atrial natriuretic peptide）分泌增加"
+    },
+    "answer": "B",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "縱膈｜主動瓣脈逆流（aortic regurgit",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 106 年第二次醫師一階醫學（一）",
+    "sourceYear": 2017,
+    "sourceRound": 2,
+    "originalQuestionNumber": 57
+  },
+  {
+    "id": "MOEX-106100-1301-Q062",
+    "subject": "解剖學",
+    "chapter": "胸腔",
+    "section": "肺與胸膜",
+    "stem": "貧血（anemia）患者，其血紅素（hemoglobin）濃度僅達正常值之50%，此外並無其它心肺功能異常。此人 進行正常換氣（ventilation）時，與健康的人相比較，下列那些參數顯著偏低？①體動脈血中氧分壓 ②體動脈血中氧合血紅素飽和百分比 ③肺泡內氧分壓 ④供給周邊組織的氧氣量",
+    "options": {
+      "A": "僅②③④",
+      "B": "僅①②④",
+      "C": "僅②④",
+      "D": "僅④"
+    },
+    "answer": "D",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "肺與胸膜｜貧血（anemia）患者，其血紅素（hemo",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 106 年第二次醫師一階醫學（一）",
+    "sourceYear": 2017,
+    "sourceRound": 2,
+    "originalQuestionNumber": 62
+  },
+  {
+    "id": "MOEX-106100-1301-Q063",
+    "subject": "解剖學",
+    "chapter": "腹部",
+    "section": "肝膽胰脾",
+    "stem": "下列何者對於抑制胃的活動力（motility）與排空（emptying）作用最強？",
+    "options": {
+      "A": "胃內僅含碳水化合物之食物",
+      "B": "胃壁擴張",
+      "C": "進入十二指腸內之高脂食物",
+      "D": "胃泌素（gastrin）"
+    },
+    "answer": "C",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "肝膽胰脾｜對於抑制胃的活動力（motility）與排空",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 106 年第二次醫師一階醫學（一）",
+    "sourceYear": 2017,
+    "sourceRound": 2,
+    "originalQuestionNumber": 63
+  },
+  {
+    "id": "MOEX-106100-1301-Q064",
+    "subject": "解剖學",
+    "chapter": "腹部",
+    "section": "肝膽胰脾",
+    "stem": "對血清素（serotonin）的敘述，下列何者正確？",
+    "options": {
+      "A": "大腦和腸道分泌大多為不同之亞型（subtype）",
+      "B": "消化道分泌量約占全身產量的90%",
+      "C": "由胱胺酸（cystine）所合成",
+      "D": "主要由胃的 parietal cells 所分泌"
+    },
+    "answer": "B",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "肝膽胰脾｜對血清素（serotonin）的敘述，下列何",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 106 年第二次醫師一階醫學（一）",
+    "sourceYear": 2017,
+    "sourceRound": 2,
+    "originalQuestionNumber": 64
+  },
+  {
+    "id": "MOEX-106100-1301-Q070",
+    "subject": "解剖學",
+    "chapter": "腹部",
+    "section": "腎臟與後腹腔",
+    "stem": "下列那一個腺體所分泌之激素多為脂溶性？",
+    "options": {
+      "A": "胃（stomach）",
+      "B": "心臟（heart）",
+      "C": "胰臟（pancreas）",
+      "D": "腎上腺皮質（adrenal cortex）"
+    },
+    "answer": "D",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "腎臟後腹膜關係",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 106 年第二次醫師一階醫學（一）",
+    "sourceYear": 2017,
+    "sourceRound": 2,
+    "originalQuestionNumber": 70
+  },
+  {
+    "id": "MOEX-106100-1301-Q073",
+    "subject": "解剖學",
+    "chapter": "骨盆與會陰",
+    "section": "會陰三角",
+    "stem": "在人類卵巢濾泡（follicle）成熟過程中，於何階段出現cumulus oophorus？",
+    "options": {
+      "A": "primary follicle",
+      "B": "mature follicle",
+      "C": "preantral follicle",
+      "D": "early antral follicle"
+    },
+    "answer": "B",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "會陰三角｜在人類卵巢濾泡（follicle）成熟過程中",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 106 年第二次醫師一階醫學（一）",
+    "sourceYear": 2017,
+    "sourceRound": 2,
+    "originalQuestionNumber": 73
+  },
+  {
+    "id": "MOEX-106100-1301-Q079",
+    "subject": "解剖學",
+    "chapter": "胸腔",
+    "section": "縱膈",
+    "stem": "在A、B兩種未知的細菌雙股DNA中，我們測得其胸腺嘧啶（thymidine）的成分分別占了16%與31%，下列敘 述何者錯誤？",
+    "options": {
+      "A": "A細菌的腺嘌呤（adenosine）約占其DNA組成的16%",
+      "B": "A細菌的胞嘧啶（cytosine）約占其DNA組成的34%",
+      "C": "B細菌的胞嘧啶（cytosine）約占其DNA組成的31%",
+      "D": "推測A細菌比B細菌更有可能是在高溫溫泉地生存"
+    },
+    "answer": "C",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "縱膈｜在A、B兩種未知的細菌雙股DNA中，我們測得",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 106 年第二次醫師一階醫學（一）",
+    "sourceYear": 2017,
+    "sourceRound": 2,
+    "originalQuestionNumber": 79
+  },
+  {
+    "id": "MOEX-106100-1301-Q088",
+    "subject": "解剖學",
+    "chapter": "腹部",
+    "section": "肝膽胰脾",
+    "stem": "病人無法進食時，因為肝臟可以進行gluconeogenesis，一般仍不至於發生低血糖，下列何種物質無法被轉化 為glucose？",
+    "options": {
+      "A": "lactate",
+      "B": "alanine",
+      "C": "glycerol",
+      "D": "ethanol"
+    },
+    "answer": "D",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "肝十二指腸韌帶與 portal triad",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 106 年第二次醫師一階醫學（一）",
+    "sourceYear": 2017,
+    "sourceRound": 2,
+    "originalQuestionNumber": 88
+  },
+  {
+    "id": "MOEX-106100-1301-Q091",
+    "subject": "解剖學",
+    "chapter": "腹部",
+    "section": "肝膽胰脾",
+    "stem": "在肝臟細胞膜（plasma membrane）中，下列何種脂質含量最低？",
+    "options": {
+      "A": "膽鹼磷脂（phosphatidylcholine）",
+      "B": "鞘磷脂（sphingolipids）",
+      "C": "心磷脂（cardiolipin）",
+      "D": "膽固醇（cholesterol）"
+    },
+    "answer": "C",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "肝十二指腸韌帶與 portal triad",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 106 年第二次醫師一階醫學（一）",
+    "sourceYear": 2017,
+    "sourceRound": 2,
+    "originalQuestionNumber": 91
+  },
+  {
+    "id": "MOEX-106100-1301-Q099",
+    "subject": "解剖學",
+    "chapter": "胸腔",
+    "section": "心臟與冠狀動脈",
+    "stem": "心房利鈉肽（Atrial natriuretic factor: ANF）是調節體液平衡的配體（ligand），其受體為下列何種類型？",
+    "options": {
+      "A": "第一型受體酪胺酸磷酸酶（receptor tyrosine kinase classⅠ）",
+      "B": "第二型受體酪胺酸磷酸酶（receptor tyrosine kinase classⅡ）",
+      "C": "膜鑲嵌型鳥苷酸環化酶（guanylyl cyclase）受體",
+      "D": "乙型腎上腺素受體（β-adrenergic receptor）"
+    },
+    "answer": "C",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "心臟與冠狀動脈｜心房利鈉肽（Atrial natriuret",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 106 年第二次醫師一階醫學（一）",
+    "sourceYear": 2017,
+    "sourceRound": 2,
+    "originalQuestionNumber": 99
+  },
+  {
+    "id": "MOEX-107020-5301-Q001",
+    "subject": "解剖學",
+    "chapter": "神經解剖",
+    "section": "腦幹核區",
+    "stem": "腦中風病患到院時兩眼同時看向右側，下列何者最可能受破壞？",
+    "options": {
+      "A": "右側paramedian pontine reticular formation（PPRF）",
+      "B": "右側大腦半球之額葉（frontal lobe）",
+      "C": "右側動眼神經（oculomotor nerve）",
+      "D": "右側上丘（superior colliculus）"
+    },
+    "answer": "B",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "腦幹核區｜腦中風病患到院時兩眼同時看向右側，下列何者最",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 107 年第一次醫師一階醫學（一）",
+    "sourceYear": 2018,
+    "sourceRound": 1,
+    "originalQuestionNumber": 1
+  },
+  {
+    "id": "MOEX-107020-5301-Q002",
+    "subject": "解剖學",
+    "chapter": "頭頸部",
+    "section": "顏面神經與三叉神經",
+    "stem": "下列何者不參與角膜反射（corneal reflex）？",
+    "options": {
+      "A": "三叉神經感覺核",
+      "B": "面神經運動核",
+      "C": "上丘",
+      "D": "三叉神經視枝（ophthalmic division of trigeminal nerve）"
+    },
+    "answer": "C",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "三叉神經感覺分支",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 107 年第一次醫師一階醫學（一）",
+    "sourceYear": 2018,
+    "sourceRound": 1,
+    "originalQuestionNumber": 2
+  },
+  {
+    "id": "MOEX-107020-5301-Q003",
+    "subject": "解剖學",
+    "chapter": "頭頸部",
+    "section": "舌與味覺",
+    "stem": "下列何者由源自C1的神經透過舌下神經（CN XII）來支配？",
+    "options": {
+      "A": "胸骨舌骨肌（sternohyoid m.）",
+      "B": "頦舌骨肌（geniohyoid m.）",
+      "C": "胸骨甲狀肌（sternothyroid m.）",
+      "D": "莖突舌骨肌（stylohyoid m.）"
+    },
+    "answer": "B",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "舌肌運動支配",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 107 年第一次醫師一階醫學（一）",
+    "sourceYear": 2018,
+    "sourceRound": 1,
+    "originalQuestionNumber": 3
+  },
+  {
+    "id": "MOEX-107020-5301-Q005",
+    "subject": "解剖學",
+    "chapter": "胸腔",
+    "section": "肺與胸膜",
+    "stem": "肋間神經（intercostal nerve）之外側皮支（lateral cutaneous branch），一般由下列何處鑽出？",
+    "options": {
+      "A": "肋骨角（costal angle）",
+      "B": "肩胛骨線（scapular line）",
+      "C": "正中腋線（midaxillary line）",
+      "D": "正中鎖骨線（midclavicular line）"
+    },
+    "answer": "C",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "肺與胸膜｜肋間神經（intercostal nerve",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 107 年第一次醫師一階醫學（一）",
+    "sourceYear": 2018,
+    "sourceRound": 1,
+    "originalQuestionNumber": 5
+  },
+  {
+    "id": "MOEX-107020-5301-Q006",
+    "subject": "解剖學",
+    "chapter": "腹部",
+    "section": "肝膽胰脾",
+    "stem": "下列何者匯入乳糜池（cisterna chyli）？ ①腸淋巴幹（intestinal lymphatic trunk） ②左腰淋巴幹（left lumbar lymphatic trunk） ③右腰淋巴幹（right lumbar lymphatic trunk）",
+    "options": {
+      "A": "僅①",
+      "B": "僅①②",
+      "C": "僅①③",
+      "D": "①②③"
+    },
+    "answer": "D",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "肝膽胰脾｜匯入乳糜池（cisterna chyli）",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 107 年第一次醫師一階醫學（一）",
+    "sourceYear": 2018,
+    "sourceRound": 1,
+    "originalQuestionNumber": 6
+  },
+  {
+    "id": "MOEX-107020-5301-Q007",
+    "subject": "解剖學",
+    "chapter": "腹部",
+    "section": "肝膽胰脾",
+    "stem": "下列何者構成弓狀線（arcuate line）下方腹直肌前的鞘膜（rectus sheath anterior to the rectus abdominis）？ ①Scarpa's fascia ②腹外斜肌（external abdominal oblique muscle）的腱膜 （aponeurosis） ③腹內斜肌（internal abdominal oblique muscle）的腱膜 ④腹橫肌（transversus abdominis）的腱膜",
+    "options": {
+      "A": "①",
+      "B": "僅②",
+      "C": "僅②③",
+      "D": "②③④"
+    },
+    "answer": "D",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "肝膽胰脾｜構成弓狀線（arcuate line）下方腹",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 107 年第一次醫師一階醫學（一）",
+    "sourceYear": 2018,
+    "sourceRound": 1,
+    "originalQuestionNumber": 7
+  },
+  {
+    "id": "MOEX-107020-5301-Q008",
+    "subject": "解剖學",
+    "chapter": "骨盆與會陰",
+    "section": "會陰三角",
+    "stem": "下列何者不附著於坐骨棘（ischial spine）上？",
+    "options": {
+      "A": "尾骨肌（coccygeus）",
+      "B": "梨狀肌（piriformis）",
+      "C": "上孖肌（superior gemellus）",
+      "D": "薦棘韌帶（sacrospinous ligament）"
+    },
+    "answer": "B",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "會陰三角｜不附著於坐骨棘（ischial spine）",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 107 年第一次醫師一階醫學（一）",
+    "sourceYear": 2018,
+    "sourceRound": 1,
+    "originalQuestionNumber": 8
+  },
+  {
+    "id": "MOEX-107020-5301-Q009",
+    "subject": "解剖學",
+    "chapter": "下肢",
+    "section": "腰薦神經叢",
+    "stem": "下列何者附著於脛骨粗隆（tibial tuberosity）？",
+    "options": {
+      "A": "薦粗隆韌帶（sacrotuberous ligament）",
+      "B": "脛側副韌帶（tibial collateral ligament）",
+      "C": "腓側副韌帶（fibular collateral ligament）",
+      "D": "膝韌帶（patellar ligament）"
+    },
+    "answer": "D",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "腰薦神經叢｜附著於脛骨粗隆（tibial tuberos",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 107 年第一次醫師一階醫學（一）",
+    "sourceYear": 2018,
+    "sourceRound": 1,
+    "originalQuestionNumber": 9
+  },
+  {
+    "id": "MOEX-107020-5301-Q010",
+    "subject": "解剖學",
+    "chapter": "上肢",
+    "section": "上肢血管",
+    "stem": "下列那些肌肉與肋骨連結且與呼吸有關？",
+    "options": {
+      "A": "斜方肌（trapezius）、闊背肌（latissimus dorsi）",
+      "B": "大菱形肌（rhomboideus major）、提肩胛肌（levator scapulae）",
+      "C": "上後鋸肌（serratus posterior superior）、下後鋸肌（serratus posterior inferior）",
+      "D": "頭夾肌（splenius capitis）、頸夾肌（splenius cervicis）"
+    },
+    "answer": "C",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "上肢血管｜下列那些肌肉與肋骨連結且與呼吸有關",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 107 年第一次醫師一階醫學（一）",
+    "sourceYear": 2018,
+    "sourceRound": 1,
+    "originalQuestionNumber": 10
+  },
+  {
+    "id": "MOEX-107020-5301-Q011",
+    "subject": "解剖學",
+    "chapter": "神經解剖",
+    "section": "腦幹核區",
+    "stem": "左側L5～S1腰椎間盤突出，突出位置偏中間，壓到的脊神經是：",
+    "options": {
+      "A": "L4",
+      "B": "L5及S1",
+      "C": "S1",
+      "D": "Co1"
+    },
+    "answer": "C",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "腦幹核區｜左側L5～S1腰椎間盤突出，突出位置偏中間，",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 107 年第一次醫師一階醫學（一）",
+    "sourceYear": 2018,
+    "sourceRound": 1,
+    "originalQuestionNumber": 11
+  },
+  {
+    "id": "MOEX-107020-5301-Q012",
+    "subject": "解剖學",
+    "chapter": "神經解剖",
+    "section": "腦幹核區",
+    "stem": "關於韁核（habenular nucleus）的敘述，下列何者錯誤？",
+    "options": {
+      "A": "位於丘腦上部（epithalamus）",
+      "B": "與丘腦髓紋（stria medullaris thalami）相連接",
+      "C": "經由韁核腳間核神經路徑（habenular-interpeduncular tract）將訊息傳入中腦（midbrain）",
+      "D": "與短期記憶（short term memory）形成密切關聯"
+    },
+    "answer": "D",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "腦幹核區｜韁核（habenular nucleus）的",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 107 年第一次醫師一階醫學（一）",
+    "sourceYear": 2018,
+    "sourceRound": 1,
+    "originalQuestionNumber": 12
+  },
+  {
+    "id": "MOEX-107020-5301-Q013",
+    "subject": "解剖學",
+    "chapter": "神經解剖",
+    "section": "小腦",
+    "stem": "關於楔狀核（cuneate nucleus）之敘述，下列何者錯誤？",
+    "options": {
+      "A": "可傳遞上肢震動覺",
+      "B": "發出楔狀核小腦徑（cuneocerebellar tract）",
+      "C": "可將感覺訊息傳入丘腦（thalamus）",
+      "D": "位於延髓（medulla oblongata）"
+    },
+    "answer": "B",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "小腦｜楔狀核（cuneate nucleus）之敘",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 107 年第一次醫師一階醫學（一）",
+    "sourceYear": 2018,
+    "sourceRound": 1,
+    "originalQuestionNumber": 13
+  },
+  {
+    "id": "MOEX-107020-5301-Q014",
+    "subject": "解剖學",
+    "chapter": "神經解剖",
+    "section": "小腦",
+    "stem": "下列何構造不位於小腦橋腦角（cerebellopontine angle）？",
+    "options": {
+      "A": "顏面神經（facial nerve）",
+      "B": "外旋神經（abducens nerve）",
+      "C": "前庭耳蝸神經（vestibulocochlear nerve）",
+      "D": "中間神經（nervus intermedius）"
+    },
+    "answer": "B",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "小腦｜下列何構造不位於小腦橋腦角（cerebell",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 107 年第一次醫師一階醫學（一）",
+    "sourceYear": 2018,
+    "sourceRound": 1,
+    "originalQuestionNumber": 14
+  },
+  {
+    "id": "MOEX-107020-5301-Q015",
+    "subject": "解剖學",
+    "chapter": "神經解剖",
+    "section": "腦幹核區",
+    "stem": "有關運動系統之敘述，下列何者錯誤？",
+    "options": {
+      "A": "大腦額葉（frontal lobe）與頂葉（parietal lobe）皆可發出神經纖維形成皮質脊髓徑（corticospinal tract）",
+      "B": "前庭脊髓徑（vestibulospinal tract）主要興奮屈肌群（flexor muscles）",
+      "C": "網狀系統（reticular formation）可參與運動的調控",
+      "D": "支配右側咀嚼肌之上運動神經元（upper motor neuron）來自兩側大腦半球"
+    },
+    "answer": "B",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "腦幹核區｜運動系統之敘述，下列何者錯誤",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 107 年第一次醫師一階醫學（一）",
+    "sourceYear": 2018,
+    "sourceRound": 1,
+    "originalQuestionNumber": 15
+  },
+  {
+    "id": "MOEX-107020-5301-Q017",
+    "subject": "解剖學",
+    "chapter": "胸腔",
+    "section": "縱膈",
+    "stem": "有關頸部交感神經幹（sympathetic trunk）之敘述，下列何者正確？",
+    "options": {
+      "A": "頸部交感神經幹無灰交通枝（gray rami communicantes）",
+      "B": "下頸神經節與第一胸神經節（first thoracic ganglion）經常合併而成星狀神經節（stellate ganglion）",
+      "C": "上頸神經節會發出灰交通枝（gray rami communicantes）至第五、六頸脊神經（cervical spinal nerves）",
+      "D": "中頸神經節不發出心神經（cardiac nerves）"
+    },
+    "answer": "B",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "縱膈｜頸部交感神經幹（sympathetic tr",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 107 年第一次醫師一階醫學（一）",
+    "sourceYear": 2018,
+    "sourceRound": 1,
+    "originalQuestionNumber": 17
+  },
+  {
+    "id": "MOEX-107020-5301-Q019",
+    "subject": "解剖學",
+    "chapter": "頭頸部",
+    "section": "顏面神經與三叉神經",
+    "stem": "下列何者不參與形成前顱窩（anterior cranial fossa）？",
+    "options": {
+      "A": "顳骨（temporal bone）",
+      "B": "篩骨（ethmoid bone）",
+      "C": "蝶骨（sphenoid bone）",
+      "D": "額骨（frontal bone）"
+    },
+    "answer": "A",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "顏面神經與三叉神經｜不參與形成前顱窩（anterior cran",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 107 年第一次醫師一階醫學（一）",
+    "sourceYear": 2018,
+    "sourceRound": 1,
+    "originalQuestionNumber": 19
+  },
+  {
+    "id": "MOEX-107020-5301-Q020",
+    "subject": "解剖學",
+    "chapter": "胸腔",
+    "section": "縱膈",
+    "stem": "下列那一條動脈是升主動脈（ascending aorta）的分支？",
+    "options": {
+      "A": "內胸動脈（internal thoracic artery）",
+      "B": "冠狀動脈（coronary artery）",
+      "C": "支氣管動脈（bronchial artery）",
+      "D": "肋間動脈（intercostal artery）"
+    },
+    "answer": "B",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "縱膈｜下列那一條動脈是升主動脈（ascending",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 107 年第一次醫師一階醫學（一）",
+    "sourceYear": 2018,
+    "sourceRound": 1,
+    "originalQuestionNumber": 20
+  },
+  {
+    "id": "MOEX-107020-5301-Q021",
+    "subject": "解剖學",
+    "chapter": "胸腔",
+    "section": "肺與胸膜",
+    "stem": "在病人上身直立姿勢進行肋膜穿刺術時，下列那一個位置最有可能刺傷肺臟？",
+    "options": {
+      "A": "鎖骨中線（midclavicular line）第8肋間",
+      "B": "肩胛線（scapular line）第9肋間",
+      "C": "腋中線（midaxillary line）第9肋間",
+      "D": "胸椎旁第10肋間"
+    },
+    "answer": "B",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "肺與胸膜｜在病人上身直立姿勢進行肋膜穿刺術時，下列那一",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 107 年第一次醫師一階醫學（一）",
+    "sourceYear": 2018,
+    "sourceRound": 1,
+    "originalQuestionNumber": 21
+  },
+  {
+    "id": "MOEX-107020-5301-Q023",
+    "subject": "解剖學",
+    "chapter": "胸腔",
+    "section": "縱膈",
+    "stem": "下列何者不會壓迫食道，形成生理性狹窄處而影響吞嚥？",
+    "options": {
+      "A": "主動脈弓",
+      "B": "支氣管",
+      "C": "肺動脈",
+      "D": "橫膈"
+    },
+    "answer": "C",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "後縱膈主要構造",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 107 年第一次醫師一階醫學（一）",
+    "sourceYear": 2018,
+    "sourceRound": 1,
+    "originalQuestionNumber": 23
+  },
+  {
+    "id": "MOEX-107020-5301-Q024",
+    "subject": "解剖學",
+    "chapter": "胸腔",
+    "section": "縱膈",
+    "stem": "下列何者不屬縱隔（mediastinum）構造？",
+    "options": {
+      "A": "食道",
+      "B": "胸腺",
+      "C": "肺臟",
+      "D": "胸主動脈"
+    },
+    "answer": "C",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "後縱膈主要構造",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 107 年第一次醫師一階醫學（一）",
+    "sourceYear": 2018,
+    "sourceRound": 1,
+    "originalQuestionNumber": 24
+  },
+  {
+    "id": "MOEX-107020-5301-Q025",
+    "subject": "解剖學",
+    "chapter": "腹部",
+    "section": "門脈系統",
+    "stem": "下列那兩條靜脈的連接，組成門脈系統與體循環系統的吻合（portal-systemic anastomosis）？",
+    "options": {
+      "A": "腹壁上靜脈與旋髂淺靜脈（superior epigastric and superficial circumflex iliac vein）",
+      "B": "副臍靜脈與腹壁淺靜脈（paraumbilical veins and superficial epigastric vein）",
+      "C": "脾靜脈與下腸繫膜靜脈（splenic vein and inferior mesenteric vein）",
+      "D": "右與左胃網膜靜脈（right and left gastroepiploic vein）"
+    },
+    "answer": "B",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "門脈系統｜下列那兩條靜脈的連接，組成門脈系統與體循環系",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 107 年第一次醫師一階醫學（一）",
+    "sourceYear": 2018,
+    "sourceRound": 1,
+    "originalQuestionNumber": 25
+  },
+  {
+    "id": "MOEX-107020-5301-Q026",
+    "subject": "解剖學",
+    "chapter": "腹部",
+    "section": "肝膽胰脾",
+    "stem": "脾臟破裂進行緊急手術，於脾動脈（splenic artery）發源處結紮該動脈以利止血，術後，下列何者的血流不 受影響？",
+    "options": {
+      "A": "背胰動脈（dorsal pancreatic artery）",
+      "B": "短胃動脈（short gastric artery）",
+      "C": "左胃動脈（left gastric artery）",
+      "D": "左胃網膜動脈（left gastroomental artery）"
+    },
+    "answer": "C",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "脾動脈走行",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 107 年第一次醫師一階醫學（一）",
+    "sourceYear": 2018,
+    "sourceRound": 1,
+    "originalQuestionNumber": 26
+  },
+  {
+    "id": "MOEX-107020-5301-Q028",
+    "subject": "解剖學",
+    "chapter": "骨盆與會陰",
+    "section": "會陰三角",
+    "stem": "男性球尿道腺（bulbourethral gland）感染發炎時，下列何者因位置關係最可能被感染？",
+    "options": {
+      "A": "會陰淺橫肌（superficial transverse perineal muscle）",
+      "B": "球海綿體肌（bulbospongiosus muscle）",
+      "C": "外尿道括約肌（external urethral sphincter muscle）",
+      "D": "坐骨海綿體肌（ischiocavernosus muscle）"
+    },
+    "answer": "C",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "會陰三角｜男性球尿道腺（bulbourethral g",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 107 年第一次醫師一階醫學（一）",
+    "sourceYear": 2018,
+    "sourceRound": 1,
+    "originalQuestionNumber": 28
+  },
+  {
+    "id": "MOEX-107020-5301-Q029",
+    "subject": "解剖學",
+    "chapter": "下肢",
+    "section": "下肢血管",
+    "stem": "下列選項中，心臟科醫師會優先選擇，由何處進入施行心臟冠狀動脈的氣球擴張術（percutaneous transluminal coronary angioplasty）？",
+    "options": {
+      "A": "股動脈（femoral artery）",
+      "B": "股靜脈（femoral vein）",
+      "C": "大隱靜脈（great saphenous vein）",
+      "D": "小隱靜脈（small saphenous vein）"
+    },
+    "answer": "A",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "股動脈走行",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 107 年第一次醫師一階醫學（一）",
+    "sourceYear": 2018,
+    "sourceRound": 1,
+    "originalQuestionNumber": 29
+  },
+  {
+    "id": "MOEX-107020-5301-Q030",
+    "subject": "解剖學",
+    "chapter": "上肢",
+    "section": "臂神經叢",
+    "stem": "橈神經（radial nerve）在大圓肌（teres major）下方處受到傷害，通常也會傷及與其伴行的那一條血管？",
+    "options": {
+      "A": "肱動脈（brachial artery）",
+      "B": "深肱動脈（deep brachial artery）",
+      "C": "前迴旋肱動脈（anterior circumflex humeral artery）",
+      "D": "後迴旋肱動脈（posterior circumflex humeral artery）"
+    },
+    "answer": "B",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "臂神經叢終末分支",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 107 年第一次醫師一階醫學（一）",
+    "sourceYear": 2018,
+    "sourceRound": 1,
+    "originalQuestionNumber": 30
+  },
+  {
+    "id": "MOEX-107020-5301-Q032",
+    "subject": "解剖學",
+    "chapter": "頭頸部",
+    "section": "顏面神經與三叉神經",
+    "stem": "呼吸器官的原基（respiratory primordium）起源於下列何者的尾端（caudal end）？",
+    "options": {
+      "A": "第一咽囊（pharyngeal pouch）",
+      "B": "第二咽囊（pharyngeal pouch）",
+      "C": "第三咽囊（pharyngeal pouch）",
+      "D": "第四咽囊（pharyngeal pouch）"
+    },
+    "answer": "D",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "顏面神經與三叉神經｜呼吸器官的原基（respiratory pr",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 107 年第一次醫師一階醫學（一）",
+    "sourceYear": 2018,
+    "sourceRound": 1,
+    "originalQuestionNumber": 32
+  },
+  {
+    "id": "MOEX-107020-5301-Q033",
+    "subject": "解剖學",
+    "chapter": "腹部",
+    "section": "胃腸道血管",
+    "stem": "下列何種器官由前腸（foregut）衍生而來？",
+    "options": {
+      "A": "脾臟（spleen）",
+      "B": "膽囊（gallbladder）",
+      "C": "闌尾（appendix）",
+      "D": "空腸（jejunum）"
+    },
+    "answer": "B",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "闌尾動脈",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 107 年第一次醫師一階醫學（一）",
+    "sourceYear": 2018,
+    "sourceRound": 1,
+    "originalQuestionNumber": 33
+  },
+  {
+    "id": "MOEX-107020-5301-Q035",
+    "subject": "解剖學",
+    "chapter": "胸腔",
+    "section": "心臟與冠狀動脈",
+    "stem": "下列那一項構造，位於胚胎之胸心包膜（pleuropericardial membrane）內？",
+    "options": {
+      "A": "膈神經（phrenic nerve）",
+      "B": "肺芽（lung bud）",
+      "C": "背側主動脈（dorsal aorta）",
+      "D": "食道（esophagus）"
+    },
+    "answer": "A",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "心臟與冠狀動脈｜下列那一項構造，位於胚胎之胸心包膜（pleu",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 107 年第一次醫師一階醫學（一）",
+    "sourceYear": 2018,
+    "sourceRound": 1,
+    "originalQuestionNumber": 35
+  },
+  {
+    "id": "MOEX-107020-5301-Q039",
+    "subject": "解剖學",
+    "chapter": "上肢",
+    "section": "上肢血管",
+    "stem": "下列何者不屬於彈性動脈（elastic artery）？",
+    "options": {
+      "A": "主動脈（aorta）",
+      "B": "頭臂動脈（brachiocephalic artery）",
+      "C": "肺動脈幹（pulmonary trunk）",
+      "D": "肱動脈（brachial artery）"
+    },
+    "answer": "D",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "上肢血管｜不屬於彈性動脈（elastic artery",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 107 年第一次醫師一階醫學（一）",
+    "sourceYear": 2018,
+    "sourceRound": 1,
+    "originalQuestionNumber": 39
+  },
+  {
+    "id": "MOEX-107020-5301-Q041",
+    "subject": "解剖學",
+    "chapter": "腹部",
+    "section": "肝膽胰脾",
+    "stem": "製造血液中白蛋白（albumin）的主要場所為？",
+    "options": {
+      "A": "小腸",
+      "B": "脾臟",
+      "C": "胰臟",
+      "D": "肝臟"
+    },
+    "answer": "D",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "胰臟鄰近關係",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 107 年第一次醫師一階醫學（一）",
+    "sourceYear": 2018,
+    "sourceRound": 1,
+    "originalQuestionNumber": 41
+  },
+  {
+    "id": "MOEX-107020-5301-Q042",
+    "subject": "解剖學",
+    "chapter": "腹部",
+    "section": "肝膽胰脾",
+    "stem": "下列關於闌尾（appendix）之敘述，何項錯誤？",
+    "options": {
+      "A": "起自盲腸的小型盲端管狀憩室（diverticulum）",
+      "B": "黏膜層（mucosa layer）之內襯上皮為複層扁平上皮（stratified squamous epithelium）",
+      "C": "有相當多的淋巴組織在黏膜下層（submucosa layer）",
+      "D": "外肌層（muscularis externa）有環走及縱走兩層"
+    },
+    "answer": "B",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "肝膽胰脾｜下列關於闌尾（appendix）之敘述，何項",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 107 年第一次醫師一階醫學（一）",
+    "sourceYear": 2018,
+    "sourceRound": 1,
+    "originalQuestionNumber": 42
+  },
+  {
+    "id": "MOEX-107020-5301-Q043",
+    "subject": "解剖學",
+    "chapter": "腹部",
+    "section": "腎臟與後腹腔",
+    "stem": "下列何者會因神經刺激而釋放出腎上腺素：",
+    "options": {
+      "A": "腎上腺皮質絲球帶（zona glomerulosa）",
+      "B": "腎上腺皮質束狀帶（zona fasciculata）",
+      "C": "腎上腺髓質（adrenal medulla）",
+      "D": "腎上腺皮質網狀帶（zona reticularis）"
+    },
+    "answer": "C",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "腎臟後腹膜關係",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 107 年第一次醫師一階醫學（一）",
+    "sourceYear": 2018,
+    "sourceRound": 1,
+    "originalQuestionNumber": 43
+  },
+  {
+    "id": "MOEX-107020-5301-Q047",
+    "subject": "解剖學",
+    "chapter": "腹部",
+    "section": "腹膜關係",
+    "stem": "與位在視網膜顳側（temporal portion of the retina）光感受細胞相聯繫的神經節細胞（ganglion cells），通 常投射至視丘那一核區？",
+    "options": {
+      "A": "contralateral lateral geniculate nucleus",
+      "B": "ipsilateral lateral geniculate nucleus",
+      "C": "contralateral medial geniculate nucleus",
+      "D": "ipsilateral medial geniculate nucleus"
+    },
+    "answer": "B",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "腹膜關係｜位在視網膜顳側（temporal porti",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 107 年第一次醫師一階醫學（一）",
+    "sourceYear": 2018,
+    "sourceRound": 1,
+    "originalQuestionNumber": 47
+  },
+  {
+    "id": "MOEX-107020-5301-Q048",
+    "subject": "解剖學",
+    "chapter": "腹部",
+    "section": "腹膜關係",
+    "stem": "當最大的光線強度刺激時，會使視網膜上的光感受細胞（photoreceptor cells）膜電位趨近於下列何者？",
+    "options": {
+      "A": "鈉離子的平衡電位",
+      "B": "鉀離子的平衡電位",
+      "C": "鈣離子的平衡電位",
+      "D": "0 mV"
+    },
+    "answer": "B",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "腹膜關係｜當最大的光線強度刺激時，會使視網膜上的光感受",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 107 年第一次醫師一階醫學（一）",
+    "sourceYear": 2018,
+    "sourceRound": 1,
+    "originalQuestionNumber": 48
+  },
+  {
+    "id": "MOEX-107020-5301-Q049",
+    "subject": "解剖學",
+    "chapter": "神經解剖",
+    "section": "視覺路徑",
+    "stem": "因腦瘤壓迫造成無法看到左眼內側視野及右眼外側視野的影像。此患者被腦瘤所壓迫的位置最可能為下列何 者？",
+    "options": {
+      "A": "右眼的視神經（optic nerve）",
+      "B": "視交叉（optic chiasm）",
+      "C": "左側的視神經路徑（optic tract）",
+      "D": "右側的視神經路徑（optic tract）"
+    },
+    "answer": "C",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "視交叉病灶",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 107 年第一次醫師一階醫學（一）",
+    "sourceYear": 2018,
+    "sourceRound": 1,
+    "originalQuestionNumber": 49
+  },
+  {
+    "id": "MOEX-107020-5301-Q051",
+    "subject": "解剖學",
+    "chapter": "神經解剖",
+    "section": "腦幹核區",
+    "stem": "下列那一個大腦運動區位於體感覺區的後方，並且負責眼手的協調？",
+    "options": {
+      "A": "primary motor cortex",
+      "B": "premotor cortex",
+      "C": "supplementary motor cortex",
+      "D": "parietal-lobe association cortex"
+    },
+    "answer": "D",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "腦幹核區｜下列那一個大腦運動區位於體感覺區的後方，並且",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 107 年第一次醫師一階醫學（一）",
+    "sourceYear": 2018,
+    "sourceRound": 1,
+    "originalQuestionNumber": 51
+  },
+  {
+    "id": "MOEX-107020-5301-Q052",
+    "subject": "解剖學",
+    "chapter": "神經解剖",
+    "section": "腦幹核區",
+    "stem": "下列何者是負責掌控手指肌肉執行精細動作的最主要運動路徑？",
+    "options": {
+      "A": "側皮質脊髓路徑（lateral corticospinal tract）",
+      "B": "腹皮質脊髓路徑（ventral corticospinal tract）",
+      "C": "網狀脊髓路徑（reticulospinal tract）",
+      "D": "紅核脊髓路徑（rubrospinal tract）"
+    },
+    "answer": "A",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "腦幹核區｜負責掌控手指肌肉執行精細動作的最主要運動路徑",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 107 年第一次醫師一階醫學（一）",
+    "sourceYear": 2018,
+    "sourceRound": 1,
+    "originalQuestionNumber": 52
+  },
+  {
+    "id": "MOEX-107020-5301-Q054",
+    "subject": "解剖學",
+    "chapter": "腹部",
+    "section": "肝膽胰脾",
+    "stem": "下列何種鈣離子通道（calcium channel）是所有肌細胞皆具有的，並負責釋出鈣離子啟動收縮？",
+    "options": {
+      "A": "肌漿網膜上ryanodine receptor",
+      "B": "肌細胞膜上ligand-gated Ca2+ channel",
+      "C": "肌漿網膜上dihydropyridine receptor",
+      "D": "肌細胞膜上L-type Ca2+ channel"
+    },
+    "answer": "A",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "肝膽胰脾｜下列何種鈣離子通道（calcium chan",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 107 年第一次醫師一階醫學（一）",
+    "sourceYear": 2018,
+    "sourceRound": 1,
+    "originalQuestionNumber": 54
+  },
+  {
+    "id": "MOEX-107020-5301-Q057",
+    "subject": "解剖學",
+    "chapter": "胸腔",
+    "section": "縱膈",
+    "stem": "林小姐因出現頭昏、噁心、嘔吐被送至急診室，當時呼吸頻率為13次／分，體循環動脈血液分析數值分別 為：PaO ＝98 mmHg，PaCO ＝38 mmHg，SaO ＝70%，Hb＝14 g/100 mL。根據上述的結果，推測可 2 2 2 能為下列何種病患之特徵？",
+    "options": {
+      "A": "一氧化碳中毒",
+      "B": "大量失血",
+      "C": "呼吸衰竭",
+      "D": "高山症"
+    },
+    "answer": "A",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "縱膈｜林小姐因出現頭昏、噁心、嘔吐被送至急診室，當",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 107 年第一次醫師一階醫學（一）",
+    "sourceYear": 2018,
+    "sourceRound": 1,
+    "originalQuestionNumber": 57
+  },
+  {
+    "id": "MOEX-107020-5301-Q058",
+    "subject": "解剖學",
+    "chapter": "頭頸部",
+    "section": "頸動脈鞘",
+    "stem": "若頸動脈竇（carotid sinus）及主動脈弓（aortic arch）上的感壓受器（baroreceptor）放電頻率（firing rate）增加，則下列何者正確？",
+    "options": {
+      "A": "其訊號經由迷走（vagus）神經傳遞，中止於視丘（thalamus）",
+      "B": "其作用會興奮交感神經，使血管收縮（vasoconstriction）",
+      "C": "其作用會抑制副交感神經，降低心輸出量",
+      "D": "其作用會造成血管擴張（vasodilation）、心跳降低"
+    },
+    "answer": "D",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "頸動脈竇與頸動脈小體",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 107 年第一次醫師一階醫學（一）",
+    "sourceYear": 2018,
+    "sourceRound": 1,
+    "originalQuestionNumber": 58
+  },
+  {
+    "id": "MOEX-107020-5301-Q059",
+    "subject": "解剖學",
+    "chapter": "胸腔",
+    "section": "縱膈",
+    "stem": "從事慢跑等耐力運動時，心輸出量（cardiac output）可能增加 4～7 倍。此時身體可利用下列那些作用來增 加心輸出量？①興奮動脈感壓受器（arterial baroreceptors），使其放電頻率增加 ②增加吸氣的深度及頻 率 ③興奮交感神經 ④興奮副交感神經 ⑤促進骨骼肌小動脈擴張",
+    "options": {
+      "A": "①②③",
+      "B": "①③⑤",
+      "C": "②③⑤",
+      "D": "②④⑤"
+    },
+    "answer": "C",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "縱膈｜從事慢跑等耐力運動時，心輸出量（cardia",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 107 年第一次醫師一階醫學（一）",
+    "sourceYear": 2018,
+    "sourceRound": 1,
+    "originalQuestionNumber": 59
+  },
+  {
+    "id": "MOEX-107020-5301-Q061",
+    "subject": "解剖學",
+    "chapter": "胸腔",
+    "section": "肺與胸膜",
+    "stem": "用力呼氣（forced expiration）時，最不易發生下列何種現象？",
+    "options": {
+      "A": "肋膜內壓（intrapleural pressure, P ）不會高於大氣壓力（atmospheric pressure, P ） ip atm",
+      "B": "內肋間神經（internal intercostal nerve）興奮",
+      "C": "延髓（medulla oblongata）內有些腹側呼吸群神經元（ventral respiratory group neuron）興奮",
+      "D": "無論如何用力，部分細支氣管（bronchiole）內的氣體無法被呼出"
+    },
+    "answer": "A",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "肺門構造相對位置",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 107 年第一次醫師一階醫學（一）",
+    "sourceYear": 2018,
+    "sourceRound": 1,
+    "originalQuestionNumber": 61
+  },
+  {
+    "id": "MOEX-107020-5301-Q063",
+    "subject": "解剖學",
+    "chapter": "神經解剖",
+    "section": "小腦",
+    "stem": "人類的嘔吐中樞（vomiting center）位於何處？",
+    "options": {
+      "A": "大腦（cerebrum）",
+      "B": "小腦（cerebellum）",
+      "C": "腦幹（brainstem）",
+      "D": "脊髓（spinal cord）"
+    },
+    "answer": "C",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "小腦｜人類的嘔吐中樞（vomiting cente",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 107 年第一次醫師一階醫學（一）",
+    "sourceYear": 2018,
+    "sourceRound": 1,
+    "originalQuestionNumber": 63
+  },
+  {
+    "id": "MOEX-107020-5301-Q065",
+    "subject": "解剖學",
+    "chapter": "腹部",
+    "section": "腹膜關係",
+    "stem": "若泌尿道阻塞而導致鮑氏囊淨水壓（hydrostatic pressure of the Bowman's capsule）增高時，腎絲球過濾率 （glomerular filtration rate）最可能因此而產生下列何種改變？",
+    "options": {
+      "A": "反射性增加",
+      "B": "快速增加並逐漸趨於穩定",
+      "C": "減少",
+      "D": "不受影響"
+    },
+    "answer": "C",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "腹膜關係｜若泌尿道阻塞而導致鮑氏囊淨水壓（hydros",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 107 年第一次醫師一階醫學（一）",
+    "sourceYear": 2018,
+    "sourceRound": 1,
+    "originalQuestionNumber": 65
+  },
+  {
+    "id": "MOEX-107020-5301-Q069",
+    "subject": "解剖學",
+    "chapter": "神經解剖",
+    "section": "腦幹核區",
+    "stem": "有關壓力（stress）造成身體主要反應之敘述，下列何者正確？",
+    "options": {
+      "A": "會刺激交感神經系統分泌正腎上腺素，但不影響腎上腺分泌腎上腺素",
+      "B": "糖皮質素（glucocorticoid hormone）的分泌增加較正腎上腺素為快",
+      "C": "會刺激糖皮質素（glucocorticoid hormone）的分泌",
+      "D": "會刺激胰島素大量分泌"
+    },
+    "answer": "C",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "腦幹核區｜壓力（stress）造成身體主要反應之敘述，",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 107 年第一次醫師一階醫學（一）",
+    "sourceYear": 2018,
+    "sourceRound": 1,
+    "originalQuestionNumber": 69
+  },
+  {
+    "id": "MOEX-107020-5301-Q091",
+    "subject": "解剖學",
+    "chapter": "胸腔",
+    "section": "縱膈",
+    "stem": "心血管疾病的病人使用aspirin預防血栓發生，減少中風及心肌梗塞，下列敘述何者錯誤？",
+    "options": {
+      "A": "aspirin抑制cyclooxygenase",
+      "B": "可減少thromboxanes合成",
+      "C": "可減少prostaglandins合成",
+      "D": "可減少膽固醇的生合成"
+    },
+    "answer": "D",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "縱膈｜心血管疾病的病人使用aspirin預防血栓發",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 107 年第一次醫師一階醫學（一）",
+    "sourceYear": 2018,
+    "sourceRound": 1,
+    "originalQuestionNumber": 91
+  },
+  {
+    "id": "MOEX-107100-1301-Q001",
+    "subject": "解剖學",
+    "chapter": "神經解剖",
+    "section": "小腦",
+    "stem": "下列何者不經由下小腦腳（inferior cerebellar peduncle）進入小腦？",
+    "options": {
+      "A": "前庭小腦徑（vestibulocerebellar tract）",
+      "B": "橄欖核小腦徑（olivocerebellar tract）",
+      "C": "背側脊髓小腦徑（dorsal spinocerebellar tract）",
+      "D": "腹側脊髓小腦徑（ventral spinocerebellar tract）"
+    },
+    "answer": "D",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "前庭小腦功能",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 107 年第二次醫師一階醫學（一）",
+    "sourceYear": 2018,
+    "sourceRound": 2,
+    "originalQuestionNumber": 1
+  },
+  {
+    "id": "MOEX-107100-1301-Q002",
+    "subject": "解剖學",
+    "chapter": "神經解剖",
+    "section": "自律神經",
+    "stem": "有關三叉神經之敘述，下列何者錯誤？",
+    "options": {
+      "A": "含一般體運動傳出神經纖維",
+      "B": "其分支攜帶副交感神經纖維",
+      "C": "含本體感覺神經纖維",
+      "D": "其神經核分布於延腦、橋腦與中腦"
+    },
+    "answer": "A",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "副交感路徑",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 107 年第二次醫師一階醫學（一）",
+    "sourceYear": 2018,
+    "sourceRound": 2,
+    "originalQuestionNumber": 2
+  },
+  {
+    "id": "MOEX-107100-1301-Q003",
+    "subject": "解剖學",
+    "chapter": "頭頸部",
+    "section": "咽喉解剖",
+    "stem": "下列何者受到傷害，最可能造成病人口咽處黏膜一般感覺缺失？",
+    "options": {
+      "A": "迷走神經（vagus nerve）",
+      "B": "舌咽神經（glossopharyngeal nerve）",
+      "C": "頸襻（ansa cervicalis）",
+      "D": "喉返神經（recurrent laryngeal nerve）"
+    },
+    "answer": "B",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "喉返神經走行",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 107 年第二次醫師一階醫學（一）",
+    "sourceYear": 2018,
+    "sourceRound": 2,
+    "originalQuestionNumber": 3
+  },
+  {
+    "id": "MOEX-107100-1301-Q005",
+    "subject": "解剖學",
+    "chapter": "神經解剖",
+    "section": "腦幹核區",
+    "stem": "鼓膜張肌（tensor tympani）由何神經支配？",
+    "options": {
+      "A": "第五顱神經第三支",
+      "B": "副神經（accessory nerve）之顱根（cranial root），轉經迷走神經（vagus nerve）",
+      "C": "第八顱神經",
+      "D": "第七顱神經"
+    },
+    "answer": "A",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "腦幹核區｜鼓膜張肌（tensor tympani）由何",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 107 年第二次醫師一階醫學（一）",
+    "sourceYear": 2018,
+    "sourceRound": 2,
+    "originalQuestionNumber": 5
+  },
+  {
+    "id": "MOEX-107100-1301-Q006",
+    "subject": "解剖學",
+    "chapter": "胸腔",
+    "section": "肺與胸膜",
+    "stem": "肺韌帶（pulmonary ligament）位於肺臟何處？",
+    "options": {
+      "A": "尖端（apex）",
+      "B": "基底面（base）",
+      "C": "肋骨面（costal surface）",
+      "D": "根部（root）"
+    },
+    "answer": "D",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "肺與胸膜｜肺韌帶（pulmonary ligament",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 107 年第二次醫師一階醫學（一）",
+    "sourceYear": 2018,
+    "sourceRound": 2,
+    "originalQuestionNumber": 6
+  },
+  {
+    "id": "MOEX-107100-1301-Q007",
+    "subject": "解剖學",
+    "chapter": "腹部",
+    "section": "肝膽胰脾",
+    "stem": "主胰管（major pancreatic duct）與膽管（common bile duct）共同開口於十二指腸何處？",
+    "options": {
+      "A": "上段（superior part）",
+      "B": "下行段（descending part）",
+      "C": "下段（inferior part）",
+      "D": "上行段（ascending part）"
+    },
+    "answer": "B",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "胰臟鄰近關係",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 107 年第二次醫師一階醫學（一）",
+    "sourceYear": 2018,
+    "sourceRound": 2,
+    "originalQuestionNumber": 7
+  },
+  {
+    "id": "MOEX-107100-1301-Q008",
+    "subject": "解剖學",
+    "chapter": "胸腔",
+    "section": "橫膈",
+    "stem": "橫膈的右腳（right crus of the diaphragm）圍繞著下列那一個構造？",
+    "options": {
+      "A": "主動脈",
+      "B": "下腔靜脈",
+      "C": "食道",
+      "D": "肝門靜脈"
+    },
+    "answer": "C",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "橫膈｜橫膈的右腳（right crus of th",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 107 年第二次醫師一階醫學（一）",
+    "sourceYear": 2018,
+    "sourceRound": 2,
+    "originalQuestionNumber": 8
+  },
+  {
+    "id": "MOEX-107100-1301-Q009",
+    "subject": "解剖學",
+    "chapter": "骨盆與會陰",
+    "section": "會陰三角",
+    "stem": "下列何者最可能緊貼在排空後的膀胱上方？",
+    "options": {
+      "A": "直腸",
+      "B": "子宮",
+      "C": "陰道",
+      "D": "輸卵管"
+    },
+    "answer": "B",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "會陰三角｜可能緊貼在排空後的膀胱上方",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 107 年第二次醫師一階醫學（一）",
+    "sourceYear": 2018,
+    "sourceRound": 2,
+    "originalQuestionNumber": 9
+  },
+  {
+    "id": "MOEX-107100-1301-Q010",
+    "subject": "解剖學",
+    "chapter": "下肢",
+    "section": "下肢血管",
+    "stem": "下列何者伴行小隱靜脈（small saphenous vein），且傳遞小腿後外側與小腳趾的皮膚感覺？",
+    "options": {
+      "A": "隱神經（saphenous nerve）",
+      "B": "腓腸神經（sural nerve）",
+      "C": "腓深神經（deep fibular nerve）",
+      "D": "腓淺神經（superficial fibular nerve）"
+    },
+    "answer": "B",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "下肢血管｜伴行小隱靜脈（small saphenous",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 107 年第二次醫師一階醫學（一）",
+    "sourceYear": 2018,
+    "sourceRound": 2,
+    "originalQuestionNumber": 10
+  },
+  {
+    "id": "MOEX-107100-1301-Q011",
+    "subject": "解剖學",
+    "chapter": "頭頸部",
+    "section": "顏面神經與三叉神經",
+    "stem": "車禍頸部受傷，造成右手拇指感覺喪失，其餘四指正常，最可能是右側那一條頸部脊神經受損？",
+    "options": {
+      "A": "C5",
+      "B": "C6",
+      "C": "C7",
+      "D": "C8"
+    },
+    "answer": "B",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "顏面神經與三叉神經｜車禍頸部受傷，造成右手拇指感覺喪失，其餘四指",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 107 年第二次醫師一階醫學（一）",
+    "sourceYear": 2018,
+    "sourceRound": 2,
+    "originalQuestionNumber": 11
+  },
+  {
+    "id": "MOEX-107100-1301-Q012",
+    "subject": "解剖學",
+    "chapter": "下肢",
+    "section": "足部",
+    "stem": "踩到玻璃劃破足底外側動脈（lateral plantar artery）造成出血，如果採用加壓止血法，按壓下列何處最為適 當？",
+    "options": {
+      "A": "股三角（femoral triangle）",
+      "B": "膕窩（popliteal fossa）",
+      "C": "跗骨隧道（tarsal tunnel）",
+      "D": "足背（dorsalis pedis）"
+    },
+    "answer": "C",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "足底外側神經分布",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 107 年第二次醫師一階醫學（一）",
+    "sourceYear": 2018,
+    "sourceRound": 2,
+    "originalQuestionNumber": 12
+  },
+  {
+    "id": "MOEX-107100-1301-Q013",
+    "subject": "解剖學",
+    "chapter": "神經解剖",
+    "section": "小腦",
+    "stem": "關於背側脊髓小腦徑（dorsal spinocerebellar tract）之敘述，下列何者錯誤？",
+    "options": {
+      "A": "背側脊髓小腦徑主要經由下小腦腳（inferior cerebellar peduncle）進入小腦",
+      "B": "可將訊息傳入脊髓小腦（spinocerebellum）",
+      "C": "背側脊髓小腦徑位於脊髓（spinal cord）之背側束（dorsal funiculus）",
+      "D": "背側脊髓小腦徑主要將訊息傳入同側小腦"
+    },
+    "answer": "C",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "脊髓小腦功能",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 107 年第二次醫師一階醫學（一）",
+    "sourceYear": 2018,
+    "sourceRound": 2,
+    "originalQuestionNumber": 13
+  },
+  {
+    "id": "MOEX-107100-1301-Q014",
+    "subject": "解剖學",
+    "chapter": "神經解剖",
+    "section": "聽覺與前庭路徑",
+    "stem": "聽覺傳導路徑（auditory pathway）之敘述，下列何者錯誤？",
+    "options": {
+      "A": "初級聽覺皮質（primary auditory cortex）位於顳葉（temporal lobe）",
+      "B": "上橄欖核（superior olivary nucleus）參與聽覺之傳導",
+      "C": "右邊內耳之聽覺訊息可傳入左右兩邊之內側膝狀體（medial geniculate body）",
+      "D": "左邊內側膝狀體（medial geniculate body）之聽覺訊息，可傳入左右兩邊之初級聽覺皮質（primary auditory cortex）"
+    },
+    "answer": "D",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "上橄欖核與聲音定位",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 107 年第二次醫師一階醫學（一）",
+    "sourceYear": 2018,
+    "sourceRound": 2,
+    "originalQuestionNumber": 14
+  },
+  {
+    "id": "MOEX-107100-1301-Q015",
+    "subject": "解剖學",
+    "chapter": "神經解剖",
+    "section": "腦幹核區",
+    "stem": "關於面神經（facial nerve）之敘述，下列何者錯誤？",
+    "options": {
+      "A": "面神經核（facial nucleus）位於橋腦（pons）",
+      "B": "右側面神經核（facial nucleus）損傷，可導致右側顏面表情肌全麻痺（right facial palsy）",
+      "C": "面神經核（facial nucleus）之神經元，屬於下運動神經元（lower motor neuron）",
+      "D": "面神經（facial nerve）可傳遞咀嚼肌之本體感覺（proprioception）"
+    },
+    "answer": "D",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "腦幹核區｜面神經（facial nerve）之敘述，下",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 107 年第二次醫師一階醫學（一）",
+    "sourceYear": 2018,
+    "sourceRound": 2,
+    "originalQuestionNumber": 15
+  },
+  {
+    "id": "MOEX-107100-1301-Q016",
+    "subject": "解剖學",
+    "chapter": "神經解剖",
+    "section": "腦幹核區",
+    "stem": "有關海馬系統（hippocampal formation）之最主要傳出纖維（efferent fiber），可形成下列何構造？",
+    "options": {
+      "A": "穹束（fornix）",
+      "B": "胼胝體（corpus callosum）",
+      "C": "終紋（stria terminalis）",
+      "D": "丘腦髓紋（stria medullaris thalami）"
+    },
+    "answer": "A",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "腦幹核區｜海馬系統（hippocampal forma",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 107 年第二次醫師一階醫學（一）",
+    "sourceYear": 2018,
+    "sourceRound": 2,
+    "originalQuestionNumber": 16
+  },
+  {
+    "id": "MOEX-107100-1301-Q017",
+    "subject": "解剖學",
+    "chapter": "胸腔",
+    "section": "縱膈",
+    "stem": "上頸神經節（superior cervical ganglion）相對於下列何脊椎骨高度？",
+    "options": {
+      "A": "第一、二頸椎",
+      "B": "第四頸椎",
+      "C": "第六頸椎",
+      "D": "第一胸椎"
+    },
+    "answer": "A",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "縱膈｜上頸神經節（superior cervica",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 107 年第二次醫師一階醫學（一）",
+    "sourceYear": 2018,
+    "sourceRound": 2,
+    "originalQuestionNumber": 17
+  },
+  {
+    "id": "MOEX-107100-1301-Q018",
+    "subject": "解剖學",
+    "chapter": "頭頸部",
+    "section": "顏面神經與三叉神經",
+    "stem": "有關舌骨上肌（suprahyoid muscles）之敘述，下列何者正確？",
+    "options": {
+      "A": "二腹肌的後腹（posterior belly of digastric muscle）由顏面神經（facial nerve）支配",
+      "B": "二腹肌的前腹（anterior belly of digastric muscle）由舌下神經（hypoglossal nerve）支配",
+      "C": "下頜舌骨肌（mylohyoid muscle）由舌下神經（hypoglossal nerve）支配",
+      "D": "莖突舌骨肌（stylohyoid muscle）由下頜神經（mandibular nerve）支配"
+    },
+    "answer": "A",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "顏面神經與腮腺關係",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 107 年第二次醫師一階醫學（一）",
+    "sourceYear": 2018,
+    "sourceRound": 2,
+    "originalQuestionNumber": 18
+  },
+  {
+    "id": "MOEX-107100-1301-Q019",
+    "subject": "解剖學",
+    "chapter": "頭頸部",
+    "section": "顏面神經與三叉神經",
+    "stem": "顏面靜脈（facial vein）的感染，最可能經由下列何血管擴散至顱內的海綿竇（cavernous sinus）？",
+    "options": {
+      "A": "下頜後靜脈（retromandibular vein）",
+      "B": "上眼靜脈（superior ophthalmic vein）",
+      "C": "舌靜脈（lingual vein）",
+      "D": "上頜靜脈（maxillary vein）"
+    },
+    "answer": "B",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "顏面神經與三叉神經｜顏面靜脈（facial vein）的感染，最",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 107 年第二次醫師一階醫學（一）",
+    "sourceYear": 2018,
+    "sourceRound": 2,
+    "originalQuestionNumber": 19
+  },
+  {
+    "id": "MOEX-107100-1301-Q020",
+    "subject": "解剖學",
+    "chapter": "胸腔",
+    "section": "心臟與冠狀動脈",
+    "stem": "在心搏週期（cardiac cycle）中，血流進入冠狀動脈最主要是在：",
+    "options": {
+      "A": "肺動脈瓣打開時",
+      "B": "左心室收縮時",
+      "C": "主動脈瓣關閉時",
+      "D": "右心房舒張時"
+    },
+    "answer": "C",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "心臟與冠狀動脈｜在心搏週期（cardiac cycle）中，",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 107 年第二次醫師一階醫學（一）",
+    "sourceYear": 2018,
+    "sourceRound": 2,
+    "originalQuestionNumber": 20
+  },
+  {
+    "id": "MOEX-107100-1301-Q021",
+    "subject": "解剖學",
+    "chapter": "胸腔",
+    "section": "縱膈",
+    "stem": "引發咳嗽反射最敏感的呼吸道黏膜位於：",
+    "options": {
+      "A": "隆凸（carina）",
+      "B": "氣管（trachea）",
+      "C": "主支氣管（main bronchus）",
+      "D": "節支氣管（segmental bronchus）"
+    },
+    "answer": "A",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "縱膈｜引發咳嗽反射最敏感的呼吸道黏膜位於：",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 107 年第二次醫師一階醫學（一）",
+    "sourceYear": 2018,
+    "sourceRound": 2,
+    "originalQuestionNumber": 21
+  },
+  {
+    "id": "MOEX-107100-1301-Q022",
+    "subject": "解剖學",
+    "chapter": "胸腔",
+    "section": "縱膈",
+    "stem": "右側頭臂靜脈（brachiocephalic vein）匯入上腔靜脈（superior vena cava）的位置，對應於體表最有可能 在：",
+    "options": {
+      "A": "胸骨柄（manubrium）右緣",
+      "B": "胸骨柄（manubrium）左緣",
+      "C": "胸骨體（body）正下方",
+      "D": "右側第三肋間"
+    },
+    "answer": "A",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "縱膈｜右側頭臂靜脈（brachiocephalic",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 107 年第二次醫師一階醫學（一）",
+    "sourceYear": 2018,
+    "sourceRound": 2,
+    "originalQuestionNumber": 22
+  },
+  {
+    "id": "MOEX-107100-1301-Q023",
+    "subject": "解剖學",
+    "chapter": "胸腔",
+    "section": "縱膈",
+    "stem": "下列何者不是主動脈的直接分支？",
+    "options": {
+      "A": "食道動脈（esophageal artery）",
+      "B": "後肋間動脈（posterior intercostal artery）",
+      "C": "支氣管動脈（bronchial artery）",
+      "D": "內胸動脈（internal thoracic artery）"
+    },
+    "answer": "D",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "後縱膈主要構造",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 107 年第二次醫師一階醫學（一）",
+    "sourceYear": 2018,
+    "sourceRound": 2,
+    "originalQuestionNumber": 23
+  },
+  {
+    "id": "MOEX-107100-1301-Q024",
+    "subject": "解剖學",
+    "chapter": "胸腔",
+    "section": "心臟與冠狀動脈",
+    "stem": "下列何者最不可能由右冠狀動脈供應？",
+    "options": {
+      "A": "右心房",
+      "B": "房室結",
+      "C": "節制帶（moderator band）",
+      "D": "房室束"
+    },
+    "answer": "D",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "右冠狀動脈分支",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 107 年第二次醫師一階醫學（一）",
+    "sourceYear": 2018,
+    "sourceRound": 2,
+    "originalQuestionNumber": 24
+  },
+  {
+    "id": "MOEX-107100-1301-Q025",
+    "subject": "解剖學",
+    "chapter": "腹部",
+    "section": "肝膽胰脾",
+    "stem": "下列何者不直接匯入下腔靜脈（inferior vena cava）？",
+    "options": {
+      "A": "左腎靜脈（left renal vein）",
+      "B": "左肝靜脈（left hepatic vein）",
+      "C": "左腎上腺靜脈（left suprarenal vein）",
+      "D": "左第三、四腰靜脈（left L3, 4 lumbar veins）"
+    },
+    "answer": "C",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "肝十二指腸韌帶與 portal triad",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 107 年第二次醫師一階醫學（一）",
+    "sourceYear": 2018,
+    "sourceRound": 2,
+    "originalQuestionNumber": 25
+  },
+  {
+    "id": "MOEX-107100-1301-Q026",
+    "subject": "解剖學",
+    "chapter": "骨盆與會陰",
+    "section": "會陰三角",
+    "stem": "下列何者不存在精索（spermatic cord）內？",
+    "options": {
+      "A": "髂腹下神經（iliohypogastric nerve）",
+      "B": "輸精管（ductus deferens）",
+      "C": "提睪肌動脈（cremasteric artery）",
+      "D": "鞘突遺跡（vestige of vaginal process）"
+    },
+    "answer": "A",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "會陰三角｜不存在精索（spermatic cord）內",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 107 年第二次醫師一階醫學（一）",
+    "sourceYear": 2018,
+    "sourceRound": 2,
+    "originalQuestionNumber": 26
+  },
+  {
+    "id": "MOEX-107100-1301-Q028",
+    "subject": "解剖學",
+    "chapter": "骨盆與會陰",
+    "section": "會陰三角",
+    "stem": "穿過陰莖腳（crura）走入陰莖海綿體（corpus cavernosum）內，去支配陰莖勃起組織的動脈是：",
+    "options": {
+      "A": "陰莖球體動脈（arteries of the bulb of the penis）",
+      "B": "陰莖深動脈（deep arteries of the penis）",
+      "C": "陰莖背動脈（dorsal arteries of the penis）",
+      "D": "陰部外動脈（external pudendal arteries）"
+    },
+    "answer": "B",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "會陰三角｜穿過陰莖腳（crura）走入陰莖海綿體（co",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 107 年第二次醫師一階醫學（一）",
+    "sourceYear": 2018,
+    "sourceRound": 2,
+    "originalQuestionNumber": 28
+  },
+  {
+    "id": "MOEX-107100-1301-Q030",
+    "subject": "解剖學",
+    "chapter": "上肢",
+    "section": "肩胛區",
+    "stem": "當患者出現翼狀肩胛骨（winging of the scapula）的症狀時，最常見的原因是由於那一條神經與其支配的肌 肉受損所引發？",
+    "options": {
+      "A": "腋神經（axillary nerve）與三角肌（deltoid muscle）",
+      "B": "長胸神經（long thoracic nerve）與前鋸肌（serratus anterior）",
+      "C": "肩胛上神經（suprascapular nerve）與棘上肌（supraspinatus）",
+      "D": "下肩胛下神經（inferior subscapular nerve）與大圓肌（teres major）"
+    },
+    "answer": "B",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "肩胛區｜當患者出現翼狀肩胛骨（winging of ",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 107 年第二次醫師一階醫學（一）",
+    "sourceYear": 2018,
+    "sourceRound": 2,
+    "originalQuestionNumber": 30
+  },
+  {
+    "id": "MOEX-107100-1301-Q031",
+    "subject": "解剖學",
+    "chapter": "上肢",
+    "section": "臂神經叢",
+    "stem": "正常情形下，肌皮神經（musculocutaneous nerve）的末端會形成那一條皮神經？",
+    "options": {
+      "A": "上臂內側皮神經（medial cutaneous nerve of arm）",
+      "B": "前臂內側皮神經（medial cutaneous nerve of forearm）",
+      "C": "前臂外側皮神經（lateral cutaneous nerve of forearm）",
+      "D": "前臂後側皮神經（posterior cutaneous nerve of forearm）"
+    },
+    "answer": "C",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "臂神經叢終末分支",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 107 年第二次醫師一階醫學（一）",
+    "sourceYear": 2018,
+    "sourceRound": 2,
+    "originalQuestionNumber": 31
+  },
+  {
+    "id": "MOEX-107100-1301-Q033",
+    "subject": "解剖學",
+    "chapter": "胸腔",
+    "section": "橫膈",
+    "stem": "下列何者參與形成初始橫膈（primordial diaphragm），在早期胎兒橫膈（early fetal diaphragm）時占大部 分，而在新生嬰兒之橫膈（neonate's diaphragm）只佔相當小的部分？",
+    "options": {
+      "A": "胸腹膜（pleuroperitoneal membrane）",
+      "B": "橫中隔（septum transversum）",
+      "C": "食道繫膜（mesoesophagus）",
+      "D": "原始縱隔（primitive mediastinum）"
+    },
+    "answer": "A",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "橫膈｜參與形成初始橫膈（primordial di",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 107 年第二次醫師一階醫學（一）",
+    "sourceYear": 2018,
+    "sourceRound": 2,
+    "originalQuestionNumber": 33
+  },
+  {
+    "id": "MOEX-107100-1301-Q034",
+    "subject": "解剖學",
+    "chapter": "胸腔",
+    "section": "縱膈",
+    "stem": "下列何者是下呼吸道（lower respiratory tract）最常見的先天異常（the most common birth defect）？",
+    "options": {
+      "A": "喉閉鎖（laryngeal atresia）",
+      "B": "氣管食道瘻管（tracheoesophageal fistula）",
+      "C": "喉氣管食道裂（laryngotracheoesophageal cleft）",
+      "D": "氣管狹窄（tracheal stenosis）"
+    },
+    "answer": "B",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "後縱膈主要構造",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 107 年第二次醫師一階醫學（一）",
+    "sourceYear": 2018,
+    "sourceRound": 2,
+    "originalQuestionNumber": 34
+  },
+  {
+    "id": "MOEX-107100-1301-Q040",
+    "subject": "解剖學",
+    "chapter": "神經解剖",
+    "section": "脊髓傳導路徑",
+    "stem": "下列何者不含有腦脊髓液（cerebrospinal fluid）？",
+    "options": {
+      "A": "大池（cisterna magna）",
+      "B": "硬腦膜下腔（subdural space）",
+      "C": "蜘蛛腦膜下腔（subarachnoid space）",
+      "D": "脊髓中央管（central canal of spinal cord）"
+    },
+    "answer": "B",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "脊髓傳導路徑｜不含有腦脊髓液（cerebrospinal ",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 107 年第二次醫師一階醫學（一）",
+    "sourceYear": 2018,
+    "sourceRound": 2,
+    "originalQuestionNumber": 40
+  },
+  {
+    "id": "MOEX-107100-1301-Q043",
+    "subject": "解剖學",
+    "chapter": "腹部",
+    "section": "肝膽胰脾",
+    "stem": "結腸（colon）不具備下列那一項特徵？",
+    "options": {
+      "A": "杯狀細胞（goblet cells）",
+      "B": "單層柱狀上皮（simple columnar epithelium）",
+      "C": "潘氏細胞（Paneth cells）",
+      "D": "淋巴小結（lymphatic nodules）"
+    },
+    "answer": "C",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "肝膽胰脾｜結腸（colon）不具備下列那一項特徵",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 107 年第二次醫師一階醫學（一）",
+    "sourceYear": 2018,
+    "sourceRound": 2,
+    "originalQuestionNumber": 43
+  },
+  {
+    "id": "MOEX-107100-1301-Q044",
+    "subject": "解剖學",
+    "chapter": "神經解剖",
+    "section": "腦幹核區",
+    "stem": "鼻腔的嗅覺區（olfactory region）不具下列那一種細胞？",
+    "options": {
+      "A": "雙極神經元（bipolar neuron）",
+      "B": "杯狀細胞（goblet cell）",
+      "C": "基底細胞（basal cell）",
+      "D": "支持細胞（sustentacular cell）"
+    },
+    "answer": "B",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "腦幹核區｜鼻腔的嗅覺區（olfactory regio",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 107 年第二次醫師一階醫學（一）",
+    "sourceYear": 2018,
+    "sourceRound": 2,
+    "originalQuestionNumber": 44
+  },
+  {
+    "id": "MOEX-107100-1301-Q047",
+    "subject": "解剖學",
+    "chapter": "神經解剖",
+    "section": "腦幹核區",
+    "stem": "有關人類的彩色視覺，下列何者是最恰當的敘述？",
+    "options": {
+      "A": "正常人類視網膜上的M型錐細胞（M cones）主要吸收紅光",
+      "B": "人類視覺的三原色是指紅色、綠色與黃色",
+      "C": "人類男性與女性色盲發生的比率為1：1",
+      "D": "錐細胞（cone）辨別紅色與綠色的基因，同時位於X染色體上且位置相近"
+    },
+    "answer": "D",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "腦幹核區｜人類的彩色視覺，下列何者是最恰當的敘述",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 107 年第二次醫師一階醫學（一）",
+    "sourceYear": 2018,
+    "sourceRound": 2,
+    "originalQuestionNumber": 47
+  },
+  {
+    "id": "MOEX-107100-1301-Q048",
+    "subject": "解剖學",
+    "chapter": "腹部",
+    "section": "腹膜關係",
+    "stem": "當光線進入視網膜時，最先經過下列何種細胞？",
+    "options": {
+      "A": "rod or cone cells",
+      "B": "bipolar cells",
+      "C": "ganglion cells",
+      "D": "horizontal cells"
+    },
+    "answer": "C",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "腹膜關係｜當光線進入視網膜時，最先經過下列何種細胞",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 107 年第二次醫師一階醫學（一）",
+    "sourceYear": 2018,
+    "sourceRound": 2,
+    "originalQuestionNumber": 48
+  },
+  {
+    "id": "MOEX-107100-1301-Q049",
+    "subject": "解剖學",
+    "chapter": "腹部",
+    "section": "腹膜關係",
+    "stem": "在昏暗的環境下，視網膜桿狀細胞（rod cell）外部區段（outer segment）產生的鈉離子內流（influx）電流 主要是因為下列那一物質的作用？",
+    "options": {
+      "A": "cAMP",
+      "B": "cGMP",
+      "C": "傳導素（transducin）",
+      "D": "all-trans retinal"
+    },
+    "answer": "B",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "腹膜關係｜在昏暗的環境下，視網膜桿狀細胞（rod ce",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 107 年第二次醫師一階醫學（一）",
+    "sourceYear": 2018,
+    "sourceRound": 2,
+    "originalQuestionNumber": 49
+  },
+  {
+    "id": "MOEX-107100-1301-Q050",
+    "subject": "解剖學",
+    "chapter": "神經解剖",
+    "section": "腦幹核區",
+    "stem": "當考生正專注於國家考試試題時，額葉測得的腦波最可能是下列何者？",
+    "options": {
+      "A": "alpha rhythm",
+      "B": "beta rhythm",
+      "C": "theta rhythm",
+      "D": "delta rhythm"
+    },
+    "answer": "B",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "腦幹核區｜當考生正專注於國家考試試題時，額葉測得的腦波",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 107 年第二次醫師一階醫學（一）",
+    "sourceYear": 2018,
+    "sourceRound": 2,
+    "originalQuestionNumber": 50
+  },
+  {
+    "id": "MOEX-107100-1301-Q051",
+    "subject": "解剖學",
+    "chapter": "神經解剖",
+    "section": "腦幹核區",
+    "stem": "由右耳傳入中樞神經系統的auditory input，將傳至何處？",
+    "options": {
+      "A": "右側之postcentral gyrus",
+      "B": "兩側之posterior temporal gyrus",
+      "C": "兩側之superior temporal gyrus",
+      "D": "右側之posterior temporal gyrus"
+    },
+    "answer": "C",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "腦幹核區｜由右耳傳入中樞神經系統的auditory i",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 107 年第二次醫師一階醫學（一）",
+    "sourceYear": 2018,
+    "sourceRound": 2,
+    "originalQuestionNumber": 51
+  },
+  {
+    "id": "MOEX-107100-1301-Q057",
+    "subject": "解剖學",
+    "chapter": "胸腔",
+    "section": "縱膈",
+    "stem": "若血液黏滯係數（blood viscosity）增加時，最可能直接引起下列那一改變？",
+    "options": {
+      "A": "周邊總阻力（total peripheral resistance）增加",
+      "B": "小動脈（arterioles）半徑增加",
+      "C": "平均動脈壓（mean arterial pressure）下降",
+      "D": "心搏量（stroke volume）增加"
+    },
+    "answer": "A",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "縱膈｜若血液黏滯係數（blood viscosit",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 107 年第二次醫師一階醫學（一）",
+    "sourceYear": 2018,
+    "sourceRound": 2,
+    "originalQuestionNumber": 57
+  },
+  {
+    "id": "MOEX-107100-1301-Q060",
+    "subject": "解剖學",
+    "chapter": "胸腔",
+    "section": "肺與胸膜",
+    "stem": "下列有關肺部發生纖維化（fibrosis）後肺功能變化之敘述，何者錯誤？",
+    "options": {
+      "A": "肺活量（vital capacity）減少",
+      "B": "功能性肺餘容量（functional residual capacity）增加",
+      "C": "運動時，常呈現淺快呼吸型態（rapid shallow breathing）",
+      "D": "第一秒用力呼氣容積（FEV ）通常會減少 1"
+    },
+    "answer": "B",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "肺與胸膜｜下列有關肺部發生纖維化（fibrosis）後",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 107 年第二次醫師一階醫學（一）",
+    "sourceYear": 2018,
+    "sourceRound": 2,
+    "originalQuestionNumber": 60
+  },
+  {
+    "id": "MOEX-107100-1301-Q061",
+    "subject": "解剖學",
+    "chapter": "胸腔",
+    "section": "肺與胸膜",
+    "stem": "下列有關肺氣腫（emphysema）之敘述，何者錯誤？",
+    "options": {
+      "A": "彈性回縮力（elastic recoil）增加",
+      "B": "肺順應性（lung compliance）增加",
+      "C": "功能性肺餘容量（functional residual capacity）增加",
+      "D": "用力呼氣時，呼氣氣流速度（expiratory flow rate）降低"
+    },
+    "answer": "A",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "肺與胸膜｜下列有關肺氣腫（emphysema）之敘述，",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 107 年第二次醫師一階醫學（一）",
+    "sourceYear": 2018,
+    "sourceRound": 2,
+    "originalQuestionNumber": 61
+  },
+  {
+    "id": "MOEX-107100-1301-Q063",
+    "subject": "解剖學",
+    "chapter": "神經解剖",
+    "section": "腦幹核區",
+    "stem": "下列何者不屬於消化道的內在神經系統（intrinsic nervous system）？",
+    "options": {
+      "A": "interstitial cell of Cajal（ICC）",
+      "B": "myenteric plexus",
+      "C": "nodose ganglion",
+      "D": "submucosal plexus"
+    },
+    "answer": "C",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "腦幹核區｜不屬於消化道的內在神經系統（intrinsi",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 107 年第二次醫師一階醫學（一）",
+    "sourceYear": 2018,
+    "sourceRound": 2,
+    "originalQuestionNumber": 63
+  },
+  {
+    "id": "MOEX-107100-1301-Q078",
+    "subject": "解剖學",
+    "chapter": "腹部",
+    "section": "肝膽胰脾",
+    "stem": "生雞蛋的蛋白中之avidin會影響人類腸道對下列何種維生素的吸收？",
+    "options": {
+      "A": "folate",
+      "B": "biotin",
+      "C": "cobalamin",
+      "D": "pyridoxine"
+    },
+    "answer": "B",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "肝膽胰脾｜生雞蛋的蛋白中之avidin會影響人類腸道對",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 107 年第二次醫師一階醫學（一）",
+    "sourceYear": 2018,
+    "sourceRound": 2,
+    "originalQuestionNumber": 78
+  },
+  {
+    "id": "MOEX-108030-1301-Q001",
+    "subject": "解剖學",
+    "chapter": "神經解剖",
+    "section": "腦幹核區",
+    "stem": "有關⼩腦的敘述，下列何者錯誤？",
+    "options": {
+      "A": "背側脊髓⼩腦徑（dorsal spinocerebellar tract）主要由nucleus thoracicus（⼜稱 Clarke's column或 nucleus dorsalis）發出",
+      "B": "背側脊髓⼩腦徑（dorsal spinocerebellar tract）左右交叉後由下⼩腦腳（inferior cerebellar peduncle）進 入⼩腦",
+      "C": "上⼩腦腳（superior cerebellar peduncle）含有進、出⼩腦的神經纖維",
+      "D": "中⼩腦腳（middle cerebellar peduncle）含橋腦核（pontine nucleus）發出之神經纖維"
+    },
+    "answer": "B",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "腦幹核區｜⼩腦的敘述，下列何者錯誤",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 108 年第一次醫師一階醫學（一）",
+    "sourceYear": 2019,
+    "sourceRound": 1,
+    "originalQuestionNumber": 1
+  },
+  {
+    "id": "MOEX-108030-1301-Q002",
+    "subject": "解剖學",
+    "chapter": "頭頸部",
+    "section": "甲狀腺與副甲狀腺",
+    "stem": "甲狀腺切除⼿術不慎傷及喉外神經（external laryngeal nerve），下列何肌的功能最可能受損？",
+    "options": {
+      "A": "環狀甲骨肌（cricothyroid muscle）",
+      "B": "甲狀杓骨肌（thyroarytenoid muscle）",
+      "C": "後環杓肌（posterior cricoarytenoid muscle）",
+      "D": "外側環杓肌（lateral cricoarytenoid muscle）"
+    },
+    "answer": "A",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "甲狀腺與副甲狀腺｜甲狀腺切除⼿術不慎傷及喉外神經（extern",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 108 年第一次醫師一階醫學（一）",
+    "sourceYear": 2019,
+    "sourceRound": 1,
+    "originalQuestionNumber": 2
+  },
+  {
+    "id": "MOEX-108030-1301-Q003",
+    "subject": "解剖學",
+    "chapter": "頭頸部",
+    "section": "顏面神經與三叉神經",
+    "stem": "下列何者的分泌物最不可能流經過半⽉裂孔（hiatus semilunaris）？",
+    "options": {
+      "A": "額竇（frontal sinus）",
+      "B": "前篩竇（anterior ethmoidal sinus）",
+      "C": "上頜竇（maxillary sinus）",
+      "D": "蝶竇（sphenoid sinus）"
+    },
+    "answer": "D",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "顏面神經與三叉神經｜的分泌物最不可能流經過半⽉裂孔（hiatus",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 108 年第一次醫師一階醫學（一）",
+    "sourceYear": 2019,
+    "sourceRound": 1,
+    "originalQuestionNumber": 3
+  },
+  {
+    "id": "MOEX-108030-1301-Q004",
+    "subject": "解剖學",
+    "chapter": "神經解剖",
+    "section": "腦幹核區",
+    "stem": "兩眼同時看向正上⽅，為何種神經之作⽤？",
+    "options": {
+      "A": "眼神經（ophthalmic nerve）",
+      "B": "滑⾞神經（trochlear nerve）",
+      "C": "動眼神經（oculomotor nerve）",
+      "D": "外展神經（abducent nerve）"
+    },
+    "answer": "C",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "腦幹核區｜兩眼同時看向正上⽅，為何種神經之作⽤",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 108 年第一次醫師一階醫學（一）",
+    "sourceYear": 2019,
+    "sourceRound": 1,
+    "originalQuestionNumber": 4
+  },
+  {
+    "id": "MOEX-108030-1301-Q005",
+    "subject": "解剖學",
+    "chapter": "胸腔",
+    "section": "縱膈",
+    "stem": "胸骨柄正中間處的穿刺傷，最可能傷及下列何者？",
+    "options": {
+      "A": "主動脈⼸（aortic arch）",
+      "B": "左⼼室（left ventricle）",
+      "C": "肺動脈幹（pulmonary trunk）",
+      "D": "上腔靜脈（superior vena cava）"
+    },
+    "answer": "A",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "縱膈｜胸骨柄正中間處的穿刺傷，最可能傷及下列何者",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 108 年第一次醫師一階醫學（一）",
+    "sourceYear": 2019,
+    "sourceRound": 1,
+    "originalQuestionNumber": 5
+  },
+  {
+    "id": "MOEX-108030-1301-Q006",
+    "subject": "解剖學",
+    "chapter": "胸腔",
+    "section": "縱膈",
+    "stem": "下列何者是臍靜脈（umbilical vein）的殘跡？",
+    "options": {
+      "A": "肝鐮韌帶（falciform ligament）",
+      "B": "肝圓韌帶（ligamentum teres）",
+      "C": "冠狀韌帶（coronary ligament）",
+      "D": "正中臍韌帶（median umbilical ligament）"
+    },
+    "answer": "B",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "縱膈｜臍靜脈（umbilical vein）的殘跡",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 108 年第一次醫師一階醫學（一）",
+    "sourceYear": 2019,
+    "sourceRound": 1,
+    "originalQuestionNumber": 6
+  },
+  {
+    "id": "MOEX-108030-1301-Q007",
+    "subject": "解剖學",
+    "chapter": "胸腔",
+    "section": "橫膈",
+    "stem": "下列何者穿過橫膈中央腱（central tendon of diaphragm）？",
+    "options": {
+      "A": "主動脈",
+      "B": "下腔靜脈",
+      "C": "食道",
+      "D": "肝⾨靜脈"
+    },
+    "answer": "B",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "橫膈｜穿過橫膈中央腱（central tendon",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 108 年第一次醫師一階醫學（一）",
+    "sourceYear": 2019,
+    "sourceRound": 1,
+    "originalQuestionNumber": 7
+  },
+  {
+    "id": "MOEX-108030-1301-Q008",
+    "subject": "解剖學",
+    "chapter": "骨盆與會陰",
+    "section": "直腸與肛管",
+    "stem": "陰部神經（pudendal nerve）位於坐骨肛⾨窩（ischioanal fossa）的何處？",
+    "options": {
+      "A": "內側壁",
+      "B": "外側壁",
+      "C": "上側壁",
+      "D": "後側壁"
+    },
+    "answer": "B",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "直腸與肛管｜陰部神經（pudendal nerve）位於",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 108 年第一次醫師一階醫學（一）",
+    "sourceYear": 2019,
+    "sourceRound": 1,
+    "originalQuestionNumber": 8
+  },
+  {
+    "id": "MOEX-108030-1301-Q009",
+    "subject": "解剖學",
+    "chapter": "下肢",
+    "section": "腰薦神經叢",
+    "stem": "下列何者⾛在下肢的內側？",
+    "options": {
+      "A": "⼤隱靜脈（great saphenous vein）",
+      "B": "⼩隱靜脈（small saphenous vein）",
+      "C": "膕靜脈（popliteal vein）",
+      "D": "股靜脈（femoral vein）"
+    },
+    "answer": "A",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "腰薦神經叢｜⾛在下肢的內側",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 108 年第一次醫師一階醫學（一）",
+    "sourceYear": 2019,
+    "sourceRound": 1,
+    "originalQuestionNumber": 9
+  },
+  {
+    "id": "MOEX-108030-1301-Q010",
+    "subject": "解剖學",
+    "chapter": "上肢",
+    "section": "臂神經叢",
+    "stem": "肱骨外科頸（surgical neck of humerus）骨折，最可能傷及那⼀條神經？",
+    "options": {
+      "A": "肌⽪神經（musculocutaneous nerve）",
+      "B": "正中神經（median nerve）",
+      "C": "尺神經（ulnar nerve）",
+      "D": "腋神經（axillary nerve）"
+    },
+    "answer": "D",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "臂神經叢終末分支",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 108 年第一次醫師一階醫學（一）",
+    "sourceYear": 2019,
+    "sourceRound": 1,
+    "originalQuestionNumber": 10
+  },
+  {
+    "id": "MOEX-108030-1301-Q011",
+    "subject": "解剖學",
+    "chapter": "下肢",
+    "section": "腰薦神經叢",
+    "stem": "腳踝內側割裂，傷及繞過內踝的跗骨隧道（tarsal tunnel）內的所有肌腱，下列腳趾的何種動作最可能受影 響？",
+    "options": {
+      "A": "屈曲（flexion）",
+      "B": "伸直（extension）",
+      "C": "內收（adduction）",
+      "D": "外展（abduction）"
+    },
+    "answer": "A",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "腰薦神經叢｜腳踝內側割裂，傷及繞過內踝的跗骨隧道（tar",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 108 年第一次醫師一階醫學（一）",
+    "sourceYear": 2019,
+    "sourceRound": 1,
+    "originalQuestionNumber": 11
+  },
+  {
+    "id": "MOEX-108030-1301-Q012",
+    "subject": "解剖學",
+    "chapter": "神經解剖",
+    "section": "腦幹核區",
+    "stem": "下列何者之功能與邊緣系統（limbic system）最不相關？",
+    "options": {
+      "A": "齒狀迴（dentate gyrus）",
+      "B": "穹束（fornix）",
+      "C": "乳頭體（mamillary body）",
+      "D": "杏仁核（amygdala）"
+    },
+    "answer": "D",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "腦幹核區｜之功能與邊緣系統（limbic system",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 108 年第一次醫師一階醫學（一）",
+    "sourceYear": 2019,
+    "sourceRound": 1,
+    "originalQuestionNumber": 12
+  },
+  {
+    "id": "MOEX-108030-1301-Q013",
+    "subject": "解剖學",
+    "chapter": "神經解剖",
+    "section": "腦幹核區",
+    "stem": "關於視覺⽪質（visual cortex）的敘述，下列何者錯誤？",
+    "options": {
+      "A": "視覺聯合⽪質（visual association cortex）位於額葉（frontal lobe）",
+      "B": "初級視覺⽪質（primary visual cortex）位於枕葉（occipital lobe）",
+      "C": "視覺聯合⽪質（visual association cortex）可參與顏⾊判定與辨別",
+      "D": "初級視覺⽪質（primary visual cortex）接受外側膝狀體（lateral geniculate body）傳入之訊息"
+    },
+    "answer": "A",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "腦幹核區｜視覺⽪質（visual cortex）的敘述",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 108 年第一次醫師一階醫學（一）",
+    "sourceYear": 2019,
+    "sourceRound": 1,
+    "originalQuestionNumber": 13
+  },
+  {
+    "id": "MOEX-108030-1301-Q014",
+    "subject": "解剖學",
+    "chapter": "頭頸部",
+    "section": "顏面神經與三叉神經",
+    "stem": "正常⼈⼀側眼睛受到強光照射，雙眼瞳孔收縮，有關此反應之敘述，下列何者錯誤？",
+    "options": {
+      "A": "此為瞳孔光反射（pupillary light reflex）",
+      "B": "頂蓋前區（pretectal area）參與其機轉",
+      "C": "後聯合（posterior commissure）參與其機轉",
+      "D": "三叉神經（trigeminal nerve）之眼神經（ophthalmic nerve）參與其機轉"
+    },
+    "answer": "D",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "三叉神經感覺分支",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 108 年第一次醫師一階醫學（一）",
+    "sourceYear": 2019,
+    "sourceRound": 1,
+    "originalQuestionNumber": 14
+  },
+  {
+    "id": "MOEX-108030-1301-Q015",
+    "subject": "解剖學",
+    "chapter": "神經解剖",
+    "section": "聽覺與前庭路徑",
+    "stem": "關於前庭神經核（vestibular nuclei）的敘述，下列何者錯誤？",
+    "options": {
+      "A": "可發出前庭脊髓徑（vestibulospinal tract）",
+      "B": "部分神經纖維併入內側縱束（medial longitudinal fasciculus）",
+      "C": "主要與⼩腦齒狀核（dentate nucleus）相連繫",
+      "D": "可參與前庭眼球反射（vestibulo-ocular reflex）"
+    },
+    "answer": "C",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "前庭眼反射",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 108 年第一次醫師一階醫學（一）",
+    "sourceYear": 2019,
+    "sourceRound": 1,
+    "originalQuestionNumber": 15
+  },
+  {
+    "id": "MOEX-108030-1301-Q017",
+    "subject": "解剖學",
+    "chapter": "神經解剖",
+    "section": "自律神經",
+    "stem": "刺激淚腺（lacrimal gland）分泌的副交感節後神經纖維（parasympathetic postganglionic fibers）源⾃於下 列何者？",
+    "options": {
+      "A": "睫狀神經節（ciliary ganglion）",
+      "B": "膝神經節（geniculate ganglion）",
+      "C": "翼腭神經節（pterygopalatine ganglion）",
+      "D": "⽿神經節（otic ganglion）"
+    },
+    "answer": "C",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "副交感路徑",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 108 年第一次醫師一階醫學（一）",
+    "sourceYear": 2019,
+    "sourceRound": 1,
+    "originalQuestionNumber": 17
+  },
+  {
+    "id": "MOEX-108030-1301-Q018",
+    "subject": "解剖學",
+    "chapter": "頭頸部",
+    "section": "頸動脈鞘",
+    "stem": "下列那⼀頸部筋膜（fascia）位於舌骨下肌（infrahyoid muscles）後⾯，並覆蓋在甲狀腺（thyroid gland） 表⾯？",
+    "options": {
+      "A": "包圍層（investing layer）",
+      "B": "頸動脈鞘（carotid sheath）",
+      "C": "氣管前層（pretracheal layer）",
+      "D": "椎前層（prevertebral layer）"
+    },
+    "answer": "C",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "頸動脈鞘內容物",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 108 年第一次醫師一階醫學（一）",
+    "sourceYear": 2019,
+    "sourceRound": 1,
+    "originalQuestionNumber": 18
+  },
+  {
+    "id": "MOEX-108030-1301-Q019",
+    "subject": "解剖學",
+    "chapter": "神經解剖",
+    "section": "小腦",
+    "stem": "下列何者⽀配前、中顱窩（anterior and middle cranial fossae）的硬腦膜（dura mater）及⼩腦天幕 （tentorium cerebelli）？",
+    "options": {
+      "A": "舌咽神經（glossopharyngeal nerve）",
+      "B": "三叉神經（trigeminal nerve）",
+      "C": "迷⾛神經（vagus nerve）",
+      "D": "舌下神經（hypoglossal nerve）"
+    },
+    "answer": "B",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "小腦｜⽀配前、中顱窩（anterior and m",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 108 年第一次醫師一階醫學（一）",
+    "sourceYear": 2019,
+    "sourceRound": 1,
+    "originalQuestionNumber": 19
+  },
+  {
+    "id": "MOEX-108030-1301-Q021",
+    "subject": "解剖學",
+    "chapter": "胸腔",
+    "section": "橫膈",
+    "stem": "下肺葉病灶刺激貼著縱隔及橫膈中央的壁層胸膜⽽引起頸部疼痛，最有可能是下列那⼀條神經所引發之痛？",
+    "options": {
+      "A": "肋間神經",
+      "B": "迷⾛神經",
+      "C": "膈神經",
+      "D": "交感神經幹"
+    },
+    "answer": "C",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "橫膈｜下肺葉病灶刺激貼著縱隔及橫膈中央的壁層胸膜⽽",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 108 年第一次醫師一階醫學（一）",
+    "sourceYear": 2019,
+    "sourceRound": 1,
+    "originalQuestionNumber": 21
+  },
+  {
+    "id": "MOEX-108030-1301-Q022",
+    "subject": "解剖學",
+    "chapter": "胸腔",
+    "section": "縱膈",
+    "stem": "下列何者不負責乳腺之⾎液供應？",
+    "options": {
+      "A": "肋間動脈（intercostal artery）",
+      "B": "內胸動脈（internal thoracic artery）",
+      "C": "外胸動脈（lateral thoracic artery）",
+      "D": "肋下動脈（subcostal artery）"
+    },
+    "answer": "D",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "縱膈｜不負責乳腺之⾎液供應",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 108 年第一次醫師一階醫學（一）",
+    "sourceYear": 2019,
+    "sourceRound": 1,
+    "originalQuestionNumber": 22
+  },
+  {
+    "id": "MOEX-108030-1301-Q023",
+    "subject": "解剖學",
+    "chapter": "胸腔",
+    "section": "肺與胸膜",
+    "stem": "施⾏⼼包膜穿刺術（pericardiocentesis）時，由那⼀個位置下針，可減低刺破肋膜腔（pleural cavity）之機 會？",
+    "options": {
+      "A": "胸骨右側第六肋間",
+      "B": "胸骨左側第三肋間",
+      "C": "胸骨劍突（sternal xiphoid process）與左肋下緣交點",
+      "D": "胸骨右側第四肋間"
+    },
+    "answer": "C",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "胸膜與肋膈隱窩",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 108 年第一次醫師一階醫學（一）",
+    "sourceYear": 2019,
+    "sourceRound": 1,
+    "originalQuestionNumber": 23
+  },
+  {
+    "id": "MOEX-108030-1301-Q024",
+    "subject": "解剖學",
+    "chapter": "上肢",
+    "section": "上肢血管",
+    "stem": "正常年輕男性直立姿勢時，⼼尖（apex）之體表投影位置，最有可能在：",
+    "options": {
+      "A": "第四肋間鎖骨中線外側",
+      "B": "左側乳頭處",
+      "C": "第六肋間前腋線外側",
+      "D": "第五肋間鎖骨中線內側"
+    },
+    "answer": "D",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "上肢血管｜正常年輕男性直立姿勢時，⼼尖（apex）之體",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 108 年第一次醫師一階醫學（一）",
+    "sourceYear": 2019,
+    "sourceRound": 1,
+    "originalQuestionNumber": 24
+  },
+  {
+    "id": "MOEX-108030-1301-Q025",
+    "subject": "解剖學",
+    "chapter": "腹部",
+    "section": "肝膽胰脾",
+    "stem": "上腸繫膜淋巴結（superior mesenteric lymph nodes），最不可能引流來⾃下列何處的淋巴？",
+    "options": {
+      "A": "胰脾淋巴結（pancreaticosplenic lymph node）",
+      "B": "腸繫膜淋巴結（mesenteric lymph node）",
+      "C": "中結腸腸淋巴結（middle colic lymph node）",
+      "D": "腸管旁淋巴結（juxta-intestinal lymph node）"
+    },
+    "answer": "A",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "胰臟鄰近關係",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 108 年第一次醫師一階醫學（一）",
+    "sourceYear": 2019,
+    "sourceRound": 1,
+    "originalQuestionNumber": 25
+  },
+  {
+    "id": "MOEX-108030-1301-Q026",
+    "subject": "解剖學",
+    "chapter": "下肢",
+    "section": "腰薦神經叢",
+    "stem": "下列何者不受腰神經叢（lumbar plexus）受損影響？",
+    "options": {
+      "A": "腹橫肌（transversus abdominis muscle）",
+      "B": "提睪肌（cremaster muscle）",
+      "C": "⾁膜肌（dartos muscle）",
+      "D": "閉孔外肌（obturator externus）"
+    },
+    "answer": "C",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "閉孔神經支配",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 108 年第一次醫師一階醫學（一）",
+    "sourceYear": 2019,
+    "sourceRound": 1,
+    "originalQuestionNumber": 26
+  },
+  {
+    "id": "MOEX-108030-1301-Q027",
+    "subject": "解剖學",
+    "chapter": "骨盆與會陰",
+    "section": "泌尿生殖",
+    "stem": "下列何者不連接於⼦宮體的兩側？",
+    "options": {
+      "A": "卵巢韌帶（ovary ligament）",
+      "B": "⼦宮圓韌帶（round ligament of the uterus）",
+      "C": "闊韌帶（broad ligament）",
+      "D": "主韌帶（cardinal ligamnet）"
+    },
+    "answer": "D",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "卵巢韌帶與懸韌帶",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 108 年第一次醫師一階醫學（一）",
+    "sourceYear": 2019,
+    "sourceRound": 1,
+    "originalQuestionNumber": 27
+  },
+  {
+    "id": "MOEX-108030-1301-Q028",
+    "subject": "解剖學",
+    "chapter": "骨盆與會陰",
+    "section": "會陰三角",
+    "stem": "下列何者不是陰部神經（pudendal nerve）的分⽀？",
+    "options": {
+      "A": "陰莖背神經（dorsal nerve of penis）",
+      "B": "下直腸神經（inferior rectal nerve）",
+      "C": "前陰囊神經（anterior scrotal nerve）",
+      "D": "後陰囊神經（posterior scrotal nerve）"
+    },
+    "answer": "C",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "會陰三角｜不是陰部神經（pudendal nerve）",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 108 年第一次醫師一階醫學（一）",
+    "sourceYear": 2019,
+    "sourceRound": 1,
+    "originalQuestionNumber": 28
+  },
+  {
+    "id": "MOEX-108030-1301-Q029",
+    "subject": "解剖學",
+    "chapter": "下肢",
+    "section": "下肢血管",
+    "stem": "下肢的內側迴旋股動脈（medial circumflex femoral artery）與外側迴旋股動脈（lateral circumflex femoral artery）是下列何者的直接分⽀？",
+    "options": {
+      "A": "股動脈（femoral artery）",
+      "B": "深股動脈（deep femoral artery）",
+      "C": "前者是股動脈（femoral artery），後者是深股動脈（deep femoral artery)",
+      "D": "前者是深股動脈（deep femoral artery），後者是股動脈（femoral artery）"
+    },
+    "answer": "B",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "股動脈走行",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 108 年第一次醫師一階醫學（一）",
+    "sourceYear": 2019,
+    "sourceRound": 1,
+    "originalQuestionNumber": 29
+  },
+  {
+    "id": "MOEX-108030-1301-Q030",
+    "subject": "解剖學",
+    "chapter": "上肢",
+    "section": "肩胛區",
+    "stem": "肩胛上切迹（suprascapular notch）處的肩胛上神經（suprascapular nerve)受傷時，那兩塊肌⾁會直接受到 影響？",
+    "options": {
+      "A": "棘下肌（infraspinatus）與⼩圓肌（teres minor）",
+      "B": "三⾓肌（deltoid muscle）與⼩圓肌（teres minor）",
+      "C": "棘上肌（supraspinatus）與棘下肌（infraspinatus）",
+      "D": "棘上肌（supraspinatus）與肩胛下肌（subscapularis）"
+    },
+    "answer": "C",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "肩胛區｜肩胛上切迹（suprascapular no",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 108 年第一次醫師一階醫學（一）",
+    "sourceYear": 2019,
+    "sourceRound": 1,
+    "originalQuestionNumber": 30
+  },
+  {
+    "id": "MOEX-108030-1301-Q031",
+    "subject": "解剖學",
+    "chapter": "神經解剖",
+    "section": "腦幹核區",
+    "stem": "下列何者是單⼀並沒有成對的構造？",
+    "options": {
+      "A": "脊髓前動脈（anterior spinal artery）與⼤腦前交通動脈（anterior communicating artery）",
+      "B": "脊髓後動脈（posterior spinal artery）與⼤腦後交通動脈（posterior communicating artery）",
+      "C": "脊髓前動脈（anterior spinal artery）與⼤腦後交通動脈（posterior communicating artery）",
+      "D": "脊髓後動脈（posterior spinal artery）與⼤腦前交通動脈（anterior communicating artery）"
+    },
+    "answer": "A",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "腦幹核區｜單⼀並沒有成對的構造",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 108 年第一次醫師一階醫學（一）",
+    "sourceYear": 2019,
+    "sourceRound": 1,
+    "originalQuestionNumber": 31
+  },
+  {
+    "id": "MOEX-108030-1301-Q040",
+    "subject": "解剖學",
+    "chapter": "神經解剖",
+    "section": "腦幹核區",
+    "stem": "下列有關神經元（neuron）對受傷（injury）後反應的敘述，何者錯誤？",
+    "options": {
+      "A": "在神經受傷處遠端的軸突（axon）會出現順⾏性退化（anterograde degeneration）",
+      "B": "神經損傷導致神經元細胞體內尼⽒⼩體（Nissl body）的消失，稱為染⾊質溶解（chromatolysis）",
+      "C": "在周邊神經系統，於神經受傷處會有單核球衍⽣之吞噬細胞（monocyte-derived macrophage）的聚集",
+      "D": "在中樞神經系統，於神經受傷處主要由寡樹突膠細胞（oligodendrocyte）負責髓鞘（myelin）的分解清除"
+    },
+    "answer": "D",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "腦幹核區｜下列有關神經元（neuron）對受傷（inj",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 108 年第一次醫師一階醫學（一）",
+    "sourceYear": 2019,
+    "sourceRound": 1,
+    "originalQuestionNumber": 40
+  },
+  {
+    "id": "MOEX-108030-1301-Q041",
+    "subject": "解剖學",
+    "chapter": "腹部",
+    "section": "肝膽胰脾",
+    "stem": "下列何種器官內不具有淋巴⼩結（lymphatic nodules）？",
+    "options": {
+      "A": "胸腺（thymus）",
+      "B": "脾臟（spleen）",
+      "C": "⼩腸（small intestine）",
+      "D": "扁桃體（tonsil）"
+    },
+    "answer": "A",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "肝膽胰脾｜下列何種器官內不具有淋巴⼩結（lymphat",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 108 年第一次醫師一階醫學（一）",
+    "sourceYear": 2019,
+    "sourceRound": 1,
+    "originalQuestionNumber": 41
+  },
+  {
+    "id": "MOEX-108030-1301-Q046",
+    "subject": "解剖學",
+    "chapter": "骨盆與會陰",
+    "section": "會陰三角",
+    "stem": "精液（semen）不含下列何者之分泌產物？",
+    "options": {
+      "A": "前列腺（prostate gland）",
+      "B": "陰莖海綿體（corpus cavernosum）",
+      "C": "尿道球腺（bulbourethral gland）",
+      "D": "精囊（seminal vesicle）"
+    },
+    "answer": "B",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "會陰三角｜精液（semen）不含下列何者之分泌產物",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 108 年第一次醫師一階醫學（一）",
+    "sourceYear": 2019,
+    "sourceRound": 1,
+    "originalQuestionNumber": 46
+  },
+  {
+    "id": "MOEX-108030-1301-Q047",
+    "subject": "解剖學",
+    "chapter": "腹部",
+    "section": "腹膜關係",
+    "stem": "下列①⾄④項中那些物質運輸⽅向是由⾼濃度到低濃度？ ①鈣離⼦經由幫浦（Ca2+ ATPase） 回收⾄肌漿網（sarcoplasmic reticulum） ②鈉離⼦經由鈉-葡萄糖共同轉運蛋⽩（sodium-glucose cotransporter）進入⼩腸表⽪細胞內 ③近端腎⼩管氫離⼦經由鈉-氫逆向運輸（Na+-H+ countertransport）分泌⾄管腔 ④鉀離⼦經由滲漏性鉀離⼦通道（leak K+ channels）流出細胞",
+    "options": {
+      "A": "①③",
+      "B": "②③",
+      "C": "②④",
+      "D": "①②"
+    },
+    "answer": "C",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "腹膜關係｜下列①⾄④項中那些物質運輸⽅向是由⾼濃度到低",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 108 年第一次醫師一階醫學（一）",
+    "sourceYear": 2019,
+    "sourceRound": 1,
+    "originalQuestionNumber": 47
+  },
+  {
+    "id": "MOEX-108030-1301-Q050",
+    "subject": "解剖學",
+    "chapter": "神經解剖",
+    "section": "腦幹核區",
+    "stem": "下列有關視神經盤（optic disc）的敘述，何者錯誤？",
+    "options": {
+      "A": "視神經盤和黃斑（macula densa）是視網膜（retina）上兩個不同的構造",
+      "B": "視神經盤富含光感受器（photoreceptor）",
+      "C": "視神經盤為視神經（optic nerve）聚集處",
+      "D": "視神經盤導致視野（visual field）上的盲點（blind spot）"
+    },
+    "answer": "B",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "腦幹核區｜下列有關視神經盤（optic disc）的敘",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 108 年第一次醫師一階醫學（一）",
+    "sourceYear": 2019,
+    "sourceRound": 1,
+    "originalQuestionNumber": 50
+  },
+  {
+    "id": "MOEX-108030-1301-Q054",
+    "subject": "解剖學",
+    "chapter": "腹部",
+    "section": "肝膽胰脾",
+    "stem": "正常情況下，下列何種⾎漿蛋⽩主要由肝臟⽣成？",
+    "options": {
+      "A": "protein C",
+      "B": "von Willebrand factor（vWF）",
+      "C": "granulocyte-colony stimulating factor（G-CSF）",
+      "D": "interferon gamma"
+    },
+    "answer": "A",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "肝十二指腸韌帶與 portal triad",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 108 年第一次醫師一階醫學（一）",
+    "sourceYear": 2019,
+    "sourceRound": 1,
+    "originalQuestionNumber": 54
+  },
+  {
+    "id": "MOEX-108030-1301-Q059",
+    "subject": "解剖學",
+    "chapter": "胸腔",
+    "section": "肺與胸膜",
+    "stem": "下列何者不屬於肺氣腫（emphysema）應有的變化？",
+    "options": {
+      "A": "呼吸道阻⼒增加（increased airway resistance）",
+      "B": "擴散容積增加（increased diffusing capacity）",
+      "C": "總肺容量增加（increased total lung capacity）",
+      "D": "通氣灌流失衡（ventilation perfusion mismatch）"
+    },
+    "answer": "B",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "肺與胸膜｜不屬於肺氣腫（emphysema）應有的變化",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 108 年第一次醫師一階醫學（一）",
+    "sourceYear": 2019,
+    "sourceRound": 1,
+    "originalQuestionNumber": 59
+  },
+  {
+    "id": "MOEX-108030-1301-Q061",
+    "subject": "解剖學",
+    "chapter": "胸腔",
+    "section": "縱膈",
+    "stem": "下列何者氧分壓 最⾼？",
+    "options": {
+      "A": "肺泡（alveolus）",
+      "B": "肺泡微⾎管（alveolar capillary）內⾎液",
+      "C": "體動脈⾎（systemic arterial blood）",
+      "D": "呼出氣體（expired air）"
+    },
+    "answer": "D",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "縱膈｜氧分壓 最⾼",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 108 年第一次醫師一階醫學（一）",
+    "sourceYear": 2019,
+    "sourceRound": 1,
+    "originalQuestionNumber": 61
+  },
+  {
+    "id": "MOEX-108030-1301-Q062",
+    "subject": "解剖學",
+    "chapter": "腹部",
+    "section": "肝膽胰脾",
+    "stem": "下列何者最具有刺激胃黏膜增⽣（growth of the gastric mucosa）的功能？",
+    "options": {
+      "A": "膽囊收縮素（cholecystokinin）",
+      "B": "胃泌素（gastrin）",
+      "C": "運動素（motilin）",
+      "D": "胰泌素（secretin）"
+    },
+    "answer": "B",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "膽囊與膽囊動脈",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 108 年第一次醫師一階醫學（一）",
+    "sourceYear": 2019,
+    "sourceRound": 1,
+    "originalQuestionNumber": 62
+  },
+  {
+    "id": "MOEX-108030-1301-Q066",
+    "subject": "解剖學",
+    "chapter": "腹部",
+    "section": "腹膜關係",
+    "stem": "下列何者最不常作為腎⼩管之管腔內氫離⼦的酸鹼緩衝物質？",
+    "options": {
+      "A": "HCO - 3",
+      "B": "HPO 2- 4",
+      "C": "NH 3",
+      "D": "C H COO- 3 7"
+    },
+    "answer": "D",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "腹膜關係｜不常作為腎⼩管之管腔內氫離⼦的酸鹼緩衝物質",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 108 年第一次醫師一階醫學（一）",
+    "sourceYear": 2019,
+    "sourceRound": 1,
+    "originalQuestionNumber": 66
+  },
+  {
+    "id": "MOEX-108030-1301-Q067",
+    "subject": "解剖學",
+    "chapter": "腹部",
+    "section": "腹膜關係",
+    "stem": "下列有關腎⼩管葡萄糖再吸收的描述，何者正確？",
+    "options": {
+      "A": "遠端腎⼩管頂膜（apical membrane）利⽤第⼀型葡萄糖運輸蛋⽩（glucose transporter 1）再吸收葡萄糖",
+      "B": "遠端腎⼩管基底外側膜（basolateral membrane）利⽤第⼀型鈉依賴性葡萄糖運輸蛋⽩（sodium- dependent glucose transporter 1）再吸收葡萄糖",
+      "C": "近端腎⼩管頂膜（apical membrane）主要利⽤第⼆型鈉依賴性葡萄糖運輸蛋⽩（sodium-dependent glucose transporter 2）再吸收葡萄糖",
+      "D": "近端腎⼩管基底外側膜（basolateral membrane）主要利⽤第⼀型葡萄糖運輸蛋⽩（glucose transporter 1）再吸收葡萄糖"
+    },
+    "answer": "C",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "腹膜關係｜下列有關腎⼩管葡萄糖再吸收的描述，何者正確",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 108 年第一次醫師一階醫學（一）",
+    "sourceYear": 2019,
+    "sourceRound": 1,
+    "originalQuestionNumber": 67
+  },
+  {
+    "id": "MOEX-108030-1301-Q071",
+    "subject": "解剖學",
+    "chapter": "神經解剖",
+    "section": "腦幹核區",
+    "stem": "下列有關以激素治療因⼿術切除腦下垂體腫瘤（pituitary adenoma）所導致前葉功能全⾯性降低之敘述，何 者正確？",
+    "options": {
+      "A": "只補充雄性素（androgen）即可恢復病患精⼦製造能⼒",
+      "B": "不需要補充甲狀腺素（thyroid hormone）",
+      "C": "需補充抗利尿激素（ADH）以防⽌尿崩症",
+      "D": "當處於壓⼒（stress）狀況時，需補充額外之腎上腺⽪質素（cortisol）"
+    },
+    "answer": "D",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "腦幹核區｜下列有關以激素治療因⼿術切除腦下垂體腫瘤（p",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 108 年第一次醫師一階醫學（一）",
+    "sourceYear": 2019,
+    "sourceRound": 1,
+    "originalQuestionNumber": 71
+  },
+  {
+    "id": "MOEX-108030-1301-Q089",
+    "subject": "解剖學",
+    "chapter": "腹部",
+    "section": "肝膽胰脾",
+    "stem": "⼀位第⼀型糖尿病（type 1 diabetes mellitus）患者注射胰島素（insulin）後，未進食以⾄低⾎糖昏迷，下列 何者是造成低⾎糖的最主要因素？",
+    "options": {
+      "A": "胰島素增加肝臟組織的第⼀型葡萄糖運輸蛋⽩（GLUT1）的作⽤",
+      "B": "胰島素增加肝外組織的第四型葡萄糖運輸蛋⽩（GLUT4）的作⽤",
+      "C": "胰島素增加肝臟hexokinase的活性",
+      "D": "胰島素增加肝外組織hexokinase的活性"
+    },
+    "answer": "B",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "胰臟鄰近關係",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 108 年第一次醫師一階醫學（一）",
+    "sourceYear": 2019,
+    "sourceRound": 1,
+    "originalQuestionNumber": 89
+  },
+  {
+    "id": "MOEX-108030-1301-Q092",
+    "subject": "解剖學",
+    "chapter": "腹部",
+    "section": "腹膜關係",
+    "stem": "下列那⼀種胺基酸為腎上腺素（epinephrine）⽣合成的前驅物？",
+    "options": {
+      "A": "glycine",
+      "B": "tryptophan",
+      "C": "histidine",
+      "D": "tyrosine"
+    },
+    "answer": "D",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "腹膜關係｜下列那⼀種胺基酸為腎上腺素（epinephr",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 108 年第一次醫師一階醫學（一）",
+    "sourceYear": 2019,
+    "sourceRound": 1,
+    "originalQuestionNumber": 92
+  },
+  {
+    "id": "MOEX-108100-1301-Q001",
+    "subject": "解剖學",
+    "chapter": "神經解剖",
+    "section": "小腦",
+    "stem": "下列何者與新小腦（neocerebellum, pontocerebellum）皮質無直接聯繫？",
+    "options": {
+      "A": "橋腦核（pontine nucleus）",
+      "B": "小腦齒狀核（dentate nucleus）",
+      "C": "下橄欖核（inferior olivary nucleus）",
+      "D": "前庭神經核（vestibular nucleus）"
+    },
+    "answer": "D",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "小腦｜新小腦（neocerebellum, pon",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 108 年第二次醫師一階醫學（一）",
+    "sourceYear": 2019,
+    "sourceRound": 2,
+    "originalQuestionNumber": 1
+  },
+  {
+    "id": "MOEX-108100-1301-Q002",
+    "subject": "解剖學",
+    "chapter": "神經解剖",
+    "section": "腦神經",
+    "stem": "①額神經（frontal nerve） ②鼻睫神經（nasociliary nerve） ③動眼神經（oculomotor nerve） ④淚神經 （lacrimal nerve） ⑤滑車神經（trochlear nerve） ⑥外旋神經（abducent nerve）等六條神經中，那些不經由總 腱環（common tendinous ring）內進出眼眶？",
+    "options": {
+      "A": "①③⑤",
+      "B": "②③⑥",
+      "C": "②④⑥",
+      "D": "①④⑤"
+    },
+    "answer": "D",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "動眼神經與睫狀神經節",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 108 年第二次醫師一階醫學（一）",
+    "sourceYear": 2019,
+    "sourceRound": 2,
+    "originalQuestionNumber": 2
+  },
+  {
+    "id": "MOEX-108100-1301-Q003",
+    "subject": "解剖學",
+    "chapter": "頭頸部",
+    "section": "顏面神經與三叉神經",
+    "stem": "翼腭窩（pterygopalatine fossa）的後上方通往何處？",
+    "options": {
+      "A": "鼻腔",
+      "B": "顳下窩（infratemporal fossa）",
+      "C": "中顱窩（middle cranial fossa）",
+      "D": "口腔"
+    },
+    "answer": "C",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "顏面神經與三叉神經｜翼腭窩（pterygopalatine fo",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 108 年第二次醫師一階醫學（一）",
+    "sourceYear": 2019,
+    "sourceRound": 2,
+    "originalQuestionNumber": 3
+  },
+  {
+    "id": "MOEX-108100-1301-Q004",
+    "subject": "解剖學",
+    "chapter": "胸腔",
+    "section": "肺與胸膜",
+    "stem": "咳血（hemoptysis）之血液，最可能來自下列何者？",
+    "options": {
+      "A": "肺動脈（pulmonary artery）",
+      "B": "肺靜脈（pulmonary vein）",
+      "C": "支氣管動脈（bronchial artery）",
+      "D": "支氣管靜脈（bronchial vein）"
+    },
+    "answer": "C",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "肺門構造相對位置",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 108 年第二次醫師一階醫學（一）",
+    "sourceYear": 2019,
+    "sourceRound": 2,
+    "originalQuestionNumber": 4
+  },
+  {
+    "id": "MOEX-108100-1301-Q005",
+    "subject": "解剖學",
+    "chapter": "頭頸部",
+    "section": "咽喉解剖",
+    "stem": "迷走神經由下列何處進入腹腔？",
+    "options": {
+      "A": "食道裂孔（esophageal hiatus）",
+      "B": "主動脈孔（aortic hiatus）",
+      "C": "腔靜脈孔（caval opening）",
+      "D": "正中弓狀韌帶（medial arcuate ligament）下"
+    },
+    "answer": "A",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "咽喉解剖｜迷走神經由下列何處進入腹腔",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 108 年第二次醫師一階醫學（一）",
+    "sourceYear": 2019,
+    "sourceRound": 2,
+    "originalQuestionNumber": 5
+  },
+  {
+    "id": "MOEX-108100-1301-Q006",
+    "subject": "解剖學",
+    "chapter": "骨盆與會陰",
+    "section": "泌尿生殖",
+    "stem": "有關卵巢動脈（ovarian artery）的敘述，下列何者正確？",
+    "options": {
+      "A": "為髂內動脈（internal iliac artery）的分支",
+      "B": "經由卵巢韌帶（ovarian ligament）進入卵巢",
+      "C": "從髂外動脈（external iliac artery）的後方進入骨盆腔",
+      "D": "經由懸韌帶（suspensory ligament of ovary）進入卵巢"
+    },
+    "answer": "D",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "卵巢韌帶與懸韌帶",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 108 年第二次醫師一階醫學（一）",
+    "sourceYear": 2019,
+    "sourceRound": 2,
+    "originalQuestionNumber": 6
+  },
+  {
+    "id": "MOEX-108100-1301-Q007",
+    "subject": "解剖學",
+    "chapter": "下肢",
+    "section": "臀區",
+    "stem": "下列何者由梨狀肌（piriformis）的上方進入臀部？",
+    "options": {
+      "A": "臀上動脈（superior gluteal artery）",
+      "B": "臀下動脈（inferior gluteal artery）",
+      "C": "坐骨神經（sciatic nerve）",
+      "D": "陰部神經（pudendal nerve）"
+    },
+    "answer": "A",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "上臀神經支配",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 108 年第二次醫師一階醫學（一）",
+    "sourceYear": 2019,
+    "sourceRound": 2,
+    "originalQuestionNumber": 7
+  },
+  {
+    "id": "MOEX-108100-1301-Q008",
+    "subject": "解剖學",
+    "chapter": "下肢",
+    "section": "小腿肌群",
+    "stem": "腓深神經（deep fibular nerve）傷害，最可能導致下列何者無力？",
+    "options": {
+      "A": "腓長肌（fibularis longus）",
+      "B": "腓短肌（fibularis brevis）",
+      "C": "脛前肌（tibialis anterior）",
+      "D": "脛後肌（tibialis posterior）"
+    },
+    "answer": "C",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "脛後肌功能",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 108 年第二次醫師一階醫學（一）",
+    "sourceYear": 2019,
+    "sourceRound": 2,
+    "originalQuestionNumber": 8
+  },
+  {
+    "id": "MOEX-108100-1301-Q009",
+    "subject": "解剖學",
+    "chapter": "上肢",
+    "section": "臂神經叢",
+    "stem": "下列何者走在肱骨內上髁（medial epicondyle of humerus）的後方？",
+    "options": {
+      "A": "肌皮神經（musculocutaneous nerve）",
+      "B": "正中神經（median nerve）",
+      "C": "尺神經（ulnar nerve）",
+      "D": "橈神經（radial nerve）"
+    },
+    "answer": "C",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "臂神經叢終末分支",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 108 年第二次醫師一階醫學（一）",
+    "sourceYear": 2019,
+    "sourceRound": 2,
+    "originalQuestionNumber": 9
+  },
+  {
+    "id": "MOEX-108100-1301-Q010",
+    "subject": "解剖學",
+    "chapter": "上肢",
+    "section": "臂神經叢",
+    "stem": "腋神經（axillary nerve）受損時，下列那一塊肌肉無力？",
+    "options": {
+      "A": "三角肌（deltoid muscle）",
+      "B": "喙肱肌（coracobrachialis muscle）",
+      "C": "肱二頭肌（biceps brachii muscle）",
+      "D": "肱三頭肌（triceps brachii muscle）"
+    },
+    "answer": "A",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "臂神經叢終末分支",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 108 年第二次醫師一階醫學（一）",
+    "sourceYear": 2019,
+    "sourceRound": 2,
+    "originalQuestionNumber": 10
+  },
+  {
+    "id": "MOEX-108100-1301-Q011",
+    "subject": "解剖學",
+    "chapter": "神經解剖",
+    "section": "小腦",
+    "stem": "小腦的齒狀核－紅核－丘腦徑（dentato-rubro-thalamic tract），行經下列何構造？",
+    "options": {
+      "A": "上小腦腳（superior cerebellar peduncle）",
+      "B": "中小腦腳（middle cerebellar peduncle）",
+      "C": "下小腦腳（inferior cerebellar peduncle）",
+      "D": "繩狀體（restiform body）"
+    },
+    "answer": "A",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "小腦腳傳入傳出",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 108 年第二次醫師一階醫學（一）",
+    "sourceYear": 2019,
+    "sourceRound": 2,
+    "originalQuestionNumber": 11
+  },
+  {
+    "id": "MOEX-108100-1301-Q012",
+    "subject": "解剖學",
+    "chapter": "神經解剖",
+    "section": "脊髓傳導路徑",
+    "stem": "脊髓白質之外側束（lateral funiculus）含有下列何種神經傳導徑路？",
+    "options": {
+      "A": "背柱內側蹄系（dorsal column-medial lemniscus system）",
+      "B": "外側皮質脊髓徑（lateral corticospinal tract）",
+      "C": "前庭脊髓徑（vestibulospinal tract）",
+      "D": "四疊體脊髓徑（tectospinal tract）"
+    },
+    "answer": "B",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "背柱內側丘系統",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 108 年第二次醫師一階醫學（一）",
+    "sourceYear": 2019,
+    "sourceRound": 2,
+    "originalQuestionNumber": 12
+  },
+  {
+    "id": "MOEX-108100-1301-Q013",
+    "subject": "解剖學",
+    "chapter": "神經解剖",
+    "section": "小腦",
+    "stem": "精細觸覺主要由下列何種神經徑路傳導？",
+    "options": {
+      "A": "脊髓網狀徑（spinoreticular tract）",
+      "B": "背側脊髓小腦徑（dorsal spinocerebellar tract）",
+      "C": "背柱內側蹄系（dorsal column-medial lemniscus system）",
+      "D": "前外側系統（anterolateral system）"
+    },
+    "answer": "C",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "脊髓小腦功能",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 108 年第二次醫師一階醫學（一）",
+    "sourceYear": 2019,
+    "sourceRound": 2,
+    "originalQuestionNumber": 13
+  },
+  {
+    "id": "MOEX-108100-1301-Q014",
+    "subject": "解剖學",
+    "chapter": "神經解剖",
+    "section": "腦幹核區",
+    "stem": "下列何者出現在腦幹的interpeduncular fossa中？",
+    "options": {
+      "A": "滑車神經（trochlear nerve）",
+      "B": "動眼神經（oculomotor nerve）",
+      "C": "基底動脈（basilar artery）",
+      "D": "腦下垂體（pituitary gland）"
+    },
+    "answer": "B",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "腦幹核區｜出現在腦幹的interpeduncular ",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 108 年第二次醫師一階醫學（一）",
+    "sourceYear": 2019,
+    "sourceRound": 2,
+    "originalQuestionNumber": 14
+  },
+  {
+    "id": "MOEX-108100-1301-Q015",
+    "subject": "解剖學",
+    "chapter": "神經解剖",
+    "section": "腦幹核區",
+    "stem": "關於大腦皮質Brodmann area 4之敘述何者錯誤？",
+    "options": {
+      "A": "可發出皮質脊髓徑（corticospinal tract）",
+      "B": "含貝茲細胞（Betz cell）",
+      "C": "可接受丘腦腹外側核（ventral lateral nucleus of thalamus）傳入之訊息",
+      "D": "位於後中央迴（postcentral gyrus）"
+    },
+    "answer": "D",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "腦幹核區｜大腦皮質Brodmann area 4之敘述",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 108 年第二次醫師一階醫學（一）",
+    "sourceYear": 2019,
+    "sourceRound": 2,
+    "originalQuestionNumber": 15
+  },
+  {
+    "id": "MOEX-108100-1301-Q016",
+    "subject": "解剖學",
+    "chapter": "頭頸部",
+    "section": "顏面神經與三叉神經",
+    "stem": "三叉神經下頜支（mandibular division of trigeminal nerve）受損，最可能影響下列何者之收縮？",
+    "options": {
+      "A": "腭帆張肌（tensor veli palatini）",
+      "B": "腭帆提肌（levator veli palatini）",
+      "C": "腭咽肌（palatopharyngeus）",
+      "D": "腭舌肌（palatoglossus）"
+    },
+    "answer": "A",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "三叉神經感覺分支",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 108 年第二次醫師一階醫學（一）",
+    "sourceYear": 2019,
+    "sourceRound": 2,
+    "originalQuestionNumber": 16
+  },
+  {
+    "id": "MOEX-108100-1301-Q017",
+    "subject": "解剖學",
+    "chapter": "頭頸部",
+    "section": "咽喉解剖",
+    "stem": "下列那一肌肉是由喉外神經（external laryngeal nerve）支配？",
+    "options": {
+      "A": "後環杓肌（posterior cricoarytenoid muscle）",
+      "B": "外側環杓肌（lateral cricoarytenoid muscle）",
+      "C": "環甲肌（cricothyroid muscle）",
+      "D": "甲杓肌（thyroarytenoid muscle）"
+    },
+    "answer": "C",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "咽喉解剖｜下列那一肌肉是由喉外神經（external ",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 108 年第二次醫師一階醫學（一）",
+    "sourceYear": 2019,
+    "sourceRound": 2,
+    "originalQuestionNumber": 17
+  },
+  {
+    "id": "MOEX-108100-1301-Q018",
+    "subject": "解剖學",
+    "chapter": "頭頸部",
+    "section": "頸動脈鞘",
+    "stem": "下列那一硬腦膜靜脈竇（dural venous sinuses）的血液直接注入內頸靜脈（internal jugular vein）？",
+    "options": {
+      "A": "乙狀竇（sigmoid sinus）",
+      "B": "上岩竇（superior petrosal sinus）",
+      "C": "橫竇（transverse sinus）",
+      "D": "枕竇（occipital sinus）"
+    },
+    "answer": "A",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "頸動脈鞘｜下列那一硬腦膜靜脈竇（dural venou",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 108 年第二次醫師一階醫學（一）",
+    "sourceYear": 2019,
+    "sourceRound": 2,
+    "originalQuestionNumber": 18
+  },
+  {
+    "id": "MOEX-108100-1301-Q019",
+    "subject": "解剖學",
+    "chapter": "頭頸部",
+    "section": "顏面神經與三叉神經",
+    "stem": "下列何者不是甲狀頸幹（thyrocervical trunk）的分支？",
+    "options": {
+      "A": "深頸動脈（deep cervical artery）",
+      "B": "肩胛上動脈（suprascapular artery）",
+      "C": "橫頸動脈（transverse cervical artery）",
+      "D": "甲狀腺下動脈（inferior thyroid artery）"
+    },
+    "answer": "A",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "顏面神經與三叉神經｜不是甲狀頸幹（thyrocervical t",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 108 年第二次醫師一階醫學（一）",
+    "sourceYear": 2019,
+    "sourceRound": 2,
+    "originalQuestionNumber": 19
+  },
+  {
+    "id": "MOEX-108100-1301-Q020",
+    "subject": "解剖學",
+    "chapter": "胸腔",
+    "section": "心臟與冠狀動脈",
+    "stem": "房室結（AV node）最靠近下列何處？",
+    "options": {
+      "A": "節制帶（moderator band）",
+      "B": "下腔靜脈與右心房交界",
+      "C": "冠狀竇開口（opening of coronary sinus）",
+      "D": "界脊（crista terminalis）"
+    },
+    "answer": "C",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "心臟靜脈回流",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 108 年第二次醫師一階醫學（一）",
+    "sourceYear": 2019,
+    "sourceRound": 2,
+    "originalQuestionNumber": 20
+  },
+  {
+    "id": "MOEX-108100-1301-Q021",
+    "subject": "解剖學",
+    "chapter": "胸腔",
+    "section": "肺與胸膜",
+    "stem": "有關肺臟淋巴系統敘述，下列何者正確？",
+    "options": {
+      "A": "位於氣管分支交角下方之淋巴結稱為主動脈弓淋巴結（aortic arch node）",
+      "B": "右上肺葉淋巴匯入胸管（thoracic duct）",
+      "C": "肺臟淋巴管系統主要與肺動脈伴行",
+      "D": "左下肺葉淋巴匯入下氣管支氣管淋巴結（inferior tracheobronchial nodes）"
+    },
+    "answer": "D",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "肺門構造相對位置",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 108 年第二次醫師一階醫學（一）",
+    "sourceYear": 2019,
+    "sourceRound": 2,
+    "originalQuestionNumber": 21
+  },
+  {
+    "id": "MOEX-108100-1301-Q022",
+    "subject": "解剖學",
+    "chapter": "胸腔",
+    "section": "肺與胸膜",
+    "stem": "下列那一條肋間靜脈（intercostal vein），通常不匯入奇靜脈（azygos vein）系統？",
+    "options": {
+      "A": "左側第八肋間靜脈",
+      "B": "左側第一肋間靜脈",
+      "C": "右側第三肋間靜脈",
+      "D": "右側第十肋間靜脈"
+    },
+    "answer": "B",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "肺與胸膜｜下列那一條肋間靜脈（intercostal ",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 108 年第二次醫師一階醫學（一）",
+    "sourceYear": 2019,
+    "sourceRound": 2,
+    "originalQuestionNumber": 22
+  },
+  {
+    "id": "MOEX-108100-1301-Q023",
+    "subject": "解剖學",
+    "chapter": "胸腔",
+    "section": "縱膈",
+    "stem": "正常年輕男性直立解剖位置，體表標記（landmark）與體內構造之配對，下列何者正確？",
+    "options": {
+      "A": "頸靜脈切跡（jugular notch）水平面：C7椎骨",
+      "B": "胸骨角（sternal angle）水平面：T2椎骨",
+      "C": "劍胸關節（xiphisternal joint）水平面：T9椎骨",
+      "D": "男性乳頭：前方第6肋間"
+    },
+    "answer": "C",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "縱膈｜正常年輕男性直立解剖位置，體表標記（land",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 108 年第二次醫師一階醫學（一）",
+    "sourceYear": 2019,
+    "sourceRound": 2,
+    "originalQuestionNumber": 23
+  },
+  {
+    "id": "MOEX-108100-1301-Q024",
+    "subject": "解剖學",
+    "chapter": "胸腔",
+    "section": "心臟與冠狀動脈",
+    "stem": "下列心臟構造，何者由冠狀動脈供應血流？",
+    "options": {
+      "A": "心內膜（endocardium）",
+      "B": "心包膜外層（parietal layer of pericardium）",
+      "C": "心外膜（epicardium）",
+      "D": "心瓣膜"
+    },
+    "answer": "C",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "心臟與冠狀動脈｜下列心臟構造，何者由冠狀動脈供應血流",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 108 年第二次醫師一階醫學（一）",
+    "sourceYear": 2019,
+    "sourceRound": 2,
+    "originalQuestionNumber": 24
+  },
+  {
+    "id": "MOEX-108100-1301-Q025",
+    "subject": "解剖學",
+    "chapter": "腹部",
+    "section": "肝膽胰脾",
+    "stem": "十二指腸近幽門處潰瘍造成出血，可結紮下列那條血管以便止血？",
+    "options": {
+      "A": "肝總動脈（common heaptic artery）",
+      "B": "下胰十二指腸動脈（inferior pancreaticoduodenal artery）",
+      "C": "左胃動脈（left gastric artery）",
+      "D": "左胃網膜動脈（left gastroomental artery）"
+    },
+    "answer": "A",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "胰臟鄰近關係",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 108 年第二次醫師一階醫學（一）",
+    "sourceYear": 2019,
+    "sourceRound": 2,
+    "originalQuestionNumber": 25
+  },
+  {
+    "id": "MOEX-108100-1301-Q026",
+    "subject": "解剖學",
+    "chapter": "骨盆與會陰",
+    "section": "泌尿生殖",
+    "stem": "有關腹股溝管（inguinal canal）的敘述，下列何者正確？",
+    "options": {
+      "A": "男性腹股溝管通過精索（spermatic cord），女性通過卵巢韌帶（ligament of the ovary）",
+      "B": "胚胎期間，鞘突（vaginal process）只發生在男性個體",
+      "C": "發生在管內的疝氣，稱為直接型腹股溝疝氣（direct inguinal hernia）",
+      "D": "腹橫筋膜（transversalis fascia）圍成腹股溝管深環（deep inguinal ring）頂部的外側1/3"
+    },
+    "answer": "D",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "卵巢韌帶與懸韌帶",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 108 年第二次醫師一階醫學（一）",
+    "sourceYear": 2019,
+    "sourceRound": 2,
+    "originalQuestionNumber": 26
+  },
+  {
+    "id": "MOEX-108100-1301-Q027",
+    "subject": "解剖學",
+    "chapter": "骨盆與會陰",
+    "section": "會陰三角",
+    "stem": "當男性準備要射精時，下列何現象不會發生？",
+    "options": {
+      "A": "外尿道括約肌（external urethral sphincter）收縮",
+      "B": "前列腺（prostate gland）收縮",
+      "C": "輸精管（ductus deferens）收縮",
+      "D": "球尿道腺（bulbourethral gland）收縮"
+    },
+    "answer": "A",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "會陰三角｜當男性準備要射精時，下列何現象不會發生",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 108 年第二次醫師一階醫學（一）",
+    "sourceYear": 2019,
+    "sourceRound": 2,
+    "originalQuestionNumber": 27
+  },
+  {
+    "id": "MOEX-108100-1301-Q028",
+    "subject": "解剖學",
+    "chapter": "骨盆與會陰",
+    "section": "會陰三角",
+    "stem": "會陰體（perineal body）受傷後，下列何者的作用最可能不受影響？ ①球海綿體肌（bulbospongiosus muscle） ②會陰深橫肌（deep transverse perineal muscle） ③會陰淺橫肌（superficical transverse perineal muscle） ④坐骨海綿體肌（ischiocavernosus muscle） ⑤尿道外括約肌（external urethral sphincter muscle）",
+    "options": {
+      "A": "①③",
+      "B": "②④",
+      "C": "①⑤",
+      "D": "④⑤"
+    },
+    "answer": "D",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "會陰三角｜會陰體（perineal body）受傷後，",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 108 年第二次醫師一階醫學（一）",
+    "sourceYear": 2019,
+    "sourceRound": 2,
+    "originalQuestionNumber": 28
+  },
+  {
+    "id": "MOEX-108100-1301-Q029",
+    "subject": "解剖學",
+    "chapter": "下肢",
+    "section": "大腿前內後區",
+    "stem": "下列何者與內收長肌（adductor longus）由相同的神經支配？",
+    "options": {
+      "A": "股薄肌（gracilis）",
+      "B": "股方肌（quadratus femoris）",
+      "C": "恥骨肌（pectineus muscle）",
+      "D": "閉孔內肌（obturator internus）"
+    },
+    "answer": "A",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "大腿內收肌群",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 108 年第二次醫師一階醫學（一）",
+    "sourceYear": 2019,
+    "sourceRound": 2,
+    "originalQuestionNumber": 29
+  },
+  {
+    "id": "MOEX-108100-1301-Q030",
+    "subject": "解剖學",
+    "chapter": "上肢",
+    "section": "手部肌肉",
+    "stem": "當發生腕隧道症候群（carpal tunnel syndrome）時，手掌大拇指的那一條肌腱最可能受到影響？",
+    "options": {
+      "A": "伸拇指長肌（extensor pollicis longus）",
+      "B": "屈拇指長肌（flexor pollicis longus）",
+      "C": "外展拇指長肌（abductor pollicis longus）",
+      "D": "內收拇指肌（adductor pollicis）"
+    },
+    "answer": "B",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "腕隧道內容物",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 108 年第二次醫師一階醫學（一）",
+    "sourceYear": 2019,
+    "sourceRound": 2,
+    "originalQuestionNumber": 30
+  },
+  {
+    "id": "MOEX-108100-1301-Q033",
+    "subject": "解剖學",
+    "chapter": "胸腔",
+    "section": "橫膈",
+    "stem": "下列那一項構造，與橫膈（diaphragm）的組成無關？",
+    "options": {
+      "A": "橫中隔（septum transversum）",
+      "B": "胸腹膜（pleuroperitoneal membrane）",
+      "C": "食道背側繫膜（dorsal mesentery of esophagus）",
+      "D": "胸心包膜（pleuropericardial membrane）"
+    },
+    "answer": "D",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "橫膈｜下列那一項構造，與橫膈（diaphragm）",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 108 年第二次醫師一階醫學（一）",
+    "sourceYear": 2019,
+    "sourceRound": 2,
+    "originalQuestionNumber": 33
+  },
+  {
+    "id": "MOEX-108100-1301-Q034",
+    "subject": "解剖學",
+    "chapter": "腹部",
+    "section": "肝膽胰脾",
+    "stem": "下列關於十二指腸（duodenum）發育之敘述，何者正確？",
+    "options": {
+      "A": "全部由前腸（foregut）衍生而來",
+      "B": "十二指腸環（duodenal loop）連接卵黃柄（yolk stalk）",
+      "C": "隨著胃的旋轉，十二指腸環（duodenal loop）會旋轉至左側",
+      "D": "因上皮細胞增生而一度閉鎖（obliteration）"
+    },
+    "answer": "D",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "肝膽胰脾｜下列關於十二指腸（duodenum）發育之敘",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 108 年第二次醫師一階醫學（一）",
+    "sourceYear": 2019,
+    "sourceRound": 2,
+    "originalQuestionNumber": 34
+  },
+  {
+    "id": "MOEX-108100-1301-Q043",
+    "subject": "解剖學",
+    "chapter": "腹部",
+    "section": "肝膽胰脾",
+    "stem": "培亞氏斑（Peyer's patches）主要分布在下列何處？",
+    "options": {
+      "A": "直腸（rectum）",
+      "B": "空腸（jejunum）",
+      "C": "迴腸（ileum）",
+      "D": "十二指腸（duodenum）"
+    },
+    "answer": "C",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "肝膽胰脾｜培亞氏斑（Peyer's patches）主",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 108 年第二次醫師一階醫學（一）",
+    "sourceYear": 2019,
+    "sourceRound": 2,
+    "originalQuestionNumber": 43
+  },
+  {
+    "id": "MOEX-108100-1301-Q045",
+    "subject": "解剖學",
+    "chapter": "骨盆與會陰",
+    "section": "會陰三角",
+    "stem": "關於子宮壁（uterine wall）的敘述，下列何者正確？",
+    "options": {
+      "A": "只有子宮內膜（endometrium）會隨月經週期（menstrual cycle）改變",
+      "B": "子宮肌層（myometrium）具有二層平滑肌，外層（outer layer）最厚",
+      "C": "懷孕時，子宮肌層（myometrium）的平滑肌細胞會肥大（hypertrophy）和增生（hyperplasia）",
+      "D": "子宮頸（cervix）平滑肌的含量多於子宮體（uterine body）"
+    },
+    "answer": "C",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "會陰三角｜子宮壁（uterine wall）的敘述，下",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 108 年第二次醫師一階醫學（一）",
+    "sourceYear": 2019,
+    "sourceRound": 2,
+    "originalQuestionNumber": 45
+  },
+  {
+    "id": "MOEX-108100-1301-Q049",
+    "subject": "解剖學",
+    "chapter": "神經解剖",
+    "section": "腦幹核區",
+    "stem": "下列何者不參與瞳孔對光的反射作用？",
+    "options": {
+      "A": "midbrain",
+      "B": "ciliary ganglion",
+      "C": "Edinger-Westphal nucleus",
+      "D": "trigeminal nerve"
+    },
+    "answer": "D",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "動眼神經副核",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 108 年第二次醫師一階醫學（一）",
+    "sourceYear": 2019,
+    "sourceRound": 2,
+    "originalQuestionNumber": 49
+  },
+  {
+    "id": "MOEX-108100-1301-Q050",
+    "subject": "解剖學",
+    "chapter": "神經解剖",
+    "section": "腦神經",
+    "stem": "下列cranial nerves中，何者只含sensory fibers？",
+    "options": {
+      "A": "第II腦神經（optic nerve）",
+      "B": "第V腦神經（trigeminal nerve）",
+      "C": "第VII腦神經（facial nerve）",
+      "D": "第X腦神經（vagus nerve）"
+    },
+    "answer": "A",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "顏面神經功能與分支",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 108 年第二次醫師一階醫學（一）",
+    "sourceYear": 2019,
+    "sourceRound": 2,
+    "originalQuestionNumber": 50
+  },
+  {
+    "id": "MOEX-108100-1301-Q051",
+    "subject": "解剖學",
+    "chapter": "神經解剖",
+    "section": "腦幹核區",
+    "stem": "經由多次訓練與學習，投籃可以百發百中，與下列何腦區最為相關？",
+    "options": {
+      "A": "hippocampus",
+      "B": "basal ganglia",
+      "C": "substantia nigra",
+      "D": "cerebellum"
+    },
+    "answer": "D",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "腦幹核區｜經由多次訓練與學習，投籃可以百發百中，與下列",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 108 年第二次醫師一階醫學（一）",
+    "sourceYear": 2019,
+    "sourceRound": 2,
+    "originalQuestionNumber": 51
+  },
+  {
+    "id": "MOEX-108100-1301-Q052",
+    "subject": "解剖學",
+    "chapter": "神經解剖",
+    "section": "小腦",
+    "stem": "下列何處受損會導致病患出現動態顫抖（intention tremor）、動幅障礙（dysmetria）和姿勢不穩（unstable posture）等運動失調症狀？",
+    "options": {
+      "A": "大腦運動皮質區",
+      "B": "小腦",
+      "C": "基底核",
+      "D": "中腦"
+    },
+    "answer": "B",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "小腦半球病灶",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 108 年第二次醫師一階醫學（一）",
+    "sourceYear": 2019,
+    "sourceRound": 2,
+    "originalQuestionNumber": 52
+  },
+  {
+    "id": "MOEX-108100-1301-Q053",
+    "subject": "解剖學",
+    "chapter": "神經解剖",
+    "section": "腦幹核區",
+    "stem": "下運動神經元（lower motor neurons）的損傷會導致下列那一種疾病？",
+    "options": {
+      "A": "Parkinson’s disease",
+      "B": "Huntington’s disease",
+      "C": "amyotrophic lateral sclerosis",
+      "D": "myasthenia gravis"
+    },
+    "answer": "C",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "腦幹核區｜下運動神經元（lower motor neu",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 108 年第二次醫師一階醫學（一）",
+    "sourceYear": 2019,
+    "sourceRound": 2,
+    "originalQuestionNumber": 53
+  },
+  {
+    "id": "MOEX-108100-1301-Q057",
+    "subject": "解剖學",
+    "chapter": "胸腔",
+    "section": "縱膈",
+    "stem": "當人體突然大量失血，最不可能發生下列何種狀況？",
+    "options": {
+      "A": "動脈感壓受器放電頻率（arterial baroreceptor firing rate）增加",
+      "B": "支配靜脈的交感神經活性（sympathetic activity）增加",
+      "C": "支配心臟的副交感神經活性（parasympathetic activity）減少",
+      "D": "週邊血管總阻力（total peripheral resistance）增加"
+    },
+    "answer": "A",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "縱膈｜當人體突然大量失血，最不可能發生下列何種狀況",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 108 年第二次醫師一階醫學（一）",
+    "sourceYear": 2019,
+    "sourceRound": 2,
+    "originalQuestionNumber": 57
+  },
+  {
+    "id": "MOEX-108100-1301-Q060",
+    "subject": "解剖學",
+    "chapter": "胸腔",
+    "section": "肺與胸膜",
+    "stem": "氣體交換（gas exchange）可發生在下列那些位置？①支氣管（bronchi） ②肺泡（alveoli） ③末端細支 氣管（terminal bronchioles） ④呼吸性細支氣管（respiratory bronchioles）",
+    "options": {
+      "A": "僅①②",
+      "B": "僅②④",
+      "C": "僅②③④",
+      "D": "僅①③④"
+    },
+    "answer": "B",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "肺門構造相對位置",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 108 年第二次醫師一階醫學（一）",
+    "sourceYear": 2019,
+    "sourceRound": 2,
+    "originalQuestionNumber": 60
+  },
+  {
+    "id": "MOEX-108100-1301-Q062",
+    "subject": "解剖學",
+    "chapter": "胸腔",
+    "section": "肺與胸膜",
+    "stem": "張先生到醫院進行各項肺容積之測量，測量結果顯示總肺容量（total lung capacity）為5000毫升，肺餘容積 （residual volume）為300毫升，兩者之間的差值稱之為何？",
+    "options": {
+      "A": "肺活量（vital capacity）",
+      "B": "吸氣儲備容積（inspiratory reserve volume）",
+      "C": "潮氣容積（tidal volume）",
+      "D": "功能性肺餘容量（functional residual capacity）"
+    },
+    "answer": "A",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "肺與胸膜｜張先生到醫院進行各項肺容積之測量，測量結果顯",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 108 年第二次醫師一階醫學（一）",
+    "sourceYear": 2019,
+    "sourceRound": 2,
+    "originalQuestionNumber": 62
+  },
+  {
+    "id": "MOEX-108100-1301-Q063",
+    "subject": "解剖學",
+    "chapter": "骨盆與會陰",
+    "section": "會陰三角",
+    "stem": "下列何者參與排便反射？",
+    "options": {
+      "A": "直腸的壓力感覺受器傳達至黏膜下神經叢",
+      "B": "直腸平滑肌受腰椎神經釋放的epinephrine刺激",
+      "C": "外肛和內肛括約肌一起受腸神經釋放的nitric oxide刺激",
+      "D": "內肛括約肌受到副交感神經釋放的 acetylcholine 刺激"
+    },
+    "answer": "D",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "會陰三角｜參與排便反射",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 108 年第二次醫師一階醫學（一）",
+    "sourceYear": 2019,
+    "sourceRound": 2,
+    "originalQuestionNumber": 63
+  },
+  {
+    "id": "MOEX-108100-1301-Q064",
+    "subject": "解剖學",
+    "chapter": "腹部",
+    "section": "肝膽胰脾",
+    "stem": "胰蛋白酶（trypsin）不參與下列那種酵素的活化？",
+    "options": {
+      "A": "colipase",
+      "B": "carboxypeptidase B",
+      "C": "elastase",
+      "D": "deoxyribonuclease"
+    },
+    "answer": "D",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "胰臟鄰近關係",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 108 年第二次醫師一階醫學（一）",
+    "sourceYear": 2019,
+    "sourceRound": 2,
+    "originalQuestionNumber": 64
+  },
+  {
+    "id": "MOEX-108100-1301-Q071",
+    "subject": "解剖學",
+    "chapter": "骨盆與會陰",
+    "section": "會陰三角",
+    "stem": "催產素（oxytocin）的主要作用為何？",
+    "options": {
+      "A": "促進子宮鬆弛（uterine relaxation）",
+      "B": "促進排乳作用（milk ejection）",
+      "C": "抑制黃體分解（luteolysis）",
+      "D": "抑制前列腺素 F （PGF ）的分泌 2α 2α"
+    },
+    "answer": "B",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "會陰三角｜催產素（oxytocin）的主要作用為何",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 108 年第二次醫師一階醫學（一）",
+    "sourceYear": 2019,
+    "sourceRound": 2,
+    "originalQuestionNumber": 71
+  },
+  {
+    "id": "MOEX-109100-1301-Q001",
+    "subject": "解剖學",
+    "chapter": "神經解剖",
+    "section": "腦幹核區",
+    "stem": "有關中樞神經系統內下行徑路的敘述，下列何者錯誤？",
+    "options": {
+      "A": "前庭脊髓徑（vestibulospinal tract）主要支配軀幹與肢體之伸肌群（extensor muscle）",
+      "B": "網狀系統接受多方面傳入之訊息且發出網狀脊髓徑（reticulospinal tract）調控運動系統",
+      "C": "在人體，紅核脊髓徑（rubrospinal tract）支配上下肢之屈肌群",
+      "D": "腹側大腦皮質脊髓徑（ventral corticospinal tract）主要支配軀幹之肌群"
+    },
+    "answer": "C",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "腦幹核區｜中樞神經系統內下行徑路的敘述，下列何者錯誤",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 109 年第二次醫師一階醫學（一）",
+    "sourceYear": 2020,
+    "sourceRound": 2,
+    "originalQuestionNumber": 1
+  },
+  {
+    "id": "MOEX-109100-1301-Q002",
+    "subject": "解剖學",
+    "chapter": "骨盆與會陰",
+    "section": "會陰三角",
+    "stem": "有關內耳外淋巴（perilymph）的敘述，下列何者錯誤？",
+    "options": {
+      "A": "存在於連接圓窗（round window）與卵圓窗（oval window）間的管道",
+      "B": "存於耳蝸的前庭階（scala vestibuli）內",
+      "C": "與蛛網膜下腔（subarachnoid space）相交通",
+      "D": "存於膜性迷路（membranous labyrinth）內"
+    },
+    "answer": "D",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "會陰三角｜內耳外淋巴（perilymph）的敘述，下列",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 109 年第二次醫師一階醫學（一）",
+    "sourceYear": 2020,
+    "sourceRound": 2,
+    "originalQuestionNumber": 2
+  },
+  {
+    "id": "MOEX-109100-1301-Q003",
+    "subject": "解剖學",
+    "chapter": "頭頸部",
+    "section": "頸動脈鞘",
+    "stem": "有關內頸動脈（internal carotid artery）的敘述，下列何者錯誤？",
+    "options": {
+      "A": "起源於總頸動脈",
+      "B": "在頸部它走於內頸靜脈的內側",
+      "C": "於破裂孔（foramen lacerum）處轉向後方進入顱腔",
+      "D": "與外旋神經（abducent nerve）共同穿過海綿竇（cavernous sinus）"
+    },
+    "answer": "C",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "頸動脈鞘｜內頸動脈（internal carotid ",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 109 年第二次醫師一階醫學（一）",
+    "sourceYear": 2020,
+    "sourceRound": 2,
+    "originalQuestionNumber": 3
+  },
+  {
+    "id": "MOEX-109100-1301-Q005",
+    "subject": "解剖學",
+    "chapter": "腹部",
+    "section": "肝膽胰脾",
+    "stem": "消化道管壁內，有縱走皺摺的是：",
+    "options": {
+      "A": "食道",
+      "B": "胃",
+      "C": "空腸",
+      "D": "橫結腸"
+    },
+    "answer": "B",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "肝膽胰脾｜消化道管壁內，有縱走皺摺的是：",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 109 年第二次醫師一階醫學（一）",
+    "sourceYear": 2020,
+    "sourceRound": 2,
+    "originalQuestionNumber": 5
+  },
+  {
+    "id": "MOEX-109100-1301-Q006",
+    "subject": "解剖學",
+    "chapter": "下肢",
+    "section": "腰薦神經叢",
+    "stem": "下列何者支配提睪肌（cremasteric muscle）？",
+    "options": {
+      "A": "髂腹下神經（iliohypogastric nerve）",
+      "B": "髂腹股溝神經（ilioinguinal nerve）",
+      "C": "生殖股神經（genitofemoral nerve）",
+      "D": "閉孔神經（obturator nerve）"
+    },
+    "answer": "C",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "閉孔神經支配",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 109 年第二次醫師一階醫學（一）",
+    "sourceYear": 2020,
+    "sourceRound": 2,
+    "originalQuestionNumber": 6
+  },
+  {
+    "id": "MOEX-109100-1301-Q007",
+    "subject": "解剖學",
+    "chapter": "骨盆與會陰",
+    "section": "會陰三角",
+    "stem": "膀胱下動脈（inferior vesical artery）發生阻塞，下列何者最不可能受影響？",
+    "options": {
+      "A": "膀胱",
+      "B": "直腸",
+      "C": "儲精囊",
+      "D": "輸精管"
+    },
+    "answer": "B",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "會陰三角｜膀胱下動脈（inferior vesical",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 109 年第二次醫師一階醫學（一）",
+    "sourceYear": 2020,
+    "sourceRound": 2,
+    "originalQuestionNumber": 7
+  },
+  {
+    "id": "MOEX-109100-1301-Q008",
+    "subject": "解剖學",
+    "chapter": "骨盆與會陰",
+    "section": "直腸與肛管",
+    "stem": "直腸梳狀線（pectinate line）下方之淋巴，最常直接匯流至下列何處？",
+    "options": {
+      "A": "髂內淋巴結（internal iliac lymph nodes）",
+      "B": "髂外淋巴結（external iliac lymph nodes）",
+      "C": "腹股溝淺淋巴結（superficial inguinal lymph nodes）",
+      "D": "腰淋巴結（lumbar lymph nodes）"
+    },
+    "answer": "C",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "直腸與肛管｜直腸梳狀線（pectinate line）下",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 109 年第二次醫師一階醫學（一）",
+    "sourceYear": 2020,
+    "sourceRound": 2,
+    "originalQuestionNumber": 8
+  },
+  {
+    "id": "MOEX-109100-1301-Q010",
+    "subject": "解剖學",
+    "chapter": "腹部",
+    "section": "腹膜關係",
+    "stem": "下列何者不是腹膜的衍生物？",
+    "options": {
+      "A": "白膜（tunica albuginea）",
+      "B": "鞘膜（tunica vaginalis）",
+      "C": "闊韌帶（broad ligament）",
+      "D": "懸韌帶（suspensory ligament）"
+    },
+    "answer": "A",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "腹膜腔分區",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 109 年第二次醫師一階醫學（一）",
+    "sourceYear": 2020,
+    "sourceRound": 2,
+    "originalQuestionNumber": 10
+  },
+  {
+    "id": "MOEX-109100-1301-Q011",
+    "subject": "解剖學",
+    "chapter": "骨盆與會陰",
+    "section": "泌尿生殖",
+    "stem": "下列何者是直接連接子宮與卵巢的支持構造？",
+    "options": {
+      "A": "卵巢繫膜（ovarian mesovarium）",
+      "B": "卵巢韌帶（ovarian ligament）",
+      "C": "子宮圓韌帶（round ligament of the uterus）",
+      "D": "輸卵管繫膜（mesosalpinx）"
+    },
+    "answer": "B",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "卵巢韌帶與懸韌帶",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 109 年第二次醫師一階醫學（一）",
+    "sourceYear": 2020,
+    "sourceRound": 2,
+    "originalQuestionNumber": 11
+  },
+  {
+    "id": "MOEX-109100-1301-Q012",
+    "subject": "解剖學",
+    "chapter": "上肢",
+    "section": "前臂屈伸肌",
+    "stem": "下列前臂（forearm）的肌肉中，那一塊附著在手腕的豆狀骨（pisiform bone）上？",
+    "options": {
+      "A": "旋前圓肌（pronator teres）",
+      "B": "橈側屈腕肌（flexor carpi radialis）",
+      "C": "掌長肌（palmaris longus）",
+      "D": "尺側屈腕肌（flexor carpi ulnaris）"
+    },
+    "answer": "D",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "前臂屈伸肌｜下列前臂（forearm）的肌肉中，那一塊附",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 109 年第二次醫師一階醫學（一）",
+    "sourceYear": 2020,
+    "sourceRound": 2,
+    "originalQuestionNumber": 12
+  },
+  {
+    "id": "MOEX-109100-1301-Q013",
+    "subject": "解剖學",
+    "chapter": "胸腔",
+    "section": "縱膈",
+    "stem": "有關頸椎關節的敘述，下列何者正確？",
+    "options": {
+      "A": "寰枕關節（atlanto-occipital joint）主要提供頭部左右轉動",
+      "B": "翼韌帶（alar ligament）主要連結樞椎（axis）的齒突（dens）與寰椎（atlas）",
+      "C": "樞椎的齒突主要與寰椎前結節（anterior tubercle）的後表面形成關節",
+      "D": "橫突（transverse process）上有肋關節面（costal facet）"
+    },
+    "answer": "C",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "縱膈｜頸椎關節的敘述，下列何者正確",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 109 年第二次醫師一階醫學（一）",
+    "sourceYear": 2020,
+    "sourceRound": 2,
+    "originalQuestionNumber": 13
+  },
+  {
+    "id": "MOEX-109100-1301-Q014",
+    "subject": "解剖學",
+    "chapter": "神經解剖",
+    "section": "腦幹核區",
+    "stem": "胼胝體（corpus callosum）的主要血流供給來自下列何動脈？",
+    "options": {
+      "A": "大腦前動脈（anterior cerebral artery）",
+      "B": "大腦中動脈（middle cerebral artery）",
+      "C": "前脈絡叢動脈（anterior choroid artery）",
+      "D": "豆紋動脈 (lenticulostriate artery)"
+    },
+    "answer": "A",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "腦幹核區｜胼胝體（corpus callosum）的主",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 109 年第二次醫師一階醫學（一）",
+    "sourceYear": 2020,
+    "sourceRound": 2,
+    "originalQuestionNumber": 14
+  },
+  {
+    "id": "MOEX-109100-1301-Q015",
+    "subject": "解剖學",
+    "chapter": "神經解剖",
+    "section": "小腦",
+    "stem": "下列何種神經傳導徑路，通過脊髓白質腹側聯合（ventral white commissure）？",
+    "options": {
+      "A": "脊髓丘腦徑（spinothalamic tract）",
+      "B": "背側脊髓小腦徑（dorsal spinocerebellar tract）",
+      "C": "網狀脊髓徑（reticulospinal tract）",
+      "D": "紅核脊髓徑（rubrospinal tract）"
+    },
+    "answer": "A",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "脊髓小腦功能",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 109 年第二次醫師一階醫學（一）",
+    "sourceYear": 2020,
+    "sourceRound": 2,
+    "originalQuestionNumber": 15
+  },
+  {
+    "id": "MOEX-109100-1301-Q016",
+    "subject": "解剖學",
+    "chapter": "神經解剖",
+    "section": "腦幹核區",
+    "stem": "下列何構造不屬於外側嗅覺區（lateral olfactory area）？",
+    "options": {
+      "A": "前隔區（septal area）",
+      "B": "鉤迴 （uncus）",
+      "C": "內鼻皮質（entorhinal cortex）",
+      "D": "杏仁核（amygdala）"
+    },
+    "answer": "A",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "腦幹核區｜下列何構造不屬於外側嗅覺區（lateral ",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 109 年第二次醫師一階醫學（一）",
+    "sourceYear": 2020,
+    "sourceRound": 2,
+    "originalQuestionNumber": 16
+  },
+  {
+    "id": "MOEX-109100-1301-Q017",
+    "subject": "解剖學",
+    "chapter": "神經解剖",
+    "section": "腦幹核區",
+    "stem": "關於孤立束核（solitary nucleus）之敘述 ，下列何者錯誤？",
+    "options": {
+      "A": "可接受味覺的感覺訊息",
+      "B": "可接受一般內臟感覺訊息",
+      "C": "含有副交感神經節前神經元（parasympathic preganglionic neuron）",
+      "D": "位於延髓（medulla oblongata）"
+    },
+    "answer": "C",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "腦幹核區｜孤立束核（solitary nucleus）",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 109 年第二次醫師一階醫學（一）",
+    "sourceYear": 2020,
+    "sourceRound": 2,
+    "originalQuestionNumber": 17
+  },
+  {
+    "id": "MOEX-109100-1301-Q018",
+    "subject": "解剖學",
+    "chapter": "神經解剖",
+    "section": "腦幹核區",
+    "stem": "大腦初級視覺皮質（primary visual cortex）之主要血流來自何處？",
+    "options": {
+      "A": "大腦後動脈（posterior cerebral artery）",
+      "B": "大腦前動脈（anterior cerebral artery）",
+      "C": "大腦中動脈（middle cerebral artery）",
+      "D": "後交通動脈（posterior communicating artery）"
+    },
+    "answer": "A",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "腦幹核區｜大腦初級視覺皮質（primary visua",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 109 年第二次醫師一階醫學（一）",
+    "sourceYear": 2020,
+    "sourceRound": 2,
+    "originalQuestionNumber": 18
+  },
+  {
+    "id": "MOEX-109100-1301-Q019",
+    "subject": "解剖學",
+    "chapter": "頭頸部",
+    "section": "咽喉解剖",
+    "stem": "腭扁桃腺（palatine tonsil）的血液供應，主要來自下列何者的分支？",
+    "options": {
+      "A": "顏面動脈（facial artery）",
+      "B": "下齒槽動脈（inferior alveolar artery）",
+      "C": "舌動脈（lingual artery）",
+      "D": "上頜動脈（maxillary artery）"
+    },
+    "answer": "A",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "咽喉解剖｜腭扁桃腺（palatine tonsil）的",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 109 年第二次醫師一階醫學（一）",
+    "sourceYear": 2020,
+    "sourceRound": 2,
+    "originalQuestionNumber": 19
+  },
+  {
+    "id": "MOEX-109100-1301-Q020",
+    "subject": "解剖學",
+    "chapter": "頭頸部",
+    "section": "咽喉解剖",
+    "stem": "關於梨狀窩（piriform fossa）之敘述，下列何者正確？",
+    "options": {
+      "A": "位於口咽（oropharynx）的黏膜凹窩（mucosal recess）",
+      "B": "位於舌基部（base of tongue）與會厭（epiglottis）之間",
+      "C": "其黏膜深層有喉外神經（external laryngeal nerve）走過",
+      "D": "梨狀窩與喉入口（laryngeal inlet）之間隔著杓狀會厭皺襞（aryepiglottic fold）"
+    },
+    "answer": "D",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "咽喉解剖｜梨狀窩（piriform fossa）之敘述",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 109 年第二次醫師一階醫學（一）",
+    "sourceYear": 2020,
+    "sourceRound": 2,
+    "originalQuestionNumber": 20
+  },
+  {
+    "id": "MOEX-109100-1301-Q021",
+    "subject": "解剖學",
+    "chapter": "頭頸部",
+    "section": "顏面神經與三叉神經",
+    "stem": "橫顏面動脈（transverse facial artery）是下列那一動脈的分支？",
+    "options": {
+      "A": "顏面動脈（facial artery）",
+      "B": "上頜動脈（maxillary artery）",
+      "C": "頰動脈（buccal artery）",
+      "D": "淺顳動脈（superficial temporal artery）"
+    },
+    "answer": "D",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "顏面神經與三叉神經｜橫顏面動脈（transverse facia",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 109 年第二次醫師一階醫學（一）",
+    "sourceYear": 2020,
+    "sourceRound": 2,
+    "originalQuestionNumber": 21
+  },
+  {
+    "id": "MOEX-109100-1301-Q022",
+    "subject": "解剖學",
+    "chapter": "胸腔",
+    "section": "心臟與冠狀動脈",
+    "stem": "下列何者與心臟纖維骨架（fibrous skeleton）的功能，最不相關？",
+    "options": {
+      "A": "提供瓣膜附著處",
+      "B": "使心房心室不同時收縮",
+      "C": "冠狀動脈供血區域之分界線",
+      "D": "使瓣膜出口不會隨血流量改變而過分擴張"
+    },
+    "answer": "C",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "心臟與冠狀動脈｜心臟纖維骨架（fibrous skeleto",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 109 年第二次醫師一階醫學（一）",
+    "sourceYear": 2020,
+    "sourceRound": 2,
+    "originalQuestionNumber": 22
+  },
+  {
+    "id": "MOEX-109100-1301-Q023",
+    "subject": "解剖學",
+    "chapter": "胸腔",
+    "section": "肺與胸膜",
+    "stem": "下列何種情形通常不會導致肺塌陷（atelectasis）？",
+    "options": {
+      "A": "氣胸（pneumothorax）",
+      "B": "肋膜積液（pleural effusion）",
+      "C": "肺栓塞（pulmonary thrombosis）",
+      "D": "支氣管阻塞（bronchial obstruction）"
+    },
+    "answer": "C",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "肺門構造相對位置",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 109 年第二次醫師一階醫學（一）",
+    "sourceYear": 2020,
+    "sourceRound": 2,
+    "originalQuestionNumber": 23
+  },
+  {
+    "id": "MOEX-109100-1301-Q024",
+    "subject": "解剖學",
+    "chapter": "胸腔",
+    "section": "縱膈",
+    "stem": "內胸動脈（internal thoracic artery）走在：",
+    "options": {
+      "A": "壁層肋膜（parietal pleura）內側",
+      "B": "壁層肋膜（parietal pleura）與胸橫肌（transversus thoracis）之間",
+      "C": "胸橫肌（transversus thoracis）與肋軟骨之間",
+      "D": "胸骨正下方"
+    },
+    "answer": "C",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "縱膈｜內胸動脈（internal thoracic",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 109 年第二次醫師一階醫學（一）",
+    "sourceYear": 2020,
+    "sourceRound": 2,
+    "originalQuestionNumber": 24
+  },
+  {
+    "id": "MOEX-109100-1301-Q025",
+    "subject": "解剖學",
+    "chapter": "胸腔",
+    "section": "縱膈",
+    "stem": "有關關節的敘述，下列何者正確？",
+    "options": {
+      "A": "椎間關節（intervertebral joint）屬滑液關節（synovial joint）",
+      "B": "第一胸肋關節（sternocostal joint）屬滑液關節（synovial joint）",
+      "C": "第二到第七胸肋關節（sternocostal joint）屬軟骨關節（cartilaginous joint）",
+      "D": "胸鎖關節（sternoclavicular joint）屬滑液關節（synovial joint）"
+    },
+    "answer": "D",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "縱膈｜關節的敘述，下列何者正確",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 109 年第二次醫師一階醫學（一）",
+    "sourceYear": 2020,
+    "sourceRound": 2,
+    "originalQuestionNumber": 25
+  },
+  {
+    "id": "MOEX-109100-1301-Q026",
+    "subject": "解剖學",
+    "chapter": "胸腔",
+    "section": "肺與胸膜",
+    "stem": "有關肋間隙（intercostal space）之敘述，下列何者正確？",
+    "options": {
+      "A": "第五肋間是指介於第四及第五肋骨間的間隙",
+      "B": "共有11個肋間隙",
+      "C": "長胸神經（long thoracic nerve）的分支穿入肋間",
+      "D": "肋間神經（intercostal nerve）走在外肋間肌（external intercostal muscle）與內肋間肌（internal intercostal muscle）之間"
+    },
+    "answer": "B",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "肺與胸膜｜肋間隙（intercostal space）",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 109 年第二次醫師一階醫學（一）",
+    "sourceYear": 2020,
+    "sourceRound": 2,
+    "originalQuestionNumber": 26
+  },
+  {
+    "id": "MOEX-109100-1301-Q027",
+    "subject": "解剖學",
+    "chapter": "下肢",
+    "section": "腰薦神經叢",
+    "stem": "下列何者穿過外側弓狀韌帶（lateral arcuate ligament）下方後，支配前外側腹壁的皮膚？",
+    "options": {
+      "A": "肋下神經（subcostal nerve）",
+      "B": "髂腹股溝神經（iliohypogastric nerve）",
+      "C": "閉孔神經（obturator nerve）",
+      "D": "股神經（femoral nerve）"
+    },
+    "answer": "A",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "閉孔神經支配",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 109 年第二次醫師一階醫學（一）",
+    "sourceYear": 2020,
+    "sourceRound": 2,
+    "originalQuestionNumber": 27
+  },
+  {
+    "id": "MOEX-109100-1301-Q028",
+    "subject": "解剖學",
+    "chapter": "骨盆與會陰",
+    "section": "會陰三角",
+    "stem": "下列何處是女性骨盆腔最低的地方？",
+    "options": {
+      "A": "腹壁膀胱陷凹（abdominovesical pouch）",
+      "B": "直腸膀胱陷凹（rectovesical pouch）",
+      "C": "直腸子宮陷凹（rectouterine pouch）",
+      "D": "子宮膀胱陷凹（uterovesical pouch）"
+    },
+    "answer": "C",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "會陰三角｜下列何處是女性骨盆腔最低的地方",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 109 年第二次醫師一階醫學（一）",
+    "sourceYear": 2020,
+    "sourceRound": 2,
+    "originalQuestionNumber": 28
+  },
+  {
+    "id": "MOEX-109100-1301-Q029",
+    "subject": "解剖學",
+    "chapter": "骨盆與會陰",
+    "section": "會陰三角",
+    "stem": "下列何者不附著在坐骨粗隆（ischial tuberosity）？",
+    "options": {
+      "A": "半腱肌（semitendinosus）",
+      "B": "半膜肌（semimembranosus）",
+      "C": "股二頭肌長頭（long head of biceps femoris）",
+      "D": "股二頭肌短頭（short head of biceps femoris）"
+    },
+    "answer": "D",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "會陰三角｜不附著在坐骨粗隆（ischial tuber",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 109 年第二次醫師一階醫學（一）",
+    "sourceYear": 2020,
+    "sourceRound": 2,
+    "originalQuestionNumber": 29
+  },
+  {
+    "id": "MOEX-109100-1301-Q030",
+    "subject": "解剖學",
+    "chapter": "胸腔",
+    "section": "縱膈",
+    "stem": "網球肘（tennis elbow）與高爾夫球肘（golfer's elbow）最常感覺到疼痛的部位，分別是在那一個位置？",
+    "options": {
+      "A": "前者在冠狀窩（coronoid fossa），後者在鷹嘴窩（olecranon fossa）",
+      "B": "前者在鷹嘴窩（olecranon fossa），後者在冠狀窩（coronoid fossa）",
+      "C": "前者在內上髁（medial epicondyle），後者在外上髁（lateral epicondyle）",
+      "D": "前者在外上髁（lateral epicondyle），後者在內上髁（medial epicondyle）"
+    },
+    "answer": "D",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "縱膈｜網球肘（tennis elbow）與高爾夫球",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 109 年第二次醫師一階醫學（一）",
+    "sourceYear": 2020,
+    "sourceRound": 2,
+    "originalQuestionNumber": 30
+  },
+  {
+    "id": "MOEX-109100-1301-Q033",
+    "subject": "解剖學",
+    "chapter": "腹部",
+    "section": "胃腸道血管",
+    "stem": "中腸環（midgut loop）的旋轉，以下列何者為軸心？",
+    "options": {
+      "A": "卵黃柄（yolk stalk）",
+      "B": "腹腔動脈（celiac artery）",
+      "C": "腸繫膜上動脈（superior mesenteric artery）",
+      "D": "腸繫膜下動脈（inferior mesenteric artery）"
+    },
+    "answer": "C",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "前腸血供",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 109 年第二次醫師一階醫學（一）",
+    "sourceYear": 2020,
+    "sourceRound": 2,
+    "originalQuestionNumber": 33
+  },
+  {
+    "id": "MOEX-109100-1301-Q034",
+    "subject": "解剖學",
+    "chapter": "腹部",
+    "section": "腎臟與後腹腔",
+    "stem": "下列何種構造不是由中腎管（mesonephric duct）衍生而成？",
+    "options": {
+      "A": "睪丸網（rete testis）",
+      "B": "副睪（epididymis）",
+      "C": "輸精管（ductus deferens）",
+      "D": "精囊（seminal vesicle）"
+    },
+    "answer": "A",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "腎臟後腹膜關係",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 109 年第二次醫師一階醫學（一）",
+    "sourceYear": 2020,
+    "sourceRound": 2,
+    "originalQuestionNumber": 34
+  },
+  {
+    "id": "MOEX-109100-1301-Q043",
+    "subject": "解剖學",
+    "chapter": "腹部",
+    "section": "肝膽胰脾",
+    "stem": "下列何者位於肌外層（muscularis externa）調節腸蠕動（peristalsis）？",
+    "options": {
+      "A": "梅斯納氏小體（Meissner's corpuscle）",
+      "B": "梅斯納氏神經叢（Meissner's plexus）",
+      "C": "歐巴氏神經叢（Auerbach's plexus）",
+      "D": "蒲金氏纖維（Purkinje fiber）"
+    },
+    "answer": "C",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "肝膽胰脾｜位於肌外層（muscularis exter",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 109 年第二次醫師一階醫學（一）",
+    "sourceYear": 2020,
+    "sourceRound": 2,
+    "originalQuestionNumber": 43
+  },
+  {
+    "id": "MOEX-109100-1301-Q044",
+    "subject": "解剖學",
+    "chapter": "腹部",
+    "section": "腹膜關係",
+    "stem": "下列那一構造位於腎髓質（renal medulla）？",
+    "options": {
+      "A": "遠曲小管（distal convoluted tubule）",
+      "B": "緻密斑（macula densa）",
+      "C": "亨利氏環的細段（thin limb of loop of Henle）",
+      "D": "腎小體（renal corpuscle）"
+    },
+    "answer": "C",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "腹膜關係｜下列那一構造位於腎髓質（renal medu",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 109 年第二次醫師一階醫學（一）",
+    "sourceYear": 2020,
+    "sourceRound": 2,
+    "originalQuestionNumber": 44
+  },
+  {
+    "id": "MOEX-109100-1301-Q046",
+    "subject": "解剖學",
+    "chapter": "骨盆與會陰",
+    "section": "會陰三角",
+    "stem": "下列關於睪丸支持細胞（Sertoli cell）的敘述，何者正確？",
+    "options": {
+      "A": "在青春期之後具有複製能力",
+      "B": "主要藉由黏連接合（adherens junction）形成睪丸支持細胞間接合複合體（Sertoli cell-to-Sertoli cell junctional complex）",
+      "C": "可形成血睪障壁（blood-testis barrier）",
+      "D": "僅具有外分泌（exocrine）功能"
+    },
+    "answer": "C",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "會陰三角｜下列關於睪丸支持細胞（Sertoli cel",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 109 年第二次醫師一階醫學（一）",
+    "sourceYear": 2020,
+    "sourceRound": 2,
+    "originalQuestionNumber": 46
+  },
+  {
+    "id": "MOEX-109100-1301-Q048",
+    "subject": "解剖學",
+    "chapter": "神經解剖",
+    "section": "腦幹核區",
+    "stem": "下列有關大腦皮質對語言功能調控的敘述，何者最恰當？",
+    "options": {
+      "A": "弓狀束（arcuate fasciculus）受損會導致傳導性失語症（conduction aphasia）",
+      "B": "Broca’s area受損的病人，可能展現流利的口語能力，但語言內容卻無意義",
+      "C": "慣用右手的人，他的Wernicke’s area一般也都在右大腦皮質",
+      "D": "語言皮質都位於大腦的頂葉（parietal lobe）"
+    },
+    "answer": "A",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "腦幹核區｜下列有關大腦皮質對語言功能調控的敘述，何者最",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 109 年第二次醫師一階醫學（一）",
+    "sourceYear": 2020,
+    "sourceRound": 2,
+    "originalQuestionNumber": 48
+  },
+  {
+    "id": "MOEX-109100-1301-Q051",
+    "subject": "解剖學",
+    "chapter": "神經解剖",
+    "section": "腦幹核區",
+    "stem": "梅尼爾氏症候群出現眩暈感（vertigo）的症狀，最可能是因為下列何處受到異常刺激？",
+    "options": {
+      "A": "內耳",
+      "B": "聽覺皮質",
+      "C": "小腦",
+      "D": "視神經交叉"
+    },
+    "answer": "A",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "腦幹核區｜梅尼爾氏症候群出現眩暈感（vertigo）的",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 109 年第二次醫師一階醫學（一）",
+    "sourceYear": 2020,
+    "sourceRound": 2,
+    "originalQuestionNumber": 51
+  },
+  {
+    "id": "MOEX-109100-1301-Q053",
+    "subject": "解剖學",
+    "chapter": "神經解剖",
+    "section": "腦幹核區",
+    "stem": "在升降梯加速與減速時，負責偵測身體之垂直位移，並引起適當反射以保持平衡之主要結構為何？",
+    "options": {
+      "A": "utricle",
+      "B": "saccule",
+      "C": "semicircular ducts",
+      "D": "cochlea"
+    },
+    "answer": "B",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "腦幹核區｜在升降梯加速與減速時，負責偵測身體之垂直位移",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 109 年第二次醫師一階醫學（一）",
+    "sourceYear": 2020,
+    "sourceRound": 2,
+    "originalQuestionNumber": 53
+  },
+  {
+    "id": "MOEX-109100-1301-Q055",
+    "subject": "解剖學",
+    "chapter": "腹部",
+    "section": "肝膽胰脾",
+    "stem": "下列那一種疾病起因於缺少菸鹼酸膽鹼型受器（nicotinic cholinergic receptor），並可以用乙醯膽鹼分解酶抑 制劑（acetylcholinesterase inhibitor）加以治療？",
+    "options": {
+      "A": "muscle cramps",
+      "B": "hypocalcemic tetany",
+      "C": "muscular dystrophy",
+      "D": "myasthenia gravis"
+    },
+    "answer": "D",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "肝膽胰脾｜下列那一種疾病起因於缺少菸鹼酸膽鹼型受器（n",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 109 年第二次醫師一階醫學（一）",
+    "sourceYear": 2020,
+    "sourceRound": 2,
+    "originalQuestionNumber": 55
+  },
+  {
+    "id": "MOEX-109100-1301-Q060",
+    "subject": "解剖學",
+    "chapter": "胸腔",
+    "section": "肺與胸膜",
+    "stem": "下列有關肺部界面活性劑（surfactant）之敘述，何者錯誤？",
+    "options": {
+      "A": "為第二型肺泡細胞（type II alveolar cells）所分泌",
+      "B": "其缺乏時，肺泡不易擴張",
+      "C": "可增加肺順應性（lung compliance）",
+      "D": "可增加肺泡的表面張力（surface tension）"
+    },
+    "answer": "D",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "肺與胸膜｜下列有關肺部界面活性劑（surfactant",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 109 年第二次醫師一階醫學（一）",
+    "sourceYear": 2020,
+    "sourceRound": 2,
+    "originalQuestionNumber": 60
+  },
+  {
+    "id": "MOEX-109100-1301-Q061",
+    "subject": "解剖學",
+    "chapter": "胸腔",
+    "section": "縱膈",
+    "stem": "居住於平地的居民，登上3000公尺的高山並待了七天，下列何種生理變化最不可能發生？",
+    "options": {
+      "A": "血比容（hematocrit）增加",
+      "B": "動脈氧分壓（PaO ）下降 2",
+      "C": "動脈二氧化碳分壓（PaCO ） 增加 2",
+      "D": "肺泡通氣量（alveolar ventilation）增加"
+    },
+    "answer": "C",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "縱膈｜居住於平地的居民，登上3000公尺的高山並待",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 109 年第二次醫師一階醫學（一）",
+    "sourceYear": 2020,
+    "sourceRound": 2,
+    "originalQuestionNumber": 61
+  },
+  {
+    "id": "MOEX-109100-1301-Q065",
+    "subject": "解剖學",
+    "chapter": "腹部",
+    "section": "腹膜關係",
+    "stem": "正常情況下，下列那一段腎小管對水分的通透性（permeability）最大？",
+    "options": {
+      "A": "亨利氏彎管的細下降枝（thin descending limb）",
+      "B": "亨利氏彎管的細上升枝（thin ascending limb）",
+      "C": "亨利氏彎管的粗上升枝（thick ascending limb）",
+      "D": "集尿管（collecting duct）的髓質部（inner medullary portion）"
+    },
+    "answer": "A",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "腹膜關係｜正常情況下，下列那一段腎小管對水分的通透性（",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 109 年第二次醫師一階醫學（一）",
+    "sourceYear": 2020,
+    "sourceRound": 2,
+    "originalQuestionNumber": 65
+  },
+  {
+    "id": "MOEX-109100-1301-Q067",
+    "subject": "解剖學",
+    "chapter": "腹部",
+    "section": "腹膜關係",
+    "stem": "將雄鼠之腦下垂體前葉（anterior pituitary）移植到另一隻雄鼠之腎臟包膜（renal capsule）內，數週後移植的 腦下垂體前葉生長情況良好，則接受移植之雄鼠其血中激素與沒接受移植之雄性對照鼠的比較，其變化之情 形最接近下列何者？（FSH：follicle stimulating hormone；LH：luteinizing hormone；TSH：thyroid-stimulating hormone；PRL：prolactin；↑：明顯增加；-：幾乎不變）",
+    "options": {
+      "A": "FSH↑；LH↑；TSH↑；PRL↑",
+      "B": "FSH-；LH-；TSH-；PRL-",
+      "C": "FSH↑；LH↑；TSH-；PRL-",
+      "D": "FSH-；LH-；TSH-；PRL↑"
+    },
+    "answer": "D",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "腹膜關係｜將雄鼠之腦下垂體前葉（anterior pi",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 109 年第二次醫師一階醫學（一）",
+    "sourceYear": 2020,
+    "sourceRound": 2,
+    "originalQuestionNumber": 67
+  },
+  {
+    "id": "MOEX-109100-1301-Q070",
+    "subject": "解剖學",
+    "chapter": "骨盆與會陰",
+    "section": "會陰三角",
+    "stem": "下列何者與男性生殖器官的形成最不相關？",
+    "options": {
+      "A": "濾泡促素（FSH）",
+      "B": "染色體Y",
+      "C": "雄性素（androgen）",
+      "D": "Müllerian-inhibiting substance"
+    },
+    "answer": "A",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "會陰三角｜男性生殖器官的形成最不相關",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 109 年第二次醫師一階醫學（一）",
+    "sourceYear": 2020,
+    "sourceRound": 2,
+    "originalQuestionNumber": 70
+  },
+  {
+    "id": "MOEX-109100-1301-Q072",
+    "subject": "解剖學",
+    "chapter": "神經解剖",
+    "section": "視覺路徑",
+    "stem": "一位21歲的男性因視力障礙及頭痛就醫，醫師除了發現病患有腦壓增高的現象外，也有視野雙側顳側 （bitemporal）偏盲現象。經腦部電腦斷層掃描後，最可能的診斷為下列何者？",
+    "options": {
+      "A": "枕葉部腫瘤（occipital lobe tumor）",
+      "B": "顳葉部腫瘤（temporal lobe tumor）",
+      "C": "額葉部腫瘤（frontal lobe tumor）",
+      "D": "腦下垂體腫瘤（pituitary tumor）"
+    },
+    "answer": "D",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "Meyer’s loop 與視野缺損",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 109 年第二次醫師一階醫學（一）",
+    "sourceYear": 2020,
+    "sourceRound": 2,
+    "originalQuestionNumber": 72
+  },
+  {
+    "id": "MOEX-109100-1301-Q079",
+    "subject": "解剖學",
+    "chapter": "胸腔",
+    "section": "縱膈",
+    "stem": "下列何種反應是一種deamination的作用？",
+    "options": {
+      "A": "胞嘧啶（cytosine）變成次黃嘌呤（hypoxanthine）",
+      "B": "5'-甲基胞嘧啶（5'-methylcytosine）變成胸腺嘧啶（thymine）",
+      "C": "腺嘌呤（adenine）變成黃嘌呤（xanthine）",
+      "D": "鳥糞嘌呤（guanine）變成尿嘧啶（uracil）"
+    },
+    "answer": "B",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "縱膈｜下列何種反應是一種deamination的作",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 109 年第二次醫師一階醫學（一）",
+    "sourceYear": 2020,
+    "sourceRound": 2,
+    "originalQuestionNumber": 79
+  },
+  {
+    "id": "MOEX-109100-1301-Q090",
+    "subject": "解剖學",
+    "chapter": "腹部",
+    "section": "肝膽胰脾",
+    "stem": "下列何者並非膽固醇（cholesterol）生合成之前驅物？",
+    "options": {
+      "A": "乙酸（acetate）",
+      "B": "異戊二烯（isoprene）",
+      "C": "二氫鞘氨醇（sphinganine）",
+      "D": "鯊烯（squalene）"
+    },
+    "answer": "C",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "肝膽胰脾｜並非膽固醇（cholesterol）生合成之",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 109 年第二次醫師一階醫學（一）",
+    "sourceYear": 2020,
+    "sourceRound": 2,
+    "originalQuestionNumber": 90
+  },
+  {
+    "id": "MOEX-110020-1301-Q001",
+    "subject": "解剖學",
+    "chapter": "神經解剖",
+    "section": "腦幹核區",
+    "stem": "右邊延腦內側因梗塞性中風而損傷，造成內側延腦症候群（medial medullary syndrome），下列何者最可能出 現？",
+    "options": {
+      "A": "左側舌頭肌肉運動無力",
+      "B": "右側上肢出現intentional tremor",
+      "C": "兩側眼球無法看向左側",
+      "D": "對側肢體無力，同時同側舌頭肌肉無力"
+    },
+    "answer": "D",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "腦幹核區｜右邊延腦內側因梗塞性中風而損傷，造成內側延腦",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 110 年第一次醫師一階醫學（一）",
+    "sourceYear": 2021,
+    "sourceRound": 1,
+    "originalQuestionNumber": 1
+  },
+  {
+    "id": "MOEX-110020-1301-Q002",
+    "subject": "解剖學",
+    "chapter": "神經解剖",
+    "section": "腦幹核區",
+    "stem": "有關齒狀韌帶（denticulate ligament）的敘述，下列何者正確？",
+    "options": {
+      "A": "由硬腦膜所形成",
+      "B": "附著於尾骨內側面",
+      "C": "位於脊髓背根與腹根之間",
+      "D": "一般有32對"
+    },
+    "answer": "C",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "腦幹核區｜齒狀韌帶（denticulate ligam",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 110 年第一次醫師一階醫學（一）",
+    "sourceYear": 2021,
+    "sourceRound": 1,
+    "originalQuestionNumber": 2
+  },
+  {
+    "id": "MOEX-110020-1301-Q003",
+    "subject": "解剖學",
+    "chapter": "頭頸部",
+    "section": "甲狀腺與副甲狀腺",
+    "stem": "下甲狀腺靜脈（inferior thyroid vein）通常回流到：",
+    "options": {
+      "A": "內頸靜脈（internal jugular vein）",
+      "B": "外頸靜脈（external jugular vein）",
+      "C": "頭臂靜脈（brachiocephalic vein）",
+      "D": "鎖骨下靜脈（subclavian vein）"
+    },
+    "answer": "C",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "甲狀腺下動脈來源",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 110 年第一次醫師一階醫學（一）",
+    "sourceYear": 2021,
+    "sourceRound": 1,
+    "originalQuestionNumber": 3
+  },
+  {
+    "id": "MOEX-110020-1301-Q005",
+    "subject": "解剖學",
+    "chapter": "神經解剖",
+    "section": "腦幹核區",
+    "stem": "下列何者傳遞角膜（cornea）的一般感覺？",
+    "options": {
+      "A": "鼻睫神經（nasociliary nerve）",
+      "B": "額神經（frontal nerve）",
+      "C": "眶上神經（supraorbital nerve）",
+      "D": "動眼神經（oculomotor nerve）"
+    },
+    "answer": "A",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "腦幹核區｜傳遞角膜（cornea）的一般感覺",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 110 年第一次醫師一階醫學（一）",
+    "sourceYear": 2021,
+    "sourceRound": 1,
+    "originalQuestionNumber": 5
+  },
+  {
+    "id": "MOEX-110020-1301-Q006",
+    "subject": "解剖學",
+    "chapter": "頭頸部",
+    "section": "顏面神經與三叉神經",
+    "stem": "下列何者的血液，最不可能進入上矢狀竇（superior sagittal sinus）？",
+    "options": {
+      "A": "眼眶（orbit）",
+      "B": "額竇（frontal sinus）",
+      "C": "鼻腔（nasal cavity）",
+      "D": "顱骨膜（pericranium）"
+    },
+    "answer": "A",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "顏面神經與三叉神經｜的血液，最不可能進入上矢狀竇（superio",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 110 年第一次醫師一階醫學（一）",
+    "sourceYear": 2021,
+    "sourceRound": 1,
+    "originalQuestionNumber": 6
+  },
+  {
+    "id": "MOEX-110020-1301-Q007",
+    "subject": "解剖學",
+    "chapter": "胸腔",
+    "section": "肺與胸膜",
+    "stem": "成年男性站立時，右側肺臟的水平裂（horizontal fissure）在前方約位於下列那個肋骨附近？",
+    "options": {
+      "A": "第2",
+      "B": "第4",
+      "C": "第6",
+      "D": "第8"
+    },
+    "answer": "B",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "肺與胸膜｜成年男性站立時，右側肺臟的水平裂（horiz",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 110 年第一次醫師一階醫學（一）",
+    "sourceYear": 2021,
+    "sourceRound": 1,
+    "originalQuestionNumber": 7
+  },
+  {
+    "id": "MOEX-110020-1301-Q009",
+    "subject": "解剖學",
+    "chapter": "骨盆與會陰",
+    "section": "直腸與肛管",
+    "stem": "下列何者不位於坐骨肛門窩（ischioanal fossa）的外側？",
+    "options": {
+      "A": "提肛肌（levator ani muscle）",
+      "B": "陰部管（pudendal canal）",
+      "C": "陰部神經（pudendal nerve）",
+      "D": "閉孔內肌（obturator internus muscle）"
+    },
+    "answer": "A",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "直腸與肛管｜不位於坐骨肛門窩（ischioanal fo",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 110 年第一次醫師一階醫學（一）",
+    "sourceYear": 2021,
+    "sourceRound": 1,
+    "originalQuestionNumber": 9
+  },
+  {
+    "id": "MOEX-110020-1301-Q010",
+    "subject": "解剖學",
+    "chapter": "下肢",
+    "section": "腰薦神經叢",
+    "stem": "支配閉孔內肌（obturator internus）的神經損傷時，下列何者的功能最可能同時受影響？",
+    "options": {
+      "A": "內收長肌（adductor longus）",
+      "B": "提肛肌（levator ani）",
+      "C": "下孖肌（inferior gemellus）",
+      "D": "上孖肌（superior gemellus）"
+    },
+    "answer": "D",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "閉孔神經支配",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 110 年第一次醫師一階醫學（一）",
+    "sourceYear": 2021,
+    "sourceRound": 1,
+    "originalQuestionNumber": 10
+  },
+  {
+    "id": "MOEX-110020-1301-Q011",
+    "subject": "解剖學",
+    "chapter": "骨盆與會陰",
+    "section": "直腸與肛管",
+    "stem": "在男性，下列何者經常經由直腸進行觸診？",
+    "options": {
+      "A": "膀胱",
+      "B": "前列腺",
+      "C": "輸尿管",
+      "D": "輸精管"
+    },
+    "answer": "B",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "直腸與肛管｜在男性，下列何者經常經由直腸進行觸診",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 110 年第一次醫師一階醫學（一）",
+    "sourceYear": 2021,
+    "sourceRound": 1,
+    "originalQuestionNumber": 11
+  },
+  {
+    "id": "MOEX-110020-1301-Q012",
+    "subject": "解剖學",
+    "chapter": "下肢",
+    "section": "下肢血管",
+    "stem": "股動脈（femoral artery）穿過下列何者後進入膕窩（popliteal fossa）成為膕動脈（popliteal artery）？",
+    "options": {
+      "A": "閉孔外肌（obturator externus）",
+      "B": "股四頭肌（quadriceps femoris）",
+      "C": "內收長肌（adductor longus）",
+      "D": "內收大肌（adductor magnus）"
+    },
+    "answer": "D",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "膕動脈與膝窩解剖",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 110 年第一次醫師一階醫學（一）",
+    "sourceYear": 2021,
+    "sourceRound": 1,
+    "originalQuestionNumber": 12
+  },
+  {
+    "id": "MOEX-110020-1301-Q013",
+    "subject": "解剖學",
+    "chapter": "上肢",
+    "section": "上肢血管",
+    "stem": "下列那一條神經支配棘下肌（infraspinatus muscle）？",
+    "options": {
+      "A": "肩胛上神經（suprascapular nerve）",
+      "B": "上肩胛下神經（superior subscapular nerve）",
+      "C": "下肩胛下神經（inferior subscapular nerve）",
+      "D": "肩胛背神經（dorsal scapular nerve）"
+    },
+    "answer": "A",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "上肢血管｜下列那一條神經支配棘下肌（infraspin",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 110 年第一次醫師一階醫學（一）",
+    "sourceYear": 2021,
+    "sourceRound": 1,
+    "originalQuestionNumber": 13
+  },
+  {
+    "id": "MOEX-110020-1301-Q014",
+    "subject": "解剖學",
+    "chapter": "神經解剖",
+    "section": "腦幹核區",
+    "stem": "下列何構造可接受光線刺激，調節人體晝夜節律？",
+    "options": {
+      "A": "丘腦下核（subthalamus）",
+      "B": "視交叉上核（suprachiasmatic nucleus）",
+      "C": "藍斑核（locus ceruleus）",
+      "D": "丘腦枕部（pulvinar of thalamus）"
+    },
+    "answer": "B",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "腦幹核區｜下列何構造可接受光線刺激，調節人體晝夜節律",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 110 年第一次醫師一階醫學（一）",
+    "sourceYear": 2021,
+    "sourceRound": 1,
+    "originalQuestionNumber": 14
+  },
+  {
+    "id": "MOEX-110020-1301-Q015",
+    "subject": "解剖學",
+    "chapter": "神經解剖",
+    "section": "小腦",
+    "stem": "關於脊髓的敘述，下列何者錯誤？",
+    "options": {
+      "A": "下運動神經元（lower motor neuron）之細胞本體位於腹角（ventral horn）",
+      "B": "nucleus dorsalis of Clarke可發出脊髓小腦徑（spinocerebellar tract）",
+      "C": "背角（dorsal horn）之中間神經元（interneuron）可參與痛覺調控",
+      "D": "背角感覺神經元（dorsal horn sensory neuron）發出之神經纖維主要形成背柱（dorsal column）"
+    },
+    "answer": "D",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "脊髓小腦功能",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 110 年第一次醫師一階醫學（一）",
+    "sourceYear": 2021,
+    "sourceRound": 1,
+    "originalQuestionNumber": 15
+  },
+  {
+    "id": "MOEX-110020-1301-Q016",
+    "subject": "解剖學",
+    "chapter": "神經解剖",
+    "section": "腦幹核區",
+    "stem": "下列何者為痛覺調控之重要構造？",
+    "options": {
+      "A": "導水管周圍灰質（periaqueductal gray）",
+      "B": "內側縱束（medial longitudinal fasciculus）",
+      "C": "橋腦旁正中網狀結構（paramedian pontine reticular formation）",
+      "D": "下橄欖核（inferior olivary nucleus）"
+    },
+    "answer": "A",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "腦幹核區｜痛覺調控之重要構造",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 110 年第一次醫師一階醫學（一）",
+    "sourceYear": 2021,
+    "sourceRound": 1,
+    "originalQuestionNumber": 16
+  },
+  {
+    "id": "MOEX-110020-1301-Q018",
+    "subject": "解剖學",
+    "chapter": "神經解剖",
+    "section": "腦幹核區",
+    "stem": "關於大腦皮質之布洛卡區（Broca's area）的敘述，下列何者錯誤？",
+    "options": {
+      "A": "位於 Brodmann areas 44, 45",
+      "B": "損傷後會產生運動型失語症（motor aphasia）",
+      "C": "位於顳上迴（superior temporal gyrus）",
+      "D": "大部分人位於左側大腦半球"
+    },
+    "answer": "C",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "腦幹核區｜大腦皮質之布洛卡區（Broca's area",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 110 年第一次醫師一階醫學（一）",
+    "sourceYear": 2021,
+    "sourceRound": 1,
+    "originalQuestionNumber": 18
+  },
+  {
+    "id": "MOEX-110020-1301-Q019",
+    "subject": "解剖學",
+    "chapter": "頭頸部",
+    "section": "頸動脈鞘",
+    "stem": "供應鼻腔的動脈中，下列何者間接源自內頸動脈（internal carotid artery）？",
+    "options": {
+      "A": "蝶腭動脈（sphenopalatine artery）",
+      "B": "大腭動脈（greater palatine artery）",
+      "C": "外側鼻動脈（lateral nasal artery）",
+      "D": "前篩動脈（anterior ethmoidal artery）"
+    },
+    "answer": "D",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "頸動脈鞘｜供應鼻腔的動脈中，下列何者間接源自內頸動脈（",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 110 年第一次醫師一階醫學（一）",
+    "sourceYear": 2021,
+    "sourceRound": 1,
+    "originalQuestionNumber": 19
+  },
+  {
+    "id": "MOEX-110020-1301-Q020",
+    "subject": "解剖學",
+    "chapter": "頭頸部",
+    "section": "顏面神經與三叉神經",
+    "stem": "下列何者收縮，有助於下頜骨的下壓（depression of mandible）？",
+    "options": {
+      "A": "顳肌（temporalis muscle）",
+      "B": "翼內肌（medial pterygoid muscle）",
+      "C": "咬肌（masseter muscle）",
+      "D": "二腹肌（digastric muscle）"
+    },
+    "answer": "D",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "顏面神經與三叉神經｜收縮，有助於下頜骨的下壓（depressio",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 110 年第一次醫師一階醫學（一）",
+    "sourceYear": 2021,
+    "sourceRound": 1,
+    "originalQuestionNumber": 20
+  },
+  {
+    "id": "MOEX-110020-1301-Q021",
+    "subject": "解剖學",
+    "chapter": "胸腔",
+    "section": "心臟與冠狀動脈",
+    "stem": "下列何者與心包膜（pericardium）的神經支配較無關聯？",
+    "options": {
+      "A": "迷走神經（vagus nerve）",
+      "B": "膈神經（phrenic nerve）",
+      "C": "交感神經幹（sympathetic trunk）",
+      "D": "肋間神經（intercostal nerve）"
+    },
+    "answer": "D",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "心臟與冠狀動脈｜心包膜（pericardium）的神經支配較",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 110 年第一次醫師一階醫學（一）",
+    "sourceYear": 2021,
+    "sourceRound": 1,
+    "originalQuestionNumber": 21
+  },
+  {
+    "id": "MOEX-110020-1301-Q022",
+    "subject": "解剖學",
+    "chapter": "胸腔",
+    "section": "肺與胸膜",
+    "stem": "有關胸膜腔（pleural cavity）之敘述，下列何者正確？",
+    "options": {
+      "A": "左右胸膜腔相通",
+      "B": "向上延伸到頸部",
+      "C": "其內充滿新鮮空氣",
+      "D": "肺臟位於胸膜腔內"
+    },
+    "answer": "B",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "胸膜與肋膈隱窩",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 110 年第一次醫師一階醫學（一）",
+    "sourceYear": 2021,
+    "sourceRound": 1,
+    "originalQuestionNumber": 22
+  },
+  {
+    "id": "MOEX-110020-1301-Q023",
+    "subject": "解剖學",
+    "chapter": "胸腔",
+    "section": "縱膈",
+    "stem": "有關奇靜脈（azygos vein）之敘述，下列何者錯誤？",
+    "options": {
+      "A": "匯入上腔靜脈（superior vena cava）",
+      "B": "總髂靜脈（common iliac vein）血可經腰靜脈（lumbar vein）匯入奇靜脈",
+      "C": "大部分右側肋間靜脈血透過半奇靜脈（hemiazygos vein）匯入奇靜脈",
+      "D": "左上肋間靜脈（left superior intercostal vein）不會匯入奇靜脈"
+    },
+    "answer": "C",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "後縱膈主要構造",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 110 年第一次醫師一階醫學（一）",
+    "sourceYear": 2021,
+    "sourceRound": 1,
+    "originalQuestionNumber": 23
+  },
+  {
+    "id": "MOEX-110020-1301-Q024",
+    "subject": "解剖學",
+    "chapter": "胸腔",
+    "section": "縱膈",
+    "stem": "有關胸廓（thoracic cage）之敘述，下列何者錯誤？",
+    "options": {
+      "A": "保護重要臟器",
+      "B": "提供上肢肌肉附著點",
+      "C": "抵抗呼吸時肺部所產生負壓",
+      "D": "活動度低、不易變形"
+    },
+    "answer": "D",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "縱膈｜胸廓（thoracic cage）之敘述，下",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 110 年第一次醫師一階醫學（一）",
+    "sourceYear": 2021,
+    "sourceRound": 1,
+    "originalQuestionNumber": 24
+  },
+  {
+    "id": "MOEX-110020-1301-Q025",
+    "subject": "解剖學",
+    "chapter": "胸腔",
+    "section": "心臟與冠狀動脈",
+    "stem": "心臟之靜脈（cardiac veins）主要匯流至：",
+    "options": {
+      "A": "冠狀竇（coronary sinus）",
+      "B": "左心房（left antrium）",
+      "C": "右心室（right ventricle）",
+      "D": "上腔靜脈（superior vena cava）"
+    },
+    "answer": "A",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "心臟靜脈回流",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 110 年第一次醫師一階醫學（一）",
+    "sourceYear": 2021,
+    "sourceRound": 1,
+    "originalQuestionNumber": 25
+  },
+  {
+    "id": "MOEX-110020-1301-Q026",
+    "subject": "解剖學",
+    "chapter": "胸腔",
+    "section": "橫膈",
+    "stem": "有關橫膈（diaphragm）的敘述，下列何者錯誤？",
+    "options": {
+      "A": "下腔靜脈通過腔靜脈孔（caval opening）",
+      "B": "橫膈右腳（right crus）形成食道裂孔（esophageal hiatus）",
+      "C": "主動脈通過內側弓（medial arcuate arch）",
+      "D": "腹壁上血管（superior epigastric vessels）通過胸肋三角（sternocostal triangle）"
+    },
+    "answer": "C",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "橫膈三大開口",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 110 年第一次醫師一階醫學（一）",
+    "sourceYear": 2021,
+    "sourceRound": 1,
+    "originalQuestionNumber": 26
+  },
+  {
+    "id": "MOEX-110020-1301-Q027",
+    "subject": "解剖學",
+    "chapter": "骨盆與會陰",
+    "section": "會陰三角",
+    "stem": "王老先生接受手術摘除前列腺時，外科醫師應避免傷害下列何者，以免將來出現陰莖勃起問題？",
+    "options": {
+      "A": "陰部神經（pudendal nerve）",
+      "B": "陰莖背神經（dorsal nerve of the penis）",
+      "C": "腹下神經（hypogastric nerve）",
+      "D": "骨盆內臟神經（pelvic splanchnic nerve）"
+    },
+    "answer": "D",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "會陰三角｜王老先生接受手術摘除前列腺時，外科醫師應避免",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 110 年第一次醫師一階醫學（一）",
+    "sourceYear": 2021,
+    "sourceRound": 1,
+    "originalQuestionNumber": 27
+  },
+  {
+    "id": "MOEX-110020-1301-Q028",
+    "subject": "解剖學",
+    "chapter": "骨盆與會陰",
+    "section": "泌尿生殖",
+    "stem": "胚胎時期的引帶（gubernaculum），在女性將退化形成何構造？",
+    "options": {
+      "A": "卵巢懸韌帶（suspensory ligament of ovary）",
+      "B": "子宮圓韌帶（round ligament of uterus）",
+      "C": "內側臍韌帶（medial umbilical ligament）",
+      "D": "主韌帶（cardinal ligament）"
+    },
+    "answer": "B",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "子宮支持構造",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 110 年第一次醫師一階醫學（一）",
+    "sourceYear": 2021,
+    "sourceRound": 1,
+    "originalQuestionNumber": 28
+  },
+  {
+    "id": "MOEX-110020-1301-Q029",
+    "subject": "解剖學",
+    "chapter": "下肢",
+    "section": "腰薦神經叢",
+    "stem": "腰大肌（psoas major）與髂肌（iliacus）的肌腱合併後附著於股骨（femur）的那一個突起上？",
+    "options": {
+      "A": "粗線（linea aspera）",
+      "B": "恥骨線（pectineal line）",
+      "C": "小轉子（lesser trochanter）",
+      "D": "大轉子（greater trochanter）"
+    },
+    "answer": "C",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "腰薦神經叢｜腰大肌（psoas major）與髂肌（il",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 110 年第一次醫師一階醫學（一）",
+    "sourceYear": 2021,
+    "sourceRound": 1,
+    "originalQuestionNumber": 29
+  },
+  {
+    "id": "MOEX-110020-1301-Q030",
+    "subject": "解剖學",
+    "chapter": "上肢",
+    "section": "肩胛區",
+    "stem": "下列何者的肌腱會與盂肱關節（glenohumeral joint）的關節盂唇（glenoid labrum）連結？",
+    "options": {
+      "A": "肱二頭肌長頭（long head of biceps brachii）",
+      "B": "肱二頭肌短頭（short head of biceps brachii）",
+      "C": "肱三頭肌長頭（long head of triceps brachii）",
+      "D": "肱三頭肌外側頭（lateral head of triceps brachii）"
+    },
+    "answer": "A",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "肩關節穩定構造",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 110 年第一次醫師一階醫學（一）",
+    "sourceYear": 2021,
+    "sourceRound": 1,
+    "originalQuestionNumber": 30
+  },
+  {
+    "id": "MOEX-110020-1301-Q031",
+    "subject": "解剖學",
+    "chapter": "胸腔",
+    "section": "縱膈",
+    "stem": "背部中何者不向上附著到頭骨？",
+    "options": {
+      "A": "夾肌（splenius）",
+      "B": "半棘肌（semispinalis）",
+      "C": "髂肋肌（iliocostalis）",
+      "D": "最長肌（longissimus）"
+    },
+    "answer": "C",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "縱膈｜背部中何者不向上附著到頭骨",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 110 年第一次醫師一階醫學（一）",
+    "sourceYear": 2021,
+    "sourceRound": 1,
+    "originalQuestionNumber": 31
+  },
+  {
+    "id": "MOEX-110020-1301-Q032",
+    "subject": "解剖學",
+    "chapter": "胸腔",
+    "section": "橫膈",
+    "stem": "肌原母細胞（myoblast）進入下列何者內，衍生形成橫膈雙腳（crura of diaphragm）？",
+    "options": {
+      "A": "外側體壁（lateral body wall）",
+      "B": "頸體節（cervical somite）",
+      "C": "橫中隔（septum transversum）",
+      "D": "食道背繫膜（dorsal mesentery of esophagus）"
+    },
+    "answer": "D",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "橫膈｜肌原母細胞（myoblast）進入下列何者內",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 110 年第一次醫師一階醫學（一）",
+    "sourceYear": 2021,
+    "sourceRound": 1,
+    "originalQuestionNumber": 32
+  },
+  {
+    "id": "MOEX-110020-1301-Q033",
+    "subject": "解剖學",
+    "chapter": "腹部",
+    "section": "胃腸道血管",
+    "stem": "從腹面觀（ventral view），中腸環（midgut loop）的旋轉方式為：",
+    "options": {
+      "A": "順時針方向作180度旋轉",
+      "B": "順時針方向作270度旋轉",
+      "C": "逆時針方向作180度旋轉",
+      "D": "逆時針方向作270度旋轉"
+    },
+    "answer": "D",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "胃腸道血管｜從腹面觀（ventral view），中腸環",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 110 年第一次醫師一階醫學（一）",
+    "sourceYear": 2021,
+    "sourceRound": 1,
+    "originalQuestionNumber": 33
+  },
+  {
+    "id": "MOEX-110020-1301-Q046",
+    "subject": "解剖學",
+    "chapter": "胸腔",
+    "section": "縱膈",
+    "stem": "睪丸縱隔（mediastinum testis）是由下列何者延伸並聚集增厚而成的？",
+    "options": {
+      "A": "皮膚（skin）",
+      "B": "鞘膜臟層（visceral layer of tunica vaginalis）",
+      "C": "鞘膜壁層（parietal layer of tunica vaginalis）",
+      "D": "白膜（tunica albuginea）"
+    },
+    "answer": "D",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "縱膈｜睪丸縱隔（mediastinum testi",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 110 年第一次醫師一階醫學（一）",
+    "sourceYear": 2021,
+    "sourceRound": 1,
+    "originalQuestionNumber": 46
+  },
+  {
+    "id": "MOEX-110020-1301-Q049",
+    "subject": "解剖學",
+    "chapter": "神經解剖",
+    "section": "自律神經",
+    "stem": "交感神經興奮時，眼睛會產生下列何種反應？",
+    "options": {
+      "A": "使sphincter muscle of iris收縮，產生miosis",
+      "B": "使radial muscle of iris收縮，產生mydriasis",
+      "C": "使ciliary muscle收縮，有助於遠距離之視覺",
+      "D": "使ciliary muscle收縮，有助於近距離之視覺"
+    },
+    "answer": "B",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "自律神經｜交感神經興奮時，眼睛會產生下列何種反應",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 110 年第一次醫師一階醫學（一）",
+    "sourceYear": 2021,
+    "sourceRound": 1,
+    "originalQuestionNumber": 49
+  },
+  {
+    "id": "MOEX-110020-1301-Q052",
+    "subject": "解剖學",
+    "chapter": "上肢",
+    "section": "手部肌肉",
+    "stem": "訓練孩童捏陶土和剪紙等手部精細動作，最主要目的是為強化下列那一條神經路徑？",
+    "options": {
+      "A": "brainstem pathway",
+      "B": "dorsal column pathway",
+      "C": "corticospinal tract",
+      "D": "anterolateral spinothalamic tract"
+    },
+    "answer": "C",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "手部肌肉｜訓練孩童捏陶土和剪紙等手部精細動作，最主要目",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 110 年第一次醫師一階醫學（一）",
+    "sourceYear": 2021,
+    "sourceRound": 1,
+    "originalQuestionNumber": 52
+  },
+  {
+    "id": "MOEX-110020-1301-Q053",
+    "subject": "解剖學",
+    "chapter": "神經解剖",
+    "section": "腦幹核區",
+    "stem": "活化下列何種傳出神經元（efferent neuron）可誘發muscle spindle收縮？",
+    "options": {
+      "A": "α-神經元",
+      "B": "δ-神經元",
+      "C": "β-神經元",
+      "D": "γ-神經元"
+    },
+    "answer": "D",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "腦幹核區｜活化下列何種傳出神經元（efferent n",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 110 年第一次醫師一階醫學（一）",
+    "sourceYear": 2021,
+    "sourceRound": 1,
+    "originalQuestionNumber": 53
+  },
+  {
+    "id": "MOEX-110020-1301-Q059",
+    "subject": "解剖學",
+    "chapter": "胸腔",
+    "section": "縱膈",
+    "stem": "若因車禍而失血（hemorrhage）約20%血量，在身體啟動代償機制（reflex compensations）後，下列何者最可 能比失血前增高？",
+    "options": {
+      "A": "心搏量（stroke volume）",
+      "B": "心輸出量（cardiac output）",
+      "C": "血管周邊總阻力（total peripheral resistance）",
+      "D": "平均動脈壓（mean arterial pressure）"
+    },
+    "answer": "C",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "縱膈｜若因車禍而失血（hemorrhage）約20",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 110 年第一次醫師一階醫學（一）",
+    "sourceYear": 2021,
+    "sourceRound": 1,
+    "originalQuestionNumber": 59
+  },
+  {
+    "id": "MOEX-110020-1301-Q061",
+    "subject": "解剖學",
+    "chapter": "胸腔",
+    "section": "肺與胸膜",
+    "stem": "甲、乙、丙為同年齡且體型相近的成年男性，三人的生理無效腔（physiologic dead space）皆為150毫升。而 甲的潮氣容積（tidal volume）為200毫升，呼吸頻率（frequency of respiration）為30次／分；乙的潮氣容積為 500毫升，呼吸頻率為12次／分；丙的潮氣容積為1000毫升，呼吸頻率為6次／分。三人的肺泡通氣量 （alveolar ventilation）大小之比較，下列何者正確？",
+    "options": {
+      "A": "甲＞乙＞丙",
+      "B": "丙＞乙＞甲",
+      "C": "三人皆相同",
+      "D": "乙＞甲＞丙"
+    },
+    "answer": "B",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "肺與胸膜｜甲、乙、丙為同年齡且體型相近的成年男性，三人",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 110 年第一次醫師一階醫學（一）",
+    "sourceYear": 2021,
+    "sourceRound": 1,
+    "originalQuestionNumber": 61
+  },
+  {
+    "id": "MOEX-110020-1301-Q062",
+    "subject": "解剖學",
+    "chapter": "胸腔",
+    "section": "肺與胸膜",
+    "stem": "有關呼吸時的作功（work of breathing），下列敘述何者正確？",
+    "options": {
+      "A": "氣喘（asthma）患者呼吸比正常人更費力，作功的顯著增加主要是用於使肺臟充氣（inflation）",
+      "B": "肺纖維化（lung fibrosis）患者呼吸比正常人更費力，作功的顯著增加主要是用於使空氣經呼吸道流動",
+      "C": "表面活性劑（surfactant）分泌不足時，欲使肺臟充氣（inflation）的作功會顯著增加",
+      "D": "與氣管尚未舒張前相比較，氣管舒張（bronchodilation）時欲使空氣經呼吸道流動的作功會顯著增加"
+    },
+    "answer": "C",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "肺與胸膜｜呼吸時的作功（work of breathi",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 110 年第一次醫師一階醫學（一）",
+    "sourceYear": 2021,
+    "sourceRound": 1,
+    "originalQuestionNumber": 62
+  },
+  {
+    "id": "MOEX-110020-1301-Q063",
+    "subject": "解剖學",
+    "chapter": "腹部",
+    "section": "肝膽胰脾",
+    "stem": "下列何者是迴腸（ileum）切除患者最易導致的現象？",
+    "options": {
+      "A": "黃疸（jaundice）",
+      "B": "貧血（anemia）",
+      "C": "消化道潰瘍（peptic ulcer）",
+      "D": "血糖過高（hyperglycemia）"
+    },
+    "answer": "B",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "肝膽胰脾｜迴腸（ileum）切除患者最易導致的現象",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 110 年第一次醫師一階醫學（一）",
+    "sourceYear": 2021,
+    "sourceRound": 1,
+    "originalQuestionNumber": 63
+  },
+  {
+    "id": "MOEX-110020-1301-Q064",
+    "subject": "解剖學",
+    "chapter": "腹部",
+    "section": "肝膽胰脾",
+    "stem": "肝臟產生的膽酸主要是透過什麼作用幫助脂肪的消化吸收？",
+    "options": {
+      "A": "還原作用",
+      "B": "分解作用",
+      "C": "乳化作用",
+      "D": "氧化作用"
+    },
+    "answer": "C",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "肝十二指腸韌帶與 portal triad",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 110 年第一次醫師一階醫學（一）",
+    "sourceYear": 2021,
+    "sourceRound": 1,
+    "originalQuestionNumber": 64
+  },
+  {
+    "id": "MOEX-110020-1301-Q065",
+    "subject": "解剖學",
+    "chapter": "腹部",
+    "section": "肝膽胰脾",
+    "stem": "下列關於膽囊收縮素（cholecystokinin）之敘述，何者最恰當？",
+    "options": {
+      "A": "具促進胃排空（gastric emptying）作用",
+      "B": "可刺激胰臟分泌富含酵素的胰液",
+      "C": "只在腸道合成與分泌",
+      "D": "其血中半衰期可長達3小時"
+    },
+    "answer": "B",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "膽囊與膽囊動脈",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 110 年第一次醫師一階醫學（一）",
+    "sourceYear": 2021,
+    "sourceRound": 1,
+    "originalQuestionNumber": 65
+  },
+  {
+    "id": "MOEX-110101-1301-Q001",
+    "subject": "解剖學",
+    "chapter": "頭頸部",
+    "section": "頸動脈鞘",
+    "stem": "下列何者不是內頸動脈的分支？",
+    "options": {
+      "A": "眼動脈（ophthalmic artery）",
+      "B": "中大腦動脈（middle cerebral artery）",
+      "C": "前脈絡叢動脈（anterior choroidal artery）",
+      "D": "前交通動脈（anterior communicating artery）"
+    },
+    "answer": "D",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "頸動脈鞘｜不是內頸動脈的分支",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 110 年第二次醫師一階醫學（一）",
+    "sourceYear": 2021,
+    "sourceRound": 2,
+    "originalQuestionNumber": 1
+  },
+  {
+    "id": "MOEX-110101-1301-Q002",
+    "subject": "解剖學",
+    "chapter": "胸腔",
+    "section": "縱膈",
+    "stem": "胸段右半邊脊髓損傷，可能造成下列何種症狀？",
+    "options": {
+      "A": "右側下肢無力",
+      "B": "左側下肢震動感覺受損",
+      "C": "右側下肢痛覺異常",
+      "D": "左側上肢無力"
+    },
+    "answer": "A",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "縱膈｜胸段右半邊脊髓損傷，可能造成下列何種症狀",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 110 年第二次醫師一階醫學（一）",
+    "sourceYear": 2021,
+    "sourceRound": 2,
+    "originalQuestionNumber": 2
+  },
+  {
+    "id": "MOEX-110101-1301-Q003",
+    "subject": "解剖學",
+    "chapter": "頭頸部",
+    "section": "咽喉解剖",
+    "stem": "下列何者不供應腭扁桃腺（palatine tonsil）血液？",
+    "options": {
+      "A": "面動脈（facial artery）",
+      "B": "舌動脈（lingual artery）",
+      "C": "升咽動脈（ascending pharyngeal artery）",
+      "D": "上甲狀腺動脈（superior thyroid artery）"
+    },
+    "answer": "D",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "咽喉解剖｜不供應腭扁桃腺（palatine tonsi",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 110 年第二次醫師一階醫學（一）",
+    "sourceYear": 2021,
+    "sourceRound": 2,
+    "originalQuestionNumber": 3
+  },
+  {
+    "id": "MOEX-110101-1301-Q004",
+    "subject": "解剖學",
+    "chapter": "頭頸部",
+    "section": "顏面神經與三叉神經",
+    "stem": "大岩神經溝（groove for greater petrosal nerve) 位於：",
+    "options": {
+      "A": "蝶骨（sphenoid bone）",
+      "B": "頂骨（parietal bone）",
+      "C": "顳骨（temporal bone）",
+      "D": "枕骨（occipital bone）"
+    },
+    "answer": "C",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "顏面神經與三叉神經｜大岩神經溝（groove for great",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 110 年第二次醫師一階醫學（一）",
+    "sourceYear": 2021,
+    "sourceRound": 2,
+    "originalQuestionNumber": 4
+  },
+  {
+    "id": "MOEX-110101-1301-Q005",
+    "subject": "解剖學",
+    "chapter": "頭頸部",
+    "section": "顏面神經與三叉神經",
+    "stem": "下列何者無神經通過？",
+    "options": {
+      "A": "頸靜脈孔（jugular foramen）",
+      "B": "圓孔（foramen rotundum）",
+      "C": "篩後孔（posterior ethmoidal foramen）",
+      "D": "盲孔（foramen cecum）"
+    },
+    "answer": "D",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "顏面神經與三叉神經｜無神經通過",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 110 年第二次醫師一階醫學（一）",
+    "sourceYear": 2021,
+    "sourceRound": 2,
+    "originalQuestionNumber": 5
+  },
+  {
+    "id": "MOEX-110101-1301-Q006",
+    "subject": "解剖學",
+    "chapter": "腹部",
+    "section": "肝膽胰脾",
+    "stem": "下列何動脈的起點水平位置最低？",
+    "options": {
+      "A": "腸繫膜上動脈（superior mesenteric artery）",
+      "B": "腎上腺中動脈（middle suprarenal artery）",
+      "C": "腎動脈（renal artery）",
+      "D": "睪丸動脈（testicular artery）"
+    },
+    "answer": "D",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "肝膽胰脾｜下列何動脈的起點水平位置最低",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 110 年第二次醫師一階醫學（一）",
+    "sourceYear": 2021,
+    "sourceRound": 2,
+    "originalQuestionNumber": 6
+  },
+  {
+    "id": "MOEX-110101-1301-Q007",
+    "subject": "解剖學",
+    "chapter": "骨盆與會陰",
+    "section": "直腸與肛管",
+    "stem": "直腸上段的動脈血來自：",
+    "options": {
+      "A": "腸繫膜上動脈（superior mesenteric artery）",
+      "B": "腸繫膜下動脈（inferior mesenteric artery）",
+      "C": "腰動脈（lumbar artery）",
+      "D": "髂內動脈（internal iliac artery）"
+    },
+    "answer": "B",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "直腸與肛管｜直腸上段的動脈血來自：",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 110 年第二次醫師一階醫學（一）",
+    "sourceYear": 2021,
+    "sourceRound": 2,
+    "originalQuestionNumber": 7
+  },
+  {
+    "id": "MOEX-110101-1301-Q009",
+    "subject": "解剖學",
+    "chapter": "骨盆與會陰",
+    "section": "會陰三角",
+    "stem": "男性尿道（male urethra）最長的部分是：",
+    "options": {
+      "A": "膀胱內尿道部（intramural part）",
+      "B": "前列腺尿道部（prostatic part）",
+      "C": "膜性尿道部（membranous part）",
+      "D": "海綿體尿道部（spongy part）"
+    },
+    "answer": "D",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "會陰三角｜男性尿道（male urethra）最長的部",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 110 年第二次醫師一階醫學（一）",
+    "sourceYear": 2021,
+    "sourceRound": 2,
+    "originalQuestionNumber": 9
+  },
+  {
+    "id": "MOEX-110101-1301-Q010",
+    "subject": "解剖學",
+    "chapter": "下肢",
+    "section": "腰薦神經叢",
+    "stem": "下列何者不參與構成膝關節？",
+    "options": {
+      "A": "股骨（femur）",
+      "B": "脛骨（tibia）",
+      "C": "腓骨（fibula）",
+      "D": "髕骨（patella）"
+    },
+    "answer": "C",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "腰薦神經叢｜不參與構成膝關節",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 110 年第二次醫師一階醫學（一）",
+    "sourceYear": 2021,
+    "sourceRound": 2,
+    "originalQuestionNumber": 10
+  },
+  {
+    "id": "MOEX-110101-1301-Q011",
+    "subject": "解剖學",
+    "chapter": "胸腔",
+    "section": "縱膈",
+    "stem": "在胸腔，下列何者的分支進入脊髓成為脊髓節動脈（segmental medullary artery）？",
+    "options": {
+      "A": "椎動脈（vertebral artery）",
+      "B": "胸內動脈（internal thoracic artery）",
+      "C": "肋間前動脈（anterior intercostal artery）",
+      "D": "肋間後動脈（posterior intercostal artery）"
+    },
+    "answer": "D",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "縱膈｜在胸腔，下列何者的分支進入脊髓成為脊髓節動脈",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 110 年第二次醫師一階醫學（一）",
+    "sourceYear": 2021,
+    "sourceRound": 2,
+    "originalQuestionNumber": 11
+  },
+  {
+    "id": "MOEX-110101-1301-Q013",
+    "subject": "解剖學",
+    "chapter": "神經解剖",
+    "section": "丘腦與基底核",
+    "stem": "下列何種訊息不經由丘腦（thalamus）投射至大腦皮質？",
+    "options": {
+      "A": "視覺",
+      "B": "嗅覺",
+      "C": "體感覺",
+      "D": "聽覺"
+    },
+    "answer": "B",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "丘腦與基底核｜下列何種訊息不經由丘腦（thalamus）投",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 110 年第二次醫師一階醫學（一）",
+    "sourceYear": 2021,
+    "sourceRound": 2,
+    "originalQuestionNumber": 13
+  },
+  {
+    "id": "MOEX-110101-1301-Q014",
+    "subject": "解剖學",
+    "chapter": "神經解剖",
+    "section": "小腦",
+    "stem": "下列何構造與痛覺調控的關聯性最少？",
+    "options": {
+      "A": "脊髓第二細胞層（spinal cord, lamina II）",
+      "B": "縫核脊髓徑（raphespinal tract）",
+      "C": "脊髓小腦徑（spinocerebellar tract）",
+      "D": "背柱內側蹄系（dorsal column-medial lemniscus system）"
+    },
+    "answer": "C",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "脊髓小腦功能",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 110 年第二次醫師一階醫學（一）",
+    "sourceYear": 2021,
+    "sourceRound": 2,
+    "originalQuestionNumber": 14
+  },
+  {
+    "id": "MOEX-110101-1301-Q015",
+    "subject": "解剖學",
+    "chapter": "頭頸部",
+    "section": "顏面神經與三叉神經",
+    "stem": "下列何構造不位於菱形窩（rhomboid fossa）中？",
+    "options": {
+      "A": "面神經丘（facial colliculus）",
+      "B": "下橄欖體（inferior olive）",
+      "C": "舌下神經三角（hypoglossal trigone）",
+      "D": "迷走神經三角（vagal trigone）"
+    },
+    "answer": "B",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "顏面神經與三叉神經｜下列何構造不位於菱形窩（rhomboid f",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 110 年第二次醫師一階醫學（一）",
+    "sourceYear": 2021,
+    "sourceRound": 2,
+    "originalQuestionNumber": 15
+  },
+  {
+    "id": "MOEX-110101-1301-Q016",
+    "subject": "解剖學",
+    "chapter": "神經解剖",
+    "section": "腦神經",
+    "stem": "若動眼神經完全麻痺（complete oculomotor nerve palsy），但滑車神經（trochlear nerve）及外旋神經 （abducent nerve）並未受損，則病患受影響的眼球瞳孔會朝向？",
+    "options": {
+      "A": "正上方",
+      "B": "內上方",
+      "C": "外下方",
+      "D": "內下方"
+    },
+    "answer": "C",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "動眼神經與睫狀神經節",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 110 年第二次醫師一階醫學（一）",
+    "sourceYear": 2021,
+    "sourceRound": 2,
+    "originalQuestionNumber": 16
+  },
+  {
+    "id": "MOEX-110101-1301-Q017",
+    "subject": "解剖學",
+    "chapter": "胸腔",
+    "section": "縱膈",
+    "stem": "氣管（trachea）及食道（esophagus）最上端，起自何脊椎骨高度？",
+    "options": {
+      "A": "第二頸椎（C2）",
+      "B": "第四頸椎（C4）",
+      "C": "第六頸椎（C6）",
+      "D": "第一胸椎（T1）"
+    },
+    "answer": "C",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "後縱膈主要構造",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 110 年第二次醫師一階醫學（一）",
+    "sourceYear": 2021,
+    "sourceRound": 2,
+    "originalQuestionNumber": 17
+  },
+  {
+    "id": "MOEX-110101-1301-Q018",
+    "subject": "解剖學",
+    "chapter": "頭頸部",
+    "section": "舌與味覺",
+    "stem": "下列何者不是由舌下神經（hypoglossal nerve）支配？",
+    "options": {
+      "A": "頦舌肌（genioglossus）",
+      "B": "舌骨舌肌（hyoglossus）",
+      "C": "莖突舌肌（styloglossus）",
+      "D": "腭舌肌（palatoglossus）"
+    },
+    "answer": "D",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "舌肌運動支配",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 110 年第二次醫師一階醫學（一）",
+    "sourceYear": 2021,
+    "sourceRound": 2,
+    "originalQuestionNumber": 18
+  },
+  {
+    "id": "MOEX-110101-1301-Q019",
+    "subject": "解剖學",
+    "chapter": "胸腔",
+    "section": "心臟與冠狀動脈",
+    "stem": "有關心臟瓣膜與聽診位置的對應，下列何者正確？",
+    "options": {
+      "A": "主動脈瓣─胸骨左側第二肋間",
+      "B": "肺動脈瓣─胸骨右側第二肋間",
+      "C": "三尖瓣─胸骨右側第四肋間",
+      "D": "二尖瓣─胸骨左側第五肋間"
+    },
+    "answer": "D",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "心臟與冠狀動脈｜心臟瓣膜與聽診位置的對應，下列何者正確",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 110 年第二次醫師一階醫學（一）",
+    "sourceYear": 2021,
+    "sourceRound": 2,
+    "originalQuestionNumber": 19
+  },
+  {
+    "id": "MOEX-110101-1301-Q020",
+    "subject": "解剖學",
+    "chapter": "胸腔",
+    "section": "縱膈",
+    "stem": "有關肺臟之敘述，下列何者正確？",
+    "options": {
+      "A": "左肺三葉，右肺二葉",
+      "B": "右肺水平裂（horizontal fissure）約對應第四肋骨下緣位置",
+      "C": "右肺門（hilum）位在食道與奇靜脈（azygos vein）之間",
+      "D": "左肺門位在降主動脈與食道間"
+    },
+    "answer": "B",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "後縱膈主要構造",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 110 年第二次醫師一階醫學（一）",
+    "sourceYear": 2021,
+    "sourceRound": 2,
+    "originalQuestionNumber": 20
+  },
+  {
+    "id": "MOEX-110101-1301-Q021",
+    "subject": "解剖學",
+    "chapter": "頭頸部",
+    "section": "咽喉解剖",
+    "stem": "胸膜炎（pleuritis）所引起的疼痛，主要是由何種神經所傳導？",
+    "options": {
+      "A": "迷走神經（vagus nerve）",
+      "B": "大內臟神經（greater splachnic nerve）",
+      "C": "喉返神經（recurrent laryngeal nerve）",
+      "D": "肋間神經（intercostal nerve）"
+    },
+    "answer": "D",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "喉返神經走行",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 110 年第二次醫師一階醫學（一）",
+    "sourceYear": 2021,
+    "sourceRound": 2,
+    "originalQuestionNumber": 21
+  },
+  {
+    "id": "MOEX-110101-1301-Q022",
+    "subject": "解剖學",
+    "chapter": "胸腔",
+    "section": "肺與胸膜",
+    "stem": "有關肋間肌群的敘述，下列何者錯誤？",
+    "options": {
+      "A": "平靜吸氣（產生胸腔負壓）時，支撐肋間空間",
+      "B": "平靜呼吸時，肋間內外肌交替收縮，以提高或降低肋骨",
+      "C": "打噴嚏時，快速收縮以擠壓出胸腔內空氣",
+      "D": "深呼吸時，壓下或抬起肋骨以改變胸腔容積，增加肺活量"
+    },
+    "answer": "B",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "肺與胸膜｜肋間肌群的敘述，下列何者錯誤",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 110 年第二次醫師一階醫學（一）",
+    "sourceYear": 2021,
+    "sourceRound": 2,
+    "originalQuestionNumber": 22
+  },
+  {
+    "id": "MOEX-110101-1301-Q023",
+    "subject": "解剖學",
+    "chapter": "胸腔",
+    "section": "縱膈",
+    "stem": "上縱隔（superior mediastinum）內之構造，由前往後之順序，下列何者正確？",
+    "options": {
+      "A": "氣管，食道，主動脈弓，肺動脈幹",
+      "B": "頭臂靜脈，主動脈弓，氣管，食道",
+      "C": "主動脈弓，肺動脈幹，食道，氣管",
+      "D": "主動脈弓，頭臂靜脈，氣管，食道"
+    },
+    "answer": "B",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "後縱膈主要構造",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 110 年第二次醫師一階醫學（一）",
+    "sourceYear": 2021,
+    "sourceRound": 2,
+    "originalQuestionNumber": 23
+  },
+  {
+    "id": "MOEX-110101-1301-Q024",
+    "subject": "解剖學",
+    "chapter": "腹部",
+    "section": "肝膽胰脾",
+    "stem": "十二指腸懸肌（suspensory muscle of duodenum）由何處來的肌肉形成？",
+    "options": {
+      "A": "腰大肌（psoas major muscle）",
+      "B": "腰方肌（quadratus lumborum muscle）",
+      "C": "橫膈肌（diaphragm）",
+      "D": "肋下肌（subcostal muscle）"
+    },
+    "answer": "C",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "肝膽胰脾｜十二指腸懸肌（suspensory musc",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 110 年第二次醫師一階醫學（一）",
+    "sourceYear": 2021,
+    "sourceRound": 2,
+    "originalQuestionNumber": 24
+  },
+  {
+    "id": "MOEX-110101-1301-Q025",
+    "subject": "解剖學",
+    "chapter": "腹部",
+    "section": "肝膽胰脾",
+    "stem": "肝臟的內臟面（visceral surface），看不到下列何構造？",
+    "options": {
+      "A": "腎上腺壓迹（suprarenal impression）",
+      "B": "食道壓迹（esophageal impression）",
+      "C": "胰臟壓迹（pancreatic impression）",
+      "D": "結腸壓迹（colic impression）"
+    },
+    "answer": "C",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "胰臟鄰近關係",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 110 年第二次醫師一階醫學（一）",
+    "sourceYear": 2021,
+    "sourceRound": 2,
+    "originalQuestionNumber": 25
+  },
+  {
+    "id": "MOEX-110101-1301-Q026",
+    "subject": "解剖學",
+    "chapter": "神經解剖",
+    "section": "自律神經",
+    "stem": "來自薦部的副交感節前神經（preganglionic parasympathetic fiber），主要經由下列何者進入骨盆神經叢 （pelvic nerve plexus）？",
+    "options": {
+      "A": "腹下神經（hypogastric nerve）",
+      "B": "陰部神經（pudendal nerve）",
+      "C": "骨盆內臟神經（pelvic splanchnic nerve）",
+      "D": "閉孔神經（obturator nerve）"
+    },
+    "answer": "C",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "副交感路徑",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 110 年第二次醫師一階醫學（一）",
+    "sourceYear": 2021,
+    "sourceRound": 2,
+    "originalQuestionNumber": 26
+  },
+  {
+    "id": "MOEX-110101-1301-Q027",
+    "subject": "解剖學",
+    "chapter": "骨盆與會陰",
+    "section": "會陰三角",
+    "stem": "當尿道海綿體（corpus spongiosum）破裂造成尿液外滲，最常見尿液外滲堆積的位置在：",
+    "options": {
+      "A": "陰囊（scrotum）",
+      "B": "睪丸（testis）",
+      "C": "前列腺（prostate gland）",
+      "D": "大腿（thigh）"
+    },
+    "answer": "A",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "會陰三角｜當尿道海綿體（corpus spongios",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 110 年第二次醫師一階醫學（一）",
+    "sourceYear": 2021,
+    "sourceRound": 2,
+    "originalQuestionNumber": 27
+  },
+  {
+    "id": "MOEX-110101-1301-Q028",
+    "subject": "解剖學",
+    "chapter": "下肢",
+    "section": "小腿肌群",
+    "stem": "下列那兩塊肌肉的肌腱，在足底內側交叉？",
+    "options": {
+      "A": "脛前肌（tibialis anterior）與脛後肌（tibialis posterior）",
+      "B": "腓骨長肌（fibularis longus）與腓骨短肌（fibularis brevis）",
+      "C": "屈 趾長肌（flexor hallucis longus）與屈趾長肌（flexor digitorum longus）",
+      "D": "屈 趾短肌（flexor hallucis brevis）與屈趾短肌（flexor digitorum brevis）"
+    },
+    "answer": "C",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "脛後肌功能",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 110 年第二次醫師一階醫學（一）",
+    "sourceYear": 2021,
+    "sourceRound": 2,
+    "originalQuestionNumber": 28
+  },
+  {
+    "id": "MOEX-110101-1301-Q029",
+    "subject": "解剖學",
+    "chapter": "下肢",
+    "section": "腰薦神經叢",
+    "stem": "當腳部的跗骨隧道（tarsal tunnel）發炎時，最容易傷及下列何者？",
+    "options": {
+      "A": "脛神經（tibial nerve）",
+      "B": "腓腸神經（sural nerve）",
+      "C": "腓深神經（deep fibular nerve）",
+      "D": "腓淺神經（superficial fibular nerve）"
+    },
+    "answer": "A",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "腓總神經及分支",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 110 年第二次醫師一階醫學（一）",
+    "sourceYear": 2021,
+    "sourceRound": 2,
+    "originalQuestionNumber": 29
+  },
+  {
+    "id": "MOEX-110101-1301-Q030",
+    "subject": "解剖學",
+    "chapter": "上肢",
+    "section": "前臂屈伸肌",
+    "stem": "前臂（forearm）的旋前圓肌（pronator teres）與旋後肌（supinator），分別是由那一條神經支配？",
+    "options": {
+      "A": "前者是正中神經（median nerve)，後者是橈神經（radial nerve）",
+      "B": "前者是橈神經（radial nerve)，後者是正中神經（median nerve）",
+      "C": "兩者都是正中神經（median nerve）支配",
+      "D": "兩者都是橈神經（radial nerve）支配"
+    },
+    "answer": "A",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "正中神經支配前臂肌群",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 110 年第二次醫師一階醫學（一）",
+    "sourceYear": 2021,
+    "sourceRound": 2,
+    "originalQuestionNumber": 30
+  },
+  {
+    "id": "MOEX-110101-1301-Q031",
+    "subject": "解剖學",
+    "chapter": "胸腔",
+    "section": "縱膈",
+    "stem": "下列何者的兩種人體關節，都具有關節盤（articular disc）的構造？",
+    "options": {
+      "A": "肩關節（shoulder joint）與髖關節（hip joint）",
+      "B": "胸鎖關節（sternoclavicular joint）與肩關節（shoulder joint）",
+      "C": "顳頷關節（temporomandibular joint）與髖關節（hip joint）",
+      "D": "胸鎖關節（sternoclavicular joint）與顳頷關節（temporomandibular joint）"
+    },
+    "answer": "D",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "縱膈｜的兩種人體關節，都具有關節盤（articul",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 110 年第二次醫師一階醫學（一）",
+    "sourceYear": 2021,
+    "sourceRound": 2,
+    "originalQuestionNumber": 31
+  },
+  {
+    "id": "MOEX-110101-1301-Q033",
+    "subject": "解剖學",
+    "chapter": "腹部",
+    "section": "腹膜關係",
+    "stem": "大部分腹側腸繫膜（ventral mesentery）在胚胎發育過程中都會消失，下列何者尾端仍保留此構造？",
+    "options": {
+      "A": "原始咽（primordial pharynx）",
+      "B": "前腸（foregut）",
+      "C": "中腸（midgut）",
+      "D": "後腸（hindgut）"
+    },
+    "answer": "B",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "腹膜關係｜大部分腹側腸繫膜（ventral mesen",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 110 年第二次醫師一階醫學（一）",
+    "sourceYear": 2021,
+    "sourceRound": 2,
+    "originalQuestionNumber": 33
+  },
+  {
+    "id": "MOEX-110101-1301-Q034",
+    "subject": "解剖學",
+    "chapter": "頭頸部",
+    "section": "顏面神經與三叉神經",
+    "stem": "鎚骨（malleus），砧骨（incus），和鐙骨（stapes）是源自：",
+    "options": {
+      "A": "第1和第2咽弓（pharyngeal arch）",
+      "B": "第2和第3咽弓（pharyngeal arch）",
+      "C": "第3和第4咽弓（pharyngeal arch）",
+      "D": "第4和第6咽弓（pharyngeal arch）"
+    },
+    "answer": "A",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "顏面神經與三叉神經｜鎚骨（malleus），砧骨（incus），",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 110 年第二次醫師一階醫學（一）",
+    "sourceYear": 2021,
+    "sourceRound": 2,
+    "originalQuestionNumber": 34
+  },
+  {
+    "id": "MOEX-110101-1301-Q040",
+    "subject": "解剖學",
+    "chapter": "神經解剖",
+    "section": "小腦",
+    "stem": "蒲金氏細胞（Purkinje cells）是位於：",
+    "options": {
+      "A": "大腦皮質（cerebral cortex）",
+      "B": "小腦皮質（cerebellar cortex）",
+      "C": "丘腦（thalamus）",
+      "D": "脊髓灰質（spinal gray matter）"
+    },
+    "answer": "B",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "小腦｜蒲金氏細胞（Purkinje cells）是",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 110 年第二次醫師一階醫學（一）",
+    "sourceYear": 2021,
+    "sourceRound": 2,
+    "originalQuestionNumber": 40
+  },
+  {
+    "id": "MOEX-110101-1301-Q044",
+    "subject": "解剖學",
+    "chapter": "骨盆與會陰",
+    "section": "會陰三角",
+    "stem": "下列何種構造的上皮，不是移形上皮（transitional epithelium）？",
+    "options": {
+      "A": "腎盂（renal pelvis）",
+      "B": "尿道近端（proximal part of the urethra）",
+      "C": "膀胱（urinary bladder）",
+      "D": "尿道外口（external urethral orifice）"
+    },
+    "answer": "D",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "會陰三角｜下列何種構造的上皮，不是移形上皮（trans",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 110 年第二次醫師一階醫學（一）",
+    "sourceYear": 2021,
+    "sourceRound": 2,
+    "originalQuestionNumber": 44
+  },
+  {
+    "id": "MOEX-110101-1301-Q046",
+    "subject": "解剖學",
+    "chapter": "骨盆與會陰",
+    "section": "會陰三角",
+    "stem": "細精管（seminiferous tubules）中的細胞，下列何者最靠近管腔底部？",
+    "options": {
+      "A": "精原細胞（spermatogonium）",
+      "B": "精母細胞（spermatocyte）",
+      "C": "精細胞（spermatid）",
+      "D": "睪丸間質細胞（Leydig cell）"
+    },
+    "answer": "A",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "會陰三角｜細精管（seminiferous tubul",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 110 年第二次醫師一階醫學（一）",
+    "sourceYear": 2021,
+    "sourceRound": 2,
+    "originalQuestionNumber": 46
+  },
+  {
+    "id": "MOEX-110101-1301-Q050",
+    "subject": "解剖學",
+    "chapter": "神經解剖",
+    "section": "腦神經",
+    "stem": "有關丘腦神經核和具特定功能大腦皮質區的直接或單一突觸（direct or monosynaptic）聯絡配對，下列何項錯 誤？",
+    "options": {
+      "A": "側膝核（lateral geniculate nucleus）和初級視覺皮質（primary visual cortex）",
+      "B": "腹後側核（ventral posterior lateral nucleus）和初級感覺皮質（primary somatosensory cortex）",
+      "C": "腹後中核（ventral posterior medial nucleus）和初級痛覺皮質（primary nociceptive cortex）",
+      "D": "腹前核（ventral anterior nucleus）和運動皮質（motor cortex）"
+    },
+    "answer": "C",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "腦神經｜丘腦神經核和具特定功能大腦皮質區的直接或單一",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 110 年第二次醫師一階醫學（一）",
+    "sourceYear": 2021,
+    "sourceRound": 2,
+    "originalQuestionNumber": 50
+  },
+  {
+    "id": "MOEX-110101-1301-Q057",
+    "subject": "解剖學",
+    "chapter": "上肢",
+    "section": "上肢血管",
+    "stem": "若以一條繩線緊綁某根手指頭根部1～2分鐘後，移除該繩線後會發現該手指因短暫血流增加而變紅，這現象 最主要是下列何種局部控制機制所致？",
+    "options": {
+      "A": "主動性充血（active hyperemia）",
+      "B": "反應性充血（reactive hyperemia）",
+      "C": "肌原反應（myogenic responses）",
+      "D": "對傷害的反應（response to injury）"
+    },
+    "answer": "B",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "上肢血管｜若以一條繩線緊綁某根手指頭根部1～2分鐘後，",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 110 年第二次醫師一階醫學（一）",
+    "sourceYear": 2021,
+    "sourceRound": 2,
+    "originalQuestionNumber": 57
+  },
+  {
+    "id": "MOEX-110101-1301-Q058",
+    "subject": "解剖學",
+    "chapter": "胸腔",
+    "section": "縱膈",
+    "stem": "林小明跌倒受傷引起失血，但平均動脈壓卻無明顯改變。這是因為此時體內為了維持循環系統正常運作，啟 動了一些恆定（homeostasis）機制。這些機制最不可能包括下列何項？",
+    "options": {
+      "A": "增加血漿中腎上腺素對竇房結作用",
+      "B": "減少微動脈半徑",
+      "C": "減少心臟的副交感神經活性",
+      "D": "增加心房利鈉肽釋放"
+    },
+    "answer": "D",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "縱膈｜林小明跌倒受傷引起失血，但平均動脈壓卻無明顯",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 110 年第二次醫師一階醫學（一）",
+    "sourceYear": 2021,
+    "sourceRound": 2,
+    "originalQuestionNumber": 58
+  },
+  {
+    "id": "MOEX-110101-1301-Q062",
+    "subject": "解剖學",
+    "chapter": "腹部",
+    "section": "肝膽胰脾",
+    "stem": "正常生理狀況下，下列何種器官所分泌的脂肪酵素（lipase）最少？",
+    "options": {
+      "A": "口腔（mouth）",
+      "B": "小腸（small intestine）",
+      "C": "胰臟（pancreas）",
+      "D": "膽囊（gallbladder）"
+    },
+    "answer": "D",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "膽囊與膽囊動脈",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 110 年第二次醫師一階醫學（一）",
+    "sourceYear": 2021,
+    "sourceRound": 2,
+    "originalQuestionNumber": 62
+  },
+  {
+    "id": "MOEX-110101-1301-Q069",
+    "subject": "解剖學",
+    "chapter": "腹部",
+    "section": "腎臟與後腹腔",
+    "stem": "進食最主要可刺激腸道內分泌細胞（enteroendocrine cells）分泌下列何種物質來促進胰臟分泌胰島素 （insulin）？",
+    "options": {
+      "A": "腎上腺素（epinephrine/adrenaline）",
+      "B": "二肽基肽酶-4（dipeptidyl peptidase 4, DPP-4）",
+      "C": "類升糖素胜肽-1（glucagon-like peptide-1, GLP-1）",
+      "D": "葡萄糖運輸蛋白-4（glucose transporter 4, GLUT-4）"
+    },
+    "answer": "C",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "腎臟後腹膜關係",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 110 年第二次醫師一階醫學（一）",
+    "sourceYear": 2021,
+    "sourceRound": 2,
+    "originalQuestionNumber": 69
+  },
+  {
+    "id": "MOEX-110101-1301-Q070",
+    "subject": "解剖學",
+    "chapter": "腹部",
+    "section": "腎臟與後腹腔",
+    "stem": "下列何者是促進膽固醇進入粒線體以啟動類固醇生成（steroidogenesis）之重要因子，且其基因缺失會導致先 天性腎上腺增生症（congenital lipoid adrenal hyperplasia）？",
+    "options": {
+      "A": "膽固醇酯酶（cholesterol esterase）",
+      "B": "低密度脂蛋白受器（low-density lipoprotein receptor, LDLR）",
+      "C": "高密度脂蛋白受器（high-density lipoprotein receptor, HDLR）",
+      "D": "類固醇生成急性調控蛋白（steroidogenic acute regulatory protein, StAR）"
+    },
+    "answer": "D",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "腎臟後腹膜關係",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 110 年第二次醫師一階醫學（一）",
+    "sourceYear": 2021,
+    "sourceRound": 2,
+    "originalQuestionNumber": 70
+  },
+  {
+    "id": "MOEX-110101-1301-Q072",
+    "subject": "解剖學",
+    "chapter": "神經解剖",
+    "section": "腦幹核區",
+    "stem": "黃體生成素受器（LH receptor）缺失的男性，其精子生成（spermatogenesis）能力低，此顯示下列何者具有參 與調節精子生成的重要性？",
+    "options": {
+      "A": "抑制素（inhibin）",
+      "B": "皮質素（cortisol）",
+      "C": "雌二醇（estradiol）",
+      "D": "睪固酮（testosterone）"
+    },
+    "answer": "D",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "腦幹核區｜黃體生成素受器（LH receptor）缺失",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 110 年第二次醫師一階醫學（一）",
+    "sourceYear": 2021,
+    "sourceRound": 2,
+    "originalQuestionNumber": 72
+  },
+  {
+    "id": "MOEX-110101-1301-Q073",
+    "subject": "解剖學",
+    "chapter": "骨盆與會陰",
+    "section": "會陰三角",
+    "stem": "女性因幾乎無月經週期而求診，經檢查發現其卵巢幾乎沒有空腔濾泡（antral follicles），血液雄性素 （androgen）含量正常而雌性素（estrogen）低落；此最可能是因為缺乏下列何者所致？",
+    "options": {
+      "A": "黃體生成素（LH）",
+      "B": "濾泡促素（FSH）",
+      "C": "抑制素（inhibin）",
+      "D": "性釋素（GnRH）"
+    },
+    "answer": "B",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "會陰三角｜女性因幾乎無月經週期而求診，經檢查發現其卵巢",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 110 年第二次醫師一階醫學（一）",
+    "sourceYear": 2021,
+    "sourceRound": 2,
+    "originalQuestionNumber": 73
+  },
+  {
+    "id": "MOEX-110101-1301-Q091",
+    "subject": "解剖學",
+    "chapter": "胸腔",
+    "section": "肺與胸膜",
+    "stem": "以抑制肺部小氣道收縮為治療氣喘的策略時，下列何者最適合作為發展抑制氣喘藥物的標的？",
+    "options": {
+      "A": "COX-1/COX-2",
+      "B": "leukotriene receptor",
+      "C": "PGH 2",
+      "D": "phospholipase A2"
+    },
+    "answer": "B",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "肺與胸膜｜以抑制肺部小氣道收縮為治療氣喘的策略時，下列",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 110 年第二次醫師一階醫學（一）",
+    "sourceYear": 2021,
+    "sourceRound": 2,
+    "originalQuestionNumber": 91
+  },
+  {
+    "id": "MOEX-111020-1301-Q001",
+    "subject": "解剖學",
+    "chapter": "神經解剖",
+    "section": "腦神經",
+    "stem": "下列那一對腦幹神經核，其神經元發出神經纖維後先在腦幹內交叉到對側才離開腦幹？",
+    "options": {
+      "A": "動眼神經核（oculomotor nucleus）",
+      "B": "滑車神經核（trochlear nucleus）",
+      "C": "外旋神經核（abducens nucleus）",
+      "D": "舌下神經核（hypoglossal nucleus）"
+    },
+    "answer": "B",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "動眼神經與睫狀神經節",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 111 年第一次醫師一階醫學（一）",
+    "sourceYear": 2022,
+    "sourceRound": 1,
+    "originalQuestionNumber": 1
+  },
+  {
+    "id": "MOEX-111020-1301-Q002",
+    "subject": "解剖學",
+    "chapter": "神經解剖",
+    "section": "小腦",
+    "stem": "小腦的苔狀傳入神經纖維（mossy fiber）主要與下列小腦皮質何者中的神經細胞產生突觸（synapses）？",
+    "options": {
+      "A": "分子層（molecular layer）",
+      "B": "蒲金氏細胞層（Purkinje cell layer）",
+      "C": "顆粒層（granule cell layer）",
+      "D": "分子層（molecular layer）以及蒲金氏細胞層（Purkinje cell layer）"
+    },
+    "answer": "C",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "小腦｜小腦的苔狀傳入神經纖維（mossy fibe",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 111 年第一次醫師一階醫學（一）",
+    "sourceYear": 2022,
+    "sourceRound": 1,
+    "originalQuestionNumber": 2
+  },
+  {
+    "id": "MOEX-111020-1301-Q003",
+    "subject": "解剖學",
+    "chapter": "神經解剖",
+    "section": "腦幹核區",
+    "stem": "下列大腦皮質（cerebral cortex）的那一區負責控制兩眼外側注視（lateral gaze）的動作？",
+    "options": {
+      "A": "主要運動區（primary motor area）",
+      "B": "主要視覺區（primary visual area）",
+      "C": "運動輔助區（supplementary motor area）",
+      "D": "額葉眼動區（frontal eye field）"
+    },
+    "answer": "D",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "腦幹核區｜下列大腦皮質（cerebral cortex",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 111 年第一次醫師一階醫學（一）",
+    "sourceYear": 2022,
+    "sourceRound": 1,
+    "originalQuestionNumber": 3
+  },
+  {
+    "id": "MOEX-111020-1301-Q004",
+    "subject": "解剖學",
+    "chapter": "神經解剖",
+    "section": "腦幹核區",
+    "stem": "下列何者受刺激時，會造成同側身體伸肌（extensor muscles）收縮，屈肌（flexor muscles）鬆弛？",
+    "options": {
+      "A": "外側前庭脊髓徑（lateral vestibulospinal tract）",
+      "B": "外側網狀脊髓徑（lateral reticulospinal tract）",
+      "C": "紅核脊髓徑（rubrospinal tract）",
+      "D": "外側皮質脊髓徑（lateral corticospinal tract）"
+    },
+    "answer": "A",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "腦幹核區｜受刺激時，會造成同側身體伸肌（extenso",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 111 年第一次醫師一階醫學（一）",
+    "sourceYear": 2022,
+    "sourceRound": 1,
+    "originalQuestionNumber": 4
+  },
+  {
+    "id": "MOEX-111020-1301-Q006",
+    "subject": "解剖學",
+    "chapter": "神經解剖",
+    "section": "腦幹核區",
+    "stem": "下列何者不是間腦（diencephalon）之構造？",
+    "options": {
+      "A": "丘腦（thalamus）",
+      "B": "松果體（pineal body）",
+      "C": "豆狀核（lentiform nucleus）",
+      "D": "下視丘（hypothalamus）"
+    },
+    "answer": "C",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "腦幹核區｜不是間腦（diencephalon）之構造",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 111 年第一次醫師一階醫學（一）",
+    "sourceYear": 2022,
+    "sourceRound": 1,
+    "originalQuestionNumber": 6
+  },
+  {
+    "id": "MOEX-111020-1301-Q007",
+    "subject": "解剖學",
+    "chapter": "頭頸部",
+    "section": "顏面神經與三叉神經",
+    "stem": "下列有關眼神經（ophthalmic nerve）的描述，何者最不恰當？",
+    "options": {
+      "A": "屬於特殊感覺神經",
+      "B": "屬於體感覺神經",
+      "C": "接收眼眶結構之感覺訊息",
+      "D": "接收部分顏面之感覺訊息"
+    },
+    "answer": "A",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "顏面神經與三叉神經｜下列有關眼神經（ophthalmic ner",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 111 年第一次醫師一階醫學（一）",
+    "sourceYear": 2022,
+    "sourceRound": 1,
+    "originalQuestionNumber": 7
+  },
+  {
+    "id": "MOEX-111020-1301-Q008",
+    "subject": "解剖學",
+    "chapter": "頭頸部",
+    "section": "顏面神經與三叉神經",
+    "stem": "眼眶內側壁之鼻淚管（nasolacrimal canal）連通下列那一空間？",
+    "options": {
+      "A": "最上鼻道",
+      "B": "上鼻道",
+      "C": "中鼻道",
+      "D": "下鼻道"
+    },
+    "answer": "D",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "顏面神經與三叉神經｜眼眶內側壁之鼻淚管（nasolacrimal",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 111 年第一次醫師一階醫學（一）",
+    "sourceYear": 2022,
+    "sourceRound": 1,
+    "originalQuestionNumber": 8
+  },
+  {
+    "id": "MOEX-111020-1301-Q009",
+    "subject": "解剖學",
+    "chapter": "頭頸部",
+    "section": "舌與味覺",
+    "stem": "鼓索神經（chorda tympani nerve）經過下列那一個顳骨構造離開中耳進入顳下窩（infratemporal fossa）？",
+    "options": {
+      "A": "岩鼓裂（petrotympanic fissure）",
+      "B": "莖乳突孔（stylomastoid foramen）",
+      "C": "乳突孔（mastoid foramen）",
+      "D": "咽鼓室管（pharyngotympanic tube）"
+    },
+    "answer": "A",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "舌前 2/3 感覺與味覺",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 111 年第一次醫師一階醫學（一）",
+    "sourceYear": 2022,
+    "sourceRound": 1,
+    "originalQuestionNumber": 9
+  },
+  {
+    "id": "MOEX-111020-1301-Q010",
+    "subject": "解剖學",
+    "chapter": "頭頸部",
+    "section": "頸動脈鞘",
+    "stem": "下列何者不包覆在頸動脈鞘（carotid sheath）內？",
+    "options": {
+      "A": "頸總動脈（common carotid artery）",
+      "B": "舌咽神經（glossopharyngeal nerve）",
+      "C": "內頸動脈（internal carotid artery）",
+      "D": "迷走神經（vagus nerve）"
+    },
+    "answer": "B",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "頸動脈鞘內容物",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 111 年第一次醫師一階醫學（一）",
+    "sourceYear": 2022,
+    "sourceRound": 1,
+    "originalQuestionNumber": 10
+  },
+  {
+    "id": "MOEX-111020-1301-Q011",
+    "subject": "解剖學",
+    "chapter": "頭頸部",
+    "section": "顏面神經與三叉神經",
+    "stem": "下列何者同時參與眼眶、鼻腔與口腔三者的形成？",
+    "options": {
+      "A": "篩骨（ethmoid bone）",
+      "B": "淚骨（lacrimal bone）",
+      "C": "顴骨（zygomatic bone）",
+      "D": "上頷骨（maxillary bone）"
+    },
+    "answer": "D",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "顏面神經與三叉神經｜同時參與眼眶、鼻腔與口腔三者的形成",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 111 年第一次醫師一階醫學（一）",
+    "sourceYear": 2022,
+    "sourceRound": 1,
+    "originalQuestionNumber": 11
+  },
+  {
+    "id": "MOEX-111020-1301-Q012",
+    "subject": "解剖學",
+    "chapter": "頭頸部",
+    "section": "顏面神經與三叉神經",
+    "stem": "口腔底部近會厭軟骨（epiglottis）的黏膜，其神經支配為：",
+    "options": {
+      "A": "舌神經（lingual nerve）",
+      "B": "舌咽神經（glossopharyngeal nerve）",
+      "C": "鼓索神經（chorda tympani nerve）",
+      "D": "內喉神經（internal laryngeal nerve）"
+    },
+    "answer": "D",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "顏面神經與三叉神經｜口腔底部近會厭軟骨（epiglottis）的",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 111 年第一次醫師一階醫學（一）",
+    "sourceYear": 2022,
+    "sourceRound": 1,
+    "originalQuestionNumber": 12
+  },
+  {
+    "id": "MOEX-111020-1301-Q013",
+    "subject": "解剖學",
+    "chapter": "頭頸部",
+    "section": "顏面神經與三叉神經",
+    "stem": "蝶骨棘（spine of sphenoid bone）的位置最靠近下列何孔洞？",
+    "options": {
+      "A": "盲孔（foramen cecum）",
+      "B": "腭大孔（greater palatine foramen）",
+      "C": "棘孔（foramen spinosum）",
+      "D": "莖乳突孔（stylomastoid foramen）"
+    },
+    "answer": "C",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "顏面神經與三叉神經｜蝶骨棘（spine of sphenoid ",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 111 年第一次醫師一階醫學（一）",
+    "sourceYear": 2022,
+    "sourceRound": 1,
+    "originalQuestionNumber": 13
+  },
+  {
+    "id": "MOEX-111020-1301-Q014",
+    "subject": "解剖學",
+    "chapter": "神經解剖",
+    "section": "腦神經",
+    "stem": "下列何區的一般感覺，是第五對腦神經第三分支（CN V3）負責？",
+    "options": {
+      "A": "硬顎",
+      "B": "鼻腔內",
+      "C": "下眼瞼",
+      "D": "口腔內頰"
+    },
+    "answer": "D",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "三叉神經分支與支配",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 111 年第一次醫師一階醫學（一）",
+    "sourceYear": 2022,
+    "sourceRound": 1,
+    "originalQuestionNumber": 14
+  },
+  {
+    "id": "MOEX-111020-1301-Q015",
+    "subject": "解剖學",
+    "chapter": "頭頸部",
+    "section": "咽喉解剖",
+    "stem": "心臟缺血（cardiac ischemia）產生的痛覺主要經由下列何者傳遞入中樞神經系統？",
+    "options": {
+      "A": "膈神經（phrenic nerve）",
+      "B": "迷走神經（vagus nerve）",
+      "C": "交感神經系統（sympathetic system）",
+      "D": "左側喉返神經（left recurrent laryngeal nerve）"
+    },
+    "answer": "C",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "喉返神經走行",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 111 年第一次醫師一階醫學（一）",
+    "sourceYear": 2022,
+    "sourceRound": 1,
+    "originalQuestionNumber": 15
+  },
+  {
+    "id": "MOEX-111020-1301-Q016",
+    "subject": "解剖學",
+    "chapter": "胸腔",
+    "section": "縱膈",
+    "stem": "有關胸部交感神經節（thoracic sympathetic ganglion）的敘述，下列何者最為恰當？",
+    "options": {
+      "A": "通常會發出神經，並且只支配胸腹腔臟器",
+      "B": "僅以灰交通支（gray rami communicantes）與胸部脊神經（thoracic spinal nerve）相連",
+      "C": "上五個交感神經節，會發出節後神經纖維（postganglionic sympathetic fibers），支配胸腔內器官",
+      "D": "下七個交感神經節，會發出節後神經纖維（postganglionic sympathetic fibers），支配腹腔內器官"
+    },
+    "answer": "C",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "縱膈｜胸部交感神經節（thoracic sympa",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 111 年第一次醫師一階醫學（一）",
+    "sourceYear": 2022,
+    "sourceRound": 1,
+    "originalQuestionNumber": 16
+  },
+  {
+    "id": "MOEX-111020-1301-Q017",
+    "subject": "解剖學",
+    "chapter": "胸腔",
+    "section": "心臟與冠狀動脈",
+    "stem": "臨床上左側優勢冠狀動脈（left dominant coronary artery）指的是下列何者？",
+    "options": {
+      "A": "前室間支動脈血液來自於左冠狀動脈",
+      "B": "前室間支動脈血液來自於右冠狀動脈",
+      "C": "後室間支動脈血液來自於左冠狀動脈",
+      "D": "後室間支動脈血液來自於右冠狀動脈"
+    },
+    "answer": "C",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "右冠狀動脈分支",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 111 年第一次醫師一階醫學（一）",
+    "sourceYear": 2022,
+    "sourceRound": 1,
+    "originalQuestionNumber": 17
+  },
+  {
+    "id": "MOEX-111020-1301-Q018",
+    "subject": "解剖學",
+    "chapter": "胸腔",
+    "section": "縱膈",
+    "stem": "咳血最常發生於：",
+    "options": {
+      "A": "肺動脈系統",
+      "B": "肺靜脈系統",
+      "C": "支氣管動脈系統",
+      "D": "支氣管靜脈系統"
+    },
+    "answer": "C",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "縱膈｜咳血最常發生於：",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 111 年第一次醫師一階醫學（一）",
+    "sourceYear": 2022,
+    "sourceRound": 1,
+    "originalQuestionNumber": 18
+  },
+  {
+    "id": "MOEX-111020-1301-Q019",
+    "subject": "解剖學",
+    "chapter": "胸腔",
+    "section": "橫膈",
+    "stem": "下列何者經由橫膈（diaphragm）的主動脈裂口（aortic hiatus），穿通胸腔與腹腔？",
+    "options": {
+      "A": "胸管（thoracic duct）",
+      "B": "食道（esophagus）",
+      "C": "內胸動脈（internal thoracic artery）",
+      "D": "下膈靜脈（inferior phrenic vein）"
+    },
+    "answer": "A",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "橫膈｜經由橫膈（diaphragm）的主動脈裂口（",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 111 年第一次醫師一階醫學（一）",
+    "sourceYear": 2022,
+    "sourceRound": 1,
+    "originalQuestionNumber": 19
+  },
+  {
+    "id": "MOEX-111020-1301-Q020",
+    "subject": "解剖學",
+    "chapter": "腹部",
+    "section": "肝膽胰脾",
+    "stem": "左性腺靜脈（left gonadal vein）會直接匯入下列那一個靜脈？",
+    "options": {
+      "A": "下腔靜脈（inferior vena cava）",
+      "B": "左腎靜脈（left renal vein）",
+      "C": "左總髂靜脈（left common iliac vein）",
+      "D": "下腸繫膜靜脈（inferior mesenteric vein）"
+    },
+    "answer": "B",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "肝膽胰脾｜左性腺靜脈（left gonadal vei",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 111 年第一次醫師一階醫學（一）",
+    "sourceYear": 2022,
+    "sourceRound": 1,
+    "originalQuestionNumber": 20
+  },
+  {
+    "id": "MOEX-111020-1301-Q021",
+    "subject": "解剖學",
+    "chapter": "骨盆與會陰",
+    "section": "會陰三角",
+    "stem": "下列何者不在精索（spermatic cord）內？",
+    "options": {
+      "A": "髂腹股溝神經（ilioinguinal nerve）",
+      "B": "生殖股神經-生殖支（genital branch of genitofemoral nerve）",
+      "C": "輸精管（ductus deferens）",
+      "D": "蔓狀靜脈叢（pampiniform venous plexus）"
+    },
+    "answer": "A",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "會陰三角｜不在精索（spermatic cord）內",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 111 年第一次醫師一階醫學（一）",
+    "sourceYear": 2022,
+    "sourceRound": 1,
+    "originalQuestionNumber": 21
+  },
+  {
+    "id": "MOEX-111020-1301-Q022",
+    "subject": "解剖學",
+    "chapter": "腹部",
+    "section": "腹膜關係",
+    "stem": "下列何者與網膜孔（omental foramen）的關係位置不正確？",
+    "options": {
+      "A": "總膽管在其後方",
+      "B": "肝門靜脈在其前方",
+      "C": "肝臟在其上方",
+      "D": "十二指腸在其下方"
+    },
+    "answer": "A",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "腹膜關係｜網膜孔（omental foramen）的關",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 111 年第一次醫師一階醫學（一）",
+    "sourceYear": 2022,
+    "sourceRound": 1,
+    "originalQuestionNumber": 22
+  },
+  {
+    "id": "MOEX-111020-1301-Q023",
+    "subject": "解剖學",
+    "chapter": "骨盆與會陰",
+    "section": "直腸與肛管",
+    "stem": "關於直腸（rectum），下列敘述何者正確？",
+    "options": {
+      "A": "直腸的黏膜非常平滑，沒有任何皺褶",
+      "B": "提肛肌（levator ani）及肛尾韌帶（anococcygeal ligament）協助維持直腸與鄰近構造間的關係",
+      "C": "腹膜（peritoneum）只覆蓋到乙狀結腸（sigmoid colon），並未覆蓋到直腸",
+      "D": "肛管直腸彎曲（anorectal flexure）大略成80°，這主要是由U字型的尾骨肌（coccygeus）所造成"
+    },
+    "answer": "B",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "直腸與肛管｜直腸（rectum），下列敘述何者正確",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 111 年第一次醫師一階醫學（一）",
+    "sourceYear": 2022,
+    "sourceRound": 1,
+    "originalQuestionNumber": 23
+  },
+  {
+    "id": "MOEX-111020-1301-Q024",
+    "subject": "解剖學",
+    "chapter": "骨盆與會陰",
+    "section": "會陰三角",
+    "stem": "下列何肌肉覆蓋住陰莖腳（crus of penis）？",
+    "options": {
+      "A": "坐骨海綿體肌（ischiocavernosus muscle）",
+      "B": "球海綿體肌（bulbospongiosus muscle）",
+      "C": "會陰淺橫肌（superficial transverse perineal muscle）",
+      "D": "會陰深橫肌（deep transverse perineal muscle）"
+    },
+    "answer": "A",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "會陰三角｜下列何肌肉覆蓋住陰莖腳（crus of pe",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 111 年第一次醫師一階醫學（一）",
+    "sourceYear": 2022,
+    "sourceRound": 1,
+    "originalQuestionNumber": 24
+  },
+  {
+    "id": "MOEX-111020-1301-Q025",
+    "subject": "解剖學",
+    "chapter": "骨盆與會陰",
+    "section": "泌尿生殖",
+    "stem": "下列何神經傳遞陰道（vagina）上部及子宮頸（cervix of uterus）的痛覺傳導纖維？",
+    "options": {
+      "A": "陰部神經（pudendal nerves）",
+      "B": "下腹神經（hypogastric nerves）",
+      "C": "骨盆內臟神經（pelvic splanchnic nerves）",
+      "D": "腰內臟神經（lumbar splanchnic nerves）"
+    },
+    "answer": "C",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "子宮支持構造",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 111 年第一次醫師一階醫學（一）",
+    "sourceYear": 2022,
+    "sourceRound": 1,
+    "originalQuestionNumber": 25
+  },
+  {
+    "id": "MOEX-111020-1301-Q026",
+    "subject": "解剖學",
+    "chapter": "骨盆與會陰",
+    "section": "會陰三角",
+    "stem": "下列何者不是女性會陰深隙（deep perineal pouch）的內容物？",
+    "options": {
+      "A": "前庭球（bulb of vestibule）",
+      "B": "部分陰道（vagina）",
+      "C": "部分尿道（urethra）",
+      "D": "外尿道括約肌（external urethral sphincter muscle）"
+    },
+    "answer": "A",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "會陰深層間隙內容物",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 111 年第一次醫師一階醫學（一）",
+    "sourceYear": 2022,
+    "sourceRound": 1,
+    "originalQuestionNumber": 26
+  },
+  {
+    "id": "MOEX-111020-1301-Q027",
+    "subject": "解剖學",
+    "chapter": "上肢",
+    "section": "上肢血管",
+    "stem": "下列那一條肌肉協助三角肌（deltoid muscle）外展（abduct）上臂？",
+    "options": {
+      "A": "棘上肌（supraspinatus）",
+      "B": "棘下肌（infraspinatus）",
+      "C": "大圓肌（teres major）",
+      "D": "小圓肌（teres minor）"
+    },
+    "answer": "A",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "上肢血管｜下列那一條肌肉協助三角肌（deltoid m",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 111 年第一次醫師一階醫學（一）",
+    "sourceYear": 2022,
+    "sourceRound": 1,
+    "originalQuestionNumber": 27
+  },
+  {
+    "id": "MOEX-111020-1301-Q028",
+    "subject": "解剖學",
+    "chapter": "下肢",
+    "section": "大腿前內後區",
+    "stem": "下列何者與大腿闊筋膜（fascia lata）的附著點無關？",
+    "options": {
+      "A": "腹股溝韌帶（inguinal ligament）",
+      "B": "薦棘韌帶（sacrospinous ligament）",
+      "C": "髂嵴（iliac crest）",
+      "D": "坐骨粗隆（ischial tuberosity）"
+    },
+    "answer": "B",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "大腿前內後區｜大腿闊筋膜（fascia lata）的附著點",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 111 年第一次醫師一階醫學（一）",
+    "sourceYear": 2022,
+    "sourceRound": 1,
+    "originalQuestionNumber": 28
+  },
+  {
+    "id": "MOEX-111020-1301-Q029",
+    "subject": "解剖學",
+    "chapter": "上肢",
+    "section": "臂神經叢",
+    "stem": "下列那一條神經，支配圖中黑色區域的表皮感覺？",
+    "options": {
+      "A": "尺神經（ulnar nerve）",
+      "B": "橈神經（radial nerve）",
+      "C": "正中神經（median nerve）",
+      "D": "肌皮神經（musculocutaneous nerve）"
+    },
+    "answer": "A",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "臂神經叢終末分支",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 111 年第一次醫師一階醫學（一）",
+    "sourceYear": 2022,
+    "sourceRound": 1,
+    "originalQuestionNumber": 29
+  },
+  {
+    "id": "MOEX-111020-1301-Q030",
+    "subject": "解剖學",
+    "chapter": "胸腔",
+    "section": "縱膈",
+    "stem": "下列腋淋巴結（axillary lymph nodes）中，何者主要直接收集乳房的淋巴回流，尤其是乳房的外上側？",
+    "options": {
+      "A": "中央淋巴結（central nodes）",
+      "B": "前淋巴結（anterior nodes; pectoral nodes）",
+      "C": "外淋巴結（lateral nodes; humeral nodes）",
+      "D": "後淋巴結（posterior nodes; subscapular nodes）"
+    },
+    "answer": "B",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "縱膈｜下列腋淋巴結（axillary lymph ",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 111 年第一次醫師一階醫學（一）",
+    "sourceYear": 2022,
+    "sourceRound": 1,
+    "originalQuestionNumber": 30
+  },
+  {
+    "id": "MOEX-111020-1301-Q031",
+    "subject": "解剖學",
+    "chapter": "下肢",
+    "section": "下肢血管",
+    "stem": "病人位於膕窩處的膕靜脈（popliteal vein）發生血栓，下列何者的血流量最不可能減少?",
+    "options": {
+      "A": "大隱靜脈（great saphenous vein）",
+      "B": "小隱靜脈（small saphenous vein）",
+      "C": "脛後靜脈（posterior tibial vein）",
+      "D": "股靜脈（femoral vein）"
+    },
+    "answer": "A",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "膕動脈與膝窩解剖",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 111 年第一次醫師一階醫學（一）",
+    "sourceYear": 2022,
+    "sourceRound": 1,
+    "originalQuestionNumber": 31
+  },
+  {
+    "id": "MOEX-111020-1301-Q034",
+    "subject": "解剖學",
+    "chapter": "腹部",
+    "section": "腹膜關係",
+    "stem": "在男性生殖系統，下列何者構造衍生自胚胎時期之中腎管（mesonephric duct）？",
+    "options": {
+      "A": "細精管（seminiferous tubule）",
+      "B": "睪丸網（rete testis）",
+      "C": "射精管（ejaculatory duct）",
+      "D": "睪丸附件（appendix of testis）"
+    },
+    "answer": "C",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "腹膜關係｜在男性生殖系統，下列何者構造衍生自胚胎時期之",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 111 年第一次醫師一階醫學（一）",
+    "sourceYear": 2022,
+    "sourceRound": 1,
+    "originalQuestionNumber": 34
+  },
+  {
+    "id": "MOEX-111020-1301-Q042",
+    "subject": "解剖學",
+    "chapter": "腹部",
+    "section": "肝膽胰脾",
+    "stem": "下列何者是膽汁（bile）運送之管道？",
+    "options": {
+      "A": "赫林氏管（canal of Hering）",
+      "B": "狄氏腔（space of Disse）",
+      "C": "肝竇（hepatic sinusoid）",
+      "D": "乳糜管（lacteal）"
+    },
+    "answer": "A",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "肝十二指腸韌帶與 portal triad",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 111 年第一次醫師一階醫學（一）",
+    "sourceYear": 2022,
+    "sourceRound": 1,
+    "originalQuestionNumber": 42
+  },
+  {
+    "id": "MOEX-111020-1301-Q049",
+    "subject": "解剖學",
+    "chapter": "骨盆與會陰",
+    "section": "會陰三角",
+    "stem": "下列何者是參與引發睪丸下降至陰囊（testis descent）的重要因子，而此與精子生成能力密切相關？",
+    "options": {
+      "A": "激活素（activin）",
+      "B": "雄性素（androgen）",
+      "C": "沃氏管退化因子（Wolffian duct regression factor）",
+      "D": "血管內皮生長因子（vascular endothelial growth factor）"
+    },
+    "answer": "B",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "會陰三角｜參與引發睪丸下降至陰囊（testis des",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 111 年第一次醫師一階醫學（一）",
+    "sourceYear": 2022,
+    "sourceRound": 1,
+    "originalQuestionNumber": 49
+  },
+  {
+    "id": "MOEX-111020-1301-Q050",
+    "subject": "解剖學",
+    "chapter": "胸腔",
+    "section": "縱膈",
+    "stem": "下列對於負責傳遞視覺刺激的細胞，其接受域（receptive field）的敘述，何者最不適當？",
+    "options": {
+      "A": "細胞接受域的形狀是由光點在完全黑暗的視野中游移測試得知，當光點刺激出現的位置可改變該細胞在黑暗 （或光點游移至該位置前）時所呈現的電位活動，即定義為該細胞的接受域",
+      "B": "相鄰的兩細胞，其接受域的形狀及大小，通常較空間分布位置相隔遙遠的兩細胞更為相似；相鄰兩細胞其接 受域發生重疊的程度，通常也較空間分布位置相隔遙遠的兩細胞為高",
+      "C": "感光細胞（包括桿細胞及椎細胞）及節細胞的接受域都是圓形，後者甚至會出現光刺激之效果相反或互相拮 抗之細胞電位活動反應的同心圓分布型態 。節細胞接受域圓的直徑通常都較感光細胞圓形接受域之直徑為小",
+      "D": "不論細胞具有on-center/off-surround或off-center/on-surround的接受域，對於解析光刺激究竟出現在甚麼位置 （或稱空間解像力）都有貢獻。off-surround可能是由鄰近細胞的側抑制（lateral inhibition）所造成"
+    },
+    "answer": "C",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "縱膈｜下列對於負責傳遞視覺刺激的細胞，其接受域（r",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 111 年第一次醫師一階醫學（一）",
+    "sourceYear": 2022,
+    "sourceRound": 1,
+    "originalQuestionNumber": 50
+  },
+  {
+    "id": "MOEX-111020-1301-Q051",
+    "subject": "解剖學",
+    "chapter": "神經解剖",
+    "section": "腦幹核區",
+    "stem": "下列神經元，何項最不可能是主司意識喚起（arousal）功能的ascending reticular formation system之一部分？",
+    "options": {
+      "A": "位於pontine reticular formation的cholinergic neuron",
+      "B": "位於locus coeruleus的noradrenergic neuron",
+      "C": "位於medial septal area的dopaminergic neuron",
+      "D": "位於dorsal raphé nucleus的serotoninergic neuron"
+    },
+    "answer": "C",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "腦幹核區｜下列神經元，何項最不可能是主司意識喚起（ar",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 111 年第一次醫師一階醫學（一）",
+    "sourceYear": 2022,
+    "sourceRound": 1,
+    "originalQuestionNumber": 51
+  },
+  {
+    "id": "MOEX-111020-1301-Q052",
+    "subject": "解剖學",
+    "chapter": "神經解剖",
+    "section": "聽覺與前庭路徑",
+    "stem": "個案因長期酗酒而出現有突然想不起來本來計畫好要做的事情、想不起來一個名字熟識的人其臉孔的特徵、 想用過去學過的詞彙來進行溝通，卻怎麼也想不起來那些詞彙要怎麼說等症狀的Korsakoff syndrome，但該個 案長久以來所建立的聽覺相關記憶卻無明顯缺損。下列何項腦區和該個案之功能缺損症狀最不相關？",
+    "options": {
+      "A": "prefrontal cortex",
+      "B": "parahippocampal cortex",
+      "C": "mammillary body",
+      "D": "planum temporale"
+    },
+    "answer": "D",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "聽覺與前庭路徑｜個案因長期酗酒而出現有突然想不起來本來計畫好",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 111 年第一次醫師一階醫學（一）",
+    "sourceYear": 2022,
+    "sourceRound": 1,
+    "originalQuestionNumber": 52
+  },
+  {
+    "id": "MOEX-111020-1301-Q060",
+    "subject": "解剖學",
+    "chapter": "胸腔",
+    "section": "心臟與冠狀動脈",
+    "stem": "在正常心臟週期的等容收縮（isovolumic contraction）期中，下列各腔室的壓力排列順序何者正確？",
+    "options": {
+      "A": "主動脈的壓力（aortic pressure）＞左心室的壓力（left ventricular pressure）＞左心房的壓力（left atrial pressure）",
+      "B": "主動脈的壓力（aortic pressure）＞左心房的壓力（left atrial pressure）＞左心室的壓力（left ventricular pressure）",
+      "C": "左心室的壓力（left ventricular pressure）＞ 主動脈的壓力（aortic pressure）＞ 左心房的壓力（left atrial pressure）",
+      "D": "左心室的壓力（left ventricular pressure）＞左心房的壓力（left atrial pressure）＞ 主動脈的壓力（aortic pressure）"
+    },
+    "answer": "A",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "心臟與冠狀動脈｜在正常心臟週期的等容收縮（isovolumi",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 111 年第一次醫師一階醫學（一）",
+    "sourceYear": 2022,
+    "sourceRound": 1,
+    "originalQuestionNumber": 60
+  },
+  {
+    "id": "MOEX-111020-1301-Q062",
+    "subject": "解剖學",
+    "chapter": "胸腔",
+    "section": "縱膈",
+    "stem": "王大明車禍失血導致平均動脈壓（mean arterial pressure）下降，下列何者與此一現象之發生最不相關？",
+    "options": {
+      "A": "血液總體積大幅下降",
+      "B": "分布到心臟的副交感神經活性減少",
+      "C": "周邊靜脈壓減少及靜脈回流減少",
+      "D": "心室舒張末期容積明顯減少"
+    },
+    "answer": "B",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "縱膈｜王大明車禍失血導致平均動脈壓（mean ar",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 111 年第一次醫師一階醫學（一）",
+    "sourceYear": 2022,
+    "sourceRound": 1,
+    "originalQuestionNumber": 62
+  },
+  {
+    "id": "MOEX-111020-1301-Q063",
+    "subject": "解剖學",
+    "chapter": "胸腔",
+    "section": "肺與胸膜",
+    "stem": "有關肺臟的氧氣擴散能力（diffusing capacity for oxygen），下列敘述何者正確？",
+    "options": {
+      "A": "在肺水腫（lung edema）時增加，運動時則減少",
+      "B": "在肺水腫（lung edema）時增加，運動時也增加",
+      "C": "在肺水腫（lung edema）時減少，運動時則增加",
+      "D": "在肺水腫（lung edema）時減少，運動時也減少"
+    },
+    "answer": "C",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "肺與胸膜｜肺臟的氧氣擴散能力（diffusing ca",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 111 年第一次醫師一階醫學（一）",
+    "sourceYear": 2022,
+    "sourceRound": 1,
+    "originalQuestionNumber": 63
+  },
+  {
+    "id": "MOEX-111020-1301-Q064",
+    "subject": "解剖學",
+    "chapter": "胸腔",
+    "section": "肺與胸膜",
+    "stem": "相較於正常換氣（normal ventilation），過度換氣（hyperventilation）時可見：①肺泡內氧分壓（ ）顯著 上升 ②肺泡內二氧化碳分壓（ ）顯著下降 ③體動脈血中二氧化碳總含量（total content of CO ）顯著 2 下降",
+    "options": {
+      "A": "僅①②",
+      "B": "僅②③",
+      "C": "僅①③",
+      "D": "①②③"
+    },
+    "answer": "D",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "肺與胸膜｜相較於正常換氣（normal ventila",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 111 年第一次醫師一階醫學（一）",
+    "sourceYear": 2022,
+    "sourceRound": 1,
+    "originalQuestionNumber": 64
+  },
+  {
+    "id": "MOEX-111020-1301-Q065",
+    "subject": "解剖學",
+    "chapter": "腹部",
+    "section": "肝膽胰脾",
+    "stem": "刺激下列何者，對於促進胃酸生成的效果最低？",
+    "options": {
+      "A": "D細胞（D cell）",
+      "B": "類腸嗜鉻細胞（enterochromaffin-like cell, ECL cell）",
+      "C": "G細胞（G cell）",
+      "D": "迷走神經（vagus nerve）"
+    },
+    "answer": "A",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "肝膽胰脾｜刺激下列何者，對於促進胃酸生成的效果最低",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 111 年第一次醫師一階醫學（一）",
+    "sourceYear": 2022,
+    "sourceRound": 1,
+    "originalQuestionNumber": 65
+  },
+  {
+    "id": "MOEX-111020-1301-Q066",
+    "subject": "解剖學",
+    "chapter": "腹部",
+    "section": "肝膽胰脾",
+    "stem": "關於分節運動（segmentation）的生理功能敘述，下列何者最適當？",
+    "options": {
+      "A": "混合腸腔內容物",
+      "B": "誘發胃結腸反射（gastrocolic reflex）的前趨活動",
+      "C": "快速推進食物",
+      "D": "抑制胃排空（gastric emptying）與降低胃酸分泌"
+    },
+    "answer": "A",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "肝膽胰脾｜分節運動（segmentation）的生理功",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 111 年第一次醫師一階醫學（一）",
+    "sourceYear": 2022,
+    "sourceRound": 1,
+    "originalQuestionNumber": 66
+  },
+  {
+    "id": "MOEX-111020-1301-Q069",
+    "subject": "解剖學",
+    "chapter": "神經解剖",
+    "section": "腦幹核區",
+    "stem": "腦下垂體腫瘤（pituitary adenoma）經手術切除後，下列那一個荷爾蒙的分泌量最不會受到影響？",
+    "options": {
+      "A": "皮質醇（cortisol）",
+      "B": "醛固酮（aldosterone）",
+      "C": "黃體素（progesterone）",
+      "D": "甲狀腺素（thyroid hormone）"
+    },
+    "answer": "B",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "腦幹核區｜腦下垂體腫瘤（pituitary adeno",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 111 年第一次醫師一階醫學（一）",
+    "sourceYear": 2022,
+    "sourceRound": 1,
+    "originalQuestionNumber": 69
+  },
+  {
+    "id": "MOEX-111020-1301-Q078",
+    "subject": "解剖學",
+    "chapter": "腹部",
+    "section": "肝膽胰脾",
+    "stem": "下列何種激素－受體相互作用後，受體會由單體（monomer）形成雙聚體（dimer）？",
+    "options": {
+      "A": "乙醯膽鹼與其菸鹼受體（nicotinic acetylcholine receptor）",
+      "B": "表皮生長因子（EGF）與其受體（EGF receptor）",
+      "C": "腎上腺素與其受體（β-adrenergic receptor）",
+      "D": "膠原蛋白與其受體（integrin）"
+    },
+    "answer": "B",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "肝膽胰脾｜下列何種激素－受體相互作用後，受體會由單體（",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 111 年第一次醫師一階醫學（一）",
+    "sourceYear": 2022,
+    "sourceRound": 1,
+    "originalQuestionNumber": 78
+  },
+  {
+    "id": "MOEX-111020-1301-Q079",
+    "subject": "解剖學",
+    "chapter": "腹部",
+    "section": "腹膜關係",
+    "stem": "庫欣氏症（Cushing syndrome）是一種腎上腺皮質類固醇分泌過多的疾病，下列敘述何者錯誤？",
+    "options": {
+      "A": "腎上腺皮質類固醇合成的前驅物是膽固醇",
+      "B": "類固醇無法穿透細胞膜，故必須作用於細胞膜上之受體",
+      "C": "腎上腺皮質類固醇與其受體結合可造成受體之構形改變",
+      "D": "受體經活化之後可調控基因轉錄作用"
+    },
+    "answer": "B",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "腹膜關係｜庫欣氏症（Cushing syndrome）",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 111 年第一次醫師一階醫學（一）",
+    "sourceYear": 2022,
+    "sourceRound": 1,
+    "originalQuestionNumber": 79
+  },
+  {
+    "id": "MOEX-111020-1301-Q081",
+    "subject": "解剖學",
+    "chapter": "下肢",
+    "section": "腰薦神經叢",
+    "stem": "下列那個雙股去氧核糖核酸的物理性質可被用來測定其融化溫度（melting temperature, T ）？ m",
+    "options": {
+      "A": "導電性（conductivity）",
+      "B": "在膠體中的泳動性（mobility）",
+      "C": "水溶性（solubility）",
+      "D": "低色度（hypochromicity）"
+    },
+    "answer": "D",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "腰薦神經叢｜下列那個雙股去氧核糖核酸的物理性質可被用來測",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 111 年第一次醫師一階醫學（一）",
+    "sourceYear": 2022,
+    "sourceRound": 1,
+    "originalQuestionNumber": 81
+  },
+  {
+    "id": "MOEX-111020-1301-Q084",
+    "subject": "解剖學",
+    "chapter": "胸腔",
+    "section": "縱膈",
+    "stem": "胸腺嘧啶（thymine）經代謝後在尿液中可測得的代謝產物為下列何者？",
+    "options": {
+      "A": "β-aminoisobutyric acid",
+      "B": "β-alanine",
+      "C": "uridine",
+      "D": "citidine"
+    },
+    "answer": "A",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "縱膈｜胸腺嘧啶（thymine）經代謝後在尿液中可",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 111 年第一次醫師一階醫學（一）",
+    "sourceYear": 2022,
+    "sourceRound": 1,
+    "originalQuestionNumber": 84
+  },
+  {
+    "id": "MOEX-111020-1301-Q097",
+    "subject": "解剖學",
+    "chapter": "腹部",
+    "section": "肝膽胰脾",
+    "stem": "下列對於膽酸（bile acids）的敘述，何者錯誤？",
+    "options": {
+      "A": "在小腸內脂肪的分解吸收過程中需要膽酸的幫助",
+      "B": "膽酸可由肝細胞合成",
+      "C": "促進水溶性維生素的吸收",
+      "D": "膽固醇為合成膽酸的前驅物"
+    },
+    "answer": "C",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "肝十二指腸韌帶與 portal triad",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 111 年第一次醫師一階醫學（一）",
+    "sourceYear": 2022,
+    "sourceRound": 1,
+    "originalQuestionNumber": 97
+  },
+  {
+    "id": "MOEX-111100-1301-Q001",
+    "subject": "解剖學",
+    "chapter": "神經解剖",
+    "section": "腦幹核區",
+    "stem": "下列何者由腦幹內的內弓狀纖維（internal arcuate fibers）交叉到對側之後匯聚形成？",
+    "options": {
+      "A": "內側蹄系（medial lemniscus）",
+      "B": "脊髓蹄系（spinal lemniscus）",
+      "C": "外側蹄系（lateral lemniscus）",
+      "D": "錐體交叉（pyramidal decussation）"
+    },
+    "answer": "A",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "腦幹核區｜由腦幹內的內弓狀纖維（internal ar",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 111 年第二次醫師一階醫學（一）",
+    "sourceYear": 2022,
+    "sourceRound": 2,
+    "originalQuestionNumber": 1
+  },
+  {
+    "id": "MOEX-111100-1301-Q002",
+    "subject": "解剖學",
+    "chapter": "神經解剖",
+    "section": "腦幹核區",
+    "stem": "連結大腦皮質的布羅卡氏區（Broca's area）與沃尼克氏區（Wernicke's area）間的主要神經纖維束稱為：",
+    "options": {
+      "A": "弓狀束（arcuate fasciculus）",
+      "B": "內側縱束（medial longitudinal fasciculus）",
+      "C": "背側縱束（dorsal longitudinal fasciculus）",
+      "D": "內側前腦束（medial forebrain bundle）"
+    },
+    "answer": "A",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "腦幹核區｜連結大腦皮質的布羅卡氏區（Broca's a",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 111 年第二次醫師一階醫學（一）",
+    "sourceYear": 2022,
+    "sourceRound": 2,
+    "originalQuestionNumber": 2
+  },
+  {
+    "id": "MOEX-111100-1301-Q003",
+    "subject": "解剖學",
+    "chapter": "神經解剖",
+    "section": "丘腦與基底核",
+    "stem": "乳頭體（mamillary body）發出乳頭丘腦束（mamillo-thalamic fasciculus），主要進入丘腦（thalamus）的那一 神經核？",
+    "options": {
+      "A": "腹前側核（ventral anterior nuclei）",
+      "B": "前側核（anterior nuclei）",
+      "C": "腹後外側核（ventral posterior lateral nuclei）",
+      "D": "腹後內側核（ventral posterior medial nuclei）"
+    },
+    "answer": "B",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "丘腦運動核群",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 111 年第二次醫師一階醫學（一）",
+    "sourceYear": 2022,
+    "sourceRound": 2,
+    "originalQuestionNumber": 3
+  },
+  {
+    "id": "MOEX-111100-1301-Q004",
+    "subject": "解剖學",
+    "chapter": "神經解剖",
+    "section": "丘腦與基底核",
+    "stem": "下列何者不經過丘腦（thalamus），直接傳入邊緣系統（limbic system）？",
+    "options": {
+      "A": "嗅覺訊息（olfactory signal）",
+      "B": "視覺訊息（visual signal）",
+      "C": "聽覺訊息（auditory signal）",
+      "D": "味覺訊息（gustatory signal）"
+    },
+    "answer": "A",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "丘腦與基底核｜不經過丘腦（thalamus），直接傳入邊緣",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 111 年第二次醫師一階醫學（一）",
+    "sourceYear": 2022,
+    "sourceRound": 2,
+    "originalQuestionNumber": 4
+  },
+  {
+    "id": "MOEX-111100-1301-Q006",
+    "subject": "解剖學",
+    "chapter": "頭頸部",
+    "section": "頸動脈鞘",
+    "stem": "下列何者與內頸動脈（internal carotid artery）一起穿入海綿竇（cavernous sinus）內，而後自行進入眼眶？",
+    "options": {
+      "A": "視神經（optic nerve）",
+      "B": "外旋神經（abducens nerve）",
+      "C": "三叉神經（trigeminal nerve）",
+      "D": "滑車神經（trochlear nerve）"
+    },
+    "answer": "B",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "頸動脈鞘｜內頸動脈（internal carotid ",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 111 年第二次醫師一階醫學（一）",
+    "sourceYear": 2022,
+    "sourceRound": 2,
+    "originalQuestionNumber": 6
+  },
+  {
+    "id": "MOEX-111100-1301-Q007",
+    "subject": "解剖學",
+    "chapter": "頭頸部",
+    "section": "顏面神經與三叉神經",
+    "stem": "下列關於眼瞼（eyelid）的描述，何者正確？",
+    "options": {
+      "A": "瞼板腺（tarsal gland）分泌水樣狀液體",
+      "B": "收集眼淚的淚湖（lacrimal lake）位於眼眶外下部",
+      "C": "提上眼瞼肌（levator palpebrae superioris）負責關閉眼瞼",
+      "D": "淚腺（lacrimal gland）位於眼眶外上部"
+    },
+    "answer": "D",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "顏面神經與三叉神經｜下列關於眼瞼（eyelid）的描述，何者正確",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 111 年第二次醫師一階醫學（一）",
+    "sourceYear": 2022,
+    "sourceRound": 2,
+    "originalQuestionNumber": 7
+  },
+  {
+    "id": "MOEX-111100-1301-Q008",
+    "subject": "解剖學",
+    "chapter": "上肢",
+    "section": "上肢血管",
+    "stem": "下列何者不是頸神經叢（cervical plexus）的分支？",
+    "options": {
+      "A": "枕小神經（lesser occipital nerve）",
+      "B": "耳大神經（great auricular nerve）",
+      "C": "肩胛上神經（suprascapular nerve）",
+      "D": "鎖骨上神經（supraclavicular nerve）"
+    },
+    "answer": "C",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "上肢血管｜不是頸神經叢（cervical plexus",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 111 年第二次醫師一階醫學（一）",
+    "sourceYear": 2022,
+    "sourceRound": 2,
+    "originalQuestionNumber": 8
+  },
+  {
+    "id": "MOEX-111100-1301-Q009",
+    "subject": "解剖學",
+    "chapter": "頭頸部",
+    "section": "顏面神經與三叉神經",
+    "stem": "下列何者不是顏面神經在顳骨區域的分支？",
+    "options": {
+      "A": "岩大神經（greater petrosal nerve）",
+      "B": "岩小神經（lesser petrosal nerve）",
+      "C": "鼓索神經（chorda tympani nerve）",
+      "D": "鐙骨肌神經（nerve to stapedius）"
+    },
+    "answer": "B",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "顏面神經與腮腺關係",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 111 年第二次醫師一階醫學（一）",
+    "sourceYear": 2022,
+    "sourceRound": 2,
+    "originalQuestionNumber": 9
+  },
+  {
+    "id": "MOEX-111100-1301-Q010",
+    "subject": "解剖學",
+    "chapter": "頭頸部",
+    "section": "顏面神經與三叉神經",
+    "stem": "拔除臼齒（molar teeth）時，不慎折斷牙根，其碎片最可能進入下列何副鼻竇？",
+    "options": {
+      "A": "蝶竇（sphenoid sinus）",
+      "B": "篩竇（ethmoid sinus）",
+      "C": "額竇（frontal sinus）",
+      "D": "上頷竇（maxillary sinus）"
+    },
+    "answer": "D",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "顏面神經與三叉神經｜拔除臼齒（molar teeth）時，不慎折",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 111 年第二次醫師一階醫學（一）",
+    "sourceYear": 2022,
+    "sourceRound": 2,
+    "originalQuestionNumber": 10
+  },
+  {
+    "id": "MOEX-111100-1301-Q013",
+    "subject": "解剖學",
+    "chapter": "神經解剖",
+    "section": "視覺路徑",
+    "stem": "下列那一部位損傷會出現如圖的視野缺損情形？",
+    "options": {
+      "A": "左視徑（left optic tract）",
+      "B": "視交叉（optic chiasm）",
+      "C": "右視神經（right optic nerve）",
+      "D": "右外膝狀核（right lateral geniculate nucleus）"
+    },
+    "answer": "A",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "視交叉病灶",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 111 年第二次醫師一階醫學（一）",
+    "sourceYear": 2022,
+    "sourceRound": 2,
+    "originalQuestionNumber": 13
+  },
+  {
+    "id": "MOEX-111100-1301-Q014",
+    "subject": "解剖學",
+    "chapter": "胸腔",
+    "section": "縱膈",
+    "stem": "右後胸壁的血液主要回流至下列那一個靜脈？",
+    "options": {
+      "A": "內胸靜脈（internal thoracic vein）",
+      "B": "半奇靜脈（hemiazygos vein）",
+      "C": "副半奇靜脈（accessory hemiazygos vein）",
+      "D": "奇靜脈（azygos vein）"
+    },
+    "answer": "D",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "後縱膈主要構造",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 111 年第二次醫師一階醫學（一）",
+    "sourceYear": 2022,
+    "sourceRound": 2,
+    "originalQuestionNumber": 14
+  },
+  {
+    "id": "MOEX-111100-1301-Q015",
+    "subject": "解剖學",
+    "chapter": "胸腔",
+    "section": "心臟與冠狀動脈",
+    "stem": "漿液性心包膜（serous pericardium）壁層（parietal layer）的痛覺由下列何者傳遞？",
+    "options": {
+      "A": "肋間神經（intercostal nerve）",
+      "B": "迷走神經（vagus nerve）",
+      "C": "交感神經幹（sympathetic trunk）",
+      "D": "膈神經（phrenic nerve）"
+    },
+    "answer": "D",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "心臟與冠狀動脈｜漿液性心包膜（serous pericard",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 111 年第二次醫師一階醫學（一）",
+    "sourceYear": 2022,
+    "sourceRound": 2,
+    "originalQuestionNumber": 15
+  },
+  {
+    "id": "MOEX-111100-1301-Q016",
+    "subject": "解剖學",
+    "chapter": "胸腔",
+    "section": "肺與胸膜",
+    "stem": "有關支氣管肺節段（bronchopulmonary segment），下列敘述何者最恰當？",
+    "options": {
+      "A": "每一個支氣管肺節段內的氣體，主要由一個細支氣管（bronchiole）來供應",
+      "B": "左右肺各有十個支氣管肺節段，但部分支氣管肺節段在右肺常常會彼此合併",
+      "C": "肺動脈常見於兩個支氣管肺節段之間",
+      "D": "單一個支氣管肺節段可以被手術移除，而不影響鄰近區域支氣管肺節段的功能"
+    },
+    "answer": "D",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "肺門構造相對位置",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 111 年第二次醫師一階醫學（一）",
+    "sourceYear": 2022,
+    "sourceRound": 2,
+    "originalQuestionNumber": 16
+  },
+  {
+    "id": "MOEX-111100-1301-Q017",
+    "subject": "解剖學",
+    "chapter": "胸腔",
+    "section": "縱膈",
+    "stem": "有關胸骨角（sternal angle）之敘述，下列何者正確？",
+    "options": {
+      "A": "兩側連接第一肋骨",
+      "B": "水平位置對應第四與第五胸椎間",
+      "C": "為胸骨體與劍突交界",
+      "D": "年輕時屬滑液關節（synovial joint），中老年時骨化"
+    },
+    "answer": "B",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "縱膈｜胸骨角（sternal angle）之敘述，",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 111 年第二次醫師一階醫學（一）",
+    "sourceYear": 2022,
+    "sourceRound": 2,
+    "originalQuestionNumber": 17
+  },
+  {
+    "id": "MOEX-111100-1301-Q018",
+    "subject": "解剖學",
+    "chapter": "胸腔",
+    "section": "縱膈",
+    "stem": "下膈動脈（inferior phrenic artery）是下列何者的分支？",
+    "options": {
+      "A": "腹主動脈（abdominal aorta）",
+      "B": "腎上腺動脈（suprarenal artery）",
+      "C": "內胸動脈（internal thoracic artery）",
+      "D": "胸主動脈（thoracic aorta）"
+    },
+    "answer": "A",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "縱膈｜下膈動脈（inferior phrenic ",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 111 年第二次醫師一階醫學（一）",
+    "sourceYear": 2022,
+    "sourceRound": 2,
+    "originalQuestionNumber": 18
+  },
+  {
+    "id": "MOEX-111100-1301-Q019",
+    "subject": "解剖學",
+    "chapter": "腹部",
+    "section": "腹膜關係",
+    "stem": "下列何者是腹膜後器官（retroperitoneal organ）？",
+    "options": {
+      "A": "肝臟（liver）",
+      "B": "胃（stomach）",
+      "C": "空腸（jejunum）",
+      "D": "胰臟（pancreas）"
+    },
+    "answer": "D",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "次發性後腹膜器官",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 111 年第二次醫師一階醫學（一）",
+    "sourceYear": 2022,
+    "sourceRound": 2,
+    "originalQuestionNumber": 19
+  },
+  {
+    "id": "MOEX-111100-1301-Q020",
+    "subject": "解剖學",
+    "chapter": "腹部",
+    "section": "肝膽胰脾",
+    "stem": "肝圓韌帶（round ligament of liver）是何種結構的遺跡？",
+    "options": {
+      "A": "靜脈導管（ductus venosus）",
+      "B": "臍靜脈（umbilical vein）",
+      "C": "臍動脈（umbilical artery）",
+      "D": "臍尿管（urachus）"
+    },
+    "answer": "B",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "肝十二指腸韌帶與 portal triad",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 111 年第二次醫師一階醫學（一）",
+    "sourceYear": 2022,
+    "sourceRound": 2,
+    "originalQuestionNumber": 20
+  },
+  {
+    "id": "MOEX-111100-1301-Q021",
+    "subject": "解剖學",
+    "chapter": "胸腔",
+    "section": "橫膈",
+    "stem": "下列結構及其神經支配之配對，何者錯誤？",
+    "options": {
+      "A": "橫膈（diaphragm）：膈神經（phrenic nerve）",
+      "B": "腰大肌（psoas major muscle）：股神經（femoral nerve）",
+      "C": "腹外斜肌（external oblique muscle）：T7-T11胸段脊神經（T7-T11 thoracic spinal nerves）",
+      "D": "髂肌（iliacus）：股神經（femoral nerve）"
+    },
+    "answer": "B",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "橫膈｜下列結構及其神經支配之配對，何者錯誤",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 111 年第二次醫師一階醫學（一）",
+    "sourceYear": 2022,
+    "sourceRound": 2,
+    "originalQuestionNumber": 21
+  },
+  {
+    "id": "MOEX-111100-1301-Q022",
+    "subject": "解剖學",
+    "chapter": "骨盆與會陰",
+    "section": "會陰三角",
+    "stem": "關於女性外陰（vulva），下列敘述何者正確？",
+    "options": {
+      "A": "尿道旁腺（paraurethral glands）又稱為巴多林氏腺（Bartholin's glands），其導管（ducts）開口於尿道口附 近",
+      "B": "大前庭腺（greater vestibular gland）位於前庭球（bulb of vestibule）的前方",
+      "C": "男性陰莖（penis）有懸韌帶（suspensory ligament），但女性陰蒂（clitoris）沒有",
+      "D": "前庭球（bulb of vestibule）是由勃起組織（erectile tissue）構成"
+    },
+    "answer": "D",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "會陰三角｜女性外陰（vulva），下列敘述何者正確",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 111 年第二次醫師一階醫學（一）",
+    "sourceYear": 2022,
+    "sourceRound": 2,
+    "originalQuestionNumber": 22
+  },
+  {
+    "id": "MOEX-111100-1301-Q023",
+    "subject": "解剖學",
+    "chapter": "骨盆與會陰",
+    "section": "會陰三角",
+    "stem": "下列何者不進入骨盆腔？",
+    "options": {
+      "A": "輸尿管（ureter）",
+      "B": "薦正中動脈（median sacral artery）",
+      "C": "下直腸動脈（inferior rectal artery）",
+      "D": "卵巢動脈（ovarian artery）"
+    },
+    "answer": "C",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "會陰三角｜不進入骨盆腔",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 111 年第二次醫師一階醫學（一）",
+    "sourceYear": 2022,
+    "sourceRound": 2,
+    "originalQuestionNumber": 23
+  },
+  {
+    "id": "MOEX-111100-1301-Q024",
+    "subject": "解剖學",
+    "chapter": "骨盆與會陰",
+    "section": "會陰三角",
+    "stem": "下列何者不是髂內動脈（internal iliac artery）的分支？",
+    "options": {
+      "A": "深髂迴旋動脈（deep circumflex iliac artery）",
+      "B": "髂腰動脈（iliolumbar artery）",
+      "C": "臀上動脈（superior gluteal artery）",
+      "D": "臀下動脈（inferior gluteal artery）"
+    },
+    "answer": "A",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "會陰三角｜不是髂內動脈（internal iliac ",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 111 年第二次醫師一階醫學（一）",
+    "sourceYear": 2022,
+    "sourceRound": 2,
+    "originalQuestionNumber": 24
+  },
+  {
+    "id": "MOEX-111100-1301-Q025",
+    "subject": "解剖學",
+    "chapter": "骨盆與會陰",
+    "section": "直腸與肛管",
+    "stem": "下列何者受損對肛管（anal canal）管壁肌肉的收縮影響最大？",
+    "options": {
+      "A": "腰內臟神經（lumbar splanchnic nerve）",
+      "B": "骨盆內臟神經（pelvic splanchnic nerve）",
+      "C": "薦交感神經幹（sacral sympathetic trunk）",
+      "D": "會陰神經（perineal nerve）"
+    },
+    "answer": "B",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "直腸與肛管｜受損對肛管（anal canal）管壁肌肉的",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 111 年第二次醫師一階醫學（一）",
+    "sourceYear": 2022,
+    "sourceRound": 2,
+    "originalQuestionNumber": 25
+  },
+  {
+    "id": "MOEX-111100-1301-Q026",
+    "subject": "解剖學",
+    "chapter": "下肢",
+    "section": "下肢血管",
+    "stem": "下列有關大隱靜脈（great saphenous vein）的敘述，何者錯誤？",
+    "options": {
+      "A": "一般起源於足背靜脈弓（dorsal venous arch）",
+      "B": "於內踝（medial malleolus）的後側向上延伸",
+      "C": "會與小隱靜脈（small saphenous vein）形成吻合（anastomosis）",
+      "D": "最終匯入股靜脈（femoral vein）"
+    },
+    "answer": "B",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "大隱靜脈回流",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 111 年第二次醫師一階醫學（一）",
+    "sourceYear": 2022,
+    "sourceRound": 2,
+    "originalQuestionNumber": 26
+  },
+  {
+    "id": "MOEX-111100-1301-Q027",
+    "subject": "解剖學",
+    "chapter": "上肢",
+    "section": "前臂屈伸肌",
+    "stem": "下列那一條神經所支配的肌肉群同時具有屈曲上臂與前臂作用（flex arm and forearm）﹖",
+    "options": {
+      "A": "腋神經（axillary nerve）",
+      "B": "胸背神經（thoracodorsal nerve）",
+      "C": "肌皮神經（musculocutaneous nerve）",
+      "D": "上肩胛下神經（upper subscapular nerve）"
+    },
+    "answer": "C",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "前臂屈伸肌｜下列那一條神經所支配的肌肉群同時具有屈曲上臂",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 111 年第二次醫師一階醫學（一）",
+    "sourceYear": 2022,
+    "sourceRound": 2,
+    "originalQuestionNumber": 27
+  },
+  {
+    "id": "MOEX-111100-1301-Q028",
+    "subject": "解剖學",
+    "chapter": "下肢",
+    "section": "足部",
+    "stem": "下列何者的肌腱繞過載距突（sustentaculum tali）下方的溝槽進入足底？",
+    "options": {
+      "A": "屈 長肌（flexor hallucis longus）",
+      "B": "屈趾長肌（flexor digitorum longus）",
+      "C": "屈 短肌（flexor hallucis brevis）",
+      "D": "屈趾短肌（flexor digitorum brevis）"
+    },
+    "answer": "A",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "足部｜的肌腱繞過載距突（sustentaculum",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 111 年第二次醫師一階醫學（一）",
+    "sourceYear": 2022,
+    "sourceRound": 2,
+    "originalQuestionNumber": 28
+  },
+  {
+    "id": "MOEX-111100-1301-Q030",
+    "subject": "解剖學",
+    "chapter": "下肢",
+    "section": "臀區",
+    "stem": "股骨大轉子（greater trochanter）碎裂時，對下列何者的功能影響最小？",
+    "options": {
+      "A": "臀大肌（gluteus maximus）",
+      "B": "臀小肌（gluteus minimus）",
+      "C": "梨狀肌（piriformis）",
+      "D": "閉孔內肌（obturator internus）"
+    },
+    "answer": "A",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "梨狀肌與坐骨神經關係",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 111 年第二次醫師一階醫學（一）",
+    "sourceYear": 2022,
+    "sourceRound": 2,
+    "originalQuestionNumber": 30
+  },
+  {
+    "id": "MOEX-111100-1301-Q032",
+    "subject": "解剖學",
+    "chapter": "胸腔",
+    "section": "心臟與冠狀動脈",
+    "stem": "下列關於胚胎之胸心包膜（pleuropericardial membrane）的敘述，何項錯誤？",
+    "options": {
+      "A": "形成漿液心包膜的臟層（visceral layer of serous pericardium）",
+      "B": "此膜內包含有總主靜脈（common cardinal vein）",
+      "C": "此膜內包含有膈神經（phrenic nerve）",
+      "D": "此膜所形成之構造分隔胸膜腔與心包腔"
+    },
+    "answer": "A",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "心臟與冠狀動脈｜下列關於胚胎之胸心包膜（pleuroperi",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 111 年第二次醫師一階醫學（一）",
+    "sourceYear": 2022,
+    "sourceRound": 2,
+    "originalQuestionNumber": 32
+  },
+  {
+    "id": "MOEX-111100-1301-Q033",
+    "subject": "解剖學",
+    "chapter": "頭頸部",
+    "section": "咽喉解剖",
+    "stem": "下列那一項構造衍生自第三咽弓（pharyngeal arch）？",
+    "options": {
+      "A": "莖突舌骨韌帶（stylohyoid ligament）",
+      "B": "舌骨之小角（lesser cornu of hyoid bone）",
+      "C": "舌骨之大角（greater cornu of hyoid bone）",
+      "D": "甲狀軟骨（thyroid cartilage）"
+    },
+    "answer": "C",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "咽喉解剖｜下列那一項構造衍生自第三咽弓（pharyng",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 111 年第二次醫師一階醫學（一）",
+    "sourceYear": 2022,
+    "sourceRound": 2,
+    "originalQuestionNumber": 33
+  },
+  {
+    "id": "MOEX-111100-1301-Q034",
+    "subject": "解剖學",
+    "chapter": "腹部",
+    "section": "肝膽胰脾",
+    "stem": "在胚胎發育至第幾週時，小腸會由體外返回腹腔內？",
+    "options": {
+      "A": "第四週",
+      "B": "第七週",
+      "C": "第十週",
+      "D": "第十二週"
+    },
+    "answer": "C",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "肝膽胰脾｜在胚胎發育至第幾週時，小腸會由體外返回腹腔內",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 111 年第二次醫師一階醫學（一）",
+    "sourceYear": 2022,
+    "sourceRound": 2,
+    "originalQuestionNumber": 34
+  },
+  {
+    "id": "MOEX-111100-1301-Q042",
+    "subject": "解剖學",
+    "chapter": "頭頸部",
+    "section": "舌與味覺",
+    "stem": "下列有關舌輪廓乳突（circumvallate papillae）的敘述，何者正確？",
+    "options": {
+      "A": "分布在舌外側且與舌長軸平行",
+      "B": "含有許多味蕾（taste bud）",
+      "C": "是舌乳突（papilla）中最小且數量最多",
+      "D": "表面覆有單層扁平上皮（simple squamous epithelium）"
+    },
+    "answer": "B",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "舌與味覺｜下列有關舌輪廓乳突（circumvallat",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 111 年第二次醫師一階醫學（一）",
+    "sourceYear": 2022,
+    "sourceRound": 2,
+    "originalQuestionNumber": 42
+  },
+  {
+    "id": "MOEX-111100-1301-Q048",
+    "subject": "解剖學",
+    "chapter": "下肢",
+    "section": "腰薦神經叢",
+    "stem": "下列何者最不可能造成視野缺失（scotoma）？",
+    "options": {
+      "A": "散光（astigmatism）",
+      "B": "斜視（strabismus）",
+      "C": "黃斑部退化（macular degeneration）",
+      "D": "左側側膝核附近發生缺血缺氧中風（ischemic, hypoxic stroke around left lateral geniculate nucleus, LGN）"
+    },
+    "answer": "A",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "腰薦神經叢｜不可能造成視野缺失（scotoma）",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 111 年第二次醫師一階醫學（一）",
+    "sourceYear": 2022,
+    "sourceRound": 2,
+    "originalQuestionNumber": 48
+  },
+  {
+    "id": "MOEX-111100-1301-Q051",
+    "subject": "解剖學",
+    "chapter": "神經解剖",
+    "section": "腦幹核區",
+    "stem": "下列有關腦電圖（EEG）的敘述，何者最不適當？",
+    "options": {
+      "A": "參照電極及紀錄電極可置放於頭皮上方",
+      "B": "紀錄電極所量測到的電位（或電壓）改變強度（波的振幅），一般是在微伏特（microV）的尺度範圍",
+      "C": "警醒或專心從事思考時，在頂葉或枕葉的紀錄電極常會呈現出頻率極低（＜2 Hz）的波形",
+      "D": "紀錄電極可反映出電極下方附近，大腦皮質部位神經元之細胞外的淨電流活動"
+    },
+    "answer": "C",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "腦幹核區｜下列有關腦電圖（EEG）的敘述，何者最不適當",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 111 年第二次醫師一階醫學（一）",
+    "sourceYear": 2022,
+    "sourceRound": 2,
+    "originalQuestionNumber": 51
+  },
+  {
+    "id": "MOEX-111100-1301-Q054",
+    "subject": "解剖學",
+    "chapter": "腹部",
+    "section": "肝膽胰脾",
+    "stem": "單胺氧化酶抑制劑（monoamine oxidase inhibitors）類藥物，會增加下列何種神經傳導物質的含量？",
+    "options": {
+      "A": "乙醯膽鹼（acetylcholine）",
+      "B": "麩胺酸（glutamate）",
+      "C": "甘胺酸（glycine）",
+      "D": "正腎上腺素（norepinephrine）"
+    },
+    "answer": "D",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "肝膽胰脾｜單胺氧化酶抑制劑（monoamine oxi",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 111 年第二次醫師一階醫學（一）",
+    "sourceYear": 2022,
+    "sourceRound": 2,
+    "originalQuestionNumber": 54
+  },
+  {
+    "id": "MOEX-111100-1301-Q057",
+    "subject": "解剖學",
+    "chapter": "胸腔",
+    "section": "縱膈",
+    "stem": "有關心電圖中各個波形與波間距離所代表的生理現象，下列何者錯誤？",
+    "options": {
+      "A": "P波反映心房再極化",
+      "B": "T波反映心室再極化",
+      "C": "QRS complex對應於心室動作電位之初生期",
+      "D": "ST interval對應於心室動作電位之高原期（plateau）"
+    },
+    "answer": "A",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "縱膈｜心電圖中各個波形與波間距離所代表的生理現象，",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 111 年第二次醫師一階醫學（一）",
+    "sourceYear": 2022,
+    "sourceRound": 2,
+    "originalQuestionNumber": 57
+  },
+  {
+    "id": "MOEX-111100-1301-Q058",
+    "subject": "解剖學",
+    "chapter": "胸腔",
+    "section": "縱膈",
+    "stem": "有關主動脈瓣之關閉（aortic valve closure）的敘述，下列何者錯誤？",
+    "options": {
+      "A": "主動脈瓣之關閉產生第二心音",
+      "B": "心室等容舒張期（isovolumic ventricular relaxation）開始於主動脈瓣之關閉",
+      "C": "主動脈瓣之關閉結束了心室射血期（ventricular ejection）",
+      "D": "主動脈瓣關閉之瞬間是主動脈壓最高的時刻"
+    },
+    "answer": "D",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "縱膈｜主動脈瓣之關閉（aortic valve c",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 111 年第二次醫師一階醫學（一）",
+    "sourceYear": 2022,
+    "sourceRound": 2,
+    "originalQuestionNumber": 58
+  },
+  {
+    "id": "MOEX-111100-1301-Q060",
+    "subject": "解剖學",
+    "chapter": "上肢",
+    "section": "上肢血管",
+    "stem": "某受試者，其氧氣消耗量為每分鐘600毫升（mL/min），肺動脈血氧濃度為每公升140毫升，肱動脈（brachial artery）血氧濃度為每公升200毫升，則此受試者的心輸出量（cardiac output）為多少L/min？",
+    "options": {
+      "A": "4.2",
+      "B": "10",
+      "C": "30",
+      "D": "34.2"
+    },
+    "answer": "B",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "上肢血管｜某受試者，其氧氣消耗量為每分鐘600毫升（m",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 111 年第二次醫師一階醫學（一）",
+    "sourceYear": 2022,
+    "sourceRound": 2,
+    "originalQuestionNumber": 60
+  },
+  {
+    "id": "MOEX-111100-1301-Q061",
+    "subject": "解剖學",
+    "chapter": "胸腔",
+    "section": "肺與胸膜",
+    "stem": "健康者站立，在其肺容量等於功能肺餘容量（functional residual capacity）時開始吸氣（inspiration），此時吸 入的氣體最容易進入下列何區域的肺泡（alveolus）？",
+    "options": {
+      "A": "肺底（base）處",
+      "B": "肺中段",
+      "C": "肺尖（apex）處",
+      "D": "平均分布於肺臟各處"
+    },
+    "answer": "A",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "肺與胸膜｜健康者站立，在其肺容量等於功能肺餘容量（fu",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 111 年第二次醫師一階醫學（一）",
+    "sourceYear": 2022,
+    "sourceRound": 2,
+    "originalQuestionNumber": 61
+  },
+  {
+    "id": "MOEX-111100-1301-Q063",
+    "subject": "解剖學",
+    "chapter": "腹部",
+    "section": "肝膽胰脾",
+    "stem": "下列關於胃泌素（gastrin）的敘述，何者正確？",
+    "options": {
+      "A": "主要製造的器官是小腸（small intestine），以促進胃酸分泌",
+      "B": "主要透過抑制Gi蛋白產生作用，以抑制胃酸分泌",
+      "C": "主要作用於主細胞（chief cell），以抑制胃酸分泌",
+      "D": "主要作用於細胞膜上的膽囊收縮素乙型（CCK ）接受器，以促進胃酸分泌 B"
+    },
+    "answer": "D",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "膽囊與膽囊動脈",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 111 年第二次醫師一階醫學（一）",
+    "sourceYear": 2022,
+    "sourceRound": 2,
+    "originalQuestionNumber": 63
+  },
+  {
+    "id": "MOEX-111100-1301-Q070",
+    "subject": "解剖學",
+    "chapter": "腹部",
+    "section": "腎臟與後腹腔",
+    "stem": "半夜血糖降低時，身體會發生何種反應，以協助調節血糖恆定（glucose homeostasis）？",
+    "options": {
+      "A": "腸道（intestine）分泌胰泌素（secretin）",
+      "B": "腎臟（kidney）分泌維生素D（vitamin D）",
+      "C": "胰臟（pancreas）分泌體抑素（somatostatin）",
+      "D": "腎上腺（adrenal gland）分泌腎上腺素（epinephrine）"
+    },
+    "answer": "D",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "腎臟後腹膜關係",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 111 年第二次醫師一階醫學（一）",
+    "sourceYear": 2022,
+    "sourceRound": 2,
+    "originalQuestionNumber": 70
+  },
+  {
+    "id": "MOEX-111100-1301-Q077",
+    "subject": "解剖學",
+    "chapter": "胸腔",
+    "section": "縱膈",
+    "stem": "Pyridoxal phosphate與aspartate aminotransferase活性中心的某胺基酸形成Schiff base來催化oxaloacetate形成 aspartate，此胺基酸是下列何者？",
+    "options": {
+      "A": "lysine",
+      "B": "cysteine",
+      "C": "serine",
+      "D": "arginine"
+    },
+    "answer": "A",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "縱膈｜Pyridoxal phosphate與as",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 111 年第二次醫師一階醫學（一）",
+    "sourceYear": 2022,
+    "sourceRound": 2,
+    "originalQuestionNumber": 77
+  },
+  {
+    "id": "MOEX-112100-1301-Q001",
+    "subject": "解剖學",
+    "chapter": "神經解剖",
+    "section": "小腦",
+    "stem": "光線照射右眼會使得雙側瞳孔同時縮小，這主要是因為右側的頂蓋前區（pretectal area）接收光線刺激後，其神 經纖維經由下列何者傳遞到左側的 E-W 神經核（Edinger-Westphal nucleus）？",
+    "options": {
+      "A": "前聯合神經束（anterior commissure）",
+      "B": "後聯合神經束（posterior commissure）",
+      "C": "視神經交叉（optic chiasma）",
+      "D": "上小腦腳交叉（superior cerebellar decussation）"
+    },
+    "answer": "B",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "小腦腳傳入傳出",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 112 年第二次醫師一階醫學（一）",
+    "sourceYear": 2023,
+    "sourceRound": 2,
+    "originalQuestionNumber": 1
+  },
+  {
+    "id": "MOEX-112100-1301-Q002",
+    "subject": "解剖學",
+    "chapter": "神經解剖",
+    "section": "小腦",
+    "stem": "下列何者由脊髓背核（nucleus dorsalis of Clarke）發出，主要傳遞下肢的本體感覺（proprioception of lower limbs）？",
+    "options": {
+      "A": "背側脊髓小腦徑（dorsal spinocerebellar tract）",
+      "B": "腹側脊髓小腦徑（ventral spinocerebellar tract）",
+      "C": "楔狀核小腦徑（cuneocerebellar tract）",
+      "D": "吻端脊髓小腦徑（rostral spinocerebellar tract）"
+    },
+    "answer": "A",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "脊髓小腦功能",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 112 年第二次醫師一階醫學（一）",
+    "sourceYear": 2023,
+    "sourceRound": 2,
+    "originalQuestionNumber": 2
+  },
+  {
+    "id": "MOEX-112100-1301-Q003",
+    "subject": "解剖學",
+    "chapter": "神經解剖",
+    "section": "丘腦與基底核",
+    "stem": "下列何者不是基底核直接迴路（direct basal ganglia pathway）傳遞路徑的主要構造？",
+    "options": {
+      "A": "殼核（putamen）",
+      "B": "內蒼白球（internal segment of globus pallidus）",
+      "C": "丘腦下核（subthalamus）",
+      "D": "丘腦（thalamus）"
+    },
+    "answer": "C",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "基底核構成與功能",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 112 年第二次醫師一階醫學（一）",
+    "sourceYear": 2023,
+    "sourceRound": 2,
+    "originalQuestionNumber": 3
+  },
+  {
+    "id": "MOEX-112100-1301-Q004",
+    "subject": "解剖學",
+    "chapter": "神經解剖",
+    "section": "腦幹核區",
+    "stem": "下列何者由海馬回（hippocampus）發出，傳遞至乳頭體（mamillary body）？",
+    "options": {
+      "A": "終紋（stria terminalis）",
+      "B": "穹窿（fornix）",
+      "C": "內側前腦束（medial forebrain bundle）",
+      "D": "內側縱束（medial longitudinal fasciculus）"
+    },
+    "answer": "B",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "腦幹核區｜由海馬回（hippocampus）發出，傳遞",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 112 年第二次醫師一階醫學（一）",
+    "sourceYear": 2023,
+    "sourceRound": 2,
+    "originalQuestionNumber": 4
+  },
+  {
+    "id": "MOEX-112100-1301-Q005",
+    "subject": "解剖學",
+    "chapter": "神經解剖",
+    "section": "自律神經",
+    "stem": "關於交感節前神經元（sympathetic preganglionic neuron）之敘述，下列何者錯誤？",
+    "options": {
+      "A": "細胞體主要位於脊髓灰質（gray matter of spinal cord）之 lamina VII",
+      "B": "可接受下視丘脊髓徑（hypothalamospinal fiber）之訊息",
+      "C": "神經元位於脊髓背核（nucleus dorsalis of Clarke）中",
+      "D": "脊髓胸段（thoracic spinal cord）含有交感節前神經元"
+    },
+    "answer": "C",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "自律神經｜交感節前神經元（sympathetic pr",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 112 年第二次醫師一階醫學（一）",
+    "sourceYear": 2023,
+    "sourceRound": 2,
+    "originalQuestionNumber": 5
+  },
+  {
+    "id": "MOEX-112100-1301-Q006",
+    "subject": "解剖學",
+    "chapter": "神經解剖",
+    "section": "腦幹核區",
+    "stem": "下列有關眼球血管之敘述，何者正確？",
+    "options": {
+      "A": "眼動脈（ophthalmic artery）經由視神經管（optic canal）進入眼眶",
+      "B": "眼動脈（ophthalmic artery）為中腦膜動脈（middle meningeal artery）之分支",
+      "C": "眼下靜脈（inferior ophthalmic vein）通過共同腱環（common tendinous ring）進入眼眶",
+      "D": "淚動脈（lacrimal artery）位於視神經內側"
+    },
+    "answer": "A",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "腦幹核區｜下列有關眼球血管之敘述，何者正確",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 112 年第二次醫師一階醫學（一）",
+    "sourceYear": 2023,
+    "sourceRound": 2,
+    "originalQuestionNumber": 6
+  },
+  {
+    "id": "MOEX-112100-1301-Q007",
+    "subject": "解剖學",
+    "chapter": "頭頸部",
+    "section": "顏面神經與三叉神經",
+    "stem": "下列有關頸外靜脈（external jugular vein）的描述，何者正確？",
+    "options": {
+      "A": "屬於頸部深層靜脈",
+      "B": "位於胸鎖乳突肌（sternocleidomastoid muscle）之下",
+      "C": "與迷走神經（vagus nerve）伴行",
+      "D": "收集部分顏面的血液後注入鎖骨下靜脈（subclavian vein）"
+    },
+    "answer": "D",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "顏面神經與三叉神經｜下列有關頸外靜脈（external jugu",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 112 年第二次醫師一階醫學（一）",
+    "sourceYear": 2023,
+    "sourceRound": 2,
+    "originalQuestionNumber": 7
+  },
+  {
+    "id": "MOEX-112100-1301-Q008",
+    "subject": "解剖學",
+    "chapter": "頭頸部",
+    "section": "舌與味覺",
+    "stem": "病人主訴聲音嘶啞且口咽部和舌後三分之一的感覺喪失，經檢查發現顱底有一腫瘤。此腫瘤最可能存在下列何 處？",
+    "options": {
+      "A": "盲孔（foramen cecum）處",
+      "B": "圓孔（foramen rotundum）處",
+      "C": "頸靜脈孔（jugular foramen）處",
+      "D": "枕骨大孔（foramen magnum）處"
+    },
+    "answer": "C",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "舌後 1/3 感覺與味覺",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 112 年第二次醫師一階醫學（一）",
+    "sourceYear": 2023,
+    "sourceRound": 2,
+    "originalQuestionNumber": 8
+  },
+  {
+    "id": "MOEX-112100-1301-Q009",
+    "subject": "解剖學",
+    "chapter": "頭頸部",
+    "section": "咽喉解剖",
+    "stem": "下列那一條神經，會穿過甲狀舌骨膜（thyrohyoid membrane）進入喉部？",
+    "options": {
+      "A": "舌咽神經（glossopharyngeal nerve）",
+      "B": "內喉神經（internal laryngeal nerve）",
+      "C": "外喉神經（external laryngeal nerve）",
+      "D": "喉返神經（recurrent laryngeal nerve）"
+    },
+    "answer": "B",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "喉返神經走行",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 112 年第二次醫師一階醫學（一）",
+    "sourceYear": 2023,
+    "sourceRound": 2,
+    "originalQuestionNumber": 9
+  },
+  {
+    "id": "MOEX-112100-1301-Q010",
+    "subject": "解剖學",
+    "chapter": "神經解剖",
+    "section": "腦幹核區",
+    "stem": "下列何者不會出現在眼窩的共同腱環（common tendinous ring）內？",
+    "options": {
+      "A": "第三對腦神經（CN III）",
+      "B": "第四對腦神經（CN IV）",
+      "C": "第五對腦神經（CN V）",
+      "D": "第六對腦神經（CN VI）"
+    },
+    "answer": "B",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "腦幹核區｜不會出現在眼窩的共同腱環（common te",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 112 年第二次醫師一階醫學（一）",
+    "sourceYear": 2023,
+    "sourceRound": 2,
+    "originalQuestionNumber": 10
+  },
+  {
+    "id": "MOEX-112100-1301-Q011",
+    "subject": "解剖學",
+    "chapter": "頭頸部",
+    "section": "咽喉解剖",
+    "stem": "耳咽管（auditory tube）開口於鼓室腔（tympanic cavity）的何處？",
+    "options": {
+      "A": "前壁",
+      "B": "後壁",
+      "C": "內壁",
+      "D": "外壁"
+    },
+    "answer": "A",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "咽喉解剖｜耳咽管（auditory tube）開口於鼓",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 112 年第二次醫師一階醫學（一）",
+    "sourceYear": 2023,
+    "sourceRound": 2,
+    "originalQuestionNumber": 11
+  },
+  {
+    "id": "MOEX-112100-1301-Q013",
+    "subject": "解剖學",
+    "chapter": "神經解剖",
+    "section": "腦幹核區",
+    "stem": "下列何者部分起自翼下頷縫（pterygomandibular raphe）？",
+    "options": {
+      "A": "口輪匝肌（orbicularis oris）",
+      "B": "笑肌（risorius）",
+      "C": "顴大肌（zygomaticus major）",
+      "D": "頰肌（buccinator）"
+    },
+    "answer": "D",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "腦幹核區｜部分起自翼下頷縫（pterygomandib",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 112 年第二次醫師一階醫學（一）",
+    "sourceYear": 2023,
+    "sourceRound": 2,
+    "originalQuestionNumber": 13
+  },
+  {
+    "id": "MOEX-112100-1301-Q014",
+    "subject": "解剖學",
+    "chapter": "胸腔",
+    "section": "心臟與冠狀動脈",
+    "stem": "竇房結（sinoatrial node）最常出現在何處？",
+    "options": {
+      "A": "位於冠狀竇（coronary sinus）開口處附近",
+      "B": "位於界嵴（crista terminalis）靠近上腔靜脈與右心房的交界處",
+      "C": "位於房室間隔（atrioventricular septum）內",
+      "D": "位於上腔靜脈與心房間隔（interatrial septum）的交界處"
+    },
+    "answer": "B",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "心臟靜脈回流",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 112 年第二次醫師一階醫學（一）",
+    "sourceYear": 2023,
+    "sourceRound": 2,
+    "originalQuestionNumber": 14
+  },
+  {
+    "id": "MOEX-112100-1301-Q015",
+    "subject": "解剖學",
+    "chapter": "胸腔",
+    "section": "心臟與冠狀動脈",
+    "stem": "意外造成第四肋間、胸骨左緣穿刺傷，下列心臟的那個部位可能最先受損？",
+    "options": {
+      "A": "左心房",
+      "B": "左心室",
+      "C": "右心房",
+      "D": "右心室"
+    },
+    "answer": "D",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "心臟與冠狀動脈｜意外造成第四肋間、胸骨左緣穿刺傷，下列心臟的",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 112 年第二次醫師一階醫學（一）",
+    "sourceYear": 2023,
+    "sourceRound": 2,
+    "originalQuestionNumber": 15
+  },
+  {
+    "id": "MOEX-112100-1301-Q016",
+    "subject": "解剖學",
+    "chapter": "頭頸部",
+    "section": "舌與味覺",
+    "stem": "肺葉小舌（lingula of lung）位在肺部的那一個位置？",
+    "options": {
+      "A": "右肺上葉（superior lobe of right lung）",
+      "B": "左肺上葉（superior lobe of left lung）",
+      "C": "左肺下葉（inferior lobe of left lung）",
+      "D": "右肺下葉（inferior lobe of right lung）"
+    },
+    "answer": "B",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "舌與味覺｜肺葉小舌（lingula of lung）位",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 112 年第二次醫師一階醫學（一）",
+    "sourceYear": 2023,
+    "sourceRound": 2,
+    "originalQuestionNumber": 16
+  },
+  {
+    "id": "MOEX-112100-1301-Q017",
+    "subject": "解剖學",
+    "chapter": "胸腔",
+    "section": "肺與胸膜",
+    "stem": "肋溝（costal groove）內的肋間血管、神經，由上到下之順序為：",
+    "options": {
+      "A": "肋間動脈、肋間靜脈、肋間神經",
+      "B": "肋間神經、肋間靜脈、肋間動脈",
+      "C": "肋間靜脈、肋間動脈、肋間神經",
+      "D": "肋間神經、肋間動脈、肋間靜脈"
+    },
+    "answer": "C",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "肺與胸膜｜肋溝（costal groove）內的肋間血",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 112 年第二次醫師一階醫學（一）",
+    "sourceYear": 2023,
+    "sourceRound": 2,
+    "originalQuestionNumber": 17
+  },
+  {
+    "id": "MOEX-112100-1301-Q018",
+    "subject": "解剖學",
+    "chapter": "胸腔",
+    "section": "橫膈",
+    "stem": "下列何者穿過橫膈（diaphragm）的中央肌腱（central tendon）？",
+    "options": {
+      "A": "主動脈（aorta）",
+      "B": "食道（esophagus）",
+      "C": "迷走神經幹（vagal trunk）",
+      "D": "下腔靜脈（inferior vena cava）"
+    },
+    "answer": "D",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "橫膈｜穿過橫膈（diaphragm）的中央肌腱（c",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 112 年第二次醫師一階醫學（一）",
+    "sourceYear": 2023,
+    "sourceRound": 2,
+    "originalQuestionNumber": 18
+  },
+  {
+    "id": "MOEX-112100-1301-Q019",
+    "subject": "解剖學",
+    "chapter": "腹部",
+    "section": "肝膽胰脾",
+    "stem": "下列何者不是大腸（large intestine）的特徵？",
+    "options": {
+      "A": "腸脂垂（omental appendices）",
+      "B": "結腸帶（teniae coli）",
+      "C": "結腸袋（haustra）",
+      "D": "大彎（greater curvature）"
+    },
+    "answer": "D",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "肝膽胰脾｜不是大腸（large intestine）的",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 112 年第二次醫師一階醫學（一）",
+    "sourceYear": 2023,
+    "sourceRound": 2,
+    "originalQuestionNumber": 19
+  },
+  {
+    "id": "MOEX-112100-1301-Q020",
+    "subject": "解剖學",
+    "chapter": "骨盆與會陰",
+    "section": "會陰三角",
+    "stem": "直接型腹股溝疝氣（direct inguinal hernia）好發於下列何處？",
+    "options": {
+      "A": "腹股溝外側窩（lateral inguinal fossa）",
+      "B": "腹股溝內側窩（medial inguinal fossa）",
+      "C": "膀胱上窩（supravesical fossa）",
+      "D": "鼠蹊韌帶（inguinal ligament）的下側"
+    },
+    "answer": "B",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "會陰三角｜直接型腹股溝疝氣（direct inguin",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 112 年第二次醫師一階醫學（一）",
+    "sourceYear": 2023,
+    "sourceRound": 2,
+    "originalQuestionNumber": 20
+  },
+  {
+    "id": "MOEX-112100-1301-Q021",
+    "subject": "解剖學",
+    "chapter": "腹部",
+    "section": "肝膽胰脾",
+    "stem": "闌尾炎初期出現肚臍附近（periumbilical）疼痛感，此痛覺與下列何脊髓節段有關？",
+    "options": {
+      "A": "T6",
+      "B": "T10",
+      "C": "L1",
+      "D": "L5"
+    },
+    "answer": "B",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "肝膽胰脾｜闌尾炎初期出現肚臍附近（periumbili",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 112 年第二次醫師一階醫學（一）",
+    "sourceYear": 2023,
+    "sourceRound": 2,
+    "originalQuestionNumber": 21
+  },
+  {
+    "id": "MOEX-112100-1301-Q022",
+    "subject": "解剖學",
+    "chapter": "骨盆與會陰",
+    "section": "泌尿生殖",
+    "stem": "下列何構造延伸通過腹股溝管（inguinal canal）？",
+    "options": {
+      "A": "子宮圓韌帶（round ligament of uterus）",
+      "B": "卵巢韌帶（ligament of ovary）",
+      "C": "子宮薦骨韌帶（uterosacral ligament）",
+      "D": "主韌帶（cardinal ligament）"
+    },
+    "answer": "A",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "卵巢韌帶與懸韌帶",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 112 年第二次醫師一階醫學（一）",
+    "sourceYear": 2023,
+    "sourceRound": 2,
+    "originalQuestionNumber": 22
+  },
+  {
+    "id": "MOEX-112100-1301-Q023",
+    "subject": "解剖學",
+    "chapter": "骨盆與會陰",
+    "section": "會陰三角",
+    "stem": "關於陰莖（penis），下列敘述何者正確？",
+    "options": {
+      "A": "陰莖背動脈（dorsal artery of penis）走在陰莖背面，位於巴克氏筋膜（Buck's fascia）的淺層",
+      "B": "陰莖海綿體（corpus cavernosum）血液的供應，主要來自陰莖背動脈（dorsal artery of penis）",
+      "C": "陰莖深背靜脈（deep dorsal vein of penis）走在陰莖背面，位於巴克氏筋膜（Buck's fascia）的深層",
+      "D": "陰莖沒有淋巴管的分布"
+    },
+    "answer": "C",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "會陰三角｜陰莖（penis），下列敘述何者正確",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 112 年第二次醫師一階醫學（一）",
+    "sourceYear": 2023,
+    "sourceRound": 2,
+    "originalQuestionNumber": 23
+  },
+  {
+    "id": "MOEX-112100-1301-Q024",
+    "subject": "解剖學",
+    "chapter": "骨盆與會陰",
+    "section": "骨盆血管",
+    "stem": "下列何者不供應輸尿管（ureter）的血液？",
+    "options": {
+      "A": "下膀胱動脈（inferior vesical artery）",
+      "B": "閉孔動脈（obturator artery）",
+      "C": "子宮動脈（uterine artery）",
+      "D": "髂內動脈（internal iliac artery）"
+    },
+    "answer": "B",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "髂內動脈分支",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 112 年第二次醫師一階醫學（一）",
+    "sourceYear": 2023,
+    "sourceRound": 2,
+    "originalQuestionNumber": 24
+  },
+  {
+    "id": "MOEX-112100-1301-Q025",
+    "subject": "解剖學",
+    "chapter": "骨盆與會陰",
+    "section": "直腸與肛管",
+    "stem": "直腸一般內臟感覺（visceral afferent）的初級神經元（primary sensory neuron）位於何處？",
+    "options": {
+      "A": "L4～5 之背根神經節（dorsal root ganglia）",
+      "B": "L1～3 之背根神經節（dorsal root ganglia）",
+      "C": "S2～4 之背根神經節（dorsal root ganglia）",
+      "D": "T10～12 之背根神經節（dorsal root ganglia）"
+    },
+    "answer": "C",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "直腸與肛管｜直腸一般內臟感覺（visceral affe",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 112 年第二次醫師一階醫學（一）",
+    "sourceYear": 2023,
+    "sourceRound": 2,
+    "originalQuestionNumber": 25
+  },
+  {
+    "id": "MOEX-112100-1301-Q026",
+    "subject": "解剖學",
+    "chapter": "上肢",
+    "section": "上肢血管",
+    "stem": "三角肌粗隆（deltoid tuberosity）出現在下列何骨頭上？",
+    "options": {
+      "A": "胸骨（sternum）",
+      "B": "鎖骨（clavicle）",
+      "C": "肱骨（humerus）",
+      "D": "肩胛骨（scapula）"
+    },
+    "answer": "C",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "上肢血管｜三角肌粗隆（deltoid tuberosi",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 112 年第二次醫師一階醫學（一）",
+    "sourceYear": 2023,
+    "sourceRound": 2,
+    "originalQuestionNumber": 26
+  },
+  {
+    "id": "MOEX-112100-1301-Q027",
+    "subject": "解剖學",
+    "chapter": "上肢",
+    "section": "上肢血管",
+    "stem": "下列何者在屈肌支持帶（flexor retinaculum）的淺層？",
+    "options": {
+      "A": "尺動脈（ulnar artery）",
+      "B": "正中神經（median nerve）",
+      "C": "屈拇長肌（flexor pollicis longus）",
+      "D": "屈指淺肌（flexor digitorum superficialis）"
+    },
+    "answer": "A",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "前臂主要動脈",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 112 年第二次醫師一階醫學（一）",
+    "sourceYear": 2023,
+    "sourceRound": 2,
+    "originalQuestionNumber": 27
+  },
+  {
+    "id": "MOEX-112100-1301-Q028",
+    "subject": "解剖學",
+    "chapter": "下肢",
+    "section": "腰薦神經叢",
+    "stem": "下列有關膝關節前十字韌帶（anterior cruciate ligament）位置的敘述，何者正確？",
+    "options": {
+      "A": "位於關節囊（articular capsule）及滑液囊（synovial sac）內",
+      "B": "位於關節囊（articular capsule）內，但是在滑液囊（synovial sac）外",
+      "C": "位於關節囊（articular capsule）外，但包在滑液囊（synovial sac）內",
+      "D": "位於關節囊（articular capsule）及滑液囊（synovial sac）外"
+    },
+    "answer": "B",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "腰薦神經叢｜下列有關膝關節前十字韌帶（anterior ",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 112 年第二次醫師一階醫學（一）",
+    "sourceYear": 2023,
+    "sourceRound": 2,
+    "originalQuestionNumber": 28
+  },
+  {
+    "id": "MOEX-112100-1301-Q029",
+    "subject": "解剖學",
+    "chapter": "神經解剖",
+    "section": "脊髓傳導路徑",
+    "stem": "膝跳反射（knee jerk reflex）主要檢測下列那個脊髓節段的功能？",
+    "options": {
+      "A": "T9～T12",
+      "B": "T11～L1",
+      "C": "L2～L4",
+      "D": "L5～S2"
+    },
+    "answer": "C",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "脊髓傳導路徑｜膝跳反射（knee jerk reflex）",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 112 年第二次醫師一階醫學（一）",
+    "sourceYear": 2023,
+    "sourceRound": 2,
+    "originalQuestionNumber": 29
+  },
+  {
+    "id": "MOEX-112100-1301-Q030",
+    "subject": "解剖學",
+    "chapter": "下肢",
+    "section": "足部",
+    "stem": "下列何者的肌腱會從外側橫跨足底，附著於足底內側的第一蹠骨（first metatarsal）與楔狀骨（cuneiform）？",
+    "options": {
+      "A": "腓骨短肌（fibularis brevis）",
+      "B": "腓骨長肌（fibularis longus）",
+      "C": "屈長肌（flexor hallucis longus）",
+      "D": "屈趾長肌（flexor digitorum longus）"
+    },
+    "answer": "B",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "足底內側神經分布",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 112 年第二次醫師一階醫學（一）",
+    "sourceYear": 2023,
+    "sourceRound": 2,
+    "originalQuestionNumber": 30
+  },
+  {
+    "id": "MOEX-112100-1301-Q031",
+    "subject": "解剖學",
+    "chapter": "上肢",
+    "section": "臂神經叢",
+    "stem": "撞擊導致手肘部位的旋前圓肌（pronator teres）中央撕裂傷，下列何者最可能直接受到傷害？",
+    "options": {
+      "A": "橈神經（radial nerve）",
+      "B": "尺神經（ulnar nerve）",
+      "C": "正中神經（median nerve）",
+      "D": "正中神經（median nerve）與尺神經（ulnar nerve）均受影響"
+    },
+    "answer": "C",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "臂神經叢終末分支",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 112 年第二次醫師一階醫學（一）",
+    "sourceYear": 2023,
+    "sourceRound": 2,
+    "originalQuestionNumber": 31
+  },
+  {
+    "id": "MOEX-112100-1301-Q033",
+    "subject": "解剖學",
+    "chapter": "頭頸部",
+    "section": "甲狀腺與副甲狀腺",
+    "stem": "下列有關甲狀腺（thyroid gland）發育之敘述，何項錯誤？",
+    "options": {
+      "A": "主要為咽原基（primordial pharynx）內胚層增厚所形成",
+      "B": "甲狀腺憩室（diverticulum）會脫離咽原基（primordial pharynx）在頸部腹側向下方移動",
+      "C": "甲狀腺憩室（diverticulum）脫離咽原基（primordial pharynx）之處，即為門齒窩（incisive fossa）",
+      "D": "甲狀腺內有來自第四咽囊（pharyngeal pouch）之細胞"
+    },
+    "answer": "C",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "甲狀腺與副甲狀腺｜下列有關甲狀腺（thyroid gland）",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 112 年第二次醫師一階醫學（一）",
+    "sourceYear": 2023,
+    "sourceRound": 2,
+    "originalQuestionNumber": 33
+  },
+  {
+    "id": "MOEX-112100-1301-Q034",
+    "subject": "解剖學",
+    "chapter": "腹部",
+    "section": "腹膜關係",
+    "stem": "下列何者是由中腎管（mesonephric duct）末端所形成？",
+    "options": {
+      "A": "前列腺（prostate gland）",
+      "B": "前列腺囊（prostatic utricle）",
+      "C": "精囊（seminal vesicle）",
+      "D": "尿道球腺（bulbourethral gland）"
+    },
+    "answer": "C",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "腹膜關係｜由中腎管（mesonephric duct）",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 112 年第二次醫師一階醫學（一）",
+    "sourceYear": 2023,
+    "sourceRound": 2,
+    "originalQuestionNumber": 34
+  },
+  {
+    "id": "MOEX-112100-1301-Q036",
+    "subject": "解剖學",
+    "chapter": "胸腔",
+    "section": "縱膈",
+    "stem": "下列那一構造，因出生以前的提早閉合而造成長楔形之舟形頭（scaphocephaly）？",
+    "options": {
+      "A": "前囟（anterior fontanelle）",
+      "B": "後囟（posterior fontanelle）",
+      "C": "冠狀縫（coronal suture）",
+      "D": "矢狀縫（sagittal suture）"
+    },
+    "answer": "D",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "縱膈｜下列那一構造，因出生以前的提早閉合而造成長楔",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 112 年第二次醫師一階醫學（一）",
+    "sourceYear": 2023,
+    "sourceRound": 2,
+    "originalQuestionNumber": 36
+  },
+  {
+    "id": "MOEX-112100-1301-Q045",
+    "subject": "解剖學",
+    "chapter": "骨盆與會陰",
+    "section": "會陰三角",
+    "stem": "關於蔓狀叢（pampiniform plexus）的敘述，下列何者正確？",
+    "options": {
+      "A": "僅具有環走的平滑肌層",
+      "B": "肌肉層僅出現於中膜層（tunica media）",
+      "C": "位於睪丸（testis）中",
+      "D": "有較厚的肌肉壁，屬於非典型的靜脈（atypical vein）"
+    },
+    "answer": "D",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "會陰三角｜蔓狀叢（pampiniform plexus",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 112 年第二次醫師一階醫學（一）",
+    "sourceYear": 2023,
+    "sourceRound": 2,
+    "originalQuestionNumber": 45
+  },
+  {
+    "id": "MOEX-112100-1301-Q048",
+    "subject": "解剖學",
+    "chapter": "腹部",
+    "section": "腹膜關係",
+    "stem": "有關視網膜的敘述，下列何者最不適當？",
+    "options": {
+      "A": "錐細胞（cone）和桿細胞（rod）皆位於視網膜內，最遠離玻璃體的外層位置",
+      "B": "錐細胞（cone）因數量遠較桿細胞（rod）多，因此錐細胞對空間解像力（或視覺敏銳度）的貢獻較桿細胞多",
+      "C": "亮適應主要涉及 rhodopsin 之分解而非形成，所以較暗適應需時較短",
+      "D": "錐細胞（cone）被激起反應所需的光子量較桿細胞（rod）為多，因此在黑暗中去尋找光度極低的目標時，不 宜聚焦凝視"
+    },
+    "answer": "B",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "腹膜關係｜視網膜的敘述，下列何者最不適當",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 112 年第二次醫師一階醫學（一）",
+    "sourceYear": 2023,
+    "sourceRound": 2,
+    "originalQuestionNumber": 48
+  },
+  {
+    "id": "MOEX-112100-1301-Q049",
+    "subject": "解剖學",
+    "chapter": "神經解剖",
+    "section": "脊髓傳導路徑",
+    "stem": "已知 corticospinal tract、corticobulbar tract、rubrospinal tract 下行的刺激訊息多匯集於四肢的縮肌（flexor muscle） 群，使之收縮；而 pontine reticulospinal tract 主要的下行刺激訊息最終傾向引起四肢伸肌（extensor muscle）群的 收縮。若 uncal herniation-induced supratentorial lesion 發生在中腦四疊體（superior and inferior colliculi）之中線 間，則肢體的狀態最可能是下列何者？",
+    "options": {
+      "A": "上下肢皆伸直僵硬",
+      "B": "上肢蜷起向內靠近胸部，下肢伸直僵硬",
+      "C": "下肢蜷起向內，上肢伸直僵硬向外",
+      "D": "頸部僵硬，上下肢完全失去張力"
+    },
+    "answer": "A",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "皮質脊髓徑",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 112 年第二次醫師一階醫學（一）",
+    "sourceYear": 2023,
+    "sourceRound": 2,
+    "originalQuestionNumber": 49
+  },
+  {
+    "id": "MOEX-112100-1301-Q051",
+    "subject": "解剖學",
+    "chapter": "神經解剖",
+    "section": "腦幹核區",
+    "stem": "兔子僅以左眼多次學習 light flickering 和 shock 前後依序出現的制約，並以瞬膜在 light flickering 出現後隨即迅 速關閉來表現該制約的學習記憶成果。學習結束後發現左右眼瞬膜皆能因應 light flickering 出現而關閉。即使 在制約前先切除兔子的 optic chiasm，左右眼仍能表現出這個記憶。但若在制約訓練前將聯絡左右腦的 corpus callosum 完全切斷，右眼不能表現出該制約記憶，僅左眼能。這個現象最適合說明下列何項？",
+    "options": {
+      "A": "該制約的學習有偏重大腦皮質某一邊的功能側化現象（lateralization）",
+      "B": "該制約記憶僅能存於左腦皮質",
+      "C": "該制約記憶提取必須經由右腦皮質",
+      "D": "該制約記憶可存放於左腦及右腦皮質"
+    },
+    "answer": "D",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "腦幹核區｜兔子僅以左眼多次學習 light flick",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 112 年第二次醫師一階醫學（一）",
+    "sourceYear": 2023,
+    "sourceRound": 2,
+    "originalQuestionNumber": 51
+  },
+  {
+    "id": "MOEX-112100-1301-Q053",
+    "subject": "解剖學",
+    "chapter": "神經解剖",
+    "section": "腦幹核區",
+    "stem": "下列有關血清素（serotonin）的敘述，何者正確？",
+    "options": {
+      "A": "人體血清素含量最多的部位的是大腦，其次是消化系統與血液",
+      "B": "人體血清素受體主要是離子通道型受體",
+      "C": "血清素神經元（serotonergic neurons）在睡覺時要比清醒時的活性來得高",
+      "D": "選擇性血清素再攝取抑制劑（selective serotonin reuptake inhibitors）臨床上可用來治療憂鬱症（depression）"
+    },
+    "answer": "D",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "腦幹核區｜下列有關血清素（serotonin）的敘述，",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 112 年第二次醫師一階醫學（一）",
+    "sourceYear": 2023,
+    "sourceRound": 2,
+    "originalQuestionNumber": 53
+  },
+  {
+    "id": "MOEX-112100-1301-Q058",
+    "subject": "解剖學",
+    "chapter": "胸腔",
+    "section": "心臟與冠狀動脈",
+    "stem": "下列那一個現象不會發生在正常的心臟收縮期中？",
+    "options": {
+      "A": "心電圖出現 T 波",
+      "B": "聽見第二心音",
+      "C": "主動脈壓力達到最高",
+      "D": "肺動脈壓力達到最高"
+    },
+    "answer": "B",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "心臟與冠狀動脈｜下列那一個現象不會發生在正常的心臟收縮期中",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 112 年第二次醫師一階醫學（一）",
+    "sourceYear": 2023,
+    "sourceRound": 2,
+    "originalQuestionNumber": 58
+  },
+  {
+    "id": "MOEX-112100-1301-Q059",
+    "subject": "解剖學",
+    "chapter": "胸腔",
+    "section": "縱膈",
+    "stem": "有關心輸出量（cardiac output）的敘述，下列何者正確？",
+    "options": {
+      "A": "一個健康成人執行費力長時間運動時，他的心輸出量會顯著增加",
+      "B": "一個健康成人執行費力長時間運動時，他的整體周邊血管阻力（total peripheral resistance）會顯著增加",
+      "C": "一個健康成人執行費力長時間運動時，他的組織耗氧量會增加數倍，原因是心搏量（stroke volume）也以倍 數增加",
+      "D": "一個健康成人在步入中老年以後，心輸出量通常隨著年齡增加而緩慢增加"
+    },
+    "answer": "A",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "縱膈｜心輸出量（cardiac output）的敘",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 112 年第二次醫師一階醫學（一）",
+    "sourceYear": 2023,
+    "sourceRound": 2,
+    "originalQuestionNumber": 59
+  },
+  {
+    "id": "MOEX-112100-1301-Q069",
+    "subject": "解剖學",
+    "chapter": "腹部",
+    "section": "肝膽胰脾",
+    "stem": "有關鈉依賴葡萄糖共同轉運蛋白（SGLT）的敘述，下列何者最適當？",
+    "options": {
+      "A": "SGLT 運送葡萄糖進入細胞通常是經由促進性擴散（facilitated diffusion）作用",
+      "B": "SGLT 主要分布在肝臟及脂肪組織",
+      "C": "胰島素通常不直接調控 SGLT 運送葡萄糖之作用",
+      "D": "給與第二型 SGLT 抑制劑通常會導致血糖升高"
+    },
+    "answer": "C",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "胰臟鄰近關係",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 112 年第二次醫師一階醫學（一）",
+    "sourceYear": 2023,
+    "sourceRound": 2,
+    "originalQuestionNumber": 69
+  },
+  {
+    "id": "MOEX-112100-1301-Q071",
+    "subject": "解剖學",
+    "chapter": "腹部",
+    "section": "腹膜關係",
+    "stem": "醛固酮（aldosterone）主要是從腎上腺的何處分泌？",
+    "options": {
+      "A": "絲球帶（zona glomerulosa）",
+      "B": "囊狀帶（zona fasciculata）",
+      "C": "網狀帶（zona reticularis）",
+      "D": "髓質（medulla）"
+    },
+    "answer": "A",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "腹膜關係｜醛固酮（aldosterone）主要是從腎上",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 112 年第二次醫師一階醫學（一）",
+    "sourceYear": 2023,
+    "sourceRound": 2,
+    "originalQuestionNumber": 71
+  },
+  {
+    "id": "MOEX-112100-1301-Q074",
+    "subject": "解剖學",
+    "chapter": "胸腔",
+    "section": "縱膈",
+    "stem": "母體血液中的氧可以輸送給胎兒，是因為胎兒的血紅蛋白（hemoglobin）對氧氣的結合力比母體強，造成此差 異之原因為何？",
+    "options": {
+      "A": "胎兒心跳速率高於母體",
+      "B": "胎兒和母體使用不同的血紅蛋白",
+      "C": "胎兒體內含氧量與母體不同",
+      "D": "胎兒體內產生較多的血紅蛋白"
+    },
+    "answer": "B",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "縱膈｜母體血液中的氧可以輸送給胎兒，是因為胎兒的血",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 112 年第二次醫師一階醫學（一）",
+    "sourceYear": 2023,
+    "sourceRound": 2,
+    "originalQuestionNumber": 74
+  },
+  {
+    "id": "MOEX-112100-1301-Q078",
+    "subject": "解剖學",
+    "chapter": "腹部",
+    "section": "腹膜關係",
+    "stem": "在肌肉、肝臟與腎臟之間胺基（amino group）的運送，主要藉由下列那一組胺基酸作為胺基的攜帶者 （carriers）？",
+    "options": {
+      "A": "phenylalanine、aspartate",
+      "B": "serine、valine",
+      "C": "glutamine、alanine",
+      "D": "glutamate、glutamine"
+    },
+    "answer": "C",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "腹膜關係｜在肌肉、肝臟與腎臟之間胺基（amino gr",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 112 年第二次醫師一階醫學（一）",
+    "sourceYear": 2023,
+    "sourceRound": 2,
+    "originalQuestionNumber": 78
+  },
+  {
+    "id": "MOEX-112100-1301-Q082",
+    "subject": "解剖學",
+    "chapter": "骨盆與會陰",
+    "section": "直腸與肛管",
+    "stem": "遺傳性非息肉症大腸直腸癌（hereditary nonpolyposis colon cancer, HNPCC）病患，主要是在何種 DNA 修復功能 上產生缺失？",
+    "options": {
+      "A": "核苷酸切除修復（nucleotide excision repair）",
+      "B": "鹼基切除修復（base excision repair）",
+      "C": "重組修復（recombinational repair）",
+      "D": "核酸錯誤配對修復（mismatch repair）"
+    },
+    "answer": "D",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "直腸與肛管｜遺傳性非息肉症大腸直腸癌（hereditar",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 112 年第二次醫師一階醫學（一）",
+    "sourceYear": 2023,
+    "sourceRound": 2,
+    "originalQuestionNumber": 82
+  },
+  {
+    "id": "MOEX-113020-1301-Q001",
+    "subject": "解剖學",
+    "chapter": "頭頸部",
+    "section": "顏面神經與三叉神經",
+    "stem": "角膜（cornea）受到刺激會引發角膜反射（corneal reflex），下列何者是主要參與的神經核？",
+    "options": {
+      "A": "三叉神經脊髓核（spinal trigeminal nucleus）與動眼神經核（oculomotor nucleus）",
+      "B": "三叉神經脊髓核（spinal trigeminal nucleus）與顏面運動神經核（facial motor nucleus）",
+      "C": "E-W神經核（Edinger-Westphal nucleus）與顏面運動神經核（facial motor nucleus）",
+      "D": "E-W神經核（Edinger-Westphal nucleus）與動眼神經核（oculomotor nucleus）"
+    },
+    "answer": "B",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "三叉神經感覺分支",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 113 年第一次醫師一階醫學（一）",
+    "sourceYear": 2024,
+    "sourceRound": 1,
+    "originalQuestionNumber": 1
+  },
+  {
+    "id": "MOEX-113020-1301-Q002",
+    "subject": "解剖學",
+    "chapter": "神經解剖",
+    "section": "腦幹核區",
+    "stem": "下列何者主要位於大腦半球的內側面，其周圍是初級視覺皮質（primary visual cortex）？",
+    "options": {
+      "A": "中央溝（central sulcus）",
+      "B": "側腦溝（lateral sulcus）",
+      "C": "距狀溝（calcarine sulcus）",
+      "D": "頂枕溝（parieto-occipital sulcus）"
+    },
+    "answer": "C",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "腦幹核區｜主要位於大腦半球的內側面，其周圍是初級視覺皮",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 113 年第一次醫師一階醫學（一）",
+    "sourceYear": 2024,
+    "sourceRound": 1,
+    "originalQuestionNumber": 2
+  },
+  {
+    "id": "MOEX-113020-1301-Q005",
+    "subject": "解剖學",
+    "chapter": "神經解剖",
+    "section": "小腦",
+    "stem": "下列關於脊髓灰質的敘述何者最不恰當？",
+    "options": {
+      "A": "膠狀質（substantia gelatinosa）位於背角處，與痛覺的傳遞有關",
+      "B": "背核（nucleus dorsalis of Clarke）位於背角處，與小腦脊髓路徑有關",
+      "C": "大型運動神經元（large motor neuron）位於前角處，支配骨骼肌",
+      "D": "交感神經節前神經元（preganglionic sympathetic neuron）的細胞體位於中間帶"
+    },
+    "answer": "B",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "小腦｜下列關於脊髓灰質的敘述何者最不恰當",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 113 年第一次醫師一階醫學（一）",
+    "sourceYear": 2024,
+    "sourceRound": 1,
+    "originalQuestionNumber": 5
+  },
+  {
+    "id": "MOEX-113020-1301-Q006",
+    "subject": "解剖學",
+    "chapter": "頭頸部",
+    "section": "顏面神經與三叉神經",
+    "stem": "鼓膜（tympanic membrane）的體感覺由下列那些神經支配？①三叉神經（trigeminal nerve） ②顏面神經 （facial nerve） ③前庭耳蝸神經（vestibulocochlear nerve） ④舌咽神經（glossopharyngeal nerve） ⑤迷走神經（vagus nerve）",
+    "options": {
+      "A": "①②③",
+      "B": "①②③④",
+      "C": "②③④⑤",
+      "D": "①②④⑤"
+    },
+    "answer": "D",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "顏面神經與腮腺關係",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 113 年第一次醫師一階醫學（一）",
+    "sourceYear": 2024,
+    "sourceRound": 1,
+    "originalQuestionNumber": 6
+  },
+  {
+    "id": "MOEX-113020-1301-Q007",
+    "subject": "解剖學",
+    "chapter": "上肢",
+    "section": "上肢血管",
+    "stem": "下列有關鎖骨上神經（supraclavicular nerve）之描述，何者正確？",
+    "options": {
+      "A": "源於臂神經叢",
+      "B": "支配喉部前方表淺皮膚",
+      "C": "支配肩膀之皮膚",
+      "D": "支配頸闊肌（platysma muscle）之收縮"
+    },
+    "answer": "C",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "上肢血管｜下列有關鎖骨上神經（supraclavicu",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 113 年第一次醫師一階醫學（一）",
+    "sourceYear": 2024,
+    "sourceRound": 1,
+    "originalQuestionNumber": 7
+  },
+  {
+    "id": "MOEX-113020-1301-Q009",
+    "subject": "解剖學",
+    "chapter": "頭頸部",
+    "section": "顏面神經與三叉神經",
+    "stem": "下列何者不由篩骨（ethmoid）組成？",
+    "options": {
+      "A": "上鼻甲（superior nasal concha）",
+      "B": "中鼻甲（middle nasal concha）",
+      "C": "下鼻甲（inferior nasal concha）",
+      "D": "鼻中隔（nasal septum）"
+    },
+    "answer": "C",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "顏面神經與三叉神經｜不由篩骨（ethmoid）組成",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 113 年第一次醫師一階醫學（一）",
+    "sourceYear": 2024,
+    "sourceRound": 1,
+    "originalQuestionNumber": 9
+  },
+  {
+    "id": "MOEX-113020-1301-Q010",
+    "subject": "解剖學",
+    "chapter": "頭頸部",
+    "section": "顏面神經與三叉神經",
+    "stem": "下列何者位於後顱窩（posterior cranial fossa）？",
+    "options": {
+      "A": "盲孔（foramen cecum）",
+      "B": "弓狀隆起（arcuate eminence）",
+      "C": "乙狀竇溝（groove for sigmoid sinus）",
+      "D": "後床突（posterior clinoid process）"
+    },
+    "answer": "C",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "顏面神經與三叉神經｜位於後顱窩（posterior crania",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 113 年第一次醫師一階醫學（一）",
+    "sourceYear": 2024,
+    "sourceRound": 1,
+    "originalQuestionNumber": 10
+  },
+  {
+    "id": "MOEX-113020-1301-Q012",
+    "subject": "解剖學",
+    "chapter": "頭頸部",
+    "section": "顏面神經與三叉神經",
+    "stem": "下列何者是防止顳頷關節（temporomandibular joint）向後方脫臼最重要的構造？",
+    "options": {
+      "A": "顳頷韌帶（temporomandibular ligament）",
+      "B": "內翼肌（medial pterygoid muscle）",
+      "C": "莖突下頷韌帶（stylomandibular ligament）",
+      "D": "外翼肌（lateral pterygoid muscle）"
+    },
+    "answer": "A",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "顏面神經與三叉神經｜防止顳頷關節（temporomandibul",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 113 年第一次醫師一階醫學（一）",
+    "sourceYear": 2024,
+    "sourceRound": 1,
+    "originalQuestionNumber": 12
+  },
+  {
+    "id": "MOEX-113020-1301-Q013",
+    "subject": "解剖學",
+    "chapter": "神經解剖",
+    "section": "腦幹核區",
+    "stem": "頭部外側近翼點（pterion）處受到撞擊，數小時後發生硬腦膜外血腫，最可能是下列那一血管破裂？",
+    "options": {
+      "A": "硬腦膜靜脈竇（dural sinus）",
+      "B": "腦膜中動脈（middle meningeal artery）",
+      "C": "前大腦動脈（anterior cerebral artery）",
+      "D": "後大腦動脈（posterior cerebral artery）"
+    },
+    "answer": "B",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "腦幹核區｜頭部外側近翼點（pterion）處受到撞擊，",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 113 年第一次醫師一階醫學（一）",
+    "sourceYear": 2024,
+    "sourceRound": 1,
+    "originalQuestionNumber": 13
+  },
+  {
+    "id": "MOEX-113020-1301-Q014",
+    "subject": "解剖學",
+    "chapter": "胸腔",
+    "section": "肺與胸膜",
+    "stem": "下列何者負責傳遞靠近肋骨處之壁層胸膜（costal part of parietal pleura）的感覺訊號？",
+    "options": {
+      "A": "肋間神經（intercostal nerve）",
+      "B": "迷走神經（vagus nerve）",
+      "C": "交感神經幹（sympathetic trunk）",
+      "D": "膈神經（phrenic nerve）"
+    },
+    "answer": "A",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "胸膜與肋膈隱窩",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 113 年第一次醫師一階醫學（一）",
+    "sourceYear": 2024,
+    "sourceRound": 1,
+    "originalQuestionNumber": 14
+  },
+  {
+    "id": "MOEX-113020-1301-Q015",
+    "subject": "解剖學",
+    "chapter": "胸腔",
+    "section": "心臟與冠狀動脈",
+    "stem": "下列何者供應心臟房室結（atrioventricular node）的血液？",
+    "options": {
+      "A": "前室間動脈（left anterior descending artery）",
+      "B": "左邊緣動脈（left marginal artery）",
+      "C": "右冠狀動脈（right coronary artery）",
+      "D": "左冠狀動脈（left coronary artery）"
+    },
+    "answer": "C",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "右冠狀動脈分支",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 113 年第一次醫師一階醫學（一）",
+    "sourceYear": 2024,
+    "sourceRound": 1,
+    "originalQuestionNumber": 15
+  },
+  {
+    "id": "MOEX-113020-1301-Q016",
+    "subject": "解剖學",
+    "chapter": "胸腔",
+    "section": "肺與胸膜",
+    "stem": "有關支氣管動脈（bronchial artery）敘述，下列何者錯誤？",
+    "options": {
+      "A": "通常主幹是由左側第二肋間動脈分出",
+      "B": "供應血液給部分的肺臟組織及支氣管本身",
+      "C": "供應血液給部分的食道組織",
+      "D": "供應血液給部分的胸膜（pleura）"
+    },
+    "answer": "A",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "肺門構造相對位置",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 113 年第一次醫師一階醫學（一）",
+    "sourceYear": 2024,
+    "sourceRound": 1,
+    "originalQuestionNumber": 16
+  },
+  {
+    "id": "MOEX-113020-1301-Q017",
+    "subject": "解剖學",
+    "chapter": "胸腔",
+    "section": "肺與胸膜",
+    "stem": "高位胸椎脊髓損傷病患，在受傷初期肺活量（vital capacity）大幅下降的主要原因為：",
+    "options": {
+      "A": "橫膈肌肉癱瘓",
+      "B": "肋間肌肉癱瘓",
+      "C": "頸部肌肉癱瘓",
+      "D": "腹部肌肉癱瘓"
+    },
+    "answer": "B",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "肺與胸膜｜高位胸椎脊髓損傷病患，在受傷初期肺活量（vi",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 113 年第一次醫師一階醫學（一）",
+    "sourceYear": 2024,
+    "sourceRound": 1,
+    "originalQuestionNumber": 17
+  },
+  {
+    "id": "MOEX-113020-1301-Q018",
+    "subject": "解剖學",
+    "chapter": "腹部",
+    "section": "肝膽胰脾",
+    "stem": "主胰管（main pancreatic duct）及膽管（bile duct）會共同開口於何處？",
+    "options": {
+      "A": "十二指腸上段（superior part of duodenum）",
+      "B": "十二指腸下降段（descending part of duodenum）",
+      "C": "十二指腸水平段（horizontal part of duodenum）",
+      "D": "十二指腸上升段（ascending part of duodenum）"
+    },
+    "answer": "B",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "胰臟鄰近關係",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 113 年第一次醫師一階醫學（一）",
+    "sourceYear": 2024,
+    "sourceRound": 1,
+    "originalQuestionNumber": 18
+  },
+  {
+    "id": "MOEX-113020-1301-Q019",
+    "subject": "解剖學",
+    "chapter": "腹部",
+    "section": "肝膽胰脾",
+    "stem": "腹股溝深環（deep inguinal ring）位於下列何結構？",
+    "options": {
+      "A": "腹橫筋膜（transversalis fascia）",
+      "B": "腹內斜肌（internal oblique muscle）",
+      "C": "腹外斜肌腱膜（aponeurosis of external oblique muscle）",
+      "D": "腹橫肌腱膜（aponeurosis of transversus abdominis）"
+    },
+    "answer": "A",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "肝膽胰脾｜腹股溝深環（deep inguinal ri",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 113 年第一次醫師一階醫學（一）",
+    "sourceYear": 2024,
+    "sourceRound": 1,
+    "originalQuestionNumber": 19
+  },
+  {
+    "id": "MOEX-113020-1301-Q020",
+    "subject": "解剖學",
+    "chapter": "腹部",
+    "section": "胃腸道血管",
+    "stem": "下列何者是上腸繫膜動脈（superior mesenteric artery）的分支？",
+    "options": {
+      "A": "前上胰十二指腸動脈（anterior superior pancreaticoduodenal artery）",
+      "B": "後上胰十二指腸動脈（posterior superior pancreaticoduodenal artery）",
+      "C": "左結腸動脈（left colic artery）",
+      "D": "下胰十二指腸動脈（inferior pancreaticoduodenal artery）"
+    },
+    "answer": "D",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "中腸血供",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 113 年第一次醫師一階醫學（一）",
+    "sourceYear": 2024,
+    "sourceRound": 1,
+    "originalQuestionNumber": 20
+  },
+  {
+    "id": "MOEX-113020-1301-Q021",
+    "subject": "解剖學",
+    "chapter": "腹部",
+    "section": "肝膽胰脾",
+    "stem": "闌尾的疼痛主要由下列何者傳導？",
+    "options": {
+      "A": "內臟大神經（greater splanchnic nerve）",
+      "B": "內臟小神經（lesser splanchnic nerve）",
+      "C": "內臟最小神經（least splanchnic nerve）",
+      "D": "迷走神經（vagus nerve）"
+    },
+    "answer": "B",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "肝膽胰脾｜闌尾的疼痛主要由下列何者傳導",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 113 年第一次醫師一階醫學（一）",
+    "sourceYear": 2024,
+    "sourceRound": 1,
+    "originalQuestionNumber": 21
+  },
+  {
+    "id": "MOEX-113020-1301-Q022",
+    "subject": "解剖學",
+    "chapter": "骨盆與會陰",
+    "section": "直腸與肛管",
+    "stem": "下列何者不參與形成坐骨肛門窩（ischioanal fossa）的邊界（boundary）？",
+    "options": {
+      "A": "閉孔外肌（obturator externus）",
+      "B": "坐骨粗隆（ischial tuberosity）",
+      "C": "臀大肌（gluteus maximus）",
+      "D": "薦骨粗隆韌帶（sacrotuberous ligament）"
+    },
+    "answer": "A",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "直腸與肛管｜不參與形成坐骨肛門窩（ischioanal ",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 113 年第一次醫師一階醫學（一）",
+    "sourceYear": 2024,
+    "sourceRound": 1,
+    "originalQuestionNumber": 22
+  },
+  {
+    "id": "MOEX-113020-1301-Q023",
+    "subject": "解剖學",
+    "chapter": "骨盆與會陰",
+    "section": "骨盆血管",
+    "stem": "關於陰部內動脈（internal pudendal artery），下列敘述何者最不恰當？",
+    "options": {
+      "A": "陰部內動脈是髂內動脈（internal iliac artery）的分支",
+      "B": "陰部內動脈藉由坐骨大孔（greater sciatic foramen）離開骨盆腔",
+      "C": "陰部內動脈通過坐骨小孔（lesser sciatic foramen）進入坐骨肛門窩（ischioanal fossa）",
+      "D": "中直腸動脈（middle rectal artery）是陰部內動脈的分支"
+    },
+    "answer": "D",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "髂內動脈分支",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 113 年第一次醫師一階醫學（一）",
+    "sourceYear": 2024,
+    "sourceRound": 1,
+    "originalQuestionNumber": 23
+  },
+  {
+    "id": "MOEX-113020-1301-Q024",
+    "subject": "解剖學",
+    "chapter": "骨盆與會陰",
+    "section": "會陰三角",
+    "stem": "關於輸精管（ductus deferens），下列敘述何者正確？",
+    "options": {
+      "A": "跨過髂外動脈及靜脈（external iliac vessels），並延伸進入骨盆腔",
+      "B": "不被腹膜（peritoneum）覆蓋",
+      "C": "通過骨盆腔時，會穿過輸尿管（ureter）下方",
+      "D": "輸精管壺腹（ampulla of ductus deferens）位於輸精管與副睪管（duct of epididymis）交接處"
+    },
+    "answer": "A",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "會陰三角｜輸精管（ductus deferens），下",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 113 年第一次醫師一階醫學（一）",
+    "sourceYear": 2024,
+    "sourceRound": 1,
+    "originalQuestionNumber": 24
+  },
+  {
+    "id": "MOEX-113020-1301-Q025",
+    "subject": "解剖學",
+    "chapter": "骨盆與會陰",
+    "section": "會陰三角",
+    "stem": "下列四者中，何者之淋巴回流途徑與其他三者不同？",
+    "options": {
+      "A": "陰囊（scrotum）",
+      "B": "陰道前庭（vestibule of vagina）",
+      "C": "卵巢（ovary）",
+      "D": "大前庭腺（greater vestibular gland）"
+    },
+    "answer": "C",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "會陰三角｜下列四者中，何者之淋巴回流途徑與其他三者不同",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 113 年第一次醫師一階醫學（一）",
+    "sourceYear": 2024,
+    "sourceRound": 1,
+    "originalQuestionNumber": 25
+  },
+  {
+    "id": "MOEX-113020-1301-Q026",
+    "subject": "解剖學",
+    "chapter": "上肢",
+    "section": "上肢血管",
+    "stem": "下列何構造會與肱骨小頭（capitulum of humerus）接觸，形成關節？",
+    "options": {
+      "A": "尺骨頭（head of ulna）",
+      "B": "橈骨頭（head of radius）",
+      "C": "尺骨滑車切迹（trochlear notch of ulna）",
+      "D": "肩胛骨關節盂（glenoid cavity of scapula）"
+    },
+    "answer": "B",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "上肢血管｜下列何構造會與肱骨小頭（capitulum ",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 113 年第一次醫師一階醫學（一）",
+    "sourceYear": 2024,
+    "sourceRound": 1,
+    "originalQuestionNumber": 26
+  },
+  {
+    "id": "MOEX-113020-1301-Q027",
+    "subject": "解剖學",
+    "chapter": "下肢",
+    "section": "足部",
+    "stem": "足背大 趾外側與第二趾內側間皮膚感覺異常，最可能是下列何神經受損？",
+    "options": {
+      "A": "深腓神經（deep fibular nerve）",
+      "B": "淺腓神經（superficial fibular nerve）",
+      "C": "隱神經（saphenous nerve）",
+      "D": "內蹠神經（medial plantar nerve）"
+    },
+    "answer": "A",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "第一趾蹼間感覺與腓深神經",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 113 年第一次醫師一階醫學（一）",
+    "sourceYear": 2024,
+    "sourceRound": 1,
+    "originalQuestionNumber": 27
+  },
+  {
+    "id": "MOEX-113020-1301-Q028",
+    "subject": "解剖學",
+    "chapter": "神經解剖",
+    "section": "腦幹核區",
+    "stem": "下列有關枕下三角（suboccipital triangle）的敘述，何者正確？",
+    "options": {
+      "A": "上外側邊界是頭後大直肌（rectus capitis posterior major）",
+      "B": "上內側邊界是頭上斜肌（obliquus capitis superior）",
+      "C": "枕大神經（greater occipital nerve）從此三角的下緣穿出",
+      "D": "枕動脈（occipital artery）位於其內"
+    },
+    "answer": "C",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "腦幹核區｜下列有關枕下三角（suboccipital ",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 113 年第一次醫師一階醫學（一）",
+    "sourceYear": 2024,
+    "sourceRound": 1,
+    "originalQuestionNumber": 28
+  },
+  {
+    "id": "MOEX-113020-1301-Q029",
+    "subject": "解剖學",
+    "chapter": "上肢",
+    "section": "臂神經叢",
+    "stem": "後骨間神經（posterior interosseous nerve）是那一條神經的分支？",
+    "options": {
+      "A": "尺神經（ulnar nerve）",
+      "B": "橈神經（radial nerve）",
+      "C": "正中神經（median nerve）",
+      "D": "肌皮神經（musculocutaneous nerve）"
+    },
+    "answer": "B",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "臂神經叢終末分支",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 113 年第一次醫師一階醫學（一）",
+    "sourceYear": 2024,
+    "sourceRound": 1,
+    "originalQuestionNumber": 29
+  },
+  {
+    "id": "MOEX-113020-1301-Q030",
+    "subject": "解剖學",
+    "chapter": "下肢",
+    "section": "大腿前內後區",
+    "stem": "為進行髖關節手術，結紮了大腿上部所有形成十字吻合（cruciate anastomosis）的動脈，下列何者最不受 影響？",
+    "options": {
+      "A": "內側迴旋股動脈（medial femoral circumflex artery）",
+      "B": "外側迴旋股動脈（lateral femoral circumflex artery）",
+      "C": "上臀動脈（superior gluteal artery）",
+      "D": "下臀動脈（inferior gluteal artery）"
+    },
+    "answer": "C",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "大腿前內後區｜進行髖關節手術，結紮了大腿上部所有形成十字吻",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 113 年第一次醫師一階醫學（一）",
+    "sourceYear": 2024,
+    "sourceRound": 1,
+    "originalQuestionNumber": 30
+  },
+  {
+    "id": "MOEX-113020-1301-Q031",
+    "subject": "解剖學",
+    "chapter": "下肢",
+    "section": "腰薦神經叢",
+    "stem": "踝關節（ankle joint）由下列那三塊骨頭共同構成？",
+    "options": {
+      "A": "股骨（femur）、脛骨（tibia）與腓骨（fibula）",
+      "B": "脛骨（tibia）、腓骨（fibula）與跟骨（calcaneus）",
+      "C": "脛骨（tibia）、腓骨（fibula）與距骨（talus）",
+      "D": "脛骨（tibia）、距骨（talus）與跟骨（calcaneus）"
+    },
+    "answer": "C",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "腰薦神經叢｜踝關節（ankle joint）由下列那三塊",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 113 年第一次醫師一階醫學（一）",
+    "sourceYear": 2024,
+    "sourceRound": 1,
+    "originalQuestionNumber": 31
+  },
+  {
+    "id": "MOEX-113020-1301-Q033",
+    "subject": "解剖學",
+    "chapter": "頭頸部",
+    "section": "顏面神經與三叉神經",
+    "stem": "衍生自第二咽弓（second pharyngeal arch）的肌肉，是由下列那一條腦神經支配？",
+    "options": {
+      "A": "三叉神經（trigeminal nerve）",
+      "B": "顏面神經（facial nerve）",
+      "C": "舌咽神經（glossopharyngeal nerve）",
+      "D": "副神經（accessory nerve）"
+    },
+    "answer": "B",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "顏面神經與腮腺關係",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 113 年第一次醫師一階醫學（一）",
+    "sourceYear": 2024,
+    "sourceRound": 1,
+    "originalQuestionNumber": 33
+  },
+  {
+    "id": "MOEX-113020-1301-Q034",
+    "subject": "解剖學",
+    "chapter": "腹部",
+    "section": "胃腸道血管",
+    "stem": "下列關於十二指腸（duodenum）發育的敘述，何者最適當？",
+    "options": {
+      "A": "由前腸（foregut）與後腸（hindgut）共同發育而來",
+      "B": "血液供應有上腸繫膜動脈（superior mesenteric artery）與下腸繫膜動脈（inferior mesenteric artery）",
+      "C": "因胃（stomach）的旋轉使十二指腸旋轉至右側，並且大部分貼在後腹壁",
+      "D": "發育過程中均呈現中空管狀的結構"
+    },
+    "answer": "C",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "中腸血供",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 113 年第一次醫師一階醫學（一）",
+    "sourceYear": 2024,
+    "sourceRound": 1,
+    "originalQuestionNumber": 34
+  },
+  {
+    "id": "MOEX-113020-1301-Q035",
+    "subject": "解剖學",
+    "chapter": "胸腔",
+    "section": "肺與胸膜",
+    "stem": "嬰兒剛出生使用肺部呼吸時，常會伴隨一些現象的改變，下列敘述何者正確？",
+    "options": {
+      "A": "肺部血管阻力顯著增加",
+      "B": "肺部血流量上升",
+      "C": "肺動脈管壁顯著變厚",
+      "D": "右心房壓力高於左心房"
+    },
+    "answer": "B",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "肺門構造相對位置",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 113 年第一次醫師一階醫學（一）",
+    "sourceYear": 2024,
+    "sourceRound": 1,
+    "originalQuestionNumber": 35
+  },
+  {
+    "id": "MOEX-113020-1301-Q036",
+    "subject": "解剖學",
+    "chapter": "神經解剖",
+    "section": "腦幹核區",
+    "stem": "大腦導水管（cerebral aqueduct）是衍生自那一腦泡（brain vesicle）？",
+    "options": {
+      "A": "菱腦（rhombencephalon）",
+      "B": "中腦（mesencephalon）",
+      "C": "間腦（diencephalon）",
+      "D": "端腦（telencephalon）"
+    },
+    "answer": "B",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "腦幹核區｜大腦導水管（cerebral aqueduc",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 113 年第一次醫師一階醫學（一）",
+    "sourceYear": 2024,
+    "sourceRound": 1,
+    "originalQuestionNumber": 36
+  },
+  {
+    "id": "MOEX-113020-1301-Q038",
+    "subject": "解剖學",
+    "chapter": "胸腔",
+    "section": "縱膈",
+    "stem": "氣管的內襯上皮（lining epithelium of trachea）是屬於：",
+    "options": {
+      "A": "單層柱狀上皮（simple columnar epithelium）",
+      "B": "複層扁平上皮（stratified squamous epithelium）",
+      "C": "複層柱狀上皮（stratified columnar epithelium）",
+      "D": "具纖毛的偽複層柱狀上皮（ciliated pseudostratified columnar epithelium）"
+    },
+    "answer": "D",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "縱膈｜氣管的內襯上皮（lining epithel",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 113 年第一次醫師一階醫學（一）",
+    "sourceYear": 2024,
+    "sourceRound": 1,
+    "originalQuestionNumber": 38
+  },
+  {
+    "id": "MOEX-113020-1301-Q041",
+    "subject": "解剖學",
+    "chapter": "胸腔",
+    "section": "肺與胸膜",
+    "stem": "關於第二型肺泡細胞（type-II pneumocyte）之敘述，下列何者正確？",
+    "options": {
+      "A": "在肺泡細胞中占40%，覆蓋95%的肺泡表面（alveolar air surface）",
+      "B": "與肺泡巨噬細胞（alveolar macrophage）共同組成氣血屏障（air-blood barrier）",
+      "C": "分泌界面活性劑（surfactant）",
+      "D": "是很薄的扁平（squamous）細胞"
+    },
+    "answer": "C",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "肺與胸膜｜第二型肺泡細胞（type-II pneumo",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 113 年第一次醫師一階醫學（一）",
+    "sourceYear": 2024,
+    "sourceRound": 1,
+    "originalQuestionNumber": 41
+  },
+  {
+    "id": "MOEX-113020-1301-Q042",
+    "subject": "解剖學",
+    "chapter": "腹部",
+    "section": "肝膽胰脾",
+    "stem": "下列何種細胞具有黏原顆粒（mucinogen granules）？",
+    "options": {
+      "A": "胃賁門腺細胞（cardiac glandular cells）",
+      "B": "胰腺泡細胞（pancreatic acinar cells）",
+      "C": "耳下腺腺泡細胞（parotid acinar cells）",
+      "D": "潘氏細胞（Paneth cells）"
+    },
+    "answer": "A",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "胰臟鄰近關係",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 113 年第一次醫師一階醫學（一）",
+    "sourceYear": 2024,
+    "sourceRound": 1,
+    "originalQuestionNumber": 42
+  },
+  {
+    "id": "MOEX-113020-1301-Q046",
+    "subject": "解剖學",
+    "chapter": "骨盆與會陰",
+    "section": "會陰三角",
+    "stem": "附圖中的上皮（epithelium）主要出現於下列何者？",
+    "options": {
+      "A": "輸卵管（uterine tube）",
+      "B": "陰道（vagina）",
+      "C": "輸出小管（efferent ductules）",
+      "D": "尿道（urethra）"
+    },
+    "answer": "A",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "會陰三角｜附圖中的上皮（epithelium）主要出現",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 113 年第一次醫師一階醫學（一）",
+    "sourceYear": 2024,
+    "sourceRound": 1,
+    "originalQuestionNumber": 46
+  },
+  {
+    "id": "MOEX-113020-1301-Q048",
+    "subject": "解剖學",
+    "chapter": "腹部",
+    "section": "腹膜關係",
+    "stem": "下列何種視網膜內的細胞是具有一閾值，超過即能夠產生動作電位（action potential）？",
+    "options": {
+      "A": "雙極細胞（bipolar cell）",
+      "B": "水平細胞（horizontal cell）",
+      "C": "無軸突細胞（amacrine cell）",
+      "D": "節細胞（ganglion cell）"
+    },
+    "answer": "D",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "腹膜關係｜下列何種視網膜內的細胞是具有一閾值，超過即能",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 113 年第一次醫師一階醫學（一）",
+    "sourceYear": 2024,
+    "sourceRound": 1,
+    "originalQuestionNumber": 48
+  },
+  {
+    "id": "MOEX-113020-1301-Q049",
+    "subject": "解剖學",
+    "chapter": "神經解剖",
+    "section": "脊髓傳導路徑",
+    "stem": "自主神經系統的節前神經元細胞本體除位於一些腦神經的運動神經核外，也會存在脊髓的下列何處？",
+    "options": {
+      "A": "dorsal root ganglion",
+      "B": "substantia gelatinosa",
+      "C": "Rexed's laminae IX",
+      "D": "intermediolateral column"
+    },
+    "answer": "D",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "脊髓傳導路徑｜自主神經系統的節前神經元細胞本體除位於一些腦",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 113 年第一次醫師一階醫學（一）",
+    "sourceYear": 2024,
+    "sourceRound": 1,
+    "originalQuestionNumber": 49
+  },
+  {
+    "id": "MOEX-113020-1301-Q050",
+    "subject": "解剖學",
+    "chapter": "神經解剖",
+    "section": "自律神經",
+    "stem": "下列何項反應，交感神經和副交感神經的作用通常是較為一致的？",
+    "options": {
+      "A": "增加唾液分泌量",
+      "B": "增加心臟跳動速率",
+      "C": "增加胃腸蠕動",
+      "D": "增加膀胱括約肌收縮"
+    },
+    "answer": "A",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "副交感路徑",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 113 年第一次醫師一階醫學（一）",
+    "sourceYear": 2024,
+    "sourceRound": 1,
+    "originalQuestionNumber": 50
+  },
+  {
+    "id": "MOEX-113020-1301-Q051",
+    "subject": "解剖學",
+    "chapter": "神經解剖",
+    "section": "腦幹核區",
+    "stem": "大腦皮質接收感官傳入的刺激訊息，並將這些訊息再傳出至其他特定的大腦皮質或神經核做進一步的處理。 因此，大腦皮質傳出訊息的神經元通常是大型的錐體神經元（pyramidal neuron，又稱Betz cell），且其 樹突分布深廣，軸突包覆有較完整髓鞘，且以麩胺酸為主要的突觸傳遞物質。大腦皮質雖厚達六層，上述這 些負責傳出訊息的大型錐體神經元，其細胞體之分布密度通常在下列那一層最高？",
+    "options": {
+      "A": "第Ia層",
+      "B": "第Ib層",
+      "C": "第II層",
+      "D": "第V層"
+    },
+    "answer": "D",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "腦幹核區｜大腦皮質接收感官傳入的刺激訊息，並將這些訊息",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 113 年第一次醫師一階醫學（一）",
+    "sourceYear": 2024,
+    "sourceRound": 1,
+    "originalQuestionNumber": 51
+  },
+  {
+    "id": "MOEX-113020-1301-Q056",
+    "subject": "解剖學",
+    "chapter": "神經解剖",
+    "section": "腦幹核區",
+    "stem": "興奮dynamic γ-motor neuron時，其所支配之骨骼肌會產生何種變化？",
+    "options": {
+      "A": "張力（tone）降低",
+      "B": "對該骨骼肌長度變化之敏感度增加",
+      "C": "牽張反射（strech reflex）消失",
+      "D": "不受影響"
+    },
+    "answer": "B",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "腦幹核區｜興奮dynamic γ-motor neur",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 113 年第一次醫師一階醫學（一）",
+    "sourceYear": 2024,
+    "sourceRound": 1,
+    "originalQuestionNumber": 56
+  },
+  {
+    "id": "MOEX-113020-1301-Q058",
+    "subject": "解剖學",
+    "chapter": "胸腔",
+    "section": "心臟與冠狀動脈",
+    "stem": "對正常的心臟週期而言，在第一心音與第二心音之間，會發生下列何項生理變化？",
+    "options": {
+      "A": "心房於此時去極化",
+      "B": "心室容積快速下降",
+      "C": "心房壓力先上升之後下降",
+      "D": "心室壓力維持不變"
+    },
+    "answer": "B",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "心臟與冠狀動脈｜對正常的心臟週期而言，在第一心音與第二心音之",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 113 年第一次醫師一階醫學（一）",
+    "sourceYear": 2024,
+    "sourceRound": 1,
+    "originalQuestionNumber": 58
+  },
+  {
+    "id": "MOEX-113020-1301-Q059",
+    "subject": "解剖學",
+    "chapter": "胸腔",
+    "section": "縱膈",
+    "stem": "下列何種情況最有可能增加心輸出量（cardiac output）？",
+    "options": {
+      "A": "慢性中度貧血（moderate chronic anemia）",
+      "B": "心肌梗塞（myocardial infarction）",
+      "C": "心肌炎（myocarditis）",
+      "D": "增加靜脈順應性（increase of venous compliance）"
+    },
+    "answer": "A",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "縱膈｜下列何種情況最有可能增加心輸出量（cardi",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 113 年第一次醫師一階醫學（一）",
+    "sourceYear": 2024,
+    "sourceRound": 1,
+    "originalQuestionNumber": 59
+  },
+  {
+    "id": "MOEX-113020-1301-Q061",
+    "subject": "解剖學",
+    "chapter": "胸腔",
+    "section": "心臟與冠狀動脈",
+    "stem": "下列那一因子最可能引起冠狀動脈（coronary artery）血管收縮？",
+    "options": {
+      "A": "腺苷酸（adenosine）之局部濃度增加",
+      "B": "心跳速率減緩",
+      "C": "nitric oxide之局部濃度增加",
+      "D": "心臟代謝率增加"
+    },
+    "answer": "B",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "心臟與冠狀動脈｜下列那一因子最可能引起冠狀動脈（corona",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 113 年第一次醫師一階醫學（一）",
+    "sourceYear": 2024,
+    "sourceRound": 1,
+    "originalQuestionNumber": 61
+  },
+  {
+    "id": "MOEX-113020-1301-Q062",
+    "subject": "解剖學",
+    "chapter": "胸腔",
+    "section": "肺與胸膜",
+    "stem": "某健康者在海平面呼吸一般空氣，正常情況下，比較各處氧分壓（ ）的大小關係，下列排序何者正確？ ①吸入的氣體（inspired air，在鼻腔中測量） ②肺泡內氣體（alveolar air） ③呼出的氣體 （expired air，在鼻腔中測量）",
+    "options": {
+      "A": "①＞②＞③",
+      "B": "①＞③＞②",
+      "C": "①＝②＞③",
+      "D": "①＞②＝③"
+    },
+    "answer": "B",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "肺與胸膜｜某健康者在海平面呼吸一般空氣，正常情況下，比",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 113 年第一次醫師一階醫學（一）",
+    "sourceYear": 2024,
+    "sourceRound": 1,
+    "originalQuestionNumber": 62
+  },
+  {
+    "id": "MOEX-113020-1301-Q063",
+    "subject": "解剖學",
+    "chapter": "神經解剖",
+    "section": "腦幹核區",
+    "stem": "已知某藥物會抑制碳酸酐酶（carbonic anhydrase），但是無法穿透血腦障壁（blood-brain barrier）。 實驗中，大白鼠分為兩組，控制組未曾經過藥物處理，實驗組則事先接受該藥物注射進入體動脈（systemic artery）血中。若讓兩組大白鼠分別吸入比平時更高濃度的二氧化碳（CO ），會發生下列何種反應？ 2",
+    "options": {
+      "A": "兩組大白鼠的肺泡通氣量（alveolar ventilation）相同",
+      "B": "實驗組的主動脈體（aortic body）化學感受器（chemoreceptor）活性（activity）比控制組更強",
+      "C": "控制組的舌咽神經（glossopharyngeal nerve）放電頻率（firing frequency）比實驗組更低",
+      "D": "兩組大白鼠的中樞化學感受器（central chemoreceptor）活性相同"
+    },
+    "answer": "D",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "腦幹核區｜已知某藥物會抑制碳酸酐酶（carbonic ",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 113 年第一次醫師一階醫學（一）",
+    "sourceYear": 2024,
+    "sourceRound": 1,
+    "originalQuestionNumber": 63
+  },
+  {
+    "id": "MOEX-113020-1301-Q064",
+    "subject": "解剖學",
+    "chapter": "腹部",
+    "section": "肝膽胰脾",
+    "stem": "下列關於胰泌素（secretin）的敘述，何者正確？",
+    "options": {
+      "A": "作用在胰臟管細胞（pancreatic duct cell），協助酸鹼中和",
+      "B": "由胰臟（pancreas）製造，促進胃酸分泌",
+      "C": "透過抑制Gq蛋白，促進胃酸分泌",
+      "D": "作用於氯離子通道（Cl- channel），協助酸鹼中和"
+    },
+    "answer": "A",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "胰臟鄰近關係",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 113 年第一次醫師一階醫學（一）",
+    "sourceYear": 2024,
+    "sourceRound": 1,
+    "originalQuestionNumber": 64
+  },
+  {
+    "id": "MOEX-113020-1301-Q065",
+    "subject": "解剖學",
+    "chapter": "腹部",
+    "section": "肝膽胰脾",
+    "stem": "對於腸細胞（enterocyte）吸收的糖類物質與方式的敘述，下列何者最正確？",
+    "options": {
+      "A": "葡萄糖（glucose）主要透過鈉依賴型葡萄糖共同運輸蛋白-2（sodium-dependent glucose cotransporter-2, SGLT-2）直接吸收",
+      "B": "果糖（fructose）主要透過葡萄糖運輸蛋白-4（glucose transporter-4, GLUT-4）直接吸收",
+      "C": "半乳糖（galactose）主要透過鈉依賴型葡萄糖共同運輸蛋白-1（sodium-dependent glucose transporter-1, SGLT-1）直接吸收",
+      "D": "乳糖（lactose）主要透過葡萄糖運輸蛋白-5（glucose transporter-5, GLUT-5）直接吸收"
+    },
+    "answer": "C",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "肝膽胰脾｜對於腸細胞（enterocyte）吸收的糖類",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 113 年第一次醫師一階醫學（一）",
+    "sourceYear": 2024,
+    "sourceRound": 1,
+    "originalQuestionNumber": 65
+  },
+  {
+    "id": "MOEX-113090-1301-Q001",
+    "subject": "解剖學",
+    "chapter": "神經解剖",
+    "section": "腦幹核區",
+    "stem": "雙眼向右看時，右眼的外直肌收縮，同時左眼的內直肌收縮。腦幹內負責啟動兩眼協調進行外側注視 （lateral gaze）的神經核，主要是下列何者？",
+    "options": {
+      "A": "動眼神經核（oculomotor nucleus）",
+      "B": "外旋神經核（abducens nucleus）",
+      "C": "中線旁橋腦網狀結構（paramedian pontine reticular formation）",
+      "D": "E-W神經核（Edinger-Westphal nucleus）"
+    },
+    "answer": "C",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "動眼神經副核",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 113 年第二次醫師一階醫學（一）",
+    "sourceYear": 2024,
+    "sourceRound": 2,
+    "originalQuestionNumber": 1
+  },
+  {
+    "id": "MOEX-113090-1301-Q003",
+    "subject": "解剖學",
+    "chapter": "神經解剖",
+    "section": "丘腦與基底核",
+    "stem": "小腦傳出的神經纖維經丘腦（thalamus）後主要傳遞至下列何處的大腦皮質（cerebral cortex）？",
+    "options": {
+      "A": "主要運動區（primary motor area）",
+      "B": "扣帶運動區（cingulate motor area）",
+      "C": "運動輔助區（supplementary motor area）",
+      "D": "運動前區（premotor area）"
+    },
+    "answer": "A",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "丘腦與基底核｜小腦傳出的神經纖維經丘腦（thalamus）",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 113 年第二次醫師一階醫學（一）",
+    "sourceYear": 2024,
+    "sourceRound": 2,
+    "originalQuestionNumber": 3
+  },
+  {
+    "id": "MOEX-113090-1301-Q004",
+    "subject": "解剖學",
+    "chapter": "神經解剖",
+    "section": "聽覺與前庭路徑",
+    "stem": "下列何者由杏仁核（amygdala）發出，傳遞至下丘腦（hypothalamus）？",
+    "options": {
+      "A": "終紋（stria terminalis）",
+      "B": "穹窿（fornix）",
+      "C": "內側前腦束（medial forebrain bundle）",
+      "D": "內側縱束（medial longitudinal fasciculus）"
+    },
+    "answer": "A",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "聽覺與前庭路徑｜由杏仁核（amygdala）發出，傳遞至下丘",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 113 年第二次醫師一階醫學（一）",
+    "sourceYear": 2024,
+    "sourceRound": 2,
+    "originalQuestionNumber": 4
+  },
+  {
+    "id": "MOEX-113090-1301-Q005",
+    "subject": "解剖學",
+    "chapter": "神經解剖",
+    "section": "丘腦與基底核",
+    "stem": "有關丘腦（thalamus）功能之敘述，下列何者錯誤？",
+    "options": {
+      "A": "外膝狀體（lateral geniculate body）與視覺有關",
+      "B": "前核（anterior nucleus）與嗅覺有關",
+      "C": "腹外側核（ventrolateral nucleus）與錐體外運動系統（extrapyramidal system）有關",
+      "D": "腹後外側核（ventral posterolateral nucleus）與體感覺有關"
+    },
+    "answer": "B",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "丘腦與基底核｜丘腦（thalamus）功能之敘述，下列何者",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 113 年第二次醫師一階醫學（一）",
+    "sourceYear": 2024,
+    "sourceRound": 2,
+    "originalQuestionNumber": 5
+  },
+  {
+    "id": "MOEX-113090-1301-Q006",
+    "subject": "解剖學",
+    "chapter": "神經解剖",
+    "section": "小腦",
+    "stem": "後下小腦動脈（posterior inferior cerebellar artery）阻塞，可產生外側延腦症候群（lateral medullary syndrome），下列何者最不可能出現？",
+    "options": {
+      "A": "小腦功能異常",
+      "B": "對側肢體溫度感覺異常",
+      "C": "吞嚥困難",
+      "D": "對側肢體無力"
+    },
+    "answer": "D",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "小腦｜後下小腦動脈（posterior infer",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 113 年第二次醫師一階醫學（一）",
+    "sourceYear": 2024,
+    "sourceRound": 2,
+    "originalQuestionNumber": 6
+  },
+  {
+    "id": "MOEX-113090-1301-Q007",
+    "subject": "解剖學",
+    "chapter": "頭頸部",
+    "section": "顏面神經與三叉神經",
+    "stem": "下列何者不出現在中耳（middle ear）？",
+    "options": {
+      "A": "鼓索神經（chorda tympani nerve）",
+      "B": "內頸動脈（internal carotid artery）",
+      "C": "鐙骨肌（stapedius muscle）",
+      "D": "岩小神經（lesser petrosal nerve）"
+    },
+    "answer": "B",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "顏面神經與三叉神經｜不出現在中耳（middle ear）",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 113 年第二次醫師一階醫學（一）",
+    "sourceYear": 2024,
+    "sourceRound": 2,
+    "originalQuestionNumber": 7
+  },
+  {
+    "id": "MOEX-113090-1301-Q008",
+    "subject": "解剖學",
+    "chapter": "神經解剖",
+    "section": "腦幹核區",
+    "stem": "下列那一條眼外肌與眼球向外看的動作最不相關？",
+    "options": {
+      "A": "外直肌（lateral rectus）",
+      "B": "上斜肌（superior oblique）",
+      "C": "下斜肌（inferior oblique）",
+      "D": "上直肌（superior rectus）"
+    },
+    "answer": "D",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "腦幹核區｜下列那一條眼外肌與眼球向外看的動作最不相關",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 113 年第二次醫師一階醫學（一）",
+    "sourceYear": 2024,
+    "sourceRound": 2,
+    "originalQuestionNumber": 8
+  },
+  {
+    "id": "MOEX-113090-1301-Q009",
+    "subject": "解剖學",
+    "chapter": "神經解剖",
+    "section": "腦幹核區",
+    "stem": "視神經管（optic canal）與下列何者相通？",
+    "options": {
+      "A": "翼腭窩（pterygopalatine fossa）",
+      "B": "中顱窩（middle cranial fossa）",
+      "C": "顳下窩（infratemporal fossa）",
+      "D": "顳窩（temporal fossa）"
+    },
+    "answer": "B",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "腦幹核區｜視神經管（optic canal）與下列何者",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 113 年第二次醫師一階醫學（一）",
+    "sourceYear": 2024,
+    "sourceRound": 2,
+    "originalQuestionNumber": 9
+  },
+  {
+    "id": "MOEX-113090-1301-Q010",
+    "subject": "解剖學",
+    "chapter": "頭頸部",
+    "section": "顏面神經與三叉神經",
+    "stem": "通過下列何者的血管與其所通過的孔洞名稱不同？",
+    "options": {
+      "A": "棘孔（foramen spinosum）",
+      "B": "眶下孔（infraorbital foramen）",
+      "C": "腭大孔（greater palatine foramen）",
+      "D": "前篩孔（anterior ethmoidal foramen）"
+    },
+    "answer": "A",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "顏面神經與三叉神經｜通過下列何者的血管與其所通過的孔洞名稱不同",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 113 年第二次醫師一階醫學（一）",
+    "sourceYear": 2024,
+    "sourceRound": 2,
+    "originalQuestionNumber": 10
+  },
+  {
+    "id": "MOEX-113090-1301-Q012",
+    "subject": "解剖學",
+    "chapter": "頭頸部",
+    "section": "咽喉解剖",
+    "stem": "下列何者同時支配上、中、下三個咽縮肌（pharyngeal constrictor muscles）？",
+    "options": {
+      "A": "舌咽神經（glossopharyngeal nerve）",
+      "B": "三叉神經（trigeminal nerve）",
+      "C": "迷走神經（vagus nerve）",
+      "D": "舌下神經（hypoglossal nerve）"
+    },
+    "answer": "C",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "咽喉解剖｜同時支配上、中、下三個咽縮肌（pharyng",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 113 年第二次醫師一階醫學（一）",
+    "sourceYear": 2024,
+    "sourceRound": 2,
+    "originalQuestionNumber": 12
+  },
+  {
+    "id": "MOEX-113090-1301-Q013",
+    "subject": "解剖學",
+    "chapter": "頭頸部",
+    "section": "顏面神經與三叉神經",
+    "stem": "下列何者與張腭帆肌（tensor veli palatini muscle）具有相同來源的神經支配？",
+    "options": {
+      "A": "腭咽肌（palatopharyngeus）",
+      "B": "頸闊肌（platysma）",
+      "C": "鼓室張肌（tensor tympani）",
+      "D": "莖突咽肌（stylopharyngeus）"
+    },
+    "answer": "C",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "顏面神經與三叉神經｜張腭帆肌（tensor veli palat",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 113 年第二次醫師一階醫學（一）",
+    "sourceYear": 2024,
+    "sourceRound": 2,
+    "originalQuestionNumber": 13
+  },
+  {
+    "id": "MOEX-113090-1301-Q015",
+    "subject": "解剖學",
+    "chapter": "胸腔",
+    "section": "心臟與冠狀動脈",
+    "stem": "解剖位置下，緊鄰心臟基部（base of the heart）、左心房正後方的器官為下列何者？",
+    "options": {
+      "A": "氣管（trachea）",
+      "B": "降主動脈（descending aorta）",
+      "C": "食道（esophagus）",
+      "D": "右主支氣管（right main bronchus）"
+    },
+    "answer": "C",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "心臟與冠狀動脈｜解剖位置下，緊鄰心臟基部（base of t",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 113 年第二次醫師一階醫學（一）",
+    "sourceYear": 2024,
+    "sourceRound": 2,
+    "originalQuestionNumber": 15
+  },
+  {
+    "id": "MOEX-113090-1301-Q016",
+    "subject": "解剖學",
+    "chapter": "胸腔",
+    "section": "肺與胸膜",
+    "stem": "解剖姿勢下，肺動脈幹（pulmonary trunk）通常約在下列何處，分支成左右肺動脈？",
+    "options": {
+      "A": "第四／第五胸椎高度處",
+      "B": "第六／第七胸椎高度處",
+      "C": "第一／第二胸椎高度處",
+      "D": "第二／第三胸椎高度處"
+    },
+    "answer": "A",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "肺門構造相對位置",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 113 年第二次醫師一階醫學（一）",
+    "sourceYear": 2024,
+    "sourceRound": 2,
+    "originalQuestionNumber": 16
+  },
+  {
+    "id": "MOEX-113090-1301-Q017",
+    "subject": "解剖學",
+    "chapter": "胸腔",
+    "section": "縱膈",
+    "stem": "下列那一關節最不可能參與呼吸時胸廓的運動？",
+    "options": {
+      "A": "劍突胸骨關節（xiphisternal joint）",
+      "B": "肋橫關節（costotransverse joint）",
+      "C": "柄胸關節（manubriosternal joint）",
+      "D": "胸肋關節（sternocostal joint）"
+    },
+    "answer": "A",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "縱膈｜下列那一關節最不可能參與呼吸時胸廓的運動",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 113 年第二次醫師一階醫學（一）",
+    "sourceYear": 2024,
+    "sourceRound": 2,
+    "originalQuestionNumber": 17
+  },
+  {
+    "id": "MOEX-113090-1301-Q018",
+    "subject": "解剖學",
+    "chapter": "胸腔",
+    "section": "縱膈",
+    "stem": "有關胸管（thoracic duct）在縱隔之敘述，下列何者正確？",
+    "options": {
+      "A": "在食道與脊椎之間",
+      "B": "在氣管與食道之間",
+      "C": "在胸主動脈與脊椎之間",
+      "D": "在奇靜脈與交感神經幹之間"
+    },
+    "answer": "A",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "胸導管走行",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 113 年第二次醫師一階醫學（一）",
+    "sourceYear": 2024,
+    "sourceRound": 2,
+    "originalQuestionNumber": 18
+  },
+  {
+    "id": "MOEX-113090-1301-Q019",
+    "subject": "解剖學",
+    "chapter": "胸腔",
+    "section": "橫膈",
+    "stem": "下列何者藉由橫膈（diaphragm）的食道裂口（esophageal hiatus）由胸腔進入腹腔？",
+    "options": {
+      "A": "胸管（thoracic duct）",
+      "B": "主動脈（aorta）",
+      "C": "迷走神經幹（vagal trunk）",
+      "D": "下腔靜脈（inferior vena cava）"
+    },
+    "answer": "C",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "橫膈｜藉由橫膈（diaphragm）的食道裂口（e",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 113 年第二次醫師一階醫學（一）",
+    "sourceYear": 2024,
+    "sourceRound": 2,
+    "originalQuestionNumber": 19
+  },
+  {
+    "id": "MOEX-113090-1301-Q020",
+    "subject": "解剖學",
+    "chapter": "腹部",
+    "section": "肝膽胰脾",
+    "stem": "下列構造與十二指腸（duodenum）關係的敘述，何者最為正確？",
+    "options": {
+      "A": "膽囊（gallbladder）位於十二指腸上段（superior part of duodenum）的後方",
+      "B": "下腔靜脈（inferior vena cava）位於十二指腸水平段（horizontal part of duodenum）的前方",
+      "C": "胰臟頭部（head of pancreas）位於十二指腸下降段（descending part of duodenum）的外側",
+      "D": "上腸繫膜靜脈（superior mesenteric vein）位於十二指腸水平段（horizontal part of duodenum）的前 方"
+    },
+    "answer": "D",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "膽囊與膽囊動脈",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 113 年第二次醫師一階醫學（一）",
+    "sourceYear": 2024,
+    "sourceRound": 2,
+    "originalQuestionNumber": 20
+  },
+  {
+    "id": "MOEX-113090-1301-Q021",
+    "subject": "解剖學",
+    "chapter": "腹部",
+    "section": "肝膽胰脾",
+    "stem": "提睪肌（cremaster muscle）是由前腹壁中的何塊肌肉向下形成？",
+    "options": {
+      "A": "腹橫肌（transversus abdominis）",
+      "B": "腹內斜肌（internal oblique muscle）",
+      "C": "腹外斜肌（external oblique muscle）",
+      "D": "腹直肌（rectus abdominis）"
+    },
+    "answer": "B",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "肝膽胰脾｜提睪肌（cremaster muscle）是",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 113 年第二次醫師一階醫學（一）",
+    "sourceYear": 2024,
+    "sourceRound": 2,
+    "originalQuestionNumber": 21
+  },
+  {
+    "id": "MOEX-113090-1301-Q022",
+    "subject": "解剖學",
+    "chapter": "腹部",
+    "section": "肝膽胰脾",
+    "stem": "下列何者一般不直接起源自腹腔動脈幹（celiac trunk）？",
+    "options": {
+      "A": "左胃動脈（left gastric artery）",
+      "B": "右胃動脈（right gastric artery）",
+      "C": "肝總動脈（common hepatic artery）",
+      "D": "脾動脈（splenic artery）"
+    },
+    "answer": "B",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "脾動脈走行",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 113 年第二次醫師一階醫學（一）",
+    "sourceYear": 2024,
+    "sourceRound": 2,
+    "originalQuestionNumber": 22
+  },
+  {
+    "id": "MOEX-113090-1301-Q023",
+    "subject": "解剖學",
+    "chapter": "骨盆與會陰",
+    "section": "會陰三角",
+    "stem": "關於尿道球腺（bulbourethral gland），下列敘述何者正確？",
+    "options": {
+      "A": "直徑約5公分",
+      "B": "尿道球腺和外尿道括約肌（external urethral sphincter）都位於會陰深隙（deep perineal pouch）內",
+      "C": "尿道球腺的導管（ducts of bulbourethral glands）不穿過會陰膜（perineal membrane）",
+      "D": "尿道球腺的導管開口於膜部尿道（membranous urethra）"
+    },
+    "answer": "B",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "會陰深層間隙內容物",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 113 年第二次醫師一階醫學（一）",
+    "sourceYear": 2024,
+    "sourceRound": 2,
+    "originalQuestionNumber": 23
+  },
+  {
+    "id": "MOEX-113090-1301-Q024",
+    "subject": "解剖學",
+    "chapter": "骨盆與會陰",
+    "section": "會陰三角",
+    "stem": "下列何者供應陰蒂腳（crura of clitoris）血液？",
+    "options": {
+      "A": "前庭球動脈（artery of bulb of vestibule）",
+      "B": "陰蒂深動脈（deep artery of clitoris）",
+      "C": "陰蒂背動脈（dorsal artery of clitoris）",
+      "D": "橫會陰動脈（transverse perineal artery）"
+    },
+    "answer": "B",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "會陰三角｜供應陰蒂腳（crura of clitori",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 113 年第二次醫師一階醫學（一）",
+    "sourceYear": 2024,
+    "sourceRound": 2,
+    "originalQuestionNumber": 24
+  },
+  {
+    "id": "MOEX-113090-1301-Q025",
+    "subject": "解剖學",
+    "chapter": "骨盆與會陰",
+    "section": "會陰三角",
+    "stem": "膀胱下動脈（inferior vesical artery）阻塞時，對下列何者的影響最小？",
+    "options": {
+      "A": "直腸",
+      "B": "膀胱",
+      "C": "儲精囊",
+      "D": "前列腺"
+    },
+    "answer": "A",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "會陰三角｜膀胱下動脈（inferior vesical",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 113 年第二次醫師一階醫學（一）",
+    "sourceYear": 2024,
+    "sourceRound": 2,
+    "originalQuestionNumber": 25
+  },
+  {
+    "id": "MOEX-113090-1301-Q026",
+    "subject": "解剖學",
+    "chapter": "骨盆與會陰",
+    "section": "會陰三角",
+    "stem": "海綿體尿道部（spongy urethra）破裂時，尿液最不可能滲漏至下列何處？",
+    "options": {
+      "A": "陰囊（scrotum）皮下",
+      "B": "陰莖（penis）皮下",
+      "C": "會陰深隙（deep perineal pouch）",
+      "D": "前下腹壁之淺筋膜層（superficial fascia of anterior inferior abdominal wall）"
+    },
+    "answer": "C",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "會陰深層間隙內容物",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 113 年第二次醫師一階醫學（一）",
+    "sourceYear": 2024,
+    "sourceRound": 2,
+    "originalQuestionNumber": 26
+  },
+  {
+    "id": "MOEX-113090-1301-Q027",
+    "subject": "解剖學",
+    "chapter": "上肢",
+    "section": "臂神經叢",
+    "stem": "下列那一條神經，會走在肱肌（brachialis）與肱二頭肌（biceps brachii）之間？",
+    "options": {
+      "A": "尺神經（ulnar nerve）",
+      "B": "橈神經（radial nerve）",
+      "C": "正中神經（median nerve）",
+      "D": "肌皮神經（musculocutaneous nerve）"
+    },
+    "answer": "D",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "臂神經叢終末分支",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 113 年第二次醫師一階醫學（一）",
+    "sourceYear": 2024,
+    "sourceRound": 2,
+    "originalQuestionNumber": 27
+  },
+  {
+    "id": "MOEX-113090-1301-Q028",
+    "subject": "解剖學",
+    "chapter": "下肢",
+    "section": "下肢血管",
+    "stem": "腓骨（fibula）頭部與頸部的骨折，最可能傷及下列何者？",
+    "options": {
+      "A": "腓動脈（fibular artery）",
+      "B": "脛前動脈（anterior tibial artery）",
+      "C": "脛後動脈（posterior tibial artery）",
+      "D": "膕動脈（popliteal artery）"
+    },
+    "answer": "B",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "膕動脈與膝窩解剖",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 113 年第二次醫師一階醫學（一）",
+    "sourceYear": 2024,
+    "sourceRound": 2,
+    "originalQuestionNumber": 28
+  },
+  {
+    "id": "MOEX-113090-1301-Q030",
+    "subject": "解剖學",
+    "chapter": "神經解剖",
+    "section": "腦幹核區",
+    "stem": "下列那一條神經出現在枕下三角內（suboccipital triangle）？",
+    "options": {
+      "A": "枕下神經（suboccipital nerve）",
+      "B": "枕大神經（greater occipital nerve）",
+      "C": "枕小神經（lesser occipital nerve）",
+      "D": "第三枕神經（3rd occipital nerve）"
+    },
+    "answer": "A",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "腦幹核區｜下列那一條神經出現在枕下三角內（subocc",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 113 年第二次醫師一階醫學（一）",
+    "sourceYear": 2024,
+    "sourceRound": 2,
+    "originalQuestionNumber": 30
+  },
+  {
+    "id": "MOEX-113090-1301-Q031",
+    "subject": "解剖學",
+    "chapter": "下肢",
+    "section": "臀區",
+    "stem": "下列何者由坐骨大孔（greater sciatic foramen）進入臀區時，其位置最靠外側？",
+    "options": {
+      "A": "閉孔內肌神經（nerve to obturator internus）",
+      "B": "陰部神經（pudendal nerve）",
+      "C": "大腿後側皮神經（posterior cutaneous nerve of thigh）",
+      "D": "坐骨神經（sciatic nerve）"
+    },
+    "answer": "D",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "臀區｜由坐骨大孔（greater sciatic ",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 113 年第二次醫師一階醫學（一）",
+    "sourceYear": 2024,
+    "sourceRound": 2,
+    "originalQuestionNumber": 31
+  },
+  {
+    "id": "MOEX-113090-1301-Q035",
+    "subject": "解剖學",
+    "chapter": "腹部",
+    "section": "肝膽胰脾",
+    "stem": "下列何者屬於軀幹的軸下肌（hypaxial muscle）？",
+    "options": {
+      "A": "豎脊肌（erector spinae）",
+      "B": "腹直肌（rectus abdominis）",
+      "C": "闊背肌（latissmus dorsi）",
+      "D": "棘肌（spinalis）"
+    },
+    "answer": "B",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "肝膽胰脾｜屬於軀幹的軸下肌（hypaxial musc",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 113 年第二次醫師一階醫學（一）",
+    "sourceYear": 2024,
+    "sourceRound": 2,
+    "originalQuestionNumber": 35
+  },
+  {
+    "id": "MOEX-113090-1301-Q036",
+    "subject": "解剖學",
+    "chapter": "頭頸部",
+    "section": "顏面神經與三叉神經",
+    "stem": "聽小骨（auditory ossicle）之砧骨（incus）是源自何處？",
+    "options": {
+      "A": "第一咽弓（first pharyngeal arch）",
+      "B": "第二咽弓（second pharyngeal arch）",
+      "C": "第三咽弓（third pharyngeal arch）",
+      "D": "第四咽弓（fourth pharyngeal arch）"
+    },
+    "answer": "A",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "顏面神經與三叉神經｜聽小骨（auditory ossicle）之",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 113 年第二次醫師一階醫學（一）",
+    "sourceYear": 2024,
+    "sourceRound": 2,
+    "originalQuestionNumber": 36
+  },
+  {
+    "id": "MOEX-113090-1301-Q043",
+    "subject": "解剖學",
+    "chapter": "腹部",
+    "section": "肝膽胰脾",
+    "stem": "下列何者細胞主要分布在胃底腺（fundic glands），而沒有分布在胃幽門腺（pyloric glands）？",
+    "options": {
+      "A": "主細胞（chief cells）",
+      "B": "未分化細胞（undifferentiated cells）",
+      "C": "黏液分泌細胞（mucous-secreting cells）",
+      "D": "腸內分泌細胞（enteroendocrine cells）"
+    },
+    "answer": "A",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "肝膽胰脾｜細胞主要分布在胃底腺（fundic glan",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 113 年第二次醫師一階醫學（一）",
+    "sourceYear": 2024,
+    "sourceRound": 2,
+    "originalQuestionNumber": 43
+  },
+  {
+    "id": "MOEX-113090-1301-Q045",
+    "subject": "解剖學",
+    "chapter": "骨盆與會陰",
+    "section": "會陰三角",
+    "stem": "卵巢濾泡（ovarian follicle）成長時，顆粒細胞（granulosa cell）之間的接合構造（junction），何者 會廣泛的出現？",
+    "options": {
+      "A": "緊密接合（tight junction）",
+      "B": "黏連接合（adherens junction）",
+      "C": "間隙接合（gap junction）",
+      "D": "橋粒（desmosome）"
+    },
+    "answer": "C",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "會陰三角｜卵巢濾泡（ovarian follicle）",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 113 年第二次醫師一階醫學（一）",
+    "sourceYear": 2024,
+    "sourceRound": 2,
+    "originalQuestionNumber": 45
+  },
+  {
+    "id": "MOEX-113090-1301-Q057",
+    "subject": "解剖學",
+    "chapter": "胸腔",
+    "section": "縱膈",
+    "stem": "急診來了一位患者，半年前他曾經進行健康檢查，檢查人員抽取 1 mL的血液，經離心後測量血漿 （plasma）體積為 0.6 mL，並告訴他正常。今日他因身體不適來到急診室，再次進行血液檢查後，醫生告 訴患者出現貧血現象。下列那一個數值，最可能是今日此患者在急診室測到的血比容（hematocrit）？",
+    "options": {
+      "A": "30%",
+      "B": "40%",
+      "C": "50%",
+      "D": "75%"
+    },
+    "answer": "A",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "縱膈｜急診來了一位患者，半年前他曾經進行健康檢查，",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 113 年第二次醫師一階醫學（一）",
+    "sourceYear": 2024,
+    "sourceRound": 2,
+    "originalQuestionNumber": 57
+  },
+  {
+    "id": "MOEX-113090-1301-Q058",
+    "subject": "解剖學",
+    "chapter": "胸腔",
+    "section": "心臟與冠狀動脈",
+    "stem": "心臟組織的傳導速度由快到慢的排列，下列何者正確？",
+    "options": {
+      "A": "Purkinje system＞atrial pathways＞SA node",
+      "B": "Purkinje system＞SA node＞atrial pathways",
+      "C": "SA node＞Purkinje system＞atrial pathways",
+      "D": "atrial pathways＞Purkinje system＞SA node"
+    },
+    "answer": "A",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "心臟與冠狀動脈｜心臟組織的傳導速度由快到慢的排列，下列何者正",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 113 年第二次醫師一階醫學（一）",
+    "sourceYear": 2024,
+    "sourceRound": 2,
+    "originalQuestionNumber": 58
+  },
+  {
+    "id": "MOEX-113090-1301-Q059",
+    "subject": "解剖學",
+    "chapter": "胸腔",
+    "section": "縱膈",
+    "stem": "下列有關淋巴系統運作，何者最不易發生？",
+    "options": {
+      "A": "交感神經興奮促使淋巴管平滑肌收縮，可減緩淋巴液流速",
+      "B": "增加骨骼肌泵活動，可增加淋巴液流速",
+      "C": "淋巴管的平滑肌自發性節律收縮，可將淋巴液往心臟方向推動",
+      "D": "淋巴管的瓣膜可以幫助往心臟方向推動淋巴液"
+    },
+    "answer": "A",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "縱膈｜下列有關淋巴系統運作，何者最不易發生",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 113 年第二次醫師一階醫學（一）",
+    "sourceYear": 2024,
+    "sourceRound": 2,
+    "originalQuestionNumber": 59
+  },
+  {
+    "id": "MOEX-113090-1301-Q061",
+    "subject": "解剖學",
+    "chapter": "胸腔",
+    "section": "肺與胸膜",
+    "stem": "吸氣時有時會延長主動脈和肺動脈瓣膜關閉差距的時間，這會造成那一心音分裂（splitting）？",
+    "options": {
+      "A": "第一心音",
+      "B": "第二心音",
+      "C": "第三心音",
+      "D": "第四心音"
+    },
+    "answer": "B",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "肺門構造相對位置",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 113 年第二次醫師一階醫學（一）",
+    "sourceYear": 2024,
+    "sourceRound": 2,
+    "originalQuestionNumber": 61
+  },
+  {
+    "id": "MOEX-113090-1301-Q062",
+    "subject": "解剖學",
+    "chapter": "胸腔",
+    "section": "肺與胸膜",
+    "stem": "在整個呼吸循環（respiratory cycle）中，肺泡內壓（alveolar pressure, P ）於何時達到最高點？ alv",
+    "options": {
+      "A": "開始吸氣時",
+      "B": "吸氣階段中途",
+      "C": "吸氣結束，開始呼氣之前",
+      "D": "呼氣階段中途"
+    },
+    "answer": "D",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "肺與胸膜｜在整個呼吸循環（respiratory cy",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 113 年第二次醫師一階醫學（一）",
+    "sourceYear": 2024,
+    "sourceRound": 2,
+    "originalQuestionNumber": 62
+  },
+  {
+    "id": "MOEX-113090-1301-Q063",
+    "subject": "解剖學",
+    "chapter": "胸腔",
+    "section": "肺與胸膜",
+    "stem": "相較於健康者，肺氣腫（emphysema）的病患有下列那些特徵？①呼吸道阻力（airway resistance）增 加 ②肺臟順應性（lung compliance）減少 ③生理無效腔（physiological dead space）增加 ④體動 脈（systemic artery）血中血氧飽和度百分比（oxygen saturation percentage, ）不變",
+    "options": {
+      "A": "①②③④",
+      "B": "僅①③",
+      "C": "僅②③",
+      "D": "僅①④"
+    },
+    "answer": "B",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "肺與胸膜｜相較於健康者，肺氣腫（emphysema）的",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 113 年第二次醫師一階醫學（一）",
+    "sourceYear": 2024,
+    "sourceRound": 2,
+    "originalQuestionNumber": 63
+  },
+  {
+    "id": "MOEX-113090-1301-Q065",
+    "subject": "解剖學",
+    "chapter": "腹部",
+    "section": "肝膽胰脾",
+    "stem": "關於不帶有spike potentials的腸道慢波（slow waves）的敘述，下列何者最適當？",
+    "options": {
+      "A": "起源與卡氏間質細胞（interstitial cells of Cajal, ICC）有關，常導致腸道平滑肌之收縮",
+      "B": "起源與潘氏細胞（Paneth cell）有關，常導致腸道平滑肌之收縮",
+      "C": "起源與卡氏間質細胞（interstitial cells of Cajal, ICC）有關，很少導致腸道平滑肌之收縮",
+      "D": "起源與潘氏細胞（Paneth cell）有關，很少導致腸道平滑肌之收縮"
+    },
+    "answer": "C",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "肝膽胰脾｜不帶有spike potentials的腸道",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 113 年第二次醫師一階醫學（一）",
+    "sourceYear": 2024,
+    "sourceRound": 2,
+    "originalQuestionNumber": 65
+  },
+  {
+    "id": "MOEX-113090-1301-Q067",
+    "subject": "解剖學",
+    "chapter": "腹部",
+    "section": "腹膜關係",
+    "stem": "若受試者的腎血流量（renal blood flow）為1,250 mL/min，血比容（hematocrit）為50%，腎絲球過濾率 （glomerular filtration rate）125 mL/min，則其腎臟之過濾分數（filtration fraction）最接近下列 何者？",
+    "options": {
+      "A": "20%",
+      "B": "40%",
+      "C": "60%",
+      "D": "80%"
+    },
+    "answer": "A",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "腹膜關係｜若受試者的腎血流量（renal blood ",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 113 年第二次醫師一階醫學（一）",
+    "sourceYear": 2024,
+    "sourceRound": 2,
+    "originalQuestionNumber": 67
+  },
+  {
+    "id": "MOEX-113090-1301-Q072",
+    "subject": "解剖學",
+    "chapter": "腹部",
+    "section": "肝膽胰脾",
+    "stem": "飯後胰島素明顯增加，相對而言，下列何種組織是其最主要的作用標的，以促使葡萄糖進入其細胞而降低血 糖？",
+    "options": {
+      "A": "腎臟組織",
+      "B": "大腦皮質",
+      "C": "脂肪組織",
+      "D": "小腸黏膜"
+    },
+    "answer": "C",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "胰臟鄰近關係",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 113 年第二次醫師一階醫學（一）",
+    "sourceYear": 2024,
+    "sourceRound": 2,
+    "originalQuestionNumber": 72
+  },
+  {
+    "id": "MOEX-113090-1301-Q073",
+    "subject": "解剖學",
+    "chapter": "骨盆與會陰",
+    "section": "會陰三角",
+    "stem": "下列有關生殖生理功能和調控的敘述，何者最不適當？",
+    "options": {
+      "A": "睪固酮（testosterone）抑制腦下垂體前葉（anterior pituitary）分泌黃體生成素（luteinizing hormone, LH）",
+      "B": "抑制素（inhibin）抑制萊氏細胞（Leydig cell）分泌睪固酮（testosterone）",
+      "C": "睪固酮（testosterone）促進Wolffian duct分化",
+      "D": "二氫睪固酮（dihydrotestosterone, DHT）促進前列腺（prostate）發育"
+    },
+    "answer": "B",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "會陰三角｜下列有關生殖生理功能和調控的敘述，何者最不適",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 113 年第二次醫師一階醫學（一）",
+    "sourceYear": 2024,
+    "sourceRound": 2,
+    "originalQuestionNumber": 73
+  },
+  {
+    "id": "MOEX-113090-1301-Q088",
+    "subject": "解剖學",
+    "chapter": "腹部",
+    "section": "肝膽胰脾",
+    "stem": "下列有關pyruvate dehydrogenase（PDH）活性調控之敘述，何者錯誤？",
+    "options": {
+      "A": "NADH會抑制PDH活性",
+      "B": "acetyl-CoA會抑制PDH活性",
+      "C": "胰島素（insulin）會透過PDH phosphatase抑制PDH活性",
+      "D": "ATP會透過PDH kinase抑制PDH活性"
+    },
+    "answer": "C",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "胰臟鄰近關係",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 113 年第二次醫師一階醫學（一）",
+    "sourceYear": 2024,
+    "sourceRound": 2,
+    "originalQuestionNumber": 88
+  },
+  {
+    "id": "MOEX-114020-1301-Q002",
+    "subject": "解剖學",
+    "chapter": "神經解剖",
+    "section": "脊髓傳導路徑",
+    "stem": "病 人脊髓受損導致受傷部位以下肢體無力，溫痛覺喪失，但本體感覺與震動覺保留，下列何處最不可能受損？",
+    "options": {
+      "A": "後 索（posterior funiculus）",
+      "B": "前 索（anterior funiculus）",
+      "C": "側 索（lateral funiculus）",
+      "D": "前 角（anterior horn）"
+    },
+    "answer": "A",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "脊髓丘腦徑功能",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 114 年第一次醫師一階醫學（一）",
+    "sourceYear": 2025,
+    "sourceRound": 1,
+    "originalQuestionNumber": 2
+  },
+  {
+    "id": "MOEX-114020-1301-Q003",
+    "subject": "解剖學",
+    "chapter": "神經解剖",
+    "section": "腦幹核區",
+    "stem": "關 於前脈絡叢動脈（anterior choroidal artery）之敘述，下列何者錯誤？",
+    "options": {
+      "A": "可 供給側腦室（lateral ventricle）之脈絡叢（choroid plexus）",
+      "B": "可 供給內囊後支（posterior limb of internal capsule）",
+      "C": "多 數人的前脈絡叢動脈，由內頸動脈（internal carotid artery）分支出",
+      "D": "基 底核（basal ganglion）的殼核（putamen），主要由前脈絡叢動脈供給"
+    },
+    "answer": "D",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "腦幹核區｜關 於前脈絡叢動脈（anterior cho",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 114 年第一次醫師一階醫學（一）",
+    "sourceYear": 2025,
+    "sourceRound": 1,
+    "originalQuestionNumber": 3
+  },
+  {
+    "id": "MOEX-114020-1301-Q004",
+    "subject": "解剖學",
+    "chapter": "神經解剖",
+    "section": "腦幹核區",
+    "stem": "下 列有關巴金森氏病（Parkinson's disease）之敘述，何者錯誤？",
+    "options": {
+      "A": "病 變部位主要在黑質網狀區（substantia nigra pars reticulata）",
+      "B": "與 dopamine 分泌不足有關",
+      "C": "為 一種神經退化性疾病",
+      "D": "可 同時影響基底核迴路中的 direct loop 與 indirect loop"
+    },
+    "answer": "A",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "腦幹核區｜下 列有關巴金森氏病（Parkinson's",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 114 年第一次醫師一階醫學（一）",
+    "sourceYear": 2025,
+    "sourceRound": 1,
+    "originalQuestionNumber": 4
+  },
+  {
+    "id": "MOEX-114020-1301-Q005",
+    "subject": "解剖學",
+    "chapter": "神經解剖",
+    "section": "腦幹核區",
+    "stem": "下 列何者最不可能直接參與眼睛看近物時的調適反應（accommodation-convergence reaction）？",
+    "options": {
+      "A": "雙 眼內直肌（medial rectus）",
+      "B": "動 眼神經（oculomotor nerve）",
+      "C": "額 葉眼區（frontal eye field）",
+      "D": "睫 狀肌（ciliary muscle）"
+    },
+    "answer": "C",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "腦幹核區｜下 列何者最不可能直接參與眼睛看近物時的調適",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 114 年第一次醫師一階醫學（一）",
+    "sourceYear": 2025,
+    "sourceRound": 1,
+    "originalQuestionNumber": 5
+  },
+  {
+    "id": "MOEX-114020-1301-Q006",
+    "subject": "解剖學",
+    "chapter": "神經解剖",
+    "section": "腦幹核區",
+    "stem": "下 列何者負責供應內耳血液？",
+    "options": {
+      "A": "副 腦膜動脈（accessory meningeal artery）",
+      "B": "後 腦膜動脈（posterior meningeal artery）",
+      "C": "迷 路動脈（labyrinthine artery）",
+      "D": "咽 升動脈（ascending pharyngeal artery）"
+    },
+    "answer": "C",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "腦幹核區｜下 列何者負責供應內耳血液",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 114 年第一次醫師一階醫學（一）",
+    "sourceYear": 2025,
+    "sourceRound": 1,
+    "originalQuestionNumber": 6
+  },
+  {
+    "id": "MOEX-114020-1301-Q007",
+    "subject": "解剖學",
+    "chapter": "頭頸部",
+    "section": "顏面神經與三叉神經",
+    "stem": "下 列何者並不同時參與外聽道（external acoustic meatus）與鼓膜（tympanic membrane）之一般感覺？",
+    "options": {
+      "A": "三 叉神經（trigeminal nerve）",
+      "B": "顏 面神經（facial nerve）",
+      "C": "舌 咽神經（glossopharyngeal nerve）",
+      "D": "迷 走神經（vagus nerve）"
+    },
+    "answer": "C",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "三叉神經感覺分支",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 114 年第一次醫師一階醫學（一）",
+    "sourceYear": 2025,
+    "sourceRound": 1,
+    "originalQuestionNumber": 7
+  },
+  {
+    "id": "MOEX-114020-1301-Q008",
+    "subject": "解剖學",
+    "chapter": "神經解剖",
+    "section": "聽覺與前庭路徑",
+    "stem": "下 列何者隔開耳蝸管（cochlear duct/scala media）與鼓室階（scala tympani）？",
+    "options": {
+      "A": "前 庭膜（vestibular membrane）",
+      "B": "基 底膜（basilar membrane）",
+      "C": "鼓 膜（tympanic membrane）",
+      "D": "螺 旋韌帶（spiral ligament）"
+    },
+    "answer": "B",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "聽覺與前庭路徑｜下 列何者隔開耳蝸管（cochlear du",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 114 年第一次醫師一階醫學（一）",
+    "sourceYear": 2025,
+    "sourceRound": 1,
+    "originalQuestionNumber": 8
+  },
+  {
+    "id": "MOEX-114020-1301-Q009",
+    "subject": "解剖學",
+    "chapter": "神經解剖",
+    "section": "腦幹核區",
+    "stem": "下 列何者並不以共同腱環（common tendinous ring）為起點？",
+    "options": {
+      "A": "上 直肌（superior rectus）",
+      "B": "下 直肌（inferior rectus）",
+      "C": "外 直肌（lateral rectus）",
+      "D": "下 斜肌（inferior oblique）"
+    },
+    "answer": "D",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "腦幹核區｜下 列何者並不以共同腱環（common te",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 114 年第一次醫師一階醫學（一）",
+    "sourceYear": 2025,
+    "sourceRound": 1,
+    "originalQuestionNumber": 9
+  },
+  {
+    "id": "MOEX-114020-1301-Q010",
+    "subject": "解剖學",
+    "chapter": "頭頸部",
+    "section": "顏面神經與三叉神經",
+    "stem": "下 列何者與鐙骨肌（stapedius muscle）有相同的神經支配？",
+    "options": {
+      "A": "鼓 膜張肌（tensor tympani muscle）",
+      "B": "眼 輪匝肌（orbicularis oculi muscle）",
+      "C": "腭 帆提肌（levator veli palatini muscle）",
+      "D": "腭 帆張肌（tensor veli palatini muscle）"
+    },
+    "answer": "B",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "顏面神經與三叉神經｜下 列何者與鐙骨肌（stapedius mu",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 114 年第一次醫師一階醫學（一）",
+    "sourceYear": 2025,
+    "sourceRound": 1,
+    "originalQuestionNumber": 10
+  },
+  {
+    "id": "MOEX-114020-1301-Q011",
+    "subject": "解剖學",
+    "chapter": "頭頸部",
+    "section": "顏面神經與三叉神經",
+    "stem": "前 囟門（anterior fontanelle）處的頭皮（scalp）主要血液供應來自：",
+    "options": {
+      "A": "眶 上動脈（supraorbital artery）",
+      "B": "升 咽動脈（ascending pharyngeal artery）",
+      "C": "耳 後動脈（posterior auricular artery）",
+      "D": "枕 動脈（occipital artery）"
+    },
+    "answer": "A",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "顏面神經與三叉神經｜前 囟門（anterior fontanel",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 114 年第一次醫師一階醫學（一）",
+    "sourceYear": 2025,
+    "sourceRound": 1,
+    "originalQuestionNumber": 11
+  },
+  {
+    "id": "MOEX-114020-1301-Q012",
+    "subject": "解剖學",
+    "chapter": "神經解剖",
+    "section": "腦幹核區",
+    "stem": "擠 壓鼻尖產生的痛覺，其感覺訊息透過下列何者傳遞？",
+    "options": {
+      "A": "眼 神經分支（branches of ophthalmic nerve）",
+      "B": "上 頷神經分支（branches of maxillary nerve）",
+      "C": "下 頷神經分支（branches of mandibular nerve）",
+      "D": "顏 面神經分支（branches of facial nerve）"
+    },
+    "answer": "A",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "腦幹核區｜擠 壓鼻尖產生的痛覺，其感覺訊息透過下列何者",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 114 年第一次醫師一階醫學（一）",
+    "sourceYear": 2025,
+    "sourceRound": 1,
+    "originalQuestionNumber": 12
+  },
+  {
+    "id": "MOEX-114020-1301-Q013",
+    "subject": "解剖學",
+    "chapter": "神經解剖",
+    "section": "腦神經",
+    "stem": "下 列腦神經與其所關聯的副交感神經節的配對，何者正確？",
+    "options": {
+      "A": "第 三對腦神經（CN III）；耳神經節（otic ganglion）",
+      "B": "第 七對腦神經（CN VII）；翼腭神經節（pterygopalatine ganglion）",
+      "C": "第 九對腦神經（CN IX）；睫狀神經節（ciliary ganglion）",
+      "D": "第 十對腦神經（CN X）；下頷下神經節（submandibular ganglion）"
+    },
+    "answer": "B",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "動眼神經與睫狀神經節",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 114 年第一次醫師一階醫學（一）",
+    "sourceYear": 2025,
+    "sourceRound": 1,
+    "originalQuestionNumber": 13
+  },
+  {
+    "id": "MOEX-114020-1301-Q014",
+    "subject": "解剖學",
+    "chapter": "胸腔",
+    "section": "心臟與冠狀動脈",
+    "stem": "下 列何處，有最發達的心臟梳狀肌（pectinate muscle）？",
+    "options": {
+      "A": "左 心房後半部",
+      "B": "右 心房前半部",
+      "C": "左 心室前半部",
+      "D": "右 心室後半部"
+    },
+    "answer": "B",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "心臟與冠狀動脈｜下 列何處，有最發達的心臟梳狀肌（pecti",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 114 年第一次醫師一階醫學（一）",
+    "sourceYear": 2025,
+    "sourceRound": 1,
+    "originalQuestionNumber": 14
+  },
+  {
+    "id": "MOEX-114020-1301-Q015",
+    "subject": "解剖學",
+    "chapter": "頭頸部",
+    "section": "咽喉解剖",
+    "stem": "若 病人的主動脈弓（aortic arch）發生動脈瘤（aneurysm），造成聲音沙啞，最可能是因為下列那一條神經 功能間接受損？",
+    "options": {
+      "A": "右 側迷走神經（right vagus nerve）",
+      "B": "右 側交感神經幹（right sympathetic trunk）",
+      "C": "左 側交感神經幹（left sympathetic trunk）",
+      "D": "左 側喉返神經（left recurrent laryngeal nerve）"
+    },
+    "answer": "D",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "喉返神經走行",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 114 年第一次醫師一階醫學（一）",
+    "sourceYear": 2025,
+    "sourceRound": 1,
+    "originalQuestionNumber": 15
+  },
+  {
+    "id": "MOEX-114020-1301-Q016",
+    "subject": "解剖學",
+    "chapter": "胸腔",
+    "section": "肺與胸膜",
+    "stem": "若 病人在縱隔部分（mediastinal part）的胸膜（pleura）發炎，其轉位痛最容易出現在下列何處？",
+    "options": {
+      "A": "頸 部外側與鎖骨上方處",
+      "B": "前 胸第四肋間附近",
+      "C": "手 臂內側靠近腋下處",
+      "D": "背 部肩胛骨下方"
+    },
+    "answer": "A",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "胸膜與肋膈隱窩",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 114 年第一次醫師一階醫學（一）",
+    "sourceYear": 2025,
+    "sourceRound": 1,
+    "originalQuestionNumber": 16
+  },
+  {
+    "id": "MOEX-114020-1301-Q017",
+    "subject": "解剖學",
+    "chapter": "胸腔",
+    "section": "縱膈",
+    "stem": "有 關氣管之敘述，下列何者錯誤？",
+    "options": {
+      "A": "氣 管通常在胸骨角（sternal angle）水平面，分支為左、右主支氣管",
+      "B": "右 支氣管通常比左支氣管寬且較為垂直（vertical）",
+      "C": "正 常之左、右支氣管夾角約在 150 度",
+      "D": "除 氣管隆突（carina）之外，氣管的軟骨全為 C 型軟骨"
+    },
+    "answer": "C",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "縱膈｜有 關氣管之敘述，下列何者錯誤",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 114 年第一次醫師一階醫學（一）",
+    "sourceYear": 2025,
+    "sourceRound": 1,
+    "originalQuestionNumber": 17
+  },
+  {
+    "id": "MOEX-114020-1301-Q018",
+    "subject": "解剖學",
+    "chapter": "腹部",
+    "section": "腹膜關係",
+    "stem": "下 列何者是腹膜內器官（intraperitoneal organ）？",
+    "options": {
+      "A": "胰 臟（pancreas）",
+      "B": "腎 臟（kidney）",
+      "C": "十 二指腸（duodenum）",
+      "D": "迴 腸（ileum）"
+    },
+    "answer": "D",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "腹膜腔分區",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 114 年第一次醫師一階醫學（一）",
+    "sourceYear": 2025,
+    "sourceRound": 1,
+    "originalQuestionNumber": 18
+  },
+  {
+    "id": "MOEX-114020-1301-Q019",
+    "subject": "解剖學",
+    "chapter": "腹部",
+    "section": "肝膽胰脾",
+    "stem": "進 行闌尾（appendix）去除手術前，可藉由下列何種結構快速找到闌尾？",
+    "options": {
+      "A": "腸 脂垂（omental appendices）",
+      "B": "右 結腸動脈（right colic artery）",
+      "C": "盲 腸上的結腸帶（taenia coli of cecum）",
+      "D": "迴 結腸動脈（ileocolic artery）"
+    },
+    "answer": "C",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "肝膽胰脾｜進 行闌尾（appendix）去除手術前，可",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 114 年第一次醫師一階醫學（一）",
+    "sourceYear": 2025,
+    "sourceRound": 1,
+    "originalQuestionNumber": 19
+  },
+  {
+    "id": "MOEX-114020-1301-Q020",
+    "subject": "解剖學",
+    "chapter": "腹部",
+    "section": "肝膽胰脾",
+    "stem": "下 列何結構上有腹股溝淺環（superifical inguinal ring）的開口？",
+    "options": {
+      "A": "腹 外斜肌腱膜（aponeurosis of external oblique muscle）",
+      "B": "腹 直肌腱膜（aponeurosis of rectus abdominis）",
+      "C": "腹 內斜肌腱膜（aponeurosis of internal oblique muscle）",
+      "D": "腹 橫肌腱膜（aponeurosis of transversus abdominis）"
+    },
+    "answer": "A",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "肝膽胰脾｜下 列何結構上有腹股溝淺環（superifi",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 114 年第一次醫師一階醫學（一）",
+    "sourceYear": 2025,
+    "sourceRound": 1,
+    "originalQuestionNumber": 20
+  },
+  {
+    "id": "MOEX-114020-1301-Q021",
+    "subject": "解剖學",
+    "chapter": "腹部",
+    "section": "肝膽胰脾",
+    "stem": "下 列何者不是腹腔幹（celiac trunk）的一級分支？",
+    "options": {
+      "A": "總 肝動脈（common hepatic artery）",
+      "B": "左 胃動脈（left gastric artery）",
+      "C": "胃 十二指腸動脈（gastroduodenal artery）",
+      "D": "脾 動脈（splenic artery）"
+    },
+    "answer": "C",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "脾動脈走行",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 114 年第一次醫師一階醫學（一）",
+    "sourceYear": 2025,
+    "sourceRound": 1,
+    "originalQuestionNumber": 21
+  },
+  {
+    "id": "MOEX-114020-1301-Q022",
+    "subject": "解剖學",
+    "chapter": "骨盆與會陰",
+    "section": "骨盆血管",
+    "stem": "關 於子宮動脈（uterine artery），下列敘述何者錯誤？",
+    "options": {
+      "A": "子 宮動脈是髂內動脈（internal iliac artery）的分支",
+      "B": "子 宮動脈有一段會直接跨在輸尿管（ureter）的上方",
+      "C": "子 宮動脈的主幹會先進入子宮底（fundus），之後再發出分支供應子宮頸（cervix）",
+      "D": "子 宮動脈會與卵巢動脈吻合（anastomosis）"
+    },
+    "answer": "C",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "髂內動脈分支",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 114 年第一次醫師一階醫學（一）",
+    "sourceYear": 2025,
+    "sourceRound": 1,
+    "originalQuestionNumber": 22
+  },
+  {
+    "id": "MOEX-114020-1301-Q023",
+    "subject": "解剖學",
+    "chapter": "骨盆與會陰",
+    "section": "會陰三角",
+    "stem": "下 列何者附著於恥骨聯合（pubic symphysis）？",
+    "options": {
+      "A": "陰 莖懸韌帶（suspensory ligament of penis）",
+      "B": "陰 莖襻狀韌帶（fundiform ligament of penis）",
+      "C": "會 陰體（perineal body）",
+      "D": "會 陰淺橫肌（superficial transverse perineal muscle）"
+    },
+    "answer": "A",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "會陰三角｜下 列何者附著於恥骨聯合（pubic sym",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 114 年第一次醫師一階醫學（一）",
+    "sourceYear": 2025,
+    "sourceRound": 1,
+    "originalQuestionNumber": 23
+  },
+  {
+    "id": "MOEX-114020-1301-Q024",
+    "subject": "解剖學",
+    "chapter": "骨盆與會陰",
+    "section": "會陰三角",
+    "stem": "下 列何者不是薦神經叢（sacral plexus）的分支？",
+    "options": {
+      "A": "臀 上神經（superior gluteal nerve）",
+      "B": "閉 孔內肌神經（nerve to obturator internus）",
+      "C": "陰 部神經（pudendal nerve）",
+      "D": "閉 孔神經（obturator nerve）"
+    },
+    "answer": "D",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "會陰三角｜下 列何者不是薦神經叢（sacral ple",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 114 年第一次醫師一階醫學（一）",
+    "sourceYear": 2025,
+    "sourceRound": 1,
+    "originalQuestionNumber": 24
+  },
+  {
+    "id": "MOEX-114020-1301-Q025",
+    "subject": "解剖學",
+    "chapter": "骨盆與會陰",
+    "section": "會陰三角",
+    "stem": "下 列何構造開口於海綿體尿道（spongy urethra）？",
+    "options": {
+      "A": "前 列腺（prostate gland）",
+      "B": "精 囊（seminal vesicle）",
+      "C": "射 精管（ejaculatory duct）",
+      "D": "尿 道球腺（bulbourethral gland）"
+    },
+    "answer": "D",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "會陰三角｜下 列何構造開口於海綿體尿道（spongy ",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 114 年第一次醫師一階醫學（一）",
+    "sourceYear": 2025,
+    "sourceRound": 1,
+    "originalQuestionNumber": 25
+  },
+  {
+    "id": "MOEX-114020-1301-Q026",
+    "subject": "解剖學",
+    "chapter": "上肢",
+    "section": "上肢血管",
+    "stem": "下 列那一條肌肉的支配神經與其他選項完全不同？",
+    "options": {
+      "A": "背 闊肌（latissimus dorsi）",
+      "B": "大 菱形肌（rhomboid major）",
+      "C": "小 菱形肌（rhomboid minor）",
+      "D": "提 肩胛肌（levator scapulae）"
+    },
+    "answer": "A",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "上肢血管｜下 列那一條肌肉的支配神經與其他選項完全不同",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 114 年第一次醫師一階醫學（一）",
+    "sourceYear": 2025,
+    "sourceRound": 1,
+    "originalQuestionNumber": 26
+  },
+  {
+    "id": "MOEX-114020-1301-Q027",
+    "subject": "解剖學",
+    "chapter": "上肢",
+    "section": "臂神經叢",
+    "stem": "下 列那一神經受損，食指的外展、內收作用（abduct and adduct index）都會出現障礙？",
+    "options": {
+      "A": "腋 神經（axillary nerve）",
+      "B": "橈 神經（radial nerve）",
+      "C": "尺 神經（ulnar nerve）",
+      "D": "正 中神經（median nerve）"
+    },
+    "answer": "C",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "臂神經叢終末分支",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 114 年第一次醫師一階醫學（一）",
+    "sourceYear": 2025,
+    "sourceRound": 1,
+    "originalQuestionNumber": 27
+  },
+  {
+    "id": "MOEX-114020-1301-Q029",
+    "subject": "解剖學",
+    "chapter": "下肢",
+    "section": "腰薦神經叢",
+    "stem": "下 列何肌肉肌腱不構成鵝足（pes anserinus）？",
+    "options": {
+      "A": "股 薄肌（gracilis）",
+      "B": "縫 匠肌（sartorius）",
+      "C": "半 腱肌（semitendinosus）",
+      "D": "內 收長肌（adductor longus）"
+    },
+    "answer": "D",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "腰薦神經叢｜下 列何肌肉肌腱不構成鵝足（pes anse",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 114 年第一次醫師一階醫學（一）",
+    "sourceYear": 2025,
+    "sourceRound": 1,
+    "originalQuestionNumber": 29
+  },
+  {
+    "id": "MOEX-114020-1301-Q030",
+    "subject": "解剖學",
+    "chapter": "上肢",
+    "section": "臂神經叢",
+    "stem": "正 常情形下，臂神經叢（brachial plexus）的那一部分會包圍住腋動脈的第二段（second part of axillary artery）？",
+    "options": {
+      "A": "神 經根（roots）",
+      "B": "神 經幹（trunks）",
+      "C": "神 經分部（divisions）",
+      "D": "神 經索（cords）"
+    },
+    "answer": "D",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "臂神經叢終末分支",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 114 年第一次醫師一階醫學（一）",
+    "sourceYear": 2025,
+    "sourceRound": 1,
+    "originalQuestionNumber": 30
+  },
+  {
+    "id": "MOEX-114020-1301-Q033",
+    "subject": "解剖學",
+    "chapter": "胸腔",
+    "section": "肺與胸膜",
+    "stem": "胎 兒的肺臟（lung）發育至下列那一時期發生早產，即使小心照護也無法存活（survive）？",
+    "options": {
+      "A": "偽 腺期（pseudoglandular stage）",
+      "B": "末 囊期（terminal sac stage）",
+      "C": "小 管期（canalicular stage）",
+      "D": "肺 泡期（alveolar stage）"
+    },
+    "answer": "A",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "肺與胸膜｜胎 兒的肺臟（lung）發育至下列那一時期發",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 114 年第一次醫師一階醫學（一）",
+    "sourceYear": 2025,
+    "sourceRound": 1,
+    "originalQuestionNumber": 33
+  },
+  {
+    "id": "MOEX-114020-1301-Q034",
+    "subject": "解剖學",
+    "chapter": "腹部",
+    "section": "肝膽胰脾",
+    "stem": "下 列關於胰臟（pancreas）發育的敘述，何者正確？",
+    "options": {
+      "A": "由 中胚層發育衍生出背胰芽（dorsal pancreatic buds）和腹胰芽（ventral pancreatic buds）",
+      "B": "當 十二指腸旋轉至左側時，會使背胰芽（dorsal pancreatic buds）轉至後側和十二指腸前方的腹胰芽 （ventral pancreatic buds）癒合，形成胰臟",
+      "C": "腹 胰芽（ventral pancreatic buds）主要發育為胰臟的鉤狀突（uncinate process）以及部分的頭端",
+      "D": "環 狀胰臟（annular pancreas）為常見的消化道缺陷，主要會造成胃阻塞"
+    },
+    "answer": "C",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "胰臟鄰近關係",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 114 年第一次醫師一階醫學（一）",
+    "sourceYear": 2025,
+    "sourceRound": 1,
+    "originalQuestionNumber": 34
+  },
+  {
+    "id": "MOEX-114020-1301-Q035",
+    "subject": "解剖學",
+    "chapter": "胸腔",
+    "section": "縱膈",
+    "stem": "胚 胎正常發育時，奇靜脈根部（root of azygos vein）的起源是：",
+    "options": {
+      "A": "後 主靜脈（posterior cardinal vein）",
+      "B": "總 主靜脈（common cardinal vein）",
+      "C": "前 主靜脈（anterior cardinal vein）",
+      "D": "下 主靜脈（subcardinal vein）"
+    },
+    "answer": "A",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "後縱膈主要構造",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 114 年第一次醫師一階醫學（一）",
+    "sourceYear": 2025,
+    "sourceRound": 1,
+    "originalQuestionNumber": 35
+  },
+  {
+    "id": "MOEX-114020-1301-Q036",
+    "subject": "解剖學",
+    "chapter": "頭頸部",
+    "section": "顏面神經與三叉神經",
+    "stem": "嚼 肌（masseter）主要是源自下列何者？",
+    "options": {
+      "A": "第 一咽弓（first pharyngeal arch）",
+      "B": "第 二咽弓（second pharyngeal arch）",
+      "C": "第 三咽弓（third pharyngeal arch）",
+      "D": "第 四及第六咽弓（fourth and sixth pharyngeal arches）"
+    },
+    "answer": "A",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "顏面神經與三叉神經｜嚼 肌（masseter）主要是源自下列何者",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 114 年第一次醫師一階醫學（一）",
+    "sourceYear": 2025,
+    "sourceRound": 1,
+    "originalQuestionNumber": 36
+  },
+  {
+    "id": "MOEX-114020-1301-Q041",
+    "subject": "解剖學",
+    "chapter": "神經解剖",
+    "section": "腦幹核區",
+    "stem": "成 年後何區域的神經元（neuron）受損後，仍可由幹細胞再生？",
+    "options": {
+      "A": "腦 幹（brainstem）",
+      "B": "脊 髓灰質（gray matter）",
+      "C": "嗅 球（olfactory bulb）",
+      "D": "背 根神經節（dorsal root ganglion）"
+    },
+    "answer": "C",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "腦幹核區｜成 年後何區域的神經元（neuron）受損後",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 114 年第一次醫師一階醫學（一）",
+    "sourceYear": 2025,
+    "sourceRound": 1,
+    "originalQuestionNumber": 41
+  },
+  {
+    "id": "MOEX-114020-1301-Q043",
+    "subject": "解剖學",
+    "chapter": "腹部",
+    "section": "肝膽胰脾",
+    "stem": "胃 腺（gastric gland）的細胞中，何者主要分泌胃蛋白酶原（pepsinogen），且在 H&E 染色下呈現嗜鹼性 （basophilic）？",
+    "options": {
+      "A": "主 細胞（chief cell）",
+      "B": "黏 液頸細胞（mucous neck cell）",
+      "C": "胃 壁細胞（parietal cell）",
+      "D": "腸 內分泌細胞（enteroendocrine cell）"
+    },
+    "answer": "A",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "肝膽胰脾｜胃 腺（gastric gland）的細胞中",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 114 年第一次醫師一階醫學（一）",
+    "sourceYear": 2025,
+    "sourceRound": 1,
+    "originalQuestionNumber": 43
+  },
+  {
+    "id": "MOEX-114020-1301-Q044",
+    "subject": "解剖學",
+    "chapter": "腹部",
+    "section": "肝膽胰脾",
+    "stem": "消 化道中，下列何者的黏膜層（mucosa）及黏膜下層（submucosa）皆具有分泌黏液（mucus）的腺體？",
+    "options": {
+      "A": "食 道（esophagus）",
+      "B": "胃 （stomach）",
+      "C": "結 腸（colon）",
+      "D": "闌 尾（appendix）"
+    },
+    "answer": "A",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "肝膽胰脾｜消 化道中，下列何者的黏膜層（mucosa）",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 114 年第一次醫師一階醫學（一）",
+    "sourceYear": 2025,
+    "sourceRound": 1,
+    "originalQuestionNumber": 44
+  },
+  {
+    "id": "MOEX-114020-1301-Q047",
+    "subject": "解剖學",
+    "chapter": "神經解剖",
+    "section": "腦幹核區",
+    "stem": "下 列有關人類嗅覺功能之敘述，何者最恰當？",
+    "options": {
+      "A": "嗅 球（olfactory bulbs）中有許多嗅覺小球（olfactory glomeruli），每一個嗅覺小球接收同一類嗅覺受 器（olfactory receptors）傳導",
+      "B": "嗅 覺刺激常與情緒反應相關，原因是來自嗅球（olfactory bulbs）的神經傳導路徑上行至中樞的海馬迴 （hippocampus）",
+      "C": "嗅 球（olfactory bulbs）中之顆粒細胞（granule cells）以 glutamate 為傳導物刺激僧帽細胞（mitral cells），而僧帽細胞以 glycine 為傳導物抑制顆粒細胞",
+      "D": "嗅 覺接受器與氣味分子結合後，會藉由 cGMP 為第二信使（second messenger）進而使嗅覺感受神經元產生 興奮性電位"
+    },
+    "answer": "A",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "腦幹核區｜下 列有關人類嗅覺功能之敘述，何者最恰當",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 114 年第一次醫師一階醫學（一）",
+    "sourceYear": 2025,
+    "sourceRound": 1,
+    "originalQuestionNumber": 47
+  },
+  {
+    "id": "MOEX-114020-1301-Q048",
+    "subject": "解剖學",
+    "chapter": "神經解剖",
+    "section": "腦幹核區",
+    "stem": "下 列那一個腦區，在維持晝夜節律（circadian rhythm）方面，比其他三個腦區扮演更為重要的角色？",
+    "options": {
+      "A": "室 旁核（paraventricular nucleus）",
+      "B": "視 前區（preoptic area）",
+      "C": "上 丘（superior colliculus）",
+      "D": "視 交叉上核（suprachiasmatic nucleus）"
+    },
+    "answer": "D",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "腦幹核區｜下 列那一個腦區，在維持晝夜節律（circa",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 114 年第一次醫師一階醫學（一）",
+    "sourceYear": 2025,
+    "sourceRound": 1,
+    "originalQuestionNumber": 48
+  },
+  {
+    "id": "MOEX-114020-1301-Q049",
+    "subject": "解剖學",
+    "chapter": "胸腔",
+    "section": "縱膈",
+    "stem": "情 緒很緊張時，交感神經系統（sympathetic nervous system）會亢奮，此時其節後神經纖維 （postganglionic fiber）最可能會：",
+    "options": {
+      "A": "釋 放正腎上腺素（norepinephrine），並作用在心臟竇房結（SA node） beta2 受器（β2 receptor），促 使心跳加快",
+      "B": "釋 放乙醯膽鹼（acetylcholine），並作用在皮膚小汗腺尼古丁型受器（nicotinic receptor），促使流汗 增加",
+      "C": "釋 放正腎上腺素，並作用在支氣管平滑肌 beta2 受器（β2 receptor），促使支氣管平滑肌收縮",
+      "D": "釋 放正腎上腺素，並作用在眼睛虹膜（iris）的放射肌（radial muscle）alpha1 受器（α1 receptor）， 造成瞳孔（pupil）放大"
+    },
+    "answer": "D",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "縱膈｜情 緒很緊張時，交感神經系統（sympath",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 114 年第一次醫師一階醫學（一）",
+    "sourceYear": 2025,
+    "sourceRound": 1,
+    "originalQuestionNumber": 49
+  },
+  {
+    "id": "MOEX-114020-1301-Q050",
+    "subject": "解剖學",
+    "chapter": "腹部",
+    "section": "肝膽胰脾",
+    "stem": "下 列有關眼睛的光學現象，何者最不適當？",
+    "options": {
+      "A": "看 遠物時，眼睛焦點落在視網膜之後的現象，稱為遠視",
+      "B": "看 近物時，睫狀肌收縮但水晶體無法增加聚焦能力的現象，稱為近視",
+      "C": "水 晶體隨看遠物時的扁平狀變成看近物時的橢圓狀，稱為調視（accommodation）",
+      "D": "角 膜或水晶體不是完美弧形的現象，稱為散光（astigmatism）"
+    },
+    "answer": "B",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "肝膽胰脾｜下 列有關眼睛的光學現象，何者最不適當",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 114 年第一次醫師一階醫學（一）",
+    "sourceYear": 2025,
+    "sourceRound": 1,
+    "originalQuestionNumber": 50
+  },
+  {
+    "id": "MOEX-114020-1301-Q051",
+    "subject": "解剖學",
+    "chapter": "神經解剖",
+    "section": "腦幹核區",
+    "stem": "在 腦電圖記錄中，K 複合波最常出現在不同睡眠階段的那一期？",
+    "options": {
+      "A": "快 速動眼期",
+      "B": "非 快速動眼階段的第一期",
+      "C": "非 快速動眼階段的第二期",
+      "D": "非 快速動眼階段的第三期"
+    },
+    "answer": "C",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "腦幹核區｜在 腦電圖記錄中，K 複合波最常出現在不同睡",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 114 年第一次醫師一階醫學（一）",
+    "sourceYear": 2025,
+    "sourceRound": 1,
+    "originalQuestionNumber": 51
+  },
+  {
+    "id": "MOEX-114020-1301-Q052",
+    "subject": "解剖學",
+    "chapter": "腹部",
+    "section": "肝膽胰脾",
+    "stem": "自 celiac ganglion 出發的交感神經節後神經，最不可能影響下列何種器官之生理功能？",
+    "options": {
+      "A": "胃",
+      "B": "胰 臟",
+      "C": "肝 臟",
+      "D": "唾 液腺"
+    },
+    "answer": "D",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "胰臟鄰近關係",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 114 年第一次醫師一階醫學（一）",
+    "sourceYear": 2025,
+    "sourceRound": 1,
+    "originalQuestionNumber": 52
+  },
+  {
+    "id": "MOEX-114020-1301-Q058",
+    "subject": "解剖學",
+    "chapter": "胸腔",
+    "section": "縱膈",
+    "stem": "對 於正常左心與右心的比較，下列敘述何者最不適當？",
+    "options": {
+      "A": "左 心室與右心室的心搏量（stroke volume）是一樣的",
+      "B": "主 動脈壓恆高於肺動脈壓與右心室壓",
+      "C": "心 臟週期中主動脈瓣和肺動脈瓣都是同步開關的",
+      "D": "心 收縮期（systole）的右心室壓均高於肺動脈壓"
+    },
+    "answer": "D",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "縱膈｜對 於正常左心與右心的比較，下列敘述何者最不",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 114 年第一次醫師一階醫學（一）",
+    "sourceYear": 2025,
+    "sourceRound": 1,
+    "originalQuestionNumber": 58
+  },
+  {
+    "id": "MOEX-114020-1301-Q060",
+    "subject": "解剖學",
+    "chapter": "胸腔",
+    "section": "心臟與冠狀動脈",
+    "stem": "正 常生理情況下，下列有關冠狀動脈（coronary artery）血流增加的時機與其原因的說明，何者正確？",
+    "options": {
+      "A": "主 要在心舒張期（diastole）才會出現明顯血流，因為在心收縮期冠狀動脈會受收縮的心肌壓迫且其入口亦 遭遮蔽",
+      "B": "主 要在心舒張期（diastole）才會出現明顯血流，因為心舒張期時冠狀動脈壓力小於主動脈壓力，冠狀動脈 瓣膜才能開啟",
+      "C": "主 要在心收縮期（systole）才會出現明顯血流，因心收縮期時主動脈壓較大，較容易將血液送入冠狀動脈",
+      "D": "主 要在心收縮期（systole）才會出現明顯血流，因僅在心收縮期時血液才由左心室送入主動脈，進而再送 入冠狀動脈"
+    },
+    "answer": "A",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "心臟與冠狀動脈｜正 常生理情況下，下列有關冠狀動脈（coro",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 114 年第一次醫師一階醫學（一）",
+    "sourceYear": 2025,
+    "sourceRound": 1,
+    "originalQuestionNumber": 60
+  },
+  {
+    "id": "MOEX-114020-1301-Q062",
+    "subject": "解剖學",
+    "chapter": "胸腔",
+    "section": "肺與胸膜",
+    "stem": "下 列何種刺激最可能會造成支氣管收縮（bronchoconstriction）？",
+    "options": {
+      "A": "鄰 近的肺小動脈（pulmonary arteriole）被阻塞",
+      "B": "肺 泡（alveolus）內二氧化碳分壓（ ）上升",
+      "C": "吸 氣（inspiration）",
+      "D": "支 氣管平滑肌（smooth muscle）的β 腎上腺素受器（adrenergic receptor）被刺激 2"
+    },
+    "answer": "A",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "肺門構造相對位置",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 114 年第一次醫師一階醫學（一）",
+    "sourceYear": 2025,
+    "sourceRound": 1,
+    "originalQuestionNumber": 62
+  },
+  {
+    "id": "MOEX-114020-1301-Q064",
+    "subject": "解剖學",
+    "chapter": "腹部",
+    "section": "肝膽胰脾",
+    "stem": "下 列何種脂肪酶（lipase）需要膽汁幫助其消化作用？",
+    "options": {
+      "A": "g astric lipase",
+      "B": "p ancreatic lipase",
+      "C": "p ancreatic colipase",
+      "D": "l ingual lipase"
+    },
+    "answer": "B",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "肝膽胰脾｜下 列何種脂肪酶（lipase）需要膽汁幫助",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 114 年第一次醫師一階醫學（一）",
+    "sourceYear": 2025,
+    "sourceRound": 1,
+    "originalQuestionNumber": 64
+  },
+  {
+    "id": "MOEX-114020-1301-Q067",
+    "subject": "解剖學",
+    "chapter": "腹部",
+    "section": "腹膜關係",
+    "stem": "與 近髓質腎元（juxtamedullary nephron）相比較，皮質腎元（cortical nephron）最常缺少下列那一部 分？",
+    "options": {
+      "A": "近 曲小管（proximal convoluted tubule）",
+      "B": "近 直小管（proximal straight tubule）",
+      "C": "亨 利氏上升細小管（thin ascending limb, Henle's loop）",
+      "D": "遠 曲小管（distal convoluted tubule）"
+    },
+    "answer": "C",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "腹膜關係｜ 近髓質腎元（juxtamedullary ",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 114 年第一次醫師一階醫學（一）",
+    "sourceYear": 2025,
+    "sourceRound": 1,
+    "originalQuestionNumber": 67
+  },
+  {
+    "id": "MOEX-114090-1301-Q001",
+    "subject": "解剖學",
+    "chapter": "神經解剖",
+    "section": "小腦",
+    "stem": "下 列位於腦幹的神經核中，那一神經核與小腦（cerebellum）有直接且大量的神經纖維連結？",
+    "options": {
+      "A": "動 眼神經核（oculomotor nucleus）",
+      "B": "三 叉神經脊髓核（spinal trigeminal nucleus）",
+      "C": "三 叉神經橋腦核（pontine trigeminal nucleus）",
+      "D": "前 庭神經核（vestibular nucleus）"
+    },
+    "answer": "D",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "小腦｜下 列位於腦幹的神經核中，那一神經核與小腦（",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 114 年第二次醫師一階醫學（一）",
+    "sourceYear": 2025,
+    "sourceRound": 2,
+    "originalQuestionNumber": 1
+  },
+  {
+    "id": "MOEX-114090-1301-Q002",
+    "subject": "解剖學",
+    "chapter": "神經解剖",
+    "section": "小腦",
+    "stem": "視 覺皮質（primary visual cortex）主要由下列何者供應血液？",
+    "options": {
+      "A": "上 小腦動脈（superior cerebellar artery）",
+      "B": "前 大腦動脈（anterior cerebral artery）",
+      "C": "中 大腦動脈（middle cerebral artery）",
+      "D": "後 大腦動脈（posterior cerebral artery）"
+    },
+    "answer": "D",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "小腦｜視 覺皮質（primary visual c",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 114 年第二次醫師一階醫學（一）",
+    "sourceYear": 2025,
+    "sourceRound": 2,
+    "originalQuestionNumber": 2
+  },
+  {
+    "id": "MOEX-114090-1301-Q003",
+    "subject": "解剖學",
+    "chapter": "神經解剖",
+    "section": "丘腦與基底核",
+    "stem": "基 底核（basal ganglia）傳出的神經纖維進入下列丘腦（thalamus）的那一個核區？",
+    "options": {
+      "A": "腹 前側核（ventral anterior nuclei）",
+      "B": "前 側核（anterior nuclei）",
+      "C": "腹 後外側核（ventral posterior lateral nuclei）",
+      "D": "腹 後內側核（ventral posterior medial nuclei）"
+    },
+    "answer": "A",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "丘腦運動核群",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 114 年第二次醫師一階醫學（一）",
+    "sourceYear": 2025,
+    "sourceRound": 2,
+    "originalQuestionNumber": 3
+  },
+  {
+    "id": "MOEX-114090-1301-Q004",
+    "subject": "解剖學",
+    "chapter": "神經解剖",
+    "section": "脊髓傳導路徑",
+    "stem": "從 大腦皮質發出至脊髓的大腦皮質脊髓徑（corticospinal tract），一般不通過下列何處？",
+    "options": {
+      "A": "延 腦的錐體（pyramid of medulla oblongata）",
+      "B": "中 腦的基底腳（basis pedunculi of midbrain）",
+      "C": "橋 腦的基部（basilar pons）",
+      "D": "內 囊的前肢（anterior limb of internal capsule）"
+    },
+    "answer": "D",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "皮質脊髓徑",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 114 年第二次醫師一階醫學（一）",
+    "sourceYear": 2025,
+    "sourceRound": 2,
+    "originalQuestionNumber": 4
+  },
+  {
+    "id": "MOEX-114090-1301-Q005",
+    "subject": "解剖學",
+    "chapter": "神經解剖",
+    "section": "脊髓傳導路徑",
+    "stem": "在 牽張反射（muscle stretch reflex）中，負責將高基氏肌腱受器（Golgi tendon organ）的訊號往脊髓傳 送的神經纖維屬於下列何種類型？",
+    "options": {
+      "A": "g roup Ia",
+      "B": "g roup Ib",
+      "C": "A δ",
+      "D": "C"
+    },
+    "answer": "B",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "脊髓傳導路徑｜在 牽張反射（muscle stretch ",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 114 年第二次醫師一階醫學（一）",
+    "sourceYear": 2025,
+    "sourceRound": 2,
+    "originalQuestionNumber": 5
+  },
+  {
+    "id": "MOEX-114090-1301-Q006",
+    "subject": "解剖學",
+    "chapter": "神經解剖",
+    "section": "腦幹核區",
+    "stem": "下 列何者位於大腦額葉？",
+    "options": {
+      "A": "a ngular gyrus",
+      "B": "B roca's area",
+      "C": "t ransverse gyri of Heschl",
+      "D": "c uneus"
+    },
+    "answer": "B",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "腦幹核區｜下 列何者位於大腦額葉",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 114 年第二次醫師一階醫學（一）",
+    "sourceYear": 2025,
+    "sourceRound": 2,
+    "originalQuestionNumber": 6
+  },
+  {
+    "id": "MOEX-114090-1301-Q007",
+    "subject": "解剖學",
+    "chapter": "神經解剖",
+    "section": "腦幹核區",
+    "stem": "下 列何者不含內淋巴液？",
+    "options": {
+      "A": "球 囊（saccule）",
+      "B": "橢 圓囊（utricle）",
+      "C": "耳 蝸管（cochlear duct）",
+      "D": "鼓 室階（scala tympani）"
+    },
+    "answer": "D",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "腦幹核區｜下 列何者不含內淋巴液",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 114 年第二次醫師一階醫學（一）",
+    "sourceYear": 2025,
+    "sourceRound": 2,
+    "originalQuestionNumber": 7
+  },
+  {
+    "id": "MOEX-114090-1301-Q009",
+    "subject": "解剖學",
+    "chapter": "神經解剖",
+    "section": "腦幹核區",
+    "stem": "下 列何者與頰肌（buccinator）由相同的神經支配？",
+    "options": {
+      "A": "上 直肌（superior rectus）",
+      "B": "上 斜肌（superior oblique）",
+      "C": "外 直肌（lateral rectus）",
+      "D": "口 輪匝肌（orbicularis oris）"
+    },
+    "answer": "D",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "腦幹核區｜下 列何者與頰肌（buccinator）由相",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 114 年第二次醫師一階醫學（一）",
+    "sourceYear": 2025,
+    "sourceRound": 2,
+    "originalQuestionNumber": 9
+  },
+  {
+    "id": "MOEX-114090-1301-Q011",
+    "subject": "解剖學",
+    "chapter": "頭頸部",
+    "section": "舌與味覺",
+    "stem": "當 舌神經（lingual nerve）於顳下窩（infratemporal fossa）內受損時，下列那種舌乳突（papillae）的 一般感覺訊息傳遞最不可能受影響？",
+    "options": {
+      "A": "輪 廓狀乳突（vallate papillae）",
+      "B": "葉 狀乳突（foliate papillae）",
+      "C": "絲 狀乳突（filiform papillae）",
+      "D": "蕈 狀乳突（fungiform papillae）"
+    },
+    "answer": "A",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "舌前 2/3 感覺與味覺",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 114 年第二次醫師一階醫學（一）",
+    "sourceYear": 2025,
+    "sourceRound": 2,
+    "originalQuestionNumber": 11
+  },
+  {
+    "id": "MOEX-114090-1301-Q013",
+    "subject": "解剖學",
+    "chapter": "頭頸部",
+    "section": "顏面神經與三叉神經",
+    "stem": "下 列何者不參與形成翼腭窩（pterygopalatine fossa）？",
+    "options": {
+      "A": "蝶 骨（sphenoid bone）",
+      "B": "顳 骨（temporal bone）",
+      "C": "腭 骨（palatine bone）",
+      "D": "上 頷骨（maxilla bone）"
+    },
+    "answer": "B",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "顏面神經與三叉神經｜下 列何者不參與形成翼腭窩（pterygop",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 114 年第二次醫師一階醫學（一）",
+    "sourceYear": 2025,
+    "sourceRound": 2,
+    "originalQuestionNumber": 13
+  },
+  {
+    "id": "MOEX-114090-1301-Q014",
+    "subject": "解剖學",
+    "chapter": "頭頸部",
+    "section": "顏面神經與三叉神經",
+    "stem": "下 列何者不在頸部的肌三角（muscular triangle）內？",
+    "options": {
+      "A": "胸 骨甲狀肌（sternothyroid muscle）",
+      "B": "甲 狀腺（thyroid gland）",
+      "C": "氣 管（trachea）",
+      "D": "外 頸動脈（external carotid artery）"
+    },
+    "answer": "D",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "顏面神經與三叉神經｜下 列何者不在頸部的肌三角（muscular",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 114 年第二次醫師一階醫學（一）",
+    "sourceYear": 2025,
+    "sourceRound": 2,
+    "originalQuestionNumber": 14
+  },
+  {
+    "id": "MOEX-114090-1301-Q015",
+    "subject": "解剖學",
+    "chapter": "胸腔",
+    "section": "縱膈",
+    "stem": "關 於肋骨與胸廓（thoracic cage）的連接方式，下列敘述何者最恰當？",
+    "options": {
+      "A": "第 一肋骨一般與第一胸椎（thoracic vertebra）以及第七頸椎（cervical vertebra）相接",
+      "B": "第 九肋骨和胸骨（sternum），通常直接相連接",
+      "C": "第 六肋骨與第六胸椎的下肋關節面（inferior costal facet）相連接",
+      "D": "第 十一胸椎通常不含橫肋關節面（transverse costal facet），因此第十一肋骨只有其頭端（head of rib）和第十一胸椎相接"
+    },
+    "answer": "D",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "縱膈｜關 於肋骨與胸廓（thoracic cage",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 114 年第二次醫師一階醫學（一）",
+    "sourceYear": 2025,
+    "sourceRound": 2,
+    "originalQuestionNumber": 15
+  },
+  {
+    "id": "MOEX-114090-1301-Q016",
+    "subject": "解剖學",
+    "chapter": "胸腔",
+    "section": "心臟與冠狀動脈",
+    "stem": "一 般情況下，下列何者負責將血壓與血液化學變化訊息傳入中樞神經系統以參與心臟反射（cardiac reflex）？",
+    "options": {
+      "A": "迷 走神經（vagus nerve）",
+      "B": "頸 部交感神經（cervical sympathetic nerve）",
+      "C": "胸 部交感神經（thoracic sympathetic nerve）",
+      "D": "胸 部內臟神經（thoracic splanchnic nerve）"
+    },
+    "answer": "A",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "心臟與冠狀動脈｜一 般情況下，下列何者負責將血壓與血液化學變",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 114 年第二次醫師一階醫學（一）",
+    "sourceYear": 2025,
+    "sourceRound": 2,
+    "originalQuestionNumber": 16
+  },
+  {
+    "id": "MOEX-114090-1301-Q017",
+    "subject": "解剖學",
+    "chapter": "胸腔",
+    "section": "心臟與冠狀動脈",
+    "stem": "有 關心包膜橫竇（transverse pericardial sinus）的解剖位置描述，下列何者最恰當？",
+    "options": {
+      "A": "位 在上腔靜脈（superior vena cava）的前方",
+      "B": "位 在肺靜脈（pulmonary vein）的後方",
+      "C": "位 在左心房下方",
+      "D": "位 在肺動脈幹（pulmonary trunk）與主動脈（aorta）之間"
+    },
+    "answer": "A",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "心臟與冠狀動脈｜有 關心包膜橫竇（transverse pe",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 114 年第二次醫師一階醫學（一）",
+    "sourceYear": 2025,
+    "sourceRound": 2,
+    "originalQuestionNumber": 17
+  },
+  {
+    "id": "MOEX-114090-1301-Q018",
+    "subject": "解剖學",
+    "chapter": "胸腔",
+    "section": "心臟與冠狀動脈",
+    "stem": "下 列那部分的冠狀動脈栓塞最不可能造成左心房、左心室前壁與側壁、心尖以及心室中隔缺氧？",
+    "options": {
+      "A": "前 室間支（anterior interventricular branch）",
+      "B": "後 室間支（posterior interventricular branch）",
+      "C": "右 邊緣支（right marginal branch）",
+      "D": "左 迴旋支（left circumflex branch）"
+    },
+    "answer": "C",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "左迴旋支供血",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 114 年第二次醫師一階醫學（一）",
+    "sourceYear": 2025,
+    "sourceRound": 2,
+    "originalQuestionNumber": 18
+  },
+  {
+    "id": "MOEX-114090-1301-Q019",
+    "subject": "解剖學",
+    "chapter": "腹部",
+    "section": "腹膜關係",
+    "stem": "下 列何者不具備腸繫膜（mesentery）的構造？",
+    "options": {
+      "A": "十 二指腸下降段（descending part of duodenum）",
+      "B": "闌 尾（appendix）",
+      "C": "乙 狀結腸（sigmoid colon）",
+      "D": "橫 結腸（transverse colon）"
+    },
+    "answer": "A",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "腹膜關係｜下 列何者不具備腸繫膜（mesentery）",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 114 年第二次醫師一階醫學（一）",
+    "sourceYear": 2025,
+    "sourceRound": 2,
+    "originalQuestionNumber": 19
+  },
+  {
+    "id": "MOEX-114090-1301-Q020",
+    "subject": "解剖學",
+    "chapter": "腹部",
+    "section": "肝膽胰脾",
+    "stem": "支 配胃大彎處（greater curvature of the stomach）的左胃網膜動脈（left gastroepiploic artery）， 源自下列那條動脈？",
+    "options": {
+      "A": "總 肝動脈（common hepatic artery）",
+      "B": "左 胃動脈（left gastric artery）",
+      "C": "後 胃動脈（posterior gastric artery）",
+      "D": "脾 動脈（splenic artery）"
+    },
+    "answer": "D",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "脾動脈走行",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 114 年第二次醫師一階醫學（一）",
+    "sourceYear": 2025,
+    "sourceRound": 2,
+    "originalQuestionNumber": 20
+  },
+  {
+    "id": "MOEX-114090-1301-Q021",
+    "subject": "解剖學",
+    "chapter": "腹部",
+    "section": "腹膜關係",
+    "stem": "前 腹壁內面的臍內側韌帶（medial umbilical fold），是因腹膜（peritoneum）包覆下列何種結構所形成？",
+    "options": {
+      "A": "輸 精管（vas deferens）",
+      "B": "臍 動脈（umbilical artery）",
+      "C": "上 腹壁動脈（superior epigastric artery）",
+      "D": "肝 靜脈（hepatic vein）"
+    },
+    "answer": "B",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "腹膜腔分區",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 114 年第二次醫師一階醫學（一）",
+    "sourceYear": 2025,
+    "sourceRound": 2,
+    "originalQuestionNumber": 21
+  },
+  {
+    "id": "MOEX-114090-1301-Q022",
+    "subject": "解剖學",
+    "chapter": "神經解剖",
+    "section": "腦幹核區",
+    "stem": "前 下腹壁的皮下脂肪主要存在於下列那一層？",
+    "options": {
+      "A": "C amper's fascia",
+      "B": "S carpa's fascia",
+      "C": "腹 橫筋膜（transversalis fascia）",
+      "D": "闊 筋膜（fascia lata）"
+    },
+    "answer": "A",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "腦幹核區｜前 下腹壁的皮下脂肪主要存在於下列那一層",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 114 年第二次醫師一階醫學（一）",
+    "sourceYear": 2025,
+    "sourceRound": 2,
+    "originalQuestionNumber": 22
+  },
+  {
+    "id": "MOEX-114090-1301-Q025",
+    "subject": "解剖學",
+    "chapter": "骨盆與會陰",
+    "section": "會陰三角",
+    "stem": "關 於男性會陰部肌肉，下列敘述何者正確？",
+    "options": {
+      "A": "坐 骨海綿體肌（ischiocavernosus）收縮可壓迫陰莖球（bulb of penis），有助於維持陰莖勃起",
+      "B": "於 排尿後期，球海綿體肌（bulbospongiosus）收縮有助於將尿道內殘留尿液排出",
+      "C": "坐 骨海綿體肌（ischiocavernosus）附著於會陰體（perineal body）",
+      "D": "會 陰淺橫肌（superficial transverse perineal muscle）附著於坐骨棘（ischial spine）"
+    },
+    "answer": "B",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "會陰三角｜關 於男性會陰部肌肉，下列敘述何者正確",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 114 年第二次醫師一階醫學（一）",
+    "sourceYear": 2025,
+    "sourceRound": 2,
+    "originalQuestionNumber": 25
+  },
+  {
+    "id": "MOEX-114090-1301-Q026",
+    "subject": "解剖學",
+    "chapter": "骨盆與會陰",
+    "section": "會陰三角",
+    "stem": "關 於膀胱（urinary bladder）的神經支配，下列敘述何者錯誤？",
+    "options": {
+      "A": "下 腹神經（hypogastric nerves）包含支配膀胱的交感神經纖維（sympathetic fibers）",
+      "B": "薦 內臟神經（sacral splanchnic nerves）包含支配膀胱的副交感神經纖維（parasympathetic fibers）",
+      "C": "交 感神經纖維（sympathetic fibers）可刺激尿道內括約肌（internal urethral sphincter）收縮",
+      "D": "副 交感神經纖維（parasympathetic fibers）可刺激逼尿肌（detrusor muscle）收縮"
+    },
+    "answer": "B",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "會陰三角｜關 於膀胱（urinary bladder）",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 114 年第二次醫師一階醫學（一）",
+    "sourceYear": 2025,
+    "sourceRound": 2,
+    "originalQuestionNumber": 26
+  },
+  {
+    "id": "MOEX-114090-1301-Q027",
+    "subject": "解剖學",
+    "chapter": "上肢",
+    "section": "上肢血管",
+    "stem": "下 列何者是鎖骨下動脈（subclavian artery）的直接分支？",
+    "options": {
+      "A": "上 胸動脈（superior thoracic artery）",
+      "B": "外 胸動脈（lateral thoracic artery）",
+      "C": "內 胸動脈（internal thoracic artery）",
+      "D": "胸 肩峰動脈（thoraco-acromial artery）"
+    },
+    "answer": "C",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "上肢血管｜下 列何者是鎖骨下動脈（subclavian",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 114 年第二次醫師一階醫學（一）",
+    "sourceYear": 2025,
+    "sourceRound": 2,
+    "originalQuestionNumber": 27
+  },
+  {
+    "id": "MOEX-114090-1301-Q028",
+    "subject": "解剖學",
+    "chapter": "下肢",
+    "section": "大腿前內後區",
+    "stem": "下 列何動作不是大腿前肌群的作用？",
+    "options": {
+      "A": "彎 曲髖關節（flex hip joint）",
+      "B": "外 旋大腿（laterally rotate thigh）",
+      "C": "伸 直膝關節（extend knee joint）",
+      "D": "伸 直髖關節（extend hip joint）"
+    },
+    "answer": "D",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "大腿前內後區｜下 列何動作不是大腿前肌群的作用",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 114 年第二次醫師一階醫學（一）",
+    "sourceYear": 2025,
+    "sourceRound": 2,
+    "originalQuestionNumber": 28
+  },
+  {
+    "id": "MOEX-114090-1301-Q029",
+    "subject": "解剖學",
+    "chapter": "上肢",
+    "section": "臂神經叢",
+    "stem": "下 圖黑色陰影區域的表皮感覺神經來自：",
+    "options": {
+      "A": "正 中神經（median nerve）",
+      "B": "肌 皮神經（musculocutaneous nerve）",
+      "C": "橈 神經（radial nerve）",
+      "D": "尺 神經（ulnar nerve）"
+    },
+    "answer": "C",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "臂神經叢終末分支",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 114 年第二次醫師一階醫學（一）",
+    "sourceYear": 2025,
+    "sourceRound": 2,
+    "originalQuestionNumber": 29
+  },
+  {
+    "id": "MOEX-114090-1301-Q031",
+    "subject": "解剖學",
+    "chapter": "下肢",
+    "section": "下肢血管",
+    "stem": "下 列何者不是膕動脈（popliteal artery）的分支？",
+    "options": {
+      "A": "降 膝動脈（descending genicular artery）",
+      "B": "上 膝動脈（superior genicular artery）",
+      "C": "中 膝動脈（middle genicular artery）",
+      "D": "下 膝動脈（inferior genicular artery）"
+    },
+    "answer": "A",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "膕動脈與膝窩解剖",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 114 年第二次醫師一階醫學（一）",
+    "sourceYear": 2025,
+    "sourceRound": 2,
+    "originalQuestionNumber": 31
+  },
+  {
+    "id": "MOEX-114090-1301-Q033",
+    "subject": "解剖學",
+    "chapter": "頭頸部",
+    "section": "舌與味覺",
+    "stem": "舌 （tongue）的發育過程中，那一咽弓會形成聯合部（copula），且最後會被擠壓而消失？",
+    "options": {
+      "A": "第 一咽弓（first pharyngeal arch）",
+      "B": "第 二咽弓（second pharyngeal arch）",
+      "C": "第 三咽弓（third pharyngeal arch）",
+      "D": "第 四咽弓（fourth pharyngeal arch）"
+    },
+    "answer": "B",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "舌與味覺｜舌 （tongue）的發育過程中，那一咽弓會",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 114 年第二次醫師一階醫學（一）",
+    "sourceYear": 2025,
+    "sourceRound": 2,
+    "originalQuestionNumber": 33
+  },
+  {
+    "id": "MOEX-114090-1301-Q034",
+    "subject": "解剖學",
+    "chapter": "骨盆與會陰",
+    "section": "會陰三角",
+    "stem": "女 性陰道（vagina）的發育，是由下列那兩個構造共同形成？",
+    "options": {
+      "A": "中 腎管（mesonephric duct）與尿殖竇（urogenital sinus）",
+      "B": "中 腎管（mesonephric duct）與竇陰道球泡（sinovaginal bulb）",
+      "C": "副 中腎管（paramesonephric duct）與竇陰道球泡（sinovaginal bulb）",
+      "D": "副 中腎管（paramesonephric duct）與生殖結節（genital tubercle）"
+    },
+    "answer": "C",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "會陰三角｜女 性陰道（vagina）的發育，是由下列那",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 114 年第二次醫師一階醫學（一）",
+    "sourceYear": 2025,
+    "sourceRound": 2,
+    "originalQuestionNumber": 34
+  },
+  {
+    "id": "MOEX-114090-1301-Q036",
+    "subject": "解剖學",
+    "chapter": "神經解剖",
+    "section": "腦幹核區",
+    "stem": "神 經垂體部（neurohypophysis）是衍生自：",
+    "options": {
+      "A": "端 腦（telencephalon）",
+      "B": "間 腦（diencephalon）",
+      "C": "中 腦（mesencephalon）",
+      "D": "髓 腦（myelencephalon）"
+    },
+    "answer": "B",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "腦幹核區｜神 經垂體部（neurohypophysis",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 114 年第二次醫師一階醫學（一）",
+    "sourceYear": 2025,
+    "sourceRound": 2,
+    "originalQuestionNumber": 36
+  },
+  {
+    "id": "MOEX-114090-1301-Q043",
+    "subject": "解剖學",
+    "chapter": "腹部",
+    "section": "肝膽胰脾",
+    "stem": "消 化道中，下列何者不與其它三者位於同一器官？",
+    "options": {
+      "A": "絨 毛（villi）",
+      "B": "乳 糜管（lacteal）",
+      "C": "環 皺襞（plicae circulares）",
+      "D": "結 腸帶（teniae coli）"
+    },
+    "answer": "D",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "肝膽胰脾｜消 化道中，下列何者不與其它三者位於同一器官",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 114 年第二次醫師一階醫學（一）",
+    "sourceYear": 2025,
+    "sourceRound": 2,
+    "originalQuestionNumber": 43
+  },
+  {
+    "id": "MOEX-114090-1301-Q050",
+    "subject": "解剖學",
+    "chapter": "神經解剖",
+    "section": "腦幹核區",
+    "stem": "下 列那個腦區和恐懼情緒最直接相關？",
+    "options": {
+      "A": "視 上核（supraoptic nucleus）",
+      "B": "視 叉上核（suprachiasmatic nucleus）",
+      "C": "杏 仁核（amygdaloid nucleus）",
+      "D": "海 馬迴（hippocampus）"
+    },
+    "answer": "C",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "腦幹核區｜下 列那個腦區和恐懼情緒最直接相關",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 114 年第二次醫師一階醫學（一）",
+    "sourceYear": 2025,
+    "sourceRound": 2,
+    "originalQuestionNumber": 50
+  },
+  {
+    "id": "MOEX-114090-1301-Q051",
+    "subject": "解剖學",
+    "chapter": "神經解剖",
+    "section": "腦幹核區",
+    "stem": "下 列有關自主神經系統的敘述，何者最不適當？",
+    "options": {
+      "A": "自 主神經系統的交感部門也稱為頭薦部門",
+      "B": "交 感神經系統的節前運動神經元釋放的神經傳導物質主要是乙醯膽鹼",
+      "C": "副 交感神經系統的節後運動神經元釋放的神經傳導物質主要是乙醯膽鹼",
+      "D": "與 交感神經相較，副交感神經系統的自主神經節一般比較靠近標的組織"
+    },
+    "answer": "A",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "腦幹核區｜下 列有關自主神經系統的敘述，何者最不適當",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 114 年第二次醫師一階醫學（一）",
+    "sourceYear": 2025,
+    "sourceRound": 2,
+    "originalQuestionNumber": 51
+  },
+  {
+    "id": "MOEX-114090-1301-Q054",
+    "subject": "解剖學",
+    "chapter": "神經解剖",
+    "section": "自律神經",
+    "stem": "在 副交感神經系統興奮的情況下，下列何者有關眼球之變化最不可能發生？",
+    "options": {
+      "A": "睫 狀體（ciliary body）的環肌傾向處於收縮狀態",
+      "B": "懸 繫小帶（zonule）的張力傾向變低",
+      "C": "水 晶體的形狀傾向變薄變長",
+      "D": "瞳 孔傾向變小"
+    },
+    "answer": "C",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "副交感路徑",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 114 年第二次醫師一階醫學（一）",
+    "sourceYear": 2025,
+    "sourceRound": 2,
+    "originalQuestionNumber": 54
+  },
+  {
+    "id": "MOEX-114090-1301-Q059",
+    "subject": "解剖學",
+    "chapter": "胸腔",
+    "section": "縱膈",
+    "stem": "記 錄心肌細胞的動作電位時，在去極化與平原期之間有一段快速而短暫的再極化期（initial rapid repolarization），下列何者是它產生的主要機制？",
+    "options": {
+      "A": "關 閉鈉離子通道，打開鉀離子通道",
+      "B": "關 閉鈉離子通道，打開氯離子通道",
+      "C": "關 閉 L-type 鈣離子通道，打開 T-type 鈣離子通道",
+      "D": "關 閉 T-type 鈣離子通道，打開 L-type 鈣離子通道"
+    },
+    "answer": "A",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "縱膈｜記 錄心肌細胞的動作電位時，在去極化與平原期",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 114 年第二次醫師一階醫學（一）",
+    "sourceYear": 2025,
+    "sourceRound": 2,
+    "originalQuestionNumber": 59
+  },
+  {
+    "id": "MOEX-114090-1301-Q060",
+    "subject": "解剖學",
+    "chapter": "胸腔",
+    "section": "心臟與冠狀動脈",
+    "stem": "對 於心室肌細胞和 SA node 細胞電位的比較，下列那一敘述最為適當？",
+    "options": {
+      "A": "兩 種細胞皆有穩定的靜止膜電位（steady resting membrane potential），均約為-90 mV",
+      "B": "兩 種細胞產生的動作電位皆有平原期（plateau phase），主要均是因為打開 L-type Ca2+ channels",
+      "C": "兩 種細胞動作電位的去極化，主要都是因為打開 Na+ channels，使得 Na+流入細胞而造成",
+      "D": "兩 種細胞動作電位的再極化，主要都是因為打開 K+ channels，使得 K+流出細胞而造成"
+    },
+    "answer": "D",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "心臟與冠狀動脈｜對 於心室肌細胞和 SA node 細胞電位",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 114 年第二次醫師一階醫學（一）",
+    "sourceYear": 2025,
+    "sourceRound": 2,
+    "originalQuestionNumber": 60
+  },
+  {
+    "id": "MOEX-114090-1301-Q061",
+    "subject": "解剖學",
+    "chapter": "胸腔",
+    "section": "縱膈",
+    "stem": "下 列血壓、心跳之變化，何者最易發生於顱內壓上升的病人？",
+    "options": {
+      "A": "血 壓、心跳速率均下降",
+      "B": "血 壓上升、心跳速率下降",
+      "C": "血 壓、心跳速率均上升",
+      "D": "血 壓下降、心跳速率上升"
+    },
+    "answer": "B",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "縱膈｜下 列血壓、心跳之變化，何者最易發生於顱內壓",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 114 年第二次醫師一階醫學（一）",
+    "sourceYear": 2025,
+    "sourceRound": 2,
+    "originalQuestionNumber": 61
+  },
+  {
+    "id": "MOEX-114090-1301-Q062",
+    "subject": "解剖學",
+    "chapter": "胸腔",
+    "section": "縱膈",
+    "stem": "一 位成年女子，其體動脈血中氧氣濃度 200 mL/L，全身氧氣消耗速率（oxygen consumption rate）為 250 mL/min。已知她的心輸出量（cardiac output）為 5 L/min，血紅素濃度 16 g/dL，而且體動脈血中結合在血 紅素上的氧氣量（O bound to hemoglobin）占全部血中氧氣的 98％。則她的體靜脈血中氧氣濃度最接近下 2 列何者？",
+    "options": {
+      "A": "1 50 mL/L",
+      "B": "1 46 mL/L",
+      "C": "1 43 mL/L",
+      "D": "4 7 mL/L"
+    },
+    "answer": "A",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "縱膈｜一 位成年女子，其體動脈血中氧氣濃度 200",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 114 年第二次醫師一階醫學（一）",
+    "sourceYear": 2025,
+    "sourceRound": 2,
+    "originalQuestionNumber": 62
+  },
+  {
+    "id": "MOEX-114090-1301-Q064",
+    "subject": "解剖學",
+    "chapter": "腹部",
+    "section": "肝膽胰脾",
+    "stem": "游 離態的膽固醇在小腸上皮細胞最主要是經由下列何種方式吸收？",
+    "options": {
+      "A": "初 級主動運輸（primary active transport）",
+      "B": "次 級主動運輸（secondary active transport）",
+      "C": "擴 散作用（diffusion）",
+      "D": "內 吞作用（endocytosis）"
+    },
+    "answer": "C",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "肝膽胰脾｜游 離態的膽固醇在小腸上皮細胞最主要是經由下",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 114 年第二次醫師一階醫學（一）",
+    "sourceYear": 2025,
+    "sourceRound": 2,
+    "originalQuestionNumber": 64
+  },
+  {
+    "id": "MOEX-114090-1301-Q065",
+    "subject": "解剖學",
+    "chapter": "腹部",
+    "section": "肝膽胰脾",
+    "stem": "下 列何者是胰泌素（secretin）的最主要的直接作用？",
+    "options": {
+      "A": "刺 激膽囊收縮釋放膽汁和促進胰臟胰島素的分泌",
+      "B": "刺 激肝臟分泌膽汁和促進膽囊收縮",
+      "C": "刺 激胰臟碳酸氫根離子分泌和抑制胃腺分泌 gastrin",
+      "D": "刺 激腸道上皮細胞分泌離子和促進胃腺分泌 HCl"
+    },
+    "answer": "C",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "膽囊與膽囊動脈",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 114 年第二次醫師一階醫學（一）",
+    "sourceYear": 2025,
+    "sourceRound": 2,
+    "originalQuestionNumber": 65
+  },
+  {
+    "id": "MOEX-114090-1301-Q068",
+    "subject": "解剖學",
+    "chapter": "腹部",
+    "section": "肝膽胰脾",
+    "stem": "下 列有關胰島素的調控和生理作用的敘述，何者最為適當？",
+    "options": {
+      "A": "血 鉀降低會促進胰島素的分泌作用",
+      "B": "胰 島素會促進肝臟的葡萄糖產生速率",
+      "C": "胰 島素會促進脂肪組織脂肪合成速率",
+      "D": "胰 島素會促進酮體的生成作用（ketogenesis）"
+    },
+    "answer": "C",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "胰臟鄰近關係",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 114 年第二次醫師一階醫學（一）",
+    "sourceYear": 2025,
+    "sourceRound": 2,
+    "originalQuestionNumber": 68
+  },
+  {
+    "id": "MOEX-114090-1301-Q073",
+    "subject": "解剖學",
+    "chapter": "骨盆與會陰",
+    "section": "會陰三角",
+    "stem": "有 關卵巢濾泡（follicle）的生長，下列敘述何者最不適當?",
+    "options": {
+      "A": "最 早期的濾泡為原始濾泡（primordial follicle），至青春期才會開始發育形成初級濾泡（primary follicle）",
+      "B": "初 級濾泡的卵母細胞（oocyte）與顆粒細胞（granulosa cell）之間有透明帶（zona pellucida）形成",
+      "C": "月 經週期初期，數個濾泡生長，而後會選出一個優勢濾泡（dominant follicle），達到最後成熟的濾泡",
+      "D": "濾 泡凋零萎縮（atresia），在濾泡發育過程之各階段皆可能發生"
+    },
+    "answer": "A",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "會陰三角｜有 關卵巢濾泡（follicle）的生長，下",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 114 年第二次醫師一階醫學（一）",
+    "sourceYear": 2025,
+    "sourceRound": 2,
+    "originalQuestionNumber": 73
+  },
+  {
+    "id": "MOEX-114090-1301-Q077",
+    "subject": "解剖學",
+    "chapter": "腹部",
+    "section": "肝膽胰脾",
+    "stem": "下 列那一種維生素需要膽汁幫助吸收？",
+    "options": {
+      "A": "v itamin A",
+      "B": "v itamin B 6",
+      "C": "v itamin B 12",
+      "D": "v itamin C"
+    },
+    "answer": "A",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "肝膽胰脾｜下 列那一種維生素需要膽汁幫助吸收",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 114 年第二次醫師一階醫學（一）",
+    "sourceYear": 2025,
+    "sourceRound": 2,
+    "originalQuestionNumber": 77
+  },
+  {
+    "id": "MOEX-114090-1301-Q089",
+    "subject": "解剖學",
+    "chapter": "腹部",
+    "section": "肝膽胰脾",
+    "stem": "細 胞膜上包含甘油（glycerol）架構的複合性脂質為：",
+    "options": {
+      "A": "膽 固醇（cholesterol）",
+      "B": "磷 脂膽鹼（phosphatidylcholine）",
+      "C": "神 經醯胺（ceramide）",
+      "D": "神 經鞘磷脂（sphingomyelin）"
+    },
+    "answer": "B",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "肝膽胰脾｜細 胞膜上包含甘油（glycerol）架構的",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 114 年第二次醫師一階醫學（一）",
+    "sourceYear": 2025,
+    "sourceRound": 2,
+    "originalQuestionNumber": 89
+  },
+  {
+    "id": "MOEX-114090-1301-Q095",
+    "subject": "解剖學",
+    "chapter": "腹部",
+    "section": "肝膽胰脾",
+    "stem": "關 於胰島素（insulin）訊息如何活化肝臟細胞的肝醣合成酶（glycogen synthase, GS）的活性，下列描述 何者最合理？",
+    "options": {
+      "A": "造 成肝醣合成激酶 3（glycogen synthase kinase 3, GSK3）去磷酸化，提高 GSK3 激酶活性，活化 GS",
+      "B": "造 成肝醣合成激酶 3（glycogen synthase kinase 3, GSK3）磷酸化，提高 GSK3 激酶活性，活化 GS",
+      "C": "造 成肝醣合成激酶 3（glycogen synthase kinase 3, GSK3）去磷酸化，抑制 GSK3 激酶活性，活化 GS",
+      "D": "造 成肝醣合成激酶 3（glycogen synthase kinase 3, GSK3）磷酸化，抑制 GSK3 激酶活性，活化 GS"
+    },
+    "answer": "D",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "胰臟鄰近關係",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 114 年第二次醫師一階醫學（一）",
+    "sourceYear": 2025,
+    "sourceRound": 2,
+    "originalQuestionNumber": 95
+  },
+  {
+    "id": "MOEX-115020-1301-Q001",
+    "subject": "解剖學",
+    "chapter": "頭頸部",
+    "section": "顏面神經與三叉神經",
+    "stem": "顏面神經的感覺根（sensory root of facial nerve）主要將接收到的感覺訊息直接傳入下列腦幹內的那兩個 神經核？",
+    "options": {
+      "A": "三叉神經脊髓核（spinal trigeminal nucleus）與孤立核（solitary nucleus）",
+      "B": "三叉神經脊髓核（spinal trigeminal nucleus）與顏面運動神經核（facial motor nucleus）",
+      "C": "疑核（nucleus ambiguus）與孤立核（solitary nucleus）",
+      "D": "疑核（nucleus ambiguus）與涎核（salivatory nucleus）"
+    },
+    "answer": "A",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "顏面神經與腮腺關係",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 115 年第一次醫師一階醫學（一）",
+    "sourceYear": 2026,
+    "sourceRound": 1,
+    "originalQuestionNumber": 1
+  },
+  {
+    "id": "MOEX-115020-1301-Q002",
+    "subject": "解剖學",
+    "chapter": "神經解剖",
+    "section": "小腦",
+    "stem": "下列何者含有小腦的傳入神經纖維（afferent fibers），但不含傳出神經纖維（efferent fibers）？",
+    "options": {
+      "A": "上小腦腳（superior cerebellar peduncle）",
+      "B": "中小腦腳（middle cerebellar peduncle）",
+      "C": "下小腦腳（inferior cerebellar peduncle）",
+      "D": "上小腦腳交叉（decussation of superior cerebellar peduncle）"
+    },
+    "answer": "B",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "小腦腳傳入傳出",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 115 年第一次醫師一階醫學（一）",
+    "sourceYear": 2026,
+    "sourceRound": 1,
+    "originalQuestionNumber": 2
+  },
+  {
+    "id": "MOEX-115020-1301-Q003",
+    "subject": "解剖學",
+    "chapter": "神經解剖",
+    "section": "丘腦與基底核",
+    "stem": "下肢本體感覺（propioception）經由內側蹄系（medial lemniscus）主要傳入丘腦（thalamus）何處？",
+    "options": {
+      "A": "腹前側核（ventral anterior nuclei）",
+      "B": "腹外側核（ventral lateral nuclei）",
+      "C": "腹後外側核（ventral posterior lateral nuclei）",
+      "D": "腹後內側核（ventral posterior medial nuclei）"
+    },
+    "answer": "C",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "丘腦運動核群",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 115 年第一次醫師一階醫學（一）",
+    "sourceYear": 2026,
+    "sourceRound": 1,
+    "originalQuestionNumber": 3
+  },
+  {
+    "id": "MOEX-115020-1301-Q004",
+    "subject": "解剖學",
+    "chapter": "神經解剖",
+    "section": "腦幹核區",
+    "stem": "杏仁核（amygdala）以何構造與隔區（septal area）相連結？",
+    "options": {
+      "A": "終紋（stria terminalis）",
+      "B": "穹窿（fornix）",
+      "C": "前腦內側束（medial forebrain bundle）",
+      "D": "內側縱束（medial longitudinal fasciculus）"
+    },
+    "answer": "A",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "腦幹核區｜杏仁核（amygdala）以何構造與隔區（s",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 115 年第一次醫師一階醫學（一）",
+    "sourceYear": 2026,
+    "sourceRound": 1,
+    "originalQuestionNumber": 4
+  },
+  {
+    "id": "MOEX-115020-1301-Q005",
+    "subject": "解剖學",
+    "chapter": "神經解剖",
+    "section": "腦幹核區",
+    "stem": "關於伸張反射（stretch reflex）之敘述，下列何者錯誤？",
+    "options": {
+      "A": "其傳入纖維（afferent fiber），主要來自肌梭（muscle spindle）",
+      "B": "其傳入纖維（afferent fiber），主要為大型髓鞘神經纖維",
+      "C": "下運動神經元（lower motor neuron）損傷，可能導致伸張反射消失",
+      "D": "伸張反射為多突觸反射（multi-synaptic reflex）"
+    },
+    "answer": "D",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "腦幹核區｜伸張反射（stretch reflex）之敘",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 115 年第一次醫師一階醫學（一）",
+    "sourceYear": 2026,
+    "sourceRound": 1,
+    "originalQuestionNumber": 5
+  },
+  {
+    "id": "MOEX-115020-1301-Q006",
+    "subject": "解剖學",
+    "chapter": "神經解剖",
+    "section": "視覺路徑",
+    "stem": "下列何者不位於視網膜到大腦皮質的視覺傳導路徑（visual pathway）上？",
+    "options": {
+      "A": "外側膝狀體（lateral geniculate body）",
+      "B": "視徑（optic tract）",
+      "C": "上丘（superior colliculus）",
+      "D": "視神經（optic nerve）"
+    },
+    "answer": "C",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "視束病灶定位",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 115 年第一次醫師一階醫學（一）",
+    "sourceYear": 2026,
+    "sourceRound": 1,
+    "originalQuestionNumber": 6
+  },
+  {
+    "id": "MOEX-115020-1301-Q008",
+    "subject": "解剖學",
+    "chapter": "頭頸部",
+    "section": "顏面神經與三叉神經",
+    "stem": "關於眼眶內部之骨性結構的描述，下列何者最不恰當？",
+    "options": {
+      "A": "滑車小窩（trochlear fovea）位於額骨",
+      "B": "淚腺窩（fossa of lacrimal gland）位於眼眶內側壁",
+      "C": "眶上孔（supraorbital foramen）位於額骨",
+      "D": "視神經管（optic canal）位於蝶骨"
+    },
+    "answer": "B",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "顏面神經與三叉神經｜眼眶內部之骨性結構的描述，下列何者最不恰當",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 115 年第一次醫師一階醫學（一）",
+    "sourceYear": 2026,
+    "sourceRound": 1,
+    "originalQuestionNumber": 8
+  },
+  {
+    "id": "MOEX-115020-1301-Q009",
+    "subject": "解剖學",
+    "chapter": "頭頸部",
+    "section": "頸動脈鞘",
+    "stem": "下列關於外頸動脈（external carotid artery）的描述，何者最恰當？",
+    "options": {
+      "A": "近甲狀軟骨下緣的水平高度處由總頸動脈分支出",
+      "B": "近環狀軟骨水平高度處分支出甲狀下動脈（inferior thyroid artery）",
+      "C": "位於胸鎖乳突肌（sternocleidomastoid muscle）之上",
+      "D": "近舌骨體水平高度處分支出舌動脈（lingual artery）"
+    },
+    "answer": "D",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "頸動脈鞘｜下列關於外頸動脈（external caro",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 115 年第一次醫師一階醫學（一）",
+    "sourceYear": 2026,
+    "sourceRound": 1,
+    "originalQuestionNumber": 9
+  },
+  {
+    "id": "MOEX-115020-1301-Q010",
+    "subject": "解剖學",
+    "chapter": "神經解剖",
+    "section": "腦神經",
+    "stem": "下列何者不經由動眼神經（oculomotor nerve）來執行？",
+    "options": {
+      "A": "睫狀體收縮",
+      "B": "瞳孔收縮",
+      "C": "眼球向內側注視",
+      "D": "瞳孔擴張"
+    },
+    "answer": "D",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "動眼神經與睫狀神經節",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 115 年第一次醫師一階醫學（一）",
+    "sourceYear": 2026,
+    "sourceRound": 1,
+    "originalQuestionNumber": 10
+  },
+  {
+    "id": "MOEX-115020-1301-Q011",
+    "subject": "解剖學",
+    "chapter": "頭頸部",
+    "section": "顏面神經與三叉神經",
+    "stem": "下列何者不由顏面神經（facial nerve）支配？",
+    "options": {
+      "A": "頰肌（buccinator muscle）",
+      "B": "內翼肌（medial pterygoid muscle）",
+      "C": "闊頸肌（platysma）",
+      "D": "二腹肌後腹（posterior belly of the digastric muscle）"
+    },
+    "answer": "B",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "顏面神經與腮腺關係",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 115 年第一次醫師一階醫學（一）",
+    "sourceYear": 2026,
+    "sourceRound": 1,
+    "originalQuestionNumber": 11
+  },
+  {
+    "id": "MOEX-115020-1301-Q012",
+    "subject": "解剖學",
+    "chapter": "神經解剖",
+    "section": "腦幹核區",
+    "stem": "下列何孔洞位於眶上裂（superior orbital fissure）後側尾端，靠近蝶竇（sphenoidal sinus）的外壁？",
+    "options": {
+      "A": "後篩孔（posterior ethmoidal foramen）",
+      "B": "圓孔（foramen rotundum）",
+      "C": "乳突孔（mastoid foramen）",
+      "D": "視神經管（optic canal）"
+    },
+    "answer": "B",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "腦幹核區｜下列何孔洞位於眶上裂（superior or",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 115 年第一次醫師一階醫學（一）",
+    "sourceYear": 2026,
+    "sourceRound": 1,
+    "originalQuestionNumber": 12
+  },
+  {
+    "id": "MOEX-115020-1301-Q014",
+    "subject": "解剖學",
+    "chapter": "頭頸部",
+    "section": "舌與味覺",
+    "stem": "下列何者附著於舌骨（hyoid bone）？",
+    "options": {
+      "A": "上咽縮肌（superior pharyngeal constrictor muscle）",
+      "B": "中咽縮肌（middle pharyngeal constrictor muscle）",
+      "C": "下咽縮肌（inferior pharyngeal constrictor muscle）",
+      "D": "莖突咽肌（stylopharyngeus muscle）"
+    },
+    "answer": "B",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "舌與味覺｜附著於舌骨（hyoid bone）",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 115 年第一次醫師一階醫學（一）",
+    "sourceYear": 2026,
+    "sourceRound": 1,
+    "originalQuestionNumber": 14
+  },
+  {
+    "id": "MOEX-115020-1301-Q015",
+    "subject": "解剖學",
+    "chapter": "胸腔",
+    "section": "心臟與冠狀動脈",
+    "stem": "在解剖位置，心臟的前面（anterior surface）絕大部分面積是由下列那一個腔室所占據？",
+    "options": {
+      "A": "左心房",
+      "B": "左心室",
+      "C": "右心房",
+      "D": "右心室"
+    },
+    "answer": "D",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "心臟與冠狀動脈｜在解剖位置，心臟的前面（anterior s",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 115 年第一次醫師一階醫學（一）",
+    "sourceYear": 2026,
+    "sourceRound": 1,
+    "originalQuestionNumber": 15
+  },
+  {
+    "id": "MOEX-115020-1301-Q016",
+    "subject": "解剖學",
+    "chapter": "胸腔",
+    "section": "肺與胸膜",
+    "stem": "在肋軟骨內面（inner side），肋間神經主要的解剖位置為何？",
+    "options": {
+      "A": "位於肋間內肌（internal intercostal muscle）與胸內筋膜（endothoracic fascia）或胸橫肌 （transversus thoracic muscle）之間",
+      "B": "位於肋間外肌（external intercostal muscle）與肋間內肌（internal intercostal muscle）之間",
+      "C": "位於肋間內肌（internal intercostal muscle）與最內肋間肌（innermost intercostal muscle）之間",
+      "D": "位於最內肋間肌（innermost intercostal muscle）與胸內筋膜（endothoracic fascia）之間"
+    },
+    "answer": "A",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "肺與胸膜｜在肋軟骨內面（inner side），肋間神",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 115 年第一次醫師一階醫學（一）",
+    "sourceYear": 2026,
+    "sourceRound": 1,
+    "originalQuestionNumber": 16
+  },
+  {
+    "id": "MOEX-115020-1301-Q017",
+    "subject": "解剖學",
+    "chapter": "胸腔",
+    "section": "肺與胸膜",
+    "stem": "有關肺動脈（pulmonary artery）的常見解剖位置，下列敘述何者最恰當？",
+    "options": {
+      "A": "肺動脈幹（pulmonary trunk）的開口處，位在升主動脈（ascending aorta）基部的右後方",
+      "B": "右側肺動脈（pulmonary artery）位在升主動脈（ascending aorta）的後方",
+      "C": "左側肺動脈（pulmonary artery）位在降主動脈（descending aorta）的後方",
+      "D": "肺動脈幹（pulmonary trunk）不被心包膜（pericardium）所包覆"
+    },
+    "answer": "B",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "肺門構造相對位置",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 115 年第一次醫師一階醫學（一）",
+    "sourceYear": 2026,
+    "sourceRound": 1,
+    "originalQuestionNumber": 17
+  },
+  {
+    "id": "MOEX-115020-1301-Q018",
+    "subject": "解剖學",
+    "chapter": "神經解剖",
+    "section": "腦幹核區",
+    "stem": "典型腰椎下關節突（inferior articular process）的關節面朝向：",
+    "options": {
+      "A": "上方",
+      "B": "內側",
+      "C": "下方",
+      "D": "外側"
+    },
+    "answer": "D",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "腦幹核區｜典型腰椎下關節突（inferior arti",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 115 年第一次醫師一階醫學（一）",
+    "sourceYear": 2026,
+    "sourceRound": 1,
+    "originalQuestionNumber": 18
+  },
+  {
+    "id": "MOEX-115020-1301-Q019",
+    "subject": "解剖學",
+    "chapter": "腹部",
+    "section": "肝膽胰脾",
+    "stem": "主胰管（main pancreatic duct）及膽管（bile duct）會藉由何種結構共同開口於十二指腸下降段 （descending part of duodenum）？",
+    "options": {
+      "A": "肝管（hepatic duct）",
+      "B": "大十二指腸乳頭（major duodenal papilla）",
+      "C": "小十二指腸乳頭（minor duodenal papilla）",
+      "D": "膽囊管（cystic duct）"
+    },
+    "answer": "B",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "膽囊與膽囊動脈",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 115 年第一次醫師一階醫學（一）",
+    "sourceYear": 2026,
+    "sourceRound": 1,
+    "originalQuestionNumber": 19
+  },
+  {
+    "id": "MOEX-115020-1301-Q020",
+    "subject": "解剖學",
+    "chapter": "腹部",
+    "section": "腎臟與後腹腔",
+    "stem": "腹膜包覆下列何種結構形成臍外側韌帶（lateral umbilical fold）？",
+    "options": {
+      "A": "臍靜脈（umbilical vein）",
+      "B": "輸尿管（ureter）",
+      "C": "下腹壁動脈（inferior epigastric artery）",
+      "D": "內髂動脈（internal iliac artery）"
+    },
+    "answer": "C",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "輸尿管走行",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 115 年第一次醫師一階醫學（一）",
+    "sourceYear": 2026,
+    "sourceRound": 1,
+    "originalQuestionNumber": 20
+  },
+  {
+    "id": "MOEX-115020-1301-Q022",
+    "subject": "解剖學",
+    "chapter": "腹部",
+    "section": "腎臟與後腹腔",
+    "stem": "下列何者不發出分支供應腎上腺（suprarenal gland）？",
+    "options": {
+      "A": "膈下動脈（inferior phrenic artery）",
+      "B": "腹主動脈（abdominal aorta）",
+      "C": "睪丸動脈（testicular artery）",
+      "D": "腎動脈（renal artery）"
+    },
+    "answer": "C",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "腎臟後腹膜關係",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 115 年第一次醫師一階醫學（一）",
+    "sourceYear": 2026,
+    "sourceRound": 1,
+    "originalQuestionNumber": 22
+  },
+  {
+    "id": "MOEX-115020-1301-Q023",
+    "subject": "解剖學",
+    "chapter": "骨盆與會陰",
+    "section": "直腸與肛管",
+    "stem": "關於肛管（anal canal），下列敘述何者正確？",
+    "options": {
+      "A": "肛管的長度大約 10 至 15 公分",
+      "B": "肛門內括約肌（internal anal sphincter）由平滑肌構成，圍繞在肛管下端的肛門（anus）周圍",
+      "C": "交感神經纖維（sympathetic fibers）刺激肛門內括約肌（internal anal sphincter）收縮",
+      "D": "肛門外括約肌（external anal sphincter）只圍繞肛管的上段，不圍繞肛管的下段"
+    },
+    "answer": "C",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "肛門外括約肌神經支配",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 115 年第一次醫師一階醫學（一）",
+    "sourceYear": 2026,
+    "sourceRound": 1,
+    "originalQuestionNumber": 23
+  },
+  {
+    "id": "MOEX-115020-1301-Q024",
+    "subject": "解剖學",
+    "chapter": "骨盆與會陰",
+    "section": "會陰三角",
+    "stem": "關於陰部神經（pudendal nerve），下列敘述何者錯誤？",
+    "options": {
+      "A": "陰部神經起始於薦神經叢（sacral plexus）",
+      "B": "陰部神經藉由通過坐骨小孔（lesser sciatic foramen）而離開骨盆腔",
+      "C": "陰部神經藉由通過坐骨小孔（lesser sciatic foramem）而進入會陰（perineum）",
+      "D": "下直腸神經（inferior rectal nerve）是陰部神經的分支"
+    },
+    "answer": "B",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "會陰三角｜陰部神經（pudendal nerve），下",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 115 年第一次醫師一階醫學（一）",
+    "sourceYear": 2026,
+    "sourceRound": 1,
+    "originalQuestionNumber": 24
+  },
+  {
+    "id": "MOEX-115020-1301-Q025",
+    "subject": "解剖學",
+    "chapter": "骨盆與會陰",
+    "section": "會陰三角",
+    "stem": "關於膀胱（urinary bladder），下列敘述何者錯誤？",
+    "options": {
+      "A": "膀胱底（fundus）位於膀胱的上表面（superior surface)，被腹膜（peritoneum）覆蓋",
+      "B": "膀胱尖（apex）朝向恥骨聯合（pubic symphysis）",
+      "C": "膀胱頸（neck）在膀胱下部，靠近前列腺（prostate）",
+      "D": "尿道內括約肌（internal urethral sphincter）位於膀胱下部，主要在膀胱頸（bladder neck）"
+    },
+    "answer": "A",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "會陰三角｜膀胱（urinary bladder），下列",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 115 年第一次醫師一階醫學（一）",
+    "sourceYear": 2026,
+    "sourceRound": 1,
+    "originalQuestionNumber": 25
+  },
+  {
+    "id": "MOEX-115020-1301-Q026",
+    "subject": "解剖學",
+    "chapter": "骨盆與會陰",
+    "section": "會陰三角",
+    "stem": "下列何者最可能走在腰薦神經幹（lumbosacral trunk）與第一薦神經（S1）之間？",
+    "options": {
+      "A": "髂腰動脈（iliolumbar artery）",
+      "B": "臀上動脈（superior gluteal artery）",
+      "C": "臀下動脈（inferior gluteal artery）",
+      "D": "陰部內動脈（internal pudendal artery）"
+    },
+    "answer": "B",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "會陰三角｜可能走在腰薦神經幹（lumbosacral ",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 115 年第一次醫師一階醫學（一）",
+    "sourceYear": 2026,
+    "sourceRound": 1,
+    "originalQuestionNumber": 26
+  },
+  {
+    "id": "MOEX-115020-1301-Q027",
+    "subject": "解剖學",
+    "chapter": "下肢",
+    "section": "大腿前內後區",
+    "stem": "下列那一條神經所支配的肌肉具有內收（adduct）上臂的作用？",
+    "options": {
+      "A": "肩胛背神經（dorsal scapular nerve）",
+      "B": "肩胛上神經（suprascapular nerve）",
+      "C": "胸背神經（thoracodorsal nerve）",
+      "D": "長胸神經（long thoracic nerve）"
+    },
+    "answer": "C",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "大腿內收肌群",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 115 年第一次醫師一階醫學（一）",
+    "sourceYear": 2026,
+    "sourceRound": 1,
+    "originalQuestionNumber": 27
+  },
+  {
+    "id": "MOEX-115020-1301-Q029",
+    "subject": "解剖學",
+    "chapter": "上肢",
+    "section": "上肢血管",
+    "stem": "下列有關肘窩（cubital fossa）的敘述，何者正確？",
+    "options": {
+      "A": "旋前圓肌（pronator teres）位在上外側",
+      "B": "肱橈肌（brachioradialis）位在底部",
+      "C": "內含有尺神經（ulnar nerve）",
+      "D": "內含有正中神經（median nerve）"
+    },
+    "answer": "D",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "上肢血管｜下列有關肘窩（cubital fossa）的",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 115 年第一次醫師一階醫學（一）",
+    "sourceYear": 2026,
+    "sourceRound": 1,
+    "originalQuestionNumber": 29
+  },
+  {
+    "id": "MOEX-115020-1301-Q030",
+    "subject": "解剖學",
+    "chapter": "下肢",
+    "section": "臀區",
+    "stem": "股骨骨折導致大轉子（ggrreeaatteerr ttrroocchhaanntteerr）斷裂，下列何者的功能最不受影響？",
+    "options": {
+      "A": "上孖肌（superior gemellus）",
+      "B": "閉孔內肌（obturator internus）",
+      "C": "臀大肌（gluteus maximus）",
+      "D": "梨狀肌（piriformis）"
+    },
+    "answer": "C",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "梨狀肌與坐骨神經關係",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 115 年第一次醫師一階醫學（一）",
+    "sourceYear": 2026,
+    "sourceRound": 1,
+    "originalQuestionNumber": 30
+  },
+  {
+    "id": "MOEX-115020-1301-Q031",
+    "subject": "解剖學",
+    "chapter": "下肢",
+    "section": "腰薦神經叢",
+    "stem": "下列何者的肌腱，不會通過跗骨隧道（（tarsal tunnel）？",
+    "options": {
+      "A": "脛前肌（tibialis anterior）",
+      "B": "脛後肌（tibialis posterior）",
+      "C": "屈 長肌（fflleexxoorr hhaalllluucciiss lloonngguuss）",
+      "D": "屈趾長肌（fflleexxoorr ddiiggiittoorruumm lloonngguuss）"
+    },
+    "answer": "A",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "腰薦神經叢｜的肌腱，不會通過跗骨隧道（（tarsal t",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 115 年第一次醫師一階醫學（一）",
+    "sourceYear": 2026,
+    "sourceRound": 1,
+    "originalQuestionNumber": 31
+  },
+  {
+    "id": "MOEX-115020-1301-Q036",
+    "subject": "解剖學",
+    "chapter": "神經解剖",
+    "section": "小腦",
+    "stem": "下列構造與其發育來源的位置配對，何者錯誤？",
+    "options": {
+      "A": "橋腦及小腦（pons and cerebellum）：後腦（metencephalon）",
+      "B": "四疊體（tectum）：中腦（mesencephalon）",
+      "C": "乳狀體（mammillary body）：間腦（diencephalon）",
+      "D": "視囊（optic vesicle）：髓腦（myelencephalon）"
+    },
+    "answer": "D",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "小腦｜下列構造與其發育來源的位置配對，何者錯誤",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 115 年第一次醫師一階醫學（一）",
+    "sourceYear": 2026,
+    "sourceRound": 1,
+    "originalQuestionNumber": 36
+  },
+  {
+    "id": "MOEX-115020-1301-Q038",
+    "subject": "解剖學",
+    "chapter": "胸腔",
+    "section": "縱膈",
+    "stem": "心肌間盤（intercalated disc）的組成構造，不包括：",
+    "options": {
+      "A": "黏連接合（adhering junction）",
+      "B": "橋粒（desmosome）",
+      "C": "緊密接合（tight junction）",
+      "D": "間隙接合（gap junction）"
+    },
+    "answer": "C",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "縱膈｜心肌間盤（intercalated disc",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 115 年第一次醫師一階醫學（一）",
+    "sourceYear": 2026,
+    "sourceRound": 1,
+    "originalQuestionNumber": 38
+  },
+  {
+    "id": "MOEX-115020-1301-Q043",
+    "subject": "解剖學",
+    "chapter": "頭頸部",
+    "section": "舌與味覺",
+    "stem": "舌乳頭（papillae）中，何者數量最多且構造最小？",
+    "options": {
+      "A": "絲狀乳頭（filiform papillae）",
+      "B": "蕈狀乳頭（fungiform papillae）",
+      "C": "輪廓乳頭（circumvallate papillae）",
+      "D": "葉狀乳頭（foliate papillae）"
+    },
+    "answer": "A",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "舌與味覺｜舌乳頭（papillae）中，何者數量最多且",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 115 年第一次醫師一階醫學（一）",
+    "sourceYear": 2026,
+    "sourceRound": 1,
+    "originalQuestionNumber": 43
+  },
+  {
+    "id": "MOEX-115020-1301-Q044",
+    "subject": "解剖學",
+    "chapter": "腹部",
+    "section": "肝膽胰脾",
+    "stem": "關於消化道的組織結構，下列敘述何者正確？",
+    "options": {
+      "A": "黏膜肌層（muscularis mucosae）分布區域是由食道（esophagus）至盲腸（cecum）為止",
+      "B": "胃底腺（fundic gland）分布是由黏膜層向下延伸至肌外層（muscularis externa）",
+      "C": "小腸的絨毛（villi）主要是由黏膜下層（submucosa）突出至腸腔的構造",
+      "D": "闌尾（appendix）的黏膜層有豐富的淋巴小結（lymphatic nodules），有時會延伸到黏膜下層 （submucosa）"
+    },
+    "answer": "D",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "肝膽胰脾｜消化道的組織結構，下列敘述何者正確",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 115 年第一次醫師一階醫學（一）",
+    "sourceYear": 2026,
+    "sourceRound": 1,
+    "originalQuestionNumber": 44
+  },
+  {
+    "id": "MOEX-115020-1301-Q045",
+    "subject": "解剖學",
+    "chapter": "腹部",
+    "section": "腹膜關係",
+    "stem": "腎臟構造中，下列何者具有最發達的刷狀緣（brush border）？",
+    "options": {
+      "A": "近曲小管（proximal convoluted tubule）",
+      "B": "遠曲小管（distal convoluted tubule）",
+      "C": "亨利氏環的細升支（thin ascending limb of the loop of Henle）",
+      "D": "髓質的集尿管（medullary collecting duct）"
+    },
+    "answer": "A",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "腹膜關係｜腎臟構造中，下列何者具有最發達的刷狀緣（br",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 115 年第一次醫師一階醫學（一）",
+    "sourceYear": 2026,
+    "sourceRound": 1,
+    "originalQuestionNumber": 45
+  },
+  {
+    "id": "MOEX-115020-1301-Q048",
+    "subject": "解剖學",
+    "chapter": "神經解剖",
+    "section": "自律神經",
+    "stem": "交感神經及副交感神經合作無間調節人體的許多功能及行為包括性行為，在男性進行性行為生殖器勃起時， 下列那一個敘述最恰當？",
+    "options": {
+      "A": "交感神經節後神經元釋放乙醯膽鹼（acetylcholine）",
+      "B": "副交感神經節後神經元釋放乙醯膽鹼（acetylcholine）",
+      "C": "交感神經節後神經元釋放正腎上腺素（norepinephrine）",
+      "D": "副交感神經節後神經元釋放正腎上腺素（norepinephrine）"
+    },
+    "answer": "B",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "副交感路徑",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 115 年第一次醫師一階醫學（一）",
+    "sourceYear": 2026,
+    "sourceRound": 1,
+    "originalQuestionNumber": 48
+  },
+  {
+    "id": "MOEX-115020-1301-Q050",
+    "subject": "解剖學",
+    "chapter": "神經解剖",
+    "section": "自律神經",
+    "stem": "副交感神經系統活化會造成下列何種變化？",
+    "options": {
+      "A": "氣管平滑肌舒張",
+      "B": "膽囊舒張",
+      "C": "虹膜括約肌收縮",
+      "D": "豎毛肌收縮"
+    },
+    "answer": "C",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "副交感路徑",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 115 年第一次醫師一階醫學（一）",
+    "sourceYear": 2026,
+    "sourceRound": 1,
+    "originalQuestionNumber": 50
+  },
+  {
+    "id": "MOEX-115020-1301-Q052",
+    "subject": "解剖學",
+    "chapter": "神經解剖",
+    "section": "腦幹核區",
+    "stem": "為控制癲癇的發作，某病人在成年時被切去兩側的海馬迴（hippocampus）。下列對他在手術後情況的描述， 何者最為可能？",
+    "options": {
+      "A": "忘記小學畢業成績為全校第一",
+      "B": "仍可以學會騎腳踏車",
+      "C": "記得昨天中午去聚餐的朋友",
+      "D": "記得 30 分鐘前進行過的對話"
+    },
+    "answer": "B",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "腦幹核區｜控制癲癇的發作，某病人在成年時被切去兩側的海",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 115 年第一次醫師一階醫學（一）",
+    "sourceYear": 2026,
+    "sourceRound": 1,
+    "originalQuestionNumber": 52
+  },
+  {
+    "id": "MOEX-115020-1301-Q054",
+    "subject": "解剖學",
+    "chapter": "腹部",
+    "section": "肝膽胰脾",
+    "stem": "1995 年日本奧姆真理教發動東京地鐵沙林（sarin）毒氣攻擊，造成多人死亡與輕重傷。症狀較輕的只有瞳 孔縮小，症狀嚴重還會出現呼吸困難、肌肉抽搐或胃腸道問題等症狀。根據這些症狀，沙林的作用機制最可 能是：",
+    "options": {
+      "A": "競爭性抑制乙醯膽鹼（acetylcholine）結合到尼古丁型（nicotinic type）膽鹼受體",
+      "B": "非競爭性抑制乙醯膽鹼（acetylcholine）結合到尼古丁型（nicotinic type）膽鹼受體",
+      "C": "抑制突觸前含乙醯膽鹼（acetylcholine）突觸小泡的釋放",
+      "D": "抑制乙醯膽鹼酶（acetylcholinesterase）的作用"
+    },
+    "answer": "D",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "肝膽胰脾｜1995 年日本奧姆真理教發動東京地鐵沙林（",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 115 年第一次醫師一階醫學（一）",
+    "sourceYear": 2026,
+    "sourceRound": 1,
+    "originalQuestionNumber": 54
+  },
+  {
+    "id": "MOEX-115020-1301-Q057",
+    "subject": "解剖學",
+    "chapter": "胸腔",
+    "section": "縱膈",
+    "stem": "下列有關心電圖（electrocardiogram, ECG）中 P 波的敘述，何者最不適當？",
+    "options": {
+      "A": "P 波代表心房去極化，心房開始收縮",
+      "B": "P 波出現後心室容積會顯著升高",
+      "C": "P 波出現後心房壓力會略為升高",
+      "D": "P 波出現於心臟週期的收縮期（systolic phase）"
+    },
+    "answer": "D",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "縱膈｜下列有關心電圖（electrocardiog",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 115 年第一次醫師一階醫學（一）",
+    "sourceYear": 2026,
+    "sourceRound": 1,
+    "originalQuestionNumber": 57
+  },
+  {
+    "id": "MOEX-115020-1301-Q058",
+    "subject": "解剖學",
+    "chapter": "胸腔",
+    "section": "心臟與冠狀動脈",
+    "stem": "正常情況下，下列那一現象最不可能發生於心臟週期中的舒張期（diastole）？",
+    "options": {
+      "A": "產生第三心音",
+      "B": "心房收縮",
+      "C": "房室瓣（A-V valve）打開",
+      "D": "心電圖的 T 波開始發生"
+    },
+    "answer": "D",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "心臟與冠狀動脈｜正常情況下，下列那一現象最不可能發生於心臟週",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 115 年第一次醫師一階醫學（一）",
+    "sourceYear": 2026,
+    "sourceRound": 1,
+    "originalQuestionNumber": 58
+  },
+  {
+    "id": "MOEX-115020-1301-Q061",
+    "subject": "解剖學",
+    "chapter": "胸腔",
+    "section": "肺與胸膜",
+    "stem": "內肋間肌（iinntteerrnnaall iinntteerrccoossttaall mmuussccllee）主要在何時會收縮？",
+    "options": {
+      "A": "平靜吸氣",
+      "B": "平靜呼氣",
+      "C": "用力吸氣",
+      "D": "用力呼氣"
+    },
+    "answer": "D",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "肺與胸膜｜內肋間肌（iinntteerrnnaall ",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 115 年第一次醫師一階醫學（一）",
+    "sourceYear": 2026,
+    "sourceRound": 1,
+    "originalQuestionNumber": 61
+  },
+  {
+    "id": "MOEX-115020-1301-Q062",
+    "subject": "解剖學",
+    "chapter": "胸腔",
+    "section": "肺與胸膜",
+    "stem": "當肺內某區域的肺小動脈（ppuullmmoonnaarryy aarrtteerriioollee）發生局部血管阻塞時，最最可可能能會會導導致致下下列列何何種種反反應應？",
+    "options": {
+      "A": "此區域的肺泡內二氧化碳分壓（ ）升高，進入此區域肺泡之通氣量（vveennttiillaattiioonn,, VV ）增加 A",
+      "B": "此區域的肺泡內二氧化碳分壓（ ）升高，進入此區域肺泡之通氣量（vveennttiillaattiioonn,, VV ）減少 A",
+      "C": "此區域的肺泡內二氧化碳分壓（ ）降低，進入此區域肺泡之通氣量（vveennttiillaattiioonn,, VV ）增加 A",
+      "D": "此區域的肺泡內二氧化碳分壓（ ）降低，進入此區域肺泡之通氣量（vveennttiillaattiioonn,, VV ）減少 A"
+    },
+    "answer": "D",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "肺與胸膜｜當肺內某區域的肺小動脈（ppuullmmoo",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 115 年第一次醫師一階醫學（一）",
+    "sourceYear": 2026,
+    "sourceRound": 1,
+    "originalQuestionNumber": 62
+  },
+  {
+    "id": "MOEX-115020-1301-Q064",
+    "subject": "解剖學",
+    "chapter": "腹部",
+    "section": "肝膽胰脾",
+    "stem": "膽酸（bile acid）的功能敘述，下列何者最為適當？",
+    "options": {
+      "A": "膽酸有親脂性但無親水性，可促進三酸甘油酯通過上皮細胞膜",
+      "B": "膽酸有親水與親脂性，可經由結腸被回收利用稱之為腸肝循環",
+      "C": "膽酸有親水與親脂性，可幫助卵磷脂的結晶",
+      "D": "膽酸有親水與親脂性，可促進脂肪乳糜化及微膠粒作用"
+    },
+    "answer": "D",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "肝十二指腸韌帶與 portal triad",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 115 年第一次醫師一階醫學（一）",
+    "sourceYear": 2026,
+    "sourceRound": 1,
+    "originalQuestionNumber": 64
+  },
+  {
+    "id": "MOEX-115020-1301-Q077",
+    "subject": "解剖學",
+    "chapter": "腹部",
+    "section": "肝膽胰脾",
+    "stem": "有關 vitamin D 代謝和功能，下列敘述何者最適切？ 3",
+    "options": {
+      "A": "1α,25-二羥基維生素 D （1α,25-dihydroxyvitamin D ）可經由陽光紫外線在皮膚中形成膽鈣化醇 3 3 （cholecalciferol）",
+      "B": "1α,25-二羥基維生素 D （1α,25-dihydroxyvitamin D ）與特定核受體蛋白相互作用來調節基因表現 3 3",
+      "C": "7-脫氫膽固醇（7-dehydrocholesterol）調節腸道鈣吸收",
+      "D": "calcitriol 在肝和腎臟中形成 vitamin D 3"
+    },
+    "answer": "B",
+    "explanation": "考古題匯入，解析待補。",
+    "testedConcept": "肝十二指腸韌帶與 portal triad",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 115 年第一次醫師一階醫學（一）",
+    "sourceYear": 2026,
+    "sourceRound": 1,
+    "originalQuestionNumber": 77
   }
 ];
 
 export const anatomyOutline = [
-  {
+{
     chapter: "神經解剖",
     sections: ["腦神經", "腦幹核區", "視覺路徑", "聽覺與前庭路徑", "丘腦與基底核", "小腦", "脊髓傳導路徑", "自律神經"]
   },
