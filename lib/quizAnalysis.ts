@@ -1,0 +1,640 @@
+import { anatomyOutline } from "@/data/anatomyQuestions";
+import {
+  Attempt,
+  ChapterCompletionStats,
+  CompletionStatsBundle,
+  CompletionStatus,
+  OverallCompletionStats,
+  Question,
+  QuestionHistoryStats,
+  QuizMode,
+  QuizSettings,
+  ReviewQuestionItem,
+  SectionCompletionStats,
+  SectionStats,
+  SummaryStats
+} from "@/types/quiz";
+
+type SectionAggregate = {
+  chapter: string;
+  section: string;
+  attempts: Attempt[];
+  uniqueQuestionIds: Set<string>;
+  correctCount: number;
+  confidenceTotal: number;
+  lastAttemptedAt?: string;
+};
+
+const round = (value: number) => Math.round(value * 10) / 10;
+
+const getConfidenceLabel = (confidence: number) => {
+  switch (confidence) {
+    case 1:
+      return "完全用猜的";
+    case 2:
+      return "有印象但不會推";
+    case 3:
+      return "兩個選項猶豫";
+    case 4:
+      return "正常有把握";
+    case 5:
+      return "我很確定";
+    default:
+      return "未設定";
+  }
+};
+
+const getStatus = (completionRate: number, masteryScore: number): CompletionStatus => {
+  if (completionRate === 0) return "未開始";
+  if (completionRate < 80) return "進行中";
+  if (masteryScore < 70) return "已完成但不穩";
+  return "已完成且穩定";
+};
+
+export function calculateSummary(attempts: Attempt[], questions: Question[]): SummaryStats {
+  const total = attempts.length;
+  const correct = attempts.filter((attempt) => attempt.isCorrect).length;
+  const wrong = total - correct;
+  const averageConfidence =
+    total === 0 ? 0 : round(attempts.reduce((sum, attempt) => sum + attempt.confidence, 0) / total);
+  const overconfidenceCount = attempts.filter(
+    (attempt) => !attempt.isCorrect && attempt.confidence >= 4
+  ).length;
+  const guessRiskCount = attempts.filter(
+    (attempt) => attempt.isCorrect && attempt.confidence <= 2
+  ).length;
+  const priorityWeaknessCount = attempts.filter(
+    (attempt) => !attempt.isCorrect && attempt.confidence <= 2
+  ).length;
+
+  return {
+    total: questions.length > 0 ? total : 0,
+    correct,
+    wrong,
+    correctRate: total === 0 ? 0 : round((correct / total) * 100),
+    averageConfidence,
+    overconfidenceCount,
+    guessRiskCount,
+    priorityWeaknessCount
+  };
+}
+
+export function calculateSectionStats(attempts: Attempt[], questions: Question[]): SectionStats[] {
+  const questionMap = new Map(questions.map((question) => [question.id, question]));
+  const sections = new Map<string, SectionStats>();
+
+  attempts.forEach((attempt) => {
+    const question = questionMap.get(attempt.questionId);
+    if (!question) return;
+    const key = `${question.chapter}__${question.section}`;
+    const current =
+      sections.get(key) ??
+      ({
+        chapter: question.chapter,
+        section: question.section,
+        total: 0,
+        correct: 0,
+        wrong: 0,
+        averageConfidence: 0,
+        lowConfidence: 0,
+        overconfidence: 0,
+        guessRisk: 0,
+        priorityScore: 0
+      } satisfies SectionStats);
+
+    current.total += 1;
+    current.correct += attempt.isCorrect ? 1 : 0;
+    current.wrong += attempt.isCorrect ? 0 : 1;
+    current.averageConfidence += attempt.confidence;
+    current.lowConfidence += attempt.confidence <= 2 ? 1 : 0;
+    current.overconfidence += !attempt.isCorrect && attempt.confidence >= 4 ? 1 : 0;
+    current.guessRisk += attempt.isCorrect && attempt.confidence <= 2 ? 1 : 0;
+    current.priorityScore =
+      current.wrong * 3 +
+      current.lowConfidence * 2 +
+      current.overconfidence * 4 +
+      current.guessRisk * 2;
+
+    sections.set(key, current);
+  });
+
+  return Array.from(sections.values())
+    .map((stat) => ({
+      ...stat,
+      averageConfidence: stat.total === 0 ? 0 : round(stat.averageConfidence / stat.total)
+    }))
+    .sort((a, b) => b.priorityScore - a.priorityScore || a.chapter.localeCompare(b.chapter));
+}
+
+export function getTopWeakSections(sectionStats: SectionStats[], limit = 3) {
+  return [...sectionStats]
+    .sort((a, b) => b.priorityScore - a.priorityScore || b.wrong - a.wrong)
+    .slice(0, limit);
+}
+
+function buildSectionAggregates(questions: Question[], allAttempts: Attempt[]) {
+  const questionMap = new Map(questions.map((question) => [question.id, question]));
+  const sectionMap = new Map<string, SectionAggregate>();
+
+  anatomyOutline.forEach(({ chapter, sections }) => {
+    sections.forEach((section) => {
+      sectionMap.set(`${chapter}__${section}`, {
+        chapter,
+        section,
+        attempts: [],
+        uniqueQuestionIds: new Set<string>(),
+        correctCount: 0,
+        confidenceTotal: 0
+      });
+    });
+  });
+
+  allAttempts.forEach((attempt) => {
+    const question = questionMap.get(attempt.questionId);
+    if (!question) return;
+    const key = `${question.chapter}__${question.section}`;
+    const aggregate = sectionMap.get(key);
+    if (!aggregate) return;
+    aggregate.attempts.push(attempt);
+    aggregate.uniqueQuestionIds.add(attempt.questionId);
+    aggregate.correctCount += attempt.isCorrect ? 1 : 0;
+    aggregate.confidenceTotal += attempt.confidence;
+    if (!aggregate.lastAttemptedAt || attempt.answeredAt > aggregate.lastAttemptedAt) {
+      aggregate.lastAttemptedAt = attempt.answeredAt;
+    }
+  });
+
+  return sectionMap;
+}
+
+function toSectionCompletionStats(
+  questions: Question[],
+  sectionMap: Map<string, SectionAggregate>
+): SectionCompletionStats[] {
+  const bankCount = new Map<string, number>();
+
+  anatomyOutline.forEach(({ chapter, sections }) => {
+    sections.forEach((section) => {
+      bankCount.set(`${chapter}__${section}`, 0);
+    });
+  });
+
+  questions.forEach((question) => {
+    const key = `${question.chapter}__${question.section}`;
+    bankCount.set(key, (bankCount.get(key) ?? 0) + 1);
+  });
+
+  return Array.from(sectionMap.values()).map((aggregate) => {
+    const key = `${aggregate.chapter}__${aggregate.section}`;
+    const totalQuestionsInBank = bankCount.get(key) ?? 0;
+    const attemptedQuestions = aggregate.uniqueQuestionIds.size;
+    const completionRate =
+      totalQuestionsInBank === 0 ? 0 : round((attemptedQuestions / totalQuestionsInBank) * 100);
+    const correctRate =
+      aggregate.attempts.length === 0
+        ? 0
+        : round((aggregate.correctCount / aggregate.attempts.length) * 100);
+    const averageConfidence =
+      aggregate.attempts.length === 0
+        ? 0
+        : round(aggregate.confidenceTotal / aggregate.attempts.length);
+    const normalizedConfidence = (averageConfidence / 5) * 100;
+    const masteryScore = round(
+      completionRate * 0.4 + correctRate * 0.4 + normalizedConfidence * 0.2
+    );
+
+    return {
+      chapter: aggregate.chapter,
+      section: aggregate.section,
+      totalQuestionsInBank,
+      attemptedQuestions,
+      completionRate,
+      correctRate,
+      averageConfidence,
+      masteryScore,
+      status: getStatus(completionRate, masteryScore),
+      lastAttemptedAt: aggregate.lastAttemptedAt
+    };
+  });
+}
+
+function calculateChapterStats(sections: SectionCompletionStats[]): ChapterCompletionStats[] {
+  return anatomyOutline.map(({ chapter }) => {
+    const chapterSections = sections.filter((section) => section.chapter === chapter);
+    const totalQuestionsInBank = chapterSections.reduce(
+      (sum, section) => sum + section.totalQuestionsInBank,
+      0
+    );
+    const attemptedQuestions = chapterSections.reduce(
+      (sum, section) => sum + section.attemptedQuestions,
+      0
+    );
+    const completionRate =
+      totalQuestionsInBank === 0 ? 0 : round((attemptedQuestions / totalQuestionsInBank) * 100);
+    const correctRate =
+      chapterSections.length === 0
+        ? 0
+        : round(
+            chapterSections.reduce((sum, section) => sum + section.correctRate, 0) /
+              chapterSections.length
+          );
+    const averageConfidence =
+      chapterSections.length === 0
+        ? 0
+        : round(
+            chapterSections.reduce((sum, section) => sum + section.averageConfidence, 0) /
+              chapterSections.length
+          );
+    const normalizedConfidence = (averageConfidence / 5) * 100;
+    const masteryScore = round(
+      completionRate * 0.4 + correctRate * 0.4 + normalizedConfidence * 0.2
+    );
+
+    return {
+      chapter,
+      totalQuestionsInBank,
+      attemptedQuestions,
+      completionRate,
+      correctRate,
+      averageConfidence,
+      masteryScore,
+      status: getStatus(completionRate, masteryScore),
+      sections: chapterSections,
+    };
+  });
+}
+
+export function calculateOverallCompletion(
+  questions: Question[],
+  allSessions: { attempts: Attempt[] }[]
+): OverallCompletionStats {
+  const allAttempts = allSessions.flatMap((session) => session.attempts);
+  const uniqueAttempted = new Set(allAttempts.map((attempt) => attempt.questionId)).size;
+  const correctRate =
+    allAttempts.length === 0
+      ? 0
+      : round((allAttempts.filter((attempt) => attempt.isCorrect).length / allAttempts.length) * 100);
+  const averageConfidence =
+    allAttempts.length === 0
+      ? 0
+      : round(allAttempts.reduce((sum, attempt) => sum + attempt.confidence, 0) / allAttempts.length);
+  const completionRate =
+    questions.length === 0 ? 0 : round((uniqueAttempted / questions.length) * 100);
+  const normalizedConfidence = (averageConfidence / 5) * 100;
+  const masteryScore = round(completionRate * 0.4 + correctRate * 0.4 + normalizedConfidence * 0.2);
+
+  return {
+    totalQuestionsInBank: questions.length,
+    attemptedQuestions: uniqueAttempted,
+    completionRate,
+    correctRate,
+    averageConfidence,
+    masteryScore
+  };
+}
+
+export function calculateCompletionStats(
+  questions: Question[],
+  allSessions: { attempts: Attempt[] }[]
+): CompletionStatsBundle {
+  const allAttempts = allSessions.flatMap((session) => session.attempts);
+  const sectionMap = buildSectionAggregates(questions, allAttempts);
+  const sections = toSectionCompletionStats(questions, sectionMap).sort(
+    (a, b) => a.chapter.localeCompare(b.chapter) || a.section.localeCompare(b.section)
+  );
+  const chapters = calculateChapterStats(sections);
+  const overall = calculateOverallCompletion(questions, allSessions);
+
+  return { overall, chapters, sections };
+}
+
+export function getLowCompletionSections(sectionStats: SectionCompletionStats[], limit = 5) {
+  return [...sectionStats]
+    .sort((a, b) => a.completionRate - b.completionRate || a.masteryScore - b.masteryScore)
+    .slice(0, limit);
+}
+
+export function getUnstableCompletedSections(sectionStats: SectionCompletionStats[], limit = 5) {
+  return sectionStats
+    .filter((section) => section.completionRate >= 80 && section.masteryScore < 70)
+    .sort((a, b) => a.masteryScore - b.masteryScore)
+    .slice(0, limit);
+}
+
+export function getTopMasteredSections(sectionStats: SectionCompletionStats[], limit = 5) {
+  return [...sectionStats]
+    .filter((section) => section.attemptedQuestions > 0)
+    .sort((a, b) => b.masteryScore - a.masteryScore)
+    .slice(0, limit);
+}
+
+export function getNextRecommendedSections(
+  sectionStats: SectionCompletionStats[],
+  limit = 5
+) {
+  return [...sectionStats]
+    .filter((section) => section.totalQuestionsInBank > 0)
+    .map((section) => ({
+      ...section,
+      recommendationScore:
+        (100 - section.completionRate) * 0.45 +
+        (100 - section.masteryScore) * 0.45 +
+        (section.averageConfidence > 0 ? 5 - section.averageConfidence : 3) * 6
+    }))
+    .sort((a, b) => b.recommendationScore - a.recommendationScore)
+    .slice(0, limit);
+}
+
+export function generateAIPrompt(
+  attempts: Attempt[],
+  questions: Question[],
+  allSessions: { attempts: Attempt[] }[]
+) {
+  const questionMap = new Map(questions.map((question) => [question.id, question]));
+  const summary = calculateSummary(attempts, questions);
+  const sectionStats = calculateSectionStats(attempts, questions);
+  const topWeakSections = getTopWeakSections(sectionStats, 3);
+  const completionStats = calculateCompletionStats(questions, allSessions);
+  const lowCompletionSections = getLowCompletionSections(completionStats.sections, 5);
+  const unstableSections = getUnstableCompletedSections(completionStats.sections, 5);
+
+  const attemptLines = attempts.map((attempt, index) => {
+    const question = questionMap.get(attempt.questionId);
+    if (!question) return "";
+    return [
+      `${index + 1}. 題號：${question.id}`,
+      `來源：${question.sourceType ?? (question.source === "past-exam-inspired" ? "PAST_EXAM_STYLE" : question.source === "ai-generated" ? "AI_GENERATED" : "LOCAL_BANK")}`,
+      `來源註記：${question.sourceCitation ?? "未提供"}`,
+      `chapter：${question.chapter}`,
+      `section：${question.section}`,
+      `testedConcept：${question.testedConcept}`,
+      `我的答案：${attempt.selectedAnswer}`,
+      `正確答案：${attempt.correctAnswer}`,
+      `是否答對：${attempt.isCorrect ? "答對" : "答錯"}`,
+      `confidence：${attempt.confidence}`,
+      `信心文字：${getConfidenceLabel(attempt.confidence)}`,
+      `errorType：${attempt.errorType ?? "未填"}`,
+      `explanation 摘要：${question.explanation}`
+    ].join("｜");
+  });
+
+  const chapterLines = completionStats.chapters.map((chapter) => {
+    return `${chapter.chapter}：completionRate ${chapter.completionRate}%｜masteryScore ${chapter.masteryScore}｜status ${chapter.status}`;
+  });
+
+  const sectionLines = completionStats.sections.map((section) => {
+    return `${section.chapter} / ${section.section}：completionRate ${section.completionRate}%｜correctRate ${section.correctRate}%｜averageConfidence ${section.averageConfidence}｜masteryScore ${section.masteryScore}｜status ${section.status}`;
+  });
+
+  const weakLines = topWeakSections.map((section) => {
+    return `${section.chapter} / ${section.section}：priorityScore ${section.priorityScore}｜wrong ${section.wrong}｜averageConfidence ${section.averageConfidence}`;
+  });
+
+  const lowCompletionLines = lowCompletionSections.map((section) => {
+    return `${section.chapter} / ${section.section}：completionRate ${section.completionRate}%｜masteryScore ${section.masteryScore}`;
+  });
+
+  const unstableLines = unstableSections.map((section) => {
+    return `${section.chapter} / ${section.section}：completionRate ${section.completionRate}%｜masteryScore ${section.masteryScore}`;
+  });
+
+  return `以下是我的解剖學醫師國考測驗紀錄。請根據我的答題結果、信心程度、錯因、章節、小節、完成度與掌握度，幫我分析：
+
+1. 我最弱的前三個小節
+2. 哪些是錯誤自信：答錯但信心 >= 4
+3. 哪些是猜對風險：答對但信心 <= 2
+4. 哪些是優先補弱：答錯且信心 <= 2
+5. 哪些小節還沒刷夠，應該補進度？
+6. 哪些小節雖然完成度高，但 masteryScore 低，代表需要回頭複習？
+7. 請幫我安排下一輪 10 題應該優先抽哪些 section。
+8. 請針對最弱的 1-2 個小節，用以下格式幫我複習：
+   - 30 秒核心觀念
+   - 國考高頻考點
+   - 常見陷阱
+   - 容易混淆比較表
+   - 3 題立即小測驗
+9. 請用台灣醫學生準備醫師國考一階的語氣與深度回答，必要時可以用幽默記憶法。
+
+以下是本輪整體統計：
+總題數：${summary.total}
+答對題數：${summary.correct}
+答對率：${summary.correctRate}%
+平均信心：${summary.averageConfidence}
+錯誤自信數：${summary.overconfidenceCount}
+猜對風險數：${summary.guessRiskCount}
+優先補弱數：${summary.priorityWeaknessCount}
+
+以下是本輪作答紀錄：
+${attemptLines.join("\n")}
+
+以下是目前完成度統計：
+整體 anatomy completionRate：${completionStats.overall.completionRate}%
+整體 masteryScore：${completionStats.overall.masteryScore}
+
+各 chapter completion：
+${chapterLines.join("\n")}
+
+各 section completion：
+${sectionLines.join("\n")}
+
+以下是最需要補弱的小節：
+${weakLines.join("\n") || "目前沒有資料"}
+
+以下是完成度最低的小節：
+${lowCompletionLines.join("\n") || "目前沒有資料"}
+
+以下是已完成但不穩的小節：
+${unstableLines.join("\n") || "目前沒有資料"}`;
+}
+
+export const DEFAULT_QUIZ_SETTINGS: QuizSettings = {
+  mode: "weakness",
+  questionCount: 10
+};
+
+export function getModeLabel(mode: QuizMode) {
+  switch (mode) {
+    case "random":
+      return "隨機刷題";
+    case "weakness":
+      return "弱點補強";
+    case "review":
+      return "錯題複習";
+    case "ai_fresh":
+      return "AI 新題";
+    default:
+      return "測驗";
+  }
+}
+
+export function buildQuestionHistoryMap(allSessions: { attempts: Attempt[] }[]) {
+  const map = new Map<string, QuestionHistoryStats>();
+
+  allSessions.forEach((session) => {
+    session.attempts.forEach((attempt) => {
+      const current =
+        map.get(attempt.questionId) ??
+        ({
+          questionId: attempt.questionId,
+          attempts: 0,
+          wrong: 0,
+          correct: 0,
+          lowConfidence: 0,
+          overconfidence: 0
+        } satisfies QuestionHistoryStats);
+
+      current.attempts += 1;
+      current.correct += attempt.isCorrect ? 1 : 0;
+      current.wrong += attempt.isCorrect ? 0 : 1;
+      current.lowConfidence += attempt.confidence <= 2 ? 1 : 0;
+      current.overconfidence += !attempt.isCorrect && attempt.confidence >= 4 ? 1 : 0;
+      current.latestErrorType = attempt.errorType ?? current.latestErrorType;
+
+      if (!current.lastAttemptedAt || attempt.answeredAt > current.lastAttemptedAt) {
+        current.lastAttemptedAt = attempt.answeredAt;
+      }
+
+      map.set(attempt.questionId, current);
+    });
+  });
+
+  return map;
+}
+
+function normalizeQuestionCount(questionCount: number, max: number) {
+  return Math.max(1, Math.min(questionCount, max));
+}
+
+function shuffle<T>(items: T[]) {
+  return [...items].sort(() => Math.random() - 0.5);
+}
+
+function pickShuffledTop<T extends { score: number }>(
+  items: T[],
+  count: number,
+  candidateMultiplier = 3
+) {
+  const candidateCount = Math.min(items.length, Math.max(count, count * candidateMultiplier));
+  return shuffle(items.slice(0, candidateCount)).slice(0, count);
+}
+
+function buildQuestionScoreMap(
+  questions: Question[],
+  allSessions: { attempts: Attempt[] }[],
+  settings: QuizSettings
+) {
+  const completion = calculateCompletionStats(questions, allSessions);
+  const completionMap = new Map(
+    completion.sections.map((section) => [`${section.chapter}__${section.section}`, section] as const)
+  );
+  const historyMap = buildQuestionHistoryMap(allSessions);
+
+  return questions.map((question) => {
+    const sectionStats = completionMap.get(`${question.chapter}__${question.section}`);
+    const history = historyMap.get(question.id);
+    const completionPenalty = 100 - (sectionStats?.completionRate ?? 0);
+    const masteryPenalty = 100 - (sectionStats?.masteryScore ?? 0);
+    const wrongWeight = (history?.wrong ?? 0) * 28;
+    const lowConfidenceWeight = (history?.lowConfidence ?? 0) * 14;
+    const overconfidenceWeight = (history?.overconfidence ?? 0) * 20;
+    const unseenBonus = history ? 0 : 26;
+    const seenPenalty = history ? 60 : 0;
+    const chapterMatchBonus = settings.chapter && settings.chapter === question.chapter ? 18 : 0;
+    const sectionMatchBonus = settings.section && settings.section === question.section ? 28 : 0;
+    const reviewBonus = settings.mode === "review" && history && history.wrong > 0 ? 48 : 0;
+
+    return {
+      question,
+      history,
+      score:
+        completionPenalty * 0.35 +
+        masteryPenalty * 0.35 +
+        wrongWeight +
+        lowConfidenceWeight +
+        overconfidenceWeight +
+        unseenBonus +
+        chapterMatchBonus +
+        sectionMatchBonus +
+        reviewBonus -
+        seenPenalty
+    };
+  });
+}
+
+function filterQuestionPool(questions: Question[], settings: QuizSettings) {
+  return questions.filter((question) => {
+    if (settings.chapter && question.chapter !== settings.chapter) return false;
+    if (settings.section && question.section !== settings.section) return false;
+    return true;
+  });
+}
+
+export function createQuestionOrder(
+  questions: Question[],
+  allSessions: { attempts: Attempt[] }[],
+  settings: QuizSettings
+) {
+  const filtered = filterQuestionPool(questions, settings);
+  const sourcePool = filtered.length > 0 ? filtered : questions;
+  if (sourcePool.length === 0) return [];
+
+  const count = normalizeQuestionCount(settings.questionCount, sourcePool.length);
+  const scored = buildQuestionScoreMap(sourcePool, allSessions, settings);
+
+  if (settings.mode === "random") {
+    return shuffle(sourcePool)
+      .slice(0, count)
+      .map((question) => question.id);
+  }
+
+  if (settings.mode === "review") {
+    const reviewFirst = scored
+      .filter((item) => (item.history?.wrong ?? 0) > 0 || (item.history?.lowConfidence ?? 0) > 0)
+      .sort((a, b) => b.score - a.score);
+
+    const fallback = scored
+      .filter((item) => !reviewFirst.some((reviewItem) => reviewItem.question.id === item.question.id))
+      .sort((a, b) => b.score - a.score);
+
+    return [...pickShuffledTop(reviewFirst, count, 2), ...pickShuffledTop(fallback, count, 2)]
+      .slice(0, count)
+      .map((item) => item.question.id);
+  }
+
+  return pickShuffledTop(
+    scored.sort((a, b) => b.score - a.score),
+    count,
+    3
+  ).map((item) => item.question.id);
+}
+
+export function getReviewQuestionItems(
+  questions: Question[],
+  allSessions: { attempts: Attempt[] }[],
+  limit = 20
+): ReviewQuestionItem[] {
+  const historyMap = buildQuestionHistoryMap(allSessions);
+
+  return questions
+    .map((question) => {
+      const history = historyMap.get(question.id);
+      if (!history || (history.wrong === 0 && history.lowConfidence === 0)) return null;
+      const riskScore =
+        history.wrong * 4 + history.lowConfidence * 2 + history.overconfidence * 3 - history.correct;
+      return { question, history, riskScore };
+    })
+    .filter((item): item is ReviewQuestionItem => Boolean(item))
+    .sort((a, b) => b.riskScore - a.riskScore || b.history.wrong - a.history.wrong)
+    .slice(0, limit);
+}
+
+export function getReviewSnapshot(reviewItems: ReviewQuestionItem[]) {
+  return {
+    total: reviewItems.length,
+    overconfidence: reviewItems.filter((item) => item.history.overconfidence > 0).length,
+    lowConfidence: reviewItems.filter((item) => item.history.lowConfidence > 0).length,
+    wrongHeavy: reviewItems.filter((item) => item.history.wrong >= 2).length
+  };
+}
+
+export { getConfidenceLabel };
