@@ -7,6 +7,7 @@ import { ConfidenceSelector } from "@/components/ConfidenceSelector";
 import { ErrorTypeSelector } from "@/components/ErrorTypeSelector";
 import { QuestionCard } from "@/components/QuestionCard";
 import { anatomyQuestions } from "@/data/anatomyQuestions";
+import { pushCompletedSessionToSupabase } from "@/lib/cloudSync";
 import {
   createQuestionOrder,
   DEFAULT_QUIZ_SETTINGS,
@@ -325,6 +326,7 @@ export default function QuizPage() {
       };
       persistSession(completedSession);
       saveCompletedSession(completedSession);
+      void pushCompletedSessionToSupabase(completedSession);
       router.push("/results");
       return;
     }

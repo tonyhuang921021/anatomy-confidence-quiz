@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { AIAnalysisPanel } from "@/components/AIAnalysisPanel";
 import { AIPromptBox } from "@/components/AIPromptBox";
+import { useAuth } from "@/components/AuthProvider";
 import { ResultSummary } from "@/components/ResultSummary";
 import { WeaknessRanking } from "@/components/WeaknessRanking";
 import { anatomyQuestions } from "@/data/anatomyQuestions";
@@ -42,6 +43,7 @@ type ResultState = {
 
 export default function ResultsPage() {
   const router = useRouter();
+  const { syncVersion } = useAuth();
   const [mounted, setMounted] = useState(false);
   const [showPrompt, setShowPrompt] = useState(false);
   const [aiAnalysis, setAiAnalysis] = useState("");
@@ -95,12 +97,12 @@ export default function ResultsPage() {
       newCompletedSections
     });
     setMounted(true);
-  }, []);
+  }, [syncVersion]);
 
   function handleRestart() {
     clearCurrentSession();
     saveQuizSettings(DEFAULT_QUIZ_SETTINGS);
-    router.push("/quiz");
+    router.push("/quiz?new=1");
   }
 
   async function handleGenerateAIAnalysis() {
@@ -295,7 +297,7 @@ export default function ResultsPage() {
             </div>
             <div className="mt-5 grid gap-3">
               <Link
-                href="/quiz"
+                href="/quiz?new=1"
                 onClick={() => saveQuizSettings(DEFAULT_QUIZ_SETTINGS)}
                 className="min-h-12 rounded-2xl bg-brand-600 px-4 py-4 text-center text-sm font-semibold text-white transition hover:bg-brand-700"
               >

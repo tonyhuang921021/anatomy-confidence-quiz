@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import { useAuth } from "@/components/AuthProvider";
 import { ProgressMap } from "@/components/ProgressMap";
 import { anatomyQuestions } from "@/data/anatomyQuestions";
 import {
@@ -28,11 +29,12 @@ const emptyStats: CompletionStatsBundle = {
 
 export default function ProgressPage() {
   const [stats, setStats] = useState<CompletionStatsBundle>(emptyStats);
+  const { syncVersion } = useAuth();
 
   useEffect(() => {
     const sessions = loadCompletedSessions();
     setStats(calculateCompletionStats(anatomyQuestions, sessions));
-  }, []);
+  }, [syncVersion]);
 
   const lowCompletion = getLowCompletionSections(stats.sections, 5);
   const unstable = getUnstableCompletedSections(stats.sections, 5);
@@ -57,7 +59,7 @@ export default function ProgressPage() {
               返回首頁
             </Link>
             <Link
-              href="/quiz"
+              href="/quiz?new=1"
               className="min-h-12 rounded-2xl bg-brand-600 px-5 py-4 text-sm font-semibold text-white transition hover:bg-brand-700"
             >
               開始測驗

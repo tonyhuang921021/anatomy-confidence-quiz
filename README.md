@@ -142,6 +142,40 @@ OPENAI_MODEL=gpt-5.2
 
 未設定金鑰時，結果頁仍可正常使用，只是不會真的呼叫 OpenAI，而是回傳可複製的 prompt。
 
+## 正式版多使用者
+
+這版已加上 `Supabase Auth + 雲端 completed sessions 同步` 的骨架。
+
+### 需要的環境變數
+
+```bash
+NEXT_PUBLIC_SUPABASE_URL=你的 Supabase Project URL
+NEXT_PUBLIC_SUPABASE_ANON_KEY=你的 Supabase anon key
+```
+
+### 需要的資料表
+
+請到 Supabase SQL Editor 執行：
+
+```sql
+-- 直接貼上 supabase/schema.sql 內容
+```
+
+### 目前正式版已支援
+
+1. 使用 Email / Password 註冊與登入
+2. 以使用者分開保存 `current session` 與 `completed sessions`
+3. completed sessions 同步到 Supabase
+4. 同一帳號在手機與電腦可拉回歷史 completed sessions
+5. 首頁可看到目前登入者與同步狀態
+
+### 目前正式版還沒做滿的部分
+
+1. `current session` 仍以本機為主，尚未做即時跨裝置接續
+2. 還沒接 Google / Apple / magic link
+3. 還沒把所有統計改成完全 server-driven
+4. 目前以 `quiz_sessions.session_payload` JSON 同步，後續可再拆成 attempts table
+
 ## 題庫與來源說明
 
 - 本專案目前主題庫為本地 300 題題庫

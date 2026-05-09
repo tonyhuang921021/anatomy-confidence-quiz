@@ -24,7 +24,7 @@ export function ReviewNotebook({ items }: ReviewNotebookProps) {
           <p className="mt-2 text-sm text-slate-500">優先整理曾答錯、低信心或高風險的題目。</p>
         </div>
         <Link
-          href="/quiz"
+          href="/quiz?new=1"
           className="min-h-12 rounded-2xl bg-brand-600 px-4 py-3 text-sm font-semibold text-white transition hover:bg-brand-700"
         >
           開始錯題複習

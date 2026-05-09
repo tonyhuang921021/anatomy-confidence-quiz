@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import { useAuth } from "@/components/AuthProvider";
 import { ReviewNotebook } from "@/components/ReviewNotebook";
 import { anatomyQuestions } from "@/data/anatomyQuestions";
 import {
@@ -14,11 +15,12 @@ import { ReviewQuestionItem } from "@/types/quiz";
 
 export default function ReviewPage() {
   const [items, setItems] = useState<ReviewQuestionItem[]>([]);
+  const { syncVersion } = useAuth();
 
   useEffect(() => {
     const sessions = loadCompletedSessions();
     setItems(getReviewQuestionItems(anatomyQuestions, sessions, 24));
-  }, []);
+  }, [syncVersion]);
 
   function handleStartReview() {
     saveQuizSettings({ ...DEFAULT_QUIZ_SETTINGS, mode: "review", questionCount: 10 });
@@ -45,7 +47,7 @@ export default function ReviewPage() {
               返回首頁
             </Link>
             <Link
-              href="/quiz"
+              href="/quiz?new=1"
               onClick={handleStartReview}
               className="min-h-12 rounded-2xl bg-brand-600 px-5 py-4 text-sm font-semibold text-white transition hover:bg-brand-700"
             >

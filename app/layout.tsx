@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
 import type { ReactNode } from "react";
+import { AuthProvider } from "@/components/AuthProvider";
+import { UserStatusBar } from "@/components/UserStatusBar";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -10,7 +12,12 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html lang="zh-Hant">
-      <body>{children}</body>
+      <body>
+        <AuthProvider>
+          <UserStatusBar />
+          {children}
+        </AuthProvider>
+      </body>
     </html>
   );
 }
