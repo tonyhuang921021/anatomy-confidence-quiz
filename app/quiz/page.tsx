@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { ConfidenceSelector } from "@/components/ConfidenceSelector";
 import { ErrorTypeSelector } from "@/components/ErrorTypeSelector";
 import { QuestionCard } from "@/components/QuestionCard";
@@ -97,7 +97,6 @@ function getQuestionByOrder(session: QuizSession) {
 
 export default function QuizPage() {
   const router = useRouter();
-  const searchParams = useSearchParams();
   const [mounted, setMounted] = useState(false);
   const [session, setSession] = useState<QuizSession | null>(null);
   const [selectedAnswer, setSelectedAnswer] = useState<OptionKey | undefined>();
@@ -116,7 +115,9 @@ export default function QuizPage() {
     const existing = loadCurrentSession();
     const savedSettings = loadQuizSettings() ?? DEFAULT_QUIZ_SETTINGS;
     const completedSessions = loadCompletedSessions();
-    const shouldForceNewSession = searchParams.get("new") === "1";
+    const shouldForceNewSession =
+      typeof window !== "undefined" &&
+      new URLSearchParams(window.location.search).get("new") === "1";
     const shouldReuseExisting =
       !shouldForceNewSession &&
       existing &&
@@ -145,7 +146,7 @@ export default function QuizPage() {
     }
 
     setMounted(true);
-  }, [searchParams]);
+  }, []);
 
   useEffect(() => {
     async function loadHealth() {
