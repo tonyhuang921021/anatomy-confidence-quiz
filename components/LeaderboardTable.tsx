@@ -15,9 +15,10 @@ function formatUpdatedAt(value?: string) {
 type LeaderboardTableProps = {
   entries: LeaderboardEntry[];
   currentUserId?: string;
+  sortMode: "attempts" | "accuracy";
 };
 
-export function LeaderboardTable({ entries, currentUserId }: LeaderboardTableProps) {
+export function LeaderboardTable({ entries, currentUserId, sortMode }: LeaderboardTableProps) {
   if (entries.length === 0) {
     return (
       <section className="rounded-[2rem] bg-white p-6 shadow-card ring-1 ring-slate-100">
@@ -33,7 +34,9 @@ export function LeaderboardTable({ entries, currentUserId }: LeaderboardTablePro
         <div>
           <h2 className="text-2xl font-semibold text-ink">刷題榜</h2>
           <p className="mt-2 text-sm text-slate-500">
-            先依總答題量排序，答題量相同時再看正確率。
+            {sortMode === "attempts"
+              ? "先依總答題量排序，答題量相同時再看正確率。"
+              : "先依正確率排序，正確率相同時再看總答題量。"}
           </p>
         </div>
         <div className="rounded-2xl bg-slate-50 px-4 py-3 text-sm text-slate-700">

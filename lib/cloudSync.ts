@@ -199,6 +199,28 @@ export async function syncLeaderboardProfileForCurrentUser(
   }
 }
 
+export async function updateLeaderboardDisplayName(
+  user: Pick<User, "id" | "email" | "user_metadata">,
+  displayName: string
+) {
+  if (!isSupabaseConfigured()) return;
+
+  const supabase = getSupabaseBrowserClient();
+  const trimmed = displayName.trim().slice(0, 24) || getLeaderboardDisplayName(user);
+
+  const { error } = await supabase.from("leaderboard_profiles").upsert(
+    {
+      user_id: user.id,
+      display_name: trimmed
+    },
+    { onConflict: "user_id" }
+  );
+
+  if (error) {
+    throw error;
+  }
+}
+
 export async function loadLeaderboard(limit = 50) {
   if (!isSupabaseConfigured()) {
     return [] as LeaderboardEntry[];

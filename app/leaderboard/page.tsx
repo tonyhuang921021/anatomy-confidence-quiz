@@ -10,6 +10,7 @@ import { LeaderboardEntry } from "@/types/quiz";
 export default function LeaderboardPage() {
   const { configured, user, syncVersion } = useAuth();
   const [entries, setEntries] = useState<LeaderboardEntry[]>([]);
+  const [sortMode, setSortMode] = useState<"attempts" | "accuracy">("attempts");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
@@ -35,6 +36,22 @@ export default function LeaderboardPage() {
 
     void fetchLeaderboard();
   }, [configured, syncVersion]);
+
+  const sortedEntries = [...entries].sort((a, b) => {
+    if (sortMode === "accuracy") {
+      return (
+        b.correctRate - a.correctRate ||
+        b.totalAttempts - a.totalAttempts ||
+        b.correctAttempts - a.correctAttempts
+      );
+    }
+
+    return (
+      b.totalAttempts - a.totalAttempts ||
+      b.correctRate - a.correctRate ||
+      b.correctAttempts - a.correctAttempts
+    );
+  });
 
   return (
     <main className="shell">
@@ -85,7 +102,41 @@ export default function LeaderboardPage() {
             </p>
           </section>
         ) : (
-          <LeaderboardTable entries={entries} currentUserId={user?.id} />
+          <div className="space-y-6">
+            <section className="rounded-[2rem] bg-white p-6 shadow-card ring-1 ring-slate-100">
+              <h2 className="text-xl font-semibold text-ink">排序方式</h2>
+              <div className="mt-4 flex flex-col gap-3 sm:flex-row">
+                <button
+                  type="button"
+                  onClick={() => setSortMode("attempts")}
+                  className={`min-h-12 rounded-2xl px-4 py-3 text-sm font-semibold transition ${
+                    sortMode === "attempts"
+                      ? "bg-brand-600 text-white"
+                      : "bg-slate-100 text-slate-800 hover:bg-slate-200"
+                  }`}
+                >
+                  依總答題量排序
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setSortMode("accuracy")}
+                  className={`min-h-12 rounded-2xl px-4 py-3 text-sm font-semibold transition ${
+                    sortMode === "accuracy"
+                      ? "bg-brand-600 text-white"
+                      : "bg-slate-100 text-slate-800 hover:bg-slate-200"
+                  }`}
+                >
+                  依正確率排序
+                </button>
+              </div>
+            </section>
+
+            <LeaderboardTable
+              entries={sortedEntries}
+              currentUserId={user?.id}
+              sortMode={sortMode}
+            />
+          </div>
         )}
       </div>
     </main>

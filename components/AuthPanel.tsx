@@ -1,16 +1,25 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useAuth } from "@/components/AuthProvider";
+import {
+  syncLeaderboardProfileForCurrentUser,
+  updateLeaderboardDisplayName
+} from "@/lib/cloudSync";
 import { getSupabaseBrowserClient } from "@/lib/supabase/client";
 
 export function AuthPanel() {
   const { configured, loading, user, syncStatus, syncError, refreshCloudData, signOut } = useAuth();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [nickname, setNickname] = useState("");
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
   const [submitting, setSubmitting] = useState(false);
+
+  useEffect(() => {
+    setNickname(typeof user?.user_metadata?.display_name === "string" ? user.user_metadata.display_name : "");
+  }, [user]);
 
   async function handleSignIn() {
     setSubmitting(true);
@@ -42,7 +51,10 @@ export function AuthPanel() {
     try {
       const { error: signUpError } = await getSupabaseBrowserClient().auth.signUp({
         email,
-        password
+        password,
+        options: {
+          data: nickname.trim() ? { display_name: nickname.trim().slice(0, 24) } : undefined
+        }
       });
 
       if (signUpError) {
@@ -51,6 +63,34 @@ export function AuthPanel() {
       }
 
       setMessage("註冊成功。若你的 Supabase 專案開啟 email 驗證，請先到信箱完成確認。");
+    } finally {
+      setSubmitting(false);
+    }
+  }
+
+  async function handleSaveNickname() {
+    if (!user) return;
+    setSubmitting(true);
+    setMessage("");
+    setError("");
+
+    try {
+      const trimmed = nickname.trim().slice(0, 24);
+      const { data, error: updateError } = await getSupabaseBrowserClient().auth.updateUser({
+        data: {
+          display_name: trimmed
+        }
+      });
+
+      if (updateError) {
+        setError(updateError.message);
+        return;
+      }
+
+      await updateLeaderboardDisplayName(data.user ?? user, trimmed);
+      await syncLeaderboardProfileForCurrentUser(data.user ?? user);
+      await refreshCloudData();
+      setMessage("暱稱已更新，排行榜會顯示新的名稱。");
     } finally {
       setSubmitting(false);
     }
@@ -83,6 +123,17 @@ export function AuthPanel() {
         <p className="text-sm font-semibold uppercase tracking-[0.2em] text-brand-700">正式版登入</p>
         <h2 className="mt-2 text-2xl font-semibold text-ink">目前使用者</h2>
         <p className="mt-3 text-base font-semibold text-slate-900">{user.email}</p>
+        <div className="mt-4 grid gap-3">
+          <input
+            type="text"
+            value={nickname}
+            onChange={(event) => setNickname(event.target.value)}
+            placeholder="排行榜暱稱"
+            maxLength={24}
+            className="min-h-12 rounded-2xl border border-slate-200 px-4 py-3 text-sm text-slate-800 outline-none"
+          />
+          <p className="text-xs text-slate-500">排行榜會顯示這個暱稱，最多 24 個字。</p>
+        </div>
         <div className="mt-4 grid gap-3 sm:grid-cols-2">
           <div className="rounded-2xl bg-slate-50 px-4 py-3 text-sm text-slate-700">
             雲端同步狀態 <span className="font-semibold">{syncStatus}</span>
@@ -94,7 +145,21 @@ export function AuthPanel() {
         {syncError ? (
           <div className="mt-4 rounded-2xl bg-amber-50 p-4 text-sm text-amber-900">{syncError}</div>
         ) : null}
+        {message ? (
+          <div className="mt-4 rounded-2xl bg-emerald-50 p-4 text-sm text-emerald-900">{message}</div>
+        ) : null}
+        {error ? (
+          <div className="mt-4 rounded-2xl bg-rose-50 p-4 text-sm text-rose-900">{error}</div>
+        ) : null}
         <div className="mt-5 flex flex-col gap-3 sm:flex-row">
+          <button
+            type="button"
+            onClick={() => void handleSaveNickname()}
+            disabled={submitting}
+            className="min-h-12 rounded-2xl bg-slate-100 px-4 py-3 text-sm font-semibold text-slate-800 transition hover:bg-slate-200 disabled:cursor-not-allowed disabled:bg-slate-100"
+          >
+            儲存暱稱
+          </button>
           <button
             type="button"
             onClick={() => void refreshCloudData()}
@@ -123,6 +188,14 @@ export function AuthPanel() {
       </p>
 
       <div className="mt-5 grid gap-3">
+        <input
+          type="text"
+          value={nickname}
+          onChange={(event) => setNickname(event.target.value)}
+          placeholder="排行榜暱稱"
+          maxLength={24}
+          className="min-h-12 rounded-2xl border border-slate-200 px-4 py-3 text-sm text-slate-800 outline-none"
+        />
         <input
           type="email"
           value={email}
