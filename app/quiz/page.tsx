@@ -514,6 +514,27 @@ export default function QuizPage() {
                     本題信心：<span className="font-semibold">{getConfidenceLabel(submittedAttempt.confidence)}</span>
                   </p>
                 </div>
+
+                {currentQuestion.optionAnalysis ? (
+                  <div className="mt-5 rounded-3xl bg-white/70 p-4 text-sm text-slate-800 ring-1 ring-white/70">
+                    <h3 className="text-sm font-semibold text-ink">各選項解析</h3>
+                    <div className="mt-3 grid gap-3">
+                      {Object.entries(currentQuestion.optionAnalysis).map(([key, value]) => (
+                        <div key={key} className="rounded-2xl bg-white px-4 py-3">
+                          <p className="font-semibold text-slate-900">{key} 選項</p>
+                          <p className="mt-1 leading-7 text-slate-700">{value}</p>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                ) : null}
+
+                {currentQuestion.memoryTip ? (
+                  <div className="mt-5 rounded-3xl bg-amber-50 p-4 text-sm text-amber-950 ring-1 ring-amber-200">
+                    <h3 className="text-sm font-semibold">快速記憶法</h3>
+                    <p className="mt-2 leading-7">{currentQuestion.memoryTip}</p>
+                  </div>
+                ) : null}
               </div>
 
               {!submittedAttempt.isCorrect ? (

@@ -39761,6 +39761,486 @@ export const anatomyQuestions: Question[] = [
     "sourceYear": 2026,
     "sourceRound": 1,
     "originalQuestionNumber": 77
+  },
+  {
+    "id": "MOEX-100140-1101-Q009",
+    "subject": "解剖學",
+    "chapter": "頭頸部",
+    "section": "頸動脈鞘",
+    "stem": "如何辨識位於頸部的頸內動脈與頸外動脈？",
+    "options": {
+      "A": "頸內動脈有分支，頸外動脈無分支",
+      "B": "頸內動脈與頸外動脈皆有分支，但分支數目不同",
+      "C": "頸內動脈無分支，頸外動脈有分支",
+      "D": "由兩者之口徑不同判別"
+    },
+    "answer": "C",
+    "explanation": "在頸部，頸內動脈不發出分支；頸外動脈在頸部發出多個分支供應頭頸部，因此可用有無頸部分支辨認兩者。 這題要抓的重點是：internal carotid artery 在頸部無分支，external carotid artery 有分支。",
+    "testedConcept": "internal carotid artery 在頸部無分支，external carotid artery 有分支。",
+    "optionAnalysis": {
+      "A": "不選。頸內動脈有分支，頸外動脈無分支 與題幹要求的解剖位置、支配或功能不符。",
+      "B": "不選。頸內動脈與頸外動脈皆有分支，但分支數目不同 與題幹要求的解剖位置、支配或功能不符。",
+      "C": "正確。在頸部，頸內動脈不發出分支；頸外動脈在頸部發出多個分支供應頭頸部，因此可用有無頸部分支辨認兩者。",
+      "D": "不選。由兩者之口徑不同判別 與題幹要求的解剖位置、支配或功能不符。"
+    },
+    "memoryTip": "先定位構造，再判斷其功能、走行、支配或鄰近關係。",
+    "clinicalLink": "",
+    "answerConfidence": "medium",
+    "needsHumanReview": true,
+    "reviewFlags": [
+      "needs_manual_tag_review"
+    ],
+    "detailVersion": "v3.0-batch1",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 100 年第二次醫師一階醫學（一）",
+    "sourceYear": 2011,
+    "sourceRound": 2,
+    "originalQuestionNumber": 9,
+    "difficulty": "medium"
+  },
+  {
+    "id": "MOEX-100140-1101-Q019",
+    "subject": "解剖學",
+    "chapter": "胸腔",
+    "section": "橫膈",
+    "stem": "下列何肌在呼吸時有穩固肋骨的作用？",
+    "options": {
+      "A": "腰大肌（psoas major）",
+      "B": "腰小肌（psoas minor）",
+      "C": "腰方肌（quadratus lumborum）",
+      "D": "髂肌（iliacus）"
+    },
+    "answer": "C",
+    "explanation": "腰方肌可固定第12肋，為橫膈收縮提供穩定附著點，因此在呼吸時有穩固肋骨的作用。 這題要抓的重點是：quadratus lumborum fixes rib 12 during respiration。",
+    "testedConcept": "quadratus lumborum fixes rib 12 during respiration。",
+    "optionAnalysis": {
+      "A": "不選。腰大肌（psoas major） 與題幹要求的解剖位置、支配或功能不符。",
+      "B": "不選。腰小肌（psoas minor） 與題幹要求的解剖位置、支配或功能不符。",
+      "C": "正確。腰方肌可固定第12肋，為橫膈收縮提供穩定附著點，因此在呼吸時有穩固肋骨的作用。",
+      "D": "不選。髂肌（iliacus） 與題幹要求的解剖位置、支配或功能不符。"
+    },
+    "memoryTip": "先定位構造，再判斷其功能、走行、支配或鄰近關係。",
+    "clinicalLink": "",
+    "answerConfidence": "medium",
+    "needsHumanReview": true,
+    "reviewFlags": [
+      "needs_manual_tag_review"
+    ],
+    "detailVersion": "v3.0-batch1",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 100 年第二次醫師一階醫學（一）",
+    "sourceYear": 2011,
+    "sourceRound": 2,
+    "originalQuestionNumber": 19,
+    "difficulty": "medium"
+  },
+  {
+    "id": "MOEX-101110-1101-Q021",
+    "subject": "解剖學",
+    "chapter": "下肢",
+    "section": "大腿前內後區",
+    "stem": "內收肌裂孔（adductor hiatus）為位於下列何者的構造？",
+    "options": {
+      "A": "內收長肌（adductor longus）",
+      "B": "內收短肌（adductor brevis）",
+      "C": "內收大肌（adductor magnus）",
+      "D": "恥骨肌（pectineus）"
+    },
+    "answer": "C",
+    "explanation": "內收肌裂孔位於內收大肌腱性附著處，讓股動脈與股靜脈通過進入膕窩並改稱膕動、靜脈。 這題要抓的重點是：adductor hiatus is in adductor magnus。",
+    "testedConcept": "adductor hiatus is in adductor magnus。",
+    "optionAnalysis": {
+      "A": "不選。內收長肌（adductor longus） 與題幹要求的解剖位置、支配或功能不符。",
+      "B": "不選。內收短肌（adductor brevis） 與題幹要求的解剖位置、支配或功能不符。",
+      "C": "正確。內收肌裂孔位於內收大肌腱性附著處，讓股動脈與股靜脈通過進入膕窩並改稱膕動、靜脈。",
+      "D": "不選。恥骨肌（pectineus） 與題幹要求的解剖位置、支配或功能不符。"
+    },
+    "memoryTip": "先定位構造，再判斷其功能、走行、支配或鄰近關係。",
+    "clinicalLink": "",
+    "answerConfidence": "high",
+    "needsHumanReview": false,
+    "detailVersion": "v3.0-batch1",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 101 年第二次醫師一階醫學（一）",
+    "sourceYear": 2012,
+    "sourceRound": 2,
+    "originalQuestionNumber": 21,
+    "difficulty": "medium"
+  },
+  {
+    "id": "MOEX-103030-1101-Q011",
+    "subject": "解剖學",
+    "chapter": "頭頸部",
+    "section": "顏面神經與三叉神經",
+    "stem": "下列何者是負責張口的主要肌肉？",
+    "options": {
+      "A": "翼外肌（lateral pterygoid）",
+      "B": "顳肌（temporalis）",
+      "C": "嚼肌（masseter）",
+      "D": "顴大肌（zygomaticus major）"
+    },
+    "answer": "A",
+    "explanation": "張口主要靠翼外肌將下頜骨髁突與關節盤向前牽引，並由舌骨上肌群協助。顳肌與咬肌主要閉口，顴大肌屬表情肌。",
+    "testedConcept": "lateral pterygoid = protrusion and opening of mandible。",
+    "optionAnalysis": {
+      "A": "正確。張口主要靠翼外肌將下頜骨髁突與關節盤向前牽引，並由舌骨上肌群協助。顳肌與咬肌主要閉口，顴大肌屬表情肌。",
+      "B": "不選。顳肌（temporalis）不是本題最符合的答案；本題核心考點是：lateral pterygoid = protrusion and opening of mandible。",
+      "C": "不選。嚼肌（masseter）不是本題最符合的答案；本題核心考點是：lateral pterygoid = protrusion and opening of mandible。",
+      "D": "不選。顴大肌（zygomaticus major）不是本題最符合的答案；本題核心考點是：lateral pterygoid = protrusion and opening of mandible。"
+    },
+    "memoryTip": "翼外肌把下巴往前拉，嘴巴就打開。",
+    "clinicalLink": "顳顎關節障礙常與翼外肌和關節盤位置相關。",
+    "answerConfidence": "high",
+    "needsHumanReview": false,
+    "reviewFlags": [
+      "needs_manual_tag_review"
+    ],
+    "detailVersion": "v3.0-batch2",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 103 年第一次醫師一階醫學（一）",
+    "sourceYear": 2014,
+    "sourceRound": 1,
+    "originalQuestionNumber": 11,
+    "difficulty": "medium"
+  },
+  {
+    "id": "MOEX-103030-1101-Q032",
+    "subject": "解剖學",
+    "chapter": "神經解剖",
+    "section": "聽覺與前庭路徑",
+    "stem": "下列何者不是衍生自耳板（otic placode）？",
+    "options": {
+      "A": "耳蝸管（cochlear duct）",
+      "B": "螺旋神經節（spiral ganglion）",
+      "C": "半規管（semicircular duct）",
+      "D": "耳囊（otic capsule）"
+    },
+    "answer": "D",
+    "explanation": "耳板(otic placode)形成耳泡，衍生內耳膜迷路如耳蝸管、半規管，並與聽覺相關神經節形成有關；耳囊(otic capsule)是圍繞內耳的間質軟骨/骨性結構，不是耳板本身衍生。",
+    "testedConcept": "otic placode → membranous labyrinth；otic capsule → mesenchymal/cartilaginous capsule。",
+    "optionAnalysis": {
+      "A": "不選。耳蝸管（cochlear duct）不是本題最符合的答案；本題核心考點是：otic placode → membranous labyrinth；otic capsule → mesenchymal/cartilaginous capsule。",
+      "B": "不選。螺旋神經節（spiral ganglion）不是本題最符合的答案；本題核心考點是：otic placode → membranous labyrinth；otic capsule → mesenchymal/cartilaginous capsule。",
+      "C": "不選。半規管（semicircular duct）不是本題最符合的答案；本題核心考點是：otic placode → membranous labyrinth；otic capsule → mesenchymal/cartilaginous capsule。",
+      "D": "正確。耳板(otic placode)形成耳泡，衍生內耳膜迷路如耳蝸管、半規管，並與聽覺相關神經節形成有關；耳囊(otic capsule)是圍繞內耳的間質軟骨/骨性結構，不是耳板本身衍生。"
+    },
+    "memoryTip": "耳板做「膜迷路」，耳囊是外面骨殼。",
+    "clinicalLink": "先天性內耳畸形常涉及耳板發育。",
+    "answerConfidence": "high",
+    "needsHumanReview": false,
+    "detailVersion": "v3.0-batch2",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 103 年第一次醫師一階醫學（一）",
+    "sourceYear": 2014,
+    "sourceRound": 1,
+    "originalQuestionNumber": 32,
+    "difficulty": "medium"
+  },
+  {
+    "id": "MOEX-103100-1101-Q006",
+    "subject": "解剖學",
+    "chapter": "神經解剖",
+    "section": "脊髓傳導路徑",
+    "stem": "下面何者源自脊神經的背支（dorsal ramus of spinal nerve）？",
+    "options": {
+      "A": "頸橫神經（transverse cervical nerve）",
+      "B": "耳大神經（great auricular nerve）",
+      "C": "鎖骨上神經（supraclavicular nerve）",
+      "D": "枕大神經（greater occipital nerve）"
+    },
+    "answer": "D",
+    "explanation": "枕大神經(greater occipital nerve)來自C2脊神經後支；頸橫神經、耳大神經與鎖骨上神經都來自頸神經叢前支。",
+    "testedConcept": "greater occipital nerve = dorsal ramus of C2。",
+    "optionAnalysis": {
+      "A": "不選。頸橫神經（transverse cervical nerve）不是本題最符合的答案；本題核心考點是：greater occipital nerve = dorsal ramus of C2。",
+      "B": "不選。耳大神經（great auricular nerve）不是本題最符合的答案；本題核心考點是：greater occipital nerve = dorsal ramus of C2。",
+      "C": "不選。鎖骨上神經（supraclavicular nerve）不是本題最符合的答案；本題核心考點是：greater occipital nerve = dorsal ramus of C2。",
+      "D": "正確。枕大神經(greater occipital nerve)來自C2脊神經後支；頸橫神經、耳大神經與鎖骨上神經都來自頸神經叢前支。"
+    },
+    "memoryTip": "大神經在後腦杓，來自後支。",
+    "clinicalLink": "枕大神經痛可造成後頭部放射痛。",
+    "answerConfidence": "high",
+    "needsHumanReview": false,
+    "reviewFlags": [
+      "needs_manual_tag_review"
+    ],
+    "detailVersion": "v3.0-batch2",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 103 年第二次醫師一階醫學（一）",
+    "sourceYear": 2014,
+    "sourceRound": 2,
+    "originalQuestionNumber": 6,
+    "difficulty": "medium"
+  },
+  {
+    "id": "MOEX-103100-1101-Q041",
+    "subject": "解剖學",
+    "chapter": "神經解剖",
+    "section": "聽覺與前庭路徑",
+    "stem": "聲波傳至柯蒂氏器（organ of Corti）後再經由下列何者傳至中樞？",
+    "options": {
+      "A": "基底神經節（basal ganglion）",
+      "B": "螺旋神經節（spiral ganglion）",
+      "C": "脊神經節（spinal ganglion）",
+      "D": "交感神經節（sympathetic ganglion）"
+    },
+    "answer": "B",
+    "explanation": "柯蒂氏器的毛細胞受刺激後，訊息經第一級感覺神經元螺旋神經節傳入耳蝸神經，再至腦幹耳蝸核。",
+    "testedConcept": "organ of Corti → spiral ganglion → cochlear nerve → cochlear nuclei。",
+    "optionAnalysis": {
+      "A": "不選。基底神經節（basal ganglion）不是本題最符合的答案；本題核心考點是：organ of Corti → spiral ganglion → cochlear nerve → cochlear nuclei。",
+      "B": "正確。柯蒂氏器的毛細胞受刺激後，訊息經第一級感覺神經元螺旋神經節傳入耳蝸神經，再至腦幹耳蝸核。",
+      "C": "不選。脊神經節（spinal ganglion）不是本題最符合的答案；本題核心考點是：organ of Corti → spiral ganglion → cochlear nerve → cochlear nuclei。",
+      "D": "不選。交感神經節（sympathetic ganglion）不是本題最符合的答案；本題核心考點是：organ of Corti → spiral ganglion → cochlear nerve → cochlear nuclei。"
+    },
+    "memoryTip": "聽覺第一站：螺旋神經節。",
+    "clinicalLink": "感音神經性聽損可涉及毛細胞或螺旋神經節。",
+    "answerConfidence": "high",
+    "needsHumanReview": false,
+    "detailVersion": "v3.0-batch2",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 103 年第二次醫師一階醫學（一）",
+    "sourceYear": 2014,
+    "sourceRound": 2,
+    "originalQuestionNumber": 41,
+    "difficulty": "hard"
+  },
+  {
+    "id": "MOEX-104030-1101-Q022",
+    "subject": "解剖學",
+    "chapter": "下肢",
+    "section": "腰薦神經叢",
+    "stem": "閉孔神經（obturator nerve）前支損傷最可能造成下列何者無力？",
+    "options": {
+      "A": "閉孔內肌（obturator internus）",
+      "B": "閉孔外肌（obturator externus）",
+      "C": "內收長肌（adductor longus）",
+      "D": "內收大肌（adductor magnus）"
+    },
+    "answer": "C",
+    "explanation": "閉孔神經前支主要支配長收肌、短收肌、股薄肌及部分恥骨肌。閉孔外肌通常由閉孔神經後支支配，內收大肌也多由後支與脛神經參與。",
+    "testedConcept": "anterior division of obturator nerve → adductor longus, brevis, gracilis.",
+    "optionAnalysis": {
+      "A": "不選。閉孔內肌（obturator internus）不是本題最符合的答案；本題核心考點是：anterior division of obturator nerve → adductor longus, brevis, gracilis.",
+      "B": "不選。閉孔外肌（obturator externus）不是本題最符合的答案；本題核心考點是：anterior division of obturator nerve → adductor longus, brevis, gracilis.",
+      "C": "正確。閉孔神經前支主要支配長收肌、短收肌、股薄肌及部分恥骨肌。閉孔外肌通常由閉孔神經後支支配，內收大肌也多由後支與脛神經參與。",
+      "D": "不選。內收大肌（adductor magnus）不是本題最符合的答案；本題核心考點是：anterior division of obturator nerve → adductor longus, brevis, gracilis."
+    },
+    "memoryTip": "閉孔前支管長短薄。",
+    "clinicalLink": "閉孔神經損傷導致大腿內收無力。",
+    "answerConfidence": "high",
+    "needsHumanReview": false,
+    "detailVersion": "v3.0-batch2",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 104 年第一次醫師一階醫學（一）",
+    "sourceYear": 2015,
+    "sourceRound": 1,
+    "originalQuestionNumber": 22,
+    "difficulty": "hard"
+  },
+  {
+    "id": "MOEX-104090-5301-Q024",
+    "subject": "解剖學",
+    "chapter": "神經解剖",
+    "section": "脊髓傳導路徑",
+    "stem": "切開斜方肌（trapezius）與頭半棘肌（semispinalis capitis）的頭部附著處，最容易傷及穿 過這些肌肉的那一條神經？",
+    "options": {
+      "A": "耳大神經（great auricular nerve）",
+      "B": "耳顳神經（auriculotemporal nerve）",
+      "C": "枕大神經（greater occipital nerve）",
+      "D": "枕小神經（lesser occipital nerve）"
+    },
+    "answer": "C",
+    "explanation": "枕大神經來自第二頸神經後支，穿過頭半棘肌與斜方肌附著區後到達後頭皮。切開斜方肌與頭半棘肌的枕部附著處最容易傷及它。 這題要抓的重點是：greater occipital nerve 由 C2 後支而來，穿過 semispinalis capitis 與 trapezius。",
+    "testedConcept": "greater occipital nerve 由 C2 後支而來，穿過 semispinalis capitis 與 trapezius。",
+    "optionAnalysis": {
+      "A": "不選。耳大神經（great auricular nerve） 不是本題最佳答案；本題核心考點是：greater occipital nerve 由 C2 後支而來，穿過 semispinalis capitis 與 trapezius。",
+      "B": "不選。耳顳神經（auriculotemporal nerve） 不是本題最佳答案；本題核心考點是：greater occipital nerve 由 C2 後支而來，穿過 semispinalis capitis 與 trapezius。",
+      "C": "正確。枕大神經來自第二頸神經後支，穿過頭半棘肌與斜方肌附著區後到達後頭皮。切開斜方肌與頭半棘肌的枕部附著處最容易傷及它。",
+      "D": "不選。枕小神經（lesser occipital nerve） 不是本題最佳答案；本題核心考點是：greater occipital nerve 由 C2 後支而來，穿過 semispinalis capitis 與 trapezius。"
+    },
+    "memoryTip": "後頭痛常找枕大神經，C2 後支穿肌肉。",
+    "clinicalLink": "枕大神經神經痛會造成後枕部放射痛。",
+    "answerConfidence": "high",
+    "needsHumanReview": true,
+    "reviewFlags": [
+      "needs_manual_tag_review"
+    ],
+    "detailVersion": "v3.0-batch3",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 104 年第二次醫師一階醫學（一）",
+    "sourceYear": 2015,
+    "sourceRound": 2,
+    "originalQuestionNumber": 24,
+    "difficulty": "medium"
+  },
+  {
+    "id": "MOEX-104090-5301-Q025",
+    "subject": "解剖學",
+    "chapter": "下肢",
+    "section": "腰薦神經叢",
+    "stem": "左右髂骨嵴（iliac crest）最高點的水平連線通過下列何者的棘突（spinous process）？",
+    "options": {
+      "A": "L2",
+      "B": "L3",
+      "C": "L4",
+      "D": "L5"
+    },
+    "answer": "C",
+    "explanation": "連接兩側髂骨嵴最高點的線稱 Tuffier line，通常通過 L4 棘突或 L4/L5 椎間隙。國考常以 L4 作答。 這題要抓的重點是：Tuffier line＝兩側 iliac crest 最高點連線，約 L4。",
+    "testedConcept": "Tuffier line＝兩側 iliac crest 最高點連線，約 L4。",
+    "optionAnalysis": {
+      "A": "不選。L2 不是本題最佳答案；本題核心考點是：Tuffier line＝兩側 iliac crest 最高點連線，約 L4。",
+      "B": "不選。L3 不是本題最佳答案；本題核心考點是：Tuffier line＝兩側 iliac crest 最高點連線，約 L4。",
+      "C": "正確。連接兩側髂骨嵴最高點的線稱 Tuffier line，通常通過 L4 棘突或 L4/L5 椎間隙。國考常以 L4 作答。",
+      "D": "不選。L5 不是本題最佳答案；本題核心考點是：Tuffier line＝兩側 iliac crest 最高點連線，約 L4。"
+    },
+    "memoryTip": "摸髂嵴最高點，定位腰穿 L4/L5。",
+    "clinicalLink": "腰椎穿刺常選 L3/L4 或 L4/L5 間隙以避開脊髓。",
+    "answerConfidence": "medium",
+    "needsHumanReview": true,
+    "reviewFlags": [
+      "needs_manual_tag_review"
+    ],
+    "detailVersion": "v3.0-batch3",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 104 年第二次醫師一階醫學（一）",
+    "sourceYear": 2015,
+    "sourceRound": 2,
+    "originalQuestionNumber": 25,
+    "difficulty": "hard"
+  },
+  {
+    "id": "MOEX-107020-5301-Q050",
+    "subject": "解剖學",
+    "chapter": "神經解剖",
+    "section": "自律神經",
+    "stem": "下視丘（hypothalamus）的那一個核區為人體生物時鐘（biological clock）之主要節律點（pacemaker）？",
+    "options": {
+      "A": "paraventricular nucleus",
+      "B": "preoptic nucleus",
+      "C": "ventromedial nucleus",
+      "D": "suprachiasmatic nucleus"
+    },
+    "answer": "D",
+    "explanation": "下視丘視交叉上核(suprachiasmatic nucleus)是人體晝夜節律的主要生物時鐘，接受視網膜光訊號以調節睡眠、體溫與內分泌節律。",
+    "testedConcept": "biological clock pacemaker = suprachiasmatic nucleus。",
+    "optionAnalysis": {
+      "A": "不選。paraventricular nucleus 不是本題所問的最佳答案；請對照本題考點：biological clock pacemaker = suprachiasmatic nucleus。",
+      "B": "不選。preoptic nucleus 不是本題所問的最佳答案；請對照本題考點：biological clock pacemaker = suprachiasmatic nucleus。",
+      "C": "不選。ventromedial nucleus 不是本題所問的最佳答案；請對照本題考點：biological clock pacemaker = suprachiasmatic nucleus。",
+      "D": "正確。下視丘視交叉上核(suprachiasmatic nucleus)是人體晝夜節律的主要生物時鐘，接受視網膜光訊號以調節睡眠、體溫與內分泌節律。"
+    },
+    "memoryTip": "生物時鐘在視交叉上核。",
+    "clinicalLink": "SCN調控褪黑激素節律與睡眠週期。",
+    "answerConfidence": "high",
+    "needsHumanReview": false,
+    "detailVersion": "v3.0-batch4",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 107 年第一次醫師一階醫學（一）",
+    "sourceYear": 2018,
+    "sourceRound": 1,
+    "originalQuestionNumber": 50,
+    "difficulty": "medium"
+  },
+  {
+    "id": "MOEX-107100-1301-Q053",
+    "subject": "解剖學",
+    "chapter": "神經解剖",
+    "section": "視覺路徑",
+    "stem": "有關右眼之外側視野訊息之敘述，何者正確？",
+    "options": {
+      "A": "經由right optic nerve傳遞，在optic chiasm交叉，然後經由left optic tract傳至左側thalamus",
+      "B": "經由right optic nerve傳遞，在optic chiasm不交叉，然後經由right optic tract傳至右側thalamus",
+      "C": "經由right optic tract傳遞，在optic chiasm交叉，然後經由left optic radiation傳至左側thalamus",
+      "D": "經由right optic tract傳遞，在optic chiasm不交叉，然後經由right optic radiation傳至右側thalamus"
+    },
+    "answer": "A",
+    "explanation": "右眼外側視野投射到右眼鼻側視網膜，鼻側視網膜纖維在視交叉交叉，進入左視束並至左側外側膝狀體。 這題要抓的重點是：外側視野→鼻側視網膜→交叉→對側視束。",
+    "testedConcept": "外側視野→鼻側視網膜→交叉→對側視束。",
+    "optionAnalysis": {
+      "A": "正確／官方採計。外側視野→鼻側視網膜→交叉→對側視束。",
+      "B": "不選。經由right optic nerve傳遞，在optic chiasm不交叉，然後經由right optic tract傳至右側thalamus與本題主要考點不符；本題重點是：外側視野→鼻側視網膜→交叉→對側視束。",
+      "C": "不選。經由right optic tract傳遞，在optic chiasm交叉，然後經由left optic radiation傳至左側thalamus與本題主要考點不符；本題重點是：外側視野→鼻側視網膜→交叉→對側視束。",
+      "D": "不選。經由right optic tract傳遞，在optic chiasm不交叉，然後經由right optic radiation傳至右側thalamus與本題主要考點不符；本題重點是：外側視野→鼻側視網膜→交叉→對側視束。"
+    },
+    "memoryTip": "視野跟視網膜左右相反；鼻側纖維會交叉。",
+    "clinicalLink": "垂體腫瘤壓迫視交叉造成雙顳側偏盲。",
+    "answerConfidence": "high",
+    "needsHumanReview": false,
+    "detailVersion": "v3.0-batch5",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 107 年第二次醫師一階醫學（一）",
+    "sourceYear": 2018,
+    "sourceRound": 2,
+    "originalQuestionNumber": 53,
+    "difficulty": "medium"
+  },
+  {
+    "id": "MOEX-110020-1301-Q050",
+    "subject": "解剖學",
+    "chapter": "神經解剖",
+    "section": "自律神經",
+    "stem": "體溫調節中樞位於何處？",
+    "options": {
+      "A": "premotor cortex",
+      "B": "cerebellum",
+      "C": "amygdala",
+      "D": "hypothalamus"
+    },
+    "answer": "D",
+    "explanation": "體溫調節的主要整合中樞位於下視丘（hypothalamus），尤其是前下視丘與視前區負責散熱反應，後下視丘參與產熱反應。小腦、杏仁核與運動前皮質不是主要體溫設定點中樞。",
+    "testedConcept": "體溫調節中樞在 hypothalamus。",
+    "optionAnalysis": {
+      "A": "不選。premotor cortex 不是本題最符合的答案；本題重點是：體溫調節中樞在 hypothalamus。",
+      "B": "不選。cerebellum 不是本題最符合的答案；本題重點是：體溫調節中樞在 hypothalamus。",
+      "C": "不選。amygdala 不是本題最符合的答案；本題重點是：體溫調節中樞在 hypothalamus。",
+      "D": "正確／官方採計。體溫調節的主要整合中樞位於下視丘（hypothalamus），尤其是前下視丘與視前區負責散熱反應，後下視丘參與產熱反應。小腦、杏仁核與運動前皮質不是主要體溫設定點中樞。"
+    },
+    "memoryTip": "體溫恆定找下視丘。",
+    "clinicalLink": "發燒是下視丘設定點被前列腺素調高的結果。",
+    "answerConfidence": "high",
+    "needsHumanReview": false,
+    "detailVersion": "v3.0-batch7",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 110 年第一次醫師一階醫學（一）",
+    "sourceYear": 2021,
+    "sourceRound": 1,
+    "originalQuestionNumber": 50,
+    "difficulty": "medium"
+  },
+  {
+    "id": "MOEX-113090-1301-Q053",
+    "subject": "解剖學",
+    "chapter": "神經解剖",
+    "section": "視覺路徑",
+    "stem": "下列何種部位的損傷，最可能導致患者兩眼左視野消失？",
+    "options": {
+      "A": "right optic tract",
+      "B": "left optic nerve",
+      "C": "optic chiasm",
+      "D": "optic disc"
+    },
+    "answer": "A",
+    "explanation": "右側視徑包含來自雙眼左視野的資訊，因此右視徑受損會造成兩眼左側同名偏盲。左視神經受損只影響左眼，視交叉病變常造成雙顳偏盲。",
+    "testedConcept": "視徑病變與同名偏盲",
+    "optionAnalysis": {
+      "A": "正確／官方採計。右側視徑包含來自雙眼左視野的資訊，因此右視徑受損會造成兩眼左側同名偏盲。左視神經受損只影響左眼，視交叉病變常造成雙顳偏盲。",
+      "B": "不選。left optic nerve不是本題最符合的答案；本題核心考點是：視徑病變與同名偏盲。",
+      "C": "不選。optic chiasm不是本題最符合的答案；本題核心考點是：視徑病變與同名偏盲。",
+      "D": "不選。optic disc不是本題最符合的答案；本題核心考點是：視徑病變與同名偏盲。"
+    },
+    "memoryTip": "視徑後病變＝對側同名偏盲。",
+    "clinicalLink": "腦中風後視野檢查可協助定位視路病灶。",
+    "answerConfidence": "high",
+    "needsHumanReview": false,
+    "detailVersion": "v3.0-batch9",
+    "sourceType": "MOEX_PAST_EXAM",
+    "sourceCitation": "考選部 113 年第二次醫師一階醫學（一）",
+    "sourceYear": 2024,
+    "sourceRound": 2,
+    "originalQuestionNumber": 53,
+    "difficulty": "hard"
   }
 ];
 
