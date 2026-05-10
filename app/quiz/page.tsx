@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { ConfidenceSelector } from "@/components/ConfidenceSelector";
 import { ErrorTypeSelector } from "@/components/ErrorTypeSelector";
@@ -98,6 +98,7 @@ function getQuestionByOrder(session: QuizSession) {
 
 export default function QuizPage() {
   const router = useRouter();
+  const questionTopRef = useRef<HTMLDivElement | null>(null);
   const [mounted, setMounted] = useState(false);
   const [session, setSession] = useState<QuizSession | null>(null);
   const [selectedAnswer, setSelectedAnswer] = useState<OptionKey | undefined>();
@@ -338,6 +339,13 @@ export default function QuizPage() {
     };
     persistSession(nextSession);
     resetQuestionUI();
+
+    window.requestAnimationFrame(() => {
+      questionTopRef.current?.scrollIntoView({
+        behavior: "smooth",
+        block: "start"
+      });
+    });
   }
 
   async function handleReviewQuestion() {
@@ -400,6 +408,7 @@ export default function QuizPage() {
 
   return (
     <main className="shell">
+      <div ref={questionTopRef} />
       <div className="mb-5 flex items-center justify-between gap-3">
         <Link href="/" className="text-sm font-semibold text-slate-600 transition hover:text-brand-700">
           ← 返回首頁
