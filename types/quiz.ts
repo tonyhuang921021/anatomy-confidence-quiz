@@ -1,10 +1,19 @@
 export type OptionKey = "A" | "B" | "C" | "D" | "E";
 export type DifficultyLevel = "basic" | "easy" | "medium" | "hard";
 export type QuestionSourceType = "MOEX_PAST_EXAM" | "AI_GENERATED";
+export type SubjectName =
+  | "解剖學"
+  | "生理學"
+  | "生物化學"
+  | "藥理學"
+  | "病理學"
+  | "微生物免疫學"
+  | "胚胎學"
+  | "組織學";
 
 export type Question = {
   id: string;
-  subject: "解剖學";
+  subject: SubjectName;
   chapter: string;
   section: string;
   stem: string;
@@ -18,6 +27,13 @@ export type Question = {
   answer: OptionKey;
   explanation: string;
   testedConcept: string;
+  optionAnalysis?: Partial<Record<OptionKey, string>>;
+  memoryTip?: string;
+  clinicalLink?: string;
+  answerConfidence?: "high" | "medium" | "low";
+  needsHumanReview?: boolean;
+  reviewFlags?: string[];
+  detailVersion?: string;
   source?: "local" | "ai-generated" | "past-exam-inspired";
   sourceType?: QuestionSourceType;
   sourceCitation?: string;
@@ -58,7 +74,7 @@ export type QuizSettings = {
 
 export type QuizSession = {
   id: string;
-  subject: "解剖學";
+  subject: SubjectName;
   startedAt: string;
   completedAt?: string;
   settings?: QuizSettings;
