@@ -46,11 +46,11 @@ export type Question = {
 export type ConfidenceLevel = 1 | 2 | 3 | 4 | 5;
 
 export type ErrorType =
-  | "不懂"
+  | "完全沒印象"
   | "背錯"
-  | "看錯題幹"
+  | "看錯題目 / 粗心"
   | "兩選項猶豫"
-  | "粗心";
+  | "忘記了";
 
 export type Attempt = {
   questionId: string;

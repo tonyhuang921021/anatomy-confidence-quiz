@@ -2,7 +2,13 @@
 
 import { ErrorType } from "@/types/quiz";
 
-const errorTypes: ErrorType[] = ["不懂", "背錯", "看錯題幹", "兩選項猶豫", "粗心"];
+const errorTypes: ErrorType[] = [
+  "完全沒印象",
+  "背錯",
+  "忘記了",
+  "兩選項猶豫",
+  "看錯題目 / 粗心"
+];
 
 type ErrorTypeSelectorProps = {
   value?: ErrorType;

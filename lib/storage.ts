@@ -1,4 +1,4 @@
-import { QuizSession, QuizSettings } from "@/types/quiz";
+import { ErrorType, QuizSession, QuizSettings } from "@/types/quiz";
 
 const CURRENT_SESSION_KEY = "anatomy-confidence-current-session";
 const COMPLETED_SESSIONS_KEY = "anatomy-confidence-completed-sessions";
@@ -33,6 +33,38 @@ function getLegacyOrScopedRaw(baseKey: string) {
   return null;
 }
 
+function normalizeErrorType(errorType?: string): ErrorType | undefined {
+  switch (errorType) {
+    case "不懂":
+      return "完全沒印象";
+    case "看錯題幹":
+    case "粗心":
+      return "看錯題目 / 粗心";
+    case "背錯":
+    case "兩選項猶豫":
+    case "忘記了":
+    case "完全沒印象":
+    case "看錯題目 / 粗心":
+      return errorType;
+    default:
+      return undefined;
+  }
+}
+
+function normalizeSession(session: QuizSession): QuizSession {
+  return {
+    ...session,
+    attempts: session.attempts.map((attempt) => ({
+      ...attempt,
+      errorType: normalizeErrorType(attempt.errorType)
+    }))
+  };
+}
+
+function normalizeSessions(sessions: QuizSession[]) {
+  return sessions.map(normalizeSession);
+}
+
 export function setActiveStorageUser(userId?: string) {
   if (!isBrowser()) return;
   window.localStorage.setItem(ACTIVE_USER_KEY, userId || GUEST_USER_ID);
@@ -54,7 +86,7 @@ export function loadCurrentSession(): QuizSession | null {
   if (!raw) return null;
 
   try {
-    return JSON.parse(raw) as QuizSession;
+    return normalizeSession(JSON.parse(raw) as QuizSession);
   } catch {
     return null;
   }
@@ -90,7 +122,7 @@ export function loadCompletedSessionsForUser(userId: string): QuizSession[] {
   if (!raw) return [];
 
   try {
-    return JSON.parse(raw) as QuizSession[];
+    return normalizeSessions(JSON.parse(raw) as QuizSession[]);
   } catch {
     return [];
   }
