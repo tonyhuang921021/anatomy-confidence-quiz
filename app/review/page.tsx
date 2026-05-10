@@ -19,7 +19,7 @@ export default function ReviewPage() {
 
   useEffect(() => {
     const sessions = loadCompletedSessions();
-    setItems(getReviewQuestionItems(anatomyQuestions, sessions, 24));
+    setItems(getReviewQuestionItems(anatomyQuestions, sessions, 60));
   }, [syncVersion]);
 
   function handleStartReview() {
