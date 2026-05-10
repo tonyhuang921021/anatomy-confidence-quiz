@@ -39,7 +39,7 @@ export function AIPromptBox({ promptText }: AIPromptBoxProps) {
       <textarea
         readOnly
         value={promptText}
-        className="mt-5 min-h-[340px] w-full rounded-3xl border border-slate-200 bg-slate-50 p-4 text-sm leading-7 text-slate-700 outline-none"
+        className="mt-5 min-h-[340px] w-full max-w-full rounded-3xl border border-slate-200 bg-slate-50 p-4 text-sm leading-7 text-slate-700 outline-none"
       />
     </section>
   );

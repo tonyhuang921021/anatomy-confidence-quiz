@@ -40,7 +40,7 @@ export function AIAnalysisPanel({
         <div className="mt-4 rounded-2xl bg-amber-50 p-4 text-sm text-amber-900">{error}</div>
       ) : null}
 
-      <div className="mt-4 rounded-3xl bg-slate-50 p-4 text-sm leading-7 text-slate-700">
+      <div className="mt-4 break-words rounded-3xl bg-slate-50 p-4 text-sm leading-7 text-slate-700">
         {analysis || "尚未生成 AI 補弱解析。"}
       </div>
     </section>

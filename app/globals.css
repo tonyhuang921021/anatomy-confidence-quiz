@@ -12,11 +12,14 @@
 
 html {
   scroll-behavior: smooth;
+  overflow-x: hidden;
 }
 
 body {
   margin: 0;
   min-height: 100vh;
+  max-width: 100%;
+  overflow-x: hidden;
   background:
     radial-gradient(circle at top left, rgba(147, 208, 180, 0.22), transparent 35%),
     radial-gradient(circle at top right, rgba(96, 165, 250, 0.12), transparent 28%),
@@ -39,8 +42,10 @@ select {
 
 .shell {
   margin: 0 auto;
+  width: 100%;
   max-width: 1280px;
   padding: 24px 16px 56px;
+  overflow-x: clip;
 }
 
 @media (min-width: 640px) {
