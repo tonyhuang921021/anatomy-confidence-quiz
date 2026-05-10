@@ -77,7 +77,7 @@ export default function ReviewPage() {
       </section>
 
       <div className="mt-8">
-        <ReviewNotebook items={items} />
+        <ReviewNotebook items={items} allQuestions={anatomyQuestions} />
       </div>
     </main>
   );

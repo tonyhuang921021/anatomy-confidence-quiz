@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { OptionKey, ReviewQuestionItem } from "@/types/quiz";
+import { OptionKey, Question, ReviewQuestionItem } from "@/types/quiz";
 
 function formatTime(value?: string) {
   if (!value) return "尚未作答";
@@ -25,11 +25,129 @@ function getOptionKeys(item: ReviewQuestionItem) {
   );
 }
 
+function getOptionKeysFromQuestion(question: Question) {
+  return (["A", "B", "C", "D", "E"] as OptionKey[]).filter(
+    (key) => typeof question.options[key] === "string"
+  );
+}
+
+function getRelatedQuestions(currentQuestion: Question, allQuestions: Question[], limit = 4) {
+  const normalizedConcept = currentQuestion.testedConcept.trim().toLowerCase();
+
+  const sameConcept = allQuestions.filter(
+    (question) =>
+      question.id !== currentQuestion.id &&
+      question.testedConcept.trim().toLowerCase() === normalizedConcept
+  );
+
+  const sameSection = allQuestions.filter(
+    (question) =>
+      question.id !== currentQuestion.id &&
+      question.section === currentQuestion.section &&
+      question.chapter === currentQuestion.chapter &&
+      question.testedConcept.trim().toLowerCase() !== normalizedConcept
+  );
+
+  return [...sameConcept, ...sameSection].slice(0, limit);
+}
+
+function renderQuestionReview(item: ReviewQuestionItem) {
+  return (
+    <div className="mt-4 space-y-3 leading-7">
+      <p>
+        <span className="font-semibold">testedConcept：</span>
+        {item.question.testedConcept}
+      </p>
+      <p>
+        <span className="font-semibold">最後錯因：</span>
+        {item.history.latestErrorType ?? "未填"}
+      </p>
+      <div className="grid gap-3">
+        {getOptionKeys(item).map((key) => (
+          <div key={`${item.question.id}-${key}`} className="rounded-2xl bg-slate-50 p-4">
+            <p className="font-semibold text-slate-900">
+              {key}. {item.question.options[key]}
+            </p>
+          </div>
+        ))}
+      </div>
+      <p>
+        <span className="font-semibold">正確答案：</span>
+        {item.question.answer}
+      </p>
+      <p>
+        <span className="font-semibold">重點解析：</span>
+        {item.question.explanation}
+      </p>
+      {item.question.memoryTip ? (
+        <p>
+          <span className="font-semibold">快速記憶法：</span>
+          {item.question.memoryTip}
+        </p>
+      ) : null}
+    </div>
+  );
+}
+
+function renderRelatedQuestions(question: Question, allQuestions: Question[]) {
+  const relatedQuestions = getRelatedQuestions(question, allQuestions);
+
+  if (relatedQuestions.length === 0) {
+    return (
+      <div className="mt-4 rounded-2xl bg-slate-50 p-4 text-sm text-slate-500">
+        目前還找不到同觀念的類似題。
+      </div>
+    );
+  }
+
+  return (
+    <div className="mt-4 grid gap-3">
+      {relatedQuestions.map((relatedQuestion, index) => (
+        <details key={`${question.id}-related-${relatedQuestion.id}`} className="rounded-2xl bg-slate-50 p-4">
+          <summary className="cursor-pointer font-semibold text-ink">
+            類似題 {index + 1}：{relatedQuestion.testedConcept}
+          </summary>
+          <div className="mt-3 space-y-3 text-sm leading-7 text-slate-700">
+            <p className="font-semibold text-slate-900">
+              {relatedQuestion.chapter} / {relatedQuestion.section}
+            </p>
+            <p>{relatedQuestion.stem}</p>
+            <div className="grid gap-3">
+              {getOptionKeysFromQuestion(relatedQuestion).map((key) => (
+                <div key={`${relatedQuestion.id}-${key}`} className="rounded-2xl bg-white p-4">
+                  <p className="font-semibold text-slate-900">
+                    {key}. {relatedQuestion.options[key]}
+                  </p>
+                </div>
+              ))}
+            </div>
+            <p>
+              <span className="font-semibold">正確答案：</span>
+              {relatedQuestion.answer}
+            </p>
+            <p>
+              <span className="font-semibold">詳解：</span>
+              {relatedQuestion.explanation}
+            </p>
+            {relatedQuestion.memoryTip ? (
+              <p>
+                <span className="font-semibold">快速記憶法：</span>
+                {relatedQuestion.memoryTip}
+              </p>
+            ) : null}
+          </div>
+        </details>
+      ))}
+    </div>
+  );
+}
+
 type ReviewNotebookProps = {
   items: ReviewQuestionItem[];
+  allQuestions: Question[];
 };
 
-export function ReviewNotebook({ items }: ReviewNotebookProps) {
+export function ReviewNotebook({ items, allQuestions }: ReviewNotebookProps) {
   const wrongItems = sortByRecent(items.filter((item) => item.history.wrong > 0));
   const lowConfidenceItems = sortByRecent(items.filter((item) => item.history.lowConfidence > 0));
 
@@ -113,39 +231,14 @@ export function ReviewNotebook({ items }: ReviewNotebookProps) {
                         <summary className="cursor-pointer font-semibold text-ink">
                           查看題目、選項與詳解
                         </summary>
-                        <div className="mt-4 space-y-3 leading-7">
-                          <p>
-                            <span className="font-semibold">testedConcept：</span>
-                            {item.question.testedConcept}
-                          </p>
-                          <p>
-                            <span className="font-semibold">最後錯因：</span>
-                            {item.history.latestErrorType ?? "未填"}
-                          </p>
-                          <div className="grid gap-3">
-                            {getOptionKeys(item).map((key) => (
-                              <div key={`${item.question.id}-${key}`} className="rounded-2xl bg-slate-50 p-4">
-                                <p className="font-semibold text-slate-900">
-                                  {key}. {item.question.options[key]}
-                                </p>
-                              </div>
-                            ))}
-                          </div>
-                          <p>
-                            <span className="font-semibold">正確答案：</span>
-                            {item.question.answer}
-                          </p>
-                          <p>
-                            <span className="font-semibold">重點解析：</span>
-                            {item.question.explanation}
-                          </p>
-                          {item.question.memoryTip ? (
-                            <p>
-                              <span className="font-semibold">快速記憶法：</span>
-                              {item.question.memoryTip}
-                            </p>
-                          ) : null}
-                        </div>
+                        {renderQuestionReview(item)}
+                      </details>
+
+                      <details className="mt-4 rounded-2xl bg-white p-4 text-sm text-slate-700">
+                        <summary className="cursor-pointer font-semibold text-ink">
+                          看相同觀念類似題
+                        </summary>
+                        {renderRelatedQuestions(item.question, allQuestions)}
                       </details>
                     </article>
                   ))
@@ -209,39 +302,14 @@ export function ReviewNotebook({ items }: ReviewNotebookProps) {
                         <summary className="cursor-pointer font-semibold text-ink">
                           查看題目、選項與詳解
                         </summary>
-                        <div className="mt-4 space-y-3 leading-7">
-                          <p>
-                            <span className="font-semibold">testedConcept：</span>
-                            {item.question.testedConcept}
-                          </p>
-                          <p>
-                            <span className="font-semibold">最後錯因：</span>
-                            {item.history.latestErrorType ?? "未填"}
-                          </p>
-                          <div className="grid gap-3">
-                            {getOptionKeys(item).map((key) => (
-                              <div key={`${item.question.id}-low-${key}`} className="rounded-2xl bg-slate-50 p-4">
-                                <p className="font-semibold text-slate-900">
-                                  {key}. {item.question.options[key]}
-                                </p>
-                              </div>
-                            ))}
-                          </div>
-                          <p>
-                            <span className="font-semibold">正確答案：</span>
-                            {item.question.answer}
-                          </p>
-                          <p>
-                            <span className="font-semibold">重點解析：</span>
-                            {item.question.explanation}
-                          </p>
-                          {item.question.memoryTip ? (
-                            <p>
-                              <span className="font-semibold">快速記憶法：</span>
-                              {item.question.memoryTip}
-                            </p>
-                          ) : null}
-                        </div>
+                        {renderQuestionReview(item)}
+                      </details>
+
+                      <details className="mt-4 rounded-2xl bg-white p-4 text-sm text-slate-700">
+                        <summary className="cursor-pointer font-semibold text-ink">
+                          看相同觀念類似題
+                        </summary>
+                        {renderRelatedQuestions(item.question, allQuestions)}
                       </details>
                     </article>
                   ))
