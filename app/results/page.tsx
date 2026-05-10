@@ -318,7 +318,7 @@ export default function ResultsPage() {
               onClick={() => setShowPrompt(true)}
               className="mt-5 min-h-12 w-full rounded-2xl bg-ink px-4 py-4 text-sm font-semibold text-white transition hover:bg-slate-900"
             >
-              產生 AI 補弱 Prompt
+              產生只講弱點知識的 AI Prompt
             </button>
           </section>
 

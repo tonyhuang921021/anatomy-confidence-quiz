@@ -398,22 +398,41 @@ export function generateAIPrompt(
     return `${section.chapter} / ${section.section}：completionRate ${section.completionRate}%｜masteryScore ${section.masteryScore}`;
   });
 
-  return `以下是我的解剖學醫師國考測驗紀錄。請根據我的答題結果、信心程度、錯因、章節、小節、完成度與掌握度，幫我分析：
+  const overconfidenceLines = attempts
+    .filter((attempt) => !attempt.isCorrect && attempt.confidence >= 4)
+    .map((attempt) => {
+      const question = questionMap.get(attempt.questionId);
+      if (!question) return "";
+      return `${question.chapter} / ${question.section}｜${question.testedConcept}｜答錯但信心高（${attempt.confidence}）｜我的答案 ${attempt.selectedAnswer}｜正解 ${attempt.correctAnswer}`;
+    })
+    .filter(Boolean);
 
-1. 我最弱的前三個小節
-2. 哪些是錯誤自信：答錯但信心 >= 4
-3. 哪些是猜對風險：答對但信心 <= 2
-4. 哪些是優先補弱：答錯且信心 <= 2
-5. 哪些小節還沒刷夠，應該補進度？
-6. 哪些小節雖然完成度高，但 masteryScore 低，代表需要回頭複習？
-7. 請幫我安排下一輪 10 題應該優先抽哪些 section。
-8. 請針對最弱的 1-2 個小節，用以下格式幫我複習：
+  const priorityWeaknessLines = attempts
+    .filter((attempt) => !attempt.isCorrect && attempt.confidence <= 2)
+    .map((attempt) => {
+      const question = questionMap.get(attempt.questionId);
+      if (!question) return "";
+      return `${question.chapter} / ${question.section}｜${question.testedConcept}｜答錯且低信心（${attempt.confidence}）｜錯因 ${attempt.errorType ?? "未填"}`;
+    })
+    .filter(Boolean);
+
+  return `以下是我的解剖學醫師國考測驗紀錄。請你只做「弱點知識補強」，不要稱讚我、不要總結我哪裡做得不錯、不要輸出太多與補弱無關的分析，也不要重複貼回原始統計。
+
+回答規則：
+1. 只挑最需要補的 1 到 3 個小節。
+2. 以「小節」為單位輸出，不要先寫整體表現總結。
+3. 每個小節只回答以下內容：
+   - 為什麼這個小節現在最需要補
    - 30 秒核心觀念
    - 國考高頻考點
-   - 常見陷阱
+   - 最常錯的陷阱與混淆點
    - 容易混淆比較表
-   - 3 題立即小測驗
-9. 請用台灣醫學生準備醫師國考一階的語氣與深度回答，必要時可以用幽默記憶法。
+   - 快速記憶法
+   - 3 題立即小測驗（附答案）
+4. 如果我有錯誤自信，請特別指出我觀念錯在哪裡。
+5. 如果我有低信心答錯，請用更基礎、可快速重建的方式教。
+6. 不要另外安排鼓勵、讀書計畫、人格分析、整體優缺點、稱讚或與弱點無關的延伸內容。
+7. 請用台灣醫學生準備醫師國考一階的語氣與深度回答，重點放在知識本身，越精準越好。
 
 以下是本輪整體統計：
 總題數：${summary.total}
@@ -426,6 +445,12 @@ export function generateAIPrompt(
 
 以下是本輪作答紀錄：
 ${attemptLines.join("\n")}
+
+以下是錯誤自信題：
+${overconfidenceLines.join("\n") || "目前沒有資料"}
+
+以下是優先補弱題：
+${priorityWeaknessLines.join("\n") || "目前沒有資料"}
 
 以下是目前完成度統計：
 整體 anatomy completionRate：${completionStats.overall.completionRate}%
@@ -444,7 +469,9 @@ ${weakLines.join("\n") || "目前沒有資料"}
 ${lowCompletionLines.join("\n") || "目前沒有資料"}
 
 以下是已完成但不穩的小節：
-${unstableLines.join("\n") || "目前沒有資料"}`;
+${unstableLines.join("\n") || "目前沒有資料"}
+
+請直接開始輸出「最需要補的知識」，不要先寫客套開場。`;
 }
 
 export const DEFAULT_QUIZ_SETTINGS: QuizSettings = {

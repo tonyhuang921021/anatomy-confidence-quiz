@@ -99,6 +99,7 @@ function getQuestionByOrder(session: QuizSession) {
 export default function QuizPage() {
   const router = useRouter();
   const questionTopRef = useRef<HTMLDivElement | null>(null);
+  const contentTopRef = useRef<HTMLDivElement | null>(null);
   const [mounted, setMounted] = useState(false);
   const [session, setSession] = useState<QuizSession | null>(null);
   const [selectedAnswer, setSelectedAnswer] = useState<OptionKey | undefined>();
@@ -341,7 +342,12 @@ export default function QuizPage() {
     resetQuestionUI();
 
     window.requestAnimationFrame(() => {
-      questionTopRef.current?.scrollIntoView({
+      const target =
+        typeof window !== "undefined" && window.innerWidth >= 1280
+          ? contentTopRef.current
+          : questionTopRef.current;
+
+      target?.scrollIntoView({
         behavior: "smooth",
         block: "start"
       });
@@ -425,7 +431,7 @@ export default function QuizPage() {
         />
       </div>
 
-      <div className="mt-6 grid gap-6 xl:grid-cols-[minmax(0,1fr)_340px]">
+      <div ref={contentTopRef} className="mt-6 grid gap-6 xl:grid-cols-[minmax(0,1fr)_340px]">
         <div className="space-y-6">
           <div className="flex flex-wrap gap-2 text-xs font-semibold">
             <span className="rounded-full bg-brand-100 px-3 py-1 text-brand-800">

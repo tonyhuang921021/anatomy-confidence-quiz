@@ -24,7 +24,9 @@ export function AIPromptBox({ promptText }: AIPromptBoxProps) {
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
           <h2 className="text-xl font-semibold text-ink">AI 補弱 Prompt</h2>
-          <p className="mt-1 text-sm text-slate-500">可直接複製貼到 ChatGPT 做下一輪補弱分析。</p>
+          <p className="mt-1 text-sm text-slate-500">
+            可直接複製貼到任一 AI，重點只拿回你需要補的知識區塊。
+          </p>
         </div>
         <button
           type="button"
