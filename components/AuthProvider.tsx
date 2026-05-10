@@ -10,7 +10,10 @@ import {
   type ReactNode
 } from "react";
 import type { Session, User } from "@supabase/supabase-js";
-import { syncCompletedSessionsForCurrentUser } from "@/lib/cloudSync";
+import {
+  syncCompletedSessionsForCurrentUser,
+  syncLeaderboardProfileForCurrentUser
+} from "@/lib/cloudSync";
 import { setActiveStorageUser } from "@/lib/storage";
 import {
   getSupabaseBrowserClient,
@@ -42,12 +45,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const refreshCloudData = useCallback(async (targetUserId?: string) => {
     const userId = targetUserId || user?.id;
-    if (!configured || !userId) return;
+    if (!configured || !userId || !user) return;
 
     try {
       setSyncStatus("syncing");
       setSyncError("");
-      await syncCompletedSessionsForCurrentUser(userId);
+      const mergedSessions = await syncCompletedSessionsForCurrentUser(userId);
+      await syncLeaderboardProfileForCurrentUser(user, mergedSessions);
       setSyncStatus("ready");
       setSyncVersion((value) => value + 1);
     } catch (error) {

@@ -33,3 +33,34 @@ create policy "Users can delete their own quiz sessions"
 on public.quiz_sessions
 for delete
 using (auth.uid() = user_id);
+
+create table if not exists public.leaderboard_profiles (
+  user_id uuid primary key references auth.users (id) on delete cascade,
+  display_name text not null,
+  total_attempts integer not null default 0,
+  correct_attempts integer not null default 0,
+  correct_rate numeric(5,2) not null default 0,
+  total_sessions integer not null default 0,
+  updated_at timestamptz not null default now()
+);
+
+create index if not exists leaderboard_profiles_total_attempts_idx
+on public.leaderboard_profiles (total_attempts desc, correct_rate desc);
+
+alter table public.leaderboard_profiles enable row level security;
+
+create policy "Anyone can read leaderboard profiles"
+on public.leaderboard_profiles
+for select
+using (true);
+
+create policy "Users can insert their own leaderboard profile"
+on public.leaderboard_profiles
+for insert
+with check (auth.uid() = user_id);
+
+create policy "Users can update their own leaderboard profile"
+on public.leaderboard_profiles
+for update
+using (auth.uid() = user_id)
+with check (auth.uid() = user_id);

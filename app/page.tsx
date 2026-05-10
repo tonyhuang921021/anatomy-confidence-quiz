@@ -51,6 +51,12 @@ export default function HomePage() {
               >
                 錯題複習
               </Link>
+              <Link
+                href="/leaderboard"
+                className="min-h-12 rounded-2xl bg-slate-100 px-5 py-4 text-center text-sm font-semibold text-slate-800 transition hover:bg-slate-200 active:scale-[0.99]"
+              >
+                刷題榜
+              </Link>
             </div>
 
             <div className="mt-6 grid gap-3 sm:grid-cols-2">
@@ -81,6 +87,10 @@ export default function HomePage() {
               <Link href="/review" className="rounded-2xl bg-white/10 p-4 transition hover:bg-white/15">
                 <p className="font-semibold">看錯題與高風險題</p>
                 <p className="mt-1 text-sm text-slate-200">集中複習曾答錯或低信心題目</p>
+              </Link>
+              <Link href="/leaderboard" className="rounded-2xl bg-white/10 p-4 transition hover:bg-white/15">
+                <p className="font-semibold">看刷題榜</p>
+                <p className="mt-1 text-sm text-slate-200">依總答題量與正確率查看排名</p>
               </Link>
               <div className="rounded-2xl bg-white/10 p-4">
                 <p className="font-semibold">API 已新增</p>

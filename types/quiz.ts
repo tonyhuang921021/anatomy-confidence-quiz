@@ -171,3 +171,13 @@ export type ReviewQuestionItem = {
   history: QuestionHistoryStats;
   riskScore: number;
 };
+
+export type LeaderboardEntry = {
+  userId: string;
+  displayName: string;
+  totalAttempts: number;
+  correctAttempts: number;
+  correctRate: number;
+  totalSessions: number;
+  updatedAt?: string;
+};

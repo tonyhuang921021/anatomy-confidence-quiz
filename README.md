@@ -88,6 +88,7 @@ OPENAI_MODEL=gpt-5.2
 - `/results` 結果頁
 - `/progress` 進度總覽頁
 - `/review` 錯題複習頁
+- `/leaderboard` 刷題榜
 
 ## API Routes
 
@@ -168,6 +169,7 @@ NEXT_PUBLIC_SUPABASE_ANON_KEY=你的 Supabase anon key
 3. completed sessions 同步到 Supabase
 4. 同一帳號在手機與電腦可拉回歷史 completed sessions
 5. 首頁可看到目前登入者與同步狀態
+6. 可查看跨使用者刷題榜，依總答題量與正確率排名
 
 ### 目前正式版還沒做滿的部分
 

@@ -1,4 +1,5 @@
-import type { QuizSession } from "@/types/quiz";
+import type { User } from "@supabase/supabase-js";
+import type { LeaderboardEntry, QuizSession } from "@/types/quiz";
 import {
   loadCompletedSessions,
   loadCompletedSessionsForUser,
@@ -16,6 +17,16 @@ type QuizSessionRow = {
   started_at: string;
   completed_at: string | null;
   session_payload: QuizSession;
+  updated_at?: string | null;
+};
+
+type LeaderboardRow = {
+  user_id: string;
+  display_name: string;
+  total_attempts: number;
+  correct_attempts: number;
+  correct_rate: number;
+  total_sessions: number;
   updated_at?: string | null;
 };
 
@@ -53,6 +64,47 @@ function mergeSessions(localSessions: QuizSession[], remoteSessions: QuizSession
 
 function mapRowToSession(row: QuizSessionRow | null) {
   return row?.session_payload ?? null;
+}
+
+function getLeaderboardDisplayName(user: Pick<User, "id" | "email" | "user_metadata">) {
+  const displayName =
+    typeof user.user_metadata?.display_name === "string" ? user.user_metadata.display_name.trim() : "";
+
+  if (displayName) return displayName.slice(0, 24);
+
+  const emailName = user.email?.split("@")[0]?.trim();
+  if (emailName) return emailName.slice(0, 24);
+
+  return `玩家-${user.id.slice(0, 6)}`;
+}
+
+function summarizeLeaderboardSessions(sessions: QuizSession[]) {
+  const completedSessions = sessions.filter((session) => Boolean(session.completedAt));
+  const totalAttempts = completedSessions.reduce((sum, session) => sum + session.attempts.length, 0);
+  const correctAttempts = completedSessions.reduce(
+    (sum, session) => sum + session.attempts.filter((attempt) => attempt.isCorrect).length,
+    0
+  );
+  const correctRate = totalAttempts === 0 ? 0 : Number(((correctAttempts / totalAttempts) * 100).toFixed(1));
+
+  return {
+    totalAttempts,
+    correctAttempts,
+    correctRate,
+    totalSessions: completedSessions.length
+  };
+}
+
+function mapLeaderboardRow(row: LeaderboardRow): LeaderboardEntry {
+  return {
+    userId: row.user_id,
+    displayName: row.display_name,
+    totalAttempts: row.total_attempts,
+    correctAttempts: row.correct_attempts,
+    correctRate: Number(row.correct_rate ?? 0),
+    totalSessions: row.total_sessions,
+    updatedAt: row.updated_at ?? undefined
+  };
 }
 
 async function upsertSessionsForUser(userId: string, sessions: QuizSession[]) {
@@ -118,4 +170,52 @@ export async function pushCompletedSessionToSupabase(session: QuizSession) {
 
   if (!user) return;
   await upsertSessionsForUser(user.id, [session]);
+}
+
+export async function syncLeaderboardProfileForCurrentUser(
+  user: Pick<User, "id" | "email" | "user_metadata">,
+  sessions?: QuizSession[]
+) {
+  if (!isSupabaseConfigured()) return;
+
+  const supabase = getSupabaseBrowserClient();
+  const sourceSessions = sessions ?? loadCompletedSessions();
+  const summary = summarizeLeaderboardSessions(sourceSessions);
+
+  const { error } = await supabase.from("leaderboard_profiles").upsert(
+    {
+      user_id: user.id,
+      display_name: getLeaderboardDisplayName(user),
+      total_attempts: summary.totalAttempts,
+      correct_attempts: summary.correctAttempts,
+      correct_rate: summary.correctRate,
+      total_sessions: summary.totalSessions
+    },
+    { onConflict: "user_id" }
+  );
+
+  if (error) {
+    throw error;
+  }
+}
+
+export async function loadLeaderboard(limit = 50) {
+  if (!isSupabaseConfigured()) {
+    return [] as LeaderboardEntry[];
+  }
+
+  const supabase = getSupabaseBrowserClient();
+  const { data, error } = await supabase
+    .from("leaderboard_profiles")
+    .select("user_id, display_name, total_attempts, correct_attempts, correct_rate, total_sessions, updated_at")
+    .order("total_attempts", { ascending: false })
+    .order("correct_rate", { ascending: false })
+    .order("updated_at", { ascending: false })
+    .limit(limit);
+
+  if (error) {
+    throw error;
+  }
+
+  return (data ?? []).map((row) => mapLeaderboardRow(row as LeaderboardRow));
 }
