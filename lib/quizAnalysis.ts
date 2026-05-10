@@ -416,12 +416,50 @@ export function generateAIPrompt(
     })
     .filter(Boolean);
 
+  const confidenceScopedWeaknessLines = topWeakSections.map((section) => {
+    const relatedAttempts = attempts.filter((attempt) => {
+      const question = questionMap.get(attempt.questionId);
+      return question?.chapter === section.chapter && question.section === section.section;
+    });
+
+    const lowestConfidence = relatedAttempts.length
+      ? Math.min(...relatedAttempts.map((attempt) => attempt.confidence))
+      : 4;
+    const lowConfidenceWrongCount = relatedAttempts.filter(
+      (attempt) => !attempt.isCorrect && attempt.confidence <= 2
+    ).length;
+
+    let scope = "單一知識點";
+    let scopeInstruction = "請只補最直接的 testedConcept，外加 1 個最容易混淆的相鄰考點。";
+
+    if (lowestConfidence === 1 || lowConfidenceWrongCount >= 2) {
+      scope = "整個相關段落";
+      scopeInstruction =
+        "請從這個 section 的基礎架構開始補，帶到整段相關觀念、常考比較與典型陷阱。";
+    } else if (lowestConfidence === 2) {
+      scope = "相關考點群";
+      scopeInstruction =
+        "請以 testedConcept 為核心，延伸到同一 section 最常一起考的相關考點群，但不要擴張到整個章節。";
+    } else if (lowestConfidence === 3) {
+      scope = "單一知識點加相鄰考點";
+      scopeInstruction =
+        "請聚焦在這題對應知識點，並補 1 到 2 個最常一起混淆的相鄰考點。";
+    }
+
+    return `${section.chapter} / ${section.section}｜建議補強層級：${scope}｜最低信心 ${lowestConfidence}｜低信心答錯 ${lowConfidenceWrongCount} 題｜補法：${scopeInstruction}`;
+  });
+
   return `以下是我的解剖學醫師國考測驗紀錄。請你只做「弱點知識補強」，不要稱讚我、不要總結我哪裡做得不錯、不要輸出太多與補弱無關的分析，也不要重複貼回原始統計。
 
 回答規則：
 1. 只挑最需要補的 1 到 3 個小節。
 2. 以「小節」為單位輸出，不要先寫整體表現總結。
-3. 每個小節只回答以下內容：
+3. 每個小節的輸出範圍要依我的信心程度決定：
+   - 如果建議補強層級是「單一知識點」，就只補那個 testedConcept，不要擴寫太多。
+   - 如果建議補強層級是「單一知識點加相鄰考點」，就補核心知識點外加 1 到 2 個常混淆考點。
+   - 如果建議補強層級是「相關考點群」，就補同一 section 常一起考的考點群，但不要講整個章節。
+   - 如果建議補強層級是「整個相關段落」，就從基礎架構開始補到該段落的高頻觀念與陷阱。
+4. 每個小節只回答以下內容：
    - 為什麼這個小節現在最需要補
    - 30 秒核心觀念
    - 國考高頻考點
@@ -429,10 +467,10 @@ export function generateAIPrompt(
    - 容易混淆比較表
    - 快速記憶法
    - 3 題立即小測驗（附答案）
-4. 如果我有錯誤自信，請特別指出我觀念錯在哪裡。
-5. 如果我有低信心答錯，請用更基礎、可快速重建的方式教。
-6. 不要另外安排鼓勵、讀書計畫、人格分析、整體優缺點、稱讚或與弱點無關的延伸內容。
-7. 請用台灣醫學生準備醫師國考一階的語氣與深度回答，重點放在知識本身，越精準越好。
+5. 如果我有錯誤自信，請特別指出我觀念錯在哪裡。
+6. 如果我有低信心答錯，請用更基礎、可快速重建的方式教。
+7. 不要另外安排鼓勵、讀書計畫、人格分析、整體優缺點、稱讚或與弱點無關的延伸內容。
+8. 請用台灣醫學生準備醫師國考一階的語氣與深度回答，重點放在知識本身，越精準越好。
 
 以下是本輪整體統計：
 總題數：${summary.total}
@@ -451,6 +489,9 @@ ${overconfidenceLines.join("\n") || "目前沒有資料"}
 
 以下是優先補弱題：
 ${priorityWeaknessLines.join("\n") || "目前沒有資料"}
+
+以下是依信心程度建議的補強範圍：
+${confidenceScopedWeaknessLines.join("\n") || "目前沒有資料"}
 
 以下是目前完成度統計：
 整體 anatomy completionRate：${completionStats.overall.completionRate}%

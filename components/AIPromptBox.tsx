@@ -25,7 +25,7 @@ export function AIPromptBox({ promptText }: AIPromptBoxProps) {
         <div>
           <h2 className="text-xl font-semibold text-ink">AI 補弱 Prompt</h2>
           <p className="mt-1 text-sm text-slate-500">
-            可直接複製貼到任一 AI，重點只拿回你需要補的知識區塊。
+            可直接複製貼到任一 AI，會依你的低信心程度決定補單點、考點群或整段觀念。
           </p>
         </div>
         <button
