@@ -9,7 +9,7 @@ import { saveQuizSettings } from "@/lib/storage";
 import type { QuizSettings, SubjectName } from "@/types/quiz";
 
 const selectableSubjects = enabledSubjects.filter(
-  (item) => item.subject !== "醫學（一）" && item.subject !== "其他醫學一"
+  (item) => item.subject !== "醫學（一）" && item.subject !== "醫學（二）" && item.subject !== "其他醫學一"
 );
 
 export default function StartPage() {

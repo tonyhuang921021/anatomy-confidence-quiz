@@ -3,6 +3,7 @@ export type DifficultyLevel = "basic" | "easy" | "medium" | "hard";
 export type QuestionSourceType = "MOEX_PAST_EXAM" | "AI_GENERATED";
 export type SubjectName =
   | "醫學（一）"
+  | "醫學（二）"
   | "解剖學"
   | "生理學"
   | "生物化學"

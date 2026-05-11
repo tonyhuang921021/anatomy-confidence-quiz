@@ -23,6 +23,13 @@ export const subjectRegistry: Record<SubjectName, SubjectRegistryItem> = {
     chapters: med1OutlinesBySubject["醫學（一）"],
     questions: med1QuestionsBySubject["醫學（一）"]
   },
+  "醫學（二）": {
+    subject: "醫學（二）",
+    enabled: med1QuestionsBySubject["醫學（二）"].length > 0,
+    label: "醫學（二）全科",
+    chapters: med1OutlinesBySubject["醫學（二）"],
+    questions: med1QuestionsBySubject["醫學（二）"]
+  },
   "解剖學": {
     subject: "解剖學",
     enabled: med1QuestionsBySubject["解剖學"].length > 0,
@@ -89,7 +96,7 @@ export const subjectRegistry: Record<SubjectName, SubjectRegistryItem> = {
   "公共衛生學": {
     subject: "公共衛生學",
     enabled: med1QuestionsBySubject["公共衛生學"].length > 0,
-    label: "公共衛生學",
+    label: "公共衛生學（歸醫學二）",
     chapters: med1OutlinesBySubject["公共衛生學"],
     questions: med1QuestionsBySubject["公共衛生學"]
   },

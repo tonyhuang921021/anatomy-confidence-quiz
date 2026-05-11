@@ -146,6 +146,7 @@ export default function HomePage() {
             {Object.values(subjectRegistry).map((subject) => {
               const isAnatomy = subject.subject === "解剖學";
               const isMed1 = subject.subject === "醫學（一）";
+              const isMed2 = subject.subject === "醫學（二）";
               const questionCount = subject.questions.length;
               return (
                 <article
@@ -182,6 +183,8 @@ export default function HomePage() {
                             ? "/quiz?new=1&preset=start"
                             : isMed1
                               ? "/quiz?new=1&preset=med1"
+                              : isMed2
+                                ? "/quiz?new=1&preset=med2"
                               : "/"
                         }
                         className="min-h-12 rounded-2xl bg-brand-600 px-4 py-3 text-sm font-semibold text-white transition hover:bg-brand-700"
@@ -221,7 +224,10 @@ export default function HomePage() {
           <div className="flex flex-wrap items-center justify-between gap-4">
             <div>
               <p className="text-sm font-semibold uppercase tracking-[0.2em] text-brand-700">Quick Stats</p>
-              <h2 className="mt-2 text-2xl font-semibold text-ink">這版會重新打亂，並混入正式考古題</h2>
+              <h2 className="mt-2 text-2xl font-semibold text-ink">目前會依你選的科目抽題，並混合正式考古題與整理後題庫</h2>
+              <p className="mt-2 text-sm leading-7 text-slate-600">
+                這一格原本是舊版本留下來的提示文字，現在它的意思是：系統不會只照題庫順序出題，而會重新打亂，並在可用範圍內混入正式考古題。
+              </p>
             </div>
             <div className="rounded-3xl bg-slate-50 px-5 py-4 text-sm text-slate-700">
               整體 completionRate <span className="font-semibold text-ink">{Math.round(overall.completionRate)}%</span>

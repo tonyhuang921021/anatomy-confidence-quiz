@@ -181,8 +181,20 @@ export const allAnatomyQuestions: Question[] = [
   ...med1RemainingQuestions.filter((question) => question.subject === "解剖學")
 ];
 
+const med1CoreQuestions: Question[] = [
+  ...allAnatomyQuestions,
+  ...med1RemainingQuestions.filter(
+    (question) => question.subject === "生理學" || question.subject === "生物化學"
+  )
+];
+
+const med2CoreQuestions: Question[] = med1RemainingQuestions.filter((question) =>
+  ["藥理學", "病理學", "微生物免疫學", "公共衛生學"].includes(question.subject)
+);
+
 export const med1QuestionsBySubject: Record<SubjectName, Question[]> = {
-  "醫學（一）": [...allAnatomyQuestions, ...med1RemainingQuestions.filter((question) => question.subject !== "解剖學")],
+  "醫學（一）": med1CoreQuestions,
+  "醫學（二）": med2CoreQuestions,
   "解剖學": allAnatomyQuestions,
   "生理學": med1RemainingQuestions.filter((question) => question.subject === "生理學"),
   "生物化學": med1RemainingQuestions.filter((question) => question.subject === "生物化學"),
@@ -217,6 +229,7 @@ function buildOutline(questions: Question[]): SubjectOutlineEntry[] {
 
 export const med1OutlinesBySubject: Record<SubjectName, SubjectOutlineEntry[]> = {
   "醫學（一）": buildOutline(med1QuestionsBySubject["醫學（一）"]),
+  "醫學（二）": buildOutline(med1QuestionsBySubject["醫學（二）"]),
   "解剖學": anatomyOutline.map((item) => ({ chapter: item.chapter, sections: [...item.sections] })),
   "生理學": buildOutline(med1QuestionsBySubject["生理學"]),
   "生物化學": buildOutline(med1QuestionsBySubject["生物化學"]),

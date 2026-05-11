@@ -183,7 +183,15 @@ export default function QuizPage() {
     const med1PresetSettings: QuizSettings = {
       ...DEFAULT_QUIZ_SETTINGS,
       mode: "random",
-      subjectFilter: "全部",
+      subjectFilter: "醫學（一）",
+      questionCount: 10,
+      chapter: undefined,
+      section: undefined
+    };
+    const med2PresetSettings: QuizSettings = {
+      ...DEFAULT_QUIZ_SETTINGS,
+      mode: "random",
+      subjectFilter: "醫學（二）",
       questionCount: 10,
       chapter: undefined,
       section: undefined
@@ -193,7 +201,9 @@ export default function QuizPage() {
         ? startPresetSettings
         : preset === "med1"
           ? med1PresetSettings
-              : loadQuizSettings() ?? DEFAULT_QUIZ_SETTINGS;
+          : preset === "med2"
+            ? med2PresetSettings
+          : loadQuizSettings() ?? DEFAULT_QUIZ_SETTINGS;
     const completedSessions = loadCompletedSessions();
     const shouldForceNewSession =
       params?.get("new") === "1";
