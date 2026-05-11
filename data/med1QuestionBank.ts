@@ -54,14 +54,23 @@ function normalizeSubject(rawSubject?: string): SubjectName {
   const subject = rawSubject?.trim() ?? "";
 
   if (!subject) return "其他醫學一";
-  if (subject.includes("解剖")) return "解剖學";
+  if (
+    subject.includes("解剖") ||
+    subject.includes("組織") ||
+    subject.includes("胚胎") ||
+    subject.includes("發育生物")
+  ) {
+    return "解剖學";
+  }
   if (subject.includes("生理")) return "生理學";
-  if (subject.includes("生物化學")) return "生物化學";
-  if (subject.includes("分子生物")) return "分子生物學";
-  if (subject.includes("細胞生物")) return "細胞生物學";
-  if (subject.includes("組織")) return "組織學";
-  if (subject.includes("胚胎") || subject.includes("發育生物")) return "胚胎學";
-  if (subject.includes("寄生蟲")) return "寄生蟲學";
+  if (
+    subject.includes("生物化學") ||
+    subject.includes("分子生物") ||
+    subject.includes("細胞生物")
+  ) {
+    return "生物化學";
+  }
+  if (subject.includes("寄生蟲")) return "微生物免疫學";
   if (subject.includes("公共衛生")) return "公共衛生學";
   if (subject.includes("微生物") || subject.includes("免疫")) return "微生物免疫學";
 

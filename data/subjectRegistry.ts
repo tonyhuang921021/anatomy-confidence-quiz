@@ -26,7 +26,7 @@ export const subjectRegistry: Record<SubjectName, SubjectRegistryItem> = {
   "解剖學": {
     subject: "解剖學",
     enabled: med1QuestionsBySubject["解剖學"].length > 0,
-    label: "解剖學",
+    label: "解剖學（含組織／胚胎）",
     chapters: med1OutlinesBySubject["解剖學"],
     questions: med1QuestionsBySubject["解剖學"]
   },
@@ -40,7 +40,7 @@ export const subjectRegistry: Record<SubjectName, SubjectRegistryItem> = {
   "生物化學": {
     subject: "生物化學",
     enabled: med1QuestionsBySubject["生物化學"].length > 0,
-    label: "生物化學",
+    label: "生物化學（含細胞／分子）",
     chapters: med1OutlinesBySubject["生物化學"],
     questions: med1QuestionsBySubject["生物化學"]
   },
@@ -61,7 +61,7 @@ export const subjectRegistry: Record<SubjectName, SubjectRegistryItem> = {
   "微生物免疫學": {
     subject: "微生物免疫學",
     enabled: med1QuestionsBySubject["微生物免疫學"].length > 0,
-    label: "微生物免疫學",
+    label: "微生物免疫學（含寄生蟲）",
     chapters: med1OutlinesBySubject["微生物免疫學"],
     questions: med1QuestionsBySubject["微生物免疫學"]
   },
