@@ -15,6 +15,11 @@ export default function HomePage() {
   const availableSubjects = enabledSubjects.filter(
     (subject) => !HIDDEN_MULTI_ENTRY_SUBJECTS.includes(subject.subject)
   );
+  const totalQuestionCount = new Set(
+    Object.values(subjectRegistry)
+      .filter((subject) => subject.subject !== "醫學（一）" && subject.subject !== "醫學（二）")
+      .flatMap((subject) => subject.questions.map((question) => question.id))
+  ).size;
   const upcomingSubjects = Object.values(subjectRegistry).filter((item) => !item.enabled);
 
   return (
@@ -74,7 +79,7 @@ export default function HomePage() {
             <div className="mt-6 grid gap-3 sm:grid-cols-2">
               <div className="rounded-3xl bg-slate-50 p-4">
                 <p className="text-sm text-slate-500">目前題庫數量</p>
-                <p className="mt-2 text-2xl font-bold text-ink">{anatomyQuestions.length}</p>
+                <p className="mt-2 text-2xl font-bold text-ink">{totalQuestionCount}</p>
               </div>
               <div className="rounded-3xl bg-slate-50 p-4">
                 <p className="text-sm text-slate-500">已開放科目</p>
