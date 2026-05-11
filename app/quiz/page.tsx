@@ -108,6 +108,15 @@ function createSession(
     normalizedSettings.mode === "ai_fresh"
       ? []
       : createQuestionOrder(effectiveQuestions, completedSessions, effectiveSettings);
+  const selectedQuestionMap = new Map(
+    effectiveQuestions.map((question) => [question.id, question] as const)
+  );
+  const persistedQuestions =
+    normalizedSettings.mode === "ai_fresh"
+      ? []
+      : questionOrder
+          .map((id) => selectedQuestionMap.get(id))
+          .filter((question): question is Question => Boolean(question));
 
   return {
     id: `session-${Date.now()}`,
@@ -120,7 +129,7 @@ function createSession(
     startedAt: new Date().toISOString(),
     settings: effectiveSettings,
     questionOrder,
-    generatedQuestions: normalizedSettings.mode === "ai_fresh" ? [] : effectiveQuestions,
+    generatedQuestions: persistedQuestions,
     currentQuestionIndex: 0,
     isReviewingAnswer: false,
     attempts: []
