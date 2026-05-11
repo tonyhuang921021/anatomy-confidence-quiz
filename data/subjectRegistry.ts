@@ -33,7 +33,7 @@ export const subjectRegistry: Record<SubjectName, SubjectRegistryItem> = {
   "解剖學": {
     subject: "解剖學",
     enabled: med1QuestionsBySubject["解剖學"].length > 0,
-    label: "解剖學（含組織／胚胎）",
+    label: "解剖學",
     chapters: med1OutlinesBySubject["解剖學"],
     questions: med1QuestionsBySubject["解剖學"]
   },

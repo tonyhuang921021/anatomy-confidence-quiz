@@ -54,14 +54,9 @@ function normalizeSubject(rawSubject?: string): SubjectName {
   const subject = rawSubject?.trim() ?? "";
 
   if (!subject) return "其他醫學一";
-  if (
-    subject.includes("解剖") ||
-    subject.includes("組織") ||
-    subject.includes("胚胎") ||
-    subject.includes("發育生物")
-  ) {
-    return "解剖學";
-  }
+  if (subject.includes("解剖")) return "解剖學";
+  if (subject.includes("組織")) return "組織學";
+  if (subject.includes("胚胎") || subject.includes("發育生物")) return "胚胎學";
   if (subject.includes("生理")) return "生理學";
   if (
     subject.includes("生物化學") ||
@@ -183,6 +178,8 @@ export const allAnatomyQuestions: Question[] = [
 
 const med1CoreQuestions: Question[] = [
   ...allAnatomyQuestions,
+  ...med1RemainingQuestions.filter((question) => question.subject === "組織學"),
+  ...med1RemainingQuestions.filter((question) => question.subject === "胚胎學"),
   ...med1RemainingQuestions.filter(
     (question) => question.subject === "生理學" || question.subject === "生物化學"
   )
