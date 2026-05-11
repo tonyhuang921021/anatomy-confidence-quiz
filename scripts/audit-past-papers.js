@@ -132,8 +132,40 @@ function toMissingQuestion(raw) {
   };
 }
 
+function toRequestedPatchQuestion(raw) {
+  const acceptedAnswers = (raw.correct_answers ?? [])
+    .map((value) => String(value).trim())
+    .filter(Boolean);
+  const fallbackAnswer = String(raw.official_answer_raw ?? "").trim();
+  const primaryAnswer = acceptedAnswers[0] || fallbackAnswer;
+  if (!primaryAnswer) return null;
+
+  return {
+    id: raw.id,
+    subject: normalizeSubject(
+      raw.classification_v5?.five_subject_bucket_if_app_requires ||
+        raw.classification_v5?.primary_subject_exact
+    ),
+    sourceType: "MOEX_PAST_EXAM",
+    examCode: raw.exam_code,
+    paperCode: raw.paper_code,
+    originalQuestionNumber: raw.question_no,
+    sourceYear: raw.exam_year_gregorian,
+    examSessionLabel: raw.exam_session,
+    answerCreditType:
+      raw.answer_credit_type === "multiple"
+        ? "multiple_accepted"
+        : raw.answer_credit_type ?? "standard",
+    reviewFlags: raw.review_flags ?? [],
+    explanation: raw.explanation ?? "",
+    optionAnalysis: raw.option_analysis ?? {},
+    memoryTip: raw.memory_tip
+  };
+}
+
 function scoreQuestion(question) {
   return (
+    (question.reviewFlags?.includes("requested_supplement_patch") ? 140 : 0) +
     (question.reviewFlags?.includes("missing_question_filled_v5") ? 100 : 0) +
     (question.answerCreditType === "all_credit" ? 20 : 0) +
     (question.answerCreditType === "multiple_accepted" ? 18 : 0) +
@@ -170,14 +202,20 @@ const missingQuestions = loadExport(
   "data/sources/moex_med1_missing_22_questions_detailed_v5.ts",
   "moexMed1Missing22QuestionsDetailedV5"
 );
+const requestedPatch = loadExport(
+  "data/sources/moex_med1_requested_71_questions_detailed_patch_v5.ts",
+  "moexMed1Requested71QuestionsDetailedPatchV5"
+);
 
 const normalizedRemaining = remainingSource.questions.map(toRemainingQuestion).filter(Boolean);
 const normalizedMissing = missingQuestions.map(toMissingQuestion).filter(Boolean);
+const normalizedRequestedPatch = requestedPatch.questions.map(toRequestedPatchQuestion).filter(Boolean);
 
 const wholePaperQuestions = uniqueQuestionsByPaperSlot([
   ...anatomyQuestions,
   ...normalizedRemaining,
-  ...normalizedMissing
+  ...normalizedMissing,
+  ...normalizedRequestedPatch
 ]);
 
 const perPaper = new Map();
