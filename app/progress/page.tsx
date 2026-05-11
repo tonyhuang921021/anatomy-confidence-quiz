@@ -1,54 +1,256 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useAuth } from "@/components/AuthProvider";
-import { ProgressMap } from "@/components/ProgressMap";
-import { anatomyQuestions } from "@/data/anatomyQuestions";
-import {
-  calculateCompletionStats,
-  getLowCompletionSections,
-  getTopMasteredSections,
-  getUnstableCompletedSections
-} from "@/lib/quizAnalysis";
+import { enabledSubjects, MED1_SUBJECTS, MED2_SUBJECTS, subjectRegistry } from "@/data/subjectRegistry";
 import { loadCompletedSessions } from "@/lib/storage";
-import { CompletionStatsBundle } from "@/types/quiz";
+import type { Attempt, CompletionStatus, SubjectName } from "@/types/quiz";
 
-const emptyStats: CompletionStatsBundle = {
-  overall: {
-    totalQuestionsInBank: anatomyQuestions.length,
-    attemptedQuestions: 0,
-    completionRate: 0,
-    correctRate: 0,
-    averageConfidence: 0,
-    masteryScore: 0
-  },
-  chapters: [],
-  sections: []
+type SectionProgress = {
+  chapter: string;
+  section: string;
+  totalQuestionsInBank: number;
+  attemptedQuestions: number;
+  completionRate: number;
+  correctRate: number;
+  averageConfidence: number;
+  masteryScore: number;
+  status: CompletionStatus;
+  lastAttemptedAt?: string;
 };
 
+type SubjectProgress = {
+  subject: SubjectName;
+  label: string;
+  totalQuestionsInBank: number;
+  attemptedQuestions: number;
+  completionRate: number;
+  correctRate: number;
+  averageConfidence: number;
+  masteryScore: number;
+  status: CompletionStatus;
+  sections: SectionProgress[];
+};
+
+type GroupProgress = {
+  key: "med1" | "med2";
+  label: string;
+  description: string;
+  totalQuestionsInBank: number;
+  attemptedQuestions: number;
+  completionRate: number;
+  correctRate: number;
+  averageConfidence: number;
+  masteryScore: number;
+  status: CompletionStatus;
+  subjects: SubjectProgress[];
+};
+
+type StoredSession = {
+  attempts: Attempt[];
+};
+
+const statusClasses: Record<CompletionStatus, string> = {
+  未開始: "bg-slate-100 text-slate-700",
+  進行中: "bg-sky-100 text-sky-800",
+  已完成但不穩: "bg-amber-100 text-amber-900",
+  已完成且穩定: "bg-emerald-100 text-emerald-800"
+};
+
+function round(value: number) {
+  return Math.round(value * 10) / 10;
+}
+
+function getStatus(completionRate: number, masteryScore: number): CompletionStatus {
+  if (completionRate === 0) return "未開始";
+  if (completionRate < 80) return "進行中";
+  if (masteryScore < 70) return "已完成但不穩";
+  return "已完成且穩定";
+}
+
+function formatTime(value?: string) {
+  if (!value) return "尚未作答";
+  return new Date(value).toLocaleString("zh-TW", {
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit"
+  });
+}
+
+function calculateSectionProgress(
+  questionIds: Set<string>,
+  attempts: Attempt[],
+  chapter: string,
+  section: string
+): SectionProgress {
+  const sectionAttempts = attempts.filter((attempt) => questionIds.has(attempt.questionId));
+  const attemptedQuestions = new Set(sectionAttempts.map((attempt) => attempt.questionId)).size;
+  const completionRate =
+    questionIds.size === 0 ? 0 : round((attemptedQuestions / questionIds.size) * 100);
+  const correctRate =
+    sectionAttempts.length === 0
+      ? 0
+      : round((sectionAttempts.filter((attempt) => attempt.isCorrect).length / sectionAttempts.length) * 100);
+  const averageConfidence =
+    sectionAttempts.length === 0
+      ? 0
+      : round(
+          sectionAttempts.reduce((sum, attempt) => sum + attempt.confidence, 0) / sectionAttempts.length
+        );
+  const masteryScore = round(
+    completionRate * 0.4 + correctRate * 0.4 + (averageConfidence / 5) * 100 * 0.2
+  );
+  const lastAttemptedAt = sectionAttempts
+    .map((attempt) => attempt.answeredAt)
+    .sort()
+    .at(-1);
+
+  return {
+    chapter,
+    section,
+    totalQuestionsInBank: questionIds.size,
+    attemptedQuestions,
+    completionRate,
+    correctRate,
+    averageConfidence,
+    masteryScore,
+    status: getStatus(completionRate, masteryScore),
+    lastAttemptedAt
+  };
+}
+
+function calculateSubjectProgress(subject: SubjectName, sessions: StoredSession[]): SubjectProgress {
+  const subjectItem = subjectRegistry[subject];
+  const questionMap = new Map(subjectItem.questions.map((question) => [question.id, question] as const));
+  const attempts = sessions
+    .flatMap((session) => session.attempts)
+    .filter((attempt) => questionMap.has(attempt.questionId));
+
+  const sectionBuckets = new Map<string, Set<string>>();
+  subjectItem.questions.forEach((question) => {
+    const key = `${question.chapter}__${question.section}`;
+    const bucket = sectionBuckets.get(key) ?? new Set<string>();
+    bucket.add(question.id);
+    sectionBuckets.set(key, bucket);
+  });
+
+  const sections = Array.from(sectionBuckets.entries())
+    .map(([key, ids]) => {
+      const [chapter, section] = key.split("__");
+      return calculateSectionProgress(ids, attempts, chapter, section);
+    })
+    .sort((a, b) => a.chapter.localeCompare(b.chapter) || a.section.localeCompare(b.section));
+
+  const attemptedQuestions = new Set(attempts.map((attempt) => attempt.questionId)).size;
+  const completionRate =
+    subjectItem.questions.length === 0 ? 0 : round((attemptedQuestions / subjectItem.questions.length) * 100);
+  const correctRate =
+    attempts.length === 0 ? 0 : round((attempts.filter((attempt) => attempt.isCorrect).length / attempts.length) * 100);
+  const averageConfidence =
+    attempts.length === 0 ? 0 : round(attempts.reduce((sum, attempt) => sum + attempt.confidence, 0) / attempts.length);
+  const masteryScore = round(
+    completionRate * 0.4 + correctRate * 0.4 + (averageConfidence / 5) * 100 * 0.2
+  );
+
+  return {
+    subject,
+    label: subjectItem.label,
+    totalQuestionsInBank: subjectItem.questions.length,
+    attemptedQuestions,
+    completionRate,
+    correctRate,
+    averageConfidence,
+    masteryScore,
+    status: getStatus(completionRate, masteryScore),
+    sections
+  };
+}
+
+function aggregateGroup(
+  key: "med1" | "med2",
+  label: string,
+  description: string,
+  subjects: SubjectProgress[]
+): GroupProgress {
+  const totalQuestionsInBank = subjects.reduce((sum, subject) => sum + subject.totalQuestionsInBank, 0);
+  const attemptedQuestions = subjects.reduce((sum, subject) => sum + subject.attemptedQuestions, 0);
+  const completionRate =
+    totalQuestionsInBank === 0 ? 0 : round((attemptedQuestions / totalQuestionsInBank) * 100);
+  const correctRate =
+    subjects.length === 0 ? 0 : round(subjects.reduce((sum, subject) => sum + subject.correctRate, 0) / subjects.length);
+  const averageConfidence =
+    subjects.length === 0 ? 0 : round(subjects.reduce((sum, subject) => sum + subject.averageConfidence, 0) / subjects.length);
+  const masteryScore = round(
+    completionRate * 0.4 + correctRate * 0.4 + (averageConfidence / 5) * 100 * 0.2
+  );
+
+  return {
+    key,
+    label,
+    description,
+    totalQuestionsInBank,
+    attemptedQuestions,
+    completionRate,
+    correctRate,
+    averageConfidence,
+    masteryScore,
+    status: getStatus(completionRate, masteryScore),
+    subjects
+  };
+}
+
 export default function ProgressPage() {
-  const [stats, setStats] = useState<CompletionStatsBundle>(emptyStats);
   const { syncVersion } = useAuth();
+  const [sessions, setSessions] = useState<StoredSession[]>([]);
+  const [openGroups, setOpenGroups] = useState<Record<string, boolean>>({ med1: true, med2: true });
+  const [openSubjects, setOpenSubjects] = useState<Record<string, boolean>>({});
 
   useEffect(() => {
-    const sessions = loadCompletedSessions();
-    setStats(calculateCompletionStats(anatomyQuestions, sessions));
+    setSessions(loadCompletedSessions());
   }, [syncVersion]);
 
-  const lowCompletion = getLowCompletionSections(stats.sections, 5);
-  const unstable = getUnstableCompletedSections(stats.sections, 5);
-  const mastered = getTopMasteredSections(stats.sections, 5);
+  const med1Progress = useMemo(
+    () => MED1_SUBJECTS.map((subject) => calculateSubjectProgress(subject, sessions)).filter((subject) => subject.totalQuestionsInBank > 0),
+    [sessions]
+  );
+  const med2Progress = useMemo(
+    () => MED2_SUBJECTS.map((subject) => calculateSubjectProgress(subject, sessions)).filter((subject) => subject.totalQuestionsInBank > 0),
+    [sessions]
+  );
+
+  const groups = useMemo(
+    () => [
+      aggregateGroup("med1", "醫學（一）", "解剖、組織、胚胎、生理、生化。", med1Progress),
+      aggregateGroup("med2", "醫學（二）", "微免、寄生蟲、公衛、藥理、病理。", med2Progress)
+    ],
+    [med1Progress, med2Progress]
+  );
+
+  const allSubjects = [...med1Progress, ...med2Progress];
+  const lowCompletion = [...allSubjects]
+    .sort((a, b) => a.completionRate - b.completionRate || a.masteryScore - b.masteryScore)
+    .slice(0, 5);
+  const unstable = allSubjects
+    .filter((subject) => subject.completionRate >= 80 && subject.masteryScore < 70)
+    .sort((a, b) => a.masteryScore - b.masteryScore)
+    .slice(0, 5);
+  const mastered = [...allSubjects]
+    .filter((subject) => subject.attemptedQuestions > 0)
+    .sort((a, b) => b.masteryScore - a.masteryScore)
+    .slice(0, 5);
 
   return (
     <main className="shell">
       <section className="rounded-[2rem] bg-white p-6 shadow-card ring-1 ring-slate-100 sm:p-8">
         <div className="flex flex-wrap items-center justify-between gap-4">
           <div>
-            <p className="text-sm font-semibold uppercase tracking-[0.2em] text-brand-700">Anatomy Map</p>
-            <h1 className="mt-2 text-3xl font-bold text-ink sm:text-4xl">解剖學進度總覽</h1>
+            <p className="text-sm font-semibold uppercase tracking-[0.2em] text-brand-700">Progress Map</p>
+            <h1 className="mt-2 text-3xl font-bold text-ink sm:text-4xl">醫學一／醫學二進度總覽</h1>
             <p className="mt-3 text-slate-500">
-              依照完整 anatomy map 檢查 completionRate、correctRate、averageConfidence 與 masteryScore。
+              先看醫學一與醫學二，再往下展開各科與各 section。
             </p>
           </div>
           <div className="flex flex-wrap gap-3">
@@ -59,69 +261,72 @@ export default function ProgressPage() {
               返回首頁
             </Link>
             <Link
-              href="/quiz?new=1"
+              href="/start"
               className="min-h-12 rounded-2xl bg-brand-600 px-5 py-4 text-sm font-semibold text-white transition hover:bg-brand-700"
             >
               開始測驗
             </Link>
-            <Link
-              href="/review"
-              className="min-h-12 rounded-2xl bg-slate-100 px-5 py-4 text-sm font-semibold text-slate-800 transition hover:bg-slate-200"
-            >
-              錯題複習
-            </Link>
           </div>
         </div>
 
-        <div className="mt-6 grid gap-4 lg:grid-cols-4">
-          <article className="rounded-3xl bg-brand-50 p-5 text-brand-900">
-            <p className="text-sm font-medium">整體完成度</p>
-            <p className="mt-2 text-3xl font-bold">{stats.overall.completionRate}%</p>
-            <p className="mt-2 text-sm">已作答 {stats.overall.attemptedQuestions} / {stats.overall.totalQuestionsInBank}</p>
-          </article>
-          <article className="rounded-3xl bg-emerald-50 p-5 text-emerald-900">
-            <p className="text-sm font-medium">整體答對率</p>
-            <p className="mt-2 text-3xl font-bold">{stats.overall.correctRate}%</p>
-            <p className="mt-2 text-sm">averageConfidence {stats.overall.averageConfidence}</p>
-          </article>
-          <article className="rounded-3xl bg-sky-50 p-5 text-sky-900">
-            <p className="text-sm font-medium">整體 masteryScore</p>
-            <p className="mt-2 text-3xl font-bold">{stats.overall.masteryScore}</p>
-            <p className="mt-2 text-sm">歷史 completed sessions 計算</p>
-          </article>
-          <article className="rounded-3xl bg-slate-50 p-5 text-slate-800">
-            <p className="text-sm font-medium">章節數</p>
-            <p className="mt-2 text-3xl font-bold">{stats.chapters.length}</p>
-            <p className="mt-2 text-sm">section 數 {stats.sections.length}</p>
-          </article>
+        <div className="mt-6 grid gap-4 lg:grid-cols-2">
+          {groups.map((group) => (
+            <article key={group.key} className="rounded-3xl bg-slate-50 p-5">
+              <div className="flex items-start justify-between gap-4">
+                <div>
+                  <p className="text-sm font-medium text-slate-500">{group.label}</p>
+                  <p className="mt-2 text-3xl font-bold text-ink">{group.completionRate}%</p>
+                  <p className="mt-2 text-sm text-slate-600">{group.description}</p>
+                </div>
+                <span className={`rounded-full px-3 py-1 text-xs font-semibold ${statusClasses[group.status]}`}>
+                  {group.status}
+                </span>
+              </div>
+              <div className="mt-4 h-3 overflow-hidden rounded-full bg-white">
+                <div
+                  className="h-full rounded-full bg-gradient-to-r from-brand-500 to-emerald-400"
+                  style={{ width: `${group.completionRate}%` }}
+                />
+              </div>
+              <div className="mt-4 grid gap-3 sm:grid-cols-3">
+                <p className="rounded-2xl bg-white px-4 py-3 text-sm text-slate-700">
+                  已作答 <span className="font-semibold">{group.attemptedQuestions}</span> / {group.totalQuestionsInBank}
+                </p>
+                <p className="rounded-2xl bg-white px-4 py-3 text-sm text-slate-700">
+                  答對率 <span className="font-semibold">{group.correctRate}%</span>
+                </p>
+                <p className="rounded-2xl bg-white px-4 py-3 text-sm text-slate-700">
+                  mastery <span className="font-semibold">{group.masteryScore}</span>
+                </p>
+              </div>
+            </article>
+          ))}
         </div>
       </section>
 
       <section className="mt-8 grid gap-6 xl:grid-cols-3">
         <div className="rounded-[2rem] bg-white p-6 shadow-card ring-1 ring-slate-100">
-          <h2 className="text-xl font-semibold text-ink">完成度最低的 sections</h2>
+          <h2 className="text-xl font-semibold text-ink">完成度最低的科目</h2>
           <div className="mt-4 grid gap-3">
-            {lowCompletion.map((section) => (
-              <div key={`${section.chapter}-${section.section}`} className="rounded-2xl bg-slate-50 p-4 text-sm text-slate-700">
-                <p className="font-semibold">{section.section}</p>
-                <p className="mt-1 text-slate-500">{section.chapter}</p>
-                <p className="mt-2">completionRate {section.completionRate}%</p>
+            {lowCompletion.map((subject) => (
+              <div key={subject.subject} className="rounded-2xl bg-slate-50 p-4 text-sm text-slate-700">
+                <p className="font-semibold">{subject.label}</p>
+                <p className="mt-2">completionRate {subject.completionRate}%</p>
               </div>
             ))}
           </div>
         </div>
 
         <div className="rounded-[2rem] bg-white p-6 shadow-card ring-1 ring-slate-100">
-          <h2 className="text-xl font-semibold text-ink">已完成但不穩的 sections</h2>
+          <h2 className="text-xl font-semibold text-ink">已完成但不穩的科目</h2>
           <div className="mt-4 grid gap-3">
             {unstable.length === 0 ? (
-              <p className="rounded-2xl bg-slate-50 p-4 text-sm text-slate-600">目前沒有落在這個區間的 section。</p>
+              <p className="rounded-2xl bg-slate-50 p-4 text-sm text-slate-600">目前沒有落在這個區間的科目。</p>
             ) : (
-              unstable.map((section) => (
-                <div key={`${section.chapter}-${section.section}`} className="rounded-2xl bg-slate-50 p-4 text-sm text-slate-700">
-                  <p className="font-semibold">{section.section}</p>
-                  <p className="mt-1 text-slate-500">{section.chapter}</p>
-                  <p className="mt-2">masteryScore {section.masteryScore}</p>
+              unstable.map((subject) => (
+                <div key={subject.subject} className="rounded-2xl bg-slate-50 p-4 text-sm text-slate-700">
+                  <p className="font-semibold">{subject.label}</p>
+                  <p className="mt-2">masteryScore {subject.masteryScore}</p>
                 </div>
               ))
             )}
@@ -129,16 +334,15 @@ export default function ProgressPage() {
         </div>
 
         <div className="rounded-[2rem] bg-white p-6 shadow-card ring-1 ring-slate-100">
-          <h2 className="text-xl font-semibold text-ink">掌握度最高的 sections</h2>
+          <h2 className="text-xl font-semibold text-ink">掌握度最高的科目</h2>
           <div className="mt-4 grid gap-3">
             {mastered.length === 0 ? (
               <p className="rounded-2xl bg-slate-50 p-4 text-sm text-slate-600">還沒有足夠資料可判定。</p>
             ) : (
-              mastered.map((section) => (
-                <div key={`${section.chapter}-${section.section}`} className="rounded-2xl bg-slate-50 p-4 text-sm text-slate-700">
-                  <p className="font-semibold">{section.section}</p>
-                  <p className="mt-1 text-slate-500">{section.chapter}</p>
-                  <p className="mt-2">masteryScore {section.masteryScore}</p>
+              mastered.map((subject) => (
+                <div key={subject.subject} className="rounded-2xl bg-slate-50 p-4 text-sm text-slate-700">
+                  <p className="font-semibold">{subject.label}</p>
+                  <p className="mt-2">masteryScore {subject.masteryScore}</p>
                 </div>
               ))
             )}
@@ -146,8 +350,108 @@ export default function ProgressPage() {
         </div>
       </section>
 
-      <div className="mt-8">
-        <ProgressMap chapters={stats.chapters} />
+      <div className="mt-8 space-y-5">
+        {groups.map((group) => {
+          const isGroupOpen = openGroups[group.key];
+          return (
+            <section key={group.key} className="rounded-[2rem] bg-white p-5 shadow-card ring-1 ring-slate-100">
+              <button
+                type="button"
+                onClick={() =>
+                  setOpenGroups((current) => ({
+                    ...current,
+                    [group.key]: !current[group.key]
+                  }))
+                }
+                className="flex w-full items-center justify-between gap-4 text-left"
+              >
+                <div>
+                  <h2 className="text-2xl font-semibold text-ink">{group.label}</h2>
+                  <p className="mt-2 text-sm text-slate-500">
+                    completionRate {group.completionRate}% ・ masteryScore {group.masteryScore}
+                  </p>
+                </div>
+                <span className="text-sm font-semibold text-brand-700">{isGroupOpen ? "收合" : "展開"}</span>
+              </button>
+
+              {isGroupOpen ? (
+                <div className="mt-5 space-y-4">
+                  {group.subjects.map((subject) => {
+                    const isSubjectOpen = openSubjects[subject.subject] ?? false;
+                    return (
+                      <article key={subject.subject} className="rounded-3xl border border-slate-200 bg-slate-50 p-4">
+                        <button
+                          type="button"
+                          onClick={() =>
+                            setOpenSubjects((current) => ({
+                              ...current,
+                              [subject.subject]: !current[subject.subject]
+                            }))
+                          }
+                          className="flex w-full items-center justify-between gap-4 text-left"
+                        >
+                          <div>
+                            <h3 className="text-lg font-semibold text-ink">{subject.label}</h3>
+                            <p className="mt-2 text-sm text-slate-500">
+                              已作答 {subject.attemptedQuestions} / {subject.totalQuestionsInBank} ・ correctRate {subject.correctRate}% ・ mastery {subject.masteryScore}
+                            </p>
+                          </div>
+                          <div className="flex items-center gap-3">
+                            <span className={`rounded-full px-3 py-1 text-xs font-semibold ${statusClasses[subject.status]}`}>
+                              {subject.status}
+                            </span>
+                            <span className="text-sm font-semibold text-brand-700">{isSubjectOpen ? "收合" : "展開"}</span>
+                          </div>
+                        </button>
+
+                        {isSubjectOpen ? (
+                          <div className="mt-4 grid gap-3">
+                            {subject.sections.map((section) => (
+                              <article key={`${section.chapter}-${section.section}`} className="rounded-2xl bg-white p-4">
+                                <div className="flex items-start justify-between gap-3">
+                                  <div>
+                                    <h4 className="text-base font-semibold text-ink">{section.section}</h4>
+                                    <p className="mt-1 text-sm text-slate-500">{section.chapter}</p>
+                                  </div>
+                                  <span className={`rounded-full px-3 py-1 text-xs font-semibold ${statusClasses[section.status]}`}>
+                                    {section.status}
+                                  </span>
+                                </div>
+                                <div className="mt-3 h-3 overflow-hidden rounded-full bg-slate-100">
+                                  <div
+                                    className="h-full rounded-full bg-gradient-to-r from-sky-500 to-brand-500"
+                                    style={{ width: `${section.completionRate}%` }}
+                                  />
+                                </div>
+                                <div className="mt-3 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+                                  <p className="rounded-2xl bg-slate-50 px-4 py-3 text-sm text-slate-700">
+                                    completion {section.completionRate}%
+                                  </p>
+                                  <p className="rounded-2xl bg-slate-50 px-4 py-3 text-sm text-slate-700">
+                                    correct {section.correctRate}%
+                                  </p>
+                                  <p className="rounded-2xl bg-slate-50 px-4 py-3 text-sm text-slate-700">
+                                    confidence {section.averageConfidence}
+                                  </p>
+                                  <p className="rounded-2xl bg-slate-50 px-4 py-3 text-sm text-slate-700">
+                                    mastery {section.masteryScore}
+                                  </p>
+                                  <p className="rounded-2xl bg-slate-50 px-4 py-3 text-sm text-slate-700 sm:col-span-2 xl:col-span-4">
+                                    最近一次作答 {formatTime(section.lastAttemptedAt)}
+                                  </p>
+                                </div>
+                              </article>
+                            ))}
+                          </div>
+                        ) : null}
+                      </article>
+                    );
+                  })}
+                </div>
+              ) : null}
+            </section>
+          );
+        })}
       </div>
     </main>
   );
