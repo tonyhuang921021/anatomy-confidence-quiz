@@ -11,12 +11,12 @@ type RawQuestion = {
   paper_code?: string;
   question_no?: number;
   stem: string;
-  options: Record<string, string>;
+  options: Readonly<Record<string, string>>;
   answer?: string;
-  correct_answers?: string[];
+  correct_answers?: readonly string[];
   answer_credit_type?: string;
   explanation?: string;
-  option_analysis?: Record<string, string>;
+  option_analysis?: Readonly<Record<string, string>>;
   exam_point?: string;
   difficulty?: string;
   classification_v4?: {
@@ -27,7 +27,7 @@ type RawQuestion = {
   clinical_link?: string;
   answer_confidence?: "high" | "medium" | "low";
   needs_human_review?: boolean;
-  review_flags?: string[];
+  review_flags?: readonly string[];
   detail_phase?: string;
 };
 
