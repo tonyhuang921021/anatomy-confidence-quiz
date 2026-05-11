@@ -722,7 +722,7 @@ export function getPastPaperOptions(subjectFilter: SubjectFilter = "全部"): Pa
         ...paper,
         missingNumbers,
         isComplete: missingNumbers.length === 0,
-        questionCount: presentNumbers.size
+        questionCount: 100
       };
     })
     .sort((a, b) => {

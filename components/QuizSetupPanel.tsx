@@ -312,10 +312,7 @@ export function QuizSetupPanel({ stats }: QuizSetupPanelProps) {
                   <option value="">請選擇真實考古題</option>
                   {paperOptions.map((paper) => (
                     <option key={paper.key} value={paper.key}>
-                      {paper.label}
-                      {paper.isComplete
-                        ? "（完整 100 題）"
-                        : `（目前 ${paper.questionCount} 題，缺 ${paper.missingNumbers?.join("、")}）`}
+                      {paper.label}（{paper.questionCount} 題）
                     </option>
                   ))}
                 </select>
