@@ -161,7 +161,8 @@ function toQuestion(raw: RawQuestion): Question | null {
   };
 }
 
-const remainingQuestionsRaw = moexMed1RemainingDetailedV4Merged0011827.questions as RawQuestion[];
+const remainingQuestionsRaw =
+  moexMed1RemainingDetailedV4Merged0011827.questions as readonly RawQuestion[];
 export const med1RemainingQuestions: Question[] = remainingQuestionsRaw
   .map(toQuestion)
   .filter((question): question is Question => Boolean(question));
