@@ -162,11 +162,15 @@ export default function QuizPage() {
 
   useEffect(() => {
     const existing = loadCurrentSession();
-    const savedSettings = loadQuizSettings() ?? DEFAULT_QUIZ_SETTINGS;
+    const params =
+      typeof window !== "undefined" ? new URLSearchParams(window.location.search) : null;
+    const preset = params?.get("preset");
+    const savedSettings = preset === "start"
+      ? { ...DEFAULT_QUIZ_SETTINGS, mode: "weakness", questionCount: 10, chapter: undefined, section: undefined }
+      : loadQuizSettings() ?? DEFAULT_QUIZ_SETTINGS;
     const completedSessions = loadCompletedSessions();
     const shouldForceNewSession =
-      typeof window !== "undefined" &&
-      new URLSearchParams(window.location.search).get("new") === "1";
+      params?.get("new") === "1";
     const shouldReuseExisting =
       !shouldForceNewSession &&
       existing &&
