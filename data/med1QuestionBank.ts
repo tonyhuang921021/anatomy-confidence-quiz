@@ -382,6 +382,26 @@ function uniqueById(questions: Question[]) {
   });
 }
 
+function fillPastPaperMetadata(question: Question): Question {
+  if (question.examCode && question.paperCode && question.originalQuestionNumber) {
+    return question;
+  }
+
+  const idMatch = question.id.match(/^MOEX-(\d+)-(\d+)-Q(\d+)$/i);
+  if (!idMatch) {
+    return question;
+  }
+
+  const [, examCode, paperCode, questionNumber] = idMatch;
+  return {
+    ...question,
+    examCode: question.examCode ?? examCode,
+    paperCode: question.paperCode ?? paperCode,
+    originalQuestionNumber:
+      question.originalQuestionNumber ?? Number.parseInt(questionNumber, 10)
+  };
+}
+
 function getQuestionRichnessScore(question: Question) {
   return (
     (question.sourceType === "MOEX_PAST_EXAM" ? 200 : 0) +
@@ -406,6 +426,7 @@ function buildWholePastPaperBank() {
   const allMoexQuestions = uniqueById(
     [...allAnatomyQuestions, ...med1RemainingQuestions, ...med1MissingQuestions, ...med2CoreQuestions]
       .filter((question) => question.sourceType === "MOEX_PAST_EXAM")
+      .map(fillPastPaperMetadata)
   );
   const grouped = new Map<string, Question[]>();
 
