@@ -119,9 +119,12 @@ function toSectionLabel(topicSection?: string, fallback = "其他") {
 }
 
 function toQuestion(raw: RawQuestion): Question | null {
-  const answer = raw.answer?.trim() ?? raw.correct_answers?.[0]?.trim() ?? "";
-  if (!isOptionKey(answer)) return null;
-  if (raw.answer_credit_type && raw.answer_credit_type !== "standard") return null;
+  const acceptedAnswers = (raw.correct_answers ?? [])
+    .map((value) => value.trim())
+    .filter(isOptionKey);
+  const primaryAnswer = raw.answer?.trim() ?? acceptedAnswers[0] ?? "";
+  if (!isOptionKey(primaryAnswer)) return null;
+  if (raw.answer_credit_type === "multiple_answers") return null;
 
   const primarySubject = normalizeSubject(raw.classification_v4?.primary_subject);
   const topicSection = raw.classification_v4?.topic_section?.trim();
@@ -143,7 +146,9 @@ function toQuestion(raw: RawQuestion): Question | null {
       D: raw.options.D ?? "",
       ...(raw.options.E ? { E: raw.options.E } : {})
     },
-    answer,
+    answer: primaryAnswer,
+    acceptedAnswers: acceptedAnswers.length > 0 ? acceptedAnswers : undefined,
+    answerCreditType: raw.answer_credit_type as Question["answerCreditType"],
     explanation: raw.explanation ?? "",
     testedConcept: raw.exam_point ?? topicSection ?? section,
     optionAnalysis: raw.option_analysis as Partial<Record<OptionKey, string>> | undefined,

@@ -1,6 +1,11 @@
 export type OptionKey = "A" | "B" | "C" | "D" | "E";
 export type DifficultyLevel = "basic" | "easy" | "medium" | "hard";
 export type QuestionSourceType = "MOEX_PAST_EXAM" | "AI_GENERATED";
+export type AnswerCreditType =
+  | "standard"
+  | "multiple_accepted"
+  | "all_credit"
+  | "multiple_answers";
 export type SubjectName =
   | "醫學（一）"
   | "醫學（二）"
@@ -32,6 +37,8 @@ export type Question = {
     E?: string;
   };
   answer: OptionKey;
+  acceptedAnswers?: OptionKey[];
+  answerCreditType?: AnswerCreditType;
   explanation: string;
   testedConcept: string;
   optionAnalysis?: Partial<Record<OptionKey, string>>;

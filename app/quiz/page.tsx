@@ -71,6 +71,22 @@ function getDifficultyBadge(question: Question) {
   return null;
 }
 
+function evaluateAttempt(question: Question, selectedAnswer: OptionKey) {
+  if (question.answerCreditType === "all_credit") {
+    return true;
+  }
+
+  if (question.answerCreditType === "multiple_accepted") {
+    const acceptedAnswers =
+      question.acceptedAnswers && question.acceptedAnswers.length > 0
+        ? question.acceptedAnswers
+        : [question.answer];
+    return acceptedAnswers.includes(selectedAnswer);
+  }
+
+  return selectedAnswer === question.answer;
+}
+
 function createSession(
   questions: Question[],
   completedSessions: QuizSession[],
@@ -369,7 +385,7 @@ export default function QuizPage() {
       questionId: currentQuestion.id,
       selectedAnswer,
       correctAnswer: currentQuestion.answer,
-      isCorrect: selectedAnswer === currentQuestion.answer,
+      isCorrect: evaluateAttempt(currentQuestion, selectedAnswer),
       confidence,
       answeredAt: new Date().toISOString()
     };
@@ -543,6 +559,14 @@ export default function QuizPage() {
   const feedbackMode = session.settings?.feedbackMode ?? "full";
   const shouldShowExplanation = feedbackMode === "full";
   const shouldShowCorrectAnswer = feedbackMode === "full" || feedbackMode === "answer_only";
+  const specialScoringNote =
+    submittedAttempt && currentQuestion.answerCreditType === "multiple_accepted"
+      ? "本題多重給分：若你的答案在官方接受答案中，即算答對。"
+      : submittedAttempt && currentQuestion.answerCreditType === "all_credit"
+        ? "本題為官方送分題：本輪直接視為答對。"
+        : submittedAttempt && currentQuestion.needsHumanReview
+          ? "本題為人工複核題：目前依官方答案判定，請以官方最終公告為準。"
+          : null;
 
   return (
     <main className="shell">
@@ -655,7 +679,13 @@ export default function QuizPage() {
                 <div className="mt-4 space-y-3 text-sm leading-7">
                   {shouldShowCorrectAnswer ? (
                     <p>
-                      正確答案：<span className="font-semibold">{submittedAttempt.correctAnswer}</span>
+                      正確答案：
+                      <span className="font-semibold">
+                        {currentQuestion.answerCreditType === "multiple_accepted" &&
+                        currentQuestion.acceptedAnswers?.length
+                          ? currentQuestion.acceptedAnswers.join(" / ")
+                          : submittedAttempt.correctAnswer}
+                      </span>
                     </p>
                   ) : null}
                   {shouldShowExplanation ? (
@@ -669,6 +699,11 @@ export default function QuizPage() {
                   <p>
                     本題信心：<span className="font-semibold">{getConfidenceLabel(submittedAttempt.confidence)}</span>
                   </p>
+                  {specialScoringNote ? (
+                    <p className="rounded-2xl bg-amber-100/70 px-4 py-3 text-amber-950">
+                      {specialScoringNote}
+                    </p>
+                  ) : null}
                 </div>
 
                 {shouldShowExplanation && currentQuestion.optionAnalysis ? (
