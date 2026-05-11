@@ -13,7 +13,11 @@ const emptyStats: VisitorStats = {
   updatedAt: ""
 };
 
-export function VisitorStatsPanel() {
+type VisitorStatsPanelProps = {
+  compact?: boolean;
+};
+
+export function VisitorStatsPanel({ compact = false }: VisitorStatsPanelProps) {
   const [stats, setStats] = useState<VisitorStats>(emptyStats);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -54,10 +58,25 @@ export function VisitorStatsPanel() {
   }, []);
 
   if (!isSupabaseConfigured()) {
+    if (compact) return null;
+
     return (
       <div className="rounded-3xl bg-slate-50 p-4">
         <p className="text-sm text-slate-500">訪客統計</p>
         <p className="mt-2 text-sm text-slate-600">需先設定 Supabase 才會顯示。</p>
+      </div>
+    );
+  }
+
+  if (compact) {
+    return (
+      <div className="flex min-w-0 flex-wrap items-center justify-end gap-2 text-xs font-semibold">
+        <span className="rounded-full bg-slate-100 px-3 py-1 text-slate-700">
+          累積訪客 {loading ? "..." : stats.totalVisitors}
+        </span>
+        <span className="rounded-full bg-slate-100 px-3 py-1 text-slate-700">
+          在線估算 {loading ? "..." : stats.onlineVisitors}
+        </span>
       </div>
     );
   }

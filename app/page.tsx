@@ -1,7 +1,6 @@
 import Link from "next/link";
 import { AuthPanel } from "@/components/AuthPanel";
 import { QuizSetupPanel } from "@/components/QuizSetupPanel";
-import { VisitorStatsPanel } from "@/components/VisitorStatsPanel";
 import { anatomyQuestions } from "@/data/anatomyQuestions";
 import {
   enabledSubjects,
@@ -29,13 +28,13 @@ export default function HomePage() {
         <div className="grid gap-8 lg:grid-cols-[1.2fr_0.8fr] lg:items-center">
           <div>
             <p className="text-sm font-semibold uppercase tracking-[0.2em] text-brand-700">
-              Anatomy Confidence Quiz
+              Medical Board Step 1 Quiz
             </p>
             <h1 className="mt-3 text-4xl font-bold tracking-tight text-ink sm:text-5xl">
-              解剖學醫師國考信心測驗
+              一階醫師國考刷題測驗
             </h1>
             <p className="mt-4 max-w-2xl text-base leading-8 text-slate-600 sm:text-lg">
-              用答題結果、信心程度與完成度，找出你的解剖國考弱點。
+              用答題結果、信心程度與完成度，找出你的一階醫師國考弱點。
             </p>
 
             <div className="mt-6 flex flex-col gap-3 sm:flex-row">
@@ -77,7 +76,7 @@ export default function HomePage() {
               </Link>
             </div>
 
-            <div className="mt-6 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+            <div className="mt-6 grid gap-3 sm:grid-cols-2">
               <div className="rounded-3xl bg-slate-50 p-4">
                 <p className="text-sm text-slate-500">目前題庫數量</p>
                 <p className="mt-2 text-2xl font-bold text-ink">{totalQuestionCount}</p>
@@ -88,7 +87,6 @@ export default function HomePage() {
                   {availableSubjects.map((subject) => subject.label).join("、")}
                 </p>
               </div>
-              <VisitorStatsPanel />
             </div>
           </div>
 
@@ -100,8 +98,8 @@ export default function HomePage() {
                 <p className="mt-1 text-sm text-slate-200">先選想抽哪些科，再進入答題流程</p>
               </Link>
               <Link href="/progress" className="rounded-2xl bg-white/10 p-4 transition hover:bg-white/15">
-                <p className="font-semibold">看解剖學進度地圖</p>
-                <p className="mt-1 text-sm text-slate-200">檢查 completionRate 與 masteryScore</p>
+                <p className="font-semibold">看一階國考進度地圖</p>
+                <p className="mt-1 text-sm text-slate-200">檢查各科 completionRate 與 masteryScore</p>
               </Link>
               <Link href="/review" className="rounded-2xl bg-white/10 p-4 transition hover:bg-white/15">
                 <p className="font-semibold">看錯題與高風險題</p>
@@ -147,7 +145,7 @@ export default function HomePage() {
               <p className="text-sm font-semibold uppercase tracking-[0.2em] text-brand-700">Subjects</p>
               <h2 className="mt-2 text-2xl font-semibold text-ink">多科目入口</h2>
               <p className="mt-2 text-sm leading-7 text-slate-600">
-                目前正式啟用的是解剖學，其他科目已預留結構，之後可以直接接進同一套刷題與進度系統。
+                目前已經支援醫學一與醫學二多科刷題，之後也可以繼續沿用同一套刷題與進度系統擴充。
               </p>
             </div>
             <div className="rounded-3xl bg-slate-50 px-5 py-4 text-sm text-slate-700">

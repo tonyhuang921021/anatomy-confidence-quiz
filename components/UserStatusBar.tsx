@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useAuth } from "@/components/AuthProvider";
+import { VisitorStatsPanel } from "@/components/VisitorStatsPanel";
 
 export function UserStatusBar() {
   const { configured, loading, user, syncStatus } = useAuth();
@@ -13,9 +14,10 @@ export function UserStatusBar() {
           href="/"
           className="min-w-0 break-words text-sm font-semibold text-ink transition hover:text-brand-700"
         >
-          Anatomy Confidence Quiz
+          一階醫師國考刷題測驗
         </Link>
         <div className="flex min-w-0 flex-wrap items-center justify-end gap-2 text-xs font-semibold">
+          <VisitorStatsPanel compact />
           <span className="rounded-full bg-slate-100 px-3 py-1 text-slate-700">
             {configured ? "Supabase 已接上" : "Supabase 未設定"}
           </span>
