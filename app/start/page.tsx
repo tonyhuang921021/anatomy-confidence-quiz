@@ -33,6 +33,21 @@ export default function StartPage() {
     );
   }
 
+  function startSingleSubject(subject: SubjectName) {
+    const nextSettings: QuizSettings = {
+      ...DEFAULT_QUIZ_SETTINGS,
+      mode: "random",
+      questionCount: 10,
+      subjectFilter: subject,
+      subjectFilters: [subject],
+      chapter: undefined,
+      section: undefined
+    };
+
+    saveQuizSettings(nextSettings);
+    router.push("/quiz?new=1");
+  }
+
   function renderSubjectGroup(
     title: string,
     description: string,
@@ -72,6 +87,22 @@ export default function StartPage() {
                   </span>
                 </div>
                 <p className="mt-3 text-sm text-slate-600">{subject.questions.length} 題已上線</p>
+
+                <div className="mt-4 flex flex-wrap gap-3">
+                  <button
+                    type="button"
+                    onClick={(event) => {
+                      event.stopPropagation();
+                      startSingleSubject(subject.subject);
+                    }}
+                    className="min-h-12 rounded-2xl bg-brand-600 px-4 py-3 text-sm font-semibold text-white transition hover:bg-brand-700"
+                  >
+                    直接開始這一科
+                  </button>
+                  <span className="flex min-h-12 items-center rounded-2xl bg-white px-4 py-3 text-xs font-medium text-slate-500 ring-1 ring-slate-200">
+                    也可以點整張卡片加入混刷
+                  </span>
+                </div>
               </button>
             );
           })}
