@@ -229,6 +229,64 @@ export type PastPaperOption = {
   questionCount: number;
 };
 
+function shuffle<T>(items: T[]) {
+  return [...items].sort(() => Math.random() - 0.5);
+}
+
+function getBucketKey(question: Question, subjectFilter: SubjectFilter) {
+  if (subjectFilter === "全部") {
+    return question.subject;
+  }
+
+  if (subjectFilter === "解剖學") {
+    return question.chapter;
+  }
+
+  return question.chapter || question.section || question.subject;
+}
+
+function scaleDistribution(
+  counts: Map<string, number>,
+  targetCount: number
+) {
+  const total = Array.from(counts.values()).reduce((sum, value) => sum + value, 0);
+  if (total <= 0 || targetCount <= 0) return new Map<string, number>();
+
+  const scaledEntries = Array.from(counts.entries()).map(([key, value]) => {
+    const exact = (value / total) * targetCount;
+    const floored = Math.floor(exact);
+    return {
+      key,
+      exact,
+      count: floored,
+      remainder: exact - floored
+    };
+  });
+
+  let assigned = scaledEntries.reduce((sum, item) => sum + item.count, 0);
+  scaledEntries
+    .sort((a, b) => b.remainder - a.remainder)
+    .forEach((item) => {
+      if (assigned >= targetCount) return;
+      item.count += 1;
+      assigned += 1;
+    });
+
+  return new Map(scaledEntries.map((item) => [item.key, item.count]));
+}
+
+function buildTemplateDistribution(
+  questions: Question[],
+  subjectFilter: SubjectFilter
+) {
+  const counts = new Map<string, number>();
+  questions.forEach((question) => {
+    const key = getBucketKey(question, subjectFilter);
+    counts.set(key, (counts.get(key) ?? 0) + 1);
+  });
+  return counts;
+}
+
 export function getQuestionBankBySubjectFilter(subjectFilter: SubjectFilter = "解剖學") {
   if (subjectFilter === "全部") {
     return med1QuestionsBySubject["醫學（一）"];
@@ -269,4 +327,60 @@ export function getQuestionsForPastPaper(
   return bank
     .filter((question) => `${question.examCode}-${question.paperCode}` === paperKey)
     .sort((a, b) => (a.originalQuestionNumber ?? 0) - (b.originalQuestionNumber ?? 0));
+}
+
+export function buildExamLikeRandomSet(
+  subjectFilter: SubjectFilter = "全部",
+  questionCount = 50
+) {
+  const bank = getQuestionBankBySubjectFilter(subjectFilter);
+  if (bank.length === 0) return [];
+
+  const targetCount = Math.max(1, Math.min(questionCount, bank.length));
+  const papers = getPastPaperOptions(subjectFilter);
+
+  if (papers.length === 0) {
+    return shuffle(bank).slice(0, targetCount);
+  }
+
+  const templatePaper = papers[Math.floor(Math.random() * papers.length)];
+  const templateQuestions = getQuestionsForPastPaper(templatePaper.key, subjectFilter);
+  if (templateQuestions.length === 0) {
+    return shuffle(bank).slice(0, targetCount);
+  }
+
+  const scaledDistribution = scaleDistribution(
+    buildTemplateDistribution(templateQuestions, subjectFilter),
+    targetCount
+  );
+
+  const bankBuckets = new Map<string, Question[]>();
+  bank.forEach((question) => {
+    const key = getBucketKey(question, subjectFilter);
+    const bucket = bankBuckets.get(key) ?? [];
+    bucket.push(question);
+    bankBuckets.set(key, bucket);
+  });
+
+  const selected: Question[] = [];
+  const seenIds = new Set<string>();
+
+  scaledDistribution.forEach((count, key) => {
+    const bucket = shuffle(bankBuckets.get(key) ?? []);
+    bucket.slice(0, count).forEach((question) => {
+      if (seenIds.has(question.id)) return;
+      seenIds.add(question.id);
+      selected.push(question);
+    });
+  });
+
+  if (selected.length < targetCount) {
+    const remaining = shuffle(bank.filter((question) => !seenIds.has(question.id)));
+    remaining.slice(0, targetCount - selected.length).forEach((question) => {
+      seenIds.add(question.id);
+      selected.push(question);
+    });
+  }
+
+  return shuffle(selected).slice(0, targetCount);
 }

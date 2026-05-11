@@ -7,6 +7,7 @@ import { ConfidenceSelector } from "@/components/ConfidenceSelector";
 import { ErrorTypeSelector } from "@/components/ErrorTypeSelector";
 import { QuestionCard } from "@/components/QuestionCard";
 import {
+  buildExamLikeRandomSet,
   getPastPaperOptions,
   getQuestionBankBySubjectFilter,
   getQuestionsForPastPaper
@@ -123,7 +124,7 @@ function selectLocalQuestionSet(settings: QuizSettings, fallbackQuestions: Quest
     return paperQuestions.length > 0 ? paperQuestions : sourceBank;
   }
 
-  return sourceBank;
+  return buildExamLikeRandomSet(subjectFilter, settings.questionCount);
 }
 
 function getQuestionByOrder(session: QuizSession) {

@@ -52,7 +52,7 @@ const paperModeLabels: Record<SimulationPaperMode, string> = {
 
 const paperModeDescriptions: Record<SimulationPaperMode, string> = {
   random_set:
-    "系統從你目前選的科目題庫中亂數組一份新模擬卷，練習感最好，但章節比例不一定完全等同真實國考。",
+    "系統會先參考一份真實考古卷的分布模板，再從你目前選的科目題庫中重組一份新模擬卷，比例會盡量貼近真實國考。",
   past_paper:
     "直接指定某一年、某一次的真實考古卷，維持原始卷別與題目順序，最適合完整模考。",
   random_past_paper:
