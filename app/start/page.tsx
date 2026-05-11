@@ -3,13 +3,16 @@
 import Link from "next/link";
 import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
-import { enabledSubjects } from "@/data/subjectRegistry";
+import { enabledSubjects, MED1_SUBJECTS, MED2_SUBJECTS } from "@/data/subjectRegistry";
 import { DEFAULT_QUIZ_SETTINGS } from "@/lib/quizAnalysis";
 import { saveQuizSettings } from "@/lib/storage";
 import type { QuizSettings, SubjectName } from "@/types/quiz";
 
 const selectableSubjects = enabledSubjects.filter(
-  (item) => item.subject !== "醫學（一）" && item.subject !== "醫學（二）" && item.subject !== "其他醫學一"
+  (item) =>
+    item.subject !== "醫學（一）" &&
+    item.subject !== "醫學（二）" &&
+    (MED1_SUBJECTS.includes(item.subject) || MED2_SUBJECTS.includes(item.subject))
 );
 
 export default function StartPage() {
@@ -18,6 +21,8 @@ export default function StartPage() {
     () => selectableSubjects.slice(0, 1).map((item) => item.subject),
     []
   );
+  const med1Subjects = selectableSubjects.filter((item) => MED1_SUBJECTS.includes(item.subject));
+  const med2Subjects = selectableSubjects.filter((item) => MED2_SUBJECTS.includes(item.subject));
   const [selectedSubjects, setSelectedSubjects] = useState<SubjectName[]>(defaultSubjects);
 
   function toggleSubject(subject: SubjectName) {
@@ -25,6 +30,53 @@ export default function StartPage() {
       current.includes(subject)
         ? current.filter((item) => item !== subject)
         : [...current, subject]
+    );
+  }
+
+  function renderSubjectGroup(
+    title: string,
+    description: string,
+    subjects: typeof selectableSubjects
+  ) {
+    return (
+      <section className="rounded-[2rem] bg-slate-50 p-5 ring-1 ring-slate-100">
+        <div>
+          <h2 className="text-xl font-semibold text-ink">{title}</h2>
+          <p className="mt-2 text-sm leading-7 text-slate-600">{description}</p>
+        </div>
+
+        <div className="mt-4 grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+          {subjects.map((subject) => {
+            const active = selectedSubjects.includes(subject.subject);
+            return (
+              <button
+                key={subject.subject}
+                type="button"
+                onClick={() => toggleSubject(subject.subject)}
+                className={`rounded-3xl border p-5 text-left transition ${
+                  active
+                    ? "border-brand-500 bg-brand-50 ring-2 ring-brand-200"
+                    : "border-slate-200 bg-white hover:bg-slate-50"
+                }`}
+              >
+                <div className="flex items-center justify-between gap-3">
+                  <h3 className="text-lg font-semibold text-ink">{subject.label}</h3>
+                  <span
+                    className={`rounded-full px-3 py-1 text-xs font-semibold ${
+                      active
+                        ? "bg-brand-600 text-white"
+                        : "bg-white text-slate-500 ring-1 ring-slate-200"
+                    }`}
+                  >
+                    {active ? "已選擇" : "未選"}
+                  </span>
+                </div>
+                <p className="mt-3 text-sm text-slate-600">{subject.questions.length} 題已上線</p>
+              </button>
+            );
+          })}
+        </div>
+      </section>
     );
   }
 
@@ -66,36 +118,17 @@ export default function StartPage() {
           </Link>
         </div>
 
-        <div className="mt-6 grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
-          {selectableSubjects.map((subject) => {
-            const active = selectedSubjects.includes(subject.subject);
-            return (
-              <button
-                key={subject.subject}
-                type="button"
-                onClick={() => toggleSubject(subject.subject)}
-                className={`rounded-3xl border p-5 text-left transition ${
-                  active
-                    ? "border-brand-500 bg-brand-50 ring-2 ring-brand-200"
-                    : "border-slate-200 bg-slate-50 hover:bg-white"
-                }`}
-              >
-                <div className="flex items-center justify-between gap-3">
-                  <h2 className="text-lg font-semibold text-ink">{subject.label}</h2>
-                  <span
-                    className={`rounded-full px-3 py-1 text-xs font-semibold ${
-                      active
-                        ? "bg-brand-600 text-white"
-                        : "bg-white text-slate-500 ring-1 ring-slate-200"
-                    }`}
-                  >
-                    {active ? "已選擇" : "未選"}
-                  </span>
-                </div>
-                <p className="mt-3 text-sm text-slate-600">{subject.questions.length} 題已上線</p>
-              </button>
-            );
-          })}
+        <div className="mt-6 space-y-6">
+          {renderSubjectGroup(
+            "醫學（一）科目",
+            "先修基礎科目集中在這裡：解剖、組織、胚胎、生理、生化。",
+            med1Subjects
+          )}
+          {renderSubjectGroup(
+            "醫學（二）科目",
+            "臨床前後段常一起刷的科目集中在這裡：微免、寄生蟲、公衛、藥理、病理。",
+            med2Subjects
+          )}
         </div>
 
         <div className="mt-6 flex flex-col gap-3 rounded-3xl bg-slate-50 p-5 sm:flex-row sm:items-center sm:justify-between">

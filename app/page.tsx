@@ -2,13 +2,19 @@ import Link from "next/link";
 import { AuthPanel } from "@/components/AuthPanel";
 import { QuizSetupPanel } from "@/components/QuizSetupPanel";
 import { anatomyQuestions } from "@/data/anatomyQuestions";
-import { enabledSubjects, subjectRegistry } from "@/data/subjectRegistry";
+import {
+  enabledSubjects,
+  HIDDEN_MULTI_ENTRY_SUBJECTS,
+  subjectRegistry
+} from "@/data/subjectRegistry";
 import { calculateCompletionStats, calculateOverallCompletion } from "@/lib/quizAnalysis";
 
 export default function HomePage() {
   const stats = calculateCompletionStats(anatomyQuestions, []);
   const overall = calculateOverallCompletion(anatomyQuestions, []);
-  const availableSubjects = enabledSubjects;
+  const availableSubjects = enabledSubjects.filter(
+    (subject) => !HIDDEN_MULTI_ENTRY_SUBJECTS.includes(subject.subject)
+  );
   const upcomingSubjects = Object.values(subjectRegistry).filter((item) => !item.enabled);
 
   return (
@@ -143,7 +149,7 @@ export default function HomePage() {
           </div>
 
           <div className="mt-5 grid gap-4 lg:grid-cols-2">
-            {Object.values(subjectRegistry).map((subject) => {
+            {availableSubjects.map((subject) => {
               const isAnatomy = subject.subject === "解剖學";
               const isMed1 = subject.subject === "醫學（一）";
               const isMed2 = subject.subject === "醫學（二）";
