@@ -147,7 +147,7 @@ function toQuestion(raw: RawQuestion): Question | null {
     clinicalLink: raw.clinical_link,
     answerConfidence: raw.answer_confidence,
     needsHumanReview: raw.needs_human_review,
-    reviewFlags: raw.review_flags,
+    reviewFlags: raw.review_flags ? [...raw.review_flags] : undefined,
     detailVersion: raw.detail_phase,
     sourceType: raw.source_type === "MOEX_PAST_EXAM" ? "MOEX_PAST_EXAM" : "AI_GENERATED",
     sourceCitation: `考選部 ${raw.exam_year_gregorian ?? ""} ${raw.exam_session ?? ""} 醫學（一） ${raw.paper_code ?? ""}`.trim(),
