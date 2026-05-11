@@ -145,6 +145,7 @@ export default function HomePage() {
           <div className="mt-5 grid gap-4 lg:grid-cols-2">
             {Object.values(subjectRegistry).map((subject) => {
               const isAnatomy = subject.subject === "解剖學";
+              const isMed1 = subject.subject === "醫學（一）";
               const questionCount = subject.questions.length;
               return (
                 <article
@@ -176,7 +177,13 @@ export default function HomePage() {
                   {subject.enabled ? (
                     <div className="mt-4 flex flex-wrap gap-3">
                       <Link
-                        href={isAnatomy ? "/quiz?new=1&preset=start" : "/"}
+                        href={
+                          isAnatomy
+                            ? "/quiz?new=1&preset=start"
+                            : isMed1
+                              ? "/quiz?new=1&preset=med1"
+                              : "/"
+                        }
                         className="min-h-12 rounded-2xl bg-brand-600 px-4 py-3 text-sm font-semibold text-white transition hover:bg-brand-700"
                       >
                         開始 {subject.label}

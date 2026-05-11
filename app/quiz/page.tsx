@@ -172,8 +172,20 @@ export default function QuizPage() {
       chapter: undefined,
       section: undefined
     };
+    const med1PresetSettings: QuizSettings = {
+      ...DEFAULT_QUIZ_SETTINGS,
+      mode: "random",
+      subjectFilter: "全部",
+      questionCount: 10,
+      chapter: undefined,
+      section: undefined
+    };
     const savedSettings: QuizSettings =
-      preset === "start" ? startPresetSettings : loadQuizSettings() ?? DEFAULT_QUIZ_SETTINGS;
+      preset === "start"
+        ? startPresetSettings
+        : preset === "med1"
+          ? med1PresetSettings
+          : loadQuizSettings() ?? DEFAULT_QUIZ_SETTINGS;
     const completedSessions = loadCompletedSessions();
     const shouldForceNewSession =
       params?.get("new") === "1";
