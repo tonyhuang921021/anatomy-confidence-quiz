@@ -91,6 +91,12 @@ export function QuizSetupPanel({ stats }: QuizSetupPanelProps) {
   function updateSettings(next: Partial<QuizSettings>) {
     setSettings((current) => {
       const merged = { ...current, ...next } as QuizSettings;
+      if (next.mode === "simulation" && current.mode !== "simulation") {
+        merged.subjectFilter = "醫學（一）";
+        merged.questionCount = 100;
+        merged.chapter = undefined;
+        merged.section = undefined;
+      }
       if (next.chapter && next.chapter !== current.chapter) {
         merged.section = undefined;
       }
@@ -160,70 +166,83 @@ export function QuizSetupPanel({ stats }: QuizSetupPanelProps) {
       </div>
 
       <div className="mt-6 grid gap-4 lg:grid-cols-[0.9fr_1.1fr]">
-        <div className="rounded-3xl bg-slate-50 p-5">
-          <p className="text-sm font-medium text-slate-500">科目</p>
-          <select
-            value={settings.subjectFilter ?? "解剖學"}
-            onChange={(event) => updateSettings({ subjectFilter: event.target.value as SubjectFilter })}
-            className="mt-3 min-h-12 w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-800 outline-none"
-          >
-            <option value="全部">醫學（一）全科</option>
-            {enabledSubjects
-              .filter((item) => item.subject !== "醫學（一）")
-              .map((item) => (
-                <option key={item.subject} value={item.subject}>
-                  {item.label}（{item.questions.length} 題）
-                </option>
-              ))}
-          </select>
-
-          <p className="text-sm font-medium text-slate-500">題數</p>
-          <div className="mt-3 flex flex-wrap gap-3">
-            {questionCounts.map((count) => (
-              <button
-                key={count}
-                type="button"
-                onClick={() => updateSettings({ questionCount: count })}
-                className={`min-h-12 rounded-2xl px-4 py-3 text-sm font-semibold transition ${
-                  settings.questionCount === count
-                    ? "bg-brand-600 text-white"
-                    : "bg-white text-slate-700 ring-1 ring-slate-200 hover:bg-brand-50"
-                }`}
+        {settings.mode !== "simulation" ? (
+          <>
+            <div className="rounded-3xl bg-slate-50 p-5">
+              <p className="text-sm font-medium text-slate-500">科目</p>
+              <select
+                value={settings.subjectFilter ?? "解剖學"}
+                onChange={(event) => updateSettings({ subjectFilter: event.target.value as SubjectFilter })}
+                className="mt-3 min-h-12 w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-800 outline-none"
               >
-                {count} 題
-              </button>
-            ))}
-          </div>
-        </div>
+                <option value="全部">醫學（一）全科</option>
+                {enabledSubjects
+                  .filter((item) => item.subject !== "醫學（一）")
+                  .map((item) => (
+                    <option key={item.subject} value={item.subject}>
+                      {item.label}（{item.questions.length} 題）
+                    </option>
+                  ))}
+              </select>
 
-        <div className="rounded-3xl bg-slate-50 p-5">
-          <p className="text-sm font-medium text-slate-500">聚焦章節 / 小節（選填）</p>
-          <div className="mt-3 grid gap-3 sm:grid-cols-2">
-            <select
-              value={settings.chapter ?? ""}
-              onChange={(event) => updateSettings({ chapter: event.target.value || undefined })}
-              className="min-h-12 rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-800 outline-none"
-            >
-              <option value="">全部章節</option>
-              {chaptersWithQuestions.map((item) => (
-                <option key={item.chapter} value={item.chapter}>
-                  {item.chapter}
-                </option>
-              ))}
-            </select>
-            <select
-              value={settings.section ?? ""}
-              onChange={(event) => updateSettings({ section: event.target.value || undefined })}
-              className="min-h-12 rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-800 outline-none"
-            >
-              <option value="">全部小節</option>
-              {sections.map((section) => (
-                <option key={section} value={section}>
-                  {section}
-                </option>
-              ))}
-            </select>
+              <p className="text-sm font-medium text-slate-500">題數</p>
+              <div className="mt-3 flex flex-wrap gap-3">
+                {questionCounts.map((count) => (
+                  <button
+                    key={count}
+                    type="button"
+                    onClick={() => updateSettings({ questionCount: count })}
+                    className={`min-h-12 rounded-2xl px-4 py-3 text-sm font-semibold transition ${
+                      settings.questionCount === count
+                        ? "bg-brand-600 text-white"
+                        : "bg-white text-slate-700 ring-1 ring-slate-200 hover:bg-brand-50"
+                    }`}
+                  >
+                    {count} 題
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <div className="rounded-3xl bg-slate-50 p-5">
+              <p className="text-sm font-medium text-slate-500">聚焦章節 / 小節（選填）</p>
+              <div className="mt-3 grid gap-3 sm:grid-cols-2">
+                <select
+                  value={settings.chapter ?? ""}
+                  onChange={(event) => updateSettings({ chapter: event.target.value || undefined })}
+                  className="min-h-12 rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-800 outline-none"
+                >
+                  <option value="">全部章節</option>
+                  {chaptersWithQuestions.map((item) => (
+                    <option key={item.chapter} value={item.chapter}>
+                      {item.chapter}
+                    </option>
+                  ))}
+                </select>
+                <select
+                  value={settings.section ?? ""}
+                  onChange={(event) => updateSettings({ section: event.target.value || undefined })}
+                  className="min-h-12 rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-800 outline-none"
+                >
+                  <option value="">全部小節</option>
+                  {sections.map((section) => (
+                    <option key={section} value={section}>
+                      {section}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            </div>
+          </>
+        ) : (
+          <div className="rounded-3xl bg-slate-50 p-5">
+            <p className="text-sm font-medium text-slate-500">模擬考說明</p>
+            <p className="mt-3 text-sm leading-7 text-slate-700">
+              模擬考模式會固定用整份考卷邏輯出題，所以不提供科目、題數、章節與小節篩選，避免把模考做成一般刷題模式。
+            </p>
           </div>
+        )}
+        <div className="rounded-3xl bg-slate-50 p-5">
           {settings.mode === "ai_fresh" ? (
             <label className="mt-4 flex items-center gap-3 rounded-2xl bg-white px-4 py-3 text-sm text-slate-700 ring-1 ring-slate-200">
               <input
@@ -308,11 +327,11 @@ export function QuizSetupPanel({ stats }: QuizSetupPanelProps) {
 
       <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <p className="text-sm text-slate-600">
-          目前設定：<span className="font-semibold text-ink">{getModeLabel(settings.mode)}</span>・
-          {subjectItem?.label ?? settings.subjectFilter ?? "解剖學"}・
-          {settings.questionCount} 題
-          {settings.chapter ? `・${settings.chapter}` : ""}
-          {settings.section ? ` / ${settings.section}` : ""}
+          目前設定：
+          <span className="font-semibold text-ink"> {getModeLabel(settings.mode)}</span>
+          {settings.mode === "simulation" ? "・整份模擬考" : `・${subjectItem?.label ?? settings.subjectFilter ?? "解剖學"}・${settings.questionCount} 題`}
+          {settings.mode !== "simulation" && settings.chapter ? `・${settings.chapter}` : ""}
+          {settings.mode !== "simulation" && settings.section ? ` / ${settings.section}` : ""}
         </p>
         <button
           type="button"
