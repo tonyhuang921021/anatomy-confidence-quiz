@@ -165,9 +165,15 @@ export default function QuizPage() {
     const params =
       typeof window !== "undefined" ? new URLSearchParams(window.location.search) : null;
     const preset = params?.get("preset");
-    const savedSettings = preset === "start"
-      ? { ...DEFAULT_QUIZ_SETTINGS, mode: "weakness", questionCount: 10, chapter: undefined, section: undefined }
-      : loadQuizSettings() ?? DEFAULT_QUIZ_SETTINGS;
+    const startPresetSettings: QuizSettings = {
+      ...DEFAULT_QUIZ_SETTINGS,
+      mode: "weakness",
+      questionCount: 10,
+      chapter: undefined,
+      section: undefined
+    };
+    const savedSettings: QuizSettings =
+      preset === "start" ? startPresetSettings : loadQuizSettings() ?? DEFAULT_QUIZ_SETTINGS;
     const completedSessions = loadCompletedSessions();
     const shouldForceNewSession =
       params?.get("new") === "1";
