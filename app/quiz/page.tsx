@@ -42,6 +42,10 @@ type HealthState = {
   service?: string;
 };
 
+const allQuestionFallbackMap = new Map(
+  getQuestionBankBySubjectFilter("全部").map((question) => [question.id, question] as const)
+);
+
 function getQuestionSourceBadge(question: Question) {
   if (question.sourceType === "MOEX_PAST_EXAM") return "正式考古題";
   if (question.sourceType === "AI_GENERATED") return "AI 題庫";
@@ -134,7 +138,7 @@ function getQuestionByOrder(session: QuizSession) {
   );
 
   return ids
-    .map((id) => generatedMap.get(id) ?? anatomyQuestions.find((question) => question.id === id))
+    .map((id) => generatedMap.get(id) ?? allQuestionFallbackMap.get(id))
     .filter((question): question is Question => Boolean(question));
 }
 
