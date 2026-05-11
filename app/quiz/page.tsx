@@ -6,7 +6,11 @@ import { useRouter } from "next/navigation";
 import { ConfidenceSelector } from "@/components/ConfidenceSelector";
 import { ErrorTypeSelector } from "@/components/ErrorTypeSelector";
 import { QuestionCard } from "@/components/QuestionCard";
-import { anatomyQuestions } from "@/data/anatomyQuestions";
+import {
+  getPastPaperOptions,
+  getQuestionBankBySubjectFilter,
+  getQuestionsForPastPaper
+} from "@/data/med1QuestionBank";
 import { pushCompletedSessionToSupabase } from "@/lib/cloudSync";
 import {
   createQuestionOrder,
@@ -67,22 +71,59 @@ function createSession(
   settings: QuizSettings
 ): QuizSession {
   const normalizedSettings = { ...DEFAULT_QUIZ_SETTINGS, ...settings };
+  const localQuestionSet = selectLocalQuestionSet(normalizedSettings, questions);
+  const effectiveQuestions = localQuestionSet.length > 0 ? localQuestionSet : questions;
+  const effectiveSettings =
+    normalizedSettings.mode === "simulation" &&
+    (normalizedSettings.paperMode === "past_paper" ||
+      normalizedSettings.paperMode === "random_past_paper")
+      ? { ...normalizedSettings, questionCount: effectiveQuestions.length }
+      : normalizedSettings;
   const questionOrder =
     normalizedSettings.mode === "ai_fresh"
       ? []
-      : createQuestionOrder(questions, completedSessions, normalizedSettings);
+      : createQuestionOrder(effectiveQuestions, completedSessions, effectiveSettings);
 
   return {
     id: `session-${Date.now()}`,
-    subject: "解剖學",
+    subject:
+      (effectiveSettings.subjectFilter && effectiveSettings.subjectFilter !== "全部"
+        ? effectiveSettings.subjectFilter
+        : "醫學（一）") || "解剖學",
     startedAt: new Date().toISOString(),
-    settings: normalizedSettings,
+    settings: effectiveSettings,
     questionOrder,
-    generatedQuestions: [],
+    generatedQuestions: normalizedSettings.mode === "ai_fresh" ? [] : effectiveQuestions,
     currentQuestionIndex: 0,
     isReviewingAnswer: false,
     attempts: []
   };
+}
+
+function selectLocalQuestionSet(settings: QuizSettings, fallbackQuestions: Question[]) {
+  const subjectFilter = settings.subjectFilter ?? "解剖學";
+  const bank = getQuestionBankBySubjectFilter(subjectFilter);
+  const sourceBank = bank.length > 0 ? bank : fallbackQuestions;
+
+  if (settings.mode !== "simulation") {
+    return sourceBank;
+  }
+
+  const paperMode = settings.paperMode ?? "random_set";
+  if (paperMode === "past_paper" && settings.selectedPaperKey) {
+    const paperQuestions = getQuestionsForPastPaper(settings.selectedPaperKey, subjectFilter);
+    return paperQuestions.length > 0 ? paperQuestions : sourceBank;
+  }
+
+  if (paperMode === "random_past_paper") {
+    const papers = getPastPaperOptions(subjectFilter);
+    if (papers.length === 0) return sourceBank;
+    const selected = papers[Math.floor(Math.random() * papers.length)];
+    const paperQuestions = getQuestionsForPastPaper(selected.key, subjectFilter);
+    return paperQuestions.length > 0 ? paperQuestions : sourceBank;
+  }
+
+  return sourceBank;
 }
 
 function getQuestionByOrder(session: QuizSession) {
@@ -128,7 +169,7 @@ export default function QuizPage() {
       (existing.questionOrder?.length ?? 0) > 0;
     const nextSession = shouldReuseExisting
       ? existing
-      : createSession(anatomyQuestions, completedSessions, savedSettings);
+      : createSession(getQuestionBankBySubjectFilter(savedSettings.subjectFilter ?? "解剖學"), completedSessions, savedSettings);
 
     if (!shouldReuseExisting) {
       clearCurrentSession();
@@ -200,7 +241,7 @@ export default function QuizPage() {
     try {
       const completedSessions = loadCompletedSessions();
       const allKnownQuestions = [
-        ...anatomyQuestions,
+        ...getQuestionBankBySubjectFilter("全部"),
         ...(targetSession.generatedQuestions ?? []),
         ...completedSessions.flatMap((sessionItem) => sessionItem.generatedQuestions ?? [])
       ];
@@ -282,13 +323,50 @@ export default function QuizPage() {
       answeredAt: new Date().toISOString()
     };
 
-    const nextSession: QuizSession = {
+    const nextSessionBase: QuizSession = {
       ...session,
       attempts: [...session.attempts.filter((item) => item.questionId !== currentQuestion.id), attempt],
-      isReviewingAnswer: true
+      isReviewingAnswer: session.settings?.feedbackMode === "none" ? false : true
     };
 
-    persistSession(nextSession);
+    if (session.settings?.mode === "simulation" && session.settings?.feedbackMode === "none") {
+      const isLast = currentIndex >= targetCount - 1;
+
+      if (isLast) {
+        const completedSession: QuizSession = {
+          ...nextSessionBase,
+          completedAt: new Date().toISOString(),
+          isReviewingAnswer: false
+        };
+        persistSession(completedSession);
+        saveCompletedSession(completedSession);
+        void pushCompletedSessionToSupabase(completedSession);
+        router.push("/results");
+        return;
+      }
+
+      const advancedSession: QuizSession = {
+        ...nextSessionBase,
+        currentQuestionIndex: currentIndex + 1,
+        isReviewingAnswer: false
+      };
+      persistSession(advancedSession);
+      resetQuestionUI();
+      window.requestAnimationFrame(() => {
+        const target =
+          typeof window !== "undefined" && window.innerWidth >= 1280
+            ? contentTopRef.current
+            : questionTopRef.current;
+
+        target?.scrollIntoView({
+          behavior: "smooth",
+          block: "start"
+        });
+      });
+      return;
+    }
+
+    persistSession(nextSessionBase);
     setSubmittedAttempt(attempt);
     setErrorType(undefined);
   }
@@ -411,6 +489,9 @@ export default function QuizPage() {
           ? { text: "優先補弱", style: "bg-orange-100 text-orange-900" }
           : null;
   const difficultyBadge = submittedAttempt ? getDifficultyBadge(currentQuestion) : null;
+  const feedbackMode = session.settings?.feedbackMode ?? "full";
+  const shouldShowExplanation = feedbackMode === "full";
+  const shouldShowCorrectAnswer = feedbackMode === "full" || feedbackMode === "answer_only";
 
   return (
     <main className="shell">
@@ -439,6 +520,9 @@ export default function QuizPage() {
             </span>
             <span className="rounded-full bg-slate-100 px-3 py-1 text-slate-700">
               {targetCount} 題
+            </span>
+            <span className="rounded-full bg-slate-100 px-3 py-1 text-slate-700">
+              {session.subject}
             </span>
             <span className="rounded-full bg-slate-100 px-3 py-1 text-slate-700">
               {getQuestionSourceBadge(currentQuestion)}
@@ -518,19 +602,25 @@ export default function QuizPage() {
                   ) : null}
                 </div>
                 <div className="mt-4 space-y-3 text-sm leading-7">
-                  <p>
-                    正確答案：<span className="font-semibold">{submittedAttempt.correctAnswer}</span>
-                  </p>
-                  <p>
-                    testedConcept：<span className="font-semibold">{currentQuestion.testedConcept}</span>
-                  </p>
-                  <p>explanation：{currentQuestion.explanation}</p>
+                  {shouldShowCorrectAnswer ? (
+                    <p>
+                      正確答案：<span className="font-semibold">{submittedAttempt.correctAnswer}</span>
+                    </p>
+                  ) : null}
+                  {shouldShowExplanation ? (
+                    <>
+                      <p>
+                        testedConcept：<span className="font-semibold">{currentQuestion.testedConcept}</span>
+                      </p>
+                      <p>explanation：{currentQuestion.explanation}</p>
+                    </>
+                  ) : null}
                   <p>
                     本題信心：<span className="font-semibold">{getConfidenceLabel(submittedAttempt.confidence)}</span>
                   </p>
                 </div>
 
-                {currentQuestion.optionAnalysis ? (
+                {shouldShowExplanation && currentQuestion.optionAnalysis ? (
                   <div className="mt-5 rounded-3xl bg-white/70 p-4 text-sm text-slate-800 ring-1 ring-white/70">
                     <h3 className="text-sm font-semibold text-ink">各選項解析</h3>
                     <div className="mt-3 grid gap-3">
@@ -544,7 +634,7 @@ export default function QuizPage() {
                   </div>
                 ) : null}
 
-                {currentQuestion.memoryTip ? (
+                {shouldShowExplanation && currentQuestion.memoryTip ? (
                   <div className="mt-5 rounded-3xl bg-amber-50 p-4 text-sm text-amber-950 ring-1 ring-amber-200">
                     <h3 className="text-sm font-semibold">快速記憶法</h3>
                     <p className="mt-2 leading-7">{currentQuestion.memoryTip}</p>
@@ -552,7 +642,7 @@ export default function QuizPage() {
                 ) : null}
               </div>
 
-              {!submittedAttempt.isCorrect ? (
+              {!submittedAttempt.isCorrect && shouldShowExplanation ? (
                 <ErrorTypeSelector value={errorType} onSelect={handleErrorTypeSelect} />
               ) : null}
 
@@ -579,6 +669,16 @@ export default function QuizPage() {
               {session.settings?.mode === "ai_fresh" ? (
                 <div className="flex min-h-12 items-center rounded-2xl bg-slate-50 px-4 py-3 text-sm text-slate-600">
                   GPT 會在開始前一次先生成 {targetCount} 題
+                </div>
+              ) : session.settings?.mode === "simulation" ? (
+                <div className="flex min-h-12 items-center rounded-2xl bg-slate-50 px-4 py-3 text-sm text-slate-600">
+                  模擬考目前設定：{
+                    feedbackMode === "none"
+                      ? "全程只做題"
+                      : feedbackMode === "answer_only"
+                        ? "每題只看正確答案"
+                        : "每題看正確與詳解"
+                  }
                 </div>
               ) : null}
             </div>

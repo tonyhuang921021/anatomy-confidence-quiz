@@ -2,13 +2,21 @@
 
 import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
-import { anatomyOutline } from "@/data/anatomyQuestions";
+import { getPastPaperOptions } from "@/data/med1QuestionBank";
+import { enabledSubjects, subjectRegistry } from "@/data/subjectRegistry";
 import {
   DEFAULT_QUIZ_SETTINGS,
   getModeLabel
 } from "@/lib/quizAnalysis";
 import { saveQuizSettings } from "@/lib/storage";
-import { CompletionStatsBundle, QuizMode, QuizSettings } from "@/types/quiz";
+import {
+  CompletionStatsBundle,
+  QuizMode,
+  QuizSettings,
+  SimulationFeedbackMode,
+  SimulationPaperMode,
+  SubjectFilter
+} from "@/types/quiz";
 
 type QuizSetupPanelProps = {
   stats: CompletionStatsBundle;
@@ -18,43 +26,65 @@ const modeDescriptions: Record<QuizMode, string> = {
   weakness: "優先抽你最弱、最不穩、最需要補進度的小節。",
   random: "平均刷題，適合維持手感與快速暖機。",
   review: "優先抽歷史錯題、低信心題與高風險題。",
-  ai_fresh: "每題由 GPT 即時生成新題，降低重複感。"
+  ai_fresh: "每題由 GPT 即時生成新題，降低重複感。",
+  simulation: "像正式考試一樣，可選真實考古卷或電腦隨機整份卷。"
 };
 
-const questionCounts = [10, 15, 20];
+const questionCounts = [10, 15, 20, 50, 100];
+
+const feedbackModeLabels: Record<SimulationFeedbackMode, string> = {
+  full: "每題看正確與詳解",
+  answer_only: "每題只看正確答案",
+  none: "全程只做題，最後再看結果"
+};
+
+const paperModeLabels: Record<SimulationPaperMode, string> = {
+  random_set: "電腦隨機抽一份",
+  past_paper: "指定真實考古題",
+  random_past_paper: "隨機抽一份真實考古題"
+};
 
 export function QuizSetupPanel({ stats }: QuizSetupPanelProps) {
   const router = useRouter();
   const [settings, setSettings] = useState<QuizSettings>(DEFAULT_QUIZ_SETTINGS);
+  const selectedSubject = (settings.subjectFilter ?? "解剖學") as SubjectFilter;
+  const subjectItem =
+    selectedSubject === "全部"
+      ? subjectRegistry["醫學（一）"]
+      : subjectRegistry[selectedSubject];
 
   const sections = useMemo(() => {
     if (!settings.chapter) return [];
-    return stats.sections
-      .filter(
-        (item) => item.chapter === settings.chapter && item.totalQuestionsInBank > 0
-      )
-      .map((item) => item.section);
-  }, [settings.chapter, stats.sections]);
+    return subjectItem?.chapters.find((item) => item.chapter === settings.chapter)?.sections ?? [];
+  }, [settings.chapter, subjectItem]);
 
   const chaptersWithQuestions = useMemo(() => {
-    return anatomyOutline.filter((chapter) =>
-      stats.sections.some(
-        (section) =>
-          section.chapter === chapter.chapter && section.totalQuestionsInBank > 0
-      )
-    );
-  }, [stats.sections]);
+    return subjectItem?.chapters.filter((chapter) => chapter.sections.length > 0) ?? [];
+  }, [subjectItem]);
 
   const weakestSection = useMemo(() => {
+    if (selectedSubject !== "解剖學") return undefined;
     return [...stats.sections]
       .sort((a, b) => a.completionRate - b.completionRate || a.masteryScore - b.masteryScore)[0];
-  }, [stats.sections]);
+  }, [selectedSubject, stats.sections]);
+
+  const paperOptions = useMemo(() => {
+    const targetFilter = settings.mode === "simulation" ? settings.subjectFilter ?? "全部" : "全部";
+    return getPastPaperOptions(targetFilter);
+  }, [settings.mode, settings.subjectFilter]);
 
   function updateSettings(next: Partial<QuizSettings>) {
     setSettings((current) => {
-      const merged = { ...current, ...next };
+      const merged = { ...current, ...next } as QuizSettings;
       if (next.chapter && next.chapter !== current.chapter) {
         merged.section = undefined;
+      }
+      if (next.subjectFilter && next.subjectFilter !== current.subjectFilter) {
+        merged.chapter = undefined;
+        merged.section = undefined;
+        if (merged.mode === "simulation" && next.subjectFilter !== "全部") {
+          merged.paperMode = merged.paperMode ?? "random_set";
+        }
       }
       return merged;
     });
@@ -69,6 +99,7 @@ export function QuizSetupPanel({ stats }: QuizSetupPanelProps) {
     const nextSettings: QuizSettings = {
       mode: "weakness",
       questionCount: 10,
+      subjectFilter: "解剖學",
       chapter: weakestSection?.chapter,
       section: weakestSection?.section
     };
@@ -83,7 +114,7 @@ export function QuizSetupPanel({ stats }: QuizSetupPanelProps) {
           <p className="text-sm font-semibold uppercase tracking-[0.2em] text-brand-700">Version 2</p>
           <h2 className="mt-2 text-2xl font-semibold text-ink">智慧測驗設定</h2>
           <p className="mt-2 text-sm leading-7 text-slate-500">
-            第二版支援弱點補強、隨機刷題與錯題複習三種模式。
+            現在可切換單科刷題與醫學（一）多科模擬考，並選擇即時看詳解或整份做完再批改。
           </p>
         </div>
         <button
@@ -96,7 +127,7 @@ export function QuizSetupPanel({ stats }: QuizSetupPanelProps) {
       </div>
 
       <div className="mt-5 grid gap-4 lg:grid-cols-3">
-        {(["weakness", "random", "review", "ai_fresh"] as QuizMode[]).map((mode) => (
+        {(["weakness", "random", "review", "ai_fresh", "simulation"] as QuizMode[]).map((mode) => (
           <button
             key={mode}
             type="button"
@@ -115,6 +146,22 @@ export function QuizSetupPanel({ stats }: QuizSetupPanelProps) {
 
       <div className="mt-6 grid gap-4 lg:grid-cols-[0.9fr_1.1fr]">
         <div className="rounded-3xl bg-slate-50 p-5">
+          <p className="text-sm font-medium text-slate-500">科目</p>
+          <select
+            value={settings.subjectFilter ?? "解剖學"}
+            onChange={(event) => updateSettings({ subjectFilter: event.target.value as SubjectFilter })}
+            className="mt-3 min-h-12 w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-800 outline-none"
+          >
+            <option value="全部">醫學（一）全科</option>
+            {enabledSubjects
+              .filter((item) => item.subject !== "醫學（一）")
+              .map((item) => (
+                <option key={item.subject} value={item.subject}>
+                  {item.label}（{item.questions.length} 題）
+                </option>
+              ))}
+          </select>
+
           <p className="text-sm font-medium text-slate-500">題數</p>
           <div className="mt-3 flex flex-wrap gap-3">
             {questionCounts.map((count) => (
@@ -174,12 +221,71 @@ export function QuizSetupPanel({ stats }: QuizSetupPanelProps) {
               使用國考考古題風格改寫題
             </label>
           ) : null}
+          {settings.mode === "simulation" ? (
+            <div className="mt-4 space-y-4">
+              <div className="rounded-2xl bg-white p-4 ring-1 ring-slate-200">
+                <p className="text-sm font-medium text-slate-500">作答後顯示方式</p>
+                <div className="mt-3 grid gap-3">
+                  {(["full", "answer_only", "none"] as SimulationFeedbackMode[]).map((mode) => (
+                    <button
+                      key={mode}
+                      type="button"
+                      onClick={() => updateSettings({ feedbackMode: mode })}
+                      className={`rounded-2xl px-4 py-3 text-left text-sm font-semibold transition ${
+                        (settings.feedbackMode ?? "none") === mode
+                          ? "bg-brand-600 text-white"
+                          : "bg-slate-50 text-slate-700 hover:bg-slate-100"
+                      }`}
+                    >
+                      {feedbackModeLabels[mode]}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <div className="rounded-2xl bg-white p-4 ring-1 ring-slate-200">
+                <p className="text-sm font-medium text-slate-500">模擬考卷來源</p>
+                <div className="mt-3 grid gap-3">
+                  {(["random_set", "past_paper", "random_past_paper"] as SimulationPaperMode[]).map((mode) => (
+                    <button
+                      key={mode}
+                      type="button"
+                      onClick={() => updateSettings({ paperMode: mode })}
+                      className={`rounded-2xl px-4 py-3 text-left text-sm font-semibold transition ${
+                        (settings.paperMode ?? "random_set") === mode
+                          ? "bg-brand-600 text-white"
+                          : "bg-slate-50 text-slate-700 hover:bg-slate-100"
+                      }`}
+                    >
+                      {paperModeLabels[mode]}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {(settings.paperMode ?? "random_set") === "past_paper" ? (
+                <select
+                  value={settings.selectedPaperKey ?? ""}
+                  onChange={(event) => updateSettings({ selectedPaperKey: event.target.value || undefined })}
+                  className="min-h-12 w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-800 outline-none"
+                >
+                  <option value="">請選擇真實考古題</option>
+                  {paperOptions.map((paper) => (
+                    <option key={paper.key} value={paper.key}>
+                      {paper.label}（{paper.questionCount} 題）
+                    </option>
+                  ))}
+                </select>
+              ) : null}
+            </div>
+          ) : null}
         </div>
       </div>
 
       <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <p className="text-sm text-slate-600">
           目前設定：<span className="font-semibold text-ink">{getModeLabel(settings.mode)}</span>・
+          {subjectItem?.label ?? settings.subjectFilter ?? "解剖學"}・
           {settings.questionCount} 題
           {settings.chapter ? `・${settings.chapter}` : ""}
           {settings.section ? ` / ${settings.section}` : ""}

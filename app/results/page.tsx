@@ -70,10 +70,10 @@ export default function ResultsPage() {
     }
 
     const completedSessions = loadCompletedSessions();
-    const currentQuestions = [
-      ...anatomyQuestions,
-      ...(currentSession.generatedQuestions ?? [])
-    ];
+    const currentQuestions =
+      currentSession.generatedQuestions && currentSession.generatedQuestions.length > 0
+        ? currentSession.generatedQuestions
+        : anatomyQuestions;
     const completionStats = calculateCompletionStats(anatomyQuestions, completedSessions);
     const sessionSectionStats = calculateSectionStats(currentSession.attempts, currentQuestions);
     const previousSessions = completedSessions.filter((session) => session.id !== currentSession.id);
@@ -188,7 +188,9 @@ export default function ResultsPage() {
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
           <p className="text-sm font-semibold uppercase tracking-[0.2em] text-brand-700">Results</p>
-          <h1 className="mt-2 text-3xl font-bold text-ink sm:text-4xl">本輪解剖學弱點分析</h1>
+          <h1 className="mt-2 text-3xl font-bold text-ink sm:text-4xl">
+            本輪{state.session.subject}結果分析
+          </h1>
           <p className="mt-2 text-sm text-slate-500">
             本輪模式：{getModeLabel(state.session.settings?.mode ?? "weakness")}
           </p>
@@ -218,57 +220,66 @@ export default function ResultsPage() {
         <div className="space-y-6">
           <WeaknessRanking sections={topWeakSections} />
 
-          <section className="rounded-[2rem] bg-white p-6 shadow-card ring-1 ring-slate-100">
-            <h2 className="text-xl font-semibold text-ink">完成度更新</h2>
-            <div className="mt-5 grid gap-6 lg:grid-cols-3">
-              <div className="rounded-3xl bg-slate-50 p-5">
-                <h3 className="text-base font-semibold text-ink">本輪新增完成的小節</h3>
-                <div className="mt-3 grid gap-2 text-sm text-slate-600">
-                  {state.newCompletedSections.length === 0 ? (
-                    <p>這輪沒有新的 section 從 0 前進到已作答。</p>
-                  ) : (
-                    state.newCompletedSections.map((section) => (
-                      <p key={`${section.chapter}-${section.section}`}>
-                        {section.chapter} / {section.section}
-                      </p>
-                    ))
-                  )}
+          {state.session.subject === "解剖學" ? (
+            <section className="rounded-[2rem] bg-white p-6 shadow-card ring-1 ring-slate-100">
+              <h2 className="text-xl font-semibold text-ink">完成度更新</h2>
+              <div className="mt-5 grid gap-6 lg:grid-cols-3">
+                <div className="rounded-3xl bg-slate-50 p-5">
+                  <h3 className="text-base font-semibold text-ink">本輪新增完成的小節</h3>
+                  <div className="mt-3 grid gap-2 text-sm text-slate-600">
+                    {state.newCompletedSections.length === 0 ? (
+                      <p>這輪沒有新的 section 從 0 前進到已作答。</p>
+                    ) : (
+                      state.newCompletedSections.map((section) => (
+                        <p key={`${section.chapter}-${section.section}`}>
+                          {section.chapter} / {section.section}
+                        </p>
+                      ))
+                    )}
+                  </div>
                 </div>
-              </div>
 
-              <div className="rounded-3xl bg-slate-50 p-5">
-                <h3 className="text-base font-semibold text-ink">最需要補進度的 section</h3>
-                <div className="mt-3 grid gap-3">
-                  {state.lowCompletion.map((section) => (
-                    <div key={`${section.chapter}-${section.section}`} className="rounded-2xl bg-white p-4 text-sm text-slate-700">
-                      <p className="font-semibold">{section.section}</p>
-                      <p className="mt-1 text-slate-500">{section.chapter}</p>
-                      <p className="mt-2">completionRate {section.completionRate}%</p>
-                      <p>masteryScore {section.masteryScore}</p>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              <div className="rounded-3xl bg-slate-50 p-5">
-                <h3 className="text-base font-semibold text-ink">已完成但不穩</h3>
-                <div className="mt-3 grid gap-3">
-                  {state.unstableSections.length === 0 ? (
-                    <p className="text-sm text-slate-600">目前沒有 completionRate 高但 masteryScore 低的小節。</p>
-                  ) : (
-                    state.unstableSections.map((section) => (
+                <div className="rounded-3xl bg-slate-50 p-5">
+                  <h3 className="text-base font-semibold text-ink">最需要補進度的 section</h3>
+                  <div className="mt-3 grid gap-3">
+                    {state.lowCompletion.map((section) => (
                       <div key={`${section.chapter}-${section.section}`} className="rounded-2xl bg-white p-4 text-sm text-slate-700">
                         <p className="font-semibold">{section.section}</p>
                         <p className="mt-1 text-slate-500">{section.chapter}</p>
                         <p className="mt-2">completionRate {section.completionRate}%</p>
                         <p>masteryScore {section.masteryScore}</p>
                       </div>
-                    ))
-                  )}
+                    ))}
+                  </div>
+                </div>
+
+                <div className="rounded-3xl bg-slate-50 p-5">
+                  <h3 className="text-base font-semibold text-ink">已完成但不穩</h3>
+                  <div className="mt-3 grid gap-3">
+                    {state.unstableSections.length === 0 ? (
+                      <p className="text-sm text-slate-600">目前沒有 completionRate 高但 masteryScore 低的小節。</p>
+                    ) : (
+                      state.unstableSections.map((section) => (
+                        <div key={`${section.chapter}-${section.section}`} className="rounded-2xl bg-white p-4 text-sm text-slate-700">
+                          <p className="font-semibold">{section.section}</p>
+                          <p className="mt-1 text-slate-500">{section.chapter}</p>
+                          <p className="mt-2">completionRate {section.completionRate}%</p>
+                          <p>masteryScore {section.masteryScore}</p>
+                        </div>
+                      ))
+                    )}
+                  </div>
                 </div>
               </div>
-            </div>
-          </section>
+            </section>
+          ) : (
+            <section className="rounded-[2rem] bg-white p-6 shadow-card ring-1 ring-slate-100">
+              <h2 className="text-xl font-semibold text-ink">完成度更新</h2>
+              <p className="mt-3 text-sm leading-7 text-slate-600">
+                目前完成度地圖與補進度分析仍以解剖學為主；這輪 {state.session.subject} 的結果先以答題統計與弱點小節分析為主。
+              </p>
+            </section>
+          )}
 
           <AIAnalysisPanel
             analysis={aiAnalysis}

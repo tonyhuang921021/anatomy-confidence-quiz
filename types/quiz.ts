@@ -2,6 +2,7 @@ export type OptionKey = "A" | "B" | "C" | "D" | "E";
 export type DifficultyLevel = "basic" | "easy" | "medium" | "hard";
 export type QuestionSourceType = "MOEX_PAST_EXAM" | "AI_GENERATED";
 export type SubjectName =
+  | "醫學（一）"
   | "解剖學"
   | "生理學"
   | "生物化學"
@@ -9,7 +10,12 @@ export type SubjectName =
   | "病理學"
   | "微生物免疫學"
   | "胚胎學"
-  | "組織學";
+  | "組織學"
+  | "寄生蟲學"
+  | "公共衛生學"
+  | "細胞生物學"
+  | "分子生物學"
+  | "其他醫學一";
 
 export type Question = {
   id: string;
@@ -40,6 +46,9 @@ export type Question = {
   sourceYear?: number;
   sourceRound?: 1 | 2;
   originalQuestionNumber?: number;
+  examCode?: string;
+  paperCode?: string;
+  examSessionLabel?: string;
   difficulty?: DifficultyLevel;
 };
 
@@ -62,14 +71,22 @@ export type Attempt = {
   answeredAt: string;
 };
 
-export type QuizMode = "random" | "weakness" | "review" | "ai_fresh";
+export type QuizMode = "random" | "weakness" | "review" | "ai_fresh" | "simulation";
+
+export type SubjectFilter = SubjectName | "全部";
+export type SimulationFeedbackMode = "full" | "answer_only" | "none";
+export type SimulationPaperMode = "random_set" | "past_paper" | "random_past_paper";
 
 export type QuizSettings = {
   mode: QuizMode;
   questionCount: number;
+  subjectFilter?: SubjectFilter;
   chapter?: string;
   section?: string;
   usePastExamStyle?: boolean;
+  feedbackMode?: SimulationFeedbackMode;
+  paperMode?: SimulationPaperMode;
+  selectedPaperKey?: string;
 };
 
 export type QuizSession = {

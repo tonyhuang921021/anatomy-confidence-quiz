@@ -351,6 +351,19 @@ export function generateAIPrompt(
   allSessions: { attempts: Attempt[] }[]
 ) {
   const questionMap = new Map(questions.map((question) => [question.id, question]));
+  const subjectLabel = (() => {
+    const subjects = Array.from(
+      new Set(
+        attempts
+          .map((attempt) => questionMap.get(attempt.questionId)?.subject)
+          .filter((value): value is string => Boolean(value))
+      )
+    );
+
+    if (subjects.length === 0) return "解剖學";
+    if (subjects.length === 1) return subjects[0];
+    return "醫學（一）";
+  })();
   const summary = calculateSummary(attempts, questions);
   const sectionStats = calculateSectionStats(attempts, questions);
   const topWeakSections = getTopWeakSections(sectionStats, 3);
@@ -449,7 +462,7 @@ export function generateAIPrompt(
     return `${section.chapter} / ${section.section}｜建議補強層級：${scope}｜最低信心 ${lowestConfidence}｜低信心答錯 ${lowConfidenceWrongCount} 題｜補法：${scopeInstruction}`;
   });
 
-  return `以下是我的解剖學醫師國考測驗紀錄。請你只做「弱點知識補強」，不要稱讚我、不要總結我哪裡做得不錯、不要輸出太多與補弱無關的分析，也不要重複貼回原始統計。
+  return `以下是我的${subjectLabel}醫師國考測驗紀錄。請你只做「弱點知識補強」，不要稱讚我、不要總結我哪裡做得不錯、不要輸出太多與補弱無關的分析，也不要重複貼回原始統計。
 
 回答規則：
 1. 只挑最需要補的 1 到 3 個小節。
@@ -517,7 +530,10 @@ ${unstableLines.join("\n") || "目前沒有資料"}
 
 export const DEFAULT_QUIZ_SETTINGS: QuizSettings = {
   mode: "weakness",
-  questionCount: 10
+  questionCount: 10,
+  subjectFilter: "解剖學",
+  feedbackMode: "full",
+  paperMode: "random_set"
 };
 
 export function getModeLabel(mode: QuizMode) {
@@ -530,6 +546,8 @@ export function getModeLabel(mode: QuizMode) {
       return "錯題複習";
     case "ai_fresh":
       return "AI 新題";
+    case "simulation":
+      return "模擬考模式";
     default:
       return "測驗";
   }
@@ -692,6 +710,15 @@ export function createQuestionOrder(
     return shuffle(sourcePool)
       .slice(0, count)
       .map((question) => question.id);
+  }
+
+  if (settings.mode === "simulation") {
+    const simulationPool =
+      settings.paperMode === "past_paper" || settings.paperMode === "random_past_paper"
+        ? sourcePool
+        : shuffle(sourcePool);
+
+    return simulationPool.slice(0, count).map((question) => question.id);
   }
 
   if (settings.mode === "review") {

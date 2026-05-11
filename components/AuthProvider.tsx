@@ -43,15 +43,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [syncVersion, setSyncVersion] = useState(0);
   const [syncError, setSyncError] = useState("");
 
-  const refreshCloudData = useCallback(async (targetUserId?: string) => {
+  const refreshCloudData = useCallback(async (targetUserId?: string, targetUser?: User | null) => {
     const userId = targetUserId || user?.id;
-    if (!configured || !userId || !user) return;
+    const effectiveUser = targetUser ?? user;
+    if (!configured || !userId || !effectiveUser) return;
 
     try {
       setSyncStatus("syncing");
       setSyncError("");
       const mergedSessions = await syncCompletedSessionsForCurrentUser(userId);
-      await syncLeaderboardProfileForCurrentUser(user, mergedSessions);
+      await syncLeaderboardProfileForCurrentUser(effectiveUser, mergedSessions);
       setSyncStatus("ready");
       setSyncVersion((value) => value + 1);
     } catch (error) {
@@ -85,7 +86,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
       if (initialSession?.user) {
         try {
-          await refreshCloudData(initialSession.user.id);
+          await refreshCloudData(initialSession.user.id, initialSession.user);
         } catch (error) {
           setSyncStatus("error");
           setSyncError(error instanceof Error ? error.message : "同步失敗");
@@ -105,7 +106,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setActiveStorageUser(nextSession?.user?.id);
 
       if (nextSession?.user) {
-        void refreshCloudData(nextSession.user.id);
+        void refreshCloudData(nextSession.user.id, nextSession.user);
       } else {
         setSyncStatus("idle");
         setSyncError("");
