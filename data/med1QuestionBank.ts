@@ -498,6 +498,8 @@ export type PastPaperOption = {
   questionCount: number;
   missingNumbers?: number[];
   isComplete?: boolean;
+  sourceYear?: number;
+  sourceRound?: 1 | 2;
 };
 
 function shuffle<T>(items: T[]) {
@@ -700,9 +702,11 @@ export function getPastPaperOptions(subjectFilter: SubjectFilter = "全部"): Pa
 
     paperMap.set(key, {
       key,
-      label: `${question.sourceYear ?? ""} ${question.examSessionLabel ?? ""} 醫學（一） ${question.paperCode}`,
+      label: `${question.sourceYear ?? ""} 第${question.sourceRound ?? (question.examSessionLabel?.includes("第二") ? 2 : 1)}次 醫學（一） ${question.paperCode}`,
       subject: "醫學（一）",
-      questionCount: 1
+      questionCount: 1,
+      sourceYear: question.sourceYear,
+      sourceRound: question.sourceRound ?? (question.examSessionLabel?.includes("第二") ? 2 : 1)
     });
   });
 
@@ -726,7 +730,10 @@ export function getPastPaperOptions(subjectFilter: SubjectFilter = "全部"): Pa
       };
     })
     .sort((a, b) => {
-      if (a.isComplete !== b.isComplete) return a.isComplete ? -1 : 1;
+      const yearDiff = (a.sourceYear ?? 0) - (b.sourceYear ?? 0);
+      if (yearDiff !== 0) return yearDiff;
+      const roundDiff = (a.sourceRound ?? 1) - (b.sourceRound ?? 1);
+      if (roundDiff !== 0) return roundDiff;
       return a.key.localeCompare(b.key);
     });
 }
