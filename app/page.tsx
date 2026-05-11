@@ -103,6 +103,22 @@ export default function HomePage() {
         </div>
       </section>
 
+      <section className="mt-6 rounded-[2rem] border border-brand-200 bg-gradient-to-r from-brand-50 via-white to-amber-50 p-6 shadow-card">
+        <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+          <div>
+            <p className="text-sm font-semibold uppercase tracking-[0.2em] text-brand-700">Announcement</p>
+            <h2 className="mt-2 text-2xl font-semibold text-ink">醫學（一）題目已上線，整份作答模式同步開放</h2>
+            <p className="mt-2 max-w-3xl text-sm leading-7 text-slate-600">
+              現在除了原本的解剖學刷題，也可以直接選醫學（一）全科，並用模擬考模式寫整份卷。你可以指定真實考古題、隨機抽一整份真實考古題，或讓系統自組一份新模擬卷。
+            </p>
+          </div>
+          <div className="rounded-3xl bg-white px-5 py-4 text-sm text-slate-700 ring-1 ring-brand-100">
+            <span className="font-semibold text-ink">新增重點：</span>
+            醫學一題庫、整份模考、真實考古卷模式
+          </div>
+        </div>
+      </section>
+
       <div className="mt-6 grid gap-6">
         <AuthPanel />
 

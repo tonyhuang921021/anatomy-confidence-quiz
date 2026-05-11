@@ -38,10 +38,25 @@ const feedbackModeLabels: Record<SimulationFeedbackMode, string> = {
   none: "全程只做題，最後再看結果"
 };
 
+const feedbackModeDescriptions: Record<SimulationFeedbackMode, string> = {
+  full: "適合邊做邊學。每題送出後會顯示正解、詳解、各選項解析與記憶法。",
+  answer_only: "適合先測自己，再快速確認對錯。每題送出後只顯示正確答案，不立刻看長詳解。",
+  none: "最接近正式考試。作答當下不公布答案與詳解，但信心仍會照常記錄，最後再一起看結果。"
+};
+
 const paperModeLabels: Record<SimulationPaperMode, string> = {
   random_set: "電腦隨機抽一份",
   past_paper: "指定真實考古題",
   random_past_paper: "隨機抽一份真實考古題"
+};
+
+const paperModeDescriptions: Record<SimulationPaperMode, string> = {
+  random_set:
+    "系統從你目前選的科目題庫中亂數組一份新模擬卷，練習感最好，但章節比例不一定完全等同真實國考。",
+  past_paper:
+    "直接指定某一年、某一次的真實考古卷，維持原始卷別與題目順序，最適合完整模考。",
+  random_past_paper:
+    "從現有真實考古卷中隨機抽一整份來寫，保留真實卷的比例與題序，但你不會先知道抽到哪一份。"
 };
 
 export function QuizSetupPanel({ stats }: QuizSetupPanelProps) {
@@ -241,6 +256,9 @@ export function QuizSetupPanel({ stats }: QuizSetupPanelProps) {
                     </button>
                   ))}
                 </div>
+                <div className="mt-3 rounded-2xl bg-brand-50 px-4 py-3 text-sm leading-7 text-slate-700">
+                  {feedbackModeDescriptions[settings.feedbackMode ?? "full"]}
+                </div>
               </div>
 
               <div className="rounded-2xl bg-white p-4 ring-1 ring-slate-200">
@@ -261,6 +279,9 @@ export function QuizSetupPanel({ stats }: QuizSetupPanelProps) {
                     </button>
                   ))}
                 </div>
+                <div className="mt-3 rounded-2xl bg-amber-50 px-4 py-3 text-sm leading-7 text-slate-700">
+                  {paperModeDescriptions[settings.paperMode ?? "random_set"]}
+                </div>
               </div>
 
               {(settings.paperMode ?? "random_set") === "past_paper" ? (
@@ -277,6 +298,9 @@ export function QuizSetupPanel({ stats }: QuizSetupPanelProps) {
                   ))}
                 </select>
               ) : null}
+              <p className="text-xs leading-6 text-slate-500">
+                不論你選哪一種模擬考模式，作答時都還是可以填寫信心程度，方便之後做弱點分析。
+              </p>
             </div>
           ) : null}
         </div>
