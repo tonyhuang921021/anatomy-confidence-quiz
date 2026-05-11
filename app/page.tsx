@@ -34,6 +34,12 @@ export default function HomePage() {
                 開始測驗
               </Link>
               <Link
+                href="/#smart-setup"
+                className="min-h-12 rounded-2xl bg-amber-100 px-5 py-4 text-center text-sm font-semibold text-amber-950 transition hover:bg-amber-200 active:scale-[0.99]"
+              >
+                開始模擬考
+              </Link>
+              <Link
                 href="/progress"
                 className="min-h-12 rounded-2xl bg-slate-100 px-5 py-4 text-center text-sm font-semibold text-slate-800 transition hover:bg-slate-200 active:scale-[0.99]"
               >
@@ -119,7 +125,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      <div className="mt-6 grid gap-6">
+      <div id="smart-setup" className="mt-6 grid gap-6 scroll-mt-24">
         <AuthPanel />
 
         <section className="rounded-[2rem] bg-white p-6 shadow-card ring-1 ring-slate-100">
