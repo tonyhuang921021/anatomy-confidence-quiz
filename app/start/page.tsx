@@ -64,10 +64,8 @@ export default function StartPage() {
           {subjects.map((subject) => {
             const active = selectedSubjects.includes(subject.subject);
             return (
-              <button
+              <article
                 key={subject.subject}
-                type="button"
-                onClick={() => toggleSubject(subject.subject)}
                 className={`rounded-3xl border p-5 text-left transition ${
                   active
                     ? "border-brand-500 bg-brand-50 ring-2 ring-brand-200"
@@ -91,19 +89,27 @@ export default function StartPage() {
                 <div className="mt-4 flex flex-wrap gap-3">
                   <button
                     type="button"
-                    onClick={(event) => {
-                      event.stopPropagation();
-                      startSingleSubject(subject.subject);
-                    }}
+                    onClick={() => toggleSubject(subject.subject)}
+                    className={`min-h-12 rounded-2xl px-4 py-3 text-sm font-semibold transition ${
+                      active
+                        ? "bg-brand-100 text-brand-900 ring-1 ring-brand-200"
+                        : "bg-white text-slate-800 ring-1 ring-slate-200 hover:bg-slate-100"
+                    }`}
+                  >
+                    {active ? "從混刷移除" : "加入混刷"}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => startSingleSubject(subject.subject)}
                     className="min-h-12 rounded-2xl bg-brand-600 px-4 py-3 text-sm font-semibold text-white transition hover:bg-brand-700"
                   >
                     直接開始這一科
                   </button>
                   <span className="flex min-h-12 items-center rounded-2xl bg-white px-4 py-3 text-xs font-medium text-slate-500 ring-1 ring-slate-200">
-                    也可以點整張卡片加入混刷
+                    可單科直刷，也可加入混刷
                   </span>
                 </div>
-              </button>
+              </article>
             );
           })}
         </div>
