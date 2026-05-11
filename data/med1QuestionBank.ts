@@ -1,5 +1,6 @@
 import { anatomyOutline, anatomyQuestions } from "@/data/anatomyQuestions";
 import { moexMed1RemainingDetailedV4Merged0011827 } from "@/data/sources/moex_med1_remaining_detailed_v4_merged_001_1827";
+import { moexMed1Missing22QuestionsDetailedV5 } from "@/data/sources/moex_med1_missing_22_questions_detailed_v5";
 import type { OptionKey, Question, SubjectFilter, SubjectName } from "@/types/quiz";
 
 type RawQuestion = {
@@ -34,6 +35,30 @@ type RawQuestion = {
 type SubjectOutlineEntry = {
   chapter: string;
   sections: string[];
+};
+
+type MissingQuestionRaw = {
+  id: string;
+  year: number;
+  roc_year: number;
+  exam_round: string;
+  exam_code: string;
+  question_no: number;
+  stem: string;
+  options: Readonly<Record<string, string>>;
+  official_answer?: string | readonly string[];
+  corrected_answer?: string | readonly string[] | null;
+  answer_credit_type?: string;
+  classification_v5?: {
+    primary_subject?: string;
+    subtopic?: string;
+  };
+  explanation?: string;
+  option_analysis?: Readonly<Record<string, string>>;
+  exam_point?: string;
+  memory_tip?: string;
+  clinical_link?: string;
+  review_flags?: readonly string[];
 };
 
 const anatomyChapterKeywords = [
@@ -118,6 +143,28 @@ function toSectionLabel(topicSection?: string, fallback = "其他") {
   return source || fallback;
 }
 
+function toPartialOptionAnalysis(
+  source?: Readonly<Record<string, string>>
+): Partial<Record<OptionKey, string>> | undefined {
+  if (!source) return undefined;
+
+  const nextEntries = Object.entries(source).filter(([key]) => isOptionKey(key));
+  if (nextEntries.length === 0) return undefined;
+
+  return Object.fromEntries(nextEntries) as Partial<Record<OptionKey, string>>;
+}
+
+function normalizeAnswerCreditType(
+  value?: string
+): Question["answerCreditType"] | undefined {
+  if (!value) return "standard";
+  if (value === "all_credit") return "all_credit";
+  if (value === "multiple_accepted" || value === "multiple") return "multiple_accepted";
+  if (value === "multiple_answers") return "multiple_answers";
+  if (value === "single" || value === "standard") return "standard";
+  return "standard";
+}
+
 function toQuestion(raw: RawQuestion): Question | null {
   const acceptedAnswers = (raw.correct_answers ?? [])
     .map((value) => value.trim())
@@ -151,7 +198,7 @@ function toQuestion(raw: RawQuestion): Question | null {
     answerCreditType: raw.answer_credit_type as Question["answerCreditType"],
     explanation: raw.explanation ?? "",
     testedConcept: raw.exam_point ?? topicSection ?? section,
-    optionAnalysis: raw.option_analysis as Partial<Record<OptionKey, string>> | undefined,
+    optionAnalysis: toPartialOptionAnalysis(raw.option_analysis),
     memoryTip: raw.memory_tip,
     clinicalLink: raw.clinical_link,
     answerConfidence: raw.answer_confidence,
@@ -170,15 +217,73 @@ function toQuestion(raw: RawQuestion): Question | null {
   };
 }
 
+function toMissingQuestion(raw: MissingQuestionRaw): Question | null {
+  const answerValues = [raw.corrected_answer, raw.official_answer]
+    .flatMap((value) => (Array.isArray(value) ? value : value ? [value] : []))
+    .map((value) => value.trim())
+    .filter(isOptionKey);
+  const primaryAnswer = answerValues[0] ?? "";
+  if (!isOptionKey(primaryAnswer)) return null;
+
+  const [examCode, paperCode] = raw.exam_code.split("-");
+  const primarySubject = normalizeSubject(raw.classification_v5?.primary_subject);
+  const topicSection = raw.classification_v5?.subtopic?.replaceAll("｜", "／").trim();
+  const anatomyPlacement =
+    primarySubject === "解剖學" ? normalizeAnatomyChapter(topicSection) : null;
+  const chapter = anatomyPlacement?.chapter ?? primarySubject;
+  const section = anatomyPlacement?.section ?? toSectionLabel(topicSection, primarySubject);
+  const answerCreditType = normalizeAnswerCreditType(raw.answer_credit_type);
+
+  return {
+    id: raw.id,
+    subject: primarySubject,
+    chapter,
+    section,
+    stem: raw.stem,
+    options: {
+      A: raw.options.A ?? "",
+      B: raw.options.B ?? "",
+      C: raw.options.C ?? "",
+      D: raw.options.D ?? "",
+      ...(raw.options.E ? { E: raw.options.E } : {})
+    },
+    answer: primaryAnswer,
+    acceptedAnswers: answerValues.length > 0 ? answerValues : undefined,
+    answerCreditType,
+    explanation: raw.explanation ?? "",
+    testedConcept: raw.exam_point ?? topicSection ?? section,
+    optionAnalysis: toPartialOptionAnalysis(raw.option_analysis),
+    memoryTip: raw.memory_tip,
+    clinicalLink: raw.clinical_link,
+    needsHumanReview: raw.review_flags?.includes("needs_human_review") ?? false,
+    reviewFlags: raw.review_flags ? [...raw.review_flags] : undefined,
+    sourceType: "MOEX_PAST_EXAM",
+    sourceCitation: `考選部 ${raw.year} ${raw.exam_round} 醫學（一） ${paperCode ?? ""}`.trim(),
+    sourceYear: raw.year,
+    sourceRound: raw.exam_round.includes("第二") ? 2 : 1,
+    originalQuestionNumber: raw.question_no,
+    examCode,
+    paperCode,
+    examSessionLabel: raw.exam_round
+  };
+}
+
 const remainingQuestionsRaw =
   moexMed1RemainingDetailedV4Merged0011827.questions as readonly RawQuestion[];
 export const med1RemainingQuestions: Question[] = remainingQuestionsRaw
   .map(toQuestion)
   .filter((question): question is Question => Boolean(question));
 
+const missingQuestionsRaw =
+  moexMed1Missing22QuestionsDetailedV5 as readonly MissingQuestionRaw[];
+export const med1MissingQuestions: Question[] = missingQuestionsRaw
+  .map(toMissingQuestion)
+  .filter((question): question is Question => Boolean(question));
+
 export const allAnatomyQuestions: Question[] = [
   ...anatomyQuestions,
-  ...med1RemainingQuestions.filter((question) => question.subject === "解剖學")
+  ...med1RemainingQuestions.filter((question) => question.subject === "解剖學"),
+  ...med1MissingQuestions.filter((question) => question.subject === "解剖學")
 ];
 
 const med1CoreQuestions: Question[] = [
@@ -187,12 +292,20 @@ const med1CoreQuestions: Question[] = [
   ...med1RemainingQuestions.filter((question) => question.subject === "胚胎學"),
   ...med1RemainingQuestions.filter(
     (question) => question.subject === "生理學" || question.subject === "生物化學"
+  ),
+  ...med1MissingQuestions.filter((question) =>
+    ["組織學", "胚胎學", "生理學", "生物化學"].includes(question.subject)
   )
 ];
 
-const med2CoreQuestions: Question[] = med1RemainingQuestions.filter((question) =>
-  ["藥理學", "病理學", "微生物免疫學", "寄生蟲學", "公共衛生學"].includes(question.subject)
-);
+const med2CoreQuestions: Question[] = [
+  ...med1RemainingQuestions.filter((question) =>
+    ["藥理學", "病理學", "微生物免疫學", "寄生蟲學", "公共衛生學"].includes(question.subject)
+  ),
+  ...med1MissingQuestions.filter((question) =>
+    ["藥理學", "病理學", "微生物免疫學", "寄生蟲學", "公共衛生學"].includes(question.subject)
+  )
+];
 
 export const med1QuestionsBySubject: Record<SubjectName, Question[]> = {
   "醫學（一）": med1CoreQuestions,
@@ -252,11 +365,69 @@ export type PastPaperOption = {
   label: string;
   subject: SubjectFilter;
   questionCount: number;
+  missingNumbers?: number[];
+  isComplete?: boolean;
 };
 
 function shuffle<T>(items: T[]) {
   return [...items].sort(() => Math.random() - 0.5);
 }
+
+function uniqueById(questions: Question[]) {
+  const seenIds = new Set<string>();
+  return questions.filter((question) => {
+    if (seenIds.has(question.id)) return false;
+    seenIds.add(question.id);
+    return true;
+  });
+}
+
+function getQuestionRichnessScore(question: Question) {
+  return (
+    (question.sourceType === "MOEX_PAST_EXAM" ? 200 : 0) +
+    (question.reviewFlags?.includes("missing_question_filled_v5") ? 80 : 0) +
+    (question.answerCreditType === "all_credit" ? 25 : 0) +
+    (question.answerCreditType === "multiple_accepted" ? 20 : 0) +
+    (question.needsHumanReview ? 10 : 0) +
+    Math.min(question.explanation.length, 400) +
+    Object.keys(question.optionAnalysis ?? {}).length * 25 +
+    (question.memoryTip ? 15 : 0) +
+    (question.clinicalLink ? 12 : 0)
+  );
+}
+
+function selectBestQuestionVariant(candidates: Question[]) {
+  return [...candidates].sort((left, right) => {
+    return getQuestionRichnessScore(right) - getQuestionRichnessScore(left);
+  })[0];
+}
+
+function buildWholePastPaperBank() {
+  const allMoexQuestions = uniqueById(
+    [...allAnatomyQuestions, ...med1RemainingQuestions, ...med1MissingQuestions, ...med2CoreQuestions]
+      .filter((question) => question.sourceType === "MOEX_PAST_EXAM")
+  );
+  const grouped = new Map<string, Question[]>();
+
+  allMoexQuestions.forEach((question) => {
+    if (!question.examCode || !question.paperCode || !question.originalQuestionNumber) return;
+    const key = `${question.examCode}-${question.paperCode}-${question.originalQuestionNumber}`;
+    const bucket = grouped.get(key) ?? [];
+    bucket.push(question);
+    grouped.set(key, bucket);
+  });
+
+  return Array.from(grouped.values())
+    .map(selectBestQuestionVariant)
+    .sort((a, b) => {
+      const leftKey = `${a.examCode}-${a.paperCode}`;
+      const rightKey = `${b.examCode}-${b.paperCode}`;
+      if (leftKey !== rightKey) return leftKey.localeCompare(rightKey);
+      return (a.originalQuestionNumber ?? 0) - (b.originalQuestionNumber ?? 0);
+    });
+}
+
+const wholePastPaperBank = buildWholePastPaperBank();
 
 function getBucketKey(question: Question, subjectFilter: SubjectFilter) {
   if (subjectFilter === "全部") {
@@ -338,7 +509,8 @@ export function getQuestionBankBySubjects(subjects: SubjectName[] = []) {
 }
 
 export function getPastPaperOptions(subjectFilter: SubjectFilter = "全部"): PastPaperOption[] {
-  const bank = getQuestionBankBySubjectFilter(subjectFilter);
+  void subjectFilter;
+  const bank = wholePastPaperBank;
   const paperMap = new Map<string, PastPaperOption>();
 
   bank.forEach((question) => {
@@ -353,20 +525,42 @@ export function getPastPaperOptions(subjectFilter: SubjectFilter = "全部"): Pa
     paperMap.set(key, {
       key,
       label: `${question.sourceYear ?? ""} ${question.examSessionLabel ?? ""} 醫學（一） ${question.paperCode}`,
-      subject: subjectFilter,
+      subject: "醫學（一）",
       questionCount: 1
     });
   });
 
-  return Array.from(paperMap.values()).sort((a, b) => a.key.localeCompare(b.key));
+  return Array.from(paperMap.values())
+    .map((paper) => {
+      const presentNumbers = new Set(
+        bank
+          .filter((question) => `${question.examCode}-${question.paperCode}` === paper.key)
+          .map((question) => question.originalQuestionNumber)
+          .filter((value): value is number => typeof value === "number")
+      );
+      const missingNumbers = Array.from({ length: 100 }, (_, index) => index + 1).filter(
+        (number) => !presentNumbers.has(number)
+      );
+
+      return {
+        ...paper,
+        missingNumbers,
+        isComplete: missingNumbers.length === 0,
+        questionCount: presentNumbers.size
+      };
+    })
+    .sort((a, b) => {
+      if (a.isComplete !== b.isComplete) return a.isComplete ? -1 : 1;
+      return a.key.localeCompare(b.key);
+    });
 }
 
 export function getQuestionsForPastPaper(
   paperKey: string,
   subjectFilter: SubjectFilter = "全部"
 ) {
-  const bank = getQuestionBankBySubjectFilter(subjectFilter);
-  return bank
+  void subjectFilter;
+  return wholePastPaperBank
     .filter((question) => `${question.examCode}-${question.paperCode}` === paperKey)
     .sort((a, b) => (a.originalQuestionNumber ?? 0) - (b.originalQuestionNumber ?? 0));
 }

@@ -44,7 +44,9 @@ type HealthState = {
 };
 
 const allQuestionFallbackMap = new Map(
-  getQuestionBankBySubjectFilter("全部").map((question) => [question.id, question] as const)
+  getQuestionBankBySubjects(["醫學（一）", "醫學（二）"]).map(
+    (question) => [question.id, question] as const
+  )
 );
 
 function getQuestionSourceBadge(question: Question) {
@@ -140,15 +142,15 @@ function selectLocalQuestionSet(settings: QuizSettings, fallbackQuestions: Quest
 
   const paperMode = settings.paperMode ?? "random_set";
   if (paperMode === "past_paper" && settings.selectedPaperKey) {
-    const paperQuestions = getQuestionsForPastPaper(settings.selectedPaperKey, subjectFilter);
+    const paperQuestions = getQuestionsForPastPaper(settings.selectedPaperKey);
     return paperQuestions.length > 0 ? paperQuestions : sourceBank;
   }
 
   if (paperMode === "random_past_paper") {
-    const papers = getPastPaperOptions(subjectFilter);
+    const papers = getPastPaperOptions();
     if (papers.length === 0) return sourceBank;
     const selected = papers[Math.floor(Math.random() * papers.length)];
-    const paperQuestions = getQuestionsForPastPaper(selected.key, subjectFilter);
+    const paperQuestions = getQuestionsForPastPaper(selected.key);
     return paperQuestions.length > 0 ? paperQuestions : sourceBank;
   }
 

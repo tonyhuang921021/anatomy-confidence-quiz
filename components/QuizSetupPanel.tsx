@@ -84,9 +84,9 @@ export function QuizSetupPanel({ stats }: QuizSetupPanelProps) {
   }, [selectedSubject, stats.sections]);
 
   const paperOptions = useMemo(() => {
-    const targetFilter = settings.mode === "simulation" ? settings.subjectFilter ?? "全部" : "全部";
-    return getPastPaperOptions(targetFilter);
-  }, [settings.mode, settings.subjectFilter]);
+    if (settings.mode !== "simulation") return [];
+    return getPastPaperOptions();
+  }, [settings.mode]);
 
   function updateSettings(next: Partial<QuizSettings>) {
     setSettings((current) => {
@@ -312,7 +312,10 @@ export function QuizSetupPanel({ stats }: QuizSetupPanelProps) {
                   <option value="">請選擇真實考古題</option>
                   {paperOptions.map((paper) => (
                     <option key={paper.key} value={paper.key}>
-                      {paper.label}（{paper.questionCount} 題）
+                      {paper.label}
+                      {paper.isComplete
+                        ? "（完整 100 題）"
+                        : `（目前 ${paper.questionCount} 題，缺 ${paper.missingNumbers?.join("、")}）`}
                     </option>
                   ))}
                 </select>
