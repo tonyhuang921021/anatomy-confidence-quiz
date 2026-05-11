@@ -35,7 +35,8 @@ import {
   OptionKey,
   Question,
   QuizSession,
-  QuizSettings
+  QuizSettings,
+  SubjectName
 } from "@/types/quiz";
 
 type HealthState = {
@@ -200,6 +201,7 @@ export default function QuizPage() {
     const params =
       typeof window !== "undefined" ? new URLSearchParams(window.location.search) : null;
     const preset = params?.get("preset");
+    const directSubject = params?.get("subject");
     const startPresetSettings: QuizSettings = {
       ...DEFAULT_QUIZ_SETTINGS,
       mode: "weakness",
@@ -207,6 +209,17 @@ export default function QuizPage() {
       chapter: undefined,
       section: undefined
     };
+    const directSubjectSettings: QuizSettings | null = directSubject
+      ? {
+          ...DEFAULT_QUIZ_SETTINGS,
+          mode: "random",
+          subjectFilter: directSubject as SubjectName,
+          subjectFilters: [directSubject as SubjectName],
+          questionCount: 10,
+          chapter: undefined,
+          section: undefined
+        }
+      : null;
     const med1PresetSettings: QuizSettings = {
       ...DEFAULT_QUIZ_SETTINGS,
       mode: "random",
@@ -224,13 +237,14 @@ export default function QuizPage() {
       section: undefined
     };
     const savedSettings: QuizSettings =
-      preset === "start"
+      directSubjectSettings ??
+      (preset === "start"
         ? startPresetSettings
         : preset === "med1"
           ? med1PresetSettings
           : preset === "med2"
             ? med2PresetSettings
-          : loadQuizSettings() ?? DEFAULT_QUIZ_SETTINGS;
+            : loadQuizSettings() ?? DEFAULT_QUIZ_SETTINGS);
     const completedSessions = loadCompletedSessions();
     const shouldForceNewSession =
       params?.get("new") === "1";

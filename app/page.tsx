@@ -191,12 +191,12 @@ export default function HomePage() {
                       <Link
                         href={
                           isAnatomy
-                            ? "/quiz?new=1&preset=start"
+                            ? `/quiz?new=1&subject=${encodeURIComponent(subject.subject)}`
                             : isMed1
                               ? "/quiz?new=1&preset=med1"
                               : isMed2
                                 ? "/quiz?new=1&preset=med2"
-                              : "/"
+                                : `/quiz?new=1&subject=${encodeURIComponent(subject.subject)}`
                         }
                         className="min-h-12 rounded-2xl bg-brand-600 px-4 py-3 text-sm font-semibold text-white transition hover:bg-brand-700"
                       >
