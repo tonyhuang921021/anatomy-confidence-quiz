@@ -9,6 +9,7 @@ import { QuestionCard } from "@/components/QuestionCard";
 import {
   buildExamLikeRandomSet,
   getPastPaperOptions,
+  getQuestionBankBySubjects,
   getQuestionBankBySubjectFilter,
   getQuestionsForPastPaper
 } from "@/data/med1QuestionBank";
@@ -78,6 +79,7 @@ function createSession(
   const normalizedSettings = { ...DEFAULT_QUIZ_SETTINGS, ...settings };
   const localQuestionSet = selectLocalQuestionSet(normalizedSettings, questions);
   const effectiveQuestions = localQuestionSet.length > 0 ? localQuestionSet : questions;
+  const selectedSubjects = normalizedSettings.subjectFilters?.filter(Boolean) ?? [];
   const effectiveSettings =
     normalizedSettings.mode === "simulation" &&
     (normalizedSettings.paperMode === "past_paper" ||
@@ -92,9 +94,11 @@ function createSession(
   return {
     id: `session-${Date.now()}`,
     subject:
-      (effectiveSettings.subjectFilter && effectiveSettings.subjectFilter !== "全部"
-        ? effectiveSettings.subjectFilter
-        : "醫學（一）") || "解剖學",
+      selectedSubjects.length === 1
+        ? selectedSubjects[0]
+        : (effectiveSettings.subjectFilter && effectiveSettings.subjectFilter !== "全部"
+            ? effectiveSettings.subjectFilter
+            : "醫學（一）") || "解剖學",
     startedAt: new Date().toISOString(),
     settings: effectiveSettings,
     questionOrder,
@@ -106,8 +110,12 @@ function createSession(
 }
 
 function selectLocalQuestionSet(settings: QuizSettings, fallbackQuestions: Question[]) {
+  const selectedSubjects = settings.subjectFilters?.filter(Boolean) ?? [];
   const subjectFilter = settings.subjectFilter ?? "解剖學";
-  const bank = getQuestionBankBySubjectFilter(subjectFilter);
+  const bank =
+    selectedSubjects.length > 0
+      ? getQuestionBankBySubjects(selectedSubjects)
+      : getQuestionBankBySubjectFilter(subjectFilter);
   const sourceBank = bank.length > 0 ? bank : fallbackQuestions;
 
   if (settings.mode !== "simulation") {
@@ -185,7 +193,7 @@ export default function QuizPage() {
         ? startPresetSettings
         : preset === "med1"
           ? med1PresetSettings
-          : loadQuizSettings() ?? DEFAULT_QUIZ_SETTINGS;
+              : loadQuizSettings() ?? DEFAULT_QUIZ_SETTINGS;
     const completedSessions = loadCompletedSessions();
     const shouldForceNewSession =
       params?.get("new") === "1";
@@ -196,7 +204,13 @@ export default function QuizPage() {
       (existing.questionOrder?.length ?? 0) > 0;
     const nextSession = shouldReuseExisting
       ? existing
-      : createSession(getQuestionBankBySubjectFilter(savedSettings.subjectFilter ?? "解剖學"), completedSessions, savedSettings);
+      : createSession(
+          (savedSettings.subjectFilters?.length ?? 0) > 0
+            ? getQuestionBankBySubjects(savedSettings.subjectFilters ?? [])
+            : getQuestionBankBySubjectFilter(savedSettings.subjectFilter ?? "解剖學"),
+          completedSessions,
+          savedSettings
+        );
 
     if (!shouldReuseExisting) {
       clearCurrentSession();

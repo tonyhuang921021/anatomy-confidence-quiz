@@ -296,6 +296,23 @@ export function getQuestionBankBySubjectFilter(subjectFilter: SubjectFilter = "�
   return med1QuestionsBySubject[subjectFilter] ?? [];
 }
 
+export function getQuestionBankBySubjects(subjects: SubjectName[] = []) {
+  if (subjects.length === 0) return [];
+
+  const uniqueIds = new Set<string>();
+  const merged: Question[] = [];
+
+  subjects.forEach((subject) => {
+    (med1QuestionsBySubject[subject] ?? []).forEach((question) => {
+      if (uniqueIds.has(question.id)) return;
+      uniqueIds.add(question.id);
+      merged.push(question);
+    });
+  });
+
+  return merged;
+}
+
 export function getPastPaperOptions(subjectFilter: SubjectFilter = "全部"): PastPaperOption[] {
   const bank = getQuestionBankBySubjectFilter(subjectFilter);
   const paperMap = new Map<string, PastPaperOption>();

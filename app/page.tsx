@@ -28,7 +28,7 @@ export default function HomePage() {
 
             <div className="mt-6 flex flex-col gap-3 sm:flex-row">
               <Link
-                href="/quiz?new=1&preset=start"
+                href="/start"
                 className="min-h-12 rounded-2xl bg-brand-600 px-5 py-4 text-center text-sm font-semibold text-white transition hover:bg-brand-700 active:scale-[0.99]"
               >
                 開始測驗
@@ -82,9 +82,9 @@ export default function HomePage() {
           <div className="rounded-[2rem] bg-ink p-6 text-white shadow-card">
             <p className="text-sm font-semibold uppercase tracking-[0.2em] text-brand-200">快速入口</p>
             <div className="mt-4 grid gap-3">
-              <Link href="/quiz?new=1&preset=start" className="rounded-2xl bg-white/10 p-4 transition hover:bg-white/15">
+              <Link href="/start" className="rounded-2xl bg-white/10 p-4 transition hover:bg-white/15">
                 <p className="font-semibold">立即開始 10 題測驗</p>
-                <p className="mt-1 text-sm text-slate-200">直接進入答題流程</p>
+                <p className="mt-1 text-sm text-slate-200">先選想抽哪些科，再進入答題流程</p>
               </Link>
               <Link href="/progress" className="rounded-2xl bg-white/10 p-4 transition hover:bg-white/15">
                 <p className="font-semibold">看解剖學進度地圖</p>

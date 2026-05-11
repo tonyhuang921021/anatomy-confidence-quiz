@@ -81,6 +81,7 @@ export type QuizSettings = {
   mode: QuizMode;
   questionCount: number;
   subjectFilter?: SubjectFilter;
+  subjectFilters?: SubjectName[];
   chapter?: string;
   section?: string;
   usePastExamStyle?: boolean;
