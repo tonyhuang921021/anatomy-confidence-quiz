@@ -68,7 +68,7 @@ export const subjectRegistry: Record<SubjectName, SubjectRegistryItem> = {
   "微生物免疫學": {
     subject: "微生物免疫學",
     enabled: med1QuestionsBySubject["微生物免疫學"].length > 0,
-    label: "微生物免疫學（含寄生蟲）",
+    label: "微生物免疫學",
     chapters: med1OutlinesBySubject["微生物免疫學"],
     questions: med1QuestionsBySubject["微生物免疫學"]
   },

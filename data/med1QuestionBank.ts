@@ -70,7 +70,7 @@ function normalizeSubject(rawSubject?: string): SubjectName {
   ) {
     return "生物化學";
   }
-  if (subject.includes("寄生蟲")) return "微生物免疫學";
+  if (subject.includes("寄生蟲")) return "寄生蟲學";
   if (subject.includes("公共衛生")) return "公共衛生學";
   if (subject.includes("微生物") || subject.includes("免疫")) return "微生物免疫學";
 
@@ -189,7 +189,7 @@ const med1CoreQuestions: Question[] = [
 ];
 
 const med2CoreQuestions: Question[] = med1RemainingQuestions.filter((question) =>
-  ["藥理學", "病理學", "微生物免疫學", "公共衛生學"].includes(question.subject)
+  ["藥理學", "病理學", "微生物免疫學", "寄生蟲學", "公共衛生學"].includes(question.subject)
 );
 
 export const med1QuestionsBySubject: Record<SubjectName, Question[]> = {
