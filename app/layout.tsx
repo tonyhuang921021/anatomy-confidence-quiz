@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import type { ReactNode } from "react";
 import { AuthProvider } from "@/components/AuthProvider";
 import { UserStatusBar } from "@/components/UserStatusBar";
+import { VisitorPresenceTracker } from "@/components/VisitorPresenceTracker";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -15,6 +16,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
       <body>
         <AuthProvider>
           <UserStatusBar />
+          <VisitorPresenceTracker />
           {children}
         </AuthProvider>
       </body>

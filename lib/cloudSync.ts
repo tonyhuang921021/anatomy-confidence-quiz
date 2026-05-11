@@ -1,5 +1,5 @@
 import type { User } from "@supabase/supabase-js";
-import type { LeaderboardEntry, QuizSession } from "@/types/quiz";
+import type { LeaderboardEntry, QuizSession, VisitorStats } from "@/types/quiz";
 import {
   loadCompletedSessions,
   loadCompletedSessionsForUser,
@@ -29,6 +29,24 @@ type LeaderboardRow = {
   total_sessions: number;
   updated_at?: string | null;
 };
+
+const VISITOR_STORAGE_KEY = "acq-visitor-id";
+const ONLINE_WINDOW_MS = 2 * 60 * 1000;
+
+function getVisitorId() {
+  if (typeof window === "undefined") return null;
+
+  const existingId = window.localStorage.getItem(VISITOR_STORAGE_KEY);
+  if (existingId) return existingId;
+
+  const nextId =
+    typeof crypto !== "undefined" && "randomUUID" in crypto
+      ? crypto.randomUUID()
+      : `visitor-${Date.now()}-${Math.random().toString(36).slice(2, 10)}`;
+
+  window.localStorage.setItem(VISITOR_STORAGE_KEY, nextId);
+  return nextId;
+}
 
 function sessionFreshnessValue(session: QuizSession) {
   return session.completedAt || session.startedAt || "";
@@ -240,4 +258,58 @@ export async function loadLeaderboard(limit = 50) {
   }
 
   return (data ?? []).map((row) => mapLeaderboardRow(row as LeaderboardRow));
+}
+
+export async function trackVisitorPresence(userId?: string | null) {
+  if (!isSupabaseConfigured()) return;
+
+  const visitorId = getVisitorId();
+  if (!visitorId) return;
+
+  const supabase = getSupabaseBrowserClient();
+  const now = new Date().toISOString();
+
+  const { error } = await supabase.from("site_visitors").upsert(
+    {
+      visitor_id: visitorId,
+      user_id: userId ?? null,
+      last_seen_at: now
+    },
+    { onConflict: "visitor_id" }
+  );
+
+  if (error) {
+    throw error;
+  }
+}
+
+export async function loadVisitorStats(): Promise<VisitorStats> {
+  if (!isSupabaseConfigured()) {
+    return {
+      totalVisitors: 0,
+      onlineVisitors: 0,
+      updatedAt: new Date().toISOString()
+    };
+  }
+
+  const supabase = getSupabaseBrowserClient();
+  const onlineSince = new Date(Date.now() - ONLINE_WINDOW_MS).toISOString();
+
+  const [{ count: totalVisitors, error: totalError }, { count: onlineVisitors, error: onlineError }] =
+    await Promise.all([
+      supabase.from("site_visitors").select("*", { count: "exact", head: true }),
+      supabase
+        .from("site_visitors")
+        .select("*", { count: "exact", head: true })
+        .gte("last_seen_at", onlineSince)
+    ]);
+
+  if (totalError) throw totalError;
+  if (onlineError) throw onlineError;
+
+  return {
+    totalVisitors: totalVisitors ?? 0,
+    onlineVisitors: onlineVisitors ?? 0,
+    updatedAt: new Date().toISOString()
+  };
 }

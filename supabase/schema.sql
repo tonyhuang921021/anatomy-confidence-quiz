@@ -64,3 +64,35 @@ on public.leaderboard_profiles
 for update
 using (auth.uid() = user_id)
 with check (auth.uid() = user_id);
+
+create table if not exists public.site_visitors (
+  visitor_id text primary key,
+  user_id uuid references auth.users (id) on delete set null,
+  first_seen_at timestamptz not null default now(),
+  last_seen_at timestamptz not null default now()
+);
+
+create index if not exists site_visitors_last_seen_at_idx
+on public.site_visitors (last_seen_at desc);
+
+alter table public.site_visitors enable row level security;
+
+drop policy if exists "Anyone can read site visitors" on public.site_visitors;
+drop policy if exists "Anyone can insert site visitors" on public.site_visitors;
+drop policy if exists "Anyone can update site visitors" on public.site_visitors;
+
+create policy "Anyone can read site visitors"
+on public.site_visitors
+for select
+using (true);
+
+create policy "Anyone can insert site visitors"
+on public.site_visitors
+for insert
+with check (true);
+
+create policy "Anyone can update site visitors"
+on public.site_visitors
+for update
+using (true)
+with check (true);

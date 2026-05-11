@@ -207,3 +207,9 @@ export type LeaderboardEntry = {
   totalSessions: number;
   updatedAt?: string;
 };
+
+export type VisitorStats = {
+  totalVisitors: number;
+  onlineVisitors: number;
+  updatedAt: string;
+};

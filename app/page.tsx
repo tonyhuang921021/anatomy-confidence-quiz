@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { AuthPanel } from "@/components/AuthPanel";
 import { QuizSetupPanel } from "@/components/QuizSetupPanel";
+import { VisitorStatsPanel } from "@/components/VisitorStatsPanel";
 import { anatomyQuestions } from "@/data/anatomyQuestions";
 import {
   enabledSubjects,
@@ -76,7 +77,7 @@ export default function HomePage() {
               </Link>
             </div>
 
-            <div className="mt-6 grid gap-3 sm:grid-cols-2">
+            <div className="mt-6 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
               <div className="rounded-3xl bg-slate-50 p-4">
                 <p className="text-sm text-slate-500">目前題庫數量</p>
                 <p className="mt-2 text-2xl font-bold text-ink">{totalQuestionCount}</p>
@@ -87,6 +88,7 @@ export default function HomePage() {
                   {availableSubjects.map((subject) => subject.label).join("、")}
                 </p>
               </div>
+              <VisitorStatsPanel />
             </div>
           </div>
 
