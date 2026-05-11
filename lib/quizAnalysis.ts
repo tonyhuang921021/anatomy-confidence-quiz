@@ -12,6 +12,7 @@ import {
   ReviewQuestionItem,
   SectionCompletionStats,
   SectionStats,
+  SubjectName,
   SummaryStats
 } from "@/types/quiz";
 
@@ -356,7 +357,7 @@ export function generateAIPrompt(
       new Set(
         attempts
           .map((attempt) => questionMap.get(attempt.questionId)?.subject)
-          .filter((value): value is string => Boolean(value))
+          .filter((value): value is SubjectName => Boolean(value))
       )
     );
 
