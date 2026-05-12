@@ -29,6 +29,9 @@ export function LeaderboardTable({ entries, currentUserId, sortMode }: Leaderboa
     );
   }
 
+  const maxAttempts = Math.max(...entries.map((entry) => entry.totalAttempts), 0);
+  const maxCorrectAttempts = Math.max(...entries.map((entry) => entry.correctAttempts), 0);
+
   return (
     <section className="rounded-[2rem] bg-white p-6 shadow-card ring-1 ring-slate-100">
       <div className="flex flex-wrap items-center justify-between gap-3">
@@ -49,11 +52,17 @@ export function LeaderboardTable({ entries, currentUserId, sortMode }: Leaderboa
         {entries.map((entry, index) => {
           const isCurrentUser = currentUserId === entry.userId;
           const isChampion = index === 0;
+          const normalizedName = entry.displayName.trim();
+          const isMetricLeader =
+            entry.totalAttempts === maxAttempts || entry.correctAttempts === maxCorrectAttempts;
+          const isEnzoHero = normalizedName === "Enzo" && isMetricLeader;
+          const isSquirrelHero = normalizedName === "松鼠" && isMetricLeader;
+          const hasHeroBackground = isEnzoHero || isSquirrelHero;
           return (
             <article
               key={entry.userId}
               className={`relative overflow-hidden rounded-3xl border p-5 ${
-                isChampion
+                hasHeroBackground || isChampion
                   ? "border-amber-300 bg-[radial-gradient(circle_at_top_right,_rgba(251,191,36,0.35),_rgba(255,251,235,0.95)_45%,_rgba(255,255,255,1)_80%)] shadow-[0_18px_45px_rgba(245,158,11,0.18)]"
                   : index < 3
                   ? "border-amber-200 bg-amber-50/70"
@@ -62,23 +71,36 @@ export function LeaderboardTable({ entries, currentUserId, sortMode }: Leaderboa
                     : "border-slate-200 bg-slate-50"
               }`}
             >
-              {isChampion ? (
+              {hasHeroBackground || isChampion ? (
                 <>
-                  <div className="pointer-events-none absolute inset-y-0 right-[-2%] w-[36%] sm:right-0 sm:w-[44%]">
-                    <div className="absolute inset-y-[-8%] right-[-10%] w-[115%] rounded-full bg-amber-300/20 blur-3xl" />
-                    <Image
-                      src="/assets/lbj-crown.png"
-                      alt="LBJ 冠軍裝飾"
-                      fill
-                      className="object-contain object-right-center opacity-20 sm:opacity-30 drop-shadow-[0_16px_24px_rgba(15,23,42,0.16)]"
-                    />
-                  </div>
-                  <div className="mb-4 flex items-center gap-2 pr-[26%] sm:pr-[40%]">
+                  {isEnzoHero ? (
+                    <div className="pointer-events-none absolute inset-y-0 left-[-4%] w-[34%] sm:left-[-2%] sm:w-[38%]">
+                      <div className="absolute inset-y-[-8%] left-[-12%] w-[120%] rounded-full bg-sky-300/15 blur-3xl" />
+                      <Image
+                        src="/assets/sga.png"
+                        alt="SGA 冠軍裝飾"
+                        fill
+                        className="object-contain object-left-center opacity-20 sm:opacity-30 drop-shadow-[0_16px_24px_rgba(15,23,42,0.16)]"
+                      />
+                    </div>
+                  ) : null}
+                  {(isEnzoHero || isSquirrelHero || isChampion) ? (
+                    <div className="pointer-events-none absolute inset-y-0 right-[-2%] w-[36%] sm:right-0 sm:w-[44%]">
+                      <div className="absolute inset-y-[-8%] right-[-10%] w-[115%] rounded-full bg-amber-300/20 blur-3xl" />
+                      <Image
+                        src="/assets/lbj-crown.png"
+                        alt="LBJ 冠軍裝飾"
+                        fill
+                        className="object-contain object-right-center opacity-20 sm:opacity-30 drop-shadow-[0_16px_24px_rgba(15,23,42,0.16)]"
+                      />
+                    </div>
+                  ) : null}
+                  <div className={`mb-4 flex items-center gap-2 ${isEnzoHero ? "px-[22%] sm:px-[30%]" : "pr-[26%] sm:pr-[40%]"}`}>
                     <span className="rounded-full bg-amber-400 px-3 py-1 text-xs font-black tracking-[0.18em] text-amber-950">
-                      KING MODE
+                      {isEnzoHero ? "DUAL MVP MODE" : "KING MODE"}
                     </span>
                     <span className="text-xs font-semibold text-amber-900/80">
-                      第一名限定冠軍特效
+                      {isEnzoHero ? "左 SGA、右 LBJ 冠軍背景" : "第一名限定冠軍特效"}
                     </span>
                   </div>
                 </>
@@ -89,14 +111,18 @@ export function LeaderboardTable({ entries, currentUserId, sortMode }: Leaderboa
                   <div className="flex flex-wrap items-center gap-3">
                     <span
                       className={`rounded-full px-3 py-1 text-xs font-semibold ring-1 ${
-                        isChampion
+                        hasHeroBackground || isChampion
                           ? "bg-amber-100 text-amber-950 ring-amber-300"
                           : "bg-white text-slate-700 ring-slate-200"
                       }`}
                     >
                       第 {index + 1} 名
                     </span>
-                    {isChampion ? (
+                    {isEnzoHero ? (
+                      <span className="rounded-full bg-sky-900 px-3 py-1 text-xs font-semibold text-white">
+                        SGA + LBJ Tier
+                      </span>
+                    ) : isSquirrelHero || isChampion ? (
                       <span className="rounded-full bg-ink px-3 py-1 text-xs font-semibold text-white">
                         LBJ Crown Tier
                       </span>
