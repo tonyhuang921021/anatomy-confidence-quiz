@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { LeaderboardEntry } from "@/types/quiz";
 
 function formatUpdatedAt(value?: string) {
@@ -47,23 +48,63 @@ export function LeaderboardTable({ entries, currentUserId, sortMode }: Leaderboa
       <div className="mt-5 grid gap-4">
         {entries.map((entry, index) => {
           const isCurrentUser = currentUserId === entry.userId;
+          const isChampion = index === 0;
           return (
             <article
               key={entry.userId}
-              className={`rounded-3xl border p-5 ${
-                index < 3
+              className={`relative overflow-hidden rounded-3xl border p-5 ${
+                isChampion
+                  ? "border-amber-300 bg-[radial-gradient(circle_at_top_right,_rgba(251,191,36,0.35),_rgba(255,251,235,0.95)_45%,_rgba(255,255,255,1)_80%)] shadow-[0_18px_45px_rgba(245,158,11,0.18)]"
+                  : index < 3
                   ? "border-amber-200 bg-amber-50/70"
                   : isCurrentUser
                     ? "border-brand-200 bg-brand-50/70"
                     : "border-slate-200 bg-slate-50"
               }`}
             >
+              {isChampion ? (
+                <>
+                  <div className="pointer-events-none absolute right-[-0.5rem] top-[-1.25rem] h-24 w-24 rounded-full bg-amber-300/30 blur-2xl" />
+                  <div className="pointer-events-none absolute right-3 top-3 hidden sm:block">
+                    <div className="relative">
+                      <div className="absolute inset-0 scale-110 rounded-full bg-amber-300/30 blur-xl" />
+                      <Image
+                        src="/assets/lbj-crown.png"
+                        alt="LBJ 冠軍裝飾"
+                        width={118}
+                        height={71}
+                        className="relative rotate-[-7deg] drop-shadow-[0_10px_18px_rgba(15,23,42,0.28)]"
+                      />
+                    </div>
+                  </div>
+                  <div className="mb-4 flex items-center gap-2 pr-24 sm:pr-32">
+                    <span className="rounded-full bg-amber-400 px-3 py-1 text-xs font-black tracking-[0.18em] text-amber-950">
+                      KING MODE
+                    </span>
+                    <span className="text-xs font-semibold text-amber-900/80">
+                      第一名限定冠軍特效
+                    </span>
+                  </div>
+                </>
+              ) : null}
+
               <div className="flex flex-wrap items-start justify-between gap-4">
                 <div className="min-w-0 flex-1">
                   <div className="flex flex-wrap items-center gap-3">
-                    <span className="rounded-full bg-white px-3 py-1 text-xs font-semibold text-slate-700 ring-1 ring-slate-200">
+                    <span
+                      className={`rounded-full px-3 py-1 text-xs font-semibold ring-1 ${
+                        isChampion
+                          ? "bg-amber-100 text-amber-950 ring-amber-300"
+                          : "bg-white text-slate-700 ring-slate-200"
+                      }`}
+                    >
                       第 {index + 1} 名
                     </span>
+                    {isChampion ? (
+                      <span className="rounded-full bg-ink px-3 py-1 text-xs font-semibold text-white">
+                        LBJ Crown Tier
+                      </span>
+                    ) : null}
                     {isCurrentUser ? (
                       <span className="rounded-full bg-brand-100 px-3 py-1 text-xs font-semibold text-brand-800">
                         你
