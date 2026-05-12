@@ -64,7 +64,7 @@ export function LeaderboardTable({ entries, currentUserId, sortMode }: Leaderboa
             >
               {isChampion ? (
                 <>
-                  <div className="pointer-events-none absolute right-[-1.5rem] top-[-0.5rem] hidden h-[10.5rem] w-[10.5rem] sm:block">
+                  <div className="pointer-events-none absolute right-[-2.25rem] top-[-0.75rem] hidden h-[13rem] w-[13rem] sm:block">
                     <div className="absolute inset-0 rounded-full bg-amber-300/20 blur-3xl" />
                     <Image
                       src="/assets/lbj-crown.png"
