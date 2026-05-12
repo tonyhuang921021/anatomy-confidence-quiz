@@ -56,7 +56,7 @@ export function LeaderboardTable({ entries, currentUserId, sortMode }: Leaderboa
           const lowerName = normalizedName.toLowerCase();
           const isMetricLeader =
             entry.totalAttempts === maxAttempts || entry.correctAttempts === maxCorrectAttempts;
-          const isEnzoHero = lowerName.includes("enzo") && isMetricLeader;
+          const isEnzoHero = lowerName.includes("enzo") && (isMetricLeader || isChampion);
           const isSquirrelHero = normalizedName.includes("松鼠") && isMetricLeader;
           const hasHeroBackground = isEnzoHero || isSquirrelHero;
           return (
