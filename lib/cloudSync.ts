@@ -207,7 +207,8 @@ export async function syncLeaderboardProfileForCurrentUser(
       total_attempts: summary.totalAttempts,
       correct_attempts: summary.correctAttempts,
       correct_rate: summary.correctRate,
-      total_sessions: summary.totalSessions
+      total_sessions: summary.totalSessions,
+      updated_at: new Date().toISOString()
     },
     { onConflict: "user_id" }
   );
@@ -229,7 +230,8 @@ export async function updateLeaderboardDisplayName(
   const { error } = await supabase.from("leaderboard_profiles").upsert(
     {
       user_id: user.id,
-      display_name: trimmed
+      display_name: trimmed,
+      updated_at: new Date().toISOString()
     },
     { onConflict: "user_id" }
   );
