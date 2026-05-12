@@ -64,15 +64,15 @@ export function LeaderboardTable({ entries, currentUserId, sortMode }: Leaderboa
             >
               {isChampion ? (
                 <>
-                  <div className="pointer-events-none absolute right-[-0.5rem] top-[-1.25rem] h-24 w-24 rounded-full bg-amber-300/30 blur-2xl" />
-                  <div className="pointer-events-none absolute right-3 top-3 hidden sm:block">
+                  <div className="pointer-events-none absolute right-[-0.75rem] top-[-1.75rem] h-24 w-24 rounded-full bg-amber-300/30 blur-2xl" />
+                  <div className="pointer-events-none absolute right-1 top-[-0.75rem] hidden sm:block">
                     <div className="relative">
                       <div className="absolute inset-0 scale-110 rounded-full bg-amber-300/30 blur-xl" />
                       <Image
                         src="/assets/lbj-crown.png"
                         alt="LBJ 冠軍裝飾"
-                        width={118}
-                        height={71}
+                        width={108}
+                        height={65}
                         className="relative rotate-[-7deg] drop-shadow-[0_10px_18px_rgba(15,23,42,0.28)]"
                       />
                     </div>
