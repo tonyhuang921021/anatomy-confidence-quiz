@@ -74,41 +74,32 @@ export function LeaderboardTable({ entries, currentUserId, sortMode }: Leaderboa
             >
               {hasHeroBackground || isChampion ? (
                 <>
-                  {isEnzoHero ? (
-                    <div className="pointer-events-none absolute bottom-0 left-[-2%] top-auto z-0 h-[96%] w-[52%] sm:left-0 sm:h-[112%] sm:w-[44%]">
-                      <div className="absolute inset-y-[16%] left-[-4%] w-[112%] rounded-full bg-sky-300/30 blur-3xl" />
-                      <Image
-                        src="/assets/sga.png"
-                        alt="SGA 冠軍裝飾"
-                        fill
-                        className="object-contain object-left-bottom opacity-80 sm:opacity-90 drop-shadow-[0_18px_28px_rgba(15,23,42,0.24)]"
-                      />
-                    </div>
-                  ) : null}
                   {(isEnzoHero || isSquirrelHero || isChampion) ? (
                     <div className="pointer-events-none absolute inset-y-0 right-[-2%] w-[36%] sm:right-0 sm:w-[44%]">
                       <div className="absolute inset-y-[-8%] right-[-10%] w-[115%] rounded-full bg-amber-300/20 blur-3xl" />
                       <Image
-                        src="/assets/lbj-crown.png"
-                        alt="LBJ 冠軍裝飾"
+                        src={isEnzoHero ? "/assets/sga.png" : "/assets/lbj-crown.png"}
+                        alt={isEnzoHero ? "SGA 冠軍裝飾" : "LBJ 冠軍裝飾"}
                         fill
-                        className="object-contain object-right-center opacity-20 sm:opacity-30 drop-shadow-[0_16px_24px_rgba(15,23,42,0.16)]"
+                        className={`object-contain object-right-center drop-shadow-[0_16px_24px_rgba(15,23,42,0.16)] ${
+                          isEnzoHero ? "opacity-70 sm:opacity-80" : "opacity-20 sm:opacity-30"
+                        }`}
                       />
                     </div>
                   ) : null}
-                  <div className={`relative z-10 mb-4 flex items-center gap-2 ${isEnzoHero ? "pl-[22%] pr-[26%] sm:pl-[24%] sm:pr-[32%]" : "pr-[26%] sm:pr-[40%]"}`}>
+                  <div className={`relative z-10 mb-4 flex items-center gap-2 ${isEnzoHero ? "pr-[26%] sm:pr-[32%]" : "pr-[26%] sm:pr-[40%]"}`}>
                     <span className="rounded-full bg-amber-400 px-3 py-1 text-xs font-black tracking-[0.18em] text-amber-950">
-                      {isEnzoHero ? "DUAL MVP MODE" : "KING MODE"}
+                      {isEnzoHero ? "SGA MODE" : "KING MODE"}
                     </span>
                     <span className="text-xs font-semibold text-amber-900/80">
-                      {isEnzoHero ? "左 SGA、右 LBJ 冠軍背景" : "第一名限定冠軍特效"}
+                      {isEnzoHero ? "右側 SGA 冠軍背景" : "第一名限定冠軍特效"}
                     </span>
                   </div>
                 </>
               ) : null}
 
               <div className="relative z-10 flex flex-wrap items-start justify-between gap-4">
-                <div className={`min-w-0 flex-1 ${isEnzoHero ? "pl-[22%] sm:pl-[24%]" : ""}`}>
+                <div className="min-w-0 flex-1">
                   <div className="flex flex-wrap items-center gap-3">
                     <span
                       className={`rounded-full px-3 py-1 text-xs font-semibold ring-1 ${
@@ -121,7 +112,7 @@ export function LeaderboardTable({ entries, currentUserId, sortMode }: Leaderboa
                     </span>
                     {isEnzoHero ? (
                       <span className="rounded-full bg-sky-900 px-3 py-1 text-xs font-semibold text-white">
-                        SGA + LBJ Tier
+                        SGA Tier
                       </span>
                     ) : isSquirrelHero || isChampion ? (
                       <span className="rounded-full bg-ink px-3 py-1 text-xs font-semibold text-white">
