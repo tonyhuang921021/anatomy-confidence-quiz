@@ -9,6 +9,7 @@ import { useAuth } from "@/components/AuthProvider";
 import { ResultSummary } from "@/components/ResultSummary";
 import { WeaknessRanking } from "@/components/WeaknessRanking";
 import { anatomyQuestions } from "@/data/anatomyQuestions";
+import { subjectRegistry } from "@/data/subjectRegistry";
 import {
   calculateCompletionStats,
   calculateSectionStats,
@@ -27,7 +28,27 @@ import {
   loadCurrentSession,
   saveQuizSettings
 } from "@/lib/storage";
-import { QuizSession, SectionCompletionStats, SectionStats, SummaryStats } from "@/types/quiz";
+import { Attempt, OptionKey, Question, QuizSession, SectionCompletionStats, SectionStats, SummaryStats } from "@/types/quiz";
+
+const allQuestions = Array.from(
+  new Map(
+    Object.values(subjectRegistry)
+      .filter((subject) => subject.subject !== "醫學（一）" && subject.subject !== "醫學（二）")
+      .flatMap((subject) => subject.questions.map((question) => [question.id, question] as const))
+  ).values()
+);
+
+const optionKeys: OptionKey[] = ["A", "B", "C", "D", "E"];
+
+function getQuestionMap(session: QuizSession) {
+  return new Map(
+    [...allQuestions, ...(session.generatedQuestions ?? [])].map((question) => [question.id, question] as const)
+  );
+}
+
+function getAvailableOptionKeys(question: Question) {
+  return optionKeys.filter((key) => typeof question.options[key] === "string");
+}
 
 type ResultState = {
   session: QuizSession | null;
@@ -182,6 +203,14 @@ export default function ResultsPage() {
   }
 
   const topWeakSections = getTopWeakSections(state.sectionStats, 3);
+  const questionMap = getQuestionMap(state.session);
+  const reviewedAttempts = state.session.attempts
+    .map((attempt) => ({
+      attempt,
+      question: questionMap.get(attempt.questionId)
+    }))
+    .filter((item): item is { attempt: Attempt; question: Question } => Boolean(item.question));
+  const wrongAttempts = reviewedAttempts.filter((item) => !item.attempt.isCorrect);
 
   return (
     <main className="shell">
@@ -288,6 +317,141 @@ export default function ResultsPage() {
             loading={aiLoading}
             onGenerate={handleGenerateAIAnalysis}
           />
+
+          <section className="rounded-[2rem] bg-white p-6 shadow-card ring-1 ring-slate-100">
+            <div className="flex flex-wrap items-center justify-between gap-3">
+              <div>
+                <h2 className="text-xl font-semibold text-ink">題目回顧</h2>
+                <p className="mt-2 text-sm text-slate-500">先看錯題，再往下展開全部題目做完整複盤。</p>
+              </div>
+              <div className="flex flex-wrap gap-2 text-xs font-semibold">
+                <span className="rounded-full bg-rose-100 px-3 py-1 text-rose-900">錯題 {wrongAttempts.length}</span>
+                <span className="rounded-full bg-slate-100 px-3 py-1 text-slate-700">全部 {reviewedAttempts.length}</span>
+              </div>
+            </div>
+
+            <div className="mt-5 space-y-6">
+              <div>
+                <h3 className="text-base font-semibold text-ink">錯題回顧</h3>
+                <div className="mt-3 grid gap-3">
+                  {wrongAttempts.length === 0 ? (
+                    <div className="rounded-2xl bg-emerald-50 p-4 text-sm text-emerald-900">
+                      這輪沒有錯題，可以直接展開下方全部題目回顧。
+                    </div>
+                  ) : (
+                    wrongAttempts.map(({ attempt, question }, index) => (
+                      <details key={`wrong-${attempt.questionId}`} className="rounded-2xl bg-rose-50 p-4">
+                        <summary className="cursor-pointer text-sm font-semibold text-rose-950">
+                          錯題 {index + 1}：{question.chapter} / {question.section} / {question.testedConcept}
+                        </summary>
+                        <div className="mt-4 space-y-3 text-sm leading-7 text-slate-700">
+                          <p className="font-semibold text-slate-900">{question.stem}</p>
+                          <div className="grid gap-3">
+                            {getAvailableOptionKeys(question).map((key) => (
+                              <div key={`${question.id}-${key}`} className="rounded-2xl bg-white p-4">
+                                <p className="font-semibold text-slate-900">
+                                  {key}. {question.options[key]}
+                                </p>
+                              </div>
+                            ))}
+                          </div>
+                          <p>
+                            <span className="font-semibold">我的答案：</span>
+                            {attempt.selectedAnswer}
+                          </p>
+                          <p>
+                            <span className="font-semibold">正確答案：</span>
+                            {question.acceptedAnswers?.length && question.answerCreditType === "multiple_accepted"
+                              ? question.acceptedAnswers.join(" / ")
+                              : attempt.correctAnswer}
+                          </p>
+                          <p>
+                            <span className="font-semibold">信心：</span>
+                            {attempt.confidence}
+                          </p>
+                          {attempt.errorType ? (
+                            <p>
+                              <span className="font-semibold">錯因：</span>
+                              {attempt.errorType}
+                            </p>
+                          ) : null}
+                          <p>
+                            <span className="font-semibold">詳解：</span>
+                            {question.explanation}
+                          </p>
+                          {question.memoryTip ? (
+                            <p>
+                              <span className="font-semibold">快速記憶法：</span>
+                              {question.memoryTip}
+                            </p>
+                          ) : null}
+                        </div>
+                      </details>
+                    ))
+                  )}
+                </div>
+              </div>
+
+              <div>
+                <h3 className="text-base font-semibold text-ink">全部題目回顧</h3>
+                <div className="mt-3 grid gap-3">
+                  {reviewedAttempts.map(({ attempt, question }, index) => (
+                    <details key={`all-${attempt.questionId}`} className="rounded-2xl bg-slate-50 p-4">
+                      <summary className="cursor-pointer text-sm font-semibold text-ink">
+                        第 {index + 1} 題：{attempt.isCorrect ? "答對" : "答錯"} / {question.chapter} / {question.section}
+                      </summary>
+                      <div className="mt-4 space-y-3 text-sm leading-7 text-slate-700">
+                        <p className="font-semibold text-slate-900">{question.stem}</p>
+                        <div className="grid gap-3">
+                          {getAvailableOptionKeys(question).map((key) => (
+                            <div key={`${question.id}-all-${key}`} className="rounded-2xl bg-white p-4">
+                              <p className="font-semibold text-slate-900">
+                                {key}. {question.options[key]}
+                              </p>
+                            </div>
+                          ))}
+                        </div>
+                        <p>
+                          <span className="font-semibold">我的答案：</span>
+                          {attempt.selectedAnswer}
+                        </p>
+                        <p>
+                          <span className="font-semibold">正確答案：</span>
+                          {question.acceptedAnswers?.length && question.answerCreditType === "multiple_accepted"
+                            ? question.acceptedAnswers.join(" / ")
+                            : attempt.correctAnswer}
+                        </p>
+                        <p>
+                          <span className="font-semibold">testedConcept：</span>
+                          {question.testedConcept}
+                        </p>
+                        <p>
+                          <span className="font-semibold">信心：</span>
+                          {attempt.confidence}
+                        </p>
+                        {attempt.errorType ? (
+                          <p>
+                            <span className="font-semibold">錯因：</span>
+                            {attempt.errorType}
+                          </p>
+                        ) : null}
+                        <p>
+                          <span className="font-semibold">詳解：</span>
+                          {question.explanation}
+                        </p>
+                        {question.memoryTip ? (
+                          <p>
+                            <span className="font-semibold">快速記憶法：</span>
+                            {question.memoryTip}
+                          </p>
+                        ) : null}
+                      </div>
+                    </details>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </section>
 
           {showPrompt ? <AIPromptBox promptText={state.promptText} /> : null}
         </div>

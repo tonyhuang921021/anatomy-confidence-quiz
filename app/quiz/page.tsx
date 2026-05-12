@@ -401,6 +401,17 @@ export default function QuizPage() {
   function handleSelectConfidence(value: ConfidenceLevel) {
     setConfidence(value);
     setConfidenceExpanded(value <= 3);
+
+    if (!session || !submittedAttempt) return;
+
+    const nextAttempts = session.attempts.map((attempt) =>
+      attempt.questionId === submittedAttempt.questionId ? { ...attempt, confidence: value } : attempt
+    );
+    const nextSession = { ...session, attempts: nextAttempts };
+    const updatedAttempt =
+      nextAttempts.find((attempt) => attempt.questionId === submittedAttempt.questionId) ?? null;
+    persistSession(nextSession);
+    setSubmittedAttempt(updatedAttempt);
   }
 
   function handleSubmit() {
@@ -751,6 +762,17 @@ export default function QuizPage() {
                     <p className="mt-2 leading-7">{currentQuestion.memoryTip}</p>
                   </div>
                 ) : null}
+              </div>
+
+              <ConfidenceSelector
+                value={confidence}
+                expanded={confidenceExpanded}
+                onExpand={() => setConfidenceExpanded((current) => !current)}
+                onSelect={handleSelectConfidence}
+              />
+
+              <div className="rounded-3xl border border-slate-200 bg-slate-50 p-4 text-sm text-slate-700">
+                這題已送出；如果你想補填或修正信心程度，可以直接在這裡重選，系統會更新本題紀錄。
               </div>
 
               {!submittedAttempt.isCorrect && shouldShowExplanation ? (
