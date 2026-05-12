@@ -82,7 +82,7 @@ export function LeaderboardTable({ entries, currentUserId, sortMode }: Leaderboa
                         alt={isEnzoHero ? "SGA 冠軍裝飾" : "LBJ 冠軍裝飾"}
                         fill
                         className={`object-contain object-right-center drop-shadow-[0_16px_24px_rgba(15,23,42,0.16)] ${
-                          isEnzoHero ? "opacity-70 sm:opacity-80" : "opacity-20 sm:opacity-30"
+                          isEnzoHero ? "opacity-20 sm:opacity-30" : "opacity-20 sm:opacity-30"
                         }`}
                       />
                     </div>
