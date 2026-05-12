@@ -596,6 +596,23 @@ function shuffle<T>(items: T[]) {
   return [...items].sort(() => Math.random() - 0.5);
 }
 
+function getPrioritizedFreshPool(
+  questions: Question[],
+  allSessions: { attempts: Attempt[] }[]
+) {
+  const historyMap = buildQuestionHistoryMap(allSessions);
+  const unseen = shuffle(questions.filter((question) => !historyMap.has(question.id)));
+  const seen = shuffle(
+    questions.filter((question) => historyMap.has(question.id))
+  ).sort((a, b) => {
+    const attemptedAtA = historyMap.get(a.id)?.lastAttemptedAt ?? "";
+    const attemptedAtB = historyMap.get(b.id)?.lastAttemptedAt ?? "";
+    return attemptedAtA.localeCompare(attemptedAtB);
+  });
+
+  return [...unseen, ...seen];
+}
+
 function diversifyBySection<T extends { question: Question; score: number }>(
   items: T[],
   count: number,
@@ -708,7 +725,7 @@ export function createQuestionOrder(
   const scored = buildQuestionScoreMap(sourcePool, allSessions, settings);
 
   if (settings.mode === "random") {
-    return shuffle(sourcePool)
+    return getPrioritizedFreshPool(sourcePool, allSessions)
       .slice(0, count)
       .map((question) => question.id);
   }
