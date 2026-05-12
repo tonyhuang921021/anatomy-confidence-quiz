@@ -64,20 +64,16 @@ export function LeaderboardTable({ entries, currentUserId, sortMode }: Leaderboa
             >
               {isChampion ? (
                 <>
-                  <div className="pointer-events-none absolute right-[-0.75rem] top-[-1.75rem] h-24 w-24 rounded-full bg-amber-300/30 blur-2xl" />
-                  <div className="pointer-events-none absolute right-1 top-[-0.75rem] hidden sm:block">
-                    <div className="relative">
-                      <div className="absolute inset-0 scale-110 rounded-full bg-amber-300/30 blur-xl" />
-                      <Image
-                        src="/assets/lbj-crown.png"
-                        alt="LBJ 冠軍裝飾"
-                        width={108}
-                        height={65}
-                        className="relative rotate-[-7deg] drop-shadow-[0_10px_18px_rgba(15,23,42,0.28)]"
-                      />
-                    </div>
+                  <div className="pointer-events-none absolute right-[-1.5rem] top-[-0.5rem] hidden h-[10.5rem] w-[10.5rem] sm:block">
+                    <div className="absolute inset-0 rounded-full bg-amber-300/20 blur-3xl" />
+                    <Image
+                      src="/assets/lbj-crown.png"
+                      alt="LBJ 冠軍裝飾"
+                      fill
+                      className="object-contain object-right-top opacity-25 drop-shadow-[0_16px_24px_rgba(15,23,42,0.16)]"
+                    />
                   </div>
-                  <div className="mb-4 flex items-center gap-2 pr-24 sm:pr-32">
+                  <div className="mb-4 flex items-center gap-2">
                     <span className="rounded-full bg-amber-400 px-3 py-1 text-xs font-black tracking-[0.18em] text-amber-950">
                       KING MODE
                     </span>
@@ -114,12 +110,12 @@ export function LeaderboardTable({ entries, currentUserId, sortMode }: Leaderboa
                   <h3 className="mt-3 break-words text-xl font-semibold text-ink">{entry.displayName}</h3>
                   <p className="mt-2 text-sm text-slate-500">最近同步：{formatUpdatedAt(entry.updatedAt)}</p>
                 </div>
-                <div className="rounded-2xl bg-white px-4 py-3 text-sm text-slate-700">
-                  正確率 <span className="font-semibold">{entry.correctRate}%</span>
-                </div>
               </div>
 
               <div className="mt-4 grid gap-3 sm:grid-cols-3">
+                <p className="rounded-2xl bg-white px-4 py-3 text-sm text-slate-700">
+                  正確率 <span className="font-semibold">{entry.correctRate}%</span>
+                </p>
                 <p className="rounded-2xl bg-white px-4 py-3 text-sm text-slate-700">
                   總答題量 <span className="font-semibold">{entry.totalAttempts}</span>
                 </p>
