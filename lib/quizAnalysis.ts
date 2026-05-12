@@ -430,6 +430,15 @@ export function generateAIPrompt(
     })
     .filter(Boolean);
 
+  const lowConfidenceLines = attempts
+    .filter((attempt) => attempt.confidence <= 3)
+    .map((attempt) => {
+      const question = questionMap.get(attempt.questionId);
+      if (!question) return "";
+      return `${question.chapter} / ${question.section}｜${question.testedConcept}｜${attempt.isCorrect ? "答對但沒信心" : "答錯且沒信心"}（${attempt.confidence}）｜我的答案 ${attempt.selectedAnswer}｜正解 ${attempt.correctAnswer}`;
+    })
+    .filter(Boolean);
+
   const confidenceScopedWeaknessLines = topWeakSections.map((section) => {
     const relatedAttempts = attempts.filter((attempt) => {
       const question = questionMap.get(attempt.questionId);
@@ -483,8 +492,9 @@ export function generateAIPrompt(
    - 3 題立即小測驗（附答案）
 5. 如果我有錯誤自信，請特別指出我觀念錯在哪裡。
 6. 如果我有低信心答錯，請用更基礎、可快速重建的方式教。
-7. 不要另外安排鼓勵、讀書計畫、人格分析、整體優缺點、稱讚或與弱點無關的延伸內容。
-8. 請用台灣醫學生準備醫師國考一階的語氣與深度回答，重點放在知識本身，越精準越好。
+7. 如果我有低信心但答對的題，請一起補講，因為代表我會做但不穩。
+8. 不要另外安排鼓勵、讀書計畫、人格分析、整體優缺點、稱讚或與弱點無關的延伸內容。
+9. 請用台灣醫學生準備醫師國考一階的語氣與深度回答，重點放在知識本身，越精準越好。
 
 以下是本輪整體統計：
 總題數：${summary.total}
@@ -503,6 +513,9 @@ ${overconfidenceLines.join("\n") || "目前沒有資料"}
 
 以下是優先補弱題：
 ${priorityWeaknessLines.join("\n") || "目前沒有資料"}
+
+以下是低信心題（包含答對但不穩）：
+${lowConfidenceLines.join("\n") || "目前沒有資料"}
 
 以下是依信心程度建議的補強範圍：
 ${confidenceScopedWeaknessLines.join("\n") || "目前沒有資料"}

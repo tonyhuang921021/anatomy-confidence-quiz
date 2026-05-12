@@ -590,6 +590,8 @@ export default function QuizPage() {
         ? { text: "錯誤自信", style: "bg-rose-100 text-rose-900" }
         : submittedAttempt && !submittedAttempt.isCorrect && submittedAttempt.confidence <= 2
           ? { text: "優先補弱", style: "bg-orange-100 text-orange-900" }
+          : submittedAttempt && submittedAttempt.confidence <= 3
+            ? { text: "低信心", style: "bg-yellow-100 text-yellow-900" }
           : null;
   const difficultyBadge = submittedAttempt ? getDifficultyBadge(currentQuestion) : null;
   const feedbackMode = session.settings?.feedbackMode ?? "full";
