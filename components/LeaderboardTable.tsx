@@ -64,16 +64,16 @@ export function LeaderboardTable({ entries, currentUserId, sortMode }: Leaderboa
             >
               {isChampion ? (
                 <>
-                  <div className="pointer-events-none absolute inset-y-0 right-0 hidden w-[44%] sm:block">
+                  <div className="pointer-events-none absolute inset-y-0 right-[-2%] w-[36%] sm:right-0 sm:w-[44%]">
                     <div className="absolute inset-y-[-8%] right-[-10%] w-[115%] rounded-full bg-amber-300/20 blur-3xl" />
                     <Image
                       src="/assets/lbj-crown.png"
                       alt="LBJ 冠軍裝飾"
                       fill
-                      className="object-contain object-right-center opacity-30 drop-shadow-[0_16px_24px_rgba(15,23,42,0.16)]"
+                      className="object-contain object-right-center opacity-20 sm:opacity-30 drop-shadow-[0_16px_24px_rgba(15,23,42,0.16)]"
                     />
                   </div>
-                  <div className="mb-4 flex items-center gap-2 pr-[40%]">
+                  <div className="mb-4 flex items-center gap-2 pr-[26%] sm:pr-[40%]">
                     <span className="rounded-full bg-amber-400 px-3 py-1 text-xs font-black tracking-[0.18em] text-amber-950">
                       KING MODE
                     </span>
