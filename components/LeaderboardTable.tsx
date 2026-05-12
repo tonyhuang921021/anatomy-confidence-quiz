@@ -53,10 +53,11 @@ export function LeaderboardTable({ entries, currentUserId, sortMode }: Leaderboa
           const isCurrentUser = currentUserId === entry.userId;
           const isChampion = index === 0;
           const normalizedName = entry.displayName.trim();
+          const lowerName = normalizedName.toLowerCase();
           const isMetricLeader =
             entry.totalAttempts === maxAttempts || entry.correctAttempts === maxCorrectAttempts;
-          const isEnzoHero = normalizedName === "Enzo" && isMetricLeader;
-          const isSquirrelHero = normalizedName === "松鼠" && isMetricLeader;
+          const isEnzoHero = lowerName.includes("enzo") && isMetricLeader;
+          const isSquirrelHero = normalizedName.includes("松鼠") && isMetricLeader;
           const hasHeroBackground = isEnzoHero || isSquirrelHero;
           return (
             <article
@@ -74,13 +75,13 @@ export function LeaderboardTable({ entries, currentUserId, sortMode }: Leaderboa
               {hasHeroBackground || isChampion ? (
                 <>
                   {isEnzoHero ? (
-                    <div className="pointer-events-none absolute bottom-0 left-[-6%] top-auto h-[92%] w-[46%] sm:left-[-4%] sm:h-[108%] sm:w-[42%]">
-                      <div className="absolute inset-y-[18%] left-[-8%] w-[118%] rounded-full bg-sky-300/28 blur-3xl" />
+                    <div className="pointer-events-none absolute bottom-0 left-[-2%] top-auto z-0 h-[96%] w-[52%] sm:left-0 sm:h-[112%] sm:w-[44%]">
+                      <div className="absolute inset-y-[16%] left-[-4%] w-[112%] rounded-full bg-sky-300/30 blur-3xl" />
                       <Image
                         src="/assets/sga.png"
                         alt="SGA 冠軍裝飾"
                         fill
-                        className="object-contain object-left-bottom opacity-60 sm:opacity-72 drop-shadow-[0_16px_24px_rgba(15,23,42,0.22)]"
+                        className="object-contain object-left-bottom opacity-80 sm:opacity-90 drop-shadow-[0_18px_28px_rgba(15,23,42,0.24)]"
                       />
                     </div>
                   ) : null}
@@ -95,7 +96,7 @@ export function LeaderboardTable({ entries, currentUserId, sortMode }: Leaderboa
                       />
                     </div>
                   ) : null}
-                  <div className={`relative z-10 mb-4 flex items-center gap-2 ${isEnzoHero ? "px-[30%] sm:px-[32%]" : "pr-[26%] sm:pr-[40%]"}`}>
+                  <div className={`relative z-10 mb-4 flex items-center gap-2 ${isEnzoHero ? "pl-[22%] pr-[26%] sm:pl-[24%] sm:pr-[32%]" : "pr-[26%] sm:pr-[40%]"}`}>
                     <span className="rounded-full bg-amber-400 px-3 py-1 text-xs font-black tracking-[0.18em] text-amber-950">
                       {isEnzoHero ? "DUAL MVP MODE" : "KING MODE"}
                     </span>
@@ -107,7 +108,7 @@ export function LeaderboardTable({ entries, currentUserId, sortMode }: Leaderboa
               ) : null}
 
               <div className="relative z-10 flex flex-wrap items-start justify-between gap-4">
-                <div className={`min-w-0 flex-1 ${isEnzoHero ? "pl-[30%] sm:pl-[28%]" : ""}`}>
+                <div className={`min-w-0 flex-1 ${isEnzoHero ? "pl-[22%] sm:pl-[24%]" : ""}`}>
                   <div className="flex flex-wrap items-center gap-3">
                     <span
                       className={`rounded-full px-3 py-1 text-xs font-semibold ring-1 ${
