@@ -430,6 +430,15 @@ export function generateAIPrompt(
     })
     .filter(Boolean);
 
+  const wrongLines = attempts
+    .filter((attempt) => !attempt.isCorrect)
+    .map((attempt) => {
+      const question = questionMap.get(attempt.questionId);
+      if (!question) return "";
+      return `${question.chapter} / ${question.section}｜${question.testedConcept}｜信心 ${attempt.confidence}｜我的答案 ${attempt.selectedAnswer}｜正解 ${attempt.correctAnswer}｜錯因 ${attempt.errorType ?? "未填"}`;
+    })
+    .filter(Boolean);
+
   const lowConfidenceLines = attempts
     .filter((attempt) => attempt.confidence <= 3)
     .map((attempt) => {
@@ -475,26 +484,28 @@ export function generateAIPrompt(
   return `以下是我的${subjectLabel}醫師國考測驗紀錄。請你只做「弱點知識補強」，不要稱讚我、不要總結我哪裡做得不錯、不要輸出太多與補弱無關的分析，也不要重複貼回原始統計。
 
 回答規則：
-1. 只挑最需要補的 1 到 3 個小節。
-2. 以「小節」為單位輸出，不要先寫整體表現總結。
-3. 每個小節的輸出範圍要依我的信心程度決定：
+1. 必須覆蓋我所有答錯題，以及所有低信心題（confidence <= 3），不能漏掉任何一題。
+2. 如果多題屬於同一個 testedConcept 或同一組高度相關觀念，可以合併講解，但要在標題中清楚列出你正在講哪些題目或哪些 testedConcept。
+3. 不要先寫整體表現總結，直接從需要補的題目或觀念開始講。
+4. 每一組輸出的補強範圍要依我的信心程度決定：
    - 如果建議補強層級是「單一知識點」，就只補那個 testedConcept，不要擴寫太多。
    - 如果建議補強層級是「單一知識點加相鄰考點」，就補核心知識點外加 1 到 2 個常混淆考點。
    - 如果建議補強層級是「相關考點群」，就補同一 section 常一起考的考點群，但不要講整個章節。
    - 如果建議補強層級是「整個相關段落」，就從基礎架構開始補到該段落的高頻觀念與陷阱。
-4. 每個小節只回答以下內容：
-   - 為什麼這個小節現在最需要補
+5. 每一組只回答以下內容：
+   - 這一題或這一組題為什麼需要補
    - 30 秒核心觀念
    - 國考高頻考點
    - 最常錯的陷阱與混淆點
    - 容易混淆比較表
    - 快速記憶法
    - 3 題立即小測驗（附答案）
-5. 如果我有錯誤自信，請特別指出我觀念錯在哪裡。
-6. 如果我有低信心答錯，請用更基礎、可快速重建的方式教。
-7. 如果我有低信心但答對的題，請一起補講，因為代表我會做但不穩。
-8. 不要另外安排鼓勵、讀書計畫、人格分析、整體優缺點、稱讚或與弱點無關的延伸內容。
-9. 請用台灣醫學生準備醫師國考一階的語氣與深度回答，重點放在知識本身，越精準越好。
+6. 如果我有錯誤自信，請特別指出我觀念錯在哪裡。
+7. 如果我有低信心答錯，請用更基礎、可快速重建的方式教。
+8. 如果我有低信心但答對的題，請一起補講，因為代表我會做但不穩。
+9. 你可以依照「所有錯題」與「所有低信心題」整理成有條理的段落，但不要只挑前幾個 section 來講。
+10. 不要另外安排鼓勵、讀書計畫、人格分析、整體優缺點、稱讚或與弱點無關的延伸內容。
+11. 請用台灣醫學生準備醫師國考一階的語氣與深度回答，重點放在知識本身，越精準越好。
 
 以下是本輪整體統計：
 總題數：${summary.total}
@@ -507,6 +518,9 @@ export function generateAIPrompt(
 
 以下是本輪作答紀錄：
 ${attemptLines.join("\n")}
+
+以下是所有答錯題：
+${wrongLines.join("\n") || "目前沒有資料"}
 
 以下是錯誤自信題：
 ${overconfidenceLines.join("\n") || "目前沒有資料"}
