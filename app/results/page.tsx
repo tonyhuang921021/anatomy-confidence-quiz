@@ -211,6 +211,14 @@ export default function ResultsPage() {
     }))
     .filter((item): item is { attempt: Attempt; question: Question } => Boolean(item.question));
   const wrongAttempts = reviewedAttempts.filter((item) => !item.attempt.isCorrect);
+  const lowConfidenceAttempts = reviewedAttempts
+    .filter((item) => item.attempt.confidence <= 3)
+    .sort((a, b) => {
+      if (a.attempt.confidence !== b.attempt.confidence) {
+        return a.attempt.confidence - b.attempt.confidence;
+      }
+      return a.question.chapter.localeCompare(b.question.chapter) || a.question.section.localeCompare(b.question.section);
+    });
 
   return (
     <main className="shell">
@@ -364,6 +372,71 @@ export default function ResultsPage() {
                             {question.acceptedAnswers?.length && question.answerCreditType === "multiple_accepted"
                               ? question.acceptedAnswers.join(" / ")
                               : attempt.correctAnswer}
+                          </p>
+                          <p>
+                            <span className="font-semibold">信心：</span>
+                            {attempt.confidence}
+                          </p>
+                          {attempt.errorType ? (
+                            <p>
+                              <span className="font-semibold">錯因：</span>
+                              {attempt.errorType}
+                            </p>
+                          ) : null}
+                          <p>
+                            <span className="font-semibold">詳解：</span>
+                            {question.explanation}
+                          </p>
+                          {question.memoryTip ? (
+                            <p>
+                              <span className="font-semibold">快速記憶法：</span>
+                              {question.memoryTip}
+                            </p>
+                          ) : null}
+                        </div>
+                      </details>
+                    ))
+                  )}
+                </div>
+              </div>
+
+              <div>
+                <h3 className="text-base font-semibold text-ink">沒信心題目回顧</h3>
+                <div className="mt-3 grid gap-3">
+                  {lowConfidenceAttempts.length === 0 ? (
+                    <div className="rounded-2xl bg-sky-50 p-4 text-sm text-sky-900">
+                      這輪沒有標記為低信心的題目。
+                    </div>
+                  ) : (
+                    lowConfidenceAttempts.map(({ attempt, question }, index) => (
+                      <details key={`low-confidence-${attempt.questionId}`} className="rounded-2xl bg-amber-50 p-4">
+                        <summary className="cursor-pointer text-sm font-semibold text-amber-950">
+                          信心 {attempt.confidence}｜{index + 1}：{question.chapter} / {question.section} / {question.testedConcept}
+                        </summary>
+                        <div className="mt-4 space-y-3 text-sm leading-7 text-slate-700">
+                          <p className="font-semibold text-slate-900">{question.stem}</p>
+                          <div className="grid gap-3">
+                            {getAvailableOptionKeys(question).map((key) => (
+                              <div key={`${question.id}-low-${key}`} className="rounded-2xl bg-white p-4">
+                                <p className="font-semibold text-slate-900">
+                                  {key}. {question.options[key]}
+                                </p>
+                              </div>
+                            ))}
+                          </div>
+                          <p>
+                            <span className="font-semibold">我的答案：</span>
+                            {attempt.selectedAnswer}
+                          </p>
+                          <p>
+                            <span className="font-semibold">正確答案：</span>
+                            {question.acceptedAnswers?.length && question.answerCreditType === "multiple_accepted"
+                              ? question.acceptedAnswers.join(" / ")
+                              : attempt.correctAnswer}
+                          </p>
+                          <p>
+                            <span className="font-semibold">是否答對：</span>
+                            {attempt.isCorrect ? "答對" : "答錯"}
                           </p>
                           <p>
                             <span className="font-semibold">信心：</span>
