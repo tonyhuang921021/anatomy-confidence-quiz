@@ -11,6 +11,14 @@ create table if not exists public.quiz_sessions (
 create index if not exists quiz_sessions_user_id_idx on public.quiz_sessions (user_id);
 create index if not exists quiz_sessions_completed_at_idx on public.quiz_sessions (completed_at desc);
 
+grant select, insert, update, delete
+  on public.quiz_sessions
+  to authenticated;
+
+grant select, insert, update, delete
+  on public.quiz_sessions
+  to service_role;
+
 alter table public.quiz_sessions enable row level security;
 
 create policy "Users can read their own quiz sessions"
@@ -47,6 +55,18 @@ create table if not exists public.leaderboard_profiles (
 create index if not exists leaderboard_profiles_total_attempts_idx
 on public.leaderboard_profiles (total_attempts desc, correct_rate desc);
 
+grant select
+  on public.leaderboard_profiles
+  to anon;
+
+grant select, insert, update, delete
+  on public.leaderboard_profiles
+  to authenticated;
+
+grant select, insert, update, delete
+  on public.leaderboard_profiles
+  to service_role;
+
 alter table public.leaderboard_profiles enable row level security;
 
 create policy "Anyone can read leaderboard profiles"
@@ -74,6 +94,18 @@ create table if not exists public.site_visitors (
 
 create index if not exists site_visitors_last_seen_at_idx
 on public.site_visitors (last_seen_at desc);
+
+grant select, insert, update
+  on public.site_visitors
+  to anon;
+
+grant select, insert, update, delete
+  on public.site_visitors
+  to authenticated;
+
+grant select, insert, update, delete
+  on public.site_visitors
+  to service_role;
 
 alter table public.site_visitors enable row level security;
 
