@@ -148,7 +148,7 @@ export default function StartPage() {
               <div>
                 <h2 className="text-xl font-semibold text-ink">季節限定（到 5/15 早上 9 點）</h2>
                 <p className="mt-2 text-sm leading-7 text-slate-700">
-                  收錄所有生理學題目，外加和生殖範圍有關的題目。可以單獨勾，也可以和其他科一起抽。
+                  只收錄生理學裡和生殖範圍有關的題目。可以單獨勾，也可以和其他科一起抽。
                 </p>
               </div>
 
@@ -163,7 +163,7 @@ export default function StartPage() {
                   }`}
                 >
                   <div className="flex items-center justify-between gap-3">
-                    <h3 className="text-lg font-semibold text-ink">生理 + 生殖範圍</h3>
+                    <h3 className="text-lg font-semibold text-ink">生理學・生殖範圍</h3>
                     <span
                       className={`rounded-full px-3 py-1 text-xs font-semibold ${
                         includeSeasonalLimited

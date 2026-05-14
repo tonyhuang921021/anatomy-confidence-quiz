@@ -733,12 +733,10 @@ const SEASONAL_REPRO_KEYWORDS = [
 ];
 
 export function getSeasonalLimitedQuestions() {
-  const bank = getQuestionBankBySubjects(["醫學（一）", "醫學（二）"]);
+  const bank = getQuestionBankBySubjects(["生理學"]);
 
   return dedupeQuestionBank(
     bank.filter((question) => {
-      if (question.subject === "生理學") return true;
-
       const haystack = [
         question.subject,
         question.chapter,
