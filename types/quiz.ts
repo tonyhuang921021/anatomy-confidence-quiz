@@ -90,6 +90,7 @@ export type QuizSettings = {
   questionCount: number;
   subjectFilter?: SubjectFilter;
   subjectFilters?: SubjectName[];
+  excludeAiGenerated?: boolean;
   chapter?: string;
   section?: string;
   usePastExamStyle?: boolean;

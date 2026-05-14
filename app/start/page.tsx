@@ -24,6 +24,7 @@ export default function StartPage() {
   const med1Subjects = selectableSubjects.filter((item) => MED1_SUBJECTS.includes(item.subject));
   const med2Subjects = selectableSubjects.filter((item) => MED2_SUBJECTS.includes(item.subject));
   const [selectedSubjects, setSelectedSubjects] = useState<SubjectName[]>(defaultSubjects);
+  const [excludeAiGenerated, setExcludeAiGenerated] = useState(false);
 
   function toggleSubject(subject: SubjectName) {
     setSelectedSubjects((current) =>
@@ -89,6 +90,7 @@ export default function StartPage() {
       questionCount: 10,
       subjectFilter: selectedSubjects.length === 1 ? selectedSubjects[0] : "全部",
       subjectFilters: selectedSubjects,
+      excludeAiGenerated,
       chapter: undefined,
       section: undefined
     };
@@ -143,6 +145,17 @@ export default function StartPage() {
               className="min-h-12 rounded-2xl bg-white px-4 py-3 text-sm font-semibold text-slate-800 ring-1 ring-slate-200 transition hover:bg-slate-100"
             >
               全選
+            </button>
+            <button
+              type="button"
+              onClick={() => setExcludeAiGenerated((current) => !current)}
+              className={`min-h-12 rounded-2xl px-4 py-3 text-sm font-semibold transition ${
+                excludeAiGenerated
+                  ? "bg-amber-100 text-amber-900 ring-1 ring-amber-300"
+                  : "bg-white text-slate-800 ring-1 ring-slate-200 hover:bg-slate-100"
+              }`}
+            >
+              {excludeAiGenerated ? "不做 AI 題：已開啟" : "不做 AI 題"}
             </button>
             <button
               type="button"

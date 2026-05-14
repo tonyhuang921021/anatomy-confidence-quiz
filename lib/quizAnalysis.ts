@@ -733,6 +733,7 @@ function buildQuestionScoreMap(
 
 function filterQuestionPool(questions: Question[], settings: QuizSettings) {
   return questions.filter((question) => {
+    if (settings.excludeAiGenerated && question.sourceType === "AI_GENERATED") return false;
     if (settings.chapter && question.chapter !== settings.chapter) return false;
     if (settings.section && question.section !== settings.section) return false;
     return true;
@@ -745,7 +746,7 @@ export function createQuestionOrder(
   settings: QuizSettings
 ) {
   const filtered = filterQuestionPool(questions, settings);
-  const sourcePool = filtered.length > 0 ? filtered : questions;
+  const sourcePool = filtered.length > 0 ? filtered : settings.excludeAiGenerated ? [] : questions;
   if (sourcePool.length === 0) return [];
 
   const count = normalizeQuestionCount(settings.questionCount, sourcePool.length);
