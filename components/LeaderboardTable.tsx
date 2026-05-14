@@ -57,8 +57,49 @@ export function LeaderboardTable({ entries, currentUserId, sortMode }: Leaderboa
           const isMetricLeader =
             entry.totalAttempts === maxAttempts || entry.correctAttempts === maxCorrectAttempts;
           const isEnzoHero = lowerName.includes("enzo") && (isMetricLeader || isChampion);
-          const isSquirrelHero = normalizedName.includes("松鼠") && isMetricLeader;
-          const hasHeroBackground = isEnzoHero || isSquirrelHero;
+          const isZebraHero = normalizedName.includes("無學學") && (isMetricLeader || isChampion);
+          const isSquirrelHero = normalizedName.includes("松鼠") && (isMetricLeader || isChampion);
+          const heroType = isEnzoHero
+            ? "sga"
+            : isZebraHero
+              ? "zebra"
+              : isSquirrelHero
+                ? "lbj"
+                : isChampion
+                  ? "lbj"
+                  : null;
+          const hasHeroBackground = heroType !== null;
+
+          const heroImageSrc =
+            heroType === "sga"
+              ? "/assets/sga.png"
+              : heroType === "zebra"
+                ? "/assets/zebra.png"
+                : "/assets/lbj-crown.png";
+          const heroImageAlt =
+            heroType === "sga"
+              ? "SGA 冠軍裝飾"
+              : heroType === "zebra"
+                ? "斑馬冠軍裝飾"
+                : "LBJ 冠軍裝飾";
+          const heroModeLabel =
+            heroType === "sga"
+              ? "SGA MODE"
+              : heroType === "zebra"
+                ? "ZEBRA MODE"
+                : "KING MODE";
+          const heroModeHint =
+            heroType === "sga"
+              ? "右側 SGA 冠軍背景"
+              : heroType === "zebra"
+                ? "右側斑馬冠軍背景"
+                : "第一名限定冠軍特效";
+          const heroTierLabel =
+            heroType === "sga"
+              ? "SGA Tier"
+              : heroType === "zebra"
+                ? "Zebra Tier"
+                : "LBJ Crown Tier";
           return (
             <article
               key={entry.userId}
@@ -74,25 +115,23 @@ export function LeaderboardTable({ entries, currentUserId, sortMode }: Leaderboa
             >
               {hasHeroBackground || isChampion ? (
                 <>
-                  {(isEnzoHero || isSquirrelHero || isChampion) ? (
+                  {heroType ? (
                     <div className="pointer-events-none absolute inset-y-0 right-[-2%] w-[36%] sm:right-0 sm:w-[44%]">
                       <div className="absolute inset-y-[-8%] right-[-10%] w-[115%] rounded-full bg-amber-300/20 blur-3xl" />
                       <Image
-                        src={isEnzoHero ? "/assets/sga.png" : "/assets/lbj-crown.png"}
-                        alt={isEnzoHero ? "SGA 冠軍裝飾" : "LBJ 冠軍裝飾"}
+                        src={heroImageSrc}
+                        alt={heroImageAlt}
                         fill
-                        className={`object-contain object-right-center drop-shadow-[0_16px_24px_rgba(15,23,42,0.16)] ${
-                          isEnzoHero ? "opacity-20 sm:opacity-30" : "opacity-20 sm:opacity-30"
-                        }`}
+                        className="object-contain object-right-center opacity-20 drop-shadow-[0_16px_24px_rgba(15,23,42,0.16)] sm:opacity-30"
                       />
                     </div>
                   ) : null}
-                  <div className={`relative z-10 mb-4 flex items-center gap-2 ${isEnzoHero ? "pr-[26%] sm:pr-[32%]" : "pr-[26%] sm:pr-[40%]"}`}>
+                  <div className={`relative z-10 mb-4 flex items-center gap-2 ${heroType === "sga" ? "pr-[26%] sm:pr-[32%]" : "pr-[26%] sm:pr-[40%]"}`}>
                     <span className="rounded-full bg-amber-400 px-3 py-1 text-xs font-black tracking-[0.18em] text-amber-950">
-                      {isEnzoHero ? "SGA MODE" : "KING MODE"}
+                      {heroModeLabel}
                     </span>
                     <span className="text-xs font-semibold text-amber-900/80">
-                      {isEnzoHero ? "右側 SGA 冠軍背景" : "第一名限定冠軍特效"}
+                      {heroModeHint}
                     </span>
                   </div>
                 </>
@@ -110,13 +149,9 @@ export function LeaderboardTable({ entries, currentUserId, sortMode }: Leaderboa
                     >
                       第 {index + 1} 名
                     </span>
-                    {isEnzoHero ? (
-                      <span className="rounded-full bg-sky-900 px-3 py-1 text-xs font-semibold text-white">
-                        SGA Tier
-                      </span>
-                    ) : isSquirrelHero || isChampion ? (
+                    {heroType ? (
                       <span className="rounded-full bg-ink px-3 py-1 text-xs font-semibold text-white">
-                        LBJ Crown Tier
+                        {heroTierLabel}
                       </span>
                     ) : null}
                     {isCurrentUser ? (
