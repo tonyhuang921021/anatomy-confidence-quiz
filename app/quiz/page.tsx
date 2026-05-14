@@ -11,7 +11,8 @@ import {
   getPastPaperOptions,
   getQuestionBankBySubjects,
   getQuestionBankBySubjectFilter,
-  getQuestionsForPastPaper
+  getQuestionsForPastPaper,
+  getSeasonalLimitedQuestions
 } from "@/data/med1QuestionBank";
 import { pushCompletedSessionToSupabase } from "@/lib/cloudSync";
 import {
@@ -145,6 +146,27 @@ function selectLocalQuestionSet(settings: QuizSettings, fallbackQuestions: Quest
       ? getQuestionBankBySubjects(selectedSubjects)
       : getQuestionBankBySubjectFilter(subjectFilter);
   const sourceBank = bank.length > 0 ? bank : fallbackQuestions;
+
+  if ((settings.customQuestionIds?.length ?? 0) > 0) {
+    const seasonalMap = new Map(
+      getSeasonalLimitedQuestions().map((question) => [question.id, question] as const)
+    );
+    const customQuestions = settings.customQuestionIds
+      ?.map((id) => seasonalMap.get(id) ?? allQuestionFallbackMap.get(id))
+      .filter((question): question is Question => Boolean(question));
+
+    if ((customQuestions?.length ?? 0) > 0) {
+      if (selectedSubjects.length === 0) {
+        return customQuestions ?? [];
+      }
+
+      const merged = new Map<string, Question>();
+      [...sourceBank, ...(customQuestions ?? [])].forEach((question) => {
+        merged.set(question.id, question);
+      });
+      return Array.from(merged.values());
+    }
+  }
 
   if (settings.mode !== "simulation") {
     return sourceBank;

@@ -91,6 +91,8 @@ export type QuizSettings = {
   subjectFilter?: SubjectFilter;
   subjectFilters?: SubjectName[];
   excludeAiGenerated?: boolean;
+  customQuestionIds?: string[];
+  customPoolLabel?: string;
   chapter?: string;
   section?: string;
   usePastExamStyle?: boolean;

@@ -686,6 +686,81 @@ export function getQuestionBankBySubjects(subjects: SubjectName[] = []) {
   return merged;
 }
 
+const SEASONAL_REPRO_KEYWORDS = [
+  "生殖",
+  "泌尿生殖",
+  "排卵",
+  "月經",
+  "妊娠",
+  "胎兒",
+  "胎盤",
+  "子宮",
+  "卵巢",
+  "睪丸",
+  "陰道",
+  "陰莖",
+  "攝護腺",
+  "前列腺",
+  "精囊",
+  "精子",
+  "卵子",
+  "受精",
+  "著床",
+  "泌乳",
+  "乳房",
+  "性腺",
+  "生殖股神經",
+  "生殖內分泌",
+  "GnRH",
+  "FSH",
+  "LH",
+  "雌激素",
+  "黃體素",
+  "睪固酮",
+  "ovary",
+  "ovarian",
+  "testis",
+  "testicular",
+  "uterus",
+  "uterine",
+  "placenta",
+  "placental",
+  "pregnan",
+  "menstrual",
+  "ovulation",
+  "spermat",
+  "reproduct"
+];
+
+export function getSeasonalLimitedQuestions() {
+  const bank = getQuestionBankBySubjects(["醫學（一）", "醫學（二）"]);
+
+  return dedupeQuestionBank(
+    bank.filter((question) => {
+      if (question.subject === "生理學") return true;
+
+      const haystack = [
+        question.subject,
+        question.chapter,
+        question.section,
+        question.stem,
+        question.testedConcept,
+        question.explanation,
+        question.memoryTip,
+        question.clinicalLink,
+        ...Object.values(question.options)
+      ]
+        .filter(Boolean)
+        .join(" ")
+        .toLowerCase();
+
+      return SEASONAL_REPRO_KEYWORDS.some((keyword) =>
+        haystack.includes(keyword.toLowerCase())
+      );
+    })
+  );
+}
+
 export function getPastPaperOptions(subjectFilter: SubjectFilter = "全部"): PastPaperOption[] {
   void subjectFilter;
   const bank = wholePastPaperBank;

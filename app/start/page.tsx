@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { enabledSubjects, MED1_SUBJECTS, MED2_SUBJECTS } from "@/data/subjectRegistry";
+import { getSeasonalLimitedQuestions } from "@/data/med1QuestionBank";
 import { DEFAULT_QUIZ_SETTINGS } from "@/lib/quizAnalysis";
 import { saveQuizSettings } from "@/lib/storage";
 import type { QuizSettings, SubjectName } from "@/types/quiz";
@@ -25,6 +26,10 @@ export default function StartPage() {
   const med2Subjects = selectableSubjects.filter((item) => MED2_SUBJECTS.includes(item.subject));
   const [selectedSubjects, setSelectedSubjects] = useState<SubjectName[]>(defaultSubjects);
   const [excludeAiGenerated, setExcludeAiGenerated] = useState(false);
+  const [includeSeasonalLimited, setIncludeSeasonalLimited] = useState(false);
+  const seasonalLimitedQuestions = useMemo(() => getSeasonalLimitedQuestions(), []);
+  const seasonalDeadline = new Date("2026-05-15T09:00:00+08:00");
+  const seasonalAvailable = new Date() < seasonalDeadline;
 
   function toggleSubject(subject: SubjectName) {
     setSelectedSubjects((current) =>
@@ -82,15 +87,22 @@ export default function StartPage() {
   }
 
   function handleStart() {
-    if (selectedSubjects.length === 0) return;
+    if (selectedSubjects.length === 0 && !includeSeasonalLimited) return;
 
     const nextSettings: QuizSettings = {
       ...DEFAULT_QUIZ_SETTINGS,
       mode: "random",
       questionCount: 10,
-      subjectFilter: selectedSubjects.length === 1 ? selectedSubjects[0] : "全部",
+      subjectFilter:
+        selectedSubjects.length === 1 && !includeSeasonalLimited ? selectedSubjects[0] : "全部",
       subjectFilters: selectedSubjects,
       excludeAiGenerated,
+      customQuestionIds: includeSeasonalLimited
+        ? seasonalLimitedQuestions
+            .filter((question) => !excludeAiGenerated || question.sourceType !== "AI_GENERATED")
+            .map((question) => question.id)
+        : undefined,
+      customPoolLabel: includeSeasonalLimited ? "季節限定" : undefined,
       chapter: undefined,
       section: undefined
     };
@@ -131,11 +143,49 @@ export default function StartPage() {
             "臨床前後段常一起刷的科目集中在這裡：微免、寄生蟲、公衛、藥理、病理。",
             med2Subjects
           )}
+          {seasonalAvailable ? (
+            <section className="rounded-[2rem] bg-amber-50 p-5 ring-1 ring-amber-200">
+              <div>
+                <h2 className="text-xl font-semibold text-ink">季節限定（到 5/15 早上 9 點）</h2>
+                <p className="mt-2 text-sm leading-7 text-slate-700">
+                  收錄所有生理學題目，外加和生殖範圍有關的題目。可以單獨勾，也可以和其他科一起抽。
+                </p>
+              </div>
+
+              <div className="mt-4">
+                <button
+                  type="button"
+                  onClick={() => setIncludeSeasonalLimited((current) => !current)}
+                  className={`w-full rounded-3xl border p-5 text-left transition ${
+                    includeSeasonalLimited
+                      ? "border-amber-500 bg-amber-100 ring-2 ring-amber-200"
+                      : "border-amber-200 bg-white hover:bg-amber-50"
+                  }`}
+                >
+                  <div className="flex items-center justify-between gap-3">
+                    <h3 className="text-lg font-semibold text-ink">生理 + 生殖範圍</h3>
+                    <span
+                      className={`rounded-full px-3 py-1 text-xs font-semibold ${
+                        includeSeasonalLimited
+                          ? "bg-amber-600 text-white"
+                          : "bg-white text-slate-500 ring-1 ring-slate-200"
+                      }`}
+                    >
+                      {includeSeasonalLimited ? "已選擇" : "未選"}
+                    </span>
+                  </div>
+                  <p className="mt-3 text-sm text-slate-600">
+                    {seasonalLimitedQuestions.length} 題已收錄
+                  </p>
+                </button>
+              </div>
+            </section>
+          ) : null}
         </div>
 
         <div className="mt-6 flex flex-col gap-3 rounded-3xl bg-slate-50 p-5 sm:flex-row sm:items-center sm:justify-between">
           <p className="text-sm text-slate-700">
-            目前將抽取 <span className="font-semibold text-ink">{selectedSubjects.length || 0}</span> 科，
+            目前將抽取 <span className="font-semibold text-ink">{selectedSubjects.length + (includeSeasonalLimited ? 1 : 0)}</span> 個範圍，
             共 <span className="font-semibold text-ink">10 題</span>
           </p>
           <div className="flex flex-wrap gap-3">
@@ -160,7 +210,7 @@ export default function StartPage() {
             <button
               type="button"
               onClick={handleStart}
-              disabled={selectedSubjects.length === 0}
+              disabled={selectedSubjects.length === 0 && !includeSeasonalLimited}
               className="min-h-12 rounded-2xl bg-brand-600 px-5 py-3 text-sm font-semibold text-white transition hover:bg-brand-700 disabled:cursor-not-allowed disabled:bg-slate-300"
             >
               開始 10 題測驗
