@@ -504,22 +504,22 @@ const remainingQuestionsRaw =
   moexMed1RemainingDetailedV4Merged0011827.questions as readonly RawQuestion[];
 export const med1RemainingQuestions: Question[] = remainingQuestionsRaw
   .map(toQuestion)
-  .map(applyClassificationOverride)
-  .filter((question): question is Question => Boolean(question));
+  .filter((question): question is Question => Boolean(question))
+  .map(applyClassificationOverride);
 
 const missingQuestionsRaw =
   moexMed1Missing22QuestionsDetailedV5 as readonly MissingQuestionRaw[];
 export const med1MissingQuestions: Question[] = missingQuestionsRaw
   .map(toMissingQuestion)
-  .map(applyClassificationOverride)
-  .filter((question): question is Question => Boolean(question));
+  .filter((question): question is Question => Boolean(question))
+  .map(applyClassificationOverride);
 
 const requestedPatchQuestionsRaw =
   moexMed1Requested71QuestionsDetailedPatchV5.questions as readonly RequestedPatchQuestionRaw[];
 export const med1RequestedPatchQuestions: Question[] = requestedPatchQuestionsRaw
   .map(toRequestedPatchQuestion)
-  .map(applyClassificationOverride)
-  .filter((question): question is Question => Boolean(question));
+  .filter((question): question is Question => Boolean(question))
+  .map(applyClassificationOverride);
 
 const stage2QuestionsRaw =
   moexMedStage2Merged0013100.questions as readonly Stage2QuestionRaw[];
