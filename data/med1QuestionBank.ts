@@ -466,21 +466,20 @@ type ClassificationOverrideEntry = readonly [string, ClassificationOverride];
 
 const med1ClassificationOverrideMap = new Map<string, ClassificationOverride>(
   med1ReclassifiedQuestionsRaw
-    .map((raw) => {
+    .flatMap((raw) => {
       const explicitSubject =
         raw.classification_v5?.is_current_five_subject_applicable
           ? raw.classification_v5?.med1_current_five_subject || raw.classification_v5?.primary_subject
           : raw.classification_v5?.primary_subject;
-      if (!explicitSubject) return null;
-      return [
+      if (!explicitSubject) return [];
+      return [[
         raw.id,
         {
           subject: normalizeSubject(explicitSubject),
           topicSection: raw.classification_v5?.subtopic?.trim()
         }
-      ] as const satisfies ClassificationOverrideEntry;
+      ] as const satisfies ClassificationOverrideEntry];
     })
-    .filter((entry): entry is ClassificationOverrideEntry => entry !== null)
 );
 
 function applyClassificationOverride(question: Question): Question {
