@@ -462,6 +462,8 @@ type ClassificationOverride = {
 const med1ReclassifiedQuestionsRaw =
   (moexMed1ReclassifiedV5 as { questions: ReclassifiedQuestionRaw[] }).questions ?? [];
 
+type ClassificationOverrideEntry = readonly [string, ClassificationOverride];
+
 const med1ClassificationOverrideMap = new Map<string, ClassificationOverride>(
   med1ReclassifiedQuestionsRaw
     .map((raw) => {
@@ -476,9 +478,9 @@ const med1ClassificationOverrideMap = new Map<string, ClassificationOverride>(
           subject: normalizeSubject(explicitSubject),
           topicSection: raw.classification_v5?.subtopic?.trim()
         }
-      ] as const;
+      ] as const satisfies ClassificationOverrideEntry;
     })
-    .filter((entry): entry is readonly [string, ClassificationOverride] => Boolean(entry))
+    .filter((entry): entry is ClassificationOverrideEntry => entry !== null)
 );
 
 function applyClassificationOverride(question: Question): Question {
