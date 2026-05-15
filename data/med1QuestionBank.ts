@@ -2,8 +2,8 @@ import { anatomyOutline, anatomyQuestions } from "@/data/anatomyQuestions";
 import { moexMed1RemainingDetailedV4Merged0011827 } from "@/data/sources/moex_med1_remaining_detailed_v4_merged_001_1827";
 import { moexMed1Missing22QuestionsDetailedV5 } from "@/data/sources/moex_med1_missing_22_questions_detailed_v5";
 import { moexMed1Requested71QuestionsDetailedPatchV5 } from "@/data/sources/moex_med1_requested_71_questions_detailed_patch_v5";
-import { moexMedStage2Merged0013100 } from "@/data/sources/moex_med_stage2_detailed_merged_001_3100";
 import moexMed1ReclassifiedV5 from "@/data/sources/moex_med1_100_115_reclassified_v5.json";
+import moexMedStage2Merged0013100 from "@/data/sources/moex_med_stage2_detailed_merged_001_3100.json";
 import type { OptionKey, Question, SubjectFilter, SubjectName } from "@/types/quiz";
 
 type RawQuestion = {
