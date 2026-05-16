@@ -2,6 +2,9 @@ import { anatomyOutline, anatomyQuestions } from "@/data/anatomyQuestions";
 import { moexMed1RemainingDetailedV4Merged0011827 } from "@/data/sources/moex_med1_remaining_detailed_v4_merged_001_1827";
 import { moexMed1Missing22QuestionsDetailedV5 } from "@/data/sources/moex_med1_missing_22_questions_detailed_v5";
 import { moexMed1Requested71QuestionsDetailedPatchV5 } from "@/data/sources/moex_med1_requested_71_questions_detailed_patch_v5";
+import moexMed1MissingBatch1 from "@/data/sources/moex_med1_missing_batch1_100030_1101_detailed.json";
+import moexMed1MissingBatch2 from "@/data/sources/moex_med1_missing_batch2_109020_1301_detailed.json";
+import moexMed1MissingBatch3 from "@/data/sources/moex_med1_missing_batch3_112020_1301_detailed.json";
 import moexMed1ReclassifiedV5 from "@/data/sources/moex_med1_100_115_reclassified_v5.json";
 import moexMedStage2Merged0013100 from "@/data/sources/moex_med_stage2_detailed_merged_001_3100_classified_v3.json";
 import type { OptionKey, Question, SubjectFilter, SubjectName } from "@/types/quiz";
@@ -126,6 +129,34 @@ type ReclassifiedQuestionRaw = {
     subtopic?: string;
     is_current_five_subject_applicable?: boolean;
   };
+};
+
+type Batch3QuestionRaw = {
+  id: string;
+  year: number;
+  roc_year: number;
+  exam_round: string;
+  exam_code: string;
+  question_no: number;
+  stem: string;
+  options: Readonly<Record<string, string>>;
+  official_answer?: string | readonly string[];
+  corrected_answer?: string | readonly string[] | null;
+  answer_credit_type?: string;
+  classification_v5?: {
+    primary_subject?: string;
+    primary_subject_exact?: string;
+    med1_current_five_subject?: string;
+    subtopic?: string;
+  };
+  primary_subject_exact?: string;
+  subtopic?: string;
+  explanation?: string;
+  option_analysis?: Readonly<Record<string, string>>;
+  exam_point?: string;
+  memory_tip?: string;
+  clinical_link?: string;
+  review_flags?: readonly string[];
 };
 
 const anatomyChapterKeywords = [
@@ -411,6 +442,47 @@ function toRequestedPatchQuestion(raw: RequestedPatchQuestionRaw): Question | nu
   };
 }
 
+function toBatch3Question(raw: Batch3QuestionRaw): Question | null {
+  const [examCode, paperCode] = raw.exam_code.split("-");
+  const normalized: MissingQuestionRaw = {
+    id: raw.id,
+    year: raw.year,
+    roc_year: raw.roc_year,
+    exam_round: raw.exam_round,
+    exam_code: raw.exam_code,
+    question_no: raw.question_no,
+    stem: raw.stem,
+    options: raw.options,
+    official_answer: raw.official_answer,
+    corrected_answer: raw.corrected_answer,
+    answer_credit_type:
+      raw.answer_credit_type === "single" ? "standard" : raw.answer_credit_type,
+    classification_v5: {
+      primary_subject:
+        raw.classification_v5?.med1_current_five_subject ||
+        raw.classification_v5?.primary_subject_exact ||
+        raw.classification_v5?.primary_subject ||
+        raw.primary_subject_exact,
+      subtopic: raw.classification_v5?.subtopic || raw.subtopic
+    },
+    explanation: raw.explanation,
+    option_analysis: raw.option_analysis,
+    exam_point: raw.exam_point,
+    memory_tip: raw.memory_tip,
+    clinical_link: raw.clinical_link,
+    review_flags: raw.review_flags
+  };
+
+  const question = toMissingQuestion(normalized);
+  if (!question) return null;
+
+  return {
+    ...question,
+    examCode: question.examCode ?? examCode,
+    paperCode: question.paperCode ?? paperCode
+  };
+}
+
 function toStage2Question(raw: Stage2QuestionRaw): Question | null {
   const answerValues = [raw.corrected_answer, raw.official_answer_raw, raw.correct_answers]
     .flatMap((value) => {
@@ -524,6 +596,26 @@ export const med1MissingQuestions: Question[] = missingQuestionsRaw
   .filter((question): question is Question => Boolean(question))
   .map(applyClassificationOverride);
 
+const missingBatch1Raw =
+  (moexMed1MissingBatch1 as { questions: RawQuestion[] }).questions as readonly RawQuestion[];
+export const med1MissingBatch1Questions: Question[] = missingBatch1Raw
+  .map(toQuestion)
+  .filter((question): question is Question => Boolean(question))
+  .map(applyClassificationOverride);
+
+const missingBatch2Raw =
+  (moexMed1MissingBatch2 as { questions: RawQuestion[] }).questions as readonly RawQuestion[];
+export const med1MissingBatch2Questions: Question[] = missingBatch2Raw
+  .map(toQuestion)
+  .filter((question): question is Question => Boolean(question))
+  .map(applyClassificationOverride);
+
+const missingBatch3Raw = moexMed1MissingBatch3 as readonly Batch3QuestionRaw[];
+export const med1MissingBatch3Questions: Question[] = missingBatch3Raw
+  .map(toBatch3Question)
+  .filter((question): question is Question => Boolean(question))
+  .map(applyClassificationOverride);
+
 const requestedPatchQuestionsRaw =
   moexMed1Requested71QuestionsDetailedPatchV5.questions as readonly RequestedPatchQuestionRaw[];
 export const med1RequestedPatchQuestions: Question[] = requestedPatchQuestionsRaw
@@ -541,6 +633,9 @@ export const allAnatomyQuestions: Question[] = dedupeQuestionBank([
   ...anatomyQuestions,
   ...med1RemainingQuestions.filter((question) => question.subject === "解剖學"),
   ...med1MissingQuestions.filter((question) => question.subject === "解剖學"),
+  ...med1MissingBatch1Questions.filter((question) => question.subject === "解剖學"),
+  ...med1MissingBatch2Questions.filter((question) => question.subject === "解剖學"),
+  ...med1MissingBatch3Questions.filter((question) => question.subject === "解剖學"),
   ...med1RequestedPatchQuestions.filter((question) => question.subject === "解剖學"),
   ...medStage2Questions.filter((question) => question.subject === "解剖學")
 ]);
@@ -561,6 +656,15 @@ const med1CoreQuestions: Question[] = dedupeQuestionBank([
   ...med1MissingQuestions.filter((question) =>
     ["組織學", "胚胎學", "生理學", "生物化學"].includes(question.subject)
   ),
+  ...med1MissingBatch1Questions.filter((question) =>
+    ["組織學", "胚胎學", "生理學", "生物化學"].includes(question.subject)
+  ),
+  ...med1MissingBatch2Questions.filter((question) =>
+    ["組織學", "胚胎學", "生理學", "生物化學"].includes(question.subject)
+  ),
+  ...med1MissingBatch3Questions.filter((question) =>
+    ["組織學", "胚胎學", "生理學", "生物化學"].includes(question.subject)
+  ),
   ...med1RequestedPatchQuestions.filter((question) =>
     ["組織學", "胚胎學", "生理學", "生物化學"].includes(question.subject)
   )
@@ -576,6 +680,15 @@ const med2CoreQuestions: Question[] = dedupeQuestionBank([
   ...med1MissingQuestions.filter((question) =>
     ["藥理學", "病理學", "微生物免疫學", "寄生蟲學", "公共衛生學"].includes(question.subject)
   ),
+  ...med1MissingBatch1Questions.filter((question) =>
+    ["藥理學", "病理學", "微生物免疫學", "寄生蟲學", "公共衛生學"].includes(question.subject)
+  ),
+  ...med1MissingBatch2Questions.filter((question) =>
+    ["藥理學", "病理學", "微生物免疫學", "寄生蟲學", "公共衛生學"].includes(question.subject)
+  ),
+  ...med1MissingBatch3Questions.filter((question) =>
+    ["藥理學", "病理學", "微生物免疫學", "寄生蟲學", "公共衛生學"].includes(question.subject)
+  ),
   ...med1RequestedPatchQuestions.filter((question) =>
     ["藥理學", "病理學", "微生物免疫學", "寄生蟲學", "公共衛生學"].includes(question.subject)
   )
@@ -588,54 +701,81 @@ export const med1QuestionsBySubject: Record<SubjectName, Question[]> = {
   "生理學": dedupeQuestionBank([
     ...med1RemainingQuestions.filter((question) => question.subject === "生理學"),
     ...med1MissingQuestions.filter((question) => question.subject === "生理學"),
+    ...med1MissingBatch1Questions.filter((question) => question.subject === "生理學"),
+    ...med1MissingBatch2Questions.filter((question) => question.subject === "生理學"),
+    ...med1MissingBatch3Questions.filter((question) => question.subject === "生理學"),
     ...med1RequestedPatchQuestions.filter((question) => question.subject === "生理學"),
     ...medStage2Questions.filter((question) => question.subject === "生理學")
   ]),
   "生物化學": dedupeQuestionBank([
     ...med1RemainingQuestions.filter((question) => question.subject === "生物化學"),
     ...med1MissingQuestions.filter((question) => question.subject === "生物化學"),
+    ...med1MissingBatch1Questions.filter((question) => question.subject === "生物化學"),
+    ...med1MissingBatch2Questions.filter((question) => question.subject === "生物化學"),
+    ...med1MissingBatch3Questions.filter((question) => question.subject === "生物化學"),
     ...med1RequestedPatchQuestions.filter((question) => question.subject === "生物化學"),
     ...medStage2Questions.filter((question) => question.subject === "生物化學")
   ]),
   "藥理學": dedupeQuestionBank([
     ...med1RemainingQuestions.filter((question) => question.subject === "藥理學"),
     ...med1MissingQuestions.filter((question) => question.subject === "藥理學"),
+    ...med1MissingBatch1Questions.filter((question) => question.subject === "藥理學"),
+    ...med1MissingBatch2Questions.filter((question) => question.subject === "藥理學"),
+    ...med1MissingBatch3Questions.filter((question) => question.subject === "藥理學"),
     ...med1RequestedPatchQuestions.filter((question) => question.subject === "藥理學"),
     ...medStage2Questions.filter((question) => question.subject === "藥理學")
   ]),
   "病理學": dedupeQuestionBank([
     ...med1RemainingQuestions.filter((question) => question.subject === "病理學"),
     ...med1MissingQuestions.filter((question) => question.subject === "病理學"),
+    ...med1MissingBatch1Questions.filter((question) => question.subject === "病理學"),
+    ...med1MissingBatch2Questions.filter((question) => question.subject === "病理學"),
+    ...med1MissingBatch3Questions.filter((question) => question.subject === "病理學"),
     ...med1RequestedPatchQuestions.filter((question) => question.subject === "病理學"),
     ...medStage2Questions.filter((question) => question.subject === "病理學")
   ]),
   "微生物免疫學": dedupeQuestionBank([
     ...med1RemainingQuestions.filter((question) => question.subject === "微生物免疫學"),
     ...med1MissingQuestions.filter((question) => question.subject === "微生物免疫學"),
+    ...med1MissingBatch1Questions.filter((question) => question.subject === "微生物免疫學"),
+    ...med1MissingBatch2Questions.filter((question) => question.subject === "微生物免疫學"),
+    ...med1MissingBatch3Questions.filter((question) => question.subject === "微生物免疫學"),
     ...med1RequestedPatchQuestions.filter((question) => question.subject === "微生物免疫學"),
     ...medStage2Questions.filter((question) => question.subject === "微生物免疫學")
   ]),
   "胚胎學": dedupeQuestionBank([
     ...med1RemainingQuestions.filter((question) => question.subject === "胚胎學"),
     ...med1MissingQuestions.filter((question) => question.subject === "胚胎學"),
+    ...med1MissingBatch1Questions.filter((question) => question.subject === "胚胎學"),
+    ...med1MissingBatch2Questions.filter((question) => question.subject === "胚胎學"),
+    ...med1MissingBatch3Questions.filter((question) => question.subject === "胚胎學"),
     ...med1RequestedPatchQuestions.filter((question) => question.subject === "胚胎學"),
     ...medStage2Questions.filter((question) => question.subject === "胚胎學")
   ]),
   "組織學": dedupeQuestionBank([
     ...med1RemainingQuestions.filter((question) => question.subject === "組織學"),
     ...med1MissingQuestions.filter((question) => question.subject === "組織學"),
+    ...med1MissingBatch1Questions.filter((question) => question.subject === "組織學"),
+    ...med1MissingBatch2Questions.filter((question) => question.subject === "組織學"),
+    ...med1MissingBatch3Questions.filter((question) => question.subject === "組織學"),
     ...med1RequestedPatchQuestions.filter((question) => question.subject === "組織學"),
     ...medStage2Questions.filter((question) => question.subject === "組織學")
   ]),
   "寄生蟲學": dedupeQuestionBank([
     ...med1RemainingQuestions.filter((question) => question.subject === "寄生蟲學"),
     ...med1MissingQuestions.filter((question) => question.subject === "寄生蟲學"),
+    ...med1MissingBatch1Questions.filter((question) => question.subject === "寄生蟲學"),
+    ...med1MissingBatch2Questions.filter((question) => question.subject === "寄生蟲學"),
+    ...med1MissingBatch3Questions.filter((question) => question.subject === "寄生蟲學"),
     ...med1RequestedPatchQuestions.filter((question) => question.subject === "寄生蟲學"),
     ...medStage2Questions.filter((question) => question.subject === "寄生蟲學")
   ]),
   "公共衛生學": dedupeQuestionBank([
     ...med1RemainingQuestions.filter((question) => question.subject === "公共衛生學"),
     ...med1MissingQuestions.filter((question) => question.subject === "公共衛生學"),
+    ...med1MissingBatch1Questions.filter((question) => question.subject === "公共衛生學"),
+    ...med1MissingBatch2Questions.filter((question) => question.subject === "公共衛生學"),
+    ...med1MissingBatch3Questions.filter((question) => question.subject === "公共衛生學"),
     ...med1RequestedPatchQuestions.filter((question) => question.subject === "公共衛生學"),
     ...medStage2Questions.filter((question) => question.subject === "公共衛生學")
   ]),
@@ -767,7 +907,15 @@ function selectBestQuestionVariant(candidates: Question[]) {
 
 function buildWholePastPaperBank() {
   const allMoexQuestions = uniqueById(
-    [...allAnatomyQuestions, ...med1RemainingQuestions, ...med1MissingQuestions, ...med2CoreQuestions]
+    [
+      ...allAnatomyQuestions,
+      ...med1RemainingQuestions,
+      ...med1MissingQuestions,
+      ...med1MissingBatch1Questions,
+      ...med1MissingBatch2Questions,
+      ...med1MissingBatch3Questions,
+      ...med2CoreQuestions
+    ]
       .filter((question) => question.sourceType === "MOEX_PAST_EXAM")
       .map(fillPastPaperMetadata)
   );
