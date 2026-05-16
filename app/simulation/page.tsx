@@ -28,6 +28,34 @@ export default function SimulationPage() {
         </div>
       </section>
 
+      <section className="mt-6 rounded-[2rem] bg-white p-6 shadow-card ring-1 ring-slate-100">
+        <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+          <div>
+            <p className="text-sm font-semibold uppercase tracking-[0.2em] text-brand-700">
+              Simulation Review
+            </p>
+            <h2 className="mt-2 text-2xl font-semibold text-ink">模擬考錯題複習</h2>
+            <p className="mt-2 text-sm leading-7 text-slate-600">
+              這裡的錯題庫只整理整份模擬考做出來的錯題與低信心題，不會和平常散題刷題混在一起。
+            </p>
+          </div>
+          <div className="flex flex-wrap gap-3">
+            <Link
+              href="/review#simulation-review"
+              className="min-h-12 rounded-2xl bg-amber-500 px-5 py-4 text-sm font-semibold text-white transition hover:bg-amber-600"
+            >
+              查看模擬考錯題庫
+            </Link>
+            <Link
+              href="/review"
+              className="min-h-12 rounded-2xl bg-slate-100 px-5 py-4 text-sm font-semibold text-slate-800 transition hover:bg-slate-200"
+            >
+              前往全部複習頁
+            </Link>
+          </div>
+        </div>
+      </section>
+
       <div className="mt-6">
         <QuizSetupPanel
           stats={stats}

@@ -108,7 +108,8 @@ export default function ReviewPage() {
       </section>
 
       <div className="mt-8 grid gap-8">
-        <ReviewNotebook
+        <div id="practice-review" className="scroll-mt-24">
+          <ReviewNotebook
           title="散題錯題庫"
           description="這裡只整理平常零散刷題累積下來的錯題與低信心題，不和整份模考混在一起。"
           startLabel="開始散題錯題複習"
@@ -116,7 +117,9 @@ export default function ReviewPage() {
           items={practiceItems}
           allQuestions={allQuestions}
         />
-        <ReviewNotebook
+        </div>
+        <div id="simulation-review" className="scroll-mt-24">
+          <ReviewNotebook
           title="模擬考錯題庫"
           description="這裡只整理整份模擬考做出來的錯題與低信心題，方便你回頭補整卷觀念。"
           startLabel="開始模擬考錯題複習"
@@ -124,6 +127,7 @@ export default function ReviewPage() {
           items={simulationItems}
           allQuestions={allQuestions}
         />
+        </div>
       </div>
     </main>
   );

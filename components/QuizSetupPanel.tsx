@@ -176,7 +176,7 @@ export function QuizSetupPanel({
       <div className={`mt-5 grid gap-4 ${simulationOnly ? "lg:grid-cols-1" : "lg:grid-cols-3"}`}>
         {((simulationOnly
           ? ["simulation"]
-          : ["weakness", "random", "review", "ai_fresh", "simulation"]) as QuizMode[]).map((mode) => (
+          : ["weakness", "random", "review", "ai_fresh"]) as QuizMode[]).map((mode) => (
           <button
             key={mode}
             type="button"
