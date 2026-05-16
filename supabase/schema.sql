@@ -263,3 +263,48 @@ on public.question_attempt_devices
 for update
 using (true)
 with check (true);
+
+create table if not exists public.question_attempt_device_daily (
+  visitor_id text not null,
+  activity_date date not null,
+  first_attempt_at timestamptz not null default now(),
+  last_attempt_at timestamptz not null default now(),
+  primary key (visitor_id, activity_date)
+);
+
+create index if not exists question_attempt_device_daily_activity_date_idx
+on public.question_attempt_device_daily (activity_date desc);
+
+grant select, insert, update
+  on public.question_attempt_device_daily
+  to anon;
+
+grant select, insert, update, delete
+  on public.question_attempt_device_daily
+  to authenticated;
+
+grant select, insert, update, delete
+  on public.question_attempt_device_daily
+  to service_role;
+
+alter table public.question_attempt_device_daily enable row level security;
+
+drop policy if exists "Anyone can read question attempt device daily" on public.question_attempt_device_daily;
+drop policy if exists "Anyone can insert question attempt device daily" on public.question_attempt_device_daily;
+drop policy if exists "Anyone can update question attempt device daily" on public.question_attempt_device_daily;
+
+create policy "Anyone can read question attempt device daily"
+on public.question_attempt_device_daily
+for select
+using (true);
+
+create policy "Anyone can insert question attempt device daily"
+on public.question_attempt_device_daily
+for insert
+with check (true);
+
+create policy "Anyone can update question attempt device daily"
+on public.question_attempt_device_daily
+for update
+using (true)
+with check (true);

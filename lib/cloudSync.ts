@@ -1,6 +1,7 @@
 import type { User } from "@supabase/supabase-js";
 import type {
   LeaderboardEntry,
+  OwnerDailyPoint,
   OwnerDashboardStats,
   QuestionCommunityStats,
   QuizSession,
@@ -39,6 +40,7 @@ type LeaderboardRow = {
 type QuestionAttemptLogRow = {
   session_id: string;
   question_id: string;
+  visitor_id?: string | null;
   is_correct: boolean;
   answered_at: string;
   source_mode: string | null;
@@ -54,6 +56,13 @@ type QuestionAccuracyStatRow = {
 
 type QuestionAttemptDeviceRow = {
   visitor_id: string;
+  first_attempt_at: string;
+  last_attempt_at: string;
+};
+
+type QuestionAttemptDeviceDailyRow = {
+  visitor_id: string;
+  activity_date: string;
   first_attempt_at: string;
   last_attempt_at: string;
 };
@@ -76,6 +85,28 @@ function getTaipeiDayRange() {
     startIso: start.toISOString(),
     endIso: end.toISOString()
   };
+}
+
+function getTaipeiDayKey(date: Date) {
+  return new Intl.DateTimeFormat("en-CA", {
+    timeZone: "Asia/Taipei",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit"
+  }).format(date);
+}
+
+function getRecentTaipeiDayKeys(days: number) {
+  const today = new Date();
+  const keys: string[] = [];
+
+  for (let offset = days - 1; offset >= 0; offset -= 1) {
+    const current = new Date(today);
+    current.setDate(today.getDate() - offset);
+    keys.push(getTaipeiDayKey(current));
+  }
+
+  return keys;
 }
 
 function getVisitorId() {
@@ -181,10 +212,12 @@ function mapQuestionAccuracyStatRow(row: QuestionAccuracyStatRow): QuestionCommu
 }
 
 function buildQuestionAttemptLogRows(sessions: QuizSession[]): QuestionAttemptLogRow[] {
+  const visitorId = getVisitorId();
   return sessions.flatMap((session) =>
     session.attempts.map((attempt) => ({
       session_id: session.id,
       question_id: attempt.questionId,
+      visitor_id: visitorId,
       is_correct: attempt.isCorrect,
       answered_at: attempt.answeredAt,
       source_mode: session.settings?.mode ?? null
@@ -266,6 +299,7 @@ async function syncQuestionStatsForSessions(sessions: QuizSession[]) {
 
   await upsertQuestionAttemptLogs(sessions);
   await upsertQuestionAttemptDevice(sessions);
+  await upsertQuestionAttemptDeviceDaily(sessions);
   await refreshQuestionAccuracyStats(
     sessions.flatMap((session) => session.attempts.map((attempt) => attempt.questionId))
   );
@@ -295,6 +329,48 @@ async function upsertQuestionAttemptDevice(sessions: QuizSession[]) {
       } satisfies QuestionAttemptDeviceRow,
       { onConflict: "visitor_id" }
     );
+
+  if (error) {
+    throw error;
+  }
+}
+
+async function upsertQuestionAttemptDeviceDaily(sessions: QuizSession[]) {
+  if (!isSupabaseConfigured() || sessions.length === 0) return;
+
+  const visitorId = getVisitorId();
+  if (!visitorId) return;
+
+  const grouped = new Map<string, { first: string; last: string }>();
+
+  for (const timestamp of sessions.flatMap((session) => session.attempts.map((attempt) => attempt.answeredAt))) {
+    const dayKey = getTaipeiDayKey(new Date(timestamp));
+    const current = grouped.get(dayKey);
+
+    if (!current) {
+      grouped.set(dayKey, { first: timestamp, last: timestamp });
+      continue;
+    }
+
+    grouped.set(dayKey, {
+      first: current.first < timestamp ? current.first : timestamp,
+      last: current.last > timestamp ? current.last : timestamp
+    });
+  }
+
+  if (grouped.size === 0) return;
+
+  const rows: QuestionAttemptDeviceDailyRow[] = Array.from(grouped.entries()).map(([activityDate, value]) => ({
+    visitor_id: visitorId,
+    activity_date: activityDate,
+    first_attempt_at: value.first,
+    last_attempt_at: value.last
+  }));
+
+  const supabase = getSupabaseBrowserClient();
+  const { error } = await supabase
+    .from("question_attempt_device_daily")
+    .upsert(rows, { onConflict: "visitor_id,activity_date" });
 
   if (error) {
     throw error;
@@ -599,4 +675,47 @@ export async function loadOwnerDashboardStats(): Promise<OwnerDashboardStats> {
     totalAttempts: totalAttemptsResult.count ?? 0,
     updatedAt: now.toISOString()
   };
+}
+
+export async function loadOwnerDailySeries(days = 14): Promise<OwnerDailyPoint[]> {
+  if (!isSupabaseConfigured()) {
+    return [];
+  }
+
+  const supabase = getSupabaseBrowserClient();
+  const dayKeys = getRecentTaipeiDayKeys(days);
+  const startDate = dayKeys[0];
+
+  const [{ data: attemptRows, error: attemptError }, { data: deviceRows, error: deviceError }] =
+    await Promise.all([
+      supabase
+        .from("question_attempt_logs")
+        .select("answered_at")
+        .gte("answered_at", `${startDate}T00:00:00+08:00`),
+      supabase
+        .from("question_attempt_device_daily")
+        .select("activity_date")
+        .gte("activity_date", startDate)
+    ]);
+
+  if (attemptError) throw attemptError;
+  if (deviceError) throw deviceError;
+
+  const attemptMap = new Map<string, number>();
+  const deviceMap = new Map<string, number>();
+
+  for (const row of attemptRows ?? []) {
+    const key = getTaipeiDayKey(new Date(row.answered_at));
+    attemptMap.set(key, (attemptMap.get(key) ?? 0) + 1);
+  }
+
+  for (const row of deviceRows ?? []) {
+    deviceMap.set(row.activity_date, (deviceMap.get(row.activity_date) ?? 0) + 1);
+  }
+
+  return dayKeys.map((date) => ({
+    date,
+    attempts: attemptMap.get(date) ?? 0,
+    devices: deviceMap.get(date) ?? 0
+  }));
 }

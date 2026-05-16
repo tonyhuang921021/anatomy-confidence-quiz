@@ -1,16 +1,12 @@
 import Link from "next/link";
 import { AuthPanel } from "@/components/AuthPanel";
-import { QuizSetupPanel } from "@/components/QuizSetupPanel";
-import { anatomyQuestions } from "@/data/anatomyQuestions";
 import {
   enabledSubjects,
   HIDDEN_MULTI_ENTRY_SUBJECTS,
   subjectRegistry
 } from "@/data/subjectRegistry";
-import { calculateCompletionStats } from "@/lib/quizAnalysis";
 
 export default function HomePage() {
-  const stats = calculateCompletionStats(anatomyQuestions, []);
   const availableSubjects = enabledSubjects.filter(
     (subject) => !HIDDEN_MULTI_ENTRY_SUBJECTS.includes(subject.subject)
   );
@@ -91,7 +87,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      <div id="smart-setup" className="mt-6 grid gap-6 scroll-mt-24">
+      <div className="mt-6 grid gap-6">
         <AuthPanel />
 
         <section className="rounded-[2rem] bg-white p-6 shadow-card ring-1 ring-slate-100">
@@ -183,7 +179,6 @@ export default function HomePage() {
           </div>
         </section>
 
-        <QuizSetupPanel stats={stats} />
       </div>
     </main>
   );

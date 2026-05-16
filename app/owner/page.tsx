@@ -3,8 +3,8 @@
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import { useAuth } from "@/components/AuthProvider";
-import { loadOwnerDashboardStats } from "@/lib/cloudSync";
-import { OwnerDashboardStats } from "@/types/quiz";
+import { loadOwnerDailySeries, loadOwnerDashboardStats } from "@/lib/cloudSync";
+import { OwnerDailyPoint, OwnerDashboardStats } from "@/types/quiz";
 
 function getAllowedEmails() {
   const raw = process.env.NEXT_PUBLIC_ADMIN_EMAILS ?? "";
@@ -28,9 +28,66 @@ function formatUpdatedAt(value: string) {
   });
 }
 
+function TinyLineChart({
+  data,
+  tone,
+  valueKey
+}: {
+  data: OwnerDailyPoint[];
+  tone: "brand" | "amber";
+  valueKey: "attempts" | "devices";
+}) {
+  const width = 560;
+  const height = 180;
+  const padding = 20;
+  const values = data.map((item) => item[valueKey]);
+  const maxValue = Math.max(...values, 1);
+  const innerWidth = width - padding * 2;
+  const innerHeight = height - padding * 2;
+
+  const points = data.map((item, index) => {
+    const x = padding + (index / Math.max(data.length - 1, 1)) * innerWidth;
+    const y = padding + innerHeight - (item[valueKey] / maxValue) * innerHeight;
+    return `${x},${y}`;
+  });
+
+  const stroke = tone === "brand" ? "#0f766e" : "#d97706";
+  const fill = tone === "brand" ? "rgba(15, 118, 110, 0.10)" : "rgba(217, 119, 6, 0.10)";
+  const areaPoints = [`${padding},${height - padding}`, ...points, `${width - padding},${height - padding}`].join(" ");
+
+  return (
+    <div className="overflow-hidden rounded-3xl bg-slate-50 p-4">
+      <svg viewBox={`0 0 ${width} ${height}`} className="h-44 w-full">
+        <polygon points={areaPoints} fill={fill} />
+        <polyline
+          points={points.join(" ")}
+          fill="none"
+          stroke={stroke}
+          strokeWidth="4"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        />
+        {data.map((item, index) => {
+          const x = padding + (index / Math.max(data.length - 1, 1)) * innerWidth;
+          const y = padding + innerHeight - (item[valueKey] / maxValue) * innerHeight;
+          return <circle key={`${valueKey}-${item.date}`} cx={x} cy={y} r="4.5" fill={stroke} />;
+        })}
+      </svg>
+      <div className="mt-3 flex justify-between gap-2 overflow-hidden text-[11px] text-slate-500">
+        {data.map((item, index) => (
+          <span key={`${valueKey}-label-${item.date}`} className={index % 2 === 1 ? "opacity-60" : ""}>
+            {item.date.slice(5)}
+          </span>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 export default function OwnerPage() {
   const { configured, loading, user } = useAuth();
   const [stats, setStats] = useState<OwnerDashboardStats | null>(null);
+  const [dailySeries, setDailySeries] = useState<OwnerDailyPoint[]>([]);
   const [statsLoading, setStatsLoading] = useState(true);
   const [error, setError] = useState("");
   const allowed = useMemo(() => isAllowedEmail(user?.email), [user?.email]);
@@ -47,7 +104,12 @@ export default function OwnerPage() {
       try {
         setStatsLoading(true);
         setError("");
-        setStats(await loadOwnerDashboardStats());
+        const [nextStats, nextSeries] = await Promise.all([
+          loadOwnerDashboardStats(),
+          loadOwnerDailySeries(14)
+        ]);
+        setStats(nextStats);
+        setDailySeries(nextSeries);
       } catch (fetchError) {
         setError(fetchError instanceof Error ? fetchError.message : "數據載入失敗");
       } finally {
@@ -148,6 +210,25 @@ export default function OwnerPage() {
                 <p className="mt-2 text-3xl font-bold text-ink">{stats.totalAttempts}</p>
               </article>
             </div>
+
+            <section className="rounded-[2rem] bg-white p-6 shadow-card ring-1 ring-slate-100">
+              <div className="grid gap-6 xl:grid-cols-2">
+                <div>
+                  <h2 className="text-lg font-semibold text-ink">每日作答題數</h2>
+                  <p className="mt-2 text-sm text-slate-500">最近 14 天，大家每天總共做了幾題。</p>
+                  <div className="mt-4">
+                    <TinyLineChart data={dailySeries} tone="brand" valueKey="attempts" />
+                  </div>
+                </div>
+                <div>
+                  <h2 className="text-lg font-semibold text-ink">每日作答裝置數</h2>
+                  <p className="mt-2 text-sm text-slate-500">最近 14 天，每天有幾個不同裝置實際作答。</p>
+                  <div className="mt-4">
+                    <TinyLineChart data={dailySeries} tone="amber" valueKey="devices" />
+                  </div>
+                </div>
+              </div>
+            </section>
 
             <section className="rounded-[2rem] bg-white p-6 shadow-card ring-1 ring-slate-100">
               <p className="text-sm text-slate-500">

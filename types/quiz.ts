@@ -236,3 +236,9 @@ export type OwnerDashboardStats = {
   totalAttempts: number;
   updatedAt: string;
 };
+
+export type OwnerDailyPoint = {
+  date: string;
+  attempts: number;
+  devices: number;
+};
