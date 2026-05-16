@@ -227,6 +227,8 @@ export type QuestionCommunityStats = {
 
 export type OwnerDashboardStats = {
   totalVisitorDevices: number;
+  totalAttemptDevices: number;
+  attemptDevicesToday: number;
   onlineVisitors: number;
   totalSyncedUsers: number;
   attemptsToday: number;

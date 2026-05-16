@@ -120,6 +120,14 @@ export default function OwnerPage() {
                 <p className="mt-2 text-3xl font-bold text-ink">{stats.totalVisitorDevices}</p>
               </article>
               <article className="rounded-3xl bg-white p-5 shadow-card ring-1 ring-slate-100">
+                <p className="text-sm text-slate-500">有做過題的裝置數</p>
+                <p className="mt-2 text-3xl font-bold text-ink">{stats.totalAttemptDevices}</p>
+              </article>
+              <article className="rounded-3xl bg-white p-5 shadow-card ring-1 ring-slate-100">
+                <p className="text-sm text-slate-500">今天有做題的裝置數</p>
+                <p className="mt-2 text-3xl font-bold text-ink">{stats.attemptDevicesToday}</p>
+              </article>
+              <article className="rounded-3xl bg-white p-5 shadow-card ring-1 ring-slate-100">
                 <p className="text-sm text-slate-500">目前在線估算</p>
                 <p className="mt-2 text-3xl font-bold text-ink">{stats.onlineVisitors}</p>
               </article>

@@ -52,6 +52,12 @@ type QuestionAccuracyStatRow = {
   updated_at?: string | null;
 };
 
+type QuestionAttemptDeviceRow = {
+  visitor_id: string;
+  first_attempt_at: string;
+  last_attempt_at: string;
+};
+
 const VISITOR_STORAGE_KEY = "acq-visitor-id";
 const ONLINE_WINDOW_MS = 2 * 60 * 1000;
 
@@ -259,9 +265,40 @@ async function syncQuestionStatsForSessions(sessions: QuizSession[]) {
   if (sessions.length === 0) return;
 
   await upsertQuestionAttemptLogs(sessions);
+  await upsertQuestionAttemptDevice(sessions);
   await refreshQuestionAccuracyStats(
     sessions.flatMap((session) => session.attempts.map((attempt) => attempt.questionId))
   );
+}
+
+async function upsertQuestionAttemptDevice(sessions: QuizSession[]) {
+  if (!isSupabaseConfigured() || sessions.length === 0) return;
+
+  const visitorId = getVisitorId();
+  if (!visitorId) return;
+
+  const timestamps = sessions.flatMap((session) => session.attempts.map((attempt) => attempt.answeredAt));
+  if (timestamps.length === 0) return;
+
+  const sorted = [...timestamps].sort((a, b) => a.localeCompare(b));
+  const firstAttemptAt = sorted[0];
+  const lastAttemptAt = sorted[sorted.length - 1];
+
+  const supabase = getSupabaseBrowserClient();
+  const { error } = await supabase
+    .from("question_attempt_devices")
+    .upsert(
+      {
+        visitor_id: visitorId,
+        first_attempt_at: firstAttemptAt,
+        last_attempt_at: lastAttemptAt
+      } satisfies QuestionAttemptDeviceRow,
+      { onConflict: "visitor_id" }
+    );
+
+  if (error) {
+    throw error;
+  }
 }
 
 async function upsertSessionsForUser(userId: string, sessions: QuizSession[]) {
@@ -480,6 +517,8 @@ export async function loadOwnerDashboardStats(): Promise<OwnerDashboardStats> {
   if (!isSupabaseConfigured()) {
     return {
       totalVisitorDevices: 0,
+      totalAttemptDevices: 0,
+      attemptDevicesToday: 0,
       onlineVisitors: 0,
       totalSyncedUsers: 0,
       attemptsToday: 0,
@@ -497,6 +536,8 @@ export async function loadOwnerDashboardStats(): Promise<OwnerDashboardStats> {
 
   const [
     totalVisitorsResult,
+    totalAttemptDevicesResult,
+    todayAttemptDevicesResult,
     onlineVisitorsResult,
     totalUsersResult,
     totalAttemptsResult,
@@ -504,6 +545,12 @@ export async function loadOwnerDashboardStats(): Promise<OwnerDashboardStats> {
     last7DaysAttemptsResult
   ] = await Promise.all([
     supabase.from("site_visitors").select("*", { count: "exact", head: true }),
+    supabase.from("question_attempt_devices").select("*", { count: "exact", head: true }),
+    supabase
+      .from("question_attempt_devices")
+      .select("*", { count: "exact", head: true })
+      .gte("last_attempt_at", startIso)
+      .lt("last_attempt_at", endIso),
     supabase
       .from("site_visitors")
       .select("*", { count: "exact", head: true })
@@ -523,6 +570,8 @@ export async function loadOwnerDashboardStats(): Promise<OwnerDashboardStats> {
 
   const errors = [
     totalVisitorsResult.error,
+    totalAttemptDevicesResult.error,
+    todayAttemptDevicesResult.error,
     onlineVisitorsResult.error,
     totalUsersResult.error,
     totalAttemptsResult.error,
@@ -536,6 +585,8 @@ export async function loadOwnerDashboardStats(): Promise<OwnerDashboardStats> {
 
   return {
     totalVisitorDevices: totalVisitorsResult.count ?? 0,
+    totalAttemptDevices: totalAttemptDevicesResult.count ?? 0,
+    attemptDevicesToday: todayAttemptDevicesResult.count ?? 0,
     onlineVisitors: onlineVisitorsResult.count ?? 0,
     totalSyncedUsers: totalUsersResult.count ?? 0,
     attemptsToday: todayAttemptsResult.count ?? 0,

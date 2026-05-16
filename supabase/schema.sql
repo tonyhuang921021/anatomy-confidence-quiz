@@ -220,3 +220,46 @@ on public.question_accuracy_stats
 for update
 using (true)
 with check (true);
+
+create table if not exists public.question_attempt_devices (
+  visitor_id text primary key,
+  first_attempt_at timestamptz not null default now(),
+  last_attempt_at timestamptz not null default now()
+);
+
+create index if not exists question_attempt_devices_last_attempt_at_idx
+on public.question_attempt_devices (last_attempt_at desc);
+
+grant select, insert, update
+  on public.question_attempt_devices
+  to anon;
+
+grant select, insert, update, delete
+  on public.question_attempt_devices
+  to authenticated;
+
+grant select, insert, update, delete
+  on public.question_attempt_devices
+  to service_role;
+
+alter table public.question_attempt_devices enable row level security;
+
+drop policy if exists "Anyone can read question attempt devices" on public.question_attempt_devices;
+drop policy if exists "Anyone can insert question attempt devices" on public.question_attempt_devices;
+drop policy if exists "Anyone can update question attempt devices" on public.question_attempt_devices;
+
+create policy "Anyone can read question attempt devices"
+on public.question_attempt_devices
+for select
+using (true);
+
+create policy "Anyone can insert question attempt devices"
+on public.question_attempt_devices
+for insert
+with check (true);
+
+create policy "Anyone can update question attempt devices"
+on public.question_attempt_devices
+for update
+using (true)
+with check (true);
