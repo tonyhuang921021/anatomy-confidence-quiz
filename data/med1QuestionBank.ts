@@ -292,6 +292,22 @@ function normalizeAnswerCreditType(
   return "standard";
 }
 
+function toAnswerText(value: unknown) {
+  if (typeof value === "string") return value.trim();
+  if (Array.isArray(value)) {
+    const firstString = value.find((item) => typeof item === "string");
+    return typeof firstString === "string" ? firstString.trim() : "";
+  }
+  return "";
+}
+
+function toOptionKeyArray(value: unknown) {
+  const values = Array.isArray(value) ? value : value ? [value] : [];
+  return values
+    .map((item) => toAnswerText(item))
+    .filter(isOptionKey);
+}
+
 function parseMoexQuestionId(id: string) {
   const match = id.match(/^MOEX-(\d+)[_-](\d+)-Q(\d+)$/i);
   if (!match) return null;
@@ -305,10 +321,8 @@ function parseMoexQuestionId(id: string) {
 }
 
 function toQuestion(raw: RawQuestion): Question | null {
-  const acceptedAnswers = (raw.correct_answers ?? [])
-    .map((value) => value.trim())
-    .filter(isOptionKey);
-  const primaryAnswer = raw.answer?.trim() ?? acceptedAnswers[0] ?? "";
+  const acceptedAnswers = toOptionKeyArray(raw.correct_answers);
+  const primaryAnswer = toAnswerText(raw.answer) || acceptedAnswers[0] || "";
   if (!isOptionKey(primaryAnswer)) return null;
   if (raw.answer_credit_type === "multiple_answers") return null;
 
@@ -357,7 +371,7 @@ function toQuestion(raw: RawQuestion): Question | null {
 function toMissingQuestion(raw: MissingQuestionRaw): Question | null {
   const answerValues = [raw.corrected_answer, raw.official_answer]
     .flatMap((value) => (Array.isArray(value) ? value : value ? [value] : []))
-    .map((value) => value.trim())
+    .map((value) => toAnswerText(value))
     .filter(isOptionKey);
   const primaryAnswer = answerValues[0] ?? "";
   if (!isOptionKey(primaryAnswer)) return null;
@@ -404,10 +418,8 @@ function toMissingQuestion(raw: MissingQuestionRaw): Question | null {
 }
 
 function toRequestedPatchQuestion(raw: RequestedPatchQuestionRaw): Question | null {
-  const answerValues = (raw.correct_answers ?? [])
-    .map((value) => value.trim())
-    .filter(isOptionKey);
-  const fallbackAnswer = raw.official_answer_raw?.trim();
+  const answerValues = toOptionKeyArray(raw.correct_answers);
+  const fallbackAnswer = toAnswerText(raw.official_answer_raw);
   const primaryAnswer = answerValues[0] ?? (fallbackAnswer && isOptionKey(fallbackAnswer) ? fallbackAnswer : "");
   if (!isOptionKey(primaryAnswer)) return null;
 
@@ -454,10 +466,8 @@ function toRequestedPatchQuestion(raw: RequestedPatchQuestionRaw): Question | nu
 }
 
 function toDetailedMissingBatchQuestion(raw: DetailedMissingBatchQuestionRaw): Question | null {
-  const acceptedAnswers = (raw.correct_answers ?? [])
-    .map((value) => value.trim())
-    .filter(isOptionKey);
-  const primaryAnswer = raw.answer?.trim() ?? acceptedAnswers[0] ?? "";
+  const acceptedAnswers = toOptionKeyArray(raw.correct_answers);
+  const primaryAnswer = toAnswerText(raw.answer) || acceptedAnswers[0] || "";
   if (!isOptionKey(primaryAnswer)) return null;
   if (raw.answer_credit_type === "multiple_answers") return null;
 
@@ -558,7 +568,7 @@ function toStage2Question(raw: Stage2QuestionRaw): Question | null {
       if (Array.isArray(value)) return value;
       return value ? [value] : [];
     })
-    .map((value) => value.trim())
+    .map((value) => toAnswerText(value))
     .filter(isOptionKey);
   const primaryAnswer = answerValues[0] ?? "";
   if (!isOptionKey(primaryAnswer)) return null;
