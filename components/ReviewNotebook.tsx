@@ -1,5 +1,9 @@
+"use client";
+
 import Link from "next/link";
-import { OptionKey, Question, ReviewQuestionItem } from "@/types/quiz";
+import { useEffect, useState } from "react";
+import { loadQuestionCommunityStats } from "@/lib/cloudSync";
+import { OptionKey, Question, QuestionCommunityStats, ReviewQuestionItem } from "@/types/quiz";
 
 function formatTime(value?: string) {
   if (!value) return "尚未作答";
@@ -104,9 +108,6 @@ function renderRelatedQuestions(question: Question, allQuestions: Question[]) {
             類似題 {index + 1}：{relatedQuestion.chapter} / {relatedQuestion.section}
           </summary>
           <div className="mt-3 space-y-3 text-sm leading-7 text-slate-700">
-            <p className="font-semibold text-slate-900">
-              {relatedQuestion.chapter} / {relatedQuestion.section}
-            </p>
             <p>{relatedQuestion.stem}</p>
             <div className="grid gap-3">
               {getOptionKeysFromQuestion(relatedQuestion).map((key) => (
@@ -157,17 +158,45 @@ export function ReviewNotebook({
   startHref = "/quiz?new=1",
   onStartReview
 }: ReviewNotebookProps) {
+  const [communityStatsMap, setCommunityStatsMap] = useState<Map<string, QuestionCommunityStats>>(new Map());
   const wrongItems = sortByRecent(items.filter((item) => item.history.wrong > 0));
   const lowConfidenceItems = sortByRecent(items.filter((item) => item.history.lowConfidence > 0));
+
+  useEffect(() => {
+    async function fetchCommunityStats() {
+      if (items.length === 0) {
+        setCommunityStatsMap(new Map());
+        return;
+      }
+
+      try {
+        const stats = await loadQuestionCommunityStats(items.map((item) => item.question.id));
+        setCommunityStatsMap(new Map(stats.map((item) => [item.questionId, item] as const)));
+      } catch {
+        setCommunityStatsMap(new Map());
+      }
+    }
+
+    void fetchCommunityStats();
+  }, [items]);
+
+  function renderCommunityStats(questionId: string) {
+    const stats = communityStatsMap.get(questionId);
+    if (!stats || stats.totalAttempts === 0) return null;
+
+    return (
+      <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-600">
+        全站答對率 {stats.correctRate}%
+      </span>
+    );
+  }
 
   return (
     <section className="rounded-[2rem] bg-white p-6 shadow-card ring-1 ring-slate-100">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
           <h2 className="text-2xl font-semibold text-ink">{title}</h2>
-          <p className="mt-2 text-sm text-slate-500">
-            {description}
-          </p>
+          <p className="mt-2 text-sm text-slate-500">{description}</p>
         </div>
         <Link
           href={startHref}
@@ -212,6 +241,7 @@ export function ReviewNotebook({
                             <span className="text-sm text-slate-500">
                               {item.question.chapter} / {item.question.section}
                             </span>
+                            {renderCommunityStats(item.question.id)}
                           </div>
                           <h4 className="mt-3 break-words text-lg font-semibold leading-8 text-ink">
                             {item.question.stem}
@@ -268,6 +298,7 @@ export function ReviewNotebook({
                             <span className="text-sm text-slate-500">
                               {item.question.chapter} / {item.question.section}
                             </span>
+                            {renderCommunityStats(item.question.id)}
                           </div>
                           <h4 className="mt-3 break-words text-lg font-semibold leading-8 text-ink">
                             {item.question.stem}
