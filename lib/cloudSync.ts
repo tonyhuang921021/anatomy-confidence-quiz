@@ -305,6 +305,14 @@ async function syncQuestionStatsForSessions(sessions: QuizSession[]) {
   );
 }
 
+async function syncQuestionStatsForSessionsSafely(sessions: QuizSession[]) {
+  try {
+    await syncQuestionStatsForSessions(sessions);
+  } catch (error) {
+    console.error("Question stats sync skipped:", error);
+  }
+}
+
 async function upsertQuestionAttemptDevice(sessions: QuizSession[]) {
   if (!isSupabaseConfigured() || sessions.length === 0) return;
 
@@ -426,7 +434,7 @@ export async function syncCompletedSessionsForCurrentUser(userId: string) {
 
   saveCompletedSessions(mergedSessions);
   await upsertSessionsForUser(userId, mergedSessions);
-  await syncQuestionStatsForSessions(mergedSessions);
+  await syncQuestionStatsForSessionsSafely(mergedSessions);
 
   return mergedSessions;
 }
@@ -441,12 +449,12 @@ export async function pushCompletedSessionToSupabase(session: QuizSession) {
     await upsertSessionsForUser(data.user.id, [session]);
   }
 
-  await syncQuestionStatsForSessions([session]);
+  await syncQuestionStatsForSessionsSafely([session]);
 }
 
 export async function pushQuestionStatsSnapshotToSupabase(session: QuizSession) {
   if (!isSupabaseConfigured()) return;
-  await syncQuestionStatsForSessions([session]);
+  await syncQuestionStatsForSessionsSafely([session]);
 }
 
 export async function syncLeaderboardProfileForCurrentUser(
