@@ -145,9 +145,22 @@ function renderRelatedQuestions(question: Question, allQuestions: Question[]) {
 type ReviewNotebookProps = {
   items: ReviewQuestionItem[];
   allQuestions: Question[];
+  title?: string;
+  description?: string;
+  startLabel?: string;
+  startHref?: string;
+  onStartReview?: () => void;
 };
 
-export function ReviewNotebook({ items, allQuestions }: ReviewNotebookProps) {
+export function ReviewNotebook({
+  items,
+  allQuestions,
+  title = "錯題與低信心題筆記",
+  description = "先把錯題和沒信心的題目分開看，每區都依最近作答時間排序。",
+  startLabel = "開始錯題複習",
+  startHref = "/quiz?new=1",
+  onStartReview
+}: ReviewNotebookProps) {
   const wrongItems = sortByRecent(items.filter((item) => item.history.wrong > 0));
   const lowConfidenceItems = sortByRecent(items.filter((item) => item.history.lowConfidence > 0));
 
@@ -155,16 +168,17 @@ export function ReviewNotebook({ items, allQuestions }: ReviewNotebookProps) {
     <section className="rounded-[2rem] bg-white p-6 shadow-card ring-1 ring-slate-100">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
-          <h2 className="text-2xl font-semibold text-ink">錯題與低信心題筆記</h2>
+          <h2 className="text-2xl font-semibold text-ink">{title}</h2>
           <p className="mt-2 text-sm text-slate-500">
-            先把錯題和沒信心的題目分開看，每區都依最近作答時間排序。
+            {description}
           </p>
         </div>
         <Link
-          href="/quiz?new=1"
+          href={startHref}
+          onClick={onStartReview}
           className="min-h-12 rounded-2xl bg-brand-600 px-4 py-3 text-sm font-semibold text-white transition hover:bg-brand-700"
         >
-          開始錯題複習
+          {startLabel}
         </Link>
       </div>
 

@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { useAuth } from "@/components/AuthProvider";
 import { ReviewNotebook } from "@/components/ReviewNotebook";
-import { anatomyQuestions } from "@/data/anatomyQuestions";
+import { getQuestionBankBySubjectFilter } from "@/data/med1QuestionBank";
 import {
   DEFAULT_QUIZ_SETTINGS,
   getReviewQuestionItems,
@@ -14,19 +14,43 @@ import { loadCompletedSessions, saveQuizSettings } from "@/lib/storage";
 import { ReviewQuestionItem } from "@/types/quiz";
 
 export default function ReviewPage() {
-  const [items, setItems] = useState<ReviewQuestionItem[]>([]);
+  const [practiceItems, setPracticeItems] = useState<ReviewQuestionItem[]>([]);
+  const [simulationItems, setSimulationItems] = useState<ReviewQuestionItem[]>([]);
   const { syncVersion } = useAuth();
+  const allQuestions = getQuestionBankBySubjectFilter("全部");
 
   useEffect(() => {
     const sessions = loadCompletedSessions();
-    setItems(getReviewQuestionItems(anatomyQuestions, sessions, 60));
+    const practiceSessions = sessions.filter((session) => session.settings?.mode !== "simulation");
+    const simulationSessions = sessions.filter((session) => session.settings?.mode === "simulation");
+    setPracticeItems(getReviewQuestionItems(allQuestions, practiceSessions, 60));
+    setSimulationItems(getReviewQuestionItems(allQuestions, simulationSessions, 60));
   }, [syncVersion]);
 
-  function handleStartReview() {
-    saveQuizSettings({ ...DEFAULT_QUIZ_SETTINGS, mode: "review", questionCount: 10 });
+  function handleStartPracticeReview() {
+    saveQuizSettings({
+      ...DEFAULT_QUIZ_SETTINGS,
+      mode: "review",
+      questionCount: 10,
+      subjectFilter: "全部",
+      customQuestionIds: practiceItems.map((item) => item.question.id),
+      customPoolLabel: "散題錯題庫"
+    });
   }
 
-  const snapshot = getReviewSnapshot(items);
+  function handleStartSimulationReview() {
+    saveQuizSettings({
+      ...DEFAULT_QUIZ_SETTINGS,
+      mode: "review",
+      questionCount: 10,
+      subjectFilter: "全部",
+      customQuestionIds: simulationItems.map((item) => item.question.id),
+      customPoolLabel: "模擬考錯題庫"
+    });
+  }
+
+  const practiceSnapshot = getReviewSnapshot(practiceItems);
+  const simulationSnapshot = getReviewSnapshot(simulationItems);
 
   return (
     <main className="shell">
@@ -48,10 +72,17 @@ export default function ReviewPage() {
             </Link>
             <Link
               href="/quiz?new=1"
-              onClick={handleStartReview}
+              onClick={handleStartPracticeReview}
               className="min-h-12 rounded-2xl bg-brand-600 px-5 py-4 text-sm font-semibold text-white transition hover:bg-brand-700"
             >
-              開始錯題複習模式
+              開始散題錯題複習
+            </Link>
+            <Link
+              href="/quiz?new=1"
+              onClick={handleStartSimulationReview}
+              className="min-h-12 rounded-2xl bg-amber-500 px-5 py-4 text-sm font-semibold text-white transition hover:bg-amber-600"
+            >
+              開始模擬考錯題複習
             </Link>
           </div>
         </div>
@@ -59,25 +90,40 @@ export default function ReviewPage() {
 
       <section className="mt-8 grid gap-4 lg:grid-cols-4">
         <article className="rounded-3xl bg-rose-50 p-5 text-rose-900">
-          <p className="text-sm font-medium">總複習題數</p>
-          <p className="mt-2 text-3xl font-bold">{snapshot.total}</p>
+          <p className="text-sm font-medium">散題錯題庫</p>
+          <p className="mt-2 text-3xl font-bold">{practiceSnapshot.total}</p>
         </article>
         <article className="rounded-3xl bg-amber-50 p-5 text-amber-900">
-          <p className="text-sm font-medium">低信心題</p>
-          <p className="mt-2 text-3xl font-bold">{snapshot.lowConfidence}</p>
+          <p className="text-sm font-medium">散題低信心題</p>
+          <p className="mt-2 text-3xl font-bold">{practiceSnapshot.lowConfidence}</p>
         </article>
         <article className="rounded-3xl bg-sky-50 p-5 text-sky-900">
-          <p className="text-sm font-medium">錯誤自信題</p>
-          <p className="mt-2 text-3xl font-bold">{snapshot.overconfidence}</p>
+          <p className="text-sm font-medium">模考錯題庫</p>
+          <p className="mt-2 text-3xl font-bold">{simulationSnapshot.total}</p>
         </article>
         <article className="rounded-3xl bg-slate-50 p-5 text-slate-800">
-          <p className="text-sm font-medium">重錯題</p>
-          <p className="mt-2 text-3xl font-bold">{snapshot.wrongHeavy}</p>
+          <p className="text-sm font-medium">模考低信心題</p>
+          <p className="mt-2 text-3xl font-bold">{simulationSnapshot.lowConfidence}</p>
         </article>
       </section>
 
-      <div className="mt-8">
-        <ReviewNotebook items={items} allQuestions={anatomyQuestions} />
+      <div className="mt-8 grid gap-8">
+        <ReviewNotebook
+          title="散題錯題庫"
+          description="這裡只整理平常零散刷題累積下來的錯題與低信心題，不和整份模考混在一起。"
+          startLabel="開始散題錯題複習"
+          onStartReview={handleStartPracticeReview}
+          items={practiceItems}
+          allQuestions={allQuestions}
+        />
+        <ReviewNotebook
+          title="模擬考錯題庫"
+          description="這裡只整理整份模擬考做出來的錯題與低信心題，方便你回頭補整卷觀念。"
+          startLabel="開始模擬考錯題複習"
+          onStartReview={handleStartSimulationReview}
+          items={simulationItems}
+          allQuestions={allQuestions}
+        />
       </div>
     </main>
   );

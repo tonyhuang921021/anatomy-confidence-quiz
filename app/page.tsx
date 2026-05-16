@@ -45,7 +45,7 @@ export default function HomePage() {
                 開始測驗
               </Link>
               <Link
-                href="/#smart-setup"
+                href="/simulation"
                 className="min-h-12 rounded-2xl bg-amber-100 px-5 py-4 text-center text-sm font-semibold text-amber-950 transition hover:bg-amber-200 active:scale-[0.99]"
               >
                 開始模擬考
@@ -133,6 +133,24 @@ export default function HomePage() {
             <span className="font-semibold text-ink">新增重點：</span>
             醫學一題庫、整份模考、真實考古卷模式
           </div>
+        </div>
+      </section>
+
+      <section className="mt-6 rounded-[2rem] bg-white p-6 shadow-card ring-1 ring-slate-100">
+        <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+          <div>
+            <p className="text-sm font-semibold uppercase tracking-[0.2em] text-brand-700">Simulation Zone</p>
+            <h2 className="mt-2 text-2xl font-semibold text-ink">模擬考模式已獨立成專區</h2>
+            <p className="mt-2 max-w-3xl text-sm leading-7 text-slate-600">
+              整份模考、真實考古卷、系統模擬整卷，以及之後的模考錯題庫，現在都獨立整理，不會再和一般散題刷題混在一起。
+            </p>
+          </div>
+          <Link
+            href="/simulation"
+            className="min-h-12 rounded-2xl bg-ink px-5 py-4 text-center text-sm font-semibold text-white transition hover:bg-slate-900"
+          >
+            進入模擬考專區
+          </Link>
         </div>
       </section>
 

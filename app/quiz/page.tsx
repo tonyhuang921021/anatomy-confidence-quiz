@@ -148,11 +148,8 @@ function selectLocalQuestionSet(settings: QuizSettings, fallbackQuestions: Quest
   const sourceBank = bank.length > 0 ? bank : fallbackQuestions;
 
   if ((settings.customQuestionIds?.length ?? 0) > 0) {
-    const seasonalMap = new Map(
-      getSeasonalLimitedQuestions().map((question) => [question.id, question] as const)
-    );
     const customQuestions = settings.customQuestionIds
-      ?.map((id) => seasonalMap.get(id) ?? allQuestionFallbackMap.get(id))
+      ?.map((id) => allQuestionFallbackMap.get(id))
       .filter((question): question is Question => Boolean(question));
 
     if ((customQuestions?.length ?? 0) > 0) {

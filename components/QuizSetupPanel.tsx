@@ -20,6 +20,9 @@ import {
 
 type QuizSetupPanelProps = {
   stats: CompletionStatsBundle;
+  simulationOnly?: boolean;
+  title?: string;
+  description?: string;
 };
 
 const modeDescriptions: Record<QuizMode, string> = {
@@ -59,9 +62,25 @@ const paperModeDescriptions: Record<SimulationPaperMode, string> = {
     "從現有真實考古卷中隨機抽一整份來寫，保留真實卷的比例與題序，但你不會先知道抽到哪一份。"
 };
 
-export function QuizSetupPanel({ stats }: QuizSetupPanelProps) {
+export function QuizSetupPanel({
+  stats,
+  simulationOnly = false,
+  title,
+  description
+}: QuizSetupPanelProps) {
   const router = useRouter();
-  const [settings, setSettings] = useState<QuizSettings>(DEFAULT_QUIZ_SETTINGS);
+  const [settings, setSettings] = useState<QuizSettings>(
+    simulationOnly
+      ? {
+          ...DEFAULT_QUIZ_SETTINGS,
+          mode: "simulation",
+          subjectFilter: "全部",
+          questionCount: 100,
+          feedbackMode: "none",
+          paperMode: "random_set"
+        }
+      : DEFAULT_QUIZ_SETTINGS
+  );
   const selectedSubject = (settings.subjectFilter ?? "解剖學") as SubjectFilter;
   const subjectItem =
     selectedSubject === "全部"
@@ -133,22 +152,31 @@ export function QuizSetupPanel({ stats }: QuizSetupPanelProps) {
       <div className="flex flex-wrap items-start justify-between gap-4">
         <div>
           <p className="text-sm font-semibold uppercase tracking-[0.2em] text-brand-700">Version 2</p>
-          <h2 className="mt-2 text-2xl font-semibold text-ink">智慧測驗設定</h2>
+          <h2 className="mt-2 text-2xl font-semibold text-ink">
+            {title ?? (simulationOnly ? "模擬考模式" : "智慧測驗設定")}
+          </h2>
           <p className="mt-2 text-sm leading-7 text-slate-500">
-            現在可切換單科刷題與醫學（一）多科模擬考，並選擇即時看詳解或整份做完再批改。
+            {description ??
+              (simulationOnly
+                ? "這裡只保留整份模考需要的設定，可直接選真實考古卷或系統模擬整卷。"
+                : "現在可切換單科刷題與醫學（一）多科模擬考，並選擇即時看詳解或整份做完再批改。")}
           </p>
         </div>
-        <button
-          type="button"
-          onClick={handleQuickWeakness}
-          className="min-h-12 rounded-2xl bg-ink px-4 py-3 text-sm font-semibold text-white transition hover:bg-slate-900"
-        >
-          直接刷我最弱 section
-        </button>
+        {!simulationOnly ? (
+          <button
+            type="button"
+            onClick={handleQuickWeakness}
+            className="min-h-12 rounded-2xl bg-ink px-4 py-3 text-sm font-semibold text-white transition hover:bg-slate-900"
+          >
+            直接刷我最弱 section
+          </button>
+        ) : null}
       </div>
 
-      <div className="mt-5 grid gap-4 lg:grid-cols-3">
-        {(["weakness", "random", "review", "ai_fresh", "simulation"] as QuizMode[]).map((mode) => (
+      <div className={`mt-5 grid gap-4 ${simulationOnly ? "lg:grid-cols-1" : "lg:grid-cols-3"}`}>
+        {((simulationOnly
+          ? ["simulation"]
+          : ["weakness", "random", "review", "ai_fresh", "simulation"]) as QuizMode[]).map((mode) => (
           <button
             key={mode}
             type="button"

@@ -3,7 +3,7 @@ import { moexMed1RemainingDetailedV4Merged0011827 } from "@/data/sources/moex_me
 import { moexMed1Missing22QuestionsDetailedV5 } from "@/data/sources/moex_med1_missing_22_questions_detailed_v5";
 import { moexMed1Requested71QuestionsDetailedPatchV5 } from "@/data/sources/moex_med1_requested_71_questions_detailed_patch_v5";
 import moexMed1ReclassifiedV5 from "@/data/sources/moex_med1_100_115_reclassified_v5.json";
-import moexMedStage2Merged0013100 from "@/data/sources/moex_med_stage2_detailed_merged_001_3100.json";
+import moexMedStage2Merged0013100 from "@/data/sources/moex_med_stage2_detailed_merged_001_3100_classified_v3.json";
 import type { OptionKey, Question, SubjectFilter, SubjectName } from "@/types/quiz";
 
 type RawQuestion = {
@@ -954,10 +954,12 @@ export function getPastPaperOptions(subjectFilter: SubjectFilter = "全部"): Pa
       return;
     }
 
+    const examLabel = question.sourceCitation?.includes("醫學（二）") ? "醫學（二）" : "醫學（一）";
+
     paperMap.set(key, {
       key,
-      label: `${question.sourceYear ?? ""} 第${question.sourceRound ?? (question.examSessionLabel?.includes("第二") ? 2 : 1)}次 醫學（一） ${question.paperCode}`,
-      subject: "醫學（一）",
+      label: `${question.sourceYear ?? ""} 第${question.sourceRound ?? (question.examSessionLabel?.includes("第二") ? 2 : 1)}次 ${examLabel} ${question.paperCode}`,
+      subject: examLabel as SubjectFilter,
       questionCount: 1,
       sourceYear: question.sourceYear,
       sourceRound: question.sourceRound ?? (question.examSessionLabel?.includes("第二") ? 2 : 1)
