@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { getPastPaperOptions } from "@/data/med1QuestionBank";
 import { enabledSubjects, subjectRegistry } from "@/data/subjectRegistry";
@@ -8,7 +8,7 @@ import {
   DEFAULT_QUIZ_SETTINGS,
   getModeLabel
 } from "@/lib/quizAnalysis";
-import { saveQuizSettings } from "@/lib/storage";
+import { loadCompletedSessions, saveQuizSettings } from "@/lib/storage";
 import {
   CompletionStatsBundle,
   QuizMode,
@@ -81,6 +81,7 @@ export function QuizSetupPanel({
         }
       : DEFAULT_QUIZ_SETTINGS
   );
+  const [completedPaperCounts, setCompletedPaperCounts] = useState<Record<string, number>>({});
   const selectedSubject = (settings.subjectFilter ?? "解剖學") as SubjectFilter;
   const subjectItem =
     selectedSubject === "全部"
@@ -106,6 +107,31 @@ export function QuizSetupPanel({
     if (settings.mode !== "simulation") return [];
     return getPastPaperOptions();
   }, [settings.mode]);
+  const med1PaperOptions = useMemo(
+    () => paperOptions.filter((paper) => paper.subject === "醫學（一）"),
+    [paperOptions]
+  );
+  const med2PaperOptions = useMemo(
+    () => paperOptions.filter((paper) => paper.subject === "醫學（二）"),
+    [paperOptions]
+  );
+
+  useEffect(() => {
+    const completedSessions = loadCompletedSessions();
+    const counts = completedSessions.reduce<Record<string, number>>((accumulator, session) => {
+      const paperKey =
+        session.settings?.mode === "simulation" &&
+        session.settings?.paperMode === "past_paper"
+          ? session.settings?.selectedPaperKey
+          : undefined;
+
+      if (!paperKey) return accumulator;
+      accumulator[paperKey] = (accumulator[paperKey] ?? 0) + 1;
+      return accumulator;
+    }, {});
+
+    setCompletedPaperCounts(counts);
+  }, []);
 
   function updateSettings(next: Partial<QuizSettings>) {
     setSettings((current) => {
@@ -332,18 +358,69 @@ export function QuizSetupPanel({
               </div>
 
               {(settings.paperMode ?? "random_set") === "past_paper" ? (
-                <select
-                  value={settings.selectedPaperKey ?? ""}
-                  onChange={(event) => updateSettings({ selectedPaperKey: event.target.value || undefined })}
-                  className="min-h-12 w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-800 outline-none"
-                >
-                  <option value="">請選擇真實考古題</option>
-                  {paperOptions.map((paper) => (
-                    <option key={paper.key} value={paper.key}>
-                      {paper.label}（{paper.questionCount} 題）
-                    </option>
+                <div className="space-y-4">
+                  <div className="rounded-2xl bg-slate-50 px-4 py-3 text-sm leading-7 text-slate-600">
+                    請直接點選要做的卷別。已做過的卷會標示次數，方便你分辨哪些卷已經寫過。
+                  </div>
+
+                  {([
+                    { title: "醫學（一）", papers: med1PaperOptions, accent: "amber" },
+                    { title: "醫學（二）", papers: med2PaperOptions, accent: "sky" }
+                  ] as const).map(({ title: groupTitle, papers, accent }) => (
+                    <div key={groupTitle} className="rounded-2xl bg-slate-50 p-4">
+                      <div className="flex items-center justify-between gap-3">
+                        <p className="text-sm font-semibold text-ink">{groupTitle}</p>
+                        <span className="text-xs text-slate-500">{papers.length} 份考卷</span>
+                      </div>
+                      <div className="mt-3 grid gap-3">
+                        {papers.map((paper) => {
+                          const isSelected = settings.selectedPaperKey === paper.key;
+                          const completedCount = completedPaperCounts[paper.key] ?? 0;
+                          const accentClasses =
+                            accent === "amber"
+                              ? isSelected
+                                ? "border-amber-400 bg-amber-50 ring-2 ring-amber-200"
+                                : "border-slate-200 bg-white hover:border-amber-200 hover:bg-amber-50/60"
+                              : isSelected
+                                ? "border-sky-400 bg-sky-50 ring-2 ring-sky-200"
+                                : "border-slate-200 bg-white hover:border-sky-200 hover:bg-sky-50/60";
+
+                          return (
+                            <button
+                              key={paper.key}
+                              type="button"
+                              onClick={() => updateSettings({ selectedPaperKey: paper.key })}
+                              className={`rounded-2xl border px-4 py-4 text-left transition ${accentClasses}`}
+                            >
+                              <div className="flex flex-wrap items-start justify-between gap-3">
+                                <div>
+                                  <p className="text-sm font-semibold text-ink">{paper.label}</p>
+                                  <p className="mt-1 text-xs text-slate-500">{paper.questionCount} 題完整考卷</p>
+                                </div>
+                                <div className="flex flex-wrap gap-2">
+                                  {completedCount > 0 ? (
+                                    <span className="rounded-full bg-emerald-100 px-3 py-1 text-xs font-semibold text-emerald-700">
+                                      已做過 {completedCount} 次
+                                    </span>
+                                  ) : (
+                                    <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-500">
+                                      尚未作答
+                                    </span>
+                                  )}
+                                  {isSelected ? (
+                                    <span className="rounded-full bg-brand-600 px-3 py-1 text-xs font-semibold text-white">
+                                      目前選取
+                                    </span>
+                                  ) : null}
+                                </div>
+                              </div>
+                            </button>
+                          );
+                        })}
+                      </div>
+                    </div>
                   ))}
-                </select>
+                </div>
               ) : null}
               <p className="text-xs leading-6 text-slate-500">
                 不論你選哪一種模擬考模式，作答時都還是可以填寫信心程度，方便之後做弱點分析。
