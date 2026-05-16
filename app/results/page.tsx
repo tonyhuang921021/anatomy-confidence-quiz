@@ -8,10 +8,10 @@ import { AIPromptBox } from "@/components/AIPromptBox";
 import { useAuth } from "@/components/AuthProvider";
 import { ResultSummary } from "@/components/ResultSummary";
 import { WeaknessRanking } from "@/components/WeaknessRanking";
+import { loadQuestionCommunityStats } from "@/lib/cloudSync";
 import { anatomyQuestions } from "@/data/anatomyQuestions";
 import { subjectRegistry } from "@/data/subjectRegistry";
 import {
-  loadQuestionCommunityStats,
   calculateCompletionStats,
   calculateSectionStats,
   calculateSummary,
