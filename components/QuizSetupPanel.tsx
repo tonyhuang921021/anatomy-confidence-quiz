@@ -235,7 +235,7 @@ export function QuizSetupPanel({
         ))}
       </div>
 
-      <div className="mt-6 grid gap-4 lg:grid-cols-[0.9fr_1.1fr]">
+      <div className={`mt-6 grid gap-4 ${settings.mode === "simulation" ? "grid-cols-1" : "lg:grid-cols-[0.9fr_1.1fr]"}`}>
         {settings.mode !== "simulation" ? (
           <>
             <div className="rounded-3xl bg-slate-50 p-5">
@@ -304,14 +304,7 @@ export function QuizSetupPanel({
               </div>
             </div>
           </>
-        ) : (
-          <div className="rounded-3xl bg-slate-50 p-5">
-            <p className="text-sm font-medium text-slate-500">模擬考設定</p>
-            <p className="mt-3 text-sm leading-7 text-slate-700">
-              直接在右側調整作答後顯示方式與考卷來源即可開始。
-            </p>
-          </div>
-        )}
+        ) : null}
         <div className="rounded-3xl bg-slate-50 p-5">
           {settings.mode === "ai_fresh" ? (
             <label className="mt-4 flex items-center gap-3 rounded-2xl bg-white px-4 py-3 text-sm text-slate-700 ring-1 ring-slate-200">
