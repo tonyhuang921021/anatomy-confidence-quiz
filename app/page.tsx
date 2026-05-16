@@ -25,7 +25,7 @@ export default function HomePage() {
   return (
     <main className="shell">
       <section className="rounded-[2rem] bg-white/90 p-6 shadow-card ring-1 ring-white/70 backdrop-blur sm:p-8">
-        <div className="grid gap-8 lg:grid-cols-[1.2fr_0.8fr] lg:items-center">
+        <div>
           <div>
             <p className="text-sm font-semibold uppercase tracking-[0.2em] text-brand-700">
               Medical Board Step 1 Quiz
@@ -85,34 +85,6 @@ export default function HomePage() {
                 <p className="text-sm text-slate-500">已開放科目</p>
                 <p className="mt-2 text-lg font-bold text-ink">
                   {availableSubjects.map((subject) => subject.label).join("、")}
-                </p>
-              </div>
-            </div>
-          </div>
-
-          <div className="rounded-[2rem] bg-ink p-6 text-white shadow-card">
-            <p className="text-sm font-semibold uppercase tracking-[0.2em] text-brand-200">快速入口</p>
-            <div className="mt-4 grid gap-3">
-              <Link href="/start" className="rounded-2xl bg-white/10 p-4 transition hover:bg-white/15">
-                <p className="font-semibold">立即開始 10 題測驗</p>
-                <p className="mt-1 text-sm text-slate-200">先選想抽哪些科，再進入答題流程</p>
-              </Link>
-              <Link href="/progress" className="rounded-2xl bg-white/10 p-4 transition hover:bg-white/15">
-                <p className="font-semibold">看一階國考進度地圖</p>
-                <p className="mt-1 text-sm text-slate-200">檢查各科 completionRate 與 masteryScore</p>
-              </Link>
-              <Link href="/review" className="rounded-2xl bg-white/10 p-4 transition hover:bg-white/15">
-                <p className="font-semibold">看錯題與高風險題</p>
-                <p className="mt-1 text-sm text-slate-200">集中複習曾答錯或低信心題目</p>
-              </Link>
-              <Link href="/leaderboard" className="rounded-2xl bg-white/10 p-4 transition hover:bg-white/15">
-                <p className="font-semibold">看刷題榜</p>
-                <p className="mt-1 text-sm text-slate-200">依總答題量與正確率查看排名</p>
-              </Link>
-              <div className="rounded-2xl bg-white/10 p-4">
-                <p className="font-semibold">API 已新增</p>
-                <p className="mt-1 text-sm text-slate-200">
-                  `GET /api/health`、`GET /api/questions`、`POST /api/recommend`、`POST /api/ai-analysis`
                 </p>
               </div>
             </div>
