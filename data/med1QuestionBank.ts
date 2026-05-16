@@ -250,6 +250,18 @@ function normalizeAnswerCreditType(
   return "standard";
 }
 
+function parseMoexQuestionId(id: string) {
+  const match = id.match(/^MOEX-(\d+)[_-](\d+)-Q(\d+)$/i);
+  if (!match) return null;
+
+  const [, examCode, paperCode, questionNumber] = match;
+  return {
+    examCode,
+    paperCode,
+    questionNumber: Number.parseInt(questionNumber, 10)
+  };
+}
+
 function toQuestion(raw: RawQuestion): Question | null {
   const acceptedAnswers = (raw.correct_answers ?? [])
     .map((value) => value.trim())
@@ -416,9 +428,7 @@ function toStage2Question(raw: Stage2QuestionRaw): Question | null {
     raw.classification_v1?.subtopic
   );
 
-  const idMatch = raw.id.match(/^MOEX-(\d+)-(\d+)-Q(\d+)$/i);
-  const parsedExamCode = idMatch?.[1];
-  const parsedPaperCode = idMatch?.[2];
+  const parsedId = parseMoexQuestionId(raw.id);
 
   return {
     id: raw.id,
@@ -448,8 +458,8 @@ function toStage2Question(raw: Stage2QuestionRaw): Question | null {
     sourceYear: raw.year,
     sourceRound: raw.exam_round.includes("第二") ? 2 : 1,
     originalQuestionNumber: raw.question_no,
-    examCode: parsedExamCode,
-    paperCode: parsedPaperCode,
+    examCode: parsedId?.examCode,
+    paperCode: parsedId?.paperCode,
     examSessionLabel: raw.exam_round
   };
 }
@@ -721,18 +731,16 @@ function fillPastPaperMetadata(question: Question): Question {
     return question;
   }
 
-  const idMatch = question.id.match(/^MOEX-(\d+)-(\d+)-Q(\d+)$/i);
-  if (!idMatch) {
+  const parsedId = parseMoexQuestionId(question.id);
+  if (!parsedId) {
     return question;
   }
 
-  const [, examCode, paperCode, questionNumber] = idMatch;
   return {
     ...question,
-    examCode: question.examCode ?? examCode,
-    paperCode: question.paperCode ?? paperCode,
-    originalQuestionNumber:
-      question.originalQuestionNumber ?? Number.parseInt(questionNumber, 10)
+    examCode: question.examCode ?? parsedId.examCode,
+    paperCode: question.paperCode ?? parsedId.paperCode,
+    originalQuestionNumber: question.originalQuestionNumber ?? parsedId.questionNumber
   };
 }
 
