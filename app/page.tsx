@@ -7,11 +7,10 @@ import {
   HIDDEN_MULTI_ENTRY_SUBJECTS,
   subjectRegistry
 } from "@/data/subjectRegistry";
-import { calculateCompletionStats, calculateOverallCompletion } from "@/lib/quizAnalysis";
+import { calculateCompletionStats } from "@/lib/quizAnalysis";
 
 export default function HomePage() {
   const stats = calculateCompletionStats(anatomyQuestions, []);
-  const overall = calculateOverallCompletion(anatomyQuestions, []);
   const availableSubjects = enabledSubjects.filter(
     (subject) => !HIDDEN_MULTI_ENTRY_SUBJECTS.includes(subject.subject)
   );
@@ -92,40 +91,6 @@ export default function HomePage() {
         </div>
       </section>
 
-      <section className="mt-6 rounded-[2rem] border border-brand-200 bg-gradient-to-r from-brand-50 via-white to-amber-50 p-6 shadow-card">
-        <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
-          <div>
-            <p className="text-sm font-semibold uppercase tracking-[0.2em] text-brand-700">Announcement</p>
-            <h2 className="mt-2 text-2xl font-semibold text-ink">醫學（一）題目已上線，整份作答模式同步開放</h2>
-            <p className="mt-2 max-w-3xl text-sm leading-7 text-slate-600">
-              現在除了原本的解剖學刷題，也可以直接選醫學（一）全科，並用模擬考模式寫整份卷。你可以指定真實考古題、隨機抽一整份真實考古題，或讓系統自組一份新模擬卷。
-            </p>
-          </div>
-          <div className="rounded-3xl bg-white px-5 py-4 text-sm text-slate-700 ring-1 ring-brand-100">
-            <span className="font-semibold text-ink">新增重點：</span>
-            醫學一題庫、整份模考、真實考古卷模式
-          </div>
-        </div>
-      </section>
-
-      <section className="mt-6 rounded-[2rem] bg-white p-6 shadow-card ring-1 ring-slate-100">
-        <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
-          <div>
-            <p className="text-sm font-semibold uppercase tracking-[0.2em] text-brand-700">Simulation Zone</p>
-            <h2 className="mt-2 text-2xl font-semibold text-ink">模擬考模式已獨立成專區</h2>
-            <p className="mt-2 max-w-3xl text-sm leading-7 text-slate-600">
-              整份模考、真實考古卷、系統模擬整卷，以及之後的模考錯題庫，現在都獨立整理，不會再和一般散題刷題混在一起。
-            </p>
-          </div>
-          <Link
-            href="/simulation"
-            className="min-h-12 rounded-2xl bg-ink px-5 py-4 text-center text-sm font-semibold text-white transition hover:bg-slate-900"
-          >
-            進入模擬考專區
-          </Link>
-        </div>
-      </section>
-
       <div id="smart-setup" className="mt-6 grid gap-6 scroll-mt-24">
         <AuthPanel />
 
@@ -134,9 +99,6 @@ export default function HomePage() {
             <div>
               <p className="text-sm font-semibold uppercase tracking-[0.2em] text-brand-700">Subjects</p>
               <h2 className="mt-2 text-2xl font-semibold text-ink">多科目入口</h2>
-              <p className="mt-2 text-sm leading-7 text-slate-600">
-                目前已經支援醫學一與醫學二多科刷題，之後也可以繼續沿用同一套刷題與進度系統擴充。
-              </p>
             </div>
             <div className="rounded-3xl bg-slate-50 px-5 py-4 text-sm text-slate-700">
               已開放 <span className="font-semibold text-ink">{availableSubjects.length}</span> 科
@@ -218,21 +180,6 @@ export default function HomePage() {
                 </article>
               );
             })}
-          </div>
-        </section>
-
-        <section className="rounded-[2rem] bg-white p-6 shadow-card ring-1 ring-slate-100">
-          <div className="flex flex-wrap items-center justify-between gap-4">
-            <div>
-              <p className="text-sm font-semibold uppercase tracking-[0.2em] text-brand-700">Quick Stats</p>
-              <h2 className="mt-2 text-2xl font-semibold text-ink">目前會依你選的科目抽題，並混合正式考古題與整理後題庫</h2>
-              <p className="mt-2 text-sm leading-7 text-slate-600">
-                這一格原本是舊版本留下來的提示文字，現在它的意思是：系統不會只照題庫順序出題，而會重新打亂，並在可用範圍內混入正式考古題。
-              </p>
-            </div>
-            <div className="rounded-3xl bg-slate-50 px-5 py-4 text-sm text-slate-700">
-              整體 completionRate <span className="font-semibold text-ink">{Math.round(overall.completionRate)}%</span>
-            </div>
           </div>
         </section>
 
