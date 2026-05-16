@@ -131,6 +131,17 @@ type ReclassifiedQuestionRaw = {
   };
 };
 
+type DetailedMissingBatchQuestionRaw = RawQuestion & {
+  classification_v5?: {
+    primary_subject?: string;
+    primary_subject_exact?: string;
+    med1_current_five_subject?: string;
+    subtopic?: string;
+  };
+  subject_group_coarse?: string;
+  subject_group_keyword?: string;
+};
+
 type Batch3QuestionRaw = {
   id: string;
   year: number;
@@ -442,6 +453,64 @@ function toRequestedPatchQuestion(raw: RequestedPatchQuestionRaw): Question | nu
   };
 }
 
+function toDetailedMissingBatchQuestion(raw: DetailedMissingBatchQuestionRaw): Question | null {
+  const acceptedAnswers = (raw.correct_answers ?? [])
+    .map((value) => value.trim())
+    .filter(isOptionKey);
+  const primaryAnswer = raw.answer?.trim() ?? acceptedAnswers[0] ?? "";
+  if (!isOptionKey(primaryAnswer)) return null;
+  if (raw.answer_credit_type === "multiple_answers") return null;
+
+  const explicitSubject =
+    raw.classification_v5?.med1_current_five_subject ||
+    raw.classification_v5?.primary_subject_exact ||
+    raw.classification_v5?.primary_subject ||
+    raw.subject_group_coarse;
+  const explicitSection =
+    raw.classification_v5?.subtopic ||
+    raw.subject_group_keyword;
+  const { primarySubject, topicSection, chapter, section } = resolvePlacement(
+    explicitSubject,
+    explicitSection
+  );
+
+  return {
+    id: raw.id,
+    subject: primarySubject,
+    chapter,
+    section,
+    stem: raw.stem,
+    options: {
+      A: raw.options.A ?? "",
+      B: raw.options.B ?? "",
+      C: raw.options.C ?? "",
+      D: raw.options.D ?? "",
+      ...(raw.options.E ? { E: raw.options.E } : {})
+    },
+    answer: primaryAnswer,
+    acceptedAnswers: acceptedAnswers.length > 0 ? acceptedAnswers : undefined,
+    answerCreditType: normalizeAnswerCreditType(raw.answer_credit_type),
+    explanation: raw.explanation ?? "",
+    testedConcept: raw.exam_point ?? topicSection ?? section,
+    optionAnalysis: toPartialOptionAnalysis(raw.option_analysis),
+    memoryTip: raw.memory_tip,
+    clinicalLink: raw.clinical_link,
+    answerConfidence: raw.answer_confidence,
+    needsHumanReview: raw.needs_human_review,
+    reviewFlags: raw.review_flags ? [...raw.review_flags] : undefined,
+    detailVersion: raw.detail_phase,
+    sourceType: raw.source_type === "MOEX_PAST_EXAM" ? "MOEX_PAST_EXAM" : "AI_GENERATED",
+    sourceCitation: `考選部 ${raw.exam_year_gregorian ?? ""} ${raw.exam_session ?? ""} 醫學（一） ${raw.paper_code ?? ""}`.trim(),
+    sourceYear: raw.exam_year_gregorian,
+    sourceRound: raw.exam_session?.includes("第二") ? 2 : 1,
+    originalQuestionNumber: raw.question_no,
+    examCode: raw.exam_code,
+    paperCode: raw.paper_code,
+    examSessionLabel: raw.exam_session,
+    difficulty: normalizeDifficulty(raw.difficulty)
+  };
+}
+
 function toBatch3Question(raw: Batch3QuestionRaw): Question | null {
   const [examCode, paperCode] = raw.exam_code.split("-");
   const normalized: MissingQuestionRaw = {
@@ -597,16 +666,18 @@ export const med1MissingQuestions: Question[] = missingQuestionsRaw
   .map(applyClassificationOverride);
 
 const missingBatch1Raw =
-  (moexMed1MissingBatch1 as { questions: RawQuestion[] }).questions as readonly RawQuestion[];
+  (moexMed1MissingBatch1 as { questions: DetailedMissingBatchQuestionRaw[] })
+    .questions as readonly DetailedMissingBatchQuestionRaw[];
 export const med1MissingBatch1Questions: Question[] = missingBatch1Raw
-  .map(toQuestion)
+  .map(toDetailedMissingBatchQuestion)
   .filter((question): question is Question => Boolean(question))
   .map(applyClassificationOverride);
 
 const missingBatch2Raw =
-  (moexMed1MissingBatch2 as { questions: RawQuestion[] }).questions as readonly RawQuestion[];
+  (moexMed1MissingBatch2 as { questions: DetailedMissingBatchQuestionRaw[] })
+    .questions as readonly DetailedMissingBatchQuestionRaw[];
 export const med1MissingBatch2Questions: Question[] = missingBatch2Raw
-  .map(toQuestion)
+  .map(toDetailedMissingBatchQuestion)
   .filter((question): question is Question => Boolean(question))
   .map(applyClassificationOverride);
 
