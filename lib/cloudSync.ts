@@ -1,6 +1,7 @@
 import type { User } from "@supabase/supabase-js";
 import type {
   LeaderboardEntry,
+  OwnerDashboardStats,
   QuestionCommunityStats,
   QuizSession,
   VisitorStats
@@ -53,6 +54,23 @@ type QuestionAccuracyStatRow = {
 
 const VISITOR_STORAGE_KEY = "acq-visitor-id";
 const ONLINE_WINDOW_MS = 2 * 60 * 1000;
+
+function getTaipeiDayRange() {
+  const taipeiDate = new Intl.DateTimeFormat("en-CA", {
+    timeZone: "Asia/Taipei",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit"
+  }).format(new Date());
+
+  const start = new Date(`${taipeiDate}T00:00:00+08:00`);
+  const end = new Date(start.getTime() + 24 * 60 * 60 * 1000);
+
+  return {
+    startIso: start.toISOString(),
+    endIso: end.toISOString()
+  };
+}
 
 function getVisitorId() {
   if (typeof window === "undefined") return null;
@@ -455,5 +473,74 @@ export async function loadVisitorStats(): Promise<VisitorStats> {
     totalVisitors: totalVisitors ?? 0,
     onlineVisitors: onlineVisitors ?? 0,
     updatedAt: new Date().toISOString()
+  };
+}
+
+export async function loadOwnerDashboardStats(): Promise<OwnerDashboardStats> {
+  if (!isSupabaseConfigured()) {
+    return {
+      totalVisitorDevices: 0,
+      onlineVisitors: 0,
+      totalSyncedUsers: 0,
+      attemptsToday: 0,
+      attemptsLast7Days: 0,
+      totalAttempts: 0,
+      updatedAt: new Date().toISOString()
+    };
+  }
+
+  const supabase = getSupabaseBrowserClient();
+  const now = new Date();
+  const onlineSince = new Date(now.getTime() - ONLINE_WINDOW_MS).toISOString();
+  const sevenDaysAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000).toISOString();
+  const { startIso, endIso } = getTaipeiDayRange();
+
+  const [
+    totalVisitorsResult,
+    onlineVisitorsResult,
+    totalUsersResult,
+    totalAttemptsResult,
+    todayAttemptsResult,
+    last7DaysAttemptsResult
+  ] = await Promise.all([
+    supabase.from("site_visitors").select("*", { count: "exact", head: true }),
+    supabase
+      .from("site_visitors")
+      .select("*", { count: "exact", head: true })
+      .gte("last_seen_at", onlineSince),
+    supabase.from("leaderboard_profiles").select("*", { count: "exact", head: true }),
+    supabase.from("question_attempt_logs").select("*", { count: "exact", head: true }),
+    supabase
+      .from("question_attempt_logs")
+      .select("*", { count: "exact", head: true })
+      .gte("answered_at", startIso)
+      .lt("answered_at", endIso),
+    supabase
+      .from("question_attempt_logs")
+      .select("*", { count: "exact", head: true })
+      .gte("answered_at", sevenDaysAgo)
+  ]);
+
+  const errors = [
+    totalVisitorsResult.error,
+    onlineVisitorsResult.error,
+    totalUsersResult.error,
+    totalAttemptsResult.error,
+    todayAttemptsResult.error,
+    last7DaysAttemptsResult.error
+  ].filter(Boolean);
+
+  if (errors.length > 0) {
+    throw errors[0] as Error;
+  }
+
+  return {
+    totalVisitorDevices: totalVisitorsResult.count ?? 0,
+    onlineVisitors: onlineVisitorsResult.count ?? 0,
+    totalSyncedUsers: totalUsersResult.count ?? 0,
+    attemptsToday: todayAttemptsResult.count ?? 0,
+    attemptsLast7Days: last7DaysAttemptsResult.count ?? 0,
+    totalAttempts: totalAttemptsResult.count ?? 0,
+    updatedAt: now.toISOString()
   };
 }

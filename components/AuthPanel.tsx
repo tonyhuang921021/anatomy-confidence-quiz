@@ -16,6 +16,13 @@ export function AuthPanel() {
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
   const [submitting, setSubmitting] = useState(false);
+  const ownerAllowedEmails = (process.env.NEXT_PUBLIC_ADMIN_EMAILS ?? "")
+    .split(",")
+    .map((item) => item.trim().toLowerCase())
+    .filter(Boolean);
+  const canViewOwnerPage = user?.email
+    ? ownerAllowedEmails.includes(user.email.trim().toLowerCase())
+    : false;
 
   useEffect(() => {
     setNickname(typeof user?.user_metadata?.display_name === "string" ? user.user_metadata.display_name : "");
@@ -152,6 +159,14 @@ export function AuthPanel() {
           <div className="mt-4 rounded-2xl bg-rose-50 p-4 text-sm text-rose-900">{error}</div>
         ) : null}
         <div className="mt-5 flex flex-col gap-3 sm:flex-row">
+          {canViewOwnerPage ? (
+            <a
+              href="/owner"
+              className="min-h-12 rounded-2xl bg-slate-100 px-4 py-3 text-center text-sm font-semibold text-slate-800 transition hover:bg-slate-200"
+            >
+              私有數據頁
+            </a>
+          ) : null}
           <button
             type="button"
             onClick={() => void handleSaveNickname()}

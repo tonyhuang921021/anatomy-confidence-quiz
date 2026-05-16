@@ -224,3 +224,13 @@ export type QuestionCommunityStats = {
   correctRate: number;
   updatedAt?: string;
 };
+
+export type OwnerDashboardStats = {
+  totalVisitorDevices: number;
+  onlineVisitors: number;
+  totalSyncedUsers: number;
+  attemptsToday: number;
+  attemptsLast7Days: number;
+  totalAttempts: number;
+  updatedAt: string;
+};
