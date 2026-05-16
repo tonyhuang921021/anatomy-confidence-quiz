@@ -224,11 +224,3 @@ export type QuestionCommunityStats = {
   correctRate: number;
   updatedAt?: string;
 };
-
-export type AdminDashboardStats = {
-  totalVisitors: number;
-  onlineVisitors: number;
-  totalSyncedUsers: number;
-  todayAttempts: number;
-  updatedAt: string;
-};
