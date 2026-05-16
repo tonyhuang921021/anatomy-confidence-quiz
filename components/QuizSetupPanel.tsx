@@ -108,11 +108,27 @@ export function QuizSetupPanel({
     return getPastPaperOptions();
   }, [settings.mode]);
   const med1PaperOptions = useMemo(
-    () => paperOptions.filter((paper) => paper.subject === "醫學（一）"),
+    () =>
+      [...paperOptions]
+        .filter((paper) => paper.subject === "醫學（一）")
+        .sort((left, right) => {
+          if ((right.sourceYear ?? 0) !== (left.sourceYear ?? 0)) {
+            return (right.sourceYear ?? 0) - (left.sourceYear ?? 0);
+          }
+          return (right.sourceRound ?? 0) - (left.sourceRound ?? 0);
+        }),
     [paperOptions]
   );
   const med2PaperOptions = useMemo(
-    () => paperOptions.filter((paper) => paper.subject === "醫學（二）"),
+    () =>
+      [...paperOptions]
+        .filter((paper) => paper.subject === "醫學（二）")
+        .sort((left, right) => {
+          if ((right.sourceYear ?? 0) !== (left.sourceYear ?? 0)) {
+            return (right.sourceYear ?? 0) - (left.sourceYear ?? 0);
+          }
+          return (right.sourceRound ?? 0) - (left.sourceRound ?? 0);
+        }),
     [paperOptions]
   );
 
@@ -184,7 +200,7 @@ export function QuizSetupPanel({
           <p className="mt-2 text-sm leading-7 text-slate-500">
             {description ??
               (simulationOnly
-                ? "這裡只保留整份模考需要的設定，可直接選真實考古卷或系統模擬整卷。"
+                ? "模擬考模式會固定用整份考卷邏輯出題，所以不提供科目、題數、章節與小節篩選，避免把模考做成一般刷題模式。你可以直接選真實考古卷或系統模擬整卷。"
                 : "現在可切換單科刷題與醫學（一）多科模擬考，並選擇即時看詳解或整份做完再批改。")}
           </p>
         </div>
@@ -290,9 +306,9 @@ export function QuizSetupPanel({
           </>
         ) : (
           <div className="rounded-3xl bg-slate-50 p-5">
-            <p className="text-sm font-medium text-slate-500">模擬考說明</p>
+            <p className="text-sm font-medium text-slate-500">模擬考設定</p>
             <p className="mt-3 text-sm leading-7 text-slate-700">
-              模擬考模式會固定用整份考卷邏輯出題，所以不提供科目、題數、章節與小節篩選，避免把模考做成一般刷題模式。
+              先選擇作答後顯示方式，再決定要做系統模擬卷、指定真實考古題，或隨機抽一份真實考古題。
             </p>
           </div>
         )}
@@ -363,63 +379,65 @@ export function QuizSetupPanel({
                     請直接點選要做的卷別。已做過的卷會標示次數，方便你分辨哪些卷已經寫過。
                   </div>
 
-                  {([
+                  <div className="grid gap-4 lg:grid-cols-2">
+                    {([
                     { title: "醫學（一）", papers: med1PaperOptions, accent: "amber" },
                     { title: "醫學（二）", papers: med2PaperOptions, accent: "sky" }
-                  ] as const).map(({ title: groupTitle, papers, accent }) => (
-                    <div key={groupTitle} className="rounded-2xl bg-slate-50 p-4">
-                      <div className="flex items-center justify-between gap-3">
-                        <p className="text-sm font-semibold text-ink">{groupTitle}</p>
-                        <span className="text-xs text-slate-500">{papers.length} 份考卷</span>
-                      </div>
-                      <div className="mt-3 grid gap-3">
-                        {papers.map((paper) => {
-                          const isSelected = settings.selectedPaperKey === paper.key;
-                          const completedCount = completedPaperCounts[paper.key] ?? 0;
-                          const accentClasses =
-                            accent === "amber"
-                              ? isSelected
-                                ? "border-amber-400 bg-amber-50 ring-2 ring-amber-200"
-                                : "border-slate-200 bg-white hover:border-amber-200 hover:bg-amber-50/60"
-                              : isSelected
-                                ? "border-sky-400 bg-sky-50 ring-2 ring-sky-200"
-                                : "border-slate-200 bg-white hover:border-sky-200 hover:bg-sky-50/60";
+                    ] as const).map(({ title: groupTitle, papers, accent }) => (
+                      <div key={groupTitle} className="rounded-2xl bg-slate-50 p-4">
+                        <div className="flex items-center justify-between gap-3">
+                          <p className="text-sm font-semibold text-ink">{groupTitle}</p>
+                          <span className="text-xs text-slate-500">{papers.length} 份考卷</span>
+                        </div>
+                        <div className="mt-3 grid gap-3">
+                          {papers.map((paper) => {
+                            const isSelected = settings.selectedPaperKey === paper.key;
+                            const completedCount = completedPaperCounts[paper.key] ?? 0;
+                            const accentClasses =
+                              accent === "amber"
+                                ? isSelected
+                                  ? "border-amber-400 bg-amber-50 ring-2 ring-amber-200"
+                                  : "border-slate-200 bg-white hover:border-amber-200 hover:bg-amber-50/60"
+                                : isSelected
+                                  ? "border-sky-400 bg-sky-50 ring-2 ring-sky-200"
+                                  : "border-slate-200 bg-white hover:border-sky-200 hover:bg-sky-50/60";
 
-                          return (
-                            <button
-                              key={paper.key}
-                              type="button"
-                              onClick={() => updateSettings({ selectedPaperKey: paper.key })}
-                              className={`rounded-2xl border px-4 py-4 text-left transition ${accentClasses}`}
-                            >
-                              <div className="flex flex-wrap items-start justify-between gap-3">
-                                <div>
-                                  <p className="text-sm font-semibold text-ink">{paper.label}</p>
-                                  <p className="mt-1 text-xs text-slate-500">{paper.questionCount} 題完整考卷</p>
+                            return (
+                              <button
+                                key={paper.key}
+                                type="button"
+                                onClick={() => updateSettings({ selectedPaperKey: paper.key })}
+                                className={`rounded-2xl border px-4 py-4 text-left transition ${accentClasses}`}
+                              >
+                                <div className="flex flex-wrap items-start justify-between gap-3">
+                                  <div>
+                                    <p className="text-sm font-semibold text-ink">{paper.label}</p>
+                                    <p className="mt-1 text-xs text-slate-500">{paper.questionCount} 題完整考卷</p>
+                                  </div>
+                                  <div className="flex flex-wrap gap-2">
+                                    {completedCount > 0 ? (
+                                      <span className="rounded-full bg-emerald-100 px-3 py-1 text-xs font-semibold text-emerald-700">
+                                        已做過 {completedCount} 次
+                                      </span>
+                                    ) : (
+                                      <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-500">
+                                        尚未作答
+                                      </span>
+                                    )}
+                                    {isSelected ? (
+                                      <span className="rounded-full bg-brand-600 px-3 py-1 text-xs font-semibold text-white">
+                                        目前選取
+                                      </span>
+                                    ) : null}
+                                  </div>
                                 </div>
-                                <div className="flex flex-wrap gap-2">
-                                  {completedCount > 0 ? (
-                                    <span className="rounded-full bg-emerald-100 px-3 py-1 text-xs font-semibold text-emerald-700">
-                                      已做過 {completedCount} 次
-                                    </span>
-                                  ) : (
-                                    <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-500">
-                                      尚未作答
-                                    </span>
-                                  )}
-                                  {isSelected ? (
-                                    <span className="rounded-full bg-brand-600 px-3 py-1 text-xs font-semibold text-white">
-                                      目前選取
-                                    </span>
-                                  ) : null}
-                                </div>
-                              </div>
-                            </button>
-                          );
-                        })}
+                              </button>
+                            );
+                          })}
+                        </div>
                       </div>
-                    </div>
-                  ))}
+                    ))}
+                  </div>
                 </div>
               ) : null}
               <p className="text-xs leading-6 text-slate-500">
