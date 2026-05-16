@@ -55,10 +55,6 @@ function renderQuestionReview(item: ReviewQuestionItem) {
   return (
     <div className="mt-4 space-y-3 leading-7">
       <p>
-        <span className="font-semibold">testedConcept：</span>
-        {item.question.testedConcept}
-      </p>
-      <p>
         <span className="font-semibold">最後錯因：</span>
         {item.history.latestErrorType ?? "未填"}
       </p>
@@ -105,7 +101,7 @@ function renderRelatedQuestions(question: Question, allQuestions: Question[]) {
       {relatedQuestions.map((relatedQuestion, index) => (
         <details key={`${question.id}-related-${relatedQuestion.id}`} className="rounded-2xl bg-slate-50 p-4">
           <summary className="cursor-pointer font-semibold text-ink">
-            類似題 {index + 1}：{relatedQuestion.testedConcept}
+            類似題 {index + 1}：{relatedQuestion.chapter} / {relatedQuestion.section}
           </summary>
           <div className="mt-3 space-y-3 text-sm leading-7 text-slate-700">
             <p className="font-semibold text-slate-900">
@@ -226,21 +222,6 @@ export function ReviewNotebook({
                         </div>
                       </div>
 
-                      <div className="mt-4 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
-                        <p className="rounded-2xl bg-white px-4 py-3 text-sm text-slate-700">
-                          wrong <span className="font-semibold">{item.history.wrong}</span>
-                        </p>
-                        <p className="rounded-2xl bg-white px-4 py-3 text-sm text-slate-700">
-                          lowConfidence <span className="font-semibold">{item.history.lowConfidence}</span>
-                        </p>
-                        <p className="rounded-2xl bg-white px-4 py-3 text-sm text-slate-700">
-                          overconfidence <span className="font-semibold">{item.history.overconfidence}</span>
-                        </p>
-                        <p className="rounded-2xl bg-white px-4 py-3 text-sm text-slate-700">
-                          riskScore <span className="font-semibold">{item.riskScore}</span>
-                        </p>
-                      </div>
-
                       <details className="mt-4 rounded-2xl bg-white p-4 text-sm text-slate-700">
                         <summary className="cursor-pointer font-semibold text-ink">
                           查看題目、選項與詳解
@@ -295,21 +276,6 @@ export function ReviewNotebook({
                         <div className="rounded-2xl bg-white px-4 py-3 text-sm text-slate-700">
                           最近作答 <span className="font-semibold">{formatTime(item.history.lastAttemptedAt)}</span>
                         </div>
-                      </div>
-
-                      <div className="mt-4 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
-                        <p className="rounded-2xl bg-white px-4 py-3 text-sm text-slate-700">
-                          lowConfidence <span className="font-semibold">{item.history.lowConfidence}</span>
-                        </p>
-                        <p className="rounded-2xl bg-white px-4 py-3 text-sm text-slate-700">
-                          wrong <span className="font-semibold">{item.history.wrong}</span>
-                        </p>
-                        <p className="rounded-2xl bg-white px-4 py-3 text-sm text-slate-700">
-                          overconfidence <span className="font-semibold">{item.history.overconfidence}</span>
-                        </p>
-                        <p className="rounded-2xl bg-white px-4 py-3 text-sm text-slate-700">
-                          riskScore <span className="font-semibold">{item.riskScore}</span>
-                        </p>
                       </div>
 
                       <details className="mt-4 rounded-2xl bg-white p-4 text-sm text-slate-700">
