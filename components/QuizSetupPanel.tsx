@@ -200,7 +200,7 @@ export function QuizSetupPanel({
           <p className="mt-2 text-sm leading-7 text-slate-500">
             {description ??
               (simulationOnly
-                ? "模擬考模式會固定用整份考卷邏輯出題，所以不提供科目、題數、章節與小節篩選，避免把模考做成一般刷題模式。你可以直接選真實考古卷或系統模擬整卷。"
+                ? "模擬考模式會固定用整份考卷邏輯出題，所以不提供科目、題數、章節與小節篩選，避免把模考做成一般刷題模式。先選擇作答後顯示方式，再決定要做系統模擬卷、指定真實考古題，或隨機抽一份真實考古題。"
                 : "現在可切換單科刷題與醫學（一）多科模擬考，並選擇即時看詳解或整份做完再批改。")}
           </p>
         </div>
@@ -308,7 +308,7 @@ export function QuizSetupPanel({
           <div className="rounded-3xl bg-slate-50 p-5">
             <p className="text-sm font-medium text-slate-500">模擬考設定</p>
             <p className="mt-3 text-sm leading-7 text-slate-700">
-              先選擇作答後顯示方式，再決定要做系統模擬卷、指定真實考古題，或隨機抽一份真實考古題。
+              直接在右側調整作答後顯示方式與考卷來源即可開始。
             </p>
           </div>
         )}
