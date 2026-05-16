@@ -31,11 +31,13 @@ function formatUpdatedAt(value: string) {
 function TinyLineChart({
   data,
   tone,
-  valueKey
+  valueKey,
+  title
 }: {
   data: OwnerDailyPoint[];
   tone: "brand" | "amber";
   valueKey: "attempts" | "devices";
+  title: string;
 }) {
   const width = 560;
   const height = 180;
@@ -57,6 +59,10 @@ function TinyLineChart({
 
   return (
     <div className="overflow-hidden rounded-3xl bg-slate-50 p-4">
+      <div className="mb-3 flex items-center justify-between text-xs font-semibold">
+        <span className="text-slate-500">{title}</span>
+        <span style={{ color: stroke }}>最高 {maxValue}</span>
+      </div>
       <svg viewBox={`0 0 ${width} ${height}`} className="h-44 w-full">
         <polygon points={areaPoints} fill={fill} />
         <polyline
@@ -70,7 +76,21 @@ function TinyLineChart({
         {data.map((item, index) => {
           const x = padding + (index / Math.max(data.length - 1, 1)) * innerWidth;
           const y = padding + innerHeight - (item[valueKey] / maxValue) * innerHeight;
-          return <circle key={`${valueKey}-${item.date}`} cx={x} cy={y} r="4.5" fill={stroke} />;
+          return (
+            <g key={`${valueKey}-${item.date}`}>
+              <circle cx={x} cy={y} r="4.5" fill={stroke} />
+              <text
+                x={x}
+                y={Math.max(14, y - 10)}
+                textAnchor="middle"
+                fontSize="11"
+                fontWeight="700"
+                fill={stroke}
+              >
+                {item[valueKey]}
+              </text>
+            </g>
+          );
         })}
       </svg>
       <div className="mt-3 flex justify-between gap-2 overflow-hidden text-[11px] text-slate-500">
@@ -217,14 +237,24 @@ export default function OwnerPage() {
                   <h2 className="text-lg font-semibold text-ink">每日作答題數</h2>
                   <p className="mt-2 text-sm text-slate-500">最近 14 天，大家每天總共做了幾題。</p>
                   <div className="mt-4">
-                    <TinyLineChart data={dailySeries} tone="brand" valueKey="attempts" />
+                    <TinyLineChart
+                      data={dailySeries}
+                      tone="brand"
+                      valueKey="attempts"
+                      title="每日題數"
+                    />
                   </div>
                 </div>
                 <div>
                   <h2 className="text-lg font-semibold text-ink">每日作答裝置數</h2>
                   <p className="mt-2 text-sm text-slate-500">最近 14 天，每天有幾個不同裝置實際作答。</p>
                   <div className="mt-4">
-                    <TinyLineChart data={dailySeries} tone="amber" valueKey="devices" />
+                    <TinyLineChart
+                      data={dailySeries}
+                      tone="amber"
+                      valueKey="devices"
+                      title="每日作答裝置"
+                    />
                   </div>
                 </div>
               </div>
