@@ -41,7 +41,7 @@ export default function SimulationPage() {
           </div>
           <div className="flex flex-wrap gap-3">
             <Link
-              href="/review#simulation-review"
+              href="/simulation-review"
               className="min-h-12 rounded-2xl bg-amber-500 px-5 py-4 text-sm font-semibold text-white transition hover:bg-amber-600"
             >
               查看模擬考錯題庫
