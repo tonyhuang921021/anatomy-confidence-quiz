@@ -1,5 +1,5 @@
 import type { User } from "@supabase/supabase-js";
-import type { LeaderboardEntry, QuizSession, VisitorStats } from "@/types/quiz";
+import type { LeaderboardEntry, QuestionCommunityStats, QuizSession, VisitorStats } from "@/types/quiz";
 import {
   loadCompletedSessions,
   loadCompletedSessionsForUser,
@@ -27,6 +27,22 @@ type LeaderboardRow = {
   correct_attempts: number;
   correct_rate: number;
   total_sessions: number;
+  updated_at?: string | null;
+};
+
+type QuestionAttemptLogRow = {
+  session_id: string;
+  question_id: string;
+  is_correct: boolean;
+  answered_at: string;
+  source_mode: string | null;
+};
+
+type QuestionAccuracyStatRow = {
+  question_id: string;
+  total_attempts: number;
+  correct_attempts: number;
+  correct_rate: number;
   updated_at?: string | null;
 };
 
@@ -125,6 +141,106 @@ function mapLeaderboardRow(row: LeaderboardRow): LeaderboardEntry {
   };
 }
 
+function mapQuestionAccuracyStatRow(row: QuestionAccuracyStatRow): QuestionCommunityStats {
+  return {
+    questionId: row.question_id,
+    totalAttempts: row.total_attempts,
+    correctAttempts: row.correct_attempts,
+    correctRate: Number(row.correct_rate ?? 0),
+    updatedAt: row.updated_at ?? undefined
+  };
+}
+
+function buildQuestionAttemptLogRows(sessions: QuizSession[]): QuestionAttemptLogRow[] {
+  return sessions.flatMap((session) =>
+    session.attempts.map((attempt) => ({
+      session_id: session.id,
+      question_id: attempt.questionId,
+      is_correct: attempt.isCorrect,
+      answered_at: attempt.answeredAt,
+      source_mode: session.settings?.mode ?? null
+    }))
+  );
+}
+
+async function upsertQuestionAttemptLogs(sessions: QuizSession[]) {
+  if (!isSupabaseConfigured() || sessions.length === 0) return;
+
+  const supabase = getSupabaseBrowserClient();
+  const rows = buildQuestionAttemptLogRows(sessions);
+  if (rows.length === 0) return;
+
+  const { error } = await supabase
+    .from("question_attempt_logs")
+    .upsert(rows, { onConflict: "session_id,question_id" });
+
+  if (error) {
+    throw error;
+  }
+}
+
+async function refreshQuestionAccuracyStats(questionIds: string[]) {
+  if (!isSupabaseConfigured() || questionIds.length === 0) return;
+
+  const uniqueQuestionIds = Array.from(new Set(questionIds));
+  const supabase = getSupabaseBrowserClient();
+  const { data, error } = await supabase
+    .from("question_attempt_logs")
+    .select("question_id, is_correct")
+    .in("question_id", uniqueQuestionIds);
+
+  if (error) {
+    throw error;
+  }
+
+  const grouped = new Map<string, { total: number; correct: number }>();
+
+  for (const questionId of uniqueQuestionIds) {
+    grouped.set(questionId, { total: 0, correct: 0 });
+  }
+
+  for (const row of data ?? []) {
+    const current = grouped.get(row.question_id) ?? { total: 0, correct: 0 };
+    current.total += 1;
+    if (row.is_correct) {
+      current.correct += 1;
+    }
+    grouped.set(row.question_id, current);
+  }
+
+  const now = new Date().toISOString();
+  const rows: QuestionAccuracyStatRow[] = uniqueQuestionIds.map((questionId) => {
+    const stats = grouped.get(questionId) ?? { total: 0, correct: 0 };
+    const correctRate =
+      stats.total === 0 ? 0 : Number(((stats.correct / stats.total) * 100).toFixed(1));
+
+    return {
+      question_id: questionId,
+      total_attempts: stats.total,
+      correct_attempts: stats.correct,
+      correct_rate: correctRate,
+      updated_at: now
+    };
+  });
+
+  const { error: upsertError } = await supabase
+    .from("question_accuracy_stats")
+    .upsert(rows, { onConflict: "question_id" });
+
+  if (upsertError) {
+    throw upsertError;
+  }
+}
+
+async function syncQuestionStatsForSessions(sessions: QuizSession[]) {
+  if (sessions.length === 0) return;
+
+  await upsertQuestionAttemptLogs(sessions);
+  await refreshQuestionAccuracyStats(
+    sessions.flatMap((session) => session.attempts.map((attempt) => attempt.questionId))
+  );
+}
+
 async function upsertSessionsForUser(userId: string, sessions: QuizSession[]) {
   if (!isSupabaseConfigured() || sessions.length === 0) return;
 
@@ -174,6 +290,7 @@ export async function syncCompletedSessionsForCurrentUser(userId: string) {
 
   saveCompletedSessions(mergedSessions);
   await upsertSessionsForUser(userId, mergedSessions);
+  await syncQuestionStatsForSessions(mergedSessions);
 
   return mergedSessions;
 }
@@ -182,12 +299,13 @@ export async function pushCompletedSessionToSupabase(session: QuizSession) {
   if (!isSupabaseConfigured()) return;
 
   const supabase = getSupabaseBrowserClient();
-  const {
-    data: { user }
-  } = await supabase.auth.getUser();
+  const { data } = await supabase.auth.getUser();
 
-  if (!user) return;
-  await upsertSessionsForUser(user.id, [session]);
+  if (data.user) {
+    await upsertSessionsForUser(data.user.id, [session]);
+  }
+
+  await syncQuestionStatsForSessions([session]);
 }
 
 export async function syncLeaderboardProfileForCurrentUser(
@@ -260,6 +378,25 @@ export async function loadLeaderboard(limit = 50) {
   }
 
   return (data ?? []).map((row) => mapLeaderboardRow(row as LeaderboardRow));
+}
+
+export async function loadQuestionCommunityStats(questionIds: string[]) {
+  if (!isSupabaseConfigured() || questionIds.length === 0) {
+    return [] as QuestionCommunityStats[];
+  }
+
+  const supabase = getSupabaseBrowserClient();
+  const uniqueQuestionIds = Array.from(new Set(questionIds));
+  const { data, error } = await supabase
+    .from("question_accuracy_stats")
+    .select("question_id, total_attempts, correct_attempts, correct_rate, updated_at")
+    .in("question_id", uniqueQuestionIds);
+
+  if (error) {
+    throw error;
+  }
+
+  return (data ?? []).map((row) => mapQuestionAccuracyStatRow(row as QuestionAccuracyStatRow));
 }
 
 export async function trackVisitorPresence(userId?: string | null) {

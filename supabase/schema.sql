@@ -128,3 +128,95 @@ on public.site_visitors
 for update
 using (true)
 with check (true);
+
+create table if not exists public.question_attempt_logs (
+  session_id text not null,
+  question_id text not null,
+  is_correct boolean not null,
+  answered_at timestamptz not null,
+  source_mode text,
+  created_at timestamptz not null default now(),
+  primary key (session_id, question_id)
+);
+
+create index if not exists question_attempt_logs_question_id_idx
+on public.question_attempt_logs (question_id);
+
+grant select, insert, update
+  on public.question_attempt_logs
+  to anon;
+
+grant select, insert, update, delete
+  on public.question_attempt_logs
+  to authenticated;
+
+grant select, insert, update, delete
+  on public.question_attempt_logs
+  to service_role;
+
+alter table public.question_attempt_logs enable row level security;
+
+drop policy if exists "Anyone can read question attempt logs" on public.question_attempt_logs;
+drop policy if exists "Anyone can insert question attempt logs" on public.question_attempt_logs;
+drop policy if exists "Anyone can update question attempt logs" on public.question_attempt_logs;
+
+create policy "Anyone can read question attempt logs"
+on public.question_attempt_logs
+for select
+using (true);
+
+create policy "Anyone can insert question attempt logs"
+on public.question_attempt_logs
+for insert
+with check (true);
+
+create policy "Anyone can update question attempt logs"
+on public.question_attempt_logs
+for update
+using (true)
+with check (true);
+
+create table if not exists public.question_accuracy_stats (
+  question_id text primary key,
+  total_attempts integer not null default 0,
+  correct_attempts integer not null default 0,
+  correct_rate numeric(5,2) not null default 0,
+  updated_at timestamptz not null default now()
+);
+
+create index if not exists question_accuracy_stats_correct_rate_idx
+on public.question_accuracy_stats (correct_rate desc, total_attempts desc);
+
+grant select
+  on public.question_accuracy_stats
+  to anon;
+
+grant select, insert, update, delete
+  on public.question_accuracy_stats
+  to authenticated;
+
+grant select, insert, update, delete
+  on public.question_accuracy_stats
+  to service_role;
+
+alter table public.question_accuracy_stats enable row level security;
+
+drop policy if exists "Anyone can read question accuracy stats" on public.question_accuracy_stats;
+drop policy if exists "Anyone can insert question accuracy stats" on public.question_accuracy_stats;
+drop policy if exists "Anyone can update question accuracy stats" on public.question_accuracy_stats;
+
+create policy "Anyone can read question accuracy stats"
+on public.question_accuracy_stats
+for select
+using (true);
+
+create policy "Anyone can insert question accuracy stats"
+on public.question_accuracy_stats
+for insert
+with check (true);
+
+create policy "Anyone can update question accuracy stats"
+on public.question_accuracy_stats
+for update
+using (true)
+with check (true);

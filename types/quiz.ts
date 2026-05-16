@@ -216,3 +216,11 @@ export type VisitorStats = {
   onlineVisitors: number;
   updatedAt: string;
 };
+
+export type QuestionCommunityStats = {
+  questionId: string;
+  totalAttempts: number;
+  correctAttempts: number;
+  correctRate: number;
+  updatedAt?: string;
+};
