@@ -14,7 +14,10 @@ import {
   getQuestionsForPastPaper,
   getSeasonalLimitedQuestions
 } from "@/data/med1QuestionBank";
-import { pushCompletedSessionToSupabase } from "@/lib/cloudSync";
+import {
+  pushCompletedSessionToSupabase,
+  pushQuestionStatsSnapshotToSupabase
+} from "@/lib/cloudSync";
 import {
   createQuestionOrder,
   DEFAULT_QUIZ_SETTINGS,
@@ -473,6 +476,7 @@ export default function QuizPage() {
         isReviewingAnswer: false
       };
       persistSession(advancedSession);
+      void pushQuestionStatsSnapshotToSupabase(advancedSession);
       resetQuestionUI();
       window.requestAnimationFrame(() => {
         const target =
@@ -489,6 +493,7 @@ export default function QuizPage() {
     }
 
     persistSession(nextSessionBase);
+    void pushQuestionStatsSnapshotToSupabase(nextSessionBase);
     setSubmittedAttempt(attempt);
     setErrorType(undefined);
   }

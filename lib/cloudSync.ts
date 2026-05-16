@@ -368,6 +368,11 @@ export async function pushCompletedSessionToSupabase(session: QuizSession) {
   await syncQuestionStatsForSessions([session]);
 }
 
+export async function pushQuestionStatsSnapshotToSupabase(session: QuizSession) {
+  if (!isSupabaseConfigured()) return;
+  await syncQuestionStatsForSessions([session]);
+}
+
 export async function syncLeaderboardProfileForCurrentUser(
   user: Pick<User, "id" | "email" | "user_metadata">,
   sessions?: QuizSession[]

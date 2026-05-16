@@ -66,7 +66,7 @@ export default function OwnerPage() {
             <p className="text-sm font-semibold uppercase tracking-[0.2em] text-brand-700">Private Analytics</p>
             <h1 className="mt-2 text-3xl font-bold text-ink sm:text-4xl">私有數據頁</h1>
             <p className="mt-3 text-slate-500">
-              只看你真正需要的數字：訪客裝置、在線估算、同步用戶與最近作答量。
+              只看你真正需要的數字：訪客裝置、作答裝置、同步用戶與最近作答量。
             </p>
           </div>
           <Link
@@ -154,7 +154,7 @@ export default function OwnerPage() {
                 最後更新：<span className="font-semibold text-slate-700">{formatUpdatedAt(stats.updatedAt)}</span>
               </p>
               <p className="mt-2 text-sm text-slate-500">
-                在線估算為最近 2 分鐘內仍有活動的裝置；訪客數以裝置瀏覽器的 visitor id 去重。
+                在線估算為最近 2 分鐘內仍有活動的裝置；作答裝置與題數只統計已同步到雲端的作答。
               </p>
             </section>
           </div>
