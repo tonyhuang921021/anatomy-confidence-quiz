@@ -11,6 +11,7 @@ import { WeaknessRanking } from "@/components/WeaknessRanking";
 import { anatomyQuestions } from "@/data/anatomyQuestions";
 import { subjectRegistry } from "@/data/subjectRegistry";
 import {
+  loadQuestionCommunityStats,
   calculateCompletionStats,
   calculateSectionStats,
   calculateSummary,
@@ -28,7 +29,16 @@ import {
   loadCurrentSession,
   saveQuizSettings
 } from "@/lib/storage";
-import { Attempt, OptionKey, Question, QuizSession, SectionCompletionStats, SectionStats, SummaryStats } from "@/types/quiz";
+import {
+  Attempt,
+  OptionKey,
+  Question,
+  QuestionCommunityStats,
+  QuizSession,
+  SectionCompletionStats,
+  SectionStats,
+  SummaryStats
+} from "@/types/quiz";
 
 const allQuestions = Array.from(
   new Map(
@@ -71,6 +81,7 @@ export default function ResultsPage() {
   const [aiError, setAiError] = useState("");
   const [aiLoading, setAiLoading] = useState(false);
   const [aiModel, setAiModel] = useState("");
+  const [communityStatsMap, setCommunityStatsMap] = useState<Map<string, QuestionCommunityStats>>(new Map());
   const [state, setState] = useState<ResultState>({
     session: null,
     sessions: [],
@@ -119,6 +130,26 @@ export default function ResultsPage() {
     });
     setMounted(true);
   }, [syncVersion]);
+
+  useEffect(() => {
+    async function fetchCommunityStats() {
+      if (!state.session?.attempts.length) {
+        setCommunityStatsMap(new Map());
+        return;
+      }
+
+      try {
+        const stats = await loadQuestionCommunityStats(
+          state.session.attempts.map((attempt) => attempt.questionId)
+        );
+        setCommunityStatsMap(new Map(stats.map((item) => [item.questionId, item] as const)));
+      } catch {
+        setCommunityStatsMap(new Map());
+      }
+    }
+
+    void fetchCommunityStats();
+  }, [state.session]);
 
   function handleRestart() {
     clearCurrentSession();
@@ -219,6 +250,17 @@ export default function ResultsPage() {
       }
       return a.question.chapter.localeCompare(b.question.chapter) || a.question.section.localeCompare(b.question.section);
     });
+
+  function renderCommunityStats(questionId: string) {
+    const stats = communityStatsMap.get(questionId);
+    if (!stats || stats.totalAttempts === 0) return null;
+
+    return (
+      <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-600">
+        全站答對率 {stats.correctRate}% ・ {stats.totalAttempts} 人作答
+      </span>
+    );
+  }
 
   return (
     <main className="shell">
@@ -350,7 +392,12 @@ export default function ResultsPage() {
                     wrongAttempts.map(({ attempt, question }, index) => (
                       <details key={`wrong-${attempt.questionId}`} className="rounded-2xl bg-rose-50 p-4">
                         <summary className="cursor-pointer text-sm font-semibold text-rose-950">
-                          錯題 {index + 1}：{question.chapter} / {question.section} / {question.testedConcept}
+                          <span>
+                            錯題 {index + 1}：{question.chapter} / {question.section} / {question.testedConcept}
+                          </span>
+                          <span className="mt-2 flex flex-wrap gap-2">
+                            {renderCommunityStats(question.id)}
+                          </span>
                         </summary>
                         <div className="mt-4 space-y-3 text-sm leading-7 text-slate-700">
                           <p className="font-semibold text-slate-900">{question.stem}</p>
@@ -411,7 +458,12 @@ export default function ResultsPage() {
                     lowConfidenceAttempts.map(({ attempt, question }, index) => (
                       <details key={`low-confidence-${attempt.questionId}`} className="rounded-2xl bg-amber-50 p-4">
                         <summary className="cursor-pointer text-sm font-semibold text-amber-950">
-                          信心 {attempt.confidence}｜{index + 1}：{question.chapter} / {question.section} / {question.testedConcept}
+                          <span>
+                            信心 {attempt.confidence}｜{index + 1}：{question.chapter} / {question.section} / {question.testedConcept}
+                          </span>
+                          <span className="mt-2 flex flex-wrap gap-2">
+                            {renderCommunityStats(question.id)}
+                          </span>
                         </summary>
                         <div className="mt-4 space-y-3 text-sm leading-7 text-slate-700">
                           <p className="font-semibold text-slate-900">{question.stem}</p>
@@ -471,7 +523,12 @@ export default function ResultsPage() {
                   {reviewedAttempts.map(({ attempt, question }, index) => (
                     <details key={`all-${attempt.questionId}`} className="rounded-2xl bg-slate-50 p-4">
                       <summary className="cursor-pointer text-sm font-semibold text-ink">
-                        第 {index + 1} 題：{attempt.isCorrect ? "答對" : "答錯"} / {question.chapter} / {question.section}
+                        <span>
+                          第 {index + 1} 題：{attempt.isCorrect ? "答對" : "答錯"} / {question.chapter} / {question.section}
+                        </span>
+                        <span className="mt-2 flex flex-wrap gap-2">
+                          {renderCommunityStats(question.id)}
+                        </span>
                       </summary>
                       <div className="mt-4 space-y-3 text-sm leading-7 text-slate-700">
                         <p className="font-semibold text-slate-900">{question.stem}</p>
