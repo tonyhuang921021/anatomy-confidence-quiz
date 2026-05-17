@@ -71,6 +71,9 @@ export default function ResultsPage() {
   const { syncVersion } = useAuth();
   const [mounted, setMounted] = useState(false);
   const [communityStatsMap, setCommunityStatsMap] = useState<Map<string, QuestionCommunityStats>>(new Map());
+  const [generatedExplanations, setGeneratedExplanations] = useState<Record<string, { text: string; model: string }>>({});
+  const [explanationLoadingMap, setExplanationLoadingMap] = useState<Record<string, boolean>>({});
+  const [explanationErrorMap, setExplanationErrorMap] = useState<Record<string, string>>({});
   const [state, setState] = useState<ResultState>({
     session: null,
     sessions: [],
@@ -134,6 +137,68 @@ export default function ResultsPage() {
     router.push("/quiz?new=1");
   }
 
+  async function handleGenerateQuestionExplanation(question: Question, attempt: Attempt) {
+    setExplanationLoadingMap((current) => ({ ...current, [question.id]: true }));
+    setExplanationErrorMap((current) => ({ ...current, [question.id]: "" }));
+
+    try {
+      const response = await fetch("/api/question-explanation", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          question: {
+            id: question.id,
+            subject: question.subject,
+            chapter: question.chapter,
+            section: question.section,
+            stem: question.stem,
+            options: question.options,
+            answer: question.answer,
+            explanation: question.explanation,
+            testedConcept: question.testedConcept
+          },
+          attempt: {
+            selectedAnswer: attempt.selectedAnswer,
+            confidence: attempt.confidence,
+            isCorrect: attempt.isCorrect
+          }
+        })
+      });
+
+      const payload = (await response.json()) as {
+        ok: boolean;
+        explanation?: string;
+        model?: string;
+        message?: string;
+      };
+
+      if (!response.ok || !payload.ok || !payload.explanation) {
+        setExplanationErrorMap((current) => ({
+          ...current,
+          [question.id]: payload.message || "GPT-5-mini 詳解產生失敗。"
+        }));
+        return;
+      }
+
+      setGeneratedExplanations((current) => ({
+        ...current,
+        [question.id]: {
+          text: payload.explanation ?? "",
+          model: payload.model ?? "gpt-5-mini"
+        }
+      }));
+    } catch {
+      setExplanationErrorMap((current) => ({
+        ...current,
+        [question.id]: "無法連線到 GPT-5-mini 詳解 API。"
+      }));
+    } finally {
+      setExplanationLoadingMap((current) => ({ ...current, [question.id]: false }));
+    }
+  }
+
   if (!mounted) {
     return (
       <main className="shell">
@@ -194,6 +259,39 @@ export default function ResultsPage() {
       <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-600">
         全站答對率 {stats.correctRate}% ・ {stats.totalAttempts} 人作答
       </span>
+    );
+  }
+
+  function renderQuestionExplanationControls(question: Question, attempt: Attempt) {
+    const generated = generatedExplanations[question.id];
+    const loading = explanationLoadingMap[question.id];
+    const error = explanationErrorMap[question.id];
+
+    return (
+      <div className="space-y-3">
+        <div className="flex flex-wrap items-center gap-3">
+          <button
+            type="button"
+            onClick={() => void handleGenerateQuestionExplanation(question, attempt)}
+            disabled={loading}
+            className="min-h-10 rounded-2xl bg-slate-900 px-4 py-2 text-sm font-semibold text-white transition hover:bg-black disabled:cursor-wait disabled:opacity-60"
+          >
+            {loading ? "GPT-5-mini 生成中..." : "用 GPT-5-mini 補詳解"}
+          </button>
+          {generated ? (
+            <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-600">
+              {generated.model}
+            </span>
+          ) : null}
+        </div>
+        {error ? <p className="text-sm font-medium text-rose-700">{error}</p> : null}
+        {generated ? (
+          <div className="rounded-2xl bg-slate-900/5 p-4 text-sm leading-7 text-slate-700">
+            <p className="font-semibold text-slate-900">GPT-5-mini 補充詳解</p>
+            <p className="mt-2 whitespace-pre-wrap">{generated.text}</p>
+          </div>
+        ) : null}
+      </div>
     );
   }
 
@@ -264,7 +362,10 @@ export default function ResultsPage() {
                           </span>
                         </summary>
                         <div className="mt-4 space-y-3 text-sm leading-7 text-slate-700">
-                          <p className="font-semibold text-slate-900">{question.stem}</p>
+                          <div className="space-y-3">
+                            <p className="font-semibold text-slate-900">{question.stem}</p>
+                            {renderQuestionExplanationControls(question, attempt)}
+                          </div>
                           <div className="grid gap-3">
                             {getAvailableOptionKeys(question).map((key) => (
                               <div key={`${question.id}-${key}`} className="rounded-2xl bg-white p-4">
@@ -330,7 +431,10 @@ export default function ResultsPage() {
                           </span>
                         </summary>
                         <div className="mt-4 space-y-3 text-sm leading-7 text-slate-700">
-                          <p className="font-semibold text-slate-900">{question.stem}</p>
+                          <div className="space-y-3">
+                            <p className="font-semibold text-slate-900">{question.stem}</p>
+                            {renderQuestionExplanationControls(question, attempt)}
+                          </div>
                           <div className="grid gap-3">
                             {getAvailableOptionKeys(question).map((key) => (
                               <div key={`${question.id}-low-${key}`} className="rounded-2xl bg-white p-4">
@@ -395,7 +499,10 @@ export default function ResultsPage() {
                         </span>
                       </summary>
                       <div className="mt-4 space-y-3 text-sm leading-7 text-slate-700">
-                        <p className="font-semibold text-slate-900">{question.stem}</p>
+                        <div className="space-y-3">
+                          <p className="font-semibold text-slate-900">{question.stem}</p>
+                          {renderQuestionExplanationControls(question, attempt)}
+                        </div>
                         <div className="grid gap-3">
                           {getAvailableOptionKeys(question).map((key) => (
                             <div key={`${question.id}-all-${key}`} className="rounded-2xl bg-white p-4">

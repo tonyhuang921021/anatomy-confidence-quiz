@@ -63,13 +63,17 @@ export async function createOpenAIAnalysis(prompt: string) {
   };
 }
 
-export async function createOpenAIText(prompt: string, maxOutputTokens = 1800) {
+export async function createOpenAIText(
+  prompt: string,
+  maxOutputTokens = 1800,
+  modelOverride?: string
+) {
   const apiKey = process.env.OPENAI_API_KEY;
   if (!apiKey) {
     throw new Error("OPENAI_API_KEY is not configured.");
   }
 
-  const model = process.env.OPENAI_MODEL || "gpt-5.2";
+  const model = modelOverride || process.env.OPENAI_MODEL || "gpt-5.2";
 
   const response = await fetch("https://api.openai.com/v1/responses", {
     method: "POST",
