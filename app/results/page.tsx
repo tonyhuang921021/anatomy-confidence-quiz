@@ -176,8 +176,9 @@ export default function ResultsPage() {
     }))
     .filter((item): item is { attempt: Attempt; question: Question } => Boolean(item.question));
   const wrongAttempts = reviewedAttempts.filter((item) => !item.attempt.isCorrect);
+  const wrongAttemptIds = new Set(wrongAttempts.map((item) => item.attempt.questionId));
   const lowConfidenceAttempts = reviewedAttempts
-    .filter((item) => item.attempt.confidence <= 3)
+    .filter((item) => item.attempt.confidence <= 3 && !wrongAttemptIds.has(item.attempt.questionId))
     .sort((a, b) => {
       if (a.attempt.confidence !== b.attempt.confidence) {
         return a.attempt.confidence - b.attempt.confidence;
