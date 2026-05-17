@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import { AIPromptBox } from "@/components/AIPromptBox";
 import { useAuth } from "@/components/AuthProvider";
 import { ResultSummary } from "@/components/ResultSummary";
 import { WeaknessRanking } from "@/components/WeaknessRanking";
@@ -14,6 +15,7 @@ import {
   calculateSectionStats,
   calculateSummary,
   DEFAULT_QUIZ_SETTINGS,
+  generateAIPrompt,
   getModeLabel,
   getLowCompletionSections,
   getTopWeakSections,
@@ -69,6 +71,7 @@ type ResultState = {
   sessions: QuizSession[];
   summary: SummaryStats | null;
   sectionStats: SectionStats[];
+  promptText: string;
   lowCompletion: SectionCompletionStats[];
   unstableSections: SectionCompletionStats[];
   completionStats: ReturnType<typeof calculateCompletionStats> | null;
@@ -82,11 +85,13 @@ export default function ResultsPage() {
   const [explanationOverrides, setExplanationOverrides] = useState<Record<string, QuestionExplanationOverride>>({});
   const [explanationLoadingMap, setExplanationLoadingMap] = useState<Record<string, boolean>>({});
   const [explanationErrorMap, setExplanationErrorMap] = useState<Record<string, string>>({});
+  const [showPrompt, setShowPrompt] = useState(false);
   const [state, setState] = useState<ResultState>({
     session: null,
     sessions: [],
     summary: null,
     sectionStats: [],
+    promptText: "",
     lowCompletion: [],
     unstableSections: [],
     completionStats: null
@@ -112,6 +117,7 @@ export default function ResultsPage() {
       sessions: completedSessions,
       summary: calculateSummary(currentSession.attempts, currentQuestions),
       sectionStats: sessionSectionStats,
+      promptText: generateAIPrompt(currentSession.attempts, currentQuestions, completedSessions),
       lowCompletion: getLowCompletionSections(completionStats.sections, 5),
       unstableSections: getUnstableCompletedSections(completionStats.sections, 5),
       completionStats
@@ -595,6 +601,7 @@ export default function ResultsPage() {
               </div>
             </div>
           </section>
+          {showPrompt ? <AIPromptBox promptText={state.promptText} /> : null}
           <WeaknessRanking sections={topWeakSections} />
         </div>
 
@@ -629,6 +636,13 @@ export default function ResultsPage() {
               >
                 先看錯題複習頁
               </Link>
+              <button
+                type="button"
+                onClick={() => setShowPrompt((current) => !current)}
+                className="min-h-12 rounded-2xl bg-slate-900 px-4 py-4 text-center text-sm font-semibold text-white transition hover:bg-black"
+              >
+                {showPrompt ? "收起 AI 補弱 Prompt" : "顯示 AI 補弱 Prompt"}
+              </button>
             </div>
           </section>
         </aside>
