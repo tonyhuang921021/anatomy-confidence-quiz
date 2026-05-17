@@ -7,10 +7,7 @@ import { AIPromptBox } from "@/components/AIPromptBox";
 import { useAuth } from "@/components/AuthProvider";
 import { ResultSummary } from "@/components/ResultSummary";
 import { WeaknessRanking } from "@/components/WeaknessRanking";
-import {
-  loadQuestionCommunityStats,
-  loadSharedQuestionExplanationOverrides
-} from "@/lib/cloudSync";
+import { loadSharedQuestionExplanationOverrides } from "@/lib/cloudSync";
 import { anatomyQuestions } from "@/data/anatomyQuestions";
 import { subjectRegistry } from "@/data/subjectRegistry";
 import {
@@ -38,7 +35,6 @@ import {
   Attempt,
   OptionKey,
   Question,
-  QuestionCommunityStats,
   QuestionExplanationOverride,
   QuizSession,
   SectionCompletionStats,
@@ -85,7 +81,6 @@ export default function ResultsPage() {
   const router = useRouter();
   const { syncVersion, session } = useAuth();
   const [mounted, setMounted] = useState(false);
-  const [communityStatsMap, setCommunityStatsMap] = useState<Map<string, QuestionCommunityStats>>(new Map());
   const [explanationOverrides, setExplanationOverrides] = useState<Record<string, QuestionExplanationOverride>>({});
   const [explanationLoadingMap, setExplanationLoadingMap] = useState<Record<string, boolean>>({});
   const [explanationErrorMap, setExplanationErrorMap] = useState<Record<string, string>>({});
@@ -154,26 +149,6 @@ export default function ResultsPage() {
     }
 
     void fetchSharedExplanationOverrides();
-  }, [state.session]);
-
-  useEffect(() => {
-    async function fetchCommunityStats() {
-      if (!state.session?.attempts.length) {
-        setCommunityStatsMap(new Map());
-        return;
-      }
-
-      try {
-        const stats = await loadQuestionCommunityStats(
-          state.session.attempts.map((attempt) => attempt.questionId)
-        );
-        setCommunityStatsMap(new Map(stats.map((item) => [item.questionId, item] as const)));
-      } catch {
-        setCommunityStatsMap(new Map());
-      }
-    }
-
-    void fetchCommunityStats();
   }, [state.session]);
 
   function handleRestart() {
@@ -314,17 +289,6 @@ export default function ResultsPage() {
       return a.question.chapter.localeCompare(b.question.chapter) || a.question.section.localeCompare(b.question.section);
     });
 
-  function renderCommunityStats(questionId: string) {
-    const stats = communityStatsMap.get(questionId);
-    if (!stats || stats.totalAttempts === 0) return null;
-
-    return (
-      <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-600">
-        全站答對率 {stats.correctRate}% ・ {stats.totalAttempts} 人作答
-      </span>
-    );
-  }
-
   function renderQuestionExplanationControls(question: Question, attempt: Attempt) {
     const generated = explanationOverrides[question.id];
     const loading = explanationLoadingMap[question.id];
@@ -377,14 +341,13 @@ export default function ResultsPage() {
   function renderExplanationFooter(question: Question, attempt: Attempt) {
     return (
       <div className="space-y-3">
-        <div className="flex flex-wrap items-center gap-2">
-          {renderCommunityStats(question.id)}
-          {explanationOverrides[question.id] ? (
+        {explanationOverrides[question.id] ? (
+          <div className="flex flex-wrap items-center gap-2">
             <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-600">
               已替換詳解・{explanationOverrides[question.id]?.model ?? "gpt-5-mini"}
             </span>
-          ) : null}
-        </div>
+          </div>
+        ) : null}
         {renderQuestionExplanationControls(question, attempt)}
       </div>
     );

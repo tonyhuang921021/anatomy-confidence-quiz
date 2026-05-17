@@ -3,7 +3,6 @@
 import Link from "next/link";
 import { type ReactNode, useEffect, useState } from "react";
 import {
-  loadQuestionCommunityStats,
   loadSharedQuestionExplanationOverrides
 } from "@/lib/cloudSync";
 import {
@@ -17,7 +16,6 @@ import { useAuth } from "@/components/AuthProvider";
 import {
   OptionKey,
   Question,
-  QuestionCommunityStats,
   QuestionExplanationOverride,
   ReviewQuestionItem
 } from "@/types/quiz";
@@ -195,7 +193,6 @@ export function ReviewNotebook({
   onStartReview
 }: ReviewNotebookProps) {
   const { session } = useAuth();
-  const [communityStatsMap, setCommunityStatsMap] = useState<Map<string, QuestionCommunityStats>>(new Map());
   const [explanationOverrides, setExplanationOverrides] = useState<Record<string, QuestionExplanationOverride>>({});
   const [explanationLoadingMap, setExplanationLoadingMap] = useState<Record<string, boolean>>({});
   const [explanationErrorMap, setExplanationErrorMap] = useState<Record<string, string>>({});
@@ -228,35 +225,6 @@ export function ReviewNotebook({
 
     void fetchSharedExplanationOverrides();
   }, [items]);
-
-  useEffect(() => {
-    async function fetchCommunityStats() {
-      if (items.length === 0) {
-        setCommunityStatsMap(new Map());
-        return;
-      }
-
-      try {
-        const stats = await loadQuestionCommunityStats(items.map((item) => item.question.id));
-        setCommunityStatsMap(new Map(stats.map((item) => [item.questionId, item] as const)));
-      } catch {
-        setCommunityStatsMap(new Map());
-      }
-    }
-
-    void fetchCommunityStats();
-  }, [items]);
-
-  function renderCommunityStats(questionId: string) {
-    const stats = communityStatsMap.get(questionId);
-    if (!stats || stats.totalAttempts === 0) return null;
-
-    return (
-      <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-600">
-        全站答對率 {stats.correctRate}%
-      </span>
-    );
-  }
 
   async function handleGenerateQuestionExplanation(question: Question) {
     if (!session?.access_token) {
@@ -345,14 +313,13 @@ export function ReviewNotebook({
 
     return (
       <div className="space-y-3">
-        <div className="flex flex-wrap items-center gap-2">
-          {renderCommunityStats(question.id)}
-          {override ? (
+        {override ? (
+          <div className="flex flex-wrap items-center gap-2">
             <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-600">
               已替換詳解・{override.model ?? "gpt-5-mini"}
             </span>
-          ) : null}
-        </div>
+          </div>
+        ) : null}
         {!override ? (
           <button
             type="button"
@@ -422,7 +389,6 @@ export function ReviewNotebook({
                             <span className="text-sm text-slate-500">
                               {item.question.chapter} / {item.question.section}
                             </span>
-                            {renderCommunityStats(item.question.id)}
                           </div>
                           <h4 className="mt-3 break-words text-lg font-semibold leading-8 text-ink">
                             {item.question.stem}
@@ -486,7 +452,6 @@ export function ReviewNotebook({
                             <span className="text-sm text-slate-500">
                               {item.question.chapter} / {item.question.section}
                             </span>
-                            {renderCommunityStats(item.question.id)}
                           </div>
                           <h4 className="mt-3 break-words text-lg font-semibold leading-8 text-ink">
                             {item.question.stem}
