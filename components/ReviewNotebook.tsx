@@ -1,9 +1,22 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { type ReactNode, useEffect, useState } from "react";
 import { loadQuestionCommunityStats } from "@/lib/cloudSync";
-import { OptionKey, Question, QuestionCommunityStats, ReviewQuestionItem } from "@/types/quiz";
+import {
+  applyQuestionExplanationOverride,
+  loadQuestionExplanationOverrides,
+  saveQuestionExplanationOverride
+} from "@/lib/storage";
+import { getOrCreateVisitorId } from "@/lib/visitor";
+import { useAuth } from "@/components/AuthProvider";
+import {
+  OptionKey,
+  Question,
+  QuestionCommunityStats,
+  QuestionExplanationOverride,
+  ReviewQuestionItem
+} from "@/types/quiz";
 
 function formatTime(value?: string) {
   if (!value) return "尚未作答";
@@ -55,7 +68,11 @@ function getRelatedQuestions(currentQuestion: Question, allQuestions: Question[]
   return [...sameConcept, ...sameSection].slice(0, limit);
 }
 
-function renderQuestionReview(item: ReviewQuestionItem) {
+function renderQuestionReview(
+  item: ReviewQuestionItem,
+  renderedQuestion: Question,
+  footer: ReactNode
+) {
   return (
     <div className="mt-4 space-y-3 leading-7">
       <p>
@@ -66,25 +83,40 @@ function renderQuestionReview(item: ReviewQuestionItem) {
         {getOptionKeys(item).map((key) => (
           <div key={`${item.question.id}-${key}`} className="rounded-2xl bg-slate-50 p-4">
             <p className="font-semibold text-slate-900">
-              {key}. {item.question.options[key]}
+              {key}. {renderedQuestion.options[key]}
             </p>
           </div>
         ))}
       </div>
       <p>
         <span className="font-semibold">正確答案：</span>
-        {item.question.answer}
+        {renderedQuestion.answer}
       </p>
       <p>
         <span className="font-semibold">重點解析：</span>
-        {item.question.explanation}
+        {renderedQuestion.explanation}
       </p>
-      {item.question.memoryTip ? (
+      {renderedQuestion.optionAnalysis ? (
+        <div className="grid gap-3">
+          {getOptionKeysFromQuestion(renderedQuestion).map((key) => {
+            const text = renderedQuestion.optionAnalysis?.[key];
+            if (!text) return null;
+            return (
+              <div key={`${renderedQuestion.id}-analysis-${key}`} className="rounded-2xl bg-slate-50 p-4">
+                <p className="font-semibold text-slate-900">{key} 選項解析</p>
+                <p className="mt-1 leading-7 text-slate-700">{text}</p>
+              </div>
+            );
+          })}
+        </div>
+      ) : null}
+      {renderedQuestion.memoryTip ? (
         <p>
           <span className="font-semibold">快速記憶法：</span>
-          {item.question.memoryTip}
+          {renderedQuestion.memoryTip}
         </p>
       ) : null}
+      {footer}
     </div>
   );
 }
@@ -158,9 +190,17 @@ export function ReviewNotebook({
   startHref = "/quiz?new=1",
   onStartReview
 }: ReviewNotebookProps) {
+  const { session } = useAuth();
   const [communityStatsMap, setCommunityStatsMap] = useState<Map<string, QuestionCommunityStats>>(new Map());
+  const [explanationOverrides, setExplanationOverrides] = useState<Record<string, QuestionExplanationOverride>>({});
+  const [explanationLoadingMap, setExplanationLoadingMap] = useState<Record<string, boolean>>({});
+  const [explanationErrorMap, setExplanationErrorMap] = useState<Record<string, string>>({});
   const wrongItems = sortByRecent(items.filter((item) => item.history.wrong > 0));
   const lowConfidenceItems = sortByRecent(items.filter((item) => item.history.lowConfidence > 0));
+
+  useEffect(() => {
+    setExplanationOverrides(loadQuestionExplanationOverrides());
+  }, [items]);
 
   useEffect(() => {
     async function fetchCommunityStats() {
@@ -188,6 +228,108 @@ export function ReviewNotebook({
       <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-600">
         全站答對率 {stats.correctRate}%
       </span>
+    );
+  }
+
+  async function handleGenerateQuestionExplanation(question: Question) {
+    setExplanationLoadingMap((current) => ({ ...current, [question.id]: true }));
+    setExplanationErrorMap((current) => ({ ...current, [question.id]: "" }));
+
+    try {
+      const response = await fetch("/api/question-explanation", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          visitorId: getOrCreateVisitorId(),
+          accessToken: session?.access_token ?? null,
+          question: {
+            id: question.id,
+            subject: question.subject,
+            chapter: question.chapter,
+            section: question.section,
+            stem: question.stem,
+            options: question.options,
+            answer: question.answer,
+            explanation: question.explanation,
+            testedConcept: question.testedConcept
+          },
+          attempt: {
+            selectedAnswer: question.answer,
+            confidence: 3,
+            isCorrect: false
+          }
+        })
+      });
+
+      const payload = (await response.json()) as {
+        ok: boolean;
+        explanation?: string;
+        optionAnalysis?: Partial<Record<OptionKey, string>>;
+        memoryTip?: string;
+        model?: string;
+        message?: string;
+      };
+
+      if (!response.ok || !payload.ok || !payload.explanation) {
+        setExplanationErrorMap((current) => ({
+          ...current,
+          [question.id]: payload.message || "GPT-5-mini 詳解產生失敗。"
+        }));
+        return;
+      }
+
+      const override: QuestionExplanationOverride = {
+        explanation: payload.explanation ?? "",
+        optionAnalysis: payload.optionAnalysis ?? {},
+        memoryTip: payload.memoryTip ?? "",
+        model: payload.model ?? "gpt-5-mini",
+        updatedAt: new Date().toISOString()
+      };
+
+      saveQuestionExplanationOverride(question.id, override);
+      setExplanationOverrides((current) => ({
+        ...current,
+        [question.id]: override
+      }));
+    } catch {
+      setExplanationErrorMap((current) => ({
+        ...current,
+        [question.id]: "無法連線到 GPT-5-mini 詳解 API。"
+      }));
+    } finally {
+      setExplanationLoadingMap((current) => ({ ...current, [question.id]: false }));
+    }
+  }
+
+  function renderExplanationFooter(question: Question) {
+    const override = explanationOverrides[question.id];
+    const loading = explanationLoadingMap[question.id];
+    const error = explanationErrorMap[question.id];
+
+    return (
+      <div className="space-y-3">
+        <div className="flex flex-wrap items-center gap-2">
+          {renderCommunityStats(question.id)}
+          {override ? (
+            <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-600">
+              已替換詳解・{override.model ?? "gpt-5-mini"}
+            </span>
+          ) : null}
+        </div>
+        {!override ? (
+          <button
+            type="button"
+            onClick={() => void handleGenerateQuestionExplanation(question)}
+            disabled={loading}
+            className="min-h-10 rounded-2xl bg-slate-900 px-4 py-2 text-sm font-semibold text-white transition hover:bg-black disabled:cursor-wait disabled:opacity-60"
+          >
+            {loading ? "GPT-5-mini 生成中..." : "用 GPT-5-mini 補詳解"}
+          </button>
+        ) : null}
+        {error ? <p className="text-sm font-medium text-rose-700">{error}</p> : null}
+      </div>
     );
   }
 
@@ -232,6 +374,10 @@ export function ReviewNotebook({
                       key={`wrong-${item.question.id}`}
                       className="rounded-3xl border border-rose-200 bg-rose-50/60 p-5"
                     >
+                      {(() => {
+                        const renderedQuestion = applyQuestionExplanationOverride(item.question);
+                        return (
+                          <>
                       <div className="flex flex-wrap items-start justify-between gap-4">
                         <div className="min-w-0 flex-1">
                           <div className="flex flex-wrap items-center gap-3">
@@ -256,7 +402,7 @@ export function ReviewNotebook({
                         <summary className="cursor-pointer font-semibold text-ink">
                           查看題目、選項與詳解
                         </summary>
-                        {renderQuestionReview(item)}
+                        {renderQuestionReview(item, renderedQuestion, renderExplanationFooter(renderedQuestion))}
                       </details>
 
                       <details className="mt-4 rounded-2xl bg-white p-4 text-sm text-slate-700">
@@ -265,6 +411,9 @@ export function ReviewNotebook({
                         </summary>
                         {renderRelatedQuestions(item.question, allQuestions)}
                       </details>
+                          </>
+                        );
+                      })()}
                     </article>
                   ))
                 )}
@@ -289,6 +438,10 @@ export function ReviewNotebook({
                       key={`low-${item.question.id}`}
                       className="rounded-3xl border border-amber-200 bg-amber-50/70 p-5"
                     >
+                      {(() => {
+                        const renderedQuestion = applyQuestionExplanationOverride(item.question);
+                        return (
+                          <>
                       <div className="flex flex-wrap items-start justify-between gap-4">
                         <div className="min-w-0 flex-1">
                           <div className="flex flex-wrap items-center gap-3">
@@ -313,7 +466,7 @@ export function ReviewNotebook({
                         <summary className="cursor-pointer font-semibold text-ink">
                           查看題目、選項與詳解
                         </summary>
-                        {renderQuestionReview(item)}
+                        {renderQuestionReview(item, renderedQuestion, renderExplanationFooter(renderedQuestion))}
                       </details>
 
                       <details className="mt-4 rounded-2xl bg-white p-4 text-sm text-slate-700">
@@ -322,6 +475,9 @@ export function ReviewNotebook({
                         </summary>
                         {renderRelatedQuestions(item.question, allQuestions)}
                       </details>
+                          </>
+                        );
+                      })()}
                     </article>
                   ))
                 )}
