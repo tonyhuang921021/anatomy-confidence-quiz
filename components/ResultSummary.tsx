@@ -8,8 +8,6 @@ const cards = (summary: SummaryStats) => [
   { label: "總題數", value: summary.total, tone: "slate" },
   { label: "答對題數", value: summary.correct, tone: "emerald" },
   { label: "答對率", value: `${summary.correctRate}%`, tone: "brand" },
-  { label: "平均信心", value: summary.averageConfidence, tone: "amber" },
-  { label: "錯誤自信數", value: summary.overconfidenceCount, tone: "rose" },
   { label: "猜對風險數", value: summary.guessRiskCount, tone: "yellow" },
   { label: "優先補弱數", value: summary.priorityWeaknessCount, tone: "orange" }
 ];
