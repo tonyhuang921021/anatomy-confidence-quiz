@@ -313,6 +313,42 @@ export default function ResultsPage() {
     );
   }
 
+  function renderOptionAnalysis(question: Question) {
+    if (!question.optionAnalysis || Object.keys(question.optionAnalysis).length === 0) return null;
+
+    return (
+      <div className="grid gap-3">
+        {getAvailableOptionKeys(question).map((key) => {
+          const text = question.optionAnalysis?.[key];
+          if (!text) return null;
+
+          return (
+            <div key={`${question.id}-option-analysis-${key}`} className="rounded-2xl bg-white p-4">
+              <p className="font-semibold text-slate-900">{key} 選項解析</p>
+              <p className="mt-1 leading-7 text-slate-700">{text}</p>
+            </div>
+          );
+        })}
+      </div>
+    );
+  }
+
+  function renderExplanationFooter(question: Question, attempt: Attempt) {
+    return (
+      <div className="space-y-3">
+        <div className="flex flex-wrap items-center gap-2">
+          {renderCommunityStats(question.id)}
+          {explanationOverrides[question.id] ? (
+            <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-600">
+              已替換詳解・{explanationOverrides[question.id]?.model ?? "gpt-5-mini"}
+            </span>
+          ) : null}
+        </div>
+        {renderQuestionExplanationControls(question, attempt)}
+      </div>
+    );
+  }
+
   return (
     <main className="shell">
       <div className="flex flex-wrap items-center justify-between gap-3">
@@ -375,15 +411,9 @@ export default function ResultsPage() {
                           <span>
                             錯題 {index + 1}：{question.chapter} / {question.section} / {question.testedConcept}
                           </span>
-                          <span className="mt-2 flex flex-wrap gap-2">
-                            {renderCommunityStats(question.id)}
-                          </span>
                         </summary>
                         <div className="mt-4 space-y-3 text-sm leading-7 text-slate-700">
-                          <div className="space-y-3">
-                            <p className="font-semibold text-slate-900">{question.stem}</p>
-                            {renderQuestionExplanationControls(question, attempt)}
-                          </div>
+                          <p className="font-semibold text-slate-900">{question.stem}</p>
                           <div className="grid gap-3">
                             {getAvailableOptionKeys(question).map((key) => (
                               <div key={`${question.id}-${key}`} className="rounded-2xl bg-white p-4">
@@ -417,12 +447,14 @@ export default function ResultsPage() {
                             <span className="font-semibold">詳解：</span>
                             {question.explanation}
                           </p>
+                          {renderOptionAnalysis(question)}
                           {question.memoryTip ? (
                             <p>
                               <span className="font-semibold">快速記憶法：</span>
                               {question.memoryTip}
                             </p>
                           ) : null}
+                          {renderExplanationFooter(question, attempt)}
                         </div>
                       </details>
                     ))
@@ -444,15 +476,9 @@ export default function ResultsPage() {
                           <span>
                             信心 {attempt.confidence}｜{index + 1}：{question.chapter} / {question.section} / {question.testedConcept}
                           </span>
-                          <span className="mt-2 flex flex-wrap gap-2">
-                            {renderCommunityStats(question.id)}
-                          </span>
                         </summary>
                         <div className="mt-4 space-y-3 text-sm leading-7 text-slate-700">
-                          <div className="space-y-3">
-                            <p className="font-semibold text-slate-900">{question.stem}</p>
-                            {renderQuestionExplanationControls(question, attempt)}
-                          </div>
+                          <p className="font-semibold text-slate-900">{question.stem}</p>
                           <div className="grid gap-3">
                             {getAvailableOptionKeys(question).map((key) => (
                               <div key={`${question.id}-low-${key}`} className="rounded-2xl bg-white p-4">
@@ -490,12 +516,14 @@ export default function ResultsPage() {
                             <span className="font-semibold">詳解：</span>
                             {question.explanation}
                           </p>
+                          {renderOptionAnalysis(question)}
                           {question.memoryTip ? (
                             <p>
                               <span className="font-semibold">快速記憶法：</span>
                               {question.memoryTip}
                             </p>
                           ) : null}
+                          {renderExplanationFooter(question, attempt)}
                         </div>
                       </details>
                     ))
@@ -512,15 +540,9 @@ export default function ResultsPage() {
                         <span>
                           第 {index + 1} 題：{attempt.isCorrect ? "答對" : "答錯"} / {question.chapter} / {question.section}
                         </span>
-                        <span className="mt-2 flex flex-wrap gap-2">
-                          {renderCommunityStats(question.id)}
-                        </span>
                       </summary>
                       <div className="mt-4 space-y-3 text-sm leading-7 text-slate-700">
-                        <div className="space-y-3">
-                          <p className="font-semibold text-slate-900">{question.stem}</p>
-                          {renderQuestionExplanationControls(question, attempt)}
-                        </div>
+                        <p className="font-semibold text-slate-900">{question.stem}</p>
                         <div className="grid gap-3">
                           {getAvailableOptionKeys(question).map((key) => (
                             <div key={`${question.id}-all-${key}`} className="rounded-2xl bg-white p-4">
@@ -558,12 +580,14 @@ export default function ResultsPage() {
                           <span className="font-semibold">詳解：</span>
                           {question.explanation}
                         </p>
+                        {renderOptionAnalysis(question)}
                         {question.memoryTip ? (
                           <p>
                             <span className="font-semibold">快速記憶法：</span>
                             {question.memoryTip}
                           </p>
                         ) : null}
+                        {renderExplanationFooter(question, attempt)}
                       </div>
                     </details>
                   ))}
