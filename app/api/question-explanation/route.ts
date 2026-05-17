@@ -44,6 +44,32 @@ type UsageLogRow = {
 const HOURLY_LIMIT = 30;
 const DAILY_LIMIT = 100;
 
+function formatUnknownError(error: unknown) {
+  if (error instanceof Error && error.message.trim()) {
+    return error.message.trim();
+  }
+
+  if (error && typeof error === "object") {
+    const record = error as Record<string, unknown>;
+    const parts = [
+      typeof record.message === "string" ? record.message.trim() : "",
+      typeof record.details === "string" ? record.details.trim() : "",
+      typeof record.hint === "string" ? record.hint.trim() : "",
+      typeof record.code === "string" ? `code: ${record.code.trim()}` : ""
+    ].filter(Boolean);
+
+    if (parts.length > 0) {
+      return parts.join(" | ");
+    }
+  }
+
+  if (typeof error === "string" && error.trim()) {
+    return error.trim();
+  }
+
+  return "GPT-5-mini 詳解產生失敗。";
+}
+
 function getAllowedBypassEmails() {
   return (process.env.AI_EXPLANATION_BYPASS_EMAILS || process.env.NEXT_PUBLIC_ADMIN_EMAILS || "")
     .split(",")
@@ -438,7 +464,7 @@ export async function POST(request: NextRequest) {
       {
         ok: false,
         configured: true,
-        message: error instanceof Error ? error.message : "GPT-5-mini 詳解產生失敗。"
+        message: formatUnknownError(error)
       },
       { status: 500 }
     );
