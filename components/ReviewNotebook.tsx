@@ -92,7 +92,10 @@ function renderQuestionReview(
       </div>
       <p>
         <span className="font-semibold">正確答案：</span>
-        {renderedQuestion.answer}
+        {renderedQuestion.answerCreditType === "multiple_accepted" &&
+        renderedQuestion.acceptedAnswers?.length
+          ? renderedQuestion.acceptedAnswers.join(" / ")
+          : renderedQuestion.answer}
       </p>
       <p>
         <span className="font-semibold">重點解析：</span>
@@ -154,7 +157,10 @@ function renderRelatedQuestions(question: Question, allQuestions: Question[]) {
             </div>
             <p>
               <span className="font-semibold">正確答案：</span>
-              {relatedQuestion.answer}
+              {relatedQuestion.answerCreditType === "multiple_accepted" &&
+              relatedQuestion.acceptedAnswers?.length
+                ? relatedQuestion.acceptedAnswers.join(" / ")
+                : relatedQuestion.answer}
             </p>
             <p>
               <span className="font-semibold">詳解：</span>
@@ -255,6 +261,8 @@ export function ReviewNotebook({
             stem: question.stem,
             options: question.options,
             answer: question.answer,
+            acceptedAnswers: question.acceptedAnswers,
+            answerCreditType: question.answerCreditType,
             explanation: question.explanation,
             testedConcept: question.testedConcept
           },

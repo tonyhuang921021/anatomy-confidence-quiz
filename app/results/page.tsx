@@ -186,6 +186,8 @@ export default function ResultsPage() {
             stem: question.stem,
             options: question.options,
             answer: question.answer,
+            acceptedAnswers: question.acceptedAnswers,
+            answerCreditType: question.answerCreditType,
             explanation: question.explanation,
             testedConcept: question.testedConcept
           },

@@ -36,6 +36,17 @@ function formatUpdatedAt(value: string) {
   });
 }
 
+const GPT_5_MINI_INPUT_USD_PER_MILLION = 0.25;
+const GPT_5_MINI_OUTPUT_USD_PER_MILLION = 2.0;
+const APPROX_USD_TO_TWD = 32.5;
+
+function estimateTwdFromTokens(inputTokens: number, outputTokens: number) {
+  const usd =
+    (inputTokens * GPT_5_MINI_INPUT_USD_PER_MILLION) / 1_000_000 +
+    (outputTokens * GPT_5_MINI_OUTPUT_USD_PER_MILLION) / 1_000_000;
+  return usd * APPROX_USD_TO_TWD;
+}
+
 function TinyLineChart({
   data,
   tone,
@@ -151,6 +162,42 @@ export default function OwnerPage() {
     void fetchStats();
   }, [allowed, configured, user]);
 
+  useEffect(() => {
+    if (!configured || !user || !allowed) return;
+
+    const refresh = async () => {
+      try {
+        const [nextStats, nextSeries, nextExplanationUsage] = await Promise.all([
+          loadOwnerDashboardStats(),
+          loadOwnerDailySeries(14),
+          loadOwnerExplanationUsage()
+        ]);
+        setStats(nextStats);
+        setDailySeries(nextSeries);
+        setExplanationUsage(nextExplanationUsage);
+      } catch {
+        // keep existing view
+      }
+    };
+
+    const intervalId = window.setInterval(() => {
+      void refresh();
+    }, 30000);
+
+    const handleFocus = () => {
+      void refresh();
+    };
+
+    window.addEventListener("focus", handleFocus);
+    document.addEventListener("visibilitychange", handleFocus);
+
+    return () => {
+      window.clearInterval(intervalId);
+      window.removeEventListener("focus", handleFocus);
+      document.removeEventListener("visibilitychange", handleFocus);
+    };
+  }, [allowed, configured, user]);
+
   return (
     <main className="shell">
       <section className="rounded-[2rem] bg-white p-6 shadow-card ring-1 ring-slate-100 sm:p-8">
@@ -256,6 +303,12 @@ export default function OwnerPage() {
                 <p className="text-sm text-slate-500">AI 詳解累積總 Tokens</p>
                 <p className="mt-2 text-3xl font-bold text-ink">{stats.aiExplanationTotalTokens.toLocaleString()}</p>
               </article>
+              <article className="rounded-3xl bg-white p-5 shadow-card ring-1 ring-slate-100">
+                <p className="text-sm text-slate-500">AI 詳解累積約台幣</p>
+                <p className="mt-2 text-3xl font-bold text-ink">
+                  NT$ {estimateTwdFromTokens(stats.aiExplanationInputTokens, stats.aiExplanationOutputTokens).toFixed(2)}
+                </p>
+              </article>
             </div>
 
             <section className="rounded-[2rem] bg-white p-6 shadow-card ring-1 ring-slate-100">
@@ -303,13 +356,14 @@ export default function OwnerPage() {
                       <th className="px-3 py-3 font-semibold">Input</th>
                       <th className="px-3 py-3 font-semibold">Output</th>
                       <th className="px-3 py-3 font-semibold">總 Tokens</th>
+                      <th className="px-3 py-3 font-semibold">約台幣</th>
                       <th className="px-3 py-3 font-semibold">最後使用</th>
                     </tr>
                   </thead>
                   <tbody>
                     {explanationUsage.length === 0 ? (
                       <tr>
-                        <td colSpan={6} className="px-3 py-6 text-center text-slate-500">
+                        <td colSpan={7} className="px-3 py-6 text-center text-slate-500">
                           目前還沒有 AI 詳解使用紀錄。
                         </td>
                       </tr>
@@ -321,6 +375,9 @@ export default function OwnerPage() {
                           <td className="px-3 py-3 text-slate-700">{entry.inputTokens.toLocaleString()}</td>
                           <td className="px-3 py-3 text-slate-700">{entry.outputTokens.toLocaleString()}</td>
                           <td className="px-3 py-3 text-slate-700">{entry.totalTokens.toLocaleString()}</td>
+                          <td className="px-3 py-3 text-slate-700">
+                            NT$ {estimateTwdFromTokens(entry.inputTokens, entry.outputTokens).toFixed(2)}
+                          </td>
                           <td className="px-3 py-3 text-slate-500">
                             {entry.lastUsedAt ? formatUpdatedAt(entry.lastUsedAt) : "—"}
                           </td>
@@ -338,6 +395,9 @@ export default function OwnerPage() {
               </p>
               <p className="mt-2 text-sm text-slate-500">
                 在線估算為最近 2 分鐘內仍有活動的裝置；作答裝置與題數只統計已同步到雲端的作答。
+              </p>
+              <p className="mt-2 text-sm text-slate-500">
+                AI 詳解台幣換算使用 GPT-5-mini 目前價格估算，並以 1 USD ≈ 32.5 TWD 粗估。
               </p>
             </section>
           </div>

@@ -13,6 +13,8 @@ type QuestionExplanationRequestBody = {
     stem?: string;
     options?: Record<string, string | undefined>;
     answer?: string;
+    acceptedAnswers?: string[];
+    answerCreditType?: string;
     explanation?: string;
     testedConcept?: string;
   };
@@ -43,6 +45,17 @@ type UsageLogRow = {
 
 const HOURLY_LIMIT = 30;
 const DAILY_LIMIT = 100;
+const GPT_5_MINI_MAX_OUTPUT_TOKENS = 2600;
+
+function isOptionKey(value: string) {
+  return ["A", "B", "C", "D", "E"].includes(value);
+}
+
+function getRequiredOptionKeys(options?: Record<string, string | undefined>) {
+  return Object.entries(options ?? {})
+    .filter(([key, value]) => isOptionKey(key) && typeof value === "string" && value.trim())
+    .map(([key]) => key);
+}
 
 function formatUnknownError(error: unknown) {
   if (error instanceof Error && error.message.trim()) {
@@ -206,11 +219,19 @@ async function upsertSharedExplanationOverride(
 function buildQuestionExplanationPrompt(body: QuestionExplanationRequestBody) {
   const question = body.question;
   const attempt = body.attempt;
+  const optionKeys = getRequiredOptionKeys(question?.options);
+  const correctAnswerText =
+    question?.answerCreditType === "multiple_accepted" && (question.acceptedAnswers?.length ?? 0) > 0
+      ? question.acceptedAnswers?.join(" / ")
+      : question?.answer ?? "";
 
   return [
     "你是台灣醫學系國考家教，請用繁體中文寫一份詳盡但好讀的單題解析。",
     "請嚴格只解釋這一題，不要延伸太多無關內容。",
     "請只輸出 JSON，不要輸出 markdown，不要輸出 code block。",
+    "請務必為本題每一個實際存在的選項都提供 optionAnalysis，不能漏掉任何一個選項。",
+    "optionAnalysis 只能出現 A、B、C、D、E 這些選項鍵，不可以出現 explanation、summary、note 等額外 key。",
+    "如果本題是多重給分，請在主詳解中清楚說明任一個可接受答案都算對。",
     "",
     "JSON 格式：",
     "{",
@@ -234,13 +255,25 @@ function buildQuestionExplanationPrompt(body: QuestionExplanationRequestBody) {
     "選項：",
     ...Object.entries(question?.options ?? {}).map(([key, value]) => `${key}. ${value ?? ""}`),
     "",
-    `正確答案：${question?.answer ?? ""}`,
+    `本題實際存在的選項鍵：${optionKeys.join(", ")}`,
+    `正確答案：${correctAnswerText}`,
+    `判分方式：${question?.answerCreditType ?? "standard"}`,
     `使用者答案：${attempt?.selectedAnswer ?? "未作答"}`,
     `使用者信心：${attempt?.confidence ?? "未提供"}`,
     `是否答對：${attempt?.isCorrect ? "答對" : "答錯"}`,
     "",
     `現有解析：${question?.explanation ?? ""}`
   ].join("\n");
+}
+
+function hasCompleteOptionAnalysis(
+  payload: ParsedExplanationPayload | null,
+  options?: Record<string, string | undefined>
+) {
+  if (!payload?.explanation) return false;
+  const requiredKeys = getRequiredOptionKeys(options);
+  if (requiredKeys.length === 0) return true;
+  return requiredKeys.every((key) => Boolean(payload.optionAnalysis?.[key]?.trim()));
 }
 
 function normalizeOptionAnalysis(value: unknown) {
@@ -259,7 +292,7 @@ function normalizeOptionAnalysis(value: unknown) {
               : typeof record.text === "string"
                 ? record.text.trim()
                 : "";
-          if (!key || !text) return null;
+          if (!key || !text || !isOptionKey(key)) return null;
           return [key, text] as const;
         })
         .filter((entry): entry is readonly [string, string] => Boolean(entry))
@@ -272,7 +305,7 @@ function normalizeOptionAnalysis(value: unknown) {
         if (typeof item !== "string") return null;
         const normalizedKey = key.trim().toUpperCase();
         const normalizedValue = item.trim();
-        if (!normalizedKey || !normalizedValue) return null;
+        if (!normalizedKey || !normalizedValue || !isOptionKey(normalizedKey)) return null;
         return [normalizedKey, normalizedValue] as const;
       })
       .filter((entry): entry is readonly [string, string] => Boolean(entry))
@@ -419,8 +452,20 @@ export async function POST(request: NextRequest) {
     }
 
     const prompt = buildQuestionExplanationPrompt(body);
-    const result = await createOpenAIText(prompt, 1400, "gpt-5-mini");
-    const parsed = parseExplanationPayload(result.text);
+    let result = await createOpenAIText(prompt, GPT_5_MINI_MAX_OUTPUT_TOKENS, "gpt-5-mini");
+    let parsed = parseExplanationPayload(result.text);
+
+    if (!hasCompleteOptionAnalysis(parsed, body.question?.options)) {
+      const retryPrompt = [
+        prompt,
+        "",
+        "上一版輸出不完整。",
+        "請重新輸出完整 JSON，並確保每一個實際存在的選項都各有一段 optionAnalysis。",
+        "不要截斷，不要加入任何 A-E 以外的 key。"
+      ].join("\n");
+      result = await createOpenAIText(retryPrompt, GPT_5_MINI_MAX_OUTPUT_TOKENS, "gpt-5-mini");
+      parsed = parseExplanationPayload(result.text);
+    }
 
     if (!parsed?.explanation) {
       return NextResponse.json(
