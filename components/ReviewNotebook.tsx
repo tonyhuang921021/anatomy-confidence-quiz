@@ -307,6 +307,7 @@ export function ReviewNotebook({
     const override = explanationOverrides[question.id];
     const loading = explanationLoadingMap[question.id];
     const error = explanationErrorMap[question.id];
+    const canUseAIExplanation = Boolean(session?.access_token);
 
     return (
       <div className="space-y-3">
@@ -318,7 +319,7 @@ export function ReviewNotebook({
             </span>
           ) : null}
         </div>
-        {!override ? (
+        {!override && canUseAIExplanation ? (
           <button
             type="button"
             onClick={() => void handleGenerateQuestionExplanation(question)}
@@ -327,6 +328,11 @@ export function ReviewNotebook({
           >
             {loading ? "GPT-5-mini 生成中..." : "用 GPT-5-mini 補詳解"}
           </button>
+        ) : null}
+        {!override && !canUseAIExplanation ? (
+          <span className="inline-flex rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-600">
+            登入後可用 GPT-5-mini 補詳解
+          </span>
         ) : null}
         {error ? <p className="text-sm font-medium text-rose-700">{error}</p> : null}
       </div>

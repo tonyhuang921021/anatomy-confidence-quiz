@@ -322,6 +322,18 @@ export async function POST(request: NextRequest) {
   try {
     const userEmail = await getVerifiedUserEmail(body.accessToken);
     const visitorId = body.visitorId?.trim() || null;
+
+    if (!userEmail) {
+      return NextResponse.json(
+        {
+          ok: false,
+          configured: true,
+          message: "請先登入帳號，才能使用 GPT-5-mini 補詳解。"
+        },
+        { status: 401 }
+      );
+    }
+
     const fallbackKey = request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || "anonymous";
     const rateKey = userEmail?.trim().toLowerCase() || visitorId || fallbackKey;
 

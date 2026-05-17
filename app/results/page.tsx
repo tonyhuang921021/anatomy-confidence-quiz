@@ -294,11 +294,12 @@ export default function ResultsPage() {
     const generated = explanationOverrides[question.id];
     const loading = explanationLoadingMap[question.id];
     const error = explanationErrorMap[question.id];
+    const canUseAIExplanation = Boolean(session?.access_token);
 
     return (
       <div className="space-y-3">
         <div className="flex flex-wrap items-center gap-3">
-          {!generated ? (
+          {!generated && canUseAIExplanation ? (
             <button
               type="button"
               onClick={() => void handleGenerateQuestionExplanation(question, attempt)}
@@ -307,6 +308,11 @@ export default function ResultsPage() {
             >
               {loading ? "GPT-5-mini 生成中..." : "用 GPT-5-mini 補詳解"}
             </button>
+          ) : null}
+          {!generated && !canUseAIExplanation ? (
+            <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-600">
+              登入後可用 GPT-5-mini 補詳解
+            </span>
           ) : null}
           {generated ? (
             <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-600">
