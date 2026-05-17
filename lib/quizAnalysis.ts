@@ -572,8 +572,6 @@ export function getModeLabel(mode: QuizMode) {
       return "弱點補強";
     case "review":
       return "錯題複習";
-    case "ai_fresh":
-      return "AI 新題";
     case "simulation":
       return "模擬考模式";
     default:

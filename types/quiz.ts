@@ -79,7 +79,7 @@ export type Attempt = {
   answeredAt: string;
 };
 
-export type QuizMode = "random" | "weakness" | "review" | "ai_fresh" | "simulation";
+export type QuizMode = "random" | "weakness" | "review" | "simulation";
 
 export type SubjectFilter = SubjectName | "全部";
 export type SimulationFeedbackMode = "full" | "answer_only" | "none";
@@ -95,7 +95,6 @@ export type QuizSettings = {
   customPoolLabel?: string;
   chapter?: string;
   section?: string;
-  usePastExamStyle?: boolean;
   feedbackMode?: SimulationFeedbackMode;
   paperMode?: SimulationPaperMode;
   selectedPaperKey?: string;

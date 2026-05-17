@@ -29,7 +29,6 @@ const modeDescriptions: Record<QuizMode, string> = {
   weakness: "優先抽你最弱、最不穩、最需要補進度的小節。",
   random: "平均刷題，適合維持手感與快速暖機。",
   review: "優先抽歷史錯題、低信心題與高風險題。",
-  ai_fresh: "每題由 GPT 即時生成新題，降低重複感。",
   simulation: "像正式考試一樣，可選真實考古卷或電腦隨機整份卷。"
 };
 
@@ -218,7 +217,7 @@ export function QuizSetupPanel({
       <div className={`mt-5 grid gap-4 ${simulationOnly ? "lg:grid-cols-1" : "lg:grid-cols-3"}`}>
         {((simulationOnly
           ? ["simulation"]
-          : ["weakness", "random", "review", "ai_fresh"]) as QuizMode[]).map((mode) => (
+          : ["weakness", "random", "review"]) as QuizMode[]).map((mode) => (
           <button
             key={mode}
             type="button"
@@ -306,18 +305,6 @@ export function QuizSetupPanel({
           </>
         ) : null}
         <div className="rounded-3xl bg-slate-50 p-5">
-          {settings.mode === "ai_fresh" ? (
-            <label className="mt-4 flex items-center gap-3 rounded-2xl bg-white px-4 py-3 text-sm text-slate-700 ring-1 ring-slate-200">
-              <input
-                type="checkbox"
-                checked={Boolean(settings.usePastExamStyle)}
-                onChange={(event) =>
-                  updateSettings({ usePastExamStyle: event.target.checked })
-                }
-              />
-              使用國考考古題風格改寫題
-            </label>
-          ) : null}
           {settings.mode === "simulation" ? (
             <div className="mt-4 space-y-4">
               <div className="rounded-2xl bg-white p-4 ring-1 ring-slate-200">

@@ -43,11 +43,6 @@ import {
   SubjectName
 } from "@/types/quiz";
 
-type HealthState = {
-  openaiConfigured: boolean;
-  service?: string;
-};
-
 const allQuestionFallbackMap = new Map(
   getQuestionBankBySubjects(["醫學（一）", "醫學（二）"]).map(
     (question) => [question.id, question] as const
@@ -109,19 +104,13 @@ function createSession(
       normalizedSettings.paperMode === "random_past_paper")
       ? { ...normalizedSettings, questionCount: effectiveQuestions.length }
       : normalizedSettings;
-  const questionOrder =
-    normalizedSettings.mode === "ai_fresh"
-      ? []
-      : createQuestionOrder(effectiveQuestions, completedSessions, effectiveSettings);
+  const questionOrder = createQuestionOrder(effectiveQuestions, completedSessions, effectiveSettings);
   const selectedQuestionMap = new Map(
     effectiveQuestions.map((question) => [question.id, question] as const)
   );
-  const persistedQuestions =
-    normalizedSettings.mode === "ai_fresh"
-      ? []
-      : questionOrder
-          .map((id) => selectedQuestionMap.get(id))
-          .filter((question): question is Question => Boolean(question));
+  const persistedQuestions = questionOrder
+    .map((id) => selectedQuestionMap.get(id))
+    .filter((question): question is Question => Boolean(question));
 
   return {
     id: `session-${Date.now()}`,
@@ -200,6 +189,17 @@ function getQuestionByOrder(session: QuizSession) {
     .filter((question): question is Question => Boolean(question));
 }
 
+function normalizeLegacySettings(settings: QuizSettings): QuizSettings {
+  if ((settings as { mode?: string }).mode !== "ai_fresh") return settings;
+
+  return {
+    ...settings,
+    mode: "random",
+    chapter: undefined,
+    section: undefined
+  };
+}
+
 export default function QuizPage() {
   const router = useRouter();
   const questionTopRef = useRef<HTMLDivElement | null>(null);
@@ -211,12 +211,6 @@ export default function QuizPage() {
   const [confidenceExpanded, setConfidenceExpanded] = useState(false);
   const [submittedAttempt, setSubmittedAttempt] = useState<Attempt | null>(null);
   const [errorType, setErrorType] = useState<ErrorType | undefined>();
-  const [loadingAIQuestions, setLoadingAIQuestions] = useState(false);
-  const [aiQuestionError, setAiQuestionError] = useState("");
-  const [health, setHealth] = useState<HealthState>({ openaiConfigured: false });
-  const [reviewLoading, setReviewLoading] = useState(false);
-  const [reviewText, setReviewText] = useState("");
-  const [reviewError, setReviewError] = useState("");
 
   useEffect(() => {
     const existing = loadCurrentSession();
@@ -258,7 +252,7 @@ export default function QuizPage() {
       chapter: undefined,
       section: undefined
     };
-    const savedSettings: QuizSettings =
+    const rawSettings: QuizSettings =
       directSubjectSettings ??
       (preset === "start"
         ? startPresetSettings
@@ -267,6 +261,7 @@ export default function QuizPage() {
           : preset === "med2"
             ? med2PresetSettings
             : loadQuizSettings() ?? DEFAULT_QUIZ_SETTINGS);
+    const savedSettings = normalizeLegacySettings(rawSettings);
     const completedSessions = loadCompletedSessions();
     const shouldForceNewSession =
       params?.get("new") === "1";
@@ -306,20 +301,6 @@ export default function QuizPage() {
     setMounted(true);
   }, []);
 
-  useEffect(() => {
-    async function loadHealth() {
-      try {
-        const response = await fetch("/api/health");
-        const payload = (await response.json()) as HealthState;
-        setHealth(payload);
-      } catch {
-        setHealth({ openaiConfigured: false });
-      }
-    }
-
-    void loadHealth();
-  }, []);
-
   const questionSet = useMemo(() => (session ? getQuestionByOrder(session) : []), [session]);
   const currentIndex = session?.currentQuestionIndex ?? 0;
   const currentQuestion = questionSet[currentIndex];
@@ -342,83 +323,6 @@ export default function QuizPage() {
     setSession(nextSession);
     saveCurrentSession(nextSession);
   }
-
-  async function preloadAIQuestions(targetSession: QuizSession) {
-    if (targetSession.settings?.mode !== "ai_fresh") return;
-    if ((targetSession.generatedQuestions?.length ?? 0) >= (targetSession.settings?.questionCount ?? 10)) {
-      return;
-    }
-
-    setLoadingAIQuestions(true);
-    setAiQuestionError("");
-
-    try {
-      const completedSessions = loadCompletedSessions();
-      const allKnownQuestions = [
-        ...getQuestionBankBySubjectFilter("全部"),
-        ...(targetSession.generatedQuestions ?? []),
-        ...completedSessions.flatMap((sessionItem) => sessionItem.generatedQuestions ?? [])
-      ];
-      const questionMap = new Map(
-        allKnownQuestions.map((question) => [question.id, question] as const)
-      );
-      const usedConcepts = [
-        ...new Set([
-          ...(targetSession.generatedQuestions ?? []).map((question) => question.testedConcept),
-          ...completedSessions.flatMap((sessionItem) =>
-            sessionItem.generatedQuestions?.map((question) => question.testedConcept) ?? []
-          ),
-          ...completedSessions.flatMap((sessionItem) =>
-            sessionItem.attempts
-              .map((attempt) => questionMap.get(attempt.questionId)?.testedConcept)
-              .filter((value): value is string => Boolean(value))
-          )
-        ])
-      ];
-
-      const response = await fetch("/api/generate-question", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({
-          settings: targetSession.settings,
-          count: targetSession.settings?.questionCount ?? 10,
-          usedQuestionIds: targetSession.questionOrder ?? [],
-          usedConcepts
-        })
-      });
-
-      const payload = (await response.json()) as {
-        ok: boolean;
-        questions?: Question[];
-        message?: string;
-      };
-
-      if (!response.ok || !payload.ok || !payload.questions?.length) {
-        setAiQuestionError(payload.message || "AI 新題預生成失敗。");
-        return;
-      }
-
-      const nextSession: QuizSession = {
-        ...targetSession,
-        questionOrder: payload.questions.map((question) => question.id),
-        generatedQuestions: payload.questions
-      };
-      persistSession(nextSession);
-    } catch {
-      setAiQuestionError("無法連線到 AI 新題 API。");
-    } finally {
-      setLoadingAIQuestions(false);
-    }
-  }
-
-  useEffect(() => {
-    if (!session) return;
-    if (session.settings?.mode !== "ai_fresh") return;
-    if ((session.generatedQuestions?.length ?? 0) > 0) return;
-    void preloadAIQuestions(session);
-  }, [session]);
 
   function handleSelectConfidence(value: ConfidenceLevel) {
     setConfidence(value);
@@ -559,49 +463,11 @@ export default function QuizPage() {
     });
   }
 
-  async function handleReviewQuestion() {
-    if (!currentQuestion) return;
-    setReviewLoading(true);
-    setReviewError("");
-
-    try {
-      const response = await fetch("/api/review-question", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({
-          question: currentQuestion
-        })
-      });
-
-      const payload = (await response.json()) as {
-        ok: boolean;
-        review?: string;
-        message?: string;
-      };
-
-      if (!response.ok || !payload.ok) {
-        setReviewError(payload.message || "題目複查失敗。");
-        setReviewText("");
-        return;
-      }
-
-      setReviewText(payload.review || "");
-    } catch {
-      setReviewError("無法連線到題目複查 API。");
-      setReviewText("");
-    } finally {
-      setReviewLoading(false);
-    }
-  }
-
   if (!mounted || !session || !currentQuestion) {
     return (
       <main className="shell">
         <div className="rounded-[2rem] bg-white p-6 shadow-card ring-1 ring-slate-100">
-          {loadingAIQuestions ? "GPT 正在預生成整組新題..." : "載入中..."}
-          {aiQuestionError ? <p className="mt-3 text-sm text-rose-600">{aiQuestionError}</p> : null}
+          載入中...
         </div>
       </main>
     );
@@ -664,14 +530,8 @@ export default function QuizPage() {
             <span className="rounded-full bg-slate-100 px-3 py-1 text-slate-700">
               {getQuestionSourceBadge(currentQuestion)}
             </span>
-            <span
-              className={`rounded-full px-3 py-1 ${
-                health.openaiConfigured
-                  ? "bg-emerald-100 text-emerald-800"
-                  : "bg-amber-100 text-amber-900"
-              }`}
-            >
-              {health.openaiConfigured ? "OpenAI API 已連線" : "OpenAI API 未連線"}
+            <span className="rounded-full bg-slate-100 px-3 py-1 text-slate-700">
+              本地題庫模式
             </span>
           </div>
 
@@ -705,10 +565,10 @@ export default function QuizPage() {
                 <button
                   type="button"
                   onClick={handleSubmit}
-                  disabled={!selectedAnswer || loadingAIQuestions}
+                  disabled={!selectedAnswer}
                   className="mt-5 min-h-12 w-full rounded-2xl bg-brand-600 px-4 py-4 text-sm font-semibold text-white transition hover:bg-brand-700 disabled:cursor-not-allowed disabled:bg-slate-300"
                 >
-                  {loadingAIQuestions ? "GPT 題目生成中..." : "送出答案"}
+                  送出答案
                 </button>
               </div>
             </>
@@ -817,19 +677,7 @@ export default function QuizPage() {
 
           <div className="rounded-[2rem] bg-white p-5 shadow-card ring-1 ring-slate-100">
             <div className="flex flex-col gap-3 sm:flex-row">
-              <button
-                type="button"
-                onClick={handleReviewQuestion}
-                disabled={reviewLoading}
-                className="min-h-12 rounded-2xl bg-slate-100 px-4 py-3 text-sm font-semibold text-slate-800 transition hover:bg-slate-200 disabled:cursor-not-allowed disabled:bg-slate-100"
-              >
-                {reviewLoading ? "AI 複查中..." : "題目怪怪的請 AI 複查"}
-              </button>
-              {session.settings?.mode === "ai_fresh" ? (
-                <div className="flex min-h-12 items-center rounded-2xl bg-slate-50 px-4 py-3 text-sm text-slate-600">
-                  GPT 會在開始前一次先生成 {targetCount} 題
-                </div>
-              ) : session.settings?.mode === "simulation" ? (
+              {session.settings?.mode === "simulation" ? (
                 <div className="flex min-h-12 items-center rounded-2xl bg-slate-50 px-4 py-3 text-sm text-slate-600">
                   模擬考目前設定：{
                     feedbackMode === "none"
@@ -841,18 +689,6 @@ export default function QuizPage() {
                 </div>
               ) : null}
             </div>
-
-            {reviewError ? (
-              <div className="mt-4 rounded-2xl bg-amber-50 p-4 text-sm text-amber-900">{reviewError}</div>
-            ) : null}
-            {reviewText ? (
-              <div className="mt-4 rounded-2xl bg-slate-50 p-4 text-sm leading-7 text-slate-700">
-                {reviewText}
-              </div>
-            ) : null}
-            {aiQuestionError ? (
-              <div className="mt-4 rounded-2xl bg-amber-50 p-4 text-sm text-amber-900">{aiQuestionError}</div>
-            ) : null}
           </div>
         </div>
 
@@ -876,9 +712,6 @@ export default function QuizPage() {
             </p>
             <p className="rounded-2xl bg-slate-50 px-4 py-3 text-sm text-slate-700">
               本輪模式 <span className="font-semibold">{getModeLabel(session.settings?.mode ?? "weakness")}</span>
-            </p>
-            <p className="rounded-2xl bg-slate-50 px-4 py-3 text-sm text-slate-700">
-              API 狀態 <span className="font-semibold">{health.openaiConfigured ? "已連線" : "未連線"}</span>
             </p>
             <p className="rounded-2xl bg-slate-50 px-4 py-3 text-sm text-slate-700">
               暫時答對率{" "}
