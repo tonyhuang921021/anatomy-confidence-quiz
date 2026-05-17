@@ -72,6 +72,58 @@ function normalizeSessions(sessions: QuizSession[]) {
   return sessions.map(normalizeSession);
 }
 
+function normalizeQuestionExplanationOverride(
+  override?: QuestionExplanationOverride | null
+): QuestionExplanationOverride | null {
+  if (!override) return null;
+
+  const rawExplanation = override.explanation?.trim() ?? "";
+  if (!rawExplanation) {
+    return {
+      ...override,
+      optionAnalysis: override.optionAnalysis ?? {}
+    };
+  }
+
+  const looksLikeJson =
+    rawExplanation.startsWith("{") &&
+    rawExplanation.includes("\"explanation\"") &&
+    rawExplanation.includes("\"optionAnalysis\"");
+
+  if (!looksLikeJson) {
+    return {
+      ...override,
+      optionAnalysis: override.optionAnalysis ?? {}
+    };
+  }
+
+  try {
+    const parsed = JSON.parse(rawExplanation) as {
+      explanation?: string;
+      optionAnalysis?: Partial<Record<"A" | "B" | "C" | "D" | "E", string>>;
+      memoryTip?: string;
+    };
+
+    return {
+      ...override,
+      explanation: typeof parsed.explanation === "string" ? parsed.explanation : rawExplanation,
+      optionAnalysis:
+        parsed.optionAnalysis && typeof parsed.optionAnalysis === "object"
+          ? parsed.optionAnalysis
+          : override.optionAnalysis ?? {},
+      memoryTip:
+        typeof parsed.memoryTip === "string"
+          ? parsed.memoryTip
+          : override.memoryTip
+    };
+  } catch {
+    return {
+      ...override,
+      optionAnalysis: override.optionAnalysis ?? {}
+    };
+  }
+}
+
 export function setActiveStorageUser(userId?: string) {
   if (!isBrowser()) return;
   window.localStorage.setItem(ACTIVE_USER_KEY, userId || GUEST_USER_ID);
@@ -164,7 +216,16 @@ export function loadQuestionExplanationOverrides() {
   if (!raw) return {};
 
   try {
-    return JSON.parse(raw) as Record<string, QuestionExplanationOverride>;
+    const parsed = JSON.parse(raw) as Record<string, QuestionExplanationOverride>;
+    return Object.fromEntries(
+      Object.entries(parsed)
+        .map(([questionId, override]) => {
+          const normalized = normalizeQuestionExplanationOverride(override);
+          if (!normalized) return null;
+          return [questionId, normalized] as const;
+        })
+        .filter((entry): entry is readonly [string, QuestionExplanationOverride] => Boolean(entry))
+    );
   } catch {
     return {};
   }
@@ -191,7 +252,15 @@ export function saveQuestionExplanationOverrides(
   const current = loadQuestionExplanationOverrides();
   const next = {
     ...current,
-    ...overrides
+    ...Object.fromEntries(
+      Object.entries(overrides)
+        .map(([questionId, override]) => {
+          const normalized = normalizeQuestionExplanationOverride(override);
+          if (!normalized) return null;
+          return [questionId, normalized] as const;
+        })
+        .filter((entry): entry is readonly [string, QuestionExplanationOverride] => Boolean(entry))
+    )
   };
   window.localStorage.setItem(getScopedKey(QUESTION_EXPLANATION_OVERRIDES_KEY), JSON.stringify(next));
 }
