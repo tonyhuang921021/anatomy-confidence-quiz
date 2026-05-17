@@ -276,6 +276,9 @@ export function ReviewNotebook({
       };
 
       if (!response.ok || !payload.ok || !payload.explanation) {
+        if (response.status === 429 && payload.message && typeof window !== "undefined") {
+          window.alert(payload.message);
+        }
         setExplanationErrorMap((current) => ({
           ...current,
           [question.id]: payload.message || "GPT-5-mini 詳解產生失敗。"
