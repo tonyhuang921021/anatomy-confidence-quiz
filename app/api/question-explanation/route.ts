@@ -148,7 +148,7 @@ async function insertUsageLog(row: UsageLogRow) {
   };
   const { error: fallbackError } = await supabase.from("ai_explanation_usage_logs").insert(fallbackRow);
   if (fallbackError) {
-    throw fallbackError;
+    console.error("AI explanation usage log skipped:", fallbackError);
   }
 }
 
@@ -173,7 +173,7 @@ async function upsertSharedExplanationOverride(
   );
 
   if (error) {
-    throw error;
+    console.error("Shared question explanation override skipped:", error);
   }
 }
 
