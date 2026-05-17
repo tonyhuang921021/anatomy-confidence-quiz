@@ -1,8 +1,15 @@
-import { ErrorType, QuizSession, QuizSettings } from "@/types/quiz";
+import {
+  ErrorType,
+  Question,
+  QuestionExplanationOverride,
+  QuizSession,
+  QuizSettings
+} from "@/types/quiz";
 
 const CURRENT_SESSION_KEY = "anatomy-confidence-current-session";
 const COMPLETED_SESSIONS_KEY = "anatomy-confidence-completed-sessions";
 const QUIZ_SETTINGS_KEY = "anatomy-confidence-quiz-settings";
+const QUESTION_EXPLANATION_OVERRIDES_KEY = "anatomy-confidence-question-explanation-overrides";
 const ACTIVE_USER_KEY = "anatomy-confidence-active-user-id";
 const GUEST_USER_ID = "guest";
 
@@ -149,4 +156,48 @@ export function loadQuizSettings(): QuizSettings | null {
   } catch {
     return null;
   }
+}
+
+export function loadQuestionExplanationOverrides() {
+  if (!isBrowser()) return {} as Record<string, QuestionExplanationOverride>;
+  const raw = getLegacyOrScopedRaw(QUESTION_EXPLANATION_OVERRIDES_KEY);
+  if (!raw) return {};
+
+  try {
+    return JSON.parse(raw) as Record<string, QuestionExplanationOverride>;
+  } catch {
+    return {};
+  }
+}
+
+export function loadQuestionExplanationOverride(questionId: string) {
+  return loadQuestionExplanationOverrides()[questionId];
+}
+
+export function saveQuestionExplanationOverride(
+  questionId: string,
+  override: QuestionExplanationOverride
+) {
+  if (!isBrowser()) return;
+  const current = loadQuestionExplanationOverrides();
+  const next = {
+    ...current,
+    [questionId]: override
+  };
+  window.localStorage.setItem(
+    getScopedKey(QUESTION_EXPLANATION_OVERRIDES_KEY),
+    JSON.stringify(next)
+  );
+}
+
+export function applyQuestionExplanationOverride(question: Question): Question {
+  const override = loadQuestionExplanationOverride(question.id);
+  if (!override) return question;
+
+  return {
+    ...question,
+    explanation: override.explanation || question.explanation,
+    optionAnalysis: override.optionAnalysis ?? question.optionAnalysis,
+    memoryTip: override.memoryTip ?? question.memoryTip
+  };
 }

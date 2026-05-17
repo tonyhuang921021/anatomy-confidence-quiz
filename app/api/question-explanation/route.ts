@@ -23,6 +23,12 @@ type QuestionExplanationRequestBody = {
   };
 };
 
+type ParsedExplanationPayload = {
+  explanation?: string;
+  optionAnalysis?: Record<string, string>;
+  memoryTip?: string;
+};
+
 type UsageLogRow = {
   rate_key: string;
   visitor_id?: string | null;
@@ -137,12 +143,20 @@ function buildQuestionExplanationPrompt(body: QuestionExplanationRequestBody) {
   return [
     "你是台灣醫學系國考家教，請用繁體中文寫一份詳盡但好讀的單題解析。",
     "請嚴格只解釋這一題，不要延伸太多無關內容。",
+    "請只輸出 JSON，不要輸出 markdown，不要輸出 code block。",
     "",
-    "輸出格式：",
-    "1. 先直接點出正確答案",
-    "2. 用 2-4 段說明核心觀念",
-    "3. 逐一簡短說明各選項為什麼對或錯",
-    "4. 最後補一段臨床或考試記憶重點",
+    "JSON 格式：",
+    "{",
+    '  "explanation": "完整詳解",',
+    '  "optionAnalysis": {',
+    '    "A": "A 選項解析",',
+    '    "B": "B 選項解析",',
+    '    "C": "C 選項解析",',
+    '    "D": "D 選項解析",',
+    '    "E": "E 選項解析（若本題有 E）"',
+    "  },",
+    '  "memoryTip": "簡短記憶法，沒有就留空字串"',
+    "}",
     "",
     `科目：${question?.subject ?? ""}`,
     `章節：${question?.chapter ?? ""} / ${question?.section ?? ""}`,
@@ -160,6 +174,19 @@ function buildQuestionExplanationPrompt(body: QuestionExplanationRequestBody) {
     "",
     `現有解析：${question?.explanation ?? ""}`
   ].join("\n");
+}
+
+function parseExplanationPayload(text: string): ParsedExplanationPayload | null {
+  const trimmed = text.trim();
+  const start = trimmed.indexOf("{");
+  const end = trimmed.lastIndexOf("}");
+  if (start === -1 || end === -1 || end <= start) return null;
+
+  try {
+    return JSON.parse(trimmed.slice(start, end + 1)) as ParsedExplanationPayload;
+  } catch {
+    return null;
+  }
 }
 
 export async function POST(request: NextRequest) {
@@ -205,6 +232,18 @@ export async function POST(request: NextRequest) {
 
     const prompt = buildQuestionExplanationPrompt(body);
     const result = await createOpenAIText(prompt, 1400, "gpt-5-mini");
+    const parsed = parseExplanationPayload(result.text);
+
+    if (!parsed?.explanation) {
+      return NextResponse.json(
+        {
+          ok: false,
+          configured: true,
+          message: "GPT-5-mini 回傳格式不正確，無法儲存單題詳解。"
+        },
+        { status: 500 }
+      );
+    }
 
     await insertUsageLog({
       rate_key: rateKey,
@@ -219,7 +258,9 @@ export async function POST(request: NextRequest) {
       ok: true,
       configured: true,
       model: result.model,
-      explanation: result.text
+      explanation: parsed.explanation,
+      optionAnalysis: parsed.optionAnalysis ?? {},
+      memoryTip: parsed.memoryTip ?? ""
     });
   } catch (error) {
     return NextResponse.json(

@@ -25,6 +25,7 @@ import {
   getModeLabel
 } from "@/lib/quizAnalysis";
 import {
+  applyQuestionExplanationOverride,
   clearCurrentSession,
   loadCompletedSessions,
   loadCurrentSession,
@@ -186,6 +187,7 @@ function getQuestionByOrder(session: QuizSession) {
 
   return ids
     .map((id) => generatedMap.get(id) ?? allQuestionFallbackMap.get(id))
+    .map((question) => (question ? applyQuestionExplanationOverride(question) : question))
     .filter((question): question is Question => Boolean(question));
 }
 

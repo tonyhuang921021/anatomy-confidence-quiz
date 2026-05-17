@@ -224,6 +224,14 @@ export type QuestionCommunityStats = {
   updatedAt?: string;
 };
 
+export type QuestionExplanationOverride = {
+  explanation: string;
+  optionAnalysis?: Partial<Record<OptionKey, string>>;
+  memoryTip?: string;
+  model?: string;
+  updatedAt: string;
+};
+
 export type OwnerDashboardStats = {
   totalVisitorDevices: number;
   totalAttemptDevices: number;
