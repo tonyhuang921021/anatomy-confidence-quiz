@@ -176,17 +176,126 @@ function buildQuestionExplanationPrompt(body: QuestionExplanationRequestBody) {
   ].join("\n");
 }
 
+function normalizeOptionAnalysis(value: unknown) {
+  if (!value || typeof value !== "object") return {};
+
+  if (Array.isArray(value)) {
+    return Object.fromEntries(
+      value
+        .map((item) => {
+          if (!item || typeof item !== "object") return null;
+          const record = item as Record<string, unknown>;
+          const key = typeof record.option === "string" ? record.option.trim().toUpperCase() : "";
+          const text =
+            typeof record.analysis === "string"
+              ? record.analysis.trim()
+              : typeof record.text === "string"
+                ? record.text.trim()
+                : "";
+          if (!key || !text) return null;
+          return [key, text] as const;
+        })
+        .filter((entry): entry is readonly [string, string] => Boolean(entry))
+    );
+  }
+
+  return Object.fromEntries(
+    Object.entries(value as Record<string, unknown>)
+      .map(([key, item]) => {
+        if (typeof item !== "string") return null;
+        const normalizedKey = key.trim().toUpperCase();
+        const normalizedValue = item.trim();
+        if (!normalizedKey || !normalizedValue) return null;
+        return [normalizedKey, normalizedValue] as const;
+      })
+      .filter((entry): entry is readonly [string, string] => Boolean(entry))
+  );
+}
+
+function coerceParsedPayload(value: unknown): ParsedExplanationPayload | null {
+  if (!value || typeof value !== "object") return null;
+
+  const record = value as Record<string, unknown>;
+  const explanation =
+    typeof record.explanation === "string"
+      ? record.explanation.trim()
+      : typeof record.detailExplanation === "string"
+        ? record.detailExplanation.trim()
+        : typeof record.analysis === "string"
+          ? record.analysis.trim()
+          : "";
+
+  const memoryTip =
+    typeof record.memoryTip === "string"
+      ? record.memoryTip.trim()
+      : typeof record.memory_tip === "string"
+        ? record.memory_tip.trim()
+        : "";
+
+  const optionAnalysis = normalizeOptionAnalysis(
+    record.optionAnalysis ?? record.option_analysis ?? record.options
+  );
+
+  if (!explanation) return null;
+
+  return {
+    explanation,
+    optionAnalysis,
+    memoryTip
+  };
+}
+
 function parseExplanationPayload(text: string): ParsedExplanationPayload | null {
   const trimmed = text.trim();
-  const start = trimmed.indexOf("{");
-  const end = trimmed.lastIndexOf("}");
-  if (start === -1 || end === -1 || end <= start) return null;
+  if (!trimmed) return null;
 
-  try {
-    return JSON.parse(trimmed.slice(start, end + 1)) as ParsedExplanationPayload;
-  } catch {
-    return null;
+  const codeFenceMatch = trimmed.match(/```(?:json)?\s*([\s\S]*?)\s*```/i);
+  const rawCandidates = [trimmed];
+  if (codeFenceMatch?.[1]) rawCandidates.unshift(codeFenceMatch[1].trim());
+
+  for (const candidate of rawCandidates) {
+    try {
+      const parsed = coerceParsedPayload(JSON.parse(candidate));
+      if (parsed) return parsed;
+    } catch {
+      // continue to looser parsing
+    }
+
+    const start = candidate.indexOf("{");
+    const end = candidate.lastIndexOf("}");
+    if (start !== -1 && end !== -1 && end > start) {
+      try {
+        const parsed = coerceParsedPayload(JSON.parse(candidate.slice(start, end + 1)));
+        if (parsed) return parsed;
+      } catch {
+        // continue to looser parsing
+      }
+    }
   }
+
+  const optionAnalysis = Object.fromEntries(
+    [...trimmed.matchAll(/(?:^|\n)\s*([A-E])[\.\):：-]\s*([\s\S]*?)(?=(?:\n\s*[A-E][\.\):：-])|(?:\n\s*(?:memoryTip|memory tip|快速記憶法|記憶法)[：:])|$)/gi)]
+      .map((match) => [match[1].toUpperCase(), match[2].trim()] as const)
+      .filter(([, value]) => Boolean(value))
+  );
+
+  const memoryTipMatch = trimmed.match(/(?:memoryTip|memory tip|快速記憶法|記憶法)[：:]\s*([\s\S]+)$/i);
+  const memoryTip = memoryTipMatch?.[1]?.trim() ?? "";
+
+  const explanation = trimmed
+    .replace(/```(?:json)?/gi, "")
+    .replace(/```/g, "")
+    .replace(/(?:^|\n)\s*(?:memoryTip|memory tip|快速記憶法|記憶法)[：:][\s\S]*$/i, "")
+    .replace(/(?:^|\n)\s*[A-E][\.\):：-][\s\S]*$/m, "")
+    .trim();
+
+  if (!explanation) return null;
+
+  return {
+    explanation,
+    optionAnalysis,
+    memoryTip
+  };
 }
 
 export async function POST(request: NextRequest) {
