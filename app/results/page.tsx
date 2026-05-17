@@ -3,8 +3,6 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { AIAnalysisPanel } from "@/components/AIAnalysisPanel";
-import { AIPromptBox } from "@/components/AIPromptBox";
 import { useAuth } from "@/components/AuthProvider";
 import { ResultSummary } from "@/components/ResultSummary";
 import { WeaknessRanking } from "@/components/WeaknessRanking";
@@ -17,9 +15,7 @@ import {
   calculateSummary,
   DEFAULT_QUIZ_SETTINGS,
   getModeLabel,
-  generateAIPrompt,
   getLowCompletionSections,
-  getReviewQuestionItems,
   getTopWeakSections,
   getUnstableCompletedSections
 } from "@/lib/quizAnalysis";
@@ -65,33 +61,24 @@ type ResultState = {
   sessions: QuizSession[];
   summary: SummaryStats | null;
   sectionStats: SectionStats[];
-  promptText: string;
   lowCompletion: SectionCompletionStats[];
   unstableSections: SectionCompletionStats[];
   completionStats: ReturnType<typeof calculateCompletionStats> | null;
-  newCompletedSections: SectionCompletionStats[];
 };
 
 export default function ResultsPage() {
   const router = useRouter();
   const { syncVersion } = useAuth();
   const [mounted, setMounted] = useState(false);
-  const [showPrompt, setShowPrompt] = useState(false);
-  const [aiAnalysis, setAiAnalysis] = useState("");
-  const [aiError, setAiError] = useState("");
-  const [aiLoading, setAiLoading] = useState(false);
-  const [aiModel, setAiModel] = useState("");
   const [communityStatsMap, setCommunityStatsMap] = useState<Map<string, QuestionCommunityStats>>(new Map());
   const [state, setState] = useState<ResultState>({
     session: null,
     sessions: [],
     summary: null,
     sectionStats: [],
-    promptText: "",
     lowCompletion: [],
     unstableSections: [],
-    completionStats: null,
-    newCompletedSections: []
+    completionStats: null
   });
 
   useEffect(() => {
@@ -108,25 +95,15 @@ export default function ResultsPage() {
         : anatomyQuestions;
     const completionStats = calculateCompletionStats(anatomyQuestions, completedSessions);
     const sessionSectionStats = calculateSectionStats(currentSession.attempts, currentQuestions);
-    const previousSessions = completedSessions.filter((session) => session.id !== currentSession.id);
-    const previousCompletion = calculateCompletionStats(anatomyQuestions, previousSessions);
-    const newCompletedSections = completionStats.sections.filter((section) => {
-      const before = previousCompletion.sections.find(
-        (item) => item.chapter === section.chapter && item.section === section.section
-      );
-      return (before?.completionRate ?? 0) === 0 && section.completionRate > 0;
-    });
 
     setState({
       session: currentSession,
       sessions: completedSessions,
       summary: calculateSummary(currentSession.attempts, currentQuestions),
       sectionStats: sessionSectionStats,
-      promptText: generateAIPrompt(currentSession.attempts, currentQuestions, completedSessions),
       lowCompletion: getLowCompletionSections(completionStats.sections, 5),
       unstableSections: getUnstableCompletedSections(completionStats.sections, 5),
-      completionStats,
-      newCompletedSections
+      completionStats
     });
     setMounted(true);
   }, [syncVersion]);
@@ -155,49 +132,6 @@ export default function ResultsPage() {
     clearCurrentSession();
     saveQuizSettings(DEFAULT_QUIZ_SETTINGS);
     router.push("/quiz?new=1");
-  }
-
-  async function handleGenerateAIAnalysis() {
-    if (!state.session) return;
-    setAiLoading(true);
-    setAiError("");
-
-    try {
-      const response = await fetch("/api/ai-analysis", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({
-          attempts: state.session.attempts,
-          sessions: state.sessions,
-          prompt: state.promptText
-        })
-      });
-
-      const payload = (await response.json()) as {
-        ok: boolean;
-        analysis?: string;
-        model?: string;
-        message?: string;
-      };
-
-      if (!response.ok || !payload.ok) {
-        setAiError(payload.message || "AI 分析失敗。若未設定 OPENAI_API_KEY，請先使用下方 prompt。");
-        setAiAnalysis("");
-        setAiModel("");
-        return;
-      }
-
-      setAiAnalysis(payload.analysis || "");
-      setAiModel(payload.model || "");
-    } catch {
-      setAiError("無法連線到 AI 分析 API。");
-      setAiAnalysis("");
-      setAiModel("");
-    } finally {
-      setAiLoading(false);
-    }
   }
 
   if (!mounted) {
@@ -297,77 +231,6 @@ export default function ResultsPage() {
 
       <div className="mt-8 grid gap-6 xl:grid-cols-[minmax(0,1fr)_360px]">
         <div className="space-y-6">
-          <WeaknessRanking sections={topWeakSections} />
-
-          {state.session.subject === "解剖學" ? (
-            <section className="rounded-[2rem] bg-white p-6 shadow-card ring-1 ring-slate-100">
-              <h2 className="text-xl font-semibold text-ink">完成度更新</h2>
-              <div className="mt-5 grid gap-6 lg:grid-cols-3">
-                <div className="rounded-3xl bg-slate-50 p-5">
-                  <h3 className="text-base font-semibold text-ink">本輪新增完成的小節</h3>
-                  <div className="mt-3 grid gap-2 text-sm text-slate-600">
-                    {state.newCompletedSections.length === 0 ? (
-                      <p>這輪沒有新的 section 從 0 前進到已作答。</p>
-                    ) : (
-                      state.newCompletedSections.map((section) => (
-                        <p key={`${section.chapter}-${section.section}`}>
-                          {section.chapter} / {section.section}
-                        </p>
-                      ))
-                    )}
-                  </div>
-                </div>
-
-                <div className="rounded-3xl bg-slate-50 p-5">
-                  <h3 className="text-base font-semibold text-ink">最需要補進度的 section</h3>
-                  <div className="mt-3 grid gap-3">
-                    {state.lowCompletion.map((section) => (
-                      <div key={`${section.chapter}-${section.section}`} className="rounded-2xl bg-white p-4 text-sm text-slate-700">
-                        <p className="font-semibold">{section.section}</p>
-                        <p className="mt-1 text-slate-500">{section.chapter}</p>
-                        <p className="mt-2">completionRate {section.completionRate}%</p>
-                        <p>masteryScore {section.masteryScore}</p>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-
-                <div className="rounded-3xl bg-slate-50 p-5">
-                  <h3 className="text-base font-semibold text-ink">已完成但不穩</h3>
-                  <div className="mt-3 grid gap-3">
-                    {state.unstableSections.length === 0 ? (
-                      <p className="text-sm text-slate-600">目前沒有 completionRate 高但 masteryScore 低的小節。</p>
-                    ) : (
-                      state.unstableSections.map((section) => (
-                        <div key={`${section.chapter}-${section.section}`} className="rounded-2xl bg-white p-4 text-sm text-slate-700">
-                          <p className="font-semibold">{section.section}</p>
-                          <p className="mt-1 text-slate-500">{section.chapter}</p>
-                          <p className="mt-2">completionRate {section.completionRate}%</p>
-                          <p>masteryScore {section.masteryScore}</p>
-                        </div>
-                      ))
-                    )}
-                  </div>
-                </div>
-              </div>
-            </section>
-          ) : (
-            <section className="rounded-[2rem] bg-white p-6 shadow-card ring-1 ring-slate-100">
-              <h2 className="text-xl font-semibold text-ink">完成度更新</h2>
-              <p className="mt-3 text-sm leading-7 text-slate-600">
-                目前完成度地圖與補進度分析仍以解剖學為主；這輪 {state.session.subject} 的結果先以答題統計與弱點小節分析為主。
-              </p>
-            </section>
-          )}
-
-          <AIAnalysisPanel
-            analysis={aiAnalysis}
-            model={aiModel}
-            error={aiError}
-            loading={aiLoading}
-            onGenerate={handleGenerateAIAnalysis}
-          />
-
           <section className="rounded-[2rem] bg-white p-6 shadow-card ring-1 ring-slate-100">
             <div className="flex flex-wrap items-center justify-between gap-3">
               <div>
@@ -582,8 +445,7 @@ export default function ResultsPage() {
               </div>
             </div>
           </section>
-
-          {showPrompt ? <AIPromptBox promptText={state.promptText} /> : null}
+          <WeaknessRanking sections={topWeakSections} />
         </div>
 
         <aside className="space-y-6">
@@ -617,31 +479,6 @@ export default function ResultsPage() {
               >
                 先看錯題複習頁
               </Link>
-            </div>
-            <button
-              type="button"
-              onClick={() => setShowPrompt(true)}
-              className="mt-5 min-h-12 w-full rounded-2xl bg-ink px-4 py-4 text-sm font-semibold text-white transition hover:bg-slate-900"
-            >
-              產生只講弱點知識的 AI Prompt
-            </button>
-          </section>
-
-          <section className="rounded-[2rem] bg-white p-6 shadow-card ring-1 ring-slate-100">
-            <h2 className="text-xl font-semibold text-ink">歷史完成度摘要</h2>
-            <div className="mt-4 grid gap-3">
-              <p className="rounded-2xl bg-slate-50 px-4 py-3 text-sm text-slate-700">
-                整體 completionRate <span className="font-semibold">{state.completionStats.overall.completionRate}%</span>
-              </p>
-              <p className="rounded-2xl bg-slate-50 px-4 py-3 text-sm text-slate-700">
-                整體 masteryScore <span className="font-semibold">{state.completionStats.overall.masteryScore}</span>
-              </p>
-              <p className="rounded-2xl bg-slate-50 px-4 py-3 text-sm text-slate-700">
-                已作答不重複題數 <span className="font-semibold">{state.completionStats.overall.attemptedQuestions}</span>
-              </p>
-              <p className="rounded-2xl bg-slate-50 px-4 py-3 text-sm text-slate-700">
-                錯題複習池 <span className="font-semibold">{getReviewQuestionItems(anatomyQuestions, loadCompletedSessions(), 999).length}</span>
-              </p>
             </div>
           </section>
         </aside>
