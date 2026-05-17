@@ -423,8 +423,6 @@ export default function QuizPage() {
     setConfidence(4);
     setConfidenceExpanded(false);
     setErrorType(undefined);
-    setReviewText("");
-    setReviewError("");
   }
 
   function handleNext() {
