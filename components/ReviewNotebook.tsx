@@ -2,11 +2,15 @@
 
 import Link from "next/link";
 import { type ReactNode, useEffect, useState } from "react";
-import { loadQuestionCommunityStats } from "@/lib/cloudSync";
+import {
+  loadQuestionCommunityStats,
+  loadSharedQuestionExplanationOverrides
+} from "@/lib/cloudSync";
 import {
   applyQuestionExplanationOverride,
   loadQuestionExplanationOverrides,
-  saveQuestionExplanationOverride
+  saveQuestionExplanationOverride,
+  saveQuestionExplanationOverrides
 } from "@/lib/storage";
 import { getOrCreateVisitorId } from "@/lib/visitor";
 import { useAuth } from "@/components/AuthProvider";
@@ -203,6 +207,29 @@ export function ReviewNotebook({
   }, [items]);
 
   useEffect(() => {
+    async function fetchSharedExplanationOverrides() {
+      if (items.length === 0) return;
+
+      try {
+        const sharedOverrides = await loadSharedQuestionExplanationOverrides(
+          items.map((item) => item.question.id)
+        );
+        if (Object.keys(sharedOverrides).length === 0) return;
+
+        saveQuestionExplanationOverrides(sharedOverrides);
+        setExplanationOverrides((current) => ({
+          ...current,
+          ...sharedOverrides
+        }));
+      } catch {
+        // keep local overrides only
+      }
+    }
+
+    void fetchSharedExplanationOverrides();
+  }, [items]);
+
+  useEffect(() => {
     async function fetchCommunityStats() {
       if (items.length === 0) {
         setCommunityStatsMap(new Map());
@@ -232,6 +259,14 @@ export function ReviewNotebook({
   }
 
   async function handleGenerateQuestionExplanation(question: Question) {
+    if (!session?.access_token) {
+      setExplanationErrorMap((current) => ({
+        ...current,
+        [question.id]: "請先登入帳號，才能使用 GPT-5-mini 補詳解。"
+      }));
+      return;
+    }
+
     setExplanationLoadingMap((current) => ({ ...current, [question.id]: true }));
     setExplanationErrorMap((current) => ({ ...current, [question.id]: "" }));
 
@@ -307,7 +342,6 @@ export function ReviewNotebook({
     const override = explanationOverrides[question.id];
     const loading = explanationLoadingMap[question.id];
     const error = explanationErrorMap[question.id];
-    const canUseAIExplanation = Boolean(session?.access_token);
 
     return (
       <div className="space-y-3">
@@ -319,7 +353,7 @@ export function ReviewNotebook({
             </span>
           ) : null}
         </div>
-        {!override && canUseAIExplanation ? (
+        {!override ? (
           <button
             type="button"
             onClick={() => void handleGenerateQuestionExplanation(question)}
@@ -328,11 +362,6 @@ export function ReviewNotebook({
           >
             {loading ? "GPT-5-mini 生成中..." : "用 GPT-5-mini 補詳解"}
           </button>
-        ) : null}
-        {!override && !canUseAIExplanation ? (
-          <span className="inline-flex rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-600">
-            登入後可用 GPT-5-mini 補詳解
-          </span>
         ) : null}
         {error ? <p className="text-sm font-medium text-rose-700">{error}</p> : null}
       </div>

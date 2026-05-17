@@ -7,7 +7,10 @@ import { AIPromptBox } from "@/components/AIPromptBox";
 import { useAuth } from "@/components/AuthProvider";
 import { ResultSummary } from "@/components/ResultSummary";
 import { WeaknessRanking } from "@/components/WeaknessRanking";
-import { loadQuestionCommunityStats } from "@/lib/cloudSync";
+import {
+  loadQuestionCommunityStats,
+  loadSharedQuestionExplanationOverrides
+} from "@/lib/cloudSync";
 import { anatomyQuestions } from "@/data/anatomyQuestions";
 import { subjectRegistry } from "@/data/subjectRegistry";
 import {
@@ -28,6 +31,7 @@ import {
   loadCurrentSession,
   loadQuestionExplanationOverrides,
   saveQuestionExplanationOverride,
+  saveQuestionExplanationOverrides,
   saveQuizSettings
 } from "@/lib/storage";
 import {
@@ -130,6 +134,29 @@ export default function ResultsPage() {
   }, [syncVersion]);
 
   useEffect(() => {
+    async function fetchSharedExplanationOverrides() {
+      if (!state.session?.attempts.length) return;
+
+      try {
+        const sharedOverrides = await loadSharedQuestionExplanationOverrides(
+          state.session.attempts.map((attempt) => attempt.questionId)
+        );
+        if (Object.keys(sharedOverrides).length === 0) return;
+
+        saveQuestionExplanationOverrides(sharedOverrides);
+        setExplanationOverrides((current) => ({
+          ...current,
+          ...sharedOverrides
+        }));
+      } catch {
+        // keep local overrides only
+      }
+    }
+
+    void fetchSharedExplanationOverrides();
+  }, [state.session]);
+
+  useEffect(() => {
     async function fetchCommunityStats() {
       if (!state.session?.attempts.length) {
         setCommunityStatsMap(new Map());
@@ -156,6 +183,14 @@ export default function ResultsPage() {
   }
 
   async function handleGenerateQuestionExplanation(question: Question, attempt: Attempt) {
+    if (!session?.access_token) {
+      setExplanationErrorMap((current) => ({
+        ...current,
+        [question.id]: "請先登入帳號，才能使用 GPT-5-mini 補詳解。"
+      }));
+      return;
+    }
+
     setExplanationLoadingMap((current) => ({ ...current, [question.id]: true }));
     setExplanationErrorMap((current) => ({ ...current, [question.id]: "" }));
 
@@ -294,12 +329,11 @@ export default function ResultsPage() {
     const generated = explanationOverrides[question.id];
     const loading = explanationLoadingMap[question.id];
     const error = explanationErrorMap[question.id];
-    const canUseAIExplanation = Boolean(session?.access_token);
 
     return (
       <div className="space-y-3">
         <div className="flex flex-wrap items-center gap-3">
-          {!generated && canUseAIExplanation ? (
+          {!generated ? (
             <button
               type="button"
               onClick={() => void handleGenerateQuestionExplanation(question, attempt)}
@@ -308,11 +342,6 @@ export default function ResultsPage() {
             >
               {loading ? "GPT-5-mini 生成中..." : "用 GPT-5-mini 補詳解"}
             </button>
-          ) : null}
-          {!generated && !canUseAIExplanation ? (
-            <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-600">
-              登入後可用 GPT-5-mini 補詳解
-            </span>
           ) : null}
           {generated ? (
             <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-600">

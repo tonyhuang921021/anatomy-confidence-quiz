@@ -3,6 +3,7 @@ import type {
   LeaderboardEntry,
   OwnerDailyPoint,
   OwnerDashboardStats,
+  QuestionExplanationOverride,
   QuestionCommunityStats,
   QuizSession,
   VisitorStats
@@ -52,6 +53,15 @@ type QuestionAccuracyStatRow = {
   total_attempts: number;
   correct_attempts: number;
   correct_rate: number;
+  updated_at?: string | null;
+};
+
+type QuestionExplanationOverrideRow = {
+  question_id: string;
+  explanation: string;
+  option_analysis?: Record<string, string> | null;
+  memory_tip?: string | null;
+  model?: string | null;
   updated_at?: string | null;
 };
 
@@ -197,6 +207,18 @@ function mapQuestionAccuracyStatRow(row: QuestionAccuracyStatRow): QuestionCommu
     correctAttempts: row.correct_attempts,
     correctRate: Number(row.correct_rate ?? 0),
     updatedAt: row.updated_at ?? undefined
+  };
+}
+
+function mapQuestionExplanationOverrideRow(
+  row: QuestionExplanationOverrideRow
+): QuestionExplanationOverride {
+  return {
+    explanation: row.explanation,
+    optionAnalysis: row.option_analysis ?? {},
+    memoryTip: row.memory_tip ?? undefined,
+    model: row.model ?? undefined,
+    updatedAt: row.updated_at ?? new Date().toISOString()
   };
 }
 
@@ -535,6 +557,30 @@ export async function loadQuestionCommunityStats(questionIds: string[]) {
   }
 
   return (data ?? []).map((row) => mapQuestionAccuracyStatRow(row as QuestionAccuracyStatRow));
+}
+
+export async function loadSharedQuestionExplanationOverrides(questionIds: string[]) {
+  if (!isSupabaseConfigured() || questionIds.length === 0) {
+    return {} as Record<string, QuestionExplanationOverride>;
+  }
+
+  const supabase = getSupabaseBrowserClient();
+  const uniqueQuestionIds = Array.from(new Set(questionIds));
+  const { data, error } = await supabase
+    .from("question_explanation_overrides")
+    .select("question_id, explanation, option_analysis, memory_tip, model, updated_at")
+    .in("question_id", uniqueQuestionIds);
+
+  if (error) {
+    throw error;
+  }
+
+  return Object.fromEntries(
+    (data ?? []).map((row) => {
+      const typedRow = row as QuestionExplanationOverrideRow;
+      return [typedRow.question_id, mapQuestionExplanationOverrideRow(typedRow)] as const;
+    })
+  );
 }
 
 export async function trackVisitorPresence(userId?: string | null) {

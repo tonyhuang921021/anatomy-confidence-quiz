@@ -136,6 +136,31 @@ async function insertUsageLog(row: UsageLogRow) {
   }
 }
 
+async function upsertSharedExplanationOverride(
+  questionId: string,
+  parsed: ParsedExplanationPayload,
+  model: string
+) {
+  const supabase = getSupabaseServerClient();
+  if (!supabase) return;
+
+  const { error } = await supabase.from("question_explanation_overrides").upsert(
+    {
+      question_id: questionId,
+      explanation: parsed.explanation ?? "",
+      option_analysis: parsed.optionAnalysis ?? {},
+      memory_tip: parsed.memoryTip ?? "",
+      model,
+      updated_at: new Date().toISOString()
+    },
+    { onConflict: "question_id" }
+  );
+
+  if (error) {
+    throw error;
+  }
+}
+
 function buildQuestionExplanationPrompt(body: QuestionExplanationRequestBody) {
   const question = body.question;
   const attempt = body.attempt;
@@ -374,6 +399,12 @@ export async function POST(request: NextRequest) {
       model: result.model,
       used_at: new Date().toISOString()
     });
+
+    await upsertSharedExplanationOverride(
+      body.question.id ?? body.question.stem.slice(0, 120),
+      parsed,
+      result.model
+    );
 
     return NextResponse.json({
       ok: true,

@@ -15,6 +15,7 @@ import {
   getSeasonalLimitedQuestions
 } from "@/data/med1QuestionBank";
 import {
+  loadSharedQuestionExplanationOverrides,
   pushCompletedSessionToSupabase,
   pushQuestionStatsSnapshotToSupabase
 } from "@/lib/cloudSync";
@@ -31,7 +32,8 @@ import {
   loadCurrentSession,
   loadQuizSettings,
   saveCompletedSession,
-  saveCurrentSession
+  saveCurrentSession,
+  saveQuestionExplanationOverrides
 } from "@/lib/storage";
 import {
   Attempt,
@@ -302,6 +304,23 @@ export default function QuizPage() {
 
     setMounted(true);
   }, []);
+
+  useEffect(() => {
+    async function fetchSharedExplanationOverrides() {
+      if (!session?.questionOrder?.length) return;
+
+      try {
+        const sharedOverrides = await loadSharedQuestionExplanationOverrides(session.questionOrder);
+        if (Object.keys(sharedOverrides).length === 0) return;
+        saveQuestionExplanationOverrides(sharedOverrides);
+        setSession((current) => (current ? { ...current } : current));
+      } catch {
+        // keep local overrides only
+      }
+    }
+
+    void fetchSharedExplanationOverrides();
+  }, [session?.id, session?.questionOrder]);
 
   const questionSet = useMemo(() => (session ? getQuestionByOrder(session) : []), [session]);
   const currentIndex = session?.currentQuestionIndex ?? 0;

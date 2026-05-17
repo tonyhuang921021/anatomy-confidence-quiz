@@ -221,6 +221,54 @@ for update
 using (true)
 with check (true);
 
+create table if not exists public.question_explanation_overrides (
+  question_id text primary key,
+  explanation text not null,
+  option_analysis jsonb not null default '{}'::jsonb,
+  memory_tip text,
+  model text,
+  updated_at timestamptz not null default now()
+);
+
+create index if not exists question_explanation_overrides_updated_at_idx
+on public.question_explanation_overrides (updated_at desc);
+
+grant select
+  on public.question_explanation_overrides
+  to anon;
+
+grant select, insert, update, delete
+  on public.question_explanation_overrides
+  to authenticated;
+
+grant select, insert, update, delete
+  on public.question_explanation_overrides
+  to service_role;
+
+alter table public.question_explanation_overrides enable row level security;
+
+drop policy if exists "Anyone can read question explanation overrides" on public.question_explanation_overrides;
+drop policy if exists "Authenticated users can insert question explanation overrides" on public.question_explanation_overrides;
+drop policy if exists "Authenticated users can update question explanation overrides" on public.question_explanation_overrides;
+
+create policy "Anyone can read question explanation overrides"
+on public.question_explanation_overrides
+for select
+using (true);
+
+create policy "Authenticated users can insert question explanation overrides"
+on public.question_explanation_overrides
+for insert
+to authenticated
+with check (true);
+
+create policy "Authenticated users can update question explanation overrides"
+on public.question_explanation_overrides
+for update
+to authenticated
+using (true)
+with check (true);
+
 create table if not exists public.question_attempt_devices (
   visitor_id text primary key,
   first_attempt_at timestamptz not null default now(),

@@ -179,15 +179,21 @@ export function saveQuestionExplanationOverride(
   override: QuestionExplanationOverride
 ) {
   if (!isBrowser()) return;
+  saveQuestionExplanationOverrides({
+    [questionId]: override
+  });
+}
+
+export function saveQuestionExplanationOverrides(
+  overrides: Record<string, QuestionExplanationOverride>
+) {
+  if (!isBrowser()) return;
   const current = loadQuestionExplanationOverrides();
   const next = {
     ...current,
-    [questionId]: override
+    ...overrides
   };
-  window.localStorage.setItem(
-    getScopedKey(QUESTION_EXPLANATION_OVERRIDES_KEY),
-    JSON.stringify(next)
-  );
+  window.localStorage.setItem(getScopedKey(QUESTION_EXPLANATION_OVERRIDES_KEY), JSON.stringify(next));
 }
 
 export function applyQuestionExplanationOverride(question: Question): Question {
