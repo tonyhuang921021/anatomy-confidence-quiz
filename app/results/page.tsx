@@ -35,6 +35,7 @@ import {
   SectionStats,
   SummaryStats
 } from "@/types/quiz";
+import { getOrCreateVisitorId } from "@/lib/visitor";
 
 const allQuestions = Array.from(
   new Map(
@@ -68,7 +69,7 @@ type ResultState = {
 
 export default function ResultsPage() {
   const router = useRouter();
-  const { syncVersion } = useAuth();
+  const { syncVersion, session } = useAuth();
   const [mounted, setMounted] = useState(false);
   const [communityStatsMap, setCommunityStatsMap] = useState<Map<string, QuestionCommunityStats>>(new Map());
   const [generatedExplanations, setGeneratedExplanations] = useState<Record<string, { text: string; model: string }>>({});
@@ -148,6 +149,8 @@ export default function ResultsPage() {
           "Content-Type": "application/json"
         },
         body: JSON.stringify({
+          visitorId: getOrCreateVisitorId(),
+          accessToken: session?.access_token ?? null,
           question: {
             id: question.id,
             subject: question.subject,

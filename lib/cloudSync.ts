@@ -16,6 +16,7 @@ import {
   getSupabaseBrowserClient,
   isSupabaseConfigured
 } from "@/lib/supabase/client";
+import { getOrCreateVisitorId } from "@/lib/visitor";
 
 type QuizSessionRow = {
   id: string;
@@ -67,7 +68,6 @@ type QuestionAttemptDeviceDailyRow = {
   last_attempt_at: string;
 };
 
-const VISITOR_STORAGE_KEY = "acq-visitor-id";
 const ONLINE_WINDOW_MS = 2 * 60 * 1000;
 
 function getTaipeiDayRange() {
@@ -110,18 +110,7 @@ function getRecentTaipeiDayKeys(days: number) {
 }
 
 function getVisitorId() {
-  if (typeof window === "undefined") return null;
-
-  const existingId = window.localStorage.getItem(VISITOR_STORAGE_KEY);
-  if (existingId) return existingId;
-
-  const nextId =
-    typeof crypto !== "undefined" && "randomUUID" in crypto
-      ? crypto.randomUUID()
-      : `visitor-${Date.now()}-${Math.random().toString(36).slice(2, 10)}`;
-
-  window.localStorage.setItem(VISITOR_STORAGE_KEY, nextId);
-  return nextId;
+  return getOrCreateVisitorId();
 }
 
 function sessionFreshnessValue(session: QuizSession) {

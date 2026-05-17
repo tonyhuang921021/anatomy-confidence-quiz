@@ -308,3 +308,43 @@ on public.question_attempt_device_daily
 for update
 using (true)
 with check (true);
+
+create table if not exists public.ai_explanation_usage_logs (
+  id bigint generated always as identity primary key,
+  rate_key text not null,
+  visitor_id text,
+  user_email text,
+  question_id text not null,
+  model text not null,
+  used_at timestamptz not null default now()
+);
+
+create index if not exists ai_explanation_usage_logs_rate_key_used_at_idx
+on public.ai_explanation_usage_logs (rate_key, used_at desc);
+
+grant select, insert
+  on public.ai_explanation_usage_logs
+  to anon;
+
+grant select, insert, update, delete
+  on public.ai_explanation_usage_logs
+  to authenticated;
+
+grant select, insert, update, delete
+  on public.ai_explanation_usage_logs
+  to service_role;
+
+alter table public.ai_explanation_usage_logs enable row level security;
+
+drop policy if exists "Anyone can read ai explanation usage logs" on public.ai_explanation_usage_logs;
+drop policy if exists "Anyone can insert ai explanation usage logs" on public.ai_explanation_usage_logs;
+
+create policy "Anyone can read ai explanation usage logs"
+on public.ai_explanation_usage_logs
+for select
+using (true);
+
+create policy "Anyone can insert ai explanation usage logs"
+on public.ai_explanation_usage_logs
+for insert
+with check (true);
