@@ -8,8 +8,7 @@ const cards = (summary: SummaryStats) => [
   { label: "總題數", value: summary.total, tone: "slate" },
   { label: "答對題數", value: summary.correct, tone: "emerald" },
   { label: "答對率", value: `${summary.correctRate}%`, tone: "brand" },
-  { label: "猜對風險數", value: summary.guessRiskCount, tone: "yellow" },
-  { label: "優先補弱數", value: summary.priorityWeaknessCount, tone: "orange" }
+  { label: "猜對風險數", value: summary.guessRiskCount, tone: "yellow" }
 ];
 
 const toneClasses: Record<string, string> = {
