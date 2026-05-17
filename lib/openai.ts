@@ -10,6 +10,11 @@ type ResponseOutputItem = {
 
 type OpenAIResponsePayload = {
   output?: ResponseOutputItem[];
+  usage?: {
+    input_tokens?: number;
+    output_tokens?: number;
+    total_tokens?: number;
+  };
   error?: {
     message?: string;
   };
@@ -59,7 +64,14 @@ export async function createOpenAIAnalysis(prompt: string) {
 
   return {
     model,
-    text: extractOutputText(payload)
+    text: extractOutputText(payload),
+    usage: {
+      inputTokens: payload.usage?.input_tokens ?? 0,
+      outputTokens: payload.usage?.output_tokens ?? 0,
+      totalTokens:
+        payload.usage?.total_tokens ??
+        (payload.usage?.input_tokens ?? 0) + (payload.usage?.output_tokens ?? 0)
+    }
   };
 }
 
@@ -97,6 +109,13 @@ export async function createOpenAIText(
 
   return {
     model,
-    text: extractOutputText(payload)
+    text: extractOutputText(payload),
+    usage: {
+      inputTokens: payload.usage?.input_tokens ?? 0,
+      outputTokens: payload.usage?.output_tokens ?? 0,
+      totalTokens:
+        payload.usage?.total_tokens ??
+        (payload.usage?.input_tokens ?? 0) + (payload.usage?.output_tokens ?? 0)
+    }
   };
 }

@@ -35,6 +35,9 @@ type UsageLogRow = {
   user_email?: string | null;
   question_id: string;
   model: string;
+  input_tokens?: number;
+  output_tokens?: number;
+  total_tokens?: number;
   used_at: string;
 };
 
@@ -131,8 +134,21 @@ async function insertUsageLog(row: UsageLogRow) {
   if (!supabase) return;
 
   const { error } = await supabase.from("ai_explanation_usage_logs").insert(row);
-  if (error) {
-    throw error;
+  if (!error) {
+    return;
+  }
+
+  const fallbackRow = {
+    rate_key: row.rate_key,
+    visitor_id: row.visitor_id ?? null,
+    user_email: row.user_email ?? null,
+    question_id: row.question_id,
+    model: row.model,
+    used_at: row.used_at
+  };
+  const { error: fallbackError } = await supabase.from("ai_explanation_usage_logs").insert(fallbackRow);
+  if (fallbackError) {
+    throw fallbackError;
   }
 }
 
@@ -397,6 +413,9 @@ export async function POST(request: NextRequest) {
       user_email: userEmail,
       question_id: body.question.id ?? body.question.stem.slice(0, 120),
       model: result.model,
+      input_tokens: result.usage.inputTokens,
+      output_tokens: result.usage.outputTokens,
+      total_tokens: result.usage.totalTokens,
       used_at: new Date().toISOString()
     });
 

@@ -3,8 +3,16 @@
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import { useAuth } from "@/components/AuthProvider";
-import { loadOwnerDailySeries, loadOwnerDashboardStats } from "@/lib/cloudSync";
-import { OwnerDailyPoint, OwnerDashboardStats } from "@/types/quiz";
+import {
+  loadOwnerDailySeries,
+  loadOwnerDashboardStats,
+  loadOwnerExplanationUsage
+} from "@/lib/cloudSync";
+import {
+  OwnerDailyPoint,
+  OwnerDashboardStats,
+  OwnerExplanationUsageEntry
+} from "@/types/quiz";
 
 function getAllowedEmails() {
   const raw = process.env.NEXT_PUBLIC_ADMIN_EMAILS ?? "";
@@ -108,6 +116,7 @@ export default function OwnerPage() {
   const { configured, loading, user } = useAuth();
   const [stats, setStats] = useState<OwnerDashboardStats | null>(null);
   const [dailySeries, setDailySeries] = useState<OwnerDailyPoint[]>([]);
+  const [explanationUsage, setExplanationUsage] = useState<OwnerExplanationUsageEntry[]>([]);
   const [statsLoading, setStatsLoading] = useState(true);
   const [error, setError] = useState("");
   const allowed = useMemo(() => isAllowedEmail(user?.email), [user?.email]);
@@ -124,12 +133,14 @@ export default function OwnerPage() {
       try {
         setStatsLoading(true);
         setError("");
-        const [nextStats, nextSeries] = await Promise.all([
+        const [nextStats, nextSeries, nextExplanationUsage] = await Promise.all([
           loadOwnerDashboardStats(),
-          loadOwnerDailySeries(14)
+          loadOwnerDailySeries(14),
+          loadOwnerExplanationUsage()
         ]);
         setStats(nextStats);
         setDailySeries(nextSeries);
+        setExplanationUsage(nextExplanationUsage);
       } catch (fetchError) {
         setError(fetchError instanceof Error ? fetchError.message : "數據載入失敗");
       } finally {
@@ -229,6 +240,22 @@ export default function OwnerPage() {
                 <p className="text-sm text-slate-500">全站累積總作答題數</p>
                 <p className="mt-2 text-3xl font-bold text-ink">{stats.totalAttempts}</p>
               </article>
+              <article className="rounded-3xl bg-white p-5 shadow-card ring-1 ring-slate-100">
+                <p className="text-sm text-slate-500">AI 詳解總生成題數</p>
+                <p className="mt-2 text-3xl font-bold text-ink">{stats.aiExplanationCount}</p>
+              </article>
+              <article className="rounded-3xl bg-white p-5 shadow-card ring-1 ring-slate-100">
+                <p className="text-sm text-slate-500">AI 詳解累積 Input Tokens</p>
+                <p className="mt-2 text-3xl font-bold text-ink">{stats.aiExplanationInputTokens.toLocaleString()}</p>
+              </article>
+              <article className="rounded-3xl bg-white p-5 shadow-card ring-1 ring-slate-100">
+                <p className="text-sm text-slate-500">AI 詳解累積 Output Tokens</p>
+                <p className="mt-2 text-3xl font-bold text-ink">{stats.aiExplanationOutputTokens.toLocaleString()}</p>
+              </article>
+              <article className="rounded-3xl bg-white p-5 shadow-card ring-1 ring-slate-100">
+                <p className="text-sm text-slate-500">AI 詳解累積總 Tokens</p>
+                <p className="mt-2 text-3xl font-bold text-ink">{stats.aiExplanationTotalTokens.toLocaleString()}</p>
+              </article>
             </div>
 
             <section className="rounded-[2rem] bg-white p-6 shadow-card ring-1 ring-slate-100">
@@ -257,6 +284,51 @@ export default function OwnerPage() {
                     />
                   </div>
                 </div>
+              </div>
+            </section>
+
+            <section className="rounded-[2rem] bg-white p-6 shadow-card ring-1 ring-slate-100">
+              <div className="flex items-center justify-between gap-3">
+                <div>
+                  <h2 className="text-lg font-semibold text-ink">AI 詳解使用統計</h2>
+                  <p className="mt-2 text-sm text-slate-500">看誰總共用了多少題詳解，以及花了多少 token。</p>
+                </div>
+              </div>
+              <div className="mt-4 overflow-x-auto">
+                <table className="min-w-full text-left text-sm">
+                  <thead className="text-slate-500">
+                    <tr className="border-b border-slate-200">
+                      <th className="px-3 py-3 font-semibold">使用者 / 裝置</th>
+                      <th className="px-3 py-3 font-semibold">詳解題數</th>
+                      <th className="px-3 py-3 font-semibold">Input</th>
+                      <th className="px-3 py-3 font-semibold">Output</th>
+                      <th className="px-3 py-3 font-semibold">總 Tokens</th>
+                      <th className="px-3 py-3 font-semibold">最後使用</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {explanationUsage.length === 0 ? (
+                      <tr>
+                        <td colSpan={6} className="px-3 py-6 text-center text-slate-500">
+                          目前還沒有 AI 詳解使用紀錄。
+                        </td>
+                      </tr>
+                    ) : (
+                      explanationUsage.map((entry) => (
+                        <tr key={`${entry.userEmail ?? entry.visitorId ?? entry.label}`} className="border-b border-slate-100 last:border-b-0">
+                          <td className="px-3 py-3 font-medium text-ink">{entry.label}</td>
+                          <td className="px-3 py-3 text-slate-700">{entry.explanationCount}</td>
+                          <td className="px-3 py-3 text-slate-700">{entry.inputTokens.toLocaleString()}</td>
+                          <td className="px-3 py-3 text-slate-700">{entry.outputTokens.toLocaleString()}</td>
+                          <td className="px-3 py-3 text-slate-700">{entry.totalTokens.toLocaleString()}</td>
+                          <td className="px-3 py-3 text-slate-500">
+                            {entry.lastUsedAt ? formatUpdatedAt(entry.lastUsedAt) : "—"}
+                          </td>
+                        </tr>
+                      ))
+                    )}
+                  </tbody>
+                </table>
               </div>
             </section>
 

@@ -3,6 +3,7 @@ import type {
   LeaderboardEntry,
   OwnerDailyPoint,
   OwnerDashboardStats,
+  OwnerExplanationUsageEntry,
   QuestionExplanationOverride,
   QuestionCommunityStats,
   QuizSession,
@@ -77,6 +78,50 @@ type QuestionAttemptDeviceDailyRow = {
   first_attempt_at: string;
   last_attempt_at: string;
 };
+
+type AIExplanationUsageLogRow = {
+  rate_key: string;
+  visitor_id?: string | null;
+  user_email?: string | null;
+  question_id: string;
+  model: string;
+  input_tokens?: number | null;
+  output_tokens?: number | null;
+  total_tokens?: number | null;
+  used_at: string;
+};
+
+async function fetchAIExplanationUsageRows() {
+  if (!isSupabaseConfigured()) {
+    return [] as AIExplanationUsageLogRow[];
+  }
+
+  const supabase = getSupabaseBrowserClient();
+  const primary = await supabase
+    .from("ai_explanation_usage_logs")
+    .select("rate_key, visitor_id, user_email, question_id, model, input_tokens, output_tokens, total_tokens, used_at")
+    .order("used_at", { ascending: false });
+
+  if (!primary.error) {
+    return (primary.data ?? []) as AIExplanationUsageLogRow[];
+  }
+
+  const fallback = await supabase
+    .from("ai_explanation_usage_logs")
+    .select("rate_key, visitor_id, user_email, question_id, model, used_at")
+    .order("used_at", { ascending: false });
+
+  if (fallback.error) {
+    throw fallback.error;
+  }
+
+  return ((fallback.data ?? []) as AIExplanationUsageLogRow[]).map((row) => ({
+    ...row,
+    input_tokens: 0,
+    output_tokens: 0,
+    total_tokens: 0
+  }));
+}
 
 const ONLINE_WINDOW_MS = 2 * 60 * 1000;
 
@@ -648,6 +693,10 @@ export async function loadOwnerDashboardStats(): Promise<OwnerDashboardStats> {
       attemptsToday: 0,
       attemptsLast7Days: 0,
       totalAttempts: 0,
+      aiExplanationCount: 0,
+      aiExplanationInputTokens: 0,
+      aiExplanationOutputTokens: 0,
+      aiExplanationTotalTokens: 0,
       updatedAt: new Date().toISOString()
     };
   }
@@ -666,7 +715,8 @@ export async function loadOwnerDashboardStats(): Promise<OwnerDashboardStats> {
     totalUsersResult,
     totalAttemptsResult,
     todayAttemptsResult,
-    last7DaysAttemptsResult
+    last7DaysAttemptsResult,
+    aiExplanationUsageRows
   ] = await Promise.all([
     supabase.from("site_visitors").select("*", { count: "exact", head: true }),
     supabase.from("question_attempt_devices").select("*", { count: "exact", head: true }),
@@ -689,7 +739,8 @@ export async function loadOwnerDashboardStats(): Promise<OwnerDashboardStats> {
     supabase
       .from("question_attempt_logs")
       .select("*", { count: "exact", head: true })
-      .gte("answered_at", sevenDaysAgo)
+      .gte("answered_at", sevenDaysAgo),
+    fetchAIExplanationUsageRows()
   ]);
 
   const errors = [
@@ -707,6 +758,15 @@ export async function loadOwnerDashboardStats(): Promise<OwnerDashboardStats> {
     throw errors[0] as Error;
   }
 
+  const aiUsageRows = aiExplanationUsageRows;
+  const aiExplanationCount = aiUsageRows.length;
+  const aiExplanationInputTokens = aiUsageRows.reduce((sum, row) => sum + (row.input_tokens ?? 0), 0);
+  const aiExplanationOutputTokens = aiUsageRows.reduce((sum, row) => sum + (row.output_tokens ?? 0), 0);
+  const aiExplanationTotalTokens = aiUsageRows.reduce(
+    (sum, row) => sum + (row.total_tokens ?? (row.input_tokens ?? 0) + (row.output_tokens ?? 0)),
+    0
+  );
+
   return {
     totalVisitorDevices: totalVisitorsResult.count ?? 0,
     totalAttemptDevices: totalAttemptDevicesResult.count ?? 0,
@@ -716,8 +776,51 @@ export async function loadOwnerDashboardStats(): Promise<OwnerDashboardStats> {
     attemptsToday: todayAttemptsResult.count ?? 0,
     attemptsLast7Days: last7DaysAttemptsResult.count ?? 0,
     totalAttempts: totalAttemptsResult.count ?? 0,
+    aiExplanationCount,
+    aiExplanationInputTokens,
+    aiExplanationOutputTokens,
+    aiExplanationTotalTokens,
     updatedAt: now.toISOString()
   };
+}
+
+export async function loadOwnerExplanationUsage(): Promise<OwnerExplanationUsageEntry[]> {
+  if (!isSupabaseConfigured()) {
+    return [];
+  }
+
+  const grouped = new Map<string, OwnerExplanationUsageEntry>();
+
+  for (const row of await fetchAIExplanationUsageRows()) {
+    const key = row.user_email?.trim().toLowerCase() || row.visitor_id || row.rate_key;
+    const current = grouped.get(key) ?? {
+      label: row.user_email?.trim() || row.visitor_id || row.rate_key,
+      userEmail: row.user_email ?? undefined,
+      visitorId: row.visitor_id ?? undefined,
+      explanationCount: 0,
+      inputTokens: 0,
+      outputTokens: 0,
+      totalTokens: 0,
+      lastUsedAt: row.used_at
+    };
+
+    current.explanationCount += 1;
+    current.inputTokens += row.input_tokens ?? 0;
+    current.outputTokens += row.output_tokens ?? 0;
+    current.totalTokens += row.total_tokens ?? (row.input_tokens ?? 0) + (row.output_tokens ?? 0);
+    if (!current.lastUsedAt || row.used_at > current.lastUsedAt) {
+      current.lastUsedAt = row.used_at;
+    }
+
+    grouped.set(key, current);
+  }
+
+  return Array.from(grouped.values()).sort((a, b) => {
+    if (b.explanationCount !== a.explanationCount) {
+      return b.explanationCount - a.explanationCount;
+    }
+    return b.totalTokens - a.totalTokens;
+  });
 }
 
 export async function loadOwnerDailySeries(days = 14): Promise<OwnerDailyPoint[]> {

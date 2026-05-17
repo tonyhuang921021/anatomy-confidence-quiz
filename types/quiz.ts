@@ -241,6 +241,10 @@ export type OwnerDashboardStats = {
   attemptsToday: number;
   attemptsLast7Days: number;
   totalAttempts: number;
+  aiExplanationCount: number;
+  aiExplanationInputTokens: number;
+  aiExplanationOutputTokens: number;
+  aiExplanationTotalTokens: number;
   updatedAt: string;
 };
 
@@ -248,4 +252,15 @@ export type OwnerDailyPoint = {
   date: string;
   attempts: number;
   devices: number;
+};
+
+export type OwnerExplanationUsageEntry = {
+  label: string;
+  userEmail?: string;
+  visitorId?: string;
+  explanationCount: number;
+  inputTokens: number;
+  outputTokens: number;
+  totalTokens: number;
+  lastUsedAt?: string;
 };

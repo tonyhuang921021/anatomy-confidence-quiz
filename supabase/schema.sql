@@ -364,8 +364,20 @@ create table if not exists public.ai_explanation_usage_logs (
   user_email text,
   question_id text not null,
   model text not null,
+  input_tokens integer not null default 0,
+  output_tokens integer not null default 0,
+  total_tokens integer not null default 0,
   used_at timestamptz not null default now()
 );
+
+alter table public.ai_explanation_usage_logs
+  add column if not exists input_tokens integer not null default 0;
+
+alter table public.ai_explanation_usage_logs
+  add column if not exists output_tokens integer not null default 0;
+
+alter table public.ai_explanation_usage_logs
+  add column if not exists total_tokens integer not null default 0;
 
 create index if not exists ai_explanation_usage_logs_rate_key_used_at_idx
 on public.ai_explanation_usage_logs (rate_key, used_at desc);
