@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { AuthPanel } from "@/components/AuthPanel";
+import { ExamCountdown } from "@/components/ExamCountdown";
 import {
   enabledSubjects,
   HIDDEN_MULTI_ENTRY_SUBJECTS,
@@ -72,11 +73,12 @@ export default function HomePage() {
             </div>
 
             <div className="mt-6 grid gap-3 sm:grid-cols-2">
+              <ExamCountdown />
               <div className="rounded-3xl bg-slate-50 p-4">
                 <p className="text-sm text-slate-500">目前題庫數量</p>
                 <p className="mt-2 text-2xl font-bold text-ink">{totalQuestionCount}</p>
               </div>
-              <div className="rounded-3xl bg-slate-50 p-4">
+              <div className="rounded-3xl bg-slate-50 p-4 sm:col-span-2">
                 <p className="text-sm text-slate-500">已開放科目</p>
                 <p className="mt-2 text-lg font-bold text-ink">
                   {availableSubjects.map((subject) => subject.label).join("、")}
