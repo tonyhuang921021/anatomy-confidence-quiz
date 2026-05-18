@@ -25,7 +25,7 @@ export default function StartPage() {
   const med1Subjects = selectableSubjects.filter((item) => MED1_SUBJECTS.includes(item.subject));
   const med2Subjects = selectableSubjects.filter((item) => MED2_SUBJECTS.includes(item.subject));
   const [selectedSubjects, setSelectedSubjects] = useState<SubjectName[]>(defaultSubjects);
-  const [excludeAiGenerated, setExcludeAiGenerated] = useState(false);
+  const [excludeAiGenerated, setExcludeAiGenerated] = useState(true);
   const [includeSeasonalLimited, setIncludeSeasonalLimited] = useState(false);
   const seasonalLimitedQuestions = useMemo(() => getSeasonalLimitedQuestions(), []);
   const seasonalDeadline = new Date("2026-05-15T09:00:00+08:00");

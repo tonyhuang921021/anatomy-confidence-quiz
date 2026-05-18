@@ -560,6 +560,7 @@ export const DEFAULT_QUIZ_SETTINGS: QuizSettings = {
   mode: "weakness",
   questionCount: 10,
   subjectFilter: "解剖學",
+  excludeAiGenerated: true,
   feedbackMode: "full",
   paperMode: "random_set"
 };
