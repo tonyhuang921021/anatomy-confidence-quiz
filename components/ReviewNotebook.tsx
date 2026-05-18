@@ -202,8 +202,21 @@ export function ReviewNotebook({
   const [explanationOverrides, setExplanationOverrides] = useState<Record<string, QuestionExplanationOverride>>({});
   const [explanationLoadingMap, setExplanationLoadingMap] = useState<Record<string, boolean>>({});
   const [explanationErrorMap, setExplanationErrorMap] = useState<Record<string, string>>({});
+  const [activeCategory, setActiveCategory] = useState<"wrong" | "lowConfidence">("wrong");
   const wrongItems = sortByRecent(items.filter((item) => item.history.wrong > 0));
   const lowConfidenceItems = sortByRecent(items.filter((item) => item.history.lowConfidence > 0));
+  const activeItems = activeCategory === "wrong" ? wrongItems : lowConfidenceItems;
+
+  useEffect(() => {
+    if (activeCategory === "wrong" && wrongItems.length === 0 && lowConfidenceItems.length > 0) {
+      setActiveCategory("lowConfidence");
+      return;
+    }
+
+    if (activeCategory === "lowConfidence" && lowConfidenceItems.length === 0 && wrongItems.length > 0) {
+      setActiveCategory("wrong");
+    }
+  }, [activeCategory, lowConfidenceItems.length, wrongItems.length]);
 
   useEffect(() => {
     setExplanationOverrides(loadQuestionExplanationOverrides());
@@ -369,123 +382,109 @@ export function ReviewNotebook({
           </div>
         ) : (
           <>
-            <div>
-              <div className="flex items-center gap-3">
-                <h3 className="text-xl font-semibold text-ink">錯題區</h3>
-                <span className="rounded-full bg-rose-100 px-3 py-1 text-xs font-semibold text-rose-900">
-                  {wrongItems.length} 題
+            <div className="flex flex-wrap gap-3">
+              <button
+                type="button"
+                onClick={() => setActiveCategory("wrong")}
+                className={`min-h-12 rounded-2xl px-4 py-3 text-sm font-semibold transition ${
+                  activeCategory === "wrong"
+                    ? "bg-rose-100 text-rose-900 ring-1 ring-rose-300"
+                    : "bg-slate-100 text-slate-700 hover:bg-slate-200"
+                }`}
+              >
+                錯題
+                <span className="ml-2 rounded-full bg-white/80 px-2 py-0.5 text-xs font-semibold">
+                  {wrongItems.length}
                 </span>
-              </div>
-              <div className="mt-4 grid gap-4">
-                {wrongItems.length === 0 ? (
-                  <div className="rounded-3xl bg-slate-50 p-5 text-sm text-slate-500">
-                    目前沒有累積錯題。
-                  </div>
-                ) : (
-                  wrongItems.map((item, index) => (
-                    <article
-                      key={`wrong-${item.question.id}`}
-                      className="rounded-3xl border border-rose-200 bg-rose-50/60 p-5"
-                    >
-                      {(() => {
-                        const renderedQuestion = applyQuestionExplanationOverride(item.question);
-                        return (
-                          <>
-                      <div className="flex flex-wrap items-start justify-between gap-4">
-                        <div className="min-w-0 flex-1">
-                          <div className="flex flex-wrap items-center gap-3">
-                            <span className="rounded-full bg-rose-100 px-3 py-1 text-xs font-semibold text-rose-900">
-                              錯題 {index + 1}
-                            </span>
-                            <span className="text-sm text-slate-500">
-                              {item.question.chapter} / {item.question.section}
-                            </span>
-                          </div>
-                          <h4 className="mt-3 break-words text-lg font-semibold leading-8 text-ink">
-                            {item.question.stem}
-                          </h4>
-                        </div>
-                        <div className="rounded-2xl bg-white px-4 py-3 text-sm text-slate-700">
-                          最近作答 <span className="font-semibold">{formatTime(item.history.lastAttemptedAt)}</span>
-                        </div>
-                      </div>
-
-                      <details className="mt-4 rounded-2xl bg-white p-4 text-sm text-slate-700">
-                        <summary className="cursor-pointer font-semibold text-ink">
-                          查看題目、選項與詳解
-                        </summary>
-                        {renderQuestionReview(item, renderedQuestion, renderExplanationFooter(renderedQuestion))}
-                      </details>
-
-                      <details className="mt-4 rounded-2xl bg-white p-4 text-sm text-slate-700">
-                        <summary className="cursor-pointer font-semibold text-ink">
-                          看相同觀念類似題
-                        </summary>
-                        {renderRelatedQuestions(item.question, allQuestions)}
-                      </details>
-                          </>
-                        );
-                      })()}
-                    </article>
-                  ))
-                )}
-              </div>
+              </button>
+              <button
+                type="button"
+                onClick={() => setActiveCategory("lowConfidence")}
+                className={`min-h-12 rounded-2xl px-4 py-3 text-sm font-semibold transition ${
+                  activeCategory === "lowConfidence"
+                    ? "bg-amber-100 text-amber-900 ring-1 ring-amber-300"
+                    : "bg-slate-100 text-slate-700 hover:bg-slate-200"
+                }`}
+              >
+                沒信心題
+                <span className="ml-2 rounded-full bg-white/80 px-2 py-0.5 text-xs font-semibold">
+                  {lowConfidenceItems.length}
+                </span>
+              </button>
             </div>
 
             <div>
-              <div className="flex items-center gap-3">
-                <h3 className="text-xl font-semibold text-ink">沒信心題區</h3>
-                <span className="rounded-full bg-amber-100 px-3 py-1 text-xs font-semibold text-amber-900">
-                  {lowConfidenceItems.length} 題
+              <div className="flex flex-wrap items-center gap-3">
+                <h3 className="text-xl font-semibold text-ink">
+                  {activeCategory === "wrong" ? "錯題區" : "沒信心題區"}
+                </h3>
+                <span
+                  className={`rounded-full px-3 py-1 text-xs font-semibold ${
+                    activeCategory === "wrong"
+                      ? "bg-rose-100 text-rose-900"
+                      : "bg-amber-100 text-amber-900"
+                  }`}
+                >
+                  {activeItems.length} 題
                 </span>
               </div>
               <div className="mt-4 grid gap-4">
-                {lowConfidenceItems.length === 0 ? (
+                {activeItems.length === 0 ? (
                   <div className="rounded-3xl bg-slate-50 p-5 text-sm text-slate-500">
-                    目前沒有累積低信心題。
+                    {activeCategory === "wrong" ? "目前沒有累積錯題。" : "目前沒有累積低信心題。"}
                   </div>
                 ) : (
-                  lowConfidenceItems.map((item, index) => (
+                  activeItems.map((item, index) => (
                     <article
-                      key={`low-${item.question.id}`}
-                      className="rounded-3xl border border-amber-200 bg-amber-50/70 p-5"
+                      key={`${activeCategory}-${item.question.id}`}
+                      className={`rounded-3xl border p-5 ${
+                        activeCategory === "wrong"
+                          ? "border-rose-200 bg-rose-50/60"
+                          : "border-amber-200 bg-amber-50/70"
+                      }`}
                     >
                       {(() => {
                         const renderedQuestion = applyQuestionExplanationOverride(item.question);
                         return (
                           <>
-                      <div className="flex flex-wrap items-start justify-between gap-4">
-                        <div className="min-w-0 flex-1">
-                          <div className="flex flex-wrap items-center gap-3">
-                            <span className="rounded-full bg-amber-100 px-3 py-1 text-xs font-semibold text-amber-900">
-                              低信心 {index + 1}
-                            </span>
-                            <span className="text-sm text-slate-500">
-                              {item.question.chapter} / {item.question.section}
-                            </span>
-                          </div>
-                          <h4 className="mt-3 break-words text-lg font-semibold leading-8 text-ink">
-                            {item.question.stem}
-                          </h4>
-                        </div>
-                        <div className="rounded-2xl bg-white px-4 py-3 text-sm text-slate-700">
-                          最近作答 <span className="font-semibold">{formatTime(item.history.lastAttemptedAt)}</span>
-                        </div>
-                      </div>
+                            <div className="space-y-4">
+                              <div className="space-y-3">
+                                <div className="flex flex-wrap items-center gap-3">
+                                  <span
+                                    className={`rounded-full px-3 py-1 text-xs font-semibold ${
+                                      activeCategory === "wrong"
+                                        ? "bg-rose-100 text-rose-900"
+                                        : "bg-amber-100 text-amber-900"
+                                    }`}
+                                  >
+                                    {activeCategory === "wrong" ? `錯題 ${index + 1}` : `沒信心 ${index + 1}`}
+                                  </span>
+                                  <span className="text-sm text-slate-500">
+                                    {item.question.chapter} / {item.question.section}
+                                  </span>
+                                </div>
+                                <h4 className="break-words text-base font-semibold leading-7 text-ink sm:text-lg sm:leading-8">
+                                  {item.question.stem}
+                                </h4>
+                                <div className="rounded-2xl bg-white px-4 py-3 text-sm text-slate-700">
+                                  最近作答 <span className="font-semibold">{formatTime(item.history.lastAttemptedAt)}</span>
+                                </div>
+                              </div>
 
-                      <details className="mt-4 rounded-2xl bg-white p-4 text-sm text-slate-700">
-                        <summary className="cursor-pointer font-semibold text-ink">
-                          查看題目、選項與詳解
-                        </summary>
-                        {renderQuestionReview(item, renderedQuestion, renderExplanationFooter(renderedQuestion))}
-                      </details>
+                              <details className="rounded-2xl bg-white p-4 text-sm text-slate-700">
+                                <summary className="cursor-pointer font-semibold text-ink">
+                                  查看題目、選項與詳解
+                                </summary>
+                                {renderQuestionReview(item, renderedQuestion, renderExplanationFooter(renderedQuestion))}
+                              </details>
 
-                      <details className="mt-4 rounded-2xl bg-white p-4 text-sm text-slate-700">
-                        <summary className="cursor-pointer font-semibold text-ink">
-                          看相同觀念類似題
-                        </summary>
-                        {renderRelatedQuestions(item.question, allQuestions)}
-                      </details>
+                              <details className="rounded-2xl bg-white p-4 text-sm text-slate-700">
+                                <summary className="cursor-pointer font-semibold text-ink">
+                                  看相同觀念類似題
+                                </summary>
+                                {renderRelatedQuestions(item.question, allQuestions)}
+                              </details>
+                            </div>
                           </>
                         );
                       })()}
