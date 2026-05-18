@@ -243,6 +243,22 @@ export function ReviewNotebook({
     }
 
     void fetchSharedExplanationOverrides();
+
+    function handleFocusSync() {
+      void fetchSharedExplanationOverrides();
+    }
+
+    if (typeof window !== "undefined") {
+      window.addEventListener("focus", handleFocusSync);
+      document.addEventListener("visibilitychange", handleFocusSync);
+    }
+
+    return () => {
+      if (typeof window !== "undefined") {
+        window.removeEventListener("focus", handleFocusSync);
+        document.removeEventListener("visibilitychange", handleFocusSync);
+      }
+    };
   }, [items]);
 
   async function handleGenerateQuestionExplanation(question: Question) {

@@ -149,6 +149,22 @@ export default function ResultsPage() {
     }
 
     void fetchSharedExplanationOverrides();
+
+    function handleFocusSync() {
+      void fetchSharedExplanationOverrides();
+    }
+
+    if (typeof window !== "undefined") {
+      window.addEventListener("focus", handleFocusSync);
+      document.addEventListener("visibilitychange", handleFocusSync);
+    }
+
+    return () => {
+      if (typeof window !== "undefined") {
+        window.removeEventListener("focus", handleFocusSync);
+        document.removeEventListener("visibilitychange", handleFocusSync);
+      }
+    };
   }, [state.session]);
 
   function handleRestart() {
