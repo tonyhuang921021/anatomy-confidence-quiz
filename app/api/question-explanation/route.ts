@@ -111,6 +111,41 @@ function getSupabaseServerClient() {
   });
 }
 
+function getSupabaseWriteClient(accessToken?: string) {
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+  const anonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+
+  if (!url) {
+    return null;
+  }
+
+  if (serviceRoleKey) {
+    return createClient(url, serviceRoleKey, {
+      auth: {
+        persistSession: false,
+        autoRefreshToken: false
+      }
+    });
+  }
+
+  if (!anonKey || !accessToken) {
+    return null;
+  }
+
+  return createClient(url, anonKey, {
+    auth: {
+      persistSession: false,
+      autoRefreshToken: false
+    },
+    global: {
+      headers: {
+        Authorization: `Bearer ${accessToken}`
+      }
+    }
+  });
+}
+
 async function getVerifiedUserEmail(accessToken?: string) {
   if (!accessToken) return null;
   const supabase = getSupabaseServerClient();
@@ -168,8 +203,8 @@ async function checkUsageLimits(rateKey: string) {
   return { blocked: false };
 }
 
-async function insertUsageLog(row: UsageLogRow) {
-  const supabase = getSupabaseServerClient();
+async function insertUsageLog(row: UsageLogRow, accessToken?: string) {
+  const supabase = getSupabaseWriteClient(accessToken);
   if (!supabase) return;
 
   const { error } = await supabase.from("ai_explanation_usage_logs").insert(row);
@@ -194,9 +229,10 @@ async function insertUsageLog(row: UsageLogRow) {
 async function upsertSharedExplanationOverride(
   questionId: string,
   parsed: ParsedExplanationPayload,
-  model: string
+  model: string,
+  accessToken?: string
 ) {
-  const supabase = getSupabaseServerClient();
+  const supabase = getSupabaseWriteClient(accessToken);
   if (!supabase) return;
 
   const { error } = await supabase.from("question_explanation_overrides").upsert(
@@ -488,12 +524,13 @@ export async function POST(request: NextRequest) {
       output_tokens: result.usage.outputTokens,
       total_tokens: result.usage.totalTokens,
       used_at: new Date().toISOString()
-    });
+    }, body.accessToken);
 
     await upsertSharedExplanationOverride(
       body.question.id ?? body.question.stem.slice(0, 120),
       parsed,
-      result.model
+      result.model,
+      body.accessToken
     );
 
     return NextResponse.json({
