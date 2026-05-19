@@ -473,10 +473,10 @@ export function ReviewNotebook({
   return (
     <section
       ref={sectionRef}
-      className={`rounded-[2rem] bg-white p-4 ring-1 ring-slate-100 transition-all duration-500 ease-out motion-reduce:transition-none sm:p-6 ${
+      className={`origin-top rounded-[2rem] bg-white p-4 ring-1 ring-slate-100 transition-all duration-500 ease-out motion-reduce:transition-none sm:p-6 ${
         isSpotlighted
           ? "-mx-5 -translate-y-1 scale-[1.035] bg-white shadow-[0_30px_80px_rgba(15,42,34,0.2)] ring-slate-200"
-          : "translate-y-0 scale-[0.97] shadow-card"
+          : "translate-y-0 scale-100 shadow-card"
       } sm:mx-0 sm:scale-100`}
     >
       <div className="flex flex-wrap items-center justify-between gap-3">
