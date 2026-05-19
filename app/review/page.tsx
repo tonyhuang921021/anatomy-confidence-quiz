@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useAuth } from "@/components/AuthProvider";
 import { ReviewNotebook } from "@/components/ReviewNotebook";
 import { getQuestionBankBySubjectFilter } from "@/data/med1QuestionBank";
@@ -15,7 +15,10 @@ import { ReviewQuestionItem } from "@/types/quiz";
 
 export default function ReviewPage() {
   const [practiceItems, setPracticeItems] = useState<ReviewQuestionItem[]>([]);
+  const [isFullscreenReview, setIsFullscreenReview] = useState(false);
+  const [fullscreenDismissed, setFullscreenDismissed] = useState(false);
   const { syncVersion } = useAuth();
+  const reviewTriggerRef = useRef<HTMLDivElement | null>(null);
   const allQuestions = getQuestionBankBySubjectFilter("全部");
 
   useEffect(() => {
@@ -23,6 +26,68 @@ export default function ReviewPage() {
     const practiceSessions = sessions.filter((session) => session.settings?.mode !== "simulation");
     setPracticeItems(getReviewQuestionItems(allQuestions, practiceSessions, 60));
   }, [syncVersion]);
+
+  useEffect(() => {
+    if (typeof window === "undefined" || !reviewTriggerRef.current) return;
+
+    const mediaQuery = window.matchMedia("(max-width: 639px)");
+    if (!mediaQuery.matches) {
+      setIsFullscreenReview(false);
+      setFullscreenDismissed(false);
+      return;
+    }
+
+    let ticking = false;
+
+    const updateFullscreenState = () => {
+      ticking = false;
+      if (!reviewTriggerRef.current) return;
+
+      const rect = reviewTriggerRef.current.getBoundingClientRect();
+      const viewportHeight = window.innerHeight || 0;
+      const enteringFocusZone = rect.top <= viewportHeight * 0.56 && rect.bottom >= viewportHeight * 0.24;
+      const safelyOutsideFocusZone = rect.top > viewportHeight * 0.92 || rect.bottom < viewportHeight * 0.08;
+
+      if (enteringFocusZone && !fullscreenDismissed) {
+        setIsFullscreenReview(true);
+      }
+
+      if (safelyOutsideFocusZone && fullscreenDismissed) {
+        setFullscreenDismissed(false);
+      }
+    };
+
+    const requestUpdate = () => {
+      if (ticking) return;
+      ticking = true;
+      window.requestAnimationFrame(updateFullscreenState);
+    };
+
+    updateFullscreenState();
+    window.addEventListener("scroll", requestUpdate, { passive: true });
+    window.addEventListener("resize", requestUpdate);
+
+    return () => {
+      window.removeEventListener("scroll", requestUpdate);
+      window.removeEventListener("resize", requestUpdate);
+    };
+  }, [fullscreenDismissed]);
+
+  useEffect(() => {
+    if (typeof document === "undefined") return;
+
+    if (!isFullscreenReview) {
+      document.body.style.overflow = "";
+      return;
+    }
+
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+
+    return () => {
+      document.body.style.overflow = previousOverflow;
+    };
+  }, [isFullscreenReview]);
 
   function handleStartPracticeReview() {
     saveQuizSettings({
@@ -33,6 +98,11 @@ export default function ReviewPage() {
       customQuestionIds: practiceItems.map((item) => item.question.id),
       customPoolLabel: "散題錯題庫"
     });
+  }
+
+  function handleCloseFullscreenReview() {
+    setIsFullscreenReview(false);
+    setFullscreenDismissed(true);
   }
 
   const practiceSnapshot = getReviewSnapshot(practiceItems);
@@ -78,7 +148,7 @@ export default function ReviewPage() {
       </section>
 
       <div className="mt-8 grid gap-8">
-        <div id="practice-review" className="scroll-mt-24">
+        <div id="practice-review" ref={reviewTriggerRef} className="scroll-mt-24">
           <ReviewNotebook
             title="散題錯題庫"
             description="這裡只整理平常零散刷題累積下來的錯題與低信心題。"
@@ -89,6 +159,36 @@ export default function ReviewPage() {
           />
         </div>
       </div>
+
+      {isFullscreenReview ? (
+        <div className="fixed inset-0 z-50 bg-cream sm:hidden">
+          <div className="flex h-full flex-col">
+            <div className="flex items-center justify-between gap-3 border-b border-slate-200 bg-white px-4 py-3 shadow-sm">
+              <div>
+                <p className="text-xs font-semibold uppercase tracking-[0.18em] text-brand-700">Fullscreen Review</p>
+                <h2 className="text-lg font-bold text-ink">散題錯題庫</h2>
+              </div>
+              <button
+                type="button"
+                onClick={handleCloseFullscreenReview}
+                className="min-h-11 rounded-2xl bg-slate-100 px-4 py-2 text-sm font-semibold text-slate-800 transition hover:bg-slate-200"
+              >
+                返回頁面
+              </button>
+            </div>
+            <div className="min-h-0 flex-1 overflow-y-auto px-3 py-3">
+              <ReviewNotebook
+                title="散題錯題庫"
+                description="手機滿版複習模式。看完可按右上角返回頁面。"
+                startLabel="開始散題錯題複習"
+                onStartReview={handleStartPracticeReview}
+                items={practiceItems}
+                allQuestions={allQuestions}
+              />
+            </div>
+          </div>
+        </div>
+      ) : null}
     </main>
   );
 }
