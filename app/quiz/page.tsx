@@ -650,11 +650,20 @@ export default function QuizPage() {
                 {shouldShowExplanation && currentQuestion.optionAnalysis ? (
                   <div className="mt-5 rounded-3xl bg-white/70 p-4 text-sm text-slate-800 ring-1 ring-white/70">
                     <h3 className="text-sm font-semibold text-ink">各選項解析</h3>
-                    <div className="mt-3 grid gap-3">
+                    <div className="mt-3 space-y-2.5">
                       {Object.entries(currentQuestion.optionAnalysis).map(([key, value]) => (
-                        <div key={key} className="rounded-2xl bg-white px-4 py-3">
-                          <p className="font-semibold text-slate-900">{key} 選項</p>
-                          <p className="mt-1 leading-7 text-slate-700">{value}</p>
+                        <div
+                          key={key}
+                          className="rounded-2xl border border-slate-200 bg-white px-3 py-3 sm:px-4"
+                        >
+                          <div className="flex items-start gap-3">
+                            <span className="mt-0.5 inline-flex min-w-8 justify-center rounded-full bg-slate-50 px-2 py-1 text-xs font-semibold text-slate-700 ring-1 ring-slate-200">
+                              {key}
+                            </span>
+                            <p className="min-w-0 flex-1 text-sm leading-6 text-slate-700 sm:text-[15px] sm:leading-7">
+                              {value}
+                            </p>
+                          </div>
                         </div>
                       ))}
                     </div>

@@ -83,12 +83,20 @@ function renderQuestionReview(
         <span className="font-semibold">最後錯因：</span>
         {item.history.latestErrorType ?? "未填"}
       </p>
-      <div className="grid gap-3">
+      <div className="space-y-2.5">
         {getOptionKeys(item).map((key) => (
-          <div key={`${item.question.id}-${key}`} className="rounded-2xl bg-slate-50 p-4">
-            <p className="font-semibold text-slate-900">
-              {key}. {renderedQuestion.options[key]}
-            </p>
+          <div
+            key={`${item.question.id}-${key}`}
+            className="rounded-2xl border border-slate-200 bg-slate-50/90 px-3 py-3 sm:px-4"
+          >
+            <div className="flex items-start gap-3">
+              <span className="mt-0.5 inline-flex min-w-8 justify-center rounded-full bg-white px-2 py-1 text-xs font-semibold text-slate-700 ring-1 ring-slate-200">
+                {key}
+              </span>
+              <p className="min-w-0 flex-1 text-sm font-medium leading-6 text-slate-800 sm:text-[15px] sm:leading-7">
+                {renderedQuestion.options[key]}
+              </p>
+            </div>
           </div>
         ))}
       </div>
@@ -104,14 +112,23 @@ function renderQuestionReview(
         {renderedQuestion.explanation}
       </p>
       {renderedQuestion.optionAnalysis ? (
-        <div className="grid gap-3">
+        <div className="space-y-2.5">
           {getOptionKeysFromQuestion(renderedQuestion).map((key) => {
             const text = renderedQuestion.optionAnalysis?.[key];
             if (!text) return null;
             return (
-              <div key={`${renderedQuestion.id}-analysis-${key}`} className="rounded-2xl bg-slate-50 p-4">
-                <p className="font-semibold text-slate-900">{key} 選項解析</p>
-                <p className="mt-1 leading-7 text-slate-700">{text}</p>
+              <div
+                key={`${renderedQuestion.id}-analysis-${key}`}
+                className="rounded-2xl border border-slate-200 bg-slate-50/90 px-3 py-3 sm:px-4"
+              >
+                <div className="flex items-start gap-3">
+                  <span className="mt-0.5 inline-flex min-w-8 justify-center rounded-full bg-white px-2 py-1 text-xs font-semibold text-slate-700 ring-1 ring-slate-200">
+                    {key}
+                  </span>
+                  <p className="min-w-0 flex-1 text-sm leading-6 text-slate-700 sm:text-[15px] sm:leading-7">
+                    {text}
+                  </p>
+                </div>
               </div>
             );
           })}
@@ -148,12 +165,20 @@ function renderRelatedQuestions(question: Question, allQuestions: Question[]) {
           </summary>
           <div className="mt-3 space-y-3 text-sm leading-7 text-slate-700">
             <p>{relatedQuestion.stem}</p>
-            <div className="grid gap-3">
+            <div className="space-y-2.5">
               {getOptionKeysFromQuestion(relatedQuestion).map((key) => (
-                <div key={`${relatedQuestion.id}-${key}`} className="rounded-2xl bg-white p-4">
-                  <p className="font-semibold text-slate-900">
-                    {key}. {relatedQuestion.options[key]}
-                  </p>
+                <div
+                  key={`${relatedQuestion.id}-${key}`}
+                  className="rounded-2xl border border-slate-200 bg-white px-3 py-3 sm:px-4"
+                >
+                  <div className="flex items-start gap-3">
+                    <span className="mt-0.5 inline-flex min-w-8 justify-center rounded-full bg-slate-50 px-2 py-1 text-xs font-semibold text-slate-700 ring-1 ring-slate-200">
+                      {key}
+                    </span>
+                    <p className="min-w-0 flex-1 text-sm font-medium leading-6 text-slate-800 sm:text-[15px] sm:leading-7">
+                      {relatedQuestion.options[key]}
+                    </p>
+                  </div>
                 </div>
               ))}
             </div>
