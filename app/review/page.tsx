@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { useAuth } from "@/components/AuthProvider";
 import { ReviewNotebook } from "@/components/ReviewNotebook";
 import { getQuestionBankBySubjectFilter } from "@/data/med1QuestionBank";
@@ -15,9 +15,7 @@ import { ReviewQuestionItem } from "@/types/quiz";
 
 export default function ReviewPage() {
   const [practiceItems, setPracticeItems] = useState<ReviewQuestionItem[]>([]);
-  const [isNotebookFocused, setIsNotebookFocused] = useState(false);
   const { syncVersion } = useAuth();
-  const notebookRef = useRef<HTMLDivElement | null>(null);
   const allQuestions = getQuestionBankBySubjectFilter("全部");
 
   useEffect(() => {
@@ -25,46 +23,6 @@ export default function ReviewPage() {
     const practiceSessions = sessions.filter((session) => session.settings?.mode !== "simulation");
     setPracticeItems(getReviewQuestionItems(allQuestions, practiceSessions, 60));
   }, [syncVersion]);
-
-  useEffect(() => {
-    if (typeof window === "undefined" || !notebookRef.current) return;
-
-    const mediaQuery = window.matchMedia("(max-width: 639px)");
-    if (!mediaQuery.matches) {
-      setIsNotebookFocused(false);
-      return;
-    }
-
-    let ticking = false;
-
-    const updateFocusState = () => {
-      ticking = false;
-      if (!notebookRef.current) return;
-
-      const rect = notebookRef.current.getBoundingClientRect();
-      const viewportHeight = window.innerHeight || 0;
-      const triggerTop = viewportHeight * 0.48;
-      const triggerBottom = viewportHeight * 0.2;
-      const shouldFocus = rect.top <= triggerTop && rect.bottom >= triggerBottom;
-
-      setIsNotebookFocused(shouldFocus);
-    };
-
-    const requestUpdate = () => {
-      if (ticking) return;
-      ticking = true;
-      window.requestAnimationFrame(updateFocusState);
-    };
-
-    updateFocusState();
-    window.addEventListener("scroll", requestUpdate, { passive: true });
-    window.addEventListener("resize", requestUpdate);
-
-    return () => {
-      window.removeEventListener("scroll", requestUpdate);
-      window.removeEventListener("resize", requestUpdate);
-    };
-  }, []);
 
   function handleStartPracticeReview() {
     saveQuizSettings({
@@ -108,11 +66,7 @@ export default function ReviewPage() {
         </div>
       </section>
 
-      <section
-        className={`mt-8 grid gap-4 transition-all duration-500 ease-out motion-reduce:transition-none lg:grid-cols-2 ${
-          isNotebookFocused ? "scale-[0.94] opacity-25 blur-[1.5px]" : "scale-100 opacity-100"
-        }`}
-      >
+      <section className="mt-8 grid gap-4 lg:grid-cols-2">
         <article className="rounded-3xl bg-rose-50 p-5 text-rose-900">
           <p className="text-sm font-medium">散題錯題庫</p>
           <p className="mt-2 text-3xl font-bold">{practiceSnapshot.total}</p>
@@ -124,15 +78,7 @@ export default function ReviewPage() {
       </section>
 
       <div className="mt-8 grid gap-8">
-        <div
-          id="practice-review"
-          ref={notebookRef}
-          className={`scroll-mt-24 transition-all duration-500 ease-out motion-reduce:transition-none ${
-            isNotebookFocused
-              ? "-mt-2 scale-[1.06] rounded-[2.25rem] bg-white shadow-[0_38px_100px_rgba(15,42,34,0.24)] ring-2 ring-brand-300"
-              : "scale-100"
-          }`}
-        >
+        <div id="practice-review" className="scroll-mt-24">
           <ReviewNotebook
             title="散題錯題庫"
             description="這裡只整理平常零散刷題累積下來的錯題與低信心題。"
