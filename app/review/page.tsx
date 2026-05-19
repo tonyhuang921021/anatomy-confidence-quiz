@@ -16,6 +16,7 @@ import { ReviewQuestionItem } from "@/types/quiz";
 export default function ReviewPage() {
   const [practiceItems, setPracticeItems] = useState<ReviewQuestionItem[]>([]);
   const [isFullscreenReview, setIsFullscreenReview] = useState(false);
+  const [isFullscreenReviewVisible, setIsFullscreenReviewVisible] = useState(false);
   const [fullscreenDismissed, setFullscreenDismissed] = useState(false);
   const { syncVersion } = useAuth();
   const reviewTriggerRef = useRef<HTMLDivElement | null>(null);
@@ -89,6 +90,21 @@ export default function ReviewPage() {
     };
   }, [isFullscreenReview]);
 
+  useEffect(() => {
+    if (!isFullscreenReview || typeof window === "undefined") {
+      setIsFullscreenReviewVisible(false);
+      return;
+    }
+
+    const frame = window.requestAnimationFrame(() => {
+      setIsFullscreenReviewVisible(true);
+    });
+
+    return () => {
+      window.cancelAnimationFrame(frame);
+    };
+  }, [isFullscreenReview]);
+
   function handleStartPracticeReview() {
     saveQuizSettings({
       ...DEFAULT_QUIZ_SETTINGS,
@@ -101,8 +117,17 @@ export default function ReviewPage() {
   }
 
   function handleCloseFullscreenReview() {
-    setIsFullscreenReview(false);
+    setIsFullscreenReviewVisible(false);
     setFullscreenDismissed(true);
+
+    if (typeof window === "undefined") {
+      setIsFullscreenReview(false);
+      return;
+    }
+
+    window.setTimeout(() => {
+      setIsFullscreenReview(false);
+    }, 280);
   }
 
   const practiceSnapshot = getReviewSnapshot(practiceItems);
@@ -161,8 +186,16 @@ export default function ReviewPage() {
       </div>
 
       {isFullscreenReview ? (
-        <div className="fixed inset-0 z-50 bg-cream sm:hidden">
-          <div className="flex h-full flex-col">
+        <div
+          className={`fixed inset-0 z-50 bg-cream/95 transition-opacity duration-300 ease-out sm:hidden ${
+            isFullscreenReviewVisible ? "opacity-100" : "opacity-0"
+          }`}
+        >
+          <div
+            className={`flex h-full flex-col transition-transform duration-300 ease-out ${
+              isFullscreenReviewVisible ? "translate-y-0" : "translate-y-full"
+            }`}
+          >
             <div className="flex items-center justify-between gap-3 border-b border-slate-200 bg-white px-4 py-3 shadow-sm">
               <div>
                 <p className="text-xs font-semibold uppercase tracking-[0.18em] text-brand-700">Fullscreen Review</p>
