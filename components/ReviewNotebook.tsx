@@ -545,26 +545,28 @@ export function ReviewNotebook({
                           <>
                             <div className="space-y-4">
                               <div className="space-y-3">
-                                <div className="flex flex-wrap items-center gap-3">
-                                  <span
-                                    className={`rounded-full px-3 py-1 text-xs font-semibold ${
-                                      activeCategory === "wrong"
-                                        ? "bg-rose-100 text-rose-900"
-                                        : "bg-amber-100 text-amber-900"
-                                    }`}
-                                  >
-                                    {activeCategory === "wrong" ? `錯題 ${index + 1}` : `沒信心 ${index + 1}`}
-                                  </span>
-                                  <span className="text-sm text-slate-500">
-                                    {item.question.chapter} / {item.question.section}
+                                <div className="flex items-start justify-between gap-3">
+                                  <div className="flex min-w-0 flex-wrap items-center gap-3">
+                                    <span
+                                      className={`rounded-full px-3 py-1 text-xs font-semibold ${
+                                        activeCategory === "wrong"
+                                          ? "bg-rose-100 text-rose-900"
+                                          : "bg-amber-100 text-amber-900"
+                                      }`}
+                                    >
+                                      {activeCategory === "wrong" ? `錯題 ${index + 1}` : `沒信心 ${index + 1}`}
+                                    </span>
+                                    <span className="min-w-0 text-sm text-slate-500">
+                                      {item.question.chapter} / {item.question.section}
+                                    </span>
+                                  </div>
+                                  <span className="shrink-0 pt-0.5 text-[11px] font-medium text-slate-400 sm:text-xs">
+                                    最近作答 {formatTime(item.history.lastAttemptedAt)}
                                   </span>
                                 </div>
                                 <h4 className="break-words text-base font-semibold leading-7 text-ink sm:text-lg sm:leading-8">
                                   {item.question.stem}
                                 </h4>
-                                <div className="rounded-2xl bg-white px-4 py-3 text-sm text-slate-700">
-                                  最近作答 <span className="font-semibold">{formatTime(item.history.lastAttemptedAt)}</span>
-                                </div>
                               </div>
 
                               <details className="rounded-2xl bg-white p-3.5 text-sm text-slate-700 sm:p-4">
