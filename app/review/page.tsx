@@ -17,9 +17,8 @@ export default function ReviewPage() {
   const [practiceItems, setPracticeItems] = useState<ReviewQuestionItem[]>([]);
   const [isFullscreenReview, setIsFullscreenReview] = useState(false);
   const [isFullscreenReviewVisible, setIsFullscreenReviewVisible] = useState(false);
-  const [fullscreenDismissed, setFullscreenDismissed] = useState(false);
   const { syncVersion } = useAuth();
-  const reviewTriggerRef = useRef<HTMLDivElement | null>(null);
+  const pageScrollYRef = useRef(0);
   const allQuestions = getQuestionBankBySubjectFilter("全部");
 
   useEffect(() => {
@@ -29,64 +28,32 @@ export default function ReviewPage() {
   }, [syncVersion]);
 
   useEffect(() => {
-    if (typeof window === "undefined" || !reviewTriggerRef.current) return;
-
-    const mediaQuery = window.matchMedia("(max-width: 639px)");
-    if (!mediaQuery.matches) {
-      setIsFullscreenReview(false);
-      setFullscreenDismissed(false);
-      return;
-    }
-
-    let ticking = false;
-
-    const updateFullscreenState = () => {
-      ticking = false;
-      if (!reviewTriggerRef.current) return;
-
-      const rect = reviewTriggerRef.current.getBoundingClientRect();
-      const viewportHeight = window.innerHeight || 0;
-      const enteringFocusZone = rect.top <= viewportHeight * 0.56 && rect.bottom >= viewportHeight * 0.24;
-      const safelyOutsideFocusZone = rect.top > viewportHeight * 0.92 || rect.bottom < viewportHeight * 0.08;
-
-      if (enteringFocusZone && !fullscreenDismissed) {
-        setIsFullscreenReview(true);
-      }
-
-      if (safelyOutsideFocusZone && fullscreenDismissed) {
-        setFullscreenDismissed(false);
-      }
-    };
-
-    const requestUpdate = () => {
-      if (ticking) return;
-      ticking = true;
-      window.requestAnimationFrame(updateFullscreenState);
-    };
-
-    updateFullscreenState();
-    window.addEventListener("scroll", requestUpdate, { passive: true });
-    window.addEventListener("resize", requestUpdate);
-
-    return () => {
-      window.removeEventListener("scroll", requestUpdate);
-      window.removeEventListener("resize", requestUpdate);
-    };
-  }, [fullscreenDismissed]);
-
-  useEffect(() => {
-    if (typeof document === "undefined") return;
+    if (typeof document === "undefined" || typeof window === "undefined") return;
 
     if (!isFullscreenReview) {
       document.body.style.overflow = "";
+      document.body.style.position = "";
+      document.body.style.top = "";
+      document.body.style.width = "";
+      window.scrollTo(0, pageScrollYRef.current);
       return;
     }
 
+    pageScrollYRef.current = window.scrollY;
     const previousOverflow = document.body.style.overflow;
+    const previousPosition = document.body.style.position;
+    const previousTop = document.body.style.top;
+    const previousWidth = document.body.style.width;
     document.body.style.overflow = "hidden";
+    document.body.style.position = "fixed";
+    document.body.style.top = `-${pageScrollYRef.current}px`;
+    document.body.style.width = "100%";
 
     return () => {
       document.body.style.overflow = previousOverflow;
+      document.body.style.position = previousPosition;
+      document.body.style.top = previousTop;
+      document.body.style.width = previousWidth;
     };
   }, [isFullscreenReview]);
 
@@ -118,7 +85,6 @@ export default function ReviewPage() {
 
   function handleCloseFullscreenReview() {
     setIsFullscreenReviewVisible(false);
-    setFullscreenDismissed(true);
 
     if (typeof window === "undefined") {
       setIsFullscreenReview(false);
@@ -128,6 +94,10 @@ export default function ReviewPage() {
     window.setTimeout(() => {
       setIsFullscreenReview(false);
     }, 280);
+  }
+
+  function handleOpenFullscreenReview() {
+    setIsFullscreenReview(true);
   }
 
   const practiceSnapshot = getReviewSnapshot(practiceItems);
@@ -173,7 +143,7 @@ export default function ReviewPage() {
       </section>
 
       <div className="mt-8 grid gap-8">
-        <div id="practice-review" ref={reviewTriggerRef} className="scroll-mt-24">
+        <div id="practice-review" className="scroll-mt-24">
           <ReviewNotebook
             title="散題錯題庫"
             description="這裡只整理平常零散刷題累積下來的錯題與低信心題。"
@@ -181,13 +151,24 @@ export default function ReviewPage() {
             onStartReview={handleStartPracticeReview}
             items={practiceItems}
             allQuestions={allQuestions}
+            headerAction={
+              <button
+                type="button"
+                onClick={handleOpenFullscreenReview}
+                className="inline-flex min-h-12 items-center justify-center rounded-2xl bg-slate-100 px-4 py-3 text-sm font-semibold text-slate-800 transition hover:bg-slate-200 sm:hidden"
+                aria-label="開啟滿版錯題複習"
+                title="開啟滿版錯題複習"
+              >
+                ⛶ 滿版模式
+              </button>
+            }
           />
         </div>
       </div>
 
       {isFullscreenReview ? (
         <div
-          className={`fixed inset-0 z-50 bg-cream/95 transition-opacity duration-300 ease-out sm:hidden ${
+          className={`fixed inset-0 z-50 bg-cream transition-opacity duration-300 ease-out overscroll-none sm:hidden ${
             isFullscreenReviewVisible ? "opacity-100" : "opacity-0"
           }`}
         >

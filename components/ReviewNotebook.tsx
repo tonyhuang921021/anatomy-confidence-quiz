@@ -215,6 +215,7 @@ type ReviewNotebookProps = {
   startHref?: string;
   onStartReview?: () => void;
   fullscreenMobile?: boolean;
+  headerAction?: ReactNode;
 };
 
 export function ReviewNotebook({
@@ -225,7 +226,8 @@ export function ReviewNotebook({
   startLabel = "開始錯題複習",
   startHref = "/quiz?new=1",
   onStartReview,
-  fullscreenMobile = false
+  fullscreenMobile = false,
+  headerAction
 }: ReviewNotebookProps) {
   const { session } = useAuth();
   const [explanationOverrides, setExplanationOverrides] = useState<Record<string, QuestionExplanationOverride>>({});
@@ -457,13 +459,16 @@ export function ReviewNotebook({
           <h2 className={`${fullscreenMobile ? "text-xl" : "text-2xl"} font-semibold text-ink`}>{title}</h2>
           <p className="mt-2 text-sm text-slate-500">{description}</p>
         </div>
-        <Link
-          href={startHref}
-          onClick={onStartReview}
-          className="min-h-12 rounded-2xl bg-brand-600 px-4 py-3 text-sm font-semibold text-white transition hover:bg-brand-700"
-        >
-          {startLabel}
-        </Link>
+        <div className="flex flex-wrap items-center gap-3">
+          {headerAction}
+          <Link
+            href={startHref}
+            onClick={onStartReview}
+            className="min-h-12 rounded-2xl bg-brand-600 px-4 py-3 text-sm font-semibold text-white transition hover:bg-brand-700"
+          >
+            {startLabel}
+          </Link>
+        </div>
       </div>
 
       <div className={`${fullscreenMobile ? "mt-4" : "mt-6"} grid gap-8`}>
