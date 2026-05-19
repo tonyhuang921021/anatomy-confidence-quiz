@@ -16,7 +16,7 @@
       "C": "前庭神經核（vestibular nucleus）與動眼神經核（oculomotor nucleus）",
       "D": "前庭神經核（vestibular nucleus）與外旋神經核（abducens nucleus）"
     },
-    "official_answer": "A",
+    "official_answer": "C",
     "corrected_answer": null,
     "answer_credit_type": "single",
     "primary_subject_exact": "解剖學",
@@ -911,12 +911,12 @@
       "confidence": "high",
       "notes": "醫學（一）現行題號區間：1–31 解剖、32–36 胚胎、37–46 組織、47–73 生理、74–100 生化。"
     },
-    "explanation": "本題考 腹部與骨盆。官方答案為 A。闌尾常見位置為 retrocecal、pelvic、preileal/postileal 等；位於 pelvic brim 不是典型位置。",
+    "explanation": "本題考腹部與骨盆。正確答案為 C。闌尾常見位置包括 retrocecal、pelvic、preileal 與 postileal 等；位於 pelvic brim 並不是典型的闌尾位置，因此最不可能出現於此。",
     "option_analysis": {
-      "A": "正確。盲腸前（prececal） 是本題官方採認的答案之一。闌尾常見位置為 retrocecal、pelvic、preileal/postileal 等；位於 pelvic brim 不是典型位置。",
-      "B": "錯。迴腸後（postileal） 是本題的干擾選項；它對應到其他結構、路徑或概念，不能解釋題幹要求的核心考點。闌尾常見位置為 retrocecal、pelvic、preileal/postileal 等；位於 pelvic brim 不是典型位置。",
-      "C": "錯。骨盆緣（pelvic brim） 是本題的干擾選項；它對應到其他結構、路徑或概念，不能解釋題幹要求的核心考點。闌尾常見位置為 retrocecal、pelvic、preileal/postileal 等；位於 pelvic brim 不是典型位置。",
-      "D": "錯。盲腸後（retrocecal） 是本題的干擾選項；它對應到其他結構、路徑或概念，不能解釋題幹要求的核心考點。闌尾常見位置為 retrocecal、pelvic、preileal/postileal 等；位於 pelvic brim 不是典型位置。"
+      "A": "錯。盲腸前（prececal）雖不是最常見位置，但仍屬於闌尾可能出現的變異位置之一，因此不是本題要選的答案。",
+      "B": "錯。迴腸後（postileal）也是闌尾可見的變異位置之一，雖然比例不高，但並非最不可能出現。",
+      "C": "正確。骨盆緣（pelvic brim）不是典型描述闌尾位置的標準選項；相較於 retrocecal、pelvic、preileal、postileal 等常見或已知變異位置，最不可能的是 pelvic brim。",
+      "D": "錯。盲腸後（retrocecal）是闌尾最常見的位置之一，顯然不是最不可能出現的地方。"
     },
     "exam_point": "闌尾常見位置為 retrocecal、pelvic、preileal/postileal 等；位於 pelvic brim 不是典型位置。",
     "memory_tip": "看到「闌尾最不可能在下列何處出現？」先定位到解剖學的「腹部與骨盆」，再用關鍵字排除相近干擾選項。",
