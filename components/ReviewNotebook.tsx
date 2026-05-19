@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { type ReactNode, useEffect, useState } from "react";
+import { type ReactNode, useEffect, useRef, useState } from "react";
 import {
   loadQuestionCommunityStats,
   loadSharedQuestionExplanationOverrides
@@ -226,11 +226,13 @@ export function ReviewNotebook({
   onStartReview
 }: ReviewNotebookProps) {
   const { session } = useAuth();
+  const sectionRef = useRef<HTMLElement | null>(null);
   const [explanationOverrides, setExplanationOverrides] = useState<Record<string, QuestionExplanationOverride>>({});
   const [explanationLoadingMap, setExplanationLoadingMap] = useState<Record<string, boolean>>({});
   const [explanationErrorMap, setExplanationErrorMap] = useState<Record<string, string>>({});
   const [communityStatsMap, setCommunityStatsMap] = useState<Record<string, QuestionCommunityStats>>({});
   const [activeCategory, setActiveCategory] = useState<"wrong" | "lowConfidence">("wrong");
+  const [isSpotlighted, setIsSpotlighted] = useState(false);
   const wrongItems = sortByRecent(items.filter((item) => item.history.wrong > 0));
   const lowConfidenceItems = sortByRecent(items.filter((item) => item.history.lowConfidence > 0));
   const activeItems = activeCategory === "wrong" ? wrongItems : lowConfidenceItems;
@@ -282,6 +284,32 @@ export function ReviewNotebook({
   useEffect(() => {
     setExplanationOverrides(loadQuestionExplanationOverrides());
   }, [items]);
+
+  useEffect(() => {
+    if (typeof window === "undefined" || !sectionRef.current) return;
+
+    const mediaQuery = window.matchMedia("(max-width: 639px)");
+    if (!mediaQuery.matches) {
+      setIsSpotlighted(false);
+      return;
+    }
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        setIsSpotlighted(entry.isIntersecting && entry.intersectionRatio >= 0.35);
+      },
+      {
+        threshold: [0.2, 0.35, 0.5],
+        rootMargin: "-8% 0px -18% 0px"
+      }
+    );
+
+    observer.observe(sectionRef.current);
+
+    return () => {
+      observer.disconnect();
+    };
+  }, []);
 
   useEffect(() => {
     async function fetchSharedExplanationOverrides() {
@@ -443,7 +471,14 @@ export function ReviewNotebook({
   }
 
   return (
-    <section className="rounded-[2rem] bg-white p-4 shadow-card ring-1 ring-slate-100 sm:p-6">
+    <section
+      ref={sectionRef}
+      className={`rounded-[2rem] bg-white p-4 ring-1 ring-slate-100 transition-all duration-500 ease-out motion-reduce:transition-none sm:p-6 ${
+        isSpotlighted
+          ? "-mx-3 scale-[1.01] shadow-[0_24px_60px_rgba(15,42,34,0.14)]"
+          : "scale-[0.985] shadow-card"
+      } sm:mx-0 sm:scale-100`}
+    >
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
           <h2 className="text-2xl font-semibold text-ink">{title}</h2>
