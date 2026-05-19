@@ -783,6 +783,8 @@ export async function loadOwnerDashboardStats(): Promise<OwnerDashboardStats> {
     totalUsersResult,
     totalAttemptsResult,
     ownerDailyStatsResult,
+    todayAttemptsFallbackResult,
+    last7DaysAttemptsFallbackResult,
     aiExplanationUsageRows
   ] = await Promise.all([
     supabase.from("site_visitors").select("*", { count: "exact", head: true }),
@@ -803,6 +805,15 @@ export async function loadOwnerDashboardStats(): Promise<OwnerDashboardStats> {
       .from("owner_daily_stats")
       .select("activity_date, attempts, devices")
       .gte("activity_date", recentDayKeys[0]),
+    supabase
+      .from("question_attempt_logs")
+      .select("*", { count: "exact", head: true })
+      .gte("answered_at", startIso)
+      .lt("answered_at", endIso),
+    supabase
+      .from("question_attempt_logs")
+      .select("*", { count: "exact", head: true })
+      .gte("answered_at", `${recentDayKeys[0]}T00:00:00+08:00`),
     fetchAIExplanationUsageRows()
   ]);
 
@@ -814,7 +825,9 @@ export async function loadOwnerDashboardStats(): Promise<OwnerDashboardStats> {
     onlineVisitorsResult.error,
     totalUsersResult.error,
     totalAttemptsResult.error,
-    ownerDailyStatsResult.error
+    ownerDailyStatsResult.error,
+    todayAttemptsFallbackResult.error,
+    last7DaysAttemptsFallbackResult.error
   ].filter(Boolean);
 
   if (errors.length > 0) {
@@ -839,8 +852,14 @@ export async function loadOwnerDashboardStats(): Promise<OwnerDashboardStats> {
   const ownerDailyStats = ((ownerDailyStatsResult.data ?? []) as OwnerDailyStatRow[]).sort((a, b) =>
     a.activity_date.localeCompare(b.activity_date)
   );
-  const attemptsToday = ownerDailyStats.find((row) => row.activity_date === todayKey)?.attempts ?? 0;
-  const attemptsLast7Days = ownerDailyStats.reduce((sum, row) => sum + row.attempts, 0);
+  const aggregatedAttemptsToday = ownerDailyStats.find((row) => row.activity_date === todayKey)?.attempts;
+  const aggregatedAttemptsLast7Days = ownerDailyStats.reduce((sum, row) => sum + row.attempts, 0);
+  const attemptsToday =
+    typeof aggregatedAttemptsToday === "number"
+      ? aggregatedAttemptsToday
+      : (todayAttemptsFallbackResult.count ?? 0);
+  const attemptsLast7Days =
+    ownerDailyStats.length > 0 ? aggregatedAttemptsLast7Days : (last7DaysAttemptsFallbackResult.count ?? 0);
 
   return {
     totalVisitorDevices: totalVisitorsResult.count ?? 0,
@@ -917,6 +936,41 @@ export async function loadOwnerDailySeries(days = 14): Promise<OwnerDailyPoint[]
   const statsMap = new Map<string, OwnerDailyStatRow>();
   for (const row of (data ?? []) as OwnerDailyStatRow[]) {
     statsMap.set(row.activity_date, row);
+  }
+
+  if (statsMap.size === 0) {
+    const [{ data: attemptRows, error: attemptError }, { data: deviceRows, error: deviceError }] =
+      await Promise.all([
+        supabase
+          .from("question_attempt_logs")
+          .select("answered_at")
+          .gte("answered_at", `${startDate}T00:00:00+08:00`),
+        supabase
+          .from("question_attempt_device_daily")
+          .select("activity_date")
+          .gte("activity_date", startDate)
+      ]);
+
+    if (attemptError) throw attemptError;
+    if (deviceError) throw deviceError;
+
+    const attemptMap = new Map<string, number>();
+    const deviceMap = new Map<string, number>();
+
+    for (const row of attemptRows ?? []) {
+      const key = getTaipeiDayKey(new Date(row.answered_at));
+      attemptMap.set(key, (attemptMap.get(key) ?? 0) + 1);
+    }
+
+    for (const row of deviceRows ?? []) {
+      deviceMap.set(row.activity_date, (deviceMap.get(row.activity_date) ?? 0) + 1);
+    }
+
+    return dayKeys.map((date) => ({
+      date,
+      attempts: attemptMap.get(date) ?? 0,
+      devices: deviceMap.get(date) ?? 0
+    }));
   }
 
   return dayKeys.map((date) => ({
