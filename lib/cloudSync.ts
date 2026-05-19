@@ -5,6 +5,7 @@ import type {
   OwnerDashboardStats,
   OwnerExplanationUsageEntry,
   OwnerHourlyPoint,
+  OwnerTopAttemptVisitorEntry,
   QuestionExplanationOverride,
   QuestionCommunityStats,
   QuizSession,
@@ -925,4 +926,50 @@ export async function loadOwnerHourlySeries(): Promise<OwnerHourlyPoint[]> {
     attempts: hourAttemptMap.get(hour) ?? 0,
     devices: hourDeviceMap.get(hour)?.size ?? 0
   }));
+}
+
+function formatVisitorLabel(visitorId?: string | null) {
+  if (!visitorId) return "未知裝置";
+  const trimmed = visitorId.trim();
+  if (trimmed.length <= 8) return `裝置 ${trimmed}`;
+  return `裝置 ${trimmed.slice(0, 6)}...${trimmed.slice(-4)}`;
+}
+
+export async function loadOwnerTopAttemptVisitors(limit = 5): Promise<OwnerTopAttemptVisitorEntry[]> {
+  if (!isSupabaseConfigured()) {
+    return [];
+  }
+
+  const supabase = getSupabaseBrowserClient();
+  const { data, error } = await supabase
+    .from("question_attempt_logs")
+    .select("visitor_id, answered_at")
+    .not("visitor_id", "is", null);
+
+  if (error) throw error;
+
+  const grouped = new Map<string, OwnerTopAttemptVisitorEntry>();
+
+  for (const row of data ?? []) {
+    const visitorId = row.visitor_id?.trim();
+    if (!visitorId) continue;
+
+    const current = grouped.get(visitorId) ?? {
+      label: formatVisitorLabel(visitorId),
+      visitorId,
+      attempts: 0,
+      lastAttemptedAt: row.answered_at
+    };
+
+    current.attempts += 1;
+    if (!current.lastAttemptedAt || row.answered_at > current.lastAttemptedAt) {
+      current.lastAttemptedAt = row.answered_at;
+    }
+
+    grouped.set(visitorId, current);
+  }
+
+  return Array.from(grouped.values())
+    .sort((a, b) => b.attempts - a.attempts || (b.lastAttemptedAt ?? "").localeCompare(a.lastAttemptedAt ?? ""))
+    .slice(0, limit);
 }

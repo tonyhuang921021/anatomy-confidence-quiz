@@ -7,13 +7,15 @@ import {
   loadOwnerDailySeries,
   loadOwnerDashboardStats,
   loadOwnerExplanationUsage,
-  loadOwnerHourlySeries
+  loadOwnerHourlySeries,
+  loadOwnerTopAttemptVisitors
 } from "@/lib/cloudSync";
 import {
   OwnerDailyPoint,
   OwnerDashboardStats,
   OwnerExplanationUsageEntry,
-  OwnerHourlyPoint
+  OwnerHourlyPoint,
+  OwnerTopAttemptVisitorEntry
 } from "@/types/quiz";
 
 function getAllowedEmails() {
@@ -162,6 +164,7 @@ export default function OwnerPage() {
   const [dailySeries, setDailySeries] = useState<OwnerDailyPoint[]>([]);
   const [hourlySeries, setHourlySeries] = useState<OwnerHourlyPoint[]>([]);
   const [explanationUsage, setExplanationUsage] = useState<OwnerExplanationUsageEntry[]>([]);
+  const [topVisitors, setTopVisitors] = useState<OwnerTopAttemptVisitorEntry[]>([]);
   const [statsLoading, setStatsLoading] = useState(true);
   const [error, setError] = useState("");
   const allowed = useMemo(() => isAllowedEmail(user?.email), [user?.email]);
@@ -178,16 +181,18 @@ export default function OwnerPage() {
       try {
         setStatsLoading(true);
         setError("");
-        const [nextStats, nextSeries, nextHourlySeries, nextExplanationUsage] = await Promise.all([
+        const [nextStats, nextSeries, nextHourlySeries, nextExplanationUsage, nextTopVisitors] = await Promise.all([
           loadOwnerDashboardStats(),
           loadOwnerDailySeries(14),
           loadOwnerHourlySeries(),
-          loadOwnerExplanationUsage()
+          loadOwnerExplanationUsage(),
+          loadOwnerTopAttemptVisitors(5)
         ]);
         setStats(nextStats);
         setDailySeries(nextSeries);
         setHourlySeries(nextHourlySeries);
         setExplanationUsage(nextExplanationUsage);
+        setTopVisitors(nextTopVisitors);
       } catch (fetchError) {
         setError(fetchError instanceof Error ? fetchError.message : "數據載入失敗");
       } finally {
@@ -203,16 +208,18 @@ export default function OwnerPage() {
 
     const refresh = async () => {
       try {
-        const [nextStats, nextSeries, nextHourlySeries, nextExplanationUsage] = await Promise.all([
+        const [nextStats, nextSeries, nextHourlySeries, nextExplanationUsage, nextTopVisitors] = await Promise.all([
           loadOwnerDashboardStats(),
           loadOwnerDailySeries(14),
           loadOwnerHourlySeries(),
-          loadOwnerExplanationUsage()
+          loadOwnerExplanationUsage(),
+          loadOwnerTopAttemptVisitors(5)
         ]);
         setStats(nextStats);
         setDailySeries(nextSeries);
         setHourlySeries(nextHourlySeries);
         setExplanationUsage(nextExplanationUsage);
+        setTopVisitors(nextTopVisitors);
       } catch {
         // keep existing view
       }
@@ -316,10 +323,6 @@ export default function OwnerPage() {
                 <p className="mt-2 text-3xl font-bold text-ink">{attemptDevicesToday}</p>
               </article>
               <article className="rounded-3xl bg-white p-5 shadow-card ring-1 ring-slate-100">
-                <p className="text-sm text-slate-500">做題超過 5 題的訪客數</p>
-                <p className="mt-2 text-3xl font-bold text-ink">{stats.attemptVisitorsOverFive}</p>
-              </article>
-              <article className="rounded-3xl bg-white p-5 shadow-card ring-1 ring-slate-100">
                 <p className="text-sm text-slate-500">目前在線估算</p>
                 <p className="mt-2 text-3xl font-bold text-ink">{stats.onlineVisitors}</p>
               </article>
@@ -374,6 +377,47 @@ export default function OwnerPage() {
             </div>
               );
             })()}
+
+            <section className="rounded-[2rem] bg-white p-6 shadow-card ring-1 ring-slate-100">
+              <div className="flex items-center justify-between gap-3">
+                <div>
+                  <h2 className="text-lg font-semibold text-ink">做題前 5 多的訪客</h2>
+                  <p className="mt-2 text-sm text-slate-500">依累積作答題數排序，方便你快速看最活躍的裝置。</p>
+                </div>
+              </div>
+              <div className="mt-4 overflow-x-auto">
+                <table className="min-w-full text-left text-sm">
+                  <thead className="text-slate-500">
+                    <tr className="border-b border-slate-200">
+                      <th className="px-3 py-3 font-semibold">排名</th>
+                      <th className="px-3 py-3 font-semibold">訪客裝置</th>
+                      <th className="px-3 py-3 font-semibold">累積作答題數</th>
+                      <th className="px-3 py-3 font-semibold">最近作答</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {topVisitors.length === 0 ? (
+                      <tr>
+                        <td colSpan={4} className="px-3 py-6 text-center text-slate-500">
+                          目前還沒有足夠資料。
+                        </td>
+                      </tr>
+                    ) : (
+                      topVisitors.map((entry, index) => (
+                        <tr key={entry.visitorId ?? entry.label} className="border-b border-slate-100 last:border-b-0">
+                          <td className="px-3 py-3 font-semibold text-ink">#{index + 1}</td>
+                          <td className="px-3 py-3 font-medium text-ink">{entry.label}</td>
+                          <td className="px-3 py-3 text-slate-700">{entry.attempts}</td>
+                          <td className="px-3 py-3 text-slate-500">
+                            {entry.lastAttemptedAt ? formatUpdatedAt(entry.lastAttemptedAt) : "—"}
+                          </td>
+                        </tr>
+                      ))
+                    )}
+                  </tbody>
+                </table>
+              </div>
+            </section>
 
             <section className="rounded-[2rem] bg-white p-6 shadow-card ring-1 ring-slate-100">
               <div className="grid gap-6">

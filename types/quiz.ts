@@ -271,3 +271,10 @@ export type OwnerExplanationUsageEntry = {
   totalTokens: number;
   lastUsedAt?: string;
 };
+
+export type OwnerTopAttemptVisitorEntry = {
+  label: string;
+  visitorId?: string;
+  attempts: number;
+  lastAttemptedAt?: string;
+};
