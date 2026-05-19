@@ -236,6 +236,7 @@ export type OwnerDashboardStats = {
   totalVisitorDevices: number;
   totalAttemptDevices: number;
   attemptDevicesToday: number;
+  attemptVisitorsOverFive: number;
   onlineVisitors: number;
   totalSyncedUsers: number;
   attemptsToday: number;
@@ -250,6 +251,12 @@ export type OwnerDashboardStats = {
 
 export type OwnerDailyPoint = {
   date: string;
+  attempts: number;
+  devices: number;
+};
+
+export type OwnerHourlyPoint = {
+  hour: number;
   attempts: number;
   devices: number;
 };

@@ -6,12 +6,14 @@ import { useAuth } from "@/components/AuthProvider";
 import {
   loadOwnerDailySeries,
   loadOwnerDashboardStats,
-  loadOwnerExplanationUsage
+  loadOwnerExplanationUsage,
+  loadOwnerHourlySeries
 } from "@/lib/cloudSync";
 import {
   OwnerDailyPoint,
   OwnerDashboardStats,
-  OwnerExplanationUsageEntry
+  OwnerExplanationUsageEntry,
+  OwnerHourlyPoint
 } from "@/types/quiz";
 
 function getAllowedEmails() {
@@ -95,16 +97,20 @@ function TinyLineChart({
         {data.map((item, index) => {
           const x = padding + (index / Math.max(data.length - 1, 1)) * innerWidth;
           const y = padding + innerHeight - (item[valueKey] / maxValue) * innerHeight;
+          const labelY = y <= 28 ? y + 18 : y - 12;
           return (
             <g key={`${valueKey}-${item.date}`}>
               <circle cx={x} cy={y} r="4.5" fill={stroke} />
               <text
                 x={x}
-                y={Math.max(14, y - 10)}
+                y={labelY}
                 textAnchor="middle"
                 fontSize="11"
                 fontWeight="700"
                 fill={stroke}
+                stroke="rgba(255,255,255,0.92)"
+                strokeWidth="4"
+                paintOrder="stroke"
               >
                 {item[valueKey]}
               </text>
@@ -123,10 +129,38 @@ function TinyLineChart({
   );
 }
 
+function HourlyActivityBarChart({ data }: { data: OwnerHourlyPoint[] }) {
+  const maxAttempts = Math.max(...data.map((item) => item.attempts), 1);
+
+  return (
+    <div className="rounded-3xl bg-slate-50 p-4">
+      <div className="grid grid-cols-2 gap-2 sm:grid-cols-4 xl:grid-cols-6">
+        {data.map((item) => {
+          const heightPercent = (item.attempts / maxAttempts) * 100;
+          return (
+            <div key={`hour-${item.hour}`} className="rounded-2xl bg-white p-3 ring-1 ring-slate-100">
+              <p className="text-xs font-semibold text-slate-500">{String(item.hour).padStart(2, "0")}:00</p>
+              <div className="mt-3 flex h-24 items-end rounded-xl bg-slate-50 px-2 py-2">
+                <div
+                  className="w-full rounded-lg bg-brand-600/85"
+                  style={{ height: `${Math.max(heightPercent, item.attempts > 0 ? 12 : 0)}%` }}
+                />
+              </div>
+              <p className="mt-2 text-sm font-semibold text-ink">{item.attempts} 題</p>
+              <p className="text-xs text-slate-500">{item.devices} 台裝置</p>
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
 export default function OwnerPage() {
   const { configured, loading, user } = useAuth();
   const [stats, setStats] = useState<OwnerDashboardStats | null>(null);
   const [dailySeries, setDailySeries] = useState<OwnerDailyPoint[]>([]);
+  const [hourlySeries, setHourlySeries] = useState<OwnerHourlyPoint[]>([]);
   const [explanationUsage, setExplanationUsage] = useState<OwnerExplanationUsageEntry[]>([]);
   const [statsLoading, setStatsLoading] = useState(true);
   const [error, setError] = useState("");
@@ -144,13 +178,15 @@ export default function OwnerPage() {
       try {
         setStatsLoading(true);
         setError("");
-        const [nextStats, nextSeries, nextExplanationUsage] = await Promise.all([
+        const [nextStats, nextSeries, nextHourlySeries, nextExplanationUsage] = await Promise.all([
           loadOwnerDashboardStats(),
           loadOwnerDailySeries(14),
+          loadOwnerHourlySeries(),
           loadOwnerExplanationUsage()
         ]);
         setStats(nextStats);
         setDailySeries(nextSeries);
+        setHourlySeries(nextHourlySeries);
         setExplanationUsage(nextExplanationUsage);
       } catch (fetchError) {
         setError(fetchError instanceof Error ? fetchError.message : "數據載入失敗");
@@ -167,13 +203,15 @@ export default function OwnerPage() {
 
     const refresh = async () => {
       try {
-        const [nextStats, nextSeries, nextExplanationUsage] = await Promise.all([
+        const [nextStats, nextSeries, nextHourlySeries, nextExplanationUsage] = await Promise.all([
           loadOwnerDashboardStats(),
           loadOwnerDailySeries(14),
+          loadOwnerHourlySeries(),
           loadOwnerExplanationUsage()
         ]);
         setStats(nextStats);
         setDailySeries(nextSeries);
+        setHourlySeries(nextHourlySeries);
         setExplanationUsage(nextExplanationUsage);
       } catch {
         // keep existing view
@@ -254,6 +292,16 @@ export default function OwnerPage() {
           </div>
         ) : stats ? (
           <div className="space-y-6">
+            {(() => {
+              const todayPoint = dailySeries[dailySeries.length - 1];
+              const attemptsToday = todayPoint?.attempts ?? stats.attemptsToday;
+              const attemptDevicesToday = todayPoint?.devices ?? stats.attemptDevicesToday;
+              const topHours = [...hourlySeries]
+                .sort((a, b) => b.attempts - a.attempts || b.devices - a.devices)
+                .slice(0, 3)
+                .filter((item) => item.attempts > 0);
+
+              return (
             <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
               <article className="rounded-3xl bg-white p-5 shadow-card ring-1 ring-slate-100">
                 <p className="text-sm text-slate-500">總訪客裝置數</p>
@@ -265,7 +313,11 @@ export default function OwnerPage() {
               </article>
               <article className="rounded-3xl bg-white p-5 shadow-card ring-1 ring-slate-100">
                 <p className="text-sm text-slate-500">今天有做題的裝置數</p>
-                <p className="mt-2 text-3xl font-bold text-ink">{stats.attemptDevicesToday}</p>
+                <p className="mt-2 text-3xl font-bold text-ink">{attemptDevicesToday}</p>
+              </article>
+              <article className="rounded-3xl bg-white p-5 shadow-card ring-1 ring-slate-100">
+                <p className="text-sm text-slate-500">做題超過 5 題的訪客數</p>
+                <p className="mt-2 text-3xl font-bold text-ink">{stats.attemptVisitorsOverFive}</p>
               </article>
               <article className="rounded-3xl bg-white p-5 shadow-card ring-1 ring-slate-100">
                 <p className="text-sm text-slate-500">目前在線估算</p>
@@ -277,7 +329,7 @@ export default function OwnerPage() {
               </article>
               <article className="rounded-3xl bg-white p-5 shadow-card ring-1 ring-slate-100">
                 <p className="text-sm text-slate-500">今天大家做了幾題</p>
-                <p className="mt-2 text-3xl font-bold text-ink">{stats.attemptsToday}</p>
+                <p className="mt-2 text-3xl font-bold text-ink">{attemptsToday}</p>
               </article>
               <article className="rounded-3xl bg-white p-5 shadow-card ring-1 ring-slate-100">
                 <p className="text-sm text-slate-500">近 7 天總作答題數</p>
@@ -309,7 +361,31 @@ export default function OwnerPage() {
                   NT$ {estimateTwdFromTokens(stats.aiExplanationInputTokens, stats.aiExplanationOutputTokens).toFixed(2)}
                 </p>
               </article>
+              <article className="rounded-3xl bg-white p-5 shadow-card ring-1 ring-slate-100 md:col-span-2 xl:col-span-3">
+                <p className="text-sm text-slate-500">大家最常做題的時段</p>
+                <p className="mt-2 text-base font-semibold text-ink">
+                  {topHours.length > 0
+                    ? topHours
+                        .map((item) => `${String(item.hour).padStart(2, "0")}:00（${item.attempts} 題 / ${item.devices} 台）`)
+                        .join("、")
+                    : "目前還沒有足夠資料"}
+                </p>
+              </article>
             </div>
+              );
+            })()}
+
+            <section className="rounded-[2rem] bg-white p-6 shadow-card ring-1 ring-slate-100">
+              <div className="grid gap-6">
+                <div>
+                  <h2 className="text-lg font-semibold text-ink">大家做題的時間分布</h2>
+                  <p className="mt-2 text-sm text-slate-500">最近 7 天，大家大多在哪些時段做題。</p>
+                  <div className="mt-4">
+                    <HourlyActivityBarChart data={hourlySeries} />
+                  </div>
+                </div>
+              </div>
+            </section>
 
             <section className="rounded-[2rem] bg-white p-6 shadow-card ring-1 ring-slate-100">
               <div className="grid gap-6 xl:grid-cols-2">

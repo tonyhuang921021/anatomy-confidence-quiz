@@ -4,6 +4,7 @@ import type {
   OwnerDailyPoint,
   OwnerDashboardStats,
   OwnerExplanationUsageEntry,
+  OwnerHourlyPoint,
   QuestionExplanationOverride,
   QuestionCommunityStats,
   QuizSession,
@@ -688,6 +689,7 @@ export async function loadOwnerDashboardStats(): Promise<OwnerDashboardStats> {
       totalVisitorDevices: 0,
       totalAttemptDevices: 0,
       attemptDevicesToday: 0,
+      attemptVisitorsOverFive: 0,
       onlineVisitors: 0,
       totalSyncedUsers: 0,
       attemptsToday: 0,
@@ -711,6 +713,7 @@ export async function loadOwnerDashboardStats(): Promise<OwnerDashboardStats> {
     totalVisitorsResult,
     totalAttemptDevicesResult,
     todayAttemptDevicesResult,
+    allAttemptVisitorRowsResult,
     onlineVisitorsResult,
     totalUsersResult,
     totalAttemptsResult,
@@ -725,6 +728,7 @@ export async function loadOwnerDashboardStats(): Promise<OwnerDashboardStats> {
       .select("*", { count: "exact", head: true })
       .gte("last_attempt_at", startIso)
       .lt("last_attempt_at", endIso),
+    supabase.from("question_attempt_logs").select("visitor_id"),
     supabase
       .from("site_visitors")
       .select("*", { count: "exact", head: true })
@@ -747,6 +751,7 @@ export async function loadOwnerDashboardStats(): Promise<OwnerDashboardStats> {
     totalVisitorsResult.error,
     totalAttemptDevicesResult.error,
     todayAttemptDevicesResult.error,
+    allAttemptVisitorRowsResult.error,
     onlineVisitorsResult.error,
     totalUsersResult.error,
     totalAttemptsResult.error,
@@ -759,6 +764,13 @@ export async function loadOwnerDashboardStats(): Promise<OwnerDashboardStats> {
   }
 
   const aiUsageRows = aiExplanationUsageRows;
+  const visitorAttemptCountMap = new Map<string, number>();
+  for (const row of allAttemptVisitorRowsResult.data ?? []) {
+    const visitorId = row.visitor_id?.trim();
+    if (!visitorId) continue;
+    visitorAttemptCountMap.set(visitorId, (visitorAttemptCountMap.get(visitorId) ?? 0) + 1);
+  }
+  const attemptVisitorsOverFive = Array.from(visitorAttemptCountMap.values()).filter((count) => count > 5).length;
   const aiExplanationCount = aiUsageRows.length;
   const aiExplanationInputTokens = aiUsageRows.reduce((sum, row) => sum + (row.input_tokens ?? 0), 0);
   const aiExplanationOutputTokens = aiUsageRows.reduce((sum, row) => sum + (row.output_tokens ?? 0), 0);
@@ -771,6 +783,7 @@ export async function loadOwnerDashboardStats(): Promise<OwnerDashboardStats> {
     totalVisitorDevices: totalVisitorsResult.count ?? 0,
     totalAttemptDevices: totalAttemptDevicesResult.count ?? 0,
     attemptDevicesToday: todayAttemptDevicesResult.count ?? 0,
+    attemptVisitorsOverFive,
     onlineVisitors: onlineVisitorsResult.count ?? 0,
     totalSyncedUsers: totalUsersResult.count ?? 0,
     attemptsToday: todayAttemptsResult.count ?? 0,
@@ -863,5 +876,53 @@ export async function loadOwnerDailySeries(days = 14): Promise<OwnerDailyPoint[]
     date,
     attempts: attemptMap.get(date) ?? 0,
     devices: deviceMap.get(date) ?? 0
+  }));
+}
+
+export async function loadOwnerHourlySeries(): Promise<OwnerHourlyPoint[]> {
+  if (!isSupabaseConfigured()) {
+    return Array.from({ length: 24 }, (_, hour) => ({
+      hour,
+      attempts: 0,
+      devices: 0
+    }));
+  }
+
+  const supabase = getSupabaseBrowserClient();
+  const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString();
+  const { data, error } = await supabase
+    .from("question_attempt_logs")
+    .select("answered_at, visitor_id")
+    .gte("answered_at", sevenDaysAgo);
+
+  if (error) throw error;
+
+  const hourAttemptMap = new Map<number, number>();
+  const hourDeviceMap = new Map<number, Set<string>>();
+
+  for (const row of data ?? []) {
+    const hour = Number(
+      new Intl.DateTimeFormat("en-GB", {
+        timeZone: "Asia/Taipei",
+        hour: "2-digit",
+        hourCycle: "h23"
+      }).format(new Date(row.answered_at))
+    );
+
+    hourAttemptMap.set(hour, (hourAttemptMap.get(hour) ?? 0) + 1);
+
+    const visitorId = row.visitor_id?.trim();
+    if (!hourDeviceMap.has(hour)) {
+      hourDeviceMap.set(hour, new Set<string>());
+    }
+    if (visitorId) {
+      hourDeviceMap.get(hour)?.add(visitorId);
+    }
+  }
+
+  return Array.from({ length: 24 }, (_, hour) => ({
+    hour,
+    attempts: hourAttemptMap.get(hour) ?? 0,
+    devices: hourDeviceMap.get(hour)?.size ?? 0
   }));
 }
