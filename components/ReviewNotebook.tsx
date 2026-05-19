@@ -300,7 +300,7 @@ export function ReviewNotebook({
       },
       {
         threshold: [0.2, 0.35, 0.5],
-        rootMargin: "-8% 0px -18% 0px"
+        rootMargin: "-4% 0px -8% 0px"
       }
     );
 
@@ -475,8 +475,8 @@ export function ReviewNotebook({
       ref={sectionRef}
       className={`rounded-[2rem] bg-white p-4 ring-1 ring-slate-100 transition-all duration-500 ease-out motion-reduce:transition-none sm:p-6 ${
         isSpotlighted
-          ? "-mx-3 scale-[1.01] shadow-[0_24px_60px_rgba(15,42,34,0.14)]"
-          : "scale-[0.985] shadow-card"
+          ? "-mx-5 -translate-y-1 scale-[1.035] bg-white shadow-[0_30px_80px_rgba(15,42,34,0.2)] ring-slate-200"
+          : "translate-y-0 scale-[0.97] shadow-card"
       } sm:mx-0 sm:scale-100`}
     >
       <div className="flex flex-wrap items-center justify-between gap-3">
