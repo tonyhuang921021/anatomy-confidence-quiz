@@ -35,20 +35,34 @@ export default function ReviewPage() {
       return;
     }
 
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        setIsNotebookFocused(entry.isIntersecting && entry.intersectionRatio >= 0.2);
-      },
-      {
-        threshold: [0.12, 0.2, 0.35, 0.5],
-        rootMargin: "-2% 0px -8% 0px"
-      }
-    );
+    let ticking = false;
 
-    observer.observe(notebookRef.current);
+    const updateFocusState = () => {
+      ticking = false;
+      if (!notebookRef.current) return;
+
+      const rect = notebookRef.current.getBoundingClientRect();
+      const viewportHeight = window.innerHeight || 0;
+      const triggerTop = viewportHeight * 0.48;
+      const triggerBottom = viewportHeight * 0.2;
+      const shouldFocus = rect.top <= triggerTop && rect.bottom >= triggerBottom;
+
+      setIsNotebookFocused(shouldFocus);
+    };
+
+    const requestUpdate = () => {
+      if (ticking) return;
+      ticking = true;
+      window.requestAnimationFrame(updateFocusState);
+    };
+
+    updateFocusState();
+    window.addEventListener("scroll", requestUpdate, { passive: true });
+    window.addEventListener("resize", requestUpdate);
 
     return () => {
-      observer.disconnect();
+      window.removeEventListener("scroll", requestUpdate);
+      window.removeEventListener("resize", requestUpdate);
     };
   }, []);
 
@@ -96,7 +110,7 @@ export default function ReviewPage() {
 
       <section
         className={`mt-8 grid gap-4 transition-all duration-500 ease-out motion-reduce:transition-none lg:grid-cols-2 ${
-          isNotebookFocused ? "scale-[0.96] opacity-35 blur-[1px]" : "scale-100 opacity-100"
+          isNotebookFocused ? "scale-[0.94] opacity-25 blur-[1.5px]" : "scale-100 opacity-100"
         }`}
       >
         <article className="rounded-3xl bg-rose-50 p-5 text-rose-900">
@@ -115,7 +129,7 @@ export default function ReviewPage() {
           ref={notebookRef}
           className={`scroll-mt-24 transition-all duration-500 ease-out motion-reduce:transition-none ${
             isNotebookFocused
-              ? "-mt-2 scale-[1.03] rounded-[2.2rem] bg-white/95 shadow-[0_32px_90px_rgba(15,42,34,0.2)] ring-2 ring-brand-200"
+              ? "-mt-2 scale-[1.06] rounded-[2.25rem] bg-white shadow-[0_38px_100px_rgba(15,42,34,0.24)] ring-2 ring-brand-300"
               : "scale-100"
           }`}
         >
