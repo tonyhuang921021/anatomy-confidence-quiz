@@ -357,6 +357,50 @@ for update
 using (true)
 with check (true);
 
+create table if not exists public.owner_daily_stats (
+  activity_date date primary key,
+  attempts integer not null default 0,
+  devices integer not null default 0,
+  updated_at timestamptz not null default now()
+);
+
+create index if not exists owner_daily_stats_updated_at_idx
+on public.owner_daily_stats (updated_at desc);
+
+grant select, insert, update
+  on public.owner_daily_stats
+  to anon;
+
+grant select, insert, update, delete
+  on public.owner_daily_stats
+  to authenticated;
+
+grant select, insert, update, delete
+  on public.owner_daily_stats
+  to service_role;
+
+alter table public.owner_daily_stats enable row level security;
+
+drop policy if exists "Anyone can read owner daily stats" on public.owner_daily_stats;
+drop policy if exists "Anyone can insert owner daily stats" on public.owner_daily_stats;
+drop policy if exists "Anyone can update owner daily stats" on public.owner_daily_stats;
+
+create policy "Anyone can read owner daily stats"
+on public.owner_daily_stats
+for select
+using (true);
+
+create policy "Anyone can insert owner daily stats"
+on public.owner_daily_stats
+for insert
+with check (true);
+
+create policy "Anyone can update owner daily stats"
+on public.owner_daily_stats
+for update
+using (true)
+with check (true);
+
 create table if not exists public.ai_explanation_usage_logs (
   id bigint generated always as identity primary key,
   rate_key text not null,
