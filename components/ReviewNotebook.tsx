@@ -296,11 +296,11 @@ export function ReviewNotebook({
 
     const observer = new IntersectionObserver(
       ([entry]) => {
-        setIsSpotlighted(entry.isIntersecting && entry.intersectionRatio >= 0.35);
+        setIsSpotlighted(entry.isIntersecting && entry.intersectionRatio >= 0.18);
       },
       {
-        threshold: [0.2, 0.35, 0.5],
-        rootMargin: "-4% 0px -8% 0px"
+        threshold: [0.12, 0.18, 0.3, 0.45],
+        rootMargin: "0px 0px -6% 0px"
       }
     );
 
@@ -473,11 +473,11 @@ export function ReviewNotebook({
   return (
     <section
       ref={sectionRef}
-      className={`origin-top rounded-[2rem] bg-white p-4 ring-1 ring-slate-100 transition-all duration-500 ease-out motion-reduce:transition-none sm:p-6 ${
+      className={`origin-top rounded-[2rem] bg-white p-4 transition-all duration-500 ease-out motion-reduce:transition-none sm:p-6 ${
         isSpotlighted
-          ? "-mx-5 -translate-y-1 scale-[1.035] bg-white shadow-[0_30px_80px_rgba(15,42,34,0.2)] ring-slate-200"
-          : "translate-y-0 scale-100 shadow-card"
-      } sm:mx-0 sm:scale-100`}
+          ? "sticky top-3 z-20 -translate-y-1 scale-[1.02] bg-white/98 shadow-[0_34px_90px_rgba(15,42,34,0.24)] ring-2 ring-brand-200 backdrop-blur-sm"
+          : "translate-y-0 scale-100 shadow-card ring-1 ring-slate-100"
+      } sm:static sm:z-auto sm:translate-y-0 sm:scale-100 sm:bg-white sm:ring-1 sm:ring-slate-100`}
     >
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
