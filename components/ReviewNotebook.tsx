@@ -214,6 +214,7 @@ type ReviewNotebookProps = {
   startLabel?: string;
   startHref?: string;
   onStartReview?: () => void;
+  fullscreenMobile?: boolean;
 };
 
 export function ReviewNotebook({
@@ -223,7 +224,8 @@ export function ReviewNotebook({
   description = "先把錯題和沒信心的題目分開看，每區都依最近作答時間排序。",
   startLabel = "開始錯題複習",
   startHref = "/quiz?new=1",
-  onStartReview
+  onStartReview,
+  fullscreenMobile = false
 }: ReviewNotebookProps) {
   const { session } = useAuth();
   const [explanationOverrides, setExplanationOverrides] = useState<Record<string, QuestionExplanationOverride>>({});
@@ -443,10 +445,16 @@ export function ReviewNotebook({
   }
 
   return (
-    <section className="rounded-[2rem] bg-white p-4 shadow-card ring-1 ring-slate-100 sm:p-6">
+    <section
+      className={
+        fullscreenMobile
+          ? "bg-transparent p-0 shadow-none ring-0"
+          : "rounded-[2rem] bg-white p-4 shadow-card ring-1 ring-slate-100 sm:p-6"
+      }
+    >
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
-          <h2 className="text-2xl font-semibold text-ink">{title}</h2>
+          <h2 className={`${fullscreenMobile ? "text-xl" : "text-2xl"} font-semibold text-ink`}>{title}</h2>
           <p className="mt-2 text-sm text-slate-500">{description}</p>
         </div>
         <Link
@@ -458,7 +466,7 @@ export function ReviewNotebook({
         </Link>
       </div>
 
-      <div className="mt-6 grid gap-8">
+      <div className={`${fullscreenMobile ? "mt-4" : "mt-6"} grid gap-8`}>
         {items.length === 0 ? (
           <div className="rounded-3xl bg-slate-50 p-5 text-sm text-slate-500">
             目前還沒有累積錯題或低信心題，先去刷一輪題目吧。

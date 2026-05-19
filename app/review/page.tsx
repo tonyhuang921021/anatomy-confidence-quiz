@@ -176,7 +176,7 @@ export default function ReviewPage() {
                 返回頁面
               </button>
             </div>
-            <div className="min-h-0 flex-1 overflow-y-auto px-3 py-3">
+            <div className="min-h-0 flex-1 overflow-y-auto px-0 py-0">
               <ReviewNotebook
                 title="散題錯題庫"
                 description="手機滿版複習模式。看完可按右上角返回頁面。"
@@ -184,6 +184,7 @@ export default function ReviewPage() {
                 onStartReview={handleStartPracticeReview}
                 items={practiceItems}
                 allQuestions={allQuestions}
+                fullscreenMobile
               />
             </div>
           </div>
