@@ -772,28 +772,23 @@ export async function loadOwnerDashboardStats(): Promise<OwnerDashboardStats> {
   const onlineSince = new Date(now.getTime() - ONLINE_WINDOW_MS).toISOString();
   const { startIso, endIso } = getTaipeiDayRange();
   const recentDayKeys = getRecentTaipeiDayKeys(7);
-  const todayKey = recentDayKeys[recentDayKeys.length - 1];
+  const dailySeries = await loadOwnerDailySeries(7);
+  const todayPoint = dailySeries[dailySeries.length - 1];
+  const attemptsToday = todayPoint?.attempts ?? 0;
+  const attemptDevicesToday = todayPoint?.devices ?? 0;
+  const attemptsLast7Days = dailySeries.reduce((sum, row) => sum + row.attempts, 0);
 
   const [
     totalVisitorsResult,
     totalAttemptDevicesResult,
-    todayAttemptDevicesResult,
     allAttemptVisitorRowsResult,
     onlineVisitorsResult,
     totalUsersResult,
     totalAttemptsResult,
-    ownerDailyStatsResult,
-    todayAttemptsFallbackResult,
-    last7DaysAttemptsFallbackResult,
     aiExplanationUsageRows
   ] = await Promise.all([
     supabase.from("site_visitors").select("*", { count: "exact", head: true }),
     supabase.from("question_attempt_devices").select("*", { count: "exact", head: true }),
-    supabase
-      .from("question_attempt_devices")
-      .select("*", { count: "exact", head: true })
-      .gte("last_attempt_at", startIso)
-      .lt("last_attempt_at", endIso),
     supabase.from("question_attempt_logs").select("visitor_id"),
     supabase
       .from("site_visitors")
@@ -801,33 +796,16 @@ export async function loadOwnerDashboardStats(): Promise<OwnerDashboardStats> {
       .gte("last_seen_at", onlineSince),
     supabase.from("leaderboard_profiles").select("*", { count: "exact", head: true }),
     supabase.from("question_attempt_logs").select("*", { count: "exact", head: true }),
-    supabase
-      .from("owner_daily_stats")
-      .select("activity_date, attempts, devices")
-      .gte("activity_date", recentDayKeys[0]),
-    supabase
-      .from("question_attempt_logs")
-      .select("*", { count: "exact", head: true })
-      .gte("answered_at", startIso)
-      .lt("answered_at", endIso),
-    supabase
-      .from("question_attempt_logs")
-      .select("*", { count: "exact", head: true })
-      .gte("answered_at", `${recentDayKeys[0]}T00:00:00+08:00`),
     fetchAIExplanationUsageRows()
   ]);
 
   const errors = [
     totalVisitorsResult.error,
     totalAttemptDevicesResult.error,
-    todayAttemptDevicesResult.error,
     allAttemptVisitorRowsResult.error,
     onlineVisitorsResult.error,
     totalUsersResult.error,
-    totalAttemptsResult.error,
-    ownerDailyStatsResult.error,
-    todayAttemptsFallbackResult.error,
-    last7DaysAttemptsFallbackResult.error
+    totalAttemptsResult.error
   ].filter(Boolean);
 
   if (errors.length > 0) {
@@ -849,22 +827,11 @@ export async function loadOwnerDashboardStats(): Promise<OwnerDashboardStats> {
     (sum, row) => sum + (row.total_tokens ?? (row.input_tokens ?? 0) + (row.output_tokens ?? 0)),
     0
   );
-  const ownerDailyStats = ((ownerDailyStatsResult.data ?? []) as OwnerDailyStatRow[]).sort((a, b) =>
-    a.activity_date.localeCompare(b.activity_date)
-  );
-  const aggregatedAttemptsToday = ownerDailyStats.find((row) => row.activity_date === todayKey)?.attempts;
-  const aggregatedAttemptsLast7Days = ownerDailyStats.reduce((sum, row) => sum + row.attempts, 0);
-  const attemptsToday =
-    typeof aggregatedAttemptsToday === "number"
-      ? aggregatedAttemptsToday
-      : (todayAttemptsFallbackResult.count ?? 0);
-  const attemptsLast7Days =
-    ownerDailyStats.length > 0 ? aggregatedAttemptsLast7Days : (last7DaysAttemptsFallbackResult.count ?? 0);
 
   return {
     totalVisitorDevices: totalVisitorsResult.count ?? 0,
     totalAttemptDevices: totalAttemptDevicesResult.count ?? 0,
-    attemptDevicesToday: todayAttemptDevicesResult.count ?? 0,
+    attemptDevicesToday,
     attemptVisitorsOverFive,
     onlineVisitors: onlineVisitorsResult.count ?? 0,
     totalSyncedUsers: totalUsersResult.count ?? 0,
@@ -938,7 +905,11 @@ export async function loadOwnerDailySeries(days = 14): Promise<OwnerDailyPoint[]
     statsMap.set(row.activity_date, row);
   }
 
-  if (statsMap.size === 0) {
+  const missingDayKeys = dayKeys.filter((date) => !statsMap.has(date));
+  const attemptMap = new Map<string, number>();
+  const deviceMap = new Map<string, number>();
+
+  if (missingDayKeys.length > 0) {
     const [{ data: attemptRows, error: attemptError }, { data: deviceRows, error: deviceError }] =
       await Promise.all([
         supabase
@@ -954,9 +925,6 @@ export async function loadOwnerDailySeries(days = 14): Promise<OwnerDailyPoint[]
     if (attemptError) throw attemptError;
     if (deviceError) throw deviceError;
 
-    const attemptMap = new Map<string, number>();
-    const deviceMap = new Map<string, number>();
-
     for (const row of attemptRows ?? []) {
       const key = getTaipeiDayKey(new Date(row.answered_at));
       attemptMap.set(key, (attemptMap.get(key) ?? 0) + 1);
@@ -965,18 +933,12 @@ export async function loadOwnerDailySeries(days = 14): Promise<OwnerDailyPoint[]
     for (const row of deviceRows ?? []) {
       deviceMap.set(row.activity_date, (deviceMap.get(row.activity_date) ?? 0) + 1);
     }
-
-    return dayKeys.map((date) => ({
-      date,
-      attempts: attemptMap.get(date) ?? 0,
-      devices: deviceMap.get(date) ?? 0
-    }));
   }
 
   return dayKeys.map((date) => ({
     date,
-    attempts: statsMap.get(date)?.attempts ?? 0,
-    devices: statsMap.get(date)?.devices ?? 0
+    attempts: statsMap.get(date)?.attempts ?? attemptMap.get(date) ?? 0,
+    devices: statsMap.get(date)?.devices ?? deviceMap.get(date) ?? 0
   }));
 }
 

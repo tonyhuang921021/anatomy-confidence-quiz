@@ -300,9 +300,6 @@ export default function OwnerPage() {
         ) : stats ? (
           <div className="space-y-6">
             {(() => {
-              const todayPoint = dailySeries[dailySeries.length - 1];
-              const attemptsToday = todayPoint?.attempts ?? stats.attemptsToday;
-              const attemptDevicesToday = todayPoint?.devices ?? stats.attemptDevicesToday;
               const topHours = [...hourlySeries]
                 .sort((a, b) => b.attempts - a.attempts || b.devices - a.devices)
                 .slice(0, 3)
@@ -320,7 +317,7 @@ export default function OwnerPage() {
               </article>
               <article className="rounded-3xl bg-white p-5 shadow-card ring-1 ring-slate-100">
                 <p className="text-sm text-slate-500">今天有做題的裝置數</p>
-                <p className="mt-2 text-3xl font-bold text-ink">{attemptDevicesToday}</p>
+                <p className="mt-2 text-3xl font-bold text-ink">{stats.attemptDevicesToday}</p>
               </article>
               <article className="rounded-3xl bg-white p-5 shadow-card ring-1 ring-slate-100">
                 <p className="text-sm text-slate-500">目前在線估算</p>
@@ -332,7 +329,7 @@ export default function OwnerPage() {
               </article>
               <article className="rounded-3xl bg-white p-5 shadow-card ring-1 ring-slate-100">
                 <p className="text-sm text-slate-500">今天大家做了幾題</p>
-                <p className="mt-2 text-3xl font-bold text-ink">{attemptsToday}</p>
+                <p className="mt-2 text-3xl font-bold text-ink">{stats.attemptsToday}</p>
               </article>
               <article className="rounded-3xl bg-white p-5 shadow-card ring-1 ring-slate-100">
                 <p className="text-sm text-slate-500">近 7 天總作答題數</p>
