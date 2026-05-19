@@ -7,7 +7,10 @@ import { AIPromptBox } from "@/components/AIPromptBox";
 import { useAuth } from "@/components/AuthProvider";
 import { ResultSummary } from "@/components/ResultSummary";
 import { WeaknessRanking } from "@/components/WeaknessRanking";
-import { loadSharedQuestionExplanationOverrides } from "@/lib/cloudSync";
+import {
+  loadQuestionCommunityStats,
+  loadSharedQuestionExplanationOverrides
+} from "@/lib/cloudSync";
 import { anatomyQuestions } from "@/data/anatomyQuestions";
 import { subjectRegistry } from "@/data/subjectRegistry";
 import {
@@ -35,6 +38,7 @@ import {
   Attempt,
   OptionKey,
   Question,
+  QuestionCommunityStats,
   QuestionExplanationOverride,
   QuizSession,
   SectionCompletionStats,
@@ -84,6 +88,7 @@ export default function ResultsPage() {
   const [explanationOverrides, setExplanationOverrides] = useState<Record<string, QuestionExplanationOverride>>({});
   const [explanationLoadingMap, setExplanationLoadingMap] = useState<Record<string, boolean>>({});
   const [explanationErrorMap, setExplanationErrorMap] = useState<Record<string, string>>({});
+  const [communityStatsMap, setCommunityStatsMap] = useState<Record<string, QuestionCommunityStats>>({});
   const [showPrompt, setShowPrompt] = useState(false);
   const [state, setState] = useState<ResultState>({
     session: null,
@@ -127,6 +132,25 @@ export default function ResultsPage() {
   useEffect(() => {
     setExplanationOverrides(loadQuestionExplanationOverrides());
   }, [syncVersion]);
+
+  useEffect(() => {
+    async function fetchCommunityStats() {
+      if (!state.session?.attempts.length) return;
+
+      try {
+        const stats = await loadQuestionCommunityStats(
+          state.session.attempts.map((attempt) => attempt.questionId)
+        );
+        setCommunityStatsMap(
+          Object.fromEntries(stats.map((item) => [item.questionId, item] as const))
+        );
+      } catch {
+        // keep UI quiet if community stats table is temporarily unavailable
+      }
+    }
+
+    void fetchCommunityStats();
+  }, [state.session]);
 
   useEffect(() => {
     async function fetchSharedExplanationOverrides() {
@@ -360,15 +384,22 @@ export default function ResultsPage() {
   }
 
   function renderExplanationFooter(question: Question, attempt: Attempt) {
+    const communityStats = communityStatsMap[question.id];
+
     return (
       <div className="space-y-3">
-        {explanationOverrides[question.id] ? (
-          <div className="flex flex-wrap items-center gap-2">
+        <div className="flex flex-wrap items-center gap-2">
+          {explanationOverrides[question.id] ? (
             <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-600">
               已替換詳解・{explanationOverrides[question.id]?.model ?? "gpt-5-mini"}
             </span>
-          </div>
-        ) : null}
+          ) : null}
+          {communityStats && communityStats.totalAttempts > 0 ? (
+            <span className="rounded-full bg-sky-50 px-3 py-1 text-xs font-semibold text-sky-800 ring-1 ring-sky-200">
+              全站答對率 {communityStats.correctRate}% ・ {communityStats.totalAttempts} 人作答
+            </span>
+          ) : null}
+        </div>
         {renderQuestionExplanationControls(question, attempt)}
       </div>
     );

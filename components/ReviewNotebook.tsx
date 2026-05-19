@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { type ReactNode, useEffect, useState } from "react";
 import {
+  loadQuestionCommunityStats,
   loadSharedQuestionExplanationOverrides
 } from "@/lib/cloudSync";
 import {
@@ -16,6 +17,7 @@ import { useAuth } from "@/components/AuthProvider";
 import {
   OptionKey,
   Question,
+  QuestionCommunityStats,
   QuestionExplanationOverride,
   ReviewQuestionItem
 } from "@/types/quiz";
@@ -202,6 +204,7 @@ export function ReviewNotebook({
   const [explanationOverrides, setExplanationOverrides] = useState<Record<string, QuestionExplanationOverride>>({});
   const [explanationLoadingMap, setExplanationLoadingMap] = useState<Record<string, boolean>>({});
   const [explanationErrorMap, setExplanationErrorMap] = useState<Record<string, string>>({});
+  const [communityStatsMap, setCommunityStatsMap] = useState<Record<string, QuestionCommunityStats>>({});
   const [activeCategory, setActiveCategory] = useState<"wrong" | "lowConfidence">("wrong");
   const wrongItems = sortByRecent(items.filter((item) => item.history.wrong > 0));
   const lowConfidenceItems = sortByRecent(items.filter((item) => item.history.lowConfidence > 0));
@@ -217,6 +220,23 @@ export function ReviewNotebook({
       setActiveCategory("wrong");
     }
   }, [activeCategory, lowConfidenceItems.length, wrongItems.length]);
+
+  useEffect(() => {
+    async function fetchCommunityStats() {
+      if (items.length === 0) return;
+
+      try {
+        const stats = await loadQuestionCommunityStats(items.map((item) => item.question.id));
+        setCommunityStatsMap(
+          Object.fromEntries(stats.map((item) => [item.questionId, item] as const))
+        );
+      } catch {
+        // keep review UI usable without stats
+      }
+    }
+
+    void fetchCommunityStats();
+  }, [items]);
 
   useEffect(() => {
     setExplanationOverrides(loadQuestionExplanationOverrides());
@@ -350,16 +370,22 @@ export function ReviewNotebook({
     const override = explanationOverrides[question.id];
     const loading = explanationLoadingMap[question.id];
     const error = explanationErrorMap[question.id];
+    const communityStats = communityStatsMap[question.id];
 
     return (
       <div className="space-y-3">
-        {override ? (
-          <div className="flex flex-wrap items-center gap-2">
+        <div className="flex flex-wrap items-center gap-2">
+          {override ? (
             <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-600">
               已替換詳解・{override.model ?? "gpt-5-mini"}
             </span>
-          </div>
-        ) : null}
+          ) : null}
+          {communityStats && communityStats.totalAttempts > 0 ? (
+            <span className="rounded-full bg-sky-50 px-3 py-1 text-xs font-semibold text-sky-800 ring-1 ring-sky-200">
+              全站答對率 {communityStats.correctRate}% ・ {communityStats.totalAttempts} 人作答
+            </span>
+          ) : null}
+        </div>
         {!override ? (
           <button
             type="button"
