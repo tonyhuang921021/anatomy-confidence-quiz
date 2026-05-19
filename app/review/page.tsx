@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useAuth } from "@/components/AuthProvider";
 import { ReviewNotebook } from "@/components/ReviewNotebook";
 import { getQuestionBankBySubjectFilter } from "@/data/med1QuestionBank";
@@ -15,7 +15,9 @@ import { ReviewQuestionItem } from "@/types/quiz";
 
 export default function ReviewPage() {
   const [practiceItems, setPracticeItems] = useState<ReviewQuestionItem[]>([]);
+  const [isNotebookFocused, setIsNotebookFocused] = useState(false);
   const { syncVersion } = useAuth();
+  const notebookRef = useRef<HTMLDivElement | null>(null);
   const allQuestions = getQuestionBankBySubjectFilter("全部");
 
   useEffect(() => {
@@ -23,6 +25,32 @@ export default function ReviewPage() {
     const practiceSessions = sessions.filter((session) => session.settings?.mode !== "simulation");
     setPracticeItems(getReviewQuestionItems(allQuestions, practiceSessions, 60));
   }, [syncVersion]);
+
+  useEffect(() => {
+    if (typeof window === "undefined" || !notebookRef.current) return;
+
+    const mediaQuery = window.matchMedia("(max-width: 639px)");
+    if (!mediaQuery.matches) {
+      setIsNotebookFocused(false);
+      return;
+    }
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        setIsNotebookFocused(entry.isIntersecting && entry.intersectionRatio >= 0.2);
+      },
+      {
+        threshold: [0.12, 0.2, 0.35, 0.5],
+        rootMargin: "-2% 0px -8% 0px"
+      }
+    );
+
+    observer.observe(notebookRef.current);
+
+    return () => {
+      observer.disconnect();
+    };
+  }, []);
 
   function handleStartPracticeReview() {
     saveQuizSettings({
@@ -66,7 +94,11 @@ export default function ReviewPage() {
         </div>
       </section>
 
-      <section className="mt-8 grid gap-4 lg:grid-cols-2">
+      <section
+        className={`mt-8 grid gap-4 transition-all duration-500 ease-out motion-reduce:transition-none lg:grid-cols-2 ${
+          isNotebookFocused ? "scale-[0.96] opacity-35 blur-[1px]" : "scale-100 opacity-100"
+        }`}
+      >
         <article className="rounded-3xl bg-rose-50 p-5 text-rose-900">
           <p className="text-sm font-medium">散題錯題庫</p>
           <p className="mt-2 text-3xl font-bold">{practiceSnapshot.total}</p>
@@ -78,7 +110,15 @@ export default function ReviewPage() {
       </section>
 
       <div className="mt-8 grid gap-8">
-        <div id="practice-review" className="scroll-mt-24">
+        <div
+          id="practice-review"
+          ref={notebookRef}
+          className={`scroll-mt-24 transition-all duration-500 ease-out motion-reduce:transition-none ${
+            isNotebookFocused
+              ? "-mt-2 scale-[1.03] rounded-[2.2rem] bg-white/95 shadow-[0_32px_90px_rgba(15,42,34,0.2)] ring-2 ring-brand-200"
+              : "scale-100"
+          }`}
+        >
           <ReviewNotebook
             title="散題錯題庫"
             description="這裡只整理平常零散刷題累積下來的錯題與低信心題。"
