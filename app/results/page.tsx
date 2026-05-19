@@ -301,7 +301,7 @@ export default function ResultsPage() {
   if (!mounted) {
     return (
       <main className="shell">
-        <div className="rounded-[2rem] bg-white p-6 shadow-card ring-1 ring-slate-100">載入中...</div>
+        <div className="rounded-[2rem] bg-white p-4 shadow-card ring-1 ring-slate-100 sm:p-6">載入中...</div>
       </main>
     );
   }
@@ -309,7 +309,7 @@ export default function ResultsPage() {
   if (!state.session || !state.summary || !state.completionStats) {
     return (
       <main className="shell">
-        <section className="rounded-[2rem] bg-white p-8 text-center shadow-card ring-1 ring-slate-100">
+        <section className="rounded-[2rem] bg-white p-5 text-center shadow-card ring-1 ring-slate-100 sm:p-8">
           <h1 className="text-2xl font-semibold text-ink">目前沒有可顯示的結果</h1>
           <p className="mt-3 text-slate-500">可能尚未完成本輪測驗，或已清除 current session。</p>
           <div className="mt-6 flex flex-col justify-center gap-3 sm:flex-row">
@@ -465,7 +465,7 @@ export default function ResultsPage() {
 
       <div className="mt-8 grid gap-6 xl:grid-cols-[minmax(0,1fr)_360px]">
         <div className="space-y-6">
-          <section className="rounded-[2rem] bg-white p-6 shadow-card ring-1 ring-slate-100">
+          <section className="rounded-[2rem] bg-white p-4 shadow-card ring-1 ring-slate-100 sm:p-6">
             <div className="flex flex-wrap items-center justify-between gap-3">
               <div>
                 <h2 className="text-xl font-semibold text-ink">題目回顧</h2>
@@ -487,7 +487,7 @@ export default function ResultsPage() {
                     </div>
                   ) : (
                     wrongAttempts.map(({ attempt, question }, index) => (
-                      <details key={`wrong-${attempt.questionId}`} className="rounded-2xl bg-rose-50 p-4">
+                      <details key={`wrong-${attempt.questionId}`} className="rounded-2xl bg-rose-50 p-3.5 sm:p-4">
                         <summary className="cursor-pointer text-sm font-semibold text-rose-950">
                           <span>
                             錯題 {index + 1}：{question.chapter} / {question.section} / {question.testedConcept}
@@ -552,7 +552,7 @@ export default function ResultsPage() {
                     </div>
                   ) : (
                     lowConfidenceAttempts.map(({ attempt, question }, index) => (
-                      <details key={`low-confidence-${attempt.questionId}`} className="rounded-2xl bg-amber-50 p-4">
+                      <details key={`low-confidence-${attempt.questionId}`} className="rounded-2xl bg-amber-50 p-3.5 sm:p-4">
                         <summary className="cursor-pointer text-sm font-semibold text-amber-950">
                           <span>
                             信心 {attempt.confidence}｜{index + 1}：{question.chapter} / {question.section} / {question.testedConcept}
@@ -616,7 +616,7 @@ export default function ResultsPage() {
                 <h3 className="text-base font-semibold text-ink">全部題目回顧</h3>
                 <div className="mt-3 grid gap-3">
                   {reviewedAttempts.map(({ attempt, question }, index) => (
-                    <details key={`all-${attempt.questionId}`} className="rounded-2xl bg-slate-50 p-4">
+                    <details key={`all-${attempt.questionId}`} className="rounded-2xl bg-slate-50 p-3.5 sm:p-4">
                       <summary className="cursor-pointer text-sm font-semibold text-ink">
                         <span>
                           第 {index + 1} 題：{attempt.isCorrect ? "答對" : "答錯"} / {question.chapter} / {question.section}
@@ -681,7 +681,7 @@ export default function ResultsPage() {
         </div>
 
         <aside className="space-y-6">
-          <section className="rounded-[2rem] bg-white p-6 shadow-card ring-1 ring-slate-100">
+          <section className="rounded-[2rem] bg-white p-4 shadow-card ring-1 ring-slate-100 sm:p-6">
             <h2 className="text-xl font-semibold text-ink">補強建議</h2>
             <div className="mt-4 grid gap-3">
               <div className="rounded-2xl bg-rose-50 p-4 text-sm text-rose-900">

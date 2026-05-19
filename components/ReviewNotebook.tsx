@@ -443,7 +443,7 @@ export function ReviewNotebook({
   }
 
   return (
-    <section className="rounded-[2rem] bg-white p-6 shadow-card ring-1 ring-slate-100">
+    <section className="rounded-[2rem] bg-white p-4 shadow-card ring-1 ring-slate-100 sm:p-6">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
           <h2 className="text-2xl font-semibold text-ink">{title}</h2>
@@ -511,7 +511,7 @@ export function ReviewNotebook({
                   {activeItems.length} 題
                 </span>
               </div>
-              <div className="mt-4 grid gap-4">
+                <div className="mt-4 grid gap-3 sm:gap-4">
                 {activeItems.length === 0 ? (
                   <div className="rounded-3xl bg-slate-50 p-5 text-sm text-slate-500">
                     {activeCategory === "wrong" ? "目前沒有累積錯題。" : "目前沒有累積低信心題。"}
@@ -554,14 +554,14 @@ export function ReviewNotebook({
                                 </div>
                               </div>
 
-                              <details className="rounded-2xl bg-white p-4 text-sm text-slate-700">
+                              <details className="rounded-2xl bg-white p-3.5 text-sm text-slate-700 sm:p-4">
                                 <summary className="cursor-pointer font-semibold text-ink">
                                   查看題目、選項與詳解
                                 </summary>
                                 {renderQuestionReview(item, renderedQuestion, renderExplanationFooter(renderedQuestion))}
                               </details>
 
-                              <details className="rounded-2xl bg-white p-4 text-sm text-slate-700">
+                              <details className="rounded-2xl bg-white p-3.5 text-sm text-slate-700 sm:p-4">
                                 <summary className="cursor-pointer font-semibold text-ink">
                                   看相同觀念類似題
                                 </summary>

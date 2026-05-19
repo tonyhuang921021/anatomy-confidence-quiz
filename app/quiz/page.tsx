@@ -485,7 +485,7 @@ export default function QuizPage() {
   if (!mounted || !session || !currentQuestion) {
     return (
       <main className="shell">
-        <div className="rounded-[2rem] bg-white p-6 shadow-card ring-1 ring-slate-100">
+        <div className="rounded-[2rem] bg-white p-4 shadow-card ring-1 ring-slate-100 sm:p-6">
           載入中...
         </div>
       </main>
@@ -569,7 +569,7 @@ export default function QuizPage() {
                 onSelect={handleSelectConfidence}
               />
 
-              <div className="rounded-[2rem] bg-white p-5 shadow-card ring-1 ring-slate-100">
+              <div className="rounded-[2rem] bg-white p-4 shadow-card ring-1 ring-slate-100 sm:p-5">
                 <div className="grid gap-3 sm:grid-cols-3">
                   <p className="rounded-2xl bg-slate-50 px-4 py-3 text-sm text-slate-700">
                     已答題數 <span className="font-semibold">{answeredCount}</span>
@@ -594,7 +594,7 @@ export default function QuizPage() {
           ) : (
             <div className="space-y-4">
               <div
-                className={`rounded-[2rem] p-6 shadow-card ring-1 ${
+                className={`rounded-[2rem] p-4 shadow-card ring-1 sm:p-6 ${
                   submittedAttempt.isCorrect
                     ? "bg-emerald-50 text-emerald-900 ring-emerald-200"
                     : "bg-rose-50 text-rose-900 ring-rose-200"
@@ -703,7 +703,7 @@ export default function QuizPage() {
             </div>
           )}
 
-          <div className="rounded-[2rem] bg-white p-5 shadow-card ring-1 ring-slate-100">
+          <div className="rounded-[2rem] bg-white p-4 shadow-card ring-1 ring-slate-100 sm:p-5">
             <div className="flex flex-col gap-3 sm:flex-row">
               {session.settings?.mode === "simulation" ? (
                 <div className="flex min-h-12 items-center rounded-2xl bg-slate-50 px-4 py-3 text-sm text-slate-600">
@@ -720,7 +720,7 @@ export default function QuizPage() {
           </div>
         </div>
 
-        <aside className="h-fit rounded-[2rem] bg-white p-5 shadow-card ring-1 ring-slate-100 xl:sticky xl:top-6">
+        <aside className="h-fit rounded-[2rem] bg-white p-4 shadow-card ring-1 ring-slate-100 sm:p-5 xl:sticky xl:top-6">
           <h2 className="text-lg font-semibold text-ink">本輪狀態</h2>
           <div className="mt-4 grid gap-3">
             <p className="rounded-2xl bg-slate-50 px-4 py-3 text-sm text-slate-700">
