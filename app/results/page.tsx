@@ -733,8 +733,8 @@ export default function ResultsPage() {
         </aside>
       </div>
       {copyPromptNotice ? (
-        <div className="pointer-events-none fixed inset-x-0 bottom-6 z-50 flex justify-center px-4">
-          <div className="rounded-full bg-slate-950/72 px-4 py-2 text-sm font-medium text-white shadow-lg backdrop-blur-sm">
+        <div className="pointer-events-none fixed inset-0 z-50 flex items-center justify-center px-6">
+          <div className="rounded-2xl bg-slate-950 px-5 py-3 text-base font-semibold text-white shadow-2xl ring-1 ring-white/10">
             已經複製，可以貼進自己的 AI
           </div>
         </div>
