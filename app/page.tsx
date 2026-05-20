@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { AuthPanel } from "@/components/AuthPanel";
 import { ExamCountdown } from "@/components/ExamCountdown";
+import { FeedbackBoard } from "@/components/FeedbackBoard";
 import {
   enabledSubjects,
   HIDDEN_MULTI_ENTRY_SUBJECTS,
@@ -180,6 +181,8 @@ export default function HomePage() {
             })}
           </div>
         </section>
+
+        <FeedbackBoard />
 
       </div>
     </main>

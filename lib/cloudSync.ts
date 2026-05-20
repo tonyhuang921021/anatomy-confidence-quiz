@@ -1,5 +1,6 @@
 import type { User } from "@supabase/supabase-js";
 import type {
+  FeedbackMessage,
   LeaderboardEntry,
   OwnerDailyPoint,
   OwnerDashboardStats,
@@ -100,6 +101,14 @@ type AIExplanationUsageLogRow = {
   used_at: string;
 };
 
+type FeedbackMessageRow = {
+  id: string | number;
+  content: string;
+  display_name?: string | null;
+  is_anonymous: boolean;
+  created_at: string;
+};
+
 const SUPABASE_PAGE_SIZE = 1000;
 
 async function fetchAIExplanationUsageRows() {
@@ -177,6 +186,29 @@ function getRecentTaipeiDayKeys(days: number) {
 
 function getVisitorId() {
   return getOrCreateVisitorId();
+}
+
+function mapFeedbackMessageRow(row: FeedbackMessageRow): FeedbackMessage {
+  return {
+    id: String(row.id),
+    content: row.content,
+    displayName: row.display_name ?? undefined,
+    isAnonymous: row.is_anonymous,
+    createdAt: row.created_at
+  };
+}
+
+function getFeedbackDisplayName(user: Pick<User, "email" | "user_metadata">) {
+  const displayName =
+    typeof user.user_metadata?.display_name === "string" ? user.user_metadata.display_name.trim() : "";
+
+  if (displayName) return displayName.slice(0, 24);
+
+  if (user.email) {
+    return user.email.split("@")[0].slice(0, 24);
+  }
+
+  return "已登入使用者";
 }
 
 async function fetchAllQuestionAttemptLogs<Row extends Record<string, unknown>>(
@@ -813,6 +845,63 @@ export async function loadVisitorStats(): Promise<VisitorStats> {
     onlineVisitors: onlineVisitors ?? 0,
     updatedAt: new Date().toISOString()
   };
+}
+
+export async function loadFeedbackMessages(limit = 40): Promise<FeedbackMessage[]> {
+  if (!isSupabaseConfigured()) {
+    return [];
+  }
+
+  const supabase = getSupabaseBrowserClient();
+  const { data, error } = await supabase
+    .from("feedback_messages")
+    .select("id, content, display_name, is_anonymous, created_at")
+    .order("created_at", { ascending: false })
+    .limit(limit);
+
+  if (error) {
+    throw error;
+  }
+
+  return ((data ?? []) as FeedbackMessageRow[]).map(mapFeedbackMessageRow);
+}
+
+export async function createFeedbackMessage(input: {
+  content: string;
+  isAnonymous: boolean;
+  user?: Pick<User, "id" | "email" | "user_metadata"> | null;
+}) {
+  if (!isSupabaseConfigured()) {
+    throw new Error("Supabase 尚未設定，暫時無法留言。");
+  }
+
+  const content = input.content.trim().slice(0, 1200);
+  if (!content) {
+    throw new Error("留言內容不能是空白。");
+  }
+
+  const visitorId = getVisitorId();
+  const displayName =
+    input.isAnonymous || !input.user ? null : getFeedbackDisplayName(input.user);
+
+  const supabase = getSupabaseBrowserClient();
+  const { data, error } = await supabase
+    .from("feedback_messages")
+    .insert({
+      content,
+      display_name: displayName,
+      is_anonymous: input.isAnonymous,
+      user_id: input.user?.id ?? null,
+      visitor_id: visitorId ?? null
+    })
+    .select("id, content, display_name, is_anonymous, created_at")
+    .single();
+
+  if (error) {
+    throw error;
+  }
+
+  return mapFeedbackMessageRow(data as FeedbackMessageRow);
 }
 
 export async function loadOwnerDashboardStats(): Promise<OwnerDashboardStats> {

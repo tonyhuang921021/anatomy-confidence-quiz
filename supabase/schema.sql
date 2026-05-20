@@ -452,3 +452,43 @@ create policy "Anyone can insert ai explanation usage logs"
 on public.ai_explanation_usage_logs
 for insert
 with check (true);
+
+create table if not exists public.feedback_messages (
+  id bigint generated always as identity primary key,
+  content text not null,
+  display_name text,
+  is_anonymous boolean not null default true,
+  user_id uuid references auth.users (id) on delete set null,
+  visitor_id text,
+  created_at timestamptz not null default now()
+);
+
+create index if not exists feedback_messages_created_at_idx
+on public.feedback_messages (created_at desc);
+
+grant select, insert
+  on public.feedback_messages
+  to anon;
+
+grant select, insert, update, delete
+  on public.feedback_messages
+  to authenticated;
+
+grant select, insert, update, delete
+  on public.feedback_messages
+  to service_role;
+
+alter table public.feedback_messages enable row level security;
+
+drop policy if exists "Anyone can read feedback messages" on public.feedback_messages;
+drop policy if exists "Anyone can insert feedback messages" on public.feedback_messages;
+
+create policy "Anyone can read feedback messages"
+on public.feedback_messages
+for select
+using (true);
+
+create policy "Anyone can insert feedback messages"
+on public.feedback_messages
+for insert
+with check (true);

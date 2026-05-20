@@ -278,3 +278,11 @@ export type OwnerTopAttemptVisitorEntry = {
   attempts: number;
   lastAttemptedAt?: string;
 };
+
+export type FeedbackMessage = {
+  id: string;
+  content: string;
+  displayName?: string;
+  isAnonymous: boolean;
+  createdAt: string;
+};
