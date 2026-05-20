@@ -78,7 +78,7 @@ export function FeedbackBoard() {
       <div className="flex flex-wrap items-center justify-between gap-4">
         <div>
           <p className="text-sm font-semibold uppercase tracking-[0.2em] text-brand-700">Feedback Board</p>
-          <h2 className="mt-2 text-2xl font-semibold text-ink">網站改進留言板</h2>
+          <h2 className="mt-2 text-2xl font-semibold text-ink">留言板</h2>
           <p className="mt-3 text-sm leading-7 text-slate-600">
             大家可以匿名留言，也可以用登入帳號的暱稱留下想改進的地方。
           </p>
