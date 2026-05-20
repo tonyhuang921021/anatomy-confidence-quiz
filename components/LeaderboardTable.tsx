@@ -1,6 +1,5 @@
 "use client";
 
-import Image from "next/image";
 import { LeaderboardEntry } from "@/types/quiz";
 
 function formatUpdatedAt(value?: string) {
@@ -29,9 +28,6 @@ export function LeaderboardTable({ entries, currentUserId, sortMode }: Leaderboa
     );
   }
 
-  const maxAttempts = Math.max(...entries.map((entry) => entry.totalAttempts), 0);
-  const maxCorrectAttempts = Math.max(...entries.map((entry) => entry.correctAttempts), 0);
-
   return (
     <section className="rounded-[2rem] bg-white p-6 shadow-card ring-1 ring-slate-100">
       <div className="flex flex-wrap items-center justify-between gap-3">
@@ -52,60 +48,12 @@ export function LeaderboardTable({ entries, currentUserId, sortMode }: Leaderboa
         {entries.map((entry, index) => {
           const isCurrentUser = currentUserId === entry.userId;
           const isChampion = index === 0;
-          const normalizedName = entry.displayName.trim();
-          const lowerName = normalizedName.toLowerCase();
-          const isMetricLeader =
-            entry.totalAttempts === maxAttempts || entry.correctAttempts === maxCorrectAttempts;
-          const isEnzoHero = lowerName.includes("enzo") && (isMetricLeader || isChampion);
-          const isZebraHero = normalizedName.includes("無學學") && (isMetricLeader || isChampion);
-          const isSquirrelHero = normalizedName.includes("松鼠") && (isMetricLeader || isChampion);
-          const heroType = isEnzoHero
-            ? "sga"
-            : isZebraHero
-              ? "zebra"
-              : isSquirrelHero
-                ? "lbj"
-                : isChampion
-                  ? "lbj"
-                  : null;
-          const hasHeroBackground = heroType !== null;
-
-          const heroImageSrc =
-            heroType === "sga"
-              ? "/assets/sga.png"
-              : heroType === "zebra"
-                ? "/assets/zebra.png"
-                : "/assets/lbj-crown.png";
-          const heroImageAlt =
-            heroType === "sga"
-              ? "SGA 冠軍裝飾"
-              : heroType === "zebra"
-                ? "斑馬冠軍裝飾"
-                : "LBJ 冠軍裝飾";
-          const heroModeLabel =
-            heroType === "sga"
-              ? "SGA MODE"
-              : heroType === "zebra"
-                ? "ZEBRA MODE"
-                : "KING MODE";
-          const heroModeHint =
-            heroType === "sga"
-              ? "右側 SGA 冠軍背景"
-              : heroType === "zebra"
-                ? "右側斑馬冠軍背景"
-                : "第一名限定冠軍特效";
-          const heroTierLabel =
-            heroType === "sga"
-              ? "SGA Tier"
-              : heroType === "zebra"
-                ? "Zebra Tier"
-                : "LBJ Crown Tier";
           return (
             <article
               key={entry.userId}
               className={`relative overflow-hidden rounded-3xl border p-5 ${
-                hasHeroBackground || isChampion
-                  ? "border-amber-300 bg-[radial-gradient(circle_at_top_right,_rgba(251,191,36,0.35),_rgba(255,251,235,0.95)_45%,_rgba(255,255,255,1)_80%)] shadow-[0_18px_45px_rgba(245,158,11,0.18)]"
+                isChampion
+                  ? "border-amber-300 bg-[radial-gradient(circle_at_top_right,_rgba(251,191,36,0.18),_rgba(255,251,235,0.92)_45%,_rgba(255,255,255,1)_80%)] shadow-[0_18px_45px_rgba(245,158,11,0.12)]"
                   : index < 3
                   ? "border-amber-200 bg-amber-50/70"
                   : isCurrentUser
@@ -113,47 +61,18 @@ export function LeaderboardTable({ entries, currentUserId, sortMode }: Leaderboa
                     : "border-slate-200 bg-slate-50"
               }`}
             >
-              {hasHeroBackground || isChampion ? (
-                <>
-                  {heroType ? (
-                    <div className="pointer-events-none absolute inset-y-0 right-[-2%] w-[36%] sm:right-0 sm:w-[44%]">
-                      <div className="absolute inset-y-[-8%] right-[-10%] w-[115%] rounded-full bg-amber-300/20 blur-3xl" />
-                      <Image
-                        src={heroImageSrc}
-                        alt={heroImageAlt}
-                        fill
-                        className="object-contain object-right-center opacity-20 drop-shadow-[0_16px_24px_rgba(15,23,42,0.16)] sm:opacity-30"
-                      />
-                    </div>
-                  ) : null}
-                  <div className={`relative z-10 mb-4 flex items-center gap-2 ${heroType === "sga" ? "pr-[26%] sm:pr-[32%]" : "pr-[26%] sm:pr-[40%]"}`}>
-                    <span className="rounded-full bg-amber-400 px-3 py-1 text-xs font-black tracking-[0.18em] text-amber-950">
-                      {heroModeLabel}
-                    </span>
-                    <span className="text-xs font-semibold text-amber-900/80">
-                      {heroModeHint}
-                    </span>
-                  </div>
-                </>
-              ) : null}
-
               <div className="relative z-10 flex flex-wrap items-start justify-between gap-4">
                 <div className="min-w-0 flex-1">
                   <div className="flex flex-wrap items-center gap-3">
                     <span
                       className={`rounded-full px-3 py-1 text-xs font-semibold ring-1 ${
-                        hasHeroBackground || isChampion
+                        isChampion
                           ? "bg-amber-100 text-amber-950 ring-amber-300"
                           : "bg-white text-slate-700 ring-slate-200"
                       }`}
                     >
                       第 {index + 1} 名
                     </span>
-                    {heroType ? (
-                      <span className="rounded-full bg-ink px-3 py-1 text-xs font-semibold text-white">
-                        {heroTierLabel}
-                      </span>
-                    ) : null}
                     {isCurrentUser ? (
                       <span className="rounded-full bg-brand-100 px-3 py-1 text-xs font-semibold text-brand-800">
                         你
