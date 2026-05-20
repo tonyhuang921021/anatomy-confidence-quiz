@@ -60,6 +60,8 @@ export function AuthPanel() {
         email,
         password,
         options: {
+          emailRedirectTo:
+            typeof window !== "undefined" ? `${window.location.origin}/` : undefined,
           data: nickname.trim() ? { display_name: nickname.trim().slice(0, 24) } : undefined
         }
       });
@@ -69,7 +71,7 @@ export function AuthPanel() {
         return;
       }
 
-      setMessage("註冊成功。若你的 Supabase 專案開啟 email 驗證，請先到信箱完成確認。");
+      setMessage("註冊成功，去 email 完成驗證。");
     } finally {
       setSubmitting(false);
     }
