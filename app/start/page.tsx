@@ -59,17 +59,22 @@ export default function StartPage() {
                     : "border-slate-200 bg-white hover:bg-slate-50"
                 }`}
               >
-                <div className="flex items-start justify-between gap-3">
-                  <h3 className="text-base font-semibold text-ink sm:text-lg">{subject.label}</h3>
+                <div className="flex items-center justify-between gap-3">
+                  <div className="flex min-w-0 items-center gap-2">
+                    <h3 className="truncate text-base font-semibold text-ink sm:text-lg">{subject.label}</h3>
+                    <span className="shrink-0 rounded-full bg-slate-100 px-2.5 py-1 text-[11px] font-semibold text-slate-600">
+                      {subject.questions.length} 題
+                    </span>
+                  </div>
                   {active ? (
-                    <span className="rounded-full bg-brand-600 px-2.5 py-1 text-[11px] font-semibold text-white">
+                    <span className="shrink-0 rounded-full bg-brand-600 px-2.5 py-1 text-[11px] font-semibold text-white">
                       已選
                     </span>
                   ) : null}
                 </div>
-                <div className="mt-3 flex flex-wrap gap-2">
+                <div className="mt-2 flex flex-wrap gap-2">
                   <span className="rounded-full bg-slate-100 px-2.5 py-1 text-[11px] font-semibold text-slate-600">
-                    {subject.questions.length} 題
+                    {MED1_SUBJECTS.includes(subject.subject) ? "醫學一" : "醫學二"}
                   </span>
                 </div>
               </button>
