@@ -116,7 +116,7 @@ function createSession(
     .filter((question): question is Question => Boolean(question));
 
   return {
-    id: `session-${Date.now()}`,
+    id: `session-${crypto.randomUUID()}`,
     subject:
       selectedSubjects.length === 1
         ? selectedSubjects[0]

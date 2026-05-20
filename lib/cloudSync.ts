@@ -281,6 +281,18 @@ function sessionFreshnessValue(session: QuizSession) {
   return session.completedAt || session.startedAt || "";
 }
 
+function namespaceSessionIdForUser(userId: string, sessionId: string) {
+  const prefix = `user-${userId}:`;
+  return sessionId.startsWith(prefix) ? sessionId : `${prefix}${sessionId}`;
+}
+
+function canonicalizeSessionsForUser(userId: string, sessions: QuizSession[]) {
+  return sessions.map((session) => ({
+    ...session,
+    id: namespaceSessionIdForUser(userId, session.id)
+  }));
+}
+
 function mergeSessions(localSessions: QuizSession[], remoteSessions: QuizSession[]) {
   const merged = new Map<string, QuizSession>();
 
@@ -634,9 +646,9 @@ export async function syncCompletedSessionsForCurrentUser(userId: string) {
   }
 
   const supabase = getSupabaseBrowserClient();
-  const localSessions = mergeSessions(
-    loadCompletedSessionsForUser("guest"),
-    loadCompletedSessions()
+  const localSessions = canonicalizeSessionsForUser(
+    userId,
+    mergeSessions(loadCompletedSessionsForUser("guest"), loadCompletedSessions())
   );
   const { data, error } = await supabase
     .from("quiz_sessions")
@@ -648,9 +660,12 @@ export async function syncCompletedSessionsForCurrentUser(userId: string) {
     throw error;
   }
 
-  const remoteSessions = (data ?? [])
-    .map((row) => mapRowToSession(row as QuizSessionRow))
-    .filter((session): session is QuizSession => Boolean(session));
+  const remoteSessions = canonicalizeSessionsForUser(
+    userId,
+    (data ?? [])
+      .map((row) => mapRowToSession(row as QuizSessionRow))
+      .filter((session): session is QuizSession => Boolean(session))
+  );
   const mergedSessions = mergeSessions(localSessions, remoteSessions);
 
   saveCompletedSessions(mergedSessions);
@@ -667,10 +682,19 @@ export async function pushCompletedSessionToSupabase(session: QuizSession) {
   const { data } = await supabase.auth.getUser();
 
   if (data.user) {
-    await upsertSessionsForUser(data.user.id, [session]);
+    const canonicalSessions = canonicalizeSessionsForUser(data.user.id, [session]);
+    saveCompletedSessions(
+      mergeSessions(
+        loadCompletedSessions(),
+        canonicalSessions
+      )
+    );
+    await upsertSessionsForUser(data.user.id, canonicalSessions);
   }
 
-  await syncQuestionStatsForSessionsSafely([session]);
+  await syncQuestionStatsForSessionsSafely(
+    data.user ? canonicalizeSessionsForUser(data.user.id, [session]) : [session]
+  );
 }
 
 export async function pushQuestionStatsSnapshotToSupabase(session: QuizSession) {
