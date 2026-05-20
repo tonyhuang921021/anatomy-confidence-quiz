@@ -38,6 +38,17 @@ const SYNC_RETRY_DELAYS_MS = [0, 400, 1200];
 
 function getErrorMessage(error: unknown) {
   if (error instanceof Error) return error.message;
+  if (error && typeof error === "object") {
+    const maybeMessage =
+      "message" in error && typeof error.message === "string"
+        ? error.message
+        : "details" in error && typeof error.details === "string"
+          ? error.details
+          : "hint" in error && typeof error.hint === "string"
+            ? error.hint
+            : "";
+    return maybeMessage || JSON.stringify(error);
+  }
   return typeof error === "string" ? error : "同步失敗";
 }
 
@@ -58,6 +69,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     try {
       setSyncStatus("syncing");
       setSyncError("");
+      const {
+        data: { session: liveSession }
+      } = await getSupabaseBrowserClient().auth.getSession();
+
+      if (!liveSession?.access_token) {
+        setSyncStatus("idle");
+        return;
+      }
+
       let lastError: unknown = null;
 
       for (const delayMs of SYNC_RETRY_DELAYS_MS) {
@@ -66,6 +86,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         }
 
         try {
+          const {
+            data: { session: retrySession }
+          } = await getSupabaseBrowserClient().auth.getSession();
+
+          if (!retrySession?.access_token) {
+            lastError = new Error("尚未取得登入 session，稍後再試一次。");
+            continue;
+          }
+
           const mergedSessions = await syncCompletedSessionsForCurrentUser(userId);
           await syncLeaderboardProfileForCurrentUser(effectiveUser, mergedSessions);
           lastError = null;
