@@ -4,13 +4,6 @@ import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import { useAuth } from "@/components/AuthProvider";
 import {
-  loadOwnerDailySeries,
-  loadOwnerDashboardStats,
-  loadOwnerExplanationUsage,
-  loadOwnerHourlySeries,
-  loadOwnerTopAttemptVisitors
-} from "@/lib/cloudSync";
-import {
   OwnerDailyPoint,
   OwnerDashboardStats,
   OwnerExplanationUsageEntry,
@@ -30,6 +23,16 @@ function isAllowedEmail(email?: string | null) {
   if (!email) return false;
   return getAllowedEmails().includes(email.trim().toLowerCase());
 }
+
+type OwnerApiPayload = {
+  ok: boolean;
+  message?: string;
+  stats?: OwnerDashboardStats;
+  dailySeries?: OwnerDailyPoint[];
+  hourlySeries?: OwnerHourlyPoint[];
+  explanationUsage?: OwnerExplanationUsageEntry[];
+  topVisitors?: OwnerTopAttemptVisitorEntry[];
+};
 
 function formatUpdatedAt(value: string) {
   return new Date(value).toLocaleString("zh-TW", {
@@ -159,7 +162,7 @@ function HourlyActivityBarChart({ data }: { data: OwnerHourlyPoint[] }) {
 }
 
 export default function OwnerPage() {
-  const { configured, loading, user } = useAuth();
+  const { configured, loading, session, user } = useAuth();
   const [stats, setStats] = useState<OwnerDashboardStats | null>(null);
   const [dailySeries, setDailySeries] = useState<OwnerDailyPoint[]>([]);
   const [hourlySeries, setHourlySeries] = useState<OwnerHourlyPoint[]>([]);
@@ -170,9 +173,27 @@ export default function OwnerPage() {
   const allowed = useMemo(() => isAllowedEmail(user?.email), [user?.email]);
   const hasAllowlist = getAllowedEmails().length > 0;
 
+  async function fetchOwnerData(accessToken: string) {
+    const response = await fetch("/api/owner", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({ accessToken })
+    });
+
+    const payload = (await response.json().catch(() => null)) as OwnerApiPayload | null;
+
+    if (!response.ok || !payload?.ok || !payload.stats) {
+      throw new Error(payload?.message || "數據載入失敗");
+    }
+
+    return payload;
+  }
+
   useEffect(() => {
     async function fetchStats() {
-      if (!configured || !user || !allowed) {
+      if (!configured || !user || !allowed || !session?.access_token) {
         setStats(null);
         setStatsLoading(false);
         return;
@@ -181,18 +202,12 @@ export default function OwnerPage() {
       try {
         setStatsLoading(true);
         setError("");
-        const [nextStats, nextSeries, nextHourlySeries, nextExplanationUsage, nextTopVisitors] = await Promise.all([
-          loadOwnerDashboardStats(),
-          loadOwnerDailySeries(14),
-          loadOwnerHourlySeries(),
-          loadOwnerExplanationUsage(),
-          loadOwnerTopAttemptVisitors(5)
-        ]);
-        setStats(nextStats);
-        setDailySeries(nextSeries);
-        setHourlySeries(nextHourlySeries);
-        setExplanationUsage(nextExplanationUsage);
-        setTopVisitors(nextTopVisitors);
+        const payload = await fetchOwnerData(session.access_token);
+        setStats(payload.stats ?? null);
+        setDailySeries(payload.dailySeries ?? []);
+        setHourlySeries(payload.hourlySeries ?? []);
+        setExplanationUsage(payload.explanationUsage ?? []);
+        setTopVisitors(payload.topVisitors ?? []);
       } catch (fetchError) {
         setError(fetchError instanceof Error ? fetchError.message : "數據載入失敗");
       } finally {
@@ -201,25 +216,19 @@ export default function OwnerPage() {
     }
 
     void fetchStats();
-  }, [allowed, configured, user]);
+  }, [allowed, configured, session?.access_token, user]);
 
   useEffect(() => {
-    if (!configured || !user || !allowed) return;
+    if (!configured || !user || !allowed || !session?.access_token) return;
 
     const refresh = async () => {
       try {
-        const [nextStats, nextSeries, nextHourlySeries, nextExplanationUsage, nextTopVisitors] = await Promise.all([
-          loadOwnerDashboardStats(),
-          loadOwnerDailySeries(14),
-          loadOwnerHourlySeries(),
-          loadOwnerExplanationUsage(),
-          loadOwnerTopAttemptVisitors(5)
-        ]);
-        setStats(nextStats);
-        setDailySeries(nextSeries);
-        setHourlySeries(nextHourlySeries);
-        setExplanationUsage(nextExplanationUsage);
-        setTopVisitors(nextTopVisitors);
+        const payload = await fetchOwnerData(session.access_token);
+        setStats(payload.stats ?? null);
+        setDailySeries(payload.dailySeries ?? []);
+        setHourlySeries(payload.hourlySeries ?? []);
+        setExplanationUsage(payload.explanationUsage ?? []);
+        setTopVisitors(payload.topVisitors ?? []);
       } catch {
         // keep existing view
       }
@@ -241,7 +250,7 @@ export default function OwnerPage() {
       window.removeEventListener("focus", handleFocus);
       document.removeEventListener("visibilitychange", handleFocus);
     };
-  }, [allowed, configured, user]);
+  }, [allowed, configured, session?.access_token, user]);
 
   return (
     <main className="shell">

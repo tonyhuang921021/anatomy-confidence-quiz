@@ -142,7 +142,15 @@ create table if not exists public.question_attempt_logs (
 create index if not exists question_attempt_logs_question_id_idx
 on public.question_attempt_logs (question_id);
 
-grant select, insert, update
+create index if not exists question_attempt_logs_answered_at_idx
+on public.question_attempt_logs (answered_at desc);
+
+create index if not exists question_attempt_logs_visitor_id_idx
+on public.question_attempt_logs (visitor_id);
+
+revoke all on public.question_attempt_logs from anon;
+
+grant insert, update
   on public.question_attempt_logs
   to anon;
 
@@ -156,14 +164,8 @@ grant select, insert, update, delete
 
 alter table public.question_attempt_logs enable row level security;
 
-drop policy if exists "Anyone can read question attempt logs" on public.question_attempt_logs;
 drop policy if exists "Anyone can insert question attempt logs" on public.question_attempt_logs;
 drop policy if exists "Anyone can update question attempt logs" on public.question_attempt_logs;
-
-create policy "Anyone can read question attempt logs"
-on public.question_attempt_logs
-for select
-using (true);
 
 create policy "Anyone can insert question attempt logs"
 on public.question_attempt_logs
@@ -278,7 +280,9 @@ create table if not exists public.question_attempt_devices (
 create index if not exists question_attempt_devices_last_attempt_at_idx
 on public.question_attempt_devices (last_attempt_at desc);
 
-grant select, insert, update
+revoke all on public.question_attempt_devices from anon;
+
+grant insert, update
   on public.question_attempt_devices
   to anon;
 
@@ -292,14 +296,8 @@ grant select, insert, update, delete
 
 alter table public.question_attempt_devices enable row level security;
 
-drop policy if exists "Anyone can read question attempt devices" on public.question_attempt_devices;
 drop policy if exists "Anyone can insert question attempt devices" on public.question_attempt_devices;
 drop policy if exists "Anyone can update question attempt devices" on public.question_attempt_devices;
-
-create policy "Anyone can read question attempt devices"
-on public.question_attempt_devices
-for select
-using (true);
 
 create policy "Anyone can insert question attempt devices"
 on public.question_attempt_devices
@@ -323,7 +321,12 @@ create table if not exists public.question_attempt_device_daily (
 create index if not exists question_attempt_device_daily_activity_date_idx
 on public.question_attempt_device_daily (activity_date desc);
 
-grant select, insert, update
+create index if not exists question_attempt_device_daily_visitor_id_idx
+on public.question_attempt_device_daily (visitor_id);
+
+revoke all on public.question_attempt_device_daily from anon;
+
+grant insert, update
   on public.question_attempt_device_daily
   to anon;
 
@@ -337,14 +340,8 @@ grant select, insert, update, delete
 
 alter table public.question_attempt_device_daily enable row level security;
 
-drop policy if exists "Anyone can read question attempt device daily" on public.question_attempt_device_daily;
 drop policy if exists "Anyone can insert question attempt device daily" on public.question_attempt_device_daily;
 drop policy if exists "Anyone can update question attempt device daily" on public.question_attempt_device_daily;
-
-create policy "Anyone can read question attempt device daily"
-on public.question_attempt_device_daily
-for select
-using (true);
 
 create policy "Anyone can insert question attempt device daily"
 on public.question_attempt_device_daily
@@ -367,13 +364,8 @@ create table if not exists public.owner_daily_stats (
 create index if not exists owner_daily_stats_updated_at_idx
 on public.owner_daily_stats (updated_at desc);
 
-grant select, insert, update
-  on public.owner_daily_stats
-  to anon;
-
-grant select, insert, update, delete
-  on public.owner_daily_stats
-  to authenticated;
+revoke all on public.owner_daily_stats from anon;
+revoke all on public.owner_daily_stats from authenticated;
 
 grant select, insert, update, delete
   on public.owner_daily_stats
@@ -384,22 +376,6 @@ alter table public.owner_daily_stats enable row level security;
 drop policy if exists "Anyone can read owner daily stats" on public.owner_daily_stats;
 drop policy if exists "Anyone can insert owner daily stats" on public.owner_daily_stats;
 drop policy if exists "Anyone can update owner daily stats" on public.owner_daily_stats;
-
-create policy "Anyone can read owner daily stats"
-on public.owner_daily_stats
-for select
-using (true);
-
-create policy "Anyone can insert owner daily stats"
-on public.owner_daily_stats
-for insert
-with check (true);
-
-create policy "Anyone can update owner daily stats"
-on public.owner_daily_stats
-for update
-using (true)
-with check (true);
 
 create table if not exists public.ai_explanation_usage_logs (
   id bigint generated always as identity primary key,
@@ -426,11 +402,15 @@ alter table public.ai_explanation_usage_logs
 create index if not exists ai_explanation_usage_logs_rate_key_used_at_idx
 on public.ai_explanation_usage_logs (rate_key, used_at desc);
 
-grant select, insert
-  on public.ai_explanation_usage_logs
-  to anon;
+create index if not exists ai_explanation_usage_logs_user_email_idx
+on public.ai_explanation_usage_logs (user_email);
 
-grant select, insert, update, delete
+create index if not exists ai_explanation_usage_logs_visitor_id_idx
+on public.ai_explanation_usage_logs (visitor_id);
+
+revoke all on public.ai_explanation_usage_logs from anon;
+
+grant insert, update, delete
   on public.ai_explanation_usage_logs
   to authenticated;
 
@@ -440,17 +420,12 @@ grant select, insert, update, delete
 
 alter table public.ai_explanation_usage_logs enable row level security;
 
-drop policy if exists "Anyone can read ai explanation usage logs" on public.ai_explanation_usage_logs;
 drop policy if exists "Anyone can insert ai explanation usage logs" on public.ai_explanation_usage_logs;
-
-create policy "Anyone can read ai explanation usage logs"
-on public.ai_explanation_usage_logs
-for select
-using (true);
 
 create policy "Anyone can insert ai explanation usage logs"
 on public.ai_explanation_usage_logs
 for insert
+to authenticated
 with check (true);
 
 create table if not exists public.feedback_messages (
@@ -465,6 +440,12 @@ create table if not exists public.feedback_messages (
 
 create index if not exists feedback_messages_created_at_idx
 on public.feedback_messages (created_at desc);
+
+create index if not exists feedback_messages_user_id_created_at_idx
+on public.feedback_messages (user_id, created_at desc);
+
+create index if not exists feedback_messages_visitor_id_created_at_idx
+on public.feedback_messages (visitor_id, created_at desc);
 
 grant select, insert
   on public.feedback_messages
