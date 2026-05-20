@@ -3,7 +3,6 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { AIPromptBox } from "@/components/AIPromptBox";
 import { useAuth } from "@/components/AuthProvider";
 import { ResultSummary } from "@/components/ResultSummary";
 import { WeaknessRanking } from "@/components/WeaknessRanking";
@@ -89,7 +88,7 @@ export default function ResultsPage() {
   const [explanationLoadingMap, setExplanationLoadingMap] = useState<Record<string, boolean>>({});
   const [explanationErrorMap, setExplanationErrorMap] = useState<Record<string, string>>({});
   const [communityStatsMap, setCommunityStatsMap] = useState<Record<string, QuestionCommunityStats>>({});
-  const [showPrompt, setShowPrompt] = useState(false);
+  const [copyPromptNotice, setCopyPromptNotice] = useState(false);
   const [state, setState] = useState<ResultState>({
     session: null,
     sessions: [],
@@ -100,6 +99,18 @@ export default function ResultsPage() {
     unstableSections: [],
     completionStats: null
   });
+
+  async function handleCopyAIPrompt() {
+    if (!state.promptText) return;
+
+    try {
+      await navigator.clipboard.writeText(state.promptText);
+      setCopyPromptNotice(true);
+      window.setTimeout(() => setCopyPromptNotice(false), 1800);
+    } catch {
+      setCopyPromptNotice(false);
+    }
+  }
 
   useEffect(() => {
     const currentSession = loadCurrentSession();
@@ -676,7 +687,6 @@ export default function ResultsPage() {
               </div>
             </div>
           </section>
-          {showPrompt ? <AIPromptBox promptText={state.promptText} /> : null}
           <WeaknessRanking sections={topWeakSections} />
         </div>
 
@@ -713,15 +723,22 @@ export default function ResultsPage() {
               </Link>
               <button
                 type="button"
-                onClick={() => setShowPrompt((current) => !current)}
+                onClick={() => void handleCopyAIPrompt()}
                 className="min-h-12 rounded-2xl bg-slate-900 px-4 py-4 text-center text-sm font-semibold text-white transition hover:bg-black"
               >
-                {showPrompt ? "收起 AI 補弱 Prompt" : "顯示 AI 補弱 Prompt"}
+                複製 AI 補弱 Prompt
               </button>
             </div>
           </section>
         </aside>
       </div>
+      {copyPromptNotice ? (
+        <div className="pointer-events-none fixed inset-x-0 bottom-6 z-50 flex justify-center px-4">
+          <div className="rounded-full bg-slate-950/72 px-4 py-2 text-sm font-medium text-white shadow-lg backdrop-blur-sm">
+            已經複製，可以貼進自己的 AI
+          </div>
+        </div>
+      ) : null}
     </main>
   );
 }
