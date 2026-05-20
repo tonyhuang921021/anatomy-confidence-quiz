@@ -770,8 +770,6 @@ export async function loadOwnerDashboardStats(): Promise<OwnerDashboardStats> {
   const supabase = getSupabaseBrowserClient();
   const now = new Date();
   const onlineSince = new Date(now.getTime() - ONLINE_WINDOW_MS).toISOString();
-  const { startIso, endIso } = getTaipeiDayRange();
-  const recentDayKeys = getRecentTaipeiDayKeys(7);
   const dailySeries = await loadOwnerDailySeries(7);
   const todayPoint = dailySeries[dailySeries.length - 1];
   const attemptsToday = todayPoint?.attempts ?? 0;
@@ -893,52 +891,39 @@ export async function loadOwnerDailySeries(days = 14): Promise<OwnerDailyPoint[]
   const supabase = getSupabaseBrowserClient();
   const dayKeys = getRecentTaipeiDayKeys(days);
   const startDate = dayKeys[0];
-  const { data, error } = await supabase
-    .from("owner_daily_stats")
-    .select("activity_date, attempts, devices")
-    .gte("activity_date", startDate);
+  const [{ data: attemptRows, error: attemptError }, { data: deviceRows, error: deviceError }] =
+    await Promise.all([
+      supabase
+        .from("question_attempt_logs")
+        .select("answered_at")
+        .gte("answered_at", `${startDate}T00:00:00+08:00`),
+      supabase
+        .from("question_attempt_device_daily")
+        .select("activity_date")
+        .gte("activity_date", startDate)
+    ]);
 
-  if (error) throw error;
+  if (attemptError) throw attemptError;
+  if (deviceError) throw deviceError;
 
-  const statsMap = new Map<string, OwnerDailyStatRow>();
-  for (const row of (data ?? []) as OwnerDailyStatRow[]) {
-    statsMap.set(row.activity_date, row);
-  }
-
-  const missingDayKeys = dayKeys.filter((date) => !statsMap.has(date));
   const attemptMap = new Map<string, number>();
   const deviceMap = new Map<string, number>();
 
-  if (missingDayKeys.length > 0) {
-    const [{ data: attemptRows, error: attemptError }, { data: deviceRows, error: deviceError }] =
-      await Promise.all([
-        supabase
-          .from("question_attempt_logs")
-          .select("answered_at")
-          .gte("answered_at", `${startDate}T00:00:00+08:00`),
-        supabase
-          .from("question_attempt_device_daily")
-          .select("activity_date")
-          .gte("activity_date", startDate)
-      ]);
+  for (const row of attemptRows ?? []) {
+    const key = getTaipeiDayKey(new Date(row.answered_at));
+    if (!dayKeys.includes(key)) continue;
+    attemptMap.set(key, (attemptMap.get(key) ?? 0) + 1);
+  }
 
-    if (attemptError) throw attemptError;
-    if (deviceError) throw deviceError;
-
-    for (const row of attemptRows ?? []) {
-      const key = getTaipeiDayKey(new Date(row.answered_at));
-      attemptMap.set(key, (attemptMap.get(key) ?? 0) + 1);
-    }
-
-    for (const row of deviceRows ?? []) {
-      deviceMap.set(row.activity_date, (deviceMap.get(row.activity_date) ?? 0) + 1);
-    }
+  for (const row of deviceRows ?? []) {
+    if (!dayKeys.includes(row.activity_date)) continue;
+    deviceMap.set(row.activity_date, (deviceMap.get(row.activity_date) ?? 0) + 1);
   }
 
   return dayKeys.map((date) => ({
     date,
-    attempts: statsMap.get(date)?.attempts ?? attemptMap.get(date) ?? 0,
-    devices: statsMap.get(date)?.devices ?? deviceMap.get(date) ?? 0
+    attempts: attemptMap.get(date) ?? 0,
+    devices: deviceMap.get(date) ?? 0
   }));
 }
 
