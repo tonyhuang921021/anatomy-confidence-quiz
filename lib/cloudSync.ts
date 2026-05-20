@@ -100,6 +100,8 @@ type AIExplanationUsageLogRow = {
   used_at: string;
 };
 
+const SUPABASE_PAGE_SIZE = 1000;
+
 async function fetchAIExplanationUsageRows() {
   if (!isSupabaseConfigured()) {
     return [] as AIExplanationUsageLogRow[];
@@ -175,6 +177,72 @@ function getRecentTaipeiDayKeys(days: number) {
 
 function getVisitorId() {
   return getOrCreateVisitorId();
+}
+
+async function fetchAllQuestionAttemptLogs<Row extends Record<string, unknown>>(
+  selectClause: string,
+  configure?: (query: any) => any
+): Promise<Row[]> {
+  const supabase = getSupabaseBrowserClient();
+  const rows: Row[] = [];
+  let from = 0;
+
+  while (true) {
+    let query = supabase
+      .from("question_attempt_logs")
+      .select(selectClause)
+      .order("answered_at", { ascending: true })
+      .range(from, from + SUPABASE_PAGE_SIZE - 1);
+
+    if (configure) {
+      query = configure(query as never) as typeof query;
+    }
+
+    const { data, error } = await query;
+    if (error) throw error;
+
+    const page = (data ?? []) as unknown as Row[];
+    rows.push(...page);
+    if (page.length < SUPABASE_PAGE_SIZE) {
+      break;
+    }
+    from += SUPABASE_PAGE_SIZE;
+  }
+
+  return rows;
+}
+
+async function fetchAllQuestionAttemptDeviceDailyRows<Row extends Record<string, unknown>>(
+  selectClause: string,
+  configure?: (query: any) => any
+): Promise<Row[]> {
+  const supabase = getSupabaseBrowserClient();
+  const rows: Row[] = [];
+  let from = 0;
+
+  while (true) {
+    let query = supabase
+      .from("question_attempt_device_daily")
+      .select(selectClause)
+      .order("activity_date", { ascending: true })
+      .range(from, from + SUPABASE_PAGE_SIZE - 1);
+
+    if (configure) {
+      query = configure(query as never) as typeof query;
+    }
+
+    const { data, error } = await query;
+    if (error) throw error;
+
+    const page = (data ?? []) as unknown as Row[];
+    rows.push(...page);
+    if (page.length < SUPABASE_PAGE_SIZE) {
+      break;
+    }
+    from += SUPABASE_PAGE_SIZE;
+  }
+
+  return rows;
 }
 
 function sessionFreshnessValue(session: QuizSession) {
@@ -779,7 +847,7 @@ export async function loadOwnerDashboardStats(): Promise<OwnerDashboardStats> {
   const [
     totalVisitorsResult,
     totalAttemptDevicesResult,
-    allAttemptVisitorRowsResult,
+    allAttemptVisitorRows,
     onlineVisitorsResult,
     totalUsersResult,
     totalAttemptsResult,
@@ -787,7 +855,7 @@ export async function loadOwnerDashboardStats(): Promise<OwnerDashboardStats> {
   ] = await Promise.all([
     supabase.from("site_visitors").select("*", { count: "exact", head: true }),
     supabase.from("question_attempt_devices").select("*", { count: "exact", head: true }),
-    supabase.from("question_attempt_logs").select("visitor_id"),
+    fetchAllQuestionAttemptLogs<{ visitor_id?: string | null }>("visitor_id"),
     supabase
       .from("site_visitors")
       .select("*", { count: "exact", head: true })
@@ -800,7 +868,6 @@ export async function loadOwnerDashboardStats(): Promise<OwnerDashboardStats> {
   const errors = [
     totalVisitorsResult.error,
     totalAttemptDevicesResult.error,
-    allAttemptVisitorRowsResult.error,
     onlineVisitorsResult.error,
     totalUsersResult.error,
     totalAttemptsResult.error
@@ -812,7 +879,7 @@ export async function loadOwnerDashboardStats(): Promise<OwnerDashboardStats> {
 
   const aiUsageRows = aiExplanationUsageRows;
   const visitorAttemptCountMap = new Map<string, number>();
-  for (const row of allAttemptVisitorRowsResult.data ?? []) {
+  for (const row of allAttemptVisitorRows) {
     const visitorId = row.visitor_id?.trim();
     if (!visitorId) continue;
     visitorAttemptCountMap.set(visitorId, (visitorAttemptCountMap.get(visitorId) ?? 0) + 1);
@@ -891,20 +958,14 @@ export async function loadOwnerDailySeries(days = 14): Promise<OwnerDailyPoint[]
   const supabase = getSupabaseBrowserClient();
   const dayKeys = getRecentTaipeiDayKeys(days);
   const startDate = dayKeys[0];
-  const [{ data: attemptRows, error: attemptError }, { data: deviceRows, error: deviceError }] =
-    await Promise.all([
-      supabase
-        .from("question_attempt_logs")
-        .select("answered_at")
-        .gte("answered_at", `${startDate}T00:00:00+08:00`),
-      supabase
-        .from("question_attempt_device_daily")
-        .select("activity_date")
-        .gte("activity_date", startDate)
-    ]);
-
-  if (attemptError) throw attemptError;
-  if (deviceError) throw deviceError;
+  const [attemptRows, deviceRows] = await Promise.all([
+    fetchAllQuestionAttemptLogs<{ answered_at: string }>("answered_at", (query) =>
+      query.gte("answered_at", `${startDate}T00:00:00+08:00`)
+    ),
+    fetchAllQuestionAttemptDeviceDailyRows<{ activity_date: string }>("activity_date", (query) =>
+      query.gte("activity_date", startDate)
+    )
+  ]);
 
   const attemptMap = new Map<string, number>();
   const deviceMap = new Map<string, number>();
@@ -938,12 +999,10 @@ export async function loadOwnerHourlySeries(): Promise<OwnerHourlyPoint[]> {
 
   const supabase = getSupabaseBrowserClient();
   const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString();
-  const { data, error } = await supabase
-    .from("question_attempt_logs")
-    .select("answered_at, visitor_id")
-    .gte("answered_at", sevenDaysAgo);
-
-  if (error) throw error;
+  const data = await fetchAllQuestionAttemptLogs<{ answered_at: string; visitor_id?: string | null }>(
+    "answered_at, visitor_id",
+    (query) => query.gte("answered_at", sevenDaysAgo)
+  );
 
   const hourAttemptMap = new Map<number, number>();
   const hourDeviceMap = new Map<number, Set<string>>();
@@ -988,12 +1047,10 @@ export async function loadOwnerTopAttemptVisitors(limit = 5): Promise<OwnerTopAt
   }
 
   const supabase = getSupabaseBrowserClient();
-  const { data, error } = await supabase
-    .from("question_attempt_logs")
-    .select("visitor_id, answered_at")
-    .not("visitor_id", "is", null);
-
-  if (error) throw error;
+  const data = await fetchAllQuestionAttemptLogs<{ visitor_id?: string | null; answered_at: string }>(
+    "visitor_id, answered_at",
+    (query) => query.not("visitor_id", "is", null)
+  );
 
   const grouped = new Map<string, OwnerTopAttemptVisitorEntry>();
 
