@@ -72,11 +72,6 @@ export default function StartPage() {
                     </span>
                   ) : null}
                 </div>
-                <div className="mt-2 flex flex-wrap gap-2">
-                  <span className="rounded-full bg-slate-100 px-2.5 py-1 text-[11px] font-semibold text-slate-600">
-                    {MED1_SUBJECTS.includes(subject.subject) ? "醫學一" : "醫學二"}
-                  </span>
-                </div>
               </button>
             );
           })}
