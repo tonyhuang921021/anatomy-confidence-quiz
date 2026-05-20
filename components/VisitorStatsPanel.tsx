@@ -69,13 +69,17 @@ export function VisitorStatsPanel({ compact = false }: VisitorStatsPanelProps) {
   }
 
   if (compact) {
+    if (loading) {
+      return null;
+    }
+
     return (
       <div className="flex min-w-0 flex-wrap items-center justify-end gap-2 text-xs font-semibold">
         <span className="rounded-full bg-slate-100 px-3 py-1 text-slate-700">
-          累積訪客 {loading ? "..." : stats.totalVisitors}
+          累積訪客 {stats.totalVisitors}
         </span>
         <span className="rounded-full bg-slate-100 px-3 py-1 text-slate-700">
-          在線估算 {loading ? "..." : stats.onlineVisitors}
+          在線估算 {stats.onlineVisitors}
         </span>
       </div>
     );

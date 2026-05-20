@@ -18,13 +18,9 @@ const selectableSubjects = enabledSubjects.filter(
 
 export default function StartPage() {
   const router = useRouter();
-  const defaultSubjects = useMemo(
-    () => selectableSubjects.slice(0, 1).map((item) => item.subject),
-    []
-  );
   const med1Subjects = selectableSubjects.filter((item) => MED1_SUBJECTS.includes(item.subject));
   const med2Subjects = selectableSubjects.filter((item) => MED2_SUBJECTS.includes(item.subject));
-  const [selectedSubjects, setSelectedSubjects] = useState<SubjectName[]>(defaultSubjects);
+  const [selectedSubjects, setSelectedSubjects] = useState<SubjectName[]>([]);
   const [excludeAiGenerated, setExcludeAiGenerated] = useState(true);
   const [includeSeasonalLimited, setIncludeSeasonalLimited] = useState(false);
   const seasonalLimitedQuestions = useMemo(() => getSeasonalLimitedQuestions(), []);
@@ -41,14 +37,12 @@ export default function StartPage() {
 
   function renderSubjectGroup(
     title: string,
-    description: string,
     subjects: typeof selectableSubjects
   ) {
     return (
       <section className="rounded-[2rem] bg-slate-50 p-5 ring-1 ring-slate-100">
         <div>
           <h2 className="text-xl font-semibold text-ink">{title}</h2>
-          <p className="mt-2 text-sm leading-7 text-slate-600">{description}</p>
         </div>
 
         <div className="mt-4 grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
@@ -59,25 +53,25 @@ export default function StartPage() {
                 key={subject.subject}
                 type="button"
                 onClick={() => toggleSubject(subject.subject)}
-                className={`rounded-3xl border p-5 text-left transition ${
+                className={`rounded-3xl border p-4 text-left transition ${
                   active
                     ? "border-brand-500 bg-brand-50 ring-2 ring-brand-200"
                     : "border-slate-200 bg-white hover:bg-slate-50"
                 }`}
               >
-                <div className="flex items-center justify-between gap-3">
-                  <h3 className="text-lg font-semibold text-ink">{subject.label}</h3>
-                  <span
-                    className={`rounded-full px-3 py-1 text-xs font-semibold ${
-                      active
-                        ? "bg-brand-600 text-white"
-                        : "bg-white text-slate-500 ring-1 ring-slate-200"
-                    }`}
-                  >
-                    {active ? "已選擇" : "未選"}
+                <div className="flex items-start justify-between gap-3">
+                  <h3 className="text-base font-semibold text-ink sm:text-lg">{subject.label}</h3>
+                  {active ? (
+                    <span className="rounded-full bg-brand-600 px-2.5 py-1 text-[11px] font-semibold text-white">
+                      已選
+                    </span>
+                  ) : null}
+                </div>
+                <div className="mt-3 flex flex-wrap gap-2">
+                  <span className="rounded-full bg-slate-100 px-2.5 py-1 text-[11px] font-semibold text-slate-600">
+                    {subject.questions.length} 題
                   </span>
                 </div>
-                <p className="mt-3 text-sm text-slate-600">{subject.questions.length} 題已上線</p>
               </button>
             );
           })}
@@ -114,35 +108,35 @@ export default function StartPage() {
   return (
     <main className="shell">
       <section className="rounded-[2rem] bg-white p-6 shadow-card ring-1 ring-slate-100 sm:p-8">
-        <div className="flex flex-wrap items-center justify-between gap-4">
-          <div>
+        <div className="flex items-start justify-between gap-4">
+          <div className="min-w-0">
             <p className="text-sm font-semibold uppercase tracking-[0.2em] text-brand-700">
               Quick Start
             </p>
-            <h1 className="mt-2 text-3xl font-bold text-ink sm:text-4xl">先選想抽哪些科</h1>
+            <div className="mt-2 flex items-start justify-between gap-3">
+              <h1 className="text-3xl font-bold text-ink sm:text-4xl">先選抽哪些科</h1>
+              <Link
+                href="/"
+                className="min-h-10 shrink-0 rounded-2xl bg-slate-100 px-3 py-2 text-sm font-semibold text-slate-800 transition hover:bg-slate-200 sm:hidden"
+              >
+                返回首頁
+              </Link>
+            </div>
             <p className="mt-3 max-w-2xl text-sm leading-7 text-slate-600 sm:text-base">
               這裡會直接開始一輪 10 題。你可以只勾一科，也可以混合多科一起抽。
             </p>
           </div>
           <Link
             href="/"
-            className="min-h-12 rounded-2xl bg-slate-100 px-4 py-3 text-sm font-semibold text-slate-800 transition hover:bg-slate-200"
+            className="hidden min-h-12 rounded-2xl bg-slate-100 px-4 py-3 text-sm font-semibold text-slate-800 transition hover:bg-slate-200 sm:inline-flex"
           >
             返回首頁
           </Link>
         </div>
 
         <div className="mt-6 space-y-6">
-          {renderSubjectGroup(
-            "醫學（一）科目",
-            "先修基礎科目集中在這裡：解剖、組織、胚胎、生理、生化。",
-            med1Subjects
-          )}
-          {renderSubjectGroup(
-            "醫學（二）科目",
-            "臨床前後段常一起刷的科目集中在這裡：微免、寄生蟲、公衛、藥理、病理。",
-            med2Subjects
-          )}
+          {renderSubjectGroup("醫學（一）科目", med1Subjects)}
+          {renderSubjectGroup("醫學（二）科目", med2Subjects)}
           {seasonalAvailable ? (
             <section className="rounded-[2rem] bg-amber-50 p-5 ring-1 ring-amber-200">
               <div>
@@ -205,7 +199,7 @@ export default function StartPage() {
                   : "bg-white text-slate-800 ring-1 ring-slate-200 hover:bg-slate-100"
               }`}
             >
-              {excludeAiGenerated ? "不做 AI 題：已開啟" : "不做 AI 題"}
+              {excludeAiGenerated ? "排除 AI 題：開" : "排除 AI 題：關"}
             </button>
             <button
               type="button"

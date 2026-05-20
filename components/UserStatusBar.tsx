@@ -21,9 +21,11 @@ export function UserStatusBar() {
           <span className="rounded-full bg-slate-100 px-3 py-1 text-slate-700">
             {configured ? "Supabase 已接上" : "Supabase 未設定"}
           </span>
-          <span className="max-w-full break-all rounded-full bg-brand-50 px-3 py-1 text-brand-800">
-            {loading ? "讀取中..." : user?.email ?? "訪客模式"}
-          </span>
+          {!loading ? (
+            <span className="max-w-full break-all rounded-full bg-brand-50 px-3 py-1 text-brand-800">
+              {user?.email ?? "訪客模式"}
+            </span>
+          ) : null}
           {configured && user ? (
             <span className="rounded-full bg-emerald-50 px-3 py-1 text-emerald-800">
               sync {syncStatus}
