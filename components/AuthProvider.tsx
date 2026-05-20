@@ -34,6 +34,13 @@ type AuthContextValue = {
 
 const AuthContext = createContext<AuthContextValue | null>(null);
 
+const SYNC_RETRY_DELAYS_MS = [0, 400, 1200];
+
+function getErrorMessage(error: unknown) {
+  if (error instanceof Error) return error.message;
+  return typeof error === "string" ? error : "同步失敗";
+}
+
 export function AuthProvider({ children }: { children: ReactNode }) {
   const configured = isSupabaseConfigured();
   const [user, setUser] = useState<User | null>(null);
@@ -51,13 +58,32 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     try {
       setSyncStatus("syncing");
       setSyncError("");
-      const mergedSessions = await syncCompletedSessionsForCurrentUser(userId);
-      await syncLeaderboardProfileForCurrentUser(effectiveUser, mergedSessions);
+      let lastError: unknown = null;
+
+      for (const delayMs of SYNC_RETRY_DELAYS_MS) {
+        if (delayMs > 0) {
+          await new Promise((resolve) => window.setTimeout(resolve, delayMs));
+        }
+
+        try {
+          const mergedSessions = await syncCompletedSessionsForCurrentUser(userId);
+          await syncLeaderboardProfileForCurrentUser(effectiveUser, mergedSessions);
+          lastError = null;
+          break;
+        } catch (error) {
+          lastError = error;
+        }
+      }
+
+      if (lastError) {
+        throw lastError;
+      }
+
       setSyncStatus("ready");
       setSyncVersion((value) => value + 1);
     } catch (error) {
       setSyncStatus("error");
-      setSyncError(error instanceof Error ? error.message : "同步失敗");
+      setSyncError(getErrorMessage(error));
     }
   }, [configured, user?.id]);
 
@@ -89,7 +115,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           await refreshCloudData(initialSession.user.id, initialSession.user);
         } catch (error) {
           setSyncStatus("error");
-          setSyncError(error instanceof Error ? error.message : "同步失敗");
+          setSyncError(getErrorMessage(error));
         }
       }
 
