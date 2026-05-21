@@ -1,5 +1,5 @@
 {
-  "unique_question_count": 6193,
+  "unique_question_count": 6200,
   "duplicate_source_count": 157,
   "duplicate_examples": {
     "MOEX-100140-1101-Q051": [
@@ -88,7 +88,7 @@
     ]
   },
   "paper_count": 62,
-  "incomplete_paper_count": 4,
+  "incomplete_paper_count": 0,
   "year_count": 16,
-  "incomplete_year_count": 4
+  "incomplete_year_count": 0
 }

@@ -16,6 +16,16 @@ OPTION_KEYS = {"A", "B", "C", "D", "E"}
 MED1_PAPER_CODES = {"1101", "1301", "5301"}
 MED2_PAPER_CODES = {"2101", "2301", "6301"}
 
+MANUAL_ANSWER_OVERRIDES: dict[str, list[str]] = {
+    "MOEX-100030-2101-Q073": ["A", "B"],
+    "MOEX-111100-1301-Q040": ["B"],
+    "MOEX-111100-1301-Q062": ["A"],
+    "MOEX-111100-1301-Q065": ["A"],
+    "MOEX-114090-1301-Q049": ["C"],
+    "MOEX-114090-1301-Q094": ["C"],
+    "MOEX-115020-1301-Q066": ["D"],
+}
+
 
 @dataclass(frozen=True)
 class AuditRecord:
@@ -28,6 +38,32 @@ class AuditRecord:
     paper_code: str
     question_no: int
     source_name: str
+
+
+MANUAL_AUDIT_RECORDS = [
+    AuditRecord(
+        canonical_id="MOEX-111100-1301-Q040",
+        source_id="MOEX-111100-1301-Q040",
+        group="醫學（一）",
+        roc_year=111,
+        gregorian_year=2022,
+        exam_code="111100",
+        paper_code="1301",
+        question_no=40,
+        source_name="manual_question_override",
+    ),
+    AuditRecord(
+        canonical_id="MOEX-115020-1301-Q066",
+        source_id="MOEX-115020-1301-Q066",
+        group="醫學（一）",
+        roc_year=115,
+        gregorian_year=2026,
+        exam_code="115020",
+        paper_code="1301",
+        question_no=66,
+        source_name="manual_question_override",
+    ),
+]
 
 
 def read_text(path: Path) -> str:
@@ -138,6 +174,12 @@ def resolve_imported_answer(options: Any, answer_credit_type: Any, answer_candid
     return None
 
 
+def get_manual_answer_candidates(question_id: Any) -> list[str]:
+    if not isinstance(question_id, str):
+        return []
+    return MANUAL_ANSWER_OVERRIDES.get(question_id, [])
+
+
 def normalize_canonical_id(
     *,
     source_id: str,
@@ -222,7 +264,9 @@ def build_records() -> list[AuditRecord]:
         primary_answer = resolve_imported_answer(
             raw.get("options"),
             raw.get("answer_credit_type"),
-            ([answer_text] if answer_text in OPTION_KEYS else []) + accepted_answers,
+            get_manual_answer_candidates(raw.get("id"))
+            + ([answer_text] if answer_text in OPTION_KEYS else [])
+            + accepted_answers,
         )
         if primary_answer not in OPTION_KEYS:
             continue
@@ -261,7 +305,9 @@ def build_records() -> list[AuditRecord]:
         for candidate in (raw.get("corrected_answer"), raw.get("official_answer")):
             answer_values.extend(to_option_key_array(candidate))
         primary_answer = resolve_imported_answer(
-            raw.get("options"), raw.get("answer_credit_type"), answer_values
+            raw.get("options"),
+            raw.get("answer_credit_type"),
+            get_manual_answer_candidates(raw.get("id")) + answer_values,
         )
         if primary_answer not in OPTION_KEYS:
             continue
@@ -299,7 +345,9 @@ def build_records() -> list[AuditRecord]:
         primary_answer = resolve_imported_answer(
             raw.get("options"),
             raw.get("answer_credit_type"),
-            answer_values + ([fallback_answer] if fallback_answer in OPTION_KEYS else []),
+            get_manual_answer_candidates(raw.get("id"))
+            + answer_values
+            + ([fallback_answer] if fallback_answer in OPTION_KEYS else []),
         )
         if primary_answer not in OPTION_KEYS:
             continue
@@ -346,7 +394,9 @@ def build_records() -> list[AuditRecord]:
             primary_answer = resolve_imported_answer(
                 raw.get("options"),
                 raw.get("answer_credit_type"),
-                ([answer_text] if answer_text in OPTION_KEYS else []) + answer_values,
+                get_manual_answer_candidates(raw.get("id"))
+                + ([answer_text] if answer_text in OPTION_KEYS else [])
+                + answer_values,
             )
             if primary_answer not in OPTION_KEYS:
                 continue
@@ -386,7 +436,9 @@ def build_records() -> list[AuditRecord]:
         for candidate in (raw.get("corrected_answer"), raw.get("official_answer_raw"), raw.get("correct_answers")):
             answer_values.extend(to_option_key_array(candidate))
         primary_answer = resolve_imported_answer(
-            raw.get("options"), raw.get("answer_credit_type"), answer_values
+            raw.get("options"),
+            raw.get("answer_credit_type"),
+            get_manual_answer_candidates(raw.get("id")) + answer_values,
         )
         if primary_answer not in OPTION_KEYS:
             continue
@@ -428,7 +480,7 @@ def write_csv(path: Path, rows: list[dict[str, Any]], fieldnames: list[str]) -> 
 
 
 def main() -> None:
-    records = build_records()
+    records = build_records() + MANUAL_AUDIT_RECORDS
 
     by_question: dict[str, AuditRecord] = {}
     duplicate_sources: defaultdict[str, list[str]] = defaultdict(list)

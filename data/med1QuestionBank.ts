@@ -152,6 +152,13 @@ type QuestionMediaEntry = {
 type QuestionTextOverride = {
   stem?: string;
   options?: Partial<Question["options"]>;
+  answer?: OptionKey;
+  acceptedAnswers?: OptionKey[];
+  answerCreditType?: Question["answerCreditType"];
+  explanation?: string;
+  optionAnalysis?: Partial<Record<OptionKey, string>>;
+  memoryTip?: string;
+  testedConcept?: string;
 };
 
 type Batch3QuestionRaw = {
@@ -727,6 +734,34 @@ med1ClassificationOverrideMap.set("MOEX-103100-1101-Q085", {
   subject: "公共衛生學",
   topicSection: "中央極限定理"
 });
+med1ClassificationOverrideMap.set("MOEX-111100-1301-Q040", {
+  subject: "組織學",
+  topicSection: "內耳組織／特殊感覺"
+});
+med1ClassificationOverrideMap.set("MOEX-111100-1301-Q062", {
+  subject: "生理學",
+  topicSection: "呼吸生理／血液氣體運輸"
+});
+med1ClassificationOverrideMap.set("MOEX-111100-1301-Q065", {
+  subject: "生理學",
+  topicSection: "腎臟生理／酸鹼平衡"
+});
+med1ClassificationOverrideMap.set("MOEX-114090-1301-Q049", {
+  subject: "生理學",
+  topicSection: "神經生理／語言功能"
+});
+med1ClassificationOverrideMap.set("MOEX-114090-1301-Q094", {
+  subject: "生物化學",
+  topicSection: "電子傳遞鏈與氧化磷酸化"
+});
+med1ClassificationOverrideMap.set("MOEX-115020-1301-Q066", {
+  subject: "生理學",
+  topicSection: "腎臟生理／氨排泄與尿素循環"
+});
+med1ClassificationOverrideMap.set("MOEX-100030-2101-Q073", {
+  subject: "藥理學",
+  topicSection: "抗生素"
+});
 
 function applyClassificationOverride(question: Question): Question {
   const override = med1ClassificationOverrideMap.get(question.id);
@@ -792,6 +827,94 @@ const questionTextOverrides: Record<string, QuestionTextOverride> = {
       C: "僅23",
       D: "僅13"
     }
+  },
+  "MOEX-100030-2101-Q073": {
+    answer: "A",
+    acceptedAnswers: ["A", "B"],
+    answerCreditType: "multiple_accepted",
+    explanation:
+      "四環黴素類常見副作用包括腸胃不適、牙齒與骨骼沉積、肝毒性、腎毒性，以及光敏感反應。光敏感最常被考到的是 demeclocycline，但 doxycycline 也可能造成 photosensitivity，因此官方給 A 或 B 都可接受。",
+    optionAnalysis: {
+      A: "Demeclocycline 可造成明顯光敏感，是傳統最常考答案。",
+      B: "Doxycycline 也可造成光敏感，所以官方也給分。",
+      C: "Oxytetracycline 不是光敏感最典型代表。",
+      D: "Minocycline 比較常考前庭毒性、頭暈、皮膚色素沉著，不是本題最佳答案。"
+    },
+    testedConcept: "四環黴素副作用／抗生素"
+  },
+  "MOEX-111100-1301-Q040": {
+    answer: "B",
+    explanation:
+      "壺腹嵴（crista ampullaris）位於半規管的壺腹，感受角加速度，其上方是 cupula。但 cupula 本身沒有耳石。耳石（otolith／otoconia）位於橢圓囊與球囊的耳石膜，用來感受直線加速度與頭部位置變化。所以 B 把 cupula 和 otolith 混在一起，是最明顯錯誤。",
+    optionAnalysis: {
+      A: "正確。壺腹嵴感受旋轉造成的角加速度。",
+      B: "錯。cupula 沒有耳石；耳石在 utricle 與 saccule 的 macula 上。",
+      C: "正確。scala vestibuli 和 scala tympani 在 helicotrema 相通。",
+      D: "正確。cochlear duct 又稱 scala media，內含 endolymph。"
+    },
+    testedConcept: "內耳組織／特殊感覺"
+  },
+  "MOEX-111100-1301-Q062": {
+    answer: "A",
+    answerCreditType: "all_credit",
+    explanation:
+      "在周邊組織，CO₂ 進入紅血球後經 carbonic anhydrase 轉為 HCO₃⁻ 和 H⁺。HCO₃⁻ 會離開紅血球，Cl⁻ 進入紅血球，稱為 chloride shift，因此周邊組織紅血球內 Cl⁻ 較高、pH 較低。到了肺泡微血管則反向進行：HCO₃⁻ 回到紅血球，轉回 CO₂ 後排出。因為題目問的是細胞內濃度、但沒有明確指定時間點，容易產生爭議，因此本題以疑義題處理。",
+    optionAnalysis: {
+      A: "不適合當標準答案。紅血球膜電位不是這題核心判斷點。",
+      B: "有爭議。肺部 HCO₃⁻ 會進入紅血球，但很快轉成 CO₂ 排出，若問穩態濃度並不清楚。",
+      C: "通常錯。周邊組織因 chloride shift，紅血球內 Cl⁻ 應較高，不是較低。",
+      D: "錯。周邊組織 CO₂ 產生 H⁺，紅血球內 pH 較低，不是較高。"
+    },
+    testedConcept: "呼吸生理／血液氣體運輸"
+  },
+  "MOEX-111100-1301-Q065": {
+    answer: "A",
+    answerCreditType: "all_credit",
+    explanation:
+      "近端腎小管會大量再吸收濾過的 HCO₃⁻，但這個過程需要管腔側分泌 H⁺ 配合。遠端腎小管與集尿管的 α-intercalated cells 也會分泌 H⁺，並產生新的 HCO₃⁻ 回到血液。因此若題目問正確，多個選項都有部分正確，官方疑義合理，本題以疑義題處理。",
+    optionAnalysis: {
+      A: "部分正確。近端再吸收 HCO₃⁻，遠端分泌 H⁺，但近端也會分泌 H⁺。",
+      B: "部分正確但不完整。近端分泌 H⁺ 正確，遠端也參與 HCO₃⁻ 處理。",
+      C: "部分正確。近端與遠端都可參與 HCO₃⁻ 再吸收或生成。",
+      D: "部分正確。近端與遠端都可分泌 H⁺。"
+    },
+    testedConcept: "腎臟生理／酸鹼平衡"
+  },
+  "MOEX-114090-1301-Q049": {
+    answer: "C",
+    explanation:
+      "題幹重點是講話流利但閱讀困難。Broca 區病灶通常造成非流利失語，不合題幹。Wernicke 區病灶可造成流利但理解差的失語，但若題目特別強調閱讀困難，較典型與 angular gyrus 有關，因為 angular gyrus 參與視覺文字與語言理解的整合。Arcuate fasciculus 則較典型造成傳導性失語，重點是 repetition impaired。",
+    optionAnalysis: {
+      A: "Wernicke 區：流利失語、理解差，但不是單純閱讀困難最典型位置。",
+      B: "Broca 區：非流利失語，與講話流利不合。",
+      C: "Angular gyrus：與閱讀、書寫、語言整合有關，是學理上最合理答案。",
+      D: "Arcuate fasciculus：傳導性失語，特徵是複誦困難。"
+    },
+    testedConcept: "神經生理／語言功能"
+  },
+  "MOEX-114090-1301-Q094": {
+    answer: "C",
+    explanation:
+      "電子傳遞鏈中，complex I、III、IV 會將 H⁺ 從 matrix 泵到 intermembrane space，建立質子梯度。常見記法是每 2 個電子經過：complex I 泵 4H⁺、complex III 泵 4H⁺、complex IV 泵 2H⁺。所以 C 最符合標準教科書觀念。",
+    optionAnalysis: {
+      A: "錯。complex I 是把 H⁺ 從 matrix 泵到膜間腔，不是到 matrix。",
+      B: "錯。complex III 也是把 H⁺ 泵到膜間腔，不是到 matrix。",
+      C: "正確。complex III 約將 4H⁺ 移至 intermembrane space。",
+      D: "不精準。complex IV 通常是約 2H⁺ 被泵到膜間腔，不是 4H⁺。"
+    },
+    testedConcept: "電子傳遞鏈與氧化磷酸化"
+  },
+  "MOEX-115020-1301-Q066": {
+    answer: "D",
+    explanation:
+      "尿素在腎臟中的再吸收主要透過尿素轉運蛋白，例如 UT-A 類轉運，屬於 facilitated diffusion，並受到 ADH／vasopressin 影響。它不是初級主動運輸。因此 D 最明顯不適當。代謝性酸中毒時，腎臟會增加 glutamine 代謝，產生 NH₄⁺ 排酸並生成新的 HCO₃⁻。",
+    optionAnalysis: {
+      A: "大致可接受。氨可在肝臟轉成尿素，也可轉成 glutamine 形式運輸，最後由腎臟處理排出。",
+      B: "有爭議但方向可理解。ADH 增加內髓集合管尿素通透性，促進尿素再吸收與髓質高滲梯度，因此尿素排出可能下降。",
+      C: "正確。代謝性酸中毒時，腎臟 glutamine 代謝增加，以產生 NH₄⁺ 排酸。",
+      D: "錯。尿素再吸收不是初級主動運輸，而是經尿素轉運蛋白進行 facilitated diffusion。"
+    },
+    testedConcept: "腎臟生理／氨排泄與尿素循環"
   }
 };
 
@@ -805,7 +928,19 @@ function applyQuestionTextOverride(question: Question): Question {
     options: {
       ...question.options,
       ...(override.options ?? {})
-    }
+    },
+    answer: override.answer ?? question.answer,
+    acceptedAnswers: override.acceptedAnswers ?? question.acceptedAnswers,
+    answerCreditType: override.answerCreditType ?? question.answerCreditType,
+    explanation: override.explanation ?? question.explanation,
+    optionAnalysis: override.optionAnalysis
+      ? {
+          ...(question.optionAnalysis ?? {}),
+          ...override.optionAnalysis
+        }
+      : question.optionAnalysis,
+    memoryTip: override.memoryTip ?? question.memoryTip,
+    testedConcept: override.testedConcept ?? question.testedConcept
   };
 }
 
@@ -896,6 +1031,73 @@ const MED2_CANONICAL_SUBJECTS = new Set<SubjectName>([
   "公共衛生學"
 ]);
 
+const manualInjectedQuestions: Question[] = [
+  {
+    id: "MOEX-111100-1301-Q040",
+    subject: "組織學",
+    chapter: "組織學",
+    section: "內耳組織／特殊感覺",
+    stem: "下列有關膜性迷路（membranous labyrinth）的敘述，何者錯誤？",
+    options: {
+      A: "壺腹嵴（crista ampullaris）是頭部角加速運動（angular acceleration）的感覺受器",
+      B: "頂帽（cupula）的耳石（otolith）是頭部直線加速運動（linear acceleration）的感覺受器",
+      C: "前庭階（scala vestibule）與鼓室階（scala tympani）於蝸孔（helicotrema）彼此相通",
+      D: "耳蝸導管（cochlear duct）內，流動的液體為內淋巴液（endolymph）"
+    },
+    answer: "B",
+    answerCreditType: "standard",
+    explanation:
+      "壺腹嵴（crista ampullaris）位於半規管的壺腹，感受角加速度，其上方是 cupula。但 cupula 本身沒有耳石。耳石（otolith／otoconia）位於橢圓囊與球囊的耳石膜，用來感受直線加速度與頭部位置變化。所以 B 把 cupula 和 otolith 混在一起，是最明顯錯誤。",
+    testedConcept: "內耳組織／特殊感覺",
+    optionAnalysis: {
+      A: "正確。壺腹嵴感受旋轉造成的角加速度。",
+      B: "錯。cupula 沒有耳石；耳石在 utricle 與 saccule 的 macula 上。",
+      C: "正確。scala vestibuli 和 scala tympani 在 helicotrema 相通。",
+      D: "正確。cochlear duct 又稱 scala media，內含 endolymph。"
+    },
+    sourceType: "MOEX_PAST_EXAM",
+    sourceCitation: "考選部 2022 第二次 醫學（一） 1301",
+    sourceYear: 2022,
+    sourceRound: 2,
+    originalQuestionNumber: 40,
+    examCode: "111100",
+    paperCode: "1301",
+    examSessionLabel: "第二次"
+  },
+  {
+    id: "MOEX-115020-1301-Q066",
+    subject: "生理學",
+    chapter: "生理學",
+    section: "腎臟生理／氨排泄與尿素循環",
+    stem: "關於氨的排泄，下列敘述何者最不適當？",
+    options: {
+      A: "肝臟會將有毒的氨轉變為尿素（urea）或麩醯胺酸（glutamine），兩者都是腎臟排出體外",
+      B: "尿素（urea）從尿液的排出會受血管加壓素（vasopressin）的表現而下降",
+      C: "麩醯胺酸（glutamine）在腎臟中的代謝量，會因為代謝性酸中毒而增加",
+      D: "尿素（urea）的再吸收是初級主動運輸通道表現上升，促使尿素的再吸收"
+    },
+    answer: "D",
+    answerCreditType: "standard",
+    explanation:
+      "尿素在腎臟中的再吸收主要透過尿素轉運蛋白，例如 UT-A 類轉運，屬於 facilitated diffusion，並受到 ADH／vasopressin 影響。它不是初級主動運輸。因此 D 最明顯不適當。代謝性酸中毒時，腎臟會增加 glutamine 代謝，產生 NH₄⁺ 排酸並生成新的 HCO₃⁻。",
+    testedConcept: "腎臟生理／氨排泄與尿素循環",
+    optionAnalysis: {
+      A: "大致可接受。氨可在肝臟轉成尿素，也可轉成 glutamine 形式運輸，最後由腎臟處理排出。",
+      B: "有爭議但方向可理解。ADH 增加內髓集合管尿素通透性，促進尿素再吸收與髓質高滲梯度，因此尿素排出可能下降。",
+      C: "正確。代謝性酸中毒時，腎臟 glutamine 代謝增加，以產生 NH₄⁺ 排酸。",
+      D: "錯。尿素再吸收不是初級主動運輸，而是經尿素轉運蛋白進行 facilitated diffusion。"
+    },
+    sourceType: "MOEX_PAST_EXAM",
+    sourceCitation: "考選部 2026 第一次 醫學（一） 1301",
+    sourceYear: 2026,
+    sourceRound: 1,
+    originalQuestionNumber: 66,
+    examCode: "115020",
+    paperCode: "1301",
+    examSessionLabel: "第一次"
+  }
+];
+
 export const canonicalQuestionBank: Question[] = dedupeQuestionBank([
   ...anatomyQuestionsWithOverrides,
   ...med1RemainingQuestions,
@@ -904,7 +1106,8 @@ export const canonicalQuestionBank: Question[] = dedupeQuestionBank([
   ...med1MissingBatch2Questions,
   ...med1MissingBatch3Questions,
   ...med1RequestedPatchQuestions,
-  ...medStage2Questions
+  ...medStage2Questions,
+  ...manualInjectedQuestions
 ]);
 
 export const allAnatomyQuestions: Question[] = canonicalQuestionBank.filter(
