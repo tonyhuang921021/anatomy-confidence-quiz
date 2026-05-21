@@ -139,6 +139,9 @@ create table if not exists public.question_attempt_logs (
   primary key (session_id, question_id)
 );
 
+alter table public.question_attempt_logs
+  add column if not exists visitor_id text;
+
 create index if not exists question_attempt_logs_question_id_idx
 on public.question_attempt_logs (question_id);
 

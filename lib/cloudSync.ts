@@ -415,8 +415,25 @@ async function upsertQuestionAttemptLogs(sessions: QuizSession[]) {
     .from("question_attempt_logs")
     .upsert(rows, { onConflict: "session_id,question_id" });
 
-  if (error) {
+  if (!error) {
+    return;
+  }
+
+  const missingVisitorColumn =
+    typeof error.message === "string" &&
+    (error.message.includes("visitor_id") || error.message.includes("question_attempt_logs"));
+
+  if (!missingVisitorColumn) {
     throw error;
+  }
+
+  const fallbackRows = rows.map(({ visitor_id, ...rest }) => rest);
+  const { error: fallbackError } = await supabase
+    .from("question_attempt_logs")
+    .upsert(fallbackRows, { onConflict: "session_id,question_id" });
+
+  if (fallbackError) {
+    throw fallbackError;
   }
 }
 
