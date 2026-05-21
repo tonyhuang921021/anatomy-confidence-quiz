@@ -148,6 +148,11 @@ type QuestionMediaEntry = {
   optionImages?: Partial<Record<OptionKey, string>>;
 };
 
+type QuestionTextOverride = {
+  stem?: string;
+  options?: Partial<Question["options"]>;
+};
+
 type Batch3QuestionRaw = {
   id: string;
   year: number;
@@ -680,12 +685,60 @@ function applyQuestionMedia(question: Question): Question {
   };
 }
 
+const questionTextOverrides: Record<string, QuestionTextOverride> = {
+  "MOEX-113020-2301-Q029": {
+    stem:
+      "寄生蟲感染人體所造成之症狀，下列敘述何者正確？\n1犬蛔蟲（Toxocara canis）可造成眼部幼蟲移行症（ocular larva migrans）\n2班氏絲蟲（Wuchereria bancrofti）的慢性感染可造成下肢象皮病（elephantiasis）\n3免疫低下之病患受到鞭蟲（Trichuris trichiura）感染必造成死亡\n4蛔蟲（Ascaris lumbricoides）感染可能出現異位寄生（ectopic parasitism）",
+    options: {
+      A: "僅13",
+      B: "僅24",
+      C: "僅124",
+      D: "1234"
+    }
+  },
+  "MOEX-113020-2301-Q032": {
+    stem:
+      "水生植物可當何種寄生蟲之中間宿主？\n1牛羊肝吸蟲（Fasciola hepatica）\n2薑片蟲（Fasciolopsis buski）\n3中華肝吸蟲（Clonorchis sinensis）\n4槍狀肝吸蟲（Dicrocoelium dendriticum）",
+    options: {
+      A: "12",
+      B: "34",
+      C: "13",
+      D: "24"
+    }
+  },
+  "MOEX-113020-2301-Q079": {
+    stem:
+      "下列疾病中，何者一般被認為大部分是與 TH2 細胞的作用或反應有關？\n1蠕蟲類寄生蟲感染\n2外因性過敏性鼻炎（allergic rhinitis）\n3肉芽腫性發炎（granulomatous inflammation）",
+    options: {
+      A: "123",
+      B: "僅12",
+      C: "僅23",
+      D: "僅13"
+    }
+  }
+};
+
+function applyQuestionTextOverride(question: Question): Question {
+  const override = questionTextOverrides[question.id];
+  if (!override) return question;
+
+  return {
+    ...question,
+    stem: override.stem ?? question.stem,
+    options: {
+      ...question.options,
+      ...(override.options ?? {})
+    }
+  };
+}
+
 const remainingQuestionsRaw =
   moexMed1RemainingDetailedV4Merged0011827.questions as readonly RawQuestion[];
 export const med1RemainingQuestions: Question[] = remainingQuestionsRaw
   .map(toQuestion)
   .filter((question): question is Question => Boolean(question))
   .map(applyClassificationOverride)
+  .map(applyQuestionTextOverride)
   .map(applyQuestionMedia);
 
 const missingQuestionsRaw =
@@ -694,6 +747,7 @@ export const med1MissingQuestions: Question[] = missingQuestionsRaw
   .map(toMissingQuestion)
   .filter((question): question is Question => Boolean(question))
   .map(applyClassificationOverride)
+  .map(applyQuestionTextOverride)
   .map(applyQuestionMedia);
 
 const missingBatch1Raw =
@@ -703,6 +757,7 @@ export const med1MissingBatch1Questions: Question[] = missingBatch1Raw
   .map(toDetailedMissingBatchQuestion)
   .filter((question): question is Question => Boolean(question))
   .map(applyClassificationOverride)
+  .map(applyQuestionTextOverride)
   .map(applyQuestionMedia);
 
 const missingBatch2Raw =
@@ -712,6 +767,7 @@ export const med1MissingBatch2Questions: Question[] = missingBatch2Raw
   .map(toDetailedMissingBatchQuestion)
   .filter((question): question is Question => Boolean(question))
   .map(applyClassificationOverride)
+  .map(applyQuestionTextOverride)
   .map(applyQuestionMedia);
 
 const missingBatch3Raw = moexMed1MissingBatch3 as readonly Batch3QuestionRaw[];
@@ -719,6 +775,7 @@ export const med1MissingBatch3Questions: Question[] = missingBatch3Raw
   .map(toBatch3Question)
   .filter((question): question is Question => Boolean(question))
   .map(applyClassificationOverride)
+  .map(applyQuestionTextOverride)
   .map(applyQuestionMedia);
 
 const requestedPatchQuestionsRaw =
@@ -727,6 +784,7 @@ export const med1RequestedPatchQuestions: Question[] = requestedPatchQuestionsRa
   .map(toRequestedPatchQuestion)
   .filter((question): question is Question => Boolean(question))
   .map(applyClassificationOverride)
+  .map(applyQuestionTextOverride)
   .map(applyQuestionMedia);
 
 const stage2QuestionsRaw =
@@ -734,10 +792,12 @@ const stage2QuestionsRaw =
 export const medStage2Questions: Question[] = stage2QuestionsRaw
   .map(toStage2Question)
   .filter((question): question is Question => Boolean(question))
+  .map(applyQuestionTextOverride)
   .map(applyQuestionMedia);
 
 const anatomyQuestionsWithOverrides: Question[] = anatomyQuestions
   .map(applyClassificationOverride)
+  .map(applyQuestionTextOverride)
   .map(applyQuestionMedia);
 
 export const allAnatomyQuestions: Question[] = dedupeQuestionBank([
