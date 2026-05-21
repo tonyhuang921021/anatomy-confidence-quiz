@@ -270,15 +270,37 @@ function toSectionLabel(topicSection?: string, fallback = "其他") {
   return source || fallback;
 }
 
+function sanitizeImportedText(value?: string) {
+  if (!value) return "";
+
+  return value
+    .replace(/\s*代號：\d+\s*頁次：[0-9A-Za-z－—–-]+/g, "")
+    .replace(/\s{2,}/g, " ")
+    .trim();
+}
+
 function toPartialOptionAnalysis(
   source?: Readonly<Record<string, string>>
 ): Partial<Record<OptionKey, string>> | undefined {
   if (!source) return undefined;
 
-  const nextEntries = Object.entries(source).filter(([key]) => isOptionKey(key));
+  const nextEntries = Object.entries(source)
+    .filter(([key]) => isOptionKey(key))
+    .map(([key, value]) => [key, sanitizeImportedText(value)] as const)
+    .filter(([, value]) => Boolean(value));
   if (nextEntries.length === 0) return undefined;
 
   return Object.fromEntries(nextEntries) as Partial<Record<OptionKey, string>>;
+}
+
+function sanitizeOptions(options: Readonly<Record<string, string>>) {
+  return {
+    A: sanitizeImportedText(options.A ?? ""),
+    B: sanitizeImportedText(options.B ?? ""),
+    C: sanitizeImportedText(options.C ?? ""),
+    D: sanitizeImportedText(options.D ?? ""),
+    ...(options.E ? { E: sanitizeImportedText(options.E) } : {})
+  };
 }
 
 function normalizeAnswerCreditType(
@@ -336,19 +358,13 @@ function toQuestion(raw: RawQuestion): Question | null {
     subject: primarySubject,
     chapter,
     section,
-    stem: raw.stem,
-    options: {
-      A: raw.options.A ?? "",
-      B: raw.options.B ?? "",
-      C: raw.options.C ?? "",
-      D: raw.options.D ?? "",
-      ...(raw.options.E ? { E: raw.options.E } : {})
-    },
+    stem: sanitizeImportedText(raw.stem),
+    options: sanitizeOptions(raw.options),
     answer: primaryAnswer,
     acceptedAnswers: acceptedAnswers.length > 0 ? acceptedAnswers : undefined,
     answerCreditType: raw.answer_credit_type as Question["answerCreditType"],
-    explanation: raw.explanation ?? "",
-    testedConcept: raw.exam_point ?? topicSection ?? section,
+    explanation: sanitizeImportedText(raw.explanation ?? ""),
+    testedConcept: sanitizeImportedText(raw.exam_point ?? topicSection ?? section),
     optionAnalysis: toPartialOptionAnalysis(raw.option_analysis),
     memoryTip: raw.memory_tip,
     clinicalLink: raw.clinical_link,
@@ -388,19 +404,13 @@ function toMissingQuestion(raw: MissingQuestionRaw): Question | null {
     subject: primarySubject,
     chapter,
     section,
-    stem: raw.stem,
-    options: {
-      A: raw.options.A ?? "",
-      B: raw.options.B ?? "",
-      C: raw.options.C ?? "",
-      D: raw.options.D ?? "",
-      ...(raw.options.E ? { E: raw.options.E } : {})
-    },
+    stem: sanitizeImportedText(raw.stem),
+    options: sanitizeOptions(raw.options),
     answer: primaryAnswer,
     acceptedAnswers: answerValues.length > 0 ? answerValues : undefined,
     answerCreditType,
-    explanation: raw.explanation ?? "",
-    testedConcept: raw.exam_point ?? topicSection ?? section,
+    explanation: sanitizeImportedText(raw.explanation ?? ""),
+    testedConcept: sanitizeImportedText(raw.exam_point ?? topicSection ?? section),
     optionAnalysis: toPartialOptionAnalysis(raw.option_analysis),
     memoryTip: raw.memory_tip,
     clinicalLink: raw.clinical_link,
@@ -436,19 +446,13 @@ function toRequestedPatchQuestion(raw: RequestedPatchQuestionRaw): Question | nu
     subject: primarySubject,
     chapter,
     section,
-    stem: raw.stem,
-    options: {
-      A: raw.options.A ?? "",
-      B: raw.options.B ?? "",
-      C: raw.options.C ?? "",
-      D: raw.options.D ?? "",
-      ...(raw.options.E ? { E: raw.options.E } : {})
-    },
+    stem: sanitizeImportedText(raw.stem),
+    options: sanitizeOptions(raw.options),
     answer: primaryAnswer,
     acceptedAnswers: answerValues.length > 0 ? answerValues : undefined,
     answerCreditType: normalizeAnswerCreditType(raw.answer_credit_type),
-    explanation: raw.explanation ?? "",
-    testedConcept: raw.exam_point ?? topicSection ?? section,
+    explanation: sanitizeImportedText(raw.explanation ?? ""),
+    testedConcept: sanitizeImportedText(raw.exam_point ?? topicSection ?? section),
     optionAnalysis: toPartialOptionAnalysis(raw.option_analysis),
     memoryTip: raw.memory_tip,
     clinicalLink: raw.clinical_link,
@@ -489,19 +493,13 @@ function toDetailedMissingBatchQuestion(raw: DetailedMissingBatchQuestionRaw): Q
     subject: primarySubject,
     chapter,
     section,
-    stem: raw.stem,
-    options: {
-      A: raw.options.A ?? "",
-      B: raw.options.B ?? "",
-      C: raw.options.C ?? "",
-      D: raw.options.D ?? "",
-      ...(raw.options.E ? { E: raw.options.E } : {})
-    },
+    stem: sanitizeImportedText(raw.stem),
+    options: sanitizeOptions(raw.options),
     answer: primaryAnswer,
     acceptedAnswers: acceptedAnswers.length > 0 ? acceptedAnswers : undefined,
     answerCreditType: normalizeAnswerCreditType(raw.answer_credit_type),
-    explanation: raw.explanation ?? "",
-    testedConcept: raw.exam_point ?? topicSection ?? section,
+    explanation: sanitizeImportedText(raw.explanation ?? ""),
+    testedConcept: sanitizeImportedText(raw.exam_point ?? topicSection ?? section),
     optionAnalysis: toPartialOptionAnalysis(raw.option_analysis),
     memoryTip: raw.memory_tip,
     clinicalLink: raw.clinical_link,
@@ -586,19 +584,13 @@ function toStage2Question(raw: Stage2QuestionRaw): Question | null {
     subject: primarySubject,
     chapter,
     section,
-    stem: raw.stem,
-    options: {
-      A: raw.options.A ?? "",
-      B: raw.options.B ?? "",
-      C: raw.options.C ?? "",
-      D: raw.options.D ?? "",
-      ...(raw.options.E ? { E: raw.options.E } : {})
-    },
+    stem: sanitizeImportedText(raw.stem),
+    options: sanitizeOptions(raw.options),
     answer: primaryAnswer,
     acceptedAnswers: answerValues.length > 0 ? answerValues : undefined,
     answerCreditType: normalizeAnswerCreditType(raw.answer_credit_type),
-    explanation: raw.explanation ?? "",
-    testedConcept: raw.exam_point ?? topicSection ?? section,
+    explanation: sanitizeImportedText(raw.explanation ?? ""),
+    testedConcept: sanitizeImportedText(raw.exam_point ?? topicSection ?? section),
     optionAnalysis: toPartialOptionAnalysis(raw.option_analysis),
     memoryTip: raw.memory_tip,
     clinicalLink: raw.clinical_link,
@@ -642,6 +634,11 @@ const med1ClassificationOverrideMap = new Map<string, ClassificationOverride>(
       ] as const satisfies ClassificationOverrideEntry];
     })
 );
+
+med1ClassificationOverrideMap.set("MOEX-103100-1101-Q085", {
+  subject: "公共衛生學",
+  topicSection: "中央極限定理"
+});
 
 function applyClassificationOverride(question: Question): Question {
   const override = med1ClassificationOverrideMap.get(question.id);
@@ -710,8 +707,10 @@ export const medStage2Questions: Question[] = stage2QuestionsRaw
   .map(toStage2Question)
   .filter((question): question is Question => Boolean(question));
 
+const anatomyQuestionsWithOverrides: Question[] = anatomyQuestions.map(applyClassificationOverride);
+
 export const allAnatomyQuestions: Question[] = dedupeQuestionBank([
-  ...anatomyQuestions,
+  ...anatomyQuestionsWithOverrides.filter((question) => question.subject === "解剖學"),
   ...med1RemainingQuestions.filter((question) => question.subject === "解剖學"),
   ...med1MissingQuestions.filter((question) => question.subject === "解剖學"),
   ...med1MissingBatch1Questions.filter((question) => question.subject === "解剖學"),
@@ -752,6 +751,9 @@ const med1CoreQuestions: Question[] = dedupeQuestionBank([
 ]);
 
 const med2CoreQuestions: Question[] = dedupeQuestionBank([
+  ...anatomyQuestionsWithOverrides.filter((question) =>
+    ["藥理學", "病理學", "微生物免疫學", "寄生蟲學", "公共衛生學"].includes(question.subject)
+  ),
   ...medStage2Questions.filter((question) =>
     ["藥理學", "病理學", "微生物免疫學", "寄生蟲學", "公共衛生學"].includes(question.subject)
   ),
@@ -852,6 +854,7 @@ export const med1QuestionsBySubject: Record<SubjectName, Question[]> = {
     ...medStage2Questions.filter((question) => question.subject === "寄生蟲學")
   ]),
   "公共衛生學": dedupeQuestionBank([
+    ...anatomyQuestionsWithOverrides.filter((question) => question.subject === "公共衛生學"),
     ...med1RemainingQuestions.filter((question) => question.subject === "公共衛生學"),
     ...med1MissingQuestions.filter((question) => question.subject === "公共衛生學"),
     ...med1MissingBatch1Questions.filter((question) => question.subject === "公共衛生學"),
