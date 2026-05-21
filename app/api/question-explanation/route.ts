@@ -45,7 +45,31 @@ type UsageLogRow = {
 
 const HOURLY_LIMIT = 30;
 const DAILY_LIMIT = 100;
-const GPT_5_MINI_MAX_OUTPUT_TOKENS = 2600;
+const GPT_5_MINI_MAX_OUTPUT_TOKENS = 1600;
+const QUESTION_EXPLANATION_PROMPT_PREFIX = [
+  "你是台灣醫學系國考家教，請用繁體中文寫一份好讀、精準、偏精簡的單題解析。",
+  "請嚴格只解釋這一題，不要延伸太多無關內容。",
+  "主詳解請聚焦題目核心，不要把各選項的細節重複寫進主詳解。",
+  "各選項的重要說明請放在 optionAnalysis。",
+  "不要根據任何單一使用者的作答情況來改變詳解內容。",
+  "請只輸出 JSON，不要輸出 markdown，不要輸出 code block。",
+  "請務必為本題每一個實際存在的選項都提供 optionAnalysis，不能漏掉任何一個選項。",
+  "optionAnalysis 只能出現 A、B、C、D、E 這些選項鍵，不可以出現 explanation、summary、note 等額外 key。",
+  "如果本題是多重給分，請在主詳解中清楚說明任一個可接受答案都算對。",
+  "",
+  "JSON 格式：",
+  "{",
+  '  "explanation": "完整詳解",',
+  '  "optionAnalysis": {',
+  '    "A": "A 選項解析",',
+  '    "B": "B 選項解析",',
+  '    "C": "C 選項解析",',
+  '    "D": "D 選項解析",',
+  '    "E": "E 選項解析（若本題有 E）"',
+  "  },",
+  '  "memoryTip": "簡短記憶法，沒有就留空字串"',
+  "}"
+].join("\n");
 
 function isOptionKey(value: string) {
   return ["A", "B", "C", "D", "E"].includes(value);
@@ -254,7 +278,6 @@ async function upsertSharedExplanationOverride(
 
 function buildQuestionExplanationPrompt(body: QuestionExplanationRequestBody) {
   const question = body.question;
-  const attempt = body.attempt;
   const optionKeys = getRequiredOptionKeys(question?.options);
   const correctAnswerText =
     question?.answerCreditType === "multiple_accepted" && (question.acceptedAnswers?.length ?? 0) > 0
@@ -262,25 +285,7 @@ function buildQuestionExplanationPrompt(body: QuestionExplanationRequestBody) {
       : question?.answer ?? "";
 
   return [
-    "你是台灣醫學系國考家教，請用繁體中文寫一份詳盡但好讀的單題解析。",
-    "請嚴格只解釋這一題，不要延伸太多無關內容。",
-    "請只輸出 JSON，不要輸出 markdown，不要輸出 code block。",
-    "請務必為本題每一個實際存在的選項都提供 optionAnalysis，不能漏掉任何一個選項。",
-    "optionAnalysis 只能出現 A、B、C、D、E 這些選項鍵，不可以出現 explanation、summary、note 等額外 key。",
-    "如果本題是多重給分，請在主詳解中清楚說明任一個可接受答案都算對。",
-    "",
-    "JSON 格式：",
-    "{",
-    '  "explanation": "完整詳解",',
-    '  "optionAnalysis": {',
-    '    "A": "A 選項解析",',
-    '    "B": "B 選項解析",',
-    '    "C": "C 選項解析",',
-    '    "D": "D 選項解析",',
-    '    "E": "E 選項解析（若本題有 E）"',
-    "  },",
-    '  "memoryTip": "簡短記憶法，沒有就留空字串"',
-    "}",
+    QUESTION_EXPLANATION_PROMPT_PREFIX,
     "",
     `科目：${question?.subject ?? ""}`,
     `章節：${question?.chapter ?? ""} / ${question?.section ?? ""}`,
@@ -294,9 +299,54 @@ function buildQuestionExplanationPrompt(body: QuestionExplanationRequestBody) {
     `本題實際存在的選項鍵：${optionKeys.join(", ")}`,
     `正確答案：${correctAnswerText}`,
     `判分方式：${question?.answerCreditType ?? "standard"}`,
-    `使用者答案：${attempt?.selectedAnswer ?? "未作答"}`,
-    `使用者信心：${attempt?.confidence ?? "未提供"}`,
-    `是否答對：${attempt?.isCorrect ? "答對" : "答錯"}`,
+    `現有解析：${question?.explanation ?? ""}`
+  ].join("\n");
+}
+
+function getMissingOptionKeys(
+  payload: ParsedExplanationPayload | null,
+  options?: Record<string, string | undefined>
+) {
+  const requiredKeys = getRequiredOptionKeys(options);
+  return requiredKeys.filter((key) => !payload?.optionAnalysis?.[key]?.trim());
+}
+
+function buildMissingOptionRetryPrompt(
+  body: QuestionExplanationRequestBody,
+  partial: ParsedExplanationPayload,
+  missingKeys: string[]
+) {
+  const question = body.question;
+  const correctAnswerText =
+    question?.answerCreditType === "multiple_accepted" && (question.acceptedAnswers?.length ?? 0) > 0
+      ? question.acceptedAnswers?.join(" / ")
+      : question?.answer ?? "";
+
+  return [
+    QUESTION_EXPLANATION_PROMPT_PREFIX,
+    "",
+    "你上一版的主詳解可沿用，但 optionAnalysis 不完整。",
+    `請只補齊缺少的選項解析：${missingKeys.join(", ")}。`,
+    "已經有的 optionAnalysis 可以保留原意，但整體仍請輸出完整 JSON。",
+    "不要新增 A-E 以外的 key，不要省略任何實際存在的選項。",
+    "",
+    `科目：${question?.subject ?? ""}`,
+    `章節：${question?.chapter ?? ""} / ${question?.section ?? ""}`,
+    `考點：${question?.testedConcept ?? ""}`,
+    "",
+    `題目：${question?.stem ?? ""}`,
+    "",
+    "選項：",
+    ...Object.entries(question?.options ?? {}).map(([key, value]) => `${key}. ${value ?? ""}`),
+    "",
+    `本題實際存在的選項鍵：${getRequiredOptionKeys(question?.options).join(", ")}`,
+    `正確答案：${correctAnswerText}`,
+    `判分方式：${question?.answerCreditType ?? "standard"}`,
+    "",
+    `目前主詳解：${partial.explanation ?? ""}`,
+    "",
+    "目前已有的 optionAnalysis：",
+    JSON.stringify(partial.optionAnalysis ?? {}, null, 2),
     "",
     `現有解析：${question?.explanation ?? ""}`
   ].join("\n");
@@ -491,14 +541,9 @@ export async function POST(request: NextRequest) {
     let result = await createOpenAIText(prompt, GPT_5_MINI_MAX_OUTPUT_TOKENS, "gpt-5-mini");
     let parsed = parseExplanationPayload(result.text);
 
-    if (!hasCompleteOptionAnalysis(parsed, body.question?.options)) {
-      const retryPrompt = [
-        prompt,
-        "",
-        "上一版輸出不完整。",
-        "請重新輸出完整 JSON，並確保每一個實際存在的選項都各有一段 optionAnalysis。",
-        "不要截斷，不要加入任何 A-E 以外的 key。"
-      ].join("\n");
+    const missingOptionKeys = getMissingOptionKeys(parsed, body.question?.options);
+    if (parsed?.explanation && missingOptionKeys.length > 0) {
+      const retryPrompt = buildMissingOptionRetryPrompt(body, parsed, missingOptionKeys);
       result = await createOpenAIText(retryPrompt, GPT_5_MINI_MAX_OUTPUT_TOKENS, "gpt-5-mini");
       parsed = parseExplanationPayload(result.text);
     }
