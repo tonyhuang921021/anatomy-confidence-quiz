@@ -45,6 +45,8 @@ function getSearchHaystack(question: Question) {
     question.testedConcept,
     question.stem,
     question.explanation,
+    question.memoryTip,
+    ...Object.values(question.optionAnalysis ?? {}),
     ...Object.values(question.options)
   ]
     .filter(Boolean)

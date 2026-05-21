@@ -18,7 +18,11 @@ function renderImage(src: string, alt: string) {
     <img
       src={src}
       alt={alt}
-      className="mt-3 w-full rounded-2xl border border-slate-200 bg-slate-50 object-contain"
+      className="mt-3 block max-h-[480px] max-w-full rounded-2xl border border-slate-200 bg-slate-50 object-contain"
+      style={{
+        width: "auto",
+        height: "auto"
+      }}
       loading="lazy"
     />
   );
