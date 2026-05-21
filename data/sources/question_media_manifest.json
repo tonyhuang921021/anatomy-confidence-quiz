@@ -1,0 +1,162 @@
+{
+  "MOEX-100030-2101-Q093": {
+    "stemImage": "/question-media/MOEX-100030-2101-Q093.png"
+  },
+  "MOEX-100140-1101-Q079": {
+    "stemImage": "/question-media/MOEX-100140-1101-Q079.png"
+  },
+  "MOEX-100140-2101-Q098": {
+    "stemImage": "/question-media/MOEX-100140-2101-Q098.png"
+  },
+  "MOEX-101030-2101-Q098": {
+    "stemImage": "/question-media/MOEX-101030-2101-Q098.png"
+  },
+  "MOEX-101030-2101-Q099": {
+    "stemImage": "/question-media/MOEX-101030-2101-Q099.png"
+  },
+  "MOEX-101030-2101-Q100": {
+    "stemImage": "/question-media/MOEX-101030-2101-Q100.png"
+  },
+  "MOEX-101110-2101-Q076": {
+    "stemImage": "/question-media/MOEX-101110-2101-Q076.png"
+  },
+  "MOEX-102030-2101-Q096": {
+    "stemImage": "/question-media/MOEX-102030-2101-Q096.png"
+  },
+  "MOEX-102030-2101-Q097": {
+    "stemImage": "/question-media/MOEX-102030-2101-Q097.png"
+  },
+  "MOEX-102030-2101-Q098": {
+    "stemImage": "/question-media/MOEX-102030-2101-Q098.png"
+  },
+  "MOEX-102030-2101-Q100": {
+    "stemImage": "/question-media/MOEX-102030-2101-Q100.png"
+  },
+  "MOEX-102110-2101-Q079": {
+    "stemImage": "/question-media/MOEX-102110-2101-Q079.png"
+  },
+  "MOEX-102110-2101-Q094": {
+    "stemImage": "/question-media/MOEX-102110-2101-Q094.png"
+  },
+  "MOEX-102110-2101-Q100": {
+    "stemImage": "/question-media/MOEX-102110-2101-Q100.png"
+  },
+  "MOEX-103030-2101-Q079": {
+    "stemImage": "/question-media/MOEX-103030-2101-Q079.png"
+  },
+  "MOEX-103030-2101-Q097": {
+    "stemImage": "/question-media/MOEX-103030-2101-Q097.png"
+  },
+  "MOEX-103030-2101-Q100": {
+    "stemImage": "/question-media/MOEX-103030-2101-Q100.png"
+  },
+  "MOEX-103100-1101-Q033": {
+    "stemImage": "/question-media/MOEX-103100-1101-Q033.png"
+  },
+  "MOEX-103100-1101-Q061": {
+    "stemImage": "/question-media/MOEX-103100-1101-Q061.png"
+  },
+  "MOEX-103100-2101-Q092": {
+    "stemImage": "/question-media/MOEX-103100-2101-Q092.png"
+  },
+  "MOEX-103100-2101-Q093": {
+    "stemImage": "/question-media/MOEX-103100-2101-Q093.png"
+  },
+  "MOEX-104030-2101-Q092": {
+    "stemImage": "/question-media/MOEX-104030-2101-Q092.png"
+  },
+  "MOEX-104030-2101-Q097": {
+    "stemImage": "/question-media/MOEX-104030-2101-Q097.png"
+  },
+  "MOEX-104090-6301-Q013": {
+    "stemImage": "/question-media/MOEX-104090-6301-Q013.png"
+  },
+  "MOEX-104090-6301-Q097": {
+    "stemImage": "/question-media/MOEX-104090-6301-Q097.png"
+  },
+  "MOEX-105020-6301-Q097": {
+    "stemImage": "/question-media/MOEX-105020-6301-Q097.png"
+  },
+  "MOEX-105100-6301-Q095": {
+    "stemImage": "/question-media/MOEX-105100-6301-Q095.png"
+  },
+  "MOEX-106020-5301-Q089": {
+    "stemImage": "/question-media/MOEX-106020-5301-Q089.png"
+  },
+  "MOEX-106100-2301-Q092": {
+    "stemImage": "/question-media/MOEX-106100-2301-Q092.png"
+  },
+  "MOEX-106100-2301-Q099": {
+    "stemImage": "/question-media/MOEX-106100-2301-Q099.png"
+  },
+  "MOEX-107020-6301-Q079": {
+    "stemImage": "/question-media/MOEX-107020-6301-Q079.png"
+  },
+  "MOEX-107020-6301-Q085": {
+    "stemImage": "/question-media/MOEX-107020-6301-Q085.png"
+  },
+  "MOEX-107020-6301-Q094": {
+    "stemImage": "/question-media/MOEX-107020-6301-Q094.png"
+  },
+  "MOEX-107100-2301-Q084": {
+    "stemImage": "/question-media/MOEX-107100-2301-Q084.png"
+  },
+  "MOEX-108030-2301-Q094": {
+    "stemImage": "/question-media/MOEX-108030-2301-Q094.png"
+  },
+  "MOEX-109020-1301-Q100": {
+    "optionImages": {
+      "A": "/question-media/MOEX-109020-1301-Q100-A.png",
+      "B": "/question-media/MOEX-109020-1301-Q100-B.png",
+      "C": "/question-media/MOEX-109020-1301-Q100-C.png",
+      "D": "/question-media/MOEX-109020-1301-Q100-D.png"
+    }
+  },
+  "MOEX-110020-1301-Q076": {
+    "stemImage": "/question-media/MOEX-110020-1301-Q076.png"
+  },
+  "MOEX-110101_2301-Q097": {
+    "stemImage": "/question-media/MOEX-110101_2301-Q097.png"
+  },
+  "MOEX-110101_2301-Q100": {
+    "stemImage": "/question-media/MOEX-110101_2301-Q100.png"
+  },
+  "MOEX-111020-1301-Q029": {
+    "stemImage": "/question-media/MOEX-111020-1301-Q029.png"
+  },
+  "MOEX-111100-1301-Q013": {
+    "stemImage": "/question-media/MOEX-111100-1301-Q013.png"
+  },
+  "MOEX-111100-1301-Q029": {
+    "stemImage": "/question-media/MOEX-111100-1301-Q029.png"
+  },
+  "MOEX-113020-1301-Q046": {
+    "stemImage": "/question-media/MOEX-113020-1301-Q046.png"
+  },
+  "MOEX-113020-2301-Q099": {
+    "stemImage": "/question-media/MOEX-113020-2301-Q099.png"
+  },
+  "MOEX-113020-2301-Q100": {
+    "stemImage": "/question-media/MOEX-113020-2301-Q100.png"
+  },
+  "MOEX-113090-2301-Q092": {
+    "stemImage": "/question-media/MOEX-113090-2301-Q092.png"
+  },
+  "MOEX-114020-1301-Q077": {
+    "optionImages": {
+      "A": "/question-media/MOEX-114020-1301-Q077-A.png",
+      "B": "/question-media/MOEX-114020-1301-Q077-B.png",
+      "C": "/question-media/MOEX-114020-1301-Q077-C.png",
+      "D": "/question-media/MOEX-114020-1301-Q077-D.png"
+    }
+  },
+  "MOEX-114090-1301-Q029": {
+    "stemImage": "/question-media/MOEX-114090-1301-Q029.png"
+  },
+  "MOEX-114090-2301-Q038": {
+    "stemImage": "/question-media/MOEX-114090-2301-Q038.png"
+  },
+  "MOEX-114090-2301-Q097": {
+    "stemImage": "/question-media/MOEX-114090-2301-Q097.png"
+  }
+}

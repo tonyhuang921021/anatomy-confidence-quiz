@@ -29,6 +29,7 @@ export type Question = {
   chapter: string;
   section: string;
   stem: string;
+  stemImage?: string;
   options: {
     A: string;
     B: string;
@@ -36,6 +37,7 @@ export type Question = {
     D: string;
     E?: string;
   };
+  optionImages?: Partial<Record<OptionKey, string>>;
   answer: OptionKey;
   acceptedAnswers?: OptionKey[];
   answerCreditType?: AnswerCreditType;

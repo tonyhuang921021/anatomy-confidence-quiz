@@ -7,6 +7,7 @@ import moexMed1MissingBatch2 from "@/data/sources/moex_med1_missing_batch2_10902
 import moexMed1MissingBatch3 from "@/data/sources/moex_med1_missing_batch3_112020_1301_detailed.json";
 import moexMed1ReclassifiedV5 from "@/data/sources/moex_med1_100_115_reclassified_v5.json";
 import moexMedStage2Merged0013100 from "@/data/sources/moex_med_stage2_detailed_merged_001_3100_classified_v3.json";
+import questionMediaManifest from "@/data/sources/question_media_manifest.json";
 import type { OptionKey, Question, SubjectFilter, SubjectName } from "@/types/quiz";
 
 type RawQuestion = {
@@ -140,6 +141,11 @@ type DetailedMissingBatchQuestionRaw = RawQuestion & {
   };
   subject_group_coarse?: string;
   subject_group_keyword?: string;
+};
+
+type QuestionMediaEntry = {
+  stemImage?: string;
+  optionImages?: Partial<Record<OptionKey, string>>;
 };
 
 type Batch3QuestionRaw = {
@@ -658,19 +664,37 @@ function applyClassificationOverride(question: Question): Question {
   };
 }
 
+function applyQuestionMedia(question: Question): Question {
+  const media = (questionMediaManifest as Record<string, QuestionMediaEntry>)[question.id];
+  if (!media) return question;
+
+  return {
+    ...question,
+    stemImage: media.stemImage ?? question.stemImage,
+    optionImages: media.optionImages
+      ? {
+          ...(question.optionImages ?? {}),
+          ...media.optionImages
+        }
+      : question.optionImages
+  };
+}
+
 const remainingQuestionsRaw =
   moexMed1RemainingDetailedV4Merged0011827.questions as readonly RawQuestion[];
 export const med1RemainingQuestions: Question[] = remainingQuestionsRaw
   .map(toQuestion)
   .filter((question): question is Question => Boolean(question))
-  .map(applyClassificationOverride);
+  .map(applyClassificationOverride)
+  .map(applyQuestionMedia);
 
 const missingQuestionsRaw =
   moexMed1Missing22QuestionsDetailedV5 as readonly MissingQuestionRaw[];
 export const med1MissingQuestions: Question[] = missingQuestionsRaw
   .map(toMissingQuestion)
   .filter((question): question is Question => Boolean(question))
-  .map(applyClassificationOverride);
+  .map(applyClassificationOverride)
+  .map(applyQuestionMedia);
 
 const missingBatch1Raw =
   (moexMed1MissingBatch1 as { questions: DetailedMissingBatchQuestionRaw[] })
@@ -678,7 +702,8 @@ const missingBatch1Raw =
 export const med1MissingBatch1Questions: Question[] = missingBatch1Raw
   .map(toDetailedMissingBatchQuestion)
   .filter((question): question is Question => Boolean(question))
-  .map(applyClassificationOverride);
+  .map(applyClassificationOverride)
+  .map(applyQuestionMedia);
 
 const missingBatch2Raw =
   (moexMed1MissingBatch2 as { questions: DetailedMissingBatchQuestionRaw[] })
@@ -686,28 +711,34 @@ const missingBatch2Raw =
 export const med1MissingBatch2Questions: Question[] = missingBatch2Raw
   .map(toDetailedMissingBatchQuestion)
   .filter((question): question is Question => Boolean(question))
-  .map(applyClassificationOverride);
+  .map(applyClassificationOverride)
+  .map(applyQuestionMedia);
 
 const missingBatch3Raw = moexMed1MissingBatch3 as readonly Batch3QuestionRaw[];
 export const med1MissingBatch3Questions: Question[] = missingBatch3Raw
   .map(toBatch3Question)
   .filter((question): question is Question => Boolean(question))
-  .map(applyClassificationOverride);
+  .map(applyClassificationOverride)
+  .map(applyQuestionMedia);
 
 const requestedPatchQuestionsRaw =
   moexMed1Requested71QuestionsDetailedPatchV5.questions as readonly RequestedPatchQuestionRaw[];
 export const med1RequestedPatchQuestions: Question[] = requestedPatchQuestionsRaw
   .map(toRequestedPatchQuestion)
   .filter((question): question is Question => Boolean(question))
-  .map(applyClassificationOverride);
+  .map(applyClassificationOverride)
+  .map(applyQuestionMedia);
 
 const stage2QuestionsRaw =
   moexMedStage2Merged0013100.questions as readonly Stage2QuestionRaw[];
 export const medStage2Questions: Question[] = stage2QuestionsRaw
   .map(toStage2Question)
-  .filter((question): question is Question => Boolean(question));
+  .filter((question): question is Question => Boolean(question))
+  .map(applyQuestionMedia);
 
-const anatomyQuestionsWithOverrides: Question[] = anatomyQuestions.map(applyClassificationOverride);
+const anatomyQuestionsWithOverrides: Question[] = anatomyQuestions
+  .map(applyClassificationOverride)
+  .map(applyQuestionMedia);
 
 export const allAnatomyQuestions: Question[] = dedupeQuestionBank([
   ...anatomyQuestionsWithOverrides.filter((question) => question.subject === "解剖學"),

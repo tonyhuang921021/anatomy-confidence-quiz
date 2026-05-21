@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/components/AuthProvider";
+import { QuestionOptionBlock, QuestionStemBlock } from "@/components/QuestionMediaBlock";
 import { ResultSummary } from "@/components/ResultSummary";
 import { WeaknessRanking } from "@/components/WeaknessRanking";
 import {
@@ -505,14 +506,15 @@ export default function ResultsPage() {
                           </span>
                         </summary>
                         <div className="mt-4 space-y-3 text-sm leading-7 text-slate-700">
-                          <p className="font-semibold text-slate-900">{question.stem}</p>
+                          <QuestionStemBlock question={question} />
                           <div className="grid gap-3">
                             {getAvailableOptionKeys(question).map((key) => (
-                              <div key={`${question.id}-${key}`} className="rounded-2xl bg-white p-4">
-                                <p className="font-semibold text-slate-900">
-                                  {key}. {question.options[key]}
-                                </p>
-                              </div>
+                              <QuestionOptionBlock
+                                key={`${question.id}-${key}`}
+                                question={question}
+                                optionKey={key}
+                                wrapperClassName="rounded-2xl bg-white p-4"
+                              />
                             ))}
                           </div>
                           <p>
@@ -570,14 +572,15 @@ export default function ResultsPage() {
                           </span>
                         </summary>
                         <div className="mt-4 space-y-3 text-sm leading-7 text-slate-700">
-                          <p className="font-semibold text-slate-900">{question.stem}</p>
+                          <QuestionStemBlock question={question} />
                           <div className="grid gap-3">
                             {getAvailableOptionKeys(question).map((key) => (
-                              <div key={`${question.id}-low-${key}`} className="rounded-2xl bg-white p-4">
-                                <p className="font-semibold text-slate-900">
-                                  {key}. {question.options[key]}
-                                </p>
-                              </div>
+                              <QuestionOptionBlock
+                                key={`${question.id}-low-${key}`}
+                                question={question}
+                                optionKey={key}
+                                wrapperClassName="rounded-2xl bg-white p-4"
+                              />
                             ))}
                           </div>
                           <p>
@@ -634,14 +637,15 @@ export default function ResultsPage() {
                         </span>
                       </summary>
                       <div className="mt-4 space-y-3 text-sm leading-7 text-slate-700">
-                        <p className="font-semibold text-slate-900">{question.stem}</p>
+                        <QuestionStemBlock question={question} />
                         <div className="grid gap-3">
                           {getAvailableOptionKeys(question).map((key) => (
-                            <div key={`${question.id}-all-${key}`} className="rounded-2xl bg-white p-4">
-                              <p className="font-semibold text-slate-900">
-                                {key}. {question.options[key]}
-                              </p>
-                            </div>
+                            <QuestionOptionBlock
+                              key={`${question.id}-all-${key}`}
+                              question={question}
+                              optionKey={key}
+                              wrapperClassName="rounded-2xl bg-white p-4"
+                            />
                           ))}
                         </div>
                         <p>

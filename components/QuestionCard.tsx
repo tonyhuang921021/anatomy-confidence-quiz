@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo } from "react";
+import { QuestionOptionBlock, QuestionStemBlock } from "@/components/QuestionMediaBlock";
 import { OptionKey, Question } from "@/types/quiz";
 
 type QuestionCardProps = {
@@ -69,9 +70,10 @@ export function QuestionCard({ question, selectedAnswer, onSelect }: QuestionCar
         <p className="mt-3 break-words text-xs leading-6 text-slate-500">{question.sourceCitation}</p>
       ) : null}
 
-      <h2 className="mt-5 break-words text-lg font-semibold leading-8 text-ink sm:text-xl">
-        {question.stem}
-      </h2>
+      <QuestionStemBlock
+        question={question}
+        className="mt-5 break-words text-lg font-semibold leading-8 text-ink sm:text-xl"
+      />
 
       <div className="mt-6 grid gap-3">
         {availableOptionKeys.map((key) => {
@@ -87,18 +89,14 @@ export function QuestionCard({ question, selectedAnswer, onSelect }: QuestionCar
                   : "border-slate-200 bg-white hover:border-brand-300 hover:bg-brand-50/50"
               }`}
             >
-              <span className="flex items-start gap-3">
-                <span
-                  className={`mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-sm font-bold ${
-                    isSelected ? "bg-brand-600 text-white" : "bg-slate-100 text-slate-600"
-                  }`}
-                >
-                  {key}
-                </span>
-                <span className="min-w-0 break-words text-sm leading-7 text-slate-800 sm:text-base">
-                  {question.options[key]}
-                </span>
-              </span>
+              <QuestionOptionBlock
+                question={question}
+                optionKey={key}
+                labelClassName={`mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-sm font-bold ${
+                  isSelected ? "bg-brand-600 text-white" : "bg-slate-100 text-slate-600"
+                }`}
+                textClassName="min-w-0 break-words text-sm leading-7 text-slate-800 sm:text-base"
+              />
             </button>
           );
         })}
