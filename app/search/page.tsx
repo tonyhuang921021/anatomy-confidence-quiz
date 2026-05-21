@@ -28,9 +28,10 @@ const SEARCHABLE_SUBJECTS = Object.values(subjectRegistry)
 
 const ALL_QUESTIONS = Array.from(
   new Map(
-    SEARCHABLE_SUBJECTS.flatMap((subject) =>
-      subject.questions.map((question) => [question.id, question] as const)
-    )
+    [
+      ...subjectRegistry["醫學（一）"].questions,
+      ...subjectRegistry["醫學（二）"].questions
+    ].map((question) => [question.id, question] as const)
   ).values()
 );
 
