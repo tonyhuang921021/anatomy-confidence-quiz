@@ -527,7 +527,9 @@ export default function ResultsPage() {
                             (question.answerCreditType === "multiple_accepted" ||
                               question.answerCreditType === "multiple_answers")
                               ? `${question.acceptedAnswers.join("/")} 皆可`
-                              : attempt.correctAnswer}
+                              : question.answerCreditType === "all_credit"
+                                ? "本題一律給分"
+                                : attempt.correctAnswer}
                           </p>
                           <p>
                             <span className="font-semibold">信心：</span>
@@ -595,7 +597,9 @@ export default function ResultsPage() {
                             (question.answerCreditType === "multiple_accepted" ||
                               question.answerCreditType === "multiple_answers")
                               ? `${question.acceptedAnswers.join("/")} 皆可`
-                              : attempt.correctAnswer}
+                              : question.answerCreditType === "all_credit"
+                                ? "本題一律給分"
+                                : attempt.correctAnswer}
                           </p>
                           <p>
                             <span className="font-semibold">是否答對：</span>
@@ -662,7 +666,9 @@ export default function ResultsPage() {
                           (question.answerCreditType === "multiple_accepted" ||
                             question.answerCreditType === "multiple_answers")
                             ? `${question.acceptedAnswers.join("/")} 皆可`
-                            : attempt.correctAnswer}
+                            : question.answerCreditType === "all_credit"
+                              ? "本題一律給分"
+                              : attempt.correctAnswer}
                         </p>
                         <p>
                           <span className="font-semibold">testedConcept：</span>

@@ -101,7 +101,9 @@ function renderQuestionReview(
           renderedQuestion.answerCreditType === "multiple_answers") &&
         renderedQuestion.acceptedAnswers?.length
           ? `${renderedQuestion.acceptedAnswers.join("/")} 皆可`
-          : renderedQuestion.answer}
+          : renderedQuestion.answerCreditType === "all_credit"
+            ? "本題一律給分"
+            : renderedQuestion.answer}
       </p>
       <p>
         <span className="font-semibold">重點解析：</span>
@@ -178,7 +180,9 @@ function renderRelatedQuestions(question: Question, allQuestions: Question[]) {
                 relatedQuestion.answerCreditType === "multiple_answers") &&
               relatedQuestion.acceptedAnswers?.length
                 ? `${relatedQuestion.acceptedAnswers.join("/")} 皆可`
-                : relatedQuestion.answer}
+                : relatedQuestion.answerCreditType === "all_credit"
+                  ? "本題一律給分"
+                  : relatedQuestion.answer}
             </p>
             <p>
               <span className="font-semibold">詳解：</span>

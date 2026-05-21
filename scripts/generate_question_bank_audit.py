@@ -105,6 +105,39 @@ def to_option_key_array(value: Any) -> list[str]:
     return normalized
 
 
+def get_available_option_keys(options: Any) -> list[str]:
+    if not isinstance(options, dict):
+        return []
+    return [
+        key
+        for key in ("A", "B", "C", "D", "E")
+        if isinstance(options.get(key), str) and options.get(key).strip()
+    ]
+
+
+def normalize_answer_credit_type(value: Any) -> str:
+    text = str(value or "").strip()
+    if text == "all_credit":
+        return "all_credit"
+    if text in {"multiple_accepted", "multiple"}:
+        return "multiple_accepted"
+    if text == "multiple_answers":
+        return "multiple_answers"
+    return "standard"
+
+
+def resolve_imported_answer(options: Any, answer_credit_type: Any, answer_candidates: list[str]) -> str | None:
+    for candidate in answer_candidates:
+        if candidate in OPTION_KEYS:
+            return candidate
+
+    if normalize_answer_credit_type(answer_credit_type) == "all_credit":
+        available = get_available_option_keys(options)
+        return available[0] if available else "A"
+
+    return None
+
+
 def normalize_canonical_id(
     *,
     source_id: str,
@@ -185,7 +218,12 @@ def build_records() -> list[AuditRecord]:
     )
     for raw in remaining_obj["questions"]:
         accepted_answers = to_option_key_array(raw.get("correct_answers"))
-        primary_answer = to_answer_text(raw.get("answer")) or (accepted_answers[0] if accepted_answers else "")
+        answer_text = to_answer_text(raw.get("answer"))
+        primary_answer = resolve_imported_answer(
+            raw.get("options"),
+            raw.get("answer_credit_type"),
+            ([answer_text] if answer_text in OPTION_KEYS else []) + accepted_answers,
+        )
         if primary_answer not in OPTION_KEYS:
             continue
         parsed = normalize_canonical_id(
@@ -222,7 +260,9 @@ def build_records() -> list[AuditRecord]:
         answer_values = []
         for candidate in (raw.get("corrected_answer"), raw.get("official_answer")):
             answer_values.extend(to_option_key_array(candidate))
-        primary_answer = answer_values[0] if answer_values else ""
+        primary_answer = resolve_imported_answer(
+            raw.get("options"), raw.get("answer_credit_type"), answer_values
+        )
         if primary_answer not in OPTION_KEYS:
             continue
         exam_code, paper_code = str(raw["exam_code"]).split("-")
@@ -256,7 +296,11 @@ def build_records() -> list[AuditRecord]:
     for raw in requested_patch_obj["questions"]:
         answer_values = to_option_key_array(raw.get("correct_answers"))
         fallback_answer = to_answer_text(raw.get("official_answer_raw"))
-        primary_answer = answer_values[0] if answer_values else (fallback_answer if fallback_answer in OPTION_KEYS else "")
+        primary_answer = resolve_imported_answer(
+            raw.get("options"),
+            raw.get("answer_credit_type"),
+            answer_values + ([fallback_answer] if fallback_answer in OPTION_KEYS else []),
+        )
         if primary_answer not in OPTION_KEYS:
             continue
         parsed = normalize_canonical_id(
@@ -290,8 +334,20 @@ def build_records() -> list[AuditRecord]:
         payload = json.loads((SOURCES_DIR / file_name).read_text(encoding="utf-8"))
         questions = payload["questions"] if isinstance(payload, dict) else payload
         for raw in questions:
-            accepted_answers = to_option_key_array(raw.get("correct_answers"))
-            primary_answer = to_answer_text(raw.get("answer")) or (accepted_answers[0] if accepted_answers else "")
+            answer_values: list[str] = []
+            for candidate in (
+                raw.get("answer"),
+                raw.get("correct_answers"),
+                raw.get("corrected_answer"),
+                raw.get("official_answer"),
+            ):
+                answer_values.extend(to_option_key_array(candidate))
+            answer_text = to_answer_text(raw.get("answer"))
+            primary_answer = resolve_imported_answer(
+                raw.get("options"),
+                raw.get("answer_credit_type"),
+                ([answer_text] if answer_text in OPTION_KEYS else []) + answer_values,
+            )
             if primary_answer not in OPTION_KEYS:
                 continue
             parsed = normalize_canonical_id(
@@ -303,7 +359,7 @@ def build_records() -> list[AuditRecord]:
             if not parsed:
                 continue
             canonical_id, exam_code, paper_code, question_no = parsed
-            gregorian_year = raw.get("exam_year_gregorian")
+            gregorian_year = raw.get("exam_year_gregorian", raw.get("year"))
             if not isinstance(gregorian_year, int):
                 continue
             records.append(
@@ -329,7 +385,9 @@ def build_records() -> list[AuditRecord]:
         answer_values: list[str] = []
         for candidate in (raw.get("corrected_answer"), raw.get("official_answer_raw"), raw.get("correct_answers")):
             answer_values.extend(to_option_key_array(candidate))
-        primary_answer = answer_values[0] if answer_values else ""
+        primary_answer = resolve_imported_answer(
+            raw.get("options"), raw.get("answer_credit_type"), answer_values
+        )
         if primary_answer not in OPTION_KEYS:
             continue
         parsed = normalize_canonical_id(

@@ -1,6 +1,6 @@
 {
-  "unique_question_count": 6010,
-  "duplicate_source_count": 142,
+  "unique_question_count": 6193,
+  "duplicate_source_count": 157,
   "duplicate_examples": {
     "MOEX-100140-1101-Q051": [
       "anatomyQuestions.ts",
@@ -87,8 +87,8 @@
       "moex_med1_remaining_detailed_v4_merged_001_1827.ts"
     ]
   },
-  "paper_count": 61,
-  "incomplete_paper_count": 21,
+  "paper_count": 62,
+  "incomplete_paper_count": 4,
   "year_count": 16,
-  "incomplete_year_count": 14
+  "incomplete_year_count": 4
 }
