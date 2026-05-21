@@ -28,10 +28,10 @@ const SEARCHABLE_SUBJECTS = Object.values(subjectRegistry)
 
 const ALL_QUESTIONS = Array.from(
   new Map(
-    [
-      ...subjectRegistry["醫學（一）"].questions,
-      ...subjectRegistry["醫學（二）"].questions
-    ].map((question) => [question.id, question] as const)
+    Object.values(subjectRegistry)
+      .filter((item) => item.enabled)
+      .flatMap((item) => item.questions)
+      .map((question) => [question.id, question] as const)
   ).values()
 );
 
