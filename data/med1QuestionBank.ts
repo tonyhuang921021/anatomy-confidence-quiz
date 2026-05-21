@@ -358,7 +358,6 @@ function toQuestion(raw: RawQuestion): Question | null {
   const acceptedAnswers = toOptionKeyArray(raw.correct_answers);
   const primaryAnswer = toAnswerText(raw.answer) || acceptedAnswers[0] || "";
   if (!isOptionKey(primaryAnswer)) return null;
-  if (raw.answer_credit_type === "multiple_answers") return null;
 
   const { primarySubject, topicSection, chapter, section } = resolvePlacement(
     raw.classification_v4?.primary_subject,
@@ -374,7 +373,7 @@ function toQuestion(raw: RawQuestion): Question | null {
     options: sanitizeOptions(raw.options),
     answer: primaryAnswer,
     acceptedAnswers: acceptedAnswers.length > 0 ? acceptedAnswers : undefined,
-    answerCreditType: raw.answer_credit_type as Question["answerCreditType"],
+    answerCreditType: normalizeAnswerCreditType(raw.answer_credit_type),
     explanation: sanitizeImportedText(raw.explanation ?? ""),
     testedConcept: sanitizeImportedText(raw.exam_point ?? topicSection ?? section),
     optionAnalysis: toPartialOptionAnalysis(raw.option_analysis),
@@ -485,7 +484,6 @@ function toDetailedMissingBatchQuestion(raw: DetailedMissingBatchQuestionRaw): Q
   const acceptedAnswers = toOptionKeyArray(raw.correct_answers);
   const primaryAnswer = toAnswerText(raw.answer) || acceptedAnswers[0] || "";
   if (!isOptionKey(primaryAnswer)) return null;
-  if (raw.answer_credit_type === "multiple_answers") return null;
 
   const explicitSubject =
     raw.classification_v5?.med1_current_five_subject ||
@@ -582,7 +580,6 @@ function toStage2Question(raw: Stage2QuestionRaw): Question | null {
     .filter(isOptionKey);
   const primaryAnswer = answerValues[0] ?? "";
   if (!isOptionKey(primaryAnswer)) return null;
-  if (raw.answer_credit_type === "multiple_answers") return null;
 
   const { primarySubject, topicSection, chapter, section } = resolvePlacement(
     raw.classification_v1?.primary_subject_exact,

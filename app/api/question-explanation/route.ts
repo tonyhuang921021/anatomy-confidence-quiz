@@ -280,7 +280,9 @@ function buildQuestionExplanationPrompt(body: QuestionExplanationRequestBody) {
   const question = body.question;
   const optionKeys = getRequiredOptionKeys(question?.options);
   const correctAnswerText =
-    question?.answerCreditType === "multiple_accepted" && (question.acceptedAnswers?.length ?? 0) > 0
+    (question?.answerCreditType === "multiple_accepted" ||
+      question?.answerCreditType === "multiple_answers") &&
+    (question.acceptedAnswers?.length ?? 0) > 0
       ? question.acceptedAnswers?.join(" / ")
       : question?.answer ?? "";
 
@@ -318,7 +320,9 @@ function buildMissingOptionRetryPrompt(
 ) {
   const question = body.question;
   const correctAnswerText =
-    question?.answerCreditType === "multiple_accepted" && (question.acceptedAnswers?.length ?? 0) > 0
+    (question?.answerCreditType === "multiple_accepted" ||
+      question?.answerCreditType === "multiple_answers") &&
+    (question.acceptedAnswers?.length ?? 0) > 0
       ? question.acceptedAnswers?.join(" / ")
       : question?.answer ?? "";
 

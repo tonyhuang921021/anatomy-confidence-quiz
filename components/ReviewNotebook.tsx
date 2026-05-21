@@ -97,9 +97,10 @@ function renderQuestionReview(
       </div>
       <p>
         <span className="font-semibold">正確答案：</span>
-        {renderedQuestion.answerCreditType === "multiple_accepted" &&
+        {(renderedQuestion.answerCreditType === "multiple_accepted" ||
+          renderedQuestion.answerCreditType === "multiple_answers") &&
         renderedQuestion.acceptedAnswers?.length
-          ? renderedQuestion.acceptedAnswers.join(" / ")
+          ? `${renderedQuestion.acceptedAnswers.join("/")} 皆可`
           : renderedQuestion.answer}
       </p>
       <p>
@@ -173,9 +174,10 @@ function renderRelatedQuestions(question: Question, allQuestions: Question[]) {
             </div>
             <p>
               <span className="font-semibold">正確答案：</span>
-              {relatedQuestion.answerCreditType === "multiple_accepted" &&
+              {(relatedQuestion.answerCreditType === "multiple_accepted" ||
+                relatedQuestion.answerCreditType === "multiple_answers") &&
               relatedQuestion.acceptedAnswers?.length
-                ? relatedQuestion.acceptedAnswers.join(" / ")
+                ? `${relatedQuestion.acceptedAnswers.join("/")} 皆可`
                 : relatedQuestion.answer}
             </p>
             <p>

@@ -523,8 +523,10 @@ export default function ResultsPage() {
                           </p>
                           <p>
                             <span className="font-semibold">正確答案：</span>
-                            {question.acceptedAnswers?.length && question.answerCreditType === "multiple_accepted"
-                              ? question.acceptedAnswers.join(" / ")
+                            {question.acceptedAnswers?.length &&
+                            (question.answerCreditType === "multiple_accepted" ||
+                              question.answerCreditType === "multiple_answers")
+                              ? `${question.acceptedAnswers.join("/")} 皆可`
                               : attempt.correctAnswer}
                           </p>
                           <p>
@@ -589,8 +591,10 @@ export default function ResultsPage() {
                           </p>
                           <p>
                             <span className="font-semibold">正確答案：</span>
-                            {question.acceptedAnswers?.length && question.answerCreditType === "multiple_accepted"
-                              ? question.acceptedAnswers.join(" / ")
+                            {question.acceptedAnswers?.length &&
+                            (question.answerCreditType === "multiple_accepted" ||
+                              question.answerCreditType === "multiple_answers")
+                              ? `${question.acceptedAnswers.join("/")} 皆可`
                               : attempt.correctAnswer}
                           </p>
                           <p>
@@ -654,8 +658,10 @@ export default function ResultsPage() {
                         </p>
                         <p>
                           <span className="font-semibold">正確答案：</span>
-                          {question.acceptedAnswers?.length && question.answerCreditType === "multiple_accepted"
-                            ? question.acceptedAnswers.join(" / ")
+                          {question.acceptedAnswers?.length &&
+                          (question.answerCreditType === "multiple_accepted" ||
+                            question.answerCreditType === "multiple_answers")
+                            ? `${question.acceptedAnswers.join("/")} 皆可`
                             : attempt.correctAnswer}
                         </p>
                         <p>

@@ -381,7 +381,8 @@ export default function SearchPage() {
 
                 <p>
                   <span className="font-semibold">正確答案：</span>
-                  {renderedQuestion.answerCreditType === "multiple_accepted" &&
+                  {(renderedQuestion.answerCreditType === "multiple_accepted" ||
+                    renderedQuestion.answerCreditType === "multiple_answers") &&
                   renderedQuestion.acceptedAnswers?.length
                     ? `${renderedQuestion.acceptedAnswers.join("/")} 皆可`
                     : renderedQuestion.answerCreditType === "all_credit"

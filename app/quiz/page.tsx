@@ -81,7 +81,10 @@ function evaluateAttempt(question: Question, selectedAnswer: OptionKey) {
     return true;
   }
 
-  if (question.answerCreditType === "multiple_accepted") {
+  if (
+    question.answerCreditType === "multiple_accepted" ||
+    question.answerCreditType === "multiple_answers"
+  ) {
     const acceptedAnswers =
       question.acceptedAnswers && question.acceptedAnswers.length > 0
         ? question.acceptedAnswers
@@ -622,9 +625,10 @@ export default function QuizPage() {
                     <p>
                       正確答案：
                       <span className="font-semibold">
-                        {currentQuestion.answerCreditType === "multiple_accepted" &&
+                        {(currentQuestion.answerCreditType === "multiple_accepted" ||
+                          currentQuestion.answerCreditType === "multiple_answers") &&
                         currentQuestion.acceptedAnswers?.length
-                          ? currentQuestion.acceptedAnswers.join(" / ")
+                          ? `${currentQuestion.acceptedAnswers.join("/")} 皆可`
                           : submittedAttempt.correctAnswer}
                       </span>
                     </p>
