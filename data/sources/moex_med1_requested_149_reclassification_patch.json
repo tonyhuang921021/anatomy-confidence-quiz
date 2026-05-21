@@ -1,0 +1,747 @@
+[
+  {
+    "id": "MOEX-105100-5301-Q069",
+    "primary_subject_exact": "微生物免疫學",
+    "subtopic": "超敏反應"
+  },
+  {
+    "id": "MOEX-105100-5301-Q081",
+    "primary_subject_exact": "寄生蟲學",
+    "subtopic": "醫學昆蟲與病媒"
+  },
+  {
+    "id": "MOEX-105100-5301-Q083",
+    "primary_subject_exact": "公共衛生學",
+    "subtopic": "生物統計"
+  },
+  {
+    "id": "MOEX-105100-5301-Q087",
+    "primary_subject_exact": "公共衛生學",
+    "subtopic": "流行病學與研究設計"
+  },
+  {
+    "id": "MOEX-105100-5301-Q089",
+    "primary_subject_exact": "公共衛生學",
+    "subtopic": "生物統計"
+  },
+  {
+    "id": "MOEX-105100-5301-Q090",
+    "primary_subject_exact": "公共衛生學",
+    "subtopic": "環境與職業醫學"
+  },
+  {
+    "id": "MOEX-105100-5301-Q091",
+    "primary_subject_exact": "公共衛生學",
+    "subtopic": "環境與職業醫學"
+  },
+  {
+    "id": "MOEX-105100-5301-Q093",
+    "primary_subject_exact": "公共衛生學",
+    "subtopic": "環境與職業醫學"
+  },
+  {
+    "id": "MOEX-105100-5301-Q095",
+    "primary_subject_exact": "公共衛生學",
+    "subtopic": "健康促進與預防醫學"
+  },
+  {
+    "id": "MOEX-105100-5301-Q096",
+    "primary_subject_exact": "公共衛生學",
+    "subtopic": "健康促進與預防醫學"
+  },
+  {
+    "id": "MOEX-105100-5301-Q097",
+    "primary_subject_exact": "公共衛生學",
+    "subtopic": "健康促進與預防醫學"
+  },
+  {
+    "id": "MOEX-105100-5301-Q100",
+    "primary_subject_exact": "公共衛生學",
+    "subtopic": "全球健康與死因"
+  },
+  {
+    "id": "MOEX-106020-5301-Q072",
+    "primary_subject_exact": "微生物免疫學",
+    "subtopic": "腫瘤免疫"
+  },
+  {
+    "id": "MOEX-106020-5301-Q083",
+    "primary_subject_exact": "公共衛生學",
+    "subtopic": "流行病學與研究設計"
+  },
+  {
+    "id": "MOEX-106020-5301-Q085",
+    "primary_subject_exact": "公共衛生學",
+    "subtopic": "生物統計"
+  },
+  {
+    "id": "MOEX-106020-5301-Q087",
+    "primary_subject_exact": "公共衛生學",
+    "subtopic": "流行病學與研究設計"
+  },
+  {
+    "id": "MOEX-106020-5301-Q088",
+    "primary_subject_exact": "公共衛生學",
+    "subtopic": "公共衛生總論"
+  },
+  {
+    "id": "MOEX-106020-5301-Q090",
+    "primary_subject_exact": "公共衛生學",
+    "subtopic": "環境與職業醫學"
+  },
+  {
+    "id": "MOEX-106020-5301-Q091",
+    "primary_subject_exact": "公共衛生學",
+    "subtopic": "環境與職業醫學"
+  },
+  {
+    "id": "MOEX-106020-5301-Q095",
+    "primary_subject_exact": "公共衛生學",
+    "subtopic": "健康促進與預防醫學"
+  },
+  {
+    "id": "MOEX-106020-5301-Q096",
+    "primary_subject_exact": "公共衛生學",
+    "subtopic": "健康促進與預防醫學"
+  },
+  {
+    "id": "MOEX-106020-5301-Q097",
+    "primary_subject_exact": "公共衛生學",
+    "subtopic": "健康促進與預防醫學"
+  },
+  {
+    "id": "MOEX-106020-5301-Q098",
+    "primary_subject_exact": "公共衛生學",
+    "subtopic": "衛生政策與長期照護"
+  },
+  {
+    "id": "MOEX-106020-5301-Q099",
+    "primary_subject_exact": "公共衛生學",
+    "subtopic": "衛生政策與長期照護"
+  },
+  {
+    "id": "MOEX-106100-1301-Q053",
+    "primary_subject_exact": "生理學",
+    "subtopic": "味覺生理"
+  },
+  {
+    "id": "MOEX-106100-1301-Q072",
+    "primary_subject_exact": "生理學",
+    "subtopic": "內分泌與生殖生理"
+  },
+  {
+    "id": "MOEX-106100-1301-Q077",
+    "primary_subject_exact": "生物化學",
+    "subtopic": "能量代謝與粒線體"
+  },
+  {
+    "id": "MOEX-106100-1301-Q080",
+    "primary_subject_exact": "生物化學",
+    "subtopic": "生物化學總論"
+  },
+  {
+    "id": "MOEX-106100-1301-Q089",
+    "primary_subject_exact": "生物化學",
+    "subtopic": "醣類與醣脂生化"
+  },
+  {
+    "id": "MOEX-107020-5301-Q050",
+    "primary_subject_exact": "生理學",
+    "subtopic": "下視丘生理"
+  },
+  {
+    "id": "MOEX-107020-5301-Q079",
+    "primary_subject_exact": "生物化學",
+    "subtopic": "生物化學總論"
+  },
+  {
+    "id": "MOEX-107020-5301-Q086",
+    "primary_subject_exact": "生物化學",
+    "subtopic": "分子生物學"
+  },
+  {
+    "id": "MOEX-107020-5301-Q089",
+    "primary_subject_exact": "生物化學",
+    "subtopic": "醣類與醣脂生化"
+  },
+  {
+    "id": "MOEX-107100-1301-Q053",
+    "primary_subject_exact": "生理學",
+    "subtopic": "視覺生理"
+  },
+  {
+    "id": "MOEX-107100-1301-Q056",
+    "primary_subject_exact": "生理學",
+    "subtopic": "血液生理"
+  },
+  {
+    "id": "MOEX-107100-1301-Q068",
+    "primary_subject_exact": "生物化學",
+    "subtopic": "能量代謝與粒線體"
+  },
+  {
+    "id": "MOEX-107100-1301-Q069",
+    "primary_subject_exact": "生物化學",
+    "subtopic": "維生素與輔酶"
+  },
+  {
+    "id": "MOEX-107100-1301-Q077",
+    "primary_subject_exact": "生物化學",
+    "subtopic": "維生素與輔酶"
+  },
+  {
+    "id": "MOEX-107100-1301-Q096",
+    "primary_subject_exact": "生物化學",
+    "subtopic": "能量代謝與粒線體"
+  },
+  {
+    "id": "MOEX-108030-1301-Q053",
+    "primary_subject_exact": "生理學",
+    "subtopic": "生理學總論"
+  },
+  {
+    "id": "MOEX-108030-1301-Q055",
+    "primary_subject_exact": "生理學",
+    "subtopic": "生理學總論"
+  },
+  {
+    "id": "MOEX-108030-1301-Q073",
+    "primary_subject_exact": "生理學",
+    "subtopic": "內分泌與生殖生理"
+  },
+  {
+    "id": "MOEX-108030-1301-Q074",
+    "primary_subject_exact": "生物化學",
+    "subtopic": "蛋白質與酵素"
+  },
+  {
+    "id": "MOEX-108030-1301-Q075",
+    "primary_subject_exact": "生物化學",
+    "subtopic": "蛋白質與酵素"
+  },
+  {
+    "id": "MOEX-108030-1301-Q077",
+    "primary_subject_exact": "生物化學",
+    "subtopic": "維生素與輔酶"
+  },
+  {
+    "id": "MOEX-108030-1301-Q093",
+    "primary_subject_exact": "生物化學",
+    "subtopic": "胺基酸與氮代謝"
+  },
+  {
+    "id": "MOEX-108030-1301-Q096",
+    "primary_subject_exact": "生物化學",
+    "subtopic": "血基質與卟啉代謝"
+  },
+  {
+    "id": "MOEX-108100-1301-Q076",
+    "primary_subject_exact": "生物化學",
+    "subtopic": "生物化學總論"
+  },
+  {
+    "id": "MOEX-108100-1301-Q085",
+    "primary_subject_exact": "生物化學",
+    "subtopic": "醣類與醣脂生化"
+  },
+  {
+    "id": "MOEX-109100-1301-Q050",
+    "primary_subject_exact": "生理學",
+    "subtopic": "神經生理"
+  },
+  {
+    "id": "MOEX-109100-1301-Q052",
+    "primary_subject_exact": "生理學",
+    "subtopic": "下視丘生理"
+  },
+  {
+    "id": "MOEX-109100-1301-Q056",
+    "primary_subject_exact": "生理學",
+    "subtopic": "血液生理"
+  },
+  {
+    "id": "MOEX-109100-1301-Q071",
+    "primary_subject_exact": "生理學",
+    "subtopic": "內分泌與生殖生理"
+  },
+  {
+    "id": "MOEX-109100-1301-Q077",
+    "primary_subject_exact": "生物化學",
+    "subtopic": "維生素與輔酶"
+  },
+  {
+    "id": "MOEX-109100-1301-Q078",
+    "primary_subject_exact": "生物化學",
+    "subtopic": "維生素與輔酶"
+  },
+  {
+    "id": "MOEX-109100-1301-Q088",
+    "primary_subject_exact": "生物化學",
+    "subtopic": "醣類與醣脂生化"
+  },
+  {
+    "id": "MOEX-110020-1301-Q050",
+    "primary_subject_exact": "生理學",
+    "subtopic": "下視丘生理"
+  },
+  {
+    "id": "MOEX-110020-1301-Q060",
+    "primary_subject_exact": "生理學",
+    "subtopic": "心血管生理"
+  },
+  {
+    "id": "MOEX-110020-1301-Q068",
+    "primary_subject_exact": "生理學",
+    "subtopic": "內分泌與生殖生理"
+  },
+  {
+    "id": "MOEX-110020-1301-Q094",
+    "primary_subject_exact": "生物化學",
+    "subtopic": "蛋白質與酵素"
+  },
+  {
+    "id": "MOEX-110101-1301-Q052",
+    "primary_subject_exact": "生理學",
+    "subtopic": "行為神經生理"
+  },
+  {
+    "id": "MOEX-110101-1301-Q077",
+    "primary_subject_exact": "生物化學",
+    "subtopic": "維生素與輔酶"
+  },
+  {
+    "id": "MOEX-110101-1301-Q078",
+    "primary_subject_exact": "生物化學",
+    "subtopic": "維生素與輔酶"
+  },
+  {
+    "id": "MOEX-110101-1301-Q079",
+    "primary_subject_exact": "生物化學",
+    "subtopic": "分子生物學"
+  },
+  {
+    "id": "MOEX-110101-1301-Q088",
+    "primary_subject_exact": "生物化學",
+    "subtopic": "能量代謝與粒線體"
+  },
+  {
+    "id": "MOEX-110101-1301-Q098",
+    "primary_subject_exact": "生物化學",
+    "subtopic": "生物化學總論"
+  },
+  {
+    "id": "MOEX-111020-1301-Q056",
+    "primary_subject_exact": "生理學",
+    "subtopic": "前庭與聽覺生理"
+  },
+  {
+    "id": "MOEX-111020-1301-Q061",
+    "primary_subject_exact": "生理學",
+    "subtopic": "心血管生理"
+  },
+  {
+    "id": "MOEX-111020-1301-Q094",
+    "primary_subject_exact": "生物化學",
+    "subtopic": "醣類與醣脂生化"
+  },
+  {
+    "id": "MOEX-111100-1301-Q050",
+    "primary_subject_exact": "生理學",
+    "subtopic": "胃腸生理"
+  },
+  {
+    "id": "MOEX-111100-1301-Q056",
+    "primary_subject_exact": "藥理學",
+    "subtopic": "血液藥理與抗凝血藥"
+  },
+  {
+    "id": "MOEX-111100-1301-Q089",
+    "primary_subject_exact": "生物化學",
+    "subtopic": "醣類與醣脂生化"
+  },
+  {
+    "id": "MOEX-111100-1301-Q092",
+    "primary_subject_exact": "生物化學",
+    "subtopic": "細胞訊息與細胞生物學"
+  },
+  {
+    "id": "MOEX-111100-1301-Q095",
+    "primary_subject_exact": "生物化學",
+    "subtopic": "血基質與卟啉代謝"
+  },
+  {
+    "id": "MOEX-111100-1301-Q100",
+    "primary_subject_exact": "生物化學",
+    "subtopic": "分子生物學"
+  },
+  {
+    "id": "MOEX-112100-1301-Q079",
+    "primary_subject_exact": "生物化學",
+    "subtopic": "生物化學總論"
+  },
+  {
+    "id": "MOEX-113020-1301-Q073",
+    "primary_subject_exact": "胚胎及發育生物學",
+    "subtopic": "早期胚胎發育"
+  },
+  {
+    "id": "MOEX-113020-1301-Q077",
+    "primary_subject_exact": "生物化學",
+    "subtopic": "能量代謝與粒線體"
+  },
+  {
+    "id": "MOEX-113020-1301-Q079",
+    "primary_subject_exact": "生物化學",
+    "subtopic": "生物化學總論"
+  },
+  {
+    "id": "MOEX-113020-1301-Q088",
+    "primary_subject_exact": "生物化學",
+    "subtopic": "醣類與醣脂生化"
+  },
+  {
+    "id": "MOEX-113020-1301-Q099",
+    "primary_subject_exact": "生物化學",
+    "subtopic": "分子生物學"
+  },
+  {
+    "id": "MOEX-113090-1301-Q053",
+    "primary_subject_exact": "生理學",
+    "subtopic": "視覺生理"
+  },
+  {
+    "id": "MOEX-113090-1301-Q076",
+    "primary_subject_exact": "生物化學",
+    "subtopic": "蛋白質與酵素"
+  },
+  {
+    "id": "MOEX-113090-1301-Q077",
+    "primary_subject_exact": "生物化學",
+    "subtopic": "維生素與輔酶"
+  },
+  {
+    "id": "MOEX-113090-1301-Q086",
+    "primary_subject_exact": "生物化學",
+    "subtopic": "分子生物學"
+  },
+  {
+    "id": "MOEX-113090-1301-Q089",
+    "primary_subject_exact": "生物化學",
+    "subtopic": "醣類與醣脂生化"
+  },
+  {
+    "id": "MOEX-113090-1301-Q097",
+    "primary_subject_exact": "生物化學",
+    "subtopic": "細胞訊息與細胞生物學"
+  },
+  {
+    "id": "MOEX-114020-1301-Q074",
+    "primary_subject_exact": "生物化學",
+    "subtopic": "生物化學總論"
+  },
+  {
+    "id": "MOEX-114020-1301-Q075",
+    "primary_subject_exact": "生物化學",
+    "subtopic": "蛋白質與酵素"
+  },
+  {
+    "id": "MOEX-114020-1301-Q077",
+    "primary_subject_exact": "生物化學",
+    "subtopic": "生物化學總論"
+  },
+  {
+    "id": "MOEX-114020-1301-Q097",
+    "primary_subject_exact": "生物化學",
+    "subtopic": "細胞訊息與細胞生物學"
+  },
+  {
+    "id": "MOEX-114090-1301-Q053",
+    "primary_subject_exact": "生理學",
+    "subtopic": "生理學總論"
+  },
+  {
+    "id": "MOEX-114090-1301-Q063",
+    "primary_subject_exact": "生理學",
+    "subtopic": "呼吸生理"
+  },
+  {
+    "id": "MOEX-114090-1301-Q076",
+    "primary_subject_exact": "生物化學",
+    "subtopic": "生物化學總論"
+  },
+  {
+    "id": "MOEX-114090-1301-Q088",
+    "primary_subject_exact": "生物化學",
+    "subtopic": "醣類與醣脂生化"
+  },
+  {
+    "id": "MOEX-114090-1301-Q096",
+    "primary_subject_exact": "生物化學",
+    "subtopic": "細胞訊息與細胞生物學"
+  },
+  {
+    "id": "MOEX-106100-1301-Q100",
+    "primary_subject_exact": "生物化學",
+    "subtopic": "分子生物學"
+  },
+  {
+    "id": "MOEX-107020-5301-Q085",
+    "primary_subject_exact": "生物化學",
+    "subtopic": "分子生物學"
+  },
+  {
+    "id": "MOEX-107020-5301-Q100",
+    "primary_subject_exact": "生物化學",
+    "subtopic": "分子生物學"
+  },
+  {
+    "id": "MOEX-109100-1301-Q100",
+    "primary_subject_exact": "生物化學",
+    "subtopic": "分子生物學"
+  },
+  {
+    "id": "MOEX-110020-1301-Q081",
+    "primary_subject_exact": "生物化學",
+    "subtopic": "分子生物學"
+  },
+  {
+    "id": "MOEX-110020-1301-Q082",
+    "primary_subject_exact": "生物化學",
+    "subtopic": "分子生物學"
+  },
+  {
+    "id": "MOEX-110020-1301-Q083",
+    "primary_subject_exact": "生物化學",
+    "subtopic": "分子生物學"
+  },
+  {
+    "id": "MOEX-110020-1301-Q084",
+    "primary_subject_exact": "生物化學",
+    "subtopic": "分子生物學"
+  },
+  {
+    "id": "MOEX-110020-1301-Q085",
+    "primary_subject_exact": "生物化學",
+    "subtopic": "分子生物學"
+  },
+  {
+    "id": "MOEX-110020-1301-Q086",
+    "primary_subject_exact": "生物化學",
+    "subtopic": "分子生物學"
+  },
+  {
+    "id": "MOEX-110020-1301-Q097",
+    "primary_subject_exact": "生物化學",
+    "subtopic": "分子生物學"
+  },
+  {
+    "id": "MOEX-110020-1301-Q099",
+    "primary_subject_exact": "生物化學",
+    "subtopic": "分子生物學"
+  },
+  {
+    "id": "MOEX-110020-1301-Q100",
+    "primary_subject_exact": "生物化學",
+    "subtopic": "分子生物學"
+  },
+  {
+    "id": "MOEX-113090-1301-Q079",
+    "primary_subject_exact": "生物化學",
+    "subtopic": "分子生物學"
+  },
+  {
+    "id": "MOEX-113090-1301-Q081",
+    "primary_subject_exact": "生物化學",
+    "subtopic": "分子生物學"
+  },
+  {
+    "id": "MOEX-113090-1301-Q082",
+    "primary_subject_exact": "生物化學",
+    "subtopic": "分子生物學"
+  },
+  {
+    "id": "MOEX-113090-1301-Q083",
+    "primary_subject_exact": "生物化學",
+    "subtopic": "分子生物學"
+  },
+  {
+    "id": "MOEX-113090-1301-Q084",
+    "primary_subject_exact": "生物化學",
+    "subtopic": "分子生物學"
+  },
+  {
+    "id": "MOEX-113090-1301-Q087",
+    "primary_subject_exact": "生物化學",
+    "subtopic": "分子生物學"
+  },
+  {
+    "id": "MOEX-113090-1301-Q100",
+    "primary_subject_exact": "生物化學",
+    "subtopic": "分子生物學"
+  },
+  {
+    "id": "MOEX-114020-1301-Q078",
+    "primary_subject_exact": "生物化學",
+    "subtopic": "分子生物學"
+  },
+  {
+    "id": "MOEX-114020-1301-Q080",
+    "primary_subject_exact": "生物化學",
+    "subtopic": "分子生物學"
+  },
+  {
+    "id": "MOEX-114020-1301-Q081",
+    "primary_subject_exact": "生物化學",
+    "subtopic": "分子生物學"
+  },
+  {
+    "id": "MOEX-114020-1301-Q082",
+    "primary_subject_exact": "生物化學",
+    "subtopic": "分子生物學"
+  },
+  {
+    "id": "MOEX-114020-1301-Q084",
+    "primary_subject_exact": "生物化學",
+    "subtopic": "分子生物學"
+  },
+  {
+    "id": "MOEX-114020-1301-Q085",
+    "primary_subject_exact": "生物化學",
+    "subtopic": "分子生物學"
+  },
+  {
+    "id": "MOEX-114020-1301-Q086",
+    "primary_subject_exact": "生物化學",
+    "subtopic": "分子生物學"
+  },
+  {
+    "id": "MOEX-105100-5301-Q033",
+    "primary_subject_exact": "生物化學",
+    "subtopic": "能量代謝與粒線體"
+  },
+  {
+    "id": "MOEX-106100-1301-Q097",
+    "primary_subject_exact": "生物化學",
+    "subtopic": "蛋白質與酵素"
+  },
+  {
+    "id": "MOEX-107020-5301-Q092",
+    "primary_subject_exact": "生物化學",
+    "subtopic": "蛋白質與酵素"
+  },
+  {
+    "id": "MOEX-109100-1301-Q098",
+    "primary_subject_exact": "生理學",
+    "subtopic": "肌肉生理"
+  },
+  {
+    "id": "MOEX-110020-1301-Q047",
+    "primary_subject_exact": "生理學",
+    "subtopic": "肌肉生理"
+  },
+  {
+    "id": "MOEX-110020-1301-Q091",
+    "primary_subject_exact": "生物化學",
+    "subtopic": "生物化學總論"
+  },
+  {
+    "id": "MOEX-110101-1301-Q038",
+    "primary_subject_exact": "組織學",
+    "subtopic": "細胞與胞器"
+  },
+  {
+    "id": "MOEX-110101-1301-Q092",
+    "primary_subject_exact": "生物化學",
+    "subtopic": "細胞訊息與細胞生物學"
+  },
+  {
+    "id": "MOEX-110101-1301-Q094",
+    "primary_subject_exact": "生物化學",
+    "subtopic": "蛋白質與酵素"
+  },
+  {
+    "id": "MOEX-110101-1301-Q097",
+    "primary_subject_exact": "生物化學",
+    "subtopic": "能量代謝與粒線體"
+  },
+  {
+    "id": "MOEX-111020-1301-Q077",
+    "primary_subject_exact": "生物化學",
+    "subtopic": "分子生物學"
+  },
+  {
+    "id": "MOEX-111020-1301-Q088",
+    "primary_subject_exact": "生物化學",
+    "subtopic": "蛋白質與酵素"
+  },
+  {
+    "id": "MOEX-111100-1301-Q098",
+    "primary_subject_exact": "生物化學",
+    "subtopic": "生物化學總論"
+  },
+  {
+    "id": "MOEX-112100-1301-Q092",
+    "primary_subject_exact": "生物化學",
+    "subtopic": "細胞訊息與細胞生物學"
+  },
+  {
+    "id": "MOEX-112100-1301-Q096",
+    "primary_subject_exact": "生物化學",
+    "subtopic": "蛋白質與酵素"
+  },
+  {
+    "id": "MOEX-112100-1301-Q098",
+    "primary_subject_exact": "生物化學",
+    "subtopic": "細胞訊息與細胞生物學"
+  },
+  {
+    "id": "MOEX-113020-1301-Q047",
+    "primary_subject_exact": "生物化學",
+    "subtopic": "蛋白質與酵素"
+  },
+  {
+    "id": "MOEX-113020-1301-Q083",
+    "primary_subject_exact": "生物化學",
+    "subtopic": "分子生物學"
+  },
+  {
+    "id": "MOEX-113020-1301-Q096",
+    "primary_subject_exact": "生物化學",
+    "subtopic": "細胞訊息與細胞生物學"
+  },
+  {
+    "id": "MOEX-113090-1301-Q037",
+    "primary_subject_exact": "組織學",
+    "subtopic": "細胞與胞器"
+  },
+  {
+    "id": "MOEX-113090-1301-Q092",
+    "primary_subject_exact": "生物化學",
+    "subtopic": "細胞訊息與細胞生物學"
+  },
+  {
+    "id": "MOEX-113090-1301-Q099",
+    "primary_subject_exact": "生物化學",
+    "subtopic": "細胞訊息與細胞生物學"
+  },
+  {
+    "id": "MOEX-114020-1301-Q037",
+    "primary_subject_exact": "組織學",
+    "subtopic": "細胞與胞器"
+  },
+  {
+    "id": "MOEX-114020-1301-Q089",
+    "primary_subject_exact": "生物化學",
+    "subtopic": "細胞訊息與細胞生物學"
+  },
+  {
+    "id": "MOEX-114020-1301-Q090",
+    "primary_subject_exact": "生物化學",
+    "subtopic": "細胞訊息與細胞生物學"
+  },
+  {
+    "id": "MOEX-114020-1301-Q096",
+    "primary_subject_exact": "生物化學",
+    "subtopic": "細胞訊息與細胞生物學"
+  }
+]

@@ -6,6 +6,7 @@ import moexMed1MissingBatch1 from "@/data/sources/moex_med1_missing_batch1_10003
 import moexMed1MissingBatch2 from "@/data/sources/moex_med1_missing_batch2_109020_1301_detailed.json";
 import moexMed1MissingBatch3 from "@/data/sources/moex_med1_missing_batch3_112020_1301_detailed.json";
 import moexMed1ReclassifiedV5 from "@/data/sources/moex_med1_100_115_reclassified_v5.json";
+import moexMed1Requested149ReclassificationPatch from "@/data/sources/moex_med1_requested_149_reclassification_patch.json";
 import moexMedStage2Merged0013100 from "@/data/sources/moex_med_stage2_detailed_merged_001_3100_classified_v3.json";
 import questionMediaManifest from "@/data/sources/question_media_manifest.json";
 import type { OptionKey, Question, SubjectFilter, SubjectName } from "@/types/quiz";
@@ -623,14 +624,23 @@ type ClassificationOverride = {
   topicSection?: string;
 };
 
+type SimpleReclassificationPatchEntry = {
+  id: string;
+  primary_subject_exact: string;
+  subtopic?: string;
+};
+
 const med1ReclassifiedQuestionsRaw =
   (moexMed1ReclassifiedV5 as { questions: ReclassifiedQuestionRaw[] }).questions ?? [];
+
+const med1Requested149ReclassificationPatchRaw =
+  moexMed1Requested149ReclassificationPatch as readonly SimpleReclassificationPatchEntry[];
 
 type ClassificationOverrideEntry = readonly [string, ClassificationOverride];
 
 const med1ClassificationOverrideMap = new Map<string, ClassificationOverride>(
-  med1ReclassifiedQuestionsRaw
-    .flatMap((raw) => {
+  [
+    ...med1ReclassifiedQuestionsRaw.flatMap((raw) => {
       const explicitSubject =
         raw.classification_v5?.is_current_five_subject_applicable
           ? raw.classification_v5?.med1_current_five_subject || raw.classification_v5?.primary_subject
@@ -643,7 +653,18 @@ const med1ClassificationOverrideMap = new Map<string, ClassificationOverride>(
           topicSection: raw.classification_v5?.subtopic?.trim()
         }
       ] as const satisfies ClassificationOverrideEntry];
+    }),
+    ...med1Requested149ReclassificationPatchRaw.flatMap((raw) => {
+      if (!raw.primary_subject_exact?.trim()) return [];
+      return [[
+        raw.id,
+        {
+          subject: normalizeSubject(raw.primary_subject_exact),
+          topicSection: raw.subtopic?.trim()
+        }
+      ] as const satisfies ClassificationOverrideEntry];
     })
+  ]
 );
 
 med1ClassificationOverrideMap.set("MOEX-103100-1101-Q085", {
