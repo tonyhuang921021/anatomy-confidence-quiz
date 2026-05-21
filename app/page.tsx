@@ -63,6 +63,12 @@ export default function HomePage() {
               >
                 刷題榜
               </Link>
+              <Link
+                href="/search"
+                className="min-h-12 rounded-2xl bg-slate-100 px-5 py-4 text-center text-sm font-semibold text-slate-800 transition hover:bg-slate-200 active:scale-[0.99]"
+              >
+                題目搜尋
+              </Link>
             </div>
 
             <div className="mt-6 grid gap-3 sm:grid-cols-2">
