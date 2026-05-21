@@ -14,6 +14,7 @@ import {
   saveQuestionExplanationOverrides
 } from "@/lib/storage";
 import { getOrCreateVisitorId } from "@/lib/visitor";
+import { canonicalQuestionBank } from "@/data/med1QuestionBank";
 import { subjectRegistry } from "@/data/subjectRegistry";
 import { OptionKey, Question, QuestionExplanationOverride } from "@/types/quiz";
 
@@ -28,10 +29,7 @@ const SEARCHABLE_SUBJECTS = Object.values(subjectRegistry)
 
 const ALL_QUESTIONS = Array.from(
   new Map(
-    Object.values(subjectRegistry)
-      .filter((item) => item.enabled)
-      .flatMap((item) => item.questions)
-      .map((question) => [question.id, question] as const)
+    canonicalQuestionBank.map((question) => [question.id, question] as const)
   ).values()
 );
 

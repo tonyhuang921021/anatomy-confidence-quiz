@@ -818,163 +818,64 @@ const anatomyQuestionsWithOverrides: Question[] = anatomyQuestions
   .map(applyQuestionTextOverride)
   .map(applyQuestionMedia);
 
-export const allAnatomyQuestions: Question[] = dedupeQuestionBank([
-  ...anatomyQuestionsWithOverrides.filter((question) => question.subject === "解剖學"),
-  ...med1RemainingQuestions.filter((question) => question.subject === "解剖學"),
-  ...med1MissingQuestions.filter((question) => question.subject === "解剖學"),
-  ...med1MissingBatch1Questions.filter((question) => question.subject === "解剖學"),
-  ...med1MissingBatch2Questions.filter((question) => question.subject === "解剖學"),
-  ...med1MissingBatch3Questions.filter((question) => question.subject === "解剖學"),
-  ...med1RequestedPatchQuestions.filter((question) => question.subject === "解剖學"),
-  ...medStage2Questions.filter((question) => question.subject === "解剖學")
+const MED1_CANONICAL_SUBJECTS = new Set<SubjectName>([
+  "解剖學",
+  "組織學",
+  "胚胎學",
+  "生理學",
+  "生物化學",
+  "細胞生物學",
+  "分子生物學",
+  "其他醫學一"
 ]);
 
-const med1CoreQuestions: Question[] = dedupeQuestionBank([
-  ...allAnatomyQuestions,
-  ...med1RemainingQuestions.filter((question) => question.subject === "組織學"),
-  ...med1RemainingQuestions.filter((question) => question.subject === "胚胎學"),
-  ...med1RemainingQuestions.filter(
-    (question) => question.subject === "生理學" || question.subject === "生物化學"
-  ),
-  ...medStage2Questions.filter(
-    (question) => question.subject === "組織學" || question.subject === "胚胎學"
-  ),
-  ...medStage2Questions.filter(
-    (question) => question.subject === "生理學" || question.subject === "生物化學"
-  ),
-  ...med1MissingQuestions.filter((question) =>
-    ["組織學", "胚胎學", "生理學", "生物化學"].includes(question.subject)
-  ),
-  ...med1MissingBatch1Questions.filter((question) =>
-    ["組織學", "胚胎學", "生理學", "生物化學"].includes(question.subject)
-  ),
-  ...med1MissingBatch2Questions.filter((question) =>
-    ["組織學", "胚胎學", "生理學", "生物化學"].includes(question.subject)
-  ),
-  ...med1MissingBatch3Questions.filter((question) =>
-    ["組織學", "胚胎學", "生理學", "生物化學"].includes(question.subject)
-  ),
-  ...med1RequestedPatchQuestions.filter((question) =>
-    ["組織學", "胚胎學", "生理學", "生物化學"].includes(question.subject)
-  )
+const MED2_CANONICAL_SUBJECTS = new Set<SubjectName>([
+  "藥理學",
+  "病理學",
+  "微生物免疫學",
+  "寄生蟲學",
+  "公共衛生學"
 ]);
 
-const med2CoreQuestions: Question[] = dedupeQuestionBank([
-  ...anatomyQuestionsWithOverrides.filter((question) =>
-    ["藥理學", "病理學", "微生物免疫學", "寄生蟲學", "公共衛生學"].includes(question.subject)
-  ),
-  ...medStage2Questions.filter((question) =>
-    ["藥理學", "病理學", "微生物免疫學", "寄生蟲學", "公共衛生學"].includes(question.subject)
-  ),
-  ...med1RemainingQuestions.filter((question) =>
-    ["藥理學", "病理學", "微生物免疫學", "寄生蟲學", "公共衛生學"].includes(question.subject)
-  ),
-  ...med1MissingQuestions.filter((question) =>
-    ["藥理學", "病理學", "微生物免疫學", "寄生蟲學", "公共衛生學"].includes(question.subject)
-  ),
-  ...med1MissingBatch1Questions.filter((question) =>
-    ["藥理學", "病理學", "微生物免疫學", "寄生蟲學", "公共衛生學"].includes(question.subject)
-  ),
-  ...med1MissingBatch2Questions.filter((question) =>
-    ["藥理學", "病理學", "微生物免疫學", "寄生蟲學", "公共衛生學"].includes(question.subject)
-  ),
-  ...med1MissingBatch3Questions.filter((question) =>
-    ["藥理學", "病理學", "微生物免疫學", "寄生蟲學", "公共衛生學"].includes(question.subject)
-  ),
-  ...med1RequestedPatchQuestions.filter((question) =>
-    ["藥理學", "病理學", "微生物免疫學", "寄生蟲學", "公共衛生學"].includes(question.subject)
-  )
+export const canonicalQuestionBank: Question[] = dedupeQuestionBank([
+  ...anatomyQuestionsWithOverrides,
+  ...med1RemainingQuestions,
+  ...med1MissingQuestions,
+  ...med1MissingBatch1Questions,
+  ...med1MissingBatch2Questions,
+  ...med1MissingBatch3Questions,
+  ...med1RequestedPatchQuestions,
+  ...medStage2Questions
 ]);
+
+export const allAnatomyQuestions: Question[] = canonicalQuestionBank.filter(
+  (question) => question.subject === "解剖學"
+);
+
+const med1CoreQuestions: Question[] = canonicalQuestionBank.filter((question) =>
+  MED1_CANONICAL_SUBJECTS.has(question.subject)
+);
+
+const med2CoreQuestions: Question[] = canonicalQuestionBank.filter((question) =>
+  MED2_CANONICAL_SUBJECTS.has(question.subject)
+);
 
 export const med1QuestionsBySubject: Record<SubjectName, Question[]> = {
   "醫學（一）": med1CoreQuestions,
   "醫學（二）": med2CoreQuestions,
   "解剖學": allAnatomyQuestions,
-  "生理學": dedupeQuestionBank([
-    ...med1RemainingQuestions.filter((question) => question.subject === "生理學"),
-    ...med1MissingQuestions.filter((question) => question.subject === "生理學"),
-    ...med1MissingBatch1Questions.filter((question) => question.subject === "生理學"),
-    ...med1MissingBatch2Questions.filter((question) => question.subject === "生理學"),
-    ...med1MissingBatch3Questions.filter((question) => question.subject === "生理學"),
-    ...med1RequestedPatchQuestions.filter((question) => question.subject === "生理學"),
-    ...medStage2Questions.filter((question) => question.subject === "生理學")
-  ]),
-  "生物化學": dedupeQuestionBank([
-    ...med1RemainingQuestions.filter((question) => question.subject === "生物化學"),
-    ...med1MissingQuestions.filter((question) => question.subject === "生物化學"),
-    ...med1MissingBatch1Questions.filter((question) => question.subject === "生物化學"),
-    ...med1MissingBatch2Questions.filter((question) => question.subject === "生物化學"),
-    ...med1MissingBatch3Questions.filter((question) => question.subject === "生物化學"),
-    ...med1RequestedPatchQuestions.filter((question) => question.subject === "生物化學"),
-    ...medStage2Questions.filter((question) => question.subject === "生物化學")
-  ]),
-  "藥理學": dedupeQuestionBank([
-    ...med1RemainingQuestions.filter((question) => question.subject === "藥理學"),
-    ...med1MissingQuestions.filter((question) => question.subject === "藥理學"),
-    ...med1MissingBatch1Questions.filter((question) => question.subject === "藥理學"),
-    ...med1MissingBatch2Questions.filter((question) => question.subject === "藥理學"),
-    ...med1MissingBatch3Questions.filter((question) => question.subject === "藥理學"),
-    ...med1RequestedPatchQuestions.filter((question) => question.subject === "藥理學"),
-    ...medStage2Questions.filter((question) => question.subject === "藥理學")
-  ]),
-  "病理學": dedupeQuestionBank([
-    ...med1RemainingQuestions.filter((question) => question.subject === "病理學"),
-    ...med1MissingQuestions.filter((question) => question.subject === "病理學"),
-    ...med1MissingBatch1Questions.filter((question) => question.subject === "病理學"),
-    ...med1MissingBatch2Questions.filter((question) => question.subject === "病理學"),
-    ...med1MissingBatch3Questions.filter((question) => question.subject === "病理學"),
-    ...med1RequestedPatchQuestions.filter((question) => question.subject === "病理學"),
-    ...medStage2Questions.filter((question) => question.subject === "病理學")
-  ]),
-  "微生物免疫學": dedupeQuestionBank([
-    ...med1RemainingQuestions.filter((question) => question.subject === "微生物免疫學"),
-    ...med1MissingQuestions.filter((question) => question.subject === "微生物免疫學"),
-    ...med1MissingBatch1Questions.filter((question) => question.subject === "微生物免疫學"),
-    ...med1MissingBatch2Questions.filter((question) => question.subject === "微生物免疫學"),
-    ...med1MissingBatch3Questions.filter((question) => question.subject === "微生物免疫學"),
-    ...med1RequestedPatchQuestions.filter((question) => question.subject === "微生物免疫學"),
-    ...medStage2Questions.filter((question) => question.subject === "微生物免疫學")
-  ]),
-  "胚胎學": dedupeQuestionBank([
-    ...med1RemainingQuestions.filter((question) => question.subject === "胚胎學"),
-    ...med1MissingQuestions.filter((question) => question.subject === "胚胎學"),
-    ...med1MissingBatch1Questions.filter((question) => question.subject === "胚胎學"),
-    ...med1MissingBatch2Questions.filter((question) => question.subject === "胚胎學"),
-    ...med1MissingBatch3Questions.filter((question) => question.subject === "胚胎學"),
-    ...med1RequestedPatchQuestions.filter((question) => question.subject === "胚胎學"),
-    ...medStage2Questions.filter((question) => question.subject === "胚胎學")
-  ]),
-  "組織學": dedupeQuestionBank([
-    ...med1RemainingQuestions.filter((question) => question.subject === "組織學"),
-    ...med1MissingQuestions.filter((question) => question.subject === "組織學"),
-    ...med1MissingBatch1Questions.filter((question) => question.subject === "組織學"),
-    ...med1MissingBatch2Questions.filter((question) => question.subject === "組織學"),
-    ...med1MissingBatch3Questions.filter((question) => question.subject === "組織學"),
-    ...med1RequestedPatchQuestions.filter((question) => question.subject === "組織學"),
-    ...medStage2Questions.filter((question) => question.subject === "組織學")
-  ]),
-  "寄生蟲學": dedupeQuestionBank([
-    ...med1RemainingQuestions.filter((question) => question.subject === "寄生蟲學"),
-    ...med1MissingQuestions.filter((question) => question.subject === "寄生蟲學"),
-    ...med1MissingBatch1Questions.filter((question) => question.subject === "寄生蟲學"),
-    ...med1MissingBatch2Questions.filter((question) => question.subject === "寄生蟲學"),
-    ...med1MissingBatch3Questions.filter((question) => question.subject === "寄生蟲學"),
-    ...med1RequestedPatchQuestions.filter((question) => question.subject === "寄生蟲學"),
-    ...medStage2Questions.filter((question) => question.subject === "寄生蟲學")
-  ]),
-  "公共衛生學": dedupeQuestionBank([
-    ...anatomyQuestionsWithOverrides.filter((question) => question.subject === "公共衛生學"),
-    ...med1RemainingQuestions.filter((question) => question.subject === "公共衛生學"),
-    ...med1MissingQuestions.filter((question) => question.subject === "公共衛生學"),
-    ...med1MissingBatch1Questions.filter((question) => question.subject === "公共衛生學"),
-    ...med1MissingBatch2Questions.filter((question) => question.subject === "公共衛生學"),
-    ...med1MissingBatch3Questions.filter((question) => question.subject === "公共衛生學"),
-    ...med1RequestedPatchQuestions.filter((question) => question.subject === "公共衛生學"),
-    ...medStage2Questions.filter((question) => question.subject === "公共衛生學")
-  ]),
-  "細胞生物學": med1RemainingQuestions.filter((question) => question.subject === "細胞生物學"),
-  "分子生物學": med1RemainingQuestions.filter((question) => question.subject === "分子生物學"),
-  "其他醫學一": med1RemainingQuestions.filter((question) => question.subject === "其他醫學一")
+  "生理學": canonicalQuestionBank.filter((question) => question.subject === "生理學"),
+  "生物化學": canonicalQuestionBank.filter((question) => question.subject === "生物化學"),
+  "藥理學": canonicalQuestionBank.filter((question) => question.subject === "藥理學"),
+  "病理學": canonicalQuestionBank.filter((question) => question.subject === "病理學"),
+  "微生物免疫學": canonicalQuestionBank.filter((question) => question.subject === "微生物免疫學"),
+  "胚胎學": canonicalQuestionBank.filter((question) => question.subject === "胚胎學"),
+  "組織學": canonicalQuestionBank.filter((question) => question.subject === "組織學"),
+  "寄生蟲學": canonicalQuestionBank.filter((question) => question.subject === "寄生蟲學"),
+  "公共衛生學": canonicalQuestionBank.filter((question) => question.subject === "公共衛生學"),
+  "細胞生物學": canonicalQuestionBank.filter((question) => question.subject === "細胞生物學"),
+  "分子生物學": canonicalQuestionBank.filter((question) => question.subject === "分子生物學"),
+  "其他醫學一": canonicalQuestionBank.filter((question) => question.subject === "其他醫學一")
 };
 
 function buildOutline(questions: Question[]): SubjectOutlineEntry[] {
@@ -1083,7 +984,10 @@ function getQuestionRichnessScore(question: Question) {
     (question.reviewFlags?.includes("requested_supplement_patch") ? 140 : 0) +
     (question.reviewFlags?.includes("missing_question_filled_v5") ? 80 : 0) +
     (question.answerCreditType === "all_credit" ? 25 : 0) +
-    (question.answerCreditType === "multiple_accepted" ? 20 : 0) +
+    (question.answerCreditType === "multiple_accepted" ||
+    question.answerCreditType === "multiple_answers"
+      ? 20
+      : 0) +
     (question.needsHumanReview ? 10 : 0) +
     Math.min(question.explanation.length, 400) +
     Object.keys(question.optionAnalysis ?? {}).length * 25 +
@@ -1099,19 +1003,9 @@ function selectBestQuestionVariant(candidates: Question[]) {
 }
 
 function buildWholePastPaperBank() {
-  const allMoexQuestions = uniqueById(
-    [
-      ...allAnatomyQuestions,
-      ...med1RemainingQuestions,
-      ...med1MissingQuestions,
-      ...med1MissingBatch1Questions,
-      ...med1MissingBatch2Questions,
-      ...med1MissingBatch3Questions,
-      ...med2CoreQuestions
-    ]
-      .filter((question) => question.sourceType === "MOEX_PAST_EXAM")
-      .map(fillPastPaperMetadata)
-  );
+  const allMoexQuestions = canonicalQuestionBank
+    .filter((question) => question.sourceType === "MOEX_PAST_EXAM")
+    .map(fillPastPaperMetadata);
   const grouped = new Map<string, Question[]>();
 
   allMoexQuestions.forEach((question) => {
