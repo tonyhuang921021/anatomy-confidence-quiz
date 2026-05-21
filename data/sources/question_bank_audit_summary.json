@@ -1,0 +1,94 @@
+{
+  "unique_question_count": 6010,
+  "duplicate_source_count": 142,
+  "duplicate_examples": {
+    "MOEX-100140-1101-Q051": [
+      "anatomyQuestions.ts",
+      "moex_med1_remaining_detailed_v4_merged_001_1827.ts",
+      "moex_med1_requested_71_questions_detailed_patch_v5.ts"
+    ],
+    "MOEX-100140-1101-Q076": [
+      "anatomyQuestions.ts",
+      "moex_med1_remaining_detailed_v4_merged_001_1827.ts",
+      "moex_med1_requested_71_questions_detailed_patch_v5.ts"
+    ],
+    "MOEX-100140-1101-Q086": [
+      "anatomyQuestions.ts",
+      "moex_med1_remaining_detailed_v4_merged_001_1827.ts",
+      "moex_med1_requested_71_questions_detailed_patch_v5.ts"
+    ],
+    "MOEX-100140-1101-Q087": [
+      "anatomyQuestions.ts",
+      "moex_med1_remaining_detailed_v4_merged_001_1827.ts"
+    ],
+    "MOEX-100140-1101-Q091": [
+      "anatomyQuestions.ts",
+      "moex_med1_remaining_detailed_v4_merged_001_1827.ts",
+      "moex_med1_requested_71_questions_detailed_patch_v5.ts"
+    ],
+    "MOEX-101030-1101-Q089": [
+      "anatomyQuestions.ts",
+      "moex_med1_remaining_detailed_v4_merged_001_1827.ts"
+    ],
+    "MOEX-101030-1101-Q090": [
+      "anatomyQuestions.ts",
+      "moex_med1_remaining_detailed_v4_merged_001_1827.ts"
+    ],
+    "MOEX-101030-1101-Q093": [
+      "anatomyQuestions.ts",
+      "moex_med1_remaining_detailed_v4_merged_001_1827.ts"
+    ],
+    "MOEX-101030-1101-Q095": [
+      "anatomyQuestions.ts",
+      "moex_med1_remaining_detailed_v4_merged_001_1827.ts"
+    ],
+    "MOEX-101030-1101-Q098": [
+      "anatomyQuestions.ts",
+      "moex_med1_remaining_detailed_v4_merged_001_1827.ts"
+    ],
+    "MOEX-101030-1101-Q100": [
+      "anatomyQuestions.ts",
+      "moex_med1_remaining_detailed_v4_merged_001_1827.ts"
+    ],
+    "MOEX-101110-1101-Q089": [
+      "anatomyQuestions.ts",
+      "moex_med1_remaining_detailed_v4_merged_001_1827.ts"
+    ],
+    "MOEX-101110-1101-Q096": [
+      "anatomyQuestions.ts",
+      "moex_med1_remaining_detailed_v4_merged_001_1827.ts"
+    ],
+    "MOEX-102030-1101-Q051": [
+      "anatomyQuestions.ts",
+      "moex_med1_remaining_detailed_v4_merged_001_1827.ts"
+    ],
+    "MOEX-102030-1101-Q084": [
+      "anatomyQuestions.ts",
+      "moex_med1_remaining_detailed_v4_merged_001_1827.ts"
+    ],
+    "MOEX-104030-1101-Q095": [
+      "anatomyQuestions.ts",
+      "moex_med1_remaining_detailed_v4_merged_001_1827.ts"
+    ],
+    "MOEX-104090-5301-Q090": [
+      "anatomyQuestions.ts",
+      "moex_med1_remaining_detailed_v4_merged_001_1827.ts"
+    ],
+    "MOEX-105020-5301-Q089": [
+      "anatomyQuestions.ts",
+      "moex_med1_remaining_detailed_v4_merged_001_1827.ts"
+    ],
+    "MOEX-105100-5301-Q020": [
+      "anatomyQuestions.ts",
+      "moex_med1_remaining_detailed_v4_merged_001_1827.ts"
+    ],
+    "MOEX-105100-5301-Q032": [
+      "anatomyQuestions.ts",
+      "moex_med1_remaining_detailed_v4_merged_001_1827.ts"
+    ]
+  },
+  "paper_count": 61,
+  "incomplete_paper_count": 21,
+  "year_count": 16,
+  "incomplete_year_count": 14
+}
