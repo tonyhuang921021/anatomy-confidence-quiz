@@ -491,18 +491,57 @@ async function refreshQuestionAccuracyStats(questionIds: string[]) {
 }
 
 async function refreshAggregatedStatsViaApi(sessions: QuizSession[]) {
+  const attemptRows = buildQuestionAttemptLogRows(sessions);
   const questionIds = Array.from(
-    new Set(sessions.flatMap((session) => session.attempts.map((attempt) => attempt.questionId)))
+    new Set(attemptRows.map((attempt) => attempt.question_id))
   );
   const activityDates = Array.from(
-    new Set(
-      sessions.flatMap((session) =>
-        session.attempts.map((attempt) => getTaipeiDayKey(new Date(attempt.answeredAt)))
-      )
-    )
+    new Set(attemptRows.map((attempt) => getTaipeiDayKey(new Date(attempt.answered_at))))
   );
+  const visitorId = getVisitorId();
+  const timestamps = attemptRows.map((attempt) => attempt.answered_at).sort((a, b) => a.localeCompare(b));
+  const deviceRow =
+    visitorId && timestamps.length > 0
+      ? {
+          visitor_id: visitorId,
+          first_attempt_at: timestamps[0],
+          last_attempt_at: timestamps[timestamps.length - 1]
+        }
+      : null;
+  const deviceDailyGrouped = new Map<string, { first: string; last: string }>();
 
-  if (questionIds.length === 0 && activityDates.length === 0) return;
+  for (const timestamp of timestamps) {
+    const dayKey = getTaipeiDayKey(new Date(timestamp));
+    const current = deviceDailyGrouped.get(dayKey);
+    if (!current) {
+      deviceDailyGrouped.set(dayKey, { first: timestamp, last: timestamp });
+      continue;
+    }
+    deviceDailyGrouped.set(dayKey, {
+      first: current.first < timestamp ? current.first : timestamp,
+      last: current.last > timestamp ? current.last : timestamp
+    });
+  }
+
+  const deviceDailyRows =
+    visitorId
+      ? Array.from(deviceDailyGrouped.entries()).map(([activity_date, value]) => ({
+          visitor_id: visitorId,
+          activity_date,
+          first_attempt_at: value.first,
+          last_attempt_at: value.last
+        }))
+      : [];
+
+  if (
+    questionIds.length === 0 &&
+    activityDates.length === 0 &&
+    attemptRows.length === 0 &&
+    !deviceRow &&
+    deviceDailyRows.length === 0
+  ) {
+    return;
+  }
 
   const response = await fetch("/api/stats-sync", {
     method: "POST",
@@ -510,6 +549,9 @@ async function refreshAggregatedStatsViaApi(sessions: QuizSession[]) {
       "Content-Type": "application/json"
     },
     body: JSON.stringify({
+      attemptRows,
+      deviceRow,
+      deviceDailyRows,
       questionIds,
       activityDates
     })
@@ -524,9 +566,6 @@ async function refreshAggregatedStatsViaApi(sessions: QuizSession[]) {
 async function syncQuestionStatsForSessions(sessions: QuizSession[]) {
   if (sessions.length === 0) return;
 
-  await upsertQuestionAttemptLogs(sessions);
-  await upsertQuestionAttemptDevice(sessions);
-  await upsertQuestionAttemptDeviceDaily(sessions);
   await refreshAggregatedStatsViaApi(sessions);
 }
 

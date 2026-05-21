@@ -4,6 +4,25 @@ import { createClient } from "@supabase/supabase-js";
 type StatsSyncBody = {
   questionIds?: string[];
   activityDates?: string[];
+  attemptRows?: {
+    session_id: string;
+    question_id: string;
+    visitor_id?: string | null;
+    is_correct: boolean;
+    answered_at: string;
+    source_mode?: string | null;
+  }[];
+  deviceRow?: {
+    visitor_id: string;
+    first_attempt_at: string;
+    last_attempt_at: string;
+  } | null;
+  deviceDailyRows?: {
+    visitor_id: string;
+    activity_date: string;
+    first_attempt_at: string;
+    last_attempt_at: string;
+  }[];
 };
 
 type QuestionAttemptLogRow = {
@@ -86,6 +105,50 @@ async function refreshQuestionAccuracyStats(
   if (upsertError) throw upsertError;
 }
 
+async function upsertAttemptRows(
+  supabase: any,
+  rows: NonNullable<StatsSyncBody["attemptRows"]>
+) {
+  if (rows.length === 0) return;
+
+  const { error } = await supabase
+    .from("question_attempt_logs")
+    .upsert(rows as any, { onConflict: "session_id,question_id" });
+
+  if (!error) return;
+
+  const fallbackRows = rows.map(({ visitor_id, ...rest }) => rest);
+  const { error: fallbackError } = await supabase
+    .from("question_attempt_logs")
+    .upsert(fallbackRows as any, { onConflict: "session_id,question_id" });
+
+  if (fallbackError) throw fallbackError;
+}
+
+async function upsertAttemptDevice(
+  supabase: any,
+  row: NonNullable<StatsSyncBody["deviceRow"]>
+) {
+  const { error } = await supabase
+    .from("question_attempt_devices")
+    .upsert(row as any, { onConflict: "visitor_id" });
+
+  if (error) throw error;
+}
+
+async function upsertAttemptDeviceDaily(
+  supabase: any,
+  rows: NonNullable<StatsSyncBody["deviceDailyRows"]>
+) {
+  if (rows.length === 0) return;
+
+  const { error } = await supabase
+    .from("question_attempt_device_daily")
+    .upsert(rows as any, { onConflict: "visitor_id,activity_date" });
+
+  if (error) throw error;
+}
+
 async function refreshOwnerDailyStats(
   supabase: any,
   activityDates: string[]
@@ -152,6 +215,11 @@ export async function POST(request: NextRequest) {
 
   try {
     const body = (await request.json()) as StatsSyncBody;
+    await Promise.all([
+      upsertAttemptRows(supabase, body.attemptRows ?? []),
+      body.deviceRow ? upsertAttemptDevice(supabase, body.deviceRow) : Promise.resolve(),
+      upsertAttemptDeviceDaily(supabase, body.deviceDailyRows ?? [])
+    ]);
     await Promise.all([
       refreshQuestionAccuracyStats(supabase, body.questionIds ?? []),
       refreshOwnerDailyStats(supabase, body.activityDates ?? [])
