@@ -622,6 +622,84 @@ function shuffle<T>(items: T[]) {
   return [...items].sort(() => Math.random() - 0.5);
 }
 
+function normalizeStemForGrouping(stem: string) {
+  return stem.replace(/\s+/g, "").trim();
+}
+
+function isFollowUpStem(stem: string) {
+  const normalized = normalizeStemForGrouping(stem);
+  return normalized.startsWith("承上題");
+}
+
+function getFollowUpClusterMap(questions: Question[]) {
+  const clusterByQuestionId = new Map<string, { key: string; order: number }>();
+
+  const grouped = new Map<string, Question[]>();
+  questions.forEach((question) => {
+    if (!question.examCode || !question.paperCode || !question.originalQuestionNumber) return;
+    const paperKey = `${question.examCode}-${question.paperCode}`;
+    const bucket = grouped.get(paperKey) ?? [];
+    bucket.push(question);
+    grouped.set(paperKey, bucket);
+  });
+
+  grouped.forEach((paperQuestions, paperKey) => {
+    const sorted = [...paperQuestions].sort(
+      (left, right) => (left.originalQuestionNumber ?? 0) - (right.originalQuestionNumber ?? 0)
+    );
+
+    let currentClusterKey: string | null = null;
+    let currentClusterOrder = 0;
+
+    sorted.forEach((question) => {
+      const questionNumber = question.originalQuestionNumber ?? 0;
+      if (!isFollowUpStem(question.stem)) {
+        currentClusterKey = `${paperKey}-${questionNumber}`;
+        currentClusterOrder = 0;
+        clusterByQuestionId.set(question.id, {
+          key: currentClusterKey,
+          order: currentClusterOrder
+        });
+        return;
+      }
+
+      if (!currentClusterKey) {
+        currentClusterKey = `${paperKey}-${questionNumber}`;
+        currentClusterOrder = 0;
+      } else {
+        currentClusterOrder += 1;
+      }
+
+      clusterByQuestionId.set(question.id, {
+        key: currentClusterKey,
+        order: currentClusterOrder
+      });
+    });
+  });
+
+  return clusterByQuestionId;
+}
+
+function keepFollowUpQuestionsTogether(questionIds: string[], questionMap: Map<string, Question>) {
+  if (questionIds.length <= 1) return questionIds;
+
+  const clusterMap = getFollowUpClusterMap(
+    questionIds.map((id) => questionMap.get(id)).filter((question): question is Question => Boolean(question))
+  );
+
+  return [...questionIds].sort((leftId, rightId) => {
+    const leftCluster = clusterMap.get(leftId);
+    const rightCluster = clusterMap.get(rightId);
+
+    if (!leftCluster && !rightCluster) return 0;
+    if (!leftCluster) return 1;
+    if (!rightCluster) return -1;
+
+    if (leftCluster.key !== rightCluster.key) return 0;
+    return leftCluster.order - rightCluster.order;
+  });
+}
+
 function getPrioritizedFreshPool(
   questions: Question[],
   allSessions: { attempts: Attempt[] }[]
@@ -750,11 +828,15 @@ export function createQuestionOrder(
 
   const count = normalizeQuestionCount(settings.questionCount, sourcePool.length);
   const scored = buildQuestionScoreMap(sourcePool, allSessions, settings);
+  const sourceQuestionMap = new Map(sourcePool.map((question) => [question.id, question] as const));
 
   if (settings.mode === "random") {
-    return getPrioritizedFreshPool(sourcePool, allSessions)
+    return keepFollowUpQuestionsTogether(
+      getPrioritizedFreshPool(sourcePool, allSessions)
       .slice(0, count)
-      .map((question) => question.id);
+      .map((question) => question.id),
+      sourceQuestionMap
+    );
   }
 
   if (settings.mode === "simulation") {
@@ -763,7 +845,10 @@ export function createQuestionOrder(
         ? sourcePool
         : shuffle(sourcePool);
 
-    return simulationPool.slice(0, count).map((question) => question.id);
+    return keepFollowUpQuestionsTogether(
+      simulationPool.slice(0, count).map((question) => question.id),
+      sourceQuestionMap
+    );
   }
 
   if (settings.mode === "review") {
@@ -775,16 +860,22 @@ export function createQuestionOrder(
       .filter((item) => !reviewFirst.some((reviewItem) => reviewItem.question.id === item.question.id))
       .sort((a, b) => b.score - a.score);
 
-    return [...diversifyBySection(reviewFirst, count, 3), ...diversifyBySection(fallback, count, 3)]
-      .slice(0, count)
-      .map((item) => item.question.id);
+    return keepFollowUpQuestionsTogether(
+      [...diversifyBySection(reviewFirst, count, 3), ...diversifyBySection(fallback, count, 3)]
+        .slice(0, count)
+        .map((item) => item.question.id),
+      sourceQuestionMap
+    );
   }
 
-  return diversifyBySection(
-    scored.sort((a, b) => b.score - a.score),
-    count,
-    4
-  ).map((item) => item.question.id);
+  return keepFollowUpQuestionsTogether(
+    diversifyBySection(
+      scored.sort((a, b) => b.score - a.score),
+      count,
+      4
+    ).map((item) => item.question.id),
+    sourceQuestionMap
+  );
 }
 
 export function getReviewQuestionItems(
