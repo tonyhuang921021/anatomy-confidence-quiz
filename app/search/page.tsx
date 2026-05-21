@@ -11,10 +11,7 @@ const SEARCHABLE_SUBJECTS = Object.values(subjectRegistry)
     (item) =>
       item.enabled &&
       item.subject !== "醫學（一）" &&
-      item.subject !== "醫學（二）" &&
-      item.subject !== "細胞生物學" &&
-      item.subject !== "分子生物學" &&
-      item.subject !== "其他醫學一"
+      item.subject !== "醫學（二）"
   )
   .sort((left, right) => left.label.localeCompare(right.label, "zh-Hant"));
 
