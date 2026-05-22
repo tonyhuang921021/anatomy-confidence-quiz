@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import { useAuth } from "@/components/AuthProvider";
 import {
+  OwnerClassificationReportEntry,
   OwnerDailyPoint,
   OwnerDashboardStats,
   OwnerExplanationUsageEntry,
@@ -32,6 +33,7 @@ type OwnerApiPayload = {
   hourlySeries?: OwnerHourlyPoint[];
   explanationUsage?: OwnerExplanationUsageEntry[];
   topVisitors?: OwnerTopAttemptVisitorEntry[];
+  classificationReports?: OwnerClassificationReportEntry[];
 };
 
 function formatUpdatedAt(value: string) {
@@ -168,6 +170,7 @@ export default function OwnerPage() {
   const [hourlySeries, setHourlySeries] = useState<OwnerHourlyPoint[]>([]);
   const [explanationUsage, setExplanationUsage] = useState<OwnerExplanationUsageEntry[]>([]);
   const [topVisitors, setTopVisitors] = useState<OwnerTopAttemptVisitorEntry[]>([]);
+  const [classificationReports, setClassificationReports] = useState<OwnerClassificationReportEntry[]>([]);
   const [statsLoading, setStatsLoading] = useState(true);
   const [error, setError] = useState("");
   const allowed = useMemo(() => isAllowedEmail(user?.email), [user?.email]);
@@ -208,6 +211,7 @@ export default function OwnerPage() {
         setHourlySeries(payload.hourlySeries ?? []);
         setExplanationUsage(payload.explanationUsage ?? []);
         setTopVisitors(payload.topVisitors ?? []);
+        setClassificationReports(payload.classificationReports ?? []);
       } catch (fetchError) {
         setError(fetchError instanceof Error ? fetchError.message : "數據載入失敗");
       } finally {
@@ -229,6 +233,7 @@ export default function OwnerPage() {
         setHourlySeries(payload.hourlySeries ?? []);
         setExplanationUsage(payload.explanationUsage ?? []);
         setTopVisitors(payload.topVisitors ?? []);
+        setClassificationReports(payload.classificationReports ?? []);
       } catch {
         // keep existing view
       }
@@ -512,6 +517,63 @@ export default function OwnerPage() {
                     )}
                   </tbody>
                 </table>
+              </div>
+            </section>
+
+            <section className="rounded-[2rem] bg-white p-6 shadow-card ring-1 ring-slate-100">
+              <div className="flex items-center justify-between gap-3">
+                <div>
+                  <h2 className="text-lg font-semibold text-ink">分類更動回報</h2>
+                  <p className="mt-2 text-sm text-slate-500">看誰回報了哪一題分類有問題，以及 AI 建議改分到哪裡。</p>
+                </div>
+                <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-700">
+                  {classificationReports.length} 筆
+                </span>
+              </div>
+              <div className="mt-4 grid gap-3">
+                {classificationReports.length === 0 ? (
+                  <div className="rounded-2xl bg-slate-50 p-4 text-sm text-slate-500">
+                    目前還沒有分類更動回報。
+                  </div>
+                ) : (
+                  classificationReports.map((report) => (
+                    <article key={report.id} className="rounded-3xl border border-slate-200 bg-slate-50 p-4">
+                      <div className="flex flex-wrap items-start justify-between gap-3">
+                        <div className="min-w-0">
+                          <p className="text-sm font-semibold text-ink">{report.questionId}</p>
+                          <p className="mt-1 text-xs text-slate-500">
+                            回報者：{report.reporterLabel} ・ {formatUpdatedAt(report.createdAt)}
+                          </p>
+                        </div>
+                        {report.model ? (
+                          <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-700">
+                            {report.model}
+                          </span>
+                        ) : null}
+                      </div>
+                      <div className="mt-3 grid gap-2 text-sm text-slate-700">
+                        <p>
+                          <span className="font-semibold">目前分類：</span>
+                          {report.currentSubject}
+                          {report.currentChapter ? ` / ${report.currentChapter}` : ""}
+                          {report.currentSection ? ` / ${report.currentSection}` : ""}
+                        </p>
+                        <p>
+                          <span className="font-semibold">AI 建議：</span>
+                          {report.suggestedSubject ?? "未判定"}
+                          {report.suggestedChapter ? ` / ${report.suggestedChapter}` : ""}
+                          {report.suggestedSection ? ` / ${report.suggestedSection}` : ""}
+                        </p>
+                        {report.reason ? (
+                          <p>
+                            <span className="font-semibold">原因：</span>
+                            {report.reason}
+                          </p>
+                        ) : null}
+                      </div>
+                    </article>
+                  ))
+                )}
               </div>
             </section>
 

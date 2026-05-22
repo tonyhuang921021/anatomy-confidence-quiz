@@ -50,6 +50,7 @@ function normalizeErrorType(errorType?: string): ErrorType | undefined {
     case "背錯":
     case "兩選項猶豫":
     case "忘記了":
+    case "沒學過":
     case "完全沒印象":
     case "看錯題目 / 粗心":
       return errorType;

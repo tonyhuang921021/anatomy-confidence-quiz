@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 import type {
+  OwnerClassificationReportEntry,
   OwnerDailyPoint,
   OwnerDashboardStats,
   OwnerExplanationUsageEntry,
@@ -30,6 +31,22 @@ type AIExplanationUsageLogRow = {
   output_tokens?: number | null;
   total_tokens?: number | null;
   used_at: string;
+};
+
+type ClassificationReportRow = {
+  id: string | number;
+  question_id: string;
+  current_subject: string;
+  current_chapter?: string | null;
+  current_section?: string | null;
+  suggested_subject?: string | null;
+  suggested_chapter?: string | null;
+  suggested_section?: string | null;
+  reason?: string | null;
+  model?: string | null;
+  reporter_email?: string | null;
+  visitor_id?: string | null;
+  created_at: string;
 };
 
 const SUPABASE_PAGE_SIZE = 1000;
@@ -366,6 +383,38 @@ async function fetchOwnerDashboardStats(
   };
 }
 
+async function fetchOwnerClassificationReports(
+  supabase: any,
+  limit = 40
+): Promise<OwnerClassificationReportEntry[]> {
+  const { data, error } = await supabase
+    .from("question_classification_reports")
+    .select(
+      "id, question_id, current_subject, current_chapter, current_section, suggested_subject, suggested_chapter, suggested_section, reason, model, reporter_email, visitor_id, created_at"
+    )
+    .order("created_at", { ascending: false })
+    .limit(limit);
+
+  if (error) throw error;
+
+  return ((data ?? []) as ClassificationReportRow[]).map((row) => ({
+    id: String(row.id),
+    questionId: row.question_id,
+    currentSubject: row.current_subject,
+    currentChapter: row.current_chapter ?? undefined,
+    currentSection: row.current_section ?? undefined,
+    suggestedSubject: row.suggested_subject ?? undefined,
+    suggestedChapter: row.suggested_chapter ?? undefined,
+    suggestedSection: row.suggested_section ?? undefined,
+    reason: row.reason ?? undefined,
+    model: row.model ?? undefined,
+    reporterLabel: row.reporter_email?.trim() || formatVisitorLabel(row.visitor_id),
+    reporterEmail: row.reporter_email ?? undefined,
+    visitorId: row.visitor_id ?? undefined,
+    createdAt: row.created_at
+  }));
+}
+
 export async function POST(request: NextRequest) {
   const supabase = getServiceSupabaseClient();
   if (!supabase) {
@@ -390,11 +439,12 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ ok: false, message: "你沒有查看私有數據頁的權限。" }, { status: 403 });
     }
 
-    const [dailySeries, hourlySeries, explanationUsage, topVisitors] = await Promise.all([
+    const [dailySeries, hourlySeries, explanationUsage, topVisitors, classificationReports] = await Promise.all([
       fetchOwnerDailySeries(supabase, 14),
       fetchOwnerHourlySeries(supabase),
       fetchOwnerExplanationUsage(supabase),
-      fetchOwnerTopAttemptVisitors(supabase, 5)
+      fetchOwnerTopAttemptVisitors(supabase, 5),
+      fetchOwnerClassificationReports(supabase, 40)
     ]);
     const stats = await fetchOwnerDashboardStats(supabase, dailySeries, explanationUsage);
 
@@ -404,7 +454,8 @@ export async function POST(request: NextRequest) {
       dailySeries,
       hourlySeries,
       explanationUsage,
-      topVisitors
+      topVisitors,
+      classificationReports
     });
   } catch (error) {
     const message = error instanceof Error ? error.message : "私有數據載入失敗";

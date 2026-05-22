@@ -113,6 +113,8 @@ export default function SearchPage() {
   const [explanationOverrides, setExplanationOverrides] = useState<Record<string, QuestionExplanationOverride>>({});
   const [explanationLoadingMap, setExplanationLoadingMap] = useState<Record<string, boolean>>({});
   const [explanationErrorMap, setExplanationErrorMap] = useState<Record<string, string>>({});
+  const [classificationReportLoadingMap, setClassificationReportLoadingMap] = useState<Record<string, boolean>>({});
+  const [classificationReportMessageMap, setClassificationReportMessageMap] = useState<Record<string, string>>({});
 
   const normalizedKeyword = normalizeSearchText(keyword);
   const compactKeyword = compactSearchText(keyword);
@@ -239,6 +241,73 @@ export default function SearchPage() {
       }));
     } finally {
       setExplanationLoadingMap((current) => ({ ...current, [question.id]: false }));
+    }
+  }
+
+  async function handleReportClassification(question: Question) {
+    setClassificationReportLoadingMap((current) => ({ ...current, [question.id]: true }));
+    setClassificationReportMessageMap((current) => ({ ...current, [question.id]: "" }));
+
+    try {
+      const response = await fetch("/api/question-classification-report", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          visitorId: getOrCreateVisitorId(),
+          accessToken: session?.access_token ?? null,
+          question: {
+            id: question.id,
+            subject: question.subject,
+            chapter: question.chapter,
+            section: question.section,
+            stem: question.stem,
+            options: question.options,
+            explanation: question.explanation,
+            testedConcept: question.testedConcept
+          }
+        })
+      });
+
+      const payload = (await response.json()) as {
+        ok: boolean;
+        suggestedSubject?: string | null;
+        suggestedChapter?: string | null;
+        suggestedSection?: string | null;
+        message?: string;
+      };
+
+      if (!response.ok || !payload.ok) {
+        if (response.status === 429 && payload.message && typeof window !== "undefined") {
+          window.alert(payload.message);
+        }
+        setClassificationReportMessageMap((current) => ({
+          ...current,
+          [question.id]: payload.message || "分類回報失敗。"
+        }));
+        return;
+      }
+
+      const suggestedPath = [
+        payload.suggestedSubject,
+        payload.suggestedChapter,
+        payload.suggestedSection
+      ].filter(Boolean).join(" / ");
+
+      setClassificationReportMessageMap((current) => ({
+        ...current,
+        [question.id]: suggestedPath
+          ? `已回報，AI 建議改分到 ${suggestedPath}。`
+          : "已回報，AI 已收到這題的重新分類請求。"
+      }));
+    } catch {
+      setClassificationReportMessageMap((current) => ({
+        ...current,
+        [question.id]: "無法連線到分類回報 API。"
+      }));
+    } finally {
+      setClassificationReportLoadingMap((current) => ({ ...current, [question.id]: false }));
     }
   }
 
@@ -443,7 +512,20 @@ export default function SearchPage() {
                       {loading ? "GPT-5-mini 生成中..." : "用 GPT-5-mini 補詳解"}
                     </button>
                   )}
+                  <button
+                    type="button"
+                    onClick={() => void handleReportClassification(renderedQuestion)}
+                    disabled={classificationReportLoadingMap[renderedQuestion.id]}
+                    className="min-h-10 rounded-2xl bg-slate-100 px-4 py-2 text-sm font-semibold text-slate-800 transition hover:bg-slate-200 disabled:cursor-wait disabled:opacity-60"
+                  >
+                    {classificationReportLoadingMap[renderedQuestion.id] ? "回報中..." : "回報此題分類錯誤"}
+                  </button>
                   {error ? <p className="text-sm font-medium text-rose-700">{error}</p> : null}
+                  {classificationReportMessageMap[renderedQuestion.id] ? (
+                    <p className="text-sm font-medium text-slate-600">
+                      {classificationReportMessageMap[renderedQuestion.id]}
+                    </p>
+                  ) : null}
                 </div>
               </div>
             </details>

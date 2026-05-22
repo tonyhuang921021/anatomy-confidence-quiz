@@ -222,6 +222,8 @@ export default function QuizPage() {
   const [explanationOverrides, setExplanationOverrides] = useState<Record<string, QuestionExplanationOverride>>({});
   const [explanationLoadingMap, setExplanationLoadingMap] = useState<Record<string, boolean>>({});
   const [explanationErrorMap, setExplanationErrorMap] = useState<Record<string, string>>({});
+  const [classificationReportLoadingMap, setClassificationReportLoadingMap] = useState<Record<string, boolean>>({});
+  const [classificationReportMessageMap, setClassificationReportMessageMap] = useState<Record<string, string>>({});
   const [selectedAnswer, setSelectedAnswer] = useState<OptionKey | undefined>();
   const [confidence, setConfidence] = useState<ConfidenceLevel>(4);
   const [confidenceExpanded, setConfidenceExpanded] = useState(false);
@@ -536,6 +538,62 @@ export default function QuizPage() {
     }
   }
 
+  async function handleReportClassification(question: Question) {
+    setClassificationReportLoadingMap((current) => ({ ...current, [question.id]: true }));
+    setClassificationReportMessageMap((current) => ({ ...current, [question.id]: "" }));
+
+    try {
+      const response = await fetch("/api/question-classification-report", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          visitorId: getOrCreateVisitorId(),
+          accessToken: authSession?.access_token ?? null,
+          question: {
+            id: question.id,
+            subject: question.subject,
+            chapter: question.chapter,
+            section: question.section,
+            stem: question.stem,
+            options: question.options,
+            explanation: question.explanation,
+            testedConcept: question.testedConcept
+          }
+        })
+      });
+
+      const payload = (await response.json()) as {
+        ok: boolean;
+        message?: string;
+        suggestedSubject?: string;
+      };
+
+      if (!response.ok || !payload.ok) {
+        setClassificationReportMessageMap((current) => ({
+          ...current,
+          [question.id]: payload.message || "分類回報送出失敗。"
+        }));
+        return;
+      }
+
+      setClassificationReportMessageMap((current) => ({
+        ...current,
+        [question.id]: payload.suggestedSubject
+          ? `已回報，AI 建議改分到 ${payload.suggestedSubject}。`
+          : "已回報，AI 會重新判讀這題分類。"
+      }));
+    } catch {
+      setClassificationReportMessageMap((current) => ({
+        ...current,
+        [question.id]: "分類回報送出失敗。"
+      }));
+    } finally {
+      setClassificationReportLoadingMap((current) => ({ ...current, [question.id]: false }));
+    }
+  }
+
   function resetQuestionUI() {
     setSubmittedAttempt(null);
     setSelectedAnswer(undefined);
@@ -609,6 +667,8 @@ export default function QuizPage() {
   const currentExplanationOverride = explanationOverrides[currentQuestion.id];
   const currentExplanationLoading = explanationLoadingMap[currentQuestion.id];
   const currentExplanationError = explanationErrorMap[currentQuestion.id];
+  const currentClassificationReportLoading = classificationReportLoadingMap[currentQuestion.id];
+  const currentClassificationReportMessage = classificationReportMessageMap[currentQuestion.id];
   const specialScoringNote =
     submittedAttempt && currentQuestion.answerCreditType === "multiple_accepted"
       ? "本題多重給分：若你的答案在官方接受答案中，即算答對。"
@@ -783,22 +843,35 @@ export default function QuizPage() {
 
                 {shouldShowExplanation ? (
                   <div className="mt-5 space-y-3">
-                    {currentExplanationOverride ? (
-                      <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-600">
-                        已替換詳解・{currentExplanationOverride.model ?? "gpt-5-mini"}
-                      </span>
-                    ) : (
+                    <div className="flex flex-wrap items-center gap-3">
+                      {currentExplanationOverride ? (
+                        <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-600">
+                          已替換詳解・{currentExplanationOverride.model ?? "gpt-5-mini"}
+                        </span>
+                      ) : (
+                        <button
+                          type="button"
+                          onClick={() => void handleGenerateQuestionExplanation(currentQuestion, submittedAttempt)}
+                          disabled={currentExplanationLoading}
+                          className="min-h-10 rounded-2xl bg-slate-900 px-4 py-2 text-sm font-semibold text-white transition hover:bg-black disabled:cursor-wait disabled:opacity-60"
+                        >
+                          {currentExplanationLoading ? "GPT-5-mini 生成中..." : "用 GPT-5-mini 補詳解"}
+                        </button>
+                      )}
                       <button
                         type="button"
-                        onClick={() => void handleGenerateQuestionExplanation(currentQuestion, submittedAttempt)}
-                        disabled={currentExplanationLoading}
-                        className="min-h-10 rounded-2xl bg-slate-900 px-4 py-2 text-sm font-semibold text-white transition hover:bg-black disabled:cursor-wait disabled:opacity-60"
+                        onClick={() => void handleReportClassification(currentQuestion)}
+                        disabled={currentClassificationReportLoading}
+                        className="min-h-10 rounded-2xl bg-slate-100 px-4 py-2 text-sm font-semibold text-slate-800 transition hover:bg-slate-200 disabled:cursor-wait disabled:opacity-60"
                       >
-                        {currentExplanationLoading ? "GPT-5-mini 生成中..." : "用 GPT-5-mini 補詳解"}
+                        {currentClassificationReportLoading ? "回報中..." : "回報此題分類錯誤"}
                       </button>
-                    )}
+                    </div>
                     {currentExplanationError ? (
                       <p className="text-sm font-medium text-rose-700">{currentExplanationError}</p>
+                    ) : null}
+                    {currentClassificationReportMessage ? (
+                      <p className="text-sm font-medium text-slate-600">{currentClassificationReportMessage}</p>
                     ) : null}
                   </div>
                 ) : null}
@@ -810,11 +883,6 @@ export default function QuizPage() {
                 onExpand={() => setConfidenceExpanded((current) => !current)}
                 onSelect={handleSelectConfidence}
               />
-
-              <div className="rounded-3xl border border-slate-200 bg-slate-50 p-4 text-sm text-slate-700">
-                這題已送出；如果你想補填或修正信心程度，可以直接在這裡重選，系統會更新本題紀錄。
-              </div>
-
               {!submittedAttempt.isCorrect && shouldShowExplanation ? (
                 <ErrorTypeSelector value={errorType} onSelect={handleErrorTypeSelect} />
               ) : null}

@@ -4,6 +4,7 @@ import { ErrorType } from "@/types/quiz";
 
 const errorTypes: ErrorType[] = [
   "完全沒印象",
+  "沒學過",
   "背錯",
   "忘記了",
   "兩選項猶豫",

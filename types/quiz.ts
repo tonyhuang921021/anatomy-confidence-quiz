@@ -69,7 +69,8 @@ export type ErrorType =
   | "背錯"
   | "看錯題目 / 粗心"
   | "兩選項猶豫"
-  | "忘記了";
+  | "忘記了"
+  | "沒學過";
 
 export type Attempt = {
   questionId: string;
@@ -279,6 +280,23 @@ export type OwnerTopAttemptVisitorEntry = {
   visitorId?: string;
   attempts: number;
   lastAttemptedAt?: string;
+};
+
+export type OwnerClassificationReportEntry = {
+  id: string;
+  questionId: string;
+  currentSubject: string;
+  currentChapter?: string;
+  currentSection?: string;
+  suggestedSubject?: string;
+  suggestedChapter?: string;
+  suggestedSection?: string;
+  reason?: string;
+  model?: string;
+  reporterLabel: string;
+  reporterEmail?: string;
+  visitorId?: string;
+  createdAt: string;
 };
 
 export type FeedbackMessage = {

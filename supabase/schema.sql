@@ -476,3 +476,53 @@ create policy "Anyone can insert feedback messages"
 on public.feedback_messages
 for insert
 with check (true);
+
+create table if not exists public.question_classification_reports (
+  id bigint generated always as identity primary key,
+  question_id text not null,
+  current_subject text not null,
+  current_chapter text,
+  current_section text,
+  suggested_subject text,
+  suggested_chapter text,
+  suggested_section text,
+  reason text,
+  model text,
+  reporter_email text,
+  user_id uuid references auth.users (id) on delete set null,
+  visitor_id text,
+  created_at timestamptz not null default now()
+);
+
+create index if not exists question_classification_reports_created_at_idx
+on public.question_classification_reports (created_at desc);
+
+create index if not exists question_classification_reports_question_id_idx
+on public.question_classification_reports (question_id);
+
+create index if not exists question_classification_reports_user_id_created_at_idx
+on public.question_classification_reports (user_id, created_at desc);
+
+create index if not exists question_classification_reports_visitor_id_created_at_idx
+on public.question_classification_reports (visitor_id, created_at desc);
+
+grant insert
+  on public.question_classification_reports
+  to anon;
+
+grant select, insert, update, delete
+  on public.question_classification_reports
+  to authenticated;
+
+grant select, insert, update, delete
+  on public.question_classification_reports
+  to service_role;
+
+alter table public.question_classification_reports enable row level security;
+
+drop policy if exists "Anyone can insert classification reports" on public.question_classification_reports;
+
+create policy "Anyone can insert classification reports"
+on public.question_classification_reports
+for insert
+with check (true);
