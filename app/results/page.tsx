@@ -564,8 +564,8 @@ function ResultsPageContent() {
 
   function renderQuestionSummaryLine(label: string, questionId: string) {
     return (
-      <span className="inline-flex max-w-full items-center gap-2 align-top">
-        <span className="min-w-0 truncate">{label}</span>
+      <span className="flex max-w-full min-w-0 items-center gap-2 align-top">
+        <span className="min-w-0 flex-1 truncate">{label}</span>
         <span className="shrink-0">{renderQuestionCommunityBadge(questionId)}</span>
       </span>
     );
@@ -643,14 +643,14 @@ function ResultsPageContent() {
                     </div>
                   ) : (
                     wrongAttempts.map(({ attempt, question }, index) => (
-                      <details key={`wrong-${attempt.questionId}`} className="rounded-2xl bg-rose-50 p-3.5 sm:p-4">
-                        <summary className="cursor-pointer text-sm font-semibold text-rose-950">
+                      <details key={`wrong-${attempt.questionId}`} className="overflow-hidden rounded-2xl bg-rose-50 p-3.5 sm:p-4">
+                        <summary className="block cursor-pointer overflow-hidden text-sm font-semibold text-rose-950">
                           {renderQuestionSummaryLine(
                             `錯題 ${index + 1}：${question.chapter} / ${question.section} / ${question.testedConcept}`,
                             question.id
                           )}
                         </summary>
-                        <div className="mt-4 space-y-3 text-sm leading-7 text-slate-700">
+                        <div className="mt-4 min-w-0 space-y-3 overflow-hidden text-sm leading-7 text-slate-700 [overflow-wrap:anywhere]">
                           <QuestionStemBlock question={question} />
                           <div className="grid gap-3">
                             {getAvailableOptionKeys(question).map((key) => (
@@ -714,14 +714,14 @@ function ResultsPageContent() {
                     </div>
                   ) : (
                     lowConfidenceAttempts.map(({ attempt, question }, index) => (
-                      <details key={`low-confidence-${attempt.questionId}`} className="rounded-2xl bg-amber-50 p-3.5 sm:p-4">
-                        <summary className="cursor-pointer text-sm font-semibold text-amber-950">
+                      <details key={`low-confidence-${attempt.questionId}`} className="overflow-hidden rounded-2xl bg-amber-50 p-3.5 sm:p-4">
+                        <summary className="block cursor-pointer overflow-hidden text-sm font-semibold text-amber-950">
                           {renderQuestionSummaryLine(
                             `信心 ${attempt.confidence}｜${index + 1}：${question.chapter} / ${question.section} / ${question.testedConcept}`,
                             question.id
                           )}
                         </summary>
-                        <div className="mt-4 space-y-3 text-sm leading-7 text-slate-700">
+                        <div className="mt-4 min-w-0 space-y-3 overflow-hidden text-sm leading-7 text-slate-700 [overflow-wrap:anywhere]">
                           <QuestionStemBlock question={question} />
                           <div className="grid gap-3">
                             {getAvailableOptionKeys(question).map((key) => (
@@ -784,14 +784,14 @@ function ResultsPageContent() {
                 <h3 className="text-base font-semibold text-ink">全部題目回顧</h3>
                 <div className="mt-3 grid gap-3">
                   {reviewedAttempts.map(({ attempt, question }, index) => (
-                    <details key={`all-${attempt.questionId}`} className="rounded-2xl bg-slate-50 p-3.5 sm:p-4">
-                      <summary className="cursor-pointer text-sm font-semibold text-ink">
+                    <details key={`all-${attempt.questionId}`} className="overflow-hidden rounded-2xl bg-slate-50 p-3.5 sm:p-4">
+                      <summary className="block cursor-pointer overflow-hidden text-sm font-semibold text-ink">
                         {renderQuestionSummaryLine(
                           `第 ${index + 1} 題：${attempt.isCorrect ? "答對" : "答錯"} / ${question.chapter} / ${question.section}`,
                           question.id
                         )}
                       </summary>
-                      <div className="mt-4 space-y-3 text-sm leading-7 text-slate-700">
+                      <div className="mt-4 min-w-0 space-y-3 overflow-hidden text-sm leading-7 text-slate-700 [overflow-wrap:anywhere]">
                         <QuestionStemBlock question={question} />
                         <div className="grid gap-3">
                           {getAvailableOptionKeys(question).map((key) => (

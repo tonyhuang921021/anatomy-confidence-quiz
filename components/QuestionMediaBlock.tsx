@@ -30,8 +30,8 @@ function renderImage(src: string, alt: string) {
 
 export function QuestionStemBlock({ question, className }: QuestionStemBlockProps) {
   return (
-    <div className={className}>
-      <p className="font-semibold text-slate-900">{question.stem}</p>
+    <div className={`min-w-0 ${className ?? ""}`}>
+      <p className="min-w-0 font-semibold text-slate-900 [overflow-wrap:anywhere]">{question.stem}</p>
       {question.stemImage ? renderImage(question.stemImage, `${question.id} 題目圖片`) : null}
     </div>
   );
@@ -66,7 +66,7 @@ export function QuestionOptionBlock({
           <p
             className={
               textClassName ??
-              "min-w-0 text-sm font-medium leading-6 text-slate-800 sm:text-[15px] sm:leading-7"
+              "min-w-0 text-sm font-medium leading-6 text-slate-800 [overflow-wrap:anywhere] sm:text-[15px] sm:leading-7"
             }
           >
             {optionText}
