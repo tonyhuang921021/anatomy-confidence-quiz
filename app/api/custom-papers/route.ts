@@ -250,6 +250,22 @@ function selectQuestionsByDifficulty(
   };
 
   const unseenSelection = pickByPriority(buildTiers(unseen), 10);
+  if (difficulty === "hard") {
+    const strictHardQuestions = unseen.filter((question) => {
+      const stat = getStat(question.id);
+      return (
+        (stat.total_attempts > 3 && stat.correct_attempts === 0) ||
+        (stat.total_attempts > 5 && stat.correct_rate < 30)
+      );
+    });
+
+    if (strictHardQuestions.length >= 10) {
+      return sample(strictHardQuestions, 10);
+    }
+
+    return strictHardQuestions;
+  }
+
   if (unseenSelection.length >= 10) {
     return unseenSelection;
   }
@@ -496,7 +512,13 @@ export async function POST(request: NextRequest) {
 
       if (selectedQuestions.length < 10) {
         return NextResponse.json(
-          { ok: false, message: "目前符合條件的題目不足 10 題，請多選一些科目再試。" },
+          {
+            ok: false,
+            message:
+              difficulty === "hard"
+                ? "目前這些科目裡，符合全難題標準的題目不足 10 題，請多選一些科目再試。"
+                : "目前符合條件的題目不足 10 題，請多選一些科目再試。"
+          },
           { status: 400 }
         );
       }
