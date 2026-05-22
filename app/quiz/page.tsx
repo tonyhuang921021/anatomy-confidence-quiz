@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
+import { useAuth } from "@/components/AuthProvider";
 import { ConfidenceSelector } from "@/components/ConfidenceSelector";
 import { ErrorTypeSelector } from "@/components/ErrorTypeSelector";
 import { QuestionCard } from "@/components/QuestionCard";
@@ -30,17 +31,21 @@ import {
   clearCurrentSession,
   loadCompletedSessions,
   loadCurrentSession,
+  loadQuestionExplanationOverrides,
   loadQuizSettings,
   saveCompletedSession,
   saveCurrentSession,
+  saveQuestionExplanationOverride,
   saveQuestionExplanationOverrides
 } from "@/lib/storage";
+import { getOrCreateVisitorId } from "@/lib/visitor";
 import {
   Attempt,
   ConfidenceLevel,
   ErrorType,
   OptionKey,
   Question,
+  QuestionExplanationOverride,
   QuizSession,
   QuizSettings,
   SubjectName
@@ -209,10 +214,14 @@ function normalizeLegacySettings(settings: QuizSettings): QuizSettings {
 
 export default function QuizPage() {
   const router = useRouter();
+  const { session: authSession } = useAuth();
   const questionTopRef = useRef<HTMLDivElement | null>(null);
   const contentTopRef = useRef<HTMLDivElement | null>(null);
   const [mounted, setMounted] = useState(false);
   const [session, setSession] = useState<QuizSession | null>(null);
+  const [explanationOverrides, setExplanationOverrides] = useState<Record<string, QuestionExplanationOverride>>({});
+  const [explanationLoadingMap, setExplanationLoadingMap] = useState<Record<string, boolean>>({});
+  const [explanationErrorMap, setExplanationErrorMap] = useState<Record<string, string>>({});
   const [selectedAnswer, setSelectedAnswer] = useState<OptionKey | undefined>();
   const [confidence, setConfidence] = useState<ConfidenceLevel>(4);
   const [confidenceExpanded, setConfidenceExpanded] = useState(false);
@@ -309,6 +318,10 @@ export default function QuizPage() {
   }, []);
 
   useEffect(() => {
+    setExplanationOverrides(loadQuestionExplanationOverrides());
+  }, []);
+
+  useEffect(() => {
     async function fetchSharedExplanationOverrides() {
       if (!session?.questionOrder?.length) return;
 
@@ -316,6 +329,7 @@ export default function QuizPage() {
         const sharedOverrides = await loadSharedQuestionExplanationOverrides(session.questionOrder);
         if (Object.keys(sharedOverrides).length === 0) return;
         saveQuestionExplanationOverrides(sharedOverrides);
+        setExplanationOverrides((current) => ({ ...current, ...sharedOverrides }));
         setSession((current) => (current ? { ...current } : current));
       } catch {
         // keep local overrides only
@@ -439,6 +453,89 @@ export default function QuizPage() {
     setSubmittedAttempt(updatedAttempt);
   }
 
+  async function handleGenerateQuestionExplanation(question: Question, attempt: Attempt) {
+    if (!authSession?.access_token) {
+      setExplanationErrorMap((current) => ({
+        ...current,
+        [question.id]: "請先登入帳號，才能使用 GPT-5-mini 補詳解。"
+      }));
+      return;
+    }
+
+    setExplanationLoadingMap((current) => ({ ...current, [question.id]: true }));
+    setExplanationErrorMap((current) => ({ ...current, [question.id]: "" }));
+
+    try {
+      const response = await fetch("/api/question-explanation", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          visitorId: getOrCreateVisitorId(),
+          accessToken: authSession.access_token,
+          question: {
+            id: question.id,
+            subject: question.subject,
+            chapter: question.chapter,
+            section: question.section,
+            stem: question.stem,
+            options: question.options,
+            answer: question.answer,
+            acceptedAnswers: question.acceptedAnswers,
+            answerCreditType: question.answerCreditType,
+            explanation: question.explanation,
+            testedConcept: question.testedConcept
+          },
+          attempt: {
+            selectedAnswer: attempt.selectedAnswer,
+            confidence: attempt.confidence,
+            isCorrect: attempt.isCorrect
+          }
+        })
+      });
+
+      const payload = (await response.json()) as {
+        ok: boolean;
+        explanation?: string;
+        optionAnalysis?: Partial<Record<OptionKey, string>>;
+        memoryTip?: string;
+        model?: string;
+        message?: string;
+      };
+
+      if (!response.ok || !payload.ok || !payload.explanation) {
+        if (response.status === 429 && payload.message && typeof window !== "undefined") {
+          window.alert(payload.message);
+        }
+        setExplanationErrorMap((current) => ({
+          ...current,
+          [question.id]: payload.message || "GPT-5-mini 詳解產生失敗。"
+        }));
+        return;
+      }
+
+      const override: QuestionExplanationOverride = {
+        explanation: payload.explanation ?? "",
+        optionAnalysis: payload.optionAnalysis ?? {},
+        memoryTip: payload.memoryTip ?? "",
+        model: payload.model ?? "gpt-5-mini",
+        updatedAt: new Date().toISOString()
+      };
+
+      saveQuestionExplanationOverride(question.id, override);
+      setExplanationOverrides((current) => ({ ...current, [question.id]: override }));
+      setSession((current) => (current ? { ...current } : current));
+    } catch {
+      setExplanationErrorMap((current) => ({
+        ...current,
+        [question.id]: "無法連線到 GPT-5-mini 詳解 API。"
+      }));
+    } finally {
+      setExplanationLoadingMap((current) => ({ ...current, [question.id]: false }));
+    }
+  }
+
   function resetQuestionUI() {
     setSubmittedAttempt(null);
     setSelectedAnswer(undefined);
@@ -509,6 +606,9 @@ export default function QuizPage() {
   const feedbackMode = session.settings?.feedbackMode ?? "full";
   const shouldShowExplanation = feedbackMode === "full";
   const shouldShowCorrectAnswer = feedbackMode === "full" || feedbackMode === "answer_only";
+  const currentExplanationOverride = explanationOverrides[currentQuestion.id];
+  const currentExplanationLoading = explanationLoadingMap[currentQuestion.id];
+  const currentExplanationError = explanationErrorMap[currentQuestion.id];
   const specialScoringNote =
     submittedAttempt && currentQuestion.answerCreditType === "multiple_accepted"
       ? "本題多重給分：若你的答案在官方接受答案中，即算答對。"
@@ -678,6 +778,28 @@ export default function QuizPage() {
                   <div className="mt-5 rounded-3xl bg-amber-50 p-4 text-sm text-amber-950 ring-1 ring-amber-200">
                     <h3 className="text-sm font-semibold">快速記憶法</h3>
                     <p className="mt-2 leading-7">{currentQuestion.memoryTip}</p>
+                  </div>
+                ) : null}
+
+                {shouldShowExplanation ? (
+                  <div className="mt-5 space-y-3">
+                    {currentExplanationOverride ? (
+                      <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-600">
+                        已替換詳解・{currentExplanationOverride.model ?? "gpt-5-mini"}
+                      </span>
+                    ) : (
+                      <button
+                        type="button"
+                        onClick={() => void handleGenerateQuestionExplanation(currentQuestion, submittedAttempt)}
+                        disabled={currentExplanationLoading}
+                        className="min-h-10 rounded-2xl bg-slate-900 px-4 py-2 text-sm font-semibold text-white transition hover:bg-black disabled:cursor-wait disabled:opacity-60"
+                      >
+                        {currentExplanationLoading ? "GPT-5-mini 生成中..." : "用 GPT-5-mini 補詳解"}
+                      </button>
+                    )}
+                    {currentExplanationError ? (
+                      <p className="text-sm font-medium text-rose-700">{currentExplanationError}</p>
+                    ) : null}
                   </div>
                 ) : null}
               </div>
