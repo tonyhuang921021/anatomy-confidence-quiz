@@ -274,6 +274,85 @@ to authenticated
 using (true)
 with check (true);
 
+create table if not exists public.custom_papers (
+  paper_code text primary key,
+  name text,
+  question_ids jsonb not null default '[]'::jsonb,
+  subject_filters jsonb not null default '[]'::jsonb,
+  difficulty text not null,
+  is_public boolean not null default false,
+  created_by_user_id uuid references auth.users (id) on delete set null,
+  created_by_email text,
+  created_by_label text,
+  visitor_id text,
+  created_at timestamptz not null default now()
+);
+
+create index if not exists custom_papers_created_at_idx
+on public.custom_papers (created_at desc);
+
+create index if not exists custom_papers_is_public_created_at_idx
+on public.custom_papers (is_public, created_at desc);
+
+grant select
+  on public.custom_papers
+  to anon;
+
+grant select, insert, update, delete
+  on public.custom_papers
+  to authenticated;
+
+grant select, insert, update, delete
+  on public.custom_papers
+  to service_role;
+
+alter table public.custom_papers enable row level security;
+
+drop policy if exists "Anyone can read custom papers" on public.custom_papers;
+
+create policy "Anyone can read custom papers"
+on public.custom_papers
+for select
+using (true);
+
+create table if not exists public.custom_paper_attempts (
+  session_id text primary key,
+  paper_code text not null references public.custom_papers (paper_code) on delete cascade,
+  user_id uuid references auth.users (id) on delete set null,
+  user_email text,
+  participant_label text not null,
+  visitor_id text,
+  correct_count integer not null default 0,
+  total_count integer not null default 0,
+  accuracy_rate numeric(5,1) not null default 0,
+  completed_at timestamptz not null,
+  created_at timestamptz not null default now()
+);
+
+create index if not exists custom_paper_attempts_paper_code_completed_at_idx
+on public.custom_paper_attempts (paper_code, completed_at desc);
+
+grant select
+  on public.custom_paper_attempts
+  to anon;
+
+grant select, insert, update, delete
+  on public.custom_paper_attempts
+  to authenticated;
+
+grant select, insert, update, delete
+  on public.custom_paper_attempts
+  to service_role;
+
+alter table public.custom_paper_attempts enable row level security;
+
+drop policy if exists "Anyone can read custom paper attempts" on public.custom_paper_attempts;
+
+create policy "Anyone can read custom paper attempts"
+on public.custom_paper_attempts
+for select
+using (true);
+
 create table if not exists public.question_attempt_devices (
   visitor_id text primary key,
   first_attempt_at timestamptz not null default now(),

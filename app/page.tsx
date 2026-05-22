@@ -91,6 +91,15 @@ export default function HomePage() {
 
         <FeedbackBoard />
 
+        <div className="flex justify-start">
+          <Link
+            href="/custom-papers"
+            className="inline-flex min-h-11 items-center justify-center rounded-2xl bg-slate-100 px-4 py-2 text-sm font-semibold text-slate-800 transition hover:bg-slate-200"
+          >
+            自訂卷模式
+          </Link>
+        </div>
+
       </div>
     </main>
   );

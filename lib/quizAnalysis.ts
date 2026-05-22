@@ -575,6 +575,8 @@ export function getModeLabel(mode: QuizMode) {
       return "錯題複習";
     case "simulation":
       return "模擬考模式";
+    case "custom_paper":
+      return "自訂卷模式";
     default:
       return "測驗";
   }

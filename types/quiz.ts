@@ -63,6 +63,7 @@ export type Question = {
 };
 
 export type ConfidenceLevel = 1 | 2 | 3 | 4 | 5;
+export type CustomPaperDifficulty = "easy" | "medium" | "hard";
 
 export type ErrorType =
   | "完全沒印象"
@@ -82,7 +83,7 @@ export type Attempt = {
   answeredAt: string;
 };
 
-export type QuizMode = "random" | "weakness" | "review" | "simulation";
+export type QuizMode = "random" | "weakness" | "review" | "simulation" | "custom_paper";
 
 export type SubjectFilter = SubjectName | "全部";
 export type SimulationFeedbackMode = "full" | "answer_only" | "none";
@@ -101,6 +102,10 @@ export type QuizSettings = {
   feedbackMode?: SimulationFeedbackMode;
   paperMode?: SimulationPaperMode;
   selectedPaperKey?: string;
+  customPaperCode?: string;
+  customPaperName?: string;
+  customPaperDifficulty?: CustomPaperDifficulty;
+  customPaperIsPublic?: boolean;
 };
 
 export type QuizSession = {
@@ -316,4 +321,33 @@ export type FeedbackMessage = {
   displayName?: string;
   isAnonymous: boolean;
   createdAt: string;
+};
+
+export type CustomPaperParticipant = {
+  sessionId: string;
+  label: string;
+  userEmail?: string;
+  visitorId?: string;
+  correctCount: number;
+  totalCount: number;
+  accuracyRate: number;
+  completedAt: string;
+};
+
+export type CustomPaperSummary = {
+  paperCode: string;
+  name?: string;
+  subjectLabels: string[];
+  difficulty: CustomPaperDifficulty;
+  isPublic: boolean;
+  questionCount: number;
+  createdAt: string;
+  createdByLabel?: string;
+  averageAccuracyRate: number;
+  participantCount: number;
+};
+
+export type CustomPaperDetail = CustomPaperSummary & {
+  questionIds: string[];
+  participants: CustomPaperParticipant[];
 };

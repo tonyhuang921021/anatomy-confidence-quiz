@@ -23,7 +23,13 @@ export default function ReviewPage() {
 
   useEffect(() => {
     const sessions = loadCompletedSessions();
-    const practiceSessions = sessions.filter((session) => session.settings?.mode !== "simulation");
+    const practiceSessions = sessions.filter(
+      (session) =>
+        session.settings?.mode !== "simulation" &&
+        session.settings?.mode !== "custom_paper" &&
+        session.settings?.customPoolLabel !== "模擬考錯題庫" &&
+        session.settings?.customPoolLabel !== "自訂卷錯題庫"
+    );
     setPracticeItems(getReviewQuestionItems(allQuestions, practiceSessions, 60));
   }, [syncVersion]);
 

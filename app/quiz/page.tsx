@@ -18,6 +18,7 @@ import {
 } from "@/data/med1QuestionBank";
 import {
   loadConfirmedQuestionClassificationOverrides,
+  recordCustomPaperAttempt,
   loadSharedQuestionExplanationOverrides,
   pushCompletedSessionToSupabase,
   pushQuestionStatsSnapshotToSupabase
@@ -130,6 +131,8 @@ function createSession(
     subject:
       selectedSubjects.length === 1
         ? selectedSubjects[0]
+        : normalizedSettings.mode === "custom_paper" && selectedSubjects.length > 0
+          ? selectedSubjects[0]
         : (effectiveSettings.subjectFilter && effectiveSettings.subjectFilter !== "全部"
             ? effectiveSettings.subjectFilter
             : "醫學（一）") || "解剖學",
@@ -237,6 +240,10 @@ function normalizeLegacySettings(settings: QuizSettings): QuizSettings {
   };
 }
 
+function isCustomPaperSession(session: QuizSession) {
+  return session.settings?.mode === "custom_paper" && Boolean(session.settings?.customPaperCode);
+}
+
 export default function QuizPage() {
   const router = useRouter();
   const { session: authSession } = useAuth();
@@ -255,6 +262,17 @@ export default function QuizPage() {
   const [confidenceExpanded, setConfidenceExpanded] = useState(false);
   const [submittedAttempt, setSubmittedAttempt] = useState<Attempt | null>(null);
   const [errorType, setErrorType] = useState<ErrorType | undefined>();
+
+  function syncCompletedCustomPaper(completedSession: QuizSession) {
+    if (!isCustomPaperSession(completedSession)) return;
+
+    void recordCustomPaperAttempt({
+      accessToken: authSession?.access_token ?? null,
+      visitorId: getOrCreateVisitorId() ?? "",
+      paperCode: completedSession.settings?.customPaperCode ?? "",
+      session: completedSession
+    });
+  }
 
   useEffect(() => {
     async function initializeSession() {
@@ -459,6 +477,7 @@ export default function QuizPage() {
         persistSession(completedSession);
         saveCompletedSession(completedSession);
         void pushCompletedSessionToSupabase(completedSession);
+        syncCompletedCustomPaper(completedSession);
         router.push(`/results?sessionId=${encodeURIComponent(completedSession.id)}`);
         return;
       }
@@ -664,6 +683,7 @@ export default function QuizPage() {
       persistSession(completedSession);
       saveCompletedSession(completedSession);
       void pushCompletedSessionToSupabase(completedSession);
+      syncCompletedCustomPaper(completedSession);
       router.push(`/results?sessionId=${encodeURIComponent(completedSession.id)}`);
       return;
     }

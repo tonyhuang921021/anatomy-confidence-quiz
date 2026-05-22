@@ -1,5 +1,8 @@
 import type { User } from "@supabase/supabase-js";
 import type {
+  CustomPaperDetail,
+  CustomPaperDifficulty,
+  CustomPaperSummary,
   FeedbackMessage,
   LeaderboardEntry,
   OwnerDailyPoint,
@@ -1363,4 +1366,95 @@ export async function loadOwnerTopAttemptVisitors(limit = 5): Promise<OwnerTopAt
   return Array.from(grouped.values())
     .sort((a, b) => b.attempts - a.attempts || (b.lastAttemptedAt ?? "").localeCompare(a.lastAttemptedAt ?? ""))
     .slice(0, limit);
+}
+
+type GenerateCustomPaperInput = {
+  accessToken?: string | null;
+  visitorId: string;
+  selectedSubjects: string[];
+  difficulty: CustomPaperDifficulty;
+  name?: string;
+  isPublic: boolean;
+  doneQuestionIds: string[];
+};
+
+type RecordCustomPaperAttemptInput = {
+  accessToken?: string | null;
+  visitorId: string;
+  paperCode: string;
+  session: QuizSession;
+};
+
+export async function generateCustomPaper(
+  input: GenerateCustomPaperInput
+): Promise<CustomPaperDetail> {
+  const response = await fetch("/api/custom-papers", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+      action: "generate",
+      ...input
+    })
+  });
+
+  const payload = (await response.json().catch(() => null)) as
+    | { ok?: boolean; message?: string; paper?: CustomPaperDetail }
+    | null;
+
+  if (!response.ok || !payload?.ok || !payload.paper) {
+    throw new Error(payload?.message || "自訂卷產生失敗");
+  }
+
+  return payload.paper;
+}
+
+export async function lookupCustomPaper(paperCode: string): Promise<CustomPaperDetail> {
+  const response = await fetch(`/api/custom-papers?paperCode=${encodeURIComponent(paperCode)}`);
+  const payload = (await response.json().catch(() => null)) as
+    | { ok?: boolean; message?: string; paper?: CustomPaperDetail }
+    | null;
+
+  if (!response.ok || !payload?.ok || !payload.paper) {
+    throw new Error(payload?.message || "找不到這份自訂卷");
+  }
+
+  return payload.paper;
+}
+
+export async function loadPublicCustomPapers(): Promise<CustomPaperSummary[]> {
+  const response = await fetch("/api/custom-papers");
+  const payload = (await response.json().catch(() => null)) as
+    | { ok?: boolean; message?: string; papers?: CustomPaperSummary[] }
+    | null;
+
+  if (!response.ok || !payload?.ok || !payload.papers) {
+    throw new Error(payload?.message || "公開卷載入失敗");
+  }
+
+  return payload.papers;
+}
+
+export async function recordCustomPaperAttempt(
+  input: RecordCustomPaperAttemptInput
+) {
+  const response = await fetch("/api/custom-papers", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+      action: "submit_attempt",
+      ...input
+    })
+  });
+
+  const payload = (await response.json().catch(() => null)) as
+    | { ok?: boolean; message?: string }
+    | null;
+
+  if (!response.ok || !payload?.ok) {
+    throw new Error(payload?.message || "自訂卷作答紀錄同步失敗");
+  }
 }
