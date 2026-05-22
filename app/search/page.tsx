@@ -5,6 +5,7 @@ import { useEffect, useMemo, useState } from "react";
 import { useAuth } from "@/components/AuthProvider";
 import { QuestionOptionBlock, QuestionStemBlock } from "@/components/QuestionMediaBlock";
 import {
+  loadConfirmedQuestionClassificationOverrides,
   loadSharedQuestionExplanationOverrides
 } from "@/lib/cloudSync";
 import {
@@ -14,9 +15,17 @@ import {
   saveQuestionExplanationOverrides
 } from "@/lib/storage";
 import { getOrCreateVisitorId } from "@/lib/visitor";
-import { canonicalQuestionBank } from "@/data/med1QuestionBank";
+import {
+  applyQuestionClassificationOverride,
+  getCanonicalQuestionBank
+} from "@/data/med1QuestionBank";
 import { subjectRegistry } from "@/data/subjectRegistry";
-import { OptionKey, Question, QuestionExplanationOverride } from "@/types/quiz";
+import {
+  OptionKey,
+  Question,
+  QuestionClassificationOverride,
+  QuestionExplanationOverride
+} from "@/types/quiz";
 
 const SEARCHABLE_SUBJECTS = Object.values(subjectRegistry)
   .filter(
@@ -26,20 +35,6 @@ const SEARCHABLE_SUBJECTS = Object.values(subjectRegistry)
       item.subject !== "醫學（二）"
   )
   .sort((left, right) => left.label.localeCompare(right.label, "zh-Hant"));
-
-const ALL_QUESTIONS = Array.from(
-  new Map(
-    canonicalQuestionBank.map((question) => [question.id, question] as const)
-  ).values()
-);
-
-const YEAR_OPTIONS = Array.from(
-  new Set(
-    ALL_QUESTIONS.map((question) => question.sourceYear).filter(
-      (year): year is number => typeof year === "number"
-    )
-  )
-).sort((a, b) => b - a);
 
 const OPTION_KEYS = ["A", "B", "C", "D", "E"] as const;
 const PAGE_SIZE = 30;
@@ -115,9 +110,30 @@ export default function SearchPage() {
   const [explanationErrorMap, setExplanationErrorMap] = useState<Record<string, string>>({});
   const [classificationReportLoadingMap, setClassificationReportLoadingMap] = useState<Record<string, boolean>>({});
   const [classificationReportMessageMap, setClassificationReportMessageMap] = useState<Record<string, string>>({});
+  const [classificationOverrides, setClassificationOverrides] = useState<Record<string, QuestionClassificationOverride>>({});
 
   const normalizedKeyword = normalizeSearchText(keyword);
   const compactKeyword = compactSearchText(keyword);
+  const allQuestions = useMemo(
+    () =>
+      Array.from(
+        new Map(
+          getCanonicalQuestionBank(classificationOverrides).map((question) => [question.id, question] as const)
+        ).values()
+      ),
+    [classificationOverrides]
+  );
+  const yearOptions = useMemo(
+    () =>
+      Array.from(
+        new Set(
+          allQuestions.map((question) => question.sourceYear).filter(
+            (year): year is number => typeof year === "number"
+          )
+        )
+      ).sort((a, b) => b - a),
+    [allQuestions]
+  );
 
   useEffect(() => {
     setCurrentPage(1);
@@ -127,13 +143,21 @@ export default function SearchPage() {
     setExplanationOverrides(loadQuestionExplanationOverrides());
   }, []);
 
+  useEffect(() => {
+    void loadConfirmedQuestionClassificationOverrides()
+      .then((overrides) => setClassificationOverrides(overrides))
+      .catch(() => {
+        // keep static bank if override fetch fails
+      });
+  }, []);
+
   const filteredResults = useMemo(() => {
-    return ALL_QUESTIONS.filter((question) => {
+    return allQuestions.filter((question) => {
       if (selectedSubject !== "全部" && question.subject !== selectedSubject) return false;
       if (selectedYear !== "全部" && String(question.sourceYear ?? "") !== selectedYear) return false;
       return matchesQuestion(question, normalizedKeyword, compactKeyword);
     });
-  }, [compactKeyword, normalizedKeyword, selectedSubject, selectedYear]);
+  }, [allQuestions, compactKeyword, normalizedKeyword, selectedSubject, selectedYear]);
 
   const totalMatches = filteredResults.length;
   const totalPages = Math.max(1, Math.ceil(totalMatches / PAGE_SIZE));
@@ -365,7 +389,7 @@ export default function SearchPage() {
               className="min-h-12 w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-800 outline-none transition focus:border-brand-400 focus:ring-2 focus:ring-brand-100"
             >
               <option value="全部">全部年份</option>
-              {YEAR_OPTIONS.map((year) => (
+              {yearOptions.map((year) => (
                 <option key={year} value={String(year)}>
                   {year}
                 </option>
@@ -390,7 +414,7 @@ export default function SearchPage() {
         ) : (
           pageResults.map((question) => {
             const renderedQuestion = mergeQuestionExplanationOverride(
-              applyQuestionExplanationOverride(question),
+              applyQuestionClassificationOverride(question, classificationOverrides[question.id]),
               explanationOverrides[question.id]
             );
             const override = explanationOverrides[question.id];

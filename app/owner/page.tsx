@@ -171,6 +171,7 @@ export default function OwnerPage() {
   const [explanationUsage, setExplanationUsage] = useState<OwnerExplanationUsageEntry[]>([]);
   const [topVisitors, setTopVisitors] = useState<OwnerTopAttemptVisitorEntry[]>([]);
   const [classificationReports, setClassificationReports] = useState<OwnerClassificationReportEntry[]>([]);
+  const [approvingReportId, setApprovingReportId] = useState<string | null>(null);
   const [statsLoading, setStatsLoading] = useState(true);
   const [error, setError] = useState("");
   const allowed = useMemo(() => isAllowedEmail(user?.email), [user?.email]);
@@ -192,6 +193,54 @@ export default function OwnerPage() {
     }
 
     return payload;
+  }
+
+  async function handleApproveClassificationReport(reportId: string) {
+    if (!session?.access_token) return;
+
+    try {
+      setApprovingReportId(reportId);
+      setError("");
+      const response = await fetch("/api/owner/classification-approve", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          accessToken: session.access_token,
+          reportId
+        })
+      });
+
+      const payload = (await response.json().catch(() => null)) as
+        | {
+            ok?: boolean;
+            message?: string;
+            appliedAt?: string;
+            approvedByEmail?: string;
+          }
+        | null;
+
+      if (!response.ok || !payload?.ok) {
+        throw new Error(payload?.message || "確認套用失敗");
+      }
+
+      setClassificationReports((current) =>
+        current.map((report) =>
+          report.id === reportId
+            ? {
+                ...report,
+                appliedAt: payload.appliedAt ?? new Date().toISOString(),
+                approvedByEmail: payload.approvedByEmail ?? user?.email ?? undefined
+              }
+            : report
+        )
+      );
+    } catch (approveError) {
+      setError(approveError instanceof Error ? approveError.message : "確認套用失敗");
+    } finally {
+      setApprovingReportId(null);
+    }
   }
 
   useEffect(() => {
@@ -545,11 +594,18 @@ export default function OwnerPage() {
                             回報者：{report.reporterLabel} ・ {formatUpdatedAt(report.createdAt)}
                           </p>
                         </div>
-                        {report.model ? (
-                          <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-700">
-                            {report.model}
-                          </span>
-                        ) : null}
+                        <div className="flex flex-wrap items-center gap-2">
+                          {report.appliedAt ? (
+                            <span className="rounded-full bg-emerald-100 px-3 py-1 text-xs font-semibold text-emerald-800">
+                              已套用
+                            </span>
+                          ) : null}
+                          {report.model ? (
+                            <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-700">
+                              {report.model}
+                            </span>
+                          ) : null}
+                        </div>
                       </div>
                       <div className="mt-3 grid gap-2 text-sm text-slate-700">
                         <p>
@@ -570,6 +626,27 @@ export default function OwnerPage() {
                             {report.reason}
                           </p>
                         ) : null}
+                        {report.appliedAt ? (
+                          <p>
+                            <span className="font-semibold">套用時間：</span>
+                            {formatUpdatedAt(report.appliedAt)}
+                            {report.approvedByEmail ? ` ・ ${report.approvedByEmail}` : ""}
+                          </p>
+                        ) : null}
+                      </div>
+                      <div className="mt-4 flex justify-end">
+                        <button
+                          type="button"
+                          onClick={() => void handleApproveClassificationReport(report.id)}
+                          disabled={Boolean(report.appliedAt) || approvingReportId === report.id}
+                          className="min-h-10 rounded-2xl bg-slate-900 px-4 py-2 text-sm font-semibold text-white transition hover:bg-black disabled:cursor-not-allowed disabled:bg-slate-300"
+                        >
+                          {report.appliedAt
+                            ? "已正式套用"
+                            : approvingReportId === report.id
+                              ? "套用中..."
+                              : "確認後正式套用到題庫 override"}
+                        </button>
                       </div>
                     </article>
                   ))

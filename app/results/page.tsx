@@ -9,8 +9,10 @@ import { ResultSummary } from "@/components/ResultSummary";
 import { WeaknessRanking } from "@/components/WeaknessRanking";
 import {
   loadQuestionCommunityStats,
+  loadConfirmedQuestionClassificationOverrides,
   loadSharedQuestionExplanationOverrides
 } from "@/lib/cloudSync";
+import { applyQuestionClassificationOverride } from "@/data/med1QuestionBank";
 import { anatomyQuestions } from "@/data/anatomyQuestions";
 import { subjectRegistry } from "@/data/subjectRegistry";
 import {
@@ -37,6 +39,7 @@ import {
   Attempt,
   OptionKey,
   Question,
+  QuestionClassificationOverride,
   QuestionCommunityStats,
   QuestionExplanationOverride,
   QuizSession,
@@ -56,11 +59,16 @@ const allQuestions = Array.from(
 
 const optionKeys: OptionKey[] = ["A", "B", "C", "D", "E"];
 
-function getQuestionMap(session: QuizSession) {
+function getQuestionMap(
+  session: QuizSession,
+  classificationOverrides: Record<string, QuestionClassificationOverride>
+) {
   return new Map(
     [...allQuestions, ...(session.generatedQuestions ?? [])].map((question) => [
       question.id,
-      applyQuestionExplanationOverride(question)
+      applyQuestionExplanationOverride(
+        applyQuestionClassificationOverride(question, classificationOverrides[question.id])
+      )
     ] as const)
   );
 }
@@ -107,6 +115,7 @@ function ResultsPageContent() {
   const [explanationErrorMap, setExplanationErrorMap] = useState<Record<string, string>>({});
   const [classificationReportLoadingMap, setClassificationReportLoadingMap] = useState<Record<string, boolean>>({});
   const [classificationReportMessageMap, setClassificationReportMessageMap] = useState<Record<string, string>>({});
+  const [classificationOverrides, setClassificationOverrides] = useState<Record<string, QuestionClassificationOverride>>({});
   const [communityStatsMap, setCommunityStatsMap] = useState<Record<string, QuestionCommunityStats>>({});
   const [copyPromptNotice, setCopyPromptNotice] = useState(false);
   const [isFullscreenReview, setIsFullscreenReview] = useState(false);
@@ -250,6 +259,18 @@ function ResultsPageContent() {
   useEffect(() => {
     setExplanationOverrides(loadQuestionExplanationOverrides());
   }, [syncVersion]);
+
+  useEffect(() => {
+    if (!state.session?.attempts.length) return;
+
+    void loadConfirmedQuestionClassificationOverrides(
+      state.session.attempts.map((attempt) => attempt.questionId)
+    )
+      .then((overrides) => setClassificationOverrides(overrides))
+      .catch(() => {
+        // keep static classification if override fetch fails
+      });
+  }, [state.session]);
 
   useEffect(() => {
     async function fetchCommunityStats() {
@@ -562,7 +583,7 @@ function ResultsPageContent() {
   }
 
   const topWeakSections = getTopWeakSections(state.sectionStats, 3);
-  const questionMap = getQuestionMap(state.session);
+  const questionMap = getQuestionMap(state.session, classificationOverrides);
   const reviewedAttempts = state.session.attempts
     .map((attempt) => ({
       attempt,

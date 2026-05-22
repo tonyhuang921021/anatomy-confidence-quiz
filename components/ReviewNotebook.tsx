@@ -4,9 +4,11 @@ import Link from "next/link";
 import { type ReactNode, useEffect, useState } from "react";
 import { QuestionOptionBlock, QuestionStemBlock } from "@/components/QuestionMediaBlock";
 import {
+  loadConfirmedQuestionClassificationOverrides,
   loadQuestionCommunityStats,
   loadSharedQuestionExplanationOverrides
 } from "@/lib/cloudSync";
+import { applyQuestionClassificationOverride } from "@/data/med1QuestionBank";
 import {
   applyQuestionExplanationOverride,
   loadQuestionExplanationOverrides,
@@ -18,6 +20,7 @@ import { useAuth } from "@/components/AuthProvider";
 import {
   OptionKey,
   Question,
+  QuestionClassificationOverride,
   QuestionCommunityStats,
   QuestionExplanationOverride,
   ReviewQuestionItem
@@ -230,6 +233,7 @@ export function ReviewNotebook({
   const [explanationErrorMap, setExplanationErrorMap] = useState<Record<string, string>>({});
   const [classificationReportLoadingMap, setClassificationReportLoadingMap] = useState<Record<string, boolean>>({});
   const [classificationReportMessageMap, setClassificationReportMessageMap] = useState<Record<string, string>>({});
+  const [classificationOverrides, setClassificationOverrides] = useState<Record<string, QuestionClassificationOverride>>({});
   const [communityStatsMap, setCommunityStatsMap] = useState<Record<string, QuestionCommunityStats>>({});
   const [activeCategory, setActiveCategory] = useState<"wrong" | "lowConfidence">("wrong");
   const wrongItems = sortByRecent(items.filter((item) => item.history.wrong > 0));
@@ -282,6 +286,16 @@ export function ReviewNotebook({
 
   useEffect(() => {
     setExplanationOverrides(loadQuestionExplanationOverrides());
+  }, [items]);
+
+  useEffect(() => {
+    if (items.length === 0) return;
+
+    void loadConfirmedQuestionClassificationOverrides(items.map((item) => item.question.id))
+      .then((overrides) => setClassificationOverrides(overrides))
+      .catch(() => {
+        // keep static classification if override fetch fails
+      });
   }, [items]);
 
   useEffect(() => {
@@ -617,7 +631,12 @@ export function ReviewNotebook({
                       }`}
                     >
                       {(() => {
-                        const renderedQuestion = applyQuestionExplanationOverride(item.question);
+                        const renderedQuestion = applyQuestionExplanationOverride(
+                          applyQuestionClassificationOverride(
+                            item.question,
+                            classificationOverrides[item.question.id]
+                          )
+                        );
                         return (
                           <>
                             <div className="space-y-4">

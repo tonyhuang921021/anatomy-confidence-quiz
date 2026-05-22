@@ -526,3 +526,42 @@ create policy "Anyone can insert classification reports"
 on public.question_classification_reports
 for insert
 with check (true);
+
+alter table public.question_classification_reports
+  add column if not exists applied_at timestamptz;
+
+alter table public.question_classification_reports
+  add column if not exists approved_by_email text;
+
+create table if not exists public.question_classification_overrides (
+  question_id text primary key,
+  subject text not null,
+  chapter text not null,
+  section text not null,
+  source_report_id bigint references public.question_classification_reports (id) on delete set null,
+  updated_at timestamptz not null default now()
+);
+
+create index if not exists question_classification_overrides_updated_at_idx
+on public.question_classification_overrides (updated_at desc);
+
+grant select
+  on public.question_classification_overrides
+  to anon;
+
+grant select, insert, update, delete
+  on public.question_classification_overrides
+  to authenticated;
+
+grant select, insert, update, delete
+  on public.question_classification_overrides
+  to service_role;
+
+alter table public.question_classification_overrides enable row level security;
+
+drop policy if exists "Anyone can read classification overrides" on public.question_classification_overrides;
+
+create policy "Anyone can read classification overrides"
+on public.question_classification_overrides
+for select
+using (true);

@@ -7,6 +7,7 @@ import type {
   OwnerExplanationUsageEntry,
   OwnerHourlyPoint,
   OwnerTopAttemptVisitorEntry,
+  QuestionClassificationOverride,
   QuestionExplanationOverride,
   QuestionCommunityStats,
   QuizSession,
@@ -66,6 +67,15 @@ type QuestionExplanationOverrideRow = {
   option_analysis?: Record<string, string> | null;
   memory_tip?: string | null;
   model?: string | null;
+  updated_at?: string | null;
+};
+
+type QuestionClassificationOverrideRow = {
+  question_id: string;
+  subject: string;
+  chapter: string;
+  section: string;
+  source_report_id?: string | number | null;
   updated_at?: string | null;
 };
 
@@ -197,6 +207,22 @@ function mapFeedbackMessageRow(row: FeedbackMessageRow): FeedbackMessage {
     displayName: row.display_name ?? undefined,
     isAnonymous: row.is_anonymous,
     createdAt: row.created_at
+  };
+}
+
+function mapQuestionClassificationOverrideRow(
+  row: QuestionClassificationOverrideRow
+): QuestionClassificationOverride {
+  return {
+    questionId: row.question_id,
+    subject: row.subject as QuestionClassificationOverride["subject"],
+    chapter: row.chapter,
+    section: row.section,
+    sourceReportId:
+      row.source_report_id === null || row.source_report_id === undefined
+        ? undefined
+        : String(row.source_report_id),
+    updatedAt: row.updated_at ?? new Date().toISOString()
   };
 }
 
@@ -897,6 +923,35 @@ export async function loadSharedQuestionExplanationOverrides(questionIds: string
     (data ?? []).map((row) => {
       const typedRow = row as QuestionExplanationOverrideRow;
       return [typedRow.question_id, mapQuestionExplanationOverrideRow(typedRow)] as const;
+    })
+  );
+}
+
+export async function loadConfirmedQuestionClassificationOverrides(questionIds?: string[]) {
+  if (!isSupabaseConfigured()) {
+    return {} as Record<string, QuestionClassificationOverride>;
+  }
+
+  const supabase = getSupabaseBrowserClient();
+  const uniqueQuestionIds = Array.from(new Set((questionIds ?? []).filter(Boolean)));
+  let query = supabase
+    .from("question_classification_overrides")
+    .select("question_id, subject, chapter, section, source_report_id, updated_at");
+
+  if (uniqueQuestionIds.length > 0) {
+    query = query.in("question_id", uniqueQuestionIds);
+  }
+
+  const { data, error } = await query;
+
+  if (error) {
+    throw error;
+  }
+
+  return Object.fromEntries(
+    (data ?? []).map((row) => {
+      const typedRow = row as QuestionClassificationOverrideRow;
+      return [typedRow.question_id, mapQuestionClassificationOverrideRow(typedRow)] as const;
     })
   );
 }

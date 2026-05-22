@@ -47,6 +47,8 @@ type ClassificationReportRow = {
   reporter_email?: string | null;
   visitor_id?: string | null;
   created_at: string;
+  applied_at?: string | null;
+  approved_by_email?: string | null;
 };
 
 const SUPABASE_PAGE_SIZE = 1000;
@@ -390,7 +392,7 @@ async function fetchOwnerClassificationReports(
   const { data, error } = await supabase
     .from("question_classification_reports")
     .select(
-      "id, question_id, current_subject, current_chapter, current_section, suggested_subject, suggested_chapter, suggested_section, reason, model, reporter_email, visitor_id, created_at"
+      "id, question_id, current_subject, current_chapter, current_section, suggested_subject, suggested_chapter, suggested_section, reason, model, reporter_email, visitor_id, created_at, applied_at, approved_by_email"
     )
     .order("created_at", { ascending: false })
     .limit(limit);
@@ -411,7 +413,9 @@ async function fetchOwnerClassificationReports(
     reporterLabel: row.reporter_email?.trim() || formatVisitorLabel(row.visitor_id),
     reporterEmail: row.reporter_email ?? undefined,
     visitorId: row.visitor_id ?? undefined,
-    createdAt: row.created_at
+    createdAt: row.created_at,
+    appliedAt: row.applied_at ?? undefined,
+    approvedByEmail: row.approved_by_email ?? undefined
   }));
 }
 

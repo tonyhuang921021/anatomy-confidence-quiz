@@ -9,7 +9,13 @@ import moexMed1ReclassifiedV5 from "@/data/sources/moex_med1_100_115_reclassifie
 import moexMed1Requested149ReclassificationPatch from "@/data/sources/moex_med1_requested_149_reclassification_patch.json";
 import moexMedStage2Merged0013100 from "@/data/sources/moex_med_stage2_detailed_merged_001_3100_classified_v3.json";
 import questionMediaManifest from "@/data/sources/question_media_manifest.json";
-import type { OptionKey, Question, SubjectFilter, SubjectName } from "@/types/quiz";
+import type {
+  OptionKey,
+  Question,
+  QuestionClassificationOverride,
+  SubjectFilter,
+  SubjectName
+} from "@/types/quiz";
 
 type RawQuestion = {
   id: string;
@@ -1264,8 +1270,8 @@ function selectBestQuestionVariant(candidates: Question[]) {
   })[0];
 }
 
-function buildWholePastPaperBank() {
-  const allMoexQuestions = canonicalQuestionBank
+function buildWholePastPaperBankFromBank(questionBank: Question[]) {
+  const allMoexQuestions = questionBank
     .filter((question) => question.sourceType === "MOEX_PAST_EXAM")
     .map(fillPastPaperMetadata);
   const grouped = new Map<string, Question[]>();
@@ -1288,7 +1294,68 @@ function buildWholePastPaperBank() {
     });
 }
 
-const wholePastPaperBank = buildWholePastPaperBank();
+const wholePastPaperBank = buildWholePastPaperBankFromBank(canonicalQuestionBank);
+
+export function applyQuestionClassificationOverride(
+  question: Question,
+  override?: QuestionClassificationOverride | null
+) {
+  if (!override) return question;
+
+  return {
+    ...question,
+    subject: override.subject,
+    chapter: override.chapter,
+    section: override.section
+  };
+}
+
+export function applyQuestionClassificationOverrides(
+  questions: Question[],
+  overrides: Record<string, QuestionClassificationOverride> = {}
+) {
+  if (Object.keys(overrides).length === 0) return questions;
+
+  return questions.map((question) =>
+    applyQuestionClassificationOverride(question, overrides[question.id])
+  );
+}
+
+function buildRuntimeQuestionMap(questionBank: Question[]): Record<SubjectName, Question[]> {
+  return {
+    "醫學（一）": questionBank.filter((question) => question.sourceCitation?.includes("醫學（一）")),
+    "醫學（二）": questionBank.filter((question) => question.sourceCitation?.includes("醫學（二）")),
+    "解剖學": questionBank.filter((question) => question.subject === "解剖學"),
+    "生理學": questionBank.filter((question) => question.subject === "生理學"),
+    "生物化學": questionBank.filter((question) => question.subject === "生物化學"),
+    "藥理學": questionBank.filter((question) => question.subject === "藥理學"),
+    "病理學": questionBank.filter((question) => question.subject === "病理學"),
+    "微生物免疫學": questionBank.filter((question) => question.subject === "微生物免疫學"),
+    "胚胎學": questionBank.filter((question) => question.subject === "胚胎學"),
+    "組織學": questionBank.filter((question) => question.subject === "組織學"),
+    "寄生蟲學": questionBank.filter((question) => question.subject === "寄生蟲學"),
+    "公共衛生學": questionBank.filter((question) => question.subject === "公共衛生學"),
+    "細胞生物學": questionBank.filter((question) => question.subject === "細胞生物學"),
+    "分子生物學": questionBank.filter((question) => question.subject === "分子生物學"),
+    "其他醫學一": questionBank.filter((question) => question.subject === "其他醫學一")
+  };
+}
+
+export function getCanonicalQuestionBank(
+  overrides: Record<string, QuestionClassificationOverride> = {}
+) {
+  if (Object.keys(overrides).length === 0) return canonicalQuestionBank;
+
+  return dedupeQuestionBank(applyQuestionClassificationOverrides(canonicalQuestionBank, overrides));
+}
+
+function getWholePastPaperBank(
+  overrides: Record<string, QuestionClassificationOverride> = {}
+) {
+  if (Object.keys(overrides).length === 0) return wholePastPaperBank;
+
+  return buildWholePastPaperBankFromBank(getCanonicalQuestionBank(overrides));
+}
 
 function getBucketKey(question: Question, subjectFilter: SubjectFilter) {
   if (subjectFilter === "全部") {
@@ -1344,25 +1411,41 @@ function buildTemplateDistribution(
   return counts;
 }
 
-export function getQuestionBankBySubjectFilter(subjectFilter: SubjectFilter = "解剖學") {
+export function getQuestionBankBySubjectFilter(
+  subjectFilter: SubjectFilter = "解剖學",
+  overrides: Record<string, QuestionClassificationOverride> = {}
+) {
+  const questionMap =
+    Object.keys(overrides).length === 0
+      ? med1QuestionsBySubject
+      : buildRuntimeQuestionMap(getCanonicalQuestionBank(overrides));
+
   if (subjectFilter === "全部") {
     return dedupeQuestionBank([
-      ...med1QuestionsBySubject["醫學（一）"],
-      ...med1QuestionsBySubject["醫學（二）"]
+      ...questionMap["醫學（一）"],
+      ...questionMap["醫學（二）"]
     ]);
   }
 
-  return med1QuestionsBySubject[subjectFilter] ?? [];
+  return questionMap[subjectFilter] ?? [];
 }
 
-export function getQuestionBankBySubjects(subjects: SubjectName[] = []) {
+export function getQuestionBankBySubjects(
+  subjects: SubjectName[] = [],
+  overrides: Record<string, QuestionClassificationOverride> = {}
+) {
   if (subjects.length === 0) return [];
+
+  const questionMap =
+    Object.keys(overrides).length === 0
+      ? med1QuestionsBySubject
+      : buildRuntimeQuestionMap(getCanonicalQuestionBank(overrides));
 
   const uniqueIds = new Set<string>();
   const merged: Question[] = [];
 
   subjects.forEach((subject) => {
-    (med1QuestionsBySubject[subject] ?? []).forEach((question) => {
+    (questionMap[subject] ?? []).forEach((question) => {
       if (uniqueIds.has(question.id)) return;
       uniqueIds.add(question.id);
       merged.push(question);
@@ -1418,8 +1501,10 @@ const SEASONAL_REPRO_KEYWORDS = [
   "reproduct"
 ];
 
-export function getSeasonalLimitedQuestions() {
-  const bank = getQuestionBankBySubjects(["生理學"]);
+export function getSeasonalLimitedQuestions(
+  overrides: Record<string, QuestionClassificationOverride> = {}
+) {
+  const bank = getQuestionBankBySubjects(["生理學"], overrides);
 
   return dedupeQuestionBank(
     bank.filter((question) => {
@@ -1445,9 +1530,12 @@ export function getSeasonalLimitedQuestions() {
   );
 }
 
-export function getPastPaperOptions(subjectFilter: SubjectFilter = "全部"): PastPaperOption[] {
+export function getPastPaperOptions(
+  subjectFilter: SubjectFilter = "全部",
+  overrides: Record<string, QuestionClassificationOverride> = {}
+): PastPaperOption[] {
   void subjectFilter;
-  const bank = wholePastPaperBank;
+  const bank = getWholePastPaperBank(overrides);
   const paperMap = new Map<string, PastPaperOption>();
 
   bank.forEach((question) => {
@@ -1501,30 +1589,32 @@ export function getPastPaperOptions(subjectFilter: SubjectFilter = "全部"): Pa
 
 export function getQuestionsForPastPaper(
   paperKey: string,
-  subjectFilter: SubjectFilter = "全部"
+  subjectFilter: SubjectFilter = "全部",
+  overrides: Record<string, QuestionClassificationOverride> = {}
 ) {
   void subjectFilter;
-  return wholePastPaperBank
+  return getWholePastPaperBank(overrides)
     .filter((question) => `${question.examCode}-${question.paperCode}` === paperKey)
     .sort((a, b) => (a.originalQuestionNumber ?? 0) - (b.originalQuestionNumber ?? 0));
 }
 
 export function buildExamLikeRandomSet(
   subjectFilter: SubjectFilter = "全部",
-  questionCount = 50
+  questionCount = 50,
+  overrides: Record<string, QuestionClassificationOverride> = {}
 ) {
-  const bank = getQuestionBankBySubjectFilter(subjectFilter);
+  const bank = getQuestionBankBySubjectFilter(subjectFilter, overrides);
   if (bank.length === 0) return [];
 
   const targetCount = Math.max(1, Math.min(questionCount, bank.length));
-  const papers = getPastPaperOptions(subjectFilter);
+  const papers = getPastPaperOptions(subjectFilter, overrides);
 
   if (papers.length === 0) {
     return shuffle(bank).slice(0, targetCount);
   }
 
   const templatePaper = papers[Math.floor(Math.random() * papers.length)];
-  const templateQuestions = getQuestionsForPastPaper(templatePaper.key, subjectFilter);
+  const templateQuestions = getQuestionsForPastPaper(templatePaper.key, subjectFilter, overrides);
   if (templateQuestions.length === 0) {
     return shuffle(bank).slice(0, targetCount);
   }

@@ -8,6 +8,7 @@ import { ConfidenceSelector } from "@/components/ConfidenceSelector";
 import { ErrorTypeSelector } from "@/components/ErrorTypeSelector";
 import { QuestionCard } from "@/components/QuestionCard";
 import {
+  applyQuestionClassificationOverride,
   buildExamLikeRandomSet,
   getPastPaperOptions,
   getQuestionBankBySubjects,
@@ -16,6 +17,7 @@ import {
   getSeasonalLimitedQuestions
 } from "@/data/med1QuestionBank";
 import {
+  loadConfirmedQuestionClassificationOverrides,
   loadSharedQuestionExplanationOverrides,
   pushCompletedSessionToSupabase,
   pushQuestionStatsSnapshotToSupabase
@@ -45,17 +47,12 @@ import {
   ErrorType,
   OptionKey,
   Question,
+  QuestionClassificationOverride,
   QuestionExplanationOverride,
   QuizSession,
   QuizSettings,
   SubjectName
 } from "@/types/quiz";
-
-const allQuestionFallbackMap = new Map(
-  getQuestionBankBySubjects(["醫學（一）", "醫學（二）"]).map(
-    (question) => [question.id, question] as const
-  )
-);
 
 function getQuestionSourceBadge(question: Question) {
   if (question.sourceType === "MOEX_PAST_EXAM") return "正式考古題";
@@ -103,10 +100,15 @@ function evaluateAttempt(question: Question, selectedAnswer: OptionKey) {
 function createSession(
   questions: Question[],
   completedSessions: QuizSession[],
-  settings: QuizSettings
+  settings: QuizSettings,
+  classificationOverrides: Record<string, QuestionClassificationOverride> = {}
 ): QuizSession {
   const normalizedSettings = { ...DEFAULT_QUIZ_SETTINGS, ...settings };
-  const localQuestionSet = selectLocalQuestionSet(normalizedSettings, questions);
+  const localQuestionSet = selectLocalQuestionSet(
+    normalizedSettings,
+    questions,
+    classificationOverrides
+  );
   const effectiveQuestions = localQuestionSet.length > 0 ? localQuestionSet : questions;
   const selectedSubjects = normalizedSettings.subjectFilters?.filter(Boolean) ?? [];
   const effectiveSettings =
@@ -141,18 +143,27 @@ function createSession(
   };
 }
 
-function selectLocalQuestionSet(settings: QuizSettings, fallbackQuestions: Question[]) {
+function selectLocalQuestionSet(
+  settings: QuizSettings,
+  fallbackQuestions: Question[],
+  classificationOverrides: Record<string, QuestionClassificationOverride> = {}
+) {
   const selectedSubjects = settings.subjectFilters?.filter(Boolean) ?? [];
   const subjectFilter = settings.subjectFilter ?? "解剖學";
   const bank =
     selectedSubjects.length > 0
-      ? getQuestionBankBySubjects(selectedSubjects)
-      : getQuestionBankBySubjectFilter(subjectFilter);
+      ? getQuestionBankBySubjects(selectedSubjects, classificationOverrides)
+      : getQuestionBankBySubjectFilter(subjectFilter, classificationOverrides);
   const sourceBank = bank.length > 0 ? bank : fallbackQuestions;
+  const runtimeQuestionMap = new Map(
+    getQuestionBankBySubjects(["醫學（一）", "醫學（二）"], classificationOverrides).map(
+      (question) => [question.id, question] as const
+    )
+  );
 
   if ((settings.customQuestionIds?.length ?? 0) > 0) {
     const customQuestions = settings.customQuestionIds
-      ?.map((id) => allQuestionFallbackMap.get(id))
+      ?.map((id) => runtimeQuestionMap.get(id))
       .filter((question): question is Question => Boolean(question));
 
     if ((customQuestions?.length ?? 0) > 0) {
@@ -174,30 +185,44 @@ function selectLocalQuestionSet(settings: QuizSettings, fallbackQuestions: Quest
 
   const paperMode = settings.paperMode ?? "random_set";
   if (paperMode === "past_paper" && settings.selectedPaperKey) {
-    const paperQuestions = getQuestionsForPastPaper(settings.selectedPaperKey);
+    const paperQuestions = getQuestionsForPastPaper(
+      settings.selectedPaperKey,
+      "全部",
+      classificationOverrides
+    );
     return paperQuestions.length > 0 ? paperQuestions : sourceBank;
   }
 
   if (paperMode === "random_past_paper") {
-    const papers = getPastPaperOptions();
+    const papers = getPastPaperOptions("全部", classificationOverrides);
     if (papers.length === 0) return sourceBank;
     const selected = papers[Math.floor(Math.random() * papers.length)];
-    const paperQuestions = getQuestionsForPastPaper(selected.key);
+    const paperQuestions = getQuestionsForPastPaper(selected.key, "全部", classificationOverrides);
     return paperQuestions.length > 0 ? paperQuestions : sourceBank;
   }
 
-  return buildExamLikeRandomSet(subjectFilter, settings.questionCount);
+  return buildExamLikeRandomSet(subjectFilter, settings.questionCount, classificationOverrides);
 }
 
-function getQuestionByOrder(session: QuizSession) {
+function getQuestionByOrder(
+  session: QuizSession,
+  fallbackMap: Map<string, Question>,
+  classificationOverrides: Record<string, QuestionClassificationOverride> = {}
+) {
   const ids = session.questionOrder ?? [];
   const generatedMap = new Map(
     (session.generatedQuestions ?? []).map((question) => [question.id, question] as const)
   );
 
   return ids
-    .map((id) => generatedMap.get(id) ?? allQuestionFallbackMap.get(id))
-    .map((question) => (question ? applyQuestionExplanationOverride(question) : question))
+    .map((id) => generatedMap.get(id) ?? fallbackMap.get(id))
+    .map((question) =>
+      question
+        ? applyQuestionExplanationOverride(
+            applyQuestionClassificationOverride(question, classificationOverrides[question.id])
+          )
+        : question
+    )
     .filter((question): question is Question => Boolean(question));
 }
 
@@ -219,6 +244,7 @@ export default function QuizPage() {
   const contentTopRef = useRef<HTMLDivElement | null>(null);
   const [mounted, setMounted] = useState(false);
   const [session, setSession] = useState<QuizSession | null>(null);
+  const [classificationOverrides, setClassificationOverrides] = useState<Record<string, QuestionClassificationOverride>>({});
   const [explanationOverrides, setExplanationOverrides] = useState<Record<string, QuestionExplanationOverride>>({});
   const [explanationLoadingMap, setExplanationLoadingMap] = useState<Record<string, boolean>>({});
   const [explanationErrorMap, setExplanationErrorMap] = useState<Record<string, string>>({});
@@ -231,92 +257,101 @@ export default function QuizPage() {
   const [errorType, setErrorType] = useState<ErrorType | undefined>();
 
   useEffect(() => {
-    const existing = loadCurrentSession();
-    const params =
-      typeof window !== "undefined" ? new URLSearchParams(window.location.search) : null;
-    const preset = params?.get("preset");
-    const directSubject = params?.get("subject");
-    const startPresetSettings: QuizSettings = {
-      ...DEFAULT_QUIZ_SETTINGS,
-      mode: "weakness",
-      questionCount: 10,
-      chapter: undefined,
-      section: undefined
-    };
-    const directSubjectSettings: QuizSettings | null = directSubject
-      ? {
-          ...DEFAULT_QUIZ_SETTINGS,
-          mode: "random",
-          subjectFilter: directSubject as SubjectName,
-          subjectFilters: [directSubject as SubjectName],
-          questionCount: 10,
-          chapter: undefined,
-          section: undefined
-        }
-      : null;
-    const med1PresetSettings: QuizSettings = {
-      ...DEFAULT_QUIZ_SETTINGS,
-      mode: "random",
-      subjectFilter: "醫學（一）",
-      questionCount: 10,
-      chapter: undefined,
-      section: undefined
-    };
-    const med2PresetSettings: QuizSettings = {
-      ...DEFAULT_QUIZ_SETTINGS,
-      mode: "random",
-      subjectFilter: "醫學（二）",
-      questionCount: 10,
-      chapter: undefined,
-      section: undefined
-    };
-    const rawSettings: QuizSettings =
-      directSubjectSettings ??
-      (preset === "start"
-        ? startPresetSettings
-        : preset === "med1"
-          ? med1PresetSettings
-          : preset === "med2"
-            ? med2PresetSettings
-            : loadQuizSettings() ?? DEFAULT_QUIZ_SETTINGS);
-    const savedSettings = normalizeLegacySettings(rawSettings);
-    const completedSessions = loadCompletedSessions();
-    const shouldForceNewSession =
-      params?.get("new") === "1";
-    const shouldReuseExisting =
-      !shouldForceNewSession &&
-      existing &&
-      !existing.completedAt &&
-      (existing.questionOrder?.length ?? 0) > 0;
-    const nextSession = shouldReuseExisting
-      ? existing
-      : createSession(
-          (savedSettings.subjectFilters?.length ?? 0) > 0
-            ? getQuestionBankBySubjects(savedSettings.subjectFilters ?? [])
-            : getQuestionBankBySubjectFilter(savedSettings.subjectFilter ?? "解剖學"),
-          completedSessions,
-          savedSettings
-        );
+    async function initializeSession() {
+      const loadedOverrides = await loadConfirmedQuestionClassificationOverrides().catch(
+        () => ({} as Record<string, QuestionClassificationOverride>)
+      );
+      setClassificationOverrides(loadedOverrides);
 
-    if (!shouldReuseExisting) {
-      clearCurrentSession();
+      const existing = loadCurrentSession();
+      const params =
+        typeof window !== "undefined" ? new URLSearchParams(window.location.search) : null;
+      const preset = params?.get("preset");
+      const directSubject = params?.get("subject");
+      const startPresetSettings: QuizSettings = {
+        ...DEFAULT_QUIZ_SETTINGS,
+        mode: "weakness",
+        questionCount: 10,
+        chapter: undefined,
+        section: undefined
+      };
+      const directSubjectSettings: QuizSettings | null = directSubject
+        ? {
+            ...DEFAULT_QUIZ_SETTINGS,
+            mode: "random",
+            subjectFilter: directSubject as SubjectName,
+            subjectFilters: [directSubject as SubjectName],
+            questionCount: 10,
+            chapter: undefined,
+            section: undefined
+          }
+        : null;
+      const med1PresetSettings: QuizSettings = {
+        ...DEFAULT_QUIZ_SETTINGS,
+        mode: "random",
+        subjectFilter: "醫學（一）",
+        questionCount: 10,
+        chapter: undefined,
+        section: undefined
+      };
+      const med2PresetSettings: QuizSettings = {
+        ...DEFAULT_QUIZ_SETTINGS,
+        mode: "random",
+        subjectFilter: "醫學（二）",
+        questionCount: 10,
+        chapter: undefined,
+        section: undefined
+      };
+      const rawSettings: QuizSettings =
+        directSubjectSettings ??
+        (preset === "start"
+          ? startPresetSettings
+          : preset === "med1"
+            ? med1PresetSettings
+            : preset === "med2"
+              ? med2PresetSettings
+              : loadQuizSettings() ?? DEFAULT_QUIZ_SETTINGS);
+      const savedSettings = normalizeLegacySettings(rawSettings);
+      const completedSessions = loadCompletedSessions();
+      const shouldForceNewSession = params?.get("new") === "1";
+      const shouldReuseExisting =
+        !shouldForceNewSession &&
+        existing &&
+        !existing.completedAt &&
+        (existing.questionOrder?.length ?? 0) > 0;
+      const nextSession = shouldReuseExisting
+        ? existing
+        : createSession(
+            (savedSettings.subjectFilters?.length ?? 0) > 0
+              ? getQuestionBankBySubjects(savedSettings.subjectFilters ?? [], loadedOverrides)
+              : getQuestionBankBySubjectFilter(savedSettings.subjectFilter ?? "解剖學", loadedOverrides),
+            completedSessions,
+            savedSettings,
+            loadedOverrides
+          );
+
+      if (!shouldReuseExisting) {
+        clearCurrentSession();
+      }
+
+      setSession(nextSession);
+      saveCurrentSession(nextSession);
+
+      if (existing?.isReviewingAnswer) {
+        const currentQuestionId = existing.questionOrder?.[existing.currentQuestionIndex ?? 0];
+        const currentAttempt =
+          existing.attempts.find((attempt) => attempt.questionId === currentQuestionId) ?? null;
+        setSubmittedAttempt(currentAttempt);
+        setSelectedAnswer(currentAttempt?.selectedAnswer);
+        setConfidence(currentAttempt?.confidence ?? 4);
+        setConfidenceExpanded((currentAttempt?.confidence ?? 4) <= 3);
+        setErrorType(currentAttempt?.errorType);
+      }
+
+      setMounted(true);
     }
 
-    setSession(nextSession);
-    saveCurrentSession(nextSession);
-
-    if (existing?.isReviewingAnswer) {
-      const currentQuestionId = existing.questionOrder?.[existing.currentQuestionIndex ?? 0];
-      const currentAttempt =
-        existing.attempts.find((attempt) => attempt.questionId === currentQuestionId) ?? null;
-      setSubmittedAttempt(currentAttempt);
-      setSelectedAnswer(currentAttempt?.selectedAnswer);
-      setConfidence(currentAttempt?.confidence ?? 4);
-      setConfidenceExpanded((currentAttempt?.confidence ?? 4) <= 3);
-      setErrorType(currentAttempt?.errorType);
-    }
-
-    setMounted(true);
+    void initializeSession();
   }, []);
 
   useEffect(() => {
@@ -341,7 +376,21 @@ export default function QuizPage() {
     void fetchSharedExplanationOverrides();
   }, [session?.id, session?.questionOrder]);
 
-  const questionSet = useMemo(() => (session ? getQuestionByOrder(session) : []), [session]);
+  const allQuestionFallbackMap = useMemo(
+    () =>
+      new Map(
+        getQuestionBankBySubjects(["醫學（一）", "醫學（二）"], classificationOverrides).map(
+          (question) => [question.id, question] as const
+        )
+      ),
+    [classificationOverrides]
+  );
+
+  const questionSet = useMemo(
+    () =>
+      session ? getQuestionByOrder(session, allQuestionFallbackMap, classificationOverrides) : [],
+    [allQuestionFallbackMap, classificationOverrides, session]
+  );
   const currentIndex = session?.currentQuestionIndex ?? 0;
   const currentQuestion = questionSet[currentIndex];
   const targetCount = session?.settings?.questionCount ?? questionSet.length;

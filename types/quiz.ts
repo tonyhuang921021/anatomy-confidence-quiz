@@ -297,6 +297,17 @@ export type OwnerClassificationReportEntry = {
   reporterEmail?: string;
   visitorId?: string;
   createdAt: string;
+  appliedAt?: string;
+  approvedByEmail?: string;
+};
+
+export type QuestionClassificationOverride = {
+  questionId: string;
+  subject: SubjectName;
+  chapter: string;
+  section: string;
+  sourceReportId?: string;
+  updatedAt: string;
 };
 
 export type FeedbackMessage = {
