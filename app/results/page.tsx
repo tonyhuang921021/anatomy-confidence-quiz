@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useAuth } from "@/components/AuthProvider";
 import { QuestionOptionBlock, QuestionStemBlock } from "@/components/QuestionMediaBlock";
 import { ResultSummary } from "@/components/ResultSummary";
@@ -28,7 +28,6 @@ import {
   applyQuestionExplanationOverride,
   clearCurrentSession,
   loadCompletedSessions,
-  loadCurrentSession,
   loadQuestionExplanationOverrides,
   saveQuestionExplanationOverride,
   saveQuestionExplanationOverrides,
@@ -99,6 +98,7 @@ function getAccuracyTone(correctRate: number) {
 
 export default function ResultsPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const { syncVersion, session } = useAuth();
   const [mounted, setMounted] = useState(false);
   const [requestedSessionId, setRequestedSessionId] = useState<string | null>(null);
@@ -131,10 +131,7 @@ export default function ResultsPage() {
   }
 
   useEffect(() => {
-    const targetSessionId =
-      typeof window === "undefined"
-        ? null
-        : new URLSearchParams(window.location.search).get("sessionId");
+    const targetSessionId = searchParams.get("sessionId");
     setRequestedSessionId(targetSessionId);
     const completedSessions = loadCompletedSessions();
     const targetSession =
@@ -176,7 +173,7 @@ export default function ResultsPage() {
       completionStats
     });
     setMounted(true);
-  }, [syncVersion]);
+  }, [searchParams, syncVersion]);
 
   useEffect(() => {
     setExplanationOverrides(loadQuestionExplanationOverrides());
