@@ -58,9 +58,9 @@ export default function CustomPapersPage() {
   const med2Subjects = selectableSubjects.filter((item) => MED2_SUBJECTS.includes(item.subject));
   const [tab, setTab] = useState<"generate" | "public" | "lookup">("generate");
   const [selectedSubjects, setSelectedSubjects] = useState<SubjectName[]>([]);
-  const [difficulty, setDifficulty] = useState<CustomPaperDifficulty>("medium");
+  const [difficulty, setDifficulty] = useState<CustomPaperDifficulty>("hard");
   const [paperName, setPaperName] = useState("");
-  const [isPublic, setIsPublic] = useState(false);
+  const [isPublic, setIsPublic] = useState(true);
   const [generating, setGenerating] = useState(false);
   const [generateError, setGenerateError] = useState("");
   const [generatedPaper, setGeneratedPaper] = useState<CustomPaperDetail | null>(null);
