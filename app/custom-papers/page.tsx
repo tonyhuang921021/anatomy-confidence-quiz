@@ -56,7 +56,7 @@ export default function CustomPapersPage() {
   const { session } = useAuth();
   const med1Subjects = selectableSubjects.filter((item) => MED1_SUBJECTS.includes(item.subject));
   const med2Subjects = selectableSubjects.filter((item) => MED2_SUBJECTS.includes(item.subject));
-  const [tab, setTab] = useState<"generate" | "lookup">("generate");
+  const [tab, setTab] = useState<"generate" | "public" | "lookup">("generate");
   const [selectedSubjects, setSelectedSubjects] = useState<SubjectName[]>([]);
   const [difficulty, setDifficulty] = useState<CustomPaperDifficulty>("medium");
   const [paperName, setPaperName] = useState("");
@@ -254,6 +254,17 @@ export default function CustomPapersPage() {
           </button>
           <button
             type="button"
+            onClick={() => setTab("public")}
+            className={`min-h-12 rounded-2xl px-5 py-3 text-sm font-semibold transition ${
+              tab === "public"
+                ? "bg-brand-600 text-white"
+                : "bg-slate-100 text-slate-800 hover:bg-slate-200"
+            }`}
+          >
+            可以直接做的公開卷
+          </button>
+          <button
+            type="button"
             onClick={() => setTab("lookup")}
             className={`min-h-12 rounded-2xl px-5 py-3 text-sm font-semibold transition ${
               tab === "lookup"
@@ -341,7 +352,7 @@ export default function CustomPapersPage() {
             </div>
           </div>
         </section>
-      ) : (
+      ) : tab === "lookup" ? (
         <section className="mt-6 rounded-[2rem] bg-white p-6 shadow-card ring-1 ring-slate-100 sm:p-8">
           <div className="rounded-[2rem] bg-slate-50 p-5 ring-1 ring-slate-100">
             <label className="text-sm font-semibold text-ink">輸入五碼考卷碼</label>
@@ -366,57 +377,58 @@ export default function CustomPapersPage() {
             ) : null}
           </div>
 
-          <div className="mt-6">
-            <div className="flex items-center justify-between gap-3">
-              <h2 className="text-xl font-semibold text-ink">可以直接做的公開卷</h2>
-              <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-600">
-                最新 {publicPapers.length} 份
-              </span>
-            </div>
+        </section>
+      ) : (
+        <section className="mt-6 rounded-[2rem] bg-white p-6 shadow-card ring-1 ring-slate-100 sm:p-8">
+          <div className="flex items-center justify-between gap-3">
+            <h2 className="text-xl font-semibold text-ink">可以直接做的公開卷</h2>
+            <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-600">
+              最新 {publicPapers.length} 份
+            </span>
+          </div>
 
-            <div className="mt-4 grid gap-3">
-              {publicLoading ? (
-                <div className="rounded-2xl bg-slate-50 p-4 text-sm text-slate-600">正在載入公開卷...</div>
-              ) : publicError ? (
-                <div className="rounded-2xl bg-rose-50 p-4 text-sm text-rose-900">{publicError}</div>
-              ) : publicPapers.length === 0 ? (
-                <div className="rounded-2xl bg-slate-50 p-4 text-sm text-slate-600">目前還沒有公開卷。</div>
-              ) : (
-                publicPapers.map((paper) => (
-                  <button
-                    key={paper.paperCode}
-                    type="button"
-                    onClick={() => void handleLookupPaper(paper.paperCode)}
-                    className="rounded-3xl border border-slate-200 bg-slate-50 p-4 text-left transition hover:border-brand-200 hover:bg-white"
-                  >
-                    <div className="flex flex-wrap items-start justify-between gap-3">
-                      <div className="min-w-0">
-                        <div className="flex flex-wrap items-center gap-2">
-                          <span className="rounded-full bg-slate-900 px-2.5 py-1 text-[11px] font-semibold text-white">
-                            {paper.paperCode}
-                          </span>
-                          <h3 className="text-base font-semibold text-ink">{paper.name || "未命名自訂卷"}</h3>
-                        </div>
-                        <p className="mt-2 text-sm text-slate-600">
-                          {paper.subjectLabels.join("・")} ・ {difficultyMeta[paper.difficulty].label} ・ {paper.questionCount} 題
-                        </p>
-                        <p className="mt-1 text-xs text-slate-500">
-                          {paper.createdByLabel || "匿名"} ・ {formatPaperTime(paper.createdAt)}
-                        </p>
-                      </div>
-                      <div className="flex flex-wrap gap-2 text-xs font-semibold">
-                        <span className="rounded-full bg-emerald-100 px-3 py-1 text-emerald-800">
-                          平均 {paper.averageAccuracyRate}%
+          <div className="mt-4 grid gap-3">
+            {publicLoading ? (
+              <div className="rounded-2xl bg-slate-50 p-4 text-sm text-slate-600">正在載入公開卷...</div>
+            ) : publicError ? (
+              <div className="rounded-2xl bg-rose-50 p-4 text-sm text-rose-900">{publicError}</div>
+            ) : publicPapers.length === 0 ? (
+              <div className="rounded-2xl bg-slate-50 p-4 text-sm text-slate-600">目前還沒有公開卷。</div>
+            ) : (
+              publicPapers.map((paper) => (
+                <button
+                  key={paper.paperCode}
+                  type="button"
+                  onClick={() => void handleLookupPaper(paper.paperCode)}
+                  className="rounded-3xl border border-slate-200 bg-slate-50 p-4 text-left transition hover:border-brand-200 hover:bg-white"
+                >
+                  <div className="flex flex-wrap items-start justify-between gap-3">
+                    <div className="min-w-0">
+                      <div className="flex flex-wrap items-center gap-2">
+                        <span className="rounded-full bg-slate-900 px-2.5 py-1 text-[11px] font-semibold text-white">
+                          {paper.paperCode}
                         </span>
-                        <span className="rounded-full bg-slate-200 px-3 py-1 text-slate-700">
-                          {paper.participantCount} 人作答
-                        </span>
+                        <h3 className="text-base font-semibold text-ink">{paper.name || "未命名自訂卷"}</h3>
                       </div>
+                      <p className="mt-2 text-sm text-slate-600">
+                        {paper.subjectLabels.join("・")} ・ {difficultyMeta[paper.difficulty].label} ・ {paper.questionCount} 題
+                      </p>
+                      <p className="mt-1 text-xs text-slate-500">
+                        {paper.createdByLabel || "匿名"} ・ {formatPaperTime(paper.createdAt)}
+                      </p>
                     </div>
-                  </button>
-                ))
-              )}
-            </div>
+                    <div className="flex flex-wrap gap-2 text-xs font-semibold">
+                      <span className="rounded-full bg-emerald-100 px-3 py-1 text-emerald-800">
+                        平均 {paper.averageAccuracyRate}%
+                      </span>
+                      <span className="rounded-full bg-slate-200 px-3 py-1 text-slate-700">
+                        {paper.participantCount} 人作答
+                      </span>
+                    </div>
+                  </div>
+                </button>
+              ))
+            )}
           </div>
         </section>
       )}
