@@ -477,14 +477,9 @@ export async function POST(request: NextRequest) {
       const actor = await resolveActor(supabase, body.accessToken, body.visitorId);
       const classificationOverrides = await loadClassificationOverrides(supabase);
       const bank = getQuestionBankWithOverrides(classificationOverrides);
-      const scopedIds = bank
-        .filter((question) => selectedSubjects.includes(question.subject))
-        .map((question) => question.id);
-
       const { data: accuracyRows, error: accuracyError } = await supabase
         .from("question_accuracy_stats")
-        .select("question_id, total_attempts, correct_attempts, correct_rate")
-        .in("question_id", scopedIds);
+        .select("question_id, total_attempts, correct_attempts, correct_rate");
 
       if (accuracyError) throw accuracyError;
 
