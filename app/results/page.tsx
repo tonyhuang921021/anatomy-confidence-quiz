@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useAuth } from "@/components/AuthProvider";
 import { QuestionOptionBlock, QuestionStemBlock } from "@/components/QuestionMediaBlock";
@@ -96,7 +96,7 @@ function getAccuracyTone(correctRate: number) {
   return "bg-emerald-100 text-emerald-800";
 }
 
-export default function ResultsPage() {
+function ResultsPageContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { syncVersion, session } = useAuth();
@@ -903,5 +903,21 @@ export default function ResultsPage() {
         </div>
       ) : null}
     </main>
+  );
+}
+
+export default function ResultsPage() {
+  return (
+    <Suspense
+      fallback={
+        <main className="shell">
+          <div className="rounded-[2rem] bg-white p-4 shadow-card ring-1 ring-slate-100 sm:p-6">
+            載入中...
+          </div>
+        </main>
+      }
+    >
+      <ResultsPageContent />
+    </Suspense>
   );
 }
