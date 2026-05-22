@@ -91,6 +91,12 @@ function getSessionModeLabel(session: QuizSession) {
         : "隨機刷題";
 }
 
+function getAccuracyTone(correctRate: number) {
+  if (correctRate < 30) return "bg-rose-100 text-rose-800";
+  if (correctRate <= 60) return "bg-amber-100 text-amber-800";
+  return "bg-emerald-100 text-emerald-800";
+}
+
 export default function ResultsPage() {
   const router = useRouter();
   const { syncVersion, session } = useAuth();
@@ -373,6 +379,7 @@ export default function ResultsPage() {
                 const completedAt = sessionItem.completedAt ?? sessionItem.startedAt;
                 const correctCount = sessionItem.attempts.filter((attempt) => attempt.isCorrect).length;
                 const totalCount = sessionItem.attempts.length;
+                const correctRate = totalCount > 0 ? Math.round((correctCount / totalCount) * 100) : 0;
 
                 return (
                   <Link
@@ -397,6 +404,9 @@ export default function ResultsPage() {
                       </div>
                       <div className="flex flex-wrap gap-2 text-xs font-semibold">
                         <span className="rounded-full bg-slate-200 px-3 py-1 text-slate-700">{totalCount} 題</span>
+                        <span className={`rounded-full px-3 py-1 ${getAccuracyTone(correctRate)}`}>
+                          答對率 {correctRate}%
+                        </span>
                         <span className="rounded-full bg-emerald-100 px-3 py-1 text-emerald-800">
                           {correctCount} / {totalCount} 答對
                         </span>
@@ -530,8 +540,6 @@ export default function ResultsPage() {
   }
 
   function renderExplanationFooter(question: Question, attempt: Attempt) {
-    const communityStats = communityStatsMap[question.id];
-
     return (
       <div className="space-y-3">
         <div className="flex flex-wrap items-center gap-2">
@@ -540,14 +548,20 @@ export default function ResultsPage() {
               已替換詳解・{explanationOverrides[question.id]?.model ?? "gpt-5-mini"}
             </span>
           ) : null}
-          {communityStats && communityStats.totalAttempts > 0 ? (
-            <span className="rounded-full bg-sky-50 px-3 py-1 text-xs font-semibold text-sky-800 ring-1 ring-sky-200">
-              全站答對率 {communityStats.correctRate}% ・ {communityStats.totalAttempts} 人作答
-            </span>
-          ) : null}
         </div>
         {renderQuestionExplanationControls(question, attempt)}
       </div>
+    );
+  }
+
+  function renderQuestionCommunityBadge(questionId: string) {
+    const communityStats = communityStatsMap[questionId];
+    if (!communityStats || communityStats.totalAttempts <= 0) return null;
+
+    return (
+      <span className="rounded-full bg-sky-50 px-2.5 py-1 text-[11px] font-semibold text-sky-800 ring-1 ring-sky-200">
+        全站 {communityStats.correctRate}%・{communityStats.totalAttempts} 人
+      </span>
     );
   }
 
@@ -625,9 +639,12 @@ export default function ResultsPage() {
                     wrongAttempts.map(({ attempt, question }, index) => (
                       <details key={`wrong-${attempt.questionId}`} className="rounded-2xl bg-rose-50 p-3.5 sm:p-4">
                         <summary className="cursor-pointer text-sm font-semibold text-rose-950">
-                          <span>
-                            錯題 {index + 1}：{question.chapter} / {question.section} / {question.testedConcept}
-                          </span>
+                          <div className="flex flex-wrap items-center gap-2 pr-6">
+                            <span>
+                              錯題 {index + 1}：{question.chapter} / {question.section} / {question.testedConcept}
+                            </span>
+                            {renderQuestionCommunityBadge(question.id)}
+                          </div>
                         </summary>
                         <div className="mt-4 space-y-3 text-sm leading-7 text-slate-700">
                           <QuestionStemBlock question={question} />
@@ -695,9 +712,12 @@ export default function ResultsPage() {
                     lowConfidenceAttempts.map(({ attempt, question }, index) => (
                       <details key={`low-confidence-${attempt.questionId}`} className="rounded-2xl bg-amber-50 p-3.5 sm:p-4">
                         <summary className="cursor-pointer text-sm font-semibold text-amber-950">
-                          <span>
-                            信心 {attempt.confidence}｜{index + 1}：{question.chapter} / {question.section} / {question.testedConcept}
-                          </span>
+                          <div className="flex flex-wrap items-center gap-2 pr-6">
+                            <span>
+                              信心 {attempt.confidence}｜{index + 1}：{question.chapter} / {question.section} / {question.testedConcept}
+                            </span>
+                            {renderQuestionCommunityBadge(question.id)}
+                          </div>
                         </summary>
                         <div className="mt-4 space-y-3 text-sm leading-7 text-slate-700">
                           <QuestionStemBlock question={question} />
@@ -764,9 +784,12 @@ export default function ResultsPage() {
                   {reviewedAttempts.map(({ attempt, question }, index) => (
                     <details key={`all-${attempt.questionId}`} className="rounded-2xl bg-slate-50 p-3.5 sm:p-4">
                       <summary className="cursor-pointer text-sm font-semibold text-ink">
-                        <span>
-                          第 {index + 1} 題：{attempt.isCorrect ? "答對" : "答錯"} / {question.chapter} / {question.section}
-                        </span>
+                        <div className="flex flex-wrap items-center gap-2 pr-6">
+                          <span>
+                            第 {index + 1} 題：{attempt.isCorrect ? "答對" : "答錯"} / {question.chapter} / {question.section}
+                          </span>
+                          {renderQuestionCommunityBadge(question.id)}
+                        </div>
                       </summary>
                       <div className="mt-4 space-y-3 text-sm leading-7 text-slate-700">
                         <QuestionStemBlock question={question} />
