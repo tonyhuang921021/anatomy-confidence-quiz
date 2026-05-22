@@ -114,26 +114,35 @@ export default function ResultsPage() {
   }
 
   useEffect(() => {
+    const targetSessionId =
+      typeof window === "undefined"
+        ? null
+        : new URLSearchParams(window.location.search).get("sessionId");
     const currentSession = loadCurrentSession();
-    if (!currentSession?.completedAt) {
+    const completedSessions = loadCompletedSessions();
+    const targetSession =
+      targetSessionId
+        ? completedSessions.find((item) => item.id === targetSessionId) ?? null
+        : currentSession;
+
+    if (!targetSession?.completedAt) {
       setMounted(true);
       return;
     }
 
-    const completedSessions = loadCompletedSessions();
     const currentQuestions =
-      currentSession.generatedQuestions && currentSession.generatedQuestions.length > 0
-        ? currentSession.generatedQuestions
+      targetSession.generatedQuestions && targetSession.generatedQuestions.length > 0
+        ? targetSession.generatedQuestions
         : anatomyQuestions;
     const completionStats = calculateCompletionStats(anatomyQuestions, completedSessions);
-    const sessionSectionStats = calculateSectionStats(currentSession.attempts, currentQuestions);
+    const sessionSectionStats = calculateSectionStats(targetSession.attempts, currentQuestions);
 
     setState({
-      session: currentSession,
+      session: targetSession,
       sessions: completedSessions,
-      summary: calculateSummary(currentSession.attempts, currentQuestions),
+      summary: calculateSummary(targetSession.attempts, currentQuestions),
       sectionStats: sessionSectionStats,
-      promptText: generateAIPrompt(currentSession.attempts, currentQuestions, completedSessions),
+      promptText: generateAIPrompt(targetSession.attempts, currentQuestions, completedSessions),
       lowCompletion: getLowCompletionSections(completionStats.sections, 5),
       unstableSections: getUnstableCompletedSections(completionStats.sections, 5),
       completionStats
@@ -452,6 +461,15 @@ export default function ResultsPage() {
           </h1>
           <p className="mt-2 text-sm text-slate-500">
             本輪模式：{getModeLabel(state.session.settings?.mode ?? "weakness")}
+          </p>
+          <p className="mt-1 text-sm text-slate-500">
+            完成時間：
+            {new Date(state.session.completedAt ?? state.session.startedAt).toLocaleString("zh-TW", {
+              month: "2-digit",
+              day: "2-digit",
+              hour: "2-digit",
+              minute: "2-digit"
+            })}
           </p>
         </div>
         <div className="flex flex-wrap gap-3">
