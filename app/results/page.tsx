@@ -562,6 +562,15 @@ export default function ResultsPage() {
     );
   }
 
+  function renderQuestionSummaryLine(label: string, questionId: string) {
+    return (
+      <span className="inline-flex max-w-full items-center gap-2 align-top">
+        <span className="min-w-0 truncate">{label}</span>
+        <span className="shrink-0">{renderQuestionCommunityBadge(questionId)}</span>
+      </span>
+    );
+  }
+
   return (
     <main className="shell">
       <div className="flex flex-wrap items-center justify-between gap-3">
@@ -636,12 +645,10 @@ export default function ResultsPage() {
                     wrongAttempts.map(({ attempt, question }, index) => (
                       <details key={`wrong-${attempt.questionId}`} className="rounded-2xl bg-rose-50 p-3.5 sm:p-4">
                         <summary className="cursor-pointer text-sm font-semibold text-rose-950">
-                          <div className="flex flex-wrap items-center gap-2 pr-6">
-                            <span>
-                              錯題 {index + 1}：{question.chapter} / {question.section} / {question.testedConcept}
-                            </span>
-                            {renderQuestionCommunityBadge(question.id)}
-                          </div>
+                          {renderQuestionSummaryLine(
+                            `錯題 ${index + 1}：${question.chapter} / ${question.section} / ${question.testedConcept}`,
+                            question.id
+                          )}
                         </summary>
                         <div className="mt-4 space-y-3 text-sm leading-7 text-slate-700">
                           <QuestionStemBlock question={question} />
@@ -709,12 +716,10 @@ export default function ResultsPage() {
                     lowConfidenceAttempts.map(({ attempt, question }, index) => (
                       <details key={`low-confidence-${attempt.questionId}`} className="rounded-2xl bg-amber-50 p-3.5 sm:p-4">
                         <summary className="cursor-pointer text-sm font-semibold text-amber-950">
-                          <div className="flex flex-wrap items-center gap-2 pr-6">
-                            <span>
-                              信心 {attempt.confidence}｜{index + 1}：{question.chapter} / {question.section} / {question.testedConcept}
-                            </span>
-                            {renderQuestionCommunityBadge(question.id)}
-                          </div>
+                          {renderQuestionSummaryLine(
+                            `信心 ${attempt.confidence}｜${index + 1}：${question.chapter} / ${question.section} / ${question.testedConcept}`,
+                            question.id
+                          )}
                         </summary>
                         <div className="mt-4 space-y-3 text-sm leading-7 text-slate-700">
                           <QuestionStemBlock question={question} />
@@ -781,12 +786,10 @@ export default function ResultsPage() {
                   {reviewedAttempts.map(({ attempt, question }, index) => (
                     <details key={`all-${attempt.questionId}`} className="rounded-2xl bg-slate-50 p-3.5 sm:p-4">
                       <summary className="cursor-pointer text-sm font-semibold text-ink">
-                        <div className="flex flex-wrap items-center gap-2 pr-6">
-                          <span>
-                            第 {index + 1} 題：{attempt.isCorrect ? "答對" : "答錯"} / {question.chapter} / {question.section}
-                          </span>
-                          {renderQuestionCommunityBadge(question.id)}
-                        </div>
+                        {renderQuestionSummaryLine(
+                          `第 ${index + 1} 題：${attempt.isCorrect ? "答對" : "答錯"} / ${question.chapter} / ${question.section}`,
+                          question.id
+                        )}
                       </summary>
                       <div className="mt-4 space-y-3 text-sm leading-7 text-slate-700">
                         <QuestionStemBlock question={question} />
