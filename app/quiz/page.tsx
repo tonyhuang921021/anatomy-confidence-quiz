@@ -394,7 +394,7 @@ export default function QuizPage() {
         persistSession(completedSession);
         saveCompletedSession(completedSession);
         void pushCompletedSessionToSupabase(completedSession);
-        router.push("/results");
+        router.push(`/results?sessionId=${encodeURIComponent(completedSession.id)}`);
         return;
       }
 
@@ -460,7 +460,7 @@ export default function QuizPage() {
       persistSession(completedSession);
       saveCompletedSession(completedSession);
       void pushCompletedSessionToSupabase(completedSession);
-      router.push("/results");
+      router.push(`/results?sessionId=${encodeURIComponent(completedSession.id)}`);
       return;
     }
 

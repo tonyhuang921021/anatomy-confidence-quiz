@@ -95,6 +95,7 @@ export default function ResultsPage() {
   const router = useRouter();
   const { syncVersion, session } = useAuth();
   const [mounted, setMounted] = useState(false);
+  const [requestedSessionId, setRequestedSessionId] = useState<string | null>(null);
   const [explanationOverrides, setExplanationOverrides] = useState<Record<string, QuestionExplanationOverride>>({});
   const [explanationLoadingMap, setExplanationLoadingMap] = useState<Record<string, boolean>>({});
   const [explanationErrorMap, setExplanationErrorMap] = useState<Record<string, string>>({});
@@ -128,14 +129,25 @@ export default function ResultsPage() {
       typeof window === "undefined"
         ? null
         : new URLSearchParams(window.location.search).get("sessionId");
-    const currentSession = loadCurrentSession();
+    setRequestedSessionId(targetSessionId);
     const completedSessions = loadCompletedSessions();
     const targetSession =
       targetSessionId
         ? completedSessions.find((item) => item.id === targetSessionId) ?? null
-        : currentSession;
+        : null;
 
     if (!targetSession?.completedAt) {
+      setState((current) => ({
+        ...current,
+        session: null,
+        sessions: completedSessions,
+        summary: null,
+        sectionStats: [],
+        promptText: "",
+        lowCompletion: [],
+        unstableSections: [],
+        completionStats: null
+      }));
       setMounted(true);
       return;
     }
@@ -344,12 +356,12 @@ export default function ResultsPage() {
     )
     .slice(0, 30);
 
-  if (!state.session || !state.summary || !state.completionStats) {
+  if (!requestedSessionId) {
     return (
       <main className="shell">
         <section className="rounded-[2rem] bg-white p-5 text-center shadow-card ring-1 ring-slate-100 sm:p-8">
-          <h1 className="text-2xl font-semibold text-ink">目前沒有可顯示的結果</h1>
-          <p className="mt-3 text-slate-500">可以直接從下面選一筆已完成作答紀錄來看當次結果頁。</p>
+          <h1 className="text-2xl font-semibold text-ink">每次作答紀錄</h1>
+          <p className="mt-3 text-slate-500">先選一筆紀錄，再進去看那一次的完整結果頁。</p>
 
           <div className="mt-6 grid gap-3 text-left">
             {recentCompletedSessions.length === 0 ? (
@@ -402,6 +414,31 @@ export default function ResultsPage() {
               className="min-h-12 rounded-2xl bg-slate-100 px-5 py-4 text-sm font-semibold text-slate-800 transition hover:bg-slate-200"
             >
               返回首頁
+            </Link>
+            <Link
+              href="/quiz"
+              className="min-h-12 rounded-2xl bg-brand-600 px-5 py-4 text-sm font-semibold text-white transition hover:bg-brand-700"
+            >
+              開始測驗
+            </Link>
+          </div>
+        </section>
+      </main>
+    );
+  }
+
+  if (!state.session || !state.summary || !state.completionStats) {
+    return (
+      <main className="shell">
+        <section className="rounded-[2rem] bg-white p-5 text-center shadow-card ring-1 ring-slate-100 sm:p-8">
+          <h1 className="text-2xl font-semibold text-ink">找不到這次作答紀錄</h1>
+          <p className="mt-3 text-slate-500">這筆結果可能已被清除，或尚未完成作答。</p>
+          <div className="mt-6 flex flex-col justify-center gap-3 sm:flex-row">
+            <Link
+              href="/results"
+              className="min-h-12 rounded-2xl bg-slate-100 px-5 py-4 text-sm font-semibold text-slate-800 transition hover:bg-slate-200"
+            >
+              回到作答紀錄
             </Link>
             <Link
               href="/quiz"
@@ -537,6 +574,12 @@ export default function ResultsPage() {
         </div>
         <div className="flex flex-wrap gap-3">
           <Link
+            href="/results"
+            className="min-h-12 rounded-2xl bg-slate-100 px-5 py-4 text-sm font-semibold text-slate-800 transition hover:bg-slate-200"
+          >
+            回到作答紀錄
+          </Link>
+          <Link
             href="/progress"
             className="min-h-12 rounded-2xl bg-slate-100 px-5 py-4 text-sm font-semibold text-slate-800 transition hover:bg-slate-200"
           >
@@ -551,53 +594,6 @@ export default function ResultsPage() {
           </button>
         </div>
       </div>
-
-      <section className="mt-6 rounded-[2rem] bg-white p-4 shadow-card ring-1 ring-slate-100 sm:p-6">
-        <h2 className="text-xl font-semibold text-ink">每次作答紀錄</h2>
-        <p className="mt-2 text-sm text-slate-500">先選一筆紀錄，再往下看那一次的完整結果頁。</p>
-        <div className="mt-4 grid gap-3">
-          {recentCompletedSessions.map((sessionItem) => {
-            const completedAt = sessionItem.completedAt ?? sessionItem.startedAt;
-            const correctCount = sessionItem.attempts.filter((attempt) => attempt.isCorrect).length;
-            const totalCount = sessionItem.attempts.length;
-            const isCurrent = sessionItem.id === state.session?.id;
-
-            return (
-              <Link
-                key={sessionItem.id}
-                href={`/results?sessionId=${encodeURIComponent(sessionItem.id)}`}
-                className={`rounded-2xl border p-4 text-sm transition ${
-                  isCurrent
-                    ? "border-brand-300 bg-brand-50 text-brand-900"
-                    : "border-slate-200 bg-slate-50 text-slate-700 hover:border-brand-200 hover:bg-white"
-                }`}
-              >
-                <div className="flex flex-wrap items-start justify-between gap-3">
-                  <div>
-                    <p className="font-semibold">
-                      {sessionItem.subject}・{getSessionModeLabel(sessionItem)}
-                    </p>
-                    <p className="mt-2 text-xs text-slate-500">
-                      {new Date(completedAt).toLocaleString("zh-TW", {
-                        month: "2-digit",
-                        day: "2-digit",
-                        hour: "2-digit",
-                        minute: "2-digit"
-                      })}
-                    </p>
-                  </div>
-                  <div className="flex flex-wrap gap-2 text-xs font-semibold">
-                    <span className="rounded-full bg-slate-200 px-3 py-1 text-slate-700">{totalCount} 題</span>
-                    <span className="rounded-full bg-emerald-100 px-3 py-1 text-emerald-800">
-                      {correctCount} / {totalCount} 答對
-                    </span>
-                  </div>
-                </div>
-              </Link>
-            );
-          })}
-        </div>
-      </section>
 
       <div className="mt-6">
         <ResultSummary summary={state.summary} />
