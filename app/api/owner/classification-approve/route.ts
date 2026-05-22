@@ -5,6 +5,10 @@ import type { SubjectName } from "@/types/quiz";
 type ApproveClassificationBody = {
   accessToken?: string;
   reportId?: string;
+  action?: "approve" | "manual_apply" | "revoke";
+  subject?: SubjectName;
+  chapter?: string;
+  section?: string;
 };
 
 type ReportRow = {
@@ -101,7 +105,38 @@ export async function POST(request: NextRequest) {
     }
 
     const typedReport = report as ReportRow;
-    const subject = typedReport.suggested_subject?.trim() as SubjectName | undefined;
+    const action = body.action ?? "approve";
+    const now = new Date().toISOString();
+
+    if (action === "revoke") {
+      const { error: deleteOverrideError } = await supabase
+        .from("question_classification_overrides")
+        .delete()
+        .eq("question_id", typedReport.question_id);
+
+      if (deleteOverrideError) throw deleteOverrideError;
+
+      const { error: resetReportError } = await supabase
+        .from("question_classification_reports")
+        .update({
+          applied_at: null,
+          approved_by_email: null
+        })
+        .eq("id", typedReport.id);
+
+      if (resetReportError) throw resetReportError;
+
+      return NextResponse.json({
+        ok: true,
+        action: "revoke",
+        questionId: typedReport.question_id
+      });
+    }
+
+    const subject =
+      action === "manual_apply"
+        ? body.subject
+        : (typedReport.suggested_subject?.trim() as SubjectName | undefined);
     if (!subject || !VALID_SUBJECTS.has(subject)) {
       return NextResponse.json(
         { ok: false, message: "這筆回報目前沒有可套用的有效科目。" },
@@ -109,9 +144,10 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const chapter = typedReport.suggested_chapter?.trim() || subject;
-    const section = typedReport.suggested_section?.trim() || chapter;
-    const now = new Date().toISOString();
+    const chapter =
+      (action === "manual_apply" ? body.chapter : typedReport.suggested_chapter)?.trim() || subject;
+    const section =
+      (action === "manual_apply" ? body.section : typedReport.suggested_section)?.trim() || chapter;
 
     const { error: overrideError } = await supabase.from("question_classification_overrides").upsert(
       {
@@ -127,18 +163,30 @@ export async function POST(request: NextRequest) {
 
     if (overrideError) throw overrideError;
 
+    const reportUpdatePayload =
+      action === "manual_apply"
+        ? {
+            suggested_subject: subject,
+            suggested_chapter: chapter,
+            suggested_section: section,
+            applied_at: now,
+            approved_by_email: userData.user.email
+          }
+        : {
+            applied_at: now,
+            approved_by_email: userData.user.email
+          };
+
     const { error: updateReportError } = await supabase
       .from("question_classification_reports")
-      .update({
-        applied_at: now,
-        approved_by_email: userData.user.email
-      })
+      .update(reportUpdatePayload)
       .eq("id", typedReport.id);
 
     if (updateReportError) throw updateReportError;
 
     return NextResponse.json({
       ok: true,
+      action,
       questionId: typedReport.question_id,
       subject,
       chapter,
