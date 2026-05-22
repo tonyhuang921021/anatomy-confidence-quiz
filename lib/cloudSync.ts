@@ -1385,6 +1385,16 @@ type RecordCustomPaperAttemptInput = {
   session: QuizSession;
 };
 
+function tryParseJson<T>(rawText: string): T | null {
+  if (!rawText) return null;
+
+  try {
+    return JSON.parse(rawText) as T;
+  } catch {
+    return null;
+  }
+}
+
 export async function generateCustomPaper(
   input: GenerateCustomPaperInput
 ): Promise<CustomPaperDetail> {
@@ -1399,12 +1409,13 @@ export async function generateCustomPaper(
     })
   });
 
-  const payload = (await response.json().catch(() => null)) as
+  const rawText = await response.text();
+  const payload = tryParseJson<
     | { ok?: boolean; message?: string; paper?: CustomPaperDetail }
-    | null;
+  >(rawText);
 
   if (!response.ok || !payload?.ok || !payload.paper) {
-    throw new Error(payload?.message || "自訂卷產生失敗");
+    throw new Error(payload?.message || rawText || "自訂卷產生失敗");
   }
 
   return payload.paper;
@@ -1412,12 +1423,13 @@ export async function generateCustomPaper(
 
 export async function lookupCustomPaper(paperCode: string): Promise<CustomPaperDetail> {
   const response = await fetch(`/api/custom-papers?paperCode=${encodeURIComponent(paperCode)}`);
-  const payload = (await response.json().catch(() => null)) as
+  const rawText = await response.text();
+  const payload = tryParseJson<
     | { ok?: boolean; message?: string; paper?: CustomPaperDetail }
-    | null;
+  >(rawText);
 
   if (!response.ok || !payload?.ok || !payload.paper) {
-    throw new Error(payload?.message || "找不到這份自訂卷");
+    throw new Error(payload?.message || rawText || "找不到這份自訂卷");
   }
 
   return payload.paper;
@@ -1425,12 +1437,13 @@ export async function lookupCustomPaper(paperCode: string): Promise<CustomPaperD
 
 export async function loadPublicCustomPapers(): Promise<CustomPaperSummary[]> {
   const response = await fetch("/api/custom-papers");
-  const payload = (await response.json().catch(() => null)) as
+  const rawText = await response.text();
+  const payload = tryParseJson<
     | { ok?: boolean; message?: string; papers?: CustomPaperSummary[] }
-    | null;
+  >(rawText);
 
   if (!response.ok || !payload?.ok || !payload.papers) {
-    throw new Error(payload?.message || "公開卷載入失敗");
+    throw new Error(payload?.message || rawText || "公開卷載入失敗");
   }
 
   return payload.papers;
@@ -1450,11 +1463,12 @@ export async function recordCustomPaperAttempt(
     })
   });
 
-  const payload = (await response.json().catch(() => null)) as
+  const rawText = await response.text();
+  const payload = tryParseJson<
     | { ok?: boolean; message?: string }
-    | null;
+  >(rawText);
 
   if (!response.ok || !payload?.ok) {
-    throw new Error(payload?.message || "自訂卷作答紀錄同步失敗");
+    throw new Error(payload?.message || rawText || "自訂卷作答紀錄同步失敗");
   }
 }

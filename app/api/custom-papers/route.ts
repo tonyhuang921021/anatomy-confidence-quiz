@@ -90,6 +90,33 @@ function getServiceSupabaseClient() {
   });
 }
 
+function formatCustomPaperErrorMessage(error: unknown) {
+  const message = error instanceof Error ? error.message : "自訂卷操作失敗";
+
+  if (
+    message.includes("custom_papers") &&
+    (message.includes("does not exist") || message.includes("Could not find"))
+  ) {
+    return "Supabase 還沒建立 custom_papers 資料表，請先跑自訂卷模式那段 SQL。";
+  }
+
+  if (
+    message.includes("custom_paper_attempts") &&
+    (message.includes("does not exist") || message.includes("Could not find"))
+  ) {
+    return "Supabase 還沒建立 custom_paper_attempts 資料表，請先跑自訂卷模式那段 SQL。";
+  }
+
+  if (
+    message.includes("question_accuracy_stats") &&
+    (message.includes("does not exist") || message.includes("Could not find"))
+  ) {
+    return "Supabase 缺少 question_accuracy_stats，先把統計相關 SQL 跑完再用自訂卷模式。";
+  }
+
+  return message;
+}
+
 function getAllowedSubjectList(subjects: string[] = []) {
   return Array.from(
     new Set(
@@ -420,7 +447,7 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json({ ok: true, papers });
   } catch (error) {
-    const message = error instanceof Error ? error.message : "自訂卷載入失敗";
+    const message = formatCustomPaperErrorMessage(error);
     return NextResponse.json({ ok: false, message }, { status: 500 });
   }
 }
@@ -545,7 +572,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({ ok: true });
   } catch (error) {
-    const message = error instanceof Error ? error.message : "自訂卷操作失敗";
+    const message = formatCustomPaperErrorMessage(error);
     return NextResponse.json({ ok: false, message }, { status: 500 });
   }
 }
