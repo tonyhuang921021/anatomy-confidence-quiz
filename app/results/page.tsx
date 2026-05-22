@@ -81,6 +81,16 @@ type ResultState = {
   completionStats: ReturnType<typeof calculateCompletionStats> | null;
 };
 
+function getSessionModeLabel(session: QuizSession) {
+  return session.settings?.mode === "simulation"
+    ? "模擬考"
+    : session.settings?.mode === "review"
+      ? "錯題複習"
+      : session.settings?.mode === "weakness"
+        ? "弱點補強"
+        : "隨機刷題";
+}
+
 export default function ResultsPage() {
   const router = useRouter();
   const { syncVersion, session } = useAuth();
@@ -327,12 +337,65 @@ export default function ResultsPage() {
     );
   }
 
+  const recentCompletedSessions = [...state.sessions]
+    .filter((sessionItem) => Boolean(sessionItem.completedAt))
+    .sort((a, b) =>
+      (b.completedAt ?? b.startedAt).localeCompare(a.completedAt ?? a.startedAt)
+    )
+    .slice(0, 30);
+
   if (!state.session || !state.summary || !state.completionStats) {
     return (
       <main className="shell">
         <section className="rounded-[2rem] bg-white p-5 text-center shadow-card ring-1 ring-slate-100 sm:p-8">
           <h1 className="text-2xl font-semibold text-ink">目前沒有可顯示的結果</h1>
-          <p className="mt-3 text-slate-500">可能尚未完成本輪測驗，或已清除 current session。</p>
+          <p className="mt-3 text-slate-500">可以直接從下面選一筆已完成作答紀錄來看當次結果頁。</p>
+
+          <div className="mt-6 grid gap-3 text-left">
+            {recentCompletedSessions.length === 0 ? (
+              <div className="rounded-2xl bg-slate-50 p-4 text-sm text-slate-600">
+                目前還沒有已完成的作答紀錄。
+              </div>
+            ) : (
+              recentCompletedSessions.map((sessionItem, index) => {
+                const completedAt = sessionItem.completedAt ?? sessionItem.startedAt;
+                const correctCount = sessionItem.attempts.filter((attempt) => attempt.isCorrect).length;
+                const totalCount = sessionItem.attempts.length;
+
+                return (
+                  <Link
+                    key={sessionItem.id}
+                    href={`/results?sessionId=${encodeURIComponent(sessionItem.id)}`}
+                    className="rounded-3xl border border-slate-200 bg-slate-50 p-4 transition hover:border-brand-200 hover:bg-white"
+                  >
+                    <div className="flex flex-wrap items-start justify-between gap-3">
+                      <div>
+                        <p className="text-sm font-semibold text-ink">
+                          第 {recentCompletedSessions.length - index} 筆・{sessionItem.subject}
+                        </p>
+                        <p className="mt-2 text-sm text-slate-500">
+                          {getSessionModeLabel(sessionItem)} ・{" "}
+                          {new Date(completedAt).toLocaleString("zh-TW", {
+                            month: "2-digit",
+                            day: "2-digit",
+                            hour: "2-digit",
+                            minute: "2-digit"
+                          })}
+                        </p>
+                      </div>
+                      <div className="flex flex-wrap gap-2 text-xs font-semibold">
+                        <span className="rounded-full bg-slate-200 px-3 py-1 text-slate-700">{totalCount} 題</span>
+                        <span className="rounded-full bg-emerald-100 px-3 py-1 text-emerald-800">
+                          {correctCount} / {totalCount} 答對
+                        </span>
+                      </div>
+                    </div>
+                  </Link>
+                );
+              })
+            )}
+          </div>
+
           <div className="mt-6 flex flex-col justify-center gap-3 sm:flex-row">
             <Link
               href="/"
@@ -762,6 +825,46 @@ export default function ResultsPage() {
               >
                 複製 AI 補弱 Prompt
               </button>
+            </div>
+          </section>
+
+          <section className="rounded-[2rem] bg-white p-4 shadow-card ring-1 ring-slate-100 sm:p-6">
+            <h2 className="text-xl font-semibold text-ink">每次作答紀錄</h2>
+            <p className="mt-2 text-sm text-slate-500">點一下就能切到那一次的結果頁。</p>
+            <div className="mt-4 grid gap-3">
+              {recentCompletedSessions.map((sessionItem) => {
+                const completedAt = sessionItem.completedAt ?? sessionItem.startedAt;
+                const correctCount = sessionItem.attempts.filter((attempt) => attempt.isCorrect).length;
+                const totalCount = sessionItem.attempts.length;
+                const isCurrent = sessionItem.id === state.session?.id;
+
+                return (
+                  <Link
+                    key={sessionItem.id}
+                    href={`/results?sessionId=${encodeURIComponent(sessionItem.id)}`}
+                    className={`rounded-2xl border p-4 text-sm transition ${
+                      isCurrent
+                        ? "border-brand-300 bg-brand-50 text-brand-900"
+                        : "border-slate-200 bg-slate-50 text-slate-700 hover:border-brand-200 hover:bg-white"
+                    }`}
+                  >
+                    <p className="font-semibold">
+                      {sessionItem.subject}・{getSessionModeLabel(sessionItem)}
+                    </p>
+                    <p className="mt-2 text-xs text-slate-500">
+                      {new Date(completedAt).toLocaleString("zh-TW", {
+                        month: "2-digit",
+                        day: "2-digit",
+                        hour: "2-digit",
+                        minute: "2-digit"
+                      })}
+                    </p>
+                    <p className="mt-2 text-xs font-semibold">
+                      {correctCount} / {totalCount} 答對
+                    </p>
+                  </Link>
+                );
+              })}
             </div>
           </section>
         </aside>

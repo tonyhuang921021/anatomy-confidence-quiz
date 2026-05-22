@@ -237,12 +237,6 @@ export default function ProgressPage() {
     .filter((subject) => subject.attemptedQuestions > 0)
     .sort((a, b) => b.masteryScore - a.masteryScore)
     .slice(0, 5);
-  const recentCompletedSessions = [...sessions]
-    .filter((session) => Boolean(session.completedAt))
-    .sort((a, b) =>
-      (b.completedAt ?? b.startedAt).localeCompare(a.completedAt ?? a.startedAt)
-    )
-    .slice(0, 20);
 
   return (
     <main className="shell">
@@ -349,66 +343,6 @@ export default function ProgressPage() {
               ))
             )}
           </div>
-        </div>
-      </section>
-
-      <section className="mt-8 rounded-[2rem] bg-white p-6 shadow-card ring-1 ring-slate-100">
-        <div className="flex flex-wrap items-center justify-between gap-4">
-          <div>
-            <p className="text-sm font-semibold uppercase tracking-[0.2em] text-brand-700">History</p>
-            <h2 className="mt-2 text-2xl font-semibold text-ink">每次作答紀錄</h2>
-            <p className="mt-2 text-sm text-slate-500">點開就能查看當次 10 題的完整結果頁。</p>
-          </div>
-        </div>
-
-        <div className="mt-5 grid gap-3">
-          {recentCompletedSessions.length === 0 ? (
-            <div className="rounded-2xl bg-slate-50 p-4 text-sm text-slate-600">目前還沒有已完成的作答紀錄。</div>
-          ) : (
-            recentCompletedSessions.map((sessionItem, index) => {
-              const completedAt = sessionItem.completedAt ?? sessionItem.startedAt;
-              const correctCount = sessionItem.attempts.filter((attempt) => attempt.isCorrect).length;
-              const totalCount = sessionItem.attempts.length;
-              const modeLabel =
-                sessionItem.settings?.mode === "simulation"
-                  ? "模擬考"
-                  : sessionItem.settings?.mode === "review"
-                    ? "錯題複習"
-                    : sessionItem.settings?.mode === "weakness"
-                      ? "弱點補強"
-                      : "隨機刷題";
-
-              return (
-                <Link
-                  key={sessionItem.id}
-                  href={`/results?sessionId=${encodeURIComponent(sessionItem.id)}`}
-                  className="rounded-3xl border border-slate-200 bg-slate-50 p-4 transition hover:border-brand-200 hover:bg-white"
-                >
-                  <div className="flex flex-wrap items-start justify-between gap-3">
-                    <div>
-                      <p className="text-sm font-semibold text-ink">
-                        第 {recentCompletedSessions.length - index} 筆・{sessionItem.subject}
-                      </p>
-                      <p className="mt-2 text-sm text-slate-500">
-                        {modeLabel} ・ {new Date(completedAt).toLocaleString("zh-TW", {
-                          month: "2-digit",
-                          day: "2-digit",
-                          hour: "2-digit",
-                          minute: "2-digit"
-                        })}
-                      </p>
-                    </div>
-                    <div className="flex flex-wrap gap-2 text-xs font-semibold">
-                      <span className="rounded-full bg-slate-200 px-3 py-1 text-slate-700">{totalCount} 題</span>
-                      <span className="rounded-full bg-emerald-100 px-3 py-1 text-emerald-800">
-                        {correctCount} / {totalCount} 答對
-                      </span>
-                    </div>
-                  </div>
-                </Link>
-              );
-            })
-          )}
         </div>
       </section>
 
