@@ -251,12 +251,13 @@ function selectQuestionsByDifficulty(
   const unseenSelection = pickByPriority(buildTiers(unseen), 10);
   if (difficulty === "hard") {
     const strictHardQuestions = unseen.filter(isStrictHardQuestion);
+    const orderedStrictHardQuestions = byHardness(strictHardQuestions);
 
-    if (strictHardQuestions.length >= 10) {
-      return sample(strictHardQuestions, 10);
+    if (orderedStrictHardQuestions.length >= 10) {
+      return orderedStrictHardQuestions.slice(0, 10);
     }
 
-    return strictHardQuestions;
+    return orderedStrictHardQuestions;
   }
 
   if (unseenSelection.length >= 10) {
