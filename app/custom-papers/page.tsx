@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { useAuth } from "@/components/AuthProvider";
 import { enabledSubjects, MED1_SUBJECTS, MED2_SUBJECTS } from "@/data/subjectRegistry";
 import {
+  generateAISearchCustomPaper,
   generateCustomPaper,
   loadPublicCustomPapers,
   lookupCustomPaper
@@ -39,6 +40,10 @@ const difficultyMeta: Record<CustomPaperDifficulty, { label: string; description
   hard: {
     label: "難",
     description: "只抽至少 1 人做過且全站答對率不超過三分之一的題目，並從最難的開始取。"
+  },
+  ai_search: {
+    label: "AI 檢索",
+    description: "打關鍵字後由 AI 幫你找出同一區塊的相關題目。"
   }
 };
 
@@ -51,16 +56,21 @@ function formatPaperTime(value: string) {
   });
 }
 
+function formatSubjectLabels(labels: string[]) {
+  return labels.length > 0 ? labels.join("・") : "全部科目";
+}
+
 export default function CustomPapersPage() {
   const router = useRouter();
   const { session } = useAuth();
   const med1Subjects = selectableSubjects.filter((item) => MED1_SUBJECTS.includes(item.subject));
   const med2Subjects = selectableSubjects.filter((item) => MED2_SUBJECTS.includes(item.subject));
-  const [tab, setTab] = useState<"generate" | "public" | "lookup">("generate");
+  const [tab, setTab] = useState<"generate" | "ai_search" | "public" | "lookup">("generate");
   const [selectedSubjects, setSelectedSubjects] = useState<SubjectName[]>([]);
   const [difficulty, setDifficulty] = useState<CustomPaperDifficulty>("hard");
   const [paperName, setPaperName] = useState("");
   const [isPublic, setIsPublic] = useState(true);
+  const [aiQuery, setAiQuery] = useState("");
   const [generating, setGenerating] = useState(false);
   const [generateError, setGenerateError] = useState("");
   const [generatedPaper, setGeneratedPaper] = useState<CustomPaperDetail | null>(null);
@@ -115,7 +125,7 @@ export default function CustomPapersPage() {
     saveQuizSettings({
       ...DEFAULT_QUIZ_SETTINGS,
       mode: "custom_paper",
-      questionCount: 10,
+      questionCount: paper.questionIds.length,
       subjectFilter,
       subjectFilters,
       customQuestionIds: paper.questionIds,
@@ -152,6 +162,33 @@ export default function CustomPapersPage() {
       }
     } catch (error) {
       setGenerateError(error instanceof Error ? error.message : "自訂卷產生失敗");
+    } finally {
+      setGenerating(false);
+    }
+  }
+
+  async function handleGenerateAISearch() {
+    if (!aiQuery.trim()) return;
+
+    try {
+      setGenerating(true);
+      setGenerateError("");
+      const paper = await generateAISearchCustomPaper({
+        accessToken: session?.access_token ?? null,
+        visitorId: getOrCreateVisitorId() ?? "",
+        selectedSubjects,
+        query: aiQuery,
+        name: paperName,
+        isPublic
+      });
+      setGeneratedPaper(paper);
+      setSelectedPaper(paper);
+      setTab("lookup");
+      if (paper.isPublic) {
+        setPublicPapers((current) => [paper, ...current].slice(0, 30));
+      }
+    } catch (error) {
+      setGenerateError(error instanceof Error ? error.message : "AI 智慧檢索自訂卷產生失敗");
     } finally {
       setGenerating(false);
     }
@@ -254,6 +291,17 @@ export default function CustomPapersPage() {
           </button>
           <button
             type="button"
+            onClick={() => setTab("ai_search")}
+            className={`min-h-12 rounded-2xl px-5 py-3 text-sm font-semibold transition ${
+              tab === "ai_search"
+                ? "bg-brand-600 text-white"
+                : "bg-slate-100 text-slate-800 hover:bg-slate-200"
+            }`}
+          >
+            AI 智慧檢索
+          </button>
+          <button
+            type="button"
             onClick={() => setTab("public")}
             className={`min-h-12 rounded-2xl px-5 py-3 text-sm font-semibold transition ${
               tab === "public"
@@ -286,7 +334,7 @@ export default function CustomPapersPage() {
             <div className="rounded-[2rem] bg-slate-50 p-5 ring-1 ring-slate-100">
               <h2 className="text-lg font-semibold text-ink">難度</h2>
               <div className="mt-4 grid gap-3 lg:grid-cols-3">
-                {(Object.keys(difficultyMeta) as CustomPaperDifficulty[]).map((level) => (
+                {(["easy", "medium", "hard"] as CustomPaperDifficulty[]).map((level) => (
                   <button
                     key={level}
                     type="button"
@@ -343,6 +391,74 @@ export default function CustomPapersPage() {
                   className="min-h-12 rounded-2xl bg-brand-600 px-5 py-3 text-sm font-semibold text-white transition hover:bg-brand-700 disabled:cursor-not-allowed disabled:bg-slate-300"
                 >
                   {generating ? "產卷中..." : "產生 10 題自訂卷"}
+                </button>
+              </div>
+
+              {generateError ? (
+                <div className="mt-4 rounded-2xl bg-rose-50 p-4 text-sm text-rose-900">{generateError}</div>
+              ) : null}
+            </div>
+          </div>
+        </section>
+      ) : tab === "ai_search" ? (
+        <section className="mt-6 rounded-[2rem] bg-white p-6 shadow-card ring-1 ring-slate-100 sm:p-8">
+          <div className="grid gap-6">
+            <div className="rounded-[2rem] bg-slate-50 p-5 ring-1 ring-slate-100">
+              <h2 className="text-lg font-semibold text-ink">AI 智慧檢索題目</h2>
+              <p className="mt-2 text-sm leading-7 text-slate-600">
+                打你剛學完的區塊、章節或關鍵字，AI 會幫你找出同一區塊的相關題目，整包做成一份卷。這份卷不只 10 題，會把找到的相關題都放進去。
+              </p>
+              <textarea
+                value={aiQuery}
+                onChange={(event) => setAiQuery(event.target.value.slice(0, 200))}
+                placeholder="例如：腎小管酸鹼平衡、brachial plexus、類固醇生成、血液氣體運輸"
+                className="mt-4 min-h-28 w-full rounded-3xl border border-slate-200 bg-white p-4 text-sm leading-7 text-slate-800 outline-none"
+              />
+              <p className="mt-2 text-xs text-slate-500">
+                可不選科目；如果有先勾科目，AI 就只會在那些科目裡找題。
+              </p>
+            </div>
+
+            {renderSubjectGroup("醫學（一）科目篩選（可不選）", med1Subjects)}
+            {renderSubjectGroup("醫學（二）科目篩選（可不選）", med2Subjects)}
+
+            <div className="rounded-[2rem] bg-slate-50 p-5 ring-1 ring-slate-100">
+              <div className="grid gap-4 lg:grid-cols-[1.2fr_0.8fr]">
+                <div>
+                  <label className="text-sm font-semibold text-ink">這份卷的名稱（可不填）</label>
+                  <input
+                    value={paperName}
+                    onChange={(event) => setPaperName(event.target.value.slice(0, 60))}
+                    placeholder="例如：腎臟酸鹼平衡總整理"
+                    className="mt-2 min-h-12 w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-800 outline-none"
+                  />
+                </div>
+                <div className="flex items-end">
+                  <button
+                    type="button"
+                    onClick={() => setIsPublic((current) => !current)}
+                    className={`min-h-12 w-full rounded-2xl px-4 py-3 text-sm font-semibold transition ${
+                      isPublic
+                        ? "bg-emerald-100 text-emerald-900 ring-1 ring-emerald-300"
+                        : "bg-white text-slate-800 ring-1 ring-slate-200 hover:bg-slate-50"
+                    }`}
+                  >
+                    {isPublic ? "公開這份卷：開" : "公開這份卷：關"}
+                  </button>
+                </div>
+              </div>
+
+              <div className="mt-4 flex flex-wrap items-center justify-between gap-3">
+                <p className="text-sm text-slate-600">
+                  AI 會先理解你輸入的區塊，再把相關題目整包組成一份卷；這個模式可直接公開給大家一起做。
+                </p>
+                <button
+                  type="button"
+                  onClick={() => void handleGenerateAISearch()}
+                  disabled={generating || !aiQuery.trim()}
+                  className="min-h-12 rounded-2xl bg-brand-600 px-5 py-3 text-sm font-semibold text-white transition hover:bg-brand-700 disabled:cursor-not-allowed disabled:bg-slate-300"
+                >
+                  {generating ? "AI 檢索中..." : "產生 AI 智慧檢索卷"}
                 </button>
               </div>
 
@@ -411,7 +527,7 @@ export default function CustomPapersPage() {
                         <h3 className="text-base font-semibold text-ink">{paper.name || "未命名自訂卷"}</h3>
                       </div>
                       <p className="mt-2 text-sm text-slate-600">
-                        {paper.subjectLabels.join("・")} ・ {difficultyMeta[paper.difficulty].label} ・ {paper.questionCount} 題
+                        {formatSubjectLabels(paper.subjectLabels)} ・ {difficultyMeta[paper.difficulty].label} ・ {paper.questionCount} 題
                       </p>
                       <p className="mt-1 text-xs text-slate-500">
                         {paper.createdByLabel || "匿名"} ・ {formatPaperTime(paper.createdAt)}
@@ -446,7 +562,7 @@ export default function CustomPapersPage() {
                 </h2>
               </div>
               <p className="mt-3 text-sm leading-7 text-slate-600">
-                {selectedPaper.subjectLabels.join("・")} ・ {difficultyMeta[selectedPaper.difficulty].label} ・ {selectedPaper.questionCount} 題
+                {formatSubjectLabels(selectedPaper.subjectLabels)} ・ {difficultyMeta[selectedPaper.difficulty].label} ・ {selectedPaper.questionCount} 題
               </p>
               <p className="mt-1 text-xs text-slate-500">
                 {selectedPaper.createdByLabel || "匿名"} 建立 ・ {formatPaperTime(selectedPaper.createdAt)}
@@ -468,7 +584,7 @@ export default function CustomPapersPage() {
               onClick={() => handleStartPaper(selectedPaper)}
               className="min-h-12 rounded-2xl bg-brand-600 px-5 py-3 text-sm font-semibold text-white transition hover:bg-brand-700"
             >
-              開始寫這份 10 題自訂卷
+              開始寫這份 {selectedPaper.questionCount} 題自訂卷
             </button>
             <button
               type="button"

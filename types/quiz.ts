@@ -63,7 +63,7 @@ export type Question = {
 };
 
 export type ConfidenceLevel = 1 | 2 | 3 | 4 | 5;
-export type CustomPaperDifficulty = "easy" | "medium" | "hard";
+export type CustomPaperDifficulty = "easy" | "medium" | "hard" | "ai_search";
 
 export type ErrorType =
   | "完全沒印象"

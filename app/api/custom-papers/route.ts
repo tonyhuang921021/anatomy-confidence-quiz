@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
+import { createOpenAIText, isOpenAIConfigured } from "@/lib/openai";
 import {
   getCanonicalQuestionBank
 } from "@/data/med1QuestionBank";
@@ -66,12 +67,28 @@ type GenerateBody = {
   doneQuestionIds?: string[];
 };
 
+type GenerateAISearchBody = {
+  action: "generate_ai_search";
+  accessToken?: string | null;
+  visitorId?: string | null;
+  selectedSubjects?: string[];
+  query?: string;
+  name?: string;
+  isPublic?: boolean;
+};
+
 type SubmitAttemptBody = {
   action: "submit_attempt";
   accessToken?: string | null;
   visitorId?: string | null;
   paperCode?: string;
   session?: QuizSession;
+};
+
+type AISearchPlan = {
+  title?: string;
+  searchTerms?: string[];
+  relatedConcepts?: string[];
 };
 
 function getServiceSupabaseClient() {
@@ -127,6 +144,18 @@ function getAllowedSubjectList(subjects: string[] = []) {
   );
 }
 
+function stripJsonCodeFence(value: string) {
+  return value.replace(/^```(?:json)?\s*/i, "").replace(/\s*```$/i, "").trim();
+}
+
+function normalizeSearchText(text: string) {
+  return text.toLowerCase().trim();
+}
+
+function compactSearchText(text: string) {
+  return text.toLowerCase().replace(/[\s\-_/，。、；：（）()]+/g, "");
+}
+
 function sample<T>(items: T[], count: number) {
   const pool = [...items];
   for (let index = pool.length - 1; index > 0; index -= 1) {
@@ -160,6 +189,124 @@ function getQuestionBankWithOverrides(
   overrides: Record<string, QuestionClassificationOverride>
 ) {
   return getCanonicalQuestionBank(overrides);
+}
+
+function buildAISearchExpansionPrompt(query: string, selectedSubjects: SubjectName[]) {
+  const subjectText =
+    selectedSubjects.length > 0 ? selectedSubjects.join("、") : "不限科目（醫學一與醫學二各科都可）";
+
+  return [
+    "你是台灣醫學系國考題庫檢索助手。",
+    "使用者剛學完一個區塊，想把相關題目整批找出來做成一份卷。",
+    "請根據使用者輸入，整理出最有助於檢索考題的主題詞。",
+    "請只輸出 JSON，不要輸出 markdown 或 code block。",
+    "",
+    "JSON 格式：",
+    "{",
+    '  "title": "這份卷最適合的短標題",',
+    '  "searchTerms": ["關鍵詞1", "關鍵詞2", "關鍵詞3"],',
+    '  "relatedConcepts": ["延伸概念1", "延伸概念2"]',
+    "}",
+    "",
+    `使用者輸入：${query}`,
+    `科目限制：${subjectText}`
+  ].join("\n");
+}
+
+function parseAISearchPlan(raw: string): AISearchPlan {
+  const cleaned = stripJsonCodeFence(raw);
+  const parsed = JSON.parse(cleaned) as AISearchPlan;
+  return {
+    title: parsed.title?.trim(),
+    searchTerms: (parsed.searchTerms ?? []).map((item) => item.trim()).filter(Boolean),
+    relatedConcepts: (parsed.relatedConcepts ?? []).map((item) => item.trim()).filter(Boolean)
+  };
+}
+
+function buildQuestionSearchCorpus(question: Question) {
+  return [
+    question.subject,
+    question.chapter,
+    question.section,
+    question.testedConcept,
+    question.stem,
+    question.explanation,
+    question.memoryTip,
+    ...Object.values(question.options ?? {}),
+    ...Object.values(question.optionAnalysis ?? {})
+  ]
+    .filter(Boolean)
+    .join("\n");
+}
+
+function scoreQuestionAgainstSearchTerms(question: Question, terms: string[]) {
+  const normalizedCorpus = normalizeSearchText(buildQuestionSearchCorpus(question));
+  const compactCorpus = compactSearchText(normalizedCorpus);
+  let score = 0;
+
+  for (const rawTerm of terms) {
+    const term = normalizeSearchText(rawTerm);
+    if (!term) continue;
+    const compactTerm = compactSearchText(term);
+
+    if (question.subject.toLowerCase().includes(term)) score += 8;
+    if ((question.chapter ?? "").toLowerCase().includes(term)) score += 7;
+    if ((question.section ?? "").toLowerCase().includes(term)) score += 7;
+    if ((question.testedConcept ?? "").toLowerCase().includes(term)) score += 7;
+    if (normalizeSearchText(question.stem).includes(term)) score += 6;
+    if (normalizeSearchText(question.explanation ?? "").includes(term)) score += 4;
+    if (compactTerm && compactCorpus.includes(compactTerm)) score += 3;
+  }
+
+  return score;
+}
+
+function summarizeQuestionForAISearch(question: Question) {
+  return [
+    `id=${question.id}`,
+    `subject=${question.subject}`,
+    `chapter=${question.chapter ?? ""}`,
+    `section=${question.section ?? ""}`,
+    `concept=${question.testedConcept ?? ""}`,
+    `stem=${question.stem.replace(/\s+/g, " ").slice(0, 140)}`
+  ].join(" | ");
+}
+
+function buildAIRerankPrompt(query: string, plan: AISearchPlan, candidates: Question[]) {
+  const candidateLines = candidates
+    .map((question, index) => `${index + 1}. ${summarizeQuestionForAISearch(question)}`)
+    .join("\n");
+
+  return [
+    "你是台灣醫學系國考題庫檢索助手。",
+    "請從候選題目中挑出真正和使用者想練習的區塊相關的題目。",
+    "寧可保守，不要把明顯不相關的題目加進來。",
+    "如果是同一區塊的題目，就盡量都保留。",
+    "請只輸出 JSON，不要輸出 markdown 或 code block。",
+    "",
+    "JSON 格式：",
+    "{",
+    '  "relevantIds": ["MOEX-...","MOEX-..."],',
+    '  "reason": "一句簡短說明這批題目主要圍繞什麼主題"',
+    "}",
+    "",
+    `使用者輸入：${query}`,
+    `AI 整理標題：${plan.title ?? ""}`,
+    `AI 整理關鍵詞：${(plan.searchTerms ?? []).join("、")}`,
+    `AI 延伸概念：${(plan.relatedConcepts ?? []).join("、")}`,
+    "",
+    "候選題目：",
+    candidateLines
+  ].join("\n");
+}
+
+function parseRelevantIds(raw: string) {
+  const cleaned = stripJsonCodeFence(raw);
+  const parsed = JSON.parse(cleaned) as { relevantIds?: string[]; reason?: string };
+  return {
+    relevantIds: (parsed.relevantIds ?? []).map((item) => item.trim()).filter(Boolean),
+    reason: parsed.reason?.trim()
+  };
 }
 
 function selectQuestionsByDifficulty(
@@ -472,7 +619,11 @@ export async function POST(request: NextRequest) {
   }
 
   try {
-    const body = (await request.json().catch(() => null)) as GenerateBody | SubmitAttemptBody | null;
+    const body = (await request.json().catch(() => null)) as
+      | GenerateBody
+      | GenerateAISearchBody
+      | SubmitAttemptBody
+      | null;
     if (!body?.action) {
       return NextResponse.json({ ok: false, message: "缺少操作類型。" }, { status: 400 });
     }
@@ -548,6 +699,105 @@ export async function POST(request: NextRequest) {
           averageAccuracyRate: 0,
           participantCount: 0,
           questionIds: selectedQuestions.map((question) => question.id),
+          participants: []
+        } satisfies CustomPaperDetail
+      });
+    }
+
+    if (body.action === "generate_ai_search") {
+      if (!isOpenAIConfigured()) {
+        return NextResponse.json(
+          { ok: false, message: "OPENAI_API_KEY 尚未設定，暫時無法使用 AI 智慧檢索。" },
+          { status: 500 }
+        );
+      }
+
+      const query = body.query?.trim() ?? "";
+      if (!query) {
+        return NextResponse.json({ ok: false, message: "請先輸入想檢索的區塊或關鍵字。" }, { status: 400 });
+      }
+
+      const selectedSubjects = getAllowedSubjectList(body.selectedSubjects);
+      const effectiveSubjects =
+        selectedSubjects.length > 0 ? selectedSubjects : Array.from(ALLOWED_SUBJECTS);
+      const actor = await resolveActor(supabase, body.accessToken, body.visitorId);
+      const classificationOverrides = await loadClassificationOverrides(supabase);
+      const bank = getQuestionBankWithOverrides(classificationOverrides).filter((question) =>
+        effectiveSubjects.includes(question.subject)
+      );
+
+      const expansion = await createOpenAIText(
+        buildAISearchExpansionPrompt(query, effectiveSubjects),
+        500,
+        "gpt-5-mini"
+      );
+      const plan = parseAISearchPlan(expansion.text);
+      const searchTerms = Array.from(
+        new Set(
+          [query, ...(plan.searchTerms ?? []), ...(plan.relatedConcepts ?? [])]
+            .map((item) => item.trim())
+            .filter(Boolean)
+        )
+      );
+
+      const scoredCandidates = bank
+        .map((question) => ({
+          question,
+          score: scoreQuestionAgainstSearchTerms(question, searchTerms)
+        }))
+        .filter((item) => item.score > 0)
+        .sort((left, right) => right.score - left.score || left.question.id.localeCompare(right.question.id));
+
+      const candidateQuestions = scoredCandidates.slice(0, 80).map((item) => item.question);
+      if (candidateQuestions.length === 0) {
+        return NextResponse.json(
+          { ok: false, message: "目前找不到和這個區塊明顯相關的題目，請換更具體的關鍵字試試。" },
+          { status: 400 }
+        );
+      }
+
+      const rerank = await createOpenAIText(
+        buildAIRerankPrompt(query, plan, candidateQuestions),
+        900,
+        "gpt-5-mini"
+      );
+      const relevant = parseRelevantIds(rerank.text);
+      const relevantIdSet = new Set(relevant.relevantIds);
+      const orderedRelevantQuestions = candidateQuestions.filter((question) => relevantIdSet.has(question.id));
+      const finalQuestions =
+        orderedRelevantQuestions.length > 0 ? orderedRelevantQuestions : candidateQuestions.slice(0, 20);
+
+      const paperCode = await generateUniquePaperCode(supabase);
+      const insertRow = {
+        paper_code: paperCode,
+        name: body.name?.trim().slice(0, 60) || plan.title?.slice(0, 60) || `AI 檢索：${query.slice(0, 24)}`,
+        question_ids: finalQuestions.map((question) => question.id),
+        subject_filters: selectedSubjects,
+        difficulty: "ai_search" as CustomPaperDifficulty,
+        is_public: Boolean(body.isPublic),
+        created_by_user_id: actor.userId,
+        created_by_email: actor.userEmail,
+        created_by_label: actor.label,
+        visitor_id: body.visitorId ?? null
+      };
+
+      const { error: insertError } = await supabase.from("custom_papers").insert(insertRow);
+      if (insertError) throw insertError;
+
+      return NextResponse.json({
+        ok: true,
+        paper: {
+          paperCode,
+          name: insertRow.name ?? undefined,
+          subjectLabels: selectedSubjects,
+          difficulty: "ai_search" as CustomPaperDifficulty,
+          isPublic: insertRow.is_public,
+          questionCount: finalQuestions.length,
+          createdAt: new Date().toISOString(),
+          createdByLabel: actor.label,
+          averageAccuracyRate: 0,
+          participantCount: 0,
+          questionIds: finalQuestions.map((question) => question.id),
           participants: []
         } satisfies CustomPaperDetail
       });

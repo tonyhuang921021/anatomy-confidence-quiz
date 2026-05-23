@@ -1399,6 +1399,15 @@ type GenerateCustomPaperInput = {
   doneQuestionIds: string[];
 };
 
+type GenerateAISearchCustomPaperInput = {
+  accessToken?: string | null;
+  visitorId: string;
+  selectedSubjects: string[];
+  query: string;
+  name?: string;
+  isPublic: boolean;
+};
+
 type RecordCustomPaperAttemptInput = {
   accessToken?: string | null;
   visitorId: string;
@@ -1437,6 +1446,32 @@ export async function generateCustomPaper(
 
   if (!response.ok || !payload?.ok || !payload.paper) {
     throw new Error(payload?.message || rawText || "自訂卷產生失敗");
+  }
+
+  return payload.paper;
+}
+
+export async function generateAISearchCustomPaper(
+  input: GenerateAISearchCustomPaperInput
+): Promise<CustomPaperDetail> {
+  const response = await fetch("/api/custom-papers", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+      action: "generate_ai_search",
+      ...input
+    })
+  });
+
+  const rawText = await response.text();
+  const payload = tryParseJson<
+    | { ok?: boolean; message?: string; paper?: CustomPaperDetail }
+  >(rawText);
+
+  if (!response.ok || !payload?.ok || !payload.paper) {
+    throw new Error(payload?.message || rawText || "AI 智慧檢索自訂卷產生失敗");
   }
 
   return payload.paper;
