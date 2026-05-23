@@ -26,6 +26,7 @@ type StatsSyncBody = {
 };
 
 type QuestionAttemptLogRow = {
+  session_id: string;
   question_id: string;
   is_correct: boolean;
   answered_at: string;
@@ -60,6 +61,25 @@ function getServiceSupabaseClient() {
   });
 }
 
+function normalizeAttemptSessionId(sessionId: string) {
+  return sessionId.replace(/^user-[^:]+:/, "");
+}
+
+function dedupeAttemptRows<T extends { session_id: string; question_id: string }>(rows: T[]) {
+  const deduped = new Map<string, T>();
+
+  for (const row of rows) {
+    const normalizedSessionId = normalizeAttemptSessionId(row.session_id);
+    const dedupeKey = `${normalizedSessionId}::${row.question_id}`;
+    deduped.set(dedupeKey, {
+      ...row,
+      session_id: normalizedSessionId
+    });
+  }
+
+  return Array.from(deduped.values());
+}
+
 async function refreshQuestionAccuracyStats(
   supabase: any,
   questionIds: string[]
@@ -69,7 +89,7 @@ async function refreshQuestionAccuracyStats(
 
   const { data, error } = await supabase
     .from("question_attempt_logs")
-    .select("question_id, is_correct")
+    .select("session_id, question_id, is_correct, answered_at")
     .in("question_id", uniqueQuestionIds);
 
   if (error) throw error;
@@ -79,7 +99,9 @@ async function refreshQuestionAccuracyStats(
     grouped.set(questionId, { total: 0, correct: 0 });
   }
 
-  for (const row of (data ?? []) as QuestionAttemptLogRow[]) {
+  const dedupedRows = dedupeAttemptRows((data ?? []) as QuestionAttemptLogRow[]);
+
+  for (const row of dedupedRows) {
     const current = grouped.get(row.question_id) ?? { total: 0, correct: 0 };
     current.total += 1;
     if (row.is_correct) current.correct += 1;
@@ -109,15 +131,16 @@ async function upsertAttemptRows(
   supabase: any,
   rows: NonNullable<StatsSyncBody["attemptRows"]>
 ) {
-  if (rows.length === 0) return;
+  const normalizedRows = dedupeAttemptRows(rows);
+  if (normalizedRows.length === 0) return;
 
   const { error } = await supabase
     .from("question_attempt_logs")
-    .upsert(rows as any, { onConflict: "session_id,question_id" });
+    .upsert(normalizedRows as any, { onConflict: "session_id,question_id" });
 
   if (!error) return;
 
-  const fallbackRows = rows.map(({ visitor_id, ...rest }) => rest);
+  const fallbackRows = normalizedRows.map(({ visitor_id, ...rest }) => rest);
   const { error: fallbackError } = await supabase
     .from("question_attempt_logs")
     .upsert(fallbackRows as any, { onConflict: "session_id,question_id" });
@@ -165,7 +188,7 @@ async function refreshOwnerDailyStats(
     await Promise.all([
       supabase
         .from("question_attempt_logs")
-        .select("answered_at")
+        .select("session_id, question_id, answered_at")
         .gte("answered_at", `${startDate}T00:00:00+08:00`)
         .lt("answered_at", endDateExclusive.toISOString()),
       supabase
@@ -180,7 +203,9 @@ async function refreshOwnerDailyStats(
   const attemptMap = new Map<string, number>();
   const deviceMap = new Map<string, number>();
 
-  for (const row of (attemptRows ?? []) as Pick<QuestionAttemptLogRow, "answered_at">[]) {
+  const dedupedAttemptRows = dedupeAttemptRows((attemptRows ?? []) as QuestionAttemptLogRow[]);
+
+  for (const row of dedupedAttemptRows) {
     const dayKey = getTaipeiDayKey(new Date(row.answered_at));
     if (!uniqueDates.includes(dayKey)) continue;
     attemptMap.set(dayKey, (attemptMap.get(dayKey) ?? 0) + 1);

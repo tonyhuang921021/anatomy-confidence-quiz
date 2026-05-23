@@ -14,6 +14,8 @@ type OwnerRequestBody = {
 };
 
 type QuestionAttemptLogRow = {
+  session_id: string;
+  question_id: string;
   visitor_id?: string | null;
   answered_at: string;
 };
@@ -88,6 +90,25 @@ function getRecentTaipeiDayKeys(days: number) {
   return keys;
 }
 
+function normalizeAttemptSessionId(sessionId: string) {
+  return sessionId.replace(/^user-[^:]+:/, "");
+}
+
+function dedupeAttemptRows<T extends { session_id: string; question_id: string }>(rows: T[]) {
+  const deduped = new Map<string, T>();
+
+  for (const row of rows) {
+    const normalizedSessionId = normalizeAttemptSessionId(row.session_id);
+    const dedupeKey = `${normalizedSessionId}::${row.question_id}`;
+    deduped.set(dedupeKey, {
+      ...row,
+      session_id: normalizedSessionId
+    });
+  }
+
+  return Array.from(deduped.values());
+}
+
 function formatVisitorLabel(visitorId?: string | null) {
   if (!visitorId) return "未知裝置";
   const trimmed = visitorId.trim();
@@ -151,10 +172,10 @@ async function fetchOwnerDailySeries(
   const dayKeys = getRecentTaipeiDayKeys(days);
   const startDate = dayKeys[0];
   const [attemptRows, deviceRows] = await Promise.all([
-    fetchAllRows<Pick<QuestionAttemptLogRow, "answered_at">>(
+    fetchAllRows<Pick<QuestionAttemptLogRow, "session_id" | "question_id" | "answered_at">>(
       supabase,
       "question_attempt_logs",
-      "answered_at",
+      "session_id, question_id, answered_at",
       "answered_at",
       (query) => query.gte("answered_at", `${startDate}T00:00:00+08:00`)
     ),
@@ -170,7 +191,7 @@ async function fetchOwnerDailySeries(
   const attemptMap = new Map<string, number>();
   const deviceMap = new Map<string, number>();
 
-  for (const row of attemptRows) {
+  for (const row of dedupeAttemptRows(attemptRows)) {
     const key = getTaipeiDayKey(new Date(row.answered_at));
     if (!dayKeys.includes(key)) continue;
     attemptMap.set(key, (attemptMap.get(key) ?? 0) + 1);
@@ -195,7 +216,7 @@ async function fetchOwnerHourlySeries(
   const data = await fetchAllRows<QuestionAttemptLogRow>(
     supabase,
     "question_attempt_logs",
-    "answered_at, visitor_id",
+    "session_id, question_id, answered_at, visitor_id",
     "answered_at",
     (query) => query.gte("answered_at", sevenDaysAgo)
   );
@@ -203,7 +224,7 @@ async function fetchOwnerHourlySeries(
   const hourAttemptMap = new Map<number, number>();
   const hourDeviceMap = new Map<number, Set<string>>();
 
-  for (const row of data) {
+  for (const row of dedupeAttemptRows(data)) {
     const hour = Number(
       new Intl.DateTimeFormat("en-GB", {
         timeZone: "Asia/Taipei",
@@ -279,14 +300,14 @@ async function fetchOwnerTopAttemptVisitors(
   const rows = await fetchAllRows<QuestionAttemptLogRow>(
     supabase,
     "question_attempt_logs",
-    "visitor_id, answered_at",
+    "session_id, question_id, visitor_id, answered_at",
     "answered_at",
     (query) => query.not("visitor_id", "is", null)
   );
 
   const grouped = new Map<string, OwnerTopAttemptVisitorEntry>();
 
-  for (const row of rows) {
+  for (const row of dedupeAttemptRows(rows)) {
     const visitorId = row.visitor_id?.trim();
     if (!visitorId) continue;
 
@@ -327,14 +348,14 @@ async function fetchOwnerDashboardStats(
     allAttemptVisitorRows,
     onlineVisitorsResult,
     totalUsersResult,
-    totalAttemptsResult
+    allAttemptRows
   ] = await Promise.all([
     supabase.from("site_visitors").select("*", { count: "exact", head: true }),
     supabase.from("question_attempt_devices").select("*", { count: "exact", head: true }),
-    fetchAllRows<{ visitor_id?: string | null }>(
+    fetchAllRows<Pick<QuestionAttemptLogRow, "session_id" | "question_id" | "visitor_id">>(
       supabase,
       "question_attempt_logs",
-      "visitor_id",
+      "session_id, question_id, visitor_id",
       "answered_at"
     ),
     supabase
@@ -342,25 +363,31 @@ async function fetchOwnerDashboardStats(
       .select("*", { count: "exact", head: true })
       .gte("last_seen_at", onlineSince),
     supabase.from("leaderboard_profiles").select("*", { count: "exact", head: true }),
-    supabase.from("question_attempt_logs").select("*", { count: "exact", head: true })
+    fetchAllRows<Pick<QuestionAttemptLogRow, "session_id" | "question_id">>(
+      supabase,
+      "question_attempt_logs",
+      "session_id, question_id",
+      "answered_at"
+    )
   ]);
 
   const errors = [
     totalVisitorsResult.error,
     totalAttemptDevicesResult.error,
     onlineVisitorsResult.error,
-    totalUsersResult.error,
-    totalAttemptsResult.error
+    totalUsersResult.error
   ].filter(Boolean);
 
   if (errors.length > 0) throw errors[0];
 
   const visitorAttemptCountMap = new Map<string, number>();
-  for (const row of allAttemptVisitorRows) {
+  for (const row of dedupeAttemptRows(allAttemptVisitorRows)) {
     const visitorId = row.visitor_id?.trim();
     if (!visitorId) continue;
     visitorAttemptCountMap.set(visitorId, (visitorAttemptCountMap.get(visitorId) ?? 0) + 1);
   }
+
+  const dedupedAttemptCount = dedupeAttemptRows(allAttemptRows).length;
 
   const aiExplanationCount = explanationUsage.reduce((sum, row) => sum + row.explanationCount, 0);
   const aiExplanationInputTokens = explanationUsage.reduce((sum, row) => sum + row.inputTokens, 0);
@@ -376,7 +403,7 @@ async function fetchOwnerDashboardStats(
     totalSyncedUsers: totalUsersResult.count ?? 0,
     attemptsToday,
     attemptsLast7Days,
-    totalAttempts: totalAttemptsResult.count ?? 0,
+    totalAttempts: dedupedAttemptCount,
     aiExplanationCount,
     aiExplanationInputTokens,
     aiExplanationOutputTokens,
