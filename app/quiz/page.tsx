@@ -639,16 +639,17 @@ export default function QuizPage() {
         })
       });
 
-      const payload = (await response.json()) as {
+      const rawText = await response.text();
+      const payload = (rawText ? JSON.parse(rawText) : null) as {
         ok: boolean;
         message?: string;
         suggestedSubject?: string;
-      };
+      } | null;
 
-      if (!response.ok || !payload.ok) {
+      if (!response.ok || !payload?.ok) {
         setClassificationReportMessageMap((current) => ({
           ...current,
-          [question.id]: payload.message || "分類回報送出失敗。"
+          [question.id]: payload?.message || rawText || "分類回報送出失敗。"
         }));
         return;
       }

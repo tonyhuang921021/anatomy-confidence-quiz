@@ -455,21 +455,22 @@ export function ReviewNotebook({
         })
       });
 
-      const payload = (await response.json()) as {
+      const rawText = await response.text();
+      const payload = (rawText ? JSON.parse(rawText) : null) as {
         ok: boolean;
         suggestedSubject?: string | null;
         suggestedChapter?: string | null;
         suggestedSection?: string | null;
         message?: string;
-      };
+      } | null;
 
-      if (!response.ok || !payload.ok) {
-        if (response.status === 429 && payload.message && typeof window !== "undefined") {
+      if (!response.ok || !payload?.ok) {
+        if (response.status === 429 && payload?.message && typeof window !== "undefined") {
           window.alert(payload.message);
         }
         setClassificationReportMessageMap((current) => ({
           ...current,
-          [question.id]: payload.message || "分類回報失敗。"
+          [question.id]: payload?.message || rawText || "分類回報失敗。"
         }));
         return;
       }
