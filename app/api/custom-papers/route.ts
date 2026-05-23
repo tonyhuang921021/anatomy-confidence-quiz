@@ -100,6 +100,20 @@ type AISearchPlan = {
   relatedConcepts?: string[];
 };
 
+type AIUsageLogRow = {
+  rate_key: string;
+  visitor_id?: string | null;
+  user_email?: string | null;
+  question_id: string;
+  model: string;
+  input_tokens?: number;
+  output_tokens?: number;
+  total_tokens?: number;
+  used_at: string;
+};
+
+const AI_SEARCH_USAGE_PREFIX = "AI_SEARCH:";
+
 function getServiceSupabaseClient() {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
@@ -114,6 +128,27 @@ function getServiceSupabaseClient() {
       autoRefreshToken: false
     }
   });
+}
+
+async function insertAIUsageLog(supabase: any, row: AIUsageLogRow) {
+  const usageTable = supabase.from("ai_explanation_usage_logs") as any;
+  const { error } = await usageTable.insert(row);
+  if (!error) {
+    return;
+  }
+
+  const fallbackRow = {
+    rate_key: row.rate_key,
+    visitor_id: row.visitor_id ?? null,
+    user_email: row.user_email ?? null,
+    question_id: row.question_id,
+    model: row.model,
+    used_at: row.used_at
+  };
+  const { error: fallbackError } = await usageTable.insert(fallbackRow);
+  if (fallbackError) {
+    console.error("AI search usage log skipped:", fallbackError);
+  }
 }
 
 function formatCustomPaperErrorMessage(error: unknown) {
@@ -804,6 +839,18 @@ export async function POST(request: NextRequest) {
 
       const { error: insertError } = await supabase.from("custom_papers").insert(insertRow);
       if (insertError) throw insertError;
+
+      await insertAIUsageLog(supabase, {
+        rate_key: `ai-search:${actor.userEmail?.trim().toLowerCase() || body.visitorId?.trim() || paperCode}`,
+        visitor_id: body.visitorId ?? null,
+        user_email: actor.userEmail ?? null,
+        question_id: `${AI_SEARCH_USAGE_PREFIX}${paperCode}`,
+        model: rerank.model,
+        input_tokens: expansion.usage.inputTokens + rerank.usage.inputTokens,
+        output_tokens: expansion.usage.outputTokens + rerank.usage.outputTokens,
+        total_tokens: expansion.usage.totalTokens + rerank.usage.totalTokens,
+        used_at: new Date().toISOString()
+      });
 
       return NextResponse.json({
         ok: true,

@@ -114,6 +114,8 @@ type AIExplanationUsageLogRow = {
   used_at: string;
 };
 
+const AI_SEARCH_USAGE_PREFIX = "AI_SEARCH:";
+
 type FeedbackMessageRow = {
   id: string | number;
   content: string;
@@ -157,6 +159,19 @@ async function fetchAIExplanationUsageRows() {
     output_tokens: 0,
     total_tokens: 0
   }));
+}
+
+function filterAIUsageRows(
+  rows: AIExplanationUsageLogRow[],
+  feature: "explanation" | "search"
+) {
+  return rows.filter((row) => {
+    const questionId = row.question_id ?? "";
+    if (feature === "search") {
+      return questionId.startsWith(AI_SEARCH_USAGE_PREFIX);
+    }
+    return !questionId.startsWith(AI_SEARCH_USAGE_PREFIX);
+  });
 }
 
 const ONLINE_WINDOW_MS = 2 * 60 * 1000;
@@ -1142,6 +1157,10 @@ export async function loadOwnerDashboardStats(): Promise<OwnerDashboardStats> {
       aiExplanationInputTokens: 0,
       aiExplanationOutputTokens: 0,
       aiExplanationTotalTokens: 0,
+      aiSearchCount: 0,
+      aiSearchInputTokens: 0,
+      aiSearchOutputTokens: 0,
+      aiSearchTotalTokens: 0,
       updatedAt: new Date().toISOString()
     };
   }
@@ -1188,7 +1207,8 @@ export async function loadOwnerDashboardStats(): Promise<OwnerDashboardStats> {
     throw errors[0] as Error;
   }
 
-  const aiUsageRows = aiExplanationUsageRows;
+  const aiUsageRows = filterAIUsageRows(aiExplanationUsageRows, "explanation");
+  const aiSearchRows = filterAIUsageRows(aiExplanationUsageRows, "search");
   const visitorAttemptCountMap = new Map<string, number>();
   for (const row of allAttemptVisitorRows) {
     const visitorId = row.visitor_id?.trim();
@@ -1200,6 +1220,13 @@ export async function loadOwnerDashboardStats(): Promise<OwnerDashboardStats> {
   const aiExplanationInputTokens = aiUsageRows.reduce((sum, row) => sum + (row.input_tokens ?? 0), 0);
   const aiExplanationOutputTokens = aiUsageRows.reduce((sum, row) => sum + (row.output_tokens ?? 0), 0);
   const aiExplanationTotalTokens = aiUsageRows.reduce(
+    (sum, row) => sum + (row.total_tokens ?? (row.input_tokens ?? 0) + (row.output_tokens ?? 0)),
+    0
+  );
+  const aiSearchCount = aiSearchRows.length;
+  const aiSearchInputTokens = aiSearchRows.reduce((sum, row) => sum + (row.input_tokens ?? 0), 0);
+  const aiSearchOutputTokens = aiSearchRows.reduce((sum, row) => sum + (row.output_tokens ?? 0), 0);
+  const aiSearchTotalTokens = aiSearchRows.reduce(
     (sum, row) => sum + (row.total_tokens ?? (row.input_tokens ?? 0) + (row.output_tokens ?? 0)),
     0
   );
@@ -1218,18 +1245,24 @@ export async function loadOwnerDashboardStats(): Promise<OwnerDashboardStats> {
     aiExplanationInputTokens,
     aiExplanationOutputTokens,
     aiExplanationTotalTokens,
+    aiSearchCount,
+    aiSearchInputTokens,
+    aiSearchOutputTokens,
+    aiSearchTotalTokens,
     updatedAt: now.toISOString()
   };
 }
 
-export async function loadOwnerExplanationUsage(): Promise<OwnerExplanationUsageEntry[]> {
+export async function loadOwnerExplanationUsage(
+  feature: "explanation" | "search" = "explanation"
+): Promise<OwnerExplanationUsageEntry[]> {
   if (!isSupabaseConfigured()) {
     return [];
   }
 
   const grouped = new Map<string, OwnerExplanationUsageEntry>();
 
-  for (const row of await fetchAIExplanationUsageRows()) {
+  for (const row of filterAIUsageRows(await fetchAIExplanationUsageRows(), feature)) {
     const key = row.user_email?.trim().toLowerCase() || row.visitor_id || row.rate_key;
     const current = grouped.get(key) ?? {
       label: row.user_email?.trim() || row.visitor_id || row.rate_key,

@@ -49,6 +49,7 @@ type OwnerApiPayload = {
   dailySeries?: OwnerDailyPoint[];
   hourlySeries?: OwnerHourlyPoint[];
   explanationUsage?: OwnerExplanationUsageEntry[];
+  searchUsage?: OwnerExplanationUsageEntry[];
   topVisitors?: OwnerTopAttemptVisitorEntry[];
   classificationReports?: OwnerClassificationReportEntry[];
 };
@@ -186,6 +187,7 @@ export default function OwnerPage() {
   const [dailySeries, setDailySeries] = useState<OwnerDailyPoint[]>([]);
   const [hourlySeries, setHourlySeries] = useState<OwnerHourlyPoint[]>([]);
   const [explanationUsage, setExplanationUsage] = useState<OwnerExplanationUsageEntry[]>([]);
+  const [searchUsage, setSearchUsage] = useState<OwnerExplanationUsageEntry[]>([]);
   const [topVisitors, setTopVisitors] = useState<OwnerTopAttemptVisitorEntry[]>([]);
   const [classificationReports, setClassificationReports] = useState<OwnerClassificationReportEntry[]>([]);
   const [approvingReportId, setApprovingReportId] = useState<string | null>(null);
@@ -397,6 +399,7 @@ export default function OwnerPage() {
         setDailySeries(payload.dailySeries ?? []);
         setHourlySeries(payload.hourlySeries ?? []);
         setExplanationUsage(payload.explanationUsage ?? []);
+        setSearchUsage(payload.searchUsage ?? []);
         setTopVisitors(payload.topVisitors ?? []);
         setClassificationReports(payload.classificationReports ?? []);
       } catch (fetchError) {
@@ -419,6 +422,7 @@ export default function OwnerPage() {
         setDailySeries(payload.dailySeries ?? []);
         setHourlySeries(payload.hourlySeries ?? []);
         setExplanationUsage(payload.explanationUsage ?? []);
+        setSearchUsage(payload.searchUsage ?? []);
         setTopVisitors(payload.topVisitors ?? []);
         setClassificationReports(payload.classificationReports ?? []);
       } catch {
@@ -562,6 +566,28 @@ export default function OwnerPage() {
                   NT$ {estimateTwdFromTokens(stats.aiExplanationInputTokens, stats.aiExplanationOutputTokens).toFixed(2)}
                 </p>
               </article>
+              <article className="rounded-3xl bg-white p-5 shadow-card ring-1 ring-slate-100">
+                <p className="text-sm text-slate-500">AI 智慧檢索總生成卷數</p>
+                <p className="mt-2 text-3xl font-bold text-ink">{stats.aiSearchCount}</p>
+              </article>
+              <article className="rounded-3xl bg-white p-5 shadow-card ring-1 ring-slate-100">
+                <p className="text-sm text-slate-500">AI 智慧檢索累積 Input Tokens</p>
+                <p className="mt-2 text-3xl font-bold text-ink">{stats.aiSearchInputTokens.toLocaleString()}</p>
+              </article>
+              <article className="rounded-3xl bg-white p-5 shadow-card ring-1 ring-slate-100">
+                <p className="text-sm text-slate-500">AI 智慧檢索累積 Output Tokens</p>
+                <p className="mt-2 text-3xl font-bold text-ink">{stats.aiSearchOutputTokens.toLocaleString()}</p>
+              </article>
+              <article className="rounded-3xl bg-white p-5 shadow-card ring-1 ring-slate-100">
+                <p className="text-sm text-slate-500">AI 智慧檢索累積總 Tokens</p>
+                <p className="mt-2 text-3xl font-bold text-ink">{stats.aiSearchTotalTokens.toLocaleString()}</p>
+              </article>
+              <article className="rounded-3xl bg-white p-5 shadow-card ring-1 ring-slate-100">
+                <p className="text-sm text-slate-500">AI 智慧檢索累積約台幣</p>
+                <p className="mt-2 text-3xl font-bold text-ink">
+                  NT$ {estimateTwdFromTokens(stats.aiSearchInputTokens, stats.aiSearchOutputTokens).toFixed(2)}
+                </p>
+              </article>
               <article className="rounded-3xl bg-white p-5 shadow-card ring-1 ring-slate-100 md:col-span-2 xl:col-span-3">
                 <p className="text-sm text-slate-500">大家最常做題的時段</p>
                 <p className="mt-2 text-base font-semibold text-ink">
@@ -688,6 +714,55 @@ export default function OwnerPage() {
                     ) : (
                       explanationUsage.map((entry) => (
                         <tr key={`${entry.userEmail ?? entry.visitorId ?? entry.label}`} className="border-b border-slate-100 last:border-b-0">
+                          <td className="px-3 py-3 font-medium text-ink">{entry.label}</td>
+                          <td className="px-3 py-3 text-slate-700">{entry.explanationCount}</td>
+                          <td className="px-3 py-3 text-slate-700">{entry.inputTokens.toLocaleString()}</td>
+                          <td className="px-3 py-3 text-slate-700">{entry.outputTokens.toLocaleString()}</td>
+                          <td className="px-3 py-3 text-slate-700">{entry.totalTokens.toLocaleString()}</td>
+                          <td className="px-3 py-3 text-slate-700">
+                            NT$ {estimateTwdFromTokens(entry.inputTokens, entry.outputTokens).toFixed(2)}
+                          </td>
+                          <td className="px-3 py-3 text-slate-500">
+                            {entry.lastUsedAt ? formatUpdatedAt(entry.lastUsedAt) : "—"}
+                          </td>
+                        </tr>
+                      ))
+                    )}
+                  </tbody>
+                </table>
+              </div>
+            </section>
+
+            <section className="rounded-[2rem] bg-white p-6 shadow-card ring-1 ring-slate-100">
+              <div className="flex items-center justify-between gap-3">
+                <div>
+                  <h2 className="text-lg font-semibold text-ink">AI 智慧檢索使用統計</h2>
+                  <p className="mt-2 text-sm text-slate-500">看誰總共用了多少次 AI 智慧檢索，以及花了多少 token。</p>
+                </div>
+              </div>
+              <div className="mt-4 overflow-x-auto">
+                <table className="min-w-full text-left text-sm">
+                  <thead className="text-slate-500">
+                    <tr className="border-b border-slate-200">
+                      <th className="px-3 py-3 font-semibold">使用者 / 裝置</th>
+                      <th className="px-3 py-3 font-semibold">檢索次數</th>
+                      <th className="px-3 py-3 font-semibold">Input</th>
+                      <th className="px-3 py-3 font-semibold">Output</th>
+                      <th className="px-3 py-3 font-semibold">總 Tokens</th>
+                      <th className="px-3 py-3 font-semibold">約台幣</th>
+                      <th className="px-3 py-3 font-semibold">最後使用</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {searchUsage.length === 0 ? (
+                      <tr>
+                        <td colSpan={7} className="px-3 py-6 text-center text-slate-500">
+                          目前還沒有 AI 智慧檢索使用紀錄。
+                        </td>
+                      </tr>
+                    ) : (
+                      searchUsage.map((entry) => (
+                        <tr key={`search-${entry.userEmail ?? entry.visitorId ?? entry.label}`} className="border-b border-slate-100 last:border-b-0">
                           <td className="px-3 py-3 font-medium text-ink">{entry.label}</td>
                           <td className="px-3 py-3 text-slate-700">{entry.explanationCount}</td>
                           <td className="px-3 py-3 text-slate-700">{entry.inputTokens.toLocaleString()}</td>
@@ -861,7 +936,7 @@ export default function OwnerPage() {
                 在線估算為最近 2 分鐘內仍有活動的裝置；作答裝置與題數只統計已同步到雲端的作答。
               </p>
               <p className="mt-2 text-sm text-slate-500">
-                AI 詳解台幣換算使用 GPT-5-mini 目前價格估算，並以 1 USD ≈ 32.5 TWD 粗估。
+                AI 詳解與 AI 智慧檢索台幣換算都使用 GPT-5-mini 目前價格估算，並以 1 USD ≈ 32.5 TWD 粗估。
               </p>
             </section>
           </div>

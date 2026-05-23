@@ -43,6 +43,8 @@ type UsageLogRow = {
   used_at: string;
 };
 
+const AI_EXPLANATION_USAGE_PREFIX = "AI_EXPLANATION:";
+
 const HOURLY_LIMIT = 30;
 const DAILY_LIMIT = 100;
 const GPT_5_MINI_MAX_OUTPUT_TOKENS = 1600;
@@ -567,7 +569,7 @@ export async function POST(request: NextRequest) {
       rate_key: rateKey,
       visitor_id: visitorId,
       user_email: userEmail,
-      question_id: body.question.id ?? body.question.stem.slice(0, 120),
+      question_id: `${AI_EXPLANATION_USAGE_PREFIX}${body.question.id ?? body.question.stem.slice(0, 120)}`,
       model: result.model,
       input_tokens: result.usage.inputTokens,
       output_tokens: result.usage.outputTokens,

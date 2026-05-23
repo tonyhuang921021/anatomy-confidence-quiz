@@ -29,11 +29,14 @@ type AIExplanationUsageLogRow = {
   rate_key: string;
   visitor_id?: string | null;
   user_email?: string | null;
+  question_id?: string | null;
   input_tokens?: number | null;
   output_tokens?: number | null;
   total_tokens?: number | null;
   used_at: string;
 };
+
+const AI_SEARCH_USAGE_PREFIX = "AI_SEARCH:";
 
 type ClassificationReportRow = {
   id: string | number;
@@ -252,18 +255,25 @@ async function fetchOwnerHourlySeries(
 }
 
 async function fetchOwnerExplanationUsage(
-  supabase: any
+  supabase: any,
+  feature: "explanation" | "search"
 ): Promise<OwnerExplanationUsageEntry[]> {
   const rows = await fetchAllRows<AIExplanationUsageLogRow>(
     supabase,
     "ai_explanation_usage_logs",
-    "rate_key, visitor_id, user_email, input_tokens, output_tokens, total_tokens, used_at",
+    "rate_key, visitor_id, user_email, question_id, input_tokens, output_tokens, total_tokens, used_at",
     "used_at"
   );
 
   const grouped = new Map<string, OwnerExplanationUsageEntry>();
 
-  for (const row of rows) {
+  for (const row of rows.filter((entry) => {
+    const questionId = entry.question_id ?? "";
+    if (feature === "search") {
+      return questionId.startsWith(AI_SEARCH_USAGE_PREFIX);
+    }
+    return !questionId.startsWith(AI_SEARCH_USAGE_PREFIX);
+  })) {
     const key = row.user_email?.trim().toLowerCase() || row.visitor_id || row.rate_key;
     const current = grouped.get(key) ?? {
       label: row.user_email?.trim() || row.visitor_id || row.rate_key,
@@ -333,7 +343,8 @@ async function fetchOwnerTopAttemptVisitors(
 async function fetchOwnerDashboardStats(
   supabase: any,
   dailySeries: OwnerDailyPoint[],
-  explanationUsage: OwnerExplanationUsageEntry[]
+  explanationUsage: OwnerExplanationUsageEntry[],
+  searchUsage: OwnerExplanationUsageEntry[]
 ): Promise<OwnerDashboardStats> {
   const now = new Date();
   const onlineSince = new Date(now.getTime() - ONLINE_WINDOW_MS).toISOString();
@@ -393,6 +404,10 @@ async function fetchOwnerDashboardStats(
   const aiExplanationInputTokens = explanationUsage.reduce((sum, row) => sum + row.inputTokens, 0);
   const aiExplanationOutputTokens = explanationUsage.reduce((sum, row) => sum + row.outputTokens, 0);
   const aiExplanationTotalTokens = explanationUsage.reduce((sum, row) => sum + row.totalTokens, 0);
+  const aiSearchCount = searchUsage.reduce((sum, row) => sum + row.explanationCount, 0);
+  const aiSearchInputTokens = searchUsage.reduce((sum, row) => sum + row.inputTokens, 0);
+  const aiSearchOutputTokens = searchUsage.reduce((sum, row) => sum + row.outputTokens, 0);
+  const aiSearchTotalTokens = searchUsage.reduce((sum, row) => sum + row.totalTokens, 0);
 
   return {
     totalVisitorDevices: totalVisitorsResult.count ?? 0,
@@ -408,6 +423,10 @@ async function fetchOwnerDashboardStats(
     aiExplanationInputTokens,
     aiExplanationOutputTokens,
     aiExplanationTotalTokens,
+    aiSearchCount,
+    aiSearchInputTokens,
+    aiSearchOutputTokens,
+    aiSearchTotalTokens,
     updatedAt: now.toISOString()
   };
 }
@@ -470,14 +489,15 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ ok: false, message: "你沒有查看私有數據頁的權限。" }, { status: 403 });
     }
 
-    const [dailySeries, hourlySeries, explanationUsage, topVisitors, classificationReports] = await Promise.all([
+    const [dailySeries, hourlySeries, explanationUsage, searchUsage, topVisitors, classificationReports] = await Promise.all([
       fetchOwnerDailySeries(supabase, 14),
       fetchOwnerHourlySeries(supabase),
-      fetchOwnerExplanationUsage(supabase),
+      fetchOwnerExplanationUsage(supabase, "explanation"),
+      fetchOwnerExplanationUsage(supabase, "search"),
       fetchOwnerTopAttemptVisitors(supabase, 5),
       fetchOwnerClassificationReports(supabase, 40)
     ]);
-    const stats = await fetchOwnerDashboardStats(supabase, dailySeries, explanationUsage);
+    const stats = await fetchOwnerDashboardStats(supabase, dailySeries, explanationUsage, searchUsage);
 
     return NextResponse.json({
       ok: true,
@@ -485,6 +505,7 @@ export async function POST(request: NextRequest) {
       dailySeries,
       hourlySeries,
       explanationUsage,
+      searchUsage,
       topVisitors,
       classificationReports
     });

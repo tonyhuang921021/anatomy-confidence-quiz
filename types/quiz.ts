@@ -254,6 +254,10 @@ export type OwnerDashboardStats = {
   aiExplanationInputTokens: number;
   aiExplanationOutputTokens: number;
   aiExplanationTotalTokens: number;
+  aiSearchCount: number;
+  aiSearchInputTokens: number;
+  aiSearchOutputTokens: number;
+  aiSearchTotalTokens: number;
   updatedAt: string;
 };
 
