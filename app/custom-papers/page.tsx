@@ -232,6 +232,7 @@ export default function CustomPapersPage() {
       const paper = await lookupCustomPaper(normalizedCode);
       setSelectedPaper(paper);
       setPaperCodeInput(normalizedCode);
+      setTab("lookup");
     } catch (error) {
       setLookupError(error instanceof Error ? error.message : "找不到這份自訂卷");
     } finally {
@@ -667,7 +668,7 @@ export default function CustomPapersPage() {
         </section>
       )}
 
-      {selectedPaper ? (
+      {tab === "lookup" && selectedPaper ? (
         <section className="mt-6 rounded-[2rem] bg-white p-6 shadow-card ring-1 ring-slate-100 sm:p-8">
           <div className="flex flex-wrap items-start justify-between gap-4">
             <div>
