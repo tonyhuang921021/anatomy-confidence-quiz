@@ -318,9 +318,11 @@ export type QuestionClassificationOverride = {
 export type FeedbackMessage = {
   id: string;
   content: string;
+  parentId?: string;
   displayName?: string;
   isAnonymous: boolean;
   createdAt: string;
+  replies?: FeedbackMessage[];
 };
 
 export type CustomPaperParticipant = {

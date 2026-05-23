@@ -18,6 +18,8 @@ export function FeedbackBoard() {
   const { configured, user } = useAuth();
   const [messages, setMessages] = useState<FeedbackMessage[]>([]);
   const [content, setContent] = useState("");
+  const [replyTargetId, setReplyTargetId] = useState<string | null>(null);
+  const [replyContent, setReplyContent] = useState("");
   const [isAnonymous, setIsAnonymous] = useState(true);
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
@@ -68,6 +70,38 @@ export function FeedbackBoard() {
       setMessage("留言已送出，謝謝你的建議。");
     } catch (submitError) {
       setError(submitError instanceof Error ? submitError.message : "留言送出失敗");
+    } finally {
+      setSubmitting(false);
+    }
+  }
+
+  async function handleReply(parentId: string) {
+    setSubmitting(true);
+    setError("");
+    setMessage("");
+
+    try {
+      const created = await createFeedbackMessage({
+        content: replyContent,
+        isAnonymous: !user || isAnonymous,
+        user,
+        parentId
+      });
+      setMessages((current) =>
+        current.map((entry) =>
+          entry.id === parentId
+            ? {
+                ...entry,
+                replies: [...(entry.replies ?? []), created]
+              }
+            : entry
+        )
+      );
+      setReplyContent("");
+      setReplyTargetId(null);
+      setMessage("回覆已送出。");
+    } catch (submitError) {
+      setError(submitError instanceof Error ? submitError.message : "回覆送出失敗");
     } finally {
       setSubmitting(false);
     }
@@ -172,6 +206,60 @@ export function FeedbackBoard() {
                     </div>
                   </div>
                   <p className="mt-3 whitespace-pre-wrap text-sm leading-7 text-slate-700">{entry.content}</p>
+                  <div className="mt-3 flex items-center gap-2">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setReplyTargetId((current) => (current === entry.id ? null : entry.id));
+                        setReplyContent("");
+                      }}
+                      className="rounded-full bg-white px-3 py-1.5 text-xs font-semibold text-slate-600 ring-1 ring-slate-200 transition hover:bg-slate-100"
+                    >
+                      {replyTargetId === entry.id ? "收起回覆" : "回覆"}
+                    </button>
+                    {(entry.replies?.length ?? 0) > 0 ? (
+                      <span className="text-xs text-slate-500">{entry.replies?.length} 則回覆</span>
+                    ) : null}
+                  </div>
+
+                  {replyTargetId === entry.id ? (
+                    <div className="mt-3 rounded-2xl bg-white p-3 ring-1 ring-slate-200">
+                      <textarea
+                        value={replyContent}
+                        onChange={(event) => setReplyContent(event.target.value)}
+                        maxLength={800}
+                        placeholder="回覆這則留言..."
+                        className="min-h-24 w-full rounded-2xl border border-slate-200 bg-white p-3 text-sm leading-7 text-slate-800 outline-none"
+                      />
+                      <div className="mt-3 flex items-center justify-between gap-3">
+                        <p className="text-xs text-slate-500">{replyContent.length} / 800</p>
+                        <button
+                          type="button"
+                          onClick={() => void handleReply(entry.id)}
+                          disabled={submitting || !replyContent.trim()}
+                          className="min-h-10 rounded-2xl bg-slate-900 px-4 py-2 text-sm font-semibold text-white transition hover:bg-slate-800 disabled:cursor-not-allowed disabled:bg-slate-300"
+                        >
+                          {submitting ? "送出中..." : "送出回覆"}
+                        </button>
+                      </div>
+                    </div>
+                  ) : null}
+
+                  {(entry.replies?.length ?? 0) > 0 ? (
+                    <div className="mt-4 space-y-2 border-l border-slate-200 pl-3">
+                      {entry.replies?.map((reply) => (
+                        <div key={reply.id} className="rounded-2xl bg-white px-3 py-3 ring-1 ring-slate-200">
+                          <p className="text-sm font-semibold text-ink">
+                            {reply.isAnonymous ? "匿名使用者" : reply.displayName || "已登入使用者"}
+                          </p>
+                          <p className="mt-1 text-xs text-slate-500">{formatCreatedAt(reply.createdAt)}</p>
+                          <p className="mt-2 whitespace-pre-wrap text-sm leading-7 text-slate-700">
+                            {reply.content}
+                          </p>
+                        </div>
+                      ))}
+                    </div>
+                  ) : null}
                 </article>
               ))
             )}

@@ -513,6 +513,7 @@ with check (true);
 create table if not exists public.feedback_messages (
   id bigint generated always as identity primary key,
   content text not null,
+  parent_id bigint references public.feedback_messages (id) on delete cascade,
   display_name text,
   is_anonymous boolean not null default true,
   user_id uuid references auth.users (id) on delete set null,
@@ -520,8 +521,14 @@ create table if not exists public.feedback_messages (
   created_at timestamptz not null default now()
 );
 
+alter table public.feedback_messages
+  add column if not exists parent_id bigint references public.feedback_messages (id) on delete cascade;
+
 create index if not exists feedback_messages_created_at_idx
 on public.feedback_messages (created_at desc);
+
+create index if not exists feedback_messages_parent_id_created_at_idx
+on public.feedback_messages (parent_id, created_at asc);
 
 create index if not exists feedback_messages_user_id_created_at_idx
 on public.feedback_messages (user_id, created_at desc);

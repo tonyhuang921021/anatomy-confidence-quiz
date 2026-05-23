@@ -117,6 +117,7 @@ type AIExplanationUsageLogRow = {
 type FeedbackMessageRow = {
   id: string | number;
   content: string;
+  parent_id?: string | number | null;
   display_name?: string | null;
   is_anonymous: boolean;
   created_at: string;
@@ -207,6 +208,7 @@ function mapFeedbackMessageRow(row: FeedbackMessageRow): FeedbackMessage {
   return {
     id: String(row.id),
     content: row.content,
+    parentId: row.parent_id ? String(row.parent_id) : undefined,
     displayName: row.display_name ?? undefined,
     isAnonymous: row.is_anonymous,
     createdAt: row.created_at
@@ -1021,21 +1023,39 @@ export async function loadFeedbackMessages(limit = 40): Promise<FeedbackMessage[
   const supabase = getSupabaseBrowserClient();
   const { data, error } = await supabase
     .from("feedback_messages")
-    .select("id, content, display_name, is_anonymous, created_at")
+    .select("id, content, parent_id, display_name, is_anonymous, created_at")
     .order("created_at", { ascending: false })
-    .limit(limit);
+    .limit(limit * 4);
 
   if (error) {
     throw error;
   }
 
-  return ((data ?? []) as FeedbackMessageRow[]).map(mapFeedbackMessageRow);
+  const flatMessages = ((data ?? []) as FeedbackMessageRow[]).map(mapFeedbackMessageRow);
+  const byParent = new Map<string, FeedbackMessage[]>();
+  const roots: FeedbackMessage[] = [];
+
+  for (const entry of flatMessages) {
+    if (!entry.parentId) {
+      roots.push({ ...entry, replies: [] });
+      continue;
+    }
+    const group = byParent.get(entry.parentId) ?? [];
+    group.push({ ...entry, replies: [] });
+    byParent.set(entry.parentId, group);
+  }
+
+  return roots.slice(0, limit).map((entry) => ({
+    ...entry,
+    replies: (byParent.get(entry.id) ?? []).sort((left, right) => left.createdAt.localeCompare(right.createdAt))
+  }));
 }
 
 export async function createFeedbackMessage(input: {
   content: string;
   isAnonymous: boolean;
   user?: Pick<User, "id" | "email" | "user_metadata"> | null;
+  parentId?: string | null;
 }) {
   if (!isSupabaseConfigured()) {
     throw new Error("Supabase 尚未設定，暫時無法留言。");
@@ -1090,12 +1110,13 @@ export async function createFeedbackMessage(input: {
     .from("feedback_messages")
     .insert({
       content,
+      parent_id: input.parentId?.trim() || null,
       display_name: displayName,
       is_anonymous: input.isAnonymous,
       user_id: input.user?.id ?? null,
       visitor_id: visitorId ?? null
     })
-    .select("id, content, display_name, is_anonymous, created_at")
+    .select("id, content, parent_id, display_name, is_anonymous, created_at")
     .single();
 
   if (error) {
