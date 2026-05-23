@@ -85,6 +85,15 @@ type SubmitAttemptBody = {
   session?: QuizSession;
 };
 
+type UpdateMetadataBody = {
+  action: "update_metadata";
+  accessToken?: string | null;
+  visitorId?: string | null;
+  paperCode?: string;
+  name?: string;
+  isPublic?: boolean;
+};
+
 type AISearchPlan = {
   title?: string;
   searchTerms?: string[];
@@ -557,6 +566,17 @@ async function resolveActor(
   };
 }
 
+function canEditPaper(
+  row: CustomPaperRow,
+  actor: Awaited<ReturnType<typeof resolveActor>>,
+  visitorId?: string | null
+) {
+  if (actor.userId && row.created_by_user_id === actor.userId) return true;
+  if (actor.userEmail && row.created_by_email && actor.userEmail === row.created_by_email) return true;
+  if (!actor.userId && visitorId && row.visitor_id && visitorId === row.visitor_id) return true;
+  return false;
+}
+
 export async function GET(request: NextRequest) {
   const supabase = getServiceSupabaseClient();
   if (!supabase) {
@@ -623,6 +643,7 @@ export async function POST(request: NextRequest) {
       | GenerateBody
       | GenerateAISearchBody
       | SubmitAttemptBody
+      | UpdateMetadataBody
       | null;
     if (!body?.action) {
       return NextResponse.json({ ok: false, message: "缺少操作類型。" }, { status: 400 });
@@ -800,6 +821,55 @@ export async function POST(request: NextRequest) {
           questionIds: finalQuestions.map((question) => question.id),
           participants: []
         } satisfies CustomPaperDetail
+      });
+    }
+
+    if (body.action === "update_metadata") {
+      const paperCode = body.paperCode?.trim().toUpperCase();
+      if (!paperCode) {
+        return NextResponse.json({ ok: false, message: "缺少考卷碼。" }, { status: 400 });
+      }
+
+      const { data, error } = await supabase
+        .from("custom_papers")
+        .select("paper_code, name, question_ids, subject_filters, difficulty, is_public, created_by_user_id, created_by_email, created_by_label, visitor_id, created_at")
+        .eq("paper_code", paperCode)
+        .maybeSingle();
+
+      if (error) throw error;
+      if (!data) {
+        return NextResponse.json({ ok: false, message: "找不到這份自訂卷。" }, { status: 404 });
+      }
+
+      const actor = await resolveActor(supabase, body.accessToken, body.visitorId);
+      if (!canEditPaper(data as CustomPaperRow, actor, body.visitorId ?? null)) {
+        return NextResponse.json({ ok: false, message: "只有這份卷的建立者才能修改卷名或公開設定。" }, { status: 403 });
+      }
+
+      const nextName = body.name?.trim().slice(0, 60) || null;
+      const nextIsPublic = Boolean(body.isPublic);
+
+      const { error: updateError } = await supabase
+        .from("custom_papers")
+        .update({
+          name: nextName,
+          is_public: nextIsPublic
+        })
+        .eq("paper_code", paperCode);
+
+      if (updateError) throw updateError;
+
+      const attempts = await loadPaperAttempts(supabase, paperCode);
+      return NextResponse.json({
+        ok: true,
+        paper: toPaperDetail(
+          {
+            ...(data as CustomPaperRow),
+            name: nextName,
+            is_public: nextIsPublic
+          },
+          attempts
+        )
       });
     }
 

@@ -1415,6 +1415,14 @@ type RecordCustomPaperAttemptInput = {
   session: QuizSession;
 };
 
+type UpdateCustomPaperMetadataInput = {
+  accessToken?: string | null;
+  visitorId: string;
+  paperCode: string;
+  name?: string;
+  isPublic: boolean;
+};
+
 function tryParseJson<T>(rawText: string): T | null {
   if (!rawText) return null;
 
@@ -1527,4 +1535,30 @@ export async function recordCustomPaperAttempt(
   if (!response.ok || !payload?.ok) {
     throw new Error(payload?.message || rawText || "自訂卷作答紀錄同步失敗");
   }
+}
+
+export async function updateCustomPaperMetadata(
+  input: UpdateCustomPaperMetadataInput
+): Promise<CustomPaperDetail> {
+  const response = await fetch("/api/custom-papers", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+      action: "update_metadata",
+      ...input
+    })
+  });
+
+  const rawText = await response.text();
+  const payload = tryParseJson<
+    | { ok?: boolean; message?: string; paper?: CustomPaperDetail }
+  >(rawText);
+
+  if (!response.ok || !payload?.ok || !payload.paper) {
+    throw new Error(payload?.message || rawText || "更新自訂卷失敗");
+  }
+
+  return payload.paper;
 }

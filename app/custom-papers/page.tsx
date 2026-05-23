@@ -9,7 +9,8 @@ import {
   generateAISearchCustomPaper,
   generateCustomPaper,
   loadPublicCustomPapers,
-  lookupCustomPaper
+  lookupCustomPaper,
+  updateCustomPaperMetadata
 } from "@/lib/cloudSync";
 import { DEFAULT_QUIZ_SETTINGS } from "@/lib/quizAnalysis";
 import { loadCompletedSessions, saveQuizSettings } from "@/lib/storage";
@@ -78,6 +79,11 @@ export default function CustomPapersPage() {
   const [lookupLoading, setLookupLoading] = useState(false);
   const [lookupError, setLookupError] = useState("");
   const [selectedPaper, setSelectedPaper] = useState<CustomPaperDetail | null>(null);
+  const [editingPaperName, setEditingPaperName] = useState("");
+  const [editingPaperPublic, setEditingPaperPublic] = useState(false);
+  const [updatingPaper, setUpdatingPaper] = useState(false);
+  const [updatePaperMessage, setUpdatePaperMessage] = useState("");
+  const [updatePaperError, setUpdatePaperError] = useState("");
   const [publicPapers, setPublicPapers] = useState<CustomPaperSummary[]>([]);
   const [publicLoading, setPublicLoading] = useState(true);
   const [publicError, setPublicError] = useState("");
@@ -97,6 +103,13 @@ export default function CustomPapersPage() {
 
     void fetchPublicPapers();
   }, []);
+
+  useEffect(() => {
+    setEditingPaperName(selectedPaper?.name ?? "");
+    setEditingPaperPublic(selectedPaper?.isPublic ?? false);
+    setUpdatePaperMessage("");
+    setUpdatePaperError("");
+  }, [selectedPaper?.paperCode, selectedPaper?.name, selectedPaper?.isPublic]);
 
   const doneQuestionIds = useMemo(() => {
     const sessions = loadCompletedSessions();
@@ -208,6 +221,37 @@ export default function CustomPapersPage() {
       setLookupError(error instanceof Error ? error.message : "找不到這份自訂卷");
     } finally {
       setLookupLoading(false);
+    }
+  }
+
+  async function handleUpdateSelectedPaper() {
+    if (!selectedPaper) return;
+
+    try {
+      setUpdatingPaper(true);
+      setUpdatePaperError("");
+      setUpdatePaperMessage("");
+      const updated = await updateCustomPaperMetadata({
+        accessToken: session?.access_token ?? null,
+        visitorId: getOrCreateVisitorId() ?? "",
+        paperCode: selectedPaper.paperCode,
+        name: editingPaperName,
+        isPublic: editingPaperPublic
+      });
+      setSelectedPaper(updated);
+      setGeneratedPaper((current) => (current?.paperCode === updated.paperCode ? updated : current));
+      setPublicPapers((current) => {
+        const next = current.filter((item) => item.paperCode !== updated.paperCode);
+        if (updated.isPublic) {
+          return [updated, ...next].slice(0, 30);
+        }
+        return next;
+      });
+      setUpdatePaperMessage("這份卷的名稱與公開設定已更新。");
+    } catch (error) {
+      setUpdatePaperError(error instanceof Error ? error.message : "更新自訂卷失敗");
+    } finally {
+      setUpdatingPaper(false);
     }
   }
 
@@ -593,6 +637,53 @@ export default function CustomPapersPage() {
             >
               複製考卷碼
             </button>
+          </div>
+
+          <div className="mt-6 rounded-[2rem] bg-slate-50 p-5 ring-1 ring-slate-100">
+            <h3 className="text-lg font-semibold text-ink">建立者可修改這份卷</h3>
+            <p className="mt-2 text-sm leading-7 text-slate-600">
+              如果你是這份卷的建立者，可以在這裡改卷名，或切換要不要公開。
+            </p>
+            <div className="mt-4 grid gap-4 lg:grid-cols-[1.2fr_0.8fr]">
+              <div>
+                <label className="text-sm font-semibold text-ink">卷名</label>
+                <input
+                  value={editingPaperName}
+                  onChange={(event) => setEditingPaperName(event.target.value.slice(0, 60))}
+                  placeholder="例如：腎臟酸鹼平衡總整理"
+                  className="mt-2 min-h-12 w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-800 outline-none"
+                />
+              </div>
+              <div className="flex items-end">
+                <button
+                  type="button"
+                  onClick={() => setEditingPaperPublic((current) => !current)}
+                  className={`min-h-12 w-full rounded-2xl px-4 py-3 text-sm font-semibold transition ${
+                    editingPaperPublic
+                      ? "bg-emerald-100 text-emerald-900 ring-1 ring-emerald-300"
+                      : "bg-white text-slate-800 ring-1 ring-slate-200 hover:bg-slate-50"
+                  }`}
+                >
+                  {editingPaperPublic ? "公開這份卷：開" : "公開這份卷：關"}
+                </button>
+              </div>
+            </div>
+            <div className="mt-4 flex flex-wrap items-center gap-3">
+              <button
+                type="button"
+                onClick={() => void handleUpdateSelectedPaper()}
+                disabled={updatingPaper}
+                className="min-h-12 rounded-2xl bg-slate-900 px-5 py-3 text-sm font-semibold text-white transition hover:bg-slate-800 disabled:cursor-not-allowed disabled:bg-slate-300"
+              >
+                {updatingPaper ? "更新中..." : "更新這份卷"}
+              </button>
+              {updatePaperMessage ? (
+                <span className="text-sm text-emerald-700">{updatePaperMessage}</span>
+              ) : null}
+              {updatePaperError ? (
+                <span className="text-sm text-rose-700">{updatePaperError}</span>
+              ) : null}
+            </div>
           </div>
 
           <div className="mt-6">
