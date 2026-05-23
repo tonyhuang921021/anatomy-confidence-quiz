@@ -38,7 +38,7 @@ const difficultyMeta: Record<CustomPaperDifficulty, { label: string; description
   },
   hard: {
     label: "難",
-    description: "優先抽三人以上全錯或五人以上答對率低於三成的題目，不夠時會逐步放寬。"
+    description: "只抽至少 1 人做過且全站答對率不超過三分之一的題目，並從最難的開始取。"
   }
 };
 

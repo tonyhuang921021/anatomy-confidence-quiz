@@ -510,7 +510,7 @@ export async function POST(request: NextRequest) {
             ok: false,
             message:
               difficulty === "hard"
-                ? `目前這些科目裡，符合全難題標準的題目不足 10 題；目前符合條件 ${selectedQuestions.length} 題，請多選一些科目再試。`
+                ? `目前這些科目裡，符合「至少 1 人做過且答對率不超過三分之一」的難題不足 10 題；目前符合條件 ${selectedQuestions.length} 題，請多選一些科目再試。`
                 : `目前符合條件的題目不足 10 題；目前符合條件 ${selectedQuestions.length} 題，請多選一些科目再試。`
           },
           { status: 400 }
