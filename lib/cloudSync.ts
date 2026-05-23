@@ -1439,6 +1439,8 @@ type GenerateAISearchCustomPaperInput = {
   query: string;
   name?: string;
   isPublic: boolean;
+  yearFrom?: number;
+  yearTo?: number;
 };
 
 type RecordCustomPaperAttemptInput = {

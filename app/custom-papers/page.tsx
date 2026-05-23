@@ -29,6 +29,17 @@ const selectableSubjects = enabledSubjects.filter(
     (MED1_SUBJECTS.includes(item.subject) || MED2_SUBJECTS.includes(item.subject))
 );
 
+const allSourceYears = Array.from(
+  new Set(
+    selectableSubjects
+      .flatMap((subject) => subject.questions.map((question) => question.sourceYear))
+      .filter((year): year is number => typeof year === "number")
+  )
+).sort((left, right) => left - right);
+
+const MIN_SOURCE_YEAR = allSourceYears[0] ?? 100;
+const MAX_SOURCE_YEAR = allSourceYears[allSourceYears.length - 1] ?? 115;
+
 const difficultyMeta: Record<CustomPaperDifficulty, { label: string; description: string }> = {
   easy: {
     label: "易",
@@ -72,6 +83,8 @@ export default function CustomPapersPage() {
   const [paperName, setPaperName] = useState("");
   const [isPublic, setIsPublic] = useState(true);
   const [aiQuery, setAiQuery] = useState("");
+  const [yearFrom, setYearFrom] = useState(MIN_SOURCE_YEAR);
+  const [yearTo, setYearTo] = useState(MAX_SOURCE_YEAR);
   const [generating, setGenerating] = useState(false);
   const [generateError, setGenerateError] = useState("");
   const [generatedPaper, setGeneratedPaper] = useState<CustomPaperDetail | null>(null);
@@ -192,7 +205,9 @@ export default function CustomPapersPage() {
         selectedSubjects,
         query: aiQuery,
         name: paperName,
-        isPublic
+        isPublic,
+        yearFrom,
+        yearTo
       });
       setGeneratedPaper(paper);
       setSelectedPaper(paper);
@@ -461,6 +476,65 @@ export default function CustomPapersPage() {
               <p className="mt-2 text-xs text-slate-500">
                 可不選科目；如果有先勾科目，AI 就只會在那些科目裡找題。
               </p>
+            </div>
+
+            <div className="rounded-[2rem] bg-slate-50 p-5 ring-1 ring-slate-100">
+              <div className="flex flex-wrap items-center justify-between gap-3">
+                <div>
+                  <h2 className="text-lg font-semibold text-ink">年份範圍</h2>
+                  <p className="mt-2 text-sm leading-7 text-slate-600">
+                    只在你指定的考古題年份區間內做 AI 檢索。
+                  </p>
+                </div>
+                <div className="rounded-full bg-white px-4 py-2 text-sm font-semibold text-ink ring-1 ring-slate-200">
+                  {yearFrom} 年到 {yearTo} 年
+                </div>
+              </div>
+
+              <div className="mt-5 grid gap-5 lg:grid-cols-2">
+                <label className="block">
+                  <div className="flex items-center justify-between gap-3 text-sm font-semibold text-ink">
+                    <span>起始年份</span>
+                    <span>{yearFrom}</span>
+                  </div>
+                  <input
+                    type="range"
+                    min={MIN_SOURCE_YEAR}
+                    max={MAX_SOURCE_YEAR}
+                    step={1}
+                    value={yearFrom}
+                    onChange={(event) => {
+                      const next = Number(event.target.value);
+                      setYearFrom(next);
+                      if (next > yearTo) {
+                        setYearTo(next);
+                      }
+                    }}
+                    className="mt-3 w-full accent-brand-600"
+                  />
+                </label>
+                <label className="block">
+                  <div className="flex items-center justify-between gap-3 text-sm font-semibold text-ink">
+                    <span>結束年份</span>
+                    <span>{yearTo}</span>
+                  </div>
+                  <input
+                    type="range"
+                    min={MIN_SOURCE_YEAR}
+                    max={MAX_SOURCE_YEAR}
+                    step={1}
+                    value={yearTo}
+                    onChange={(event) => {
+                      const next = Number(event.target.value);
+                      setYearTo(next);
+                      if (next < yearFrom) {
+                        setYearFrom(next);
+                      }
+                    }}
+                    className="mt-3 w-full accent-brand-600"
+                  />
+                </label>
+              </div>
             </div>
 
             {renderSubjectGroup("醫學（一）科目篩選（可不選）", med1Subjects)}

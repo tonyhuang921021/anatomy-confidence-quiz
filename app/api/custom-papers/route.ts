@@ -75,6 +75,8 @@ type GenerateAISearchBody = {
   query?: string;
   name?: string;
   isPublic?: boolean;
+  yearFrom?: number;
+  yearTo?: number;
 };
 
 type SubmitAttemptBody = {
@@ -776,11 +778,27 @@ export async function POST(request: NextRequest) {
       const selectedSubjects = getAllowedSubjectList(body.selectedSubjects);
       const effectiveSubjects =
         selectedSubjects.length > 0 ? selectedSubjects : Array.from(ALLOWED_SUBJECTS);
+      const normalizedYearFrom = Number.isFinite(body.yearFrom) ? Math.trunc(body.yearFrom as number) : 100;
+      const normalizedYearTo = Number.isFinite(body.yearTo) ? Math.trunc(body.yearTo as number) : 115;
+      const yearFrom = Math.min(normalizedYearFrom, normalizedYearTo);
+      const yearTo = Math.max(normalizedYearFrom, normalizedYearTo);
       const actor = await resolveActor(supabase, body.accessToken, body.visitorId);
       const classificationOverrides = await loadClassificationOverrides(supabase);
-      const bank = getQuestionBankWithOverrides(classificationOverrides).filter((question) =>
-        effectiveSubjects.includes(question.subject)
+      const bank = getQuestionBankWithOverrides(classificationOverrides).filter(
+        (question) =>
+          effectiveSubjects.includes(question.subject) &&
+          question.sourceType !== "AI_GENERATED" &&
+          typeof question.sourceYear === "number" &&
+          question.sourceYear >= yearFrom &&
+          question.sourceYear <= yearTo
       );
+
+      if (bank.length === 0) {
+        return NextResponse.json(
+          { ok: false, message: `目前 ${yearFrom} 到 ${yearTo} 年、你選的科目範圍內沒有可檢索的考古題。` },
+          { status: 400 }
+        );
+      }
 
       const expansion = await createOpenAIText(
         buildAISearchExpansionPrompt(query, effectiveSubjects),
