@@ -195,6 +195,10 @@ export default function CustomPapersPage() {
 
   async function handleGenerateAISearch() {
     if (!aiQuery.trim()) return;
+    if (!session?.access_token) {
+      setGenerateError("請先登入帳號，才能使用 AI 智慧檢索。");
+      return;
+    }
 
     try {
       setGenerating(true);

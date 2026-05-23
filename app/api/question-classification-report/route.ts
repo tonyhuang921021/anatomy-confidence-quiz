@@ -214,15 +214,24 @@ export async function POST(request: NextRequest) {
     }
 
     const verifiedUser = await getVerifiedUser(body?.accessToken);
+    if (!verifiedUser?.id || !verifiedUser.email) {
+      return NextResponse.json(
+        {
+          ok: false,
+          message: "請先登入帳號，才能回報此題分類錯誤。"
+        },
+        { status: 401 }
+      );
+    }
     const visitorId = body?.visitorId?.trim() || null;
-    const actorColumn = verifiedUser?.id ? "user_id" : "visitor_id";
-    const actorValue = verifiedUser?.id || visitorId;
+    const actorColumn = "user_id" as const;
+    const actorValue = verifiedUser.id;
 
     if (!actorValue) {
       return NextResponse.json(
         {
           ok: false,
-          message: "目前無法識別回報來源，請稍後再試。"
+          message: "請先登入帳號，才能回報此題分類錯誤。"
         },
         { status: 400 }
       );

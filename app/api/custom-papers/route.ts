@@ -770,6 +770,13 @@ export async function POST(request: NextRequest) {
         );
       }
 
+      if (!body.accessToken) {
+        return NextResponse.json(
+          { ok: false, message: "請先登入帳號，才能使用 AI 智慧檢索。" },
+          { status: 401 }
+        );
+      }
+
       const query = body.query?.trim() ?? "";
       if (!query) {
         return NextResponse.json({ ok: false, message: "請先輸入想檢索的區塊或關鍵字。" }, { status: 400 });
@@ -783,6 +790,12 @@ export async function POST(request: NextRequest) {
       const yearFrom = Math.min(normalizedYearFrom, normalizedYearTo);
       const yearTo = Math.max(normalizedYearFrom, normalizedYearTo);
       const actor = await resolveActor(supabase, body.accessToken, body.visitorId);
+      if (!actor.userId || !actor.userEmail) {
+        return NextResponse.json(
+          { ok: false, message: "請先登入帳號，才能使用 AI 智慧檢索。" },
+          { status: 401 }
+        );
+      }
       const classificationOverrides = await loadClassificationOverrides(supabase);
       const bank = getQuestionBankWithOverrides(classificationOverrides).filter(
         (question) =>

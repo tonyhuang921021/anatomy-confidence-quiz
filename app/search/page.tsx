@@ -271,6 +271,13 @@ export default function SearchPage() {
   }
 
   async function handleReportClassification(question: Question) {
+    if (!session?.access_token) {
+      setClassificationReportMessageMap((current) => ({
+        ...current,
+        [question.id]: "請先登入帳號，才能回報此題分類錯誤。"
+      }));
+      return;
+    }
     setClassificationReportLoadingMap((current) => ({ ...current, [question.id]: true }));
     setClassificationReportMessageMap((current) => ({ ...current, [question.id]: "" }));
 
