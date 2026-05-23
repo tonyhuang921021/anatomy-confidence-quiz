@@ -200,19 +200,18 @@ function selectQuestionsByDifficulty(
       return rightStat.total_attempts - leftStat.total_attempts;
     });
 
+  const isStrictHardQuestion = (question: Question) => {
+    const stat = getStat(question.id);
+    return stat.total_attempts > 0 && stat.correct_rate <= 33.3;
+  };
+
   const buildTiers = (questions: Question[]) => {
     if (difficulty === "hard") {
       return [
+        questions.filter(isStrictHardQuestion),
         questions.filter((question) => {
           const stat = getStat(question.id);
-          return (
-            (stat.total_attempts > 3 && stat.correct_attempts === 0) ||
-            (stat.total_attempts > 5 && stat.correct_rate < 30)
-          );
-        }),
-        questions.filter((question) => {
-          const stat = getStat(question.id);
-          return stat.total_attempts > 3 && stat.correct_rate < 45;
+          return stat.total_attempts > 0 && stat.correct_rate <= 45;
         }),
         byHardness(questions)
       ];
@@ -251,13 +250,7 @@ function selectQuestionsByDifficulty(
 
   const unseenSelection = pickByPriority(buildTiers(unseen), 10);
   if (difficulty === "hard") {
-    const strictHardQuestions = unseen.filter((question) => {
-      const stat = getStat(question.id);
-      return (
-        (stat.total_attempts > 3 && stat.correct_attempts === 0) ||
-        (stat.total_attempts > 5 && stat.correct_rate < 30)
-      );
-    });
+    const strictHardQuestions = unseen.filter(isStrictHardQuestion);
 
     if (strictHardQuestions.length >= 10) {
       return sample(strictHardQuestions, 10);
@@ -516,8 +509,8 @@ export async function POST(request: NextRequest) {
             ok: false,
             message:
               difficulty === "hard"
-                ? "目前這些科目裡，符合全難題標準的題目不足 10 題，請多選一些科目再試。"
-                : "目前符合條件的題目不足 10 題，請多選一些科目再試。"
+                ? `目前這些科目裡，符合全難題標準的題目不足 10 題；目前符合條件 ${selectedQuestions.length} 題，請多選一些科目再試。`
+                : `目前符合條件的題目不足 10 題；目前符合條件 ${selectedQuestions.length} 題，請多選一些科目再試。`
           },
           { status: 400 }
         );
