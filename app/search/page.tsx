@@ -118,7 +118,9 @@ export default function SearchPage() {
     () =>
       Array.from(
         new Map(
-          getCanonicalQuestionBank(classificationOverrides).map((question) => [question.id, question] as const)
+          getCanonicalQuestionBank(classificationOverrides)
+            .filter((question) => question.sourceType !== "AI_GENERATED")
+            .map((question) => [question.id, question] as const)
         ).values()
       ),
     [classificationOverrides]
