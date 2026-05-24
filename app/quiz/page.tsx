@@ -183,7 +183,7 @@ function selectLocalQuestionSet(
     );
 
     if (mergedCustomQuestions.length > 0) {
-      if (selectedSubjects.length === 0) {
+      if (settings.mode === "custom_paper" || selectedSubjects.length === 0) {
         return mergedCustomQuestions;
       }
 

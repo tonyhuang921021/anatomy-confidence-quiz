@@ -824,6 +824,12 @@ export function createQuestionOrder(
   allSessions: { attempts: Attempt[] }[],
   settings: QuizSettings
 ) {
+  const customQuestionIds = settings.customQuestionIds ?? [];
+  if (settings.mode === "custom_paper" && customQuestionIds.length > 0) {
+    const questionMap = new Map(questions.map((question) => [question.id, question] as const));
+    return customQuestionIds.filter((id) => questionMap.has(id));
+  }
+
   const filtered = filterQuestionPool(questions, settings);
   const sourcePool = filtered.length > 0 ? filtered : settings.excludeAiGenerated ? [] : questions;
   if (sourcePool.length === 0) return [];
