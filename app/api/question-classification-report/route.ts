@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 import { createOpenAIText, isOpenAIConfigured } from "@/lib/openai";
+import { getActiveAIAccountBan } from "@/lib/aiAccountBan";
 
 type ClassificationReportRequestBody = {
   visitorId?: string;
@@ -31,6 +32,7 @@ type ParsedClassificationPayload = {
 
 const HOURLY_LIMIT = 8;
 const DAILY_LIMIT = 20;
+const AI_CLASSIFICATION_USAGE_PREFIX = "AI_CLASSIFICATION:";
 const CLASSIFICATION_SUBJECTS = [
   "解剖學",
   "生理學",
@@ -145,6 +147,37 @@ async function checkUsageLimits(supabase: any, actorColumn: "user_id" | "visitor
   return { blocked: false };
 }
 
+async function insertUsageLog(
+  supabase: any,
+  row: {
+    rate_key: string;
+    visitor_id?: string | null;
+    user_email?: string | null;
+    question_id: string;
+    model: string;
+    input_tokens?: number;
+    output_tokens?: number;
+    total_tokens?: number;
+    used_at: string;
+  }
+) {
+  const { error } = await supabase.from("ai_explanation_usage_logs").insert(row);
+  if (!error) return;
+
+  const fallbackRow = {
+    rate_key: row.rate_key,
+    visitor_id: row.visitor_id ?? null,
+    user_email: row.user_email ?? null,
+    question_id: row.question_id,
+    model: row.model,
+    used_at: row.used_at
+  };
+  const { error: fallbackError } = await supabase.from("ai_explanation_usage_logs").insert(fallbackRow);
+  if (fallbackError) {
+    console.error("AI classification usage log skipped:", fallbackError);
+  }
+}
+
 function buildClassificationPrompt(question: NonNullable<ClassificationReportRequestBody["question"]>) {
   const optionLines = Object.entries(question.options ?? {})
     .filter(([, value]) => typeof value === "string" && value.trim())
@@ -223,6 +256,17 @@ export async function POST(request: NextRequest) {
         { status: 401 }
       );
     }
+
+    const activeBan = await getActiveAIAccountBan(supabase, verifiedUser.email);
+    if (activeBan) {
+      return NextResponse.json(
+        {
+          ok: false,
+          message: `這個帳號的 AI 功能已被暫停到 ${new Date(activeBan.banned_until).toLocaleString("zh-TW")} 。`
+        },
+        { status: 429 }
+      );
+    }
     const visitorId = body?.visitorId?.trim() || null;
     const actorColumn = "user_id" as const;
     const actorValue = verifiedUser.id;
@@ -268,6 +312,18 @@ export async function POST(request: NextRequest) {
 
     const { error } = await supabase.from("question_classification_reports").insert(insertPayload);
     if (error) throw error;
+
+    await insertUsageLog(supabase, {
+      rate_key: `ai-classification:${verifiedUser.email.trim().toLowerCase()}`,
+      visitor_id: visitorId,
+      user_email: verifiedUser.email,
+      question_id: `${AI_CLASSIFICATION_USAGE_PREFIX}${question.id}`,
+      model: result.model,
+      input_tokens: result.usage.inputTokens,
+      output_tokens: result.usage.outputTokens,
+      total_tokens: result.usage.totalTokens,
+      used_at: new Date().toISOString()
+    });
 
     return NextResponse.json({
       ok: true,

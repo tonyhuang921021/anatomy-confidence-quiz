@@ -6,8 +6,10 @@ import type {
   OwnerDashboardStats,
   OwnerExplanationUsageEntry,
   OwnerHourlyPoint,
+  OwnerRecentAIAccountEntry,
   OwnerTopAttemptVisitorEntry
 } from "@/types/quiz";
+import { normalizeEmail } from "@/lib/aiAccountBan";
 
 type OwnerRequestBody = {
   accessToken?: string;
@@ -37,6 +39,12 @@ type AIExplanationUsageLogRow = {
 };
 
 const AI_SEARCH_USAGE_PREFIX = "AI_SEARCH:";
+const AI_CLASSIFICATION_USAGE_PREFIX = "AI_CLASSIFICATION:";
+
+type AIAccountBanSummaryRow = {
+  user_email: string;
+  banned_until: string;
+};
 
 type ClassificationReportRow = {
   id: string | number;
@@ -303,6 +311,88 @@ async function fetchOwnerExplanationUsage(
   });
 }
 
+async function fetchRecentAIAccounts(
+  supabase: any
+): Promise<OwnerRecentAIAccountEntry[]> {
+  const hourAgo = new Date(Date.now() - 60 * 60 * 1000).toISOString();
+  const rows = await fetchAllRows<AIExplanationUsageLogRow>(
+    supabase,
+    "ai_explanation_usage_logs",
+    "rate_key, visitor_id, user_email, question_id, input_tokens, output_tokens, total_tokens, used_at",
+    "used_at",
+    (query) => query.gte("used_at", hourAgo)
+  );
+
+  const grouped = new Map<string, OwnerRecentAIAccountEntry>();
+
+  for (const row of rows) {
+    const userEmail = normalizeEmail(row.user_email);
+    if (!userEmail) continue;
+
+    const current = grouped.get(userEmail) ?? {
+      label: row.user_email?.trim() || userEmail,
+      userEmail,
+      requestCountLastHour: 0,
+      explanationCountLastHour: 0,
+      searchCountLastHour: 0,
+      classificationCountLastHour: 0,
+      lastUsedAt: row.used_at
+    };
+
+    current.requestCountLastHour += 1;
+    const questionId = row.question_id ?? "";
+    if (questionId.startsWith(AI_SEARCH_USAGE_PREFIX)) {
+      current.searchCountLastHour += 1;
+    } else if (questionId.startsWith(AI_CLASSIFICATION_USAGE_PREFIX)) {
+      current.classificationCountLastHour += 1;
+    } else {
+      current.explanationCountLastHour += 1;
+    }
+
+    if (!current.lastUsedAt || row.used_at > current.lastUsedAt) {
+      current.lastUsedAt = row.used_at;
+    }
+
+    grouped.set(userEmail, current);
+  }
+
+  const { data: banRows, error: banError } = await supabase
+    .from("ai_account_bans")
+    .select("user_email, banned_until");
+
+  if (banError) {
+    const message = String(banError.message ?? "");
+    if (!(message.includes("ai_account_bans") && (message.includes("does not exist") || message.includes("Could not find")))) {
+      throw banError;
+    }
+  }
+
+  for (const row of (((banRows ?? []) as AIAccountBanSummaryRow[]) || [])) {
+    const userEmail = normalizeEmail(row.user_email);
+    if (!userEmail) continue;
+    const current = grouped.get(userEmail) ?? {
+      label: row.user_email.trim(),
+      userEmail,
+      requestCountLastHour: 0,
+      explanationCountLastHour: 0,
+      searchCountLastHour: 0,
+      classificationCountLastHour: 0
+    };
+    current.bannedUntil = row.banned_until;
+    grouped.set(userEmail, current);
+  }
+
+  return Array.from(grouped.values()).sort((a, b) => {
+    const aActiveBan = a.bannedUntil && new Date(a.bannedUntil).getTime() > Date.now() ? 1 : 0;
+    const bActiveBan = b.bannedUntil && new Date(b.bannedUntil).getTime() > Date.now() ? 1 : 0;
+    if (bActiveBan !== aActiveBan) return bActiveBan - aActiveBan;
+    if (b.requestCountLastHour !== a.requestCountLastHour) {
+      return b.requestCountLastHour - a.requestCountLastHour;
+    }
+    return (b.lastUsedAt ?? "").localeCompare(a.lastUsedAt ?? "");
+  });
+}
+
 async function fetchOwnerTopAttemptVisitors(
   supabase: any,
   limit = 5
@@ -489,13 +579,14 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ ok: false, message: "你沒有查看私有數據頁的權限。" }, { status: 403 });
     }
 
-    const [dailySeries, hourlySeries, explanationUsage, searchUsage, topVisitors, classificationReports] = await Promise.all([
+    const [dailySeries, hourlySeries, explanationUsage, searchUsage, topVisitors, classificationReports, recentAiAccounts] = await Promise.all([
       fetchOwnerDailySeries(supabase, 14),
       fetchOwnerHourlySeries(supabase),
       fetchOwnerExplanationUsage(supabase, "explanation"),
       fetchOwnerExplanationUsage(supabase, "search"),
       fetchOwnerTopAttemptVisitors(supabase, 5),
-      fetchOwnerClassificationReports(supabase, 40)
+      fetchOwnerClassificationReports(supabase, 40),
+      fetchRecentAIAccounts(supabase)
     ]);
     const stats = await fetchOwnerDashboardStats(supabase, dailySeries, explanationUsage, searchUsage);
 
@@ -507,7 +598,8 @@ export async function POST(request: NextRequest) {
       explanationUsage,
       searchUsage,
       topVisitors,
-      classificationReports
+      classificationReports,
+      recentAiAccounts
     });
   } catch (error) {
     const message = error instanceof Error ? error.message : "私有數據載入失敗";

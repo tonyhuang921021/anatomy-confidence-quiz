@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 import { createOpenAIText, isOpenAIConfigured } from "@/lib/openai";
+import { getActiveAIAccountBan } from "@/lib/aiAccountBan";
 import { bundledCustomPaperSeeds } from "@/data/bundledCustomPapers";
 import {
   getCanonicalQuestionBank
@@ -1034,6 +1035,17 @@ export async function POST(request: NextRequest) {
         return NextResponse.json(
           { ok: false, message: "請先登入帳號，才能使用 AI 智慧檢索。" },
           { status: 401 }
+        );
+      }
+
+      const activeBan = await getActiveAIAccountBan(supabase, actor.userEmail);
+      if (activeBan) {
+        return NextResponse.json(
+          {
+            ok: false,
+            message: `這個帳號的 AI 功能已被暫停到 ${new Date(activeBan.banned_until).toLocaleString("zh-TW")} 。`
+          },
+          { status: 429 }
         );
       }
       const classificationOverrides = await loadClassificationOverrides(supabase);

@@ -9,6 +9,7 @@ import {
   OwnerDashboardStats,
   OwnerExplanationUsageEntry,
   OwnerHourlyPoint,
+  OwnerRecentAIAccountEntry,
   SubjectName,
   OwnerTopAttemptVisitorEntry
 } from "@/types/quiz";
@@ -50,6 +51,7 @@ type OwnerApiPayload = {
   hourlySeries?: OwnerHourlyPoint[];
   explanationUsage?: OwnerExplanationUsageEntry[];
   searchUsage?: OwnerExplanationUsageEntry[];
+  recentAiAccounts?: OwnerRecentAIAccountEntry[];
   topVisitors?: OwnerTopAttemptVisitorEntry[];
   classificationReports?: OwnerClassificationReportEntry[];
 };
@@ -61,6 +63,10 @@ function formatUpdatedAt(value: string) {
     hour: "2-digit",
     minute: "2-digit"
   });
+}
+
+function isBanActive(value?: string) {
+  return Boolean(value && new Date(value).getTime() > Date.now());
 }
 
 const GPT_5_MINI_INPUT_USD_PER_MILLION = 0.25;
@@ -188,9 +194,11 @@ export default function OwnerPage() {
   const [hourlySeries, setHourlySeries] = useState<OwnerHourlyPoint[]>([]);
   const [explanationUsage, setExplanationUsage] = useState<OwnerExplanationUsageEntry[]>([]);
   const [searchUsage, setSearchUsage] = useState<OwnerExplanationUsageEntry[]>([]);
+  const [recentAiAccounts, setRecentAiAccounts] = useState<OwnerRecentAIAccountEntry[]>([]);
   const [topVisitors, setTopVisitors] = useState<OwnerTopAttemptVisitorEntry[]>([]);
   const [classificationReports, setClassificationReports] = useState<OwnerClassificationReportEntry[]>([]);
   const [approvingReportId, setApprovingReportId] = useState<string | null>(null);
+  const [aiBanPendingEmail, setAiBanPendingEmail] = useState<string | null>(null);
   const [manualSubjectMap, setManualSubjectMap] = useState<Record<string, SubjectName>>({});
   const [manualChapterMap, setManualChapterMap] = useState<Record<string, string>>({});
   const [manualSectionMap, setManualSectionMap] = useState<Record<string, string>>({});
@@ -215,6 +223,53 @@ export default function OwnerPage() {
     }
 
     return payload;
+  }
+
+  async function handleAIBan(userEmail: string, action: "ban_one_hour" | "unban") {
+    if (!session?.access_token) return;
+
+    try {
+      setAiBanPendingEmail(userEmail);
+      setError("");
+      const response = await fetch("/api/owner/ai-ban", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          accessToken: session.access_token,
+          userEmail,
+          action
+        })
+      });
+
+      const payload = (await response.json().catch(() => null)) as
+        | {
+            ok?: boolean;
+            message?: string;
+            bannedUntil?: string | null;
+          }
+        | null;
+
+      if (!response.ok || !payload?.ok) {
+        throw new Error(payload?.message || "AI 冷凍操作失敗");
+      }
+
+      setRecentAiAccounts((current) =>
+        current.map((entry) =>
+          entry.userEmail === userEmail
+            ? {
+                ...entry,
+                bannedUntil: payload.bannedUntil ?? undefined
+              }
+            : entry
+        )
+      );
+    } catch (banError) {
+      setError(banError instanceof Error ? banError.message : "AI 冷凍操作失敗");
+    } finally {
+      setAiBanPendingEmail(null);
+    }
   }
 
   async function handleApproveClassificationReport(reportId: string) {
@@ -400,6 +455,7 @@ export default function OwnerPage() {
         setHourlySeries(payload.hourlySeries ?? []);
         setExplanationUsage(payload.explanationUsage ?? []);
         setSearchUsage(payload.searchUsage ?? []);
+        setRecentAiAccounts(payload.recentAiAccounts ?? []);
         setTopVisitors(payload.topVisitors ?? []);
         setClassificationReports(payload.classificationReports ?? []);
       } catch (fetchError) {
@@ -423,6 +479,7 @@ export default function OwnerPage() {
         setHourlySeries(payload.hourlySeries ?? []);
         setExplanationUsage(payload.explanationUsage ?? []);
         setSearchUsage(payload.searchUsage ?? []);
+        setRecentAiAccounts(payload.recentAiAccounts ?? []);
         setTopVisitors(payload.topVisitors ?? []);
         setClassificationReports(payload.classificationReports ?? []);
       } catch {
@@ -681,6 +738,87 @@ export default function OwnerPage() {
                     />
                   </div>
                 </div>
+              </div>
+            </section>
+
+            <section className="rounded-[2rem] bg-white p-6 shadow-card ring-1 ring-slate-100">
+              <div className="flex items-center justify-between gap-3">
+                <div>
+                  <h2 className="text-lg font-semibold text-ink">最近 1 小時 AI 請求帳號</h2>
+                  <p className="mt-2 text-sm text-slate-500">
+                    直接看哪個帳號最近 1 小時用了幾次 AI，並可一鍵冷凍 1 小時。
+                  </p>
+                </div>
+              </div>
+              <div className="mt-4 overflow-x-auto">
+                <table className="min-w-full text-left text-sm">
+                  <thead className="text-slate-500">
+                    <tr className="border-b border-slate-200">
+                      <th className="px-3 py-3 font-semibold">帳號</th>
+                      <th className="px-3 py-3 font-semibold">最近 1 小時總次數</th>
+                      <th className="px-3 py-3 font-semibold">AI 詳解</th>
+                      <th className="px-3 py-3 font-semibold">AI 檢索</th>
+                      <th className="px-3 py-3 font-semibold">AI 分類</th>
+                      <th className="px-3 py-3 font-semibold">最後請求</th>
+                      <th className="px-3 py-3 font-semibold">狀態</th>
+                      <th className="px-3 py-3 font-semibold">操作</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {recentAiAccounts.length === 0 ? (
+                      <tr>
+                        <td colSpan={8} className="px-3 py-6 text-center text-slate-500">
+                          最近 1 小時目前沒有 AI 請求紀錄。
+                        </td>
+                      </tr>
+                    ) : (
+                      recentAiAccounts.map((entry) => {
+                        const activeBan = isBanActive(entry.bannedUntil);
+                        return (
+                          <tr key={entry.userEmail} className="border-b border-slate-100 last:border-b-0">
+                            <td className="px-3 py-3 font-medium text-ink">{entry.label}</td>
+                            <td className="px-3 py-3 text-slate-700">{entry.requestCountLastHour}</td>
+                            <td className="px-3 py-3 text-slate-700">{entry.explanationCountLastHour}</td>
+                            <td className="px-3 py-3 text-slate-700">{entry.searchCountLastHour}</td>
+                            <td className="px-3 py-3 text-slate-700">{entry.classificationCountLastHour}</td>
+                            <td className="px-3 py-3 text-slate-500">
+                              {entry.lastUsedAt ? formatUpdatedAt(entry.lastUsedAt) : "—"}
+                            </td>
+                            <td className="px-3 py-3">
+                              {activeBan ? (
+                                <span className="rounded-full bg-rose-100 px-3 py-1 text-xs font-semibold text-rose-700">
+                                  冷凍到 {entry.bannedUntil ? formatUpdatedAt(entry.bannedUntil) : "—"}
+                                </span>
+                              ) : (
+                                <span className="rounded-full bg-emerald-100 px-3 py-1 text-xs font-semibold text-emerald-700">
+                                  正常
+                                </span>
+                              )}
+                            </td>
+                            <td className="px-3 py-3">
+                              <button
+                                type="button"
+                                onClick={() => handleAIBan(entry.userEmail, activeBan ? "unban" : "ban_one_hour")}
+                                disabled={aiBanPendingEmail === entry.userEmail}
+                                className={`rounded-2xl px-4 py-2 text-xs font-semibold transition ${
+                                  activeBan
+                                    ? "bg-slate-100 text-slate-800 hover:bg-slate-200"
+                                    : "bg-rose-600 text-white hover:bg-rose-700"
+                                } disabled:cursor-not-allowed disabled:opacity-60`}
+                              >
+                                {aiBanPendingEmail === entry.userEmail
+                                  ? "處理中..."
+                                  : activeBan
+                                    ? "解除冷凍"
+                                    : "冷凍 1 小時"}
+                              </button>
+                            </td>
+                          </tr>
+                        );
+                      })
+                    )}
+                  </tbody>
+                </table>
               </div>
             </section>
 

@@ -655,3 +655,21 @@ create policy "Anyone can read classification overrides"
 on public.question_classification_overrides
 for select
 using (true);
+
+create table if not exists public.ai_account_bans (
+  user_email text primary key,
+  banned_until timestamptz not null,
+  reason text,
+  created_by_email text,
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now()
+);
+
+create index if not exists ai_account_bans_banned_until_idx
+on public.ai_account_bans (banned_until desc);
+
+grant select, insert, update, delete
+  on public.ai_account_bans
+  to service_role;
+
+alter table public.ai_account_bans enable row level security;

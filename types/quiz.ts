@@ -285,6 +285,17 @@ export type OwnerExplanationUsageEntry = {
   lastUsedAt?: string;
 };
 
+export type OwnerRecentAIAccountEntry = {
+  label: string;
+  userEmail: string;
+  requestCountLastHour: number;
+  explanationCountLastHour: number;
+  searchCountLastHour: number;
+  classificationCountLastHour: number;
+  lastUsedAt?: string;
+  bannedUntil?: string;
+};
+
 export type OwnerTopAttemptVisitorEntry = {
   label: string;
   visitorId?: string;

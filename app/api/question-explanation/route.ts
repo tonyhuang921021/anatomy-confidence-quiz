@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 import { createOpenAIText, isOpenAIConfigured } from "@/lib/openai";
+import { getActiveAIAccountBan } from "@/lib/aiAccountBan";
 
 type QuestionExplanationRequestBody = {
   visitorId?: string;
@@ -181,6 +182,12 @@ async function getVerifiedUserEmail(accessToken?: string) {
   if (error || !data.user?.email) return null;
 
   return data.user.email;
+}
+
+async function checkAIAccountBan(email?: string | null) {
+  const supabase = getSupabaseServerClient();
+  if (!supabase || !email) return null;
+  return getActiveAIAccountBan(supabase, email);
 }
 
 async function checkUsageLimits(rateKey: string) {
@@ -523,6 +530,18 @@ export async function POST(request: NextRequest) {
           message: "請先登入帳號，才能使用 GPT-5-mini 補詳解。"
         },
         { status: 401 }
+      );
+    }
+
+    const activeBan = await checkAIAccountBan(userEmail);
+    if (activeBan && !isBypassEmail(userEmail)) {
+      return NextResponse.json(
+        {
+          ok: false,
+          configured: true,
+          message: `這個帳號的 AI 功能已被暫停到 ${new Date(activeBan.banned_until).toLocaleString("zh-TW")} 。`
+        },
+        { status: 429 }
       );
     }
 
