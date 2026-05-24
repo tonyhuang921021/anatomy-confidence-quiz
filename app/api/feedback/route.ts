@@ -77,51 +77,6 @@ async function getVerifiedUser(supabase: any, accessToken?: string | null): Prom
   };
 }
 
-async function sendFeedbackNotificationEmail(input: {
-  content: string;
-  isReply: boolean;
-  displayName: string;
-  isAnonymous: boolean;
-  createdAt: string;
-}) {
-  const apiKey = process.env.RESEND_API_KEY;
-  const toEmail = process.env.FEEDBACK_NOTIFY_TO_EMAIL || "tonyhuang921021@gmail.com";
-  const fromEmail = process.env.FEEDBACK_NOTIFY_FROM_EMAIL;
-
-  if (!apiKey || !toEmail || !fromEmail) {
-    return;
-  }
-
-  const subject = input.isReply ? "留言板有新回覆" : "留言板有新留言";
-  const bodyText = [
-    `${input.isReply ? "收到新回覆" : "收到新留言"}`,
-    `顯示名稱：${input.isAnonymous ? "匿名使用者" : input.displayName}`,
-    `時間：${new Date(input.createdAt).toLocaleString("zh-TW")}`,
-    "",
-    input.content
-  ].join("\n");
-
-  const response = await fetch("https://api.resend.com/emails", {
-    method: "POST",
-    headers: {
-      Authorization: `Bearer ${apiKey}`,
-      "Content-Type": "application/json"
-    },
-    body: JSON.stringify({
-      from: fromEmail,
-      to: [toEmail],
-      subject,
-      text: bodyText
-    }),
-    cache: "no-store"
-  });
-
-  if (!response.ok) {
-    const text = await response.text().catch(() => "");
-    throw new Error(text || "留言通知寄送失敗");
-  }
-}
-
 export async function POST(request: NextRequest) {
   const supabase = getServiceSupabaseClient();
   if (!supabase) {
@@ -200,23 +155,9 @@ export async function POST(request: NextRequest) {
 
     if (error) throw error;
 
-    const typedRow = data as FeedbackMessageRow;
-
-    try {
-      await sendFeedbackNotificationEmail({
-        content,
-        isReply: Boolean(body?.parentId?.trim()),
-        displayName: displayName ?? "匿名使用者",
-        isAnonymous,
-        createdAt: typedRow.created_at
-      });
-    } catch (mailError) {
-      console.error("Feedback notification email skipped:", mailError);
-    }
-
     return NextResponse.json({
       ok: true,
-      message: mapFeedbackMessageRow(typedRow)
+      message: mapFeedbackMessageRow(data as FeedbackMessageRow)
     });
   } catch (error) {
     const message = error instanceof Error ? error.message : "留言送出失敗";
