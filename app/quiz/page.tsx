@@ -752,6 +752,8 @@ export default function QuizPage() {
           : null;
   const difficultyBadge = submittedAttempt ? getDifficultyBadge(currentQuestion) : null;
   const feedbackMode = session.settings?.feedbackMode ?? "full";
+  const isBlindSimulation =
+    session.settings?.mode === "simulation" && feedbackMode === "none";
   const shouldShowExplanation = feedbackMode === "full";
   const shouldShowCorrectAnswer = feedbackMode === "full" || feedbackMode === "answer_only";
   const currentExplanationOverride = explanationOverrides[currentQuestion.id];
@@ -827,9 +829,11 @@ export default function QuizPage() {
                   <p className="rounded-2xl bg-slate-50 px-4 py-3 text-sm text-slate-700">
                     已答題數 <span className="font-semibold">{answeredCount}</span>
                   </p>
-                  <p className="rounded-2xl bg-slate-50 px-4 py-3 text-sm text-slate-700">
-                    目前答對數 <span className="font-semibold">{correctCount}</span>
-                  </p>
+                  {!isBlindSimulation ? (
+                    <p className="rounded-2xl bg-slate-50 px-4 py-3 text-sm text-slate-700">
+                      目前答對數 <span className="font-semibold">{correctCount}</span>
+                    </p>
+                  ) : null}
                   <p className="rounded-2xl bg-slate-50 px-4 py-3 text-sm text-slate-700">
                     本輪平均信心 <span className="font-semibold">{averageConfidence}</span>
                   </p>
@@ -1025,12 +1029,14 @@ export default function QuizPage() {
             <p className="rounded-2xl bg-slate-50 px-4 py-3 text-sm text-slate-700">
               本輪模式 <span className="font-semibold">{getModeLabel(session.settings?.mode ?? "weakness")}</span>
             </p>
-            <p className="rounded-2xl bg-slate-50 px-4 py-3 text-sm text-slate-700">
-              暫時答對率{" "}
-              <span className="font-semibold">
-                {answeredCount === 0 ? 0 : Math.round((correctCount / answeredCount) * 100)}%
-              </span>
-            </p>
+            {!isBlindSimulation ? (
+              <p className="rounded-2xl bg-slate-50 px-4 py-3 text-sm text-slate-700">
+                暫時答對率{" "}
+                <span className="font-semibold">
+                  {answeredCount === 0 ? 0 : Math.round((correctCount / answeredCount) * 100)}%
+                </span>
+              </p>
+            ) : null}
           </div>
         </aside>
       </div>
