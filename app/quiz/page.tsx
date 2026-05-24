@@ -368,7 +368,7 @@ export default function QuizPage() {
       setSession(nextSession);
       saveCurrentSession(nextSession);
 
-      if (existing?.isReviewingAnswer) {
+      if (shouldReuseExisting && existing?.isReviewingAnswer) {
         const currentQuestionId = existing.questionOrder?.[existing.currentQuestionIndex ?? 0];
         const currentAttempt =
           existing.attempts.find((attempt) => attempt.questionId === currentQuestionId) ?? null;
@@ -377,6 +377,8 @@ export default function QuizPage() {
         setConfidence(currentAttempt?.confidence ?? 4);
         setConfidenceExpanded((currentAttempt?.confidence ?? 4) <= 3);
         setErrorType(currentAttempt?.errorType);
+      } else {
+        resetQuestionUI();
       }
 
       setMounted(true);
