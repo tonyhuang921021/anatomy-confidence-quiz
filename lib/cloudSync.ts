@@ -1081,64 +1081,38 @@ export async function createFeedbackMessage(input: {
     throw new Error("留言內容不能是空白。");
   }
 
-  const visitorId = getVisitorId();
-  const displayName =
-    input.isAnonymous || !input.user ? null : getFeedbackDisplayName(input.user);
+  const accessToken = input.user
+    ? (await getSupabaseBrowserClient().auth.getSession()).data.session?.access_token ?? null
+    : null;
 
-  const supabase = getSupabaseBrowserClient();
-  const now = Date.now();
-  const hourAgo = new Date(now - 60 * 60 * 1000).toISOString();
-  const dayAgo = new Date(now - 24 * 60 * 60 * 1000).toISOString();
-  const isLoggedIn = Boolean(input.user?.id);
-  const actorColumn = isLoggedIn ? "user_id" : "visitor_id";
-  const actorValue = isLoggedIn ? input.user?.id ?? null : visitorId ?? null;
-
-  if (!actorValue) {
-    throw new Error("目前無法識別留言來源，請稍後再試。");
-  }
-
-  const [hourResult, dayResult] = await Promise.all([
-    supabase
-      .from("feedback_messages")
-      .select("*", { count: "exact", head: true })
-      .eq(actorColumn, actorValue)
-      .gte("created_at", hourAgo),
-    supabase
-      .from("feedback_messages")
-      .select("*", { count: "exact", head: true })
-      .eq(actorColumn, actorValue)
-      .gte("created_at", dayAgo)
-  ]);
-
-  if (hourResult.error) throw hourResult.error;
-  if (dayResult.error) throw dayResult.error;
-
-  if ((hourResult.count ?? 0) >= FEEDBACK_HOURLY_LIMIT) {
-    throw new Error(`留言太快了，1 小時內最多 ${FEEDBACK_HOURLY_LIMIT} 則，請稍後再試。`);
-  }
-
-  if ((dayResult.count ?? 0) >= FEEDBACK_DAILY_LIMIT) {
-    throw new Error(`今天留言已達上限，24 小時內最多 ${FEEDBACK_DAILY_LIMIT} 則。`);
-  }
-
-  const { data, error } = await supabase
-    .from("feedback_messages")
-    .insert({
+  const response = await fetch("/api/feedback", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+      accessToken,
+      visitorId: getVisitorId(),
       content,
-      parent_id: input.parentId?.trim() || null,
-      display_name: displayName,
-      is_anonymous: input.isAnonymous,
-      user_id: input.user?.id ?? null,
-      visitor_id: visitorId ?? null
+      isAnonymous: input.isAnonymous,
+      parentId: input.parentId ?? null
     })
-    .select("id, content, parent_id, display_name, is_anonymous, created_at")
-    .single();
+  });
 
-  if (error) {
-    throw error;
+  const payload = (await response.json().catch(() => null)) as
+    | {
+        ok?: boolean;
+        message?: string | FeedbackMessage;
+      }
+    | null;
+
+  if (!response.ok || !payload?.ok || !payload.message || typeof payload.message === "string") {
+    throw new Error(
+      typeof payload?.message === "string" ? payload.message : "留言送出失敗"
+    );
   }
 
-  return mapFeedbackMessageRow(data as FeedbackMessageRow);
+  return payload.message;
 }
 
 export async function loadOwnerDashboardStats(): Promise<OwnerDashboardStats> {
