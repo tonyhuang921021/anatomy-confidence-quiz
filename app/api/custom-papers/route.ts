@@ -277,6 +277,14 @@ function stripJsonCodeFence(value: string) {
   return value.replace(/^```(?:json)?\s*/i, "").replace(/\s*```$/i, "").trim();
 }
 
+function normalizeJsonLikeInput(raw: string) {
+  return raw
+    .replace(/^\uFEFF/, "")
+    .replace(/[“”]/g, '"')
+    .replace(/[‘’]/g, "'")
+    .trim();
+}
+
 function normalizeSearchText(text: string) {
   return text.toLowerCase().trim();
 }
@@ -677,9 +685,11 @@ function normalizeImportedSubject(subject?: string): SubjectName {
 function normalizeImportedCustomPaperQuestions(rawJson: string, paperCode: string) {
   let parsed: unknown;
   try {
-    parsed = JSON.parse(rawJson);
+    parsed = JSON.parse(normalizeJsonLikeInput(stripJsonCodeFence(rawJson)));
   } catch {
-    throw new Error("這段內容不是合法 JSON，請確認你的 AI 輸出的是純 JSON 陣列。");
+    throw new Error(
+      "這段內容不是合法 JSON，請確認你的 AI 輸出的是純 JSON 陣列；如果用了智慧引號（“ ”）現在也可以直接貼，系統會自動轉換。"
+    );
   }
 
   if (!Array.isArray(parsed) || parsed.length === 0) {
