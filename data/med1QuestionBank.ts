@@ -1349,6 +1349,8 @@ export function getCanonicalQuestionBank(
   return dedupeQuestionBank(applyQuestionClassificationOverrides(canonicalQuestionBank, overrides));
 }
 
+export { getImportedCustomPaperQuestionsByIds } from "@/data/importedCustomPaperQuestions";
+
 function getWholePastPaperBank(
   overrides: Record<string, QuestionClassificationOverride> = {}
 ) {

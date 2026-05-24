@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 import { createOpenAIText, isOpenAIConfigured } from "@/lib/openai";
+import { bundledCustomPaperSeeds } from "@/data/bundledCustomPapers";
 import {
   getCanonicalQuestionBank
 } from "@/data/med1QuestionBank";
@@ -130,6 +131,46 @@ function getServiceSupabaseClient() {
       autoRefreshToken: false
     }
   });
+}
+
+async function ensureBundledCustomPapersSeeded(supabase: any) {
+  if (bundledCustomPaperSeeds.length === 0) return;
+
+  const paperCodes = bundledCustomPaperSeeds.map((seed) => seed.paperCode);
+  const { data, error } = await supabase
+    .from("custom_papers")
+    .select("paper_code")
+    .in("paper_code", paperCodes);
+
+  if (error) {
+    console.error("Failed to inspect bundled custom papers:", error);
+    return;
+  }
+
+  const existingCodes = new Set(
+    ((data ?? []) as { paper_code: string }[]).map((row) => row.paper_code)
+  );
+  const missingRows = bundledCustomPaperSeeds
+    .filter((seed) => !existingCodes.has(seed.paperCode))
+    .map((seed) => ({
+      paper_code: seed.paperCode,
+      name: seed.name,
+      question_ids: seed.questionIds,
+      subject_filters: seed.subjectFilters,
+      difficulty: seed.difficulty,
+      is_public: seed.isPublic,
+      created_by_user_id: null,
+      created_by_email: seed.createdByEmail,
+      created_by_label: seed.createdByLabel,
+      visitor_id: null
+    }));
+
+  if (missingRows.length === 0) return;
+
+  const { error: insertError } = await supabase.from("custom_papers").insert(missingRows);
+  if (insertError) {
+    console.error("Failed to seed bundled custom papers:", insertError);
+  }
 }
 
 async function insertAIUsageLog(supabase: any, row: AIUsageLogRow) {
@@ -624,6 +665,7 @@ export async function GET(request: NextRequest) {
   }
 
   try {
+    await ensureBundledCustomPapersSeeded(supabase);
     const paperCode = request.nextUrl.searchParams.get("paperCode")?.trim().toUpperCase();
 
     if (paperCode) {
@@ -676,6 +718,7 @@ export async function POST(request: NextRequest) {
   }
 
   try {
+    await ensureBundledCustomPapersSeeded(supabase);
     const body = (await request.json().catch(() => null)) as
       | GenerateBody
       | GenerateAISearchBody

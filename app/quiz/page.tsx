@@ -11,6 +11,7 @@ import {
   applyQuestionClassificationOverride,
   buildExamLikeRandomSet,
   getPastPaperOptions,
+  getImportedCustomPaperQuestionsByIds,
   getQuestionBankBySubjects,
   getQuestionBankBySubjectFilter,
   getQuestionsForPastPaper,
@@ -165,17 +166,28 @@ function selectLocalQuestionSet(
   );
 
   if ((settings.customQuestionIds?.length ?? 0) > 0) {
+    const importedCustomQuestions = getImportedCustomPaperQuestionsByIds(
+      settings.customQuestionIds ?? []
+    );
     const customQuestions = settings.customQuestionIds
       ?.map((id) => runtimeQuestionMap.get(id))
       .filter((question): question is Question => Boolean(question));
+    const mergedCustomQuestions = Array.from(
+      new Map(
+        [...(customQuestions ?? []), ...importedCustomQuestions].map((question) => [
+          question.id,
+          question
+        ])
+      ).values()
+    );
 
-    if ((customQuestions?.length ?? 0) > 0) {
+    if (mergedCustomQuestions.length > 0) {
       if (selectedSubjects.length === 0) {
-        return customQuestions ?? [];
+        return mergedCustomQuestions;
       }
 
       const merged = new Map<string, Question>();
-      [...sourceBank, ...(customQuestions ?? [])].forEach((question) => {
+      [...sourceBank, ...mergedCustomQuestions].forEach((question) => {
         merged.set(question.id, question);
       });
       return Array.from(merged.values());
