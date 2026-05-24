@@ -278,6 +278,7 @@ create table if not exists public.custom_papers (
   paper_code text primary key,
   name text,
   question_ids jsonb not null default '[]'::jsonb,
+  question_payload jsonb,
   subject_filters jsonb not null default '[]'::jsonb,
   difficulty text not null,
   is_public boolean not null default false,
@@ -307,6 +308,9 @@ grant select, insert, update, delete
   to service_role;
 
 alter table public.custom_papers enable row level security;
+
+alter table public.custom_papers
+  add column if not exists question_payload jsonb;
 
 drop policy if exists "Anyone can read custom papers" on public.custom_papers;
 

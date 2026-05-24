@@ -166,6 +166,7 @@ function selectLocalQuestionSet(
   );
 
   if ((settings.customQuestionIds?.length ?? 0) > 0) {
+    const inlineCustomQuestions = (settings.customQuestionPayload ?? []).filter(Boolean);
     const importedCustomQuestions = getImportedCustomPaperQuestionsByIds(
       settings.customQuestionIds ?? []
     );
@@ -174,7 +175,7 @@ function selectLocalQuestionSet(
       .filter((question): question is Question => Boolean(question));
     const mergedCustomQuestions = Array.from(
       new Map(
-        [...(customQuestions ?? []), ...importedCustomQuestions].map((question) => [
+        [...(customQuestions ?? []), ...importedCustomQuestions, ...inlineCustomQuestions].map((question) => [
           question.id,
           question
         ])

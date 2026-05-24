@@ -96,6 +96,7 @@ export type QuizSettings = {
   subjectFilters?: SubjectName[];
   excludeAiGenerated?: boolean;
   customQuestionIds?: string[];
+  customQuestionPayload?: Question[];
   customPoolLabel?: string;
   chapter?: string;
   section?: string;
@@ -355,5 +356,6 @@ export type CustomPaperSummary = {
 
 export type CustomPaperDetail = CustomPaperSummary & {
   questionIds: string[];
+  questions?: Question[];
   participants: CustomPaperParticipant[];
 };

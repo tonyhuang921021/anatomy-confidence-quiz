@@ -26,6 +26,7 @@ type CustomPaperRow = {
   paper_code: string;
   name?: string | null;
   question_ids: string[];
+  question_payload?: Question[] | null;
   subject_filters?: string[] | null;
   difficulty: CustomPaperDifficulty;
   is_public: boolean;
@@ -97,6 +98,15 @@ type UpdateMetadataBody = {
   isPublic?: boolean;
 };
 
+type ImportJsonBody = {
+  action: "import_json";
+  accessToken?: string | null;
+  visitorId?: string | null;
+  rawJson?: string;
+  name?: string;
+  isPublic?: boolean;
+};
+
 type AISearchPlan = {
   title?: string;
   searchTerms?: string[];
@@ -116,6 +126,10 @@ type AIUsageLogRow = {
 };
 
 const AI_SEARCH_USAGE_PREFIX = "AI_SEARCH:";
+const CUSTOM_PAPER_SELECT_WITH_PAYLOAD =
+  "paper_code, name, question_ids, question_payload, subject_filters, difficulty, is_public, created_by_user_id, created_by_email, created_by_label, visitor_id, created_at";
+const CUSTOM_PAPER_SELECT_BASE =
+  "paper_code, name, question_ids, subject_filters, difficulty, is_public, created_by_user_id, created_by_email, created_by_label, visitor_id, created_at";
 
 function getServiceSupabaseClient() {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
@@ -137,25 +151,32 @@ async function ensureBundledCustomPapersSeeded(supabase: any) {
   if (bundledCustomPaperSeeds.length === 0) return;
 
   const paperCodes = bundledCustomPaperSeeds.map((seed) => seed.paperCode);
-  const { data, error } = await supabase
+  let { data, error } = await supabase
     .from("custom_papers")
-    .select("paper_code")
+    .select("paper_code, question_payload")
     .in("paper_code", paperCodes);
+
+  if (error && String(error.message ?? "").includes("question_payload")) {
+    ({ data, error } = await supabase
+      .from("custom_papers")
+      .select("paper_code")
+      .in("paper_code", paperCodes));
+  }
 
   if (error) {
     console.error("Failed to inspect bundled custom papers:", error);
     return;
   }
 
-  const existingCodes = new Set(
-    ((data ?? []) as { paper_code: string }[]).map((row) => row.paper_code)
-  );
+  const existingRows = (data ?? []) as { paper_code: string; question_payload?: Question[] | null }[];
+  const existingCodes = new Set(existingRows.map((row) => row.paper_code));
   const missingRows = bundledCustomPaperSeeds
     .filter((seed) => !existingCodes.has(seed.paperCode))
     .map((seed) => ({
       paper_code: seed.paperCode,
       name: seed.name,
       question_ids: seed.questionIds,
+      question_payload: seed.questions ?? null,
       subject_filters: seed.subjectFilters,
       difficulty: seed.difficulty,
       is_public: seed.isPublic,
@@ -167,10 +188,30 @@ async function ensureBundledCustomPapersSeeded(supabase: any) {
 
   if (missingRows.length === 0) return;
 
-  const { error: insertError } = await supabase.from("custom_papers").insert(missingRows);
+  let { error: insertError } = await supabase.from("custom_papers").insert(missingRows);
+  if (insertError && String(insertError.message ?? "").includes("question_payload")) {
+    ({ error: insertError } = await supabase.from("custom_papers").insert(
+      missingRows.map(({ question_payload, ...row }) => row)
+    ));
+  }
   if (insertError) {
     console.error("Failed to seed bundled custom papers:", insertError);
   }
+
+  await Promise.all(
+    existingRows.map(async (row) => {
+      if (Array.isArray(row.question_payload) && row.question_payload.length > 0) return;
+      const seed = bundledCustomPaperSeeds.find((item) => item.paperCode === row.paper_code);
+      if (!seed?.questions?.length) return;
+      const { error: updateError } = await supabase
+        .from("custom_papers")
+        .update({ question_payload: seed.questions })
+        .eq("paper_code", row.paper_code);
+      if (updateError) {
+        console.error("Failed to backfill bundled custom paper payload:", updateError);
+      }
+    })
+  );
 }
 
 async function insertAIUsageLog(supabase: any, row: AIUsageLogRow) {
@@ -571,8 +612,138 @@ function toPaperDetail(
   return {
     ...summary,
     questionIds: Array.isArray(row.question_ids) ? row.question_ids : [],
+    questions: Array.isArray(row.question_payload) ? row.question_payload : undefined,
     participants
   };
+}
+
+type ImportedCustomPaperQuestionRaw = {
+  subject?: string;
+  chapter?: string;
+  section?: string;
+  question?: string;
+  stem?: string;
+  options?: Record<string, string>;
+  answer?: string;
+  accepted_answers?: string[];
+  acceptedAnswers?: string[];
+  answer_credit_type?: string;
+  answerCreditType?: string;
+  tested_concept?: string;
+  testedConcept?: string;
+  explanation?: string;
+  option_analysis?: Record<string, string>;
+  optionAnalysis?: Record<string, string>;
+  memory_tip?: string;
+  memoryTip?: string;
+};
+
+function toValidOptionText(value: unknown) {
+  return typeof value === "string" ? value.trim() : "";
+}
+
+function toValidOptionKey(value: unknown): value is "A" | "B" | "C" | "D" | "E" {
+  return value === "A" || value === "B" || value === "C" || value === "D" || value === "E";
+}
+
+function normalizeImportedAnswerType(raw: ImportedCustomPaperQuestionRaw) {
+  const value = String(raw.answer_credit_type ?? raw.answerCreditType ?? "standard").trim();
+  if (value === "all_credit") return "all_credit" as const;
+  if (value === "multiple_accepted" || value === "multiple_answers") {
+    return "multiple_accepted" as const;
+  }
+  return "standard" as const;
+}
+
+function normalizeImportedSubject(subject?: string): SubjectName {
+  const value = subject?.trim() ?? "";
+  if (ALLOWED_SUBJECTS.has(value as SubjectName)) return value as SubjectName;
+  if (value.includes("解剖")) return "解剖學";
+  if (value.includes("生理")) return "生理學";
+  if (value.includes("生化") || value.includes("生物化學")) return "生物化學";
+  if (value.includes("藥理")) return "藥理學";
+  if (value.includes("病理")) return "病理學";
+  if (value.includes("微生物") || value.includes("免疫")) return "微生物免疫學";
+  if (value.includes("胚胎")) return "胚胎學";
+  if (value.includes("組織")) return "組織學";
+  if (value.includes("寄生蟲")) return "寄生蟲學";
+  if (value.includes("公衛") || value.includes("公共衛生")) return "公共衛生學";
+  if (value.includes("細胞")) return "細胞生物學";
+  if (value.includes("分子")) return "分子生物學";
+  return "其他醫學一";
+}
+
+function normalizeImportedCustomPaperQuestions(rawJson: string, paperCode: string) {
+  let parsed: unknown;
+  try {
+    parsed = JSON.parse(rawJson);
+  } catch {
+    throw new Error("這段內容不是合法 JSON，請確認你的 AI 輸出的是純 JSON 陣列。");
+  }
+
+  if (!Array.isArray(parsed) || parsed.length === 0) {
+    throw new Error("請貼一個至少包含 1 題的 JSON 陣列。");
+  }
+
+  return parsed.map((item, index) => {
+    const raw = (item ?? {}) as ImportedCustomPaperQuestionRaw;
+    const stem = String(raw.question ?? raw.stem ?? "").trim();
+    if (!stem) {
+      throw new Error(`第 ${index + 1} 題缺少題幹 question。`);
+    }
+
+    const options = raw.options ?? {};
+    const normalizedOptions = {
+      A: toValidOptionText(options.A),
+      B: toValidOptionText(options.B),
+      C: toValidOptionText(options.C),
+      D: toValidOptionText(options.D),
+      E: toValidOptionText(options.E) || undefined
+    };
+    if (!normalizedOptions.A || !normalizedOptions.B || !normalizedOptions.C || !normalizedOptions.D) {
+      throw new Error(`第 ${index + 1} 題至少要有 A、B、C、D 四個選項。`);
+    }
+
+    const answer = String(raw.answer ?? "").trim().toUpperCase();
+    if (!toValidOptionKey(answer)) {
+      throw new Error(`第 ${index + 1} 題的 answer 必須是 A/B/C/D/E 其中之一。`);
+    }
+
+    const answerCreditType = normalizeImportedAnswerType(raw);
+    const acceptedAnswersSource = raw.accepted_answers ?? raw.acceptedAnswers ?? [answer];
+    const acceptedAnswers = acceptedAnswersSource
+      .map((value) => String(value).trim().toUpperCase())
+      .filter((value): value is "A" | "B" | "C" | "D" | "E" => toValidOptionKey(value));
+
+    const optionAnalysisSource = raw.option_analysis ?? raw.optionAnalysis ?? {};
+    const optionAnalysis = Object.fromEntries(
+      Object.entries(optionAnalysisSource)
+        .filter(([key, value]) => toValidOptionKey(key) && typeof value === "string" && value.trim())
+        .map(([key, value]) => [key, value.trim()])
+    ) as Partial<Record<"A" | "B" | "C" | "D" | "E", string>>;
+
+    return {
+      id: `${paperCode}-Q${String(index + 1).padStart(3, "0")}`,
+      subject: normalizeImportedSubject(raw.subject),
+      chapter: raw.chapter?.trim() || "未分類章節",
+      section: raw.section?.trim() || "未分類小節",
+      stem,
+      options: normalizedOptions,
+      answer,
+      acceptedAnswers:
+        answerCreditType === "multiple_accepted" && acceptedAnswers.length > 0
+          ? acceptedAnswers
+          : undefined,
+      answerCreditType,
+      explanation: raw.explanation?.trim() || "尚未提供詳解。",
+      testedConcept: raw.tested_concept?.trim() || raw.testedConcept?.trim() || "匯入題目",
+      optionAnalysis: Object.keys(optionAnalysis).length > 0 ? optionAnalysis : undefined,
+      memoryTip: raw.memory_tip?.trim() || raw.memoryTip?.trim() || undefined,
+      difficulty: "medium" as const,
+      source: "local" as const,
+      sourceCitation: `匯入自訂卷：${paperCode}`
+    } satisfies Question;
+  });
 }
 
 async function loadClassificationOverrides(supabase: any) {
@@ -608,6 +779,46 @@ async function loadPaperAttempts(supabase: any, paperCode: string) {
 
   if (error) throw error;
   return (data ?? []) as CustomPaperAttemptRow[];
+}
+
+async function loadCustomPaperByCode(supabase: any, paperCode: string) {
+  let { data, error } = await supabase
+    .from("custom_papers")
+    .select(CUSTOM_PAPER_SELECT_WITH_PAYLOAD)
+    .eq("paper_code", paperCode)
+    .maybeSingle();
+
+  if (error && String(error.message ?? "").includes("question_payload")) {
+    ({ data, error } = await supabase
+      .from("custom_papers")
+      .select(CUSTOM_PAPER_SELECT_BASE)
+      .eq("paper_code", paperCode)
+      .maybeSingle());
+  }
+
+  if (error) throw error;
+  return (data ?? null) as CustomPaperRow | null;
+}
+
+async function loadPublicCustomPaperRows(supabase: any) {
+  let { data, error } = await supabase
+    .from("custom_papers")
+    .select(CUSTOM_PAPER_SELECT_WITH_PAYLOAD)
+    .eq("is_public", true)
+    .order("created_at", { ascending: false })
+    .limit(PUBLIC_PAPER_LIMIT);
+
+  if (error && String(error.message ?? "").includes("question_payload")) {
+    ({ data, error } = await supabase
+      .from("custom_papers")
+      .select(CUSTOM_PAPER_SELECT_BASE)
+      .eq("is_public", true)
+      .order("created_at", { ascending: false })
+      .limit(PUBLIC_PAPER_LIMIT));
+  }
+
+  if (error) throw error;
+  return (data ?? []) as CustomPaperRow[];
 }
 
 async function resolveActor(
@@ -669,13 +880,7 @@ export async function GET(request: NextRequest) {
     const paperCode = request.nextUrl.searchParams.get("paperCode")?.trim().toUpperCase();
 
     if (paperCode) {
-      const { data, error } = await supabase
-        .from("custom_papers")
-        .select("paper_code, name, question_ids, subject_filters, difficulty, is_public, created_by_user_id, created_by_email, created_by_label, visitor_id, created_at")
-        .eq("paper_code", paperCode)
-        .maybeSingle();
-
-      if (error) throw error;
+      const data = await loadCustomPaperByCode(supabase, paperCode);
       if (!data) {
         return NextResponse.json({ ok: false, message: "找不到這份自訂卷。" }, { status: 404 });
       }
@@ -687,16 +892,7 @@ export async function GET(request: NextRequest) {
       });
     }
 
-    const { data, error } = await supabase
-      .from("custom_papers")
-      .select("paper_code, name, question_ids, subject_filters, difficulty, is_public, created_by_user_id, created_by_email, created_by_label, visitor_id, created_at")
-      .eq("is_public", true)
-      .order("created_at", { ascending: false })
-      .limit(PUBLIC_PAPER_LIMIT);
-
-    if (error) throw error;
-
-    const rows = (data ?? []) as CustomPaperRow[];
+    const rows = await loadPublicCustomPaperRows(supabase);
     const papers = await Promise.all(
       rows.map(async (row) => toPaperSummary(row, await loadPaperAttempts(supabase, row.paper_code)))
     );
@@ -722,6 +918,7 @@ export async function POST(request: NextRequest) {
     const body = (await request.json().catch(() => null)) as
       | GenerateBody
       | GenerateAISearchBody
+      | ImportJsonBody
       | SubmitAttemptBody
       | UpdateMetadataBody
       | null;
@@ -940,6 +1137,65 @@ export async function POST(request: NextRequest) {
           averageAccuracyRate: 0,
           participantCount: 0,
           questionIds: finalQuestions.map((question) => question.id),
+          questions: finalQuestions,
+          participants: []
+        } satisfies CustomPaperDetail
+      });
+    }
+
+    if (body.action === "import_json") {
+      const importBody = body as ImportJsonBody;
+      const rawJson = importBody.rawJson?.trim() ?? "";
+      if (!rawJson) {
+        return NextResponse.json({ ok: false, message: "請先貼上要匯入的 JSON。" }, { status: 400 });
+      }
+
+      const actor = await resolveActor(supabase, importBody.accessToken, importBody.visitorId);
+      const paperCode = await generateUniquePaperCode(supabase);
+      const importedQuestions = normalizeImportedCustomPaperQuestions(rawJson, paperCode);
+      const subjectLabels = Array.from(new Set(importedQuestions.map((question) => question.subject)));
+
+      const insertRow = {
+        paper_code: paperCode,
+        name: importBody.name?.trim().slice(0, 60) || `匯入卷：${paperCode}`,
+        question_ids: importedQuestions.map((question) => question.id),
+        question_payload: importedQuestions,
+        subject_filters: subjectLabels,
+        difficulty: "medium" as CustomPaperDifficulty,
+        is_public: Boolean(importBody.isPublic),
+        created_by_user_id: actor.userId,
+        created_by_email: actor.userEmail,
+        created_by_label: actor.label,
+        visitor_id: importBody.visitorId ?? null
+      };
+
+      const { error: insertError } = await supabase.from("custom_papers").insert(insertRow);
+      if (insertError) {
+        const insertMessage = String(insertError.message ?? "");
+        if (insertMessage.includes("question_payload")) {
+          return NextResponse.json(
+            { ok: false, message: "Supabase 還沒建立 custom_papers.question_payload 欄位，請先跑我提供的 SQL。" },
+            { status: 400 }
+          );
+        }
+        throw insertError;
+      }
+
+      return NextResponse.json({
+        ok: true,
+        paper: {
+          paperCode,
+          name: insertRow.name,
+          subjectLabels,
+          difficulty: "medium" as CustomPaperDifficulty,
+          isPublic: insertRow.is_public,
+          questionCount: importedQuestions.length,
+          createdAt: new Date().toISOString(),
+          createdByLabel: actor.label,
+          averageAccuracyRate: 0,
+          participantCount: 0,
+          questionIds: importedQuestions.map((question) => question.id),
+          questions: importedQuestions,
           participants: []
         } satisfies CustomPaperDetail
       });
@@ -951,13 +1207,7 @@ export async function POST(request: NextRequest) {
         return NextResponse.json({ ok: false, message: "缺少考卷碼。" }, { status: 400 });
       }
 
-      const { data, error } = await supabase
-        .from("custom_papers")
-        .select("paper_code, name, question_ids, subject_filters, difficulty, is_public, created_by_user_id, created_by_email, created_by_label, visitor_id, created_at")
-        .eq("paper_code", paperCode)
-        .maybeSingle();
-
-      if (error) throw error;
+      const data = await loadCustomPaperByCode(supabase, paperCode);
       if (!data) {
         return NextResponse.json({ ok: false, message: "找不到這份自訂卷。" }, { status: 404 });
       }

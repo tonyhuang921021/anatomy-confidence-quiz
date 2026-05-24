@@ -8,6 +8,7 @@ import { enabledSubjects, MED1_SUBJECTS, MED2_SUBJECTS } from "@/data/subjectReg
 import {
   generateAISearchCustomPaper,
   generateCustomPaper,
+  importJsonCustomPaper,
   loadPublicCustomPapers,
   lookupCustomPaper,
   updateCustomPaperMetadata
@@ -21,6 +22,45 @@ import type {
   CustomPaperSummary,
   SubjectName
 } from "@/types/quiz";
+
+const IMPORT_JSON_TEMPLATE = `你是醫學題庫整理助手。請嚴格只輸出 JSON 陣列，不要加 Markdown、不要加任何前後說明。
+
+[
+  {
+    "subject": "解剖學",
+    "chapter": "例如：臂神經叢",
+    "section": "例如：上肢／周邊神經",
+    "question": "題幹全文",
+    "options": {
+      "A": "選項 A",
+      "B": "選項 B",
+      "C": "選項 C",
+      "D": "選項 D",
+      "E": ""
+    },
+    "answer": "A",
+    "accepted_answers": ["A"],
+    "answer_credit_type": "standard",
+    "tested_concept": "這題在考什麼核心概念",
+    "explanation": "完整詳解",
+    "option_analysis": {
+      "A": "A 選項解析",
+      "B": "B 選項解析",
+      "C": "C 選項解析",
+      "D": "D 選項解析",
+      "E": ""
+    },
+    "memory_tip": "一句快速記憶法"
+  }
+]
+
+規則：
+1. answer 只能是 A/B/C/D/E 其中之一。
+2. 單選題 accepted_answers 請和 answer 一樣，例如 ["A"]。
+3. 如果有複數給分，accepted_answers 可寫多個答案，例如 ["B","D"]，並把 answer_credit_type 寫成 "multiple_accepted"。
+4. 如果本題一律給分，answer_credit_type 請寫成 "all_credit"。
+5. 沒有 E 選項時，E 可以留空字串。
+6. 所有欄位都請保留，不要省略 key。`;
 
 const selectableSubjects = enabledSubjects.filter(
   (item) =>
@@ -77,7 +117,7 @@ export default function CustomPapersPage() {
   const { session } = useAuth();
   const med1Subjects = selectableSubjects.filter((item) => MED1_SUBJECTS.includes(item.subject));
   const med2Subjects = selectableSubjects.filter((item) => MED2_SUBJECTS.includes(item.subject));
-  const [tab, setTab] = useState<"generate" | "ai_search" | "public" | "lookup">("generate");
+  const [tab, setTab] = useState<"generate" | "ai_search" | "public" | "import" | "lookup">("generate");
   const [selectedSubjects, setSelectedSubjects] = useState<SubjectName[]>([]);
   const [difficulty, setDifficulty] = useState<CustomPaperDifficulty>("hard");
   const [paperName, setPaperName] = useState("");
@@ -89,6 +129,10 @@ export default function CustomPapersPage() {
   const [generateError, setGenerateError] = useState("");
   const [generatedPaper, setGeneratedPaper] = useState<CustomPaperDetail | null>(null);
   const [paperCodeInput, setPaperCodeInput] = useState("");
+  const [importJsonText, setImportJsonText] = useState("");
+  const [importingJson, setImportingJson] = useState(false);
+  const [importJsonError, setImportJsonError] = useState("");
+  const [importTemplateMessage, setImportTemplateMessage] = useState("");
   const [lookupLoading, setLookupLoading] = useState(false);
   const [lookupError, setLookupError] = useState("");
   const [selectedPaper, setSelectedPaper] = useState<CustomPaperDetail | null>(null);
@@ -155,6 +199,7 @@ export default function CustomPapersPage() {
       subjectFilter,
       subjectFilters,
       customQuestionIds: paper.questionIds,
+      customQuestionPayload: paper.questions,
       customPoolLabel: `自訂卷：${paper.name || paper.paperCode}`,
       customPaperCode: paper.paperCode,
       customPaperName: paper.name,
@@ -226,6 +271,32 @@ export default function CustomPapersPage() {
     }
   }
 
+  async function handleImportJsonPaper() {
+    if (!importJsonText.trim()) return;
+
+    try {
+      setImportingJson(true);
+      setImportJsonError("");
+      const paper = await importJsonCustomPaper({
+        accessToken: session?.access_token ?? null,
+        visitorId: getOrCreateVisitorId() ?? "",
+        rawJson: importJsonText,
+        name: paperName,
+        isPublic
+      });
+      setGeneratedPaper(paper);
+      setSelectedPaper(paper);
+      setTab("lookup");
+      if (paper.isPublic) {
+        setPublicPapers((current) => [paper, ...current].slice(0, 30));
+      }
+    } catch (error) {
+      setImportJsonError(error instanceof Error ? error.message : "JSON 自訂卷匯入失敗");
+    } finally {
+      setImportingJson(false);
+    }
+  }
+
   async function handleLookupPaper(code: string) {
     const normalizedCode = code.trim().toUpperCase();
     if (!normalizedCode) return;
@@ -241,6 +312,17 @@ export default function CustomPapersPage() {
       setLookupError(error instanceof Error ? error.message : "找不到這份自訂卷");
     } finally {
       setLookupLoading(false);
+    }
+  }
+
+  async function handleCopyImportTemplate() {
+    try {
+      await navigator.clipboard.writeText(IMPORT_JSON_TEMPLATE);
+      setImportTemplateMessage("模板已複製，可以貼給自己的 AI。");
+      window.setTimeout(() => setImportTemplateMessage(""), 2200);
+    } catch {
+      setImportTemplateMessage("目前無法自動複製，請直接手動複製下面模板。");
+      window.setTimeout(() => setImportTemplateMessage(""), 2600);
     }
   }
 
@@ -374,6 +456,17 @@ export default function CustomPapersPage() {
             }`}
           >
             可以直接做的公開卷
+          </button>
+          <button
+            type="button"
+            onClick={() => setTab("import")}
+            className={`min-h-12 rounded-2xl px-5 py-3 text-sm font-semibold transition ${
+              tab === "import"
+                ? "bg-brand-600 text-white"
+                : "bg-slate-100 text-slate-800 hover:bg-slate-200"
+            }`}
+          >
+            匯入 JSON 題目卷
           </button>
           <button
             type="button"
@@ -587,6 +680,91 @@ export default function CustomPapersPage() {
 
               {generateError ? (
                 <div className="mt-4 rounded-2xl bg-rose-50 p-4 text-sm text-rose-900">{generateError}</div>
+              ) : null}
+            </div>
+          </div>
+        </section>
+      ) : tab === "import" ? (
+        <section className="mt-6 rounded-[2rem] bg-white p-6 shadow-card ring-1 ring-slate-100 sm:p-8">
+          <div className="grid gap-6">
+            <div className="rounded-[2rem] bg-slate-50 p-5 ring-1 ring-slate-100">
+              <div className="flex flex-wrap items-start justify-between gap-3">
+                <div>
+                  <h2 className="text-lg font-semibold text-ink">匯入 JSON 題目卷</h2>
+                  <p className="mt-2 text-sm leading-7 text-slate-600">
+                    先把下面模板貼給你自己的 AI，請它照格式輸出 JSON；再把整段貼回來，就能直接變成一張自訂卷。
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => void handleCopyImportTemplate()}
+                  className="min-h-12 rounded-2xl bg-slate-900 px-5 py-3 text-sm font-semibold text-white transition hover:bg-slate-800"
+                >
+                  複製給 AI 的模板
+                </button>
+              </div>
+
+              {importTemplateMessage ? (
+                <div className="mt-4 rounded-2xl bg-emerald-50 px-4 py-3 text-sm text-emerald-900">
+                  {importTemplateMessage}
+                </div>
+              ) : null}
+
+              <pre className="mt-4 overflow-x-auto rounded-3xl bg-white p-4 text-xs leading-6 text-slate-700 ring-1 ring-slate-200 sm:text-sm">
+                {IMPORT_JSON_TEMPLATE}
+              </pre>
+            </div>
+
+            <div className="rounded-[2rem] bg-slate-50 p-5 ring-1 ring-slate-100">
+              <div className="grid gap-4 lg:grid-cols-[1.2fr_0.8fr]">
+                <div>
+                  <label className="text-sm font-semibold text-ink">這份卷的名稱（可不填）</label>
+                  <input
+                    value={paperName}
+                    onChange={(event) => setPaperName(event.target.value.slice(0, 60))}
+                    placeholder="例如：剛學完 brachial plexus 的整理卷"
+                    className="mt-2 min-h-12 w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-800 outline-none"
+                  />
+                </div>
+                <div className="flex items-end">
+                  <button
+                    type="button"
+                    onClick={() => setIsPublic((current) => !current)}
+                    className={`min-h-12 w-full rounded-2xl px-4 py-3 text-sm font-semibold transition ${
+                      isPublic
+                        ? "bg-emerald-100 text-emerald-900 ring-1 ring-emerald-300"
+                        : "bg-white text-slate-800 ring-1 ring-slate-200 hover:bg-slate-50"
+                    }`}
+                  >
+                    {isPublic ? "公開這份卷：開" : "公開這份卷：關"}
+                  </button>
+                </div>
+              </div>
+
+              <label className="mt-4 block text-sm font-semibold text-ink">把 AI 輸出的 JSON 貼在這裡</label>
+              <textarea
+                value={importJsonText}
+                onChange={(event) => setImportJsonText(event.target.value)}
+                placeholder='貼上像 [{"subject":"解剖學", ...}] 這種完整 JSON'
+                className="mt-2 min-h-[20rem] w-full rounded-3xl border border-slate-200 bg-white p-4 font-mono text-xs leading-6 text-slate-800 outline-none sm:text-sm"
+              />
+
+              <div className="mt-4 flex flex-wrap items-center justify-between gap-3">
+                <p className="text-sm text-slate-600">
+                  匯入後會直接生成一張自訂卷；之後一樣可以分享考卷碼、公開給大家做，或再改卷名與公開設定。
+                </p>
+                <button
+                  type="button"
+                  onClick={() => void handleImportJsonPaper()}
+                  disabled={importingJson || !importJsonText.trim()}
+                  className="min-h-12 rounded-2xl bg-brand-600 px-5 py-3 text-sm font-semibold text-white transition hover:bg-brand-700 disabled:cursor-not-allowed disabled:bg-slate-300"
+                >
+                  {importingJson ? "匯入中..." : "把這段 JSON 變成一張卷"}
+                </button>
+              </div>
+
+              {importJsonError ? (
+                <div className="mt-4 rounded-2xl bg-rose-50 p-4 text-sm text-rose-900">{importJsonError}</div>
               ) : null}
             </div>
           </div>
