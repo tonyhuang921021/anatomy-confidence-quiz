@@ -117,7 +117,7 @@ export default function CustomPapersPage() {
   const { session } = useAuth();
   const med1Subjects = selectableSubjects.filter((item) => MED1_SUBJECTS.includes(item.subject));
   const med2Subjects = selectableSubjects.filter((item) => MED2_SUBJECTS.includes(item.subject));
-  const [tab, setTab] = useState<"generate" | "ai_search" | "public" | "import" | "lookup">("generate");
+  const [tab, setTab] = useState<"generate" | "ai_search" | "public" | "import" | "lookup">("public");
   const [selectedSubjects, setSelectedSubjects] = useState<SubjectName[]>([]);
   const [difficulty, setDifficulty] = useState<CustomPaperDifficulty>("hard");
   const [paperName, setPaperName] = useState("");
@@ -426,6 +426,17 @@ export default function CustomPapersPage() {
         <div className="mt-6 flex flex-wrap gap-3">
           <button
             type="button"
+            onClick={() => setTab("public")}
+            className={`min-h-12 rounded-2xl px-5 py-3 text-sm font-semibold transition ${
+              tab === "public"
+                ? "bg-brand-600 text-white"
+                : "bg-slate-100 text-slate-800 hover:bg-slate-200"
+            }`}
+          >
+            可以直接做的公開卷
+          </button>
+          <button
+            type="button"
             onClick={() => setTab("generate")}
             className={`min-h-12 rounded-2xl px-5 py-3 text-sm font-semibold transition ${
               tab === "generate"
@@ -445,17 +456,6 @@ export default function CustomPapersPage() {
             }`}
           >
             AI 智慧檢索
-          </button>
-          <button
-            type="button"
-            onClick={() => setTab("public")}
-            className={`min-h-12 rounded-2xl px-5 py-3 text-sm font-semibold transition ${
-              tab === "public"
-                ? "bg-brand-600 text-white"
-                : "bg-slate-100 text-slate-800 hover:bg-slate-200"
-            }`}
-          >
-            可以直接做的公開卷
           </button>
           <button
             type="button"
