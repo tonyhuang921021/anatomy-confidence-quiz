@@ -169,6 +169,12 @@ export function AuthPanel() {
               私有數據頁
             </a>
           ) : null}
+          <a
+            href="/progress"
+            className="min-h-12 rounded-2xl bg-slate-100 px-4 py-3 text-center text-sm font-semibold text-slate-800 transition hover:bg-slate-200"
+          >
+            進度總覽
+          </a>
           <button
             type="button"
             onClick={() => void handleSaveNickname()}
