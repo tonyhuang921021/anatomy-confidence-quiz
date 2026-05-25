@@ -133,7 +133,7 @@ export default function PeakChallengePage() {
             <p className="text-sm font-semibold uppercase tracking-[0.2em] text-brand-700">Peak Challenge</p>
             <h1 className="mt-2 text-3xl font-bold text-ink sm:text-4xl">巔峰賽模式</h1>
             <p className="mt-3 max-w-3xl text-slate-500">
-              先看榜單。只有散題錯題庫超過 25 題的挑戰者才能開局；每次答對加 1 分，答錯立刻結束。題目會從你最可能再錯的考古題與新的 AI 難題混合產生。
+              先看榜單。只有散題錯題庫超過 25 題的挑戰者才能開局；每次答對加 1 分，答錯立刻結束。
             </p>
           </div>
           <div className="flex flex-wrap gap-3">
