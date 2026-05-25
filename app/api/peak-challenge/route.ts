@@ -286,24 +286,29 @@ function buildWeaknessPastCandidateSummaries(
   doneQuestionIds: Set<string>
 ) {
   const excludedIds = new Set(weaknessPool.map((candidate) => candidate.questionId));
-  const weaknessByTopic = new Map<string, number>();
+  const weaknessByChapter = new Map<string, number>();
+  const weaknessBySection = new Map<string, number>();
 
   for (const candidate of weaknessPool) {
-    const key = `${candidate.subject}__${candidate.chapter}__${candidate.section}`;
+    const chapterKey = `${candidate.subject}__${candidate.chapter}`;
+    const sectionKey = `${candidate.subject}__${candidate.chapter}__${candidate.section}`;
     const weight = (candidate.riskScore ?? 0) + (candidate.wrongCount ?? 0) * 3 + (candidate.lowConfidenceCount ?? 0) * 2;
-    weaknessByTopic.set(key, (weaknessByTopic.get(key) ?? 0) + weight);
+    weaknessByChapter.set(chapterKey, (weaknessByChapter.get(chapterKey) ?? 0) + weight);
+    weaknessBySection.set(sectionKey, (weaknessBySection.get(sectionKey) ?? 0) + weight);
   }
 
   return questions
     .filter((question) => !doneQuestionIds.has(question.id) && !excludedIds.has(question.id))
     .map((question) => {
-      const topicKey = `${question.subject}__${question.chapter}__${question.section}`;
-      const topicalWeight = weaknessByTopic.get(topicKey) ?? 0;
+      const chapterKey = `${question.subject}__${question.chapter}`;
+      const sectionKey = `${question.subject}__${question.chapter}__${question.section}`;
+      const chapterWeight = weaknessByChapter.get(chapterKey) ?? 0;
+      const sectionWeight = weaknessBySection.get(sectionKey) ?? 0;
       const conceptWeight = weaknessPool.reduce((sum, candidate) => {
         if (!candidate.testedConcept || !question.testedConcept) return sum;
         return question.testedConcept.includes(candidate.testedConcept) ||
           candidate.testedConcept.includes(question.testedConcept)
-          ? sum + 12
+          ? sum + 6
           : sum;
       }, 0);
       return {
@@ -313,7 +318,7 @@ function buildWeaknessPastCandidateSummaries(
         section: question.section,
         stem: question.stem,
         testedConcept: question.testedConcept,
-        riskScore: topicalWeight + conceptWeight,
+        riskScore: chapterWeight * 1.2 + sectionWeight * 0.6 + conceptWeight,
         wrongCount: 0,
         lowConfidenceCount: 0,
         sourceType: question.sourceType
@@ -341,7 +346,7 @@ function buildAIGenerationPrompt(input: {
 
   return [
     "你是台灣醫學系國考命題助手，現在要替『巔峰賽模式』出新的難題。",
-    `請輸出 ${input.count} 題全新的單選題，主題要集中在挑戰者最容易錯的區塊。`,
+    `請輸出 ${input.count} 題全新的單選題，主題要集中在挑戰者最容易錯的章節，但不一定要卡在同一個狹窄弱點。`,
     "這些題要符合：",
     "1. 必須像國考考古題會出的難題，不要像隨便延伸的冷知識。",
     "2. 題幹可以有深度，但不要出成單靠刁鑽敘述取勝。",
@@ -352,6 +357,7 @@ function buildAIGenerationPrompt(input: {
     "7. explanation 與 option_analysis 要完整，並直接說明每個誘答點為什麼容易誤選。",
     "8. 只輸出 JSON 陣列，不要輸出 markdown、不要輸出任何前後說明。",
     "9. 不要重寫我給你的原題題幹；請基於弱點區塊重新設計全新的臨床或概念情境。",
+    "10. 優先維持同章節，但可以換不同小節、不同 tested concept，讓題目更有變化。",
     "",
     "[",
     "  {",
