@@ -14,7 +14,7 @@ import { loadCompletedSessions, saveQuizSettings } from "@/lib/storage";
 import type { ReviewQuestionItem } from "@/types/quiz";
 
 function getAllowedEmails() {
-  return (process.env.NEXT_PUBLIC_ADMIN_EMAILS ?? "")
+  return (process.env.NEXT_PUBLIC_ADMIN_EMAILS ?? "tonyhuang921021@gmail.com")
     .split(",")
     .map((item) => item.trim().toLowerCase())
     .filter(Boolean);

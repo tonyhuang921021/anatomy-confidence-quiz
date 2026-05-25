@@ -389,7 +389,9 @@ function getLeaderboardDisplayName(user: Pick<User, "id" | "email" | "user_metad
 }
 
 function summarizeLeaderboardSessions(sessions: QuizSession[]) {
-  const completedSessions = sessions.filter((session) => Boolean(session.completedAt));
+  const completedSessions = sessions.filter(
+    (session) => Boolean(session.completedAt) && session.settings?.mode !== "peak_challenge"
+  );
   const totalAttempts = completedSessions.reduce((sum, session) => sum + session.attempts.length, 0);
   const correctAttempts = completedSessions.reduce(
     (sum, session) => sum + session.attempts.filter((attempt) => attempt.isCorrect).length,

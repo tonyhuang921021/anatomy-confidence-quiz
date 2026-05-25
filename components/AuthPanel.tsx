@@ -16,7 +16,7 @@ export function AuthPanel() {
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
   const [submitting, setSubmitting] = useState(false);
-  const ownerAllowedEmails = (process.env.NEXT_PUBLIC_ADMIN_EMAILS ?? "")
+  const ownerAllowedEmails = (process.env.NEXT_PUBLIC_ADMIN_EMAILS ?? "tonyhuang921021@gmail.com")
     .split(",")
     .map((item) => item.trim().toLowerCase())
     .filter(Boolean);
@@ -167,6 +167,14 @@ export function AuthPanel() {
               className="min-h-12 rounded-2xl bg-slate-100 px-4 py-3 text-center text-sm font-semibold text-slate-800 transition hover:bg-slate-200"
             >
               私有數據頁
+            </a>
+          ) : null}
+          {canViewOwnerPage ? (
+            <a
+              href="/peak"
+              className="min-h-12 rounded-2xl bg-rose-100 px-4 py-3 text-center text-sm font-semibold text-rose-950 transition hover:bg-rose-200"
+            >
+              巔峰賽模式
             </a>
           ) : null}
           <a

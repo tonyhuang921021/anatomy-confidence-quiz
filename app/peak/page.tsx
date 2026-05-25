@@ -21,7 +21,7 @@ import type { PeakChallengeLeaderboardEntry } from "@/types/quiz";
 const ENTRY_THRESHOLD = 25;
 
 function getAllowedEmails() {
-  return (process.env.NEXT_PUBLIC_ADMIN_EMAILS ?? "")
+  return (process.env.NEXT_PUBLIC_ADMIN_EMAILS ?? "tonyhuang921021@gmail.com")
     .split(",")
     .map((item) => item.trim().toLowerCase())
     .filter(Boolean);
