@@ -69,6 +69,99 @@ function stripJsonCodeFence(value: string) {
   return value.replace(/^```(?:json)?\s*/i, "").replace(/\s*```$/i, "").trim();
 }
 
+function normalizeJsonLikeInput(value: string) {
+  return value
+    .replace(/^\uFEFF/, "")
+    .replace(/[“”]/g, '"')
+    .replace(/[‘’]/g, "'")
+    .trim();
+}
+
+function coerceParsedClassificationPayload(value: unknown): ParsedClassificationPayload | null {
+  if (!value || typeof value !== "object") return null;
+
+  const record = value as Record<string, unknown>;
+  const subject =
+    typeof record.subject === "string"
+      ? record.subject.trim()
+      : typeof record.primary_subject_exact === "string"
+        ? record.primary_subject_exact.trim()
+        : "";
+  const chapter =
+    typeof record.chapter === "string"
+      ? record.chapter.trim()
+      : typeof record.subtopic === "string"
+        ? record.subtopic.trim()
+        : "";
+  const section =
+    typeof record.section === "string"
+      ? record.section.trim()
+      : typeof record.topic === "string"
+        ? record.topic.trim()
+        : "";
+  const reason =
+    typeof record.reason === "string"
+      ? record.reason.trim()
+      : typeof record.rationale === "string"
+        ? record.rationale.trim()
+        : "";
+
+  if (!subject) return null;
+
+  return {
+    subject,
+    chapter,
+    section,
+    reason
+  };
+}
+
+function parseClassificationPayload(text: string): ParsedClassificationPayload | null {
+  const trimmed = normalizeJsonLikeInput(stripJsonCodeFence(text));
+  if (!trimmed) return null;
+
+  const rawCandidates = [trimmed];
+  const codeFenceMatch = trimmed.match(/```(?:json)?\s*([\s\S]*?)\s*```/i);
+  if (codeFenceMatch?.[1]) {
+    rawCandidates.unshift(normalizeJsonLikeInput(codeFenceMatch[1]));
+  }
+
+  for (const candidate of rawCandidates) {
+    try {
+      const parsed = coerceParsedClassificationPayload(JSON.parse(candidate));
+      if (parsed) return parsed;
+    } catch {
+      // continue to looser parsing
+    }
+
+    const start = candidate.indexOf("{");
+    const end = candidate.lastIndexOf("}");
+    if (start !== -1 && end !== -1 && end > start) {
+      try {
+        const parsed = coerceParsedClassificationPayload(JSON.parse(candidate.slice(start, end + 1)));
+        if (parsed) return parsed;
+      } catch {
+        // continue to looser parsing
+      }
+    }
+  }
+
+  const subjectMatch = trimmed.match(/(?:^|\n)\s*(?:subject|科目)\s*["']?\s*[:：]\s*["']?([^\n"'}，,]+)["']?/i);
+  const chapterMatch = trimmed.match(/(?:^|\n)\s*(?:chapter|章節)\s*["']?\s*[:：]\s*["']?([^\n"'}]+?)["']?(?=\n|$)/i);
+  const sectionMatch = trimmed.match(/(?:^|\n)\s*(?:section|小節)\s*["']?\s*[:：]\s*["']?([^\n"'}]+?)["']?(?=\n|$)/i);
+  const reasonMatch = trimmed.match(/(?:^|\n)\s*(?:reason|理由)\s*["']?\s*[:：]\s*["']?([\s\S]+?)["']?(?=\n\s*[A-Za-z\u4e00-\u9fff_]+\s*[:：]|\s*$)/i);
+
+  const subject = subjectMatch?.[1]?.trim() ?? "";
+  if (!subject) return null;
+
+  return {
+    subject,
+    chapter: chapterMatch?.[1]?.trim() ?? "",
+    section: sectionMatch?.[1]?.trim() ?? "",
+    reason: reasonMatch?.[1]?.trim() ?? ""
+  };
+}
+
 function formatUnknownError(error: unknown) {
   if (error instanceof Error && error.message.trim()) {
     return error.message.trim();
@@ -293,7 +386,10 @@ export async function POST(request: NextRequest) {
     }
 
     const result = await createOpenAIText(buildClassificationPrompt(question), 600, "gpt-5-mini");
-    const parsed = JSON.parse(stripJsonCodeFence(result.text)) as ParsedClassificationPayload;
+    const parsed = parseClassificationPayload(result.text);
+    if (!parsed?.subject) {
+      throw new Error("AI 回傳的分類格式不完整，請再試一次。");
+    }
 
     const insertPayload = {
       question_id: question.id,
