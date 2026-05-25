@@ -282,6 +282,7 @@ export default function QuizPage() {
   const [explanationErrorMap, setExplanationErrorMap] = useState<Record<string, string>>({});
   const [classificationReportLoadingMap, setClassificationReportLoadingMap] = useState<Record<string, boolean>>({});
   const [classificationReportMessageMap, setClassificationReportMessageMap] = useState<Record<string, string>>({});
+  const [isSubmittingAnswer, setIsSubmittingAnswer] = useState(false);
   const [selectedAnswer, setSelectedAnswer] = useState<OptionKey | undefined>();
   const [confidence, setConfidence] = useState<ConfidenceLevel>(4);
   const [confidenceExpanded, setConfidenceExpanded] = useState(false);
@@ -489,6 +490,7 @@ export default function QuizPage() {
 
   function handleSubmit() {
     if (!session || !currentQuestion || !selectedAnswer) return;
+    setIsSubmittingAnswer(true);
 
     const attempt: Attempt = {
       questionId: currentQuestion.id,
@@ -577,6 +579,7 @@ export default function QuizPage() {
           persistSession(advancedSession);
           void pushQuestionStatsSnapshotToSupabase(advancedSession);
           resetQuestionUI();
+          setIsSubmittingAnswer(false);
           window.requestAnimationFrame(() => {
             const target =
               typeof window !== "undefined" && window.innerWidth >= 1280
@@ -631,6 +634,7 @@ export default function QuizPage() {
       persistSession(advancedSession);
       void pushQuestionStatsSnapshotToSupabase(advancedSession);
       resetQuestionUI();
+      setIsSubmittingAnswer(false);
       window.requestAnimationFrame(() => {
         const target =
           typeof window !== "undefined" && window.innerWidth >= 1280
@@ -649,6 +653,7 @@ export default function QuizPage() {
     void pushQuestionStatsSnapshotToSupabase(nextSessionBase);
     setSubmittedAttempt(attempt);
     setErrorType(undefined);
+    setIsSubmittingAnswer(false);
   }
 
   function handleErrorTypeSelect(value: ErrorType) {
@@ -970,10 +975,14 @@ export default function QuizPage() {
                 <button
                   type="button"
                   onClick={handleSubmit}
-                  disabled={!selectedAnswer}
+                  disabled={!selectedAnswer || isSubmittingAnswer}
                   className="mt-5 min-h-12 w-full rounded-2xl bg-brand-600 px-4 py-4 text-sm font-semibold text-white transition hover:bg-brand-700 disabled:cursor-not-allowed disabled:bg-slate-300"
                 >
-                  送出答案
+                  {isSubmittingAnswer
+                    ? isPeakChallenge
+                      ? "巔峰賽生成下一題中..."
+                      : "送出中..."
+                    : "送出答案"}
                 </button>
               </div>
             </>
