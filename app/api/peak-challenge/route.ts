@@ -45,6 +45,21 @@ type QuestionAccuracyRow = {
   correct_rate: number;
 };
 
+type SharedAIQuestionRow = {
+  id: string;
+  feature: string;
+  subject: SubjectName;
+  chapter: string;
+  section: string;
+  tested_concept?: string | null;
+  question_payload: Question;
+  source_model?: string | null;
+  usage_count?: number | null;
+  last_used_at?: string | null;
+  created_at?: string | null;
+  updated_at?: string | null;
+};
+
 type GeneratePeakBody = {
   action: "generate";
   accessToken?: string | null;
@@ -493,6 +508,99 @@ function normalizeGeneratedPeakQuestions(rawJson: string, paperCode: string) {
   });
 }
 
+async function fetchReusableSharedAIQuestions(
+  supabase: any,
+  input: {
+    practicedSubjects: SubjectName[];
+    candidatePool: PeakCandidateSummary[];
+    doneQuestionIds: Set<string>;
+    limit: number;
+  }
+) {
+  if (input.limit <= 0) return [] as Question[];
+
+  const chapterSet = new Set(input.candidatePool.map((candidate) => `${candidate.subject}__${candidate.chapter}`));
+  const sectionSet = new Set(
+    input.candidatePool.map((candidate) => `${candidate.subject}__${candidate.chapter}__${candidate.section}`)
+  );
+
+  const { data, error } = await supabase
+    .from("shared_ai_questions")
+    .select("id, feature, subject, chapter, section, tested_concept, question_payload, source_model, usage_count, last_used_at, created_at, updated_at")
+    .eq("feature", "peak_challenge")
+    .order("usage_count", { ascending: true })
+    .order("created_at", { ascending: false })
+    .limit(120);
+
+  if (error) {
+    if (String(error.message ?? "").includes("shared_ai_questions")) {
+      return [] as Question[];
+    }
+    throw error;
+  }
+
+  const rows = ((data ?? []) as SharedAIQuestionRow[]).filter((row) => {
+    if (input.practicedSubjects.length > 0 && !input.practicedSubjects.includes(row.subject)) return false;
+    if (input.doneQuestionIds.has(row.id)) return false;
+    const chapterKey = `${row.subject}__${row.chapter}`;
+    const sectionKey = `${row.subject}__${row.chapter}__${row.section}`;
+    return chapterSet.has(chapterKey) || sectionSet.has(sectionKey);
+  });
+
+  return rows.slice(0, input.limit).map((row) => ({
+    ...(row.question_payload as Question),
+    id: row.id
+  }));
+}
+
+async function upsertSharedAIQuestions(supabase: any, questions: Question[], model: string) {
+  if (questions.length === 0) return;
+
+  const rows = questions.map((question) => ({
+    id: question.id,
+    feature: "peak_challenge",
+    subject: question.subject,
+    chapter: question.chapter,
+    section: question.section,
+    tested_concept: question.testedConcept ?? null,
+    question_payload: question,
+    source_model: model,
+    updated_at: new Date().toISOString()
+  }));
+
+  const { error } = await supabase.from("shared_ai_questions").upsert(rows, { onConflict: "id" });
+  if (error && !String(error.message ?? "").includes("shared_ai_questions")) {
+    throw error;
+  }
+}
+
+async function bumpSharedAIQuestionUsage(supabase: any, questions: Question[]) {
+  if (questions.length === 0) return;
+  const ids = questions.map((question) => question.id);
+  const { data, error } = await supabase
+    .from("shared_ai_questions")
+    .select("id, usage_count")
+    .in("id", ids);
+
+  if (error) {
+    if (String(error.message ?? "").includes("shared_ai_questions")) return;
+    throw error;
+  }
+
+  const rows = ((data ?? []) as { id: string; usage_count?: number | null }[]).map((row) => ({
+    id: row.id,
+    usage_count: (row.usage_count ?? 0) + 1,
+    last_used_at: new Date().toISOString(),
+    updated_at: new Date().toISOString()
+  }));
+
+  if (rows.length === 0) return;
+  const { error: upsertError } = await supabase.from("shared_ai_questions").upsert(rows, { onConflict: "id" });
+  if (upsertError && !String(upsertError.message ?? "").includes("shared_ai_questions")) {
+    throw upsertError;
+  }
+}
+
 function mixPeakQuestions(pastQuestions: Question[], aiQuestions: Question[], limit = TARGET_QUESTION_COUNT) {
   const result: Question[] = [];
   const pastPool = [...pastQuestions];
@@ -761,15 +869,22 @@ export async function POST(request: NextRequest) {
       }
 
       const aiQuestionCount = Math.max(desiredCount - selectedPastQuestions.length, 0);
+      const reusableAIQuestions = await fetchReusableSharedAIQuestions(supabase, {
+        practicedSubjects,
+        candidatePool: (shouldUseNewHardTrack ? hardPastCandidateSummaries : weaknessPastCandidateSummaries).slice(0, 24),
+        doneQuestionIds,
+        limit: aiQuestionCount
+      });
+      const remainingAiQuestionCount = Math.max(aiQuestionCount - reusableAIQuestions.length, 0);
       let generatedAIQuestions: Question[] = [];
-      if (aiQuestionCount > 0) {
+      if (remainingAiQuestionCount > 0) {
         const generation = await createOpenAIText(
           buildAIGenerationPrompt({
-            count: aiQuestionCount,
+            count: remainingAiQuestionCount,
             candidatePool: (shouldUseNewHardTrack ? hardPastCandidateSummaries : weaknessPastCandidateSummaries).slice(0, 18),
             selectedPastQuestions
           }),
-          Math.max(2600, aiQuestionCount * 1200),
+          Math.max(2600, remainingAiQuestionCount * 1200),
           "gpt-5-mini"
         );
         totalInputTokens += generation.usage.inputTokens;
@@ -777,7 +892,10 @@ export async function POST(request: NextRequest) {
         totalTokens += generation.usage.totalTokens;
         model = generation.model;
         generatedAIQuestions = normalizeGeneratedPeakQuestions(generation.text, `PEAK-${Date.now()}`);
+        await upsertSharedAIQuestions(supabase, generatedAIQuestions, model);
       }
+      await bumpSharedAIQuestionUsage(supabase, reusableAIQuestions);
+      generatedAIQuestions = [...reusableAIQuestions, ...generatedAIQuestions];
 
       const combinedQuestions = mixPeakQuestions(selectedPastQuestions, generatedAIQuestions, desiredCount);
       if (combinedQuestions.length === 0) {

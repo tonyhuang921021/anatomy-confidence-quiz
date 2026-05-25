@@ -692,6 +692,30 @@ on public.peak_challenge_runs
 for select
 using (true);
 
+create table if not exists public.shared_ai_questions (
+  id text primary key,
+  feature text not null,
+  subject text not null,
+  chapter text not null,
+  section text not null,
+  tested_concept text,
+  question_payload jsonb not null,
+  source_model text,
+  usage_count integer not null default 0,
+  last_used_at timestamptz,
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now()
+);
+
+create index if not exists shared_ai_questions_feature_idx
+on public.shared_ai_questions (feature, subject, chapter, section);
+
+grant select, insert, update, delete
+  on public.shared_ai_questions
+  to service_role;
+
+alter table public.shared_ai_questions enable row level security;
+
 create table if not exists public.ai_account_bans (
   user_email text primary key,
   banned_until timestamptz not null,
