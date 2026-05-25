@@ -164,7 +164,7 @@ export default function PeakChallengePage() {
         ) : null}
       </section>
 
-      <section className="mt-6 grid gap-4 lg:grid-cols-3">
+      <section className="mt-6 grid gap-4 lg:grid-cols-2">
         <article className="rounded-3xl bg-rose-50 p-5 text-rose-900">
           <p className="text-sm font-medium">散題錯題庫</p>
           <p className="mt-2 text-3xl font-bold">{practiceSnapshot.total}</p>
@@ -174,17 +174,6 @@ export default function PeakChallengePage() {
           <p className="text-sm font-medium">你已做過的巔峰賽題目</p>
           <p className="mt-2 text-3xl font-bold">{peakDoneQuestionIds.length}</p>
           <p className="mt-2 text-sm">新開局會優先避開這些題</p>
-        </article>
-        <article className="rounded-3xl bg-slate-50 p-5 text-slate-900">
-          <p className="text-sm font-medium">目前資格</p>
-          <p className="mt-2 text-3xl font-bold">{canEnter ? "可挑戰" : "未解鎖"}</p>
-          <p className="mt-2 text-sm">
-            {session?.access_token
-              ? canEnter
-                ? "你已符合進場門檻。"
-                : `再累積 ${Math.max(ENTRY_THRESHOLD + 1 - practiceSnapshot.total, 0)} 題錯題即可解鎖。`
-              : "請先登入帳號後再挑戰。"}
-          </p>
         </article>
       </section>
 
