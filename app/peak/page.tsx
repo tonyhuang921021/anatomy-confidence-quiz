@@ -20,9 +20,21 @@ import type { PeakChallengeLeaderboardEntry } from "@/types/quiz";
 
 const ENTRY_THRESHOLD = 25;
 
+function getAllowedEmails() {
+  return (process.env.NEXT_PUBLIC_ADMIN_EMAILS ?? "")
+    .split(",")
+    .map((item) => item.trim().toLowerCase())
+    .filter(Boolean);
+}
+
+function isAllowedEmail(email?: string | null) {
+  if (!email) return false;
+  return getAllowedEmails().includes(email.trim().toLowerCase());
+}
+
 export default function PeakChallengePage() {
   const router = useRouter();
-  const { session, syncVersion } = useAuth();
+  const { session, syncVersion, user } = useAuth();
   const [leaderboard, setLeaderboard] = useState<PeakChallengeLeaderboardEntry[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -72,8 +84,14 @@ export default function PeakChallengePage() {
   }, [allQuestions, syncVersion]);
 
   const canEnter = practiceSnapshot.total > ENTRY_THRESHOLD;
+  const allowed = isAllowedEmail(user?.email);
 
   useEffect(() => {
+    if (!allowed) {
+      setLoading(false);
+      return;
+    }
+
     async function fetchLeaderboard() {
       try {
         setLoading(true);
@@ -87,9 +105,13 @@ export default function PeakChallengePage() {
     }
 
     void fetchLeaderboard();
-  }, [syncVersion]);
+  }, [allowed, syncVersion]);
 
   async function handleStartPeakChallenge() {
+    if (!allowed) {
+      setStartError("這個模式目前僅限站長帳號使用。");
+      return;
+    }
     if (!session?.access_token) {
       setStartError("請先登入帳號，才能開始巔峰賽。");
       return;
@@ -137,6 +159,22 @@ export default function PeakChallengePage() {
 
   return (
     <main className="shell">
+      {!allowed ? (
+        <section className="rounded-[2rem] bg-white p-6 shadow-card ring-1 ring-slate-100 sm:p-8">
+          <p className="text-sm font-semibold uppercase tracking-[0.2em] text-brand-700">Peak Challenge</p>
+          <h1 className="mt-2 text-3xl font-bold text-ink sm:text-4xl">巔峰賽模式</h1>
+          <p className="mt-3 max-w-3xl text-slate-500">這個模式目前先隱藏，僅限站長帳號使用。</p>
+          <div className="mt-6">
+            <Link
+              href="/"
+              className="inline-flex min-h-12 items-center justify-center rounded-2xl bg-slate-100 px-5 py-4 text-sm font-semibold text-slate-800 transition hover:bg-slate-200"
+            >
+              返回首頁
+            </Link>
+          </div>
+        </section>
+      ) : (
+        <>
       <section className="rounded-[2rem] bg-white p-6 shadow-card ring-1 ring-slate-100 sm:p-8">
         <div className="flex flex-wrap items-center justify-between gap-4">
           <div>
@@ -244,6 +282,8 @@ export default function PeakChallengePage() {
           </div>
         )}
       </section>
+        </>
+      )}
     </main>
   );
 }

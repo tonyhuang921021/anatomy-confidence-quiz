@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
+import { useAuth } from "@/components/AuthProvider";
 import { ReviewNotebook } from "@/components/ReviewNotebook";
 import { getQuestionBankBySubjectFilter } from "@/data/med1QuestionBank";
 import {
@@ -12,12 +13,27 @@ import {
 import { loadCompletedSessions, saveQuizSettings } from "@/lib/storage";
 import type { ReviewQuestionItem } from "@/types/quiz";
 
+function getAllowedEmails() {
+  return (process.env.NEXT_PUBLIC_ADMIN_EMAILS ?? "")
+    .split(",")
+    .map((item) => item.trim().toLowerCase())
+    .filter(Boolean);
+}
+
+function isAllowedEmail(email?: string | null) {
+  if (!email) return false;
+  return getAllowedEmails().includes(email.trim().toLowerCase());
+}
+
 export default function PeakReviewPage() {
+  const { user } = useAuth();
   const baseQuestions = useMemo(() => getQuestionBankBySubjectFilter("全部"), []);
   const [peakItems, setPeakItems] = useState<ReviewQuestionItem[]>([]);
   const [reviewBank, setReviewBank] = useState(baseQuestions);
+  const allowed = isAllowedEmail(user?.email);
 
   useEffect(() => {
+    if (!allowed) return;
     const sessions = loadCompletedSessions();
     const peakSessions = sessions.filter((session) => session.settings?.mode === "peak_challenge");
     const sessionQuestions = peakSessions.flatMap((session) => session.generatedQuestions ?? []);
@@ -26,7 +42,7 @@ export default function PeakReviewPage() {
     );
     setReviewBank(mergedQuestions);
     setPeakItems(getReviewQuestionItems(mergedQuestions, peakSessions, 80));
-  }, [baseQuestions]);
+  }, [allowed, baseQuestions]);
 
   function handleStartPeakReview() {
     const reviewIds = new Set(peakItems.map((item) => item.question.id));
@@ -42,6 +58,26 @@ export default function PeakReviewPage() {
   }
 
   const snapshot = getReviewSnapshot(peakItems);
+
+  if (!allowed) {
+    return (
+      <main className="shell">
+        <section className="rounded-[2rem] bg-white p-6 shadow-card ring-1 ring-slate-100 sm:p-8">
+          <p className="text-sm font-semibold uppercase tracking-[0.2em] text-brand-700">Peak Challenge Review</p>
+          <h1 className="mt-2 text-3xl font-bold text-ink sm:text-4xl">巔峰賽錯題庫</h1>
+          <p className="mt-3 text-slate-500">這個模式目前先隱藏，僅限站長帳號使用。</p>
+          <div className="mt-6">
+            <Link
+              href="/"
+              className="inline-flex min-h-12 items-center justify-center rounded-2xl bg-slate-100 px-5 py-4 text-sm font-semibold text-slate-800 transition hover:bg-slate-200"
+            >
+              返回首頁
+            </Link>
+          </div>
+        </section>
+      </main>
+    );
+  }
 
   return (
     <main className="shell">

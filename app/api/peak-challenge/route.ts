@@ -110,6 +110,18 @@ const ALLOWED_SUBJECTS = new Set<SubjectName>([
   "其他醫學一"
 ]);
 
+function getAllowedEmails() {
+  return (process.env.NEXT_PUBLIC_ADMIN_EMAILS ?? "")
+    .split(",")
+    .map((item) => item.trim().toLowerCase())
+    .filter(Boolean);
+}
+
+function isAllowedEmail(email?: string | null) {
+  if (!email) return false;
+  return getAllowedEmails().includes(email.trim().toLowerCase());
+}
+
 function getServiceSupabaseClient() {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
@@ -583,6 +595,12 @@ export async function POST(request: NextRequest) {
           { status: 401 }
         );
       }
+      if (!isAllowedEmail(actor.email)) {
+        return NextResponse.json(
+          { ok: false, message: "這個模式目前僅限站長帳號使用。" },
+          { status: 403 }
+        );
+      }
 
       const activeBan = await getActiveAIAccountBan(supabase, actor.email);
       if (activeBan) {
@@ -743,6 +761,12 @@ export async function POST(request: NextRequest) {
         return NextResponse.json(
           { ok: false, message: "請先登入帳號，才能送出巔峰賽成績。" },
           { status: 401 }
+        );
+      }
+      if (!isAllowedEmail(actor.email)) {
+        return NextResponse.json(
+          { ok: false, message: "這個模式目前僅限站長帳號使用。" },
+          { status: 403 }
         );
       }
 
