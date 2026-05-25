@@ -38,6 +38,13 @@ type PeakCandidateSummary = {
   sourceType?: string;
 };
 
+type QuestionAccuracyRow = {
+  question_id: string;
+  total_attempts: number;
+  correct_attempts?: number;
+  correct_rate: number;
+};
+
 type GeneratePeakBody = {
   action: "generate";
   accessToken?: string | null;
@@ -46,6 +53,8 @@ type GeneratePeakBody = {
   doneQuestionIds?: string[];
   desiredCount?: number;
   existingSourceBreakdown?: { pastExam?: number; aiGenerated?: number };
+  practicedSubjects?: SubjectName[];
+  nextQuestionIndex?: number;
 };
 
 type SubmitPeakBody = {
@@ -222,6 +231,41 @@ function parseSelectedIds(raw: string) {
       reason: ""
     };
   }
+}
+
+function buildHardPastCandidateSummaries(
+  questions: Question[],
+  statsRows: QuestionAccuracyRow[],
+  doneQuestionIds: Set<string>
+) {
+  const statsMap = new Map(statsRows.map((row) => [row.question_id, row] as const));
+
+  return questions
+    .filter((question) => !doneQuestionIds.has(question.id))
+    .map((question) => {
+      const stats = statsMap.get(question.id);
+      return {
+        questionId: question.id,
+        subject: question.subject,
+        chapter: question.chapter,
+        section: question.section,
+        stem: question.stem,
+        testedConcept: question.testedConcept,
+        riskScore:
+          stats && stats.total_attempts > 0
+            ? (100 - Number(stats.correct_rate ?? 0)) + Math.min(stats.total_attempts, 20)
+            : 0,
+        wrongCount: stats ? Math.max(stats.total_attempts - Number(stats.correct_attempts ?? 0), 0) : 0,
+        lowConfidenceCount: 0,
+        sourceType: question.sourceType
+      } satisfies PeakCandidateSummary;
+    })
+    .sort(
+      (left, right) =>
+        (right.riskScore ?? 0) - (left.riskScore ?? 0) ||
+        (right.wrongCount ?? 0) - (left.wrongCount ?? 0) ||
+        left.questionId.localeCompare(right.questionId)
+    );
 }
 
 function buildAIGenerationPrompt(input: {
@@ -558,6 +602,10 @@ export async function POST(request: NextRequest) {
       const doneQuestionIds = new Set((body.doneQuestionIds ?? []).filter(Boolean));
       const desiredCount = Math.max(1, Math.min(body.desiredCount ?? TARGET_QUESTION_COUNT, TARGET_QUESTION_COUNT));
       const existingSourceBreakdown = body.existingSourceBreakdown ?? {};
+      const practicedSubjects =
+        (body.practicedSubjects ?? []).filter((subject): subject is SubjectName => ALLOWED_SUBJECTS.has(subject)) ||
+        [];
+      const nextQuestionIndex = Math.max(0, body.nextQuestionIndex ?? doneQuestionIds.size);
       const rawCandidates = (body.wrongPoolCandidates ?? [])
         .filter((candidate) => candidate && typeof candidate.questionId === "string")
         .sort(
@@ -570,12 +618,34 @@ export async function POST(request: NextRequest) {
         desiredCount === 1
           ? (existingSourceBreakdown.pastExam ?? 0) <= (existingSourceBreakdown.aiGenerated ?? 0)
           : true;
-      const targetPastExamCount =
-        desiredCount === 1 ? (preferPastExamForThisPull ? 1 : 0) : Math.min(Math.ceil(desiredCount / 2), PAST_EXAM_TARGET_COUNT);
+      const shouldUseNewHardTrack = nextQuestionIndex % 2 === 0;
 
-      const pastExamCandidateSummaries = rawCandidates
-        .filter((candidate) => pastExamMap.has(candidate.questionId) && !doneQuestionIds.has(candidate.questionId))
-        .slice(0, 36);
+      const practicedPastExamQuestions =
+        practicedSubjects.length > 0
+          ? pastExamBank.filter((question) => practicedSubjects.includes(question.subject))
+          : pastExamBank;
+      const { data: accuracyData } = await supabase
+        .from("question_accuracy_stats")
+        .select("question_id, total_attempts, correct_attempts, correct_rate");
+      const hardPastCandidateSummaries = buildHardPastCandidateSummaries(
+        practicedPastExamQuestions,
+        ((accuracyData ?? []) as QuestionAccuracyRow[]).filter((row) => Number(row.total_attempts ?? 0) > 0),
+        doneQuestionIds
+      ).slice(0, 36);
+      const targetPastExamCount =
+        desiredCount === 1
+          ? shouldUseNewHardTrack
+            ? Math.min(hardPastCandidateSummaries.length > 0 ? 1 : 0, 1)
+            : preferPastExamForThisPull
+              ? 1
+              : 0
+          : Math.min(Math.ceil(desiredCount / 2), PAST_EXAM_TARGET_COUNT);
+
+      const pastExamCandidateSummaries = shouldUseNewHardTrack
+        ? hardPastCandidateSummaries
+        : rawCandidates
+            .filter((candidate) => pastExamMap.has(candidate.questionId) && !doneQuestionIds.has(candidate.questionId))
+            .slice(0, 36);
 
       let selectedPastQuestions: Question[] = [];
       let totalInputTokens = 0;
@@ -621,7 +691,7 @@ export async function POST(request: NextRequest) {
         const generation = await createOpenAIText(
           buildAIGenerationPrompt({
             count: aiQuestionCount,
-            candidatePool: rawCandidates.slice(0, 18),
+            candidatePool: (shouldUseNewHardTrack ? hardPastCandidateSummaries : rawCandidates).slice(0, 18),
             selectedPastQuestions
           }),
           Math.max(2600, aiQuestionCount * 1200),

@@ -1643,6 +1643,8 @@ export async function generatePeakChallengeSession(input: {
   doneQuestionIds: string[];
   desiredCount?: number;
   existingSourceBreakdown?: { pastExam?: number; aiGenerated?: number };
+  practicedSubjects?: SubjectName[];
+  nextQuestionIndex?: number;
 }) {
   const response = await fetch("/api/peak-challenge", {
     method: "POST",

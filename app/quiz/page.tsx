@@ -283,6 +283,7 @@ export default function QuizPage() {
   const [classificationReportLoadingMap, setClassificationReportLoadingMap] = useState<Record<string, boolean>>({});
   const [classificationReportMessageMap, setClassificationReportMessageMap] = useState<Record<string, string>>({});
   const [isSubmittingAnswer, setIsSubmittingAnswer] = useState(false);
+  const [isPeakPrefetching, setIsPeakPrefetching] = useState(false);
   const [selectedAnswer, setSelectedAnswer] = useState<OptionKey | undefined>();
   const [confidence, setConfidence] = useState<ConfidenceLevel>(4);
   const [confidenceExpanded, setConfidenceExpanded] = useState(false);
@@ -524,10 +525,35 @@ export default function QuizPage() {
       }
 
       const peakCandidates = nextSessionBase.settings?.peakWrongPoolCandidates ?? [];
+      const hasBufferedNextQuestion = (nextSessionBase.questionOrder?.length ?? 0) > currentIndex + 1;
       const accumulatedBreakdown = {
         pastExam: nextSessionBase.settings?.peakSourceBreakdown?.pastExam ?? 0,
         aiGenerated: nextSessionBase.settings?.peakSourceBreakdown?.aiGenerated ?? 0
       };
+      if (hasBufferedNextQuestion) {
+        const advancedSession: QuizSession = {
+          ...nextSessionBase,
+          currentQuestionIndex: currentIndex + 1,
+          isReviewingAnswer: false
+        };
+        persistSession(advancedSession);
+        void pushQuestionStatsSnapshotToSupabase(advancedSession);
+        resetQuestionUI();
+        setIsSubmittingAnswer(false);
+        window.requestAnimationFrame(() => {
+          const target =
+            typeof window !== "undefined" && window.innerWidth >= 1280
+              ? contentTopRef.current
+              : questionTopRef.current;
+
+          target?.scrollIntoView({
+            behavior: "smooth",
+            block: "start"
+          });
+        });
+        return;
+      }
+
       const doneQuestionIds = Array.from(
         new Set([
           ...(nextSessionBase.questionOrder ?? []),
@@ -545,7 +571,9 @@ export default function QuizPage() {
             wrongPoolCandidates: peakCandidates,
             doneQuestionIds,
             desiredCount: 1,
-            existingSourceBreakdown: accumulatedBreakdown
+            existingSourceBreakdown: accumulatedBreakdown,
+            practicedSubjects: nextSessionBase.settings?.subjectFilters ?? [],
+            nextQuestionIndex: nextSessionBase.questionOrder?.length ?? 0
           });
 
           const mergedGeneratedQuestions = Array.from(
@@ -862,6 +890,92 @@ export default function QuizPage() {
       });
     });
   }
+
+  useEffect(() => {
+    if (
+      session?.settings?.mode !== "peak_challenge" ||
+      !session ||
+      !currentQuestion ||
+      submittedAttempt ||
+      session.completedAt ||
+      isPeakPrefetching
+    ) {
+      return;
+    }
+
+    const hasBufferedNextQuestion = (session.questionOrder?.length ?? 0) > currentIndex + 1;
+    if (hasBufferedNextQuestion) return;
+
+    const peakCandidates = session.settings?.peakWrongPoolCandidates ?? [];
+    if (peakCandidates.length === 0) return;
+
+    setIsPeakPrefetching(true);
+    const practicedSubjects = session.settings?.subjectFilters ?? [];
+    const sourceBreakdown = session.settings?.peakSourceBreakdown ?? { pastExam: 0, aiGenerated: 0 };
+    const doneQuestionIds = Array.from(
+      new Set([
+        ...(session.questionOrder ?? []),
+        ...loadCompletedSessions()
+          .filter((item) => item.settings?.mode === "peak_challenge")
+          .flatMap((item) => item.attempts.map((entry) => entry.questionId))
+      ])
+    );
+
+    void generatePeakChallengeSession({
+      accessToken: authSession?.access_token ?? null,
+      visitorId: getOrCreateVisitorId() ?? "",
+      wrongPoolCandidates: peakCandidates,
+      doneQuestionIds,
+      desiredCount: 1,
+      existingSourceBreakdown: sourceBreakdown,
+      practicedSubjects,
+      nextQuestionIndex: session.questionOrder?.length ?? 0
+    })
+      .then((nextQuestionBatch) => {
+        setSession((current) => {
+          if (!current || current.id !== session.id || current.completedAt) return current;
+          if ((current.questionOrder?.length ?? 0) > currentIndex + 1) return current;
+
+          const mergedGeneratedQuestions = Array.from(
+            new Map(
+              [...(current.generatedQuestions ?? []), ...nextQuestionBatch.questions].map((question) => [
+                question.id,
+                question
+              ])
+            ).values()
+          );
+          const mergedQuestionOrder = Array.from(
+            new Set([...(current.questionOrder ?? []), ...nextQuestionBatch.questionIds])
+          );
+          const nextSession: QuizSession = {
+            ...current,
+            generatedQuestions: mergedGeneratedQuestions,
+            questionOrder: mergedQuestionOrder,
+            settings: {
+              ...current.settings,
+              mode: "peak_challenge",
+              questionCount: mergedQuestionOrder.length,
+              peakSourceBreakdown: {
+                pastExam:
+                  (current.settings?.peakSourceBreakdown?.pastExam ?? 0) +
+                  (nextQuestionBatch.sourceBreakdown.pastExam ?? 0),
+                aiGenerated:
+                  (current.settings?.peakSourceBreakdown?.aiGenerated ?? 0) +
+                  (nextQuestionBatch.sourceBreakdown.aiGenerated ?? 0)
+              }
+            }
+          };
+          saveCurrentSession(nextSession);
+          return nextSession;
+        });
+      })
+      .catch(() => {
+        // prefetch failure should not block current question
+      })
+      .finally(() => {
+        setIsPeakPrefetching(false);
+      });
+  }, [authSession?.access_token, currentIndex, currentQuestion, isPeakPrefetching, session, submittedAttempt]);
 
   if (!mounted || !session || !currentQuestion) {
     return (

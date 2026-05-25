@@ -30,7 +30,7 @@ export default function PeakChallengePage() {
   const [startError, setStartError] = useState("");
   const allQuestions = useMemo(() => getQuestionBankBySubjectFilter("全部"), []);
 
-  const { practiceSnapshot, wrongPoolCandidates, peakDoneQuestionIds } = useMemo(() => {
+  const { practiceSnapshot, wrongPoolCandidates, peakDoneQuestionIds, practicedSubjects } = useMemo(() => {
     const sessions = loadCompletedSessions();
     const practiceSessions = sessions.filter(
       (sessionItem) =>
@@ -60,6 +60,13 @@ export default function PeakChallengePage() {
       })),
       peakDoneQuestionIds: Array.from(
         new Set(peakSessions.flatMap((sessionItem) => sessionItem.attempts.map((attempt) => attempt.questionId)))
+      ),
+      practicedSubjects: Array.from(
+        new Set(
+          practiceSessions
+            .flatMap((sessionItem) => sessionItem.generatedQuestions?.map((question) => question.subject) ?? [])
+            .filter(Boolean)
+        )
       )
     };
   }, [allQuestions, syncVersion]);
@@ -101,7 +108,9 @@ export default function PeakChallengePage() {
         wrongPoolCandidates,
         doneQuestionIds: peakDoneQuestionIds,
         desiredCount: 1,
-        existingSourceBreakdown: { pastExam: 0, aiGenerated: 0 }
+        existingSourceBreakdown: { pastExam: 0, aiGenerated: 0 },
+        practicedSubjects,
+        nextQuestionIndex: 0
       });
 
       saveQuizSettings({
@@ -109,6 +118,7 @@ export default function PeakChallengePage() {
         mode: "peak_challenge",
         questionCount: generated.questionIds.length,
         subjectFilter: "全部",
+        subjectFilters: practicedSubjects,
         customQuestionIds: generated.questionIds,
         customQuestionPayload: generated.questions,
         customPoolLabel: "巔峰賽錯題庫",
