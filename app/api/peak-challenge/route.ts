@@ -204,16 +204,16 @@ async function loadClassificationOverrides(supabase: any) {
 
 function buildPastExamSelectionPrompt(candidates: PeakCandidateSummary[], count: number) {
   const lines = candidates.map((candidate, index) =>
-    `${index + 1}. ${candidate.questionId}｜${candidate.subject}｜${candidate.chapter} / ${candidate.section}｜wrong ${candidate.wrongCount ?? 0}｜lowConfidence ${candidate.lowConfidenceCount ?? 0}｜risk ${candidate.riskScore ?? 0}\n題幹：${candidate.stem}\n考點：${candidate.testedConcept ?? ""}`
+    `${index + 1}. ${candidate.questionId}｜${candidate.subject}｜${candidate.chapter} / ${candidate.section}｜risk ${candidate.riskScore ?? 0}\n考點：${candidate.testedConcept ?? ""}`
   );
 
   return [
     "你是台灣醫學系國考刷題教練。",
-    "現在要替一位錯題很多的挑戰者，從他自己的錯題庫候選題中挑出最可能再次失手、而且很像國考會拿來卡人的考古題。",
+    "現在要替一位錯題很多的挑戰者，從『尚未做過、但和他弱點高度相關』的候選考古題中挑出最可能再次失手的題目。",
     `請只挑 ${Math.min(count, candidates.length)} 題，寧可保守，不要挑太簡單或已經太直白的題。`,
     "優先考慮：",
-    "1. 錯誤次數高或低信心次數高",
-    "2. 題幹本身概念容易混淆",
+    "1. 題目來自挑戰者弱點章節，但不是他做過的原題",
+    "2. 題幹概念容易混淆",
     "3. 選項之間辨識度低、容易被誘答",
     "4. 真的像國考會出的高鑑別度題",
     "請只輸出 JSON，不要輸出 markdown。",
@@ -280,16 +280,63 @@ function buildHardPastCandidateSummaries(
     );
 }
 
+function buildWeaknessPastCandidateSummaries(
+  questions: Question[],
+  weaknessPool: PeakCandidateSummary[],
+  doneQuestionIds: Set<string>
+) {
+  const excludedIds = new Set(weaknessPool.map((candidate) => candidate.questionId));
+  const weaknessByTopic = new Map<string, number>();
+
+  for (const candidate of weaknessPool) {
+    const key = `${candidate.subject}__${candidate.chapter}__${candidate.section}`;
+    const weight = (candidate.riskScore ?? 0) + (candidate.wrongCount ?? 0) * 3 + (candidate.lowConfidenceCount ?? 0) * 2;
+    weaknessByTopic.set(key, (weaknessByTopic.get(key) ?? 0) + weight);
+  }
+
+  return questions
+    .filter((question) => !doneQuestionIds.has(question.id) && !excludedIds.has(question.id))
+    .map((question) => {
+      const topicKey = `${question.subject}__${question.chapter}__${question.section}`;
+      const topicalWeight = weaknessByTopic.get(topicKey) ?? 0;
+      const conceptWeight = weaknessPool.reduce((sum, candidate) => {
+        if (!candidate.testedConcept || !question.testedConcept) return sum;
+        return question.testedConcept.includes(candidate.testedConcept) ||
+          candidate.testedConcept.includes(question.testedConcept)
+          ? sum + 12
+          : sum;
+      }, 0);
+      return {
+        questionId: question.id,
+        subject: question.subject,
+        chapter: question.chapter,
+        section: question.section,
+        stem: question.stem,
+        testedConcept: question.testedConcept,
+        riskScore: topicalWeight + conceptWeight,
+        wrongCount: 0,
+        lowConfidenceCount: 0,
+        sourceType: question.sourceType
+      } satisfies PeakCandidateSummary;
+    })
+    .filter((candidate) => (candidate.riskScore ?? 0) > 0)
+    .sort(
+      (left, right) =>
+        (right.riskScore ?? 0) - (left.riskScore ?? 0) ||
+        left.questionId.localeCompare(right.questionId)
+    );
+}
+
 function buildAIGenerationPrompt(input: {
   count: number;
   candidatePool: PeakCandidateSummary[];
   selectedPastQuestions: Question[];
 }) {
   const weaknessLines = input.candidatePool.slice(0, 14).map((candidate, index) =>
-    `${index + 1}. ${candidate.subject}｜${candidate.chapter} / ${candidate.section}｜wrong ${candidate.wrongCount ?? 0}｜lowConfidence ${candidate.lowConfidenceCount ?? 0}｜risk ${candidate.riskScore ?? 0}\n題幹：${candidate.stem}\n考點：${candidate.testedConcept ?? ""}`
+    `${index + 1}. ${candidate.subject}｜${candidate.chapter} / ${candidate.section}｜risk ${candidate.riskScore ?? 0}\n考點：${candidate.testedConcept ?? ""}`
   );
   const pastLines = input.selectedPastQuestions.map((question, index) =>
-    `${index + 1}. ${question.subject}｜${question.chapter} / ${question.section}\n題幹：${question.stem}\nA.${question.options.A}\nB.${question.options.B}\nC.${question.options.C}\nD.${question.options.D}\n${question.options.E ? `E.${question.options.E}\n` : ""}答案：${question.answer}\n考點：${question.testedConcept}`
+    `${index + 1}. ${question.subject}｜${question.chapter} / ${question.section}｜考點：${question.testedConcept}`
   );
 
   return [
@@ -300,10 +347,11 @@ function buildAIGenerationPrompt(input: {
     "2. 題幹可以有深度，但不要出成單靠刁鑽敘述取勝。",
     "3. 選項一定要有誘答力：錯誤選項要看起來 plausible，不能一眼排除。",
     "4. 錯誤選項最好來自常見混淆點、相鄰概念、相似解剖/生理/病理名詞。",
-    "5. 請避免和下面參考考古題太像，不要只是換字重寫。",
+    "5. 請避免和挑戰者做過或已選進本輪的考古題太像，不要只是換字重寫。",
     "6. 一律輸出 4 選 1 或 5 選 1 的單選題；沒有 E 就留空字串。",
     "7. explanation 與 option_analysis 要完整，並直接說明每個誘答點為什麼容易誤選。",
     "8. 只輸出 JSON 陣列，不要輸出 markdown、不要輸出任何前後說明。",
+    "9. 不要重寫我給你的原題題幹；請基於弱點區塊重新設計全新的臨床或概念情境。",
     "",
     "[",
     "  {",
@@ -650,6 +698,11 @@ export async function POST(request: NextRequest) {
         ((accuracyData ?? []) as QuestionAccuracyRow[]).filter((row) => Number(row.total_attempts ?? 0) > 0),
         doneQuestionIds
       ).slice(0, 36);
+      const weaknessPastCandidateSummaries = buildWeaknessPastCandidateSummaries(
+        pastExamBank,
+        rawCandidates,
+        doneQuestionIds
+      ).slice(0, 36);
       const targetPastExamCount =
         desiredCount === 1
           ? shouldUseNewHardTrack
@@ -661,9 +714,7 @@ export async function POST(request: NextRequest) {
 
       const pastExamCandidateSummaries = shouldUseNewHardTrack
         ? hardPastCandidateSummaries
-        : rawCandidates
-            .filter((candidate) => pastExamMap.has(candidate.questionId) && !doneQuestionIds.has(candidate.questionId))
-            .slice(0, 36);
+        : weaknessPastCandidateSummaries;
 
       let selectedPastQuestions: Question[] = [];
       let totalInputTokens = 0;
@@ -709,7 +760,7 @@ export async function POST(request: NextRequest) {
         const generation = await createOpenAIText(
           buildAIGenerationPrompt({
             count: aiQuestionCount,
-            candidatePool: (shouldUseNewHardTrack ? hardPastCandidateSummaries : rawCandidates).slice(0, 18),
+            candidatePool: (shouldUseNewHardTrack ? hardPastCandidateSummaries : weaknessPastCandidateSummaries).slice(0, 18),
             selectedPastQuestions
           }),
           Math.max(2600, aiQuestionCount * 1200),
