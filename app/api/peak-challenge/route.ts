@@ -44,6 +44,8 @@ type GeneratePeakBody = {
   visitorId?: string | null;
   wrongPoolCandidates?: PeakCandidateSummary[];
   doneQuestionIds?: string[];
+  desiredCount?: number;
+  existingSourceBreakdown?: { pastExam?: number; aiGenerated?: number };
 };
 
 type SubmitPeakBody = {
@@ -179,7 +181,7 @@ async function loadClassificationOverrides(supabase: any) {
   );
 }
 
-function buildPastExamSelectionPrompt(candidates: PeakCandidateSummary[]) {
+function buildPastExamSelectionPrompt(candidates: PeakCandidateSummary[], count: number) {
   const lines = candidates.map((candidate, index) =>
     `${index + 1}. ${candidate.questionId}｜${candidate.subject}｜${candidate.chapter} / ${candidate.section}｜wrong ${candidate.wrongCount ?? 0}｜lowConfidence ${candidate.lowConfidenceCount ?? 0}｜risk ${candidate.riskScore ?? 0}\n題幹：${candidate.stem}\n考點：${candidate.testedConcept ?? ""}`
   );
@@ -187,7 +189,7 @@ function buildPastExamSelectionPrompt(candidates: PeakCandidateSummary[]) {
   return [
     "你是台灣醫學系國考刷題教練。",
     "現在要替一位錯題很多的挑戰者，從他自己的錯題庫候選題中挑出最可能再次失手、而且很像國考會拿來卡人的考古題。",
-    `請只挑 ${Math.min(PAST_EXAM_TARGET_COUNT, candidates.length)} 題，寧可保守，不要挑太簡單或已經太直白的題。`,
+    `請只挑 ${Math.min(count, candidates.length)} 題，寧可保守，不要挑太簡單或已經太直白的題。`,
     "優先考慮：",
     "1. 錯誤次數高或低信心次數高",
     "2. 題幹本身概念容易混淆",
@@ -381,7 +383,7 @@ function normalizeGeneratedPeakQuestions(rawJson: string, paperCode: string) {
   });
 }
 
-function mixPeakQuestions(pastQuestions: Question[], aiQuestions: Question[]) {
+function mixPeakQuestions(pastQuestions: Question[], aiQuestions: Question[], limit = TARGET_QUESTION_COUNT) {
   const result: Question[] = [];
   const pastPool = [...pastQuestions];
   const aiPool = [...aiQuestions];
@@ -395,7 +397,7 @@ function mixPeakQuestions(pastQuestions: Question[], aiQuestions: Question[]) {
     }
   }
 
-  return result.slice(0, TARGET_QUESTION_COUNT);
+  return result.slice(0, limit);
 }
 
 function aggregateLeaderboard(rows: PeakChallengeRunRow[]): PeakChallengeLeaderboardEntry[] {
@@ -554,6 +556,8 @@ export async function POST(request: NextRequest) {
       const pastExamBank = bank.filter((question) => question.sourceType === "MOEX_PAST_EXAM");
       const pastExamMap = new Map(pastExamBank.map((question) => [question.id, question] as const));
       const doneQuestionIds = new Set((body.doneQuestionIds ?? []).filter(Boolean));
+      const desiredCount = Math.max(1, Math.min(body.desiredCount ?? TARGET_QUESTION_COUNT, TARGET_QUESTION_COUNT));
+      const existingSourceBreakdown = body.existingSourceBreakdown ?? {};
       const rawCandidates = (body.wrongPoolCandidates ?? [])
         .filter((candidate) => candidate && typeof candidate.questionId === "string")
         .sort(
@@ -562,6 +566,12 @@ export async function POST(request: NextRequest) {
             (right.wrongCount ?? 0) - (left.wrongCount ?? 0) ||
             (right.lowConfidenceCount ?? 0) - (left.lowConfidenceCount ?? 0)
         );
+      const preferPastExamForThisPull =
+        desiredCount === 1
+          ? (existingSourceBreakdown.pastExam ?? 0) <= (existingSourceBreakdown.aiGenerated ?? 0)
+          : true;
+      const targetPastExamCount =
+        desiredCount === 1 ? (preferPastExamForThisPull ? 1 : 0) : Math.min(Math.ceil(desiredCount / 2), PAST_EXAM_TARGET_COUNT);
 
       const pastExamCandidateSummaries = rawCandidates
         .filter((candidate) => pastExamMap.has(candidate.questionId) && !doneQuestionIds.has(candidate.questionId))
@@ -572,9 +582,9 @@ export async function POST(request: NextRequest) {
       let totalOutputTokens = 0;
       let totalTokens = 0;
       let model = "gpt-5-mini";
-      if (pastExamCandidateSummaries.length > 0) {
+      if (targetPastExamCount > 0 && pastExamCandidateSummaries.length > 0) {
         const selection = await createOpenAIText(
-          buildPastExamSelectionPrompt(pastExamCandidateSummaries),
+          buildPastExamSelectionPrompt(pastExamCandidateSummaries, targetPastExamCount),
           500,
           "gpt-5-mini"
         );
@@ -592,20 +602,20 @@ export async function POST(request: NextRequest) {
             seen.add(question.id);
             return !doneQuestionIds.has(question.id);
           })
-          .slice(0, PAST_EXAM_TARGET_COUNT);
+          .slice(0, targetPastExamCount);
 
-        if (selectedPastQuestions.length < PAST_EXAM_TARGET_COUNT) {
+        if (selectedPastQuestions.length < targetPastExamCount) {
           for (const candidate of pastExamCandidateSummaries) {
             const fallback = pastExamMap.get(candidate.questionId);
             if (!fallback || seen.has(fallback.id) || doneQuestionIds.has(fallback.id)) continue;
             seen.add(fallback.id);
             selectedPastQuestions.push(fallback);
-            if (selectedPastQuestions.length >= PAST_EXAM_TARGET_COUNT) break;
+            if (selectedPastQuestions.length >= targetPastExamCount) break;
           }
         }
       }
 
-      const aiQuestionCount = Math.max(TARGET_QUESTION_COUNT - selectedPastQuestions.length, 0);
+      const aiQuestionCount = Math.max(desiredCount - selectedPastQuestions.length, 0);
       let generatedAIQuestions: Question[] = [];
       if (aiQuestionCount > 0) {
         const generation = await createOpenAIText(
@@ -624,7 +634,7 @@ export async function POST(request: NextRequest) {
         generatedAIQuestions = normalizeGeneratedPeakQuestions(generation.text, `PEAK-${Date.now()}`);
       }
 
-      const combinedQuestions = mixPeakQuestions(selectedPastQuestions, generatedAIQuestions);
+      const combinedQuestions = mixPeakQuestions(selectedPastQuestions, generatedAIQuestions, desiredCount);
       if (combinedQuestions.length === 0) {
         return NextResponse.json(
           { ok: false, message: "目前還抓不出可用的巔峰賽題目，請先再累積一些錯題後重試。" },

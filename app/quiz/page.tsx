@@ -18,6 +18,7 @@ import {
   getSeasonalLimitedQuestions
 } from "@/data/med1QuestionBank";
 import {
+  generatePeakChallengeSession,
   loadConfirmedQuestionClassificationOverrides,
   recordCustomPaperAttempt,
   recordPeakChallengeRun,
@@ -447,7 +448,10 @@ export default function QuizPage() {
   );
   const currentIndex = session?.currentQuestionIndex ?? 0;
   const currentQuestion = questionSet[currentIndex];
-  const targetCount = session?.settings?.questionCount ?? questionSet.length;
+  const targetCount =
+    session?.settings?.mode === "peak_challenge"
+      ? questionSet.length
+      : session?.settings?.questionCount ?? questionSet.length;
   const progress =
     targetCount === 0 ? 0 : ((currentIndex + (submittedAttempt ? 1 : 0)) / targetCount) * 100;
   const answeredCount = session?.attempts.length ?? 0;
@@ -502,9 +506,7 @@ export default function QuizPage() {
     };
 
     if (session.settings?.mode === "peak_challenge") {
-      const isLast = currentIndex >= targetCount - 1;
-
-      if (!attempt.isCorrect || isLast) {
+      if (!attempt.isCorrect) {
         const completedSession: QuizSession = {
           ...nextSessionBase,
           completedAt: new Date().toISOString(),
@@ -519,25 +521,87 @@ export default function QuizPage() {
         return;
       }
 
-      const advancedSession: QuizSession = {
-        ...nextSessionBase,
-        currentQuestionIndex: currentIndex + 1,
-        isReviewingAnswer: false
+      const peakCandidates = nextSessionBase.settings?.peakWrongPoolCandidates ?? [];
+      const accumulatedBreakdown = {
+        pastExam: nextSessionBase.settings?.peakSourceBreakdown?.pastExam ?? 0,
+        aiGenerated: nextSessionBase.settings?.peakSourceBreakdown?.aiGenerated ?? 0
       };
-      persistSession(advancedSession);
-      void pushQuestionStatsSnapshotToSupabase(advancedSession);
-      resetQuestionUI();
-      window.requestAnimationFrame(() => {
-        const target =
-          typeof window !== "undefined" && window.innerWidth >= 1280
-            ? contentTopRef.current
-            : questionTopRef.current;
+      const doneQuestionIds = Array.from(
+        new Set([
+          ...(nextSessionBase.questionOrder ?? []),
+          ...loadCompletedSessions()
+            .filter((item) => item.settings?.mode === "peak_challenge")
+            .flatMap((item) => item.attempts.map((entry) => entry.questionId))
+        ])
+      );
 
-        target?.scrollIntoView({
-          behavior: "smooth",
-          block: "start"
-        });
-      });
+      void (async () => {
+        try {
+          const nextQuestionBatch = await generatePeakChallengeSession({
+            accessToken: authSession?.access_token ?? null,
+            visitorId: getOrCreateVisitorId() ?? "",
+            wrongPoolCandidates: peakCandidates,
+            doneQuestionIds,
+            desiredCount: 1,
+            existingSourceBreakdown: accumulatedBreakdown
+          });
+
+          const mergedGeneratedQuestions = Array.from(
+            new Map(
+              [...(nextSessionBase.generatedQuestions ?? []), ...nextQuestionBatch.questions].map((question) => [
+                question.id,
+                question
+              ])
+            ).values()
+          );
+          const mergedQuestionOrder = Array.from(
+            new Set([...(nextSessionBase.questionOrder ?? []), ...nextQuestionBatch.questionIds])
+          );
+          const advancedSession: QuizSession = {
+            ...nextSessionBase,
+            generatedQuestions: mergedGeneratedQuestions,
+            questionOrder: mergedQuestionOrder,
+            currentQuestionIndex: currentIndex + 1,
+            isReviewingAnswer: false,
+            settings: {
+              ...nextSessionBase.settings,
+              mode: "peak_challenge",
+              questionCount: mergedQuestionOrder.length,
+              peakSourceBreakdown: {
+                pastExam: accumulatedBreakdown.pastExam + (nextQuestionBatch.sourceBreakdown.pastExam ?? 0),
+                aiGenerated: accumulatedBreakdown.aiGenerated + (nextQuestionBatch.sourceBreakdown.aiGenerated ?? 0)
+              }
+            }
+          };
+
+          persistSession(advancedSession);
+          void pushQuestionStatsSnapshotToSupabase(advancedSession);
+          resetQuestionUI();
+          window.requestAnimationFrame(() => {
+            const target =
+              typeof window !== "undefined" && window.innerWidth >= 1280
+                ? contentTopRef.current
+                : questionTopRef.current;
+
+            target?.scrollIntoView({
+              behavior: "smooth",
+              block: "start"
+            });
+          });
+        } catch {
+          const completedSession: QuizSession = {
+            ...nextSessionBase,
+            completedAt: new Date().toISOString(),
+            isReviewingAnswer: false
+          };
+          persistSession(completedSession);
+          saveCompletedSession(completedSession);
+          void pushCompletedSessionToSupabase(completedSession);
+          void pushQuestionStatsSnapshotToSupabase(completedSession);
+          syncCompletedPeakChallenge(completedSession);
+          router.push(`/results?sessionId=${encodeURIComponent(completedSession.id)}`);
+        }
+      })();
       return;
     }
 

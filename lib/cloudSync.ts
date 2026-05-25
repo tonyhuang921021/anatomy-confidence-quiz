@@ -1641,6 +1641,8 @@ export async function generatePeakChallengeSession(input: {
   visitorId?: string;
   wrongPoolCandidates: PeakChallengeCandidateInput[];
   doneQuestionIds: string[];
+  desiredCount?: number;
+  existingSourceBreakdown?: { pastExam?: number; aiGenerated?: number };
 }) {
   const response = await fetch("/api/peak-challenge", {
     method: "POST",

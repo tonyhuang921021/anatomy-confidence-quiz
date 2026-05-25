@@ -99,7 +99,9 @@ export default function PeakChallengePage() {
         accessToken: session.access_token,
         visitorId: getOrCreateVisitorId() ?? "",
         wrongPoolCandidates,
-        doneQuestionIds: peakDoneQuestionIds
+        doneQuestionIds: peakDoneQuestionIds,
+        desiredCount: 1,
+        existingSourceBreakdown: { pastExam: 0, aiGenerated: 0 }
       });
 
       saveQuizSettings({
@@ -110,7 +112,9 @@ export default function PeakChallengePage() {
         customQuestionIds: generated.questionIds,
         customQuestionPayload: generated.questions,
         customPoolLabel: "巔峰賽錯題庫",
-        feedbackMode: "none"
+        feedbackMode: "none",
+        peakWrongPoolCandidates: wrongPoolCandidates,
+        peakSourceBreakdown: generated.sourceBreakdown
       });
 
       router.push("/quiz?new=1");

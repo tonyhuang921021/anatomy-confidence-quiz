@@ -113,6 +113,22 @@ export type QuizSettings = {
   customPaperName?: string;
   customPaperDifficulty?: CustomPaperDifficulty;
   customPaperIsPublic?: boolean;
+  peakWrongPoolCandidates?: {
+    questionId: string;
+    subject: SubjectName;
+    chapter: string;
+    section: string;
+    stem: string;
+    testedConcept?: string;
+    riskScore?: number;
+    wrongCount?: number;
+    lowConfidenceCount?: number;
+    sourceType?: QuestionSourceType;
+  }[];
+  peakSourceBreakdown?: {
+    pastExam?: number;
+    aiGenerated?: number;
+  };
 };
 
 export type QuizSession = {
