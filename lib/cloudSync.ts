@@ -132,6 +132,35 @@ const SUPABASE_PAGE_SIZE = 1000;
 const FEEDBACK_HOURLY_LIMIT = 3;
 const FEEDBACK_DAILY_LIMIT = 10;
 
+function normalizeAttemptSessionId(sessionId: string) {
+  return sessionId.replace(/^user-[^:]+:/, "");
+}
+
+function dedupeAttemptRows<
+  T extends {
+    session_id: string;
+    question_id: string;
+    answered_at?: string;
+    is_correct?: boolean;
+  }
+>(rows: T[]) {
+  const deduped = new Map<string, T>();
+
+  for (const row of rows) {
+    const normalizedSessionId = normalizeAttemptSessionId(row.session_id);
+    const answeredAt = row.answered_at ?? "";
+    const correctness =
+      typeof row.is_correct === "boolean" ? (row.is_correct ? "1" : "0") : "";
+    const dedupeKey = `${normalizedSessionId}::${row.question_id}::${answeredAt}::${correctness}`;
+    deduped.set(dedupeKey, {
+      ...row,
+      session_id: normalizedSessionId
+    });
+  }
+
+  return Array.from(deduped.values());
+}
+
 async function fetchAIExplanationUsageRows() {
   if (!isSupabaseConfigured()) {
     return [] as AIExplanationUsageLogRow[];
