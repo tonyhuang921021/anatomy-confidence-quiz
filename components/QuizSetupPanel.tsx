@@ -30,7 +30,8 @@ const modeDescriptions: Record<QuizMode, string> = {
   random: "平均刷題，適合維持手感與快速暖機。",
   review: "優先抽歷史錯題、低信心題與高風險題。",
   simulation: "像正式考試一樣，可選真實考古卷或電腦隨機整份卷。",
-  custom_paper: "自訂卷模式會用專屬頁面產卷或輸入考卷碼。"
+  custom_paper: "自訂卷模式會用專屬頁面產卷或輸入考卷碼。",
+  peak_challenge: "巔峰賽會從你的高風險題與 AI 新題組成闖關卷，答錯立刻結束。"
 };
 
 const questionCounts = [10, 15, 20, 50, 100];

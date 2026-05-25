@@ -93,6 +93,8 @@ function getSessionModeLabel(session: QuizSession) {
     ? "模擬考"
     : session.settings?.mode === "custom_paper"
       ? "自訂卷"
+    : session.settings?.mode === "peak_challenge"
+      ? "巔峰賽"
     : session.settings?.mode === "review"
       ? "錯題複習"
       : session.settings?.mode === "weakness"

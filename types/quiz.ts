@@ -83,7 +83,13 @@ export type Attempt = {
   answeredAt: string;
 };
 
-export type QuizMode = "random" | "weakness" | "review" | "simulation" | "custom_paper";
+export type QuizMode =
+  | "random"
+  | "weakness"
+  | "review"
+  | "simulation"
+  | "custom_paper"
+  | "peak_challenge";
 
 export type SubjectFilter = SubjectName | "全部";
 export type SimulationFeedbackMode = "full" | "answer_only" | "none";
@@ -369,4 +375,14 @@ export type CustomPaperDetail = CustomPaperSummary & {
   questionIds: string[];
   questions?: Question[];
   participants: CustomPaperParticipant[];
+};
+
+export type PeakChallengeLeaderboardEntry = {
+  label: string;
+  userEmail?: string;
+  bestScore: number;
+  runCount: number;
+  averageScore: number;
+  latestScore: number;
+  latestCompletedAt?: string;
 };

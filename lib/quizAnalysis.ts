@@ -577,6 +577,8 @@ export function getModeLabel(mode: QuizMode) {
       return "模擬考模式";
     case "custom_paper":
       return "自訂卷模式";
+    case "peak_challenge":
+      return "巔峰賽";
     default:
       return "測驗";
   }
@@ -825,7 +827,7 @@ export function createQuestionOrder(
   settings: QuizSettings
 ) {
   const customQuestionIds = settings.customQuestionIds ?? [];
-  if (settings.mode === "custom_paper" && customQuestionIds.length > 0) {
+  if ((settings.mode === "custom_paper" || settings.mode === "peak_challenge") && customQuestionIds.length > 0) {
     const questionMap = new Map(questions.map((question) => [question.id, question] as const));
     return customQuestionIds.filter((id) => questionMap.has(id));
   }

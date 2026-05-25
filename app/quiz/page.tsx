@@ -20,6 +20,7 @@ import {
 import {
   loadConfirmedQuestionClassificationOverrides,
   recordCustomPaperAttempt,
+  recordPeakChallengeRun,
   loadSharedQuestionExplanationOverrides,
   pushCompletedSessionToSupabase,
   pushQuestionStatsSnapshotToSupabase
@@ -134,6 +135,8 @@ function createSession(
         ? selectedSubjects[0]
         : normalizedSettings.mode === "custom_paper" && selectedSubjects.length > 0
           ? selectedSubjects[0]
+        : normalizedSettings.mode === "peak_challenge" && selectedSubjects.length > 0
+          ? selectedSubjects[0]
         : (effectiveSettings.subjectFilter && effectiveSettings.subjectFilter !== "全部"
             ? effectiveSettings.subjectFilter
             : "醫學（一）") || "解剖學",
@@ -183,7 +186,11 @@ function selectLocalQuestionSet(
     );
 
     if (mergedCustomQuestions.length > 0) {
-      if (settings.mode === "custom_paper" || selectedSubjects.length === 0) {
+      if (
+        settings.mode === "custom_paper" ||
+        settings.mode === "peak_challenge" ||
+        selectedSubjects.length === 0
+      ) {
         return mergedCustomQuestions;
       }
 
@@ -257,6 +264,10 @@ function isCustomPaperSession(session: QuizSession) {
   return session.settings?.mode === "custom_paper" && Boolean(session.settings?.customPaperCode);
 }
 
+function isPeakChallengeSession(session: QuizSession) {
+  return session.settings?.mode === "peak_challenge";
+}
+
 export default function QuizPage() {
   const router = useRouter();
   const { session: authSession } = useAuth();
@@ -283,6 +294,16 @@ export default function QuizPage() {
       accessToken: authSession?.access_token ?? null,
       visitorId: getOrCreateVisitorId() ?? "",
       paperCode: completedSession.settings?.customPaperCode ?? "",
+      session: completedSession
+    });
+  }
+
+  function syncCompletedPeakChallenge(completedSession: QuizSession) {
+    if (!isPeakChallengeSession(completedSession)) return;
+
+    void recordPeakChallengeRun({
+      accessToken: authSession?.access_token ?? null,
+      visitorId: getOrCreateVisitorId() ?? "",
       session: completedSession
     });
   }
@@ -480,6 +501,46 @@ export default function QuizPage() {
       isReviewingAnswer: session.settings?.feedbackMode === "none" ? false : true
     };
 
+    if (session.settings?.mode === "peak_challenge") {
+      const isLast = currentIndex >= targetCount - 1;
+
+      if (!attempt.isCorrect || isLast) {
+        const completedSession: QuizSession = {
+          ...nextSessionBase,
+          completedAt: new Date().toISOString(),
+          isReviewingAnswer: false
+        };
+        persistSession(completedSession);
+        saveCompletedSession(completedSession);
+        void pushCompletedSessionToSupabase(completedSession);
+        void pushQuestionStatsSnapshotToSupabase(completedSession);
+        syncCompletedPeakChallenge(completedSession);
+        router.push(`/results?sessionId=${encodeURIComponent(completedSession.id)}`);
+        return;
+      }
+
+      const advancedSession: QuizSession = {
+        ...nextSessionBase,
+        currentQuestionIndex: currentIndex + 1,
+        isReviewingAnswer: false
+      };
+      persistSession(advancedSession);
+      void pushQuestionStatsSnapshotToSupabase(advancedSession);
+      resetQuestionUI();
+      window.requestAnimationFrame(() => {
+        const target =
+          typeof window !== "undefined" && window.innerWidth >= 1280
+            ? contentTopRef.current
+            : questionTopRef.current;
+
+        target?.scrollIntoView({
+          behavior: "smooth",
+          block: "start"
+        });
+      });
+      return;
+    }
+
     if (session.settings?.mode === "simulation" && session.settings?.feedbackMode === "none") {
       const isLast = currentIndex >= targetCount - 1;
 
@@ -492,6 +553,7 @@ export default function QuizPage() {
         persistSession(completedSession);
         saveCompletedSession(completedSession);
         void pushCompletedSessionToSupabase(completedSession);
+        void pushQuestionStatsSnapshotToSupabase(completedSession);
         syncCompletedCustomPaper(completedSession);
         router.push(`/results?sessionId=${encodeURIComponent(completedSession.id)}`);
         return;
@@ -756,8 +818,9 @@ export default function QuizPage() {
   const feedbackMode = session.settings?.feedbackMode ?? "full";
   const isBlindSimulation =
     session.settings?.mode === "simulation" && feedbackMode === "none";
-  const shouldShowExplanation = feedbackMode === "full";
-  const shouldShowCorrectAnswer = feedbackMode === "full" || feedbackMode === "answer_only";
+  const isPeakChallenge = session.settings?.mode === "peak_challenge";
+  const shouldShowExplanation = !isPeakChallenge && feedbackMode === "full";
+  const shouldShowCorrectAnswer = !isPeakChallenge && (feedbackMode === "full" || feedbackMode === "answer_only");
   const currentExplanationOverride = explanationOverrides[currentQuestion.id];
   const currentExplanationLoading = explanationLoadingMap[currentQuestion.id];
   const currentExplanationError = explanationErrorMap[currentQuestion.id];
@@ -829,9 +892,9 @@ export default function QuizPage() {
               <div className="rounded-[2rem] bg-white p-4 shadow-card ring-1 ring-slate-100 sm:p-5">
                 <div className="grid gap-3 sm:grid-cols-3">
                   <p className="rounded-2xl bg-slate-50 px-4 py-3 text-sm text-slate-700">
-                    已答題數 <span className="font-semibold">{answeredCount}</span>
+                    {isPeakChallenge ? "目前分數" : "已答題數"} <span className="font-semibold">{answeredCount}</span>
                   </p>
-                  {!isBlindSimulation ? (
+                  {!isBlindSimulation && !isPeakChallenge ? (
                     <p className="rounded-2xl bg-slate-50 px-4 py-3 text-sm text-slate-700">
                       目前答對數 <span className="font-semibold">{correctCount}</span>
                     </p>
@@ -1005,6 +1068,10 @@ export default function QuizPage() {
                         : "每題看正確與詳解"
                   }
                 </div>
+              ) : isPeakChallenge ? (
+                <div className="flex min-h-12 items-center rounded-2xl bg-rose-50 px-4 py-3 text-sm text-rose-900">
+                  巔峰賽規則：答對 1 題得 1 分，答錯立刻結束；本輪混合考古題與 AI 難題。
+                </div>
               ) : null}
             </div>
           </div>
@@ -1026,12 +1093,12 @@ export default function QuizPage() {
               目前信心 <span className="font-semibold">{getConfidenceLabel(confidence)}</span>
             </p>
             <p className="rounded-2xl bg-slate-50 px-4 py-3 text-sm text-slate-700">
-              已答題數 <span className="font-semibold">{answeredCount}</span>
+              {isPeakChallenge ? "目前分數" : "已答題數"} <span className="font-semibold">{answeredCount}</span>
             </p>
             <p className="rounded-2xl bg-slate-50 px-4 py-3 text-sm text-slate-700">
               本輪模式 <span className="font-semibold">{getModeLabel(session.settings?.mode ?? "weakness")}</span>
             </p>
-            {!isBlindSimulation ? (
+            {!isBlindSimulation && !isPeakChallenge ? (
               <p className="rounded-2xl bg-slate-50 px-4 py-3 text-sm text-slate-700">
                 暫時答對率{" "}
                 <span className="font-semibold">

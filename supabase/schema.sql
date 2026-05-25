@@ -656,6 +656,42 @@ on public.question_classification_overrides
 for select
 using (true);
 
+create table if not exists public.peak_challenge_runs (
+  session_id text primary key,
+  user_id uuid references auth.users (id) on delete set null,
+  user_email text,
+  participant_label text not null,
+  score integer not null default 0,
+  total_answered integer not null default 0,
+  question_ids jsonb not null default '[]'::jsonb,
+  source_breakdown jsonb not null default '{}'::jsonb,
+  completed_at timestamptz not null,
+  created_at timestamptz not null default now()
+);
+
+create index if not exists peak_challenge_runs_completed_at_idx
+on public.peak_challenge_runs (completed_at desc);
+
+create index if not exists peak_challenge_runs_user_email_idx
+on public.peak_challenge_runs (user_email);
+
+grant select
+  on public.peak_challenge_runs
+  to anon;
+
+grant select, insert, update, delete
+  on public.peak_challenge_runs
+  to service_role;
+
+alter table public.peak_challenge_runs enable row level security;
+
+drop policy if exists "Anyone can read peak challenge runs" on public.peak_challenge_runs;
+
+create policy "Anyone can read peak challenge runs"
+on public.peak_challenge_runs
+for select
+using (true);
+
 create table if not exists public.ai_account_bans (
   user_email text primary key,
   banned_until timestamptz not null,

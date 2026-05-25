@@ -10,9 +10,12 @@ import type {
   OwnerExplanationUsageEntry,
   OwnerHourlyPoint,
   OwnerTopAttemptVisitorEntry,
+  PeakChallengeLeaderboardEntry,
   QuestionClassificationOverride,
   QuestionExplanationOverride,
   QuestionCommunityStats,
+  QuestionSourceType,
+  SubjectName,
   QuizSession,
   VisitorStats
 } from "@/types/quiz";
@@ -1604,4 +1607,96 @@ export async function updateCustomPaperMetadata(
   }
 
   return payload.paper;
+}
+
+type PeakChallengeCandidateInput = {
+  questionId: string;
+  subject: SubjectName;
+  chapter: string;
+  section: string;
+  stem: string;
+  testedConcept?: string;
+  riskScore?: number;
+  wrongCount?: number;
+  lowConfidenceCount?: number;
+  sourceType?: QuestionSourceType;
+};
+
+export async function loadPeakChallengeLeaderboard(): Promise<PeakChallengeLeaderboardEntry[]> {
+  const response = await fetch("/api/peak-challenge");
+  const rawText = await response.text();
+  const payload = tryParseJson<
+    | { ok?: boolean; message?: string; leaderboard?: PeakChallengeLeaderboardEntry[] }
+  >(rawText);
+
+  if (!response.ok || !payload?.ok || !payload.leaderboard) {
+    throw new Error(payload?.message || rawText || "巔峰賽榜單載入失敗");
+  }
+
+  return payload.leaderboard;
+}
+
+export async function generatePeakChallengeSession(input: {
+  accessToken?: string | null;
+  visitorId?: string;
+  wrongPoolCandidates: PeakChallengeCandidateInput[];
+  doneQuestionIds: string[];
+}) {
+  const response = await fetch("/api/peak-challenge", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+      action: "generate",
+      ...input
+    })
+  });
+
+  const rawText = await response.text();
+  const payload = tryParseJson<
+    | {
+        ok?: boolean;
+        message?: string;
+        sessionTitle?: string;
+        questionIds?: string[];
+        questions?: CustomPaperDetail["questions"];
+        sourceBreakdown?: { pastExam?: number; aiGenerated?: number };
+      }
+  >(rawText);
+
+  if (!response.ok || !payload?.ok || !payload.questionIds || !payload.questions) {
+    throw new Error(payload?.message || rawText || "巔峰賽題目產生失敗");
+  }
+
+  return {
+    sessionTitle: payload.sessionTitle ?? "巔峰賽",
+    questionIds: payload.questionIds,
+    questions: payload.questions,
+    sourceBreakdown: payload.sourceBreakdown ?? {}
+  };
+}
+
+export async function recordPeakChallengeRun(input: {
+  accessToken?: string | null;
+  visitorId?: string;
+  session: QuizSession;
+}) {
+  const response = await fetch("/api/peak-challenge", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+      action: "submit",
+      ...input
+    })
+  });
+
+  const rawText = await response.text();
+  const payload = tryParseJson<{ ok?: boolean; message?: string }>(rawText);
+
+  if (!response.ok || !payload?.ok) {
+    throw new Error(payload?.message || rawText || "巔峰賽成績同步失敗");
+  }
 }

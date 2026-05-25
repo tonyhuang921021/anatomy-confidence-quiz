@@ -40,6 +40,12 @@ export default function HomePage() {
                 開始模擬考
               </Link>
               <Link
+                href="/peak"
+                className="min-h-12 rounded-2xl bg-rose-100 px-5 py-4 text-center text-sm font-semibold text-rose-950 transition hover:bg-rose-200 active:scale-[0.99]"
+              >
+                巔峰賽模式
+              </Link>
+              <Link
                 href="/results"
                 className="min-h-12 rounded-2xl bg-slate-100 px-5 py-4 text-center text-sm font-semibold text-slate-800 transition hover:bg-slate-200 active:scale-[0.99]"
               >
