@@ -24,7 +24,7 @@ export default function PeakReviewPage() {
       new Map([...baseQuestions, ...sessionQuestions].map((question) => [question.id, question] as const)).values()
     );
     setReviewBank(mergedQuestions);
-    setPeakItems(getReviewQuestionItems(mergedQuestions, peakSessions, 80));
+    setPeakItems(getReviewQuestionItems(mergedQuestions, peakSessions, Number.MAX_SAFE_INTEGER));
   }, [baseQuestions]);
 
   function handleStartPeakReview() {

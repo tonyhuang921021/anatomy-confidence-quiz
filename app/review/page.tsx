@@ -32,7 +32,7 @@ export default function ReviewPage() {
         session.settings?.customPoolLabel !== "自訂卷錯題庫" &&
         session.settings?.customPoolLabel !== "巔峰賽錯題庫"
     );
-    setPracticeItems(getReviewQuestionItems(allQuestions, practiceSessions, 60));
+    setPracticeItems(getReviewQuestionItems(allQuestions, practiceSessions, Number.MAX_SAFE_INTEGER));
   }, [syncVersion]);
 
   useEffect(() => {
