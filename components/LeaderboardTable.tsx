@@ -53,9 +53,9 @@ export function LeaderboardTable({ entries, currentUserId, sortMode }: Leaderboa
               key={entry.userId}
               className={`relative overflow-hidden rounded-3xl border p-5 ${
                 isChampion
-                  ? "border-amber-300 bg-[radial-gradient(circle_at_top_right,_rgba(251,191,36,0.18),_rgba(255,251,235,0.92)_45%,_rgba(255,255,255,1)_80%)] shadow-[0_18px_45px_rgba(245,158,11,0.12)]"
+                  ? "podium-champion border-amber-300 shadow-[0_18px_45px_rgba(245,158,11,0.12)]"
                   : index < 3
-                  ? "border-amber-200 bg-amber-50/70"
+                  ? "podium-top border-amber-200"
                   : isCurrentUser
                     ? "border-brand-200 bg-brand-50/70"
                     : "border-slate-200 bg-slate-50"
@@ -67,7 +67,7 @@ export function LeaderboardTable({ entries, currentUserId, sortMode }: Leaderboa
                     <span
                       className={`rounded-full px-3 py-1 text-xs font-semibold ring-1 ${
                         isChampion
-                          ? "bg-amber-100 text-amber-950 ring-amber-300"
+                          ? "podium-badge-champion bg-amber-100 text-amber-950 ring-amber-300"
                           : "bg-white text-slate-700 ring-slate-200"
                       }`}
                     >
