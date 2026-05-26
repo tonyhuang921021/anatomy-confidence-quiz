@@ -12,6 +12,7 @@ const QUIZ_SETTINGS_KEY = "anatomy-confidence-quiz-settings";
 const QUESTION_EXPLANATION_OVERRIDES_KEY = "anatomy-confidence-question-explanation-overrides";
 const PEAK_CHALLENGE_PRELOAD_KEY = "anatomy-confidence-peak-challenge-preload";
 const HOME_TONE_MODE_KEY = "anatomy-confidence-home-tone-mode";
+const THEME_MODE_KEY = "anatomy-confidence-theme-mode";
 const ACTIVE_USER_KEY = "anatomy-confidence-active-user-id";
 const GUEST_USER_ID = "guest";
 
@@ -277,6 +278,7 @@ export type PeakChallengePreload = {
 };
 
 export type HomeToneMode = "calm" | "anxious";
+export type ThemeMode = "light" | "dark";
 
 export function savePeakChallengePreload(preload: PeakChallengePreload) {
   if (!isBrowser()) return;
@@ -310,6 +312,18 @@ export function loadHomeToneMode(): HomeToneMode {
   if (!isBrowser()) return "calm";
   const raw = getLegacyOrScopedRaw(HOME_TONE_MODE_KEY);
   return raw === "anxious" ? "anxious" : "calm";
+}
+
+export function saveThemeMode(mode: ThemeMode) {
+  if (!isBrowser()) return;
+  window.localStorage.setItem(getScopedKey(THEME_MODE_KEY), mode);
+  window.dispatchEvent(new CustomEvent("theme-mode-change", { detail: mode }));
+}
+
+export function loadThemeMode(): ThemeMode {
+  if (!isBrowser()) return "light";
+  const raw = getLegacyOrScopedRaw(THEME_MODE_KEY);
+  return raw === "dark" ? "dark" : "light";
 }
 
 export function applyQuestionExplanationOverride(question: Question): Question {

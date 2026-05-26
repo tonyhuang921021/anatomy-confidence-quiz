@@ -8,7 +8,7 @@ export function UserStatusBar() {
   const { configured, loading, user, syncStatus } = useAuth();
 
   return (
-    <div className="sticky top-0 z-50 border-b border-[rgba(16,42,34,0.08)] bg-[rgba(250,248,243,0.84)] backdrop-blur-xl">
+    <div className="topbar-shell sticky top-0 z-50 backdrop-blur-xl">
       <div className="shell flex min-w-0 items-center justify-between gap-3 py-2.5">
         <Link
           href="/"
@@ -25,7 +25,7 @@ export function UserStatusBar() {
             </span>
           ) : null}
           {configured && user ? (
-            <span className="rounded-full bg-emerald-50 px-3 py-1 text-emerald-800 ring-1 ring-emerald-100">
+            <span className="rounded-full bg-emerald-50 px-3 py-1 text-emerald-800 ring-1 ring-emerald-100 dark-success-chip">
               {syncStatus}
             </span>
           ) : null}

@@ -15,6 +15,29 @@
   --brand-deep: #1f5840;
   --brand-tint: #dfece5;
   --accent-warm: #b9814f;
+  --topbar-bg: rgba(250, 248, 243, 0.84);
+  --topbar-border: rgba(16, 42, 34, 0.08);
+  --selection-bg: rgba(63, 155, 115, 0.18);
+  --grid-line: rgba(16, 42, 34, 0.03);
+}
+
+html[data-theme="dark"] {
+  color-scheme: dark;
+  --bg-base: #0e1618;
+  --bg-wash: #101b1d;
+  --ink-main: #ecf4ef;
+  --ink-soft: #9fb0a9;
+  --line-soft: rgba(236, 244, 239, 0.12);
+  --surface: rgba(16, 26, 29, 0.88);
+  --surface-muted: rgba(16, 26, 29, 0.68);
+  --brand-main: #74c79e;
+  --brand-deep: #3d8f68;
+  --brand-tint: rgba(116, 199, 158, 0.12);
+  --accent-warm: #d49a62;
+  --topbar-bg: rgba(10, 16, 18, 0.84);
+  --topbar-border: rgba(236, 244, 239, 0.1);
+  --selection-bg: rgba(116, 199, 158, 0.24);
+  --grid-line: rgba(236, 244, 239, 0.035);
 }
 
 * {
@@ -32,9 +55,9 @@ body {
   max-width: 100%;
   overflow-x: hidden;
   background:
-    radial-gradient(circle at 12% 0%, rgba(185, 129, 79, 0.12), transparent 28%),
-    radial-gradient(circle at 100% 8%, rgba(63, 155, 115, 0.12), transparent 24%),
-    linear-gradient(180deg, var(--bg-base) 0%, #f8f7f2 42%, var(--bg-wash) 100%);
+    radial-gradient(circle at 12% 0%, color-mix(in srgb, var(--accent-warm) 16%, transparent), transparent 28%),
+    radial-gradient(circle at 100% 8%, color-mix(in srgb, var(--brand-main) 16%, transparent), transparent 24%),
+    linear-gradient(180deg, var(--bg-base) 0%, color-mix(in srgb, var(--bg-base) 72%, white 28%) 42%, var(--bg-wash) 100%);
   color: var(--ink-main);
   font-family: "Noto Sans TC", "Segoe UI", sans-serif;
   position: relative;
@@ -46,8 +69,8 @@ body::before {
   inset: 0;
   pointer-events: none;
   background-image:
-    linear-gradient(to right, rgba(16, 42, 34, 0.03) 1px, transparent 1px),
-    linear-gradient(to bottom, rgba(16, 42, 34, 0.03) 1px, transparent 1px);
+    linear-gradient(to right, var(--grid-line) 1px, transparent 1px),
+    linear-gradient(to bottom, var(--grid-line) 1px, transparent 1px);
   background-size: 32px 32px;
   mask-image: linear-gradient(180deg, rgba(0, 0, 0, 0.14), transparent 60%);
 }
@@ -79,7 +102,7 @@ select {
 }
 
 ::selection {
-  background: rgba(63, 155, 115, 0.18);
+  background: var(--selection-bg);
   color: var(--ink-main);
 }
 
@@ -133,4 +156,56 @@ select {
     color: var(--ink-soft);
     border: 1px solid var(--line-soft);
   }
+
+  .topbar-shell {
+    border-bottom: 1px solid var(--topbar-border);
+    background: var(--topbar-bg);
+  }
+}
+
+html[data-theme="dark"] .stat-chip,
+html[data-theme="dark"] .secondary-pill,
+html[data-theme="dark"] .surface-card input,
+html[data-theme="dark"] .surface-card textarea,
+html[data-theme="dark"] .surface-card select {
+  background: rgba(22, 34, 38, 0.88);
+  color: var(--ink-main);
+  border-color: var(--line-soft);
+}
+
+html[data-theme="dark"] .secondary-pill:hover {
+  background: rgba(28, 42, 46, 0.96);
+}
+
+html[data-theme="dark"] .dark-success-chip {
+  background: rgba(15, 62, 43, 0.86);
+  color: #cdf6de;
+  --tw-ring-color: rgba(116, 199, 158, 0.22);
+}
+
+html[data-theme="dark"] .text-slate-900,
+html[data-theme="dark"] .text-slate-800,
+html[data-theme="dark"] .text-slate-700,
+html[data-theme="dark"] .text-slate-600,
+html[data-theme="dark"] .text-slate-500,
+html[data-theme="dark"] .text-slate-400 {
+  color: var(--ink-soft);
+}
+
+html[data-theme="dark"] .text-slate-900,
+html[data-theme="dark"] .text-slate-800,
+html[data-theme="dark"] .text-ink {
+  color: var(--ink-main);
+}
+
+html[data-theme="dark"] .bg-white,
+html[data-theme="dark"] .bg-slate-50,
+html[data-theme="dark"] .bg-slate-100,
+html[data-theme="dark"] .bg-\[rgba\(255\2c 255\2c 255\2c 0\.72\)\] {
+  background-color: rgba(22, 34, 38, 0.88);
+}
+
+html[data-theme="dark"] .border-slate-200,
+html[data-theme="dark"] .border-slate-100 {
+  border-color: var(--line-soft);
 }
