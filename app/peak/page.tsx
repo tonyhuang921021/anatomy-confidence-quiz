@@ -14,7 +14,13 @@ import {
   getReviewQuestionItems,
   getReviewSnapshot
 } from "@/lib/quizAnalysis";
-import { loadCompletedSessions, saveQuizSettings } from "@/lib/storage";
+import {
+  clearPeakChallengePreload,
+  loadCompletedSessions,
+  loadPeakChallengePreload,
+  savePeakChallengePreload,
+  saveQuizSettings
+} from "@/lib/storage";
 import { getOrCreateVisitorId } from "@/lib/visitor";
 import type { PeakChallengeLeaderboardEntry } from "@/types/quiz";
 
@@ -27,7 +33,9 @@ export default function PeakChallengePage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [starting, setStarting] = useState(false);
+  const [preloading, setPreloading] = useState(false);
   const [startError, setStartError] = useState("");
+  const [hasPreparedOpening, setHasPreparedOpening] = useState(false);
   const allQuestions = useMemo(() => getQuestionBankBySubjectFilter("全部"), []);
 
   const { practiceSnapshot, wrongPoolCandidates, peakDoneQuestionIds, practicedSubjects } = useMemo(() => {
@@ -72,6 +80,20 @@ export default function PeakChallengePage() {
   }, [allQuestions, syncVersion]);
 
   const canEnter = practiceSnapshot.total > ENTRY_THRESHOLD;
+  const preloadFingerprint = useMemo(
+    () =>
+      JSON.stringify({
+        subjects: practicedSubjects,
+        done: peakDoneQuestionIds,
+        candidates: wrongPoolCandidates.map((item) => [
+          item.questionId,
+          item.riskScore ?? 0,
+          item.wrongCount ?? 0,
+          item.lowConfidenceCount ?? 0
+        ])
+      }),
+    [peakDoneQuestionIds, practicedSubjects, wrongPoolCandidates]
+  );
 
   useEffect(() => {
     async function fetchLeaderboard() {
@@ -89,6 +111,75 @@ export default function PeakChallengePage() {
     void fetchLeaderboard();
   }, [syncVersion]);
 
+  useEffect(() => {
+    const accessToken = session?.access_token;
+
+    if (!accessToken || !canEnter) {
+      setHasPreparedOpening(false);
+      return;
+    }
+
+    const existingPreload = loadPeakChallengePreload();
+    if (
+      existingPreload &&
+      existingPreload.fingerprint === preloadFingerprint &&
+      existingPreload.questionIds.length > 0 &&
+      existingPreload.questions.length > 0
+    ) {
+      setHasPreparedOpening(true);
+      return;
+    }
+
+    let cancelled = false;
+
+    async function prepareOpeningQuestions() {
+      try {
+        setPreloading(true);
+        const generated = await generatePeakChallengeSession({
+          accessToken,
+          visitorId: getOrCreateVisitorId() ?? "",
+          wrongPoolCandidates,
+          doneQuestionIds: peakDoneQuestionIds,
+          desiredCount: 2,
+          existingSourceBreakdown: { pastExam: 0, aiGenerated: 0 },
+          practicedSubjects,
+          nextQuestionIndex: 0
+        });
+
+        if (cancelled) return;
+
+        savePeakChallengePreload({
+          fingerprint: preloadFingerprint,
+          questionIds: generated.questionIds,
+          questions: generated.questions,
+          sourceBreakdown: generated.sourceBreakdown,
+          preparedAt: new Date().toISOString()
+        });
+        setHasPreparedOpening(true);
+      } catch {
+        if (cancelled) return;
+        setHasPreparedOpening(false);
+      } finally {
+        if (!cancelled) {
+          setPreloading(false);
+        }
+      }
+    }
+
+    void prepareOpeningQuestions();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [
+    canEnter,
+    peakDoneQuestionIds,
+    practicedSubjects,
+    preloadFingerprint,
+    session?.access_token,
+    wrongPoolCandidates
+  ]);
+
   async function handleStartPeakChallenge() {
     if (!session?.access_token) {
       setStartError("請先登入帳號，才能開始巔峰賽。");
@@ -102,16 +193,28 @@ export default function PeakChallengePage() {
     try {
       setStarting(true);
       setStartError("");
-      const generated = await generatePeakChallengeSession({
-        accessToken: session.access_token,
-        visitorId: getOrCreateVisitorId() ?? "",
-        wrongPoolCandidates,
-        doneQuestionIds: peakDoneQuestionIds,
-        desiredCount: 2,
-        existingSourceBreakdown: { pastExam: 0, aiGenerated: 0 },
-        practicedSubjects,
-        nextQuestionIndex: 0
-      });
+      const existingPreload = loadPeakChallengePreload();
+      const generated =
+        existingPreload &&
+        existingPreload.fingerprint === preloadFingerprint &&
+        existingPreload.questionIds.length > 0 &&
+        existingPreload.questions.length > 0
+          ? {
+              questionIds: existingPreload.questionIds,
+              questions: existingPreload.questions,
+              sourceBreakdown: existingPreload.sourceBreakdown,
+              sessionTitle: "巔峰賽"
+            }
+          : await generatePeakChallengeSession({
+              accessToken: session.access_token,
+              visitorId: getOrCreateVisitorId() ?? "",
+              wrongPoolCandidates,
+              doneQuestionIds: peakDoneQuestionIds,
+              desiredCount: 2,
+              existingSourceBreakdown: { pastExam: 0, aiGenerated: 0 },
+              practicedSubjects,
+              nextQuestionIndex: 0
+            });
 
       saveQuizSettings({
         ...DEFAULT_QUIZ_SETTINGS,
@@ -126,6 +229,7 @@ export default function PeakChallengePage() {
         peakWrongPoolCandidates: wrongPoolCandidates,
         peakSourceBreakdown: generated.sourceBreakdown
       });
+      clearPeakChallengePreload();
 
       router.push("/quiz?new=1");
     } catch (generateError) {
@@ -154,7 +258,13 @@ export default function PeakChallengePage() {
               disabled={starting || !canEnter || !session?.access_token}
               className="min-h-12 rounded-2xl bg-rose-600 px-5 py-4 text-sm font-semibold text-white transition hover:bg-rose-700 disabled:cursor-not-allowed disabled:bg-slate-300"
             >
-              {starting ? "巔峰賽生成中..." : "開始巔峰賽"}
+              {starting
+                ? "巔峰賽生成中..."
+                : preloading && !hasPreparedOpening
+                  ? "巔峰賽暖機中..."
+                  : hasPreparedOpening
+                    ? "開始巔峰賽"
+                    : "開始巔峰賽"}
             </button>
             <Link
               href="/peak-review"

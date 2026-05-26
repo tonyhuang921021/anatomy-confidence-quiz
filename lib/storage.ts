@@ -10,6 +10,7 @@ const CURRENT_SESSION_KEY = "anatomy-confidence-current-session";
 const COMPLETED_SESSIONS_KEY = "anatomy-confidence-completed-sessions";
 const QUIZ_SETTINGS_KEY = "anatomy-confidence-quiz-settings";
 const QUESTION_EXPLANATION_OVERRIDES_KEY = "anatomy-confidence-question-explanation-overrides";
+const PEAK_CHALLENGE_PRELOAD_KEY = "anatomy-confidence-peak-challenge-preload";
 const ACTIVE_USER_KEY = "anatomy-confidence-active-user-id";
 const GUEST_USER_ID = "guest";
 
@@ -264,6 +265,36 @@ export function saveQuestionExplanationOverrides(
     )
   };
   window.localStorage.setItem(getScopedKey(QUESTION_EXPLANATION_OVERRIDES_KEY), JSON.stringify(next));
+}
+
+export type PeakChallengePreload = {
+  fingerprint: string;
+  questionIds: string[];
+  questions: Question[];
+  sourceBreakdown: { pastExam?: number; aiGenerated?: number };
+  preparedAt: string;
+};
+
+export function savePeakChallengePreload(preload: PeakChallengePreload) {
+  if (!isBrowser()) return;
+  window.localStorage.setItem(getScopedKey(PEAK_CHALLENGE_PRELOAD_KEY), JSON.stringify(preload));
+}
+
+export function loadPeakChallengePreload(): PeakChallengePreload | null {
+  if (!isBrowser()) return null;
+  const raw = getLegacyOrScopedRaw(PEAK_CHALLENGE_PRELOAD_KEY);
+  if (!raw) return null;
+
+  try {
+    return JSON.parse(raw) as PeakChallengePreload;
+  } catch {
+    return null;
+  }
+}
+
+export function clearPeakChallengePreload() {
+  if (!isBrowser()) return;
+  window.localStorage.removeItem(getScopedKey(PEAK_CHALLENGE_PRELOAD_KEY));
 }
 
 export function applyQuestionExplanationOverride(question: Question): Question {
