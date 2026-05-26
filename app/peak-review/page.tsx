@@ -6,8 +6,7 @@ import { ReviewNotebook } from "@/components/ReviewNotebook";
 import { getQuestionBankBySubjectFilter } from "@/data/med1QuestionBank";
 import {
   DEFAULT_QUIZ_SETTINGS,
-  getReviewQuestionItems,
-  getReviewSnapshot
+  getReviewQuestionItems
 } from "@/lib/quizAnalysis";
 import { loadCompletedSessions, saveQuizSettings } from "@/lib/storage";
 import type { ReviewQuestionItem } from "@/types/quiz";
@@ -41,7 +40,8 @@ export default function PeakReviewPage() {
     });
   }
 
-  const snapshot = getReviewSnapshot(peakItems);
+  const wrongCount = peakItems.filter((item) => item.history.wrong > 0).length;
+  const lowConfidenceCount = peakItems.filter((item) => item.history.lowConfidence > 0).length;
 
   return (
     <main className="shell">
@@ -75,11 +75,11 @@ export default function PeakReviewPage() {
       <section className="mt-8 grid gap-4 lg:grid-cols-2">
         <article className="rounded-3xl bg-rose-50 p-5 text-rose-900">
           <p className="text-sm font-medium">巔峰賽錯題庫</p>
-          <p className="mt-2 text-3xl font-bold">{snapshot.total}</p>
+          <p className="mt-2 text-3xl font-bold">{wrongCount}</p>
         </article>
         <article className="rounded-3xl bg-amber-50 p-5 text-amber-900">
           <p className="text-sm font-medium">巔峰賽低信心題</p>
-          <p className="mt-2 text-3xl font-bold">{snapshot.lowConfidence}</p>
+          <p className="mt-2 text-3xl font-bold">{lowConfidenceCount}</p>
         </article>
       </section>
 
