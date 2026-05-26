@@ -114,18 +114,18 @@ export function FeedbackBoard() {
           <p className="eyebrow">Board</p>
           <h2 className="display-title mt-2 text-3xl">留言板</h2>
         </div>
-        <div className="surface-card-muted px-4 py-3 text-sm text-slate-700">
+        <div className="surface-card-muted px-4 py-3 text-sm body-soft">
           最新 {messages.length} 則
         </div>
       </div>
 
       {!configured ? (
-        <div className="mt-5 rounded-3xl bg-slate-50 p-4 text-sm text-slate-600">
+        <div className="surface-card-muted mt-5 p-4 text-sm body-soft">
           目前尚未設定 Supabase，留言板暫時無法使用。
         </div>
       ) : (
         <>
-          <div className="mt-5 rounded-[1.8rem] bg-[rgba(246,247,244,0.9)] p-4 ring-1 ring-[rgba(16,42,34,0.06)]">
+          <div className="surface-card-muted mt-5 p-4">
             {user ? (
               <div className="mb-4 flex flex-wrap gap-2">
                 <button
@@ -152,7 +152,7 @@ export function FeedbackBoard() {
                 </button>
               </div>
             ) : (
-              <div className="mb-4 rounded-2xl bg-white px-4 py-3 text-sm text-slate-600 ring-1 ring-slate-200">
+              <div className="surface-card-muted mb-4 px-4 py-3 text-sm body-soft">
                 目前未登入，送出後會以匿名顯示。
               </div>
             )}
@@ -186,14 +186,14 @@ export function FeedbackBoard() {
 
           <div className="mt-5 space-y-3">
             {loading ? (
-              <div className="rounded-3xl bg-slate-50 p-4 text-sm text-slate-600">正在載入留言...</div>
+              <div className="surface-card-muted p-4 text-sm body-soft">正在載入留言...</div>
             ) : messages.length === 0 ? (
-              <div className="rounded-3xl bg-slate-50 p-4 text-sm text-slate-600">
+              <div className="surface-card-muted p-4 text-sm body-soft">
                 還沒有留言，你可以成為第一個給建議的人。
               </div>
             ) : (
               messages.map((entry) => (
-                <article key={entry.id} className="rounded-[1.8rem] bg-[rgba(246,247,244,0.95)] p-4 ring-1 ring-[rgba(16,42,34,0.06)]">
+                <article key={entry.id} className="surface-card-muted p-4">
                   <div className="flex items-start justify-between gap-3">
                     <div>
                       <p className="text-sm font-semibold text-ink">

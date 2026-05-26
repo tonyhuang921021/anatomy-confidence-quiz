@@ -102,8 +102,8 @@ export function HomeToneBanner() {
   }, [mode, stats]);
 
   return (
-    <div className="mt-5 rounded-2xl border border-slate-200/80 bg-white/70 px-4 py-3 backdrop-blur-sm">
-      <p className="text-sm leading-7 text-slate-600 sm:text-[15px]">{content.body}</p>
+    <div className="surface-card-muted mt-5 px-4 py-3">
+      <p className="body-soft text-sm leading-7 sm:text-[15px]">{content.body}</p>
     </div>
   );
 }

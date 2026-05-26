@@ -5,6 +5,7 @@
 :root {
   color-scheme: light;
   --bg-base: #f5f2e9;
+  --bg-mid: #f8f7f2;
   --bg-wash: #edf3ee;
   --ink-main: #102a22;
   --ink-soft: #56685f;
@@ -23,21 +24,22 @@
 
 html[data-theme="dark"] {
   color-scheme: dark;
-  --bg-base: #0e1618;
-  --bg-wash: #101b1d;
-  --ink-main: #ecf4ef;
-  --ink-soft: #9fb0a9;
-  --line-soft: rgba(236, 244, 239, 0.12);
-  --surface: rgba(16, 26, 29, 0.88);
-  --surface-muted: rgba(16, 26, 29, 0.68);
-  --brand-main: #74c79e;
-  --brand-deep: #3d8f68;
-  --brand-tint: rgba(116, 199, 158, 0.12);
-  --accent-warm: #d49a62;
-  --topbar-bg: rgba(10, 16, 18, 0.84);
-  --topbar-border: rgba(236, 244, 239, 0.1);
-  --selection-bg: rgba(116, 199, 158, 0.24);
-  --grid-line: rgba(236, 244, 239, 0.035);
+  --bg-base: #0d1117;
+  --bg-mid: #131a25;
+  --bg-wash: #161f2c;
+  --ink-main: #edf2f8;
+  --ink-soft: #a6b0bd;
+  --line-soft: rgba(237, 242, 248, 0.1);
+  --surface: rgba(19, 26, 37, 0.84);
+  --surface-muted: rgba(19, 26, 37, 0.66);
+  --brand-main: #90a8d8;
+  --brand-deep: #677ca6;
+  --brand-tint: rgba(144, 168, 216, 0.12);
+  --accent-warm: #c59a74;
+  --topbar-bg: rgba(10, 14, 22, 0.84);
+  --topbar-border: rgba(237, 242, 248, 0.08);
+  --selection-bg: rgba(144, 168, 216, 0.25);
+  --grid-line: rgba(237, 242, 248, 0.028);
 }
 
 * {
@@ -57,7 +59,7 @@ body {
   background:
     radial-gradient(circle at 12% 0%, color-mix(in srgb, var(--accent-warm) 16%, transparent), transparent 28%),
     radial-gradient(circle at 100% 8%, color-mix(in srgb, var(--brand-main) 16%, transparent), transparent 24%),
-    linear-gradient(180deg, var(--bg-base) 0%, color-mix(in srgb, var(--bg-base) 72%, white 28%) 42%, var(--bg-wash) 100%);
+    linear-gradient(180deg, var(--bg-base) 0%, var(--bg-mid) 42%, var(--bg-wash) 100%);
   color: var(--ink-main);
   font-family: "Noto Sans TC", "Segoe UI", sans-serif;
   position: relative;
@@ -110,11 +112,13 @@ select {
   .surface-card {
     @apply rounded-[2rem] border border-[rgba(16,42,34,0.08)] shadow-card backdrop-blur;
     background: var(--surface);
+    border-color: var(--line-soft);
   }
 
   .surface-card-muted {
     @apply rounded-[1.75rem] border border-[rgba(16,42,34,0.08)] backdrop-blur;
     background: var(--surface-muted);
+    border-color: var(--line-soft);
   }
 
   .eyebrow {
@@ -168,19 +172,23 @@ html[data-theme="dark"] .secondary-pill,
 html[data-theme="dark"] .surface-card input,
 html[data-theme="dark"] .surface-card textarea,
 html[data-theme="dark"] .surface-card select {
-  background: rgba(22, 34, 38, 0.88);
+  background: rgba(27, 36, 52, 0.88);
   color: var(--ink-main);
   border-color: var(--line-soft);
 }
 
 html[data-theme="dark"] .secondary-pill:hover {
-  background: rgba(28, 42, 46, 0.96);
+  background: rgba(35, 46, 66, 0.96);
 }
 
 html[data-theme="dark"] .dark-success-chip {
-  background: rgba(15, 62, 43, 0.86);
-  color: #cdf6de;
-  --tw-ring-color: rgba(116, 199, 158, 0.22);
+  background: rgba(39, 51, 78, 0.92);
+  color: #dfe8f9;
+  --tw-ring-color: rgba(144, 168, 216, 0.18);
+}
+
+html[data-theme="dark"] .primary-pill {
+  box-shadow: 0 18px 40px rgba(8, 12, 20, 0.3);
 }
 
 html[data-theme="dark"] .text-slate-900,
@@ -202,10 +210,67 @@ html[data-theme="dark"] .bg-white,
 html[data-theme="dark"] .bg-slate-50,
 html[data-theme="dark"] .bg-slate-100,
 html[data-theme="dark"] .bg-\[rgba\(255\2c 255\2c 255\2c 0\.72\)\] {
-  background-color: rgba(22, 34, 38, 0.88);
+  background-color: rgba(27, 36, 52, 0.88);
 }
 
 html[data-theme="dark"] .border-slate-200,
 html[data-theme="dark"] .border-slate-100 {
+  border-color: var(--line-soft);
+}
+
+html[data-theme="dark"] .bg-emerald-50,
+html[data-theme="dark"] .bg-rose-50,
+html[data-theme="dark"] .bg-amber-50,
+html[data-theme="dark"] .bg-emerald-100,
+html[data-theme="dark"] .bg-rose-100,
+html[data-theme="dark"] .bg-amber-100,
+html[data-theme="dark"] .bg-sky-50,
+html[data-theme="dark"] .bg-brand-50,
+html[data-theme="dark"] .bg-white\/70,
+html[data-theme="dark"] .bg-white\/80 {
+  background-color: rgba(27, 36, 52, 0.92);
+}
+
+html[data-theme="dark"] .text-emerald-900,
+html[data-theme="dark"] .text-emerald-950,
+html[data-theme="dark"] .text-rose-900,
+html[data-theme="dark"] .text-rose-950,
+html[data-theme="dark"] .text-amber-900,
+html[data-theme="dark"] .text-emerald-800,
+html[data-theme="dark"] .text-rose-800,
+html[data-theme="dark"] .text-amber-800,
+html[data-theme="dark"] .text-emerald-700 {
+  color: var(--ink-main);
+}
+
+html[data-theme="dark"] .bg-slate-900,
+html[data-theme="dark"] .bg-slate-800 {
+  background-color: rgba(27, 36, 52, 0.96);
+}
+
+html[data-theme="dark"] .hover\:bg-slate-50:hover,
+html[data-theme="dark"] .hover\:bg-slate-100:hover,
+html[data-theme="dark"] .hover\:bg-slate-200:hover,
+html[data-theme="dark"] .hover\:bg-slate-800:hover,
+html[data-theme="dark"] .hover\:bg-slate-900:hover {
+  background-color: rgba(35, 46, 66, 0.96);
+}
+
+html[data-theme="dark"] .ring-slate-200,
+html[data-theme="dark"] .ring-slate-100,
+html[data-theme="dark"] .ring-emerald-100,
+html[data-theme="dark"] .ring-emerald-200,
+html[data-theme="dark"] .ring-amber-200,
+html[data-theme="dark"] .ring-rose-200,
+html[data-theme="dark"] .ring-rose-300 {
+  --tw-ring-color: rgba(237, 242, 248, 0.08);
+}
+
+html[data-theme="dark"] .border-amber-200,
+html[data-theme="dark"] .border-amber-400,
+html[data-theme="dark"] .border-rose-200,
+html[data-theme="dark"] .border-sky-200,
+html[data-theme="dark"] .hover\:border-amber-200:hover,
+html[data-theme="dark"] .hover\:border-sky-200:hover {
   border-color: var(--line-soft);
 }

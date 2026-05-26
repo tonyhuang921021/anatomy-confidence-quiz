@@ -50,21 +50,21 @@ export function ExamCountdown() {
   const countdown = useMemo(() => getCountdownParts(now), [now]);
 
   return (
-    <div className="rounded-3xl bg-amber-50 p-4 ring-1 ring-amber-200">
+    <div className="surface-card-muted p-4">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
-          <p className="text-sm font-semibold uppercase tracking-[0.16em] text-amber-800">Exam Countdown</p>
-          <p className="mt-2 text-sm text-slate-600">國考時間：7/17 早上 8:40</p>
+          <p className="eyebrow text-sm tracking-[0.16em]">Exam Countdown</p>
+          <p className="body-soft mt-2 text-sm">國考時間：7/17 早上 8:40</p>
         </div>
         {countdown.isPast ? (
-          <span className="rounded-full bg-emerald-100 px-3 py-2 text-sm font-semibold text-emerald-900">
+          <span className="stat-chip px-3 py-2 text-sm">
             國考時間已到
           </span>
         ) : (
-          <div className="flex flex-wrap items-center gap-2 text-sm font-semibold text-amber-950">
-            <span className="rounded-2xl bg-white px-3 py-2 ring-1 ring-amber-200">{countdown.days} 天</span>
-            <span className="rounded-2xl bg-white px-3 py-2 ring-1 ring-amber-200">{countdown.hours} 小時</span>
-            <span className="rounded-2xl bg-white px-3 py-2 ring-1 ring-amber-200">{countdown.minutes} 分鐘</span>
+          <div className="flex flex-wrap items-center gap-2 text-sm font-semibold text-ink">
+            <span className="stat-chip px-3 py-2 text-sm">{countdown.days} 天</span>
+            <span className="stat-chip px-3 py-2 text-sm">{countdown.hours} 小時</span>
+            <span className="stat-chip px-3 py-2 text-sm">{countdown.minutes} 分鐘</span>
           </div>
         )}
       </div>
