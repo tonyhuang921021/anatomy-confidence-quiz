@@ -89,7 +89,7 @@ export function HomeToneBanner() {
       .filter((item): item is { date: string; attempts: number; correctRate: number } => Boolean(item))
       .map((item, index, arr) => {
         const offsetFromEnd = arr.length - 1 - index;
-        return `${formatDateLabel(item.date, offsetFromEnd)} ${item.attempts} 題，正確率 ${item.correctRate}%`;
+        return `${formatDateLabel(item.date, offsetFromEnd)}大家 ${item.attempts} 題，正確率 ${item.correctRate}%`;
       });
 
     return {
