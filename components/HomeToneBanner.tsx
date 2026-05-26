@@ -22,10 +22,10 @@ function getCalmLine() {
 }
 
 function getAnxiousEncouragement(todayAttempts: number) {
-  if (todayAttempts >= 400) return "今天已經很多人在往前推了，你也不是一個人在撐。";
-  if (todayAttempts >= 200) return "今天整體節奏很快，但穩定把自己的弱點抓出來就夠了。";
-  if (todayAttempts > 0) return "今天大家也在慢慢堆進度，你現在開始也完全來得及。";
-  return "今天還很安靜，現在開始刷，這波節奏就由你帶起來。";
+  if (todayAttempts >= 400) return "別人今天已經推了這麼多題，你如果還在拖，差距只會繼續拉開。";
+  if (todayAttempts >= 200) return "節奏已經起來了，現在還不跟上，等到考前只會更慌。";
+  if (todayAttempts > 0) return "大家都已經開始累積，你再慢一步，弱點就多留一天。";
+  return "現在還沒什麼人開跑，正好輪到你先把今天的進度頂上去。";
 }
 
 function formatDateLabel(date: string, offsetFromEnd: number) {
