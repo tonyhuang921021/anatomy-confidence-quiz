@@ -107,7 +107,7 @@ export default function PeakChallengePage() {
         visitorId: getOrCreateVisitorId() ?? "",
         wrongPoolCandidates,
         doneQuestionIds: peakDoneQuestionIds,
-        desiredCount: 1,
+        desiredCount: 2,
         existingSourceBreakdown: { pastExam: 0, aiGenerated: 0 },
         practicedSubjects,
         nextQuestionIndex: 0
