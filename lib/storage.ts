@@ -11,6 +11,7 @@ const COMPLETED_SESSIONS_KEY = "anatomy-confidence-completed-sessions";
 const QUIZ_SETTINGS_KEY = "anatomy-confidence-quiz-settings";
 const QUESTION_EXPLANATION_OVERRIDES_KEY = "anatomy-confidence-question-explanation-overrides";
 const PEAK_CHALLENGE_PRELOAD_KEY = "anatomy-confidence-peak-challenge-preload";
+const HOME_TONE_MODE_KEY = "anatomy-confidence-home-tone-mode";
 const ACTIVE_USER_KEY = "anatomy-confidence-active-user-id";
 const GUEST_USER_ID = "guest";
 
@@ -275,6 +276,8 @@ export type PeakChallengePreload = {
   preparedAt: string;
 };
 
+export type HomeToneMode = "calm" | "anxious";
+
 export function savePeakChallengePreload(preload: PeakChallengePreload) {
   if (!isBrowser()) return;
   window.localStorage.setItem(getScopedKey(PEAK_CHALLENGE_PRELOAD_KEY), JSON.stringify(preload));
@@ -295,6 +298,18 @@ export function loadPeakChallengePreload(): PeakChallengePreload | null {
 export function clearPeakChallengePreload() {
   if (!isBrowser()) return;
   window.localStorage.removeItem(getScopedKey(PEAK_CHALLENGE_PRELOAD_KEY));
+}
+
+export function saveHomeToneMode(mode: HomeToneMode) {
+  if (!isBrowser()) return;
+  window.localStorage.setItem(getScopedKey(HOME_TONE_MODE_KEY), mode);
+  window.dispatchEvent(new CustomEvent("home-tone-mode-change", { detail: mode }));
+}
+
+export function loadHomeToneMode(): HomeToneMode {
+  if (!isBrowser()) return "calm";
+  const raw = getLegacyOrScopedRaw(HOME_TONE_MODE_KEY);
+  return raw === "anxious" ? "anxious" : "calm";
 }
 
 export function applyQuestionExplanationOverride(question: Question): Question {

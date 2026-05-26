@@ -2,15 +2,9 @@ import Link from "next/link";
 import { AuthPanel } from "@/components/AuthPanel";
 import { ExamCountdown } from "@/components/ExamCountdown";
 import { FeedbackBoard } from "@/components/FeedbackBoard";
-import { subjectRegistry } from "@/data/subjectRegistry";
+import { HomeToneBanner } from "@/components/HomeToneBanner";
 
 export default function HomePage() {
-  const totalQuestionCount = new Set(
-    Object.values(subjectRegistry)
-      .filter((subject) => subject.subject !== "醫學（一）" && subject.subject !== "醫學（二）")
-      .flatMap((subject) => subject.questions.map((question) => question.id))
-  ).size;
-
   return (
     <main className="shell">
       <section className="surface-card overflow-hidden p-6 sm:p-8 lg:p-10">
@@ -27,6 +21,7 @@ export default function HomePage() {
             <p className="body-soft mt-5 max-w-2xl text-sm leading-7 sm:text-base">
               用答題結果、信心程度與完成度，找出你的一階醫師國考弱點。
             </p>
+            <HomeToneBanner />
 
             <div className="mt-7 flex flex-wrap gap-3">
               <Link href="/start" className="primary-pill">

@@ -117,6 +117,12 @@ type AIExplanationUsageLogRow = {
   used_at: string;
 };
 
+export type CommunityRecentAttemptPoint = {
+  date: string;
+  attempts: number;
+  correctRate: number;
+};
+
 const AI_SEARCH_USAGE_PREFIX = "AI_SEARCH:";
 
 type FeedbackMessageRow = {
@@ -1384,6 +1390,41 @@ export async function loadOwnerHourlySeries(): Promise<OwnerHourlyPoint[]> {
     attempts: hourAttemptMap.get(hour) ?? 0,
     devices: hourDeviceMap.get(hour)?.size ?? 0
   }));
+}
+
+export async function loadRecentCommunityAttemptStats(days = 2): Promise<CommunityRecentAttemptPoint[]> {
+  if (!isSupabaseConfigured()) {
+    return [];
+  }
+
+  const dayKeys = getRecentTaipeiDayKeys(days);
+  const startDate = dayKeys[0];
+  const data = await fetchAllQuestionAttemptLogs<{ answered_at: string; is_correct: boolean }>(
+    "answered_at, is_correct",
+    (query) => query.gte("answered_at", `${startDate}T00:00:00+08:00`)
+  );
+
+  const grouped = new Map<string, { attempts: number; correct: number }>();
+  dayKeys.forEach((key) => grouped.set(key, { attempts: 0, correct: 0 }));
+
+  for (const row of data ?? []) {
+    const key = getTaipeiDayKey(new Date(row.answered_at));
+    if (!dayKeys.includes(key)) continue;
+    const current = grouped.get(key) ?? { attempts: 0, correct: 0 };
+    current.attempts += 1;
+    current.correct += row.is_correct ? 1 : 0;
+    grouped.set(key, current);
+  }
+
+  return dayKeys.map((date) => {
+    const current = grouped.get(date) ?? { attempts: 0, correct: 0 };
+    return {
+      date,
+      attempts: current.attempts,
+      correctRate:
+        current.attempts === 0 ? 0 : Number(((current.correct / current.attempts) * 100).toFixed(1))
+    };
+  });
 }
 
 function formatVisitorLabel(visitorId?: string | null) {
