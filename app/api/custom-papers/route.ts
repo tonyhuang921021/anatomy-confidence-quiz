@@ -285,6 +285,21 @@ function normalizeJsonLikeInput(raw: string) {
     .trim();
 }
 
+function safeJsonParse<T>(raw: string): T | null {
+  try {
+    return JSON.parse(raw) as T;
+  } catch {
+    return null;
+  }
+}
+
+function extractJsonObjectCandidate(raw: string) {
+  const start = raw.indexOf("{");
+  const end = raw.lastIndexOf("}");
+  if (start === -1 || end === -1 || end <= start) return null;
+  return raw.slice(start, end + 1);
+}
+
 function normalizeSearchText(text: string) {
   return text.toLowerCase().trim();
 }
@@ -350,13 +365,61 @@ function buildAISearchExpansionPrompt(query: string, selectedSubjects: SubjectNa
   ].join("\n");
 }
 
-function parseAISearchPlan(raw: string): AISearchPlan {
-  const cleaned = stripJsonCodeFence(raw);
-  const parsed = JSON.parse(cleaned) as AISearchPlan;
+function coerceAISearchPlan(value: unknown): AISearchPlan | null {
+  if (!value || typeof value !== "object") return null;
+  const record = value as Record<string, unknown>;
+  const searchTerms = Array.isArray(record.searchTerms)
+    ? record.searchTerms
+    : Array.isArray(record.keywords)
+      ? record.keywords
+      : [];
+  const relatedConcepts = Array.isArray(record.relatedConcepts)
+    ? record.relatedConcepts
+    : Array.isArray(record.related)
+      ? record.related
+      : [];
+
   return {
-    title: parsed.title?.trim(),
-    searchTerms: (parsed.searchTerms ?? []).map((item) => item.trim()).filter(Boolean),
-    relatedConcepts: (parsed.relatedConcepts ?? []).map((item) => item.trim()).filter(Boolean)
+    title: typeof record.title === "string" ? record.title.trim() : "",
+    searchTerms: searchTerms
+      .map((item) => (typeof item === "string" ? item.trim() : ""))
+      .filter(Boolean),
+    relatedConcepts: relatedConcepts
+      .map((item) => (typeof item === "string" ? item.trim() : ""))
+      .filter(Boolean)
+  };
+}
+
+function parseAISearchPlan(raw: string): AISearchPlan {
+  const cleaned = normalizeJsonLikeInput(stripJsonCodeFence(raw));
+  const candidates = [cleaned];
+  const objectCandidate = extractJsonObjectCandidate(cleaned);
+  if (objectCandidate) candidates.unshift(objectCandidate);
+
+  for (const candidate of candidates) {
+    const parsed = safeJsonParse<unknown>(candidate);
+    const normalized = coerceAISearchPlan(parsed);
+    if (normalized) {
+      return normalized;
+    }
+  }
+
+  const titleMatch = cleaned.match(/(?:^|\n)\s*(?:title|標題)\s*["']?\s*[:：]\s*["']?([^\n"'}]+?)["']?(?=\n|$)/i);
+  const searchTermsMatch = cleaned.match(/(?:searchTerms|keywords|關鍵詞)\s*["']?\s*[:：]\s*\[?([^\]\n]+)\]?/i);
+  const relatedConceptsMatch = cleaned.match(/(?:relatedConcepts|related|延伸概念)\s*["']?\s*[:：]\s*\[?([^\]\n]+)\]?/i);
+
+  return {
+    title: titleMatch?.[1]?.trim() ?? "",
+    searchTerms:
+      searchTermsMatch?.[1]
+        ?.split(/[、,，]/)
+        .map((item) => item.replace(/^["'\s]+|["'\s]+$/g, "").trim())
+        .filter(Boolean) ?? [],
+    relatedConcepts:
+      relatedConceptsMatch?.[1]
+        ?.split(/[、,，]/)
+        .map((item) => item.replace(/^["'\s]+|["'\s]+$/g, "").trim())
+        .filter(Boolean) ?? []
   };
 }
 
@@ -437,12 +500,52 @@ function buildAIRerankPrompt(query: string, plan: AISearchPlan, candidates: Ques
   ].join("\n");
 }
 
-function parseRelevantIds(raw: string) {
-  const cleaned = stripJsonCodeFence(raw);
-  const parsed = JSON.parse(cleaned) as { relevantIds?: string[]; reason?: string };
+function coerceRelevantIdsPayload(value: unknown) {
+  if (!value || typeof value !== "object") return null;
+  const record = value as Record<string, unknown>;
+  const relevantIds = Array.isArray(record.relevantIds)
+    ? record.relevantIds
+    : Array.isArray(record.ids)
+      ? record.ids
+      : [];
+
   return {
-    relevantIds: (parsed.relevantIds ?? []).map((item) => item.trim()).filter(Boolean),
-    reason: parsed.reason?.trim()
+    relevantIds: relevantIds
+      .map((item) => (typeof item === "string" ? item.trim() : ""))
+      .filter(Boolean),
+    reason:
+      typeof record.reason === "string"
+        ? record.reason.trim()
+        : typeof record.rationale === "string"
+          ? record.rationale.trim()
+          : ""
+  };
+}
+
+function parseRelevantIds(raw: string) {
+  const cleaned = normalizeJsonLikeInput(stripJsonCodeFence(raw));
+  const candidates = [cleaned];
+  const objectCandidate = extractJsonObjectCandidate(cleaned);
+  if (objectCandidate) candidates.unshift(objectCandidate);
+
+  for (const candidate of candidates) {
+    const parsed = safeJsonParse<unknown>(candidate);
+    const normalized = coerceRelevantIdsPayload(parsed);
+    if (normalized) {
+      return normalized;
+    }
+  }
+
+  const idsMatch = cleaned.match(/(?:relevantIds|ids)\s*["']?\s*[:：]\s*\[?([^\]\n]+)\]?/i);
+  const reasonMatch = cleaned.match(/(?:reason|rationale|理由)\s*["']?\s*[:：]\s*["']?([\s\S]+?)["']?(?=\n\s*[A-Za-z\u4e00-\u9fff_]+\s*[:：]|\s*$)/i);
+
+  return {
+    relevantIds:
+      idsMatch?.[1]
+        ?.split(/[、,，]/)
+        .map((item) => item.replace(/^["'\s]+|["'\s]+$/g, "").trim())
+        .filter(Boolean) ?? [],
+    reason: reasonMatch?.[1]?.trim() ?? ""
   };
 }
 
