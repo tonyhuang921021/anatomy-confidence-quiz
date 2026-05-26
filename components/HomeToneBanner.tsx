@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { loadRecentCommunityAttemptStats } from "@/lib/cloudSync";
 import { loadHomeToneMode, type HomeToneMode } from "@/lib/storage";
 
 const CALM_LINES = [
@@ -57,9 +56,15 @@ export function HomeToneBanner() {
     if (mode !== "anxious") return;
 
     let cancelled = false;
-    void loadRecentCommunityAttemptStats(2)
-      .then((rows) => {
-        if (!cancelled) setStats(rows);
+    void fetch("/api/community-stats")
+      .then(async (response) => {
+        const payload = (await response.json().catch(() => null)) as
+          | { ok?: boolean; points?: { date: string; attempts: number; correctRate: number }[] }
+          | null;
+        if (!response.ok || !payload?.ok || !payload.points) {
+          throw new Error("community-stats-unavailable");
+        }
+        if (!cancelled) setStats(payload.points);
       })
       .catch(() => {
         if (!cancelled) setStats([]);
