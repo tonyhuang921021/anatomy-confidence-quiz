@@ -141,6 +141,7 @@ export function getActiveStorageUser() {
 export function saveCurrentSession(session: QuizSession) {
   if (!isBrowser()) return;
   window.localStorage.setItem(getScopedKey(CURRENT_SESSION_KEY), JSON.stringify(session));
+  window.dispatchEvent(new CustomEvent("current-session-change", { detail: session }));
 }
 
 export function loadCurrentSession(): QuizSession | null {
@@ -158,6 +159,7 @@ export function loadCurrentSession(): QuizSession | null {
 export function clearCurrentSession() {
   if (!isBrowser()) return;
   window.localStorage.removeItem(getScopedKey(CURRENT_SESSION_KEY));
+  window.dispatchEvent(new CustomEvent("current-session-change", { detail: null }));
 }
 
 export function saveCompletedSession(session: QuizSession) {

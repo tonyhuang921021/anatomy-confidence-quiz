@@ -1258,7 +1258,7 @@ export default function QuizPage() {
                 ) : null}
 
                 {shouldShowExplanation && currentQuestion.memoryTip ? (
-                  <div className="mt-5 rounded-3xl bg-amber-50 p-4 text-sm text-amber-950 ring-1 ring-amber-200">
+                  <div className="memory-tip-box mt-5">
                     <h3 className="text-sm font-semibold">快速記憶法</h3>
                     <p className="mt-2 leading-7">{currentQuestion.memoryTip}</p>
                   </div>

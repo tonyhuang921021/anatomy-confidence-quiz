@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { AuthPanel } from "@/components/AuthPanel";
+import { ContinueQuizButton } from "@/components/ContinueQuizButton";
 import { ExamCountdown } from "@/components/ExamCountdown";
 import { FeedbackBoard } from "@/components/FeedbackBoard";
 import { HomeToneBanner } from "@/components/HomeToneBanner";
@@ -27,6 +28,7 @@ export default function HomePage() {
               <Link href="/start" className="primary-pill">
                 開始測驗
               </Link>
+              <ContinueQuizButton />
               <Link href="/simulation" className="secondary-pill">
                 開始模擬考
               </Link>

@@ -140,10 +140,10 @@ function renderQuestionReview(
         </div>
       ) : null}
       {renderedQuestion.memoryTip ? (
-        <p>
+        <div className="memory-tip-box">
           <span className="font-semibold">快速記憶法：</span>
           {renderedQuestion.memoryTip}
-        </p>
+        </div>
       ) : null}
       {footer}
     </div>
@@ -196,10 +196,10 @@ function renderRelatedQuestions(question: Question, allQuestions: Question[]) {
               {relatedQuestion.explanation}
             </p>
             {relatedQuestion.memoryTip ? (
-              <p>
+              <div className="memory-tip-box">
                 <span className="font-semibold">快速記憶法：</span>
                 {relatedQuestion.memoryTip}
-              </p>
+              </div>
             ) : null}
           </div>
         </details>

@@ -596,10 +596,10 @@ export default function SearchPage() {
                   </div>
                 ) : null}
                 {renderedQuestion.memoryTip ? (
-                  <p>
+                  <div className="memory-tip-box">
                     <span className="font-semibold">快速記憶法：</span>
                     {renderedQuestion.memoryTip}
-                  </p>
+                  </div>
                 ) : null}
                 <div className="space-y-3">
                   {override ? (

@@ -165,6 +165,13 @@ select {
     border-bottom: 1px solid var(--topbar-border);
     background: var(--topbar-bg);
   }
+
+  .memory-tip-box {
+    @apply rounded-2xl border px-4 py-3 text-sm leading-7;
+    border-color: color-mix(in srgb, var(--accent-warm) 20%, var(--line-soft));
+    background: color-mix(in srgb, var(--accent-warm) 10%, var(--surface));
+    color: var(--ink-main);
+  }
 }
 
 html[data-theme="dark"] .stat-chip,
@@ -221,10 +228,8 @@ html[data-theme="dark"] .border-slate-100 {
 }
 
 html[data-theme="dark"] .bg-emerald-50,
-html[data-theme="dark"] .bg-rose-50,
 html[data-theme="dark"] .bg-amber-50,
 html[data-theme="dark"] .bg-emerald-100,
-html[data-theme="dark"] .bg-rose-100,
 html[data-theme="dark"] .bg-amber-100,
 html[data-theme="dark"] .bg-sky-50,
 html[data-theme="dark"] .bg-brand-50,
@@ -235,14 +240,24 @@ html[data-theme="dark"] .bg-white\/80 {
 
 html[data-theme="dark"] .text-emerald-900,
 html[data-theme="dark"] .text-emerald-950,
-html[data-theme="dark"] .text-rose-900,
-html[data-theme="dark"] .text-rose-950,
 html[data-theme="dark"] .text-amber-900,
 html[data-theme="dark"] .text-emerald-800,
-html[data-theme="dark"] .text-rose-800,
 html[data-theme="dark"] .text-amber-800,
 html[data-theme="dark"] .text-emerald-700 {
   color: var(--ink-main);
+}
+
+html[data-theme="dark"] .bg-rose-50,
+html[data-theme="dark"] .bg-rose-100 {
+  background-color: rgba(79, 41, 53, 0.44);
+}
+
+html[data-theme="dark"] .text-rose-900,
+html[data-theme="dark"] .text-rose-950,
+html[data-theme="dark"] .text-rose-800,
+html[data-theme="dark"] .text-rose-700,
+html[data-theme="dark"] .text-rose-600 {
+  color: #efc4cf;
 }
 
 html[data-theme="dark"] .bg-slate-900,
@@ -275,4 +290,11 @@ html[data-theme="dark"] .border-sky-200,
 html[data-theme="dark"] .hover\:border-amber-200:hover,
 html[data-theme="dark"] .hover\:border-sky-200:hover {
   border-color: var(--line-soft);
+}
+
+html[data-theme="dark"] .border-rose-200,
+html[data-theme="dark"] .ring-rose-200,
+html[data-theme="dark"] .ring-rose-300 {
+  border-color: rgba(239, 196, 207, 0.12);
+  --tw-ring-color: rgba(239, 196, 207, 0.12);
 }

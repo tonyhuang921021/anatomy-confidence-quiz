@@ -817,10 +817,10 @@ function ResultsPageContent() {
                       </p>
                       {renderOptionAnalysis(question)}
                       {question.memoryTip ? (
-                        <p>
+                        <div className="memory-tip-box">
                           <span className="font-semibold">快速記憶法：</span>
                           {question.memoryTip}
-                        </p>
+                        </div>
                       ) : null}
                       {renderExplanationFooter(question, attempt)}
                     </div>
@@ -892,10 +892,10 @@ function ResultsPageContent() {
                       </p>
                       {renderOptionAnalysis(question)}
                       {question.memoryTip ? (
-                        <p>
+                        <div className="memory-tip-box">
                           <span className="font-semibold">快速記憶法：</span>
                           {question.memoryTip}
-                        </p>
+                        </div>
                       ) : null}
                       {renderExplanationFooter(question, attempt)}
                     </div>
@@ -962,10 +962,10 @@ function ResultsPageContent() {
                     </p>
                     {renderOptionAnalysis(question)}
                     {question.memoryTip ? (
-                      <p>
+                      <div className="memory-tip-box">
                         <span className="font-semibold">快速記憶法：</span>
                         {question.memoryTip}
-                      </p>
+                      </div>
                     ) : null}
                     {renderExplanationFooter(question, attempt)}
                   </div>
