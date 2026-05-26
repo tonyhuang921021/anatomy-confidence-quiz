@@ -339,6 +339,27 @@ export default function QuizPage() {
     });
   }
 
+  async function requestNextPeakChallengeBatchWithRetry(
+    baseSession: QuizSession,
+    retries = 2
+  ) {
+    let lastError: unknown;
+
+    for (let attempt = 0; attempt <= retries; attempt += 1) {
+      try {
+        return await requestNextPeakChallengeBatch(baseSession);
+      } catch (error) {
+        lastError = error;
+
+        if (attempt < retries) {
+          await new Promise((resolve) => window.setTimeout(resolve, 500 * (attempt + 1)));
+        }
+      }
+    }
+
+    throw lastError instanceof Error ? lastError : new Error("下一題產生失敗，請再試一次。");
+  }
+
   useEffect(() => {
     async function initializeSession() {
       const loadedOverrides = await loadConfirmedQuestionClassificationOverrides().catch(
@@ -584,7 +605,7 @@ export default function QuizPage() {
 
       void (async () => {
         try {
-          const nextQuestionBatch = await requestNextPeakChallengeBatch(nextSessionBase);
+          const nextQuestionBatch = await requestNextPeakChallengeBatchWithRetry(nextSessionBase);
 
           const mergedGeneratedQuestions = Array.from(
             new Map(
@@ -906,7 +927,7 @@ export default function QuizPage() {
     try {
       setIsSubmittingAnswer(true);
       setPeakNextQuestionError("");
-      const nextQuestionBatch = await requestNextPeakChallengeBatch(session);
+      const nextQuestionBatch = await requestNextPeakChallengeBatchWithRetry(session);
       const mergedGeneratedQuestions = Array.from(
         new Map(
           [...(session.generatedQuestions ?? []), ...nextQuestionBatch.questions].map((question) => [
@@ -980,7 +1001,7 @@ export default function QuizPage() {
     if (peakCandidates.length === 0) return;
 
     setIsPeakPrefetching(true);
-    void requestNextPeakChallengeBatch(session)
+    void requestNextPeakChallengeBatchWithRetry(session)
       .then((nextQuestionBatch) => {
         setSession((current) => {
           if (!current || current.id !== session.id || current.completedAt) return current;
