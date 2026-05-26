@@ -103,10 +103,7 @@ export function HomeToneBanner() {
 
   return (
     <div className="mt-5 rounded-2xl border border-slate-200/80 bg-white/70 px-4 py-3 backdrop-blur-sm">
-      <div className="flex flex-wrap items-center gap-2 text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">
-        <span>{content.label}</span>
-      </div>
-      <p className="mt-2 text-sm leading-7 text-slate-600 sm:text-[15px]">{content.body}</p>
+      <p className="text-sm leading-7 text-slate-600 sm:text-[15px]">{content.body}</p>
     </div>
   );
 }
