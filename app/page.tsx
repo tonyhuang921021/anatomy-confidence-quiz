@@ -18,12 +18,10 @@ export default function HomePage() {
           <div>
             <p className="eyebrow">Board Prep Lab</p>
             <h1 className="display-title mt-4 max-w-4xl text-5xl leading-[1.02] sm:text-6xl">
-              用更乾淨的題感，
-              <br className="hidden sm:block" />
-              把弱點逼出來。
+              一階醫師國考刷題測驗
             </h1>
             <p className="body-soft mt-5 max-w-2xl text-sm leading-7 sm:text-base">
-              刷題、模擬考、錯題複習、自訂卷都保留，入口先變得更安靜、更好找。
+              用答題結果、信心程度與完成度，找出你的一階醫師國考弱點。
             </p>
 
             <div className="mt-7 flex flex-wrap gap-3">
