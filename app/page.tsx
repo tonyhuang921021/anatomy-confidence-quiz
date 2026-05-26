@@ -13,67 +13,57 @@ export default function HomePage() {
 
   return (
     <main className="shell">
-      <section className="rounded-[2rem] bg-white/90 p-6 shadow-card ring-1 ring-white/70 backdrop-blur sm:p-8">
-        <div>
+      <section className="surface-card overflow-hidden p-6 sm:p-8 lg:p-10">
+        <div className="grid gap-8 lg:grid-cols-[minmax(0,1.25fr)_360px] lg:items-end">
           <div>
-            <p className="text-sm font-semibold uppercase tracking-[0.2em] text-brand-700">
-              Medical Board Step 1 Quiz
-            </p>
-            <h1 className="mt-3 text-4xl font-bold tracking-tight text-ink sm:text-5xl">
-              一階醫師國考刷題測驗
+            <p className="eyebrow">Board Prep Lab</p>
+            <h1 className="display-title mt-4 max-w-4xl text-5xl leading-[1.02] sm:text-6xl">
+              用更乾淨的題感，
+              <br className="hidden sm:block" />
+              把弱點逼出來。
             </h1>
-            <p className="mt-4 max-w-2xl text-base leading-8 text-slate-600 sm:text-lg">
-              用答題結果、信心程度與完成度，找出你的一階醫師國考弱點。
+            <p className="body-soft mt-5 max-w-2xl text-sm leading-7 sm:text-base">
+              刷題、模擬考、錯題複習、自訂卷都保留，入口先變得更安靜、更好找。
             </p>
 
-            <div className="mt-6 flex flex-col gap-3 sm:flex-row">
-              <Link
-                href="/start"
-                className="min-h-12 rounded-2xl bg-brand-600 px-5 py-4 text-center text-sm font-semibold text-white transition hover:bg-brand-700 active:scale-[0.99]"
-              >
+            <div className="mt-7 flex flex-wrap gap-3">
+              <Link href="/start" className="primary-pill">
                 開始測驗
               </Link>
-              <Link
-                href="/simulation"
-                className="min-h-12 rounded-2xl bg-amber-100 px-5 py-4 text-center text-sm font-semibold text-amber-950 transition hover:bg-amber-200 active:scale-[0.99]"
-              >
+              <Link href="/simulation" className="secondary-pill">
                 開始模擬考
               </Link>
-              <Link
-                href="/results"
-                className="min-h-12 rounded-2xl bg-slate-100 px-5 py-4 text-center text-sm font-semibold text-slate-800 transition hover:bg-slate-200 active:scale-[0.99]"
-              >
-                查看結果頁
-              </Link>
-              <Link
-                href="/review"
-                className="min-h-12 rounded-2xl bg-slate-100 px-5 py-4 text-center text-sm font-semibold text-slate-800 transition hover:bg-slate-200 active:scale-[0.99]"
-              >
-                錯題複習
-              </Link>
-              <Link
-                href="/leaderboard"
-                className="min-h-12 rounded-2xl bg-slate-100 px-5 py-4 text-center text-sm font-semibold text-slate-800 transition hover:bg-slate-200 active:scale-[0.99]"
-              >
-                刷題榜
-              </Link>
-              <Link
-                href="/search"
-                className="min-h-12 rounded-2xl bg-slate-100 px-5 py-4 text-center text-sm font-semibold text-slate-800 transition hover:bg-slate-200 active:scale-[0.99]"
-              >
-                題目搜尋
+              <Link href="/results" className="secondary-pill">
+                查看結果
               </Link>
             </div>
 
-            <div className="mt-6 grid gap-3 sm:grid-cols-2">
-              <ExamCountdown />
-              <div className="rounded-3xl bg-slate-50 p-4">
-                <p className="text-sm text-slate-500">目前題庫數量</p>
-                <p className="mt-2 text-2xl font-bold text-ink">{totalQuestionCount}</p>
-              </div>
-              <div className="rounded-3xl bg-slate-50 p-4 sm:col-span-2">
-                <p className="text-sm text-slate-500">已開放科目</p>
-                <p className="mt-2 text-lg font-bold text-ink">醫學一、醫學二</p>
+            <div className="mt-8 flex flex-wrap gap-2">
+              <span className="stat-chip">醫學一</span>
+              <span className="stat-chip">醫學二</span>
+              <span className="stat-chip">{totalQuestionCount} 題</span>
+              <span className="stat-chip">錯題複習</span>
+              <span className="stat-chip">自訂卷</span>
+            </div>
+          </div>
+
+          <div className="grid gap-3">
+            <ExamCountdown />
+            <div className="surface-card-muted p-5">
+              <p className="text-xs font-semibold uppercase tracking-[0.22em] text-slate-500">常用入口</p>
+              <div className="mt-4 grid gap-2">
+                <Link href="/review" className="secondary-pill justify-between px-4">
+                  錯題複習
+                  <span className="text-slate-400">→</span>
+                </Link>
+                <Link href="/search" className="secondary-pill justify-between px-4">
+                  題目搜尋
+                  <span className="text-slate-400">→</span>
+                </Link>
+                <Link href="/leaderboard" className="secondary-pill justify-between px-4">
+                  刷題榜
+                  <span className="text-slate-400">→</span>
+                </Link>
               </div>
             </div>
           </div>
@@ -88,12 +78,11 @@ export default function HomePage() {
         <div className="flex justify-start">
           <Link
             href="/custom-papers"
-            className="inline-flex min-h-11 items-center justify-center rounded-2xl bg-slate-100 px-4 py-2 text-sm font-semibold text-slate-800 transition hover:bg-slate-200"
+            className="secondary-pill min-h-11 px-4 py-2"
           >
             自訂卷模式
           </Link>
         </div>
-
       </div>
     </main>
   );

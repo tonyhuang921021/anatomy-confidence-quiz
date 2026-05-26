@@ -108,17 +108,14 @@ export function FeedbackBoard() {
   }
 
   return (
-    <section className="rounded-[2rem] bg-white p-6 shadow-card ring-1 ring-slate-100">
+    <section className="surface-card p-6">
       <div className="flex flex-wrap items-center justify-between gap-4">
         <div>
-          <p className="text-sm font-semibold uppercase tracking-[0.2em] text-brand-700">Feedback Board</p>
-          <h2 className="mt-2 text-2xl font-semibold text-ink">留言板</h2>
-          <p className="mt-3 text-sm leading-7 text-slate-600">
-            大家可以匿名留言，也可以用登入帳號的暱稱留下想改進的地方。
-          </p>
+          <p className="eyebrow">Board</p>
+          <h2 className="display-title mt-2 text-3xl">留言板</h2>
         </div>
-        <div className="rounded-3xl bg-slate-50 px-4 py-3 text-sm text-slate-700">
-          最新 <span className="font-semibold text-ink">{messages.length}</span> 則留言
+        <div className="surface-card-muted px-4 py-3 text-sm text-slate-700">
+          最新 {messages.length} 則
         </div>
       </div>
 
@@ -128,7 +125,7 @@ export function FeedbackBoard() {
         </div>
       ) : (
         <>
-          <div className="mt-5 rounded-3xl bg-slate-50 p-4">
+          <div className="mt-5 rounded-[1.8rem] bg-[rgba(246,247,244,0.9)] p-4 ring-1 ring-[rgba(16,42,34,0.06)]">
             {user ? (
               <div className="mb-4 flex flex-wrap gap-2">
                 <button
@@ -173,7 +170,7 @@ export function FeedbackBoard() {
                 type="button"
                 onClick={() => void handleSubmit()}
                 disabled={submitting || !content.trim()}
-                className="min-h-11 rounded-2xl bg-brand-600 px-4 py-3 text-sm font-semibold text-white transition hover:bg-brand-700 disabled:cursor-not-allowed disabled:bg-slate-300"
+                className="primary-pill min-h-11 px-4 py-3 disabled:cursor-not-allowed disabled:bg-slate-300"
               >
                 {submitting ? "送出中..." : "送出留言"}
               </button>
@@ -196,7 +193,7 @@ export function FeedbackBoard() {
               </div>
             ) : (
               messages.map((entry) => (
-                <article key={entry.id} className="rounded-3xl bg-slate-50 p-4">
+                <article key={entry.id} className="rounded-[1.8rem] bg-[rgba(246,247,244,0.95)] p-4 ring-1 ring-[rgba(16,42,34,0.06)]">
                   <div className="flex items-start justify-between gap-3">
                     <div>
                       <p className="text-sm font-semibold text-ink">

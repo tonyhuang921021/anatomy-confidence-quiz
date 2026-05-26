@@ -26,10 +26,12 @@ const config: Config = {
         cream: "#f7f6f1"
       },
       boxShadow: {
-        card: "0 18px 40px rgba(15, 42, 34, 0.08)"
+        card: "0 22px 60px rgba(19, 38, 32, 0.08)",
+        float: "0 30px 80px rgba(19, 38, 32, 0.12)"
       },
       fontFamily: {
-        sans: ["'Noto Sans TC'", "'Segoe UI'", "sans-serif"]
+        sans: ["'Noto Sans TC'", "'Segoe UI'", "sans-serif"],
+        serif: ["'Iowan Old Style'", "'Palatino Linotype'", "'Noto Serif TC'", "serif"]
       }
     }
   },

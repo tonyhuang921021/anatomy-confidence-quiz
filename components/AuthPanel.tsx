@@ -107,20 +107,16 @@ export function AuthPanel() {
 
   if (!configured) {
     return (
-      <section className="rounded-[2rem] bg-white p-6 shadow-card ring-1 ring-slate-100">
-        <p className="text-sm font-semibold uppercase tracking-[0.2em] text-brand-700">正式版登入</p>
-        <h2 className="mt-2 text-2xl font-semibold text-ink">Supabase 尚未設定</h2>
-        <p className="mt-3 text-sm leading-7 text-slate-600">
-          請先填入 `NEXT_PUBLIC_SUPABASE_URL`、`NEXT_PUBLIC_SUPABASE_ANON_KEY`，再建立 `quiz_sessions`
-          資料表與 RLS。這樣每個人就能有分開的雲端作答紀錄。
-        </p>
+      <section className="surface-card p-6">
+        <p className="eyebrow">Account</p>
+        <h2 className="display-title mt-2 text-3xl">Supabase 尚未設定</h2>
       </section>
     );
   }
 
   if (loading) {
     return (
-      <section className="rounded-[2rem] bg-white p-6 shadow-card ring-1 ring-slate-100">
+      <section className="surface-card p-6">
         <p className="text-sm text-slate-600">正在讀取登入狀態...</p>
       </section>
     );
@@ -128,10 +124,18 @@ export function AuthPanel() {
 
   if (user) {
     return (
-      <section className="rounded-[2rem] bg-white p-6 shadow-card ring-1 ring-slate-100">
-        <p className="text-sm font-semibold uppercase tracking-[0.2em] text-brand-700">正式版登入</p>
-        <h2 className="mt-2 text-2xl font-semibold text-ink">目前使用者</h2>
-        <p className="mt-3 text-base font-semibold text-slate-900">{user.email}</p>
+      <section className="surface-card p-6">
+        <p className="eyebrow">Account</p>
+        <div className="mt-2 flex flex-col gap-5 lg:flex-row lg:items-start lg:justify-between">
+          <div>
+            <h2 className="display-title text-3xl">目前使用者</h2>
+            <p className="mt-2 text-sm font-semibold text-slate-900 sm:text-base">{user.email}</p>
+          </div>
+          <div className="flex flex-wrap gap-2">
+            <div className="stat-chip">同步 {syncStatus}</div>
+            <div className="stat-chip">ID {user.id.slice(0, 8)}...</div>
+          </div>
+        </div>
         <div className="mt-4 grid gap-3">
           <input
             type="text"
@@ -141,15 +145,7 @@ export function AuthPanel() {
             maxLength={24}
             className="min-h-12 rounded-2xl border border-slate-200 px-4 py-3 text-sm text-slate-800 outline-none"
           />
-          <p className="text-xs text-slate-500">排行榜會顯示這個暱稱，最多 24 個字。</p>
-        </div>
-        <div className="mt-4 grid gap-3 sm:grid-cols-2">
-          <div className="rounded-2xl bg-slate-50 px-4 py-3 text-sm text-slate-700">
-            雲端同步狀態 <span className="font-semibold">{syncStatus}</span>
-          </div>
-          <div className="rounded-2xl bg-slate-50 px-4 py-3 text-sm text-slate-700">
-            使用者 ID <span className="font-semibold">{user.id.slice(0, 8)}...</span>
-          </div>
+          <p className="text-xs text-slate-500">排行榜會顯示這個暱稱。</p>
         </div>
         {syncError ? (
           <div className="mt-4 rounded-2xl bg-amber-50 p-4 text-sm text-amber-900">{syncError}</div>
@@ -164,7 +160,7 @@ export function AuthPanel() {
           {canViewOwnerPage ? (
             <a
               href="/owner"
-              className="min-h-12 rounded-2xl bg-slate-100 px-4 py-3 text-center text-sm font-semibold text-slate-800 transition hover:bg-slate-200"
+              className="secondary-pill text-center"
             >
               私有數據頁
             </a>
@@ -172,14 +168,14 @@ export function AuthPanel() {
           {canViewOwnerPage ? (
             <a
               href="/peak"
-              className="min-h-12 rounded-2xl bg-rose-100 px-4 py-3 text-center text-sm font-semibold text-rose-950 transition hover:bg-rose-200"
+              className="inline-flex min-h-12 items-center justify-center rounded-full bg-rose-100 px-4 py-3 text-center text-sm font-semibold text-rose-950 transition hover:bg-rose-200"
             >
               巔峰賽模式
             </a>
           ) : null}
           <a
             href="/progress"
-            className="min-h-12 rounded-2xl bg-slate-100 px-4 py-3 text-center text-sm font-semibold text-slate-800 transition hover:bg-slate-200"
+            className="secondary-pill text-center"
           >
             進度總覽
           </a>
@@ -187,21 +183,21 @@ export function AuthPanel() {
             type="button"
             onClick={() => void handleSaveNickname()}
             disabled={submitting}
-            className="min-h-12 rounded-2xl bg-slate-100 px-4 py-3 text-sm font-semibold text-slate-800 transition hover:bg-slate-200 disabled:cursor-not-allowed disabled:bg-slate-100"
+            className="secondary-pill disabled:cursor-not-allowed disabled:bg-slate-100"
           >
             儲存暱稱
           </button>
           <button
             type="button"
             onClick={() => void refreshCloudData()}
-            className="min-h-12 rounded-2xl bg-brand-600 px-4 py-3 text-sm font-semibold text-white transition hover:bg-brand-700"
+            className="primary-pill"
           >
             立即同步雲端紀錄
           </button>
           <button
             type="button"
             onClick={() => void signOut()}
-            className="min-h-12 rounded-2xl bg-slate-100 px-4 py-3 text-sm font-semibold text-slate-800 transition hover:bg-slate-200"
+            className="secondary-pill"
           >
             登出
           </button>
@@ -211,12 +207,10 @@ export function AuthPanel() {
   }
 
   return (
-    <section className="rounded-[2rem] bg-white p-6 shadow-card ring-1 ring-slate-100">
-      <p className="text-sm font-semibold uppercase tracking-[0.2em] text-brand-700">正式版登入</p>
-      <h2 className="mt-2 text-2xl font-semibold text-ink">建立個人雲端紀錄</h2>
-      <p className="mt-3 text-sm leading-7 text-slate-600">
-        登入後，completed sessions 會依使用者分開保存，手機與電腦也能同步。
-      </p>
+    <section className="surface-card p-6">
+      <p className="eyebrow">Account</p>
+      <h2 className="display-title mt-2 text-3xl">建立個人雲端紀錄</h2>
+      <p className="body-soft mt-3 text-sm leading-7">登入後可以同步作答、錯題與自訂卷。</p>
 
       <div className="mt-5 grid gap-3">
         <input
@@ -255,7 +249,7 @@ export function AuthPanel() {
           type="button"
           onClick={() => void handleSignIn()}
           disabled={submitting || !email || !password}
-          className="min-h-12 rounded-2xl bg-brand-600 px-4 py-3 text-sm font-semibold text-white transition hover:bg-brand-700 disabled:cursor-not-allowed disabled:bg-slate-300"
+          className="primary-pill disabled:cursor-not-allowed disabled:bg-slate-300"
         >
           以 Email 登入
         </button>
@@ -263,7 +257,7 @@ export function AuthPanel() {
           type="button"
           onClick={() => void handleSignUp()}
           disabled={submitting || !email || !password}
-          className="min-h-12 rounded-2xl bg-slate-100 px-4 py-3 text-sm font-semibold text-slate-800 transition hover:bg-slate-200 disabled:cursor-not-allowed disabled:bg-slate-100"
+          className="secondary-pill disabled:cursor-not-allowed disabled:bg-slate-100"
         >
           註冊新帳號
         </button>

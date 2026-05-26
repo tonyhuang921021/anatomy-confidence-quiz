@@ -40,9 +40,9 @@ export default function StartPage() {
     subjects: typeof selectableSubjects
   ) {
     return (
-      <section className="rounded-[2rem] bg-slate-50 p-5 ring-1 ring-slate-100">
+      <section className="surface-card-muted p-5">
         <div>
-          <h2 className="text-xl font-semibold text-ink">{title}</h2>
+          <h2 className="font-serif text-2xl font-semibold tracking-[-0.03em] text-ink">{title}</h2>
         </div>
 
         <div className="mt-4 grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
@@ -53,10 +53,10 @@ export default function StartPage() {
                 key={subject.subject}
                 type="button"
                 onClick={() => toggleSubject(subject.subject)}
-                className={`rounded-3xl border p-4 text-left transition ${
+                className={`rounded-[1.6rem] border p-4 text-left transition ${
                   active
-                    ? "border-brand-500 bg-brand-50 ring-2 ring-brand-200"
-                    : "border-slate-200 bg-white hover:bg-slate-50"
+                    ? "border-brand-400 bg-white shadow-card ring-1 ring-brand-200"
+                    : "border-slate-200/80 bg-white/80 hover:bg-white"
                 }`}
               >
                 <div className="flex items-center justify-between gap-3">
@@ -107,50 +107,45 @@ export default function StartPage() {
 
   return (
     <main className="shell">
-      <section className="rounded-[2rem] bg-white p-6 shadow-card ring-1 ring-slate-100 sm:p-8">
+      <section className="surface-card p-6 sm:p-8">
         <div className="flex items-start justify-between gap-4">
           <div className="min-w-0">
-            <p className="text-sm font-semibold uppercase tracking-[0.2em] text-brand-700">
-              Quick Start
-            </p>
+            <p className="eyebrow">Start</p>
             <div className="mt-2 flex items-start justify-between gap-3">
-              <h1 className="text-3xl font-bold text-ink sm:text-4xl">先選抽哪些科</h1>
+              <h1 className="display-title text-4xl sm:text-5xl">先選抽哪些科</h1>
               <Link
                 href="/"
-                className="min-h-10 shrink-0 rounded-2xl bg-slate-100 px-3 py-2 text-sm font-semibold text-slate-800 transition hover:bg-slate-200 sm:hidden"
+                className="secondary-pill min-h-10 shrink-0 px-3 py-2 sm:hidden"
               >
                 返回首頁
               </Link>
             </div>
-            <p className="mt-3 max-w-2xl text-sm leading-7 text-slate-600 sm:text-base">
-              這裡會直接開始一輪 10 題。你可以只勾一科，也可以混合多科一起抽。
+            <p className="body-soft mt-3 max-w-2xl text-sm leading-7 sm:text-base">
+              固定抽 10 題。可以只勾一科，也可以混著抽。
             </p>
           </div>
           <Link
             href="/"
-            className="hidden min-h-12 rounded-2xl bg-slate-100 px-4 py-3 text-sm font-semibold text-slate-800 transition hover:bg-slate-200 sm:inline-flex"
+            className="secondary-pill hidden sm:inline-flex"
           >
             返回首頁
           </Link>
         </div>
 
         <div className="mt-6 space-y-6">
-          {renderSubjectGroup("醫學（一）科目", med1Subjects)}
-          {renderSubjectGroup("醫學（二）科目", med2Subjects)}
+          {renderSubjectGroup("醫學一", med1Subjects)}
+          {renderSubjectGroup("醫學二", med2Subjects)}
           {seasonalAvailable ? (
-            <section className="rounded-[2rem] bg-amber-50 p-5 ring-1 ring-amber-200">
+            <section className="rounded-[2rem] border border-amber-200 bg-[rgba(255,247,232,0.9)] p-5">
               <div>
-                <h2 className="text-xl font-semibold text-ink">季節限定（到 5/15 早上 9 點）</h2>
-                <p className="mt-2 text-sm leading-7 text-slate-700">
-                  只收錄生理學裡和生殖範圍有關的題目。可以單獨勾，也可以和其他科一起抽。
-                </p>
+                <h2 className="font-serif text-2xl font-semibold tracking-[-0.03em] text-ink">季節限定</h2>
               </div>
 
               <div className="mt-4">
                 <button
                   type="button"
                   onClick={() => setIncludeSeasonalLimited((current) => !current)}
-                  className={`w-full rounded-3xl border p-5 text-left transition ${
+                  className={`w-full rounded-[1.6rem] border p-5 text-left transition ${
                     includeSeasonalLimited
                       ? "border-amber-500 bg-amber-100 ring-2 ring-amber-200"
                       : "border-amber-200 bg-white hover:bg-amber-50"
@@ -168,32 +163,29 @@ export default function StartPage() {
                       {includeSeasonalLimited ? "已選擇" : "未選"}
                     </span>
                   </div>
-                  <p className="mt-3 text-sm text-slate-600">
-                    {seasonalLimitedQuestions.length} 題已收錄
-                  </p>
+                  <p className="mt-3 text-sm text-slate-600">{seasonalLimitedQuestions.length} 題</p>
                 </button>
               </div>
             </section>
           ) : null}
         </div>
 
-        <div className="mt-6 flex flex-col gap-3 rounded-3xl bg-slate-50 p-5 sm:flex-row sm:items-center sm:justify-between">
+        <div className="surface-card-muted mt-6 flex flex-col gap-3 p-5 sm:flex-row sm:items-center sm:justify-between">
           <p className="text-sm text-slate-700">
-            目前將抽取 <span className="font-semibold text-ink">{selectedSubjects.length + (includeSeasonalLimited ? 1 : 0)}</span> 個範圍，
-            共 <span className="font-semibold text-ink">10 題</span>
+            已選 <span className="font-semibold text-ink">{selectedSubjects.length + (includeSeasonalLimited ? 1 : 0)}</span> 個範圍・固定 10 題
           </p>
           <div className="flex flex-wrap gap-3">
             <button
               type="button"
               onClick={() => setSelectedSubjects(selectableSubjects.map((item) => item.subject))}
-              className="min-h-12 rounded-2xl bg-white px-4 py-3 text-sm font-semibold text-slate-800 ring-1 ring-slate-200 transition hover:bg-slate-100"
+              className="secondary-pill bg-white px-4 py-3"
             >
               全選
             </button>
             <button
               type="button"
               onClick={() => setExcludeAiGenerated((current) => !current)}
-              className={`min-h-12 rounded-2xl px-4 py-3 text-sm font-semibold transition ${
+              className={`min-h-12 rounded-full px-4 py-3 text-sm font-semibold transition ${
                 excludeAiGenerated
                   ? "bg-amber-100 text-amber-900 ring-1 ring-amber-300"
                   : "bg-white text-slate-800 ring-1 ring-slate-200 hover:bg-slate-100"
@@ -205,7 +197,7 @@ export default function StartPage() {
               type="button"
               onClick={handleStart}
               disabled={selectedSubjects.length === 0 && !includeSeasonalLimited}
-              className="min-h-12 rounded-2xl bg-brand-600 px-5 py-3 text-sm font-semibold text-white transition hover:bg-brand-700 disabled:cursor-not-allowed disabled:bg-slate-300"
+              className="primary-pill disabled:cursor-not-allowed disabled:bg-slate-300"
             >
               開始 10 題測驗
             </button>

@@ -4,6 +4,17 @@
 
 :root {
   color-scheme: light;
+  --bg-base: #f5f2e9;
+  --bg-wash: #edf3ee;
+  --ink-main: #102a22;
+  --ink-soft: #56685f;
+  --line-soft: rgba(16, 42, 34, 0.08);
+  --surface: rgba(255, 255, 255, 0.88);
+  --surface-muted: rgba(255, 255, 255, 0.62);
+  --brand-main: #2d7d5b;
+  --brand-deep: #1f5840;
+  --brand-tint: #dfece5;
+  --accent-warm: #b9814f;
 }
 
 * {
@@ -21,11 +32,24 @@ body {
   max-width: 100%;
   overflow-x: hidden;
   background:
-    radial-gradient(circle at top left, rgba(147, 208, 180, 0.22), transparent 35%),
-    radial-gradient(circle at top right, rgba(96, 165, 250, 0.12), transparent 28%),
-    linear-gradient(180deg, #f7f6f1 0%, #f8fbfa 52%, #eef6f3 100%);
-  color: #102a22;
+    radial-gradient(circle at 12% 0%, rgba(185, 129, 79, 0.12), transparent 28%),
+    radial-gradient(circle at 100% 8%, rgba(63, 155, 115, 0.12), transparent 24%),
+    linear-gradient(180deg, var(--bg-base) 0%, #f8f7f2 42%, var(--bg-wash) 100%);
+  color: var(--ink-main);
   font-family: "Noto Sans TC", "Segoe UI", sans-serif;
+  position: relative;
+}
+
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  background-image:
+    linear-gradient(to right, rgba(16, 42, 34, 0.03) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(16, 42, 34, 0.03) 1px, transparent 1px);
+  background-size: 32px 32px;
+  mask-image: linear-gradient(180deg, rgba(0, 0, 0, 0.14), transparent 60%);
 }
 
 a {
@@ -43,13 +67,70 @@ select {
 .shell {
   margin: 0 auto;
   width: 100%;
-  max-width: 1280px;
+  max-width: 1340px;
   padding: 20px 12px 52px;
   overflow-x: clip;
 }
 
 @media (min-width: 640px) {
   .shell {
-    padding: 32px 24px 64px;
+    padding: 28px 24px 64px;
+  }
+}
+
+::selection {
+  background: rgba(63, 155, 115, 0.18);
+  color: var(--ink-main);
+}
+
+@layer components {
+  .surface-card {
+    @apply rounded-[2rem] border border-[rgba(16,42,34,0.08)] shadow-card backdrop-blur;
+    background: var(--surface);
+  }
+
+  .surface-card-muted {
+    @apply rounded-[1.75rem] border border-[rgba(16,42,34,0.08)] backdrop-blur;
+    background: var(--surface-muted);
+  }
+
+  .eyebrow {
+    @apply text-[11px] font-semibold uppercase tracking-[0.28em];
+    color: var(--brand-main);
+  }
+
+  .display-title {
+    @apply font-serif font-bold tracking-[-0.03em] text-ink;
+  }
+
+  .body-soft {
+    color: var(--ink-soft);
+  }
+
+  .primary-pill {
+    @apply inline-flex min-h-12 items-center justify-center rounded-full px-5 py-3 text-sm font-semibold text-white transition;
+    background: linear-gradient(135deg, var(--brand-main), var(--brand-deep));
+  }
+
+  .primary-pill:hover {
+    filter: brightness(1.02);
+  }
+
+  .secondary-pill {
+    @apply inline-flex min-h-12 items-center justify-center rounded-full border px-5 py-3 text-sm font-semibold transition;
+    border-color: var(--line-soft);
+    background: rgba(255, 255, 255, 0.72);
+    color: var(--ink-main);
+  }
+
+  .secondary-pill:hover {
+    background: rgba(255, 255, 255, 0.96);
+  }
+
+  .stat-chip {
+    @apply inline-flex items-center rounded-full px-3 py-1 text-xs font-semibold;
+    background: rgba(255, 255, 255, 0.72);
+    color: var(--ink-soft);
+    border: 1px solid var(--line-soft);
   }
 }

@@ -396,27 +396,25 @@ export default function CustomPapersPage() {
 
   return (
     <main className="shell">
-      <section className="rounded-[2rem] bg-white p-6 shadow-card ring-1 ring-slate-100 sm:p-8">
+      <section className="surface-card p-6 sm:p-8">
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div>
-            <p className="text-sm font-semibold uppercase tracking-[0.2em] text-brand-700">
-              Custom Papers
-            </p>
-            <h1 className="mt-2 text-3xl font-bold text-ink sm:text-4xl">自訂卷模式</h1>
-            <p className="mt-3 max-w-3xl text-sm leading-7 text-slate-600 sm:text-base">
-              你可以自己產一份 10 題自訂卷，拿五碼考卷碼分享給別人，也可以直接輸入考卷碼去寫同一份卷。
+            <p className="eyebrow">Custom Papers</p>
+            <h1 className="display-title mt-2 text-4xl sm:text-5xl">自訂卷模式</h1>
+            <p className="body-soft mt-3 max-w-3xl text-sm leading-7 sm:text-base">
+              產生、搜尋、匯入，或直接做別人公開的卷。
             </p>
           </div>
           <div className="flex flex-wrap gap-3">
             <Link
               href="/custom-papers/review"
-              className="min-h-12 rounded-2xl bg-amber-100 px-5 py-4 text-sm font-semibold text-amber-900 transition hover:bg-amber-200"
+              className="inline-flex min-h-12 items-center justify-center rounded-full bg-amber-100 px-5 py-4 text-sm font-semibold text-amber-900 transition hover:bg-amber-200"
             >
               自訂卷錯題庫
             </Link>
             <Link
               href="/"
-              className="min-h-12 rounded-2xl bg-slate-100 px-5 py-4 text-sm font-semibold text-slate-800 transition hover:bg-slate-200"
+              className="secondary-pill"
             >
               返回首頁
             </Link>
@@ -427,10 +425,10 @@ export default function CustomPapersPage() {
           <button
             type="button"
             onClick={() => setTab("public")}
-            className={`min-h-12 rounded-2xl px-5 py-3 text-sm font-semibold transition ${
+            className={`min-h-12 rounded-full px-5 py-3 text-sm font-semibold transition ${
               tab === "public"
                 ? "bg-brand-600 text-white"
-                : "bg-slate-100 text-slate-800 hover:bg-slate-200"
+                : "bg-white text-slate-800 ring-1 ring-slate-200 hover:bg-slate-50"
             }`}
           >
             可以直接做的公開卷
@@ -438,10 +436,10 @@ export default function CustomPapersPage() {
           <button
             type="button"
             onClick={() => setTab("generate")}
-            className={`min-h-12 rounded-2xl px-5 py-3 text-sm font-semibold transition ${
+            className={`min-h-12 rounded-full px-5 py-3 text-sm font-semibold transition ${
               tab === "generate"
                 ? "bg-brand-600 text-white"
-                : "bg-slate-100 text-slate-800 hover:bg-slate-200"
+                : "bg-white text-slate-800 ring-1 ring-slate-200 hover:bg-slate-50"
             }`}
           >
             產生題目
@@ -449,10 +447,10 @@ export default function CustomPapersPage() {
           <button
             type="button"
             onClick={() => setTab("ai_search")}
-            className={`min-h-12 rounded-2xl px-5 py-3 text-sm font-semibold transition ${
+            className={`min-h-12 rounded-full px-5 py-3 text-sm font-semibold transition ${
               tab === "ai_search"
                 ? "bg-brand-600 text-white"
-                : "bg-slate-100 text-slate-800 hover:bg-slate-200"
+                : "bg-white text-slate-800 ring-1 ring-slate-200 hover:bg-slate-50"
             }`}
           >
             AI 智慧檢索
@@ -460,10 +458,10 @@ export default function CustomPapersPage() {
           <button
             type="button"
             onClick={() => setTab("import")}
-            className={`min-h-12 rounded-2xl px-5 py-3 text-sm font-semibold transition ${
+            className={`min-h-12 rounded-full px-5 py-3 text-sm font-semibold transition ${
               tab === "import"
                 ? "bg-brand-600 text-white"
-                : "bg-slate-100 text-slate-800 hover:bg-slate-200"
+                : "bg-white text-slate-800 ring-1 ring-slate-200 hover:bg-slate-50"
             }`}
           >
             匯入 JSON 題目卷
@@ -471,10 +469,10 @@ export default function CustomPapersPage() {
           <button
             type="button"
             onClick={() => setTab("lookup")}
-            className={`min-h-12 rounded-2xl px-5 py-3 text-sm font-semibold transition ${
+            className={`min-h-12 rounded-full px-5 py-3 text-sm font-semibold transition ${
               tab === "lookup"
                 ? "bg-brand-600 text-white"
-                : "bg-slate-100 text-slate-800 hover:bg-slate-200"
+                : "bg-white text-slate-800 ring-1 ring-slate-200 hover:bg-slate-50"
             }`}
           >
             輸入題目卷代碼
