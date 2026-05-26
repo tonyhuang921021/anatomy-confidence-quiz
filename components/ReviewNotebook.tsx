@@ -18,6 +18,10 @@ import {
 import { getOrCreateVisitorId } from "@/lib/visitor";
 import { useAuth } from "@/components/AuthProvider";
 import {
+  buildRelatedQuestionContext,
+  findPreviousQuestionForContinuation
+} from "@/lib/questionContext";
+import {
   OptionKey,
   Question,
   QuestionClassificationOverride,
@@ -349,6 +353,8 @@ export function ReviewNotebook({
     setExplanationLoadingMap((current) => ({ ...current, [question.id]: true }));
     setExplanationErrorMap((current) => ({ ...current, [question.id]: "" }));
 
+    const previousQuestion = findPreviousQuestionForContinuation(question, allQuestions);
+
     try {
       const response = await fetch("/api/question-explanation", {
         method: "POST",
@@ -371,6 +377,7 @@ export function ReviewNotebook({
             explanation: question.explanation,
             testedConcept: question.testedConcept
           },
+          previousQuestion: previousQuestion ? buildRelatedQuestionContext(previousQuestion) : undefined,
           attempt: {
             selectedAnswer: question.answer,
             confidence: 3,

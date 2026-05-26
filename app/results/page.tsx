@@ -48,6 +48,10 @@ import {
   SummaryStats
 } from "@/types/quiz";
 import { getOrCreateVisitorId } from "@/lib/visitor";
+import {
+  buildRelatedQuestionContext,
+  findPreviousQuestionForContinuation
+} from "@/lib/questionContext";
 
 const allQuestions = Array.from(
   new Map(
@@ -406,6 +410,11 @@ function ResultsPageContent() {
     setExplanationLoadingMap((current) => ({ ...current, [question.id]: true }));
     setExplanationErrorMap((current) => ({ ...current, [question.id]: "" }));
 
+    const previousQuestion = findPreviousQuestionForContinuation(
+      question,
+      Array.from(questionMap.values())
+    );
+
     try {
       const response = await fetch("/api/question-explanation", {
         method: "POST",
@@ -428,6 +437,7 @@ function ResultsPageContent() {
             explanation: question.explanation,
             testedConcept: question.testedConcept
           },
+          previousQuestion: previousQuestion ? buildRelatedQuestionContext(previousQuestion) : undefined,
           attempt: {
             selectedAnswer: attempt.selectedAnswer,
             confidence: attempt.confidence,

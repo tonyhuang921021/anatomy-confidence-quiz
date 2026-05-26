@@ -16,6 +16,10 @@ import {
 } from "@/lib/storage";
 import { getOrCreateVisitorId } from "@/lib/visitor";
 import {
+  buildRelatedQuestionContext,
+  findPreviousQuestionForContinuation
+} from "@/lib/questionContext";
+import {
   applyQuestionClassificationOverride,
   getCanonicalQuestionBank
 } from "@/data/med1QuestionBank";
@@ -104,6 +108,7 @@ export default function SearchPage() {
   const [selectedSubject, setSelectedSubject] = useState("全部");
   const [keyword, setKeyword] = useState("");
   const [selectedYear, setSelectedYear] = useState("全部");
+  const [yearSortOrder, setYearSortOrder] = useState<"desc" | "asc">("desc");
   const [currentPage, setCurrentPage] = useState(1);
   const [explanationOverrides, setExplanationOverrides] = useState<Record<string, QuestionExplanationOverride>>({});
   const [explanationLoadingMap, setExplanationLoadingMap] = useState<Record<string, boolean>>({});
@@ -133,13 +138,13 @@ export default function SearchPage() {
             (year): year is number => typeof year === "number"
           )
         )
-      ).sort((a, b) => b - a),
-    [allQuestions]
+      ).sort((a, b) => (yearSortOrder === "desc" ? b - a : a - b)),
+    [allQuestions, yearSortOrder]
   );
 
   useEffect(() => {
     setCurrentPage(1);
-  }, [keyword, selectedSubject, selectedYear]);
+  }, [keyword, selectedSubject, selectedYear, yearSortOrder]);
 
   useEffect(() => {
     setExplanationOverrides(loadQuestionExplanationOverrides());
@@ -154,12 +159,48 @@ export default function SearchPage() {
   }, []);
 
   const filteredResults = useMemo(() => {
-    return allQuestions.filter((question) => {
-      if (selectedSubject !== "全部" && question.subject !== selectedSubject) return false;
-      if (selectedYear !== "全部" && String(question.sourceYear ?? "") !== selectedYear) return false;
-      return matchesQuestion(question, normalizedKeyword, compactKeyword);
-    });
-  }, [allQuestions, compactKeyword, normalizedKeyword, selectedSubject, selectedYear]);
+    return allQuestions
+      .filter((question) => {
+        if (selectedSubject !== "全部" && question.subject !== selectedSubject) return false;
+        if (selectedYear !== "全部" && String(question.sourceYear ?? "") !== selectedYear) return false;
+        return matchesQuestion(question, normalizedKeyword, compactKeyword);
+      })
+      .sort((left, right) => {
+        const yearLeft = left.sourceYear ?? (yearSortOrder === "desc" ? -Infinity : Infinity);
+        const yearRight = right.sourceYear ?? (yearSortOrder === "desc" ? -Infinity : Infinity);
+        if (yearLeft !== yearRight) {
+          return yearSortOrder === "desc" ? yearRight - yearLeft : yearLeft - yearRight;
+        }
+
+        const examLeft = left.examCode ?? "";
+        const examRight = right.examCode ?? "";
+        if (examLeft !== examRight) {
+          return yearSortOrder === "desc"
+            ? examRight.localeCompare(examLeft)
+            : examLeft.localeCompare(examRight);
+        }
+
+        const paperLeft = left.paperCode ?? "";
+        const paperRight = right.paperCode ?? "";
+        if (paperLeft !== paperRight) {
+          return yearSortOrder === "desc"
+            ? paperRight.localeCompare(paperLeft)
+            : paperLeft.localeCompare(paperRight);
+        }
+
+        const questionNoLeft = left.originalQuestionNumber ?? (yearSortOrder === "desc" ? -Infinity : Infinity);
+        const questionNoRight = right.originalQuestionNumber ?? (yearSortOrder === "desc" ? -Infinity : Infinity);
+        if (questionNoLeft !== questionNoRight) {
+          return yearSortOrder === "desc"
+            ? questionNoRight - questionNoLeft
+            : questionNoLeft - questionNoRight;
+        }
+
+        return yearSortOrder === "desc"
+          ? right.id.localeCompare(left.id)
+          : left.id.localeCompare(right.id);
+      });
+  }, [allQuestions, compactKeyword, normalizedKeyword, selectedSubject, selectedYear, yearSortOrder]);
 
   const totalMatches = filteredResults.length;
   const totalPages = Math.max(1, Math.ceil(totalMatches / PAGE_SIZE));
@@ -202,6 +243,8 @@ export default function SearchPage() {
     setExplanationLoadingMap((current) => ({ ...current, [question.id]: true }));
     setExplanationErrorMap((current) => ({ ...current, [question.id]: "" }));
 
+    const previousQuestion = findPreviousQuestionForContinuation(question, allQuestions);
+
     try {
       const response = await fetch("/api/question-explanation", {
         method: "POST",
@@ -223,7 +266,8 @@ export default function SearchPage() {
             answerCreditType: question.answerCreditType,
             explanation: question.explanation,
             testedConcept: question.testedConcept
-          }
+          },
+          previousQuestion: previousQuestion ? buildRelatedQuestionContext(previousQuestion) : undefined
         })
       });
 
@@ -364,7 +408,7 @@ export default function SearchPage() {
           </Link>
         </div>
 
-        <div className="mt-6 grid gap-4 lg:grid-cols-[1.2fr_1fr_0.8fr]">
+        <div className="mt-6 grid gap-4 lg:grid-cols-[1.2fr_1fr_0.8fr_1fr]">
           <label className="space-y-2">
             <span className="text-sm font-semibold text-slate-700">關鍵字</span>
             <input
@@ -406,6 +450,32 @@ export default function SearchPage() {
               ))}
             </select>
           </label>
+
+          <fieldset className="space-y-2">
+            <legend className="text-sm font-semibold text-slate-700">年份排序</legend>
+            <div className="grid min-h-12 grid-cols-2 gap-2 rounded-2xl border border-slate-200 bg-slate-50 p-2">
+              <label className="flex cursor-pointer items-center gap-2 rounded-xl bg-white px-3 py-2 text-sm text-slate-700 ring-1 ring-slate-200">
+                <input
+                  type="radio"
+                  name="year-sort-order"
+                  checked={yearSortOrder === "desc"}
+                  onChange={() => setYearSortOrder("desc")}
+                  className="h-4 w-4 accent-slate-900"
+                />
+                由近至遠
+              </label>
+              <label className="flex cursor-pointer items-center gap-2 rounded-xl bg-white px-3 py-2 text-sm text-slate-700 ring-1 ring-slate-200">
+                <input
+                  type="radio"
+                  name="year-sort-order"
+                  checked={yearSortOrder === "asc"}
+                  onChange={() => setYearSortOrder("asc")}
+                  className="h-4 w-4 accent-slate-900"
+                />
+                由遠至近
+              </label>
+            </div>
+          </fieldset>
         </div>
 
         <div className="mt-5 flex flex-wrap gap-2 text-sm font-semibold">

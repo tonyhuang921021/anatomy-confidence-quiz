@@ -19,6 +19,17 @@ type QuestionExplanationRequestBody = {
     explanation?: string;
     testedConcept?: string;
   };
+  previousQuestion?: {
+    id?: string;
+    stem?: string;
+    options?: Record<string, string | undefined>;
+    answer?: string;
+    acceptedAnswers?: string[];
+    answerCreditType?: string;
+    explanation?: string;
+    testedConcept?: string;
+    sourceLabel?: string;
+  };
   attempt?: {
     selectedAnswer?: string;
     confidence?: number;
@@ -287,6 +298,7 @@ async function upsertSharedExplanationOverride(
 
 function buildQuestionExplanationPrompt(body: QuestionExplanationRequestBody) {
   const question = body.question;
+  const previousQuestion = body.previousQuestion;
   const optionKeys = getRequiredOptionKeys(question?.options);
   const correctAnswerText =
     (question?.answerCreditType === "multiple_accepted" ||
@@ -304,6 +316,28 @@ function buildQuestionExplanationPrompt(body: QuestionExplanationRequestBody) {
     "",
     `題目：${question?.stem ?? ""}`,
     "",
+    previousQuestion?.stem
+      ? [
+          "上一題資訊（本題為承上題時請務必一併參考）：",
+          `上一題來源：${previousQuestion.sourceLabel ?? ""}`,
+          `上一題題號：${previousQuestion.id ?? ""}`,
+          `上一題考點：${previousQuestion.testedConcept ?? ""}`,
+          `上一題題目：${previousQuestion.stem ?? ""}`,
+          "上一題選項：",
+          ...Object.entries(previousQuestion.options ?? {}).map(
+            ([key, value]) => `${key}. ${value ?? ""}`
+          ),
+          `上一題答案：${
+            (previousQuestion.answerCreditType === "multiple_accepted" ||
+              previousQuestion.answerCreditType === "multiple_answers") &&
+            (previousQuestion.acceptedAnswers?.length ?? 0) > 0
+              ? previousQuestion.acceptedAnswers?.join(" / ")
+              : previousQuestion.answer ?? ""
+          }`,
+          `上一題解析：${previousQuestion.explanation ?? ""}`,
+          ""
+        ].join("\n")
+      : "",
     "選項：",
     ...Object.entries(question?.options ?? {}).map(([key, value]) => `${key}. ${value ?? ""}`),
     "",
@@ -328,6 +362,7 @@ function buildMissingOptionRetryPrompt(
   missingKeys: string[]
 ) {
   const question = body.question;
+  const previousQuestion = body.previousQuestion;
   const correctAnswerText =
     (question?.answerCreditType === "multiple_accepted" ||
       question?.answerCreditType === "multiple_answers") &&
@@ -349,6 +384,28 @@ function buildMissingOptionRetryPrompt(
     "",
     `題目：${question?.stem ?? ""}`,
     "",
+    previousQuestion?.stem
+      ? [
+          "上一題資訊（本題為承上題時請務必一併參考）：",
+          `上一題來源：${previousQuestion.sourceLabel ?? ""}`,
+          `上一題題號：${previousQuestion.id ?? ""}`,
+          `上一題考點：${previousQuestion.testedConcept ?? ""}`,
+          `上一題題目：${previousQuestion.stem ?? ""}`,
+          "上一題選項：",
+          ...Object.entries(previousQuestion.options ?? {}).map(
+            ([key, value]) => `${key}. ${value ?? ""}`
+          ),
+          `上一題答案：${
+            (previousQuestion.answerCreditType === "multiple_accepted" ||
+              previousQuestion.answerCreditType === "multiple_answers") &&
+            (previousQuestion.acceptedAnswers?.length ?? 0) > 0
+              ? previousQuestion.acceptedAnswers?.join(" / ")
+              : previousQuestion.answer ?? ""
+          }`,
+          `上一題解析：${previousQuestion.explanation ?? ""}`,
+          ""
+        ].join("\n")
+      : "",
     "選項：",
     ...Object.entries(question?.options ?? {}).map(([key, value]) => `${key}. ${value ?? ""}`),
     "",

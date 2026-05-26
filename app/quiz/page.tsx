@@ -27,6 +27,10 @@ import {
   pushQuestionStatsSnapshotToSupabase
 } from "@/lib/cloudSync";
 import {
+  buildRelatedQuestionContext,
+  findPreviousQuestionForContinuation
+} from "@/lib/questionContext";
+import {
   createQuestionOrder,
   DEFAULT_QUIZ_SETTINGS,
   getConfidenceLabel,
@@ -709,6 +713,8 @@ export default function QuizPage() {
     setExplanationLoadingMap((current) => ({ ...current, [question.id]: true }));
     setExplanationErrorMap((current) => ({ ...current, [question.id]: "" }));
 
+    const previousQuestion = findPreviousQuestionForContinuation(question, questionSet);
+
     try {
       const response = await fetch("/api/question-explanation", {
         method: "POST",
@@ -731,6 +737,7 @@ export default function QuizPage() {
             explanation: question.explanation,
             testedConcept: question.testedConcept
           },
+          previousQuestion: previousQuestion ? buildRelatedQuestionContext(previousQuestion) : undefined,
           attempt: {
             selectedAnswer: attempt.selectedAnswer,
             confidence: attempt.confidence,
