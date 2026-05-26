@@ -125,18 +125,6 @@ const ALLOWED_SUBJECTS = new Set<SubjectName>([
   "其他醫學一"
 ]);
 
-function getAllowedEmails() {
-  return (process.env.NEXT_PUBLIC_ADMIN_EMAILS ?? "tonyhuang921021@gmail.com")
-    .split(",")
-    .map((item) => item.trim().toLowerCase())
-    .filter(Boolean);
-}
-
-function isAllowedEmail(email?: string | null) {
-  if (!email) return false;
-  return getAllowedEmails().includes(email.trim().toLowerCase());
-}
-
 function getServiceSupabaseClient() {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
@@ -634,7 +622,6 @@ function aggregateLeaderboard(rows: PeakChallengeRunRow[]): PeakChallengeLeaderb
         userEmail: row.user_email ?? undefined,
         bestScore: score,
         runCount: 1,
-        averageScore: score,
         latestScore,
         latestCompletedAt
       });
@@ -646,7 +633,6 @@ function aggregateLeaderboard(rows: PeakChallengeRunRow[]): PeakChallengeLeaderb
       ...current,
       bestScore: Math.max(current.bestScore, score),
       runCount: nextRunCount,
-      averageScore: Number((((current.averageScore * current.runCount) + score) / nextRunCount).toFixed(1)),
       latestScore:
         !current.latestCompletedAt || latestCompletedAt > current.latestCompletedAt
           ? latestScore
@@ -660,7 +646,6 @@ function aggregateLeaderboard(rows: PeakChallengeRunRow[]): PeakChallengeLeaderb
 
   return [...grouped.values()].sort((left, right) =>
     right.bestScore - left.bestScore ||
-    right.averageScore - left.averageScore ||
     right.runCount - left.runCount ||
     (right.latestCompletedAt ?? "").localeCompare(left.latestCompletedAt ?? "")
   );
@@ -755,12 +740,6 @@ export async function POST(request: NextRequest) {
         return NextResponse.json(
           { ok: false, message: "請先登入帳號，才能開始巔峰賽。" },
           { status: 401 }
-        );
-      }
-      if (!isAllowedEmail(actor.email)) {
-        return NextResponse.json(
-          { ok: false, message: "這個模式目前僅限站長帳號使用。" },
-          { status: 403 }
         );
       }
 
@@ -936,12 +915,6 @@ export async function POST(request: NextRequest) {
         return NextResponse.json(
           { ok: false, message: "請先登入帳號，才能送出巔峰賽成績。" },
           { status: 401 }
-        );
-      }
-      if (!isAllowedEmail(actor.email)) {
-        return NextResponse.json(
-          { ok: false, message: "這個模式目前僅限站長帳號使用。" },
-          { status: 403 }
         );
       }
 

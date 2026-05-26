@@ -398,7 +398,6 @@ export type PeakChallengeLeaderboardEntry = {
   userEmail?: string;
   bestScore: number;
   runCount: number;
-  averageScore: number;
   latestScore: number;
   latestCompletedAt?: string;
 };

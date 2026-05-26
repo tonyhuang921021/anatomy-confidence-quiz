@@ -165,14 +165,12 @@ export function AuthPanel() {
               私有數據頁
             </a>
           ) : null}
-          {canViewOwnerPage ? (
-            <a
-              href="/peak"
-              className="inline-flex min-h-12 items-center justify-center rounded-full bg-rose-100 px-4 py-3 text-center text-sm font-semibold text-rose-950 transition hover:bg-rose-200"
-            >
-              巔峰賽模式
-            </a>
-          ) : null}
+          <a
+            href="/peak"
+            className="inline-flex min-h-12 items-center justify-center rounded-full bg-rose-100 px-4 py-3 text-center text-sm font-semibold text-rose-950 transition hover:bg-rose-200"
+          >
+            巔峰賽模式
+          </a>
           <a
             href="/progress"
             className="secondary-pill text-center"

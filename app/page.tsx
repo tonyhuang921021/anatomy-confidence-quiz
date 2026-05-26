@@ -58,6 +58,10 @@ export default function HomePage() {
                   刷題榜
                   <span className="text-slate-400">→</span>
                 </Link>
+                <Link href="/peak" className="secondary-pill justify-between px-4">
+                  巔峰賽模式
+                  <span className="text-slate-400">→</span>
+                </Link>
               </div>
             </div>
           </div>
