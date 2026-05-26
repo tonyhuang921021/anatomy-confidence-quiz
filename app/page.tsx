@@ -16,7 +16,11 @@ export default function HomePage() {
       <section className="surface-card overflow-hidden p-6 sm:p-8 lg:p-10">
         <div className="grid gap-8 lg:grid-cols-[minmax(0,1.25fr)_360px] lg:items-end">
           <div>
-            <p className="eyebrow">Board Prep Lab</p>
+            <div className="flex flex-wrap items-center gap-2">
+              <p className="eyebrow">Board Prep Lab</p>
+              <span className="stat-chip">醫學一</span>
+              <span className="stat-chip">醫學二</span>
+            </div>
             <h1 className="display-title mt-4 max-w-4xl text-5xl leading-[1.02] sm:text-6xl">
               一階醫師國考刷題測驗
             </h1>
@@ -34,11 +38,6 @@ export default function HomePage() {
               <Link href="/results" className="secondary-pill">
                 查看結果
               </Link>
-            </div>
-
-            <div className="mt-8 flex flex-wrap gap-2">
-              <span className="stat-chip">醫學一</span>
-              <span className="stat-chip">醫學二</span>
             </div>
           </div>
 
