@@ -39,9 +39,6 @@ export default function HomePage() {
             <div className="mt-8 flex flex-wrap gap-2">
               <span className="stat-chip">醫學一</span>
               <span className="stat-chip">醫學二</span>
-              <span className="stat-chip">{totalQuestionCount} 題</span>
-              <span className="stat-chip">錯題複習</span>
-              <span className="stat-chip">自訂卷</span>
             </div>
           </div>
 
