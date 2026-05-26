@@ -308,6 +308,61 @@ function compactSearchText(text: string) {
   return text.toLowerCase().replace(/[\s\-_/，。、；：（）()]+/g, "");
 }
 
+const MEDICAL_SEARCH_FRAGMENTS = [
+  "血液",
+  "腫瘤",
+  "腫瘤學",
+  "凝血",
+  "貧血",
+  "白血病",
+  "淋巴",
+  "骨髓",
+  "免疫",
+  "感染",
+  "發炎",
+  "代謝",
+  "內分泌",
+  "呼吸",
+  "循環",
+  "腎臟",
+  "肝臟",
+  "心臟",
+  "神經",
+  "消化",
+  "胃腸"
+];
+
+function expandAISearchTerms(terms: string[]) {
+  const expanded = new Set<string>();
+
+  for (const rawTerm of terms) {
+    const term = rawTerm.trim();
+    if (!term) continue;
+    expanded.add(term);
+
+    const strippedStudySuffix = term.replace(/學$/u, "").trim();
+    if (strippedStudySuffix && strippedStudySuffix !== term) {
+      expanded.add(strippedStudySuffix);
+    }
+
+    const compactTerm = compactSearchText(term);
+    for (const fragment of MEDICAL_SEARCH_FRAGMENTS) {
+      if (compactTerm.includes(compactSearchText(fragment))) {
+        expanded.add(fragment);
+      }
+    }
+
+    if (/^[\p{Script=Han}A-Za-z0-9]+$/u.test(term)) {
+      const slashSplit = term.split(/[／/、・·]/).map((item) => item.trim()).filter(Boolean);
+      for (const item of slashSplit) {
+        expanded.add(item);
+      }
+    }
+  }
+
+  return Array.from(expanded);
+}
+
 function sample<T>(items: T[], count: number) {
   const pool = [...items];
   for (let index = pool.length - 1; index > 0; index -= 1) {
@@ -1184,11 +1239,13 @@ export async function POST(request: NextRequest) {
         "gpt-5-mini"
       );
       const plan = parseAISearchPlan(expansion.text);
-      const searchTerms = Array.from(
-        new Set(
-          [query, ...(plan.searchTerms ?? []), ...(plan.relatedConcepts ?? [])]
-            .map((item) => item.trim())
-            .filter(Boolean)
+      const searchTerms = expandAISearchTerms(
+        Array.from(
+          new Set(
+            [query, ...(plan.searchTerms ?? []), ...(plan.relatedConcepts ?? [])]
+              .map((item) => item.trim())
+              .filter(Boolean)
+          )
         )
       );
 
@@ -1203,7 +1260,10 @@ export async function POST(request: NextRequest) {
       const candidateQuestions = scoredCandidates.slice(0, 80).map((item) => item.question);
       if (candidateQuestions.length === 0) {
         return NextResponse.json(
-          { ok: false, message: "目前找不到和這個區塊明顯相關的題目，請換更具體的關鍵字試試。" },
+          {
+            ok: false,
+            message: `目前在 ${yearFrom} 到 ${yearTo} 年、你選的科目範圍內，還抓不到和「${query}」明顯相關的題目。可以改試更核心的關鍵字，例如把大範圍拆成 1 到 2 個概念詞。`
+          },
           { status: 400 }
         );
       }
