@@ -288,6 +288,7 @@ export default function QuizPage() {
   const [classificationReportMessageMap, setClassificationReportMessageMap] = useState<Record<string, string>>({});
   const [isSubmittingAnswer, setIsSubmittingAnswer] = useState(false);
   const [isPeakPrefetching, setIsPeakPrefetching] = useState(false);
+  const [peakNextQuestionError, setPeakNextQuestionError] = useState("");
   const [selectedAnswer, setSelectedAnswer] = useState<OptionKey | undefined>();
   const [confidence, setConfidence] = useState<ConfidenceLevel>(4);
   const [confidenceExpanded, setConfidenceExpanded] = useState(false);
@@ -312,6 +313,29 @@ export default function QuizPage() {
       accessToken: authSession?.access_token ?? null,
       visitorId: getOrCreateVisitorId() ?? "",
       session: completedSession
+    });
+  }
+
+  async function requestNextPeakChallengeBatch(baseSession: QuizSession) {
+    const peakCandidates = baseSession.settings?.peakWrongPoolCandidates ?? [];
+    const doneQuestionIds = Array.from(
+      new Set([
+        ...(baseSession.questionOrder ?? []),
+        ...loadCompletedSessions()
+          .filter((item) => item.settings?.mode === "peak_challenge")
+          .flatMap((item) => item.attempts.map((entry) => entry.questionId))
+      ])
+    );
+
+    return generatePeakChallengeSession({
+      accessToken: authSession?.access_token ?? null,
+      visitorId: getOrCreateVisitorId() ?? "",
+      wrongPoolCandidates: peakCandidates,
+      doneQuestionIds,
+      desiredCount: 1,
+      existingSourceBreakdown: baseSession.settings?.peakSourceBreakdown ?? { pastExam: 0, aiGenerated: 0 },
+      practicedSubjects: baseSession.settings?.subjectFilters ?? [],
+      nextQuestionIndex: baseSession.questionOrder?.length ?? 0
     });
   }
 
@@ -496,6 +520,7 @@ export default function QuizPage() {
   function handleSubmit() {
     if (!session || !currentQuestion || !selectedAnswer) return;
     setIsSubmittingAnswer(true);
+    setPeakNextQuestionError("");
 
     const attempt: Attempt = {
       questionId: currentQuestion.id,
@@ -528,7 +553,6 @@ export default function QuizPage() {
         return;
       }
 
-      const peakCandidates = nextSessionBase.settings?.peakWrongPoolCandidates ?? [];
       const hasBufferedNextQuestion = (nextSessionBase.questionOrder?.length ?? 0) > currentIndex + 1;
       const accumulatedBreakdown = {
         pastExam: nextSessionBase.settings?.peakSourceBreakdown?.pastExam ?? 0,
@@ -558,27 +582,9 @@ export default function QuizPage() {
         return;
       }
 
-      const doneQuestionIds = Array.from(
-        new Set([
-          ...(nextSessionBase.questionOrder ?? []),
-          ...loadCompletedSessions()
-            .filter((item) => item.settings?.mode === "peak_challenge")
-            .flatMap((item) => item.attempts.map((entry) => entry.questionId))
-        ])
-      );
-
       void (async () => {
         try {
-          const nextQuestionBatch = await generatePeakChallengeSession({
-            accessToken: authSession?.access_token ?? null,
-            visitorId: getOrCreateVisitorId() ?? "",
-            wrongPoolCandidates: peakCandidates,
-            doneQuestionIds,
-            desiredCount: 1,
-            existingSourceBreakdown: accumulatedBreakdown,
-            practicedSubjects: nextSessionBase.settings?.subjectFilters ?? [],
-            nextQuestionIndex: nextSessionBase.questionOrder?.length ?? 0
-          });
+          const nextQuestionBatch = await requestNextPeakChallengeBatch(nextSessionBase);
 
           const mergedGeneratedQuestions = Array.from(
             new Map(
@@ -610,6 +616,7 @@ export default function QuizPage() {
 
           persistSession(advancedSession);
           void pushQuestionStatsSnapshotToSupabase(advancedSession);
+          setPeakNextQuestionError("");
           resetQuestionUI();
           setIsSubmittingAnswer(false);
           window.requestAnimationFrame(() => {
@@ -623,18 +630,13 @@ export default function QuizPage() {
               block: "start"
             });
           });
-        } catch {
-          const completedSession: QuizSession = {
-            ...nextSessionBase,
-            completedAt: new Date().toISOString(),
-            isReviewingAnswer: false
-          };
-          persistSession(completedSession);
-          saveCompletedSession(completedSession);
-          void pushCompletedSessionToSupabase(completedSession);
-          void pushQuestionStatsSnapshotToSupabase(completedSession);
-          syncCompletedPeakChallenge(completedSession);
-          router.push(`/results?sessionId=${encodeURIComponent(completedSession.id)}`);
+        } catch (error) {
+          persistSession(nextSessionBase);
+          setSubmittedAttempt(attempt);
+          setPeakNextQuestionError(
+            error instanceof Error ? error.message : "下一題產生失敗，請再試一次。"
+          );
+          setIsSubmittingAnswer(false);
         }
       })();
       return;
@@ -898,6 +900,67 @@ export default function QuizPage() {
     });
   }
 
+  async function handleRetryPeakNextQuestion() {
+    if (!session || session.settings?.mode !== "peak_challenge" || !submittedAttempt?.isCorrect) return;
+
+    try {
+      setIsSubmittingAnswer(true);
+      setPeakNextQuestionError("");
+      const nextQuestionBatch = await requestNextPeakChallengeBatch(session);
+      const mergedGeneratedQuestions = Array.from(
+        new Map(
+          [...(session.generatedQuestions ?? []), ...nextQuestionBatch.questions].map((question) => [
+            question.id,
+            question
+          ])
+        ).values()
+      );
+      const mergedQuestionOrder = Array.from(
+        new Set([...(session.questionOrder ?? []), ...nextQuestionBatch.questionIds])
+      );
+      const advancedSession: QuizSession = {
+        ...session,
+        generatedQuestions: mergedGeneratedQuestions,
+        questionOrder: mergedQuestionOrder,
+        currentQuestionIndex: currentIndex + 1,
+        isReviewingAnswer: false,
+        settings: {
+          ...session.settings,
+          mode: "peak_challenge",
+          questionCount: mergedQuestionOrder.length,
+          peakSourceBreakdown: {
+            pastExam:
+              (session.settings?.peakSourceBreakdown?.pastExam ?? 0) +
+              (nextQuestionBatch.sourceBreakdown.pastExam ?? 0),
+            aiGenerated:
+              (session.settings?.peakSourceBreakdown?.aiGenerated ?? 0) +
+              (nextQuestionBatch.sourceBreakdown.aiGenerated ?? 0)
+          }
+        }
+      };
+
+      persistSession(advancedSession);
+      void pushQuestionStatsSnapshotToSupabase(advancedSession);
+      resetQuestionUI();
+      setPeakNextQuestionError("");
+      setIsSubmittingAnswer(false);
+      window.requestAnimationFrame(() => {
+        const target =
+          typeof window !== "undefined" && window.innerWidth >= 1280
+            ? contentTopRef.current
+            : questionTopRef.current;
+
+        target?.scrollIntoView({
+          behavior: "smooth",
+          block: "start"
+        });
+      });
+    } catch (error) {
+      setPeakNextQuestionError(error instanceof Error ? error.message : "下一題產生失敗，請再試一次。");
+      setIsSubmittingAnswer(false);
+    }
+  }
+
   useEffect(() => {
     if (
       session?.settings?.mode !== "peak_challenge" ||
@@ -917,27 +980,7 @@ export default function QuizPage() {
     if (peakCandidates.length === 0) return;
 
     setIsPeakPrefetching(true);
-    const practicedSubjects = session.settings?.subjectFilters ?? [];
-    const sourceBreakdown = session.settings?.peakSourceBreakdown ?? { pastExam: 0, aiGenerated: 0 };
-    const doneQuestionIds = Array.from(
-      new Set([
-        ...(session.questionOrder ?? []),
-        ...loadCompletedSessions()
-          .filter((item) => item.settings?.mode === "peak_challenge")
-          .flatMap((item) => item.attempts.map((entry) => entry.questionId))
-      ])
-    );
-
-    void generatePeakChallengeSession({
-      accessToken: authSession?.access_token ?? null,
-      visitorId: getOrCreateVisitorId() ?? "",
-      wrongPoolCandidates: peakCandidates,
-      doneQuestionIds,
-      desiredCount: 1,
-      existingSourceBreakdown: sourceBreakdown,
-      practicedSubjects,
-      nextQuestionIndex: session.questionOrder?.length ?? 0
-    })
+    void requestNextPeakChallengeBatch(session)
       .then((nextQuestionBatch) => {
         setSession((current) => {
           if (!current || current.id !== session.id || current.completedAt) return current;
@@ -973,6 +1016,7 @@ export default function QuizPage() {
             }
           };
           saveCurrentSession(nextSession);
+          setPeakNextQuestionError("");
           return nextSession;
         });
       })
@@ -1157,6 +1201,11 @@ export default function QuizPage() {
                   <p>
                     本題信心：<span className="font-semibold">{getConfidenceLabel(submittedAttempt.confidence)}</span>
                   </p>
+                  {isPeakChallenge && peakNextQuestionError ? (
+                    <p className="rounded-2xl bg-amber-100/70 px-4 py-3 text-amber-950">
+                      {peakNextQuestionError}
+                    </p>
+                  ) : null}
                   {specialScoringNote ? (
                     <p className="rounded-2xl bg-amber-100/70 px-4 py-3 text-amber-950">
                       {specialScoringNote}
@@ -1240,13 +1289,24 @@ export default function QuizPage() {
                 <ErrorTypeSelector value={errorType} onSelect={handleErrorTypeSelect} />
               ) : null}
 
-              <button
-                type="button"
-                onClick={handleNext}
-                className="min-h-12 w-full rounded-2xl bg-ink px-4 py-4 text-sm font-semibold text-white transition hover:bg-slate-900"
-              >
-                {currentIndex === targetCount - 1 ? "查看結果" : "下一題"}
-              </button>
+              {isPeakChallenge && submittedAttempt.isCorrect && peakNextQuestionError ? (
+                <button
+                  type="button"
+                  onClick={() => void handleRetryPeakNextQuestion()}
+                  disabled={isSubmittingAnswer}
+                  className="min-h-12 w-full rounded-2xl bg-ink px-4 py-4 text-sm font-semibold text-white transition hover:bg-slate-900 disabled:cursor-not-allowed disabled:bg-slate-300"
+                >
+                  {isSubmittingAnswer ? "巔峰賽生成下一題中..." : "重試生成下一題"}
+                </button>
+              ) : (
+                <button
+                  type="button"
+                  onClick={handleNext}
+                  className="min-h-12 w-full rounded-2xl bg-ink px-4 py-4 text-sm font-semibold text-white transition hover:bg-slate-900"
+                >
+                  {currentIndex === targetCount - 1 ? "查看結果" : "下一題"}
+                </button>
+              )}
             </div>
           )}
 
