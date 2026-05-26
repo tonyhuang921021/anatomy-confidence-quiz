@@ -808,6 +808,19 @@ export async function POST(request: NextRequest) {
       const pastExamCandidateSummaries = shouldUseNewHardTrack
         ? hardPastCandidateSummaries
         : weaknessPastCandidateSummaries;
+      const aiFallbackPastCandidateSummaries = Array.from(
+        new Map(
+          [...hardPastCandidateSummaries, ...weaknessPastCandidateSummaries].map((candidate) => [
+            candidate.questionId,
+            candidate
+          ])
+        ).values()
+      ).sort(
+        (left, right) =>
+          (right.riskScore ?? 0) - (left.riskScore ?? 0) ||
+          (right.wrongCount ?? 0) - (left.wrongCount ?? 0) ||
+          left.questionId.localeCompare(right.questionId)
+      );
 
       let selectedPastQuestions: Question[] = [];
       let totalInputTokens = 0;
@@ -856,27 +869,43 @@ export async function POST(request: NextRequest) {
       });
       const remainingAiQuestionCount = Math.max(aiQuestionCount - reusableAIQuestions.length, 0);
       let generatedAIQuestions: Question[] = [];
+      let fallbackPastQuestions: Question[] = [];
       if (remainingAiQuestionCount > 0) {
-        const generation = await createOpenAIText(
-          buildAIGenerationPrompt({
-            count: remainingAiQuestionCount,
-            candidatePool: (shouldUseNewHardTrack ? hardPastCandidateSummaries : weaknessPastCandidateSummaries).slice(0, 18),
-            selectedPastQuestions
-          }),
-          Math.max(2600, remainingAiQuestionCount * 1200),
-          "gpt-5-mini"
-        );
-        totalInputTokens += generation.usage.inputTokens;
-        totalOutputTokens += generation.usage.outputTokens;
-        totalTokens += generation.usage.totalTokens;
-        model = generation.model;
-        generatedAIQuestions = normalizeGeneratedPeakQuestions(generation.text, `PEAK-${Date.now()}`);
-        await upsertSharedAIQuestions(supabase, generatedAIQuestions, model);
+        try {
+          const generation = await createOpenAIText(
+            buildAIGenerationPrompt({
+              count: remainingAiQuestionCount,
+              candidatePool: (shouldUseNewHardTrack ? hardPastCandidateSummaries : weaknessPastCandidateSummaries).slice(0, 18),
+              selectedPastQuestions
+            }),
+            Math.max(2600, remainingAiQuestionCount * 1200),
+            "gpt-5-mini"
+          );
+          totalInputTokens += generation.usage.inputTokens;
+          totalOutputTokens += generation.usage.outputTokens;
+          totalTokens += generation.usage.totalTokens;
+          model = generation.model;
+          generatedAIQuestions = normalizeGeneratedPeakQuestions(generation.text, `PEAK-${Date.now()}`);
+          await upsertSharedAIQuestions(supabase, generatedAIQuestions, model);
+        } catch {
+          const seenPastIds = new Set(selectedPastQuestions.map((question) => question.id));
+          for (const candidate of aiFallbackPastCandidateSummaries) {
+            const fallback = pastExamMap.get(candidate.questionId);
+            if (!fallback || doneQuestionIds.has(fallback.id) || seenPastIds.has(fallback.id)) continue;
+            seenPastIds.add(fallback.id);
+            fallbackPastQuestions.push(fallback);
+            if (fallbackPastQuestions.length >= remainingAiQuestionCount) break;
+          }
+        }
       }
       await bumpSharedAIQuestionUsage(supabase, reusableAIQuestions);
       generatedAIQuestions = [...reusableAIQuestions, ...generatedAIQuestions];
 
-      const combinedQuestions = mixPeakQuestions(selectedPastQuestions, generatedAIQuestions, desiredCount);
+      const combinedQuestions = mixPeakQuestions(
+        [...selectedPastQuestions, ...fallbackPastQuestions],
+        generatedAIQuestions,
+        desiredCount
+      );
       if (combinedQuestions.length === 0) {
         return NextResponse.json(
           { ok: false, message: "目前還抓不出可用的巔峰賽題目，請先再累積一些錯題後重試。" },
@@ -903,7 +932,7 @@ export async function POST(request: NextRequest) {
         questionIds: combinedQuestions.map((question) => question.id),
         questions: combinedQuestions,
         sourceBreakdown: {
-          pastExam: selectedPastQuestions.length,
+          pastExam: selectedPastQuestions.length + fallbackPastQuestions.length,
           aiGenerated: generatedAIQuestions.length
         }
       });
