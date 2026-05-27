@@ -1,6 +1,9 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
 type AttemptRow = {
   session_id: string;
   question_id: string;
@@ -114,25 +117,37 @@ export async function GET() {
       grouped.set(key, current);
     }
 
-    return NextResponse.json({
-      ok: true,
-      points: dayKeys.map((date) => {
-        const current = grouped.get(date) ?? { attempts: 0, correct: 0 };
-        return {
-          date,
-          attempts: current.attempts,
-          correctRate:
-            current.attempts === 0 ? 0 : Number(((current.correct / current.attempts) * 100).toFixed(1))
-        };
-      })
-    });
+    return NextResponse.json(
+      {
+        ok: true,
+        points: dayKeys.map((date) => {
+          const current = grouped.get(date) ?? { attempts: 0, correct: 0 };
+          return {
+            date,
+            attempts: current.attempts,
+            correctRate:
+              current.attempts === 0 ? 0 : Number(((current.correct / current.attempts) * 100).toFixed(1))
+          };
+        })
+      },
+      {
+        headers: {
+          "Cache-Control": "no-store, no-cache, must-revalidate, proxy-revalidate"
+        }
+      }
+    );
   } catch (error) {
     return NextResponse.json(
       {
         ok: false,
         message: error instanceof Error ? error.message : "首頁社群統計載入失敗"
       },
-      { status: 500 }
+      {
+        status: 500,
+        headers: {
+          "Cache-Control": "no-store, no-cache, must-revalidate, proxy-revalidate"
+        }
+      }
     );
   }
 }
