@@ -56,8 +56,10 @@ export function HomeToneBanner() {
     if (mode !== "anxious") return;
 
     let cancelled = false;
-    void fetch("/api/community-stats")
-      .then(async (response) => {
+
+    async function refreshStats() {
+      try {
+        const response = await fetch("/api/community-stats", { cache: "no-store" });
         const payload = (await response.json().catch(() => null)) as
           | { ok?: boolean; points?: { date: string; attempts: number; correctRate: number }[] }
           | null;
@@ -65,13 +67,29 @@ export function HomeToneBanner() {
           throw new Error("community-stats-unavailable");
         }
         if (!cancelled) setStats(payload.points);
-      })
-      .catch(() => {
+      } catch {
         if (!cancelled) setStats([]);
-      });
+      }
+    }
+
+    function handleVisibilityChange() {
+      if (document.visibilityState === "visible") {
+        void refreshStats();
+      }
+    }
+
+    void refreshStats();
+    const intervalId = window.setInterval(() => {
+      void refreshStats();
+    }, 30_000);
+    window.addEventListener("focus", handleVisibilityChange);
+    document.addEventListener("visibilitychange", handleVisibilityChange);
 
     return () => {
       cancelled = true;
+      window.clearInterval(intervalId);
+      window.removeEventListener("focus", handleVisibilityChange);
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
     };
   }, [mode]);
 
