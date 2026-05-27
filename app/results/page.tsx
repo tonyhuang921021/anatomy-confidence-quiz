@@ -391,6 +391,48 @@ function ResultsPageContent() {
     };
   }, [state.session]);
 
+  const recentCompletedSessions = useMemo(
+    () =>
+      [...state.sessions]
+        .filter((sessionItem) => Boolean(sessionItem.completedAt))
+        .sort((a, b) =>
+          (b.completedAt ?? b.startedAt).localeCompare(a.completedAt ?? a.startedAt)
+        )
+        .slice(0, 30),
+    [state.sessions]
+  );
+  const topWeakSections = useMemo(() => getTopWeakSections(state.sectionStats, 3), [state.sectionStats]);
+  const activeSession = state.session;
+  const questionMap = useMemo(
+    () => (activeSession ? getQuestionMap(activeSession, classificationOverrides) : new Map<string, Question>()),
+    [activeSession, classificationOverrides]
+  );
+  const reviewedAttempts = useMemo(
+    () =>
+      (activeSession?.attempts ?? [])
+        .map((attempt) => ({
+          attempt,
+          question: questionMap.get(attempt.questionId)
+        }))
+        .filter((item): item is { attempt: Attempt; question: Question } => Boolean(item.question)),
+    [activeSession?.attempts, questionMap]
+  );
+  const wrongAttempts = useMemo(
+    () => reviewedAttempts.filter((item) => !item.attempt.isCorrect),
+    [reviewedAttempts]
+  );
+  const lowConfidenceAttempts = useMemo(() => {
+    const wrongAttemptIds = new Set(wrongAttempts.map((item) => item.attempt.questionId));
+    return reviewedAttempts
+      .filter((item) => item.attempt.confidence <= 3 && !wrongAttemptIds.has(item.attempt.questionId))
+      .sort((a, b) => {
+        if (a.attempt.confidence !== b.attempt.confidence) {
+          return a.attempt.confidence - b.attempt.confidence;
+        }
+        return a.question.chapter.localeCompare(b.question.chapter) || a.question.section.localeCompare(b.question.section);
+      });
+  }, [reviewedAttempts, wrongAttempts]);
+
   function handleRestart() {
     clearCurrentSession();
     saveQuizSettings(DEFAULT_QUIZ_SETTINGS);
@@ -514,17 +556,6 @@ function ResultsPageContent() {
     );
   }
 
-  const recentCompletedSessions = useMemo(
-    () =>
-      [...state.sessions]
-        .filter((sessionItem) => Boolean(sessionItem.completedAt))
-        .sort((a, b) =>
-          (b.completedAt ?? b.startedAt).localeCompare(a.completedAt ?? a.startedAt)
-        )
-        .slice(0, 30),
-    [state.sessions]
-  );
-
   if (!requestedSessionId) {
     return (
       <main className="shell">
@@ -624,38 +655,6 @@ function ResultsPageContent() {
       </main>
     );
   }
-
-  const activeSession = state.session;
-  const topWeakSections = useMemo(() => getTopWeakSections(state.sectionStats, 3), [state.sectionStats]);
-  const questionMap = useMemo(
-    () => getQuestionMap(activeSession, classificationOverrides),
-    [activeSession, classificationOverrides]
-  );
-  const reviewedAttempts = useMemo(
-    () =>
-      activeSession.attempts
-        .map((attempt) => ({
-          attempt,
-          question: questionMap.get(attempt.questionId)
-        }))
-        .filter((item): item is { attempt: Attempt; question: Question } => Boolean(item.question)),
-    [activeSession.attempts, questionMap]
-  );
-  const wrongAttempts = useMemo(
-    () => reviewedAttempts.filter((item) => !item.attempt.isCorrect),
-    [reviewedAttempts]
-  );
-  const lowConfidenceAttempts = useMemo(() => {
-    const wrongAttemptIds = new Set(wrongAttempts.map((item) => item.attempt.questionId));
-    return reviewedAttempts
-      .filter((item) => item.attempt.confidence <= 3 && !wrongAttemptIds.has(item.attempt.questionId))
-      .sort((a, b) => {
-        if (a.attempt.confidence !== b.attempt.confidence) {
-          return a.attempt.confidence - b.attempt.confidence;
-        }
-        return a.question.chapter.localeCompare(b.question.chapter) || a.question.section.localeCompare(b.question.section);
-      });
-  }, [reviewedAttempts, wrongAttempts]);
 
   function renderQuestionExplanationControls(question: Question, attempt: Attempt) {
     const generated = explanationOverrides[question.id];
