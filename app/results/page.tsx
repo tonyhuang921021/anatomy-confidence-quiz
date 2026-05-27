@@ -68,12 +68,14 @@ function getQuestionMap(
   classificationOverrides: Record<string, QuestionClassificationOverride>
 ) {
   return new Map(
-    [...allQuestions, ...(session.generatedQuestions ?? [])].map((question) => [
-      question.id,
-      applyQuestionExplanationOverride(
-        applyQuestionClassificationOverride(question, classificationOverrides[question.id])
-      )
-    ] as const)
+    [...allQuestions, ...(session.generatedQuestions ?? [])]
+      .filter((question): question is Question => Boolean(question?.id))
+      .map((question) => [
+        question.id,
+        applyQuestionExplanationOverride(
+          applyQuestionClassificationOverride(question, classificationOverrides[question.id])
+        )
+      ] as const)
   );
 }
 

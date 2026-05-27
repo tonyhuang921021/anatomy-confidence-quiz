@@ -240,7 +240,9 @@ function getQuestionByOrder(
 ) {
   const ids = session.questionOrder ?? [];
   const generatedMap = new Map(
-    (session.generatedQuestions ?? []).map((question) => [question.id, question] as const)
+    (session.generatedQuestions ?? [])
+      .filter((question): question is Question => Boolean(question?.id))
+      .map((question) => [question.id, question] as const)
   );
 
   return ids

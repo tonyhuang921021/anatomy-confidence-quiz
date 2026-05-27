@@ -1,5 +1,6 @@
 import {
   ErrorType,
+  OptionKey,
   Question,
   QuestionExplanationOverride,
   QuizSession,
@@ -62,9 +63,89 @@ function normalizeErrorType(errorType?: string): ErrorType | undefined {
   }
 }
 
+function isOptionKey(value: unknown): value is OptionKey {
+  return value === "A" || value === "B" || value === "C" || value === "D" || value === "E";
+}
+
+function normalizeStoredQuestion(question: unknown): Question | null {
+  if (!question || typeof question !== "object") return null;
+
+  const raw = question as Partial<Question> & {
+    options?: Partial<Record<OptionKey, unknown>>;
+    acceptedAnswers?: unknown[];
+  };
+
+  const id = typeof raw.id === "string" ? raw.id.trim() : "";
+  const subject = typeof raw.subject === "string" ? raw.subject.trim() : "";
+  const chapter = typeof raw.chapter === "string" ? raw.chapter.trim() : "";
+  const section = typeof raw.section === "string" ? raw.section.trim() : "";
+  const stem = typeof raw.stem === "string" ? raw.stem.trim() : "";
+  const explanation = typeof raw.explanation === "string" ? raw.explanation.trim() : "";
+  const testedConcept = typeof raw.testedConcept === "string" ? raw.testedConcept.trim() : "";
+  const answer = typeof raw.answer === "string" ? raw.answer.trim().toUpperCase() : "";
+  const options = (raw.options ?? {}) as Record<string, unknown>;
+  const optionA = typeof options.A === "string" ? options.A.trim() : "";
+  const optionB = typeof options.B === "string" ? options.B.trim() : "";
+  const optionC = typeof options.C === "string" ? options.C.trim() : "";
+  const optionD = typeof options.D === "string" ? options.D.trim() : "";
+  const optionE = typeof options.E === "string" && options.E.trim() ? options.E.trim() : undefined;
+
+  if (
+    !id ||
+    !subject ||
+    !chapter ||
+    !section ||
+    !stem ||
+    !explanation ||
+    !testedConcept ||
+    !isOptionKey(answer) ||
+    !optionA ||
+    !optionB ||
+    !optionC ||
+    !optionD
+  ) {
+    return null;
+  }
+
+  const acceptedAnswers = Array.isArray(raw.acceptedAnswers)
+    ? raw.acceptedAnswers
+        .map((value) => String(value).trim().toUpperCase())
+        .filter((value): value is OptionKey => isOptionKey(value))
+    : undefined;
+
+  return {
+    ...raw,
+    id,
+    subject: subject as Question["subject"],
+    chapter,
+    section,
+    stem,
+    explanation,
+    testedConcept,
+    answer,
+    options: {
+      A: optionA,
+      B: optionB,
+      C: optionC,
+      D: optionD,
+      E: optionE
+    },
+    acceptedAnswers: acceptedAnswers && acceptedAnswers.length > 0 ? acceptedAnswers : undefined,
+    answerCreditType:
+      raw.answerCreditType === "all_credit"
+        ? "all_credit"
+        : raw.answerCreditType === "multiple_accepted" || raw.answerCreditType === "multiple_answers"
+          ? "multiple_accepted"
+          : "standard"
+  };
+}
+
 function normalizeSession(session: QuizSession): QuizSession {
   return {
     ...session,
+    generatedQuestions: (session.generatedQuestions ?? [])
+      .map(normalizeStoredQuestion)
+      .filter((question): question is Question => Boolean(question)),
     attempts: session.attempts.map((attempt) => ({
       ...attempt,
       errorType: normalizeErrorType(attempt.errorType)
