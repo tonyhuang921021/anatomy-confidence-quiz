@@ -70,6 +70,7 @@ type GeneratePeakBody = {
   existingSourceBreakdown?: { pastExam?: number; aiGenerated?: number };
   practicedSubjects?: SubjectName[];
   nextQuestionIndex?: number;
+  consumeAttempt?: boolean;
 };
 
 type SubmitPeakBody = {
@@ -77,6 +78,12 @@ type SubmitPeakBody = {
   accessToken?: string | null;
   visitorId?: string | null;
   session?: QuizSession;
+};
+
+type StartGateBody = {
+  action: "start_gate";
+  accessToken?: string | null;
+  visitorId?: string | null;
 };
 
 type VerifiedUser = {
@@ -109,6 +116,8 @@ type ImportedAIQuestionRaw = {
 const TARGET_QUESTION_COUNT = 10;
 const PAST_EXAM_TARGET_COUNT = 5;
 const AI_USAGE_PREFIX = "PEAK_CHALLENGE:";
+const DAILY_PEAK_CHALLENGE_LIMIT = 3;
+const OWNER_EMAIL = "tonyhuang921021@gmail.com";
 const ALLOWED_SUBJECTS = new Set<SubjectName>([
   "解剖學",
   "生理學",
@@ -161,7 +170,96 @@ function formatPeakChallengeErrorMessage(error: unknown) {
   ) {
     return "Supabase 還沒建立 peak_challenge_runs 資料表，請先跑巔峰賽那段 SQL。";
   }
+  if (
+    message.includes("peak_challenge_attempt_logs") &&
+    (message.includes("does not exist") || message.includes("Could not find"))
+  ) {
+    return "Supabase 還沒建立 peak_challenge_attempt_logs 資料表，請先跑我補的巔峰賽每日次數 SQL。";
+  }
   return message;
+}
+
+function isPeakChallengeOwner(email?: string | null) {
+  return (email ?? "").trim().toLowerCase() === OWNER_EMAIL;
+}
+
+function getTaipeiDayBounds(date = new Date()) {
+  const offsetMs = 8 * 60 * 60 * 1000;
+  const taipei = new Date(date.getTime() + offsetMs);
+  const year = taipei.getUTCFullYear();
+  const month = taipei.getUTCMonth();
+  const day = taipei.getUTCDate();
+  const startUtcMs = Date.UTC(year, month, day, -8, 0, 0, 0);
+  const endUtcMs = Date.UTC(year, month, day + 1, -8, 0, 0, 0);
+  return {
+    startIso: new Date(startUtcMs).toISOString(),
+    endIso: new Date(endUtcMs).toISOString()
+  };
+}
+
+async function getPeakChallengeDailyAttemptCount(supabase: any, email: string) {
+  const { startIso, endIso } = getTaipeiDayBounds();
+  const { count, error } = await supabase
+    .from("peak_challenge_attempt_logs")
+    .select("id", { count: "exact", head: true })
+    .eq("user_email", email.trim().toLowerCase())
+    .gte("started_at", startIso)
+    .lt("started_at", endIso);
+
+  if (error) throw error;
+  return count ?? 0;
+}
+
+async function consumePeakChallengeAttemptOrThrow(supabase: any, actor: VerifiedUser, visitorId?: string | null) {
+  const normalizedEmail = actor.email?.trim().toLowerCase();
+  if (!normalizedEmail || isPeakChallengeOwner(normalizedEmail)) {
+    return { remainingAttempts: null as number | null };
+  }
+
+  const usedAttempts = await getPeakChallengeDailyAttemptCount(supabase, normalizedEmail);
+  if (usedAttempts >= DAILY_PEAK_CHALLENGE_LIMIT) {
+    const error = new Error(`今日巔峰賽挑戰次數已用完（每天最多 ${DAILY_PEAK_CHALLENGE_LIMIT} 次）。`);
+    (error).name = "PeakChallengeLimitError";
+    throw error;
+  }
+
+  const { error } = await supabase.from("peak_challenge_attempt_logs").insert({
+    user_id: actor.id,
+    user_email: normalizedEmail,
+    visitor_id: visitorId ?? null
+  });
+  if (error) throw error;
+
+  return {
+    remainingAttempts: Math.max(DAILY_PEAK_CHALLENGE_LIMIT - usedAttempts - 1, 0)
+  };
+}
+
+async function getPeakChallengeAttemptStatus(supabase: any, actor: VerifiedUser) {
+  const normalizedEmail = actor.email?.trim().toLowerCase();
+  if (!normalizedEmail) {
+    return {
+      dailyLimit: DAILY_PEAK_CHALLENGE_LIMIT,
+      usedAttempts: 0,
+      remainingAttempts: DAILY_PEAK_CHALLENGE_LIMIT,
+      isOwnerBypass: false
+    };
+  }
+  if (isPeakChallengeOwner(normalizedEmail)) {
+    return {
+      dailyLimit: DAILY_PEAK_CHALLENGE_LIMIT,
+      usedAttempts: 0,
+      remainingAttempts: null as number | null,
+      isOwnerBypass: true
+    };
+  }
+  const usedAttempts = await getPeakChallengeDailyAttemptCount(supabase, normalizedEmail);
+  return {
+    dailyLimit: DAILY_PEAK_CHALLENGE_LIMIT,
+    usedAttempts,
+    remainingAttempts: Math.max(DAILY_PEAK_CHALLENGE_LIMIT - usedAttempts, 0),
+    isOwnerBypass: false
+  };
 }
 
 async function getVerifiedUser(supabase: any, accessToken?: string | null): Promise<VerifiedUser | null> {
@@ -179,6 +277,12 @@ async function getVerifiedUser(supabase: any, accessToken?: string | null): Prom
     email: data.user.email,
     label: displayName || data.user.email?.split("@")[0] || "已登入使用者"
   };
+}
+
+function requestAccessTokenFromHeadersOrNull(request: NextRequest) {
+  const authHeader = request.headers.get("authorization") ?? "";
+  if (!authHeader.toLowerCase().startsWith("bearer ")) return null;
+  return authHeader.slice(7).trim() || null;
 }
 
 async function loadClassificationOverrides(supabase: any) {
@@ -682,7 +786,7 @@ async function insertAIUsageLog(
   }
 }
 
-export async function GET() {
+export async function GET(request: NextRequest) {
   const supabase = getServiceSupabaseClient();
   if (!supabase) {
     return NextResponse.json(
@@ -692,6 +796,7 @@ export async function GET() {
   }
 
   try {
+    const accessToken = requestAccessTokenFromHeadersOrNull(request);
     const { data, error } = await supabase
       .from("peak_challenge_runs")
       .select("session_id, user_id, user_email, participant_label, score, total_answered, question_ids, source_breakdown, completed_at, created_at")
@@ -700,14 +805,23 @@ export async function GET() {
 
     if (error) throw error;
 
+    const actor = await getVerifiedUser(supabase, accessToken);
+    const attemptStatus = actor ? await getPeakChallengeAttemptStatus(supabase, actor) : null;
+
     return NextResponse.json({
       ok: true,
-      leaderboard: aggregateLeaderboard((data ?? []) as PeakChallengeRunRow[])
+      leaderboard: aggregateLeaderboard((data ?? []) as PeakChallengeRunRow[]),
+      attemptStatus
     });
   } catch (error) {
+    const message = formatPeakChallengeErrorMessage(error);
+    const status =
+      message.includes("今日巔峰賽挑戰次數已用完") || message.includes("AI 功能已被暫停")
+        ? 429
+        : 500;
     return NextResponse.json(
-      { ok: false, message: formatPeakChallengeErrorMessage(error) },
-      { status: 500 }
+      { ok: false, message },
+      { status }
     );
   }
 }
@@ -722,9 +836,33 @@ export async function POST(request: NextRequest) {
   }
 
   try {
-    const body = (await request.json().catch(() => null)) as GeneratePeakBody | SubmitPeakBody | null;
+    const body = (await request.json().catch(() => null)) as GeneratePeakBody | SubmitPeakBody | StartGateBody | null;
     if (!body?.action) {
       return NextResponse.json({ ok: false, message: "缺少操作類型。" }, { status: 400 });
+    }
+
+    if (body.action === "start_gate") {
+      const actor = await getVerifiedUser(supabase, body.accessToken);
+      if (!actor?.id || !actor.email) {
+        return NextResponse.json(
+          { ok: false, message: "請先登入帳號，才能開始巔峰賽。" },
+          { status: 401 }
+        );
+      }
+
+      const activeBan = await getActiveAIAccountBan(supabase, actor.email);
+      if (activeBan) {
+        return NextResponse.json(
+          {
+            ok: false,
+            message: `這個帳號的 AI 功能已被暫停到 ${new Date(activeBan.banned_until).toLocaleString("zh-TW")} 。`
+          },
+          { status: 429 }
+        );
+      }
+
+      const attemptStatus = await consumePeakChallengeAttemptOrThrow(supabase, actor, body.visitorId);
+      return NextResponse.json({ ok: true, remainingAttempts: attemptStatus.remainingAttempts });
     }
 
     if (body.action === "generate") {
@@ -765,6 +903,11 @@ export async function POST(request: NextRequest) {
         (body.practicedSubjects ?? []).filter((subject): subject is SubjectName => ALLOWED_SUBJECTS.has(subject)) ||
         [];
       const nextQuestionIndex = Math.max(0, body.nextQuestionIndex ?? doneQuestionIds.size);
+      let remainingAttempts: number | null = null;
+      if (body.consumeAttempt && nextQuestionIndex === 0) {
+        const attemptStatus = await consumePeakChallengeAttemptOrThrow(supabase, actor, body.visitorId);
+        remainingAttempts = attemptStatus.remainingAttempts;
+      }
       const rawCandidates = (body.wrongPoolCandidates ?? [])
         .filter((candidate) => candidate && typeof candidate.questionId === "string")
         .sort(
@@ -931,6 +1074,7 @@ export async function POST(request: NextRequest) {
         sessionTitle: "巔峰賽",
         questionIds: combinedQuestions.map((question) => question.id),
         questions: combinedQuestions,
+        remainingAttempts,
         sourceBreakdown: {
           pastExam: selectedPastQuestions.length + fallbackPastQuestions.length,
           aiGenerated: generatedAIQuestions.length

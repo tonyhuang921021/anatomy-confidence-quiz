@@ -6,7 +6,9 @@ import { useRouter } from "next/navigation";
 import { useAuth } from "@/components/AuthProvider";
 import { getQuestionBankBySubjectFilter } from "@/data/med1QuestionBank";
 import {
+  claimPeakChallengeStart,
   generatePeakChallengeSession,
+  loadPeakChallengeAccessStatus,
   loadPeakChallengeLeaderboard
 } from "@/lib/cloudSync";
 import {
@@ -36,6 +38,8 @@ export default function PeakChallengePage() {
   const [preloading, setPreloading] = useState(false);
   const [startError, setStartError] = useState("");
   const [hasPreparedOpening, setHasPreparedOpening] = useState(false);
+  const [attemptsRemaining, setAttemptsRemaining] = useState<number | null>(null);
+  const [ownerBypass, setOwnerBypass] = useState(false);
   const allQuestions = useMemo(() => getQuestionBankBySubjectFilter("全部"), []);
 
   const { practiceSnapshot, wrongPoolCandidates, peakDoneQuestionIds, practicedSubjects } = useMemo(() => {
@@ -100,7 +104,13 @@ export default function PeakChallengePage() {
       try {
         setLoading(true);
         setError("");
-        setLeaderboard(await loadPeakChallengeLeaderboard());
+        const [nextLeaderboard, accessStatus] = await Promise.all([
+          loadPeakChallengeLeaderboard(),
+          loadPeakChallengeAccessStatus().catch(() => null)
+        ]);
+        setLeaderboard(nextLeaderboard);
+        setAttemptsRemaining(accessStatus?.remainingAttempts ?? null);
+        setOwnerBypass(Boolean(accessStatus?.isOwnerBypass));
       } catch (fetchError) {
         setError(fetchError instanceof Error ? fetchError.message : "巔峰賽榜單載入失敗");
       } finally {
@@ -114,7 +124,7 @@ export default function PeakChallengePage() {
   useEffect(() => {
     const accessToken = session?.access_token;
 
-    if (!accessToken || !canEnter) {
+    if (!accessToken || !canEnter || attemptsRemaining === 0) {
       setHasPreparedOpening(false);
       return;
     }
@@ -143,7 +153,8 @@ export default function PeakChallengePage() {
           desiredCount: 2,
           existingSourceBreakdown: { pastExam: 0, aiGenerated: 0 },
           practicedSubjects,
-          nextQuestionIndex: 0
+          nextQuestionIndex: 0,
+          consumeAttempt: false
         });
 
         if (cancelled) return;
@@ -185,6 +196,10 @@ export default function PeakChallengePage() {
       setStartError("請先登入帳號，才能開始巔峰賽。");
       return;
     }
+    if (!ownerBypass && attemptsRemaining === 0) {
+      setStartError("你今天的巔峰賽挑戰次數已用完（每天最多 3 次）。");
+      return;
+    }
     if (!canEnter) {
       setStartError(`目前散題錯題庫只有 ${practiceSnapshot.total} 題，超過 ${ENTRY_THRESHOLD} 題才能進入巔峰賽。`);
       return;
@@ -194,6 +209,15 @@ export default function PeakChallengePage() {
       setStarting(true);
       setStartError("");
       const existingPreload = loadPeakChallengePreload();
+      const gate = existingPreload &&
+        existingPreload.fingerprint === preloadFingerprint &&
+        existingPreload.questionIds.length > 0 &&
+        existingPreload.questions.length > 0
+          ? await claimPeakChallengeStart({
+              accessToken: session.access_token,
+              visitorId: getOrCreateVisitorId() ?? ""
+            })
+          : null;
       const generated =
         existingPreload &&
         existingPreload.fingerprint === preloadFingerprint &&
@@ -203,7 +227,8 @@ export default function PeakChallengePage() {
               questionIds: existingPreload.questionIds,
               questions: existingPreload.questions,
               sourceBreakdown: existingPreload.sourceBreakdown,
-              sessionTitle: "巔峰賽"
+              sessionTitle: "巔峰賽",
+              remainingAttempts: gate?.remainingAttempts ?? null
             }
           : await generatePeakChallengeSession({
               accessToken: session.access_token,
@@ -213,8 +238,10 @@ export default function PeakChallengePage() {
               desiredCount: 2,
               existingSourceBreakdown: { pastExam: 0, aiGenerated: 0 },
               practicedSubjects,
-              nextQuestionIndex: 0
+              nextQuestionIndex: 0,
+              consumeAttempt: true
             });
+      setAttemptsRemaining(gate?.remainingAttempts ?? generated.remainingAttempts ?? attemptsRemaining);
 
       saveQuizSettings({
         ...DEFAULT_QUIZ_SETTINGS,
@@ -250,6 +277,9 @@ export default function PeakChallengePage() {
             <p className="mt-3 max-w-3xl text-slate-500">
               先看榜單。只有散題錯題庫超過 25 題的挑戰者才能開局；每次答對加 1 分，答錯立刻結束。
             </p>
+            {ownerBypass ? null : attemptsRemaining !== null ? (
+              <p className="mt-2 text-sm text-slate-500">今日剩餘挑戰 {attemptsRemaining} / 3 次</p>
+            ) : null}
           </div>
           <div className="flex flex-wrap gap-3">
             <button

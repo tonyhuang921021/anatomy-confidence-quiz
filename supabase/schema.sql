@@ -692,6 +692,23 @@ on public.peak_challenge_runs
 for select
 using (true);
 
+create table if not exists public.peak_challenge_attempt_logs (
+  id bigint generated always as identity primary key,
+  user_id uuid references auth.users (id) on delete set null,
+  user_email text not null,
+  visitor_id text,
+  started_at timestamptz not null default now()
+);
+
+create index if not exists peak_challenge_attempt_logs_user_email_started_at_idx
+on public.peak_challenge_attempt_logs (user_email, started_at desc);
+
+grant select, insert, update, delete
+  on public.peak_challenge_attempt_logs
+  to service_role;
+
+alter table public.peak_challenge_attempt_logs enable row level security;
+
 create table if not exists public.shared_ai_questions (
   id text primary key,
   feature text not null,

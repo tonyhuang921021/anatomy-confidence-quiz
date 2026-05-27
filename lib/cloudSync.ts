@@ -1771,11 +1771,27 @@ type PeakChallengeCandidateInput = {
   sourceType?: QuestionSourceType;
 };
 
+async function buildSupabaseAuthHeader() {
+  if (!isSupabaseConfigured()) return null;
+  const client = getSupabaseBrowserClient();
+  const { data } = await client.auth.getSession();
+  const token = data.session?.access_token;
+  return token ? `Bearer ${token}` : null;
+}
+
 export async function loadPeakChallengeLeaderboard(): Promise<PeakChallengeLeaderboardEntry[]> {
-  const response = await fetch("/api/peak-challenge");
+  const authHeader = await buildSupabaseAuthHeader();
+  const response = await fetch("/api/peak-challenge", {
+    headers: authHeader ? { Authorization: authHeader } : undefined,
+    cache: "no-store"
+  });
   const rawText = await response.text();
   const payload = tryParseJson<
-    | { ok?: boolean; message?: string; leaderboard?: PeakChallengeLeaderboardEntry[] }
+    | {
+        ok?: boolean;
+        message?: string;
+        leaderboard?: PeakChallengeLeaderboardEntry[];
+      }
   >(rawText);
 
   if (!response.ok || !payload?.ok || !payload.leaderboard) {
@@ -1783,6 +1799,61 @@ export async function loadPeakChallengeLeaderboard(): Promise<PeakChallengeLeade
   }
 
   return payload.leaderboard;
+}
+
+export async function loadPeakChallengeAccessStatus() {
+  const authHeader = await buildSupabaseAuthHeader();
+  const response = await fetch("/api/peak-challenge", {
+    headers: authHeader ? { Authorization: authHeader } : undefined,
+    cache: "no-store"
+  });
+  const rawText = await response.text();
+  const payload = tryParseJson<
+    | {
+        ok?: boolean;
+        message?: string;
+        attemptStatus?: {
+          dailyLimit: number;
+          usedAttempts: number;
+          remainingAttempts: number | null;
+          isOwnerBypass: boolean;
+        } | null;
+      }
+  >(rawText);
+
+  if (!response.ok || !payload?.ok) {
+    throw new Error(payload?.message || rawText || "巔峰賽狀態載入失敗");
+  }
+
+  return payload.attemptStatus ?? null;
+}
+
+export async function claimPeakChallengeStart(input: {
+  accessToken?: string | null;
+  visitorId?: string;
+}) {
+  const response = await fetch("/api/peak-challenge", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+      action: "start_gate",
+      ...input
+    })
+  });
+
+  const rawText = await response.text();
+  const payload = tryParseJson<{ ok?: boolean; message?: string; remainingAttempts?: number | null }>(rawText);
+
+  if (!response.ok || !payload?.ok) {
+    throw new Error(payload?.message || rawText || "巔峰賽開始失敗");
+  }
+
+  return {
+    remainingAttempts:
+      typeof payload.remainingAttempts === "number" ? payload.remainingAttempts : null
+  };
 }
 
 export async function generatePeakChallengeSession(input: {
@@ -1794,6 +1865,7 @@ export async function generatePeakChallengeSession(input: {
   existingSourceBreakdown?: { pastExam?: number; aiGenerated?: number };
   practicedSubjects?: SubjectName[];
   nextQuestionIndex?: number;
+  consumeAttempt?: boolean;
 }) {
   const response = await fetch("/api/peak-challenge", {
     method: "POST",
@@ -1815,6 +1887,7 @@ export async function generatePeakChallengeSession(input: {
         questionIds?: string[];
         questions?: CustomPaperDetail["questions"];
         sourceBreakdown?: { pastExam?: number; aiGenerated?: number };
+        remainingAttempts?: number | null;
       }
   >(rawText);
 
@@ -1826,7 +1899,9 @@ export async function generatePeakChallengeSession(input: {
     sessionTitle: payload.sessionTitle ?? "巔峰賽",
     questionIds: payload.questionIds,
     questions: payload.questions,
-    sourceBreakdown: payload.sourceBreakdown ?? {}
+    sourceBreakdown: payload.sourceBreakdown ?? {},
+    remainingAttempts:
+      typeof payload.remainingAttempts === "number" ? payload.remainingAttempts : null
   };
 }
 
