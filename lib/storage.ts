@@ -179,6 +179,7 @@ export function saveCompletedSession(session: QuizSession) {
 export function saveCompletedSessions(sessions: QuizSession[]) {
   if (!isBrowser()) return;
   window.localStorage.setItem(getScopedKey(COMPLETED_SESSIONS_KEY), JSON.stringify(sessions));
+  window.dispatchEvent(new CustomEvent("completed-sessions-change", { detail: sessions }));
 }
 
 export function loadCompletedSessions(): QuizSession[] {

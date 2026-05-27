@@ -27,8 +27,8 @@ html[data-theme="dark"] {
   --bg-base: #141820;
   --bg-mid: #171d26;
   --bg-wash: #1b222d;
-  --ink-main: #cfd6e0;
-  --ink-soft: #9aa4b1;
+  --ink-main: #dbe3ee;
+  --ink-soft: #b1bcc9;
   --line-soft: rgba(207, 214, 224, 0.065);
   --surface: rgba(29, 36, 47, 0.7);
   --surface-muted: rgba(29, 36, 47, 0.54);
@@ -215,17 +215,18 @@ html[data-theme="dark"] .primary-pill {
 
 html[data-theme="dark"] .text-slate-900,
 html[data-theme="dark"] .text-slate-800,
-html[data-theme="dark"] .text-slate-700,
-html[data-theme="dark"] .text-slate-600,
-html[data-theme="dark"] .text-slate-500,
-html[data-theme="dark"] .text-slate-400 {
-  color: var(--ink-soft);
-}
-
-html[data-theme="dark"] .text-slate-900,
-html[data-theme="dark"] .text-slate-800,
 html[data-theme="dark"] .text-ink {
   color: var(--ink-main);
+}
+
+html[data-theme="dark"] .text-slate-700,
+html[data-theme="dark"] .text-slate-600,
+html[data-theme="dark"] .text-slate-500 {
+  color: #c1cbd7;
+}
+
+html[data-theme="dark"] .text-slate-400 {
+  color: var(--ink-soft);
 }
 
 html[data-theme="dark"] .bg-white,
@@ -270,7 +271,14 @@ html[data-theme="dark"] .text-rose-950,
 html[data-theme="dark"] .text-rose-800,
 html[data-theme="dark"] .text-rose-700,
 html[data-theme="dark"] .text-rose-600 {
-  color: #efc4cf;
+  color: #f2c9d4;
+}
+
+html[data-theme="dark"] .text-red-700,
+html[data-theme="dark"] .text-red-600,
+html[data-theme="dark"] .text-red-500,
+html[data-theme="dark"] .text-red-400 {
+  color: #f0b9c8;
 }
 
 html[data-theme="dark"] .bg-slate-900,
