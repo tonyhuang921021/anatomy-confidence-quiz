@@ -1,4 +1,5 @@
 import {
+  ConfidenceLevel,
   ErrorType,
   OptionKey,
   Question,
@@ -61,6 +62,10 @@ function normalizeErrorType(errorType?: string): ErrorType | undefined {
     default:
       return undefined;
   }
+}
+
+function normalizeConfidenceLevel(value: unknown): ConfidenceLevel {
+  return value === 1 || value === 2 || value === 3 || value === 4 || value === 5 ? value : 4;
 }
 
 function isOptionKey(value: unknown): value is OptionKey {
@@ -140,16 +145,62 @@ function normalizeStoredQuestion(question: unknown): Question | null {
   };
 }
 
+function normalizeStoredAttempt(attempt: unknown) {
+  if (!attempt || typeof attempt !== "object") return null;
+  const raw = attempt as Partial<QuizSession["attempts"][number]>;
+  const questionId = typeof raw.questionId === "string" ? raw.questionId.trim() : "";
+  const selectedAnswer = typeof raw.selectedAnswer === "string" ? raw.selectedAnswer.trim().toUpperCase() : "";
+  const correctAnswer = typeof raw.correctAnswer === "string" ? raw.correctAnswer.trim().toUpperCase() : "";
+  const answeredAt = typeof raw.answeredAt === "string" && raw.answeredAt.trim()
+    ? raw.answeredAt
+    : new Date(0).toISOString();
+
+  if (!questionId || !isOptionKey(selectedAnswer) || !isOptionKey(correctAnswer)) {
+    return null;
+  }
+
+  return {
+    questionId,
+    selectedAnswer,
+    correctAnswer,
+    isCorrect: Boolean(raw.isCorrect),
+    confidence: normalizeConfidenceLevel(raw.confidence),
+    errorType: normalizeErrorType(raw.errorType),
+    answeredAt
+  };
+}
+
 function normalizeSession(session: QuizSession): QuizSession {
+  const normalizedAttempts = Array.isArray(session.attempts)
+    ? session.attempts
+        .map(normalizeStoredAttempt)
+        .filter((attempt): attempt is NonNullable<ReturnType<typeof normalizeStoredAttempt>> => Boolean(attempt))
+    : [];
+
   return {
     ...session,
+    subject: typeof session.subject === "string" && session.subject.trim()
+      ? session.subject
+      : "解剖學",
+    startedAt:
+      typeof session.startedAt === "string" && session.startedAt.trim()
+        ? session.startedAt
+        : new Date(0).toISOString(),
+    completedAt:
+      typeof session.completedAt === "string" && session.completedAt.trim()
+        ? session.completedAt
+        : undefined,
+    questionOrder: Array.isArray(session.questionOrder)
+      ? session.questionOrder.filter((questionId): questionId is string => typeof questionId === "string" && questionId.trim().length > 0)
+      : [],
     generatedQuestions: (session.generatedQuestions ?? [])
       .map(normalizeStoredQuestion)
       .filter((question): question is Question => Boolean(question)),
-    attempts: session.attempts.map((attempt) => ({
-      ...attempt,
-      errorType: normalizeErrorType(attempt.errorType)
-    }))
+    currentQuestionIndex:
+      typeof session.currentQuestionIndex === "number" && session.currentQuestionIndex >= 0
+        ? session.currentQuestionIndex
+        : 0,
+    attempts: normalizedAttempts
   };
 }
 

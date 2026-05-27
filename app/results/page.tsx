@@ -230,48 +230,62 @@ function ResultsPageContent() {
   }
 
   useEffect(() => {
-    const targetSessionId = searchParams.get("sessionId");
-    setRequestedSessionId(targetSessionId);
-    const completedSessions = loadCompletedSessions();
-    const targetSession =
-      targetSessionId
-        ? completedSessions.find((item) => item.id === targetSessionId) ?? null
-        : null;
+    try {
+      const targetSessionId = searchParams.get("sessionId");
+      setRequestedSessionId(targetSessionId);
+      const completedSessions = loadCompletedSessions();
+      const targetSession =
+        targetSessionId
+          ? completedSessions.find((item) => item.id === targetSessionId) ?? null
+          : null;
 
-    if (!targetSession?.completedAt) {
-      setState((current) => ({
-        ...current,
-        session: null,
+      if (!targetSession?.completedAt) {
+        setState((current) => ({
+          ...current,
+          session: null,
+          sessions: completedSessions,
+          summary: null,
+          sectionStats: [],
+          promptText: "",
+          lowCompletion: [],
+          unstableSections: [],
+          completionStats: null
+        }));
+        setMounted(true);
+        return;
+      }
+
+      const currentQuestions =
+        targetSession.generatedQuestions && targetSession.generatedQuestions.length > 0
+          ? targetSession.generatedQuestions
+          : anatomyQuestions;
+      const completionStats = calculateCompletionStats(anatomyQuestions, completedSessions);
+      const sessionSectionStats = calculateSectionStats(targetSession.attempts, currentQuestions);
+
+      setState({
+        session: targetSession,
         sessions: completedSessions,
+        summary: calculateSummary(targetSession.attempts, currentQuestions),
+        sectionStats: sessionSectionStats,
+        promptText: generateAIPrompt(targetSession.attempts, currentQuestions, completedSessions),
+        lowCompletion: getLowCompletionSections(completionStats.sections, 5),
+        unstableSections: getUnstableCompletedSections(completionStats.sections, 5),
+        completionStats
+      });
+      setMounted(true);
+    } catch {
+      setState({
+        session: null,
+        sessions: [],
         summary: null,
         sectionStats: [],
         promptText: "",
         lowCompletion: [],
         unstableSections: [],
         completionStats: null
-      }));
+      });
       setMounted(true);
-      return;
     }
-
-    const currentQuestions =
-      targetSession.generatedQuestions && targetSession.generatedQuestions.length > 0
-        ? targetSession.generatedQuestions
-        : anatomyQuestions;
-    const completionStats = calculateCompletionStats(anatomyQuestions, completedSessions);
-    const sessionSectionStats = calculateSectionStats(targetSession.attempts, currentQuestions);
-
-    setState({
-      session: targetSession,
-      sessions: completedSessions,
-      summary: calculateSummary(targetSession.attempts, currentQuestions),
-      sectionStats: sessionSectionStats,
-      promptText: generateAIPrompt(targetSession.attempts, currentQuestions, completedSessions),
-      lowCompletion: getLowCompletionSections(completionStats.sections, 5),
-      unstableSections: getUnstableCompletedSections(completionStats.sections, 5),
-      completionStats
-    });
-    setMounted(true);
   }, [searchParams, syncVersion]);
 
   useEffect(() => {
