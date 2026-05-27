@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { Suspense, useEffect, useState } from "react";
+import { Suspense, useEffect, useMemo, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useAuth } from "@/components/AuthProvider";
 import { QuestionOptionBlock, QuestionStemBlock } from "@/components/QuestionMediaBlock";
@@ -307,6 +307,7 @@ function ResultsPageContent() {
     void fetchCommunityStats();
 
     function handleFocusSync() {
+      if (typeof document !== "undefined" && document.visibilityState !== "visible") return;
       void fetchCommunityStats();
     }
 
@@ -497,12 +498,16 @@ function ResultsPageContent() {
     );
   }
 
-  const recentCompletedSessions = [...state.sessions]
-    .filter((sessionItem) => Boolean(sessionItem.completedAt))
-    .sort((a, b) =>
-      (b.completedAt ?? b.startedAt).localeCompare(a.completedAt ?? a.startedAt)
-    )
-    .slice(0, 30);
+  const recentCompletedSessions = useMemo(
+    () =>
+      [...state.sessions]
+        .filter((sessionItem) => Boolean(sessionItem.completedAt))
+        .sort((a, b) =>
+          (b.completedAt ?? b.startedAt).localeCompare(a.completedAt ?? a.startedAt)
+        )
+        .slice(0, 30),
+    [state.sessions]
+  );
 
   if (!requestedSessionId) {
     return (
@@ -604,24 +609,37 @@ function ResultsPageContent() {
     );
   }
 
-  const topWeakSections = getTopWeakSections(state.sectionStats, 3);
-  const questionMap = getQuestionMap(state.session, classificationOverrides);
-  const reviewedAttempts = state.session.attempts
-    .map((attempt) => ({
-      attempt,
-      question: questionMap.get(attempt.questionId)
-    }))
-    .filter((item): item is { attempt: Attempt; question: Question } => Boolean(item.question));
-  const wrongAttempts = reviewedAttempts.filter((item) => !item.attempt.isCorrect);
-  const wrongAttemptIds = new Set(wrongAttempts.map((item) => item.attempt.questionId));
-  const lowConfidenceAttempts = reviewedAttempts
-    .filter((item) => item.attempt.confidence <= 3 && !wrongAttemptIds.has(item.attempt.questionId))
-    .sort((a, b) => {
-      if (a.attempt.confidence !== b.attempt.confidence) {
-        return a.attempt.confidence - b.attempt.confidence;
-      }
-      return a.question.chapter.localeCompare(b.question.chapter) || a.question.section.localeCompare(b.question.section);
-    });
+  const activeSession = state.session;
+  const topWeakSections = useMemo(() => getTopWeakSections(state.sectionStats, 3), [state.sectionStats]);
+  const questionMap = useMemo(
+    () => getQuestionMap(activeSession, classificationOverrides),
+    [activeSession, classificationOverrides]
+  );
+  const reviewedAttempts = useMemo(
+    () =>
+      activeSession.attempts
+        .map((attempt) => ({
+          attempt,
+          question: questionMap.get(attempt.questionId)
+        }))
+        .filter((item): item is { attempt: Attempt; question: Question } => Boolean(item.question)),
+    [activeSession.attempts, questionMap]
+  );
+  const wrongAttempts = useMemo(
+    () => reviewedAttempts.filter((item) => !item.attempt.isCorrect),
+    [reviewedAttempts]
+  );
+  const lowConfidenceAttempts = useMemo(() => {
+    const wrongAttemptIds = new Set(wrongAttempts.map((item) => item.attempt.questionId));
+    return reviewedAttempts
+      .filter((item) => item.attempt.confidence <= 3 && !wrongAttemptIds.has(item.attempt.questionId))
+      .sort((a, b) => {
+        if (a.attempt.confidence !== b.attempt.confidence) {
+          return a.attempt.confidence - b.attempt.confidence;
+        }
+        return a.question.chapter.localeCompare(b.question.chapter) || a.question.section.localeCompare(b.question.section);
+      });
+  }, [reviewedAttempts, wrongAttempts]);
 
   function renderQuestionExplanationControls(question: Question, attempt: Attempt) {
     const generated = explanationOverrides[question.id];

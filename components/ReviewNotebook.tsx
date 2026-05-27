@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { type ReactNode, useEffect, useState } from "react";
+import { type ReactNode, useEffect, useMemo, useState } from "react";
 import { QuestionOptionBlock, QuestionStemBlock } from "@/components/QuestionMediaBlock";
 import {
   loadConfirmedQuestionClassificationOverrides,
@@ -240,9 +240,27 @@ export function ReviewNotebook({
   const [classificationOverrides, setClassificationOverrides] = useState<Record<string, QuestionClassificationOverride>>({});
   const [communityStatsMap, setCommunityStatsMap] = useState<Record<string, QuestionCommunityStats>>({});
   const [activeCategory, setActiveCategory] = useState<"wrong" | "lowConfidence">("wrong");
-  const wrongItems = sortByRecent(items.filter((item) => item.history.wrong > 0));
-  const lowConfidenceItems = sortByRecent(items.filter((item) => item.history.lowConfidence > 0));
-  const activeItems = activeCategory === "wrong" ? wrongItems : lowConfidenceItems;
+  const [visibleCount, setVisibleCount] = useState(40);
+  const questionIdsKey = useMemo(
+    () => items.map((item) => item.question.id).sort().join("|"),
+    [items]
+  );
+  const wrongItems = useMemo(
+    () => sortByRecent(items.filter((item) => item.history.wrong > 0)),
+    [items]
+  );
+  const lowConfidenceItems = useMemo(
+    () => sortByRecent(items.filter((item) => item.history.lowConfidence > 0)),
+    [items]
+  );
+  const activeItems = useMemo(
+    () => (activeCategory === "wrong" ? wrongItems : lowConfidenceItems),
+    [activeCategory, lowConfidenceItems, wrongItems]
+  );
+  const visibleItems = useMemo(
+    () => activeItems.slice(0, visibleCount),
+    [activeItems, visibleCount]
+  );
 
   useEffect(() => {
     if (activeCategory === "wrong" && wrongItems.length === 0 && lowConfidenceItems.length > 0) {
@@ -254,6 +272,10 @@ export function ReviewNotebook({
       setActiveCategory("wrong");
     }
   }, [activeCategory, lowConfidenceItems.length, wrongItems.length]);
+
+  useEffect(() => {
+    setVisibleCount(40);
+  }, [activeCategory, questionIdsKey]);
 
   useEffect(() => {
     async function fetchCommunityStats() {
@@ -272,6 +294,7 @@ export function ReviewNotebook({
     void fetchCommunityStats();
 
     function handleFocusSync() {
+      if (typeof document !== "undefined" && document.visibilityState !== "visible") return;
       void fetchCommunityStats();
     }
 
@@ -286,11 +309,11 @@ export function ReviewNotebook({
         document.removeEventListener("visibilitychange", handleFocusSync);
       }
     };
-  }, [items]);
+  }, [items, questionIdsKey]);
 
   useEffect(() => {
     setExplanationOverrides(loadQuestionExplanationOverrides());
-  }, [items]);
+  }, [items, questionIdsKey]);
 
   useEffect(() => {
     if (items.length === 0) return;
@@ -300,7 +323,7 @@ export function ReviewNotebook({
       .catch(() => {
         // keep static classification if override fetch fails
       });
-  }, [items]);
+  }, [items, questionIdsKey]);
 
   useEffect(() => {
     async function fetchSharedExplanationOverrides() {
@@ -636,7 +659,7 @@ export function ReviewNotebook({
                     {activeCategory === "wrong" ? "目前沒有累積錯題。" : "目前沒有累積低信心題。"}
                   </div>
                 ) : (
-                  activeItems.map((item, index) => (
+                  visibleItems.map((item, index) => (
                     <article
                       key={`${activeCategory}-${item.question.id}`}
                       className={`rounded-3xl border p-5 ${
@@ -701,6 +724,17 @@ export function ReviewNotebook({
                   ))
                 )}
               </div>
+              {activeItems.length > visibleItems.length ? (
+                <div className="mt-4 flex justify-center">
+                  <button
+                    type="button"
+                    onClick={() => setVisibleCount((current) => current + 40)}
+                    className="min-h-11 rounded-2xl bg-slate-100 px-4 py-2 text-sm font-semibold text-slate-800 transition hover:bg-slate-200"
+                  >
+                    再顯示 40 題
+                  </button>
+                </div>
+              ) : null}
             </div>
           </>
         )}

@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useMemo, useState } from "react";
+import { useDeferredValue, useEffect, useMemo, useState } from "react";
 import { useAuth } from "@/components/AuthProvider";
 import { QuestionOptionBlock, QuestionStemBlock } from "@/components/QuestionMediaBlock";
 import {
@@ -116,9 +116,10 @@ export default function SearchPage() {
   const [classificationReportLoadingMap, setClassificationReportLoadingMap] = useState<Record<string, boolean>>({});
   const [classificationReportMessageMap, setClassificationReportMessageMap] = useState<Record<string, string>>({});
   const [classificationOverrides, setClassificationOverrides] = useState<Record<string, QuestionClassificationOverride>>({});
+  const deferredKeyword = useDeferredValue(keyword);
 
-  const normalizedKeyword = normalizeSearchText(keyword);
-  const compactKeyword = compactSearchText(keyword);
+  const normalizedKeyword = normalizeSearchText(deferredKeyword);
+  const compactKeyword = compactSearchText(deferredKeyword);
   const allQuestions = useMemo(
     () =>
       Array.from(
@@ -207,6 +208,10 @@ export default function SearchPage() {
   const safeCurrentPage = Math.min(currentPage, totalPages);
   const pageStart = (safeCurrentPage - 1) * PAGE_SIZE;
   const pageResults = filteredResults.slice(pageStart, pageStart + PAGE_SIZE);
+  const pageResultIdsKey = useMemo(
+    () => pageResults.map((question) => question.id).join("|"),
+    [pageResults]
+  );
 
   useEffect(() => {
     async function fetchSharedExplanationOverrides() {
@@ -229,7 +234,7 @@ export default function SearchPage() {
     }
 
     void fetchSharedExplanationOverrides();
-  }, [pageResults]);
+  }, [pageResultIdsKey, pageResults]);
 
   async function handleGenerateQuestionExplanation(question: Question) {
     if (!session?.access_token) {
