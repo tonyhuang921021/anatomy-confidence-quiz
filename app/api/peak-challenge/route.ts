@@ -600,6 +600,88 @@ function normalizeGeneratedPeakQuestions(rawJson: string, paperCode: string) {
   });
 }
 
+function sanitizeStoredPeakQuestion(rawQuestion: unknown, fallbackId: string): Question | null {
+  if (!rawQuestion || typeof rawQuestion !== "object") return null;
+
+  const question = rawQuestion as Partial<Question>;
+  const stem = typeof question.stem === "string" ? question.stem.trim() : "";
+  if (!stem) return null;
+
+  const options = question.options ?? {};
+  const normalizedOptions = {
+    A: toValidOptionText((options as Record<string, unknown>).A),
+    B: toValidOptionText((options as Record<string, unknown>).B),
+    C: toValidOptionText((options as Record<string, unknown>).C),
+    D: toValidOptionText((options as Record<string, unknown>).D),
+    E: toValidOptionText((options as Record<string, unknown>).E) || undefined
+  };
+  if (!normalizedOptions.A || !normalizedOptions.B || !normalizedOptions.C || !normalizedOptions.D) {
+    return null;
+  }
+
+  const rawAnswer = String(question.answer ?? "").trim().toUpperCase();
+  if (!toValidOptionKey(rawAnswer)) return null;
+
+  const acceptedAnswers =
+    Array.isArray(question.acceptedAnswers) && question.acceptedAnswers.length > 0
+      ? question.acceptedAnswers
+          .map((value) => String(value).trim().toUpperCase())
+          .filter((value): value is OptionKey => toValidOptionKey(value))
+      : undefined;
+
+  return {
+    id: question.id?.trim() || fallbackId,
+    subject: normalizeImportedSubject(question.subject),
+    chapter: typeof question.chapter === "string" && question.chapter.trim() ? question.chapter.trim() : "巔峰賽 AI 新題",
+    section: typeof question.section === "string" && question.section.trim() ? question.section.trim() : "巔峰賽 AI 新題",
+    stem,
+    options: normalizedOptions,
+    answer: rawAnswer,
+    acceptedAnswers:
+      question.answerCreditType === "multiple_accepted" && acceptedAnswers && acceptedAnswers.length > 0
+        ? acceptedAnswers
+        : undefined,
+    answerCreditType:
+      question.answerCreditType === "all_credit"
+        ? "all_credit"
+        : question.answerCreditType === "multiple_accepted" || question.answerCreditType === "multiple_answers"
+          ? "multiple_accepted"
+          : "standard",
+    explanation:
+      typeof question.explanation === "string" && question.explanation.trim()
+        ? question.explanation.trim()
+        : "尚未提供詳解。",
+    testedConcept:
+      typeof question.testedConcept === "string" && question.testedConcept.trim()
+        ? question.testedConcept.trim()
+        : "巔峰賽 AI 新題",
+    optionAnalysis:
+      question.optionAnalysis && typeof question.optionAnalysis === "object"
+        ? Object.fromEntries(
+            Object.entries(question.optionAnalysis)
+              .filter(([key, value]) => toValidOptionKey(key) && typeof value === "string" && value.trim())
+              .map(([key, value]) => [key, value.trim()])
+          ) as Partial<Record<OptionKey, string>>
+        : undefined,
+    memoryTip:
+      typeof question.memoryTip === "string" && question.memoryTip.trim()
+        ? question.memoryTip.trim()
+        : undefined,
+    difficulty: question.difficulty === "easy" || question.difficulty === "medium" || question.difficulty === "hard"
+      ? question.difficulty
+      : "hard",
+    source:
+      question.source === "past-exam-inspired" || question.source === "ai-generated"
+        ? question.source
+        : "ai-generated",
+    sourceType: question.sourceType === "MOEX_PAST_EXAM" ? "MOEX_PAST_EXAM" : "AI_GENERATED",
+    sourceCitation:
+      typeof question.sourceCitation === "string" && question.sourceCitation.trim()
+        ? question.sourceCitation.trim()
+        : "巔峰賽共享 AI 題"
+  };
+}
+
 async function fetchReusableSharedAIQuestions(
   supabase: any,
   input: {
@@ -639,10 +721,10 @@ async function fetchReusableSharedAIQuestions(
     return chapterSet.has(chapterKey) || sectionSet.has(sectionKey);
   });
 
-  return rows.slice(0, input.limit).map((row) => ({
-    ...(row.question_payload as Question),
-    id: row.id
-  }));
+  return rows
+    .slice(0, input.limit)
+    .map((row) => sanitizeStoredPeakQuestion(row.question_payload, row.id))
+    .filter((question): question is Question => Boolean(question));
 }
 
 async function upsertSharedAIQuestions(supabase: any, questions: Question[], model: string) {
@@ -1048,7 +1130,13 @@ export async function POST(request: NextRequest) {
         [...selectedPastQuestions, ...fallbackPastQuestions],
         generatedAIQuestions,
         desiredCount
-      );
+      )
+        .map((question) =>
+          question.sourceType === "MOEX_PAST_EXAM"
+            ? question
+            : sanitizeStoredPeakQuestion(question, question.id)
+        )
+        .filter((question): question is Question => Boolean(question));
       if (combinedQuestions.length === 0) {
         return NextResponse.json(
           { ok: false, message: "目前還抓不出可用的巔峰賽題目，請先再累積一些錯題後重試。" },
