@@ -145,8 +145,15 @@ export function saveCurrentSession(session: QuizSession) {
 }
 
 export function loadCurrentSession(): QuizSession | null {
+  return loadCurrentSessionForUser(getActiveStorageUser());
+}
+
+export function loadCurrentSessionForUser(userId: string): QuizSession | null {
   if (!isBrowser()) return null;
-  const raw = getLegacyOrScopedRaw(CURRENT_SESSION_KEY);
+  const scopedKey = getScopedKeyForUser(CURRENT_SESSION_KEY, userId);
+  const raw =
+    window.localStorage.getItem(scopedKey) ??
+    (userId === GUEST_USER_ID ? getLegacyOrScopedRaw(CURRENT_SESSION_KEY) : null);
   if (!raw) return null;
 
   try {

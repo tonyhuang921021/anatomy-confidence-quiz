@@ -11,6 +11,7 @@ import {
 } from "react";
 import type { Session, User } from "@supabase/supabase-js";
 import {
+  syncCurrentSessionForCurrentUser,
   syncCompletedSessionsForCurrentUser,
   syncLeaderboardProfileForCurrentUser
 } from "@/lib/cloudSync";
@@ -95,6 +96,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             continue;
           }
 
+          await syncCurrentSessionForCurrentUser(userId);
           const mergedSessions = await syncCompletedSessionsForCurrentUser(userId);
           await syncLeaderboardProfileForCurrentUser(effectiveUser, mergedSessions);
           lastError = null;

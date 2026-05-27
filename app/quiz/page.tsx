@@ -22,6 +22,7 @@ import {
   loadConfirmedQuestionClassificationOverrides,
   recordCustomPaperAttempt,
   recordPeakChallengeRun,
+  pushCurrentSessionToSupabase,
   loadSharedQuestionExplanationOverrides,
   pushCompletedSessionToSupabase,
   pushQuestionStatsSnapshotToSupabase
@@ -481,6 +482,18 @@ export default function QuizPage() {
 
     void fetchSharedExplanationOverrides();
   }, [session?.id, session?.questionOrder]);
+
+  useEffect(() => {
+    if (!authSession?.user?.id || !session || session.completedAt || !mounted) return;
+
+    const timer = window.setTimeout(() => {
+      void pushCurrentSessionToSupabase(session);
+    }, 500);
+
+    return () => {
+      window.clearTimeout(timer);
+    };
+  }, [authSession?.user?.id, mounted, session]);
 
   const allQuestionFallbackMap = useMemo(
     () =>

@@ -20,8 +20,11 @@ import type {
   VisitorStats
 } from "@/types/quiz";
 import {
+  loadCurrentSession,
+  loadCurrentSessionForUser,
   loadCompletedSessions,
   loadCompletedSessionsForUser,
+  saveCurrentSession,
   saveCompletedSessions
 } from "@/lib/storage";
 import {
@@ -367,6 +370,16 @@ function sessionFreshnessValue(session: QuizSession) {
   return session.completedAt || session.startedAt || "";
 }
 
+function sessionActivityValue(session: QuizSession, fallbackUpdatedAt?: string | null) {
+  const latestAnsweredAt = session.attempts
+    .map((attempt) => attempt.answeredAt)
+    .filter(Boolean)
+    .sort()
+    .at(-1);
+
+  return latestAnsweredAt || session.completedAt || fallbackUpdatedAt || session.startedAt || "";
+}
+
 function namespaceSessionIdForUser(userId: string, sessionId: string) {
   const prefix = `user-${userId}:`;
   return sessionId.startsWith(prefix) ? sessionId : `${prefix}${sessionId}`;
@@ -409,6 +422,26 @@ function mergeSessions(localSessions: QuizSession[], remoteSessions: QuizSession
 
 function mapRowToSession(row: QuizSessionRow | null) {
   return row?.session_payload ?? null;
+}
+
+async function fetchActiveQuizSessionRow(userId: string) {
+  if (!isSupabaseConfigured()) return null;
+
+  const supabase = getSupabaseBrowserClient();
+  const { data, error } = await supabase
+    .from("quiz_sessions")
+    .select("id, user_id, subject, started_at, completed_at, session_payload, updated_at")
+    .eq("user_id", userId)
+    .is("completed_at", null)
+    .order("updated_at", { ascending: false })
+    .limit(1)
+    .maybeSingle();
+
+  if (error) {
+    throw error;
+  }
+
+  return (data as QuizSessionRow | null) ?? null;
 }
 
 function getLeaderboardDisplayName(user: Pick<User, "id" | "email" | "user_metadata">) {
@@ -845,6 +878,40 @@ export async function syncCompletedSessionsForCurrentUser(userId: string) {
   return mergedSessions;
 }
 
+export async function syncCurrentSessionForCurrentUser(userId: string) {
+  if (!isSupabaseConfigured()) {
+    return loadCurrentSession();
+  }
+
+  const guestSession = loadCurrentSessionForUser("guest");
+  const localUserSession = loadCurrentSessionForUser(userId);
+  const localCurrentSession =
+    [localUserSession, guestSession]
+      .filter((session): session is QuizSession => Boolean(session) && !session?.completedAt)
+      .sort((left, right) => sessionActivityValue(right).localeCompare(sessionActivityValue(left)))[0] ?? null;
+
+  const remoteRow = await fetchActiveQuizSessionRow(userId);
+  const remoteCurrentSession = remoteRow ? mapRowToSession(remoteRow) : null;
+
+  const localActivity = localCurrentSession ? sessionActivityValue(localCurrentSession) : "";
+  const remoteActivity = remoteCurrentSession
+    ? sessionActivityValue(remoteCurrentSession, remoteRow?.updated_at)
+    : "";
+
+  let winner = localCurrentSession;
+
+  if (remoteCurrentSession && (!winner || remoteActivity > localActivity)) {
+    winner = canonicalizeSessionsForUser(userId, [remoteCurrentSession])[0] ?? remoteCurrentSession;
+    saveCurrentSession(winner);
+  }
+
+  if (winner && !winner.completedAt) {
+    await upsertSessionsForUser(userId, canonicalizeSessionsForUser(userId, [winner]));
+  }
+
+  return winner ?? remoteCurrentSession ?? null;
+}
+
 export async function pushCompletedSessionToSupabase(session: QuizSession) {
   if (!isSupabaseConfigured()) return;
 
@@ -870,6 +937,16 @@ export async function pushCompletedSessionToSupabase(session: QuizSession) {
 export async function pushQuestionStatsSnapshotToSupabase(session: QuizSession) {
   if (!isSupabaseConfigured()) return;
   await syncQuestionStatsForSessionsSafely([session]);
+}
+
+export async function pushCurrentSessionToSupabase(session: QuizSession) {
+  if (!isSupabaseConfigured() || session.completedAt) return;
+
+  const supabase = getSupabaseBrowserClient();
+  const { data } = await supabase.auth.getUser();
+  if (!data.user) return;
+
+  await upsertSessionsForUser(data.user.id, canonicalizeSessionsForUser(data.user.id, [session]));
 }
 
 export async function syncLeaderboardProfileForCurrentUser(
