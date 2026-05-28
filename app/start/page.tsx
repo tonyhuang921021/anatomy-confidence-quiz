@@ -152,7 +152,7 @@ export default function StartPage() {
     const nextSettings: QuizSettings = {
       ...DEFAULT_QUIZ_SETTINGS,
       mode: "random",
-      questionCount: availableQuestionCount,
+      questionCount: 10,
       yearFrom: practiceYearRange.yearFrom,
       yearTo: practiceYearRange.yearTo,
       subjectFilter:
@@ -189,7 +189,7 @@ export default function StartPage() {
               </Link>
             </div>
             <p className="body-soft mt-3 max-w-2xl text-sm leading-7 sm:text-base">
-              可以只勾一科，也可以混著抽。開始後會依你設定的年份範圍，直接帶出那段期間實際有的題數。
+              可以只勾一科，也可以混著抽。年份範圍只會影響抽題池，每次開始測驗仍固定 10 題。
             </p>
           </div>
           <Link
@@ -269,7 +269,7 @@ export default function StartPage() {
               disabled={(selectedSubjects.length === 0 && !includeSeasonalLimited) || availableQuestionCount === 0}
               className="primary-pill disabled:cursor-not-allowed disabled:bg-slate-300"
             >
-              開始 {availableQuestionCount} 題測驗
+              開始 10 題測驗
             </button>
           </div>
         </div>
