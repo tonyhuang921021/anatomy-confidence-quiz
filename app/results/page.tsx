@@ -28,9 +28,11 @@ import {
 } from "@/lib/quizAnalysis";
 import {
   applyQuestionExplanationOverride,
+  loadCurrentSession,
   clearCurrentSession,
   loadCompletedSessions,
   loadQuestionExplanationOverrides,
+  saveCompletedSession,
   saveQuestionExplanationOverride,
   saveQuestionExplanationOverrides,
   saveQuizSettings
@@ -237,10 +239,24 @@ function ResultsPageContent() {
       const targetSessionId = searchParams.get("sessionId");
       setRequestedSessionId(targetSessionId);
       const completedSessions = loadCompletedSessions();
+      const currentSession = loadCurrentSession();
+      const fallbackCurrentSession =
+        targetSessionId &&
+        currentSession?.id === targetSessionId &&
+        currentSession.completedAt
+          ? currentSession
+          : null;
       const targetSession =
         targetSessionId
-          ? completedSessions.find((item) => item.id === targetSessionId) ?? null
+          ? completedSessions.find((item) => item.id === targetSessionId) ?? fallbackCurrentSession ?? null
           : null;
+
+      if (
+        fallbackCurrentSession &&
+        !completedSessions.some((item) => item.id === fallbackCurrentSession.id)
+      ) {
+        saveCompletedSession(fallbackCurrentSession);
+      }
 
       if (!targetSession?.completedAt) {
         setState((current) => ({

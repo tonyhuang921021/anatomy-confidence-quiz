@@ -537,6 +537,12 @@ export default function QuizPage() {
     saveCurrentSession(nextSession);
   }
 
+  function finalizeCompletedSession(completedSession: QuizSession) {
+    setSession(completedSession);
+    saveCompletedSession(completedSession);
+    clearCurrentSession();
+  }
+
   function handleSelectConfidence(value: ConfidenceLevel) {
     setConfidence(value);
     setConfidenceExpanded(value <= 3);
@@ -580,8 +586,7 @@ export default function QuizPage() {
           completedAt: new Date().toISOString(),
           isReviewingAnswer: false
         };
-        persistSession(completedSession);
-        saveCompletedSession(completedSession);
+        finalizeCompletedSession(completedSession);
         void pushCompletedSessionToSupabase(completedSession);
         void pushQuestionStatsSnapshotToSupabase(completedSession);
         syncCompletedPeakChallenge(completedSession);
@@ -687,8 +692,7 @@ export default function QuizPage() {
           completedAt: new Date().toISOString(),
           isReviewingAnswer: false
         };
-        persistSession(completedSession);
-        saveCompletedSession(completedSession);
+        finalizeCompletedSession(completedSession);
         void pushCompletedSessionToSupabase(completedSession);
         void pushQuestionStatsSnapshotToSupabase(completedSession);
         syncCompletedCustomPaper(completedSession);
@@ -907,8 +911,7 @@ export default function QuizPage() {
         completedAt: new Date().toISOString(),
         isReviewingAnswer: false
       };
-      persistSession(completedSession);
-      saveCompletedSession(completedSession);
+      finalizeCompletedSession(completedSession);
       void pushCompletedSessionToSupabase(completedSession);
       syncCompletedCustomPaper(completedSession);
       router.push(`/results?sessionId=${encodeURIComponent(completedSession.id)}`);
