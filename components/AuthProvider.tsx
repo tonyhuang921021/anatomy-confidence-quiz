@@ -36,6 +36,7 @@ type AuthContextValue = {
 const AuthContext = createContext<AuthContextValue | null>(null);
 
 const SYNC_RETRY_DELAYS_MS = [0, 400, 1200];
+const CLOUD_REFRESH_INTERVAL_MS = 45_000;
 
 function getErrorMessage(error: unknown) {
   if (error instanceof Error) return error.message;
@@ -174,6 +175,36 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       subscription.unsubscribe();
     };
   }, [configured]);
+
+  useEffect(() => {
+    if (!configured || !user?.id) return;
+    const activeUser = user;
+
+    function handleVisibilityRefresh() {
+      if (document.visibilityState === "visible") {
+        void refreshCloudData(activeUser.id, activeUser);
+      }
+    }
+
+    function handleFocusRefresh() {
+      void refreshCloudData(activeUser.id, activeUser);
+    }
+
+    const intervalId = window.setInterval(() => {
+      if (document.visibilityState === "visible") {
+        void refreshCloudData(activeUser.id, activeUser);
+      }
+    }, CLOUD_REFRESH_INTERVAL_MS);
+
+    document.addEventListener("visibilitychange", handleVisibilityRefresh);
+    window.addEventListener("focus", handleFocusRefresh);
+
+    return () => {
+      window.clearInterval(intervalId);
+      document.removeEventListener("visibilitychange", handleVisibilityRefresh);
+      window.removeEventListener("focus", handleFocusRefresh);
+    };
+  }, [configured, refreshCloudData, user]);
 
   const value = useMemo<AuthContextValue>(
     () => ({

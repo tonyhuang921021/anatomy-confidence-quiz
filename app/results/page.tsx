@@ -1116,7 +1116,7 @@ function ResultsPageContent() {
       ) : null}
       {isFullscreenReview ? (
         <div
-          className={`fixed inset-0 z-50 bg-cream transition-opacity duration-300 ease-out overscroll-none sm:hidden ${
+          className={`fixed inset-0 z-50 bg-[color:var(--bg-base)] transition-opacity duration-300 ease-out overscroll-none sm:hidden ${
             isFullscreenReviewVisible ? "opacity-100" : "opacity-0"
           }`}
         >
@@ -1125,7 +1125,7 @@ function ResultsPageContent() {
               isFullscreenReviewVisible ? "translate-y-0" : "translate-y-full"
             }`}
           >
-            <div className="flex items-center justify-between gap-3 border-b border-slate-200 bg-white px-4 py-3 shadow-sm">
+            <div className="flex items-center justify-between gap-3 border-b px-4 py-3 shadow-sm border-[color:var(--line-soft)] bg-[color:var(--surface)] backdrop-blur">
               <div>
                 <p className="text-xs font-semibold uppercase tracking-[0.18em] text-brand-700">Fullscreen Review</p>
                 <h2 className="text-lg font-bold text-ink">題目回顧</h2>

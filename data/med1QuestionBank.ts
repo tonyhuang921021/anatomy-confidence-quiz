@@ -921,6 +921,15 @@ const questionTextOverrides: Record<string, QuestionTextOverride> = {
       D: "錯。尿素再吸收不是初級主動運輸，而是經尿素轉運蛋白進行 facilitated diffusion。"
     },
     testedConcept: "腎臟生理／氨排泄與尿素循環"
+  },
+  "MOEX-115020-1301-Q060": {
+    stem: "有關腦部循環與血流調控之敘述，何者最為適當？",
+    options: {
+      A: "腦部之流量自動控制（flow autoregulation）機制較肝臟顯著，腦部動脈血中二氧化碳濃度升高時會引起血管擴張",
+      B: "肝臟之流量自動控制（flow autoregulation）機制較腦部顯著，腦部動脈血中二氧化碳濃度升高時會引起血管擴張",
+      C: "腦部之流量自動控制（flow autoregulation）機制較肝臟顯著，腦部動脈血中二氧化碳濃度升高時會引起血管收縮",
+      D: "肝臟之流量自動控制（flow autoregulation）機制較腦部顯著，腦部動脈血中二氧化碳濃度升高時會引起血管收縮"
+    }
   }
 };
 
