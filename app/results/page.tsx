@@ -114,6 +114,8 @@ function getAccuracyTone(correctRate: number) {
   return "bg-emerald-100 text-emerald-800";
 }
 
+const RESULTS_HISTORY_PAGE_SIZE = 30;
+
 function ResultsPageContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -130,6 +132,7 @@ function ResultsPageContent() {
   const [copyPromptNotice, setCopyPromptNotice] = useState(false);
   const [isFullscreenReview, setIsFullscreenReview] = useState(false);
   const [isFullscreenReviewVisible, setIsFullscreenReviewVisible] = useState(false);
+  const [visibleHistoryCount, setVisibleHistoryCount] = useState(RESULTS_HISTORY_PAGE_SIZE);
   const [state, setState] = useState<ResultState>({
     session: null,
     sessions: [],
@@ -289,6 +292,10 @@ function ResultsPageContent() {
   }, [searchParams, syncVersion]);
 
   useEffect(() => {
+    setVisibleHistoryCount(RESULTS_HISTORY_PAGE_SIZE);
+  }, [syncVersion, requestedSessionId]);
+
+  useEffect(() => {
     setExplanationOverrides(loadQuestionExplanationOverrides());
   }, [syncVersion]);
 
@@ -397,9 +404,12 @@ function ResultsPageContent() {
         .filter((sessionItem) => Boolean(sessionItem.completedAt))
         .sort((a, b) =>
           (b.completedAt ?? b.startedAt).localeCompare(a.completedAt ?? a.startedAt)
-        )
-        .slice(0, 30),
+        ),
     [state.sessions]
+  );
+  const visibleCompletedSessions = useMemo(
+    () => recentCompletedSessions.slice(0, visibleHistoryCount),
+    [recentCompletedSessions, visibleHistoryCount]
   );
   const topWeakSections = useMemo(() => getTopWeakSections(state.sectionStats, 3), [state.sectionStats]);
   const activeSession = state.session;
@@ -569,7 +579,7 @@ function ResultsPageContent() {
                 目前還沒有已完成的作答紀錄。
               </div>
             ) : (
-              recentCompletedSessions.map((sessionItem, index) => {
+              visibleCompletedSessions.map((sessionItem, index) => {
                 const completedAt = sessionItem.completedAt ?? sessionItem.startedAt;
                 const correctCount = sessionItem.attempts.filter((attempt) => attempt.isCorrect).length;
                 const totalCount = sessionItem.attempts.length;
@@ -611,6 +621,18 @@ function ResultsPageContent() {
               })
             )}
           </div>
+
+          {visibleCompletedSessions.length < recentCompletedSessions.length ? (
+            <div className="mt-4 flex justify-center">
+              <button
+                type="button"
+                onClick={() => setVisibleHistoryCount((current) => current + RESULTS_HISTORY_PAGE_SIZE)}
+                className="min-h-12 rounded-2xl bg-slate-100 px-5 py-3 text-sm font-semibold text-slate-800 transition hover:bg-slate-200"
+              >
+                載入更多
+              </button>
+            </div>
+          ) : null}
 
           <div className="mt-6 flex flex-col justify-center gap-3 sm:flex-row">
             <Link
