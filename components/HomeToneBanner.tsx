@@ -1,6 +1,8 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import { useAuth } from "@/components/AuthProvider";
+import { getHomeToneModePreference } from "@/lib/accountPreferences";
 import { loadHomeToneMode, type HomeToneMode } from "@/lib/storage";
 
 const CALM_LINES = [
@@ -35,11 +37,12 @@ function formatDateLabel(date: string, offsetFromEnd: number) {
 }
 
 export function HomeToneBanner() {
+  const { user } = useAuth();
   const [mode, setMode] = useState<HomeToneMode>("calm");
   const [stats, setStats] = useState<{ date: string; attempts: number; correctRate: number }[]>([]);
 
   useEffect(() => {
-    setMode(loadHomeToneMode());
+    setMode(getHomeToneModePreference(user?.user_metadata) ?? loadHomeToneMode());
 
     function handleModeChange(event: Event) {
       const detail = (event as CustomEvent<HomeToneMode>).detail;
@@ -50,7 +53,7 @@ export function HomeToneBanner() {
     return () => {
       window.removeEventListener("home-tone-mode-change", handleModeChange as EventListener);
     };
-  }, []);
+  }, [user?.id, user?.user_metadata]);
 
   useEffect(() => {
     if (mode !== "anxious") return;

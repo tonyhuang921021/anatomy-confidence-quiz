@@ -18,6 +18,12 @@ import {
   type HomeToneMode,
   type ThemeMode
 } from "@/lib/storage";
+import {
+  getHomeToneModePreference,
+  getPracticeYearRangePreference,
+  getThemeModePreference,
+  type AccountPreferencePatch
+} from "@/lib/accountPreferences";
 import { getSupabaseBrowserClient } from "@/lib/supabase/client";
 
 export function AuthPanel() {
@@ -73,22 +79,56 @@ export function AuthPanel() {
   }, [user]);
 
   useEffect(() => {
-    setHomeToneMode(loadHomeToneMode());
-    setThemeMode(loadThemeMode());
-  }, []);
+    const accountToneMode = getHomeToneModePreference(user?.user_metadata);
+    const accountThemeMode = getThemeModePreference(user?.user_metadata);
+    const nextToneMode = accountToneMode ?? loadHomeToneMode();
+    const nextThemeMode = accountThemeMode ?? loadThemeMode();
+    setHomeToneMode(nextToneMode);
+    setThemeMode(nextThemeMode);
+    if (accountToneMode) saveHomeToneMode(accountToneMode);
+    if (accountThemeMode) saveThemeMode(accountThemeMode);
+  }, [user?.id, user?.user_metadata]);
 
   useEffect(() => {
-    setPracticeYearRange(loadPracticeYearRange(defaultPracticeYearRange) ?? defaultPracticeYearRange);
-  }, [defaultPracticeYearRange]);
+    const accountRange = getPracticeYearRangePreference(user?.user_metadata, defaultPracticeYearRange);
+    const nextRange = accountRange ?? loadPracticeYearRange(defaultPracticeYearRange) ?? defaultPracticeYearRange;
+    setPracticeYearRange(nextRange);
+    if (accountRange) savePracticeYearRange(accountRange);
+  }, [defaultPracticeYearRange, user?.id, user?.user_metadata]);
+
+  async function persistAccountPreferences(patch: AccountPreferencePatch) {
+    if (!user) return;
+
+    const { error: updateError } = await getSupabaseBrowserClient().auth.updateUser({
+      data: {
+        ...user.user_metadata,
+        ...patch
+      }
+    });
+
+    if (updateError) {
+      throw updateError;
+    }
+  }
 
   function handleChangeHomeToneMode(mode: HomeToneMode) {
     setHomeToneMode(mode);
     saveHomeToneMode(mode);
+    if (!user) return;
+    setError("");
+    void persistAccountPreferences({ home_tone_mode: mode }).catch((persistError) => {
+      setError(persistError instanceof Error ? persistError.message : "首頁模式同步失敗");
+    });
   }
 
   function handleChangeThemeMode(mode: ThemeMode) {
     setThemeMode(mode);
     saveThemeMode(mode);
+    if (!user) return;
+    setError("");
+    void persistAccountPreferences({ theme_mode: mode }).catch((persistError) => {
+      setError(persistError instanceof Error ? persistError.message : "暗夜模式同步失敗");
+    });
   }
 
   function handleChangePracticeYearRange(next: PracticeYearRange) {
@@ -98,6 +138,14 @@ export function AuthPanel() {
     };
     setPracticeYearRange(normalized);
     savePracticeYearRange(normalized);
+    if (!user) return;
+    setError("");
+    void persistAccountPreferences({
+      practice_year_from: normalized.yearFrom,
+      practice_year_to: normalized.yearTo
+    }).catch((persistError) => {
+      setError(persistError instanceof Error ? persistError.message : "年份設定同步失敗");
+    });
   }
 
   async function handleSignIn() {

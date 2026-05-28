@@ -3,10 +3,12 @@
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
+import { useAuth } from "@/components/AuthProvider";
 import { enabledSubjects, MED1_SUBJECTS, MED2_SUBJECTS } from "@/data/subjectRegistry";
 import { getSeasonalLimitedQuestions } from "@/data/med1QuestionBank";
 import { DEFAULT_QUIZ_SETTINGS } from "@/lib/quizAnalysis";
 import { loadPracticeYearRange, saveQuizSettings, type PracticeYearRange } from "@/lib/storage";
+import { getPracticeYearRangePreference } from "@/lib/accountPreferences";
 import type { QuizSettings, SubjectName } from "@/types/quiz";
 
 const selectableSubjects = enabledSubjects.filter(
@@ -18,6 +20,7 @@ const selectableSubjects = enabledSubjects.filter(
 
 export default function StartPage() {
   const router = useRouter();
+  const { user } = useAuth();
   const med1Subjects = selectableSubjects.filter((item) => MED1_SUBJECTS.includes(item.subject));
   const med2Subjects = selectableSubjects.filter((item) => MED2_SUBJECTS.includes(item.subject));
   const [selectedSubjects, setSelectedSubjects] = useState<SubjectName[]>([]);
@@ -47,8 +50,10 @@ export default function StartPage() {
   const seasonalAvailable = new Date() < seasonalDeadline;
 
   useEffect(() => {
-    setPracticeYearRange(loadPracticeYearRange(defaultPracticeYearRange) ?? defaultPracticeYearRange);
-  }, [defaultPracticeYearRange]);
+    const accountRange = getPracticeYearRangePreference(user?.user_metadata, defaultPracticeYearRange);
+    const nextRange = accountRange ?? loadPracticeYearRange(defaultPracticeYearRange) ?? defaultPracticeYearRange;
+    setPracticeYearRange(nextRange);
+  }, [defaultPracticeYearRange, user?.id, user?.user_metadata]);
 
   const availableQuestionCount = useMemo(() => {
     const subjectQuestionPool = selectedSubjects.length > 0

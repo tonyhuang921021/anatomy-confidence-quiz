@@ -1,6 +1,8 @@
 "use client";
 
 import { useEffect } from "react";
+import { useAuth } from "@/components/AuthProvider";
+import { getThemeModePreference } from "@/lib/accountPreferences";
 import { loadThemeMode, type ThemeMode } from "@/lib/storage";
 
 function applyThemeMode(mode: ThemeMode) {
@@ -9,8 +11,10 @@ function applyThemeMode(mode: ThemeMode) {
 }
 
 export function ThemeModeSync() {
+  const { user } = useAuth();
+
   useEffect(() => {
-    applyThemeMode(loadThemeMode());
+    applyThemeMode(getThemeModePreference(user?.user_metadata) ?? loadThemeMode());
 
     function handleThemeModeChange(event: Event) {
       const detail = (event as CustomEvent<ThemeMode>).detail;
@@ -30,7 +34,7 @@ export function ThemeModeSync() {
       window.removeEventListener("theme-mode-change", handleThemeModeChange as EventListener);
       window.removeEventListener("storage", handleStorageChange);
     };
-  }, []);
+  }, [user?.id, user?.user_metadata]);
 
   return null;
 }
