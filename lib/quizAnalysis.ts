@@ -817,6 +817,12 @@ function filterQuestionPool(questions: Question[], settings: QuizSettings) {
     if (settings.excludeAiGenerated && question.sourceType === "AI_GENERATED") return false;
     if (settings.chapter && question.chapter !== settings.chapter) return false;
     if (settings.section && question.section !== settings.section) return false;
+    if (typeof settings.yearFrom === "number" && typeof question.sourceYear === "number" && question.sourceYear < settings.yearFrom) {
+      return false;
+    }
+    if (typeof settings.yearTo === "number" && typeof question.sourceYear === "number" && question.sourceYear > settings.yearTo) {
+      return false;
+    }
     return true;
   });
 }

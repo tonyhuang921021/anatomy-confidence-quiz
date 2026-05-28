@@ -15,6 +15,7 @@ const QUESTION_EXPLANATION_OVERRIDES_KEY = "anatomy-confidence-question-explanat
 const PEAK_CHALLENGE_PRELOAD_KEY = "anatomy-confidence-peak-challenge-preload";
 const HOME_TONE_MODE_KEY = "anatomy-confidence-home-tone-mode";
 const THEME_MODE_KEY = "anatomy-confidence-theme-mode";
+const PRACTICE_YEAR_RANGE_KEY = "anatomy-confidence-practice-year-range";
 const ACTIVE_USER_KEY = "anatomy-confidence-active-user-id";
 const GUEST_USER_ID = "guest";
 
@@ -421,6 +422,10 @@ export type PeakChallengePreload = {
 
 export type HomeToneMode = "calm" | "anxious";
 export type ThemeMode = "light" | "dark";
+export type PracticeYearRange = {
+  yearFrom: number;
+  yearTo: number;
+};
 
 export function savePeakChallengePreload(preload: PeakChallengePreload) {
   if (!isBrowser()) return;
@@ -466,6 +471,41 @@ export function loadThemeMode(): ThemeMode {
   if (!isBrowser()) return "light";
   const raw = getLegacyOrScopedRaw(THEME_MODE_KEY);
   return raw === "dark" ? "dark" : "light";
+}
+
+export function savePracticeYearRange(range: PracticeYearRange) {
+  if (!isBrowser()) return;
+  const normalized = {
+    yearFrom: Math.min(range.yearFrom, range.yearTo),
+    yearTo: Math.max(range.yearFrom, range.yearTo)
+  };
+  window.localStorage.setItem(getScopedKey(PRACTICE_YEAR_RANGE_KEY), JSON.stringify(normalized));
+  window.dispatchEvent(new CustomEvent("practice-year-range-change", { detail: normalized }));
+}
+
+export function loadPracticeYearRange(defaultRange?: PracticeYearRange): PracticeYearRange | null {
+  if (!isBrowser()) return defaultRange ?? null;
+  const raw = getLegacyOrScopedRaw(PRACTICE_YEAR_RANGE_KEY);
+  if (!raw) return defaultRange ?? null;
+
+  try {
+    const parsed = JSON.parse(raw) as Partial<PracticeYearRange>;
+    if (
+      typeof parsed.yearFrom === "number" &&
+      Number.isFinite(parsed.yearFrom) &&
+      typeof parsed.yearTo === "number" &&
+      Number.isFinite(parsed.yearTo)
+    ) {
+      return {
+        yearFrom: Math.min(parsed.yearFrom, parsed.yearTo),
+        yearTo: Math.max(parsed.yearFrom, parsed.yearTo)
+      };
+    }
+  } catch {
+    return defaultRange ?? null;
+  }
+
+  return defaultRange ?? null;
 }
 
 export function applyQuestionExplanationOverride(question: Question): Question {

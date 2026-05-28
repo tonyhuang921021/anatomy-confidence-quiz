@@ -1,12 +1,12 @@
 "use client";
 
 import Link from "next/link";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { enabledSubjects, MED1_SUBJECTS, MED2_SUBJECTS } from "@/data/subjectRegistry";
 import { getSeasonalLimitedQuestions } from "@/data/med1QuestionBank";
 import { DEFAULT_QUIZ_SETTINGS } from "@/lib/quizAnalysis";
-import { saveQuizSettings } from "@/lib/storage";
+import { loadPracticeYearRange, saveQuizSettings, type PracticeYearRange } from "@/lib/storage";
 import type { QuizSettings, SubjectName } from "@/types/quiz";
 
 const selectableSubjects = enabledSubjects.filter(
@@ -24,8 +24,74 @@ export default function StartPage() {
   const [excludeAiGenerated, setExcludeAiGenerated] = useState(true);
   const [includeSeasonalLimited, setIncludeSeasonalLimited] = useState(false);
   const seasonalLimitedQuestions = useMemo(() => getSeasonalLimitedQuestions(), []);
+  const availableYears = useMemo(
+    () =>
+      Array.from(
+        new Set(
+          selectableSubjects
+            .flatMap((item) => item.questions.map((question) => question.sourceYear))
+            .filter((year): year is number => typeof year === "number")
+        )
+      ).sort((a, b) => a - b),
+    []
+  );
+  const defaultPracticeYearRange = useMemo<PracticeYearRange>(
+    () => ({
+      yearFrom: availableYears[0] ?? 100,
+      yearTo: availableYears[availableYears.length - 1] ?? 115
+    }),
+    [availableYears]
+  );
+  const [practiceYearRange, setPracticeYearRange] = useState<PracticeYearRange>(defaultPracticeYearRange);
   const seasonalDeadline = new Date("2026-05-15T09:00:00+08:00");
   const seasonalAvailable = new Date() < seasonalDeadline;
+
+  useEffect(() => {
+    setPracticeYearRange(loadPracticeYearRange(defaultPracticeYearRange) ?? defaultPracticeYearRange);
+  }, [defaultPracticeYearRange]);
+
+  const availableQuestionCount = useMemo(() => {
+    const subjectQuestionPool = selectedSubjects.length > 0
+      ? selectableSubjects
+          .filter((item) => selectedSubjects.includes(item.subject))
+          .flatMap((item) => item.questions)
+      : [];
+
+    const filteredSubjectQuestions = subjectQuestionPool.filter((question) => {
+      if (excludeAiGenerated && question.sourceType === "AI_GENERATED") return false;
+      if (
+        typeof question.sourceYear === "number" &&
+        (question.sourceYear < practiceYearRange.yearFrom || question.sourceYear > practiceYearRange.yearTo)
+      ) {
+        return false;
+      }
+      return true;
+    });
+
+    const seasonalQuestions = includeSeasonalLimited
+      ? seasonalLimitedQuestions.filter((question) => {
+          if (excludeAiGenerated && question.sourceType === "AI_GENERATED") return false;
+          if (
+            typeof question.sourceYear === "number" &&
+            (question.sourceYear < practiceYearRange.yearFrom || question.sourceYear > practiceYearRange.yearTo)
+          ) {
+            return false;
+          }
+          return true;
+        })
+      : [];
+
+    return new Set(
+      [...filteredSubjectQuestions, ...seasonalQuestions].map((question) => question.id)
+    ).size;
+  }, [
+    excludeAiGenerated,
+    includeSeasonalLimited,
+    practiceYearRange.yearFrom,
+    practiceYearRange.yearTo,
+    seasonalLimitedQuestions,
+    selectedSubjects
+  ]);
 
   function toggleSubject(subject: SubjectName) {
     setSelectedSubjects((current) =>
@@ -81,12 +147,14 @@ export default function StartPage() {
   }
 
   function handleStart() {
-    if (selectedSubjects.length === 0 && !includeSeasonalLimited) return;
+    if ((selectedSubjects.length === 0 && !includeSeasonalLimited) || availableQuestionCount === 0) return;
 
     const nextSettings: QuizSettings = {
       ...DEFAULT_QUIZ_SETTINGS,
       mode: "random",
-      questionCount: 10,
+      questionCount: availableQuestionCount,
+      yearFrom: practiceYearRange.yearFrom,
+      yearTo: practiceYearRange.yearTo,
       subjectFilter:
         selectedSubjects.length === 1 && !includeSeasonalLimited ? selectedSubjects[0] : "全部",
       subjectFilters: selectedSubjects,
@@ -121,7 +189,7 @@ export default function StartPage() {
               </Link>
             </div>
             <p className="body-soft mt-3 max-w-2xl text-sm leading-7 sm:text-base">
-              固定抽 10 題。可以只勾一科，也可以混著抽。
+              可以只勾一科，也可以混著抽。開始後會依你設定的年份範圍，直接帶出那段期間實際有的題數。
             </p>
           </div>
           <Link
@@ -172,7 +240,9 @@ export default function StartPage() {
 
         <div className="surface-card-muted mt-6 flex flex-col gap-3 p-5 sm:flex-row sm:items-center sm:justify-between">
           <p className="text-sm text-slate-700">
-            已選 <span className="font-semibold text-ink">{selectedSubjects.length + (includeSeasonalLimited ? 1 : 0)}</span> 個範圍・固定 10 題
+            已選 <span className="font-semibold text-ink">{selectedSubjects.length + (includeSeasonalLimited ? 1 : 0)}</span> 個範圍・
+            {practiceYearRange.yearFrom} 到 {practiceYearRange.yearTo} 年共{" "}
+            <span className="font-semibold text-ink">{availableQuestionCount}</span> 題
           </p>
           <div className="flex flex-wrap gap-3">
             <button
@@ -196,10 +266,10 @@ export default function StartPage() {
             <button
               type="button"
               onClick={handleStart}
-              disabled={selectedSubjects.length === 0 && !includeSeasonalLimited}
+              disabled={(selectedSubjects.length === 0 && !includeSeasonalLimited) || availableQuestionCount === 0}
               className="primary-pill disabled:cursor-not-allowed disabled:bg-slate-300"
             >
-              開始 10 題測驗
+              開始 {availableQuestionCount} 題測驗
             </button>
           </div>
         </div>

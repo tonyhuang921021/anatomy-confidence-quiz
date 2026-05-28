@@ -1,16 +1,20 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useAuth } from "@/components/AuthProvider";
+import { enabledSubjects, MED1_SUBJECTS, MED2_SUBJECTS } from "@/data/subjectRegistry";
 import {
   syncLeaderboardProfileForCurrentUser,
   updateLeaderboardDisplayName
 } from "@/lib/cloudSync";
 import {
+  loadPracticeYearRange,
   loadHomeToneMode,
   loadThemeMode,
+  savePracticeYearRange,
   saveHomeToneMode,
   saveThemeMode,
+  type PracticeYearRange,
   type HomeToneMode,
   type ThemeMode
 } from "@/lib/storage";
@@ -26,6 +30,7 @@ export function AuthPanel() {
   const [submitting, setSubmitting] = useState(false);
   const [homeToneMode, setHomeToneMode] = useState<HomeToneMode>("calm");
   const [themeMode, setThemeMode] = useState<ThemeMode>("light");
+  const [settingsOpen, setSettingsOpen] = useState(false);
   const ownerAllowedEmails = (process.env.NEXT_PUBLIC_ADMIN_EMAILS ?? "tonyhuang921021@gmail.com")
     .split(",")
     .map((item) => item.trim().toLowerCase())
@@ -33,6 +38,35 @@ export function AuthPanel() {
   const canViewOwnerPage = user?.email
     ? ownerAllowedEmails.includes(user.email.trim().toLowerCase())
     : false;
+  const selectableSubjects = useMemo(
+    () =>
+      enabledSubjects.filter(
+        (item) =>
+          item.subject !== "醫學（一）" &&
+          item.subject !== "醫學（二）" &&
+          (MED1_SUBJECTS.includes(item.subject) || MED2_SUBJECTS.includes(item.subject))
+      ),
+    []
+  );
+  const availableYears = useMemo(
+    () =>
+      Array.from(
+        new Set(
+          selectableSubjects
+            .flatMap((item) => item.questions.map((question) => question.sourceYear))
+            .filter((year): year is number => typeof year === "number")
+        )
+      ).sort((a, b) => a - b),
+    [selectableSubjects]
+  );
+  const defaultPracticeYearRange = useMemo<PracticeYearRange>(
+    () => ({
+      yearFrom: availableYears[0] ?? 100,
+      yearTo: availableYears[availableYears.length - 1] ?? 115
+    }),
+    [availableYears]
+  );
+  const [practiceYearRange, setPracticeYearRange] = useState<PracticeYearRange>(defaultPracticeYearRange);
 
   useEffect(() => {
     setNickname(typeof user?.user_metadata?.display_name === "string" ? user.user_metadata.display_name : "");
@@ -43,6 +77,10 @@ export function AuthPanel() {
     setThemeMode(loadThemeMode());
   }, []);
 
+  useEffect(() => {
+    setPracticeYearRange(loadPracticeYearRange(defaultPracticeYearRange) ?? defaultPracticeYearRange);
+  }, [defaultPracticeYearRange]);
+
   function handleChangeHomeToneMode(mode: HomeToneMode) {
     setHomeToneMode(mode);
     saveHomeToneMode(mode);
@@ -51,6 +89,15 @@ export function AuthPanel() {
   function handleChangeThemeMode(mode: ThemeMode) {
     setThemeMode(mode);
     saveThemeMode(mode);
+  }
+
+  function handleChangePracticeYearRange(next: PracticeYearRange) {
+    const normalized = {
+      yearFrom: Math.min(next.yearFrom, next.yearTo),
+      yearTo: Math.max(next.yearFrom, next.yearTo)
+    };
+    setPracticeYearRange(normalized);
+    savePracticeYearRange(normalized);
   }
 
   async function handleSignIn() {
@@ -171,43 +218,111 @@ export function AuthPanel() {
             className="min-h-12 rounded-2xl border border-slate-200 px-4 py-3 text-sm text-slate-800 outline-none"
           />
           <p className="text-xs text-slate-500">排行榜會顯示這個暱稱。</p>
-          <div className="rounded-2xl border border-slate-200 px-3 py-3">
-            <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">首頁模式</p>
-            <div className="mt-3 flex flex-wrap items-center gap-2">
-              <button
-                type="button"
-                onClick={() => handleChangeHomeToneMode("calm")}
-                className={`min-h-11 rounded-full px-4 py-2 text-sm font-semibold transition ${
-                  homeToneMode === "calm"
-                    ? "bg-emerald-100 text-emerald-950"
-                    : "bg-slate-100 text-slate-700 hover:bg-slate-200"
-                }`}
-              >
-                抗焦慮版
-              </button>
-              <button
-                type="button"
-                onClick={() => handleChangeHomeToneMode("anxious")}
-                className={`min-h-11 rounded-full px-4 py-2 text-sm font-semibold transition ${
-                  homeToneMode === "anxious"
-                    ? "bg-rose-100 text-rose-950"
-                    : "bg-slate-100 text-slate-700 hover:bg-slate-200"
-                }`}
-              >
-                焦慮版
-              </button>
-              <button
-                type="button"
-                onClick={() => handleChangeThemeMode(themeMode === "dark" ? "light" : "dark")}
-                className={`min-h-11 rounded-full px-4 py-2 text-sm font-semibold transition ${
-                  themeMode === "dark"
-                    ? "bg-slate-900 text-slate-100"
-                    : "bg-slate-100 text-slate-700 hover:bg-slate-200"
-                }`}
-              >
-                暗夜模式
-              </button>
-            </div>
+          <div className="rounded-2xl border border-slate-200">
+            <button
+              type="button"
+              onClick={() => setSettingsOpen((current) => !current)}
+              className="flex min-h-12 w-full items-center justify-between px-4 py-3 text-left"
+            >
+              <div>
+                <p className="text-sm font-semibold text-ink">設定</p>
+                <p className="mt-1 text-xs text-slate-500">首頁模式、暗夜模式、開始測驗抽題年份</p>
+              </div>
+              <span className="text-sm font-semibold text-slate-500">{settingsOpen ? "收合" : "展開"}</span>
+            </button>
+            {settingsOpen ? (
+              <div className="border-t border-slate-200 px-4 py-4">
+                <div className="space-y-4">
+                  <div>
+                    <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">首頁模式</p>
+                    <div className="mt-3 flex flex-wrap items-center gap-2">
+                      <button
+                        type="button"
+                        onClick={() => handleChangeHomeToneMode("calm")}
+                        className={`min-h-11 rounded-full px-4 py-2 text-sm font-semibold transition ${
+                          homeToneMode === "calm"
+                            ? "bg-emerald-100 text-emerald-950"
+                            : "bg-slate-100 text-slate-700 hover:bg-slate-200"
+                        }`}
+                      >
+                        抗焦慮版
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => handleChangeHomeToneMode("anxious")}
+                        className={`min-h-11 rounded-full px-4 py-2 text-sm font-semibold transition ${
+                          homeToneMode === "anxious"
+                            ? "bg-rose-100 text-rose-950"
+                            : "bg-slate-100 text-slate-700 hover:bg-slate-200"
+                        }`}
+                      >
+                        焦慮版
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => handleChangeThemeMode(themeMode === "dark" ? "light" : "dark")}
+                        className={`min-h-11 rounded-full px-4 py-2 text-sm font-semibold transition ${
+                          themeMode === "dark"
+                            ? "bg-slate-900 text-slate-100"
+                            : "bg-slate-100 text-slate-700 hover:bg-slate-200"
+                        }`}
+                      >
+                        暗夜模式
+                      </button>
+                    </div>
+                  </div>
+
+                  <div>
+                    <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">開始測驗抽題年份</p>
+                    <p className="mt-2 text-sm text-slate-600">
+                      目前設定：{practiceYearRange.yearFrom} 年到 {practiceYearRange.yearTo} 年
+                    </p>
+                    <div className="mt-3 grid gap-3 sm:grid-cols-2">
+                      <label className="grid gap-2 text-sm text-slate-700">
+                        從哪一年開始
+                        <select
+                          value={practiceYearRange.yearFrom}
+                          onChange={(event) => {
+                            const nextFrom = Number(event.target.value);
+                            handleChangePracticeYearRange({
+                              yearFrom: nextFrom,
+                              yearTo: Math.max(nextFrom, practiceYearRange.yearTo)
+                            });
+                          }}
+                          className="min-h-12 rounded-2xl border border-slate-200 px-4 py-3 text-sm text-slate-800 outline-none"
+                        >
+                          {availableYears.map((year) => (
+                            <option key={`from-${year}`} value={year}>
+                              {year}
+                            </option>
+                          ))}
+                        </select>
+                      </label>
+                      <label className="grid gap-2 text-sm text-slate-700">
+                        到哪一年結束
+                        <select
+                          value={practiceYearRange.yearTo}
+                          onChange={(event) => {
+                            const nextTo = Number(event.target.value);
+                            handleChangePracticeYearRange({
+                              yearFrom: Math.min(practiceYearRange.yearFrom, nextTo),
+                              yearTo: nextTo
+                            });
+                          }}
+                          className="min-h-12 rounded-2xl border border-slate-200 px-4 py-3 text-sm text-slate-800 outline-none"
+                        >
+                          {availableYears.map((year) => (
+                            <option key={`to-${year}`} value={year}>
+                              {year}
+                            </option>
+                          ))}
+                        </select>
+                      </label>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            ) : null}
           </div>
         </div>
         {syncError ? (
