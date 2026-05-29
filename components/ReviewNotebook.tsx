@@ -27,7 +27,8 @@ import {
   QuestionClassificationOverride,
   QuestionCommunityStats,
   QuestionExplanationOverride,
-  ReviewQuestionItem
+  ReviewQuestionItem,
+  SubjectName
 } from "@/types/quiz";
 
 function formatTime(value?: string) {
@@ -215,7 +216,7 @@ type ReviewNotebookProps = {
   description?: string;
   startLabel?: string;
   startHref?: string;
-  onStartReview?: () => void;
+  onStartReview?: (items: ReviewQuestionItem[]) => void;
   fullscreenMobile?: boolean;
   headerAction?: ReactNode;
 };
@@ -241,17 +242,32 @@ export function ReviewNotebook({
   const [communityStatsMap, setCommunityStatsMap] = useState<Record<string, QuestionCommunityStats>>({});
   const [activeCategory, setActiveCategory] = useState<"wrong" | "lowConfidence">("wrong");
   const [visibleCount, setVisibleCount] = useState(40);
+  const [selectedSubjects, setSelectedSubjects] = useState<SubjectName[]>([]);
   const questionIdsKey = useMemo(
     () => items.map((item) => item.question.id).sort().join("|"),
     [items]
   );
-  const wrongItems = useMemo(
-    () => sortByRecent(items.filter((item) => item.history.wrong > 0)),
+  const availableSubjects = useMemo(
+    () =>
+      Array.from(new Set(items.map((item) => item.question.subject))).sort((a, b) =>
+        a.localeCompare(b, "zh-Hant")
+      ) as SubjectName[],
     [items]
   );
+  const filteredItems = useMemo(
+    () =>
+      selectedSubjects.length === 0
+        ? items
+        : items.filter((item) => selectedSubjects.includes(item.question.subject)),
+    [items, selectedSubjects]
+  );
+  const wrongItems = useMemo(
+    () => sortByRecent(filteredItems.filter((item) => item.history.wrong > 0)),
+    [filteredItems]
+  );
   const lowConfidenceItems = useMemo(
-    () => sortByRecent(items.filter((item) => item.history.lowConfidence > 0)),
-    [items]
+    () => sortByRecent(filteredItems.filter((item) => item.history.lowConfidence > 0)),
+    [filteredItems]
   );
   const activeItems = useMemo(
     () => (activeCategory === "wrong" ? wrongItems : lowConfidenceItems),
@@ -275,7 +291,23 @@ export function ReviewNotebook({
 
   useEffect(() => {
     setVisibleCount(40);
-  }, [activeCategory, questionIdsKey]);
+  }, [activeCategory, questionIdsKey, selectedSubjects]);
+
+  useEffect(() => {
+    setSelectedSubjects((current) => current.filter((subject) => availableSubjects.includes(subject)));
+  }, [availableSubjects]);
+
+  function toggleSubject(subject: SubjectName) {
+    setSelectedSubjects((current) =>
+      current.includes(subject)
+        ? current.filter((item) => item !== subject)
+        : [...current, subject]
+    );
+  }
+
+  function clearSubjectFilter() {
+    setSelectedSubjects([]);
+  }
 
   useEffect(() => {
     async function fetchCommunityStats() {
@@ -592,7 +624,7 @@ export function ReviewNotebook({
           {headerAction}
           <Link
             href={startHref}
-            onClick={onStartReview}
+            onClick={() => onStartReview?.(filteredItems)}
             className="min-h-12 rounded-2xl bg-brand-600 px-4 py-3 text-sm font-semibold text-white transition hover:bg-brand-700"
           >
             {startLabel}
@@ -607,6 +639,44 @@ export function ReviewNotebook({
           </div>
         ) : (
           <>
+            <div className="space-y-3">
+              <div className="flex flex-wrap items-center gap-2">
+                <span className="text-sm font-semibold text-slate-600">科目篩選</span>
+                <button
+                  type="button"
+                  onClick={clearSubjectFilter}
+                  className={`min-h-10 rounded-full px-3 py-2 text-xs font-semibold transition ${
+                    selectedSubjects.length === 0
+                      ? "bg-slate-900 text-white"
+                      : "bg-slate-100 text-slate-700 hover:bg-slate-200"
+                  }`}
+                >
+                  全部
+                </button>
+                {availableSubjects.map((subject) => {
+                  const active = selectedSubjects.includes(subject);
+                  return (
+                    <button
+                      key={subject}
+                      type="button"
+                      onClick={() => toggleSubject(subject)}
+                      className={`min-h-10 rounded-full px-3 py-2 text-xs font-semibold transition ${
+                        active
+                          ? "bg-brand-100 text-brand-900 ring-1 ring-brand-300"
+                          : "bg-slate-100 text-slate-700 hover:bg-slate-200"
+                      }`}
+                    >
+                      {subject}
+                    </button>
+                  );
+                })}
+              </div>
+              <p className="text-xs text-slate-500">
+                {selectedSubjects.length === 0
+                  ? "目前顯示全部科目的錯題與低信心題。"
+                  : `目前只顯示 ${selectedSubjects.join("、")}。`}
+              </p>
+            </div>
             <div className="flex flex-wrap gap-3">
               <button
                 type="button"
@@ -656,7 +726,9 @@ export function ReviewNotebook({
                 <div className="mt-4 grid gap-3 sm:gap-4">
                 {activeItems.length === 0 ? (
                   <div className="rounded-3xl bg-slate-50 p-5 text-sm text-slate-500">
-                    {activeCategory === "wrong" ? "目前沒有累積錯題。" : "目前沒有累積低信心題。"}
+                    {activeCategory === "wrong"
+                      ? "目前沒有符合篩選條件的錯題。"
+                      : "目前沒有符合篩選條件的低信心題。"}
                   </div>
                 ) : (
                   visibleItems.map((item, index) => (

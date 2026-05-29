@@ -79,13 +79,13 @@ export default function ReviewPage() {
     };
   }, [isFullscreenReview]);
 
-  function handleStartPracticeReview() {
+  function handleStartPracticeReview(filteredItems: ReviewQuestionItem[] = practiceItems) {
     saveQuizSettings({
       ...DEFAULT_QUIZ_SETTINGS,
       mode: "review",
       questionCount: 10,
       subjectFilter: "全部",
-      customQuestionIds: practiceItems.map((item) => item.question.id),
+      customQuestionIds: filteredItems.map((item) => item.question.id),
       customPoolLabel: "散題錯題庫"
     });
   }
@@ -130,7 +130,7 @@ export default function ReviewPage() {
             </Link>
             <Link
               href="/quiz?new=1"
-              onClick={handleStartPracticeReview}
+              onClick={() => handleStartPracticeReview()}
               className="min-h-12 rounded-2xl bg-brand-600 px-5 py-4 text-sm font-semibold text-white transition hover:bg-brand-700"
             >
               開始散題錯題複習
