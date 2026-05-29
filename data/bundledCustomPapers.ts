@@ -1,4 +1,5 @@
 import { importedCustomPaperQuestions } from "@/data/importedCustomPaperQuestions";
+import { cancerDrugCustomPaperQuestionIds } from "@/data/cancerDrugCustomPaper";
 import { hemOncCustomPaperQuestionIds } from "@/data/hemOncCustomPaper";
 import type { CustomPaperDifficulty, Question, SubjectName } from "@/types/quiz";
 
@@ -31,6 +32,16 @@ export const bundledCustomPaperSeeds: BundledCustomPaperSeed[] = [
     name: "血種大禮包",
     questionIds: [...hemOncCustomPaperQuestionIds],
     subjectFilters: ["病理學", "微生物免疫學", "藥理學", "生物化學", "組織學"],
+    difficulty: "ai_search",
+    isPublic: true,
+    createdByEmail: "tonyhuang921021@gmail.com",
+    createdByLabel: "松鼠"
+  },
+  {
+    paperCode: "ONCO5",
+    name: "癌症藥物大禮包",
+    questionIds: [...cancerDrugCustomPaperQuestionIds],
+    subjectFilters: ["藥理學", "微生物免疫學", "病理學", "生物化學"],
     difficulty: "ai_search",
     isPublic: true,
     createdByEmail: "tonyhuang921021@gmail.com",
