@@ -903,11 +903,9 @@ export default function QuizPage() {
 
   function handleNext() {
     if (!session) return;
-    const shouldStopAfterReview =
-      session.settings?.mode === "random" && session.settings?.stopAfterReview;
     const isLast = currentIndex >= targetCount - 1;
 
-    if (isLast || shouldStopAfterReview) {
+    if (isLast) {
       const completedSession: QuizSession = {
         ...session,
         completedAt: new Date().toISOString(),
@@ -939,6 +937,20 @@ export default function QuizPage() {
         block: "start"
       });
     });
+  }
+
+  function handleEndAfterReview() {
+    if (!session) return;
+
+    const completedSession: QuizSession = {
+      ...session,
+      completedAt: new Date().toISOString(),
+      isReviewingAnswer: false
+    };
+    finalizeCompletedSession(completedSession);
+    void pushCompletedSessionToSupabase(completedSession);
+    syncCompletedCustomPaper(completedSession);
+    router.push(`/results?sessionId=${encodeURIComponent(completedSession.id)}`);
   }
 
   async function handleRetryPeakNextQuestion() {
@@ -1330,24 +1342,38 @@ export default function QuizPage() {
                 <ErrorTypeSelector value={errorType} onSelect={handleErrorTypeSelect} />
               ) : null}
 
-              {isPeakChallenge && submittedAttempt.isCorrect && peakNextQuestionError ? (
-                <button
-                  type="button"
-                  onClick={() => void handleRetryPeakNextQuestion()}
-                  disabled={isSubmittingAnswer}
-                  className="min-h-12 w-full rounded-2xl bg-ink px-4 py-4 text-sm font-semibold text-white transition hover:bg-slate-900 disabled:cursor-not-allowed disabled:bg-slate-300"
-                >
-                  {isSubmittingAnswer ? "巔峰賽生成下一題中..." : "重試生成下一題"}
-                </button>
-              ) : (
-                <button
-                  type="button"
-                  onClick={handleNext}
-                  className="min-h-12 w-full rounded-2xl bg-ink px-4 py-4 text-sm font-semibold text-white transition hover:bg-slate-900"
-                >
-                  {currentIndex === targetCount - 1 ? "查看結果" : "下一題"}
-                </button>
-              )}
+              <div className="grid gap-3">
+                {isPeakChallenge && submittedAttempt.isCorrect && peakNextQuestionError ? (
+                  <button
+                    type="button"
+                    onClick={() => void handleRetryPeakNextQuestion()}
+                    disabled={isSubmittingAnswer}
+                    className="min-h-12 w-full rounded-2xl bg-ink px-4 py-4 text-sm font-semibold text-white transition hover:bg-slate-900 disabled:cursor-not-allowed disabled:bg-slate-300"
+                  >
+                    {isSubmittingAnswer ? "巔峰賽生成下一題中..." : "重試生成下一題"}
+                  </button>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={handleNext}
+                    className="min-h-12 w-full rounded-2xl bg-ink px-4 py-4 text-sm font-semibold text-white transition hover:bg-slate-900"
+                  >
+                    {currentIndex === targetCount - 1 ? "查看結果" : "下一題"}
+                  </button>
+                )}
+                {session.settings?.mode === "random" &&
+                session.settings?.stopAfterReview &&
+                !isPeakChallenge &&
+                currentIndex < targetCount - 1 ? (
+                  <button
+                    type="button"
+                    onClick={handleEndAfterReview}
+                    className="min-h-12 w-full rounded-2xl bg-slate-100 px-4 py-4 text-sm font-semibold text-slate-800 transition hover:bg-slate-200"
+                  >
+                    結束測驗
+                  </button>
+                ) : null}
+              </div>
             </div>
           )}
 
