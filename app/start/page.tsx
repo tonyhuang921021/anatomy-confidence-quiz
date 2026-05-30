@@ -7,8 +7,19 @@ import { useAuth } from "@/components/AuthProvider";
 import { enabledSubjects, MED1_SUBJECTS, MED2_SUBJECTS } from "@/data/subjectRegistry";
 import { getSeasonalLimitedQuestions } from "@/data/med1QuestionBank";
 import { DEFAULT_QUIZ_SETTINGS } from "@/lib/quizAnalysis";
-import { loadPracticeYearRange, saveQuizSettings, type PracticeYearRange } from "@/lib/storage";
-import { getPracticeYearRangePreference } from "@/lib/accountPreferences";
+import {
+  loadPracticeQuestionCount,
+  loadPracticeStopAfterReview,
+  loadPracticeYearRange,
+  saveQuizSettings,
+  type PracticeQuestionCount,
+  type PracticeYearRange
+} from "@/lib/storage";
+import {
+  getPracticeQuestionCountPreference,
+  getPracticeStopAfterReviewPreference,
+  getPracticeYearRangePreference
+} from "@/lib/accountPreferences";
 import type { QuizSettings, SubjectName } from "@/types/quiz";
 
 const selectableSubjects = enabledSubjects.filter(
@@ -46,6 +57,8 @@ export default function StartPage() {
     [availableYears]
   );
   const [practiceYearRange, setPracticeYearRange] = useState<PracticeYearRange>(defaultPracticeYearRange);
+  const [practiceQuestionCount, setPracticeQuestionCount] = useState<PracticeQuestionCount>(10);
+  const [practiceStopAfterReview, setPracticeStopAfterReview] = useState(false);
   const seasonalDeadline = new Date("2026-05-15T09:00:00+08:00");
   const seasonalAvailable = new Date() < seasonalDeadline;
 
@@ -54,6 +67,17 @@ export default function StartPage() {
     const nextRange = accountRange ?? loadPracticeYearRange(defaultPracticeYearRange) ?? defaultPracticeYearRange;
     setPracticeYearRange(nextRange);
   }, [defaultPracticeYearRange, user?.id, user?.user_metadata]);
+
+  useEffect(() => {
+    const nextCount = user
+      ? getPracticeQuestionCountPreference(user?.user_metadata, 10)
+      : loadPracticeQuestionCount(10);
+    const nextStopAfterReview = user
+      ? getPracticeStopAfterReviewPreference(user?.user_metadata, false)
+      : loadPracticeStopAfterReview(false);
+    setPracticeQuestionCount(nextCount);
+    setPracticeStopAfterReview(nextStopAfterReview);
+  }, [user?.id, user?.user_metadata]);
 
   const availableQuestionCount = useMemo(() => {
     const subjectQuestionPool = selectedSubjects.length > 0
@@ -157,7 +181,8 @@ export default function StartPage() {
     const nextSettings: QuizSettings = {
       ...DEFAULT_QUIZ_SETTINGS,
       mode: "random",
-      questionCount: 10,
+      questionCount: Math.min(practiceQuestionCount, availableQuestionCount),
+      stopAfterReview: practiceStopAfterReview,
       yearFrom: practiceYearRange.yearFrom,
       yearTo: practiceYearRange.yearTo,
       subjectFilter:
@@ -274,7 +299,7 @@ export default function StartPage() {
               disabled={(selectedSubjects.length === 0 && !includeSeasonalLimited) || availableQuestionCount === 0}
               className="primary-pill disabled:cursor-not-allowed disabled:bg-slate-300"
             >
-              開始 10 題測驗
+              開始 {Math.min(practiceQuestionCount, availableQuestionCount)} 題測驗
             </button>
           </div>
         </div>

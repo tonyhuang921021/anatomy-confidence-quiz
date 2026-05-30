@@ -1,5 +1,10 @@
 import type { User } from "@supabase/supabase-js";
-import type { HomeToneMode, PracticeYearRange, ThemeMode } from "@/lib/storage";
+import type {
+  HomeToneMode,
+  PracticeQuestionCount,
+  PracticeYearRange,
+  ThemeMode
+} from "@/lib/storage";
 
 type MetadataSource = User["user_metadata"] | null | undefined;
 
@@ -8,6 +13,8 @@ export type AccountPreferencePatch = {
   theme_mode?: ThemeMode;
   practice_year_from?: number;
   practice_year_to?: number;
+  practice_question_count?: PracticeQuestionCount;
+  practice_stop_after_review?: boolean;
 };
 
 export function getHomeToneModePreference(metadata: MetadataSource): HomeToneMode | null {
@@ -33,4 +40,20 @@ export function getPracticeYearRangePreference(
   }
 
   return defaultRange ?? null;
+}
+
+export function getPracticeQuestionCountPreference(
+  metadata: MetadataSource,
+  defaultCount: PracticeQuestionCount = 10
+): PracticeQuestionCount {
+  const value = metadata?.practice_question_count;
+  return [5, 10, 15, 20, 25, 30, 35, 40, 45, 50].includes(value)
+    ? (value as PracticeQuestionCount)
+    : defaultCount;
+}
+
+export function getPracticeStopAfterReviewPreference(metadata: MetadataSource, defaultValue = false) {
+  return typeof metadata?.practice_stop_after_review === "boolean"
+    ? metadata.practice_stop_after_review
+    : defaultValue;
 }

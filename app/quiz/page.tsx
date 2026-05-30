@@ -903,9 +903,11 @@ export default function QuizPage() {
 
   function handleNext() {
     if (!session) return;
+    const shouldStopAfterReview =
+      session.settings?.mode === "random" && session.settings?.stopAfterReview;
     const isLast = currentIndex >= targetCount - 1;
 
-    if (isLast) {
+    if (isLast || shouldStopAfterReview) {
       const completedSession: QuizSession = {
         ...session,
         completedAt: new Date().toISOString(),

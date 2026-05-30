@@ -8,18 +8,25 @@ import {
   updateLeaderboardDisplayName
 } from "@/lib/cloudSync";
 import {
+  loadPracticeQuestionCount,
+  loadPracticeStopAfterReview,
   loadPracticeYearRange,
   loadHomeToneMode,
   loadThemeMode,
+  savePracticeQuestionCount,
+  savePracticeStopAfterReview,
   savePracticeYearRange,
   saveHomeToneMode,
   saveThemeMode,
+  type PracticeQuestionCount,
   type PracticeYearRange,
   type HomeToneMode,
   type ThemeMode
 } from "@/lib/storage";
 import {
   getHomeToneModePreference,
+  getPracticeQuestionCountPreference,
+  getPracticeStopAfterReviewPreference,
   getPracticeYearRangePreference,
   getThemeModePreference,
   type AccountPreferencePatch
@@ -73,6 +80,8 @@ export function AuthPanel() {
     [availableYears]
   );
   const [practiceYearRange, setPracticeYearRange] = useState<PracticeYearRange>(defaultPracticeYearRange);
+  const [practiceQuestionCount, setPracticeQuestionCount] = useState<PracticeQuestionCount>(10);
+  const [practiceStopAfterReview, setPracticeStopAfterReview] = useState(false);
 
   useEffect(() => {
     setNickname(typeof user?.user_metadata?.display_name === "string" ? user.user_metadata.display_name : "");
@@ -95,6 +104,19 @@ export function AuthPanel() {
     setPracticeYearRange(nextRange);
     if (accountRange) savePracticeYearRange(accountRange);
   }, [defaultPracticeYearRange, user?.id, user?.user_metadata]);
+
+  useEffect(() => {
+    const accountCount = getPracticeQuestionCountPreference(user?.user_metadata, 10);
+    const accountStopAfterReview = getPracticeStopAfterReviewPreference(user?.user_metadata, false);
+    const nextCount = user ? accountCount : loadPracticeQuestionCount(10);
+    const nextStopAfterReview = user ? accountStopAfterReview : loadPracticeStopAfterReview(false);
+    setPracticeQuestionCount(nextCount);
+    setPracticeStopAfterReview(nextStopAfterReview);
+    if (user) {
+      savePracticeQuestionCount(accountCount);
+      savePracticeStopAfterReview(accountStopAfterReview);
+    }
+  }, [user?.id, user?.user_metadata]);
 
   async function persistAccountPreferences(patch: AccountPreferencePatch) {
     if (!user) return;
@@ -145,6 +167,30 @@ export function AuthPanel() {
       practice_year_to: normalized.yearTo
     }).catch((persistError) => {
       setError(persistError instanceof Error ? persistError.message : "年份設定同步失敗");
+    });
+  }
+
+  function handleChangePracticeQuestionCount(next: PracticeQuestionCount) {
+    setPracticeQuestionCount(next);
+    savePracticeQuestionCount(next);
+    if (!user) return;
+    setError("");
+    void persistAccountPreferences({
+      practice_question_count: next
+    }).catch((persistError) => {
+      setError(persistError instanceof Error ? persistError.message : "題數設定同步失敗");
+    });
+  }
+
+  function handleChangePracticeStopAfterReview(enabled: boolean) {
+    setPracticeStopAfterReview(enabled);
+    savePracticeStopAfterReview(enabled);
+    if (!user) return;
+    setError("");
+    void persistAccountPreferences({
+      practice_stop_after_review: enabled
+    }).catch((persistError) => {
+      setError(persistError instanceof Error ? persistError.message : "結束作答設定同步失敗");
     });
   }
 
@@ -274,7 +320,7 @@ export function AuthPanel() {
             >
               <div>
                 <p className="text-sm font-semibold text-ink">設定</p>
-                <p className="mt-1 text-xs text-slate-500">首頁模式、暗夜模式、開始測驗抽題年份</p>
+                <p className="mt-1 text-xs text-slate-500">首頁模式、暗夜模式、開始測驗設定</p>
               </div>
               <span className="text-sm font-semibold text-slate-500">{settingsOpen ? "收合" : "展開"}</span>
             </button>
@@ -366,6 +412,55 @@ export function AuthPanel() {
                           ))}
                         </select>
                       </label>
+                    </div>
+                  </div>
+
+                  <div>
+                    <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">開始測驗題數</p>
+                    <p className="mt-2 text-sm text-slate-600">目前設定：每次 {practiceQuestionCount} 題</p>
+                    <div className="mt-3 grid gap-2 sm:grid-cols-5">
+                      {[5, 10, 15, 20, 25, 30, 35, 40, 45, 50].map((count) => (
+                        <button
+                          key={count}
+                          type="button"
+                          onClick={() => handleChangePracticeQuestionCount(count as PracticeQuestionCount)}
+                          className={`min-h-11 rounded-2xl px-3 py-2 text-sm font-semibold transition ${
+                            practiceQuestionCount === count
+                              ? "bg-brand-600 text-white"
+                              : "bg-slate-100 text-slate-700 hover:bg-slate-200"
+                          }`}
+                        >
+                          {count} 題
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div>
+                    <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">作答節奏</p>
+                    <div className="mt-3 flex flex-wrap gap-2">
+                      <button
+                        type="button"
+                        onClick={() => handleChangePracticeStopAfterReview(false)}
+                        className={`min-h-11 rounded-full px-4 py-2 text-sm font-semibold transition ${
+                          !practiceStopAfterReview
+                            ? "bg-brand-600 text-white"
+                            : "bg-slate-100 text-slate-700 hover:bg-slate-200"
+                        }`}
+                      >
+                        正常做完整輪
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => handleChangePracticeStopAfterReview(true)}
+                        className={`min-h-11 rounded-full px-4 py-2 text-sm font-semibold transition ${
+                          practiceStopAfterReview
+                            ? "bg-amber-100 text-amber-900 ring-1 ring-amber-300"
+                            : "bg-slate-100 text-slate-700 hover:bg-slate-200"
+                        }`}
+                      >
+                        看完某題詳解後結束
+                      </button>
                     </div>
                   </div>
                 </div>

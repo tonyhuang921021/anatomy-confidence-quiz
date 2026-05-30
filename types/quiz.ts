@@ -98,6 +98,7 @@ export type SimulationPaperMode = "random_set" | "past_paper" | "random_past_pap
 export type QuizSettings = {
   mode: QuizMode;
   questionCount: number;
+  stopAfterReview?: boolean;
   yearFrom?: number;
   yearTo?: number;
   subjectFilter?: SubjectFilter;

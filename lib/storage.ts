@@ -16,6 +16,8 @@ const PEAK_CHALLENGE_PRELOAD_KEY = "anatomy-confidence-peak-challenge-preload";
 const HOME_TONE_MODE_KEY = "anatomy-confidence-home-tone-mode";
 const THEME_MODE_KEY = "anatomy-confidence-theme-mode";
 const PRACTICE_YEAR_RANGE_KEY = "anatomy-confidence-practice-year-range";
+const PRACTICE_QUESTION_COUNT_KEY = "anatomy-confidence-practice-question-count";
+const PRACTICE_STOP_AFTER_REVIEW_KEY = "anatomy-confidence-practice-stop-after-review";
 const ACTIVE_USER_KEY = "anatomy-confidence-active-user-id";
 const GUEST_USER_ID = "guest";
 
@@ -427,6 +429,8 @@ export type PracticeYearRange = {
   yearTo: number;
 };
 
+export type PracticeQuestionCount = 5 | 10 | 15 | 20 | 25 | 30 | 35 | 40 | 45 | 50;
+
 export function savePeakChallengePreload(preload: PeakChallengePreload) {
   if (!isBrowser()) return;
   window.localStorage.setItem(getScopedKey(PEAK_CHALLENGE_PRELOAD_KEY), JSON.stringify(preload));
@@ -481,6 +485,35 @@ export function savePracticeYearRange(range: PracticeYearRange) {
   };
   window.localStorage.setItem(getScopedKey(PRACTICE_YEAR_RANGE_KEY), JSON.stringify(normalized));
   window.dispatchEvent(new CustomEvent("practice-year-range-change", { detail: normalized }));
+}
+
+export function savePracticeQuestionCount(count: PracticeQuestionCount) {
+  if (!isBrowser()) return;
+  window.localStorage.setItem(getScopedKey(PRACTICE_QUESTION_COUNT_KEY), String(count));
+  window.dispatchEvent(new CustomEvent("practice-question-count-change", { detail: count }));
+}
+
+export function loadPracticeQuestionCount(defaultCount: PracticeQuestionCount = 10): PracticeQuestionCount {
+  if (!isBrowser()) return defaultCount;
+  const raw = getLegacyOrScopedRaw(PRACTICE_QUESTION_COUNT_KEY);
+  const value = Number(raw);
+  return [5, 10, 15, 20, 25, 30, 35, 40, 45, 50].includes(value)
+    ? (value as PracticeQuestionCount)
+    : defaultCount;
+}
+
+export function savePracticeStopAfterReview(enabled: boolean) {
+  if (!isBrowser()) return;
+  window.localStorage.setItem(getScopedKey(PRACTICE_STOP_AFTER_REVIEW_KEY), enabled ? "true" : "false");
+  window.dispatchEvent(new CustomEvent("practice-stop-after-review-change", { detail: enabled }));
+}
+
+export function loadPracticeStopAfterReview(defaultValue = false) {
+  if (!isBrowser()) return defaultValue;
+  const raw = getLegacyOrScopedRaw(PRACTICE_STOP_AFTER_REVIEW_KEY);
+  if (raw === "true") return true;
+  if (raw === "false") return false;
+  return defaultValue;
 }
 
 export function loadPracticeYearRange(defaultRange?: PracticeYearRange): PracticeYearRange | null {
