@@ -84,14 +84,12 @@ export function HomeToneBanner() {
     void refreshStats();
     const intervalId = window.setInterval(() => {
       void refreshStats();
-    }, 30_000);
-    window.addEventListener("focus", handleVisibilityChange);
+    }, 60_000);
     document.addEventListener("visibilitychange", handleVisibilityChange);
 
     return () => {
       cancelled = true;
       window.clearInterval(intervalId);
-      window.removeEventListener("focus", handleVisibilityChange);
       document.removeEventListener("visibilitychange", handleVisibilityChange);
     };
   }, [mode]);

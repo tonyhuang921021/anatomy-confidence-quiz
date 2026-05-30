@@ -4,7 +4,7 @@ import { useEffect } from "react";
 import { trackVisitorPresence } from "@/lib/cloudSync";
 import { useAuth } from "@/components/AuthProvider";
 
-const HEARTBEAT_INTERVAL_MS = 60 * 1000;
+const HEARTBEAT_INTERVAL_MS = 75 * 1000;
 
 export function VisitorPresenceTracker() {
   const { user, configured } = useAuth();

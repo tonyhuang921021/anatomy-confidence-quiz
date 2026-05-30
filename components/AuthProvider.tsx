@@ -6,6 +6,7 @@ import {
   useContext,
   useEffect,
   useMemo,
+  useRef,
   useState,
   type ReactNode
 } from "react";
@@ -36,7 +37,8 @@ type AuthContextValue = {
 const AuthContext = createContext<AuthContextValue | null>(null);
 
 const SYNC_RETRY_DELAYS_MS = [0, 400, 1200];
-const CLOUD_REFRESH_INTERVAL_MS = 45_000;
+const CLOUD_REFRESH_INTERVAL_MS = 90_000;
+const MIN_CLOUD_REFRESH_GAP_MS = 20_000;
 
 function getErrorMessage(error: unknown) {
   if (error instanceof Error) return error.message;
@@ -62,6 +64,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [syncStatus, setSyncStatus] = useState<AuthContextValue["syncStatus"]>("idle");
   const [syncVersion, setSyncVersion] = useState(0);
   const [syncError, setSyncError] = useState("");
+  const lastRefreshAtRef = useRef(0);
 
   const refreshCloudData = useCallback(async (targetUserId?: string, targetUser?: User | null) => {
     const userId = targetUserId || user?.id;
@@ -113,6 +116,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
       setSyncStatus("ready");
       setSyncVersion((value) => value + 1);
+      lastRefreshAtRef.current = Date.now();
     } catch (error) {
       setSyncStatus("error");
       setSyncError(getErrorMessage(error));
@@ -181,13 +185,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const activeUser = user;
 
     function handleVisibilityRefresh() {
-      if (document.visibilityState === "visible") {
+      if (
+        document.visibilityState === "visible" &&
+        Date.now() - lastRefreshAtRef.current >= MIN_CLOUD_REFRESH_GAP_MS
+      ) {
         void refreshCloudData(activeUser.id, activeUser);
       }
     }
 
     function handleFocusRefresh() {
-      void refreshCloudData(activeUser.id, activeUser);
+      if (Date.now() - lastRefreshAtRef.current >= MIN_CLOUD_REFRESH_GAP_MS) {
+        void refreshCloudData(activeUser.id, activeUser);
+      }
     }
 
     const intervalId = window.setInterval(() => {

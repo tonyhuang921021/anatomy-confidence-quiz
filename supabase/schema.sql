@@ -24,23 +24,23 @@ alter table public.quiz_sessions enable row level security;
 create policy "Users can read their own quiz sessions"
 on public.quiz_sessions
 for select
-using (auth.uid() = user_id);
+using ((select auth.uid()) = user_id);
 
 create policy "Users can insert their own quiz sessions"
 on public.quiz_sessions
 for insert
-with check (auth.uid() = user_id);
+with check ((select auth.uid()) = user_id);
 
 create policy "Users can update their own quiz sessions"
 on public.quiz_sessions
 for update
-using (auth.uid() = user_id)
-with check (auth.uid() = user_id);
+using ((select auth.uid()) = user_id)
+with check ((select auth.uid()) = user_id);
 
 create policy "Users can delete their own quiz sessions"
 on public.quiz_sessions
 for delete
-using (auth.uid() = user_id);
+using ((select auth.uid()) = user_id);
 
 create table if not exists public.leaderboard_profiles (
   user_id uuid primary key references auth.users (id) on delete cascade,
@@ -77,13 +77,13 @@ using (true);
 create policy "Users can insert their own leaderboard profile"
 on public.leaderboard_profiles
 for insert
-with check (auth.uid() = user_id);
+with check ((select auth.uid()) = user_id);
 
 create policy "Users can update their own leaderboard profile"
 on public.leaderboard_profiles
 for update
-using (auth.uid() = user_id)
-with check (auth.uid() = user_id);
+using ((select auth.uid()) = user_id)
+with check ((select auth.uid()) = user_id);
 
 create table if not exists public.site_visitors (
   visitor_id text primary key,
@@ -95,13 +95,11 @@ create table if not exists public.site_visitors (
 create index if not exists site_visitors_last_seen_at_idx
 on public.site_visitors (last_seen_at desc);
 
-grant select, insert, update
-  on public.site_visitors
-  to anon;
+create index if not exists site_visitors_user_id_idx
+on public.site_visitors (user_id);
 
-grant select, insert, update, delete
-  on public.site_visitors
-  to authenticated;
+revoke all on public.site_visitors from anon;
+revoke all on public.site_visitors from authenticated;
 
 grant select, insert, update, delete
   on public.site_visitors
@@ -112,20 +110,12 @@ alter table public.site_visitors enable row level security;
 drop policy if exists "Anyone can read site visitors" on public.site_visitors;
 drop policy if exists "Anyone can insert site visitors" on public.site_visitors;
 drop policy if exists "Anyone can update site visitors" on public.site_visitors;
+drop policy if exists "Service role can manage site visitors" on public.site_visitors;
 
-create policy "Anyone can read site visitors"
+create policy "Service role can manage site visitors"
 on public.site_visitors
-for select
-using (true);
-
-create policy "Anyone can insert site visitors"
-on public.site_visitors
-for insert
-with check (true);
-
-create policy "Anyone can update site visitors"
-on public.site_visitors
-for update
+for all
+to service_role
 using (true)
 with check (true);
 
@@ -152,14 +142,7 @@ create index if not exists question_attempt_logs_visitor_id_idx
 on public.question_attempt_logs (visitor_id);
 
 revoke all on public.question_attempt_logs from anon;
-
-grant insert, update
-  on public.question_attempt_logs
-  to anon;
-
-grant select, insert, update, delete
-  on public.question_attempt_logs
-  to authenticated;
+revoke all on public.question_attempt_logs from authenticated;
 
 grant select, insert, update, delete
   on public.question_attempt_logs
@@ -169,15 +152,12 @@ alter table public.question_attempt_logs enable row level security;
 
 drop policy if exists "Anyone can insert question attempt logs" on public.question_attempt_logs;
 drop policy if exists "Anyone can update question attempt logs" on public.question_attempt_logs;
+drop policy if exists "Service role can manage question attempt logs" on public.question_attempt_logs;
 
-create policy "Anyone can insert question attempt logs"
+create policy "Service role can manage question attempt logs"
 on public.question_attempt_logs
-for insert
-with check (true);
-
-create policy "Anyone can update question attempt logs"
-on public.question_attempt_logs
-for update
+for all
+to service_role
 using (true)
 with check (true);
 
@@ -196,7 +176,7 @@ grant select
   on public.question_accuracy_stats
   to anon;
 
-grant select, insert, update, delete
+grant select
   on public.question_accuracy_stats
   to authenticated;
 
@@ -209,20 +189,17 @@ alter table public.question_accuracy_stats enable row level security;
 drop policy if exists "Anyone can read question accuracy stats" on public.question_accuracy_stats;
 drop policy if exists "Anyone can insert question accuracy stats" on public.question_accuracy_stats;
 drop policy if exists "Anyone can update question accuracy stats" on public.question_accuracy_stats;
+drop policy if exists "Service role can manage question accuracy stats" on public.question_accuracy_stats;
 
 create policy "Anyone can read question accuracy stats"
 on public.question_accuracy_stats
 for select
 using (true);
 
-create policy "Anyone can insert question accuracy stats"
+create policy "Service role can manage question accuracy stats"
 on public.question_accuracy_stats
-for insert
-with check (true);
-
-create policy "Anyone can update question accuracy stats"
-on public.question_accuracy_stats
-for update
+for all
+to service_role
 using (true)
 with check (true);
 
@@ -242,7 +219,7 @@ grant select
   on public.question_explanation_overrides
   to anon;
 
-grant select, insert, update, delete
+grant select
   on public.question_explanation_overrides
   to authenticated;
 
@@ -255,22 +232,17 @@ alter table public.question_explanation_overrides enable row level security;
 drop policy if exists "Anyone can read question explanation overrides" on public.question_explanation_overrides;
 drop policy if exists "Authenticated users can insert question explanation overrides" on public.question_explanation_overrides;
 drop policy if exists "Authenticated users can update question explanation overrides" on public.question_explanation_overrides;
+drop policy if exists "Service role can manage question explanation overrides" on public.question_explanation_overrides;
 
 create policy "Anyone can read question explanation overrides"
 on public.question_explanation_overrides
 for select
 using (true);
 
-create policy "Authenticated users can insert question explanation overrides"
+create policy "Service role can manage question explanation overrides"
 on public.question_explanation_overrides
-for insert
-to authenticated
-with check (true);
-
-create policy "Authenticated users can update question explanation overrides"
-on public.question_explanation_overrides
-for update
-to authenticated
+for all
+to service_role
 using (true)
 with check (true);
 
@@ -295,13 +267,8 @@ on public.custom_papers (created_at desc);
 create index if not exists custom_papers_is_public_created_at_idx
 on public.custom_papers (is_public, created_at desc);
 
-grant select
-  on public.custom_papers
-  to anon;
-
-grant select, insert, update, delete
-  on public.custom_papers
-  to authenticated;
+create index if not exists custom_papers_created_by_user_id_idx
+on public.custom_papers (created_by_user_id);
 
 grant select, insert, update, delete
   on public.custom_papers
@@ -313,11 +280,14 @@ alter table public.custom_papers
   add column if not exists question_payload jsonb;
 
 drop policy if exists "Anyone can read custom papers" on public.custom_papers;
+drop policy if exists "Service role can manage custom papers" on public.custom_papers;
 
-create policy "Anyone can read custom papers"
+create policy "Service role can manage custom papers"
 on public.custom_papers
-for select
-using (true);
+for all
+to service_role
+using (true)
+with check (true);
 
 create table if not exists public.custom_paper_attempts (
   session_id text primary key,
@@ -336,13 +306,8 @@ create table if not exists public.custom_paper_attempts (
 create index if not exists custom_paper_attempts_paper_code_completed_at_idx
 on public.custom_paper_attempts (paper_code, completed_at desc);
 
-grant select
-  on public.custom_paper_attempts
-  to anon;
-
-grant select, insert, update, delete
-  on public.custom_paper_attempts
-  to authenticated;
+create index if not exists custom_paper_attempts_user_id_idx
+on public.custom_paper_attempts (user_id);
 
 grant select, insert, update, delete
   on public.custom_paper_attempts
@@ -351,11 +316,14 @@ grant select, insert, update, delete
 alter table public.custom_paper_attempts enable row level security;
 
 drop policy if exists "Anyone can read custom paper attempts" on public.custom_paper_attempts;
+drop policy if exists "Service role can manage custom paper attempts" on public.custom_paper_attempts;
 
-create policy "Anyone can read custom paper attempts"
+create policy "Service role can manage custom paper attempts"
 on public.custom_paper_attempts
-for select
-using (true);
+for all
+to service_role
+using (true)
+with check (true);
 
 create table if not exists public.question_attempt_devices (
   visitor_id text primary key,
@@ -367,14 +335,7 @@ create index if not exists question_attempt_devices_last_attempt_at_idx
 on public.question_attempt_devices (last_attempt_at desc);
 
 revoke all on public.question_attempt_devices from anon;
-
-grant insert, update
-  on public.question_attempt_devices
-  to anon;
-
-grant select, insert, update, delete
-  on public.question_attempt_devices
-  to authenticated;
+revoke all on public.question_attempt_devices from authenticated;
 
 grant select, insert, update, delete
   on public.question_attempt_devices
@@ -384,15 +345,12 @@ alter table public.question_attempt_devices enable row level security;
 
 drop policy if exists "Anyone can insert question attempt devices" on public.question_attempt_devices;
 drop policy if exists "Anyone can update question attempt devices" on public.question_attempt_devices;
+drop policy if exists "Service role can manage question attempt devices" on public.question_attempt_devices;
 
-create policy "Anyone can insert question attempt devices"
+create policy "Service role can manage question attempt devices"
 on public.question_attempt_devices
-for insert
-with check (true);
-
-create policy "Anyone can update question attempt devices"
-on public.question_attempt_devices
-for update
+for all
+to service_role
 using (true)
 with check (true);
 
@@ -411,14 +369,7 @@ create index if not exists question_attempt_device_daily_visitor_id_idx
 on public.question_attempt_device_daily (visitor_id);
 
 revoke all on public.question_attempt_device_daily from anon;
-
-grant insert, update
-  on public.question_attempt_device_daily
-  to anon;
-
-grant select, insert, update, delete
-  on public.question_attempt_device_daily
-  to authenticated;
+revoke all on public.question_attempt_device_daily from authenticated;
 
 grant select, insert, update, delete
   on public.question_attempt_device_daily
@@ -428,15 +379,12 @@ alter table public.question_attempt_device_daily enable row level security;
 
 drop policy if exists "Anyone can insert question attempt device daily" on public.question_attempt_device_daily;
 drop policy if exists "Anyone can update question attempt device daily" on public.question_attempt_device_daily;
+drop policy if exists "Service role can manage question attempt device daily" on public.question_attempt_device_daily;
 
-create policy "Anyone can insert question attempt device daily"
+create policy "Service role can manage question attempt device daily"
 on public.question_attempt_device_daily
-for insert
-with check (true);
-
-create policy "Anyone can update question attempt device daily"
-on public.question_attempt_device_daily
-for update
+for all
+to service_role
 using (true)
 with check (true);
 
@@ -462,6 +410,14 @@ alter table public.owner_daily_stats enable row level security;
 drop policy if exists "Anyone can read owner daily stats" on public.owner_daily_stats;
 drop policy if exists "Anyone can insert owner daily stats" on public.owner_daily_stats;
 drop policy if exists "Anyone can update owner daily stats" on public.owner_daily_stats;
+drop policy if exists "Service role can manage owner daily stats" on public.owner_daily_stats;
+
+create policy "Service role can manage owner daily stats"
+on public.owner_daily_stats
+for all
+to service_role
+using (true)
+with check (true);
 
 create table if not exists public.ai_explanation_usage_logs (
   id bigint generated always as identity primary key,
@@ -495,10 +451,7 @@ create index if not exists ai_explanation_usage_logs_visitor_id_idx
 on public.ai_explanation_usage_logs (visitor_id);
 
 revoke all on public.ai_explanation_usage_logs from anon;
-
-grant insert, update, delete
-  on public.ai_explanation_usage_logs
-  to authenticated;
+revoke all on public.ai_explanation_usage_logs from authenticated;
 
 grant select, insert, update, delete
   on public.ai_explanation_usage_logs
@@ -507,11 +460,13 @@ grant select, insert, update, delete
 alter table public.ai_explanation_usage_logs enable row level security;
 
 drop policy if exists "Anyone can insert ai explanation usage logs" on public.ai_explanation_usage_logs;
+drop policy if exists "Service role can manage ai explanation usage logs" on public.ai_explanation_usage_logs;
 
-create policy "Anyone can insert ai explanation usage logs"
+create policy "Service role can manage ai explanation usage logs"
 on public.ai_explanation_usage_logs
-for insert
-to authenticated
+for all
+to service_role
+using (true)
 with check (true);
 
 create table if not exists public.feedback_messages (
@@ -540,11 +495,11 @@ on public.feedback_messages (user_id, created_at desc);
 create index if not exists feedback_messages_visitor_id_created_at_idx
 on public.feedback_messages (visitor_id, created_at desc);
 
-grant select, insert
+grant select
   on public.feedback_messages
   to anon;
 
-grant select, insert, update, delete
+grant select
   on public.feedback_messages
   to authenticated;
 
@@ -556,15 +511,18 @@ alter table public.feedback_messages enable row level security;
 
 drop policy if exists "Anyone can read feedback messages" on public.feedback_messages;
 drop policy if exists "Anyone can insert feedback messages" on public.feedback_messages;
+drop policy if exists "Service role can manage feedback messages" on public.feedback_messages;
 
 create policy "Anyone can read feedback messages"
 on public.feedback_messages
 for select
 using (true);
 
-create policy "Anyone can insert feedback messages"
+create policy "Service role can manage feedback messages"
 on public.feedback_messages
-for insert
+for all
+to service_role
+using (true)
 with check (true);
 
 create table if not exists public.question_classification_reports (
@@ -596,14 +554,6 @@ on public.question_classification_reports (user_id, created_at desc);
 create index if not exists question_classification_reports_visitor_id_created_at_idx
 on public.question_classification_reports (visitor_id, created_at desc);
 
-grant insert
-  on public.question_classification_reports
-  to anon;
-
-grant select, insert, update, delete
-  on public.question_classification_reports
-  to authenticated;
-
 grant select, insert, update, delete
   on public.question_classification_reports
   to service_role;
@@ -611,10 +561,13 @@ grant select, insert, update, delete
 alter table public.question_classification_reports enable row level security;
 
 drop policy if exists "Anyone can insert classification reports" on public.question_classification_reports;
+drop policy if exists "Service role can manage classification reports" on public.question_classification_reports;
 
-create policy "Anyone can insert classification reports"
+create policy "Service role can manage classification reports"
 on public.question_classification_reports
-for insert
+for all
+to service_role
+using (true)
 with check (true);
 
 alter table public.question_classification_reports
@@ -635,11 +588,14 @@ create table if not exists public.question_classification_overrides (
 create index if not exists question_classification_overrides_updated_at_idx
 on public.question_classification_overrides (updated_at desc);
 
+create index if not exists question_classification_overrides_source_report_id_idx
+on public.question_classification_overrides (source_report_id);
+
 grant select
   on public.question_classification_overrides
   to anon;
 
-grant select, insert, update, delete
+grant select
   on public.question_classification_overrides
   to authenticated;
 
@@ -650,11 +606,19 @@ grant select, insert, update, delete
 alter table public.question_classification_overrides enable row level security;
 
 drop policy if exists "Anyone can read classification overrides" on public.question_classification_overrides;
+drop policy if exists "Service role can manage classification overrides" on public.question_classification_overrides;
 
 create policy "Anyone can read classification overrides"
 on public.question_classification_overrides
 for select
 using (true);
+
+create policy "Service role can manage classification overrides"
+on public.question_classification_overrides
+for all
+to service_role
+using (true)
+with check (true);
 
 create table if not exists public.peak_challenge_runs (
   session_id text primary key,
@@ -674,6 +638,9 @@ on public.peak_challenge_runs (completed_at desc);
 
 create index if not exists peak_challenge_runs_user_email_idx
 on public.peak_challenge_runs (user_email);
+
+create index if not exists peak_challenge_runs_user_id_idx
+on public.peak_challenge_runs (user_id);
 
 grant select
   on public.peak_challenge_runs
@@ -703,11 +670,23 @@ create table if not exists public.peak_challenge_attempt_logs (
 create index if not exists peak_challenge_attempt_logs_user_email_started_at_idx
 on public.peak_challenge_attempt_logs (user_email, started_at desc);
 
+create index if not exists peak_challenge_attempt_logs_user_id_idx
+on public.peak_challenge_attempt_logs (user_id);
+
 grant select, insert, update, delete
   on public.peak_challenge_attempt_logs
   to service_role;
 
 alter table public.peak_challenge_attempt_logs enable row level security;
+
+drop policy if exists "Service role can manage peak challenge attempt logs" on public.peak_challenge_attempt_logs;
+
+create policy "Service role can manage peak challenge attempt logs"
+on public.peak_challenge_attempt_logs
+for all
+to service_role
+using (true)
+with check (true);
 
 create table if not exists public.shared_ai_questions (
   id text primary key,
@@ -733,6 +712,15 @@ grant select, insert, update, delete
 
 alter table public.shared_ai_questions enable row level security;
 
+drop policy if exists "Service role can manage shared ai questions" on public.shared_ai_questions;
+
+create policy "Service role can manage shared ai questions"
+on public.shared_ai_questions
+for all
+to service_role
+using (true)
+with check (true);
+
 create table if not exists public.ai_account_bans (
   user_email text primary key,
   banned_until timestamptz not null,
@@ -750,3 +738,12 @@ grant select, insert, update, delete
   to service_role;
 
 alter table public.ai_account_bans enable row level security;
+
+drop policy if exists "Service role can manage ai account bans" on public.ai_account_bans;
+
+create policy "Service role can manage ai account bans"
+on public.ai_account_bans
+for all
+to service_role
+using (true)
+with check (true);

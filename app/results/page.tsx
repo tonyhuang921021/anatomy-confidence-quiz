@@ -354,23 +354,6 @@ function ResultsPageContent() {
     }
 
     void fetchCommunityStats();
-
-    function handleFocusSync() {
-      if (typeof document !== "undefined" && document.visibilityState !== "visible") return;
-      void fetchCommunityStats();
-    }
-
-    if (typeof window !== "undefined") {
-      window.addEventListener("focus", handleFocusSync);
-      document.addEventListener("visibilitychange", handleFocusSync);
-    }
-
-    return () => {
-      if (typeof window !== "undefined") {
-        window.removeEventListener("focus", handleFocusSync);
-        document.removeEventListener("visibilitychange", handleFocusSync);
-      }
-    };
   }, [state.session]);
 
   useEffect(() => {
@@ -406,22 +389,6 @@ function ResultsPageContent() {
     }
 
     void fetchSharedExplanationOverrides();
-
-    function handleFocusSync() {
-      void fetchSharedExplanationOverrides();
-    }
-
-    if (typeof window !== "undefined") {
-      window.addEventListener("focus", handleFocusSync);
-      document.addEventListener("visibilitychange", handleFocusSync);
-    }
-
-    return () => {
-      if (typeof window !== "undefined") {
-        window.removeEventListener("focus", handleFocusSync);
-        document.removeEventListener("visibilitychange", handleFocusSync);
-      }
-    };
   }, [state.session]);
 
   const recentCompletedSessions = useMemo(

@@ -1099,20 +1099,21 @@ export async function trackVisitorPresence(userId?: string | null) {
   const visitorId = getVisitorId();
   if (!visitorId) return;
 
-  const supabase = getSupabaseBrowserClient();
-  const now = new Date().toISOString();
-
-  const { error } = await supabase.from("site_visitors").upsert(
-    {
-      visitor_id: visitorId,
-      user_id: userId ?? null,
-      last_seen_at: now
+  const response = await fetch("/api/visitor-presence", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
     },
-    { onConflict: "visitor_id" }
-  );
+    body: JSON.stringify({
+      visitorId,
+      userId: userId ?? null
+    }),
+    cache: "no-store"
+  });
 
-  if (error) {
-    throw error;
+  const payload = (await response.json().catch(() => null)) as { ok?: boolean; message?: string } | null;
+  if (!response.ok || !payload?.ok) {
+    throw new Error(payload?.message || "訪客狀態同步失敗");
   }
 }
 
@@ -1125,26 +1126,16 @@ export async function loadVisitorStats(): Promise<VisitorStats> {
     };
   }
 
-  const supabase = getSupabaseBrowserClient();
-  const onlineSince = new Date(Date.now() - ONLINE_WINDOW_MS).toISOString();
+  const response = await fetch("/api/visitor-stats", { cache: "no-store" });
+  const payload = (await response.json().catch(() => null)) as
+    | { ok?: boolean; message?: string; stats?: VisitorStats }
+    | null;
 
-  const [{ count: totalVisitors, error: totalError }, { count: onlineVisitors, error: onlineError }] =
-    await Promise.all([
-      supabase.from("site_visitors").select("*", { count: "exact", head: true }),
-      supabase
-        .from("site_visitors")
-        .select("*", { count: "exact", head: true })
-        .gte("last_seen_at", onlineSince)
-    ]);
+  if (!response.ok || !payload?.ok || !payload.stats) {
+    throw new Error(payload?.message || "訪客統計讀取失敗");
+  }
 
-  if (totalError) throw totalError;
-  if (onlineError) throw onlineError;
-
-  return {
-    totalVisitors: totalVisitors ?? 0,
-    onlineVisitors: onlineVisitors ?? 0,
-    updatedAt: new Date().toISOString()
-  };
+  return payload.stats;
 }
 
 export async function loadFeedbackMessages(limit = 40): Promise<FeedbackMessage[]> {
