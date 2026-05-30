@@ -195,6 +195,59 @@ async function fetchOwnerDailySeries(
     ] as const)
   );
 
+  const recentDayKeys = dayKeys.slice(-2);
+  if (recentDayKeys.length > 0) {
+    const startDate = recentDayKeys[0];
+    const endDate = recentDayKeys[recentDayKeys.length - 1];
+    const endDateExclusive = new Date(`${endDate}T00:00:00+08:00`);
+    endDateExclusive.setDate(endDateExclusive.getDate() + 1);
+
+    const [attemptRows, deviceRows] = await Promise.all([
+      fetchAllRows<Pick<QuestionAttemptLogRow, "session_id" | "question_id" | "answered_at">>(
+        supabase,
+        "question_attempt_logs",
+        "session_id, question_id, answered_at",
+        "answered_at",
+        (query) =>
+          query
+            .gte("answered_at", `${startDate}T00:00:00+08:00`)
+            .lt("answered_at", endDateExclusive.toISOString())
+      ),
+      fetchAllRows<Pick<QuestionAttemptDeviceDailyRow, "activity_date" | "visitor_id">>(
+        supabase,
+        "question_attempt_device_daily",
+        "visitor_id, activity_date",
+        "activity_date",
+        (query) => query.in("activity_date", recentDayKeys)
+      )
+    ]);
+
+    const recentAttemptMap = new Map<string, number>();
+    const recentDeviceMap = new Map<string, Set<string>>();
+
+    for (const row of dedupeAttemptRows(attemptRows)) {
+      const key = getTaipeiDayKey(new Date(row.answered_at));
+      if (!recentDayKeys.includes(key)) continue;
+      recentAttemptMap.set(key, (recentAttemptMap.get(key) ?? 0) + 1);
+    }
+
+    for (const row of deviceRows) {
+      if (!recentDayKeys.includes(row.activity_date)) continue;
+      const visitorId = row.visitor_id?.trim();
+      const current = recentDeviceMap.get(row.activity_date) ?? new Set<string>();
+      if (visitorId) current.add(visitorId);
+      recentDeviceMap.set(row.activity_date, current);
+    }
+
+    for (const key of recentDayKeys) {
+      dayMap.set(key, {
+        activity_date: key,
+        attempts: recentAttemptMap.get(key) ?? 0,
+        devices: recentDeviceMap.get(key)?.size ?? 0
+      });
+    }
+  }
+
   return dayKeys.map((date) => ({
     date,
     attempts: dayMap.get(date)?.attempts ?? 0,

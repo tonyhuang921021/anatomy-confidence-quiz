@@ -33,6 +33,7 @@ type QuestionAttemptLogRow = {
 };
 
 type QuestionAttemptDeviceDailyRow = {
+  visitor_id?: string;
   activity_date: string;
 };
 
@@ -203,7 +204,7 @@ async function refreshOwnerDailyStats(
         .lt("answered_at", endDateExclusive.toISOString()),
       supabase
         .from("question_attempt_device_daily")
-        .select("activity_date")
+        .select("visitor_id, activity_date")
         .in("activity_date", uniqueDates)
     ]);
 
@@ -211,7 +212,7 @@ async function refreshOwnerDailyStats(
   if (deviceError) throw deviceError;
 
   const attemptMap = new Map<string, number>();
-  const deviceMap = new Map<string, number>();
+  const deviceMap = new Map<string, Set<string>>();
 
   const dedupedAttemptRows = dedupeAttemptRows((attemptRows ?? []) as QuestionAttemptLogRow[]);
 
@@ -222,13 +223,16 @@ async function refreshOwnerDailyStats(
   }
 
   for (const row of (deviceRows ?? []) as QuestionAttemptDeviceDailyRow[]) {
-    deviceMap.set(row.activity_date, (deviceMap.get(row.activity_date) ?? 0) + 1);
+    const visitorId = row.visitor_id?.trim();
+    const current = deviceMap.get(row.activity_date) ?? new Set<string>();
+    if (visitorId) current.add(visitorId);
+    deviceMap.set(row.activity_date, current);
   }
 
   const rows = uniqueDates.map((activityDate) => ({
     activity_date: activityDate,
     attempts: attemptMap.get(activityDate) ?? 0,
-    devices: deviceMap.get(activityDate) ?? 0,
+    devices: deviceMap.get(activityDate)?.size ?? 0,
     updated_at: new Date().toISOString()
   }));
 
