@@ -335,7 +335,7 @@ export function QuizSetupPanel({
               <div className="rounded-2xl bg-white p-4 ring-1 ring-slate-200">
                 <p className="text-sm font-medium text-slate-500">模擬考卷來源</p>
                 <div className="mt-3 grid gap-3">
-                  {(["random_set", "past_paper", "random_past_paper"] as SimulationPaperMode[]).map((mode) => (
+                  {(["past_paper", "random_past_paper", "random_set"] as SimulationPaperMode[]).map((mode) => (
                     <button
                       key={mode}
                       type="button"

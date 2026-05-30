@@ -116,6 +116,16 @@ function getAccuracyTone(correctRate: number) {
   return "bg-emerald-100 text-emerald-800";
 }
 
+function getSubjectStatOrder(subject: string) {
+  const med1Order = ["解剖學", "組織學", "胚胎學", "生理學", "生物化學"];
+  const med2Order = ["微生物免疫學", "寄生蟲學", "公共衛生學", "藥理學", "病理學"];
+  const med1Index = med1Order.indexOf(subject);
+  if (med1Index >= 0) return med1Index;
+  const med2Index = med2Order.indexOf(subject);
+  if (med2Index >= 0) return med2Index;
+  return 999;
+}
+
 const RESULTS_HISTORY_PAGE_SIZE = 30;
 
 function ResultsPageContent() {
@@ -458,6 +468,24 @@ function ResultsPageContent() {
         return a.question.chapter.localeCompare(b.question.chapter) || a.question.section.localeCompare(b.question.section);
       });
   }, [reviewedAttempts, wrongAttempts]);
+  const simulationSubjectScores = useMemo(() => {
+    if (activeSession?.settings?.mode !== "simulation") return [];
+
+    const bucket = new Map<string, { subject: string; correct: number; total: number }>();
+    for (const { attempt, question } of reviewedAttempts) {
+      const subject = question.subject;
+      const current = bucket.get(subject) ?? { subject, correct: 0, total: 0 };
+      current.total += 1;
+      if (attempt.isCorrect) current.correct += 1;
+      bucket.set(subject, current);
+    }
+
+    return Array.from(bucket.values()).sort((left, right) => {
+      const orderDiff = getSubjectStatOrder(left.subject) - getSubjectStatOrder(right.subject);
+      if (orderDiff !== 0) return orderDiff;
+      return left.subject.localeCompare(right.subject);
+    });
+  }, [activeSession?.settings?.mode, reviewedAttempts]);
 
   function handleRestart() {
     clearCurrentSession();
@@ -1095,6 +1123,30 @@ function ResultsPageContent() {
 
       <div className="mt-6">
         <ResultSummary summary={state.summary} />
+        {simulationSubjectScores.length > 0 ? (
+          <section className="mt-4 rounded-[2rem] bg-white p-5 shadow-card ring-1 ring-slate-100 sm:p-6">
+            <div className="flex flex-wrap items-end justify-between gap-3">
+              <div>
+                <h2 className="text-lg font-semibold text-ink">模擬考分科得分</h2>
+                <p className="mt-2 text-sm text-slate-500">每科顯示本次作答答對題數 / 該科總題數，五科加總滿分 100。</p>
+              </div>
+              <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-700">
+                總分 {state.summary.correct} / {state.summary.total}
+              </span>
+            </div>
+            <div className="mt-4 grid gap-3 sm:grid-cols-2 xl:grid-cols-5">
+              {simulationSubjectScores.map((item) => (
+                <article key={item.subject} className="rounded-2xl bg-slate-50 px-4 py-4 ring-1 ring-slate-200">
+                  <p className="text-sm font-medium text-slate-500">{item.subject}</p>
+                  <p className="mt-2 text-2xl font-bold text-ink">
+                    {item.correct}
+                    <span className="ml-1 text-base font-semibold text-slate-500">/ {item.total}</span>
+                  </p>
+                </article>
+              ))}
+            </div>
+          </section>
+        ) : null}
       </div>
 
       <div className="mt-8 grid gap-6 xl:grid-cols-[minmax(0,1fr)_360px]">
