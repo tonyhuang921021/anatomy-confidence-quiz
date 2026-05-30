@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { AuthPanel } from "@/components/AuthPanel";
 import { ContinueQuizButton } from "@/components/ContinueQuizButton";
+import { ClientSectionBoundary } from "@/components/ClientSectionBoundary";
 import { ExamCountdown } from "@/components/ExamCountdown";
 import { FeedbackBoard } from "@/components/FeedbackBoard";
 import { HomeToneBanner } from "@/components/HomeToneBanner";
@@ -22,13 +23,17 @@ export default function HomePage() {
             <p className="body-soft mt-5 max-w-2xl text-sm leading-7 sm:text-base">
               用答題結果、信心程度與完成度，找出你的一階醫師國考弱點。
             </p>
-            <HomeToneBanner />
+            <ClientSectionBoundary title="首頁提示">
+              <HomeToneBanner />
+            </ClientSectionBoundary>
 
             <div className="mt-7 flex flex-wrap gap-3">
               <Link href="/start" className="primary-pill">
                 開始測驗
               </Link>
-              <ContinueQuizButton />
+              <ClientSectionBoundary title="繼續測驗">
+                <ContinueQuizButton />
+              </ClientSectionBoundary>
               <Link href="/simulation" className="secondary-pill">
                 開始一份考古題
               </Link>
@@ -62,9 +67,13 @@ export default function HomePage() {
       </section>
 
       <div className="mt-6 grid gap-6">
-        <AuthPanel />
+        <ClientSectionBoundary title="帳號區塊">
+          <AuthPanel />
+        </ClientSectionBoundary>
 
-        <FeedbackBoard />
+        <ClientSectionBoundary title="留言板">
+          <FeedbackBoard />
+        </ClientSectionBoundary>
 
         <div className="flex justify-start">
           <Link

@@ -36,6 +36,11 @@ function formatDateLabel(date: string, offsetFromEnd: number) {
   return date.slice(5);
 }
 
+function getLastPoint<T>(items: T[], fromEnd = 0) {
+  const index = items.length - 1 - fromEnd;
+  return index >= 0 ? items[index] : undefined;
+}
+
 export function HomeToneBanner() {
   const { user } = useAuth();
   const [mode, setMode] = useState<HomeToneMode>("calm");
@@ -102,8 +107,8 @@ export function HomeToneBanner() {
       };
     }
 
-    const today = stats.at(-1);
-    const yesterday = stats.at(-2);
+    const today = getLastPoint(stats, 0);
+    const yesterday = getLastPoint(stats, 1);
     const segments = [yesterday, today]
       .filter((item): item is { date: string; attempts: number; correctRate: number } => Boolean(item))
       .map((item, index, arr) => {
