@@ -202,7 +202,6 @@ export default function ProgressPage() {
   const { syncVersion } = useAuth();
   const [sessions, setSessions] = useState<QuizSession[]>([]);
   const [openGroups, setOpenGroups] = useState<Record<string, boolean>>({ med1: true, med2: true });
-  const [openSubjects, setOpenSubjects] = useState<Record<string, boolean>>({});
 
   useEffect(() => {
     setSessions(loadCompletedSessions());
@@ -246,7 +245,7 @@ export default function ProgressPage() {
             <p className="text-sm font-semibold uppercase tracking-[0.2em] text-brand-700">Progress Map</p>
             <h1 className="mt-2 text-3xl font-bold text-ink sm:text-4xl">醫學一／醫學二進度總覽</h1>
             <p className="mt-3 text-slate-500">
-              先看醫學一與醫學二，再往下展開各科與各 section。
+              先看醫學一與醫學二，再往下看各科進度。
             </p>
           </div>
           <div className="flex flex-wrap gap-3">
@@ -372,77 +371,21 @@ export default function ProgressPage() {
 
               {isGroupOpen ? (
                 <div className="mt-5 space-y-4">
-                  {group.subjects.map((subject) => {
-                    const isSubjectOpen = openSubjects[subject.subject] ?? false;
-                    return (
-                      <article key={subject.subject} className="rounded-3xl border border-slate-200 bg-slate-50 p-4">
-                        <button
-                          type="button"
-                          onClick={() =>
-                            setOpenSubjects((current) => ({
-                              ...current,
-                              [subject.subject]: !current[subject.subject]
-                            }))
-                          }
-                          className="flex w-full items-center justify-between gap-4 text-left"
-                        >
-                          <div>
-                            <h3 className="text-lg font-semibold text-ink">{subject.label}</h3>
-                            <p className="mt-2 text-sm text-slate-500">
-                              已作答 {subject.attemptedQuestions} / {subject.totalQuestionsInBank} ・ correctRate {subject.correctRate}% ・ mastery {subject.masteryScore}
-                            </p>
-                          </div>
-                          <div className="flex items-center gap-3">
-                            <span className={`rounded-full px-3 py-1 text-xs font-semibold ${statusClasses[subject.status]}`}>
-                              {subject.status}
-                            </span>
-                            <span className="text-sm font-semibold text-brand-700">{isSubjectOpen ? "收合" : "展開"}</span>
-                          </div>
-                        </button>
-
-                        {isSubjectOpen ? (
-                          <div className="mt-4 grid gap-3">
-                            {subject.sections.map((section) => (
-                              <article key={`${section.chapter}-${section.section}`} className="rounded-2xl bg-white p-4">
-                                <div className="flex items-start justify-between gap-3">
-                                  <div>
-                                    <h4 className="text-base font-semibold text-ink">{section.section}</h4>
-                                    <p className="mt-1 text-sm text-slate-500">{section.chapter}</p>
-                                  </div>
-                                  <span className={`rounded-full px-3 py-1 text-xs font-semibold ${statusClasses[section.status]}`}>
-                                    {section.status}
-                                  </span>
-                                </div>
-                                <div className="mt-3 h-3 overflow-hidden rounded-full bg-slate-100">
-                                  <div
-                                    className="h-full rounded-full bg-gradient-to-r from-sky-500 to-brand-500"
-                                    style={{ width: `${section.completionRate}%` }}
-                                  />
-                                </div>
-                                <div className="mt-3 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
-                                  <p className="rounded-2xl bg-slate-50 px-4 py-3 text-sm text-slate-700">
-                                    completion {section.completionRate}%
-                                  </p>
-                                  <p className="rounded-2xl bg-slate-50 px-4 py-3 text-sm text-slate-700">
-                                    correct {section.correctRate}%
-                                  </p>
-                                  <p className="rounded-2xl bg-slate-50 px-4 py-3 text-sm text-slate-700">
-                                    confidence {section.averageConfidence}
-                                  </p>
-                                  <p className="rounded-2xl bg-slate-50 px-4 py-3 text-sm text-slate-700">
-                                    mastery {section.masteryScore}
-                                  </p>
-                                  <p className="rounded-2xl bg-slate-50 px-4 py-3 text-sm text-slate-700 sm:col-span-2 xl:col-span-4">
-                                    最近一次作答 {formatTime(section.lastAttemptedAt)}
-                                  </p>
-                                </div>
-                              </article>
-                            ))}
-                          </div>
-                        ) : null}
-                      </article>
-                    );
-                  })}
+                  {group.subjects.map((subject) => (
+                    <article key={subject.subject} className="rounded-3xl border border-slate-200 bg-slate-50 p-4">
+                      <div className="flex items-start justify-between gap-4">
+                        <div>
+                          <h3 className="text-lg font-semibold text-ink">{subject.label}</h3>
+                          <p className="mt-2 text-sm text-slate-500">
+                            已作答 {subject.attemptedQuestions} / {subject.totalQuestionsInBank} ・ correctRate {subject.correctRate}% ・ mastery {subject.masteryScore}
+                          </p>
+                        </div>
+                        <span className={`rounded-full px-3 py-1 text-xs font-semibold ${statusClasses[subject.status]}`}>
+                          {subject.status}
+                        </span>
+                      </div>
+                    </article>
+                  ))}
                 </div>
               ) : null}
             </section>
