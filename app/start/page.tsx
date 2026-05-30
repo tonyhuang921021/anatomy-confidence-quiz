@@ -35,9 +35,12 @@ export default function StartPage() {
   const med1Subjects = selectableSubjects.filter((item) => MED1_SUBJECTS.includes(item.subject));
   const med2Subjects = selectableSubjects.filter((item) => MED2_SUBJECTS.includes(item.subject));
   const [selectedSubjects, setSelectedSubjects] = useState<SubjectName[]>([]);
-  const [excludeAiGenerated, setExcludeAiGenerated] = useState(true);
   const [includeSeasonalLimited, setIncludeSeasonalLimited] = useState(false);
   const seasonalLimitedQuestions = useMemo(() => getSeasonalLimitedQuestions(), []);
+  const seasonalLimitedPastExamCount = useMemo(
+    () => seasonalLimitedQuestions.filter((question) => question.sourceType !== "AI_GENERATED").length,
+    [seasonalLimitedQuestions]
+  );
   const availableYears = useMemo(
     () =>
       Array.from(
@@ -59,6 +62,7 @@ export default function StartPage() {
   const [practiceYearRange, setPracticeYearRange] = useState<PracticeYearRange>(defaultPracticeYearRange);
   const [practiceQuestionCount, setPracticeQuestionCount] = useState<PracticeQuestionCount>(10);
   const [practiceStopAfterReview, setPracticeStopAfterReview] = useState(false);
+  const excludeAiGenerated = true;
   const seasonalDeadline = new Date("2026-05-15T09:00:00+08:00");
   const seasonalAvailable = new Date() < seasonalDeadline;
 
@@ -146,6 +150,7 @@ export default function StartPage() {
         <div className="mt-4 grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
           {subjects.map((subject) => {
             const active = selectedSubjects.includes(subject.subject);
+            const pastExamCount = subject.questions.filter((question) => question.sourceType !== "AI_GENERATED").length;
             return (
               <button
                 key={subject.subject}
@@ -161,7 +166,7 @@ export default function StartPage() {
                   <div className="flex min-w-0 items-center gap-2">
                     <h3 className="truncate text-base font-semibold text-ink sm:text-lg">{subject.label}</h3>
                     <span className="shrink-0 rounded-full bg-slate-100 px-2.5 py-1 text-[11px] font-semibold text-slate-600">
-                      {subject.questions.length} 題
+                      {pastExamCount} 題
                     </span>
                   </div>
                   {active ? (
@@ -267,7 +272,7 @@ export default function StartPage() {
                       {includeSeasonalLimited ? "已選擇" : "未選"}
                     </span>
                   </div>
-                  <p className="mt-3 text-sm text-slate-600">{seasonalLimitedQuestions.length} 題</p>
+                  <p className="mt-3 text-sm text-slate-600">{seasonalLimitedPastExamCount} 題</p>
                 </button>
               </div>
             </section>
@@ -288,17 +293,6 @@ export default function StartPage() {
               className="secondary-pill bg-white px-4 py-3"
             >
               全選
-            </button>
-            <button
-              type="button"
-              onClick={() => setExcludeAiGenerated((current) => !current)}
-              className={`min-h-12 rounded-full px-4 py-3 text-sm font-semibold transition ${
-                excludeAiGenerated
-                  ? "bg-amber-100 text-amber-900 ring-1 ring-amber-300"
-                  : "bg-white text-slate-800 ring-1 ring-slate-200 hover:bg-slate-100"
-              }`}
-            >
-              {excludeAiGenerated ? "排除 AI 題：開" : "排除 AI 題：關"}
             </button>
             <button
               type="button"
