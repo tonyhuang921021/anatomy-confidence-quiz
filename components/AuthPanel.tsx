@@ -416,27 +416,6 @@ export function AuthPanel() {
                   </div>
 
                   <div>
-                    <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">開始測驗題數</p>
-                    <p className="mt-2 text-sm text-slate-600">目前設定：每次 {practiceQuestionCount} 題</p>
-                    <div className="mt-3 grid gap-2 sm:grid-cols-5">
-                      {[5, 10, 15, 20, 25, 30, 35, 40, 45, 50].map((count) => (
-                        <button
-                          key={count}
-                          type="button"
-                          onClick={() => handleChangePracticeQuestionCount(count as PracticeQuestionCount)}
-                          className={`min-h-11 rounded-2xl px-3 py-2 text-sm font-semibold transition ${
-                            practiceQuestionCount === count
-                              ? "bg-brand-600 text-white"
-                              : "bg-slate-100 text-slate-700 hover:bg-slate-200"
-                          }`}
-                        >
-                          {count} 題
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-
-                  <div>
                     <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">作答節奏</p>
                     <div className="mt-3 flex flex-wrap gap-2">
                       <button
@@ -463,6 +442,31 @@ export function AuthPanel() {
                       </button>
                     </div>
                   </div>
+
+                  {!practiceStopAfterReview ? (
+                    <div>
+                      <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">開始測驗題數</p>
+                      <p className="mt-2 text-sm text-slate-600">目前設定：每次 {practiceQuestionCount} 題</p>
+                      <label className="mt-3 grid gap-2 text-sm text-slate-700 sm:max-w-xs">
+                        選擇題數
+                        <select
+                          value={practiceQuestionCount}
+                          onChange={(event) =>
+                            handleChangePracticeQuestionCount(
+                              Number(event.target.value) as PracticeQuestionCount
+                            )
+                          }
+                          className="min-h-12 rounded-2xl border border-slate-200 px-4 py-3 text-sm text-slate-800 outline-none"
+                        >
+                          {[5, 10, 15, 20, 25, 30, 35, 40, 45, 50].map((count) => (
+                            <option key={count} value={count}>
+                              {count} 題
+                            </option>
+                          ))}
+                        </select>
+                      </label>
+                    </div>
+                  ) : null}
                 </div>
               </div>
             ) : null}

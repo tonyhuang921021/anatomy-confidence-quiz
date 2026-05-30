@@ -121,6 +121,9 @@ export default function StartPage() {
     seasonalLimitedQuestions,
     selectedSubjects
   ]);
+  const effectiveQuestionCount = practiceStopAfterReview
+    ? Math.min(1, availableQuestionCount)
+    : Math.min(practiceQuestionCount, availableQuestionCount);
 
   function toggleSubject(subject: SubjectName) {
     setSelectedSubjects((current) =>
@@ -181,7 +184,7 @@ export default function StartPage() {
     const nextSettings: QuizSettings = {
       ...DEFAULT_QUIZ_SETTINGS,
       mode: "random",
-      questionCount: Math.min(practiceQuestionCount, availableQuestionCount),
+      questionCount: effectiveQuestionCount,
       stopAfterReview: practiceStopAfterReview,
       yearFrom: practiceYearRange.yearFrom,
       yearTo: practiceYearRange.yearTo,
@@ -219,7 +222,10 @@ export default function StartPage() {
               </Link>
             </div>
             <p className="body-soft mt-3 max-w-2xl text-sm leading-7 sm:text-base">
-              可以只勾一科，也可以混著抽。年份範圍只會影響抽題池，每次開始測驗仍固定 10 題。
+              可以只勾一科，也可以混著抽。年份範圍只會影響抽題池。
+              {practiceStopAfterReview
+                ? " 目前是看完某題詳解就結束，所以會直接開始單題測驗。"
+                : ` 目前會從題池裡抽 ${practiceQuestionCount} 題開始測驗。`}
             </p>
           </div>
           <Link
@@ -273,6 +279,7 @@ export default function StartPage() {
             已選 <span className="font-semibold text-ink">{selectedSubjects.length + (includeSeasonalLimited ? 1 : 0)}</span> 個範圍・
             {practiceYearRange.yearFrom} 到 {practiceYearRange.yearTo} 年共{" "}
             <span className="font-semibold text-ink">{availableQuestionCount}</span> 題
+            {practiceStopAfterReview ? "・單題結束模式" : `・每次抽 ${practiceQuestionCount} 題`}
           </p>
           <div className="flex flex-wrap gap-3">
             <button
@@ -299,7 +306,9 @@ export default function StartPage() {
               disabled={(selectedSubjects.length === 0 && !includeSeasonalLimited) || availableQuestionCount === 0}
               className="primary-pill disabled:cursor-not-allowed disabled:bg-slate-300"
             >
-              開始 {Math.min(practiceQuestionCount, availableQuestionCount)} 題測驗
+              {practiceStopAfterReview
+                ? "開始單題測驗"
+                : `開始 ${effectiveQuestionCount} 題測驗`}
             </button>
           </div>
         </div>
