@@ -414,13 +414,18 @@ function sessionFreshnessValue(session: QuizSession) {
 }
 
 function sessionActivityValue(session: QuizSession, fallbackUpdatedAt?: string | null) {
-  const latestAnsweredAt = session.attempts
+  const answeredAtValues = session.attempts
     .map((attempt) => attempt.answeredAt)
     .filter(Boolean)
-    .sort()
-    .at(-1);
+    .sort();
 
-  return latestAnsweredAt || session.completedAt || fallbackUpdatedAt || session.startedAt || "";
+  return (
+    answeredAtValues[answeredAtValues.length - 1] ||
+    session.completedAt ||
+    fallbackUpdatedAt ||
+    session.startedAt ||
+    ""
+  );
 }
 
 function namespaceSessionIdForUser(userId: string, sessionId: string) {
@@ -461,6 +466,22 @@ function mergeSessions(localSessions: QuizSession[], remoteSessions: QuizSession
   return Array.from(merged.values()).sort((a, b) =>
     sessionFreshnessValue(b).localeCompare(sessionFreshnessValue(a))
   );
+}
+
+function getSessionsNeedingUpload(localSessions: QuizSession[], remoteSessions: QuizSession[]) {
+  const remoteById = new Map(remoteSessions.map((session) => [session.id, session] as const));
+
+  return localSessions.filter((localSession) => {
+    const remoteSession = remoteById.get(localSession.id);
+    if (!remoteSession) return true;
+
+    const localFreshness = sessionFreshnessValue(localSession);
+    const remoteFreshness = sessionFreshnessValue(remoteSession);
+    if (localFreshness > remoteFreshness) return true;
+    if (localFreshness < remoteFreshness) return false;
+
+    return localSession.attempts.length > remoteSession.attempts.length;
+  });
 }
 
 function mapRowToSession(row: QuizSessionRow | null) {
@@ -913,10 +934,11 @@ export async function syncCompletedSessionsForCurrentUser(userId: string) {
       .filter((session): session is QuizSession => Boolean(session))
   );
   const mergedSessions = mergeSessions(localSessions, remoteSessions);
+  const sessionsToUpload = getSessionsNeedingUpload(localSessions, remoteSessions);
 
   saveCompletedSessions(mergedSessions);
-  await upsertSessionsForUser(userId, mergedSessions);
-  await syncQuestionStatsForSessionsSafely(mergedSessions);
+  await upsertSessionsForUser(userId, sessionsToUpload);
+  await syncQuestionStatsForSessionsSafely(sessionsToUpload);
 
   return mergedSessions;
 }

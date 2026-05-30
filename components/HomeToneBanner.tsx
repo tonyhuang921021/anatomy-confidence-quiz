@@ -41,6 +41,8 @@ function getLastPoint<T>(items: T[], fromEnd = 0) {
   return index >= 0 ? items[index] : undefined;
 }
 
+const ANXIOUS_STATS_REFRESH_MS = 5 * 60 * 1000;
+
 export function HomeToneBanner() {
   const { user } = useAuth();
   const [mode, setMode] = useState<HomeToneMode>("calm");
@@ -89,7 +91,7 @@ export function HomeToneBanner() {
     void refreshStats();
     const intervalId = window.setInterval(() => {
       void refreshStats();
-    }, 60_000);
+    }, ANXIOUS_STATS_REFRESH_MS);
     document.addEventListener("visibilitychange", handleVisibilityChange);
 
     return () => {

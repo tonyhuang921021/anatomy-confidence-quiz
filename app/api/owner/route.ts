@@ -181,42 +181,24 @@ async function fetchOwnerDailySeries(
   days = 14
 ): Promise<OwnerDailyPoint[]> {
   const dayKeys = getRecentTaipeiDayKeys(days);
-  const startDate = dayKeys[0];
-  const [attemptRows, deviceRows] = await Promise.all([
-    fetchAllRows<Pick<QuestionAttemptLogRow, "session_id" | "question_id" | "answered_at">>(
-      supabase,
-      "question_attempt_logs",
-      "session_id, question_id, answered_at",
-      "answered_at",
-      (query) => query.gte("answered_at", `${startDate}T00:00:00+08:00`)
-    ),
-    fetchAllRows<Pick<QuestionAttemptDeviceDailyRow, "activity_date">>(
-      supabase,
-      "question_attempt_device_daily",
-      "activity_date",
-      "activity_date",
-      (query) => query.gte("activity_date", startDate)
-    )
-  ]);
+  const { data, error } = await supabase
+    .from("owner_daily_stats")
+    .select("activity_date, attempts, devices")
+    .in("activity_date", dayKeys);
 
-  const attemptMap = new Map<string, number>();
-  const deviceMap = new Map<string, number>();
+  if (error) throw error;
 
-  for (const row of dedupeAttemptRows(attemptRows)) {
-    const key = getTaipeiDayKey(new Date(row.answered_at));
-    if (!dayKeys.includes(key)) continue;
-    attemptMap.set(key, (attemptMap.get(key) ?? 0) + 1);
-  }
-
-  for (const row of deviceRows) {
-    if (!dayKeys.includes(row.activity_date)) continue;
-    deviceMap.set(row.activity_date, (deviceMap.get(row.activity_date) ?? 0) + 1);
-  }
+  const dayMap = new Map(
+    ((data ?? []) as { activity_date: string; attempts: number; devices: number }[]).map((row) => [
+      row.activity_date,
+      row
+    ] as const)
+  );
 
   return dayKeys.map((date) => ({
     date,
-    attempts: attemptMap.get(date) ?? 0,
-    devices: deviceMap.get(date) ?? 0
+    attempts: dayMap.get(date)?.attempts ?? 0,
+    devices: dayMap.get(date)?.devices ?? 0
   }));
 }
 
@@ -449,7 +431,7 @@ async function fetchOwnerDashboardStats(
     allAttemptVisitorRows,
     onlineVisitorsResult,
     totalUsersResult,
-    allAttemptRows
+    totalAttemptsResult
   ] = await Promise.all([
     supabase.from("site_visitors").select("*", { count: "exact", head: true }),
     supabase.from("question_attempt_devices").select("*", { count: "exact", head: true }),
@@ -464,19 +446,15 @@ async function fetchOwnerDashboardStats(
       .select("*", { count: "exact", head: true })
       .gte("last_seen_at", onlineSince),
     supabase.from("leaderboard_profiles").select("*", { count: "exact", head: true }),
-    fetchAllRows<Pick<QuestionAttemptLogRow, "session_id" | "question_id">>(
-      supabase,
-      "question_attempt_logs",
-      "session_id, question_id",
-      "answered_at"
-    )
+    supabase.from("question_attempt_logs").select("*", { count: "exact", head: true })
   ]);
 
   const errors = [
     totalVisitorsResult.error,
     totalAttemptDevicesResult.error,
     onlineVisitorsResult.error,
-    totalUsersResult.error
+    totalUsersResult.error,
+    totalAttemptsResult.error
   ].filter(Boolean);
 
   if (errors.length > 0) throw errors[0];
@@ -487,8 +465,6 @@ async function fetchOwnerDashboardStats(
     if (!visitorId) continue;
     visitorAttemptCountMap.set(visitorId, (visitorAttemptCountMap.get(visitorId) ?? 0) + 1);
   }
-
-  const dedupedAttemptCount = dedupeAttemptRows(allAttemptRows).length;
 
   const aiExplanationCount = explanationUsage.reduce((sum, row) => sum + row.explanationCount, 0);
   const aiExplanationInputTokens = explanationUsage.reduce((sum, row) => sum + row.inputTokens, 0);
@@ -508,7 +484,7 @@ async function fetchOwnerDashboardStats(
     totalSyncedUsers: totalUsersResult.count ?? 0,
     attemptsToday,
     attemptsLast7Days,
-    totalAttempts: dedupedAttemptCount,
+    totalAttempts: totalAttemptsResult.count ?? 0,
     aiExplanationCount,
     aiExplanationInputTokens,
     aiExplanationOutputTokens,

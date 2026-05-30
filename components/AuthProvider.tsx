@@ -37,8 +37,8 @@ type AuthContextValue = {
 const AuthContext = createContext<AuthContextValue | null>(null);
 
 const SYNC_RETRY_DELAYS_MS = [0, 400, 1200];
-const CLOUD_REFRESH_INTERVAL_MS = 90_000;
-const MIN_CLOUD_REFRESH_GAP_MS = 20_000;
+const CLOUD_REFRESH_INTERVAL_MS = 3 * 60 * 1000;
+const MIN_CLOUD_REFRESH_GAP_MS = 60_000;
 
 function getErrorMessage(error: unknown) {
   if (error instanceof Error) return error.message;

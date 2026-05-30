@@ -11,6 +11,11 @@ type AttemptRow = {
   is_correct: boolean;
 };
 
+type OwnerDailyStatRow = {
+  activity_date: string;
+  attempts: number;
+};
+
 const SUPABASE_PAGE_SIZE = 1000;
 
 function getServiceSupabaseClient() {
@@ -93,6 +98,16 @@ async function fetchAllAttemptRows(supabase: any, startDate: string) {
   return rows;
 }
 
+async function fetchOwnerDailyAttemptRows(supabase: any, dayKeys: string[]) {
+  const { data, error } = await supabase
+    .from("owner_daily_stats")
+    .select("activity_date, attempts")
+    .in("activity_date", dayKeys);
+
+  if (error) throw error;
+  return (data ?? []) as OwnerDailyStatRow[];
+}
+
 export async function GET() {
   const supabase = getServiceSupabaseClient();
   if (!supabase) {
@@ -104,15 +119,23 @@ export async function GET() {
 
   try {
     const dayKeys = getRecentTaipeiDayKeys(2);
-    const attemptRows = dedupeAttemptRows(await fetchAllAttemptRows(supabase, dayKeys[0]));
+    const [attemptRows, dailyAttemptRows] = await Promise.all([
+      fetchAllAttemptRows(supabase, dayKeys[0]),
+      fetchOwnerDailyAttemptRows(supabase, dayKeys)
+    ]);
+    const dedupedAttemptRows = dedupeAttemptRows(attemptRows);
     const grouped = new Map<string, { attempts: number; correct: number }>();
-    dayKeys.forEach((key) => grouped.set(key, { attempts: 0, correct: 0 }));
+    const attemptsByDay = new Map(
+      dailyAttemptRows.map((row) => [row.activity_date, row.attempts] as const)
+    );
+    dayKeys.forEach((key) =>
+      grouped.set(key, { attempts: attemptsByDay.get(key) ?? 0, correct: 0 })
+    );
 
-    for (const row of attemptRows) {
+    for (const row of dedupedAttemptRows) {
       const key = getTaipeiDayKey(new Date(row.answered_at));
       if (!dayKeys.includes(key)) continue;
       const current = grouped.get(key) ?? { attempts: 0, correct: 0 };
-      current.attempts += 1;
       current.correct += row.is_correct ? 1 : 0;
       grouped.set(key, current);
     }

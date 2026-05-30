@@ -488,11 +488,15 @@ export default function OwnerPage() {
     };
 
     const intervalId = window.setInterval(() => {
-      void refresh();
-    }, 30000);
+      if (document.visibilityState === "visible") {
+        void refresh();
+      }
+    }, 180000);
 
     const handleFocus = () => {
-      void refresh();
+      if (document.visibilityState === "visible") {
+        void refresh();
+      }
     };
 
     window.addEventListener("focus", handleFocus);

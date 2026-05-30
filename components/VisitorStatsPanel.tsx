@@ -5,7 +5,7 @@ import { loadVisitorStats } from "@/lib/cloudSync";
 import { isSupabaseConfigured } from "@/lib/supabase/client";
 import type { VisitorStats } from "@/types/quiz";
 
-const REFRESH_INTERVAL_MS = 90 * 1000;
+const REFRESH_INTERVAL_MS = 3 * 60 * 1000;
 
 const emptyStats: VisitorStats = {
   totalVisitors: 0,
