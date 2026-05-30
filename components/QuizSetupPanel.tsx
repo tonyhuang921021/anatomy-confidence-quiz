@@ -71,14 +71,14 @@ export function QuizSetupPanel({
 }: QuizSetupPanelProps) {
   const router = useRouter();
   const [settings, setSettings] = useState<QuizSettings>(
-    simulationOnly
+        simulationOnly
       ? {
           ...DEFAULT_QUIZ_SETTINGS,
           mode: "simulation",
           subjectFilter: "全部",
           questionCount: 100,
           feedbackMode: "none",
-          paperMode: "random_set"
+          paperMode: "past_paper"
         }
       : DEFAULT_QUIZ_SETTINGS
   );
@@ -158,6 +158,7 @@ export function QuizSetupPanel({
         merged.questionCount = 100;
         merged.chapter = undefined;
         merged.section = undefined;
+        merged.paperMode = "past_paper";
       }
       if (next.chapter && next.chapter !== current.chapter) {
         merged.section = undefined;
@@ -166,7 +167,7 @@ export function QuizSetupPanel({
         merged.chapter = undefined;
         merged.section = undefined;
         if (merged.mode === "simulation" && next.subjectFilter !== "全部") {
-          merged.paperMode = merged.paperMode ?? "random_set";
+          merged.paperMode = merged.paperMode ?? "past_paper";
         }
       }
       return merged;

@@ -30,7 +30,7 @@ export default function HomePage() {
               </Link>
               <ContinueQuizButton />
               <Link href="/simulation" className="secondary-pill">
-                開始模擬考
+                開始一份考古題
               </Link>
               <Link href="/results" className="secondary-pill">
                 查看結果
