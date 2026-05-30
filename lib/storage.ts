@@ -23,9 +23,36 @@ const GUEST_USER_ID = "guest";
 
 const isBrowser = () => typeof window !== "undefined";
 
+function safeLocalStorageGetItem(key: string) {
+  if (!isBrowser()) return null;
+  try {
+    return window.localStorage.getItem(key);
+  } catch {
+    return null;
+  }
+}
+
+function safeLocalStorageSetItem(key: string, value: string) {
+  if (!isBrowser()) return;
+  try {
+    window.localStorage.setItem(key, value);
+  } catch {
+    // Ignore storage write failures on restrictive browsers/private mode.
+  }
+}
+
+function safeLocalStorageRemoveItem(key: string) {
+  if (!isBrowser()) return;
+  try {
+    window.localStorage.removeItem(key);
+  } catch {
+    // Ignore storage delete failures on restrictive browsers/private mode.
+  }
+}
+
 function getScopedKey(baseKey: string) {
   if (!isBrowser()) return `${baseKey}:${GUEST_USER_ID}`;
-  const userId = window.localStorage.getItem(ACTIVE_USER_KEY) || GUEST_USER_ID;
+  const userId = safeLocalStorageGetItem(ACTIVE_USER_KEY) || GUEST_USER_ID;
   return `${baseKey}:${userId}`;
 }
 
@@ -36,12 +63,12 @@ function getScopedKeyForUser(baseKey: string, userId: string) {
 function getLegacyOrScopedRaw(baseKey: string) {
   if (!isBrowser()) return null;
   const scopedKey = getScopedKey(baseKey);
-  const scopedValue = window.localStorage.getItem(scopedKey);
+  const scopedValue = safeLocalStorageGetItem(scopedKey);
   if (scopedValue) return scopedValue;
 
-  const legacyValue = window.localStorage.getItem(baseKey);
+  const legacyValue = safeLocalStorageGetItem(baseKey);
   if (legacyValue) {
-    window.localStorage.setItem(scopedKey, legacyValue);
+    safeLocalStorageSetItem(scopedKey, legacyValue);
     return legacyValue;
   }
 
@@ -265,17 +292,17 @@ function normalizeQuestionExplanationOverride(
 
 export function setActiveStorageUser(userId?: string) {
   if (!isBrowser()) return;
-  window.localStorage.setItem(ACTIVE_USER_KEY, userId || GUEST_USER_ID);
+  safeLocalStorageSetItem(ACTIVE_USER_KEY, userId || GUEST_USER_ID);
 }
 
 export function getActiveStorageUser() {
   if (!isBrowser()) return GUEST_USER_ID;
-  return window.localStorage.getItem(ACTIVE_USER_KEY) || GUEST_USER_ID;
+  return safeLocalStorageGetItem(ACTIVE_USER_KEY) || GUEST_USER_ID;
 }
 
 export function saveCurrentSession(session: QuizSession) {
   if (!isBrowser()) return;
-  window.localStorage.setItem(getScopedKey(CURRENT_SESSION_KEY), JSON.stringify(session));
+  safeLocalStorageSetItem(getScopedKey(CURRENT_SESSION_KEY), JSON.stringify(session));
   window.dispatchEvent(new CustomEvent("current-session-change", { detail: session }));
 }
 
@@ -287,7 +314,7 @@ export function loadCurrentSessionForUser(userId: string): QuizSession | null {
   if (!isBrowser()) return null;
   const scopedKey = getScopedKeyForUser(CURRENT_SESSION_KEY, userId);
   const raw =
-    window.localStorage.getItem(scopedKey) ??
+    safeLocalStorageGetItem(scopedKey) ??
     (userId === GUEST_USER_ID ? getLegacyOrScopedRaw(CURRENT_SESSION_KEY) : null);
   if (!raw) return null;
 
@@ -300,7 +327,7 @@ export function loadCurrentSessionForUser(userId: string): QuizSession | null {
 
 export function clearCurrentSession() {
   if (!isBrowser()) return;
-  window.localStorage.removeItem(getScopedKey(CURRENT_SESSION_KEY));
+  safeLocalStorageRemoveItem(getScopedKey(CURRENT_SESSION_KEY));
   window.dispatchEvent(new CustomEvent("current-session-change", { detail: null }));
 }
 
@@ -313,7 +340,7 @@ export function saveCompletedSession(session: QuizSession) {
 
 export function saveCompletedSessions(sessions: QuizSession[]) {
   if (!isBrowser()) return;
-  window.localStorage.setItem(getScopedKey(COMPLETED_SESSIONS_KEY), JSON.stringify(sessions));
+  safeLocalStorageSetItem(getScopedKey(COMPLETED_SESSIONS_KEY), JSON.stringify(sessions));
   window.dispatchEvent(new CustomEvent("completed-sessions-change", { detail: sessions }));
 }
 
@@ -325,7 +352,7 @@ export function loadCompletedSessionsForUser(userId: string): QuizSession[] {
   if (!isBrowser()) return [];
   const scopedKey = getScopedKeyForUser(COMPLETED_SESSIONS_KEY, userId);
   const raw =
-    window.localStorage.getItem(scopedKey) ??
+    safeLocalStorageGetItem(scopedKey) ??
     (userId === GUEST_USER_ID ? getLegacyOrScopedRaw(COMPLETED_SESSIONS_KEY) : null);
   if (!raw) return [];
 
@@ -338,13 +365,13 @@ export function loadCompletedSessionsForUser(userId: string): QuizSession[] {
 
 export function clearHistory() {
   if (!isBrowser()) return;
-  window.localStorage.removeItem(getScopedKey(COMPLETED_SESSIONS_KEY));
-  window.localStorage.removeItem(getScopedKey(CURRENT_SESSION_KEY));
+  safeLocalStorageRemoveItem(getScopedKey(COMPLETED_SESSIONS_KEY));
+  safeLocalStorageRemoveItem(getScopedKey(CURRENT_SESSION_KEY));
 }
 
 export function saveQuizSettings(settings: QuizSettings) {
   if (!isBrowser()) return;
-  window.localStorage.setItem(getScopedKey(QUIZ_SETTINGS_KEY), JSON.stringify(settings));
+  safeLocalStorageSetItem(getScopedKey(QUIZ_SETTINGS_KEY), JSON.stringify(settings));
 }
 
 export function loadQuizSettings(): QuizSettings | null {
@@ -411,7 +438,7 @@ export function saveQuestionExplanationOverrides(
         .filter((entry): entry is readonly [string, QuestionExplanationOverride] => Boolean(entry))
     )
   };
-  window.localStorage.setItem(getScopedKey(QUESTION_EXPLANATION_OVERRIDES_KEY), JSON.stringify(next));
+  safeLocalStorageSetItem(getScopedKey(QUESTION_EXPLANATION_OVERRIDES_KEY), JSON.stringify(next));
 }
 
 export type PeakChallengePreload = {
@@ -433,7 +460,7 @@ export type PracticeQuestionCount = 5 | 10 | 15 | 20 | 25 | 30 | 35 | 40 | 45 | 
 
 export function savePeakChallengePreload(preload: PeakChallengePreload) {
   if (!isBrowser()) return;
-  window.localStorage.setItem(getScopedKey(PEAK_CHALLENGE_PRELOAD_KEY), JSON.stringify(preload));
+  safeLocalStorageSetItem(getScopedKey(PEAK_CHALLENGE_PRELOAD_KEY), JSON.stringify(preload));
 }
 
 export function loadPeakChallengePreload(): PeakChallengePreload | null {
@@ -450,12 +477,12 @@ export function loadPeakChallengePreload(): PeakChallengePreload | null {
 
 export function clearPeakChallengePreload() {
   if (!isBrowser()) return;
-  window.localStorage.removeItem(getScopedKey(PEAK_CHALLENGE_PRELOAD_KEY));
+  safeLocalStorageRemoveItem(getScopedKey(PEAK_CHALLENGE_PRELOAD_KEY));
 }
 
 export function saveHomeToneMode(mode: HomeToneMode) {
   if (!isBrowser()) return;
-  window.localStorage.setItem(getScopedKey(HOME_TONE_MODE_KEY), mode);
+  safeLocalStorageSetItem(getScopedKey(HOME_TONE_MODE_KEY), mode);
   window.dispatchEvent(new CustomEvent("home-tone-mode-change", { detail: mode }));
 }
 
@@ -467,7 +494,7 @@ export function loadHomeToneMode(): HomeToneMode {
 
 export function saveThemeMode(mode: ThemeMode) {
   if (!isBrowser()) return;
-  window.localStorage.setItem(getScopedKey(THEME_MODE_KEY), mode);
+  safeLocalStorageSetItem(getScopedKey(THEME_MODE_KEY), mode);
   window.dispatchEvent(new CustomEvent("theme-mode-change", { detail: mode }));
 }
 
@@ -483,13 +510,13 @@ export function savePracticeYearRange(range: PracticeYearRange) {
     yearFrom: Math.min(range.yearFrom, range.yearTo),
     yearTo: Math.max(range.yearFrom, range.yearTo)
   };
-  window.localStorage.setItem(getScopedKey(PRACTICE_YEAR_RANGE_KEY), JSON.stringify(normalized));
+  safeLocalStorageSetItem(getScopedKey(PRACTICE_YEAR_RANGE_KEY), JSON.stringify(normalized));
   window.dispatchEvent(new CustomEvent("practice-year-range-change", { detail: normalized }));
 }
 
 export function savePracticeQuestionCount(count: PracticeQuestionCount) {
   if (!isBrowser()) return;
-  window.localStorage.setItem(getScopedKey(PRACTICE_QUESTION_COUNT_KEY), String(count));
+  safeLocalStorageSetItem(getScopedKey(PRACTICE_QUESTION_COUNT_KEY), String(count));
   window.dispatchEvent(new CustomEvent("practice-question-count-change", { detail: count }));
 }
 
@@ -504,7 +531,7 @@ export function loadPracticeQuestionCount(defaultCount: PracticeQuestionCount = 
 
 export function savePracticeStopAfterReview(enabled: boolean) {
   if (!isBrowser()) return;
-  window.localStorage.setItem(getScopedKey(PRACTICE_STOP_AFTER_REVIEW_KEY), enabled ? "true" : "false");
+  safeLocalStorageSetItem(getScopedKey(PRACTICE_STOP_AFTER_REVIEW_KEY), enabled ? "true" : "false");
   window.dispatchEvent(new CustomEvent("practice-stop-after-review-change", { detail: enabled }));
 }
 
