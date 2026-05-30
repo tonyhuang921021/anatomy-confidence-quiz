@@ -57,3 +57,11 @@ export function getPracticeStopAfterReviewPreference(metadata: MetadataSource, d
     ? metadata.practice_stop_after_review
     : defaultValue;
 }
+
+export function hasPracticeQuestionCountPreference(metadata: MetadataSource) {
+  return typeof metadata?.practice_question_count === "number";
+}
+
+export function hasPracticeStopAfterReviewPreference(metadata: MetadataSource) {
+  return typeof metadata?.practice_stop_after_review === "boolean";
+}

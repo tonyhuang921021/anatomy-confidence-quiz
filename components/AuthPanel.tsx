@@ -25,6 +25,8 @@ import {
 } from "@/lib/storage";
 import {
   getHomeToneModePreference,
+  hasPracticeQuestionCountPreference,
+  hasPracticeStopAfterReviewPreference,
   getPracticeQuestionCountPreference,
   getPracticeStopAfterReviewPreference,
   getPracticeYearRangePreference,
@@ -115,6 +117,17 @@ export function AuthPanel() {
     if (user) {
       savePracticeQuestionCount(accountCount);
       savePracticeStopAfterReview(accountStopAfterReview);
+      const missingQuestionCount = !hasPracticeQuestionCountPreference(user.user_metadata);
+      const missingStopAfterReview = !hasPracticeStopAfterReviewPreference(user.user_metadata);
+      if (missingQuestionCount || missingStopAfterReview) {
+        const patch: AccountPreferencePatch = {};
+        if (missingQuestionCount) patch.practice_question_count = 10;
+        if (missingStopAfterReview) patch.practice_stop_after_review = false;
+        void persistAccountPreferences(patch).catch(() => {});
+      }
+    } else {
+      savePracticeQuestionCount(nextCount);
+      savePracticeStopAfterReview(nextStopAfterReview);
     }
   }, [user?.id, user?.user_metadata]);
 
