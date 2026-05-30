@@ -260,6 +260,49 @@ function getVisitorId() {
   return getOrCreateVisitorId();
 }
 
+type OwnerApiPayload = {
+  ok?: boolean;
+  message?: string;
+  stats?: OwnerDashboardStats;
+  dailySeries?: OwnerDailyPoint[];
+  hourlySeries?: OwnerHourlyPoint[];
+  explanationUsage?: OwnerExplanationUsageEntry[];
+  searchUsage?: OwnerExplanationUsageEntry[];
+};
+
+async function fetchOwnerApiPayload() {
+  if (!isSupabaseConfigured()) {
+    return null;
+  }
+
+  const supabase = getSupabaseBrowserClient();
+  const {
+    data: { session }
+  } = await supabase.auth.getSession();
+  const accessToken = session?.access_token;
+
+  if (!accessToken) {
+    return null;
+  }
+
+  const response = await fetch("/api/owner", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({ accessToken }),
+    cache: "no-store"
+  });
+
+  const payload = (await response.json().catch(() => null)) as OwnerApiPayload | null;
+
+  if (!response.ok || !payload?.ok) {
+    throw new Error(payload?.message || "私有數據載入失敗");
+  }
+
+  return payload;
+}
+
 function mapFeedbackMessageRow(row: FeedbackMessageRow): FeedbackMessage {
   return {
     id: String(row.id),
@@ -1224,7 +1267,8 @@ export async function createFeedbackMessage(input: {
 }
 
 export async function loadOwnerDashboardStats(): Promise<OwnerDashboardStats> {
-  if (!isSupabaseConfigured()) {
+  const payload = await fetchOwnerApiPayload();
+  if (!payload?.stats) {
     return {
       totalVisitorDevices: 0,
       totalAttemptDevices: 0,
@@ -1247,217 +1291,31 @@ export async function loadOwnerDashboardStats(): Promise<OwnerDashboardStats> {
     };
   }
 
-  const supabase = getSupabaseBrowserClient();
-  const now = new Date();
-  const onlineSince = new Date(now.getTime() - ONLINE_WINDOW_MS).toISOString();
-  const dailySeries = await loadOwnerDailySeries(7);
-  const todayPoint = dailySeries[dailySeries.length - 1];
-  const attemptsToday = todayPoint?.attempts ?? 0;
-  const attemptDevicesToday = todayPoint?.devices ?? 0;
-  const attemptsLast7Days = dailySeries.reduce((sum, row) => sum + row.attempts, 0);
-
-  const [
-    totalVisitorsResult,
-    totalAttemptDevicesResult,
-    allAttemptVisitorRows,
-    onlineVisitorsResult,
-    totalUsersResult,
-    totalAttemptsResult,
-    aiExplanationUsageRows
-  ] = await Promise.all([
-    supabase.from("site_visitors").select("*", { count: "exact", head: true }),
-    supabase.from("question_attempt_devices").select("*", { count: "exact", head: true }),
-    fetchAllQuestionAttemptLogs<{ visitor_id?: string | null }>("visitor_id"),
-    supabase
-      .from("site_visitors")
-      .select("*", { count: "exact", head: true })
-      .gte("last_seen_at", onlineSince),
-    supabase.from("leaderboard_profiles").select("*", { count: "exact", head: true }),
-    supabase.from("question_attempt_logs").select("*", { count: "exact", head: true }),
-    fetchAIExplanationUsageRows()
-  ]);
-
-  const errors = [
-    totalVisitorsResult.error,
-    totalAttemptDevicesResult.error,
-    onlineVisitorsResult.error,
-    totalUsersResult.error,
-    totalAttemptsResult.error
-  ].filter(Boolean);
-
-  if (errors.length > 0) {
-    throw errors[0] as Error;
-  }
-
-  const aiUsageRows = filterAIUsageRows(aiExplanationUsageRows, "explanation");
-  const aiSearchRows = filterAIUsageRows(aiExplanationUsageRows, "search");
-  const visitorAttemptCountMap = new Map<string, number>();
-  for (const row of allAttemptVisitorRows) {
-    const visitorId = row.visitor_id?.trim();
-    if (!visitorId) continue;
-    visitorAttemptCountMap.set(visitorId, (visitorAttemptCountMap.get(visitorId) ?? 0) + 1);
-  }
-  const attemptVisitorsOverFive = Array.from(visitorAttemptCountMap.values()).filter((count) => count > 5).length;
-  const aiExplanationCount = aiUsageRows.length;
-  const aiExplanationInputTokens = aiUsageRows.reduce((sum, row) => sum + (row.input_tokens ?? 0), 0);
-  const aiExplanationOutputTokens = aiUsageRows.reduce((sum, row) => sum + (row.output_tokens ?? 0), 0);
-  const aiExplanationTotalTokens = aiUsageRows.reduce(
-    (sum, row) => sum + (row.total_tokens ?? (row.input_tokens ?? 0) + (row.output_tokens ?? 0)),
-    0
-  );
-  const aiSearchCount = aiSearchRows.length;
-  const aiSearchInputTokens = aiSearchRows.reduce((sum, row) => sum + (row.input_tokens ?? 0), 0);
-  const aiSearchOutputTokens = aiSearchRows.reduce((sum, row) => sum + (row.output_tokens ?? 0), 0);
-  const aiSearchTotalTokens = aiSearchRows.reduce(
-    (sum, row) => sum + (row.total_tokens ?? (row.input_tokens ?? 0) + (row.output_tokens ?? 0)),
-    0
-  );
-
-  return {
-    totalVisitorDevices: totalVisitorsResult.count ?? 0,
-    totalAttemptDevices: totalAttemptDevicesResult.count ?? 0,
-    attemptDevicesToday,
-    attemptVisitorsOverFive,
-    onlineVisitors: onlineVisitorsResult.count ?? 0,
-    totalSyncedUsers: totalUsersResult.count ?? 0,
-    attemptsToday,
-    attemptsLast7Days,
-    totalAttempts: totalAttemptsResult.count ?? 0,
-    aiExplanationCount,
-    aiExplanationInputTokens,
-    aiExplanationOutputTokens,
-    aiExplanationTotalTokens,
-    aiSearchCount,
-    aiSearchInputTokens,
-    aiSearchOutputTokens,
-    aiSearchTotalTokens,
-    updatedAt: now.toISOString()
-  };
+  return payload.stats;
 }
 
 export async function loadOwnerExplanationUsage(
   feature: "explanation" | "search" = "explanation"
 ): Promise<OwnerExplanationUsageEntry[]> {
-  if (!isSupabaseConfigured()) {
-    return [];
-  }
-
-  const grouped = new Map<string, OwnerExplanationUsageEntry>();
-
-  for (const row of filterAIUsageRows(await fetchAIExplanationUsageRows(), feature)) {
-    const key = row.user_email?.trim().toLowerCase() || row.visitor_id || row.rate_key;
-    const current = grouped.get(key) ?? {
-      label: row.user_email?.trim() || row.visitor_id || row.rate_key,
-      userEmail: row.user_email ?? undefined,
-      visitorId: row.visitor_id ?? undefined,
-      explanationCount: 0,
-      inputTokens: 0,
-      outputTokens: 0,
-      totalTokens: 0,
-      lastUsedAt: row.used_at
-    };
-
-    current.explanationCount += 1;
-    current.inputTokens += row.input_tokens ?? 0;
-    current.outputTokens += row.output_tokens ?? 0;
-    current.totalTokens += row.total_tokens ?? (row.input_tokens ?? 0) + (row.output_tokens ?? 0);
-    if (!current.lastUsedAt || row.used_at > current.lastUsedAt) {
-      current.lastUsedAt = row.used_at;
-    }
-
-    grouped.set(key, current);
-  }
-
-  return Array.from(grouped.values()).sort((a, b) => {
-    if (b.explanationCount !== a.explanationCount) {
-      return b.explanationCount - a.explanationCount;
-    }
-    return b.totalTokens - a.totalTokens;
-  });
+  const payload = await fetchOwnerApiPayload();
+  return feature === "search" ? (payload?.searchUsage ?? []) : (payload?.explanationUsage ?? []);
 }
 
 export async function loadOwnerDailySeries(days = 14): Promise<OwnerDailyPoint[]> {
-  if (!isSupabaseConfigured()) {
-    return [];
-  }
-
-  const supabase = getSupabaseBrowserClient();
-  const dayKeys = getRecentTaipeiDayKeys(days);
-  const startDate = dayKeys[0];
-  const [attemptRows, deviceRows] = await Promise.all([
-    fetchAllQuestionAttemptLogs<{ answered_at: string }>("answered_at", (query) =>
-      query.gte("answered_at", `${startDate}T00:00:00+08:00`)
-    ),
-    fetchAllQuestionAttemptDeviceDailyRows<{ activity_date: string }>("activity_date", (query) =>
-      query.gte("activity_date", startDate)
-    )
-  ]);
-
-  const attemptMap = new Map<string, number>();
-  const deviceMap = new Map<string, number>();
-
-  for (const row of attemptRows ?? []) {
-    const key = getTaipeiDayKey(new Date(row.answered_at));
-    if (!dayKeys.includes(key)) continue;
-    attemptMap.set(key, (attemptMap.get(key) ?? 0) + 1);
-  }
-
-  for (const row of deviceRows ?? []) {
-    if (!dayKeys.includes(row.activity_date)) continue;
-    deviceMap.set(row.activity_date, (deviceMap.get(row.activity_date) ?? 0) + 1);
-  }
-
-  return dayKeys.map((date) => ({
-    date,
-    attempts: attemptMap.get(date) ?? 0,
-    devices: deviceMap.get(date) ?? 0
-  }));
+  const payload = await fetchOwnerApiPayload();
+  return (payload?.dailySeries ?? []).slice(-days);
 }
 
 export async function loadOwnerHourlySeries(): Promise<OwnerHourlyPoint[]> {
-  if (!isSupabaseConfigured()) {
-    return Array.from({ length: 24 }, (_, hour) => ({
+  const payload = await fetchOwnerApiPayload();
+  return (
+    payload?.hourlySeries ??
+    Array.from({ length: 24 }, (_, hour) => ({
       hour,
       attempts: 0,
       devices: 0
-    }));
-  }
-
-  const supabase = getSupabaseBrowserClient();
-  const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString();
-  const data = await fetchAllQuestionAttemptLogs<{ answered_at: string; visitor_id?: string | null }>(
-    "answered_at, visitor_id",
-    (query) => query.gte("answered_at", sevenDaysAgo)
+    }))
   );
-
-  const hourAttemptMap = new Map<number, number>();
-  const hourDeviceMap = new Map<number, Set<string>>();
-
-  for (const row of data ?? []) {
-    const hour = Number(
-      new Intl.DateTimeFormat("en-GB", {
-        timeZone: "Asia/Taipei",
-        hour: "2-digit",
-        hourCycle: "h23"
-      }).format(new Date(row.answered_at))
-    );
-
-    hourAttemptMap.set(hour, (hourAttemptMap.get(hour) ?? 0) + 1);
-
-    const visitorId = row.visitor_id?.trim();
-    if (!hourDeviceMap.has(hour)) {
-      hourDeviceMap.set(hour, new Set<string>());
-    }
-    if (visitorId) {
-      hourDeviceMap.get(hour)?.add(visitorId);
-    }
-  }
-
-  return Array.from({ length: 24 }, (_, hour) => ({
-    hour,
-    attempts: hourAttemptMap.get(hour) ?? 0,
-    devices: hourDeviceMap.get(hour)?.size ?? 0
-  }));
 }
 
 export async function loadRecentCommunityAttemptStats(days = 2): Promise<CommunityRecentAttemptPoint[]> {
