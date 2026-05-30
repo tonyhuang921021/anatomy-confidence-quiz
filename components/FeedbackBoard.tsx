@@ -184,7 +184,7 @@ export function FeedbackBoard() {
             ) : null}
           </div>
 
-          <div className="mt-5 space-y-3">
+          <div className="mt-5 max-h-[32rem] space-y-3 overflow-y-auto pr-1 sm:max-h-[36rem]">
             {loading ? (
               <div className="surface-card-muted p-4 text-sm body-soft">正在載入留言...</div>
             ) : messages.length === 0 ? (
