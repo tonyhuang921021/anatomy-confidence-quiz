@@ -999,7 +999,8 @@ async function resolveActor(
     return {
       userId: null,
       userEmail: null,
-      label: visitorId ? `訪客 ${visitorId.slice(0, 6)}` : "匿名訪客"
+      label: visitorId ? `訪客 ${visitorId.slice(0, 6)}` : "匿名訪客",
+      createdAt: null as string | null
     };
   }
 
@@ -1008,7 +1009,8 @@ async function resolveActor(
     return {
       userId: null,
       userEmail: null,
-      label: visitorId ? `訪客 ${visitorId.slice(0, 6)}` : "匿名訪客"
+      label: visitorId ? `訪客 ${visitorId.slice(0, 6)}` : "匿名訪客",
+      createdAt: null as string | null
     };
   }
 
@@ -1020,8 +1022,16 @@ async function resolveActor(
   return {
     userId: data.user.id,
     userEmail: data.user.email ?? null,
-    label: displayName || data.user.email?.split("@")[0] || "已登入使用者"
+    label: displayName || data.user.email?.split("@")[0] || "已登入使用者",
+    createdAt: data.user.created_at ?? null
   };
+}
+
+function isAccountOlderThanDays(createdAt: string | null | undefined, days: number) {
+  if (!createdAt) return false;
+  const createdAtMs = new Date(createdAt).getTime();
+  if (Number.isNaN(createdAtMs)) return false;
+  return Date.now() - createdAtMs >= days * 24 * 60 * 60 * 1000;
 }
 
 function canEditPaper(
@@ -1203,6 +1213,13 @@ export async function POST(request: NextRequest) {
         return NextResponse.json(
           { ok: false, message: "請先登入帳號，才能使用 AI 智慧檢索。" },
           { status: 401 }
+        );
+      }
+
+      if (!isAccountOlderThanDays(actor.createdAt, 7)) {
+        return NextResponse.json(
+          { ok: false, message: "AI 智慧檢索目前只開放給註冊滿 7 天的帳號使用。" },
+          { status: 403 }
         );
       }
 

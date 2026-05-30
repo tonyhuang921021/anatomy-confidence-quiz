@@ -144,6 +144,13 @@ export default function CustomPapersPage() {
   const [publicPapers, setPublicPapers] = useState<CustomPaperSummary[]>([]);
   const [publicLoading, setPublicLoading] = useState(true);
   const [publicError, setPublicError] = useState("");
+  const aiSearchEligible = useMemo(() => {
+    const createdAt = session?.user?.created_at;
+    if (!createdAt) return false;
+    const createdAtMs = new Date(createdAt).getTime();
+    if (Number.isNaN(createdAtMs)) return false;
+    return Date.now() - createdAtMs >= 7 * 24 * 60 * 60 * 1000;
+  }, [session?.user?.created_at]);
 
   useEffect(() => {
     async function fetchPublicPapers() {
@@ -242,6 +249,10 @@ export default function CustomPapersPage() {
     if (!aiQuery.trim()) return;
     if (!session?.access_token) {
       setGenerateError("請先登入帳號，才能使用 AI 智慧檢索。");
+      return;
+    }
+    if (!aiSearchEligible) {
+      setGenerateError("AI 智慧檢索目前只開放給註冊滿 7 天的帳號使用。");
       return;
     }
 
@@ -572,6 +583,9 @@ export default function CustomPapersPage() {
               <p className="mt-2 text-xs text-slate-500">
                 可不選科目；如果有先勾科目，AI 就只會在那些科目裡找題。
               </p>
+              <p className="mt-2 text-xs text-slate-500">
+                需註冊滿 7 天的帳號才能使用 AI 智慧檢索。
+              </p>
             </div>
 
             <div className="rounded-[2rem] bg-slate-50 p-5 ring-1 ring-slate-100">
@@ -669,7 +683,7 @@ export default function CustomPapersPage() {
                 <button
                   type="button"
                   onClick={() => void handleGenerateAISearch()}
-                  disabled={generating || !aiQuery.trim()}
+                  disabled={generating || !aiQuery.trim() || !session?.access_token || !aiSearchEligible}
                   className="min-h-12 rounded-2xl bg-brand-600 px-5 py-3 text-sm font-semibold text-white transition hover:bg-brand-700 disabled:cursor-not-allowed disabled:bg-slate-300"
                 >
                   {generating ? "AI 檢索中..." : "產生 AI 智慧檢索卷"}
