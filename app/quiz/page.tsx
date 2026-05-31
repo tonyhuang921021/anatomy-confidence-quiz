@@ -532,6 +532,26 @@ export default function QuizPage() {
           ).toFixed(1)
         );
 
+  useEffect(() => {
+    if (!session || !currentQuestion || submittedAttempt) return;
+
+    const existingAttempt =
+      session.attempts.find((attempt) => attempt.questionId === currentQuestion.id) ?? null;
+
+    if (existingAttempt) {
+      setSelectedAnswer(existingAttempt.selectedAnswer);
+      setConfidence(existingAttempt.confidence);
+      setConfidenceExpanded(existingAttempt.confidence <= 3);
+      setErrorType(existingAttempt.errorType);
+      return;
+    }
+
+    setSelectedAnswer(undefined);
+    setConfidence(4);
+    setConfidenceExpanded(false);
+    setErrorType(undefined);
+  }, [currentQuestion?.id, session, submittedAttempt]);
+
   function persistSession(nextSession: QuizSession) {
     setSession(nextSession);
     saveCurrentSession(nextSession);
@@ -728,6 +748,31 @@ export default function QuizPage() {
     setSubmittedAttempt(attempt);
     setErrorType(undefined);
     setIsSubmittingAnswer(false);
+  }
+
+  function handleBlindSimulationPrevious() {
+    if (!session || !isBlindSimulation || currentIndex === 0) return;
+
+    const previousSession: QuizSession = {
+      ...session,
+      currentQuestionIndex: currentIndex - 1,
+      isReviewingAnswer: false
+    };
+    persistSession(previousSession);
+    setSubmittedAttempt(null);
+    setPeakNextQuestionError("");
+
+    window.requestAnimationFrame(() => {
+      const target =
+        typeof window !== "undefined" && window.innerWidth >= 1280
+          ? contentTopRef.current
+          : questionTopRef.current;
+
+      target?.scrollIntoView({
+        behavior: "smooth",
+        block: "start"
+      });
+    });
   }
 
   function handleErrorTypeSelect(value: ErrorType) {
@@ -1190,18 +1235,36 @@ export default function QuizPage() {
                     本輪平均信心 <span className="font-semibold">{averageConfidence}</span>
                   </p>
                 </div>
-                <button
-                  type="button"
-                  onClick={handleSubmit}
-                  disabled={!selectedAnswer || isSubmittingAnswer}
-                  className="mt-5 min-h-12 w-full rounded-2xl bg-brand-600 px-4 py-4 text-sm font-semibold text-white transition hover:bg-brand-700 disabled:cursor-not-allowed disabled:bg-slate-300"
-                >
-                  {isSubmittingAnswer
-                    ? isPeakChallenge
-                      ? "巔峰賽生成下一題中..."
-                      : "送出中..."
-                    : "送出答案"}
-                </button>
+                <div className="mt-5 grid gap-3 sm:grid-cols-2">
+                  {isBlindSimulation ? (
+                    <button
+                      type="button"
+                      onClick={handleBlindSimulationPrevious}
+                      disabled={currentIndex === 0 || isSubmittingAnswer}
+                      className="min-h-12 w-full rounded-2xl bg-slate-100 px-4 py-4 text-sm font-semibold text-slate-800 transition hover:bg-slate-200 disabled:cursor-not-allowed disabled:bg-slate-100 disabled:text-slate-400"
+                    >
+                      上一題
+                    </button>
+                  ) : null}
+                  <button
+                    type="button"
+                    onClick={handleSubmit}
+                    disabled={!selectedAnswer || isSubmittingAnswer}
+                    className={`min-h-12 w-full rounded-2xl bg-brand-600 px-4 py-4 text-sm font-semibold text-white transition hover:bg-brand-700 disabled:cursor-not-allowed disabled:bg-slate-300 ${
+                      isBlindSimulation ? "" : "sm:col-span-2"
+                    }`}
+                  >
+                    {isSubmittingAnswer
+                      ? isPeakChallenge
+                        ? "巔峰賽生成下一題中..."
+                        : "送出中..."
+                      : isBlindSimulation
+                        ? currentIndex === targetCount - 1
+                          ? "完成並看結果"
+                          : "儲存並下一題"
+                        : "送出答案"}
+                  </button>
+                </div>
               </div>
             </>
           ) : (
