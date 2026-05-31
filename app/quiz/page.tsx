@@ -126,7 +126,14 @@ function createSession(
       normalizedSettings.paperMode === "random_past_paper")
       ? { ...normalizedSettings, questionCount: effectiveQuestions.length }
       : normalizedSettings;
-  const questionOrder = createQuestionOrder(effectiveQuestions, completedSessions, effectiveSettings);
+  const questionOrder =
+    effectiveSettings.mode === "simulation" &&
+    (effectiveSettings.paperMode === "past_paper" ||
+      effectiveSettings.paperMode === "random_past_paper")
+      ? [...effectiveQuestions]
+          .sort((left, right) => (left.originalQuestionNumber ?? 0) - (right.originalQuestionNumber ?? 0))
+          .map((question) => question.id)
+      : createQuestionOrder(effectiveQuestions, completedSessions, effectiveSettings);
   const selectedQuestionMap = new Map(
     effectiveQuestions.map((question) => [question.id, question] as const)
   );
@@ -546,7 +553,9 @@ export default function QuizPage() {
   const currentIndex = session?.currentQuestionIndex ?? 0;
   const currentQuestion = questionSet[currentIndex];
   const targetCount =
-    session?.settings?.mode === "peak_challenge"
+    session?.settings?.mode === "simulation"
+      ? questionSet.length
+      : session?.settings?.mode === "peak_challenge"
       ? questionSet.length
       : session?.settings?.questionCount ?? questionSet.length;
   const progress =
