@@ -775,6 +775,39 @@ export default function QuizPage() {
     });
   }
 
+  function handleJumpToQuestion(targetIndex: number) {
+    if (
+      !session ||
+      session.settings?.mode !== "simulation" ||
+      targetIndex < 0 ||
+      targetIndex >= questionSet.length ||
+      targetIndex === currentIndex
+    ) {
+      return;
+    }
+
+    const jumpedSession: QuizSession = {
+      ...session,
+      currentQuestionIndex: targetIndex,
+      isReviewingAnswer: false
+    };
+    persistSession(jumpedSession);
+    setSubmittedAttempt(null);
+    setPeakNextQuestionError("");
+
+    window.requestAnimationFrame(() => {
+      const target =
+        typeof window !== "undefined" && window.innerWidth >= 1280
+          ? contentTopRef.current
+          : questionTopRef.current;
+
+      target?.scrollIntoView({
+        behavior: "smooth",
+        block: "start"
+      });
+    });
+  }
+
   function handleErrorTypeSelect(value: ErrorType) {
     if (!session || !submittedAttempt) return;
     setErrorType(value);
@@ -1491,6 +1524,39 @@ export default function QuizPage() {
               </p>
             ) : null}
           </div>
+
+          {session.settings?.mode === "simulation" ? (
+            <div className="mt-5 hidden xl:block">
+              <div className="rounded-[1.6rem] bg-slate-50 p-4">
+                <p className="text-sm font-semibold text-ink">題號導覽</p>
+                <p className="mt-1 text-xs text-slate-500">可直接跳回前面檢查或修改答案。</p>
+                <div className="mt-3 grid grid-cols-5 gap-2">
+                  {questionSet.map((question, index) => {
+                    const existingAttempt = session.attempts.find((attempt) => attempt.questionId === question.id);
+                    const isCurrent = index === currentIndex;
+                    return (
+                      <button
+                        key={question.id}
+                        type="button"
+                        onClick={() => handleJumpToQuestion(index)}
+                        disabled={isSubmittingAnswer}
+                        className={`min-h-10 rounded-xl text-sm font-semibold transition ${
+                          isCurrent
+                            ? "bg-brand-600 text-white"
+                            : existingAttempt
+                              ? "bg-slate-200 text-slate-800 hover:bg-slate-300"
+                              : "bg-white text-slate-600 ring-1 ring-slate-200 hover:bg-slate-100"
+                        } disabled:cursor-not-allowed disabled:opacity-60`}
+                        aria-label={`前往第 ${index + 1} 題`}
+                      >
+                        {index + 1}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+            </div>
+          ) : null}
         </aside>
       </div>
     </main>
