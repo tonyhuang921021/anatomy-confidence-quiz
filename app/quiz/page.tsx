@@ -1511,8 +1511,8 @@ export default function QuizPage() {
                     {currentIndex === targetCount - 1 ? "查看結果" : "下一題"}
                   </button>
                 )}
-                {session.settings?.mode === "random" &&
-                session.settings?.stopAfterReview &&
+                {((session.settings?.mode === "random" && session.settings?.stopAfterReview) ||
+                  session.settings?.mode === "custom_paper") &&
                 !isPeakChallenge &&
                 currentIndex < targetCount - 1 ? (
                   <button
