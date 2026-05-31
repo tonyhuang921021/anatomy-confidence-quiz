@@ -362,16 +362,80 @@ function getAvailableOptionKeys(options: Readonly<Record<string, string>>) {
   });
 }
 
-function resolveImportedAnswer(
+const importedAnswerOverrideMap: Record<
+  string,
+  {
+    answer: OptionKey;
+    acceptedAnswers?: OptionKey[];
+    answerCreditType?: Question["answerCreditType"];
+  }
+> = {
+  "MOEX-100030-2101-Q073": {
+    answer: "A",
+    acceptedAnswers: ["A", "B"],
+    answerCreditType: "multiple_accepted"
+  },
+  "MOEX-111100-1301-Q062": {
+    answer: "A",
+    answerCreditType: "all_credit"
+  },
+  "MOEX-111100-1301-Q065": {
+    answer: "A",
+    answerCreditType: "all_credit"
+  },
+  "MOEX-114090-1301-Q049": {
+    answer: "C",
+    answerCreditType: "standard"
+  },
+  "MOEX-114090-1301-Q094": {
+    answer: "C",
+    answerCreditType: "standard"
+  }
+};
+
+function resolveImportedAnswerForQuestion(
+  questionId: string,
   options: Readonly<Record<string, string>>,
   answerCreditType: Question["answerCreditType"] | undefined,
   answerCandidates: OptionKey[]
 ) {
+  const resolved = resolveImportedAnswer(options, answerCreditType, answerCandidates);
+  if (resolved) return resolved;
+
+  const override = importedAnswerOverrideMap[questionId];
+  if (!override) return null;
+
+  const availableOptionKeys = getAvailableOptionKeys(options);
+  if (!availableOptionKeys.includes(override.answer)) {
+    return null;
+  }
+
+  const acceptedAnswers = override.acceptedAnswers?.filter((value) =>
+    availableOptionKeys.includes(value)
+  );
+
+  return {
+    answer: override.answer,
+    acceptedAnswers: acceptedAnswers?.length ? acceptedAnswers : undefined,
+    answerCreditType: override.answerCreditType ?? answerCreditType
+  };
+}
+
+function resolveImportedAnswer(
+  options: Readonly<Record<string, string>>,
+  answerCreditType: Question["answerCreditType"] | undefined,
+  answerCandidates: OptionKey[]
+): {
+  answer: OptionKey;
+  acceptedAnswers?: OptionKey[];
+  answerCreditType?: Question["answerCreditType"];
+} | null {
   const primaryAnswer = answerCandidates[0];
   if (primaryAnswer && isOptionKey(primaryAnswer)) {
     return {
       answer: primaryAnswer,
-      acceptedAnswers: answerCandidates.length > 0 ? answerCandidates : undefined
+      acceptedAnswers: answerCandidates.length > 0 ? answerCandidates : undefined,
+      answerCreditType
     };
   }
 
@@ -380,7 +444,8 @@ function resolveImportedAnswer(
     const fallbackAnswer = availableOptionKeys[0] ?? "A";
     return {
       answer: fallbackAnswer,
-      acceptedAnswers: availableOptionKeys.length > 0 ? availableOptionKeys : undefined
+      acceptedAnswers: availableOptionKeys.length > 0 ? availableOptionKeys : undefined,
+      answerCreditType
     };
   }
 
@@ -403,7 +468,8 @@ function toQuestion(raw: RawQuestion): Question | null {
   const answerCreditType = normalizeAnswerCreditType(raw.answer_credit_type);
   const acceptedAnswers = toOptionKeyArray(raw.correct_answers);
   const fallbackAnswer = toAnswerText(raw.answer);
-  const resolvedAnswer = resolveImportedAnswer(
+  const resolvedAnswer = resolveImportedAnswerForQuestion(
+    raw.id,
     raw.options,
     answerCreditType,
     [
@@ -427,7 +493,7 @@ function toQuestion(raw: RawQuestion): Question | null {
     options: sanitizeOptions(raw.options),
     answer: resolvedAnswer.answer,
     acceptedAnswers: resolvedAnswer.acceptedAnswers,
-    answerCreditType,
+    answerCreditType: resolvedAnswer.answerCreditType ?? answerCreditType,
     explanation: sanitizeImportedText(raw.explanation ?? ""),
     testedConcept: sanitizeImportedText(raw.exam_point ?? topicSection ?? section),
     optionAnalysis: toPartialOptionAnalysis(raw.option_analysis),
@@ -455,7 +521,12 @@ function toMissingQuestion(raw: MissingQuestionRaw): Question | null {
     .flatMap((value) => (Array.isArray(value) ? value : value ? [value] : []))
     .map((value) => toAnswerText(value))
     .filter(isOptionKey);
-  const resolvedAnswer = resolveImportedAnswer(raw.options, answerCreditType, answerValues);
+  const resolvedAnswer = resolveImportedAnswerForQuestion(
+    raw.id,
+    raw.options,
+    answerCreditType,
+    answerValues
+  );
   if (!resolvedAnswer) return null;
 
   const [examCode, paperCode] = raw.exam_code.split("-");
@@ -473,7 +544,7 @@ function toMissingQuestion(raw: MissingQuestionRaw): Question | null {
     options: sanitizeOptions(raw.options),
     answer: resolvedAnswer.answer,
     acceptedAnswers: resolvedAnswer.acceptedAnswers,
-    answerCreditType,
+    answerCreditType: resolvedAnswer.answerCreditType ?? answerCreditType,
     explanation: sanitizeImportedText(raw.explanation ?? ""),
     testedConcept: sanitizeImportedText(raw.exam_point ?? topicSection ?? section),
     optionAnalysis: toPartialOptionAnalysis(raw.option_analysis),
@@ -496,7 +567,8 @@ function toRequestedPatchQuestion(raw: RequestedPatchQuestionRaw): Question | nu
   const answerCreditType = normalizeAnswerCreditType(raw.answer_credit_type);
   const answerValues = toOptionKeyArray(raw.correct_answers);
   const fallbackAnswer = toAnswerText(raw.official_answer_raw);
-  const resolvedAnswer = resolveImportedAnswer(
+  const resolvedAnswer = resolveImportedAnswerForQuestion(
+    raw.id,
     raw.options,
     answerCreditType,
     [
@@ -523,7 +595,7 @@ function toRequestedPatchQuestion(raw: RequestedPatchQuestionRaw): Question | nu
     options: sanitizeOptions(raw.options),
     answer: resolvedAnswer.answer,
     acceptedAnswers: resolvedAnswer.acceptedAnswers,
-    answerCreditType,
+    answerCreditType: resolvedAnswer.answerCreditType ?? answerCreditType,
     explanation: sanitizeImportedText(raw.explanation ?? ""),
     testedConcept: sanitizeImportedText(raw.exam_point ?? topicSection ?? section),
     optionAnalysis: toPartialOptionAnalysis(raw.option_analysis),
@@ -546,7 +618,8 @@ function toDetailedMissingBatchQuestion(raw: DetailedMissingBatchQuestionRaw): Q
   const answerCreditType = normalizeAnswerCreditType(raw.answer_credit_type);
   const acceptedAnswers = toOptionKeyArray(raw.correct_answers);
   const fallbackAnswer = toAnswerText(raw.answer);
-  const resolvedAnswer = resolveImportedAnswer(
+  const resolvedAnswer = resolveImportedAnswerForQuestion(
+    raw.id,
     raw.options,
     answerCreditType,
     [
@@ -578,7 +651,7 @@ function toDetailedMissingBatchQuestion(raw: DetailedMissingBatchQuestionRaw): Q
     options: sanitizeOptions(raw.options),
     answer: resolvedAnswer.answer,
     acceptedAnswers: resolvedAnswer.acceptedAnswers,
-    answerCreditType,
+    answerCreditType: resolvedAnswer.answerCreditType ?? answerCreditType,
     explanation: sanitizeImportedText(raw.explanation ?? ""),
     testedConcept: sanitizeImportedText(raw.exam_point ?? topicSection ?? section),
     optionAnalysis: toPartialOptionAnalysis(raw.option_analysis),
@@ -650,7 +723,12 @@ function toStage2Question(raw: Stage2QuestionRaw): Question | null {
     })
     .map((value) => toAnswerText(value))
     .filter(isOptionKey);
-  const resolvedAnswer = resolveImportedAnswer(raw.options, answerCreditType, answerValues);
+  const resolvedAnswer = resolveImportedAnswerForQuestion(
+    raw.id,
+    raw.options,
+    answerCreditType,
+    answerValues
+  );
   if (!resolvedAnswer) return null;
 
   const { primarySubject, topicSection, chapter, section } = resolvePlacement(
@@ -669,7 +747,7 @@ function toStage2Question(raw: Stage2QuestionRaw): Question | null {
     options: sanitizeOptions(raw.options),
     answer: resolvedAnswer.answer,
     acceptedAnswers: resolvedAnswer.acceptedAnswers,
-    answerCreditType,
+    answerCreditType: resolvedAnswer.answerCreditType ?? answerCreditType,
     explanation: sanitizeImportedText(raw.explanation ?? ""),
     testedConcept: sanitizeImportedText(raw.exam_point ?? topicSection ?? section),
     optionAnalysis: toPartialOptionAnalysis(raw.option_analysis),
