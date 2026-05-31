@@ -8,6 +8,7 @@ type QuestionCardProps = {
   question: Question;
   selectedAnswer?: OptionKey;
   onSelect: (value: OptionKey) => void;
+  showMetadata?: boolean;
 };
 
 const optionKeys: OptionKey[] = ["A", "B", "C", "D", "E"];
@@ -37,7 +38,12 @@ function getStableHash(text: string) {
   return text.split("").reduce((sum, char, index) => sum + char.charCodeAt(0) * (index + 1), 0);
 }
 
-export function QuestionCard({ question, selectedAnswer, onSelect }: QuestionCardProps) {
+export function QuestionCard({
+  question,
+  selectedAnswer,
+  onSelect,
+  showMetadata = true
+}: QuestionCardProps) {
   const availableOptionKeys = useMemo(
     () =>
       optionKeys
@@ -51,28 +57,32 @@ export function QuestionCard({ question, selectedAnswer, onSelect }: QuestionCar
 
   return (
     <div className="min-w-0 rounded-[2rem] bg-white p-5 shadow-card ring-1 ring-slate-100 sm:p-7">
-      <div className="flex flex-wrap gap-2 text-xs font-semibold">
-        <span className="max-w-full break-words rounded-full bg-brand-100 px-3 py-1 text-brand-800">
-          {question.subject}
-        </span>
-        <span className="max-w-full break-words rounded-full bg-slate-100 px-3 py-1 text-slate-700">
-          {question.chapter}
-        </span>
-        <span className="max-w-full break-words rounded-full bg-slate-100 px-3 py-1 text-slate-700">
-          {question.section}
-        </span>
-        <span className="max-w-full break-words rounded-full bg-emerald-100 px-3 py-1 text-emerald-800">
-          {getSourceLabel(question)}
-        </span>
-      </div>
+      {showMetadata ? (
+        <>
+          <div className="flex flex-wrap gap-2 text-xs font-semibold">
+            <span className="max-w-full break-words rounded-full bg-brand-100 px-3 py-1 text-brand-800">
+              {question.subject}
+            </span>
+            <span className="max-w-full break-words rounded-full bg-slate-100 px-3 py-1 text-slate-700">
+              {question.chapter}
+            </span>
+            <span className="max-w-full break-words rounded-full bg-slate-100 px-3 py-1 text-slate-700">
+              {question.section}
+            </span>
+            <span className="max-w-full break-words rounded-full bg-emerald-100 px-3 py-1 text-emerald-800">
+              {getSourceLabel(question)}
+            </span>
+          </div>
 
-      {question.sourceCitation ? (
-        <p className="mt-3 break-words text-xs leading-6 text-slate-500">{question.sourceCitation}</p>
+          {question.sourceCitation ? (
+            <p className="mt-3 break-words text-xs leading-6 text-slate-500">{question.sourceCitation}</p>
+          ) : null}
+        </>
       ) : null}
 
       <QuestionStemBlock
         question={question}
-        className="mt-5 break-words text-lg font-semibold leading-8 text-ink sm:text-xl"
+        className={`${showMetadata ? "mt-5" : ""} break-words text-lg font-semibold leading-8 text-ink sm:text-xl`}
       />
 
       <div className="mt-6 grid gap-3">

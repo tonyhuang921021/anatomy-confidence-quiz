@@ -1222,27 +1222,41 @@ export default function QuizPage() {
       <div ref={contentTopRef} className="mt-6 grid gap-6 xl:grid-cols-[minmax(0,1fr)_340px]">
         <div className="space-y-6">
           <div className="flex flex-wrap gap-2 text-xs font-semibold">
-            <span className="rounded-full bg-brand-100 px-3 py-1 text-brand-800">
-              {getModeLabel(session.settings?.mode ?? "weakness")}
-            </span>
-            <span className="rounded-full bg-slate-100 px-3 py-1 text-slate-700">
-              {targetCount} 題
-            </span>
-            <span className="rounded-full bg-slate-100 px-3 py-1 text-slate-700">
-              {session.subject}
-            </span>
-            <span className="rounded-full bg-slate-100 px-3 py-1 text-slate-700">
-              {getQuestionSourceBadge(currentQuestion)}
-            </span>
-            <span className="rounded-full bg-slate-100 px-3 py-1 text-slate-700">
-              本地題庫模式
-            </span>
+            {session.settings?.mode === "simulation" ? (
+              <>
+                <span className="rounded-full bg-brand-100 px-3 py-1 text-brand-800">
+                  {getModeLabel(session.settings?.mode ?? "weakness")}
+                </span>
+                <span className="rounded-full bg-slate-100 px-3 py-1 text-slate-700">
+                  {targetCount} 題
+                </span>
+              </>
+            ) : (
+              <>
+                <span className="rounded-full bg-brand-100 px-3 py-1 text-brand-800">
+                  {getModeLabel(session.settings?.mode ?? "weakness")}
+                </span>
+                <span className="rounded-full bg-slate-100 px-3 py-1 text-slate-700">
+                  {targetCount} 題
+                </span>
+                <span className="rounded-full bg-slate-100 px-3 py-1 text-slate-700">
+                  {session.subject}
+                </span>
+                <span className="rounded-full bg-slate-100 px-3 py-1 text-slate-700">
+                  {getQuestionSourceBadge(currentQuestion)}
+                </span>
+                <span className="rounded-full bg-slate-100 px-3 py-1 text-slate-700">
+                  本地題庫模式
+                </span>
+              </>
+            )}
           </div>
 
           <QuestionCard
             question={currentQuestion}
             selectedAnswer={selectedAnswer}
             onSelect={setSelectedAnswer}
+            showMetadata={session.settings?.mode !== "simulation"}
           />
 
           {!submittedAttempt ? (
@@ -1500,21 +1514,25 @@ export default function QuizPage() {
             <p className="rounded-2xl bg-slate-50 px-4 py-3 text-sm text-slate-700">
               本輪進度 <span className="font-semibold">{currentIndex + 1} / {targetCount}</span>
             </p>
-            <p className="rounded-2xl bg-slate-50 px-4 py-3 text-sm text-slate-700">
-              目前章節 <span className="font-semibold">{currentQuestion.chapter}</span>
-            </p>
-            <p className="rounded-2xl bg-slate-50 px-4 py-3 text-sm text-slate-700">
-              目前小節 <span className="font-semibold">{currentQuestion.section}</span>
-            </p>
-            <p className="rounded-2xl bg-slate-50 px-4 py-3 text-sm text-slate-700">
-              目前信心 <span className="font-semibold">{getConfidenceLabel(confidence)}</span>
-            </p>
-            <p className="rounded-2xl bg-slate-50 px-4 py-3 text-sm text-slate-700">
-              {isPeakChallenge ? "目前分數" : "已答題數"} <span className="font-semibold">{answeredCount}</span>
-            </p>
-            <p className="rounded-2xl bg-slate-50 px-4 py-3 text-sm text-slate-700">
-              本輪模式 <span className="font-semibold">{getModeLabel(session.settings?.mode ?? "weakness")}</span>
-            </p>
+            {session.settings?.mode === "simulation" ? null : (
+              <>
+                <p className="rounded-2xl bg-slate-50 px-4 py-3 text-sm text-slate-700">
+                  目前章節 <span className="font-semibold">{currentQuestion.chapter}</span>
+                </p>
+                <p className="rounded-2xl bg-slate-50 px-4 py-3 text-sm text-slate-700">
+                  目前小節 <span className="font-semibold">{currentQuestion.section}</span>
+                </p>
+                <p className="rounded-2xl bg-slate-50 px-4 py-3 text-sm text-slate-700">
+                  目前信心 <span className="font-semibold">{getConfidenceLabel(confidence)}</span>
+                </p>
+                <p className="rounded-2xl bg-slate-50 px-4 py-3 text-sm text-slate-700">
+                  {isPeakChallenge ? "目前分數" : "已答題數"} <span className="font-semibold">{answeredCount}</span>
+                </p>
+                <p className="rounded-2xl bg-slate-50 px-4 py-3 text-sm text-slate-700">
+                  本輪模式 <span className="font-semibold">{getModeLabel(session.settings?.mode ?? "weakness")}</span>
+                </p>
+              </>
+            )}
             {!isBlindSimulation && !isPeakChallenge ? (
               <p className="rounded-2xl bg-slate-50 px-4 py-3 text-sm text-slate-700">
                 暫時答對率{" "}

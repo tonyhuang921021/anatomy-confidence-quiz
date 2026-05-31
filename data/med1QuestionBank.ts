@@ -1586,7 +1586,7 @@ export function getPastPaperOptions(
         ...paper,
         missingNumbers,
         isComplete: missingNumbers.length === 0,
-        questionCount: 100
+        questionCount: presentNumbers.size
       };
     })
     .sort((a, b) => {
