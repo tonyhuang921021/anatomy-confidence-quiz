@@ -300,8 +300,35 @@ function sanitizeImportedText(value?: string) {
 
   return value
     .replace(/\s*代號：\d+\s*頁次：[0-9A-Za-z－—–-]+/g, "")
+    .replace(/([\u3400-\u9fff])\s+([\u3400-\u9fff])/g, "$1$2")
+    .replace(/([\u3400-\u9fff])\s+([（〔［【「『《])/g, "$1$2")
+    .replace(/([）〕］】」』》])\s+([\u3400-\u9fff])/g, "$1$2")
     .replace(/\s{2,}/g, " ")
     .trim();
+}
+
+function sanitizeQuestionText(question: Question): Question {
+  return {
+    ...question,
+    stem: sanitizeImportedText(question.stem),
+    explanation: sanitizeImportedText(question.explanation),
+    testedConcept: sanitizeImportedText(question.testedConcept),
+    memoryTip: question.memoryTip ? sanitizeImportedText(question.memoryTip) : question.memoryTip,
+    clinicalLink: question.clinicalLink
+      ? sanitizeImportedText(question.clinicalLink)
+      : question.clinicalLink,
+    options: Object.fromEntries(
+      Object.entries(question.options).map(([key, value]) => [key, sanitizeImportedText(value)])
+    ) as Question["options"],
+    optionAnalysis: question.optionAnalysis
+      ? (Object.fromEntries(
+          Object.entries(question.optionAnalysis).map(([key, value]) => [
+            key,
+            sanitizeImportedText(value)
+          ])
+        ) as Partial<Record<OptionKey, string>>)
+      : question.optionAnalysis
+  };
 }
 
 function toPartialOptionAnalysis(
@@ -1042,6 +1069,7 @@ const remainingQuestionsRaw =
 export const med1RemainingQuestions: Question[] = remainingQuestionsRaw
   .map(toQuestion)
   .filter((question): question is Question => Boolean(question))
+  .map(sanitizeQuestionText)
   .map(applyClassificationOverride)
   .map(applyQuestionTextOverride)
   .map(applyQuestionMedia);
@@ -1051,6 +1079,7 @@ const missingQuestionsRaw =
 export const med1MissingQuestions: Question[] = missingQuestionsRaw
   .map(toMissingQuestion)
   .filter((question): question is Question => Boolean(question))
+  .map(sanitizeQuestionText)
   .map(applyClassificationOverride)
   .map(applyQuestionTextOverride)
   .map(applyQuestionMedia);
@@ -1061,6 +1090,7 @@ const missingBatch1Raw =
 export const med1MissingBatch1Questions: Question[] = missingBatch1Raw
   .map(toDetailedMissingBatchQuestion)
   .filter((question): question is Question => Boolean(question))
+  .map(sanitizeQuestionText)
   .map(applyClassificationOverride)
   .map(applyQuestionTextOverride)
   .map(applyQuestionMedia);
@@ -1071,6 +1101,7 @@ const missingBatch2Raw =
 export const med1MissingBatch2Questions: Question[] = missingBatch2Raw
   .map(toDetailedMissingBatchQuestion)
   .filter((question): question is Question => Boolean(question))
+  .map(sanitizeQuestionText)
   .map(applyClassificationOverride)
   .map(applyQuestionTextOverride)
   .map(applyQuestionMedia);
@@ -1079,6 +1110,7 @@ const missingBatch3Raw = moexMed1MissingBatch3 as readonly Batch3QuestionRaw[];
 export const med1MissingBatch3Questions: Question[] = missingBatch3Raw
   .map(toBatch3Question)
   .filter((question): question is Question => Boolean(question))
+  .map(sanitizeQuestionText)
   .map(applyClassificationOverride)
   .map(applyQuestionTextOverride)
   .map(applyQuestionMedia);
@@ -1088,6 +1120,7 @@ const requestedPatchQuestionsRaw =
 export const med1RequestedPatchQuestions: Question[] = requestedPatchQuestionsRaw
   .map(toRequestedPatchQuestion)
   .filter((question): question is Question => Boolean(question))
+  .map(sanitizeQuestionText)
   .map(applyClassificationOverride)
   .map(applyQuestionTextOverride)
   .map(applyQuestionMedia);
@@ -1097,10 +1130,12 @@ const stage2QuestionsRaw =
 export const medStage2Questions: Question[] = stage2QuestionsRaw
   .map(toStage2Question)
   .filter((question): question is Question => Boolean(question))
+  .map(sanitizeQuestionText)
   .map(applyQuestionTextOverride)
   .map(applyQuestionMedia);
 
 const anatomyQuestionsWithOverrides: Question[] = anatomyQuestions
+  .map(sanitizeQuestionText)
   .map(applyClassificationOverride)
   .map(applyQuestionTextOverride)
   .map(applyQuestionMedia);
