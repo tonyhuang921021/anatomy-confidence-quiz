@@ -276,6 +276,22 @@ function isPeakChallengeSession(session: QuizSession) {
   return session.settings?.mode === "peak_challenge";
 }
 
+function getExpectedSimulationQuestionCount(
+  settings: QuizSettings,
+  classificationOverrides: Record<string, QuestionClassificationOverride> = {}
+) {
+  if (settings.mode !== "simulation") return settings.questionCount;
+
+  if (
+    (settings.paperMode === "past_paper" || settings.paperMode === "random_past_paper") &&
+    settings.selectedPaperKey
+  ) {
+    return getQuestionsForPastPaper(settings.selectedPaperKey, "全部", classificationOverrides).length;
+  }
+
+  return settings.questionCount;
+}
+
 export default function QuizPage() {
   const router = useRouter();
   const { session: authSession } = useAuth();
@@ -421,11 +437,26 @@ export default function QuizPage() {
       const savedSettings = normalizeLegacySettings(rawSettings);
       const completedSessions = loadCompletedSessions();
       const shouldForceNewSession = params?.get("new") === "1";
+      const expectedSimulationQuestionCount = getExpectedSimulationQuestionCount(
+        savedSettings,
+        loadedOverrides
+      );
+      const existingSimulationQuestionCount =
+        existing?.settings?.mode === "simulation"
+          ? existing.questionOrder?.length ?? 0
+          : null;
+      const shouldInvalidateExistingSimulationSession =
+        existing?.settings?.mode === "simulation" &&
+        savedSettings.mode === "simulation" &&
+        existingSimulationQuestionCount !== null &&
+        expectedSimulationQuestionCount > 0 &&
+        existingSimulationQuestionCount !== expectedSimulationQuestionCount;
       const shouldReuseExisting =
         !shouldForceNewSession &&
         existing &&
         !existing.completedAt &&
-        (existing.questionOrder?.length ?? 0) > 0;
+        (existing.questionOrder?.length ?? 0) > 0 &&
+        !shouldInvalidateExistingSimulationSession;
       const nextSession = shouldReuseExisting
         ? existing
         : createSession(
