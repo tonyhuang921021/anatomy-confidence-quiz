@@ -88,12 +88,11 @@
 
       .hero-grid {
         display: grid;
-        grid-template-columns: 1.6fr 0.9fr;
+        grid-template-columns: 1fr;
         gap: 24px;
         margin-top: 34px;
       }
 
-      .hero-card,
       .toc,
       .section-card,
       .feature-card,
@@ -106,11 +105,6 @@
         box-shadow: 0 12px 30px rgba(31, 36, 48, 0.05);
       }
 
-      .hero-card {
-        padding: 24px 26px;
-      }
-
-      .hero-card h2,
       .toc h2,
       .section-header h2 {
         margin: 0 0 10px;
@@ -118,7 +112,6 @@
         letter-spacing: -0.02em;
       }
 
-      .hero-card ul,
       .toc ul {
         margin: 0;
         padding-left: 18px;
@@ -149,33 +142,6 @@
 
       .toc a:hover {
         background: rgba(255, 255, 255, 0.7);
-      }
-
-      .summary-grid {
-        display: grid;
-        grid-template-columns: repeat(4, minmax(0, 1fr));
-        gap: 14px;
-        margin-top: 24px;
-      }
-
-      .metric {
-        padding: 18px 18px 16px;
-        border: 1px solid var(--line);
-        border-radius: var(--radius-md);
-        background: rgba(255, 255, 255, 0.62);
-      }
-
-      .metric span {
-        display: block;
-        color: var(--muted);
-        font-size: 13px;
-      }
-
-      .metric strong {
-        display: block;
-        margin-top: 6px;
-        font-size: 24px;
-        letter-spacing: -0.03em;
       }
 
       .section {
@@ -319,7 +285,6 @@
 
         .hero-grid,
         .content-grid,
-        .summary-grid,
         .two-col-list {
           grid-template-columns: 1fr;
         }
@@ -354,34 +319,6 @@
         </p>
 
         <div class="hero-grid">
-          <div class="hero-card">
-            <h2>這份手冊特別整理的重點</h2>
-            <ul>
-              <li>不只教你怎麼刷題，也會說明信心、低信心題與 AI 補強如何一起使用。</li>
-              <li>把 GPT-5-mini 補詳解、複製 AI Prompt、重新分類回報等功能都放進同一份說明裡。</li>
-              <li>以實際網站畫面做說明，方便你之後直接分享給同學。</li>
-            </ul>
-
-            <div class="summary-grid">
-              <div class="metric">
-                <span>主要模組</span>
-                <strong>6 大區</strong>
-              </div>
-              <div class="metric">
-                <span>操作情境</span>
-                <strong>刷題＋回顧</strong>
-              </div>
-              <div class="metric">
-                <span>適合對象</span>
-                <strong>新手到考前</strong>
-              </div>
-              <div class="metric">
-                <span>核心特色</span>
-                <strong>弱點追蹤</strong>
-              </div>
-            </div>
-          </div>
-
           <nav class="toc">
             <h2>目錄</h2>
             <ul>
