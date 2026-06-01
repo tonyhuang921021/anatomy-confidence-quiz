@@ -186,6 +186,7 @@ export function getNeuroAnatomyQuestionBank(
 ) {
   return getCanonicalQuestionBank(overrides).filter(
     (question) =>
+      question.sourceType === "MOEX_PAST_EXAM" &&
       question.subject === "解剖學" &&
       (question.chapter.includes("神經解剖") ||
         question.section.includes("腦神經") ||

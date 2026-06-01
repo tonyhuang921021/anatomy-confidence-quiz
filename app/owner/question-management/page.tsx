@@ -253,7 +253,7 @@ export default function OwnerQuestionManagementPage() {
             <p className="text-sm font-semibold uppercase tracking-[0.2em] text-brand-700">Question Management</p>
             <h1 className="mt-2 text-3xl font-bold text-ink sm:text-4xl">神經解剖題庫管理台</h1>
             <p className="mt-3 max-w-3xl text-slate-500">
-              先從神經解剖開始。這裡可以查題、看候選題、生成 AI 候選 tag / relation，再決定哪些正式採用。
+              先從神經解剖正式考古題開始。這裡可以查題、看候選題、生成 AI 候選 tag / relation，再決定哪些正式採用。
             </p>
           </div>
           <div className="flex flex-wrap gap-3">
