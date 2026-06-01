@@ -53,18 +53,19 @@ const {
   getNeuroAnatomyQuestionBank
 } = require("../lib/questionManagement.ts");
 
-function buildQuestionPayload(question) {
+function buildQuestionPayload(question, options = {}) {
+  const { includeExplanation = false } = options;
   return {
     id: question.id,
     chapter: question.chapter,
     section: question.section,
     stem: question.stem,
     testedConcept: question.testedConcept,
-    explanation: question.explanation,
     clinicalLink: question.clinicalLink ?? "",
     sourceYear: question.sourceYear ?? null,
     examCode: question.examCode ?? null,
-    questionNumber: question.originalQuestionNumber ?? null
+    questionNumber: question.originalQuestionNumber ?? null,
+    ...(includeExplanation ? { explanation: question.explanation } : {})
   };
 }
 
@@ -130,8 +131,10 @@ function main() {
   }
 
   const items = selected.map((question) => ({
-    main_question: buildQuestionPayload(question),
-    candidate_questions: buildNeuroCandidateQuestions(question, bank, candidateLimit).map(buildQuestionPayload)
+    main_question: buildQuestionPayload(question, { includeExplanation: true }),
+    candidate_questions: buildNeuroCandidateQuestions(question, bank, candidateLimit).map((candidate) =>
+      buildQuestionPayload(candidate)
+    )
   }));
 
   const prompt = buildBatchPrompt(items);
