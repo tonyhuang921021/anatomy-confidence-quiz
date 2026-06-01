@@ -520,12 +520,20 @@ export default function OwnerPage() {
               只看你真正需要的數字：訪客裝置、作答裝置、同步用戶與最近作答量。
             </p>
           </div>
-          <Link
-            href="/"
-            className="min-h-12 rounded-2xl bg-slate-100 px-5 py-4 text-sm font-semibold text-slate-800 transition hover:bg-slate-200"
-          >
-            返回首頁
-          </Link>
+          <div className="flex flex-wrap gap-3">
+            <Link
+              href="/owner/question-management"
+              className="min-h-12 rounded-2xl bg-brand-700 px-5 py-4 text-sm font-semibold text-white transition hover:bg-brand-800"
+            >
+              題庫管理台
+            </Link>
+            <Link
+              href="/"
+              className="min-h-12 rounded-2xl bg-slate-100 px-5 py-4 text-sm font-semibold text-slate-800 transition hover:bg-slate-200"
+            >
+              返回首頁
+            </Link>
+          </div>
         </div>
       </section>
 
