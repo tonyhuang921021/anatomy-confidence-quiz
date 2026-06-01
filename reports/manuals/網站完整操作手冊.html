@@ -256,6 +256,140 @@
         font-size: 16px;
       }
 
+      .settings-shot {
+        margin-top: 22px;
+        padding: 22px;
+        border: 1px solid var(--line);
+        border-radius: 26px;
+        background: linear-gradient(180deg, rgba(255, 255, 255, 0.84), rgba(247, 242, 234, 0.88));
+        box-shadow: 0 16px 36px rgba(31, 36, 48, 0.06);
+      }
+
+      .settings-shell {
+        overflow: hidden;
+        border: 1px solid rgba(31, 36, 48, 0.1);
+        border-radius: 24px;
+        background: rgba(255, 255, 255, 0.78);
+      }
+
+      .settings-head {
+        display: flex;
+        align-items: start;
+        justify-content: space-between;
+        gap: 16px;
+        padding: 22px 22px 18px;
+        border-bottom: 1px solid rgba(31, 36, 48, 0.08);
+      }
+
+      .settings-head p {
+        margin: 0;
+      }
+
+      .settings-brow {
+        font-size: 12px;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+        color: var(--muted);
+      }
+
+      .settings-title {
+        margin-top: 8px !important;
+        font-size: 26px;
+        font-weight: 700;
+        color: var(--ink);
+      }
+
+      .settings-email {
+        margin-top: 6px !important;
+        font-size: 14px;
+        color: var(--muted);
+      }
+
+      .settings-badges {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+      }
+
+      .settings-badge {
+        padding: 8px 12px;
+        border-radius: 999px;
+        background: rgba(255, 255, 255, 0.9);
+        border: 1px solid rgba(31, 36, 48, 0.08);
+        color: var(--muted);
+        font-size: 12px;
+      }
+
+      .settings-body {
+        padding: 20px 22px 22px;
+      }
+
+      .settings-item + .settings-item {
+        margin-top: 16px;
+      }
+
+      .settings-item {
+        padding: 18px;
+        border-radius: 18px;
+        border: 1px solid rgba(31, 36, 48, 0.08);
+        background: rgba(247, 242, 234, 0.46);
+      }
+
+      .settings-item h3 {
+        margin: 0 0 10px;
+        font-size: 16px;
+      }
+
+      .settings-item p {
+        margin: 0;
+        color: var(--muted);
+        font-size: 14px;
+        line-height: 1.8;
+      }
+
+      .toggle-row,
+      .select-row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin-top: 12px;
+      }
+
+      .toggle-pill {
+        padding: 10px 14px;
+        border-radius: 999px;
+        font-size: 13px;
+        font-weight: 600;
+        border: 1px solid rgba(31, 36, 48, 0.08);
+        background: white;
+        color: var(--muted);
+      }
+
+      .toggle-pill.active-calm {
+        background: #dff4e7;
+        color: #1d5c39;
+      }
+
+      .toggle-pill.active-dark {
+        background: #26303b;
+        color: #edf3f7;
+      }
+
+      .toggle-pill.active-brand {
+        background: #bf644f;
+        color: white;
+      }
+
+      .select-mock {
+        min-width: 168px;
+        padding: 12px 14px;
+        border-radius: 16px;
+        border: 1px solid rgba(31, 36, 48, 0.08);
+        background: white;
+        color: var(--ink);
+        font-size: 14px;
+      }
+
       .closing {
         margin-top: 26px;
         padding: 28px 30px;
@@ -398,6 +532,50 @@
           <div class="tip-card">
             <strong>建議做法</strong>
             <p>如果你正在複習某幾年的題目，先在設定裡調整年份範圍，再回到開始測驗，抽題會更貼近你現在的讀書策略。</p>
+          </div>
+
+          <div class="settings-shot">
+            <div class="settings-shell">
+              <div class="settings-head">
+                <div>
+                  <p class="settings-brow">Account</p>
+                  <p class="settings-title">目前使用者</p>
+                  <p class="settings-email">tonyhuang921021@gmail.com</p>
+                </div>
+                <div class="settings-badges">
+                  <span class="settings-badge">同步 已連線</span>
+                  <span class="settings-badge">ID 6c82a1f0...</span>
+                </div>
+              </div>
+              <div class="settings-body">
+                <div class="settings-item">
+                  <h3>首頁模式</h3>
+                  <p>登入後，焦慮版 / 抗焦慮版與暗夜模式會跟著帳號走，換裝置後也能沿用同一套偏好。</p>
+                  <div class="toggle-row">
+                    <span class="toggle-pill active-calm">抗焦慮版</span>
+                    <span class="toggle-pill">焦慮版</span>
+                    <span class="toggle-pill active-dark">暗夜模式</span>
+                  </div>
+                </div>
+                <div class="settings-item">
+                  <h3>開始測驗抽題年份</h3>
+                  <p>可以先限定只抽某段年份的題目，讓題池更接近你目前的複習範圍。</p>
+                  <div class="select-row">
+                    <div class="select-mock">從 2019 年開始</div>
+                    <div class="select-mock">到 2026 年結束</div>
+                  </div>
+                </div>
+                <div class="settings-item">
+                  <h3>作答節奏與題數</h3>
+                  <p>可以選擇正常做完整輪，或開啟每題詳解後可結束；沒開自由結束時，也能設定一次想做幾題。</p>
+                  <div class="toggle-row">
+                    <span class="toggle-pill active-brand">正常做完整輪</span>
+                    <span class="toggle-pill">每題詳解後可結束</span>
+                    <div class="select-mock">每次 10 題</div>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </section>
