@@ -180,6 +180,25 @@
         align-items: start;
       }
 
+      .home-grid {
+        display: grid;
+        grid-template-columns: 0.92fr 1.08fr;
+        gap: 28px;
+        align-items: start;
+      }
+
+      .home-copy {
+        max-width: 620px;
+      }
+
+      .home-grid .section-intro {
+        max-width: 32ch;
+      }
+
+      .home-grid .image-card {
+        margin-top: 4px;
+      }
+
       .feature-stack {
         display: grid;
         gap: 14px;
@@ -529,18 +548,18 @@
 
       <section class="section" id="home">
         <div class="section-card">
-          <div class="section-header">
-            <div>
-              <div class="section-index">Section 01</div>
-              <h2>首頁與主要入口</h2>
-            </div>
-          </div>
-          <p class="section-intro">
-            首頁是整個網站的操作中樞。你可以從這裡快速進入一般刷題、整份考古題、查看結果、錯題複習、自訂卷與題目搜尋。對第一次使用的人來說，先熟悉首頁的節奏最重要。
-          </p>
+          <div class="home-grid">
+            <div class="home-copy">
+              <div class="section-header">
+                <div>
+                  <div class="section-index">Section 01</div>
+                  <h2>首頁與主要入口</h2>
+                </div>
+              </div>
+              <p class="section-intro">
+                首頁是整個網站的操作中樞。你可以從這裡快速進入一般刷題、整份考古題、查看結果、錯題複習、自訂卷與題目搜尋。對第一次使用的人來說，先熟悉首頁的節奏最重要。
+              </p>
 
-          <div class="content-grid">
-            <div>
               <div class="feature-stack">
                 <div class="feature-card">
                   <h3>常用入口</h3>
