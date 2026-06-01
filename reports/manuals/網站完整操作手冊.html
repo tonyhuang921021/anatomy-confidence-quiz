@@ -217,11 +217,49 @@
         height: auto;
       }
 
+      .review-crop {
+        max-height: 780px;
+      }
+
+      .review-crop img {
+        width: 100%;
+        height: 780px;
+        object-fit: cover;
+        object-position: center 68%;
+      }
+
       .image-card figcaption {
         padding: 16px 18px 18px;
         color: var(--muted);
         font-size: 14px;
         line-height: 1.7;
+      }
+
+      .masked-figure {
+        position: relative;
+      }
+
+      .mask-box {
+        position: absolute;
+        background: linear-gradient(180deg, rgba(255, 251, 245, 0.98), rgba(247, 242, 234, 0.98));
+        border: 1px solid rgba(31, 36, 48, 0.08);
+        border-radius: 12px;
+        box-shadow: 0 8px 18px rgba(31, 36, 48, 0.06);
+      }
+
+      .mask-email {
+        left: 1.2%;
+        top: 8.2%;
+        width: 25%;
+        height: 6.2%;
+      }
+
+      .mask-id {
+        right: 1.1%;
+        top: 1.2%;
+        width: 17%;
+        height: 4.5%;
+        border-radius: 999px;
       }
 
       .two-col-list {
@@ -534,49 +572,12 @@
             <p>如果你正在複習某幾年的題目，先在設定裡調整年份範圍，再回到開始測驗，抽題會更貼近你現在的讀書策略。</p>
           </div>
 
-          <div class="settings-shot">
-            <div class="settings-shell">
-              <div class="settings-head">
-                <div>
-                  <p class="settings-brow">Account</p>
-                  <p class="settings-title">目前使用者</p>
-                  <p class="settings-email">tonyhuang921021@gmail.com</p>
-                </div>
-                <div class="settings-badges">
-                  <span class="settings-badge">同步 已連線</span>
-                  <span class="settings-badge">ID 6c82a1f0...</span>
-                </div>
-              </div>
-              <div class="settings-body">
-                <div class="settings-item">
-                  <h3>首頁模式</h3>
-                  <p>登入後，焦慮版 / 抗焦慮版與暗夜模式會跟著帳號走，換裝置後也能沿用同一套偏好。</p>
-                  <div class="toggle-row">
-                    <span class="toggle-pill active-calm">抗焦慮版</span>
-                    <span class="toggle-pill">焦慮版</span>
-                    <span class="toggle-pill active-dark">暗夜模式</span>
-                  </div>
-                </div>
-                <div class="settings-item">
-                  <h3>開始測驗抽題年份</h3>
-                  <p>可以先限定只抽某段年份的題目，讓題池更接近你目前的複習範圍。</p>
-                  <div class="select-row">
-                    <div class="select-mock">從 2019 年開始</div>
-                    <div class="select-mock">到 2026 年結束</div>
-                  </div>
-                </div>
-                <div class="settings-item">
-                  <h3>作答節奏與題數</h3>
-                  <p>可以選擇正常做完整輪，或開啟每題詳解後可結束；沒開自由結束時，也能設定一次想做幾題。</p>
-                  <div class="toggle-row">
-                    <span class="toggle-pill active-brand">正常做完整輪</span>
-                    <span class="toggle-pill">每題詳解後可結束</span>
-                    <div class="select-mock">每次 10 題</div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
+          <figure class="image-card masked-figure" style="margin-top: 22px">
+            <img src="../manual_assets/settings-real.png" alt="登入後的設定區塊" />
+            <span class="mask-box mask-email" aria-hidden="true"></span>
+            <span class="mask-box mask-id" aria-hidden="true"></span>
+            <figcaption>這張是實際登入後展開設定的畫面。首頁模式、暗夜模式、抽題年份、作答節奏與題數都集中在同一個設定區塊裡。</figcaption>
+          </figure>
         </div>
       </section>
 
@@ -615,8 +616,8 @@
           </div>
 
           <figure class="image-card" style="margin-top: 22px">
-            <img src="../manual_assets/quiz-question.png" alt="作答畫面" />
-            <figcaption>作答畫面會同時收集你的答案與信心。這是後面整理錯題、低信心題和弱點分析的基礎。</figcaption>
+            <img src="../manual_assets/confidence-real.png" alt="作答畫面與信心區塊" />
+            <figcaption>這張實際畫面可以更清楚看到信心區塊的位置。你在送出答案前選的信心，會直接影響後面的低信心題整理與弱點分析。</figcaption>
           </figure>
         </div>
       </section>
@@ -634,7 +635,7 @@
           </p>
 
           <div class="content-grid">
-            <figure class="image-card">
+            <figure class="image-card review-crop">
               <img src="../manual_assets/quiz-review.png" alt="詳解畫面" />
               <figcaption>這一區會顯示正解、本題信心、主詳解、選項解析與快速記憶法，也是 AI 功能最常使用的地方。</figcaption>
             </figure>
