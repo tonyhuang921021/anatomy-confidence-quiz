@@ -175,7 +175,16 @@ export function QuizSetupPanel({
   }
 
   function handleStart() {
-    saveQuizSettings(settings);
+    const nextSettings =
+      settings.mode === "simulation"
+        ? {
+            ...settings,
+            sessionName: undefined,
+            selectedPaperKey:
+              settings.paperMode === "past_paper" ? settings.selectedPaperKey : undefined
+          }
+        : settings;
+    saveQuizSettings(nextSettings);
     router.push("/quiz?new=1");
   }
 

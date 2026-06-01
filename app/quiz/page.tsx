@@ -108,6 +108,39 @@ function evaluateAttempt(question: Question, selectedAnswer: OptionKey) {
   return selectedAnswer === question.answer;
 }
 
+function buildSimulationSessionName(settings: QuizSettings, questions: Question[]) {
+  if (settings.mode !== "simulation") return settings.sessionName;
+  if (settings.sessionName?.trim()) return settings.sessionName.trim();
+  if (
+    settings.paperMode !== "past_paper" &&
+    settings.paperMode !== "random_past_paper"
+  ) {
+    return undefined;
+  }
+
+  const firstQuestion = questions.find(
+    (question) => typeof question.sourceYear === "number"
+  );
+
+  if (!firstQuestion?.sourceYear) return "模擬考試卷";
+  return `${firstQuestion.sourceYear} 年第 ${firstQuestion.sourceRound ?? 1} 次試卷`;
+}
+
+function getSimulationSelectedPaperKey(settings: QuizSettings, questions: Question[]) {
+  if (settings.selectedPaperKey) return settings.selectedPaperKey;
+  const firstQuestion = questions.find(
+    (question) => question.examCode && question.paperCode
+  );
+  if (!firstQuestion?.examCode || !firstQuestion.paperCode) return undefined;
+  return `${firstQuestion.examCode}-${firstQuestion.paperCode}`;
+}
+
+function buildResultsHref(session: QuizSession) {
+  const basePath =
+    session.settings?.mode === "simulation" ? "/simulation-results" : "/results";
+  return `${basePath}?sessionId=${encodeURIComponent(session.id)}`;
+}
+
 function createSession(
   questions: Question[],
   completedSessions: QuizSession[],
@@ -142,6 +175,14 @@ function createSession(
   const persistedQuestions = questionOrder
     .map((id) => selectedQuestionMap.get(id))
     .filter((question): question is Question => Boolean(question));
+  const simulationSessionName = buildSimulationSessionName(
+    effectiveSettings,
+    persistedQuestions
+  );
+  const simulationSelectedPaperKey =
+    effectiveSettings.mode === "simulation"
+      ? getSimulationSelectedPaperKey(effectiveSettings, persistedQuestions)
+      : effectiveSettings.selectedPaperKey;
 
   return {
     id: `session-${crypto.randomUUID()}`,
@@ -156,7 +197,14 @@ function createSession(
             ? effectiveSettings.subjectFilter
             : "醫學（一）") || "解剖學",
     startedAt: new Date().toISOString(),
-    settings: effectiveSettings,
+    settings:
+      effectiveSettings.mode === "simulation"
+        ? {
+            ...effectiveSettings,
+            selectedPaperKey: simulationSelectedPaperKey,
+            sessionName: simulationSessionName
+          }
+        : effectiveSettings,
     questionOrder,
     generatedQuestions: persistedQuestions,
     currentQuestionIndex: 0,
@@ -663,7 +711,7 @@ export default function QuizPage() {
         void pushCompletedSessionToSupabase(completedSession);
         void pushQuestionStatsSnapshotToSupabase(completedSession);
         syncCompletedPeakChallenge(completedSession);
-        router.push(`/results?sessionId=${encodeURIComponent(completedSession.id)}`);
+        router.push(buildResultsHref(completedSession));
         return;
       }
 
@@ -769,7 +817,7 @@ export default function QuizPage() {
         void pushCompletedSessionToSupabase(completedSession);
         void pushQuestionStatsSnapshotToSupabase(completedSession);
         syncCompletedCustomPaper(completedSession);
-        router.push(`/results?sessionId=${encodeURIComponent(completedSession.id)}`);
+        router.push(buildResultsHref(completedSession));
         return;
       }
 
@@ -1046,7 +1094,7 @@ export default function QuizPage() {
       finalizeCompletedSession(completedSession);
       void pushCompletedSessionToSupabase(completedSession);
       syncCompletedCustomPaper(completedSession);
-      router.push(`/results?sessionId=${encodeURIComponent(completedSession.id)}`);
+      router.push(buildResultsHref(completedSession));
       return;
     }
 
@@ -1082,7 +1130,7 @@ export default function QuizPage() {
     finalizeCompletedSession(completedSession);
     void pushCompletedSessionToSupabase(completedSession);
     syncCompletedCustomPaper(completedSession);
-    router.push(`/results?sessionId=${encodeURIComponent(completedSession.id)}`);
+    router.push(buildResultsHref(completedSession));
   }
 
   async function handleRetryPeakNextQuestion() {

@@ -41,16 +41,16 @@ export default function SimulationPage() {
           </div>
           <div className="flex flex-wrap gap-3">
             <Link
+              href="/simulation-results"
+              className="min-h-12 rounded-2xl bg-emerald-600 px-5 py-4 text-sm font-semibold text-white transition hover:bg-emerald-700"
+            >
+              查看模擬考結果
+            </Link>
+            <Link
               href="/simulation-review"
               className="min-h-12 rounded-2xl bg-amber-500 px-5 py-4 text-sm font-semibold text-white transition hover:bg-amber-600"
             >
               查看模擬考錯題庫
-            </Link>
-            <Link
-              href="/review"
-              className="min-h-12 rounded-2xl bg-slate-100 px-5 py-4 text-sm font-semibold text-slate-800 transition hover:bg-slate-200"
-            >
-              前往全部複習頁
             </Link>
           </div>
         </div>

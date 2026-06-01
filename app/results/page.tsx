@@ -11,6 +11,7 @@ import {
   loadQuestionCommunityStats,
   loadConfirmedQuestionClassificationOverrides,
   loadSharedQuestionExplanationOverrides,
+  pushCompletedSessionToSupabase,
   syncSharedQuestionExplanationOverrides
 } from "@/lib/cloudSync";
 import { applyQuestionClassificationOverride } from "@/data/med1QuestionBank";
@@ -112,6 +113,32 @@ function getSessionModeLabel(session: QuizSession) {
         : "隨機刷題";
 }
 
+function isSimulationSession(session: QuizSession) {
+  return session.settings?.mode === "simulation";
+}
+
+function getDefaultSimulationSessionName(session: QuizSession) {
+  if (!isSimulationSession(session)) return null;
+  const firstQuestion = session.generatedQuestions?.find(
+    (question) => typeof question.sourceYear === "number"
+  );
+  if (!firstQuestion?.sourceYear) return "模擬考試卷";
+  return `${firstQuestion.sourceYear} 年第 ${firstQuestion.sourceRound ?? 1} 次試卷`;
+}
+
+function getSessionDisplayName(session: QuizSession) {
+  if (isSimulationSession(session)) {
+    return session.settings?.sessionName?.trim() || getDefaultSimulationSessionName(session) || "模擬考試卷";
+  }
+
+  return `${session.subject} ${getSessionModeLabel(session)}`;
+}
+
+function getSessionResultsHref(session: QuizSession) {
+  const basePath = isSimulationSession(session) ? "/simulation-results" : "/results";
+  return `${basePath}?sessionId=${encodeURIComponent(session.id)}`;
+}
+
 function getAccuracyTone(correctRate: number) {
   if (correctRate < 30) return "bg-rose-100 text-rose-800";
   if (correctRate <= 60) return "bg-amber-100 text-amber-800";
@@ -147,6 +174,10 @@ function ResultsPageContent() {
   const [isFullscreenReview, setIsFullscreenReview] = useState(false);
   const [isFullscreenReviewVisible, setIsFullscreenReviewVisible] = useState(false);
   const [visibleHistoryCount, setVisibleHistoryCount] = useState(RESULTS_HISTORY_PAGE_SIZE);
+  const [resultsScope, setResultsScope] = useState<"default" | "simulation">("default");
+  const [editableSessionName, setEditableSessionName] = useState("");
+  const [sessionNameNotice, setSessionNameNotice] = useState("");
+  const [isSavingSessionName, setIsSavingSessionName] = useState(false);
   const [state, setState] = useState<ResultState>({
     session: null,
     sessions: [],
@@ -249,8 +280,13 @@ function ResultsPageContent() {
   useEffect(() => {
     try {
       const targetSessionId = searchParams.get("sessionId");
+      const nextScope = searchParams.get("scope") === "simulation" ? "simulation" : "default";
+      setResultsScope(nextScope);
       setRequestedSessionId(targetSessionId);
       const completedSessions = loadCompletedSessions();
+      const scopedSessions = completedSessions.filter((sessionItem) =>
+        nextScope === "simulation" ? isSimulationSession(sessionItem) : !isSimulationSession(sessionItem)
+      );
       const currentSession = loadCurrentSession();
       const fallbackCurrentSession =
         targetSessionId &&
@@ -263,6 +299,18 @@ function ResultsPageContent() {
           ? completedSessions.find((item) => item.id === targetSessionId) ?? fallbackCurrentSession ?? null
           : null;
 
+      if (targetSessionId && targetSession?.completedAt) {
+        const shouldUseSimulationScope = isSimulationSession(targetSession);
+        if (shouldUseSimulationScope && nextScope !== "simulation") {
+          router.replace(`/simulation-results?sessionId=${encodeURIComponent(targetSession.id)}`);
+          return;
+        }
+        if (!shouldUseSimulationScope && nextScope === "simulation") {
+          router.replace(`/results?sessionId=${encodeURIComponent(targetSession.id)}`);
+          return;
+        }
+      }
+
       if (
         fallbackCurrentSession &&
         !completedSessions.some((item) => item.id === fallbackCurrentSession.id)
@@ -274,7 +322,7 @@ function ResultsPageContent() {
         setState((current) => ({
           ...current,
           session: null,
-          sessions: completedSessions,
+          sessions: scopedSessions,
           summary: null,
           sectionStats: [],
           promptText: "",
@@ -295,7 +343,7 @@ function ResultsPageContent() {
 
       setState({
         session: targetSession,
-        sessions: completedSessions,
+        sessions: scopedSessions,
         summary: calculateSummary(targetSession.attempts, currentQuestions),
         sectionStats: sessionSectionStats,
         promptText: generateAIPrompt(targetSession.attempts, currentQuestions, completedSessions),
@@ -317,11 +365,22 @@ function ResultsPageContent() {
       });
       setMounted(true);
     }
-  }, [searchParams, syncVersion]);
+  }, [router, searchParams, syncVersion]);
 
   useEffect(() => {
     setVisibleHistoryCount(RESULTS_HISTORY_PAGE_SIZE);
   }, [syncVersion, requestedSessionId]);
+
+  useEffect(() => {
+    if (!state.session) {
+      setEditableSessionName("");
+      setSessionNameNotice("");
+      return;
+    }
+
+    setEditableSessionName(getSessionDisplayName(state.session));
+    setSessionNameNotice("");
+  }, [state.session]);
 
   useEffect(() => {
     setExplanationOverrides(loadQuestionExplanationOverrides());
@@ -473,6 +532,42 @@ function ResultsPageContent() {
     router.push("/quiz?new=1");
   }
 
+  async function handleSaveSimulationSessionName() {
+    if (!state.session || !isSimulationSession(state.session)) return;
+
+    const nextName =
+      editableSessionName.trim() || getDefaultSimulationSessionName(state.session) || "模擬考試卷";
+    const nextSession: QuizSession = {
+      ...state.session,
+      settings: {
+        ...(state.session.settings ?? DEFAULT_QUIZ_SETTINGS),
+        mode: "simulation",
+        sessionName: nextName
+      }
+    };
+
+    setIsSavingSessionName(true);
+    setSessionNameNotice("");
+
+    saveCompletedSession(nextSession);
+    setState((current) => ({
+      ...current,
+      session: nextSession,
+      sessions: current.sessions.map((sessionItem) =>
+        sessionItem.id === nextSession.id ? nextSession : sessionItem
+      )
+    }));
+
+    try {
+      await pushCompletedSessionToSupabase(nextSession);
+      setSessionNameNotice("已更新試卷名稱。");
+    } catch {
+      setSessionNameNotice("已更新本機名稱，雲端同步稍後再試。");
+    } finally {
+      setIsSavingSessionName(false);
+    }
+  }
+
   function handleOpenFullscreenReview() {
     setIsFullscreenReview(true);
     if (typeof window !== "undefined") {
@@ -595,8 +690,14 @@ function ResultsPageContent() {
     return (
       <main className="shell">
         <section className="rounded-[2rem] bg-white p-5 text-center shadow-card ring-1 ring-slate-100 sm:p-8">
-          <h1 className="text-2xl font-semibold text-ink">每次作答紀錄</h1>
-          <p className="mt-3 text-slate-500">先選一筆紀錄，再進去看那一次的完整結果頁。</p>
+          <h1 className="text-2xl font-semibold text-ink">
+            {resultsScope === "simulation" ? "模擬考作答紀錄" : "每次作答紀錄"}
+          </h1>
+          <p className="mt-3 text-slate-500">
+            {resultsScope === "simulation"
+              ? "這裡只顯示整份模擬考的結果，不會和平常散題刷題混在一起。"
+              : "先選一筆紀錄，再進去看那一次的完整結果頁。"}
+          </p>
 
           <div className="mt-6 grid gap-3 text-left">
             {recentCompletedSessions.length === 0 ? (
@@ -613,13 +714,15 @@ function ResultsPageContent() {
                 return (
                   <Link
                     key={sessionItem.id}
-                    href={`/results?sessionId=${encodeURIComponent(sessionItem.id)}`}
+                    href={getSessionResultsHref(sessionItem)}
                     className="rounded-3xl border border-slate-200 bg-slate-50 p-4 transition hover:border-brand-200 hover:bg-white"
                   >
                     <div className="flex flex-wrap items-start justify-between gap-3">
                       <div>
                         <p className="text-sm font-semibold text-ink">
-                          第 {recentCompletedSessions.length - index} 筆・{sessionItem.subject}
+                          {resultsScope === "simulation"
+                            ? getSessionDisplayName(sessionItem)
+                            : `第 ${recentCompletedSessions.length - index} 筆・${sessionItem.subject}`}
                         </p>
                         <p className="mt-2 text-sm text-slate-500">
                           {getSessionModeLabel(sessionItem)} ・{" "}
@@ -661,16 +764,16 @@ function ResultsPageContent() {
 
           <div className="mt-6 flex flex-col justify-center gap-3 sm:flex-row">
             <Link
-              href="/"
+              href={resultsScope === "simulation" ? "/simulation" : "/"}
               className="min-h-12 rounded-2xl bg-slate-100 px-5 py-4 text-sm font-semibold text-slate-800 transition hover:bg-slate-200"
             >
-              返回首頁
+              {resultsScope === "simulation" ? "返回模擬考專區" : "返回首頁"}
             </Link>
             <Link
-              href="/quiz"
+              href={resultsScope === "simulation" ? "/simulation" : "/quiz"}
               className="min-h-12 rounded-2xl bg-brand-600 px-5 py-4 text-sm font-semibold text-white transition hover:bg-brand-700"
             >
-              開始測驗
+              {resultsScope === "simulation" ? "前往模擬考專區" : "開始測驗"}
             </Link>
           </div>
         </section>
@@ -686,16 +789,16 @@ function ResultsPageContent() {
           <p className="mt-3 text-slate-500">這筆結果可能已被清除，或尚未完成作答。</p>
           <div className="mt-6 flex flex-col justify-center gap-3 sm:flex-row">
             <Link
-              href="/results"
+              href={resultsScope === "simulation" ? "/simulation-results" : "/results"}
               className="min-h-12 rounded-2xl bg-slate-100 px-5 py-4 text-sm font-semibold text-slate-800 transition hover:bg-slate-200"
             >
-              回到作答紀錄
+              {resultsScope === "simulation" ? "回到模擬考作答紀錄" : "回到作答紀錄"}
             </Link>
             <Link
-              href="/quiz"
+              href={resultsScope === "simulation" ? "/simulation" : "/quiz"}
               className="min-h-12 rounded-2xl bg-brand-600 px-5 py-4 text-sm font-semibold text-white transition hover:bg-brand-700"
             >
-              開始測驗
+              {resultsScope === "simulation" ? "前往模擬考專區" : "開始測驗"}
             </Link>
           </div>
         </section>
@@ -1064,7 +1167,9 @@ function ResultsPageContent() {
         <div>
           <p className="text-sm font-semibold uppercase tracking-[0.2em] text-brand-700">Results</p>
           <h1 className="mt-2 text-3xl font-bold text-ink sm:text-4xl">
-            本輪{state.session.subject}結果分析
+            {isSimulationSession(state.session)
+              ? `${getSessionDisplayName(state.session)}結果分析`
+              : `本輪${state.session.subject}結果分析`}
           </h1>
           <p className="mt-2 text-sm text-slate-500">
             本輪模式：{getModeLabel(state.session.settings?.mode ?? "weakness")}
@@ -1078,13 +1183,34 @@ function ResultsPageContent() {
               minute: "2-digit"
             })}
           </p>
+          {isSimulationSession(state.session) ? (
+            <div className="mt-4 flex flex-col gap-3 sm:max-w-xl sm:flex-row sm:items-center">
+              <input
+                value={editableSessionName}
+                onChange={(event) => setEditableSessionName(event.target.value)}
+                className="min-h-12 flex-1 rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-800 outline-none"
+                placeholder="替這份模擬考命名"
+              />
+              <button
+                type="button"
+                onClick={handleSaveSimulationSessionName}
+                disabled={isSavingSessionName}
+                className="min-h-12 rounded-2xl bg-slate-100 px-4 py-3 text-sm font-semibold text-slate-800 transition hover:bg-slate-200 disabled:cursor-not-allowed disabled:opacity-60"
+              >
+                {isSavingSessionName ? "儲存中..." : "儲存名稱"}
+              </button>
+            </div>
+          ) : null}
+          {sessionNameNotice ? (
+            <p className="mt-2 text-sm text-emerald-700">{sessionNameNotice}</p>
+          ) : null}
         </div>
         <div className="flex flex-wrap gap-3">
           <Link
-            href="/results"
+            href={resultsScope === "simulation" ? "/simulation-results" : "/results"}
             className="min-h-12 rounded-2xl bg-slate-100 px-5 py-4 text-sm font-semibold text-slate-800 transition hover:bg-slate-200"
           >
-            回到作答紀錄
+            {resultsScope === "simulation" ? "回到模擬考作答紀錄" : "回到作答紀錄"}
           </Link>
           <Link
             href="/progress"
