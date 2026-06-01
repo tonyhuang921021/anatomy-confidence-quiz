@@ -250,6 +250,17 @@
         object-position: center top;
       }
 
+      .results-crop {
+        max-height: 620px;
+      }
+
+      .results-crop img {
+        width: 100%;
+        height: 620px;
+        object-fit: cover;
+        object-position: center top;
+      }
+
       .image-card figcaption {
         padding: 16px 18px 18px;
         color: var(--muted);
@@ -710,6 +721,11 @@
               <p>有些題你雖然答對，但其實是猜的、猶豫很久，這些題通常比單純錯題更值得在考前回頭補。</p>
             </div>
           </div>
+
+          <figure class="image-card results-crop" style="margin-top: 22px">
+            <img src="../manual_assets/results-real.png" alt="結果頁畫面" />
+            <figcaption>結果頁會把總題數、答對率、錯題回顧、低信心題與補強建議整理在同一頁，是做完整輪後最重要的回顧區塊。</figcaption>
+          </figure>
 
           <div class="tip-card">
             <strong>實戰建議</strong>
