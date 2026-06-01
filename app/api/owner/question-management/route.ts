@@ -316,7 +316,7 @@ export async function POST(request: NextRequest) {
     }
 
     if (action === "inspect_question") {
-      const candidates = buildNeuroCandidateQuestions(question, neuroBank, 20);
+      const candidates = buildNeuroCandidateQuestions(question, neuroBank, 10);
       const suggestions = await loadSuggestionRows(supabase, question.id);
 
       return NextResponse.json({
@@ -336,7 +336,7 @@ export async function POST(request: NextRequest) {
         );
       }
 
-      const candidates = buildNeuroCandidateQuestions(question, neuroBank, 20);
+      const candidates = buildNeuroCandidateQuestions(question, neuroBank, 10);
       if (candidates.length === 0) {
         return NextResponse.json({ ok: false, message: "這題目前找不到合適候選題。" }, { status: 400 });
       }

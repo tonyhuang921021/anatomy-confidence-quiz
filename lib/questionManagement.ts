@@ -201,7 +201,7 @@ export function getNeuroAnatomyQuestionBank(
   );
 }
 
-export function buildNeuroCandidateQuestions(mainQuestion: Question, bank: Question[], limit = 20) {
+export function buildNeuroCandidateQuestions(mainQuestion: Question, bank: Question[], limit = 10) {
   const mainTokens = getQuestionTokenSet(mainQuestion);
 
   return bank
