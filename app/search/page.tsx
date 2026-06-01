@@ -6,10 +6,12 @@ import { useAuth } from "@/components/AuthProvider";
 import { QuestionOptionBlock, QuestionStemBlock } from "@/components/QuestionMediaBlock";
 import {
   loadConfirmedQuestionClassificationOverrides,
-  loadSharedQuestionExplanationOverrides
+  loadSharedQuestionExplanationOverrides,
+  syncSharedQuestionExplanationOverrides
 } from "@/lib/cloudSync";
 import {
   applyQuestionExplanationOverride,
+  getPendingQuestionExplanationOverrideSync,
   loadQuestionExplanationOverrides,
   saveQuestionExplanationOverride,
   saveQuestionExplanationOverrides
@@ -218,16 +220,27 @@ export default function SearchPage() {
       if (pageResults.length === 0) return;
 
       try {
+        const questionIds = pageResults.map((question) => question.id);
         const sharedOverrides = await loadSharedQuestionExplanationOverrides(
-          pageResults.map((question) => question.id)
+          questionIds
         );
-        if (Object.keys(sharedOverrides).length === 0) return;
+        if (Object.keys(sharedOverrides).length > 0) {
+          saveQuestionExplanationOverrides(sharedOverrides);
+          setExplanationOverrides((current) => ({
+            ...current,
+            ...sharedOverrides
+          }));
+        }
 
-        saveQuestionExplanationOverrides(sharedOverrides);
-        setExplanationOverrides((current) => ({
-          ...current,
-          ...sharedOverrides
-        }));
+        if (session?.access_token) {
+          const pendingOverrides = getPendingQuestionExplanationOverrideSync(
+            questionIds,
+            sharedOverrides
+          );
+          if (pendingOverrides.length > 0) {
+            await syncSharedQuestionExplanationOverrides(pendingOverrides, session.access_token);
+          }
+        }
       } catch {
         // keep local overrides only
       }
@@ -278,6 +291,7 @@ export default function SearchPage() {
 
       const payload = (await response.json()) as {
         ok: boolean;
+        sharedSaved?: boolean;
         explanation?: string;
         optionAnalysis?: Partial<Record<OptionKey, string>>;
         memoryTip?: string;
@@ -285,7 +299,7 @@ export default function SearchPage() {
         message?: string;
       };
 
-      if (!response.ok || !payload.ok || !payload.explanation) {
+      if (!response.ok || !payload.ok || !payload.explanation || payload.sharedSaved === false) {
         if (response.status === 429 && payload.message && typeof window !== "undefined") {
           window.alert(payload.message);
         }

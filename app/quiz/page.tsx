@@ -24,6 +24,7 @@ import {
   recordPeakChallengeRun,
   pushCurrentSessionToSupabase,
   loadSharedQuestionExplanationOverrides,
+  syncSharedQuestionExplanationOverrides,
   pushCompletedSessionToSupabase,
   pushQuestionStatsSnapshotToSupabase
 } from "@/lib/cloudSync";
@@ -40,6 +41,7 @@ import {
 import {
   applyQuestionExplanationOverride,
   clearCurrentSession,
+  getPendingQuestionExplanationOverrideSync,
   loadCompletedSessions,
   loadCurrentSession,
   loadQuestionExplanationOverrides,
@@ -511,17 +513,28 @@ export default function QuizPage() {
 
       try {
         const sharedOverrides = await loadSharedQuestionExplanationOverrides(session.questionOrder);
-        if (Object.keys(sharedOverrides).length === 0) return;
-        saveQuestionExplanationOverrides(sharedOverrides);
-        setExplanationOverrides((current) => ({ ...current, ...sharedOverrides }));
-        setSession((current) => (current ? { ...current } : current));
+        if (Object.keys(sharedOverrides).length > 0) {
+          saveQuestionExplanationOverrides(sharedOverrides);
+          setExplanationOverrides((current) => ({ ...current, ...sharedOverrides }));
+          setSession((current) => (current ? { ...current } : current));
+        }
+
+        if (authSession?.access_token) {
+          const pendingOverrides = getPendingQuestionExplanationOverrideSync(
+            session.questionOrder,
+            sharedOverrides
+          );
+          if (pendingOverrides.length > 0) {
+            await syncSharedQuestionExplanationOverrides(pendingOverrides, authSession.access_token);
+          }
+        }
       } catch {
         // keep local overrides only
       }
     }
 
     void fetchSharedExplanationOverrides();
-  }, [session?.id, session?.questionOrder]);
+  }, [authSession?.access_token, session?.id, session?.questionOrder]);
 
   useEffect(() => {
     if (!authSession?.user?.id || !session || session.completedAt || !mounted) return;
@@ -908,6 +921,7 @@ export default function QuizPage() {
 
       const payload = (await response.json()) as {
         ok: boolean;
+        sharedSaved?: boolean;
         explanation?: string;
         optionAnalysis?: Partial<Record<OptionKey, string>>;
         memoryTip?: string;
@@ -915,7 +929,7 @@ export default function QuizPage() {
         message?: string;
       };
 
-      if (!response.ok || !payload.ok || !payload.explanation) {
+      if (!response.ok || !payload.ok || !payload.explanation || payload.sharedSaved === false) {
         if (response.status === 429 && payload.message && typeof window !== "undefined") {
           window.alert(payload.message);
         }

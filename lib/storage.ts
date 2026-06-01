@@ -411,6 +411,50 @@ export function loadQuestionExplanationOverride(questionId: string) {
   return loadQuestionExplanationOverrides()[questionId];
 }
 
+export function loadQuestionExplanationOverridesForIds(questionIds: string[]) {
+  const allOverrides = loadQuestionExplanationOverrides();
+  return Object.fromEntries(
+    questionIds
+      .map((questionId) => {
+        const override = allOverrides[questionId];
+        if (!override) return null;
+        return [questionId, override] as const;
+      })
+      .filter((entry): entry is readonly [string, QuestionExplanationOverride] => Boolean(entry))
+  );
+}
+
+export function getPendingQuestionExplanationOverrideSync(
+  questionIds: string[],
+  sharedOverrides: Record<string, QuestionExplanationOverride>
+) {
+  const localOverrides = loadQuestionExplanationOverridesForIds(questionIds);
+
+  return Object.entries(localOverrides)
+    .filter(([questionId, localOverride]) => {
+      const sharedOverride = sharedOverrides[questionId];
+      if (!sharedOverride) return true;
+
+      const localUpdatedAt = localOverride.updatedAt ?? "";
+      const sharedUpdatedAt = sharedOverride.updatedAt ?? "";
+      if (localUpdatedAt && sharedUpdatedAt && localUpdatedAt <= sharedUpdatedAt) {
+        return false;
+      }
+
+      return (
+        localOverride.explanation !== sharedOverride.explanation ||
+        JSON.stringify(localOverride.optionAnalysis ?? {}) !==
+          JSON.stringify(sharedOverride.optionAnalysis ?? {}) ||
+        (localOverride.memoryTip ?? "") !== (sharedOverride.memoryTip ?? "") ||
+        (localOverride.model ?? "") !== (sharedOverride.model ?? "")
+      );
+    })
+    .map(([questionId, override]) => ({
+      questionId,
+      override
+    }));
+}
+
 export function saveQuestionExplanationOverride(
   questionId: string,
   override: QuestionExplanationOverride

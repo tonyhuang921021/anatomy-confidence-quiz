@@ -1129,6 +1129,52 @@ export async function loadSharedQuestionExplanationOverrides(questionIds: string
   );
 }
 
+export async function syncSharedQuestionExplanationOverrides(
+  overrides: Array<{
+    questionId: string;
+    override: QuestionExplanationOverride;
+  }>,
+  accessToken?: string | null
+) {
+  if (!accessToken || overrides.length === 0) {
+    return { syncedCount: 0 };
+  }
+
+  const response = await fetch("/api/question-explanation", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+      action: "sync_overrides",
+      accessToken,
+      overrides: overrides.map(({ questionId, override }) => ({
+        questionId,
+        explanation: override.explanation,
+        optionAnalysis: override.optionAnalysis ?? {},
+        memoryTip: override.memoryTip ?? "",
+        model: override.model ?? "gpt-5-mini",
+        updatedAt: override.updatedAt
+      }))
+    })
+  });
+
+  const rawText = await response.text();
+  const payload = (rawText ? JSON.parse(rawText) : null) as {
+    ok?: boolean;
+    syncedCount?: number;
+    message?: string;
+  } | null;
+
+  if (!response.ok || !payload?.ok) {
+    throw new Error(payload?.message || "共享詳解同步失敗。");
+  }
+
+  return {
+    syncedCount: payload.syncedCount ?? 0
+  };
+}
+
 export async function loadConfirmedQuestionClassificationOverrides(questionIds?: string[]) {
   if (!isSupabaseConfigured()) {
     return {} as Record<string, QuestionClassificationOverride>;

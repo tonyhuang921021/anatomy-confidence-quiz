@@ -10,7 +10,8 @@ import { WeaknessRanking } from "@/components/WeaknessRanking";
 import {
   loadQuestionCommunityStats,
   loadConfirmedQuestionClassificationOverrides,
-  loadSharedQuestionExplanationOverrides
+  loadSharedQuestionExplanationOverrides,
+  syncSharedQuestionExplanationOverrides
 } from "@/lib/cloudSync";
 import { applyQuestionClassificationOverride } from "@/data/med1QuestionBank";
 import { anatomyQuestions } from "@/data/anatomyQuestions";
@@ -30,6 +31,7 @@ import {
   applyQuestionExplanationOverride,
   loadCurrentSession,
   clearCurrentSession,
+  getPendingQuestionExplanationOverrideSync,
   loadCompletedSessions,
   loadQuestionExplanationOverrides,
   saveCompletedSession,
@@ -373,16 +375,27 @@ function ResultsPageContent() {
       if (!state.session?.attempts.length) return;
 
       try {
+        const questionIds = state.session.attempts.map((attempt) => attempt.questionId);
         const sharedOverrides = await loadSharedQuestionExplanationOverrides(
-          state.session.attempts.map((attempt) => attempt.questionId)
+          questionIds
         );
-        if (Object.keys(sharedOverrides).length === 0) return;
+        if (Object.keys(sharedOverrides).length > 0) {
+          saveQuestionExplanationOverrides(sharedOverrides);
+          setExplanationOverrides((current) => ({
+            ...current,
+            ...sharedOverrides
+          }));
+        }
 
-        saveQuestionExplanationOverrides(sharedOverrides);
-        setExplanationOverrides((current) => ({
-          ...current,
-          ...sharedOverrides
-        }));
+        if (session?.access_token) {
+          const pendingOverrides = getPendingQuestionExplanationOverrideSync(
+            questionIds,
+            sharedOverrides
+          );
+          if (pendingOverrides.length > 0) {
+            await syncSharedQuestionExplanationOverrides(pendingOverrides, session.access_token);
+          }
+        }
       } catch {
         // keep local overrides only
       }
@@ -528,6 +541,7 @@ function ResultsPageContent() {
 
       const payload = (await response.json()) as {
         ok: boolean;
+        sharedSaved?: boolean;
         explanation?: string;
         optionAnalysis?: Partial<Record<OptionKey, string>>;
         memoryTip?: string;
@@ -535,7 +549,7 @@ function ResultsPageContent() {
         message?: string;
       };
 
-      if (!response.ok || !payload.ok || !payload.explanation) {
+      if (!response.ok || !payload.ok || !payload.explanation || payload.sharedSaved === false) {
         if (response.status === 429 && payload.message && typeof window !== "undefined") {
           window.alert(payload.message);
         }

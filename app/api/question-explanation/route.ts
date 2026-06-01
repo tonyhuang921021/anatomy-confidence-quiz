@@ -4,6 +4,7 @@ import { createOpenAIText, isOpenAIConfigured } from "@/lib/openai";
 import { getActiveAIAccountBan } from "@/lib/aiAccountBan";
 
 type QuestionExplanationRequestBody = {
+  action?: "generate" | "sync_override" | "sync_overrides";
   visitorId?: string;
   accessToken?: string;
   question?: {
@@ -35,6 +36,22 @@ type QuestionExplanationRequestBody = {
     confidence?: number;
     isCorrect?: boolean;
   };
+  override?: {
+    questionId?: string;
+    explanation?: string;
+    optionAnalysis?: Record<string, string>;
+    memoryTip?: string;
+    model?: string;
+    updatedAt?: string;
+  };
+  overrides?: Array<{
+    questionId?: string;
+    explanation?: string;
+    optionAnalysis?: Record<string, string>;
+    memoryTip?: string;
+    model?: string;
+    updatedAt?: string;
+  }>;
 };
 
 type ParsedExplanationPayload = {
@@ -274,10 +291,13 @@ async function upsertSharedExplanationOverride(
   questionId: string,
   parsed: ParsedExplanationPayload,
   model: string,
-  accessToken?: string
+  accessToken?: string,
+  updatedAt?: string
 ) {
   const supabase = getSupabaseWriteClient(accessToken);
-  if (!supabase) return;
+  if (!supabase) {
+    throw new Error("找不到可寫入共享詳解的 Supabase 憑證。");
+  }
 
   const { error } = await supabase.from("question_explanation_overrides").upsert(
     {
@@ -286,14 +306,59 @@ async function upsertSharedExplanationOverride(
       option_analysis: parsed.optionAnalysis ?? {},
       memory_tip: parsed.memoryTip ?? "",
       model,
-      updated_at: new Date().toISOString()
+      updated_at: updatedAt || new Date().toISOString()
     },
     { onConflict: "question_id" }
   );
 
   if (error) {
-    console.error("Shared question explanation override skipped:", error);
+    throw new Error(`共享詳解寫入失敗：${formatUnknownError(error)}`);
   }
+}
+
+async function syncSharedExplanationOverrides(
+  overrides: NonNullable<QuestionExplanationRequestBody["overrides"]>,
+  accessToken?: string
+) {
+  const normalizedOverrides: Array<{
+    questionId: string;
+    parsed: ParsedExplanationPayload;
+    model: string;
+    updatedAt?: string;
+  }> = [];
+
+  for (const item of overrides) {
+    const questionId = item.questionId?.trim();
+    const explanation = item.explanation?.trim();
+    if (!questionId || !explanation) continue;
+
+    normalizedOverrides.push({
+      questionId,
+      parsed: {
+        explanation,
+        optionAnalysis: normalizeOptionAnalysis(item.optionAnalysis ?? {}),
+        memoryTip: item.memoryTip?.trim() ?? ""
+      },
+      model: item.model?.trim() || "gpt-5-mini",
+      updatedAt: item.updatedAt?.trim() || undefined
+    });
+  }
+
+  if (normalizedOverrides.length === 0) {
+    return 0;
+  }
+
+  for (const item of normalizedOverrides) {
+    await upsertSharedExplanationOverride(
+      item.questionId,
+      item.parsed,
+      item.model,
+      accessToken,
+      item.updatedAt
+    );
+  }
+
+  return normalizedOverrides.length;
 }
 
 function buildQuestionExplanationPrompt(body: QuestionExplanationRequestBody) {
@@ -556,6 +621,47 @@ function parseExplanationPayload(text: string): ParsedExplanationPayload | null 
 
 export async function POST(request: NextRequest) {
   const body = (await request.json()) as QuestionExplanationRequestBody;
+  const action = body.action ?? "generate";
+
+  if (action === "sync_override" || action === "sync_overrides") {
+    try {
+      const userEmail = await getVerifiedUserEmail(body.accessToken);
+      if (!userEmail) {
+        return NextResponse.json(
+          {
+            ok: false,
+            configured: true,
+            message: "請先登入帳號，才能同步共享詳解。"
+          },
+          { status: 401 }
+        );
+      }
+
+      const overrideList =
+        action === "sync_override"
+          ? body.override
+            ? [body.override]
+            : []
+          : (body.overrides ?? []);
+
+      const syncedCount = await syncSharedExplanationOverrides(overrideList, body.accessToken);
+
+      return NextResponse.json({
+        ok: true,
+        configured: true,
+        syncedCount
+      });
+    } catch (error) {
+      return NextResponse.json(
+        {
+          ok: false,
+          configured: true,
+          message: formatUnknownError(error)
+        },
+        { status: 500 }
+      );
+    }
+  }
 
   if (!body.question?.stem || !body.question?.answer) {
     return NextResponse.json(
@@ -663,6 +769,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({
       ok: true,
       configured: true,
+      sharedSaved: true,
       model: result.model,
       explanation: parsed.explanation,
       optionAnalysis: parsed.optionAnalysis ?? {},
