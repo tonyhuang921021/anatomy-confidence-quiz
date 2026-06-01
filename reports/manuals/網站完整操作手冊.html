@@ -1,0 +1,632 @@
+<!doctype html>
+<html lang="zh-Hant">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>一階醫師國考刷題測驗｜完整操作手冊</title>
+    <style>
+      :root {
+        --paper: #f5f0e8;
+        --paper-soft: #fbf8f2;
+        --ink: #1f2430;
+        --muted: #667085;
+        --line: rgba(31, 36, 48, 0.12);
+        --accent: #b65b48;
+        --accent-soft: rgba(182, 91, 72, 0.1);
+        --card: rgba(255, 255, 255, 0.72);
+        --shadow: 0 20px 50px rgba(31, 36, 48, 0.08);
+        --radius-xl: 30px;
+        --radius-lg: 22px;
+        --radius-md: 16px;
+        --max: 1180px;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      html {
+        scroll-behavior: smooth;
+      }
+
+      body {
+        margin: 0;
+        font-family: "Iowan Old Style", "Palatino Linotype", "Noto Serif TC", serif;
+        color: var(--ink);
+        background:
+          radial-gradient(circle at top left, rgba(182, 91, 72, 0.08), transparent 28%),
+          linear-gradient(180deg, #f7f2ea 0%, #f3eee6 52%, #f6f1ea 100%);
+      }
+
+      a {
+        color: inherit;
+      }
+
+      .page {
+        width: min(calc(100% - 32px), var(--max));
+        margin: 0 auto;
+        padding: 36px 0 80px;
+      }
+
+      .hero {
+        position: relative;
+        overflow: hidden;
+        padding: 44px;
+        border: 1px solid var(--line);
+        border-radius: 38px;
+        background: linear-gradient(145deg, rgba(255, 255, 255, 0.82), rgba(251, 248, 242, 0.92));
+        box-shadow: var(--shadow);
+      }
+
+      .eyebrow {
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        padding: 9px 14px;
+        border-radius: 999px;
+        background: var(--accent-soft);
+        color: var(--accent);
+        font-size: 13px;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+      }
+
+      .hero h1 {
+        margin: 20px 0 10px;
+        font-size: clamp(34px, 5vw, 58px);
+        line-height: 1.05;
+        letter-spacing: -0.03em;
+      }
+
+      .hero p {
+        max-width: 780px;
+        margin: 0;
+        color: var(--muted);
+        font-size: 18px;
+        line-height: 1.9;
+      }
+
+      .hero-grid {
+        display: grid;
+        grid-template-columns: 1.6fr 0.9fr;
+        gap: 24px;
+        margin-top: 34px;
+      }
+
+      .hero-card,
+      .toc,
+      .section-card,
+      .feature-card,
+      .tip-card,
+      .image-card {
+        border: 1px solid var(--line);
+        border-radius: var(--radius-lg);
+        background: var(--card);
+        backdrop-filter: blur(14px);
+        box-shadow: 0 12px 30px rgba(31, 36, 48, 0.05);
+      }
+
+      .hero-card {
+        padding: 24px 26px;
+      }
+
+      .hero-card h2,
+      .toc h2,
+      .section-header h2 {
+        margin: 0 0 10px;
+        font-size: 20px;
+        letter-spacing: -0.02em;
+      }
+
+      .hero-card ul,
+      .toc ul {
+        margin: 0;
+        padding-left: 18px;
+        color: var(--muted);
+        line-height: 1.9;
+      }
+
+      .toc {
+        padding: 24px 24px 22px;
+      }
+
+      .toc ul {
+        list-style: none;
+        padding: 0;
+      }
+
+      .toc li + li {
+        margin-top: 10px;
+      }
+
+      .toc a {
+        display: block;
+        padding: 10px 12px;
+        border-radius: 12px;
+        text-decoration: none;
+        transition: background 160ms ease;
+      }
+
+      .toc a:hover {
+        background: rgba(255, 255, 255, 0.7);
+      }
+
+      .summary-grid {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 14px;
+        margin-top: 24px;
+      }
+
+      .metric {
+        padding: 18px 18px 16px;
+        border: 1px solid var(--line);
+        border-radius: var(--radius-md);
+        background: rgba(255, 255, 255, 0.62);
+      }
+
+      .metric span {
+        display: block;
+        color: var(--muted);
+        font-size: 13px;
+      }
+
+      .metric strong {
+        display: block;
+        margin-top: 6px;
+        font-size: 24px;
+        letter-spacing: -0.03em;
+      }
+
+      .section {
+        margin-top: 26px;
+      }
+
+      .section-card {
+        padding: 32px;
+      }
+
+      .section-header {
+        display: flex;
+        align-items: start;
+        justify-content: space-between;
+        gap: 16px;
+        margin-bottom: 18px;
+      }
+
+      .section-index {
+        font-size: 13px;
+        color: var(--accent);
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+      }
+
+      .section-intro {
+        color: var(--muted);
+        font-size: 17px;
+        line-height: 1.85;
+      }
+
+      .content-grid {
+        display: grid;
+        grid-template-columns: 1.05fr 0.95fr;
+        gap: 24px;
+        align-items: start;
+      }
+
+      .feature-stack {
+        display: grid;
+        gap: 14px;
+      }
+
+      .feature-card {
+        padding: 18px 20px;
+      }
+
+      .feature-card h3 {
+        margin: 0 0 8px;
+        font-size: 18px;
+      }
+
+      .feature-card p,
+      .section-card p,
+      .section-card li {
+        color: var(--muted);
+        line-height: 1.85;
+        font-size: 16px;
+      }
+
+      .section-card ul {
+        margin: 14px 0 0;
+        padding-left: 18px;
+      }
+
+      .image-card {
+        overflow: hidden;
+      }
+
+      .image-card img {
+        display: block;
+        width: 100%;
+        height: auto;
+      }
+
+      .image-card figcaption {
+        padding: 16px 18px 18px;
+        color: var(--muted);
+        font-size: 14px;
+        line-height: 1.7;
+      }
+
+      .two-col-list {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 12px 18px;
+        margin-top: 18px;
+      }
+
+      .chip {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        margin: 10px 10px 0 0;
+        padding: 10px 14px;
+        border-radius: 999px;
+        background: rgba(255, 255, 255, 0.72);
+        border: 1px solid var(--line);
+        color: var(--muted);
+        font-size: 14px;
+      }
+
+      .tip-card {
+        margin-top: 18px;
+        padding: 20px 22px;
+        background: linear-gradient(180deg, rgba(182, 91, 72, 0.08), rgba(255, 255, 255, 0.75));
+      }
+
+      .tip-card strong {
+        display: block;
+        margin-bottom: 8px;
+        font-size: 16px;
+      }
+
+      .closing {
+        margin-top: 26px;
+        padding: 28px 30px;
+        border: 1px solid var(--line);
+        border-radius: 30px;
+        background: linear-gradient(180deg, rgba(255, 255, 255, 0.8), rgba(251, 248, 242, 0.92));
+        box-shadow: var(--shadow);
+      }
+
+      .closing h2 {
+        margin: 0 0 10px;
+        font-size: 28px;
+      }
+
+      .closing p {
+        margin: 0;
+        color: var(--muted);
+        line-height: 1.9;
+      }
+
+      @media (max-width: 980px) {
+        .hero,
+        .section-card,
+        .closing {
+          padding: 24px;
+        }
+
+        .hero-grid,
+        .content-grid,
+        .summary-grid,
+        .two-col-list {
+          grid-template-columns: 1fr;
+        }
+      }
+
+      @media (max-width: 720px) {
+        .page {
+          width: min(calc(100% - 20px), var(--max));
+          padding-top: 18px;
+        }
+
+        .hero h1 {
+          font-size: 34px;
+        }
+
+        .section-card p,
+        .section-card li,
+        .section-intro,
+        .hero p {
+          font-size: 15px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="page">
+      <section class="hero">
+        <div class="eyebrow">Board Prep Lab · User Manual</div>
+        <h1>一階醫師國考刷題測驗<br />完整操作手冊</h1>
+        <p>
+          這份手冊整理網站目前最重要的使用方式與功能設計，從開始刷題、信心紀錄、AI 詳解，到錯題複習、自訂卷與搜尋整理成一份完整導覽。
+        </p>
+
+        <div class="hero-grid">
+          <div class="hero-card">
+            <h2>這份手冊特別整理的重點</h2>
+            <ul>
+              <li>不只教你怎麼刷題，也會說明信心、低信心題與 AI 補強如何一起使用。</li>
+              <li>把 GPT-5-mini 補詳解、複製 AI Prompt、重新分類回報等功能都放進同一份說明裡。</li>
+              <li>以實際網站畫面做說明，方便你之後直接分享給同學。</li>
+            </ul>
+
+            <div class="summary-grid">
+              <div class="metric">
+                <span>主要模組</span>
+                <strong>6 大區</strong>
+              </div>
+              <div class="metric">
+                <span>操作情境</span>
+                <strong>刷題＋回顧</strong>
+              </div>
+              <div class="metric">
+                <span>適合對象</span>
+                <strong>新手到考前</strong>
+              </div>
+              <div class="metric">
+                <span>核心特色</span>
+                <strong>弱點追蹤</strong>
+              </div>
+            </div>
+          </div>
+
+          <nav class="toc">
+            <h2>目錄</h2>
+            <ul>
+              <li><a href="#home">01 首頁與入口</a></li>
+              <li><a href="#settings">02 目前使用者與設定</a></li>
+              <li><a href="#practice">03 開始測驗與作答</a></li>
+              <li><a href="#review">04 詳解、信心與 AI 功能</a></li>
+              <li><a href="#results">05 查看結果與錯題複習</a></li>
+              <li><a href="#search">06 題目搜尋與自訂卷</a></li>
+            </ul>
+          </nav>
+        </div>
+      </section>
+
+      <section class="section" id="home">
+        <div class="section-card">
+          <div class="section-header">
+            <div>
+              <div class="section-index">Section 01</div>
+              <h2>首頁與主要入口</h2>
+            </div>
+          </div>
+          <p class="section-intro">
+            首頁是整個網站的操作中樞。你可以從這裡快速進入一般刷題、整份考古題、查看結果、錯題複習、自訂卷與題目搜尋。對第一次使用的人來說，先熟悉首頁的節奏最重要。
+          </p>
+
+          <div class="content-grid">
+            <div>
+              <div class="feature-stack">
+                <div class="feature-card">
+                  <h3>常用入口</h3>
+                  <p>開始測驗、開始一份考古題、查看結果、錯題複習、自訂卷模式、題目搜尋，幾乎所有高頻功能都從首頁進。</p>
+                </div>
+                <div class="feature-card">
+                  <h3>首頁資訊</h3>
+                  <p>除了入口外，首頁也會顯示訪客數、在線估算、留言板，以及目前使用者區塊的設定控制。</p>
+                </div>
+              </div>
+
+              <div class="chip">開始測驗：平常散題刷題</div>
+              <div class="chip">開始一份考古題：整份模考</div>
+              <div class="chip">查看結果：回顧每次作答</div>
+              <div class="chip">自訂卷模式：主題卷與公開卷</div>
+            </div>
+
+            <figure class="image-card">
+              <img src="../manual_assets/home.png" alt="首頁畫面" />
+              <figcaption>首頁會集中呈現最常用的功能入口，視覺上保持乾淨，讓使用者很快知道下一步要去哪裡。</figcaption>
+            </figure>
+          </div>
+        </div>
+      </section>
+
+      <section class="section" id="settings">
+        <div class="section-card">
+          <div class="section-header">
+            <div>
+              <div class="section-index">Section 02</div>
+              <h2>目前使用者與設定</h2>
+            </div>
+          </div>
+          <p class="section-intro">
+            設定集中在目前使用者區塊裡，不另外拆成複雜頁面。這裡的重點不是只換外觀，而是直接影響你的抽題範圍、作答節奏與跨裝置同步。
+          </p>
+
+          <div class="two-col-list">
+            <div class="feature-card">
+              <h3>跟帳號同步的設定</h3>
+              <p>登入後，像焦慮版 / 抗焦慮版、暗夜模式、開始測驗年份範圍、題數偏好等都會跟帳號走。</p>
+            </div>
+            <div class="feature-card">
+              <h3>開始測驗抽題控制</h3>
+              <p>可以先設定只抽某些年份的題目，也能決定一次做幾題，或開啟每題詳解後可結束。</p>
+            </div>
+          </div>
+
+          <div class="tip-card">
+            <strong>建議做法</strong>
+            <p>如果你正在複習某幾年的題目，先在設定裡調整年份範圍，再回到開始測驗，抽題會更貼近你現在的讀書策略。</p>
+          </div>
+        </div>
+      </section>
+
+      <section class="section" id="practice">
+        <div class="section-card">
+          <div class="section-header">
+            <div>
+              <div class="section-index">Section 03</div>
+              <h2>開始測驗與作答流程</h2>
+            </div>
+          </div>
+          <p class="section-intro">
+            一般散題刷題會先從開始測驗頁選科，再進入單題作答。這一段最重要的不是只做對，而是把作答信心一起記錄下來，後面系統才抓得到你真正不穩的地方。
+          </p>
+
+          <div class="content-grid">
+            <figure class="image-card">
+              <img src="../manual_assets/start.png" alt="開始測驗頁" />
+              <figcaption>開始測驗頁會顯示目前選了哪些科目、年份範圍內的題數，以及本輪準備抽幾題。</figcaption>
+            </figure>
+
+            <div class="feature-stack">
+              <div class="feature-card">
+                <h3>開始測驗頁</h3>
+                <p>可以自由勾選要抽哪些科，也會看到目前題池內總共有多少題。年份範圍只影響抽題池，不會動到正式題庫本身。</p>
+              </div>
+              <div class="feature-card">
+                <h3>作答畫面</h3>
+                <p>每題都會看到題目、選項、題目來源與信心選擇器。你送出前可以先決定自己是有把握、普通、還是不太確定。</p>
+              </div>
+              <div class="feature-card">
+                <h3>為什麼信心很重要</h3>
+                <p>這個網站不只記錄你有沒有答對，還會記錄你答題時的把握程度，這樣後面才分得出來哪些是錯題、哪些是答對但不穩。</p>
+              </div>
+            </div>
+          </div>
+
+          <figure class="image-card" style="margin-top: 22px">
+            <img src="../manual_assets/quiz-question.png" alt="作答畫面" />
+            <figcaption>作答畫面會同時收集你的答案與信心。這是後面整理錯題、低信心題和弱點分析的基礎。</figcaption>
+          </figure>
+        </div>
+      </section>
+
+      <section class="section" id="review">
+        <div class="section-card">
+          <div class="section-header">
+            <div>
+              <div class="section-index">Section 04</div>
+              <h2>詳解、信心與 AI 補強功能</h2>
+            </div>
+          </div>
+          <p class="section-intro">
+            題目送出後，這個網站最有價值的區域才真正開始。你不只會看到正解，還能利用 AI 詳解、分類回報、錯因標記與自由結束測驗等功能，把一次刷題變成真正有整理價值的回顧。
+          </p>
+
+          <div class="content-grid">
+            <figure class="image-card">
+              <img src="../manual_assets/quiz-review.png" alt="詳解畫面" />
+              <figcaption>這一區會顯示正解、本題信心、主詳解、選項解析與快速記憶法，也是 AI 功能最常使用的地方。</figcaption>
+            </figure>
+
+            <div class="feature-stack">
+              <div class="feature-card">
+                <h3>用 GPT-5-mini 補詳解</h3>
+                <p>如果原始題庫講得不夠清楚，可以直接補一份新的 AI 詳解。現在補完後會同步到共享詳解，之後換裝置也看得到。</p>
+              </div>
+              <div class="feature-card">
+                <h3>回報此題分類錯誤</h3>
+                <p>如果你覺得科目、章節、小節分錯，可以直接回報。這些回報之後會進入後台，讓站長決定是否正式套用。</p>
+              </div>
+              <div class="feature-card">
+                <h3>錯因紀錄與自由收題</h3>
+                <p>答錯時可以順手記錄錯因；若你有開啟每題詳解後可結束，也能在每題詳解後自己決定要不要停在這裡。</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="section" id="results">
+        <div class="section-card">
+          <div class="section-header">
+            <div>
+              <div class="section-index">Section 05</div>
+              <h2>查看結果與錯題複習</h2>
+            </div>
+          </div>
+          <p class="section-intro">
+            做完一輪後，網站不只是給你一個分數，而是把這輪的錯題、低信心題、章節弱點與補強提示都整理起來。這一段非常適合考前快速找自己哪裡還不穩。
+          </p>
+
+          <div class="two-col-list">
+            <div class="feature-card">
+              <h3>查看結果</h3>
+              <p>先從作答紀錄裡挑一筆，再看那一輪的總題數、正確率、錯題回顧與低信心題回顧。</p>
+            </div>
+            <div class="feature-card">
+              <h3>複製 AI 補弱 Prompt</h3>
+              <p>系統會依據這輪的錯題、低信心題與章節弱點，自動整理成一段可以直接貼給 ChatGPT 的補強 prompt。</p>
+            </div>
+            <div class="feature-card">
+              <h3>錯題複習</h3>
+              <p>錯題複習頁會把一般散題刷題累積下來的題目分成錯題與低信心題，還可以用科目篩選縮小範圍。</p>
+            </div>
+            <div class="feature-card">
+              <h3>低信心題的價值</h3>
+              <p>有些題你雖然答對，但其實是猜的、猶豫很久，這些題通常比單純錯題更值得在考前回頭補。</p>
+            </div>
+          </div>
+
+          <div class="tip-card">
+            <strong>實戰建議</strong>
+            <p>如果時間有限，先回頭看低信心題，再看錯題。因為很多正式考試出事的地方，不是你完全不會，而是你原本就不穩。</p>
+          </div>
+        </div>
+      </section>
+
+      <section class="section" id="search">
+        <div class="section-card">
+          <div class="section-header">
+            <div>
+              <div class="section-index">Section 06</div>
+              <h2>題目搜尋與自訂卷模式</h2>
+            </div>
+          </div>
+          <p class="section-intro">
+            如果你已經不是單純想刷題，而是想整理某個主題、回查某個觀念，或把一批題目包成自己的卷，那題目搜尋和自訂卷會是最好用的兩個模組。
+          </p>
+
+          <div class="content-grid">
+            <figure class="image-card">
+              <img src="../manual_assets/search.png" alt="題目搜尋頁" />
+              <figcaption>題目搜尋不只搜題幹，也能搜尋詳解、章節、年份，適合主題複習和回查觀念。</figcaption>
+            </figure>
+
+            <div class="feature-stack">
+              <div class="feature-card">
+                <h3>題目搜尋</h3>
+                <p>可搭配科目、關鍵字、年份與排序方式。搜尋範圍除了題幹，還包括詳解、記憶法、章節與小節。</p>
+              </div>
+              <div class="feature-card">
+                <h3>自訂卷模式</h3>
+                <p>可以做公開卷、輸入考卷碼、自己產卷、用 AI 智慧檢索卷，或把自己的 JSON 題目直接匯入成一張卷。</p>
+              </div>
+              <div class="feature-card">
+                <h3>複製給 AI 的模板</h3>
+                <p>如果你有自己的 AI，可以先複製模板、請 AI 依格式輸出 JSON，再貼回網站直接生成一張自訂卷，不需要再寫程式匯入。</p>
+              </div>
+            </div>
+          </div>
+
+          <figure class="image-card" style="margin-top: 22px">
+            <img src="../manual_assets/custom-papers.png" alt="自訂卷模式頁" />
+            <figcaption>自訂卷模式適合主題整理、公開分享、同學一起做同一份卷，也能用五碼考卷碼快速分享。</figcaption>
+          </figure>
+        </div>
+      </section>
+
+      <section class="closing">
+        <h2>最後建議</h2>
+        <p>
+          這個網站最值得利用的地方，不只是刷題本身，而是把 <strong>作答信心、低信心題、AI 詳解與主題整理</strong> 一起用起來。當你開始把每輪作答都當成一次可回顧、可補強、可再利用的資料，這個網站就不只是題庫，而會變成真正幫你逼出弱點的訓練系統。
+        </p>
+      </section>
+    </div>
+  </body>
+</html>
