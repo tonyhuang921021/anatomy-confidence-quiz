@@ -228,6 +228,24 @@ select {
     @apply translate-x-0;
   }
 
+  .note-question-backdrop {
+    @apply fixed inset-0 z-30 bg-slate-950/10 opacity-0 backdrop-blur-[1px] transition;
+    pointer-events: none;
+  }
+
+  .note-question-backdrop[data-open="true"] {
+    @apply opacity-100;
+    pointer-events: auto;
+  }
+
+  .note-question-close-tab {
+    @apply absolute left-0 top-1/2 z-50 -translate-x-full -translate-y-1/2 rounded-l-2xl border border-r-0 px-2 py-6 text-xs font-bold text-white shadow-xl transition hover:bg-teal-700;
+    background: #0f172a;
+    border-color: var(--line-soft);
+    writing-mode: vertical-rl;
+    letter-spacing: 0.16em;
+  }
+
   .topbar-shell {
     border-bottom: 1px solid var(--topbar-border);
     background: var(--topbar-bg);

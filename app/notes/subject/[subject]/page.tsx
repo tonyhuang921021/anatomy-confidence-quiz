@@ -271,21 +271,29 @@ export default function SubjectNotesPage() {
               </button>
             ) : null}
 
+            <button
+              type="button"
+              className="note-question-backdrop"
+              data-open={Boolean(activeQuestionNote)}
+              onClick={() => setActiveQuestionNoteId("")}
+              aria-label="收合考古題抽屜"
+            />
+
             <aside className="note-question-drawer" data-open={Boolean(activeQuestionNote)}>
-              <div className="flex items-start justify-between gap-3">
+              <button
+                type="button"
+                onClick={() => setActiveQuestionNoteId("")}
+                className="note-question-close-tab"
+              >
+                收合
+              </button>
+              <div>
                 <div>
                   <p className="text-xs font-bold uppercase tracking-[0.22em] text-teal-700">Linked Questions</p>
                   <h2 className="mt-2 text-2xl font-black text-slate-950">
                     {activeQuestionNote?.title ?? "考古題"}
                   </h2>
                 </div>
-                <button
-                  type="button"
-                  onClick={() => setActiveQuestionNoteId("")}
-                  className="secondary-pill px-4 py-2 text-sm"
-                >
-                  收合
-                </button>
               </div>
 
               <div className="mt-5 grid gap-4">
