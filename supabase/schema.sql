@@ -149,6 +149,10 @@ grant select, insert, update, delete
 
 alter table public.leaderboard_profiles enable row level security;
 
+drop policy if exists "Anyone can read leaderboard profiles" on public.leaderboard_profiles;
+drop policy if exists "Users can insert their own leaderboard profile" on public.leaderboard_profiles;
+drop policy if exists "Users can update their own leaderboard profile" on public.leaderboard_profiles;
+
 create policy "Anyone can read leaderboard profiles"
 on public.leaderboard_profiles
 for select
