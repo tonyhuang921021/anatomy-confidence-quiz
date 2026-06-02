@@ -567,6 +567,26 @@ function buildAttemptMap(rows: QuizSessionAttemptRow[]) {
   return attemptMap;
 }
 
+function dedupeSessionRows(rows: QuizSessionRow[]) {
+  const deduped = new Map<string, QuizSessionRow>();
+
+  for (const row of rows) {
+    deduped.set(row.id, row);
+  }
+
+  return Array.from(deduped.values());
+}
+
+function dedupeSessionAttemptRows(rows: ReturnType<typeof mapAttemptToCloudRow>[]) {
+  const deduped = new Map<string, ReturnType<typeof mapAttemptToCloudRow>>();
+
+  for (const row of rows) {
+    deduped.set(`${row.session_id}::${row.question_order}`, row);
+  }
+
+  return Array.from(deduped.values());
+}
+
 function namespaceSessionIdForUser(userId: string, sessionId: string) {
   const prefix = `user-${userId}:`;
   return sessionId.startsWith(prefix) ? sessionId : `${prefix}${sessionId}`;
@@ -1125,7 +1145,9 @@ async function upsertSessionsForUser(userId: string, sessions: QuizSession[]) {
   if (!isSupabaseConfigured() || sessions.length === 0) return;
 
   const supabase = getSupabaseBrowserClient();
-  const rows: QuizSessionRow[] = sessions.map((session) => buildSessionRowForCloud(userId, session));
+  const rows = dedupeSessionRows(
+    sessions.map((session) => buildSessionRowForCloud(userId, session))
+  );
 
   const { error } = await supabase
     .from("quiz_sessions")
@@ -1135,8 +1157,10 @@ async function upsertSessionsForUser(userId: string, sessions: QuizSession[]) {
     throw error;
   }
 
-  const attemptRows = sessions.flatMap((session) =>
-    session.attempts.map((attempt, index) => mapAttemptToCloudRow(userId, session, attempt, index))
+  const attemptRows = dedupeSessionAttemptRows(
+    sessions.flatMap((session) =>
+      session.attempts.map((attempt, index) => mapAttemptToCloudRow(userId, session, attempt, index))
+    )
   );
 
   if (attemptRows.length === 0) return;
