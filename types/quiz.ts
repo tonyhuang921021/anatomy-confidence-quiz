@@ -218,6 +218,63 @@ export type CompletionStatsBundle = {
   sections: SectionCompletionStats[];
 };
 
+export type StudyNoteTagType =
+  | "concept"
+  | "disease"
+  | "drug"
+  | "mechanism"
+  | "anatomy"
+  | "symptom"
+  | "treatment"
+  | "exam_skill"
+  | "misc";
+
+export type StudyNoteTag = {
+  id?: string;
+  noteId?: string;
+  tag: string;
+  tagType: StudyNoteTagType;
+  source?: "manual" | "chatgpt_metadata" | "imported";
+};
+
+export type StudyNoteQuestionLink = {
+  id?: string;
+  noteId?: string;
+  questionId: string;
+  relationType: "related" | "same_concept" | "explains" | "practice_target";
+  confidence?: number;
+  reason?: string;
+};
+
+export type StudyNoteCollection = {
+  id: string;
+  name: string;
+  description?: string;
+  createdAt: string;
+  updatedAt: string;
+};
+
+export type StudyNoteSummary = {
+  id: string;
+  title: string;
+  summary?: string;
+  subject?: SubjectName;
+  chapter?: string;
+  section?: string;
+  source?: string;
+  collectionId?: string;
+  collectionName?: string;
+  tags: StudyNoteTag[];
+  questionLinkCount: number;
+  createdAt: string;
+  updatedAt: string;
+};
+
+export type StudyNoteDetail = StudyNoteSummary & {
+  rawMarkdown: string;
+  questionLinks: StudyNoteQuestionLink[];
+};
+
 export type QuestionHistoryStats = {
   questionId: string;
   attempts: number;

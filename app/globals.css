@@ -185,6 +185,98 @@ select {
   .podium-badge-champion {
     background: rgba(244, 223, 187, 0.86);
   }
+
+  .note-markdown {
+    @apply text-sm leading-7 sm:text-base;
+    color: var(--ink-main);
+  }
+
+  .note-markdown h1,
+  .note-markdown h2,
+  .note-markdown h3 {
+    @apply font-bold text-ink;
+    line-height: 1.35;
+  }
+
+  .note-markdown h1 {
+    @apply mt-0 text-3xl;
+  }
+
+  .note-markdown h2 {
+    @apply mt-8 text-2xl;
+  }
+
+  .note-markdown h3 {
+    @apply mt-6 text-xl;
+  }
+
+  .note-markdown p,
+  .note-markdown ul,
+  .note-markdown ol,
+  .note-markdown table,
+  .note-markdown pre,
+  .note-markdown blockquote {
+    @apply mt-4;
+  }
+
+  .note-markdown ul,
+  .note-markdown ol {
+    @apply pl-6;
+  }
+
+  .note-markdown ul {
+    @apply list-disc;
+  }
+
+  .note-markdown ol {
+    @apply list-decimal;
+  }
+
+  .note-markdown li {
+    @apply my-1;
+  }
+
+  .note-markdown strong {
+    @apply font-bold text-ink;
+  }
+
+  .note-markdown blockquote {
+    @apply rounded-2xl border-l-4 px-4 py-3;
+    border-color: color-mix(in srgb, var(--brand-main) 35%, var(--line-soft));
+    background: color-mix(in srgb, var(--brand-main) 8%, var(--surface));
+  }
+
+  .note-markdown code {
+    @apply rounded-md px-1.5 py-0.5 text-[0.92em];
+    background: color-mix(in srgb, var(--brand-main) 10%, var(--surface-muted));
+  }
+
+  .note-markdown pre {
+    @apply overflow-x-auto rounded-2xl p-4 text-sm;
+    background: #102a22;
+    color: #f8fafc;
+  }
+
+  .note-markdown pre code {
+    @apply bg-transparent p-0 text-inherit;
+  }
+
+  .note-markdown table {
+    @apply block w-full overflow-x-auto rounded-2xl border text-sm;
+    border-color: var(--line-soft);
+    border-collapse: separate;
+    border-spacing: 0;
+  }
+
+  .note-markdown th,
+  .note-markdown td {
+    @apply min-w-[9rem] border-b px-3 py-2 text-left align-top;
+    border-color: var(--line-soft);
+  }
+
+  .note-markdown th {
+    background: color-mix(in srgb, var(--brand-main) 10%, var(--surface));
+  }
 }
 
 html[data-theme="dark"] .stat-chip,

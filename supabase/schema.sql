@@ -1,3 +1,5 @@
+create extension if not exists pgcrypto;
+
 create table if not exists public.quiz_sessions (
   id text primary key,
   user_id uuid not null references auth.users (id) on delete cascade,
@@ -827,6 +829,138 @@ drop policy if exists "Service role can manage ai account bans" on public.ai_acc
 
 create policy "Service role can manage ai account bans"
 on public.ai_account_bans
+for all
+to service_role
+using (true)
+with check (true);
+
+create table if not exists public.study_note_collections (
+  id uuid primary key default gen_random_uuid(),
+  user_id uuid not null references auth.users (id) on delete cascade,
+  name text not null,
+  description text,
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now(),
+  unique (user_id, name)
+);
+
+create index if not exists study_note_collections_user_id_updated_at_idx
+on public.study_note_collections (user_id, updated_at desc);
+
+grant select, insert, update, delete
+  on public.study_note_collections
+  to service_role;
+
+alter table public.study_note_collections enable row level security;
+
+drop policy if exists "Service role can manage study note collections" on public.study_note_collections;
+
+create policy "Service role can manage study note collections"
+on public.study_note_collections
+for all
+to service_role
+using (true)
+with check (true);
+
+create table if not exists public.study_notes (
+  id uuid primary key default gen_random_uuid(),
+  user_id uuid not null references auth.users (id) on delete cascade,
+  collection_id uuid references public.study_note_collections (id) on delete set null,
+  title text not null,
+  raw_markdown text not null,
+  summary text,
+  subject text,
+  chapter text,
+  section text,
+  source text not null default 'chatgpt',
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now()
+);
+
+create index if not exists study_notes_user_id_updated_at_idx
+on public.study_notes (user_id, updated_at desc);
+
+create index if not exists study_notes_user_id_subject_idx
+on public.study_notes (user_id, subject, updated_at desc);
+
+create index if not exists study_notes_collection_id_idx
+on public.study_notes (collection_id);
+
+grant select, insert, update, delete
+  on public.study_notes
+  to service_role;
+
+alter table public.study_notes enable row level security;
+
+drop policy if exists "Service role can manage study notes" on public.study_notes;
+
+create policy "Service role can manage study notes"
+on public.study_notes
+for all
+to service_role
+using (true)
+with check (true);
+
+create table if not exists public.study_note_tags (
+  id bigint generated always as identity primary key,
+  note_id uuid not null references public.study_notes (id) on delete cascade,
+  user_id uuid not null references auth.users (id) on delete cascade,
+  tag text not null,
+  tag_type text not null default 'misc',
+  source text not null default 'manual',
+  created_at timestamptz not null default now(),
+  unique (note_id, tag_type, tag)
+);
+
+create index if not exists study_note_tags_user_id_tag_idx
+on public.study_note_tags (user_id, tag_type, tag);
+
+create index if not exists study_note_tags_note_id_idx
+on public.study_note_tags (note_id);
+
+grant select, insert, update, delete
+  on public.study_note_tags
+  to service_role;
+
+alter table public.study_note_tags enable row level security;
+
+drop policy if exists "Service role can manage study note tags" on public.study_note_tags;
+
+create policy "Service role can manage study note tags"
+on public.study_note_tags
+for all
+to service_role
+using (true)
+with check (true);
+
+create table if not exists public.study_note_question_links (
+  id bigint generated always as identity primary key,
+  note_id uuid not null references public.study_notes (id) on delete cascade,
+  user_id uuid not null references auth.users (id) on delete cascade,
+  question_id text not null,
+  relation_type text not null default 'related',
+  confidence numeric(5,4),
+  reason text,
+  created_at timestamptz not null default now(),
+  unique (note_id, question_id, relation_type)
+);
+
+create index if not exists study_note_question_links_user_id_question_id_idx
+on public.study_note_question_links (user_id, question_id);
+
+create index if not exists study_note_question_links_note_id_idx
+on public.study_note_question_links (note_id);
+
+grant select, insert, update, delete
+  on public.study_note_question_links
+  to service_role;
+
+alter table public.study_note_question_links enable row level security;
+
+drop policy if exists "Service role can manage study note question links" on public.study_note_question_links;
+
+create policy "Service role can manage study note question links"
+on public.study_note_question_links
 for all
 to service_role
 using (true)
