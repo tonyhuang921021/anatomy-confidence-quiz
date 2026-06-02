@@ -141,28 +141,33 @@ export default function SubjectNotesPage() {
         ) : !validSubject ? (
           <div className="surface-card p-6"><p className="body-soft">找不到這個科目的筆記頁。</p></div>
         ) : (
-          <div className="grid gap-6 lg:grid-cols-[300px_minmax(0,1fr)]">
-            <aside className="surface-card sticky top-4 max-h-[calc(100vh-2rem)] overflow-auto p-5">
-              <p className="text-xs font-bold uppercase tracking-[0.22em] text-slate-500">Outline</p>
-              <div className="mt-4 grid gap-2">
-                {orderedSections.length > 0 ? (
-                  orderedSections.map((item) => (
-                    <a
-                      key={`${item.chapter}-${item.section}`}
-                      href={`#${getSectionAnchor(item.section)}`}
-                      className="rounded-2xl px-3 py-2 text-sm font-bold text-slate-700 hover:bg-teal-50 hover:text-teal-800"
-                    >
-                      <span className="block text-[11px] font-semibold text-slate-400">{item.chapter}</span>
-                      {item.section}
-                    </a>
-                  ))
-                ) : (
-                  <p className="body-soft text-sm">目前還沒有筆記小節。</p>
-                )}
+          <div className="relative">
+            <aside className="note-outline-drawer">
+              <div className="note-outline-handle" aria-hidden="true">
+                小節
+              </div>
+              <div className="note-outline-panel surface-card">
+                <p className="text-xs font-bold uppercase tracking-[0.22em] text-slate-500">Outline</p>
+                <div className="mt-4 grid gap-2">
+                  {orderedSections.length > 0 ? (
+                    orderedSections.map((item) => (
+                      <a
+                        key={`${item.chapter}-${item.section}`}
+                        href={`#${getSectionAnchor(item.section)}`}
+                        className="rounded-2xl px-3 py-2 text-sm font-bold text-slate-700 hover:bg-teal-50 hover:text-teal-800"
+                      >
+                        <span className="block text-[11px] font-semibold text-slate-400">{item.chapter}</span>
+                        {item.section}
+                      </a>
+                    ))
+                  ) : (
+                    <p className="body-soft text-sm">目前還沒有筆記小節。</p>
+                  )}
+                </div>
               </div>
             </aside>
 
-            <article className="surface-card min-w-0 p-5 sm:p-8 lg:p-10">
+            <article className="surface-card min-w-0 p-5 sm:p-8 lg:p-12">
               {loading ? <p className="body-soft">正在載入這科的大文件...</p> : null}
               {error ? <p className="rounded-2xl bg-rose-50 px-4 py-3 text-sm font-semibold text-rose-700">{error}</p> : null}
               {!loading && notes.length === 0 ? (

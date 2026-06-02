@@ -161,6 +161,47 @@ select {
     border: 1px solid var(--line-soft);
   }
 
+  .note-outline-drawer {
+    @apply mb-4;
+  }
+
+  .note-outline-panel {
+    @apply max-h-72 overflow-auto p-4;
+  }
+
+  .note-outline-handle {
+    @apply mb-2 inline-flex rounded-full px-3 py-1 text-xs font-bold tracking-[0.18em] text-white;
+    background: var(--brand-main);
+  }
+
+  @media (min-width: 1024px) {
+    .note-outline-drawer {
+      @apply fixed bottom-8 left-0 top-24 z-40 mb-0 w-[344px] pr-5;
+      pointer-events: none;
+      transform: translateX(-304px);
+      transition: transform 220ms ease, filter 220ms ease;
+    }
+
+    .note-outline-drawer:hover,
+    .note-outline-drawer:focus-within {
+      pointer-events: auto;
+      transform: translateX(0);
+      filter: drop-shadow(0 24px 48px rgba(16, 42, 34, 0.16));
+    }
+
+    .note-outline-panel {
+      @apply h-full max-h-none overflow-auto rounded-l-none p-5;
+      pointer-events: auto;
+    }
+
+    .note-outline-handle {
+      @apply absolute right-0 top-1/2 mb-0 -translate-y-1/2 rounded-l-none rounded-r-2xl px-2 py-5;
+      pointer-events: auto;
+      writing-mode: vertical-rl;
+      letter-spacing: 0.18em;
+    }
+  }
+
   .topbar-shell {
     border-bottom: 1px solid var(--topbar-border);
     background: var(--topbar-bg);
