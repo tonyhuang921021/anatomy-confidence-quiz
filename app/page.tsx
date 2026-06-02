@@ -5,6 +5,7 @@ import { ClientSectionBoundary } from "@/components/ClientSectionBoundary";
 import { ExamCountdown } from "@/components/ExamCountdown";
 import { FeedbackBoard } from "@/components/FeedbackBoard";
 import { HomeToneBanner } from "@/components/HomeToneBanner";
+import { OwnerOnlyNotesLink } from "@/components/OwnerOnlyNotesLink";
 
 export default function HomePage() {
   return (
@@ -56,10 +57,9 @@ export default function HomePage() {
                   題目搜尋
                   <span className="text-slate-400">→</span>
                 </Link>
-                <Link href="/notes" className="secondary-pill justify-between px-4">
-                  學習筆記
-                  <span className="text-slate-400">→</span>
-                </Link>
+                <ClientSectionBoundary title="學習筆記入口">
+                  <OwnerOnlyNotesLink />
+                </ClientSectionBoundary>
                 <Link href="/leaderboard" className="secondary-pill justify-between px-4">
                   刷題榜
                   <span className="text-slate-400">→</span>

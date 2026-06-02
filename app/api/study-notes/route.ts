@@ -7,6 +7,7 @@ import type {
   StudyNoteTag,
   SubjectName
 } from "@/types/quiz";
+import { isAdminEmail } from "@/lib/adminAccess";
 
 type StudyNoteRow = {
   id: string;
@@ -89,6 +90,13 @@ async function getAuthedUser(request: NextRequest, supabase: ServiceSupabaseClie
   const { data, error } = await supabase.auth.getUser(accessToken);
   if (error || !data.user) {
     return { userId: "", error: NextResponse.json({ ok: false, message: "登入驗證失敗。" }, { status: 401 }) };
+  }
+
+  if (!isAdminEmail(data.user.email)) {
+    return {
+      userId: "",
+      error: NextResponse.json({ ok: false, message: "學習筆記目前只開放站長使用。" }, { status: 403 })
+    };
   }
 
   return { userId: data.user.id, error: null };

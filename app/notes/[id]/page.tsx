@@ -6,6 +6,7 @@ import { useParams, useRouter } from "next/navigation";
 import { useAuth } from "@/components/AuthProvider";
 import { StudyNoteMarkdown } from "@/components/StudyNoteMarkdown";
 import { getCanonicalQuestionBank } from "@/data/med1QuestionBank";
+import { isAdminEmail } from "@/lib/adminAccess";
 import { DEFAULT_QUIZ_SETTINGS } from "@/lib/quizAnalysis";
 import { saveQuizSettings } from "@/lib/storage";
 import { loadStudyNote } from "@/lib/studyNotes";
@@ -28,9 +29,10 @@ export default function StudyNoteDetailPage() {
   const [note, setNote] = useState<StudyNoteDetail | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const notesAllowed = isAdminEmail(user?.email);
 
   useEffect(() => {
-    if (!configured || !session?.access_token || !params.id) {
+    if (!configured || !session?.access_token || !params.id || !notesAllowed) {
       setNote(null);
       return;
     }
@@ -54,7 +56,7 @@ export default function StudyNoteDetailPage() {
     return () => {
       cancelled = true;
     };
-  }, [configured, params.id, session?.access_token]);
+  }, [configured, notesAllowed, params.id, session?.access_token]);
 
   const questionMap = useMemo(
     () =>
@@ -113,6 +115,7 @@ export default function StudyNoteDetailPage() {
         <article className="surface-card min-w-0 p-5 sm:p-8">
           {!configured ? <p className="body-soft">Supabase 尚未設定，學習筆記需要雲端儲存才能使用。</p> : null}
           {configured && !user ? <p className="body-soft">請先登入，才能讀取自己的私人筆記。</p> : null}
+          {configured && user && !notesAllowed ? <p className="body-soft">學習筆記目前只開放站長使用。</p> : null}
           {loading ? <p className="body-soft">正在載入筆記...</p> : null}
           {error ? <p className="rounded-2xl bg-rose-50 px-4 py-3 text-sm font-semibold text-rose-700">{error}</p> : null}
           {note ? <StudyNoteMarkdown markdown={note.rawMarkdown} /> : null}

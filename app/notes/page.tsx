@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useDeferredValue, useEffect, useMemo, useState } from "react";
 import { useAuth } from "@/components/AuthProvider";
 import { MED1_SUBJECTS, MED2_SUBJECTS, subjectRegistry } from "@/data/subjectRegistry";
+import { isAdminEmail } from "@/lib/adminAccess";
 import { loadStudyNotes } from "@/lib/studyNotes";
 import type { StudyNoteSummary } from "@/types/quiz";
 
@@ -28,9 +29,10 @@ export default function StudyNotesPage() {
   const [error, setError] = useState("");
   const deferredSearch = useDeferredValue(search);
   const deferredTag = useDeferredValue(tag);
+  const notesAllowed = isAdminEmail(user?.email);
 
   useEffect(() => {
-    if (!configured || !session?.access_token) {
+    if (!configured || !session?.access_token || !notesAllowed) {
       setNotes([]);
       return;
     }
@@ -59,7 +61,7 @@ export default function StudyNotesPage() {
     return () => {
       cancelled = true;
     };
-  }, [configured, deferredSearch, deferredTag, session?.access_token, subject]);
+  }, [configured, deferredSearch, deferredTag, notesAllowed, session?.access_token, subject]);
 
   const tagSuggestions = useMemo(() => {
     return Array.from(new Set(notes.flatMap((note) => note.tags.map((item) => item.tag))))
@@ -88,6 +90,8 @@ export default function StudyNotesPage() {
           <p className="body-soft">Supabase 尚未設定，學習筆記需要雲端儲存才能使用。</p>
         ) : !user ? (
           <p className="body-soft">請先在首頁登入，筆記會以私人資料存在雲端。</p>
+        ) : !notesAllowed ? (
+          <p className="body-soft">學習筆記目前只開放站長使用。</p>
         ) : (
           <>
             <div className="grid gap-3 lg:grid-cols-[minmax(0,1.4fr)_220px_220px]">
