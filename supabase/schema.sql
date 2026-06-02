@@ -972,3 +972,28 @@ for all
 to service_role
 using (true)
 with check (true);
+
+create table if not exists public.study_note_stars (
+  note_id uuid not null references public.study_notes (id) on delete cascade,
+  user_id uuid not null references auth.users (id) on delete cascade,
+  created_at timestamptz not null default now(),
+  primary key (note_id, user_id)
+);
+
+create index if not exists study_note_stars_user_id_created_at_idx
+on public.study_note_stars (user_id, created_at desc);
+
+grant select, insert, update, delete
+  on public.study_note_stars
+  to service_role;
+
+alter table public.study_note_stars enable row level security;
+
+drop policy if exists "Service role can manage study note stars" on public.study_note_stars;
+
+create policy "Service role can manage study note stars"
+on public.study_note_stars
+for all
+to service_role
+using (true)
+with check (true);

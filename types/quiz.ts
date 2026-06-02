@@ -267,6 +267,7 @@ export type StudyNoteSummary = {
   tags: StudyNoteTag[];
   questionLinkCount: number;
   displayOrder?: number;
+  isStarred?: boolean;
   createdAt: string;
   updatedAt: string;
 };

@@ -7,9 +7,8 @@ import { useAuth } from "@/components/AuthProvider";
 import { StudyNoteMarkdown } from "@/components/StudyNoteMarkdown";
 import { getCanonicalQuestionBank } from "@/data/med1QuestionBank";
 import { subjectRegistry } from "@/data/subjectRegistry";
-import { isAdminEmail } from "@/lib/adminAccess";
 import { isNoteSubject } from "@/lib/noteSubjects";
-import { loadStudyNote, loadStudyNotes, reorderStudyNotes } from "@/lib/studyNotes";
+import { loadStudyNote, loadStudyNotes, reorderStudyNotes, toggleStudyNoteStar } from "@/lib/studyNotes";
 import type { Question, StudyNoteDetail, SubjectName } from "@/types/quiz";
 
 function buildQuestionMap(): Map<string, Question> {
@@ -30,13 +29,12 @@ export default function SubjectNotesPage() {
   const [currentNoteId, setCurrentNoteId] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
-  const notesAllowed = isAdminEmail(user?.email);
   const validSubject = isNoteSubject(subject);
   const subjectName = subject as SubjectName;
   const subjectItem = validSubject ? subjectRegistry[subjectName] : null;
 
   useEffect(() => {
-    if (!configured || !session?.access_token || !notesAllowed || !validSubject) {
+    if (!configured || !session?.access_token || !validSubject) {
       setNotes([]);
       return;
     }
@@ -63,7 +61,7 @@ export default function SubjectNotesPage() {
     return () => {
       cancelled = true;
     };
-  }, [configured, notesAllowed, session?.access_token, subject, validSubject]);
+  }, [configured, session?.access_token, subject, validSubject]);
 
   const questionMap = useMemo(() => buildQuestionMap(), []);
   const currentNote = notes.find((note) => note.id === currentNoteId) ?? notes[0];
@@ -144,6 +142,31 @@ export default function SubjectNotesPage() {
     });
   }
 
+  async function handleToggleStar(noteId: string) {
+    if (!session?.access_token) return;
+    const note = notes.find((item) => item.id === noteId);
+    if (!note) return;
+    const nextStarred = !note.isStarred;
+
+    setNotes((currentNotes) =>
+      currentNotes.map((item) => (item.id === noteId ? { ...item, isStarred: nextStarred } : item))
+    );
+    setError("");
+
+    try {
+      await toggleStudyNoteStar({
+        accessToken: session.access_token,
+        noteId,
+        starred: nextStarred
+      });
+    } catch (rawError) {
+      setNotes((currentNotes) =>
+        currentNotes.map((item) => (item.id === noteId ? { ...item, isStarred: !nextStarred } : item))
+      );
+      setError(rawError instanceof Error ? rawError.message : "筆記星號更新失敗");
+    }
+  }
+
   return (
     <main className="shell max-w-[1600px]">
       <section className="surface-card p-6 sm:p-8">
@@ -172,9 +195,7 @@ export default function SubjectNotesPage() {
         {!configured ? (
           <div className="surface-card p-6"><p className="body-soft">Supabase 尚未設定，學習筆記需要雲端儲存才能使用。</p></div>
         ) : !user ? (
-          <div className="surface-card p-6"><p className="body-soft">請先在首頁登入，才能讀取自己的私人筆記。</p></div>
-        ) : !notesAllowed ? (
-          <div className="surface-card p-6"><p className="body-soft">學習筆記目前只開放站長使用。</p></div>
+          <div className="surface-card p-6"><p className="body-soft">請先在首頁登入，才能讀取自己的學習筆記。</p></div>
         ) : !validSubject ? (
           <div className="surface-card p-6"><p className="body-soft">找不到這個科目的筆記頁。</p></div>
         ) : (
@@ -206,9 +227,12 @@ export default function SubjectNotesPage() {
                         </button>
                         <a
                           href={`#note-${note.id}`}
-                          className="min-w-0 truncate text-sm font-bold text-slate-700 group-hover:text-teal-800"
+                          className="grid min-w-0 grid-cols-[minmax(0,1fr)_auto] items-center gap-2 text-sm font-bold text-slate-700 group-hover:text-teal-800"
                         >
-                          {note.title}
+                          <span className="min-w-0 truncate">{note.title}</span>
+                          <span className={note.isStarred ? "text-amber-500" : "text-slate-300"} aria-label={note.isStarred ? "已打星" : "未打星"}>
+                            {note.isStarred ? "★" : "☆"}
+                          </span>
                         </a>
                       </div>
                     ))
@@ -241,6 +265,16 @@ export default function SubjectNotesPage() {
                           {note.summary ? <p className="body-soft mt-2 leading-7">{note.summary}</p> : null}
                         </div>
                         <div className="flex flex-wrap justify-end gap-2">
+                          <button
+                            type="button"
+                            onClick={() => void handleToggleStar(note.id)}
+                            className={note.isStarred ? "secondary-pill border-amber-200 bg-amber-50 px-4 py-2 text-sm text-amber-700" : "secondary-pill px-4 py-2 text-sm"}
+                            aria-pressed={Boolean(note.isStarred)}
+                            aria-label={note.isStarred ? `取消 ${note.title} 的星號` : `幫 ${note.title} 打星號`}
+                          >
+                            <span aria-hidden="true">{note.isStarred ? "★" : "☆"}</span>
+                            {note.isStarred ? "已打星" : "打星星"}
+                          </button>
                           <Link href={`/notes/${note.id}`} className="secondary-pill px-4 py-2 text-sm">
                             編輯 / 詳情
                           </Link>

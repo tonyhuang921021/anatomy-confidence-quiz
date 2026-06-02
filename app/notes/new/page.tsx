@@ -6,7 +6,6 @@ import { useRouter } from "next/navigation";
 import { useAuth } from "@/components/AuthProvider";
 import { getCanonicalQuestionBank } from "@/data/med1QuestionBank";
 import { MED1_SUBJECTS, MED2_SUBJECTS, subjectRegistry } from "@/data/subjectRegistry";
-import { isAdminEmail } from "@/lib/adminAccess";
 import { STUDY_NOTE_FORMAT_PROMPT } from "@/lib/studyNotePrompt";
 import {
   createStudyNote,
@@ -70,7 +69,6 @@ export default function NewStudyNotePage() {
   const [error, setError] = useState("");
   const [isPending, startTransition] = useTransition();
   const deferredQuestionSearch = useDeferredValue(questionSearch);
-  const notesAllowed = isAdminEmail(user?.email);
 
   const allQuestions = useMemo(
     () =>
@@ -151,10 +149,6 @@ export default function NewStudyNotePage() {
       setError("請先登入再儲存筆記。");
       return;
     }
-    if (!notesAllowed) {
-      setError("學習筆記目前只開放站長使用。");
-      return;
-    }
     setError("");
     setMessage("");
 
@@ -200,9 +194,7 @@ export default function NewStudyNotePage() {
         {!configured ? (
           <p className="body-soft">Supabase 尚未設定，學習筆記需要雲端儲存才能使用。</p>
         ) : !user ? (
-          <p className="body-soft">請先在首頁登入，登入後就能新增私人筆記。</p>
-        ) : !notesAllowed ? (
-          <p className="body-soft">學習筆記目前只開放站長使用。</p>
+          <p className="body-soft">請先在首頁登入，登入後就能新增自己的學習筆記。</p>
         ) : (
           <div className="grid min-w-0 gap-6 xl:grid-cols-[minmax(0,1.25fr)_minmax(280px,380px)]">
             <div className="grid min-w-0 gap-4">

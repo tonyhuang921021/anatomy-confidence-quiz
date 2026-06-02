@@ -6,7 +6,6 @@ import { useParams, useRouter } from "next/navigation";
 import { useAuth } from "@/components/AuthProvider";
 import { StudyNoteMarkdown } from "@/components/StudyNoteMarkdown";
 import { getCanonicalQuestionBank } from "@/data/med1QuestionBank";
-import { isAdminEmail } from "@/lib/adminAccess";
 import { DEFAULT_QUIZ_SETTINGS } from "@/lib/quizAnalysis";
 import { saveQuizSettings } from "@/lib/storage";
 import { deleteStudyNote, loadStudyNote, updateStudyNote } from "@/lib/studyNotes";
@@ -35,10 +34,9 @@ export default function StudyNoteDetailPage() {
   const [error, setError] = useState("");
   const [message, setMessage] = useState("");
   const [isPending, startTransition] = useTransition();
-  const notesAllowed = isAdminEmail(user?.email);
 
   useEffect(() => {
-    if (!configured || !session?.access_token || !params.id || !notesAllowed) {
+    if (!configured || !session?.access_token || !params.id) {
       setNote(null);
       return;
     }
@@ -67,7 +65,7 @@ export default function StudyNoteDetailPage() {
     return () => {
       cancelled = true;
     };
-  }, [configured, notesAllowed, params.id, session?.access_token]);
+  }, [configured, params.id, session?.access_token]);
 
   const questionMap = useMemo(
     () =>
@@ -170,12 +168,12 @@ export default function StudyNoteDetailPage() {
             {note?.summary ? <p className="body-soft mt-4 max-w-3xl leading-7">{note.summary}</p> : null}
           </div>
           <div className="flex flex-wrap gap-2">
-            {note && notesAllowed ? (
+            {note ? (
               <button type="button" onClick={() => setEditing((value) => !value)} className="secondary-pill">
                 {editing ? "取消編輯" : "編輯筆記"}
               </button>
             ) : null}
-            {note && notesAllowed ? (
+            {note ? (
               <button
                 type="button"
                 onClick={handleDeleteNote}
@@ -195,8 +193,7 @@ export default function StudyNoteDetailPage() {
       <section className="mt-6 grid gap-6 xl:grid-cols-[minmax(0,1fr)_340px]">
         <article className="surface-card min-w-0 p-5 sm:p-8 lg:p-10">
           {!configured ? <p className="body-soft">Supabase 尚未設定，學習筆記需要雲端儲存才能使用。</p> : null}
-          {configured && !user ? <p className="body-soft">請先登入，才能讀取自己的私人筆記。</p> : null}
-          {configured && user && !notesAllowed ? <p className="body-soft">學習筆記目前只開放站長使用。</p> : null}
+          {configured && !user ? <p className="body-soft">請先登入，才能讀取自己的學習筆記。</p> : null}
           {loading ? <p className="body-soft">正在載入筆記...</p> : null}
           {error ? <p className="rounded-2xl bg-rose-50 px-4 py-3 text-sm font-semibold text-rose-700">{error}</p> : null}
           {message ? <p className="rounded-2xl bg-teal-50 px-4 py-3 text-sm font-semibold text-teal-800">{message}</p> : null}

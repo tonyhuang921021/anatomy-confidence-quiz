@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
-import { isAdminEmail } from "@/lib/adminAccess";
 
 type ReorderStudyNotesBody = {
   orderedIds?: string[];
@@ -41,9 +40,6 @@ export async function POST(request: NextRequest) {
   const { data: userData, error: userError } = await supabase.auth.getUser(accessToken);
   if (userError || !userData.user) {
     return NextResponse.json({ ok: false, message: "登入驗證失敗。" }, { status: 401 });
-  }
-  if (!isAdminEmail(userData.user.email)) {
-    return NextResponse.json({ ok: false, message: "學習筆記目前只開放站長使用。" }, { status: 403 });
   }
 
   try {

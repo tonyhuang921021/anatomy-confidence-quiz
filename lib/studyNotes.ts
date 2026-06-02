@@ -47,6 +47,12 @@ export type ReorderStudyNotesInput = {
   orderedIds: string[];
 };
 
+export type ToggleStudyNoteStarInput = {
+  accessToken?: string | null;
+  noteId: string;
+  starred: boolean;
+};
+
 function tryParseJson<T>(rawText: string): T | null {
   if (!rawText.trim()) return null;
 
@@ -432,4 +438,14 @@ export async function reorderStudyNotes(input: ReorderStudyNotesInput): Promise<
     body: JSON.stringify({ orderedIds: input.orderedIds })
   });
   await parseStudyNoteResponse<{ updated?: number }>(response);
+}
+
+export async function toggleStudyNoteStar(input: ToggleStudyNoteStarInput): Promise<{ starred: boolean }> {
+  const response = await fetch("/api/study-notes/star", {
+    method: "POST",
+    headers: buildAuthHeaders(input.accessToken),
+    body: JSON.stringify({ noteId: input.noteId, starred: input.starred })
+  });
+  const payload = await parseStudyNoteResponse<{ starred?: boolean }>(response);
+  return { starred: Boolean(payload.starred) };
 }

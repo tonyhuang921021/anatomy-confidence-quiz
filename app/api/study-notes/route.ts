@@ -7,7 +7,6 @@ import type {
   StudyNoteTag,
   SubjectName
 } from "@/types/quiz";
-import { isAdminEmail } from "@/lib/adminAccess";
 
 type StudyNoteRow = {
   id: string;
@@ -45,6 +44,10 @@ type StudyNoteQuestionLinkRow = {
   relation_type: string;
   confidence?: number | null;
   reason?: string | null;
+};
+
+type StudyNoteStarRow = {
+  note_id: string;
 };
 
 type CreateStudyNoteBody = {
@@ -94,13 +97,6 @@ async function getAuthedUser(request: NextRequest, supabase: ServiceSupabaseClie
     return { userId: "", error: NextResponse.json({ ok: false, message: "登入驗證失敗。" }, { status: 401 }) };
   }
 
-  if (!isAdminEmail(data.user.email)) {
-    return {
-      userId: "",
-      error: NextResponse.json({ ok: false, message: "學習筆記目前只開放站長使用。" }, { status: 403 })
-    };
-  }
-
   return { userId: data.user.id, error: null };
 }
 
@@ -138,7 +134,8 @@ function mapNoteSummary(
   row: StudyNoteRow,
   tags: StudyNoteTag[],
   questionLinkCount: number,
-  collection?: StudyNoteCollectionRow
+  collection?: StudyNoteCollectionRow,
+  starredNoteIds = new Set<string>()
 ): StudyNoteSummary {
   return {
     id: row.id,
@@ -153,6 +150,7 @@ function mapNoteSummary(
     tags,
     questionLinkCount,
     displayOrder: typeof row.display_order === "number" ? row.display_order : undefined,
+    isStarred: starredNoteIds.has(row.id),
     createdAt: row.created_at,
     updatedAt: row.updated_at
   };
@@ -242,6 +240,25 @@ async function loadCollectionsById(
   return new Map(((data ?? []) as StudyNoteCollectionRow[]).map((row) => [row.id, row] as const));
 }
 
+async function loadStarredNoteIds(supabase: ServiceSupabaseClient, userId: string, noteIds: string[]) {
+  if (noteIds.length === 0) return new Set<string>();
+
+  const { data, error } = await supabase
+    .from("study_note_stars")
+    .select("note_id")
+    .eq("user_id", userId)
+    .in("note_id", noteIds);
+
+  if (error) {
+    if (error.code === "42P01" || String(error.message ?? "").includes("study_note_stars")) {
+      return new Set<string>();
+    }
+    throw error;
+  }
+
+  return new Set(((data ?? []) as StudyNoteStarRow[]).map((row) => row.note_id));
+}
+
 async function getOrCreateCollectionId(
   supabase: ServiceSupabaseClient,
   userId: string,
@@ -303,6 +320,7 @@ export async function GET(request: NextRequest) {
     const noteIds = noteRows.map((row) => row.id);
     const tagsByNoteId = await loadTagsByNoteId(supabase, userId, noteIds);
     const linksByNoteId = await loadQuestionLinksByNoteId(supabase, userId, noteIds);
+    const starredNoteIds = await loadStarredNoteIds(supabase, userId, noteIds);
     const collectionMap = await loadCollectionsById(
       supabase,
       userId,
@@ -342,7 +360,8 @@ export async function GET(request: NextRequest) {
           row,
           tagsByNoteId.get(row.id) ?? [],
           linksByNoteId.get(row.id)?.length ?? 0,
-          row.collection_id ? collectionMap.get(row.collection_id) : undefined
+          row.collection_id ? collectionMap.get(row.collection_id) : undefined,
+          starredNoteIds
         ),
         rawMarkdown: row.raw_markdown,
         questionLinks: linksByNoteId.get(row.id) ?? []
@@ -355,7 +374,8 @@ export async function GET(request: NextRequest) {
         row,
         tagsByNoteId.get(row.id) ?? [],
         linksByNoteId.get(row.id)?.length ?? 0,
-        row.collection_id ? collectionMap.get(row.collection_id) : undefined
+        row.collection_id ? collectionMap.get(row.collection_id) : undefined,
+        starredNoteIds
       )
     );
 
@@ -454,6 +474,7 @@ export async function POST(request: NextRequest) {
 
     const tagsByNoteId = await loadTagsByNoteId(supabase, userId, [noteId]);
     const linksByNoteId = await loadQuestionLinksByNoteId(supabase, userId, [noteId]);
+    const starredNoteIds = await loadStarredNoteIds(supabase, userId, [noteId]);
     const collectionMap = await loadCollectionsById(supabase, userId, collectionId ? [collectionId] : []);
     const row = insertedNote as StudyNoteRow;
     const note: StudyNoteDetail = {
@@ -461,7 +482,8 @@ export async function POST(request: NextRequest) {
         row,
         tagsByNoteId.get(noteId) ?? [],
         linksByNoteId.get(noteId)?.length ?? 0,
-        collectionId ? collectionMap.get(collectionId) : undefined
+        collectionId ? collectionMap.get(collectionId) : undefined,
+        starredNoteIds
       ),
       rawMarkdown: row.raw_markdown,
       questionLinks: linksByNoteId.get(noteId) ?? []
@@ -580,6 +602,7 @@ export async function PUT(request: NextRequest) {
 
     const tagsByNoteId = await loadTagsByNoteId(supabase, userId, [noteId]);
     const linksByNoteId = await loadQuestionLinksByNoteId(supabase, userId, [noteId]);
+    const starredNoteIds = await loadStarredNoteIds(supabase, userId, [noteId]);
     const collectionMap = await loadCollectionsById(supabase, userId, collectionId ? [collectionId] : []);
     const row = updatedNote as StudyNoteRow;
     const note: StudyNoteDetail = {
@@ -587,7 +610,8 @@ export async function PUT(request: NextRequest) {
         row,
         tagsByNoteId.get(noteId) ?? [],
         linksByNoteId.get(noteId)?.length ?? 0,
-        collectionId ? collectionMap.get(collectionId) : undefined
+        collectionId ? collectionMap.get(collectionId) : undefined,
+        starredNoteIds
       ),
       rawMarkdown: row.raw_markdown,
       questionLinks: linksByNoteId.get(noteId) ?? []

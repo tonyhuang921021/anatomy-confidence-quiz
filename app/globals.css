@@ -219,7 +219,7 @@ select {
   }
 
   .note-question-drawer {
-    @apply fixed inset-y-0 right-0 z-40 w-[min(92vw,440px)] translate-x-full overflow-auto border-l p-4 shadow-2xl transition;
+    @apply fixed inset-y-0 right-0 z-40 w-[min(88vw,440px)] max-w-[calc(100vw-2.75rem)] translate-x-full overflow-auto border-l p-4 shadow-2xl transition;
     background: var(--surface);
     border-color: var(--line-soft);
   }
@@ -272,8 +272,13 @@ select {
   }
 
   .note-markdown {
-    @apply text-sm leading-7 sm:text-base;
+    @apply min-w-0 max-w-full text-sm leading-7 sm:text-base;
     color: var(--ink-main);
+    overflow-wrap: break-word;
+  }
+
+  .note-markdown > * {
+    max-width: 100%;
   }
 
   .note-markdown h1,
@@ -285,6 +290,7 @@ select {
     @apply font-bold text-ink;
     line-height: 1.35;
     break-after: avoid;
+    overflow-wrap: anywhere;
   }
 
   .note-markdown h1 {
@@ -345,6 +351,7 @@ select {
 
   .note-markdown li {
     @apply my-1;
+    overflow-wrap: anywhere;
   }
 
   .note-markdown strong {
@@ -363,7 +370,7 @@ select {
   }
 
   .note-markdown pre {
-    @apply overflow-x-auto rounded-2xl p-4 text-sm;
+    @apply max-w-full overflow-x-auto rounded-2xl p-4 text-sm;
     background: #102a22;
     color: #f8fafc;
   }
@@ -373,7 +380,7 @@ select {
   }
 
   .note-markdown table {
-    @apply block w-full overflow-x-auto rounded-2xl border text-sm shadow-sm;
+    @apply block max-w-full overflow-x-auto rounded-2xl border text-sm shadow-sm;
     border-color: var(--line-soft);
     border-collapse: separate;
     border-spacing: 0;
@@ -381,8 +388,28 @@ select {
 
   .note-markdown th,
   .note-markdown td {
-    @apply min-w-[9rem] border-b px-3 py-2 text-left align-top;
+    @apply min-w-[8rem] border-b px-3 py-2 text-left align-top;
     border-color: var(--line-soft);
+    overflow-wrap: break-word;
+  }
+
+  @media (max-width: 640px) {
+    .note-markdown h1 {
+      @apply text-2xl;
+    }
+
+    .note-markdown h2 {
+      @apply text-xl;
+    }
+
+    .note-markdown h3 {
+      @apply text-lg;
+    }
+
+    .note-markdown th,
+    .note-markdown td {
+      @apply min-w-[7rem] px-2 py-2 text-xs;
+    }
   }
 
   .note-markdown th {

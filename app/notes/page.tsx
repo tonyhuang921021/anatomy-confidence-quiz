@@ -3,7 +3,6 @@
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import { useAuth } from "@/components/AuthProvider";
-import { isAdminEmail } from "@/lib/adminAccess";
 import { NOTE_SUBJECTS } from "@/lib/noteSubjects";
 import { loadStudyNotes } from "@/lib/studyNotes";
 import { subjectRegistry } from "@/data/subjectRegistry";
@@ -24,10 +23,9 @@ export default function StudyNotesPage() {
   const [notes, setNotes] = useState<StudyNoteSummary[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
-  const notesAllowed = isAdminEmail(user?.email);
 
   useEffect(() => {
-    if (!configured || !session?.access_token || !notesAllowed) {
+    if (!configured || !session?.access_token) {
       setNotes([]);
       return;
     }
@@ -51,7 +49,7 @@ export default function StudyNotesPage() {
     return () => {
       cancelled = true;
     };
-  }, [configured, notesAllowed, session?.access_token]);
+  }, [configured, session?.access_token]);
 
   const statsBySubject = useMemo(() => {
     const map = new Map<string, { count: number; updatedAt?: string; chapters: Set<string> }>();
@@ -89,9 +87,7 @@ export default function StudyNotesPage() {
         {!configured ? (
           <p className="body-soft">Supabase 尚未設定，學習筆記需要雲端儲存才能使用。</p>
         ) : !user ? (
-          <p className="body-soft">請先在首頁登入，筆記會以私人資料存在雲端。</p>
-        ) : !notesAllowed ? (
-          <p className="body-soft">學習筆記目前只開放站長使用。</p>
+          <p className="body-soft">請先在首頁登入，登入後就能建立自己的學習筆記。</p>
         ) : (
           <>
             {loading ? <p className="body-soft">正在整理十科筆記...</p> : null}
