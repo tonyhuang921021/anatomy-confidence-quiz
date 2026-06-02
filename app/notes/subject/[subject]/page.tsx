@@ -26,6 +26,7 @@ export default function SubjectNotesPage() {
   const { configured, session, user } = useAuth();
   const [notes, setNotes] = useState<StudyNoteDetail[]>([]);
   const [draggingNoteId, setDraggingNoteId] = useState("");
+  const [activeQuestionNoteId, setActiveQuestionNoteId] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const notesAllowed = isAdminEmail(user?.email);
@@ -64,6 +65,16 @@ export default function SubjectNotesPage() {
   }, [configured, notesAllowed, session?.access_token, subject, validSubject]);
 
   const questionMap = useMemo(() => buildQuestionMap(), []);
+  const activeQuestionNote = notes.find((note) => note.id === activeQuestionNoteId);
+  const activeRelatedQuestions = useMemo(() => {
+    if (!activeQuestionNote) return [];
+    return activeQuestionNote.questionLinks
+      .map((link) => ({
+        link,
+        question: questionMap.get(link.questionId)
+      }))
+      .filter((item): item is { link: typeof item.link; question: Question } => Boolean(item.question));
+  }, [activeQuestionNote, questionMap]);
 
   async function persistOrder(nextNotes: StudyNoteDetail[]) {
     if (!session?.access_token) return;
@@ -198,20 +209,13 @@ export default function SubjectNotesPage() {
                         </div>
                         <div className="flex flex-wrap justify-end gap-2">
                           {relatedQuestions.length > 0 ? (
-                            <details className="relative">
-                              <summary className="secondary-pill cursor-pointer list-none px-4 py-2 text-sm">
-                                考古題 {relatedQuestions.length}
-                              </summary>
-                              <div className="absolute right-0 z-20 mt-2 grid max-h-96 w-[min(88vw,420px)] gap-2 overflow-auto rounded-3xl border border-slate-200 bg-white p-3 shadow-xl">
-                                {relatedQuestions.map(({ link, question }) => (
-                                  <div key={`${question.id}-${link.relationType}`} className="rounded-2xl bg-slate-50 p-3 text-xs leading-5 text-slate-700">
-                                    <p className="font-bold text-slate-950">{question.id}</p>
-                                    <p className="mt-1 line-clamp-3">{question.stem}</p>
-                                    {link.reason ? <p className="mt-2 text-slate-500">{link.reason}</p> : null}
-                                  </div>
-                                ))}
-                              </div>
-                            </details>
+                            <button
+                              type="button"
+                              onClick={() => setActiveQuestionNoteId(note.id)}
+                              className="secondary-pill px-4 py-2 text-sm"
+                            >
+                              考古題 {relatedQuestions.length}
+                            </button>
                           ) : null}
                           <Link href={`/notes/${note.id}`} className="secondary-pill px-4 py-2 text-sm">
                             編輯 / 詳情
@@ -230,6 +234,62 @@ export default function SubjectNotesPage() {
                 })}
               </div>
             </article>
+
+            <aside className="note-question-drawer" data-open={Boolean(activeQuestionNote)}>
+              <div className="flex items-start justify-between gap-3">
+                <div>
+                  <p className="text-xs font-bold uppercase tracking-[0.22em] text-teal-700">Linked Questions</p>
+                  <h2 className="mt-2 text-2xl font-black text-slate-950">
+                    {activeQuestionNote?.title ?? "考古題"}
+                  </h2>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setActiveQuestionNoteId("")}
+                  className="secondary-pill px-4 py-2 text-sm"
+                >
+                  收合
+                </button>
+              </div>
+
+              <div className="mt-5 grid gap-4">
+                {activeRelatedQuestions.length > 0 ? activeRelatedQuestions.map(({ link, question }) => (
+                  <article key={`${question.id}-${link.relationType}`} className="rounded-3xl border border-slate-200 bg-white p-4 text-sm leading-7">
+                    <div className="flex flex-wrap items-center gap-2 text-xs font-semibold text-slate-500">
+                      <span className="font-bold text-slate-950">{question.id}</span>
+                      <span>{question.subject}</span>
+                      <span>{question.chapter}</span>
+                      <span>{question.section}</span>
+                    </div>
+                    <p className="mt-3 font-bold text-slate-950">{question.stem}</p>
+                    <div className="mt-3 grid gap-2">
+                      {Object.entries(question.options)
+                        .filter(([, value]) => Boolean(value))
+                        .map(([key, value]) => (
+                          <p key={key} className="rounded-2xl bg-slate-50 px-3 py-2 text-slate-700">
+                            <span className="font-bold text-slate-950">{key}. </span>
+                            {value}
+                          </p>
+                        ))}
+                    </div>
+                    {link.reason ? <p className="mt-3 rounded-2xl bg-amber-50 px-3 py-2 text-xs font-semibold leading-5 text-amber-800">{link.reason}</p> : null}
+                    <details className="mt-3">
+                      <summary className="secondary-pill cursor-pointer list-none px-4 py-2 text-sm">
+                        看答案與詳解
+                      </summary>
+                      <div className="mt-3 rounded-2xl bg-slate-950 px-4 py-3 text-sm leading-7 text-white">
+                        <p className="font-bold">答案：{question.answer}</p>
+                        <p className="mt-2 text-slate-100">{question.explanation}</p>
+                      </div>
+                    </details>
+                  </article>
+                )) : (
+                  <p className="body-soft rounded-3xl border border-dashed border-slate-200 bg-slate-50 p-4 text-sm">
+                    這篇筆記還沒有連結題目。
+                  </p>
+                )}
+              </div>
+            </aside>
           </div>
         )}
       </section>

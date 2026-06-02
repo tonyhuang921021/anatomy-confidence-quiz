@@ -218,6 +218,16 @@ select {
     }
   }
 
+  .note-question-drawer {
+    @apply fixed inset-y-0 right-0 z-40 w-[min(92vw,440px)] translate-x-full overflow-auto border-l p-4 shadow-2xl transition;
+    background: var(--surface);
+    border-color: var(--line-soft);
+  }
+
+  .note-question-drawer[data-open="true"] {
+    @apply translate-x-0;
+  }
+
   .topbar-shell {
     border-bottom: 1px solid var(--topbar-border);
     background: var(--topbar-bg);
