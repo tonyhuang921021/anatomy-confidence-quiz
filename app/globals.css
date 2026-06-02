@@ -248,13 +248,6 @@ select {
     color: var(--ink-main);
   }
 
-  @media (min-width: 1180px) {
-    .note-markdown {
-      column-count: 2;
-      column-gap: 2.25rem;
-    }
-  }
-
   .note-markdown h1,
   .note-markdown h2,
   .note-markdown h3,
