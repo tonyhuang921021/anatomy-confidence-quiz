@@ -31,6 +31,11 @@ grant select, insert, update, delete
 
 alter table public.quiz_sessions enable row level security;
 
+drop policy if exists "Users can read their own quiz sessions" on public.quiz_sessions;
+drop policy if exists "Users can insert their own quiz sessions" on public.quiz_sessions;
+drop policy if exists "Users can update their own quiz sessions" on public.quiz_sessions;
+drop policy if exists "Users can delete their own quiz sessions" on public.quiz_sessions;
+
 create policy "Users can read their own quiz sessions"
 on public.quiz_sessions
 for select
