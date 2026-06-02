@@ -36,8 +36,10 @@ function safeLocalStorageSetItem(key: string, value: string) {
   if (!isBrowser()) return;
   try {
     window.localStorage.setItem(key, value);
+    return true;
   } catch {
     // Ignore storage write failures on restrictive browsers/private mode.
+    return false;
   }
 }
 
@@ -45,8 +47,10 @@ function safeLocalStorageRemoveItem(key: string) {
   if (!isBrowser()) return;
   try {
     window.localStorage.removeItem(key);
+    return true;
   } catch {
     // Ignore storage delete failures on restrictive browsers/private mode.
+    return false;
   }
 }
 
@@ -238,6 +242,50 @@ function normalizeSessions(sessions: QuizSession[]) {
   return sessions.map(normalizeSession);
 }
 
+function compactQuestionForStorage(question: Question): Question {
+  return {
+    id: question.id,
+    subject: question.subject,
+    chapter: question.chapter,
+    section: question.section,
+    stem: question.stem,
+    explanation: question.explanation,
+    testedConcept: question.testedConcept,
+    answer: question.answer,
+    options: question.options,
+    acceptedAnswers: question.acceptedAnswers,
+    answerCreditType: question.answerCreditType,
+    source: question.source,
+    sourceType: question.sourceType,
+    sourceYear: question.sourceYear,
+    sourceRound: question.sourceRound,
+    paperCode: question.paperCode,
+    examCode: question.examCode,
+    originalQuestionNumber: question.originalQuestionNumber,
+    memoryTip: question.memoryTip,
+    optionAnalysis: question.optionAnalysis,
+    difficulty: question.difficulty
+  };
+}
+
+function compactGeneratedQuestionsForStorage(session: QuizSession) {
+  const generatedQuestions = (session.generatedQuestions ?? []).filter(Boolean);
+  if (generatedQuestions.length === 0) return undefined;
+
+  const retainedQuestions = generatedQuestions
+    .filter((question) => question.sourceType !== "MOEX_PAST_EXAM")
+    .map(compactQuestionForStorage);
+
+  return retainedQuestions.length > 0 ? retainedQuestions : undefined;
+}
+
+function compactSessionForStorage(session: QuizSession): QuizSession {
+  return {
+    ...session,
+    generatedQuestions: compactGeneratedQuestionsForStorage(session)
+  };
+}
+
 function normalizeQuestionExplanationOverride(
   override?: QuestionExplanationOverride | null
 ): QuestionExplanationOverride | null {
@@ -302,7 +350,7 @@ export function getActiveStorageUser() {
 
 export function saveCurrentSession(session: QuizSession) {
   if (!isBrowser()) return;
-  safeLocalStorageSetItem(getScopedKey(CURRENT_SESSION_KEY), JSON.stringify(session));
+  safeLocalStorageSetItem(getScopedKey(CURRENT_SESSION_KEY), JSON.stringify(compactSessionForStorage(session)));
   window.dispatchEvent(new CustomEvent("current-session-change", { detail: session }));
 }
 
@@ -335,13 +383,28 @@ export function saveCompletedSession(session: QuizSession) {
   if (!isBrowser()) return;
   const sessions = loadCompletedSessions();
   const nextSessions = [...sessions.filter((item) => item.id !== session.id), session];
-  saveCompletedSessions(nextSessions);
+  return saveCompletedSessions(nextSessions);
 }
 
 export function saveCompletedSessions(sessions: QuizSession[]) {
   if (!isBrowser()) return;
-  safeLocalStorageSetItem(getScopedKey(COMPLETED_SESSIONS_KEY), JSON.stringify(sessions));
-  window.dispatchEvent(new CustomEvent("completed-sessions-change", { detail: sessions }));
+  const scopedKey = getScopedKey(COMPLETED_SESSIONS_KEY);
+  const normalized = normalizeSessions(sessions).sort((left, right) =>
+    (left.completedAt ?? left.startedAt).localeCompare(right.completedAt ?? right.startedAt)
+  );
+
+  let persisted = normalized.map(compactSessionForStorage);
+  let didPersist = safeLocalStorageSetItem(scopedKey, JSON.stringify(persisted));
+
+  while (!didPersist && persisted.length > 1) {
+    persisted = persisted.slice(1);
+    didPersist = safeLocalStorageSetItem(scopedKey, JSON.stringify(persisted));
+  }
+
+  if (!didPersist) return false;
+
+  window.dispatchEvent(new CustomEvent("completed-sessions-change", { detail: persisted }));
+  return true;
 }
 
 export function loadCompletedSessions(): QuizSession[] {

@@ -660,8 +660,11 @@ export default function QuizPage() {
 
   function finalizeCompletedSession(completedSession: QuizSession) {
     setSession(completedSession);
-    saveCompletedSession(completedSession);
-    clearCurrentSession();
+    saveCurrentSession(completedSession);
+    const saved = saveCompletedSession(completedSession);
+    if (saved !== false) {
+      clearCurrentSession();
+    }
   }
 
   function handleSelectConfidence(value: ConfidenceLevel) {
