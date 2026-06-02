@@ -3,13 +3,11 @@
 import Link from "next/link";
 import { useDeferredValue, useEffect, useMemo, useState } from "react";
 import { useAuth } from "@/components/AuthProvider";
-import { enabledSubjects } from "@/data/subjectRegistry";
+import { MED1_SUBJECTS, MED2_SUBJECTS, subjectRegistry } from "@/data/subjectRegistry";
 import { loadStudyNotes } from "@/lib/studyNotes";
 import type { StudyNoteSummary } from "@/types/quiz";
 
-const SUBJECT_OPTIONS = enabledSubjects.filter(
-  (item) => item.subject !== "醫學（一）" && item.subject !== "醫學（二）"
-);
+const SUBJECT_OPTIONS = [...MED1_SUBJECTS, ...MED2_SUBJECTS].map((subjectName) => subjectRegistry[subjectName]);
 
 function formatDate(value: string) {
   return new Intl.DateTimeFormat("zh-Hant", {
@@ -76,7 +74,7 @@ export default function StudyNotesPage() {
             <p className="eyebrow">Study Notes</p>
             <h1 className="display-title mt-3 text-4xl sm:text-5xl">學習筆記庫</h1>
             <p className="body-soft mt-4 max-w-2xl leading-7">
-              收 ChatGPT 產出的複習資料，保留 Markdown 排版，再慢慢接回題庫、tag 和知識連結。
+              收各種複習資料與整理筆記，保留 Markdown 排版，再慢慢接回題庫、tag 和知識連結。
             </p>
           </div>
           <Link href="/notes/new" className="primary-pill">
@@ -149,7 +147,7 @@ export default function StudyNotesPage() {
               {!loading && notes.length === 0 ? (
                 <div className="rounded-3xl border border-dashed border-slate-200 bg-slate-50 p-6">
                   <p className="font-semibold text-slate-900">目前還沒有符合條件的筆記。</p>
-                  <p className="body-soft mt-2 text-sm">先新增一篇 ChatGPT 複習資料，筆記庫就會開始長出來。</p>
+                  <p className="body-soft mt-2 text-sm">先新增一篇複習資料，筆記庫就會開始長出來。</p>
                 </div>
               ) : null}
               {notes.map((note) => (

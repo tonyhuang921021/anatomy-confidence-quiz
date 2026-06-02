@@ -350,7 +350,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ ok: false, message: "請輸入筆記標題。" }, { status: 400 });
     }
     if (!rawMarkdown) {
-      return NextResponse.json({ ok: false, message: "請貼上 ChatGPT 學習資料。" }, { status: 400 });
+      return NextResponse.json({ ok: false, message: "請貼上學習資料。" }, { status: 400 });
     }
 
     const collectionId = await getOrCreateCollectionId(supabase, userId, body?.collectionName);
@@ -366,7 +366,7 @@ export async function POST(request: NextRequest) {
         subject: normalizeOptionalText(body?.subject),
         chapter: normalizeOptionalText(body?.chapter),
         section: normalizeOptionalText(body?.section),
-        source: "chatgpt",
+        source: "manual",
         updated_at: now
       })
       .select("id, user_id, collection_id, title, raw_markdown, summary, subject, chapter, section, source, created_at, updated_at")

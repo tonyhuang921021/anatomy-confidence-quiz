@@ -872,7 +872,7 @@ create table if not exists public.study_notes (
   subject text,
   chapter text,
   section text,
-  source text not null default 'chatgpt',
+  source text not null default 'manual',
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now()
 );

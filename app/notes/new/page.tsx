@@ -5,15 +5,13 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/components/AuthProvider";
 import { getCanonicalQuestionBank } from "@/data/med1QuestionBank";
-import { enabledSubjects, subjectRegistry } from "@/data/subjectRegistry";
+import { MED1_SUBJECTS, MED2_SUBJECTS, subjectRegistry } from "@/data/subjectRegistry";
 import { DEFAULT_QUIZ_SETTINGS } from "@/lib/quizAnalysis";
 import { saveQuizSettings } from "@/lib/storage";
 import { createStudyNote, parseStudyNoteMetadata } from "@/lib/studyNotes";
 import type { Question, StudyNoteQuestionLink, StudyNoteTag, SubjectName } from "@/types/quiz";
 
-const SUBJECT_OPTIONS = enabledSubjects.filter(
-  (item) => item.subject !== "醫學（一）" && item.subject !== "醫學（二）"
-);
+const SUBJECT_OPTIONS = [...MED1_SUBJECTS, ...MED2_SUBJECTS].map((subjectName) => subjectRegistry[subjectName]);
 
 function buildQuestionSearchText(question: Question) {
   return [
@@ -193,9 +191,9 @@ export default function NewStudyNotePage() {
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div>
             <p className="eyebrow">New Study Note</p>
-            <h1 className="display-title mt-3 text-4xl sm:text-5xl">新增 ChatGPT 學習筆記</h1>
+            <h1 className="display-title mt-3 text-4xl sm:text-5xl">新增學習筆記</h1>
             <p className="body-soft mt-4 max-w-2xl leading-7">
-              貼上 ChatGPT 回覆全文，網站會保留 Markdown 排版；分類、tag 和相關題可以先手動補。
+              貼上學習資料全文，網站會保留 Markdown 排版；分類、tag 和相關題可以先手動補。
             </p>
           </div>
           <Link href="/notes" className="secondary-pill">
@@ -222,11 +220,11 @@ export default function NewStudyNotePage() {
                 />
               </label>
               <label className="grid gap-2 text-sm font-semibold text-slate-700">
-                ChatGPT Markdown 全文
+                Markdown 全文
                 <textarea
                   value={rawMarkdown}
                   onChange={(event) => setRawMarkdown(event.target.value)}
-                  placeholder="把 ChatGPT 產出的複習資料貼在這裡..."
+                  placeholder="把學習資料、整理筆記或複習重點貼在這裡..."
                   rows={18}
                   className="min-h-[420px] rounded-3xl border border-slate-200 bg-white px-4 py-3 font-mono text-sm leading-6 outline-none focus:border-teal-500"
                 />
@@ -331,7 +329,7 @@ export default function NewStudyNotePage() {
                 <textarea
                   value={metadataJson}
                   onChange={(event) => setMetadataJson(event.target.value)}
-                  placeholder='可貼 ChatGPT 生出的 JSON，例如 {"summary":"...","tags":[{"tag":"視交叉","tag_type":"anatomy"}]}'
+                  placeholder='可貼整理好的 metadata JSON，例如 {"summary":"...","tags":[{"tag":"視交叉","tag_type":"anatomy"}]}'
                   rows={7}
                   className="mt-3 w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 font-mono text-xs leading-5 outline-none focus:border-teal-500"
                 />
