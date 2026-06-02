@@ -873,12 +873,19 @@ create table if not exists public.study_notes (
   chapter text,
   section text,
   source text not null default 'manual',
+  display_order integer not null default 0,
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now()
 );
 
+alter table public.study_notes
+  add column if not exists display_order integer not null default 0;
+
 create index if not exists study_notes_user_id_updated_at_idx
 on public.study_notes (user_id, updated_at desc);
+
+create index if not exists study_notes_user_id_subject_display_order_idx
+on public.study_notes (user_id, subject, display_order, created_at);
 
 create index if not exists study_notes_user_id_subject_idx
 on public.study_notes (user_id, subject, updated_at desc);

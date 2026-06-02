@@ -20,6 +20,7 @@ type StudyNoteRow = {
   chapter?: string | null;
   section?: string | null;
   source?: string | null;
+  display_order?: number | null;
   created_at: string;
   updated_at: string;
 };
@@ -151,9 +152,32 @@ function mapNoteSummary(
     collectionName: collection?.name,
     tags,
     questionLinkCount,
+    displayOrder: typeof row.display_order === "number" ? row.display_order : undefined,
     createdAt: row.created_at,
     updatedAt: row.updated_at
   };
+}
+
+async function getNextDisplayOrder(
+  supabase: ServiceSupabaseClient,
+  userId: string,
+  subject?: string
+) {
+  let query = supabase
+    .from("study_notes")
+    .select("display_order")
+    .eq("user_id", userId)
+    .order("display_order", { ascending: false })
+    .limit(1);
+
+  const normalizedSubject = normalizeOptionalText(subject);
+  query = normalizedSubject ? query.eq("subject", normalizedSubject) : query.is("subject", null);
+
+  const { data, error } = await query;
+  if (error) throw error;
+
+  const current = Number(((data ?? [])[0] as { display_order?: number } | undefined)?.display_order ?? 0);
+  return current + 1000;
 }
 
 async function loadTagsByNoteId(supabase: ServiceSupabaseClient, userId: string, noteIds: string[]) {
@@ -261,9 +285,10 @@ export async function GET(request: NextRequest) {
 
     let query = supabase
       .from("study_notes")
-      .select("id, user_id, collection_id, title, raw_markdown, summary, subject, chapter, section, source, created_at, updated_at")
+      .select("id, user_id, collection_id, title, raw_markdown, summary, subject, chapter, section, source, display_order, created_at, updated_at")
       .eq("user_id", userId)
-      .order("updated_at", { ascending: false });
+      .order("display_order", { ascending: true })
+      .order("created_at", { ascending: true });
 
     if (noteId) {
       query = query.eq("id", noteId).limit(1);
@@ -363,6 +388,7 @@ export async function POST(request: NextRequest) {
     }
 
     const collectionId = await getOrCreateCollectionId(supabase, userId, body?.collectionName);
+    const displayOrder = await getNextDisplayOrder(supabase, userId, body?.subject);
     const now = new Date().toISOString();
     const { data: insertedNote, error: insertError } = await supabase
       .from("study_notes")
@@ -376,9 +402,10 @@ export async function POST(request: NextRequest) {
         chapter: normalizeOptionalText(body?.chapter),
         section: normalizeOptionalText(body?.section),
         source: "manual",
+        display_order: displayOrder,
         updated_at: now
       })
-      .select("id, user_id, collection_id, title, raw_markdown, summary, subject, chapter, section, source, created_at, updated_at")
+      .select("id, user_id, collection_id, title, raw_markdown, summary, subject, chapter, section, source, display_order, created_at, updated_at")
       .single();
 
     if (insertError) throw insertError;
@@ -487,7 +514,7 @@ export async function PUT(request: NextRequest) {
       })
       .eq("id", noteId)
       .eq("user_id", userId)
-      .select("id, user_id, collection_id, title, raw_markdown, summary, subject, chapter, section, source, created_at, updated_at")
+      .select("id, user_id, collection_id, title, raw_markdown, summary, subject, chapter, section, source, display_order, created_at, updated_at")
       .single();
 
     if (updateError) throw updateError;

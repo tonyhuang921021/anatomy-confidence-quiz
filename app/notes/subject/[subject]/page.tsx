@@ -9,32 +9,8 @@ import { getCanonicalQuestionBank } from "@/data/med1QuestionBank";
 import { subjectRegistry } from "@/data/subjectRegistry";
 import { isAdminEmail } from "@/lib/adminAccess";
 import { isNoteSubject } from "@/lib/noteSubjects";
-import { loadStudyNote, loadStudyNotes } from "@/lib/studyNotes";
+import { loadStudyNote, loadStudyNotes, reorderStudyNotes } from "@/lib/studyNotes";
 import type { Question, StudyNoteDetail, SubjectName } from "@/types/quiz";
-
-type OutlineSection = {
-  chapter: string;
-  section: string;
-};
-
-function getNoteSectionKey(note: StudyNoteDetail) {
-  return note.section || note.chapter || "未分小節";
-}
-
-function getSectionAnchor(section: string) {
-  return encodeURIComponent(section);
-}
-
-function groupNotesBySection(notes: StudyNoteDetail[]) {
-  const map = new Map<string, StudyNoteDetail[]>();
-  for (const note of notes) {
-    const key = getNoteSectionKey(note);
-    const bucket = map.get(key) ?? [];
-    bucket.push(note);
-    map.set(key, bucket);
-  }
-  return map;
-}
 
 function buildQuestionMap(): Map<string, Question> {
   return new Map(
@@ -49,6 +25,7 @@ export default function SubjectNotesPage() {
   const subject = decodeURIComponent(params.subject ?? "");
   const { configured, session, user } = useAuth();
   const [notes, setNotes] = useState<StudyNoteDetail[]>([]);
+  const [draggingNoteId, setDraggingNoteId] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const notesAllowed = isAdminEmail(user?.email);
@@ -86,26 +63,34 @@ export default function SubjectNotesPage() {
     };
   }, [configured, notesAllowed, session?.access_token, subject, validSubject]);
 
-  const groupedNotes = useMemo(() => groupNotesBySection(notes), [notes]);
   const questionMap = useMemo(() => buildQuestionMap(), []);
 
-  const orderedSections = useMemo<OutlineSection[]>(() => {
-    const outline = (subjectItem?.chapters ?? []).flatMap((chapter) =>
-      chapter.sections.map((section) => ({
-        chapter: chapter.chapter,
-        section
-      }))
-    );
-    const outlineSectionNames = outline.map((item) => item.section);
-    const extra = Array.from(groupedNotes.keys())
-      .filter((section) => !outlineSectionNames.includes(section))
-      .map((section) => ({
-        chapter: "未列入小節排序",
-        section
-      }));
+  async function persistOrder(nextNotes: StudyNoteDetail[]) {
+    if (!session?.access_token) return;
+    try {
+      await reorderStudyNotes({
+        accessToken: session.access_token,
+        orderedIds: nextNotes.map((note) => note.id)
+      });
+    } catch (rawError) {
+      setError(rawError instanceof Error ? rawError.message : "筆記排序更新失敗");
+    }
+  }
 
-    return [...outline, ...extra].filter((item) => groupedNotes.has(item.section));
-  }, [groupedNotes, subjectItem?.chapters]);
+  function moveDraggedNote(targetNoteId: string) {
+    if (!draggingNoteId || draggingNoteId === targetNoteId) return;
+    setNotes((currentNotes) => {
+      const fromIndex = currentNotes.findIndex((note) => note.id === draggingNoteId);
+      const toIndex = currentNotes.findIndex((note) => note.id === targetNoteId);
+      if (fromIndex < 0 || toIndex < 0) return currentNotes;
+
+      const nextNotes = [...currentNotes];
+      const [movedNote] = nextNotes.splice(fromIndex, 1);
+      nextNotes.splice(toIndex, 0, movedNote);
+      void persistOrder(nextNotes);
+      return nextNotes;
+    });
+  }
 
   return (
     <main className="shell max-w-[1600px]">
@@ -116,8 +101,8 @@ export default function SubjectNotesPage() {
             <h1 className="display-title mt-3 text-4xl sm:text-5xl">
               {subjectItem?.label ?? "學習筆記"}
             </h1>
-              <p className="body-soft mt-4 max-w-3xl leading-7">
-              這裡會把同一科的筆記串成一份大文件。左邊先依照目前題庫小節排序，之後可替換成小傑小節目錄。
+            <p className="body-soft mt-4 max-w-3xl leading-7">
+              這裡會把同一科的筆記串成一份大文件。左邊顯示筆記名稱，抓住六點把手可以調整順序。
             </p>
           </div>
           <div className="flex flex-wrap gap-2">
@@ -144,24 +129,39 @@ export default function SubjectNotesPage() {
           <div className="relative">
             <aside className="note-outline-drawer">
               <div className="note-outline-handle" aria-hidden="true">
-                小節
+                筆記
               </div>
               <div className="note-outline-panel surface-card">
-                <p className="text-xs font-bold uppercase tracking-[0.22em] text-slate-500">Outline</p>
+                <p className="text-xs font-bold uppercase tracking-[0.22em] text-slate-500">Notes</p>
                 <div className="mt-4 grid gap-2">
-                  {orderedSections.length > 0 ? (
-                    orderedSections.map((item) => (
-                      <a
-                        key={`${item.chapter}-${item.section}`}
-                        href={`#${getSectionAnchor(item.section)}`}
-                        className="rounded-2xl px-3 py-2 text-sm font-bold text-slate-700 hover:bg-teal-50 hover:text-teal-800"
+                  {notes.length > 0 ? (
+                    notes.map((note) => (
+                      <div
+                        key={note.id}
+                        onDragOver={(event) => event.preventDefault()}
+                        onDrop={() => moveDraggedNote(note.id)}
+                        className="group grid grid-cols-[32px_minmax(0,1fr)] items-center gap-2 rounded-2xl px-2 py-2 hover:bg-teal-50"
                       >
-                        <span className="block text-[11px] font-semibold text-slate-400">{item.chapter}</span>
-                        {item.section}
-                      </a>
+                        <button
+                          type="button"
+                          draggable
+                          onDragStart={() => setDraggingNoteId(note.id)}
+                          onDragEnd={() => setDraggingNoteId("")}
+                          aria-label={`拖曳排序：${note.title}`}
+                          className="grid h-8 w-8 cursor-grab place-items-center rounded-xl text-slate-300 transition hover:bg-white hover:text-teal-700 active:cursor-grabbing"
+                        >
+                          <span className="leading-none">⠿</span>
+                        </button>
+                        <a
+                          href={`#note-${note.id}`}
+                          className="min-w-0 truncate text-sm font-bold text-slate-700 group-hover:text-teal-800"
+                        >
+                          {note.title}
+                        </a>
+                      </div>
                     ))
                   ) : (
-                    <p className="body-soft text-sm">目前還沒有筆記小節。</p>
+                    <p className="body-soft text-sm">目前還沒有筆記。</p>
                   )}
                 </div>
               </div>
@@ -178,39 +178,54 @@ export default function SubjectNotesPage() {
               ) : null}
 
               <div className="grid gap-10">
-                {orderedSections.map((outlineSection) => {
-                  const sectionNotes = groupedNotes.get(outlineSection.section) ?? [];
-                  if (sectionNotes.length === 0) return null;
+                {notes.map((note) => {
+                  const relatedQuestions = note.questionLinks
+                    .map((link) => ({
+                      link,
+                      question: questionMap.get(link.questionId)
+                    }))
+                    .filter((item): item is { link: typeof item.link; question: Question } => Boolean(item.question));
+
                   return (
-                    <section key={outlineSection.section} id={getSectionAnchor(outlineSection.section)} className="scroll-mt-8">
-                      <p className="text-sm font-bold uppercase tracking-[0.18em] text-teal-700">{outlineSection.chapter}</p>
-                      <h2 className="mt-2 text-3xl font-black text-slate-950">{outlineSection.section}</h2>
-                      <div className="mt-5 grid gap-6">
-                        {sectionNotes.map((note) => (
-                          <article key={note.id} className="rounded-[2rem] border border-slate-200 bg-white p-5 sm:p-7">
-                            <div className="flex flex-wrap items-start justify-between gap-3">
-                              <div>
-                                <p className="text-xs font-bold uppercase tracking-[0.2em] text-teal-700">
-                                  {note.section || note.collectionName || "Study Note"}
-                                </p>
-                                <h3 className="mt-2 text-2xl font-black text-slate-950">{note.title}</h3>
-                                {note.summary ? <p className="body-soft mt-2 leading-7">{note.summary}</p> : null}
+                    <article key={note.id} id={`note-${note.id}`} className="scroll-mt-8 rounded-[2rem] border border-slate-200 bg-white p-5 sm:p-7">
+                      <div className="flex flex-wrap items-start justify-between gap-3">
+                        <div className="min-w-0">
+                          <p className="text-xs font-bold uppercase tracking-[0.2em] text-teal-700">
+                            {note.subject || note.collectionName || "Study Note"}
+                          </p>
+                          <h2 className="mt-2 text-3xl font-black text-slate-950">{note.title}</h2>
+                          {note.summary ? <p className="body-soft mt-2 leading-7">{note.summary}</p> : null}
+                        </div>
+                        <div className="flex flex-wrap justify-end gap-2">
+                          {relatedQuestions.length > 0 ? (
+                            <details className="relative">
+                              <summary className="secondary-pill cursor-pointer list-none px-4 py-2 text-sm">
+                                考古題 {relatedQuestions.length}
+                              </summary>
+                              <div className="absolute right-0 z-20 mt-2 grid max-h-96 w-[min(88vw,420px)] gap-2 overflow-auto rounded-3xl border border-slate-200 bg-white p-3 shadow-xl">
+                                {relatedQuestions.map(({ link, question }) => (
+                                  <div key={`${question.id}-${link.relationType}`} className="rounded-2xl bg-slate-50 p-3 text-xs leading-5 text-slate-700">
+                                    <p className="font-bold text-slate-950">{question.id}</p>
+                                    <p className="mt-1 line-clamp-3">{question.stem}</p>
+                                    {link.reason ? <p className="mt-2 text-slate-500">{link.reason}</p> : null}
+                                  </div>
+                                ))}
                               </div>
-                              <Link href={`/notes/${note.id}`} className="secondary-pill px-4 py-2 text-sm">
-                                編輯 / 詳情
-                              </Link>
-                            </div>
-                            <div className="mt-6">
-                              <StudyNoteMarkdown
-                                markdown={note.rawMarkdown}
-                                questionMap={questionMap}
-                                questionLinks={note.questionLinks}
-                              />
-                            </div>
-                          </article>
-                        ))}
+                            </details>
+                          ) : null}
+                          <Link href={`/notes/${note.id}`} className="secondary-pill px-4 py-2 text-sm">
+                            編輯 / 詳情
+                          </Link>
+                        </div>
                       </div>
-                    </section>
+                      <div className="mt-6">
+                        <StudyNoteMarkdown
+                          markdown={note.rawMarkdown}
+                          questionMap={questionMap}
+                          questionLinks={note.questionLinks}
+                        />
+                      </div>
+                    </article>
                   );
                 })}
               </div>

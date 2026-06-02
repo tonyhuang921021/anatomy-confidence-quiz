@@ -7,10 +7,13 @@ import { useAuth } from "@/components/AuthProvider";
 import { getCanonicalQuestionBank } from "@/data/med1QuestionBank";
 import { MED1_SUBJECTS, MED2_SUBJECTS, subjectRegistry } from "@/data/subjectRegistry";
 import { isAdminEmail } from "@/lib/adminAccess";
-import { DEFAULT_QUIZ_SETTINGS } from "@/lib/quizAnalysis";
-import { saveQuizSettings } from "@/lib/storage";
 import { STUDY_NOTE_FORMAT_PROMPT } from "@/lib/studyNotePrompt";
-import { createStudyNote, parseStudyNoteMetadata } from "@/lib/studyNotes";
+import {
+  createStudyNote,
+  inferStudyNoteTitle,
+  parseStudyNoteMetadata,
+  stripStudyNoteMetadataBlock
+} from "@/lib/studyNotes";
 import type { Question, StudyNoteQuestionLink, StudyNoteTag, SubjectName } from "@/types/quiz";
 
 const SUBJECT_OPTIONS = [...MED1_SUBJECTS, ...MED2_SUBJECTS].map((subjectName) => subjectRegistry[subjectName]);
@@ -57,11 +60,8 @@ export default function NewStudyNotePage() {
   const [rawMarkdown, setRawMarkdown] = useState("");
   const [summary, setSummary] = useState("");
   const [subject, setSubject] = useState<SubjectName | "">("");
-  const [chapter, setChapter] = useState("");
-  const [section, setSection] = useState("");
   const [collectionName, setCollectionName] = useState("");
   const [manualTags, setManualTags] = useState("");
-  const [metadataJson, setMetadataJson] = useState("");
   const [metadataTags, setMetadataTags] = useState<StudyNoteTag[]>([]);
   const [questionSearch, setQuestionSearch] = useState("");
   const [questionLinks, setQuestionLinks] = useState<StudyNoteQuestionLink[]>([]);
@@ -70,10 +70,6 @@ export default function NewStudyNotePage() {
   const [isPending, startTransition] = useTransition();
   const deferredQuestionSearch = useDeferredValue(questionSearch);
   const notesAllowed = isAdminEmail(user?.email);
-
-  const selectedSubjectItem = subject ? subjectRegistry[subject] : null;
-  const chapterOptions = selectedSubjectItem?.chapters ?? [];
-  const sectionOptions = chapterOptions.find((item) => item.chapter === chapter)?.sections ?? [];
 
   const allQuestions = useMemo(
     () =>
@@ -106,27 +102,21 @@ export default function NewStudyNotePage() {
       .slice(0, 12);
   }, [allQuestions, deferredQuestionSearch, subject]);
 
-  function applyMetadata() {
-    const parsed = parseStudyNoteMetadata(metadataJson);
-    if (!parsed) {
-      setError("metadata JSON 解析失敗，請確認是不是完整 JSON 或 json code block。");
-      setMessage("");
-      return;
-    }
+  function applyMetadataFromMarkdown(markdown: string) {
+    const parsed = parseStudyNoteMetadata(markdown);
+    if (!parsed) return;
 
+    if (parsed.title) setTitle(parsed.title);
     if (parsed.summary) setSummary(parsed.summary);
-    if (parsed.subject) {
-      setSubject(parsed.subject);
-      setChapter("");
-      setSection("");
-    }
-    if (parsed.chapter) setChapter(parsed.chapter);
-    if (parsed.section) setSection(parsed.section);
+    if (parsed.subject) setSubject(parsed.subject);
     if (parsed.collectionName) setCollectionName(parsed.collectionName);
     setMetadataTags((current) => mergeUniqueTags(current, parsed.tags ?? []));
     setQuestionLinks((current) => mergeUniqueLinks(current, parsed.questionLinks ?? []));
-    setError("");
-    setMessage("已套用 metadata JSON。");
+  }
+
+  function handleMarkdownChange(value: string) {
+    setRawMarkdown(value);
+    applyMetadataFromMarkdown(value);
   }
 
   function addQuestionLink(question: Question) {
@@ -142,21 +132,6 @@ export default function NewStudyNotePage() {
 
   function removeQuestionLink(questionId: string) {
     setQuestionLinks((current) => current.filter((item) => item.questionId !== questionId));
-  }
-
-  function startLinkedQuiz() {
-    if (questionLinks.length === 0) return;
-    saveQuizSettings({
-      ...DEFAULT_QUIZ_SETTINGS,
-      mode: "custom_paper",
-      questionCount: questionLinks.length,
-      subjectFilter: subject || "全部",
-      subjectFilters: subject ? [subject] : undefined,
-      customQuestionIds: questionLinks.map((item) => item.questionId),
-      customPoolLabel: title ? `筆記：${title}` : "學習筆記相關題",
-      customPaperName: title || "學習筆記相關題"
-    });
-    router.push("/quiz?new=1");
   }
 
   async function copyFormatPrompt() {
@@ -184,14 +159,14 @@ export default function NewStudyNotePage() {
 
     startTransition(async () => {
       try {
+        const cleanedMarkdown = stripStudyNoteMetadataBlock(rawMarkdown);
+        const inferredTitle = title || inferStudyNoteTitle(rawMarkdown);
         const note = await createStudyNote({
           accessToken: session.access_token,
-          title,
-          rawMarkdown,
+          title: inferredTitle,
+          rawMarkdown: cleanedMarkdown,
           summary,
           subject,
-          chapter,
-          section,
           collectionName,
           tags: mergeUniqueTags(parseManualTags(manualTags), metadataTags),
           questionLinks
@@ -211,7 +186,7 @@ export default function NewStudyNotePage() {
             <p className="eyebrow">New Study Note</p>
             <h1 className="display-title mt-3 text-4xl sm:text-5xl">新增學習筆記</h1>
             <p className="body-soft mt-4 max-w-2xl leading-7">
-              貼上學習資料全文，網站會保留 Markdown 排版；分類、tag 和相關題可以先手動補。
+              貼上 ChatGPT 產出的 Markdown，網站會自動讀取開頭的 note-meta 來建立標題、科目、分類與摘要。
             </p>
           </div>
           <Link href="/notes" className="secondary-pill">
@@ -231,33 +206,23 @@ export default function NewStudyNotePage() {
           <div className="grid min-w-0 gap-6 xl:grid-cols-[minmax(0,1.25fr)_minmax(280px,380px)]">
             <div className="grid min-w-0 gap-4">
               <label className="grid gap-2 text-sm font-semibold text-slate-700">
-                標題
-                <input
-                  value={title}
-                  onChange={(event) => setTitle(event.target.value)}
-                  placeholder="例如 視覺路徑定位總整理"
-                  className="rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm outline-none focus:border-teal-500"
-                />
-              </label>
-              <label className="grid gap-2 text-sm font-semibold text-slate-700">
                 Markdown 全文
                 <textarea
                   value={rawMarkdown}
-                  onChange={(event) => setRawMarkdown(event.target.value)}
+                  onChange={(event) => handleMarkdownChange(event.target.value)}
                   placeholder="把學習資料、整理筆記或複習重點貼在這裡..."
                   rows={18}
                   className="min-h-[420px] rounded-3xl border border-slate-200 bg-white px-4 py-3 font-mono text-sm leading-6 outline-none focus:border-teal-500"
                 />
               </label>
               <label className="grid gap-2 text-sm font-semibold text-slate-700">
-                摘要
-                <textarea
-                  value={summary}
-                  onChange={(event) => setSummary(event.target.value)}
-                  placeholder="可選：寫一小段這篇在講什麼"
-                  rows={3}
-                  className="rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm outline-none focus:border-teal-500"
-                />
+                自動讀取結果
+                <div className="rounded-3xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm leading-7 text-slate-700">
+                  <p><span className="font-bold text-slate-950">標題：</span>{title || inferStudyNoteTitle(rawMarkdown)}</p>
+                  <p><span className="font-bold text-slate-950">科目：</span>{subject || "尚未讀取"}</p>
+                  <p><span className="font-bold text-slate-950">分類：</span>{collectionName || "尚未讀取"}</p>
+                  <p><span className="font-bold text-slate-950">摘要：</span>{summary || "尚未讀取"}</p>
+                </div>
               </label>
             </div>
 
@@ -270,7 +235,7 @@ export default function NewStudyNotePage() {
                   </button>
                 </div>
                 <p className="mt-2 text-sm leading-6 text-slate-600">
-                  先把這段貼給 ChatGPT，再貼你的資料。它只會把原本內容轉成網站看得懂的 Markdown，保留大標到小標、表格和條列。
+                  先把這段貼給 ChatGPT，再貼你的資料。它會在最上方加入 note-meta，網站貼上後會自動建立標題、科目、分類和摘要。
                 </p>
                 <pre className="mt-3 max-h-56 max-w-full overflow-auto whitespace-pre-wrap break-words rounded-2xl bg-slate-950 p-3 text-xs leading-5 text-white">
                   {STUDY_NOTE_FORMAT_PROMPT}
@@ -278,25 +243,14 @@ export default function NewStudyNotePage() {
               </div>
 
               <div className="min-w-0 rounded-3xl border border-slate-200 bg-white p-4">
-                <h2 className="text-lg font-bold text-slate-950">分類</h2>
+                <h2 className="text-lg font-bold text-slate-950">自動分類</h2>
                 <div className="mt-4 grid gap-3">
-                  <label className="grid gap-2 text-sm font-semibold text-slate-700">
-                    資料夾
-                    <input
-                      value={collectionName}
-                      onChange={(event) => setCollectionName(event.target.value)}
-                      placeholder="例如 神經解剖定位"
-                      className="rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm outline-none focus:border-teal-500"
-                    />
-                  </label>
                   <label className="grid gap-2 text-sm font-semibold text-slate-700">
                     科目
                     <select
                       value={subject}
                       onChange={(event) => {
                         setSubject(event.target.value as SubjectName | "");
-                        setChapter("");
-                        setSection("");
                       }}
                       className="rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm outline-none focus:border-teal-500"
                     >
@@ -309,37 +263,13 @@ export default function NewStudyNotePage() {
                     </select>
                   </label>
                   <label className="grid gap-2 text-sm font-semibold text-slate-700">
-                    章節
-                    <select
-                      value={chapter}
-                      onChange={(event) => {
-                        setChapter(event.target.value);
-                        setSection("");
-                      }}
+                    分類
+                    <input
+                      value={collectionName}
+                      onChange={(event) => setCollectionName(event.target.value)}
+                      placeholder="例如 神經解剖定位"
                       className="rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm outline-none focus:border-teal-500"
-                    >
-                      <option value="">未選章節</option>
-                      {chapterOptions.map((item) => (
-                        <option key={item.chapter} value={item.chapter}>
-                          {item.chapter}
-                        </option>
-                      ))}
-                    </select>
-                  </label>
-                  <label className="grid gap-2 text-sm font-semibold text-slate-700">
-                    小節
-                    <select
-                      value={section}
-                      onChange={(event) => setSection(event.target.value)}
-                      className="rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm outline-none focus:border-teal-500"
-                    >
-                      <option value="">未選小節</option>
-                      {sectionOptions.map((item) => (
-                        <option key={item} value={item}>
-                          {item}
-                        </option>
-                      ))}
-                    </select>
+                    />
                   </label>
                   <label className="grid gap-2 text-sm font-semibold text-slate-700">
                     手動 tags
@@ -352,31 +282,6 @@ export default function NewStudyNotePage() {
                     />
                   </label>
                 </div>
-              </div>
-
-              <div className="min-w-0 rounded-3xl border border-slate-200 bg-white p-4">
-                <div className="flex items-center justify-between gap-3">
-                  <h2 className="text-lg font-bold text-slate-950">metadata JSON</h2>
-                  <button type="button" onClick={applyMetadata} className="secondary-pill px-4 py-2 text-sm">
-                    套用
-                  </button>
-                </div>
-                <textarea
-                  value={metadataJson}
-                  onChange={(event) => setMetadataJson(event.target.value)}
-                  placeholder='可貼整理好的 metadata JSON，例如 {"summary":"...","tags":[{"tag":"視交叉","tag_type":"anatomy"}]}'
-                  rows={7}
-                  className="mt-3 w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 font-mono text-xs leading-5 outline-none focus:border-teal-500"
-                />
-                {metadataTags.length > 0 ? (
-                  <div className="mt-3 flex flex-wrap gap-2">
-                    {metadataTags.map((item) => (
-                      <span key={`${item.tagType}-${item.tag}`} className="rounded-full bg-teal-50 px-3 py-1 text-xs font-semibold text-teal-800">
-                        #{item.tag}
-                      </span>
-                    ))}
-                  </div>
-                ) : null}
               </div>
 
               <div className="min-w-0 rounded-3xl border border-slate-200 bg-white p-4">
@@ -418,9 +323,6 @@ export default function NewStudyNotePage() {
                         <p className="mt-1 line-clamp-2">{question.stem}</p>
                       </div>
                     ))}
-                    <button type="button" onClick={startLinkedQuiz} className="secondary-pill justify-center px-4 py-2 text-sm">
-                      先用這些題目試做自訂卷
-                    </button>
                   </div>
                 ) : null}
               </div>

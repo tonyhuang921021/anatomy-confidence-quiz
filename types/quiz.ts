@@ -266,6 +266,7 @@ export type StudyNoteSummary = {
   collectionName?: string;
   tags: StudyNoteTag[];
   questionLinkCount: number;
+  displayOrder?: number;
   createdAt: string;
   updatedAt: string;
 };

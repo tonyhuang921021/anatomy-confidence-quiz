@@ -8,6 +8,7 @@ import type {
 } from "@/types/quiz";
 
 export type StudyNoteMetadataInput = {
+  title?: string;
   summary?: string;
   subject?: SubjectName;
   chapter?: string;
@@ -39,6 +40,11 @@ export type LoadStudyNotesInput = {
   search?: string;
   subject?: string;
   tag?: string;
+};
+
+export type ReorderStudyNotesInput = {
+  accessToken?: string | null;
+  orderedIds: string[];
 };
 
 function tryParseJson<T>(rawText: string): T | null {
@@ -123,11 +129,53 @@ function normalizeMetadataQuestionLinks(rawLinks: unknown): StudyNoteQuestionLin
     .filter((item): item is StudyNoteQuestionLink => Boolean(item));
 }
 
+function parseNoteMetaBlock(rawText: string): Record<string, string> | null {
+  const match = rawText.match(/```note-meta\s*([\s\S]*?)```/i);
+  if (!match) return null;
+
+  const metadata: Record<string, string> = {};
+  match[1].split("\n").forEach((line) => {
+    const dividerIndex = line.indexOf(":");
+    if (dividerIndex <= 0) return;
+    const key = line.slice(0, dividerIndex).trim();
+    const value = line.slice(dividerIndex + 1).trim();
+    if (key && value) metadata[key] = value;
+  });
+  return metadata;
+}
+
+function normalizeMetadataSubject(value?: string): SubjectName | undefined {
+  const trimmed = value?.trim();
+  if (!trimmed) return undefined;
+  return trimmed as SubjectName;
+}
+
+function parseCommaSeparatedTags(value?: string): StudyNoteTag[] {
+  return (value ?? "")
+    .split(/[,，、\n]/)
+    .map((tag) => tag.trim())
+    .filter(Boolean)
+    .map((tag) => ({ tag, tagType: "misc" as const, source: "chatgpt_metadata" as const }));
+}
+
 export function parseStudyNoteMetadata(rawText: string): StudyNoteMetadataInput | null {
+  const noteMeta = parseNoteMetaBlock(rawText);
+  if (noteMeta) {
+    return {
+      title: noteMeta.title,
+      summary: noteMeta.summary,
+      subject: normalizeMetadataSubject(noteMeta.subject),
+      collectionName: noteMeta.collection ?? noteMeta.category ?? noteMeta.collectionName,
+      tags: parseCommaSeparatedTags(noteMeta.tags),
+      questionLinks: []
+    };
+  }
+
   const parsed = tryParseJson<Record<string, unknown>>(rawText);
   if (!parsed) return null;
 
   return {
+    title: typeof parsed.title === "string" ? parsed.title : undefined,
     summary: typeof parsed.summary === "string" ? parsed.summary : undefined,
     subject: typeof parsed.subject === "string" ? (parsed.subject as SubjectName) : undefined,
     chapter: typeof parsed.chapter === "string" ? parsed.chapter : undefined,
@@ -141,6 +189,20 @@ export function parseStudyNoteMetadata(rawText: string): StudyNoteMetadataInput 
     tags: normalizeMetadataTags(parsed.tags),
     questionLinks: normalizeMetadataQuestionLinks(parsed.questionLinks ?? parsed.question_links)
   };
+}
+
+export function stripStudyNoteMetadataBlock(rawText: string) {
+  return rawText.replace(/```note-meta\s*[\s\S]*?```\s*/i, "").trim();
+}
+
+export function inferStudyNoteTitle(rawMarkdown: string) {
+  const metadataTitle = parseStudyNoteMetadata(rawMarkdown)?.title?.trim();
+  if (metadataTitle) return metadataTitle;
+
+  const heading = rawMarkdown.match(/^#\s+(.+)$/m)?.[1]?.trim();
+  if (heading) return heading;
+
+  return "未命名學習筆記";
 }
 
 function buildAuthHeaders(accessToken?: string | null) {
@@ -216,4 +278,13 @@ export async function deleteStudyNote(id: string, accessToken?: string | null): 
     headers: buildAuthHeaders(accessToken)
   });
   await parseStudyNoteResponse<{ deletedId?: string }>(response);
+}
+
+export async function reorderStudyNotes(input: ReorderStudyNotesInput): Promise<void> {
+  const response = await fetch("/api/study-notes/reorder", {
+    method: "POST",
+    headers: buildAuthHeaders(input.accessToken),
+    body: JSON.stringify({ orderedIds: input.orderedIds })
+  });
+  await parseStudyNoteResponse<{ updated?: number }>(response);
 }
