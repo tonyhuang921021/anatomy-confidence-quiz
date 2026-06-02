@@ -30,6 +30,10 @@ export type CreateStudyNoteInput = {
   questionLinks?: StudyNoteQuestionLink[];
 };
 
+export type UpdateStudyNoteInput = CreateStudyNoteInput & {
+  id: string;
+};
+
 export type LoadStudyNotesInput = {
   accessToken?: string | null;
   search?: string;
@@ -191,5 +195,16 @@ export async function createStudyNote(input: CreateStudyNoteInput): Promise<Stud
   });
   const payload = await parseStudyNoteResponse<{ note?: StudyNoteDetail }>(response);
   if (!payload.note) throw new Error("學習筆記建立失敗");
+  return payload.note;
+}
+
+export async function updateStudyNote(input: UpdateStudyNoteInput): Promise<StudyNoteDetail> {
+  const response = await fetch("/api/study-notes", {
+    method: "PUT",
+    headers: buildAuthHeaders(input.accessToken),
+    body: JSON.stringify(input)
+  });
+  const payload = await parseStudyNoteResponse<{ note?: StudyNoteDetail }>(response);
+  if (!payload.note) throw new Error("學習筆記更新失敗");
   return payload.note;
 }

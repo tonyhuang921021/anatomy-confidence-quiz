@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState, useTransition } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { useAuth } from "@/components/AuthProvider";
 import { StudyNoteMarkdown } from "@/components/StudyNoteMarkdown";
@@ -9,7 +9,7 @@ import { getCanonicalQuestionBank } from "@/data/med1QuestionBank";
 import { isAdminEmail } from "@/lib/adminAccess";
 import { DEFAULT_QUIZ_SETTINGS } from "@/lib/quizAnalysis";
 import { saveQuizSettings } from "@/lib/storage";
-import { loadStudyNote } from "@/lib/studyNotes";
+import { loadStudyNote, updateStudyNote } from "@/lib/studyNotes";
 import type { Question, StudyNoteDetail } from "@/types/quiz";
 
 function formatDate(value: string) {
@@ -27,8 +27,14 @@ export default function StudyNoteDetailPage() {
   const router = useRouter();
   const { configured, session, user } = useAuth();
   const [note, setNote] = useState<StudyNoteDetail | null>(null);
+  const [draftTitle, setDraftTitle] = useState("");
+  const [draftSummary, setDraftSummary] = useState("");
+  const [draftMarkdown, setDraftMarkdown] = useState("");
+  const [editing, setEditing] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [message, setMessage] = useState("");
+  const [isPending, startTransition] = useTransition();
   const notesAllowed = isAdminEmail(user?.email);
 
   useEffect(() => {
@@ -42,7 +48,12 @@ export default function StudyNoteDetailPage() {
     setError("");
     loadStudyNote(params.id, session.access_token)
       .then((nextNote) => {
-        if (!cancelled) setNote(nextNote);
+        if (!cancelled) {
+          setNote(nextNote);
+          setDraftTitle(nextNote.title);
+          setDraftSummary(nextNote.summary ?? "");
+          setDraftMarkdown(nextNote.rawMarkdown);
+        }
       })
       .catch((rawError) => {
         if (!cancelled) {
@@ -94,31 +105,110 @@ export default function StudyNoteDetailPage() {
     router.push("/quiz?new=1");
   }
 
+  function handleSaveEdit() {
+    if (!note || !session?.access_token) return;
+    setError("");
+    setMessage("");
+    startTransition(async () => {
+      try {
+        const updated = await updateStudyNote({
+          id: note.id,
+          accessToken: session.access_token,
+          title: draftTitle,
+          rawMarkdown: draftMarkdown,
+          summary: draftSummary,
+          subject: note.subject ?? "",
+          chapter: note.chapter,
+          section: note.section,
+          collectionName: note.collectionName,
+          tags: note.tags,
+          questionLinks: note.questionLinks
+        });
+        setNote(updated);
+        setEditing(false);
+        setMessage("筆記已更新。");
+      } catch (rawError) {
+        setError(rawError instanceof Error ? rawError.message : "筆記更新失敗");
+      }
+    });
+  }
+
   return (
     <main className="shell">
       <section className="surface-card p-6 sm:p-8">
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div>
             <p className="eyebrow">Study Note</p>
-            <h1 className="display-title mt-3 text-4xl sm:text-5xl">
-              {note?.title ?? "學習筆記"}
-            </h1>
+            {editing ? (
+              <input
+                value={draftTitle}
+                onChange={(event) => setDraftTitle(event.target.value)}
+                className="mt-3 w-full rounded-3xl border border-slate-200 bg-white px-4 py-3 text-3xl font-black text-slate-950 outline-none focus:border-teal-500 sm:text-5xl"
+              />
+            ) : (
+              <h1 className="display-title mt-3 text-4xl sm:text-5xl">
+                {note?.title ?? "學習筆記"}
+              </h1>
+            )}
             {note?.summary ? <p className="body-soft mt-4 max-w-3xl leading-7">{note.summary}</p> : null}
           </div>
-          <Link href="/notes" className="secondary-pill">
-            回筆記庫
-          </Link>
+          <div className="flex flex-wrap gap-2">
+            {note && notesAllowed ? (
+              <button type="button" onClick={() => setEditing((value) => !value)} className="secondary-pill">
+                {editing ? "取消編輯" : "編輯筆記"}
+              </button>
+            ) : null}
+            <Link href={note?.subject ? `/notes/subject/${encodeURIComponent(note.subject)}` : "/notes"} className="secondary-pill">
+              回筆記庫
+            </Link>
+          </div>
         </div>
       </section>
 
-      <section className="mt-6 grid gap-6 xl:grid-cols-[minmax(0,1fr)_360px]">
-        <article className="surface-card min-w-0 p-5 sm:p-8">
+      <section className="mt-6 grid gap-6 xl:grid-cols-[minmax(0,1fr)_340px]">
+        <article className="surface-card min-w-0 p-5 sm:p-8 lg:p-10">
           {!configured ? <p className="body-soft">Supabase 尚未設定，學習筆記需要雲端儲存才能使用。</p> : null}
           {configured && !user ? <p className="body-soft">請先登入，才能讀取自己的私人筆記。</p> : null}
           {configured && user && !notesAllowed ? <p className="body-soft">學習筆記目前只開放站長使用。</p> : null}
           {loading ? <p className="body-soft">正在載入筆記...</p> : null}
           {error ? <p className="rounded-2xl bg-rose-50 px-4 py-3 text-sm font-semibold text-rose-700">{error}</p> : null}
-          {note ? <StudyNoteMarkdown markdown={note.rawMarkdown} /> : null}
+          {message ? <p className="rounded-2xl bg-teal-50 px-4 py-3 text-sm font-semibold text-teal-800">{message}</p> : null}
+          {note && editing ? (
+            <div className="grid gap-4">
+              <label className="grid gap-2 text-sm font-semibold text-slate-700">
+                摘要
+                <textarea
+                  value={draftSummary}
+                  onChange={(event) => setDraftSummary(event.target.value)}
+                  rows={3}
+                  className="rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm outline-none focus:border-teal-500"
+                />
+              </label>
+              <label className="grid gap-2 text-sm font-semibold text-slate-700">
+                Markdown 內容
+                <textarea
+                  value={draftMarkdown}
+                  onChange={(event) => setDraftMarkdown(event.target.value)}
+                  rows={24}
+                  className="min-h-[620px] rounded-3xl border border-slate-200 bg-white px-4 py-3 font-mono text-sm leading-6 outline-none focus:border-teal-500"
+                />
+              </label>
+              <button
+                type="button"
+                onClick={handleSaveEdit}
+                disabled={isPending}
+                className="primary-pill justify-center disabled:opacity-60"
+              >
+                {isPending ? "儲存中..." : "儲存修改"}
+              </button>
+            </div>
+          ) : note ? (
+            <StudyNoteMarkdown
+              markdown={note.rawMarkdown}
+              questionMap={questionMap}
+              questionLinks={note.questionLinks}
+            />
+          ) : null}
         </article>
 
         <aside className="grid content-start gap-4">

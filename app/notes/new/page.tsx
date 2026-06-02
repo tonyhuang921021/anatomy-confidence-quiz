@@ -9,6 +9,7 @@ import { MED1_SUBJECTS, MED2_SUBJECTS, subjectRegistry } from "@/data/subjectReg
 import { isAdminEmail } from "@/lib/adminAccess";
 import { DEFAULT_QUIZ_SETTINGS } from "@/lib/quizAnalysis";
 import { saveQuizSettings } from "@/lib/storage";
+import { STUDY_NOTE_FORMAT_PROMPT } from "@/lib/studyNotePrompt";
 import { createStudyNote, parseStudyNoteMetadata } from "@/lib/studyNotes";
 import type { Question, StudyNoteQuestionLink, StudyNoteTag, SubjectName } from "@/types/quiz";
 
@@ -158,6 +159,17 @@ export default function NewStudyNotePage() {
     router.push("/quiz?new=1");
   }
 
+  async function copyFormatPrompt() {
+    try {
+      await navigator.clipboard.writeText(STUDY_NOTE_FORMAT_PROMPT);
+      setMessage("已複製固定格式提示，可以貼給 ChatGPT。");
+      setError("");
+    } catch {
+      setError("複製失敗，可以手動複製右側格式提示。");
+      setMessage("");
+    }
+  }
+
   function handleSave() {
     if (!session?.access_token) {
       setError("請先登入再儲存筆記。");
@@ -250,6 +262,21 @@ export default function NewStudyNotePage() {
             </div>
 
             <aside className="grid content-start gap-4">
+              <div className="rounded-3xl border border-teal-100 bg-teal-50/70 p-4">
+                <div className="flex items-center justify-between gap-3">
+                  <h2 className="text-lg font-bold text-slate-950">固定格式提示</h2>
+                  <button type="button" onClick={copyFormatPrompt} className="secondary-pill px-4 py-2 text-sm">
+                    複製
+                  </button>
+                </div>
+                <p className="mt-2 text-sm leading-6 text-slate-600">
+                  先把這段貼給 ChatGPT，再貼你的資料。它會用大標題到小標題排版，題目會輸出成網站可展開的小卡短碼。
+                </p>
+                <pre className="mt-3 max-h-56 overflow-auto rounded-2xl bg-slate-950 p-3 text-xs leading-5 text-white">
+                  {STUDY_NOTE_FORMAT_PROMPT}
+                </pre>
+              </div>
+
               <div className="rounded-3xl border border-slate-200 bg-white p-4">
                 <h2 className="text-lg font-bold text-slate-950">分類</h2>
                 <div className="mt-4 grid gap-3">
