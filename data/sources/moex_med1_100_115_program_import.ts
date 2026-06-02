@@ -29057,14 +29057,14 @@ export const moexMed1Questions100to115 = [
     "stem": "有關睪丸的血流，下列何者正確？",
     "options": {
       "A": "睪丸動脈（testicular artery）來自腹主動脈（abdominal aorta）",
-      "B": "左睪丸動脈（left testicular artery）起自腹主動脈（abdominal aorta），右睪丸動脈來自右腎動",
-      "C": "脈（right renal artery）",
-      "D": "左右睪丸動脈（left and right testicular arteries）各源自同側的腎動脈（renal artery） 來自同側的髂內動脈（internal iliac artery）"
+      "B": "左睪丸動脈（left testicular artery）起自腹主動脈（abdominal aorta），右睪丸動脈來自右腎動脈（right renal artery）",
+      "C": "左右睪丸動脈（left and right testicular arteries）各源自同側的腎動脈（renal artery）",
+      "D": "來自同側的髂內動脈（internal iliac artery）"
     },
     "option_A": "睪丸動脈（testicular artery）來自腹主動脈（abdominal aorta）",
-    "option_B": "左睪丸動脈（left testicular artery）起自腹主動脈（abdominal aorta），右睪丸動脈來自右腎動",
-    "option_C": "脈（right renal artery）",
-    "option_D": "左右睪丸動脈（left and right testicular arteries）各源自同側的腎動脈（renal artery） 來自同側的髂內動脈（internal iliac artery）",
+    "option_B": "左睪丸動脈（left testicular artery）起自腹主動脈（abdominal aorta），右睪丸動脈來自右腎動脈（right renal artery）",
+    "option_C": "左右睪丸動脈（left and right testicular arteries）各源自同側的腎動脈（renal artery）",
+    "option_D": "來自同側的髂內動脈（internal iliac artery）",
     "option_E": "",
     "option_count": 4,
     "answer": "A",

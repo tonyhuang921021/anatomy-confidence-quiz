@@ -11048,9 +11048,9 @@ export const anatomyQuestions: Question[] = [
     "stem": "有關睪丸的血流，下列何者正確？",
     "options": {
       "A": "睪丸動脈（testicular artery）來自腹主動脈（abdominal aorta）",
-      "B": "左睪丸動脈（left testicular artery）起自腹主動脈（abdominal aorta），右睪丸動脈來自右腎動",
-      "C": "脈（right renal artery）",
-      "D": "左右睪丸動脈（left and right testicular arteries）各源自同側的腎動脈（renal artery） 來自同側的髂內動脈（internal iliac artery）"
+      "B": "左睪丸動脈（left testicular artery）起自腹主動脈（abdominal aorta），右睪丸動脈來自右腎動脈（right renal artery）",
+      "C": "左右睪丸動脈（left and right testicular arteries）各源自同側的腎動脈（renal artery）",
+      "D": "來自同側的髂內動脈（internal iliac artery）"
     },
     "answer": "A",
     "explanation": "睪丸動脈為腹主動脈直接分支，因睪丸胚胎原位在腹後壁，下降後血供仍保留高位來源。",
@@ -11062,9 +11062,9 @@ export const anatomyQuestions: Question[] = [
     "originalQuestionNumber": 17,
     "optionAnalysis": {
       "A": "正確。睪丸動脈為腹主動脈直接分支，因睪丸胚胎原位在腹後壁，下降後血供仍保留高位來源。",
-      "B": "不選。左睪丸動脈（left testicular artery）起自腹主動脈（abdominal aorta），右睪丸動脈來自右腎動不是本題最符合的答案；本題核心考點是：testicular/ovarian arteries arise directly from abdominal aorta。",
-      "C": "不選。脈（right renal artery）不是本題最符合的答案；本題核心考點是：testicular/ovarian arteries arise directly from abdominal aorta。",
-      "D": "不選。左右睪丸動脈（left and right testicular arteries）各源自同側的腎動脈（renal artery） 來自同側的髂內動脈（internal iliac artery）不是本題最符合的答案；本題核心考點是：testicular/ovarian arteries arise directly from abdominal aorta。"
+      "B": "不選。右睪丸動脈不是來自右腎動脈；本題核心考點是：testicular/ovarian arteries arise directly from abdominal aorta。",
+      "C": "不選。左右睪丸動脈不是各源自同側腎動脈；本題核心考點是：testicular/ovarian arteries arise directly from abdominal aorta。",
+      "D": "不選。睪丸動脈不是來自同側髂內動脈；本題核心考點是：testicular/ovarian arteries arise directly from abdominal aorta。"
     },
     "memoryTip": "性腺動脈跟著胚胎老家，從腹主動脈來。",
     "clinicalLink": "精索內含睪丸動脈，睪丸扭轉會影響血流。",
