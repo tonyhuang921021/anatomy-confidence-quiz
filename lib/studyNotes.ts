@@ -252,6 +252,94 @@ export function stripStudyNoteMetadataBlock(rawText: string) {
   return rawText.trimStart().slice(looseMeta.length).trim();
 }
 
+function isDividerLine(line: string) {
+  return /^[\s\-—–⸻]+$/.test(line.trim()) && line.trim().length >= 3;
+}
+
+function splitTableCells(line: string) {
+  const trimmed = line.trim();
+  if (trimmed.includes("\t")) return trimmed.split("\t").map((cell) => cell.trim()).filter(Boolean);
+  return trimmed.split(/\s{2,}/).map((cell) => cell.trim()).filter(Boolean);
+}
+
+function looksLikePlainTableLine(line: string) {
+  const cells = splitTableCells(line);
+  return cells.length >= 2 && !line.trim().startsWith("|") && !line.trim().startsWith("*") && !line.trim().startsWith("-");
+}
+
+function getHeadingLevel(line: string, previousLine: string, nextLine: string) {
+  const trimmed = line.trim();
+  if (!trimmed || trimmed.startsWith("#") || trimmed.startsWith("*") || trimmed.startsWith("-")) return 0;
+  if (trimmed.includes(":") || trimmed.includes("：")) return 0;
+  if (looksLikePlainTableLine(trimmed)) return 0;
+  if (trimmed.length > 34) return 0;
+  if (/^[A-E]\./.test(trimmed)) return 0;
+  if (previousLine.trim() && nextLine.trim()) return 0;
+
+  if (/總整理|核心概念|高頻|速背/.test(trimmed)) return 1;
+  if (/總表|咽弓|咽囊|咽裂|主動脈弓|疾病|Syndrome|Cyst/.test(trimmed)) return 2;
+  return 3;
+}
+
+function flushTable(tableRows: string[][], output: string[]) {
+  if (tableRows.length < 2) {
+    tableRows.forEach((row) => output.push(row.join(" ")));
+    return;
+  }
+
+  const maxColumns = Math.max(...tableRows.map((row) => row.length));
+  const normalizedRows = tableRows.map((row) => {
+    const nextRow = [...row];
+    while (nextRow.length < maxColumns) nextRow.push("");
+    return nextRow;
+  });
+
+  output.push(`| ${normalizedRows[0].join(" | ")} |`);
+  output.push(`| ${normalizedRows[0].map(() => "---").join(" | ")} |`);
+  normalizedRows.slice(1).forEach((row) => output.push(`| ${row.join(" | ")} |`));
+}
+
+export function normalizeStudyNoteMarkdown(rawText: string) {
+  const lines = rawText.replace(/\r\n/g, "\n").split("\n");
+  const output: string[] = [];
+  let tableRows: string[][] = [];
+
+  lines.forEach((line, index) => {
+    const trimmed = line.trim();
+    const previousLine = lines[index - 1] ?? "";
+    const nextLine = lines[index + 1] ?? "";
+
+    if (looksLikePlainTableLine(line)) {
+      tableRows.push(splitTableCells(line));
+      return;
+    }
+
+    if (tableRows.length > 0) {
+      flushTable(tableRows, output);
+      tableRows = [];
+    }
+
+    if (isDividerLine(line)) {
+      output.push("---");
+      return;
+    }
+
+    const headingLevel = getHeadingLevel(line, previousLine, nextLine);
+    if (headingLevel > 0) {
+      output.push(`${"#".repeat(headingLevel)} ${trimmed}`);
+      return;
+    }
+
+    output.push(line);
+  });
+
+  if (tableRows.length > 0) {
+    flushTable(tableRows, output);
+  }
+
+  return output.join("\n").replace(/\n{3,}/g, "\n\n").trim();
+}
+
 export function inferStudyNoteTitle(rawMarkdown: string) {
   const metadataTitle = parseStudyNoteMetadata(rawMarkdown)?.title?.trim();
   if (metadataTitle) return metadataTitle;

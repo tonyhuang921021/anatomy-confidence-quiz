@@ -11,6 +11,7 @@ import { STUDY_NOTE_FORMAT_PROMPT } from "@/lib/studyNotePrompt";
 import {
   createStudyNote,
   inferStudyNoteTitle,
+  normalizeStudyNoteMarkdown,
   parseStudyNoteMetadata,
   stripStudyNoteMetadataBlock
 } from "@/lib/studyNotes";
@@ -159,7 +160,7 @@ export default function NewStudyNotePage() {
 
     startTransition(async () => {
       try {
-        const cleanedMarkdown = stripStudyNoteMetadataBlock(rawMarkdown);
+        const cleanedMarkdown = normalizeStudyNoteMarkdown(stripStudyNoteMetadataBlock(rawMarkdown));
         const inferredTitle = title || inferStudyNoteTitle(rawMarkdown);
         const note = await createStudyNote({
           accessToken: session.access_token,
