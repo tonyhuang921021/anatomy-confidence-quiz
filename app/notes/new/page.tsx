@@ -264,13 +264,13 @@ export default function NewStudyNotePage() {
             <aside className="grid content-start gap-4">
               <div className="rounded-3xl border border-teal-100 bg-teal-50/70 p-4">
                 <div className="flex items-center justify-between gap-3">
-                  <h2 className="text-lg font-bold text-slate-950">固定格式提示</h2>
+                  <h2 className="text-lg font-bold text-slate-950">Markdown 還原提示</h2>
                   <button type="button" onClick={copyFormatPrompt} className="secondary-pill px-4 py-2 text-sm">
                     複製
                   </button>
                 </div>
                 <p className="mt-2 text-sm leading-6 text-slate-600">
-                  先把這段貼給 ChatGPT，再貼你的資料。它會用大標題到小標題排版，題目會輸出成網站可展開的小卡短碼。
+                  先把這段貼給 ChatGPT，再貼你的資料。它只會把原本內容轉成網站看得懂的 Markdown，保留大標到小標、表格和條列。
                 </p>
                 <pre className="mt-3 max-h-56 overflow-auto rounded-2xl bg-slate-950 p-3 text-xs leading-5 text-white">
                   {STUDY_NOTE_FORMAT_PROMPT}

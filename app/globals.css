@@ -193,7 +193,10 @@ select {
 
   .note-markdown h1,
   .note-markdown h2,
-  .note-markdown h3 {
+  .note-markdown h3,
+  .note-markdown h4,
+  .note-markdown h5,
+  .note-markdown h6 {
     @apply font-bold text-ink;
     line-height: 1.35;
   }
@@ -210,12 +213,22 @@ select {
     @apply mt-6 text-xl;
   }
 
+  .note-markdown h4 {
+    @apply mt-5 text-lg;
+  }
+
+  .note-markdown h5,
+  .note-markdown h6 {
+    @apply mt-4 text-base;
+  }
+
   .note-markdown p,
   .note-markdown ul,
   .note-markdown ol,
   .note-markdown table,
   .note-markdown pre,
-  .note-markdown blockquote {
+  .note-markdown blockquote,
+  .note-markdown hr {
     @apply mt-4;
   }
 
@@ -262,7 +275,7 @@ select {
   }
 
   .note-markdown table {
-    @apply block w-full overflow-x-auto rounded-2xl border text-sm;
+    @apply block w-full overflow-x-auto rounded-2xl border text-sm shadow-sm;
     border-color: var(--line-soft);
     border-collapse: separate;
     border-spacing: 0;
@@ -276,6 +289,15 @@ select {
 
   .note-markdown th {
     background: color-mix(in srgb, var(--brand-main) 10%, var(--surface));
+  }
+
+  .note-markdown tbody tr:nth-child(even) {
+    background: color-mix(in srgb, var(--brand-main) 4%, var(--surface));
+  }
+
+  .note-markdown hr {
+    @apply border-0 border-t;
+    border-color: var(--line-soft);
   }
 }
 
