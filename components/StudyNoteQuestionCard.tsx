@@ -15,7 +15,7 @@ export function StudyNoteQuestionCard({ question, link, title }: Props) {
 
   if (!question) {
     return (
-      <div className="my-5 rounded-3xl border border-dashed border-slate-200 bg-slate-50 px-4 py-3 text-sm font-semibold text-slate-500">
+      <div className="study-note-question-card my-5 rounded-3xl border border-dashed border-slate-200 bg-slate-50 px-4 py-3 text-sm font-semibold text-slate-500">
         找不到這題：{link?.questionId ?? title ?? "未指定題號"}
       </div>
     );
@@ -24,7 +24,7 @@ export function StudyNoteQuestionCard({ question, link, title }: Props) {
   const optionEntries = Object.entries(question.options).filter(([, value]) => Boolean(value));
 
   return (
-    <div className="my-5 rounded-3xl border border-teal-100 bg-teal-50/70 p-3 shadow-sm">
+    <div className="study-note-question-card my-5 rounded-3xl border border-teal-100 bg-teal-50/70 p-3 shadow-sm">
       <button
         type="button"
         onClick={() => setShowQuestion((value) => !value)}

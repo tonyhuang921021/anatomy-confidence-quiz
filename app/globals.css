@@ -248,6 +248,13 @@ select {
     color: var(--ink-main);
   }
 
+  @media (min-width: 1180px) {
+    .note-markdown {
+      column-count: 2;
+      column-gap: 2.25rem;
+    }
+  }
+
   .note-markdown h1,
   .note-markdown h2,
   .note-markdown h3,
@@ -256,6 +263,7 @@ select {
   .note-markdown h6 {
     @apply font-bold text-ink;
     line-height: 1.35;
+    break-after: avoid;
   }
 
   .note-markdown h1 {
@@ -287,6 +295,18 @@ select {
   .note-markdown blockquote,
   .note-markdown hr {
     @apply mt-4;
+  }
+
+  .note-markdown table,
+  .note-markdown pre,
+  .note-markdown blockquote,
+  .note-markdown hr {
+    break-inside: avoid;
+  }
+
+  .note-markdown .study-note-question-card {
+    break-inside: avoid;
+    column-span: all;
   }
 
   .note-markdown ul,

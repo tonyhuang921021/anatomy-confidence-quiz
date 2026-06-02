@@ -131,17 +131,68 @@ function normalizeMetadataQuestionLinks(rawLinks: unknown): StudyNoteQuestionLin
 
 function parseNoteMetaBlock(rawText: string): Record<string, string> | null {
   const match = rawText.match(/```note-meta\s*([\s\S]*?)```/i);
-  if (!match) return null;
+  const rawMetaText = match?.[1] ?? parseLooseNoteMetaText(rawText);
+  if (!rawMetaText) return null;
 
   const metadata: Record<string, string> = {};
-  match[1].split("\n").forEach((line) => {
-    const dividerIndex = line.indexOf(":");
+  rawMetaText.split("\n").forEach((line) => {
+    const dividerIndex = line.search(/[:：]/);
     if (dividerIndex <= 0) return;
-    const key = line.slice(0, dividerIndex).trim();
+    const key = normalizeMetadataKey(line.slice(0, dividerIndex).trim());
     const value = line.slice(dividerIndex + 1).trim();
     if (key && value) metadata[key] = value;
   });
-  return metadata;
+  return Object.keys(metadata).length > 0 ? metadata : null;
+}
+
+function parseLooseNoteMetaText(rawText: string) {
+  const lines = rawText.trimStart().split("\n");
+  const metadataLines: string[] = [];
+  const allowedKeys = new Set([
+    "title",
+    "subject",
+    "collection",
+    "category",
+    "summary",
+    "tags",
+    "標題",
+    "科目",
+    "分類",
+    "摘要",
+    "標籤"
+  ]);
+
+  for (const line of lines) {
+    const trimmed = line.trim();
+    if (!trimmed) {
+      if (metadataLines.length > 0) break;
+      continue;
+    }
+
+    const dividerIndex = trimmed.search(/[:：]/);
+    if (dividerIndex <= 0) break;
+
+    const rawKey = trimmed.slice(0, dividerIndex).trim();
+    if (!allowedKeys.has(rawKey)) break;
+
+    metadataLines.push(trimmed);
+  }
+
+  return metadataLines.length >= 2 ? metadataLines.join("\n") : null;
+}
+
+function normalizeMetadataKey(key: string) {
+  const map: Record<string, string> = {
+    標題: "title",
+    科目: "subject",
+    分類: "collection",
+    摘要: "summary",
+    標籤: "tags",
+    category: "collection",
+    collectionName: "collection",
+    collection_name: "collection"
+  };
+  return map[key] ?? key;
 }
 
 function normalizeMetadataSubject(value?: string): SubjectName | undefined {
@@ -165,7 +216,7 @@ export function parseStudyNoteMetadata(rawText: string): StudyNoteMetadataInput 
       title: noteMeta.title,
       summary: noteMeta.summary,
       subject: normalizeMetadataSubject(noteMeta.subject),
-      collectionName: noteMeta.collection ?? noteMeta.category ?? noteMeta.collectionName,
+      collectionName: noteMeta.collection,
       tags: parseCommaSeparatedTags(noteMeta.tags),
       questionLinks: []
     };
@@ -192,7 +243,13 @@ export function parseStudyNoteMetadata(rawText: string): StudyNoteMetadataInput 
 }
 
 export function stripStudyNoteMetadataBlock(rawText: string) {
-  return rawText.replace(/```note-meta\s*[\s\S]*?```\s*/i, "").trim();
+  const fenced = rawText.replace(/```note-meta\s*[\s\S]*?```\s*/i, "").trim();
+  if (fenced !== rawText.trim()) return fenced;
+
+  const looseMeta = parseLooseNoteMetaText(rawText);
+  if (!looseMeta) return rawText.trim();
+
+  return rawText.trimStart().slice(looseMeta.length).trim();
 }
 
 export function inferStudyNoteTitle(rawMarkdown: string) {
