@@ -228,8 +228,8 @@ export default function NewStudyNotePage() {
         ) : !notesAllowed ? (
           <p className="body-soft">學習筆記目前只開放站長使用。</p>
         ) : (
-          <div className="grid gap-6 xl:grid-cols-[minmax(0,1.25fr)_420px]">
-            <div className="grid gap-4">
+          <div className="grid min-w-0 gap-6 xl:grid-cols-[minmax(0,1.25fr)_minmax(280px,380px)]">
+            <div className="grid min-w-0 gap-4">
               <label className="grid gap-2 text-sm font-semibold text-slate-700">
                 標題
                 <input
@@ -261,8 +261,8 @@ export default function NewStudyNotePage() {
               </label>
             </div>
 
-            <aside className="grid content-start gap-4">
-              <div className="rounded-3xl border border-teal-100 bg-teal-50/70 p-4">
+            <aside className="grid min-w-0 content-start gap-4">
+              <div className="min-w-0 rounded-3xl border border-teal-100 bg-teal-50/70 p-4">
                 <div className="flex items-center justify-between gap-3">
                   <h2 className="text-lg font-bold text-slate-950">Markdown 還原提示</h2>
                   <button type="button" onClick={copyFormatPrompt} className="secondary-pill px-4 py-2 text-sm">
@@ -272,12 +272,12 @@ export default function NewStudyNotePage() {
                 <p className="mt-2 text-sm leading-6 text-slate-600">
                   先把這段貼給 ChatGPT，再貼你的資料。它只會把原本內容轉成網站看得懂的 Markdown，保留大標到小標、表格和條列。
                 </p>
-                <pre className="mt-3 max-h-56 overflow-auto rounded-2xl bg-slate-950 p-3 text-xs leading-5 text-white">
+                <pre className="mt-3 max-h-56 max-w-full overflow-auto whitespace-pre-wrap break-words rounded-2xl bg-slate-950 p-3 text-xs leading-5 text-white">
                   {STUDY_NOTE_FORMAT_PROMPT}
                 </pre>
               </div>
 
-              <div className="rounded-3xl border border-slate-200 bg-white p-4">
+              <div className="min-w-0 rounded-3xl border border-slate-200 bg-white p-4">
                 <h2 className="text-lg font-bold text-slate-950">分類</h2>
                 <div className="mt-4 grid gap-3">
                   <label className="grid gap-2 text-sm font-semibold text-slate-700">
@@ -354,7 +354,7 @@ export default function NewStudyNotePage() {
                 </div>
               </div>
 
-              <div className="rounded-3xl border border-slate-200 bg-white p-4">
+              <div className="min-w-0 rounded-3xl border border-slate-200 bg-white p-4">
                 <div className="flex items-center justify-between gap-3">
                   <h2 className="text-lg font-bold text-slate-950">metadata JSON</h2>
                   <button type="button" onClick={applyMetadata} className="secondary-pill px-4 py-2 text-sm">
@@ -379,7 +379,7 @@ export default function NewStudyNotePage() {
                 ) : null}
               </div>
 
-              <div className="rounded-3xl border border-slate-200 bg-white p-4">
+              <div className="min-w-0 rounded-3xl border border-slate-200 bg-white p-4">
                 <h2 className="text-lg font-bold text-slate-950">相關題目</h2>
                 <input
                   value={questionSearch}
@@ -396,10 +396,10 @@ export default function NewStudyNotePage() {
                         type="button"
                         onClick={() => addQuestionLink(question)}
                         disabled={selected}
-                        className="rounded-2xl border border-slate-200 bg-slate-50 px-3 py-2 text-left text-xs leading-5 text-slate-700 disabled:opacity-60"
+                        className="min-w-0 rounded-2xl border border-slate-200 bg-slate-50 px-3 py-2 text-left text-xs leading-5 text-slate-700 disabled:opacity-60"
                       >
-                        <span className="font-bold text-slate-950">{selected ? "已加入 · " : ""}{question.id}</span>
-                        <span className="block">{question.subject} / {question.chapter} / {question.section}</span>
+                        <span className="block break-words font-bold text-slate-950">{selected ? "已加入 · " : ""}{question.id}</span>
+                        <span className="block break-words">{question.subject} / {question.chapter} / {question.section}</span>
                         <span className="block line-clamp-2">{question.stem}</span>
                       </button>
                     );
