@@ -27,6 +27,7 @@ export default function SubjectNotesPage() {
   const [notes, setNotes] = useState<StudyNoteDetail[]>([]);
   const [draggingNoteId, setDraggingNoteId] = useState("");
   const [activeQuestionNoteId, setActiveQuestionNoteId] = useState("");
+  const [currentNoteId, setCurrentNoteId] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const notesAllowed = isAdminEmail(user?.email);
@@ -65,6 +66,10 @@ export default function SubjectNotesPage() {
   }, [configured, notesAllowed, session?.access_token, subject, validSubject]);
 
   const questionMap = useMemo(() => buildQuestionMap(), []);
+  const currentNote = notes.find((note) => note.id === currentNoteId) ?? notes[0];
+  const currentRelatedQuestionCount = currentNote?.questionLinks
+    .filter((link) => questionMap.has(link.questionId))
+    .length ?? 0;
   const activeQuestionNote = notes.find((note) => note.id === activeQuestionNoteId);
   const activeRelatedQuestions = useMemo(() => {
     if (!activeQuestionNote) return [];
@@ -75,6 +80,42 @@ export default function SubjectNotesPage() {
       }))
       .filter((item): item is { link: typeof item.link; question: Question } => Boolean(item.question));
   }, [activeQuestionNote, questionMap]);
+
+  useEffect(() => {
+    if (notes.length === 0) {
+      setCurrentNoteId("");
+      return;
+    }
+
+    if (!currentNoteId || !notes.some((note) => note.id === currentNoteId)) {
+      setCurrentNoteId(notes[0].id);
+    }
+  }, [currentNoteId, notes]);
+
+  useEffect(() => {
+    if (notes.length === 0) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const visibleEntry = entries
+          .filter((entry) => entry.isIntersecting)
+          .sort((left, right) => left.boundingClientRect.top - right.boundingClientRect.top)[0];
+        const noteId = visibleEntry?.target.getAttribute("data-note-id");
+        if (noteId) setCurrentNoteId(noteId);
+      },
+      {
+        rootMargin: "-18% 0px -62% 0px",
+        threshold: [0, 0.25, 0.5]
+      }
+    );
+
+    notes.forEach((note) => {
+      const element = document.getElementById(`note-${note.id}`);
+      if (element) observer.observe(element);
+    });
+
+    return () => observer.disconnect();
+  }, [notes]);
 
   async function persistOrder(nextNotes: StudyNoteDetail[]) {
     if (!session?.access_token) return;
@@ -189,16 +230,8 @@ export default function SubjectNotesPage() {
               ) : null}
 
               <div className="grid gap-10">
-                {notes.map((note) => {
-                  const relatedQuestions = note.questionLinks
-                    .map((link) => ({
-                      link,
-                      question: questionMap.get(link.questionId)
-                    }))
-                    .filter((item): item is { link: typeof item.link; question: Question } => Boolean(item.question));
-
-                  return (
-                    <article key={note.id} id={`note-${note.id}`} className="scroll-mt-8 rounded-[2rem] border border-slate-200 bg-white p-5 sm:p-7">
+                {notes.map((note) => (
+                    <article key={note.id} id={`note-${note.id}`} data-note-id={note.id} className="scroll-mt-8 rounded-[2rem] border border-slate-200 bg-white p-5 sm:p-7">
                       <div className="flex flex-wrap items-start justify-between gap-3">
                         <div className="min-w-0">
                           <p className="text-xs font-bold uppercase tracking-[0.2em] text-teal-700">
@@ -208,15 +241,6 @@ export default function SubjectNotesPage() {
                           {note.summary ? <p className="body-soft mt-2 leading-7">{note.summary}</p> : null}
                         </div>
                         <div className="flex flex-wrap justify-end gap-2">
-                          {relatedQuestions.length > 0 ? (
-                            <button
-                              type="button"
-                              onClick={() => setActiveQuestionNoteId(note.id)}
-                              className="secondary-pill px-4 py-2 text-sm"
-                            >
-                              考古題 {relatedQuestions.length}
-                            </button>
-                          ) : null}
                           <Link href={`/notes/${note.id}`} className="secondary-pill px-4 py-2 text-sm">
                             編輯 / 詳情
                           </Link>
@@ -230,10 +254,22 @@ export default function SubjectNotesPage() {
                         />
                       </div>
                     </article>
-                  );
-                })}
+                ))}
               </div>
             </article>
+
+            {currentNote ? (
+              <button
+                type="button"
+                onClick={() => setActiveQuestionNoteId(currentNote.id)}
+                className="fixed right-3 top-1/2 z-30 -translate-y-1/2 rounded-l-2xl rounded-r-none border border-r-0 bg-slate-950 px-3 py-4 text-xs font-bold leading-5 text-white shadow-xl transition hover:bg-teal-700 sm:right-0"
+                aria-label={`打開 ${currentNote.title} 的考古題`}
+              >
+                <span className="block [writing-mode:vertical-rl]">
+                  考古題 {currentRelatedQuestionCount}
+                </span>
+              </button>
+            ) : null}
 
             <aside className="note-question-drawer" data-open={Boolean(activeQuestionNote)}>
               <div className="flex items-start justify-between gap-3">
