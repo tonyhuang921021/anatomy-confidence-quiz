@@ -8,8 +8,18 @@ create table if not exists public.quiz_sessions (
   updated_at timestamptz not null default now()
 );
 
+alter table public.quiz_sessions
+  add column if not exists mode text,
+  add column if not exists session_name text,
+  add column if not exists question_count integer not null default 0,
+  add column if not exists correct_count integer not null default 0,
+  add column if not exists wrong_count integer not null default 0,
+  add column if not exists average_confidence numeric(5,2);
+
 create index if not exists quiz_sessions_user_id_idx on public.quiz_sessions (user_id);
 create index if not exists quiz_sessions_completed_at_idx on public.quiz_sessions (completed_at desc);
+create index if not exists quiz_sessions_mode_completed_at_idx
+on public.quiz_sessions (mode, completed_at desc);
 
 grant select, insert, update, delete
   on public.quiz_sessions
@@ -39,6 +49,71 @@ with check ((select auth.uid()) = user_id);
 
 create policy "Users can delete their own quiz sessions"
 on public.quiz_sessions
+for delete
+using ((select auth.uid()) = user_id);
+
+create table if not exists public.quiz_session_attempts (
+  session_id text not null references public.quiz_sessions (id) on delete cascade,
+  user_id uuid not null references auth.users (id) on delete cascade,
+  question_order integer not null,
+  question_id text not null,
+  selected_answer text not null,
+  correct_answer text not null,
+  is_correct boolean not null,
+  confidence smallint,
+  error_type text,
+  answered_at timestamptz not null,
+  source_mode text,
+  subject_snapshot text,
+  chapter_snapshot text,
+  section_snapshot text,
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now(),
+  primary key (session_id, question_order)
+);
+
+create index if not exists quiz_session_attempts_user_id_idx
+on public.quiz_session_attempts (user_id, answered_at desc);
+
+create index if not exists quiz_session_attempts_session_id_idx
+on public.quiz_session_attempts (session_id, question_order);
+
+create index if not exists quiz_session_attempts_question_id_idx
+on public.quiz_session_attempts (question_id);
+
+grant select, insert, update, delete
+  on public.quiz_session_attempts
+  to authenticated;
+
+grant select, insert, update, delete
+  on public.quiz_session_attempts
+  to service_role;
+
+alter table public.quiz_session_attempts enable row level security;
+
+drop policy if exists "Users can read their own quiz session attempts" on public.quiz_session_attempts;
+drop policy if exists "Users can insert their own quiz session attempts" on public.quiz_session_attempts;
+drop policy if exists "Users can update their own quiz session attempts" on public.quiz_session_attempts;
+drop policy if exists "Users can delete their own quiz session attempts" on public.quiz_session_attempts;
+
+create policy "Users can read their own quiz session attempts"
+on public.quiz_session_attempts
+for select
+using ((select auth.uid()) = user_id);
+
+create policy "Users can insert their own quiz session attempts"
+on public.quiz_session_attempts
+for insert
+with check ((select auth.uid()) = user_id);
+
+create policy "Users can update their own quiz session attempts"
+on public.quiz_session_attempts
+for update
+using ((select auth.uid()) = user_id)
+with check ((select auth.uid()) = user_id);
+
+create policy "Users can delete their own quiz session attempts"
+on public.quiz_session_attempts
 for delete
 using ((select auth.uid()) = user_id);
 

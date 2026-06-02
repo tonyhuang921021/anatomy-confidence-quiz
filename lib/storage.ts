@@ -238,11 +238,11 @@ function normalizeSession(session: QuizSession): QuizSession {
   };
 }
 
-function normalizeSessions(sessions: QuizSession[]) {
+export function normalizeSessions(sessions: QuizSession[]) {
   return sessions.map(normalizeSession);
 }
 
-function compactQuestionForStorage(question: Question): Question {
+export function compactQuestionForStorage(question: Question): Question {
   return {
     id: question.id,
     subject: question.subject,
@@ -268,7 +268,7 @@ function compactQuestionForStorage(question: Question): Question {
   };
 }
 
-function compactGeneratedQuestionsForStorage(session: QuizSession) {
+export function compactGeneratedQuestionsForStorage(session: QuizSession) {
   const generatedQuestions = (session.generatedQuestions ?? []).filter(Boolean);
   if (generatedQuestions.length === 0) return undefined;
 
@@ -279,7 +279,7 @@ function compactGeneratedQuestionsForStorage(session: QuizSession) {
   return retainedQuestions.length > 0 ? retainedQuestions : undefined;
 }
 
-function compactSessionForStorage(session: QuizSession): QuizSession {
+export function compactSessionForStorage(session: QuizSession): QuizSession {
   return {
     ...session,
     generatedQuestions: compactGeneratedQuestionsForStorage(session)

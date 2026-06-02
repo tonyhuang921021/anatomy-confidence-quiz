@@ -176,7 +176,7 @@ NEXT_PUBLIC_SUPABASE_ANON_KEY=你的 Supabase anon key
 1. `current session` 仍以本機為主，尚未做即時跨裝置接續
 2. 還沒接 Google / Apple / magic link
 3. 還沒把所有統計改成完全 server-driven
-4. 目前以 `quiz_sessions.session_payload` JSON 同步，後續可再拆成 attempts table
+4. `quiz_sessions` 只保留精簡 session payload，題目作答紀錄拆到 `quiz_session_attempts`，降低單筆同步大小與本機壓力
 
 ## 題庫與來源說明
 

@@ -1,5 +1,6 @@
 import type { User } from "@supabase/supabase-js";
 import type {
+  Attempt,
   CustomPaperDetail,
   CustomPaperDifficulty,
   CustomPaperSummary,
@@ -14,16 +15,21 @@ import type {
   QuestionClassificationOverride,
   QuestionExplanationOverride,
   QuestionCommunityStats,
+  Question,
   QuestionSourceType,
   SubjectName,
   QuizSession,
   VisitorStats
 } from "@/types/quiz";
 import {
+  compactGeneratedQuestionsForStorage,
+  compactQuestionForStorage,
+  compactSessionForStorage,
   loadCurrentSession,
   loadCurrentSessionForUser,
   loadCompletedSessions,
   loadCompletedSessionsForUser,
+  normalizeSessions,
   saveCurrentSession,
   saveCompletedSessions
 } from "@/lib/storage";
@@ -37,10 +43,33 @@ type QuizSessionRow = {
   id: string;
   user_id: string;
   subject: string;
+  mode?: string | null;
+  session_name?: string | null;
+  question_count?: number | null;
+  correct_count?: number | null;
+  wrong_count?: number | null;
+  average_confidence?: number | null;
   started_at: string;
   completed_at: string | null;
-  session_payload: QuizSession;
+  session_payload: Partial<QuizSession> | null;
   updated_at?: string | null;
+};
+
+type QuizSessionAttemptRow = {
+  session_id: string;
+  user_id: string;
+  question_order: number;
+  question_id: string;
+  selected_answer: string;
+  correct_answer: string;
+  is_correct: boolean;
+  confidence: number | null;
+  error_type?: string | null;
+  answered_at: string;
+  source_mode?: string | null;
+  subject_snapshot?: string | null;
+  chapter_snapshot?: string | null;
+  section_snapshot?: string | null;
 };
 
 type LeaderboardRow = {
@@ -428,6 +457,116 @@ function sessionActivityValue(session: QuizSession, fallbackUpdatedAt?: string |
   );
 }
 
+function calculateAverageConfidence(attempts: Attempt[]) {
+  if (attempts.length === 0) return null;
+  const average = attempts.reduce((sum, attempt) => sum + attempt.confidence, 0) / attempts.length;
+  return Math.round(average * 100) / 100;
+}
+
+function compactQuestionForCloud(question: Question): Question {
+  return compactQuestionForStorage(question);
+}
+
+function buildSessionPayloadForCloud(session: QuizSession): Partial<QuizSession> {
+  const compacted = compactSessionForStorage(session);
+  const generatedQuestions = (compacted.generatedQuestions ?? []).map(compactQuestionForCloud);
+  const shouldRetainGeneratedQuestions =
+    generatedQuestions.length > 0 &&
+    (session.settings?.mode === "custom_paper" ||
+      session.settings?.mode === "simulation" ||
+      session.settings?.mode === "peak_challenge" ||
+      generatedQuestions.some((question) => question.sourceType !== "MOEX_PAST_EXAM"));
+
+  return {
+    settings: compacted.settings,
+    questionOrder: compacted.questionOrder,
+    generatedQuestions: shouldRetainGeneratedQuestions ? generatedQuestions : undefined,
+    currentQuestionIndex: session.completedAt ? undefined : compacted.currentQuestionIndex,
+    isReviewingAnswer: session.completedAt ? undefined : compacted.isReviewingAnswer,
+    attempts: session.completedAt ? undefined : compacted.attempts
+  };
+}
+
+function buildSessionRowForCloud(userId: string, session: QuizSession): QuizSessionRow {
+  const correctCount = session.attempts.filter((attempt) => attempt.isCorrect).length;
+  const wrongCount = session.attempts.length - correctCount;
+
+  return {
+    id: session.id,
+    user_id: userId,
+    subject: session.subject,
+    mode: session.settings?.mode ?? null,
+    session_name:
+      session.settings?.sessionName ??
+      session.settings?.customPaperName ??
+      session.settings?.customPoolLabel ??
+      null,
+    question_count: session.questionOrder?.length ?? session.generatedQuestions?.length ?? session.attempts.length,
+    correct_count: correctCount,
+    wrong_count: wrongCount,
+    average_confidence: calculateAverageConfidence(session.attempts),
+    started_at: session.startedAt,
+    completed_at: session.completedAt ?? null,
+    session_payload: buildSessionPayloadForCloud(session)
+  };
+}
+
+function mapAttemptToCloudRow(userId: string, session: QuizSession, attempt: Attempt, index: number) {
+  const generatedQuestion =
+    session.generatedQuestions?.find((question) => question.id === attempt.questionId) ?? null;
+
+  return {
+    session_id: session.id,
+    user_id: userId,
+    question_order: index,
+    question_id: attempt.questionId,
+    selected_answer: attempt.selectedAnswer,
+    correct_answer: attempt.correctAnswer,
+    is_correct: attempt.isCorrect,
+    confidence: attempt.confidence,
+    error_type: attempt.errorType ?? null,
+    answered_at: attempt.answeredAt,
+    source_mode: session.settings?.mode ?? null,
+    subject_snapshot: generatedQuestion?.subject ?? null,
+    chapter_snapshot: generatedQuestion?.chapter ?? null,
+    section_snapshot: generatedQuestion?.section ?? null
+  };
+}
+
+function mapCloudAttemptRowToAttempt(row: QuizSessionAttemptRow): Attempt {
+  return {
+    questionId: row.question_id,
+    selectedAnswer: row.selected_answer as Attempt["selectedAnswer"],
+    correctAnswer: row.correct_answer as Attempt["correctAnswer"],
+    isCorrect: row.is_correct,
+    confidence:
+      row.confidence && row.confidence >= 1 && row.confidence <= 5
+        ? (row.confidence as Attempt["confidence"])
+        : 3,
+    errorType: row.error_type ? (row.error_type as Attempt["errorType"]) : undefined,
+    answeredAt: row.answered_at
+  };
+}
+
+function buildAttemptMap(rows: QuizSessionAttemptRow[]) {
+  const attemptMap = new Map<string, Attempt[]>();
+
+  for (const row of rows) {
+    const bucket = attemptMap.get(row.session_id) ?? [];
+    bucket.push(mapCloudAttemptRowToAttempt(row));
+    attemptMap.set(row.session_id, bucket);
+  }
+
+  for (const [sessionId, bucket] of attemptMap.entries()) {
+    attemptMap.set(
+      sessionId,
+      bucket.sort((left, right) => left.answeredAt.localeCompare(right.answeredAt))
+    );
+  }
+
+  return attemptMap;
+}
+
 function namespaceSessionIdForUser(userId: string, sessionId: string) {
   const prefix = `user-${userId}:`;
   return sessionId.startsWith(prefix) ? sessionId : `${prefix}${sessionId}`;
@@ -484,8 +623,29 @@ function getSessionsNeedingUpload(localSessions: QuizSession[], remoteSessions: 
   });
 }
 
-function mapRowToSession(row: QuizSessionRow | null) {
-  return row?.session_payload ?? null;
+function mapRowToSession(
+  row: QuizSessionRow | null,
+  attemptMap?: Map<string, Attempt[]>
+) {
+  if (!row) return null;
+
+  const payload = row.session_payload ?? {};
+  const resolvedAttempts = attemptMap?.get(row.id) ?? payload.attempts ?? [];
+
+  return normalizeSessions([
+    {
+      id: row.id,
+      subject: (payload.subject as SubjectName | undefined) ?? (row.subject as SubjectName),
+      startedAt: payload.startedAt ?? row.started_at,
+      completedAt: payload.completedAt ?? row.completed_at ?? undefined,
+      settings: payload.settings,
+      questionOrder: payload.questionOrder ?? [],
+      generatedQuestions: payload.generatedQuestions ?? [],
+      currentQuestionIndex: payload.currentQuestionIndex,
+      isReviewingAnswer: payload.isReviewingAnswer,
+      attempts: resolvedAttempts
+    }
+  ])[0] ?? null;
 }
 
 async function fetchActiveQuizSessionRow(userId: string) {
@@ -494,7 +654,9 @@ async function fetchActiveQuizSessionRow(userId: string) {
   const supabase = getSupabaseBrowserClient();
   const { data, error } = await supabase
     .from("quiz_sessions")
-    .select("id, user_id, subject, started_at, completed_at, session_payload, updated_at")
+    .select(
+      "id, user_id, subject, mode, session_name, question_count, correct_count, wrong_count, average_confidence, started_at, completed_at, session_payload, updated_at"
+    )
     .eq("user_id", userId)
     .is("completed_at", null)
     .order("updated_at", { ascending: false })
@@ -506,6 +668,67 @@ async function fetchActiveQuizSessionRow(userId: string) {
   }
 
   return (data as QuizSessionRow | null) ?? null;
+}
+
+async function fetchSessionAttemptRowsForUser(userId: string, sessionIds: string[]) {
+  if (!isSupabaseConfigured() || sessionIds.length === 0) {
+    return [] as QuizSessionAttemptRow[];
+  }
+
+  const supabase = getSupabaseBrowserClient();
+  const rows: QuizSessionAttemptRow[] = [];
+
+  for (let index = 0; index < sessionIds.length; index += 50) {
+    const chunk = sessionIds.slice(index, index + 50);
+    const { data, error } = await supabase
+      .from("quiz_session_attempts")
+      .select(
+        "session_id, user_id, question_order, question_id, selected_answer, correct_answer, is_correct, confidence, error_type, answered_at, source_mode, subject_snapshot, chapter_snapshot, section_snapshot"
+      )
+      .eq("user_id", userId)
+      .in("session_id", chunk)
+      .order("question_order", { ascending: true });
+
+    if (error) {
+      throw error;
+    }
+
+    rows.push(...((data ?? []) as QuizSessionAttemptRow[]));
+  }
+
+  return rows;
+}
+
+async function fetchQuizSessionsForUser(userId: string) {
+  if (!isSupabaseConfigured()) return [] as QuizSessionRow[];
+
+  const supabase = getSupabaseBrowserClient();
+  const { data, error } = await supabase
+    .from("quiz_sessions")
+    .select(
+      "id, user_id, subject, mode, session_name, question_count, correct_count, wrong_count, average_confidence, started_at, completed_at, session_payload, updated_at"
+    )
+    .eq("user_id", userId)
+    .order("completed_at", { ascending: false, nullsFirst: false });
+
+  if (error) {
+    throw error;
+  }
+
+  return (data ?? []) as QuizSessionRow[];
+}
+
+async function fetchResolvedQuizSessionsForUser(userId: string) {
+  const sessionRows = await fetchQuizSessionsForUser(userId);
+  const attemptRows = await fetchSessionAttemptRowsForUser(
+    userId,
+    sessionRows.map((row) => row.id)
+  );
+  const attemptMap = buildAttemptMap(attemptRows);
+
+  return sessionRows
+    .map((row) => mapRowToSession(row, attemptMap))
+    .filter((session): session is QuizSession => Boolean(session));
 }
 
 function getLeaderboardDisplayName(user: Pick<User, "id" | "email" | "user_metadata">) {
@@ -889,14 +1112,7 @@ async function upsertSessionsForUser(userId: string, sessions: QuizSession[]) {
   if (!isSupabaseConfigured() || sessions.length === 0) return;
 
   const supabase = getSupabaseBrowserClient();
-  const rows: QuizSessionRow[] = sessions.map((session) => ({
-    id: session.id,
-    user_id: userId,
-    subject: session.subject,
-    started_at: session.startedAt,
-    completed_at: session.completedAt ?? null,
-    session_payload: session
-  }));
+  const rows: QuizSessionRow[] = sessions.map((session) => buildSessionRowForCloud(userId, session));
 
   const { error } = await supabase
     .from("quiz_sessions")
@@ -905,6 +1121,20 @@ async function upsertSessionsForUser(userId: string, sessions: QuizSession[]) {
   if (error) {
     throw error;
   }
+
+  const attemptRows = sessions.flatMap((session) =>
+    session.attempts.map((attempt, index) => mapAttemptToCloudRow(userId, session, attempt, index))
+  );
+
+  if (attemptRows.length === 0) return;
+
+  const { error: attemptError } = await supabase
+    .from("quiz_session_attempts")
+    .upsert(attemptRows, { onConflict: "session_id,question_order" });
+
+  if (attemptError) {
+    throw attemptError;
+  }
 }
 
 export async function syncCompletedSessionsForCurrentUser(userId: string) {
@@ -912,27 +1142,11 @@ export async function syncCompletedSessionsForCurrentUser(userId: string) {
     return loadCompletedSessions();
   }
 
-  const supabase = getSupabaseBrowserClient();
   const localSessions = canonicalizeSessionsForUser(
     userId,
     mergeSessions(loadCompletedSessionsForUser("guest"), loadCompletedSessions())
   );
-  const { data, error } = await supabase
-    .from("quiz_sessions")
-    .select("id, user_id, subject, started_at, completed_at, session_payload, updated_at")
-    .eq("user_id", userId)
-    .order("completed_at", { ascending: false, nullsFirst: false });
-
-  if (error) {
-    throw error;
-  }
-
-  const remoteSessions = canonicalizeSessionsForUser(
-    userId,
-    (data ?? [])
-      .map((row) => mapRowToSession(row as QuizSessionRow))
-      .filter((session): session is QuizSession => Boolean(session))
-  );
+  const remoteSessions = canonicalizeSessionsForUser(userId, await fetchResolvedQuizSessionsForUser(userId));
   const mergedSessions = mergeSessions(localSessions, remoteSessions);
   const sessionsToUpload = getSessionsNeedingUpload(localSessions, remoteSessions);
 
@@ -956,7 +1170,10 @@ export async function syncCurrentSessionForCurrentUser(userId: string) {
       .sort((left, right) => sessionActivityValue(right).localeCompare(sessionActivityValue(left)))[0] ?? null;
 
   const remoteRow = await fetchActiveQuizSessionRow(userId);
-  const remoteCurrentSession = remoteRow ? mapRowToSession(remoteRow) : null;
+  const remoteAttemptMap = remoteRow
+    ? buildAttemptMap(await fetchSessionAttemptRowsForUser(userId, [remoteRow.id]))
+    : undefined;
+  const remoteCurrentSession = remoteRow ? mapRowToSession(remoteRow, remoteAttemptMap) : null;
 
   const localActivity = localCurrentSession ? sessionActivityValue(localCurrentSession) : "";
   const remoteActivity = remoteCurrentSession
