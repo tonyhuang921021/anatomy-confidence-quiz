@@ -1,24 +1,43 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useAuth } from "@/components/AuthProvider";
 import { ReviewNotebook } from "@/components/ReviewNotebook";
-import { getQuestionBankBySubjectFilter } from "@/data/med1QuestionBank";
+import { applyQuestionClassificationOverride, getQuestionBankBySubjectFilter } from "@/data/med1QuestionBank";
+import { loadConfirmedQuestionClassificationOverrides } from "@/lib/cloudSync";
 import {
   DEFAULT_QUIZ_SETTINGS,
   getReviewQuestionItems
 } from "@/lib/quizAnalysis";
 import { loadCompletedSessions, saveQuizSettings } from "@/lib/storage";
-import { ReviewQuestionItem } from "@/types/quiz";
+import { QuestionClassificationOverride, ReviewQuestionItem } from "@/types/quiz";
 
 export default function ReviewPage() {
   const [practiceItems, setPracticeItems] = useState<ReviewQuestionItem[]>([]);
+  const [classificationOverrides, setClassificationOverrides] = useState<
+    Record<string, QuestionClassificationOverride>
+  >({});
   const [isFullscreenReview, setIsFullscreenReview] = useState(false);
   const [isFullscreenReviewVisible, setIsFullscreenReviewVisible] = useState(false);
   const { syncVersion } = useAuth();
   const pageScrollYRef = useRef(0);
-  const allQuestions = getQuestionBankBySubjectFilter("全部");
+  const baseQuestions = useMemo(() => getQuestionBankBySubjectFilter("全部"), []);
+  const allQuestions = useMemo(
+    () =>
+      baseQuestions.map((question) =>
+        applyQuestionClassificationOverride(question, classificationOverrides[question.id])
+      ),
+    [baseQuestions, classificationOverrides]
+  );
+
+  useEffect(() => {
+    void loadConfirmedQuestionClassificationOverrides(baseQuestions.map((question) => question.id))
+      .then((overrides) => setClassificationOverrides(overrides))
+      .catch(() => {
+        // keep static classification if override fetch fails
+      });
+  }, [baseQuestions, syncVersion]);
 
   useEffect(() => {
     const sessions = loadCompletedSessions();
@@ -32,7 +51,7 @@ export default function ReviewPage() {
         session.settings?.customPoolLabel !== "巔峰賽錯題庫"
     );
     setPracticeItems(getReviewQuestionItems(allQuestions, practiceSessions, Number.MAX_SAFE_INTEGER));
-  }, [syncVersion]);
+  }, [allQuestions, syncVersion]);
 
   useEffect(() => {
     if (typeof document === "undefined" || typeof window === "undefined") return;

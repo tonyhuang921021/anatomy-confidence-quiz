@@ -134,6 +134,19 @@ function getSessionDisplayName(session: QuizSession) {
   return `${session.subject} ${getSessionModeLabel(session)}`;
 }
 
+function getSessionSubjectLabel(
+  session: QuizSession,
+  reviewedAttempts: Array<{ question: Question }>
+) {
+  if (isSimulationSession(session)) {
+    return `${getSessionDisplayName(session)}結果分析`;
+  }
+
+  const subjects = Array.from(new Set(reviewedAttempts.map((item) => item.question.subject).filter(Boolean)));
+  const subject = subjects.length === 1 ? subjects[0] : session.subject;
+  return `本輪${subject}結果分析`;
+}
+
 function getSessionResultsHref(session: QuizSession) {
   const basePath = isSimulationSession(session) ? "/simulation-results" : "/results";
   return `${basePath}?sessionId=${encodeURIComponent(session.id)}`;
@@ -476,7 +489,6 @@ function ResultsPageContent() {
     () => recentCompletedSessions.slice(0, visibleHistoryCount),
     [recentCompletedSessions, visibleHistoryCount]
   );
-  const topWeakSections = useMemo(() => getTopWeakSections(state.sectionStats, 3), [state.sectionStats]);
   const activeSession = state.session;
   const questionMap = useMemo(
     () => (activeSession ? getQuestionMap(activeSession, classificationOverrides) : new Map<string, Question>()),
@@ -496,6 +508,12 @@ function ResultsPageContent() {
     () => reviewedAttempts.filter((item) => !item.attempt.isCorrect),
     [reviewedAttempts]
   );
+  const derivedSectionStats = useMemo(
+    () =>
+      activeSession ? calculateSectionStats(activeSession.attempts, reviewedAttempts.map((item) => item.question)) : [],
+    [activeSession, reviewedAttempts]
+  );
+  const topWeakSections = useMemo(() => getTopWeakSections(derivedSectionStats, 3), [derivedSectionStats]);
   const lowConfidenceAttempts = useMemo(() => {
     const wrongAttemptIds = new Set(wrongAttempts.map((item) => item.attempt.questionId));
     return reviewedAttempts
@@ -1167,9 +1185,7 @@ function ResultsPageContent() {
         <div>
           <p className="text-sm font-semibold uppercase tracking-[0.2em] text-brand-700">Results</p>
           <h1 className="mt-2 text-3xl font-bold text-ink sm:text-4xl">
-            {isSimulationSession(state.session)
-              ? `${getSessionDisplayName(state.session)}結果分析`
-              : `本輪${state.session.subject}結果分析`}
+            {getSessionSubjectLabel(state.session, reviewedAttempts)}
           </h1>
           <p className="mt-2 text-sm text-slate-500">
             本輪模式：{getModeLabel(state.session.settings?.mode ?? "weakness")}

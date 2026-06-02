@@ -1,28 +1,47 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useAuth } from "@/components/AuthProvider";
 import { ReviewNotebook } from "@/components/ReviewNotebook";
-import { getQuestionBankBySubjectFilter } from "@/data/med1QuestionBank";
+import { applyQuestionClassificationOverride, getQuestionBankBySubjectFilter } from "@/data/med1QuestionBank";
+import { loadConfirmedQuestionClassificationOverrides } from "@/lib/cloudSync";
 import {
   DEFAULT_QUIZ_SETTINGS,
   getReviewQuestionItems,
   getReviewSnapshot
 } from "@/lib/quizAnalysis";
 import { loadCompletedSessions, saveQuizSettings } from "@/lib/storage";
-import { ReviewQuestionItem } from "@/types/quiz";
+import { QuestionClassificationOverride, ReviewQuestionItem } from "@/types/quiz";
 
 export default function SimulationReviewPage() {
   const [simulationItems, setSimulationItems] = useState<ReviewQuestionItem[]>([]);
+  const [classificationOverrides, setClassificationOverrides] = useState<
+    Record<string, QuestionClassificationOverride>
+  >({});
   const { syncVersion } = useAuth();
-  const allQuestions = getQuestionBankBySubjectFilter("全部");
+  const baseQuestions = useMemo(() => getQuestionBankBySubjectFilter("全部"), []);
+  const allQuestions = useMemo(
+    () =>
+      baseQuestions.map((question) =>
+        applyQuestionClassificationOverride(question, classificationOverrides[question.id])
+      ),
+    [baseQuestions, classificationOverrides]
+  );
+
+  useEffect(() => {
+    void loadConfirmedQuestionClassificationOverrides(baseQuestions.map((question) => question.id))
+      .then((overrides) => setClassificationOverrides(overrides))
+      .catch(() => {
+        // keep static classification if override fetch fails
+      });
+  }, [baseQuestions, syncVersion]);
 
   useEffect(() => {
     const sessions = loadCompletedSessions();
     const simulationSessions = sessions.filter((session) => session.settings?.mode === "simulation");
     setSimulationItems(getReviewQuestionItems(allQuestions, simulationSessions, 60));
-  }, [syncVersion]);
+  }, [allQuestions, syncVersion]);
 
   function handleStartSimulationReview() {
     saveQuizSettings({

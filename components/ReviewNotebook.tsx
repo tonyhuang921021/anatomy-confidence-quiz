@@ -31,6 +31,10 @@ import {
   SubjectName
 } from "@/types/quiz";
 
+type RenderedReviewQuestionItem = ReviewQuestionItem & {
+  renderedQuestion: Question;
+};
+
 function formatTime(value?: string) {
   if (!value) return "尚未作答";
   return new Date(value).toLocaleString("zh-TW", {
@@ -41,12 +45,28 @@ function formatTime(value?: string) {
   });
 }
 
-function sortByRecent(items: ReviewQuestionItem[]) {
+function sortByRecent<T extends ReviewQuestionItem>(items: T[]) {
   return [...items].sort((a, b) => {
     const timeA = a.history.lastAttemptedAt ? new Date(a.history.lastAttemptedAt).getTime() : 0;
     const timeB = b.history.lastAttemptedAt ? new Date(b.history.lastAttemptedAt).getTime() : 0;
     return timeB - timeA || b.riskScore - a.riskScore || b.history.wrong - a.history.wrong;
   });
+}
+
+function applyLocalExplanationOverride(
+  question: Question,
+  override?: QuestionExplanationOverride
+) {
+  if (!override) return question;
+  return {
+    ...question,
+    explanation: override.explanation || question.explanation,
+    optionAnalysis:
+      override.optionAnalysis && Object.keys(override.optionAnalysis).length > 0
+        ? { ...question.optionAnalysis, ...override.optionAnalysis }
+        : question.optionAnalysis,
+    memoryTip: override.memoryTip || question.memoryTip
+  };
 }
 
 function getOptionKeys(item: ReviewQuestionItem) {
@@ -247,19 +267,37 @@ export function ReviewNotebook({
     () => items.map((item) => item.question.id).sort().join("|"),
     [items]
   );
+  const renderedAllQuestions = useMemo(
+    () =>
+      allQuestions.map((question) =>
+        applyQuestionClassificationOverride(question, classificationOverrides[question.id])
+      ),
+    [allQuestions, classificationOverrides]
+  );
+  const renderedItems = useMemo<RenderedReviewQuestionItem[]>(
+    () =>
+      items.map((item) => ({
+        ...item,
+        renderedQuestion: applyQuestionClassificationOverride(
+          item.question,
+          classificationOverrides[item.question.id]
+        )
+      })),
+    [items, classificationOverrides]
+  );
   const availableSubjects = useMemo(
     () =>
-      Array.from(new Set(items.map((item) => item.question.subject))).sort((a, b) =>
+      Array.from(new Set(renderedItems.map((item) => item.renderedQuestion.subject))).sort((a, b) =>
         a.localeCompare(b, "zh-Hant")
       ) as SubjectName[],
-    [items]
+    [renderedItems]
   );
   const filteredItems = useMemo(
     () =>
       selectedSubjects.length === 0
-        ? items
-        : items.filter((item) => selectedSubjects.includes(item.question.subject)),
-    [items, selectedSubjects]
+        ? renderedItems
+        : renderedItems.filter((item) => selectedSubjects.includes(item.renderedQuestion.subject)),
+    [renderedItems, selectedSubjects]
   );
   const wrongItems = useMemo(
     () => sortByRecent(filteredItems.filter((item) => item.history.wrong > 0)),
@@ -708,11 +746,9 @@ export function ReviewNotebook({
                       }`}
                     >
                       {(() => {
-                        const renderedQuestion = applyQuestionExplanationOverride(
-                          applyQuestionClassificationOverride(
-                            item.question,
-                            classificationOverrides[item.question.id]
-                          )
+                        const renderedQuestion = applyLocalExplanationOverride(
+                          applyQuestionExplanationOverride(item.renderedQuestion),
+                          explanationOverrides[item.question.id]
                         );
                         return (
                           <>
@@ -730,7 +766,7 @@ export function ReviewNotebook({
                                       {activeCategory === "wrong" ? `錯題 ${index + 1}` : `沒信心 ${index + 1}`}
                                     </span>
                                     <span className="min-w-0 text-sm text-slate-500">
-                                      {item.question.chapter} / {item.question.section}
+                                      {renderedQuestion.chapter} / {renderedQuestion.section}
                                     </span>
                                   </div>
                                   <span className="shrink-0 pt-0.5 text-[11px] font-medium text-slate-400 sm:text-xs">
@@ -738,7 +774,7 @@ export function ReviewNotebook({
                                   </span>
                                 </div>
                                 <h4 className="break-words text-base font-semibold leading-7 text-ink sm:text-lg sm:leading-8">
-                                  {item.question.stem}
+                                  {renderedQuestion.stem}
                                 </h4>
                               </div>
 
@@ -753,7 +789,7 @@ export function ReviewNotebook({
                                 <summary className="cursor-pointer font-semibold text-ink">
                                   看相同觀念類似題
                                 </summary>
-                                {renderRelatedQuestions(item.question, allQuestions)}
+                                {renderRelatedQuestions(renderedQuestion, renderedAllQuestions)}
                               </details>
                             </div>
                           </>
