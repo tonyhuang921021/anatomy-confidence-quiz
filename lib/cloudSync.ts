@@ -726,9 +726,22 @@ async function fetchResolvedQuizSessionsForUser(userId: string) {
   );
   const attemptMap = buildAttemptMap(attemptRows);
 
-  return sessionRows
+  const sessions = sessionRows
     .map((row) => mapRowToSession(row, attemptMap))
     .filter((session): session is QuizSession => Boolean(session));
+
+  const sessionsMissingAttemptRows = sessionRows
+    .filter((row) => {
+      const payloadAttempts = row.session_payload?.attempts ?? [];
+      return payloadAttempts.length > 0 && !attemptMap.has(row.id);
+    })
+    .map((row) => mapRowToSession(row))
+    .filter((session): session is QuizSession => Boolean(session));
+
+  return {
+    sessions,
+    sessionsMissingAttemptRows
+  };
 }
 
 function getLeaderboardDisplayName(user: Pick<User, "id" | "email" | "user_metadata">) {
@@ -1146,11 +1159,18 @@ export async function syncCompletedSessionsForCurrentUser(userId: string) {
     userId,
     mergeSessions(loadCompletedSessionsForUser("guest"), loadCompletedSessions())
   );
-  const remoteSessions = canonicalizeSessionsForUser(userId, await fetchResolvedQuizSessionsForUser(userId));
+  const { sessions: fetchedRemoteSessions, sessionsMissingAttemptRows } =
+    await fetchResolvedQuizSessionsForUser(userId);
+  const remoteSessions = canonicalizeSessionsForUser(userId, fetchedRemoteSessions);
   const mergedSessions = mergeSessions(localSessions, remoteSessions);
   const sessionsToUpload = getSessionsNeedingUpload(localSessions, remoteSessions);
+  const sessionsToBackfill = canonicalizeSessionsForUser(userId, sessionsMissingAttemptRows);
 
   saveCompletedSessions(mergedSessions);
+  if (sessionsToBackfill.length > 0) {
+    await upsertSessionsForUser(userId, sessionsToBackfill);
+    await syncQuestionStatsForSessionsSafely(sessionsToBackfill);
+  }
   await upsertSessionsForUser(userId, sessionsToUpload);
   await syncQuestionStatsForSessionsSafely(sessionsToUpload);
 
