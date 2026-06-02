@@ -208,3 +208,12 @@ export async function updateStudyNote(input: UpdateStudyNoteInput): Promise<Stud
   if (!payload.note) throw new Error("學習筆記更新失敗");
   return payload.note;
 }
+
+export async function deleteStudyNote(id: string, accessToken?: string | null): Promise<void> {
+  const params = new URLSearchParams({ id });
+  const response = await fetch(`/api/study-notes?${params.toString()}`, {
+    method: "DELETE",
+    headers: buildAuthHeaders(accessToken)
+  });
+  await parseStudyNoteResponse<{ deletedId?: string }>(response);
+}

@@ -572,3 +572,51 @@ export async function PUT(request: NextRequest) {
     return NextResponse.json({ ok: false, message }, { status: 500 });
   }
 }
+
+export async function DELETE(request: NextRequest) {
+  const supabase = getServiceSupabaseClient();
+  if (!supabase) {
+    return NextResponse.json({ ok: false, message: "Supabase 尚未設定。" }, { status: 500 });
+  }
+
+  const { userId, error } = await getAuthedUser(request, supabase);
+  if (error) return error;
+
+  try {
+    const { searchParams } = new URL(request.url);
+    const noteId = searchParams.get("id")?.trim() ?? "";
+
+    if (!noteId) {
+      return NextResponse.json({ ok: false, message: "缺少筆記 ID。" }, { status: 400 });
+    }
+
+    const { error: deleteLinkError } = await supabase
+      .from("study_note_question_links")
+      .delete()
+      .eq("note_id", noteId)
+      .eq("user_id", userId);
+    if (deleteLinkError) throw deleteLinkError;
+
+    const { error: deleteTagError } = await supabase
+      .from("study_note_tags")
+      .delete()
+      .eq("note_id", noteId)
+      .eq("user_id", userId);
+    if (deleteTagError) throw deleteTagError;
+
+    const { data: deletedNote, error: deleteNoteError } = await supabase
+      .from("study_notes")
+      .delete()
+      .eq("id", noteId)
+      .eq("user_id", userId)
+      .select("id")
+      .single();
+
+    if (deleteNoteError) throw deleteNoteError;
+
+    return NextResponse.json({ ok: true, deletedId: deletedNote.id });
+  } catch (rawError) {
+    const message = rawError instanceof Error ? rawError.message : "學習筆記刪除失敗";
+    return NextResponse.json({ ok: false, message }, { status: 500 });
+  }
+}

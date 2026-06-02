@@ -9,7 +9,7 @@ import { getCanonicalQuestionBank } from "@/data/med1QuestionBank";
 import { isAdminEmail } from "@/lib/adminAccess";
 import { DEFAULT_QUIZ_SETTINGS } from "@/lib/quizAnalysis";
 import { saveQuizSettings } from "@/lib/storage";
-import { loadStudyNote, updateStudyNote } from "@/lib/studyNotes";
+import { deleteStudyNote, loadStudyNote, updateStudyNote } from "@/lib/studyNotes";
 import type { Question, StudyNoteDetail } from "@/types/quiz";
 
 function formatDate(value: string) {
@@ -133,6 +133,23 @@ export default function StudyNoteDetailPage() {
     });
   }
 
+  function handleDeleteNote() {
+    if (!note || !session?.access_token) return;
+    const confirmed = window.confirm(`確定要刪除「${note.title}」嗎？這個動作不能復原。`);
+    if (!confirmed) return;
+
+    setError("");
+    setMessage("");
+    startTransition(async () => {
+      try {
+        await deleteStudyNote(note.id, session.access_token);
+        router.push(note.subject ? `/notes/subject/${encodeURIComponent(note.subject)}` : "/notes");
+      } catch (rawError) {
+        setError(rawError instanceof Error ? rawError.message : "筆記刪除失敗");
+      }
+    });
+  }
+
   return (
     <main className="shell">
       <section className="surface-card p-6 sm:p-8">
@@ -156,6 +173,16 @@ export default function StudyNoteDetailPage() {
             {note && notesAllowed ? (
               <button type="button" onClick={() => setEditing((value) => !value)} className="secondary-pill">
                 {editing ? "取消編輯" : "編輯筆記"}
+              </button>
+            ) : null}
+            {note && notesAllowed ? (
+              <button
+                type="button"
+                onClick={handleDeleteNote}
+                disabled={isPending}
+                className="secondary-pill border-rose-200 bg-rose-50 text-rose-700 disabled:opacity-60"
+              >
+                刪除筆記
               </button>
             ) : null}
             <Link href={note?.subject ? `/notes/subject/${encodeURIComponent(note.subject)}` : "/notes"} className="secondary-pill">
