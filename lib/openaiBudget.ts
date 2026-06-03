@@ -50,7 +50,9 @@ export function getServiceSupabaseClient() {
 }
 
 function roundUsd(value: number) {
-  return Math.max(0, Number(value.toFixed(2)));
+  const normalized = Number(value);
+  if (!Number.isFinite(normalized)) return 0;
+  return Math.max(0, Number(normalized.toFixed(2)));
 }
 
 function getFallbackBudgetUsd() {
@@ -150,7 +152,7 @@ async function fetchOpenAICostsUsd() {
     for (const bucket of payload?.data ?? []) {
       for (const result of bucket.results ?? []) {
         if ((result.amount?.currency ?? "usd").toLowerCase() !== "usd") continue;
-        usedUsd += result.amount?.value ?? 0;
+        usedUsd += Number(result.amount?.value ?? 0);
       }
     }
 
