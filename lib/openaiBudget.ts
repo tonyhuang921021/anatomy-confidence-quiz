@@ -3,6 +3,7 @@ import type { OpenAIBudgetStatus } from "@/types/quiz";
 
 const AI_BUDGET_SETTING_KEY = "openai_budget_usd";
 const COST_CACHE_TTL_MS = 60 * 60 * 1000;
+const DEFAULT_COSTS_START_DATE = "2024-01-01";
 
 type SiteSettingRow = {
   setting_key: string;
@@ -105,9 +106,11 @@ export async function saveOpenAIBudgetUsd(budgetUsd: number, supabase = getServi
 
 function getCostRangeUnixSeconds() {
   const now = new Date();
-  const start = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), 1, 0, 0, 0));
+  const configuredStartDate = process.env.OPENAI_COSTS_START_DATE ?? DEFAULT_COSTS_START_DATE;
+  const start = new Date(`${configuredStartDate}T00:00:00.000Z`);
+  const safeStart = Number.isNaN(start.getTime()) ? new Date(`${DEFAULT_COSTS_START_DATE}T00:00:00.000Z`) : start;
   return {
-    startTime: Math.floor(start.getTime() / 1000),
+    startTime: Math.floor(safeStart.getTime() / 1000),
     endTime: Math.floor(now.getTime() / 1000)
   };
 }
@@ -132,7 +135,7 @@ async function fetchOpenAICostsUsd() {
       start_time: String(startTime),
       end_time: String(endTime),
       bucket_width: "1d",
-      limit: "31"
+      limit: "180"
     });
     if (nextPage) params.set("page", nextPage);
 
@@ -158,7 +161,7 @@ async function fetchOpenAICostsUsd() {
 
     nextPage = payload?.next_page;
     pageCount += 1;
-  } while (nextPage && pageCount < 4);
+  } while (nextPage && pageCount < 24);
 
   cachedCosts = {
     usedUsd: roundUsd(usedUsd),
