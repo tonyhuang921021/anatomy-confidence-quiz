@@ -13,7 +13,7 @@ function formatQuestionCandidates(candidates: StudyNotePromptQuestionCandidate[]
 
   return `
 
-下面是網站題庫提供的「近十年候選題」。你必須做一件事：從這份清單挑出和筆記最相關的國考題題號，填進 note-meta 的 questionLinks。
+下面是網站題庫提供的候選題。只有當我明確貼出候選題時，才從這份清單挑出和筆記最相關的國考題題號，填進 note-meta 的 questionLinks。
 
 規則：
 - 只能從候選題清單挑題號，不要自己編不存在的題號。
@@ -47,7 +47,7 @@ subject: 解剖學／組織學／胚胎學／生理學／生物化學／微生�
 collection: 這篇適合放的資料夾或主題分類
 summary: 50 字內摘要
 tags: tag1, tag2, tag3
-questionLinks: 從候選題挑出的題目ID1, 題目ID2, 題目ID3
+questionLinks: 你自行查到且和內容高度相關的題目ID1, 題目ID2, 題目ID3
 \`\`\`
 2. note-meta code block 之後才輸出 Markdown 正文。
 3. 保留原本內容的邏輯、順序和語氣，不要自行補不存在的段落。
@@ -61,11 +61,13 @@ questionLinks: 從候選題挑出的題目ID1, 題目ID2, 題目ID3
 - 避免重複解釋同一個定義；必要補充可放在同一條列後面。
 - 每個小標底下盡量 3-6 個重點即可，除非原文真的需要更多。
 8. 不要輸出 HTML，不要輸出圖片連結，不要包成 JSON。
-9. 如果我有提供候選題，questionLinks 不能省略；請判斷哪些候選題和筆記重點高度相關，並把題號填入 note-meta 的 questionLinks。
-10. 不需要在正文貼題目；網站會根據 questionLinks 自動帶入題目、選項、答案與詳解。
-11. 如果正文原本有明確題號，而且你確定是網站題庫的題目，可以額外用這個短碼獨立放一行，但這不是必要：
+9. 請你自己上網查公開的台灣醫師國考或一階醫師國考題目來源，找和這篇筆記高度相關的正式考古題題號，填進 note-meta 的 questionLinks。
+10. questionLinks 只放題號，不要放題幹、選項或詳解；網站會用題號自動帶入本地題庫的題目、選項、答案與詳解。
+11. 題號格式請優先使用網站可辨識的 ID，例如 MOEX-110020-1301-Q018。如果你在公開來源只查到年份、次別和題號，請用「2014-2-Q017」這種清楚格式，並盡量避免含糊描述。
+12. 如果你真的找不到高度相關的正式考古題，questionLinks 可以留空，但不要自己編題號。
+13. 如果正文原本有明確題號，而且你確定是網站題庫的題目，可以額外用這個短碼獨立放一行，但這不是必要：
 [question-note id="題目ID" title="簡短題目標題"]
-12. 不要加「以下是整理後內容」這種開場白。${formatQuestionCandidates(candidates)}
+14. 不要加「以下是整理後內容」這種開場白。${formatQuestionCandidates(candidates)}
 
 簡單說：請把你的原本好讀排版，轉成乾淨、標準、可貼進網站的 Markdown，並在最上方附上網站看得懂的 note-meta。`;
 }

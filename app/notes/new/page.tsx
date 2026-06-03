@@ -17,7 +17,6 @@ import {
 import type { Question, StudyNoteQuestionLink, StudyNoteTag, SubjectName } from "@/types/quiz";
 
 const SUBJECT_OPTIONS = [...MED1_SUBJECTS, ...MED2_SUBJECTS].map((subjectName) => subjectRegistry[subjectName]);
-const RELATED_PROMPT_QUESTION_LIMIT = 18;
 
 function buildQuestionSearchText(question: Question) {
   return [
@@ -54,36 +53,11 @@ function mergeUniqueLinks(left: StudyNoteQuestionLink[], right: StudyNoteQuestio
   );
 }
 
-function extractPromptKeywords(...values: string[]) {
-  return Array.from(
-    new Set(
-      values
-        .join(" ")
-        .split(/[\s,，、。．.；;：:()（）\[\]【】「」『』"'!?！？/\\|]+/)
-        .map((keyword) => keyword.trim().toLowerCase())
-        .filter((keyword) => keyword.length >= 2)
-        .filter((keyword) => !["title", "subject", "collection", "summary", "tags", "questionlinks"].includes(keyword))
-    )
-  ).slice(0, 80);
-}
-
 function getQuestionLabel(question: Question) {
   if (question.sourceYear && question.sourceRound && question.originalQuestionNumber) {
     return `${question.sourceYear} 第 ${question.sourceRound} 次第 ${question.originalQuestionNumber} 題`;
   }
   return question.examSessionLabel ?? question.paperCode ?? question.examCode;
-}
-
-function scoreRelatedQuestion(question: Question, keywords: string[]) {
-  if (keywords.length === 0) return 0;
-  const text = buildQuestionSearchText(question);
-
-  return keywords.reduce((score, keyword) => {
-    if (!text.includes(keyword)) return score;
-    if (question.testedConcept?.toLowerCase().includes(keyword)) return score + 5;
-    if (question.chapter?.toLowerCase().includes(keyword) || question.section?.toLowerCase().includes(keyword)) return score + 4;
-    return score + 1;
-  }, 0);
 }
 
 export default function NewStudyNotePage() {
@@ -134,42 +108,7 @@ export default function NewStudyNotePage() {
       .slice(0, 12);
   }, [allQuestions, deferredQuestionSearch, subject]);
 
-  const promptQuestionCandidates = useMemo(() => {
-    const latestYear = Math.max(...allQuestions.map((question) => question.sourceYear ?? 0));
-    const earliestRecentYear = latestYear > 0 ? latestYear - 9 : 0;
-    const keywords = extractPromptKeywords(rawMarkdown, title, summary, collectionName, manualTags, questionSearch);
-    const selectedIds = new Set(questionLinks.map((link) => link.questionId));
-    const selected = allQuestions.filter((question) => selectedIds.has(question.id));
-    const scored = allQuestions
-      .filter((question) => !selectedIds.has(question.id))
-      .filter((question) => !subject || question.subject === subject)
-      .filter((question) => !earliestRecentYear || (question.sourceYear ?? 0) >= earliestRecentYear)
-      .map((question) => ({ question, score: scoreRelatedQuestion(question, keywords) }))
-      .filter((item) => item.score > 0)
-      .sort((left, right) => {
-        if (right.score !== left.score) return right.score - left.score;
-        return (right.question.sourceYear ?? 0) - (left.question.sourceYear ?? 0);
-      })
-      .map((item) => item.question);
-
-    return [...selected, ...scored].slice(0, RELATED_PROMPT_QUESTION_LIMIT);
-  }, [allQuestions, collectionName, manualTags, questionLinks, questionSearch, rawMarkdown, subject, summary, title]);
-
-  const promptText = useMemo(
-    () =>
-      buildStudyNoteFormatPrompt(
-        promptQuestionCandidates.map((question) => ({
-          id: question.id,
-          label: getQuestionLabel(question),
-          subject: question.subject,
-          chapter: question.chapter,
-          section: question.section,
-          testedConcept: question.testedConcept,
-          stem: question.stem
-        }))
-      ),
-    [promptQuestionCandidates]
-  );
+  const promptText = useMemo(() => buildStudyNoteFormatPrompt(), []);
 
   function applyMetadataFromMarkdown(markdown: string) {
     const parsed = parseStudyNoteMetadata(markdown);
@@ -206,7 +145,7 @@ export default function NewStudyNotePage() {
   async function copyFormatPrompt() {
     try {
       await navigator.clipboard.writeText(promptText);
-      setMessage(`已複製固定格式提示，這次附上 ${promptQuestionCandidates.length} 題近十年候選題。`);
+      setMessage("已複製固定格式提示。ChatGPT 會自行查公開考古題，並回填可解析的 questionLinks 題號。");
       setError("");
     } catch {
       setError("複製失敗，可以手動複製右側格式提示。");
@@ -299,10 +238,10 @@ export default function NewStudyNotePage() {
                 </div>
                 <p className="mt-2 text-sm leading-6 text-slate-600">
                   先把這段貼給 ChatGPT，再貼你的資料。它會在最上方加入 note-meta，網站貼上後會自動建立標題、科目、分類和摘要。
-                  也會依目前內容、科目、tags 與搜尋字，附上近十年候選題讓 ChatGPT 回填 questionLinks。
+                  它也會自行查公開正式考古題，並把相關題號回填成 questionLinks。
                 </p>
                 <p className="mt-2 rounded-2xl bg-white/70 px-3 py-2 text-xs font-semibold text-teal-900">
-                  這次會附上 {promptQuestionCandidates.length} 題候選題；如果想更精準，可以先貼原始內容、選科目或在相關題目搜尋欄輸入關鍵字。
+                  不需要先給候選題；只要它回傳網站可辨識的題號，貼回來後就會自動帶入本地題庫的題目、選項、答案與詳解。
                 </p>
                 <pre className="mt-3 max-h-56 max-w-full overflow-auto whitespace-pre-wrap break-words rounded-2xl bg-slate-950 p-3 text-xs leading-5 text-white">
                   {promptText}
