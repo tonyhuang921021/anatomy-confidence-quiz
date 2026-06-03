@@ -353,7 +353,7 @@ export type OpenAIBudgetStatus = {
   usedUsd?: number;
   remainingUsd?: number;
   currency: "usd";
-  source: "openai_costs" | "unavailable";
+  source: "manual" | "openai_costs" | "unavailable";
   updatedAt: string;
   message?: string;
 };

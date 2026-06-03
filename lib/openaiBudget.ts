@@ -66,8 +66,20 @@ function getFallbackBudgetUsd() {
   return Number.isFinite(value) && value > 0 ? roundUsd(value) : 0;
 }
 
-export async function loadOpenAIBudgetUsd(supabase = getServiceSupabaseClient()) {
-  if (!supabase) return getFallbackBudgetUsd();
+function getFallbackUsedUsd() {
+  const value = Number(process.env.OPENAI_USED_USD ?? 0);
+  return Number.isFinite(value) && value > 0 ? roundUsd(value) : undefined;
+}
+
+async function loadOpenAIBudgetSetting(supabase = getServiceSupabaseClient()) {
+  const fallbackBudgetUsd = getFallbackBudgetUsd();
+  const fallbackUsedUsd = getFallbackUsedUsd();
+  if (!supabase) {
+    return {
+      budgetUsd: fallbackBudgetUsd,
+      usedUsd: fallbackUsedUsd
+    };
+  }
 
   const { data, error } = await supabase
     .from("site_settings")
@@ -78,27 +90,41 @@ export async function loadOpenAIBudgetUsd(supabase = getServiceSupabaseClient())
   if (error) {
     const message = String(error.message ?? "");
     if (message.includes("site_settings") || message.includes("Could not find")) {
-      return getFallbackBudgetUsd();
+      return {
+        budgetUsd: fallbackBudgetUsd,
+        usedUsd: fallbackUsedUsd
+      };
     }
     throw error;
   }
 
   const row = data as SiteSettingRow | null;
-  const value = Number(row?.value?.budgetUsd ?? 0);
-  return Number.isFinite(value) && value > 0 ? roundUsd(value) : getFallbackBudgetUsd();
+  const budgetValue = Number(row?.value?.budgetUsd ?? 0);
+  const usedValue = Number(row?.value?.usedUsd ?? NaN);
+  return {
+    budgetUsd: Number.isFinite(budgetValue) && budgetValue > 0 ? roundUsd(budgetValue) : fallbackBudgetUsd,
+    usedUsd: Number.isFinite(usedValue) && usedValue >= 0 ? roundUsd(usedValue) : fallbackUsedUsd
+  };
 }
 
-export async function saveOpenAIBudgetUsd(budgetUsd: number, supabase = getServiceSupabaseClient()) {
+export async function loadOpenAIBudgetUsd(supabase = getServiceSupabaseClient()) {
+  const setting = await loadOpenAIBudgetSetting(supabase);
+  return setting.budgetUsd;
+}
+
+export async function saveOpenAIBudgetUsd(budgetUsd: number, usedUsd?: number, supabase = getServiceSupabaseClient()) {
   if (!supabase) {
     throw new Error("SUPABASE_SERVICE_ROLE_KEY 尚未設定，無法儲存 AI 補強基金預算。");
   }
 
   const normalizedBudget = Number.isFinite(budgetUsd) && budgetUsd > 0 ? roundUsd(budgetUsd) : 0;
+  const normalizedUsed = Number.isFinite(usedUsd) && Number(usedUsd) >= 0 ? roundUsd(Number(usedUsd)) : undefined;
   const { error } = await supabase.from("site_settings").upsert(
     {
       setting_key: AI_BUDGET_SETTING_KEY,
       value: {
-        budgetUsd: normalizedBudget
+        budgetUsd: normalizedBudget,
+        usedUsd: normalizedUsed ?? null
       },
       updated_at: new Date().toISOString()
     },
@@ -106,7 +132,10 @@ export async function saveOpenAIBudgetUsd(budgetUsd: number, supabase = getServi
   );
 
   if (error) throw error;
-  return normalizedBudget;
+  return {
+    budgetUsd: normalizedBudget,
+    usedUsd: normalizedUsed
+  };
 }
 
 function getCostRangeUnixSeconds() {
@@ -189,7 +218,8 @@ async function fetchOpenAICostsUsd() {
 
 export async function loadOpenAIBudgetStatus(options: LoadOpenAIBudgetStatusOptions = {}): Promise<OpenAIBudgetStatus> {
   const includeLiveCosts = options.includeLiveCosts ?? true;
-  const budgetUsd = await loadOpenAIBudgetUsd();
+  const setting = await loadOpenAIBudgetSetting();
+  const budgetUsd = setting.budgetUsd;
   const base = {
     enabled: budgetUsd > 0,
     budgetUsd,
@@ -202,6 +232,16 @@ export async function loadOpenAIBudgetStatus(options: LoadOpenAIBudgetStatusOpti
       ...base,
       source: "unavailable",
       message: "AI 補強基金預算尚未設定。"
+    };
+  }
+
+  if (typeof setting.usedUsd === "number") {
+    return {
+      ...base,
+      usedUsd: setting.usedUsd,
+      remainingUsd: roundUsd(budgetUsd - setting.usedUsd),
+      source: "manual",
+      updatedAt: base.updatedAt
     };
   }
 

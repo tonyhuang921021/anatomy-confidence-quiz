@@ -205,6 +205,7 @@ export default function OwnerPage() {
   const [classificationReports, setClassificationReports] = useState<OwnerClassificationReportEntry[]>([]);
   const [openAIBudget, setOpenAIBudget] = useState<OpenAIBudgetStatus | null>(null);
   const [budgetInput, setBudgetInput] = useState("");
+  const [budgetUsedInput, setBudgetUsedInput] = useState("");
   const [budgetMessage, setBudgetMessage] = useState("");
   const [budgetSaving, setBudgetSaving] = useState(false);
   const [approvingReportId, setApprovingReportId] = useState<string | null>(null);
@@ -251,15 +252,21 @@ export default function OwnerPage() {
 
     setOpenAIBudget(payload.budget);
     setBudgetInput(payload.budget.budgetUsd > 0 ? String(payload.budget.budgetUsd) : "");
+    setBudgetUsedInput(typeof payload.budget.usedUsd === "number" ? String(payload.budget.usedUsd) : "");
     return payload.budget;
   }
 
   async function handleSaveBudget() {
     if (!session?.access_token) return;
     const budgetUsd = Number(budgetInput);
+    const usedUsd = Number(budgetUsedInput || 0);
 
     if (!Number.isFinite(budgetUsd) || budgetUsd < 0) {
       setBudgetMessage("請輸入 0 以上的美元預算。");
+      return;
+    }
+    if (!Number.isFinite(usedUsd) || usedUsd < 0) {
+      setBudgetMessage("請輸入 0 以上的已使用金額。");
       return;
     }
 
@@ -274,7 +281,8 @@ export default function OwnerPage() {
         },
         body: JSON.stringify({
           accessToken: session.access_token,
-          budgetUsd
+          budgetUsd,
+          usedUsd
         })
       });
 
@@ -292,6 +300,7 @@ export default function OwnerPage() {
 
       setOpenAIBudget(payload.budget);
       setBudgetInput(payload.budget.budgetUsd > 0 ? String(payload.budget.budgetUsd) : "");
+      setBudgetUsedInput(typeof payload.budget.usedUsd === "number" ? String(payload.budget.usedUsd) : "");
       setBudgetMessage("AI 補強基金預算已更新，留言板小置頂訊息會跟著同步。");
     } catch (saveError) {
       setBudgetMessage(saveError instanceof Error ? saveError.message : "AI 補強基金預算更新失敗");
@@ -694,6 +703,16 @@ export default function OwnerPage() {
                       onChange={(event) => setBudgetInput(event.target.value)}
                       inputMode="decimal"
                       placeholder="例如 20"
+                      className="min-h-11 rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm outline-none focus:border-brand-600"
+                    />
+                  </label>
+                  <label className="grid gap-2 text-sm font-semibold text-slate-700">
+                    已使用（USD）
+                    <input
+                      value={budgetUsedInput}
+                      onChange={(event) => setBudgetUsedInput(event.target.value)}
+                      inputMode="decimal"
+                      placeholder="例如 3.21"
                       className="min-h-11 rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm outline-none focus:border-brand-600"
                     />
                   </label>

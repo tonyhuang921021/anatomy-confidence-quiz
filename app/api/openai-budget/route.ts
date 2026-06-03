@@ -8,6 +8,7 @@ import {
 type BudgetRequestBody = {
   accessToken?: string;
   budgetUsd?: number;
+  usedUsd?: number;
 };
 
 function getAllowedEmails() {
@@ -62,8 +63,13 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ ok: false, message: "預算需介於 0 到 10000 美元。" }, { status: 400 });
     }
 
-    await saveOpenAIBudgetUsd(budgetUsd, supabase);
-    const budget = await loadOpenAIBudgetStatus();
+    const usedUsd = Number(body.usedUsd ?? 0);
+    if (!Number.isFinite(usedUsd) || usedUsd < 0 || usedUsd > 10000) {
+      return NextResponse.json({ ok: false, message: "已使用金額需介於 0 到 10000 美元。" }, { status: 400 });
+    }
+
+    await saveOpenAIBudgetUsd(budgetUsd, usedUsd, supabase);
+    const budget = await loadOpenAIBudgetStatus({ includeLiveCosts: false });
     return NextResponse.json({ ok: true, budget });
   } catch (error) {
     const message = error instanceof Error ? error.message : "AI 補強基金預算更新失敗";
