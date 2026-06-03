@@ -73,6 +73,7 @@ export default function NewStudyNotePage() {
   const [metadataTags, setMetadataTags] = useState<StudyNoteTag[]>([]);
   const [questionSearch, setQuestionSearch] = useState("");
   const [questionLinks, setQuestionLinks] = useState<StudyNoteQuestionLink[]>([]);
+  const [promptExamQuestionCount, setPromptExamQuestionCount] = useState(6);
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
   const [isPending, startTransition] = useTransition();
@@ -109,7 +110,10 @@ export default function NewStudyNotePage() {
       .slice(0, 12);
   }, [allQuestions, deferredQuestionSearch, subject]);
 
-  const promptText = useMemo(() => buildStudyNoteFormatPrompt(), []);
+  const promptText = useMemo(
+    () => buildStudyNoteFormatPrompt([], { examQuestionCount: promptExamQuestionCount }),
+    [promptExamQuestionCount]
+  );
 
   function applyMetadataFromMarkdown(markdown: string) {
     const parsed = parseStudyNoteMetadata(markdown);
@@ -146,7 +150,7 @@ export default function NewStudyNotePage() {
   async function copyFormatPrompt() {
     try {
       await navigator.clipboard.writeText(promptText);
-      setMessage("已複製固定格式提示。ChatGPT 會自行查公開考古題，並回填可解析的 questionLinks 題號。");
+      setMessage(`已複製固定格式提示。ChatGPT 會自行查公開考古題，目標回填 ${promptExamQuestionCount} 題。`);
       setError("");
     } catch {
       setError("複製失敗，可以手動複製右側格式提示。");
@@ -231,6 +235,24 @@ export default function NewStudyNotePage() {
 
             <aside className="grid min-w-0 content-start gap-4">
               <div className="min-w-0 rounded-3xl border border-teal-100 bg-teal-50/70 p-4">
+                <label className="mb-4 grid gap-2 text-sm font-semibold text-slate-700">
+                  要請 ChatGPT 找幾題考古題
+                  <input
+                    value={promptExamQuestionCount}
+                    onChange={(event) => {
+                      const nextValue = Number(event.target.value);
+                      if (!Number.isFinite(nextValue)) return;
+                      setPromptExamQuestionCount(Math.min(8, Math.max(0, Math.floor(nextValue))));
+                    }}
+                    type="number"
+                    min={0}
+                    max={8}
+                    className="rounded-2xl border border-teal-200 bg-white px-4 py-3 text-sm outline-none focus:border-teal-500"
+                  />
+                  <span className="text-xs font-medium leading-5 text-slate-500">
+                    最多 8 題；如果找不到足夠的可確認題號，ChatGPT 會只放能確認的題。
+                  </span>
+                </label>
                 <div className="flex items-center justify-between gap-3">
                   <h2 className="text-lg font-bold text-slate-950">Markdown 還原提示</h2>
                   <button type="button" onClick={copyFormatPrompt} className="secondary-pill px-4 py-2 text-sm">

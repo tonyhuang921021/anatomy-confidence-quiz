@@ -8,6 +8,15 @@ type StudyNotePromptQuestionCandidate = {
   stem: string;
 };
 
+type StudyNoteFormatPromptOptions = {
+  examQuestionCount?: number;
+};
+
+function normalizeExamQuestionCount(value?: number) {
+  if (!Number.isFinite(value)) return 6;
+  return Math.min(8, Math.max(0, Math.floor(Number(value))));
+}
+
 function formatQuestionCandidates(candidates: StudyNotePromptQuestionCandidate[]) {
   if (candidates.length === 0) return "";
 
@@ -34,7 +43,11 @@ ${candidates
   .join("\n\n")}`;
 }
 
-export function buildStudyNoteFormatPrompt(candidates: StudyNotePromptQuestionCandidate[] = []) {
+export function buildStudyNoteFormatPrompt(
+  candidates: StudyNotePromptQuestionCandidate[] = [],
+  options: StudyNoteFormatPromptOptions = {}
+) {
+  const examQuestionCount = normalizeExamQuestionCount(options.examQuestionCount);
   return `請把接下來的內容轉成「網站筆記可以完整還原的 Markdown」。
 
 目標不是重寫，也不是硬套模板；目標是讓我可以直接複製貼上到筆記系統，排版不要跑掉。
@@ -62,15 +75,16 @@ questionLinks: 2022-1-1301-Q025, 2020-2-1301-Q021, 2011-1-1301-Q017
 - 每個小標底下盡量 3-6 個重點即可，除非原文真的需要更多。
 8. 不要輸出 HTML，不要輸出圖片連結，不要包成 JSON。
 9. 相關考古題不是靠我提供候選題。請你使用網路搜尋／瀏覽功能，自己查公開的台灣醫師國考或一階醫師國考題目來源，找和這篇筆記高度相關的正式考古題題號，填進 note-meta 的 questionLinks。
-10. 如果你目前這個模型或對話不能上網搜尋，請不要輸出整理後筆記，也不要把 questionLinks 留空交差。請只回覆：「目前這個 ChatGPT 對話不能上網查考古題題號，請改用有開啟網路搜尋的 ChatGPT 後再貼一次。」。
-11. 搜尋時請用筆記的核心關鍵字搭配「醫師國考」、「一階」、「考選部」、「年份」、「第幾次」、「題號」等字詞查證；不要憑印象亂填題號。
-12. questionLinks 只放題號，不要放題幹、選項或詳解；網站會用題號自動帶入本地題庫的題目、選項、答案與詳解。
-13. 題號格式請優先使用「西元年-第幾次-卷碼-Q題號」，例如 2022-1-1301-Q025。卷碼常見如 1301；如果來源沒有卷碼，才用 2022-1-Q025。不要自己推測或編造 MOEX ID。
-14. 只有當公開來源或我貼給你的內容已經明確出現完整 MOEX ID 時，才可以輸出 MOEX-110020-1301-Q026 這種格式；不要把年份、次別、卷碼自行組成 MOEX ID，因為很容易錯。
-15. 如果你已經實際上網搜尋，但真的找不到高度相關的正式考古題，questionLinks 可以留空，並在 summary 後補一句「未找到可確認題號」；但不要自己編題號。
-16. 如果正文原本有明確題號，而且你確定是網站題庫的題目，可以額外用這個短碼獨立放一行，但這不是必要：
+10. 這次 questionLinks 目標題數是 ${examQuestionCount} 題，最多 8 題。請優先找最相關的正式考古題；如果實際可確認題目少於 ${examQuestionCount} 題，就只放能確認的題號，不要為了湊數編題號。
+11. 如果你目前這個模型或對話不能上網搜尋，請不要輸出整理後筆記，也不要把 questionLinks 留空交差。請只回覆：「目前這個 ChatGPT 對話不能上網查考古題題號，請改用有開啟網路搜尋的 ChatGPT 後再貼一次。」。
+12. 搜尋時請用筆記的核心關鍵字搭配「醫師國考」、「一階」、「考選部」、「年份」、「第幾次」、「題號」等字詞查證；不要憑印象亂填題號。
+13. questionLinks 只放題號，不要放題幹、選項或詳解；網站會用題號自動帶入本地題庫的題目、選項、答案與詳解。
+14. 題號格式請優先使用「西元年-第幾次-卷碼-Q題號」，例如 2022-1-1301-Q025。卷碼常見如 1301；如果來源沒有卷碼，才用 2022-1-Q025。不要自己推測或編造 MOEX ID。
+15. 只有當公開來源或我貼給你的內容已經明確出現完整 MOEX ID 時，才可以輸出 MOEX-110020-1301-Q026 這種格式；不要把年份、次別、卷碼自行組成 MOEX ID，因為很容易錯。
+16. 如果你已經實際上網搜尋，但真的找不到高度相關的正式考古題，questionLinks 可以留空，並在 summary 後補一句「未找到可確認題號」；但不要自己編題號。
+17. 如果正文原本有明確題號，而且你確定是網站題庫的題目，可以額外用這個短碼獨立放一行，但這不是必要：
 [question-note id="題目ID" title="簡短題目標題"]
-17. 不要加「以下是整理後內容」這種開場白。${formatQuestionCandidates(candidates)}
+18. 不要加「以下是整理後內容」這種開場白。${formatQuestionCandidates(candidates)}
 
 簡單說：請把你的原本好讀排版，轉成乾淨、標準、可貼進網站的 Markdown，並在最上方附上網站看得懂的 note-meta。`;
 }
