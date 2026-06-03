@@ -74,6 +74,7 @@ export default function NewStudyNotePage() {
   const [questionSearch, setQuestionSearch] = useState("");
   const [questionLinks, setQuestionLinks] = useState<StudyNoteQuestionLink[]>([]);
   const [promptExamQuestionCount, setPromptExamQuestionCount] = useState(6);
+  const [promptDetailLevel, setPromptDetailLevel] = useState<"concise" | "detailed">("detailed");
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
   const [isPending, startTransition] = useTransition();
@@ -111,8 +112,8 @@ export default function NewStudyNotePage() {
   }, [allQuestions, deferredQuestionSearch, subject]);
 
   const promptText = useMemo(
-    () => buildStudyNoteFormatPrompt([], { examQuestionCount: promptExamQuestionCount }),
-    [promptExamQuestionCount]
+    () => buildStudyNoteFormatPrompt([], { examQuestionCount: promptExamQuestionCount, detailLevel: promptDetailLevel }),
+    [promptDetailLevel, promptExamQuestionCount]
   );
 
   function applyMetadataFromMarkdown(markdown: string) {
@@ -150,7 +151,7 @@ export default function NewStudyNotePage() {
   async function copyFormatPrompt() {
     try {
       await navigator.clipboard.writeText(promptText);
-      setMessage(`已複製固定格式提示。ChatGPT 會自行查公開考古題，目標回填 ${promptExamQuestionCount} 題。`);
+      setMessage(`已複製${promptDetailLevel === "concise" ? "精簡" : "詳細"}版固定格式提示，目標回填 ${promptExamQuestionCount} 題考古題。`);
       setError("");
     } catch {
       setError("複製失敗，可以手動複製右側格式提示。");
@@ -253,6 +254,36 @@ export default function NewStudyNotePage() {
                     最多 8 題；如果找不到足夠的可確認題號，ChatGPT 會只放能確認的題。
                   </span>
                 </label>
+                <div className="mb-4 grid gap-2 text-sm font-semibold text-slate-700">
+                  筆記輸出密度
+                  <div className="grid grid-cols-2 gap-2">
+                    <button
+                      type="button"
+                      onClick={() => setPromptDetailLevel("concise")}
+                      className={`rounded-2xl px-4 py-3 text-sm font-bold transition ${
+                        promptDetailLevel === "concise"
+                          ? "bg-slate-950 text-white"
+                          : "bg-white text-slate-700 ring-1 ring-teal-100 hover:bg-teal-50"
+                      }`}
+                    >
+                      精簡
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setPromptDetailLevel("detailed")}
+                      className={`rounded-2xl px-4 py-3 text-sm font-bold transition ${
+                        promptDetailLevel === "detailed"
+                          ? "bg-slate-950 text-white"
+                          : "bg-white text-slate-700 ring-1 ring-teal-100 hover:bg-teal-50"
+                      }`}
+                    >
+                      詳細
+                    </button>
+                  </div>
+                  <span className="text-xs font-medium leading-5 text-slate-500">
+                    精簡適合考前速讀；詳細會保留推理、易混淆點與必要補充。
+                  </span>
+                </div>
                 <div className="flex items-center justify-between gap-3">
                   <h2 className="text-lg font-bold text-slate-950">Markdown 還原提示</h2>
                   <button type="button" onClick={copyFormatPrompt} className="secondary-pill px-4 py-2 text-sm">

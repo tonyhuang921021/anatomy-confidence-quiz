@@ -10,6 +10,7 @@ type StudyNotePromptQuestionCandidate = {
 
 type StudyNoteFormatPromptOptions = {
   examQuestionCount?: number;
+  detailLevel?: "concise" | "detailed";
 };
 
 function normalizeExamQuestionCount(value?: number) {
@@ -48,6 +49,18 @@ export function buildStudyNoteFormatPrompt(
   options: StudyNoteFormatPromptOptions = {}
 ) {
   const examQuestionCount = normalizeExamQuestionCount(options.examQuestionCount);
+  const detailLevel = options.detailLevel ?? "detailed";
+  const detailInstruction =
+    detailLevel === "concise"
+      ? `精簡版排版要求：
+- 保留所有必考觀念，但刪掉重複語句、閒聊、過長例子和不必要鋪陳。
+- 每個小標底下優先 3-5 個重點。
+- 表格優先，段落盡量短。
+- 不要犧牲正確性，但可以把延伸補充壓縮成「補充」一小段。`
+      : `詳細版排版要求：
+- 保留原本解釋脈絡、推理過程、易混淆點和必要補充。
+- 可以用較完整的段落說明原因，但仍避免重複。
+- 適合需要讀懂整個觀念，而不是只背結論的筆記。`;
   return `請把接下來的內容轉成「網站筆記可以完整還原的 Markdown」。
 
 目標不是重寫，也不是硬套模板；目標是讓我可以直接複製貼上到筆記系統，排版不要跑掉。
@@ -73,6 +86,7 @@ questionLinks: 2022-1-1301-Q025, 2020-2-1301-Q021, 2011-1-1301-Q017
 - 請你自行判斷是否適合做「兩欄感」排版；如果適合，請用 Markdown table 做左右對照或雙欄整理，例如「左欄：結構／右欄：重點」、「左欄：易混淆點／右欄：辨認法」。只適合短資訊、小整理、對照表；長段落不要硬拆成兩欄。
 - 避免重複解釋同一個定義；必要補充可放在同一條列後面。
 - 每個小標底下盡量 3-6 個重點即可，除非原文真的需要更多。
+${detailInstruction}
 8. 不要輸出 HTML，不要輸出圖片連結，不要包成 JSON。
 9. 相關考古題不是靠我提供候選題。請你使用網路搜尋／瀏覽功能，自己查公開的台灣醫師國考或一階醫師國考題目來源，找和這篇筆記高度相關的正式考古題題號，填進 note-meta 的 questionLinks。
 10. 這次 questionLinks 目標題數是 ${examQuestionCount} 題，最多 8 題。請優先找最相關的正式考古題；如果實際可確認題目少於 ${examQuestionCount} 題，就只放能確認的題號，不要為了湊數編題號。

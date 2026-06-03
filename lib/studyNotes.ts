@@ -281,6 +281,19 @@ function splitTableCells(line: string) {
   return trimmed.split(/\s{2,}/).map((cell) => cell.trim()).filter(Boolean);
 }
 
+function splitCollapsedPipeTableRows(line: string) {
+  const trimmed = line.trim();
+  if (!trimmed.startsWith("|") || !trimmed.endsWith("|")) return [line];
+  if (!/\|\s+\|/.test(trimmed)) return [line];
+
+  const leadingWhitespace = line.match(/^\s*/)?.[0] ?? "";
+  return trimmed
+    .replace(/\|\s+\|/g, "|\n|")
+    .split("\n")
+    .map((row) => `${leadingWhitespace}${row.trim()}`)
+    .filter(Boolean);
+}
+
 function looksLikePlainTableLine(line: string) {
   const cells = splitTableCells(line);
   return cells.length >= 2 && !line.trim().startsWith("|") && !line.trim().startsWith("*") && !line.trim().startsWith("-");
@@ -319,7 +332,7 @@ function flushTable(tableRows: string[][], output: string[]) {
 }
 
 export function normalizeStudyNoteMarkdown(rawText: string) {
-  const lines = rawText.replace(/\r\n/g, "\n").split("\n");
+  const lines = rawText.replace(/\r\n/g, "\n").split("\n").flatMap(splitCollapsedPipeTableRows);
   const output: string[] = [];
   let tableRows: string[][] = [];
 
