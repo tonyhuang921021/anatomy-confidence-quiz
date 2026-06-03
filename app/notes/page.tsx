@@ -4,6 +4,11 @@ import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import { useAuth } from "@/components/AuthProvider";
 import { NOTE_SUBJECTS } from "@/lib/noteSubjects";
+import {
+  getMicrobiologyImmunologyCategory,
+  isMicrobiologyImmunologySubject,
+  MICROBIOLOGY_IMMUNOLOGY_CATEGORIES
+} from "@/lib/noteSubjectCategories";
 import { loadStudyNotes } from "@/lib/studyNotes";
 import { subjectRegistry } from "@/data/subjectRegistry";
 import type { StudyNoteSummary } from "@/types/quiz";
@@ -21,6 +26,7 @@ function formatDate(value?: string) {
 export default function StudyNotesPage() {
   const { configured, session, user } = useAuth();
   const [notes, setNotes] = useState<StudyNoteSummary[]>([]);
+  const [expandedMicrobiology, setExpandedMicrobiology] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
@@ -96,12 +102,18 @@ export default function StudyNotesPage() {
               {NOTE_SUBJECTS.map((subject) => {
                 const item = subjectRegistry[subject];
                 const stats = statsBySubject.get(subject);
-                return (
-                  <Link
-                    key={subject}
-                    href={`/notes/subject/${encodeURIComponent(subject)}`}
-                    className="group rounded-[2rem] border border-slate-200 bg-white p-5 shadow-sm transition hover:-translate-y-1 hover:border-teal-300 hover:shadow-xl"
-                  >
+                const isMicrobiology = isMicrobiologyImmunologySubject(subject);
+                const subjectNotes = notes.filter((note) => note.subject === subject);
+                const microCategoryCounts = new Map(
+                  MICROBIOLOGY_IMMUNOLOGY_CATEGORIES.map((category) => [
+                    category.id,
+                    subjectNotes.filter((note) => getMicrobiologyImmunologyCategory(note) === category.id).length
+                  ])
+                );
+                const cardClassName =
+                  "group rounded-[2rem] border border-slate-200 bg-white p-5 text-left shadow-sm transition hover:-translate-y-1 hover:border-teal-300 hover:shadow-xl";
+                const cardContent = (
+                  <>
                     <p className="text-xs font-bold uppercase tracking-[0.22em] text-teal-700">Subject</p>
                     <h2 className="mt-3 text-2xl font-black text-slate-950">{item.label}</h2>
                     <div className="mt-5 grid gap-2 text-sm font-semibold text-slate-600">
@@ -110,8 +122,48 @@ export default function StudyNotesPage() {
                       <span>更新 {formatDate(stats?.updatedAt)}</span>
                     </div>
                     <span className="mt-5 inline-flex rounded-full bg-slate-950 px-4 py-2 text-sm font-bold text-white transition group-hover:bg-teal-700">
-                      打開大文件
+                      {isMicrobiology ? "選擇分類" : "打開大文件"}
                     </span>
+                  </>
+                );
+                if (isMicrobiology) {
+                  return (
+                    <div key={subject} className="grid gap-3">
+                      <button
+                        type="button"
+                        onClick={() => setExpandedMicrobiology((current) => !current)}
+                        className={cardClassName}
+                        aria-expanded={expandedMicrobiology}
+                      >
+                        {cardContent}
+                      </button>
+                      {expandedMicrobiology ? (
+                        <div className="grid gap-2 rounded-[1.5rem] border border-teal-100 bg-teal-50/70 p-3">
+                          {MICROBIOLOGY_IMMUNOLOGY_CATEGORIES.map((category) => (
+                            <Link
+                              key={category.id}
+                              href={`/notes/subject/${encodeURIComponent(subject)}?category=${category.id}`}
+                              className="rounded-2xl bg-white px-4 py-3 text-sm font-bold text-slate-800 shadow-sm transition hover:bg-teal-700 hover:text-white"
+                            >
+                              <span className="flex items-center justify-between gap-3">
+                                <span>{category.label}</span>
+                                <span>{microCategoryCounts.get(category.id) ?? 0} 篇</span>
+                              </span>
+                              <span className="mt-1 block text-xs font-medium opacity-70">{category.description}</span>
+                            </Link>
+                          ))}
+                        </div>
+                      ) : null}
+                    </div>
+                  );
+                }
+                return (
+                  <Link
+                    key={subject}
+                    href={`/notes/subject/${encodeURIComponent(subject)}`}
+                    className={cardClassName}
+                  >
+                    {cardContent}
                   </Link>
                 );
               })}

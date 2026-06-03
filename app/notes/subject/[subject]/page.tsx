@@ -2,12 +2,17 @@
 
 import Link from "next/link";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { useParams } from "next/navigation";
+import { useParams, useSearchParams } from "next/navigation";
 import { useAuth } from "@/components/AuthProvider";
 import { StudyNoteMarkdown } from "@/components/StudyNoteMarkdown";
 import { getCanonicalQuestionBank } from "@/data/med1QuestionBank";
 import { subjectRegistry } from "@/data/subjectRegistry";
 import { isNoteSubject } from "@/lib/noteSubjects";
+import {
+  filterMicrobiologyImmunologyNotes,
+  isMicrobiologyImmunologySubject,
+  MICROBIOLOGY_IMMUNOLOGY_CATEGORIES
+} from "@/lib/noteSubjectCategories";
 import { loadStudyNote, loadStudyNotes, reorderStudyNotes, toggleStudyNoteStar } from "@/lib/studyNotes";
 import type { Question, StudyNoteDetail, SubjectName } from "@/types/quiz";
 
@@ -21,7 +26,9 @@ function buildQuestionMap(): Map<string, Question> {
 
 export default function SubjectNotesPage() {
   const params = useParams<{ subject: string }>();
+  const searchParams = useSearchParams();
   const subject = decodeURIComponent(params.subject ?? "");
+  const category = searchParams.get("category");
   const { configured, session, user } = useAuth();
   const [notes, setNotes] = useState<StudyNoteDetail[]>([]);
   const [draggingNoteId, setDraggingNoteId] = useState("");
@@ -33,6 +40,10 @@ export default function SubjectNotesPage() {
   const validSubject = isNoteSubject(subject);
   const subjectName = subject as SubjectName;
   const subjectItem = validSubject ? subjectRegistry[subjectName] : null;
+  const isMicrobiology = isMicrobiologyImmunologySubject(subject);
+  const categoryItem = isMicrobiology
+    ? MICROBIOLOGY_IMMUNOLOGY_CATEGORIES.find((item) => item.id === category)
+    : undefined;
   const notesRef = useRef<StudyNoteDetail[]>([]);
   const originalOrderRef = useRef<string[]>([]);
 
@@ -54,7 +65,8 @@ export default function SubjectNotesPage() {
         const details = await Promise.all(
           nextNotes.map((note) => loadStudyNote(note.id, session.access_token))
         );
-        if (!cancelled) setNotes(details);
+        const filteredDetails = isMicrobiology ? filterMicrobiologyImmunologyNotes(details, category) : details;
+        if (!cancelled) setNotes(filteredDetails);
       })
       .catch((rawError) => {
         if (!cancelled) {
@@ -68,7 +80,7 @@ export default function SubjectNotesPage() {
     return () => {
       cancelled = true;
     };
-  }, [configured, session?.access_token, subject, validSubject]);
+  }, [category, configured, isMicrobiology, session?.access_token, subject, validSubject]);
 
   const questionMap = useMemo(() => buildQuestionMap(), []);
   const currentNote = notes.find((note) => note.id === currentNoteId) ?? notes[0];
@@ -204,16 +216,29 @@ export default function SubjectNotesPage() {
           <div>
             <p className="eyebrow">Subject Document</p>
             <h1 className="display-title mt-3 text-4xl sm:text-5xl">
-              {subjectItem?.label ?? "學習筆記"}
+              {subjectItem?.label ?? "學習筆記"}{categoryItem ? `｜${categoryItem.label}` : ""}
             </h1>
             <p className="body-soft mt-4 max-w-3xl leading-7">
-              這裡會把同一科的筆記串成一份大文件。左邊顯示筆記名稱，抓住六點把手可以調整順序。
+              {categoryItem
+                ? `${categoryItem.description}。左邊顯示筆記名稱，抓住六點把手可以調整順序。`
+                : "這裡會把同一科的筆記串成一份大文件。左邊顯示筆記名稱，抓住六點把手可以調整順序。"}
             </p>
           </div>
           <div className="flex flex-wrap gap-2">
             <Link href="/notes" className="secondary-pill">
               回十科
             </Link>
+            {isMicrobiology ? (
+              MICROBIOLOGY_IMMUNOLOGY_CATEGORIES.map((item) => (
+                <Link
+                  key={item.id}
+                  href={`/notes/subject/${encodeURIComponent(subject)}?category=${item.id}`}
+                  className={item.id === category ? "primary-pill" : "secondary-pill"}
+                >
+                  {item.label}
+                </Link>
+              ))
+            ) : null}
             <Link href="/notes/new" className="primary-pill">
               新增筆記
             </Link>
