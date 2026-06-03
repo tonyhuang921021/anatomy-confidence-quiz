@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useMemo, useState, useTransition } from "react";
+import { useDeferredValue, useEffect, useMemo, useState, useTransition } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { useAuth } from "@/components/AuthProvider";
 import { StudyNoteMarkdown } from "@/components/StudyNoteMarkdown";
@@ -9,7 +9,7 @@ import { getCanonicalQuestionBank } from "@/data/med1QuestionBank";
 import { DEFAULT_QUIZ_SETTINGS } from "@/lib/quizAnalysis";
 import { saveQuizSettings } from "@/lib/storage";
 import { deleteStudyNote, loadStudyNote, updateStudyNote } from "@/lib/studyNotes";
-import type { Question, StudyNoteDetail } from "@/types/quiz";
+import type { Question, StudyNoteDetail, StudyNoteQuestionLink } from "@/types/quiz";
 
 function formatDate(value: string) {
   return new Intl.DateTimeFormat("zh-Hant", {
@@ -21,6 +21,29 @@ function formatDate(value: string) {
   }).format(new Date(value));
 }
 
+function buildQuestionSearchText(question: Question) {
+  return [
+    question.id,
+    question.subject,
+    question.chapter,
+    question.section,
+    question.testedConcept,
+    question.stem,
+    question.examCode,
+    question.paperCode,
+    question.sourceYear ? String(question.sourceYear) : ""
+  ]
+    .filter(Boolean)
+    .join(" ")
+    .toLowerCase();
+}
+
+function mergeUniqueLinks(left: StudyNoteQuestionLink[], right: StudyNoteQuestionLink[]) {
+  return Array.from(
+    new Map([...left, ...right].map((item) => [`${item.questionId}:${item.relationType}`, item] as const)).values()
+  );
+}
+
 export default function StudyNoteDetailPage() {
   const params = useParams<{ id: string }>();
   const router = useRouter();
@@ -29,11 +52,14 @@ export default function StudyNoteDetailPage() {
   const [draftTitle, setDraftTitle] = useState("");
   const [draftSummary, setDraftSummary] = useState("");
   const [draftMarkdown, setDraftMarkdown] = useState("");
+  const [draftQuestionLinks, setDraftQuestionLinks] = useState<StudyNoteQuestionLink[]>([]);
+  const [questionSearch, setQuestionSearch] = useState("");
   const [editing, setEditing] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [message, setMessage] = useState("");
   const [isPending, startTransition] = useTransition();
+  const deferredQuestionSearch = useDeferredValue(questionSearch);
 
   useEffect(() => {
     if (!configured || !session?.access_token || !params.id) {
@@ -51,6 +77,7 @@ export default function StudyNoteDetailPage() {
           setDraftTitle(nextNote.title);
           setDraftSummary(nextNote.summary ?? "");
           setDraftMarkdown(nextNote.rawMarkdown);
+          setDraftQuestionLinks(nextNote.questionLinks);
         }
       })
       .catch((rawError) => {
@@ -67,15 +94,42 @@ export default function StudyNoteDetailPage() {
     };
   }, [configured, params.id, session?.access_token]);
 
-  const questionMap = useMemo(
+  const allQuestions = useMemo(
     () =>
-      new Map(
-        getCanonicalQuestionBank()
-          .filter((question) => question.sourceType !== "AI_GENERATED")
-          .map((question) => [question.id, question] as const)
+      Array.from(
+        new Map(
+          getCanonicalQuestionBank()
+            .filter((question) => question.sourceType !== "AI_GENERATED")
+            .map((question) => [question.id, question] as const)
+        ).values()
       ),
     []
   );
+
+  const questionMap = useMemo(
+    () => new Map(allQuestions.map((question) => [question.id, question] as const)),
+    [allQuestions]
+  );
+
+  const selectedDraftQuestions = useMemo(
+    () =>
+      draftQuestionLinks
+        .map((link) => ({
+          link,
+          question: questionMap.get(link.questionId)
+        }))
+        .filter((item): item is { link: StudyNoteQuestionLink; question: Question } => Boolean(item.question)),
+    [draftQuestionLinks, questionMap]
+  );
+
+  const questionResults = useMemo(() => {
+    const keyword = deferredQuestionSearch.trim().toLowerCase();
+    if (keyword.length < 2) return [];
+
+    return allQuestions
+      .filter((question) => buildQuestionSearchText(question).includes(keyword))
+      .slice(0, 12);
+  }, [allQuestions, deferredQuestionSearch]);
 
   const relatedQuestions = useMemo(() => {
     if (!note) return [];
@@ -103,6 +157,41 @@ export default function StudyNoteDetailPage() {
     router.push("/quiz?new=1");
   }
 
+  function resetDraftsFromNote(nextNote = note) {
+    if (!nextNote) return;
+    setDraftTitle(nextNote.title);
+    setDraftSummary(nextNote.summary ?? "");
+    setDraftMarkdown(nextNote.rawMarkdown);
+    setDraftQuestionLinks(nextNote.questionLinks);
+    setQuestionSearch("");
+  }
+
+  function toggleEditing() {
+    if (editing) {
+      resetDraftsFromNote();
+      setEditing(false);
+      return;
+    }
+
+    resetDraftsFromNote();
+    setEditing(true);
+  }
+
+  function addQuestionLink(question: Question) {
+    setDraftQuestionLinks((current) =>
+      mergeUniqueLinks(current, [
+        {
+          questionId: question.id,
+          relationType: "related"
+        }
+      ])
+    );
+  }
+
+  function removeQuestionLink(questionId: string) {
+    setDraftQuestionLinks((current) => current.filter((item) => item.questionId !== questionId));
+  }
+
   function handleSaveEdit() {
     if (!note || !session?.access_token) return;
     setError("");
@@ -120,9 +209,10 @@ export default function StudyNoteDetailPage() {
           section: note.section,
           collectionName: note.collectionName,
           tags: note.tags,
-          questionLinks: note.questionLinks
+          questionLinks: draftQuestionLinks
         });
         setNote(updated);
+        resetDraftsFromNote(updated);
         setEditing(false);
         setMessage("筆記已更新。");
       } catch (rawError) {
@@ -169,7 +259,7 @@ export default function StudyNoteDetailPage() {
           </div>
           <div className="flex flex-wrap gap-2">
             {note ? (
-              <button type="button" onClick={() => setEditing((value) => !value)} className="secondary-pill">
+              <button type="button" onClick={toggleEditing} className="secondary-pill">
                 {editing ? "取消編輯" : "編輯筆記"}
               </button>
             ) : null}
@@ -217,6 +307,64 @@ export default function StudyNoteDetailPage() {
                   className="min-h-[620px] rounded-3xl border border-slate-200 bg-white px-4 py-3 font-mono text-sm leading-6 outline-none focus:border-teal-500"
                 />
               </label>
+              <div className="rounded-3xl border border-slate-200 bg-white p-4">
+                <div className="flex flex-wrap items-center justify-between gap-3">
+                  <div>
+                    <h2 className="text-lg font-bold text-slate-950">相關題目</h2>
+                    <p className="mt-1 text-sm font-normal leading-6 text-slate-500">
+                      編輯時也可以搜尋題號、概念、題幹或章節，把題目連到這篇筆記。
+                    </p>
+                  </div>
+                  <span className="stat-chip">{selectedDraftQuestions.length} 題</span>
+                </div>
+                <input
+                  value={questionSearch}
+                  onChange={(event) => setQuestionSearch(event.target.value)}
+                  placeholder="搜尋題號、概念、題幹或章節"
+                  className="mt-4 w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm outline-none focus:border-teal-500"
+                />
+                <div className="mt-3 grid gap-2">
+                  {questionResults.map((question) => {
+                    const selected = draftQuestionLinks.some((item) => item.questionId === question.id);
+                    return (
+                      <button
+                        key={question.id}
+                        type="button"
+                        onClick={() => addQuestionLink(question)}
+                        disabled={selected}
+                        className="min-w-0 rounded-2xl border border-slate-200 bg-slate-50 px-3 py-2 text-left text-xs leading-5 text-slate-700 transition hover:border-teal-200 hover:bg-teal-50 disabled:opacity-60"
+                      >
+                        <span className="block break-words font-bold text-slate-950">
+                          {selected ? "已加入 · " : ""}
+                          {question.id}
+                        </span>
+                        <span className="block break-words">{question.subject} / {question.chapter} / {question.section}</span>
+                        <span className="block line-clamp-2">{question.stem}</span>
+                      </button>
+                    );
+                  })}
+                </div>
+                {selectedDraftQuestions.length > 0 ? (
+                  <div className="mt-4 grid gap-2">
+                    {selectedDraftQuestions.map(({ link, question }) => (
+                      <div key={`${question.id}-${link.relationType}`} className="rounded-2xl bg-teal-50 px-3 py-2 text-xs text-teal-900">
+                        <div className="flex items-start justify-between gap-2">
+                          <div className="min-w-0">
+                            <p className="font-bold">{question.id}</p>
+                            <p className="mt-1 text-teal-800">{question.subject} / {question.chapter} / {question.section}</p>
+                          </div>
+                          <button type="button" onClick={() => removeQuestionLink(question.id)} className="shrink-0 font-semibold text-rose-700">
+                            移除
+                          </button>
+                        </div>
+                        <p className="mt-1 line-clamp-2">{question.stem}</p>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <p className="body-soft mt-3 text-sm">目前還沒有加入題目。</p>
+                )}
+              </div>
               <button
                 type="button"
                 onClick={handleSaveEdit}
