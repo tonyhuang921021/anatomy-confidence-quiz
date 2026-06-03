@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useParams } from "next/navigation";
 import { useAuth } from "@/components/AuthProvider";
 import { StudyNoteMarkdown } from "@/components/StudyNoteMarkdown";
@@ -25,6 +25,7 @@ export default function SubjectNotesPage() {
   const { configured, session, user } = useAuth();
   const [notes, setNotes] = useState<StudyNoteDetail[]>([]);
   const [draggingNoteId, setDraggingNoteId] = useState("");
+  const [dragOverNoteId, setDragOverNoteId] = useState("");
   const [activeQuestionNoteId, setActiveQuestionNoteId] = useState("");
   const [currentNoteId, setCurrentNoteId] = useState("");
   const [loading, setLoading] = useState(false);
@@ -32,6 +33,12 @@ export default function SubjectNotesPage() {
   const validSubject = isNoteSubject(subject);
   const subjectName = subject as SubjectName;
   const subjectItem = validSubject ? subjectRegistry[subjectName] : null;
+  const notesRef = useRef<StudyNoteDetail[]>([]);
+  const originalOrderRef = useRef<string[]>([]);
+
+  useEffect(() => {
+    notesRef.current = notes;
+  }, [notes]);
 
   useEffect(() => {
     if (!configured || !session?.access_token || !validSubject) {
@@ -127,7 +134,19 @@ export default function SubjectNotesPage() {
     }
   }
 
-  function moveDraggedNote(targetNoteId: string) {
+  function getOrderKey(targetNotes: StudyNoteDetail[]) {
+    return targetNotes.map((note) => note.id).join(",");
+  }
+
+  function beginDrag(noteId: string, dataTransfer: DataTransfer) {
+    setDraggingNoteId(noteId);
+    setDragOverNoteId(noteId);
+    originalOrderRef.current = notesRef.current.map((note) => note.id);
+    dataTransfer.effectAllowed = "move";
+    dataTransfer.setData("text/plain", noteId);
+  }
+
+  function previewDraggedNote(targetNoteId: string) {
     if (!draggingNoteId || draggingNoteId === targetNoteId) return;
     setNotes((currentNotes) => {
       const fromIndex = currentNotes.findIndex((note) => note.id === draggingNoteId);
@@ -137,9 +156,20 @@ export default function SubjectNotesPage() {
       const nextNotes = [...currentNotes];
       const [movedNote] = nextNotes.splice(fromIndex, 1);
       nextNotes.splice(toIndex, 0, movedNote);
-      void persistOrder(nextNotes);
       return nextNotes;
     });
+    setDragOverNoteId(targetNoteId);
+  }
+
+  function finishDrag() {
+    const originalOrderKey = originalOrderRef.current.join(",");
+    const nextOrderKey = getOrderKey(notesRef.current);
+    setDraggingNoteId("");
+    setDragOverNoteId("");
+    originalOrderRef.current = [];
+    if (originalOrderKey && originalOrderKey !== nextOrderKey) {
+      void persistOrder(notesRef.current);
+    }
   }
 
   async function handleToggleStar(noteId: string) {
@@ -211,15 +241,24 @@ export default function SubjectNotesPage() {
                     notes.map((note) => (
                       <div
                         key={note.id}
-                        onDragOver={(event) => event.preventDefault()}
-                        onDrop={() => moveDraggedNote(note.id)}
-                        className="group grid grid-cols-[32px_minmax(0,1fr)] items-center gap-2 rounded-2xl px-2 py-2 hover:bg-teal-50"
+                        onDragEnter={() => previewDraggedNote(note.id)}
+                        onDragOver={(event) => {
+                          event.preventDefault();
+                          event.dataTransfer.dropEffect = "move";
+                        }}
+                        onDrop={(event) => {
+                          event.preventDefault();
+                          finishDrag();
+                        }}
+                        data-dragging={draggingNoteId === note.id}
+                        data-drop-target={dragOverNoteId === note.id && draggingNoteId !== note.id}
+                        className="note-outline-item group grid grid-cols-[32px_minmax(0,1fr)] items-center gap-2 rounded-2xl px-2 py-2 hover:bg-teal-50"
                       >
                         <button
                           type="button"
                           draggable
-                          onDragStart={() => setDraggingNoteId(note.id)}
-                          onDragEnd={() => setDraggingNoteId("")}
+                          onDragStart={(event) => beginDrag(note.id, event.dataTransfer)}
+                          onDragEnd={finishDrag}
                           aria-label={`拖曳排序：${note.title}`}
                           className="grid h-8 w-8 cursor-grab place-items-center rounded-xl text-slate-300 transition hover:bg-white hover:text-teal-700 active:cursor-grabbing"
                         >
