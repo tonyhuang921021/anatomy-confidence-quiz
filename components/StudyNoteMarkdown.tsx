@@ -4,6 +4,7 @@ import ReactMarkdown from "react-markdown";
 import rehypeSanitize from "rehype-sanitize";
 import remarkGfm from "remark-gfm";
 import { StudyNoteQuestionCard } from "@/components/StudyNoteQuestionCard";
+import { normalizeStudyNoteMarkdown } from "@/lib/studyNotes";
 import type { Question, StudyNoteQuestionLink } from "@/types/quiz";
 
 type Props = {
@@ -50,7 +51,7 @@ function parseMarkdownParts(markdown: string): MarkdownPart[] {
 }
 
 export function StudyNoteMarkdown({ markdown, questionMap, questionLinks = [] }: Props) {
-  const parts = parseMarkdownParts(markdown);
+  const parts = parseMarkdownParts(normalizeStudyNoteMarkdown(markdown));
   const embeddedQuestionIds = new Set(parts.filter((part) => part.type === "question").map((part) => part.id));
   const appendedQuestionLinks = questionLinks.filter((link) => !embeddedQuestionIds.has(link.questionId));
 

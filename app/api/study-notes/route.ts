@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
+import { normalizeStudyNoteMarkdown } from "@/lib/studyNotes";
 import type {
   StudyNoteDetail,
   StudyNoteQuestionLink,
@@ -398,7 +399,7 @@ export async function POST(request: NextRequest) {
   try {
     const body = (await request.json().catch(() => null)) as CreateStudyNoteBody | null;
     const title = body?.title?.trim() ?? "";
-    const rawMarkdown = body?.rawMarkdown?.trim() ?? "";
+    const rawMarkdown = normalizeStudyNoteMarkdown(body?.rawMarkdown?.trim() ?? "");
 
     if (!title) {
       return NextResponse.json({ ok: false, message: "請輸入筆記標題。" }, { status: 400 });
@@ -509,7 +510,7 @@ export async function PUT(request: NextRequest) {
     const body = (await request.json().catch(() => null)) as CreateStudyNoteBody | null;
     const noteId = body?.id?.trim() ?? "";
     const title = body?.title?.trim() ?? "";
-    const rawMarkdown = body?.rawMarkdown?.trim() ?? "";
+    const rawMarkdown = normalizeStudyNoteMarkdown(body?.rawMarkdown?.trim() ?? "");
 
     if (!noteId) {
       return NextResponse.json({ ok: false, message: "缺少筆記 ID。" }, { status: 400 });
