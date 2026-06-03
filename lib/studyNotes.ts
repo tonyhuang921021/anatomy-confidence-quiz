@@ -299,6 +299,12 @@ function looksLikePlainTableLine(line: string) {
   return cells.length >= 2 && !line.trim().startsWith("|") && !line.trim().startsWith("*") && !line.trim().startsWith("-");
 }
 
+function looksLikeMarkdownPipeTableLine(line: string) {
+  const trimmed = line.trim();
+  if (!trimmed.startsWith("|") || !trimmed.endsWith("|")) return false;
+  return trimmed.split("|").filter((cell) => cell.trim()).length >= 2;
+}
+
 function getHeadingLevel(line: string, previousLine: string, nextLine: string) {
   const trimmed = line.trim();
   if (!trimmed || trimmed.startsWith("#") || trimmed.startsWith("*") || trimmed.startsWith("-")) return 0;
@@ -340,6 +346,15 @@ export function normalizeStudyNoteMarkdown(rawText: string) {
     const trimmed = line.trim();
     const previousLine = lines[index - 1] ?? "";
     const nextLine = lines[index + 1] ?? "";
+    const isPipeTableLine = looksLikeMarkdownPipeTableLine(line);
+    const previousOutput = output[output.length - 1] ?? "";
+
+    if (isPipeTableLine && previousOutput.trim() && !looksLikeMarkdownPipeTableLine(previousOutput)) {
+      output.push("");
+    }
+    if (!isPipeTableLine && looksLikeMarkdownPipeTableLine(previousOutput) && trimmed) {
+      output.push("");
+    }
 
     if (looksLikePlainTableLine(line)) {
       tableRows.push(splitTableCells(line));
