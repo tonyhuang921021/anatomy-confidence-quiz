@@ -92,17 +92,25 @@ export function FeedbackBoard() {
 
   useEffect(() => {
     async function fetchBudget() {
-      try {
-        const response = await fetch("/api/openai-budget", { cache: "no-store" });
+      const loadBudget = async (url: string) => {
+        const response = await fetch(url, { cache: "no-store" });
         const payload = (await response.json().catch(() => null)) as
           | { ok?: boolean; budget?: OpenAIBudgetStatus }
           | null;
         if (response.ok && payload?.ok && payload.budget?.enabled) {
           setBudget(payload.budget);
         }
+      };
+
+      try {
+        await loadBudget("/api/openai-budget?live=false");
       } catch {
         // Keep the feedback board quiet if the budget badge is unavailable.
       }
+
+      void loadBudget("/api/openai-budget").catch(() => {
+        // Keep the fast pinned message visible even if the live costs call is slow or unavailable.
+      });
     }
 
     void fetchBudget();

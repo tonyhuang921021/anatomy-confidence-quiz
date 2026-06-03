@@ -22,9 +22,10 @@ function isAllowedEmail(email?: string | null) {
   return getAllowedEmails().includes(email.trim().toLowerCase());
 }
 
-export async function GET() {
+export async function GET(request: NextRequest) {
   try {
-    const budget = await loadOpenAIBudgetStatus();
+    const includeLiveCosts = request.nextUrl.searchParams.get("live") !== "false";
+    const budget = await loadOpenAIBudgetStatus({ includeLiveCosts });
     return NextResponse.json({ ok: true, budget });
   } catch (error) {
     const message = error instanceof Error ? error.message : "AI 補強基金狀態讀取失敗";

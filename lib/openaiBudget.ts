@@ -34,6 +34,10 @@ let cachedCosts:
     }
   | null = null;
 
+type LoadOpenAIBudgetStatusOptions = {
+  includeLiveCosts?: boolean;
+};
+
 export function getServiceSupabaseClient() {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
@@ -172,7 +176,8 @@ async function fetchOpenAICostsUsd() {
   return cachedCosts;
 }
 
-export async function loadOpenAIBudgetStatus(): Promise<OpenAIBudgetStatus> {
+export async function loadOpenAIBudgetStatus(options: LoadOpenAIBudgetStatusOptions = {}): Promise<OpenAIBudgetStatus> {
+  const includeLiveCosts = options.includeLiveCosts ?? true;
   const budgetUsd = await loadOpenAIBudgetUsd();
   const base = {
     enabled: budgetUsd > 0,
@@ -186,6 +191,24 @@ export async function loadOpenAIBudgetStatus(): Promise<OpenAIBudgetStatus> {
       ...base,
       source: "unavailable",
       message: "AI 補強基金預算尚未設定。"
+    };
+  }
+
+  if (!includeLiveCosts) {
+    if (cachedCosts) {
+      return {
+        ...base,
+        usedUsd: cachedCosts.usedUsd,
+        remainingUsd: roundUsd(budgetUsd - cachedCosts.usedUsd),
+        source: "openai_costs",
+        updatedAt: cachedCosts.updatedAt
+      };
+    }
+
+    return {
+      ...base,
+      source: "unavailable",
+      message: "使用狀態整理中。"
     };
   }
 
