@@ -238,10 +238,10 @@ export default function NewStudyNotePage() {
                 </div>
                 <p className="mt-2 text-sm leading-6 text-slate-600">
                   先把這段貼給 ChatGPT，再貼你的資料。它會在最上方加入 note-meta，網站貼上後會自動建立標題、科目、分類和摘要。
-                  它也會自行查公開正式考古題，並把相關題號回填成 questionLinks。
+                  如果要自動補相關考古題，請貼到有開啟網路搜尋的 ChatGPT；它會自行查公開正式考古題，並把相關題號回填成 questionLinks。
                 </p>
                 <p className="mt-2 rounded-2xl bg-white/70 px-3 py-2 text-xs font-semibold text-teal-900">
-                  不需要先給候選題；只要它回傳網站可辨識的題號，貼回來後就會自動帶入本地題庫的題目、選項、答案與詳解。
+                  不需要先給候選題；但 ChatGPT 必須能上網查題號。只要它回傳網站可辨識的題號，貼回來後就會自動帶入本地題庫的題目、選項、答案與詳解。
                 </p>
                 <pre className="mt-3 max-h-56 max-w-full overflow-auto whitespace-pre-wrap break-words rounded-2xl bg-slate-950 p-3 text-xs leading-5 text-white">
                   {promptText}
