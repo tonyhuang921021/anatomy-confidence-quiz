@@ -272,7 +272,8 @@ export function stripStudyNoteMetadataBlock(rawText: string) {
 }
 
 function isDividerLine(line: string) {
-  return /^[\s\-—–⸻]+$/.test(line.trim()) && line.trim().length >= 3;
+  const trimmed = line.trim();
+  return trimmed === "⸻" || (/^[\s\-—–⸻]+$/.test(trimmed) && trimmed.length >= 3);
 }
 
 function splitTableCells(line: string) {
@@ -303,6 +304,19 @@ function looksLikeMarkdownPipeTableLine(line: string) {
   const trimmed = line.trim();
   if (!trimmed.startsWith("|") || !trimmed.endsWith("|")) return false;
   return trimmed.split("|").filter((cell) => cell.trim()).length >= 2;
+}
+
+function splitPipeTableCells(line: string) {
+  return line
+    .trim()
+    .replace(/^\|/, "")
+    .replace(/\|$/, "")
+    .split("|")
+    .map((cell) => cell.trim());
+}
+
+function isPipeTableDividerRow(row: string[]) {
+  return row.length > 0 && row.every((cell) => /^:?-{3,}:?$/.test(cell.trim()));
 }
 
 function getHeadingLevel(line: string, previousLine: string, nextLine: string) {
@@ -337,26 +351,51 @@ function flushTable(tableRows: string[][], output: string[]) {
   normalizedRows.slice(1).forEach((row) => output.push(`| ${row.join(" | ")} |`));
 }
 
+function ensureBlankBeforeBlock(output: string[]) {
+  if (output.length > 0 && output[output.length - 1].trim()) {
+    output.push("");
+  }
+}
+
+function flushPipeTable(tableRows: string[][], output: string[]) {
+  if (tableRows.length === 0) return;
+  if (tableRows.length < 2 || tableRows[0].length < 2) {
+    tableRows.forEach((row) => output.push(`| ${row.join(" | ")} |`));
+    return;
+  }
+
+  const [headerRow, maybeDividerRow, ...remainingRows] = tableRows;
+  const bodyRows = isPipeTableDividerRow(maybeDividerRow) ? remainingRows : [maybeDividerRow, ...remainingRows];
+  const maxColumns = Math.max(headerRow.length, ...bodyRows.map((row) => row.length));
+  const normalizeRow = (row: string[]) => {
+    const nextRow = [...row];
+    while (nextRow.length < maxColumns) nextRow.push("");
+    return nextRow.slice(0, maxColumns);
+  };
+
+  const normalizedHeader = normalizeRow(headerRow);
+  output.push(`| ${normalizedHeader.join(" | ")} |`);
+  output.push(`| ${normalizedHeader.map(() => "---").join(" | ")} |`);
+  bodyRows.map(normalizeRow).forEach((row) => output.push(`| ${row.join(" | ")} |`));
+}
+
 export function normalizeStudyNoteMarkdown(rawText: string) {
   const lines = rawText.replace(/\r\n/g, "\n").split("\n").flatMap(splitCollapsedPipeTableRows);
   const output: string[] = [];
   let tableRows: string[][] = [];
+  let pipeTableRows: string[][] = [];
 
   lines.forEach((line, index) => {
     const trimmed = line.trim();
     const previousLine = lines[index - 1] ?? "";
     const nextLine = lines[index + 1] ?? "";
     const isPipeTableLine = looksLikeMarkdownPipeTableLine(line);
-    const previousOutput = output[output.length - 1] ?? "";
-
-    if (isPipeTableLine && previousOutput.trim() && !looksLikeMarkdownPipeTableLine(previousOutput)) {
-      output.push("");
-    }
-    if (!isPipeTableLine && looksLikeMarkdownPipeTableLine(previousOutput) && trimmed) {
-      output.push("");
-    }
 
     if (looksLikePlainTableLine(line)) {
+      if (pipeTableRows.length > 0) {
+        flushPipeTable(pipeTableRows, output);
+        pipeTableRows = [];
+      }
       tableRows.push(splitTableCells(line));
       return;
     }
@@ -364,6 +403,21 @@ export function normalizeStudyNoteMarkdown(rawText: string) {
     if (tableRows.length > 0) {
       flushTable(tableRows, output);
       tableRows = [];
+    }
+
+    if (isPipeTableLine) {
+      if (pipeTableRows.length === 0) ensureBlankBeforeBlock(output);
+      pipeTableRows.push(splitPipeTableCells(line));
+      return;
+    }
+
+    if (pipeTableRows.length > 0) {
+      flushPipeTable(pipeTableRows, output);
+      pipeTableRows = [];
+    }
+
+    if (looksLikeMarkdownPipeTableLine(output[output.length - 1] ?? "") && trimmed) {
+      output.push("");
     }
 
     if (isDividerLine(line)) {
@@ -382,6 +436,9 @@ export function normalizeStudyNoteMarkdown(rawText: string) {
 
   if (tableRows.length > 0) {
     flushTable(tableRows, output);
+  }
+  if (pipeTableRows.length > 0) {
+    flushPipeTable(pipeTableRows, output);
   }
 
   return output.join("\n").replace(/\n{3,}/g, "\n\n").trim();
