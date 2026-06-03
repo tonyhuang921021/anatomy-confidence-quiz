@@ -6,6 +6,7 @@ import { useParams, useRouter } from "next/navigation";
 import { useAuth } from "@/components/AuthProvider";
 import { StudyNoteMarkdown } from "@/components/StudyNoteMarkdown";
 import { getCanonicalQuestionBank } from "@/data/med1QuestionBank";
+import { resolveStudyNoteQuestionLinks } from "@/lib/questionLinkResolver";
 import { DEFAULT_QUIZ_SETTINGS } from "@/lib/quizAnalysis";
 import { saveQuizSettings } from "@/lib/storage";
 import { deleteStudyNote, loadStudyNote, updateStudyNote } from "@/lib/studyNotes";
@@ -209,7 +210,7 @@ export default function StudyNoteDetailPage() {
           section: note.section,
           collectionName: note.collectionName,
           tags: note.tags,
-          questionLinks: draftQuestionLinks
+          questionLinks: resolveStudyNoteQuestionLinks(draftQuestionLinks, allQuestions)
         });
         setNote(updated);
         resetDraftsFromNote(updated);
