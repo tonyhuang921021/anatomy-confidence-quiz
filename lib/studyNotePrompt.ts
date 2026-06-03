@@ -1,4 +1,33 @@
-export const STUDY_NOTE_FORMAT_PROMPT = `請把接下來的內容轉成「網站筆記可以完整還原的 Markdown」。
+type StudyNotePromptQuestionCandidate = {
+  id: string;
+  label?: string;
+  subject?: string;
+  chapter?: string;
+  section?: string;
+  testedConcept?: string;
+  stem: string;
+};
+
+function formatQuestionCandidates(candidates: StudyNotePromptQuestionCandidate[]) {
+  if (candidates.length === 0) return "";
+
+  return `
+
+下面是網站題庫提供的「近十年候選題」。如果你判斷某題和這篇筆記真的相關，請只從這份清單挑題號，填進 note-meta 的 questionLinks；不要自己編不存在的題號。
+
+候選題：
+${candidates
+  .map((question, index) => {
+    const scope = [question.label, question.subject, question.chapter, question.section].filter(Boolean).join(" / ");
+    const concept = question.testedConcept ? `｜概念：${question.testedConcept}` : "";
+    return `${index + 1}. ${question.id}${scope ? `｜${scope}` : ""}${concept}
+題幹：${question.stem}`;
+  })
+  .join("\n\n")}`;
+}
+
+export function buildStudyNoteFormatPrompt(candidates: StudyNotePromptQuestionCandidate[] = []) {
+  return `請把接下來的內容轉成「網站筆記可以完整還原的 Markdown」。
 
 目標不是重寫，也不是硬套模板；目標是讓我可以直接複製貼上到筆記系統，排版不要跑掉。
 
@@ -10,6 +39,7 @@ subject: 解剖學／組織學／胚胎學／生理學／生物化學／微生�
 collection: 這篇適合放的資料夾或主題分類
 summary: 50 字內摘要
 tags: tag1, tag2, tag3
+questionLinks: 題目ID1, 題目ID2
 \`\`\`
 2. note-meta code block 之後才輸出 Markdown 正文。
 3. 保留原本內容的邏輯、順序和語氣，不要自行補不存在的段落。
@@ -25,7 +55,11 @@ tags: tag1, tag2, tag3
 8. 不要輸出 HTML，不要輸出圖片連結，不要包成 JSON。
 9. 如果原文有題號，而且你確定是網站題庫的題目，可以額外用這個短碼獨立放一行：
 [question-note id="題目ID" title="簡短題目標題"]
-10. 如果沒有明確題號，不要硬產生 question-note。
-11. 不要加「以下是整理後內容」這種開場白。
+10. 如果我有提供候選題，請判斷哪些候選題和筆記重點高度相關，並把題號填入 note-meta 的 questionLinks。沒有高度相關就留空，不要硬加。
+11. 如果沒有明確題號，不要硬產生 question-note。
+12. 不要加「以下是整理後內容」這種開場白。${formatQuestionCandidates(candidates)}
 
 簡單說：請把你的原本好讀排版，轉成乾淨、標準、可貼進網站的 Markdown，並在最上方附上網站看得懂的 note-meta。`;
+}
+
+export const STUDY_NOTE_FORMAT_PROMPT = buildStudyNoteFormatPrompt();

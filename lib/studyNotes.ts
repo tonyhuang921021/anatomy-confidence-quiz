@@ -135,6 +135,14 @@ function normalizeMetadataQuestionLinks(rawLinks: unknown): StudyNoteQuestionLin
     .filter((item): item is StudyNoteQuestionLink => Boolean(item));
 }
 
+function parseCommaSeparatedQuestionLinks(value?: string): StudyNoteQuestionLink[] {
+  return (value ?? "")
+    .split(/[,，、\n]/)
+    .map((questionId) => questionId.trim())
+    .filter(Boolean)
+    .map((questionId) => ({ questionId, relationType: "related" as const }));
+}
+
 function parseNoteMetaBlock(rawText: string): Record<string, string> | null {
   const match = rawText.match(/```note-meta\s*([\s\S]*?)```/i);
   const rawMetaText = match?.[1] ?? parseLooseNoteMetaText(rawText);
@@ -161,11 +169,14 @@ function parseLooseNoteMetaText(rawText: string) {
     "category",
     "summary",
     "tags",
+    "questionLinks",
+    "question_links",
     "標題",
     "科目",
     "分類",
     "摘要",
-    "標籤"
+    "標籤",
+    "相關題目"
   ]);
 
   for (const line of lines) {
@@ -194,9 +205,11 @@ function normalizeMetadataKey(key: string) {
     分類: "collection",
     摘要: "summary",
     標籤: "tags",
+    相關題目: "questionLinks",
     category: "collection",
     collectionName: "collection",
-    collection_name: "collection"
+    collection_name: "collection",
+    question_links: "questionLinks"
   };
   return map[key] ?? key;
 }
@@ -224,7 +237,7 @@ export function parseStudyNoteMetadata(rawText: string): StudyNoteMetadataInput 
       subject: normalizeMetadataSubject(noteMeta.subject),
       collectionName: noteMeta.collection,
       tags: parseCommaSeparatedTags(noteMeta.tags),
-      questionLinks: []
+      questionLinks: parseCommaSeparatedQuestionLinks(noteMeta.questionLinks)
     };
   }
 
