@@ -3,6 +3,7 @@ import type { OpenAIBudgetStatus } from "@/types/quiz";
 
 const AI_BUDGET_SETTING_KEY = "openai_budget_usd";
 const COST_CACHE_TTL_MS = 60 * 60 * 1000;
+const COST_FETCH_TIMEOUT_MS = 12 * 1000;
 const DEFAULT_COSTS_START_DATE = "2024-01-01";
 
 type SiteSettingRow = {
@@ -119,6 +120,16 @@ function getCostRangeUnixSeconds() {
   };
 }
 
+function withTimeout<T>(promise: Promise<T>, timeoutMs: number, message: string) {
+  return new Promise<T>((resolve, reject) => {
+    const timeout = setTimeout(() => reject(new Error(message)), timeoutMs);
+    promise
+      .then(resolve)
+      .catch(reject)
+      .finally(() => clearTimeout(timeout));
+  });
+}
+
 async function fetchOpenAICostsUsd() {
   if (cachedCosts && cachedCosts.expiresAt > Date.now()) {
     return cachedCosts;
@@ -213,7 +224,7 @@ export async function loadOpenAIBudgetStatus(options: LoadOpenAIBudgetStatusOpti
   }
 
   try {
-    const costs = await fetchOpenAICostsUsd();
+    const costs = await withTimeout(fetchOpenAICostsUsd(), COST_FETCH_TIMEOUT_MS, "OpenAI 成本查詢逾時。");
     const usedUsd = costs.usedUsd;
     return {
       ...base,

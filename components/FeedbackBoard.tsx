@@ -25,11 +25,14 @@ function BudgetPinnedMessage({ budget }: { budget: OpenAIBudgetStatus }) {
   const used = formatUsd(budget.usedUsd);
   const budgetTotal = formatUsd(budget.budgetUsd);
   const remaining = formatUsd(budget.remainingUsd);
+  const statusMessage = budget.message?.replace(/[。.]$/, "");
   const text =
     used && budgetTotal && remaining
       ? `AI 補強基金：已使用 ${used} / 預算 ${budgetTotal}，剩餘約 ${remaining}`
       : budgetTotal
-        ? `AI 補強基金：預算 ${budgetTotal}，使用狀態整理中`
+        ? statusMessage && statusMessage !== "使用狀態整理中"
+          ? `AI 補強基金：預算 ${budgetTotal}，使用量暫時讀不到（${statusMessage}）`
+          : `AI 補強基金：預算 ${budgetTotal}，使用狀態整理中`
         : "";
 
   if (!text) return null;
