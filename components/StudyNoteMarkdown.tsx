@@ -51,6 +51,8 @@ function parseMarkdownParts(markdown: string): MarkdownPart[] {
 
 export function StudyNoteMarkdown({ markdown, questionMap, questionLinks = [] }: Props) {
   const parts = parseMarkdownParts(markdown);
+  const embeddedQuestionIds = new Set(parts.filter((part) => part.type === "question").map((part) => part.id));
+  const appendedQuestionLinks = questionLinks.filter((link) => !embeddedQuestionIds.has(link.questionId));
 
   return (
     <div className="note-markdown">
@@ -73,6 +75,24 @@ export function StudyNoteMarkdown({ markdown, questionMap, questionLinks = [] }:
           </ReactMarkdown>
         );
       })}
+      {appendedQuestionLinks.length > 0 ? (
+        <section className="study-note-linked-questions mt-8 rounded-[2rem] border border-teal-100 bg-teal-50/50 p-4">
+          <p className="text-xs font-bold uppercase tracking-[0.18em] text-teal-700">Linked Exam Questions</p>
+          <h2 className="mt-2 text-2xl font-black text-slate-950">相關國考題</h2>
+          <p className="mt-1 text-sm leading-6 text-slate-600">
+            這些題號來自筆記 metadata，網站會自動帶入題目、選項、答案與詳解。
+          </p>
+          <div className="mt-4">
+            {appendedQuestionLinks.map((link) => (
+              <StudyNoteQuestionCard
+                key={`${link.questionId}-${link.relationType}`}
+                question={questionMap?.get(link.questionId)}
+                link={link}
+              />
+            ))}
+          </div>
+        </section>
+      ) : null}
     </div>
   );
 }
