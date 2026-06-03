@@ -136,11 +136,17 @@ function normalizeMetadataQuestionLinks(rawLinks: unknown): StudyNoteQuestionLin
 }
 
 function parseCommaSeparatedQuestionLinks(value?: string): StudyNoteQuestionLink[] {
-  return (value ?? "")
-    .split(/[,，、\n]/)
+  const cleaned = (value ?? "").replace(/^\s*(?:questionLinks|question_links|相關題目)\s*[:：]/i, "");
+  return cleaned
+    .split(/[,，、;\n]/)
     .map((questionId) => questionId.trim())
+    .map((questionId) => questionId.replace(/^\s*(?:questionLinks|question_links|相關題目)\s*[:：]\s*/i, ""))
     .filter(Boolean)
     .map((questionId) => ({ questionId, relationType: "related" as const }));
+}
+
+export function parseStudyNoteQuestionLinkText(value?: string): StudyNoteQuestionLink[] {
+  return parseCommaSeparatedQuestionLinks(value);
 }
 
 function parseNoteMetaBlock(rawText: string): Record<string, string> | null {
@@ -284,11 +290,12 @@ function splitTableCells(line: string) {
 
 function splitCollapsedPipeTableRows(line: string) {
   const trimmed = line.trim();
-  if (!trimmed.startsWith("|") || !trimmed.endsWith("|")) return [line];
-  if (!/\|\s+\|/.test(trimmed)) return [line];
+  const pipeCandidate = getPipeTableCandidateLine(trimmed);
+  if (!pipeCandidate || !pipeCandidate.endsWith("|")) return [line];
+  if (!/\|\s+\|/.test(pipeCandidate)) return [line];
 
   const leadingWhitespace = line.match(/^\s*/)?.[0] ?? "";
-  return trimmed
+  return pipeCandidate
     .replace(/\|\s+\|/g, "|\n|")
     .split("\n")
     .map((row) => `${leadingWhitespace}${row.trim()}`)
@@ -301,14 +308,21 @@ function looksLikePlainTableLine(line: string) {
 }
 
 function looksLikeMarkdownPipeTableLine(line: string) {
-  const trimmed = line.trim();
+  const trimmed = getPipeTableCandidateLine(line);
+  if (!trimmed) return false;
   if (!trimmed.startsWith("|") || !trimmed.endsWith("|")) return false;
   return trimmed.split("|").filter((cell) => cell.trim()).length >= 2;
 }
 
+function getPipeTableCandidateLine(line: string) {
+  const trimmed = line.trim();
+  if (trimmed.startsWith("|")) return trimmed;
+  const withoutHeadingMarker = trimmed.replace(/^#{1,6}\s+/, "");
+  return withoutHeadingMarker.startsWith("|") ? withoutHeadingMarker : "";
+}
+
 function splitPipeTableCells(line: string) {
-  return line
-    .trim()
+  return getPipeTableCandidateLine(line)
     .replace(/^\|/, "")
     .replace(/\|$/, "")
     .split("|")
@@ -322,6 +336,7 @@ function isPipeTableDividerRow(row: string[]) {
 function getHeadingLevel(line: string, previousLine: string, nextLine: string) {
   const trimmed = line.trim();
   if (!trimmed || trimmed.startsWith("#") || trimmed.startsWith("*") || trimmed.startsWith("-")) return 0;
+  if (looksLikeMarkdownPipeTableLine(trimmed)) return 0;
   if (trimmed.includes(":") || trimmed.includes("：")) return 0;
   if (looksLikePlainTableLine(trimmed)) return 0;
   if (trimmed.length > 34) return 0;

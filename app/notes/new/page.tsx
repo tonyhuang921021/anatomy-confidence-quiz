@@ -7,11 +7,12 @@ import { useAuth } from "@/components/AuthProvider";
 import { getCanonicalQuestionBank } from "@/data/med1QuestionBank";
 import { MED1_SUBJECTS, MED2_SUBJECTS, subjectRegistry } from "@/data/subjectRegistry";
 import { resolveStudyNoteQuestionLinks } from "@/lib/questionLinkResolver";
-import { buildStudyNoteFormatPrompt } from "@/lib/studyNotePrompt";
+import { buildStudyNoteFormatPrompt, buildStudyNoteQuestionLinkPrompt } from "@/lib/studyNotePrompt";
 import {
   createStudyNote,
   inferStudyNoteTitle,
   normalizeStudyNoteMarkdown,
+  parseStudyNoteQuestionLinkText,
   parseStudyNoteMetadata,
   stripStudyNoteMetadataBlock
 } from "@/lib/studyNotes";
@@ -72,6 +73,7 @@ export default function NewStudyNotePage() {
   const [manualTags, setManualTags] = useState("");
   const [metadataTags, setMetadataTags] = useState<StudyNoteTag[]>([]);
   const [questionSearch, setQuestionSearch] = useState("");
+  const [questionCodeText, setQuestionCodeText] = useState("");
   const [questionLinks, setQuestionLinks] = useState<StudyNoteQuestionLink[]>([]);
   const [promptExamQuestionCount, setPromptExamQuestionCount] = useState(6);
   const [promptDetailLevel, setPromptDetailLevel] = useState<"concise" | "detailed">("detailed");
@@ -115,6 +117,10 @@ export default function NewStudyNotePage() {
     () => buildStudyNoteFormatPrompt([], { examQuestionCount: promptExamQuestionCount, detailLevel: promptDetailLevel }),
     [promptDetailLevel, promptExamQuestionCount]
   );
+  const questionLinkPromptText = useMemo(
+    () => buildStudyNoteQuestionLinkPrompt(promptExamQuestionCount),
+    [promptExamQuestionCount]
+  );
 
   function applyMetadataFromMarkdown(markdown: string) {
     const parsed = parseStudyNoteMetadata(markdown);
@@ -148,6 +154,19 @@ export default function NewStudyNotePage() {
     setQuestionLinks((current) => current.filter((item) => item.questionId !== questionId));
   }
 
+  function addQuestionLinksFromText() {
+    const resolvedLinks = resolveStudyNoteQuestionLinks(parseStudyNoteQuestionLinkText(questionCodeText), allQuestions);
+    if (resolvedLinks.length === 0) {
+      setError("沒有找到可對應的題目。請確認題號有年份、第幾次、卷碼與 Q 題號，例如 2022-1-1301-Q025。");
+      setMessage("");
+      return;
+    }
+    setQuestionLinks((current) => mergeUniqueLinks(current, resolvedLinks));
+    setQuestionCodeText("");
+    setMessage(`已加入 ${resolvedLinks.length} 題相關題目。`);
+    setError("");
+  }
+
   async function copyFormatPrompt() {
     try {
       await navigator.clipboard.writeText(promptText);
@@ -155,6 +174,17 @@ export default function NewStudyNotePage() {
       setError("");
     } catch {
       setError("複製失敗，可以手動複製右側格式提示。");
+      setMessage("");
+    }
+  }
+
+  async function copyQuestionLinkPrompt() {
+    try {
+      await navigator.clipboard.writeText(questionLinkPromptText);
+      setMessage(`已複製專門補題號提示，目標 ${promptExamQuestionCount} 題。`);
+      setError("");
+    } catch {
+      setError("複製失敗，可以手動複製右側題號提示。");
       setMessage("");
     }
   }
@@ -346,6 +376,38 @@ export default function NewStudyNotePage() {
 
               <div className="min-w-0 rounded-3xl border border-slate-200 bg-white p-4">
                 <h2 className="text-lg font-bold text-slate-950">相關題目</h2>
+                <div className="mt-3 rounded-2xl border border-amber-100 bg-amber-50/70 p-3">
+                  <div className="flex flex-wrap items-center justify-between gap-2">
+                    <div>
+                      <p className="text-sm font-bold text-slate-950">專門補題號 Prompt</p>
+                      <p className="mt-1 text-xs leading-5 text-slate-600">
+                        只請 ChatGPT 回傳 questionLinks，不要把來源或題幹塞進筆記。
+                      </p>
+                    </div>
+                    <button type="button" onClick={copyQuestionLinkPrompt} className="secondary-pill px-4 py-2 text-sm">
+                      複製
+                    </button>
+                  </div>
+                  <pre className="mt-3 max-h-36 max-w-full overflow-auto whitespace-pre-wrap break-words rounded-2xl bg-slate-950 p-3 text-xs leading-5 text-white">
+                    {questionLinkPromptText}
+                  </pre>
+                </div>
+                <label className="mt-3 grid gap-2 text-sm font-semibold text-slate-700">
+                  貼上題目代碼
+                  <textarea
+                    value={questionCodeText}
+                    onChange={(event) => setQuestionCodeText(event.target.value)}
+                    placeholder="questionLinks: 2022-1-1301-Q025, 2020-2-1301-Q021"
+                    rows={3}
+                    className="rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm outline-none focus:border-teal-500"
+                  />
+                  <span className="text-xs font-medium leading-5 text-slate-500">
+                    建議用年份-次別-卷碼-Q題號；沒有卷碼又撞到多題時，網站不會亂猜。
+                  </span>
+                </label>
+                <button type="button" onClick={addQuestionLinksFromText} className="secondary-pill mt-3 justify-center px-4 py-2 text-sm">
+                  用題目代碼加入
+                </button>
                 <input
                   value={questionSearch}
                   onChange={(event) => setQuestionSearch(event.target.value)}

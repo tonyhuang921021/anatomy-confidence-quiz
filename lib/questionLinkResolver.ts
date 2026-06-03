@@ -30,7 +30,8 @@ function parseQuestionReference(rawReference: string) {
       year: normalizeYear(examCode.slice(0, 3)),
       round: inferRoundFromExamCode(examCode),
       paperCode,
-      questionNumber: normalizeQuestionNumber(questionNumberText)
+      questionNumber: normalizeQuestionNumber(questionNumberText),
+      hasPaperCode: true
     };
   }
 
@@ -43,7 +44,8 @@ function parseQuestionReference(rawReference: string) {
       year: normalizeYear(yearText),
       round: roundText === "2" || roundText === "二" ? 2 : 1,
       paperCode,
-      questionNumber: normalizeQuestionNumber(questionNumberText)
+      questionNumber: normalizeQuestionNumber(questionNumberText),
+      hasPaperCode: true
     };
   }
 
@@ -53,7 +55,8 @@ function parseQuestionReference(rawReference: string) {
     return {
       year: normalizeYear(yearText),
       round: roundText === "2" || roundText === "二" ? 2 : 1,
-      questionNumber: normalizeQuestionNumber(questionNumberText)
+      questionNumber: normalizeQuestionNumber(questionNumberText),
+      hasPaperCode: false
     };
   }
 
@@ -79,6 +82,8 @@ function findQuestionByReference(questions: Question[], rawReference: string) {
     if (parsed.paperCode && question.paperCode !== parsed.paperCode) return false;
     return question.originalQuestionNumber === parsed.questionNumber;
   });
+
+  if (!parsed.hasPaperCode && candidates.length > 1) return null;
 
   return candidates[0] ?? null;
 }

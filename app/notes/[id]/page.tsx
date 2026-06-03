@@ -9,7 +9,8 @@ import { getCanonicalQuestionBank } from "@/data/med1QuestionBank";
 import { resolveStudyNoteQuestionLinks } from "@/lib/questionLinkResolver";
 import { DEFAULT_QUIZ_SETTINGS } from "@/lib/quizAnalysis";
 import { saveQuizSettings } from "@/lib/storage";
-import { deleteStudyNote, loadStudyNote, updateStudyNote } from "@/lib/studyNotes";
+import { buildStudyNoteQuestionLinkPrompt } from "@/lib/studyNotePrompt";
+import { deleteStudyNote, loadStudyNote, parseStudyNoteQuestionLinkText, updateStudyNote } from "@/lib/studyNotes";
 import type { Question, StudyNoteDetail, StudyNoteQuestionLink } from "@/types/quiz";
 
 function formatDate(value: string) {
@@ -55,12 +56,14 @@ export default function StudyNoteDetailPage() {
   const [draftMarkdown, setDraftMarkdown] = useState("");
   const [draftQuestionLinks, setDraftQuestionLinks] = useState<StudyNoteQuestionLink[]>([]);
   const [questionSearch, setQuestionSearch] = useState("");
+  const [draftQuestionCodeText, setDraftQuestionCodeText] = useState("");
   const [editing, setEditing] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [message, setMessage] = useState("");
   const [isPending, startTransition] = useTransition();
   const deferredQuestionSearch = useDeferredValue(questionSearch);
+  const questionLinkPromptText = useMemo(() => buildStudyNoteQuestionLinkPrompt(8), []);
 
   useEffect(() => {
     if (!configured || !session?.access_token || !params.id) {
@@ -165,6 +168,7 @@ export default function StudyNoteDetailPage() {
     setDraftMarkdown(nextNote.rawMarkdown);
     setDraftQuestionLinks(nextNote.questionLinks);
     setQuestionSearch("");
+    setDraftQuestionCodeText("");
   }
 
   function toggleEditing() {
@@ -191,6 +195,30 @@ export default function StudyNoteDetailPage() {
 
   function removeQuestionLink(questionId: string) {
     setDraftQuestionLinks((current) => current.filter((item) => item.questionId !== questionId));
+  }
+
+  function addQuestionLinksFromText() {
+    const resolvedLinks = resolveStudyNoteQuestionLinks(parseStudyNoteQuestionLinkText(draftQuestionCodeText), allQuestions);
+    if (resolvedLinks.length === 0) {
+      setError("沒有找到可對應的題目。請確認題號有年份、第幾次、卷碼與 Q 題號，例如 2022-1-1301-Q025。");
+      setMessage("");
+      return;
+    }
+    setDraftQuestionLinks((current) => mergeUniqueLinks(current, resolvedLinks));
+    setDraftQuestionCodeText("");
+    setMessage(`已加入 ${resolvedLinks.length} 題相關題目。`);
+    setError("");
+  }
+
+  async function copyQuestionLinkPrompt() {
+    try {
+      await navigator.clipboard.writeText(questionLinkPromptText);
+      setMessage("已複製專門補題號提示。");
+      setError("");
+    } catch {
+      setError("複製失敗，可以手動複製題號提示。");
+      setMessage("");
+    }
   }
 
   function handleSaveEdit() {
@@ -318,6 +346,38 @@ export default function StudyNoteDetailPage() {
                   </div>
                   <span className="stat-chip">{selectedDraftQuestions.length} 題</span>
                 </div>
+                <div className="mt-4 rounded-2xl border border-amber-100 bg-amber-50/70 p-3">
+                  <div className="flex flex-wrap items-center justify-between gap-2">
+                    <div>
+                      <p className="text-sm font-bold text-slate-950">專門補題號 Prompt</p>
+                      <p className="mt-1 text-xs leading-5 text-slate-600">
+                        貼給 ChatGPT 後，再把它回傳的 questionLinks 貼到下面欄位。
+                      </p>
+                    </div>
+                    <button type="button" onClick={copyQuestionLinkPrompt} className="secondary-pill px-4 py-2 text-sm">
+                      複製
+                    </button>
+                  </div>
+                  <pre className="mt-3 max-h-36 max-w-full overflow-auto whitespace-pre-wrap break-words rounded-2xl bg-slate-950 p-3 text-xs leading-5 text-white">
+                    {questionLinkPromptText}
+                  </pre>
+                </div>
+                <label className="mt-4 grid gap-2 text-sm font-semibold text-slate-700">
+                  貼上題目代碼
+                  <textarea
+                    value={draftQuestionCodeText}
+                    onChange={(event) => setDraftQuestionCodeText(event.target.value)}
+                    placeholder="questionLinks: 2022-1-1301-Q025, 2020-2-1301-Q021"
+                    rows={3}
+                    className="rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm outline-none focus:border-teal-500"
+                  />
+                  <span className="text-xs font-medium leading-5 text-slate-500">
+                    建議包含卷碼；像 2019-2-Q008 若撞到多題，網站會先跳過避免連錯。
+                  </span>
+                </label>
+                <button type="button" onClick={addQuestionLinksFromText} className="secondary-pill mt-3 justify-center px-4 py-2 text-sm">
+                  用題目代碼加入
+                </button>
                 <input
                   value={questionSearch}
                   onChange={(event) => setQuestionSearch(event.target.value)}

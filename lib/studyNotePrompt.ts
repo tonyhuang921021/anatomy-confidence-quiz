@@ -104,4 +104,37 @@ ${detailInstruction}
 簡單說：請把你的原本好讀排版，轉成乾淨、標準、可貼進網站的 Markdown，並在最上方附上網站看得懂的 note-meta。`;
 }
 
+export function buildStudyNoteQuestionLinkPrompt(maxQuestionCount = 8) {
+  const count = normalizeExamQuestionCount(maxQuestionCount);
+  return `請幫我替這篇學習筆記補「相關台灣醫師國考題號」，目標 ${count} 題，最多 8 題。
+
+你不需要重寫筆記正文，也不要輸出題幹、選項、答案、詳解或來源查證段落。只需要輸出一段可以貼回網站的題號清單。
+
+請盡量上網查公開來源，找和筆記核心觀念高度相關的正式考古題。不要憑印象亂編題號；找不到足夠題目時，少於 ${count} 題也可以。
+
+題號格式請優先用：
+西元年-第幾次-卷碼-Q題號
+
+範例：
+2022-1-1301-Q025
+2020-2-1301-Q021
+2011-1-1301-Q017
+
+重要：
+- 請盡量補上卷碼，例如 1301、2301、5301，因為只有 2019-2-Q008 這種格式會分不清楚是第 2 次考還是醫學二／醫學一哪一卷。
+- 如果公開來源真的沒有卷碼，才可以暫時用 2019-2-Q008；但請不要自己猜卷碼。
+- 如果你查到的是完整 MOEX ID，且來源本身明確出現完整 ID，才可以用 MOEX-110020-1301-Q026。
+- 不要把查證來源、URL、搜尋過程放進筆記正文，避免佔空間。
+
+請只輸出下面其中一種格式，越簡單越好：
+
+questionLinks: 2022-1-1301-Q025, 2020-2-1301-Q021, 2011-1-1301-Q017
+
+如果找不到可確認題號，請回：
+questionLinks:
+
+我接下來會貼學習筆記內容，請你根據筆記找相關題號。`;
+}
+
 export const STUDY_NOTE_FORMAT_PROMPT = buildStudyNoteFormatPrompt();
+export const STUDY_NOTE_QUESTION_LINK_PROMPT = buildStudyNoteQuestionLinkPrompt();
