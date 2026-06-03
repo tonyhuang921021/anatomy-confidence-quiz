@@ -335,7 +335,7 @@ export default function SubjectNotesPage() {
               <button
                 type="button"
                 onClick={() => setActiveQuestionNoteId(currentNote.id)}
-                className="fixed right-3 top-1/2 z-30 -translate-y-1/2 rounded-l-2xl rounded-r-none border border-r-0 bg-slate-950 px-3 py-4 text-xs font-bold leading-5 text-white shadow-xl transition hover:bg-teal-700 sm:right-0"
+                className="fixed right-5 top-1/2 z-30 -translate-y-1/2 rounded-3xl border border-white/20 bg-slate-950 px-4 py-5 text-sm font-bold leading-5 text-white shadow-2xl shadow-slate-900/20 transition hover:bg-teal-700 sm:right-6"
                 aria-label={`打開 ${currentNote.title} 的考古題`}
               >
                 <span className="block [writing-mode:vertical-rl]">
