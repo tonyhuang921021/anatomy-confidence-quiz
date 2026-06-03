@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { useAuth } from "@/components/AuthProvider";
 import { createFeedbackMessage, loadFeedbackMessages } from "@/lib/cloudSync";
-import type { FeedbackMessage } from "@/types/quiz";
+import type { FeedbackMessage, OpenAIBudgetStatus } from "@/types/quiz";
 
 function formatCreatedAt(value: string) {
   return new Date(value).toLocaleString("zh-TW", {
@@ -14,9 +14,45 @@ function formatCreatedAt(value: string) {
   });
 }
 
+function formatUsd(value?: number) {
+  if (typeof value !== "number" || !Number.isFinite(value)) return null;
+  return `US$${value.toFixed(2)}`;
+}
+
+function BudgetPinnedMessage({ budget }: { budget: OpenAIBudgetStatus }) {
+  if (!budget.enabled) return null;
+
+  const used = formatUsd(budget.usedUsd);
+  const budgetTotal = formatUsd(budget.budgetUsd);
+  const remaining = formatUsd(budget.remainingUsd);
+  const text =
+    used && budgetTotal && remaining
+      ? `AI 補強基金：已使用 ${used} / 預算 ${budgetTotal}，剩餘約 ${remaining}`
+      : budgetTotal
+        ? `AI 補強基金：預算 ${budgetTotal}，使用狀態整理中`
+        : "";
+
+  if (!text) return null;
+
+  return (
+    <div className="mt-5 rounded-3xl border border-emerald-100 bg-emerald-50/70 px-4 py-3 text-sm leading-6 text-emerald-950">
+      <div className="flex flex-wrap items-center gap-2">
+        <span className="rounded-full bg-white/80 px-2.5 py-1 text-[11px] font-bold uppercase tracking-[0.16em] text-emerald-700">
+          Pinned
+        </span>
+        <span className="font-semibold">{text}</span>
+      </div>
+      <p className="mt-1 text-xs leading-5 text-emerald-800/80">
+        小小透明一下，AI 詳解能穩穩開著就好，大家照自己的節奏用。
+      </p>
+    </div>
+  );
+}
+
 export function FeedbackBoard() {
   const { configured, user } = useAuth();
   const [messages, setMessages] = useState<FeedbackMessage[]>([]);
+  const [budget, setBudget] = useState<OpenAIBudgetStatus | null>(null);
   const [content, setContent] = useState("");
   const [replyTargetId, setReplyTargetId] = useState<string | null>(null);
   const [replyContent, setReplyContent] = useState("");
@@ -53,6 +89,24 @@ export function FeedbackBoard() {
 
     void fetchMessages();
   }, [configured]);
+
+  useEffect(() => {
+    async function fetchBudget() {
+      try {
+        const response = await fetch("/api/openai-budget", { cache: "no-store" });
+        const payload = (await response.json().catch(() => null)) as
+          | { ok?: boolean; budget?: OpenAIBudgetStatus }
+          | null;
+        if (response.ok && payload?.ok && payload.budget?.enabled) {
+          setBudget(payload.budget);
+        }
+      } catch {
+        // Keep the feedback board quiet if the budget badge is unavailable.
+      }
+    }
+
+    void fetchBudget();
+  }, []);
 
   async function handleSubmit() {
     setSubmitting(true);
@@ -125,6 +179,8 @@ export function FeedbackBoard() {
         </div>
       ) : (
         <>
+          {budget ? <BudgetPinnedMessage budget={budget} /> : null}
+
           <div className="surface-card-muted mt-5 p-4">
             {user ? (
               <div className="mb-4 flex flex-wrap gap-2">

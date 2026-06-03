@@ -347,6 +347,17 @@ export type OwnerDashboardStats = {
   updatedAt: string;
 };
 
+export type OpenAIBudgetStatus = {
+  enabled: boolean;
+  budgetUsd: number;
+  usedUsd?: number;
+  remainingUsd?: number;
+  currency: "usd";
+  source: "openai_costs" | "unavailable";
+  updatedAt: string;
+  message?: string;
+};
+
 export type OwnerDailyPoint = {
   date: string;
   attempts: number;

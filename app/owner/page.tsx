@@ -9,6 +9,7 @@ import {
   OwnerDashboardStats,
   OwnerExplanationUsageEntry,
   OwnerHourlyPoint,
+  OpenAIBudgetStatus,
   OwnerRecentAIAccountEntry,
   SubjectName,
   OwnerTopAttemptVisitorEntry
@@ -78,6 +79,11 @@ function estimateTwdFromTokens(inputTokens: number, outputTokens: number) {
     (inputTokens * GPT_5_MINI_INPUT_USD_PER_MILLION) / 1_000_000 +
     (outputTokens * GPT_5_MINI_OUTPUT_USD_PER_MILLION) / 1_000_000;
   return usd * APPROX_USD_TO_TWD;
+}
+
+function formatUsd(value?: number) {
+  if (typeof value !== "number" || !Number.isFinite(value)) return null;
+  return `US$${value.toFixed(2)}`;
 }
 
 function TinyLineChart({
@@ -197,6 +203,10 @@ export default function OwnerPage() {
   const [recentAiAccounts, setRecentAiAccounts] = useState<OwnerRecentAIAccountEntry[]>([]);
   const [topVisitors, setTopVisitors] = useState<OwnerTopAttemptVisitorEntry[]>([]);
   const [classificationReports, setClassificationReports] = useState<OwnerClassificationReportEntry[]>([]);
+  const [openAIBudget, setOpenAIBudget] = useState<OpenAIBudgetStatus | null>(null);
+  const [budgetInput, setBudgetInput] = useState("");
+  const [budgetMessage, setBudgetMessage] = useState("");
+  const [budgetSaving, setBudgetSaving] = useState(false);
   const [approvingReportId, setApprovingReportId] = useState<string | null>(null);
   const [aiBanPendingEmail, setAiBanPendingEmail] = useState<string | null>(null);
   const [manualSubjectMap, setManualSubjectMap] = useState<Record<string, SubjectName>>({});
@@ -223,6 +233,71 @@ export default function OwnerPage() {
     }
 
     return payload;
+  }
+
+  async function fetchOpenAIBudget() {
+    const response = await fetch("/api/openai-budget", { cache: "no-store" });
+    const payload = (await response.json().catch(() => null)) as
+      | {
+          ok?: boolean;
+          message?: string;
+          budget?: OpenAIBudgetStatus;
+        }
+      | null;
+
+    if (!response.ok || !payload?.ok || !payload.budget) {
+      throw new Error(payload?.message || "AI 補強基金狀態載入失敗");
+    }
+
+    setOpenAIBudget(payload.budget);
+    setBudgetInput(payload.budget.budgetUsd > 0 ? String(payload.budget.budgetUsd) : "");
+    return payload.budget;
+  }
+
+  async function handleSaveBudget() {
+    if (!session?.access_token) return;
+    const budgetUsd = Number(budgetInput);
+
+    if (!Number.isFinite(budgetUsd) || budgetUsd < 0) {
+      setBudgetMessage("請輸入 0 以上的美元預算。");
+      return;
+    }
+
+    try {
+      setBudgetSaving(true);
+      setBudgetMessage("");
+      setError("");
+      const response = await fetch("/api/openai-budget", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          accessToken: session.access_token,
+          budgetUsd
+        })
+      });
+
+      const payload = (await response.json().catch(() => null)) as
+        | {
+            ok?: boolean;
+            message?: string;
+            budget?: OpenAIBudgetStatus;
+          }
+        | null;
+
+      if (!response.ok || !payload?.ok || !payload.budget) {
+        throw new Error(payload?.message || "AI 補強基金預算更新失敗");
+      }
+
+      setOpenAIBudget(payload.budget);
+      setBudgetInput(payload.budget.budgetUsd > 0 ? String(payload.budget.budgetUsd) : "");
+      setBudgetMessage("AI 補強基金預算已更新，留言板小置頂訊息會跟著同步。");
+    } catch (saveError) {
+      setBudgetMessage(saveError instanceof Error ? saveError.message : "AI 補強基金預算更新失敗");
+    } finally {
+      setBudgetSaving(false);
+    }
   }
 
   async function handleAIBan(userEmail: string, action: "ban_one_hour" | "unban") {
@@ -458,6 +533,7 @@ export default function OwnerPage() {
         setRecentAiAccounts(payload.recentAiAccounts ?? []);
         setTopVisitors(payload.topVisitors ?? []);
         setClassificationReports(payload.classificationReports ?? []);
+        await fetchOpenAIBudget();
       } catch (fetchError) {
         setError(fetchError instanceof Error ? fetchError.message : "數據載入失敗");
       } finally {
@@ -482,6 +558,7 @@ export default function OwnerPage() {
         setRecentAiAccounts(payload.recentAiAccounts ?? []);
         setTopVisitors(payload.topVisitors ?? []);
         setClassificationReports(payload.classificationReports ?? []);
+        await fetchOpenAIBudget();
       } catch {
         // keep existing view
       }
@@ -573,6 +650,68 @@ export default function OwnerPage() {
           </div>
         ) : stats ? (
           <div className="space-y-6">
+            <section className="rounded-[2rem] bg-white p-6 shadow-card ring-1 ring-slate-100">
+              <div className="flex flex-wrap items-start justify-between gap-4">
+                <div>
+                  <h2 className="text-lg font-semibold text-ink">AI 補強基金</h2>
+                  <p className="mt-2 text-sm text-slate-500">
+                    這裡設定公開留言板的小置頂訊息，不會放太大，也不會寫「本月」。
+                  </p>
+                </div>
+                {openAIBudget?.enabled ? (
+                  <span className="rounded-full bg-emerald-100 px-3 py-1 text-xs font-semibold text-emerald-800">
+                    留言板顯示中
+                  </span>
+                ) : (
+                  <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-600">
+                    未公開顯示
+                  </span>
+                )}
+              </div>
+              <div className="mt-4 grid gap-4 lg:grid-cols-[minmax(0,1fr)_minmax(240px,320px)]">
+                <div className="rounded-3xl bg-slate-50 p-4 text-sm leading-7 text-slate-700">
+                  {openAIBudget?.enabled && typeof openAIBudget.usedUsd === "number" ? (
+                    <p className="font-semibold text-ink">
+                      AI 補強基金：已使用 {formatUsd(openAIBudget.usedUsd)} / 預算 {formatUsd(openAIBudget.budgetUsd)}
+                      ，剩餘約 {formatUsd(openAIBudget.remainingUsd)}
+                    </p>
+                  ) : openAIBudget?.enabled ? (
+                    <p className="font-semibold text-ink">
+                      AI 補強基金：預算 {formatUsd(openAIBudget.budgetUsd)}，使用狀態整理中
+                    </p>
+                  ) : (
+                    <p className="font-semibold text-ink">設定預算後，首頁留言板才會顯示小置頂訊息。</p>
+                  )}
+                  {openAIBudget?.message ? (
+                    <p className="mt-2 text-xs text-slate-500">{openAIBudget.message}</p>
+                  ) : null}
+                </div>
+                <div className="grid gap-3">
+                  <label className="grid gap-2 text-sm font-semibold text-slate-700">
+                    預算（USD）
+                    <input
+                      value={budgetInput}
+                      onChange={(event) => setBudgetInput(event.target.value)}
+                      inputMode="decimal"
+                      placeholder="例如 20"
+                      className="min-h-11 rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm outline-none focus:border-brand-600"
+                    />
+                  </label>
+                  <button
+                    type="button"
+                    onClick={() => void handleSaveBudget()}
+                    disabled={budgetSaving}
+                    className="min-h-11 rounded-2xl bg-slate-900 px-4 py-3 text-sm font-semibold text-white transition hover:bg-black disabled:cursor-not-allowed disabled:bg-slate-300"
+                  >
+                    {budgetSaving ? "儲存中..." : "儲存預算"}
+                  </button>
+                  {budgetMessage ? (
+                    <p className="rounded-2xl bg-slate-50 px-3 py-2 text-xs font-semibold text-slate-600">{budgetMessage}</p>
+                  ) : null}
+                </div>
+              </div>
+            </section>
+
             {(() => {
               const topHours = [...hourlySeries]
                 .sort((a, b) => b.attempts - a.attempts || b.devices - a.devices)

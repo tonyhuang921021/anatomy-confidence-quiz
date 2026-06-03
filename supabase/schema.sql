@@ -505,6 +505,36 @@ to service_role
 using (true)
 with check (true);
 
+create table if not exists public.site_settings (
+  setting_key text primary key,
+  value jsonb not null default '{}'::jsonb,
+  updated_at timestamptz not null default now()
+);
+
+create index if not exists site_settings_updated_at_idx
+on public.site_settings (updated_at desc);
+
+revoke all on public.site_settings from anon;
+revoke all on public.site_settings from authenticated;
+
+grant select, insert, update, delete
+  on public.site_settings
+  to service_role;
+
+alter table public.site_settings enable row level security;
+
+drop policy if exists "Anyone can read site settings" on public.site_settings;
+drop policy if exists "Anyone can insert site settings" on public.site_settings;
+drop policy if exists "Anyone can update site settings" on public.site_settings;
+drop policy if exists "Service role can manage site settings" on public.site_settings;
+
+create policy "Service role can manage site settings"
+on public.site_settings
+for all
+to service_role
+using (true)
+with check (true);
+
 create table if not exists public.ai_explanation_usage_logs (
   id bigint generated always as identity primary key,
   rate_key text not null,
