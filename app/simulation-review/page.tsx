@@ -40,16 +40,16 @@ export default function SimulationReviewPage() {
   useEffect(() => {
     const sessions = loadCompletedSessions();
     const simulationSessions = sessions.filter((session) => session.settings?.mode === "simulation");
-    setSimulationItems(getReviewQuestionItems(allQuestions, simulationSessions, 60));
+    setSimulationItems(getReviewQuestionItems(allQuestions, simulationSessions, Number.MAX_SAFE_INTEGER));
   }, [allQuestions, syncVersion]);
 
-  function handleStartSimulationReview() {
+  function handleStartSimulationReview(filteredItems: ReviewQuestionItem[] = simulationItems) {
     saveQuizSettings({
       ...DEFAULT_QUIZ_SETTINGS,
       mode: "review",
-      questionCount: 10,
+      questionCount: Math.max(1, filteredItems.length),
       subjectFilter: "全部",
-      customQuestionIds: simulationItems.map((item) => item.question.id),
+      customQuestionIds: filteredItems.map((item) => item.question.id),
       customPoolLabel: "模擬考錯題庫"
     });
   }
@@ -76,7 +76,7 @@ export default function SimulationReviewPage() {
             </Link>
             <Link
               href="/quiz?new=1"
-              onClick={handleStartSimulationReview}
+              onClick={() => handleStartSimulationReview()}
               className="min-h-12 rounded-2xl bg-amber-500 px-5 py-4 text-sm font-semibold text-white transition hover:bg-amber-600"
             >
               開始模擬考錯題複習
