@@ -251,6 +251,7 @@ export type StudyNoteCollection = {
   name: string;
   subject?: SubjectName;
   description?: string;
+  displayOrder?: number;
   createdAt: string;
   updatedAt: string;
 };

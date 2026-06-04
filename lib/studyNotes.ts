@@ -71,6 +71,11 @@ export type UpdateStudyNoteCollectionInput = CreateStudyNoteCollectionInput & {
   id: string;
 };
 
+export type ReorderStudyNoteCollectionsInput = {
+  accessToken?: string | null;
+  orderedIds: string[];
+};
+
 function tryParseJson<T>(rawText: string): T | null {
   if (!rawText.trim()) return null;
 
@@ -866,4 +871,27 @@ export async function updateStudyNoteCollection(
   const payload = await parseStudyNoteResponse<{ collection?: StudyNoteCollection }>(response);
   if (!payload.collection) throw new Error("資料夾更新失敗");
   return payload.collection;
+}
+
+export async function reorderStudyNoteCollections(
+  input: ReorderStudyNoteCollectionsInput
+): Promise<void> {
+  const response = await fetch("/api/study-note-collections", {
+    method: "PUT",
+    headers: buildAuthHeaders(input.accessToken),
+    body: JSON.stringify({ orderedIds: input.orderedIds })
+  });
+  await parseStudyNoteResponse<{ updated?: number }>(response);
+}
+
+export async function deleteStudyNoteCollection(
+  id: string,
+  accessToken?: string | null
+): Promise<void> {
+  const params = new URLSearchParams({ id });
+  const response = await fetch(`/api/study-note-collections?${params.toString()}`, {
+    method: "DELETE",
+    headers: buildAuthHeaders(accessToken)
+  });
+  await parseStudyNoteResponse<{ deletedId?: string }>(response);
 }

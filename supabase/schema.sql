@@ -877,12 +877,16 @@ create table if not exists public.study_note_collections (
   name text not null,
   subject text,
   description text,
+  display_order integer not null default 0,
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now()
 );
 
 alter table public.study_note_collections
   add column if not exists subject text;
+
+alter table public.study_note_collections
+  add column if not exists display_order integer not null default 0;
 
 alter table public.study_note_collections
   drop constraint if exists study_note_collections_user_id_name_key;
@@ -904,6 +908,9 @@ on public.study_note_collections (user_id, updated_at desc);
 
 create unique index if not exists study_note_collections_user_id_subject_name_key
 on public.study_note_collections (user_id, subject, name);
+
+create index if not exists study_note_collections_user_id_subject_display_order_idx
+on public.study_note_collections (user_id, subject, display_order, created_at);
 
 grant select, insert, update, delete
   on public.study_note_collections
