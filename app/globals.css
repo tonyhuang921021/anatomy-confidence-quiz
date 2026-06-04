@@ -374,6 +374,20 @@ select {
     color: var(--brand-deep);
   }
 
+  .home-evidence-pill {
+    @apply rounded-2xl border px-3 py-2;
+    border-color: var(--line-soft);
+    background: rgba(255, 255, 255, 0.58);
+  }
+
+  .home-evidence-pill span {
+    @apply block text-base font-black text-ink;
+  }
+
+  .home-evidence-pill small {
+    @apply mt-1 block text-[11px] font-semibold text-slate-500;
+  }
+
   .note-outline-drawer {
     @apply fixed inset-x-0 bottom-0 z-40 px-4 pb-3;
     pointer-events: none;
@@ -820,6 +834,11 @@ html[data-theme="dark"] .home-progress-card-warm {
 html[data-theme="dark"] .home-entry-mark {
   background: rgba(138, 154, 184, 0.12);
   color: var(--ink-main);
+}
+
+html[data-theme="dark"] .home-evidence-pill {
+  background: rgba(35, 43, 55, 0.56);
+  border-color: var(--line-soft);
 }
 
 html[data-theme="dark"] .dark-success-chip {

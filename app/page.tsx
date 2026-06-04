@@ -6,6 +6,7 @@ import { ClientSectionBoundary } from "@/components/ClientSectionBoundary";
 import { ExamCountdown } from "@/components/ExamCountdown";
 import { FeedbackBoard } from "@/components/FeedbackBoard";
 import { HomeToneBanner } from "@/components/HomeToneBanner";
+import { HomeWeaknessInsight } from "@/components/HomeWeaknessInsight";
 import { OwnerOnlyNotesLink } from "@/components/OwnerOnlyNotesLink";
 
 type HomeAnimationStyle = CSSProperties & {
@@ -141,25 +142,17 @@ export default function HomePage() {
                   <div className="home-pulse-dot" aria-hidden="true" />
                 </div>
                 <div className="mt-6 grid gap-3">
-                  <div className="home-progress-card">
-                    <div className="flex justify-between text-xs font-bold text-ink">
-                      <span>神經解剖定位</span>
-                      <span>72%</span>
-                    </div>
-                    <div className="mt-3 h-2 overflow-hidden rounded-full bg-white/70">
-                      <div className="home-progress-fill w-[72%]" />
-                    </div>
-                  </div>
+                  <ClientSectionBoundary title="首頁弱點判讀">
+                    <HomeWeaknessInsight />
+                  </ClientSectionBoundary>
                   <div className="home-progress-card home-progress-card-warm">
                     <div className="flex justify-between text-xs font-bold text-ink">
-                      <span>模擬考錯題</span>
-                      <span>待複習</span>
+                      <span>下一步建議</span>
+                      <span>10 題起跑</span>
                     </div>
-                    <div className="mt-3 grid grid-cols-5 gap-1">
-                      {Array.from({ length: 10 }).map((_, index) => (
-                        <span key={index} className={index < 6 ? "home-spark active" : "home-spark"} />
-                      ))}
-                    </div>
+                    <p className="body-soft mt-3 text-xs leading-6">
+                      先用散題累積判讀資料，再進模擬考；模擬考結果會另外分流，不會混進散題錯題庫。
+                    </p>
                   </div>
                   <ExamCountdown />
                 </div>
