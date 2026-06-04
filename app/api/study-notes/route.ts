@@ -280,7 +280,7 @@ async function getOrCreateCollectionId(
         subject: normalizedSubject,
         updated_at: new Date().toISOString()
       },
-      { onConflict: "user_id,name" }
+      { onConflict: "user_id,subject,name" }
     )
     .select("id")
     .single();

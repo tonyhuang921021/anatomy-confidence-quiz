@@ -878,17 +878,31 @@ create table if not exists public.study_note_collections (
   subject text,
   description text,
   created_at timestamptz not null default now(),
-  updated_at timestamptz not null default now(),
-  unique (user_id, name)
+  updated_at timestamptz not null default now()
 );
 
 alter table public.study_note_collections
   add column if not exists subject text;
 
+alter table public.study_note_collections
+  drop constraint if exists study_note_collections_user_id_name_key;
+
+update public.study_note_collections collections
+set subject = notes.subject
+from (
+  select collection_id, min(subject) as subject
+  from public.study_notes
+  where collection_id is not null
+    and subject is not null
+  group by collection_id
+) notes
+where collections.id = notes.collection_id
+  and collections.subject is null;
+
 create index if not exists study_note_collections_user_id_updated_at_idx
 on public.study_note_collections (user_id, updated_at desc);
 
-create index if not exists study_note_collections_user_id_subject_name_idx
+create unique index if not exists study_note_collections_user_id_subject_name_key
 on public.study_note_collections (user_id, subject, name);
 
 grant select, insert, update, delete

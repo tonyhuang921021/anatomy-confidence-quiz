@@ -87,7 +87,7 @@ export async function GET(request: NextRequest) {
 
     if (collectionError) throw collectionError;
     const rows = ((data ?? []) as StudyNoteCollectionRow[]).filter((row) =>
-      subject ? !row.subject || row.subject === subject : true
+      subject ? row.subject === subject : true
     );
 
     return NextResponse.json({
@@ -121,13 +121,16 @@ export async function POST(request: NextRequest) {
 
     const { data, error: insertError } = await supabase
       .from("study_note_collections")
-      .insert({
-        user_id: userId,
-        name,
-        subject,
-        description,
-        updated_at: new Date().toISOString()
-      })
+      .upsert(
+        {
+          user_id: userId,
+          name,
+          subject,
+          description,
+          updated_at: new Date().toISOString()
+        },
+        { onConflict: "user_id,subject,name" }
+      )
       .select("id, name, subject, description, created_at, updated_at")
       .single();
 
