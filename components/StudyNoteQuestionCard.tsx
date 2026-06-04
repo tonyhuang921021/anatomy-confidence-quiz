@@ -15,7 +15,7 @@ export function StudyNoteQuestionCard({ question, link, title }: Props) {
 
   if (!question) {
     return (
-      <div className="study-note-question-card my-5 rounded-3xl border border-dashed border-slate-200 bg-slate-50 px-4 py-3 text-sm font-semibold text-slate-500">
+      <div className="study-note-question-card my-5 min-w-0 overflow-hidden break-words rounded-3xl border border-dashed border-slate-200 bg-slate-50 px-4 py-3 text-sm font-semibold text-slate-500">
         找不到這題：{link?.questionId ?? title ?? "未指定題號"}
       </div>
     );
@@ -24,7 +24,7 @@ export function StudyNoteQuestionCard({ question, link, title }: Props) {
   const optionEntries = Object.entries(question.options).filter(([, value]) => Boolean(value));
 
   return (
-    <div className="study-note-question-card my-5 rounded-3xl border border-teal-100 bg-teal-50/70 p-3 shadow-sm">
+    <div className="study-note-question-card my-5 min-w-0 overflow-hidden rounded-3xl border border-teal-100 bg-teal-50/70 p-3 shadow-sm">
       <button
         type="button"
         onClick={() => setShowQuestion((value) => !value)}
@@ -42,17 +42,17 @@ export function StudyNoteQuestionCard({ question, link, title }: Props) {
       </button>
 
       {showQuestion ? (
-        <div className="mt-3 rounded-2xl bg-white p-4 text-sm leading-7 text-slate-700">
+        <div className="mt-3 min-w-0 overflow-hidden break-words rounded-2xl bg-white p-4 text-sm leading-7 text-slate-700">
           <div className="flex flex-wrap gap-2 text-xs font-semibold text-slate-500">
             <span>{question.id}</span>
             <span>{question.subject}</span>
             <span>{question.chapter}</span>
             <span>{question.section}</span>
           </div>
-          <p className="mt-3 font-semibold text-slate-900">{question.stem}</p>
+          <p className="mt-3 break-words font-semibold text-slate-900">{question.stem}</p>
           <div className="mt-3 grid gap-2">
             {optionEntries.map(([key, value]) => (
-              <p key={key} className="rounded-2xl bg-slate-50 px-3 py-2">
+              <p key={key} className="break-words rounded-2xl bg-slate-50 px-3 py-2">
                 <span className="font-bold text-slate-950">{key}. </span>
                 {value}
               </p>
@@ -71,7 +71,7 @@ export function StudyNoteQuestionCard({ question, link, title }: Props) {
             {showAnswer ? "收合答案詳解" : "看答案與詳解"}
           </button>
           {showAnswer ? (
-            <div className="mt-3 rounded-2xl bg-slate-950 px-4 py-3 text-sm leading-7 text-white">
+            <div className="mt-3 min-w-0 overflow-hidden break-words rounded-2xl bg-slate-950 px-4 py-3 text-sm leading-7 text-white">
               <p className="font-bold">答案：{question.answer}</p>
               <p className="mt-2 text-slate-100">{question.explanation}</p>
             </div>

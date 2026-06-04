@@ -110,13 +110,13 @@ select {
 
 @layer components {
   .surface-card {
-    @apply rounded-[2rem] border border-[rgba(16,42,34,0.08)] shadow-card backdrop-blur;
+    @apply min-w-0 rounded-[2rem] border border-[rgba(16,42,34,0.08)] shadow-card backdrop-blur;
     background: var(--surface);
     border-color: var(--line-soft);
   }
 
   .surface-card-muted {
-    @apply rounded-[1.75rem] border border-[rgba(16,42,34,0.08)] backdrop-blur;
+    @apply min-w-0 rounded-[1.75rem] border border-[rgba(16,42,34,0.08)] backdrop-blur;
     background: var(--surface-muted);
     border-color: var(--line-soft);
   }
@@ -299,10 +299,23 @@ select {
     @apply min-w-0 max-w-full text-sm leading-7 sm:text-base;
     color: var(--ink-main);
     overflow-wrap: break-word;
+    word-break: break-word;
   }
 
   .note-markdown > * {
     max-width: 100%;
+    min-width: 0;
+  }
+
+  .note-markdown p,
+  .note-markdown li,
+  .note-markdown a,
+  .note-markdown span,
+  .note-markdown strong,
+  .note-markdown td,
+  .note-markdown th {
+    overflow-wrap: anywhere;
+    word-break: break-word;
   }
 
   .note-markdown h1,
@@ -397,6 +410,7 @@ select {
     @apply max-w-full overflow-x-auto rounded-2xl p-4 text-sm;
     background: #102a22;
     color: #f8fafc;
+    white-space: pre;
   }
 
   .note-markdown pre code {
@@ -404,10 +418,11 @@ select {
   }
 
   .note-markdown table {
-    @apply block max-w-full overflow-x-auto rounded-2xl border text-sm shadow-sm;
+    @apply block w-full max-w-full overflow-x-auto rounded-2xl border text-sm shadow-sm;
     border-color: var(--line-soft);
     border-collapse: separate;
     border-spacing: 0;
+    -webkit-overflow-scrolling: touch;
   }
 
   .note-markdown th,
@@ -418,6 +433,11 @@ select {
   }
 
   @media (max-width: 640px) {
+    .note-markdown {
+      width: 100%;
+      overflow-x: hidden;
+    }
+
     .note-markdown h1 {
       @apply text-2xl;
     }
@@ -432,7 +452,11 @@ select {
 
     .note-markdown th,
     .note-markdown td {
-      @apply min-w-[7rem] px-2 py-2 text-xs;
+      @apply min-w-[5.5rem] px-2 py-2 text-xs;
+    }
+
+    .note-markdown pre {
+      @apply text-xs;
     }
   }
 

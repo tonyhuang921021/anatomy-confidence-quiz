@@ -211,11 +211,11 @@ export default function SubjectNotesPage() {
 
   return (
     <main className="shell max-w-[1600px]">
-      <section className="surface-card p-6 sm:p-8">
+      <section className="surface-card overflow-hidden p-6 sm:p-8">
         <div className="flex flex-wrap items-start justify-between gap-4">
-          <div>
+          <div className="min-w-0">
             <p className="eyebrow">Subject Document</p>
-            <h1 className="display-title mt-3 text-4xl sm:text-5xl">
+            <h1 className="display-title mt-3 break-words text-4xl sm:text-5xl">
               {subjectItem?.label ?? "學習筆記"}{categoryItem ? `｜${categoryItem.label}` : ""}
             </h1>
             <p className="body-soft mt-4 max-w-3xl leading-7">
@@ -307,7 +307,7 @@ export default function SubjectNotesPage() {
               </div>
             </aside>
 
-            <article className="surface-card min-w-0 p-5 sm:p-8 lg:p-12">
+            <article className="surface-card min-w-0 overflow-hidden p-5 sm:p-8 lg:p-12">
               {loading ? <p className="body-soft">正在載入這科的大文件...</p> : null}
               {error ? <p className="rounded-2xl bg-rose-50 px-4 py-3 text-sm font-semibold text-rose-700">{error}</p> : null}
               {!loading && notes.length === 0 ? (
@@ -317,15 +317,15 @@ export default function SubjectNotesPage() {
                 </div>
               ) : null}
 
-              <div className="grid gap-10">
+              <div className="grid min-w-0 gap-10">
                 {notes.map((note) => (
-                    <article key={note.id} id={`note-${note.id}`} data-note-id={note.id} className="scroll-mt-8 rounded-[2rem] border border-slate-200 bg-white p-5 sm:p-7">
+                    <article key={note.id} id={`note-${note.id}`} data-note-id={note.id} className="min-w-0 overflow-hidden scroll-mt-8 rounded-[2rem] border border-slate-200 bg-white p-5 sm:p-7">
                       <div className="flex flex-wrap items-start justify-between gap-3">
                         <div className="min-w-0">
                           <p className="text-xs font-bold uppercase tracking-[0.2em] text-teal-700">
                             {note.subject || note.collectionName || "Study Note"}
                           </p>
-                          <h2 className="mt-2 text-3xl font-black text-slate-950">{note.title}</h2>
+                          <h2 className="mt-2 break-words text-3xl font-black text-slate-950">{note.title}</h2>
                           {note.summary ? <p className="body-soft mt-2 leading-7">{note.summary}</p> : null}
                         </div>
                         <div className="flex flex-wrap justify-end gap-2">
@@ -396,19 +396,19 @@ export default function SubjectNotesPage() {
 
               <div className="mt-5 grid gap-4">
                 {activeRelatedQuestions.length > 0 ? activeRelatedQuestions.map(({ link, question }) => (
-                  <article key={`${question.id}-${link.relationType}`} className="rounded-3xl border border-slate-200 bg-white p-4 text-sm leading-7">
+                  <article key={`${question.id}-${link.relationType}`} className="min-w-0 overflow-hidden rounded-3xl border border-slate-200 bg-white p-4 text-sm leading-7">
                     <div className="flex flex-wrap items-center gap-2 text-xs font-semibold text-slate-500">
                       <span className="font-bold text-slate-950">{question.id}</span>
                       <span>{question.subject}</span>
                       <span>{question.chapter}</span>
                       <span>{question.section}</span>
                     </div>
-                    <p className="mt-3 font-bold text-slate-950">{question.stem}</p>
+                    <p className="mt-3 break-words font-bold text-slate-950">{question.stem}</p>
                     <div className="mt-3 grid gap-2">
                       {Object.entries(question.options)
                         .filter(([, value]) => Boolean(value))
                         .map(([key, value]) => (
-                          <p key={key} className="rounded-2xl bg-slate-50 px-3 py-2 text-slate-700">
+                          <p key={key} className="break-words rounded-2xl bg-slate-50 px-3 py-2 text-slate-700">
                             <span className="font-bold text-slate-950">{key}. </span>
                             {value}
                           </p>
@@ -419,7 +419,7 @@ export default function SubjectNotesPage() {
                       <summary className="secondary-pill cursor-pointer list-none px-4 py-2 text-sm">
                         看答案與詳解
                       </summary>
-                      <div className="mt-3 rounded-2xl bg-slate-950 px-4 py-3 text-sm leading-7 text-white">
+                      <div className="mt-3 min-w-0 overflow-hidden break-words rounded-2xl bg-slate-950 px-4 py-3 text-sm leading-7 text-white">
                         <p className="font-bold">答案：{question.answer}</p>
                         <p className="mt-2 text-slate-100">{question.explanation}</p>
                       </div>

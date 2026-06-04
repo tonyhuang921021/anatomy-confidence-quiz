@@ -271,9 +271,9 @@ export default function StudyNoteDetailPage() {
 
   return (
     <main className="shell">
-      <section className="surface-card p-6 sm:p-8">
+      <section className="surface-card overflow-hidden p-6 sm:p-8">
         <div className="flex flex-wrap items-start justify-between gap-4">
-          <div>
+          <div className="min-w-0">
             <p className="eyebrow">Study Note</p>
             {editing ? (
               <input
@@ -282,7 +282,7 @@ export default function StudyNoteDetailPage() {
                 className="mt-3 w-full rounded-3xl border border-slate-200 bg-white px-4 py-3 text-3xl font-black text-slate-950 outline-none focus:border-teal-500 sm:text-5xl"
               />
             ) : (
-              <h1 className="display-title mt-3 text-4xl sm:text-5xl">
+              <h1 className="display-title mt-3 break-words text-4xl sm:text-5xl">
                 {note?.title ?? "學習筆記"}
               </h1>
             )}
@@ -311,15 +311,15 @@ export default function StudyNoteDetailPage() {
         </div>
       </section>
 
-      <section className="mt-6 grid gap-6 xl:grid-cols-[minmax(0,1fr)_340px]">
-        <article className="surface-card min-w-0 p-5 sm:p-8 lg:p-10">
+      <section className="mt-6 grid min-w-0 gap-6 xl:grid-cols-[minmax(0,1fr)_340px]">
+        <article className="surface-card min-w-0 overflow-hidden p-5 sm:p-8 lg:p-10">
           {!configured ? <p className="body-soft">Supabase 尚未設定，學習筆記需要雲端儲存才能使用。</p> : null}
           {configured && !user ? <p className="body-soft">請先登入，才能讀取自己的學習筆記。</p> : null}
           {loading ? <p className="body-soft">正在載入筆記...</p> : null}
           {error ? <p className="rounded-2xl bg-rose-50 px-4 py-3 text-sm font-semibold text-rose-700">{error}</p> : null}
           {message ? <p className="rounded-2xl bg-teal-50 px-4 py-3 text-sm font-semibold text-teal-800">{message}</p> : null}
           {note && editing ? (
-            <div className="grid gap-4">
+            <div className="grid min-w-0 gap-4">
               <label className="grid gap-2 text-sm font-semibold text-slate-700">
                 摘要
                 <textarea
@@ -338,7 +338,7 @@ export default function StudyNoteDetailPage() {
                   className="min-h-[620px] rounded-3xl border border-slate-200 bg-white px-4 py-3 font-mono text-sm leading-6 outline-none focus:border-teal-500"
                 />
               </label>
-              <div className="rounded-3xl border border-slate-200 bg-white p-4">
+              <div className="min-w-0 overflow-hidden rounded-3xl border border-slate-200 bg-white p-4">
                 <div className="flex flex-wrap items-center justify-between gap-3">
                   <div>
                     <h2 className="text-lg font-bold text-slate-950">相關題目</h2>
@@ -446,7 +446,7 @@ export default function StudyNoteDetailPage() {
           ) : null}
         </article>
 
-        <aside className="grid content-start gap-4">
+        <aside className="grid min-w-0 content-start gap-4">
           {note ? (
             <>
               <div className="surface-card p-5">
