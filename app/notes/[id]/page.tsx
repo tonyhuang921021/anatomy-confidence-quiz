@@ -10,7 +10,7 @@ import { resolveStudyNoteQuestionLinks } from "@/lib/questionLinkResolver";
 import { DEFAULT_QUIZ_SETTINGS } from "@/lib/quizAnalysis";
 import { saveQuizSettings } from "@/lib/storage";
 import { buildStudyNoteQuestionLinkPrompt } from "@/lib/studyNotePrompt";
-import { deleteStudyNote, loadStudyNote, parseStudyNoteQuestionLinkText, updateStudyNote } from "@/lib/studyNotes";
+import { deleteStudyNote, loadStudyNote, parseStudyNoteMetadata, parseStudyNoteQuestionLinkText, updateStudyNote } from "@/lib/studyNotes";
 import type { Question, StudyNoteDetail, StudyNoteQuestionLink } from "@/types/quiz";
 
 function formatDate(value: string) {
@@ -31,6 +31,9 @@ function buildQuestionSearchText(question: Question) {
     question.section,
     question.testedConcept,
     question.stem,
+    question.explanation,
+    question.memoryTip,
+    Object.values(question.options).join(" "),
     question.examCode,
     question.paperCode,
     question.sourceYear ? String(question.sourceYear) : ""
@@ -44,6 +47,33 @@ function mergeUniqueLinks(left: StudyNoteQuestionLink[], right: StudyNoteQuestio
   return Array.from(
     new Map([...left, ...right].map((item) => [`${item.questionId}:${item.relationType}`, item] as const)).values()
   );
+}
+
+function findQuestionLinksByKeywords(
+  keywords: string[] | undefined,
+  questions: Question[],
+  subject?: string | null
+): StudyNoteQuestionLink[] {
+  const normalizedKeywords = Array.from(
+    new Set(
+      (keywords ?? [])
+        .map((keyword) => keyword.trim().toLowerCase())
+        .filter((keyword) => keyword.length >= 2)
+    )
+  );
+  if (normalizedKeywords.length === 0) return [];
+
+  return questions
+    .filter((question) => {
+      if (subject && question.subject !== subject) return false;
+      const haystack = buildQuestionSearchText(question);
+      return normalizedKeywords.some((keyword) => haystack.includes(keyword));
+    })
+    .map((question) => ({
+      questionId: question.id,
+      relationType: "related" as const,
+      reason: `由搜尋詞自動加入：${normalizedKeywords.join(", ")}`
+    }));
 }
 
 export default function StudyNoteDetailPage() {
@@ -198,17 +228,20 @@ export default function StudyNoteDetailPage() {
   }
 
   function addQuestionLinksFromText() {
+    const parsedMetadata = parseStudyNoteMetadata(draftQuestionCodeText);
     const resolvedLinks = resolveStudyNoteQuestionLinks(parseStudyNoteQuestionLinkText(draftQuestionCodeText), allQuestions, {
       subject: note?.subject
     });
-    if (resolvedLinks.length === 0) {
-      setError("沒有找到可對應的題目。請確認題號有年份、第幾次、卷碼與 Q 題號，例如 2022-1-1301-Q025。");
+    const keywordLinks = findQuestionLinksByKeywords(parsedMetadata?.searchKeywords, allQuestions, note?.subject);
+    const nextLinks = mergeUniqueLinks(resolvedLinks, keywordLinks);
+    if (nextLinks.length === 0) {
+      setError("沒有找到可對應的題目。請確認題號格式，或貼 searchKeywords: 咽弓, 咽囊 這種搜尋詞。");
       setMessage("");
       return;
     }
-    setDraftQuestionLinks((current) => mergeUniqueLinks(current, resolvedLinks));
+    setDraftQuestionLinks((current) => mergeUniqueLinks(current, nextLinks));
     setDraftQuestionCodeText("");
-    setMessage(`已加入 ${resolvedLinks.length} 題相關題目。`);
+    setMessage(`已加入 ${nextLinks.length} 題相關題目。`);
     setError("");
   }
 
@@ -353,7 +386,7 @@ export default function StudyNoteDetailPage() {
                     <div>
                       <p className="text-sm font-bold text-slate-950">專門補題號 Prompt</p>
                       <p className="mt-1 text-xs leading-5 text-slate-600">
-                        貼給 ChatGPT、Gemini、Claude 或其他 AI 後，再把它回傳的 questionLinks 貼到下面欄位。
+                        貼給 ChatGPT、Gemini、Claude 或其他 AI 後，再把它回傳的 questionLinks 或 searchKeywords 貼到下面欄位。
                       </p>
                     </div>
                     <button type="button" onClick={copyQuestionLinkPrompt} className="secondary-pill px-4 py-2 text-sm">
@@ -369,7 +402,7 @@ export default function StudyNoteDetailPage() {
                   <textarea
                     value={draftQuestionCodeText}
                     onChange={(event) => setDraftQuestionCodeText(event.target.value)}
-                    placeholder="questionLinks: 2022-1-1301-Q025, 2020-2-1301-Q021"
+                    placeholder={"questionLinks: 2022-1-1301-Q025, 2020-2-1301-Q021\nsearchKeywords: 咽弓, 咽囊, pharyngeal arch"}
                     rows={3}
                     className="rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm outline-none focus:border-teal-500"
                   />

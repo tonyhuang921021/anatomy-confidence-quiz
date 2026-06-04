@@ -28,6 +28,9 @@ function buildQuestionSearchText(question: Question) {
     question.section,
     question.testedConcept,
     question.stem,
+    question.explanation,
+    question.memoryTip,
+    Object.values(question.options).join(" "),
     question.examCode,
     question.paperCode,
     question.sourceYear ? String(question.sourceYear) : ""
@@ -53,6 +56,33 @@ function mergeUniqueLinks(left: StudyNoteQuestionLink[], right: StudyNoteQuestio
   return Array.from(
     new Map([...left, ...right].map((item) => [`${item.questionId}:${item.relationType}`, item] as const)).values()
   );
+}
+
+function findQuestionLinksByKeywords(
+  keywords: string[] | undefined,
+  questions: Question[],
+  subject: SubjectName | ""
+): StudyNoteQuestionLink[] {
+  const normalizedKeywords = Array.from(
+    new Set(
+      (keywords ?? [])
+        .map((keyword) => keyword.trim().toLowerCase())
+        .filter((keyword) => keyword.length >= 2)
+    )
+  );
+  if (normalizedKeywords.length === 0) return [];
+
+  return questions
+    .filter((question) => {
+      if (subject && question.subject !== subject) return false;
+      const haystack = buildQuestionSearchText(question);
+      return normalizedKeywords.some((keyword) => haystack.includes(keyword));
+    })
+    .map((question) => ({
+      questionId: question.id,
+      relationType: "related" as const,
+      reason: `由搜尋詞自動加入：${normalizedKeywords.join(", ")}`
+    }));
 }
 
 function getQuestionLabel(question: Question) {
@@ -134,7 +164,10 @@ export default function NewStudyNotePage() {
     setQuestionLinks((current) =>
       mergeUniqueLinks(
         current,
-        resolveStudyNoteQuestionLinks(parsed.questionLinks ?? [], allQuestions, { subject: parsed.subject ?? subject })
+        mergeUniqueLinks(
+          resolveStudyNoteQuestionLinks(parsed.questionLinks ?? [], allQuestions, { subject: parsed.subject ?? subject }),
+          findQuestionLinksByKeywords(parsed.searchKeywords, allQuestions, parsed.subject ?? subject)
+        )
       )
     );
   }
@@ -160,17 +193,20 @@ export default function NewStudyNotePage() {
   }
 
   function addQuestionLinksFromText() {
+    const parsedMetadata = parseStudyNoteMetadata(questionCodeText);
     const resolvedLinks = resolveStudyNoteQuestionLinks(parseStudyNoteQuestionLinkText(questionCodeText), allQuestions, {
       subject
     });
-    if (resolvedLinks.length === 0) {
-      setError("沒有找到可對應的題目。請確認題號有年份、第幾次、卷碼與 Q 題號，例如 2022-1-1301-Q025。");
+    const keywordLinks = findQuestionLinksByKeywords(parsedMetadata?.searchKeywords, allQuestions, subject);
+    const nextLinks = mergeUniqueLinks(resolvedLinks, keywordLinks);
+    if (nextLinks.length === 0) {
+      setError("沒有找到可對應的題目。請確認題號格式，或貼 searchKeywords: 咽弓, 咽囊 這種搜尋詞。");
       setMessage("");
       return;
     }
-    setQuestionLinks((current) => mergeUniqueLinks(current, resolvedLinks));
+    setQuestionLinks((current) => mergeUniqueLinks(current, nextLinks));
     setQuestionCodeText("");
-    setMessage(`已加入 ${resolvedLinks.length} 題相關題目。`);
+    setMessage(`已加入 ${nextLinks.length} 題相關題目。`);
     setError("");
   }
 
@@ -404,12 +440,12 @@ export default function NewStudyNotePage() {
                   <textarea
                     value={questionCodeText}
                     onChange={(event) => setQuestionCodeText(event.target.value)}
-                    placeholder="questionLinks: 2022-1-1301-Q025, 2020-2-1301-Q021"
+                    placeholder={"questionLinks: 2022-1-1301-Q025, 2020-2-1301-Q021\nsearchKeywords: 咽弓, 咽囊, pharyngeal arch"}
                     rows={3}
                     className="rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm outline-none focus:border-teal-500"
                   />
                   <span className="text-xs font-medium leading-5 text-slate-500">
-                    建議用年份-次別-卷碼-Q題號；沒有卷碼又撞到多題時，網站不會亂猜。
+                    建議用年份-次別-卷碼-Q題號；也可以貼 searchKeywords，網站會用搜尋詞自動拉本地題庫題目。
                   </span>
                 </label>
                 <button type="button" onClick={addQuestionLinksFromText} className="secondary-pill mt-3 justify-center px-4 py-2 text-sm">

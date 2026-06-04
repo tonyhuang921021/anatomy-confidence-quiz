@@ -151,12 +151,12 @@ export function HomeWeaknessInsight() {
           <h3 className="mt-1 text-base font-black text-ink">{insight.section}</h3>
           <p className="body-soft mt-1 text-xs">{insight.chapter}</p>
         </div>
-        <span className="home-entry-mark">答錯率 {insight.wrongRate}%</span>
+        <span className="home-entry-mark home-risk-chip">答錯率 {insight.wrongRate}%</span>
       </div>
 
       <div className="mt-4 h-2 overflow-hidden rounded-full bg-white/70">
         <div
-          className="home-progress-fill"
+          className="home-progress-fill home-risk-fill"
           style={{ width: `${Math.max(insight.wrongRate, 8)}%` }}
         />
       </div>
@@ -166,7 +166,7 @@ export function HomeWeaknessInsight() {
           <span>{insight.total}</span>
           <small>已作答</small>
         </div>
-        <div className="home-evidence-pill">
+        <div className="home-evidence-pill home-evidence-risk">
           <span>{insight.wrong}</span>
           <small>答錯</small>
         </div>

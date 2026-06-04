@@ -345,6 +345,14 @@ select {
     transform-origin: left center;
   }
 
+  .home-risk-fill {
+    background: linear-gradient(
+      90deg,
+      color-mix(in srgb, #c05f5f 82%, var(--accent-warm)),
+      color-mix(in srgb, #d88978 70%, var(--accent-warm))
+    );
+  }
+
   .home-spark {
     height: 10px;
     border-radius: 999px;
@@ -374,6 +382,11 @@ select {
     color: var(--brand-deep);
   }
 
+  .home-risk-chip {
+    background: color-mix(in srgb, #cf6f6f 14%, white);
+    color: #8f3d3d;
+  }
+
   .home-evidence-pill {
     @apply rounded-2xl border px-3 py-2;
     border-color: var(--line-soft);
@@ -386,6 +399,16 @@ select {
 
   .home-evidence-pill small {
     @apply mt-1 block text-[11px] font-semibold text-slate-500;
+  }
+
+  .home-evidence-risk {
+    background: color-mix(in srgb, #cf6f6f 9%, white);
+    border-color: color-mix(in srgb, #cf6f6f 24%, var(--line-soft));
+  }
+
+  .home-evidence-risk span,
+  .home-evidence-risk small {
+    color: #8f3d3d;
   }
 
   .note-outline-drawer {
@@ -836,9 +859,24 @@ html[data-theme="dark"] .home-entry-mark {
   color: var(--ink-main);
 }
 
+html[data-theme="dark"] .home-risk-chip {
+  background: rgba(207, 111, 111, 0.16);
+  color: #f1c0c0;
+}
+
 html[data-theme="dark"] .home-evidence-pill {
   background: rgba(35, 43, 55, 0.56);
   border-color: var(--line-soft);
+}
+
+html[data-theme="dark"] .home-evidence-risk {
+  background: rgba(126, 66, 72, 0.34);
+  border-color: rgba(207, 111, 111, 0.2);
+}
+
+html[data-theme="dark"] .home-evidence-risk span,
+html[data-theme="dark"] .home-evidence-risk small {
+  color: #f1c0c0;
 }
 
 html[data-theme="dark"] .dark-success-chip {

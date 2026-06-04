@@ -145,15 +145,6 @@ export default function HomePage() {
                   <ClientSectionBoundary title="首頁弱點判讀">
                     <HomeWeaknessInsight />
                   </ClientSectionBoundary>
-                  <div className="home-progress-card home-progress-card-warm">
-                    <div className="flex justify-between text-xs font-bold text-ink">
-                      <span>下一步建議</span>
-                      <span>10 題起跑</span>
-                    </div>
-                    <p className="body-soft mt-3 text-xs leading-6">
-                      先用散題累積判讀資料，再進模擬考；模擬考結果會另外分流，不會混進散題錯題庫。
-                    </p>
-                  </div>
                   <ExamCountdown />
                 </div>
               </div>

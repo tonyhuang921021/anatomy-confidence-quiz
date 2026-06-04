@@ -16,6 +16,7 @@ export type StudyNoteMetadataInput = {
   collectionName?: string;
   tags?: StudyNoteTag[];
   questionLinks?: StudyNoteQuestionLink[];
+  searchKeywords?: string[];
 };
 
 export type CreateStudyNoteInput = {
@@ -136,7 +137,14 @@ function normalizeMetadataQuestionLinks(rawLinks: unknown): StudyNoteQuestionLin
 }
 
 function parseCommaSeparatedQuestionLinks(value?: string): StudyNoteQuestionLink[] {
-  const cleaned = (value ?? "")
+  const rawValue = value ?? "";
+  const explicitQuestionLines = rawValue
+    .split("\n")
+    .filter((line) =>
+      /^\s*(?:question\s*links|questionLinks|question_links|related\s*questions|exam\s*questions|相關題目|考古題|題號)\s*[:：]/i.test(line)
+    );
+  const sourceText = explicitQuestionLines.length > 0 ? explicitQuestionLines.join("\n") : rawValue;
+  const cleaned = sourceText
     .replace(/^\s*(?:question\s*links|questionLinks|question_links|related\s*questions|exam\s*questions|相關題目|考古題|題號)\s*[:：]/i, "")
     .replace(/[\[\]"]/g, "")
     .replace(/```/g, "");
@@ -180,7 +188,7 @@ function parseNoteMetaBlock(rawText: string): Record<string, string> | null {
     const value = trimmed.slice(dividerIndex + 1).trim();
     if (!key) return;
 
-    if (key === "tags" || key === "questionLinks") {
+    if (key === "tags" || key === "questionLinks" || key === "searchKeywords") {
       activeListKey = key;
     } else {
       activeListKey = "";
@@ -195,7 +203,7 @@ function parseLooseNoteMetaText(rawText: string) {
   const lines = rawText.trimStart().split("\n");
   const metadataLines: string[] = [];
   let activeListKey = "";
-  const allowedKeys = new Set(["title", "subject", "collection", "summary", "tags", "questionLinks"]);
+  const allowedKeys = new Set(["title", "subject", "collection", "summary", "tags", "questionLinks", "searchKeywords"]);
 
   for (const line of lines) {
     const trimmed = line.trim();
@@ -217,7 +225,7 @@ function parseLooseNoteMetaText(rawText: string) {
     if (!allowedKeys.has(normalizedKey)) break;
 
     metadataLines.push(trimmed);
-    activeListKey = normalizedKey === "tags" || normalizedKey === "questionLinks" ? normalizedKey : "";
+    activeListKey = normalizedKey === "tags" || normalizedKey === "questionLinks" || normalizedKey === "searchKeywords" ? normalizedKey : "";
   }
 
   return metadataLines.length >= 2 ? metadataLines.join("\n") : null;
@@ -250,6 +258,11 @@ function normalizeMetadataKey(key: string) {
     相關考古題: "questionLinks",
     考古題: "questionLinks",
     題號: "questionLinks",
+    搜尋詞: "searchKeywords",
+    搜尋關鍵字: "searchKeywords",
+    題庫搜尋詞: "searchKeywords",
+    題庫搜尋關鍵字: "searchKeywords",
+    相關搜尋詞: "searchKeywords",
     category: "collection",
     collectionName: "collection",
     collection_name: "collection",
@@ -261,7 +274,11 @@ function normalizeMetadataKey(key: string) {
     questionlinks: "questionLinks",
     relatedquestions: "questionLinks",
     examquestions: "questionLinks",
-    pastquestions: "questionLinks"
+    pastquestions: "questionLinks",
+    searchkeywords: "searchKeywords",
+    searchterms: "searchKeywords",
+    questionsearchkeywords: "searchKeywords",
+    questionkeywords: "searchKeywords"
   };
   const compactMap: Record<string, string> = {
     title: "title",
@@ -280,7 +297,11 @@ function normalizeMetadataKey(key: string) {
     questionids: "questionLinks",
     relatedquestions: "questionLinks",
     examquestions: "questionLinks",
-    pastquestions: "questionLinks"
+    pastquestions: "questionLinks",
+    searchkeywords: "searchKeywords",
+    searchterms: "searchKeywords",
+    questionsearchkeywords: "searchKeywords",
+    questionkeywords: "searchKeywords"
   };
   return map[key] ?? compactMap[compactKey] ?? key;
 }
@@ -300,6 +321,18 @@ function parseCommaSeparatedTags(value?: string): StudyNoteTag[] {
     .map((tag) => ({ tag, tagType: "misc" as const, source: "chatgpt_metadata" as const }));
 }
 
+function parseCommaSeparatedKeywords(value?: string): string[] {
+  return Array.from(
+    new Set(
+      (value ?? "")
+        .replace(/[\[\]"]/g, "")
+        .split(/[,，、;\n]/)
+        .map((keyword) => keyword.trim().replace(/^[-*]\s*/, ""))
+        .filter((keyword) => keyword.length > 0)
+    )
+  );
+}
+
 export function parseStudyNoteMetadata(rawText: string): StudyNoteMetadataInput | null {
   const noteMeta = parseNoteMetaBlock(rawText);
   if (noteMeta) {
@@ -309,7 +342,8 @@ export function parseStudyNoteMetadata(rawText: string): StudyNoteMetadataInput 
       subject: normalizeMetadataSubject(noteMeta.subject),
       collectionName: noteMeta.collection,
       tags: parseCommaSeparatedTags(noteMeta.tags),
-      questionLinks: parseCommaSeparatedQuestionLinks(noteMeta.questionLinks)
+      questionLinks: parseCommaSeparatedQuestionLinks(noteMeta.questionLinks),
+      searchKeywords: parseCommaSeparatedKeywords(noteMeta.searchKeywords)
     };
   }
 
@@ -332,6 +366,13 @@ export function parseStudyNoteMetadata(rawText: string): StudyNoteMetadataInput 
     parsedMetadata.question_ids ??
     parsedMetadata.relatedQuestions ??
     parsedMetadata.related_questions;
+  const rawSearchKeywords =
+    parsedMetadata.searchKeywords ??
+    parsedMetadata.search_keywords ??
+    parsedMetadata.searchTerms ??
+    parsedMetadata.search_terms ??
+    parsedMetadata.questionSearchKeywords ??
+    parsedMetadata.question_search_keywords;
 
   return {
     title: typeof parsedMetadata.title === "string" ? parsedMetadata.title : undefined,
@@ -355,7 +396,13 @@ export function parseStudyNoteMetadata(rawText: string): StudyNoteMetadataInput 
     questionLinks:
       typeof rawQuestionLinks === "string"
         ? parseCommaSeparatedQuestionLinks(rawQuestionLinks)
-        : normalizeMetadataQuestionLinks(rawQuestionLinks)
+        : normalizeMetadataQuestionLinks(rawQuestionLinks),
+    searchKeywords:
+      typeof rawSearchKeywords === "string"
+        ? parseCommaSeparatedKeywords(rawSearchKeywords)
+        : Array.isArray(rawSearchKeywords)
+          ? parseCommaSeparatedKeywords(rawSearchKeywords.map((value) => String(value)).join("\n"))
+          : []
   };
 }
 
