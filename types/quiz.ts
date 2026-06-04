@@ -249,6 +249,7 @@ export type StudyNoteQuestionLink = {
 export type StudyNoteCollection = {
   id: string;
   name: string;
+  subject?: SubjectName;
   description?: string;
   createdAt: string;
   updatedAt: string;

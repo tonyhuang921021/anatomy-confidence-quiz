@@ -875,14 +875,21 @@ create table if not exists public.study_note_collections (
   id uuid primary key default gen_random_uuid(),
   user_id uuid not null references auth.users (id) on delete cascade,
   name text not null,
+  subject text,
   description text,
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now(),
   unique (user_id, name)
 );
 
+alter table public.study_note_collections
+  add column if not exists subject text;
+
 create index if not exists study_note_collections_user_id_updated_at_idx
 on public.study_note_collections (user_id, updated_at desc);
+
+create index if not exists study_note_collections_user_id_subject_name_idx
+on public.study_note_collections (user_id, subject, name);
 
 grant select, insert, update, delete
   on public.study_note_collections

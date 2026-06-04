@@ -1,5 +1,6 @@
 import type {
   StudyNoteDetail,
+  StudyNoteCollection,
   StudyNoteQuestionLink,
   StudyNoteSummary,
   StudyNoteTag,
@@ -52,6 +53,22 @@ export type ToggleStudyNoteStarInput = {
   accessToken?: string | null;
   noteId: string;
   starred: boolean;
+};
+
+export type LoadStudyNoteCollectionsInput = {
+  accessToken?: string | null;
+  subject?: string;
+};
+
+export type CreateStudyNoteCollectionInput = {
+  accessToken?: string | null;
+  name: string;
+  subject?: string;
+  description?: string;
+};
+
+export type UpdateStudyNoteCollectionInput = CreateStudyNoteCollectionInput & {
+  id: string;
 };
 
 function tryParseJson<T>(rawText: string): T | null {
@@ -810,4 +827,43 @@ export async function toggleStudyNoteStar(input: ToggleStudyNoteStarInput): Prom
   });
   const payload = await parseStudyNoteResponse<{ starred?: boolean }>(response);
   return { starred: Boolean(payload.starred) };
+}
+
+export async function loadStudyNoteCollections(
+  input: LoadStudyNoteCollectionsInput
+): Promise<StudyNoteCollection[]> {
+  const params = new URLSearchParams();
+  if (input.subject?.trim()) params.set("subject", input.subject.trim());
+
+  const response = await fetch(`/api/study-note-collections?${params.toString()}`, {
+    headers: buildAuthHeaders(input.accessToken)
+  });
+  const payload = await parseStudyNoteResponse<{ collections?: StudyNoteCollection[] }>(response);
+  return payload.collections ?? [];
+}
+
+export async function createStudyNoteCollection(
+  input: CreateStudyNoteCollectionInput
+): Promise<StudyNoteCollection> {
+  const response = await fetch("/api/study-note-collections", {
+    method: "POST",
+    headers: buildAuthHeaders(input.accessToken),
+    body: JSON.stringify(input)
+  });
+  const payload = await parseStudyNoteResponse<{ collection?: StudyNoteCollection }>(response);
+  if (!payload.collection) throw new Error("資料夾建立失敗");
+  return payload.collection;
+}
+
+export async function updateStudyNoteCollection(
+  input: UpdateStudyNoteCollectionInput
+): Promise<StudyNoteCollection> {
+  const response = await fetch("/api/study-note-collections", {
+    method: "PUT",
+    headers: buildAuthHeaders(input.accessToken),
+    body: JSON.stringify(input)
+  });
+  const payload = await parseStudyNoteResponse<{ collection?: StudyNoteCollection }>(response);
+  if (!payload.collection) throw new Error("資料夾更新失敗");
+  return payload.collection;
 }

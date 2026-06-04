@@ -28,6 +28,7 @@ type StudyNoteRow = {
 type StudyNoteCollectionRow = {
   id: string;
   name: string;
+  subject?: string | null;
 };
 
 type StudyNoteTagRow = {
@@ -232,7 +233,7 @@ async function loadCollectionsById(
 
   const { data, error } = await supabase
     .from("study_note_collections")
-    .select("id, name")
+    .select("id, name, subject")
     .eq("user_id", userId)
     .in("id", collectionIds);
 
@@ -263,10 +264,12 @@ async function loadStarredNoteIds(supabase: ServiceSupabaseClient, userId: strin
 async function getOrCreateCollectionId(
   supabase: ServiceSupabaseClient,
   userId: string,
-  collectionName?: string
+  collectionName?: string,
+  subject?: string
 ) {
   const name = collectionName?.trim();
   if (!name) return null;
+  const normalizedSubject = normalizeOptionalText(subject);
 
   const { data, error } = await supabase
     .from("study_note_collections")
@@ -274,6 +277,7 @@ async function getOrCreateCollectionId(
       {
         user_id: userId,
         name,
+        subject: normalizedSubject,
         updated_at: new Date().toISOString()
       },
       { onConflict: "user_id,name" }
@@ -408,7 +412,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ ok: false, message: "請貼上學習資料。" }, { status: 400 });
     }
 
-    const collectionId = await getOrCreateCollectionId(supabase, userId, body?.collectionName);
+    const collectionId = await getOrCreateCollectionId(supabase, userId, body?.collectionName, body?.subject);
     const displayOrder = await getNextDisplayOrder(supabase, userId, body?.subject);
     const now = new Date().toISOString();
     const { data: insertedNote, error: insertError } = await supabase
@@ -522,7 +526,7 @@ export async function PUT(request: NextRequest) {
       return NextResponse.json({ ok: false, message: "請貼上學習資料。" }, { status: 400 });
     }
 
-    const collectionId = await getOrCreateCollectionId(supabase, userId, body?.collectionName);
+    const collectionId = await getOrCreateCollectionId(supabase, userId, body?.collectionName, body?.subject);
     const { data: updatedNote, error: updateError } = await supabase
       .from("study_notes")
       .update({

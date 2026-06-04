@@ -13,8 +13,17 @@ import {
   isMicrobiologyImmunologySubject,
   MICROBIOLOGY_IMMUNOLOGY_CATEGORIES
 } from "@/lib/noteSubjectCategories";
-import { loadStudyNote, loadStudyNotes, reorderStudyNotes, toggleStudyNoteStar } from "@/lib/studyNotes";
-import type { Question, StudyNoteDetail, SubjectName } from "@/types/quiz";
+import {
+  createStudyNoteCollection,
+  loadStudyNote,
+  loadStudyNoteCollections,
+  loadStudyNotes,
+  reorderStudyNotes,
+  toggleStudyNoteStar,
+  updateStudyNote,
+  updateStudyNoteCollection
+} from "@/lib/studyNotes";
+import type { Question, StudyNoteCollection, StudyNoteDetail, SubjectName } from "@/types/quiz";
 
 function buildQuestionMap(): Map<string, Question> {
   return new Map(
@@ -24,6 +33,13 @@ function buildQuestionMap(): Map<string, Question> {
   );
 }
 
+type OutlineGroup = {
+  id: string;
+  name: string;
+  collection?: StudyNoteCollection;
+  notes: StudyNoteDetail[];
+};
+
 export default function SubjectNotesPage() {
   const params = useParams<{ subject: string }>();
   const searchParams = useSearchParams();
@@ -31,11 +47,14 @@ export default function SubjectNotesPage() {
   const category = searchParams.get("category");
   const { configured, session, user } = useAuth();
   const [notes, setNotes] = useState<StudyNoteDetail[]>([]);
+  const [collections, setCollections] = useState<StudyNoteCollection[]>([]);
+  const [outlineEditMode, setOutlineEditMode] = useState(false);
   const [draggingNoteId, setDraggingNoteId] = useState("");
   const [dragOverNoteId, setDragOverNoteId] = useState("");
   const [activeQuestionNoteId, setActiveQuestionNoteId] = useState("");
   const [currentNoteId, setCurrentNoteId] = useState("");
   const [loading, setLoading] = useState(false);
+  const [outlineSaving, setOutlineSaving] = useState(false);
   const [error, setError] = useState("");
   const validSubject = isNoteSubject(subject);
   const subjectName = subject as SubjectName;
@@ -54,13 +73,21 @@ export default function SubjectNotesPage() {
   useEffect(() => {
     if (!configured || !session?.access_token || !validSubject) {
       setNotes([]);
+      setCollections([]);
       return;
     }
 
     let cancelled = false;
     setLoading(true);
     setError("");
-    loadStudyNotes({ accessToken: session.access_token, subject })
+    Promise.all([
+      loadStudyNotes({ accessToken: session.access_token, subject }),
+      loadStudyNoteCollections({ accessToken: session.access_token, subject })
+    ])
+      .then(async ([nextNotes, nextCollections]) => {
+        if (!cancelled) setCollections(nextCollections);
+        return nextNotes;
+      })
       .then(async (nextNotes) => {
         const details = await Promise.all(
           nextNotes.map((note) => loadStudyNote(note.id, session.access_token))
@@ -84,6 +111,44 @@ export default function SubjectNotesPage() {
 
   const questionMap = useMemo(() => buildQuestionMap(), []);
   const currentNote = notes.find((note) => note.id === currentNoteId) ?? notes[0];
+  const outlineGroups = useMemo(() => {
+    const collectionMap = new Map<string, StudyNoteCollection>();
+    collections.forEach((collection) => {
+      collectionMap.set(collection.id, collection);
+    });
+    notes.forEach((note) => {
+      if (note.collectionId && note.collectionName && !collectionMap.has(note.collectionId)) {
+        collectionMap.set(note.collectionId, {
+          id: note.collectionId,
+          name: note.collectionName,
+          subject: note.subject,
+          createdAt: note.createdAt,
+          updatedAt: note.updatedAt
+        });
+      }
+    });
+
+    const grouped: OutlineGroup[] = Array.from(collectionMap.values())
+      .sort((left, right) => left.name.localeCompare(right.name, "zh-Hant"))
+      .map((collection) => ({
+        id: collection.id,
+        name: collection.name,
+        collection,
+        notes: notes.filter((note) => note.collectionId === collection.id)
+      }));
+
+    const unfiledNotes = notes.filter((note) => !note.collectionId);
+    if (unfiledNotes.length > 0) {
+      grouped.push({
+        id: "unfiled",
+        name: "未分類",
+        collection: undefined,
+        notes: unfiledNotes
+      });
+    }
+
+    return grouped;
+  }, [collections, notes]);
   const currentRelatedQuestionCount = currentNote?.questionLinks
     .filter((link) => questionMap.has(link.questionId))
     .length ?? 0;
@@ -151,6 +216,7 @@ export default function SubjectNotesPage() {
   }
 
   function beginDrag(noteId: string, dataTransfer: DataTransfer) {
+    if (!outlineEditMode) return;
     setDraggingNoteId(noteId);
     setDragOverNoteId(noteId);
     originalOrderRef.current = notesRef.current.map((note) => note.id);
@@ -159,6 +225,7 @@ export default function SubjectNotesPage() {
   }
 
   function previewDraggedNote(targetNoteId: string) {
+    if (!outlineEditMode) return;
     if (!draggingNoteId || draggingNoteId === targetNoteId) return;
     setNotes((currentNotes) => {
       const fromIndex = currentNotes.findIndex((note) => note.id === draggingNoteId);
@@ -174,6 +241,7 @@ export default function SubjectNotesPage() {
   }
 
   function finishDrag() {
+    if (!outlineEditMode) return;
     const originalOrderKey = originalOrderRef.current.join(",");
     const nextOrderKey = getOrderKey(notesRef.current);
     setDraggingNoteId("");
@@ -207,6 +275,145 @@ export default function SubjectNotesPage() {
       );
       setError(rawError instanceof Error ? rawError.message : "筆記星號更新失敗");
     }
+  }
+
+  async function handleCreateCollection() {
+    if (!session?.access_token || outlineSaving) return;
+    const name = window.prompt("新增資料夾名稱");
+    const normalizedName = name?.trim();
+    if (!normalizedName) return;
+
+    setOutlineSaving(true);
+    setError("");
+    try {
+      const collection = await createStudyNoteCollection({
+        accessToken: session.access_token,
+        name: normalizedName,
+        subject
+      });
+      setCollections((currentCollections) => {
+        const nextMap = new Map(currentCollections.map((item) => [item.id, item] as const));
+        nextMap.set(collection.id, collection);
+        return Array.from(nextMap.values());
+      });
+    } catch (rawError) {
+      setError(rawError instanceof Error ? rawError.message : "資料夾建立失敗");
+    } finally {
+      setOutlineSaving(false);
+    }
+  }
+
+  async function handleRenameCollection(collection: StudyNoteCollection) {
+    if (!session?.access_token || outlineSaving) return;
+    const name = window.prompt("更改資料夾名稱", collection.name);
+    const normalizedName = name?.trim();
+    if (!normalizedName || normalizedName === collection.name) return;
+
+    setOutlineSaving(true);
+    setError("");
+    try {
+      const updated = await updateStudyNoteCollection({
+        accessToken: session.access_token,
+        id: collection.id,
+        name: normalizedName,
+        subject: collection.subject
+      });
+      setCollections((currentCollections) =>
+        currentCollections.map((item) => (item.id === updated.id ? updated : item))
+      );
+      setNotes((currentNotes) =>
+        currentNotes.map((note) =>
+          note.collectionId === updated.id ? { ...note, collectionName: updated.name } : note
+        )
+      );
+    } catch (rawError) {
+      setError(rawError instanceof Error ? rawError.message : "資料夾更新失敗");
+    } finally {
+      setOutlineSaving(false);
+    }
+  }
+
+  async function handleRenameNote(note: StudyNoteDetail) {
+    if (!session?.access_token || outlineSaving) return;
+    const title = window.prompt("更改筆記名稱", note.title);
+    const normalizedTitle = title?.trim();
+    if (!normalizedTitle || normalizedTitle === note.title) return;
+
+    setOutlineSaving(true);
+    setError("");
+    try {
+      const updated = await updateStudyNote({
+        accessToken: session.access_token,
+        id: note.id,
+        title: normalizedTitle,
+        rawMarkdown: note.rawMarkdown,
+        summary: note.summary,
+        subject: note.subject,
+        chapter: note.chapter,
+        section: note.section,
+        collectionName: note.collectionName,
+        tags: note.tags,
+        questionLinks: note.questionLinks
+      });
+      setNotes((currentNotes) =>
+        currentNotes.map((item) => (item.id === updated.id ? updated : item))
+      );
+    } catch (rawError) {
+      setError(rawError instanceof Error ? rawError.message : "筆記名稱更新失敗");
+    } finally {
+      setOutlineSaving(false);
+    }
+  }
+
+  async function handleMoveNoteToCollection(note: StudyNoteDetail, collectionName?: string) {
+    if (!session?.access_token || outlineSaving) return;
+    setOutlineSaving(true);
+    setError("");
+    try {
+      const updated = await updateStudyNote({
+        accessToken: session.access_token,
+        id: note.id,
+        title: note.title,
+        rawMarkdown: note.rawMarkdown,
+        summary: note.summary,
+        subject: note.subject,
+        chapter: note.chapter,
+        section: note.section,
+        collectionName,
+        tags: note.tags,
+        questionLinks: note.questionLinks
+      });
+      setNotes((currentNotes) =>
+        currentNotes.map((item) => (item.id === updated.id ? updated : item))
+      );
+      const updatedCollectionId = updated.collectionId;
+      const updatedCollectionName = updated.collectionName;
+      if (updatedCollectionId && updatedCollectionName) {
+        setCollections((currentCollections) => {
+          if (currentCollections.some((collection) => collection.id === updatedCollectionId)) {
+            return currentCollections;
+          }
+          return [
+            ...currentCollections,
+            {
+              id: updatedCollectionId,
+              name: updatedCollectionName,
+              subject: updated.subject,
+              createdAt: updated.createdAt,
+              updatedAt: updated.updatedAt
+            }
+          ];
+        });
+      }
+    } catch (rawError) {
+      setError(rawError instanceof Error ? rawError.message : "筆記資料夾更新失敗");
+    } finally {
+      setOutlineSaving(false);
+    }
+  }
+
+  function scrollToTop() {
+    window.scrollTo({ top: 0, behavior: "smooth" });
   }
 
   return (
@@ -260,45 +467,140 @@ export default function SubjectNotesPage() {
                 筆記
               </div>
               <div className="note-outline-panel surface-card">
-                <p className="text-xs font-bold uppercase tracking-[0.22em] text-slate-500">Notes</p>
-                <div className="mt-4 grid gap-2">
-                  {notes.length > 0 ? (
-                    notes.map((note) => (
-                      <div
-                        key={note.id}
-                        onDragEnter={() => previewDraggedNote(note.id)}
-                        onDragOver={(event) => {
-                          event.preventDefault();
-                          event.dataTransfer.dropEffect = "move";
-                        }}
-                        onDrop={(event) => {
-                          event.preventDefault();
-                          finishDrag();
-                        }}
-                        data-dragging={draggingNoteId === note.id}
-                        data-drop-target={dragOverNoteId === note.id && draggingNoteId !== note.id}
-                        className="note-outline-item group grid grid-cols-[32px_minmax(0,1fr)] items-center gap-2 rounded-2xl px-2 py-2 hover:bg-teal-50"
+                <div className="flex items-center justify-between gap-2">
+                  <div>
+                    <p className="text-xs font-bold uppercase tracking-[0.22em] text-slate-500">Notes</p>
+                    {outlineEditMode ? (
+                      <p className="mt-1 text-[11px] font-semibold text-teal-700">
+                        編輯中：可拖曳、改名、分資料夾
+                      </p>
+                    ) : null}
+                  </div>
+                  <div className="flex shrink-0 gap-2">
+                    {outlineEditMode ? (
+                      <button
+                        type="button"
+                        onClick={() => void handleCreateCollection()}
+                        disabled={outlineSaving}
+                        className="rounded-full border border-teal-100 bg-teal-50 px-3 py-1.5 text-xs font-bold text-teal-800 transition hover:bg-teal-100 disabled:opacity-50"
                       >
-                        <button
-                          type="button"
-                          draggable
-                          onDragStart={(event) => beginDrag(note.id, event.dataTransfer)}
-                          onDragEnd={finishDrag}
-                          aria-label={`拖曳排序：${note.title}`}
-                          className="grid h-8 w-8 cursor-grab place-items-center rounded-xl text-slate-300 transition hover:bg-white hover:text-teal-700 active:cursor-grabbing"
-                        >
-                          <span className="leading-none">⠿</span>
-                        </button>
-                        <a
-                          href={`#note-${note.id}`}
-                          className="grid min-w-0 grid-cols-[minmax(0,1fr)_auto] items-center gap-2 text-sm font-bold text-slate-700 group-hover:text-teal-800"
-                        >
-                          <span className="min-w-0 truncate">{note.title}</span>
-                          <span className={note.isStarred ? "text-amber-500" : "text-slate-300"} aria-label={note.isStarred ? "已打星" : "未打星"}>
-                            {note.isStarred ? "★" : "☆"}
-                          </span>
-                        </a>
-                      </div>
+                        新增資料夾
+                      </button>
+                    ) : null}
+                    <button
+                      type="button"
+                      onClick={() => setOutlineEditMode((value) => !value)}
+                      className={outlineEditMode ? "rounded-full bg-slate-950 px-3 py-1.5 text-xs font-bold text-white transition hover:bg-teal-700" : "rounded-full border border-slate-200 bg-white px-3 py-1.5 text-xs font-bold text-slate-700 transition hover:bg-slate-50"}
+                    >
+                      {outlineEditMode ? "完成" : "編輯"}
+                    </button>
+                  </div>
+                </div>
+                <div className="mt-4 grid gap-2">
+                  {outlineGroups.length > 0 ? (
+                    outlineGroups.map((group) => (
+                      <section key={group.id} className="rounded-2xl border border-slate-100 bg-white/70 p-2">
+                        <div className="flex items-center justify-between gap-2 px-2 py-1">
+                          <p className="min-w-0 truncate text-[11px] font-black uppercase tracking-[0.16em] text-slate-500">
+                            {group.name}
+                          </p>
+                          {outlineEditMode && group.collection ? (
+                            <button
+                              type="button"
+                              onClick={() => {
+                                if (group.collection) void handleRenameCollection(group.collection);
+                              }}
+                              disabled={outlineSaving}
+                              className="rounded-full px-2 py-1 text-[11px] font-bold text-teal-700 transition hover:bg-teal-50 disabled:opacity-50"
+                            >
+                              改名
+                            </button>
+                          ) : null}
+                        </div>
+                        <div className="grid gap-1">
+                          {group.notes.length > 0 ? (
+                            group.notes.map((note) => (
+                              <div
+                                key={note.id}
+                                onDragEnter={() => previewDraggedNote(note.id)}
+                                onDragOver={(event) => {
+                                  if (!outlineEditMode) return;
+                                  event.preventDefault();
+                                  event.dataTransfer.dropEffect = "move";
+                                }}
+                                onDrop={(event) => {
+                                  if (!outlineEditMode) return;
+                                  event.preventDefault();
+                                  finishDrag();
+                                }}
+                                data-dragging={draggingNoteId === note.id}
+                                data-drop-target={dragOverNoteId === note.id && draggingNoteId !== note.id}
+                                className={`note-outline-item group rounded-2xl px-2 py-2 hover:bg-teal-50 ${
+                                  outlineEditMode
+                                    ? "grid grid-cols-[32px_minmax(0,1fr)] gap-2"
+                                    : "grid grid-cols-[minmax(0,1fr)]"
+                                }`}
+                              >
+                                {outlineEditMode ? (
+                                  <button
+                                    type="button"
+                                    draggable
+                                    onDragStart={(event) => beginDrag(note.id, event.dataTransfer)}
+                                    onDragEnd={finishDrag}
+                                    aria-label={`拖曳排序：${note.title}`}
+                                    className="grid h-8 w-8 cursor-grab place-items-center rounded-xl text-slate-300 transition hover:bg-white hover:text-teal-700 active:cursor-grabbing"
+                                  >
+                                    <span className="leading-none">⠿</span>
+                                  </button>
+                                ) : null}
+                                <div className="min-w-0">
+                                  <a
+                                    href={`#note-${note.id}`}
+                                    className="grid min-w-0 grid-cols-[minmax(0,1fr)_auto] items-center gap-2 text-sm font-bold text-slate-700 group-hover:text-teal-800"
+                                  >
+                                    <span className="min-w-0 truncate">{note.title}</span>
+                                    <span className={note.isStarred ? "text-amber-500" : "text-slate-300"} aria-label={note.isStarred ? "已打星" : "未打星"}>
+                                      {note.isStarred ? "★" : "☆"}
+                                    </span>
+                                  </a>
+                                  {outlineEditMode ? (
+                                    <div className="mt-2 grid gap-2">
+                                      <div className="flex flex-wrap gap-1">
+                                        <button
+                                          type="button"
+                                          onClick={() => void handleRenameNote(note)}
+                                          disabled={outlineSaving}
+                                          className="rounded-full bg-slate-50 px-2.5 py-1 text-[11px] font-bold text-slate-600 transition hover:bg-teal-50 hover:text-teal-700 disabled:opacity-50"
+                                        >
+                                          改筆記名
+                                        </button>
+                                      </div>
+                                      <select
+                                        value={note.collectionId ?? ""}
+                                        onChange={(event) => {
+                                          const nextCollection = collections.find((item) => item.id === event.target.value);
+                                          void handleMoveNoteToCollection(note, nextCollection?.name);
+                                        }}
+                                        disabled={outlineSaving}
+                                        className="min-h-8 rounded-xl border border-slate-200 bg-white px-2 py-1 text-xs font-semibold text-slate-600 outline-none disabled:opacity-50"
+                                      >
+                                        <option value="">未分類</option>
+                                        {collections.map((collection) => (
+                                          <option key={collection.id} value={collection.id}>
+                                            {collection.name}
+                                          </option>
+                                        ))}
+                                      </select>
+                                    </div>
+                                  ) : null}
+                                </div>
+                              </div>
+                            ))
+                          ) : (
+                            <p className="px-2 py-2 text-xs font-semibold text-slate-400">這個資料夾還沒有筆記。</p>
+                          )}
+                        </div>
+                      </section>
                     ))
                   ) : (
                     <p className="body-soft text-sm">目前還沒有筆記。</p>
@@ -368,6 +670,16 @@ export default function SubjectNotesPage() {
                 </span>
               </button>
             ) : null}
+
+            <button
+              type="button"
+              onClick={scrollToTop}
+              className="fixed bottom-5 right-5 z-30 grid h-11 w-11 place-items-center rounded-full border border-white/60 bg-white/90 text-lg font-black text-slate-800 shadow-xl shadow-slate-900/10 backdrop-blur transition hover:-translate-y-0.5 hover:bg-teal-700 hover:text-white sm:bottom-6 sm:right-6"
+              aria-label="回到頁面頂端"
+              title="回頂"
+            >
+              ↑
+            </button>
 
             <button
               type="button"
