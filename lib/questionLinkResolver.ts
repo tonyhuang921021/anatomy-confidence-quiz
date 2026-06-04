@@ -1,4 +1,11 @@
-import type { Question, StudyNoteQuestionLink } from "@/types/quiz";
+import type { Question, StudyNoteQuestionLink, SubjectName } from "@/types/quiz";
+
+type ResolveStudyNoteQuestionLinksOptions = {
+  subject?: SubjectName | "" | null;
+};
+
+const MED1_SUBJECTS: SubjectName[] = ["解剖學", "組織學", "胚胎學", "生理學", "生物化學", "細胞生物學", "分子生物學", "其他醫學一"];
+const MED2_SUBJECTS: SubjectName[] = ["微生物免疫學", "寄生蟲學", "公共衛生學", "藥理學", "病理學"];
 
 function normalizeQuestionNumber(value: string) {
   const parsed = Number(value.replace(/^0+/, "") || "0");
@@ -63,7 +70,30 @@ function parseQuestionReference(rawReference: string) {
   return null;
 }
 
-function findQuestionByReference(questions: Question[], rawReference: string) {
+function narrowCandidatesBySubject(candidates: Question[], subject?: SubjectName | "" | null) {
+  if (!subject || candidates.length <= 1) return candidates;
+
+  const exactSubjectMatches = candidates.filter((question) => question.subject === subject);
+  if (exactSubjectMatches.length > 0) return exactSubjectMatches;
+
+  if (subject === "醫學（一）") {
+    const med1Matches = candidates.filter((question) => MED1_SUBJECTS.includes(question.subject));
+    if (med1Matches.length > 0) return med1Matches;
+  }
+
+  if (subject === "醫學（二）") {
+    const med2Matches = candidates.filter((question) => MED2_SUBJECTS.includes(question.subject));
+    if (med2Matches.length > 0) return med2Matches;
+  }
+
+  return candidates;
+}
+
+function findQuestionByReference(
+  questions: Question[],
+  rawReference: string,
+  options: ResolveStudyNoteQuestionLinksOptions = {}
+) {
   const reference = rawReference.trim();
   const exact = questions.find((question) => question.id.toLowerCase() === reference.toLowerCase());
   if (exact) return exact;
@@ -82,20 +112,22 @@ function findQuestionByReference(questions: Question[], rawReference: string) {
     if (parsed.paperCode && question.paperCode !== parsed.paperCode) return false;
     return question.originalQuestionNumber === parsed.questionNumber;
   });
+  const narrowedCandidates = parsed.hasPaperCode ? candidates : narrowCandidatesBySubject(candidates, options.subject);
 
-  if (!parsed.hasPaperCode && candidates.length > 1) return null;
+  if (!parsed.hasPaperCode && narrowedCandidates.length > 1) return null;
 
-  return candidates[0] ?? null;
+  return narrowedCandidates[0] ?? null;
 }
 
 export function resolveStudyNoteQuestionLinks(
   links: StudyNoteQuestionLink[],
-  questions: Question[]
+  questions: Question[],
+  options: ResolveStudyNoteQuestionLinksOptions = {}
 ): StudyNoteQuestionLink[] {
   const resolved = new Map<string, StudyNoteQuestionLink>();
 
   links.forEach((link) => {
-    const question = findQuestionByReference(questions, link.questionId);
+    const question = findQuestionByReference(questions, link.questionId, options);
     if (!question) return;
     resolved.set(`${question.id}:${link.relationType}`, {
       ...link,

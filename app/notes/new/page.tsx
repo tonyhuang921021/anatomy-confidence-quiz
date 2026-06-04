@@ -131,7 +131,12 @@ export default function NewStudyNotePage() {
     if (parsed.subject) setSubject(parsed.subject);
     if (parsed.collectionName) setCollectionName(parsed.collectionName);
     setMetadataTags((current) => mergeUniqueTags(current, parsed.tags ?? []));
-    setQuestionLinks((current) => mergeUniqueLinks(current, resolveStudyNoteQuestionLinks(parsed.questionLinks ?? [], allQuestions)));
+    setQuestionLinks((current) =>
+      mergeUniqueLinks(
+        current,
+        resolveStudyNoteQuestionLinks(parsed.questionLinks ?? [], allQuestions, { subject: parsed.subject ?? subject })
+      )
+    );
   }
 
   function handleMarkdownChange(value: string) {
@@ -155,7 +160,9 @@ export default function NewStudyNotePage() {
   }
 
   function addQuestionLinksFromText() {
-    const resolvedLinks = resolveStudyNoteQuestionLinks(parseStudyNoteQuestionLinkText(questionCodeText), allQuestions);
+    const resolvedLinks = resolveStudyNoteQuestionLinks(parseStudyNoteQuestionLinkText(questionCodeText), allQuestions, {
+      subject
+    });
     if (resolvedLinks.length === 0) {
       setError("沒有找到可對應的題目。請確認題號有年份、第幾次、卷碼與 Q 題號，例如 2022-1-1301-Q025。");
       setMessage("");

@@ -198,7 +198,9 @@ export default function StudyNoteDetailPage() {
   }
 
   function addQuestionLinksFromText() {
-    const resolvedLinks = resolveStudyNoteQuestionLinks(parseStudyNoteQuestionLinkText(draftQuestionCodeText), allQuestions);
+    const resolvedLinks = resolveStudyNoteQuestionLinks(parseStudyNoteQuestionLinkText(draftQuestionCodeText), allQuestions, {
+      subject: note?.subject
+    });
     if (resolvedLinks.length === 0) {
       setError("沒有找到可對應的題目。請確認題號有年份、第幾次、卷碼與 Q 題號，例如 2022-1-1301-Q025。");
       setMessage("");
@@ -238,7 +240,7 @@ export default function StudyNoteDetailPage() {
           section: note.section,
           collectionName: note.collectionName,
           tags: note.tags,
-          questionLinks: resolveStudyNoteQuestionLinks(draftQuestionLinks, allQuestions)
+          questionLinks: resolveStudyNoteQuestionLinks(draftQuestionLinks, allQuestions, { subject: note.subject })
         });
         setNote(updated);
         resetDraftsFromNote(updated);
