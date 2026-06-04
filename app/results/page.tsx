@@ -10,6 +10,7 @@ import { WeaknessRanking } from "@/components/WeaknessRanking";
 import {
   loadQuestionCommunityStats,
   loadConfirmedQuestionClassificationOverrides,
+  loadCompletedSessionFromSupabase,
   loadSharedQuestionExplanationOverrides,
   pushCompletedSessionToSupabase,
   syncSharedQuestionExplanationOverrides
@@ -291,13 +292,19 @@ function ResultsPageContent() {
   }
 
   useEffect(() => {
-    try {
+    let cancelled = false;
+
+    async function resolveResultSession() {
+      try {
       const targetSessionId = searchParams.get("sessionId");
       const nextScope = searchParams.get("scope") === "simulation" ? "simulation" : "default";
-      setResultsScope(nextScope);
-      setRequestedSessionId(targetSessionId);
-      const completedSessions = loadCompletedSessions();
-      const scopedSessions = completedSessions.filter((sessionItem) =>
+      if (!cancelled) {
+        setResultsScope(nextScope);
+        setRequestedSessionId(targetSessionId);
+      }
+
+      let completedSessions = loadCompletedSessions();
+      let scopedSessions = completedSessions.filter((sessionItem) =>
         nextScope === "simulation" ? isSimulationSession(sessionItem) : !isSimulationSession(sessionItem)
       );
       const currentSession = loadCurrentSession();
@@ -311,15 +318,36 @@ function ResultsPageContent() {
         targetSessionId
           ? completedSessions.find((item) => item.id === targetSessionId) ?? fallbackCurrentSession ?? null
           : null;
+      let resolvedTargetSession = targetSession;
 
-      if (targetSessionId && targetSession?.completedAt) {
-        const shouldUseSimulationScope = isSimulationSession(targetSession);
+      if (targetSessionId && !resolvedTargetSession?.completedAt && session?.user?.id) {
+        let cloudSession = await loadCompletedSessionFromSupabase(targetSessionId);
+        if (!cloudSession?.completedAt) {
+          await new Promise((resolve) => window.setTimeout(resolve, 900));
+          if (!cancelled) {
+            cloudSession = await loadCompletedSessionFromSupabase(targetSessionId);
+          }
+        }
+        if (cloudSession?.completedAt) {
+          saveCompletedSession(cloudSession);
+          completedSessions = loadCompletedSessions();
+          scopedSessions = completedSessions.filter((sessionItem) =>
+            nextScope === "simulation" ? isSimulationSession(sessionItem) : !isSimulationSession(sessionItem)
+          );
+          resolvedTargetSession = cloudSession;
+        }
+      }
+
+      if (cancelled) return;
+
+      if (targetSessionId && resolvedTargetSession?.completedAt) {
+        const shouldUseSimulationScope = isSimulationSession(resolvedTargetSession);
         if (shouldUseSimulationScope && nextScope !== "simulation") {
-          router.replace(`/simulation-results?sessionId=${encodeURIComponent(targetSession.id)}`);
+          router.replace(`/simulation-results?sessionId=${encodeURIComponent(resolvedTargetSession.id)}`);
           return;
         }
         if (!shouldUseSimulationScope && nextScope === "simulation") {
-          router.replace(`/results?sessionId=${encodeURIComponent(targetSession.id)}`);
+          router.replace(`/results?sessionId=${encodeURIComponent(resolvedTargetSession.id)}`);
           return;
         }
       }
@@ -331,7 +359,7 @@ function ResultsPageContent() {
         saveCompletedSession(fallbackCurrentSession);
       }
 
-      if (!targetSession?.completedAt) {
+      if (!resolvedTargetSession?.completedAt) {
         setState((current) => ({
           ...current,
           session: null,
@@ -348,37 +376,45 @@ function ResultsPageContent() {
       }
 
       const currentQuestions =
-        targetSession.generatedQuestions && targetSession.generatedQuestions.length > 0
-          ? targetSession.generatedQuestions
+        resolvedTargetSession.generatedQuestions && resolvedTargetSession.generatedQuestions.length > 0
+          ? resolvedTargetSession.generatedQuestions
           : anatomyQuestions;
       const completionStats = calculateCompletionStats(anatomyQuestions, completedSessions);
-      const sessionSectionStats = calculateSectionStats(targetSession.attempts, currentQuestions);
+      const sessionSectionStats = calculateSectionStats(resolvedTargetSession.attempts, currentQuestions);
 
       setState({
-        session: targetSession,
+        session: resolvedTargetSession,
         sessions: scopedSessions,
-        summary: calculateSummary(targetSession.attempts, currentQuestions),
+        summary: calculateSummary(resolvedTargetSession.attempts, currentQuestions),
         sectionStats: sessionSectionStats,
-        promptText: generateAIPrompt(targetSession.attempts, currentQuestions, completedSessions),
+        promptText: generateAIPrompt(resolvedTargetSession.attempts, currentQuestions, completedSessions),
         lowCompletion: getLowCompletionSections(completionStats.sections, 5),
         unstableSections: getUnstableCompletedSections(completionStats.sections, 5),
         completionStats
       });
       setMounted(true);
-    } catch {
-      setState({
-        session: null,
-        sessions: [],
-        summary: null,
-        sectionStats: [],
-        promptText: "",
-        lowCompletion: [],
-        unstableSections: [],
-        completionStats: null
-      });
-      setMounted(true);
+      } catch {
+        if (cancelled) return;
+        setState({
+          session: null,
+          sessions: [],
+          summary: null,
+          sectionStats: [],
+          promptText: "",
+          lowCompletion: [],
+          unstableSections: [],
+          completionStats: null
+        });
+        setMounted(true);
+      }
     }
-  }, [router, searchParams, syncVersion]);
+
+    void resolveResultSession();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [router, searchParams, session?.user?.id, syncVersion]);
 
   useEffect(() => {
     setVisibleHistoryCount(RESULTS_HISTORY_PAGE_SIZE);

@@ -22,6 +22,10 @@ create index if not exists quiz_sessions_user_id_idx on public.quiz_sessions (us
 create index if not exists quiz_sessions_completed_at_idx on public.quiz_sessions (completed_at desc);
 create index if not exists quiz_sessions_mode_completed_at_idx
 on public.quiz_sessions (mode, completed_at desc);
+create index if not exists quiz_sessions_user_id_completed_at_idx
+on public.quiz_sessions (user_id, completed_at desc);
+create index if not exists quiz_sessions_user_id_updated_at_idx
+on public.quiz_sessions (user_id, updated_at desc);
 
 grant select, insert, update, delete
   on public.quiz_sessions
@@ -87,6 +91,9 @@ on public.quiz_session_attempts (session_id, question_order);
 
 create index if not exists quiz_session_attempts_question_id_idx
 on public.quiz_session_attempts (question_id);
+
+create index if not exists quiz_session_attempts_user_id_question_id_answered_at_idx
+on public.quiz_session_attempts (user_id, question_id, answered_at desc);
 
 grant select, insert, update, delete
   on public.quiz_session_attempts

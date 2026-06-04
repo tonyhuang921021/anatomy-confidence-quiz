@@ -738,6 +738,26 @@ async function fetchQuizSessionsForUser(userId: string) {
   return (data ?? []) as QuizSessionRow[];
 }
 
+async function fetchQuizSessionByIdForUser(userId: string, sessionId: string) {
+  if (!isSupabaseConfigured() || !sessionId) return null;
+
+  const supabase = getSupabaseBrowserClient();
+  const { data, error } = await supabase
+    .from("quiz_sessions")
+    .select(
+      "id, user_id, subject, mode, session_name, question_count, correct_count, wrong_count, average_confidence, started_at, completed_at, session_payload, updated_at"
+    )
+    .eq("user_id", userId)
+    .eq("id", sessionId)
+    .maybeSingle();
+
+  if (error) {
+    throw error;
+  }
+
+  return (data as QuizSessionRow | null) ?? null;
+}
+
 async function fetchResolvedQuizSessionsForUser(userId: string) {
   const sessionRows = await fetchQuizSessionsForUser(userId);
   const attemptRows = await fetchSessionAttemptRowsForUser(
@@ -762,6 +782,22 @@ async function fetchResolvedQuizSessionsForUser(userId: string) {
     sessions,
     sessionsMissingAttemptRows
   };
+}
+
+export async function loadCompletedSessionFromSupabase(sessionId: string) {
+  if (!isSupabaseConfigured() || !sessionId) return null;
+
+  const supabase = getSupabaseBrowserClient();
+  const { data } = await supabase.auth.getUser();
+  const userId = data.user?.id;
+  if (!userId) return null;
+
+  const row = await fetchQuizSessionByIdForUser(userId, sessionId);
+  if (!row?.completed_at) return null;
+
+  const attemptRows = await fetchSessionAttemptRowsForUser(userId, [row.id]);
+  const session = mapRowToSession(row, buildAttemptMap(attemptRows));
+  return session ? canonicalizeSessionsForUser(userId, [session])[0] ?? session : null;
 }
 
 function getLeaderboardDisplayName(user: Pick<User, "id" | "email" | "user_metadata">) {
