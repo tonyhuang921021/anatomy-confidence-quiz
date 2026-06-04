@@ -56,12 +56,25 @@ const paperModeLabels: Record<SimulationPaperMode, string> = {
 
 const paperModeDescriptions: Record<SimulationPaperMode, string> = {
   random_set:
-    "系統會先參考一份真實考古卷的分布模板，再從你目前選的科目題庫中重組一份新模擬卷，比例會盡量貼近真實國考。",
+    "系統會依你選的醫學（一）或醫學（二）正式科目比例，重組一份 100 題新模擬卷。",
   past_paper:
-    "直接指定某一年、某一次的真實考古卷，維持原始卷別與題目順序，最適合完整模考。",
+    "直接指定某一年、某一次、某一卷別的真實考古卷，維持原始題序，最適合完整模考。",
   random_past_paper:
-    "從現有真實考古卷中隨機抽一整份來寫，保留真實卷的比例與題序，但你不會先知道抽到哪一份。"
+    "從你選的醫學（一）或醫學（二）真實考古卷中隨機抽一整份來寫，保留真實卷題序。"
 };
+
+const simulationSubjectOptions = [
+  {
+    subject: "醫學（一）" as SubjectFilter,
+    label: "醫學（一）",
+    description: "解剖 31、生理 27、生化 27、組織 10、胚胎 5"
+  },
+  {
+    subject: "醫學（二）" as SubjectFilter,
+    label: "醫學（二）",
+    description: "微免 28、藥理 25、病理 25、公衛 15、寄生蟲 7"
+  }
+];
 
 export function QuizSetupPanel({
   stats,
@@ -75,7 +88,7 @@ export function QuizSetupPanel({
       ? {
           ...DEFAULT_QUIZ_SETTINGS,
           mode: "simulation",
-          subjectFilter: "全部",
+          subjectFilter: "醫學（一）",
           questionCount: 100,
           feedbackMode: "none",
           paperMode: "past_paper"
@@ -106,8 +119,8 @@ export function QuizSetupPanel({
 
   const paperOptions = useMemo(() => {
     if (settings.mode !== "simulation") return [];
-    return getPastPaperOptions();
-  }, [settings.mode]);
+    return getPastPaperOptions(settings.subjectFilter ?? "醫學（一）");
+  }, [settings.mode, settings.subjectFilter]);
   const med1PaperOptions = useMemo(
     () =>
       [...paperOptions]
@@ -132,6 +145,8 @@ export function QuizSetupPanel({
         }),
     [paperOptions]
   );
+  const selectedPaperOptions =
+    settings.subjectFilter === "醫學（二）" ? med2PaperOptions : med1PaperOptions;
 
   useEffect(() => {
     const completedSessions = loadCompletedSessions();
@@ -150,6 +165,17 @@ export function QuizSetupPanel({
     setCompletedPaperCounts(counts);
   }, []);
 
+  useEffect(() => {
+    if (settings.mode !== "simulation" || settings.paperMode !== "past_paper") return;
+    if (selectedPaperOptions.length === 0) return;
+    const stillAvailable = selectedPaperOptions.some((paper) => paper.key === settings.selectedPaperKey);
+    if (stillAvailable) return;
+    setSettings((current) => ({
+      ...current,
+      selectedPaperKey: selectedPaperOptions[0]?.key
+    }));
+  }, [selectedPaperOptions, settings.mode, settings.paperMode, settings.selectedPaperKey]);
+
   function updateSettings(next: Partial<QuizSettings>) {
     setSettings((current) => {
       const merged = { ...current, ...next } as QuizSettings;
@@ -159,6 +185,7 @@ export function QuizSetupPanel({
         merged.chapter = undefined;
         merged.section = undefined;
         merged.paperMode = "past_paper";
+        merged.selectedPaperKey = undefined;
       }
       if (next.chapter && next.chapter !== current.chapter) {
         merged.section = undefined;
@@ -166,8 +193,17 @@ export function QuizSetupPanel({
       if (next.subjectFilter && next.subjectFilter !== current.subjectFilter) {
         merged.chapter = undefined;
         merged.section = undefined;
-        if (merged.mode === "simulation" && next.subjectFilter !== "全部") {
+        if (merged.mode === "simulation") {
           merged.paperMode = merged.paperMode ?? "past_paper";
+          merged.questionCount = 100;
+          merged.selectedPaperKey = undefined;
+        }
+      }
+      if (next.paperMode && next.paperMode !== current.paperMode) {
+        merged.selectedPaperKey = undefined;
+        if (merged.mode === "simulation") {
+          merged.questionCount = 100;
+          merged.subjectFilter = merged.subjectFilter === "醫學（二）" ? "醫學（二）" : "醫學（一）";
         }
       }
       return merged;
@@ -175,11 +211,15 @@ export function QuizSetupPanel({
   }
 
   function handleStart() {
+    const simulationSubject: SubjectFilter =
+      settings.subjectFilter === "醫學（二）" ? "醫學（二）" : "醫學（一）";
     const nextSettings =
       settings.mode === "simulation"
         ? {
             ...settings,
             sessionName: undefined,
+            questionCount: 100,
+            subjectFilter: simulationSubject,
             selectedPaperKey:
               settings.paperMode === "past_paper" ? settings.selectedPaperKey : undefined
           }
@@ -320,6 +360,35 @@ export function QuizSetupPanel({
           {settings.mode === "simulation" ? (
             <div className="mt-4 space-y-4">
               <div className="rounded-2xl bg-white p-4 ring-1 ring-slate-200">
+                <p className="text-sm font-medium text-slate-500">模擬考卷別</p>
+                <div className="mt-3 grid gap-3 sm:grid-cols-2">
+                  {simulationSubjectOptions.map((item) => (
+                    <button
+                      key={item.subject}
+                      type="button"
+                      onClick={() => updateSettings({ subjectFilter: item.subject })}
+                      className={`rounded-2xl px-4 py-4 text-left transition ${
+                        (settings.subjectFilter ?? "醫學（一）") === item.subject
+                          ? "bg-brand-600 text-white"
+                          : "bg-slate-50 text-slate-700 hover:bg-slate-100"
+                      }`}
+                    >
+                      <span className="block text-sm font-semibold">{item.label}</span>
+                      <span
+                        className={`mt-2 block text-xs leading-6 ${
+                          (settings.subjectFilter ?? "醫學（一）") === item.subject
+                            ? "text-white/80"
+                            : "text-slate-500"
+                        }`}
+                      >
+                        {item.description}
+                      </span>
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <div className="rounded-2xl bg-white p-4 ring-1 ring-slate-200">
                 <p className="text-sm font-medium text-slate-500">作答後顯示方式</p>
                 <div className="mt-3 grid gap-3">
                   {(["full", "answer_only", "none"] as SimulationFeedbackMode[]).map((mode) => (
@@ -373,8 +442,9 @@ export function QuizSetupPanel({
 
                   <div className="grid gap-4 lg:grid-cols-2">
                     {([
-                    { title: "醫學（一）", papers: med1PaperOptions, accent: "amber" },
-                    { title: "醫學（二）", papers: med2PaperOptions, accent: "sky" }
+                      settings.subjectFilter === "醫學（二）"
+                        ? { title: "醫學（二）", papers: selectedPaperOptions, accent: "sky" }
+                        : { title: "醫學（一）", papers: selectedPaperOptions, accent: "amber" }
                     ] as const).map(({ title: groupTitle, papers, accent }) => (
                       <div key={groupTitle} className="rounded-2xl bg-slate-50 p-4">
                         <div className="flex items-center justify-between gap-3">
@@ -444,7 +514,9 @@ export function QuizSetupPanel({
         <p className="text-sm text-slate-600">
           目前設定：
           <span className="font-semibold text-ink"> {getModeLabel(settings.mode)}</span>
-          {settings.mode === "simulation" ? "・整份模擬考" : `・${subjectItem?.label ?? settings.subjectFilter ?? "解剖學"}・${settings.questionCount} 題`}
+          {settings.mode === "simulation"
+            ? `・${settings.subjectFilter === "醫學（二）" ? "醫學（二）" : "醫學（一）"}・${paperModeLabels[settings.paperMode ?? "random_set"]}・100 題`
+            : `・${subjectItem?.label ?? settings.subjectFilter ?? "解剖學"}・${settings.questionCount} 題`}
           {settings.mode !== "simulation" && settings.chapter ? `・${settings.chapter}` : ""}
           {settings.mode !== "simulation" && settings.section ? ` / ${settings.section}` : ""}
         </p>

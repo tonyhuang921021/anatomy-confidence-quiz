@@ -909,6 +909,51 @@ function applyQuestionMedia(question: Question): Question {
 }
 
 const questionTextOverrides: Record<string, QuestionTextOverride> = {
+  "MOEX-104030-1101-Q077": {
+    options: {
+      A: "僅①②",
+      B: "僅①③",
+      C: "僅②③",
+      D: "①②③"
+    },
+    optionAnalysis: {
+      A: "不選。犬複殖器絛蟲主要是誤食帶囊尾幼蟲的跳蚤而感染，②不是錯誤途徑。",
+      B: "正確。①誤食蟲卵與③誤食生殖節片不是人體典型感染途徑；②誤食帶蟲跳蚤才是感染途徑。",
+      C: "不選。②是正確感染途徑，不應列為錯誤。",
+      D: "不選。三者不全錯，②是典型感染途徑。"
+    }
+  },
+  "MOEX-104030-1101-Q078": {
+    options: {
+      A: "僅①②",
+      B: "僅①③",
+      C: "僅②③",
+      D: "①②③"
+    },
+    optionAnalysis: {
+      A: "正確。埃及血吸蟲典型表現包含血尿，尿液中也可見嗜酸性白血球。",
+      B: "不選。慢性感染與膀胱癌風險增加有關，但題幹第③寫成因成蟲刺激，表述不如①②符合本題官方答案。",
+      C: "不選。第③不是本題官方採用的正確敘述組合。",
+      D: "不選。官方答案只採 ①②。"
+    }
+  },
+  "MOEX-104030-1101-Q092": {
+    options: {
+      A: "①②③",
+      B: "①③②",
+      C: "②①③",
+      D: "③②①"
+    },
+    explanation:
+      "站立工作檯高度通常依工作精細度調整：精密工作需要較高檯面以接近視線並減少彎腰；輕工作約在中間；較重工作需要較低檯面，方便肩臂與軀幹出力。因此由高到低為精密工作、輕工作、較重工作，即 ①②③。",
+    optionAnalysis: {
+      A: "正確。精密工作最高，輕工作次之，較重工作最低。",
+      B: "不選。較重工作不應高於輕工作，否則不利出力。",
+      C: "不選。精密工作通常需要最高檯面，不應排在輕工作後。",
+      D: "不選。較重工作通常需要最低檯面，不應排最高。"
+    },
+    testedConcept: "公共衛生學／人因工程／站立工作檯高度"
+  },
   "MOEX-113020-2301-Q029": {
     stem:
       "寄生蟲感染人體所造成之症狀，下列敘述何者正確？\n1犬蛔蟲（Toxocara canis）可造成眼部幼蟲移行症（ocular larva migrans）\n2班氏絲蟲（Wuchereria bancrofti）的慢性感染可造成下肢象皮病（elephantiasis）\n3免疫低下之病患受到鞭蟲（Trichuris trichiura）感染必造成死亡\n4蛔蟲（Ascaris lumbricoides）感染可能出現異位寄生（ectopic parasitism）",
@@ -1158,6 +1203,23 @@ const MED2_CANONICAL_SUBJECTS = new Set<SubjectName>([
   "寄生蟲學",
   "公共衛生學"
 ]);
+
+const SIMULATION_EXAM_DISTRIBUTIONS: Partial<Record<SubjectFilter, Partial<Record<SubjectName, number>>>> = {
+  "醫學（一）": {
+    "解剖學": 31,
+    "生理學": 27,
+    "生物化學": 27,
+    "組織學": 10,
+    "胚胎學": 5
+  },
+  "醫學（二）": {
+    "微生物免疫學": 28,
+    "藥理學": 25,
+    "病理學": 25,
+    "公共衛生學": 15,
+    "寄生蟲學": 7
+  }
+};
 
 const manualInjectedQuestions: Question[] = [
   {
@@ -1658,20 +1720,25 @@ export function getPastPaperOptions(
   subjectFilter: SubjectFilter = "全部",
   overrides: Record<string, QuestionClassificationOverride> = {}
 ): PastPaperOption[] {
-  void subjectFilter;
   const bank = getWholePastPaperBank(overrides);
   const paperMap = new Map<string, PastPaperOption>();
 
   bank.forEach((question) => {
     if (!question.examCode || !question.paperCode) return;
+    const examLabel = question.sourceCitation?.includes("醫學（二）") ? "醫學（二）" : "醫學（一）";
+    if (
+      subjectFilter === "醫學（一）" ||
+      subjectFilter === "醫學（二）"
+    ) {
+      if (examLabel !== subjectFilter) return;
+    }
+
     const key = `${question.examCode}-${question.paperCode}`;
     const current = paperMap.get(key);
     if (current) {
       current.questionCount += 1;
       return;
     }
-
-    const examLabel = question.sourceCitation?.includes("醫學（二）") ? "醫學（二）" : "醫學（一）";
 
     paperMap.set(key, {
       key,
@@ -1716,10 +1783,48 @@ export function getQuestionsForPastPaper(
   subjectFilter: SubjectFilter = "全部",
   overrides: Record<string, QuestionClassificationOverride> = {}
 ) {
-  void subjectFilter;
   return getWholePastPaperBank(overrides)
-    .filter((question) => `${question.examCode}-${question.paperCode}` === paperKey)
+    .filter((question) => {
+      if (`${question.examCode}-${question.paperCode}` !== paperKey) return false;
+      if (
+        subjectFilter === "醫學（一）" ||
+        subjectFilter === "醫學（二）"
+      ) {
+        const examLabel = question.sourceCitation?.includes("醫學（二）") ? "醫學（二）" : "醫學（一）";
+        return examLabel === subjectFilter;
+      }
+      return true;
+    })
     .sort((a, b) => (a.originalQuestionNumber ?? 0) - (b.originalQuestionNumber ?? 0));
+}
+
+function buildDistributionRandomSet(
+  bank: Question[],
+  distribution: Partial<Record<SubjectName, number>>,
+  targetCount: number
+) {
+  const selected: Question[] = [];
+  const seenIds = new Set<string>();
+
+  Object.entries(distribution).forEach(([subject, requestedCount]) => {
+    const count = Math.max(0, Math.floor(requestedCount ?? 0));
+    const bucket = shuffle(bank.filter((question) => question.subject === subject));
+    bucket.slice(0, count).forEach((question) => {
+      if (seenIds.has(question.id)) return;
+      seenIds.add(question.id);
+      selected.push(question);
+    });
+  });
+
+  if (selected.length < targetCount) {
+    const remaining = shuffle(bank.filter((question) => !seenIds.has(question.id)));
+    remaining.slice(0, targetCount - selected.length).forEach((question) => {
+      seenIds.add(question.id);
+      selected.push(question);
+    });
+  }
+
+  return shuffle(selected).slice(0, targetCount);
 }
 
 export function buildExamLikeRandomSet(
@@ -1731,6 +1836,11 @@ export function buildExamLikeRandomSet(
   if (bank.length === 0) return [];
 
   const targetCount = Math.max(1, Math.min(questionCount, bank.length));
+  const fixedDistribution = SIMULATION_EXAM_DISTRIBUTIONS[subjectFilter];
+  if (fixedDistribution) {
+    return buildDistributionRandomSet(bank, fixedDistribution, Math.min(100, targetCount));
+  }
+
   const papers = getPastPaperOptions(subjectFilter, overrides);
 
   if (papers.length === 0) {

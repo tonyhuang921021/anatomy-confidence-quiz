@@ -270,24 +270,33 @@ function selectLocalQuestionSet(
   }
 
   const paperMode = settings.paperMode ?? "random_set";
-  if (paperMode === "past_paper" && settings.selectedPaperKey) {
+  if (paperMode === "past_paper") {
+    const fallbackPaper = getPastPaperOptions(subjectFilter, classificationOverrides)
+      .sort((left, right) => {
+        if ((right.sourceYear ?? 0) !== (left.sourceYear ?? 0)) {
+          return (right.sourceYear ?? 0) - (left.sourceYear ?? 0);
+        }
+        return (right.sourceRound ?? 0) - (left.sourceRound ?? 0);
+      })[0];
+    const paperKey = settings.selectedPaperKey ?? fallbackPaper?.key;
+    if (!paperKey) return sourceBank;
     const paperQuestions = getQuestionsForPastPaper(
-      settings.selectedPaperKey,
-      "全部",
+      paperKey,
+      subjectFilter,
       classificationOverrides
     );
     return paperQuestions.length > 0 ? paperQuestions : sourceBank;
   }
 
   if (paperMode === "random_past_paper") {
-    const papers = getPastPaperOptions("全部", classificationOverrides);
+    const papers = getPastPaperOptions(subjectFilter, classificationOverrides);
     if (papers.length === 0) return sourceBank;
     const selected = papers[Math.floor(Math.random() * papers.length)];
-    const paperQuestions = getQuestionsForPastPaper(selected.key, "全部", classificationOverrides);
+    const paperQuestions = getQuestionsForPastPaper(selected.key, subjectFilter, classificationOverrides);
     return paperQuestions.length > 0 ? paperQuestions : sourceBank;
   }
 
-  return buildExamLikeRandomSet(subjectFilter, settings.questionCount, classificationOverrides);
+  return buildExamLikeRandomSet(subjectFilter, 100, classificationOverrides);
 }
 
 function getQuestionByOrder(
@@ -343,10 +352,14 @@ function getExpectedSimulationQuestionCount(
     (settings.paperMode === "past_paper" || settings.paperMode === "random_past_paper") &&
     settings.selectedPaperKey
   ) {
-    return getQuestionsForPastPaper(settings.selectedPaperKey, "全部", classificationOverrides).length;
+    return getQuestionsForPastPaper(
+      settings.selectedPaperKey,
+      settings.subjectFilter ?? "醫學（一）",
+      classificationOverrides
+    ).length;
   }
 
-  return settings.questionCount;
+  return settings.mode === "simulation" ? 100 : settings.questionCount;
 }
 
 export default function QuizPage() {
