@@ -161,6 +161,219 @@ select {
     border: 1px solid var(--line-soft);
   }
 
+  .home-shell {
+    position: relative;
+  }
+
+  .home-shell::before {
+    content: "";
+    position: absolute;
+    inset: 12px 8px auto;
+    height: 440px;
+    pointer-events: none;
+    background:
+      radial-gradient(circle at 18% 18%, color-mix(in srgb, var(--accent-warm) 18%, transparent), transparent 36%),
+      radial-gradient(circle at 78% 8%, color-mix(in srgb, var(--brand-main) 20%, transparent), transparent 34%);
+    filter: blur(10px);
+    opacity: 0.78;
+  }
+
+  .home-hero {
+    position: relative;
+    isolation: isolate;
+    box-shadow:
+      0 28px 80px rgba(19, 38, 32, 0.1),
+      inset 0 1px 0 rgba(255, 255, 255, 0.7);
+  }
+
+  .home-hero::after {
+    content: "";
+    position: absolute;
+    inset: auto 24px 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, color-mix(in srgb, var(--brand-main) 35%, transparent), transparent);
+  }
+
+  .home-grain {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+    background-image:
+      linear-gradient(115deg, rgba(255, 255, 255, 0.54), transparent 28%, rgba(255, 255, 255, 0.2) 70%, transparent),
+      radial-gradient(circle at 0 0, rgba(255, 255, 255, 0.55), transparent 32%);
+    opacity: 0.72;
+  }
+
+  .home-orb {
+    position: absolute;
+    z-index: 0;
+    pointer-events: none;
+    border-radius: 999px;
+    filter: blur(3px);
+    opacity: 0.78;
+    animation: home-float 8s ease-in-out infinite;
+  }
+
+  .home-orb-one {
+    right: 10%;
+    top: 9%;
+    width: 180px;
+    height: 180px;
+    background: color-mix(in srgb, var(--brand-main) 18%, transparent);
+  }
+
+  .home-orb-two {
+    bottom: 12%;
+    left: 42%;
+    width: 150px;
+    height: 150px;
+    background: color-mix(in srgb, var(--accent-warm) 16%, transparent);
+    animation-delay: -3.4s;
+  }
+
+  .home-chip {
+    animation: home-rise 580ms ease both;
+  }
+
+  .home-title-accent {
+    color: color-mix(in srgb, var(--brand-deep) 86%, var(--accent-warm));
+    text-shadow: 0 16px 40px color-mix(in srgb, var(--brand-main) 16%, transparent);
+  }
+
+  .home-reveal {
+    animation: home-rise 720ms cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+
+  .home-reveal-late {
+    animation-delay: 140ms;
+  }
+
+  .home-action-card,
+  .home-entry-card {
+    animation: home-rise 620ms cubic-bezier(0.22, 1, 0.36, 1) both;
+    animation-delay: var(--home-delay, 0ms);
+  }
+
+  .home-action-card {
+    @apply flex min-h-24 min-w-0 flex-col justify-center rounded-[1.45rem] border px-5 py-4 transition;
+    border-color: var(--line-soft);
+    background: rgba(255, 255, 255, 0.66);
+    color: var(--ink-main);
+    box-shadow: 0 16px 38px rgba(19, 38, 32, 0.055);
+  }
+
+  .home-action-card:hover {
+    transform: translateY(-3px);
+    background: rgba(255, 255, 255, 0.9);
+    box-shadow: 0 24px 52px rgba(19, 38, 32, 0.1);
+  }
+
+  .home-action-primary {
+    border-color: color-mix(in srgb, var(--brand-main) 38%, transparent);
+    background:
+      radial-gradient(circle at top right, rgba(255, 255, 255, 0.28), transparent 42%),
+      linear-gradient(135deg, var(--brand-main), var(--brand-deep));
+    color: white;
+  }
+
+  .home-action-primary:hover {
+    background:
+      radial-gradient(circle at top right, rgba(255, 255, 255, 0.34), transparent 44%),
+      linear-gradient(135deg, color-mix(in srgb, var(--brand-main) 92%, white), var(--brand-deep));
+  }
+
+  .home-mini-strip {
+    @apply rounded-[1.6rem] border px-5 py-4;
+    border-color: var(--line-soft);
+    background: color-mix(in srgb, var(--surface-muted) 78%, transparent);
+  }
+
+  .home-device-card {
+    @apply min-w-0 rounded-[2rem] border p-3 shadow-float;
+    position: relative;
+    border-color: color-mix(in srgb, var(--brand-main) 16%, var(--line-soft));
+    background:
+      linear-gradient(145deg, rgba(255, 255, 255, 0.72), rgba(255, 255, 255, 0.38)),
+      color-mix(in srgb, var(--brand-tint) 62%, transparent);
+    animation: home-card-float 7s ease-in-out infinite;
+  }
+
+  .home-device-top {
+    @apply mb-3 flex items-center gap-1.5 px-2 pt-1;
+  }
+
+  .home-device-top span {
+    width: 9px;
+    height: 9px;
+    border-radius: 999px;
+    background: color-mix(in srgb, var(--brand-main) 28%, white);
+  }
+
+  .home-device-screen {
+    @apply rounded-[1.6rem] border p-5 sm:p-6;
+    border-color: var(--line-soft);
+    background:
+      radial-gradient(circle at 85% 10%, color-mix(in srgb, var(--brand-main) 10%, transparent), transparent 32%),
+      rgba(255, 255, 255, 0.68);
+  }
+
+  .home-pulse-dot {
+    width: 14px;
+    height: 14px;
+    border-radius: 999px;
+    background: var(--brand-main);
+    box-shadow: 0 0 0 0 color-mix(in srgb, var(--brand-main) 28%, transparent);
+    animation: home-pulse 1.9s ease-out infinite;
+  }
+
+  .home-progress-card {
+    @apply rounded-[1.25rem] border p-4;
+    border-color: var(--line-soft);
+    background: color-mix(in srgb, var(--brand-main) 8%, white);
+  }
+
+  .home-progress-card-warm {
+    background: color-mix(in srgb, var(--accent-warm) 10%, white);
+  }
+
+  .home-progress-fill {
+    height: 100%;
+    border-radius: 999px;
+    background: linear-gradient(90deg, var(--brand-main), color-mix(in srgb, var(--accent-warm) 70%, var(--brand-main)));
+    animation: home-progress 1.2s cubic-bezier(0.22, 1, 0.36, 1) both 460ms;
+    transform-origin: left center;
+  }
+
+  .home-spark {
+    height: 10px;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.7);
+  }
+
+  .home-spark.active {
+    background: linear-gradient(90deg, var(--accent-warm), color-mix(in srgb, var(--brand-main) 42%, var(--accent-warm)));
+  }
+
+  .home-entry-card {
+    @apply min-w-0 rounded-[1.6rem] border p-5 transition;
+    border-color: var(--line-soft);
+    background: rgba(255, 255, 255, 0.64);
+    box-shadow: 0 18px 44px rgba(19, 38, 32, 0.06);
+  }
+
+  .home-entry-card:hover {
+    transform: translateY(-4px);
+    background: rgba(255, 255, 255, 0.92);
+    box-shadow: 0 28px 60px rgba(19, 38, 32, 0.1);
+  }
+
+  .home-entry-mark {
+    @apply inline-flex rounded-full px-3 py-1 text-xs font-black;
+    background: color-mix(in srgb, var(--brand-main) 12%, white);
+    color: var(--brand-deep);
+  }
+
   .note-outline-drawer {
     @apply fixed inset-x-0 bottom-0 z-40 px-4 pb-3;
     pointer-events: none;
@@ -474,6 +687,101 @@ select {
   }
 }
 
+@keyframes home-rise {
+  from {
+    opacity: 0;
+    transform: translateY(18px) scale(0.985);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes home-float {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+  50% {
+    transform: translate3d(12px, -14px, 0) scale(1.05);
+  }
+}
+
+@keyframes home-card-float {
+  0%,
+  100% {
+    transform: translateY(0) rotate(0deg);
+  }
+  50% {
+    transform: translateY(-8px) rotate(-0.35deg);
+  }
+}
+
+@keyframes home-pulse {
+  0% {
+    box-shadow: 0 0 0 0 color-mix(in srgb, var(--brand-main) 32%, transparent);
+  }
+  70% {
+    box-shadow: 0 0 0 16px transparent;
+  }
+  100% {
+    box-shadow: 0 0 0 0 transparent;
+  }
+}
+
+@keyframes home-progress {
+  from {
+    transform: scaleX(0.28);
+  }
+  to {
+    transform: scaleX(1);
+  }
+}
+
+@media (max-width: 640px) {
+  .home-shell::before {
+    height: 320px;
+  }
+
+  .home-orb-one {
+    right: -18%;
+    top: 4%;
+  }
+
+  .home-orb-two {
+    bottom: 36%;
+    left: -14%;
+  }
+
+  .home-device-card {
+    animation: none;
+  }
+
+  .home-action-card {
+    min-height: 5.25rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .home-reveal,
+  .home-reveal-late,
+  .home-action-card,
+  .home-entry-card,
+  .home-chip,
+  .home-orb,
+  .home-device-card,
+  .home-pulse-dot,
+  .home-progress-fill {
+    animation: none;
+  }
+
+  .home-action-card:hover,
+  .home-entry-card:hover {
+    transform: none;
+  }
+}
+
 html[data-theme="dark"] .stat-chip,
 html[data-theme="dark"] .secondary-pill,
 html[data-theme="dark"] .surface-card input,
@@ -486,6 +794,32 @@ html[data-theme="dark"] .surface-card select {
 
 html[data-theme="dark"] .secondary-pill:hover {
   background: rgba(40, 48, 61, 0.76);
+}
+
+html[data-theme="dark"] .home-action-card,
+html[data-theme="dark"] .home-entry-card,
+html[data-theme="dark"] .home-device-screen {
+  background: rgba(35, 43, 55, 0.68);
+  border-color: var(--line-soft);
+}
+
+html[data-theme="dark"] .home-action-primary {
+  background:
+    radial-gradient(circle at top right, rgba(255, 255, 255, 0.08), transparent 42%),
+    linear-gradient(135deg, rgba(84, 101, 128, 0.9), rgba(54, 65, 84, 0.95));
+}
+
+html[data-theme="dark"] .home-mini-strip,
+html[data-theme="dark"] .home-device-card,
+html[data-theme="dark"] .home-progress-card,
+html[data-theme="dark"] .home-progress-card-warm {
+  background: rgba(35, 43, 55, 0.58);
+  border-color: var(--line-soft);
+}
+
+html[data-theme="dark"] .home-entry-mark {
+  background: rgba(138, 154, 184, 0.12);
+  color: var(--ink-main);
 }
 
 html[data-theme="dark"] .dark-success-chip {
