@@ -465,6 +465,85 @@ function splitCollapsedPipeTableRows(line: string) {
     .filter(Boolean);
 }
 
+function normalizeTableContinuationText(line: string) {
+  return line
+    .trim()
+    .replace(/^<br\s*\/?>\s*/i, "")
+    .replace(/<br\s*\/?>/gi, "； ")
+    .replace(/\s+/g, " ")
+    .replace(/。\s*；/g, "；")
+    .trim();
+}
+
+function getNextNonEmptyLine(lines: string[], startIndex: number) {
+  for (let index = startIndex; index < lines.length; index += 1) {
+    if (lines[index]?.trim()) return lines[index];
+  }
+  return "";
+}
+
+function looksLikePipeTableContinuation(line: string) {
+  const trimmed = line.trim();
+  return Boolean(trimmed) && (trimmed.startsWith("<br") || trimmed.endsWith("|"));
+}
+
+function repairGeminiPipeTableLines(lines: string[]) {
+  const repaired: string[] = [];
+  let pendingRow = "";
+  let insidePipeTable = false;
+
+  lines.forEach((line, index) => {
+    const trimmed = line.trim();
+    const pipeCandidate = getPipeTableCandidateLine(line);
+
+    if (pendingRow) {
+      if (!trimmed) return;
+      pendingRow = `${pendingRow} ${normalizeTableContinuationText(line)}`;
+      if (trimmed.endsWith("|")) {
+        repaired.push(pendingRow);
+        pendingRow = "";
+        insidePipeTable = true;
+      }
+      return;
+    }
+
+    if (pipeCandidate) {
+      if (pipeCandidate.endsWith("|")) {
+        repaired.push(pipeCandidate);
+        insidePipeTable = true;
+        return;
+      }
+
+      pendingRow = pipeCandidate;
+      insidePipeTable = true;
+      return;
+    }
+
+    if (insidePipeTable && !trimmed) {
+      const nextLine = getNextNonEmptyLine(lines, index + 1);
+      if (getPipeTableCandidateLine(nextLine) || looksLikePipeTableContinuation(nextLine)) return;
+      repaired.push(line);
+      insidePipeTable = false;
+      return;
+    }
+
+    if (insidePipeTable && looksLikePipeTableContinuation(line)) {
+      const lastIndex = repaired.length - 1;
+      if (lastIndex >= 0 && getPipeTableCandidateLine(repaired[lastIndex])) {
+        repaired[lastIndex] = `${repaired[lastIndex].replace(/\|$/, "").trim()} ${normalizeTableContinuationText(line)}`;
+        if (!repaired[lastIndex].endsWith("|")) repaired[lastIndex] = `${repaired[lastIndex]} |`;
+        return;
+      }
+    }
+
+    insidePipeTable = false;
+    repaired.push(line);
+  });
+
+  if (pendingRow) repaired.push(pendingRow.endsWith("|") ? pendingRow : `${pendingRow} |`);
+  return repaired;
+}
+
 function looksLikePlainTableLine(line: string) {
   const cells = splitTableCells(line);
   return cells.length >= 2 && !line.trim().startsWith("|") && !line.trim().startsWith("*") && !line.trim().startsWith("-");
@@ -489,7 +568,7 @@ function splitPipeTableCells(line: string) {
     .replace(/^\|/, "")
     .replace(/\|$/, "")
     .split("|")
-    .map((cell) => cell.trim());
+    .map((cell) => normalizeTableContinuationText(cell));
 }
 
 function isPipeTableDividerRow(row: string[]) {
@@ -543,7 +622,13 @@ function flushPipeTable(tableRows: string[][], output: string[]) {
   }
 
   const [headerRow, maybeDividerRow, ...remainingRows] = tableRows;
-  const bodyRows = isPipeTableDividerRow(maybeDividerRow) ? remainingRows : [maybeDividerRow, ...remainingRows];
+  const bodyRows = (isPipeTableDividerRow(maybeDividerRow) ? remainingRows : [maybeDividerRow, ...remainingRows])
+    .filter((row) => !isPipeTableDividerRow(row));
+  if (bodyRows.length === 0) {
+    output.push(`| ${headerRow.join(" | ")} |`);
+    output.push(`| ${headerRow.map(() => "---").join(" | ")} |`);
+    return;
+  }
   const maxColumns = Math.max(headerRow.length, ...bodyRows.map((row) => row.length));
   const normalizeRow = (row: string[]) => {
     const nextRow = [...row];
@@ -558,7 +643,8 @@ function flushPipeTable(tableRows: string[][], output: string[]) {
 }
 
 export function normalizeStudyNoteMarkdown(rawText: string) {
-  const lines = rawText.replace(/\r\n/g, "\n").split("\n").flatMap(splitCollapsedPipeTableRows);
+  const lines = repairGeminiPipeTableLines(rawText.replace(/\r\n/g, "\n").split("\n"))
+    .flatMap(splitCollapsedPipeTableRows);
   const output: string[] = [];
   let tableRows: string[][] = [];
   let pipeTableRows: string[][] = [];
