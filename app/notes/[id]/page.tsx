@@ -353,7 +353,7 @@ export default function StudyNoteDetailPage() {
                     <div>
                       <p className="text-sm font-bold text-slate-950">專門補題號 Prompt</p>
                       <p className="mt-1 text-xs leading-5 text-slate-600">
-                        貼給 ChatGPT 後，再把它回傳的 questionLinks 貼到下面欄位。
+                        貼給 ChatGPT、Gemini、Claude 或其他 AI 後，再把它回傳的 questionLinks 貼到下面欄位。
                       </p>
                     </div>
                     <button type="button" onClick={copyQuestionLinkPrompt} className="secondary-pill px-4 py-2 text-sm">

@@ -136,11 +136,17 @@ function normalizeMetadataQuestionLinks(rawLinks: unknown): StudyNoteQuestionLin
 }
 
 function parseCommaSeparatedQuestionLinks(value?: string): StudyNoteQuestionLink[] {
-  const cleaned = (value ?? "").replace(/^\s*(?:questionLinks|question_links|相關題目)\s*[:：]/i, "");
+  const cleaned = (value ?? "")
+    .replace(/^\s*(?:question\s*links|questionLinks|question_links|related\s*questions|exam\s*questions|相關題目|考古題|題號)\s*[:：]/i, "")
+    .replace(/[\[\]"]/g, "")
+    .replace(/```/g, "");
   return cleaned
     .split(/[,，、;\n]/)
-    .map((questionId) => questionId.trim())
-    .map((questionId) => questionId.replace(/^\s*(?:questionLinks|question_links|相關題目)\s*[:：]\s*/i, ""))
+    .map((questionId) => questionId.trim().replace(/^[-*]\s*/, ""))
+    .map((questionId) =>
+      questionId.replace(/^\s*(?:question\s*links|questionLinks|question_links|related\s*questions|exam\s*questions|相關題目|考古題|題號)\s*[:：]\s*/i, "")
+    )
+    .map((questionId) => questionId.replace(/^\d+\.\s*/, ""))
     .filter(Boolean)
     .map((questionId) => ({ questionId, relationType: "related" as const }));
 }
@@ -150,17 +156,37 @@ export function parseStudyNoteQuestionLinkText(value?: string): StudyNoteQuestio
 }
 
 function parseNoteMetaBlock(rawText: string): Record<string, string> | null {
-  const match = rawText.match(/```note-meta\s*([\s\S]*?)```/i);
+  const match =
+    rawText.match(/^\s*```(?:note-meta|metadata|meta|yaml|yml)\s*([\s\S]*?)```/i) ??
+    rawText.match(/^\s*---\s*\n([\s\S]*?)\n---/);
   const rawMetaText = match?.[1] ?? parseLooseNoteMetaText(rawText);
   if (!rawMetaText) return null;
 
   const metadata: Record<string, string> = {};
+  let activeListKey = "";
   rawMetaText.split("\n").forEach((line) => {
-    const dividerIndex = line.search(/[:：]/);
+    const trimmed = line.trim();
+    if (!trimmed || /^---+$/.test(trimmed)) return;
+
+    const listMatch = trimmed.match(/^[-*]\s+(.+)$/);
+    if (listMatch && activeListKey) {
+      metadata[activeListKey] = [metadata[activeListKey], listMatch[1].trim()].filter(Boolean).join("\n");
+      return;
+    }
+
+    const dividerIndex = trimmed.search(/[:：]/);
     if (dividerIndex <= 0) return;
-    const key = normalizeMetadataKey(line.slice(0, dividerIndex).trim());
-    const value = line.slice(dividerIndex + 1).trim();
-    if (key && value) metadata[key] = value;
+    const key = normalizeMetadataKey(trimmed.slice(0, dividerIndex).trim());
+    const value = trimmed.slice(dividerIndex + 1).trim();
+    if (!key) return;
+
+    if (key === "tags" || key === "questionLinks") {
+      activeListKey = key;
+    } else {
+      activeListKey = "";
+    }
+
+    metadata[key] = metadata[key] ? [metadata[key], value].filter(Boolean).join("\n") : value;
   });
   return Object.keys(metadata).length > 0 ? metadata : null;
 }
@@ -168,22 +194,8 @@ function parseNoteMetaBlock(rawText: string): Record<string, string> | null {
 function parseLooseNoteMetaText(rawText: string) {
   const lines = rawText.trimStart().split("\n");
   const metadataLines: string[] = [];
-  const allowedKeys = new Set([
-    "title",
-    "subject",
-    "collection",
-    "category",
-    "summary",
-    "tags",
-    "questionLinks",
-    "question_links",
-    "標題",
-    "科目",
-    "分類",
-    "摘要",
-    "標籤",
-    "相關題目"
-  ]);
+  let activeListKey = "";
+  const allowedKeys = new Set(["title", "subject", "collection", "summary", "tags", "questionLinks"]);
 
   for (const line of lines) {
     const trimmed = line.trim();
@@ -192,32 +204,85 @@ function parseLooseNoteMetaText(rawText: string) {
       continue;
     }
 
+    if (activeListKey && /^[-*]\s+/.test(trimmed)) {
+      metadataLines.push(trimmed);
+      continue;
+    }
+
     const dividerIndex = trimmed.search(/[:：]/);
     if (dividerIndex <= 0) break;
 
     const rawKey = trimmed.slice(0, dividerIndex).trim();
-    if (!allowedKeys.has(rawKey)) break;
+    const normalizedKey = normalizeMetadataKey(rawKey);
+    if (!allowedKeys.has(normalizedKey)) break;
 
     metadataLines.push(trimmed);
+    activeListKey = normalizedKey === "tags" || normalizedKey === "questionLinks" ? normalizedKey : "";
   }
 
   return metadataLines.length >= 2 ? metadataLines.join("\n") : null;
 }
 
 function normalizeMetadataKey(key: string) {
+  const compactKey = key
+    .trim()
+    .replace(/^#+\s*/, "")
+    .replace(/["'`]/g, "")
+    .replace(/[\s_-]+/g, "")
+    .toLowerCase();
   const map: Record<string, string> = {
     標題: "title",
+    題名: "title",
+    筆記標題: "title",
     科目: "subject",
+    學科: "subject",
+    主題科目: "subject",
     分類: "collection",
+    資料夾: "collection",
+    主題分類: "collection",
+    集合: "collection",
     摘要: "summary",
+    簡介: "summary",
+    重點摘要: "summary",
     標籤: "tags",
+    關鍵字: "tags",
     相關題目: "questionLinks",
+    相關考古題: "questionLinks",
+    考古題: "questionLinks",
+    題號: "questionLinks",
     category: "collection",
     collectionName: "collection",
     collection_name: "collection",
-    question_links: "questionLinks"
+    folder: "collection",
+    topic: "collection",
+    keywords: "tags",
+    question_links: "questionLinks",
+    questionids: "questionLinks",
+    questionlinks: "questionLinks",
+    relatedquestions: "questionLinks",
+    examquestions: "questionLinks",
+    pastquestions: "questionLinks"
   };
-  return map[key] ?? key;
+  const compactMap: Record<string, string> = {
+    title: "title",
+    notetitle: "title",
+    subject: "subject",
+    collection: "collection",
+    collectionname: "collection",
+    category: "collection",
+    folder: "collection",
+    topic: "collection",
+    summary: "summary",
+    abstract: "summary",
+    tags: "tags",
+    keywords: "tags",
+    questionlinks: "questionLinks",
+    questionids: "questionLinks",
+    relatedquestions: "questionLinks",
+    examquestions: "questionLinks",
+    pastquestions: "questionLinks"
+  };
+  return map[key] ?? compactMap[compactKey] ?? key;
 }
 
 function normalizeMetadataSubject(value?: string): SubjectName | undefined {
@@ -228,8 +293,9 @@ function normalizeMetadataSubject(value?: string): SubjectName | undefined {
 
 function parseCommaSeparatedTags(value?: string): StudyNoteTag[] {
   return (value ?? "")
+    .replace(/[\[\]"]/g, "")
     .split(/[,，、\n]/)
-    .map((tag) => tag.trim())
+    .map((tag) => tag.trim().replace(/^[-*]\s*/, ""))
     .filter(Boolean)
     .map((tag) => ({ tag, tagType: "misc" as const, source: "chatgpt_metadata" as const }));
 }
@@ -249,27 +315,77 @@ export function parseStudyNoteMetadata(rawText: string): StudyNoteMetadataInput 
 
   const parsed = tryParseJson<Record<string, unknown>>(rawText);
   if (!parsed) return null;
+  const parsedMetadata =
+    parsed.metadata && typeof parsed.metadata === "object"
+      ? (parsed.metadata as Record<string, unknown>)
+      : parsed.noteMeta && typeof parsed.noteMeta === "object"
+        ? (parsed.noteMeta as Record<string, unknown>)
+        : parsed.note_meta && typeof parsed.note_meta === "object"
+          ? (parsed.note_meta as Record<string, unknown>)
+          : parsed;
+
+  const rawTags = parsedMetadata.tags ?? parsedMetadata.keywords;
+  const rawQuestionLinks =
+    parsedMetadata.questionLinks ??
+    parsedMetadata.question_links ??
+    parsedMetadata.questionIds ??
+    parsedMetadata.question_ids ??
+    parsedMetadata.relatedQuestions ??
+    parsedMetadata.related_questions;
 
   return {
-    title: typeof parsed.title === "string" ? parsed.title : undefined,
-    summary: typeof parsed.summary === "string" ? parsed.summary : undefined,
-    subject: typeof parsed.subject === "string" ? (parsed.subject as SubjectName) : undefined,
-    chapter: typeof parsed.chapter === "string" ? parsed.chapter : undefined,
-    section: typeof parsed.section === "string" ? parsed.section : undefined,
+    title: typeof parsedMetadata.title === "string" ? parsedMetadata.title : undefined,
+    summary: typeof parsedMetadata.summary === "string" ? parsedMetadata.summary : undefined,
+    subject: typeof parsedMetadata.subject === "string" ? (parsedMetadata.subject as SubjectName) : undefined,
+    chapter: typeof parsedMetadata.chapter === "string" ? parsedMetadata.chapter : undefined,
+    section: typeof parsedMetadata.section === "string" ? parsedMetadata.section : undefined,
     collectionName:
-      typeof parsed.collectionName === "string"
-        ? parsed.collectionName
-        : typeof parsed.collection_name === "string"
-          ? parsed.collection_name
-          : undefined,
-    tags: normalizeMetadataTags(parsed.tags),
-    questionLinks: normalizeMetadataQuestionLinks(parsed.questionLinks ?? parsed.question_links)
+      typeof parsedMetadata.collectionName === "string"
+        ? parsedMetadata.collectionName
+        : typeof parsedMetadata.collection_name === "string"
+          ? parsedMetadata.collection_name
+          : typeof parsedMetadata.collection === "string"
+            ? parsedMetadata.collection
+            : typeof parsedMetadata.category === "string"
+              ? parsedMetadata.category
+              : typeof parsedMetadata.folder === "string"
+                ? parsedMetadata.folder
+                : undefined,
+    tags: typeof rawTags === "string" ? parseCommaSeparatedTags(rawTags) : normalizeMetadataTags(rawTags),
+    questionLinks:
+      typeof rawQuestionLinks === "string"
+        ? parseCommaSeparatedQuestionLinks(rawQuestionLinks)
+        : normalizeMetadataQuestionLinks(rawQuestionLinks)
   };
 }
 
+function stripJsonStudyNoteWrapper(rawText: string) {
+  const parsed = tryParseJson<Record<string, unknown>>(rawText);
+  if (!parsed) return null;
+  const markdown =
+    typeof parsed.rawMarkdown === "string"
+      ? parsed.rawMarkdown
+      : typeof parsed.raw_markdown === "string"
+        ? parsed.raw_markdown
+        : typeof parsed.markdown === "string"
+          ? parsed.markdown
+          : typeof parsed.content === "string"
+            ? parsed.content
+            : typeof parsed.body === "string"
+              ? parsed.body
+              : undefined;
+  return markdown?.trim() || null;
+}
+
 export function stripStudyNoteMetadataBlock(rawText: string) {
-  const fenced = rawText.replace(/```note-meta\s*[\s\S]*?```\s*/i, "").trim();
+  const jsonMarkdown = stripJsonStudyNoteWrapper(rawText);
+  if (jsonMarkdown) return jsonMarkdown;
+
+  const fenced = rawText.replace(/^\s*```(?:note-meta|metadata|meta|yaml|yml)\s*[\s\S]*?```\s*/i, "").trim();
   if (fenced !== rawText.trim()) return fenced;
+
+  const frontMatter = rawText.replace(/^\s*---\s*\n[\s\S]*?\n---\s*/i, "").trim();
+  if (frontMatter !== rawText.trim()) return frontMatter;
 
   const looseMeta = parseLooseNoteMetaText(rawText);
   if (!looseMeta) return rawText.trim();

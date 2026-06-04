@@ -177,7 +177,7 @@ export default function NewStudyNotePage() {
   async function copyFormatPrompt() {
     try {
       await navigator.clipboard.writeText(promptText);
-      setMessage(`已複製${promptDetailLevel === "concise" ? "精簡" : "詳細"}版固定格式提示，目標回填 ${promptExamQuestionCount} 題考古題。`);
+      setMessage(`已複製${promptDetailLevel === "concise" ? "精簡" : "詳細"}版固定格式提示，可貼給 ChatGPT、Gemini 或 Claude；目標回填 ${promptExamQuestionCount} 題考古題。`);
       setError("");
     } catch {
       setError("複製失敗，可以手動複製右側格式提示。");
@@ -233,7 +233,7 @@ export default function NewStudyNotePage() {
             <p className="eyebrow">New Study Note</p>
             <h1 className="display-title mt-3 text-4xl sm:text-5xl">新增學習筆記</h1>
             <p className="body-soft mt-4 max-w-2xl leading-7">
-              貼上 ChatGPT 產出的 Markdown，網站會自動讀取開頭的 note-meta 來建立標題、科目、分類與摘要。
+              貼上 ChatGPT、Gemini、Claude 或其他 AI 產出的 Markdown，網站會自動讀取開頭的 note-meta 來建立標題、科目、分類與摘要。
             </p>
           </div>
           <Link href="/notes" className="secondary-pill">
@@ -274,7 +274,7 @@ export default function NewStudyNotePage() {
             <aside className="grid min-w-0 content-start gap-4">
               <div className="min-w-0 rounded-3xl border border-teal-100 bg-teal-50/70 p-4">
                 <label className="mb-4 grid gap-2 text-sm font-semibold text-slate-700">
-                  要請 ChatGPT 找幾題考古題
+                  要請 AI 找幾題考古題
                   <input
                     value={promptExamQuestionCount}
                     onChange={(event) => {
@@ -288,7 +288,7 @@ export default function NewStudyNotePage() {
                     className="rounded-2xl border border-teal-200 bg-white px-4 py-3 text-sm outline-none focus:border-teal-500"
                   />
                   <span className="text-xs font-medium leading-5 text-slate-500">
-                    最多 8 題；如果找不到足夠的可確認題號，ChatGPT 會只放能確認的題。
+                    最多 8 題；如果找不到足夠的可確認題號，AI 只需要放能確認的題。
                   </span>
                 </label>
                 <div className="mb-4 grid gap-2 text-sm font-semibold text-slate-700">
@@ -328,11 +328,11 @@ export default function NewStudyNotePage() {
                   </button>
                 </div>
                 <p className="mt-2 text-sm leading-6 text-slate-600">
-                  先把這段貼給 ChatGPT，再貼你的資料。它會在最上方加入 note-meta，網站貼上後會自動建立標題、科目、分類和摘要。
-                  如果要自動補相關考古題，請貼到有開啟網路搜尋的 ChatGPT；它會自行查公開正式考古題，並把相關題號回填成 questionLinks。
+                  先把這段貼給 ChatGPT、Gemini、Claude 或其他 AI，再貼你的資料。它會在最上方加入 note-meta，網站貼上後會自動建立標題、科目、分類和摘要。
+                  如果要自動補相關考古題，請貼到有開啟網路搜尋的模型；不能上網也沒關係，題號留空，筆記正文仍可儲存。
                 </p>
                 <p className="mt-2 rounded-2xl bg-white/70 px-3 py-2 text-xs font-semibold text-teal-900">
-                  不需要先給候選題；但 ChatGPT 必須能上網查題號。建議回傳 2022-1-1301-Q025 這種格式，貼回來後會自動轉成本地題庫題目。
+                  不需要先給候選題；能上網的模型才補題號。建議回傳 2022-1-1301-Q025 這種格式，貼回來後會自動轉成本地題庫題目。
                 </p>
                 <pre className="mt-3 max-h-56 max-w-full overflow-auto whitespace-pre-wrap break-words rounded-2xl bg-slate-950 p-3 text-xs leading-5 text-white">
                   {promptText}
@@ -388,7 +388,7 @@ export default function NewStudyNotePage() {
                     <div>
                       <p className="text-sm font-bold text-slate-950">專門補題號 Prompt</p>
                       <p className="mt-1 text-xs leading-5 text-slate-600">
-                        只請 ChatGPT 回傳 questionLinks，不要把來源或題幹塞進筆記。
+                        只請 AI 回傳 questionLinks，不要把來源或題幹塞進筆記。
                       </p>
                     </div>
                     <button type="button" onClick={copyQuestionLinkPrompt} className="secondary-pill px-4 py-2 text-sm">

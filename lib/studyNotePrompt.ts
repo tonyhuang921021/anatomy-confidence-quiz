@@ -13,6 +13,8 @@ type StudyNoteFormatPromptOptions = {
   detailLevel?: "concise" | "detailed";
 };
 
+const SUPPORTED_NOTE_SUBJECTS = "解剖學／組織學／胚胎學／生理學／生物化學／微生物免疫學／寄生蟲學／公共衛生學／藥理學／病理學";
+
 function normalizeExamQuestionCount(value?: number) {
   if (!Number.isFinite(value)) return 6;
   return Math.min(8, Math.max(0, Math.floor(Number(value))));
@@ -63,18 +65,28 @@ export function buildStudyNoteFormatPrompt(
 - 適合需要讀懂整個觀念，而不是只背結論的筆記。`;
   return `請把接下來的內容轉成「網站筆記可以完整還原的 Markdown」。
 
+這不是 ChatGPT 專用格式；不管你是 ChatGPT、Gemini、Claude 或其他模型，都請依照下面的匯入格式輸出。
 目標不是重寫，也不是硬套模板；目標是讓我可以直接複製貼上到筆記系統，排版不要跑掉。
 
 請遵守：
-1. 最上方一定要先輸出一個 fenced code block，語言名稱必須是 note-meta，讓網站自動分類。不要省略三個反引號。格式固定如下：
+1. 最上方一定要先輸出一個 fenced code block，語言名稱請用 note-meta，讓網站自動分類。不要省略三個反引號。格式固定如下：
 \`\`\`note-meta
 title: 這篇筆記的清楚標題
-subject: 解剖學／組織學／胚胎學／生理學／生物化學／微生物免疫學／寄生蟲學／公共衛生學／藥理學／病理學
+subject: ${SUPPORTED_NOTE_SUBJECTS}
 collection: 這篇適合放的資料夾或主題分類
 summary: 50 字內摘要
 tags: tag1, tag2, tag3
 questionLinks: 2022-1-1301-Q025, 2020-2-1301-Q021, 2011-1-1301-Q017
 \`\`\`
+如果你的介面不方便輸出 note-meta code block，備案可以用 YAML front matter，但 note-meta code block 最好：
+---
+title: 這篇筆記的清楚標題
+subject: ${SUPPORTED_NOTE_SUBJECTS}
+collection: 這篇適合放的資料夾或主題分類
+summary: 50 字內摘要
+tags: tag1, tag2, tag3
+questionLinks:
+---
 2. note-meta code block 之後才輸出 Markdown 正文。
 3. 保留原本內容的邏輯、順序和語氣，不要自行補不存在的段落。
 4. 用 Markdown 標題呈現大字到小字的層級，例如 #、##、###、####。如果原文沒有那麼多層，就不要硬補。
@@ -88,9 +100,9 @@ questionLinks: 2022-1-1301-Q025, 2020-2-1301-Q021, 2011-1-1301-Q017
 - 每個小標底下盡量 3-6 個重點即可，除非原文真的需要更多。
 ${detailInstruction}
 8. 不要輸出 HTML，不要輸出圖片連結，不要包成 JSON。
-9. 相關考古題不是靠我提供候選題。請你使用網路搜尋／瀏覽功能，自己查公開的台灣醫師國考或一階醫師國考題目來源，找和這篇筆記高度相關的正式考古題題號，填進 note-meta 的 questionLinks。
+9. 相關考古題可以補，但不要阻擋筆記正文產出。若你有網路搜尋／瀏覽功能，請自己查公開的台灣醫師國考或一階醫師國考題目來源，找和這篇筆記高度相關的正式考古題題號，填進 note-meta 的 questionLinks。
 10. 這次 questionLinks 目標題數是 ${examQuestionCount} 題，最多 8 題。請優先找最相關的正式考古題；如果實際可確認題目少於 ${examQuestionCount} 題，就只放能確認的題號，不要為了湊數編題號。
-11. 如果你目前這個模型或對話不能上網搜尋，請不要輸出整理後筆記，也不要把 questionLinks 留空交差。請只回覆：「目前這個 ChatGPT 對話不能上網查考古題題號，請改用有開啟網路搜尋的 ChatGPT 後再貼一次。」。
+11. 如果你目前這個模型或對話不能上網搜尋，仍然要輸出整理後筆記；questionLinks 請留空，並在 summary 後補一句「未找到可確認題號」。不要因為不能查題號就拒絕整理筆記。
 12. 搜尋時請用筆記的核心關鍵字搭配「醫師國考」、「一階」、「考選部」、「年份」、「第幾次」、「題號」等字詞查證；不要憑印象亂填題號。
 13. questionLinks 只放題號，不要放題幹、選項或詳解；網站會用題號自動帶入本地題庫的題目、選項、答案與詳解。
 14. 查證題號時使用的來源、搜尋過程、URL、引用依據只用來幫你判斷題號，不要寫進 Markdown 正文，也不要新增「題號查證來源」「相關考古題來源」「搜尋紀錄」這類段落。題號放在最上方 note-meta 的 questionLinks 就好。
@@ -109,9 +121,12 @@ export function buildStudyNoteQuestionLinkPrompt(maxQuestionCount = 8) {
   const count = normalizeExamQuestionCount(maxQuestionCount);
   return `請幫我替這篇學習筆記補「相關台灣醫師國考題號」，目標 ${count} 題，最多 8 題。
 
+這不是 ChatGPT 專用 prompt；如果你是 Gemini、Claude 或其他模型，也請照這個簡單格式輸出即可。
+
 你不需要重寫筆記正文，也不要輸出題幹、選項、答案、詳解或來源查證段落。只需要輸出一段可以貼回網站的題號清單。
 
 請盡量上網查公開來源，找和筆記核心觀念高度相關的正式考古題。不要憑印象亂編題號；找不到足夠題目時，少於 ${count} 題也可以。
+如果你不能上網或找不到可確認題號，請直接回 questionLinks:，不要放棄、不要編題號，也不要輸出很長的解釋。
 
 題號格式請優先用：
 西元年-第幾次-卷碼-Q題號
