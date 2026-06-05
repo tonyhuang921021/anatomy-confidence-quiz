@@ -544,6 +544,7 @@ export default function QuizPage() {
 
       setSession(nextSession);
       saveCurrentSession(nextSession);
+      void pushCurrentSessionToSupabase(nextSession);
 
       if (shouldReuseExisting && existing?.isReviewingAnswer) {
         const currentQuestionId = existing.questionOrder?.[existing.currentQuestionIndex ?? 0];
@@ -669,6 +670,7 @@ export default function QuizPage() {
   function persistSession(nextSession: QuizSession) {
     setSession(nextSession);
     saveCurrentSession(nextSession);
+    void pushCurrentSessionToSupabase(nextSession);
   }
 
   function finalizeCompletedSession(completedSession: QuizSession) {
@@ -1265,6 +1267,7 @@ export default function QuizPage() {
             }
           };
           saveCurrentSession(nextSession);
+          void pushCurrentSessionToSupabase(nextSession);
           setPeakNextQuestionError("");
           return nextSession;
         });

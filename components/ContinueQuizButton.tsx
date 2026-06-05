@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
+import { useAuth } from "@/components/AuthProvider";
 import { loadCompletedSessions, loadCurrentSession } from "@/lib/storage";
 import type { QuizSession } from "@/types/quiz";
 
@@ -10,8 +11,10 @@ function isResumableSession(session: QuizSession | null) {
 }
 
 export function ContinueQuizButton() {
+  const { configured, session: authSession, syncStatus, syncVersion, refreshCloudData } = useAuth();
   const [session, setSession] = useState<QuizSession | null>(null);
   const [completedSessionIds, setCompletedSessionIds] = useState<string[]>([]);
+  const [cloudRefreshUserId, setCloudRefreshUserId] = useState("");
 
   useEffect(() => {
     setSession(loadCurrentSession());
@@ -55,6 +58,18 @@ export function ContinueQuizButton() {
     };
   }, []);
 
+  useEffect(() => {
+    setSession(loadCurrentSession());
+    setCompletedSessionIds(loadCompletedSessions().map((item) => item.id));
+  }, [syncVersion]);
+
+  useEffect(() => {
+    const userId = authSession?.user?.id ?? "";
+    if (!configured || !userId || cloudRefreshUserId === userId) return;
+    setCloudRefreshUserId(userId);
+    void refreshCloudData();
+  }, [authSession?.user?.id, cloudRefreshUserId, configured, refreshCloudData]);
+
   const resumeMeta = useMemo(() => {
     if (!session || !isResumableSession(session)) return null;
     if (completedSessionIds.includes(session.id)) return null;
@@ -68,7 +83,12 @@ export function ContinueQuizButton() {
     };
   }, [completedSessionIds, session]);
 
-  if (!resumeMeta) return null;
+  if (!resumeMeta) {
+    if (configured && authSession?.user && syncStatus === "syncing") {
+      return <p className="body-soft text-sm">正在檢查是否有做到一半的測驗...</p>;
+    }
+    return null;
+  }
 
   return (
     <div className="flex flex-wrap items-center gap-3">
