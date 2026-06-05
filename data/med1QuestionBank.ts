@@ -909,6 +909,25 @@ function applyQuestionMedia(question: Question): Question {
 }
 
 const questionTextOverrides: Record<string, QuestionTextOverride> = {
+  "MOEX-103100-1101-Q055": {
+    stem:
+      "孕婦在懷孕期間感染下列那些病毒後，容易造成嬰兒先天性缺陷？①Cytomegalovirus ②Influenza virus ③Rubella virus ④Adenovirus",
+    options: {
+      A: "①②",
+      B: "①③",
+      C: "②③",
+      D: "③④"
+    },
+    explanation:
+      "容易造成嬰兒先天性缺陷的典型病毒包含 cytomegalovirus（CMV）與 rubella virus。Influenza virus 與 adenovirus 不是本題所問的典型先天性缺陷組合，因此正確組合為 ①③。",
+    optionAnalysis: {
+      A: "不選。① CMV 是典型先天感染病原，但 ② influenza virus 不是造成先天性缺陷的典型答案。",
+      B: "正確。① CMV 與 ③ rubella virus 都是容易造成先天性缺陷的典型病毒。",
+      C: "不選。③ rubella virus 正確，但 ② influenza virus 不是本題典型先天性缺陷病原。",
+      D: "不選。③ rubella virus 正確，但 ④ adenovirus 不是本題典型先天性缺陷病原。"
+    },
+    testedConcept: "微生物免疫學／病毒學／先天性感染：CMV 與 Rubella"
+  },
   "MOEX-104030-1101-Q077": {
     options: {
       A: "僅①②",
