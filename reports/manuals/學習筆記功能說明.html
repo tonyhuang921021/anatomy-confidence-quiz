@@ -1,0 +1,730 @@
+<!doctype html>
+<html lang="zh-Hant">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>學習筆記功能說明</title>
+    <style>
+      :root {
+        --paper: #f5f0e8;
+        --paper-soft: #fbf8f2;
+        --ink: #132c24;
+        --muted: #637468;
+        --line: rgba(19, 44, 36, 0.12);
+        --accent: #2f7a59;
+        --accent-deep: #0f172a;
+        --accent-soft: #e8f5ee;
+        --warn-soft: #fff7df;
+        --card: rgba(255, 255, 255, 0.78);
+        --shadow: 0 24px 70px rgba(19, 44, 36, 0.1);
+        --radius-xl: 34px;
+        --radius-lg: 24px;
+        --max: 1120px;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      html {
+        scroll-behavior: smooth;
+      }
+
+      body {
+        margin: 0;
+        color: var(--ink);
+        font-family: "Iowan Old Style", "Palatino Linotype", "Noto Serif TC", serif;
+        background:
+          radial-gradient(circle at 8% 0%, rgba(47, 122, 89, 0.15), transparent 30%),
+          linear-gradient(180deg, #f8f3eb 0%, #eef4ee 56%, #f6f1e8 100%);
+      }
+
+      a {
+        color: inherit;
+      }
+
+      .page {
+        width: min(calc(100% - 32px), var(--max));
+        margin: 0 auto;
+        padding: 34px 0 72px;
+      }
+
+      .hero,
+      .section,
+      .quick-card,
+      .mock {
+        border: 1px solid var(--line);
+        background: var(--card);
+        box-shadow: var(--shadow);
+        backdrop-filter: blur(14px);
+      }
+
+      .hero {
+        overflow: hidden;
+        border-radius: 40px;
+        padding: clamp(28px, 5vw, 52px);
+      }
+
+      .eyebrow {
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        color: var(--accent);
+        font-size: 13px;
+        font-weight: 900;
+        letter-spacing: 0.22em;
+        text-transform: uppercase;
+      }
+
+      h1,
+      h2,
+      h3,
+      p {
+        margin-top: 0;
+      }
+
+      h1 {
+        max-width: 780px;
+        margin-bottom: 18px;
+        font-size: clamp(40px, 7vw, 74px);
+        line-height: 1.02;
+        letter-spacing: -0.055em;
+      }
+
+      .lead {
+        max-width: 760px;
+        margin-bottom: 0;
+        color: var(--muted);
+        font-size: 19px;
+        line-height: 1.9;
+      }
+
+      .quick-grid {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 14px;
+        margin-top: 26px;
+      }
+
+      .quick-card {
+        border-radius: 22px;
+        padding: 18px;
+      }
+
+      .quick-card strong {
+        display: block;
+        margin-bottom: 8px;
+        color: var(--accent-deep);
+        font-size: 17px;
+      }
+
+      .quick-card span {
+        color: var(--muted);
+        font-size: 14px;
+        line-height: 1.65;
+      }
+
+      .section {
+        margin-top: 24px;
+        border-radius: var(--radius-xl);
+        padding: clamp(22px, 4vw, 36px);
+      }
+
+      .section-header {
+        display: flex;
+        align-items: start;
+        justify-content: space-between;
+        gap: 20px;
+        margin-bottom: 22px;
+      }
+
+      .section-number {
+        color: #b65b48;
+        font-size: 13px;
+        font-weight: 900;
+        letter-spacing: 0.16em;
+        text-transform: uppercase;
+      }
+
+      .section h2 {
+        margin: 8px 0 0;
+        color: var(--accent-deep);
+        font-size: clamp(28px, 4vw, 42px);
+        letter-spacing: -0.04em;
+      }
+
+      .section-intro {
+        max-width: 42ch;
+        color: var(--muted);
+        font-size: 16px;
+        line-height: 1.85;
+      }
+
+      .two-col {
+        display: grid;
+        grid-template-columns: minmax(0, 0.86fr) minmax(0, 1.14fr);
+        gap: 26px;
+        align-items: start;
+      }
+
+      .steps {
+        display: grid;
+        gap: 12px;
+        margin: 0;
+        padding: 0;
+        list-style: none;
+      }
+
+      .steps li {
+        display: grid;
+        grid-template-columns: 34px minmax(0, 1fr);
+        gap: 12px;
+        align-items: start;
+        color: var(--muted);
+        font-size: 16px;
+        line-height: 1.75;
+      }
+
+      .steps b {
+        color: var(--ink);
+      }
+
+      .step-dot {
+        display: grid;
+        place-items: center;
+        width: 34px;
+        height: 34px;
+        border-radius: 999px;
+        background: var(--accent-soft);
+        color: var(--accent);
+        font-family: ui-sans-serif, system-ui, sans-serif;
+        font-size: 14px;
+        font-weight: 900;
+      }
+
+      .mock {
+        overflow: hidden;
+        border-radius: 28px;
+        background: rgba(255, 255, 255, 0.86);
+      }
+
+      .mock-bar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        padding: 15px 18px;
+        border-bottom: 1px solid var(--line);
+        background: #fbf8f2;
+      }
+
+      .mock-title {
+        color: var(--accent-deep);
+        font-family: ui-sans-serif, system-ui, sans-serif;
+        font-size: 13px;
+        font-weight: 900;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+      }
+
+      .pill,
+      .dark-pill {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 999px;
+        padding: 9px 14px;
+        font-family: ui-sans-serif, system-ui, sans-serif;
+        font-size: 13px;
+        font-weight: 800;
+        white-space: nowrap;
+      }
+
+      .pill {
+        border: 1px solid var(--line);
+        background: white;
+        color: var(--ink);
+      }
+
+      .dark-pill {
+        background: var(--accent-deep);
+        color: white;
+      }
+
+      .green-pill {
+        background: var(--accent);
+        color: white;
+      }
+
+      .mock-body {
+        padding: 18px;
+      }
+
+      .field {
+        display: grid;
+        gap: 8px;
+        margin-bottom: 14px;
+        font-family: ui-sans-serif, system-ui, sans-serif;
+        font-size: 12px;
+        font-weight: 800;
+        color: #344054;
+      }
+
+      .input,
+      .textarea,
+      .preview-box {
+        border: 1px solid rgba(15, 23, 42, 0.12);
+        border-radius: 18px;
+        background: #f8fafc;
+        padding: 13px 14px;
+        color: #475467;
+        font-family: ui-sans-serif, system-ui, sans-serif;
+        font-size: 13px;
+        font-weight: 600;
+        line-height: 1.6;
+      }
+
+      .textarea {
+        min-height: 150px;
+      }
+
+      .prompt-box,
+      pre {
+        overflow: auto;
+        max-height: 240px;
+        margin: 0;
+        border-radius: 20px;
+        background: #0f172a;
+        padding: 16px;
+        color: #f8fafc;
+        font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+        font-size: 12px;
+        line-height: 1.75;
+        white-space: pre-wrap;
+      }
+
+      .ai-chat {
+        display: grid;
+        gap: 12px;
+      }
+
+      .bubble {
+        border-radius: 22px;
+        padding: 15px 17px;
+        font-family: ui-sans-serif, system-ui, sans-serif;
+        font-size: 14px;
+        line-height: 1.75;
+      }
+
+      .bubble.user {
+        margin-left: 54px;
+        background: var(--accent-soft);
+      }
+
+      .bubble.ai {
+        margin-right: 28px;
+        border: 1px solid var(--line);
+        background: white;
+      }
+
+      .note-doc {
+        display: grid;
+        grid-template-columns: 220px minmax(0, 1fr) 154px;
+        min-height: 360px;
+      }
+
+      .outline {
+        border-right: 1px solid var(--line);
+        background: rgba(232, 245, 238, 0.5);
+        padding: 16px;
+      }
+
+      .outline h4,
+      .drawer h4 {
+        margin: 0 0 12px;
+        color: #667085;
+        font-family: ui-sans-serif, system-ui, sans-serif;
+        font-size: 12px;
+        font-weight: 900;
+        letter-spacing: 0.22em;
+        text-transform: uppercase;
+      }
+
+      .outline-item {
+        margin-bottom: 9px;
+        border-radius: 14px;
+        padding: 10px 12px;
+        background: rgba(255, 255, 255, 0.72);
+        color: #344054;
+        font-family: ui-sans-serif, system-ui, sans-serif;
+        font-size: 13px;
+        font-weight: 800;
+      }
+
+      .outline-item.active {
+        background: var(--accent-soft);
+        color: var(--accent);
+      }
+
+      .doc-content {
+        padding: 26px;
+      }
+
+      .doc-content h3 {
+        margin-bottom: 10px;
+        color: var(--ink);
+        font-size: 31px;
+        letter-spacing: -0.04em;
+      }
+
+      .doc-content p {
+        color: var(--muted);
+        line-height: 1.8;
+      }
+
+      .mini-table {
+        width: 100%;
+        overflow: hidden;
+        border-collapse: collapse;
+        border-radius: 16px;
+        font-family: ui-sans-serif, system-ui, sans-serif;
+        font-size: 13px;
+      }
+
+      .mini-table th,
+      .mini-table td {
+        border-bottom: 1px solid rgba(15, 23, 42, 0.08);
+        padding: 12px;
+        text-align: left;
+      }
+
+      .mini-table th {
+        background: var(--accent-soft);
+        color: var(--ink);
+      }
+
+      .drawer {
+        border-left: 1px solid var(--line);
+        background: #f8fafc;
+        padding: 16px;
+      }
+
+      .question-card {
+        border: 1px solid rgba(47, 122, 89, 0.18);
+        border-radius: 18px;
+        background: white;
+        padding: 13px;
+        font-family: ui-sans-serif, system-ui, sans-serif;
+        font-size: 12px;
+        line-height: 1.6;
+      }
+
+      .callout {
+        margin-top: 18px;
+        border-radius: 22px;
+        background: var(--warn-soft);
+        padding: 16px 18px;
+        color: #7a4c16;
+        font-family: ui-sans-serif, system-ui, sans-serif;
+        font-size: 14px;
+        font-weight: 700;
+        line-height: 1.75;
+      }
+
+      .tight-list {
+        margin: 0;
+        padding-left: 18px;
+        color: var(--muted);
+        line-height: 1.85;
+      }
+
+      .tight-list strong {
+        color: var(--ink);
+      }
+
+      .footer-note {
+        margin: 28px auto 0;
+        max-width: 760px;
+        color: var(--muted);
+        font-family: ui-sans-serif, system-ui, sans-serif;
+        font-size: 14px;
+        line-height: 1.8;
+        text-align: center;
+      }
+
+      @media (max-width: 880px) {
+        .quick-grid,
+        .two-col {
+          grid-template-columns: 1fr;
+        }
+
+        .section-header {
+          display: block;
+        }
+
+        .note-doc {
+          grid-template-columns: 1fr;
+        }
+
+        .outline,
+        .drawer {
+          border: 0;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main class="page">
+      <section class="hero">
+        <p class="eyebrow">Study Notes Manual</p>
+        <h1>學習筆記，照這 5 步就能用</h1>
+        <p class="lead">
+          這不是完整功能百科。只講同學真的會用到的流程：複製 prompt、請 AI 整理、貼回網站、存成筆記，最後用左側目錄和右側考古題複習。
+        </p>
+        <div class="quick-grid">
+          <div class="quick-card">
+            <strong>先複製提示詞</strong>
+            <span>選精簡或詳細，再把固定格式 prompt 貼給你的 AI。</span>
+          </div>
+          <div class="quick-card">
+            <strong>再貼回網站</strong>
+            <span>網站會讀 note-meta，自動抓標題、科目、摘要與搜尋詞。</span>
+          </div>
+          <div class="quick-card">
+            <strong>最後接考古題</strong>
+            <span>右側題目抽屜可看題目、選項、答案與詳解。</span>
+          </div>
+        </div>
+      </section>
+
+      <section class="section" id="steps">
+        <div class="section-header">
+          <div>
+            <p class="section-number">01 / 快速流程</p>
+            <h2>不要想太多，照順序做</h2>
+          </div>
+          <p class="section-intro">
+            新增筆記的核心不是手動排版，而是先讓 AI 用網站看得懂的格式輸出。你只要複製、貼上、儲存。
+          </p>
+        </div>
+        <div class="two-col">
+          <ol class="steps">
+            <li><span class="step-dot">1</span><span><b>進入學習筆記</b>，按 `新增筆記`。</span></li>
+            <li><span class="step-dot">2</span><span><b>選精簡或詳細</b>，設定想找幾題考古題，最多 8 題。</span></li>
+            <li><span class="step-dot">3</span><span><b>複製 Markdown 還原提示</b>，貼到 ChatGPT、Gemini、Claude 或其他 AI。</span></li>
+            <li><span class="step-dot">4</span><span><b>問你的主題</b>，例如：請整理藥物交互作用。</span></li>
+            <li><span class="step-dot">5</span><span><b>把 AI 回覆整段貼回網站</b>，確認自動讀取結果後按 `儲存筆記`。</span></li>
+          </ol>
+          <figure class="mock" aria-label="新增筆記介面重點示意">
+            <div class="mock-bar">
+              <span class="mock-title">New Study Note</span>
+              <span class="pill">回筆記庫</span>
+            </div>
+            <div class="mock-body">
+              <label class="field">Markdown 全文
+                <div class="textarea">把 AI 回覆整段貼在這裡，包含最上方 note-meta。</div>
+              </label>
+              <div class="preview-box">
+                <b>自動讀取結果</b><br />
+                標題：藥物交互作用總整理<br />
+                科目：藥理學<br />
+                摘要：CYP、warfarin、rifampin 與 azole 互動
+              </div>
+            </div>
+          </figure>
+        </div>
+      </section>
+
+      <section class="section" id="prompt">
+        <div class="section-header">
+          <div>
+            <p class="section-number">02 / Prompt</p>
+            <h2>精簡、詳細，看目的選</h2>
+          </div>
+          <p class="section-intro">
+            精簡不是少內容，是把重複句子壓掉；詳細會保留推理與易混淆點。兩者都會要求 AI 輸出網站能還原的 Markdown。
+          </p>
+        </div>
+        <div class="two-col">
+          <div>
+            <ul class="tight-list">
+              <li><strong>精簡：</strong>考前速讀，表格與短條列優先。</li>
+              <li><strong>詳細：</strong>第一次讀懂觀念，保留原因、機轉與比較。</li>
+              <li><strong>考古題數：</strong>最多 8 題；找不到可確認題號時，不要硬編。</li>
+              <li><strong>搜尋詞：</strong>AI 會給 `searchKeywords`，網站會用它自動搜尋本地題庫。</li>
+            </ul>
+            <div class="callout">
+              建議：一般複習先用詳細，考前整理再用精簡。不要讓 AI 把題號查證來源塞進正文，題號放在 note-meta 就好。
+            </div>
+          </div>
+          <figure class="mock" aria-label="Prompt 區塊重點示意">
+            <div class="mock-bar">
+              <span class="mock-title">Markdown 還原提示</span>
+              <span class="dark-pill">複製</span>
+            </div>
+            <div class="mock-body">
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px">
+                <span class="dark-pill">精簡</span>
+                <span class="pill">詳細</span>
+              </div>
+              <div class="input">要請 AI 找幾題考古題：6</div>
+              <pre class="prompt-box">請把接下來的內容轉成網站筆記可以完整還原的 Markdown。
+最上方一定要輸出 note-meta。
+保留表格、條列、粗體、code block。
+questionLinks 最多 8 題；找不到就留空。
+searchKeywords 請放能命中題庫的代表詞。</pre>
+            </div>
+          </figure>
+        </div>
+      </section>
+
+      <section class="section" id="ai-demo">
+        <div class="section-header">
+          <div>
+            <p class="section-number">03 / AI 示範</p>
+            <h2>範例：問藥物交互作用</h2>
+          </div>
+          <p class="section-intro">
+            這裡只示範關鍵格式。實際內容可以很長，但手冊只需要看懂：上面是 note-meta，下面是整理後正文。
+          </p>
+        </div>
+        <div class="mock">
+          <div class="mock-bar">
+            <span class="mock-title">Your AI</span>
+            <span class="pill">示意，不是長截圖</span>
+          </div>
+          <div class="mock-body ai-chat">
+            <div class="bubble user">
+              我已貼上網站 prompt。請整理藥物交互作用，國考常考的 CYP、warfarin、macrolide、rifampin、azole 互動也要放進去。
+            </div>
+            <div class="bubble ai">
+              <pre>```note-meta
+title: 藥物交互作用總整理
+subject: 藥理學
+collection:
+summary: 整理 CYP、warfarin、macrolide、rifampin 與 azole 類常見交互作用。
+tags: 藥物交互作用, CYP, warfarin, rifampin
+searchKeywords: CYP, warfarin, rifampin, macrolide, azole
+questionLinks:
+```
+
+# 藥物交互作用總整理
+
+## 最高頻判斷
+
+| 類型 | 代表藥 | 結果 |
+| --- | --- | --- |
+| CYP inhibitor | macrolide, azole | 其他藥濃度上升 |
+| CYP inducer | rifampin | 其他藥濃度下降 |
+| Warfarin + inhibitor | azole, macrolide | INR 上升、出血風險上升 |</pre>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="section" id="save">
+        <div class="section-header">
+          <div>
+            <p class="section-number">04 / 儲存</p>
+            <h2>貼回來，看自動讀取有沒有成功</h2>
+          </div>
+          <p class="section-intro">
+            貼回 `Markdown 全文` 後，網站會讀取 note-meta。如果標題、科目、摘要都有出現，就可以儲存。
+          </p>
+        </div>
+        <div class="two-col">
+          <figure class="mock" aria-label="貼回儲存示意">
+            <div class="mock-bar">
+              <span class="mock-title">Paste & Save</span>
+              <span class="green-pill pill">儲存筆記</span>
+            </div>
+            <div class="mock-body">
+              <label class="field">Markdown 全文
+                <div class="textarea">```note-meta<br />title: 藥物交互作用總整理<br />subject: 藥理學<br />...<br />```<br /><br /># 藥物交互作用總整理<br />## 最高頻判斷</div>
+              </label>
+            </div>
+          </figure>
+          <div>
+            <ul class="tight-list">
+              <li><strong>標題沒讀到：</strong>確認最上方有 `title:`。</li>
+              <li><strong>科目沒讀到：</strong>確認 `subject:` 是網站支援科目，例如 `藥理學`。</li>
+              <li><strong>表格跑掉：</strong>請 AI 重新輸出標準 Markdown table，每列都要換行。</li>
+              <li><strong>考古題沒接上：</strong>可在筆記編輯頁再貼 `questionLinks` 或 `searchKeywords`。</li>
+            </ul>
+            <div class="callout">
+              小重點：新增時可以先不放資料夾。回到科目頁後，再由左側目錄自己整理順序、資料夾與星號。
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="section" id="read">
+        <div class="section-header">
+          <div>
+            <p class="section-number">05 / 筆記庫</p>
+            <h2>左邊目錄，右邊考古題</h2>
+          </div>
+          <p class="section-intro">
+            回筆記庫後，剛剛的筆記會出現在科目裡。科目頁像一份大文件：左側快速跳筆記，右側抽屜放相關題目。
+          </p>
+        </div>
+        <figure class="mock" aria-label="筆記大文件與考古題抽屜示意">
+          <div class="mock-bar">
+            <span class="mock-title">Subject Document</span>
+            <span class="pill">藥理學</span>
+          </div>
+          <div class="note-doc">
+            <aside class="outline">
+              <h4>Notes</h4>
+              <div class="outline-item active">藥物交互作用總整理 ★</div>
+              <div class="outline-item">抗生素整理</div>
+              <div class="outline-item">抗凝血藥物</div>
+            </aside>
+            <article class="doc-content">
+              <h3>藥物交互作用總整理</h3>
+              <p>先看機轉：抑制代謝會讓藥物濃度上升；誘導代謝會讓藥物濃度下降。</p>
+              <table class="mini-table">
+                <thead>
+                  <tr><th>類型</th><th>代表藥</th><th>結果</th></tr>
+                </thead>
+                <tbody>
+                  <tr><td>CYP inhibitor</td><td>macrolide, azole</td><td>濃度上升</td></tr>
+                  <tr><td>CYP inducer</td><td>rifampin</td><td>濃度下降</td></tr>
+                </tbody>
+              </table>
+            </article>
+            <aside class="drawer">
+              <h4>考古題</h4>
+              <div class="question-card">
+                <b>Related Question</b><br />
+                CYP 與 warfarin 交互作用<br /><br />
+                <span class="pill">看題目</span>
+                <span class="pill">看答案</span>
+              </div>
+            </aside>
+          </div>
+        </figure>
+      </section>
+
+      <section class="section" id="tips">
+        <div class="section-header">
+          <div>
+            <p class="section-number">06 / 常見狀況</p>
+            <h2>只記這幾個就好</h2>
+          </div>
+        </div>
+        <ul class="tight-list">
+          <li><strong>AI 找不到題號：</strong>沒關係，讓它至少給 `searchKeywords`，網站會用本地題庫搜尋。</li>
+          <li><strong>AI 題號格式怪：</strong>盡量請它輸出 `2022-1-1301-Q025`；只有 `2019-2-Q008` 時可能會對不到。</li>
+          <li><strong>正文太長：</strong>改用精簡 prompt；但不要叫 AI 刪必考觀念。</li>
+          <li><strong>之後想補題：</strong>進筆記詳情按 `編輯筆記`，在相關題目區貼題號或搜尋詞。</li>
+          <li><strong>想整理順序：</strong>回科目頁左側，按 `編輯` 後再拖曳筆記或資料夾。</li>
+        </ul>
+      </section>
+
+      <p class="footer-note">
+        建議分享給同學時，只叫他們先看 01 到 05。真正重要的是把 AI 回覆變成可搜尋、可整理、可接考古題的筆記，不是把每個按鈕背起來。
+      </p>
+    </main>
+  </body>
+</html>
