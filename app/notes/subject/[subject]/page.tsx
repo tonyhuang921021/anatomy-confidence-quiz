@@ -67,8 +67,14 @@ function isAutoCategoryFolderName(name: string | undefined, category?: string | 
   });
 }
 
-function flattenAutoCategoryFolder(note: StudyNoteDetail, category?: string | null): StudyNoteDetail {
-  if (!isAutoCategoryFolderName(note.collectionName, category)) return note;
+function isAutoMetadataFolderName(name: string | undefined, category?: string | null) {
+  const normalizedName = name?.trim();
+  if (!normalizedName) return false;
+  return isAutoCategoryFolderName(normalizedName, category) || /\s*[\/／]\s*/.test(normalizedName);
+}
+
+function flattenAutoMetadataFolder(note: StudyNoteDetail, category?: string | null): StudyNoteDetail {
+  if (!isAutoMetadataFolderName(note.collectionName, category)) return note;
   return {
     ...note,
     collectionId: undefined,
@@ -128,9 +134,7 @@ export default function SubjectNotesPage() {
       loadStudyNoteCollections({ accessToken: session.access_token, subject })
     ])
       .then(async ([nextNotes, nextCollections]) => {
-        const visibleCollections = category
-          ? nextCollections.filter((collection) => !isAutoCategoryFolderName(collection.name, category))
-          : nextCollections;
+        const visibleCollections = nextCollections.filter((collection) => !isAutoMetadataFolderName(collection.name, category));
         if (!cancelled) setCollections(visibleCollections);
         return nextNotes;
       })
@@ -138,11 +142,9 @@ export default function SubjectNotesPage() {
         const details = await Promise.all(
           nextNotes.map((note) => loadStudyNote(note.id, session.access_token))
         );
-        const flattenedDetails = category
-          ? details.map((note) => flattenAutoCategoryFolder(note, category))
-          : details;
-        const filteredDetails = isMicrobiology ? filterMicrobiologyImmunologyNotes(flattenedDetails, category) : flattenedDetails;
-        if (!cancelled) setNotes(filteredDetails);
+        const filteredDetails = isMicrobiology ? filterMicrobiologyImmunologyNotes(details, category) : details;
+        const visibleDetails = filteredDetails.map((note) => flattenAutoMetadataFolder(note, category));
+        if (!cancelled) setNotes(visibleDetails);
       })
       .catch((rawError) => {
         if (!cancelled) {
