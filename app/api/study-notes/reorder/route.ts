@@ -2,6 +2,10 @@ import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 
 type ReorderStudyNotesBody = {
+  items?: {
+    type?: string;
+    id?: string;
+  }[];
   orderedIds?: string[];
 };
 
@@ -44,6 +48,36 @@ export async function POST(request: NextRequest) {
 
   try {
     const body = (await request.json().catch(() => null)) as ReorderStudyNotesBody | null;
+    const rawItems = (body?.items ?? [])
+      .map((item) => ({
+        type: item.type === "collection" ? "collection" : item.type === "note" ? "note" : "",
+        id: item.id?.trim() ?? ""
+      }))
+      .filter((item) => item.type && item.id);
+    if (rawItems.length > 0) {
+      const uniqueItems = Array.from(
+        new Map(rawItems.map((item) => [`${item.type}:${item.id}`, item] as const)).values()
+      );
+      const now = new Date().toISOString();
+      const updates = uniqueItems.map((item, index) => {
+        const table = item.type === "collection" ? "study_note_collections" : "study_notes";
+        return supabase
+          .from(table)
+          .update({
+            display_order: (index + 1) * 1000,
+            updated_at: now
+          })
+          .eq("id", item.id)
+          .eq("user_id", userData.user.id);
+      });
+
+      const results = await Promise.all(updates);
+      const failed = results.find((result) => result.error);
+      if (failed?.error) throw failed.error;
+
+      return NextResponse.json({ ok: true, updated: uniqueItems.length });
+    }
+
     const orderedIds = (body?.orderedIds ?? [])
       .map((id) => id.trim())
       .filter(Boolean);

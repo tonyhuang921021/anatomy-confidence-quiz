@@ -76,6 +76,16 @@ export type ReorderStudyNoteCollectionsInput = {
   orderedIds: string[];
 };
 
+export type ReorderStudyNoteOutlineItem = {
+  type: "note" | "collection";
+  id: string;
+};
+
+export type ReorderStudyNoteOutlineInput = {
+  accessToken?: string | null;
+  items: ReorderStudyNoteOutlineItem[];
+};
+
 function tryParseJson<T>(rawText: string): T | null {
   if (!rawText.trim()) return null;
 
@@ -851,6 +861,15 @@ export async function reorderStudyNotes(input: ReorderStudyNotesInput): Promise<
     method: "POST",
     headers: buildAuthHeaders(input.accessToken),
     body: JSON.stringify({ orderedIds: input.orderedIds })
+  });
+  await parseStudyNoteResponse<{ updated?: number }>(response);
+}
+
+export async function reorderStudyNoteOutline(input: ReorderStudyNoteOutlineInput): Promise<void> {
+  const response = await fetch("/api/study-notes/reorder", {
+    method: "POST",
+    headers: buildAuthHeaders(input.accessToken),
+    body: JSON.stringify({ items: input.items })
   });
   await parseStudyNoteResponse<{ updated?: number }>(response);
 }
