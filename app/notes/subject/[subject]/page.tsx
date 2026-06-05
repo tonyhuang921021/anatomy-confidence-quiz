@@ -51,6 +51,7 @@ type OutlineDragPayload =
   | { type: "collection"; id: string };
 
 const NOTE_MOVE_SUBJECTS = [...MED1_SUBJECTS, ...MED2_SUBJECTS];
+const STUDY_NOTES_MANUAL_HREF = "/manuals/學習筆記功能說明.html";
 
 function getAutoCategoryFolderPrefixes(category?: string | null) {
   if (category === "virus") return ["病毒學", "病毒", "virology"];
@@ -891,6 +892,9 @@ export default function SubjectNotesPage() {
                 </Link>
               ))
             ) : null}
+            <a href={STUDY_NOTES_MANUAL_HREF} target="_blank" rel="noreferrer" className="secondary-pill">
+              打開說明書
+            </a>
             <Link href="/notes/new" className="primary-pill">
               新增筆記
             </Link>

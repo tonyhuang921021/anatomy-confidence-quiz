@@ -13,6 +13,8 @@ import { loadStudyNotes } from "@/lib/studyNotes";
 import { subjectRegistry } from "@/data/subjectRegistry";
 import type { StudyNoteSummary } from "@/types/quiz";
 
+const STUDY_NOTES_MANUAL_HREF = "/manuals/學習筆記功能說明.html";
+
 function formatDate(value?: string) {
   if (!value) return "尚無筆記";
   return new Intl.DateTimeFormat("zh-Hant", {
@@ -83,9 +85,14 @@ export default function StudyNotesPage() {
               先選一科，進去後會像一份大文件：左邊是章節檢索，右邊是完整筆記、相關題目小卡與可編輯內容。
             </p>
           </div>
-          <Link href="/notes/new" className="primary-pill">
-            新增筆記
-          </Link>
+          <div className="flex flex-wrap gap-2">
+            <a href={STUDY_NOTES_MANUAL_HREF} target="_blank" rel="noreferrer" className="secondary-pill">
+              打開說明書
+            </a>
+            <Link href="/notes/new" className="primary-pill">
+              新增筆記
+            </Link>
+          </div>
         </div>
       </section>
 
