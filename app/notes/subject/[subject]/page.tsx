@@ -192,18 +192,10 @@ export default function SubjectNotesPage() {
         notes: notes.filter((note) => note.collectionId === collection.id)
       }));
 
-    const unfiledNotes = notes.filter((note) => !note.collectionId);
-    if (unfiledNotes.length > 0) {
-      grouped.push({
-        id: "unfiled",
-        name: "未分類",
-        collection: undefined,
-        notes: unfiledNotes
-      });
-    }
-
     return grouped;
   }, [collections, notes]);
+  const rootNotes = useMemo(() => notes.filter((note) => !note.collectionId), [notes]);
+  const hasOutlineItems = rootNotes.length > 0 || outlineGroups.length > 0;
   const currentRelatedQuestionCount = currentNote?.questionLinks
     .filter((link) => questionMap.has(link.questionId))
     .length ?? 0;
@@ -381,6 +373,16 @@ export default function SubjectNotesPage() {
     if (payload.type === "collection" && collection) {
       finishCollectionDrag();
     }
+  }
+
+  function handleDropOnRoot(event: React.DragEvent<HTMLElement>) {
+    if (!outlineEditMode) return;
+    event.preventDefault();
+    const payload = readDragPayload(event.dataTransfer);
+    if (payload?.type !== "note") return;
+    const note = notesRef.current.find((item) => item.id === payload.id);
+    if (note) void handleMoveNoteToCollection(note, undefined);
+    finishDrag();
   }
 
   async function handleToggleStar(noteId: string) {
@@ -578,6 +580,66 @@ export default function SubjectNotesPage() {
     window.scrollTo({ top: 0, behavior: "smooth" });
   }
 
+  function renderOutlineNote(note: StudyNoteDetail, nested = false) {
+    return (
+      <div
+        key={note.id}
+        onDragEnter={() => previewDraggedNote(note.id)}
+        onDragOver={(event) => {
+          if (!outlineEditMode) return;
+          event.preventDefault();
+          event.dataTransfer.dropEffect = "move";
+        }}
+        onDrop={(event) => {
+          if (!outlineEditMode) return;
+          event.preventDefault();
+          finishDrag();
+        }}
+        data-dragging={draggingNoteId === note.id}
+        data-drop-target={dragOverNoteId === note.id && draggingNoteId !== note.id}
+        className={`note-outline-item group rounded-2xl px-2 py-2 hover:bg-teal-50 ${
+          outlineEditMode
+            ? "grid grid-cols-[28px_minmax(0,1fr)] gap-2"
+            : "grid grid-cols-[minmax(0,1fr)]"
+        } ${nested ? "" : "bg-white/70"}`}
+      >
+        {outlineEditMode ? (
+          <button
+            type="button"
+            draggable
+            onDragStart={(event) => beginNoteDrag(note.id, event.dataTransfer)}
+            onDragEnd={finishDrag}
+            aria-label={`拖曳排序：${note.title}`}
+            className="grid h-8 w-7 cursor-grab place-items-center rounded-xl text-slate-300 transition hover:bg-white hover:text-teal-700 active:cursor-grabbing"
+          >
+            <span className="leading-none">⠿</span>
+          </button>
+        ) : null}
+        <div className="min-w-0">
+          <a
+            href={`#note-${note.id}`}
+            className="grid min-w-0 grid-cols-[minmax(0,1fr)_auto] items-center gap-2 text-sm font-bold text-slate-700 group-hover:text-teal-800"
+          >
+            <span className="min-w-0 truncate">{note.title}</span>
+            <span className={note.isStarred ? "text-amber-500" : "text-slate-300"} aria-label={note.isStarred ? "已打星" : "未打星"}>
+              {note.isStarred ? "★" : "☆"}
+            </span>
+          </a>
+          {outlineEditMode ? (
+            <button
+              type="button"
+              onClick={() => void handleRenameNote(note)}
+              disabled={outlineSaving}
+              className="mt-2 rounded-full bg-slate-50 px-2.5 py-1 text-[11px] font-bold text-slate-600 transition hover:bg-teal-50 hover:text-teal-700 disabled:opacity-50"
+            >
+              改筆記名
+            </button>
+          ) : null}
+        </div>
+      </div>
+    );
+  }
+
   return (
     <main className="shell max-w-[1600px]">
       <section className="surface-card overflow-hidden p-6 sm:p-8">
@@ -658,9 +720,19 @@ export default function SubjectNotesPage() {
                     </button>
                   </div>
                 </div>
-                <div className="mt-4 grid gap-2">
-                  {outlineGroups.length > 0 ? (
-                    outlineGroups.map((group) => (
+                <div
+                  className="mt-4 grid gap-2"
+                  onDragOver={(event) => {
+                    if (!outlineEditMode || !draggingNoteId) return;
+                    event.preventDefault();
+                    event.dataTransfer.dropEffect = "move";
+                  }}
+                  onDrop={handleDropOnRoot}
+                >
+                  {hasOutlineItems ? (
+                    <>
+                      {rootNotes.map((note) => renderOutlineNote(note))}
+                      {outlineGroups.map((group) => (
                       <section
                         key={group.id}
                         className="rounded-2xl border border-slate-100 bg-white/80 p-2"
@@ -729,69 +801,14 @@ export default function SubjectNotesPage() {
                         </div>
                         <div className="ml-5 mt-1 grid gap-1 border-l border-slate-100 pl-3">
                           {group.notes.length > 0 ? (
-                            group.notes.map((note) => (
-                              <div
-                                key={note.id}
-                                onDragEnter={() => previewDraggedNote(note.id)}
-                                onDragOver={(event) => {
-                                  if (!outlineEditMode) return;
-                                  event.preventDefault();
-                                  event.dataTransfer.dropEffect = "move";
-                                }}
-                                onDrop={(event) => {
-                                  if (!outlineEditMode) return;
-                                  event.preventDefault();
-                                  finishDrag();
-                                }}
-                                data-dragging={draggingNoteId === note.id}
-                                data-drop-target={dragOverNoteId === note.id && draggingNoteId !== note.id}
-                                className={`note-outline-item group rounded-2xl px-2 py-2 hover:bg-teal-50 ${
-                                  outlineEditMode
-                                    ? "grid grid-cols-[28px_minmax(0,1fr)] gap-2"
-                                    : "grid grid-cols-[minmax(0,1fr)]"
-                                }`}
-                              >
-                                {outlineEditMode ? (
-                                  <button
-                                    type="button"
-                                    draggable
-                                    onDragStart={(event) => beginNoteDrag(note.id, event.dataTransfer)}
-                                    onDragEnd={finishDrag}
-                                    aria-label={`拖曳排序：${note.title}`}
-                                    className="grid h-8 w-7 cursor-grab place-items-center rounded-xl text-slate-300 transition hover:bg-white hover:text-teal-700 active:cursor-grabbing"
-                                  >
-                                    <span className="leading-none">⠿</span>
-                                  </button>
-                                ) : null}
-                                <div className="min-w-0">
-                                  <a
-                                    href={`#note-${note.id}`}
-                                    className="grid min-w-0 grid-cols-[minmax(0,1fr)_auto] items-center gap-2 text-sm font-bold text-slate-700 group-hover:text-teal-800"
-                                  >
-                                    <span className="min-w-0 truncate">{note.title}</span>
-                                    <span className={note.isStarred ? "text-amber-500" : "text-slate-300"} aria-label={note.isStarred ? "已打星" : "未打星"}>
-                                      {note.isStarred ? "★" : "☆"}
-                                    </span>
-                                  </a>
-                                  {outlineEditMode ? (
-                                    <button
-                                      type="button"
-                                      onClick={() => void handleRenameNote(note)}
-                                      disabled={outlineSaving}
-                                      className="mt-2 rounded-full bg-slate-50 px-2.5 py-1 text-[11px] font-bold text-slate-600 transition hover:bg-teal-50 hover:text-teal-700 disabled:opacity-50"
-                                    >
-                                      改筆記名
-                                    </button>
-                                  ) : null}
-                                </div>
-                              </div>
-                            ))
+                            group.notes.map((note) => renderOutlineNote(note, true))
                           ) : (
                             <p className="px-2 py-2 text-xs font-semibold text-slate-400">這個資料夾還沒有筆記。</p>
                           )}
                         </div>
                       </section>
-                    ))
+                    ))}
+                    </>
                   ) : (
                     <p className="body-soft text-sm">目前還沒有筆記。</p>
                   )}
