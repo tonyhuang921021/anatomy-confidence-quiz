@@ -159,7 +159,6 @@ export default function NewStudyNotePage() {
     if (parsed.title) setTitle(parsed.title);
     if (parsed.summary) setSummary(parsed.summary);
     if (parsed.subject) setSubject(parsed.subject);
-    if (parsed.collectionName) setCollectionName(parsed.collectionName);
     setMetadataTags((current) => mergeUniqueTags(current, parsed.tags ?? []));
     setQuestionLinks((current) =>
       mergeUniqueLinks(
@@ -250,7 +249,7 @@ export default function NewStudyNotePage() {
           rawMarkdown: cleanedMarkdown,
           summary,
           subject,
-          collectionName,
+          collectionName: collectionName.trim() || undefined,
           tags: mergeUniqueTags(parseManualTags(manualTags), metadataTags),
           questionLinks
         });
@@ -269,7 +268,7 @@ export default function NewStudyNotePage() {
             <p className="eyebrow">New Study Note</p>
             <h1 className="display-title mt-3 text-4xl sm:text-5xl">新增學習筆記</h1>
             <p className="body-soft mt-4 max-w-2xl leading-7">
-              貼上 ChatGPT、Gemini、Claude 或其他 AI 產出的 Markdown，網站會自動讀取開頭的 note-meta 來建立標題、科目、分類與摘要。
+              貼上 ChatGPT、Gemini、Claude 或其他 AI 產出的 Markdown，網站會自動讀取開頭的 note-meta 來建立標題、科目與摘要；資料夾先不自動套用，之後可在左側筆記欄自行整理。
             </p>
           </div>
           <Link href="/notes" className="secondary-pill">
@@ -301,7 +300,7 @@ export default function NewStudyNotePage() {
                 <div className="rounded-3xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm leading-7 text-slate-700">
                   <p><span className="font-bold text-slate-950">標題：</span>{title || inferStudyNoteTitle(rawMarkdown)}</p>
                   <p><span className="font-bold text-slate-950">科目：</span>{subject || "尚未讀取"}</p>
-                  <p><span className="font-bold text-slate-950">分類：</span>{collectionName || "尚未讀取"}</p>
+                  <p><span className="font-bold text-slate-950">資料夾：</span>{collectionName || "預設放在科目底下，不自動分資料夾"}</p>
                   <p><span className="font-bold text-slate-950">摘要：</span>{summary || "尚未讀取"}</p>
                 </div>
               </label>

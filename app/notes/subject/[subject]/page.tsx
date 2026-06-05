@@ -46,6 +46,36 @@ type OutlineDragPayload =
   | { type: "note"; id: string }
   | { type: "collection"; id: string };
 
+function getAutoCategoryFolderPrefixes(category?: string | null) {
+  if (category === "virus") return ["病毒學", "病毒", "virology"];
+  if (category === "bacteria") return ["細菌學", "細菌", "bacteriology"];
+  if (category === "immunity") return ["免疫學", "免疫", "immunology"];
+  return [];
+}
+
+function isAutoCategoryFolderName(name: string | undefined, category?: string | null) {
+  const normalizedName = name?.trim().toLowerCase();
+  if (!normalizedName) return false;
+  return getAutoCategoryFolderPrefixes(category).some((prefix) => {
+    const normalizedPrefix = prefix.toLowerCase();
+    return (
+      normalizedName.startsWith(`${normalizedPrefix} /`) ||
+      normalizedName.startsWith(`${normalizedPrefix}/`) ||
+      normalizedName.startsWith(`${normalizedPrefix} ／`) ||
+      normalizedName.startsWith(`${normalizedPrefix}／`)
+    );
+  });
+}
+
+function flattenAutoCategoryFolder(note: StudyNoteDetail, category?: string | null): StudyNoteDetail {
+  if (!isAutoCategoryFolderName(note.collectionName, category)) return note;
+  return {
+    ...note,
+    collectionId: undefined,
+    collectionName: undefined
+  };
+}
+
 export default function SubjectNotesPage() {
   const params = useParams<{ subject: string }>();
   const searchParams = useSearchParams();
@@ -98,14 +128,20 @@ export default function SubjectNotesPage() {
       loadStudyNoteCollections({ accessToken: session.access_token, subject })
     ])
       .then(async ([nextNotes, nextCollections]) => {
-        if (!cancelled) setCollections(nextCollections);
+        const visibleCollections = category
+          ? nextCollections.filter((collection) => !isAutoCategoryFolderName(collection.name, category))
+          : nextCollections;
+        if (!cancelled) setCollections(visibleCollections);
         return nextNotes;
       })
       .then(async (nextNotes) => {
         const details = await Promise.all(
           nextNotes.map((note) => loadStudyNote(note.id, session.access_token))
         );
-        const filteredDetails = isMicrobiology ? filterMicrobiologyImmunologyNotes(details, category) : details;
+        const flattenedDetails = category
+          ? details.map((note) => flattenAutoCategoryFolder(note, category))
+          : details;
+        const filteredDetails = isMicrobiology ? filterMicrobiologyImmunologyNotes(flattenedDetails, category) : flattenedDetails;
         if (!cancelled) setNotes(filteredDetails);
       })
       .catch((rawError) => {
@@ -285,6 +321,7 @@ export default function SubjectNotesPage() {
       const nextNotes = [...currentNotes];
       const [movedNote] = nextNotes.splice(fromIndex, 1);
       nextNotes.splice(toIndex, 0, movedNote);
+      notesRef.current = nextNotes;
       return nextNotes;
     });
     setDragOverNoteId(targetNoteId);
@@ -313,6 +350,7 @@ export default function SubjectNotesPage() {
       const nextCollections = [...currentCollections];
       const [movedCollection] = nextCollections.splice(fromIndex, 1);
       nextCollections.splice(toIndex, 0, movedCollection);
+      collectionsRef.current = nextCollections;
       return nextCollections;
     });
     setDragOverCollectionId(targetCollectionId);
@@ -627,13 +665,17 @@ export default function SubjectNotesPage() {
                         data-drop-target={dragOverCollectionId === group.id && draggingCollectionId !== group.id}
                         onDragEnter={(event) => {
                           if (!outlineEditMode || !group.collection) return;
-                          const payload = readDragPayload(event.dataTransfer);
-                          if (payload?.type === "collection") previewDraggedCollection(group.id);
+                          if (draggingCollectionId) {
+                            previewDraggedCollection(group.id);
+                          }
                         }}
                         onDragOver={(event) => {
                           if (!outlineEditMode) return;
                           event.preventDefault();
                           event.dataTransfer.dropEffect = "move";
+                          if (group.collection && draggingCollectionId) {
+                            previewDraggedCollection(group.id);
+                          }
                         }}
                         onDrop={(event) => handleDropOnFolder(event, group.collection)}
                       >
