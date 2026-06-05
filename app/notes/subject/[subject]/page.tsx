@@ -6,7 +6,7 @@ import { useParams, useSearchParams } from "next/navigation";
 import { useAuth } from "@/components/AuthProvider";
 import { StudyNoteMarkdown } from "@/components/StudyNoteMarkdown";
 import { getCanonicalQuestionBank } from "@/data/med1QuestionBank";
-import { subjectRegistry } from "@/data/subjectRegistry";
+import { MED1_SUBJECTS, MED2_SUBJECTS, subjectRegistry } from "@/data/subjectRegistry";
 import { isNoteSubject } from "@/lib/noteSubjects";
 import {
   filterMicrobiologyImmunologyNotes,
@@ -49,6 +49,8 @@ type OutlineRootItem =
 type OutlineDragPayload =
   | { type: "note"; id: string }
   | { type: "collection"; id: string };
+
+const NOTE_MOVE_SUBJECTS = [...MED1_SUBJECTS, ...MED2_SUBJECTS];
 
 function getAutoCategoryFolderPrefixes(category?: string | null) {
   if (category === "virus") return ["病毒學", "病毒", "virology"];
@@ -100,6 +102,7 @@ export default function SubjectNotesPage() {
   const [draggingCollectionId, setDraggingCollectionId] = useState("");
   const [dragOverCollectionId, setDragOverCollectionId] = useState("");
   const [activeQuestionNoteId, setActiveQuestionNoteId] = useState("");
+  const [moveMenuNoteId, setMoveMenuNoteId] = useState("");
   const [currentNoteId, setCurrentNoteId] = useState("");
   const [loading, setLoading] = useState(false);
   const [outlineSaving, setOutlineSaving] = useState(false);
@@ -684,6 +687,50 @@ export default function SubjectNotesPage() {
     }
   }
 
+  function shouldKeepNoteInCurrentView(note: StudyNoteDetail) {
+    if (note.subject !== subject) return false;
+    if (!isMicrobiology) return true;
+    return filterMicrobiologyImmunologyNotes([note], category).length > 0;
+  }
+
+  async function handleMoveNoteDestination(
+    note: StudyNoteDetail,
+    targetSubject: SubjectName,
+    targetCategory?: string
+  ) {
+    if (!session?.access_token || outlineSaving) return;
+    const categoryLabel = MICROBIOLOGY_IMMUNOLOGY_CATEGORIES.find((item) => item.id === targetCategory)?.label;
+
+    setOutlineSaving(true);
+    setMoveMenuNoteId("");
+    setError("");
+    try {
+      const updated = await updateStudyNote({
+        accessToken: session.access_token,
+        id: note.id,
+        title: note.title,
+        rawMarkdown: note.rawMarkdown,
+        summary: note.summary,
+        subject: targetSubject,
+        chapter: categoryLabel,
+        section: undefined,
+        collectionName: undefined,
+        tags: note.tags,
+        questionLinks: note.questionLinks
+      });
+      setNotes((currentNotes) => {
+        if (!shouldKeepNoteInCurrentView(updated)) {
+          return currentNotes.filter((item) => item.id !== updated.id);
+        }
+        return currentNotes.map((item) => (item.id === updated.id ? updated : item));
+      });
+    } catch (rawError) {
+      setError(rawError instanceof Error ? rawError.message : "筆記移動失敗");
+    } finally {
+      setOutlineSaving(false);
+    }
+  }
+
   function scrollToTop() {
     window.scrollTo({ top: 0, behavior: "smooth" });
   }
@@ -748,14 +795,66 @@ export default function SubjectNotesPage() {
             </span>
           </a>
           {outlineEditMode ? (
-            <button
-              type="button"
-              onClick={() => void handleRenameNote(note)}
-              disabled={outlineSaving}
-              className="mt-2 rounded-full bg-slate-50 px-2.5 py-1 text-[11px] font-bold text-slate-600 transition hover:bg-teal-50 hover:text-teal-700 disabled:opacity-50"
-            >
-              改筆記名
-            </button>
+            <>
+              <div className="mt-2 flex flex-wrap gap-1.5">
+                <button
+                  type="button"
+                  onClick={() => void handleRenameNote(note)}
+                  disabled={outlineSaving}
+                  className="rounded-full bg-slate-50 px-2.5 py-1 text-[11px] font-bold text-slate-600 transition hover:bg-teal-50 hover:text-teal-700 disabled:opacity-50"
+                >
+                  改筆記名
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setMoveMenuNoteId((current) => (current === note.id ? "" : note.id))}
+                  disabled={outlineSaving}
+                  aria-expanded={moveMenuNoteId === note.id}
+                  className="rounded-full bg-slate-50 px-2.5 py-1 text-[11px] font-bold text-slate-600 transition hover:bg-amber-50 hover:text-amber-700 disabled:opacity-50"
+                >
+                  移動
+                </button>
+              </div>
+              {moveMenuNoteId === note.id ? (
+                <div className="mt-2 rounded-2xl border border-slate-100 bg-white/95 p-2 shadow-sm">
+                  <p className="px-1 pb-1 text-[10px] font-black uppercase tracking-[0.18em] text-slate-400">
+                    移到
+                  </p>
+                  <div className="grid grid-cols-2 gap-1">
+                    {NOTE_MOVE_SUBJECTS.map((targetSubject) => {
+                      const isMicrobiologyTarget = isMicrobiologyImmunologySubject(targetSubject);
+                      return (
+                        <div key={targetSubject} className={isMicrobiologyTarget ? "col-span-2" : ""}>
+                          <button
+                            type="button"
+                            onClick={() => void handleMoveNoteDestination(note, targetSubject)}
+                            disabled={outlineSaving}
+                            className="w-full rounded-xl bg-slate-50 px-2 py-1.5 text-left text-[11px] font-bold text-slate-600 transition hover:bg-teal-50 hover:text-teal-800 disabled:opacity-50"
+                          >
+                            {subjectRegistry[targetSubject].label.replace(/（.*）/g, "")}
+                          </button>
+                          {isMicrobiologyTarget ? (
+                            <div className="mt-1 grid grid-cols-3 gap-1 pl-2">
+                              {MICROBIOLOGY_IMMUNOLOGY_CATEGORIES.map((item) => (
+                                <button
+                                  key={item.id}
+                                  type="button"
+                                  onClick={() => void handleMoveNoteDestination(note, targetSubject, item.id)}
+                                  disabled={outlineSaving}
+                                  className="rounded-xl bg-teal-50 px-2 py-1 text-[10px] font-black text-teal-700 transition hover:bg-teal-100 disabled:opacity-50"
+                                >
+                                  {item.label}
+                                </button>
+                              ))}
+                            </div>
+                          ) : null}
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              ) : null}
+            </>
           ) : null}
         </div>
       </div>
