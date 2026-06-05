@@ -670,9 +670,40 @@ export function normalizeStudyNoteMarkdown(rawText: string) {
   const output: string[] = [];
   let tableRows: string[][] = [];
   let pipeTableRows: string[][] = [];
+  let codeFence: "```" | "~~~" | null = null;
+
+  function flushOpenTables() {
+    if (tableRows.length > 0) {
+      flushTable(tableRows, output);
+      tableRows = [];
+    }
+    if (pipeTableRows.length > 0) {
+      flushPipeTable(pipeTableRows, output);
+      pipeTableRows = [];
+    }
+  }
 
   lines.forEach((line, index) => {
     const trimmed = line.trim();
+    const normalizedFenceLine = line.replace(/^\s*#{1,6}\s*(```|~~~)/, "$1");
+    const fenceMatch = normalizedFenceLine.match(/^\s*(```|~~~)/);
+
+    if (codeFence) {
+      output.push(normalizedFenceLine);
+      if (fenceMatch?.[1] === codeFence) {
+        codeFence = null;
+      }
+      return;
+    }
+
+    if (fenceMatch) {
+      flushOpenTables();
+      ensureBlankBeforeBlock(output);
+      output.push(normalizedFenceLine);
+      codeFence = fenceMatch[1] as "```" | "~~~";
+      return;
+    }
+
     const previousLine = lines[index - 1] ?? "";
     const nextLine = lines[index + 1] ?? "";
     const isPipeTableLine = looksLikeMarkdownPipeTableLine(line);

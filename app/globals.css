@@ -664,14 +664,17 @@ select {
   }
 
   .note-markdown pre {
-    @apply max-w-full overflow-x-auto rounded-2xl p-4 text-sm;
-    background: #102a22;
-    color: #f8fafc;
+    @apply max-w-full overflow-x-auto rounded-[1.75rem] border p-5 text-sm shadow-sm;
+    background: color-mix(in srgb, var(--surface-muted) 55%, white);
+    border-color: var(--line-soft);
+    color: var(--ink-main);
     white-space: pre;
+    line-height: 1.75;
   }
 
   .note-markdown pre code {
     @apply bg-transparent p-0 text-inherit;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
   }
 
   .note-markdown table {
