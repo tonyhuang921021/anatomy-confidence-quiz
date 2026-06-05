@@ -21,6 +21,8 @@ type WeakSectionInsight = {
 
 const MIN_TOTAL_ATTEMPTS_FOR_DIAGNOSIS = 10;
 const MIN_SECTION_ATTEMPTS_FOR_DIAGNOSIS = 2;
+const WEAKNESS_ROTATION_INTERVAL_MS = 6 * 60 * 60 * 1000;
+const MAX_ROTATING_WEAK_SECTIONS = 5;
 
 function round(value: number) {
   return Math.round(value * 10) / 10;
@@ -28,7 +30,7 @@ function round(value: number) {
 
 function getWeakSectionInsight(sessions: QuizSession[]): {
   totalAttempts: number;
-  insight: WeakSectionInsight | null;
+  insights: WeakSectionInsight[];
 } {
   const questions = getQuestionBankBySubjectFilter("全部");
   const questionMap = new Map(questions.map((question) => [question.id, question] as const));
@@ -91,13 +93,23 @@ function getWeakSectionInsight(sessions: QuizSession[]): {
 
   return {
     totalAttempts: attempts.length,
-    insight: attempts.length >= MIN_TOTAL_ATTEMPTS_FOR_DIAGNOSIS ? ranked[0] ?? null : null
+    insights: attempts.length >= MIN_TOTAL_ATTEMPTS_FOR_DIAGNOSIS ? ranked : []
   };
+}
+
+function getWeaknessRotationBucket() {
+  return Math.floor(Date.now() / WEAKNESS_ROTATION_INTERVAL_MS);
+}
+
+function getNextWeaknessRotationDelay() {
+  const nextBoundary = (getWeaknessRotationBucket() + 1) * WEAKNESS_ROTATION_INTERVAL_MS;
+  return Math.max(nextBoundary - Date.now(), 60_000);
 }
 
 export function HomeWeaknessInsight() {
   const { syncVersion } = useAuth();
   const [sessions, setSessions] = useState<QuizSession[]>([]);
+  const [rotationBucket, setRotationBucket] = useState(getWeaknessRotationBucket);
 
   useEffect(() => {
     function refreshSessions() {
@@ -111,7 +123,22 @@ export function HomeWeaknessInsight() {
     };
   }, [syncVersion]);
 
-  const { totalAttempts, insight } = useMemo(() => getWeakSectionInsight(sessions), [sessions]);
+  useEffect(() => {
+    const timeoutId = window.setTimeout(() => {
+      setRotationBucket(getWeaknessRotationBucket());
+    }, getNextWeaknessRotationDelay());
+
+    return () => {
+      window.clearTimeout(timeoutId);
+    };
+  }, [rotationBucket]);
+
+  const { totalAttempts, insights } = useMemo(() => getWeakSectionInsight(sessions), [sessions]);
+  const insight = useMemo(() => {
+    if (insights.length === 0) return null;
+    const rotatingPool = insights.slice(0, MAX_ROTATING_WEAK_SECTIONS);
+    return rotatingPool[rotationBucket % rotatingPool.length] ?? rotatingPool[0] ?? null;
+  }, [insights, rotationBucket]);
   const neededAttempts = Math.max(MIN_TOTAL_ATTEMPTS_FOR_DIAGNOSIS - totalAttempts, 0);
 
   if (!insight) {
