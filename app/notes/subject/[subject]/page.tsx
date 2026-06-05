@@ -444,7 +444,7 @@ export default function SubjectNotesPage() {
     }
   }
 
-  function handleDropOnFolder(event: React.DragEvent<HTMLElement>, collection?: StudyNoteCollection) {
+  function handleDropOnRootCollection(event: React.DragEvent<HTMLElement>, collection?: StudyNoteCollection) {
     if (!outlineEditMode) return;
     event.preventDefault();
     const payload = readDragPayload(event.dataTransfer);
@@ -461,9 +461,7 @@ export default function SubjectNotesPage() {
       return;
     }
 
-    if (payload.type === "collection" && collection) {
-      finishRootDrag();
-    }
+    finishRootDrag();
   }
 
   function handleDropOnRoot(event: React.DragEvent<HTMLElement>) {
@@ -478,6 +476,21 @@ export default function SubjectNotesPage() {
     } else {
       finishDrag();
     }
+  }
+
+  function handleDropOnRootItem(event: React.DragEvent<HTMLElement>) {
+    if (!outlineEditMode) return;
+    event.preventDefault();
+    const payload = readDragPayload(event.dataTransfer);
+    if (payload?.type === "note") {
+      const note = notesRef.current.find((item) => item.id === payload.id);
+      if (note?.collectionId) {
+        void handleMoveNoteToCollection(note, undefined);
+        finishDrag();
+        return;
+      }
+    }
+    finishRootDrag();
   }
 
   async function handleToggleStar(noteId: string) {
@@ -697,11 +710,11 @@ export default function SubjectNotesPage() {
         }}
         onDrop={(event) => {
           if (!outlineEditMode) return;
-          event.preventDefault();
           if (nested) {
+            event.preventDefault();
             finishDrag();
           } else {
-            finishRootDrag();
+            handleDropOnRootItem(event);
           }
         }}
         data-dragging={draggingNoteId === note.id}
@@ -859,7 +872,7 @@ export default function SubjectNotesPage() {
                           event.dataTransfer.dropEffect = "move";
                           if (group.collection) previewDraggedRootItem(groupKey);
                         }}
-                        onDrop={(event) => handleDropOnFolder(event, group.collection)}
+                        onDrop={(event) => handleDropOnRootCollection(event, group.collection)}
                       >
                         <div
                           className="group flex items-center gap-2 rounded-xl px-2 py-2 text-slate-700 transition hover:bg-teal-50"
