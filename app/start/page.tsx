@@ -29,12 +29,21 @@ const selectableSubjects = enabledSubjects.filter(
     (MED1_SUBJECTS.includes(item.subject) || MED2_SUBJECTS.includes(item.subject))
 );
 
+const MICROBIOLOGY_SUBJECT: SubjectName = "微生物免疫學";
+const MICROBIOLOGY_TRACKS = [
+  { label: "病毒", chapter: "病毒學" },
+  { label: "細菌", chapter: "細菌學" },
+  { label: "免疫", chapter: "免疫學" }
+] as const;
+
 export default function StartPage() {
   const router = useRouter();
   const { user } = useAuth();
   const med1Subjects = selectableSubjects.filter((item) => MED1_SUBJECTS.includes(item.subject));
   const med2Subjects = selectableSubjects.filter((item) => MED2_SUBJECTS.includes(item.subject));
   const [selectedSubjects, setSelectedSubjects] = useState<SubjectName[]>([]);
+  const [microbiologyExpanded, setMicrobiologyExpanded] = useState(false);
+  const [selectedMicrobiologyChapters, setSelectedMicrobiologyChapters] = useState<string[]>([]);
   const [includeSeasonalLimited, setIncludeSeasonalLimited] = useState(false);
   const seasonalLimitedQuestions = useMemo(() => getSeasonalLimitedQuestions(), []);
   const seasonalLimitedPastExamCount = useMemo(
@@ -83,14 +92,41 @@ export default function StartPage() {
     setPracticeStopAfterReview(nextStopAfterReview);
   }, [user?.id, user?.user_metadata]);
 
-  const availableQuestionCount = useMemo(() => {
-    const subjectQuestionPool = selectedSubjects.length > 0
-      ? selectableSubjects
-          .filter((item) => selectedSubjects.includes(item.subject))
-          .flatMap((item) => item.questions)
-      : [];
+  useEffect(() => {
+    setSelectedSubjects((current) => {
+      const hasMicrobiology = current.includes(MICROBIOLOGY_SUBJECT);
 
-    const filteredSubjectQuestions = subjectQuestionPool.filter((question) => {
+      if (selectedMicrobiologyChapters.length > 0) {
+        return hasMicrobiology ? current : [...current, MICROBIOLOGY_SUBJECT];
+      }
+
+      return hasMicrobiology
+        ? current.filter((subject) => subject !== MICROBIOLOGY_SUBJECT)
+        : current;
+    });
+  }, [selectedMicrobiologyChapters]);
+
+  const selectedSubjectQuestionPool = useMemo(() => {
+    if (selectedSubjects.length === 0) return [];
+
+    return selectableSubjects
+      .filter((item) => selectedSubjects.includes(item.subject))
+      .flatMap((item) => {
+        if (
+          item.subject === MICROBIOLOGY_SUBJECT &&
+          selectedMicrobiologyChapters.length > 0
+        ) {
+          return item.questions.filter((question) =>
+            selectedMicrobiologyChapters.includes(question.chapter)
+          );
+        }
+
+        return item.questions;
+      });
+  }, [selectedMicrobiologyChapters, selectedSubjects]);
+
+  const availableQuestionCount = useMemo(() => {
+    const filteredSubjectQuestions = selectedSubjectQuestionPool.filter((question) => {
       if (excludeAiGenerated && question.sourceType === "AI_GENERATED") return false;
       if (
         typeof question.sourceYear === "number" &&
@@ -123,18 +159,37 @@ export default function StartPage() {
     practiceYearRange.yearFrom,
     practiceYearRange.yearTo,
     seasonalLimitedQuestions,
-    selectedSubjects
+    selectedSubjectQuestionPool
   ]);
   const effectiveQuestionCount = practiceStopAfterReview
     ? availableQuestionCount
     : Math.min(practiceQuestionCount, availableQuestionCount);
 
   function toggleSubject(subject: SubjectName) {
+    if (subject === MICROBIOLOGY_SUBJECT) {
+      setMicrobiologyExpanded((current) => !current);
+      return;
+    }
+
     setSelectedSubjects((current) =>
       current.includes(subject)
         ? current.filter((item) => item !== subject)
         : [...current, subject]
     );
+  }
+
+  function toggleMicrobiologyChapter(chapter: string) {
+    setSelectedMicrobiologyChapters((current) =>
+      current.includes(chapter)
+        ? current.filter((item) => item !== chapter)
+        : [...current, chapter]
+    );
+  }
+
+  function selectAllSubjects() {
+    setSelectedSubjects(selectableSubjects.map((item) => item.subject));
+    setSelectedMicrobiologyChapters(MICROBIOLOGY_TRACKS.map((track) => track.chapter));
+    setMicrobiologyExpanded(true);
   }
 
   function renderSubjectGroup(
@@ -150,7 +205,88 @@ export default function StartPage() {
         <div className="mt-4 grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
           {subjects.map((subject) => {
             const active = selectedSubjects.includes(subject.subject);
-            const pastExamCount = subject.questions.filter((question) => question.sourceType !== "AI_GENERATED").length;
+            const isMicrobiology = subject.subject === MICROBIOLOGY_SUBJECT;
+            const selectedMicrobiologyQuestionCount = isMicrobiology && selectedMicrobiologyChapters.length > 0
+              ? subject.questions.filter(
+                  (question) =>
+                    question.sourceType !== "AI_GENERATED" &&
+                    selectedMicrobiologyChapters.includes(question.chapter)
+                ).length
+              : null;
+            const pastExamCount =
+              selectedMicrobiologyQuestionCount ??
+              subject.questions.filter((question) => question.sourceType !== "AI_GENERATED").length;
+
+            if (isMicrobiology) {
+              return (
+                <div
+                  key={subject.subject}
+                  className={`rounded-[1.6rem] border p-4 text-left transition ${
+                    active
+                      ? "border-brand-400 bg-white shadow-card ring-1 ring-brand-200"
+                      : "border-slate-200/80 bg-white/80 hover:bg-white"
+                  }`}
+                >
+                  <button
+                    type="button"
+                    onClick={() => toggleSubject(subject.subject)}
+                    className="w-full text-left"
+                    aria-expanded={microbiologyExpanded}
+                  >
+                    <div className="flex items-center justify-between gap-3">
+                      <div className="flex min-w-0 items-center gap-2">
+                        <h3 className="truncate text-base font-semibold text-ink sm:text-lg">{subject.label}</h3>
+                        <span className="shrink-0 rounded-full bg-slate-100 px-2.5 py-1 text-[11px] font-semibold text-slate-600">
+                          {pastExamCount} 題
+                        </span>
+                      </div>
+                      <span className="shrink-0 rounded-full bg-slate-100 px-2.5 py-1 text-[11px] font-semibold text-slate-600">
+                        {microbiologyExpanded ? "收合" : "選分類"}
+                      </span>
+                    </div>
+                    {active ? (
+                      <p className="mt-3 text-xs font-semibold text-brand-700">
+                        已選 {selectedMicrobiologyChapters.map((chapter) => chapter.replace("學", "")).join("、")}
+                      </p>
+                    ) : (
+                      <p className="mt-3 text-xs text-slate-500">點開後選病毒、細菌或免疫。</p>
+                    )}
+                  </button>
+
+                  {microbiologyExpanded ? (
+                    <div className="mt-4 grid gap-2 sm:grid-cols-3">
+                      {MICROBIOLOGY_TRACKS.map((track) => {
+                        const trackActive = selectedMicrobiologyChapters.includes(track.chapter);
+                        const trackCount = subject.questions.filter(
+                          (question) =>
+                            question.chapter === track.chapter &&
+                            question.sourceType !== "AI_GENERATED"
+                        ).length;
+
+                        return (
+                          <button
+                            key={track.chapter}
+                            type="button"
+                            onClick={() => toggleMicrobiologyChapter(track.chapter)}
+                            className={`rounded-2xl border px-3 py-3 text-center text-sm font-semibold transition ${
+                              trackActive
+                                ? "border-brand-500 bg-brand-600 text-white shadow-sm"
+                                : "border-slate-200 bg-slate-50 text-slate-700 hover:bg-white"
+                            }`}
+                          >
+                            <span className="block">{track.label}</span>
+                            <span className={trackActive ? "text-white/80" : "text-slate-400"}>
+                              {trackCount} 題
+                            </span>
+                          </button>
+                        );
+                      })}
+                    </div>
+                  ) : null}
+                </div>
+              );
+            }
+
             return (
               <button
                 key={subject.subject}
@@ -186,6 +322,25 @@ export default function StartPage() {
   function handleStart() {
     if ((selectedSubjects.length === 0 && !includeSeasonalLimited) || availableQuestionCount === 0) return;
 
+    const shouldUseExactStartPool = selectedMicrobiologyChapters.length > 0;
+    const exactStartQuestionIds = shouldUseExactStartPool
+      ? Array.from(
+          new Set(
+            [
+              ...selectedSubjectQuestionPool,
+              ...(includeSeasonalLimited
+                ? seasonalLimitedQuestions.filter(
+                    (question) => !excludeAiGenerated || question.sourceType !== "AI_GENERATED"
+                  )
+                : [])
+            ].map((question) => question.id)
+          )
+        )
+      : undefined;
+    const selectedMicrobiologyLabels = MICROBIOLOGY_TRACKS
+      .filter((track) => selectedMicrobiologyChapters.includes(track.chapter))
+      .map((track) => track.label);
+
     const nextSettings: QuizSettings = {
       ...DEFAULT_QUIZ_SETTINGS,
       mode: "random",
@@ -197,12 +352,23 @@ export default function StartPage() {
         selectedSubjects.length === 1 && !includeSeasonalLimited ? selectedSubjects[0] : "全部",
       subjectFilters: selectedSubjects,
       excludeAiGenerated,
-      customQuestionIds: includeSeasonalLimited
+      customQuestionIds: exactStartQuestionIds ?? (includeSeasonalLimited
         ? seasonalLimitedQuestions
             .filter((question) => !excludeAiGenerated || question.sourceType !== "AI_GENERATED")
             .map((question) => question.id)
-        : undefined,
-      customPoolLabel: includeSeasonalLimited ? "季節限定" : undefined,
+        : undefined),
+      strictCustomQuestionPool: shouldUseExactStartPool,
+      customPoolLabel: shouldUseExactStartPool
+        ? `開始測驗：${[
+            ...selectedSubjects.filter((subject) => subject !== MICROBIOLOGY_SUBJECT),
+            selectedMicrobiologyLabels.length > 0
+              ? `微生物免疫學（${selectedMicrobiologyLabels.join("、")}）`
+              : null,
+            includeSeasonalLimited ? "季節限定" : null
+          ].filter(Boolean).join("、")}`
+        : includeSeasonalLimited
+          ? "季節限定"
+          : undefined,
       chapter: undefined,
       section: undefined
     };
@@ -289,7 +455,7 @@ export default function StartPage() {
           <div className="flex flex-wrap gap-3">
             <button
               type="button"
-              onClick={() => setSelectedSubjects(selectableSubjects.map((item) => item.subject))}
+              onClick={selectAllSubjects}
               className="secondary-pill bg-white px-4 py-3"
             >
               全選

@@ -249,6 +249,10 @@ function selectLocalQuestionSet(
     );
 
     if (mergedCustomQuestions.length > 0) {
+      if (settings.strictCustomQuestionPool) {
+        return mergedCustomQuestions;
+      }
+
       if (
         settings.mode === "custom_paper" ||
         settings.mode === "peak_challenge" ||

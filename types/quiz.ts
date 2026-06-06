@@ -108,6 +108,7 @@ export type QuizSettings = {
   customQuestionIds?: string[];
   customQuestionPayload?: Question[];
   customPoolLabel?: string;
+  strictCustomQuestionPool?: boolean;
   chapter?: string;
   section?: string;
   feedbackMode?: SimulationFeedbackMode;
