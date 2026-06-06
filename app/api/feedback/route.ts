@@ -103,38 +103,40 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ ok: false, message: "目前無法識別留言來源，請稍後再試。" }, { status: 400 });
     }
 
-    const now = Date.now();
-    const hourAgo = new Date(now - 60 * 60 * 1000).toISOString();
-    const dayAgo = new Date(now - 24 * 60 * 60 * 1000).toISOString();
+    if (!isLoggedIn) {
+      const now = Date.now();
+      const hourAgo = new Date(now - 60 * 60 * 1000).toISOString();
+      const dayAgo = new Date(now - 24 * 60 * 60 * 1000).toISOString();
 
-    const [hourResult, dayResult] = await Promise.all([
-      supabase
-        .from("feedback_messages")
-        .select("*", { count: "exact", head: true })
-        .eq(actorColumn, actorValue)
-        .gte("created_at", hourAgo),
-      supabase
-        .from("feedback_messages")
-        .select("*", { count: "exact", head: true })
-        .eq(actorColumn, actorValue)
-        .gte("created_at", dayAgo)
-    ]);
+      const [hourResult, dayResult] = await Promise.all([
+        supabase
+          .from("feedback_messages")
+          .select("*", { count: "exact", head: true })
+          .eq(actorColumn, actorValue)
+          .gte("created_at", hourAgo),
+        supabase
+          .from("feedback_messages")
+          .select("*", { count: "exact", head: true })
+          .eq(actorColumn, actorValue)
+          .gte("created_at", dayAgo)
+      ]);
 
-    if (hourResult.error) throw hourResult.error;
-    if (dayResult.error) throw dayResult.error;
+      if (hourResult.error) throw hourResult.error;
+      if (dayResult.error) throw dayResult.error;
 
-    if ((hourResult.count ?? 0) >= FEEDBACK_HOURLY_LIMIT) {
-      return NextResponse.json(
-        { ok: false, message: `留言太快了，1 小時內最多 ${FEEDBACK_HOURLY_LIMIT} 則，請稍後再試。` },
-        { status: 429 }
-      );
-    }
+      if ((hourResult.count ?? 0) >= FEEDBACK_HOURLY_LIMIT) {
+        return NextResponse.json(
+          { ok: false, message: `留言太快了，1 小時內最多 ${FEEDBACK_HOURLY_LIMIT} 則，請稍後再試。` },
+          { status: 429 }
+        );
+      }
 
-    if ((dayResult.count ?? 0) >= FEEDBACK_DAILY_LIMIT) {
-      return NextResponse.json(
-        { ok: false, message: `今天留言已達上限，24 小時內最多 ${FEEDBACK_DAILY_LIMIT} 則。` },
-        { status: 429 }
-      );
+      if ((dayResult.count ?? 0) >= FEEDBACK_DAILY_LIMIT) {
+        return NextResponse.json(
+          { ok: false, message: `今天留言已達上限，24 小時內最多 ${FEEDBACK_DAILY_LIMIT} 則。` },
+          { status: 429 }
+        );
+      }
     }
 
     const isAnonymous = !verifiedUser || Boolean(body?.isAnonymous);
