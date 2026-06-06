@@ -498,13 +498,54 @@ function splitCollapsedPipeTableRows(line: string) {
 }
 
 function normalizeTableContinuationText(line: string) {
-  return line
+  return normalizeInlineStudyNoteSyntax(line)
     .trim()
     .replace(/^<br\s*\/?>\s*/i, "")
     .replace(/<br\s*\/?>/gi, "； ")
     .replace(/\s+/g, " ")
     .replace(/。\s*；/g, "；")
     .trim();
+}
+
+const INLINE_LATEX_REPLACEMENTS: Array<[RegExp, string]> = [
+  [/\\+alpha/g, "α"],
+  [/\\+beta/g, "β"],
+  [/\\+gamma/g, "γ"],
+  [/\\+delta/g, "δ"],
+  [/\\+epsilon/g, "ε"],
+  [/\\+theta/g, "θ"],
+  [/\\+lambda/g, "λ"],
+  [/\\+mu/g, "μ"],
+  [/\\+pi/g, "π"],
+  [/\\+sigma/g, "σ"],
+  [/\\+tau/g, "τ"],
+  [/\\+omega/g, "ω"],
+  [/\\+pm/g, "±"],
+  [/\\+times/g, "×"],
+  [/\\+rightarrow/g, "→"],
+  [/\\+leftarrow/g, "←"],
+  [/\\+geq/g, "≥"],
+  [/\\+leq/g, "≤"]
+];
+
+function normalizeInlineLatexContent(value: string) {
+  let normalized = value.replace(/\s*-\s*/g, "-");
+  INLINE_LATEX_REPLACEMENTS.forEach(([pattern, replacement]) => {
+    normalized = normalized.replace(pattern, replacement);
+  });
+  return normalized.replace(/\s+/g, " ").trim();
+}
+
+function normalizeInlineStudyNoteSyntax(line: string) {
+  let normalized = line
+    .replace(/\$([^$\n]+)\$/g, (_match, content: string) => normalizeInlineLatexContent(content))
+    .replace(/\\\(([^()\n]+)\\\)/g, (_match, content: string) => normalizeInlineLatexContent(content));
+
+  INLINE_LATEX_REPLACEMENTS.forEach(([pattern, replacement]) => {
+    normalized = normalized.replace(pattern, replacement);
+  });
+
+  return normalized;
 }
 
 function getNextNonEmptyLine(lines: string[], startIndex: number) {
@@ -694,8 +735,9 @@ export function normalizeStudyNoteMarkdown(rawText: string) {
   }
 
   lines.forEach((line, index) => {
-    const trimmed = line.trim();
-    const normalizedFenceLine = line.replace(/^\s*#{1,6}\s*(```|~~~)/, "$1");
+    const normalizedLine = normalizeInlineStudyNoteSyntax(line);
+    const trimmed = normalizedLine.trim();
+    const normalizedFenceLine = normalizedLine.replace(/^\s*#{1,6}\s*(```|~~~)/, "$1");
     const fenceMatch = normalizedFenceLine.match(/^\s*(```|~~~)/);
 
     if (codeFence) {
@@ -716,14 +758,14 @@ export function normalizeStudyNoteMarkdown(rawText: string) {
 
     const previousLine = lines[index - 1] ?? "";
     const nextLine = lines[index + 1] ?? "";
-    const isPipeTableLine = looksLikeMarkdownPipeTableLine(line);
+    const isPipeTableLine = looksLikeMarkdownPipeTableLine(normalizedLine);
 
-    if (looksLikePlainTableLine(line)) {
+    if (looksLikePlainTableLine(normalizedLine)) {
       if (pipeTableRows.length > 0) {
         flushPipeTable(pipeTableRows, output);
         pipeTableRows = [];
       }
-      tableRows.push(splitTableCells(line));
+      tableRows.push(splitTableCells(normalizedLine));
       return;
     }
 
@@ -734,7 +776,7 @@ export function normalizeStudyNoteMarkdown(rawText: string) {
 
     if (isPipeTableLine) {
       if (pipeTableRows.length === 0) ensureBlankBeforeBlock(output);
-      pipeTableRows.push(splitPipeTableCells(line));
+      pipeTableRows.push(splitPipeTableCells(normalizedLine));
       return;
     }
 
@@ -747,18 +789,18 @@ export function normalizeStudyNoteMarkdown(rawText: string) {
       output.push("");
     }
 
-    if (isDividerLine(line)) {
+    if (isDividerLine(normalizedLine)) {
       output.push("---");
       return;
     }
 
-    const headingLevel = getHeadingLevel(line, previousLine, nextLine);
+    const headingLevel = getHeadingLevel(normalizedLine, previousLine, nextLine);
     if (headingLevel > 0) {
       output.push(`${"#".repeat(headingLevel)} ${trimmed}`);
       return;
     }
 
-    output.push(line);
+    output.push(normalizedLine);
   });
 
   if (tableRows.length > 0) {

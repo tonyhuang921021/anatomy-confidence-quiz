@@ -716,16 +716,16 @@ select {
   }
 
   .note-markdown table {
-    @apply block w-full max-w-full overflow-x-auto rounded-2xl border text-sm shadow-sm;
+    @apply w-full max-w-full rounded-2xl border text-sm shadow-sm;
     border-color: var(--line-soft);
     border-collapse: separate;
     border-spacing: 0;
-    -webkit-overflow-scrolling: touch;
+    table-layout: fixed;
   }
 
   .note-markdown th,
   .note-markdown td {
-    @apply min-w-[8rem] border-b px-3 py-2 text-left align-top;
+    @apply border-b px-3 py-2 text-left align-top;
     border-color: var(--line-soft);
     overflow-wrap: break-word;
   }
@@ -751,6 +751,12 @@ select {
     .note-markdown th,
     .note-markdown td {
       @apply min-w-[5.5rem] px-2 py-2 text-xs;
+    }
+
+    .note-markdown table {
+      @apply block overflow-x-auto;
+      table-layout: auto;
+      -webkit-overflow-scrolling: touch;
     }
 
     .note-markdown pre {
