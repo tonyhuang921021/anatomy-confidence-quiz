@@ -63,17 +63,26 @@ type OutlineDragPayload =
   | { type: "note"; id: string }
   | { type: "collection"; id: string };
 
+type NoteUndoSnapshot = {
+  noteId: string;
+  rawMarkdown: string;
+};
+
 const NOTE_MOVE_SUBJECTS = [...MED1_SUBJECTS, ...MED2_SUBJECTS];
 const NOTE_TEXT_COLORS = [
-  { id: "red", label: "紅色", value: "#b44747" },
-  { id: "green", label: "綠色", value: "#2f7d63" },
-  { id: "blue", label: "藍色", value: "#2f6f9f" },
-  { id: "amber", label: "琥珀", value: "#9a651f" },
-  { id: "purple", label: "紫色", value: "#7453a6" },
-  { id: "black", label: "黑色", value: "#102a22" }
+  { id: "red", label: "鮮紅", value: "#ff1744" },
+  { id: "green", label: "亮綠", value: "#00c853" },
+  { id: "blue", label: "亮藍", value: "#2979ff" },
+  { id: "orange", label: "橘色", value: "#ff9100" },
+  { id: "purple", label: "亮紫", value: "#d500f9" },
+  { id: "black", label: "黑色", value: "#050816" }
 ] as const;
+const NOTE_BACKGROUND_HIGHLIGHT = { id: "yellow", label: "亮黃背景", value: "#fff176" } as const;
 
 type NoteTextColorId = (typeof NOTE_TEXT_COLORS)[number]["id"];
+type NoteMarkKind = `color-${NoteTextColorId}` | "bg-yellow";
+
+const NOTE_MARK_LINK_PATTERN = /\[((?:\\.|[^\]\\])*)\]\(#note-(?:color-[a-z]+|bg-yellow)\)/g;
 
 function escapeMarkdownLinkText(value: string) {
   return value
@@ -81,6 +90,32 @@ function escapeMarkdownLinkText(value: string) {
     .replace(/\]/g, "\\]")
     .replace(/\[/g, "\\[")
     .replace(/\n+/g, " ");
+}
+
+function unescapeMarkdownLinkText(value: string) {
+  return value.replace(/\\([\[\]\\])/g, "$1");
+}
+
+function createNoteMark(text: string, kind: NoteMarkKind) {
+  return `[${escapeMarkdownLinkText(text)}](#note-${kind})`;
+}
+
+function replaceSelectedTextWithNoteMark(markdown: string, selectedText: string, kind: NoteMarkKind) {
+  const normalizedSelectedText = selectedText.replace(/\s+/g, " ").trim();
+  if (!normalizedSelectedText) return null;
+
+  NOTE_MARK_LINK_PATTERN.lastIndex = 0;
+  let match: RegExpExecArray | null;
+  while ((match = NOTE_MARK_LINK_PATTERN.exec(markdown))) {
+    const markedText = unescapeMarkdownLinkText(match[1]).replace(/\s+/g, " ").trim();
+    if (markedText === normalizedSelectedText) {
+      return `${markdown.slice(0, match.index)}${createNoteMark(markedText, kind)}${markdown.slice(match.index + match[0].length)}`;
+    }
+  }
+
+  const directIndex = markdown.indexOf(normalizedSelectedText);
+  if (directIndex < 0) return null;
+  return `${markdown.slice(0, directIndex)}${createNoteMark(normalizedSelectedText, kind)}${markdown.slice(directIndex + normalizedSelectedText.length)}`;
 }
 
 function getAutoCategoryFolderPrefixes(category?: string | null) {
@@ -139,6 +174,7 @@ export default function SubjectNotesPage() {
   const [selectedTextColor, setSelectedTextColor] = useState<NoteTextColorId>("red");
   const [colorPickerOpen, setColorPickerOpen] = useState(false);
   const [colorApplyMessage, setColorApplyMessage] = useState("");
+  const [noteUndoStack, setNoteUndoStack] = useState<NoteUndoSnapshot[]>([]);
   const [explanationOverrides, setExplanationOverrides] = useState<Record<string, QuestionExplanationOverride>>({});
   const [explanationLoadingMap, setExplanationLoadingMap] = useState<Record<string, boolean>>({});
   const [explanationErrorMap, setExplanationErrorMap] = useState<Record<string, string>>({});
@@ -945,14 +981,56 @@ export default function SubjectNotesPage() {
     window.scrollTo({ top: 0, behavior: "smooth" });
   }
 
-  async function handleApplySelectedTextColor() {
+  async function persistNoteMarkdownChange(
+    note: StudyNoteDetail,
+    nextMarkdown: string,
+    previousNotes: StudyNoteDetail[],
+    successMessage: string
+  ) {
+    const optimisticNotes = previousNotes.map((item) =>
+      item.id === note.id ? { ...item, rawMarkdown: nextMarkdown } : item
+    );
+
+    notesRef.current = optimisticNotes;
+    setNotes(optimisticNotes);
+    setOutlineSaving(true);
+    setColorApplyMessage(successMessage);
+
+    try {
+      const updated = await updateStudyNote({
+        accessToken: session?.access_token ?? "",
+        id: note.id,
+        title: note.title,
+        rawMarkdown: nextMarkdown,
+        summary: note.summary,
+        subject: note.subject,
+        chapter: note.chapter,
+        section: note.section,
+        collectionName: note.collectionName,
+        tags: note.tags,
+        questionLinks: note.questionLinks
+      });
+      setNotes((currentNotes) =>
+        currentNotes.map((item) => (item.id === updated.id ? updated : item))
+      );
+    } catch (rawError) {
+      notesRef.current = previousNotes;
+      setNotes(previousNotes);
+      setColorApplyMessage("更新失敗");
+      setError(rawError instanceof Error ? rawError.message : "筆記更新失敗");
+    } finally {
+      setOutlineSaving(false);
+    }
+  }
+
+  async function handleApplySelectedTextMark(kind: NoteMarkKind) {
     if (!session?.access_token || outlineSaving) return;
     if (typeof window === "undefined") return;
 
     const selection = window.getSelection();
     const selectedText = selection?.toString().replace(/\s+/g, " ").trim() ?? "";
     if (!selection || selection.rangeCount === 0 || !selectedText) {
-      setColorApplyMessage("先選取要標色的文字");
+      setColorApplyMessage("先選取文字");
       return;
     }
 
@@ -986,48 +1064,40 @@ export default function SubjectNotesPage() {
     const matchedText = candidates.find((value) => normalizedMarkdown.includes(value));
 
     if (!matchedText) {
-      setColorApplyMessage("這段文字太複雜，請改到編輯頁標色");
+      setColorApplyMessage("這段文字太複雜");
       return;
     }
 
-    const coloredText = `[${escapeMarkdownLinkText(matchedText)}](#note-color-${selectedTextColor})`;
-    const nextMarkdown = normalizedMarkdown.replace(matchedText, coloredText);
-    const previousNotes = notesRef.current;
-    const optimisticNotes = previousNotes.map((item) =>
-      item.id === note.id ? { ...item, rawMarkdown: nextMarkdown } : item
-    );
-
-    notesRef.current = optimisticNotes;
-    setNotes(optimisticNotes);
-    setOutlineSaving(true);
-    setColorApplyMessage("已標色");
-
-    try {
-      const updated = await updateStudyNote({
-        accessToken: session.access_token,
-        id: note.id,
-        title: note.title,
-        rawMarkdown: nextMarkdown,
-        summary: note.summary,
-        subject: note.subject,
-        chapter: note.chapter,
-        section: note.section,
-        collectionName: note.collectionName,
-        tags: note.tags,
-        questionLinks: note.questionLinks
-      });
-      setNotes((currentNotes) =>
-        currentNotes.map((item) => (item.id === updated.id ? updated : item))
-      );
-      selection.removeAllRanges();
-    } catch (rawError) {
-      notesRef.current = previousNotes;
-      setNotes(previousNotes);
-      setColorApplyMessage("標色失敗");
-      setError(rawError instanceof Error ? rawError.message : "文字標色失敗");
-    } finally {
-      setOutlineSaving(false);
+    const nextMarkdown = replaceSelectedTextWithNoteMark(normalizedMarkdown, matchedText, kind);
+    if (!nextMarkdown || nextMarkdown === normalizedMarkdown) {
+      setColorApplyMessage("已經是這個標記");
+      return;
     }
+
+    const previousNotes = notesRef.current;
+    setNoteUndoStack((current) => [...current, { noteId: note.id, rawMarkdown: note.rawMarkdown }].slice(-20));
+    await persistNoteMarkdownChange(note, nextMarkdown, previousNotes, kind === "bg-yellow" ? "已加背景" : "已改顏色");
+    selection.removeAllRanges();
+  }
+
+  async function handleUndoNoteMark() {
+    if (!session?.access_token || outlineSaving) return;
+    const snapshot = noteUndoStack[noteUndoStack.length - 1];
+    if (!snapshot) {
+      setColorApplyMessage("沒有上一步");
+      return;
+    }
+
+    const note = notesRef.current.find((item) => item.id === snapshot.noteId);
+    if (!note) {
+      setNoteUndoStack((current) => current.slice(0, -1));
+      setColorApplyMessage("找不到筆記");
+      return;
+    }
+
+    const previousNotes = notesRef.current;
+    setNoteUndoStack((current) => current.slice(0, -1));
+    await persistNoteMarkdownChange(note, snapshot.rawMarkdown, previousNotes, "已返回上一步");
   }
 
   function renderOutlineNote(note: StudyNoteDetail, nested = false) {
@@ -1473,8 +1543,18 @@ export default function SubjectNotesPage() {
             ) : null}
 
             <div className="fixed bottom-5 right-5 z-30 flex items-center gap-2 sm:bottom-6 sm:right-6">
+              <button
+                type="button"
+                onClick={() => void handleUndoNoteMark()}
+                disabled={outlineSaving || noteUndoStack.length === 0}
+                className="grid h-11 w-11 place-items-center rounded-full border border-white/60 bg-white/90 text-base font-black text-slate-700 shadow-xl shadow-slate-900/10 backdrop-blur transition hover:-translate-y-0.5 hover:bg-slate-950 hover:text-white disabled:cursor-not-allowed disabled:opacity-45"
+                aria-label="返回上一步文字標記"
+                title="返回上一步"
+              >
+                ↶
+              </button>
               <div className="note-color-tool relative flex items-center" data-open={colorPickerOpen}>
-                <div className="note-color-palette absolute right-12 flex items-center gap-1 rounded-full border border-white/70 bg-white/90 p-1.5 shadow-xl shadow-slate-900/10 backdrop-blur">
+                <div className="note-color-palette absolute bottom-14 right-0 flex items-center gap-1 rounded-full border border-white/70 bg-white/90 p-1.5 shadow-xl shadow-slate-900/10 backdrop-blur">
                   {NOTE_TEXT_COLORS.map((color) => (
                     <button
                       key={color.id}
@@ -1505,7 +1585,7 @@ export default function SubjectNotesPage() {
                 <button
                   type="button"
                   onMouseDown={(event) => event.preventDefault()}
-                  onClick={() => void handleApplySelectedTextColor()}
+                  onClick={() => void handleApplySelectedTextMark(`color-${selectedTextColor}`)}
                   className="grid h-11 w-11 place-items-center rounded-full border border-white/60 bg-white/90 shadow-xl shadow-slate-900/10 backdrop-blur transition hover:-translate-y-0.5 hover:bg-slate-50"
                   aria-label={`套用${selectedTextColorItem.label}文字顏色`}
                   title="選取文字後按一下標色"
@@ -1527,6 +1607,20 @@ export default function SubjectNotesPage() {
                   ‹
                 </button>
               </div>
+              <button
+                type="button"
+                onMouseDown={(event) => event.preventDefault()}
+                onClick={() => void handleApplySelectedTextMark("bg-yellow")}
+                className="grid h-11 w-11 place-items-center rounded-full border border-white/60 bg-white/90 shadow-xl shadow-slate-900/10 backdrop-blur transition hover:-translate-y-0.5 hover:bg-yellow-50"
+                aria-label="套用亮黃色文字背景"
+                title="選取文字後按一下加亮黃背景"
+              >
+                <span
+                  className="h-5 w-5 rounded-full border-2 border-white shadow-sm ring-1 ring-slate-200"
+                  style={{ backgroundColor: NOTE_BACKGROUND_HIGHLIGHT.value }}
+                  aria-hidden="true"
+                />
+              </button>
               <button
                 type="button"
                 onClick={scrollToTop}

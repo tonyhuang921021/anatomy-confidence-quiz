@@ -541,6 +541,13 @@ function normalizeInlineStudyNoteSyntax(line: string) {
     .replace(/\$([^$\n]+)\$/g, (_match, content: string) => normalizeInlineLatexContent(content))
     .replace(/\\\(([^()\n]+)\\\)/g, (_match, content: string) => normalizeInlineLatexContent(content));
 
+  normalized = normalized
+    .replace(
+      /\[\[((?:\\.|[^\]\\])*)\]\(#note-(?:color-[a-z]+|bg-yellow)\)\]\(#note-((?:color-[a-z]+)|bg-yellow)\)/g,
+      "[$1](#note-$2)"
+    )
+    .replace(/\[\]\(#note-(?:color-[a-z]+|bg-yellow)\)/g, "");
+
   INLINE_LATEX_REPLACEMENTS.forEach(([pattern, replacement]) => {
     normalized = normalized.replace(pattern, replacement);
   });

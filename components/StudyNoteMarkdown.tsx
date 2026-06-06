@@ -11,9 +11,14 @@ const NOTE_TEXT_COLOR_CLASS_MAP: Record<string, string> = {
   red: "note-text-color-red",
   green: "note-text-color-green",
   blue: "note-text-color-blue",
-  amber: "note-text-color-amber",
+  amber: "note-text-color-orange",
+  orange: "note-text-color-orange",
   purple: "note-text-color-purple",
   black: "note-text-color-black"
+};
+
+const NOTE_TEXT_BACKGROUND_CLASS_MAP: Record<string, string> = {
+  yellow: "note-text-bg-yellow"
 };
 
 type Props = {
@@ -90,6 +95,11 @@ export function StudyNoteMarkdown({ markdown, questionMap, questionLinks = [] }:
                 const colorClassName = colorKey ? NOTE_TEXT_COLOR_CLASS_MAP[colorKey] : undefined;
                 if (colorClassName) {
                   return <span className={colorClassName}>{children}</span>;
+                }
+                const backgroundKey = href?.match(/^#note-bg-([a-z]+)$/)?.[1];
+                const backgroundClassName = backgroundKey ? NOTE_TEXT_BACKGROUND_CLASS_MAP[backgroundKey] : undefined;
+                if (backgroundClassName) {
+                  return <span className={backgroundClassName}>{children}</span>;
                 }
                 return (
                   <a href={href}>

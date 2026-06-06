@@ -778,34 +778,42 @@ select {
   }
 
   .note-text-color-red {
-    color: #b44747;
+    color: #ff1744;
   }
 
   .note-text-color-green {
-    color: #2f7d63;
+    color: #00a846;
   }
 
   .note-text-color-blue {
-    color: #2f6f9f;
+    color: #1268ff;
   }
 
-  .note-text-color-amber {
-    color: #9a651f;
+  .note-text-color-orange {
+    color: #ff6d00;
   }
 
   .note-text-color-purple {
-    color: #7453a6;
+    color: #b000f5;
   }
 
   .note-text-color-black {
-    color: var(--ink-main);
+    color: #050816;
+  }
+
+  .note-text-bg-yellow {
+    border-radius: 0.35em;
+    background: #fff176;
+    box-decoration-break: clone;
+    -webkit-box-decoration-break: clone;
+    padding: 0.04em 0.18em;
   }
 
   .note-color-palette {
     pointer-events: none;
     opacity: 0;
-    transform: translateX(12px) scale(0.96);
-    transform-origin: right center;
+    transform: translateY(8px) scale(0.96);
+    transform-origin: right bottom;
     transition:
       opacity 160ms ease,
       transform 180ms cubic-bezier(0.22, 1, 0.36, 1);
@@ -814,7 +822,7 @@ select {
   .note-color-tool[data-open="true"] .note-color-palette {
     pointer-events: auto;
     opacity: 1;
-    transform: translateX(0) scale(1);
+    transform: translateY(0) scale(1);
   }
 
   .note-color-tool[data-open="true"] .note-color-palette-toggle {
