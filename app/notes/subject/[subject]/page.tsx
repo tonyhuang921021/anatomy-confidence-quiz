@@ -23,6 +23,7 @@ import {
   loadStudyNote,
   loadStudyNoteCollections,
   loadStudyNotes,
+  normalizeStudyNoteMarkdown,
   reorderStudyNoteOutline,
   reorderStudyNotes,
   toggleStudyNoteStar,
@@ -63,7 +64,24 @@ type OutlineDragPayload =
   | { type: "collection"; id: string };
 
 const NOTE_MOVE_SUBJECTS = [...MED1_SUBJECTS, ...MED2_SUBJECTS];
-const STUDY_NOTES_MANUAL_HREF = "/manuals/學習筆記功能說明.html";
+const NOTE_TEXT_COLORS = [
+  { id: "red", label: "紅色", value: "#b44747" },
+  { id: "green", label: "綠色", value: "#2f7d63" },
+  { id: "blue", label: "藍色", value: "#2f6f9f" },
+  { id: "amber", label: "琥珀", value: "#9a651f" },
+  { id: "purple", label: "紫色", value: "#7453a6" },
+  { id: "black", label: "黑色", value: "#102a22" }
+] as const;
+
+type NoteTextColorId = (typeof NOTE_TEXT_COLORS)[number]["id"];
+
+function escapeMarkdownLinkText(value: string) {
+  return value
+    .replace(/\\/g, "\\\\")
+    .replace(/\]/g, "\\]")
+    .replace(/\[/g, "\\[")
+    .replace(/\n+/g, " ");
+}
 
 function getAutoCategoryFolderPrefixes(category?: string | null) {
   if (category === "virus") return ["病毒學", "病毒", "virology"];
@@ -118,6 +136,9 @@ export default function SubjectNotesPage() {
   const [activeQuestionNoteId, setActiveQuestionNoteId] = useState("");
   const [moveMenuNoteId, setMoveMenuNoteId] = useState("");
   const [currentNoteId, setCurrentNoteId] = useState("");
+  const [selectedTextColor, setSelectedTextColor] = useState<NoteTextColorId>("red");
+  const [colorPickerOpen, setColorPickerOpen] = useState(false);
+  const [colorApplyMessage, setColorApplyMessage] = useState("");
   const [explanationOverrides, setExplanationOverrides] = useState<Record<string, QuestionExplanationOverride>>({});
   const [explanationLoadingMap, setExplanationLoadingMap] = useState<Record<string, boolean>>({});
   const [explanationErrorMap, setExplanationErrorMap] = useState<Record<string, string>>({});
@@ -189,6 +210,7 @@ export default function SubjectNotesPage() {
 
   const questionMap = useMemo(() => buildQuestionMap(), []);
   const currentNote = notes.find((note) => note.id === currentNoteId) ?? notes[0];
+  const selectedTextColorItem = NOTE_TEXT_COLORS.find((item) => item.id === selectedTextColor) ?? NOTE_TEXT_COLORS[0];
   const outlineGroups = useMemo(() => {
     const collectionMap = new Map<string, StudyNoteCollection>();
     collections.forEach((collection) => {
@@ -923,6 +945,91 @@ export default function SubjectNotesPage() {
     window.scrollTo({ top: 0, behavior: "smooth" });
   }
 
+  async function handleApplySelectedTextColor() {
+    if (!session?.access_token || outlineSaving) return;
+    if (typeof window === "undefined") return;
+
+    const selection = window.getSelection();
+    const selectedText = selection?.toString().replace(/\s+/g, " ").trim() ?? "";
+    if (!selection || selection.rangeCount === 0 || !selectedText) {
+      setColorApplyMessage("先選取要標色的文字");
+      return;
+    }
+
+    const range = selection.getRangeAt(0);
+    const startElement =
+      range.startContainer instanceof Element
+        ? range.startContainer
+        : range.startContainer.parentElement;
+    const endElement =
+      range.endContainer instanceof Element
+        ? range.endContainer
+        : range.endContainer.parentElement;
+    const startArticle = startElement?.closest<HTMLElement>("[data-study-note-id]");
+    const endArticle = endElement?.closest<HTMLElement>("[data-study-note-id]");
+
+    if (!startArticle || !endArticle || startArticle.dataset.studyNoteId !== endArticle.dataset.studyNoteId) {
+      setColorApplyMessage("請只選同一篇筆記內的文字");
+      return;
+    }
+
+    const note = notesRef.current.find((item) => item.id === startArticle.dataset.studyNoteId);
+    if (!note) {
+      setColorApplyMessage("找不到這篇筆記");
+      return;
+    }
+
+    const normalizedMarkdown = normalizeStudyNoteMarkdown(note.rawMarkdown);
+    const candidates = [selection.toString(), selectedText]
+      .map((value) => value.replace(/\s+/g, " ").trim())
+      .filter(Boolean);
+    const matchedText = candidates.find((value) => normalizedMarkdown.includes(value));
+
+    if (!matchedText) {
+      setColorApplyMessage("這段文字太複雜，請改到編輯頁標色");
+      return;
+    }
+
+    const coloredText = `[${escapeMarkdownLinkText(matchedText)}](#note-color-${selectedTextColor})`;
+    const nextMarkdown = normalizedMarkdown.replace(matchedText, coloredText);
+    const previousNotes = notesRef.current;
+    const optimisticNotes = previousNotes.map((item) =>
+      item.id === note.id ? { ...item, rawMarkdown: nextMarkdown } : item
+    );
+
+    notesRef.current = optimisticNotes;
+    setNotes(optimisticNotes);
+    setOutlineSaving(true);
+    setColorApplyMessage("已標色");
+
+    try {
+      const updated = await updateStudyNote({
+        accessToken: session.access_token,
+        id: note.id,
+        title: note.title,
+        rawMarkdown: nextMarkdown,
+        summary: note.summary,
+        subject: note.subject,
+        chapter: note.chapter,
+        section: note.section,
+        collectionName: note.collectionName,
+        tags: note.tags,
+        questionLinks: note.questionLinks
+      });
+      setNotes((currentNotes) =>
+        currentNotes.map((item) => (item.id === updated.id ? updated : item))
+      );
+      selection.removeAllRanges();
+    } catch (rawError) {
+      notesRef.current = previousNotes;
+      setNotes(previousNotes);
+      setColorApplyMessage("標色失敗");
+      setError(rawError instanceof Error ? rawError.message : "文字標色失敗");
+    } finally {
+      setOutlineSaving(false);
+    }
+  }
+
   function renderOutlineNote(note: StudyNoteDetail, nested = false) {
     const rootKey = `note:${note.id}`;
     return (
@@ -1081,9 +1188,6 @@ export default function SubjectNotesPage() {
                 </Link>
               ))
             ) : null}
-            <a href={STUDY_NOTES_MANUAL_HREF} target="_blank" rel="noreferrer" className="secondary-pill">
-              打開說明書
-            </a>
             <Link href="/notes/new" className="primary-pill">
               新增筆記
             </Link>
@@ -1315,7 +1419,13 @@ export default function SubjectNotesPage() {
 
               <div className="grid min-w-0 gap-10">
                 {notes.map((note) => (
-                    <article key={note.id} id={`note-${note.id}`} data-note-id={note.id} className="min-w-0 overflow-hidden scroll-mt-8 rounded-[2rem] border border-slate-200 bg-white p-5 sm:p-7">
+                    <article
+                      key={note.id}
+                      id={`note-${note.id}`}
+                      data-note-id={note.id}
+                      data-study-note-id={note.id}
+                      className="min-w-0 overflow-hidden scroll-mt-8 rounded-[2rem] border border-slate-200 bg-white p-5 sm:p-7"
+                    >
                       <div className="flex flex-wrap items-start justify-between gap-3">
                         <div className="min-w-0">
                           <h2 className="break-words text-3xl font-black text-slate-950">{note.title}</h2>
@@ -1362,15 +1472,71 @@ export default function SubjectNotesPage() {
               </button>
             ) : null}
 
-            <button
-              type="button"
-              onClick={scrollToTop}
-              className="fixed bottom-5 right-5 z-30 grid h-11 w-11 place-items-center rounded-full border border-white/60 bg-white/90 text-lg font-black text-slate-800 shadow-xl shadow-slate-900/10 backdrop-blur transition hover:-translate-y-0.5 hover:bg-teal-700 hover:text-white sm:bottom-6 sm:right-6"
-              aria-label="回到頁面頂端"
-              title="回頂"
-            >
-              ↑
-            </button>
+            <div className="fixed bottom-5 right-5 z-30 flex items-center gap-2 sm:bottom-6 sm:right-6">
+              <div className="note-color-tool relative flex items-center" data-open={colorPickerOpen}>
+                <div className="note-color-palette absolute right-12 flex items-center gap-1 rounded-full border border-white/70 bg-white/90 p-1.5 shadow-xl shadow-slate-900/10 backdrop-blur">
+                  {NOTE_TEXT_COLORS.map((color) => (
+                    <button
+                      key={color.id}
+                      type="button"
+                      onMouseDown={(event) => event.preventDefault()}
+                      onClick={() => {
+                        setSelectedTextColor(color.id);
+                        setColorPickerOpen(false);
+                        setColorApplyMessage("");
+                      }}
+                      className="grid h-8 w-8 place-items-center rounded-full border border-slate-200 bg-white transition hover:scale-105"
+                      aria-label={`選擇${color.label}`}
+                      aria-pressed={selectedTextColor === color.id}
+                    >
+                      <span
+                        className="h-4 w-4 rounded-full border border-white shadow-sm"
+                        style={{ backgroundColor: color.value }}
+                        aria-hidden="true"
+                      />
+                    </button>
+                  ))}
+                </div>
+                {colorApplyMessage ? (
+                  <span className="absolute bottom-12 right-0 whitespace-nowrap rounded-full bg-slate-950 px-3 py-1 text-xs font-bold text-white shadow-lg">
+                    {colorApplyMessage}
+                  </span>
+                ) : null}
+                <button
+                  type="button"
+                  onMouseDown={(event) => event.preventDefault()}
+                  onClick={() => void handleApplySelectedTextColor()}
+                  className="grid h-11 w-11 place-items-center rounded-full border border-white/60 bg-white/90 shadow-xl shadow-slate-900/10 backdrop-blur transition hover:-translate-y-0.5 hover:bg-slate-50"
+                  aria-label={`套用${selectedTextColorItem.label}文字顏色`}
+                  title="選取文字後按一下標色"
+                >
+                  <span
+                    className="h-5 w-5 rounded-full border-2 border-white shadow-sm ring-1 ring-slate-200"
+                    style={{ backgroundColor: selectedTextColorItem.value }}
+                    aria-hidden="true"
+                  />
+                </button>
+                <button
+                  type="button"
+                  onMouseDown={(event) => event.preventDefault()}
+                  onClick={() => setColorPickerOpen((value) => !value)}
+                  className="note-color-palette-toggle absolute -left-3 grid h-7 w-7 place-items-center rounded-full border border-white/70 bg-white/95 text-xs font-black text-slate-600 shadow-lg transition hover:bg-teal-50 hover:text-teal-700"
+                  aria-label="打開文字顏色選單"
+                  aria-expanded={colorPickerOpen}
+                >
+                  ‹
+                </button>
+              </div>
+              <button
+                type="button"
+                onClick={scrollToTop}
+                className="grid h-11 w-11 place-items-center rounded-full border border-white/60 bg-white/90 text-lg font-black text-slate-800 shadow-xl shadow-slate-900/10 backdrop-blur transition hover:-translate-y-0.5 hover:bg-teal-700 hover:text-white"
+                aria-label="回到頁面頂端"
+                title="回頂"
+              >
+                ↑
+              </button>
+            </div>
 
             <button
               type="button"

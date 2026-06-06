@@ -7,6 +7,15 @@ import { StudyNoteQuestionCard } from "@/components/StudyNoteQuestionCard";
 import { normalizeStudyNoteMarkdown } from "@/lib/studyNotes";
 import type { Question, StudyNoteQuestionLink } from "@/types/quiz";
 
+const NOTE_TEXT_COLOR_CLASS_MAP: Record<string, string> = {
+  red: "note-text-color-red",
+  green: "note-text-color-green",
+  blue: "note-text-color-blue",
+  amber: "note-text-color-amber",
+  purple: "note-text-color-purple",
+  black: "note-text-color-black"
+};
+
 type Props = {
   markdown: string;
   questionMap?: Map<string, Question>;
@@ -71,7 +80,25 @@ export function StudyNoteMarkdown({ markdown, questionMap, questionLinks = [] }:
         }
 
         return (
-          <ReactMarkdown key={index} remarkPlugins={[remarkGfm]} rehypePlugins={[rehypeSanitize]}>
+          <ReactMarkdown
+            key={index}
+            remarkPlugins={[remarkGfm]}
+            rehypePlugins={[rehypeSanitize]}
+            components={{
+              a({ href, children }) {
+                const colorKey = href?.match(/^#note-color-([a-z]+)$/)?.[1];
+                const colorClassName = colorKey ? NOTE_TEXT_COLOR_CLASS_MAP[colorKey] : undefined;
+                if (colorClassName) {
+                  return <span className={colorClassName}>{children}</span>;
+                }
+                return (
+                  <a href={href}>
+                    {children}
+                  </a>
+                );
+              }
+            }}
+          >
             {part.content}
           </ReactMarkdown>
         );
