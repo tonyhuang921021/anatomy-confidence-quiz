@@ -1,7 +1,13 @@
 "use client";
 
 import { useState } from "react";
-import type { Question, StudyNoteQuestionLink } from "@/types/quiz";
+import { useAuth } from "@/components/AuthProvider";
+import {
+  loadQuestionExplanationOverride,
+  saveQuestionExplanationOverride
+} from "@/lib/storage";
+import { getOrCreateVisitorId } from "@/lib/visitor";
+import type { OptionKey, Question, QuestionExplanationOverride, StudyNoteQuestionLink } from "@/types/quiz";
 
 type Props = {
   question?: Question;
@@ -10,8 +16,14 @@ type Props = {
 };
 
 export function StudyNoteQuestionCard({ question, link, title }: Props) {
+  const { session } = useAuth();
   const [showQuestion, setShowQuestion] = useState(false);
   const [showAnswer, setShowAnswer] = useState(false);
+  const [explanationOverride, setExplanationOverride] = useState<QuestionExplanationOverride | null>(() =>
+    question ? loadQuestionExplanationOverride(question.id) ?? null : null
+  );
+  const [explanationLoading, setExplanationLoading] = useState(false);
+  const [explanationError, setExplanationError] = useState("");
 
   if (!question) {
     return (
@@ -22,6 +34,80 @@ export function StudyNoteQuestionCard({ question, link, title }: Props) {
   }
 
   const optionEntries = Object.entries(question.options).filter(([, value]) => Boolean(value));
+  const explanation = explanationOverride?.explanation || question.explanation;
+  const optionAnalysis = explanationOverride?.optionAnalysis ?? question.optionAnalysis;
+  const memoryTip = explanationOverride?.memoryTip ?? question.memoryTip;
+
+  async function handleGenerateExplanation() {
+    if (!question) return;
+    if (!session?.access_token) {
+      setExplanationError("請先登入帳號，才能使用 GPT-5-mini 補詳解。");
+      return;
+    }
+
+    setExplanationLoading(true);
+    setExplanationError("");
+
+    try {
+      const response = await fetch("/api/question-explanation", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          visitorId: getOrCreateVisitorId(),
+          accessToken: session.access_token,
+          question: {
+            id: question.id,
+            subject: question.subject,
+            chapter: question.chapter,
+            section: question.section,
+            stem: question.stem,
+            options: question.options,
+            answer: question.answer,
+            acceptedAnswers: question.acceptedAnswers,
+            answerCreditType: question.answerCreditType,
+            explanation: question.explanation,
+            testedConcept: question.testedConcept
+          }
+        })
+      });
+
+      const payload = (await response.json()) as {
+        ok: boolean;
+        sharedSaved?: boolean;
+        explanation?: string;
+        optionAnalysis?: Partial<Record<OptionKey, string>>;
+        memoryTip?: string;
+        model?: string;
+        message?: string;
+      };
+
+      if (!response.ok || !payload.ok || !payload.explanation || payload.sharedSaved === false) {
+        if (response.status === 429 && payload.message && typeof window !== "undefined") {
+          window.alert(payload.message);
+        }
+        setExplanationError(payload.message || "GPT-5-mini 詳解產生失敗。");
+        return;
+      }
+
+      const override: QuestionExplanationOverride = {
+        explanation: payload.explanation,
+        optionAnalysis: payload.optionAnalysis ?? {},
+        memoryTip: payload.memoryTip ?? "",
+        model: payload.model ?? "gpt-5-mini",
+        updatedAt: new Date().toISOString()
+      };
+
+      saveQuestionExplanationOverride(question.id, override);
+      setExplanationOverride(override);
+      setShowAnswer(true);
+    } catch {
+      setExplanationError("無法連線到 GPT-5-mini 詳解 API。");
+    } finally {
+      setExplanationLoading(false);
+    }
+  }
 
   return (
     <div className="study-note-question-card my-5 min-w-0 overflow-hidden rounded-3xl border border-teal-100 bg-teal-50/70 p-3 shadow-sm">
@@ -70,10 +156,40 @@ export function StudyNoteQuestionCard({ question, link, title }: Props) {
           >
             {showAnswer ? "收合答案詳解" : "看答案與詳解"}
           </button>
+          <button
+            type="button"
+            onClick={() => void handleGenerateExplanation()}
+            disabled={explanationLoading}
+            className="secondary-pill ml-2 mt-4 px-4 py-2 text-sm disabled:opacity-60"
+          >
+            {explanationLoading ? "GPT-5-mini 生成中..." : "用 GPT-5-mini 補詳解"}
+          </button>
+          {explanationError ? (
+            <p className="mt-3 rounded-2xl bg-rose-50 px-3 py-2 text-xs font-semibold leading-5 text-rose-700">
+              {explanationError}
+            </p>
+          ) : null}
           {showAnswer ? (
             <div className="mt-3 min-w-0 overflow-hidden break-words rounded-2xl bg-slate-950 px-4 py-3 text-sm leading-7 text-white">
               <p className="font-bold">答案：{question.answer}</p>
-              <p className="mt-2 text-slate-100">{question.explanation}</p>
+              <p className="mt-2 text-slate-100">{explanation}</p>
+              {optionAnalysis && Object.keys(optionAnalysis).length > 0 ? (
+                <div className="mt-3 grid gap-2">
+                  {Object.entries(optionAnalysis).map(([key, value]) =>
+                    value ? (
+                      <p key={key} className="rounded-2xl bg-white/10 px-3 py-2">
+                        <span className="font-bold text-white">{key}. </span>
+                        <span className="text-slate-100">{value}</span>
+                      </p>
+                    ) : null
+                  )}
+                </div>
+              ) : null}
+              {memoryTip ? (
+                <p className="mt-3 rounded-2xl bg-teal-400/15 px-3 py-2 text-teal-50">
+                  快速記憶：{memoryTip}
+                </p>
+              ) : null}
             </div>
           ) : null}
         </div>
