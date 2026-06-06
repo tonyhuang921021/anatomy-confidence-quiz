@@ -114,6 +114,7 @@ export default function SubjectNotesPage() {
   const [dragOverNoteId, setDragOverNoteId] = useState("");
   const [draggingCollectionId, setDraggingCollectionId] = useState("");
   const [dragOverCollectionId, setDragOverCollectionId] = useState("");
+  const [dragOverRootZone, setDragOverRootZone] = useState(false);
   const [activeQuestionNoteId, setActiveQuestionNoteId] = useState("");
   const [moveMenuNoteId, setMoveMenuNoteId] = useState("");
   const [currentNoteId, setCurrentNoteId] = useState("");
@@ -343,6 +344,16 @@ export default function SubjectNotesPage() {
     return "";
   }
 
+  function getDraggedNote() {
+    if (!draggingNoteId) return undefined;
+    return notesRef.current.find((note) => note.id === draggingNoteId);
+  }
+
+  function getCollectionForNote(note: StudyNoteDetail) {
+    if (!note.collectionId) return undefined;
+    return collectionsRef.current.find((collection) => collection.id === note.collectionId);
+  }
+
   function applyRootOutlineOrder(nextItems: OutlineRootItem[]) {
     rootOutlineItemsRef.current = nextItems;
     const orderByKey = new Map(nextItems.map((item, index) => [getRootItemKey(item), (index + 1) * 1000] as const));
@@ -445,13 +456,32 @@ export default function SubjectNotesPage() {
     setDragOverNoteId(targetNoteId);
   }
 
+  function previewDraggedNoteCollection(targetNote: StudyNoteDetail) {
+    if (!outlineEditMode || !targetNote.collectionId) return;
+    const draggedNote = getDraggedNote();
+    if (!draggedNote || draggedNote.id === targetNote.id) return;
+
+    if (draggedNote.collectionId === targetNote.collectionId) {
+      previewDraggedNote(targetNote.id);
+      return;
+    }
+
+    setDragOverCollectionId(targetNote.collectionId);
+    setDragOverNoteId("");
+  }
+
   function finishDrag() {
     if (!outlineEditMode) return;
     const originalOrderKey = originalOrderRef.current.join(",");
     const nextOrderKey = getOrderKey(notesRef.current);
     setDraggingNoteId("");
     setDragOverNoteId("");
+    setDraggingCollectionId("");
+    setDragOverCollectionId("");
+    setDragOverRootZone(false);
     originalOrderRef.current = [];
+    originalRootOrderRef.current = [];
+    lastPreviewTargetRef.current = "";
     if (originalOrderKey && originalOrderKey !== nextOrderKey) {
       void persistOrder(notesRef.current);
     }
@@ -465,6 +495,7 @@ export default function SubjectNotesPage() {
     setDragOverNoteId("");
     setDraggingCollectionId("");
     setDragOverCollectionId("");
+    setDragOverRootZone(false);
     originalRootOrderRef.current = [];
     lastPreviewTargetRef.current = "";
     if (originalOrderKey && originalOrderKey !== nextOrderKey) {
@@ -475,12 +506,13 @@ export default function SubjectNotesPage() {
   function handleDropOnRootCollection(event: React.DragEvent<HTMLElement>, collection?: StudyNoteCollection) {
     if (!outlineEditMode) return;
     event.preventDefault();
+    event.stopPropagation();
     const payload = readDragPayload(event.dataTransfer);
     if (!payload) return;
 
     if (payload.type === "note") {
       const note = notesRef.current.find((item) => item.id === payload.id);
-      if (note) void handleMoveNoteToCollection(note, collection?.name);
+      if (note) void handleMoveNoteToCollection(note, collection?.name, collection);
       if (originalRootOrderRef.current.length > 0) {
         finishRootDrag();
       } else {
@@ -490,6 +522,35 @@ export default function SubjectNotesPage() {
     }
 
     finishRootDrag();
+  }
+
+  function handleDropOnNestedNote(event: React.DragEvent<HTMLElement>, targetNote: StudyNoteDetail) {
+    if (!outlineEditMode) return;
+    event.preventDefault();
+    event.stopPropagation();
+    const payload = readDragPayload(event.dataTransfer);
+    if (payload?.type !== "note") {
+      finishDrag();
+      return;
+    }
+
+    const draggedNote = notesRef.current.find((item) => item.id === payload.id);
+    if (!draggedNote || draggedNote.id === targetNote.id) {
+      finishDrag();
+      return;
+    }
+
+    if (targetNote.collectionName && draggedNote.collectionId !== targetNote.collectionId) {
+      void handleMoveNoteToCollection(draggedNote, targetNote.collectionName, getCollectionForNote(targetNote));
+      if (originalRootOrderRef.current.length > 0) {
+        finishRootDrag();
+      } else {
+        finishDrag();
+      }
+      return;
+    }
+
+    finishDrag();
   }
 
   function handleDropOnRoot(event: React.DragEvent<HTMLElement>) {
@@ -509,6 +570,7 @@ export default function SubjectNotesPage() {
   function handleDropOnRootItem(event: React.DragEvent<HTMLElement>) {
     if (!outlineEditMode) return;
     event.preventDefault();
+    event.stopPropagation();
     const payload = readDragPayload(event.dataTransfer);
     if (payload?.type === "note") {
       const note = notesRef.current.find((item) => item.id === payload.id);
@@ -665,8 +727,29 @@ export default function SubjectNotesPage() {
     }
   }
 
-  async function handleMoveNoteToCollection(note: StudyNoteDetail, collectionName?: string) {
+  async function handleMoveNoteToCollection(
+    note: StudyNoteDetail,
+    collectionName?: string,
+    collection?: StudyNoteCollection
+  ) {
     if (!session?.access_token || outlineSaving) return;
+    const previousNotes = notesRef.current;
+    const fallbackCollection = collectionName
+      ? collectionsRef.current.find((item) => item.name === collectionName)
+      : undefined;
+    const optimisticCollection = collection ?? fallbackCollection;
+    const optimisticNotes = previousNotes.map((item) =>
+      item.id === note.id
+        ? {
+            ...item,
+            collectionId: collectionName ? optimisticCollection?.id : undefined,
+            collectionName
+          }
+        : item
+    );
+
+    notesRef.current = optimisticNotes;
+    setNotes(optimisticNotes);
     setOutlineSaving(true);
     setError("");
     try {
@@ -706,6 +789,8 @@ export default function SubjectNotesPage() {
         });
       }
     } catch (rawError) {
+      notesRef.current = previousNotes;
+      setNotes(previousNotes);
       setError(rawError instanceof Error ? rawError.message : "筆記資料夾更新失敗");
     } finally {
       setOutlineSaving(false);
@@ -843,9 +928,11 @@ export default function SubjectNotesPage() {
     return (
       <div
         key={note.id}
-        onDragEnter={() => {
+        onDragEnter={(event) => {
+          if (!outlineEditMode) return;
+          if (nested) event.stopPropagation();
           if (nested) {
-            previewDraggedNote(note.id);
+            previewDraggedNoteCollection(note);
           } else {
             previewDraggedRootItem(rootKey);
           }
@@ -853,6 +940,7 @@ export default function SubjectNotesPage() {
         onDragOver={(event) => {
           if (!outlineEditMode) return;
           event.preventDefault();
+          if (nested) event.stopPropagation();
           event.dataTransfer.dropEffect = "move";
           if (!nested) {
             previewDraggedRootItem(rootKey);
@@ -861,8 +949,7 @@ export default function SubjectNotesPage() {
         onDrop={(event) => {
           if (!outlineEditMode) return;
           if (nested) {
-            event.preventDefault();
-            finishDrag();
+            handleDropOnNestedNote(event, note);
           } else {
             handleDropOnRootItem(event);
           }
@@ -1049,15 +1136,55 @@ export default function SubjectNotesPage() {
                 </div>
                 <div
                   className="mt-4 grid gap-2"
+                  data-root-drop-target={dragOverRootZone}
+                  onDragEnter={(event) => {
+                    if (!outlineEditMode || !draggingNoteId) return;
+                    event.preventDefault();
+                    setDragOverRootZone(true);
+                    setDragOverCollectionId("");
+                    setDragOverNoteId("");
+                  }}
                   onDragOver={(event) => {
                     if (!outlineEditMode || !draggingNoteId) return;
                     event.preventDefault();
                     event.dataTransfer.dropEffect = "move";
+                    setDragOverRootZone(true);
+                  }}
+                  onDragLeave={(event) => {
+                    if (!outlineEditMode) return;
+                    if (event.currentTarget.contains(event.relatedTarget as Node | null)) return;
+                    setDragOverRootZone(false);
                   }}
                   onDrop={handleDropOnRoot}
                 >
                   {hasOutlineItems ? (
                     <>
+                      {outlineEditMode ? (
+                        <div
+                          className="note-outline-root-dropzone rounded-2xl border border-dashed border-slate-200 bg-slate-50/80 px-3 py-3 text-xs font-bold text-slate-500"
+                          data-drop-target={dragOverRootZone}
+                          onDragEnter={(event) => {
+                            if (!outlineEditMode || !draggingNoteId) return;
+                            event.preventDefault();
+                            event.stopPropagation();
+                            setDragOverRootZone(true);
+                            setDragOverCollectionId("");
+                            setDragOverNoteId("");
+                          }}
+                          onDragOver={(event) => {
+                            if (!outlineEditMode || !draggingNoteId) return;
+                            event.preventDefault();
+                            event.stopPropagation();
+                            event.dataTransfer.dropEffect = "move";
+                            setDragOverRootZone(true);
+                            setDragOverCollectionId("");
+                            setDragOverNoteId("");
+                          }}
+                          onDrop={handleDropOnRoot}
+                        >
+                          拖到這裡，移出資料夾並放回科目根目錄
+                        </div>
+                      ) : null}
                       {rootOutlineItems.map((item) => {
                         if (item.type === "note") return renderOutlineNote(item.note);
                         const group = item.group;
@@ -1069,13 +1196,23 @@ export default function SubjectNotesPage() {
                         data-drop-target={dragOverCollectionId === group.id && draggingCollectionId !== group.id}
                         onDragEnter={(event) => {
                           if (!outlineEditMode || !group.collection) return;
+                          event.stopPropagation();
                           previewDraggedRootItem(groupKey);
+                          if (draggingNoteId) {
+                            setDragOverCollectionId(group.id);
+                            setDragOverRootZone(false);
+                          }
                         }}
                         onDragOver={(event) => {
                           if (!outlineEditMode) return;
                           event.preventDefault();
+                          event.stopPropagation();
                           event.dataTransfer.dropEffect = "move";
                           if (group.collection) previewDraggedRootItem(groupKey);
+                          if (draggingNoteId) {
+                            setDragOverCollectionId(group.id);
+                            setDragOverRootZone(false);
+                          }
                         }}
                         onDrop={(event) => handleDropOnRootCollection(event, group.collection)}
                       >
@@ -1125,11 +1262,34 @@ export default function SubjectNotesPage() {
                             </div>
                           ) : null}
                         </div>
-                        <div className="ml-5 mt-1 grid gap-1 border-l border-slate-100 pl-3">
+                        <div
+                          className="note-outline-folder-body ml-5 mt-1 grid min-h-14 gap-1 rounded-2xl border border-dashed border-transparent border-l-slate-100 px-2 py-2"
+                          data-drop-target={dragOverCollectionId === group.id && draggingCollectionId !== group.id}
+                          onDragEnter={(event) => {
+                            if (!outlineEditMode || !group.collection || !draggingNoteId) return;
+                            event.preventDefault();
+                            event.stopPropagation();
+                            setDragOverCollectionId(group.id);
+                            setDragOverNoteId("");
+                            setDragOverRootZone(false);
+                          }}
+                          onDragOver={(event) => {
+                            if (!outlineEditMode || !group.collection || !draggingNoteId) return;
+                            event.preventDefault();
+                            event.stopPropagation();
+                            event.dataTransfer.dropEffect = "move";
+                            setDragOverCollectionId(group.id);
+                            setDragOverNoteId("");
+                            setDragOverRootZone(false);
+                          }}
+                          onDrop={(event) => handleDropOnRootCollection(event, group.collection)}
+                        >
                           {group.notes.length > 0 ? (
                             group.notes.map((note) => renderOutlineNote(note, true))
                           ) : (
-                            <p className="px-2 py-2 text-xs font-semibold text-slate-400">這個資料夾還沒有筆記。</p>
+                            <p className="rounded-xl px-2 py-4 text-xs font-semibold text-slate-400">
+                              這個資料夾還沒有筆記。拖到這裡即可放入。
+                            </p>
                           )}
                         </div>
                       </section>
