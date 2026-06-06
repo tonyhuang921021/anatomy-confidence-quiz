@@ -31,9 +31,9 @@ const selectableSubjects = enabledSubjects.filter(
 
 const MICROBIOLOGY_SUBJECT: SubjectName = "微生物免疫學";
 const MICROBIOLOGY_TRACKS = [
-  { label: "病毒", chapter: "病毒學" },
-  { label: "細菌", chapter: "細菌學" },
-  { label: "免疫", chapter: "免疫學" }
+  { label: "病毒", section: "病毒學" },
+  { label: "細菌", section: "細菌學" },
+  { label: "免疫", section: "免疫學" }
 ] as const;
 
 export default function StartPage() {
@@ -43,7 +43,7 @@ export default function StartPage() {
   const med2Subjects = selectableSubjects.filter((item) => MED2_SUBJECTS.includes(item.subject));
   const [selectedSubjects, setSelectedSubjects] = useState<SubjectName[]>([]);
   const [microbiologyExpanded, setMicrobiologyExpanded] = useState(false);
-  const [selectedMicrobiologyChapters, setSelectedMicrobiologyChapters] = useState<string[]>([]);
+  const [selectedMicrobiologySections, setSelectedMicrobiologySections] = useState<string[]>([]);
   const [includeSeasonalLimited, setIncludeSeasonalLimited] = useState(false);
   const seasonalLimitedQuestions = useMemo(() => getSeasonalLimitedQuestions(), []);
   const seasonalLimitedPastExamCount = useMemo(
@@ -96,7 +96,7 @@ export default function StartPage() {
     setSelectedSubjects((current) => {
       const hasMicrobiology = current.includes(MICROBIOLOGY_SUBJECT);
 
-      if (selectedMicrobiologyChapters.length > 0) {
+      if (selectedMicrobiologySections.length > 0) {
         return hasMicrobiology ? current : [...current, MICROBIOLOGY_SUBJECT];
       }
 
@@ -104,7 +104,7 @@ export default function StartPage() {
         ? current.filter((subject) => subject !== MICROBIOLOGY_SUBJECT)
         : current;
     });
-  }, [selectedMicrobiologyChapters]);
+  }, [selectedMicrobiologySections]);
 
   const selectedSubjectQuestionPool = useMemo(() => {
     if (selectedSubjects.length === 0) return [];
@@ -114,16 +114,16 @@ export default function StartPage() {
       .flatMap((item) => {
         if (
           item.subject === MICROBIOLOGY_SUBJECT &&
-          selectedMicrobiologyChapters.length > 0
+          selectedMicrobiologySections.length > 0
         ) {
           return item.questions.filter((question) =>
-            selectedMicrobiologyChapters.includes(question.chapter)
+            selectedMicrobiologySections.includes(question.section)
           );
         }
 
         return item.questions;
       });
-  }, [selectedMicrobiologyChapters, selectedSubjects]);
+  }, [selectedMicrobiologySections, selectedSubjects]);
 
   const availableQuestionCount = useMemo(() => {
     const filteredSubjectQuestions = selectedSubjectQuestionPool.filter((question) => {
@@ -178,17 +178,17 @@ export default function StartPage() {
     );
   }
 
-  function toggleMicrobiologyChapter(chapter: string) {
-    setSelectedMicrobiologyChapters((current) =>
-      current.includes(chapter)
-        ? current.filter((item) => item !== chapter)
-        : [...current, chapter]
+  function toggleMicrobiologySection(section: string) {
+    setSelectedMicrobiologySections((current) =>
+      current.includes(section)
+        ? current.filter((item) => item !== section)
+        : [...current, section]
     );
   }
 
   function selectAllSubjects() {
     setSelectedSubjects(selectableSubjects.map((item) => item.subject));
-    setSelectedMicrobiologyChapters(MICROBIOLOGY_TRACKS.map((track) => track.chapter));
+    setSelectedMicrobiologySections(MICROBIOLOGY_TRACKS.map((track) => track.section));
     setMicrobiologyExpanded(true);
   }
 
@@ -206,11 +206,11 @@ export default function StartPage() {
           {subjects.map((subject) => {
             const active = selectedSubjects.includes(subject.subject);
             const isMicrobiology = subject.subject === MICROBIOLOGY_SUBJECT;
-            const selectedMicrobiologyQuestionCount = isMicrobiology && selectedMicrobiologyChapters.length > 0
+            const selectedMicrobiologyQuestionCount = isMicrobiology && selectedMicrobiologySections.length > 0
               ? subject.questions.filter(
                   (question) =>
                     question.sourceType !== "AI_GENERATED" &&
-                    selectedMicrobiologyChapters.includes(question.chapter)
+                    selectedMicrobiologySections.includes(question.section)
                 ).length
               : null;
             const pastExamCount =
@@ -246,7 +246,7 @@ export default function StartPage() {
                     </div>
                     {active ? (
                       <p className="mt-3 text-xs font-semibold text-brand-700">
-                        已選 {selectedMicrobiologyChapters.map((chapter) => chapter.replace("學", "")).join("、")}
+                        已選 {selectedMicrobiologySections.map((section) => section.replace("學", "")).join("、")}
                       </p>
                     ) : (
                       <p className="mt-3 text-xs text-slate-500">點開後選病毒、細菌或免疫。</p>
@@ -256,18 +256,18 @@ export default function StartPage() {
                   {microbiologyExpanded ? (
                     <div className="mt-4 grid gap-2 sm:grid-cols-3">
                       {MICROBIOLOGY_TRACKS.map((track) => {
-                        const trackActive = selectedMicrobiologyChapters.includes(track.chapter);
+                        const trackActive = selectedMicrobiologySections.includes(track.section);
                         const trackCount = subject.questions.filter(
                           (question) =>
-                            question.chapter === track.chapter &&
+                            question.section === track.section &&
                             question.sourceType !== "AI_GENERATED"
                         ).length;
 
                         return (
                           <button
-                            key={track.chapter}
+                            key={track.section}
                             type="button"
-                            onClick={() => toggleMicrobiologyChapter(track.chapter)}
+                            onClick={() => toggleMicrobiologySection(track.section)}
                             className={`rounded-2xl border px-3 py-3 text-center text-sm font-semibold transition ${
                               trackActive
                                 ? "border-brand-500 bg-brand-600 text-white shadow-sm"
@@ -322,7 +322,7 @@ export default function StartPage() {
   function handleStart() {
     if ((selectedSubjects.length === 0 && !includeSeasonalLimited) || availableQuestionCount === 0) return;
 
-    const shouldUseExactStartPool = selectedMicrobiologyChapters.length > 0;
+    const shouldUseExactStartPool = selectedMicrobiologySections.length > 0;
     const exactStartQuestionIds = shouldUseExactStartPool
       ? Array.from(
           new Set(
@@ -338,7 +338,7 @@ export default function StartPage() {
         )
       : undefined;
     const selectedMicrobiologyLabels = MICROBIOLOGY_TRACKS
-      .filter((track) => selectedMicrobiologyChapters.includes(track.chapter))
+      .filter((track) => selectedMicrobiologySections.includes(track.section))
       .map((track) => track.label);
 
     const nextSettings: QuizSettings = {
