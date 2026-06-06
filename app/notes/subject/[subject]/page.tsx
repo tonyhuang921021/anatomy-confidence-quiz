@@ -14,6 +14,10 @@ import {
   MICROBIOLOGY_IMMUNOLOGY_CATEGORIES
 } from "@/lib/noteSubjectCategories";
 import {
+  loadQuestionExplanationOverridesForIds,
+  saveQuestionExplanationOverride
+} from "@/lib/storage";
+import {
   createStudyNoteCollection,
   deleteStudyNoteCollection,
   loadStudyNote,
@@ -25,7 +29,15 @@ import {
   updateStudyNote,
   updateStudyNoteCollection
 } from "@/lib/studyNotes";
-import type { Question, StudyNoteCollection, StudyNoteDetail, SubjectName } from "@/types/quiz";
+import { getOrCreateVisitorId } from "@/lib/visitor";
+import type {
+  OptionKey,
+  Question,
+  QuestionExplanationOverride,
+  StudyNoteCollection,
+  StudyNoteDetail,
+  SubjectName
+} from "@/types/quiz";
 
 function buildQuestionMap(): Map<string, Question> {
   return new Map(
@@ -105,6 +117,9 @@ export default function SubjectNotesPage() {
   const [activeQuestionNoteId, setActiveQuestionNoteId] = useState("");
   const [moveMenuNoteId, setMoveMenuNoteId] = useState("");
   const [currentNoteId, setCurrentNoteId] = useState("");
+  const [explanationOverrides, setExplanationOverrides] = useState<Record<string, QuestionExplanationOverride>>({});
+  const [explanationLoadingMap, setExplanationLoadingMap] = useState<Record<string, boolean>>({});
+  const [explanationErrorMap, setExplanationErrorMap] = useState<Record<string, string>>({});
   const [loading, setLoading] = useState(false);
   const [outlineSaving, setOutlineSaving] = useState(false);
   const [error, setError] = useState("");
@@ -238,6 +253,15 @@ export default function SubjectNotesPage() {
       }))
       .filter((item): item is { link: typeof item.link; question: Question } => Boolean(item.question));
   }, [activeQuestionNote, questionMap]);
+
+  useEffect(() => {
+    const questionIds = activeRelatedQuestions.map((item) => item.question.id);
+    if (questionIds.length === 0) return;
+    setExplanationOverrides((current) => ({
+      ...current,
+      ...loadQuestionExplanationOverridesForIds(questionIds)
+    }));
+  }, [activeRelatedQuestions]);
 
   useEffect(() => {
     if (notes.length === 0) {
@@ -732,6 +756,84 @@ export default function SubjectNotesPage() {
     }
   }
 
+  async function handleGenerateQuestionExplanation(question: Question) {
+    if (!session?.access_token) {
+      setExplanationErrorMap((current) => ({
+        ...current,
+        [question.id]: "請先登入帳號，才能使用 GPT-5-mini 補詳解。"
+      }));
+      return;
+    }
+
+    setExplanationLoadingMap((current) => ({ ...current, [question.id]: true }));
+    setExplanationErrorMap((current) => ({ ...current, [question.id]: "" }));
+
+    try {
+      const response = await fetch("/api/question-explanation", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          visitorId: getOrCreateVisitorId(),
+          accessToken: session.access_token,
+          question: {
+            id: question.id,
+            subject: question.subject,
+            chapter: question.chapter,
+            section: question.section,
+            stem: question.stem,
+            options: question.options,
+            answer: question.answer,
+            acceptedAnswers: question.acceptedAnswers,
+            answerCreditType: question.answerCreditType,
+            explanation: question.explanation,
+            testedConcept: question.testedConcept
+          }
+        })
+      });
+
+      const payload = (await response.json()) as {
+        ok: boolean;
+        sharedSaved?: boolean;
+        explanation?: string;
+        optionAnalysis?: Partial<Record<OptionKey, string>>;
+        memoryTip?: string;
+        model?: string;
+        message?: string;
+      };
+
+      if (!response.ok || !payload.ok || !payload.explanation || payload.sharedSaved === false) {
+        if (response.status === 429 && payload.message && typeof window !== "undefined") {
+          window.alert(payload.message);
+        }
+        setExplanationErrorMap((current) => ({
+          ...current,
+          [question.id]: payload.message || "GPT-5-mini 詳解產生失敗。"
+        }));
+        return;
+      }
+
+      const override: QuestionExplanationOverride = {
+        explanation: payload.explanation,
+        optionAnalysis: payload.optionAnalysis ?? {},
+        memoryTip: payload.memoryTip ?? "",
+        model: payload.model ?? "gpt-5-mini",
+        updatedAt: new Date().toISOString()
+      };
+
+      saveQuestionExplanationOverride(question.id, override);
+      setExplanationOverrides((current) => ({ ...current, [question.id]: override }));
+    } catch {
+      setExplanationErrorMap((current) => ({
+        ...current,
+        [question.id]: "無法連線到 GPT-5-mini 詳解 API。"
+      }));
+    } finally {
+      setExplanationLoadingMap((current) => ({ ...current, [question.id]: false }));
+    }
+  }
+
   function scrollToTop() {
     window.scrollTo({ top: 0, behavior: "smooth" });
   }
@@ -1136,37 +1238,78 @@ export default function SubjectNotesPage() {
               </div>
 
               <div className="mt-5 grid gap-4">
-                {activeRelatedQuestions.length > 0 ? activeRelatedQuestions.map(({ link, question }) => (
-                  <article key={`${question.id}-${link.relationType}`} className="min-w-0 overflow-hidden rounded-3xl border border-slate-200 bg-white p-4 text-sm leading-7">
-                    <div className="flex flex-wrap items-center gap-2 text-xs font-semibold text-slate-500">
-                      <span className="font-bold text-slate-950">{question.id}</span>
-                      <span>{question.subject}</span>
-                      <span>{question.chapter}</span>
-                      <span>{question.section}</span>
-                    </div>
-                    <p className="mt-3 break-words font-bold text-slate-950">{question.stem}</p>
-                    <div className="mt-3 grid gap-2">
-                      {Object.entries(question.options)
-                        .filter(([, value]) => Boolean(value))
-                        .map(([key, value]) => (
-                          <p key={key} className="break-words rounded-2xl bg-slate-50 px-3 py-2 text-slate-700">
-                            <span className="font-bold text-slate-950">{key}. </span>
-                            {value}
-                          </p>
-                        ))}
-                    </div>
-                    {link.reason ? <p className="mt-3 rounded-2xl bg-amber-50 px-3 py-2 text-xs font-semibold leading-5 text-amber-800">{link.reason}</p> : null}
-                    <details className="mt-3">
-                      <summary className="secondary-pill cursor-pointer list-none px-4 py-2 text-sm">
-                        看答案與詳解
-                      </summary>
-                      <div className="mt-3 min-w-0 overflow-hidden break-words rounded-2xl bg-slate-950 px-4 py-3 text-sm leading-7 text-white">
-                        <p className="font-bold">答案：{question.answer}</p>
-                        <p className="mt-2 text-slate-100">{question.explanation}</p>
+                {activeRelatedQuestions.length > 0 ? activeRelatedQuestions.map(({ link, question }) => {
+                  const override = explanationOverrides[question.id];
+                  const explanation = override?.explanation || question.explanation;
+                  const optionAnalysis = override?.optionAnalysis ?? question.optionAnalysis;
+                  const memoryTip = override?.memoryTip ?? question.memoryTip;
+                  const explanationLoading = explanationLoadingMap[question.id];
+                  const explanationError = explanationErrorMap[question.id];
+
+                  return (
+                    <article key={`${question.id}-${link.relationType}`} className="min-w-0 overflow-hidden rounded-3xl border border-slate-200 bg-white p-4 text-sm leading-7">
+                      <div className="flex flex-wrap items-center gap-2 text-xs font-semibold text-slate-500">
+                        <span className="font-bold text-slate-950">{question.id}</span>
+                        <span>{question.subject}</span>
+                        <span>{question.chapter}</span>
+                        <span>{question.section}</span>
                       </div>
-                    </details>
-                  </article>
-                )) : (
+                      <p className="mt-3 break-words font-bold text-slate-950">{question.stem}</p>
+                      <div className="mt-3 grid gap-2">
+                        {Object.entries(question.options)
+                          .filter(([, value]) => Boolean(value))
+                          .map(([key, value]) => (
+                            <p key={key} className="break-words rounded-2xl bg-slate-50 px-3 py-2 text-slate-700">
+                              <span className="font-bold text-slate-950">{key}. </span>
+                              {value}
+                            </p>
+                          ))}
+                      </div>
+                      {link.reason ? <p className="mt-3 rounded-2xl bg-amber-50 px-3 py-2 text-xs font-semibold leading-5 text-amber-800">{link.reason}</p> : null}
+                      <div className="mt-3 flex flex-wrap gap-2">
+                        <details>
+                          <summary className="secondary-pill cursor-pointer list-none px-4 py-2 text-sm">
+                            看答案與詳解
+                          </summary>
+                          <div className="mt-3 min-w-0 overflow-hidden break-words rounded-2xl bg-slate-950 px-4 py-3 text-sm leading-7 text-white">
+                            <p className="font-bold">答案：{question.answer}</p>
+                            <p className="mt-2 text-slate-100">{explanation}</p>
+                            {optionAnalysis && Object.keys(optionAnalysis).length > 0 ? (
+                              <div className="mt-3 grid gap-2">
+                                {Object.entries(optionAnalysis).map(([key, value]) =>
+                                  value ? (
+                                    <p key={key} className="rounded-2xl bg-white/10 px-3 py-2">
+                                      <span className="font-bold text-white">{key}. </span>
+                                      <span className="text-slate-100">{value}</span>
+                                    </p>
+                                  ) : null
+                                )}
+                              </div>
+                            ) : null}
+                            {memoryTip ? (
+                              <p className="mt-3 rounded-2xl bg-teal-400/15 px-3 py-2 text-teal-50">
+                                快速記憶：{memoryTip}
+                              </p>
+                            ) : null}
+                          </div>
+                        </details>
+                        <button
+                          type="button"
+                          onClick={() => void handleGenerateQuestionExplanation(question)}
+                          disabled={explanationLoading}
+                          className="secondary-pill px-4 py-2 text-sm disabled:opacity-60"
+                        >
+                          {explanationLoading ? "GPT-5-mini 生成中..." : "用 GPT-5-mini 補詳解"}
+                        </button>
+                      </div>
+                      {explanationError ? (
+                        <p className="mt-3 rounded-2xl bg-rose-50 px-3 py-2 text-xs font-semibold leading-5 text-rose-700">
+                          {explanationError}
+                        </p>
+                      ) : null}
+                    </article>
+                  );
+                }) : (
                   <p className="body-soft rounded-3xl border border-dashed border-slate-200 bg-slate-50 p-4 text-sm">
                     這篇筆記還沒有連結題目。
                   </p>
