@@ -20,7 +20,7 @@ import {
   getPracticeStopAfterReviewPreference,
   getPracticeYearRangePreference
 } from "@/lib/accountPreferences";
-import type { QuizSettings, SubjectName } from "@/types/quiz";
+import type { Question, QuizSettings, SubjectName } from "@/types/quiz";
 
 const selectableSubjects = enabledSubjects.filter(
   (item) =>
@@ -31,10 +31,220 @@ const selectableSubjects = enabledSubjects.filter(
 
 const MICROBIOLOGY_SUBJECT: SubjectName = "微生物免疫學";
 const MICROBIOLOGY_TRACKS = [
-  { label: "病毒", section: "病毒學" },
-  { label: "細菌", section: "細菌學" },
-  { label: "免疫", section: "免疫學" }
+  { key: "virus", label: "病毒" },
+  { key: "bacteria", label: "細菌" },
+  { key: "immunity", label: "免疫" }
 ] as const;
+type MicrobiologyTrackKey = (typeof MICROBIOLOGY_TRACKS)[number]["key"];
+
+const MICROBIOLOGY_TRACK_KEYWORDS: Record<MicrobiologyTrackKey, string[]> = {
+  virus: [
+    "病毒",
+    "virus",
+    "viral",
+    "viridae",
+    "virinae",
+    "phage",
+    "rna virus",
+    "dna virus",
+    "hiv",
+    "hbv",
+    "hcv",
+    "hav",
+    "hev",
+    "cmv",
+    "ebv",
+    "hsv",
+    "vzv",
+    "hpv",
+    "influenza",
+    "adenovirus",
+    "enterovirus",
+    "rotavirus",
+    "rubella",
+    "measles",
+    "mumps",
+    "rabies",
+    "poliovirus",
+    "coronavirus",
+    "hepatitis",
+    "retrovirus",
+    "herpes",
+    "poxvirus",
+    "parvovirus",
+    "togavirus",
+    "flavivirus",
+    "picornavirus",
+    "orthomyxovirus",
+    "paramyxovirus",
+    "papillomavirus"
+  ],
+  bacteria: [
+    "微生物",
+    "microbiology",
+    "microbe",
+    "microbial",
+    "細菌",
+    "bacteria",
+    "bacterial",
+    "bacillus",
+    "coccus",
+    "菌",
+    "桿菌",
+    "球菌",
+    "螺旋菌",
+    "分枝桿菌",
+    "抗酸菌",
+    "革蘭",
+    "gram",
+    "staphylococcus",
+    "streptococcus",
+    "neisseria",
+    "escherichia",
+    "salmonella",
+    "shigella",
+    "vibrio",
+    "clostridium",
+    "bacillus",
+    "corynebacterium",
+    "listeria",
+    "mycobacterium",
+    "treponema",
+    "borrelia",
+    "leptospira",
+    "chlamydia",
+    "rickettsia",
+    "mycoplasma",
+    "pseudomonas",
+    "klebsiella",
+    "proteus",
+    "bacteroides",
+    "actinomyces",
+    "nocardia",
+    "真菌",
+    "黴菌",
+    "fung",
+    "mycos",
+    "candida",
+    "cryptococcus",
+    "aspergillus",
+    "histoplasma",
+    "coccidioides",
+    "pneumocystis",
+    "dermatophyte",
+    "yeast",
+    "mold",
+    "抗菌",
+    "滅菌",
+    "消毒",
+    "培養",
+    "染色",
+    "毒素"
+  ],
+  immunity: [
+    "免疫",
+    "immun",
+    "antibody",
+    "antigen",
+    "mhc",
+    "hla",
+    "t cell",
+    "b cell",
+    "t細胞",
+    "b細胞",
+    "抗體",
+    "抗原",
+    "補體",
+    "complement",
+    "cytokine",
+    "介白素",
+    "interleukin",
+    "巨噬",
+    "macrophage",
+    "樹突",
+    "dendritic",
+    "nk cell",
+    "ige",
+    "igg",
+    "iga",
+    "igm",
+    "igd",
+    "hypersensitivity",
+    "過敏",
+    "疫苗",
+    "vaccine",
+    "先天免疫",
+    "後天免疫",
+    "adaptive",
+    "innate",
+    "發炎",
+    "inflammation",
+    "移植",
+    "transplant",
+    "autoimmune",
+    "自體免疫"
+  ]
+};
+
+function normalizeMicrobiologySearchText(value: string) {
+  return value.toLocaleLowerCase("en-US");
+}
+
+function getMicrobiologySearchText(question: Question) {
+  return normalizeMicrobiologySearchText(
+    [
+      question.chapter,
+      question.section,
+      question.testedConcept,
+      question.stem,
+      question.options.A,
+      question.options.B,
+      question.options.C,
+      question.options.D,
+      question.options.E,
+      question.explanation,
+      question.memoryTip,
+      question.clinicalLink
+    ]
+      .filter(Boolean)
+      .join(" ")
+  );
+}
+
+function getMicrobiologyTrackKeys(question: Question): MicrobiologyTrackKey[] {
+  const text = getMicrobiologySearchText(question);
+  const exactSectionMatches = MICROBIOLOGY_TRACKS.filter((track) => {
+    if (track.key === "virus") return question.section.includes("病毒");
+    if (track.key === "bacteria") {
+      return (
+        question.section.includes("細菌") ||
+        question.section.includes("真菌") ||
+        question.section.includes("微生物")
+      );
+    }
+    return question.section.includes("免疫");
+  }).map((track) => track.key);
+
+  if (exactSectionMatches.length > 0) return exactSectionMatches;
+
+  return MICROBIOLOGY_TRACKS
+    .filter((track) =>
+      MICROBIOLOGY_TRACK_KEYWORDS[track.key].some((keyword) =>
+        text.includes(keyword.toLocaleLowerCase("en-US"))
+      )
+    )
+    .map((track) => track.key);
+}
+
+function questionMatchesMicrobiologyTracks(
+  question: Question,
+  selectedTrackKeys: MicrobiologyTrackKey[]
+) {
+  if (selectedTrackKeys.length === 0) return true;
+  if (selectedTrackKeys.length === MICROBIOLOGY_TRACKS.length) return true;
+  const questionTrackKeys = getMicrobiologyTrackKeys(question);
+  return selectedTrackKeys.some((trackKey) => questionTrackKeys.includes(trackKey));
+}
 
 export default function StartPage() {
   const router = useRouter();
@@ -43,7 +253,7 @@ export default function StartPage() {
   const med2Subjects = selectableSubjects.filter((item) => MED2_SUBJECTS.includes(item.subject));
   const [selectedSubjects, setSelectedSubjects] = useState<SubjectName[]>([]);
   const [microbiologyExpanded, setMicrobiologyExpanded] = useState(false);
-  const [selectedMicrobiologySections, setSelectedMicrobiologySections] = useState<string[]>([]);
+  const [selectedMicrobiologyTracks, setSelectedMicrobiologyTracks] = useState<MicrobiologyTrackKey[]>([]);
   const [includeSeasonalLimited, setIncludeSeasonalLimited] = useState(false);
   const seasonalLimitedQuestions = useMemo(() => getSeasonalLimitedQuestions(), []);
   const seasonalLimitedPastExamCount = useMemo(
@@ -96,7 +306,7 @@ export default function StartPage() {
     setSelectedSubjects((current) => {
       const hasMicrobiology = current.includes(MICROBIOLOGY_SUBJECT);
 
-      if (selectedMicrobiologySections.length > 0) {
+      if (selectedMicrobiologyTracks.length > 0) {
         return hasMicrobiology ? current : [...current, MICROBIOLOGY_SUBJECT];
       }
 
@@ -104,7 +314,7 @@ export default function StartPage() {
         ? current.filter((subject) => subject !== MICROBIOLOGY_SUBJECT)
         : current;
     });
-  }, [selectedMicrobiologySections]);
+  }, [selectedMicrobiologyTracks]);
 
   const selectedSubjectQuestionPool = useMemo(() => {
     if (selectedSubjects.length === 0) return [];
@@ -114,16 +324,16 @@ export default function StartPage() {
       .flatMap((item) => {
         if (
           item.subject === MICROBIOLOGY_SUBJECT &&
-          selectedMicrobiologySections.length > 0
+          selectedMicrobiologyTracks.length > 0
         ) {
           return item.questions.filter((question) =>
-            selectedMicrobiologySections.includes(question.section)
+            questionMatchesMicrobiologyTracks(question, selectedMicrobiologyTracks)
           );
         }
 
         return item.questions;
       });
-  }, [selectedMicrobiologySections, selectedSubjects]);
+  }, [selectedMicrobiologyTracks, selectedSubjects]);
 
   const availableQuestionCount = useMemo(() => {
     const filteredSubjectQuestions = selectedSubjectQuestionPool.filter((question) => {
@@ -178,17 +388,17 @@ export default function StartPage() {
     );
   }
 
-  function toggleMicrobiologySection(section: string) {
-    setSelectedMicrobiologySections((current) =>
-      current.includes(section)
-        ? current.filter((item) => item !== section)
-        : [...current, section]
+  function toggleMicrobiologyTrack(trackKey: MicrobiologyTrackKey) {
+    setSelectedMicrobiologyTracks((current) =>
+      current.includes(trackKey)
+        ? current.filter((item) => item !== trackKey)
+        : [...current, trackKey]
     );
   }
 
   function selectAllSubjects() {
     setSelectedSubjects(selectableSubjects.map((item) => item.subject));
-    setSelectedMicrobiologySections(MICROBIOLOGY_TRACKS.map((track) => track.section));
+    setSelectedMicrobiologyTracks(MICROBIOLOGY_TRACKS.map((track) => track.key));
     setMicrobiologyExpanded(true);
   }
 
@@ -206,11 +416,11 @@ export default function StartPage() {
           {subjects.map((subject) => {
             const active = selectedSubjects.includes(subject.subject);
             const isMicrobiology = subject.subject === MICROBIOLOGY_SUBJECT;
-            const selectedMicrobiologyQuestionCount = isMicrobiology && selectedMicrobiologySections.length > 0
+            const selectedMicrobiologyQuestionCount = isMicrobiology && selectedMicrobiologyTracks.length > 0
               ? subject.questions.filter(
                   (question) =>
                     question.sourceType !== "AI_GENERATED" &&
-                    selectedMicrobiologySections.includes(question.section)
+                    questionMatchesMicrobiologyTracks(question, selectedMicrobiologyTracks)
                 ).length
               : null;
             const pastExamCount =
@@ -246,7 +456,10 @@ export default function StartPage() {
                     </div>
                     {active ? (
                       <p className="mt-3 text-xs font-semibold text-brand-700">
-                        已選 {selectedMicrobiologySections.map((section) => section.replace("學", "")).join("、")}
+                        已選 {MICROBIOLOGY_TRACKS
+                          .filter((track) => selectedMicrobiologyTracks.includes(track.key))
+                          .map((track) => track.label)
+                          .join("、")}
                       </p>
                     ) : (
                       <p className="mt-3 text-xs text-slate-500">點開後選病毒、細菌或免疫。</p>
@@ -256,18 +469,18 @@ export default function StartPage() {
                   {microbiologyExpanded ? (
                     <div className="mt-4 grid gap-2 sm:grid-cols-3">
                       {MICROBIOLOGY_TRACKS.map((track) => {
-                        const trackActive = selectedMicrobiologySections.includes(track.section);
+                        const trackActive = selectedMicrobiologyTracks.includes(track.key);
                         const trackCount = subject.questions.filter(
                           (question) =>
-                            question.section === track.section &&
-                            question.sourceType !== "AI_GENERATED"
+                            question.sourceType !== "AI_GENERATED" &&
+                            questionMatchesMicrobiologyTracks(question, [track.key])
                         ).length;
 
                         return (
                           <button
-                            key={track.section}
+                            key={track.key}
                             type="button"
-                            onClick={() => toggleMicrobiologySection(track.section)}
+                            onClick={() => toggleMicrobiologyTrack(track.key)}
                             className={`rounded-2xl border px-3 py-3 text-center text-sm font-semibold transition ${
                               trackActive
                                 ? "border-brand-500 bg-brand-600 text-white shadow-sm"
@@ -322,7 +535,7 @@ export default function StartPage() {
   function handleStart() {
     if ((selectedSubjects.length === 0 && !includeSeasonalLimited) || availableQuestionCount === 0) return;
 
-    const shouldUseExactStartPool = selectedMicrobiologySections.length > 0;
+    const shouldUseExactStartPool = selectedMicrobiologyTracks.length > 0;
     const exactStartQuestionIds = shouldUseExactStartPool
       ? Array.from(
           new Set(
@@ -338,7 +551,7 @@ export default function StartPage() {
         )
       : undefined;
     const selectedMicrobiologyLabels = MICROBIOLOGY_TRACKS
-      .filter((track) => selectedMicrobiologySections.includes(track.section))
+      .filter((track) => selectedMicrobiologyTracks.includes(track.key))
       .map((track) => track.label);
 
     const nextSettings: QuizSettings = {
