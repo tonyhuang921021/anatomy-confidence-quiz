@@ -6,6 +6,7 @@ import {
   useContext,
   useEffect,
   useMemo,
+  useRef,
   useState,
   type ReactNode
 } from "react";
@@ -32,6 +33,7 @@ type AuthContextValue = {
 };
 
 const AuthContext = createContext<AuthContextValue | null>(null);
+const CLOUD_RESUME_SYNC_TIMEOUT_MS = 4500;
 
 function getErrorMessage(error: unknown) {
   if (error instanceof Error) return error.message;
@@ -49,6 +51,16 @@ function getErrorMessage(error: unknown) {
   return typeof error === "string" ? error : "同步失敗";
 }
 
+function withTimeout<T>(promise: Promise<T>, timeoutMs: number, message: string) {
+  return new Promise<T>((resolve, reject) => {
+    const timeoutId = window.setTimeout(() => reject(new Error(message)), timeoutMs);
+    promise
+      .then(resolve)
+      .catch(reject)
+      .finally(() => window.clearTimeout(timeoutId));
+  });
+}
+
 export function AuthProvider({ children }: { children: ReactNode }) {
   const configured = isSupabaseConfigured();
   const [user, setUser] = useState<User | null>(null);
@@ -57,28 +69,50 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [syncStatus, setSyncStatus] = useState<AuthContextValue["syncStatus"]>("idle");
   const [syncVersion, setSyncVersion] = useState(0);
   const [syncError, setSyncError] = useState("");
+  const syncInFlightRef = useRef<Promise<void> | null>(null);
 
   const refreshCloudData = useCallback(async (targetUserId?: string, targetUser?: User | null) => {
     const userId = targetUserId || user?.id;
     const effectiveUser = targetUser ?? user;
     if (!configured || !userId || !effectiveUser) return;
 
+    if (syncInFlightRef.current) {
+      await withTimeout(
+        syncInFlightRef.current,
+        CLOUD_RESUME_SYNC_TIMEOUT_MS,
+        "雲端續寫同步仍在背景整理，先使用本機紀錄。"
+      ).catch((error) => {
+        setSyncStatus("error");
+        setSyncError(getErrorMessage(error));
+      });
+      return;
+    }
+
+    setSyncStatus("syncing");
+    setSyncError("");
+
+    const syncTask = syncCurrentSessionForCurrentUser(userId)
+      .then(() => {
+        setSyncStatus("ready");
+        setSyncVersion((value) => value + 1);
+      })
+      .catch((error) => {
+        setSyncStatus("error");
+        setSyncError(getErrorMessage(error));
+      })
+      .finally(() => {
+        if (syncInFlightRef.current === syncTask) {
+          syncInFlightRef.current = null;
+        }
+      });
+
+    syncInFlightRef.current = syncTask;
     try {
-      setSyncStatus("syncing");
-      setSyncError("");
-      const {
-        data: { session: liveSession }
-      } = await getSupabaseBrowserClient().auth.getSession();
-
-      if (!liveSession?.access_token) {
-        setSyncStatus("idle");
-        return;
-      }
-
-      await syncCurrentSessionForCurrentUser(userId);
-
-      setSyncStatus("ready");
-      setSyncVersion((value) => value + 1);
+      await withTimeout(
+        syncTask,
+        CLOUD_RESUME_SYNC_TIMEOUT_MS,
+        "雲端續寫同步逾時，先使用本機紀錄。"
+      );
     } catch (error) {
       setSyncStatus("error");
       setSyncError(getErrorMessage(error));
@@ -107,17 +141,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setSession(initialSession);
       setUser(initialSession?.user ?? null);
       setActiveStorageUser(initialSession?.user?.id);
+      setLoading(false);
 
       if (initialSession?.user) {
-        try {
-          await refreshCloudData(initialSession.user.id, initialSession.user);
-        } catch (error) {
-          setSyncStatus("error");
-          setSyncError(getErrorMessage(error));
-        }
+        void refreshCloudData(initialSession.user.id, initialSession.user);
       }
-
-      setLoading(false);
     }
 
     void bootstrap();
