@@ -159,6 +159,24 @@ function getAccuracyTone(correctRate: number) {
   return "bg-emerald-100 text-emerald-800";
 }
 
+function getQuestionSourceBadgeLabel(question: Question) {
+  if (question.sourceYear && question.sourceRound && question.originalQuestionNumber) {
+    return `${question.sourceYear} 第${question.sourceRound}次 Q${question.originalQuestionNumber}`;
+  }
+  if (question.sourceYear && question.originalQuestionNumber) {
+    return `${question.sourceYear} Q${question.originalQuestionNumber}`;
+  }
+  if (question.originalQuestionNumber) {
+    return `Q${question.originalQuestionNumber}`;
+  }
+  if (question.sourceType === "AI_GENERATED") return "AI 題";
+  return "";
+}
+
+function normalizeSummaryStem(stem: string) {
+  return stem.replace(/\s+/g, " ").trim();
+}
+
 function getSubjectStatOrder(subject: string) {
   const med1Order = ["解剖學", "組織學", "胚胎學", "生理學", "生物化學"];
   const med2Order = ["微生物免疫學", "寄生蟲學", "公共衛生學", "藥理學", "病理學"];
@@ -955,11 +973,39 @@ function ResultsPageContent() {
     );
   }
 
-  function renderQuestionSummaryLine(label: string, questionId: string) {
+  function renderQuestionSummaryLine({
+    prefix,
+    question,
+    suffix
+  }: {
+    prefix: string;
+    question: Question;
+    suffix?: string;
+  }) {
+    const sourceBadge = getQuestionSourceBadgeLabel(question);
+    const shouldShowLeadingSlash = !prefix.trim().endsWith("：");
     return (
       <span className="flex max-w-full min-w-0 items-center gap-2 align-top">
-        <span className="min-w-0 flex-1 truncate">{label}</span>
-        <span className="shrink-0">{renderQuestionCommunityBadge(questionId)}</span>
+        <span className="min-w-0 flex-1 overflow-hidden">
+          <span className="flex min-w-0 flex-wrap items-baseline gap-x-1.5 gap-y-1">
+            <span className="shrink-0">{prefix}</span>
+            {shouldShowLeadingSlash ? <span className="shrink-0 text-slate-400">/</span> : null}
+            <span className="shrink-0">{question.subject}</span>
+            <span className="shrink-0 text-slate-400">/</span>
+            <span className="min-w-[8rem] flex-1 truncate font-semibold">
+              {normalizeSummaryStem(question.stem)}
+            </span>
+            {suffix ? <span className="shrink-0 text-xs font-semibold text-slate-500">{suffix}</span> : null}
+          </span>
+        </span>
+        <span className="flex shrink-0 items-center gap-1.5">
+          {sourceBadge ? (
+            <span className="rounded-full bg-white/80 px-2.5 py-1 text-[11px] font-bold text-slate-600 ring-1 ring-slate-200">
+              {sourceBadge}
+            </span>
+          ) : null}
+          {renderQuestionCommunityBadge(question.id)}
+        </span>
       </span>
     );
   }
@@ -1007,10 +1053,10 @@ function ResultsPageContent() {
                 wrongAttempts.map(({ attempt, question }, index) => (
                   <details key={`wrong-${attempt.questionId}`} className="overflow-hidden rounded-2xl bg-rose-50 p-3.5 sm:p-4">
                     <summary className="block cursor-pointer overflow-hidden text-sm font-semibold text-rose-950">
-                      {renderQuestionSummaryLine(
-                        `錯題 ${index + 1}：${question.chapter} / ${question.section} / ${question.testedConcept}`,
-                        question.id
-                      )}
+                      {renderQuestionSummaryLine({
+                        prefix: `錯題 ${index + 1}：`,
+                        question
+                      })}
                     </summary>
                     <div className="mt-4 min-w-0 space-y-3 overflow-hidden text-sm leading-7 text-slate-700 [overflow-wrap:anywhere]">
                       <QuestionStemBlock question={question} />
@@ -1078,10 +1124,11 @@ function ResultsPageContent() {
                 lowConfidenceAttempts.map(({ attempt, question }, index) => (
                   <details key={`low-confidence-${attempt.questionId}`} className="overflow-hidden rounded-2xl bg-amber-50 p-3.5 sm:p-4">
                     <summary className="block cursor-pointer overflow-hidden text-sm font-semibold text-amber-950">
-                      {renderQuestionSummaryLine(
-                        `信心 ${attempt.confidence}｜${index + 1}：${question.chapter} / ${question.section} / ${question.testedConcept}`,
-                        question.id
-                      )}
+                      {renderQuestionSummaryLine({
+                        prefix: `信心 ${attempt.confidence}｜${index + 1}：`,
+                        question,
+                        suffix: attempt.isCorrect ? "答對" : "答錯"
+                      })}
                     </summary>
                     <div className="mt-4 min-w-0 space-y-3 overflow-hidden text-sm leading-7 text-slate-700 [overflow-wrap:anywhere]">
                       <QuestionStemBlock question={question} />
@@ -1148,10 +1195,11 @@ function ResultsPageContent() {
               {reviewedAttempts.map(({ attempt, question }, index) => (
                 <details key={`all-${attempt.questionId}`} className="overflow-hidden rounded-2xl bg-slate-50 p-3.5 sm:p-4">
                   <summary className="block cursor-pointer overflow-hidden text-sm font-semibold text-ink">
-                    {renderQuestionSummaryLine(
-                      `第 ${index + 1} 題：${attempt.isCorrect ? "答對" : "答錯"} / ${question.chapter} / ${question.section}`,
-                      question.id
-                    )}
+                    {renderQuestionSummaryLine({
+                      prefix: `第 ${index + 1} 題：${attempt.isCorrect ? "答對" : "答錯"}`,
+                      question,
+                      suffix: `信心 ${attempt.confidence}`
+                    })}
                   </summary>
                   <div className="mt-4 min-w-0 space-y-3 overflow-hidden text-sm leading-7 text-slate-700 [overflow-wrap:anywhere]">
                     <QuestionStemBlock question={question} />
