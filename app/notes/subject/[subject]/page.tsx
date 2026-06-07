@@ -1713,14 +1713,20 @@ export default function SubjectNotesPage() {
                             ) : null}
                           </div>
                         </details>
-                        <button
-                          type="button"
-                          onClick={() => void handleGenerateQuestionExplanation(question)}
-                          disabled={explanationLoading}
-                          className="secondary-pill px-4 py-2 text-sm disabled:opacity-60"
-                        >
-                          {explanationLoading ? "GPT-5-mini 生成中..." : "用 GPT-5-mini 補詳解"}
-                        </button>
+                        {override ? (
+                          <span className="secondary-pill px-4 py-2 text-sm text-slate-600">
+                            已替換詳解・{override.model ?? "gpt-5-mini"}
+                          </span>
+                        ) : (
+                          <button
+                            type="button"
+                            onClick={() => void handleGenerateQuestionExplanation(question)}
+                            disabled={explanationLoading}
+                            className="secondary-pill px-4 py-2 text-sm disabled:cursor-wait disabled:opacity-60"
+                          >
+                            {explanationLoading ? "GPT-5-mini 生成中..." : "用 GPT-5-mini 補詳解"}
+                          </button>
+                        )}
                       </div>
                       {explanationError ? (
                         <p className="mt-3 rounded-2xl bg-rose-50 px-3 py-2 text-xs font-semibold leading-5 text-rose-700">

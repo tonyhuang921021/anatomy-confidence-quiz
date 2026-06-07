@@ -71,17 +71,32 @@ const optionKeys: OptionKey[] = ["A", "B", "C", "D", "E"];
 
 function getQuestionMap(
   session: QuizSession,
-  classificationOverrides: Record<string, QuestionClassificationOverride>
+  classificationOverrides: Record<string, QuestionClassificationOverride>,
+  explanationOverrides: Record<string, QuestionExplanationOverride>
 ) {
   return new Map(
     [...allQuestions, ...(session.generatedQuestions ?? [])]
       .filter((question): question is Question => Boolean(question?.id))
-      .map((question) => [
-        question.id,
-        applyQuestionExplanationOverride(
-          applyQuestionClassificationOverride(question, classificationOverrides[question.id])
-        )
-      ] as const)
+      .map((question) => {
+        const classifiedQuestion = applyQuestionClassificationOverride(
+          question,
+          classificationOverrides[question.id]
+        );
+        const storedQuestion = applyQuestionExplanationOverride(classifiedQuestion);
+        const override = explanationOverrides[question.id];
+
+        return [
+          question.id,
+          override
+            ? {
+                ...storedQuestion,
+                explanation: override.explanation || storedQuestion.explanation,
+                optionAnalysis: override.optionAnalysis ?? storedQuestion.optionAnalysis,
+                memoryTip: override.memoryTip || storedQuestion.memoryTip
+              }
+            : storedQuestion
+        ] as const;
+      })
   );
 }
 
@@ -545,8 +560,11 @@ function ResultsPageContent() {
   );
   const activeSession = state.session;
   const questionMap = useMemo(
-    () => (activeSession ? getQuestionMap(activeSession, classificationOverrides) : new Map<string, Question>()),
-    [activeSession, classificationOverrides]
+    () =>
+      activeSession
+        ? getQuestionMap(activeSession, classificationOverrides, explanationOverrides)
+        : new Map<string, Question>(),
+    [activeSession, classificationOverrides, explanationOverrides]
   );
   const reviewedAttempts = useMemo(
     () =>
@@ -950,13 +968,6 @@ function ResultsPageContent() {
   function renderExplanationFooter(question: Question, attempt: Attempt) {
     return (
       <div className="space-y-3">
-        <div className="flex flex-wrap items-center gap-2">
-          {explanationOverrides[question.id] ? (
-            <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-600">
-              已替換詳解・{explanationOverrides[question.id]?.model ?? "gpt-5-mini"}
-            </span>
-          ) : null}
-        </div>
         {renderQuestionExplanationControls(question, attempt)}
       </div>
     );
