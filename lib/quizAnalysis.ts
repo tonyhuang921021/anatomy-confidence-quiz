@@ -684,13 +684,25 @@ function getFollowUpClusterMap(questions: Question[]) {
   return clusterByQuestionId;
 }
 
-function keepFollowUpQuestionsTogether(questionIds: string[], questionMap: Map<string, Question>) {
-  if (questionIds.length <= 1) return questionIds;
+function getPreviousQuestionForFollowUp(question: Question, questionMap: Map<string, Question>) {
+  if (!isFollowUpStem(question.stem)) return null;
+  if (!question.examCode || !question.paperCode || !question.originalQuestionNumber) return null;
 
-  const clusterMap = getFollowUpClusterMap(
-    questionIds.map((id) => questionMap.get(id)).filter((question): question is Question => Boolean(question))
-  );
+  const previousQuestionNumber = question.originalQuestionNumber - 1;
+  if (previousQuestionNumber < 1) return null;
 
+  for (const candidate of questionMap.values()) {
+    if (candidate.id === question.id) continue;
+    if (candidate.examCode !== question.examCode) continue;
+    if (candidate.paperCode !== question.paperCode) continue;
+    if (candidate.originalQuestionNumber !== previousQuestionNumber) continue;
+    return candidate;
+  }
+
+  return null;
+}
+
+function sortFollowUpQuestionIds(questionIds: string[], clusterMap: Map<string, { key: string; order: number }>) {
   return [...questionIds].sort((leftId, rightId) => {
     const leftCluster = clusterMap.get(leftId);
     const rightCluster = clusterMap.get(rightId);
@@ -702,6 +714,49 @@ function keepFollowUpQuestionsTogether(questionIds: string[], questionMap: Map<s
     if (leftCluster.key !== rightCluster.key) return 0;
     return leftCluster.order - rightCluster.order;
   });
+}
+
+function keepFollowUpQuestionsTogether(questionIds: string[], questionMap: Map<string, Question>) {
+  if (questionIds.length === 0) return questionIds;
+
+  const targetCount = questionIds.length;
+  const selectedIds = new Set(questionIds);
+  const protectedIds = new Set<string>();
+  const expandedIds: string[] = [];
+  const pushUnique = (id: string) => {
+    if (!expandedIds.includes(id)) expandedIds.push(id);
+  };
+
+  questionIds.forEach((id) => {
+    const question = questionMap.get(id);
+    const previousQuestion = question ? getPreviousQuestionForFollowUp(question, questionMap) : null;
+
+    if (previousQuestion && !selectedIds.has(previousQuestion.id)) {
+      protectedIds.add(previousQuestion.id);
+      pushUnique(previousQuestion.id);
+    }
+
+    if (question && isFollowUpStem(question.stem)) {
+      protectedIds.add(id);
+    }
+
+    pushUnique(id);
+  });
+
+  const clusterMap = getFollowUpClusterMap(
+    expandedIds.map((id) => questionMap.get(id)).filter((question): question is Question => Boolean(question))
+  );
+
+  const sorted = sortFollowUpQuestionIds(expandedIds, clusterMap);
+  if (sorted.length <= targetCount) return sorted;
+
+  const trimmed = [...sorted];
+  for (let index = trimmed.length - 1; index >= 0 && trimmed.length > targetCount; index -= 1) {
+    if (protectedIds.has(trimmed[index])) continue;
+    trimmed.splice(index, 1);
+  }
+
+  return protectedIds.size > targetCount ? trimmed : trimmed.slice(0, targetCount);
 }
 
 function getPrioritizedFreshPool(

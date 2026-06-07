@@ -973,6 +973,24 @@ const questionTextOverrides: Record<string, QuestionTextOverride> = {
     },
     testedConcept: "公共衛生學／人因工程／站立工作檯高度"
   },
+  "MOEX-113090-2301-Q021": {
+    options: {
+      A: "免疫球蛋白基因的V-D-J重組，先從重鏈（heavy chain）開始",
+      B: "μ重鏈（μ heavy chain）與VpreB及λ5組成的pre-BCR，對pre-B細胞繼續發育是必要的",
+      C: "Bruton's tyrosine kinase（Btk）是pre-BCR或BCR下游訊息傳遞的必要蛋白，缺乏Btk會造成X-linked agammaglobulinemia（XLA）",
+      D: "表現IgM的immature B細胞如果辨識到抗原，就會開始細胞分裂（clonal expansion）"
+    },
+    answer: "D",
+    explanation:
+      "B細胞發育中，重鏈 V-D-J 重組先發生，pre-BCR 由 μ 重鏈搭配 surrogate light chain（VpreB、λ5）形成，Btk 也是 pre-BCR/BCR 訊息傳遞的重要蛋白。Immature B 細胞若辨識到自身抗原，通常進入 receptor editing、clonal deletion 或 anergy，不會直接進行 clonal expansion，因此 D 最不適當。",
+    optionAnalysis: {
+      A: "適當。免疫球蛋白基因重組通常先從重鏈 V-D-J 重組開始。",
+      B: "適當。μ heavy chain 與 VpreB、λ5 形成 pre-BCR，對 pre-B 細胞繼續發育很重要。",
+      C: "適當。Btk 是 pre-BCR/BCR 下游訊息傳遞所需蛋白，缺乏會造成 X-linked agammaglobulinemia。",
+      D: "不適當。Immature B 細胞辨識自身抗原時會被耐受機制處理，而不是開始 clonal expansion。"
+    },
+    testedConcept: "微生物免疫學／免疫學／B細胞發育"
+  },
   "MOEX-113020-2301-Q029": {
     stem:
       "寄生蟲感染人體所造成之症狀，下列敘述何者正確？\n1犬蛔蟲（Toxocara canis）可造成眼部幼蟲移行症（ocular larva migrans）\n2班氏絲蟲（Wuchereria bancrofti）的慢性感染可造成下肢象皮病（elephantiasis）\n3免疫低下之病患受到鞭蟲（Trichuris trichiura）感染必造成死亡\n4蛔蟲（Ascaris lumbricoides）感染可能出現異位寄生（ectopic parasitism）",
