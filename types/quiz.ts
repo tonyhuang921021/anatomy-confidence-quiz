@@ -329,6 +329,16 @@ export type QuestionExplanationOverride = {
   updatedAt: string;
 };
 
+export type YangmingExplanationContent = {
+  body: string;
+  author?: string;
+  reviewer?: string;
+  assets?: {
+    src: string;
+    alt?: string;
+  }[];
+};
+
 export type OwnerDashboardStats = {
   totalVisitorDevices: number;
   totalAttemptDevices: number;
@@ -419,6 +429,15 @@ export type OwnerClassificationReportEntry = {
   createdAt: string;
   appliedAt?: string;
   approvedByEmail?: string;
+};
+
+export type OwnerYangmingModeActivationEntry = {
+  label: string;
+  userEmail?: string;
+  visitorId?: string;
+  activationCount: number;
+  firstEnabledAt?: string;
+  lastEnabledAt?: string;
 };
 
 export type QuestionClassificationOverride = {

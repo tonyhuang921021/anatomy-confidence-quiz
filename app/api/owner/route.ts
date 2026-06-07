@@ -7,6 +7,7 @@ import type {
   OwnerExplanationUsageEntry,
   OwnerHourlyPoint,
   OwnerRecentAIAccountEntry,
+  OwnerYangmingModeActivationEntry,
   OwnerTopAttemptVisitorEntry
 } from "@/types/quiz";
 import { normalizeEmail } from "@/lib/aiAccountBan";
@@ -62,6 +63,12 @@ type ClassificationReportRow = {
   created_at: string;
   applied_at?: string | null;
   approved_by_email?: string | null;
+};
+
+type YangmingModeActivationRow = {
+  user_email?: string | null;
+  visitor_id?: string | null;
+  enabled_at: string;
 };
 
 const SUPABASE_PAGE_SIZE = 1000;
@@ -584,6 +591,53 @@ async function fetchOwnerClassificationReports(
   }));
 }
 
+async function fetchOwnerYangmingModeActivations(
+  supabase: any,
+  limit = 80
+): Promise<OwnerYangmingModeActivationEntry[]> {
+  const { data, error } = await supabase
+    .from("yangming_mode_activations")
+    .select("user_email, visitor_id, enabled_at")
+    .order("enabled_at", { ascending: false })
+    .limit(1000);
+
+  if (error) {
+    const message = String(error.message ?? "");
+    if (message.includes("yangming_mode_activations") && (message.includes("does not exist") || message.includes("Could not find"))) {
+      return [];
+    }
+    throw error;
+  }
+
+  const grouped = new Map<string, OwnerYangmingModeActivationEntry>();
+  for (const row of ((data ?? []) as YangmingModeActivationRow[])) {
+    const userEmail = row.user_email?.trim().toLowerCase();
+    const visitorId = row.visitor_id?.trim();
+    const key = userEmail || visitorId || "unknown";
+    const current = grouped.get(key) ?? {
+      label: userEmail || formatVisitorLabel(visitorId),
+      userEmail: userEmail || undefined,
+      visitorId: visitorId || undefined,
+      activationCount: 0,
+      firstEnabledAt: row.enabled_at,
+      lastEnabledAt: row.enabled_at
+    };
+
+    current.activationCount += 1;
+    if (!current.firstEnabledAt || row.enabled_at < current.firstEnabledAt) {
+      current.firstEnabledAt = row.enabled_at;
+    }
+    if (!current.lastEnabledAt || row.enabled_at > current.lastEnabledAt) {
+      current.lastEnabledAt = row.enabled_at;
+    }
+    grouped.set(key, current);
+  }
+
+  return Array.from(grouped.values())
+    .sort((a, b) => (b.lastEnabledAt ?? "").localeCompare(a.lastEnabledAt ?? ""))
+    .slice(0, limit);
+}
+
 export async function POST(request: NextRequest) {
   const supabase = getServiceSupabaseClient();
   if (!supabase) {
@@ -608,14 +662,24 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ ok: false, message: "你沒有查看私有數據頁的權限。" }, { status: 403 });
     }
 
-    const [dailySeries, hourlySeries, explanationUsage, searchUsage, topVisitors, classificationReports, recentAiAccounts] = await Promise.all([
+    const [
+      dailySeries,
+      hourlySeries,
+      explanationUsage,
+      searchUsage,
+      topVisitors,
+      classificationReports,
+      recentAiAccounts,
+      yangmingModeActivations
+    ] = await Promise.all([
       fetchOwnerDailySeries(supabase, 14),
       fetchOwnerHourlySeries(supabase),
       fetchOwnerExplanationUsage(supabase, "explanation"),
       fetchOwnerExplanationUsage(supabase, "search"),
       fetchOwnerTopAttemptVisitors(supabase, 5),
       fetchOwnerClassificationReports(supabase, 40),
-      fetchRecentAIAccounts(supabase)
+      fetchRecentAIAccounts(supabase),
+      fetchOwnerYangmingModeActivations(supabase, 80)
     ]);
     const stats = await fetchOwnerDashboardStats(supabase, dailySeries, explanationUsage, searchUsage);
 
@@ -628,7 +692,8 @@ export async function POST(request: NextRequest) {
       searchUsage,
       topVisitors,
       classificationReports,
-      recentAiAccounts
+      recentAiAccounts,
+      yangmingModeActivations
     });
   } catch (error) {
     const message = error instanceof Error ? error.message : "私有數據載入失敗";

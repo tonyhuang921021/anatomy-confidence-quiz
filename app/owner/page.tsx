@@ -11,6 +11,7 @@ import {
   OwnerHourlyPoint,
   OpenAIBudgetStatus,
   OwnerRecentAIAccountEntry,
+  OwnerYangmingModeActivationEntry,
   SubjectName,
   OwnerTopAttemptVisitorEntry
 } from "@/types/quiz";
@@ -55,6 +56,7 @@ type OwnerApiPayload = {
   recentAiAccounts?: OwnerRecentAIAccountEntry[];
   topVisitors?: OwnerTopAttemptVisitorEntry[];
   classificationReports?: OwnerClassificationReportEntry[];
+  yangmingModeActivations?: OwnerYangmingModeActivationEntry[];
 };
 
 function formatUpdatedAt(value: string) {
@@ -201,6 +203,7 @@ export default function OwnerPage() {
   const [explanationUsage, setExplanationUsage] = useState<OwnerExplanationUsageEntry[]>([]);
   const [searchUsage, setSearchUsage] = useState<OwnerExplanationUsageEntry[]>([]);
   const [recentAiAccounts, setRecentAiAccounts] = useState<OwnerRecentAIAccountEntry[]>([]);
+  const [yangmingModeActivations, setYangmingModeActivations] = useState<OwnerYangmingModeActivationEntry[]>([]);
   const [topVisitors, setTopVisitors] = useState<OwnerTopAttemptVisitorEntry[]>([]);
   const [classificationReports, setClassificationReports] = useState<OwnerClassificationReportEntry[]>([]);
   const [openAIBudget, setOpenAIBudget] = useState<OpenAIBudgetStatus | null>(null);
@@ -540,6 +543,7 @@ export default function OwnerPage() {
         setExplanationUsage(payload.explanationUsage ?? []);
         setSearchUsage(payload.searchUsage ?? []);
         setRecentAiAccounts(payload.recentAiAccounts ?? []);
+        setYangmingModeActivations(payload.yangmingModeActivations ?? []);
         setTopVisitors(payload.topVisitors ?? []);
         setClassificationReports(payload.classificationReports ?? []);
         await fetchOpenAIBudget();
@@ -565,6 +569,7 @@ export default function OwnerPage() {
         setExplanationUsage(payload.explanationUsage ?? []);
         setSearchUsage(payload.searchUsage ?? []);
         setRecentAiAccounts(payload.recentAiAccounts ?? []);
+        setYangmingModeActivations(payload.yangmingModeActivations ?? []);
         setTopVisitors(payload.topVisitors ?? []);
         setClassificationReports(payload.classificationReports ?? []);
         await fetchOpenAIBudget();
@@ -986,6 +991,54 @@ export default function OwnerPage() {
                           </tr>
                         );
                       })
+                    )}
+                  </tbody>
+                </table>
+              </div>
+            </section>
+
+            <section className="rounded-[2rem] bg-white p-6 shadow-card ring-1 ring-slate-100">
+              <div className="flex items-center justify-between gap-3">
+                <div>
+                  <h2 className="text-lg font-semibold text-ink">陽明詳解模式啟用紀錄</h2>
+                  <p className="mt-2 text-sm text-slate-500">
+                    只統計真正完成隱藏開關的人；未啟用者不會在公開頁看到任何提示。
+                  </p>
+                </div>
+              </div>
+              <div className="mt-4 overflow-x-auto">
+                <table className="min-w-full text-left text-sm">
+                  <thead className="text-slate-500">
+                    <tr className="border-b border-slate-200">
+                      <th className="px-3 py-3 font-semibold">使用者 / 裝置</th>
+                      <th className="px-3 py-3 font-semibold">啟用次數</th>
+                      <th className="px-3 py-3 font-semibold">第一次啟用</th>
+                      <th className="px-3 py-3 font-semibold">最後啟用</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {yangmingModeActivations.length === 0 ? (
+                      <tr>
+                        <td colSpan={4} className="px-3 py-6 text-center text-slate-500">
+                          目前還沒有啟用紀錄。
+                        </td>
+                      </tr>
+                    ) : (
+                      yangmingModeActivations.map((entry) => (
+                        <tr
+                          key={`${entry.userEmail ?? entry.visitorId ?? entry.label}-yangming`}
+                          className="border-b border-slate-100 last:border-b-0"
+                        >
+                          <td className="px-3 py-3 font-medium text-ink">{entry.label}</td>
+                          <td className="px-3 py-3 text-slate-700">{entry.activationCount}</td>
+                          <td className="px-3 py-3 text-slate-500">
+                            {entry.firstEnabledAt ? formatUpdatedAt(entry.firstEnabledAt) : "—"}
+                          </td>
+                          <td className="px-3 py-3 text-slate-500">
+                            {entry.lastEnabledAt ? formatUpdatedAt(entry.lastEnabledAt) : "—"}
+                          </td>
+                        </tr>
+                      ))
                     )}
                   </tbody>
                 </table>

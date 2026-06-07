@@ -52,6 +52,7 @@ import {
   saveQuestionExplanationOverrides
 } from "@/lib/storage";
 import { getOrCreateVisitorId } from "@/lib/visitor";
+import { isYangmingModeEnabled, YANGMING_MODE_EVENT } from "@/lib/yangmingMode";
 import {
   Attempt,
   ConfidenceLevel,
@@ -62,7 +63,8 @@ import {
   QuestionExplanationOverride,
   QuizSession,
   QuizSettings,
-  SubjectName
+  SubjectName,
+  YangmingExplanationContent
 } from "@/types/quiz";
 
 function getQuestionSourceBadge(question: Question) {
@@ -106,6 +108,33 @@ function evaluateAttempt(question: Question, selectedAnswer: OptionKey) {
   }
 
   return selectedAnswer === question.answer;
+}
+
+function YangmingExplanationBlock({ content }: { content: YangmingExplanationContent }) {
+  return (
+    <div className="rounded-3xl bg-white/70 p-4 text-sm leading-7 text-slate-800 ring-1 ring-white/70">
+      <div className="whitespace-pre-wrap">{content.body}</div>
+      {content.assets?.length ? (
+        <div className="mt-4 grid gap-3">
+          {content.assets.map((asset) => (
+            <img
+              key={asset.src}
+              src={asset.src}
+              alt={asset.alt ?? ""}
+              className="max-h-[520px] w-full rounded-2xl object-contain ring-1 ring-slate-200"
+            />
+          ))}
+        </div>
+      ) : null}
+      {content.author || content.reviewer ? (
+        <p className="mt-4 text-xs font-semibold text-slate-500">
+          {content.author ? `撰寫：${content.author}` : ""}
+          {content.author && content.reviewer ? "　" : ""}
+          {content.reviewer ? `校稿：${content.reviewer}` : ""}
+        </p>
+      ) : null}
+    </div>
+  );
 }
 
 function buildSimulationSessionName(settings: QuizSettings, questions: Question[]) {
@@ -379,6 +408,9 @@ export default function QuizPage() {
   const [explanationErrorMap, setExplanationErrorMap] = useState<Record<string, string>>({});
   const [classificationReportLoadingMap, setClassificationReportLoadingMap] = useState<Record<string, boolean>>({});
   const [classificationReportMessageMap, setClassificationReportMessageMap] = useState<Record<string, string>>({});
+  const [yangmingModeEnabled, setYangmingModeEnabledState] = useState(false);
+  const [yangmingExplanationMap, setYangmingExplanationMap] = useState<Record<string, YangmingExplanationContent | null>>({});
+  const [showAiExplanationAfterYangming, setShowAiExplanationAfterYangming] = useState(false);
   const [isSubmittingAnswer, setIsSubmittingAnswer] = useState(false);
   const [isPeakPrefetching, setIsPeakPrefetching] = useState(false);
   const [peakNextQuestionError, setPeakNextQuestionError] = useState("");
@@ -574,6 +606,22 @@ export default function QuizPage() {
   }, []);
 
   useEffect(() => {
+    setYangmingModeEnabledState(Boolean(authSession?.access_token) && isYangmingModeEnabled());
+
+    const handleModeChange = () => {
+      setYangmingModeEnabledState(Boolean(authSession?.access_token) && isYangmingModeEnabled());
+    };
+
+    window.addEventListener(YANGMING_MODE_EVENT, handleModeChange);
+    window.addEventListener("storage", handleModeChange);
+
+    return () => {
+      window.removeEventListener(YANGMING_MODE_EVENT, handleModeChange);
+      window.removeEventListener("storage", handleModeChange);
+    };
+  }, [authSession?.access_token]);
+
+  useEffect(() => {
     async function fetchSharedExplanationOverrides() {
       if (!session?.questionOrder?.length) return;
 
@@ -631,6 +679,10 @@ export default function QuizPage() {
   );
   const currentIndex = session?.currentQuestionIndex ?? 0;
   const currentQuestion = questionSet[currentIndex];
+  const currentYangmingExplanation =
+    currentQuestion && authSession?.access_token && yangmingModeEnabled
+      ? yangmingExplanationMap[currentQuestion.id] ?? null
+      : null;
   const targetCount =
     session?.settings?.mode === "simulation"
       ? questionSet.length
@@ -650,6 +702,46 @@ export default function QuizPage() {
             answeredCount
           ).toFixed(1)
         );
+
+  useEffect(() => {
+    setShowAiExplanationAfterYangming(false);
+  }, [currentQuestion?.id]);
+
+  useEffect(() => {
+    async function fetchYangmingExplanation() {
+      if (!authSession?.access_token || !yangmingModeEnabled || !currentQuestion?.id) return;
+      if (Object.prototype.hasOwnProperty.call(yangmingExplanationMap, currentQuestion.id)) return;
+
+      try {
+        const response = await fetch("/api/yangming-explanation", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({
+            accessToken: authSession.access_token,
+            questionId: currentQuestion.id
+          })
+        });
+
+        const payload = (await response.json().catch(() => null)) as
+          | {
+              ok?: boolean;
+              explanation?: YangmingExplanationContent | null;
+            }
+          | null;
+
+        setYangmingExplanationMap((current) => ({
+          ...current,
+          [currentQuestion.id]: response.ok && payload?.ok ? payload.explanation ?? null : null
+        }));
+      } catch {
+        setYangmingExplanationMap((current) => ({ ...current, [currentQuestion.id]: null }));
+      }
+    }
+
+    void fetchYangmingExplanation();
+  }, [authSession?.access_token, currentQuestion?.id, yangmingExplanationMap, yangmingModeEnabled]);
 
   useEffect(() => {
     if (!session || !currentQuestion || submittedAttempt) return;
@@ -1316,6 +1408,9 @@ export default function QuizPage() {
   const currentExplanationError = explanationErrorMap[currentQuestion.id];
   const currentClassificationReportLoading = classificationReportLoadingMap[currentQuestion.id];
   const currentClassificationReportMessage = classificationReportMessageMap[currentQuestion.id];
+  const shouldUseYangmingExplanation = shouldShowExplanation && Boolean(currentYangmingExplanation);
+  const shouldShowAiExplanationDetails =
+    !shouldUseYangmingExplanation || showAiExplanationAfterYangming;
   const specialScoringNote =
     submittedAttempt && currentQuestion.answerCreditType === "multiple_accepted"
       ? "本題多重給分：若你的答案在官方接受答案中，即算答對。"
@@ -1483,7 +1578,19 @@ export default function QuizPage() {
                       <p>
                         testedConcept：<span className="font-semibold">{currentQuestion.testedConcept}</span>
                       </p>
-                      <p>explanation：{currentQuestion.explanation}</p>
+                      {currentYangmingExplanation ? (
+                        <YangmingExplanationBlock content={currentYangmingExplanation} />
+                      ) : null}
+                      {shouldUseYangmingExplanation && !showAiExplanationAfterYangming ? (
+                        <button
+                          type="button"
+                          onClick={() => setShowAiExplanationAfterYangming(true)}
+                          className="min-h-10 rounded-2xl bg-white/70 px-4 py-2 text-sm font-semibold text-slate-800 ring-1 ring-slate-200 transition hover:bg-white"
+                        >
+                          顯示 AI 詳解
+                        </button>
+                      ) : null}
+                      {shouldShowAiExplanationDetails ? <p>explanation：{currentQuestion.explanation}</p> : null}
                     </>
                   ) : null}
                   <p>
@@ -1501,7 +1608,7 @@ export default function QuizPage() {
                   ) : null}
                 </div>
 
-                {shouldShowExplanation && currentQuestion.optionAnalysis ? (
+                {shouldShowExplanation && shouldShowAiExplanationDetails && currentQuestion.optionAnalysis ? (
                   <div className="mt-5 rounded-3xl bg-white/70 p-4 text-sm text-slate-800 ring-1 ring-white/70">
                     <h3 className="text-sm font-semibold text-ink">各選項解析</h3>
                     <div className="mt-3 space-y-2.5">
@@ -1524,7 +1631,7 @@ export default function QuizPage() {
                   </div>
                 ) : null}
 
-                {shouldShowExplanation && currentQuestion.memoryTip ? (
+                {shouldShowExplanation && shouldShowAiExplanationDetails && currentQuestion.memoryTip ? (
                   <div className="memory-tip-box mt-5">
                     <h3 className="text-sm font-semibold">快速記憶法</h3>
                     <p className="mt-2 leading-7">{currentQuestion.memoryTip}</p>

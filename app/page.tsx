@@ -5,6 +5,7 @@ import { ContinueQuizButton } from "@/components/ContinueQuizButton";
 import { ClientSectionBoundary } from "@/components/ClientSectionBoundary";
 import { ExamCountdown } from "@/components/ExamCountdown";
 import { FeedbackBoard } from "@/components/FeedbackBoard";
+import { HiddenYangmingModeSwitch } from "@/components/HiddenYangmingModeSwitch";
 import { HomeToneBanner } from "@/components/HomeToneBanner";
 import { HomeWeaknessInsight } from "@/components/HomeWeaknessInsight";
 import { OwnerOnlyNotesLink } from "@/components/OwnerOnlyNotesLink";
@@ -139,7 +140,7 @@ export default function HomePage() {
                     <p className="eyebrow text-[10px]">Today Focus</p>
                     <h2 className="mt-2 text-2xl font-black tracking-[-0.04em] text-ink">先補最會漏的洞</h2>
                   </div>
-                  <div className="home-pulse-dot" aria-hidden="true" />
+                  <HiddenYangmingModeSwitch />
                 </div>
                 <div className="mt-6 grid gap-3">
                   <ClientSectionBoundary title="首頁弱點判讀">

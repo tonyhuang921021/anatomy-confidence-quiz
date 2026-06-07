@@ -592,6 +592,110 @@ to service_role
 using (true)
 with check (true);
 
+create table if not exists public.yangming_mode_activations (
+  id bigint generated always as identity primary key,
+  user_id uuid references auth.users (id) on delete set null,
+  user_email text,
+  visitor_id text,
+  user_agent text,
+  enabled_at timestamptz not null default now()
+);
+
+alter table public.yangming_mode_activations
+  add column if not exists user_id uuid references auth.users (id) on delete set null;
+
+alter table public.yangming_mode_activations
+  add column if not exists user_email text;
+
+alter table public.yangming_mode_activations
+  add column if not exists visitor_id text;
+
+alter table public.yangming_mode_activations
+  add column if not exists user_agent text;
+
+alter table public.yangming_mode_activations
+  add column if not exists enabled_at timestamptz not null default now();
+
+create index if not exists yangming_mode_activations_enabled_at_idx
+on public.yangming_mode_activations (enabled_at desc);
+
+create index if not exists yangming_mode_activations_user_email_idx
+on public.yangming_mode_activations (user_email);
+
+create index if not exists yangming_mode_activations_visitor_id_idx
+on public.yangming_mode_activations (visitor_id);
+
+revoke all on public.yangming_mode_activations from anon;
+revoke all on public.yangming_mode_activations from authenticated;
+
+grant select, insert, update, delete
+  on public.yangming_mode_activations
+  to service_role;
+
+alter table public.yangming_mode_activations enable row level security;
+
+drop policy if exists "Anyone can read yangming mode activations" on public.yangming_mode_activations;
+drop policy if exists "Anyone can insert yangming mode activations" on public.yangming_mode_activations;
+drop policy if exists "Service role can manage yangming mode activations" on public.yangming_mode_activations;
+
+create policy "Service role can manage yangming mode activations"
+on public.yangming_mode_activations
+for all
+to service_role
+using (true)
+with check (true);
+
+create table if not exists public.yangming_question_explanations (
+  question_id text primary key,
+  body text not null,
+  author text,
+  reviewer text,
+  assets jsonb not null default '[]'::jsonb,
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now()
+);
+
+alter table public.yangming_question_explanations
+  add column if not exists body text;
+
+alter table public.yangming_question_explanations
+  add column if not exists author text;
+
+alter table public.yangming_question_explanations
+  add column if not exists reviewer text;
+
+alter table public.yangming_question_explanations
+  add column if not exists assets jsonb not null default '[]'::jsonb;
+
+alter table public.yangming_question_explanations
+  add column if not exists created_at timestamptz not null default now();
+
+alter table public.yangming_question_explanations
+  add column if not exists updated_at timestamptz not null default now();
+
+create index if not exists yangming_question_explanations_updated_at_idx
+on public.yangming_question_explanations (updated_at desc);
+
+revoke all on public.yangming_question_explanations from anon;
+revoke all on public.yangming_question_explanations from authenticated;
+
+grant select, insert, update, delete
+  on public.yangming_question_explanations
+  to service_role;
+
+alter table public.yangming_question_explanations enable row level security;
+
+drop policy if exists "Anyone can read yangming question explanations" on public.yangming_question_explanations;
+drop policy if exists "Anyone can insert yangming question explanations" on public.yangming_question_explanations;
+drop policy if exists "Service role can manage yangming question explanations" on public.yangming_question_explanations;
+
+create policy "Service role can manage yangming question explanations"
+on public.yangming_question_explanations
+for all
+to service_role
+using (true)
+with check (true);
+
 create table if not exists public.feedback_messages (
   id bigint generated always as identity primary key,
   content text not null,

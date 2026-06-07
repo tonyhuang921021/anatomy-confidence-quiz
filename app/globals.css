@@ -319,12 +319,34 @@ select {
   }
 
   .home-pulse-dot {
+    display: block;
     width: 14px;
     height: 14px;
     border-radius: 999px;
     background: var(--brand-main);
     box-shadow: 0 0 0 0 color-mix(in srgb, var(--brand-main) 28%, transparent);
     animation: home-pulse 1.9s ease-out infinite;
+  }
+
+  .home-hidden-mode-trigger {
+    display: inline-flex;
+    min-height: 32px;
+    min-width: 32px;
+    align-items: center;
+    justify-content: center;
+    border: 0;
+    border-radius: 999px;
+    background: transparent;
+    color: inherit;
+    appearance: none;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .home-hidden-mode-trigger:focus,
+  .home-hidden-mode-trigger:focus-visible,
+  .home-hidden-mode-trigger:active {
+    outline: none;
+    box-shadow: none;
   }
 
   .home-progress-card {
