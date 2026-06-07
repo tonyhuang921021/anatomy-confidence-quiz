@@ -37,6 +37,9 @@ type QuestionAttemptDeviceDailyRow = {
   activity_date: string;
 };
 
+type NormalizedAttemptRow = NonNullable<StatsSyncBody["attemptRows"]>[number];
+type NormalizedDeviceDailyRow = NonNullable<StatsSyncBody["deviceDailyRows"]>[number];
+
 function getTaipeiDayKey(date: Date) {
   return new Intl.DateTimeFormat("en-CA", {
     timeZone: "Asia/Taipei",
@@ -78,10 +81,7 @@ function dedupeAttemptRows<
 
   for (const row of rows) {
     const normalizedSessionId = normalizeAttemptSessionId(row.session_id);
-    const answeredAt = row.answered_at ?? "";
-    const correctness =
-      typeof row.is_correct === "boolean" ? (row.is_correct ? "1" : "0") : "";
-    const dedupeKey = `${normalizedSessionId}::${row.question_id}::${answeredAt}::${correctness}`;
+    const dedupeKey = `${normalizedSessionId}::${row.question_id}`;
     deduped.set(dedupeKey, {
       ...row,
       session_id: normalizedSessionId
@@ -91,28 +91,68 @@ function dedupeAttemptRows<
   return Array.from(deduped.values());
 }
 
-async function refreshQuestionAccuracyStats(
+function getAttemptKey(row: Pick<NormalizedAttemptRow, "session_id" | "question_id">) {
+  return `${normalizeAttemptSessionId(row.session_id)}::${row.question_id}`;
+}
+
+async function getNewAttemptRows(
   supabase: any,
-  questionIds: string[]
+  rows: NormalizedAttemptRow[]
 ) {
-  const uniqueQuestionIds = Array.from(new Set(questionIds.map((id) => id.trim()).filter(Boolean)));
+  if (rows.length === 0) return [] as NormalizedAttemptRow[];
+
+  const sessionIds = Array.from(new Set(rows.map((row) => normalizeAttemptSessionId(row.session_id))));
+  const existingKeys = new Set<string>();
+
+  for (let index = 0; index < sessionIds.length; index += 50) {
+    const chunk = sessionIds.slice(index, index + 50);
+    const { data, error } = await supabase
+      .from("question_attempt_logs")
+      .select("session_id, question_id")
+      .in("session_id", chunk);
+
+    if (error) throw error;
+
+    for (const row of data ?? []) {
+      existingKeys.add(getAttemptKey(row));
+    }
+  }
+
+  return rows.filter((row) => !existingKeys.has(getAttemptKey(row)));
+}
+
+async function refreshQuestionAccuracyStatsFromAttempts(
+  supabase: any,
+  attemptRows: NormalizedAttemptRow[]
+) {
+  const uniqueQuestionIds = Array.from(
+    new Set(attemptRows.map((row) => row.question_id.trim()).filter(Boolean))
+  );
   if (uniqueQuestionIds.length === 0) return;
 
   const { data, error } = await supabase
-    .from("question_attempt_logs")
-    .select("session_id, question_id, is_correct, answered_at")
+    .from("question_accuracy_stats")
+    .select("question_id, total_attempts, correct_attempts")
     .in("question_id", uniqueQuestionIds);
 
   if (error) throw error;
+
+  const currentStats = new Map(
+    ((data ?? []) as { question_id: string; total_attempts: number; correct_attempts: number }[]).map((row) => [
+      row.question_id,
+      {
+        total: Number(row.total_attempts ?? 0),
+        correct: Number(row.correct_attempts ?? 0)
+      }
+    ] as const)
+  );
 
   const grouped = new Map<string, { total: number; correct: number }>();
   for (const questionId of uniqueQuestionIds) {
     grouped.set(questionId, { total: 0, correct: 0 });
   }
 
-  const dedupedRows = dedupeAttemptRows((data ?? []) as QuestionAttemptLogRow[]);
-
-  for (const row of dedupedRows) {
+  for (const row of attemptRows) {
     const current = grouped.get(row.question_id) ?? { total: 0, correct: 0 };
     current.total += 1;
     if (row.is_correct) current.correct += 1;
@@ -121,7 +161,12 @@ async function refreshQuestionAccuracyStats(
 
   const now = new Date().toISOString();
   const rows = uniqueQuestionIds.map((questionId) => {
-    const stats = grouped.get(questionId) ?? { total: 0, correct: 0 };
+    const current = currentStats.get(questionId) ?? { total: 0, correct: 0 };
+    const increment = grouped.get(questionId) ?? { total: 0, correct: 0 };
+    const stats = {
+      total: current.total + increment.total,
+      correct: current.correct + increment.correct
+    };
     return {
       question_id: questionId,
       total_attempts: stats.total,
@@ -143,13 +188,15 @@ async function upsertAttemptRows(
   rows: NonNullable<StatsSyncBody["attemptRows"]>
 ) {
   const normalizedRows = dedupeAttemptRows(rows);
-  if (normalizedRows.length === 0) return;
+  if (normalizedRows.length === 0) return [] as NormalizedAttemptRow[];
+
+  const newRows = await getNewAttemptRows(supabase, normalizedRows);
 
   const { error } = await supabase
     .from("question_attempt_logs")
     .upsert(normalizedRows as any, { onConflict: "session_id,question_id" });
 
-  if (!error) return;
+  if (!error) return newRows;
 
   const fallbackRows = normalizedRows.map(({ visitor_id, ...rest }) => rest);
   const { error: fallbackError } = await supabase
@@ -157,6 +204,7 @@ async function upsertAttemptRows(
     .upsert(fallbackRows as any, { onConflict: "session_id,question_id" });
 
   if (fallbackError) throw fallbackError;
+  return newRows;
 }
 
 async function upsertAttemptDevice(
@@ -174,73 +222,93 @@ async function upsertAttemptDeviceDaily(
   supabase: any,
   rows: NonNullable<StatsSyncBody["deviceDailyRows"]>
 ) {
-  if (rows.length === 0) return;
+  if (rows.length === 0) return [] as NormalizedDeviceDailyRow[];
+
+  const normalizedRows = rows.filter((row) => row.visitor_id?.trim() && row.activity_date?.trim());
+  if (normalizedRows.length === 0) return [] as NormalizedDeviceDailyRow[];
+
+  const visitorIds = Array.from(new Set(normalizedRows.map((row) => row.visitor_id)));
+  const existingKeys = new Set<string>();
+
+  for (let index = 0; index < visitorIds.length; index += 50) {
+    const chunk = visitorIds.slice(index, index + 50);
+    const { data, error } = await supabase
+      .from("question_attempt_device_daily")
+      .select("visitor_id, activity_date")
+      .in("visitor_id", chunk);
+
+    if (error) throw error;
+
+    for (const row of data ?? []) {
+      existingKeys.add(`${row.visitor_id}::${row.activity_date}`);
+    }
+  }
+
+  const newRows = normalizedRows.filter(
+    (row) => !existingKeys.has(`${row.visitor_id}::${row.activity_date}`)
+  );
 
   const { error } = await supabase
     .from("question_attempt_device_daily")
-    .upsert(rows as any, { onConflict: "visitor_id,activity_date" });
+    .upsert(normalizedRows as any, { onConflict: "visitor_id,activity_date" });
 
   if (error) throw error;
+  return newRows;
 }
 
-async function refreshOwnerDailyStats(
+async function refreshOwnerDailyStatsFromAttempts(
   supabase: any,
-  activityDates: string[]
+  attemptRows: NormalizedAttemptRow[],
+  deviceDailyRows: NormalizedDeviceDailyRow[]
 ) {
-  const uniqueDates = Array.from(new Set(activityDates.map((date) => date.trim()).filter(Boolean))).sort();
+  const uniqueDates = Array.from(
+    new Set([
+      ...attemptRows.map((row) => getTaipeiDayKey(new Date(row.answered_at))),
+      ...deviceDailyRows.map((row) => row.activity_date)
+    ])
+  ).sort();
   if (uniqueDates.length === 0) return;
 
-  const startDate = uniqueDates[0];
-  const endDate = uniqueDates[uniqueDates.length - 1];
-  const endDateExclusive = new Date(`${endDate}T00:00:00+08:00`);
-  endDateExclusive.setDate(endDateExclusive.getDate() + 1);
+  const { data, error } = await supabase
+    .from("owner_daily_stats")
+    .select("activity_date, attempts, devices")
+    .in("activity_date", uniqueDates);
 
-  const [{ data: attemptRows, error: attemptError }, { data: deviceRows, error: deviceError }] =
-    await Promise.all([
-      supabase
-        .from("question_attempt_logs")
-        .select("session_id, question_id, answered_at")
-        .gte("answered_at", `${startDate}T00:00:00+08:00`)
-        .lt("answered_at", endDateExclusive.toISOString()),
-      supabase
-        .from("question_attempt_device_daily")
-        .select("visitor_id, activity_date")
-        .in("activity_date", uniqueDates)
-    ]);
+  if (error) throw error;
 
-  if (attemptError) throw attemptError;
-  if (deviceError) throw deviceError;
-
+  const currentStats = new Map(
+    ((data ?? []) as { activity_date: string; attempts: number; devices: number }[]).map((row) => [
+      row.activity_date,
+      {
+        attempts: Number(row.attempts ?? 0),
+        devices: Number(row.devices ?? 0)
+      }
+    ] as const)
+  );
   const attemptMap = new Map<string, number>();
-  const deviceMap = new Map<string, Set<string>>();
+  const deviceMap = new Map<string, number>();
 
-  const dedupedAttemptRows = dedupeAttemptRows((attemptRows ?? []) as QuestionAttemptLogRow[]);
-
-  for (const row of dedupedAttemptRows) {
+  for (const row of attemptRows) {
     const dayKey = getTaipeiDayKey(new Date(row.answered_at));
-    if (!uniqueDates.includes(dayKey)) continue;
     attemptMap.set(dayKey, (attemptMap.get(dayKey) ?? 0) + 1);
   }
 
-  for (const row of (deviceRows ?? []) as QuestionAttemptDeviceDailyRow[]) {
-    const visitorId = row.visitor_id?.trim();
-    const current = deviceMap.get(row.activity_date) ?? new Set<string>();
-    if (visitorId) current.add(visitorId);
-    deviceMap.set(row.activity_date, current);
+  for (const row of deviceDailyRows) {
+    deviceMap.set(row.activity_date, (deviceMap.get(row.activity_date) ?? 0) + 1);
   }
 
   const rows = uniqueDates.map((activityDate) => ({
     activity_date: activityDate,
-    attempts: attemptMap.get(activityDate) ?? 0,
-    devices: deviceMap.get(activityDate)?.size ?? 0,
+    attempts: (currentStats.get(activityDate)?.attempts ?? 0) + (attemptMap.get(activityDate) ?? 0),
+    devices: (currentStats.get(activityDate)?.devices ?? 0) + (deviceMap.get(activityDate) ?? 0),
     updated_at: new Date().toISOString()
   }));
 
-  const { error } = await supabase
+  const { error: upsertError } = await supabase
     .from("owner_daily_stats")
     .upsert(rows as any, { onConflict: "activity_date" });
 
-  if (error) throw error;
+  if (upsertError) throw upsertError;
 }
 
 export async function POST(request: NextRequest) {
@@ -254,14 +322,16 @@ export async function POST(request: NextRequest) {
 
   try {
     const body = (await request.json()) as StatsSyncBody;
-    await Promise.all([
-      upsertAttemptRows(supabase, body.attemptRows ?? []),
+    const newAttemptRows = await upsertAttemptRows(supabase, body.attemptRows ?? []);
+
+    const [, newDeviceDailyRows] = await Promise.all([
       body.deviceRow ? upsertAttemptDevice(supabase, body.deviceRow) : Promise.resolve(),
       upsertAttemptDeviceDaily(supabase, body.deviceDailyRows ?? [])
     ]);
+
     await Promise.all([
-      refreshQuestionAccuracyStats(supabase, body.questionIds ?? []),
-      refreshOwnerDailyStats(supabase, body.activityDates ?? [])
+      refreshQuestionAccuracyStatsFromAttempts(supabase, newAttemptRows),
+      refreshOwnerDailyStatsFromAttempts(supabase, newAttemptRows, newDeviceDailyRows)
     ]);
 
     return NextResponse.json({ ok: true });

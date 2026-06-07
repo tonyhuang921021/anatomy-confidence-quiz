@@ -879,6 +879,20 @@ function buildQuestionAttemptLogRows(sessions: QuizSession[]): QuestionAttemptLo
   );
 }
 
+function buildLatestAttemptStatsSession(session: QuizSession) {
+  const latestAttempt = [...session.attempts]
+    .filter((attempt) => attempt.answeredAt)
+    .sort((left, right) => left.answeredAt.localeCompare(right.answeredAt))
+    .at(-1);
+
+  if (!latestAttempt) return null;
+
+  return {
+    ...session,
+    attempts: [latestAttempt]
+  };
+}
+
 async function upsertQuestionAttemptLogs(sessions: QuizSession[]) {
   if (!isSupabaseConfigured() || sessions.length === 0) return;
 
@@ -1229,10 +1243,8 @@ export async function syncCompletedSessionsForCurrentUser(userId: string) {
   saveCompletedSessions(mergedSessions);
   if (sessionsToBackfill.length > 0) {
     await upsertSessionsForUser(userId, sessionsToBackfill);
-    await syncQuestionStatsForSessionsSafely(sessionsToBackfill);
   }
   await upsertSessionsForUser(userId, sessionsToUpload);
-  await syncQuestionStatsForSessionsSafely(sessionsToUpload);
 
   return mergedSessions;
 }
@@ -1290,15 +1302,13 @@ export async function pushCompletedSessionToSupabase(session: QuizSession) {
     );
     await upsertSessionsForUser(data.user.id, canonicalSessions);
   }
-
-  await syncQuestionStatsForSessionsSafely(
-    data.user ? canonicalizeSessionsForUser(data.user.id, [session]) : [session]
-  );
 }
 
 export async function pushQuestionStatsSnapshotToSupabase(session: QuizSession) {
   if (!isSupabaseConfigured()) return;
-  await syncQuestionStatsForSessionsSafely([session]);
+  const latestAttemptSession = buildLatestAttemptStatsSession(session);
+  if (!latestAttemptSession) return;
+  await syncQuestionStatsForSessionsSafely([latestAttemptSession]);
 }
 
 export async function pushCurrentSessionToSupabase(session: QuizSession) {
