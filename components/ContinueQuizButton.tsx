@@ -11,10 +11,9 @@ function isResumableSession(session: QuizSession | null) {
 }
 
 export function ContinueQuizButton() {
-  const { configured, session: authSession, syncStatus, syncVersion, refreshCloudData } = useAuth();
+  const { configured, session: authSession, syncStatus, syncVersion } = useAuth();
   const [session, setSession] = useState<QuizSession | null>(null);
   const [completedSessionIds, setCompletedSessionIds] = useState<string[]>([]);
-  const [cloudRefreshUserId, setCloudRefreshUserId] = useState("");
 
   useEffect(() => {
     setSession(loadCurrentSession());
@@ -62,13 +61,6 @@ export function ContinueQuizButton() {
     setSession(loadCurrentSession());
     setCompletedSessionIds(loadCompletedSessions().map((item) => item.id));
   }, [syncVersion]);
-
-  useEffect(() => {
-    const userId = authSession?.user?.id ?? "";
-    if (!configured || !userId || cloudRefreshUserId === userId) return;
-    setCloudRefreshUserId(userId);
-    void refreshCloudData();
-  }, [authSession?.user?.id, cloudRefreshUserId, configured, refreshCloudData]);
 
   const resumeMeta = useMemo(() => {
     if (!session || !isResumableSession(session)) return null;

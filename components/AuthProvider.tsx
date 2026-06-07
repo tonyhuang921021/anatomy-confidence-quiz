@@ -6,15 +6,12 @@ import {
   useContext,
   useEffect,
   useMemo,
-  useRef,
   useState,
   type ReactNode
 } from "react";
 import type { Session, User } from "@supabase/supabase-js";
 import {
-  syncCurrentSessionForCurrentUser,
-  syncCompletedSessionsForCurrentUser,
-  syncLeaderboardProfileForCurrentUser
+  syncCurrentSessionForCurrentUser
 } from "@/lib/cloudSync";
 import { setActiveStorageUser } from "@/lib/storage";
 import {
@@ -35,10 +32,6 @@ type AuthContextValue = {
 };
 
 const AuthContext = createContext<AuthContextValue | null>(null);
-
-const SYNC_RETRY_DELAYS_MS = [0, 400, 1200];
-const CLOUD_REFRESH_INTERVAL_MS = 3 * 60 * 1000;
-const MIN_CLOUD_REFRESH_GAP_MS = 60_000;
 
 function getErrorMessage(error: unknown) {
   if (error instanceof Error) return error.message;
@@ -64,7 +57,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [syncStatus, setSyncStatus] = useState<AuthContextValue["syncStatus"]>("idle");
   const [syncVersion, setSyncVersion] = useState(0);
   const [syncError, setSyncError] = useState("");
-  const lastRefreshAtRef = useRef(0);
 
   const refreshCloudData = useCallback(async (targetUserId?: string, targetUser?: User | null) => {
     const userId = targetUserId || user?.id;
@@ -83,40 +75,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         return;
       }
 
-      let lastError: unknown = null;
-
-      for (const delayMs of SYNC_RETRY_DELAYS_MS) {
-        if (delayMs > 0) {
-          await new Promise((resolve) => window.setTimeout(resolve, delayMs));
-        }
-
-        try {
-          const {
-            data: { session: retrySession }
-          } = await getSupabaseBrowserClient().auth.getSession();
-
-          if (!retrySession?.access_token) {
-            lastError = new Error("尚未取得登入 session，稍後再試一次。");
-            continue;
-          }
-
-          await syncCurrentSessionForCurrentUser(userId);
-          const mergedSessions = await syncCompletedSessionsForCurrentUser(userId);
-          await syncLeaderboardProfileForCurrentUser(effectiveUser, mergedSessions);
-          lastError = null;
-          break;
-        } catch (error) {
-          lastError = error;
-        }
-      }
-
-      if (lastError) {
-        throw lastError;
-      }
+      await syncCurrentSessionForCurrentUser(userId);
 
       setSyncStatus("ready");
       setSyncVersion((value) => value + 1);
-      lastRefreshAtRef.current = Date.now();
     } catch (error) {
       setSyncStatus("error");
       setSyncError(getErrorMessage(error));
@@ -179,41 +141,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       subscription.unsubscribe();
     };
   }, [configured]);
-
-  useEffect(() => {
-    if (!configured || !user?.id) return;
-    const activeUser = user;
-
-    function handleVisibilityRefresh() {
-      if (
-        document.visibilityState === "visible" &&
-        Date.now() - lastRefreshAtRef.current >= MIN_CLOUD_REFRESH_GAP_MS
-      ) {
-        void refreshCloudData(activeUser.id, activeUser);
-      }
-    }
-
-    function handleFocusRefresh() {
-      if (Date.now() - lastRefreshAtRef.current >= MIN_CLOUD_REFRESH_GAP_MS) {
-        void refreshCloudData(activeUser.id, activeUser);
-      }
-    }
-
-    const intervalId = window.setInterval(() => {
-      if (document.visibilityState === "visible") {
-        void refreshCloudData(activeUser.id, activeUser);
-      }
-    }, CLOUD_REFRESH_INTERVAL_MS);
-
-    document.addEventListener("visibilitychange", handleVisibilityRefresh);
-    window.addEventListener("focus", handleFocusRefresh);
-
-    return () => {
-      window.clearInterval(intervalId);
-      document.removeEventListener("visibilitychange", handleVisibilityRefresh);
-      window.removeEventListener("focus", handleFocusRefresh);
-    };
-  }, [configured, refreshCloudData, user]);
 
   const value = useMemo<AuthContextValue>(
     () => ({
