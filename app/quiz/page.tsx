@@ -841,7 +841,6 @@ export default function QuizPage() {
           isReviewingAnswer: false
         };
         persistSession(advancedSession);
-        void pushQuestionStatsSnapshotToSupabase(advancedSession);
         resetQuestionUI();
         setIsSubmittingAnswer(false);
         window.requestAnimationFrame(() => {
@@ -891,7 +890,6 @@ export default function QuizPage() {
           };
 
           persistSession(advancedSession);
-          void pushQuestionStatsSnapshotToSupabase(advancedSession);
           setPeakNextQuestionError("");
           resetQuestionUI();
           setIsSubmittingAnswer(false);
@@ -941,7 +939,6 @@ export default function QuizPage() {
         isReviewingAnswer: false
       };
       persistSession(advancedSession);
-      void pushQuestionStatsSnapshotToSupabase(advancedSession);
       resetQuestionUI();
       setIsSubmittingAnswer(false);
       window.requestAnimationFrame(() => {
@@ -959,7 +956,6 @@ export default function QuizPage() {
     }
 
     persistSession(nextSessionBase);
-    void pushQuestionStatsSnapshotToSupabase(nextSessionBase);
     setSubmittedAttempt(attempt);
     setErrorType(undefined);
     setIsSubmittingAnswer(false);
@@ -1207,6 +1203,7 @@ export default function QuizPage() {
       };
       finalizeCompletedSession(completedSession);
       void pushCompletedSessionToSupabase(completedSession);
+      void pushQuestionStatsSnapshotToSupabase(completedSession);
       syncCompletedCustomPaper(completedSession);
       router.push(buildResultsHref(completedSession));
       return;
@@ -1243,6 +1240,7 @@ export default function QuizPage() {
     };
     finalizeCompletedSession(completedSession);
     void pushCompletedSessionToSupabase(completedSession);
+    void pushQuestionStatsSnapshotToSupabase(completedSession);
     syncCompletedCustomPaper(completedSession);
     router.push(buildResultsHref(completedSession));
   }
@@ -1287,7 +1285,6 @@ export default function QuizPage() {
       };
 
       persistSession(advancedSession);
-      void pushQuestionStatsSnapshotToSupabase(advancedSession);
       resetQuestionUI();
       setPeakNextQuestionError("");
       setIsSubmittingAnswer(false);

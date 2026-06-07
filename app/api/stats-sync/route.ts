@@ -191,17 +191,18 @@ async function upsertAttemptRows(
   if (normalizedRows.length === 0) return [] as NormalizedAttemptRow[];
 
   const newRows = await getNewAttemptRows(supabase, normalizedRows);
+  if (newRows.length === 0) return [] as NormalizedAttemptRow[];
 
   const { error } = await supabase
     .from("question_attempt_logs")
-    .upsert(normalizedRows as any, { onConflict: "session_id,question_id" });
+    .upsert(newRows as any, { onConflict: "session_id,question_id", ignoreDuplicates: true });
 
   if (!error) return newRows;
 
-  const fallbackRows = normalizedRows.map(({ visitor_id, ...rest }) => rest);
+  const fallbackRows = newRows.map(({ visitor_id, ...rest }) => rest);
   const { error: fallbackError } = await supabase
     .from("question_attempt_logs")
-    .upsert(fallbackRows as any, { onConflict: "session_id,question_id" });
+    .upsert(fallbackRows as any, { onConflict: "session_id,question_id", ignoreDuplicates: true });
 
   if (fallbackError) throw fallbackError;
   return newRows;

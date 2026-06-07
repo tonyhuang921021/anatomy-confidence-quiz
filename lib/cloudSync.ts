@@ -169,6 +169,17 @@ type FeedbackMessageRow = {
 const SUPABASE_PAGE_SIZE = 1000;
 const FEEDBACK_HOURLY_LIMIT = 3;
 const FEEDBACK_DAILY_LIMIT = 10;
+const CURRENT_SESSION_SYNC_MIN_INTERVAL_MS = 15_000;
+
+type CurrentSessionSyncState = {
+  lastSyncedAt: number;
+  lastSignature: string;
+  pendingTimer: ReturnType<typeof setTimeout> | null;
+  pendingSession: QuizSession | null;
+  pendingSignature: string;
+};
+
+const currentSessionSyncState = new Map<string, CurrentSessionSyncState>();
 
 function normalizeAttemptSessionId(sessionId: string) {
   return sessionId.replace(/^user-[^:]+:/, "");
@@ -1315,10 +1326,82 @@ export async function pushCurrentSessionToSupabase(session: QuizSession) {
   if (!isSupabaseConfigured() || session.completedAt) return;
 
   const supabase = getSupabaseBrowserClient();
-  const { data } = await supabase.auth.getUser();
-  if (!data.user) return;
+  const { data } = await supabase.auth.getSession();
+  const user = data.session?.user;
+  if (!user) return;
+  const userId = user.id;
 
-  await upsertSessionsForUser(data.user.id, canonicalizeSessionsForUser(data.user.id, [session]));
+  const canonicalSession = canonicalizeSessionsForUser(userId, [session])[0];
+  if (!canonicalSession) return;
+
+  const latestAttemptAt =
+    canonicalSession.attempts
+      .map((attempt) => attempt.answeredAt)
+      .sort((left, right) => right.localeCompare(left))[0] ?? "";
+  const signature = [
+    canonicalSession.id,
+    canonicalSession.currentQuestionIndex ?? 0,
+    canonicalSession.isReviewingAnswer ? "reviewing" : "answering",
+    canonicalSession.attempts.length,
+    latestAttemptAt,
+    canonicalSession.questionOrder?.length ?? 0
+  ].join("|");
+  const stateKey = `${userId}:${canonicalSession.id}`;
+  const now = Date.now();
+  const existing = currentSessionSyncState.get(stateKey);
+
+  if (existing?.lastSignature === signature) return;
+
+  async function flush(nextSession: QuizSession, nextSignature: string) {
+    await upsertSessionsForUser(userId, [nextSession]);
+    currentSessionSyncState.set(stateKey, {
+      lastSyncedAt: Date.now(),
+      lastSignature: nextSignature,
+      pendingTimer: null,
+      pendingSession: null,
+      pendingSignature: ""
+    });
+  }
+
+  if (!existing || now - existing.lastSyncedAt >= CURRENT_SESSION_SYNC_MIN_INTERVAL_MS) {
+    if (existing?.pendingTimer) {
+      clearTimeout(existing.pendingTimer);
+    }
+    await flush(canonicalSession, signature);
+    return;
+  }
+
+  const remaining = CURRENT_SESSION_SYNC_MIN_INTERVAL_MS - (now - existing.lastSyncedAt);
+  if (existing.pendingTimer) {
+    existing.pendingSession = canonicalSession;
+    existing.pendingSignature = signature;
+    currentSessionSyncState.set(stateKey, existing);
+    return;
+  }
+
+  const nextState: CurrentSessionSyncState = {
+    ...existing,
+    pendingSession: canonicalSession,
+    pendingSignature: signature,
+    pendingTimer: setTimeout(() => {
+      const latestState = currentSessionSyncState.get(stateKey);
+      const pendingSession = latestState?.pendingSession;
+      const pendingSignature = latestState?.pendingSignature || signature;
+      latestState?.pendingTimer && clearTimeout(latestState.pendingTimer);
+      if (!pendingSession) return;
+      void flush(pendingSession, pendingSignature).catch((error) => {
+        console.error("Current session cloud sync skipped:", error);
+        currentSessionSyncState.set(stateKey, {
+          lastSyncedAt: latestState?.lastSyncedAt ?? 0,
+          lastSignature: latestState?.lastSignature ?? "",
+          pendingTimer: null,
+          pendingSession: pendingSession,
+          pendingSignature
+        });
+      });
+    }, remaining)
+  };
+  currentSessionSyncState.set(stateKey, nextState);
 }
 
 export async function syncLeaderboardProfileForCurrentUser(
