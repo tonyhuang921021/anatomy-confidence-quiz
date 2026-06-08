@@ -25,6 +25,8 @@ import {
   compactGeneratedQuestionsForStorage,
   compactQuestionForStorage,
   compactSessionForStorage,
+  clearMatchingCurrentSessions,
+  getCanonicalSessionId,
   loadCurrentSession,
   loadCurrentSessionForUser,
   loadCompletedSessions,
@@ -182,7 +184,7 @@ type CurrentSessionSyncState = {
 const currentSessionSyncState = new Map<string, CurrentSessionSyncState>();
 
 function normalizeAttemptSessionId(sessionId: string) {
-  return sessionId.replace(/^user-[^:]+:/, "");
+  return getCanonicalSessionId(sessionId);
 }
 
 function dedupeAttemptRows<
@@ -468,6 +470,14 @@ function sessionActivityValue(session: QuizSession, fallbackUpdatedAt?: string |
   );
 }
 
+function isCompletedQuizSession(session: QuizSession) {
+  return Boolean(session.completedAt);
+}
+
+function isCompletedQuizSessionRow(row: Pick<QuizSessionRow, "completed_at" | "session_payload">) {
+  return Boolean(row.completed_at || row.session_payload?.completedAt);
+}
+
 function calculateAverageConfidence(attempts: Attempt[]) {
   if (attempts.length === 0) return null;
   const average = attempts.reduce((sum, attempt) => sum + attempt.confidence, 0) / attempts.length;
@@ -494,7 +504,7 @@ function buildSessionPayloadForCloud(session: QuizSession): Partial<QuizSession>
     generatedQuestions: shouldRetainGeneratedQuestions ? generatedQuestions : undefined,
     currentQuestionIndex: session.completedAt ? undefined : compacted.currentQuestionIndex,
     isReviewingAnswer: session.completedAt ? undefined : compacted.isReviewingAnswer,
-    attempts: session.completedAt ? undefined : compacted.attempts
+    attempts: compacted.attempts.length > 0 ? compacted.attempts : undefined
   };
 }
 
@@ -614,9 +624,19 @@ function mergeSessions(localSessions: QuizSession[], remoteSessions: QuizSession
   const merged = new Map<string, QuizSession>();
 
   for (const session of [...localSessions, ...remoteSessions]) {
-    const current = merged.get(session.id);
+    const key = getCanonicalSessionId(session.id);
+    const current = merged.get(key);
     if (!current) {
-      merged.set(session.id, session);
+      merged.set(key, session);
+      continue;
+    }
+
+    if (isCompletedQuizSession(current) && !isCompletedQuizSession(session)) {
+      continue;
+    }
+
+    if (!isCompletedQuizSession(current) && isCompletedQuizSession(session)) {
+      merged.set(key, session);
       continue;
     }
 
@@ -629,7 +649,7 @@ function mergeSessions(localSessions: QuizSession[], remoteSessions: QuizSession
       nextFreshness > currentFreshness ||
       (nextFreshness === currentFreshness && nextAttempts >= currentAttempts)
     ) {
-      merged.set(session.id, session);
+      merged.set(key, session);
     }
   }
 
@@ -639,11 +659,13 @@ function mergeSessions(localSessions: QuizSession[], remoteSessions: QuizSession
 }
 
 function getSessionsNeedingUpload(localSessions: QuizSession[], remoteSessions: QuizSession[]) {
-  const remoteById = new Map(remoteSessions.map((session) => [session.id, session] as const));
+  const remoteById = new Map(remoteSessions.map((session) => [getCanonicalSessionId(session.id), session] as const));
 
   return localSessions.filter((localSession) => {
-    const remoteSession = remoteById.get(localSession.id);
+    const remoteSession = remoteById.get(getCanonicalSessionId(localSession.id));
     if (!remoteSession) return true;
+    if (!isCompletedQuizSession(localSession) && isCompletedQuizSession(remoteSession)) return false;
+    if (isCompletedQuizSession(localSession) && !isCompletedQuizSession(remoteSession)) return true;
 
     const localFreshness = sessionFreshnessValue(localSession);
     const remoteFreshness = sessionFreshnessValue(remoteSession);
@@ -1206,20 +1228,52 @@ async function upsertSessionsForUser(userId: string, sessions: QuizSession[]) {
   if (!isSupabaseConfigured() || sessions.length === 0) return;
 
   const supabase = getSupabaseBrowserClient();
-  const rows = dedupeSessionRows(
-    sessions.map((session) => buildSessionRowForCloud(userId, session))
+  const namespacedSessions = canonicalizeSessionsForUser(userId, sessions);
+  const rows = dedupeSessionRows(namespacedSessions.map((session) => buildSessionRowForCloud(userId, session)));
+  const incompleteSessionIds = rows
+    .filter((row) => !isCompletedQuizSessionRow(row))
+    .map((row) => row.id);
+  const protectedCompletedSessionIds = new Set<string>();
+
+  if (incompleteSessionIds.length > 0) {
+    const { data, error: existingError } = await supabase
+      .from("quiz_sessions")
+      .select("id, completed_at, session_payload")
+      .eq("user_id", userId)
+      .in("id", incompleteSessionIds);
+
+    if (existingError) {
+      throw existingError;
+    }
+
+    for (const row of (data ?? []) as Pick<QuizSessionRow, "id" | "completed_at" | "session_payload">[]) {
+      if (isCompletedQuizSessionRow(row)) {
+        protectedCompletedSessionIds.add(row.id);
+      }
+    }
+  }
+
+  const safeSessions = namespacedSessions.filter(
+    (session) => isCompletedQuizSession(session) || !protectedCompletedSessionIds.has(session.id)
   );
+  const safeRows = rows.filter((row) => !protectedCompletedSessionIds.has(row.id));
+
+  for (const sessionId of protectedCompletedSessionIds) {
+    clearMatchingCurrentSessions(sessionId, [userId]);
+  }
+
+  if (safeRows.length === 0) return;
 
   const { error } = await supabase
     .from("quiz_sessions")
-    .upsert(rows, { onConflict: "id" });
+    .upsert(safeRows, { onConflict: "id" });
 
   if (error) {
     throw error;
   }
 
   const attemptRows = dedupeSessionAttemptRows(
-    sessions.flatMap((session) =>
+    safeSessions.flatMap((session) =>
       session.attempts.map((attempt, index) => mapAttemptToCloudRow(userId, session, attempt, index))
     )
   );
@@ -1243,13 +1297,20 @@ export async function syncCompletedSessionsForCurrentUser(userId: string) {
   const localSessions = canonicalizeSessionsForUser(
     userId,
     mergeSessions(loadCompletedSessionsForUser("guest"), loadCompletedSessions())
+      .filter(isCompletedQuizSession)
   );
   const { sessions: fetchedRemoteSessions, sessionsMissingAttemptRows } =
     await fetchResolvedQuizSessionsForUser(userId);
-  const remoteSessions = canonicalizeSessionsForUser(userId, fetchedRemoteSessions);
-  const mergedSessions = mergeSessions(localSessions, remoteSessions);
+  const remoteSessions = canonicalizeSessionsForUser(
+    userId,
+    fetchedRemoteSessions.filter(isCompletedQuizSession)
+  );
+  const mergedSessions = mergeSessions(localSessions, remoteSessions).filter(isCompletedQuizSession);
   const sessionsToUpload = getSessionsNeedingUpload(localSessions, remoteSessions);
-  const sessionsToBackfill = canonicalizeSessionsForUser(userId, sessionsMissingAttemptRows);
+  const sessionsToBackfill = canonicalizeSessionsForUser(
+    userId,
+    sessionsMissingAttemptRows.filter(isCompletedQuizSession)
+  );
 
   saveCompletedSessions(mergedSessions);
   if (sessionsToBackfill.length > 0) {
@@ -1267,10 +1328,22 @@ export async function syncCurrentSessionForCurrentUser(userId: string) {
 
   const guestSession = loadCurrentSessionForUser("guest");
   const localUserSession = loadCurrentSessionForUser(userId);
-  const localCurrentSession =
+  let localCurrentSession: QuizSession | null =
     [localUserSession, guestSession]
       .filter((session): session is QuizSession => Boolean(session) && !session?.completedAt)
       .sort((left, right) => sessionActivityValue(right).localeCompare(sessionActivityValue(left)))[0] ?? null;
+
+  if (localCurrentSession) {
+    const completedSessionIds = new Set(
+      mergeSessions(loadCompletedSessionsForUser("guest"), loadCompletedSessionsForUser(userId))
+        .filter((completedSession) => Boolean(completedSession.completedAt))
+        .map((completedSession) => getCanonicalSessionId(completedSession.id))
+    );
+    if (completedSessionIds.has(getCanonicalSessionId(localCurrentSession.id))) {
+      clearMatchingCurrentSessions(localCurrentSession.id, [userId]);
+      localCurrentSession = null;
+    }
+  }
 
   const remoteRow = await fetchActiveQuizSessionRow(userId);
   const remoteAttemptMap = remoteRow
@@ -1312,11 +1385,17 @@ export async function pushCompletedSessionToSupabase(session: QuizSession) {
       )
     );
     await upsertSessionsForUser(data.user.id, canonicalSessions);
+    await syncLeaderboardProfileForCurrentUser(data.user, loadCompletedSessions());
   }
 }
 
 export async function pushQuestionStatsSnapshotToSupabase(session: QuizSession) {
   if (!isSupabaseConfigured()) return;
+  if (session.completedAt) {
+    await syncQuestionStatsForSessionsSafely([session]);
+    return;
+  }
+
   const latestAttemptSession = buildLatestAttemptStatsSession(session);
   if (!latestAttemptSession) return;
   await syncQuestionStatsForSessionsSafely([latestAttemptSession]);

@@ -12,7 +12,9 @@ import {
 } from "react";
 import type { Session, User } from "@supabase/supabase-js";
 import {
-  syncCurrentSessionForCurrentUser
+  syncCompletedSessionsForCurrentUser,
+  syncCurrentSessionForCurrentUser,
+  syncLeaderboardProfileForCurrentUser
 } from "@/lib/cloudSync";
 import { setActiveStorageUser } from "@/lib/storage";
 import {
@@ -91,7 +93,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setSyncStatus("syncing");
     setSyncError("");
 
-    const syncTask = syncCurrentSessionForCurrentUser(userId)
+    const syncTask = syncCompletedSessionsForCurrentUser(userId)
+      .then((completedSessions) =>
+        syncLeaderboardProfileForCurrentUser(effectiveUser, completedSessions).then(() => completedSessions)
+      )
+      .then(() => syncCurrentSessionForCurrentUser(userId))
       .then(() => {
         setSyncStatus("ready");
         setSyncVersion((value) => value + 1);

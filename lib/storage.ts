@@ -64,6 +64,14 @@ function getScopedKeyForUser(baseKey: string, userId: string) {
   return `${baseKey}:${userId || GUEST_USER_ID}`;
 }
 
+export function getCanonicalSessionId(sessionId: string) {
+  return sessionId.replace(/^user-[^:]+:/, "");
+}
+
+function sessionDedupeKey(session: QuizSession) {
+  return getCanonicalSessionId(session.id);
+}
+
 function getLegacyOrScopedRaw(baseKey: string) {
   if (!isBrowser()) return null;
   const scopedKey = getScopedKey(baseKey);
@@ -242,6 +250,28 @@ export function normalizeSessions(sessions: QuizSession[]) {
   return sessions.map(normalizeSession);
 }
 
+function dedupeSessionsByCanonicalId(sessions: QuizSession[]) {
+  const dedupedBySession = new Map<string, QuizSession>();
+  for (const session of sessions) {
+    const key = sessionDedupeKey(session);
+    const current = dedupedBySession.get(key);
+    if (!current) {
+      dedupedBySession.set(key, session);
+      continue;
+    }
+
+    const currentFreshness = current.completedAt ?? current.startedAt;
+    const nextFreshness = session.completedAt ?? session.startedAt;
+    if (
+      nextFreshness > currentFreshness ||
+      (nextFreshness === currentFreshness && session.attempts.length >= current.attempts.length)
+    ) {
+      dedupedBySession.set(key, session);
+    }
+  }
+  return Array.from(dedupedBySession.values());
+}
+
 export function compactQuestionForStorage(question: Question): Question {
   return {
     id: question.id,
@@ -350,6 +380,18 @@ export function getActiveStorageUser() {
 
 export function saveCurrentSession(session: QuizSession) {
   if (!isBrowser()) return;
+  const canonicalId = getCanonicalSessionId(session.id);
+  const alreadyCompleted = loadCompletedSessions().some(
+    (completedSession) =>
+      Boolean(completedSession.completedAt) &&
+      getCanonicalSessionId(completedSession.id) === canonicalId
+  );
+
+  if (!session.completedAt && alreadyCompleted) {
+    clearMatchingCurrentSessions(session.id);
+    return;
+  }
+
   safeLocalStorageSetItem(getScopedKey(CURRENT_SESSION_KEY), JSON.stringify(compactSessionForStorage(session)));
   window.dispatchEvent(new CustomEvent("current-session-change", { detail: session }));
 }
@@ -379,17 +421,52 @@ export function clearCurrentSession() {
   window.dispatchEvent(new CustomEvent("current-session-change", { detail: null }));
 }
 
+export function clearCurrentSessionForUser(userId: string) {
+  if (!isBrowser()) return;
+  safeLocalStorageRemoveItem(getScopedKeyForUser(CURRENT_SESSION_KEY, userId));
+}
+
+export function clearMatchingCurrentSessions(sessionId: string, userIds: string[] = []) {
+  if (!isBrowser()) return;
+  const canonicalId = getCanonicalSessionId(sessionId);
+  const scopedUserIds = Array.from(new Set([getActiveStorageUser(), GUEST_USER_ID, ...userIds].filter(Boolean)));
+
+  for (const userId of scopedUserIds) {
+    const current = loadCurrentSessionForUser(userId);
+    if (current && getCanonicalSessionId(current.id) === canonicalId) {
+      safeLocalStorageRemoveItem(getScopedKeyForUser(CURRENT_SESSION_KEY, userId));
+    }
+  }
+
+  const legacyRaw = safeLocalStorageGetItem(CURRENT_SESSION_KEY);
+  if (legacyRaw) {
+    try {
+      const legacySession = normalizeSession(JSON.parse(legacyRaw) as QuizSession);
+      if (getCanonicalSessionId(legacySession.id) === canonicalId) {
+        safeLocalStorageRemoveItem(CURRENT_SESSION_KEY);
+      }
+    } catch {
+      // Ignore malformed legacy current sessions.
+    }
+  }
+
+  window.dispatchEvent(new CustomEvent("current-session-change", { detail: null }));
+}
+
 export function saveCompletedSession(session: QuizSession) {
   if (!isBrowser()) return;
   const sessions = loadCompletedSessions();
-  const nextSessions = [...sessions.filter((item) => item.id !== session.id), session];
+  const nextKey = sessionDedupeKey(session);
+  const nextSessions = [...sessions.filter((item) => sessionDedupeKey(item) !== nextKey), session];
   return saveCompletedSessions(nextSessions);
 }
 
 export function saveCompletedSessions(sessions: QuizSession[]) {
   if (!isBrowser()) return;
   const scopedKey = getScopedKey(COMPLETED_SESSIONS_KEY);
-  const normalized = normalizeSessions(sessions).sort((left, right) =>
+  const normalized = dedupeSessionsByCanonicalId(normalizeSessions(sessions))
+    .filter((session) => Boolean(session.completedAt))
+    .sort((left, right) =>
     (left.completedAt ?? left.startedAt).localeCompare(right.completedAt ?? right.startedAt)
   );
 
@@ -402,6 +479,10 @@ export function saveCompletedSessions(sessions: QuizSession[]) {
   }
 
   if (!didPersist) return false;
+
+  for (const session of persisted) {
+    clearMatchingCurrentSessions(session.id);
+  }
 
   window.dispatchEvent(new CustomEvent("completed-sessions-change", { detail: persisted }));
   return true;
@@ -420,7 +501,7 @@ export function loadCompletedSessionsForUser(userId: string): QuizSession[] {
   if (!raw) return [];
 
   try {
-    return normalizeSessions(JSON.parse(raw) as QuizSession[]);
+    return dedupeSessionsByCanonicalId(normalizeSessions(JSON.parse(raw) as QuizSession[]));
   } catch {
     return [];
   }

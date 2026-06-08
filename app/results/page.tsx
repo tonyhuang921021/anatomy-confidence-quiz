@@ -412,15 +412,42 @@ function ResultsPageContent() {
         resolvedTargetSession.generatedQuestions && resolvedTargetSession.generatedQuestions.length > 0
           ? resolvedTargetSession.generatedQuestions
           : anatomyQuestions;
+      const promptQuestions = Array.from(
+        new Map(
+          [...allQuestions, ...currentQuestions, ...(resolvedTargetSession.generatedQuestions ?? [])].map((question) => [
+            question.id,
+            question
+          ] as const)
+        ).values()
+      );
+      const promptQuestionMap = new Map(promptQuestions.map((question) => [question.id, question] as const));
+      const currentQuestionIds = new Set(currentQuestions.map((question) => question.id));
+      const hasAllAttemptQuestions = resolvedTargetSession.attempts.every((attempt) =>
+        currentQuestionIds.has(attempt.questionId)
+      );
+      const analysisQuestions = hasAllAttemptQuestions
+        ? currentQuestions
+        : resolvedTargetSession.attempts
+            .map((attempt) => promptQuestionMap.get(attempt.questionId))
+            .filter((question): question is Question => Boolean(question));
+      const resolvedAnalysisQuestions = analysisQuestions.length > 0 ? analysisQuestions : promptQuestions;
       const completionStats = calculateCompletionStats(anatomyQuestions, completedSessions);
-      const sessionSectionStats = calculateSectionStats(resolvedTargetSession.attempts, currentQuestions);
+      const sessionSectionStats = calculateSectionStats(
+        resolvedTargetSession.attempts,
+        resolvedAnalysisQuestions
+      );
 
       setState({
         session: resolvedTargetSession,
         sessions: scopedSessions,
-        summary: calculateSummary(resolvedTargetSession.attempts, currentQuestions),
+        summary: calculateSummary(resolvedTargetSession.attempts, resolvedAnalysisQuestions),
         sectionStats: sessionSectionStats,
-        promptText: generateAIPrompt(resolvedTargetSession.attempts, currentQuestions, completedSessions),
+        promptText: generateAIPrompt(
+          resolvedTargetSession.attempts,
+          resolvedAnalysisQuestions,
+          completedSessions,
+          promptQuestions
+        ),
         lowCompletion: getLowCompletionSections(completionStats.sections, 5),
         unstableSections: getUnstableCompletedSections(completionStats.sections, 5),
         completionStats

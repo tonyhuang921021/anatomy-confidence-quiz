@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import { useAuth } from "@/components/AuthProvider";
-import { loadCompletedSessions, loadCurrentSession } from "@/lib/storage";
+import { getCanonicalSessionId, loadCompletedSessions, loadCurrentSession } from "@/lib/storage";
 import type { QuizSession } from "@/types/quiz";
 
 function isResumableSession(session: QuizSession | null) {
@@ -17,7 +17,7 @@ export function ContinueQuizButton() {
 
   useEffect(() => {
     setSession(loadCurrentSession());
-    setCompletedSessionIds(loadCompletedSessions().map((item) => item.id));
+    setCompletedSessionIds(loadCompletedSessions().map((item) => getCanonicalSessionId(item.id)));
 
     function handleSessionChange(event: Event) {
       const detail = (event as CustomEvent<QuizSession | null>).detail;
@@ -27,7 +27,7 @@ export function ContinueQuizButton() {
     function handleCompletedSessionsChange(event: Event) {
       const detail = (event as CustomEvent<QuizSession[] | undefined>).detail;
       const sessions = detail ?? loadCompletedSessions();
-      setCompletedSessionIds(sessions.map((item) => item.id));
+      setCompletedSessionIds(sessions.map((item) => getCanonicalSessionId(item.id)));
     }
 
     function handleStorageChange(event: StorageEvent) {
@@ -36,7 +36,7 @@ export function ContinueQuizButton() {
         event.key?.includes("anatomy-confidence-completed-sessions")
       ) {
         setSession(loadCurrentSession());
-        setCompletedSessionIds(loadCompletedSessions().map((item) => item.id));
+        setCompletedSessionIds(loadCompletedSessions().map((item) => getCanonicalSessionId(item.id)));
       }
     }
 
@@ -59,12 +59,12 @@ export function ContinueQuizButton() {
 
   useEffect(() => {
     setSession(loadCurrentSession());
-    setCompletedSessionIds(loadCompletedSessions().map((item) => item.id));
+    setCompletedSessionIds(loadCompletedSessions().map((item) => getCanonicalSessionId(item.id)));
   }, [syncVersion]);
 
   const resumeMeta = useMemo(() => {
     if (!session || !isResumableSession(session)) return null;
-    if (completedSessionIds.includes(session.id)) return null;
+    if (completedSessionIds.includes(getCanonicalSessionId(session.id))) return null;
     const activeSession = session;
     const currentIndex = activeSession.currentQuestionIndex ?? 0;
     const total = activeSession.questionOrder?.length ?? 0;
