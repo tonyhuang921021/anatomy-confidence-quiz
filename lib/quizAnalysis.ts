@@ -349,9 +349,12 @@ export function getNextRecommendedSections(
 export function generateAIPrompt(
   attempts: Attempt[],
   questions: Question[],
-  allSessions: { attempts: Attempt[] }[]
+  allSessions: { attempts: Attempt[] }[],
+  lookupQuestions: Question[] = questions
 ) {
-  const questionMap = new Map(questions.map((question) => [question.id, question]));
+  const questionMap = new Map([...lookupQuestions, ...questions].map((question) => [question.id, question]));
+  const formatMissingQuestionAttempt = (attempt: Attempt, label: string) =>
+    `${label}｜題號 ${attempt.questionId}｜題目資料暫時未載入｜信心 ${attempt.confidence}｜我的答案 ${attempt.selectedAnswer}｜正解 ${attempt.correctAnswer}｜錯因 ${attempt.errorType ?? "未填"}`;
   const subjectLabel = (() => {
     const subjects = Array.from(
       new Set(
@@ -374,7 +377,18 @@ export function generateAIPrompt(
 
   const attemptLines = attempts.map((attempt, index) => {
     const question = questionMap.get(attempt.questionId);
-    if (!question) return "";
+    if (!question) {
+      return [
+        `${index + 1}. 題號：${attempt.questionId}`,
+        "題目資料：暫時未載入",
+        `我的答案：${attempt.selectedAnswer}`,
+        `正確答案：${attempt.correctAnswer}`,
+        `是否答對：${attempt.isCorrect ? "答對" : "答錯"}`,
+        `confidence：${attempt.confidence}`,
+        `信心文字：${getConfidenceLabel(attempt.confidence)}`,
+        `errorType：${attempt.errorType ?? "未填"}`
+      ].join("｜");
+    }
     return [
       `${index + 1}. 題號：${question.id}`,
       `來源：${question.sourceType ?? (question.source === "past-exam-inspired" ? "PAST_EXAM_STYLE" : question.source === "ai-generated" ? "AI_GENERATED" : "LOCAL_BANK")}`,
@@ -416,7 +430,7 @@ export function generateAIPrompt(
     .filter((attempt) => !attempt.isCorrect && attempt.confidence >= 4)
     .map((attempt) => {
       const question = questionMap.get(attempt.questionId);
-      if (!question) return "";
+      if (!question) return formatMissingQuestionAttempt(attempt, "題目資料暫時未載入｜答錯但信心高");
       return `${question.chapter} / ${question.section}｜${question.testedConcept}｜答錯但信心高（${attempt.confidence}）｜我的答案 ${attempt.selectedAnswer}｜正解 ${attempt.correctAnswer}`;
     })
     .filter(Boolean);
@@ -425,7 +439,7 @@ export function generateAIPrompt(
     .filter((attempt) => !attempt.isCorrect && attempt.confidence <= 2)
     .map((attempt) => {
       const question = questionMap.get(attempt.questionId);
-      if (!question) return "";
+      if (!question) return formatMissingQuestionAttempt(attempt, "題目資料暫時未載入｜答錯且低信心");
       return `${question.chapter} / ${question.section}｜${question.testedConcept}｜答錯且低信心（${attempt.confidence}）｜錯因 ${attempt.errorType ?? "未填"}`;
     })
     .filter(Boolean);
@@ -434,7 +448,7 @@ export function generateAIPrompt(
     .filter((attempt) => !attempt.isCorrect)
     .map((attempt) => {
       const question = questionMap.get(attempt.questionId);
-      if (!question) return "";
+      if (!question) return formatMissingQuestionAttempt(attempt, "題目資料暫時未載入｜答錯");
       return `${question.chapter} / ${question.section}｜${question.testedConcept}｜信心 ${attempt.confidence}｜我的答案 ${attempt.selectedAnswer}｜正解 ${attempt.correctAnswer}｜錯因 ${attempt.errorType ?? "未填"}`;
     })
     .filter(Boolean);
@@ -443,7 +457,12 @@ export function generateAIPrompt(
     .filter((attempt) => attempt.confidence <= 3)
     .map((attempt) => {
       const question = questionMap.get(attempt.questionId);
-      if (!question) return "";
+      if (!question) {
+        return formatMissingQuestionAttempt(
+          attempt,
+          `題目資料暫時未載入｜${attempt.isCorrect ? "答對但沒信心" : "答錯且沒信心"}`
+        );
+      }
       return `${question.chapter} / ${question.section}｜${question.testedConcept}｜${attempt.isCorrect ? "答對但沒信心" : "答錯且沒信心"}（${attempt.confidence}）｜我的答案 ${attempt.selectedAnswer}｜正解 ${attempt.correctAnswer}`;
     })
     .filter(Boolean);
