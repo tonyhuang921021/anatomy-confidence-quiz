@@ -40,6 +40,7 @@ import {
 } from "@/lib/quizAnalysis";
 import {
   applyQuestionExplanationOverride,
+  clearMatchingCurrentSessions,
   clearCurrentSession,
   getPendingQuestionExplanationOverrideSync,
   loadCompletedSessions,
@@ -52,7 +53,7 @@ import {
   saveQuestionExplanationOverrides
 } from "@/lib/storage";
 import { getOrCreateVisitorId } from "@/lib/visitor";
-import { isYangmingModeEnabled, YANGMING_MODE_EVENT } from "@/lib/yangmingMode";
+import { isYangmingModeEnabled, setYangmingModeEnabled, YANGMING_MODE_EVENT } from "@/lib/yangmingMode";
 import {
   Attempt,
   ConfidenceLevel,
@@ -110,27 +111,142 @@ function evaluateAttempt(question: Question, selectedAnswer: OptionKey) {
   return selectedAnswer === question.answer;
 }
 
-function YangmingExplanationBlock({ content }: { content: YangmingExplanationContent }) {
+function YangmingExplanationBlock({
+  content,
+  onReport
+}: {
+  content: YangmingExplanationContent;
+  onReport?: () => void;
+}) {
+  const sections = content.sections ?? [];
+  const assets = content.assets ?? [];
+  const hasStructuredSections = sections.length > 0;
+
+  function renderAssetFigure(
+    asset: NonNullable<YangmingExplanationContent["assets"]>[number] | undefined,
+    fallbackKey: string,
+    sectionFallback = false
+  ) {
+    if (!asset?.src) return null;
+    const isFallback = sectionFallback || asset.fallback || asset.kind === "page_snapshot";
+    const imageMaxHeight = isFallback ? "max-h-[760px]" : "max-h-[520px]";
+    const imageWidth = asset.width ? Math.min(asset.width, isFallback ? 920 : 760) : undefined;
+    const caption = isFallback
+      ? `備用原頁截圖${asset.page ? `（第 ${asset.page} 頁）` : ""}：精準圖片或表格不足時保留完整詳解頁面。`
+      : asset.alt;
+
+    return (
+      <figure
+        key={fallbackKey}
+        className={`my-3 overflow-hidden rounded-2xl bg-white/80 p-2 ring-1 ${
+          isFallback ? "ring-amber-100" : "ring-slate-200"
+        }`}
+      >
+        {isFallback ? (
+          <div className="mb-2 flex flex-wrap items-center gap-2 px-1 text-[11px] font-bold text-amber-800">
+            <span className="rounded-full bg-amber-50 px-2 py-0.5 ring-1 ring-amber-100">
+              備用原頁截圖
+            </span>
+            <span className="font-medium text-slate-400">
+              若圖片或表格切割不完整，先用這張保留原詳解。
+            </span>
+          </div>
+        ) : null}
+        <img
+          src={asset.src}
+          alt={asset.alt ?? ""}
+          loading="lazy"
+          className={`h-auto ${imageMaxHeight} max-w-full object-contain`}
+          style={{ width: imageWidth }}
+        />
+        {caption ? (
+          <figcaption className={`mt-2 text-xs ${isFallback ? "text-amber-800/80" : "text-slate-500"}`}>
+            {caption}
+          </figcaption>
+        ) : null}
+      </figure>
+    );
+  }
+
+  function renderAsset(assetIndex: number | undefined, fallbackKey: string, sectionFallback = false) {
+    if (typeof assetIndex !== "number") return null;
+    return renderAssetFigure(assets[assetIndex], fallbackKey, sectionFallback);
+  }
+
   return (
     <div className="rounded-3xl bg-white/70 p-4 text-sm leading-7 text-slate-800 ring-1 ring-white/70">
-      <div className="whitespace-pre-wrap">{content.body}</div>
-      {content.assets?.length ? (
+      <div className="mb-3 flex items-start justify-between gap-3">
+        {onReport ? (
+          <button
+            type="button"
+            onClick={onReport}
+            className="rounded-full bg-amber-50 px-3 py-1 text-[11px] font-bold text-amber-800 ring-1 ring-amber-100 transition hover:bg-amber-100"
+          >
+            回報陽明詳解
+          </button>
+        ) : (
+          <span />
+        )}
+        {content.author || content.reviewer ? (
+          <p className="text-right text-[11px] font-semibold leading-5 text-slate-500">
+            {content.author ? `撰寫：${content.author}` : ""}
+            {content.author && content.reviewer ? "　" : ""}
+            {content.reviewer ? `審稿：${content.reviewer}` : ""}
+          </p>
+        ) : null}
+      </div>
+      {hasStructuredSections ? (
+        <div className="space-y-4">
+          {sections.map((section, index) => {
+            if (section.kind === "image") {
+              return renderAsset(section.assetIndex, `yangming-section-image-${index}`, section.fallback);
+            }
+
+            return (
+              <section key={`yangming-section-${index}`} className="min-w-0">
+                {section.label ? (
+                  <p className="mb-1 text-xs font-black uppercase tracking-[0.18em] text-teal-700">
+                    {section.label}
+                  </p>
+                ) : null}
+                {section.runs?.length ? (
+                  <div className="whitespace-pre-wrap break-words">
+                    {section.runs.map((run, runIndex) => (
+                      <span
+                        key={`yangming-run-${index}-${runIndex}`}
+                        className={
+                          run.script === "super"
+                            ? "align-super text-[0.72em]"
+                            : run.script === "sub"
+                              ? "align-sub text-[0.72em]"
+                              : undefined
+                        }
+                      >
+                        {run.text}
+                      </span>
+                    ))}
+                  </div>
+                ) : section.text ? (
+                  <div className="whitespace-pre-wrap break-words">{section.text}</div>
+                ) : null}
+              </section>
+            );
+          })}
+        </div>
+      ) : (
+        <div className="whitespace-pre-wrap break-words">{content.body}</div>
+      )}
+      {!hasStructuredSections && assets.length ? (
         <div className="mt-4 grid gap-3">
-          {content.assets.map((asset) => (
-            <img
-              key={asset.src}
-              src={asset.src}
-              alt={asset.alt ?? ""}
-              className="max-h-[520px] w-full rounded-2xl object-contain ring-1 ring-slate-200"
-            />
-          ))}
+          {assets.map((asset) => renderAssetFigure(asset, asset.src))}
         </div>
       ) : null}
-      {content.author || content.reviewer ? (
-        <p className="mt-4 text-xs font-semibold text-slate-500">
-          {content.author ? `撰寫：${content.author}` : ""}
-          {content.author && content.reviewer ? "　" : ""}
-          {content.reviewer ? `校稿：${content.reviewer}` : ""}
+      {content.sourceLabel || content.sourceFile ? (
+        <p className="mt-4 text-[11px] font-medium leading-5 text-slate-400">
+          資料來源：{content.sourceLabel ?? content.sourceFile}
+          {content.sourcePageStart
+            ? `，第 ${content.sourcePageStart}${content.sourcePageEnd && content.sourcePageEnd !== content.sourcePageStart ? `-${content.sourcePageEnd}` : ""} 頁`
+            : ""}
         </p>
       ) : null}
     </div>
@@ -400,6 +516,7 @@ export default function QuizPage() {
   const { session: authSession } = useAuth();
   const questionTopRef = useRef<HTMLDivElement | null>(null);
   const contentTopRef = useRef<HTMLDivElement | null>(null);
+  const completedSessionIdsRef = useRef(new Set<string>());
   const [mounted, setMounted] = useState(false);
   const [session, setSession] = useState<QuizSession | null>(null);
   const [classificationOverrides, setClassificationOverrides] = useState<Record<string, QuestionClassificationOverride>>({});
@@ -411,6 +528,10 @@ export default function QuizPage() {
   const [yangmingModeEnabled, setYangmingModeEnabledState] = useState(false);
   const [yangmingExplanationMap, setYangmingExplanationMap] = useState<Record<string, YangmingExplanationContent | null>>({});
   const [showAiExplanationAfterYangming, setShowAiExplanationAfterYangming] = useState(false);
+  const [yangmingReportOpen, setYangmingReportOpen] = useState(false);
+  const [yangmingReportReason, setYangmingReportReason] = useState("");
+  const [yangmingReportLoading, setYangmingReportLoading] = useState(false);
+  const [yangmingReportMessage, setYangmingReportMessage] = useState("");
   const [isSubmittingAnswer, setIsSubmittingAnswer] = useState(false);
   const [isPeakPrefetching, setIsPeakPrefetching] = useState(false);
   const [peakNextQuestionError, setPeakNextQuestionError] = useState("");
@@ -606,10 +727,37 @@ export default function QuizPage() {
   }, []);
 
   useEffect(() => {
-    setYangmingModeEnabledState(Boolean(authSession?.access_token) && isYangmingModeEnabled());
+    const accountKey = authSession?.user?.id ?? null;
+    setYangmingModeEnabledState(Boolean(authSession?.access_token) && isYangmingModeEnabled(accountKey));
+
+    async function refreshCloudYangmingMode() {
+      if (!authSession?.access_token || !accountKey) {
+        setYangmingModeEnabledState(false);
+        return;
+      }
+
+      try {
+        const response = await fetch("/api/yangming-mode", {
+          headers: {
+            Authorization: `Bearer ${authSession.access_token}`
+          }
+        });
+        const payload = (await response.json().catch(() => null)) as
+          | { ok?: boolean; enabled?: boolean }
+          | null;
+        if (response.ok && payload?.ok && payload.enabled) {
+          setYangmingModeEnabled(true, accountKey);
+          setYangmingModeEnabledState(true);
+        }
+      } catch {
+        // Local account cache is enough when the cloud status check is unavailable.
+      }
+    }
+
+    void refreshCloudYangmingMode();
 
     const handleModeChange = () => {
-      setYangmingModeEnabledState(Boolean(authSession?.access_token) && isYangmingModeEnabled());
+      setYangmingModeEnabledState(Boolean(authSession?.access_token) && isYangmingModeEnabled(accountKey));
     };
 
     window.addEventListener(YANGMING_MODE_EVENT, handleModeChange);
@@ -619,7 +767,7 @@ export default function QuizPage() {
       window.removeEventListener(YANGMING_MODE_EVENT, handleModeChange);
       window.removeEventListener("storage", handleModeChange);
     };
-  }, [authSession?.access_token]);
+  }, [authSession?.access_token, authSession?.user?.id]);
 
   useEffect(() => {
     async function fetchSharedExplanationOverrides() {
@@ -683,6 +831,9 @@ export default function QuizPage() {
     currentQuestion && authSession?.access_token && yangmingModeEnabled
       ? yangmingExplanationMap[currentQuestion.id] ?? null
       : null;
+  const hasCheckedCurrentYangmingExplanation =
+    Boolean(currentQuestion && authSession?.access_token && yangmingModeEnabled) &&
+    Object.prototype.hasOwnProperty.call(yangmingExplanationMap, currentQuestion.id);
   const targetCount =
     session?.settings?.mode === "simulation"
       ? questionSet.length
@@ -770,12 +921,18 @@ export default function QuizPage() {
   }
 
   function finalizeCompletedSession(completedSession: QuizSession) {
+    const completedKey = completedSession.id.replace(/^user-[^:]+:/, "");
+    if (completedSessionIdsRef.current.has(completedKey)) {
+      return false;
+    }
+    completedSessionIdsRef.current.add(completedKey);
     setSession(completedSession);
     saveCurrentSession(completedSession);
     const saved = saveCompletedSession(completedSession);
     if (saved !== false) {
-      clearCurrentSession();
+      clearMatchingCurrentSessions(completedSession.id, [authSession?.user?.id ?? ""]);
     }
+    return saved !== false;
   }
 
   function handleSelectConfidence(value: ConfidenceLevel) {
@@ -1183,6 +1340,63 @@ export default function QuizPage() {
     }
   }
 
+  function openYangmingReportDialog() {
+    setYangmingReportReason("");
+    setYangmingReportMessage("");
+    setYangmingReportOpen(true);
+  }
+
+  async function handleSubmitYangmingReport() {
+    if (!currentQuestion || !currentYangmingExplanation) return;
+    if (!authSession?.access_token) {
+      setYangmingReportMessage("請先登入帳號，才能回報陽明詳解。");
+      return;
+    }
+    if (yangmingReportReason.trim().length < 2) {
+      setYangmingReportMessage("請簡單填一下回報原因。");
+      return;
+    }
+
+    setYangmingReportLoading(true);
+    setYangmingReportMessage("");
+
+    try {
+      const response = await fetch("/api/yangming-explanation-report", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          accessToken: authSession.access_token,
+          visitorId: getOrCreateVisitorId(),
+          questionId: currentQuestion.id,
+          reason: yangmingReportReason,
+          sourceLabel: currentYangmingExplanation.sourceLabel,
+          sourceFile: currentYangmingExplanation.sourceFile
+        })
+      });
+
+      const payload = (await response.json().catch(() => null)) as
+        | { ok?: boolean; message?: string }
+        | null;
+      if (!response.ok || !payload?.ok) {
+        setYangmingReportMessage(payload?.message || "回報失敗，請再試一次。");
+        return;
+      }
+
+      setYangmingReportMessage("已收到回報，謝謝你幫忙抓錯。");
+      window.setTimeout(() => {
+        setYangmingReportOpen(false);
+        setYangmingReportReason("");
+        setYangmingReportMessage("");
+      }, 900);
+    } catch {
+      setYangmingReportMessage("無法連線到回報 API，請再試一次。");
+    } finally {
+      setYangmingReportLoading(false);
+    }
+  }
+
   function resetQuestionUI() {
     setSubmittedAttempt(null);
     setSelectedAnswer(undefined);
@@ -1406,6 +1620,8 @@ export default function QuizPage() {
   const currentClassificationReportLoading = classificationReportLoadingMap[currentQuestion.id];
   const currentClassificationReportMessage = classificationReportMessageMap[currentQuestion.id];
   const shouldUseYangmingExplanation = shouldShowExplanation && Boolean(currentYangmingExplanation);
+  const shouldShowMissingYangmingExplanation =
+    shouldShowExplanation && hasCheckedCurrentYangmingExplanation && !currentYangmingExplanation;
   const shouldShowAiExplanationDetails =
     !shouldUseYangmingExplanation || showAiExplanationAfterYangming;
   const specialScoringNote =
@@ -1576,7 +1792,14 @@ export default function QuizPage() {
                         testedConcept：<span className="font-semibold">{currentQuestion.testedConcept}</span>
                       </p>
                       {currentYangmingExplanation ? (
-                        <YangmingExplanationBlock content={currentYangmingExplanation} />
+                        <YangmingExplanationBlock
+                          content={currentYangmingExplanation}
+                          onReport={openYangmingReportDialog}
+                        />
+                      ) : shouldShowMissingYangmingExplanation ? (
+                        <div className="rounded-3xl bg-white/70 px-4 py-3 text-sm font-semibold text-slate-600 ring-1 ring-white/70">
+                          此題沒有陽明詳解。
+                        </div>
                       ) : null}
                       {shouldUseYangmingExplanation && !showAiExplanationAfterYangming ? (
                         <button
@@ -1806,6 +2029,75 @@ export default function QuizPage() {
           ) : null}
         </aside>
       </div>
+      {yangmingReportOpen ? (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/35 px-4 py-6 backdrop-blur-sm"
+          onClick={() => {
+            if (!yangmingReportLoading) setYangmingReportOpen(false);
+          }}
+        >
+          <div
+            className="w-full max-w-lg rounded-[2rem] bg-white p-5 shadow-2xl ring-1 ring-slate-200 sm:p-6"
+            onClick={(event) => event.stopPropagation()}
+          >
+            <div className="flex items-start justify-between gap-4">
+              <div>
+                <p className="text-xs font-black uppercase tracking-[0.22em] text-amber-700">
+                  Yangming Report
+                </p>
+                <h2 className="mt-2 text-xl font-black text-ink">回報陽明詳解</h2>
+                <p className="mt-2 text-sm leading-6 text-slate-500">
+                  可以寫「圖片不對」「表格漏掉」「詳解對錯題」這種原因，我會在後台看。
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={() => setYangmingReportOpen(false)}
+                disabled={yangmingReportLoading}
+                className="rounded-full bg-slate-100 px-3 py-1 text-sm font-bold text-slate-600 transition hover:bg-slate-200 disabled:opacity-50"
+              >
+                關閉
+              </button>
+            </div>
+            <div className="mt-5">
+              <textarea
+                value={yangmingReportReason}
+                onChange={(event) => setYangmingReportReason(event.target.value)}
+                rows={5}
+                maxLength={1200}
+                placeholder="請填回報原因..."
+                className="w-full resize-none rounded-3xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm leading-6 text-slate-800 outline-none transition focus:border-amber-300 focus:bg-white focus:ring-4 focus:ring-amber-100"
+              />
+              <p className="mt-2 text-right text-xs text-slate-400">
+                {yangmingReportReason.length}/1200
+              </p>
+            </div>
+            {yangmingReportMessage ? (
+              <p className="mt-3 rounded-2xl bg-slate-50 px-4 py-3 text-sm font-semibold text-slate-700">
+                {yangmingReportMessage}
+              </p>
+            ) : null}
+            <div className="mt-5 flex flex-col gap-3 sm:flex-row sm:justify-end">
+              <button
+                type="button"
+                onClick={() => setYangmingReportOpen(false)}
+                disabled={yangmingReportLoading}
+                className="min-h-11 rounded-2xl bg-slate-100 px-5 py-2 text-sm font-bold text-slate-700 transition hover:bg-slate-200 disabled:opacity-50"
+              >
+                取消
+              </button>
+              <button
+                type="button"
+                onClick={() => void handleSubmitYangmingReport()}
+                disabled={yangmingReportLoading}
+                className="min-h-11 rounded-2xl bg-amber-600 px-5 py-2 text-sm font-bold text-white transition hover:bg-amber-700 disabled:cursor-wait disabled:opacity-60"
+              >
+                {yangmingReportLoading ? "送出中..." : "送出回報"}
+              </button>
+            </div>
+          </div>
+        </div>
+      ) : null}
     </main>
   );
 }

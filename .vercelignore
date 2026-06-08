@@ -1,0 +1,6 @@
+reports
+.env*
+.vercel
+.pycache
+*.log
+tsconfig.tsbuildinfo

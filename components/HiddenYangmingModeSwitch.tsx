@@ -5,7 +5,7 @@ import { useAuth } from "@/components/AuthProvider";
 import { getOrCreateVisitorId } from "@/lib/visitor";
 import { isYangmingModeEnabled, setYangmingModeEnabled } from "@/lib/yangmingMode";
 
-const REQUIRED_TAPS = 30;
+const REQUIRED_TAPS = 50;
 const TAP_WINDOW_MS = 12_000;
 const TOAST_DURATION_MS = 1800;
 
@@ -27,7 +27,7 @@ export function HiddenYangmingModeSwitch() {
 
   async function recordActivation() {
     try {
-      await fetch("/api/yangming-mode", {
+      const response = await fetch("/api/yangming-mode", {
         method: "POST",
         headers: {
           "Content-Type": "application/json"
@@ -37,12 +37,13 @@ export function HiddenYangmingModeSwitch() {
           visitorId: getOrCreateVisitorId()
         })
       });
+      return response.ok;
     } catch {
-      // The hidden local switch should still work when logging is unavailable.
+      return false;
     }
   }
 
-  function handleSecretTap() {
+  async function handleSecretTap() {
     if (!session?.access_token) {
       tapTimesRef.current = [];
       return;
@@ -54,11 +55,13 @@ export function HiddenYangmingModeSwitch() {
     if (tapTimesRef.current.length < REQUIRED_TAPS) return;
 
     tapTimesRef.current = [];
-    if (!isYangmingModeEnabled()) {
-      setYangmingModeEnabled(true);
+    const recorded = await recordActivation();
+    if (!recorded) return;
+
+    if (!isYangmingModeEnabled(session.user.id)) {
+      setYangmingModeEnabled(true, session.user.id);
     }
     showEnabledToast();
-    void recordActivation();
   }
 
   return (

@@ -7,6 +7,7 @@ import type {
   OwnerExplanationUsageEntry,
   OwnerHourlyPoint,
   OwnerRecentAIAccountEntry,
+  OwnerYangmingExplanationReportEntry,
   OwnerYangmingModeActivationEntry,
   OwnerTopAttemptVisitorEntry
 } from "@/types/quiz";
@@ -69,6 +70,17 @@ type YangmingModeActivationRow = {
   user_email?: string | null;
   visitor_id?: string | null;
   enabled_at: string;
+};
+
+type YangmingExplanationReportRow = {
+  id: string | number;
+  question_id: string;
+  reason: string;
+  reporter_email?: string | null;
+  visitor_id?: string | null;
+  source_label?: string | null;
+  source_file?: string | null;
+  created_at: string;
 };
 
 const SUPABASE_PAGE_SIZE = 1000;
@@ -638,6 +650,37 @@ async function fetchOwnerYangmingModeActivations(
     .slice(0, limit);
 }
 
+async function fetchOwnerYangmingExplanationReports(
+  supabase: any,
+  limit = 80
+): Promise<OwnerYangmingExplanationReportEntry[]> {
+  const { data, error } = await supabase
+    .from("yangming_explanation_reports")
+    .select("id, question_id, reason, reporter_email, visitor_id, source_label, source_file, created_at")
+    .order("created_at", { ascending: false })
+    .limit(limit);
+
+  if (error) {
+    const message = String(error.message ?? "");
+    if (message.includes("yangming_explanation_reports") && (message.includes("does not exist") || message.includes("Could not find"))) {
+      return [];
+    }
+    throw error;
+  }
+
+  return ((data ?? []) as YangmingExplanationReportRow[]).map((row) => ({
+    id: String(row.id),
+    questionId: row.question_id,
+    reason: row.reason,
+    reporterLabel: row.reporter_email?.trim() || formatVisitorLabel(row.visitor_id),
+    reporterEmail: row.reporter_email ?? undefined,
+    visitorId: row.visitor_id ?? undefined,
+    sourceLabel: row.source_label ?? undefined,
+    sourceFile: row.source_file ?? undefined,
+    createdAt: row.created_at
+  }));
+}
+
 export async function POST(request: NextRequest) {
   const supabase = getServiceSupabaseClient();
   if (!supabase) {
@@ -670,7 +713,8 @@ export async function POST(request: NextRequest) {
       topVisitors,
       classificationReports,
       recentAiAccounts,
-      yangmingModeActivations
+      yangmingModeActivations,
+      yangmingExplanationReports
     ] = await Promise.all([
       fetchOwnerDailySeries(supabase, 14),
       fetchOwnerHourlySeries(supabase),
@@ -679,7 +723,8 @@ export async function POST(request: NextRequest) {
       fetchOwnerTopAttemptVisitors(supabase, 5),
       fetchOwnerClassificationReports(supabase, 40),
       fetchRecentAIAccounts(supabase),
-      fetchOwnerYangmingModeActivations(supabase, 80)
+      fetchOwnerYangmingModeActivations(supabase, 80),
+      fetchOwnerYangmingExplanationReports(supabase, 80)
     ]);
     const stats = await fetchOwnerDashboardStats(supabase, dailySeries, explanationUsage, searchUsage);
 
@@ -693,7 +738,8 @@ export async function POST(request: NextRequest) {
       topVisitors,
       classificationReports,
       recentAiAccounts,
-      yangmingModeActivations
+      yangmingModeActivations,
+      yangmingExplanationReports
     });
   } catch (error) {
     const message = error instanceof Error ? error.message : "私有數據載入失敗";

@@ -11,6 +11,7 @@ import {
   OwnerHourlyPoint,
   OpenAIBudgetStatus,
   OwnerRecentAIAccountEntry,
+  OwnerYangmingExplanationReportEntry,
   OwnerYangmingModeActivationEntry,
   SubjectName,
   OwnerTopAttemptVisitorEntry
@@ -57,6 +58,7 @@ type OwnerApiPayload = {
   topVisitors?: OwnerTopAttemptVisitorEntry[];
   classificationReports?: OwnerClassificationReportEntry[];
   yangmingModeActivations?: OwnerYangmingModeActivationEntry[];
+  yangmingExplanationReports?: OwnerYangmingExplanationReportEntry[];
 };
 
 function formatUpdatedAt(value: string) {
@@ -204,6 +206,7 @@ export default function OwnerPage() {
   const [searchUsage, setSearchUsage] = useState<OwnerExplanationUsageEntry[]>([]);
   const [recentAiAccounts, setRecentAiAccounts] = useState<OwnerRecentAIAccountEntry[]>([]);
   const [yangmingModeActivations, setYangmingModeActivations] = useState<OwnerYangmingModeActivationEntry[]>([]);
+  const [yangmingExplanationReports, setYangmingExplanationReports] = useState<OwnerYangmingExplanationReportEntry[]>([]);
   const [topVisitors, setTopVisitors] = useState<OwnerTopAttemptVisitorEntry[]>([]);
   const [classificationReports, setClassificationReports] = useState<OwnerClassificationReportEntry[]>([]);
   const [openAIBudget, setOpenAIBudget] = useState<OpenAIBudgetStatus | null>(null);
@@ -544,6 +547,7 @@ export default function OwnerPage() {
         setSearchUsage(payload.searchUsage ?? []);
         setRecentAiAccounts(payload.recentAiAccounts ?? []);
         setYangmingModeActivations(payload.yangmingModeActivations ?? []);
+        setYangmingExplanationReports(payload.yangmingExplanationReports ?? []);
         setTopVisitors(payload.topVisitors ?? []);
         setClassificationReports(payload.classificationReports ?? []);
         await fetchOpenAIBudget();
@@ -570,6 +574,7 @@ export default function OwnerPage() {
         setSearchUsage(payload.searchUsage ?? []);
         setRecentAiAccounts(payload.recentAiAccounts ?? []);
         setYangmingModeActivations(payload.yangmingModeActivations ?? []);
+        setYangmingExplanationReports(payload.yangmingExplanationReports ?? []);
         setTopVisitors(payload.topVisitors ?? []);
         setClassificationReports(payload.classificationReports ?? []);
         await fetchOpenAIBudget();
@@ -913,6 +918,62 @@ export default function OwnerPage() {
                     />
                   </div>
                 </div>
+              </div>
+            </section>
+
+            <section className="rounded-[2rem] bg-white p-6 shadow-card ring-1 ring-slate-100">
+              <div className="flex items-center justify-between gap-3">
+                <div>
+                  <h2 className="text-lg font-semibold text-ink">陽明詳解回報</h2>
+                  <p className="mt-2 text-sm text-slate-500">
+                    同學在題目詳解右上角送出的圖片、表格、答案或對應錯誤回報。
+                  </p>
+                </div>
+                <span className="rounded-full bg-amber-50 px-3 py-1 text-xs font-bold text-amber-800">
+                  {yangmingExplanationReports.length} 筆
+                </span>
+              </div>
+              <div className="mt-4 overflow-x-auto">
+                <table className="min-w-full text-left text-sm">
+                  <thead className="text-slate-500">
+                    <tr className="border-b border-slate-200">
+                      <th className="px-3 py-3 font-semibold">題號</th>
+                      <th className="px-3 py-3 font-semibold">原因</th>
+                      <th className="px-3 py-3 font-semibold">回報者</th>
+                      <th className="px-3 py-3 font-semibold">來源</th>
+                      <th className="px-3 py-3 font-semibold">時間</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {yangmingExplanationReports.length === 0 ? (
+                      <tr>
+                        <td colSpan={5} className="px-3 py-6 text-center text-slate-500">
+                          目前還沒有陽明詳解回報。
+                        </td>
+                      </tr>
+                    ) : (
+                      yangmingExplanationReports.map((report) => (
+                        <tr key={report.id} className="border-b border-slate-100 last:border-b-0">
+                          <td className="whitespace-nowrap px-3 py-3 font-mono text-xs font-bold text-ink">
+                            {report.questionId}
+                          </td>
+                          <td className="min-w-[260px] px-3 py-3 text-slate-700">
+                            {report.reason}
+                          </td>
+                          <td className="whitespace-nowrap px-3 py-3 text-slate-500">
+                            {report.reporterLabel}
+                          </td>
+                          <td className="min-w-[180px] px-3 py-3 text-xs text-slate-400">
+                            {report.sourceLabel ?? report.sourceFile ?? "—"}
+                          </td>
+                          <td className="whitespace-nowrap px-3 py-3 text-slate-500">
+                            {formatUpdatedAt(report.createdAt)}
+                          </td>
+                        </tr>
+                      ))
+                    )}
+                  </tbody>
+                </table>
               </div>
             </section>
 

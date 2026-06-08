@@ -650,7 +650,16 @@ create table if not exists public.yangming_question_explanations (
   body text not null,
   author text,
   reviewer text,
+  source_label text,
+  source_file text,
+  source_page_start integer,
+  source_page_end integer,
+  question_stem_snapshot text,
+  answer_snapshot text,
+  sections jsonb not null default '[]'::jsonb,
   assets jsonb not null default '[]'::jsonb,
+  match_status text,
+  match_score numeric,
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now()
 );
@@ -665,7 +674,34 @@ alter table public.yangming_question_explanations
   add column if not exists reviewer text;
 
 alter table public.yangming_question_explanations
+  add column if not exists source_label text;
+
+alter table public.yangming_question_explanations
+  add column if not exists source_file text;
+
+alter table public.yangming_question_explanations
+  add column if not exists source_page_start integer;
+
+alter table public.yangming_question_explanations
+  add column if not exists source_page_end integer;
+
+alter table public.yangming_question_explanations
+  add column if not exists question_stem_snapshot text;
+
+alter table public.yangming_question_explanations
+  add column if not exists answer_snapshot text;
+
+alter table public.yangming_question_explanations
+  add column if not exists sections jsonb not null default '[]'::jsonb;
+
+alter table public.yangming_question_explanations
   add column if not exists assets jsonb not null default '[]'::jsonb;
+
+alter table public.yangming_question_explanations
+  add column if not exists match_status text;
+
+alter table public.yangming_question_explanations
+  add column if not exists match_score numeric;
 
 alter table public.yangming_question_explanations
   add column if not exists created_at timestamptz not null default now();
@@ -691,6 +727,84 @@ drop policy if exists "Service role can manage yangming question explanations" o
 
 create policy "Service role can manage yangming question explanations"
 on public.yangming_question_explanations
+for all
+to service_role
+using (true)
+with check (true);
+
+insert into storage.buckets (id, name, public, file_size_limit, allowed_mime_types)
+values (
+  'yangming-explanations',
+  'yangming-explanations',
+  true,
+  52428800,
+  array['image/png', 'image/jpeg', 'image/webp']
+)
+on conflict (id) do update
+set
+  public = excluded.public,
+  file_size_limit = excluded.file_size_limit,
+  allowed_mime_types = excluded.allowed_mime_types;
+
+create table if not exists public.yangming_explanation_reports (
+  id bigint generated always as identity primary key,
+  question_id text not null,
+  reason text not null,
+  user_id uuid references auth.users (id) on delete set null,
+  reporter_email text,
+  visitor_id text,
+  source_label text,
+  source_file text,
+  created_at timestamptz not null default now()
+);
+
+alter table public.yangming_explanation_reports
+  add column if not exists question_id text;
+
+alter table public.yangming_explanation_reports
+  add column if not exists reason text;
+
+alter table public.yangming_explanation_reports
+  add column if not exists user_id uuid references auth.users (id) on delete set null;
+
+alter table public.yangming_explanation_reports
+  add column if not exists reporter_email text;
+
+alter table public.yangming_explanation_reports
+  add column if not exists visitor_id text;
+
+alter table public.yangming_explanation_reports
+  add column if not exists source_label text;
+
+alter table public.yangming_explanation_reports
+  add column if not exists source_file text;
+
+alter table public.yangming_explanation_reports
+  add column if not exists created_at timestamptz not null default now();
+
+create index if not exists yangming_explanation_reports_created_at_idx
+on public.yangming_explanation_reports (created_at desc);
+
+create index if not exists yangming_explanation_reports_question_id_idx
+on public.yangming_explanation_reports (question_id);
+
+create index if not exists yangming_explanation_reports_user_id_created_at_idx
+on public.yangming_explanation_reports (user_id, created_at desc);
+
+revoke all on public.yangming_explanation_reports from anon;
+revoke all on public.yangming_explanation_reports from authenticated;
+
+grant select, insert, update, delete
+  on public.yangming_explanation_reports
+  to service_role;
+
+alter table public.yangming_explanation_reports enable row level security;
+
+drop policy if exists "Anyone can insert yangming explanation reports" on public.yangming_explanation_reports;
+drop policy if exists "Service role can manage yangming explanation reports" on public.yangming_explanation_reports;
+
+create policy "Service role can manage yangming explanation reports"
+on public.yangming_explanation_reports
 for all
 to service_role
 using (true)

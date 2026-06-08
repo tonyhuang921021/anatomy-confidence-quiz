@@ -3,5 +3,9 @@
 .next-broken-*
 node_modules
 .env.local
+.env.*.local
+.vercel
+.pycache
+reports
 *.log
 tsconfig.tsbuildinfo

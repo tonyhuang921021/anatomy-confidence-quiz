@@ -22,6 +22,45 @@ function getServiceSupabaseClient() {
   });
 }
 
+function getBearerToken(request: NextRequest) {
+  const header = request.headers.get("authorization") ?? "";
+  const match = header.match(/^Bearer\s+(.+)$/i);
+  return match?.[1]?.trim() || null;
+}
+
+export async function GET(request: NextRequest) {
+  const supabase = getServiceSupabaseClient();
+  if (!supabase) {
+    return NextResponse.json({ ok: false, enabled: false, message: "Supabase 尚未設定。" }, { status: 503 });
+  }
+
+  try {
+    const accessToken = getBearerToken(request);
+    if (!accessToken) {
+      return NextResponse.json({ ok: false, enabled: false, message: "請先登入。" }, { status: 401 });
+    }
+
+    const { data, error: authError } = await supabase.auth.getUser(accessToken);
+    if (authError || !data.user?.id) {
+      return NextResponse.json({ ok: false, enabled: false, message: "登入驗證失敗。" }, { status: 401 });
+    }
+
+    const { data: activation, error } = await supabase
+      .from("yangming_mode_activations")
+      .select("id")
+      .eq("user_id", data.user.id)
+      .limit(1)
+      .maybeSingle();
+
+    if (error) throw error;
+
+    return NextResponse.json({ ok: true, enabled: Boolean(activation) });
+  } catch (error) {
+    const message = error instanceof Error ? error.message : "陽明詳解模式狀態讀取失敗";
+    return NextResponse.json({ ok: false, enabled: false, message }, { status: 500 });
+  }
+}
+
 export async function POST(request: NextRequest) {
   const supabase = getServiceSupabaseClient();
   if (!supabase) {

@@ -333,9 +333,33 @@ export type YangmingExplanationContent = {
   body: string;
   author?: string;
   reviewer?: string;
+  sourceLabel?: string;
+  sourceFile?: string;
+  sourcePageStart?: number;
+  sourcePageEnd?: number;
+  questionStemSnapshot?: string;
+  answerSnapshot?: string;
+  sections?: {
+    kind: string;
+    label?: string;
+    text?: string;
+    runs?: {
+      text: string;
+      script?: "super" | "sub";
+    }[];
+    assetIndex?: number;
+    page?: number;
+    fallback?: boolean;
+  }[];
   assets?: {
     src: string;
+    storagePath?: string;
     alt?: string;
+    width?: number;
+    height?: number;
+    page?: number;
+    kind?: "image" | "table" | "page_snapshot" | string;
+    fallback?: boolean;
   }[];
 };
 
@@ -438,6 +462,18 @@ export type OwnerYangmingModeActivationEntry = {
   activationCount: number;
   firstEnabledAt?: string;
   lastEnabledAt?: string;
+};
+
+export type OwnerYangmingExplanationReportEntry = {
+  id: string;
+  questionId: string;
+  reason: string;
+  reporterLabel: string;
+  reporterEmail?: string;
+  visitorId?: string;
+  sourceLabel?: string;
+  sourceFile?: string;
+  createdAt: string;
 };
 
 export type QuestionClassificationOverride = {
