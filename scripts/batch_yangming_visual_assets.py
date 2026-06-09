@@ -21,6 +21,7 @@ ROOT = Path(__file__).resolve().parents[1]
 PREVIEW_SCRIPT = ROOT / "scripts" / "preview_yangming_explanations.py"
 DEFAULT_SOURCE_DIR = Path("/Users/huangguanlun/Downloads/陽明詳解")
 DEFAULT_OUTPUT_DIR = ROOT / "reports" / "yangming_import_preview" / "visual_full"
+DEFAULT_BASE_ROWS = ROOT / "reports" / "yangming_import_preview" / "yangming_consolidated_rows.json"
 
 
 def load_preview_module():
@@ -78,6 +79,274 @@ def prefix_asset_paths(rows: list[dict[str, Any]], prefix: str) -> None:
             src = asset.get("src")
             if isinstance(src, str) and src and not src.startswith(prefix):
                 asset["src"] = f"{prefix}{src}"
+
+
+def load_json_rows(path: Path) -> list[dict[str, Any]]:
+    if not path.exists():
+        return []
+    payload = json.loads(path.read_text(encoding="utf-8"))
+    if not isinstance(payload, list):
+        raise ValueError(f"Expected a JSON array at {path}")
+    return [row for row in payload if isinstance(row, dict)]
+
+
+def merge_base_rows(
+    consolidated_rows: list[dict[str, Any]],
+    base_rows: list[dict[str, Any]],
+    allowed_source_files: set[str] | None = None,
+) -> int:
+    """Recover questions found by text/stem parsing but missed by visual parsing.
+
+    The website should never lose a Yangming explanation just because the
+    visual/table extractor failed to identify a row. These recovered rows still
+    get original page snapshots attached later, and the row keeps an audit flag
+    so we know the text was only used as a locator.
+    """
+    existing_ids = {
+        str(row.get("question_id") or "")
+        for row in consolidated_rows
+        if row.get("question_id")
+    }
+    added = 0
+    for base_row in base_rows:
+        source_file = str(base_row.get("source_file") or "").split(" :: ", 1)[0]
+        if allowed_source_files is not None and source_file not in allowed_source_files:
+            continue
+        question_id = str(base_row.get("question_id") or "")
+        if not question_id or question_id in existing_ids:
+            continue
+        recovered = dict(base_row)
+        recovered["assets"] = []
+        recovered["sections"] = [
+            section
+            for section in recovered.get("sections", [])
+            if isinstance(section, dict) and section.get("kind") != "image"
+        ]
+        recovered["match_strategy"] = f"snapshot_text_locator:{recovered.get('match_strategy') or 'unknown'}"
+        recovered["visual_fallback"] = True
+        recovered["snapshot_audit"] = {
+            "locator": "base_text_consolidated_rows",
+            "reason": "visual_extractor_missed_question",
+            "source_file": recovered.get("source_file"),
+            "source_page_start": recovered.get("source_page_start"),
+            "source_page_end": recovered.get("source_page_end"),
+            "matched_question_no": recovered.get("matched_question_no"),
+        }
+        consolidated_rows.append(recovered)
+        existing_ids.add(question_id)
+        added += 1
+
+    consolidated_rows.sort(
+        key=lambda row: (
+            str(row.get("exam_code") or ""),
+            str(row.get("paper_code") or ""),
+            int(row.get("matched_question_no") or row.get("extracted_question_no") or 0),
+        )
+    )
+    return added
+
+
+def build_reports_for_rows(
+    rows: list[dict[str, Any]],
+    source_metas: dict[tuple[str, str], Any],
+    paper_questions: dict[tuple[str, str], list[Any]],
+) -> list[dict[str, Any]]:
+    by_question_id = {
+        str(row.get("question_id") or ""): row
+        for row in rows
+        if row.get("question_id")
+    }
+    reports: list[dict[str, Any]] = []
+    for key, meta in sorted(source_metas.items()):
+        expected_questions = paper_questions.get(key, [])
+        matched_nos: set[int] = set()
+        low_nos: set[int] = set()
+        for question in expected_questions:
+            row = by_question_id.get(question.question_id)
+            if not row:
+                continue
+            if row.get("match_status") == "low_confidence":
+                low_nos.add(question.question_no)
+            else:
+                matched_nos.add(question.question_no)
+        safe_missing = [q.question_no for q in expected_questions if q.question_no not in matched_nos]
+        uncovered = [q.question_no for q in expected_questions if q.question_no not in matched_nos and q.question_no not in low_nos]
+        reports.append({
+            "expected_paper": f"{meta.exam_code}-{meta.paper_code}",
+            "roc_year": meta.roc_year,
+            "round_no": meta.round_no,
+            "group": meta.group,
+            "expected_questions": len(expected_questions),
+            "matched_question_count": len(matched_nos),
+            "low_confidence_question_count": len(low_nos),
+            "safe_missing_question_count": len(safe_missing),
+            "safe_missing_question_nos": " ".join(str(qno) for qno in safe_missing),
+            "uncovered_question_count": len(uncovered),
+            "uncovered_question_nos": " ".join(str(qno) for qno in uncovered),
+        })
+    return reports
+
+
+def row_question_no(row: dict[str, Any]) -> int:
+    try:
+        return int(row.get("matched_question_no") or row.get("extracted_question_no") or row.get("question_no") or 0)
+    except (TypeError, ValueError):
+        return 0
+
+
+def recover_uncovered_rows_from_neighbors(
+    rows: list[dict[str, Any]],
+    source_metas: dict[tuple[str, str], Any],
+    paper_questions: dict[tuple[str, str], list[Any]],
+) -> int:
+    """Create visual-only placeholders for questions no extractor can read.
+
+    This is intentionally conservative: the row is marked for review and uses a
+    neighboring page span, so the site can show the original PDF evidence instead
+    of pretending there is no Yangming explanation.
+    """
+    by_question_id = {
+        str(row.get("question_id") or ""): row
+        for row in rows
+        if row.get("question_id")
+    }
+    rows_by_paper: dict[tuple[str, str], list[dict[str, Any]]] = {}
+    for row in rows:
+        key = (str(row.get("exam_code") or ""), str(row.get("paper_code") or ""))
+        if key[0] and key[1]:
+            rows_by_paper.setdefault(key, []).append(row)
+
+    added = 0
+    for key, meta in source_metas.items():
+        paper_rows = sorted(
+            [row for row in rows_by_paper.get(key, []) if row_question_no(row) > 0],
+            key=row_question_no,
+        )
+        if not paper_rows:
+            continue
+        expected_questions = paper_questions.get(key, [])
+        for question in expected_questions:
+            if question.question_id in by_question_id:
+                continue
+            previous_row = next((row for row in reversed(paper_rows) if row_question_no(row) < question.question_no), None)
+            next_row = next((row for row in paper_rows if row_question_no(row) > question.question_no), None)
+            anchor_row = previous_row or next_row
+            if not anchor_row:
+                continue
+            source_file = str(anchor_row.get("source_file") or "").split(" :: ", 1)[0]
+            try:
+                previous_end = int(previous_row.get("source_page_end") or previous_row.get("source_page_start") or 0) if previous_row else 0
+                next_start = int(next_row.get("source_page_start") or next_row.get("source_page_end") or 0) if next_row else 0
+            except (TypeError, ValueError):
+                previous_end = 0
+                next_start = 0
+
+            if previous_end and next_start:
+                start_page = min(previous_end, next_start)
+                end_page = max(previous_end, next_start)
+            elif previous_end:
+                start_page = previous_end
+                end_page = previous_end
+            elif next_start:
+                start_page = max(1, next_start)
+                end_page = next_start
+            else:
+                continue
+
+            recovered = {
+                "question_id": question.question_id,
+                "match_status": "low_confidence",
+                "match_strategy": "visual_only_neighbor_span",
+                "match_score": 0,
+                "base_match_score": 0,
+                "extracted_question_no": question.question_no,
+                "matched_question_no": question.question_no,
+                "source_file": source_file,
+                "source_label": f"{meta.roc_year} 年第 {meta.round_no} 次 {meta.group}",
+                "exam_code": meta.exam_code,
+                "paper_code": meta.paper_code,
+                "question_no": question.question_no,
+                "author": None,
+                "reviewer": None,
+                "question_stem_snapshot": question.stem,
+                "answer_snapshot": "",
+                "body": "此題目前以原 PDF 截圖作為陽明詳解依據，請優先看原始版面並協助回報校正。",
+                "sections": [{
+                    "kind": "detail",
+                    "label": "待核對",
+                    "text": "此題由前後題頁碼推定原始詳解位置，文字尚待校正。"
+                }],
+                "assets": [],
+                "source_page_start": start_page,
+                "source_page_end": end_page,
+                "source_page_regions": [],
+                "visual_fallback": True,
+                "needs_review": True,
+                "snapshot_audit": {
+                    "locator": "neighbor_page_span",
+                    "reason": "no_text_or_visual_candidate",
+                    "source_file": source_file,
+                    "source_page_start": start_page,
+                    "source_page_end": end_page,
+                    "matched_question_no": question.question_no,
+                    "previous_question_no": row_question_no(previous_row) if previous_row else "",
+                    "next_question_no": row_question_no(next_row) if next_row else "",
+                },
+            }
+            rows.append(recovered)
+            paper_rows.append(recovered)
+            paper_rows.sort(key=row_question_no)
+            by_question_id[question.question_id] = recovered
+            added += 1
+
+    rows.sort(
+        key=lambda row: (
+            str(row.get("exam_code") or ""),
+            str(row.get("paper_code") or ""),
+            row_question_no(row),
+        )
+    )
+    return added
+
+
+def build_snapshot_audit_rows(rows: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    audit_rows: list[dict[str, Any]] = []
+    for row in rows:
+        assets = row.get("assets") if isinstance(row.get("assets"), list) else []
+        snapshot_assets = [
+            asset
+            for asset in assets
+            if isinstance(asset, dict) and asset.get("kind") == "question_snapshot"
+        ]
+        audit = row.get("snapshot_audit") if isinstance(row.get("snapshot_audit"), dict) else {}
+        audit_rows.append({
+            "question_id": row.get("question_id") or "",
+            "exam_code": row.get("exam_code") or "",
+            "paper_code": row.get("paper_code") or "",
+            "matched_question_no": row.get("matched_question_no") or row.get("extracted_question_no") or "",
+            "source_file": audit.get("source_file") or str(row.get("source_file") or "").split(" :: ", 1)[0],
+            "source_page_start": audit.get("source_page_start") or row.get("source_page_start") or "",
+            "source_page_end": audit.get("source_page_end") or row.get("source_page_end") or "",
+            "snapshot_region_count": audit.get("snapshot_region_count") or len(snapshot_assets),
+            "snapshot_asset_count": len(snapshot_assets),
+            "snapshot_source": audit.get("snapshot_source") or "",
+            "visual_fallback": "yes" if row.get("visual_fallback") else "",
+            "locator": audit.get("locator") or "",
+            "match_status": row.get("match_status") or "",
+            "match_strategy": row.get("match_strategy") or "",
+        })
+    return audit_rows
+
+
+def build_source_metas_for_papers(
+    paper_meta: dict[tuple[int, int, str], Any],
+    represented_papers: set[tuple[str, str]],
+) -> dict[tuple[str, str], Any]:
+    return {
+        (meta.exam_code, meta.paper_code): meta
+        for meta in paper_meta.values()
+        if (meta.exam_code, meta.paper_code) in represented_papers
+    }
 
 
 def attach_page_snapshot_fallbacks(
@@ -158,6 +427,16 @@ def attach_page_snapshot_fallbacks(
             sections = row.setdefault("sections", [])
             qno = row.get("matched_question_no") or row.get("extracted_question_no") or row.get("question_no") or "unknown"
             snapshot_regions = row_snapshot_regions(row, doc, start_page, end_page)
+            row.setdefault("snapshot_audit", {})
+            if isinstance(row["snapshot_audit"], dict):
+                row["snapshot_audit"].update({
+                    "snapshot_region_count": len(snapshot_regions),
+                    "snapshot_mode": mode,
+                    "snapshot_source": "source_page_regions" if row.get("source_page_regions") else "full_page_fallback",
+                    "source_file": source_file,
+                    "source_page_start": start_page,
+                    "source_page_end": end_page,
+                })
             for region_index, region in enumerate(snapshot_regions, start=1):
                 page_number = int(region["page"])
                 if page_number <= 0 or page_number > doc.page_count:
@@ -183,6 +462,8 @@ def attach_page_snapshot_fallbacks(
                     "bbox": region["bbox"],
                     "kind": "question_snapshot" if is_primary_snapshot else "page_snapshot",
                     "fallback": not is_primary_snapshot,
+                    "snapshotIndex": region_index,
+                    "snapshotSource": "source_page_regions" if row.get("source_page_regions") else "full_page_fallback",
                 })
                 sections.append({
                     "kind": "image",
@@ -205,6 +486,22 @@ def main() -> int:
     parser.add_argument("--limit", type=int, default=0)
     parser.add_argument("--skip-existing", action="store_true")
     parser.add_argument(
+        "--base-rows",
+        type=Path,
+        default=DEFAULT_BASE_ROWS,
+        help="Optional complete consolidated rows JSON used to recover questions missed by visual extraction.",
+    )
+    parser.add_argument(
+        "--no-base-row-merge",
+        action="store_true",
+        help="Disable recovering rows from --base-rows.",
+    )
+    parser.add_argument(
+        "--no-neighbor-span-recovery",
+        action="store_true",
+        help="Disable visual-only placeholder rows for questions no extractor can locate.",
+    )
+    parser.add_argument(
         "--page-snapshot-mode",
         choices=["all", "missing", "none"],
         default="all",
@@ -220,6 +517,7 @@ def main() -> int:
     pdfs = sorted(args.source_dir.glob("*.pdf"))
     if args.limit:
         pdfs = pdfs[: args.limit]
+    processed_source_files = {pdf.name for pdf in pdfs}
 
     all_rows: list[dict[str, Any]] = []
     all_file_reports: list[dict[str, Any]] = []
@@ -303,12 +601,30 @@ def main() -> int:
         for row in all_rows
         if row.get("exam_code") and row.get("paper_code")
     }
-    source_metas = {
-        key: meta
-        for key, meta in paper_meta.items()
-        if key in represented_papers
-    }
+    source_metas = build_source_metas_for_papers(paper_meta, represented_papers)
     consolidated_rows, consolidated_reports = preview.build_consolidated(all_rows, source_metas, paper_questions)
+    base_rows_added = 0
+    if not args.no_base_row_merge and args.base_rows and args.base_rows.exists():
+        base_rows = load_json_rows(args.base_rows)
+        scoped_base_rows = [
+            row
+            for row in base_rows
+            if str(row.get("source_file") or "").split(" :: ", 1)[0] in processed_source_files
+        ]
+        represented_papers.update(
+            (str(row.get("exam_code") or ""), str(row.get("paper_code") or ""))
+            for row in scoped_base_rows
+            if row.get("exam_code") and row.get("paper_code")
+        )
+        source_metas = build_source_metas_for_papers(paper_meta, represented_papers)
+        base_rows_added = merge_base_rows(consolidated_rows, scoped_base_rows, processed_source_files)
+        if base_rows_added:
+            consolidated_reports = build_reports_for_rows(consolidated_rows, source_metas, paper_questions)
+    neighbor_rows_added = 0
+    if not args.no_neighbor_span_recovery:
+        neighbor_rows_added = recover_uncovered_rows_from_neighbors(consolidated_rows, source_metas, paper_questions)
+        if neighbor_rows_added:
+            consolidated_reports = build_reports_for_rows(consolidated_rows, source_metas, paper_questions)
     gap_audit_rows = preview.build_gap_audit(all_rows, consolidated_reports, paper_questions)
     content_quality_rows = preview.build_content_quality_audit(consolidated_rows)
     fallback_assets_added = attach_page_snapshot_fallbacks(
@@ -366,6 +682,22 @@ def main() -> int:
         "uncovered_question_count",
         "uncovered_question_nos",
     ])
+    write_csv(args.output_dir / "yangming_snapshot_audit.csv", build_snapshot_audit_rows(consolidated_rows), [
+        "question_id",
+        "exam_code",
+        "paper_code",
+        "matched_question_no",
+        "source_file",
+        "source_page_start",
+        "source_page_end",
+        "snapshot_region_count",
+        "snapshot_asset_count",
+        "snapshot_source",
+        "visual_fallback",
+        "locator",
+        "match_status",
+        "match_strategy",
+    ])
     preview.write_gap_audit(args.output_dir, gap_audit_rows)
     preview.write_content_quality_audit(args.output_dir, content_quality_rows)
 
@@ -380,6 +712,9 @@ def main() -> int:
         "gap_audit_rows": len(gap_audit_rows),
         "content_quality_audit_rows": len(content_quality_rows),
         "fallback_page_assets_added": fallback_assets_added,
+        "base_rows_path": str(args.base_rows) if args.base_rows else "",
+        "base_rows_added": base_rows_added,
+        "neighbor_rows_added": neighbor_rows_added,
         "page_snapshot_mode": args.page_snapshot_mode,
         **asset_counts,
     }
