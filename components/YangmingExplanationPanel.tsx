@@ -215,10 +215,13 @@ function renderAssetFigure(
   sectionFallback = false
 ) {
   if (!asset?.src) return null;
-  const isFallback = sectionFallback || asset.fallback || asset.kind === "page_snapshot";
-  const imageMaxHeight = isFallback ? "max-h-[760px]" : "max-h-[520px]";
-  const imageWidth = asset.width ? Math.min(asset.width, isFallback ? 920 : 760) : undefined;
-  const caption = isFallback
+  const isPrimarySnapshot = asset.kind === "question_snapshot";
+  const isFallback = !isPrimarySnapshot && (sectionFallback || asset.fallback || asset.kind === "page_snapshot");
+  const imageMaxHeight = isPrimarySnapshot ? "max-h-[920px]" : isFallback ? "max-h-[760px]" : "max-h-[520px]";
+  const imageWidth = asset.width ? Math.min(asset.width, isPrimarySnapshot ? 980 : isFallback ? 920 : 760) : undefined;
+  const caption = isPrimarySnapshot
+    ? `完整原頁截圖${asset.page ? `（第 ${asset.page} 頁）` : ""}：依題號對上的陽明詳解原版面。`
+    : isFallback
     ? `備用原頁截圖${asset.page ? `（第 ${asset.page} 頁）` : ""}：精準圖片或表格不足時保留完整詳解頁面。`
     : asset.alt;
 
@@ -229,13 +232,13 @@ function renderAssetFigure(
         isFallback ? "ring-amber-100" : "ring-slate-200"
       }`}
     >
-      {isFallback ? (
+      {isPrimarySnapshot || isFallback ? (
         <div className="mb-2 flex min-w-0 flex-wrap items-center gap-2 px-1 text-[11px] font-bold text-amber-800">
           <span className="rounded-full bg-amber-50 px-2 py-0.5 ring-1 ring-amber-100">
-            備用原頁截圖
+            {isPrimarySnapshot ? "完整原頁截圖" : "備用原頁截圖"}
           </span>
           <span className="min-w-0 break-words font-medium text-slate-400 [overflow-wrap:anywhere]">
-            若圖片或表格切割不完整，先用這張保留原詳解。
+            {isPrimarySnapshot ? "這張保留原始詳解版面。" : "若圖片或表格切割不完整，先用這張保留原詳解。"}
           </span>
         </div>
       ) : null}
@@ -261,6 +264,10 @@ function renderAssetFigure(
   );
 }
 
+function isPrimaryQuestionSnapshot(asset: NonNullable<YangmingExplanationContent["assets"]>[number] | undefined) {
+  return asset?.kind === "question_snapshot";
+}
+
 function YangmingExplanationContentBlock({
   content,
   onReport,
@@ -274,6 +281,10 @@ function YangmingExplanationContentBlock({
   const assets = content.assets ?? [];
   const hasStructuredSections = sections.length > 0;
   const renderBodyBackup = shouldRenderBodyBackup(content);
+  const primarySnapshotAssets = assets
+    .map((asset, index) => ({ asset, index }))
+    .filter(({ asset }) => isPrimaryQuestionSnapshot(asset));
+  const primarySnapshotIndexes = new Set(primarySnapshotAssets.map(({ index }) => index));
   const referencedAssetIndexes = new Set(
     sections
       .map((section) => section.assetIndex)
@@ -320,10 +331,33 @@ function YangmingExplanationContentBlock({
           </p>
         ) : null}
       </div>
+      {primarySnapshotAssets.length ? (
+        <section className="mb-4 min-w-0 max-w-full overflow-hidden rounded-2xl bg-amber-50/50 p-3 ring-1 ring-amber-100">
+          <div className="mb-2 flex min-w-0 flex-wrap items-center gap-2">
+            <span className="rounded-full bg-amber-100 px-2 py-0.5 text-[11px] font-black text-amber-900">
+              原始版面
+            </span>
+            <span className="text-xs font-semibold leading-5 text-amber-800/75">
+              這張是依題號對上的完整陽明詳解截圖；文字抽取若有誤，以這裡為準。
+            </span>
+          </div>
+          <div className="grid min-w-0 max-w-full gap-3 overflow-hidden">
+            {primarySnapshotAssets.map(({ asset, index }) =>
+              renderAssetFigure(asset, `yangming-primary-snapshot-${index}`, true)
+            )}
+          </div>
+        </section>
+      ) : null}
       {hasStructuredSections ? (
         <div className="min-w-0 max-w-full space-y-4 overflow-hidden">
           {sections.map((section, index) => {
             if (section.kind === "image") {
+              if (
+                typeof section.assetIndex === "number" &&
+                primarySnapshotIndexes.has(section.assetIndex)
+              ) {
+                return null;
+              }
               return renderAsset(section.assetIndex, `yangming-section-image-${index}`, section.fallback);
             }
 
@@ -378,7 +412,9 @@ function YangmingExplanationContentBlock({
       ) : null}
       {!hasStructuredSections && assets.length ? (
         <div className="mt-4 grid min-w-0 max-w-full gap-3 overflow-hidden">
-          {assets.map((asset) => renderAssetFigure(asset, asset.src))}
+          {assets.map((asset, index) =>
+            primarySnapshotIndexes.has(index) ? null : renderAssetFigure(asset, asset.src)
+          )}
         </div>
       ) : null}
       {content.sourceLabel || content.sourceFile ? (
