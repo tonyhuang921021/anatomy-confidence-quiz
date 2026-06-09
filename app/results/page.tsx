@@ -7,6 +7,7 @@ import { useAuth } from "@/components/AuthProvider";
 import { QuestionOptionBlock, QuestionStemBlock } from "@/components/QuestionMediaBlock";
 import { ResultSummary } from "@/components/ResultSummary";
 import { WeaknessRanking } from "@/components/WeaknessRanking";
+import { YangmingExplanationPanel } from "@/components/YangmingExplanationPanel";
 import {
   loadQuestionCommunityStats,
   loadConfirmedQuestionClassificationOverrides,
@@ -1136,6 +1137,7 @@ function ResultsPageContent() {
                         <span className="font-semibold">詳解：</span>
                         {question.explanation}
                       </p>
+                      <YangmingExplanationPanel questionId={question.id} compact className="mt-3" />
                       {renderOptionAnalysis(question)}
                       {question.memoryTip ? (
                         <div className="memory-tip-box">
@@ -1212,6 +1214,7 @@ function ResultsPageContent() {
                         <span className="font-semibold">詳解：</span>
                         {question.explanation}
                       </p>
+                      <YangmingExplanationPanel questionId={question.id} compact className="mt-3" />
                       {renderOptionAnalysis(question)}
                       {question.memoryTip ? (
                         <div className="memory-tip-box">
@@ -1283,6 +1286,7 @@ function ResultsPageContent() {
                       <span className="font-semibold">詳解：</span>
                       {question.explanation}
                     </p>
+                    <YangmingExplanationPanel questionId={question.id} compact className="mt-3" />
                     {renderOptionAnalysis(question)}
                     {question.memoryTip ? (
                       <div className="memory-tip-box">

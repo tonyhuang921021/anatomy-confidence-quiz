@@ -750,6 +750,12 @@ create table if not exists public.yangming_explanation_reports (
   id bigint generated always as identity primary key,
   question_id text not null,
   reason text not null,
+  report_type text not null default 'report',
+  proposed_body text,
+  previous_body text,
+  previous_assets jsonb,
+  kept_asset_indexes jsonb,
+  applied_at timestamptz,
   user_id uuid references auth.users (id) on delete set null,
   reporter_email text,
   visitor_id text,
@@ -763,6 +769,24 @@ alter table public.yangming_explanation_reports
 
 alter table public.yangming_explanation_reports
   add column if not exists reason text;
+
+alter table public.yangming_explanation_reports
+  add column if not exists report_type text not null default 'report';
+
+alter table public.yangming_explanation_reports
+  add column if not exists proposed_body text;
+
+alter table public.yangming_explanation_reports
+  add column if not exists previous_body text;
+
+alter table public.yangming_explanation_reports
+  add column if not exists previous_assets jsonb;
+
+alter table public.yangming_explanation_reports
+  add column if not exists kept_asset_indexes jsonb;
+
+alter table public.yangming_explanation_reports
+  add column if not exists applied_at timestamptz;
 
 alter table public.yangming_explanation_reports
   add column if not exists user_id uuid references auth.users (id) on delete set null;

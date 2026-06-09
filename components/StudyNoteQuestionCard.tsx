@@ -1,7 +1,9 @@
 "use client";
 
 import { useState } from "react";
+import { FormattedQuestionText } from "@/components/FormattedQuestionText";
 import { useAuth } from "@/components/AuthProvider";
+import { YangmingExplanationPanel } from "@/components/YangmingExplanationPanel";
 import {
   loadQuestionExplanationOverride,
   saveQuestionExplanationOverride
@@ -135,12 +137,14 @@ export function StudyNoteQuestionCard({ question, link, title }: Props) {
             <span>{question.chapter}</span>
             <span>{question.section}</span>
           </div>
-          <p className="mt-3 break-words font-semibold text-slate-900">{question.stem}</p>
+          <p className="mt-3 break-words font-semibold text-slate-900">
+            <FormattedQuestionText text={question.stem} />
+          </p>
           <div className="mt-3 grid gap-2">
             {optionEntries.map(([key, value]) => (
               <p key={key} className="break-words rounded-2xl bg-slate-50 px-3 py-2">
                 <span className="font-bold text-slate-950">{key}. </span>
-                {value}
+                <FormattedQuestionText text={value} />
               </p>
             ))}
           </div>
@@ -173,6 +177,12 @@ export function StudyNoteQuestionCard({ question, link, title }: Props) {
             <div className="mt-3 min-w-0 overflow-hidden break-words rounded-2xl bg-slate-950 px-4 py-3 text-sm leading-7 text-white">
               <p className="font-bold">答案：{question.answer}</p>
               <p className="mt-2 text-slate-100">{explanation}</p>
+              <YangmingExplanationPanel
+                questionId={question.id}
+                compact
+                className="mt-3"
+                buttonClassName="min-h-10 rounded-2xl bg-amber-100/15 px-4 py-2 text-sm font-semibold text-amber-50 ring-1 ring-amber-100/20 transition hover:bg-amber-100/25 disabled:cursor-wait disabled:opacity-60"
+              />
               {optionAnalysis && Object.keys(optionAnalysis).length > 0 ? (
                 <div className="mt-3 grid gap-2">
                   {Object.entries(optionAnalysis).map(([key, value]) =>

@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { type ReactNode, useEffect, useMemo, useState } from "react";
 import { QuestionOptionBlock, QuestionStemBlock } from "@/components/QuestionMediaBlock";
+import { YangmingExplanationPanel } from "@/components/YangmingExplanationPanel";
 import {
   loadConfirmedQuestionClassificationOverrides,
   loadQuestionCommunityStats,
@@ -145,6 +146,7 @@ function renderQuestionReview(
         <span className="font-semibold">重點解析：</span>
         {renderedQuestion.explanation}
       </p>
+      <YangmingExplanationPanel questionId={renderedQuestion.id} compact className="mt-3" />
       {renderedQuestion.optionAnalysis ? (
         <div className="space-y-2.5">
           {getOptionKeysFromQuestion(renderedQuestion).map((key) => {
@@ -224,6 +226,7 @@ function renderRelatedQuestions(question: Question, allQuestions: Question[]) {
               <span className="font-semibold">詳解：</span>
               {relatedQuestion.explanation}
             </p>
+            <YangmingExplanationPanel questionId={relatedQuestion.id} compact className="mt-3" />
             {relatedQuestion.memoryTip ? (
               <div className="memory-tip-box">
                 <span className="font-semibold">快速記憶法：</span>

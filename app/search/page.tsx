@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useDeferredValue, useEffect, useMemo, useState } from "react";
 import { useAuth } from "@/components/AuthProvider";
 import { QuestionOptionBlock, QuestionStemBlock } from "@/components/QuestionMediaBlock";
+import { YangmingExplanationPanel } from "@/components/YangmingExplanationPanel";
 import {
   loadConfirmedQuestionClassificationOverrides,
   loadSharedQuestionExplanationOverrides,
@@ -591,6 +592,7 @@ export default function SearchPage() {
                   <span className="font-semibold">詳解：</span>
                   {renderedQuestion.explanation}
                 </p>
+                <YangmingExplanationPanel questionId={renderedQuestion.id} compact className="mt-3" />
                 {renderedQuestion.optionAnalysis ? (
                   <div className="space-y-2.5">
                     {OPTION_KEYS.map((key) => {
