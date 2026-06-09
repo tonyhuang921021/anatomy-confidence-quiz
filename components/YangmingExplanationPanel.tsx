@@ -72,6 +72,8 @@ function normalizeYangmingPlainText(text: string) {
     .replace(/\n[ \t]+/g, "\n")
     .replace(new RegExp(`([^\\n])\\s*(${labelPattern})\\s*([：:])`, "g"), "$1\n\n$2$3")
     .replace(/詳寫\s*[：:]/g, "詳解：")
+    .replace(/([^\n])\s*([（(][A-D][)）])/g, "$1\n$2")
+    .replace(/([^\nA-Za-z0-9])\s*([A-D])\s*([.．、：:])(?=\s*[\u4e00-\u9fffA-Za-z0-9])/g, "$1\n$2$3")
     .replace(/([。！？；;])\s*(\([A-D]\)|[A-D][.．、：:])(?=\s*[\u4e00-\u9fffA-Za-z0-9])/g, "$1\n$2")
     .replace(/([^\n])\s+(\([A-D]\)|[A-D][.．、：:])(?=\s*[\u4e00-\u9fffA-Za-z0-9])/g, "$1\n$2")
     .replace(/([。！？；;])\s*(\d+[.．、])(?=\s*[\u4e00-\u9fffA-Za-z0-9])/g, "$1\n$2")
