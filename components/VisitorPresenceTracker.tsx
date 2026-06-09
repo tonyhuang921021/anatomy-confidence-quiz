@@ -3,6 +3,7 @@
 import { useEffect } from "react";
 import { trackVisitorPresence } from "@/lib/cloudSync";
 import { useAuth } from "@/components/AuthProvider";
+import { isSupabaseRecoveryMode } from "@/lib/supabase/recoveryMode";
 
 const HEARTBEAT_INTERVAL_MS = 10 * 60 * 1000;
 const INITIAL_HEARTBEAT_DELAY_MS = 45 * 1000;
@@ -25,6 +26,7 @@ export function VisitorPresenceTracker() {
   const { user, configured } = useAuth();
 
   useEffect(() => {
+    if (isSupabaseRecoveryMode()) return;
     if (!configured) return;
 
     let cancelled = false;

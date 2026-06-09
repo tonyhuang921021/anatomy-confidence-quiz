@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { loadVisitorStats } from "@/lib/cloudSync";
 import { isSupabaseConfigured } from "@/lib/supabase/client";
+import { isSupabaseRecoveryMode, getRecoveryTimestamp } from "@/lib/supabase/recoveryMode";
 import type { VisitorStats } from "@/types/quiz";
 
 const REFRESH_INTERVAL_MS = 15 * 60 * 1000;
@@ -23,6 +24,16 @@ export function VisitorStatsPanel({ compact = false }: VisitorStatsPanelProps) {
   const [error, setError] = useState("");
 
   useEffect(() => {
+    if (isSupabaseRecoveryMode()) {
+      setStats({
+        totalVisitors: 0,
+        onlineVisitors: 0,
+        updatedAt: getRecoveryTimestamp()
+      });
+      setLoading(false);
+      return;
+    }
+
     if (compact) {
       setLoading(false);
       return;

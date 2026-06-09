@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect } from "react";
+import { isSupabaseRecoveryMode } from "@/lib/supabase/recoveryMode";
 
 function isSafariBrowser() {
   if (typeof navigator === "undefined") return false;
@@ -36,12 +37,12 @@ export function PWARegistration() {
 
     const register = async () => {
       try {
-        if (isSafariBrowser()) {
+        if (isSupabaseRecoveryMode() || isSafariBrowser()) {
           await disableServiceWorker();
           return;
         }
 
-        await navigator.serviceWorker.register("/sw.js?v=3", { scope: "/" });
+        await navigator.serviceWorker.register("/sw.js?v=4", { scope: "/" });
       } catch (error) {
         console.error("Service worker registration failed:", error);
       }

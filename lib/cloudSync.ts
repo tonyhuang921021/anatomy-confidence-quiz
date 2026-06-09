@@ -161,7 +161,10 @@ export type CommunityRecentAttemptPoint = {
 const AI_SEARCH_USAGE_PREFIX = "AI_SEARCH:";
 
 const SUPABASE_PAGE_SIZE = 1000;
-const CURRENT_SESSION_SYNC_MIN_INTERVAL_MS = 15_000;
+const CLOUD_COMPLETED_SESSION_FETCH_LIMIT = 60;
+const CLOUD_COMPLETED_SESSION_UPLOAD_LIMIT = 30;
+const CLOUD_ATTEMPT_SESSION_FETCH_CHUNK_SIZE = 20;
+const CURRENT_SESSION_SYNC_MIN_INTERVAL_MS = 30_000;
 
 type CurrentSessionSyncState = {
   lastSyncedAt: number;
@@ -710,8 +713,8 @@ async function fetchSessionAttemptRowsForUser(userId: string, sessionIds: string
   const supabase = getSupabaseBrowserClient();
   const rows: QuizSessionAttemptRow[] = [];
 
-  for (let index = 0; index < sessionIds.length; index += 50) {
-    const chunk = sessionIds.slice(index, index + 50);
+  for (let index = 0; index < sessionIds.length; index += CLOUD_ATTEMPT_SESSION_FETCH_CHUNK_SIZE) {
+    const chunk = sessionIds.slice(index, index + CLOUD_ATTEMPT_SESSION_FETCH_CHUNK_SIZE);
     const { data, error } = await supabase
       .from("quiz_session_attempts")
       .select(
@@ -741,7 +744,9 @@ async function fetchQuizSessionsForUser(userId: string) {
       "id, user_id, subject, mode, session_name, question_count, correct_count, wrong_count, average_confidence, started_at, completed_at, session_payload, updated_at"
     )
     .eq("user_id", userId)
-    .order("completed_at", { ascending: false, nullsFirst: false });
+    .not("completed_at", "is", null)
+    .order("completed_at", { ascending: false, nullsFirst: false })
+    .limit(CLOUD_COMPLETED_SESSION_FETCH_LIMIT);
 
   if (error) {
     throw error;
@@ -1281,19 +1286,22 @@ export async function syncCompletedSessionsForCurrentUser(userId: string) {
     return loadCompletedSessions();
   }
 
-  const localSessions = canonicalizeSessionsForUser(
+  const localCompletedSessions = canonicalizeSessionsForUser(
     userId,
     mergeSessions(loadCompletedSessionsForUser("guest"), loadCompletedSessions())
       .filter(isCompletedQuizSession)
   );
+  const localSessionsToSync = [...localCompletedSessions]
+    .sort((left, right) => sessionFreshnessValue(right).localeCompare(sessionFreshnessValue(left)))
+    .slice(0, CLOUD_COMPLETED_SESSION_UPLOAD_LIMIT);
   const { sessions: fetchedRemoteSessions, sessionsMissingAttemptRows } =
     await fetchResolvedQuizSessionsForUser(userId);
   const remoteSessions = canonicalizeSessionsForUser(
     userId,
     fetchedRemoteSessions.filter(isCompletedQuizSession)
   );
-  const mergedSessions = mergeSessions(localSessions, remoteSessions).filter(isCompletedQuizSession);
-  const sessionsToUpload = getSessionsNeedingUpload(localSessions, remoteSessions);
+  const mergedSessions = mergeSessions(localCompletedSessions, remoteSessions).filter(isCompletedQuizSession);
+  const sessionsToUpload = getSessionsNeedingUpload(localSessionsToSync, remoteSessions);
   const sessionsToBackfill = canonicalizeSessionsForUser(
     userId,
     sessionsMissingAttemptRows.filter(isCompletedQuizSession)

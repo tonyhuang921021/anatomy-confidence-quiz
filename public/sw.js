@@ -1,4 +1,4 @@
-const CACHE_VERSION = "pwa-v3";
+const CACHE_VERSION = "pwa-v4";
 const SHELL_CACHE = `${CACHE_VERSION}-shell`;
 const RUNTIME_CACHE = `${CACHE_VERSION}-runtime`;
 const OFFLINE_URL = "/offline.html";
@@ -72,16 +72,13 @@ self.addEventListener("fetch", (event) => {
   }
 
   const isStaticAsset =
-    url.pathname.startsWith("/_next/static/") ||
     url.pathname.startsWith("/assets/") ||
     url.pathname.startsWith("/question-media/") ||
     url.pathname.endsWith(".svg") ||
     url.pathname.endsWith(".png") ||
     url.pathname.endsWith(".jpg") ||
     url.pathname.endsWith(".jpeg") ||
-    url.pathname.endsWith(".webp") ||
-    url.pathname.endsWith(".css") ||
-    url.pathname.endsWith(".js");
+    url.pathname.endsWith(".webp");
 
   if (!isStaticAsset) {
     return;
