@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
+import { isSupabaseRecoveryMode } from "@/lib/supabase/recoveryMode";
 
 type YangmingModeRequestBody = {
   accessToken?: string | null;
@@ -29,6 +30,10 @@ function getBearerToken(request: NextRequest) {
 }
 
 export async function GET(request: NextRequest) {
+  if (isSupabaseRecoveryMode()) {
+    return NextResponse.json({ ok: true, enabled: true, deferred: true });
+  }
+
   const supabase = getServiceSupabaseClient();
   if (!supabase) {
     return NextResponse.json({ ok: false, enabled: false, message: "Supabase 尚未設定。" }, { status: 503 });
@@ -62,6 +67,10 @@ export async function GET(request: NextRequest) {
 }
 
 export async function POST(request: NextRequest) {
+  if (isSupabaseRecoveryMode()) {
+    return NextResponse.json({ ok: true, deferred: true });
+  }
+
   const supabase = getServiceSupabaseClient();
   if (!supabase) {
     return NextResponse.json({ ok: false, message: "Supabase 尚未設定。" }, { status: 503 });

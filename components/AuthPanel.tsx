@@ -55,7 +55,16 @@ function withTimeout<T>(promise: Promise<T>, timeoutMs: number, message: string)
 }
 
 export function AuthPanel() {
-  const { configured, loading, user, syncStatus, syncError, refreshCloudData, signOut } = useAuth();
+  const {
+    configured,
+    loading,
+    user,
+    syncStatus,
+    syncError,
+    applyAuthSession,
+    refreshCloudData,
+    signOut
+  } = useAuth();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [nickname, setNickname] = useState("");
@@ -232,7 +241,7 @@ export function AuthPanel() {
     setError("");
 
     try {
-      const { error: signInError } = await withTimeout(
+      const { data, error: signInError } = await withTimeout(
         getSupabaseBrowserClient().auth.signInWithPassword({
           email,
           password
@@ -246,6 +255,7 @@ export function AuthPanel() {
         return;
       }
 
+      applyAuthSession(data.session ?? null);
       setMessage("登入成功，正在同步雲端紀錄。");
     } catch (signInError) {
       setError(signInError instanceof Error ? signInError.message : "登入失敗，請稍後再試。");

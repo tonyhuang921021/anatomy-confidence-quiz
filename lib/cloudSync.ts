@@ -39,6 +39,7 @@ import {
   getSupabaseBrowserClient,
   isSupabaseConfigured
 } from "@/lib/supabase/client";
+import { getRecoveryTimestamp, isSupabaseRecoveryMode } from "@/lib/supabase/recoveryMode";
 import { getOrCreateVisitorId } from "@/lib/visitor";
 
 type QuizSessionRow = {
@@ -818,6 +819,7 @@ async function fetchResolvedQuizSessionsForUser(userId: string) {
 }
 
 export async function loadCompletedSessionFromSupabase(sessionId: string) {
+  if (isSupabaseRecoveryMode()) return null;
   if (!isSupabaseConfigured() || !sessionId) return null;
 
   const supabase = getSupabaseBrowserClient();
@@ -927,6 +929,7 @@ function buildLatestAttemptStatsSession(session: QuizSession) {
 }
 
 async function upsertQuestionAttemptLogs(sessions: QuizSession[]) {
+  if (isSupabaseRecoveryMode()) return;
   if (!isSupabaseConfigured() || sessions.length === 0) return;
 
   const supabase = getSupabaseBrowserClient();
@@ -960,6 +963,7 @@ async function upsertQuestionAttemptLogs(sessions: QuizSession[]) {
 }
 
 async function refreshQuestionAccuracyStats(questionIds: string[]) {
+  if (isSupabaseRecoveryMode()) return;
   if (!isSupabaseConfigured() || questionIds.length === 0) return;
 
   const uniqueQuestionIds = Array.from(new Set(questionIds));
@@ -1013,6 +1017,7 @@ async function refreshQuestionAccuracyStats(questionIds: string[]) {
 }
 
 async function refreshAggregatedStatsViaApi(sessions: QuizSession[]) {
+  if (isSupabaseRecoveryMode()) return;
   const attemptRows = buildQuestionAttemptLogRows(sessions);
   const questionIds = Array.from(
     new Set(attemptRows.map((attempt) => attempt.question_id))
@@ -1100,6 +1105,7 @@ async function syncQuestionStatsForSessionsSafely(sessions: QuizSession[]) {
 }
 
 async function upsertQuestionAttemptDevice(sessions: QuizSession[]) {
+  if (isSupabaseRecoveryMode()) return;
   if (!isSupabaseConfigured() || sessions.length === 0) return;
 
   const visitorId = getVisitorId();
@@ -1130,6 +1136,7 @@ async function upsertQuestionAttemptDevice(sessions: QuizSession[]) {
 }
 
 async function upsertQuestionAttemptDeviceDaily(sessions: QuizSession[]) {
+  if (isSupabaseRecoveryMode()) return;
   if (!isSupabaseConfigured() || sessions.length === 0) return;
 
   const visitorId = getVisitorId();
@@ -1172,6 +1179,7 @@ async function upsertQuestionAttemptDeviceDaily(sessions: QuizSession[]) {
 }
 
 async function refreshOwnerDailyStatsForDates(activityDates: string[]) {
+  if (isSupabaseRecoveryMode()) return;
   if (!isSupabaseConfigured() || activityDates.length === 0) return;
 
   const uniqueDates = Array.from(new Set(activityDates)).sort();
@@ -1225,6 +1233,7 @@ async function refreshOwnerDailyStatsForDates(activityDates: string[]) {
 }
 
 async function upsertSessionsForUser(userId: string, sessions: QuizSession[]) {
+  if (isSupabaseRecoveryMode()) return;
   if (!isSupabaseConfigured() || sessions.length === 0) return;
 
   const supabase = getSupabaseBrowserClient();
@@ -1290,7 +1299,7 @@ async function upsertSessionsForUser(userId: string, sessions: QuizSession[]) {
 }
 
 export async function syncCompletedSessionsForCurrentUser(userId: string) {
-  if (!isSupabaseConfigured()) {
+  if (isSupabaseRecoveryMode() || !isSupabaseConfigured()) {
     return loadCompletedSessions();
   }
 
@@ -1322,7 +1331,7 @@ export async function syncCompletedSessionsForCurrentUser(userId: string) {
 }
 
 export async function syncCurrentSessionForCurrentUser(userId: string) {
-  if (!isSupabaseConfigured()) {
+  if (isSupabaseRecoveryMode() || !isSupabaseConfigured()) {
     return loadCurrentSession();
   }
 
@@ -1371,6 +1380,7 @@ export async function syncCurrentSessionForCurrentUser(userId: string) {
 }
 
 export async function pushCompletedSessionToSupabase(session: QuizSession) {
+  if (isSupabaseRecoveryMode()) return;
   if (!isSupabaseConfigured()) return;
 
   const supabase = getSupabaseBrowserClient();
@@ -1390,6 +1400,7 @@ export async function pushCompletedSessionToSupabase(session: QuizSession) {
 }
 
 export async function pushQuestionStatsSnapshotToSupabase(session: QuizSession) {
+  if (isSupabaseRecoveryMode()) return;
   if (!isSupabaseConfigured()) return;
   if (session.completedAt) {
     await syncQuestionStatsForSessionsSafely([session]);
@@ -1402,6 +1413,7 @@ export async function pushQuestionStatsSnapshotToSupabase(session: QuizSession) 
 }
 
 export async function pushCurrentSessionToSupabase(session: QuizSession) {
+  if (isSupabaseRecoveryMode()) return;
   if (!isSupabaseConfigured() || session.completedAt) return;
 
   const supabase = getSupabaseBrowserClient();
@@ -1487,6 +1499,7 @@ export async function syncLeaderboardProfileForCurrentUser(
   user: Pick<User, "id" | "email" | "user_metadata">,
   sessions?: QuizSession[]
 ) {
+  if (isSupabaseRecoveryMode()) return;
   if (!isSupabaseConfigured()) return;
 
   const supabase = getSupabaseBrowserClient();
@@ -1515,6 +1528,7 @@ export async function updateLeaderboardDisplayName(
   user: Pick<User, "id" | "email" | "user_metadata">,
   displayName: string
 ) {
+  if (isSupabaseRecoveryMode()) return;
   if (!isSupabaseConfigured()) return;
 
   const supabase = getSupabaseBrowserClient();
@@ -1535,7 +1549,7 @@ export async function updateLeaderboardDisplayName(
 }
 
 export async function loadLeaderboard(limit = 50) {
-  if (!isSupabaseConfigured()) {
+  if (isSupabaseRecoveryMode() || !isSupabaseConfigured()) {
     return [] as LeaderboardEntry[];
   }
 
@@ -1559,7 +1573,7 @@ const BACKGROUND_STATS_LOOKUP_LIMIT = 40;
 const BACKGROUND_CLASSIFICATION_LOOKUP_LIMIT = 60;
 
 export async function loadQuestionCommunityStats(questionIds: string[]) {
-  if (!isSupabaseConfigured() || questionIds.length === 0) {
+  if (isSupabaseRecoveryMode() || !isSupabaseConfigured() || questionIds.length === 0) {
     return [] as QuestionCommunityStats[];
   }
 
@@ -1578,7 +1592,7 @@ export async function loadQuestionCommunityStats(questionIds: string[]) {
 }
 
 export async function loadSharedQuestionExplanationOverrides(questionIds: string[]) {
-  if (!isSupabaseConfigured() || questionIds.length === 0) {
+  if (isSupabaseRecoveryMode() || !isSupabaseConfigured() || questionIds.length === 0) {
     return {} as Record<string, QuestionExplanationOverride>;
   }
 
@@ -1608,6 +1622,9 @@ export async function syncSharedQuestionExplanationOverrides(
   }>,
   accessToken?: string | null
 ) {
+  if (isSupabaseRecoveryMode()) {
+    return { syncedCount: 0 };
+  }
   if (!accessToken || overrides.length === 0) {
     return { syncedCount: 0 };
   }
@@ -1648,7 +1665,7 @@ export async function syncSharedQuestionExplanationOverrides(
 }
 
 export async function loadConfirmedQuestionClassificationOverrides(questionIds?: string[]) {
-  if (!isSupabaseConfigured()) {
+  if (isSupabaseRecoveryMode() || !isSupabaseConfigured()) {
     return {} as Record<string, QuestionClassificationOverride>;
   }
 
@@ -1683,6 +1700,7 @@ export async function loadConfirmedQuestionClassificationOverrides(questionIds?:
 }
 
 export async function trackVisitorPresence(userId?: string | null) {
+  if (isSupabaseRecoveryMode()) return;
   if (!isSupabaseConfigured()) return;
 
   const visitorId = getVisitorId();
@@ -1707,11 +1725,11 @@ export async function trackVisitorPresence(userId?: string | null) {
 }
 
 export async function loadVisitorStats(): Promise<VisitorStats> {
-  if (!isSupabaseConfigured()) {
+  if (isSupabaseRecoveryMode() || !isSupabaseConfigured()) {
     return {
       totalVisitors: 0,
       onlineVisitors: 0,
-      updatedAt: new Date().toISOString()
+      updatedAt: getRecoveryTimestamp()
     };
   }
 
@@ -1728,7 +1746,7 @@ export async function loadVisitorStats(): Promise<VisitorStats> {
 }
 
 export async function loadFeedbackMessages(limit = 20): Promise<FeedbackMessage[]> {
-  if (!isSupabaseConfigured()) {
+  if (isSupabaseRecoveryMode() || !isSupabaseConfigured()) {
     return [];
   }
 
@@ -1769,6 +1787,9 @@ export async function createFeedbackMessage(input: {
   user?: Pick<User, "id" | "email" | "user_metadata"> | null;
   parentId?: string | null;
 }) {
+  if (isSupabaseRecoveryMode()) {
+    throw new Error("留言板暫時維護中，先讓登入與同步恢復。");
+  }
   if (!isSupabaseConfigured()) {
     throw new Error("Supabase 尚未設定，暫時無法留言。");
   }

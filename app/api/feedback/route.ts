@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
+import { isSupabaseRecoveryMode } from "@/lib/supabase/recoveryMode";
 
 type FeedbackBody = {
   accessToken?: string | null;
@@ -78,6 +79,13 @@ async function getVerifiedUser(supabase: any, accessToken?: string | null): Prom
 }
 
 export async function POST(request: NextRequest) {
+  if (isSupabaseRecoveryMode()) {
+    return NextResponse.json(
+      { ok: false, message: "留言板暫時維護中，先讓登入與同步恢復。" },
+      { status: 503 }
+    );
+  }
+
   const supabase = getServiceSupabaseClient();
   if (!supabase) {
     return NextResponse.json(

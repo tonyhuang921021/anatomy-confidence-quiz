@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
+import { isSupabaseRecoveryMode } from "@/lib/supabase/recoveryMode";
 
 type YangmingExplanationReportRequestBody = {
   accessToken?: string | null;
@@ -62,6 +63,13 @@ function isMissingColumnError(error: unknown) {
 }
 
 export async function POST(request: NextRequest) {
+  if (isSupabaseRecoveryMode()) {
+    return NextResponse.json(
+      { ok: false, message: "陽明詳解回報暫時維護中，先讓登入與同步恢復。" },
+      { status: 503 }
+    );
+  }
+
   const supabase = getServiceSupabaseClient();
   if (!supabase) {
     return NextResponse.json(

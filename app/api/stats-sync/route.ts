@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
+import { isSupabaseRecoveryMode } from "@/lib/supabase/recoveryMode";
 
 type StatsSyncBody = {
   questionIds?: string[];
@@ -313,6 +314,10 @@ async function refreshOwnerDailyStatsFromAttempts(
 }
 
 export async function POST(request: NextRequest) {
+  if (isSupabaseRecoveryMode()) {
+    return NextResponse.json({ ok: true, deferred: true });
+  }
+
   const supabase = getServiceSupabaseClient();
   if (!supabase) {
     return NextResponse.json(

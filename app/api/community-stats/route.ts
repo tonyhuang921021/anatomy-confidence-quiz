@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
+import { isSupabaseRecoveryMode } from "@/lib/supabase/recoveryMode";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
@@ -94,6 +95,25 @@ async function fetchAllAttemptRows(supabase: any, startDate: string) {
 }
 
 export async function GET() {
+  if (isSupabaseRecoveryMode()) {
+    const dayKeys = getRecentTaipeiDayKeys(2);
+    return NextResponse.json(
+      {
+        ok: true,
+        points: dayKeys.map((date) => ({
+          date,
+          attempts: 0,
+          correctRate: 0
+        }))
+      },
+      {
+        headers: {
+          "Cache-Control": "public, s-maxage=300, stale-while-revalidate=600"
+        }
+      }
+    );
+  }
+
   const supabase = getServiceSupabaseClient();
   if (!supabase) {
     return NextResponse.json(

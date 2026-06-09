@@ -1,5 +1,6 @@
 import { createClient } from "@supabase/supabase-js";
 import type { OpenAIBudgetStatus } from "@/types/quiz";
+import { isSupabaseRecoveryMode } from "@/lib/supabase/recoveryMode";
 
 const AI_BUDGET_SETTING_KEY = "openai_budget_usd";
 const BUDGET_SETTING_CACHE_TTL_MS = 10 * 60 * 1000;
@@ -87,6 +88,13 @@ async function loadOpenAIBudgetSetting(supabase = getServiceSupabaseClient()) {
     return {
       budgetUsd: cachedBudgetSetting.budgetUsd,
       usedUsd: cachedBudgetSetting.usedUsd
+    };
+  }
+
+  if (isSupabaseRecoveryMode()) {
+    return {
+      budgetUsd: fallbackBudgetUsd,
+      usedUsd: fallbackUsedUsd
     };
   }
 

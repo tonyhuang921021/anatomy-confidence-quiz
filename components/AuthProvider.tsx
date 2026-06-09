@@ -30,6 +30,7 @@ type AuthContextValue = {
   syncStatus: "idle" | "syncing" | "ready" | "error";
   syncVersion: number;
   syncError: string;
+  applyAuthSession: (nextSession: Session | null) => void;
   refreshCloudData: () => Promise<void>;
   signOut: () => Promise<void>;
 };
@@ -131,6 +132,21 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   }, [configured, user?.id]);
 
+  const applyAuthSession = useCallback((nextSession: Session | null) => {
+    setSession(nextSession);
+    setUser(nextSession?.user ?? null);
+    setActiveStorageUser(nextSession?.user?.id);
+
+    if (nextSession?.user) {
+      setSyncStatus("ready");
+      setSyncError("");
+      void refreshCloudData(nextSession.user.id, nextSession.user);
+    } else {
+      setSyncStatus("idle");
+      setSyncError("");
+    }
+  }, [refreshCloudData]);
+
   const handleSignOut = useCallback(async () => {
     if (!configured) return;
     await getSupabaseBrowserClient().auth.signOut();
@@ -183,16 +199,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       data: { subscription }
     } = supabase.auth.onAuthStateChange((event, nextSession) => {
       if (event === "INITIAL_SESSION") return;
-      setSession(nextSession);
-      setUser(nextSession?.user ?? null);
-      setActiveStorageUser(nextSession?.user?.id);
-
-      if (nextSession?.user) {
-        void refreshCloudData(nextSession.user.id, nextSession.user);
-      } else {
-        setSyncStatus("idle");
-        setSyncError("");
-      }
+      applyAuthSession(nextSession);
     });
 
     return () => {
@@ -210,10 +217,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       syncStatus,
       syncVersion,
       syncError,
+      applyAuthSession,
       refreshCloudData,
       signOut: handleSignOut
     }),
-    [configured, handleSignOut, loading, refreshCloudData, session, syncError, syncStatus, syncVersion, user]
+    [applyAuthSession, configured, handleSignOut, loading, refreshCloudData, session, syncError, syncStatus, syncVersion, user]
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

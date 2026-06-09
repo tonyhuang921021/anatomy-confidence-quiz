@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
+import { isSupabaseRecoveryMode } from "@/lib/supabase/recoveryMode";
 
 type VisitorPresenceBody = {
   visitorId?: string | null;
@@ -23,6 +24,10 @@ function getServiceSupabaseClient() {
 }
 
 export async function POST(request: NextRequest) {
+  if (isSupabaseRecoveryMode()) {
+    return NextResponse.json({ ok: true }, { headers: { "Cache-Control": "no-store" } });
+  }
+
   const supabase = getServiceSupabaseClient();
   if (!supabase) {
     return NextResponse.json({ ok: false, message: "visitor-presence-unavailable" }, { status: 503 });

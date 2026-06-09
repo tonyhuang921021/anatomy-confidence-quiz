@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
+import { isSupabaseRecoveryMode } from "@/lib/supabase/recoveryMode";
 
 type YangmingExplanationRequestBody = {
   accessToken?: string | null;
@@ -220,6 +221,10 @@ function normalizeAssets(
 }
 
 export async function POST(request: NextRequest) {
+  if (isSupabaseRecoveryMode()) {
+    return NextResponse.json({ ok: true, explanation: null, deferred: true });
+  }
+
   const supabase = getServiceSupabaseClient();
   if (!supabase) {
     return NextResponse.json({ ok: false, message: "Supabase 尚未設定。" }, { status: 503 });

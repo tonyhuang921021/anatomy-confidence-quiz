@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
+import { getRecoveryTimestamp, isSupabaseRecoveryMode } from "@/lib/supabase/recoveryMode";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
@@ -24,6 +25,13 @@ function getServiceSupabaseClient() {
 }
 
 export async function GET() {
+  if (isSupabaseRecoveryMode()) {
+    return NextResponse.json(
+      { ok: true, stats: { totalVisitors: 0, onlineVisitors: 0, updatedAt: getRecoveryTimestamp() } },
+      { headers: { "Cache-Control": VISITOR_STATS_CACHE_CONTROL } }
+    );
+  }
+
   const supabase = getServiceSupabaseClient();
   if (!supabase) {
     return NextResponse.json(
