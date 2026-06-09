@@ -27,7 +27,11 @@ export async function GET(request: NextRequest) {
   try {
     const includeLiveCosts = request.nextUrl.searchParams.get("live") !== "false";
     const budget = await loadOpenAIBudgetStatus({ includeLiveCosts });
-    return NextResponse.json({ ok: true, budget });
+    const response = NextResponse.json({ ok: true, budget });
+    if (!includeLiveCosts) {
+      response.headers.set("Cache-Control", "public, s-maxage=300, stale-while-revalidate=600");
+    }
+    return response;
   } catch (error) {
     const message = error instanceof Error ? error.message : "AI 補強基金狀態讀取失敗";
     return NextResponse.json({ ok: false, message }, { status: 500 });

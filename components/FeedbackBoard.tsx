@@ -96,7 +96,7 @@ export function FeedbackBoard() {
   useEffect(() => {
     async function fetchBudget() {
       const loadBudget = async (url: string) => {
-        const response = await fetch(url, { cache: "no-store" });
+        const response = await fetch(url);
         const payload = (await response.json().catch(() => null)) as
           | { ok?: boolean; budget?: OpenAIBudgetStatus }
           | null;

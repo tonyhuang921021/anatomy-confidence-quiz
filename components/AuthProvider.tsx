@@ -36,7 +36,9 @@ type AuthContextValue = {
 
 const AuthContext = createContext<AuthContextValue | null>(null);
 const CLOUD_RESUME_SYNC_TIMEOUT_MS = 4500;
+const AUTH_SESSION_BOOTSTRAP_TIMEOUT_MS = 3500;
 const CLOUD_FALLBACK_MESSAGE = "雲端同步暫時連不上，先使用本機紀錄；稍後可再按一次同步。";
+const AUTH_FALLBACK_MESSAGE = "登入狀態讀取逾時，先以本機模式使用；如果剛剛已登入，請稍後再按一次同步。";
 
 function getErrorMessage(error: unknown) {
   if (error instanceof Error) return error.message;
@@ -142,19 +144,36 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
 
     const supabase = getSupabaseBrowserClient();
+    let cancelled = false;
 
     async function bootstrap() {
-      const {
-        data: { session: initialSession }
-      } = await supabase.auth.getSession();
+      try {
+        const {
+          data: { session: initialSession }
+        } = await withTimeout(
+          supabase.auth.getSession(),
+          AUTH_SESSION_BOOTSTRAP_TIMEOUT_MS,
+          AUTH_FALLBACK_MESSAGE
+        );
 
-      setSession(initialSession);
-      setUser(initialSession?.user ?? null);
-      setActiveStorageUser(initialSession?.user?.id);
-      setLoading(false);
+        if (cancelled) return;
 
-      if (initialSession?.user) {
-        void refreshCloudData(initialSession.user.id, initialSession.user);
+        setSession(initialSession);
+        setUser(initialSession?.user ?? null);
+        setActiveStorageUser(initialSession?.user?.id);
+        setLoading(false);
+
+        if (initialSession?.user) {
+          void refreshCloudData(initialSession.user.id, initialSession.user);
+        }
+      } catch (error) {
+        if (cancelled) return;
+        setSession(null);
+        setUser(null);
+        setActiveStorageUser();
+        setSyncStatus("ready");
+        setSyncError(getErrorMessage(error) || AUTH_FALLBACK_MESSAGE);
+        setLoading(false);
       }
     }
 
@@ -162,7 +181,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     const {
       data: { subscription }
-    } = supabase.auth.onAuthStateChange((_event, nextSession) => {
+    } = supabase.auth.onAuthStateChange((event, nextSession) => {
+      if (event === "INITIAL_SESSION") return;
       setSession(nextSession);
       setUser(nextSession?.user ?? null);
       setActiveStorageUser(nextSession?.user?.id);
@@ -176,6 +196,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     });
 
     return () => {
+      cancelled = true;
       subscription.unsubscribe();
     };
   }, [configured]);

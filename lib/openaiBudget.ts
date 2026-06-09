@@ -2,6 +2,7 @@ import { createClient } from "@supabase/supabase-js";
 import type { OpenAIBudgetStatus } from "@/types/quiz";
 
 const AI_BUDGET_SETTING_KEY = "openai_budget_usd";
+const BUDGET_SETTING_CACHE_TTL_MS = 10 * 60 * 1000;
 const COST_CACHE_TTL_MS = 60 * 60 * 1000;
 const COST_FETCH_TIMEOUT_MS = 12 * 1000;
 const DEFAULT_COSTS_START_DATE = "2024-01-01";
@@ -31,6 +32,14 @@ let cachedCosts:
   | {
       usedUsd: number;
       updatedAt: string;
+      expiresAt: number;
+    }
+  | null = null;
+
+let cachedBudgetSetting:
+  | {
+      budgetUsd: number;
+      usedUsd?: number;
       expiresAt: number;
     }
   | null = null;
@@ -74,6 +83,13 @@ function getFallbackUsedUsd() {
 async function loadOpenAIBudgetSetting(supabase = getServiceSupabaseClient()) {
   const fallbackBudgetUsd = getFallbackBudgetUsd();
   const fallbackUsedUsd = getFallbackUsedUsd();
+  if (cachedBudgetSetting && cachedBudgetSetting.expiresAt > Date.now()) {
+    return {
+      budgetUsd: cachedBudgetSetting.budgetUsd,
+      usedUsd: cachedBudgetSetting.usedUsd
+    };
+  }
+
   if (!supabase) {
     return {
       budgetUsd: fallbackBudgetUsd,
@@ -95,16 +111,27 @@ async function loadOpenAIBudgetSetting(supabase = getServiceSupabaseClient()) {
         usedUsd: fallbackUsedUsd
       };
     }
+    if (cachedBudgetSetting) {
+      return {
+        budgetUsd: cachedBudgetSetting.budgetUsd,
+        usedUsd: cachedBudgetSetting.usedUsd
+      };
+    }
     throw error;
   }
 
   const row = data as SiteSettingRow | null;
   const budgetValue = Number(row?.value?.budgetUsd ?? 0);
   const usedValue = Number(row?.value?.usedUsd ?? NaN);
-  return {
+  const setting = {
     budgetUsd: Number.isFinite(budgetValue) && budgetValue > 0 ? roundUsd(budgetValue) : fallbackBudgetUsd,
     usedUsd: Number.isFinite(usedValue) && usedValue >= 0 ? roundUsd(usedValue) : fallbackUsedUsd
   };
+  cachedBudgetSetting = {
+    ...setting,
+    expiresAt: Date.now() + BUDGET_SETTING_CACHE_TTL_MS
+  };
+  return setting;
 }
 
 export async function loadOpenAIBudgetUsd(supabase = getServiceSupabaseClient()) {
@@ -132,6 +159,11 @@ export async function saveOpenAIBudgetUsd(budgetUsd: number, usedUsd?: number, s
   );
 
   if (error) throw error;
+  cachedBudgetSetting = {
+    budgetUsd: normalizedBudget,
+    usedUsd: normalizedUsed,
+    expiresAt: Date.now() + BUDGET_SETTING_CACHE_TTL_MS
+  };
   return {
     budgetUsd: normalizedBudget,
     usedUsd: normalizedUsed

@@ -35,6 +35,25 @@ import {
 } from "@/lib/accountPreferences";
 import { getSupabaseBrowserClient } from "@/lib/supabase/client";
 
+const AUTH_ACTION_TIMEOUT_MS = 8000;
+
+function getSyncStatusLabel(status: "idle" | "syncing" | "ready" | "error") {
+  if (status === "syncing") return "雲端同步中";
+  if (status === "ready") return "已同步";
+  if (status === "error") return "雲端暫時忙碌";
+  return "本機可用";
+}
+
+function withTimeout<T>(promise: Promise<T>, timeoutMs: number, message: string) {
+  return new Promise<T>((resolve, reject) => {
+    const timeoutId = window.setTimeout(() => reject(new Error(message)), timeoutMs);
+    promise
+      .then(resolve)
+      .catch(reject)
+      .finally(() => window.clearTimeout(timeoutId));
+  });
+}
+
 export function AuthPanel() {
   const { configured, loading, user, syncStatus, syncError, refreshCloudData, signOut } = useAuth();
   const [email, setEmail] = useState("");
@@ -213,10 +232,14 @@ export function AuthPanel() {
     setError("");
 
     try {
-      const { error: signInError } = await getSupabaseBrowserClient().auth.signInWithPassword({
-        email,
-        password
-      });
+      const { error: signInError } = await withTimeout(
+        getSupabaseBrowserClient().auth.signInWithPassword({
+          email,
+          password
+        }),
+        AUTH_ACTION_TIMEOUT_MS,
+        "登入伺服器暫時忙碌，請稍後再試。"
+      );
 
       if (signInError) {
         setError(signInError.message);
@@ -224,6 +247,8 @@ export function AuthPanel() {
       }
 
       setMessage("登入成功，正在同步雲端紀錄。");
+    } catch (signInError) {
+      setError(signInError instanceof Error ? signInError.message : "登入失敗，請稍後再試。");
     } finally {
       setSubmitting(false);
     }
@@ -235,15 +260,19 @@ export function AuthPanel() {
     setError("");
 
     try {
-      const { error: signUpError } = await getSupabaseBrowserClient().auth.signUp({
-        email,
-        password,
-        options: {
-          emailRedirectTo:
-            typeof window !== "undefined" ? `${window.location.origin}/` : undefined,
-          data: nickname.trim() ? { display_name: nickname.trim().slice(0, 24) } : undefined
-        }
-      });
+      const { error: signUpError } = await withTimeout(
+        getSupabaseBrowserClient().auth.signUp({
+          email,
+          password,
+          options: {
+            emailRedirectTo:
+              typeof window !== "undefined" ? `${window.location.origin}/` : undefined,
+            data: nickname.trim() ? { display_name: nickname.trim().slice(0, 24) } : undefined
+          }
+        }),
+        AUTH_ACTION_TIMEOUT_MS,
+        "註冊伺服器暫時忙碌，請稍後再試。"
+      );
 
       if (signUpError) {
         setError(signUpError.message);
@@ -251,6 +280,8 @@ export function AuthPanel() {
       }
 
       setMessage("註冊成功，去 email 完成驗證。");
+    } catch (signUpError) {
+      setError(signUpError instanceof Error ? signUpError.message : "註冊失敗，請稍後再試。");
     } finally {
       setSubmitting(false);
     }
@@ -311,7 +342,7 @@ export function AuthPanel() {
             <p className="mt-2 text-sm font-semibold text-slate-900 sm:text-base">{user.email}</p>
           </div>
           <div className="flex flex-wrap gap-2">
-            <div className="stat-chip">同步 {syncStatus}</div>
+            <div className="stat-chip">{getSyncStatusLabel(syncStatus)}</div>
             <div className="stat-chip">ID {user.id.slice(0, 8)}...</div>
           </div>
         </div>
@@ -569,6 +600,9 @@ export function AuthPanel() {
 
       {message ? (
         <div className="mt-4 rounded-2xl bg-emerald-50 p-4 text-sm text-emerald-900">{message}</div>
+      ) : null}
+      {syncError ? (
+        <div className="mt-4 rounded-2xl bg-amber-50 p-4 text-sm text-amber-900">{syncError}</div>
       ) : null}
       {error ? (
         <div className="mt-4 rounded-2xl bg-rose-50 p-4 text-sm text-rose-900">{error}</div>

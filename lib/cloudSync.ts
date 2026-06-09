@@ -1580,7 +1580,7 @@ export async function loadSharedQuestionExplanationOverrides(questionIds: string
   }
 
   const supabase = getSupabaseBrowserClient();
-  const uniqueQuestionIds = Array.from(new Set(questionIds));
+  const uniqueQuestionIds = Array.from(new Set(questionIds)).slice(0, 20);
   const { data, error } = await supabase
     .from("question_explanation_overrides")
     .select("question_id, explanation, option_analysis, memory_tip, model, updated_at")
