@@ -9,7 +9,8 @@ import { loadConfirmedQuestionClassificationOverrides } from "@/lib/cloudSync";
 import {
   DEFAULT_QUIZ_SETTINGS,
   getReviewQuestionItems,
-  getReviewSnapshot
+  getReviewSnapshot,
+  mergeQuestionsWithSessionSnapshots
 } from "@/lib/quizAnalysis";
 import { loadCompletedSessions, saveQuizSettings } from "@/lib/storage";
 import { QuestionClassificationOverride, ReviewQuestionItem } from "@/types/quiz";
@@ -40,7 +41,8 @@ export default function SimulationReviewPage() {
   useEffect(() => {
     const sessions = loadCompletedSessions();
     const simulationSessions = sessions.filter((session) => session.settings?.mode === "simulation");
-    setSimulationItems(getReviewQuestionItems(allQuestions, simulationSessions, Number.MAX_SAFE_INTEGER));
+    const reviewQuestions = mergeQuestionsWithSessionSnapshots(allQuestions, simulationSessions);
+    setSimulationItems(getReviewQuestionItems(reviewQuestions, simulationSessions, Number.MAX_SAFE_INTEGER));
   }, [allQuestions, syncVersion]);
 
   function handleStartSimulationReview(filteredItems: ReviewQuestionItem[] = simulationItems) {
@@ -50,6 +52,7 @@ export default function SimulationReviewPage() {
       questionCount: Math.max(1, filteredItems.length),
       subjectFilter: "全部",
       customQuestionIds: filteredItems.map((item) => item.question.id),
+      customQuestionPayload: filteredItems.map((item) => item.question),
       customPoolLabel: "模擬考錯題庫"
     });
   }

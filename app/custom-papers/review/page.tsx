@@ -8,7 +8,8 @@ import { getQuestionBankBySubjectFilter } from "@/data/med1QuestionBank";
 import {
   DEFAULT_QUIZ_SETTINGS,
   getReviewQuestionItems,
-  getReviewSnapshot
+  getReviewSnapshot,
+  mergeQuestionsWithSessionSnapshots
 } from "@/lib/quizAnalysis";
 import { loadCompletedSessions, saveQuizSettings } from "@/lib/storage";
 import { ReviewQuestionItem } from "@/types/quiz";
@@ -21,7 +22,8 @@ export default function CustomPaperReviewPage() {
   useEffect(() => {
     const sessions = loadCompletedSessions();
     const customPaperSessions = sessions.filter((session) => session.settings?.mode === "custom_paper");
-    setCustomPaperItems(getReviewQuestionItems(allQuestions, customPaperSessions, 60));
+    const reviewQuestions = mergeQuestionsWithSessionSnapshots(allQuestions, customPaperSessions);
+    setCustomPaperItems(getReviewQuestionItems(reviewQuestions, customPaperSessions, Number.MAX_SAFE_INTEGER));
   }, [syncVersion]);
 
   function handleStartCustomPaperReview() {
@@ -31,6 +33,7 @@ export default function CustomPaperReviewPage() {
       questionCount: 10,
       subjectFilter: "全部",
       customQuestionIds: customPaperItems.map((item) => item.question.id),
+      customQuestionPayload: customPaperItems.map((item) => item.question),
       customPoolLabel: "自訂卷錯題庫"
     });
   }

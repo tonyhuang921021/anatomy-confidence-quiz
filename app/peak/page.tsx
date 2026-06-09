@@ -14,7 +14,8 @@ import {
 import {
   DEFAULT_QUIZ_SETTINGS,
   getReviewQuestionItems,
-  getReviewSnapshot
+  getReviewSnapshot,
+  mergeQuestionsWithSessionSnapshots
 } from "@/lib/quizAnalysis";
 import {
   clearPeakChallengePreload,
@@ -54,7 +55,8 @@ export default function PeakChallengePage() {
         sessionItem.settings?.customPoolLabel !== "巔峰賽錯題庫"
     );
     const peakSessions = sessions.filter((sessionItem) => sessionItem.settings?.mode === "peak_challenge");
-    const practiceItems = getReviewQuestionItems(allQuestions, practiceSessions, 120);
+    const reviewQuestions = mergeQuestionsWithSessionSnapshots(allQuestions, practiceSessions);
+    const practiceItems = getReviewQuestionItems(reviewQuestions, practiceSessions, 120);
 
     return {
       practiceSnapshot: getReviewSnapshot(practiceItems),

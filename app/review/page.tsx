@@ -8,7 +8,8 @@ import { applyQuestionClassificationOverride, getQuestionBankBySubjectFilter } f
 import { loadConfirmedQuestionClassificationOverrides } from "@/lib/cloudSync";
 import {
   DEFAULT_QUIZ_SETTINGS,
-  getReviewQuestionItems
+  getReviewQuestionItems,
+  mergeQuestionsWithSessionSnapshots
 } from "@/lib/quizAnalysis";
 import { loadCompletedSessions, saveQuizSettings } from "@/lib/storage";
 import { QuestionClassificationOverride, ReviewQuestionItem } from "@/types/quiz";
@@ -50,7 +51,8 @@ export default function ReviewPage() {
         session.settings?.customPoolLabel !== "自訂卷錯題庫" &&
         session.settings?.customPoolLabel !== "巔峰賽錯題庫"
     );
-    setPracticeItems(getReviewQuestionItems(allQuestions, practiceSessions, Number.MAX_SAFE_INTEGER));
+    const reviewQuestions = mergeQuestionsWithSessionSnapshots(allQuestions, practiceSessions);
+    setPracticeItems(getReviewQuestionItems(reviewQuestions, practiceSessions, Number.MAX_SAFE_INTEGER));
   }, [allQuestions, syncVersion]);
 
   useEffect(() => {
@@ -105,6 +107,7 @@ export default function ReviewPage() {
       questionCount: 10,
       subjectFilter: "全部",
       customQuestionIds: filteredItems.map((item) => item.question.id),
+      customQuestionPayload: filteredItems.map((item) => item.question),
       customPoolLabel: "散題錯題庫"
     });
   }

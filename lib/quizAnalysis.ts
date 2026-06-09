@@ -7,6 +7,7 @@ import {
   OverallCompletionStats,
   Question,
   QuestionHistoryStats,
+  QuizSession,
   QuizMode,
   QuizSettings,
   ReviewQuestionItem,
@@ -986,6 +987,29 @@ export function getReviewQuestionItems(
     .filter((item): item is ReviewQuestionItem => Boolean(item))
     .sort((a, b) => b.riskScore - a.riskScore || b.history.wrong - a.history.wrong)
     .slice(0, limit);
+}
+
+export function mergeQuestionsWithSessionSnapshots(
+  questions: Question[],
+  sessions: Pick<QuizSession, "generatedQuestions" | "settings">[]
+) {
+  const merged = new Map(questions.map((question) => [question.id, question] as const));
+
+  for (const session of sessions) {
+    for (const question of session.generatedQuestions ?? []) {
+      if (question?.id && !merged.has(question.id)) {
+        merged.set(question.id, question);
+      }
+    }
+
+    for (const question of session.settings?.customQuestionPayload ?? []) {
+      if (question?.id && !merged.has(question.id)) {
+        merged.set(question.id, question);
+      }
+    }
+  }
+
+  return Array.from(merged.values());
 }
 
 export function getReviewSnapshot(reviewItems: ReviewQuestionItem[]) {

@@ -6,7 +6,8 @@ import { ReviewNotebook } from "@/components/ReviewNotebook";
 import { getQuestionBankBySubjectFilter } from "@/data/med1QuestionBank";
 import {
   DEFAULT_QUIZ_SETTINGS,
-  getReviewQuestionItems
+  getReviewQuestionItems,
+  mergeQuestionsWithSessionSnapshots
 } from "@/lib/quizAnalysis";
 import { loadCompletedSessions, saveQuizSettings } from "@/lib/storage";
 import type { ReviewQuestionItem } from "@/types/quiz";
@@ -19,10 +20,7 @@ export default function PeakReviewPage() {
   useEffect(() => {
     const sessions = loadCompletedSessions();
     const peakSessions = sessions.filter((session) => session.settings?.mode === "peak_challenge");
-    const sessionQuestions = peakSessions.flatMap((session) => session.generatedQuestions ?? []);
-    const mergedQuestions = Array.from(
-      new Map([...baseQuestions, ...sessionQuestions].map((question) => [question.id, question] as const)).values()
-    );
+    const mergedQuestions = mergeQuestionsWithSessionSnapshots(baseQuestions, peakSessions);
     setReviewBank(mergedQuestions);
     setPeakItems(getReviewQuestionItems(mergedQuestions, peakSessions, Number.MAX_SAFE_INTEGER));
   }, [baseQuestions]);
