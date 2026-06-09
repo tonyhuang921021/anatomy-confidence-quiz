@@ -193,6 +193,22 @@ function renderFormattedRuns(runs: YangmingTextRun[], keyPrefix: string) {
   );
 }
 
+function renderRawTextBackup(text: string) {
+  if (!text.trim()) return null;
+  return (
+    <details className="mt-4 min-w-0 max-w-full overflow-hidden rounded-2xl bg-slate-50/80 p-3 ring-1 ring-slate-200">
+      <summary className="cursor-pointer select-none text-xs font-black uppercase tracking-[0.18em] text-slate-600">
+        原始完整文字
+      </summary>
+      <div className="mt-3 max-h-[520px] max-w-full overflow-auto rounded-xl bg-white/80 p-3 text-[13px] leading-7 text-slate-700 ring-1 ring-slate-100">
+        <pre className="whitespace-pre-wrap break-words font-sans [overflow-wrap:anywhere]">
+          {text}
+        </pre>
+      </div>
+    </details>
+  );
+}
+
 function renderAssetFigure(
   asset: NonNullable<YangmingExplanationContent["assets"]>[number] | undefined,
   fallbackKey: string,
@@ -258,6 +274,19 @@ function YangmingExplanationContentBlock({
   const assets = content.assets ?? [];
   const hasStructuredSections = sections.length > 0;
   const renderBodyBackup = shouldRenderBodyBackup(content);
+  const referencedAssetIndexes = new Set(
+    sections
+      .map((section) => section.assetIndex)
+      .filter((assetIndex): assetIndex is number => typeof assetIndex === "number")
+  );
+  const unreferencedFallbackAssets = hasStructuredSections
+    ? assets
+        .map((asset, index) => ({ asset, index }))
+        .filter(
+          ({ asset, index }) =>
+            !referencedAssetIndexes.has(index) && (asset.fallback || asset.kind === "page_snapshot")
+        )
+    : [];
 
   function renderAsset(assetIndex: number | undefined, fallbackKey: string, sectionFallback = false) {
     if (typeof assetIndex !== "number") return null;
@@ -328,6 +357,25 @@ function YangmingExplanationContentBlock({
       ) : (
         renderFormattedPlainText(content.body, "yangming-body")
       )}
+      {renderRawTextBackup(content.body)}
+      {unreferencedFallbackAssets.length ? (
+        <details
+          className="mt-4 min-w-0 max-w-full overflow-hidden rounded-2xl bg-amber-50/60 p-3 ring-1 ring-amber-100"
+          open={renderBodyBackup || undefined}
+        >
+          <summary className="cursor-pointer select-none text-xs font-black uppercase tracking-[0.18em] text-amber-800">
+            原始版面截圖
+          </summary>
+          <p className="mt-2 text-xs font-semibold leading-5 text-amber-800/75">
+            文字抽取漏段或選項亂掉時，先用原頁截圖核對完整內容。
+          </p>
+          <div className="mt-3 grid min-w-0 max-w-full gap-3 overflow-hidden">
+            {unreferencedFallbackAssets.map(({ asset, index }) =>
+              renderAssetFigure(asset, `yangming-unreferenced-fallback-${index}`, true)
+            )}
+          </div>
+        </details>
+      ) : null}
       {!hasStructuredSections && assets.length ? (
         <div className="mt-4 grid min-w-0 max-w-full gap-3 overflow-hidden">
           {assets.map((asset) => renderAssetFigure(asset, asset.src))}
