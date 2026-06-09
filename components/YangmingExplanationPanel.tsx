@@ -21,6 +21,176 @@ type YangmingExplanationResponse = {
 const yangmingExplanationCache = new Map<string, YangmingExplanationContent | null>();
 const yangmingExplanationPromiseCache = new Map<string, Promise<YangmingExplanationContent | null>>();
 
+type YangmingTextRun = {
+  text: string;
+  script?: "super" | "sub";
+};
+
+const YANGMING_BLOCK_LABELS = [
+  "答案",
+  "簡答",
+  "簡解",
+  "詳解",
+  "詳寫",
+  "參考詳解",
+  "答題要訣",
+  "參考資料",
+  "資料出處",
+  "補充",
+  "Key",
+  "key"
+];
+
+const YANGMING_AUTO_SPLIT_LABELS = [
+  "答案",
+  "簡答",
+  "簡解",
+  "詳解",
+  "詳寫",
+  "參考詳解",
+  "答題要訣",
+  "參考資料",
+  "資料出處"
+];
+
+function normalizeYangmingLabel(label: string | undefined) {
+  if (!label) return "";
+  const compactLabel = label.replace(/\s+/g, "");
+  if (compactLabel === "詳寫") return "詳解";
+  if (compactLabel === "資料出處") return "參考資料";
+  return label.trim();
+}
+
+function normalizeYangmingPlainText(text: string) {
+  const labelPattern = YANGMING_AUTO_SPLIT_LABELS.join("|");
+  return text
+    .replace(/\r\n?/g, "\n")
+    .replace(/```[a-zA-Z]*\s*/g, "")
+    .replace(/```/g, "")
+    .replace(/^\s*`\s*$/gm, "")
+    .replace(/[ \t]+\n/g, "\n")
+    .replace(/\n[ \t]+/g, "\n")
+    .replace(new RegExp(`([^\\n])\\s*(${labelPattern})\\s*([：:])`, "g"), "$1\n\n$2$3")
+    .replace(/詳寫\s*[：:]/g, "詳解：")
+    .replace(/([。！？；;])\s*(\([A-D]\)|[A-D][.．、：:])(?=\s*[\u4e00-\u9fffA-Za-z0-9])/g, "$1\n$2")
+    .replace(/([^\n])\s+(\([A-D]\)|[A-D][.．、：:])(?=\s*[\u4e00-\u9fffA-Za-z0-9])/g, "$1\n$2")
+    .replace(/([。！？；;])\s*(\d+[.．、])(?=\s*[\u4e00-\u9fffA-Za-z0-9])/g, "$1\n$2")
+    .replace(/\n\s*[、，,]\s*\n/g, "\n")
+    .replace(/\n{3,}/g, "\n\n")
+    .trim();
+}
+
+function splitYangmingParagraphs(text: string) {
+  const normalized = normalizeYangmingPlainText(text);
+  if (!normalized) return [];
+  return normalized
+    .split(/\n{2,}/)
+    .map((paragraph) => paragraph.trim())
+    .filter(Boolean);
+}
+
+function isStandaloneLabel(text: string) {
+  const compactText = text.replace(/\s+/g, "").replace(/[：:]/g, "");
+  return YANGMING_BLOCK_LABELS.some((label) => compactText === label);
+}
+
+function compactYangmingText(text: string) {
+  return normalizeYangmingPlainText(text)
+    .replace(/\s+/g, "")
+    .replace(/[、，,.:：;；`'"「」『』()（）\[\]{}<>《》|\\/_\-—~。．·•]/g, "");
+}
+
+function getSectionPlainText(sections: NonNullable<YangmingExplanationContent["sections"]>) {
+  return sections
+    .map((section) => {
+      if (section.kind === "image") return "";
+      return section.text || section.runs?.map((run) => run.text).join("") || "";
+    })
+    .join("\n");
+}
+
+function shouldRenderBodyBackup(content: YangmingExplanationContent) {
+  const sections = content.sections ?? [];
+  if (!sections.length || !content.body) return false;
+
+  const bodyText = compactYangmingText(content.body);
+  const sectionText = compactYangmingText(getSectionPlainText(sections));
+  if (bodyText.length < 80) return false;
+  if (sectionText.length < 20) return true;
+  if (bodyText.length > sectionText.length + 180 && sectionText.length / bodyText.length < 0.82) return true;
+
+  const bodyMiddleStart = Math.floor(bodyText.length * 0.35);
+  const bodyMiddle = bodyText.slice(bodyMiddleStart, bodyMiddleStart + 120);
+  return bodyMiddle.length >= 80 && !sectionText.includes(bodyMiddle);
+}
+
+function renderFormattedPlainText(text: string, keyPrefix: string) {
+  const paragraphs = splitYangmingParagraphs(text);
+  if (!paragraphs.length) return null;
+
+  return (
+    <div className="max-w-full space-y-2.5 break-words [overflow-wrap:anywhere]">
+      {paragraphs.map((paragraph, paragraphIndex) => {
+        const labelMatch = paragraph.match(/^([^：:\n]{1,8})[：:]\s*([\s\S]*)$/);
+        const rawLabel = labelMatch ? normalizeYangmingLabel(labelMatch[1]) : "";
+        const body = labelMatch ? labelMatch[2].trim() : paragraph;
+        const isLabelBlock = rawLabel && YANGMING_BLOCK_LABELS.includes(rawLabel);
+        if (isLabelBlock) {
+          return (
+            <div key={`${keyPrefix}-paragraph-${paragraphIndex}`} className="space-y-1.5">
+              <p className="text-xs font-black uppercase tracking-[0.18em] text-teal-700">
+                {rawLabel}
+              </p>
+              {body ? (
+                <p className="whitespace-pre-wrap text-[15px] leading-8 text-slate-800">{body}</p>
+              ) : null}
+            </div>
+          );
+        }
+
+        return (
+          <p
+            key={`${keyPrefix}-paragraph-${paragraphIndex}`}
+            className="whitespace-pre-wrap text-[15px] leading-8 text-slate-800"
+          >
+            {paragraph}
+          </p>
+        );
+      })}
+    </div>
+  );
+}
+
+function renderRunSpan(run: YangmingTextRun, key: string) {
+  return (
+    <span
+      key={key}
+      className={
+        run.script === "super"
+          ? "align-super text-[0.72em]"
+          : run.script === "sub"
+            ? "align-sub text-[0.72em]"
+            : undefined
+      }
+    >
+      {run.text}
+    </span>
+  );
+}
+
+function renderFormattedRuns(runs: YangmingTextRun[], keyPrefix: string) {
+  const hasScriptRuns = runs.some((run) => run.script);
+  if (!hasScriptRuns) {
+    return renderFormattedPlainText(runs.map((run) => run.text).join(""), keyPrefix);
+  }
+
+  return (
+    <div className="max-w-full whitespace-pre-wrap break-words text-[15px] leading-8 text-slate-800 [overflow-wrap:anywhere]">
+      {runs.map((run, runIndex) => renderRunSpan(run, `${keyPrefix}-run-${runIndex}`))}
+    </div>
+  );
+}
+
 function renderAssetFigure(
   asset: NonNullable<YangmingExplanationContent["assets"]>[number] | undefined,
   fallbackKey: string,
@@ -85,6 +255,7 @@ function YangmingExplanationContentBlock({
   const sections = content.sections ?? [];
   const assets = content.assets ?? [];
   const hasStructuredSections = sections.length > 0;
+  const renderBodyBackup = shouldRenderBodyBackup(content);
 
   function renderAsset(assetIndex: number | undefined, fallbackKey: string, sectionFallback = false) {
     if (typeof assetIndex !== "number") return null;
@@ -127,41 +298,33 @@ function YangmingExplanationContentBlock({
 
             return (
               <section key={`yangming-section-${index}`} className="min-w-0 max-w-full overflow-hidden">
-                {section.label ? (
+                {section.label && !isStandaloneLabel(section.text ?? "") ? (
                   <p className="mb-1 break-words text-xs font-black uppercase tracking-[0.18em] text-teal-700 [overflow-wrap:anywhere]">
-                    {section.label}
+                    {normalizeYangmingLabel(section.label)}
                   </p>
                 ) : null}
                 {section.runs?.length ? (
-                  <div className="max-w-full whitespace-pre-wrap break-words [overflow-wrap:anywhere]">
-                    {section.runs.map((run, runIndex) => (
-                      <span
-                        key={`yangming-run-${index}-${runIndex}`}
-                        className={
-                          run.script === "super"
-                            ? "align-super text-[0.72em]"
-                            : run.script === "sub"
-                              ? "align-sub text-[0.72em]"
-                              : undefined
-                        }
-                      >
-                        {run.text}
-                      </span>
-                    ))}
-                  </div>
+                  renderFormattedRuns(section.runs, `yangming-section-${index}`)
                 ) : section.text ? (
-                  <div className="max-w-full whitespace-pre-wrap break-words [overflow-wrap:anywhere]">
-                    {section.text}
-                  </div>
+                  renderFormattedPlainText(section.text, `yangming-section-${index}`)
                 ) : null}
               </section>
             );
           })}
+          {renderBodyBackup ? (
+            <section className="min-w-0 max-w-full overflow-hidden rounded-2xl bg-amber-50/60 p-3 ring-1 ring-amber-100">
+              <p className="mb-2 text-xs font-black uppercase tracking-[0.18em] text-amber-800">
+                完整文字
+              </p>
+              <p className="mb-2 text-xs font-semibold leading-5 text-amber-800/75">
+                結構化詳解可能有漏段，這裡自動補上原始完整文字。
+              </p>
+              {renderFormattedPlainText(content.body, "yangming-body-backup")}
+            </section>
+          ) : null}
         </div>
       ) : (
-        <div className="max-w-full whitespace-pre-wrap break-words [overflow-wrap:anywhere]">
-          {content.body}
-        </div>
+        renderFormattedPlainText(content.body, "yangming-body")
       )}
       {!hasStructuredSections && assets.length ? (
         <div className="mt-4 grid min-w-0 max-w-full gap-3 overflow-hidden">
