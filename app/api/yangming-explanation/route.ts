@@ -8,7 +8,7 @@ type YangmingExplanationRequestBody = {
 
 type YangmingExplanationRow = {
   question_id: string;
-  body: string;
+  body?: string | null;
   author?: string | null;
   reviewer?: string | null;
   source_label?: string | null;
@@ -19,6 +19,19 @@ type YangmingExplanationRow = {
   answer_snapshot?: string | null;
   sections?: unknown;
   assets?: unknown;
+  match_status?: string | null;
+  match_score?: number | string | null;
+};
+
+type NormalizedYangmingAsset = {
+  src: string;
+  storagePath?: string;
+  alt?: string;
+  width?: number;
+  height?: number;
+  page?: number;
+  kind?: string;
+  fallback?: boolean;
 };
 
 const YANGMING_EXPLANATION_BUCKET =
@@ -40,7 +53,55 @@ function getServiceSupabaseClient() {
   });
 }
 
-function normalizeSections(value: unknown) {
+function getQuestionNumberFromId(questionId: string | undefined) {
+  const match = questionId?.match(/-Q0*(\d{1,3})$/);
+  return match ? Number(match[1]) : null;
+}
+
+function flattenUnknownStrings(value: unknown): string[] {
+  if (typeof value === "string") return [value];
+  if (Array.isArray(value)) return value.flatMap((item) => flattenUnknownStrings(item));
+  if (value && typeof value === "object") {
+    return Object.values(value as Record<string, unknown>).flatMap((item) => flattenUnknownStrings(item));
+  }
+  return [];
+}
+
+function detectAssetQuestionNumber(record: { rows?: unknown }) {
+  const rows = Array.isArray(record.rows) ? record.rows : [];
+  for (const row of rows) {
+    const cells = Array.isArray(row) ? row.map((cell) => (typeof cell === "string" ? cell : "")) : [];
+    const questionLabelIndex = cells.findIndex((cell) => /題\s*號|題號/.test(cell));
+    if (questionLabelIndex === -1) continue;
+    const nearbyCells = cells.slice(questionLabelIndex + 1, questionLabelIndex + 8);
+    for (const cell of nearbyCells) {
+      const match = cell.match(/\b0*(\d{1,3})\b/);
+      if (match) return Number(match[1]);
+    }
+  }
+
+  const combinedRows = flattenUnknownStrings(record.rows).join(" ");
+  const inlineMatch = combinedRows.match(/題\s*號\s*0*(\d{1,3})/);
+  return inlineMatch ? Number(inlineMatch[1]) : null;
+}
+
+function isMeaningfulYangmingText(text: string | null | undefined) {
+  if (!text) return false;
+  const compact = text.replace(/\s+/g, "");
+  if (compact.length < 4) return false;
+
+  const informativeText = compact.replace(
+    /[、，,.:：;；`'"「」『』()（）\[\]{}<>《》|\\/_\-—~。．·•]/g,
+    ""
+  );
+  return informativeText.length >= 2;
+}
+
+function isNonNullable<T>(value: T | null | undefined): value is T {
+  return value != null;
+}
+
+function normalizeSections(value: unknown, assetIndexMap?: Map<number, number>) {
   if (!Array.isArray(value)) return [];
   return value
     .map((item) => {
@@ -55,27 +116,48 @@ function normalizeSections(value: unknown) {
         fallback?: unknown;
       };
       if (typeof record.kind !== "string" || !record.kind.trim()) return null;
+      const rawAssetIndex = typeof record.assetIndex === "number" ? record.assetIndex : undefined;
+      const mappedAssetIndex =
+        typeof rawAssetIndex === "number" && assetIndexMap
+          ? assetIndexMap.get(rawAssetIndex)
+          : rawAssetIndex;
+      if (
+        record.kind.trim() === "image" &&
+        typeof rawAssetIndex === "number" &&
+        typeof mappedAssetIndex !== "number"
+      ) {
+        return null;
+      }
+      const normalizedRuns = Array.isArray(record.runs)
+        ? record.runs
+            .map((run) => {
+              if (!run || typeof run !== "object") return null;
+              const runRecord = run as { text?: unknown; script?: unknown };
+              if (typeof runRecord.text !== "string" || !runRecord.text) return null;
+              return {
+                text: runRecord.text,
+                script:
+                  runRecord.script === "super" || runRecord.script === "sub"
+                    ? runRecord.script
+                    : undefined
+              };
+            })
+            .filter(isNonNullable)
+        : undefined;
+      const normalizedText = typeof record.text === "string" ? record.text : undefined;
+      const runText = normalizedRuns?.map((run) => run?.text ?? "").join("");
+      if (
+        record.kind.trim() !== "image" &&
+        !isMeaningfulYangmingText(normalizedText || runText)
+      ) {
+        return null;
+      }
       return {
         kind: record.kind.trim(),
         label: typeof record.label === "string" ? record.label : undefined,
-        text: typeof record.text === "string" ? record.text : undefined,
-        runs: Array.isArray(record.runs)
-          ? record.runs
-              .map((run) => {
-                if (!run || typeof run !== "object") return null;
-                const runRecord = run as { text?: unknown; script?: unknown };
-                if (typeof runRecord.text !== "string" || !runRecord.text) return null;
-                return {
-                  text: runRecord.text,
-                  script:
-                    runRecord.script === "super" || runRecord.script === "sub"
-                      ? runRecord.script
-                      : undefined
-                };
-              })
-              .filter(Boolean)
-          : undefined,
-        assetIndex: typeof record.assetIndex === "number" ? record.assetIndex : undefined,
+        text: normalizedText,
+        runs: normalizedRuns,
+        assetIndex: mappedAssetIndex,
         page: typeof record.page === "number" ? record.page : undefined,
         fallback: record.fallback === true
       };
@@ -91,31 +173,15 @@ function normalizeAssets(
       };
     };
   },
-  value: unknown
-): {
-  src: string;
-  storagePath?: string;
-  alt?: string;
-  width?: number;
-  height?: number;
-  page?: number;
-  kind?: string;
-  fallback?: boolean;
-}[] {
-  if (!Array.isArray(value)) return [];
-  const assets: {
-    src: string;
-    storagePath?: string;
-    alt?: string;
-    width?: number;
-    height?: number;
-    page?: number;
-    kind?: string;
-    fallback?: boolean;
-  }[] = [];
+  value: unknown,
+  expectedQuestionNo: number | null
+): { assets: NormalizedYangmingAsset[]; assetIndexMap: Map<number, number> } {
+  if (!Array.isArray(value)) return { assets: [], assetIndexMap: new Map() };
+  const assets: NormalizedYangmingAsset[] = [];
+  const assetIndexMap = new Map<number, number>();
 
-  for (const item of value) {
-    if (!item || typeof item !== "object") continue;
+  value.forEach((item, originalIndex) => {
+    if (!item || typeof item !== "object") return;
     const record = item as {
       src?: unknown;
       alt?: unknown;
@@ -124,14 +190,20 @@ function normalizeAssets(
       page?: unknown;
       kind?: unknown;
       fallback?: unknown;
+      rows?: unknown;
     };
-    if (typeof record.src !== "string" || !record.src.trim()) continue;
+    if (typeof record.src !== "string" || !record.src.trim()) return;
+    const assetQuestionNo = detectAssetQuestionNumber(record);
+    if (expectedQuestionNo && assetQuestionNo && assetQuestionNo !== expectedQuestionNo) {
+      return;
+    }
     const storagePath = record.src.trim();
     const publicUrl =
       storagePath.startsWith("http://") || storagePath.startsWith("https://")
         ? storagePath
         : supabase.storage.from(YANGMING_EXPLANATION_BUCKET).getPublicUrl(storagePath).data.publicUrl;
 
+    assetIndexMap.set(originalIndex, assets.length);
     assets.push({
       src: publicUrl,
       storagePath,
@@ -142,9 +214,9 @@ function normalizeAssets(
       kind: typeof record.kind === "string" ? record.kind : undefined,
       fallback: record.fallback === true
     });
-  }
+  });
 
-  return assets;
+  return { assets, assetIndexMap };
 }
 
 export async function POST(request: NextRequest) {
@@ -156,38 +228,13 @@ export async function POST(request: NextRequest) {
   try {
     const body = (await request.json().catch(() => ({}))) as YangmingExplanationRequestBody;
     const questionId = body.questionId?.trim();
-    if (!body.accessToken) {
-      return NextResponse.json({ ok: false, message: "請先登入。" }, { status: 401 });
-    }
     if (!questionId) {
       return NextResponse.json({ ok: false, message: "缺少題號。" }, { status: 400 });
     }
 
-    const { data, error: authError } = await supabase.auth.getUser(body.accessToken);
-    if (authError || !data.user) {
-      return NextResponse.json({ ok: false, message: "登入驗證失敗。" }, { status: 401 });
-    }
-
-    const activationFilter = data.user.email
-      ? `user_id.eq.${data.user.id},user_email.eq.${data.user.email}`
-      : `user_id.eq.${data.user.id}`;
-    const { data: activationRows, error: activationError } = await supabase
-      .from("yangming_mode_activations")
-      .select("id")
-      .or(activationFilter)
-      .limit(1);
-
-    if (activationError) {
-      throw activationError;
-    }
-
-    if (!activationRows?.length) {
-      return NextResponse.json({ ok: false, message: "尚未啟用。" }, { status: 403 });
-    }
-
     const { data: explanationRow, error: explanationError } = await supabase
       .from("yangming_question_explanations")
-      .select("question_id, body, author, reviewer, source_label, source_file, source_page_start, source_page_end, question_stem_snapshot, answer_snapshot, sections, assets")
+      .select("question_id, body, author, reviewer, source_label, source_file, source_page_start, source_page_end, question_stem_snapshot, answer_snapshot, sections, assets, match_status, match_score")
       .eq("question_id", questionId)
       .maybeSingle();
 
@@ -200,14 +247,33 @@ export async function POST(request: NextRequest) {
     }
 
     const row = explanationRow as YangmingExplanationRow | null;
-    if (!row?.body) {
+    if (!row) {
+      return NextResponse.json({ ok: true, explanation: null });
+    }
+
+    const matchScore =
+      typeof row.match_score === "number"
+        ? row.match_score
+        : typeof row.match_score === "string"
+          ? Number(row.match_score)
+          : null;
+    if (row.match_status === "low_confidence" || (matchScore !== null && matchScore < 0.5)) {
+      return NextResponse.json({ ok: true, explanation: null });
+    }
+
+    const expectedQuestionNo = getQuestionNumberFromId(row.question_id);
+    const normalizedAssetBundle = normalizeAssets(supabase, row.assets, expectedQuestionNo);
+    const normalizedSections = normalizeSections(row.sections, normalizedAssetBundle.assetIndexMap);
+    const normalizedBody =
+      typeof row.body === "string" && isMeaningfulYangmingText(row.body) ? row.body : "";
+    if (!normalizedBody && normalizedSections.length === 0 && normalizedAssetBundle.assets.length === 0) {
       return NextResponse.json({ ok: true, explanation: null });
     }
 
     return NextResponse.json({
       ok: true,
       explanation: {
-        body: row.body,
+        body: normalizedBody,
         author: row.author ?? undefined,
         reviewer: row.reviewer ?? undefined,
         sourceLabel: row.source_label ?? undefined,
@@ -216,8 +282,8 @@ export async function POST(request: NextRequest) {
         sourcePageEnd: row.source_page_end ?? undefined,
         questionStemSnapshot: row.question_stem_snapshot ?? undefined,
         answerSnapshot: row.answer_snapshot ?? undefined,
-        sections: normalizeSections(row.sections),
-        assets: normalizeAssets(supabase, row.assets)
+        sections: normalizedSections,
+        assets: normalizedAssetBundle.assets
       }
     });
   } catch (error) {

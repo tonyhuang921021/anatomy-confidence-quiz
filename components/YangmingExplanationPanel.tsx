@@ -1,0 +1,543 @@
+"use client";
+
+import { useEffect, useRef, useState } from "react";
+import { useAuth } from "@/components/AuthProvider";
+import { getOrCreateVisitorId } from "@/lib/visitor";
+import type { YangmingExplanationContent } from "@/types/quiz";
+
+type Props = {
+  questionId: string;
+  className?: string;
+  buttonClassName?: string;
+  compact?: boolean;
+};
+
+type YangmingExplanationResponse = {
+  ok?: boolean;
+  explanation?: YangmingExplanationContent | null;
+  message?: string;
+};
+
+const yangmingExplanationCache = new Map<string, YangmingExplanationContent | null>();
+const yangmingExplanationPromiseCache = new Map<string, Promise<YangmingExplanationContent | null>>();
+
+function renderAssetFigure(
+  asset: NonNullable<YangmingExplanationContent["assets"]>[number] | undefined,
+  fallbackKey: string,
+  sectionFallback = false
+) {
+  if (!asset?.src) return null;
+  const isFallback = sectionFallback || asset.fallback || asset.kind === "page_snapshot";
+  const imageMaxHeight = isFallback ? "max-h-[760px]" : "max-h-[520px]";
+  const imageWidth = asset.width ? Math.min(asset.width, isFallback ? 920 : 760) : undefined;
+  const caption = isFallback
+    ? `備用原頁截圖${asset.page ? `（第 ${asset.page} 頁）` : ""}：精準圖片或表格不足時保留完整詳解頁面。`
+    : asset.alt;
+
+  return (
+    <figure
+      key={fallbackKey}
+      className={`my-3 min-w-0 max-w-full overflow-hidden rounded-2xl bg-white/80 p-2 ring-1 ${
+        isFallback ? "ring-amber-100" : "ring-slate-200"
+      }`}
+    >
+      {isFallback ? (
+        <div className="mb-2 flex min-w-0 flex-wrap items-center gap-2 px-1 text-[11px] font-bold text-amber-800">
+          <span className="rounded-full bg-amber-50 px-2 py-0.5 ring-1 ring-amber-100">
+            備用原頁截圖
+          </span>
+          <span className="min-w-0 break-words font-medium text-slate-400 [overflow-wrap:anywhere]">
+            若圖片或表格切割不完整，先用這張保留原詳解。
+          </span>
+        </div>
+      ) : null}
+      <div className="max-w-full overflow-x-auto">
+        <img
+          src={asset.src}
+          alt={asset.alt ?? ""}
+          loading="lazy"
+          className={`h-auto ${imageMaxHeight} max-w-full object-contain`}
+          style={{ width: imageWidth ? "100%" : undefined, maxWidth: imageWidth }}
+        />
+      </div>
+      {caption ? (
+        <figcaption
+          className={`mt-2 break-words text-xs [overflow-wrap:anywhere] ${
+            isFallback ? "text-amber-800/80" : "text-slate-500"
+          }`}
+        >
+          {caption}
+        </figcaption>
+      ) : null}
+    </figure>
+  );
+}
+
+function YangmingExplanationContentBlock({
+  content,
+  onReport,
+  onCorrect
+}: {
+  content: YangmingExplanationContent;
+  onReport: () => void;
+  onCorrect: () => void;
+}) {
+  const sections = content.sections ?? [];
+  const assets = content.assets ?? [];
+  const hasStructuredSections = sections.length > 0;
+
+  function renderAsset(assetIndex: number | undefined, fallbackKey: string, sectionFallback = false) {
+    if (typeof assetIndex !== "number") return null;
+    return renderAssetFigure(assets[assetIndex], fallbackKey, sectionFallback);
+  }
+
+  return (
+    <div className="min-w-0 max-w-full overflow-hidden rounded-3xl bg-white/70 p-3 text-sm leading-7 text-slate-800 ring-1 ring-white/70 [overflow-wrap:anywhere] sm:p-4">
+      <div className="mb-3 flex min-w-0 flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+        <div className="flex min-w-0 flex-wrap gap-2">
+          <button
+            type="button"
+            onClick={onCorrect}
+            className="rounded-full bg-teal-50 px-3 py-1 text-[11px] font-bold text-teal-800 ring-1 ring-teal-100 transition hover:bg-teal-100"
+          >
+            修正詳解
+          </button>
+          <button
+            type="button"
+            onClick={onReport}
+            className="rounded-full bg-amber-50 px-3 py-1 text-[11px] font-bold text-amber-800 ring-1 ring-amber-100 transition hover:bg-amber-100"
+          >
+            回報陽明詳解
+          </button>
+        </div>
+        {content.author || content.reviewer ? (
+          <p className="min-w-0 break-words text-left text-[11px] font-semibold leading-5 text-slate-500 [overflow-wrap:anywhere] sm:text-right">
+            {content.author ? `撰寫：${content.author}` : ""}
+            {content.author && content.reviewer ? "　" : ""}
+            {content.reviewer ? `審稿：${content.reviewer}` : ""}
+          </p>
+        ) : null}
+      </div>
+      {hasStructuredSections ? (
+        <div className="min-w-0 max-w-full space-y-4 overflow-hidden">
+          {sections.map((section, index) => {
+            if (section.kind === "image") {
+              return renderAsset(section.assetIndex, `yangming-section-image-${index}`, section.fallback);
+            }
+
+            return (
+              <section key={`yangming-section-${index}`} className="min-w-0 max-w-full overflow-hidden">
+                {section.label ? (
+                  <p className="mb-1 break-words text-xs font-black uppercase tracking-[0.18em] text-teal-700 [overflow-wrap:anywhere]">
+                    {section.label}
+                  </p>
+                ) : null}
+                {section.runs?.length ? (
+                  <div className="max-w-full whitespace-pre-wrap break-words [overflow-wrap:anywhere]">
+                    {section.runs.map((run, runIndex) => (
+                      <span
+                        key={`yangming-run-${index}-${runIndex}`}
+                        className={
+                          run.script === "super"
+                            ? "align-super text-[0.72em]"
+                            : run.script === "sub"
+                              ? "align-sub text-[0.72em]"
+                              : undefined
+                        }
+                      >
+                        {run.text}
+                      </span>
+                    ))}
+                  </div>
+                ) : section.text ? (
+                  <div className="max-w-full whitespace-pre-wrap break-words [overflow-wrap:anywhere]">
+                    {section.text}
+                  </div>
+                ) : null}
+              </section>
+            );
+          })}
+        </div>
+      ) : (
+        <div className="max-w-full whitespace-pre-wrap break-words [overflow-wrap:anywhere]">
+          {content.body}
+        </div>
+      )}
+      {!hasStructuredSections && assets.length ? (
+        <div className="mt-4 grid min-w-0 max-w-full gap-3 overflow-hidden">
+          {assets.map((asset) => renderAssetFigure(asset, asset.src))}
+        </div>
+      ) : null}
+      {content.sourceLabel || content.sourceFile ? (
+        <p className="mt-4 break-words text-[11px] font-medium leading-5 text-slate-400 [overflow-wrap:anywhere]">
+          資料來源：{content.sourceLabel ?? content.sourceFile}
+          {content.sourcePageStart
+            ? `，第 ${content.sourcePageStart}${content.sourcePageEnd && content.sourcePageEnd !== content.sourcePageStart ? `-${content.sourcePageEnd}` : ""} 頁`
+            : ""}
+        </p>
+      ) : null}
+    </div>
+  );
+}
+
+export function YangmingExplanationPanel({
+  questionId,
+  className = "",
+  buttonClassName = "",
+  compact = false
+}: Props) {
+  const { session } = useAuth();
+  const activeQuestionIdRef = useRef(questionId);
+  const [expanded, setExpanded] = useState(false);
+  const [checked, setChecked] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [content, setContent] = useState<YangmingExplanationContent | null>(null);
+  const [error, setError] = useState("");
+  const [reportOpen, setReportOpen] = useState(false);
+  const [reportMode, setReportMode] = useState<"report" | "correction">("report");
+  const [reportReason, setReportReason] = useState("");
+  const [correctionDraft, setCorrectionDraft] = useState("");
+  const [keptAssetIndexes, setKeptAssetIndexes] = useState<number[]>([]);
+  const [reportLoading, setReportLoading] = useState(false);
+  const [reportMessage, setReportMessage] = useState("");
+
+  useEffect(() => {
+    activeQuestionIdRef.current = questionId;
+    setExpanded(false);
+    setChecked(false);
+    setLoading(false);
+    setContent(null);
+    setError("");
+    setReportOpen(false);
+    setReportMessage("");
+  }, [questionId]);
+
+  async function loadYangmingExplanation() {
+    if (loading) return;
+    if (expanded && checked) {
+      setExpanded(false);
+      return;
+    }
+    setExpanded(true);
+    if (checked) return;
+
+    setLoading(true);
+    setError("");
+    try {
+      if (yangmingExplanationCache.has(questionId)) {
+        if (activeQuestionIdRef.current !== questionId) return;
+        setContent(yangmingExplanationCache.get(questionId) ?? null);
+        setChecked(true);
+        return;
+      }
+
+      let pendingRequest = yangmingExplanationPromiseCache.get(questionId);
+      if (!pendingRequest) {
+        pendingRequest = fetch("/api/yangming-explanation", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({ questionId })
+        })
+          .then(async (response) => {
+            const payload = (await response.json().catch(() => null)) as YangmingExplanationResponse | null;
+            if (!response.ok || !payload?.ok) {
+              throw new Error(payload?.message || "陽明詳解載入失敗。");
+            }
+            return payload.explanation ?? null;
+          })
+          .then((nextContent) => {
+            yangmingExplanationCache.set(questionId, nextContent);
+            return nextContent;
+          })
+          .finally(() => {
+            yangmingExplanationPromiseCache.delete(questionId);
+          });
+        yangmingExplanationPromiseCache.set(questionId, pendingRequest);
+      }
+      const nextContent = await pendingRequest;
+      if (activeQuestionIdRef.current !== questionId) return;
+      setContent(nextContent);
+      setChecked(true);
+    } catch (requestError) {
+      if (activeQuestionIdRef.current !== questionId) return;
+      setError(requestError instanceof Error ? requestError.message : "無法連線到陽明詳解 API。");
+      setContent(null);
+      setChecked(true);
+    } finally {
+      if (activeQuestionIdRef.current === questionId) {
+        setLoading(false);
+      }
+    }
+  }
+
+  function openReportDialog() {
+    setReportMode("report");
+    setReportReason("");
+    setCorrectionDraft("");
+    setKeptAssetIndexes([]);
+    setReportMessage("");
+    setReportOpen(true);
+  }
+
+  function openCorrectionDialog() {
+    if (!content) return;
+    setReportMode("correction");
+    setReportReason("修正陽明詳解內容");
+    setCorrectionDraft(content.body ?? "");
+    setKeptAssetIndexes((content.assets ?? []).map((_, index) => index));
+    setReportMessage("");
+    setReportOpen(true);
+  }
+
+  function toggleCorrectionAsset(index: number) {
+    setKeptAssetIndexes((current) =>
+      current.includes(index)
+        ? current.filter((assetIndex) => assetIndex !== index)
+        : [...current, index].sort((a, b) => a - b)
+    );
+  }
+
+  async function submitReport() {
+    if (reportMode === "correction" && !content) return;
+    if (!session?.access_token) {
+      setReportMessage("請先登入帳號，才能回報或修正陽明詳解。");
+      return;
+    }
+    if (reportReason.trim().length < 2) {
+      setReportMessage("請簡單填一下回報原因。");
+      return;
+    }
+    if (reportMode === "correction" && correctionDraft.trim().length < 10) {
+      setReportMessage("修正版內容太短，請至少保留主要詳解文字。");
+      return;
+    }
+
+    setReportLoading(true);
+    setReportMessage("");
+    try {
+      const response = await fetch("/api/yangming-explanation-report", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          accessToken: session.access_token,
+          visitorId: getOrCreateVisitorId(),
+          questionId,
+          reason: reportReason,
+          reportType: reportMode,
+          proposedBody: reportMode === "correction" ? correctionDraft : undefined,
+          keptAssetIndexes: reportMode === "correction" ? keptAssetIndexes : undefined,
+          sourceLabel: content?.sourceLabel,
+          sourceFile: content?.sourceFile
+        })
+      });
+      const payload = (await response.json().catch(() => null)) as
+        | { ok?: boolean; message?: string }
+        | null;
+      if (!response.ok || !payload?.ok) {
+        setReportMessage(payload?.message || "回報失敗，請再試一次。");
+        return;
+      }
+      if (reportMode === "correction") {
+        const correctedContent = {
+          ...content,
+          body: correctionDraft.trim(),
+          sections: [],
+          assets: (content.assets ?? []).filter((_, index) => keptAssetIndexes.includes(index))
+        };
+        setContent(correctedContent);
+        yangmingExplanationCache.set(questionId, correctedContent);
+      }
+      setReportMessage(reportMode === "correction" ? "已採用修正版，謝謝你幫大家補洞。" : "已收到回報。");
+      window.setTimeout(() => setReportOpen(false), 900);
+    } catch {
+      setReportMessage("無法連線到回報 API，請再試一次。");
+    } finally {
+      setReportLoading(false);
+    }
+  }
+
+  return (
+    <div className={`min-w-0 max-w-full overflow-hidden ${className}`}>
+      <button
+        type="button"
+        onClick={() => void loadYangmingExplanation()}
+        disabled={loading}
+        className={
+          buttonClassName ||
+          "min-h-10 rounded-2xl bg-amber-50 px-4 py-2 text-sm font-semibold text-amber-900 ring-1 ring-amber-100 transition hover:bg-amber-100 disabled:cursor-wait disabled:opacity-60"
+        }
+      >
+        {loading ? "陽明詳解載入中..." : expanded ? "收合陽明詳解" : "顯示陽明詳解"}
+      </button>
+
+      {expanded ? (
+        <div className={`min-w-0 max-w-full overflow-hidden ${compact ? "mt-3" : "mt-4"}`}>
+          {error ? (
+            <div className="rounded-3xl bg-rose-50 px-4 py-3 text-sm font-semibold text-rose-700 ring-1 ring-rose-100 [overflow-wrap:anywhere]">
+              {error}
+            </div>
+          ) : content ? (
+            <YangmingExplanationContentBlock
+              content={content}
+              onReport={openReportDialog}
+              onCorrect={openCorrectionDialog}
+            />
+          ) : checked ? (
+            <div className="rounded-3xl bg-white/70 px-4 py-3 text-sm font-semibold text-slate-600 ring-1 ring-white/70 [overflow-wrap:anywhere]">
+              <p>此題沒有陽明詳解。</p>
+              <button
+                type="button"
+                onClick={openReportDialog}
+                className="mt-3 rounded-full bg-amber-50 px-3 py-1 text-[11px] font-bold text-amber-800 ring-1 ring-amber-100 transition hover:bg-amber-100"
+              >
+                回報陽明詳解
+              </button>
+            </div>
+          ) : null}
+        </div>
+      ) : null}
+
+      {reportOpen ? (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/35 px-3 py-6 backdrop-blur-sm"
+          onClick={() => {
+            if (!reportLoading) setReportOpen(false);
+          }}
+        >
+          <div
+            className="max-h-[calc(100vh-2rem)] w-full max-w-[calc(100vw-1.5rem)] overflow-y-auto rounded-[2rem] bg-white p-5 shadow-2xl ring-1 ring-slate-200 sm:max-w-lg sm:p-6"
+            onClick={(event) => event.stopPropagation()}
+          >
+            <div className="flex min-w-0 items-start justify-between gap-4">
+              <div className="min-w-0">
+                <p className="text-xs font-black uppercase tracking-[0.22em] text-amber-700">
+                  Yangming Report
+                </p>
+                <h2 className="mt-2 break-words text-xl font-black text-ink [overflow-wrap:anywhere]">
+                  {reportMode === "correction" ? "修正陽明詳解" : "回報陽明詳解"}
+                </h2>
+                <p className="mt-2 break-words text-sm leading-6 text-slate-500 [overflow-wrap:anywhere]">
+                  {reportMode === "correction"
+                    ? "修正版會立刻套用到這題詳解，同時保留原文與修訂紀錄。"
+                    : "可以寫「圖片不對」「表格漏掉」「詳解對錯題」這種原因。"}
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={() => setReportOpen(false)}
+                disabled={reportLoading}
+                className="rounded-full bg-slate-100 px-3 py-1 text-sm font-bold text-slate-600 transition hover:bg-slate-200 disabled:opacity-50"
+              >
+                關閉
+              </button>
+            </div>
+
+            {reportMode === "correction" ? (
+              <div className="mt-4">
+                <label className="text-sm font-bold text-slate-800" htmlFor="yangming-correction">
+                  修正版詳解
+                </label>
+                <textarea
+                  id="yangming-correction"
+                  value={correctionDraft}
+                  onChange={(event) => setCorrectionDraft(event.target.value)}
+                  className="mt-2 h-52 w-full resize-y rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm leading-6 text-slate-800 outline-none transition focus:border-teal-300 focus:bg-white"
+                  maxLength={30000}
+                  placeholder="直接修改這題陽明詳解文字..."
+                />
+                <p className="mt-1 text-right text-xs text-slate-400">{correctionDraft.length}/30000</p>
+
+                {content?.assets?.length ? (
+                  <div className="mt-4 rounded-3xl bg-amber-50/70 p-3 ring-1 ring-amber-100">
+                    <div className="flex items-center justify-between gap-3">
+                      <p className="text-sm font-bold text-amber-900">保留圖片 / 表格</p>
+                      <p className="text-xs font-semibold text-amber-800">
+                        已保留 {keptAssetIndexes.length} / {content.assets.length}
+                      </p>
+                    </div>
+                    <div className="mt-3 grid max-h-64 gap-3 overflow-y-auto pr-1">
+                      {content.assets.map((asset, index) => {
+                        const isKept = keptAssetIndexes.includes(index);
+                        return (
+                          <label
+                            key={`${asset.src}-${index}`}
+                            className={`flex min-w-0 cursor-pointer gap-3 overflow-hidden rounded-2xl bg-white p-2 ring-1 transition ${
+                              isKept ? "ring-teal-200" : "opacity-55 ring-slate-100"
+                            }`}
+                          >
+                            <input
+                              type="checkbox"
+                              checked={isKept}
+                              onChange={() => toggleCorrectionAsset(index)}
+                              className="mt-2"
+                            />
+                            <img
+                              src={asset.src}
+                              alt={asset.alt ?? ""}
+                              loading="lazy"
+                              className="h-20 w-24 shrink-0 rounded-xl object-contain ring-1 ring-slate-100"
+                            />
+                            <span className="min-w-0 flex-1 break-words text-xs font-semibold leading-5 text-slate-600 [overflow-wrap:anywhere]">
+                              {asset.alt || asset.storagePath || `圖片 ${index + 1}`}
+                            </span>
+                          </label>
+                        );
+                      })}
+                    </div>
+                    <p className="mt-2 text-xs leading-5 text-amber-800">
+                      取消勾選只會移除這題詳解裡的圖片引用，不會刪掉原始檔。
+                    </p>
+                  </div>
+                ) : null}
+              </div>
+            ) : null}
+
+            <div className="mt-4">
+              <label className="text-sm font-bold text-slate-800" htmlFor="yangming-report-reason">
+                {reportMode === "correction" ? "修正原因" : "回報原因"}
+              </label>
+              <textarea
+                id="yangming-report-reason"
+                value={reportReason}
+                onChange={(event) => setReportReason(event.target.value)}
+                className="mt-2 h-28 w-full resize-none rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm leading-6 text-slate-800 outline-none transition focus:border-amber-300 focus:bg-white"
+                maxLength={1200}
+                placeholder="例如：這題詳解貼到下一題、表格被截斷、圖片不對..."
+              />
+              <p className="mt-1 text-right text-xs text-slate-400">{reportReason.length}/1200</p>
+            </div>
+
+            {reportMessage ? (
+              <p className="mt-3 rounded-2xl bg-slate-50 px-3 py-2 text-sm font-semibold text-slate-700">
+                {reportMessage}
+              </p>
+            ) : null}
+
+            <div className="mt-5 flex flex-wrap justify-end gap-3">
+              <button
+                type="button"
+                onClick={() => setReportOpen(false)}
+                disabled={reportLoading}
+                className="rounded-2xl bg-slate-100 px-4 py-2 text-sm font-bold text-slate-700 transition hover:bg-slate-200 disabled:opacity-50"
+              >
+                取消
+              </button>
+              <button
+                type="button"
+                onClick={() => void submitReport()}
+                disabled={reportLoading}
+                className="rounded-2xl bg-amber-600 px-4 py-2 text-sm font-bold text-white transition hover:bg-amber-700 disabled:cursor-wait disabled:opacity-60"
+              >
+                {reportLoading ? "送出中..." : reportMode === "correction" ? "套用修正版" : "送出回報"}
+              </button>
+            </div>
+          </div>
+        </div>
+      ) : null}
+    </div>
+  );
+}
