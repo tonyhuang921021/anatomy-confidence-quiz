@@ -36,6 +36,7 @@ type AuthContextValue = {
 
 const AuthContext = createContext<AuthContextValue | null>(null);
 const CLOUD_RESUME_SYNC_TIMEOUT_MS = 4500;
+const CLOUD_FALLBACK_MESSAGE = "雲端同步暫時連不上，先使用本機紀錄；稍後可再按一次同步。";
 
 function getErrorMessage(error: unknown) {
   if (error instanceof Error) return error.message;
@@ -73,6 +74,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [syncError, setSyncError] = useState("");
   const syncInFlightRef = useRef<Promise<void> | null>(null);
 
+  function markLocalSyncFallback(error: unknown) {
+    setSyncStatus("ready");
+    setSyncError(getErrorMessage(error) || CLOUD_FALLBACK_MESSAGE);
+    setSyncVersion((value) => value + 1);
+  }
+
   const refreshCloudData = useCallback(async (targetUserId?: string, targetUser?: User | null) => {
     const userId = targetUserId || user?.id;
     const effectiveUser = targetUser ?? user;
@@ -83,10 +90,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         syncInFlightRef.current,
         CLOUD_RESUME_SYNC_TIMEOUT_MS,
         "雲端續寫同步仍在背景整理，先使用本機紀錄。"
-      ).catch((error) => {
-        setSyncStatus("error");
-        setSyncError(getErrorMessage(error));
-      });
+      ).catch(markLocalSyncFallback);
       return;
     }
 
@@ -103,8 +107,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         setSyncVersion((value) => value + 1);
       })
       .catch((error) => {
-        setSyncStatus("error");
-        setSyncError(getErrorMessage(error));
+        markLocalSyncFallback(error);
       })
       .finally(() => {
         if (syncInFlightRef.current === syncTask) {
@@ -120,8 +123,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         "雲端續寫同步逾時，先使用本機紀錄。"
       );
     } catch (error) {
-      setSyncStatus("error");
-      setSyncError(getErrorMessage(error));
+      markLocalSyncFallback(error);
     }
   }, [configured, user?.id]);
 
