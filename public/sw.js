@@ -11,7 +11,6 @@ self.addEventListener("activate", (event) => {
       .then((keys) =>
         Promise.all(keys.filter((key) => key.startsWith("pwa-")).map((key) => caches.delete(key)))
       )
-      .then(() => self.registration.unregister())
       .then(() => self.clients.claim())
       .then(() =>
         self.clients.matchAll({ type: "window", includeUncontrolled: true }).then((clients) =>
@@ -25,6 +24,7 @@ self.addEventListener("activate", (event) => {
           )
         )
       )
+      .then(() => self.registration.unregister())
   );
 });
 
