@@ -4,6 +4,7 @@ import {
   loadOpenAIBudgetStatus,
   saveOpenAIBudgetUsd
 } from "@/lib/openaiBudget";
+import { isSupabaseRecoveryMode } from "@/lib/supabase/recoveryMode";
 
 type BudgetRequestBody = {
   accessToken?: string;
@@ -39,6 +40,13 @@ export async function GET(request: NextRequest) {
 }
 
 export async function POST(request: NextRequest) {
+  if (isSupabaseRecoveryMode()) {
+    return NextResponse.json(
+      { ok: false, message: "Supabase recovery mode 開啟中，暫時無法更新 AI 補強基金預算。" },
+      { status: 503, headers: { "Cache-Control": "no-store" } }
+    );
+  }
+
   const supabase = getServiceSupabaseClient();
   if (!supabase) {
     return NextResponse.json(

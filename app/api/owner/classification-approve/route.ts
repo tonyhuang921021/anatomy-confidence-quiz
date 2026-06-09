@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
+import { isSupabaseRecoveryMode } from "@/lib/supabase/recoveryMode";
 import type { SubjectName } from "@/types/quiz";
 
 type ApproveClassificationBody = {
@@ -66,6 +67,13 @@ function getServiceSupabaseClient() {
 }
 
 export async function POST(request: NextRequest) {
+  if (isSupabaseRecoveryMode()) {
+    return NextResponse.json(
+      { ok: false, message: "Supabase recovery mode 開啟中，暫時無法套用分類。" },
+      { status: 503, headers: { "Cache-Control": "no-store" } }
+    );
+  }
+
   const supabase = getServiceSupabaseClient();
   if (!supabase) {
     return NextResponse.json(

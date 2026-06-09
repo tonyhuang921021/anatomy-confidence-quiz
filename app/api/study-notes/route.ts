@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 import { normalizeStudyNoteMarkdown } from "@/lib/studyNotes";
+import { isSupabaseRecoveryMode } from "@/lib/supabase/recoveryMode";
 import type {
   StudyNoteDetail,
   StudyNoteQuestionLink,
@@ -290,6 +291,20 @@ async function getOrCreateCollectionId(
 }
 
 export async function GET(request: NextRequest) {
+  if (isSupabaseRecoveryMode()) {
+    const { searchParams } = new URL(request.url);
+    if (searchParams.get("id")) {
+      return NextResponse.json(
+        { ok: false, message: "學習筆記雲端暫時維護中，請稍後再試。" },
+        { status: 503, headers: { "Cache-Control": "no-store" } }
+      );
+    }
+    return NextResponse.json(
+      { ok: true, notes: [], recovery: true },
+      { headers: { "Cache-Control": "no-store" } }
+    );
+  }
+
   const supabase = getServiceSupabaseClient();
   if (!supabase) {
     return NextResponse.json({ ok: false, message: "Supabase 尚未設定。" }, { status: 500 });
@@ -392,6 +407,13 @@ export async function GET(request: NextRequest) {
 }
 
 export async function POST(request: NextRequest) {
+  if (isSupabaseRecoveryMode()) {
+    return NextResponse.json(
+      { ok: false, message: "學習筆記雲端暫時維護中，先讓登入與同步恢復。" },
+      { status: 503, headers: { "Cache-Control": "no-store" } }
+    );
+  }
+
   const supabase = getServiceSupabaseClient();
   if (!supabase) {
     return NextResponse.json({ ok: false, message: "Supabase 尚未設定。" }, { status: 500 });
@@ -502,6 +524,13 @@ export async function POST(request: NextRequest) {
 }
 
 export async function PUT(request: NextRequest) {
+  if (isSupabaseRecoveryMode()) {
+    return NextResponse.json(
+      { ok: false, message: "學習筆記雲端暫時維護中，先讓登入與同步恢復。" },
+      { status: 503, headers: { "Cache-Control": "no-store" } }
+    );
+  }
+
   const supabase = getServiceSupabaseClient();
   if (!supabase) {
     return NextResponse.json({ ok: false, message: "Supabase 尚未設定。" }, { status: 500 });
@@ -630,6 +659,13 @@ export async function PUT(request: NextRequest) {
 }
 
 export async function DELETE(request: NextRequest) {
+  if (isSupabaseRecoveryMode()) {
+    return NextResponse.json(
+      { ok: false, message: "學習筆記雲端暫時維護中，先讓登入與同步恢復。" },
+      { status: 503, headers: { "Cache-Control": "no-store" } }
+    );
+  }
+
   const supabase = getServiceSupabaseClient();
   if (!supabase) {
     return NextResponse.json({ ok: false, message: "Supabase 尚未設定。" }, { status: 500 });

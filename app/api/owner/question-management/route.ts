@@ -11,6 +11,7 @@ import {
   type QuestionManagementTagSuggestion
 } from "@/lib/questionManagement";
 import { createOpenAIText, isOpenAIConfigured } from "@/lib/openai";
+import { isSupabaseRecoveryMode } from "@/lib/supabase/recoveryMode";
 import type { Question, QuestionClassificationOverride } from "@/types/quiz";
 
 type QuestionManagementAction =
@@ -272,6 +273,13 @@ function coerceRelationSuggestion(
 }
 
 export async function POST(request: NextRequest) {
+  if (isSupabaseRecoveryMode()) {
+    return NextResponse.json(
+      { ok: false, message: "Supabase recovery mode 開啟中，題庫管理台暫時停用雲端操作。" },
+      { status: 503, headers: { "Cache-Control": "no-store" } }
+    );
+  }
+
   const supabase = getServiceSupabaseClient();
   if (!supabase) {
     return NextResponse.json(

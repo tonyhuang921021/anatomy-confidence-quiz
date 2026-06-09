@@ -3,6 +3,7 @@ import { createClient } from "@supabase/supabase-js";
 import { createOpenAIText, isOpenAIConfigured } from "@/lib/openai";
 import { getActiveAIAccountBan } from "@/lib/aiAccountBan";
 import { getCanonicalQuestionBank } from "@/data/med1QuestionBank";
+import { isSupabaseRecoveryMode } from "@/lib/supabase/recoveryMode";
 import type {
   OptionKey,
   PeakChallengeLeaderboardEntry,
@@ -869,6 +870,13 @@ async function insertAIUsageLog(
 }
 
 export async function GET(request: NextRequest) {
+  if (isSupabaseRecoveryMode()) {
+    return NextResponse.json(
+      { ok: true, leaderboard: [], attemptStatus: null, recovery: true },
+      { headers: { "Cache-Control": "no-store" } }
+    );
+  }
+
   const supabase = getServiceSupabaseClient();
   if (!supabase) {
     return NextResponse.json(
@@ -909,6 +917,13 @@ export async function GET(request: NextRequest) {
 }
 
 export async function POST(request: NextRequest) {
+  if (isSupabaseRecoveryMode()) {
+    return NextResponse.json(
+      { ok: false, message: "巔峰賽暫時維護中，先讓登入與同步恢復。" },
+      { status: 503, headers: { "Cache-Control": "no-store" } }
+    );
+  }
+
   const supabase = getServiceSupabaseClient();
   if (!supabase) {
     return NextResponse.json(

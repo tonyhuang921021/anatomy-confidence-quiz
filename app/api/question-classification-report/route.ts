@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 import { createOpenAIText, isOpenAIConfigured } from "@/lib/openai";
 import { getActiveAIAccountBan } from "@/lib/aiAccountBan";
+import { isSupabaseRecoveryMode } from "@/lib/supabase/recoveryMode";
 
 type ClassificationReportRequestBody = {
   visitorId?: string;
@@ -304,6 +305,13 @@ function buildClassificationPrompt(question: NonNullable<ClassificationReportReq
 }
 
 export async function POST(request: NextRequest) {
+  if (isSupabaseRecoveryMode()) {
+    return NextResponse.json(
+      { ok: false, message: "分類回報暫時維護中，先讓登入與同步恢復。" },
+      { status: 503, headers: { "Cache-Control": "no-store" } }
+    );
+  }
+
   try {
     const body = (await request.json().catch(() => null)) as ClassificationReportRequestBody | null;
     const question = body?.question;

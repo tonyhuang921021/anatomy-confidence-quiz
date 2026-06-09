@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
+import { isSupabaseRecoveryMode } from "@/lib/supabase/recoveryMode";
 import type { StudyNoteCollection, SubjectName } from "@/types/quiz";
 
 type StudyNoteCollectionRow = {
@@ -90,6 +91,13 @@ async function getNextCollectionDisplayOrder(
 }
 
 export async function GET(request: NextRequest) {
+  if (isSupabaseRecoveryMode()) {
+    return NextResponse.json(
+      { ok: true, collections: [], recovery: true },
+      { headers: { "Cache-Control": "no-store" } }
+    );
+  }
+
   const supabase = getServiceSupabaseClient();
   if (!supabase) {
     return NextResponse.json({ ok: false, message: "Supabase 尚未設定。" }, { status: 500 });
@@ -125,6 +133,13 @@ export async function GET(request: NextRequest) {
 }
 
 export async function POST(request: NextRequest) {
+  if (isSupabaseRecoveryMode()) {
+    return NextResponse.json(
+      { ok: false, message: "學習筆記資料夾暫時維護中，先讓登入與同步恢復。" },
+      { status: 503, headers: { "Cache-Control": "no-store" } }
+    );
+  }
+
   const supabase = getServiceSupabaseClient();
   if (!supabase) {
     return NextResponse.json({ ok: false, message: "Supabase 尚未設定。" }, { status: 500 });
@@ -170,6 +185,13 @@ export async function POST(request: NextRequest) {
 }
 
 export async function PUT(request: NextRequest) {
+  if (isSupabaseRecoveryMode()) {
+    return NextResponse.json(
+      { ok: false, message: "學習筆記資料夾暫時維護中，先讓登入與同步恢復。" },
+      { status: 503, headers: { "Cache-Control": "no-store" } }
+    );
+  }
+
   const supabase = getServiceSupabaseClient();
   if (!supabase) {
     return NextResponse.json({ ok: false, message: "Supabase 尚未設定。" }, { status: 500 });
@@ -231,6 +253,13 @@ export async function PUT(request: NextRequest) {
 }
 
 export async function DELETE(request: NextRequest) {
+  if (isSupabaseRecoveryMode()) {
+    return NextResponse.json(
+      { ok: false, message: "學習筆記資料夾暫時維護中，先讓登入與同步恢復。" },
+      { status: 503, headers: { "Cache-Control": "no-store" } }
+    );
+  }
+
   const supabase = getServiceSupabaseClient();
   if (!supabase) {
     return NextResponse.json({ ok: false, message: "Supabase 尚未設定。" }, { status: 500 });

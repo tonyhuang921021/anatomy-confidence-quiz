@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 import { createOpenAIText, isOpenAIConfigured } from "@/lib/openai";
 import { getActiveAIAccountBan } from "@/lib/aiAccountBan";
+import { isSupabaseRecoveryMode } from "@/lib/supabase/recoveryMode";
 
 type QuestionExplanationRequestBody = {
   action?: "generate" | "sync_override" | "sync_overrides";
@@ -624,6 +625,15 @@ export async function POST(request: NextRequest) {
   const action = body.action ?? "generate";
 
   if (action === "sync_override" || action === "sync_overrides") {
+    if (isSupabaseRecoveryMode()) {
+      return NextResponse.json({
+        ok: true,
+        configured: true,
+        syncedCount: 0,
+        deferred: true
+      });
+    }
+
     try {
       const userEmail = await getVerifiedUserEmail(body.accessToken);
       if (!userEmail) {

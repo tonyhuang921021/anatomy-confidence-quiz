@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 import { normalizeEmail } from "@/lib/aiAccountBan";
+import { isSupabaseRecoveryMode } from "@/lib/supabase/recoveryMode";
 
 type OwnerAIBanBody = {
   accessToken?: string;
@@ -37,6 +38,13 @@ function getServiceSupabaseClient() {
 }
 
 export async function POST(request: NextRequest) {
+  if (isSupabaseRecoveryMode()) {
+    return NextResponse.json(
+      { ok: false, message: "Supabase recovery mode 開啟中，暫時無法管理 AI 冷凍名單。" },
+      { status: 503, headers: { "Cache-Control": "no-store" } }
+    );
+  }
+
   const supabase = getServiceSupabaseClient();
   if (!supabase) {
     return NextResponse.json(
