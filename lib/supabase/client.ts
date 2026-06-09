@@ -1,4 +1,5 @@
 import { createClient, type SupabaseClient } from "@supabase/supabase-js";
+import { isSupabaseRecoveryMode } from "@/lib/supabase/recoveryMode";
 
 let browserClient: SupabaseClient | null = null;
 
@@ -12,6 +13,9 @@ export function isSupabaseConfigured() {
 export function getSupabaseBrowserClient() {
   if (!isSupabaseConfigured()) {
     throw new Error("Supabase environment variables are missing.");
+  }
+  if (isSupabaseRecoveryMode()) {
+    throw new Error("Supabase recovery mode is active.");
   }
 
   if (!browserClient) {
