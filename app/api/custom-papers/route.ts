@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 import { createOpenAIText, isOpenAIConfigured } from "@/lib/openai";
 import { getActiveAIAccountBan } from "@/lib/aiAccountBan";
+import { getRecoveryTimestamp, isSupabaseRecoveryMode } from "@/lib/supabase/recoveryMode";
 import { bundledCustomPaperSeeds } from "@/data/bundledCustomPapers";
 import {
   getCanonicalQuestionBank
@@ -131,6 +132,36 @@ const CUSTOM_PAPER_SELECT_WITH_PAYLOAD =
   "paper_code, name, question_ids, question_payload, subject_filters, difficulty, is_public, created_by_user_id, created_by_email, created_by_label, visitor_id, created_at";
 const CUSTOM_PAPER_SELECT_BASE =
   "paper_code, name, question_ids, subject_filters, difficulty, is_public, created_by_user_id, created_by_email, created_by_label, visitor_id, created_at";
+const CUSTOM_PAPER_RECOVERY_MESSAGE = "自訂卷雲端資料維護中，先顯示網站內建卷；新增、公開與作答排名暫時不寫入雲端。";
+
+function bundledSeedToCustomPaperRow(seed: (typeof bundledCustomPaperSeeds)[number]): CustomPaperRow {
+  return {
+    paper_code: seed.paperCode,
+    name: seed.name,
+    question_ids: seed.questionIds,
+    question_payload: seed.questions ?? null,
+    subject_filters: seed.subjectFilters,
+    difficulty: seed.difficulty,
+    is_public: seed.isPublic,
+    created_by_user_id: null,
+    created_by_email: seed.createdByEmail,
+    created_by_label: seed.createdByLabel,
+    visitor_id: null,
+    created_at: "2026-06-01T00:00:00.000Z"
+  };
+}
+
+function getBundledCustomPaperRow(paperCode: string) {
+  const seed = bundledCustomPaperSeeds.find((item) => item.paperCode.toUpperCase() === paperCode.toUpperCase());
+  return seed ? bundledSeedToCustomPaperRow(seed) : null;
+}
+
+function getBundledPublicCustomPaperRows() {
+  return bundledCustomPaperSeeds
+    .filter((seed) => seed.isPublic)
+    .map(bundledSeedToCustomPaperRow)
+    .slice(0, PUBLIC_PAPER_LIMIT);
+}
 
 function getServiceSupabaseClient() {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
@@ -1046,6 +1077,35 @@ function canEditPaper(
 }
 
 export async function GET(request: NextRequest) {
+  if (isSupabaseRecoveryMode()) {
+    const paperCode = request.nextUrl.searchParams.get("paperCode")?.trim().toUpperCase();
+
+    if (paperCode) {
+      const row = getBundledCustomPaperRow(paperCode);
+      if (!row) {
+        return NextResponse.json(
+          { ok: false, message: CUSTOM_PAPER_RECOVERY_MESSAGE, recovery: true },
+          { status: 503 }
+        );
+      }
+
+      return NextResponse.json({
+        ok: true,
+        recovery: true,
+        recoveredAt: getRecoveryTimestamp(),
+        paper: toPaperDetail(row, [])
+      });
+    }
+
+    return NextResponse.json({
+      ok: true,
+      recovery: true,
+      recoveredAt: getRecoveryTimestamp(),
+      message: CUSTOM_PAPER_RECOVERY_MESSAGE,
+      papers: getBundledPublicCustomPaperRows().map((row) => toPaperSummary(row, []))
+    });
+  }
+
   const supabase = getServiceSupabaseClient();
   if (!supabase) {
     return NextResponse.json(
@@ -1084,6 +1144,34 @@ export async function GET(request: NextRequest) {
 }
 
 export async function POST(request: NextRequest) {
+  if (isSupabaseRecoveryMode()) {
+    const body = (await request.json().catch(() => null)) as
+      | GenerateBody
+      | GenerateAISearchBody
+      | ImportJsonBody
+      | SubmitAttemptBody
+      | UpdateMetadataBody
+      | null;
+
+    if (body?.action === "submit_attempt") {
+      return NextResponse.json({
+        ok: true,
+        recovery: true,
+        deferred: true,
+        message: CUSTOM_PAPER_RECOVERY_MESSAGE
+      });
+    }
+
+    return NextResponse.json(
+      {
+        ok: false,
+        recovery: true,
+        message: CUSTOM_PAPER_RECOVERY_MESSAGE
+      },
+      { status: 503 }
+    );
+  }
+
   const supabase = getServiceSupabaseClient();
   if (!supabase) {
     return NextResponse.json(

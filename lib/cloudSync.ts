@@ -214,7 +214,7 @@ function dedupeAttemptRows<
 }
 
 async function fetchAIExplanationUsageRows() {
-  if (!isSupabaseConfigured()) {
+  if (isSupabaseRecoveryMode() || !isSupabaseConfigured()) {
     return [] as AIExplanationUsageLogRow[];
   }
 
@@ -314,7 +314,7 @@ type OwnerApiPayload = {
 };
 
 async function fetchOwnerApiPayload() {
-  if (!isSupabaseConfigured()) {
+  if (isSupabaseRecoveryMode() || !isSupabaseConfigured()) {
     return null;
   }
 
@@ -703,7 +703,7 @@ function mapRowToSession(
 }
 
 async function fetchActiveQuizSessionRow(userId: string) {
-  if (!isSupabaseConfigured()) return null;
+  if (isSupabaseRecoveryMode() || !isSupabaseConfigured()) return null;
 
   const supabase = getSupabaseBrowserClient();
   const { data, error } = await supabase
@@ -725,7 +725,7 @@ async function fetchActiveQuizSessionRow(userId: string) {
 }
 
 async function fetchSessionAttemptRowsForUser(userId: string, sessionIds: string[]) {
-  if (!isSupabaseConfigured() || sessionIds.length === 0) {
+  if (isSupabaseRecoveryMode() || !isSupabaseConfigured() || sessionIds.length === 0) {
     return [] as QuizSessionAttemptRow[];
   }
 
@@ -754,7 +754,7 @@ async function fetchSessionAttemptRowsForUser(userId: string, sessionIds: string
 }
 
 async function fetchQuizSessionsForUser(userId: string) {
-  if (!isSupabaseConfigured()) return [] as QuizSessionRow[];
+  if (isSupabaseRecoveryMode() || !isSupabaseConfigured()) return [] as QuizSessionRow[];
 
   const supabase = getSupabaseBrowserClient();
   const { data, error } = await supabase
@@ -773,7 +773,7 @@ async function fetchQuizSessionsForUser(userId: string) {
 }
 
 async function fetchQuizSessionByIdForUser(userId: string, sessionId: string) {
-  if (!isSupabaseConfigured() || !sessionId) return null;
+  if (isSupabaseRecoveryMode() || !isSupabaseConfigured() || !sessionId) return null;
 
   const supabase = getSupabaseBrowserClient();
   const { data, error } = await supabase
@@ -2188,7 +2188,7 @@ type PeakChallengeCandidateInput = {
 };
 
 async function buildSupabaseAuthHeader() {
-  if (!isSupabaseConfigured()) return null;
+  if (isSupabaseRecoveryMode() || !isSupabaseConfigured()) return null;
   const client = getSupabaseBrowserClient();
   const { data } = await client.auth.getSession();
   const token = data.session?.access_token;

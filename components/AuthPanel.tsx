@@ -34,8 +34,10 @@ import {
   type AccountPreferencePatch
 } from "@/lib/accountPreferences";
 import { getSupabaseBrowserClient } from "@/lib/supabase/client";
+import { isSupabaseRecoveryMode } from "@/lib/supabase/recoveryMode";
 
 const AUTH_ACTION_TIMEOUT_MS = 8000;
+const RECOVERY_MODE_MESSAGE = "雲端登入與同步維護中，先用訪客模式作答；目前紀錄會先留在本機。";
 
 function getSyncStatusLabel(status: "idle" | "syncing" | "ready" | "error") {
   if (status === "syncing") return "雲端同步中";
@@ -55,6 +57,7 @@ function withTimeout<T>(promise: Promise<T>, timeoutMs: number, message: string)
 }
 
 export function AuthPanel() {
+  const recoveryMode = isSupabaseRecoveryMode();
   const {
     configured,
     loading,
@@ -160,7 +163,7 @@ export function AuthPanel() {
   }, [user?.id, user?.user_metadata]);
 
   async function persistAccountPreferences(patch: AccountPreferencePatch) {
-    if (!user) return;
+    if (!user || recoveryMode) return;
 
     const { error: updateError } = await getSupabaseBrowserClient().auth.updateUser({
       data: {
@@ -236,6 +239,11 @@ export function AuthPanel() {
   }
 
   async function handleSignIn() {
+    if (recoveryMode) {
+      setError(RECOVERY_MODE_MESSAGE);
+      return;
+    }
+
     setSubmitting(true);
     setMessage("");
     setError("");
@@ -265,6 +273,11 @@ export function AuthPanel() {
   }
 
   async function handleSignUp() {
+    if (recoveryMode) {
+      setError(RECOVERY_MODE_MESSAGE);
+      return;
+    }
+
     setSubmitting(true);
     setMessage("");
     setError("");
@@ -299,6 +312,10 @@ export function AuthPanel() {
 
   async function handleSaveNickname() {
     if (!user) return;
+    if (recoveryMode) {
+      setError(RECOVERY_MODE_MESSAGE);
+      return;
+    }
     setSubmitting(true);
     setMessage("");
     setError("");
@@ -330,6 +347,21 @@ export function AuthPanel() {
       <section className="surface-card p-6">
         <p className="eyebrow">Account</p>
         <h2 className="display-title mt-2 text-3xl">Supabase 尚未設定</h2>
+      </section>
+    );
+  }
+
+  if (recoveryMode) {
+    return (
+      <section className="surface-card p-6">
+        <p className="eyebrow">Account</p>
+        <h2 className="display-title mt-2 text-3xl">雲端同步維護中</h2>
+        <p className="body-soft mt-3 text-sm leading-7">
+          目前先暫停登入與跨裝置同步，避免伺服器忙碌時卡住作答。你仍然可以用訪客模式刷題，本機紀錄會保存在這台裝置。
+        </p>
+        <div className="mt-4 rounded-2xl bg-amber-50 p-4 text-sm leading-7 text-amber-900">
+          {RECOVERY_MODE_MESSAGE}
+        </div>
       </section>
     );
   }

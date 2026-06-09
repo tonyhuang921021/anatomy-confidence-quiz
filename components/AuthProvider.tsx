@@ -21,6 +21,7 @@ import {
   getSupabaseBrowserClient,
   isSupabaseConfigured
 } from "@/lib/supabase/client";
+import { isSupabaseRecoveryMode } from "@/lib/supabase/recoveryMode";
 
 type AuthContextValue = {
   user: User | null;
@@ -40,6 +41,7 @@ const CLOUD_RESUME_SYNC_TIMEOUT_MS = 4500;
 const AUTH_SESSION_BOOTSTRAP_TIMEOUT_MS = 3500;
 const CLOUD_FALLBACK_MESSAGE = "雲端同步暫時連不上，先使用本機紀錄；稍後可再按一次同步。";
 const AUTH_FALLBACK_MESSAGE = "登入狀態讀取逾時，先以本機模式使用；如果剛剛已登入，請稍後再按一次同步。";
+const RECOVERY_MODE_MESSAGE = "雲端登入與同步維護中，先使用本機紀錄；作答不會被登入流程卡住。";
 
 function getErrorMessage(error: unknown) {
   if (error instanceof Error) return error.message;
@@ -69,6 +71,7 @@ function withTimeout<T>(promise: Promise<T>, timeoutMs: number, message: string)
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const configured = isSupabaseConfigured();
+  const recoveryMode = isSupabaseRecoveryMode();
   const [user, setUser] = useState<User | null>(null);
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
@@ -84,6 +87,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }
 
   const refreshCloudData = useCallback(async (targetUserId?: string, targetUser?: User | null) => {
+    if (recoveryMode) {
+      setSyncStatus("ready");
+      setSyncError(RECOVERY_MODE_MESSAGE);
+      setSyncVersion((value) => value + 1);
+      return;
+    }
+
     const userId = targetUserId || user?.id;
     const effectiveUser = targetUser ?? user;
     if (!configured || !userId || !effectiveUser) return;
@@ -130,7 +140,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     } catch (error) {
       markLocalSyncFallback(error);
     }
-  }, [configured, user?.id]);
+  }, [configured, recoveryMode, user?.id]);
 
   const applyAuthSession = useCallback((nextSession: Session | null) => {
     setSession(nextSession);
@@ -149,12 +159,24 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const handleSignOut = useCallback(async () => {
     if (!configured) return;
+    if (recoveryMode) {
+      setSession(null);
+      setUser(null);
+      setActiveStorageUser();
+      setSyncStatus("ready");
+      setSyncError(RECOVERY_MODE_MESSAGE);
+      return;
+    }
     await getSupabaseBrowserClient().auth.signOut();
-  }, [configured]);
+  }, [configured, recoveryMode]);
 
   useEffect(() => {
-    if (!configured) {
+    if (!configured || recoveryMode) {
       setActiveStorageUser();
+      setSession(null);
+      setUser(null);
+      setSyncStatus(recoveryMode ? "ready" : "idle");
+      setSyncError(recoveryMode ? RECOVERY_MODE_MESSAGE : "");
       setLoading(false);
       return;
     }
@@ -206,7 +228,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       cancelled = true;
       subscription.unsubscribe();
     };
-  }, [configured]);
+  }, [configured, recoveryMode]);
 
   const value = useMemo<AuthContextValue>(
     () => ({
