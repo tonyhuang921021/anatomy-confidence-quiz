@@ -1555,13 +1555,16 @@ export async function loadLeaderboard(limit = 50) {
   return (data ?? []).map((row) => mapLeaderboardRow(row as LeaderboardRow));
 }
 
+const BACKGROUND_STATS_LOOKUP_LIMIT = 40;
+const BACKGROUND_CLASSIFICATION_LOOKUP_LIMIT = 60;
+
 export async function loadQuestionCommunityStats(questionIds: string[]) {
   if (!isSupabaseConfigured() || questionIds.length === 0) {
     return [] as QuestionCommunityStats[];
   }
 
   const supabase = getSupabaseBrowserClient();
-  const uniqueQuestionIds = Array.from(new Set(questionIds));
+  const uniqueQuestionIds = Array.from(new Set(questionIds)).slice(0, BACKGROUND_STATS_LOOKUP_LIMIT);
   const { data, error } = await supabase
     .from("question_accuracy_stats")
     .select("question_id, total_attempts, correct_attempts, correct_rate, updated_at")
@@ -1650,14 +1653,20 @@ export async function loadConfirmedQuestionClassificationOverrides(questionIds?:
   }
 
   const supabase = getSupabaseBrowserClient();
-  const uniqueQuestionIds = Array.from(new Set((questionIds ?? []).filter(Boolean)));
+  const uniqueQuestionIds = Array.from(new Set((questionIds ?? []).filter(Boolean))).slice(
+    0,
+    BACKGROUND_CLASSIFICATION_LOOKUP_LIMIT
+  );
+
+  if (uniqueQuestionIds.length === 0) {
+    return {} as Record<string, QuestionClassificationOverride>;
+  }
+
   let query = supabase
     .from("question_classification_overrides")
     .select("question_id, subject, chapter, section, source_report_id, updated_at");
 
-  if (uniqueQuestionIds.length > 0) {
-    query = query.in("question_id", uniqueQuestionIds);
-  }
+  query = query.in("question_id", uniqueQuestionIds);
 
   const { data, error } = await query;
 
