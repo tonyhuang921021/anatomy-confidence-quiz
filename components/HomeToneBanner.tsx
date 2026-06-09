@@ -90,7 +90,9 @@ export function HomeToneBanner() {
 
     void refreshStats();
     const intervalId = window.setInterval(() => {
-      void refreshStats();
+      if (document.visibilityState === "visible") {
+        void refreshStats();
+      }
     }, ANXIOUS_STATS_REFRESH_MS);
     document.addEventListener("visibilitychange", handleVisibilityChange);
 

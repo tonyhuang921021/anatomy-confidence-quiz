@@ -27,6 +27,7 @@ type FeedbackMessageRow = {
 
 const FEEDBACK_HOURLY_LIMIT = 3;
 const FEEDBACK_DAILY_LIMIT = 10;
+const FEEDBACK_READ_CACHE_HEADER = "public, s-maxage=60, stale-while-revalidate=300";
 
 function getServiceSupabaseClient() {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
@@ -55,6 +56,28 @@ function mapFeedbackMessageRow(row: FeedbackMessageRow) {
   };
 }
 
+function buildFeedbackTree(rows: FeedbackMessageRow[], limit: number) {
+  const flatMessages = rows.map(mapFeedbackMessageRow);
+  const byParent = new Map<string, ReturnType<typeof mapFeedbackMessageRow>[]>();
+  const roots: ReturnType<typeof mapFeedbackMessageRow>[] = [];
+
+  for (const entry of flatMessages) {
+    if (!entry.parentId) {
+      roots.push(entry);
+      continue;
+    }
+
+    const group = byParent.get(entry.parentId) ?? [];
+    group.push(entry);
+    byParent.set(entry.parentId, group);
+  }
+
+  return roots.slice(0, limit).map((entry) => ({
+    ...entry,
+    replies: (byParent.get(entry.id) ?? []).sort((left, right) => left.createdAt.localeCompare(right.createdAt))
+  }));
+}
+
 function getFeedbackDisplayName(user: VerifiedUser) {
   const displayName = user.displayName?.trim();
   if (displayName) return displayName.slice(0, 24);
@@ -76,6 +99,46 @@ async function getVerifiedUser(supabase: any, accessToken?: string | null): Prom
         ? data.user.user_metadata.display_name
         : null
   };
+}
+
+export async function GET(request: NextRequest) {
+  if (isSupabaseRecoveryMode()) {
+    return NextResponse.json(
+      { ok: true, messages: [], recovery: true },
+      { headers: { "Cache-Control": FEEDBACK_READ_CACHE_HEADER } }
+    );
+  }
+
+  const supabase = getServiceSupabaseClient();
+  if (!supabase) {
+    return NextResponse.json(
+      { ok: true, messages: [] },
+      { headers: { "Cache-Control": FEEDBACK_READ_CACHE_HEADER } }
+    );
+  }
+
+  const requestedLimit = Number(request.nextUrl.searchParams.get("limit") ?? "20");
+  const limit = Number.isFinite(requestedLimit)
+    ? Math.min(40, Math.max(1, Math.trunc(requestedLimit)))
+    : 20;
+
+  try {
+    const { data, error } = await supabase
+      .from("feedback_messages")
+      .select("id, content, parent_id, display_name, is_anonymous, created_at")
+      .order("created_at", { ascending: false })
+      .limit(limit * 4);
+
+    if (error) throw error;
+
+    return NextResponse.json(
+      { ok: true, messages: buildFeedbackTree((data ?? []) as FeedbackMessageRow[], limit) },
+      { headers: { "Cache-Control": FEEDBACK_READ_CACHE_HEADER } }
+    );
+  } catch (error) {
+    const message = error instanceof Error ? error.message : "留言讀取失敗";
+    return NextResponse.json({ ok: false, message }, { status: 500 });
+  }
 }
 
 export async function POST(request: NextRequest) {

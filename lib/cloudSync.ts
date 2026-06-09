@@ -160,18 +160,7 @@ export type CommunityRecentAttemptPoint = {
 
 const AI_SEARCH_USAGE_PREFIX = "AI_SEARCH:";
 
-type FeedbackMessageRow = {
-  id: string | number;
-  content: string;
-  parent_id?: string | number | null;
-  display_name?: string | null;
-  is_anonymous: boolean;
-  created_at: string;
-};
-
 const SUPABASE_PAGE_SIZE = 1000;
-const FEEDBACK_HOURLY_LIMIT = 3;
-const FEEDBACK_DAILY_LIMIT = 10;
 const CURRENT_SESSION_SYNC_MIN_INTERVAL_MS = 15_000;
 
 type CurrentSessionSyncState = {
@@ -344,17 +333,6 @@ async function fetchOwnerApiPayload() {
   }
 
   return payload;
-}
-
-function mapFeedbackMessageRow(row: FeedbackMessageRow): FeedbackMessage {
-  return {
-    id: String(row.id),
-    content: row.content,
-    parentId: row.parent_id ? String(row.parent_id) : undefined,
-    displayName: row.display_name ?? undefined,
-    isAnonymous: row.is_anonymous,
-    createdAt: row.created_at
-  };
 }
 
 function mapQuestionClassificationOverrideRow(
@@ -1750,35 +1728,18 @@ export async function loadFeedbackMessages(limit = 20): Promise<FeedbackMessage[
     return [];
   }
 
-  const supabase = getSupabaseBrowserClient();
-  const { data, error } = await supabase
-    .from("feedback_messages")
-    .select("id, content, parent_id, display_name, is_anonymous, created_at")
-    .order("created_at", { ascending: false })
-    .limit(limit * 4);
+  const response = await fetch(`/api/feedback?limit=${encodeURIComponent(String(limit))}`, {
+    cache: "no-store"
+  });
+  const payload = (await response.json().catch(() => null)) as
+    | { ok?: boolean; message?: string; messages?: FeedbackMessage[] }
+    | null;
 
-  if (error) {
-    throw error;
+  if (!response.ok || !payload?.ok) {
+    throw new Error(payload?.message || "留言讀取失敗");
   }
 
-  const flatMessages = ((data ?? []) as FeedbackMessageRow[]).map(mapFeedbackMessageRow);
-  const byParent = new Map<string, FeedbackMessage[]>();
-  const roots: FeedbackMessage[] = [];
-
-  for (const entry of flatMessages) {
-    if (!entry.parentId) {
-      roots.push({ ...entry, replies: [] });
-      continue;
-    }
-    const group = byParent.get(entry.parentId) ?? [];
-    group.push({ ...entry, replies: [] });
-    byParent.set(entry.parentId, group);
-  }
-
-  return roots.slice(0, limit).map((entry) => ({
-    ...entry,
-    replies: (byParent.get(entry.id) ?? []).sort((left, right) => left.createdAt.localeCompare(right.createdAt))
-  }));
+  return payload.messages ?? [];
 }
 
 export async function createFeedbackMessage(input: {
