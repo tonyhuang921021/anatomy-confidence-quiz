@@ -341,7 +341,7 @@ export function YangmingExplanationPanel({
         setReportMessage(payload?.message || "回報失敗，請再試一次。");
         return;
       }
-      if (reportMode === "correction") {
+      if (reportMode === "correction" && content) {
         const correctedContent = {
           ...content,
           body: correctionDraft.trim(),
