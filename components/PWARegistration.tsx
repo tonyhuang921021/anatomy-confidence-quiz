@@ -3,6 +3,8 @@
 import { useEffect } from "react";
 import { isSupabaseRecoveryMode } from "@/lib/supabase/recoveryMode";
 
+const RECOVERY_SW_RELOAD_KEY = "pwa-recovery-sw-reload-v2";
+
 function isSafariBrowser() {
   if (typeof navigator === "undefined") return false;
   const userAgent = navigator.userAgent;
@@ -25,7 +27,8 @@ export function PWARegistration() {
       return;
     }
 
-    const disableServiceWorker = async () => {
+    const disableServiceWorker = async (reloadControlledPage = false) => {
+      const hasController = Boolean(navigator.serviceWorker.controller);
       try {
         const registrations = await navigator.serviceWorker.getRegistrations();
         await Promise.all(registrations.map((registration) => registration.unregister()));
@@ -33,16 +36,25 @@ export function PWARegistration() {
         // Ignore unregister failures.
       }
       await clearPwaCaches();
+
+      if (!reloadControlledPage || !hasController) return;
+      try {
+        if (sessionStorage.getItem(RECOVERY_SW_RELOAD_KEY) === "done") return;
+        sessionStorage.setItem(RECOVERY_SW_RELOAD_KEY, "done");
+        window.location.reload();
+      } catch {
+        window.location.reload();
+      }
     };
 
     const register = async () => {
       try {
         if (isSupabaseRecoveryMode() || isSafariBrowser()) {
-          await disableServiceWorker();
+          await disableServiceWorker(true);
           return;
         }
 
-        await navigator.serviceWorker.register("/sw.js?v=4", { scope: "/" });
+        await navigator.serviceWorker.register("/sw.js?v=5", { scope: "/" });
       } catch (error) {
         console.error("Service worker registration failed:", error);
       }
