@@ -54028,13 +54028,13 @@ export const moexMed1RemainingDetailedV4Merged0011827 = {
       "options": {
         "A": "第一咽囊（1st pharyngeal pouch）",
         "B": "第二咽囊（2nd pharyngeal pouch）",
-        "C": "rd",
-        "D": "第三咽囊（3 pharyngeal pouch） 第四咽囊（4th pharyngeal pouch）"
+        "C": "第三咽囊（3rd pharyngeal pouch）",
+        "D": "第四咽囊（4th pharyngeal pouch）"
       },
       "option_A": "第一咽囊（1st pharyngeal pouch）",
       "option_B": "第二咽囊（2nd pharyngeal pouch）",
-      "option_C": "rd",
-      "option_D": "第三咽囊（3 pharyngeal pouch） 第四咽囊（4th pharyngeal pouch）",
+      "option_C": "第三咽囊（3rd pharyngeal pouch）",
+      "option_D": "第四咽囊（4th pharyngeal pouch）",
       "option_E": "",
       "option_count": 4,
       "answer": "D",
@@ -54043,12 +54043,12 @@ export const moexMed1RemainingDetailedV4Merged0011827 = {
       ],
       "answer_credit_type": "standard",
       "answer_note": "第29題",
-      "explanation": "甲狀腺濾泡旁細胞(C cells)源自神經嵴細胞，經第四/第五咽囊的 ultimobranchial body 進入甲狀腺。此題選項文字抽取有錯位，官方答案 D 對應第四咽囊相關來源。",
+      "explanation": "甲狀腺濾泡旁細胞（C cells）源自神經嵴細胞，經第四咽囊相關的 ultimobranchial body 進入甲狀腺，因此本題選第四咽囊。",
       "option_analysis": {
         "A": "第一咽囊形成中耳腔與耳咽管等，不是 C cell 來源。",
         "B": "第二咽囊與腭扁桃體相關。",
-        "C": "選項文字抽取不完整，不足以作答。",
-        "D": "正確，官方答案對應第四咽囊/ultimobranchial body 相關來源。"
+        "C": "第三咽囊形成胸腺與下副甲狀腺，不是甲狀腺濾泡旁細胞主要來源。",
+        "D": "正確，第四咽囊相關的 ultimobranchial body 與甲狀腺濾泡旁細胞來源有關。"
       },
       "exam_point": "Parafollicular C cells arise from neural crest via ultimobranchial body。",
       "difficulty": "中偏難",
