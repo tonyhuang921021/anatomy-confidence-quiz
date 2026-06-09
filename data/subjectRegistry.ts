@@ -51,7 +51,7 @@ export const subjectRegistry: Record<SubjectName, SubjectRegistryItem> = {
   "生物化學": {
     subject: "生物化學",
     enabled: med1QuestionsBySubject["生物化學"].length > 0,
-    label: "生物化學（含細胞／分子）",
+    label: "生物化學",
     chapters: med1OutlinesBySubject["生物化學"],
     questions: med1QuestionsBySubject["生物化學"]
   },

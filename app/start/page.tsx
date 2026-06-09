@@ -8,7 +8,6 @@ import { enabledSubjects, MED1_SUBJECTS, MED2_SUBJECTS } from "@/data/subjectReg
 import { getSeasonalLimitedQuestions } from "@/data/med1QuestionBank";
 import { DEFAULT_QUIZ_SETTINGS } from "@/lib/quizAnalysis";
 import {
-  BIOCHEMISTRY_SUBJECT,
   getAllSubjectTrackKeys,
   getSubjectTrackLabels,
   getSubjectTracks,
@@ -47,9 +46,7 @@ export default function StartPage() {
   const med2Subjects = selectableSubjects.filter((item) => MED2_SUBJECTS.includes(item.subject));
   const [selectedSubjects, setSelectedSubjects] = useState<SubjectName[]>([]);
   const [microbiologyExpanded, setMicrobiologyExpanded] = useState(false);
-  const [biochemistryExpanded, setBiochemistryExpanded] = useState(false);
   const [selectedMicrobiologyTracks, setSelectedMicrobiologyTracks] = useState<SubjectTrackKey<typeof MICROBIOLOGY_SUBJECT>[]>([]);
-  const [selectedBiochemistryTracks, setSelectedBiochemistryTracks] = useState<SubjectTrackKey<typeof BIOCHEMISTRY_SUBJECT>[]>([]);
   const [includeSeasonalLimited, setIncludeSeasonalLimited] = useState(false);
   const seasonalLimitedQuestions = useMemo(() => getSeasonalLimitedQuestions(), []);
   const seasonalLimitedPastExamCount = useMemo(
@@ -112,20 +109,6 @@ export default function StartPage() {
     });
   }, [selectedMicrobiologyTracks]);
 
-  useEffect(() => {
-    setSelectedSubjects((current) => {
-      const hasBiochemistry = current.includes(BIOCHEMISTRY_SUBJECT);
-
-      if (selectedBiochemistryTracks.length > 0) {
-        return hasBiochemistry ? current : [...current, BIOCHEMISTRY_SUBJECT];
-      }
-
-      return hasBiochemistry
-        ? current.filter((subject) => subject !== BIOCHEMISTRY_SUBJECT)
-        : current;
-    });
-  }, [selectedBiochemistryTracks]);
-
   const selectedSubjectQuestionPool = useMemo(() => {
     if (selectedSubjects.length === 0) return [];
 
@@ -138,15 +121,9 @@ export default function StartPage() {
           );
         }
 
-        if (item.subject === BIOCHEMISTRY_SUBJECT && selectedBiochemistryTracks.length > 0) {
-          return item.questions.filter((question) =>
-            questionMatchesSubjectTracks(question, BIOCHEMISTRY_SUBJECT, selectedBiochemistryTracks)
-          );
-        }
-
         return item.questions;
       });
-  }, [selectedBiochemistryTracks, selectedMicrobiologyTracks, selectedSubjects]);
+  }, [selectedMicrobiologyTracks, selectedSubjects]);
 
   const availableQuestionCount = useMemo(() => {
     const filteredSubjectQuestions = selectedSubjectQuestionPool.filter((question) => {
@@ -189,7 +166,7 @@ export default function StartPage() {
     : Math.min(practiceQuestionCount, availableQuestionCount);
 
   function toggleSubject(subject: SubjectName) {
-    if (subject === MICROBIOLOGY_SUBJECT || subject === BIOCHEMISTRY_SUBJECT) {
+    if (subject === MICROBIOLOGY_SUBJECT) {
       toggleTrackSubject(subject);
       return;
     }
@@ -202,29 +179,19 @@ export default function StartPage() {
   }
 
   function getSelectedTrackKeys(subject: TrackSubject) {
-    return subject === MICROBIOLOGY_SUBJECT ? selectedMicrobiologyTracks : selectedBiochemistryTracks;
+    return selectedMicrobiologyTracks;
   }
 
   function setSelectedTrackKeys(subject: TrackSubject, keys: string[]) {
-    if (subject === MICROBIOLOGY_SUBJECT) {
-      setSelectedMicrobiologyTracks(keys as SubjectTrackKey<typeof MICROBIOLOGY_SUBJECT>[]);
-      return;
-    }
-
-    setSelectedBiochemistryTracks(keys as SubjectTrackKey<typeof BIOCHEMISTRY_SUBJECT>[]);
+    setSelectedMicrobiologyTracks(keys as SubjectTrackKey<typeof MICROBIOLOGY_SUBJECT>[]);
   }
 
   function setTrackExpanded(subject: TrackSubject, expanded: boolean | ((current: boolean) => boolean)) {
-    if (subject === MICROBIOLOGY_SUBJECT) {
-      setMicrobiologyExpanded(expanded);
-      return;
-    }
-
-    setBiochemistryExpanded(expanded);
+    setMicrobiologyExpanded(expanded);
   }
 
   function isTrackExpanded(subject: TrackSubject) {
-    return subject === MICROBIOLOGY_SUBJECT ? microbiologyExpanded : biochemistryExpanded;
+    return microbiologyExpanded;
   }
 
   function toggleTrackSubject(subject: TrackSubject) {
@@ -243,17 +210,8 @@ export default function StartPage() {
         ? current.filter((item) => item !== trackKey)
         : [...current, trackKey];
 
-    if (subject === MICROBIOLOGY_SUBJECT) {
-      setSelectedMicrobiologyTracks((current) =>
-        nextUpdater(current).filter((key): key is SubjectTrackKey<typeof MICROBIOLOGY_SUBJECT> =>
-          allKeys.includes(key as never)
-        )
-      );
-      return;
-    }
-
-    setSelectedBiochemistryTracks((current) =>
-      nextUpdater(current).filter((key): key is SubjectTrackKey<typeof BIOCHEMISTRY_SUBJECT> =>
+    setSelectedMicrobiologyTracks((current) =>
+      nextUpdater(current).filter((key): key is SubjectTrackKey<typeof MICROBIOLOGY_SUBJECT> =>
         allKeys.includes(key as never)
       )
     );
@@ -262,9 +220,7 @@ export default function StartPage() {
   function selectAllSubjects() {
     setSelectedSubjects(selectableSubjects.map((item) => item.subject));
     setSelectedMicrobiologyTracks(getAllSubjectTrackKeys(MICROBIOLOGY_SUBJECT));
-    setSelectedBiochemistryTracks(getAllSubjectTrackKeys(BIOCHEMISTRY_SUBJECT));
     setMicrobiologyExpanded(true);
-    setBiochemistryExpanded(true);
   }
 
   function renderSubjectGroup(
@@ -417,8 +373,7 @@ export default function StartPage() {
   function handleStart() {
     if ((selectedSubjects.length === 0 && !includeSeasonalLimited) || availableQuestionCount === 0) return;
 
-    const shouldUseExactStartPool =
-      selectedMicrobiologyTracks.length > 0 || selectedBiochemistryTracks.length > 0;
+    const shouldUseExactStartPool = selectedMicrobiologyTracks.length > 0;
     const exactStartQuestionIds = shouldUseExactStartPool
       ? Array.from(
           new Set(
@@ -434,7 +389,6 @@ export default function StartPage() {
         )
       : undefined;
     const selectedMicrobiologyLabels = getSubjectTrackLabels(MICROBIOLOGY_SUBJECT, selectedMicrobiologyTracks);
-    const selectedBiochemistryLabels = getSubjectTrackLabels(BIOCHEMISTRY_SUBJECT, selectedBiochemistryTracks);
 
     const nextSettings: QuizSettings = {
       ...DEFAULT_QUIZ_SETTINGS,
@@ -455,14 +409,9 @@ export default function StartPage() {
       strictCustomQuestionPool: shouldUseExactStartPool,
       customPoolLabel: shouldUseExactStartPool
         ? `開始測驗：${[
-            ...selectedSubjects.filter(
-              (subject) => subject !== MICROBIOLOGY_SUBJECT && subject !== BIOCHEMISTRY_SUBJECT
-            ),
+            ...selectedSubjects.filter((subject) => subject !== MICROBIOLOGY_SUBJECT),
             selectedMicrobiologyLabels.length > 0
               ? `微生物免疫學（${selectedMicrobiologyLabels.join("、")}）`
-              : null,
-            selectedBiochemistryLabels.length > 0
-              ? `生物化學（${selectedBiochemistryLabels.join("、")}）`
               : null,
             includeSeasonalLimited ? "季節限定" : null
           ].filter(Boolean).join("、")}`

@@ -3,17 +3,13 @@ import type { Question, SubjectName } from "@/types/quiz";
 export const MICROBIOLOGY_SUBJECT = "微生物免疫學" as SubjectName;
 export const BIOCHEMISTRY_SUBJECT = "生物化學" as SubjectName;
 
-export type TrackSubject = typeof MICROBIOLOGY_SUBJECT | typeof BIOCHEMISTRY_SUBJECT;
+export type TrackSubject = typeof MICROBIOLOGY_SUBJECT;
 
 export const SUBJECT_TRACKS = {
   [MICROBIOLOGY_SUBJECT]: [
     { key: "virus", label: "病毒" },
     { key: "bacteria", label: "細菌" },
     { key: "immunity", label: "免疫" }
-  ],
-  [BIOCHEMISTRY_SUBJECT]: [
-    { key: "biochemistry", label: "生化" },
-    { key: "molecular", label: "分生" }
   ]
 } as const;
 
@@ -169,52 +165,12 @@ const MICROBIOLOGY_KEYWORDS: Record<MicrobiologyTrackKey, string[]> = {
   ]
 };
 
-const MOLECULAR_KEYWORDS = [
-  "分子",
-  "細胞",
-  "molecular",
-  "cell biology",
-  "cellular",
-  "gene",
-  "genetic",
-  "genome",
-  "chromosome",
-  "dna",
-  "rna",
-  "mrna",
-  "trna",
-  "rrna",
-  "replication",
-  "transcription",
-  "translation",
-  "轉錄",
-  "轉譯",
-  "複製",
-  "基因",
-  "染色體",
-  "核酸",
-  "核苷酸",
-  "蛋白質合成",
-  "ribosome",
-  "promoter",
-  "operon",
-  "lac",
-  "pcr",
-  "western blot",
-  "northern blot",
-  "southern blot",
-  "細胞週期",
-  "cell cycle",
-  "訊息傳遞",
-  "signal transduction"
-];
-
 function normalizeSearchText(value: string) {
   return value.toLocaleLowerCase("en-US");
 }
 
 export function isTrackSubject(subject?: string | null): subject is TrackSubject {
-  return subject === MICROBIOLOGY_SUBJECT || subject === BIOCHEMISTRY_SUBJECT;
+  return subject === MICROBIOLOGY_SUBJECT;
 }
 
 export function getSubjectTracks(subject: TrackSubject) {
@@ -272,14 +228,6 @@ export function getQuestionTrackKeys(question: Question): SubjectTrackKey[] {
         )
       )
       .map((track) => track.key);
-  }
-
-  if (question.subject === BIOCHEMISTRY_SUBJECT) {
-    const text = getQuestionSearchText(question);
-    const looksMolecular = MOLECULAR_KEYWORDS.some((keyword) =>
-      text.includes(keyword.toLocaleLowerCase("en-US"))
-    );
-    return [looksMolecular ? "molecular" : "biochemistry"];
   }
 
   return [];
