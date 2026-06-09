@@ -1706,7 +1706,7 @@ export async function loadVisitorStats(): Promise<VisitorStats> {
     };
   }
 
-  const response = await fetch("/api/visitor-stats", { cache: "no-store" });
+  const response = await fetch("/api/visitor-stats");
   const payload = (await response.json().catch(() => null)) as
     | { ok?: boolean; message?: string; stats?: VisitorStats }
     | null;
@@ -1718,7 +1718,7 @@ export async function loadVisitorStats(): Promise<VisitorStats> {
   return payload.stats;
 }
 
-export async function loadFeedbackMessages(limit = 40): Promise<FeedbackMessage[]> {
+export async function loadFeedbackMessages(limit = 20): Promise<FeedbackMessage[]> {
   if (!isSupabaseConfigured()) {
     return [];
   }

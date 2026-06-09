@@ -98,10 +98,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setSyncError("");
 
     const syncTask = syncCompletedSessionsForCurrentUser(userId)
-      .then((completedSessions) =>
-        syncLeaderboardProfileForCurrentUser(effectiveUser, completedSessions).then(() => completedSessions)
-      )
-      .then(() => syncCurrentSessionForCurrentUser(userId))
+      .then((completedSessions) => {
+        void syncLeaderboardProfileForCurrentUser(effectiveUser, completedSessions).catch((error) => {
+          console.error("Leaderboard sync skipped:", error);
+        });
+        return syncCurrentSessionForCurrentUser(userId);
+      })
       .then(() => {
         setSyncStatus("ready");
         setSyncVersion((value) => value + 1);

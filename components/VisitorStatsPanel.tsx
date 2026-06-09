@@ -5,7 +5,7 @@ import { loadVisitorStats } from "@/lib/cloudSync";
 import { isSupabaseConfigured } from "@/lib/supabase/client";
 import type { VisitorStats } from "@/types/quiz";
 
-const REFRESH_INTERVAL_MS = 3 * 60 * 1000;
+const REFRESH_INTERVAL_MS = 15 * 60 * 1000;
 
 const emptyStats: VisitorStats = {
   totalVisitors: 0,
@@ -23,6 +23,11 @@ export function VisitorStatsPanel({ compact = false }: VisitorStatsPanelProps) {
   const [error, setError] = useState("");
 
   useEffect(() => {
+    if (compact) {
+      setLoading(false);
+      return;
+    }
+
     if (!isSupabaseConfigured()) {
       setLoading(false);
       return;
@@ -66,7 +71,7 @@ export function VisitorStatsPanel({ compact = false }: VisitorStatsPanelProps) {
       window.clearInterval(intervalId);
       document.removeEventListener("visibilitychange", handleVisibilityChange);
     };
-  }, []);
+  }, [compact]);
 
   if (!isSupabaseConfigured()) {
     if (compact) return null;

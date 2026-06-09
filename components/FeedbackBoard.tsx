@@ -110,10 +110,6 @@ export function FeedbackBoard() {
       } catch {
         // Keep the feedback board quiet if the budget badge is unavailable.
       }
-
-      void loadBudget("/api/openai-budget").catch(() => {
-        // Keep the fast pinned message visible even if the live costs call is slow or unavailable.
-      });
     }
 
     void fetchBudget();

@@ -2,10 +2,15 @@
 
 import Link from "next/link";
 import { useAuth } from "@/components/AuthProvider";
-import { VisitorStatsPanel } from "@/components/VisitorStatsPanel";
 
 export function UserStatusBar() {
-  const { configured, loading, user, syncStatus } = useAuth();
+  const { configured, loading, user, syncStatus, syncError } = useAuth();
+  const syncLabel =
+    syncStatus === "syncing"
+      ? "雲端同步中"
+      : syncError
+        ? "本機可用"
+        : "已同步";
 
   return (
     <div className="topbar-shell sticky top-0 z-50 backdrop-blur-xl">
@@ -17,7 +22,6 @@ export function UserStatusBar() {
           一階醫師國考刷題測驗
         </Link>
         <div className="flex min-w-0 flex-wrap items-center justify-end gap-2 text-[11px] font-semibold">
-          <VisitorStatsPanel compact />
           {!configured ? <span className="stat-chip">Supabase 未設定</span> : null}
           {!loading ? (
             <span className="stat-chip max-w-full break-all">
@@ -25,8 +29,17 @@ export function UserStatusBar() {
             </span>
           ) : null}
           {configured && user ? (
-            <span className="rounded-full bg-emerald-50 px-3 py-1 text-emerald-800 ring-1 ring-emerald-100 dark-success-chip">
-              {syncStatus}
+            <span
+              className={`rounded-full px-3 py-1 ring-1 ${
+                syncStatus === "syncing"
+                  ? "bg-amber-50 text-amber-800 ring-amber-100"
+                  : syncError
+                    ? "bg-slate-50 text-slate-600 ring-slate-200"
+                    : "bg-emerald-50 text-emerald-800 ring-emerald-100 dark-success-chip"
+              }`}
+              title={syncError || undefined}
+            >
+              {syncLabel}
             </span>
           ) : null}
         </div>

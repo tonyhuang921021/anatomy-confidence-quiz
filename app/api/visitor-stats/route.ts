@@ -5,6 +5,7 @@ export const dynamic = "force-dynamic";
 export const revalidate = 0;
 
 const ONLINE_WINDOW_MS = 2 * 60 * 1000;
+const VISITOR_STATS_CACHE_CONTROL = "public, s-maxage=300, stale-while-revalidate=600";
 
 function getServiceSupabaseClient() {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
@@ -27,7 +28,7 @@ export async function GET() {
   if (!supabase) {
     return NextResponse.json(
       { ok: true, stats: { totalVisitors: 0, onlineVisitors: 0, updatedAt: new Date().toISOString() } },
-      { headers: { "Cache-Control": "no-store, no-cache, must-revalidate, proxy-revalidate" } }
+      { headers: { "Cache-Control": VISITOR_STATS_CACHE_CONTROL } }
     );
   }
 
@@ -54,7 +55,7 @@ export async function GET() {
           updatedAt: new Date().toISOString()
         }
       },
-      { headers: { "Cache-Control": "no-store, no-cache, must-revalidate, proxy-revalidate" } }
+      { headers: { "Cache-Control": VISITOR_STATS_CACHE_CONTROL } }
     );
   } catch (error) {
     const message = error instanceof Error ? error.message : "visitor-stats-failed";
