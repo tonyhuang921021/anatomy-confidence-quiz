@@ -8,6 +8,7 @@ import { FeedbackBoard } from "@/components/FeedbackBoard";
 import { HomeToneBanner } from "@/components/HomeToneBanner";
 import { HomeWeaknessInsight } from "@/components/HomeWeaknessInsight";
 import { OwnerOnlyNotesLink } from "@/components/OwnerOnlyNotesLink";
+import { isSupabaseRecoveryMode } from "@/lib/supabase/recoveryMode";
 
 type HomeAnimationStyle = CSSProperties & {
   "--home-delay"?: string;
@@ -62,6 +63,43 @@ const QUICK_ENTRIES = [
 ] as const;
 
 export default function HomePage() {
+  if (isSupabaseRecoveryMode()) {
+    return (
+      <main className="shell home-shell">
+        <section className="surface-card overflow-hidden p-6 sm:p-8 lg:p-10">
+          <p className="eyebrow">Recovery Mode</p>
+          <h1 className="display-title mt-4 max-w-4xl text-[3rem] leading-[1] sm:text-6xl lg:text-[5rem]">
+            雲端同步維護中
+          </h1>
+          <p className="body-soft mt-5 max-w-3xl text-base leading-8 sm:text-lg">
+            目前先暫停登入、留言板、跨裝置同步與雲端筆記，讓作答頁維持順暢。你仍然可以用訪客模式刷題，本機紀錄會留在這台裝置。
+          </p>
+          <div className="mt-8 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+            <Link href="/start" className="home-action-card home-action-primary">
+              <span className="text-sm font-bold">開始測驗</span>
+              <span className="mt-2 text-xs opacity-75">本機散題刷題</span>
+            </Link>
+            <Link href="/simulation" className="home-action-card">
+              <span className="text-sm font-bold">開始一份考古題</span>
+              <span className="mt-2 text-xs opacity-75">整回練習</span>
+            </Link>
+            <Link href="/results" className="home-action-card">
+              <span className="text-sm font-bold">查看本機結果</span>
+              <span className="mt-2 text-xs opacity-75">先看此裝置紀錄</span>
+            </Link>
+            <Link href="/search" className="home-action-card">
+              <span className="text-sm font-bold">題目搜尋</span>
+              <span className="mt-2 text-xs opacity-75">查題與複習</span>
+            </Link>
+          </div>
+          <div className="mt-8 rounded-[2rem] bg-amber-50/80 p-5 text-sm font-semibold leading-7 text-amber-900 ring-1 ring-amber-100">
+            如果你原本已經開著舊分頁，那個分頁可能仍會嘗試連雲端；從這個首頁重新進入會使用新的維護模式。
+          </div>
+        </section>
+      </main>
+    );
+  }
+
   return (
     <main className="shell home-shell">
       <section className="home-hero surface-card overflow-hidden p-5 sm:p-7 lg:p-10">

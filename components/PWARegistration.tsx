@@ -41,7 +41,7 @@ export function PWARegistration() {
           return;
         }
 
-        await navigator.serviceWorker.register("/sw.js?v=2", { scope: "/" });
+        await navigator.serviceWorker.register("/sw.js?v=3", { scope: "/" });
       } catch (error) {
         console.error("Service worker registration failed:", error);
       }

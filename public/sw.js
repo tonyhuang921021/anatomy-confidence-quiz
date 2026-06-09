@@ -1,4 +1,4 @@
-const CACHE_VERSION = "pwa-v2";
+const CACHE_VERSION = "pwa-v3";
 const SHELL_CACHE = `${CACHE_VERSION}-shell`;
 const RUNTIME_CACHE = `${CACHE_VERSION}-runtime`;
 const OFFLINE_URL = "/offline.html";
@@ -27,7 +27,19 @@ self.addEventListener("activate", (event) => {
           .filter((key) => key !== SHELL_CACHE && key !== RUNTIME_CACHE)
           .map((key) => caches.delete(key))
       )
-    ).then(() => self.clients.claim())
+    )
+      .then(() => self.clients.claim())
+      .then(() =>
+        self.clients.matchAll({ type: "window", includeUncontrolled: true }).then((clients) =>
+          Promise.all(
+            clients.map((client) =>
+              "navigate" in client && typeof client.navigate === "function"
+                ? client.navigate("/")
+                : Promise.resolve(null)
+            )
+          )
+        )
+      )
   );
 });
 
