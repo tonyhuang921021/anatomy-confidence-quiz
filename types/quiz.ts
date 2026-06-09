@@ -288,6 +288,7 @@ export type QuestionHistoryStats = {
   lowConfidence: number;
   overconfidence: number;
   lastAttemptedAt?: string;
+  lastAttemptCorrect?: boolean;
   latestErrorType?: ErrorType;
 };
 

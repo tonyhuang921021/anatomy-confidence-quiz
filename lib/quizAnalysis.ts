@@ -629,6 +629,7 @@ export function buildQuestionHistoryMap(allSessions: { attempts: Attempt[] }[]) 
 
       if (!current.lastAttemptedAt || attempt.answeredAt > current.lastAttemptedAt) {
         current.lastAttemptedAt = attempt.answeredAt;
+        current.lastAttemptCorrect = attempt.isCorrect;
       }
 
       map.set(attempt.questionId, current);

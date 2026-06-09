@@ -8,6 +8,7 @@ import { StudyNoteMarkdown } from "@/components/StudyNoteMarkdown";
 import { getCanonicalQuestionBank } from "@/data/med1QuestionBank";
 import { MED1_SUBJECTS, MED2_SUBJECTS, subjectRegistry } from "@/data/subjectRegistry";
 import { isNoteSubject } from "@/lib/noteSubjects";
+import { BIOCHEMISTRY_SUBJECT } from "@/lib/questionTrackFilters";
 import {
   filterMicrobiologyImmunologyNotes,
   isMicrobiologyImmunologySubject,
@@ -39,6 +40,14 @@ import type {
   StudyNoteDetail,
   SubjectName
 } from "@/types/quiz";
+
+function getAllowedQuestionSubjectsForNote(note: StudyNoteDetail): SubjectName[] {
+  if (note.subject === BIOCHEMISTRY_SUBJECT) {
+    return ["生物化學", "細胞生物學", "分子生物學"];
+  }
+
+  return note.subject ? [note.subject] : [];
+}
 
 function buildQuestionMap(): Map<string, Question> {
   return new Map(
@@ -300,17 +309,25 @@ export default function SubjectNotesPage() {
     rootOutlineItemsRef.current = rootOutlineItems;
   }, [rootOutlineItems]);
   const currentRelatedQuestionCount = currentNote?.questionLinks
-    .filter((link) => questionMap.has(link.questionId))
+    .filter((link) => {
+      const question = questionMap.get(link.questionId);
+      if (!currentNote || !question) return false;
+      return getAllowedQuestionSubjectsForNote(currentNote).includes(question.subject);
+    })
     .length ?? 0;
   const activeQuestionNote = notes.find((note) => note.id === activeQuestionNoteId);
   const activeRelatedQuestions = useMemo(() => {
     if (!activeQuestionNote) return [];
+    const allowedSubjects = getAllowedQuestionSubjectsForNote(activeQuestionNote);
     return activeQuestionNote.questionLinks
       .map((link) => ({
         link,
         question: questionMap.get(link.questionId)
       }))
-      .filter((item): item is { link: typeof item.link; question: Question } => Boolean(item.question));
+      .filter(
+        (item): item is { link: typeof item.link; question: Question } =>
+          item.question !== undefined && allowedSubjects.includes(item.question.subject)
+      );
   }, [activeQuestionNote, questionMap]);
 
   useEffect(() => {

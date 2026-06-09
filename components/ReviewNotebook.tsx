@@ -53,6 +53,14 @@ function sortByRecent<T extends ReviewQuestionItem>(items: T[]) {
   });
 }
 
+function isResolvedReviewItem(item: ReviewQuestionItem) {
+  return (
+    (item.history.wrong > 0 || item.history.lowConfidence > 0) &&
+    item.history.correct >= 2 &&
+    item.history.lastAttemptCorrect === true
+  );
+}
+
 function applyLocalExplanationOverride(
   question: Question,
   override?: QuestionExplanationOverride
@@ -260,7 +268,7 @@ export function ReviewNotebook({
   const [classificationReportMessageMap, setClassificationReportMessageMap] = useState<Record<string, string>>({});
   const [classificationOverrides, setClassificationOverrides] = useState<Record<string, QuestionClassificationOverride>>({});
   const [communityStatsMap, setCommunityStatsMap] = useState<Record<string, QuestionCommunityStats>>({});
-  const [activeCategory, setActiveCategory] = useState<"wrong" | "lowConfidence">("wrong");
+  const [activeCategory, setActiveCategory] = useState<"wrong" | "lowConfidence" | "resolved">("wrong");
   const [visibleCount, setVisibleCount] = useState(40);
   const [selectedSubjects, setSelectedSubjects] = useState<SubjectName[]>([]);
   const questionIdsKey = useMemo(
@@ -299,17 +307,30 @@ export function ReviewNotebook({
         : renderedItems.filter((item) => selectedSubjects.includes(item.renderedQuestion.subject)),
     [renderedItems, selectedSubjects]
   );
-  const wrongItems = useMemo(
-    () => sortByRecent(filteredItems.filter((item) => item.history.wrong > 0)),
+  const unresolvedItems = useMemo(
+    () => filteredItems.filter((item) => !isResolvedReviewItem(item)),
     [filteredItems]
+  );
+  const resolvedItems = useMemo(
+    () => sortByRecent(filteredItems.filter((item) => isResolvedReviewItem(item))),
+    [filteredItems]
+  );
+  const wrongItems = useMemo(
+    () => sortByRecent(unresolvedItems.filter((item) => item.history.wrong > 0)),
+    [unresolvedItems]
   );
   const lowConfidenceItems = useMemo(
-    () => sortByRecent(filteredItems.filter((item) => item.history.lowConfidence > 0)),
-    [filteredItems]
+    () => sortByRecent(unresolvedItems.filter((item) => item.history.lowConfidence > 0)),
+    [unresolvedItems]
   );
   const activeItems = useMemo(
-    () => (activeCategory === "wrong" ? wrongItems : lowConfidenceItems),
-    [activeCategory, lowConfidenceItems, wrongItems]
+    () =>
+      activeCategory === "wrong"
+        ? wrongItems
+        : activeCategory === "lowConfidence"
+          ? lowConfidenceItems
+          : resolvedItems,
+    [activeCategory, lowConfidenceItems, resolvedItems, wrongItems]
   );
   const visibleItems = useMemo(
     () => activeItems.slice(0, visibleCount),
@@ -317,6 +338,18 @@ export function ReviewNotebook({
   );
 
   useEffect(() => {
+    if (activeCategory === "resolved" && resolvedItems.length === 0) {
+      if (wrongItems.length > 0) {
+        setActiveCategory("wrong");
+        return;
+      }
+
+      if (lowConfidenceItems.length > 0) {
+        setActiveCategory("lowConfidence");
+        return;
+      }
+    }
+
     if (activeCategory === "wrong" && wrongItems.length === 0 && lowConfidenceItems.length > 0) {
       setActiveCategory("lowConfidence");
       return;
@@ -324,8 +357,18 @@ export function ReviewNotebook({
 
     if (activeCategory === "lowConfidence" && lowConfidenceItems.length === 0 && wrongItems.length > 0) {
       setActiveCategory("wrong");
+      return;
     }
-  }, [activeCategory, lowConfidenceItems.length, wrongItems.length]);
+
+    if (
+      activeCategory !== "resolved" &&
+      wrongItems.length === 0 &&
+      lowConfidenceItems.length === 0 &&
+      resolvedItems.length > 0
+    ) {
+      setActiveCategory("resolved");
+    }
+  }, [activeCategory, lowConfidenceItems.length, resolvedItems.length, wrongItems.length]);
 
   useEffect(() => {
     setVisibleCount(40);
@@ -629,8 +672,19 @@ export function ReviewNotebook({
           {headerAction}
           <Link
             href={startHref}
-            onClick={() => onStartReview?.(filteredItems)}
-            className="min-h-12 rounded-2xl bg-brand-600 px-4 py-3 text-sm font-semibold text-white transition hover:bg-brand-700"
+            onClick={(event) => {
+              if (unresolvedItems.length === 0) {
+                event.preventDefault();
+                return;
+              }
+              onStartReview?.(unresolvedItems);
+            }}
+            aria-disabled={unresolvedItems.length === 0}
+            className={`min-h-12 rounded-2xl px-4 py-3 text-sm font-semibold transition ${
+              unresolvedItems.length === 0
+                ? "pointer-events-none bg-slate-200 text-slate-500"
+                : "bg-brand-600 text-white hover:bg-brand-700"
+            }`}
           >
             {startLabel}
           </Link>
@@ -711,18 +765,38 @@ export function ReviewNotebook({
                   {lowConfidenceItems.length}
                 </span>
               </button>
+              <button
+                type="button"
+                onClick={() => setActiveCategory("resolved")}
+                className={`min-h-12 rounded-2xl px-4 py-3 text-sm font-semibold transition ${
+                  activeCategory === "resolved"
+                    ? "bg-emerald-100 text-emerald-900 ring-1 ring-emerald-300"
+                    : "bg-slate-100 text-slate-700 hover:bg-slate-200"
+                }`}
+              >
+                已解決
+                <span className="ml-2 rounded-full bg-white/80 px-2 py-0.5 text-xs font-semibold">
+                  {resolvedItems.length}
+                </span>
+              </button>
             </div>
 
             <div>
               <div className="flex flex-wrap items-center gap-3">
                 <h3 className="text-xl font-semibold text-ink">
-                  {activeCategory === "wrong" ? "錯題區" : "沒信心題區"}
+                  {activeCategory === "wrong"
+                    ? "錯題區"
+                    : activeCategory === "lowConfidence"
+                      ? "沒信心題區"
+                      : "已解決錯題"}
                 </h3>
                 <span
                   className={`rounded-full px-3 py-1 text-xs font-semibold ${
                     activeCategory === "wrong"
                       ? "bg-rose-100 text-rose-900"
-                      : "bg-amber-100 text-amber-900"
+                      : activeCategory === "lowConfidence"
+                        ? "bg-amber-100 text-amber-900"
+                        : "bg-emerald-100 text-emerald-900"
                   }`}
                 >
                   {activeItems.length} 題
@@ -733,7 +807,9 @@ export function ReviewNotebook({
                   <div className="rounded-3xl bg-slate-50 p-5 text-sm text-slate-500">
                     {activeCategory === "wrong"
                       ? "目前沒有符合篩選條件的錯題。"
-                      : "目前沒有符合篩選條件的低信心題。"}
+                      : activeCategory === "lowConfidence"
+                        ? "目前沒有符合篩選條件的低信心題。"
+                        : "目前還沒有答對兩次以上的已解決錯題。"}
                   </div>
                 ) : (
                   visibleItems.map((item, index) => (
@@ -742,7 +818,9 @@ export function ReviewNotebook({
                       className={`rounded-3xl border p-5 ${
                         activeCategory === "wrong"
                           ? "border-rose-200 bg-rose-50/60"
-                          : "border-amber-200 bg-amber-50/70"
+                          : activeCategory === "lowConfidence"
+                            ? "border-amber-200 bg-amber-50/70"
+                            : "border-emerald-200 bg-emerald-50/70"
                       }`}
                     >
                       {(() => {
@@ -760,10 +838,16 @@ export function ReviewNotebook({
                                       className={`rounded-full px-3 py-1 text-xs font-semibold ${
                                         activeCategory === "wrong"
                                           ? "bg-rose-100 text-rose-900"
-                                          : "bg-amber-100 text-amber-900"
+                                          : activeCategory === "lowConfidence"
+                                            ? "bg-amber-100 text-amber-900"
+                                            : "bg-emerald-100 text-emerald-900"
                                       }`}
                                     >
-                                      {activeCategory === "wrong" ? `錯題 ${index + 1}` : `沒信心 ${index + 1}`}
+                                      {activeCategory === "wrong"
+                                        ? `錯題 ${index + 1}`
+                                        : activeCategory === "lowConfidence"
+                                          ? `沒信心 ${index + 1}`
+                                          : `已解決 ${index + 1}`}
                                     </span>
                                     <span className="min-w-0 text-sm text-slate-500">
                                       {renderedQuestion.chapter} / {renderedQuestion.section}
