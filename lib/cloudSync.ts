@@ -1555,18 +1555,20 @@ export async function loadQuestionCommunityStats(questionIds: string[]) {
     return [] as QuestionCommunityStats[];
   }
 
-  const supabase = getSupabaseBrowserClient();
   const uniqueQuestionIds = Array.from(new Set(questionIds)).slice(0, BACKGROUND_STATS_LOOKUP_LIMIT);
-  const { data, error } = await supabase
-    .from("question_accuracy_stats")
-    .select("question_id, total_attempts, correct_attempts, correct_rate, updated_at")
-    .in("question_id", uniqueQuestionIds);
+  const response = await fetch(
+    `/api/question-background-data?kind=stats&ids=${encodeURIComponent(uniqueQuestionIds.join(","))}`,
+    { cache: "no-store" }
+  );
+  const payload = (await response.json().catch(() => null)) as
+    | { ok?: boolean; message?: string; stats?: QuestionAccuracyStatRow[] }
+    | null;
 
-  if (error) {
-    throw error;
+  if (!response.ok || !payload?.ok) {
+    throw new Error(payload?.message || "題目統計讀取失敗");
   }
 
-  return (data ?? []).map((row) => mapQuestionAccuracyStatRow(row as QuestionAccuracyStatRow));
+  return (payload.stats ?? []).map((row) => mapQuestionAccuracyStatRow(row as QuestionAccuracyStatRow));
 }
 
 export async function loadSharedQuestionExplanationOverrides(questionIds: string[]) {
@@ -1574,19 +1576,21 @@ export async function loadSharedQuestionExplanationOverrides(questionIds: string
     return {} as Record<string, QuestionExplanationOverride>;
   }
 
-  const supabase = getSupabaseBrowserClient();
   const uniqueQuestionIds = Array.from(new Set(questionIds)).slice(0, 20);
-  const { data, error } = await supabase
-    .from("question_explanation_overrides")
-    .select("question_id, explanation, option_analysis, memory_tip, model, updated_at")
-    .in("question_id", uniqueQuestionIds);
+  const response = await fetch(
+    `/api/question-background-data?kind=explanations&ids=${encodeURIComponent(uniqueQuestionIds.join(","))}`,
+    { cache: "no-store" }
+  );
+  const payload = (await response.json().catch(() => null)) as
+    | { ok?: boolean; message?: string; overrides?: QuestionExplanationOverrideRow[] }
+    | null;
 
-  if (error) {
-    throw error;
+  if (!response.ok || !payload?.ok) {
+    throw new Error(payload?.message || "共享詳解讀取失敗");
   }
 
   return Object.fromEntries(
-    (data ?? []).map((row) => {
+    (payload.overrides ?? []).map((row) => {
       const typedRow = row as QuestionExplanationOverrideRow;
       return [typedRow.question_id, mapQuestionExplanationOverrideRow(typedRow)] as const;
     })
@@ -1647,7 +1651,6 @@ export async function loadConfirmedQuestionClassificationOverrides(questionIds?:
     return {} as Record<string, QuestionClassificationOverride>;
   }
 
-  const supabase = getSupabaseBrowserClient();
   const uniqueQuestionIds = Array.from(new Set((questionIds ?? []).filter(Boolean))).slice(
     0,
     BACKGROUND_CLASSIFICATION_LOOKUP_LIMIT
@@ -1657,20 +1660,20 @@ export async function loadConfirmedQuestionClassificationOverrides(questionIds?:
     return {} as Record<string, QuestionClassificationOverride>;
   }
 
-  let query = supabase
-    .from("question_classification_overrides")
-    .select("question_id, subject, chapter, section, source_report_id, updated_at");
+  const response = await fetch(
+    `/api/question-background-data?kind=classifications&ids=${encodeURIComponent(uniqueQuestionIds.join(","))}`,
+    { cache: "no-store" }
+  );
+  const payload = (await response.json().catch(() => null)) as
+    | { ok?: boolean; message?: string; overrides?: QuestionClassificationOverrideRow[] }
+    | null;
 
-  query = query.in("question_id", uniqueQuestionIds);
-
-  const { data, error } = await query;
-
-  if (error) {
-    throw error;
+  if (!response.ok || !payload?.ok) {
+    throw new Error(payload?.message || "分類覆蓋讀取失敗");
   }
 
   return Object.fromEntries(
-    (data ?? []).map((row) => {
+    (payload.overrides ?? []).map((row) => {
       const typedRow = row as QuestionClassificationOverrideRow;
       return [typedRow.question_id, mapQuestionClassificationOverrideRow(typedRow)] as const;
     })
