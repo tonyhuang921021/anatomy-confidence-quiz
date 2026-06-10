@@ -16,6 +16,7 @@ type YangmingExplanationResponse = {
   ok?: boolean;
   explanation?: YangmingExplanationContent | null;
   message?: string;
+  degraded?: boolean;
 };
 
 const yangmingExplanationCache = new Map<string, YangmingExplanationContent | null>();
@@ -493,6 +494,9 @@ export function YangmingExplanationPanel({
             const payload = (await response.json().catch(() => null)) as YangmingExplanationResponse | null;
             if (!response.ok || !payload?.ok) {
               throw new Error(payload?.message || "陽明詳解載入失敗。");
+            }
+            if (payload.degraded && !payload.explanation) {
+              throw new Error(payload.message || "陽明詳解暫時讀不到，晚點再試一次。");
             }
             return payload.explanation ?? null;
           })

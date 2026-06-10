@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 import { isSupabaseRecoveryMode } from "@/lib/supabase/recoveryMode";
+import { withServerTimeout } from "@/lib/serverTimeout";
 
 type YangmingExplanationRequestBody = {
   accessToken?: string | null;
@@ -237,11 +238,15 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ ok: false, message: "缺少題號。" }, { status: 400 });
     }
 
-    const { data: explanationRow, error: explanationError } = await supabase
-      .from("yangming_question_explanations")
-      .select("question_id, body, author, reviewer, source_label, source_file, source_page_start, source_page_end, question_stem_snapshot, answer_snapshot, sections, assets, match_status, match_score")
-      .eq("question_id", questionId)
-      .maybeSingle();
+    const { data: explanationRow, error: explanationError } = await withServerTimeout(
+      supabase
+        .from("yangming_question_explanations")
+        .select("question_id, body, author, reviewer, source_label, source_file, source_page_start, source_page_end, question_stem_snapshot, answer_snapshot, sections, assets, match_status, match_score")
+        .eq("question_id", questionId)
+        .maybeSingle(),
+      2500,
+      "陽明詳解讀取逾時"
+    );
 
     if (explanationError) {
       const message = String(explanationError.message ?? "");
@@ -293,6 +298,13 @@ export async function POST(request: NextRequest) {
     });
   } catch (error) {
     const message = error instanceof Error ? error.message : "詳解載入失敗";
-    return NextResponse.json({ ok: false, message }, { status: 500 });
+    return NextResponse.json(
+      { ok: true, explanation: null, degraded: true, message },
+      {
+        headers: {
+          "Cache-Control": "public, s-maxage=30, stale-while-revalidate=120"
+        }
+      }
+    );
   }
 }

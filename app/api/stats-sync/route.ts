@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 import { isSupabaseRecoveryMode } from "@/lib/supabase/recoveryMode";
+import { isServerTimeoutError, withServerTimeout } from "@/lib/serverTimeout";
 
 type StatsSyncBody = {
   questionIds?: string[];
@@ -45,6 +46,7 @@ const MAX_REQUEST_BYTES = 300_000;
 const MAX_ATTEMPT_ROWS_PER_REQUEST = 250;
 const MAX_DEVICE_DAILY_ROWS_PER_REQUEST = 90;
 const MAX_DEVICE_IDS_PER_LOOKUP = 50;
+const STATS_SYNC_TIMEOUT_MS = 4500;
 
 function getTaipeiDayKey(date: Date) {
   return new Intl.DateTimeFormat("en-CA", {
@@ -360,21 +362,36 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const newAttemptRows = await upsertAttemptRows(supabase, attemptRows);
+    await withServerTimeout(
+      (async () => {
+        const newAttemptRows = await upsertAttemptRows(supabase, attemptRows);
 
-    const [, newDeviceDailyRows] = await Promise.all([
-      body.deviceRow ? upsertAttemptDevice(supabase, body.deviceRow) : Promise.resolve(),
-      upsertAttemptDeviceDaily(supabase, deviceDailyRows)
-    ]);
+        const [, newDeviceDailyRows] = await Promise.all([
+          body.deviceRow ? upsertAttemptDevice(supabase, body.deviceRow) : Promise.resolve(),
+          upsertAttemptDeviceDaily(supabase, deviceDailyRows)
+        ]);
 
-    await Promise.all([
-      refreshQuestionAccuracyStatsFromAttempts(supabase, newAttemptRows),
-      refreshOwnerDailyStatsFromAttempts(supabase, newAttemptRows, newDeviceDailyRows)
-    ]);
+        await Promise.all([
+          refreshQuestionAccuracyStatsFromAttempts(supabase, newAttemptRows),
+          refreshOwnerDailyStatsFromAttempts(supabase, newAttemptRows, newDeviceDailyRows)
+        ]);
+      })(),
+      STATS_SYNC_TIMEOUT_MS,
+      "統計同步逾時，已改為稍後再補"
+    );
 
     return NextResponse.json({ ok: true });
   } catch (error) {
     const message = error instanceof Error ? error.message : "統計同步失敗";
+    if (
+      isServerTimeoutError(error) ||
+      /timeout|timed out|terminated|connection/i.test(message)
+    ) {
+      return NextResponse.json(
+        { ok: true, deferred: true, message },
+        { status: 202, headers: { "Cache-Control": "no-store" } }
+      );
+    }
     return NextResponse.json({ ok: false, message }, { status: 500 });
   }
 }

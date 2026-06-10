@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 import { isSupabaseRecoveryMode } from "@/lib/supabase/recoveryMode";
+import { withServerTimeout } from "@/lib/serverTimeout";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
@@ -59,19 +60,23 @@ async function countAttemptsForDay(supabase: ReturnType<typeof getServiceSupabas
   }
 
   const { startIso, endIso } = getTaipeiDayRange(dayKey);
-  const [attemptResult, correctResult] = await Promise.all([
-    supabase
-      .from("question_attempt_logs")
-      .select("session_id", { count: "exact", head: true })
-      .gte("answered_at", startIso)
-      .lt("answered_at", endIso),
-    supabase
-      .from("question_attempt_logs")
-      .select("session_id", { count: "exact", head: true })
-      .eq("is_correct", true)
-      .gte("answered_at", startIso)
-      .lt("answered_at", endIso)
-  ]);
+  const [attemptResult, correctResult] = await withServerTimeout(
+    Promise.all([
+      supabase
+        .from("question_attempt_logs")
+        .select("session_id", { count: "exact", head: true })
+        .gte("answered_at", startIso)
+        .lt("answered_at", endIso),
+      supabase
+        .from("question_attempt_logs")
+        .select("session_id", { count: "exact", head: true })
+        .eq("is_correct", true)
+        .gte("answered_at", startIso)
+        .lt("answered_at", endIso)
+    ]),
+    1600,
+    "首頁社群統計補查逾時"
+  );
 
   if (attemptResult.error) throw attemptResult.error;
   if (correctResult.error) throw correctResult.error;
@@ -121,10 +126,14 @@ export async function GET(request: Request) {
 
   try {
     const dayKeys = getRecentTaipeiDayKeys(days);
-    const { data, error } = await supabase
-      .from("owner_daily_stats")
-      .select("activity_date, attempts")
-      .in("activity_date", dayKeys);
+    const { data, error } = await withServerTimeout(
+      supabase
+        .from("owner_daily_stats")
+        .select("activity_date, attempts")
+        .in("activity_date", dayKeys),
+      1600,
+      "首頁社群統計讀取逾時"
+    );
 
     if (error) throw error;
 
@@ -138,8 +147,14 @@ export async function GET(request: Request) {
     const fallbackCounts = new Map<string, { attempts: number; correctRate: number }>();
 
     if (fallbackDayKeys.length > 0) {
-      const fallbackResults = await Promise.all(
-        fallbackDayKeys.map(async (date) => [date, await countAttemptsForDay(supabase, date)] as const)
+      const fallbackResults = await withServerTimeout(
+        Promise.all(
+          fallbackDayKeys
+            .slice(-2)
+            .map(async (date) => [date, await countAttemptsForDay(supabase, date)] as const)
+        ),
+        2200,
+        "首頁社群統計補查逾時"
       );
 
       for (const [date, stats] of fallbackResults) {
@@ -167,15 +182,21 @@ export async function GET(request: Request) {
       }
     );
   } catch (error) {
+    const dayKeys = getRecentTaipeiDayKeys(days);
     return NextResponse.json(
       {
-        ok: false,
-        message: error instanceof Error ? error.message : "首頁社群統計載入失敗"
+        ok: true,
+        degraded: true,
+        message: error instanceof Error ? error.message : "首頁社群統計載入失敗",
+        points: dayKeys.map((date) => ({
+          date,
+          attempts: 0,
+          correctRate: 0
+        }))
       },
       {
-        status: 500,
         headers: {
-          "Cache-Control": "no-store, no-cache, must-revalidate, proxy-revalidate"
+          "Cache-Control": "public, s-maxage=60, stale-while-revalidate=120"
         }
       }
     );

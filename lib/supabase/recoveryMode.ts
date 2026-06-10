@@ -1,13 +1,8 @@
 export function isSupabaseRecoveryMode() {
-  const configured = process.env.NEXT_PUBLIC_SUPABASE_RECOVERY_MODE;
-  if (configured === "off") return false;
-  if (configured === "true") return true;
-
-  // Keep the app usable while Supabase Auth/REST are timing out. Turn this off
-  // only after DB recovery with NEXT_PUBLIC_SUPABASE_RECOVERY_MODE=off.
-  // Older deployments may still have this set to "false"; do not let that
-  // bypass the emergency circuit breaker during the current outage.
-  return true;
+  const configured = process.env.NEXT_PUBLIC_SUPABASE_RECOVERY_MODE?.trim().toLowerCase();
+  if (!configured) return false;
+  if (["off", "false", "0", "no"].includes(configured)) return false;
+  return ["on", "true", "1", "yes"].includes(configured);
 }
 
 export function getRecoveryTimestamp() {
