@@ -48,6 +48,25 @@ const MAX_DEVICE_DAILY_ROWS_PER_REQUEST = 90;
 const MAX_DEVICE_IDS_PER_LOOKUP = 50;
 const STATS_SYNC_TIMEOUT_MS = 4500;
 
+function isMissingCorrectAttemptsColumn(error: unknown) {
+  const maybeError = error as { code?: string; message?: string; details?: string; hint?: string } | null;
+  const haystack = [
+    maybeError?.code,
+    maybeError?.message,
+    maybeError?.details,
+    maybeError?.hint
+  ]
+    .filter(Boolean)
+    .join(" ")
+    .toLowerCase();
+
+  return (
+    haystack.includes("correct_attempts") ||
+    haystack.includes("pgrst204") ||
+    haystack.includes("42703")
+  );
+}
+
 function getTaipeiDayKey(date: Date) {
   return new Intl.DateTimeFormat("en-CA", {
     timeZone: "Asia/Taipei",
@@ -278,40 +297,66 @@ async function refreshOwnerDailyStatsFromAttempts(
   ).sort();
   if (uniqueDates.length === 0) return;
 
-  const { data, error } = await supabase
+  let supportsCorrectAttempts = true;
+  let { data, error } = await supabase
     .from("owner_daily_stats")
-    .select("activity_date, attempts, devices")
+    .select("activity_date, attempts, correct_attempts, devices")
     .in("activity_date", uniqueDates);
+
+  if (error && isMissingCorrectAttemptsColumn(error)) {
+    supportsCorrectAttempts = false;
+    const fallbackResult = await supabase
+      .from("owner_daily_stats")
+      .select("activity_date, attempts, devices")
+      .in("activity_date", uniqueDates);
+    data = fallbackResult.data;
+    error = fallbackResult.error;
+  }
 
   if (error) throw error;
 
   const currentStats = new Map(
-    ((data ?? []) as { activity_date: string; attempts: number; devices: number }[]).map((row) => [
+    ((data ?? []) as { activity_date: string; attempts: number; correct_attempts?: number | null; devices: number }[]).map((row) => [
       row.activity_date,
       {
         attempts: Number(row.attempts ?? 0),
+        correctAttempts: Number(row.correct_attempts ?? 0),
         devices: Number(row.devices ?? 0)
       }
     ] as const)
   );
   const attemptMap = new Map<string, number>();
+  const correctAttemptMap = new Map<string, number>();
   const deviceMap = new Map<string, number>();
 
   for (const row of attemptRows) {
     const dayKey = getTaipeiDayKey(new Date(row.answered_at));
     attemptMap.set(dayKey, (attemptMap.get(dayKey) ?? 0) + 1);
+    if (row.is_correct) {
+      correctAttemptMap.set(dayKey, (correctAttemptMap.get(dayKey) ?? 0) + 1);
+    }
   }
 
   for (const row of deviceDailyRows) {
     deviceMap.set(row.activity_date, (deviceMap.get(row.activity_date) ?? 0) + 1);
   }
 
-  const rows = uniqueDates.map((activityDate) => ({
-    activity_date: activityDate,
-    attempts: (currentStats.get(activityDate)?.attempts ?? 0) + (attemptMap.get(activityDate) ?? 0),
-    devices: (currentStats.get(activityDate)?.devices ?? 0) + (deviceMap.get(activityDate) ?? 0),
-    updated_at: new Date().toISOString()
-  }));
+  const rows = uniqueDates.map((activityDate) => {
+    const baseRow = {
+      activity_date: activityDate,
+      attempts: (currentStats.get(activityDate)?.attempts ?? 0) + (attemptMap.get(activityDate) ?? 0),
+      devices: (currentStats.get(activityDate)?.devices ?? 0) + (deviceMap.get(activityDate) ?? 0),
+      updated_at: new Date().toISOString()
+    };
+
+    if (!supportsCorrectAttempts) return baseRow;
+
+    return {
+      ...baseRow,
+      correct_attempts:
+        (currentStats.get(activityDate)?.correctAttempts ?? 0) + (correctAttemptMap.get(activityDate) ?? 0)
+    };
+  });
 
   const { error: upsertError } = await supabase
     .from("owner_daily_stats")

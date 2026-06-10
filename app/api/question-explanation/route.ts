@@ -3,6 +3,7 @@ import { createClient } from "@supabase/supabase-js";
 import { createOpenAIText, isOpenAIConfigured } from "@/lib/openai";
 import { getActiveAIAccountBan } from "@/lib/aiAccountBan";
 import { isSupabaseRecoveryMode } from "@/lib/supabase/recoveryMode";
+import { isServerTimeoutError, withServerTimeout } from "@/lib/serverTimeout";
 
 type QuestionExplanationRequestBody = {
   action?: "generate" | "sync_override" | "sync_overrides";
@@ -227,7 +228,7 @@ async function checkUsageLimits(rateKey: string) {
   const hourAgo = new Date(now - 60 * 60 * 1000).toISOString();
   const dayAgo = new Date(now - 24 * 60 * 60 * 1000).toISOString();
 
-  const [hourResult, dayResult] = await Promise.all([
+  const [hourResult, dayResult] = await withServerTimeout(Promise.all([
     supabase
       .from("ai_explanation_usage_logs")
       .select("*", { count: "exact", head: true })
@@ -238,7 +239,7 @@ async function checkUsageLimits(rateKey: string) {
       .select("*", { count: "exact", head: true })
       .eq("rate_key", rateKey)
       .gte("used_at", dayAgo)
-  ]);
+  ]), 1600, "AI 詳解用量檢查逾時");
 
   const errors = [hourResult.error, dayResult.error].filter(Boolean);
   if (errors.length > 0) {
@@ -269,7 +270,14 @@ async function insertUsageLog(row: UsageLogRow, accessToken?: string) {
   const supabase = getSupabaseWriteClient(accessToken);
   if (!supabase) return;
 
-  const { error } = await supabase.from("ai_explanation_usage_logs").insert(row);
+  const { error } = await withServerTimeout(
+    supabase.from("ai_explanation_usage_logs").insert(row),
+    1800,
+    "AI 詳解使用紀錄寫入逾時"
+  ).catch((error) => {
+    console.error("AI explanation usage log skipped:", error);
+    return { error: null };
+  });
   if (!error) {
     return;
   }
@@ -282,7 +290,14 @@ async function insertUsageLog(row: UsageLogRow, accessToken?: string) {
     model: row.model,
     used_at: row.used_at
   };
-  const { error: fallbackError } = await supabase.from("ai_explanation_usage_logs").insert(fallbackRow);
+  const { error: fallbackError } = await withServerTimeout(
+    supabase.from("ai_explanation_usage_logs").insert(fallbackRow),
+    1800,
+    "AI 詳解使用紀錄寫入逾時"
+  ).catch((error) => {
+    console.error("AI explanation usage fallback log skipped:", error);
+    return { error: null };
+  });
   if (fallbackError) {
     console.error("AI explanation usage log skipped:", fallbackError);
   }
@@ -722,13 +737,23 @@ export async function POST(request: NextRequest) {
     const rateKey = userEmail?.trim().toLowerCase() || visitorId || fallbackKey;
 
     if (!isBypassEmail(userEmail)) {
-      const usageStatus = await checkUsageLimits(rateKey);
+      const usageStatus = await checkUsageLimits(rateKey).catch((error) => {
+        if (isServerTimeoutError(error)) {
+          console.warn("AI explanation usage check skipped:", error.message);
+          return { blocked: false };
+        }
+        throw error;
+      });
       if (usageStatus?.blocked) {
+        const blockedMessage =
+          "message" in usageStatus && usageStatus.message
+            ? usageStatus.message
+            : "這個裝置暫時無法使用 AI 詳解，請稍後再試。";
         return NextResponse.json(
           {
             ok: false,
             configured: true,
-            message: usageStatus.message
+            message: blockedMessage
           },
           { status: 429 }
         );

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 import { isSupabaseRecoveryMode } from "@/lib/supabase/recoveryMode";
+import { withServerTimeout } from "@/lib/serverTimeout";
 
 type FeedbackBody = {
   accessToken?: string | null;
@@ -123,11 +124,15 @@ export async function GET(request: NextRequest) {
     : 20;
 
   try {
-    const { data, error } = await supabase
-      .from("feedback_messages")
-      .select("id, content, parent_id, display_name, is_anonymous, created_at")
-      .order("created_at", { ascending: false })
-      .limit(limit * 4);
+    const { data, error } = await withServerTimeout(
+      supabase
+        .from("feedback_messages")
+        .select("id, content, parent_id, display_name, is_anonymous, created_at")
+        .order("created_at", { ascending: false })
+        .limit(limit * 4),
+      1600,
+      "留言讀取逾時"
+    );
 
     if (error) throw error;
 
@@ -137,7 +142,10 @@ export async function GET(request: NextRequest) {
     );
   } catch (error) {
     const message = error instanceof Error ? error.message : "留言讀取失敗";
-    return NextResponse.json({ ok: false, message }, { status: 500 });
+    return NextResponse.json(
+      { ok: true, degraded: true, message, messages: [] },
+      { headers: { "Cache-Control": FEEDBACK_READ_CACHE_HEADER } }
+    );
   }
 }
 
@@ -179,7 +187,7 @@ export async function POST(request: NextRequest) {
       const hourAgo = new Date(now - 60 * 60 * 1000).toISOString();
       const dayAgo = new Date(now - 24 * 60 * 60 * 1000).toISOString();
 
-      const [hourResult, dayResult] = await Promise.all([
+      const [hourResult, dayResult] = await withServerTimeout(Promise.all([
         supabase
           .from("feedback_messages")
           .select("*", { count: "exact", head: true })
@@ -190,7 +198,7 @@ export async function POST(request: NextRequest) {
           .select("*", { count: "exact", head: true })
           .eq(actorColumn, actorValue)
           .gte("created_at", dayAgo)
-      ]);
+      ]), 1600, "留言頻率檢查逾時");
 
       if (hourResult.error) throw hourResult.error;
       if (dayResult.error) throw dayResult.error;
@@ -213,18 +221,22 @@ export async function POST(request: NextRequest) {
     const isAnonymous = !verifiedUser || Boolean(body?.isAnonymous);
     const displayName = isAnonymous || !verifiedUser ? null : getFeedbackDisplayName(verifiedUser);
 
-    const { data, error } = await supabase
-      .from("feedback_messages")
-      .insert({
-        content,
-        parent_id: body?.parentId?.trim() || null,
-        display_name: displayName,
-        is_anonymous: isAnonymous,
-        user_id: verifiedUser?.id ?? null,
-        visitor_id: visitorId
-      })
-      .select("id, content, parent_id, display_name, is_anonymous, created_at")
-      .single();
+    const { data, error } = await withServerTimeout(
+      supabase
+        .from("feedback_messages")
+        .insert({
+          content,
+          parent_id: body?.parentId?.trim() || null,
+          display_name: displayName,
+          is_anonymous: isAnonymous,
+          user_id: verifiedUser?.id ?? null,
+          visitor_id: visitorId
+        })
+        .select("id, content, parent_id, display_name, is_anonymous, created_at")
+        .single(),
+      2500,
+      "留言送出逾時"
+    );
 
     if (error) throw error;
 

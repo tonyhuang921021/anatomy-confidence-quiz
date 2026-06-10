@@ -13,6 +13,7 @@ import type {
 } from "@/types/quiz";
 import { normalizeEmail } from "@/lib/aiAccountBan";
 import { isSupabaseRecoveryMode } from "@/lib/supabase/recoveryMode";
+import { withServerTimeout } from "@/lib/serverTimeout";
 
 type OwnerRequestBody = {
   accessToken?: string;
@@ -28,6 +29,13 @@ type QuestionAttemptLogRow = {
 type QuestionAttemptDeviceDailyRow = {
   visitor_id: string;
   activity_date: string;
+};
+
+type OwnerDailyStatsRow = {
+  activity_date: string;
+  attempts: number;
+  correct_attempts?: number | null;
+  devices: number;
 };
 
 type AIExplanationUsageLogRow = {
@@ -92,6 +100,9 @@ const SUPABASE_PAGE_SIZE = 1000;
 const ONLINE_WINDOW_MS = 2 * 60 * 1000;
 const OWNER_MAX_ANALYTIC_ROWS = 5_000;
 const OWNER_ANALYTIC_LOOKBACK_DAYS = 30;
+const OWNER_TOP_VISITOR_LOOKBACK_DAYS = 7;
+const OWNER_TOP_VISITOR_MAX_ROWS = 2_000;
+const OWNER_QUERY_TIMEOUT_MS = 5_000;
 
 function getLookbackIsoString(days: number) {
   return new Date(Date.now() - days * 24 * 60 * 60 * 1000).toISOString();
@@ -173,6 +184,25 @@ function getServiceSupabaseClient() {
   });
 }
 
+function isMissingCorrectAttemptsColumn(error: unknown) {
+  const maybeError = error as { code?: string; message?: string; details?: string; hint?: string } | null;
+  const haystack = [
+    maybeError?.code,
+    maybeError?.message,
+    maybeError?.details,
+    maybeError?.hint
+  ]
+    .filter(Boolean)
+    .join(" ")
+    .toLowerCase();
+
+  return (
+    haystack.includes("correct_attempts") ||
+    haystack.includes("pgrst204") ||
+    haystack.includes("42703")
+  );
+}
+
 async function fetchAllRows<Row extends Record<string, unknown>>(
   supabase: any,
   table: string,
@@ -213,72 +243,28 @@ async function fetchOwnerDailySeries(
   days = 14
 ): Promise<OwnerDailyPoint[]> {
   const dayKeys = getRecentTaipeiDayKeys(days);
-  const { data, error } = await supabase
+  let { data, error } = await supabase
     .from("owner_daily_stats")
-    .select("activity_date, attempts, devices")
+    .select("activity_date, attempts, correct_attempts, devices")
     .in("activity_date", dayKeys);
+
+  if (error && isMissingCorrectAttemptsColumn(error)) {
+    const fallbackResult = await supabase
+      .from("owner_daily_stats")
+      .select("activity_date, attempts, devices")
+      .in("activity_date", dayKeys);
+    data = fallbackResult.data;
+    error = fallbackResult.error;
+  }
 
   if (error) throw error;
 
   const dayMap = new Map(
-    ((data ?? []) as { activity_date: string; attempts: number; devices: number }[]).map((row) => [
+    ((data ?? []) as OwnerDailyStatsRow[]).map((row) => [
       row.activity_date,
       row
     ] as const)
   );
-
-  const recentDayKeys = dayKeys.slice(-2);
-  if (recentDayKeys.length > 0) {
-    const startDate = recentDayKeys[0];
-    const endDate = recentDayKeys[recentDayKeys.length - 1];
-    const endDateExclusive = new Date(`${endDate}T00:00:00+08:00`);
-    endDateExclusive.setDate(endDateExclusive.getDate() + 1);
-
-    const [attemptRows, deviceRows] = await Promise.all([
-      fetchAllRows<Pick<QuestionAttemptLogRow, "session_id" | "question_id" | "answered_at">>(
-        supabase,
-        "question_attempt_logs",
-        "session_id, question_id, answered_at",
-        "answered_at",
-        (query) =>
-          query
-            .gte("answered_at", `${startDate}T00:00:00+08:00`)
-            .lt("answered_at", endDateExclusive.toISOString())
-      ),
-      fetchAllRows<Pick<QuestionAttemptDeviceDailyRow, "activity_date" | "visitor_id">>(
-        supabase,
-        "question_attempt_device_daily",
-        "visitor_id, activity_date",
-        "activity_date",
-        (query) => query.in("activity_date", recentDayKeys)
-      )
-    ]);
-
-    const recentAttemptMap = new Map<string, number>();
-    const recentDeviceMap = new Map<string, Set<string>>();
-
-    for (const row of dedupeAttemptRows(attemptRows)) {
-      const key = getTaipeiDayKey(new Date(row.answered_at));
-      if (!recentDayKeys.includes(key)) continue;
-      recentAttemptMap.set(key, (recentAttemptMap.get(key) ?? 0) + 1);
-    }
-
-    for (const row of deviceRows) {
-      if (!recentDayKeys.includes(row.activity_date)) continue;
-      const visitorId = row.visitor_id?.trim();
-      const current = recentDeviceMap.get(row.activity_date) ?? new Set<string>();
-      if (visitorId) current.add(visitorId);
-      recentDeviceMap.set(row.activity_date, current);
-    }
-
-    for (const key of recentDayKeys) {
-      dayMap.set(key, {
-        activity_date: key,
-        attempts: recentAttemptMap.get(key) ?? 0,
-        devices: recentDeviceMap.get(key)?.size ?? 0
-      });
-    }
-  }
 
   return dayKeys.map((date) => ({
     date,
@@ -290,13 +276,14 @@ async function fetchOwnerDailySeries(
 async function fetchOwnerHourlySeries(
   supabase: any
 ): Promise<OwnerHourlyPoint[]> {
-  const sevenDaysAgo = getLookbackIsoString(7);
+  const oneDayAgo = getLookbackIsoString(1);
   const data = await fetchAllRows<QuestionAttemptLogRow>(
     supabase,
     "question_attempt_logs",
     "session_id, question_id, answered_at, visitor_id",
     "answered_at",
-    (query) => query.gte("answered_at", sevenDaysAgo)
+    (query) => query.gte("answered_at", oneDayAgo),
+    2_000
   );
 
   const hourAttemptMap = new Map<number, number>();
@@ -466,13 +453,14 @@ async function fetchOwnerTopAttemptVisitors(
   supabase: any,
   limit = 5
 ): Promise<OwnerTopAttemptVisitorEntry[]> {
-  const lookbackSince = getLookbackIsoString(OWNER_ANALYTIC_LOOKBACK_DAYS);
+  const lookbackSince = getLookbackIsoString(OWNER_TOP_VISITOR_LOOKBACK_DAYS);
   const rows = await fetchAllRows<QuestionAttemptLogRow>(
     supabase,
     "question_attempt_logs",
     "session_id, question_id, visitor_id, answered_at",
     "answered_at",
-    (query) => query.not("visitor_id", "is", null).gte("answered_at", lookbackSince)
+    (query) => query.not("visitor_id", "is", null).gte("answered_at", lookbackSince),
+    OWNER_TOP_VISITOR_MAX_ROWS
   );
 
   const grouped = new Map<string, OwnerTopAttemptVisitorEntry>();
@@ -516,26 +504,18 @@ async function fetchOwnerDashboardStats(
   const [
     totalVisitorsResult,
     totalAttemptDevicesResult,
-    allAttemptVisitorRows,
     onlineVisitorsResult,
     totalUsersResult,
-    totalAttemptsResult
+    ownerDailyRowsResult
   ] = await Promise.all([
     supabase.from("site_visitors").select("*", { count: "exact", head: true }),
     supabase.from("question_attempt_devices").select("*", { count: "exact", head: true }),
-    fetchAllRows<Pick<QuestionAttemptLogRow, "session_id" | "question_id" | "visitor_id">>(
-      supabase,
-      "question_attempt_logs",
-      "session_id, question_id, visitor_id",
-      "answered_at",
-      (query) => query.gte("answered_at", getLookbackIsoString(OWNER_ANALYTIC_LOOKBACK_DAYS))
-    ),
     supabase
       .from("site_visitors")
       .select("*", { count: "exact", head: true })
       .gte("last_seen_at", onlineSince),
     supabase.from("leaderboard_profiles").select("*", { count: "exact", head: true }),
-    supabase.from("question_attempt_logs").select("*", { count: "exact", head: true })
+    supabase.from("owner_daily_stats").select("attempts")
   ]);
 
   const errors = [
@@ -543,17 +523,10 @@ async function fetchOwnerDashboardStats(
     totalAttemptDevicesResult.error,
     onlineVisitorsResult.error,
     totalUsersResult.error,
-    totalAttemptsResult.error
+    ownerDailyRowsResult.error
   ].filter(Boolean);
 
   if (errors.length > 0) throw errors[0];
-
-  const visitorAttemptCountMap = new Map<string, number>();
-  for (const row of dedupeAttemptRows(allAttemptVisitorRows)) {
-    const visitorId = row.visitor_id?.trim();
-    if (!visitorId) continue;
-    visitorAttemptCountMap.set(visitorId, (visitorAttemptCountMap.get(visitorId) ?? 0) + 1);
-  }
 
   const aiExplanationCount = explanationUsage.reduce((sum, row) => sum + row.explanationCount, 0);
   const aiExplanationInputTokens = explanationUsage.reduce((sum, row) => sum + row.inputTokens, 0);
@@ -568,12 +541,15 @@ async function fetchOwnerDashboardStats(
     totalVisitorDevices: totalVisitorsResult.count ?? 0,
     totalAttemptDevices: totalAttemptDevicesResult.count ?? 0,
     attemptDevicesToday,
-    attemptVisitorsOverFive: Array.from(visitorAttemptCountMap.values()).filter((count) => count > 5).length,
+    attemptVisitorsOverFive: 0,
     onlineVisitors: onlineVisitorsResult.count ?? 0,
     totalSyncedUsers: totalUsersResult.count ?? 0,
     attemptsToday,
     attemptsLast7Days,
-    totalAttempts: totalAttemptsResult.count ?? 0,
+    totalAttempts: ((ownerDailyRowsResult.data ?? []) as { attempts?: number | null }[]).reduce(
+      (sum, row) => sum + Number(row.attempts ?? 0),
+      0
+    ),
     aiExplanationCount,
     aiExplanationInputTokens,
     aiExplanationOutputTokens,
@@ -743,18 +719,26 @@ export async function POST(request: NextRequest) {
       recentAiAccounts,
       yangmingModeActivations,
       yangmingExplanationReports
-    ] = await Promise.all([
-      fetchOwnerDailySeries(supabase, 14),
-      fetchOwnerHourlySeries(supabase),
-      fetchOwnerExplanationUsage(supabase, "explanation"),
-      fetchOwnerExplanationUsage(supabase, "search"),
-      fetchOwnerTopAttemptVisitors(supabase, 5),
-      fetchOwnerClassificationReports(supabase, 40),
-      fetchRecentAIAccounts(supabase),
-      fetchOwnerYangmingModeActivations(supabase, 80),
-      fetchOwnerYangmingExplanationReports(supabase, 80)
-    ]);
-    const stats = await fetchOwnerDashboardStats(supabase, dailySeries, explanationUsage, searchUsage);
+    ] = await withServerTimeout(
+      Promise.all([
+        fetchOwnerDailySeries(supabase, 14),
+        fetchOwnerHourlySeries(supabase),
+        fetchOwnerExplanationUsage(supabase, "explanation"),
+        fetchOwnerExplanationUsage(supabase, "search"),
+        fetchOwnerTopAttemptVisitors(supabase, 5),
+        fetchOwnerClassificationReports(supabase, 40),
+        fetchRecentAIAccounts(supabase),
+        fetchOwnerYangmingModeActivations(supabase, 80),
+        fetchOwnerYangmingExplanationReports(supabase, 80)
+      ]),
+      OWNER_QUERY_TIMEOUT_MS,
+      "私有數據查詢逾時"
+    );
+    const stats = await withServerTimeout(
+      fetchOwnerDashboardStats(supabase, dailySeries, explanationUsage, searchUsage),
+      OWNER_QUERY_TIMEOUT_MS,
+      "私有數據統計查詢逾時"
+    );
 
     return NextResponse.json({
       ok: true,

@@ -237,6 +237,10 @@ on public.question_attempt_logs (is_correct, answered_at desc);
 create index if not exists question_attempt_logs_visitor_id_idx
 on public.question_attempt_logs (visitor_id);
 
+create index if not exists question_attempt_logs_visitor_id_answered_at_idx
+on public.question_attempt_logs (visitor_id, answered_at desc)
+where visitor_id is not null;
+
 revoke all on public.question_attempt_logs from anon;
 revoke all on public.question_attempt_logs from authenticated;
 
@@ -487,9 +491,13 @@ with check (true);
 create table if not exists public.owner_daily_stats (
   activity_date date primary key,
   attempts integer not null default 0,
+  correct_attempts integer not null default 0,
   devices integer not null default 0,
   updated_at timestamptz not null default now()
 );
+
+alter table public.owner_daily_stats
+  add column if not exists correct_attempts integer not null default 0;
 
 create index if not exists owner_daily_stats_updated_at_idx
 on public.owner_daily_stats (updated_at desc);
@@ -569,6 +577,9 @@ alter table public.ai_explanation_usage_logs
 
 create index if not exists ai_explanation_usage_logs_rate_key_used_at_idx
 on public.ai_explanation_usage_logs (rate_key, used_at desc);
+
+create index if not exists ai_explanation_usage_logs_used_at_idx
+on public.ai_explanation_usage_logs (used_at desc);
 
 create index if not exists ai_explanation_usage_logs_user_email_idx
 on public.ai_explanation_usage_logs (user_email);
