@@ -231,6 +231,9 @@ on public.question_attempt_logs (question_id);
 create index if not exists question_attempt_logs_answered_at_idx
 on public.question_attempt_logs (answered_at desc);
 
+create index if not exists question_attempt_logs_is_correct_answered_at_idx
+on public.question_attempt_logs (is_correct, answered_at desc);
+
 create index if not exists question_attempt_logs_visitor_id_idx
 on public.question_attempt_logs (visitor_id);
 
