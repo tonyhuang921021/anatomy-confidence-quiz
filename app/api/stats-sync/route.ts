@@ -41,6 +41,11 @@ type QuestionAttemptDeviceDailyRow = {
 type NormalizedAttemptRow = NonNullable<StatsSyncBody["attemptRows"]>[number];
 type NormalizedDeviceDailyRow = NonNullable<StatsSyncBody["deviceDailyRows"]>[number];
 
+const MAX_REQUEST_BYTES = 300_000;
+const MAX_ATTEMPT_ROWS_PER_REQUEST = 250;
+const MAX_DEVICE_DAILY_ROWS_PER_REQUEST = 90;
+const MAX_DEVICE_IDS_PER_LOOKUP = 50;
+
 function getTaipeiDayKey(date: Date) {
   return new Intl.DateTimeFormat("en-CA", {
     timeZone: "Asia/Taipei",
@@ -105,8 +110,8 @@ async function getNewAttemptRows(
   const sessionIds = Array.from(new Set(rows.map((row) => normalizeAttemptSessionId(row.session_id))));
   const existingKeys = new Set<string>();
 
-  for (let index = 0; index < sessionIds.length; index += 50) {
-    const chunk = sessionIds.slice(index, index + 50);
+  for (let index = 0; index < sessionIds.length; index += MAX_DEVICE_IDS_PER_LOOKUP) {
+    const chunk = sessionIds.slice(index, index + MAX_DEVICE_IDS_PER_LOOKUP);
     const { data, error } = await supabase
       .from("question_attempt_logs")
       .select("session_id, question_id")
@@ -232,8 +237,8 @@ async function upsertAttemptDeviceDaily(
   const visitorIds = Array.from(new Set(normalizedRows.map((row) => row.visitor_id)));
   const existingKeys = new Set<string>();
 
-  for (let index = 0; index < visitorIds.length; index += 50) {
-    const chunk = visitorIds.slice(index, index + 50);
+  for (let index = 0; index < visitorIds.length; index += MAX_DEVICE_IDS_PER_LOOKUP) {
+    const chunk = visitorIds.slice(index, index + MAX_DEVICE_IDS_PER_LOOKUP);
     const { data, error } = await supabase
       .from("question_attempt_device_daily")
       .select("visitor_id, activity_date")
@@ -318,6 +323,17 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ ok: true, deferred: true });
   }
 
+  const contentLength = Number(request.headers.get("content-length") ?? 0);
+  if (contentLength > MAX_REQUEST_BYTES) {
+    return NextResponse.json(
+      {
+        ok: false,
+        message: "統計同步資料量過大，請稍後再分批同步。"
+      },
+      { status: 413, headers: { "Cache-Control": "no-store" } }
+    );
+  }
+
   const supabase = getServiceSupabaseClient();
   if (!supabase) {
     return NextResponse.json(
@@ -328,11 +344,27 @@ export async function POST(request: NextRequest) {
 
   try {
     const body = (await request.json()) as StatsSyncBody;
-    const newAttemptRows = await upsertAttemptRows(supabase, body.attemptRows ?? []);
+    const attemptRows = body.attemptRows ?? [];
+    const deviceDailyRows = body.deviceDailyRows ?? [];
+
+    if (
+      attemptRows.length > MAX_ATTEMPT_ROWS_PER_REQUEST ||
+      deviceDailyRows.length > MAX_DEVICE_DAILY_ROWS_PER_REQUEST
+    ) {
+      return NextResponse.json(
+        {
+          ok: false,
+          message: "統計同步批次過大，已拒絕本次更新。"
+        },
+        { status: 413, headers: { "Cache-Control": "no-store" } }
+      );
+    }
+
+    const newAttemptRows = await upsertAttemptRows(supabase, attemptRows);
 
     const [, newDeviceDailyRows] = await Promise.all([
       body.deviceRow ? upsertAttemptDevice(supabase, body.deviceRow) : Promise.resolve(),
-      upsertAttemptDeviceDaily(supabase, body.deviceDailyRows ?? [])
+      upsertAttemptDeviceDaily(supabase, deviceDailyRows)
     ]);
 
     await Promise.all([

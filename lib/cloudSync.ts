@@ -165,6 +165,7 @@ const CLOUD_COMPLETED_SESSION_FETCH_LIMIT = 60;
 const CLOUD_COMPLETED_SESSION_UPLOAD_LIMIT = 30;
 const CLOUD_ATTEMPT_SESSION_FETCH_CHUNK_SIZE = 20;
 const CURRENT_SESSION_SYNC_MIN_INTERVAL_MS = 30_000;
+const STATS_SYNC_ATTEMPT_BATCH_SIZE = 200;
 
 type CurrentSessionSyncState = {
   lastSyncedAt: number;
@@ -1001,7 +1002,7 @@ async function refreshQuestionAccuracyStats(questionIds: string[]) {
 
 async function refreshAggregatedStatsViaApi(sessions: QuizSession[]) {
   if (isSupabaseRecoveryMode()) return;
-  const attemptRows = buildQuestionAttemptLogRows(sessions);
+  const attemptRows = dedupeAttemptRows(buildQuestionAttemptLogRows(sessions));
   const questionIds = Array.from(
     new Set(attemptRows.map((attempt) => attempt.question_id))
   );
@@ -1053,23 +1054,40 @@ async function refreshAggregatedStatsViaApi(sessions: QuizSession[]) {
     return;
   }
 
-  const response = await fetch("/api/stats-sync", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json"
-    },
-    body: JSON.stringify({
-      attemptRows,
-      deviceRow,
-      deviceDailyRows,
-      questionIds,
-      activityDates
-    })
-  });
+  const attemptBatches =
+    attemptRows.length === 0
+      ? [[]]
+      : Array.from(
+          { length: Math.ceil(attemptRows.length / STATS_SYNC_ATTEMPT_BATCH_SIZE) },
+          (_, index) =>
+            attemptRows.slice(
+              index * STATS_SYNC_ATTEMPT_BATCH_SIZE,
+              (index + 1) * STATS_SYNC_ATTEMPT_BATCH_SIZE
+            )
+        );
 
-  if (!response.ok) {
-    const payload = (await response.json().catch(() => null)) as { message?: string } | null;
-    throw new Error(payload?.message || "統計聚合更新失敗");
+  for (const [index, attemptBatch] of attemptBatches.entries()) {
+    const response = await fetch("/api/stats-sync", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      cache: "no-store",
+      body: JSON.stringify({
+        attemptRows: attemptBatch,
+        deviceRow,
+        deviceDailyRows: index === 0 ? deviceDailyRows : [],
+        questionIds: Array.from(new Set(attemptBatch.map((attempt) => attempt.question_id))),
+        activityDates: Array.from(
+          new Set(attemptBatch.map((attempt) => getTaipeiDayKey(new Date(attempt.answered_at))))
+        )
+      })
+    });
+
+    if (!response.ok) {
+      const payload = (await response.json().catch(() => null)) as { message?: string } | null;
+      throw new Error(payload?.message || "統計聚合更新失敗");
+    }
   }
 }
 

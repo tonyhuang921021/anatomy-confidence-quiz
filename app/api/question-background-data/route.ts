@@ -45,8 +45,8 @@ function getQuestionIds(request: NextRequest, kind: BackgroundDataKind) {
 
 function emptyPayload(kind: BackgroundDataKind, recovery = false) {
   if (kind === "stats") return { ok: true, stats: [], recovery };
-  if (kind === "explanations") return { ok: true, overrides: {}, recovery };
-  return { ok: true, overrides: {}, recovery };
+  if (kind === "explanations") return { ok: true, overrides: [], recovery };
+  return { ok: true, overrides: [], recovery };
 }
 
 export async function GET(request: NextRequest) {

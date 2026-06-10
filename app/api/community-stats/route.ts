@@ -5,15 +5,6 @@ import { isSupabaseRecoveryMode } from "@/lib/supabase/recoveryMode";
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
 
-type AttemptRow = {
-  session_id: string;
-  question_id: string;
-  answered_at: string;
-  is_correct: boolean;
-};
-
-const SUPABASE_PAGE_SIZE = 1000;
-
 function getServiceSupabaseClient() {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
@@ -52,48 +43,6 @@ function getRecentTaipeiDayKeys(days: number) {
   return keys;
 }
 
-function normalizeAttemptSessionId(sessionId: string) {
-  return sessionId.replace(/^user-[^:]+:/, "");
-}
-
-function dedupeAttemptRows(rows: AttemptRow[]) {
-  const deduped = new Map<string, AttemptRow>();
-
-  for (const row of rows) {
-    const normalizedSessionId = normalizeAttemptSessionId(row.session_id);
-    const dedupeKey = `${normalizedSessionId}::${row.question_id}`;
-    deduped.set(dedupeKey, {
-      ...row,
-      session_id: normalizedSessionId
-    });
-  }
-
-  return Array.from(deduped.values());
-}
-
-async function fetchAllAttemptRows(supabase: any, startDate: string) {
-  const rows: AttemptRow[] = [];
-  let from = 0;
-
-  while (true) {
-    const { data, error } = await supabase
-      .from("question_attempt_logs")
-      .select("session_id, question_id, answered_at, is_correct")
-      .gte("answered_at", `${startDate}T00:00:00+08:00`)
-      .order("answered_at", { ascending: true })
-      .range(from, from + SUPABASE_PAGE_SIZE - 1);
-
-    if (error) throw error;
-
-    const page = (data ?? []) as AttemptRow[];
-    rows.push(...page);
-    if (page.length < SUPABASE_PAGE_SIZE) break;
-    from += SUPABASE_PAGE_SIZE;
-  }
-
-  return rows;
-}
-
 export async function GET(request: Request) {
   const url = new URL(request.url);
   const requestedDays = Number(url.searchParams.get("days") ?? "2");
@@ -130,30 +79,28 @@ export async function GET(request: Request) {
 
   try {
     const dayKeys = getRecentTaipeiDayKeys(days);
-    const attemptRows = await fetchAllAttemptRows(supabase, dayKeys[0]);
-    const dedupedAttemptRows = dedupeAttemptRows(attemptRows);
-    const grouped = new Map<string, { attempts: number; correct: number }>();
-    dayKeys.forEach((key) => grouped.set(key, { attempts: 0, correct: 0 }));
+    const { data, error } = await supabase
+      .from("owner_daily_stats")
+      .select("activity_date, attempts")
+      .in("activity_date", dayKeys);
 
-    for (const row of dedupedAttemptRows) {
-      const key = getTaipeiDayKey(new Date(row.answered_at));
-      if (!dayKeys.includes(key)) continue;
-      const current = grouped.get(key) ?? { attempts: 0, correct: 0 };
-      current.attempts += 1;
-      current.correct += row.is_correct ? 1 : 0;
-      grouped.set(key, current);
-    }
+    if (error) throw error;
+
+    const grouped = new Map(
+      ((data ?? []) as { activity_date: string; attempts: number }[]).map((row) => [
+        row.activity_date,
+        Number(row.attempts ?? 0)
+      ] as const)
+    );
 
     return NextResponse.json(
       {
         ok: true,
         points: dayKeys.map((date) => {
-          const current = grouped.get(date) ?? { attempts: 0, correct: 0 };
           return {
             date,
-            attempts: current.attempts,
-            correctRate:
-              current.attempts === 0 ? 0 : Number(((current.correct / current.attempts) * 100).toFixed(1))
+            attempts: grouped.get(date) ?? 0,
+            correctRate: 0
           };
         })
       },
