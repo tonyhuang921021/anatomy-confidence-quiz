@@ -166,6 +166,7 @@ const CLOUD_COMPLETED_SESSION_UPLOAD_LIMIT = 30;
 const CLOUD_ATTEMPT_SESSION_FETCH_CHUNK_SIZE = 20;
 const CURRENT_SESSION_SYNC_MIN_INTERVAL_MS = 30_000;
 const STATS_SYNC_ATTEMPT_BATCH_SIZE = 200;
+const CLOUD_SESSION_LOOKUP_TIMEOUT_MS = 3500;
 
 type CurrentSessionSyncState = {
   lastSyncedAt: number;
@@ -204,6 +205,20 @@ function dedupeAttemptRows<
   }
 
   return Array.from(deduped.values());
+}
+
+function withCloudFallback<T>(
+  task: Promise<T>,
+  fallback: T,
+  timeoutMs = CLOUD_SESSION_LOOKUP_TIMEOUT_MS
+) {
+  return new Promise<T>((resolve) => {
+    const timeoutId = setTimeout(() => resolve(fallback), timeoutMs);
+    task
+      .then(resolve)
+      .catch(() => resolve(fallback))
+      .finally(() => clearTimeout(timeoutId));
+  });
 }
 
 async function fetchAIExplanationUsageRows() {
@@ -806,17 +821,22 @@ export async function loadCompletedSessionFromSupabase(sessionId: string) {
   if (isSupabaseRecoveryMode()) return null;
   if (!isSupabaseConfigured() || !sessionId) return null;
 
-  const supabase = getSupabaseBrowserClient();
-  const { data } = await supabase.auth.getUser();
-  const userId = data.user?.id;
-  if (!userId) return null;
+  return withCloudFallback(
+    (async () => {
+      const supabase = getSupabaseBrowserClient();
+      const { data } = await supabase.auth.getUser();
+      const userId = data.user?.id;
+      if (!userId) return null;
 
-  const row = await fetchQuizSessionByIdForUser(userId, sessionId);
-  if (!row?.completed_at) return null;
+      const row = await fetchQuizSessionByIdForUser(userId, sessionId);
+      if (!row?.completed_at) return null;
 
-  const attemptRows = await fetchSessionAttemptRowsForUser(userId, [row.id]);
-  const session = mapRowToSession(row, buildAttemptMap(attemptRows));
-  return session ? canonicalizeSessionsForUser(userId, [session])[0] ?? session : null;
+      const attemptRows = await fetchSessionAttemptRowsForUser(userId, [row.id]);
+      const session = mapRowToSession(row, buildAttemptMap(attemptRows));
+      return session ? canonicalizeSessionsForUser(userId, [session])[0] ?? session : null;
+    })(),
+    null
+  );
 }
 
 function getLeaderboardDisplayName(user: Pick<User, "id" | "email" | "user_metadata">) {
