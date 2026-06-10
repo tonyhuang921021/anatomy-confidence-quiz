@@ -69,7 +69,7 @@ function flattenUnknownStrings(value: unknown): string[] {
   return [];
 }
 
-function detectAssetQuestionNumber(record: { rows?: unknown }) {
+function detectAssetQuestionNumber(record: { rows?: unknown; alt?: unknown; src?: unknown }) {
   const rows = Array.isArray(record.rows) ? record.rows : [];
   for (const row of rows) {
     const cells = Array.isArray(row) ? row.map((cell) => (typeof cell === "string" ? cell : "")) : [];
@@ -84,7 +84,15 @@ function detectAssetQuestionNumber(record: { rows?: unknown }) {
 
   const combinedRows = flattenUnknownStrings(record.rows).join(" ");
   const inlineMatch = combinedRows.match(/題\s*號\s*0*(\d{1,3})/);
-  return inlineMatch ? Number(inlineMatch[1]) : null;
+  if (inlineMatch) return Number(inlineMatch[1]);
+
+  const hints = [record.alt, record.src]
+    .filter((value): value is string => typeof value === "string")
+    .join(" ");
+  const labelMatch =
+    hints.match(/第\s*0*(\d{1,3})\s*題/) ??
+    hints.match(/(?:^|[-_/])q0*(\d{1,3})(?:[-_.]|$)/i);
+  return labelMatch ? Number(labelMatch[1]) : null;
 }
 
 function isMeaningfulYangmingText(text: string | null | undefined) {
@@ -261,19 +269,21 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ ok: true, explanation: null });
     }
 
+    const expectedQuestionNo = getQuestionNumberFromId(row.question_id);
+    const normalizedAssetBundle = normalizeAssets(supabase, row.assets, expectedQuestionNo);
+    const normalizedSections = normalizeSections(row.sections, normalizedAssetBundle.assetIndexMap);
     const matchScore =
       typeof row.match_score === "number"
         ? row.match_score
         : typeof row.match_score === "string"
           ? Number(row.match_score)
           : null;
-    if (row.match_status === "low_confidence" || (matchScore !== null && matchScore < 0.5)) {
+    if (
+      (row.match_status === "low_confidence" || (matchScore !== null && matchScore < 0.5)) &&
+      normalizedAssetBundle.assets.length === 0
+    ) {
       return NextResponse.json({ ok: true, explanation: null });
     }
-
-    const expectedQuestionNo = getQuestionNumberFromId(row.question_id);
-    const normalizedAssetBundle = normalizeAssets(supabase, row.assets, expectedQuestionNo);
-    const normalizedSections = normalizeSections(row.sections, normalizedAssetBundle.assetIndexMap);
     const normalizedBody =
       typeof row.body === "string" && isMeaningfulYangmingText(row.body) ? row.body : "";
     if (!normalizedBody && normalizedSections.length === 0 && normalizedAssetBundle.assets.length === 0) {
