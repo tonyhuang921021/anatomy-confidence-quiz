@@ -713,6 +713,91 @@ def chunk_page_regions(chunk: list[dict[str, Any]]) -> list[dict[str, Any]]:
     return regions
 
 
+def item_bbox(item: dict[str, Any]) -> list[float] | None:
+    bbox = item.get("bbox")
+    if not isinstance(bbox, list) or len(bbox) != 4:
+        return None
+    try:
+        x0, y0, x1, y1 = (float(value) for value in bbox)
+    except (TypeError, ValueError):
+        return None
+    if (x1 - x0) < 20 or (y1 - y0) < 8:
+        return None
+    return [x0, y0, x1, y1]
+
+
+def chunk_boundary_page_regions(
+    items: list[dict[str, Any]],
+    start_index: int,
+    end_index: int,
+) -> list[dict[str, Any]]:
+    """Capture the original PDF span from question N to before question N+1.
+
+    Text/table extraction can miss lines inside scanned or mixed-layout
+    explanations. For the visual fallback, the safest source of truth is the
+    geometric region between adjacent detected question starts. Wide x bounds
+    are intentional; write_page_clip_asset clamps them to the actual page.
+    """
+    if start_index < 0 or start_index >= len(items):
+        return []
+
+    chunk = items[start_index:end_index]
+    if not chunk:
+        return []
+
+    page_numbers = sorted({
+        item.get("page")
+        for item in chunk
+        if isinstance(item.get("page"), int)
+    })
+    if not page_numbers:
+        return []
+
+    start_item = items[start_index]
+    start_page = start_item.get("page")
+    start_box = item_bbox(start_item)
+    next_item = items[end_index] if end_index < len(items) else None
+    next_page = next_item.get("page") if isinstance(next_item, dict) else None
+    next_box = item_bbox(next_item) if isinstance(next_item, dict) else None
+
+    regions: list[dict[str, Any]] = []
+    for page in page_numbers:
+        page_items = [item for item in chunk if item.get("page") == page and item_bbox(item)]
+        if not page_items:
+            continue
+        valid_boxes = [bbox for bbox in (item_bbox(item) for item in page_items) if bbox]
+        if not valid_boxes:
+            continue
+
+        top = min(bbox[1] for bbox in valid_boxes)
+        bottom = max(bbox[3] for bbox in valid_boxes)
+
+        if page == start_page and start_box:
+            top = start_box[1]
+        elif page != start_page:
+            top = 0
+
+        if next_box and next_page == page:
+            bottom = next_box[1]
+        elif next_box and isinstance(next_page, int) and page < next_page:
+            bottom = 10000
+
+        if bottom <= top:
+            bottom = max(bbox[3] for bbox in valid_boxes)
+
+        regions.append({
+            "page": page,
+            "bbox": [
+                0,
+                round(max(0, top - 8), 2),
+                10000,
+                round(bottom + 8, 2),
+            ],
+        })
+
+    return regions
+
+
 def parse_table_chunk(chunk: list[dict[str, Any]], source_label: str, fallback_qno: int | None = None) -> dict[str, Any]:
     header = next((item["text"] for item in chunk[:4] if item["type"] == "text" and "題號" in item["text"]), "")
     q_match = re.search(r"題號\s*([0-9]{1,3})", header)
@@ -933,7 +1018,10 @@ def parse_items_for_meta(
     for start_index, (item_index, qno) in enumerate(starts):
         end = starts[start_index + 1][0] if start_index + 1 < len(starts) else len(items)
         chunk = items[item_index:end]
+        boundary_regions = chunk_boundary_page_regions(items, item_index, end)
         parsed = parse_table_chunk(chunk, source_label, qno)
+        if boundary_regions:
+            parsed["source_page_regions"] = boundary_regions
         extracted_qno = int(parsed["question_no"] or qno or 0) or None
         extracted_stem = parsed["question_stem_snapshot"]
         matched_question, score, base_score, matched_qno = best_paper_match(extracted_stem, expected_questions, extracted_qno)

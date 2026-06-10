@@ -17,6 +17,52 @@ const ROW_BATCH_SIZE = 200;
 const ASSET_CONCURRENCY = Number(process.env.YANGMING_ASSET_CONCURRENCY || "2");
 const ASSET_UPLOAD_RETRIES = Number(process.env.YANGMING_ASSET_UPLOAD_RETRIES || "4");
 
+function assetKindFilter() {
+  const rawFilter = process.env.YANGMING_ASSET_KIND_FILTER?.trim();
+  if (!rawFilter) return null;
+  const kinds = rawFilter
+    .split(",")
+    .map((kind) => kind.trim())
+    .filter(Boolean);
+  return kinds.length ? new Set(kinds) : null;
+}
+
+function filterAssetsByKind(assets, allowedKinds) {
+  if (!Array.isArray(assets)) return [];
+  if (!allowedKinds) return assets;
+  return assets.filter((asset) => allowedKinds.has(String(asset.kind || "")));
+}
+
+function filterAssetsWithIndexMap(assets, allowedKinds) {
+  if (!Array.isArray(assets)) return { assets: [], assetIndexMap: new Map() };
+  const filteredAssets = [];
+  const assetIndexMap = new Map();
+  assets.forEach((asset, index) => {
+    if (allowedKinds && !allowedKinds.has(String(asset?.kind || ""))) return;
+    assetIndexMap.set(index, filteredAssets.length);
+    filteredAssets.push(asset);
+  });
+  return { assets: filteredAssets, assetIndexMap };
+}
+
+function remapSections(sections, assetIndexMap, isFilteringAssets) {
+  if (!Array.isArray(sections)) return [];
+  return sections
+    .map((section) => {
+      if (!section || typeof section !== "object") return null;
+      const nextSection = { ...section };
+      if (typeof nextSection.assetIndex === "number") {
+        const mappedIndex = assetIndexMap.get(nextSection.assetIndex);
+        if (typeof mappedIndex !== "number") {
+          return isFilteringAssets ? null : nextSection;
+        }
+        nextSection.assetIndex = mappedIndex;
+      }
+      return nextSection;
+    })
+    .filter(Boolean);
+}
+
 function loadEnvFile(filePath) {
   if (!fs.existsSync(filePath)) return;
   const content = fs.readFileSync(filePath, "utf8");
@@ -131,14 +177,16 @@ async function retryUpload(worker, label) {
   throw lastError;
 }
 
-function toDbRow(row, storagePrefix = "") {
-  const assets = Array.isArray(row.assets)
-    ? row.assets.map((asset) => ({
+function toDbRow(row, storagePrefix = "", allowedAssetKinds = null) {
+  const { assets: filteredAssets, assetIndexMap } = filterAssetsWithIndexMap(row.assets, allowedAssetKinds);
+  const assets = filteredAssets
+    .map((asset) => ({
         ...asset,
         // src is stored as the Storage object path; the API maps it to a public URL.
         src: typeof asset.src === "string" ? withStoragePrefix(asset.src, storagePrefix) : ""
       }))
-    : [];
+    ;
+  const sections = remapSections(row.sections, assetIndexMap, Boolean(allowedAssetKinds));
 
   return sanitizeForPostgres({
     question_id: row.question_id,
@@ -151,7 +199,7 @@ function toDbRow(row, storagePrefix = "") {
     source_page_end: row.source_page_end || null,
     question_stem_snapshot: row.question_stem_snapshot || null,
     answer_snapshot: row.answer_snapshot || null,
-    sections: Array.isArray(row.sections) ? row.sections : [],
+    sections,
     assets,
     match_status: row.match_status || null,
     match_score:
@@ -164,10 +212,10 @@ function toDbRow(row, storagePrefix = "") {
   });
 }
 
-function collectAssets(rows, assetRoot, storagePrefix = "") {
+function collectAssets(rows, assetRoot, storagePrefix = "", allowedAssetKinds = null) {
   const unique = new Map();
   for (const row of rows) {
-    for (const asset of Array.isArray(row.assets) ? row.assets : []) {
+    for (const asset of filterAssetsByKind(row.assets, allowedAssetKinds)) {
       const objectPath = typeof asset.src === "string" ? asset.src.trim() : "";
       if (!objectPath || /^(?:https?:)?\/\//i.test(objectPath) || objectPath.startsWith("/")) continue;
       const filePath = path.join(assetRoot, objectPath);
@@ -276,8 +324,8 @@ async function filterExistingAssets(supabase, bucket, assets) {
   return pending;
 }
 
-async function upsertRows(supabase, rows, storagePrefix = "") {
-  const batches = chunk(rows.map((row) => toDbRow(row, storagePrefix)), ROW_BATCH_SIZE);
+async function upsertRows(supabase, rows, storagePrefix = "", allowedAssetKinds = null) {
+  const batches = chunk(rows.map((row) => toDbRow(row, storagePrefix, allowedAssetKinds)), ROW_BATCH_SIZE);
   let upserted = 0;
   for (const batch of batches) {
     const { error } = await supabase
@@ -301,6 +349,7 @@ async function main() {
   const key = serviceRoleKey || requiredEnv("NEXT_PUBLIC_SUPABASE_ANON_KEY");
   const storagePrefix = normalizeStoragePrefix(process.env.YANGMING_STORAGE_PREFIX);
   const importToken = process.env.YANGMING_IMPORT_TOKEN?.trim();
+  const allowedAssetKinds = assetKindFilter();
 
   const rows = JSON.parse(fs.readFileSync(sourcePath, "utf8"));
   if (!Array.isArray(rows)) {
@@ -321,19 +370,20 @@ async function main() {
       : undefined
   });
 
-  const assets = collectAssets(rows, assetRoot, storagePrefix);
+  const assets = collectAssets(rows, assetRoot, storagePrefix, allowedAssetKinds);
   console.log(`import source: ${sourcePath}`);
   console.log(`rows: ${rows.length}`);
   console.log(`assets: ${assets.length}`);
   console.log(`bucket: ${bucket}`);
   if (storagePrefix) console.log(`storage prefix: ${storagePrefix}`);
+  if (allowedAssetKinds) console.log(`asset kind filter: ${Array.from(allowedAssetKinds).join(", ")}`);
 
   if (serviceRoleKey) {
     await ensureBucket(supabase, bucket);
   }
   const pendingAssets = await filterExistingAssets(supabase, bucket, assets);
   await uploadAssets(supabase, bucket, pendingAssets);
-  await upsertRows(supabase, rows, storagePrefix);
+  await upsertRows(supabase, rows, storagePrefix, allowedAssetKinds);
   console.log("Yangming explanations import complete.");
 }
 
