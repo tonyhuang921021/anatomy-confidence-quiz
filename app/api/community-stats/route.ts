@@ -6,6 +6,8 @@ import { withServerTimeout } from "@/lib/serverTimeout";
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
 
+const COMMUNITY_STATS_CACHE_CONTROL = "no-store";
+
 function getServiceSupabaseClient() {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
@@ -83,7 +85,7 @@ export async function GET(request: Request) {
       },
       {
         headers: {
-          "Cache-Control": "public, s-maxage=300, stale-while-revalidate=600"
+          "Cache-Control": COMMUNITY_STATS_CACHE_CONTROL
         }
       }
     );
@@ -151,7 +153,7 @@ export async function GET(request: Request) {
       },
       {
         headers: {
-          "Cache-Control": "public, s-maxage=120, stale-while-revalidate=300"
+          "Cache-Control": COMMUNITY_STATS_CACHE_CONTROL
         }
       }
     );
@@ -170,7 +172,7 @@ export async function GET(request: Request) {
       },
       {
         headers: {
-          "Cache-Control": "public, s-maxage=60, stale-while-revalidate=120"
+          "Cache-Control": COMMUNITY_STATS_CACHE_CONTROL
         }
       }
     );
