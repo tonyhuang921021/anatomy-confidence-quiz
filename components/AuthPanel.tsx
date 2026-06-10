@@ -36,7 +36,8 @@ import {
 import { getSupabaseBrowserClient } from "@/lib/supabase/client";
 import { isSupabaseRecoveryMode } from "@/lib/supabase/recoveryMode";
 
-const AUTH_ACTION_TIMEOUT_MS = 8000;
+const AUTH_ACTION_TIMEOUT_MS = 15000;
+const AUTH_SESSION_RECOVERY_TIMEOUT_MS = 2500;
 const RECOVERY_MODE_MESSAGE = "雲端登入與同步維護中，先用訪客模式作答；目前紀錄會先留在本機。";
 
 function getSyncStatusLabel(status: "idle" | "syncing" | "ready" | "error") {
@@ -54,6 +55,21 @@ function withTimeout<T>(promise: Promise<T>, timeoutMs: number, message: string)
       .catch(reject)
       .finally(() => window.clearTimeout(timeoutId));
   });
+}
+
+async function getRecoveredAuthSession() {
+  try {
+    const {
+      data: { session }
+    } = await withTimeout(
+      getSupabaseBrowserClient().auth.getSession(),
+      AUTH_SESSION_RECOVERY_TIMEOUT_MS,
+      "登入狀態補抓逾時"
+    );
+    return session ?? null;
+  } catch {
+    return null;
+  }
 }
 
 export function AuthPanel() {
@@ -266,6 +282,13 @@ export function AuthPanel() {
       applyAuthSession(data.session ?? null);
       setMessage("登入成功，正在同步雲端紀錄。");
     } catch (signInError) {
+      const recoveredSession = await getRecoveredAuthSession();
+      if (recoveredSession) {
+        applyAuthSession(recoveredSession);
+        setMessage("登入成功，雲端紀錄會在背景同步。");
+        setError("");
+        return;
+      }
       setError(signInError instanceof Error ? signInError.message : "登入失敗，請稍後再試。");
     } finally {
       setSubmitting(false);
