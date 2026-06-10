@@ -1858,38 +1858,23 @@ export async function loadOwnerHourlySeries(): Promise<OwnerHourlyPoint[]> {
 }
 
 export async function loadRecentCommunityAttemptStats(days = 2): Promise<CommunityRecentAttemptPoint[]> {
-  if (!isSupabaseConfigured()) {
+  if (isSupabaseRecoveryMode() || !isSupabaseConfigured()) {
     return [];
   }
 
-  const dayKeys = getRecentTaipeiDayKeys(days);
-  const startDate = dayKeys[0];
-  const data = await fetchAllQuestionAttemptLogs<{ answered_at: string; is_correct: boolean }>(
-    "answered_at, is_correct",
-    (query) => query.gte("answered_at", `${startDate}T00:00:00+08:00`)
-  );
+  const safeDays = Math.min(7, Math.max(1, Math.trunc(days)));
+  const response = await fetch(`/api/community-stats?days=${encodeURIComponent(String(safeDays))}`, {
+    cache: "no-store"
+  });
+  const payload = (await response.json().catch(() => null)) as
+    | { ok?: boolean; message?: string; points?: CommunityRecentAttemptPoint[] }
+    | null;
 
-  const grouped = new Map<string, { attempts: number; correct: number }>();
-  dayKeys.forEach((key) => grouped.set(key, { attempts: 0, correct: 0 }));
-
-  for (const row of data ?? []) {
-    const key = getTaipeiDayKey(new Date(row.answered_at));
-    if (!dayKeys.includes(key)) continue;
-    const current = grouped.get(key) ?? { attempts: 0, correct: 0 };
-    current.attempts += 1;
-    current.correct += row.is_correct ? 1 : 0;
-    grouped.set(key, current);
+  if (!response.ok || !payload?.ok || !payload.points) {
+    throw new Error(payload?.message || "社群作答統計載入失敗");
   }
 
-  return dayKeys.map((date) => {
-    const current = grouped.get(date) ?? { attempts: 0, correct: 0 };
-    return {
-      date,
-      attempts: current.attempts,
-      correctRate:
-        current.attempts === 0 ? 0 : Number(((current.correct / current.attempts) * 100).toFixed(1))
-    };
-  });
+  return payload.points;
 }
 
 function formatVisitorLabel(visitorId?: string | null) {
@@ -1900,11 +1885,10 @@ function formatVisitorLabel(visitorId?: string | null) {
 }
 
 export async function loadOwnerTopAttemptVisitors(limit = 5): Promise<OwnerTopAttemptVisitorEntry[]> {
-  if (!isSupabaseConfigured()) {
+  if (isSupabaseRecoveryMode() || !isSupabaseConfigured()) {
     return [];
   }
 
-  const supabase = getSupabaseBrowserClient();
   const data = await fetchAllQuestionAttemptLogs<{ visitor_id?: string | null; answered_at: string }>(
     "visitor_id, answered_at",
     (query) => query.not("visitor_id", "is", null)

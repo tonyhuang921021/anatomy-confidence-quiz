@@ -1,11 +1,11 @@
 import { anatomyOutline, anatomyQuestions } from "@/data/anatomyQuestions";
-import { moexMed1RemainingDetailedV4Merged0011827 } from "@/data/sources/moex_med1_remaining_detailed_v4_merged_001_1827";
 import { moexMed1Missing22QuestionsDetailedV5 } from "@/data/sources/moex_med1_missing_22_questions_detailed_v5";
 import { moexMed1Requested71QuestionsDetailedPatchV5 } from "@/data/sources/moex_med1_requested_71_questions_detailed_patch_v5";
 import moexMed1MissingBatch1 from "@/data/sources/moex_med1_missing_batch1_100030_1101_detailed.json";
 import moexMed1MissingBatch2 from "@/data/sources/moex_med1_missing_batch2_109020_1301_detailed.json";
 import moexMed1MissingBatch3 from "@/data/sources/moex_med1_missing_batch3_112020_1301_detailed.json";
-import moexMed1ReclassifiedV5 from "@/data/sources/moex_med1_100_115_reclassified_v5.json";
+import moexMed1RemainingDetailedV4Merged0011827Raw from "@/data/sources/moex_med1_remaining_detailed_v4_merged_001_1827.json";
+import moexMed1ReclassifiedV5 from "@/data/sources/moex_med1_100_115_reclassified_v5_compact.json";
 import moexMed1Requested149ReclassificationPatch from "@/data/sources/moex_med1_requested_149_reclassification_patch.json";
 import moexMedStage2Merged0013100 from "@/data/sources/moex_med_stage2_detailed_merged_001_3100_classified_v3.json";
 import questionMediaManifest from "@/data/sources/question_media_manifest.json";
@@ -148,6 +148,10 @@ type DetailedMissingBatchQuestionRaw = RawQuestion & {
   };
   subject_group_coarse?: string;
   subject_group_keyword?: string;
+};
+
+type DetailedQuestionSource = {
+  questions: readonly RawQuestion[];
 };
 
 type QuestionMediaEntry = {
@@ -1146,8 +1150,9 @@ function applyQuestionTextOverride(question: Question): Question {
   };
 }
 
-const remainingQuestionsRaw =
-  moexMed1RemainingDetailedV4Merged0011827.questions as readonly RawQuestion[];
+const remainingQuestionsRaw = (
+  moexMed1RemainingDetailedV4Merged0011827Raw as DetailedQuestionSource
+).questions;
 export const med1RemainingQuestions: Question[] = remainingQuestionsRaw
   .map(toQuestion)
   .filter((question): question is Question => Boolean(question))

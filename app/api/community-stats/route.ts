@@ -94,9 +94,15 @@ async function fetchAllAttemptRows(supabase: any, startDate: string) {
   return rows;
 }
 
-export async function GET() {
+export async function GET(request: Request) {
+  const url = new URL(request.url);
+  const requestedDays = Number(url.searchParams.get("days") ?? "2");
+  const days = Number.isFinite(requestedDays)
+    ? Math.min(7, Math.max(1, Math.trunc(requestedDays)))
+    : 2;
+
   if (isSupabaseRecoveryMode()) {
-    const dayKeys = getRecentTaipeiDayKeys(2);
+    const dayKeys = getRecentTaipeiDayKeys(days);
     return NextResponse.json(
       {
         ok: true,
@@ -123,7 +129,7 @@ export async function GET() {
   }
 
   try {
-    const dayKeys = getRecentTaipeiDayKeys(2);
+    const dayKeys = getRecentTaipeiDayKeys(days);
     const attemptRows = await fetchAllAttemptRows(supabase, dayKeys[0]);
     const dedupedAttemptRows = dedupeAttemptRows(attemptRows);
     const grouped = new Map<string, { attempts: number; correct: number }>();
