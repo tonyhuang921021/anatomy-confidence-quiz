@@ -12,6 +12,7 @@ import type {
   OwnerTopAttemptVisitorEntry
 } from "@/types/quiz";
 import { normalizeEmail } from "@/lib/aiAccountBan";
+import { isSupabaseRecoveryMode } from "@/lib/supabase/recoveryMode";
 
 type OwnerRequestBody = {
   accessToken?: string;
@@ -76,6 +77,10 @@ type YangmingExplanationReportRow = {
   id: string | number;
   question_id: string;
   reason: string;
+  report_type?: string | null;
+  proposed_body?: string | null;
+  previous_body?: string | null;
+  applied_at?: string | null;
   reporter_email?: string | null;
   visitor_id?: string | null;
   source_label?: string | null;
@@ -85,6 +90,12 @@ type YangmingExplanationReportRow = {
 
 const SUPABASE_PAGE_SIZE = 1000;
 const ONLINE_WINDOW_MS = 2 * 60 * 1000;
+const OWNER_MAX_ANALYTIC_ROWS = 5_000;
+const OWNER_ANALYTIC_LOOKBACK_DAYS = 30;
+
+function getLookbackIsoString(days: number) {
+  return new Date(Date.now() - days * 24 * 60 * 60 * 1000).toISOString();
+}
 
 function getAllowedEmails() {
   return (process.env.NEXT_PUBLIC_ADMIN_EMAILS ?? "")
@@ -167,17 +178,19 @@ async function fetchAllRows<Row extends Record<string, unknown>>(
   table: string,
   selectClause: string,
   orderColumn: string,
-  configure?: (query: any) => any
+  configure?: (query: any) => any,
+  maxRows = OWNER_MAX_ANALYTIC_ROWS
 ): Promise<Row[]> {
   const rows: Row[] = [];
   let from = 0;
 
-  while (true) {
+  while (rows.length < maxRows) {
+    const pageTo = Math.min(from + SUPABASE_PAGE_SIZE - 1, maxRows - 1);
     let query = supabase
       .from(table)
       .select(selectClause)
       .order(orderColumn, { ascending: true })
-      .range(from, from + SUPABASE_PAGE_SIZE - 1);
+      .range(from, pageTo);
 
     if (configure) {
       query = configure(query as never) as typeof query;
@@ -277,7 +290,7 @@ async function fetchOwnerDailySeries(
 async function fetchOwnerHourlySeries(
   supabase: any
 ): Promise<OwnerHourlyPoint[]> {
-  const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString();
+  const sevenDaysAgo = getLookbackIsoString(7);
   const data = await fetchAllRows<QuestionAttemptLogRow>(
     supabase,
     "question_attempt_logs",
@@ -320,11 +333,13 @@ async function fetchOwnerExplanationUsage(
   supabase: any,
   feature: "explanation" | "search"
 ): Promise<OwnerExplanationUsageEntry[]> {
+  const lookbackSince = getLookbackIsoString(OWNER_ANALYTIC_LOOKBACK_DAYS);
   const rows = await fetchAllRows<AIExplanationUsageLogRow>(
     supabase,
     "ai_explanation_usage_logs",
     "rate_key, visitor_id, user_email, question_id, input_tokens, output_tokens, total_tokens, used_at",
-    "used_at"
+    "used_at",
+    (query) => query.gte("used_at", lookbackSince)
   );
 
   const grouped = new Map<string, OwnerExplanationUsageEntry>();
@@ -368,7 +383,7 @@ async function fetchOwnerExplanationUsage(
 async function fetchRecentAIAccounts(
   supabase: any
 ): Promise<OwnerRecentAIAccountEntry[]> {
-  const hourAgo = new Date(Date.now() - 60 * 60 * 1000).toISOString();
+  const hourAgo = getLookbackIsoString(1 / 24);
   const rows = await fetchAllRows<AIExplanationUsageLogRow>(
     supabase,
     "ai_explanation_usage_logs",
@@ -451,12 +466,13 @@ async function fetchOwnerTopAttemptVisitors(
   supabase: any,
   limit = 5
 ): Promise<OwnerTopAttemptVisitorEntry[]> {
+  const lookbackSince = getLookbackIsoString(OWNER_ANALYTIC_LOOKBACK_DAYS);
   const rows = await fetchAllRows<QuestionAttemptLogRow>(
     supabase,
     "question_attempt_logs",
     "session_id, question_id, visitor_id, answered_at",
     "answered_at",
-    (query) => query.not("visitor_id", "is", null)
+    (query) => query.not("visitor_id", "is", null).gte("answered_at", lookbackSince)
   );
 
   const grouped = new Map<string, OwnerTopAttemptVisitorEntry>();
@@ -511,7 +527,8 @@ async function fetchOwnerDashboardStats(
       supabase,
       "question_attempt_logs",
       "session_id, question_id, visitor_id",
-      "answered_at"
+      "answered_at",
+      (query) => query.gte("answered_at", getLookbackIsoString(OWNER_ANALYTIC_LOOKBACK_DAYS))
     ),
     supabase
       .from("site_visitors")
@@ -656,7 +673,7 @@ async function fetchOwnerYangmingExplanationReports(
 ): Promise<OwnerYangmingExplanationReportEntry[]> {
   const { data, error } = await supabase
     .from("yangming_explanation_reports")
-    .select("id, question_id, reason, reporter_email, visitor_id, source_label, source_file, created_at")
+    .select("id, question_id, reason, report_type, proposed_body, previous_body, applied_at, reporter_email, visitor_id, source_label, source_file, created_at")
     .order("created_at", { ascending: false })
     .limit(limit);
 
@@ -672,6 +689,10 @@ async function fetchOwnerYangmingExplanationReports(
     id: String(row.id),
     questionId: row.question_id,
     reason: row.reason,
+    reportType: row.report_type === "correction" ? "correction" : "report",
+    proposedBody: row.proposed_body ?? undefined,
+    previousBody: row.previous_body ?? undefined,
+    appliedAt: row.applied_at ?? undefined,
     reporterLabel: row.reporter_email?.trim() || formatVisitorLabel(row.visitor_id),
     reporterEmail: row.reporter_email ?? undefined,
     visitorId: row.visitor_id ?? undefined,
@@ -682,6 +703,13 @@ async function fetchOwnerYangmingExplanationReports(
 }
 
 export async function POST(request: NextRequest) {
+  if (isSupabaseRecoveryMode()) {
+    return NextResponse.json(
+      { ok: false, message: "Supabase recovery mode 開啟中，私有數據頁暫停讀取。" },
+      { status: 503, headers: { "Cache-Control": "no-store" } }
+    );
+  }
+
   const supabase = getServiceSupabaseClient();
   if (!supabase) {
     return NextResponse.json(

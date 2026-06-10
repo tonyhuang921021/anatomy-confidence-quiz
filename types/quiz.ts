@@ -469,6 +469,10 @@ export type OwnerYangmingExplanationReportEntry = {
   id: string;
   questionId: string;
   reason: string;
+  reportType?: "report" | "correction";
+  proposedBody?: string;
+  previousBody?: string;
+  appliedAt?: string;
   reporterLabel: string;
   reporterEmail?: string;
   visitorId?: string;

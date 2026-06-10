@@ -1,4 +1,5 @@
 import { OptionKey, Question } from "@/types/quiz";
+import { FormattedQuestionText } from "@/components/FormattedQuestionText";
 
 type QuestionStemBlockProps = {
   question: Question;
@@ -31,7 +32,9 @@ function renderImage(src: string, alt: string) {
 export function QuestionStemBlock({ question, className }: QuestionStemBlockProps) {
   return (
     <div className={`min-w-0 ${className ?? ""}`}>
-      <p className="min-w-0 font-semibold text-slate-900 [overflow-wrap:anywhere]">{question.stem}</p>
+      <p className="min-w-0 font-semibold text-slate-900 [overflow-wrap:anywhere]">
+        <FormattedQuestionText text={question.stem} />
+      </p>
       {question.stemImage ? renderImage(question.stemImage, `${question.id} 題目圖片`) : null}
     </div>
   );
@@ -69,7 +72,7 @@ export function QuestionOptionBlock({
               "min-w-0 text-sm font-medium leading-6 text-slate-800 [overflow-wrap:anywhere] sm:text-[15px] sm:leading-7"
             }
           >
-            {optionText}
+            <FormattedQuestionText text={optionText} />
           </p>
           {optionImage ? renderImage(optionImage, `${question.id} 選項 ${optionKey} 圖片`) : null}
         </div>

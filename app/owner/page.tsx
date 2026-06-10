@@ -938,6 +938,7 @@ export default function OwnerPage() {
                   <thead className="text-slate-500">
                     <tr className="border-b border-slate-200">
                       <th className="px-3 py-3 font-semibold">題號</th>
+                      <th className="px-3 py-3 font-semibold">類型</th>
                       <th className="px-3 py-3 font-semibold">原因</th>
                       <th className="px-3 py-3 font-semibold">回報者</th>
                       <th className="px-3 py-3 font-semibold">來源</th>
@@ -947,7 +948,7 @@ export default function OwnerPage() {
                   <tbody>
                     {yangmingExplanationReports.length === 0 ? (
                       <tr>
-                        <td colSpan={5} className="px-3 py-6 text-center text-slate-500">
+                        <td colSpan={6} className="px-3 py-6 text-center text-slate-500">
                           目前還沒有陽明詳解回報。
                         </td>
                       </tr>
@@ -957,8 +958,29 @@ export default function OwnerPage() {
                           <td className="whitespace-nowrap px-3 py-3 font-mono text-xs font-bold text-ink">
                             {report.questionId}
                           </td>
+                          <td className="whitespace-nowrap px-3 py-3">
+                            <span
+                              className={`rounded-full px-3 py-1 text-xs font-bold ${
+                                report.reportType === "correction"
+                                  ? "bg-teal-50 text-teal-800"
+                                  : "bg-amber-50 text-amber-800"
+                              }`}
+                            >
+                              {report.reportType === "correction" ? "已採用修正" : "回報"}
+                            </span>
+                          </td>
                           <td className="min-w-[260px] px-3 py-3 text-slate-700">
-                            {report.reason}
+                            <p>{report.reason}</p>
+                            {report.proposedBody ? (
+                              <details className="mt-2 rounded-2xl bg-slate-50 px-3 py-2 text-xs leading-5 text-slate-600">
+                                <summary className="cursor-pointer font-bold text-slate-800">
+                                  查看修正版
+                                </summary>
+                                <pre className="mt-2 max-h-64 overflow-auto whitespace-pre-wrap break-words font-sans">
+                                  {report.proposedBody}
+                                </pre>
+                              </details>
+                            ) : null}
                           </td>
                           <td className="whitespace-nowrap px-3 py-3 text-slate-500">
                             {report.reporterLabel}
