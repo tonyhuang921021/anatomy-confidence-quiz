@@ -184,9 +184,6 @@ export default function HomePage() {
                     最近網站更新
                   </h2>
                 </div>
-                <span className="rounded-full bg-white/75 px-3 py-1 text-[11px] font-bold text-slate-500 ring-1 ring-slate-100">
-                  給同學看的版本
-                </span>
               </div>
               <div className="home-release-scroll mt-3 space-y-2 pr-1">
                 {HOME_RELEASE_NOTES.map((note) => (
