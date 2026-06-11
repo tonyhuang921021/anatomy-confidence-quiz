@@ -677,7 +677,6 @@ export default function QuizPage() {
   function persistSession(nextSession: QuizSession) {
     setSession(nextSession);
     saveCurrentSession(nextSession);
-    void pushCurrentSessionToSupabase(nextSession);
   }
 
   function finalizeCompletedSession(completedSession: QuizSession) {

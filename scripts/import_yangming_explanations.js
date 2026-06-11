@@ -16,6 +16,7 @@ const DEFAULT_BUCKET = "yangming-explanations";
 const ROW_BATCH_SIZE = 200;
 const ASSET_CONCURRENCY = Number(process.env.YANGMING_ASSET_CONCURRENCY || "2");
 const ASSET_UPLOAD_RETRIES = Number(process.env.YANGMING_ASSET_UPLOAD_RETRIES || "4");
+const SKIP_ASSET_UPLOAD = process.env.YANGMING_SKIP_ASSET_UPLOAD === "1";
 
 function assetKindFilter() {
   const rawFilter = process.env.YANGMING_ASSET_KIND_FILTER?.trim();
@@ -375,14 +376,17 @@ async function main() {
   console.log(`rows: ${rows.length}`);
   console.log(`assets: ${assets.length}`);
   console.log(`bucket: ${bucket}`);
+  if (SKIP_ASSET_UPLOAD) console.log("asset upload: skipped");
   if (storagePrefix) console.log(`storage prefix: ${storagePrefix}`);
   if (allowedAssetKinds) console.log(`asset kind filter: ${Array.from(allowedAssetKinds).join(", ")}`);
 
-  if (serviceRoleKey) {
-    await ensureBucket(supabase, bucket);
+  if (!SKIP_ASSET_UPLOAD) {
+    if (serviceRoleKey) {
+      await ensureBucket(supabase, bucket);
+    }
+    const pendingAssets = await filterExistingAssets(supabase, bucket, assets);
+    await uploadAssets(supabase, bucket, pendingAssets);
   }
-  const pendingAssets = await filterExistingAssets(supabase, bucket, assets);
-  await uploadAssets(supabase, bucket, pendingAssets);
   await upsertRows(supabase, rows, storagePrefix, allowedAssetKinds);
   console.log("Yangming explanations import complete.");
 }

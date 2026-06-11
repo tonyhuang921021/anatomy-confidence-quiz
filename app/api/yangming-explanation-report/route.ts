@@ -62,6 +62,12 @@ function isMissingColumnError(error: unknown) {
   );
 }
 
+function getQuestionIdLookupCandidates(questionId: string) {
+  const trimmed = questionId.trim();
+  const normalized = trimmed.replace(/^MOEX-(\d+)[_-](\d+)-Q/i, "MOEX-$1-$2-Q");
+  return Array.from(new Set([trimmed, normalized]));
+}
+
 export async function POST(request: NextRequest) {
   if (isSupabaseRecoveryMode()) {
     return NextResponse.json(
@@ -106,12 +112,22 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ ok: false, message: "登入驗證失敗。" }, { status: 401 });
     }
 
-    const { data: currentExplanation, error: currentExplanationError } = await supabase
+    const questionIdCandidates = getQuestionIdLookupCandidates(questionId);
+    const { data: currentExplanationRows, error: currentExplanationError } = await supabase
       .from("yangming_question_explanations")
       .select("question_id, body, author, reviewer, source_label, source_file, source_page_start, source_page_end, question_stem_snapshot, answer_snapshot, assets")
-      .eq("question_id", questionId)
-      .maybeSingle();
+      .in("question_id", questionIdCandidates)
+      .limit(questionIdCandidates.length);
     if (currentExplanationError) throw currentExplanationError;
+    const currentExplanation =
+      (Array.isArray(currentExplanationRows) ? currentExplanationRows : []).find(
+        (candidate) => candidate.question_id === questionId
+      ) ??
+      (Array.isArray(currentExplanationRows) ? currentExplanationRows : []).find(
+        (candidate) => candidate.question_id === questionIdCandidates[1]
+      ) ??
+      null;
+    const resolvedQuestionId = currentExplanation?.question_id ?? questionIdCandidates[0];
 
     const previousBody =
       typeof currentExplanation?.body === "string" ? currentExplanation.body : null;
@@ -121,7 +137,7 @@ export async function POST(request: NextRequest) {
     const appliedAt = reportType === "correction" ? new Date().toISOString() : null;
 
     const baseReportRow = {
-      question_id: questionId,
+      question_id: resolvedQuestionId,
       reason: reason.slice(0, MAX_REASON_LENGTH),
       user_id: data.user.id,
       reporter_email: data.user.email ?? null,
@@ -157,7 +173,7 @@ export async function POST(request: NextRequest) {
         .from("yangming_question_explanations")
         .upsert(
           {
-            question_id: questionId,
+            question_id: resolvedQuestionId,
             body: clippedProposedBody,
             author: currentExplanation?.author ?? null,
             reviewer: currentExplanation?.reviewer ?? null,

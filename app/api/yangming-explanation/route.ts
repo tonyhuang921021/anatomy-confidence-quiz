@@ -60,6 +60,12 @@ function getQuestionNumberFromId(questionId: string | undefined) {
   return match ? Number(match[1]) : null;
 }
 
+function getQuestionIdLookupCandidates(questionId: string) {
+  const trimmed = questionId.trim();
+  const normalized = trimmed.replace(/^MOEX-(\d+)[_-](\d+)-Q/i, "MOEX-$1-$2-Q");
+  return Array.from(new Set([trimmed, normalized]));
+}
+
 function flattenUnknownStrings(value: unknown): string[] {
   if (typeof value === "string") return [value];
   if (Array.isArray(value)) return value.flatMap((item) => flattenUnknownStrings(item));
@@ -246,12 +252,13 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ ok: false, message: "缺少題號。" }, { status: 400 });
     }
 
-    const { data: explanationRow, error: explanationError } = await withServerTimeout(
+    const questionIdCandidates = getQuestionIdLookupCandidates(questionId);
+    const { data: explanationRows, error: explanationError } = await withServerTimeout(
       supabase
         .from("yangming_question_explanations")
         .select("question_id, body, author, reviewer, source_label, source_file, source_page_start, source_page_end, question_stem_snapshot, answer_snapshot, sections, assets, match_status, match_score")
-        .eq("question_id", questionId)
-        .maybeSingle(),
+        .in("question_id", questionIdCandidates)
+        .limit(questionIdCandidates.length),
       2500,
       "陽明詳解讀取逾時"
     );
@@ -264,7 +271,11 @@ export async function POST(request: NextRequest) {
       throw explanationError;
     }
 
-    const row = explanationRow as YangmingExplanationRow | null;
+    const rows = (Array.isArray(explanationRows) ? explanationRows : []) as YangmingExplanationRow[];
+    const row =
+      rows.find((candidate) => candidate.question_id === questionId) ??
+      rows.find((candidate) => candidate.question_id === questionIdCandidates[1]) ??
+      null;
     if (!row) {
       return NextResponse.json({ ok: true, explanation: null });
     }

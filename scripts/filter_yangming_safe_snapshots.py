@@ -11,6 +11,7 @@ from __future__ import annotations
 
 import argparse
 import copy
+import csv
 import json
 import re
 from collections import Counter
@@ -138,25 +139,34 @@ def is_safe_snapshot(
     asset_root: Path,
     source_dir: Path,
     pdf_cache: dict[Path, fitz.Document],
-) -> tuple[bool, str, list[dict[str, Any]]]:
+) -> tuple[bool, str, list[dict[str, Any]], str]:
     question_no = row_question_no(row)
     if asset.get("kind") != "question_snapshot":
-        return False, "not_snapshot", []
+        return False, "not_snapshot", [], ""
     if asset.get("snapshotSource") != "source_page_regions":
-        return False, "fallback_full_page", []
+        return False, "fallback_full_page", [], ""
     src = asset.get("src")
     if not isinstance(src, str) or not src:
-        return False, "missing_src", []
+        return False, "missing_src", [], ""
     if not (asset_root / src).exists():
-        return False, "missing_file", []
+        return False, "missing_file", [], ""
 
     text = extract_clip_text(row, asset, source_dir, pdf_cache)
     candidates = candidate_question_numbers(text)
-    foreign_candidates = [candidate for candidate in candidates if question_no and candidate["n"] != question_no]
-    if foreign_candidates:
-        return False, "foreign_question_start", foreign_candidates[:3]
-
     current_candidates = [candidate for candidate in candidates if question_no and candidate["n"] == question_no]
+    first_current_index = current_candidates[0]["char_index"] if current_candidates else None
+    # A true cross-question contamination almost always shows up as Q(n+1)
+    # after the current question. Do not reject unrelated numbered lists inside
+    # explanations (for example "1. Carpal tunnel..." in question 8).
+    next_question_candidates = [
+        candidate
+        for candidate in candidates
+        if question_no
+        and candidate["n"] == question_no + 1
+    ]
+    if next_question_candidates:
+        return False, "next_question_start", next_question_candidates[:3], text
+
     if current_candidates:
         lines_before, chars_before, prefix_tail = prefix_stats(text, current_candidates[0]["char_index"])
         if chars_before >= 35 and lines_before >= 1:
@@ -171,25 +181,82 @@ def is_safe_snapshot(
                         "prefix_tail": prefix_tail,
                     }
                 ],
+                text,
             )
+    else:
+        previous_question_candidates = [
+            candidate
+            for candidate in candidates
+            if question_no
+            and candidate["n"] == question_no - 1
+            and candidate.get("line_index", 999) <= 3
+        ]
+        if previous_question_candidates:
+            return False, "previous_question_start_without_current", previous_question_candidates[:3], text
 
-    return True, "kept", candidates[:3]
+    return True, "kept", candidates[:3], text
 
 
-def build_safe_rows(rows: list[dict[str, Any]], asset_root: Path, source_dir: Path) -> tuple[list[dict[str, Any]], Counter[str]]:
+def compact_excerpt(text: str, limit: int = 220) -> str:
+    return re.sub(r"\s+", " ", text).strip()[:limit]
+
+
+def build_audit_entry(
+    row: dict[str, Any],
+    asset: dict[str, Any],
+    asset_index: int,
+    is_safe: bool,
+    reason: str,
+    detail: list[dict[str, Any]],
+    text: str,
+) -> dict[str, Any]:
+    question_no = row_question_no(row)
+    candidate_numbers = [candidate.get("n") for candidate in detail if isinstance(candidate, dict)]
+    return {
+        "question_id": row.get("question_id"),
+        "question_no": question_no,
+        "source_file": str(row.get("source_file") or ""),
+        "source_label": str(row.get("source_label") or ""),
+        "asset_index": asset_index,
+        "src": asset.get("src"),
+        "page": asset.get("page"),
+        "bbox": asset.get("bbox"),
+        "kept": is_safe,
+        "reason": reason,
+        "candidate_question_numbers": candidate_numbers,
+        "detail": detail,
+        "excerpt": compact_excerpt(text),
+    }
+
+
+def build_safe_rows(
+    rows: list[dict[str, Any]],
+    asset_root: Path,
+    source_dir: Path,
+) -> tuple[list[dict[str, Any]], Counter[str], list[dict[str, Any]]]:
     pdf_cache: dict[Path, fitz.Document] = {}
     reasons: Counter[str] = Counter()
+    audit_rows: list[dict[str, Any]] = []
     safe_rows: list[dict[str, Any]] = []
     try:
         for row in rows:
             next_row = copy.deepcopy(row)
             kept_assets: list[dict[str, Any]] = []
-            for asset in row.get("assets") or []:
+            for asset_index, asset in enumerate(row.get("assets") or []):
                 if not isinstance(asset, dict):
                     reasons["invalid_asset"] += 1
+                    audit_rows.append({
+                        "question_id": row.get("question_id"),
+                        "question_no": row_question_no(row),
+                        "source_file": str(row.get("source_file") or ""),
+                        "asset_index": asset_index,
+                        "kept": False,
+                        "reason": "invalid_asset",
+                    })
                     continue
-                is_safe, reason, _detail = is_safe_snapshot(row, asset, asset_root, source_dir, pdf_cache)
+                is_safe, reason, detail, text = is_safe_snapshot(row, asset, asset_root, source_dir, pdf_cache)
                 reasons[reason] += 1
+                audit_rows.append(build_audit_entry(row, asset, asset_index, is_safe, reason, detail, text))
                 if is_safe:
                     kept_assets.append(asset)
 
@@ -215,7 +282,32 @@ def build_safe_rows(rows: list[dict[str, Any]], asset_root: Path, source_dir: Pa
     finally:
         for doc in pdf_cache.values():
             doc.close()
-    return safe_rows, reasons
+    return safe_rows, reasons, audit_rows
+
+
+def write_audit_csv(path: Path, audit_rows: list[dict[str, Any]]) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    fields = [
+        "question_id",
+        "question_no",
+        "source_file",
+        "source_label",
+        "asset_index",
+        "page",
+        "kept",
+        "reason",
+        "candidate_question_numbers",
+        "src",
+        "excerpt",
+    ]
+    with path.open("w", newline="", encoding="utf-8") as handle:
+        writer = csv.DictWriter(handle, fieldnames=fields)
+        writer.writeheader()
+        for row in audit_rows:
+            writer.writerow({
+                **{field: row.get(field, "") for field in fields},
+                "candidate_question_numbers": " ".join(str(value) for value in row.get("candidate_question_numbers") or []),
+            })
 
 
 def main() -> None:
@@ -224,12 +316,19 @@ def main() -> None:
     parser.add_argument("output_json", type=Path)
     parser.add_argument("--asset-root", type=Path, required=True)
     parser.add_argument("--source-dir", type=Path, required=True)
+    parser.add_argument("--audit-json", type=Path)
+    parser.add_argument("--audit-csv", type=Path)
     args = parser.parse_args()
 
     rows = json.loads(args.input_json.read_text(encoding="utf-8"))
-    safe_rows, reasons = build_safe_rows(rows, args.asset_root, args.source_dir)
+    safe_rows, reasons, audit_rows = build_safe_rows(rows, args.asset_root, args.source_dir)
     args.output_json.parent.mkdir(parents=True, exist_ok=True)
     args.output_json.write_text(json.dumps(safe_rows, ensure_ascii=False, indent=2), encoding="utf-8")
+    if args.audit_json:
+        args.audit_json.parent.mkdir(parents=True, exist_ok=True)
+        args.audit_json.write_text(json.dumps(audit_rows, ensure_ascii=False, indent=2), encoding="utf-8")
+    if args.audit_csv:
+        write_audit_csv(args.audit_csv, audit_rows)
 
     print(
         json.dumps(
@@ -239,6 +338,8 @@ def main() -> None:
                 "assets": sum(len(row.get("assets") or []) for row in safe_rows),
                 "reasons": dict(reasons),
                 "output": str(args.output_json),
+                "audit_json": str(args.audit_json) if args.audit_json else None,
+                "audit_csv": str(args.audit_csv) if args.audit_csv else None,
             },
             ensure_ascii=False,
             indent=2,
