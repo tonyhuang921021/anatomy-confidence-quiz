@@ -37,6 +37,13 @@ OCR_FALLBACK_FILENAMES = {
     "106-1醫學(二).pdf",
 }
 OCR_QUESTION_MARKER_RE = re.compile(r"(?:題目|題幹)(?![\w\u4e00-\u9fff])\s*[|:：]?")
+FIXED_FILENAME_META: dict[str, tuple[int, int, str]] = {
+    "1-1_醫學一總檔.pdf": (113, 2, "醫學（一）"),
+    "2-1_醫學二總檔.pdf": (113, 2, "醫學（二）"),
+    # This merged file's printed footer/header says older years in places, but
+    # its question content matches the 112-2 medical stage 1 paper.
+    "醫學一(全)_merged.pdf": (112, 2, "醫學（一）"),
+}
 
 
 @dataclass(frozen=True)
@@ -188,15 +195,19 @@ def hydrate_paper_questions(
     return hydrated
 
 
+def compact_filename(path: Path) -> str:
+    return re.sub(r"\s+", "", path.name)
+
+
+def fixed_file_meta_key(path: Path) -> tuple[int, int, str] | None:
+    return FIXED_FILENAME_META.get(compact_filename(path))
+
+
 def parse_file_meta(path: Path, paper_meta: dict[tuple[int, int, str], PaperMeta]) -> PaperMeta | None:
     name = path.name
-    compact_name = re.sub(r"\s+", "", name)
-    fixed_name_meta = {
-        "1-1_醫學一總檔.pdf": (113, 2, "醫學（一）"),
-        "2-1_醫學二總檔.pdf": (113, 2, "醫學（二）"),
-    }
-    if compact_name in fixed_name_meta:
-        return paper_meta.get(fixed_name_meta[compact_name])
+    fixed_meta_key = fixed_file_meta_key(path)
+    if fixed_meta_key:
+        return paper_meta.get(fixed_meta_key)
 
     match = re.search(r"(?P<roc>\d{3})\s*[-－]\s*(?P<round>[12]).*?醫學\s*[（(]?(?P<exam>[一二])", name)
     if not match:
@@ -2097,15 +2108,16 @@ def main() -> int:
         pdfs = pdfs[: args.limit]
 
     for path in pdfs:
-        has_conflict, page_meta_summary = has_conflicting_page_metas(path, paper_meta)
-        if has_conflict:
-            file_reports.append({
-                "file": path.name,
-                "status": "mixed_page_metas_skipped",
-                "extracted": 0,
-                "page_meta_summary": page_meta_summary,
-            })
-            continue
+        if not fixed_file_meta_key(path):
+            has_conflict, page_meta_summary = has_conflicting_page_metas(path, paper_meta)
+            if has_conflict:
+                file_reports.append({
+                    "file": path.name,
+                    "status": "mixed_page_metas_skipped",
+                    "extracted": 0,
+                    "page_meta_summary": page_meta_summary,
+                })
+                continue
         meta = parse_file_meta(path, paper_meta)
         if not meta:
             bookmark_sections = parse_bookmark_sections(
