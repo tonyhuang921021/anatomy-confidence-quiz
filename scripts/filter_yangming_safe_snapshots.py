@@ -29,6 +29,7 @@ QUESTION_WORDS = re.compile(
 )
 OPTION_PATTERN = re.compile(r"(\([A-D]\)|（[A-D]）)")
 QUESTION_LINE_PATTERN = re.compile(r"^\s*(?:題\s*號\s*)?0*(\d{1,3})(?:\s*[.．、]|[\s　]+)(.*)")
+EXPLICIT_QUESTION_NO_PATTERN = re.compile(r"題\s*號\s*[:：]?\s*0*(\d{1,3})(?=\s|　|科|$)")
 
 
 def source_pdf(row: dict[str, Any], source_dir: Path) -> Path:
@@ -133,6 +134,46 @@ def row_question_no(row: dict[str, Any]) -> int | None:
         return None
 
 
+def row_extracted_question_no(row: dict[str, Any]) -> int | None:
+    try:
+        return int(row.get("extracted_question_no"))
+    except Exception:
+        return None
+
+
+def row_matched_question_no(row: dict[str, Any]) -> int | None:
+    try:
+        return int(row.get("matched_question_no") or row.get("question_no"))
+    except Exception:
+        return None
+
+
+def explicit_question_numbers(text: str) -> list[dict[str, Any]]:
+    """Find table-style headers such as "題號 59 科目 ...".
+
+    These headers are stronger evidence than fuzzy question text matching. If a
+    clip explicitly says it is another question, we should reject it even if the
+    surrounding stem looked similar.
+    """
+    candidates: list[dict[str, Any]] = []
+    for match in EXPLICIT_QUESTION_NO_PATTERN.finditer(text):
+        question_no = int(match.group(1))
+        if question_no < 1 or question_no > 100:
+            continue
+        line_start = text.rfind("\n", 0, match.start()) + 1
+        line_end = text.find("\n", match.end())
+        if line_end < 0:
+            line_end = min(len(text), match.end() + 140)
+        candidates.append(
+            {
+                "n": question_no,
+                "line": text[line_start:line_end].strip()[:160],
+                "char_index": match.start(),
+            }
+        )
+    return candidates
+
+
 def is_safe_snapshot(
     row: dict[str, Any],
     asset: dict[str, Any],
@@ -152,6 +193,13 @@ def is_safe_snapshot(
         return False, "missing_file", [], ""
 
     text = extract_clip_text(row, asset, source_dir, pdf_cache)
+    explicit_candidates = explicit_question_numbers(text)
+    wrong_explicit_candidates = [
+        candidate for candidate in explicit_candidates if question_no and candidate["n"] != question_no
+    ]
+    if wrong_explicit_candidates:
+        return False, "wrong_question_number_in_snapshot", wrong_explicit_candidates[:3], text
+
     candidates = candidate_question_numbers(text)
     current_candidates = [candidate for candidate in candidates if question_no and candidate["n"] == question_no]
     first_current_index = current_candidates[0]["char_index"] if current_candidates else None
@@ -241,6 +289,40 @@ def build_safe_rows(
     try:
         for row in rows:
             next_row = copy.deepcopy(row)
+            extracted_no = row_extracted_question_no(row)
+            matched_no = row_matched_question_no(row)
+            if extracted_no and matched_no and extracted_no != matched_no:
+                reasons["question_number_mismatch"] += 1
+                next_row["assets"] = []
+                next_row["sections"] = []
+                next_row["body"] = ""
+                next_row["match_status"] = "question_number_mismatch"
+                next_row["match_score"] = 0
+                next_row["safety_rejection"] = {
+                    "reason": "question_number_mismatch",
+                    "extracted_question_no": extracted_no,
+                    "matched_question_no": matched_no,
+                }
+                audit_rows.append(
+                    {
+                        "question_id": row.get("question_id"),
+                        "question_no": matched_no,
+                        "source_file": str(row.get("source_file") or ""),
+                        "source_label": str(row.get("source_label") or ""),
+                        "asset_index": "",
+                        "src": "",
+                        "page": "",
+                        "bbox": "",
+                        "kept": False,
+                        "reason": "question_number_mismatch",
+                        "candidate_question_numbers": [extracted_no],
+                        "detail": [next_row["safety_rejection"]],
+                        "excerpt": "",
+                    }
+                )
+                safe_rows.append(next_row)
+                continue
+
             kept_assets: list[dict[str, Any]] = []
             for asset_index, asset in enumerate(row.get("assets") or []):
                 if not isinstance(asset, dict):

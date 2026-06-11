@@ -194,6 +194,42 @@ function renderFormattedRuns(runs: YangmingTextRun[], keyPrefix: string) {
   );
 }
 
+function YangmingAssetImage({
+  asset,
+  imageMaxHeight,
+  imageWidth
+}: {
+  asset: NonNullable<YangmingExplanationContent["assets"]>[number];
+  imageMaxHeight: string;
+  imageWidth: number | undefined;
+}) {
+  const [failed, setFailed] = useState(false);
+
+  if (failed) {
+    return (
+      <div className="rounded-2xl bg-amber-50 px-4 py-3 text-sm font-semibold leading-6 text-amber-900 ring-1 ring-amber-100">
+        <p>這張原頁截圖暫時讀不到，可能是圖片還沒同步到雲端。</p>
+        {asset.storagePath || asset.src ? (
+          <p className="mt-1 break-words text-xs font-medium text-amber-800/75 [overflow-wrap:anywhere]">
+            圖片路徑：{asset.storagePath || asset.src}
+          </p>
+        ) : null}
+      </div>
+    );
+  }
+
+  return (
+    <img
+      src={asset.src}
+      alt={asset.alt ?? ""}
+      loading="lazy"
+      onError={() => setFailed(true)}
+      className={`h-auto ${imageMaxHeight} max-w-full object-contain`}
+      style={{ width: imageWidth ? "100%" : undefined, maxWidth: imageWidth }}
+    />
+  );
+}
+
 function renderRawTextBackup(text: string) {
   if (!text.trim()) return null;
   return (
@@ -244,13 +280,7 @@ function renderAssetFigure(
         </div>
       ) : null}
       <div className="max-w-full overflow-x-auto">
-        <img
-          src={asset.src}
-          alt={asset.alt ?? ""}
-          loading="lazy"
-          className={`h-auto ${imageMaxHeight} max-w-full object-contain`}
-          style={{ width: imageWidth ? "100%" : undefined, maxWidth: imageWidth }}
-        />
+        <YangmingAssetImage asset={asset} imageMaxHeight={imageMaxHeight} imageWidth={imageWidth} />
       </div>
       {caption ? (
         <figcaption
