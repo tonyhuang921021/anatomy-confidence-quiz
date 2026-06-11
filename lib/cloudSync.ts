@@ -161,7 +161,8 @@ export type CommunityRecentAttemptPoint = {
 const AI_SEARCH_USAGE_PREFIX = "AI_SEARCH:";
 
 const SUPABASE_PAGE_SIZE = 1000;
-const CLOUD_COMPLETED_SESSION_FETCH_LIMIT = 60;
+const CLOUD_COMPLETED_SESSION_FETCH_PAGE_SIZE = 300;
+const CLOUD_COMPLETED_SESSION_FETCH_MAX_ROWS = 3000;
 const CLOUD_COMPLETED_SESSION_UPLOAD_LIMIT = 30;
 const CLOUD_ATTEMPT_SESSION_FETCH_CHUNK_SIZE = 20;
 const CURRENT_SESSION_SYNC_MIN_INTERVAL_MS = 30_000;
@@ -754,21 +755,39 @@ async function fetchQuizSessionsForUser(userId: string) {
   if (isSupabaseRecoveryMode() || !isSupabaseConfigured()) return [] as QuizSessionRow[];
 
   const supabase = getSupabaseBrowserClient();
-  const { data, error } = await supabase
-    .from("quiz_sessions")
-    .select(
-      "id, user_id, subject, mode, session_name, question_count, correct_count, wrong_count, average_confidence, started_at, completed_at, session_payload, updated_at"
-    )
-    .eq("user_id", userId)
-    .not("completed_at", "is", null)
-    .order("completed_at", { ascending: false, nullsFirst: false })
-    .limit(CLOUD_COMPLETED_SESSION_FETCH_LIMIT);
+  const rows: QuizSessionRow[] = [];
 
-  if (error) {
-    throw error;
+  for (
+    let from = 0;
+    from < CLOUD_COMPLETED_SESSION_FETCH_MAX_ROWS;
+    from += CLOUD_COMPLETED_SESSION_FETCH_PAGE_SIZE
+  ) {
+    const to = Math.min(
+      from + CLOUD_COMPLETED_SESSION_FETCH_PAGE_SIZE - 1,
+      CLOUD_COMPLETED_SESSION_FETCH_MAX_ROWS - 1
+    );
+    const { data, error } = await supabase
+      .from("quiz_sessions")
+      .select(
+        "id, user_id, subject, mode, session_name, question_count, correct_count, wrong_count, average_confidence, started_at, completed_at, session_payload, updated_at"
+      )
+      .eq("user_id", userId)
+      .not("completed_at", "is", null)
+      .order("completed_at", { ascending: false, nullsFirst: false })
+      .range(from, to);
+
+    if (error) {
+      throw error;
+    }
+
+    const pageRows = (data ?? []) as QuizSessionRow[];
+    rows.push(...pageRows);
+    if (pageRows.length < CLOUD_COMPLETED_SESSION_FETCH_PAGE_SIZE) {
+      break;
+    }
   }
 
-  return (data ?? []) as QuizSessionRow[];
+  return rows;
 }
 
 async function fetchQuizSessionByIdForUser(userId: string, sessionId: string) {
@@ -793,9 +812,13 @@ async function fetchQuizSessionByIdForUser(userId: string, sessionId: string) {
 
 async function fetchResolvedQuizSessionsForUser(userId: string) {
   const sessionRows = await fetchQuizSessionsForUser(userId);
+  const sessionRowsNeedingAttemptRows = sessionRows.filter((row) => {
+    const payloadAttempts = row.session_payload?.attempts ?? [];
+    return payloadAttempts.length === 0;
+  });
   const attemptRows = await fetchSessionAttemptRowsForUser(
     userId,
-    sessionRows.map((row) => row.id)
+    sessionRowsNeedingAttemptRows.map((row) => row.id)
   );
   const attemptMap = buildAttemptMap(attemptRows);
 
