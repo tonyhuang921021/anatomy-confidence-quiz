@@ -189,6 +189,14 @@ def hydrate_paper_questions(
 
 def parse_file_meta(path: Path, paper_meta: dict[tuple[int, int, str], PaperMeta]) -> PaperMeta | None:
     name = path.name
+    compact_name = re.sub(r"\s+", "", name)
+    fixed_name_meta = {
+        "1-1_醫學一總檔.pdf": (113, 2, "醫學（一）"),
+        "2-1_醫學二總檔.pdf": (113, 2, "醫學（二）"),
+    }
+    if compact_name in fixed_name_meta:
+        return paper_meta.get(fixed_name_meta[compact_name])
+
     match = re.search(r"(?P<roc>\d{3})\s*[-－]\s*(?P<round>[12]).*?醫學\s*[（(]?(?P<exam>[一二])", name)
     if not match:
         match = re.search(r"(?P<roc>\d{3})\s*[-－]\s*(?P<round>[12]).*?醫學(?P<exam>[一二])", name)

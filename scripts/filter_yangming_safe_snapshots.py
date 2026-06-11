@@ -66,6 +66,73 @@ def extract_clip_text(
     return page.get_text("text", clip=rect) or ""
 
 
+def slug_for_source(row: dict[str, Any]) -> str:
+    source_name = str(row.get("source_file") or "unknown.pdf").split(" :: ", 1)[0]
+    return re.sub(r"[^A-Za-z0-9_.-]+", "-", Path(source_name).stem).strip("-") or "source"
+
+
+def render_region_snapshot_assets(
+    row: dict[str, Any],
+    asset_root: Path,
+    source_dir: Path,
+    pdf_cache: dict[Path, fitz.Document],
+) -> list[dict[str, Any]]:
+    regions = row.get("source_page_regions")
+    if not isinstance(regions, list) or not regions:
+        return []
+    pdf_path = source_pdf(row, source_dir)
+    if not pdf_path.exists():
+        return []
+    doc = pdf_cache.get(pdf_path)
+    if doc is None:
+        doc = fitz.open(pdf_path)
+        pdf_cache[pdf_path] = doc
+
+    question_id = str(row.get("question_id") or "unknown-question")
+    question_no = row_question_no(row) or row.get("question_no") or "unknown"
+    source_slug = slug_for_source(row)
+    assets: list[dict[str, Any]] = []
+    output_dir = asset_root / "assets" / "source-page-regions" / source_slug
+    output_dir.mkdir(parents=True, exist_ok=True)
+
+    for region_index, region in enumerate(regions):
+        if not isinstance(region, dict):
+            continue
+        try:
+            page_no = int(region.get("page"))
+            page = doc[page_no - 1]
+            x0, y0, x1, y1 = [float(value) for value in region.get("bbox")]
+        except Exception:
+            continue
+        rect = fitz.Rect(
+            max(page.rect.x0, x0),
+            max(page.rect.y0, y0),
+            min(page.rect.x1, x1),
+            min(page.rect.y1, y1),
+        )
+        if rect.is_empty:
+            continue
+        pixmap = page.get_pixmap(matrix=fitz.Matrix(2, 2), clip=rect, alpha=False)
+        filename = f"{question_id}-q{question_no}-p{page_no:04d}-r{region_index:02d}.png"
+        output_path = output_dir / filename
+        if not output_path.exists():
+            pixmap.save(output_path)
+        assets.append(
+            {
+                "src": str(output_path.relative_to(asset_root)),
+                "alt": f"{row.get('source_label') or ''} 第 {question_no} 題原頁截圖".strip(),
+                "width": pixmap.width,
+                "height": pixmap.height,
+                "page": page_no,
+                "bbox": [rect.x0, rect.y0, rect.x1, rect.y1],
+                "kind": "question_snapshot",
+                "snapshotSource": "source_page_regions",
+                "fallback": False,
+            }
+        )
+    return assets
+
+
 def candidate_question_numbers(text: str) -> list[dict[str, Any]]:
     lines = [line.strip() for line in text.splitlines()]
     candidates: list[dict[str, Any]] = []
@@ -323,8 +390,18 @@ def build_safe_rows(
                 safe_rows.append(next_row)
                 continue
 
+            candidate_assets = [
+                asset
+                for asset in (row.get("assets") or [])
+                if isinstance(asset, dict) and asset.get("kind") == "question_snapshot"
+            ]
+            if not candidate_assets:
+                candidate_assets = render_region_snapshot_assets(row, asset_root, source_dir, pdf_cache)
+                if candidate_assets:
+                    reasons["generated_region_snapshot"] += len(candidate_assets)
+
             kept_assets: list[dict[str, Any]] = []
-            for asset_index, asset in enumerate(row.get("assets") or []):
+            for asset_index, asset in enumerate(candidate_assets):
                 if not isinstance(asset, dict):
                     reasons["invalid_asset"] += 1
                     audit_rows.append({
