@@ -827,17 +827,9 @@ async function fetchResolvedQuizSessionsForUser(userId: string) {
     .map((row) => mapRowToSession(row, attemptMap))
     .filter((session): session is QuizSession => Boolean(session));
 
-  const sessionsMissingAttemptRows = sessionRows
-    .filter((row) => {
-      const payloadAttempts = row.session_payload?.attempts ?? [];
-      return payloadAttempts.length > 0 && !attemptMap.has(row.id);
-    })
-    .map((row) => mapRowToSession(row))
-    .filter((session): session is QuizSession => Boolean(session));
-
   return {
     sessions,
-    sessionsMissingAttemptRows
+    sessionsMissingAttemptRows: [] as QuizSession[]
   };
 }
 
