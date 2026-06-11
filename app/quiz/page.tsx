@@ -374,6 +374,8 @@ export default function QuizPage() {
   const questionTopRef = useRef<HTMLDivElement | null>(null);
   const contentTopRef = useRef<HTMLDivElement | null>(null);
   const completedSessionIdsRef = useRef(new Set<string>());
+  const deferredCurrentSessionSaveRef = useRef<number | null>(null);
+  const deferredCurrentSessionRef = useRef<QuizSession | null>(null);
   const [mounted, setMounted] = useState(false);
   const [session, setSession] = useState<QuizSession | null>(null);
   const [classificationOverrides, setClassificationOverrides] = useState<Record<string, QuestionClassificationOverride>>({});
@@ -410,6 +412,33 @@ export default function QuizPage() {
       visitorId: getOrCreateVisitorId() ?? "",
       session: completedSession
     });
+  }
+
+  function flushDeferredCurrentSessionSave() {
+    if (deferredCurrentSessionSaveRef.current !== null) {
+      window.clearTimeout(deferredCurrentSessionSaveRef.current);
+      deferredCurrentSessionSaveRef.current = null;
+    }
+
+    const pendingSession = deferredCurrentSessionRef.current;
+    deferredCurrentSessionRef.current = null;
+    if (pendingSession) {
+      saveCurrentSession(pendingSession);
+    }
+  }
+
+  function scheduleCurrentSessionSave(nextSession: QuizSession) {
+    deferredCurrentSessionRef.current = nextSession;
+    if (deferredCurrentSessionSaveRef.current !== null) return;
+
+    deferredCurrentSessionSaveRef.current = window.setTimeout(() => {
+      deferredCurrentSessionSaveRef.current = null;
+      const pendingSession = deferredCurrentSessionRef.current;
+      deferredCurrentSessionRef.current = null;
+      if (pendingSession) {
+        saveCurrentSession(pendingSession);
+      }
+    }, 120);
   }
 
   async function requestNextPeakChallengeBatch(baseSession: QuizSession) {
@@ -455,6 +484,24 @@ export default function QuizPage() {
 
     throw lastError instanceof Error ? lastError : new Error("下一題產生失敗，請再試一次。");
   }
+
+  useEffect(() => {
+    const flushPendingSession = () => flushDeferredCurrentSessionSave();
+    const flushWhenHidden = () => {
+      if (document.visibilityState === "hidden") {
+        flushDeferredCurrentSessionSave();
+      }
+    };
+
+    window.addEventListener("pagehide", flushPendingSession);
+    document.addEventListener("visibilitychange", flushWhenHidden);
+
+    return () => {
+      window.removeEventListener("pagehide", flushPendingSession);
+      document.removeEventListener("visibilitychange", flushWhenHidden);
+      flushDeferredCurrentSessionSave();
+    };
+  }, []);
 
   useEffect(() => {
     async function initializeSession() {
@@ -674,8 +721,21 @@ export default function QuizPage() {
     setErrorType(undefined);
   }, [currentQuestion?.id, session, submittedAttempt]);
 
-  function persistSession(nextSession: QuizSession) {
+  function persistSession(
+    nextSession: QuizSession,
+    options: { deferLocalSave?: boolean } = {}
+  ) {
     setSession(nextSession);
+    if (options.deferLocalSave) {
+      scheduleCurrentSessionSave(nextSession);
+      return;
+    }
+
+    deferredCurrentSessionRef.current = null;
+    if (deferredCurrentSessionSaveRef.current !== null) {
+      window.clearTimeout(deferredCurrentSessionSaveRef.current);
+      deferredCurrentSessionSaveRef.current = null;
+    }
     saveCurrentSession(nextSession);
   }
 
@@ -706,7 +766,7 @@ export default function QuizPage() {
     const nextSession = { ...session, attempts: nextAttempts };
     const updatedAttempt =
       nextAttempts.find((attempt) => attempt.questionId === submittedAttempt.questionId) ?? null;
-    persistSession(nextSession);
+    persistSession(nextSession, { deferLocalSave: true });
     setSubmittedAttempt(updatedAttempt);
   }
 
@@ -885,7 +945,7 @@ export default function QuizPage() {
       currentQuestionIndex: currentIndex - 1,
       isReviewingAnswer: false
     };
-    persistSession(previousSession);
+    persistSession(previousSession, { deferLocalSave: true });
     setSubmittedAttempt(null);
     setPeakNextQuestionError("");
 
@@ -918,7 +978,7 @@ export default function QuizPage() {
       currentQuestionIndex: targetIndex,
       isReviewingAnswer: false
     };
-    persistSession(jumpedSession);
+    persistSession(jumpedSession, { deferLocalSave: true });
     setSubmittedAttempt(null);
     setPeakNextQuestionError("");
 
@@ -944,7 +1004,7 @@ export default function QuizPage() {
     const nextSession = { ...session, attempts: nextAttempts };
     const updatedAttempt =
       nextAttempts.find((attempt) => attempt.questionId === submittedAttempt.questionId) ?? null;
-    persistSession(nextSession);
+    persistSession(nextSession, { deferLocalSave: true });
     setSubmittedAttempt(updatedAttempt);
   }
 
@@ -1130,7 +1190,7 @@ export default function QuizPage() {
       currentQuestionIndex: currentIndex + 1,
       isReviewingAnswer: false
     };
-    persistSession(nextSession);
+    persistSession(nextSession, { deferLocalSave: true });
     resetQuestionUI();
 
     window.requestAnimationFrame(() => {

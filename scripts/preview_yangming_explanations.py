@@ -856,6 +856,143 @@ def chunk_boundary_page_regions(
     return regions
 
 
+def find_question_start_by_stem(
+    items: list[dict[str, Any]],
+    question: PaperQuestion,
+) -> int | None:
+    """Locate a question in a PDF by matching the canonical question stem.
+
+    Some Yangming files do not expose a clean "題號 N" text block, so the
+    normal table-start splitter can swallow Q(n+1) inside Q(n). In that case,
+    the canonical question stem from our bank is a safer recovery anchor.
+    """
+    expected = normalize_for_match(question.stem)
+    if len(expected) < 20:
+        return None
+
+    expected_head = expected[:90]
+    shorter_head = expected[:42]
+    best_index: int | None = None
+    best_score = 0.0
+
+    text_item_indexes = [index for index, item in enumerate(items) if item.get("type") == "text"]
+    for position, index in enumerate(text_item_indexes):
+        window_items = [
+            items[item_index]
+            for item_index in text_item_indexes[position : position + 5]
+        ]
+        window_text = " ".join(str(item.get("text") or "") for item in window_items)
+        normalized_window = normalize_for_match(window_text)
+        if not normalized_window:
+            continue
+
+        if expected_head and expected_head in normalized_window:
+            return index
+        if shorter_head and shorter_head in normalized_window:
+            return index
+
+        score = similarity_score(window_text, question.stem)
+        if score > best_score:
+            best_score = score
+            best_index = index
+
+    return best_index if best_score >= 0.74 else None
+
+
+def recover_missing_rows_by_stem(
+    rows: list[dict[str, Any]],
+    items: list[dict[str, Any]],
+    source_file: str,
+    meta: PaperMeta,
+    paper_questions: dict[tuple[str, str], list[PaperQuestion]],
+    source_label: str,
+) -> list[dict[str, Any]]:
+    """Add screenshot-only rows for questions missed by layout parsing.
+
+    This does not invent text explanations. It only creates source_page_regions
+    anchored by the exact question stem, so the later safety filter still has
+    to validate the resulting screenshot before it can be imported.
+    """
+    expected_questions = paper_questions.get((meta.exam_code, meta.paper_code), [])
+    if not expected_questions:
+        return rows
+
+    covered_question_ids = {
+        str(row.get("question_id"))
+        for row in rows
+        if row.get("question_id") and row.get("match_status") in {"matched", "low_confidence"}
+    }
+    missing_questions = [
+        question for question in expected_questions if question.question_id not in covered_question_ids
+    ]
+    if not missing_questions:
+        return rows
+
+    start_cache: dict[int, int] = {}
+    for question in missing_questions:
+        start_index = find_question_start_by_stem(items, question)
+        if start_index is not None:
+            start_cache[question.question_no] = start_index
+
+    recovered_rows: list[dict[str, Any]] = []
+    for question in missing_questions:
+        start_index = start_cache.get(question.question_no)
+        if start_index is None:
+            continue
+
+        next_index = None
+        for later_question in expected_questions:
+            if later_question.question_no <= question.question_no:
+                continue
+            later_start = start_cache.get(later_question.question_no)
+            if later_start is None:
+                later_start = find_question_start_by_stem(items, later_question)
+                if later_start is not None:
+                    start_cache[later_question.question_no] = later_start
+            if later_start is not None and later_start > start_index:
+                next_index = later_start
+                break
+        if next_index is None:
+            next_detected = [
+                start
+                for start, _qno in find_table_starts(items)
+                if start > start_index
+            ]
+            next_index = min(next_detected) if next_detected else len(items)
+
+        regions = chunk_boundary_page_regions(items, start_index, next_index)
+        if not regions:
+            continue
+
+        recovered_rows.append({
+            "question_id": question.question_id,
+            "match_status": "matched",
+            "match_strategy": "stem_region_recovery",
+            "match_score": 1.0,
+            "base_match_score": 1.0,
+            "extracted_question_no": question.question_no,
+            "matched_question_no": question.question_no,
+            "source_file": source_file,
+            "source_label": source_label,
+            "exam_code": meta.exam_code,
+            "paper_code": meta.paper_code,
+            "question_no": question.question_no,
+            "author": None,
+            "reviewer": None,
+            "question_stem_snapshot": question.stem,
+            "answer_snapshot": "",
+            "sections": [],
+            "assets": [],
+            "body": "",
+            "source_page_start": regions[0].get("page"),
+            "source_page_end": regions[-1].get("page"),
+            "source_page_regions": regions,
+            "recovered_by": "canonical_stem_region",
+        })
+
+    return [*rows, *recovered_rows]
+
+
 def parse_table_chunk(chunk: list[dict[str, Any]], source_label: str, fallback_qno: int | None = None) -> dict[str, Any]:
     header = next((item["text"] for item in chunk[:4] if item["type"] == "text" and "題號" in item["text"]), "")
     q_match = re.search(r"題號\s*([0-9]{1,3})", header)
@@ -1136,12 +1273,16 @@ def parse_table_pdf(
     image_output_dir: Path | None = None,
     detect_tables: bool = False,
 ) -> list[dict[str, Any]]:
-    return parse_items_for_meta(
-        extract_items(path, image_output_dir=image_output_dir, detect_tables=detect_tables),
+    items = extract_items(path, image_output_dir=image_output_dir, detect_tables=detect_tables)
+    source_label = f"{meta.roc_year} 年第 {meta.round_no} 次 {meta.group}"
+    rows = parse_items_for_meta(
+        items,
         path.name,
         meta,
         paper_questions,
+        source_label,
     )
+    return recover_missing_rows_by_stem(rows, items, path.name, meta, paper_questions, source_label)
 
 
 def safe_cache_name(path: Path) -> str:
@@ -1644,13 +1785,15 @@ def parse_content_inferred_pdf(
     if not meta:
         return None
     source_label = f"{meta.roc_year} 年第 {meta.round_no} 次 {meta.group}（合併檔）"
-    return meta, parse_items_for_meta(
-        extract_items(path, image_output_dir=image_output_dir, detect_tables=detect_tables),
+    items = extract_items(path, image_output_dir=image_output_dir, detect_tables=detect_tables)
+    rows = parse_items_for_meta(
+        items,
         path.name,
         meta,
         paper_questions,
         source_label,
     )
+    return meta, recover_missing_rows_by_stem(rows, items, path.name, meta, paper_questions, source_label)
 
 
 def row_rank(row: dict[str, Any]) -> tuple[int, int, float, int, int]:

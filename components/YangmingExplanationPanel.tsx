@@ -204,6 +204,7 @@ function YangmingAssetImage({
   imageWidth: number | undefined;
 }) {
   const [failed, setFailed] = useState(false);
+  const [loaded, setLoaded] = useState(false);
 
   if (failed) {
     return (
@@ -219,14 +220,31 @@ function YangmingAssetImage({
   }
 
   return (
-    <img
-      src={asset.src}
-      alt={asset.alt ?? ""}
-      loading="lazy"
-      onError={() => setFailed(true)}
-      className={`h-auto ${imageMaxHeight} max-w-full object-contain`}
-      style={{ width: imageWidth ? "100%" : undefined, maxWidth: imageWidth }}
-    />
+    <div className="relative flex min-h-32 max-w-full items-center justify-center overflow-hidden rounded-xl bg-slate-50/60">
+      {!loaded ? (
+        <div className="absolute inset-0 flex items-center justify-center px-4 text-center text-xs font-semibold text-slate-400">
+          原頁截圖載入中...
+        </div>
+      ) : null}
+      <img
+        src={asset.src}
+        alt={asset.alt ?? ""}
+        loading="lazy"
+        onLoad={(event) => {
+          const image = event.currentTarget;
+          if (image.naturalWidth <= 0 || image.naturalHeight <= 0) {
+            setFailed(true);
+            return;
+          }
+          setLoaded(true);
+        }}
+        onError={() => setFailed(true)}
+        className={`relative z-10 h-auto ${imageMaxHeight} max-w-full object-contain transition-opacity ${
+          loaded ? "opacity-100" : "opacity-0"
+        }`}
+        style={{ width: imageWidth ? "100%" : undefined, maxWidth: imageWidth }}
+      />
+    </div>
   );
 }
 
