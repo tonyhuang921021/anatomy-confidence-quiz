@@ -20,6 +20,7 @@ const PRACTICE_QUESTION_COUNT_KEY = "anatomy-confidence-practice-question-count"
 const PRACTICE_STOP_AFTER_REVIEW_KEY = "anatomy-confidence-practice-stop-after-review";
 const ACTIVE_USER_KEY = "anatomy-confidence-active-user-id";
 const GUEST_USER_ID = "guest";
+const completedSessionsMemoryCache = new Map<string, QuizSession[]>();
 
 const isBrowser = () => typeof window !== "undefined";
 
@@ -464,11 +465,14 @@ export function saveCompletedSession(session: QuizSession) {
 export function saveCompletedSessions(sessions: QuizSession[]) {
   if (!isBrowser()) return;
   const scopedKey = getScopedKey(COMPLETED_SESSIONS_KEY);
+  const activeUser = getActiveStorageUser();
   const normalized = dedupeSessionsByCanonicalId(normalizeSessions(sessions))
     .filter((session) => Boolean(session.completedAt))
     .sort((left, right) =>
     (left.completedAt ?? left.startedAt).localeCompare(right.completedAt ?? right.startedAt)
   );
+
+  completedSessionsMemoryCache.set(activeUser, normalized);
 
   let persisted = normalized.map(compactSessionForStorage);
   let didPersist = safeLocalStorageSetItem(scopedKey, JSON.stringify(persisted));
@@ -478,13 +482,16 @@ export function saveCompletedSessions(sessions: QuizSession[]) {
     didPersist = safeLocalStorageSetItem(scopedKey, JSON.stringify(persisted));
   }
 
-  if (!didPersist) return false;
+  if (!didPersist) {
+    window.dispatchEvent(new CustomEvent("completed-sessions-change", { detail: normalized }));
+    return false;
+  }
 
   for (const session of persisted) {
     clearMatchingCurrentSessions(session.id);
   }
 
-  window.dispatchEvent(new CustomEvent("completed-sessions-change", { detail: persisted }));
+  window.dispatchEvent(new CustomEvent("completed-sessions-change", { detail: normalized }));
   return true;
 }
 
@@ -494,6 +501,9 @@ export function loadCompletedSessions(): QuizSession[] {
 
 export function loadCompletedSessionsForUser(userId: string): QuizSession[] {
   if (!isBrowser()) return [];
+  const cachedSessions = completedSessionsMemoryCache.get(userId);
+  if (cachedSessions) return cachedSessions;
+
   const scopedKey = getScopedKeyForUser(COMPLETED_SESSIONS_KEY, userId);
   const raw =
     safeLocalStorageGetItem(scopedKey) ??
@@ -509,6 +519,7 @@ export function loadCompletedSessionsForUser(userId: string): QuizSession[] {
 
 export function clearHistory() {
   if (!isBrowser()) return;
+  completedSessionsMemoryCache.delete(getActiveStorageUser());
   safeLocalStorageRemoveItem(getScopedKey(COMPLETED_SESSIONS_KEY));
   safeLocalStorageRemoveItem(getScopedKey(CURRENT_SESSION_KEY));
 }
