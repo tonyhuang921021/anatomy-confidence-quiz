@@ -163,7 +163,8 @@ const AI_SEARCH_USAGE_PREFIX = "AI_SEARCH:";
 const SUPABASE_PAGE_SIZE = 1000;
 const CLOUD_COMPLETED_SESSION_FETCH_PAGE_SIZE = 300;
 const CLOUD_COMPLETED_SESSION_FETCH_MAX_ROWS = 3000;
-const CLOUD_COMPLETED_SESSION_UPLOAD_LIMIT = 30;
+const CLOUD_COMPLETED_SESSION_UPLOAD_LIMIT = 3000;
+const CLOUD_COMPLETED_SESSION_UPLOAD_BATCH_SIZE = 25;
 const CLOUD_ATTEMPT_SESSION_FETCH_CHUNK_SIZE = 20;
 const CURRENT_SESSION_SYNC_MIN_INTERVAL_MS = 30_000;
 const STATS_SYNC_ATTEMPT_BATCH_SIZE = 200;
@@ -1342,6 +1343,24 @@ async function upsertSessionsForUser(userId: string, sessions: QuizSession[]) {
   }
 }
 
+async function upsertSessionsForUserInBatches(
+  userId: string,
+  sessions: QuizSession[],
+  batchSize = CLOUD_COMPLETED_SESSION_UPLOAD_BATCH_SIZE
+) {
+  for (let index = 0; index < sessions.length; index += batchSize) {
+    await upsertSessionsForUser(userId, sessions.slice(index, index + batchSize));
+  }
+}
+
+async function upsertSessionsForUserInBatchesSafely(userId: string, sessions: QuizSession[]) {
+  try {
+    await upsertSessionsForUserInBatches(userId, sessions);
+  } catch (error) {
+    console.error("Completed session backfill skipped:", error);
+  }
+}
+
 export async function syncCompletedSessionsForCurrentUser(userId: string) {
   if (isSupabaseRecoveryMode() || !isSupabaseConfigured()) {
     return loadCompletedSessions();
@@ -1370,9 +1389,11 @@ export async function syncCompletedSessionsForCurrentUser(userId: string) {
 
   saveCompletedSessions(mergedSessions);
   if (sessionsToBackfill.length > 0) {
-    await upsertSessionsForUser(userId, sessionsToBackfill);
+    void upsertSessionsForUserInBatchesSafely(userId, sessionsToBackfill);
   }
-  await upsertSessionsForUser(userId, sessionsToUpload);
+  if (sessionsToUpload.length > 0) {
+    void upsertSessionsForUserInBatchesSafely(userId, sessionsToUpload);
+  }
 
   return mergedSessions;
 }
