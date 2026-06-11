@@ -62,6 +62,34 @@ const QUICK_ENTRIES = [
   }
 ] as const;
 
+const HOME_RELEASE_NOTES = [
+  {
+    time: "06/11 11:45",
+    title: "陽明詳解讀取更穩",
+    body: "修正部分考古題題號格式不同導致找不到詳解的問題。"
+  },
+  {
+    time: "06/11 11:40",
+    title: "做題同步減壓",
+    body: "作答時先快速存到本機，再延遲同步到雲端，減少按下一題卡住。"
+  },
+  {
+    time: "06/11 11:30",
+    title: "陽明詳解截圖再檢查",
+    body: "移除容易切到下一題的截圖，避免詳解混到隔壁題。"
+  },
+  {
+    time: "06/09",
+    title: "陽明詳解開放查看",
+    body: "有詳解的題目可另外展開陽明詳解，也可以回報內容問題。"
+  },
+  {
+    time: "06/05",
+    title: "學習筆記連回考古題",
+    body: "筆記右側可查看相關題目，讀筆記時能順手回到題庫練習。"
+  }
+] as const;
+
 export default function HomePage() {
   if (isSupabaseRecoveryMode()) {
     return (
@@ -147,6 +175,31 @@ export default function HomePage() {
                 </ClientSectionBoundary>
               </div>
             </div>
+
+            <section className="home-release-notes mt-5" aria-labelledby="home-release-title">
+              <div className="flex items-center justify-between gap-3">
+                <div>
+                  <p className="eyebrow text-[10px]">Updates</p>
+                  <h2 id="home-release-title" className="mt-1 text-sm font-black tracking-[-0.02em] text-ink">
+                    最近網站更新
+                  </h2>
+                </div>
+                <span className="rounded-full bg-white/75 px-3 py-1 text-[11px] font-bold text-slate-500 ring-1 ring-slate-100">
+                  給同學看的版本
+                </span>
+              </div>
+              <div className="home-release-scroll mt-3 space-y-2 pr-1">
+                {HOME_RELEASE_NOTES.map((note) => (
+                  <article key={`${note.time}-${note.title}`} className="home-release-item">
+                    <time className="text-[11px] font-black text-brand-700">{note.time}</time>
+                    <div className="min-w-0">
+                      <h3 className="truncate text-sm font-black text-ink">{note.title}</h3>
+                      <p className="mt-0.5 text-xs font-semibold leading-5 text-slate-500">{note.body}</p>
+                    </div>
+                  </article>
+                ))}
+              </div>
+            </section>
 
             <div className="home-mini-strip mt-8 grid gap-3 sm:grid-cols-3">
               <div>
