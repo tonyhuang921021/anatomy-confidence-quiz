@@ -15,6 +15,7 @@ import re
 import subprocess
 import tempfile
 import hashlib
+from collections import Counter
 from dataclasses import dataclass
 from difflib import SequenceMatcher
 from pathlib import Path
@@ -207,6 +208,44 @@ def parse_file_meta(path: Path, paper_meta: dict[tuple[int, int, str], PaperMeta
     round_no = int(match.group("round"))
     group = f"醫學（{match.group('exam')}）"
     return paper_meta.get((roc_year, round_no, group))
+
+
+PAGE_PAPER_META_RE = re.compile(
+    r"(?P<roc>\d{3})\s*年\s*第?\s*(?P<round>[一二12])\s*次\s*醫師考試\s*[|｜]\s*醫師\s*[（(]\s*(?P<exam>[一二12])\s*[）)]"
+)
+PAGE_ROUND_TEXT_TO_NO = {"一": 1, "二": 2, "1": 1, "2": 2}
+PAGE_EXAM_TEXT_TO_GROUP = {"一": "醫學（一）", "二": "醫學（二）", "1": "醫學（一）", "2": "醫學（二）"}
+
+
+def page_paper_meta_counts(path: Path, paper_meta: dict[tuple[int, int, str], PaperMeta]) -> Counter[tuple[int, int, str]]:
+    counts: Counter[tuple[int, int, str]] = Counter()
+    try:
+        doc = fitz.open(path)
+    except Exception:
+        return counts
+    try:
+        for page in doc:
+            text = page.get_text("text") or ""
+            match = PAGE_PAPER_META_RE.search(text)
+            if not match:
+                continue
+            round_no = PAGE_ROUND_TEXT_TO_NO.get(match.group("round"))
+            group = PAGE_EXAM_TEXT_TO_GROUP.get(match.group("exam"))
+            if not round_no or not group:
+                continue
+            key = (int(match.group("roc")), round_no, group)
+            if key in paper_meta:
+                counts[key] += 1
+    finally:
+        doc.close()
+    return counts
+
+
+def has_conflicting_page_metas(path: Path, paper_meta: dict[tuple[int, int, str], PaperMeta]) -> tuple[bool, dict[str, int]]:
+    counts = page_paper_meta_counts(path, paper_meta)
+    significant = {key: count for key, count in counts.items() if count >= 2}
+    summary = {f"{key[0]}-{key[1]}-{key[2]}": count for key, count in sorted(counts.items())}
+    return len(significant) >= 2, summary
 
 
 def text_from_block(block: dict[str, Any]) -> str:
@@ -2058,6 +2097,15 @@ def main() -> int:
         pdfs = pdfs[: args.limit]
 
     for path in pdfs:
+        has_conflict, page_meta_summary = has_conflicting_page_metas(path, paper_meta)
+        if has_conflict:
+            file_reports.append({
+                "file": path.name,
+                "status": "mixed_page_metas_skipped",
+                "extracted": 0,
+                "page_meta_summary": page_meta_summary,
+            })
+            continue
         meta = parse_file_meta(path, paper_meta)
         if not meta:
             bookmark_sections = parse_bookmark_sections(
