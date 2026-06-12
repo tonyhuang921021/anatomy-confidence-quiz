@@ -65,8 +65,8 @@ const QUICK_ENTRIES = [
 const HOME_RELEASE_NOTES = [
   {
     time: "06/13",
-    title: "忘記密碼也能救回來",
-    body: "劉人豪同學提醒後，登入區補上忘記密碼功能，可以用 Email 寄重設信。"
+    title: "劉人豪忘記密碼",
+    body: "我幫他補了忘記密碼功能，現在可以用 Email 收重設密碼信。"
   },
   {
     time: "06/12 晚上",

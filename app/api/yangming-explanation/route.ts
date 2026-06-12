@@ -101,6 +101,34 @@ function detectAssetQuestionNumber(record: { rows?: unknown; alt?: unknown; src?
   return labelMatch ? Number(labelMatch[1]) : null;
 }
 
+function detectAssetQuestionNumberFromHints(record: { alt?: unknown; src?: unknown }) {
+  const hints = [record.alt, record.src]
+    .filter((value): value is string => typeof value === "string")
+    .join(" ");
+  const labelMatch =
+    hints.match(/第\s*0*(\d{1,3})\s*題/) ??
+    hints.match(/(?:^|[-_/])q0*(\d{1,3})(?:[-_.]|$)/i);
+  return labelMatch ? Number(labelMatch[1]) : null;
+}
+
+function shouldDropAssetForQuestion(
+  record: { rows?: unknown; alt?: unknown; src?: unknown; kind?: unknown },
+  expectedQuestionNo: number | null
+) {
+  if (!expectedQuestionNo) return false;
+
+  const hintQuestionNo = detectAssetQuestionNumberFromHints(record);
+  if (hintQuestionNo === expectedQuestionNo) return false;
+
+  const kind = typeof record.kind === "string" ? record.kind.trim() : "";
+  if (kind === "question_snapshot" || kind === "page_snapshot") {
+    return false;
+  }
+
+  const assetQuestionNo = detectAssetQuestionNumber(record);
+  return Boolean(assetQuestionNo && assetQuestionNo !== expectedQuestionNo);
+}
+
 function isMeaningfulYangmingText(text: string | null | undefined) {
   if (!text) return false;
   const compact = text.replace(/\s+/g, "");
@@ -209,8 +237,7 @@ function normalizeAssets(
       rows?: unknown;
     };
     if (typeof record.src !== "string" || !record.src.trim()) return;
-    const assetQuestionNo = detectAssetQuestionNumber(record);
-    if (expectedQuestionNo && assetQuestionNo && assetQuestionNo !== expectedQuestionNo) {
+    if (shouldDropAssetForQuestion(record, expectedQuestionNo)) {
       return;
     }
     const storagePath = record.src.trim();
