@@ -4,6 +4,7 @@ import Link from "next/link";
 import { Suspense, useEffect, useMemo, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useAuth } from "@/components/AuthProvider";
+import { CopyQuestionPromptButton } from "@/components/CopyQuestionPromptButton";
 import { QuestionOptionBlock, QuestionStemBlock } from "@/components/QuestionMediaBlock";
 import { ResultSummary } from "@/components/ResultSummary";
 import { WeaknessRanking } from "@/components/WeaknessRanking";
@@ -996,6 +997,11 @@ function ResultsPageContent() {
   function renderExplanationFooter(question: Question, attempt: Attempt) {
     return (
       <div className="space-y-3">
+        <CopyQuestionPromptButton
+          question={question}
+          selectedAnswer={attempt.selectedAnswer}
+          correctAnswer={attempt.correctAnswer}
+        />
         {renderQuestionExplanationControls(question, attempt)}
       </div>
     );

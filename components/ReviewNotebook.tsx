@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { type ReactNode, useEffect, useMemo, useState } from "react";
+import { CopyQuestionPromptButton } from "@/components/CopyQuestionPromptButton";
 import { QuestionOptionBlock, QuestionStemBlock } from "@/components/QuestionMediaBlock";
 import { YangmingExplanationPanel } from "@/components/YangmingExplanationPanel";
 import {
@@ -620,6 +621,10 @@ export function ReviewNotebook({
 
     return (
       <div className="space-y-3">
+        <CopyQuestionPromptButton
+          question={question}
+          correctAnswer={question.answer}
+        />
         <div className="flex flex-wrap items-center gap-2">
           {override ? (
             <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-600">

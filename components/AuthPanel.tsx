@@ -9,11 +9,13 @@ import {
 } from "@/lib/cloudSync";
 import {
   loadPracticeQuestionCount,
+  loadPracticeFastAnswerMode,
   loadPracticeStopAfterReview,
   loadPracticeYearRange,
   loadHomeToneMode,
   loadThemeMode,
   savePracticeQuestionCount,
+  savePracticeFastAnswerMode,
   savePracticeStopAfterReview,
   savePracticeYearRange,
   saveHomeToneMode,
@@ -26,7 +28,9 @@ import {
 import {
   getHomeToneModePreference,
   hasPracticeQuestionCountPreference,
+  hasPracticeFastAnswerModePreference,
   hasPracticeStopAfterReviewPreference,
+  getPracticeFastAnswerModePreference,
   getPracticeQuestionCountPreference,
   getPracticeStopAfterReviewPreference,
   getPracticeYearRangePreference,
@@ -131,6 +135,7 @@ export function AuthPanel() {
   const [practiceYearRange, setPracticeYearRange] = useState<PracticeYearRange>(defaultPracticeYearRange);
   const [practiceQuestionCount, setPracticeQuestionCount] = useState<PracticeQuestionCount>(10);
   const [practiceStopAfterReview, setPracticeStopAfterReview] = useState(false);
+  const [practiceFastAnswerMode, setPracticeFastAnswerMode] = useState(false);
 
   useEffect(() => {
     setNickname(typeof user?.user_metadata?.display_name === "string" ? user.user_metadata.display_name : "");
@@ -157,24 +162,31 @@ export function AuthPanel() {
   useEffect(() => {
     const accountCount = getPracticeQuestionCountPreference(user?.user_metadata, 10);
     const accountStopAfterReview = getPracticeStopAfterReviewPreference(user?.user_metadata, false);
+    const accountFastAnswerMode = getPracticeFastAnswerModePreference(user?.user_metadata, false);
     const nextCount = user ? accountCount : loadPracticeQuestionCount(10);
     const nextStopAfterReview = user ? accountStopAfterReview : loadPracticeStopAfterReview(false);
+    const nextFastAnswerMode = user ? accountFastAnswerMode : loadPracticeFastAnswerMode(false);
     setPracticeQuestionCount(nextCount);
     setPracticeStopAfterReview(nextStopAfterReview);
+    setPracticeFastAnswerMode(nextFastAnswerMode);
     if (user) {
       savePracticeQuestionCount(accountCount);
       savePracticeStopAfterReview(accountStopAfterReview);
+      savePracticeFastAnswerMode(accountFastAnswerMode);
       const missingQuestionCount = !hasPracticeQuestionCountPreference(user.user_metadata);
       const missingStopAfterReview = !hasPracticeStopAfterReviewPreference(user.user_metadata);
-      if (missingQuestionCount || missingStopAfterReview) {
+      const missingFastAnswerMode = !hasPracticeFastAnswerModePreference(user.user_metadata);
+      if (missingQuestionCount || missingStopAfterReview || missingFastAnswerMode) {
         const patch: AccountPreferencePatch = {};
         if (missingQuestionCount) patch.practice_question_count = 10;
         if (missingStopAfterReview) patch.practice_stop_after_review = false;
+        if (missingFastAnswerMode) patch.practice_fast_answer_mode = false;
         void persistAccountPreferences(patch).catch(() => {});
       }
     } else {
       savePracticeQuestionCount(nextCount);
       savePracticeStopAfterReview(nextStopAfterReview);
+      savePracticeFastAnswerMode(nextFastAnswerMode);
     }
   }, [user?.id, user?.user_metadata]);
 
@@ -251,6 +263,18 @@ export function AuthPanel() {
       practice_stop_after_review: enabled
     }).catch((persistError) => {
       setError(persistError instanceof Error ? persistError.message : "結束作答設定同步失敗");
+    });
+  }
+
+  function handleChangePracticeFastAnswerMode(enabled: boolean) {
+    setPracticeFastAnswerMode(enabled);
+    savePracticeFastAnswerMode(enabled);
+    if (!user) return;
+    setError("");
+    void persistAccountPreferences({
+      practice_fast_answer_mode: enabled
+    }).catch((persistError) => {
+      setError(persistError instanceof Error ? persistError.message : "極速模式設定同步失敗");
     });
   }
 
@@ -550,6 +574,33 @@ export function AuthPanel() {
                         每題詳解後可結束
                       </button>
                     </div>
+                    <div className="mt-3 flex flex-wrap gap-2">
+                      <button
+                        type="button"
+                        onClick={() => handleChangePracticeFastAnswerMode(false)}
+                        className={`min-h-11 rounded-full px-4 py-2 text-sm font-semibold transition ${
+                          !practiceFastAnswerMode
+                            ? "bg-brand-600 text-white"
+                            : "bg-slate-100 text-slate-700 hover:bg-slate-200"
+                        }`}
+                      >
+                        選完再送出
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => handleChangePracticeFastAnswerMode(true)}
+                        className={`min-h-11 rounded-full px-4 py-2 text-sm font-semibold transition ${
+                          practiceFastAnswerMode
+                            ? "bg-cyan-100 text-cyan-950 ring-1 ring-cyan-300"
+                            : "bg-slate-100 text-slate-700 hover:bg-slate-200"
+                        }`}
+                      >
+                        極速做題：點選即送出
+                      </button>
+                    </div>
+                    <p className="mt-2 text-xs leading-5 text-slate-500">
+                      極速模式會在點選選項後直接作答，作答後仍可看詳解、調整信心與記錄錯因。
+                    </p>
                   </div>
 
                   {!practiceStopAfterReview ? (

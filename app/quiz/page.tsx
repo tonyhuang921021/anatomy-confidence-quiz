@@ -5,6 +5,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/components/AuthProvider";
 import { ConfidenceSelector } from "@/components/ConfidenceSelector";
+import { CopyQuestionPromptButton } from "@/components/CopyQuestionPromptButton";
 import { ErrorTypeSelector } from "@/components/ErrorTypeSelector";
 import { QuestionCard } from "@/components/QuestionCard";
 import { YangmingExplanationPanel } from "@/components/YangmingExplanationPanel";
@@ -46,6 +47,7 @@ import {
   getPendingQuestionExplanationOverrideSync,
   loadCompletedSessions,
   loadCurrentSession,
+  loadPracticeFastAnswerMode,
   loadQuestionExplanationOverrides,
   loadQuizSettings,
   saveCompletedSession,
@@ -387,6 +389,7 @@ export default function QuizPage() {
   const [isSubmittingAnswer, setIsSubmittingAnswer] = useState(false);
   const [isPeakPrefetching, setIsPeakPrefetching] = useState(false);
   const [peakNextQuestionError, setPeakNextQuestionError] = useState("");
+  const [fastAnswerMode, setFastAnswerMode] = useState(false);
   const [selectedAnswer, setSelectedAnswer] = useState<OptionKey | undefined>();
   const [confidence, setConfidence] = useState<ConfidenceLevel>(4);
   const [confidenceExpanded, setConfidenceExpanded] = useState(false);
@@ -484,6 +487,21 @@ export default function QuizPage() {
 
     throw lastError instanceof Error ? lastError : new Error("下一題產生失敗，請再試一次。");
   }
+
+  useEffect(() => {
+    setFastAnswerMode(loadPracticeFastAnswerMode(false));
+
+    function handleFastAnswerModeChange(event: Event) {
+      const customEvent = event as CustomEvent<boolean>;
+      setFastAnswerMode(Boolean(customEvent.detail));
+    }
+
+    window.addEventListener("practice-fast-answer-mode-change", handleFastAnswerModeChange);
+
+    return () => {
+      window.removeEventListener("practice-fast-answer-mode-change", handleFastAnswerModeChange);
+    };
+  }, []);
 
   useEffect(() => {
     const flushPendingSession = () => flushDeferredCurrentSessionSave();
@@ -770,16 +788,18 @@ export default function QuizPage() {
     setSubmittedAttempt(updatedAttempt);
   }
 
-  function handleSubmit() {
-    if (!session || !currentQuestion || !selectedAnswer) return;
+  function handleSubmit(answerOverride?: OptionKey) {
+    const answerToSubmit = answerOverride ?? selectedAnswer;
+    if (!session || !currentQuestion || !answerToSubmit || isSubmittingAnswer) return;
+    setSelectedAnswer(answerToSubmit);
     setIsSubmittingAnswer(true);
     setPeakNextQuestionError("");
 
     const attempt: Attempt = {
       questionId: currentQuestion.id,
-      selectedAnswer,
+      selectedAnswer: answerToSubmit,
       correctAnswer: currentQuestion.answer,
-      isCorrect: evaluateAttempt(currentQuestion, selectedAnswer),
+      isCorrect: evaluateAttempt(currentQuestion, answerToSubmit),
       confidence,
       answeredAt: new Date().toISOString()
     };
@@ -935,6 +955,14 @@ export default function QuizPage() {
     setSubmittedAttempt(attempt);
     setErrorType(undefined);
     setIsSubmittingAnswer(false);
+  }
+
+  function handleSelectAnswer(value: OptionKey) {
+    if (submittedAttempt || isSubmittingAnswer) return;
+    setSelectedAnswer(value);
+    if (fastAnswerMode) {
+      handleSubmit(value);
+    }
   }
 
   function handleBlindSimulationPrevious() {
@@ -1446,7 +1474,7 @@ export default function QuizPage() {
           <QuestionCard
             question={currentQuestion}
             selectedAnswer={selectedAnswer}
-            onSelect={setSelectedAnswer}
+            onSelect={handleSelectAnswer}
             showMetadata={session.settings?.mode !== "simulation"}
           />
 
@@ -1486,7 +1514,7 @@ export default function QuizPage() {
                   ) : null}
                   <button
                     type="button"
-                    onClick={handleSubmit}
+                    onClick={() => handleSubmit()}
                     disabled={!selectedAnswer || isSubmittingAnswer}
                     className={`min-h-12 w-full rounded-2xl bg-brand-600 px-4 py-4 text-sm font-semibold text-white transition hover:bg-brand-700 disabled:cursor-not-allowed disabled:bg-slate-300 ${
                       isBlindSimulation ? "" : "sm:col-span-2"
@@ -1530,6 +1558,12 @@ export default function QuizPage() {
                       難度 {difficultyBadge.text}
                     </span>
                   ) : null}
+                  <CopyQuestionPromptButton
+                    question={currentQuestion}
+                    selectedAnswer={submittedAttempt.selectedAnswer}
+                    correctAnswer={submittedAttempt.correctAnswer}
+                    className="ml-auto"
+                  />
                 </div>
                 <div className="mt-4 space-y-3 text-sm leading-7">
                   {shouldShowCorrectAnswer ? (

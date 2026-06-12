@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { CopyQuestionPromptButton } from "@/components/CopyQuestionPromptButton";
 import { FormattedQuestionText } from "@/components/FormattedQuestionText";
 import { useAuth } from "@/components/AuthProvider";
 import { YangmingExplanationPanel } from "@/components/YangmingExplanationPanel";
@@ -160,6 +161,12 @@ export function StudyNoteQuestionCard({ question, link, title }: Props) {
           >
             {showAnswer ? "收合答案詳解" : "看答案與詳解"}
           </button>
+          <CopyQuestionPromptButton
+            question={question}
+            correctAnswer={question.answer}
+            compact
+            className="ml-2 mt-4 align-middle"
+          />
           <button
             type="button"
             onClick={() => void handleGenerateExplanation()}

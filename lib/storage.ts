@@ -18,6 +18,7 @@ const THEME_MODE_KEY = "anatomy-confidence-theme-mode";
 const PRACTICE_YEAR_RANGE_KEY = "anatomy-confidence-practice-year-range";
 const PRACTICE_QUESTION_COUNT_KEY = "anatomy-confidence-practice-question-count";
 const PRACTICE_STOP_AFTER_REVIEW_KEY = "anatomy-confidence-practice-stop-after-review";
+const PRACTICE_FAST_ANSWER_MODE_KEY = "anatomy-confidence-practice-fast-answer-mode";
 const ACTIVE_USER_KEY = "anatomy-confidence-active-user-id";
 const GUEST_USER_ID = "guest";
 const completedSessionsMemoryCache = new Map<string, QuizSession[]>();
@@ -737,6 +738,20 @@ export function savePracticeStopAfterReview(enabled: boolean) {
 export function loadPracticeStopAfterReview(defaultValue = false) {
   if (!isBrowser()) return defaultValue;
   const raw = getLegacyOrScopedRaw(PRACTICE_STOP_AFTER_REVIEW_KEY);
+  if (raw === "true") return true;
+  if (raw === "false") return false;
+  return defaultValue;
+}
+
+export function savePracticeFastAnswerMode(enabled: boolean) {
+  if (!isBrowser()) return;
+  safeLocalStorageSetItem(getScopedKey(PRACTICE_FAST_ANSWER_MODE_KEY), enabled ? "true" : "false");
+  window.dispatchEvent(new CustomEvent("practice-fast-answer-mode-change", { detail: enabled }));
+}
+
+export function loadPracticeFastAnswerMode(defaultValue = false) {
+  if (!isBrowser()) return defaultValue;
+  const raw = getLegacyOrScopedRaw(PRACTICE_FAST_ANSWER_MODE_KEY);
   if (raw === "true") return true;
   if (raw === "false") return false;
   return defaultValue;

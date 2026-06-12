@@ -15,6 +15,7 @@ export type AccountPreferencePatch = {
   practice_year_to?: number;
   practice_question_count?: PracticeQuestionCount;
   practice_stop_after_review?: boolean;
+  practice_fast_answer_mode?: boolean;
 };
 
 export function getHomeToneModePreference(metadata: MetadataSource): HomeToneMode | null {
@@ -58,10 +59,20 @@ export function getPracticeStopAfterReviewPreference(metadata: MetadataSource, d
     : defaultValue;
 }
 
+export function getPracticeFastAnswerModePreference(metadata: MetadataSource, defaultValue = false) {
+  return typeof metadata?.practice_fast_answer_mode === "boolean"
+    ? metadata.practice_fast_answer_mode
+    : defaultValue;
+}
+
 export function hasPracticeQuestionCountPreference(metadata: MetadataSource) {
   return typeof metadata?.practice_question_count === "number";
 }
 
 export function hasPracticeStopAfterReviewPreference(metadata: MetadataSource) {
   return typeof metadata?.practice_stop_after_review === "boolean";
+}
+
+export function hasPracticeFastAnswerModePreference(metadata: MetadataSource) {
+  return typeof metadata?.practice_fast_answer_mode === "boolean";
 }
