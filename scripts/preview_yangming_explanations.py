@@ -1545,6 +1545,10 @@ def parse_content_meta(
     paper_meta: dict[tuple[int, int, str], PaperMeta],
     filename: str = "",
 ) -> PaperMeta | None:
+    fixed_meta_key = FIXED_FILENAME_META.get(re.sub(r"\s+", "", filename))
+    if fixed_meta_key:
+        return paper_meta.get(fixed_meta_key)
+
     text = " ".join(item["text"] for item in items[:80] if item["type"] == "text")
     text = normalize_text(text)
     match = re.search(

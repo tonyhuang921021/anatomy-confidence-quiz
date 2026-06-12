@@ -11,6 +11,7 @@ import argparse
 import csv
 import importlib.util
 import json
+import re
 import subprocess
 import sys
 from pathlib import Path
@@ -370,6 +371,33 @@ def attach_page_snapshot_fallbacks(
     def row_snapshot_regions(row: dict[str, Any], doc: Any, start_page: int, end_page: int) -> list[dict[str, Any]]:
         raw_regions = row.get("source_page_regions")
         regions: list[dict[str, Any]] = []
+        current_qno = row_question_no(row)
+        next_qno = current_qno + 1 if current_qno else 0
+
+        def trim_before_next_question(page: Any, bbox: list[float]) -> list[float]:
+            if not next_qno:
+                return bbox
+            rect = preview.fitz.Rect(*bbox)
+            try:
+                blocks = page.get_text("blocks", clip=rect)
+            except TypeError:
+                blocks = page.get_text("blocks")
+            next_header_pattern = re.compile(rf"題\s*號\s*[:：]?\s*0*{next_qno}(?=\s|　|科|$)")
+            next_top: float | None = None
+            for block in blocks:
+                try:
+                    x0, y0, x1, y1, text = block[:5]
+                except ValueError:
+                    continue
+                if y0 < bbox[1] or y0 > bbox[3]:
+                    continue
+                if next_header_pattern.search(str(text)):
+                    next_top = float(y0) if next_top is None else min(next_top, float(y0))
+            if next_top is None:
+                return bbox
+            trimmed = [bbox[0], bbox[1], bbox[2], max(bbox[1], next_top - 3)]
+            return trimmed
+
         if isinstance(raw_regions, list):
             for raw_region in raw_regions:
                 if not isinstance(raw_region, dict):
@@ -378,7 +406,29 @@ def attach_page_snapshot_fallbacks(
                 bbox = raw_region.get("bbox")
                 if not isinstance(page_number, int) or not isinstance(bbox, list) or len(bbox) != 4:
                     continue
-                regions.append({"page": page_number, "bbox": bbox})
+                if page_number <= 0 or page_number > doc.page_count:
+                    continue
+                page_rect = doc[page_number - 1].rect
+                clipped_bbox = [
+                    max(float(page_rect.x0), float(bbox[0])),
+                    max(float(page_rect.y0), float(bbox[1])),
+                    min(float(page_rect.x1), float(bbox[2])),
+                    min(float(page_rect.y1), float(bbox[3])),
+                ]
+                # Some PDFs expose only a tiny matched stem strip. Expanding it to
+                # a full page caused covers/neighboring questions to be displayed
+                # as authoritative explanations, so skip that unsafe region instead.
+                if clipped_bbox[3] - clipped_bbox[1] < 24 or clipped_bbox[2] - clipped_bbox[0] < 40:
+                    continue
+                region_height = clipped_bbox[3] - clipped_bbox[1]
+                if clipped_bbox[1] <= 80 and region_height < 110:
+                    region_text = doc[page_number - 1].get_textbox(preview.fitz.Rect(*clipped_bbox))
+                    if "題號" in region_text:
+                        continue
+                clipped_bbox = trim_before_next_question(doc[page_number - 1], clipped_bbox)
+                if clipped_bbox[3] - clipped_bbox[1] < 24 or clipped_bbox[2] - clipped_bbox[0] < 40:
+                    continue
+                regions.append({"page": page_number, "bbox": clipped_bbox})
         if regions:
             return regions
 
@@ -452,7 +502,8 @@ def attach_page_snapshot_fallbacks(
                 )
                 if not src:
                     continue
-                is_primary_snapshot = mode == "all"
+                is_source_region_snapshot = bool(row.get("source_page_regions"))
+                is_primary_snapshot = mode == "all" and is_source_region_snapshot
                 assets.append({
                     "src": src,
                     "alt": f"{source_file} 第 {qno} 題原頁截圖",
