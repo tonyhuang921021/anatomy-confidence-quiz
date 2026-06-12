@@ -65,6 +65,11 @@ const QUICK_ENTRIES = [
 const HOME_RELEASE_NOTES = [
   {
     time: "06/12",
+    title: "複製題目更乾淨",
+    body: "複製給 AI 時不再附上網站舊詳解與標記觀念，避免 AI 被錯誤內容帶歪。"
+  },
+  {
+    time: "06/12",
     title: "進度統計更準",
     body: "進度總覽與完成度統計改以正式題庫為主，不再把 AI 題算進總題數。"
   },

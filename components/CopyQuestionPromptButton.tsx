@@ -62,10 +62,7 @@ function buildQuestionPrompt({
     optionsText,
     "",
     `正確答案：${acceptedAnswerText}`,
-    selectedAnswer ? `我的答案：${selectedAnswer}` : null,
-    "",
-    question.testedConcept ? `目前標記觀念：${question.testedConcept}` : null,
-    question.explanation ? `網站原本詳解：${question.explanation}` : null
+    selectedAnswer ? `我的答案：${selectedAnswer}` : null
   ]
     .filter((line): line is string => typeof line === "string")
     .join("\n");
