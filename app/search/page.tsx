@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useDeferredValue, useEffect, useMemo, useState } from "react";
 import { useAuth } from "@/components/AuthProvider";
+import { CopyQuestionPromptButton } from "@/components/CopyQuestionPromptButton";
 import { QuestionOptionBlock, QuestionStemBlock } from "@/components/QuestionMediaBlock";
 import { YangmingExplanationPanel } from "@/components/YangmingExplanationPanel";
 import {
@@ -623,6 +624,7 @@ export default function SearchPage() {
                   </div>
                 ) : null}
                 <div className="space-y-3">
+                  <CopyQuestionPromptButton question={renderedQuestion} />
                   {override ? (
                     <span className="inline-flex rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-600">
                       已替換詳解・{override.model ?? "gpt-5-mini"}

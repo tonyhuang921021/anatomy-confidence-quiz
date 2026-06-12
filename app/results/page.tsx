@@ -433,7 +433,8 @@ function ResultsPageContent() {
             .map((attempt) => promptQuestionMap.get(attempt.questionId))
             .filter((question): question is Question => Boolean(question));
       const resolvedAnalysisQuestions = analysisQuestions.length > 0 ? analysisQuestions : promptQuestions;
-      const completionStats = calculateCompletionStats(anatomyQuestions, completedSessions);
+      const progressQuestions = anatomyQuestions.filter((question) => question.sourceType !== "AI_GENERATED");
+      const completionStats = calculateCompletionStats(progressQuestions, completedSessions);
       const sessionSectionStats = calculateSectionStats(
         resolvedTargetSession.attempts,
         resolvedAnalysisQuestions

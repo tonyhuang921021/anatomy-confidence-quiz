@@ -120,13 +120,14 @@ function calculateSectionProgress(
 
 function calculateSubjectProgress(subject: SubjectName, sessions: QuizSession[]): SubjectProgress {
   const subjectItem = subjectRegistry[subject];
-  const questionMap = new Map(subjectItem.questions.map((question) => [question.id, question] as const));
+  const trackableQuestions = subjectItem.questions.filter((question) => question.sourceType !== "AI_GENERATED");
+  const questionMap = new Map(trackableQuestions.map((question) => [question.id, question] as const));
   const attempts = sessions
     .flatMap((session) => session.attempts)
     .filter((attempt) => questionMap.has(attempt.questionId));
 
   const sectionBuckets = new Map<string, Set<string>>();
-  subjectItem.questions.forEach((question) => {
+  trackableQuestions.forEach((question) => {
     const key = `${question.chapter}__${question.section}`;
     const bucket = sectionBuckets.get(key) ?? new Set<string>();
     bucket.add(question.id);
@@ -142,7 +143,7 @@ function calculateSubjectProgress(subject: SubjectName, sessions: QuizSession[])
 
   const attemptedQuestions = new Set(attempts.map((attempt) => attempt.questionId)).size;
   const completionRate =
-    subjectItem.questions.length === 0 ? 0 : round((attemptedQuestions / subjectItem.questions.length) * 100);
+    trackableQuestions.length === 0 ? 0 : round((attemptedQuestions / trackableQuestions.length) * 100);
   const correctRate =
     attempts.length === 0 ? 0 : round((attempts.filter((attempt) => attempt.isCorrect).length / attempts.length) * 100);
   const averageConfidence =
@@ -154,7 +155,7 @@ function calculateSubjectProgress(subject: SubjectName, sessions: QuizSession[])
   return {
     subject,
     label: subjectItem.label,
-    totalQuestionsInBank: subjectItem.questions.length,
+    totalQuestionsInBank: trackableQuestions.length,
     attemptedQuestions,
     completionRate,
     correctRate,
