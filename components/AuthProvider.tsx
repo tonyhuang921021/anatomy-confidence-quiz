@@ -26,12 +26,14 @@ import { isSupabaseRecoveryMode } from "@/lib/supabase/recoveryMode";
 type AuthContextValue = {
   user: User | null;
   session: Session | null;
+  passwordRecovery: boolean;
   loading: boolean;
   configured: boolean;
   syncStatus: "idle" | "syncing" | "ready" | "error";
   syncVersion: number;
   syncError: string;
   applyAuthSession: (nextSession: Session | null) => void;
+  finishPasswordRecovery: () => void;
   refreshCloudData: () => Promise<void>;
   signOut: () => Promise<void>;
 };
@@ -74,6 +76,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const recoveryMode = isSupabaseRecoveryMode();
   const [user, setUser] = useState<User | null>(null);
   const [session, setSession] = useState<Session | null>(null);
+  const [passwordRecovery, setPasswordRecovery] = useState(false);
   const [loading, setLoading] = useState(true);
   const [syncStatus, setSyncStatus] = useState<AuthContextValue["syncStatus"]>("idle");
   const [syncVersion, setSyncVersion] = useState(0);
@@ -152,10 +155,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setSyncError("");
       void refreshCloudData(nextSession.user.id, nextSession.user);
     } else {
+      setPasswordRecovery(false);
       setSyncStatus("idle");
       setSyncError("");
     }
   }, [refreshCloudData]);
+
+  const finishPasswordRecovery = useCallback(() => {
+    setPasswordRecovery(false);
+  }, []);
 
   const handleSignOut = useCallback(async () => {
     if (!configured) return;
@@ -175,6 +183,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setActiveStorageUser();
       setSession(null);
       setUser(null);
+      setPasswordRecovery(false);
       setSyncStatus(recoveryMode ? "ready" : "idle");
       setSyncError(recoveryMode ? RECOVERY_MODE_MESSAGE : "");
       setLoading(false);
@@ -198,6 +207,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
         setSession(initialSession);
         setUser(initialSession?.user ?? null);
+        setPasswordRecovery(false);
         setActiveStorageUser(initialSession?.user?.id);
         setLoading(false);
 
@@ -208,6 +218,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         if (cancelled) return;
         setSession(null);
         setUser(null);
+        setPasswordRecovery(false);
         setActiveStorageUser();
         setSyncStatus("ready");
         setSyncError(getErrorMessage(error) || AUTH_FALLBACK_MESSAGE);
@@ -221,6 +232,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       data: { subscription }
     } = supabase.auth.onAuthStateChange((event, nextSession) => {
       if (event === "INITIAL_SESSION") return;
+      setPasswordRecovery(event === "PASSWORD_RECOVERY");
       applyAuthSession(nextSession);
     });
 
@@ -234,16 +246,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     () => ({
       user,
       session,
+      passwordRecovery,
       loading,
       configured,
       syncStatus,
       syncVersion,
       syncError,
       applyAuthSession,
+      finishPasswordRecovery,
       refreshCloudData,
       signOut: handleSignOut
     }),
-    [applyAuthSession, configured, handleSignOut, loading, refreshCloudData, session, syncError, syncStatus, syncVersion, user]
+    [applyAuthSession, configured, finishPasswordRecovery, handleSignOut, loading, passwordRecovery, refreshCloudData, session, syncError, syncStatus, syncVersion, user]
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

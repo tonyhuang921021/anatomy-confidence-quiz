@@ -82,14 +82,17 @@ export function AuthPanel() {
     configured,
     loading,
     user,
+    passwordRecovery,
     syncStatus,
     syncError,
     applyAuthSession,
+    finishPasswordRecovery,
     refreshCloudData,
     signOut
   } = useAuth();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [newPassword, setNewPassword] = useState("");
   const [nickname, setNickname] = useState("");
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
@@ -357,6 +360,83 @@ export function AuthPanel() {
     }
   }
 
+  async function handleSendPasswordReset() {
+    if (recoveryMode) {
+      setError(RECOVERY_MODE_MESSAGE);
+      return;
+    }
+
+    const trimmedEmail = email.trim();
+    if (!trimmedEmail) {
+      setError("請先輸入 Email。");
+      return;
+    }
+
+    setSubmitting(true);
+    setMessage("");
+    setError("");
+
+    try {
+      const { error: resetError } = await withTimeout(
+        getSupabaseBrowserClient().auth.resetPasswordForEmail(trimmedEmail, {
+          redirectTo: typeof window !== "undefined" ? `${window.location.origin}/` : undefined
+        }),
+        AUTH_ACTION_TIMEOUT_MS,
+        "重設密碼信寄送逾時，請稍後再試。"
+      );
+
+      if (resetError) {
+        setError(resetError.message);
+        return;
+      }
+
+      setMessage("重設密碼信已寄出，請到信箱點連結後設定新密碼。");
+    } catch (resetError) {
+      setError(resetError instanceof Error ? resetError.message : "重設密碼信寄送失敗，請稍後再試。");
+    } finally {
+      setSubmitting(false);
+    }
+  }
+
+  async function handleUpdateRecoveredPassword() {
+    if (recoveryMode) {
+      setError(RECOVERY_MODE_MESSAGE);
+      return;
+    }
+
+    if (newPassword.length < 6) {
+      setError("新密碼至少需要 6 個字元。");
+      return;
+    }
+
+    setSubmitting(true);
+    setMessage("");
+    setError("");
+
+    try {
+      const { error: updateError } = await withTimeout(
+        getSupabaseBrowserClient().auth.updateUser({
+          password: newPassword
+        }),
+        AUTH_ACTION_TIMEOUT_MS,
+        "更新密碼逾時，請稍後再試。"
+      );
+
+      if (updateError) {
+        setError(updateError.message);
+        return;
+      }
+
+      setNewPassword("");
+      finishPasswordRecovery();
+      setMessage("密碼已更新，之後可以用新密碼登入。");
+    } catch (updateError) {
+      setError(updateError instanceof Error ? updateError.message : "更新密碼失敗，請稍後再試。");
+    } finally {
+      setSubmitting(false);
+    }
+  }
+
   async function handleSaveNickname() {
     if (!user) return;
     if (recoveryMode) {
@@ -417,6 +497,57 @@ export function AuthPanel() {
     return (
       <section className="surface-card p-6">
         <p className="text-sm text-slate-600">正在讀取登入狀態...</p>
+      </section>
+    );
+  }
+
+  if (user && passwordRecovery) {
+    return (
+      <section className="surface-card p-6">
+        <p className="eyebrow">Password Reset</p>
+        <h2 className="display-title mt-2 text-3xl">設定新密碼</h2>
+        <p className="body-soft mt-3 text-sm leading-7">
+          已確認重設連結，請輸入新密碼。完成後就能用新密碼登入。
+        </p>
+
+        <div className="mt-5 grid gap-3">
+          <input
+            type="password"
+            value={newPassword}
+            onChange={(event) => setNewPassword(event.target.value)}
+            placeholder="新密碼（至少 6 個字元）"
+            className="min-h-12 rounded-2xl border border-slate-200 px-4 py-3 text-sm text-slate-800 outline-none"
+          />
+        </div>
+
+        {message ? (
+          <div className="mt-4 rounded-2xl bg-emerald-50 p-4 text-sm text-emerald-900">{message}</div>
+        ) : null}
+        {error ? (
+          <div className="mt-4 rounded-2xl bg-rose-50 p-4 text-sm text-rose-900">{error}</div>
+        ) : null}
+
+        <div className="mt-5 flex flex-col gap-3 sm:flex-row">
+          <button
+            type="button"
+            onClick={() => void handleUpdateRecoveredPassword()}
+            disabled={submitting || newPassword.length < 6}
+            className="primary-pill disabled:cursor-not-allowed disabled:bg-slate-300"
+          >
+            更新密碼
+          </button>
+          <button
+            type="button"
+            onClick={() => {
+              finishPasswordRecovery();
+              setNewPassword("");
+              setError("");
+            }}
+            className="secondary-pill"
+          >
+            先略過
+          </button>
+        </div>
       </section>
     );
   }
@@ -740,6 +871,14 @@ export function AuthPanel() {
           className="secondary-pill disabled:cursor-not-allowed disabled:bg-slate-100"
         >
           註冊新帳號
+        </button>
+        <button
+          type="button"
+          onClick={() => void handleSendPasswordReset()}
+          disabled={submitting || !email}
+          className="secondary-pill disabled:cursor-not-allowed disabled:bg-slate-100"
+        >
+          忘記密碼
         </button>
       </div>
     </section>
