@@ -71,6 +71,15 @@ function withTimeout<T>(promise: Promise<T>, timeoutMs: number, message: string)
   });
 }
 
+function isPasswordRecoveryRoute() {
+  if (typeof window === "undefined") return false;
+  return (
+    window.location.pathname === "/reset-password" ||
+    window.location.hash.includes("type=recovery") ||
+    window.location.search.includes("type=recovery")
+  );
+}
+
 export function AuthProvider({ children }: { children: ReactNode }) {
   const configured = isSupabaseConfigured();
   const recoveryMode = isSupabaseRecoveryMode();
@@ -207,7 +216,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
         setSession(initialSession);
         setUser(initialSession?.user ?? null);
-        setPasswordRecovery(false);
+        setPasswordRecovery(Boolean(initialSession?.user && isPasswordRecoveryRoute()));
         setActiveStorageUser(initialSession?.user?.id);
         setLoading(false);
 
@@ -232,7 +241,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       data: { subscription }
     } = supabase.auth.onAuthStateChange((event, nextSession) => {
       if (event === "INITIAL_SESSION") return;
-      setPasswordRecovery(event === "PASSWORD_RECOVERY");
+      setPasswordRecovery(event === "PASSWORD_RECOVERY" || Boolean(nextSession?.user && isPasswordRecoveryRoute()));
       applyAuthSession(nextSession);
     });
 

@@ -379,7 +379,7 @@ export function AuthPanel() {
     try {
       const { error: resetError } = await withTimeout(
         getSupabaseBrowserClient().auth.resetPasswordForEmail(trimmedEmail, {
-          redirectTo: typeof window !== "undefined" ? `${window.location.origin}/` : undefined
+          redirectTo: typeof window !== "undefined" ? `${window.location.origin}/reset-password` : undefined
         }),
         AUTH_ACTION_TIMEOUT_MS,
         "重設密碼信寄送逾時，請稍後再試。"
