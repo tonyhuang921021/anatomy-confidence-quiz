@@ -17,6 +17,7 @@ const ROW_BATCH_SIZE = 200;
 const ASSET_CONCURRENCY = Number(process.env.YANGMING_ASSET_CONCURRENCY || "2");
 const ASSET_UPLOAD_RETRIES = Number(process.env.YANGMING_ASSET_UPLOAD_RETRIES || "4");
 const SKIP_ASSET_UPLOAD = process.env.YANGMING_SKIP_ASSET_UPLOAD === "1";
+const DRY_RUN = process.env.YANGMING_DRY_RUN === "1";
 
 function assetKindFilter() {
   const rawFilter = process.env.YANGMING_ASSET_KIND_FILTER?.trim();
@@ -376,9 +377,23 @@ async function main() {
   console.log(`rows: ${rows.length}`);
   console.log(`assets: ${assets.length}`);
   console.log(`bucket: ${bucket}`);
+  if (DRY_RUN) console.log("dry run: enabled; no assets or rows will be written");
   if (SKIP_ASSET_UPLOAD) console.log("asset upload: skipped");
   if (storagePrefix) console.log(`storage prefix: ${storagePrefix}`);
   if (allowedAssetKinds) console.log(`asset kind filter: ${Array.from(allowedAssetKinds).join(", ")}`);
+
+  if (DRY_RUN) {
+    const assetKindCounts = rows.reduce((counts, row) => {
+      for (const asset of filterAssetsByKind(row.assets, allowedAssetKinds)) {
+        const kind = String(asset?.kind || "unknown");
+        counts[kind] = (counts[kind] || 0) + 1;
+      }
+      return counts;
+    }, {});
+    console.log(`asset kind counts: ${JSON.stringify(assetKindCounts)}`);
+    console.log("Yangming import dry run complete.");
+    return;
+  }
 
   if (!SKIP_ASSET_UPLOAD) {
     if (serviceRoleKey) {

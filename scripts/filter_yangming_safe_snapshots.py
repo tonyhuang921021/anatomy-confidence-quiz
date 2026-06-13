@@ -14,6 +14,7 @@ import copy
 import csv
 import json
 import re
+import unicodedata
 from collections import Counter
 from pathlib import Path
 from typing import Any
@@ -30,6 +31,11 @@ QUESTION_WORDS = re.compile(
 OPTION_PATTERN = re.compile(r"(\([A-D]\)|（[A-D]）)")
 QUESTION_LINE_PATTERN = re.compile(r"^\s*(?:題\s*號\s*)?0*(\d{1,3})(?:\s*[.．、]|[\s　]+)(.*)")
 EXPLICIT_QUESTION_NO_PATTERN = re.compile(r"題\s*號\s*[:：]?\s*0*(\d{1,3})(?=\s|　|科|$)")
+
+
+def normalize_pdf_text(text: str) -> str:
+    """Normalize compatibility CJK glyphs from older PDF text extraction."""
+    return unicodedata.normalize("NFKC", text or "")
 
 
 def source_pdf(row: dict[str, Any], source_dir: Path) -> Path:
@@ -134,6 +140,7 @@ def render_region_snapshot_assets(
 
 
 def candidate_question_numbers(text: str) -> list[dict[str, Any]]:
+    text = normalize_pdf_text(text)
     lines = [line.strip() for line in text.splitlines()]
     candidates: list[dict[str, Any]] = []
     cursor = 0
@@ -222,6 +229,7 @@ def explicit_question_numbers(text: str) -> list[dict[str, Any]]:
     clip explicitly says it is another question, we should reject it even if the
     surrounding stem looked similar.
     """
+    text = normalize_pdf_text(text)
     candidates: list[dict[str, Any]] = []
     for match in EXPLICIT_QUESTION_NO_PATTERN.finditer(text):
         question_no = int(match.group(1))
@@ -249,9 +257,12 @@ def is_safe_snapshot(
     pdf_cache: dict[Path, fitz.Document],
 ) -> tuple[bool, str, list[dict[str, Any]], str]:
     question_no = row_question_no(row)
-    if asset.get("kind") != "question_snapshot":
-        return False, "not_snapshot", [], ""
-    if asset.get("snapshotSource") != "source_page_regions":
+    asset_kind = str(asset.get("kind") or "")
+    if asset_kind in {"page_snapshot", "full_page"} or asset.get("fallback"):
+        return False, "fallback_full_page", [], ""
+    if asset_kind not in {"question_snapshot", "image", "table"}:
+        return False, "unsupported_asset_kind", [], ""
+    if asset_kind == "question_snapshot" and asset.get("snapshotSource") not in {"source_page_regions", "bounded_page_headers", None, ""}:
         return False, "fallback_full_page", [], ""
     src = asset.get("src")
     if not isinstance(src, str) or not src:
@@ -284,7 +295,11 @@ def is_safe_snapshot(
 
     if current_candidates:
         lines_before, chars_before, prefix_tail = prefix_stats(text, current_candidates[0]["char_index"])
-        if chars_before >= 35 and lines_before >= 1:
+        # Old PDFs often put the previous explanation's final words and the
+        # next question header on the same line. A short prefix is less harmful
+        # than dropping the whole explanation; still reject large prefixes that
+        # look like a real previous-question block or cover spillover.
+        if chars_before >= 180 and lines_before >= 3:
             return (
                 False,
                 "current_question_starts_late",
@@ -348,6 +363,7 @@ def build_safe_rows(
     rows: list[dict[str, Any]],
     asset_root: Path,
     source_dir: Path,
+    render_missing_snapshots: bool = False,
 ) -> tuple[list[dict[str, Any]], Counter[str], list[dict[str, Any]]]:
     pdf_cache: dict[Path, fitz.Document] = {}
     reasons: Counter[str] = Counter()
@@ -393,9 +409,9 @@ def build_safe_rows(
             candidate_assets = [
                 asset
                 for asset in (row.get("assets") or [])
-                if isinstance(asset, dict) and asset.get("kind") == "question_snapshot"
+                if isinstance(asset, dict) and asset.get("kind") in {"question_snapshot", "image", "table"}
             ]
-            if not candidate_assets:
+            if not candidate_assets and render_missing_snapshots:
                 candidate_assets = render_region_snapshot_assets(row, asset_root, source_dir, pdf_cache)
                 if candidate_assets:
                     reasons["generated_region_snapshot"] += len(candidate_assets)
@@ -424,14 +440,19 @@ def build_safe_rows(
             next_row["body"] = ""
             for index, asset in enumerate(kept_assets):
                 clean_asset = {key: value for key, value in asset.items() if key != "rows"}
-                clean_asset["kind"] = "question_snapshot"
                 clean_asset["fallback"] = False
-                clean_asset["snapshotSource"] = "source_page_regions"
+                if clean_asset.get("kind") == "question_snapshot":
+                    clean_asset["snapshotSource"] = clean_asset.get("snapshotSource") or "source_page_regions"
                 next_row["assets"].append(clean_asset)
+                label = "完整原頁截圖"
+                if clean_asset.get("kind") == "table":
+                    label = "原始表格截圖"
+                elif clean_asset.get("kind") == "image":
+                    label = "原始圖片"
                 next_row["sections"].append(
                     {
                         "kind": "image",
-                        "label": "完整原頁截圖",
+                        "label": label,
                         "assetIndex": index,
                         "page": clean_asset.get("page"),
                         "fallback": False,
@@ -477,10 +498,20 @@ def main() -> None:
     parser.add_argument("--source-dir", type=Path, required=True)
     parser.add_argument("--audit-json", type=Path)
     parser.add_argument("--audit-csv", type=Path)
+    parser.add_argument(
+        "--render-missing-region-snapshots",
+        action="store_true",
+        help="Generate source-page-region snapshots for rows without existing visual assets. Disabled by default for full-batch safety audits.",
+    )
     args = parser.parse_args()
 
     rows = json.loads(args.input_json.read_text(encoding="utf-8"))
-    safe_rows, reasons, audit_rows = build_safe_rows(rows, args.asset_root, args.source_dir)
+    safe_rows, reasons, audit_rows = build_safe_rows(
+        rows,
+        args.asset_root,
+        args.source_dir,
+        render_missing_snapshots=args.render_missing_region_snapshots,
+    )
     args.output_json.parent.mkdir(parents=True, exist_ok=True)
     args.output_json.write_text(json.dumps(safe_rows, ensure_ascii=False, indent=2), encoding="utf-8")
     if args.audit_json:

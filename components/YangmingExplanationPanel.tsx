@@ -271,14 +271,18 @@ function renderAssetFigure(
 ) {
   if (!asset?.src) return null;
   const isPrimarySnapshot = asset.kind === "question_snapshot";
-  const isFallback = !isPrimarySnapshot && (sectionFallback || asset.fallback || asset.kind === "page_snapshot");
-  const imageMaxHeight = isPrimarySnapshot ? "max-h-[920px]" : isFallback ? "max-h-[760px]" : "max-h-[520px]";
-  const imageWidth = asset.width ? Math.min(asset.width, isPrimarySnapshot ? 980 : isFallback ? 920 : 760) : undefined;
+  const isSourceAsset = asset.kind === "image" || asset.kind === "table";
+  const isFallback = !isPrimarySnapshot && !isSourceAsset && (sectionFallback || asset.fallback || asset.kind === "page_snapshot");
+  const isAuthoritativeAsset = isPrimarySnapshot || isSourceAsset;
+  const imageMaxHeight = isAuthoritativeAsset ? "max-h-[920px]" : isFallback ? "max-h-[760px]" : "max-h-[520px]";
+  const imageWidth = asset.width ? Math.min(asset.width, isAuthoritativeAsset ? 980 : isFallback ? 920 : 760) : undefined;
   const caption = isPrimarySnapshot
     ? `完整原頁截圖${asset.page ? `（第 ${asset.page} 頁）` : ""}：依題號對上的陽明詳解原版面。`
-    : isFallback
-    ? `備用原頁截圖${asset.page ? `（第 ${asset.page} 頁）` : ""}：精準圖片或表格不足時保留完整詳解頁面。`
-    : asset.alt;
+    : isSourceAsset
+      ? `${asset.kind === "table" ? "原始表格截圖" : "原始圖片"}${asset.page ? `（第 ${asset.page} 頁）` : ""}：依題號對上的陽明詳解原版面。`
+      : isFallback
+        ? `備用原頁截圖${asset.page ? `（第 ${asset.page} 頁）` : ""}：精準圖片或表格不足時保留完整詳解頁面。`
+        : asset.alt;
 
   return (
     <figure
@@ -287,13 +291,13 @@ function renderAssetFigure(
         isFallback ? "ring-amber-100" : "ring-slate-200"
       }`}
     >
-      {isPrimarySnapshot || isFallback ? (
+      {isAuthoritativeAsset || isFallback ? (
         <div className="mb-2 flex min-w-0 flex-wrap items-center gap-2 px-1 text-[11px] font-bold text-amber-800">
           <span className="rounded-full bg-amber-50 px-2 py-0.5 ring-1 ring-amber-100">
-            {isPrimarySnapshot ? "完整原頁截圖" : "備用原頁截圖"}
+            {isPrimarySnapshot ? "完整原頁截圖" : isSourceAsset ? "原始版面截圖" : "備用原頁截圖"}
           </span>
           <span className="min-w-0 break-words font-medium text-slate-400 [overflow-wrap:anywhere]">
-            {isPrimarySnapshot ? "這張保留原始詳解版面。" : "若圖片或表格切割不完整，先用這張保留原詳解。"}
+            {isAuthoritativeAsset ? "這張保留原始詳解版面。" : "若圖片或表格切割不完整，先用這張保留原詳解。"}
           </span>
         </div>
       ) : null}
@@ -313,8 +317,8 @@ function renderAssetFigure(
   );
 }
 
-function isPrimaryQuestionSnapshot(asset: NonNullable<YangmingExplanationContent["assets"]>[number] | undefined) {
-  return asset?.kind === "question_snapshot";
+function isAuthoritativeYangmingAsset(asset: NonNullable<YangmingExplanationContent["assets"]>[number] | undefined) {
+  return asset?.kind === "question_snapshot" || asset?.kind === "table" || asset?.kind === "image";
 }
 
 function YangmingExplanationContentBlock({
@@ -332,7 +336,7 @@ function YangmingExplanationContentBlock({
   const renderBodyBackup = shouldRenderBodyBackup(content);
   const primarySnapshotAssets = assets
     .map((asset, index) => ({ asset, index }))
-    .filter(({ asset }) => isPrimaryQuestionSnapshot(asset));
+    .filter(({ asset }) => isAuthoritativeYangmingAsset(asset));
   const primarySnapshotIndexes = new Set(primarySnapshotAssets.map(({ index }) => index));
   const referencedAssetIndexes = new Set(
     sections

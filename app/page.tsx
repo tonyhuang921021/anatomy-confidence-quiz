@@ -65,6 +65,11 @@ const QUICK_ENTRIES = [
 const HOME_RELEASE_NOTES = [
   {
     time: "06/13",
+    title: "陽明詳解原始版面更清楚",
+    body: "有表格或圖片的詳解會優先顯示原始截圖，方便直接核對，不再只看可能跑版的文字抽取。"
+  },
+  {
+    time: "06/13",
     title: "劉人豪忘記密碼",
     body: "我幫他補了忘記密碼功能，現在可以用 Email 收重設密碼信。"
   },

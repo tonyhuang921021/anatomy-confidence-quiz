@@ -11,6 +11,7 @@ from __future__ import annotations
 import argparse
 import csv
 import json
+import os
 import re
 import subprocess
 import tempfile
@@ -36,6 +37,8 @@ OCR_FALLBACK_FILENAMES = {
     "106-1醫學(一).pdf",
     "106-1醫學(二).pdf",
 }
+OCR_PAGE_TIMEOUT_SECONDS = int(os.environ.get("YANGMING_OCR_PAGE_TIMEOUT_SECONDS", "12"))
+OCR_MAX_CONSECUTIVE_TIMEOUTS = int(os.environ.get("YANGMING_OCR_MAX_CONSECUTIVE_TIMEOUTS", "2"))
 OCR_QUESTION_MARKER_RE = re.compile(r"(?:題目|題幹)(?![\w\u4e00-\u9fff])\s*[|:：]?")
 FIXED_FILENAME_META: dict[str, tuple[int, int, str]] = {
     "1-1_醫學一總檔.pdf": (113, 2, "醫學（一）"),
@@ -250,6 +253,37 @@ def page_paper_meta_counts(path: Path, paper_meta: dict[tuple[int, int, str], Pa
     finally:
         doc.close()
     return counts
+
+
+def page_paper_meta_ranges(
+    path: Path,
+    paper_meta: dict[tuple[int, int, str], PaperMeta],
+) -> dict[tuple[int, int, str], tuple[int, int, int]]:
+    pages_by_meta: dict[tuple[int, int, str], list[int]] = {}
+    try:
+        doc = fitz.open(path)
+    except Exception:
+        return {}
+    try:
+        for page_index, page in enumerate(doc, start=1):
+            text = page.get_text("text") or ""
+            match = PAGE_PAPER_META_RE.search(text)
+            if not match:
+                continue
+            round_no = PAGE_ROUND_TEXT_TO_NO.get(match.group("round"))
+            group = PAGE_EXAM_TEXT_TO_GROUP.get(match.group("exam"))
+            if not round_no or not group:
+                continue
+            key = (int(match.group("roc")), round_no, group)
+            if key in paper_meta:
+                pages_by_meta.setdefault(key, []).append(page_index)
+    finally:
+        doc.close()
+    return {
+        key: (min(pages), max(pages), len(pages))
+        for key, pages in pages_by_meta.items()
+        if pages
+    }
 
 
 def has_conflicting_page_metas(path: Path, paper_meta: dict[tuple[int, int, str], PaperMeta]) -> tuple[bool, dict[str, int]]:
@@ -917,10 +951,28 @@ def recover_missing_rows_by_stem(
     if not expected_questions:
         return rows
 
+    def is_safe_existing_cover(row: dict[str, Any]) -> bool:
+        """Do not let a mismatched low-confidence row block stem recovery.
+
+        A common failure mode is: a table chunk explicitly says it is question 7,
+        but fuzzy text matching assigns it to question 4. If we count that as
+        covered, the safer stem-region recovery never gets a chance to produce
+        the correct screenshot for question 4, and the later safety filter has
+        no choice but to blank the row.
+        """
+        if not row.get("question_id") or row.get("match_status") not in {"matched", "low_confidence"}:
+            return False
+        try:
+            extracted_no = int(row.get("extracted_question_no"))
+            matched_no = int(row.get("matched_question_no") or row.get("question_no"))
+        except (TypeError, ValueError):
+            return True
+        return extracted_no == matched_no
+
     covered_question_ids = {
         str(row.get("question_id"))
         for row in rows
-        if row.get("question_id") and row.get("match_status") in {"matched", "low_confidence"}
+        if is_safe_existing_cover(row)
     }
     missing_questions = [
         question for question in expected_questions if question.question_id not in covered_question_ids
@@ -1272,8 +1324,16 @@ def parse_table_pdf(
     paper_questions: dict[tuple[str, str], list[PaperQuestion]],
     image_output_dir: Path | None = None,
     detect_tables: bool = False,
+    page_start: int | None = None,
+    page_end: int | None = None,
 ) -> list[dict[str, Any]]:
-    items = extract_items(path, image_output_dir=image_output_dir, detect_tables=detect_tables)
+    items = extract_items(
+        path,
+        page_start=page_start,
+        page_end=page_end,
+        image_output_dir=image_output_dir,
+        detect_tables=detect_tables,
+    )
     source_label = f"{meta.roc_year} 年第 {meta.round_no} 次 {meta.group}"
     rows = parse_items_for_meta(
         items,
@@ -1301,46 +1361,66 @@ def ocr_pdf_pages(path: Path, cache_dir: Path) -> list[str]:
 
     doc = fitz.open(path)
     page_texts: list[str] = []
+    consecutive_timeouts = 0
     with tempfile.TemporaryDirectory(prefix="yangming-ocr-") as temp_dir:
         temp_path = Path(temp_dir)
         for page_no in range(1, doc.page_count + 1):
             prefix = temp_path / f"page-{page_no:03d}"
-            subprocess.run(
-                [
-                    str(PDFTOPPM),
-                    "-f",
-                    str(page_no),
-                    "-l",
-                    str(page_no),
-                    "-r",
-                    "200",
-                    "-png",
-                    str(path),
-                    str(prefix),
-                ],
-                check=True,
-                stdout=subprocess.DEVNULL,
-                stderr=subprocess.DEVNULL,
-            )
+            try:
+                subprocess.run(
+                    [
+                        str(PDFTOPPM),
+                        "-f",
+                        str(page_no),
+                        "-l",
+                        str(page_no),
+                        "-r",
+                        "200",
+                        "-png",
+                        str(path),
+                        str(prefix),
+                    ],
+                    check=True,
+                    stdout=subprocess.DEVNULL,
+                    stderr=subprocess.DEVNULL,
+                    timeout=OCR_PAGE_TIMEOUT_SECONDS,
+                )
+            except subprocess.TimeoutExpired:
+                consecutive_timeouts += 1
+                page_texts.append("")
+                if consecutive_timeouts >= OCR_MAX_CONSECUTIVE_TIMEOUTS:
+                    page_texts.extend([""] * (doc.page_count - page_no))
+                    break
+                continue
             images = sorted(temp_path.glob(f"page-{page_no:03d}-*.png"))
             if not images:
                 page_texts.append("")
                 continue
-            completed = subprocess.run(
-                [
-                    str(TESSERACT),
-                    str(images[0]),
-                    "stdout",
-                    "-l",
-                    "chi_tra+eng",
-                    "--psm",
-                    "6",
-                ],
-                check=False,
-                stdout=subprocess.PIPE,
-                stderr=subprocess.DEVNULL,
-                text=True,
-            )
+            try:
+                completed = subprocess.run(
+                    [
+                        str(TESSERACT),
+                        str(images[0]),
+                        "stdout",
+                        "-l",
+                        "chi_tra+eng",
+                        "--psm",
+                        "6",
+                    ],
+                    check=False,
+                    stdout=subprocess.PIPE,
+                    stderr=subprocess.DEVNULL,
+                    text=True,
+                    timeout=OCR_PAGE_TIMEOUT_SECONDS,
+                )
+            except subprocess.TimeoutExpired:
+                consecutive_timeouts += 1
+                page_texts.append("")
+                if consecutive_timeouts >= OCR_MAX_CONSECUTIVE_TIMEOUTS:
+                    page_texts.extend([""] * (doc.page_count - page_no))
+                    break
+                continue
+            consecutive_timeouts = 0
             page_texts.append(normalize_text(completed.stdout or ""))
     cache_path.write_text(json.dumps(page_texts, ensure_ascii=False, indent=2), encoding="utf-8")
     return page_texts
@@ -1800,15 +1880,23 @@ def parse_content_inferred_pdf(
     return meta, recover_missing_rows_by_stem(rows, items, path.name, meta, paper_questions, source_label)
 
 
-def row_rank(row: dict[str, Any]) -> tuple[int, int, float, int, int]:
+def row_rank(row: dict[str, Any]) -> tuple[int, int, int, float, int, int]:
     status_rank = {"matched": 2, "low_confidence": 1, "missing_question": 0}.get(str(row.get("match_status")), 0)
+    try:
+        extracted_no = int(row.get("extracted_question_no"))
+        matched_no = int(row.get("matched_question_no") or row.get("question_no"))
+    except (TypeError, ValueError):
+        extracted_no = 0
+        matched_no = 0
+    qno_consistency = 1 if extracted_no and matched_no and extracted_no == matched_no else 0
     sections = row.get("sections") if isinstance(row.get("sections"), list) else []
     assets = row.get("assets") if isinstance(row.get("assets"), list) else []
     body_len = len(str(row.get("body") or ""))
     content_score = min(body_len, 1200) + (len(sections) * 35) + (len(assets) * 160)
-    toc_penalty = -500 if ":: TOC" in str(row.get("source_file") or "") and content_score < 260 else 0
+    toc_penalty = -500 if ":: TOC" in str(row.get("source_file") or "") else 0
     return (
         status_rank,
+        qno_consistency,
         content_score + toc_penalty,
         float(row.get("match_score") or 0),
         len(str(row.get("question_stem_snapshot") or "")),
@@ -2234,6 +2322,11 @@ def main() -> int:
         action="store_true",
         help="When visual assets are enabled, crop PyMuPDF-detected tables as image assets.",
     )
+    parser.add_argument(
+        "--skip-ocr-fallback",
+        action="store_true",
+        help="Skip slow OCR fallback parsing for legacy PDFs.",
+    )
     args = parser.parse_args()
 
     _by_question, paper_meta, paper_questions = load_audit()
@@ -2255,17 +2348,32 @@ def main() -> int:
         pdfs = pdfs[: args.limit]
 
     for path in pdfs:
+        target_meta = parse_file_meta(path, paper_meta)
+        target_page_range: tuple[int, int] | None = None
         if not fixed_file_meta_key(path):
             has_conflict, page_meta_summary = has_conflicting_page_metas(path, paper_meta)
             if has_conflict:
-                file_reports.append({
-                    "file": path.name,
-                    "status": "mixed_page_metas_skipped",
-                    "extracted": 0,
-                    "page_meta_summary": page_meta_summary,
-                })
-                continue
-        meta = parse_file_meta(path, paper_meta)
+                target_key = (
+                    (target_meta.roc_year, target_meta.round_no, target_meta.group)
+                    if target_meta
+                    else None
+                )
+                target_range = (
+                    page_paper_meta_ranges(path, paper_meta).get(target_key)
+                    if target_key
+                    else None
+                )
+                if target_range and target_range[2] >= 2:
+                    target_page_range = (target_range[0], target_range[1])
+                else:
+                    file_reports.append({
+                        "file": path.name,
+                        "status": "mixed_page_metas_skipped",
+                        "extracted": 0,
+                        "page_meta_summary": page_meta_summary,
+                    })
+                    continue
+        meta = target_meta
         if not meta:
             bookmark_sections = parse_bookmark_sections(
                 path,
@@ -2320,17 +2428,20 @@ def main() -> int:
             paper_questions,
             image_output_dir,
             args.extract_visual_assets and args.detect_tables,
+            page_start=target_page_range[0] if target_page_range else None,
+            page_end=target_page_range[1] if target_page_range else None,
         )
         all_rows.extend(rows)
         source_metas[(meta.exam_code, meta.paper_code)] = meta
         file_reports.append(build_source_report(
             path.name,
-            "parsed_table_format",
+            "parsed_table_format_page_scoped" if target_page_range else "parsed_table_format",
             meta,
             rows,
             paper_questions,
+            {"page_start": target_page_range[0], "page_end": target_page_range[1]} if target_page_range else None,
         ))
-        if path.name in OCR_FALLBACK_FILENAMES:
+        if path.name in OCR_FALLBACK_FILENAMES and not args.skip_ocr_fallback:
             ocr_rows = parse_ocr_pdf(path, meta, paper_questions, args.ocr_cache_dir)
             all_rows.extend(ocr_rows)
             file_reports.append(build_source_report(

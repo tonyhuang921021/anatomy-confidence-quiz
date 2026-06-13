@@ -14,6 +14,7 @@ import json
 import re
 import subprocess
 import sys
+import unicodedata
 from pathlib import Path
 from typing import Any
 
@@ -23,6 +24,11 @@ PREVIEW_SCRIPT = ROOT / "scripts" / "preview_yangming_explanations.py"
 DEFAULT_SOURCE_DIR = Path("/Users/huangguanlun/Downloads/陽明詳解")
 DEFAULT_OUTPUT_DIR = ROOT / "reports" / "yangming_import_preview" / "visual_full"
 DEFAULT_BASE_ROWS = ROOT / "reports" / "yangming_import_preview" / "yangming_consolidated_rows.json"
+
+
+def normalize_pdf_text(text: str) -> str:
+    """Normalize compatibility CJK glyphs from older PDF text extraction."""
+    return unicodedata.normalize("NFKC", text or "")
 
 
 def load_preview_module():
@@ -373,32 +379,263 @@ def attach_page_snapshot_fallbacks(
         regions: list[dict[str, Any]] = []
         current_qno = row_question_no(row)
         next_qno = current_qno + 1 if current_qno else 0
+        try:
+            extracted_qno = int(row.get("extracted_question_no") or 0)
+        except (TypeError, ValueError):
+            extracted_qno = 0
+        has_question_number_mismatch = bool(extracted_qno and current_qno and extracted_qno != current_qno)
 
-        def trim_before_next_question(page: Any, bbox: list[float]) -> list[float]:
-            if not next_qno:
-                return bbox
+        def question_start_pattern(qno: int) -> re.Pattern[str]:
+            return re.compile(
+                rf"(?:(?:^|\n|\r)|[（(][^）)]{{1,12}}[）)]\s*)"
+                rf"0*{qno}\s*[.．、]?\s*"
+                r"(?=(?:下列|有關|關於|何者|何項|何種|哪|一名|一位|某|左|右|孕婦|病人|男性|女性|"
+                r"[\u4e00-\u9fff]{1,24}|[A-Za-z][A-Za-z\s(),-]{0,60}))"
+            )
+
+        def find_question_start_top(page: Any, bbox: list[float], qno: int) -> float | None:
             rect = preview.fitz.Rect(*bbox)
+            explicit_header_pattern = re.compile(rf"題\s*號\s*[:：]?\s*0*{qno}(?=\s|　|科|$)")
+            generic_header_pattern = question_start_pattern(qno)
+            old_line_pattern = re.compile(
+                rf"(?:^|[（(][^）)]{{1,12}}[）)]\s*)0*{qno}\s*[.．、]?\s*(.+)"
+            )
+            question_words = re.compile(
+                r"(下列|有關|關於|何者|何項|何種|為何|哪|哪些|敘述|正確|錯誤|不適當|最|是否|"
+                r"容易|可以|應為|何組|何處|可能|診斷|治療|受傷|感染|活性|產生|造成)"
+            )
+            option_pattern = re.compile(r"(\([A-D]\)|（[A-D]）)")
+
+            def looks_like_question_line(line_text: str, window_text: str) -> bool:
+                normalized_line = normalize_pdf_text(line_text).strip()
+                normalized_window = normalize_pdf_text(window_text)
+                if explicit_header_pattern.search(normalized_line) or generic_header_pattern.search(normalized_line):
+                    return True
+                match = old_line_pattern.search(normalized_line)
+                if not match:
+                    return False
+                rest = match.group(1).strip()
+                if not rest or rest.startswith(("答案", "出處", "參考", "補充", "詳解", "簡解", "KEY")):
+                    return False
+                if question_words.search(normalized_window) or option_pattern.search(normalized_window):
+                    return True
+                # Old 096-100 PDFs sometimes split the question stem before
+                # options appear. A long CJK/medical line after the next number
+                # is still a strong page-boundary signal.
+                return len(re.sub(r"\s+", "", rest)) >= 12
+
+            line_hits: list[float] = []
+            try:
+                page_dict = page.get_text("dict", clip=rect)
+            except TypeError:
+                page_dict = page.get_text("dict")
+            line_items: list[tuple[float, str]] = []
+            for block in page_dict.get("blocks", []):
+                if block.get("type") != 0:
+                    continue
+                for line in block.get("lines", []):
+                    try:
+                        y0 = float(line.get("bbox", [0, 0, 0, 0])[1])
+                    except (TypeError, ValueError):
+                        continue
+                    if y0 < bbox[1] or y0 > bbox[3]:
+                        continue
+                    text = "".join(str(span.get("text") or "") for span in line.get("spans", []))
+                    if text.strip():
+                        line_items.append((y0, text))
+            for index, (y0, text) in enumerate(line_items):
+                window_text = " ".join(line for _y, line in line_items[index : index + 6])
+                if looks_like_question_line(text, window_text):
+                    line_hits.append(y0)
+            if line_hits:
+                return min(line_hits)
+
             try:
                 blocks = page.get_text("blocks", clip=rect)
             except TypeError:
                 blocks = page.get_text("blocks")
-            next_header_pattern = re.compile(rf"題\s*號\s*[:：]?\s*0*{next_qno}(?=\s|　|科|$)")
-            next_top: float | None = None
+            start_top: float | None = None
             for block in blocks:
                 try:
-                    x0, y0, x1, y1, text = block[:5]
+                    _x0, y0, _x1, _y1, text = block[:5]
                 except ValueError:
                     continue
                 if y0 < bbox[1] or y0 > bbox[3]:
                     continue
-                if next_header_pattern.search(str(text)):
-                    next_top = float(y0) if next_top is None else min(next_top, float(y0))
+                block_text = normalize_pdf_text(str(text))
+                if explicit_header_pattern.search(block_text) or generic_header_pattern.search(block_text):
+                    start_top = float(y0) if start_top is None else min(start_top, float(y0))
+            return start_top
+
+        def trim_before_next_question(page: Any, bbox: list[float]) -> list[float]:
+            if not next_qno:
+                return bbox
+            next_top = find_question_start_top(page, bbox, next_qno)
             if next_top is None:
                 return bbox
             trimmed = [bbox[0], bbox[1], bbox[2], max(bbox[1], next_top - 3)]
             return trimmed
 
-        if isinstance(raw_regions, list):
+        def trim_after_current_question(page: Any, bbox: list[float]) -> list[float]:
+            """Trim accidental previous-question/cover text above the current row.
+
+            The safe filter correctly rejects screenshots that start with the
+            previous question number. Fixing the crop here is safer than making
+            that filter permissive: continuation pages without an explicit
+            current question header are left untouched.
+            """
+            if not current_qno:
+                return bbox
+            current_top = find_question_start_top(page, bbox, current_qno)
+            if current_top is None or current_top <= bbox[1] + 12:
+                return bbox
+
+            prefix_rect = preview.fitz.Rect(bbox[0], bbox[1], bbox[2], max(bbox[1], current_top - 1))
+            try:
+                prefix_text = page.get_text("text", clip=prefix_rect) or ""
+            except TypeError:
+                prefix_text = ""
+            prefix_text = normalize_pdf_text(prefix_text)
+            compact_prefix = re.sub(r"\s+", "", prefix_text)
+            explicit_qno_pattern = re.compile(r"題\s*號\s*[:：]?\s*0*(\d{1,3})(?=\s|　|科|$)")
+            explicit_numbers = [
+                int(match.group(1))
+                for match in explicit_qno_pattern.finditer(prefix_text)
+                if match.group(1).isdigit()
+            ]
+            looks_like_previous_or_cover = (
+                len(compact_prefix) >= 24
+                or any(number != current_qno for number in explicit_numbers)
+                or "題號" in prefix_text
+                or "國立陽明" in prefix_text
+            )
+            if not looks_like_previous_or_cover:
+                return bbox
+            return [bbox[0], max(bbox[1], current_top - 3), bbox[2], bbox[3]]
+
+        def has_current_question_header(page: Any, bbox: list[float]) -> bool:
+            if not current_qno:
+                return False
+            rect = preview.fitz.Rect(*bbox)
+            try:
+                text = page.get_text("text", clip=rect) or ""
+            except TypeError:
+                text = page.get_text("text") or ""
+            text = normalize_pdf_text(text)
+            return bool(
+                re.search(rf"題\s*號\s*[:：]?\s*0*{current_qno}(?=\s|　|科|$)", text)
+                or question_start_pattern(current_qno).search(text)
+            )
+
+        def looks_like_cover_page(page: Any, bbox: list[float]) -> bool:
+            rect = preview.fitz.Rect(*bbox)
+            try:
+                text = page.get_text("text", clip=rect) or ""
+            except TypeError:
+                text = page.get_text("text") or ""
+            text = normalize_pdf_text(text)
+            compact = re.sub(r"\s+", "", text)
+            if not compact:
+                return False
+            has_content_marker = bool(re.search(r"(題號|題幹|答案|簡解|詳解|KEY|參考資料|補充)", text))
+            has_cover_marker = bool(re.search(r"(國立陽明|交通大學|醫學系|組織|國考詳解|封面)", text))
+            return has_cover_marker and not has_content_marker
+
+        def table_question_no(table: Any) -> int | None:
+            try:
+                rows = table.extract()
+            except Exception:
+                return None
+            if not rows or not rows[0]:
+                return None
+            first_cell = normalize_pdf_text(str(rows[0][0] or "")).strip()
+            match = re.fullmatch(r"0*(\d{1,3})", first_cell)
+            if not match:
+                return None
+            qno = int(match.group(1))
+            return qno if 1 <= qno <= 120 else None
+
+        def contained_in(inner: tuple[float, float, float, float], outer: tuple[float, float, float, float]) -> bool:
+            margin = 2.5
+            return (
+                inner[0] >= outer[0] - margin
+                and inner[1] >= outer[1] - margin
+                and inner[2] <= outer[2] + margin
+                and inner[3] <= outer[3] + margin
+                and (outer[2] - outer[0]) * (outer[3] - outer[1]) > (inner[2] - inner[0]) * (inner[3] - inner[1])
+            )
+
+        def top_level_tables(page: Any) -> list[dict[str, Any]]:
+            try:
+                tables = list(page.find_tables().tables)
+            except Exception:
+                return []
+            page_width = float(page.rect.width)
+            candidates: list[dict[str, Any]] = []
+            for table in tables:
+                try:
+                    x0, y0, x1, y1 = [float(value) for value in table.bbox]
+                except Exception:
+                    continue
+                width = x1 - x0
+                height = y1 - y0
+                # Nested reference tables are useful inside the parent crop, but
+                # they should not become separate question boundaries.
+                if width < page_width * 0.62 or height < 35:
+                    continue
+                candidates.append({
+                    "bbox": (x0, y0, x1, y1),
+                    "question_no": table_question_no(table),
+                })
+
+            top_level: list[dict[str, Any]] = []
+            for candidate in sorted(candidates, key=lambda item: (item["bbox"][1], item["bbox"][0])):
+                if any(contained_in(candidate["bbox"], other["bbox"]) for other in candidates):
+                    continue
+                top_level.append(candidate)
+            return top_level
+
+        def table_bounded_regions() -> list[dict[str, Any]]:
+            if not current_qno:
+                return []
+            table_regions: list[dict[str, Any]] = []
+            started = False
+            stop = False
+            if has_question_number_mismatch:
+                page_numbers = range(1, doc.page_count + 1)
+            else:
+                page_numbers = range(start_page, min(end_page, doc.page_count) + 1)
+            for page_number in page_numbers:
+                page = doc[page_number - 1]
+                for table in top_level_tables(page):
+                    table_qno = table["question_no"]
+                    if not started:
+                        if table_qno != current_qno:
+                            continue
+                        started = True
+                        if has_question_number_mismatch:
+                            row["extracted_question_no"] = current_qno
+                            row["source_page_start"] = page_number
+                            row["match_status"] = "matched_by_table_question_no"
+                    elif table_qno and table_qno != current_qno:
+                        stop = True
+                        break
+
+                    bbox = list(table["bbox"])
+                    if looks_like_cover_page(page, bbox):
+                        continue
+                    table_regions.append({
+                        "page": page_number,
+                        "bbox": bbox,
+                        "snapshotSource": "bounded_page_headers",
+                    })
+                    if has_question_number_mismatch:
+                        row["source_page_end"] = page_number
+                if stop:
+                    break
+            return table_regions
+
+        if isinstance(raw_regions, list) and not has_question_number_mismatch:
             for raw_region in raw_regions:
                 if not isinstance(raw_region, dict):
                     continue
@@ -423,21 +660,43 @@ def attach_page_snapshot_fallbacks(
                 region_height = clipped_bbox[3] - clipped_bbox[1]
                 if clipped_bbox[1] <= 80 and region_height < 110:
                     region_text = doc[page_number - 1].get_textbox(preview.fitz.Rect(*clipped_bbox))
+                    region_text = normalize_pdf_text(region_text)
                     if "題號" in region_text:
                         continue
+                clipped_bbox = trim_after_current_question(doc[page_number - 1], clipped_bbox)
                 clipped_bbox = trim_before_next_question(doc[page_number - 1], clipped_bbox)
                 if clipped_bbox[3] - clipped_bbox[1] < 24 or clipped_bbox[2] - clipped_bbox[0] < 40:
                     continue
-                regions.append({"page": page_number, "bbox": clipped_bbox})
+                regions.append({
+                    "page": page_number,
+                    "bbox": clipped_bbox,
+                    "snapshotSource": "source_page_regions",
+                })
         if regions:
             return regions
 
+        table_regions = table_bounded_regions()
+        if table_regions:
+            return table_regions
+
         fallback_regions: list[dict[str, Any]] = []
+        bounded_fallback_started = False
         for page_number in range(start_page, min(end_page, doc.page_count) + 1):
             rect = doc[page_number - 1].rect
+            bbox = [rect.x0, rect.y0, rect.x1, rect.y1]
+            if looks_like_cover_page(doc[page_number - 1], bbox):
+                continue
+            bbox = trim_after_current_question(doc[page_number - 1], bbox)
+            bbox = trim_before_next_question(doc[page_number - 1], bbox)
+            if bbox[3] - bbox[1] < 24 or bbox[2] - bbox[0] < 40:
+                continue
+            is_bounded = has_current_question_header(doc[page_number - 1], bbox)
+            if is_bounded:
+                bounded_fallback_started = True
             fallback_regions.append({
                 "page": page_number,
-                "bbox": [rect.x0, rect.y0, rect.x1, rect.y1],
+                "bbox": bbox,
+                "snapshotSource": "bounded_page_headers" if bounded_fallback_started else "full_page_fallback",
             })
         return fallback_regions
 
@@ -502,7 +761,10 @@ def attach_page_snapshot_fallbacks(
                 )
                 if not src:
                     continue
-                is_source_region_snapshot = bool(row.get("source_page_regions"))
+                snapshot_source = str(region.get("snapshotSource") or (
+                    "source_page_regions" if row.get("source_page_regions") else "full_page_fallback"
+                ))
+                is_source_region_snapshot = snapshot_source in {"source_page_regions", "bounded_page_headers"}
                 is_primary_snapshot = mode == "all" and is_source_region_snapshot
                 assets.append({
                     "src": src,
@@ -514,7 +776,7 @@ def attach_page_snapshot_fallbacks(
                     "kind": "question_snapshot" if is_primary_snapshot else "page_snapshot",
                     "fallback": not is_primary_snapshot,
                     "snapshotIndex": region_index,
-                    "snapshotSource": "source_page_regions" if row.get("source_page_regions") else "full_page_fallback",
+                    "snapshotSource": snapshot_source,
                 })
                 sections.append({
                     "kind": "image",
@@ -535,6 +797,12 @@ def main() -> int:
     parser.add_argument("--source-dir", type=Path, default=DEFAULT_SOURCE_DIR)
     parser.add_argument("--output-dir", type=Path, default=DEFAULT_OUTPUT_DIR)
     parser.add_argument("--limit", type=int, default=0)
+    parser.add_argument(
+        "--only-file",
+        action="append",
+        default=[],
+        help="Process only the named PDF file. May be passed multiple times.",
+    )
     parser.add_argument("--skip-existing", action="store_true")
     parser.add_argument(
         "--base-rows",
@@ -555,7 +823,7 @@ def main() -> int:
     parser.add_argument(
         "--page-snapshot-mode",
         choices=["all", "missing", "none"],
-        default="all",
+        default="none",
         help="all: attach full per-question page snapshots to every matched row; missing: only rows without visual assets; none: disable snapshots.",
     )
     args = parser.parse_args()
@@ -566,6 +834,12 @@ def main() -> int:
     per_file_dir.mkdir(parents=True, exist_ok=True)
 
     pdfs = sorted(args.source_dir.glob("*.pdf"))
+    if args.only_file:
+        requested_files = set(args.only_file)
+        pdfs = [pdf for pdf in pdfs if pdf.name in requested_files]
+        missing_files = sorted(requested_files - {pdf.name for pdf in pdfs})
+        if missing_files:
+            raise SystemExit(f"Missing --only-file PDFs in {args.source_dir}: {', '.join(missing_files)}")
     if args.limit:
         pdfs = pdfs[: args.limit]
     processed_source_files = {pdf.name for pdf in pdfs}
@@ -593,6 +867,7 @@ def main() -> int:
                 pdf.name,
                 "--extract-visual-assets",
                 "--detect-tables",
+                "--skip-ocr-fallback",
             ]
             completed = subprocess.run(command, cwd=ROOT, text=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
             log_path = file_output_dir / "run.log"

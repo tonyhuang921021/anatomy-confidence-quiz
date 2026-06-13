@@ -112,16 +112,29 @@ function detectAssetQuestionNumberFromHints(record: { alt?: unknown; src?: unkno
 }
 
 function shouldDropAssetForQuestion(
-  record: { rows?: unknown; alt?: unknown; src?: unknown; kind?: unknown },
+  record: { rows?: unknown; alt?: unknown; src?: unknown; kind?: unknown; fallback?: unknown },
   expectedQuestionNo: number | null
 ) {
+  const kind = typeof record.kind === "string" ? record.kind.trim().toLowerCase() : "";
+  const isFallback =
+    record.fallback === true ||
+    (typeof record.fallback === "string" && record.fallback.trim().toLowerCase() === "true");
+  if (isFallback || kind === "page_snapshot" || kind === "full_page") {
+    return true;
+  }
+  if (
+    kind === "question_snapshot" &&
+    !(typeof record.src === "string" && record.src.trim().startsWith("per_file/"))
+  ) {
+    return true;
+  }
+
   if (!expectedQuestionNo) return false;
 
   const hintQuestionNo = detectAssetQuestionNumberFromHints(record);
   if (hintQuestionNo === expectedQuestionNo) return false;
 
-  const kind = typeof record.kind === "string" ? record.kind.trim() : "";
-  if (kind === "question_snapshot" || kind === "page_snapshot") {
+  if (kind === "question_snapshot") {
     return false;
   }
 
@@ -197,7 +210,7 @@ function normalizeSections(value: unknown, assetIndexMap?: Map<number, number>) 
         return null;
       }
       return {
-        kind: record.kind.trim(),
+        kind: record.kind.trim().toLowerCase(),
         label: typeof record.label === "string" ? record.label : undefined,
         text: normalizedText,
         runs: normalizedRuns,
@@ -254,7 +267,7 @@ function normalizeAssets(
       width: typeof record.width === "number" ? record.width : undefined,
       height: typeof record.height === "number" ? record.height : undefined,
       page: typeof record.page === "number" ? record.page : undefined,
-      kind: typeof record.kind === "string" ? record.kind : undefined,
+      kind: typeof record.kind === "string" ? record.kind.trim().toLowerCase() : undefined,
       fallback: record.fallback === true
     });
   });
