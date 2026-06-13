@@ -128,6 +128,9 @@ function shouldDropAssetForQuestion(
   ) {
     return true;
   }
+  if (kind !== "question_snapshot") {
+    return true;
+  }
 
   if (!expectedQuestionNo) return false;
 
@@ -322,29 +325,15 @@ export async function POST(request: NextRequest) {
 
     const expectedQuestionNo = getQuestionNumberFromId(row.question_id);
     const normalizedAssetBundle = normalizeAssets(supabase, row.assets, expectedQuestionNo);
-    const normalizedSections = normalizeSections(row.sections, normalizedAssetBundle.assetIndexMap);
-    const matchScore =
-      typeof row.match_score === "number"
-        ? row.match_score
-        : typeof row.match_score === "string"
-          ? Number(row.match_score)
-          : null;
-    if (
-      (row.match_status === "low_confidence" || (matchScore !== null && matchScore < 0.5)) &&
-      normalizedAssetBundle.assets.length === 0
-    ) {
+    if (normalizedAssetBundle.assets.length === 0) {
       return NextResponse.json({ ok: true, explanation: null });
     }
-    const normalizedBody =
-      typeof row.body === "string" && isMeaningfulYangmingText(row.body) ? row.body : "";
-    if (!normalizedBody && normalizedSections.length === 0 && normalizedAssetBundle.assets.length === 0) {
-      return NextResponse.json({ ok: true, explanation: null });
-    }
-
+    const normalizedSections = normalizeSections(row.sections, normalizedAssetBundle.assetIndexMap)
+      .filter((section) => section && section.kind === "image");
     return NextResponse.json({
       ok: true,
       explanation: {
-        body: normalizedBody,
+        body: "",
         author: row.author ?? undefined,
         reviewer: row.reviewer ?? undefined,
         sourceLabel: row.source_label ?? undefined,

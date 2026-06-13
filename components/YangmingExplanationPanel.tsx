@@ -271,16 +271,16 @@ function renderAssetFigure(
 ) {
   if (!asset?.src) return null;
   const isPrimarySnapshot = asset.kind === "question_snapshot";
-  const isSourceAsset = asset.kind === "image" || asset.kind === "table";
-  const isFallback = !isPrimarySnapshot && !isSourceAsset && (sectionFallback || asset.fallback || asset.kind === "page_snapshot");
-  const isAuthoritativeAsset = isPrimarySnapshot || isSourceAsset;
+  if (!isPrimarySnapshot && (asset.kind === "image" || asset.kind === "table")) {
+    return null;
+  }
+  const isFallback = !isPrimarySnapshot && (sectionFallback || asset.fallback || asset.kind === "page_snapshot");
+  const isAuthoritativeAsset = isPrimarySnapshot;
   const imageMaxHeight = isAuthoritativeAsset ? "max-h-[920px]" : isFallback ? "max-h-[760px]" : "max-h-[520px]";
   const imageWidth = asset.width ? Math.min(asset.width, isAuthoritativeAsset ? 980 : isFallback ? 920 : 760) : undefined;
   const caption = isPrimarySnapshot
     ? `完整原頁截圖${asset.page ? `（第 ${asset.page} 頁）` : ""}：依題號對上的陽明詳解原版面。`
-    : isSourceAsset
-      ? `${asset.kind === "table" ? "原始表格截圖" : "原始圖片"}${asset.page ? `（第 ${asset.page} 頁）` : ""}：依題號對上的陽明詳解原版面。`
-      : isFallback
+    : isFallback
         ? `備用原頁截圖${asset.page ? `（第 ${asset.page} 頁）` : ""}：精準圖片或表格不足時保留完整詳解頁面。`
         : asset.alt;
 
@@ -294,7 +294,7 @@ function renderAssetFigure(
       {isAuthoritativeAsset || isFallback ? (
         <div className="mb-2 flex min-w-0 flex-wrap items-center gap-2 px-1 text-[11px] font-bold text-amber-800">
           <span className="rounded-full bg-amber-50 px-2 py-0.5 ring-1 ring-amber-100">
-            {isPrimarySnapshot ? "完整原頁截圖" : isSourceAsset ? "原始版面截圖" : "備用原頁截圖"}
+            {isPrimarySnapshot ? "完整原頁截圖" : "備用原頁截圖"}
           </span>
           <span className="min-w-0 break-words font-medium text-slate-400 [overflow-wrap:anywhere]">
             {isAuthoritativeAsset ? "這張保留原始詳解版面。" : "若圖片或表格切割不完整，先用這張保留原詳解。"}
@@ -318,7 +318,7 @@ function renderAssetFigure(
 }
 
 function isAuthoritativeYangmingAsset(asset: NonNullable<YangmingExplanationContent["assets"]>[number] | undefined) {
-  return asset?.kind === "question_snapshot" || asset?.kind === "table" || asset?.kind === "image";
+  return asset?.kind === "question_snapshot";
 }
 
 function YangmingExplanationContentBlock({
@@ -337,6 +337,9 @@ function YangmingExplanationContentBlock({
   const primarySnapshotAssets = assets
     .map((asset, index) => ({ asset, index }))
     .filter(({ asset }) => isAuthoritativeYangmingAsset(asset));
+  const hasPrimarySnapshots = primarySnapshotAssets.length > 0;
+  const shouldRenderStructuredSections = hasStructuredSections && !hasPrimarySnapshots;
+  const shouldRenderLooseAssets = !hasStructuredSections && !hasPrimarySnapshots && assets.length > 0;
   const primarySnapshotIndexes = new Set(primarySnapshotAssets.map(({ index }) => index));
   const referencedAssetIndexes = new Set(
     sections
@@ -401,7 +404,7 @@ function YangmingExplanationContentBlock({
           </div>
         </section>
       ) : null}
-      {hasStructuredSections ? (
+      {shouldRenderStructuredSections ? (
         <div className="min-w-0 max-w-full space-y-4 overflow-hidden">
           {sections.map((section, index) => {
             if (section.kind === "image") {
@@ -429,7 +432,7 @@ function YangmingExplanationContentBlock({
               </section>
             );
           })}
-          {renderBodyBackup ? (
+          {!hasPrimarySnapshots && renderBodyBackup ? (
             <section className="min-w-0 max-w-full overflow-hidden rounded-2xl bg-amber-50/60 p-3 ring-1 ring-amber-100">
               <p className="mb-2 text-xs font-black uppercase tracking-[0.18em] text-amber-800">
                 完整文字
@@ -441,11 +444,11 @@ function YangmingExplanationContentBlock({
             </section>
           ) : null}
         </div>
-      ) : (
+      ) : !hasPrimarySnapshots ? (
         renderFormattedPlainText(content.body, "yangming-body")
-      )}
-      {renderRawTextBackup(content.body)}
-      {unreferencedFallbackAssets.length ? (
+      ) : null}
+      {!hasPrimarySnapshots ? renderRawTextBackup(content.body) : null}
+      {!hasPrimarySnapshots && unreferencedFallbackAssets.length ? (
         <details
           className="mt-4 min-w-0 max-w-full overflow-hidden rounded-2xl bg-amber-50/60 p-3 ring-1 ring-amber-100"
           open={renderBodyBackup || undefined}
@@ -463,7 +466,7 @@ function YangmingExplanationContentBlock({
           </div>
         </details>
       ) : null}
-      {!hasStructuredSections && assets.length ? (
+      {shouldRenderLooseAssets ? (
         <div className="mt-4 grid min-w-0 max-w-full gap-3 overflow-hidden">
           {assets.map((asset, index) =>
             primarySnapshotIndexes.has(index) ? null : renderAssetFigure(asset, asset.src)

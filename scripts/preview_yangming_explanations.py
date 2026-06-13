@@ -941,11 +941,16 @@ def recover_missing_rows_by_stem(
     paper_questions: dict[tuple[str, str], list[PaperQuestion]],
     source_label: str,
 ) -> list[dict[str, Any]]:
-    """Add screenshot-only rows for questions missed by layout parsing.
+    """Add or patch screenshot-only regions for questions missed by layout parsing.
 
     This does not invent text explanations. It only creates source_page_regions
     anchored by the exact question stem, so the later safety filter still has
     to validate the resulting screenshot before it can be imported.
+
+    Important: some PDFs parse enough OCR text to match the correct question,
+    but never produce `source_page_regions`. Those rows look "covered" to the
+    deduper while the screenshot pipeline has nothing to crop. Patch those rows
+    in place instead of appending a duplicate.
     """
     expected_questions = paper_questions.get((meta.exam_code, meta.paper_code), [])
     if not expected_questions:
@@ -969,25 +974,37 @@ def recover_missing_rows_by_stem(
             return True
         return extracted_no == matched_no
 
-    covered_question_ids = {
-        str(row.get("question_id"))
+    def row_has_source_regions(row: dict[str, Any]) -> bool:
+        regions = row.get("source_page_regions")
+        return isinstance(regions, list) and len(regions) > 0
+
+    covered_rows_by_question_id = {
+        str(row.get("question_id")): row
         for row in rows
         if is_safe_existing_cover(row)
     }
+    covered_question_ids = set(covered_rows_by_question_id)
     missing_questions = [
         question for question in expected_questions if question.question_id not in covered_question_ids
     ]
-    if not missing_questions:
+    regionless_questions = [
+        question
+        for question in expected_questions
+        if question.question_id in covered_rows_by_question_id
+        and not row_has_source_regions(covered_rows_by_question_id[question.question_id])
+    ]
+    recovery_questions = [*missing_questions, *regionless_questions]
+    if not recovery_questions:
         return rows
 
     start_cache: dict[int, int] = {}
-    for question in missing_questions:
+    for question in recovery_questions:
         start_index = find_question_start_by_stem(items, question)
         if start_index is not None:
             start_cache[question.question_no] = start_index
 
     recovered_rows: list[dict[str, Any]] = []
-    for question in missing_questions:
+    for question in recovery_questions:
         start_index = start_cache.get(question.question_no)
         if start_index is None:
             continue
@@ -1014,6 +1031,14 @@ def recover_missing_rows_by_stem(
 
         regions = chunk_boundary_page_regions(items, start_index, next_index)
         if not regions:
+            continue
+
+        existing_row = covered_rows_by_question_id.get(question.question_id)
+        if existing_row is not None:
+            existing_row["source_page_start"] = regions[0].get("page")
+            existing_row["source_page_end"] = regions[-1].get("page")
+            existing_row["source_page_regions"] = regions
+            existing_row["recovered_by"] = "canonical_stem_region_patch"
             continue
 
         recovered_rows.append({

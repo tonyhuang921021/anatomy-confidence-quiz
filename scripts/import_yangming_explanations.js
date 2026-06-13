@@ -29,6 +29,12 @@ function assetKindFilter() {
   return kinds.length ? new Set(kinds) : null;
 }
 
+function isScreenshotOnlyImport(allowedAssetKinds) {
+  if (process.env.YANGMING_SCREENSHOT_ONLY === "1") return true;
+  if (!allowedAssetKinds || allowedAssetKinds.size !== 1) return false;
+  return allowedAssetKinds.has("question_snapshot");
+}
+
 function filterAssetsByKind(assets, allowedKinds) {
   if (!Array.isArray(assets)) return [];
   if (!allowedKinds) return assets;
@@ -179,7 +185,17 @@ async function retryUpload(worker, label) {
   throw lastError;
 }
 
-function toDbRow(row, storagePrefix = "", allowedAssetKinds = null) {
+function screenshotSectionsForAssets(assets) {
+  return assets.map((asset, index) => ({
+    kind: "image",
+    label: "完整原頁截圖",
+    assetIndex: index,
+    page: asset.page ?? null,
+    fallback: false
+  }));
+}
+
+function toDbRow(row, storagePrefix = "", allowedAssetKinds = null, screenshotOnly = false) {
   const { assets: filteredAssets, assetIndexMap } = filterAssetsWithIndexMap(row.assets, allowedAssetKinds);
   const assets = filteredAssets
     .map((asset) => ({
@@ -188,19 +204,21 @@ function toDbRow(row, storagePrefix = "", allowedAssetKinds = null) {
         src: typeof asset.src === "string" ? withStoragePrefix(asset.src, storagePrefix) : ""
       }))
     ;
-  const sections = remapSections(row.sections, assetIndexMap, Boolean(allowedAssetKinds));
+  const sections = screenshotOnly
+    ? screenshotSectionsForAssets(assets)
+    : remapSections(row.sections, assetIndexMap, Boolean(allowedAssetKinds));
 
   return sanitizeForPostgres({
     question_id: row.question_id,
-    body: row.body || "",
+    body: screenshotOnly ? "" : row.body || "",
     author: row.author || null,
     reviewer: row.reviewer || null,
     source_label: row.source_label || null,
     source_file: row.source_file || null,
     source_page_start: row.source_page_start || null,
     source_page_end: row.source_page_end || null,
-    question_stem_snapshot: row.question_stem_snapshot || null,
-    answer_snapshot: row.answer_snapshot || null,
+    question_stem_snapshot: screenshotOnly ? null : row.question_stem_snapshot || null,
+    answer_snapshot: screenshotOnly ? null : row.answer_snapshot || null,
     sections,
     assets,
     match_status: row.match_status || null,
@@ -326,8 +344,11 @@ async function filterExistingAssets(supabase, bucket, assets) {
   return pending;
 }
 
-async function upsertRows(supabase, rows, storagePrefix = "", allowedAssetKinds = null) {
-  const batches = chunk(rows.map((row) => toDbRow(row, storagePrefix, allowedAssetKinds)), ROW_BATCH_SIZE);
+async function upsertRows(supabase, rows, storagePrefix = "", allowedAssetKinds = null, screenshotOnly = false) {
+  const batches = chunk(
+    rows.map((row) => toDbRow(row, storagePrefix, allowedAssetKinds, screenshotOnly)),
+    ROW_BATCH_SIZE
+  );
   let upserted = 0;
   for (const batch of batches) {
     const { error } = await supabase
@@ -352,6 +373,7 @@ async function main() {
   const storagePrefix = normalizeStoragePrefix(process.env.YANGMING_STORAGE_PREFIX);
   const importToken = process.env.YANGMING_IMPORT_TOKEN?.trim();
   const allowedAssetKinds = assetKindFilter();
+  const screenshotOnly = isScreenshotOnlyImport(allowedAssetKinds);
 
   const rows = JSON.parse(fs.readFileSync(sourcePath, "utf8"));
   if (!Array.isArray(rows)) {
@@ -381,6 +403,7 @@ async function main() {
   if (SKIP_ASSET_UPLOAD) console.log("asset upload: skipped");
   if (storagePrefix) console.log(`storage prefix: ${storagePrefix}`);
   if (allowedAssetKinds) console.log(`asset kind filter: ${Array.from(allowedAssetKinds).join(", ")}`);
+  if (screenshotOnly) console.log("screenshot-only import: enabled; OCR body and legacy sections will be cleared");
 
   if (DRY_RUN) {
     const assetKindCounts = rows.reduce((counts, row) => {
@@ -402,7 +425,7 @@ async function main() {
     const pendingAssets = await filterExistingAssets(supabase, bucket, assets);
     await uploadAssets(supabase, bucket, pendingAssets);
   }
-  await upsertRows(supabase, rows, storagePrefix, allowedAssetKinds);
+  await upsertRows(supabase, rows, storagePrefix, allowedAssetKinds, screenshotOnly);
   console.log("Yangming explanations import complete.");
 }
 
