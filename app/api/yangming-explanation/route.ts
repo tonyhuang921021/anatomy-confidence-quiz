@@ -143,7 +143,11 @@ function shouldDropAssetForQuestion(
       typeof record.src === "string" &&
       (() => {
         const src = record.src.trim().replace(/^\/+/, "");
-        return src.startsWith("per_file/") || src.includes("/per_file/");
+        return (
+          src.startsWith("per_file/") ||
+          src.includes("/per_file/") ||
+          src.startsWith("versions/")
+        );
       })()
     )
   ) {
@@ -417,13 +421,13 @@ export async function POST(request: NextRequest) {
       rows.find((candidate) => candidate.question_id === questionIdCandidates[1]) ??
       null;
     if (!row) {
-      return NextResponse.json({ ok: true, explanation: null });
+      return NextResponse.json({ ok: true, activeVersionId, explanation: null });
     }
 
     const expectedQuestionNo = getQuestionNumberFromId(row.question_id);
     const normalizedAssetBundle = normalizeAssets(supabase, row.assets, expectedQuestionNo);
     if (normalizedAssetBundle.assets.length === 0) {
-      return NextResponse.json({ ok: true, explanation: null });
+      return NextResponse.json({ ok: true, activeVersionId, explanation: null });
     }
     const normalizedSections = normalizeSections(row.sections, normalizedAssetBundle.assetIndexMap)
       .filter((section) => section && section.kind === "image");

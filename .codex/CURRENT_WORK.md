@@ -407,3 +407,18 @@
   - `/usr/bin/env YANGMING_ASSET_KIND_FILTER=question_snapshot YANGMING_SCREENSHOT_ONLY=1 YANGMING_ASSET_ROOT=/private/tmp/ym_preview_v34_1061_med12 node scripts/import_yangming_explanations.js /private/tmp/ym_safe_v34_1061_med12/yangming_safe_rows.json`
 - 重要：正式遠端寫入因為會覆蓋 production Supabase 的 `5900` rows 並上傳 `12337` assets，被安全審查擋下。這不是技術錯誤，而是 production blast radius 太大。
 - 下一步固定：不要繞過審查、不要改用其他方式偷偷上傳。需要使用者明確批准，例如：「我明確同意覆蓋正式 Supabase 陽明詳解資料，請上傳 visual_boundary_full 5900 題 + v34 194 題補包。」收到後再跑正式上傳，接著用正式站 API 抽查線上是否讀得到。
+
+2026-06-15 進度補充 22：
+
+- 使用者要求「線上直接讀新資料」。目前不是重切圖，也不是重新上傳資料，而是讓 production API 正確讀已上傳且已啟用的 versioned release。
+- 已確認 Supabase active release 正常：
+  - `ym-boundary-full-20260615`
+  - `rows_count=5900`
+  - `assets_count=12337`
+  - `storage_prefix=versions/ym-boundary-full-20260615`
+- 已確認 DB 中 `MOEX-110101-1301-Q020` 在 versioned table 裡存在，且有 3 張 `question_snapshot` asset、3 個 image section。
+- 根因：`app/api/yangming-explanation/route.ts` 舊的 `shouldDropAssetForQuestion()` 只允許 `per_file/` 或 `/per_file/` 路徑；新上傳包的 asset path 是 `versions/ym-boundary-full-20260615/assets/...`，因此 production route 讀到 row 後把新圖全部誤殺，回傳 `explanation:null`。
+- 已修 route：`question_snapshot` 現在允許 `versions/` 路徑，但仍擋 `fallback`、`page_snapshot`、`full_page` 與非 `question_snapshot`。這是讓線上直接讀新版本包，不是放寬到完整頁 fallback。
+- 已加診斷欄位：沒有 row 或 assets 被過濾空時，也會回 `activeVersionId`，方便判斷 API 是否讀到 active release。
+- 驗證：`npm run typecheck` 通過；`npm run build` 通過。
+- 下一步固定：只提交 `app/api/yangming-explanation/route.ts` 和 `.codex/CURRENT_WORK.md`，推上線後抽查正式 API 是否回 `activeVersionId: ym-boundary-full-20260615` 且 Q020 有 assets。
