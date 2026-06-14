@@ -36,6 +36,15 @@ type NormalizedYangmingAsset = {
   fallback?: boolean;
 };
 
+type SupabaseQueryClient = {
+  from: (table: string) => any;
+};
+
+type SupabaseQueryResult = {
+  data: unknown;
+  error: unknown;
+};
+
 const YANGMING_EXPLANATION_BUCKET =
   process.env.YANGMING_EXPLANATION_BUCKET || "yangming-explanations";
 
@@ -124,7 +133,13 @@ function shouldDropAssetForQuestion(
   }
   if (
     kind === "question_snapshot" &&
-    !(typeof record.src === "string" && record.src.trim().startsWith("per_file/"))
+    !(
+      typeof record.src === "string" &&
+      (() => {
+        const src = record.src.trim().replace(/^\/+/, "");
+        return src.startsWith("per_file/") || src.includes("/per_file/");
+      })()
+    )
   ) {
     return true;
   }
@@ -143,6 +158,57 @@ function shouldDropAssetForQuestion(
 
   const assetQuestionNo = detectAssetQuestionNumber(record);
   return Boolean(assetQuestionNo && assetQuestionNo !== expectedQuestionNo);
+}
+
+function isMissingTableError(error: unknown, tableName: string) {
+  const message =
+    error && typeof error === "object" && "message" in error
+      ? String((error as { message?: unknown }).message ?? "")
+      : String(error ?? "");
+  return message.includes(tableName) && (message.includes("does not exist") || message.includes("Could not find"));
+}
+
+async function getActiveYangmingVersion(supabase: SupabaseQueryClient) {
+  const { data, error } = (await withServerTimeout(
+    supabase
+      .from("yangming_explanation_releases")
+      .select("version_id")
+      .eq("is_active", true)
+      .limit(1)
+      .maybeSingle(),
+    800,
+    "陽明詳解版本讀取逾時"
+  )) as SupabaseQueryResult;
+  if (error) {
+    if (isMissingTableError(error, "yangming_explanation_releases")) return null;
+    return null;
+  }
+  const release = data as { version_id?: unknown } | null;
+  return typeof release?.version_id === "string" && release.version_id.trim()
+    ? release.version_id.trim()
+    : null;
+}
+
+async function fetchYangmingRows(
+  supabase: SupabaseQueryClient,
+  questionIdCandidates: string[],
+  versionId?: string | null
+) {
+  const columns =
+    "question_id, body, author, reviewer, source_label, source_file, source_page_start, source_page_end, question_stem_snapshot, answer_snapshot, sections, assets, match_status, match_score";
+  const query = versionId
+    ? supabase
+        .from("yangming_question_explanations_versioned")
+        .select(columns)
+        .eq("version_id", versionId)
+        .in("question_id", questionIdCandidates)
+        .limit(questionIdCandidates.length)
+    : supabase
+        .from("yangming_question_explanations")
+        .select(columns)
+        .in("question_id", questionIdCandidates)
+        .limit(questionIdCandidates.length);
+  return withServerTimeout(query, versionId ? 1600 : 2200, "陽明詳解讀取逾時") as Promise<SupabaseQueryResult>;
 }
 
 function isMeaningfulYangmingText(text: string | null | undefined) {
@@ -296,25 +362,35 @@ export async function POST(request: NextRequest) {
     }
 
     const questionIdCandidates = getQuestionIdLookupCandidates(questionId);
-    const { data: explanationRows, error: explanationError } = await withServerTimeout(
-      supabase
-        .from("yangming_question_explanations")
-        .select("question_id, body, author, reviewer, source_label, source_file, source_page_start, source_page_end, question_stem_snapshot, answer_snapshot, sections, assets, match_status, match_score")
-        .in("question_id", questionIdCandidates)
-        .limit(questionIdCandidates.length),
-      2500,
-      "陽明詳解讀取逾時"
-    );
+    const activeVersionId = await getActiveYangmingVersion(supabase);
+    let { data: explanationRows, error: explanationError } = activeVersionId
+      ? await fetchYangmingRows(supabase, questionIdCandidates, activeVersionId)
+      : await fetchYangmingRows(supabase, questionIdCandidates);
 
     if (explanationError) {
-      const message = String(explanationError.message ?? "");
-      if (message.includes("yangming_question_explanations") && (message.includes("does not exist") || message.includes("Could not find"))) {
-        return NextResponse.json({ ok: true, explanation: null });
+      if (
+        activeVersionId &&
+        isMissingTableError(explanationError, "yangming_question_explanations_versioned")
+      ) {
+        const legacyResult = await fetchYangmingRows(supabase, questionIdCandidates);
+        explanationRows = legacyResult.data;
+        explanationError = legacyResult.error;
       }
-      throw explanationError;
+      if (explanationError) {
+        if (isMissingTableError(explanationError, "yangming_question_explanations")) {
+          return NextResponse.json({ ok: true, explanation: null });
+        }
+        throw explanationError;
+      }
     }
 
-    const rows = (Array.isArray(explanationRows) ? explanationRows : []) as YangmingExplanationRow[];
+    let rows = (Array.isArray(explanationRows) ? explanationRows : []) as YangmingExplanationRow[];
+    if (activeVersionId && rows.length === 0) {
+      const legacyResult = await fetchYangmingRows(supabase, questionIdCandidates);
+      if (!legacyResult.error && Array.isArray(legacyResult.data)) {
+        rows = legacyResult.data as YangmingExplanationRow[];
+      }
+    }
     const row =
       rows.find((candidate) => candidate.question_id === questionId) ??
       rows.find((candidate) => candidate.question_id === questionIdCandidates[1]) ??

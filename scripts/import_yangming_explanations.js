@@ -195,7 +195,7 @@ function screenshotSectionsForAssets(assets) {
   }));
 }
 
-function toDbRow(row, storagePrefix = "", allowedAssetKinds = null, screenshotOnly = false) {
+function toDbRow(row, storagePrefix = "", allowedAssetKinds = null, screenshotOnly = false, versionId = "") {
   const { assets: filteredAssets, assetIndexMap } = filterAssetsWithIndexMap(row.assets, allowedAssetKinds);
   const assets = filteredAssets
     .map((asset) => ({
@@ -208,7 +208,7 @@ function toDbRow(row, storagePrefix = "", allowedAssetKinds = null, screenshotOn
     ? screenshotSectionsForAssets(assets)
     : remapSections(row.sections, assetIndexMap, Boolean(allowedAssetKinds));
 
-  return sanitizeForPostgres({
+  const dbRow = {
     question_id: row.question_id,
     body: screenshotOnly ? "" : row.body || "",
     author: row.author || null,
@@ -229,7 +229,13 @@ function toDbRow(row, storagePrefix = "", allowedAssetKinds = null, screenshotOn
           ? Number(row.match_score)
           : null,
     updated_at: new Date().toISOString()
-  });
+  };
+
+  if (versionId) {
+    dbRow.version_id = versionId;
+  }
+
+  return sanitizeForPostgres(dbRow);
 }
 
 function collectAssets(rows, assetRoot, storagePrefix = "", allowedAssetKinds = null) {
@@ -344,19 +350,51 @@ async function filterExistingAssets(supabase, bucket, assets) {
   return pending;
 }
 
-async function upsertRows(supabase, rows, storagePrefix = "", allowedAssetKinds = null, screenshotOnly = false) {
+async function upsertRelease(supabase, release) {
+  const { error } = await supabase
+    .from("yangming_explanation_releases")
+    .upsert(
+      {
+        version_id: release.versionId,
+        label: release.label || release.versionId,
+        status: release.status,
+        is_active: false,
+        source_path: release.sourcePath,
+        storage_prefix: release.storagePrefix,
+        rows_count: release.rowsCount,
+        assets_count: release.assetsCount,
+        notes: release.notes || null,
+        updated_at: new Date().toISOString()
+      },
+      { onConflict: "version_id" }
+    );
+  if (error) throw error;
+}
+
+async function upsertRows(
+  supabase,
+  rows,
+  storagePrefix = "",
+  allowedAssetKinds = null,
+  screenshotOnly = false,
+  versionId = ""
+) {
+  const table = versionId
+    ? "yangming_question_explanations_versioned"
+    : "yangming_question_explanations";
+  const onConflict = versionId ? "version_id,question_id" : "question_id";
   const batches = chunk(
-    rows.map((row) => toDbRow(row, storagePrefix, allowedAssetKinds, screenshotOnly)),
+    rows.map((row) => toDbRow(row, storagePrefix, allowedAssetKinds, screenshotOnly, versionId)),
     ROW_BATCH_SIZE
   );
   let upserted = 0;
   for (const batch of batches) {
     const { error } = await supabase
-      .from("yangming_question_explanations")
-      .upsert(batch, { onConflict: "question_id" });
+      .from(table)
+      .upsert(batch, { onConflict });
     if (error) throw error;
     upserted += batch.length;
-    console.log(`upserted explanations ${upserted}/${rows.length}`);
+    console.log(`upserted explanations ${upserted}/${rows.length}${versionId ? ` (${versionId})` : ""}`);
   }
 }
 
@@ -370,7 +408,13 @@ async function main() {
   const url = requiredEnv("NEXT_PUBLIC_SUPABASE_URL");
   const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY?.trim();
   const key = serviceRoleKey || requiredEnv("NEXT_PUBLIC_SUPABASE_ANON_KEY");
-  const storagePrefix = normalizeStoragePrefix(process.env.YANGMING_STORAGE_PREFIX);
+  const versionId = normalizeStoragePrefix(process.env.YANGMING_IMPORT_VERSION_ID);
+  const versionLabel = process.env.YANGMING_IMPORT_VERSION_LABEL?.trim() || versionId;
+  const versionStatus = ["candidate", "archived"].includes(process.env.YANGMING_IMPORT_VERSION_STATUS || "")
+    ? process.env.YANGMING_IMPORT_VERSION_STATUS
+    : "candidate";
+  const explicitStoragePrefix = normalizeStoragePrefix(process.env.YANGMING_STORAGE_PREFIX);
+  const storagePrefix = explicitStoragePrefix || (versionId ? `versions/${versionId}` : "");
   const importToken = process.env.YANGMING_IMPORT_TOKEN?.trim();
   const allowedAssetKinds = assetKindFilter();
   const screenshotOnly = isScreenshotOnlyImport(allowedAssetKinds);
@@ -402,6 +446,10 @@ async function main() {
   if (DRY_RUN) console.log("dry run: enabled; no assets or rows will be written");
   if (SKIP_ASSET_UPLOAD) console.log("asset upload: skipped");
   if (storagePrefix) console.log(`storage prefix: ${storagePrefix}`);
+  if (versionId) {
+    console.log(`versioned import: ${versionId}`);
+    console.log(`version status: ${versionStatus}`);
+  }
   if (allowedAssetKinds) console.log(`asset kind filter: ${Array.from(allowedAssetKinds).join(", ")}`);
   if (screenshotOnly) console.log("screenshot-only import: enabled; OCR body and legacy sections will be cleared");
 
@@ -418,6 +466,20 @@ async function main() {
     return;
   }
 
+  if (versionId) {
+    await upsertRelease(supabase, {
+      versionId,
+      label: versionLabel,
+      status: versionStatus,
+      sourcePath,
+      storagePrefix,
+      rowsCount: rows.length,
+      assetsCount: assets.length,
+      notes: process.env.YANGMING_IMPORT_VERSION_NOTES?.trim() || null
+    });
+    console.log(`upserted release ${versionId}`);
+  }
+
   if (!SKIP_ASSET_UPLOAD) {
     if (serviceRoleKey) {
       await ensureBucket(supabase, bucket);
@@ -425,7 +487,7 @@ async function main() {
     const pendingAssets = await filterExistingAssets(supabase, bucket, assets);
     await uploadAssets(supabase, bucket, pendingAssets);
   }
-  await upsertRows(supabase, rows, storagePrefix, allowedAssetKinds, screenshotOnly);
+  await upsertRows(supabase, rows, storagePrefix, allowedAssetKinds, screenshotOnly, versionId);
   console.log("Yangming explanations import complete.");
 }
 

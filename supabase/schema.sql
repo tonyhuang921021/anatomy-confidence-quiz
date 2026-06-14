@@ -746,6 +746,174 @@ to service_role
 using (true)
 with check (true);
 
+create table if not exists public.yangming_explanation_releases (
+  version_id text primary key,
+  label text,
+  status text not null default 'candidate',
+  is_active boolean not null default false,
+  source_path text,
+  storage_prefix text,
+  rows_count integer not null default 0,
+  assets_count integer not null default 0,
+  notes text,
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now(),
+  activated_at timestamptz,
+  constraint yangming_explanation_releases_status_check
+    check (status in ('candidate', 'active', 'archived'))
+);
+
+alter table public.yangming_explanation_releases
+  add column if not exists label text;
+
+alter table public.yangming_explanation_releases
+  add column if not exists status text not null default 'candidate';
+
+alter table public.yangming_explanation_releases
+  add column if not exists is_active boolean not null default false;
+
+alter table public.yangming_explanation_releases
+  add column if not exists source_path text;
+
+alter table public.yangming_explanation_releases
+  add column if not exists storage_prefix text;
+
+alter table public.yangming_explanation_releases
+  add column if not exists rows_count integer not null default 0;
+
+alter table public.yangming_explanation_releases
+  add column if not exists assets_count integer not null default 0;
+
+alter table public.yangming_explanation_releases
+  add column if not exists notes text;
+
+alter table public.yangming_explanation_releases
+  add column if not exists created_at timestamptz not null default now();
+
+alter table public.yangming_explanation_releases
+  add column if not exists updated_at timestamptz not null default now();
+
+alter table public.yangming_explanation_releases
+  add column if not exists activated_at timestamptz;
+
+create unique index if not exists yangming_explanation_releases_one_active_idx
+on public.yangming_explanation_releases (is_active)
+where is_active;
+
+revoke all on public.yangming_explanation_releases from anon;
+revoke all on public.yangming_explanation_releases from authenticated;
+
+grant select, insert, update, delete
+  on public.yangming_explanation_releases
+  to service_role;
+
+alter table public.yangming_explanation_releases enable row level security;
+
+drop policy if exists "Service role can manage yangming explanation releases" on public.yangming_explanation_releases;
+
+create policy "Service role can manage yangming explanation releases"
+on public.yangming_explanation_releases
+for all
+to service_role
+using (true)
+with check (true);
+
+create table if not exists public.yangming_question_explanations_versioned (
+  version_id text not null references public.yangming_explanation_releases (version_id) on delete cascade,
+  question_id text not null,
+  body text not null default '',
+  author text,
+  reviewer text,
+  source_label text,
+  source_file text,
+  source_page_start integer,
+  source_page_end integer,
+  question_stem_snapshot text,
+  answer_snapshot text,
+  sections jsonb not null default '[]'::jsonb,
+  assets jsonb not null default '[]'::jsonb,
+  match_status text,
+  match_score numeric,
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now(),
+  primary key (version_id, question_id)
+);
+
+alter table public.yangming_question_explanations_versioned
+  add column if not exists version_id text;
+
+alter table public.yangming_question_explanations_versioned
+  add column if not exists question_id text;
+
+alter table public.yangming_question_explanations_versioned
+  add column if not exists body text not null default '';
+
+alter table public.yangming_question_explanations_versioned
+  add column if not exists author text;
+
+alter table public.yangming_question_explanations_versioned
+  add column if not exists reviewer text;
+
+alter table public.yangming_question_explanations_versioned
+  add column if not exists source_label text;
+
+alter table public.yangming_question_explanations_versioned
+  add column if not exists source_file text;
+
+alter table public.yangming_question_explanations_versioned
+  add column if not exists source_page_start integer;
+
+alter table public.yangming_question_explanations_versioned
+  add column if not exists source_page_end integer;
+
+alter table public.yangming_question_explanations_versioned
+  add column if not exists question_stem_snapshot text;
+
+alter table public.yangming_question_explanations_versioned
+  add column if not exists answer_snapshot text;
+
+alter table public.yangming_question_explanations_versioned
+  add column if not exists sections jsonb not null default '[]'::jsonb;
+
+alter table public.yangming_question_explanations_versioned
+  add column if not exists assets jsonb not null default '[]'::jsonb;
+
+alter table public.yangming_question_explanations_versioned
+  add column if not exists match_status text;
+
+alter table public.yangming_question_explanations_versioned
+  add column if not exists match_score numeric;
+
+alter table public.yangming_question_explanations_versioned
+  add column if not exists created_at timestamptz not null default now();
+
+alter table public.yangming_question_explanations_versioned
+  add column if not exists updated_at timestamptz not null default now();
+
+create index if not exists yangming_question_explanations_versioned_question_id_idx
+on public.yangming_question_explanations_versioned (question_id);
+
+create index if not exists yangming_question_explanations_versioned_updated_at_idx
+on public.yangming_question_explanations_versioned (updated_at desc);
+
+revoke all on public.yangming_question_explanations_versioned from anon;
+revoke all on public.yangming_question_explanations_versioned from authenticated;
+
+grant select, insert, update, delete
+  on public.yangming_question_explanations_versioned
+  to service_role;
+
+alter table public.yangming_question_explanations_versioned enable row level security;
+
+drop policy if exists "Service role can manage versioned yangming question explanations" on public.yangming_question_explanations_versioned;
+
+create policy "Service role can manage versioned yangming question explanations"
+on public.yangming_question_explanations_versioned
+for all
+to service_role
+using (true)
+with check (true);
+
 insert into storage.buckets (id, name, public, file_size_limit, allowed_mime_types)
 values (
   'yangming-explanations',
