@@ -18,6 +18,14 @@
 2026-06-15 目前執行狀態：
 
 - 使用者最新指令是「線上直接讀新資料」，並要求可以不要覆蓋舊資料、方便切回。
+- 已把新包實際上傳到 Supabase 版本化資料，不覆蓋 legacy：
+  - version id：`ym-boundary-full-20260615`
+  - DB rows：`5900`
+  - Storage assets：`12337`
+  - release 狀態：`active`
+- 正式站第一次 API 抽查曾回 `陽明詳解版本讀取逾時`，原因在 route 每次先查 `yangming_explanation_releases` 且 timeout 只有 800ms。
+- 已修 `app/api/yangming-explanation/route.ts`：active release 查詢改 2500ms、加入 5 分鐘記憶體快取，且版本查詢短暫失敗時不讓整個 API degraded。此修正已通過 `npm run typecheck` 與 `npm run build`，下一步是提交推上線再抽查正式 API 是否回傳 `versions/ym-boundary-full-20260615/...` 的 storagePath。
+- 本機 build 驗證時 `.next` 快取再次缺頁面檔，已把舊快取改名為 `.next-stale-20260615-active-release-route` 後重建成功；仍不是功能碼錯誤。
 - 已完成 `npm run typecheck`。
 - 已完成乾淨 `npm run build`。先前 `.next` 快取缺 `app/api/openai-budget/route.js`，已把舊快取改名為 `.next-stale-20260615-yangming-upload` 後重建成功；不是程式碼錯誤。
 - 已完成 dry-run 匯入：

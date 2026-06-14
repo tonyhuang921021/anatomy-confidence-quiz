@@ -47,6 +47,12 @@ type SupabaseQueryResult = {
 
 const YANGMING_EXPLANATION_BUCKET =
   process.env.YANGMING_EXPLANATION_BUCKET || "yangming-explanations";
+const ACTIVE_VERSION_CACHE_TTL_MS = 5 * 60 * 1000;
+
+let activeYangmingVersionCache: {
+  versionId: string | null;
+  expiresAt: number;
+} | null = null;
 
 function getServiceSupabaseClient() {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
@@ -169,24 +175,39 @@ function isMissingTableError(error: unknown, tableName: string) {
 }
 
 async function getActiveYangmingVersion(supabase: SupabaseQueryClient) {
-  const { data, error } = (await withServerTimeout(
-    supabase
-      .from("yangming_explanation_releases")
-      .select("version_id")
-      .eq("is_active", true)
-      .limit(1)
-      .maybeSingle(),
-    800,
-    "陽明詳解版本讀取逾時"
-  )) as SupabaseQueryResult;
-  if (error) {
-    if (isMissingTableError(error, "yangming_explanation_releases")) return null;
-    return null;
+  const now = Date.now();
+  if (activeYangmingVersionCache && activeYangmingVersionCache.expiresAt > now) {
+    return activeYangmingVersionCache.versionId;
   }
-  const release = data as { version_id?: unknown } | null;
-  return typeof release?.version_id === "string" && release.version_id.trim()
-    ? release.version_id.trim()
-    : null;
+
+  try {
+    const { data, error } = (await withServerTimeout(
+      supabase
+        .from("yangming_explanation_releases")
+        .select("version_id")
+        .eq("is_active", true)
+        .limit(1)
+        .maybeSingle(),
+      2500,
+      "陽明詳解版本讀取逾時"
+    )) as SupabaseQueryResult;
+    if (error) {
+      if (isMissingTableError(error, "yangming_explanation_releases")) return null;
+      return activeYangmingVersionCache?.versionId ?? null;
+    }
+    const release = data as { version_id?: unknown } | null;
+    const versionId =
+      typeof release?.version_id === "string" && release.version_id.trim()
+        ? release.version_id.trim()
+        : null;
+    activeYangmingVersionCache = {
+      versionId,
+      expiresAt: now + ACTIVE_VERSION_CACHE_TTL_MS
+    };
+    return versionId;
+  } catch {
+    return activeYangmingVersionCache?.versionId ?? null;
+  }
 }
 
 async function fetchYangmingRows(
@@ -408,6 +429,7 @@ export async function POST(request: NextRequest) {
       .filter((section) => section && section.kind === "image");
     return NextResponse.json({
       ok: true,
+      activeVersionId,
       explanation: {
         body: "",
         author: row.author ?? undefined,
