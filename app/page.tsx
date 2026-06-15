@@ -65,6 +65,11 @@ const QUICK_ENTRIES = [
 const HOME_RELEASE_NOTES = [
   {
     time: "06/15",
+    title: "微免小科選題修正",
+    body: "微生物免疫選病毒、細菌或免疫時，現在會用精簡設定重新建立題池，避免本機容量滿時沿用上一輪科目。"
+  },
+  {
+    time: "06/15",
     title: "藥理卡 ABCDE 分級更新",
     body: "藥理複習卡已改用新版官方考古題重排分級，A/B 高頻藥會更常抽到，D/E 低頻藥仍會保留補洞。"
   },

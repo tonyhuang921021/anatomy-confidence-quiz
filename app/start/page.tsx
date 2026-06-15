@@ -39,6 +39,18 @@ const selectableSubjects = enabledSubjects.filter(
     (MED1_SUBJECTS.includes(item.subject) || MED2_SUBJECTS.includes(item.subject))
 );
 
+function encodeStartSettingsForUrl(settings: QuizSettings) {
+  try {
+    const json = JSON.stringify(settings);
+    const bytes = new TextEncoder().encode(json);
+    const binary = Array.from(bytes, (byte) => String.fromCharCode(byte)).join("");
+    const encoded = btoa(binary).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/g, "");
+    return encoded.length <= 1800 ? encoded : null;
+  } catch {
+    return null;
+  }
+}
+
 export default function StartPage() {
   const router = useRouter();
   const { user } = useAuth();
@@ -371,22 +383,16 @@ export default function StartPage() {
   function handleStart() {
     if ((effectiveSelectedSubjects.length === 0 && !includeSeasonalLimited) || availableQuestionCount === 0) return;
 
-    const shouldUseExactStartPool = selectedMicrobiologyTracks.length > 0;
-    const exactStartQuestionIds = shouldUseExactStartPool
-      ? Array.from(
-          new Set(
-            [
-              ...selectedSubjectQuestionPool,
-              ...(includeSeasonalLimited
-                ? seasonalLimitedQuestions.filter(
-                    (question) => !excludeAiGenerated || question.sourceType !== "AI_GENERATED"
-                  )
-                : [])
-            ].map((question) => question.id)
-          )
-        )
-      : undefined;
+    const hasMicrobiologyTrackFilter = selectedMicrobiologyTracks.length > 0;
     const selectedMicrobiologyLabels = getSubjectTrackLabels(MICROBIOLOGY_SUBJECT, selectedMicrobiologyTracks);
+    const selectedSubjectTracks = hasMicrobiologyTrackFilter
+      ? { [MICROBIOLOGY_SUBJECT]: selectedMicrobiologyTracks }
+      : undefined;
+    const seasonalQuestionIds = includeSeasonalLimited
+      ? seasonalLimitedQuestions
+          .filter((question) => !excludeAiGenerated || question.sourceType !== "AI_GENERATED")
+          .map((question) => question.id)
+      : undefined;
 
     const nextSettings: QuizSettings = {
       ...DEFAULT_QUIZ_SETTINGS,
@@ -398,14 +404,11 @@ export default function StartPage() {
       subjectFilter:
         effectiveSelectedSubjects.length === 1 && !includeSeasonalLimited ? effectiveSelectedSubjects[0] : "全部",
       subjectFilters: effectiveSelectedSubjects,
+      subjectTracks: selectedSubjectTracks,
       excludeAiGenerated,
-      customQuestionIds: exactStartQuestionIds ?? (includeSeasonalLimited
-        ? seasonalLimitedQuestions
-            .filter((question) => !excludeAiGenerated || question.sourceType !== "AI_GENERATED")
-            .map((question) => question.id)
-        : undefined),
-      strictCustomQuestionPool: shouldUseExactStartPool,
-      customPoolLabel: shouldUseExactStartPool
+      customQuestionIds: seasonalQuestionIds,
+      strictCustomQuestionPool: false,
+      customPoolLabel: hasMicrobiologyTrackFilter
         ? `開始測驗：${[
             ...effectiveSelectedSubjects.filter((subject) => subject !== MICROBIOLOGY_SUBJECT),
             selectedMicrobiologyLabels.length > 0
@@ -421,7 +424,11 @@ export default function StartPage() {
     };
 
     saveQuizSettings(nextSettings);
-    router.push("/quiz?new=1");
+    const encodedSettings = encodeStartSettingsForUrl(nextSettings);
+    const nextUrl = encodedSettings
+      ? `/quiz?new=1&startSettings=${encodeURIComponent(encodedSettings)}`
+      : "/quiz?new=1";
+    router.push(nextUrl);
   }
 
   return (

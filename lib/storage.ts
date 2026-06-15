@@ -56,6 +56,35 @@ function safeLocalStorageRemoveItem(key: string) {
   }
 }
 
+function safeSessionStorageGetItem(key: string) {
+  if (!isBrowser()) return null;
+  try {
+    return window.sessionStorage.getItem(key);
+  } catch {
+    return null;
+  }
+}
+
+function safeSessionStorageSetItem(key: string, value: string) {
+  if (!isBrowser()) return;
+  try {
+    window.sessionStorage.setItem(key, value);
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+function safeSessionStorageRemoveItem(key: string) {
+  if (!isBrowser()) return;
+  try {
+    window.sessionStorage.removeItem(key);
+    return true;
+  } catch {
+    return false;
+  }
+}
+
 function getScopedKey(baseKey: string) {
   if (!isBrowser()) return `${baseKey}:${GUEST_USER_ID}`;
   const userId = safeLocalStorageGetItem(ACTIVE_USER_KEY) || GUEST_USER_ID;
@@ -527,12 +556,23 @@ export function clearHistory() {
 
 export function saveQuizSettings(settings: QuizSettings) {
   if (!isBrowser()) return;
-  safeLocalStorageSetItem(getScopedKey(QUIZ_SETTINGS_KEY), JSON.stringify(settings));
+  const scopedKey = getScopedKey(QUIZ_SETTINGS_KEY);
+  const serializedSettings = JSON.stringify(settings);
+  const didPersist = safeLocalStorageSetItem(scopedKey, serializedSettings);
+  if (didPersist) {
+    safeSessionStorageRemoveItem(scopedKey);
+    return;
+  }
+
+  // If a student's browser storage is already full, keep the newest start-page
+  // choice alive for this tab instead of falling back to an older subject.
+  safeSessionStorageSetItem(scopedKey, serializedSettings);
 }
 
 export function loadQuizSettings(): QuizSettings | null {
   if (!isBrowser()) return null;
-  const raw = getLegacyOrScopedRaw(QUIZ_SETTINGS_KEY);
+  const scopedKey = getScopedKey(QUIZ_SETTINGS_KEY);
+  const raw = safeSessionStorageGetItem(scopedKey) ?? getLegacyOrScopedRaw(QUIZ_SETTINGS_KEY);
   if (!raw) return null;
 
   try {

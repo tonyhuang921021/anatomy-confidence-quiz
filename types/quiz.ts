@@ -104,6 +104,7 @@ export type QuizSettings = {
   yearTo?: number;
   subjectFilter?: SubjectFilter;
   subjectFilters?: SubjectName[];
+  subjectTracks?: Partial<Record<SubjectName, string[]>>;
   excludeAiGenerated?: boolean;
   customQuestionIds?: string[];
   customQuestionPayload?: Question[];

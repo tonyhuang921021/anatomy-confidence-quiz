@@ -35,6 +35,11 @@ import {
   findPreviousQuestionForContinuation
 } from "@/lib/questionContext";
 import {
+  isTrackSubject,
+  questionMatchesSubjectTracks,
+  type TrackSubject
+} from "@/lib/questionTrackFilters";
+import {
   createQuestionOrder,
   DEFAULT_QUIZ_SETTINGS,
   getConfidenceLabel,
@@ -91,6 +96,20 @@ function getDifficultyBadge(question: Question) {
   }
 
   return null;
+}
+
+function decodeStartSettingsFromUrl(encodedSettings: string | null): QuizSettings | null {
+  if (!encodedSettings) return null;
+
+  try {
+    const normalized = encodedSettings.replace(/-/g, "+").replace(/_/g, "/");
+    const padded = normalized.padEnd(normalized.length + ((4 - (normalized.length % 4)) % 4), "=");
+    const binary = atob(padded);
+    const bytes = Uint8Array.from(binary, (character) => character.charCodeAt(0));
+    return JSON.parse(new TextDecoder().decode(bytes)) as QuizSettings;
+  } catch {
+    return null;
+  }
 }
 
 function evaluateAttempt(question: Question, selectedAnswer: OptionKey) {
@@ -157,7 +176,10 @@ function createSession(
     questions,
     classificationOverrides
   );
-  const effectiveQuestions = localQuestionSet.length > 0 ? localQuestionSet : questions;
+  const shouldRespectEmptyLocalQuestionSet =
+    hasActiveSubjectTrackFilter(normalizedSettings) || Boolean(normalizedSettings.strictCustomQuestionPool);
+  const effectiveQuestions =
+    localQuestionSet.length > 0 || shouldRespectEmptyLocalQuestionSet ? localQuestionSet : questions;
   const selectedSubjects = normalizedSettings.subjectFilters?.filter(Boolean) ?? [];
   const effectiveSettings =
     normalizedSettings.mode === "simulation" &&
@@ -217,6 +239,30 @@ function createSession(
   };
 }
 
+function getActiveSubjectTrackEntries(settings: QuizSettings): [TrackSubject, string[]][] {
+  return Object.entries(settings.subjectTracks ?? {})
+    .filter(
+      (entry): entry is [TrackSubject, string[]] =>
+        isTrackSubject(entry[0]) && Array.isArray(entry[1]) && entry[1].length > 0
+    );
+}
+
+function hasActiveSubjectTrackFilter(settings: QuizSettings) {
+  return getActiveSubjectTrackEntries(settings).length > 0;
+}
+
+function applySubjectTrackFilters(questions: Question[], settings: QuizSettings) {
+  const activeTrackEntries = getActiveSubjectTrackEntries(settings);
+  if (activeTrackEntries.length === 0) return questions;
+
+  return questions.filter((question) => {
+    const matchingTrackEntry = activeTrackEntries.find(([subject]) => question.subject === subject);
+    if (!matchingTrackEntry) return true;
+    const [subject, selectedTrackKeys] = matchingTrackEntry;
+    return questionMatchesSubjectTracks(question, subject, selectedTrackKeys);
+  });
+}
+
 function selectLocalQuestionSet(
   settings: QuizSettings,
   fallbackQuestions: Question[],
@@ -228,7 +274,13 @@ function selectLocalQuestionSet(
     selectedSubjects.length > 0
       ? getQuestionBankBySubjects(selectedSubjects, classificationOverrides)
       : getQuestionBankBySubjectFilter(subjectFilter, classificationOverrides);
-  const sourceBank = bank.length > 0 ? bank : fallbackQuestions;
+  const filteredBank = applySubjectTrackFilters(bank, settings);
+  const sourceBank =
+    filteredBank.length > 0 || hasActiveSubjectTrackFilter(settings)
+      ? filteredBank
+      : bank.length > 0
+        ? bank
+        : fallbackQuestions;
   const runtimeQuestionMap = new Map(
     getQuestionBankBySubjects(["醫學（一）", "醫學（二）"], classificationOverrides).map(
       (question) => [question.id, question] as const
@@ -533,6 +585,7 @@ export default function QuizPage() {
         typeof window !== "undefined" ? new URLSearchParams(window.location.search) : null;
       const preset = params?.get("preset");
       const directSubject = params?.get("subject");
+      const startSettingsFromUrl = decodeStartSettingsFromUrl(params?.get("startSettings") ?? null);
       const startPresetSettings: QuizSettings = {
         ...DEFAULT_QUIZ_SETTINGS,
         mode: "weakness",
@@ -568,6 +621,7 @@ export default function QuizPage() {
         section: undefined
       };
       const rawSettings: QuizSettings =
+        startSettingsFromUrl ??
         directSubjectSettings ??
         (preset === "start"
           ? startPresetSettings
