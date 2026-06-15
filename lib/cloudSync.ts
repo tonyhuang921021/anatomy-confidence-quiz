@@ -1630,7 +1630,7 @@ export async function loadLeaderboard(limit = 50) {
 }
 
 const BACKGROUND_STATS_LOOKUP_LIMIT = 40;
-const BACKGROUND_CLASSIFICATION_LOOKUP_LIMIT = 60;
+const BACKGROUND_CLASSIFICATION_LOOKUP_LIMIT = 500;
 
 export async function loadQuestionCommunityStats(questionIds: string[]) {
   if (isSupabaseRecoveryMode() || !isSupabaseConfigured() || questionIds.length === 0) {
@@ -1733,17 +1733,22 @@ export async function loadConfirmedQuestionClassificationOverrides(questionIds?:
     return {} as Record<string, QuestionClassificationOverride>;
   }
 
+  const hasExplicitQuestionIds = Array.isArray(questionIds);
   const uniqueQuestionIds = Array.from(new Set((questionIds ?? []).filter(Boolean))).slice(
     0,
     BACKGROUND_CLASSIFICATION_LOOKUP_LIMIT
   );
 
-  if (uniqueQuestionIds.length === 0) {
+  if (hasExplicitQuestionIds && uniqueQuestionIds.length === 0) {
     return {} as Record<string, QuestionClassificationOverride>;
   }
 
+  const query = hasExplicitQuestionIds
+    ? `ids=${encodeURIComponent(uniqueQuestionIds.join(","))}`
+    : "all=1";
+
   const response = await fetch(
-    `/api/question-background-data?kind=classifications&ids=${encodeURIComponent(uniqueQuestionIds.join(","))}`,
+    `/api/question-background-data?kind=classifications&${query}`,
     { cache: "no-store" }
   );
   const payload = (await response.json().catch(() => null)) as

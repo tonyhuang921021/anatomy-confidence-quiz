@@ -8,7 +8,7 @@ type BackgroundDataKind = "stats" | "explanations" | "classifications";
 const MAX_IDS_BY_KIND: Record<BackgroundDataKind, number> = {
   stats: 40,
   explanations: 20,
-  classifications: 60
+  classifications: 500
 };
 
 function getServiceSupabaseClient() {
@@ -44,6 +44,10 @@ function getQuestionIds(request: NextRequest, kind: BackgroundDataKind) {
   return Array.from(new Set(ids)).slice(0, MAX_IDS_BY_KIND[kind]);
 }
 
+function shouldLoadAllClassifications(request: NextRequest) {
+  return request.nextUrl.searchParams.get("all") === "1";
+}
+
 function emptyPayload(kind: BackgroundDataKind, recovery = false) {
   if (kind === "stats") return { ok: true, stats: [], recovery };
   if (kind === "explanations") return { ok: true, overrides: [], recovery };
@@ -68,8 +72,9 @@ export async function GET(request: NextRequest) {
     return NextResponse.json(emptyPayload(kind, true));
   }
 
+  const loadAllClassifications = kind === "classifications" && shouldLoadAllClassifications(request);
   const questionIds = getQuestionIds(request, kind);
-  if (questionIds.length === 0) {
+  if (questionIds.length === 0 && !loadAllClassifications) {
     return NextResponse.json(emptyPayload(kind));
   }
 
@@ -107,11 +112,16 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ ok: true, overrides: data ?? [] });
     }
 
+    let classificationQuery = supabase
+      .from("question_classification_overrides")
+      .select("question_id, subject, chapter, section, source_report_id, updated_at");
+
+    if (!loadAllClassifications) {
+      classificationQuery = classificationQuery.in("question_id", questionIds);
+    }
+
     const { data, error } = await withServerTimeout(
-      supabase
-        .from("question_classification_overrides")
-        .select("question_id, subject, chapter, section, source_report_id, updated_at")
-        .in("question_id", questionIds),
+      classificationQuery.order("updated_at", { ascending: false }).limit(1000),
       1800,
       "題目分類讀取逾時"
     );
