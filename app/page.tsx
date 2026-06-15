@@ -65,6 +65,11 @@ const QUICK_ENTRIES = [
 const HOME_RELEASE_NOTES = [
   {
     time: "06/15",
+    title: "藥理卡不再提前破梗",
+    body: "同分類藥物會在翻開藥理複習卡後才顯示，下一張卡會重新隱藏。"
+  },
+  {
+    time: "06/15",
     title: "新增藥理複習卡",
     body: "主頁新增藥理複習入口，可以隨機抽藥、翻卡看分類機轉口訣，並快速複製藥名。"
   },

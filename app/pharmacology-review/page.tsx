@@ -29,6 +29,7 @@ async function copyText(text: string) {
 export default function PharmacologyReviewPage() {
   const [cardIndex, setCardIndex] = useState(0);
   const [isFlipped, setIsFlipped] = useState(false);
+  const [hasRevealedClass, setHasRevealedClass] = useState(false);
   const [copied, setCopied] = useState(false);
 
   const card = PHARMACOLOGY_FLASHCARDS[cardIndex] ?? PHARMACOLOGY_FLASHCARDS[0];
@@ -40,8 +41,19 @@ export default function PharmacologyReviewPage() {
 
   const goNext = () => {
     setIsFlipped(false);
+    setHasRevealedClass(false);
     setCopied(false);
     setCardIndex(pickRandomIndex());
+  };
+
+  const flipCard = () => {
+    setIsFlipped((value) => {
+      const nextValue = !value;
+      if (nextValue) {
+        setHasRevealedClass(true);
+      }
+      return nextValue;
+    });
   };
 
   const copyDrugName = async (event: MouseEvent<HTMLButtonElement>) => {
@@ -68,7 +80,7 @@ export default function PharmacologyReviewPage() {
         </div>
       </section>
 
-      <section className="mt-6 grid gap-5 lg:grid-cols-[minmax(0,1fr)_360px]">
+      <section className={`mt-6 grid gap-5 ${hasRevealedClass ? "lg:grid-cols-[minmax(0,1fr)_360px]" : ""}`}>
         <div className="surface-card p-4 sm:p-6">
           <p className="mb-3 text-center text-xs font-black uppercase tracking-[0.22em] text-brand-700">
             口訣來自國防國考藥訣 4.2 demo
@@ -78,11 +90,11 @@ export default function PharmacologyReviewPage() {
             role="button"
             tabIndex={0}
             className={`drug-flip-card ${isFlipped ? "is-flipped" : ""}`}
-            onClick={() => setIsFlipped((value) => !value)}
+            onClick={flipCard}
             onKeyDown={(event) => {
               if (event.key === "Enter" || event.key === " ") {
                 event.preventDefault();
-                setIsFlipped((value) => !value);
+                flipCard();
               }
             }}
             aria-label="翻轉藥理複習卡"
@@ -143,31 +155,33 @@ export default function PharmacologyReviewPage() {
           </div>
         </div>
 
-        <aside className="surface-card-muted p-5">
-          <p className="eyebrow">Same Class</p>
-          <h2 className="mt-2 text-2xl font-black tracking-[-0.03em] text-ink">同分類藥物</h2>
-          <p className="body-soft mt-2 text-sm leading-6">{card.category}</p>
-          <div className="mt-5 max-h-[560px] overflow-auto rounded-[1.4rem] border border-slate-200 bg-white/72">
-            <table className="w-full min-w-[520px] text-left text-sm">
-              <thead className="sticky top-0 bg-emerald-50 text-xs font-black text-brand-700">
-                <tr>
-                  <th className="px-4 py-3">藥名</th>
-                  <th className="px-4 py-3">機轉</th>
-                  <th className="px-4 py-3">口訣</th>
-                </tr>
-              </thead>
-              <tbody>
-                {sameCategoryCards.map((item, index) => (
-                  <tr key={`${item.category}-${item.name}-${index}`} className="border-t border-slate-100 align-top">
-                    <td className="px-4 py-3 font-black text-ink">{item.name}</td>
-                    <td className="px-4 py-3 font-semibold leading-6 text-slate-600">{item.mechanism}</td>
-                    <td className="px-4 py-3 whitespace-pre-line font-semibold leading-6 text-slate-600">{item.mnemonic}</td>
+        {hasRevealedClass ? (
+          <aside className="surface-card-muted p-5">
+            <p className="eyebrow">Same Class</p>
+            <h2 className="mt-2 text-2xl font-black tracking-[-0.03em] text-ink">同分類藥物</h2>
+            <p className="body-soft mt-2 text-sm leading-6">{card.category}</p>
+            <div className="mt-5 max-h-[560px] overflow-auto rounded-[1.4rem] border border-slate-200 bg-white/72">
+              <table className="w-full min-w-[520px] text-left text-sm">
+                <thead className="sticky top-0 bg-emerald-50 text-xs font-black text-brand-700">
+                  <tr>
+                    <th className="px-4 py-3">藥名</th>
+                    <th className="px-4 py-3">機轉</th>
+                    <th className="px-4 py-3">口訣</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </aside>
+                </thead>
+                <tbody>
+                  {sameCategoryCards.map((item, index) => (
+                    <tr key={`${item.category}-${item.name}-${index}`} className="border-t border-slate-100 align-top">
+                      <td className="px-4 py-3 font-black text-ink">{item.name}</td>
+                      <td className="px-4 py-3 font-semibold leading-6 text-slate-600">{item.mechanism}</td>
+                      <td className="px-4 py-3 whitespace-pre-line font-semibold leading-6 text-slate-600">{item.mnemonic}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </aside>
+        ) : null}
       </section>
     </main>
   );
