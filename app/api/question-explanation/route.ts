@@ -137,7 +137,7 @@ function formatUnknownError(error: unknown) {
     return error.trim();
   }
 
-  return "GPT-5-mini 詳解產生失敗。";
+  return "GPT-5.4-mini 詳解產生失敗。";
 }
 
 function getAllowedBypassEmails() {
@@ -355,7 +355,7 @@ async function syncSharedExplanationOverrides(
         optionAnalysis: normalizeOptionAnalysis(item.optionAnalysis ?? {}),
         memoryTip: item.memoryTip?.trim() ?? ""
       },
-      model: item.model?.trim() || "gpt-5-mini",
+      model: item.model?.trim() || "gpt-5.4-mini",
       updatedAt: item.updatedAt?.trim() || undefined
     });
   }
@@ -700,7 +700,7 @@ export async function POST(request: NextRequest) {
       {
         ok: false,
         configured: false,
-        message: "OPENAI_API_KEY 尚未設定，無法產生 GPT-5-mini 詳解。"
+        message: "OPENAI_API_KEY 尚未設定，無法產生 GPT-5.4-mini 詳解。"
       },
       { status: 503 }
     );
@@ -715,7 +715,7 @@ export async function POST(request: NextRequest) {
         {
           ok: false,
           configured: true,
-          message: "請先登入帳號，才能使用 GPT-5-mini 補詳解。"
+          message: "請先登入帳號，才能使用 GPT-5.4-mini 補詳解。"
         },
         { status: 401 }
       );
@@ -761,13 +761,13 @@ export async function POST(request: NextRequest) {
     }
 
     const prompt = buildQuestionExplanationPrompt(body);
-    let result = await createOpenAIText(prompt, GPT_5_MINI_MAX_OUTPUT_TOKENS, "gpt-5-mini");
+    let result = await createOpenAIText(prompt, GPT_5_MINI_MAX_OUTPUT_TOKENS, "gpt-5.4-mini");
     let parsed = parseExplanationPayload(result.text);
 
     const missingOptionKeys = getMissingOptionKeys(parsed, body.question?.options);
     if (parsed?.explanation && missingOptionKeys.length > 0) {
       const retryPrompt = buildMissingOptionRetryPrompt(body, parsed, missingOptionKeys);
-      result = await createOpenAIText(retryPrompt, GPT_5_MINI_MAX_OUTPUT_TOKENS, "gpt-5-mini");
+      result = await createOpenAIText(retryPrompt, GPT_5_MINI_MAX_OUTPUT_TOKENS, "gpt-5.4-mini");
       parsed = parseExplanationPayload(result.text);
     }
 
@@ -776,7 +776,7 @@ export async function POST(request: NextRequest) {
         {
           ok: false,
           configured: true,
-          message: "GPT-5-mini 回傳格式不正確，無法儲存單題詳解。"
+          message: "GPT-5.4-mini 回傳格式不正確，無法儲存單題詳解。"
         },
         { status: 500 }
       );

@@ -44,7 +44,7 @@ export function StudyNoteQuestionCard({ question, link, title }: Props) {
   async function handleGenerateExplanation() {
     if (!question) return;
     if (!session?.access_token) {
-      setExplanationError("請先登入帳號，才能使用 GPT-5-mini 補詳解。");
+      setExplanationError("請先登入帳號，才能使用 GPT-5.4-mini 補詳解。");
       return;
     }
 
@@ -90,7 +90,7 @@ export function StudyNoteQuestionCard({ question, link, title }: Props) {
         if (response.status === 429 && payload.message && typeof window !== "undefined") {
           window.alert(payload.message);
         }
-        setExplanationError(payload.message || "GPT-5-mini 詳解產生失敗。");
+        setExplanationError(payload.message || "GPT-5.4-mini 詳解產生失敗。");
         return;
       }
 
@@ -98,7 +98,7 @@ export function StudyNoteQuestionCard({ question, link, title }: Props) {
         explanation: payload.explanation,
         optionAnalysis: payload.optionAnalysis ?? {},
         memoryTip: payload.memoryTip ?? "",
-        model: payload.model ?? "gpt-5-mini",
+        model: payload.model ?? "gpt-5.4-mini",
         updatedAt: new Date().toISOString()
       };
 
@@ -106,7 +106,7 @@ export function StudyNoteQuestionCard({ question, link, title }: Props) {
       setExplanationOverride(override);
       setShowAnswer(true);
     } catch {
-      setExplanationError("無法連線到 GPT-5-mini 詳解 API。");
+      setExplanationError("無法連線到 GPT-5.4-mini 詳解 API。");
     } finally {
       setExplanationLoading(false);
     }
@@ -173,7 +173,7 @@ export function StudyNoteQuestionCard({ question, link, title }: Props) {
             disabled={explanationLoading}
             className="secondary-pill ml-2 mt-4 px-4 py-2 text-sm disabled:opacity-60"
           >
-            {explanationLoading ? "GPT-5-mini 生成中..." : "用 GPT-5-mini 補詳解"}
+            {explanationLoading ? "GPT-5.4-mini 生成中..." : "用 GPT-5.4-mini 補詳解"}
           </button>
           {explanationError ? (
             <p className="mt-3 rounded-2xl bg-rose-50 px-3 py-2 text-xs font-semibold leading-5 text-rose-700">

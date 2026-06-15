@@ -40,7 +40,7 @@ export async function createOpenAIAnalysis(prompt: string) {
     throw new Error("OPENAI_API_KEY is not configured.");
   }
 
-  const model = process.env.OPENAI_MODEL || "gpt-5.2";
+  const model = process.env.OPENAI_MODEL || "gpt-5.4-mini";
 
   const response = await fetch("https://api.openai.com/v1/responses", {
     method: "POST",
@@ -85,7 +85,7 @@ export async function createOpenAIText(
     throw new Error("OPENAI_API_KEY is not configured.");
   }
 
-  const model = modelOverride || process.env.OPENAI_MODEL || "gpt-5.2";
+  const model = modelOverride || process.env.OPENAI_MODEL || "gpt-5.4-mini";
 
   const response = await fetch("https://api.openai.com/v1/responses", {
     method: "POST",

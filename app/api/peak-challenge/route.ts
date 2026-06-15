@@ -1066,12 +1066,12 @@ export async function POST(request: NextRequest) {
       let totalInputTokens = 0;
       let totalOutputTokens = 0;
       let totalTokens = 0;
-      let model = "gpt-5-mini";
+      let model = "gpt-5.4-mini";
       if (targetPastExamCount > 0 && pastExamCandidateSummaries.length > 0) {
         const selection = await createOpenAIText(
           buildPastExamSelectionPrompt(pastExamCandidateSummaries, targetPastExamCount),
           500,
-          "gpt-5-mini"
+          "gpt-5.4-mini"
         );
         totalInputTokens += selection.usage.inputTokens;
         totalOutputTokens += selection.usage.outputTokens;
@@ -1119,7 +1119,7 @@ export async function POST(request: NextRequest) {
               selectedPastQuestions
             }),
             Math.max(2600, remainingAiQuestionCount * 1200),
-            "gpt-5-mini"
+            "gpt-5.4-mini"
           );
           totalInputTokens += generation.usage.inputTokens;
           totalOutputTokens += generation.usage.outputTokens;

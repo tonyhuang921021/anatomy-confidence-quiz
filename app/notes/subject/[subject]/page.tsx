@@ -921,7 +921,7 @@ export default function SubjectNotesPage() {
     if (!session?.access_token) {
       setExplanationErrorMap((current) => ({
         ...current,
-        [question.id]: "請先登入帳號，才能使用 GPT-5-mini 補詳解。"
+        [question.id]: "請先登入帳號，才能使用 GPT-5.4-mini 補詳解。"
       }));
       return;
     }
@@ -970,7 +970,7 @@ export default function SubjectNotesPage() {
         }
         setExplanationErrorMap((current) => ({
           ...current,
-          [question.id]: payload.message || "GPT-5-mini 詳解產生失敗。"
+          [question.id]: payload.message || "GPT-5.4-mini 詳解產生失敗。"
         }));
         return;
       }
@@ -979,7 +979,7 @@ export default function SubjectNotesPage() {
         explanation: payload.explanation,
         optionAnalysis: payload.optionAnalysis ?? {},
         memoryTip: payload.memoryTip ?? "",
-        model: payload.model ?? "gpt-5-mini",
+        model: payload.model ?? "gpt-5.4-mini",
         updatedAt: new Date().toISOString()
       };
 
@@ -988,7 +988,7 @@ export default function SubjectNotesPage() {
     } catch {
       setExplanationErrorMap((current) => ({
         ...current,
-        [question.id]: "無法連線到 GPT-5-mini 詳解 API。"
+        [question.id]: "無法連線到 GPT-5.4-mini 詳解 API。"
       }));
     } finally {
       setExplanationLoadingMap((current) => ({ ...current, [question.id]: false }));
@@ -1739,7 +1739,7 @@ export default function SubjectNotesPage() {
                         </details>
                         {override ? (
                           <span className="secondary-pill px-4 py-2 text-sm text-slate-600">
-                            已替換詳解・{override.model ?? "gpt-5-mini"}
+                            已替換詳解・{override.model ?? "gpt-5.4-mini"}
                           </span>
                         ) : (
                           <button
@@ -1748,7 +1748,7 @@ export default function SubjectNotesPage() {
                             disabled={explanationLoading}
                             className="secondary-pill px-4 py-2 text-sm disabled:cursor-wait disabled:opacity-60"
                           >
-                            {explanationLoading ? "GPT-5-mini 生成中..." : "用 GPT-5-mini 補詳解"}
+                            {explanationLoading ? "GPT-5.4-mini 生成中..." : "用 GPT-5.4-mini 補詳解"}
                           </button>
                         )}
                       </div>

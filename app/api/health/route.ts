@@ -9,6 +9,6 @@ export function GET() {
     timestamp: new Date().toISOString(),
     questionCount: anatomyQuestions.length,
     openaiConfigured: isOpenAIConfigured(),
-    openaiModel: process.env.OPENAI_MODEL || "gpt-5.2"
+    openaiModel: process.env.OPENAI_MODEL || "gpt-5.4-mini"
   });
 }

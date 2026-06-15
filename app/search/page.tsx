@@ -255,7 +255,7 @@ export default function SearchPage() {
     if (!session?.access_token) {
       setExplanationErrorMap((current) => ({
         ...current,
-        [question.id]: "請先登入帳號，才能使用 GPT-5-mini 補詳解。"
+        [question.id]: "請先登入帳號，才能使用 GPT-5.4-mini 補詳解。"
       }));
       return;
     }
@@ -307,7 +307,7 @@ export default function SearchPage() {
         }
         setExplanationErrorMap((current) => ({
           ...current,
-          [question.id]: payload.message || "GPT-5-mini 詳解產生失敗。"
+          [question.id]: payload.message || "GPT-5.4-mini 詳解產生失敗。"
         }));
         return;
       }
@@ -316,7 +316,7 @@ export default function SearchPage() {
         explanation: payload.explanation ?? "",
         optionAnalysis: payload.optionAnalysis ?? {},
         memoryTip: payload.memoryTip ?? "",
-        model: payload.model ?? "gpt-5-mini",
+        model: payload.model ?? "gpt-5.4-mini",
         updatedAt: new Date().toISOString()
       };
 
@@ -328,7 +328,7 @@ export default function SearchPage() {
     } catch {
       setExplanationErrorMap((current) => ({
         ...current,
-        [question.id]: "無法連線到 GPT-5-mini 詳解 API。"
+        [question.id]: "無法連線到 GPT-5.4-mini 詳解 API。"
       }));
     } finally {
       setExplanationLoadingMap((current) => ({ ...current, [question.id]: false }));
@@ -627,7 +627,7 @@ export default function SearchPage() {
                   <CopyQuestionPromptButton question={renderedQuestion} />
                   {override ? (
                     <span className="inline-flex rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-600">
-                      已替換詳解・{override.model ?? "gpt-5-mini"}
+                      已替換詳解・{override.model ?? "gpt-5.4-mini"}
                     </span>
                   ) : (
                     <button
@@ -636,7 +636,7 @@ export default function SearchPage() {
                       disabled={loading}
                       className="min-h-10 rounded-2xl bg-slate-900 px-4 py-2 text-sm font-semibold text-white transition hover:bg-black disabled:cursor-wait disabled:opacity-60"
                     >
-                      {loading ? "GPT-5-mini 生成中..." : "用 GPT-5-mini 補詳解"}
+                      {loading ? "GPT-5.4-mini 生成中..." : "用 GPT-5.4-mini 補詳解"}
                     </button>
                   )}
                   <button

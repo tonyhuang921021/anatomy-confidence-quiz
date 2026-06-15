@@ -74,14 +74,14 @@ function isBanActive(value?: string) {
   return Boolean(value && new Date(value).getTime() > Date.now());
 }
 
-const GPT_5_MINI_INPUT_USD_PER_MILLION = 0.25;
-const GPT_5_MINI_OUTPUT_USD_PER_MILLION = 2.0;
+const GPT_5_4_MINI_INPUT_USD_PER_MILLION = 0.75;
+const GPT_5_4_MINI_OUTPUT_USD_PER_MILLION = 4.5;
 const APPROX_USD_TO_TWD = 32.5;
 
 function estimateTwdFromTokens(inputTokens: number, outputTokens: number) {
   const usd =
-    (inputTokens * GPT_5_MINI_INPUT_USD_PER_MILLION) / 1_000_000 +
-    (outputTokens * GPT_5_MINI_OUTPUT_USD_PER_MILLION) / 1_000_000;
+    (inputTokens * GPT_5_4_MINI_INPUT_USD_PER_MILLION) / 1_000_000 +
+    (outputTokens * GPT_5_4_MINI_OUTPUT_USD_PER_MILLION) / 1_000_000;
   return usd * APPROX_USD_TO_TWD;
 }
 
@@ -1380,7 +1380,7 @@ export default function OwnerPage() {
                 在線估算為最近 2 分鐘內仍有活動的裝置；作答裝置與題數只統計已同步到雲端的作答。
               </p>
               <p className="mt-2 text-sm text-slate-500">
-                AI 詳解與 AI 智慧檢索台幣換算都使用 GPT-5-mini 目前價格估算，並以 1 USD ≈ 32.5 TWD 粗估。
+                AI 詳解與 AI 智慧檢索台幣換算都使用 GPT-5.4-mini 目前價格估算，並以 1 USD ≈ 32.5 TWD 粗估。
               </p>
             </section>
           </div>

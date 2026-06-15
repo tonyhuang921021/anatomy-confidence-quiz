@@ -1706,7 +1706,7 @@ export async function syncSharedQuestionExplanationOverrides(
         explanation: override.explanation,
         optionAnalysis: override.optionAnalysis ?? {},
         memoryTip: override.memoryTip ?? "",
-        model: override.model ?? "gpt-5-mini",
+        model: override.model ?? "gpt-5.4-mini",
         updatedAt: override.updatedAt
       }))
     })

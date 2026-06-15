@@ -1341,7 +1341,7 @@ export async function POST(request: NextRequest) {
       const expansion = await createOpenAIText(
         buildAISearchExpansionPrompt(query, effectiveSubjects),
         500,
-        "gpt-5-mini"
+        "gpt-5.4-mini"
       );
       const plan = parseAISearchPlan(expansion.text);
       const searchTerms = expandAISearchTerms(
@@ -1376,7 +1376,7 @@ export async function POST(request: NextRequest) {
       const rerank = await createOpenAIText(
         buildAIRerankPrompt(query, plan, candidateQuestions),
         900,
-        "gpt-5-mini"
+        "gpt-5.4-mini"
       );
       const relevant = parseRelevantIds(rerank.text);
       const relevantIdSet = new Set(relevant.relevantIds);
