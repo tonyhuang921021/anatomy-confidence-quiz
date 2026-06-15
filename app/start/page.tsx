@@ -95,25 +95,19 @@ export default function StartPage() {
     setPracticeStopAfterReview(nextStopAfterReview);
   }, [user?.id, user?.user_metadata]);
 
-  useEffect(() => {
-    setSelectedSubjects((current) => {
-      const hasMicrobiology = current.includes(MICROBIOLOGY_SUBJECT);
+  const effectiveSelectedSubjects = useMemo(() => {
+    const baseSubjects = selectedSubjects.filter((subject) => subject !== MICROBIOLOGY_SUBJECT);
 
-      if (selectedMicrobiologyTracks.length > 0) {
-        return hasMicrobiology ? current : [...current, MICROBIOLOGY_SUBJECT];
-      }
-
-      return hasMicrobiology
-        ? current.filter((subject) => subject !== MICROBIOLOGY_SUBJECT)
-        : current;
-    });
-  }, [selectedMicrobiologyTracks]);
+    return selectedMicrobiologyTracks.length > 0
+      ? [...baseSubjects, MICROBIOLOGY_SUBJECT]
+      : baseSubjects;
+  }, [selectedMicrobiologyTracks.length, selectedSubjects]);
 
   const selectedSubjectQuestionPool = useMemo(() => {
-    if (selectedSubjects.length === 0) return [];
+    if (effectiveSelectedSubjects.length === 0) return [];
 
     return selectableSubjects
-      .filter((item) => selectedSubjects.includes(item.subject))
+      .filter((item) => effectiveSelectedSubjects.includes(item.subject))
       .flatMap((item) => {
         if (item.subject === MICROBIOLOGY_SUBJECT && selectedMicrobiologyTracks.length > 0) {
           return item.questions.filter((question) =>
@@ -123,7 +117,7 @@ export default function StartPage() {
 
         return item.questions;
       });
-  }, [selectedMicrobiologyTracks, selectedSubjects]);
+  }, [effectiveSelectedSubjects, selectedMicrobiologyTracks]);
 
   const availableQuestionCount = useMemo(() => {
     const filteredSubjectQuestions = selectedSubjectQuestionPool.filter((question) => {
@@ -218,7 +212,11 @@ export default function StartPage() {
   }
 
   function selectAllSubjects() {
-    setSelectedSubjects(selectableSubjects.map((item) => item.subject));
+    setSelectedSubjects(
+      selectableSubjects
+        .map((item) => item.subject)
+        .filter((subject) => subject !== MICROBIOLOGY_SUBJECT)
+    );
     setSelectedMicrobiologyTracks(getAllSubjectTrackKeys(MICROBIOLOGY_SUBJECT));
     setMicrobiologyExpanded(true);
   }
@@ -235,7 +233,7 @@ export default function StartPage() {
 
         <div className="mt-4 grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
           {subjects.map((subject) => {
-            const active = selectedSubjects.includes(subject.subject);
+            const active = effectiveSelectedSubjects.includes(subject.subject);
             const trackedSubject = isTrackSubject(subject.subject) ? subject.subject : null;
             const selectedTrackKeys = trackedSubject ? getSelectedTrackKeys(trackedSubject) : [];
             const selectedTrackedQuestionCount = trackedSubject && selectedTrackKeys.length > 0
@@ -371,7 +369,7 @@ export default function StartPage() {
   }
 
   function handleStart() {
-    if ((selectedSubjects.length === 0 && !includeSeasonalLimited) || availableQuestionCount === 0) return;
+    if ((effectiveSelectedSubjects.length === 0 && !includeSeasonalLimited) || availableQuestionCount === 0) return;
 
     const shouldUseExactStartPool = selectedMicrobiologyTracks.length > 0;
     const exactStartQuestionIds = shouldUseExactStartPool
@@ -398,8 +396,8 @@ export default function StartPage() {
       yearFrom: practiceYearRange.yearFrom,
       yearTo: practiceYearRange.yearTo,
       subjectFilter:
-        selectedSubjects.length === 1 && !includeSeasonalLimited ? selectedSubjects[0] : "全部",
-      subjectFilters: selectedSubjects,
+        effectiveSelectedSubjects.length === 1 && !includeSeasonalLimited ? effectiveSelectedSubjects[0] : "全部",
+      subjectFilters: effectiveSelectedSubjects,
       excludeAiGenerated,
       customQuestionIds: exactStartQuestionIds ?? (includeSeasonalLimited
         ? seasonalLimitedQuestions
@@ -409,7 +407,7 @@ export default function StartPage() {
       strictCustomQuestionPool: shouldUseExactStartPool,
       customPoolLabel: shouldUseExactStartPool
         ? `開始測驗：${[
-            ...selectedSubjects.filter((subject) => subject !== MICROBIOLOGY_SUBJECT),
+            ...effectiveSelectedSubjects.filter((subject) => subject !== MICROBIOLOGY_SUBJECT),
             selectedMicrobiologyLabels.length > 0
               ? `微生物免疫學（${selectedMicrobiologyLabels.join("、")}）`
               : null,
@@ -496,7 +494,7 @@ export default function StartPage() {
 
         <div className="surface-card-muted mt-6 flex flex-col gap-3 p-5 sm:flex-row sm:items-center sm:justify-between">
           <p className="text-sm text-slate-700">
-            已選 <span className="font-semibold text-ink">{selectedSubjects.length + (includeSeasonalLimited ? 1 : 0)}</span> 個範圍・
+            已選 <span className="font-semibold text-ink">{effectiveSelectedSubjects.length + (includeSeasonalLimited ? 1 : 0)}</span> 個範圍・
             {practiceYearRange.yearFrom} 到 {practiceYearRange.yearTo} 年共{" "}
             <span className="font-semibold text-ink">{availableQuestionCount}</span> 題
             {practiceStopAfterReview ? "・自由測驗・每題詳解後可結束" : `・每次抽 ${practiceQuestionCount} 題`}
@@ -512,7 +510,7 @@ export default function StartPage() {
             <button
               type="button"
               onClick={handleStart}
-              disabled={(selectedSubjects.length === 0 && !includeSeasonalLimited) || availableQuestionCount === 0}
+              disabled={(effectiveSelectedSubjects.length === 0 && !includeSeasonalLimited) || availableQuestionCount === 0}
               className="primary-pill disabled:cursor-not-allowed disabled:bg-slate-300"
             >
               {practiceStopAfterReview ? "開始自由測驗" : `開始 ${effectiveQuestionCount} 題測驗`}
