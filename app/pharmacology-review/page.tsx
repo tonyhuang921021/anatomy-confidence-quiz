@@ -25,6 +25,11 @@ const LEVEL_META = {
     label: "D 級低頻",
     hint: "低頻但保留複習",
     className: "border-slate-200 bg-slate-100 text-slate-700"
+  },
+  E: {
+    label: "E 級備用",
+    hint: "低優先，考前時間不足時最後處理",
+    className: "border-zinc-200 bg-zinc-100 text-zinc-600"
   }
 } as const;
 
