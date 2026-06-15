@@ -65,6 +65,21 @@ const QUICK_ENTRIES = [
 const HOME_RELEASE_NOTES = [
   {
     time: "06/15",
+    title: "新增藥理複習卡",
+    body: "主頁新增藥理複習入口，可以隨機抽藥、翻卡看分類機轉口訣，並快速複製藥名。"
+  },
+  {
+    time: "06/15",
+    title: "全站答對率背景載入",
+    body: "作答紀錄與錯題筆記會先顯示題目，全站答對率再分批補上，回看大量紀錄時比較順。"
+  },
+  {
+    time: "06/15",
+    title: "作答紀錄展開更順",
+    body: "題目回顧改成點開才載入內容，整回模擬考或大量作答紀錄回看時比較不卡。"
+  },
+  {
+    time: "06/15",
     title: "題目分類回報會同步套用",
     body: "管理員確認同學回報後，新的科目與章節分類會同步到開始測驗、題目搜尋與結果回顧。"
   },
@@ -292,10 +307,16 @@ export default function HomePage() {
                 </Link>
               ))}
               <div className="home-entry-card sm:col-span-2">
-                <ClientSectionBoundary title="學習筆記入口">
-                  <OwnerOnlyNotesLink />
-                </ClientSectionBoundary>
-                <p className="body-soft mt-3 text-sm leading-6">如果你開放筆記入口，這裡會直接連到整理好的十科大文件。</p>
+                <div className="grid gap-3 sm:grid-cols-2">
+                  <ClientSectionBoundary title="學習筆記入口">
+                    <OwnerOnlyNotesLink />
+                  </ClientSectionBoundary>
+                  <Link href="/pharmacology-review" className="secondary-pill justify-between px-4">
+                    藥理複習
+                    <span className="text-slate-400">→</span>
+                  </Link>
+                </div>
+                <p className="body-soft mt-3 text-sm leading-6">筆記整理與藥理抽卡都放這裡，讀書時可以直接切換。</p>
               </div>
             </div>
           </div>
