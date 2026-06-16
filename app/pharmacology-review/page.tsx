@@ -25,6 +25,11 @@ const LEVEL_META = {
     label: "D 級低頻",
     hint: "低頻但保留複習",
     className: "border-slate-200 bg-slate-100 text-slate-700"
+  },
+  E: {
+    label: "E 級備用",
+    hint: "低優先，考前時間不足時最後處理",
+    className: "border-zinc-200 bg-zinc-100 text-zinc-600"
   }
 } as const;
 
@@ -107,7 +112,7 @@ export default function PharmacologyReviewPage() {
             <p className="eyebrow">Pharmacology Cards</p>
             <h1 className="display-title mt-3 text-4xl sm:text-6xl">藥理複習</h1>
             <p className="body-soft mt-3 max-w-2xl text-base leading-8">
-              隨機抽一個藥名，點卡片翻面看分類、機轉、作用、適應症和口訣。同分類藥物會在翻面後出現在下方。
+              隨機抽一個藥名，點卡片翻面看分類、機轉、適應症、國考考點、副作用禁忌、口訣和官方出現考期。同分類藥物會在翻面後出現在下方。
             </p>
           </div>
           <Link href="/" className="secondary-pill">
@@ -143,7 +148,7 @@ export default function PharmacologyReviewPage() {
                 <span className="mt-10 block max-w-full text-center font-serif text-[clamp(2rem,11vw,4.8rem)] font-bold leading-[1.02] tracking-[-0.04em] text-ink [overflow-wrap:anywhere] sm:text-[clamp(3rem,7vw,6.2rem)]">
                   {card.name}
                 </span>
-                <span className="body-soft mt-8 block text-center text-sm font-semibold">點一下看分類、機轉、作用與口訣</span>
+                <span className="body-soft mt-8 block text-center text-sm font-semibold">點一下看機轉、考點、副作用與考期</span>
               </span>
 
               <span className="drug-flip-face drug-flip-back">
@@ -170,12 +175,22 @@ export default function PharmacologyReviewPage() {
                   </span>
                   <span className="grid gap-4 sm:grid-cols-2">
                     <span className="rounded-[1.4rem] bg-emerald-50/90 p-4">
-                      <span className="text-xs font-black text-brand-700">作用 / 重點</span>
+                      <span className="text-xs font-black text-brand-700">作用 / 國考考點</span>
                       <span className="mt-2 block text-sm font-semibold leading-7 text-slate-700">{card.effects}</span>
                     </span>
                     <span className="rounded-[1.4rem] bg-sky-50/90 p-4">
                       <span className="text-xs font-black text-sky-800">適應症</span>
                       <span className="mt-2 block text-sm font-semibold leading-7 text-slate-700">{card.indications}</span>
+                    </span>
+                  </span>
+                  <span className="grid gap-4 sm:grid-cols-2">
+                    <span className="rounded-[1.4rem] bg-rose-50/90 p-4">
+                      <span className="text-xs font-black text-rose-800">副作用 / 禁忌（高頻）</span>
+                      <span className="mt-2 block text-sm font-semibold leading-7 text-slate-700">{card.adverseEffects}</span>
+                    </span>
+                    <span className="rounded-[1.4rem] bg-violet-50/90 p-4">
+                      <span className="text-xs font-black text-violet-800">官方出現考期</span>
+                      <span className="mt-2 block text-sm font-semibold leading-7 text-slate-700">{card.officialExamPeriods}</span>
                     </span>
                   </span>
                   <span className="rounded-[1.4rem] bg-amber-50/90 p-4">
@@ -215,15 +230,17 @@ export default function PharmacologyReviewPage() {
             <h2 className="mt-2 text-2xl font-black tracking-[-0.03em] text-ink">同分類藥物</h2>
             <p className="body-soft mt-2 text-sm leading-6">{card.category}</p>
             <div className="mt-5 max-h-[560px] overflow-auto rounded-[1.4rem] border border-slate-200 bg-white/72">
-              <table className="w-full min-w-[960px] text-left text-sm">
+              <table className="w-full min-w-[1320px] text-left text-sm">
                 <thead className="sticky top-0 bg-emerald-50 text-xs font-black text-brand-700">
                   <tr>
                     <th className="px-4 py-3">藥名</th>
                     <th className="px-4 py-3">等級</th>
                     <th className="px-4 py-3">機轉</th>
-                    <th className="px-4 py-3">作用 / 重點</th>
                     <th className="px-4 py-3">適應症</th>
+                    <th className="px-4 py-3">作用 / 國考考點</th>
+                    <th className="px-4 py-3">副作用 / 禁忌（高頻）</th>
                     <th className="px-4 py-3">口訣</th>
+                    <th className="px-4 py-3">官方出現考期</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -239,9 +256,11 @@ export default function PharmacologyReviewPage() {
                           </span>
                         </td>
                         <td className="px-4 py-3 font-semibold leading-6 text-slate-600">{item.mechanism}</td>
-                        <td className="px-4 py-3 font-semibold leading-6 text-slate-600">{item.effects}</td>
                         <td className="px-4 py-3 font-semibold leading-6 text-slate-600">{item.indications}</td>
+                        <td className="px-4 py-3 font-semibold leading-6 text-slate-600">{item.effects}</td>
+                        <td className="px-4 py-3 font-semibold leading-6 text-slate-600">{item.adverseEffects}</td>
                         <td className="whitespace-pre-line px-4 py-3 font-semibold leading-6 text-slate-600">{item.mnemonic}</td>
+                        <td className="px-4 py-3 font-semibold leading-6 text-slate-600">{item.officialExamPeriods}</td>
                       </tr>
                     );
                   })}
