@@ -762,7 +762,7 @@ export default function OwnerPage() {
                 <p className="mt-2 text-3xl font-bold text-ink">{stats.attemptDevicesToday}</p>
               </article>
               <article className="rounded-3xl bg-white p-5 shadow-card ring-1 ring-slate-100">
-                <p className="text-sm text-slate-500">目前在線估算</p>
+                <p className="text-sm text-slate-500">近 60 分鐘在線估算</p>
                 <p className="mt-2 text-3xl font-bold text-ink">{stats.onlineVisitors}</p>
               </article>
               <article className="rounded-3xl bg-white p-5 shadow-card ring-1 ring-slate-100">

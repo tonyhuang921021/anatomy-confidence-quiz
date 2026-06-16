@@ -41,7 +41,7 @@ function getLastPoint<T>(items: T[], fromEnd = 0) {
   return index >= 0 ? items[index] : undefined;
 }
 
-const ANXIOUS_STATS_REFRESH_MS = 5 * 60 * 1000;
+const ANXIOUS_STATS_REFRESH_MS = 60 * 60 * 1000;
 
 export function HomeToneBanner() {
   const { user } = useAuth();
@@ -69,7 +69,7 @@ export function HomeToneBanner() {
 
     async function refreshStats() {
       try {
-        const response = await fetch("/api/community-stats", { cache: "no-store" });
+        const response = await fetch("/api/community-stats?days=2");
         const payload = (await response.json().catch(() => null)) as
           | { ok?: boolean; points?: { date: string; attempts: number; correctRate: number }[] }
           | null;
@@ -82,24 +82,16 @@ export function HomeToneBanner() {
       }
     }
 
-    function handleVisibilityChange() {
-      if (document.visibilityState === "visible") {
-        void refreshStats();
-      }
-    }
-
     void refreshStats();
     const intervalId = window.setInterval(() => {
       if (document.visibilityState === "visible") {
         void refreshStats();
       }
     }, ANXIOUS_STATS_REFRESH_MS);
-    document.addEventListener("visibilitychange", handleVisibilityChange);
 
     return () => {
       cancelled = true;
       window.clearInterval(intervalId);
-      document.removeEventListener("visibilitychange", handleVisibilityChange);
     };
   }, [mode]);
 

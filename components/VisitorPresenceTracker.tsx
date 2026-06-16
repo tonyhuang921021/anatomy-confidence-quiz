@@ -5,8 +5,8 @@ import { trackVisitorPresence } from "@/lib/cloudSync";
 import { useAuth } from "@/components/AuthProvider";
 import { isSupabaseRecoveryMode } from "@/lib/supabase/recoveryMode";
 
-const HEARTBEAT_INTERVAL_MS = 10 * 60 * 1000;
-const INITIAL_HEARTBEAT_DELAY_MS = 45 * 1000;
+const HEARTBEAT_INTERVAL_MS = 6 * 60 * 60 * 1000;
+const INITIAL_HEARTBEAT_DELAY_MS = 90 * 1000;
 const HEARTBEAT_THROTTLE_KEY = "quiz-visitor-presence-last-sent";
 
 function canSendHeartbeat() {
@@ -46,23 +46,9 @@ export function VisitorPresenceTracker() {
       void sendHeartbeat();
     }, INITIAL_HEARTBEAT_DELAY_MS);
 
-    const intervalId = window.setInterval(() => {
-      void sendHeartbeat();
-    }, HEARTBEAT_INTERVAL_MS);
-
-    function handleVisibilityChange() {
-      if (!document.hidden) {
-        void sendHeartbeat();
-      }
-    }
-
-    document.addEventListener("visibilitychange", handleVisibilityChange);
-
     return () => {
       cancelled = true;
       window.clearTimeout(initialTimeoutId);
-      window.clearInterval(intervalId);
-      document.removeEventListener("visibilitychange", handleVisibilityChange);
     };
   }, [configured, user?.id]);
 

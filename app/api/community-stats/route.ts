@@ -6,7 +6,7 @@ import { withServerTimeout } from "@/lib/serverTimeout";
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
 
-const COMMUNITY_STATS_CACHE_CONTROL = "public, s-maxage=60, stale-while-revalidate=120";
+const COMMUNITY_STATS_CACHE_CONTROL = "public, s-maxage=900, stale-while-revalidate=1800";
 
 function getServiceSupabaseClient() {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;

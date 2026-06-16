@@ -11,6 +11,22 @@ const MAX_IDS_BY_KIND: Record<BackgroundDataKind, number> = {
   classifications: 500
 };
 
+const CACHE_CONTROL_BY_KIND: Record<BackgroundDataKind, string> = {
+  stats: "public, s-maxage=1800, stale-while-revalidate=3600",
+  explanations: "public, s-maxage=300, stale-while-revalidate=900",
+  classifications: "public, s-maxage=300, stale-while-revalidate=900"
+};
+
+function jsonWithCache(payload: unknown, kind: BackgroundDataKind, init?: ResponseInit) {
+  const headers = new Headers(init?.headers);
+  headers.set("Cache-Control", CACHE_CONTROL_BY_KIND[kind]);
+
+  return NextResponse.json(payload, {
+    ...init,
+    headers
+  });
+}
+
 function getServiceSupabaseClient() {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
@@ -69,18 +85,18 @@ export async function GET(request: NextRequest) {
   }
 
   if (isSupabaseRecoveryMode()) {
-    return NextResponse.json(emptyPayload(kind, true));
+    return jsonWithCache(emptyPayload(kind, true), kind);
   }
 
   const loadAllClassifications = kind === "classifications" && shouldLoadAllClassifications(request);
   const questionIds = getQuestionIds(request, kind);
   if (questionIds.length === 0 && !loadAllClassifications) {
-    return NextResponse.json(emptyPayload(kind));
+    return jsonWithCache(emptyPayload(kind), kind);
   }
 
   const supabase = getServiceSupabaseClient();
   if (!supabase) {
-    return NextResponse.json(emptyPayload(kind));
+    return jsonWithCache(emptyPayload(kind), kind);
   }
 
   try {
@@ -95,7 +111,7 @@ export async function GET(request: NextRequest) {
       );
 
       if (error) throw error;
-      return NextResponse.json({ ok: true, stats: data ?? [] });
+      return jsonWithCache({ ok: true, stats: data ?? [] }, kind);
     }
 
     if (kind === "explanations") {
@@ -109,7 +125,7 @@ export async function GET(request: NextRequest) {
       );
 
       if (error) throw error;
-      return NextResponse.json({ ok: true, overrides: data ?? [] });
+      return jsonWithCache({ ok: true, overrides: data ?? [] }, kind);
     }
 
     let classificationQuery = supabase
@@ -127,13 +143,9 @@ export async function GET(request: NextRequest) {
     );
 
     if (error) throw error;
-    return NextResponse.json({ ok: true, overrides: data ?? [] });
+    return jsonWithCache({ ok: true, overrides: data ?? [] }, kind);
   } catch (error) {
     const message = error instanceof Error ? error.message : "背景資料讀取失敗";
-    return NextResponse.json(degradedPayload(kind, message), {
-      headers: {
-        "Cache-Control": "public, s-maxage=30, stale-while-revalidate=120"
-      }
-    });
+    return jsonWithCache(degradedPayload(kind, message), kind);
   }
 }

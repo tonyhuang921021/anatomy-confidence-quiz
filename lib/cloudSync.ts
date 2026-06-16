@@ -1695,8 +1695,7 @@ export async function loadQuestionCommunityStats(questionIds: string[]) {
 
   const uniqueQuestionIds = Array.from(new Set(questionIds)).slice(0, BACKGROUND_STATS_LOOKUP_LIMIT);
   const response = await fetch(
-    `/api/question-background-data?kind=stats&ids=${encodeURIComponent(uniqueQuestionIds.join(","))}`,
-    { cache: "no-store" }
+    `/api/question-background-data?kind=stats&ids=${encodeURIComponent(uniqueQuestionIds.join(","))}`
   );
   const payload = (await response.json().catch(() => null)) as
     | { ok?: boolean; message?: string; stats?: QuestionAccuracyStatRow[] }
@@ -1716,8 +1715,7 @@ export async function loadSharedQuestionExplanationOverrides(questionIds: string
 
   const uniqueQuestionIds = Array.from(new Set(questionIds)).slice(0, 20);
   const response = await fetch(
-    `/api/question-background-data?kind=explanations&ids=${encodeURIComponent(uniqueQuestionIds.join(","))}`,
-    { cache: "no-store" }
+    `/api/question-background-data?kind=explanations&ids=${encodeURIComponent(uniqueQuestionIds.join(","))}`
   );
   const payload = (await response.json().catch(() => null)) as
     | { ok?: boolean; message?: string; overrides?: QuestionExplanationOverrideRow[] }
@@ -1804,8 +1802,7 @@ export async function loadConfirmedQuestionClassificationOverrides(questionIds?:
     : "all=1";
 
   const response = await fetch(
-    `/api/question-background-data?kind=classifications&${query}`,
-    { cache: "no-store" }
+    `/api/question-background-data?kind=classifications&${query}`
   );
   const payload = (await response.json().catch(() => null)) as
     | { ok?: boolean; message?: string; overrides?: QuestionClassificationOverrideRow[] }
@@ -2046,9 +2043,7 @@ export async function loadRecentCommunityAttemptStats(days = 2): Promise<Communi
   }
 
   const safeDays = Math.min(7, Math.max(1, Math.trunc(days)));
-  const response = await fetch(`/api/community-stats?days=${encodeURIComponent(String(safeDays))}`, {
-    cache: "no-store"
-  });
+  const response = await fetch(`/api/community-stats?days=${encodeURIComponent(String(safeDays))}`);
   const payload = (await response.json().catch(() => null)) as
     | { ok?: boolean; message?: string; points?: CommunityRecentAttemptPoint[] }
     | null;

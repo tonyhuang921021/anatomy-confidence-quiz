@@ -6,7 +6,7 @@ import { isSupabaseConfigured } from "@/lib/supabase/client";
 import { isSupabaseRecoveryMode, getRecoveryTimestamp } from "@/lib/supabase/recoveryMode";
 import type { VisitorStats } from "@/types/quiz";
 
-const REFRESH_INTERVAL_MS = 15 * 60 * 1000;
+const REFRESH_INTERVAL_MS = 60 * 60 * 1000;
 
 const emptyStats: VisitorStats = {
   totalVisitors: 0,
@@ -69,18 +69,9 @@ export function VisitorStatsPanel({ compact = false }: VisitorStatsPanelProps) {
       }
     }, REFRESH_INTERVAL_MS);
 
-    function handleVisibilityChange() {
-      if (typeof document !== "undefined" && document.visibilityState === "visible") {
-        void refresh();
-      }
-    }
-
-    document.addEventListener("visibilitychange", handleVisibilityChange);
-
     return () => {
       cancelled = true;
       window.clearInterval(intervalId);
-      document.removeEventListener("visibilitychange", handleVisibilityChange);
     };
   }, [compact]);
 
