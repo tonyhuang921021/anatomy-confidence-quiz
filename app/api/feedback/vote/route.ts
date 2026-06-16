@@ -65,7 +65,8 @@ async function loadVoteCounts(supabase: any, messageId: string) {
 
   if (error) throw error;
 
-  return (data ?? []).reduce(
+  const rows = Array.isArray(data) ? (data as { vote_value?: number }[]) : [];
+  return rows.reduce(
     (counts: { likeCount: number; dislikeCount: number }, row: { vote_value?: number }) => {
       if (Number(row.vote_value) > 0) counts.likeCount += 1;
       if (Number(row.vote_value) < 0) counts.dislikeCount += 1;
