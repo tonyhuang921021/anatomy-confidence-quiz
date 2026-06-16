@@ -41,6 +41,7 @@ type AuthContextValue = {
 const AuthContext = createContext<AuthContextValue | null>(null);
 const CLOUD_RESUME_SYNC_TIMEOUT_MS = 4500;
 const AUTH_SESSION_BOOTSTRAP_TIMEOUT_MS = 3500;
+const AUTH_SESSION_SNAPSHOT_KEY = "medQuizAuthSessionSnapshot";
 const CLOUD_FALLBACK_MESSAGE = "雲端同步暫時連不上，先使用本機紀錄；稍後可再按一次同步。";
 const AUTH_FALLBACK_MESSAGE = "登入狀態讀取逾時，先以本機模式使用；如果剛剛已登入，請稍後再按一次同步。";
 const RECOVERY_MODE_MESSAGE = "雲端登入與同步維護中，先使用本機紀錄；作答不會被登入流程卡住。";
@@ -78,6 +79,70 @@ function isPasswordRecoveryRoute() {
     window.location.hash.includes("type=recovery") ||
     window.location.search.includes("type=recovery")
   );
+}
+
+function safeGetStorage(storage: Storage | undefined, key: string) {
+  if (!storage) return null;
+  try {
+    return storage.getItem(key);
+  } catch {
+    return null;
+  }
+}
+
+function safeSetStorage(storage: Storage | undefined, key: string, value: string) {
+  if (!storage) return false;
+  try {
+    storage.setItem(key, value);
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+function safeRemoveStorage(storage: Storage | undefined, key: string) {
+  if (!storage) return;
+  try {
+    storage.removeItem(key);
+  } catch {
+    // Ignore browsers that block storage access.
+  }
+}
+
+function loadAuthSessionSnapshot(): Session | null {
+  if (typeof window === "undefined") return null;
+  const raw =
+    safeGetStorage(window.localStorage, AUTH_SESSION_SNAPSHOT_KEY) ??
+    safeGetStorage(window.sessionStorage, AUTH_SESSION_SNAPSHOT_KEY);
+  if (!raw) return null;
+
+  try {
+    const session = JSON.parse(raw) as Session;
+    if (!session?.user?.id || !session.access_token) return null;
+    if (typeof session.expires_at === "number" && session.expires_at * 1000 <= Date.now() + 30_000) {
+      return null;
+    }
+    return session;
+  } catch {
+    return null;
+  }
+}
+
+function saveAuthSessionSnapshot(nextSession: Session | null) {
+  if (typeof window === "undefined") return;
+
+  if (!nextSession?.user?.id || !nextSession.access_token) {
+    safeRemoveStorage(window.localStorage, AUTH_SESSION_SNAPSHOT_KEY);
+    safeRemoveStorage(window.sessionStorage, AUTH_SESSION_SNAPSHOT_KEY);
+    return;
+  }
+
+  const serialized = JSON.stringify(nextSession);
+  if (!safeSetStorage(window.localStorage, AUTH_SESSION_SNAPSHOT_KEY, serialized)) {
+    safeSetStorage(window.sessionStorage, AUTH_SESSION_SNAPSHOT_KEY, serialized);
+  } else {
+    safeRemoveStorage(window.sessionStorage, AUTH_SESSION_SNAPSHOT_KEY);
+  }
 }
 
 export function AuthProvider({ children }: { children: ReactNode }) {
@@ -158,6 +223,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setSession(nextSession);
     setUser(nextSession?.user ?? null);
     setActiveStorageUser(nextSession?.user?.id);
+    saveAuthSessionSnapshot(nextSession);
 
     if (nextSession?.user) {
       setSyncStatus("ready");
@@ -180,6 +246,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setSession(null);
       setUser(null);
       setActiveStorageUser();
+      saveAuthSessionSnapshot(null);
       setSyncStatus("ready");
       setSyncError(RECOVERY_MODE_MESSAGE);
       return;
@@ -214,24 +281,31 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
         if (cancelled) return;
 
-        setSession(initialSession);
-        setUser(initialSession?.user ?? null);
-        setPasswordRecovery(Boolean(initialSession?.user && isPasswordRecoveryRoute()));
-        setActiveStorageUser(initialSession?.user?.id);
+        const recoveredSession = initialSession ?? loadAuthSessionSnapshot();
+
+        setSession(recoveredSession);
+        setUser(recoveredSession?.user ?? null);
+        setPasswordRecovery(Boolean(recoveredSession?.user && isPasswordRecoveryRoute()));
+        setActiveStorageUser(recoveredSession?.user?.id);
+        saveAuthSessionSnapshot(recoveredSession);
         setLoading(false);
 
-        if (initialSession?.user) {
-          void refreshCloudData(initialSession.user.id, initialSession.user);
+        if (recoveredSession?.user) {
+          void refreshCloudData(recoveredSession.user.id, recoveredSession.user);
         }
       } catch (error) {
         if (cancelled) return;
-        setSession(null);
-        setUser(null);
+        const recoveredSession = loadAuthSessionSnapshot();
+        setSession(recoveredSession);
+        setUser(recoveredSession?.user ?? null);
         setPasswordRecovery(false);
-        setActiveStorageUser();
+        setActiveStorageUser(recoveredSession?.user?.id);
         setSyncStatus("ready");
         setSyncError(getErrorMessage(error) || AUTH_FALLBACK_MESSAGE);
         setLoading(false);
+        if (recoveredSession?.user) {
+          void refreshCloudData(recoveredSession.user.id, recoveredSession.user);
+        }
       }
     }
 
@@ -242,6 +316,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     } = supabase.auth.onAuthStateChange((event, nextSession) => {
       if (event === "INITIAL_SESSION") return;
       setPasswordRecovery(event === "PASSWORD_RECOVERY" || Boolean(nextSession?.user && isPasswordRecoveryRoute()));
+      if (event === "SIGNED_OUT") {
+        saveAuthSessionSnapshot(null);
+      }
       applyAuthSession(nextSession);
     });
 

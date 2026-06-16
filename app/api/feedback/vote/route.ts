@@ -33,10 +33,18 @@ function getServiceSupabaseClient() {
 async function getVerifiedUser(supabase: any, accessToken?: string | null): Promise<VerifiedUser | null> {
   if (!accessToken) return null;
 
-  const { data, error } = await supabase.auth.getUser(accessToken);
-  if (error || !data.user?.id) return null;
+  try {
+    const { data, error } = (await withServerTimeout(
+      supabase.auth.getUser(accessToken),
+      1200,
+      "登入狀態驗證逾時"
+    )) as { data?: { user?: { id?: string } | null }; error?: unknown };
+    if (error || !data?.user?.id) return null;
 
-  return { id: data.user.id };
+    return { id: data.user.id };
+  } catch {
+    return null;
+  }
 }
 
 function normalizeVote(value: unknown): 1 | -1 | null {

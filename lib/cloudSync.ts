@@ -169,6 +169,8 @@ const CLOUD_ATTEMPT_SESSION_FETCH_CHUNK_SIZE = 20;
 const CURRENT_SESSION_SYNC_MIN_INTERVAL_MS = 30_000;
 const STATS_SYNC_ATTEMPT_BATCH_SIZE = 200;
 const CLOUD_SESSION_LOOKUP_TIMEOUT_MS = 3500;
+const FEEDBACK_REQUEST_TIMEOUT_MS = 10000;
+const FEEDBACK_SESSION_TIMEOUT_MS = 2500;
 
 type CurrentSessionSyncState = {
   lastSyncedAt: number;
@@ -221,6 +223,60 @@ function withCloudFallback<T>(
       .catch(() => resolve(fallback))
       .finally(() => clearTimeout(timeoutId));
   });
+}
+
+function withClientTimeout<T>(task: Promise<T>, timeoutMs: number, message: string) {
+  return new Promise<T>((resolve, reject) => {
+    const timeoutId = setTimeout(() => reject(new Error(message)), timeoutMs);
+    task
+      .then(resolve)
+      .catch(reject)
+      .finally(() => clearTimeout(timeoutId));
+  });
+}
+
+async function fetchWithClientTimeout(
+  input: RequestInfo | URL,
+  init: RequestInit,
+  timeoutMs: number,
+  timeoutMessage: string
+) {
+  const controller = typeof AbortController !== "undefined" ? new AbortController() : null;
+  let timeoutId: ReturnType<typeof setTimeout> | undefined;
+
+  if (!controller) {
+    return withClientTimeout(fetch(input, init), timeoutMs, timeoutMessage);
+  }
+
+  timeoutId = setTimeout(() => controller.abort(), timeoutMs);
+
+  try {
+    return await fetch(input, {
+      ...init,
+      signal: init.signal ?? controller.signal
+    });
+  } catch (error) {
+    if (error instanceof DOMException && error.name === "AbortError") {
+      throw new Error(timeoutMessage);
+    }
+    throw error;
+  } finally {
+    if (timeoutId) clearTimeout(timeoutId);
+  }
+}
+
+async function getFeedbackAccessToken(user?: Pick<User, "id" | "email" | "user_metadata"> | null) {
+  if (!user) return null;
+
+  try {
+    return await withClientTimeout(
+      getSupabaseBrowserClient().auth.getSession().then((result) => result.data.session?.access_token ?? null),
+      FEEDBACK_SESSION_TIMEOUT_MS,
+      "登入狀態讀取逾時，已先用匿名身分送出。"
+    );
+  } catch {
+    return null;
+  }
 }
 
 async function fetchAIExplanationUsageRows() {
@@ -1850,11 +1906,9 @@ export async function createFeedbackMessage(input: {
     throw new Error("留言內容不能是空白。");
   }
 
-  const accessToken = input.user
-    ? (await getSupabaseBrowserClient().auth.getSession()).data.session?.access_token ?? null
-    : null;
+  const accessToken = await getFeedbackAccessToken(input.user);
 
-  const response = await fetch("/api/feedback", {
+  const response = await fetchWithClientTimeout("/api/feedback", {
     method: "POST",
     headers: {
       "Content-Type": "application/json"
@@ -1866,7 +1920,7 @@ export async function createFeedbackMessage(input: {
       isAnonymous: input.isAnonymous,
       parentId: input.parentId ?? null
     })
-  });
+  }, FEEDBACK_REQUEST_TIMEOUT_MS, "留言送出逾時，請稍後再試。");
 
   const payload = (await response.json().catch(() => null)) as
     | {
@@ -1896,11 +1950,9 @@ export async function voteFeedbackMessage(input: {
     throw new Error("Supabase 尚未設定，暫時無法投票。");
   }
 
-  const accessToken = input.user
-    ? (await getSupabaseBrowserClient().auth.getSession()).data.session?.access_token ?? null
-    : null;
+  const accessToken = await getFeedbackAccessToken(input.user);
 
-  const response = await fetch("/api/feedback/vote", {
+  const response = await fetchWithClientTimeout("/api/feedback/vote", {
     method: "POST",
     headers: {
       "Content-Type": "application/json"
@@ -1911,7 +1963,7 @@ export async function voteFeedbackMessage(input: {
       messageId: input.messageId,
       vote: input.vote
     })
-  });
+  }, FEEDBACK_REQUEST_TIMEOUT_MS, "留言投票逾時，請稍後再試。");
 
   const payload = (await response.json().catch(() => null)) as
     | {

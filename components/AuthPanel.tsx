@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import { useAuth } from "@/components/AuthProvider";
 import { enabledSubjects, MED1_SUBJECTS, MED2_SUBJECTS } from "@/data/subjectRegistry";
@@ -774,19 +775,19 @@ export function AuthPanel() {
         ) : null}
         <div className="mt-5 flex flex-col gap-3 sm:flex-row">
           {canViewOwnerPage ? (
-            <a
+            <Link
               href="/owner"
               className="secondary-pill text-center"
             >
               私有數據頁
-            </a>
+            </Link>
           ) : null}
-          <a
+          <Link
             href="/progress"
             className="secondary-pill text-center"
           >
             進度總覽
-          </a>
+          </Link>
           <button
             type="button"
             onClick={() => void handleSaveNickname()}
