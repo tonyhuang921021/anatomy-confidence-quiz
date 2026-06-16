@@ -9,6 +9,7 @@ import {
   getModeLabel
 } from "@/lib/quizAnalysis";
 import { loadCompletedSessions, saveQuizSettings } from "@/lib/storage";
+import { buildNewQuizHref } from "@/lib/startSettingsUrl";
 import {
   CompletionStatsBundle,
   QuizMode,
@@ -225,7 +226,7 @@ export function QuizSetupPanel({
           }
         : settings;
     saveQuizSettings(nextSettings);
-    router.push("/quiz?new=1");
+    router.push(buildNewQuizHref(nextSettings));
   }
 
   function handleQuickWeakness() {
@@ -233,11 +234,12 @@ export function QuizSetupPanel({
       mode: "weakness",
       questionCount: 10,
       subjectFilter: "解剖學",
+      excludePreviouslyAnswered: true,
       chapter: weakestSection?.chapter,
       section: weakestSection?.section
     };
     saveQuizSettings(nextSettings);
-    router.push("/quiz?new=1");
+    router.push(buildNewQuizHref(nextSettings));
   }
 
   return (
@@ -353,6 +355,20 @@ export function QuizSetupPanel({
                   ))}
                 </select>
               </div>
+              <label className="mt-4 flex cursor-pointer items-start gap-3 rounded-2xl bg-white p-4 text-sm text-slate-700 ring-1 ring-slate-200">
+                <input
+                  type="checkbox"
+                  checked={settings.excludePreviouslyAnswered ?? true}
+                  onChange={(event) => updateSettings({ excludePreviouslyAnswered: event.target.checked })}
+                  className="mt-1 h-4 w-4 rounded border-slate-300 text-brand-600"
+                />
+                <span>
+                  <span className="block font-semibold text-ink">優先避開已做過的題目</span>
+                  <span className="mt-1 block leading-6 text-slate-500">
+                    題池夠時不重複；若篩選範圍太小，才補最久以前做過的題。
+                  </span>
+                </span>
+              </label>
             </div>
           </>
         ) : null}

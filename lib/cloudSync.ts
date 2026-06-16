@@ -1884,6 +1884,58 @@ export async function createFeedbackMessage(input: {
   return payload.message;
 }
 
+export async function voteFeedbackMessage(input: {
+  messageId: string;
+  vote: 1 | -1 | null;
+  user?: Pick<User, "id" | "email" | "user_metadata"> | null;
+}) {
+  if (isSupabaseRecoveryMode()) {
+    throw new Error("留言板暫時維護中，先讓登入與同步恢復。");
+  }
+  if (!isSupabaseConfigured()) {
+    throw new Error("Supabase 尚未設定，暫時無法投票。");
+  }
+
+  const accessToken = input.user
+    ? (await getSupabaseBrowserClient().auth.getSession()).data.session?.access_token ?? null
+    : null;
+
+  const response = await fetch("/api/feedback/vote", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+      accessToken,
+      visitorId: getVisitorId(),
+      messageId: input.messageId,
+      vote: input.vote
+    })
+  });
+
+  const payload = (await response.json().catch(() => null)) as
+    | {
+        ok?: boolean;
+        message?: string;
+        messageId?: string;
+        myVote?: 1 | -1 | null;
+        likeCount?: number;
+        dislikeCount?: number;
+      }
+    | null;
+
+  if (!response.ok || !payload?.ok || !payload.messageId) {
+    throw new Error(payload?.message || "留言投票失敗");
+  }
+
+  return {
+    messageId: payload.messageId,
+    myVote: payload.myVote ?? null,
+    likeCount: payload.likeCount ?? 0,
+    dislikeCount: payload.dislikeCount ?? 0
+  };
+}
+
 export async function loadOwnerDashboardStats(): Promise<OwnerDashboardStats> {
   const payload = await fetchOwnerApiPayload();
   if (!payload?.stats) {

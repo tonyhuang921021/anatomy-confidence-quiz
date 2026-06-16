@@ -1072,6 +1072,57 @@ to service_role
 using (true)
 with check (true);
 
+create table if not exists public.feedback_message_votes (
+  id bigint generated always as identity primary key,
+  message_id bigint not null references public.feedback_messages (id) on delete cascade,
+  vote_value smallint not null check (vote_value in (-1, 1)),
+  user_id uuid references auth.users (id) on delete cascade,
+  visitor_id text,
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now(),
+  constraint feedback_message_votes_actor_check check (user_id is not null or visitor_id is not null)
+);
+
+create unique index if not exists feedback_message_votes_user_unique_idx
+on public.feedback_message_votes (message_id, user_id)
+where user_id is not null;
+
+create unique index if not exists feedback_message_votes_visitor_unique_idx
+on public.feedback_message_votes (message_id, visitor_id)
+where user_id is null and visitor_id is not null;
+
+create index if not exists feedback_message_votes_message_id_idx
+on public.feedback_message_votes (message_id);
+
+grant select
+  on public.feedback_message_votes
+  to anon;
+
+grant select
+  on public.feedback_message_votes
+  to authenticated;
+
+grant select, insert, update, delete
+  on public.feedback_message_votes
+  to service_role;
+
+alter table public.feedback_message_votes enable row level security;
+
+drop policy if exists "Anyone can read feedback message votes" on public.feedback_message_votes;
+drop policy if exists "Service role can manage feedback message votes" on public.feedback_message_votes;
+
+create policy "Anyone can read feedback message votes"
+on public.feedback_message_votes
+for select
+using (true);
+
+create policy "Service role can manage feedback message votes"
+on public.feedback_message_votes
+for all
+to service_role
+using (true)
+with check (true);
+
 create table if not exists public.question_classification_reports (
   id bigint generated always as identity primary key,
   question_id text not null,

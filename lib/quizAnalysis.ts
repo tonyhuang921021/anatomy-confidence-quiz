@@ -581,6 +581,7 @@ export const DEFAULT_QUIZ_SETTINGS: QuizSettings = {
   questionCount: 10,
   subjectFilter: "解剖學",
   excludeAiGenerated: true,
+  excludePreviouslyAnswered: true,
   feedbackMode: "full",
   paperMode: "random_set"
 };
@@ -797,6 +798,31 @@ function getPrioritizedFreshPool(
   return [...unseen, ...seen];
 }
 
+function getRepeatAwarePool(
+  questions: Question[],
+  allSessions: { attempts: Attempt[] }[],
+  settings: QuizSettings,
+  targetCount: number
+) {
+  if (!settings.excludePreviouslyAnswered) return questions;
+  if (settings.mode !== "random" && settings.mode !== "weakness") return questions;
+
+  const historyMap = buildQuestionHistoryMap(allSessions);
+  const unseen = questions.filter((question) => !historyMap.has(question.id));
+  if (unseen.length >= targetCount) return unseen;
+  if (unseen.length === 0) return questions;
+
+  const seenByOldestFirst = questions
+    .filter((question) => historyMap.has(question.id))
+    .sort((left, right) => {
+      const leftTime = historyMap.get(left.id)?.lastAttemptedAt ?? "";
+      const rightTime = historyMap.get(right.id)?.lastAttemptedAt ?? "";
+      return leftTime.localeCompare(rightTime);
+    });
+
+  return [...unseen, ...seenByOldestFirst];
+}
+
 function diversifyBySection<T extends { question: Question; score: number }>(
   items: T[],
   count: number,
@@ -918,13 +944,15 @@ export function createQuestionOrder(
   const sourcePool = filtered.length > 0 ? filtered : settings.excludeAiGenerated ? [] : questions;
   if (sourcePool.length === 0) return [];
 
-  const count = normalizeQuestionCount(settings.questionCount, sourcePool.length);
-  const scored = buildQuestionScoreMap(sourcePool, allSessions, settings);
-  const sourceQuestionMap = new Map(sourcePool.map((question) => [question.id, question] as const));
+  const requestedCount = normalizeQuestionCount(settings.questionCount, sourcePool.length);
+  const repeatAwarePool = getRepeatAwarePool(sourcePool, allSessions, settings, requestedCount);
+  const count = normalizeQuestionCount(settings.questionCount, repeatAwarePool.length);
+  const scored = buildQuestionScoreMap(repeatAwarePool, allSessions, settings);
+  const sourceQuestionMap = new Map(repeatAwarePool.map((question) => [question.id, question] as const));
 
   if (settings.mode === "random") {
     return keepFollowUpQuestionsTogether(
-      getPrioritizedFreshPool(sourcePool, allSessions)
+      getPrioritizedFreshPool(repeatAwarePool, allSessions)
       .slice(0, count)
       .map((question) => question.id),
       sourceQuestionMap
@@ -934,8 +962,8 @@ export function createQuestionOrder(
   if (settings.mode === "simulation") {
     const simulationPool =
       settings.paperMode === "past_paper" || settings.paperMode === "random_past_paper"
-        ? sourcePool
-        : shuffle(sourcePool);
+        ? repeatAwarePool
+        : shuffle(repeatAwarePool);
 
     return keepFollowUpQuestionsTogether(
       simulationPool.slice(0, count).map((question) => question.id),

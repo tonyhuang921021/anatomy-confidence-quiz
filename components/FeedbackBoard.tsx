@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { useAuth } from "@/components/AuthProvider";
-import { createFeedbackMessage, loadFeedbackMessages } from "@/lib/cloudSync";
+import { createFeedbackMessage, loadFeedbackMessages, voteFeedbackMessage } from "@/lib/cloudSync";
 import type { FeedbackMessage, OpenAIBudgetStatus } from "@/types/quiz";
 
 function formatCreatedAt(value: string) {
@@ -52,6 +52,50 @@ function BudgetPinnedMessage({ budget }: { budget: OpenAIBudgetStatus }) {
   );
 }
 
+function FeedbackVoteControls({
+  entry,
+  disabled,
+  onVote
+}: {
+  entry: FeedbackMessage;
+  disabled: boolean;
+  onVote: (entry: FeedbackMessage, vote: 1 | -1) => void;
+}) {
+  const likeActive = entry.myVote === 1;
+  const dislikeActive = entry.myVote === -1;
+
+  return (
+    <div className="flex items-center gap-2">
+      <button
+        type="button"
+        onClick={() => onVote(entry, 1)}
+        disabled={disabled}
+        aria-pressed={likeActive}
+        className={`rounded-full px-3 py-1.5 text-xs font-semibold ring-1 transition disabled:cursor-not-allowed disabled:opacity-60 ${
+          likeActive
+            ? "bg-emerald-600 text-white ring-emerald-600"
+            : "bg-white text-slate-600 ring-slate-200 hover:bg-emerald-50 hover:text-emerald-700"
+        }`}
+      >
+        讚 {entry.likeCount ?? 0}
+      </button>
+      <button
+        type="button"
+        onClick={() => onVote(entry, -1)}
+        disabled={disabled}
+        aria-pressed={dislikeActive}
+        className={`rounded-full px-3 py-1.5 text-xs font-semibold ring-1 transition disabled:cursor-not-allowed disabled:opacity-60 ${
+          dislikeActive
+            ? "bg-rose-600 text-white ring-rose-600"
+            : "bg-white text-slate-600 ring-slate-200 hover:bg-rose-50 hover:text-rose-700"
+        }`}
+      >
+        倒讚 {entry.dislikeCount ?? 0}
+      </button>
+    </div>
+  );
+}
+
 export function FeedbackBoard() {
   const { configured, user } = useAuth();
   const [messages, setMessages] = useState<FeedbackMessage[]>([]);
@@ -62,6 +106,7 @@ export function FeedbackBoard() {
   const [isAnonymous, setIsAnonymous] = useState(true);
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
+  const [votingMessageId, setVotingMessageId] = useState<string | null>(null);
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
 
@@ -168,6 +213,50 @@ export function FeedbackBoard() {
     }
   }
 
+  function updateMessageVote(
+    entries: FeedbackMessage[],
+    messageId: string,
+    updater: (entry: FeedbackMessage) => FeedbackMessage
+  ): FeedbackMessage[] {
+    return entries.map((entry) => {
+      if (entry.id === messageId) return updater(entry);
+      if ((entry.replies?.length ?? 0) > 0) {
+        return {
+          ...entry,
+          replies: updateMessageVote(entry.replies ?? [], messageId, updater)
+        };
+      }
+      return entry;
+    });
+  }
+
+  async function handleVote(entry: FeedbackMessage, vote: 1 | -1) {
+    const nextVote = entry.myVote === vote ? null : vote;
+    setVotingMessageId(entry.id);
+    setError("");
+    setMessage("");
+
+    try {
+      const result = await voteFeedbackMessage({
+        messageId: entry.id,
+        vote: nextVote,
+        user
+      });
+      setMessages((current) =>
+        updateMessageVote(current, result.messageId, (currentEntry) => ({
+          ...currentEntry,
+          myVote: result.myVote,
+          likeCount: result.likeCount,
+          dislikeCount: result.dislikeCount
+        }))
+      );
+    } catch (voteError) {
+      setError(voteError instanceof Error ? voteError.message : "留言投票失敗");
+    } finally {
+      setVotingMessageId(null);
+    }
+  }
+
   return (
     <section className="surface-card p-6">
       <div className="flex flex-wrap items-center justify-between gap-4">
@@ -266,7 +355,12 @@ export function FeedbackBoard() {
                     </div>
                   </div>
                   <p className="mt-3 whitespace-pre-wrap text-sm leading-7 text-slate-700">{entry.content}</p>
-                  <div className="mt-3 flex items-center gap-2">
+                  <div className="mt-3 flex flex-wrap items-center gap-2">
+                    <FeedbackVoteControls
+                      entry={entry}
+                      disabled={votingMessageId === entry.id}
+                      onVote={(target, vote) => void handleVote(target, vote)}
+                    />
                     <button
                       type="button"
                       onClick={() => {
@@ -316,6 +410,13 @@ export function FeedbackBoard() {
                           <p className="mt-2 whitespace-pre-wrap text-sm leading-7 text-slate-700">
                             {reply.content}
                           </p>
+                          <div className="mt-3">
+                            <FeedbackVoteControls
+                              entry={reply}
+                              disabled={votingMessageId === reply.id}
+                              onVote={(target, vote) => void handleVote(target, vote)}
+                            />
+                          </div>
                         </div>
                       ))}
                     </div>

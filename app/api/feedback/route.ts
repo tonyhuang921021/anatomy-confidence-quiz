@@ -26,6 +26,11 @@ type FeedbackMessageRow = {
   created_at: string;
 };
 
+type FeedbackVoteRow = {
+  message_id: string | number;
+  vote_value: number;
+};
+
 const FEEDBACK_HOURLY_LIMIT = 3;
 const FEEDBACK_DAILY_LIMIT = 10;
 const FEEDBACK_READ_CACHE_HEADER = "public, s-maxage=60, stale-while-revalidate=300";
@@ -46,19 +51,68 @@ function getServiceSupabaseClient() {
   });
 }
 
-function mapFeedbackMessageRow(row: FeedbackMessageRow) {
+function isMissingRelationError(error: unknown, relationName: string) {
+  const message =
+    error && typeof error === "object" && "message" in error
+      ? String((error as { message?: unknown }).message ?? "")
+      : String(error ?? "");
+  return message.includes(relationName) && (message.includes("does not exist") || message.includes("Could not find"));
+}
+
+function mapFeedbackMessageRow(row: FeedbackMessageRow, voteCounts?: Map<string, { likeCount: number; dislikeCount: number }>) {
+  const counts = voteCounts?.get(String(row.id));
   return {
     id: String(row.id),
     content: row.content,
     parentId: row.parent_id ? String(row.parent_id) : undefined,
     displayName: row.display_name ?? undefined,
     isAnonymous: row.is_anonymous,
-    createdAt: row.created_at
+    createdAt: row.created_at,
+    likeCount: counts?.likeCount ?? 0,
+    dislikeCount: counts?.dislikeCount ?? 0
   };
 }
 
-function buildFeedbackTree(rows: FeedbackMessageRow[], limit: number) {
-  const flatMessages = rows.map(mapFeedbackMessageRow);
+function buildVoteCountMap(rows: FeedbackVoteRow[]) {
+  const counts = new Map<string, { likeCount: number; dislikeCount: number }>();
+  for (const row of rows) {
+    const key = String(row.message_id);
+    const current = counts.get(key) ?? { likeCount: 0, dislikeCount: 0 };
+    if (Number(row.vote_value) > 0) current.likeCount += 1;
+    if (Number(row.vote_value) < 0) current.dislikeCount += 1;
+    counts.set(key, current);
+  }
+  return counts;
+}
+
+async function loadFeedbackVoteCounts(supabase: any, messageIds: string[]) {
+  if (messageIds.length === 0) return new Map<string, { likeCount: number; dislikeCount: number }>();
+
+  const { data, error } = await withServerTimeout(
+    supabase
+      .from("feedback_message_votes")
+      .select("message_id, vote_value")
+      .in("message_id", messageIds),
+    1200,
+    "留言投票讀取逾時"
+  );
+
+  if (error) {
+    if (isMissingRelationError(error, "feedback_message_votes")) {
+      return new Map<string, { likeCount: number; dislikeCount: number }>();
+    }
+    throw error;
+  }
+
+  return buildVoteCountMap((data ?? []) as FeedbackVoteRow[]);
+}
+
+function buildFeedbackTree(
+  rows: FeedbackMessageRow[],
+  limit: number,
+  voteCounts?: Map<string, { likeCount: number; dislikeCount: number }>
+) {
+  const flatMessages = rows.map((row) => mapFeedbackMessageRow(row, voteCounts));
   const byParent = new Map<string, ReturnType<typeof mapFeedbackMessageRow>[]>();
   const roots: ReturnType<typeof mapFeedbackMessageRow>[] = [];
 
@@ -135,9 +189,14 @@ export async function GET(request: NextRequest) {
     );
 
     if (error) throw error;
+    const rows = (data ?? []) as FeedbackMessageRow[];
+    const voteCounts = await loadFeedbackVoteCounts(
+      supabase,
+      rows.map((row) => String(row.id))
+    );
 
     return NextResponse.json(
-      { ok: true, messages: buildFeedbackTree((data ?? []) as FeedbackMessageRow[], limit) },
+      { ok: true, messages: buildFeedbackTree(rows, limit, voteCounts) },
       { headers: { "Cache-Control": FEEDBACK_READ_CACHE_HEADER } }
     );
   } catch (error) {

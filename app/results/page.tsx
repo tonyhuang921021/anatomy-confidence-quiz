@@ -43,6 +43,7 @@ import {
   saveQuestionExplanationOverrides,
   saveQuizSettings
 } from "@/lib/storage";
+import { buildNewQuizHref } from "@/lib/startSettingsUrl";
 import {
   Attempt,
   OptionKey,
@@ -50,6 +51,7 @@ import {
   QuestionClassificationOverride,
   QuestionCommunityStats,
   QuestionExplanationOverride,
+  QuizSettings,
   QuizSession,
   SectionCompletionStats,
   SectionStats,
@@ -647,9 +649,14 @@ function ResultsPageContent() {
   }, [activeSession?.settings?.mode, reviewedAttempts]);
 
   function handleRestart() {
+    const nextSettings: QuizSettings = {
+      ...DEFAULT_QUIZ_SETTINGS,
+      ...(activeSession?.settings ?? state.session?.settings ?? {}),
+      sessionName: undefined
+    };
     clearCurrentSession();
-    saveQuizSettings(DEFAULT_QUIZ_SETTINGS);
-    router.push("/quiz?new=1");
+    saveQuizSettings(nextSettings);
+    router.push(buildNewQuizHref(nextSettings));
   }
 
   async function handleSaveSimulationSessionName() {
@@ -1427,11 +1434,21 @@ function ResultsPageContent() {
             </div>
             <div className="mt-5 grid gap-3">
               <Link
-                href="/quiz?new=1"
-                onClick={() => saveQuizSettings(DEFAULT_QUIZ_SETTINGS)}
+                href={buildNewQuizHref({
+                  ...DEFAULT_QUIZ_SETTINGS,
+                  ...(activeSession?.settings ?? state.session?.settings ?? {}),
+                  sessionName: undefined
+                })}
+                onClick={() =>
+                  saveQuizSettings({
+                    ...DEFAULT_QUIZ_SETTINGS,
+                    ...(activeSession?.settings ?? state.session?.settings ?? {}),
+                    sessionName: undefined
+                  })
+                }
                 className="min-h-12 rounded-2xl bg-brand-600 px-4 py-4 text-center text-sm font-semibold text-white transition hover:bg-brand-700"
               >
-                再刷本地題庫 10 題
+                用同一設定再刷一次
               </Link>
               <Link
                 href="/review"

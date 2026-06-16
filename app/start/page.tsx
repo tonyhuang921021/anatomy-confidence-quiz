@@ -30,6 +30,7 @@ import {
   getPracticeStopAfterReviewPreference,
   getPracticeYearRangePreference
 } from "@/lib/accountPreferences";
+import { buildNewQuizHref } from "@/lib/startSettingsUrl";
 import type { Question, QuizSettings, SubjectName } from "@/types/quiz";
 
 const selectableSubjects = enabledSubjects.filter(
@@ -38,18 +39,6 @@ const selectableSubjects = enabledSubjects.filter(
     item.subject !== "醫學（二）" &&
     (MED1_SUBJECTS.includes(item.subject) || MED2_SUBJECTS.includes(item.subject))
 );
-
-function encodeStartSettingsForUrl(settings: QuizSettings) {
-  try {
-    const json = JSON.stringify(settings);
-    const bytes = new TextEncoder().encode(json);
-    const binary = Array.from(bytes, (byte) => String.fromCharCode(byte)).join("");
-    const encoded = btoa(binary).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/g, "");
-    return encoded.length <= 1800 ? encoded : null;
-  } catch {
-    return null;
-  }
-}
 
 export default function StartPage() {
   const router = useRouter();
@@ -406,6 +395,7 @@ export default function StartPage() {
       subjectFilters: effectiveSelectedSubjects,
       subjectTracks: selectedSubjectTracks,
       excludeAiGenerated,
+      excludePreviouslyAnswered: true,
       customQuestionIds: seasonalQuestionIds,
       strictCustomQuestionPool: false,
       customPoolLabel: hasMicrobiologyTrackFilter
@@ -424,11 +414,7 @@ export default function StartPage() {
     };
 
     saveQuizSettings(nextSettings);
-    const encodedSettings = encodeStartSettingsForUrl(nextSettings);
-    const nextUrl = encodedSettings
-      ? `/quiz?new=1&startSettings=${encodeURIComponent(encodedSettings)}`
-      : "/quiz?new=1";
-    router.push(nextUrl);
+    router.push(buildNewQuizHref(nextSettings));
   }
 
   return (
@@ -504,6 +490,7 @@ export default function StartPage() {
             已選 <span className="font-semibold text-ink">{effectiveSelectedSubjects.length + (includeSeasonalLimited ? 1 : 0)}</span> 個範圍・
             {practiceYearRange.yearFrom} 到 {practiceYearRange.yearTo} 年共{" "}
             <span className="font-semibold text-ink">{availableQuestionCount}</span> 題
+            ・優先不重複已做題
             {practiceStopAfterReview ? "・自由測驗・每題詳解後可結束" : `・每次抽 ${practiceQuestionCount} 題`}
           </p>
           <div className="flex flex-wrap gap-3">

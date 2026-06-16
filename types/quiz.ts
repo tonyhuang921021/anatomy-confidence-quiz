@@ -106,6 +106,7 @@ export type QuizSettings = {
   subjectFilters?: SubjectName[];
   subjectTracks?: Partial<Record<SubjectName, string[]>>;
   excludeAiGenerated?: boolean;
+  excludePreviouslyAnswered?: boolean;
   customQuestionIds?: string[];
   customQuestionPayload?: Question[];
   customPoolLabel?: string;
@@ -498,6 +499,9 @@ export type FeedbackMessage = {
   displayName?: string;
   isAnonymous: boolean;
   createdAt: string;
+  likeCount?: number;
+  dislikeCount?: number;
+  myVote?: 1 | -1 | null;
   replies?: FeedbackMessage[];
 };
 
