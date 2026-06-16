@@ -54,14 +54,14 @@ function isMissingRelationError(error: unknown, relationName: string) {
 }
 
 async function loadVoteCounts(supabase: any, messageId: string) {
-  const { data, error } = await withServerTimeout(
+  const { data, error } = (await withServerTimeout(
     supabase
       .from("feedback_message_votes")
       .select("vote_value")
       .eq("message_id", messageId),
     1200,
     "留言投票統計逾時"
-  );
+  )) as { data?: unknown; error?: unknown };
 
   if (error) throw error;
 
@@ -114,7 +114,9 @@ export async function POST(request: NextRequest) {
       .delete()
       .eq("message_id", messageId)
       .eq(actorColumn, actorValue);
-    const { error: deleteError } = await withServerTimeout(deleteQuery, 1600, "留言投票更新逾時");
+    const { error: deleteError } = (await withServerTimeout(deleteQuery, 1600, "留言投票更新逾時")) as {
+      error?: unknown;
+    };
     if (deleteError) throw deleteError;
 
     if (vote !== null) {
@@ -124,13 +126,13 @@ export async function POST(request: NextRequest) {
         user_id: verifiedUser?.id ?? null,
         visitor_id: verifiedUser?.id ? null : actorValue
       };
-      const { error } = await withServerTimeout(
+      const { error } = (await withServerTimeout(
         supabase
           .from("feedback_message_votes")
           .insert(row),
         1800,
         "留言投票儲存逾時"
-      );
+      )) as { error?: unknown };
       if (error) throw error;
     }
 

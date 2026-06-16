@@ -88,14 +88,14 @@ function buildVoteCountMap(rows: FeedbackVoteRow[]) {
 async function loadFeedbackVoteCounts(supabase: any, messageIds: string[]) {
   if (messageIds.length === 0) return new Map<string, { likeCount: number; dislikeCount: number }>();
 
-  const { data, error } = await withServerTimeout(
+  const { data, error } = (await withServerTimeout(
     supabase
       .from("feedback_message_votes")
       .select("message_id, vote_value")
       .in("message_id", messageIds),
     1200,
     "留言投票讀取逾時"
-  );
+  )) as { data?: unknown; error?: unknown };
 
   if (error) {
     if (isMissingRelationError(error, "feedback_message_votes")) {
