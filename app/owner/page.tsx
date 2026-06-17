@@ -14,25 +14,8 @@ import {
   OwnerRecentAIAccountEntry,
   OwnerYangmingExplanationReportEntry,
   OwnerYangmingModeActivationEntry,
-  SubjectName,
   OwnerTopAttemptVisitorEntry
 } from "@/types/quiz";
-
-const SUBJECT_OPTIONS: SubjectName[] = [
-  "解剖學",
-  "生理學",
-  "生物化學",
-  "藥理學",
-  "病理學",
-  "微生物免疫學",
-  "胚胎學",
-  "組織學",
-  "寄生蟲學",
-  "公共衛生學",
-  "細胞生物學",
-  "分子生物學",
-  "其他醫學一"
-];
 
 function getAllowedEmails() {
   const raw = process.env.NEXT_PUBLIC_ADMIN_EMAILS ?? "";
@@ -245,11 +228,7 @@ export default function OwnerPage() {
   const [budgetUsedInput, setBudgetUsedInput] = useState("");
   const [budgetMessage, setBudgetMessage] = useState("");
   const [budgetSaving, setBudgetSaving] = useState(false);
-  const [approvingReportId, setApprovingReportId] = useState<string | null>(null);
   const [aiBanPendingEmail, setAiBanPendingEmail] = useState<string | null>(null);
-  const [manualSubjectMap, setManualSubjectMap] = useState<Record<string, SubjectName>>({});
-  const [manualChapterMap, setManualChapterMap] = useState<Record<string, string>>({});
-  const [manualSectionMap, setManualSectionMap] = useState<Record<string, string>>({});
   const [statsLoading, setStatsLoading] = useState(true);
   const [error, setError] = useState("");
   const allowed = useMemo(() => isAllowedEmail(user?.email), [user?.email]);
@@ -390,172 +369,6 @@ export default function OwnerPage() {
       setError(banError instanceof Error ? banError.message : "AI 冷凍操作失敗");
     } finally {
       setAiBanPendingEmail(null);
-    }
-  }
-
-  async function handleApproveClassificationReport(reportId: string) {
-    if (!session?.access_token) return;
-
-    try {
-      setApprovingReportId(reportId);
-      setError("");
-      const response = await fetch("/api/owner/classification-approve", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({
-          accessToken: session.access_token,
-          reportId
-        })
-      });
-
-      const payload = (await response.json().catch(() => null)) as
-        | {
-            ok?: boolean;
-            message?: string;
-            appliedAt?: string;
-            approvedByEmail?: string;
-          }
-        | null;
-
-      if (!response.ok || !payload?.ok) {
-        throw new Error(payload?.message || "確認套用失敗");
-      }
-
-      setClassificationReports((current) =>
-        current.map((report) =>
-          report.id === reportId
-            ? {
-                ...report,
-                appliedAt: payload.appliedAt ?? new Date().toISOString(),
-                approvedByEmail: payload.approvedByEmail ?? user?.email ?? undefined
-              }
-            : report
-        )
-      );
-    } catch (approveError) {
-      setError(approveError instanceof Error ? approveError.message : "確認套用失敗");
-    } finally {
-      setApprovingReportId(null);
-    }
-  }
-
-  async function handleManualApplyClassificationReport(reportId: string) {
-    if (!session?.access_token) return;
-
-    const targetReport = classificationReports.find((report) => report.id === reportId);
-    const subject =
-      manualSubjectMap[reportId] ??
-      (targetReport?.suggestedSubject as SubjectName | undefined) ??
-      (targetReport?.currentSubject as SubjectName | undefined);
-    const chapter = manualChapterMap[reportId]?.trim() || subject;
-    const section = manualSectionMap[reportId]?.trim() || chapter;
-
-    if (!subject) {
-      setError("請先選擇要手動套用的科目。");
-      return;
-    }
-
-    try {
-      setApprovingReportId(reportId);
-      setError("");
-      const response = await fetch("/api/owner/classification-approve", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({
-          accessToken: session.access_token,
-          reportId,
-          action: "manual_apply",
-          subject,
-          chapter,
-          section
-        })
-      });
-
-      const payload = (await response.json().catch(() => null)) as
-        | {
-            ok?: boolean;
-            message?: string;
-            subject?: SubjectName;
-            chapter?: string;
-            section?: string;
-            appliedAt?: string;
-            approvedByEmail?: string;
-          }
-        | null;
-
-      if (!response.ok || !payload?.ok) {
-        throw new Error(payload?.message || "人工套用失敗");
-      }
-
-      setClassificationReports((current) =>
-        current.map((report) =>
-          report.id === reportId
-            ? {
-                ...report,
-                suggestedSubject: payload.subject ?? report.suggestedSubject,
-                suggestedChapter: payload.chapter ?? report.suggestedChapter,
-                suggestedSection: payload.section ?? report.suggestedSection,
-                appliedAt: payload.appliedAt ?? new Date().toISOString(),
-                approvedByEmail: payload.approvedByEmail ?? user?.email ?? undefined
-              }
-            : report
-        )
-      );
-    } catch (manualApplyError) {
-      setError(manualApplyError instanceof Error ? manualApplyError.message : "人工套用失敗");
-    } finally {
-      setApprovingReportId(null);
-    }
-  }
-
-  async function handleRevokeClassificationReport(reportId: string) {
-    if (!session?.access_token) return;
-
-    try {
-      setApprovingReportId(reportId);
-      setError("");
-      const response = await fetch("/api/owner/classification-approve", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({
-          accessToken: session.access_token,
-          reportId,
-          action: "revoke"
-        })
-      });
-
-      const payload = (await response.json().catch(() => null)) as
-        | {
-            ok?: boolean;
-            message?: string;
-          }
-        | null;
-
-      if (!response.ok || !payload?.ok) {
-        throw new Error(payload?.message || "撤銷套用失敗");
-      }
-
-      setClassificationReports((current) =>
-        current.map((report) =>
-          report.id === reportId
-            ? {
-                ...report,
-                appliedAt: undefined,
-                approvedByEmail: undefined
-              }
-            : report
-        )
-      );
-    } catch (revokeError) {
-      setError(revokeError instanceof Error ? revokeError.message : "撤銷套用失敗");
-    } finally {
-      setApprovingReportId(null);
     }
   }
 
@@ -1318,7 +1131,7 @@ export default function OwnerPage() {
               <div className="flex items-center justify-between gap-3">
                 <div>
                   <h2 className="text-lg font-semibold text-ink">分類更動回報</h2>
-                  <p className="mt-2 text-sm text-slate-500">看誰回報了哪一題分類有問題，以及 AI 建議改分到哪裡。</p>
+                  <p className="mt-2 text-sm text-slate-500">同學回報後會直接依 AI 建議套用，這裡只保留追蹤紀錄。</p>
                 </div>
                 <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-700">
                   {classificationReports.length} 筆
@@ -1342,9 +1155,13 @@ export default function OwnerPage() {
                         <div className="flex flex-wrap items-center gap-2">
                           {report.appliedAt ? (
                             <span className="rounded-full bg-emerald-100 px-3 py-1 text-xs font-semibold text-emerald-800">
-                              已套用
+                              已自動套用
                             </span>
-                          ) : null}
+                          ) : (
+                            <span className="rounded-full bg-amber-100 px-3 py-1 text-xs font-semibold text-amber-800">
+                              尚未套用
+                            </span>
+                          )}
                           {report.model ? (
                             <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-700">
                               {report.model}
@@ -1378,81 +1195,6 @@ export default function OwnerPage() {
                             {report.approvedByEmail ? ` ・ ${report.approvedByEmail}` : ""}
                           </p>
                         ) : null}
-                      </div>
-                      <div className="mt-4 grid gap-3 rounded-2xl bg-white p-4 ring-1 ring-slate-200">
-                        <div className="grid gap-3 md:grid-cols-3">
-                          <label className="grid gap-1 text-sm">
-                            <span className="font-semibold text-slate-700">人工改科目</span>
-                            <select
-                              value={manualSubjectMap[report.id] ?? report.suggestedSubject ?? report.currentSubject}
-                              onChange={(event) =>
-                                setManualSubjectMap((current) => ({
-                                  ...current,
-                                  [report.id]: event.target.value as SubjectName
-                                }))
-                              }
-                              className="min-h-10 rounded-2xl border border-slate-200 bg-white px-3 py-2 text-sm text-slate-800"
-                            >
-                              {SUBJECT_OPTIONS.map((subject) => (
-                                <option key={subject} value={subject}>
-                                  {subject}
-                                </option>
-                              ))}
-                            </select>
-                          </label>
-                          <label className="grid gap-1 text-sm">
-                            <span className="font-semibold text-slate-700">人工改章節</span>
-                            <input
-                              value={manualChapterMap[report.id] ?? report.suggestedChapter ?? report.currentChapter ?? ""}
-                              onChange={(event) =>
-                                setManualChapterMap((current) => ({
-                                  ...current,
-                                  [report.id]: event.target.value
-                                }))
-                              }
-                              className="min-h-10 rounded-2xl border border-slate-200 bg-white px-3 py-2 text-sm text-slate-800"
-                            />
-                          </label>
-                          <label className="grid gap-1 text-sm">
-                            <span className="font-semibold text-slate-700">人工改小節</span>
-                            <input
-                              value={manualSectionMap[report.id] ?? report.suggestedSection ?? report.currentSection ?? ""}
-                              onChange={(event) =>
-                                setManualSectionMap((current) => ({
-                                  ...current,
-                                  [report.id]: event.target.value
-                                }))
-                              }
-                              className="min-h-10 rounded-2xl border border-slate-200 bg-white px-3 py-2 text-sm text-slate-800"
-                            />
-                          </label>
-                        </div>
-                        <div className="flex flex-wrap justify-end gap-3">
-                          <button
-                            type="button"
-                            onClick={() => void handleApproveClassificationReport(report.id)}
-                            disabled={approvingReportId === report.id}
-                            className="min-h-10 rounded-2xl bg-slate-900 px-4 py-2 text-sm font-semibold text-white transition hover:bg-black disabled:cursor-not-allowed disabled:bg-slate-300"
-                          >
-                            {approvingReportId === report.id ? "套用中..." : "套用 AI 建議"}
-                          </button>
-                          <button
-                            type="button"
-                            onClick={() => void handleManualApplyClassificationReport(report.id)}
-                            disabled={approvingReportId === report.id}
-                            className="min-h-10 rounded-2xl bg-brand-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-brand-700 disabled:cursor-not-allowed disabled:bg-slate-300"
-                          >
-                            {approvingReportId === report.id ? "套用中..." : "人工改後套用"}
-                          </button>
-                          <button
-                            type="button"
-                            onClick={() => void handleRevokeClassificationReport(report.id)}
-                            disabled={!report.appliedAt || approvingReportId === report.id}
-                            className="min-h-10 rounded-2xl bg-rose-100 px-4 py-2 text-sm font-semibold text-rose-800 transition hover:bg-rose-200 disabled:cursor-not-allowed disabled:opacity-50"
-                          >
-                            撤銷這次套用
-                          </button>
-                        </div>
                       </div>
                     </article>
                   ))

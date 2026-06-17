@@ -3,6 +3,10 @@ import { createClient } from "@supabase/supabase-js";
 import { createOpenAIText, isOpenAIConfigured } from "@/lib/openai";
 import { getActiveAIAccountBan } from "@/lib/aiAccountBan";
 import { isSupabaseRecoveryMode } from "@/lib/supabase/recoveryMode";
+import {
+  AUTO_CLASSIFICATION_APPROVER,
+  autoApplyQuestionClassification
+} from "@/lib/questionClassificationAutoApply";
 
 type ClassificationReportRequestBody = {
   visitorId?: string;
@@ -414,8 +418,21 @@ export async function POST(request: NextRequest) {
       visitor_id: visitorId
     };
 
-    const { error } = await supabase.from("question_classification_reports").insert(insertPayload);
+    const { data: insertedReport, error } = await supabase
+      .from("question_classification_reports")
+      .insert(insertPayload)
+      .select("id")
+      .single();
     if (error) throw error;
+
+    const autoApplied = await autoApplyQuestionClassification(supabase, {
+      reportId: insertedReport.id,
+      questionId: question.id,
+      subject: insertPayload.suggested_subject,
+      chapter: insertPayload.suggested_chapter,
+      section: insertPayload.suggested_section,
+      approvedBy: AUTO_CLASSIFICATION_APPROVER
+    });
 
     await insertUsageLog(supabase, {
       rate_key: `ai-classification:${verifiedUser.email.trim().toLowerCase()}`,
@@ -434,7 +451,10 @@ export async function POST(request: NextRequest) {
       suggestedSubject: insertPayload.suggested_subject,
       suggestedChapter: insertPayload.suggested_chapter,
       suggestedSection: insertPayload.suggested_section,
-      reason: insertPayload.reason
+      reason: insertPayload.reason,
+      appliedAt: autoApplied.appliedAt,
+      approvedByEmail: autoApplied.approvedByEmail,
+      message: "已回報並依 AI 建議自動套用分類。"
     });
   } catch (error) {
     return NextResponse.json(

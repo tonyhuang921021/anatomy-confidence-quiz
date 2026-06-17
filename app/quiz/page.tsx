@@ -1229,9 +1229,11 @@ export default function QuizPage() {
 
       setClassificationReportMessageMap((current) => ({
         ...current,
-        [question.id]: payload.suggestedSubject
-          ? `已回報，AI 建議改分到 ${payload.suggestedSubject}。`
-          : "已回報，AI 會重新判讀這題分類。"
+        [question.id]:
+          payload.message ||
+          (payload.suggestedSubject
+            ? `已回報並自動套用到 ${payload.suggestedSubject}。`
+            : "已回報並依 AI 建議自動套用分類。")
       }));
     } catch {
       setClassificationReportMessageMap((current) => ({

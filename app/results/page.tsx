@@ -316,9 +316,11 @@ function ResultsPageContent() {
 
       setClassificationReportMessageMap((current) => ({
         ...current,
-        [question.id]: suggestedPath
-          ? `已回報，AI 建議改分到 ${suggestedPath}。`
-          : "已回報，AI 已收到這題的重新分類請求。"
+        [question.id]:
+          payload.message ||
+          (suggestedPath
+            ? `已回報並自動套用到 ${suggestedPath}。`
+            : "已回報並依 AI 建議自動套用分類。")
       }));
     } catch {
       setClassificationReportMessageMap((current) => ({
