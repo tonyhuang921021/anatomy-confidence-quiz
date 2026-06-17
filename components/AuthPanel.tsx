@@ -775,12 +775,20 @@ export function AuthPanel() {
         ) : null}
         <div className="mt-5 flex flex-col gap-3 sm:flex-row">
           {canViewOwnerPage ? (
-            <Link
-              href="/owner"
-              className="secondary-pill text-center"
-            >
-              私有數據頁
-            </Link>
+            <>
+              <Link
+                href="/owner"
+                className="secondary-pill text-center"
+              >
+                私有數據頁
+              </Link>
+              <Link
+                href="/owner/parasitology-review"
+                className="secondary-pill text-center"
+              >
+                寄生蟲複習
+              </Link>
+            </>
           ) : null}
           <Link
             href="/progress"

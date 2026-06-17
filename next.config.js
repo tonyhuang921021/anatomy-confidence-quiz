@@ -1,6 +1,13 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
+  experimental: {
+    outputFileTracingIncludes: {
+      "/api/owner/parasitology-review": [
+        "./data/owner/parasitology_board_review_interactive_v2.html"
+      ]
+    }
+  },
   async headers() {
     return [
       {
