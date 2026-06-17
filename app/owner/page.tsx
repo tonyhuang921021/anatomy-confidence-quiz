@@ -10,6 +10,7 @@ import {
   OwnerExplanationUsageEntry,
   OwnerHourlyPoint,
   OpenAIBudgetStatus,
+  OwnerQuestionIssueReportEntry,
   OwnerRecentAIAccountEntry,
   OwnerYangmingExplanationReportEntry,
   OwnerYangmingModeActivationEntry,
@@ -57,6 +58,7 @@ type OwnerApiPayload = {
   recentAiAccounts?: OwnerRecentAIAccountEntry[];
   topVisitors?: OwnerTopAttemptVisitorEntry[];
   classificationReports?: OwnerClassificationReportEntry[];
+  questionIssueReports?: OwnerQuestionIssueReportEntry[];
   yangmingModeActivations?: OwnerYangmingModeActivationEntry[];
   yangmingExplanationReports?: OwnerYangmingExplanationReportEntry[];
 };
@@ -88,6 +90,34 @@ function estimateTwdFromTokens(inputTokens: number, outputTokens: number) {
 function formatUsd(value?: number) {
   if (typeof value !== "number" || !Number.isFinite(value)) return null;
   return `US$${value.toFixed(2)}`;
+}
+
+function formatQuestionIssueReportForCopy(report: OwnerQuestionIssueReportEntry) {
+  const classification = [
+    report.currentSubject,
+    report.currentChapter,
+    report.currentSection
+  ].filter(Boolean).join(" / ");
+  const optionLines = Object.entries(report.questionOptions ?? {})
+    .map(([key, value]) => `${key}. ${value}`)
+    .join("\n");
+
+  return [
+    `題號：${report.questionId}`,
+    `回報：題目有瑕疵`,
+    `目前分類：${classification || "未提供"}`,
+    `回報者：${report.reporterLabel}`,
+    `時間：${formatUpdatedAt(report.createdAt)}`,
+    "",
+    `題幹：${report.questionStem}`,
+    optionLines ? `選項：\n${optionLines}` : "",
+    report.answer ? `答案：${report.answer}` : "",
+    report.acceptedAnswers?.length ? `可接受答案：${report.acceptedAnswers.join(", ")}` : "",
+    report.testedConcept ? `考點：${report.testedConcept}` : "",
+    report.explanation ? `原詳解：${report.explanation}` : ""
+  ]
+    .filter((line) => line !== "")
+    .join("\n");
 }
 
 function TinyLineChart({
@@ -209,6 +239,7 @@ export default function OwnerPage() {
   const [yangmingExplanationReports, setYangmingExplanationReports] = useState<OwnerYangmingExplanationReportEntry[]>([]);
   const [topVisitors, setTopVisitors] = useState<OwnerTopAttemptVisitorEntry[]>([]);
   const [classificationReports, setClassificationReports] = useState<OwnerClassificationReportEntry[]>([]);
+  const [questionIssueReports, setQuestionIssueReports] = useState<OwnerQuestionIssueReportEntry[]>([]);
   const [openAIBudget, setOpenAIBudget] = useState<OpenAIBudgetStatus | null>(null);
   const [budgetInput, setBudgetInput] = useState("");
   const [budgetUsedInput, setBudgetUsedInput] = useState("");
@@ -550,6 +581,7 @@ export default function OwnerPage() {
         setYangmingExplanationReports(payload.yangmingExplanationReports ?? []);
         setTopVisitors(payload.topVisitors ?? []);
         setClassificationReports(payload.classificationReports ?? []);
+        setQuestionIssueReports(payload.questionIssueReports ?? []);
         await fetchOpenAIBudget();
       } catch (fetchError) {
         setError(fetchError instanceof Error ? fetchError.message : "數據載入失敗");
@@ -577,6 +609,7 @@ export default function OwnerPage() {
         setYangmingExplanationReports(payload.yangmingExplanationReports ?? []);
         setTopVisitors(payload.topVisitors ?? []);
         setClassificationReports(payload.classificationReports ?? []);
+        setQuestionIssueReports(payload.questionIssueReports ?? []);
         await fetchOpenAIBudget();
       } catch {
         // keep existing view
@@ -1223,6 +1256,61 @@ export default function OwnerPage() {
                     )}
                   </tbody>
                 </table>
+              </div>
+            </section>
+
+            <section className="rounded-[2rem] bg-white p-6 shadow-card ring-1 ring-slate-100">
+              <div className="flex items-center justify-between gap-3">
+                <div>
+                  <h2 className="text-lg font-semibold text-ink">題目瑕疵回報</h2>
+                  <p className="mt-2 text-sm text-slate-500">同學回報題幹、選項、答案或圖片疑似有問題的題目，這裡整理成可直接複製的格式。</p>
+                </div>
+                <span className="rounded-full bg-amber-50 px-3 py-1 text-xs font-semibold text-amber-800 ring-1 ring-amber-100">
+                  {questionIssueReports.length} 筆
+                </span>
+              </div>
+              <div className="mt-4 grid gap-3">
+                {questionIssueReports.length === 0 ? (
+                  <div className="rounded-2xl bg-slate-50 p-4 text-sm text-slate-500">
+                    目前還沒有題目瑕疵回報。
+                  </div>
+                ) : (
+                  questionIssueReports.map((report) => (
+                    <article key={report.id} className="rounded-3xl border border-amber-100 bg-amber-50/40 p-4">
+                      <div className="flex flex-wrap items-start justify-between gap-3">
+                        <div className="min-w-0">
+                          <p className="break-words text-sm font-semibold text-ink">{report.questionId}</p>
+                          <p className="mt-1 text-xs text-slate-500">
+                            回報者：{report.reporterLabel} ・ {formatUpdatedAt(report.createdAt)}
+                          </p>
+                        </div>
+                        <span className="rounded-full bg-white px-3 py-1 text-xs font-semibold text-amber-800 ring-1 ring-amber-100">
+                          題目有瑕疵
+                        </span>
+                      </div>
+                      <div className="mt-3 grid gap-2 text-sm text-slate-700">
+                        <p>
+                          <span className="font-semibold">目前分類：</span>
+                          {report.currentSubject ?? "未提供"}
+                          {report.currentChapter ? ` / ${report.currentChapter}` : ""}
+                          {report.currentSection ? ` / ${report.currentSection}` : ""}
+                        </p>
+                        <p className="line-clamp-2 break-words">
+                          <span className="font-semibold">題幹：</span>
+                          {report.questionStem}
+                        </p>
+                      </div>
+                      <details className="mt-3 rounded-2xl bg-white p-3 ring-1 ring-amber-100">
+                        <summary className="cursor-pointer select-none text-xs font-semibold text-amber-800">
+                          展開可複製內容
+                        </summary>
+                        <pre className="mt-3 max-h-72 overflow-auto whitespace-pre-wrap break-words rounded-xl bg-slate-950 p-3 text-xs leading-6 text-slate-50 [overflow-wrap:anywhere]">
+                          {formatQuestionIssueReportForCopy(report)}
+                        </pre>
+                      </details>
+                    </article>
+                  ))
+                )}
               </div>
             </section>
 

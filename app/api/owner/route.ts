@@ -6,6 +6,7 @@ import type {
   OwnerDashboardStats,
   OwnerExplanationUsageEntry,
   OwnerHourlyPoint,
+  OwnerQuestionIssueReportEntry,
   OwnerRecentAIAccountEntry,
   OwnerYangmingExplanationReportEntry,
   OwnerYangmingModeActivationEntry,
@@ -73,6 +74,24 @@ type ClassificationReportRow = {
   created_at: string;
   applied_at?: string | null;
   approved_by_email?: string | null;
+};
+
+type QuestionIssueReportRow = {
+  id: string | number;
+  question_id: string;
+  issue_type?: string | null;
+  current_subject?: string | null;
+  current_chapter?: string | null;
+  current_section?: string | null;
+  question_stem: string;
+  question_options?: Record<string, string> | null;
+  answer?: string | null;
+  accepted_answers?: string[] | null;
+  explanation?: string | null;
+  tested_concept?: string | null;
+  reporter_email?: string | null;
+  visitor_id?: string | null;
+  created_at: string;
 };
 
 type YangmingModeActivationRow = {
@@ -596,6 +615,46 @@ async function fetchOwnerClassificationReports(
   }));
 }
 
+async function fetchOwnerQuestionIssueReports(
+  supabase: any,
+  limit = 80
+): Promise<OwnerQuestionIssueReportEntry[]> {
+  const { data, error } = await supabase
+    .from("question_issue_reports")
+    .select(
+      "id, question_id, issue_type, current_subject, current_chapter, current_section, question_stem, question_options, answer, accepted_answers, explanation, tested_concept, reporter_email, visitor_id, created_at"
+    )
+    .order("created_at", { ascending: false })
+    .limit(limit);
+
+  if (error) {
+    const message = String(error.message ?? "");
+    if (message.includes("question_issue_reports") && (message.includes("does not exist") || message.includes("Could not find"))) {
+      return [];
+    }
+    throw error;
+  }
+
+  return ((data ?? []) as QuestionIssueReportRow[]).map((row) => ({
+    id: String(row.id),
+    questionId: row.question_id,
+    issueType: row.issue_type === "question_defect" ? "question_defect" : "question_defect",
+    currentSubject: row.current_subject ?? undefined,
+    currentChapter: row.current_chapter ?? undefined,
+    currentSection: row.current_section ?? undefined,
+    questionStem: row.question_stem,
+    questionOptions: row.question_options ?? undefined,
+    answer: row.answer ?? undefined,
+    acceptedAnswers: row.accepted_answers ?? undefined,
+    explanation: row.explanation ?? undefined,
+    testedConcept: row.tested_concept ?? undefined,
+    reporterLabel: row.reporter_email?.trim() || formatVisitorLabel(row.visitor_id),
+    reporterEmail: row.reporter_email ?? undefined,
+    visitorId: row.visitor_id ?? undefined,
+    createdAt: row.created_at
+  }));
+}
+
 async function fetchOwnerYangmingModeActivations(
   supabase: any,
   limit = 80
@@ -716,6 +775,7 @@ export async function POST(request: NextRequest) {
       searchUsage,
       topVisitors,
       classificationReports,
+      questionIssueReports,
       recentAiAccounts,
       yangmingModeActivations,
       yangmingExplanationReports
@@ -727,6 +787,7 @@ export async function POST(request: NextRequest) {
         fetchOwnerExplanationUsage(supabase, "search"),
         fetchOwnerTopAttemptVisitors(supabase, 5),
         fetchOwnerClassificationReports(supabase, 40),
+        fetchOwnerQuestionIssueReports(supabase, 80),
         fetchRecentAIAccounts(supabase),
         fetchOwnerYangmingModeActivations(supabase, 80),
         fetchOwnerYangmingExplanationReports(supabase, 80)
@@ -749,6 +810,7 @@ export async function POST(request: NextRequest) {
       searchUsage,
       topVisitors,
       classificationReports,
+      questionIssueReports,
       recentAiAccounts,
       yangmingModeActivations,
       yangmingExplanationReports

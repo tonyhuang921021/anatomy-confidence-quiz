@@ -1174,6 +1174,49 @@ alter table public.question_classification_reports
 alter table public.question_classification_reports
   add column if not exists approved_by_email text;
 
+create table if not exists public.question_issue_reports (
+  id bigint generated always as identity primary key,
+  question_id text not null,
+  issue_type text not null default 'question_defect',
+  current_subject text,
+  current_chapter text,
+  current_section text,
+  question_stem text not null,
+  question_options jsonb not null default '{}'::jsonb,
+  answer text,
+  accepted_answers text[] not null default '{}'::text[],
+  explanation text,
+  tested_concept text,
+  reporter_email text,
+  user_id uuid references auth.users (id) on delete set null,
+  visitor_id text,
+  created_at timestamptz not null default now()
+);
+
+create index if not exists question_issue_reports_created_at_idx
+on public.question_issue_reports (created_at desc);
+
+create index if not exists question_issue_reports_question_id_idx
+on public.question_issue_reports (question_id);
+
+create index if not exists question_issue_reports_user_id_created_at_idx
+on public.question_issue_reports (user_id, created_at desc);
+
+grant select, insert, update, delete
+  on public.question_issue_reports
+  to service_role;
+
+alter table public.question_issue_reports enable row level security;
+
+drop policy if exists "Service role can manage question issue reports" on public.question_issue_reports;
+
+create policy "Service role can manage question issue reports"
+on public.question_issue_reports
+for all
+to service_role
+using (true)
+with check (true);
+
 create table if not exists public.question_classification_overrides (
   question_id text primary key,
   subject text not null,

@@ -458,6 +458,25 @@ export type OwnerClassificationReportEntry = {
   approvedByEmail?: string;
 };
 
+export type OwnerQuestionIssueReportEntry = {
+  id: string;
+  questionId: string;
+  issueType: "question_defect";
+  currentSubject?: string;
+  currentChapter?: string;
+  currentSection?: string;
+  questionStem: string;
+  questionOptions?: Record<string, string>;
+  answer?: string;
+  acceptedAnswers?: string[];
+  explanation?: string;
+  testedConcept?: string;
+  reporterLabel: string;
+  reporterEmail?: string;
+  visitorId?: string;
+  createdAt: string;
+};
+
 export type OwnerYangmingModeActivationEntry = {
   label: string;
   userEmail?: string;

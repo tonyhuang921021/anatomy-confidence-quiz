@@ -34,6 +34,7 @@ import {
   buildRelatedQuestionContext,
   findPreviousQuestionForContinuation
 } from "@/lib/questionContext";
+import { submitQuestionIssueReport } from "@/lib/questionIssueReport";
 import {
   isTrackSubject,
   questionMatchesSubjectTracks,
@@ -437,6 +438,7 @@ export default function QuizPage() {
   const [explanationLoadingMap, setExplanationLoadingMap] = useState<Record<string, boolean>>({});
   const [explanationErrorMap, setExplanationErrorMap] = useState<Record<string, string>>({});
   const [classificationReportLoadingMap, setClassificationReportLoadingMap] = useState<Record<string, boolean>>({});
+  const [questionIssueReportLoadingMap, setQuestionIssueReportLoadingMap] = useState<Record<string, boolean>>({});
   const [classificationReportMessageMap, setClassificationReportMessageMap] = useState<Record<string, string>>({});
   const [isSubmittingAnswer, setIsSubmittingAnswer] = useState(false);
   const [isPeakPrefetching, setIsPeakPrefetching] = useState(false);
@@ -1241,6 +1243,34 @@ export default function QuizPage() {
     }
   }
 
+  async function handleReportQuestionIssue(question: Question) {
+    if (!authSession?.access_token) {
+      setClassificationReportMessageMap((current) => ({
+        ...current,
+        [question.id]: "請先登入帳號，才能回報此題題目有瑕疵。"
+      }));
+      return;
+    }
+
+    setQuestionIssueReportLoadingMap((current) => ({ ...current, [question.id]: true }));
+    setClassificationReportMessageMap((current) => ({ ...current, [question.id]: "" }));
+
+    try {
+      const payload = await submitQuestionIssueReport(question, authSession.access_token);
+      setClassificationReportMessageMap((current) => ({
+        ...current,
+        [question.id]: payload.message ?? "已回報題目瑕疵，站長會在私有數據頁整理。"
+      }));
+    } catch (error) {
+      setClassificationReportMessageMap((current) => ({
+        ...current,
+        [question.id]: error instanceof Error ? error.message : "題目瑕疵回報送出失敗。"
+      }));
+    } finally {
+      setQuestionIssueReportLoadingMap((current) => ({ ...current, [question.id]: false }));
+    }
+  }
+
   function resetQuestionUI() {
     setSubmittedAttempt(null);
     setSelectedAnswer(undefined);
@@ -1462,6 +1492,7 @@ export default function QuizPage() {
   const currentExplanationLoading = explanationLoadingMap[currentQuestion.id];
   const currentExplanationError = explanationErrorMap[currentQuestion.id];
   const currentClassificationReportLoading = classificationReportLoadingMap[currentQuestion.id];
+  const currentQuestionIssueReportLoading = questionIssueReportLoadingMap[currentQuestion.id];
   const currentClassificationReportMessage = classificationReportMessageMap[currentQuestion.id];
   const shouldShowAiExplanationDetails = shouldShowExplanation;
   const specialScoringNote =
@@ -1709,10 +1740,18 @@ export default function QuizPage() {
                       <button
                         type="button"
                         onClick={() => void handleReportClassification(currentQuestion)}
-                        disabled={currentClassificationReportLoading}
+                        disabled={currentClassificationReportLoading || currentQuestionIssueReportLoading}
                         className="min-h-10 rounded-2xl bg-slate-100 px-4 py-2 text-sm font-semibold text-slate-800 transition hover:bg-slate-200 disabled:cursor-wait disabled:opacity-60"
                       >
                         {currentClassificationReportLoading ? "回報中..." : "回報此題分類錯誤"}
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => void handleReportQuestionIssue(currentQuestion)}
+                        disabled={currentQuestionIssueReportLoading || currentClassificationReportLoading}
+                        className="min-h-10 rounded-2xl bg-amber-50 px-4 py-2 text-sm font-semibold text-amber-900 ring-1 ring-amber-100 transition hover:bg-amber-100 disabled:cursor-wait disabled:opacity-60"
+                      >
+                        {currentQuestionIssueReportLoading ? "回報中..." : "回報此題題目有瑕疵"}
                       </button>
                     </div>
                     {currentExplanationError ? (
