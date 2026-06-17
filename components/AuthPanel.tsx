@@ -788,6 +788,12 @@ export function AuthPanel() {
               >
                 寄生蟲複習
               </Link>
+              <Link
+                href="/owner/bacteria-review"
+                className="secondary-pill text-center"
+              >
+                細菌複習
+              </Link>
             </>
           ) : null}
           <Link

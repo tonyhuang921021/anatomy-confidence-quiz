@@ -5,6 +5,9 @@ const nextConfig = {
     outputFileTracingIncludes: {
       "/api/owner/parasitology-review": [
         "./data/owner/parasitology_board_review_interactive_v2.html"
+      ],
+      "/api/owner/bacteria-review": [
+        "./data/owner/bacteria_board_review_interactive_v2.html"
       ]
     }
   },
