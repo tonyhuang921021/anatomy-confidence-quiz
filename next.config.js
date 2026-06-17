@@ -8,6 +8,9 @@ const nextConfig = {
       ],
       "/api/owner/bacteria-review": [
         "./data/owner/bacteria_board_review_interactive_v2.html"
+      ],
+      "/api/owner/virus-review": [
+        "./data/owner/virus_board_review_interactive_v1.html"
       ]
     }
   },

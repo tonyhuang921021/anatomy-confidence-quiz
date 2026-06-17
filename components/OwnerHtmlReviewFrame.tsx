@@ -10,6 +10,63 @@ type OwnerHtmlReviewFrameProps = {
   errorFallback: string;
 };
 
+const OWNER_REVIEW_VIEWPORT_FIX = `
+<style id="owner-review-viewport-fix">
+  html,
+  body {
+    min-height: 100%;
+  }
+
+  #popover {
+    max-height: min(55vh, 420px);
+    overflow-y: auto;
+    overscroll-behavior: contain;
+  }
+
+  @media (max-width: 700px) {
+    #popover {
+      position: fixed !important;
+      left: max(12px, env(safe-area-inset-left)) !important;
+      right: max(12px, env(safe-area-inset-right)) !important;
+      top: 50% !important;
+      bottom: auto !important;
+      max-width: none !important;
+      max-height: min(70dvh, 520px) !important;
+      transform: translateY(-50%) !important;
+      overflow-y: auto !important;
+      z-index: 2147483000 !important;
+    }
+
+    .modal-backdrop {
+      padding: max(8px, env(safe-area-inset-top)) 8px max(12px, env(safe-area-inset-bottom)) !important;
+      overflow-y: auto !important;
+    }
+
+    .modal,
+    dialog#bugModal {
+      max-height: calc(100dvh - 24px) !important;
+      overflow-y: auto !important;
+    }
+
+    .modal {
+      margin: 0 auto !important;
+    }
+
+    dialog#bugModal {
+      margin: 12px auto !important;
+    }
+  }
+</style>
+`;
+
+function applyOwnerReviewViewportFix(html: string) {
+  if (html.includes("owner-review-viewport-fix")) return html;
+  if (html.includes("</head>")) {
+    return html.replace("</head>", `${OWNER_REVIEW_VIEWPORT_FIX}</head>`);
+  }
+  return `${OWNER_REVIEW_VIEWPORT_FIX}${html}`;
+}
+
 function getAllowedEmails() {
   const raw = process.env.NEXT_PUBLIC_ADMIN_EMAILS ?? "";
   return raw
@@ -25,7 +82,7 @@ function isAllowedEmail(email?: string | null) {
 
 function FullPageMessage({ children }: { children: string }) {
   return (
-    <main className="flex min-h-[calc(100vh-3.5rem)] items-center justify-center bg-white p-6 text-center text-sm font-semibold text-slate-600">
+    <main className="flex min-h-screen items-center justify-center bg-white p-6 text-center text-sm font-semibold text-slate-600">
       {children}
     </main>
   );
@@ -67,7 +124,7 @@ export function OwnerHtmlReviewFrame({
           throw new Error(payload.message || errorFallback);
         }
 
-        setHtml(text);
+        setHtml(applyOwnerReviewViewportFix(text));
       } catch (loadError) {
         setError(loadError instanceof Error ? loadError.message : errorFallback);
       } finally {
@@ -103,12 +160,13 @@ export function OwnerHtmlReviewFrame({
   }
 
   return (
-    <main className="min-h-[calc(100vh-3.5rem)] bg-white">
+    <main className="min-h-screen bg-white">
       <iframe
         title={title}
         srcDoc={html}
         sandbox="allow-forms allow-modals allow-scripts"
-        className="block h-[calc(100vh-3.5rem)] min-h-[720px] w-full border-0 bg-white"
+        className="block h-screen w-full border-0 bg-white"
+        style={{ height: "100dvh" }}
       />
     </main>
   );

@@ -794,6 +794,12 @@ export function AuthPanel() {
               >
                 細菌複習
               </Link>
+              <Link
+                href="/owner/virus-review"
+                className="secondary-pill text-center"
+              >
+                病毒複習
+              </Link>
             </>
           ) : null}
           <Link

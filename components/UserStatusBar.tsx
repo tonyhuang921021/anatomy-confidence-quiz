@@ -1,16 +1,26 @@
 "use client";
 
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { useAuth } from "@/components/AuthProvider";
 
 export function UserStatusBar() {
+  const pathname = usePathname();
   const { configured, loading, user, syncStatus, syncError } = useAuth();
+  const isOwnerReviewPage =
+    pathname === "/owner/parasitology-review" ||
+    pathname === "/owner/bacteria-review" ||
+    pathname === "/owner/virus-review";
   const syncLabel =
     syncStatus === "syncing"
       ? "雲端同步中"
       : syncError
         ? "本機可用"
         : "已同步";
+
+  if (isOwnerReviewPage) {
+    return null;
+  }
 
   return (
     <div className="topbar-shell sticky top-0 z-50 backdrop-blur-xl">
