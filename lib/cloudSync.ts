@@ -152,6 +152,10 @@ type AIExplanationUsageLogRow = {
   used_at: string;
 };
 
+type SharedQuestionExplanationSyncResult = {
+  syncedCount: number;
+};
+
 export type CommunityRecentAttemptPoint = {
   date: string;
   attempts: number;
@@ -171,6 +175,9 @@ const STATS_SYNC_ATTEMPT_BATCH_SIZE = 200;
 const CLOUD_SESSION_LOOKUP_TIMEOUT_MS = 3500;
 const FEEDBACK_REQUEST_TIMEOUT_MS = 10000;
 const FEEDBACK_SESSION_TIMEOUT_MS = 2500;
+const QUESTION_EXPLANATION_SYNC_IN_FLIGHT_MS = 20_000;
+const QUESTION_EXPLANATION_SYNC_COOLDOWN_MS = 60_000;
+const QUESTION_EXPLANATION_SYNC_MARKER_PREFIX = "questionExplanationSync:";
 
 type CurrentSessionSyncState = {
   lastSyncedAt: number;
@@ -181,6 +188,11 @@ type CurrentSessionSyncState = {
 };
 
 const currentSessionSyncState = new Map<string, CurrentSessionSyncState>();
+const sharedQuestionExplanationSyncsInFlight = new Map<
+  string,
+  Promise<SharedQuestionExplanationSyncResult>
+>();
+const recentSharedQuestionExplanationSyncs = new Map<string, number>();
 
 function normalizeAttemptSessionId(sessionId: string) {
   return getCanonicalSessionId(sessionId);
@@ -263,6 +275,109 @@ async function fetchWithClientTimeout(
   } finally {
     if (timeoutId) clearTimeout(timeoutId);
   }
+}
+
+function hashText(value: string) {
+  let hash = 5381;
+  for (let index = 0; index < value.length; index += 1) {
+    hash = (hash * 33) ^ value.charCodeAt(index);
+  }
+  return (hash >>> 0).toString(36);
+}
+
+function getQuestionExplanationSyncSignature(
+  overrides: Array<{
+    questionId: string;
+    explanation: string;
+    optionAnalysis: Record<string, string>;
+    memoryTip: string;
+    model: string;
+    updatedAt?: string;
+  }>
+) {
+  return hashText(
+    overrides
+      .map((item) => {
+        const optionSignature = Object.entries(item.optionAnalysis)
+          .sort(([left], [right]) => left.localeCompare(right))
+          .map(([key, value]) => `${key}:${value.length}`)
+          .join(",");
+        return [
+          item.questionId,
+          item.updatedAt ?? "",
+          item.model,
+          item.explanation.length,
+          item.memoryTip.length,
+          optionSignature
+        ].join("|");
+      })
+      .sort()
+      .join("::")
+  );
+}
+
+function getQuestionExplanationSyncMarkerKey(signature: string) {
+  return `${QUESTION_EXPLANATION_SYNC_MARKER_PREFIX}${signature}`;
+}
+
+function readQuestionExplanationSyncMarker(signature: string) {
+  if (typeof window === "undefined") return null;
+  try {
+    const raw = window.localStorage.getItem(getQuestionExplanationSyncMarkerKey(signature));
+    if (!raw) return null;
+    const parsed = JSON.parse(raw) as {
+      startedAt?: number;
+      completedAt?: number;
+    };
+    return parsed;
+  } catch {
+    return null;
+  }
+}
+
+function writeQuestionExplanationSyncMarker(
+  signature: string,
+  marker: { startedAt?: number; completedAt?: number }
+) {
+  if (typeof window === "undefined") return;
+  try {
+    window.localStorage.setItem(
+      getQuestionExplanationSyncMarkerKey(signature),
+      JSON.stringify(marker)
+    );
+  } catch {
+    // localStorage is best-effort; in-memory dedupe still applies.
+  }
+}
+
+function clearQuestionExplanationSyncMarker(signature: string) {
+  if (typeof window === "undefined") return;
+  try {
+    window.localStorage.removeItem(getQuestionExplanationSyncMarkerKey(signature));
+  } catch {
+    // ignore storage cleanup failures
+  }
+}
+
+function shouldSkipRecentQuestionExplanationSync(signature: string, now: number) {
+  const recentSyncedAt = recentSharedQuestionExplanationSyncs.get(signature);
+  if (recentSyncedAt && now - recentSyncedAt < QUESTION_EXPLANATION_SYNC_COOLDOWN_MS) {
+    return true;
+  }
+
+  const marker = readQuestionExplanationSyncMarker(signature);
+  if (!marker) return false;
+
+  if (
+    marker.completedAt &&
+    now - marker.completedAt < QUESTION_EXPLANATION_SYNC_COOLDOWN_MS
+  ) {
+    return true;
+  }
+
+  return Boolean(
+    marker.startedAt && now - marker.startedAt < QUESTION_EXPLANATION_SYNC_IN_FLIGHT_MS
+  );
 }
 
 async function getFeedbackAccessToken(user?: Pick<User, "id" | "email" | "user_metadata"> | null) {
@@ -1739,7 +1854,7 @@ export async function syncSharedQuestionExplanationOverrides(
     override: QuestionExplanationOverride;
   }>,
   accessToken?: string | null
-) {
+): Promise<SharedQuestionExplanationSyncResult> {
   if (isSupabaseRecoveryMode()) {
     return { syncedCount: 0 };
   }
@@ -1747,39 +1862,83 @@ export async function syncSharedQuestionExplanationOverrides(
     return { syncedCount: 0 };
   }
 
-  const response = await fetch("/api/question-explanation", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json"
-    },
-    body: JSON.stringify({
-      action: "sync_overrides",
-      accessToken,
-      overrides: overrides.map(({ questionId, override }) => ({
-        questionId,
-        explanation: override.explanation,
-        optionAnalysis: override.optionAnalysis ?? {},
-        memoryTip: override.memoryTip ?? "",
-        model: override.model ?? "gpt-5.4-mini",
-        updatedAt: override.updatedAt
-      }))
-    })
-  });
+  const normalizedOverrides = overrides
+    .map(({ questionId, override }) => ({
+      questionId: questionId.trim(),
+      explanation: override.explanation,
+      optionAnalysis: override.optionAnalysis ?? {},
+      memoryTip: override.memoryTip ?? "",
+      model: override.model ?? "gpt-5.4-mini",
+      updatedAt: override.updatedAt
+    }))
+    .filter((override) => override.questionId && override.explanation?.trim())
+    .sort((left, right) => left.questionId.localeCompare(right.questionId));
 
-  const rawText = await response.text();
-  const payload = (rawText ? JSON.parse(rawText) : null) as {
-    ok?: boolean;
-    syncedCount?: number;
-    message?: string;
-  } | null;
-
-  if (!response.ok || !payload?.ok) {
-    throw new Error(payload?.message || "共享詳解同步失敗。");
+  if (normalizedOverrides.length === 0) {
+    return { syncedCount: 0 };
   }
 
-  return {
-    syncedCount: payload.syncedCount ?? 0
-  };
+  const signature = getQuestionExplanationSyncSignature(normalizedOverrides);
+  const now = Date.now();
+  if (shouldSkipRecentQuestionExplanationSync(signature, now)) {
+    return { syncedCount: 0 };
+  }
+
+  const inFlightSync = sharedQuestionExplanationSyncsInFlight.get(signature);
+  if (inFlightSync) {
+    return inFlightSync;
+  }
+
+  writeQuestionExplanationSyncMarker(signature, { startedAt: now });
+
+  const syncTask = (async () => {
+    const response = await fetch("/api/question-explanation", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        action: "sync_overrides",
+        accessToken,
+        overrides: normalizedOverrides.map((override) => ({
+          questionId: override.questionId,
+          explanation: override.explanation,
+          optionAnalysis: override.optionAnalysis,
+          memoryTip: override.memoryTip,
+          model: override.model,
+          updatedAt: override.updatedAt
+        }))
+      })
+    });
+
+    const rawText = await response.text();
+    const payload = (rawText ? JSON.parse(rawText) : null) as {
+      ok?: boolean;
+      syncedCount?: number;
+      message?: string;
+    } | null;
+
+    if (!response.ok || !payload?.ok) {
+      clearQuestionExplanationSyncMarker(signature);
+      throw new Error(payload?.message || "共享詳解同步失敗。");
+    }
+
+    const completedAt = Date.now();
+    recentSharedQuestionExplanationSyncs.set(signature, completedAt);
+    writeQuestionExplanationSyncMarker(signature, { completedAt });
+
+    return {
+      syncedCount: payload.syncedCount ?? 0
+    };
+  })();
+
+  sharedQuestionExplanationSyncsInFlight.set(signature, syncTask);
+
+  try {
+    return await syncTask;
+  } finally {
+    sharedQuestionExplanationSyncsInFlight.delete(signature);
+  }
 }
 
 export async function loadConfirmedQuestionClassificationOverrides(questionIds?: string[]) {

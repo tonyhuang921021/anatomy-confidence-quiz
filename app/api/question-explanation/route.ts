@@ -78,6 +78,7 @@ const AI_EXPLANATION_USAGE_PREFIX = "AI_EXPLANATION:";
 
 const HOURLY_LIMIT = 30;
 const DAILY_LIMIT = 100;
+const MAX_SYNC_OVERRIDES_PER_REQUEST = 50;
 const GPT_5_MINI_MAX_OUTPUT_TOKENS = 1600;
 const QUESTION_EXPLANATION_PROMPT_PREFIX = [
   "你是台灣醫學系國考家教，請用繁體中文寫一份好讀、精準、偏精簡的單題解析。",
@@ -103,6 +104,19 @@ const QUESTION_EXPLANATION_PROMPT_PREFIX = [
   '  "memoryTip": "簡短記憶法，沒有就留空字串"',
   "}"
 ].join("\n");
+
+function logQuestionExplanationRoute(event: {
+  action: QuestionExplanationRequestBody["action"] | "generate";
+  status: number;
+  durationMs: number;
+  questionId?: string | null;
+  overrideCount?: number;
+  syncedCount?: number;
+  hasUser?: boolean;
+  error?: string;
+}) {
+  console.info("question_explanation_route", JSON.stringify(event));
+}
 
 function isOptionKey(value: string) {
   return ["A", "B", "C", "D", "E"].includes(value);
@@ -638,9 +652,17 @@ function parseExplanationPayload(text: string): ParsedExplanationPayload | null 
 export async function POST(request: NextRequest) {
   const body = (await request.json()) as QuestionExplanationRequestBody;
   const action = body.action ?? "generate";
+  const startedAt = Date.now();
 
   if (action === "sync_override" || action === "sync_overrides") {
     if (isSupabaseRecoveryMode()) {
+      logQuestionExplanationRoute({
+        action,
+        status: 200,
+        durationMs: Date.now() - startedAt,
+        overrideCount: action === "sync_override" ? Number(Boolean(body.override)) : body.overrides?.length ?? 0,
+        syncedCount: 0
+      });
       return NextResponse.json({
         ok: true,
         configured: true,
@@ -652,6 +674,13 @@ export async function POST(request: NextRequest) {
     try {
       const userEmail = await getVerifiedUserEmail(body.accessToken);
       if (!userEmail) {
+        logQuestionExplanationRoute({
+          action,
+          status: 401,
+          durationMs: Date.now() - startedAt,
+          overrideCount: action === "sync_override" ? Number(Boolean(body.override)) : body.overrides?.length ?? 0,
+          hasUser: false
+        });
         return NextResponse.json(
           {
             ok: false,
@@ -669,7 +698,34 @@ export async function POST(request: NextRequest) {
             : []
           : (body.overrides ?? []);
 
+      if (overrideList.length > MAX_SYNC_OVERRIDES_PER_REQUEST) {
+        logQuestionExplanationRoute({
+          action,
+          status: 413,
+          durationMs: Date.now() - startedAt,
+          overrideCount: overrideList.length,
+          hasUser: true,
+          error: "sync_override_batch_too_large"
+        });
+        return NextResponse.json(
+          {
+            ok: false,
+            configured: true,
+            message: `一次最多同步 ${MAX_SYNC_OVERRIDES_PER_REQUEST} 筆共享詳解，請稍後再試。`
+          },
+          { status: 413 }
+        );
+      }
+
       const syncedCount = await syncSharedExplanationOverrides(overrideList, body.accessToken);
+      logQuestionExplanationRoute({
+        action,
+        status: 200,
+        durationMs: Date.now() - startedAt,
+        overrideCount: overrideList.length,
+        syncedCount,
+        hasUser: true
+      });
 
       return NextResponse.json({
         ok: true,
@@ -677,6 +733,13 @@ export async function POST(request: NextRequest) {
         syncedCount
       });
     } catch (error) {
+      logQuestionExplanationRoute({
+        action,
+        status: 500,
+        durationMs: Date.now() - startedAt,
+        overrideCount: action === "sync_override" ? Number(Boolean(body.override)) : body.overrides?.length ?? 0,
+        error: formatUnknownError(error)
+      });
       return NextResponse.json(
         {
           ok: false,
@@ -689,6 +752,13 @@ export async function POST(request: NextRequest) {
   }
 
   if (!body.question?.stem || !body.question?.answer) {
+    logQuestionExplanationRoute({
+      action,
+      status: 400,
+      durationMs: Date.now() - startedAt,
+      questionId: body.question?.id ?? null,
+      error: "missing_question_payload"
+    });
     return NextResponse.json(
       { ok: false, message: "題目資料不足，無法產生單題詳解。" },
       { status: 400 }
@@ -696,6 +766,13 @@ export async function POST(request: NextRequest) {
   }
 
   if (!isOpenAIConfigured()) {
+    logQuestionExplanationRoute({
+      action,
+      status: 503,
+      durationMs: Date.now() - startedAt,
+      questionId: body.question.id ?? null,
+      error: "openai_not_configured"
+    });
     return NextResponse.json(
       {
         ok: false,
@@ -711,6 +788,13 @@ export async function POST(request: NextRequest) {
     const visitorId = body.visitorId?.trim() || null;
 
     if (!userEmail) {
+      logQuestionExplanationRoute({
+        action,
+        status: 401,
+        durationMs: Date.now() - startedAt,
+        questionId: body.question.id ?? null,
+        hasUser: false
+      });
       return NextResponse.json(
         {
           ok: false,
@@ -723,6 +807,14 @@ export async function POST(request: NextRequest) {
 
     const activeBan = await checkAIAccountBan(userEmail);
     if (activeBan && !isBypassEmail(userEmail)) {
+      logQuestionExplanationRoute({
+        action,
+        status: 429,
+        durationMs: Date.now() - startedAt,
+        questionId: body.question.id ?? null,
+        hasUser: true,
+        error: "ai_account_banned"
+      });
       return NextResponse.json(
         {
           ok: false,
@@ -749,6 +841,14 @@ export async function POST(request: NextRequest) {
           "message" in usageStatus && usageStatus.message
             ? usageStatus.message
             : "這個裝置暫時無法使用 AI 詳解，請稍後再試。";
+        logQuestionExplanationRoute({
+          action,
+          status: 429,
+          durationMs: Date.now() - startedAt,
+          questionId: body.question.id ?? null,
+          hasUser: true,
+          error: "usage_limited"
+        });
         return NextResponse.json(
           {
             ok: false,
@@ -772,6 +872,14 @@ export async function POST(request: NextRequest) {
     }
 
     if (!parsed?.explanation) {
+      logQuestionExplanationRoute({
+        action,
+        status: 500,
+        durationMs: Date.now() - startedAt,
+        questionId: body.question.id ?? null,
+        hasUser: true,
+        error: "invalid_ai_payload"
+      });
       return NextResponse.json(
         {
           ok: false,
@@ -801,6 +909,14 @@ export async function POST(request: NextRequest) {
       body.accessToken
     );
 
+    logQuestionExplanationRoute({
+      action,
+      status: 200,
+      durationMs: Date.now() - startedAt,
+      questionId: body.question.id ?? null,
+      hasUser: true
+    });
+
     return NextResponse.json({
       ok: true,
       configured: true,
@@ -811,6 +927,13 @@ export async function POST(request: NextRequest) {
       memoryTip: parsed.memoryTip ?? ""
     });
   } catch (error) {
+    logQuestionExplanationRoute({
+      action,
+      status: 500,
+      durationMs: Date.now() - startedAt,
+      questionId: body.question?.id ?? null,
+      error: formatUnknownError(error)
+    });
     return NextResponse.json(
       {
         ok: false,
