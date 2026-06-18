@@ -1213,7 +1213,7 @@ html[data-theme="dark"] .podium-badge-champion {
   background: transparent;
   perspective: 1600px;
   outline: none;
-  touch-action: pan-y;
+  touch-action: none;
   transform-origin: 50% 82%;
   user-select: none;
   -webkit-user-select: none;

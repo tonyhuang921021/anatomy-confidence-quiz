@@ -8,12 +8,10 @@ import { PHARMACOLOGY_FLASHCARDS } from "@/data/pharmacologyFlashcards";
 
 const REVIEW_STATS_STORAGE_KEY = "pharmacology-review-stats-v1";
 const CLOUD_SYNC_DEBOUNCE_MS = 1600;
-const DESKTOP_SWIPE_THRESHOLD = 82;
-const MIN_MOBILE_SWIPE_THRESHOLD = 34;
-const MAX_MOBILE_SWIPE_THRESHOLD = 48;
-const FAST_SWIPE_VELOCITY = 0.22;
-const SWIPE_PROJECTED_DISTANCE_MS = 150;
-const MIN_COMMITTED_DRAG = 18;
+const DESKTOP_SWIPE_THRESHOLD = 128;
+const MIN_MOBILE_SWIPE_THRESHOLD = 92;
+const MAX_MOBILE_SWIPE_THRESHOLD = 118;
+const CARD_RELEASE_RATIO = 0.32;
 const SWIPE_OUT_MS = 220;
 const MIN_REVIEW_FLOOR_RATIO = 0.18;
 
@@ -279,20 +277,26 @@ function clamp(value: number, min: number, max: number) {
 
 function getSwipeThreshold(cardWidth: number) {
   if (cardWidth < 560) {
-    return clamp(cardWidth * 0.12, MIN_MOBILE_SWIPE_THRESHOLD, MAX_MOBILE_SWIPE_THRESHOLD);
+    return clamp(cardWidth * CARD_RELEASE_RATIO, MIN_MOBILE_SWIPE_THRESHOLD, MAX_MOBILE_SWIPE_THRESHOLD);
   }
 
   return DESKTOP_SWIPE_THRESHOLD;
 }
 
-function isSwipeComplete(distance: number, elapsedMs: number, threshold: number) {
-  const absoluteDistance = Math.abs(distance);
-  const velocity = elapsedMs > 0 ? absoluteDistance / elapsedMs : 0;
-  const projectedDistance = absoluteDistance + velocity * SWIPE_PROJECTED_DISTANCE_MS;
-  const fastEnough = velocity >= FAST_SWIPE_VELOCITY && absoluteDistance >= threshold * 0.34;
-  const committedEnough = absoluteDistance >= MIN_COMMITTED_DRAG && projectedDistance >= threshold * 0.92;
+function getPointerClientX(event: PointerEvent<HTMLDivElement>) {
+  const nativeEvent = event.nativeEvent;
+  const coalescedEvents = typeof nativeEvent.getCoalescedEvents === "function" ? nativeEvent.getCoalescedEvents() : [];
+  const latestEvent = coalescedEvents.at(-1);
 
-  return absoluteDistance >= threshold || fastEnough || committedEnough;
+  return latestEvent?.clientX ?? event.clientX;
+}
+
+function getPointerClientY(event: PointerEvent<HTMLDivElement>) {
+  const nativeEvent = event.nativeEvent;
+  const coalescedEvents = typeof nativeEvent.getCoalescedEvents === "function" ? nativeEvent.getCoalescedEvents() : [];
+  const latestEvent = coalescedEvents.at(-1);
+
+  return latestEvent?.clientY ?? event.clientY;
 }
 
 async function copyText(text: string) {
@@ -323,13 +327,11 @@ export default function PharmacologyReviewPage() {
   const [isLeaving, setIsLeaving] = useState(false);
   const [swipeResult, setSwipeResult] = useState<ReviewDirection | null>(null);
   const [showWeakList, setShowWeakList] = useState(false);
-  const [cloudSyncStatus, setCloudSyncStatus] = useState<CloudSyncStatus>("idle");
+  const [, setCloudSyncStatus] = useState<CloudSyncStatus>("idle");
   const cardElementRef = useRef<HTMLDivElement | null>(null);
   const knownBadgeRef = useRef<HTMLSpanElement | null>(null);
   const unknownBadgeRef = useRef<HTMLSpanElement | null>(null);
-  const pointerStartRef = useRef<{ pointerId: number; x: number; y: number; startedAt: number; cardWidth: number } | null>(
-    null
-  );
+  const pointerStartRef = useRef<{ pointerId: number; x: number; y: number; cardWidth: number } | null>(null);
   const dragXRef = useRef(0);
   const pendingDragXRef = useRef(0);
   const dragFrameRef = useRef<number | null>(null);
@@ -340,8 +342,6 @@ export default function PharmacologyReviewPage() {
 
   const card = PHARMACOLOGY_FLASHCARDS[cardIndex] ?? PHARMACOLOGY_FLASHCARDS[0];
   const levelMeta = LEVEL_META[card.examLevel] ?? LEVEL_META.D;
-  const cardStats = getReviewStats(reviewStats, card);
-  const reviewWeight = getReviewWeight(card, cardStats);
   const sameCategoryCards = PHARMACOLOGY_FLASHCARDS.filter((item) => item.category === card.category).sort(
     (first, second) => second.drawWeight - first.drawWeight || first.name.localeCompare(second.name)
   );
@@ -538,9 +538,8 @@ export default function PharmacologyReviewPage() {
 
     pointerStartRef.current = {
       pointerId: event.pointerId,
-      x: event.clientX,
-      y: event.clientY,
-      startedAt: Date.now(),
+      x: getPointerClientX(event),
+      y: getPointerClientY(event),
       cardWidth: event.currentTarget.getBoundingClientRect().width
     };
     dragXRef.current = 0;
@@ -554,14 +553,11 @@ export default function PharmacologyReviewPage() {
     const start = pointerStartRef.current;
     if (!start || start.pointerId !== event.pointerId || isLeaving) return;
 
-    const nextDragX = event.clientX - start.x;
-    const verticalDelta = Math.abs(event.clientY - start.y);
+    const nextDragX = getPointerClientX(event) - start.x;
+    const verticalDelta = Math.abs(getPointerClientY(event) - start.y);
     const horizontalDelta = Math.abs(nextDragX);
-    const hasHorizontalIntent = horizontalDelta > 7 && horizontalDelta > verticalDelta * 0.75;
-    if (!hasHorizontalIntent && verticalDelta > 10) return;
-    if (hasHorizontalIntent) {
-      event.preventDefault();
-    }
+    const hasHorizontalIntent = horizontalDelta > 4 || horizontalDelta >= verticalDelta * 0.45;
+    if (hasHorizontalIntent) event.preventDefault();
 
     dragXRef.current = nextDragX;
     scheduleDragVisual(nextDragX);
@@ -577,7 +573,6 @@ export default function PharmacologyReviewPage() {
 
     const finalDragX = dragXRef.current;
     const threshold = getSwipeThreshold(start.cardWidth);
-    const elapsedMs = Date.now() - start.startedAt;
     if (Math.abs(finalDragX) < 9) {
       dragXRef.current = 0;
       pendingDragXRef.current = 0;
@@ -586,7 +581,7 @@ export default function PharmacologyReviewPage() {
       return;
     }
 
-    if (isSwipeComplete(finalDragX, elapsedMs, threshold)) {
+    if (Math.abs(finalDragX) >= threshold) {
       finishSwipe(finalDragX > 0 ? "unknown" : "known");
       return;
     }
@@ -631,7 +626,7 @@ export default function PharmacologyReviewPage() {
       </section>
 
       <section className="mt-6 space-y-5">
-        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="grid gap-3 sm:grid-cols-2">
           <div className="surface-card-muted p-4">
             <p className="text-xs font-black text-brand-700">左滑</p>
             <p className="mt-2 text-lg font-black text-ink">會這個藥</p>
@@ -641,18 +636,6 @@ export default function PharmacologyReviewPage() {
             <p className="text-xs font-black text-rose-700">右滑</p>
             <p className="mt-2 text-lg font-black text-ink">不會這個藥</p>
             <p className="body-soft mt-1 text-sm leading-6">提高長期機率，但剛刷過會先冷卻。</p>
-          </div>
-          <div className="surface-card-muted p-4">
-            <p className="text-xs font-black text-sky-800">目前權重</p>
-            <p className="mt-2 text-lg font-black text-ink">{reviewWeight.toFixed(1)}</p>
-            <p className="body-soft mt-1 text-sm leading-6">重要度 × 不熟次數 × 間隔冷卻。</p>
-          </div>
-          <div className="surface-card-muted p-4">
-            <p className="text-xs font-black text-amber-800">這張紀錄</p>
-            <p className="mt-2 text-lg font-black text-ink">
-              會 {cardStats.known} / 不會 {cardStats.unknown}
-            </p>
-            <p className="body-soft mt-1 text-sm leading-6">點卡翻面，看完再左右滑。</p>
           </div>
         </div>
 
@@ -673,6 +656,7 @@ export default function PharmacologyReviewPage() {
             onPointerMove={handlePointerMove}
             onPointerUp={handlePointerEnd}
             onPointerCancel={handlePointerCancel}
+            onLostPointerCapture={handlePointerEnd}
             onKeyDown={(event) => {
               if (event.key === "Enter" || event.key === " ") {
                 event.preventDefault();
@@ -706,10 +690,10 @@ export default function PharmacologyReviewPage() {
                 <span className="rounded-full bg-white/70 px-4 py-2 text-xs font-black uppercase tracking-[0.2em] text-brand-700">
                   Today's Random Drug
                 </span>
-                <span className="mt-10 block max-w-full text-center font-serif text-[clamp(2rem,11vw,4.8rem)] font-bold leading-[1.02] tracking-[-0.04em] text-ink [overflow-wrap:anywhere] sm:text-[clamp(3rem,7vw,6.2rem)]">
+                <span className="mt-10 block max-w-full text-center font-serif text-[clamp(2rem,11vw,4.8rem)] font-bold leading-[1.02] tracking-[-0.02em] text-ink [overflow-wrap:normal] [word-break:normal] sm:text-[clamp(3rem,7vw,6.2rem)]">
                   {card.name}
                 </span>
-                <span className="body-soft mt-8 block text-center text-sm font-semibold">點一下看機轉；手機短滑或快甩也能換卡</span>
+                <span className="body-soft mt-8 block text-center text-sm font-semibold">點一下看機轉；抓住卡片拖到旁邊放手</span>
                 {swipeResult ? (
                   <span className="mt-5 rounded-full bg-slate-950 px-4 py-2 text-xs font-black text-white">
                     {swipeResult === "known" ? "這張收下，換下一張" : "這張先記仇，等等再來"}
@@ -722,7 +706,7 @@ export default function PharmacologyReviewPage() {
                   <span className="flex flex-wrap items-start justify-between gap-3">
                     <span>
                       <span className="eyebrow text-[10px]">藥物</span>
-                      <span className="mt-1 block text-3xl font-black tracking-[-0.03em] text-ink [overflow-wrap:anywhere]">{card.name}</span>
+                      <span className="mt-1 block text-3xl font-black tracking-[-0.02em] text-ink [overflow-wrap:normal] [word-break:normal]">{card.name}</span>
                     </span>
                     <span className={`rounded-full border px-3 py-2 text-xs font-black ${levelMeta.className}`}>
                       {levelMeta.label}
@@ -779,36 +763,11 @@ export default function PharmacologyReviewPage() {
             </span>
           </div>
 
-          <div className="relative mt-5 flex flex-col items-center gap-3 sm:flex-row sm:justify-between">
-            <div className="grid w-full gap-2 sm:w-auto sm:grid-cols-4">
-              <span className="rounded-full bg-white/70 px-4 py-2 text-center text-xs font-black text-slate-600">
-                已看 {cardStats.seen}
-              </span>
-              <span className="rounded-full bg-emerald-50 px-4 py-2 text-center text-xs font-black text-emerald-800">
-                會 {cardStats.known}
-              </span>
-              <span className="rounded-full bg-rose-50 px-4 py-2 text-center text-xs font-black text-rose-800">
-                不會 {cardStats.unknown}
-              </span>
-              <span className="rounded-full bg-slate-50 px-4 py-2 text-center text-xs font-black text-slate-600">
-                雲端
-                {cloudSyncStatus === "syncing"
-                  ? "同步中"
-                  : cloudSyncStatus === "synced"
-                    ? "已同步"
-                    : cloudSyncStatus === "queued"
-                      ? "稍後同步"
-                      : cloudSyncStatus === "error"
-                        ? "稍後重試"
-                        : "待命"}
-              </span>
+          {copied ? (
+            <div className="mt-4 flex justify-end">
+              <div className="rounded-full bg-slate-950/86 px-4 py-2 text-xs font-bold text-white shadow-lg">已複製</div>
             </div>
-            {copied ? (
-              <div className="rounded-full bg-slate-950/86 px-4 py-2 text-xs font-bold text-white shadow-lg sm:absolute sm:right-0 sm:top-1/2 sm:-translate-y-1/2">
-                已複製
-              </div>
-            ) : null}
-          </div>
+          ) : null}
         </div>
 
         {hasRevealedClass ? (
