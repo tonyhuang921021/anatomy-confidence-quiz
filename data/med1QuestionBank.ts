@@ -877,6 +877,14 @@ med1ClassificationOverrideMap.set("MOEX-100030-2101-Q073", {
   subject: "藥理學",
   topicSection: "抗生素"
 });
+med1ClassificationOverrideMap.set("MOEX-106100-1301-Q083", {
+  subject: "生物化學",
+  topicSection: "分子生物學／lac operon"
+});
+med1ClassificationOverrideMap.set("MOEX-100140-2101-Q045", {
+  subject: "生物化學",
+  topicSection: "氨基酸代謝／苯丙酮尿症"
+});
 
 function applyClassificationOverride(question: Question): Question {
   const override = med1ClassificationOverrideMap.get(question.id);
@@ -913,6 +921,95 @@ function applyQuestionMedia(question: Question): Question {
 }
 
 const questionTextOverrides: Record<string, QuestionTextOverride> = {
+  "MOEX-100030-1101-Q050": {
+    stem:
+      "承上題：一名 60 歲患有糖尿病的農夫在夏季豪雨過後下田整理農地，三天後出現發燒和倦怠，送醫發現輕微肺炎症狀；血液檢體分離出革蘭氏陰性、不發酵糖類桿菌，最可能為類鼻疽（melioidosis）。此人所感染的致病菌在生理特徵和致病性方面與下列那種細菌最相近？",
+    explanation:
+      "前題病例指向類鼻疽菌 Burkholderia pseudomallei。B. pseudomallei 是革蘭陰性、不發酵桿菌，生物學特徵與 Pseudomonas 類群相近，因此最接近綠膿桿菌（Pseudomonas aeruginosa）。",
+    optionAnalysis: {
+      A: "不選。Haemophilus influenzae 是需 X/V factor 的小型革蘭陰性球桿菌，和類鼻疽菌的非發酵桿菌特徵不相近。",
+      B: "不選。Corynebacterium diphtheriae 是革蘭陽性桿菌，和本題病原差異很大。",
+      C: "正確。Burkholderia pseudomallei 與 Pseudomonas aeruginosa 同屬革蘭陰性、非發酵桿菌這類考點。",
+      D: "不選。Legionella pneumophila 雖可造成肺炎，但不是和類鼻疽菌最相近的非發酵桿菌代表。"
+    },
+    testedConcept: "微生物免疫學／細菌學／類鼻疽菌與非發酵革蘭陰性桿菌"
+  },
+  "MOEX-100140-2101-Q045": {
+    stem:
+      "一名 3 個月大男嬰的血清中，苯丙胺酸（phenylalanine）與苯丙酮酸（phenylpyruvate）的濃度較高。若是苯酮尿症（phenylketonuria, PKU），最可能會再出現下列那個檢驗數據？",
+    options: {
+      C: "血清中的維生素 B12 濃度偏低",
+      D: "血清中的維生素 B6 濃度偏低"
+    },
+    explanation:
+      "典型苯酮尿症是 phenylalanine hydroxylase（PAH）活性降低，導致 phenylalanine 不能有效轉成 tyrosine，phenylalanine 及 phenylpyruvate 上升。Homogentisic acid 上升是 alkaptonuria 的考點，不是 PKU。",
+    optionAnalysis: {
+      A: "正確。PAH 活性降低是典型 PKU 的核心機轉。",
+      B: "不選。Homogentisic acid 濃度偏高較符合 alkaptonuria（homogentisate oxidase 缺陷）。",
+      C: "不選。維生素 B12 偏低主要聯想到巨幼紅血球性貧血或 methylmalonic acid 上升，和典型 PKU 不符。",
+      D: "不選。維生素 B6 偏低不是典型 PKU 的主要檢驗特徵。"
+    },
+    testedConcept: "生物化學／氨基酸代謝／苯丙酮尿症"
+  },
+  "MOEX-106100-1301-Q083": {
+    stem:
+      "大腸桿菌的乳糖操縱子（lac operon）上含有 β-半乳糖苷酶（β-galactosidase）、透性酶（permease）、乙醯基轉移酶（transacetylase）基因。此外在該操縱子的上游有一調控基因 I（I gene）。請配對下列各基因（a～c）之功能：\na. 基因 I\nb. β-半乳糖苷酶\nc. 透性酶\nI. 具分解乳糖的酵素活性\nII. 為一轉送蛋白質\nIII. 基因產物可調控乳糖操縱子（lac operon）",
+    explanation:
+      "lacI（I gene）產生 repressor，可調控 lac operon，故 a 對 III；β-galactosidase 分解乳糖，故 b 對 I；permease 是乳糖進入細胞的轉運蛋白，故 c 對 II。配對為 a-III, b-I, c-II。",
+    optionAnalysis: {
+      A: "不選。I gene 不是分解乳糖的酵素；β-galactosidase 才具分解乳糖活性。",
+      B: "不選。I gene 應對調控功能 III，permease 應對轉運功能 II。",
+      C: "不選。β-galactosidase 應對分解乳糖活性 I，不是轉運蛋白。",
+      D: "正確。a-I gene 對 III，b-β-galactosidase 對 I，c-permease 對 II。"
+    },
+    testedConcept: "生物化學／分子生物學／lac operon"
+  },
+  "MOEX-115020-1301-Q031": {
+    stem: "下列何者的肌腱，不會通過跗骨隧道（tarsal tunnel）？",
+    options: {
+      C: "拇趾長屈肌（flexor hallucis longus）",
+      D: "屈趾長肌（flexor digitorum longus）"
+    },
+    explanation:
+      "跗骨隧道位於內踝後方，通過內容物可用 Tom, Dick, And Very Nervous Harry 記：tibialis posterior、flexor digitorum longus、posterior tibial artery/vein、tibial nerve、flexor hallucis longus。脛前肌腱走在踝前方，不通過跗骨隧道。",
+    optionAnalysis: {
+      A: "正確。脛前肌（tibialis anterior）位於踝前方，不通過跗骨隧道。",
+      B: "不選。脛後肌（tibialis posterior）會通過跗骨隧道。",
+      C: "不選。拇趾長屈肌（flexor hallucis longus）會通過跗骨隧道。",
+      D: "不選。屈趾長肌（flexor digitorum longus）會通過跗骨隧道。"
+    },
+    testedConcept: "解剖學／下肢／跗骨隧道內容物"
+  },
+  "MOEX-113090-1301-Q076": {
+    stem:
+      "將 Michaelis-Menten equation 轉型作成的雙倒數圖（double reciprocal plot），稱為 Lineweaver-Burk plot，其方程式：1/V₀ = Kₘ/(Vmax[S]) + 1/Vmax。由此雙倒數圖要如何求得 Kₘ？",
+    options: {
+      A: "X 軸的截距為其 Kₘ",
+      B: "X 軸截距的倒數為其 Kₘ",
+      C: "X 軸截距的倒數乘以 -1 為其 Kₘ",
+      D: "Y 軸截距的倒數乘以 -1 為其 Kₘ"
+    },
+    explanation:
+      "Lineweaver-Burk plot 中 x 軸截距為 -1/Kₘ，y 軸截距為 1/Vmax。因此 Kₘ 等於 x 軸截距取倒數後再乘以 -1。",
+    optionAnalysis: {
+      A: "不選。X 軸截距是 -1/Kₘ，不是 Kₘ 本身。",
+      B: "不選。X 軸截距的倒數是 -Kₘ，還要再乘以 -1。",
+      C: "正確。X 軸截距 = -1/Kₘ，所以其倒數乘以 -1 即為 Kₘ。",
+      D: "不選。Y 軸截距是 1/Vmax，和 Kₘ 的求法不同。"
+    },
+    testedConcept: "生物化學／酵素動力學／Lineweaver-Burk plot"
+  },
+  "MOEX-102110-2101-Q058": {
+    explanation:
+      "本題問免疫抑制劑與不良作用配對何者錯誤。Cyclosporine 的代表副作用是腎毒性、高血壓、牙齦增生與多毛；重度骨髓抑制較常聯想到 azathioprine、mycophenolate 或 sirolimus 類考點，因此 C 配對錯誤。",
+    optionAnalysis: {
+      A: "配對正確，不選。Anti-CD3 monoclonal antibody 可造成類感冒症狀、cytokine release 相關反應。",
+      B: "配對正確，不選。Corticosteroids 可造成代謝與電解質相關副作用，例如水鈉滯留、低血鉀等。",
+      C: "配對錯誤，為本題答案。Cyclosporine 典型副作用是腎毒性、高血壓、牙齦增生、多毛，不是重度骨髓抑制。",
+      D: "配對正確，不選。Azathioprine 可造成骨髓抑制。"
+    },
+    testedConcept: "藥理學／免疫藥理／免疫抑制劑副作用"
+  },
   "MOEX-103100-1101-Q055": {
     stem:
       "孕婦在懷孕期間感染下列那些病毒後，容易造成嬰兒先天性缺陷？①Cytomegalovirus ②Influenza virus ③Rubella virus ④Adenovirus",
@@ -1218,6 +1315,7 @@ export const medStage2Questions: Question[] = stage2QuestionsRaw
   .map(toStage2Question)
   .filter((question): question is Question => Boolean(question))
   .map(sanitizeQuestionText)
+  .map(applyClassificationOverride)
   .map(applyQuestionTextOverride)
   .map(applyQuestionMedia);
 
