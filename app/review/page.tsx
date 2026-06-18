@@ -176,7 +176,7 @@ export default function ReviewPage() {
     setIsFullscreenReview(true);
   }
 
-  const wrongCount = practiceItems.filter((item) => item.history.wrong > 0).length;
+  const reviewCount = practiceItems.length;
   const lowConfidenceCount = practiceItems.filter((item) => item.history.lowConfidence > 0).length;
 
   return (
@@ -202,7 +202,7 @@ export default function ReviewPage() {
               onClick={() => handleStartPracticeReview()}
               className="min-h-12 rounded-2xl bg-brand-600 px-5 py-4 text-sm font-semibold text-white transition hover:bg-brand-700"
             >
-              開始散題錯題複習
+              開始散題待複習
             </Link>
           </div>
         </div>
@@ -210,8 +210,8 @@ export default function ReviewPage() {
 
       <section className="mt-8 grid gap-4 lg:grid-cols-2">
         <article className="rounded-3xl bg-rose-50 p-5 text-rose-900">
-          <p className="text-sm font-medium">散題錯題庫</p>
-          <p className="mt-2 text-3xl font-bold">{wrongCount}</p>
+          <p className="text-sm font-medium">散題待複習題</p>
+          <p className="mt-2 text-3xl font-bold">{reviewCount}</p>
         </article>
         <article className="rounded-3xl bg-amber-50 p-5 text-amber-900">
           <p className="text-sm font-medium">散題低信心題</p>
@@ -222,9 +222,9 @@ export default function ReviewPage() {
       <div className="mt-8 grid gap-8">
         <div id="practice-review" className="scroll-mt-24">
           <ReviewNotebook
-            title="散題錯題庫"
+            title="散題待複習題庫"
             description="這裡只整理平常零散刷題累積下來的錯題與低信心題。"
-            startLabel="開始散題錯題複習"
+            startLabel="開始散題待複習"
             onStartReview={handleStartPracticeReview}
             items={practiceItems}
             allQuestions={allQuestions}
@@ -257,7 +257,7 @@ export default function ReviewPage() {
             <div className="flex items-center justify-between gap-3 border-b px-4 py-3 shadow-sm border-[color:var(--line-soft)] bg-[color:var(--surface)] backdrop-blur">
               <div>
                 <p className="text-xs font-semibold uppercase tracking-[0.18em] text-brand-700">Fullscreen Review</p>
-                <h2 className="text-lg font-bold text-ink">散題錯題庫</h2>
+                <h2 className="text-lg font-bold text-ink">散題待複習題庫</h2>
               </div>
               <button
                 type="button"
@@ -269,9 +269,9 @@ export default function ReviewPage() {
             </div>
             <div className="min-h-0 flex-1 overflow-y-auto px-0 py-0">
               <ReviewNotebook
-                title="散題錯題庫"
+                title="散題待複習題庫"
                 description="手機滿版複習模式。看完可按右上角返回頁面。"
-                startLabel="開始散題錯題複習"
+                startLabel="開始散題待複習"
                 onStartReview={handleStartPracticeReview}
                 items={practiceItems}
                 allQuestions={allQuestions}

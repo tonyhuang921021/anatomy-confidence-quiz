@@ -82,7 +82,7 @@ export default function SimulationReviewPage() {
               onClick={() => handleStartSimulationReview()}
               className="min-h-12 rounded-2xl bg-amber-500 px-5 py-4 text-sm font-semibold text-white transition hover:bg-amber-600"
             >
-              開始模擬考錯題複習
+              開始模擬考待複習
             </Link>
           </div>
         </div>
@@ -90,7 +90,7 @@ export default function SimulationReviewPage() {
 
       <section className="mt-8 grid gap-4 lg:grid-cols-2">
         <article className="rounded-3xl bg-sky-50 p-5 text-sky-900">
-          <p className="text-sm font-medium">模考錯題庫</p>
+          <p className="text-sm font-medium">模考待複習題</p>
           <p className="mt-2 text-3xl font-bold">{simulationSnapshot.total}</p>
         </article>
         <article className="rounded-3xl bg-amber-50 p-5 text-amber-900">
@@ -101,9 +101,9 @@ export default function SimulationReviewPage() {
 
       <div className="mt-8">
         <ReviewNotebook
-          title="模擬考錯題庫"
+          title="模擬考待複習題庫"
           description="這裡只整理整份模擬考做出來的錯題與低信心題。"
-          startLabel="開始模擬考錯題複習"
+          startLabel="開始模擬考待複習"
           onStartReview={handleStartSimulationReview}
           items={simulationItems}
           allQuestions={allQuestions}

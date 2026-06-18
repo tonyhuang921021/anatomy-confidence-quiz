@@ -203,7 +203,7 @@ export default function PeakChallengePage() {
       return;
     }
     if (!canEnter) {
-      setStartError(`目前散題錯題庫只有 ${practiceSnapshot.total} 題，超過 ${ENTRY_THRESHOLD} 題才能進入巔峰賽。`);
+      setStartError(`目前散題待複習題只有 ${practiceSnapshot.total} 題，超過 ${ENTRY_THRESHOLD} 題才能進入巔峰賽。`);
       return;
     }
 
@@ -277,7 +277,7 @@ export default function PeakChallengePage() {
             <p className="text-sm font-semibold uppercase tracking-[0.2em] text-brand-700">Peak Challenge</p>
             <h1 className="mt-2 text-3xl font-bold text-ink sm:text-4xl">巔峰賽模式</h1>
             <p className="mt-3 max-w-3xl text-slate-500">
-              先看榜單。只有散題錯題庫超過 25 題的挑戰者才能開局；每次答對加 1 分，答錯立刻結束。
+              先看榜單。只有散題待複習題超過 25 題的挑戰者才能開局；每次答對加 1 分，答錯立刻結束。
             </p>
             {ownerBypass ? null : attemptsRemaining !== null ? (
               <p className="mt-2 text-sm text-slate-500">今日剩餘挑戰 {attemptsRemaining} / 3 次</p>
@@ -319,7 +319,7 @@ export default function PeakChallengePage() {
 
       <section className="mt-6 grid gap-4 lg:grid-cols-2">
         <article className="rounded-3xl bg-rose-50 p-5 text-rose-900">
-          <p className="text-sm font-medium">散題錯題庫</p>
+          <p className="text-sm font-medium">散題待複習題</p>
           <p className="mt-2 text-3xl font-bold">{practiceSnapshot.total}</p>
           <p className="mt-2 text-sm">超過 {ENTRY_THRESHOLD} 題才可進入</p>
         </article>
