@@ -1217,6 +1217,73 @@ to service_role
 using (true)
 with check (true);
 
+create table if not exists public.pharmacology_review_stats (
+  user_id uuid not null references auth.users (id) on delete cascade,
+  drug_key text not null,
+  drug_name text not null,
+  category text not null,
+  known_count integer not null default 0,
+  unknown_count integer not null default 0,
+  seen_count integer not null default 0,
+  last_seen_at timestamptz,
+  updated_at timestamptz not null default now(),
+  primary key (user_id, drug_key),
+  constraint pharmacology_review_stats_known_count_check check (known_count >= 0),
+  constraint pharmacology_review_stats_unknown_count_check check (unknown_count >= 0),
+  constraint pharmacology_review_stats_seen_count_check check (seen_count >= 0)
+);
+
+create index if not exists pharmacology_review_stats_user_unknown_idx
+on public.pharmacology_review_stats (user_id, unknown_count desc, updated_at desc);
+
+grant select, insert, update, delete
+  on public.pharmacology_review_stats
+  to authenticated;
+
+grant select, insert, update, delete
+  on public.pharmacology_review_stats
+  to service_role;
+
+alter table public.pharmacology_review_stats enable row level security;
+
+drop policy if exists "Users can read their own pharmacology review stats" on public.pharmacology_review_stats;
+drop policy if exists "Users can insert their own pharmacology review stats" on public.pharmacology_review_stats;
+drop policy if exists "Users can update their own pharmacology review stats" on public.pharmacology_review_stats;
+drop policy if exists "Users can delete their own pharmacology review stats" on public.pharmacology_review_stats;
+drop policy if exists "Service role can manage pharmacology review stats" on public.pharmacology_review_stats;
+
+create policy "Users can read their own pharmacology review stats"
+on public.pharmacology_review_stats
+for select
+to authenticated
+using ((select auth.uid()) = user_id);
+
+create policy "Users can insert their own pharmacology review stats"
+on public.pharmacology_review_stats
+for insert
+to authenticated
+with check ((select auth.uid()) = user_id);
+
+create policy "Users can update their own pharmacology review stats"
+on public.pharmacology_review_stats
+for update
+to authenticated
+using ((select auth.uid()) = user_id)
+with check ((select auth.uid()) = user_id);
+
+create policy "Users can delete their own pharmacology review stats"
+on public.pharmacology_review_stats
+for delete
+to authenticated
+using ((select auth.uid()) = user_id);
+
+create policy "Service role can manage pharmacology review stats"
+on public.pharmacology_review_stats
+for all
+to service_role
+using (true)
+with check (true);
+
 create table if not exists public.question_classification_overrides (
   question_id text primary key,
   subject text not null,

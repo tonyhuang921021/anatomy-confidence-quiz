@@ -1220,10 +1220,16 @@ html[data-theme="dark"] .podium-badge-champion {
   -webkit-tap-highlight-color: transparent;
   overscroll-behavior: contain;
   will-change: transform;
+  transform: translate3d(0, 0, 0);
 }
 
 .drug-flip-card:active {
   cursor: grabbing;
+}
+
+.drug-flip-card.is-dragging {
+  cursor: grabbing;
+  touch-action: none;
 }
 
 .drug-flip-card:focus-visible {
@@ -1280,5 +1286,10 @@ html[data-theme="dark"] .podium-badge-champion {
   .drug-flip-inner,
   .drug-flip-face {
     min-height: 620px;
+  }
+
+  .drug-flip-card {
+    margin-inline: -0.25rem;
+    width: calc(100% + 0.5rem);
   }
 }

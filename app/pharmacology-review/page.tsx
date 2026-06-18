@@ -1,11 +1,13 @@
 "use client";
 
 import Link from "next/link";
-import type { CSSProperties, MouseEvent, PointerEvent } from "react";
-import { useEffect, useMemo, useRef, useState } from "react";
+import type { MouseEvent, PointerEvent } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useAuth } from "@/components/AuthProvider";
 import { PHARMACOLOGY_FLASHCARDS } from "@/data/pharmacologyFlashcards";
 
 const REVIEW_STATS_STORAGE_KEY = "pharmacology-review-stats-v1";
+const CLOUD_SYNC_DEBOUNCE_MS = 1600;
 const DESKTOP_SWIPE_THRESHOLD = 92;
 const MIN_MOBILE_SWIPE_THRESHOLD = 54;
 const MAX_MOBILE_SWIPE_THRESHOLD = 76;
@@ -20,15 +22,18 @@ type DrugReviewStats = {
   unknown: number;
   seen: number;
   lastSeenAt: number | null;
+  updatedAt: number | null;
 };
 
 type DrugReviewStatsMap = Record<string, DrugReviewStats>;
+type CloudSyncStatus = "idle" | "syncing" | "synced" | "queued" | "error";
 
 const EMPTY_REVIEW_STATS: DrugReviewStats = {
   known: 0,
   unknown: 0,
   seen: 0,
-  lastSeenAt: null
+  lastSeenAt: null,
+  updatedAt: null
 };
 
 const LEVEL_META = {
@@ -64,7 +69,19 @@ function getDrugKey(item: (typeof PHARMACOLOGY_FLASHCARDS)[number]) {
 }
 
 function getReviewStats(statsMap: DrugReviewStatsMap, item: (typeof PHARMACOLOGY_FLASHCARDS)[number]) {
-  return statsMap[getDrugKey(item)] ?? EMPTY_REVIEW_STATS;
+  return normalizeReviewStats(statsMap[getDrugKey(item)]);
+}
+
+function normalizeReviewStats(value: Partial<DrugReviewStats> | undefined): DrugReviewStats {
+  if (!value || typeof value !== "object") return EMPTY_REVIEW_STATS;
+
+  return {
+    known: Math.max(0, Math.floor(Number(value.known) || 0)),
+    unknown: Math.max(0, Math.floor(Number(value.unknown) || 0)),
+    seen: Math.max(0, Math.floor(Number(value.seen) || 0)),
+    lastSeenAt: typeof value.lastSeenAt === "number" && Number.isFinite(value.lastSeenAt) ? value.lastSeenAt : null,
+    updatedAt: typeof value.updatedAt === "number" && Number.isFinite(value.updatedAt) ? value.updatedAt : null
+  };
 }
 
 function getReviewWeight(item: (typeof PHARMACOLOGY_FLASHCARDS)[number], stats: DrugReviewStats) {
@@ -128,7 +145,7 @@ function loadReviewStats(): DrugReviewStatsMap {
     const parsed = JSON.parse(stored);
     if (!parsed || typeof parsed !== "object") return {};
 
-    return parsed as DrugReviewStatsMap;
+    return normalizeReviewStatsMap(parsed as DrugReviewStatsMap);
   } catch {
     return {};
   }
@@ -153,13 +170,105 @@ function recordReviewResult(
     known: previous.known + (direction === "known" ? 1 : 0),
     unknown: previous.unknown + (direction === "unknown" ? 1 : 0),
     seen: previous.seen + 1,
-    lastSeenAt: Date.now()
+    lastSeenAt: Date.now(),
+    updatedAt: Date.now()
   };
 
   return {
     ...statsMap,
     [key]: next
   };
+}
+
+function normalizeReviewStatsMap(statsMap: DrugReviewStatsMap) {
+  return Object.fromEntries(
+    Object.entries(statsMap)
+      .filter(([key]) => typeof key === "string" && key.includes("__"))
+      .map(([key, value]) => [key, normalizeReviewStats(value)])
+  ) as DrugReviewStatsMap;
+}
+
+function mergeReviewStatsMaps(localStats: DrugReviewStatsMap, cloudStats: DrugReviewStatsMap) {
+  const merged: DrugReviewStatsMap = {};
+  const keys = new Set([...Object.keys(localStats), ...Object.keys(cloudStats)]);
+
+  keys.forEach((key) => {
+    const local = normalizeReviewStats(localStats[key]);
+    const cloud = normalizeReviewStats(cloudStats[key]);
+    merged[key] = {
+      known: Math.max(local.known, cloud.known),
+      unknown: Math.max(local.unknown, cloud.unknown),
+      seen: Math.max(local.seen, cloud.seen),
+      lastSeenAt: Math.max(local.lastSeenAt ?? 0, cloud.lastSeenAt ?? 0) || null,
+      updatedAt: Math.max(local.updatedAt ?? 0, cloud.updatedAt ?? 0) || null
+    };
+  });
+
+  return merged;
+}
+
+function serializeReviewStats(statsMap: DrugReviewStatsMap) {
+  return PHARMACOLOGY_FLASHCARDS.map((item) => {
+    const key = getDrugKey(item);
+    const stats = normalizeReviewStats(statsMap[key]);
+    if (!stats.seen && !stats.known && !stats.unknown) return null;
+
+    return {
+      drugKey: key,
+      name: item.name,
+      category: item.category,
+      known: stats.known,
+      unknown: stats.unknown,
+      seen: stats.seen,
+      lastSeenAt: stats.lastSeenAt,
+      updatedAt: stats.updatedAt ?? stats.lastSeenAt ?? Date.now()
+    };
+  }).filter(Boolean);
+}
+
+async function fetchCloudReviewStats(accessToken: string): Promise<DrugReviewStatsMap> {
+  const response = await fetch("/api/pharmacology-review-stats", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ accessToken, action: "fetch" })
+  });
+  const payload = (await response.json().catch(() => null)) as
+    | { ok?: boolean; rows?: Array<{ drugKey: string; known: number; unknown: number; seen: number; lastSeenAt: number | null; updatedAt: number | null }>; message?: string }
+    | null;
+
+  if (!response.ok || !payload?.ok) {
+    throw new Error(payload?.message || "藥理雲端紀錄讀取失敗。");
+  }
+
+  const statsMap: DrugReviewStatsMap = {};
+  payload.rows?.forEach((row) => {
+    if (!row.drugKey) return;
+    statsMap[row.drugKey] = normalizeReviewStats({
+      known: row.known,
+      unknown: row.unknown,
+      seen: row.seen,
+      lastSeenAt: row.lastSeenAt,
+      updatedAt: row.updatedAt
+    });
+  });
+
+  return statsMap;
+}
+
+async function pushCloudReviewStats(accessToken: string, statsMap: DrugReviewStatsMap) {
+  const rows = serializeReviewStats(statsMap);
+  if (rows.length === 0) return;
+
+  const response = await fetch("/api/pharmacology-review-stats", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ accessToken, action: "sync", rows })
+  });
+  const payload = (await response.json().catch(() => null)) as { ok?: boolean; message?: string } | null;
+
+  if (!response.ok || !payload?.ok) {
+    throw new Error(payload?.message || "藥理雲端紀錄同步失敗。");
+  }
 }
 
 function clamp(value: number, min: number, max: number) {
@@ -200,33 +309,35 @@ async function copyText(text: string) {
 }
 
 export default function PharmacologyReviewPage() {
+  const { configured, session } = useAuth();
   const [cardIndex, setCardIndex] = useState(0);
   const [isFlipped, setIsFlipped] = useState(false);
   const [hasRevealedClass, setHasRevealedClass] = useState(false);
   const [copied, setCopied] = useState(false);
   const [reviewStats, setReviewStats] = useState<DrugReviewStatsMap>({});
-  const [dragX, setDragX] = useState(0);
   const [isDragging, setIsDragging] = useState(false);
   const [isLeaving, setIsLeaving] = useState(false);
   const [swipeResult, setSwipeResult] = useState<ReviewDirection | null>(null);
   const [showWeakList, setShowWeakList] = useState(false);
+  const [cloudSyncStatus, setCloudSyncStatus] = useState<CloudSyncStatus>("idle");
+  const cardElementRef = useRef<HTMLDivElement | null>(null);
+  const knownBadgeRef = useRef<HTMLSpanElement | null>(null);
+  const unknownBadgeRef = useRef<HTMLSpanElement | null>(null);
   const pointerStartRef = useRef<{ pointerId: number; x: number; y: number; startedAt: number; cardWidth: number } | null>(
     null
   );
   const dragXRef = useRef(0);
+  const pendingDragXRef = useRef(0);
+  const dragFrameRef = useRef<number | null>(null);
   const swipeTimerRef = useRef<number | null>(null);
+  const cloudSyncTimerRef = useRef<number | null>(null);
+  const latestReviewStatsRef = useRef<DrugReviewStatsMap>({});
+  const accessTokenRef = useRef<string>("");
 
   const card = PHARMACOLOGY_FLASHCARDS[cardIndex] ?? PHARMACOLOGY_FLASHCARDS[0];
   const levelMeta = LEVEL_META[card.examLevel] ?? LEVEL_META.D;
   const cardStats = getReviewStats(reviewStats, card);
   const reviewWeight = getReviewWeight(card, cardStats);
-  const previewDistance = typeof window === "undefined" ? DESKTOP_SWIPE_THRESHOLD : getSwipeThreshold(window.innerWidth);
-  const knownOpacity = clamp(-dragX / previewDistance, 0, 1);
-  const unknownOpacity = clamp(dragX / previewDistance, 0, 1);
-  const cardSwipeStyle = {
-    transform: `translate3d(${dragX}px, 0, 0) rotate(${clamp(dragX / 18, -13, 13)}deg)`,
-    transition: isDragging ? "none" : `transform ${SWIPE_OUT_MS}ms cubic-bezier(0.22, 1, 0.36, 1)`
-  } satisfies CSSProperties;
   const sameCategoryCards = PHARMACOLOGY_FLASHCARDS.filter((item) => item.category === card.category).sort(
     (first, second) => second.drawWeight - first.drawWeight || first.name.localeCompare(second.name)
   );
@@ -249,6 +360,7 @@ export default function PharmacologyReviewPage() {
 
   useEffect(() => {
     const storedStats = loadReviewStats();
+    latestReviewStatsRef.current = storedStats;
     setReviewStats(storedStats);
     setCardIndex(pickWeightedIndex(storedStats));
 
@@ -256,8 +368,108 @@ export default function PharmacologyReviewPage() {
       if (swipeTimerRef.current) {
         window.clearTimeout(swipeTimerRef.current);
       }
+      if (dragFrameRef.current) {
+        window.cancelAnimationFrame(dragFrameRef.current);
+      }
+      if (cloudSyncTimerRef.current) {
+        window.clearTimeout(cloudSyncTimerRef.current);
+      }
     };
   }, []);
+
+  useEffect(() => {
+    accessTokenRef.current = session?.access_token ?? "";
+  }, [session?.access_token]);
+
+  const syncStatsToCloud = useCallback(async (statsMap: DrugReviewStatsMap) => {
+    if (!configured || !accessTokenRef.current) {
+      setCloudSyncStatus(Object.keys(statsMap).length ? "queued" : "idle");
+      return;
+    }
+
+    setCloudSyncStatus("syncing");
+    try {
+      await pushCloudReviewStats(accessTokenRef.current, statsMap);
+      setCloudSyncStatus("synced");
+    } catch {
+      setCloudSyncStatus("error");
+    }
+  }, [configured]);
+
+  const queueCloudSync = useCallback((statsMap: DrugReviewStatsMap) => {
+    latestReviewStatsRef.current = statsMap;
+
+    if (!configured || !accessTokenRef.current) {
+      setCloudSyncStatus(Object.keys(statsMap).length ? "queued" : "idle");
+      return;
+    }
+
+    setCloudSyncStatus("queued");
+    if (cloudSyncTimerRef.current) {
+      window.clearTimeout(cloudSyncTimerRef.current);
+    }
+    cloudSyncTimerRef.current = window.setTimeout(() => {
+      void syncStatsToCloud(latestReviewStatsRef.current);
+    }, CLOUD_SYNC_DEBOUNCE_MS);
+  }, [configured, syncStatsToCloud]);
+
+  useEffect(() => {
+    if (!configured || !session?.access_token) return;
+
+    let cancelled = false;
+    const accessToken = session.access_token;
+
+    async function hydrateCloudStats() {
+      setCloudSyncStatus("syncing");
+      try {
+        const cloudStats = await fetchCloudReviewStats(accessToken);
+        if (cancelled) return;
+        const mergedStats = mergeReviewStatsMaps(loadReviewStats(), cloudStats);
+        latestReviewStatsRef.current = mergedStats;
+        setReviewStats(mergedStats);
+        saveReviewStats(mergedStats);
+        setCloudSyncStatus("synced");
+        queueCloudSync(mergedStats);
+      } catch {
+        if (!cancelled) {
+          setCloudSyncStatus("error");
+        }
+      }
+    }
+
+    void hydrateCloudStats();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [configured, queueCloudSync, session?.access_token]);
+
+  const applyDragVisual = (nextDragX: number, animated = false) => {
+    const cardElement = cardElementRef.current;
+    if (!cardElement) return;
+
+    const cardWidth = cardElement.getBoundingClientRect().width || window.innerWidth;
+    const previewDistance = getSwipeThreshold(cardWidth);
+    cardElement.style.transition = animated ? `transform ${SWIPE_OUT_MS}ms cubic-bezier(0.22, 1, 0.36, 1)` : "none";
+    cardElement.style.transform = `translate3d(${nextDragX}px, 0, 0) rotate(${clamp(nextDragX / 16, -15, 15)}deg)`;
+
+    if (knownBadgeRef.current) {
+      knownBadgeRef.current.style.opacity = String(clamp(-nextDragX / previewDistance, 0, 1));
+    }
+    if (unknownBadgeRef.current) {
+      unknownBadgeRef.current.style.opacity = String(clamp(nextDragX / previewDistance, 0, 1));
+    }
+  };
+
+  const scheduleDragVisual = (nextDragX: number) => {
+    pendingDragXRef.current = nextDragX;
+    if (dragFrameRef.current !== null) return;
+
+    dragFrameRef.current = window.requestAnimationFrame(() => {
+      dragFrameRef.current = null;
+      applyDragVisual(pendingDragXRef.current);
+    });
+  };
 
   const resetCardState = () => {
     setIsFlipped(false);
@@ -282,8 +494,9 @@ export default function PharmacologyReviewPage() {
     setIsFlipped(reveal);
     setHasRevealedClass(reveal);
     setCopied(false);
-    setDragX(0);
     dragXRef.current = 0;
+    pendingDragXRef.current = 0;
+    applyDragVisual(0);
     setSwipeResult(null);
     setShowWeakList(false);
   };
@@ -292,14 +505,16 @@ export default function PharmacologyReviewPage() {
     if (isLeaving) return;
 
     const nextStats = recordReviewResult(reviewStats, card, direction);
+    latestReviewStatsRef.current = nextStats;
     setReviewStats(nextStats);
     saveReviewStats(nextStats);
+    queueCloudSync(nextStats);
     setSwipeResult(direction);
     setIsDragging(false);
     setIsLeaving(true);
     const nextDragX = direction === "known" ? -window.innerWidth * 1.08 : window.innerWidth * 1.08;
     dragXRef.current = nextDragX;
-    setDragX(nextDragX);
+    applyDragVisual(nextDragX, true);
 
     swipeTimerRef.current = window.setTimeout(() => {
       resetCardState();
@@ -307,7 +522,8 @@ export default function PharmacologyReviewPage() {
       setIsLeaving(false);
       setSwipeResult(null);
       dragXRef.current = 0;
-      setDragX(0);
+      pendingDragXRef.current = 0;
+      window.requestAnimationFrame(() => applyDragVisual(0));
     }, SWIPE_OUT_MS);
   };
 
@@ -324,7 +540,8 @@ export default function PharmacologyReviewPage() {
       cardWidth: event.currentTarget.getBoundingClientRect().width
     };
     dragXRef.current = 0;
-    setDragX(0);
+    pendingDragXRef.current = 0;
+    applyDragVisual(0);
     setIsDragging(true);
     event.currentTarget.setPointerCapture?.(event.pointerId);
   };
@@ -343,7 +560,7 @@ export default function PharmacologyReviewPage() {
     }
 
     dragXRef.current = nextDragX;
-    setDragX(nextDragX);
+    scheduleDragVisual(nextDragX);
   };
 
   const handlePointerEnd = (event: PointerEvent<HTMLDivElement>) => {
@@ -358,8 +575,9 @@ export default function PharmacologyReviewPage() {
     const threshold = getSwipeThreshold(start.cardWidth);
     const elapsedMs = Date.now() - start.startedAt;
     if (Math.abs(finalDragX) < 9) {
-      setDragX(0);
       dragXRef.current = 0;
+      pendingDragXRef.current = 0;
+      applyDragVisual(0, true);
       flipCard();
       return;
     }
@@ -370,7 +588,8 @@ export default function PharmacologyReviewPage() {
     }
 
     dragXRef.current = 0;
-    setDragX(0);
+    pendingDragXRef.current = 0;
+    applyDragVisual(0, true);
   };
 
   const handlePointerCancel = (event: PointerEvent<HTMLDivElement>) => {
@@ -378,7 +597,8 @@ export default function PharmacologyReviewPage() {
       pointerStartRef.current = null;
       setIsDragging(false);
       dragXRef.current = 0;
-      setDragX(0);
+      pendingDragXRef.current = 0;
+      applyDragVisual(0, true);
     }
   };
 
@@ -443,8 +663,8 @@ export default function PharmacologyReviewPage() {
           <div
             role="button"
             tabIndex={0}
-            className={`drug-flip-card ${isFlipped ? "is-flipped" : ""}`}
-            style={cardSwipeStyle}
+            ref={cardElementRef}
+            className={`drug-flip-card ${isFlipped ? "is-flipped" : ""} ${isDragging ? "is-dragging" : ""}`}
             onPointerDown={handlePointerDown}
             onPointerMove={handlePointerMove}
             onPointerUp={handlePointerEnd}
@@ -464,14 +684,16 @@ export default function PharmacologyReviewPage() {
             aria-label="翻轉藥理複習卡"
           >
             <span
+              ref={knownBadgeRef}
               className="pointer-events-none absolute left-5 top-5 z-30 rounded-full border border-emerald-200 bg-emerald-50/95 px-4 py-2 text-sm font-black text-emerald-800 shadow-lg"
-              style={{ opacity: knownOpacity }}
+              style={{ opacity: 0 }}
             >
               會
             </span>
             <span
+              ref={unknownBadgeRef}
               className="pointer-events-none absolute right-5 top-5 z-30 rounded-full border border-rose-200 bg-rose-50/95 px-4 py-2 text-sm font-black text-rose-800 shadow-lg"
-              style={{ opacity: unknownOpacity }}
+              style={{ opacity: 0 }}
             >
               不會
             </span>
@@ -554,7 +776,7 @@ export default function PharmacologyReviewPage() {
           </div>
 
           <div className="relative mt-5 flex flex-col items-center gap-3 sm:flex-row sm:justify-between">
-            <div className="grid w-full gap-2 sm:w-auto sm:grid-cols-3">
+            <div className="grid w-full gap-2 sm:w-auto sm:grid-cols-4">
               <span className="rounded-full bg-white/70 px-4 py-2 text-center text-xs font-black text-slate-600">
                 已看 {cardStats.seen}
               </span>
@@ -563,6 +785,18 @@ export default function PharmacologyReviewPage() {
               </span>
               <span className="rounded-full bg-rose-50 px-4 py-2 text-center text-xs font-black text-rose-800">
                 不會 {cardStats.unknown}
+              </span>
+              <span className="rounded-full bg-slate-50 px-4 py-2 text-center text-xs font-black text-slate-600">
+                雲端
+                {cloudSyncStatus === "syncing"
+                  ? "同步中"
+                  : cloudSyncStatus === "synced"
+                    ? "已同步"
+                    : cloudSyncStatus === "queued"
+                      ? "稍後同步"
+                      : cloudSyncStatus === "error"
+                        ? "稍後重試"
+                        : "待命"}
               </span>
             </div>
             {copied ? (
