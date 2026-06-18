@@ -6,7 +6,10 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { PHARMACOLOGY_FLASHCARDS } from "@/data/pharmacologyFlashcards";
 
 const REVIEW_STATS_STORAGE_KEY = "pharmacology-review-stats-v1";
-const SWIPE_THRESHOLD = 92;
+const DESKTOP_SWIPE_THRESHOLD = 92;
+const MIN_MOBILE_SWIPE_THRESHOLD = 54;
+const MAX_MOBILE_SWIPE_THRESHOLD = 76;
+const FAST_SWIPE_VELOCITY = 0.42;
 const SWIPE_OUT_MS = 240;
 const MIN_REVIEW_FLOOR_RATIO = 0.18;
 
@@ -163,6 +166,22 @@ function clamp(value: number, min: number, max: number) {
   return Math.min(max, Math.max(min, value));
 }
 
+function getSwipeThreshold(cardWidth: number) {
+  if (cardWidth < 560) {
+    return clamp(cardWidth * 0.17, MIN_MOBILE_SWIPE_THRESHOLD, MAX_MOBILE_SWIPE_THRESHOLD);
+  }
+
+  return DESKTOP_SWIPE_THRESHOLD;
+}
+
+function isSwipeComplete(distance: number, elapsedMs: number, threshold: number) {
+  const absoluteDistance = Math.abs(distance);
+  const velocity = elapsedMs > 0 ? absoluteDistance / elapsedMs : 0;
+  const fastEnough = velocity >= FAST_SWIPE_VELOCITY && absoluteDistance >= threshold * 0.45;
+
+  return absoluteDistance >= threshold || fastEnough;
+}
+
 async function copyText(text: string) {
   if (navigator.clipboard?.writeText) {
     await navigator.clipboard.writeText(text);
@@ -191,7 +210,9 @@ export default function PharmacologyReviewPage() {
   const [isLeaving, setIsLeaving] = useState(false);
   const [swipeResult, setSwipeResult] = useState<ReviewDirection | null>(null);
   const [showWeakList, setShowWeakList] = useState(false);
-  const pointerStartRef = useRef<{ pointerId: number; x: number; y: number } | null>(null);
+  const pointerStartRef = useRef<{ pointerId: number; x: number; y: number; startedAt: number; cardWidth: number } | null>(
+    null
+  );
   const dragXRef = useRef(0);
   const swipeTimerRef = useRef<number | null>(null);
 
@@ -199,8 +220,9 @@ export default function PharmacologyReviewPage() {
   const levelMeta = LEVEL_META[card.examLevel] ?? LEVEL_META.D;
   const cardStats = getReviewStats(reviewStats, card);
   const reviewWeight = getReviewWeight(card, cardStats);
-  const knownOpacity = clamp(-dragX / 120, 0, 1);
-  const unknownOpacity = clamp(dragX / 120, 0, 1);
+  const previewDistance = typeof window === "undefined" ? DESKTOP_SWIPE_THRESHOLD : getSwipeThreshold(window.innerWidth);
+  const knownOpacity = clamp(-dragX / previewDistance, 0, 1);
+  const unknownOpacity = clamp(dragX / previewDistance, 0, 1);
   const cardSwipeStyle = {
     transform: `translate3d(${dragX}px, 0, 0) rotate(${clamp(dragX / 18, -13, 13)}deg)`,
     transition: isDragging ? "none" : `transform ${SWIPE_OUT_MS}ms cubic-bezier(0.22, 1, 0.36, 1)`
@@ -297,7 +319,9 @@ export default function PharmacologyReviewPage() {
     pointerStartRef.current = {
       pointerId: event.pointerId,
       x: event.clientX,
-      y: event.clientY
+      y: event.clientY,
+      startedAt: Date.now(),
+      cardWidth: event.currentTarget.getBoundingClientRect().width
     };
     dragXRef.current = 0;
     setDragX(0);
@@ -311,7 +335,12 @@ export default function PharmacologyReviewPage() {
 
     const nextDragX = event.clientX - start.x;
     const verticalDelta = Math.abs(event.clientY - start.y);
-    if (Math.abs(nextDragX) < 6 && verticalDelta > 10) return;
+    const horizontalDelta = Math.abs(nextDragX);
+    const hasHorizontalIntent = horizontalDelta > 7 && horizontalDelta > verticalDelta * 0.75;
+    if (!hasHorizontalIntent && verticalDelta > 10) return;
+    if (hasHorizontalIntent) {
+      event.preventDefault();
+    }
 
     dragXRef.current = nextDragX;
     setDragX(nextDragX);
@@ -326,6 +355,8 @@ export default function PharmacologyReviewPage() {
     event.currentTarget.releasePointerCapture?.(event.pointerId);
 
     const finalDragX = dragXRef.current;
+    const threshold = getSwipeThreshold(start.cardWidth);
+    const elapsedMs = Date.now() - start.startedAt;
     if (Math.abs(finalDragX) < 9) {
       setDragX(0);
       dragXRef.current = 0;
@@ -333,7 +364,7 @@ export default function PharmacologyReviewPage() {
       return;
     }
 
-    if (Math.abs(finalDragX) >= SWIPE_THRESHOLD) {
+    if (isSwipeComplete(finalDragX, elapsedMs, threshold)) {
       finishSwipe(finalDragX > 0 ? "unknown" : "known");
       return;
     }
@@ -452,7 +483,7 @@ export default function PharmacologyReviewPage() {
                 <span className="mt-10 block max-w-full text-center font-serif text-[clamp(2rem,11vw,4.8rem)] font-bold leading-[1.02] tracking-[-0.04em] text-ink [overflow-wrap:anywhere] sm:text-[clamp(3rem,7vw,6.2rem)]">
                   {card.name}
                 </span>
-                <span className="body-soft mt-8 block text-center text-sm font-semibold">點一下看機轉；左滑會，右滑不會</span>
+                <span className="body-soft mt-8 block text-center text-sm font-semibold">點一下看機轉；手機短滑或快甩也能換卡</span>
                 {swipeResult ? (
                   <span className="mt-5 rounded-full bg-slate-950 px-4 py-2 text-xs font-black text-white">
                     {swipeResult === "known" ? "這張收下，換下一張" : "這張先記仇，等等再來"}

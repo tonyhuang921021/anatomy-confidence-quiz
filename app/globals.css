@@ -1216,6 +1216,9 @@ html[data-theme="dark"] .podium-badge-champion {
   touch-action: pan-y;
   transform-origin: 50% 82%;
   user-select: none;
+  -webkit-user-select: none;
+  -webkit-tap-highlight-color: transparent;
+  overscroll-behavior: contain;
   will-change: transform;
 }
 
