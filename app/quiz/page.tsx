@@ -751,7 +751,14 @@ export default function QuizPage() {
   const questionSet = useMemo(
     () =>
       session ? getQuestionByOrder(session, allQuestionFallbackMap, classificationOverrides) : [],
-    [allQuestionFallbackMap, classificationOverrides, session]
+    [
+      allQuestionFallbackMap,
+      classificationOverrides,
+      session?.generatedQuestions,
+      session?.id,
+      session?.questionOrder,
+      session?.settings
+    ]
   );
   const currentIndex = session?.currentQuestionIndex ?? 0;
   const currentQuestion = questionSet[currentIndex];

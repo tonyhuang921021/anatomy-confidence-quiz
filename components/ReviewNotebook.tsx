@@ -38,6 +38,11 @@ type RenderedReviewQuestionItem = ReviewQuestionItem & {
   renderedQuestion: Question;
 };
 
+type RelatedQuestionIndex = {
+  byConcept: Map<string, Question[]>;
+  bySection: Map<string, Question[]>;
+};
+
 function formatTime(value?: string) {
   if (!value) return "尚未作答";
   return new Date(value).toLocaleString("zh-TW", {
@@ -92,21 +97,50 @@ function getOptionKeysFromQuestion(question: Question) {
   );
 }
 
-function getRelatedQuestions(currentQuestion: Question, allQuestions: Question[], limit = 4) {
-  const normalizedConcept = currentQuestion.testedConcept.trim().toLowerCase();
+function normalizeRelatedConcept(question: Question) {
+  return question.testedConcept.trim().toLowerCase();
+}
 
-  const sameConcept = allQuestions.filter(
-    (question) =>
-      question.id !== currentQuestion.id &&
-      question.testedConcept.trim().toLowerCase() === normalizedConcept
+function getSectionKey(question: Question) {
+  return `${question.chapter}__${question.section}`;
+}
+
+function buildRelatedQuestionIndex(allQuestions: Question[]): RelatedQuestionIndex {
+  const byConcept = new Map<string, Question[]>();
+  const bySection = new Map<string, Question[]>();
+
+  for (const question of allQuestions) {
+    const conceptKey = normalizeRelatedConcept(question);
+    const conceptQuestions = byConcept.get(conceptKey);
+    if (conceptQuestions) {
+      conceptQuestions.push(question);
+    } else {
+      byConcept.set(conceptKey, [question]);
+    }
+
+    const sectionKey = getSectionKey(question);
+    const sectionQuestions = bySection.get(sectionKey);
+    if (sectionQuestions) {
+      sectionQuestions.push(question);
+    } else {
+      bySection.set(sectionKey, [question]);
+    }
+  }
+
+  return { byConcept, bySection };
+}
+
+function getRelatedQuestions(currentQuestion: Question, index: RelatedQuestionIndex, limit = 4) {
+  const normalizedConcept = normalizeRelatedConcept(currentQuestion);
+
+  const sameConcept = (index.byConcept.get(normalizedConcept) ?? []).filter(
+    (question) => question.id !== currentQuestion.id
   );
 
-  const sameSection = allQuestions.filter(
+  const sameSection = (index.bySection.get(getSectionKey(currentQuestion)) ?? []).filter(
     (question) =>
       question.id !== currentQuestion.id &&
-      question.section === currentQuestion.section &&
-      question.chapter === currentQuestion.chapter &&
-      question.testedConcept.trim().toLowerCase() !== normalizedConcept
+      normalizeRelatedConcept(question) !== normalizedConcept
   );
 
   return [...sameConcept, ...sameSection].slice(0, limit);
@@ -183,8 +217,8 @@ function renderQuestionReview(
   );
 }
 
-function renderRelatedQuestions(question: Question, allQuestions: Question[]) {
-  const relatedQuestions = getRelatedQuestions(question, allQuestions);
+function renderRelatedQuestions(question: Question, relatedQuestionIndex: RelatedQuestionIndex) {
+  const relatedQuestions = getRelatedQuestions(question, relatedQuestionIndex);
 
   if (relatedQuestions.length === 0) {
     return (
@@ -274,11 +308,13 @@ export function ReviewNotebook({
   const [classificationReportMessageMap, setClassificationReportMessageMap] = useState<Record<string, string>>({});
   const [classificationOverrides, setClassificationOverrides] = useState<Record<string, QuestionClassificationOverride>>({});
   const [communityStatsMap, setCommunityStatsMap] = useState<Record<string, QuestionCommunityStats>>({});
+  const [openQuestionIds, setOpenQuestionIds] = useState<Set<string>>(() => new Set());
+  const [openRelatedQuestionIds, setOpenRelatedQuestionIds] = useState<Set<string>>(() => new Set());
   const [activeCategory, setActiveCategory] = useState<"wrong" | "lowConfidence" | "resolved">("wrong");
   const [visibleCount, setVisibleCount] = useState(40);
   const [selectedSubjects, setSelectedSubjects] = useState<SubjectName[]>([]);
   const questionIdsKey = useMemo(
-    () => items.map((item) => item.question.id).sort().join("|"),
+    () => items.map((item) => item.question.id).join("|"),
     [items]
   );
   const renderedAllQuestions = useMemo(
@@ -298,6 +334,10 @@ export function ReviewNotebook({
         )
       })),
     [items, classificationOverrides]
+  );
+  const relatedQuestionIndex = useMemo(
+    () => buildRelatedQuestionIndex(renderedAllQuestions),
+    [renderedAllQuestions]
   );
   const availableSubjects = useMemo(
     () =>
@@ -342,6 +382,11 @@ export function ReviewNotebook({
     () => activeItems.slice(0, visibleCount),
     [activeItems, visibleCount]
   );
+  const visibleQuestionIds = useMemo(
+    () => visibleItems.map((item) => item.question.id),
+    [visibleItems]
+  );
+  const visibleQuestionIdsKey = useMemo(() => visibleQuestionIds.join("|"), [visibleQuestionIds]);
 
   useEffect(() => {
     if (activeCategory === "resolved" && resolvedItems.length === 0) {
@@ -396,22 +441,50 @@ export function ReviewNotebook({
     setSelectedSubjects([]);
   }
 
+  function setQuestionDetailsOpen(questionId: string, isOpen: boolean) {
+    setOpenQuestionIds((current) => {
+      const next = new Set(current);
+      if (isOpen) {
+        next.add(questionId);
+      } else {
+        next.delete(questionId);
+      }
+      return next;
+    });
+  }
+
+  function setRelatedDetailsOpen(questionId: string, isOpen: boolean) {
+    setOpenRelatedQuestionIds((current) => {
+      const next = new Set(current);
+      if (isOpen) {
+        next.add(questionId);
+      } else {
+        next.delete(questionId);
+      }
+      return next;
+    });
+  }
+
   useEffect(() => {
     async function fetchCommunityStats() {
-      if (items.length === 0) return;
+      if (visibleQuestionIds.length === 0) return;
+
+      const missingQuestionIds = visibleQuestionIds.filter((id) => !communityStatsMap[id]);
+      if (missingQuestionIds.length === 0) return;
 
       try {
-        const stats = await loadQuestionCommunityStats(items.map((item) => item.question.id));
-        setCommunityStatsMap(
-          Object.fromEntries(stats.map((item) => [item.questionId, item] as const))
-        );
+        const stats = await loadQuestionCommunityStats(missingQuestionIds);
+        setCommunityStatsMap((current) => ({
+          ...current,
+          ...Object.fromEntries(stats.map((item) => [item.questionId, item] as const))
+        }));
       } catch {
         // keep review UI usable without stats
       }
     }
 
     void fetchCommunityStats();
-  }, [items, questionIdsKey]);
+  }, [visibleQuestionIdsKey]);
 
   useEffect(() => {
     setExplanationOverrides(loadQuestionExplanationOverrides());
@@ -429,12 +502,10 @@ export function ReviewNotebook({
 
   useEffect(() => {
     async function fetchSharedExplanationOverrides() {
-      if (items.length === 0) return;
+      if (visibleQuestionIds.length === 0) return;
 
       try {
-        const sharedOverrides = await loadSharedQuestionExplanationOverrides(
-          items.map((item) => item.question.id)
-        );
+        const sharedOverrides = await loadSharedQuestionExplanationOverrides(visibleQuestionIds);
         if (Object.keys(sharedOverrides).length === 0) return;
 
         saveQuestionExplanationOverrides(sharedOverrides);
@@ -448,7 +519,7 @@ export function ReviewNotebook({
     }
 
     void fetchSharedExplanationOverrides();
-  }, [items]);
+  }, [visibleQuestionIdsKey]);
 
   async function handleGenerateQuestionExplanation(question: Question) {
     if (!session?.access_token) {
@@ -877,6 +948,8 @@ export function ReviewNotebook({
                           applyQuestionExplanationOverride(item.renderedQuestion),
                           explanationOverrides[item.question.id]
                         );
+                        const isQuestionOpen = openQuestionIds.has(item.question.id);
+                        const isRelatedOpen = openRelatedQuestionIds.has(item.question.id);
                         return (
                           <>
                             <div className="space-y-4">
@@ -911,18 +984,38 @@ export function ReviewNotebook({
                                 </h4>
                               </div>
 
-                              <details className="rounded-2xl bg-white p-3.5 text-sm text-slate-700 sm:p-4">
+                              <details
+                                open={isQuestionOpen}
+                                onToggle={(event) =>
+                                  setQuestionDetailsOpen(item.question.id, event.currentTarget.open)
+                                }
+                                className="rounded-2xl bg-white p-3.5 text-sm text-slate-700 sm:p-4"
+                              >
                                 <summary className="cursor-pointer font-semibold text-ink">
                                   查看題目、選項與詳解
                                 </summary>
-                                {renderQuestionReview(item, renderedQuestion, renderExplanationFooter(renderedQuestion))}
+                                {isQuestionOpen
+                                  ? renderQuestionReview(
+                                      item,
+                                      renderedQuestion,
+                                      renderExplanationFooter(renderedQuestion)
+                                    )
+                                  : null}
                               </details>
 
-                              <details className="rounded-2xl bg-white p-3.5 text-sm text-slate-700 sm:p-4">
+                              <details
+                                open={isRelatedOpen}
+                                onToggle={(event) =>
+                                  setRelatedDetailsOpen(item.question.id, event.currentTarget.open)
+                                }
+                                className="rounded-2xl bg-white p-3.5 text-sm text-slate-700 sm:p-4"
+                              >
                                 <summary className="cursor-pointer font-semibold text-ink">
                                   看相同觀念類似題
                                 </summary>
-                                {renderRelatedQuestions(renderedQuestion, renderedAllQuestions)}
+                                {isRelatedOpen
+                                  ? renderRelatedQuestions(renderedQuestion, relatedQuestionIndex)
+                                  : null}
                               </details>
                             </div>
                           </>

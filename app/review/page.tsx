@@ -8,11 +8,62 @@ import { applyQuestionClassificationOverride, getQuestionBankBySubjectFilter } f
 import { loadConfirmedQuestionClassificationOverrides } from "@/lib/cloudSync";
 import {
   DEFAULT_QUIZ_SETTINGS,
+  buildQuestionHistoryMap,
   getReviewQuestionItems,
-  mergeQuestionsWithSessionSnapshots
 } from "@/lib/quizAnalysis";
 import { loadCompletedSessions, saveQuizSettings } from "@/lib/storage";
-import { QuestionClassificationOverride, ReviewQuestionItem } from "@/types/quiz";
+import { Question, QuestionClassificationOverride, QuizSession, ReviewQuestionItem } from "@/types/quiz";
+
+function isPracticeReviewSession(session: QuizSession) {
+  return (
+    session.settings?.mode !== "simulation" &&
+    session.settings?.mode !== "custom_paper" &&
+    session.settings?.mode !== "peak_challenge" &&
+    session.settings?.customPoolLabel !== "模擬考錯題庫" &&
+    session.settings?.customPoolLabel !== "自訂卷錯題庫" &&
+    session.settings?.customPoolLabel !== "巔峰賽錯題庫"
+  );
+}
+
+function buildReviewCandidateQuestions(
+  questions: Question[],
+  sessions: QuizSession[],
+  classificationOverrides: Record<string, QuestionClassificationOverride>
+) {
+  const historyMap = buildQuestionHistoryMap(sessions);
+  const targetQuestionIds = new Set(
+    Array.from(historyMap.values())
+      .filter((history) => history.wrong > 0 || history.lowConfidence > 0)
+      .map((history) => history.questionId)
+  );
+
+  if (targetQuestionIds.size === 0) return [];
+
+  const merged = new Map<string, Question>();
+  const addQuestion = (question?: Question) => {
+    if (!question?.id || !targetQuestionIds.has(question.id) || merged.has(question.id)) return;
+    merged.set(
+      question.id,
+      applyQuestionClassificationOverride(question, classificationOverrides[question.id])
+    );
+  };
+
+  for (const question of questions) {
+    addQuestion(question);
+  }
+
+  for (const session of sessions) {
+    for (const question of session.generatedQuestions ?? []) {
+      addQuestion(question);
+    }
+
+    for (const question of session.settings?.customQuestionPayload ?? []) {
+      addQuestion(question);
+    }
+  }
+
+  return Array.from(merged.values());
+}
 
 export default function ReviewPage() {
   const [practiceItems, setPracticeItems] = useState<ReviewQuestionItem[]>([]);
@@ -42,18 +93,14 @@ export default function ReviewPage() {
 
   useEffect(() => {
     const sessions = loadCompletedSessions();
-    const practiceSessions = sessions.filter(
-      (session) =>
-        session.settings?.mode !== "simulation" &&
-        session.settings?.mode !== "custom_paper" &&
-        session.settings?.mode !== "peak_challenge" &&
-        session.settings?.customPoolLabel !== "模擬考錯題庫" &&
-        session.settings?.customPoolLabel !== "自訂卷錯題庫" &&
-        session.settings?.customPoolLabel !== "巔峰賽錯題庫"
+    const practiceSessions = sessions.filter(isPracticeReviewSession);
+    const reviewQuestions = buildReviewCandidateQuestions(
+      allQuestions,
+      practiceSessions,
+      classificationOverrides
     );
-    const reviewQuestions = mergeQuestionsWithSessionSnapshots(allQuestions, practiceSessions);
     setPracticeItems(getReviewQuestionItems(reviewQuestions, practiceSessions, Number.MAX_SAFE_INTEGER));
-  }, [allQuestions, syncVersion]);
+  }, [allQuestions, classificationOverrides, syncVersion]);
 
   useEffect(() => {
     if (typeof document === "undefined" || typeof window === "undefined") return;
