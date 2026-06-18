@@ -488,6 +488,12 @@ export default function OwnerPage() {
               病毒複習
             </Link>
             <Link
+              href="/owner/biochemistry-review"
+              className="min-h-12 rounded-2xl bg-brand-700 px-5 py-4 text-sm font-semibold text-white transition hover:bg-brand-800"
+            >
+              生化複習
+            </Link>
+            <Link
               href="/"
               className="min-h-12 rounded-2xl bg-slate-100 px-5 py-4 text-sm font-semibold text-slate-800 transition hover:bg-slate-200"
             >

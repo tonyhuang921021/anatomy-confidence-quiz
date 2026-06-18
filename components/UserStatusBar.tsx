@@ -10,7 +10,8 @@ export function UserStatusBar() {
   const isOwnerReviewPage =
     pathname === "/owner/parasitology-review" ||
     pathname === "/owner/bacteria-review" ||
-    pathname === "/owner/virus-review";
+    pathname === "/owner/virus-review" ||
+    pathname === "/owner/biochemistry-review";
   const syncLabel =
     syncStatus === "syncing"
       ? "雲端同步中"
