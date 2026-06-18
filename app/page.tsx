@@ -65,6 +65,11 @@ const QUICK_ENTRIES = [
 const HOME_RELEASE_NOTES = [
   {
     time: "06/18",
+    title: "112-2 疊字退散",
+    body: "2023 第二次醫學（一）有些題目把「下列何者」念成咒語，已把 OCR 疊字壓回正常人類語言。"
+  },
+  {
+    time: "06/18",
     title: "登出不再裝死",
     body: "Safari 如果跟 Supabase 眉來眼去太久，現在也會先把本機登出；刷題榜載太慢會給重試，不再原地發呆。"
   },

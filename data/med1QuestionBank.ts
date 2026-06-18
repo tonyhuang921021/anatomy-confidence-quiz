@@ -299,10 +299,59 @@ function toSectionLabel(topicSection?: string, fallback = "其他") {
   return source || fallback;
 }
 
+const DUPLICATED_OCR_CJK_PAIR_PATTERN = /([\u3400-\u9fff])\1/g;
+const DUPLICATED_OCR_ASCII_TOKEN_PATTERN = /[A-Za-z0-9][A-Za-z0-9'./:+-]{3,}/g;
+const DUPLICATED_OCR_PUNCTUATION_PATTERN = /([,.:;'\]\)）])\1/g;
+
+function collapseDuplicatedOcrToken(token: string) {
+  if (token.length < 4) return token;
+
+  let collapsed = "";
+  let pairCount = 0;
+  let duplicatedPairCount = 0;
+  for (let index = 0; index < token.length; index += 2) {
+    const first = token[index];
+    const second = token[index + 1];
+    if (!second) {
+      collapsed += first;
+      continue;
+    }
+
+    pairCount += 1;
+    if (first === second) {
+      duplicatedPairCount += 1;
+      collapsed += first;
+    } else {
+      collapsed += first + second;
+    }
+  }
+
+  return pairCount > 0 && duplicatedPairCount / pairCount >= 0.7 ? collapsed : token;
+}
+
+function looksLikeDuplicatedOcrText(value: string) {
+  const cjkPairCount = value.match(DUPLICATED_OCR_CJK_PAIR_PATTERN)?.length ?? 0;
+  const duplicatedAsciiTokenCount =
+    value
+      .match(DUPLICATED_OCR_ASCII_TOKEN_PATTERN)
+      ?.filter((token) => collapseDuplicatedOcrToken(token) !== token).length ?? 0;
+
+  return cjkPairCount >= 2 || duplicatedAsciiTokenCount >= 2;
+}
+
+function collapseDuplicatedOcrText(value: string) {
+  if (!looksLikeDuplicatedOcrText(value)) return value;
+
+  return value
+    .replace(DUPLICATED_OCR_CJK_PAIR_PATTERN, "$1")
+    .replace(DUPLICATED_OCR_ASCII_TOKEN_PATTERN, (token) => collapseDuplicatedOcrToken(token))
+    .replace(DUPLICATED_OCR_PUNCTUATION_PATTERN, "$1");
+}
+
 function sanitizeImportedText(value?: string) {
   if (!value) return "";
 
-  return value
+  return collapseDuplicatedOcrText(value)
     .replace(/\s*代號：\d+\s*頁次：[0-9A-Za-z－—–-]+/g, "")
     .replace(/([\u3400-\u9fff])\s+([\u3400-\u9fff])/g, "$1$2")
     .replace(/([\u3400-\u9fff])\s+([（〔［【「『《])/g, "$1$2")
