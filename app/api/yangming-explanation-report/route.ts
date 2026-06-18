@@ -16,6 +16,7 @@ type YangmingExplanationReportRequestBody = {
 
 const MAX_REASON_LENGTH = 1200;
 const MAX_PROPOSED_BODY_LENGTH = 30000;
+const MIN_CORRECTION_BODY_LENGTH = 10;
 
 function getServiceSupabaseClient() {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
@@ -68,6 +69,10 @@ function getQuestionIdLookupCandidates(questionId: string) {
   return Array.from(new Set([trimmed, normalized]));
 }
 
+function hasMeaningfulCorrectionText(text: string | null | undefined) {
+  return (text ?? "").replace(/\s+/g, "").length >= MIN_CORRECTION_BODY_LENGTH;
+}
+
 export async function POST(request: NextRequest) {
   if (isSupabaseRecoveryMode()) {
     return NextResponse.json(
@@ -103,10 +108,6 @@ export async function POST(request: NextRequest) {
     if (reason.length < 2) {
       return NextResponse.json({ ok: false, message: "請簡單填一下回報原因。" }, { status: 400 });
     }
-    if (reportType === "correction" && proposedBody.length < 10) {
-      return NextResponse.json({ ok: false, message: "修正版內容太短，請至少保留主要詳解文字。" }, { status: 400 });
-    }
-
     const { data, error: authError } = await supabase.auth.getUser(body.accessToken);
     if (authError || !data.user?.id) {
       return NextResponse.json({ ok: false, message: "登入驗證失敗。" }, { status: 401 });
@@ -132,8 +133,25 @@ export async function POST(request: NextRequest) {
     const previousBody =
       typeof currentExplanation?.body === "string" ? currentExplanation.body : null;
     const previousAssets = Array.isArray(currentExplanation?.assets) ? currentExplanation.assets : [];
+    const effectiveProposedBody =
+      reportType === "correction" && hasMeaningfulCorrectionText(proposedBody)
+        ? proposedBody
+        : previousBody ?? "";
+    const hasCorrectionText =
+      reportType === "correction" && hasMeaningfulCorrectionText(effectiveProposedBody);
+    const hasKeptAssets =
+      reportType === "correction" &&
+      (requestedKeptAssetIndexes === null
+        ? previousAssets.length > 0
+        : requestedKeptAssetIndexes.some((index) => index >= 0 && index < previousAssets.length));
+    if (reportType === "correction" && !hasCorrectionText && !hasKeptAssets) {
+      return NextResponse.json(
+        { ok: false, message: "請至少保留一張詳解圖片，或填入主要詳解文字。" },
+        { status: 400 }
+      );
+    }
     const clippedProposedBody =
-      reportType === "correction" ? proposedBody.slice(0, MAX_PROPOSED_BODY_LENGTH) : null;
+      reportType === "correction" ? effectiveProposedBody.slice(0, MAX_PROPOSED_BODY_LENGTH) : null;
     const appliedAt = reportType === "correction" ? new Date().toISOString() : null;
 
     const baseReportRow = {
@@ -163,7 +181,7 @@ export async function POST(request: NextRequest) {
       if (fallbackError) throw fallbackError;
     }
 
-    if (reportType === "correction" && clippedProposedBody) {
+    if (reportType === "correction") {
       const now = new Date().toISOString();
       const nextAssets =
         requestedKeptAssetIndexes === null

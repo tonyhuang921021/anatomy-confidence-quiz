@@ -103,6 +103,10 @@ function compactYangmingText(text: string) {
     .replace(/[、，,.:：;；`'"「」『』()（）\[\]{}<>《》|\\/_\-—~。．·•]/g, "");
 }
 
+function hasMeaningfulCorrectionText(text: string | null | undefined) {
+  return normalizeYangmingPlainText(text ?? "").length >= 10;
+}
+
 function getSectionPlainText(sections: NonNullable<YangmingExplanationContent["sections"]>) {
   return sections
     .map((section) => {
@@ -582,8 +586,12 @@ export function YangmingExplanationPanel({
       setReportMessage("請簡單填一下回報原因。");
       return;
     }
-    if (reportMode === "correction" && correctionDraft.trim().length < 10) {
-      setReportMessage("修正版內容太短，請至少保留主要詳解文字。");
+    const hasCorrectionText =
+      reportMode === "correction" &&
+      (hasMeaningfulCorrectionText(correctionDraft) || hasMeaningfulCorrectionText(content?.body));
+    const hasKeptAssets = reportMode === "correction" && keptAssetIndexes.length > 0;
+    if (reportMode === "correction" && !hasCorrectionText && !hasKeptAssets) {
+      setReportMessage("請至少保留一張詳解圖片，或填入主要詳解文字。");
       return;
     }
 
@@ -601,7 +609,12 @@ export function YangmingExplanationPanel({
           questionId,
           reason: reportReason,
           reportType: reportMode,
-          proposedBody: reportMode === "correction" ? correctionDraft : undefined,
+          proposedBody:
+            reportMode === "correction"
+              ? hasMeaningfulCorrectionText(correctionDraft)
+                ? correctionDraft
+                : content?.body ?? ""
+              : undefined,
           keptAssetIndexes: reportMode === "correction" ? keptAssetIndexes : undefined,
           sourceLabel: content?.sourceLabel,
           sourceFile: content?.sourceFile
@@ -617,7 +630,9 @@ export function YangmingExplanationPanel({
       if (reportMode === "correction" && content) {
         const correctedContent = {
           ...content,
-          body: correctionDraft.trim(),
+          body: hasMeaningfulCorrectionText(correctionDraft)
+            ? correctionDraft.trim()
+            : content.body ?? "",
           sections: [],
           assets: (content.assets ?? []).filter((_, index) => keptAssetIndexes.includes(index))
         };
