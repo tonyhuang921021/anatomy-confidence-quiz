@@ -18,6 +18,7 @@ import {
 } from "@/lib/cloudSync";
 import { setActiveStorageUser } from "@/lib/storage";
 import {
+  clearSupabaseBrowserAuthStorage,
   getSupabaseBrowserClient,
   isSupabaseConfigured
 } from "@/lib/supabase/client";
@@ -41,6 +42,7 @@ type AuthContextValue = {
 const AuthContext = createContext<AuthContextValue | null>(null);
 const CLOUD_RESUME_SYNC_TIMEOUT_MS = 4500;
 const AUTH_SESSION_BOOTSTRAP_TIMEOUT_MS = 3500;
+const AUTH_SIGN_OUT_TIMEOUT_MS = 2500;
 const AUTH_SESSION_SNAPSHOT_KEY = "medQuizAuthSessionSnapshot";
 const CLOUD_FALLBACK_MESSAGE = "雲端同步暫時連不上，先使用本機紀錄；稍後可再按一次同步。";
 const AUTH_FALLBACK_MESSAGE = "登入狀態讀取逾時，先以本機模式使用；如果剛剛已登入，請稍後再按一次同步。";
@@ -242,16 +244,30 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const handleSignOut = useCallback(async () => {
     if (!configured) return;
+
+    setSession(null);
+    setUser(null);
+    setActiveStorageUser();
+    saveAuthSessionSnapshot(null);
+    setPasswordRecovery(false);
+    setSyncStatus("idle");
+    setSyncError("");
+    clearSupabaseBrowserAuthStorage();
+
     if (recoveryMode) {
-      setSession(null);
-      setUser(null);
-      setActiveStorageUser();
-      saveAuthSessionSnapshot(null);
       setSyncStatus("ready");
       setSyncError(RECOVERY_MODE_MESSAGE);
       return;
     }
-    await getSupabaseBrowserClient().auth.signOut();
+
+    void withTimeout(
+      getSupabaseBrowserClient().auth.signOut({ scope: "local" }),
+      AUTH_SIGN_OUT_TIMEOUT_MS,
+      "登出回應逾時，已先清除本機登入狀態。"
+    ).catch((error) => {
+      clearSupabaseBrowserAuthStorage();
+      setSyncError(getErrorMessage(error) || "已登出此瀏覽器；遠端登出回應較慢。");
+    });
   }, [configured, recoveryMode]);
 
   useEffect(() => {

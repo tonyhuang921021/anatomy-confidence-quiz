@@ -98,6 +98,7 @@ export function AuthPanel() {
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
   const [submitting, setSubmitting] = useState(false);
+  const [signingOut, setSigningOut] = useState(false);
   const [homeToneMode, setHomeToneMode] = useState<HomeToneMode>("calm");
   const [themeMode, setThemeMode] = useState<ThemeMode>("light");
   const [settingsOpen, setSettingsOpen] = useState(false);
@@ -470,6 +471,14 @@ export function AuthPanel() {
     }
   }
 
+  async function handleSignOutClick() {
+    setSigningOut(true);
+    setError("");
+    setMessage("正在登出這台瀏覽器...");
+    await signOut();
+    setSigningOut(false);
+  }
+
   if (!configured) {
     return (
       <section className="surface-card p-6">
@@ -825,10 +834,11 @@ export function AuthPanel() {
           </button>
           <button
             type="button"
-            onClick={() => void signOut()}
-            className="secondary-pill"
+            onClick={() => void handleSignOutClick()}
+            disabled={signingOut}
+            className="secondary-pill disabled:cursor-not-allowed disabled:bg-slate-100"
           >
-            登出
+            {signingOut ? "登出中..." : "登出"}
           </button>
         </div>
       </section>

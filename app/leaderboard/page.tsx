@@ -7,35 +7,65 @@ import { useAuth } from "@/components/AuthProvider";
 import { loadLeaderboard } from "@/lib/cloudSync";
 import { LeaderboardEntry } from "@/types/quiz";
 
+const LEADERBOARD_LOAD_TIMEOUT_MS = 5000;
+
 export default function LeaderboardPage() {
   const { configured, user, syncVersion } = useAuth();
   const [entries, setEntries] = useState<LeaderboardEntry[]>([]);
   const [sortMode, setSortMode] = useState<"attempts" | "accuracy">("attempts");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [reloadKey, setReloadKey] = useState(0);
 
   useEffect(() => {
+    let isActive = true;
+    const controller = new AbortController();
+    const timeoutId = window.setTimeout(() => {
+      controller.abort();
+    }, LEADERBOARD_LOAD_TIMEOUT_MS);
+
     async function fetchLeaderboard() {
       if (!configured) {
         setEntries([]);
         setLoading(false);
+        window.clearTimeout(timeoutId);
         return;
       }
 
       try {
         setLoading(true);
         setError("");
-        const data = await loadLeaderboard(50);
+        const data = await loadLeaderboard(50, { signal: controller.signal });
+        if (!isActive) return;
         setEntries(data);
       } catch (fetchError) {
-        setError(fetchError instanceof Error ? fetchError.message : "刷題榜載入失敗");
+        if (!isActive) return;
+        const isAbortError =
+          fetchError instanceof Error &&
+          (fetchError.name === "AbortError" || fetchError.message.toLowerCase().includes("abort"));
+        setError(
+          isAbortError
+            ? "刷題榜讀取逾時，請稍後再試一次。"
+            : fetchError instanceof Error
+              ? fetchError.message
+              : "刷題榜載入失敗"
+        );
       } finally {
-        setLoading(false);
+        if (isActive) {
+          setLoading(false);
+        }
+        window.clearTimeout(timeoutId);
       }
     }
 
     void fetchLeaderboard();
-  }, [configured, syncVersion]);
+
+    return () => {
+      isActive = false;
+      window.clearTimeout(timeoutId);
+      controller.abort();
+    };
+  }, [configured, reloadKey, syncVersion]);
 
   const sortedEntries = [...entries].sort((a, b) => {
     if (sortMode === "accuracy") {
@@ -100,6 +130,13 @@ export default function LeaderboardPage() {
             <p className="mt-2 text-sm leading-7 text-slate-600">
               如果你剛升級這版，請回 Supabase SQL Editor 重新執行一次 [supabase/schema.sql](/Users/huangguanlun/Documents/New%20project/supabase/schema.sql)。
             </p>
+            <button
+              type="button"
+              onClick={() => setReloadKey((value) => value + 1)}
+              className="mt-4 min-h-12 rounded-2xl bg-brand-600 px-5 py-4 text-sm font-semibold text-white transition hover:bg-brand-700"
+            >
+              重新載入刷題榜
+            </button>
           </section>
         ) : (
           <div className="space-y-6">

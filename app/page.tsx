@@ -65,6 +65,11 @@ const QUICK_ENTRIES = [
 const HOME_RELEASE_NOTES = [
   {
     time: "06/18",
+    title: "登出不再裝死",
+    body: "Safari 如果跟 Supabase 眉來眼去太久，現在也會先把本機登出；刷題榜載太慢會給重試，不再原地發呆。"
+  },
+  {
+    time: "06/18",
     title: "陽明詳解修圖不卡文字",
     body: "修正版如果只是刪掉多餘截圖，現在不用硬湊一篇作文；有原文字就保留，純圖片也能乖乖修圖。"
   },

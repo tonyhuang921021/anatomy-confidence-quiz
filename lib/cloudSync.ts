@@ -1779,19 +1779,21 @@ export async function updateLeaderboardDisplayName(
   }
 }
 
-export async function loadLeaderboard(limit = 50) {
+export async function loadLeaderboard(limit = 50, options: { signal?: AbortSignal } = {}) {
   if (isSupabaseRecoveryMode() || !isSupabaseConfigured()) {
     return [] as LeaderboardEntry[];
   }
 
   const supabase = getSupabaseBrowserClient();
-  const { data, error } = await supabase
+  const query = supabase
     .from("leaderboard_profiles")
     .select("user_id, display_name, total_attempts, correct_attempts, correct_rate, total_sessions, updated_at")
     .order("total_attempts", { ascending: false })
     .order("correct_rate", { ascending: false })
     .order("updated_at", { ascending: false })
     .limit(limit);
+
+  const { data, error } = await (options.signal ? query.abortSignal(options.signal) : query);
 
   if (error) {
     throw error;

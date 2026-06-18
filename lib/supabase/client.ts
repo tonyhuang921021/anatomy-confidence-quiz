@@ -72,6 +72,20 @@ function createResilientAuthStorage(): BrowserAuthStorage | undefined {
   };
 }
 
+function getSupabaseAuthStorageKeys() {
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  if (!url) return [];
+
+  try {
+    const projectRef = new URL(url).hostname.split(".")[0];
+    if (!projectRef) return [];
+    const baseKey = `sb-${projectRef}-auth-token`;
+    return [baseKey, `${baseKey}-code-verifier`];
+  } catch {
+    return [];
+  }
+}
+
 export function isSupabaseConfigured() {
   return Boolean(
     process.env.NEXT_PUBLIC_SUPABASE_URL &&
@@ -103,4 +117,13 @@ export function getSupabaseBrowserClient() {
   }
 
   return browserClient;
+}
+
+export function clearSupabaseBrowserAuthStorage() {
+  if (!isBrowser()) return;
+
+  for (const key of getSupabaseAuthStorageKeys()) {
+    safelyRemove(window.localStorage, key);
+    safelyRemove(window.sessionStorage, key);
+  }
 }
