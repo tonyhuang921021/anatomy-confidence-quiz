@@ -264,9 +264,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       getSupabaseBrowserClient().auth.signOut({ scope: "local" }),
       AUTH_SIGN_OUT_TIMEOUT_MS,
       "登出回應逾時，已先清除本機登入狀態。"
-    ).catch((error) => {
+    ).catch(() => {
       clearSupabaseBrowserAuthStorage();
-      setSyncError(getErrorMessage(error) || "已登出此瀏覽器；遠端登出回應較慢。");
     });
   }, [configured, recoveryMode]);
 

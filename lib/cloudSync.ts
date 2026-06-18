@@ -75,16 +75,6 @@ type QuizSessionAttemptRow = {
   section_snapshot?: string | null;
 };
 
-type LeaderboardRow = {
-  user_id: string;
-  display_name: string;
-  total_attempts: number;
-  correct_attempts: number;
-  correct_rate: number;
-  total_sessions: number;
-  updated_at?: string | null;
-};
-
 type QuestionAttemptLogRow = {
   session_id: string;
   question_id: string;
@@ -1057,18 +1047,6 @@ function summarizeLeaderboardSessions(sessions: QuizSession[]) {
   };
 }
 
-function mapLeaderboardRow(row: LeaderboardRow): LeaderboardEntry {
-  return {
-    userId: row.user_id,
-    displayName: row.display_name,
-    totalAttempts: row.total_attempts,
-    correctAttempts: row.correct_attempts,
-    correctRate: Number(row.correct_rate ?? 0),
-    totalSessions: row.total_sessions,
-    updatedAt: row.updated_at ?? undefined
-  };
-}
-
 function mapQuestionAccuracyStatRow(row: QuestionAccuracyStatRow): QuestionCommunityStats {
   return {
     questionId: row.question_id,
@@ -1784,22 +1762,18 @@ export async function loadLeaderboard(limit = 50, options: { signal?: AbortSigna
     return [] as LeaderboardEntry[];
   }
 
-  const supabase = getSupabaseBrowserClient();
-  const query = supabase
-    .from("leaderboard_profiles")
-    .select("user_id, display_name, total_attempts, correct_attempts, correct_rate, total_sessions, updated_at")
-    .order("total_attempts", { ascending: false })
-    .order("correct_rate", { ascending: false })
-    .order("updated_at", { ascending: false })
-    .limit(limit);
+  const response = await fetch(`/api/leaderboard?limit=${encodeURIComponent(String(limit))}`, {
+    signal: options.signal
+  });
+  const payload = (await response.json().catch(() => null)) as
+    | { ok?: boolean; message?: string; leaderboard?: LeaderboardEntry[] }
+    | null;
 
-  const { data, error } = await (options.signal ? query.abortSignal(options.signal) : query);
-
-  if (error) {
-    throw error;
+  if (!response.ok || !payload?.ok || !payload.leaderboard) {
+    throw new Error(payload?.message || "刷題榜載入失敗");
   }
 
-  return (data ?? []).map((row) => mapLeaderboardRow(row as LeaderboardRow));
+  return payload.leaderboard;
 }
 
 const BACKGROUND_STATS_LOOKUP_LIMIT = 40;
