@@ -79,9 +79,14 @@ function getQuestionMap(
   classificationOverrides: Record<string, QuestionClassificationOverride>,
   explanationOverrides: Record<string, QuestionExplanationOverride>
 ) {
+  const requiredQuestionIds = new Set(session.attempts.map((attempt) => attempt.questionId));
+
   return new Map(
     [...allQuestions, ...(session.generatedQuestions ?? [])]
-      .filter((question): question is Question => Boolean(question?.id))
+      .filter(
+        (question): question is Question =>
+          Boolean(question?.id) && requiredQuestionIds.has(question.id)
+      )
       .map((question) => {
         const classifiedQuestion = applyQuestionClassificationOverride(
           question,
@@ -226,6 +231,7 @@ function ResultsPageContent() {
   const [copyPromptNotice, setCopyPromptNotice] = useState(false);
   const [isFullscreenReview, setIsFullscreenReview] = useState(false);
   const [isFullscreenReviewVisible, setIsFullscreenReviewVisible] = useState(false);
+  const [openReviewDetailKeys, setOpenReviewDetailKeys] = useState<Set<string>>(() => new Set());
   const [visibleHistoryCount, setVisibleHistoryCount] = useState(RESULTS_HISTORY_PAGE_SIZE);
   const [resultsScope, setResultsScope] = useState<"default" | "simulation">("default");
   const [editableSessionName, setEditableSessionName] = useState("");
@@ -518,6 +524,10 @@ function ResultsPageContent() {
   }, [syncVersion, requestedSessionId]);
 
   useEffect(() => {
+    setOpenReviewDetailKeys(new Set());
+  }, [requestedSessionId]);
+
+  useEffect(() => {
     if (!state.session) {
       setEditableSessionName("");
       setSessionNameNotice("");
@@ -743,6 +753,18 @@ function ResultsPageContent() {
     } else {
       setIsFullscreenReview(false);
     }
+  }
+
+  function setReviewDetailOpen(key: string, isOpen: boolean) {
+    setOpenReviewDetailKeys((current) => {
+      const next = new Set(current);
+      if (isOpen) {
+        next.add(key);
+      } else {
+        next.delete(key);
+      }
+      return next;
+    });
   }
 
   async function handleGenerateQuestionExplanation(question: Question, attempt: Attempt) {
@@ -1104,6 +1126,85 @@ function ResultsPageContent() {
     );
   }
 
+  function renderAttemptReviewDetails({
+    attempt,
+    question,
+    optionKeySuffix,
+    showCorrectness = false,
+    showTestedConcept = false
+  }: {
+    attempt: Attempt;
+    question: Question;
+    optionKeySuffix: string;
+    showCorrectness?: boolean;
+    showTestedConcept?: boolean;
+  }) {
+    return (
+      <div className="mt-4 min-w-0 space-y-3 overflow-hidden text-sm leading-7 text-slate-700 [overflow-wrap:anywhere]">
+        <QuestionStemBlock question={question} />
+        <div className="grid gap-3">
+          {getAvailableOptionKeys(question).map((key) => (
+            <QuestionOptionBlock
+              key={`${question.id}-${optionKeySuffix}-${key}`}
+              question={question}
+              optionKey={key}
+              wrapperClassName="rounded-2xl bg-white p-4"
+            />
+          ))}
+        </div>
+        <p>
+          <span className="font-semibold">我的答案：</span>
+          {attempt.selectedAnswer}
+        </p>
+        <p>
+          <span className="font-semibold">正確答案：</span>
+          {question.acceptedAnswers?.length &&
+          (question.answerCreditType === "multiple_accepted" ||
+            question.answerCreditType === "multiple_answers")
+            ? `${question.acceptedAnswers.join("/")} 皆可`
+            : question.answerCreditType === "all_credit"
+              ? "本題一律給分"
+              : attempt.correctAnswer}
+        </p>
+        {showCorrectness ? (
+          <p>
+            <span className="font-semibold">是否答對：</span>
+            {attempt.isCorrect ? "答對" : "答錯"}
+          </p>
+        ) : null}
+        {showTestedConcept ? (
+          <p>
+            <span className="font-semibold">testedConcept：</span>
+            {question.testedConcept}
+          </p>
+        ) : null}
+        <p>
+          <span className="font-semibold">信心：</span>
+          {attempt.confidence}
+        </p>
+        {attempt.errorType ? (
+          <p>
+            <span className="font-semibold">錯因：</span>
+            {attempt.errorType}
+          </p>
+        ) : null}
+        <p>
+          <span className="font-semibold">詳解：</span>
+          {question.explanation}
+        </p>
+        <YangmingExplanationPanel questionId={question.id} compact className="mt-3" />
+        {renderOptionAnalysis(question)}
+        {question.memoryTip ? (
+          <div className="memory-tip-box">
+            <span className="font-semibold">快速記憶法：</span>
+            {question.memoryTip}
+          </div>
+        ) : null}
+        {renderExplanationFooter(question, attempt)}
+      </div>
+    );
+  }
+
   function renderReviewSection(fullscreenMobile = false) {
     return (
       <section
@@ -1144,66 +1245,33 @@ function ResultsPageContent() {
                   這輪沒有錯題，可以直接展開下方全部題目回顧。
                 </div>
               ) : (
-                wrongAttempts.map(({ attempt, question }, index) => (
-                  <details key={`wrong-${attempt.questionId}`} className="overflow-hidden rounded-2xl bg-rose-50 p-3.5 sm:p-4">
-                    <summary className="block cursor-pointer overflow-hidden text-sm font-semibold text-rose-950">
-                      {renderQuestionSummaryLine({
-                        prefix: `錯題 ${index + 1}：`,
-                        question
-                      })}
-                    </summary>
-                    <div className="mt-4 min-w-0 space-y-3 overflow-hidden text-sm leading-7 text-slate-700 [overflow-wrap:anywhere]">
-                      <QuestionStemBlock question={question} />
-                      <div className="grid gap-3">
-                        {getAvailableOptionKeys(question).map((key) => (
-                          <QuestionOptionBlock
-                            key={`${question.id}-${key}`}
-                            question={question}
-                            optionKey={key}
-                            wrapperClassName="rounded-2xl bg-white p-4"
-                          />
-                        ))}
-                      </div>
-                      <p>
-                        <span className="font-semibold">我的答案：</span>
-                        {attempt.selectedAnswer}
-                      </p>
-                      <p>
-                        <span className="font-semibold">正確答案：</span>
-                        {question.acceptedAnswers?.length &&
-                        (question.answerCreditType === "multiple_accepted" ||
-                          question.answerCreditType === "multiple_answers")
-                          ? `${question.acceptedAnswers.join("/")} 皆可`
-                          : question.answerCreditType === "all_credit"
-                            ? "本題一律給分"
-                            : attempt.correctAnswer}
-                      </p>
-                      <p>
-                        <span className="font-semibold">信心：</span>
-                        {attempt.confidence}
-                      </p>
-                      {attempt.errorType ? (
-                        <p>
-                          <span className="font-semibold">錯因：</span>
-                          {attempt.errorType}
-                        </p>
-                      ) : null}
-                      <p>
-                        <span className="font-semibold">詳解：</span>
-                        {question.explanation}
-                      </p>
-                      <YangmingExplanationPanel questionId={question.id} compact className="mt-3" />
-                      {renderOptionAnalysis(question)}
-                      {question.memoryTip ? (
-                        <div className="memory-tip-box">
-                          <span className="font-semibold">快速記憶法：</span>
-                          {question.memoryTip}
-                        </div>
-                      ) : null}
-                      {renderExplanationFooter(question, attempt)}
-                    </div>
-                  </details>
-                ))
+                wrongAttempts.map(({ attempt, question }, index) => {
+                  const detailKey = `wrong-${attempt.questionId}-${index}`;
+                  const isOpen = openReviewDetailKeys.has(detailKey);
+
+                  return (
+                    <details
+                      key={detailKey}
+                      open={isOpen}
+                      onToggle={(event) => setReviewDetailOpen(detailKey, event.currentTarget.open)}
+                      className="overflow-hidden rounded-2xl bg-rose-50 p-3.5 sm:p-4"
+                    >
+                      <summary className="block cursor-pointer overflow-hidden text-sm font-semibold text-rose-950">
+                        {renderQuestionSummaryLine({
+                          prefix: `錯題 ${index + 1}：`,
+                          question
+                        })}
+                      </summary>
+                      {isOpen
+                        ? renderAttemptReviewDetails({
+                            attempt,
+                            question,
+                            optionKeySuffix: "wrong"
+                          })
+                        : null}
+                    </details>
+                  );
+                })
               )}
             </div>
           </div>
@@ -1216,71 +1284,35 @@ function ResultsPageContent() {
                   這輪沒有標記為低信心的題目。
                 </div>
               ) : (
-                lowConfidenceAttempts.map(({ attempt, question }, index) => (
-                  <details key={`low-confidence-${attempt.questionId}`} className="overflow-hidden rounded-2xl bg-amber-50 p-3.5 sm:p-4">
-                    <summary className="block cursor-pointer overflow-hidden text-sm font-semibold text-amber-950">
-                      {renderQuestionSummaryLine({
-                        prefix: `信心 ${attempt.confidence}｜${index + 1}：`,
-                        question,
-                        suffix: attempt.isCorrect ? "答對" : "答錯"
-                      })}
-                    </summary>
-                    <div className="mt-4 min-w-0 space-y-3 overflow-hidden text-sm leading-7 text-slate-700 [overflow-wrap:anywhere]">
-                      <QuestionStemBlock question={question} />
-                      <div className="grid gap-3">
-                        {getAvailableOptionKeys(question).map((key) => (
-                          <QuestionOptionBlock
-                            key={`${question.id}-low-${key}`}
-                            question={question}
-                            optionKey={key}
-                            wrapperClassName="rounded-2xl bg-white p-4"
-                          />
-                        ))}
-                      </div>
-                      <p>
-                        <span className="font-semibold">我的答案：</span>
-                        {attempt.selectedAnswer}
-                      </p>
-                      <p>
-                        <span className="font-semibold">正確答案：</span>
-                        {question.acceptedAnswers?.length &&
-                        (question.answerCreditType === "multiple_accepted" ||
-                          question.answerCreditType === "multiple_answers")
-                          ? `${question.acceptedAnswers.join("/")} 皆可`
-                          : question.answerCreditType === "all_credit"
-                            ? "本題一律給分"
-                            : attempt.correctAnswer}
-                      </p>
-                      <p>
-                        <span className="font-semibold">是否答對：</span>
-                        {attempt.isCorrect ? "答對" : "答錯"}
-                      </p>
-                      <p>
-                        <span className="font-semibold">信心：</span>
-                        {attempt.confidence}
-                      </p>
-                      {attempt.errorType ? (
-                        <p>
-                          <span className="font-semibold">錯因：</span>
-                          {attempt.errorType}
-                        </p>
-                      ) : null}
-                      <p>
-                        <span className="font-semibold">詳解：</span>
-                        {question.explanation}
-                      </p>
-                      <YangmingExplanationPanel questionId={question.id} compact className="mt-3" />
-                      {renderOptionAnalysis(question)}
-                      {question.memoryTip ? (
-                        <div className="memory-tip-box">
-                          <span className="font-semibold">快速記憶法：</span>
-                          {question.memoryTip}
-                        </div>
-                      ) : null}
-                      {renderExplanationFooter(question, attempt)}
-                    </div>
-                  </details>
-                ))
+                lowConfidenceAttempts.map(({ attempt, question }, index) => {
+                  const detailKey = `low-confidence-${attempt.questionId}-${index}`;
+                  const isOpen = openReviewDetailKeys.has(detailKey);
+
+                  return (
+                    <details
+                      key={detailKey}
+                      open={isOpen}
+                      onToggle={(event) => setReviewDetailOpen(detailKey, event.currentTarget.open)}
+                      className="overflow-hidden rounded-2xl bg-amber-50 p-3.5 sm:p-4"
+                    >
+                      <summary className="block cursor-pointer overflow-hidden text-sm font-semibold text-amber-950">
+                        {renderQuestionSummaryLine({
+                          prefix: `信心 ${attempt.confidence}｜${index + 1}：`,
+                          question,
+                          suffix: attempt.isCorrect ? "答對" : "答錯"
+                        })}
+                      </summary>
+                      {isOpen
+                        ? renderAttemptReviewDetails({
+                            attempt,
+                            question,
+                            optionKeySuffix: "low",
+                            showCorrectness: true
+                          })
+                        : null}
+                    </details>
+                  );
+                })
               )}
             </div>
           </div>
@@ -1288,71 +1320,35 @@ function ResultsPageContent() {
           <div>
             <h3 className="text-base font-semibold text-ink">全部題目回顧</h3>
             <div className="mt-3 grid gap-3">
-              {reviewedAttempts.map(({ attempt, question }, index) => (
-                <details key={`all-${attempt.questionId}`} className="overflow-hidden rounded-2xl bg-slate-50 p-3.5 sm:p-4">
-                  <summary className="block cursor-pointer overflow-hidden text-sm font-semibold text-ink">
-                    {renderQuestionSummaryLine({
-                      prefix: `第 ${index + 1} 題：${attempt.isCorrect ? "答對" : "答錯"}`,
-                      question,
-                      suffix: `信心 ${attempt.confidence}`
-                    })}
-                  </summary>
-                  <div className="mt-4 min-w-0 space-y-3 overflow-hidden text-sm leading-7 text-slate-700 [overflow-wrap:anywhere]">
-                    <QuestionStemBlock question={question} />
-                    <div className="grid gap-3">
-                      {getAvailableOptionKeys(question).map((key) => (
-                        <QuestionOptionBlock
-                          key={`${question.id}-all-${key}`}
-                          question={question}
-                          optionKey={key}
-                          wrapperClassName="rounded-2xl bg-white p-4"
-                        />
-                      ))}
-                    </div>
-                    <p>
-                      <span className="font-semibold">我的答案：</span>
-                      {attempt.selectedAnswer}
-                    </p>
-                    <p>
-                      <span className="font-semibold">正確答案：</span>
-                      {question.acceptedAnswers?.length &&
-                      (question.answerCreditType === "multiple_accepted" ||
-                        question.answerCreditType === "multiple_answers")
-                        ? `${question.acceptedAnswers.join("/")} 皆可`
-                        : question.answerCreditType === "all_credit"
-                          ? "本題一律給分"
-                          : attempt.correctAnswer}
-                    </p>
-                    <p>
-                      <span className="font-semibold">testedConcept：</span>
-                      {question.testedConcept}
-                    </p>
-                    <p>
-                      <span className="font-semibold">信心：</span>
-                      {attempt.confidence}
-                    </p>
-                    {attempt.errorType ? (
-                      <p>
-                        <span className="font-semibold">錯因：</span>
-                        {attempt.errorType}
-                      </p>
-                    ) : null}
-                    <p>
-                      <span className="font-semibold">詳解：</span>
-                      {question.explanation}
-                    </p>
-                    <YangmingExplanationPanel questionId={question.id} compact className="mt-3" />
-                    {renderOptionAnalysis(question)}
-                    {question.memoryTip ? (
-                      <div className="memory-tip-box">
-                        <span className="font-semibold">快速記憶法：</span>
-                        {question.memoryTip}
-                      </div>
-                    ) : null}
-                    {renderExplanationFooter(question, attempt)}
-                  </div>
-                </details>
-              ))}
+              {reviewedAttempts.map(({ attempt, question }, index) => {
+                const detailKey = `all-${attempt.questionId}-${index}`;
+                const isOpen = openReviewDetailKeys.has(detailKey);
+
+                return (
+                  <details
+                    key={detailKey}
+                    open={isOpen}
+                    onToggle={(event) => setReviewDetailOpen(detailKey, event.currentTarget.open)}
+                    className="overflow-hidden rounded-2xl bg-slate-50 p-3.5 sm:p-4"
+                  >
+                    <summary className="block cursor-pointer overflow-hidden text-sm font-semibold text-ink">
+                      {renderQuestionSummaryLine({
+                        prefix: `第 ${index + 1} 題：${attempt.isCorrect ? "答對" : "答錯"}`,
+                        question,
+                        suffix: `信心 ${attempt.confidence}`
+                      })}
+                    </summary>
+                    {isOpen
+                      ? renderAttemptReviewDetails({
+                          attempt,
+                          question,
+                          optionKeySuffix: "all",
+                          showTestedConcept: true
+                        })
+                      : null}
+                  </details>
+                );
+              })}
             </div>
           </div>
         </div>
