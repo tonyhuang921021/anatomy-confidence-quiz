@@ -8,11 +8,13 @@ import { PHARMACOLOGY_FLASHCARDS } from "@/data/pharmacologyFlashcards";
 
 const REVIEW_STATS_STORAGE_KEY = "pharmacology-review-stats-v1";
 const CLOUD_SYNC_DEBOUNCE_MS = 1600;
-const DESKTOP_SWIPE_THRESHOLD = 92;
-const MIN_MOBILE_SWIPE_THRESHOLD = 54;
-const MAX_MOBILE_SWIPE_THRESHOLD = 76;
-const FAST_SWIPE_VELOCITY = 0.42;
-const SWIPE_OUT_MS = 240;
+const DESKTOP_SWIPE_THRESHOLD = 82;
+const MIN_MOBILE_SWIPE_THRESHOLD = 34;
+const MAX_MOBILE_SWIPE_THRESHOLD = 48;
+const FAST_SWIPE_VELOCITY = 0.22;
+const SWIPE_PROJECTED_DISTANCE_MS = 150;
+const MIN_COMMITTED_DRAG = 18;
+const SWIPE_OUT_MS = 220;
 const MIN_REVIEW_FLOOR_RATIO = 0.18;
 
 type ReviewDirection = "known" | "unknown";
@@ -277,7 +279,7 @@ function clamp(value: number, min: number, max: number) {
 
 function getSwipeThreshold(cardWidth: number) {
   if (cardWidth < 560) {
-    return clamp(cardWidth * 0.17, MIN_MOBILE_SWIPE_THRESHOLD, MAX_MOBILE_SWIPE_THRESHOLD);
+    return clamp(cardWidth * 0.12, MIN_MOBILE_SWIPE_THRESHOLD, MAX_MOBILE_SWIPE_THRESHOLD);
   }
 
   return DESKTOP_SWIPE_THRESHOLD;
@@ -286,9 +288,11 @@ function getSwipeThreshold(cardWidth: number) {
 function isSwipeComplete(distance: number, elapsedMs: number, threshold: number) {
   const absoluteDistance = Math.abs(distance);
   const velocity = elapsedMs > 0 ? absoluteDistance / elapsedMs : 0;
-  const fastEnough = velocity >= FAST_SWIPE_VELOCITY && absoluteDistance >= threshold * 0.45;
+  const projectedDistance = absoluteDistance + velocity * SWIPE_PROJECTED_DISTANCE_MS;
+  const fastEnough = velocity >= FAST_SWIPE_VELOCITY && absoluteDistance >= threshold * 0.34;
+  const committedEnough = absoluteDistance >= MIN_COMMITTED_DRAG && projectedDistance >= threshold * 0.92;
 
-  return absoluteDistance >= threshold || fastEnough;
+  return absoluteDistance >= threshold || fastEnough || committedEnough;
 }
 
 async function copyText(text: string) {
