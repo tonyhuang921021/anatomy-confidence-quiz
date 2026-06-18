@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import { ConfidenceLevel } from "@/types/quiz";
 import { getConfidenceLabel } from "@/lib/quizAnalysis";
 
@@ -18,18 +19,37 @@ export function ConfidenceSelector({
   onExpand,
   onSelect
 }: ConfidenceSelectorProps) {
+  const [localValue, setLocalValue] = useState(value);
+  const [localExpanded, setLocalExpanded] = useState(expanded);
+
+  useEffect(() => {
+    setLocalValue(value);
+    setLocalExpanded(expanded);
+  }, [expanded, value]);
+
+  function handleExpand() {
+    setLocalExpanded((current) => !current);
+    onExpand();
+  }
+
+  function handleSelect(value: ConfidenceLevel) {
+    setLocalValue(value);
+    setLocalExpanded(value <= 3);
+    onSelect(value);
+  }
+
   return (
     <div className="rounded-3xl border border-slate-200 bg-slate-50 p-4">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
           <p className="text-sm font-medium text-slate-500">目前信心</p>
-          <p className="text-base font-semibold text-ink">{getConfidenceLabel(value)}</p>
+          <p className="text-base font-semibold text-ink">{getConfidenceLabel(localValue)}</p>
         </div>
         <button
           type="button"
-          onClick={onExpand}
+          onClick={handleExpand}
           className={`min-h-12 rounded-2xl px-4 py-3 text-sm font-semibold transition ${
-            expanded || value <= 3
+            localExpanded || localValue <= 3
               ? "bg-amber-100 text-amber-900 ring-2 ring-amber-300"
               : "bg-white text-slate-700 ring-1 ring-slate-200 hover:bg-amber-50"
           }`}
@@ -38,15 +58,15 @@ export function ConfidenceSelector({
         </button>
       </div>
 
-      {expanded ? (
+      {localExpanded ? (
         <div className="mt-4 grid gap-3 sm:grid-cols-3">
           {lowConfidenceOptions.map((option) => (
             <button
               key={option}
               type="button"
-              onClick={() => onSelect(option)}
+              onClick={() => handleSelect(option)}
               className={`min-h-12 rounded-2xl px-4 py-3 text-left text-sm font-medium transition ${
-                value === option
+                localValue === option
                   ? "bg-amber-500 text-white ring-2 ring-amber-200"
                   : "bg-white text-slate-700 ring-1 ring-slate-200 hover:bg-amber-50"
               }`}

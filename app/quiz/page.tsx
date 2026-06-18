@@ -447,6 +447,7 @@ export default function QuizPage() {
   const [selectedAnswer, setSelectedAnswer] = useState<OptionKey | undefined>();
   const [confidence, setConfidence] = useState<ConfidenceLevel>(4);
   const [confidenceExpanded, setConfidenceExpanded] = useState(false);
+  const confidenceRef = useRef<ConfidenceLevel>(4);
   const [submittedAttempt, setSubmittedAttempt] = useState<Attempt | null>(null);
   const [errorType, setErrorType] = useState<ErrorType | undefined>();
 
@@ -680,8 +681,10 @@ export default function QuizPage() {
           existing.attempts.find((attempt) => attempt.questionId === currentQuestionId) ?? null;
         setSubmittedAttempt(currentAttempt);
         setSelectedAnswer(currentAttempt?.selectedAnswer);
-        setConfidence(currentAttempt?.confidence ?? 4);
-        setConfidenceExpanded((currentAttempt?.confidence ?? 4) <= 3);
+        const nextConfidence = currentAttempt?.confidence ?? 4;
+        confidenceRef.current = nextConfidence;
+        setConfidence(nextConfidence);
+        setConfidenceExpanded(nextConfidence <= 3);
         setErrorType(currentAttempt?.errorType);
       } else {
         resetQuestionUI();
@@ -772,6 +775,7 @@ export default function QuizPage() {
     targetCount === 0 ? 0 : ((currentIndex + (submittedAttempt ? 1 : 0)) / targetCount) * 100;
   const answeredCount = session?.attempts.length ?? 0;
   const correctCount = session?.attempts.filter((attempt) => attempt.isCorrect).length ?? 0;
+  const displayedConfidence = submittedAttempt?.confidence ?? confidence;
   const averageConfidence =
     answeredCount === 0
       ? 0
@@ -790,6 +794,7 @@ export default function QuizPage() {
 
     if (existingAttempt) {
       setSelectedAnswer(existingAttempt.selectedAnswer);
+      confidenceRef.current = existingAttempt.confidence;
       setConfidence(existingAttempt.confidence);
       setConfidenceExpanded(existingAttempt.confidence <= 3);
       setErrorType(existingAttempt.errorType);
@@ -797,6 +802,7 @@ export default function QuizPage() {
     }
 
     setSelectedAnswer(undefined);
+    confidenceRef.current = 4;
     setConfidence(4);
     setConfidenceExpanded(false);
     setErrorType(undefined);
@@ -836,8 +842,7 @@ export default function QuizPage() {
   }
 
   function handleSelectConfidence(value: ConfidenceLevel) {
-    setConfidence(value);
-    setConfidenceExpanded(value <= 3);
+    confidenceRef.current = value;
 
     if (!session || !submittedAttempt) return;
 
@@ -863,7 +868,7 @@ export default function QuizPage() {
       selectedAnswer: answerToSubmit,
       correctAnswer: currentQuestion.answer,
       isCorrect: evaluateAttempt(currentQuestion, answerToSubmit),
-      confidence,
+      confidence: confidenceRef.current,
       answeredAt: new Date().toISOString()
     };
 
@@ -1283,6 +1288,7 @@ export default function QuizPage() {
   function resetQuestionUI() {
     setSubmittedAttempt(null);
     setSelectedAnswer(undefined);
+    confidenceRef.current = 4;
     setConfidence(4);
     setConfidenceExpanded(false);
     setErrorType(undefined);
@@ -1575,9 +1581,9 @@ export default function QuizPage() {
           {!submittedAttempt ? (
             <>
               <ConfidenceSelector
-                value={confidence}
-                expanded={confidenceExpanded}
-                onExpand={() => setConfidenceExpanded((current) => !current)}
+                value={displayedConfidence}
+                expanded={confidenceExpanded || displayedConfidence <= 3}
+                onExpand={() => undefined}
                 onSelect={handleSelectConfidence}
               />
 
@@ -1774,9 +1780,9 @@ export default function QuizPage() {
               </div>
 
               <ConfidenceSelector
-                value={confidence}
-                expanded={confidenceExpanded}
-                onExpand={() => setConfidenceExpanded((current) => !current)}
+                value={displayedConfidence}
+                expanded={confidenceExpanded || displayedConfidence <= 3}
+                onExpand={() => undefined}
                 onSelect={handleSelectConfidence}
               />
               {!submittedAttempt.isCorrect && shouldShowExplanation ? (
@@ -1854,7 +1860,7 @@ export default function QuizPage() {
                   目前小節 <span className="font-semibold">{currentQuestion.section}</span>
                 </p>
                 <p className="rounded-2xl bg-slate-50 px-4 py-3 text-sm text-slate-700">
-                  目前信心 <span className="font-semibold">{getConfidenceLabel(confidence)}</span>
+                  目前信心 <span className="font-semibold">{getConfidenceLabel(displayedConfidence)}</span>
                 </p>
                 <p className="rounded-2xl bg-slate-50 px-4 py-3 text-sm text-slate-700">
                   {isPeakChallenge ? "目前分數" : "已答題數"} <span className="font-semibold">{answeredCount}</span>
