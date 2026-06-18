@@ -1207,12 +1207,20 @@ html[data-theme="dark"] .podium-badge-champion {
   display: block;
   min-height: 560px;
   width: 100%;
-  cursor: pointer;
+  cursor: grab;
   border: 0;
   border-radius: 2rem;
   background: transparent;
   perspective: 1600px;
   outline: none;
+  touch-action: pan-y;
+  transform-origin: 50% 82%;
+  user-select: none;
+  will-change: transform;
+}
+
+.drug-flip-card:active {
+  cursor: grabbing;
 }
 
 .drug-flip-card:focus-visible {
