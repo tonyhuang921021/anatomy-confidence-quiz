@@ -22,6 +22,7 @@ const PRACTICE_FAST_ANSWER_MODE_KEY = "anatomy-confidence-practice-fast-answer-m
 const ACTIVE_USER_KEY = "anatomy-confidence-active-user-id";
 const GUEST_USER_ID = "guest";
 const completedSessionsMemoryCache = new Map<string, QuizSession[]>();
+const completedSessionIdMemoryCache = new Map<string, Set<string>>();
 
 const isBrowser = () => typeof window !== "undefined";
 
@@ -101,6 +102,19 @@ export function getCanonicalSessionId(sessionId: string) {
 
 function sessionDedupeKey(session: QuizSession) {
   return getCanonicalSessionId(session.id);
+}
+
+function buildCompletedSessionIdSet(sessions: QuizSession[]) {
+  return new Set(
+    sessions
+      .filter((session) => Boolean(session.completedAt))
+      .map((session) => getCanonicalSessionId(session.id))
+  );
+}
+
+function cacheCompletedSessionsForUser(userId: string, sessions: QuizSession[]) {
+  completedSessionsMemoryCache.set(userId, sessions);
+  completedSessionIdMemoryCache.set(userId, buildCompletedSessionIdSet(sessions));
 }
 
 function getLegacyOrScopedRaw(baseKey: string) {
@@ -411,12 +425,9 @@ export function getActiveStorageUser() {
 
 export function saveCurrentSession(session: QuizSession) {
   if (!isBrowser()) return;
+  const activeUser = getActiveStorageUser();
   const canonicalId = getCanonicalSessionId(session.id);
-  const alreadyCompleted = loadCompletedSessions().some(
-    (completedSession) =>
-      Boolean(completedSession.completedAt) &&
-      getCanonicalSessionId(completedSession.id) === canonicalId
-  );
+  const alreadyCompleted = completedSessionIdMemoryCache.get(activeUser)?.has(canonicalId) ?? false;
 
   if (!session.completedAt && alreadyCompleted) {
     clearMatchingCurrentSessions(session.id);
@@ -502,7 +513,7 @@ export function saveCompletedSessions(sessions: QuizSession[]) {
     (left.completedAt ?? left.startedAt).localeCompare(right.completedAt ?? right.startedAt)
   );
 
-  completedSessionsMemoryCache.set(activeUser, normalized);
+  cacheCompletedSessionsForUser(activeUser, normalized);
 
   let persisted = normalized.map(compactSessionForStorage);
   let didPersist = safeLocalStorageSetItem(scopedKey, JSON.stringify(persisted));
@@ -538,18 +549,26 @@ export function loadCompletedSessionsForUser(userId: string): QuizSession[] {
   const raw =
     safeLocalStorageGetItem(scopedKey) ??
     (userId === GUEST_USER_ID ? getLegacyOrScopedRaw(COMPLETED_SESSIONS_KEY) : null);
-  if (!raw) return [];
+  if (!raw) {
+    cacheCompletedSessionsForUser(userId, []);
+    return [];
+  }
 
   try {
-    return dedupeSessionsByCanonicalId(normalizeSessions(JSON.parse(raw) as QuizSession[]));
+    const normalized = dedupeSessionsByCanonicalId(normalizeSessions(JSON.parse(raw) as QuizSession[]));
+    cacheCompletedSessionsForUser(userId, normalized);
+    return normalized;
   } catch {
+    cacheCompletedSessionsForUser(userId, []);
     return [];
   }
 }
 
 export function clearHistory() {
   if (!isBrowser()) return;
-  completedSessionsMemoryCache.delete(getActiveStorageUser());
+  const activeUser = getActiveStorageUser();
+  completedSessionsMemoryCache.delete(activeUser);
+  completedSessionIdMemoryCache.delete(activeUser);
   safeLocalStorageRemoveItem(getScopedKey(COMPLETED_SESSIONS_KEY));
   safeLocalStorageRemoveItem(getScopedKey(CURRENT_SESSION_KEY));
 }
