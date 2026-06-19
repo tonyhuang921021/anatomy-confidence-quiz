@@ -332,6 +332,7 @@ export default function PharmacologyReviewPage() {
   const knownBadgeRef = useRef<HTMLSpanElement | null>(null);
   const unknownBadgeRef = useRef<HTMLSpanElement | null>(null);
   const pointerStartRef = useRef<{ pointerId: number | null; x: number; y: number; cardWidth: number } | null>(null);
+  const dragIntentRef = useRef<"horizontal" | "vertical" | null>(null);
   const dragXRef = useRef(0);
   const pendingDragXRef = useRef(0);
   const dragFrameRef = useRef<number | null>(null);
@@ -497,6 +498,7 @@ export default function PharmacologyReviewPage() {
 
   const resetActiveDrag = () => {
     pointerStartRef.current = null;
+    dragIntentRef.current = null;
     setIsDragging(false);
     dragXRef.current = 0;
     pendingDragXRef.current = 0;
@@ -561,6 +563,7 @@ export default function PharmacologyReviewPage() {
 
   const handlePointerDown = (event: PointerEvent<HTMLDivElement>) => {
     if (isLeaving) return;
+    if (event.pointerType === "touch") return;
     const target = event.target as HTMLElement;
     if (target.closest("button,a")) return;
 
@@ -571,6 +574,7 @@ export default function PharmacologyReviewPage() {
       cardWidth: event.currentTarget.getBoundingClientRect().width
     };
     dragXRef.current = 0;
+    dragIntentRef.current = null;
     pendingDragXRef.current = 0;
     applyDragVisual(0);
     setIsDragging(true);
@@ -584,7 +588,8 @@ export default function PharmacologyReviewPage() {
     const nextDragX = getPointerClientX(event) - start.x;
     const verticalDelta = Math.abs(getPointerClientY(event) - start.y);
     const horizontalDelta = Math.abs(nextDragX);
-    const hasHorizontalIntent = horizontalDelta > 4 || horizontalDelta >= verticalDelta * 0.45;
+    const hasHorizontalIntent = horizontalDelta > 12 && horizontalDelta > verticalDelta * 1.08;
+    if (!hasHorizontalIntent && verticalDelta > 10 && verticalDelta > horizontalDelta) return;
     if (hasHorizontalIntent) event.preventDefault();
 
     dragXRef.current = nextDragX;
@@ -621,6 +626,7 @@ export default function PharmacologyReviewPage() {
       cardWidth: event.currentTarget.getBoundingClientRect().width
     };
     dragXRef.current = 0;
+    dragIntentRef.current = null;
     pendingDragXRef.current = 0;
     applyDragVisual(0);
     setIsDragging(true);
@@ -632,8 +638,26 @@ export default function PharmacologyReviewPage() {
     const touch = event.touches[0];
     if (!touch) return;
 
-    event.preventDefault();
     const nextDragX = touch.clientX - start.x;
+    const verticalDelta = Math.abs(touch.clientY - start.y);
+    const horizontalDelta = Math.abs(nextDragX);
+
+    if (dragIntentRef.current === null) {
+      if (verticalDelta > 10 && verticalDelta > horizontalDelta * 1.15) {
+        dragIntentRef.current = "vertical";
+        setIsDragging(false);
+        return;
+      }
+      if (horizontalDelta > 12 && horizontalDelta > verticalDelta * 1.08) {
+        dragIntentRef.current = "horizontal";
+      } else {
+        return;
+      }
+    }
+
+    if (dragIntentRef.current !== "horizontal") return;
+
+    event.preventDefault();
     dragXRef.current = nextDragX;
     scheduleDragVisual(nextDragX);
   };
@@ -644,9 +668,12 @@ export default function PharmacologyReviewPage() {
 
     const touch = event.changedTouches[0];
     const finalDragX = touch ? touch.clientX - start.x : dragXRef.current;
+    const wasHorizontalDrag = dragIntentRef.current === "horizontal";
     dragXRef.current = finalDragX;
     pointerStartRef.current = null;
+    dragIntentRef.current = null;
     setIsDragging(false);
+    if (!wasHorizontalDrag && Math.abs(finalDragX) >= 9) return;
     settleDrag(finalDragX, start.cardWidth);
   };
 
@@ -671,7 +698,7 @@ export default function PharmacologyReviewPage() {
             <p className="eyebrow">Pharmacology Cards</p>
             <h1 className="display-title mt-3 text-4xl sm:text-6xl">藥理複習</h1>
             <p className="body-soft mt-3 max-w-2xl text-base leading-8">
-              隨機抽一個藥名，點卡片翻面看分類、機轉、適應症、國考考點、副作用禁忌、口訣和官方出現考期。左滑代表會，右滑代表不會，抽卡會依照重要度和你的不熟程度自動調整。
+              隨機抽一個藥名，點卡片翻面看分類、機轉、適應症、國考考點、副作用禁忌、口訣和官方出現考期。拖到左邊代表會、拖到右邊代表不會，抽卡會依照重要度和你的不熟程度自動調整。
             </p>
           </div>
           <Link href="/" className="secondary-pill">
@@ -749,7 +776,7 @@ export default function PharmacologyReviewPage() {
                 <span className="rounded-full bg-white/70 px-4 py-2 text-xs font-black uppercase tracking-[0.2em] text-brand-700">
                   Today's Random Drug
                 </span>
-                <span className="mt-10 block max-w-full text-center font-serif text-[clamp(2rem,11vw,4.8rem)] font-bold leading-[1.02] tracking-[-0.02em] text-ink [overflow-wrap:normal] [word-break:normal] sm:text-[clamp(3rem,7vw,6.2rem)]">
+                <span className="mt-10 block max-w-full text-center font-serif text-[clamp(2rem,11vw,4.8rem)] font-bold leading-[1.02] tracking-[-0.02em] text-ink [overflow-wrap:break-word] [word-break:normal] sm:text-[clamp(3rem,7vw,6.2rem)]">
                   {card.name}
                 </span>
                 <span className="body-soft mt-8 block text-center text-sm font-semibold">點一下看機轉；抓住卡片拖到旁邊放手</span>
@@ -765,7 +792,7 @@ export default function PharmacologyReviewPage() {
                   <span className="flex flex-wrap items-start justify-between gap-3">
                     <span>
                       <span className="eyebrow text-[10px]">藥物</span>
-                      <span className="mt-1 block text-3xl font-black tracking-[-0.02em] text-ink [overflow-wrap:normal] [word-break:normal]">{card.name}</span>
+                      <span className="mt-1 block text-3xl font-black tracking-[-0.02em] text-ink [overflow-wrap:break-word] [word-break:normal]">{card.name}</span>
                     </span>
                     <span className={`rounded-full border px-3 py-2 text-xs font-black ${levelMeta.className}`}>
                       {levelMeta.label}

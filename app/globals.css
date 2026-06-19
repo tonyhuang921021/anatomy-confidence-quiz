@@ -1213,7 +1213,7 @@ html[data-theme="dark"] .podium-badge-champion {
   background: transparent;
   perspective: 1600px;
   outline: none;
-  touch-action: none;
+  touch-action: pan-y;
   transform-origin: 50% 82%;
   user-select: none;
   -webkit-user-select: none;
@@ -1229,7 +1229,7 @@ html[data-theme="dark"] .podium-badge-champion {
 
 .drug-flip-card.is-dragging {
   cursor: grabbing;
-  touch-action: none;
+  touch-action: pan-y;
 }
 
 .drug-flip-card:focus-visible {
