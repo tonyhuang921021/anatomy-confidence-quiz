@@ -69,6 +69,7 @@ export function QuestionSupplementCardsPanel({
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [uploading, setUploading] = useState(false);
+  const [draggingImage, setDraggingImage] = useState(false);
   const [votingCardId, setVotingCardId] = useState<string | null>(null);
   const [reactionLoading, setReactionLoading] = useState(false);
   const [error, setError] = useState("");
@@ -138,8 +139,12 @@ export function QuestionSupplementCardsPanel({
     }
   }
 
-  async function handleUploadImage(file?: File | null) {
-    if (!file) return;
+  async function handleUploadImages(files: File[]) {
+    const imageFiles = files.filter((file) => ["image/png", "image/jpeg", "image/webp"].includes(file.type));
+    if (imageFiles.length === 0) {
+      setError("請拖曳 PNG、JPEG 或 WebP 圖片。");
+      return;
+    }
     if (!session?.access_token) {
       setError("請先登入，才能上傳圖片。");
       return;
@@ -147,18 +152,31 @@ export function QuestionSupplementCardsPanel({
     setUploading(true);
     setError("");
     try {
-      const url = await uploadQuestionSupplementImage({
-        questionId: question.id,
-        accessToken: session.access_token,
-        file
+      const urls: string[] = [];
+      for (const file of imageFiles) {
+        const url = await uploadQuestionSupplementImage({
+          questionId: question.id,
+          accessToken: session.access_token,
+          file
+        });
+        urls.push(url);
+      }
+      setDraftMarkdown((current) => {
+        const prefix = current.trimEnd();
+        const images = urls.map((url) => `![補充圖片](${url})`).join("\n");
+        return `${prefix}${prefix ? "\n\n" : ""}${images}\n`;
       });
-      setDraftMarkdown((current) => `${current.trimEnd()}\n\n![補充圖片](${url})\n`);
-      setMessage("圖片已插入補充卡片。");
+      setMessage(imageFiles.length > 1 ? `已插入 ${imageFiles.length} 張補充圖片。` : "圖片已插入補充卡片。");
     } catch (rawError) {
       setError(rawError instanceof Error ? rawError.message : "圖片上傳失敗");
     } finally {
       setUploading(false);
     }
+  }
+
+  function handleUploadImage(file?: File | null) {
+    if (!file) return;
+    void handleUploadImages([file]);
   }
 
   async function handleVote(card: QuestionSupplementCard, vote: QuestionSupplementCardVote) {
@@ -258,9 +276,31 @@ export function QuestionSupplementCardsPanel({
             <textarea
               value={draftMarkdown}
               onChange={(event) => setDraftMarkdown(event.target.value)}
+              onDragEnter={(event) => {
+                if (Array.from(event.dataTransfer.items).some((item) => item.kind === "file")) {
+                  event.preventDefault();
+                  setDraggingImage(true);
+                }
+              }}
+              onDragOver={(event) => {
+                if (Array.from(event.dataTransfer.items).some((item) => item.kind === "file")) {
+                  event.preventDefault();
+                  event.dataTransfer.dropEffect = uploading ? "none" : "copy";
+                  setDraggingImage(true);
+                }
+              }}
+              onDragLeave={() => setDraggingImage(false)}
+              onDrop={(event) => {
+                event.preventDefault();
+                setDraggingImage(false);
+                if (uploading) return;
+                void handleUploadImages(Array.from(event.dataTransfer.files));
+              }}
               rows={compact ? 7 : 10}
-              className="min-h-44 rounded-2xl border border-slate-200 bg-white px-4 py-3 font-mono text-sm leading-6 outline-none focus:border-teal-400 focus:ring-4 focus:ring-teal-50"
-              placeholder="可以貼自己查到的資料、表格、記憶法，或補充這題為什麼根本純搞。支援 Markdown。"
+              className={`min-h-44 rounded-2xl border px-4 py-3 font-mono text-sm leading-6 outline-none transition focus:border-teal-400 focus:ring-4 focus:ring-teal-50 ${
+                draggingImage ? "border-teal-400 bg-teal-50/70 ring-4 ring-teal-50" : "border-slate-200 bg-white"
+              }`}
+              placeholder="可以貼自己查到的資料、表格、記憶法，或補充這題為什麼根本純搞。支援 Markdown，也可以直接把圖片拖進來。"
             />
           </label>
           <div className="mt-3 flex flex-wrap items-center justify-between gap-2">
@@ -274,7 +314,7 @@ export function QuestionSupplementCardsPanel({
                 onChange={(event) => {
                   const file = event.target.files?.[0];
                   event.currentTarget.value = "";
-                  void handleUploadImage(file);
+                  handleUploadImage(file);
                 }}
               />
             </label>

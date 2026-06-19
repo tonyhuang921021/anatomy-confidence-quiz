@@ -1,7 +1,6 @@
 "use client";
 
 import Link from "next/link";
-import type { ReactNode } from "react";
 import { Suspense, useEffect, useMemo, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useAuth } from "@/components/AuthProvider";
@@ -1066,13 +1065,11 @@ function ResultsPageContent() {
   function renderQuestionSummaryLine({
     prefix,
     question,
-    suffix,
-    action
+    suffix
   }: {
     prefix: string;
     question: Question;
     suffix?: string;
-    action?: ReactNode;
   }) {
     const sourceBadge = getQuestionSourceBadgeLabel(question);
     const shouldShowLeadingSlash = !prefix.trim().endsWith("：");
@@ -1099,16 +1096,6 @@ function ResultsPageContent() {
             ) : null}
             {renderQuestionCommunityBadge(question.id)}
           </span>
-          {action ? (
-            <span
-              onClick={(event) => {
-                event.preventDefault();
-                event.stopPropagation();
-              }}
-            >
-              {action}
-            </span>
-          ) : null}
         </span>
       </span>
     );
@@ -1129,6 +1116,14 @@ function ResultsPageContent() {
   }) {
     return (
       <div className="mt-4 min-w-0 space-y-3 overflow-hidden text-sm leading-7 text-slate-700 [overflow-wrap:anywhere]">
+        <div className="flex justify-end">
+          <CopyQuestionPromptButton
+            question={question}
+            selectedAnswer={attempt.selectedAnswer}
+            correctAnswer={attempt.correctAnswer}
+            className="px-0"
+          />
+        </div>
         <QuestionStemBlock question={question} />
         <div className="grid gap-3">
           {getAvailableOptionKeys(question).map((key) => (
@@ -1247,15 +1242,7 @@ function ResultsPageContent() {
                       <summary className="block cursor-pointer overflow-hidden text-sm font-semibold text-rose-950">
                         {renderQuestionSummaryLine({
                           prefix: `錯題 ${index + 1}：`,
-                          question,
-                          action: (
-                            <CopyQuestionPromptButton
-                              question={question}
-                              selectedAnswer={attempt.selectedAnswer}
-                              correctAnswer={attempt.correctAnswer}
-                              className="px-3 py-1.5 text-xs"
-                            />
-                          )
+                          question
                         })}
                       </summary>
                       {isOpen
@@ -1295,15 +1282,7 @@ function ResultsPageContent() {
                         {renderQuestionSummaryLine({
                           prefix: `信心 ${attempt.confidence}｜${index + 1}：`,
                           question,
-                          suffix: attempt.isCorrect ? "答對" : "答錯",
-                          action: (
-                            <CopyQuestionPromptButton
-                              question={question}
-                              selectedAnswer={attempt.selectedAnswer}
-                              correctAnswer={attempt.correctAnswer}
-                              className="px-3 py-1.5 text-xs"
-                            />
-                          )
+                          suffix: attempt.isCorrect ? "答對" : "答錯"
                         })}
                       </summary>
                       {isOpen
@@ -1339,15 +1318,7 @@ function ResultsPageContent() {
                       {renderQuestionSummaryLine({
                         prefix: `第 ${index + 1} 題：${attempt.isCorrect ? "答對" : "答錯"}`,
                         question,
-                        suffix: `信心 ${attempt.confidence}`,
-                        action: (
-                          <CopyQuestionPromptButton
-                            question={question}
-                            selectedAnswer={attempt.selectedAnswer}
-                            correctAnswer={attempt.correctAnswer}
-                            className="px-3 py-1.5 text-xs"
-                          />
-                        )
+                        suffix: `信心 ${attempt.confidence}`
                       })}
                     </summary>
                     {isOpen
