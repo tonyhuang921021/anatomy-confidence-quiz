@@ -249,6 +249,44 @@ export type StudyNoteQuestionLink = {
   reason?: string;
 };
 
+export type QuestionSupplementCardVote = "helpful" | "problematic";
+
+export type QuestionSupplementCard = {
+  id: string;
+  questionId: string;
+  subject?: SubjectName;
+  chapter?: string;
+  section?: string;
+  contentMarkdown: string;
+  authorLabel: string;
+  isMine?: boolean;
+  helpfulCount: number;
+  problematicCount: number;
+  myVote?: QuestionSupplementCardVote;
+  attachmentUrls?: string[];
+  createdAt: string;
+  updatedAt: string;
+};
+
+export type QuestionSupplementReactionType = "pure_chaos";
+
+export type QuestionSupplementReactionSummary = {
+  type: QuestionSupplementReactionType;
+  label: string;
+  count: number;
+  active?: boolean;
+};
+
+export type RecentQuestionSupplementCard = {
+  id: string;
+  questionId: string;
+  subject?: SubjectName;
+  chapter?: string;
+  section?: string;
+  contentPreview: string;
+  updatedAt: string;
+};
+
 export type StudyNoteCollection = {
   id: string;
   name: string;

@@ -9,7 +9,7 @@ import { CopyQuestionPromptButton } from "@/components/CopyQuestionPromptButton"
 import { ErrorTypeSelector } from "@/components/ErrorTypeSelector";
 import { QuestionCard } from "@/components/QuestionCard";
 import { QuestionIssueReportButton } from "@/components/QuestionIssueReportButton";
-import { YangmingExplanationPanel } from "@/components/YangmingExplanationPanel";
+import { QuestionExplanationTabs } from "@/components/QuestionExplanationTabs";
 import {
   applyQuestionClassificationOverride,
   buildExamLikeRandomSet,
@@ -1659,8 +1659,8 @@ export default function QuizPage() {
                         testedConcept：<span className="font-semibold">{currentQuestion.testedConcept}</span>
                       </p>
                       {shouldShowAiExplanationDetails ? <p>整題詳解：{currentQuestion.explanation}</p> : null}
-                      <YangmingExplanationPanel
-                        questionId={currentQuestion.id}
+                      <QuestionExplanationTabs
+                        question={currentQuestion}
                         className="mt-3"
                       />
                     </>

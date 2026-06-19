@@ -928,6 +928,20 @@ set
   file_size_limit = excluded.file_size_limit,
   allowed_mime_types = excluded.allowed_mime_types;
 
+insert into storage.buckets (id, name, public, file_size_limit, allowed_mime_types)
+values (
+  'question-supplement-attachments',
+  'question-supplement-attachments',
+  true,
+  3145728,
+  array['image/png', 'image/jpeg', 'image/webp']
+)
+on conflict (id) do update
+set
+  public = excluded.public,
+  file_size_limit = excluded.file_size_limit,
+  allowed_mime_types = excluded.allowed_mime_types;
+
 create table if not exists public.yangming_explanation_reports (
   id bigint generated always as identity primary key,
   question_id text not null,
@@ -1239,6 +1253,107 @@ drop policy if exists "Service role can manage question issue reports" on public
 
 create policy "Service role can manage question issue reports"
 on public.question_issue_reports
+for all
+to service_role
+using (true)
+with check (true);
+
+create table if not exists public.question_supplement_cards (
+  id uuid primary key default gen_random_uuid(),
+  question_id text not null,
+  subject text,
+  chapter text,
+  section text,
+  question_stem text,
+  content_markdown text not null,
+  attachment_urls text[] not null default '{}'::text[],
+  author_label text not null,
+  author_email text,
+  user_id uuid not null references auth.users (id) on delete cascade,
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now(),
+  unique (user_id, question_id)
+);
+
+create index if not exists question_supplement_cards_question_updated_idx
+on public.question_supplement_cards (question_id, updated_at desc);
+
+create index if not exists question_supplement_cards_user_updated_idx
+on public.question_supplement_cards (user_id, updated_at desc);
+
+create index if not exists question_supplement_cards_subject_updated_idx
+on public.question_supplement_cards (subject, updated_at desc);
+
+grant select, insert, update, delete
+  on public.question_supplement_cards
+  to service_role;
+
+alter table public.question_supplement_cards enable row level security;
+
+drop policy if exists "Service role can manage question supplement cards" on public.question_supplement_cards;
+
+create policy "Service role can manage question supplement cards"
+on public.question_supplement_cards
+for all
+to service_role
+using (true)
+with check (true);
+
+create table if not exists public.question_supplement_card_votes (
+  id bigint generated always as identity primary key,
+  card_id uuid not null references public.question_supplement_cards (id) on delete cascade,
+  question_id text not null,
+  vote_value text not null check (vote_value in ('helpful', 'problematic')),
+  user_id uuid not null references auth.users (id) on delete cascade,
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now(),
+  unique (card_id, user_id)
+);
+
+create index if not exists question_supplement_card_votes_card_id_idx
+on public.question_supplement_card_votes (card_id);
+
+create index if not exists question_supplement_card_votes_question_id_idx
+on public.question_supplement_card_votes (question_id);
+
+grant select, insert, update, delete
+  on public.question_supplement_card_votes
+  to service_role;
+
+alter table public.question_supplement_card_votes enable row level security;
+
+drop policy if exists "Service role can manage question supplement card votes" on public.question_supplement_card_votes;
+
+create policy "Service role can manage question supplement card votes"
+on public.question_supplement_card_votes
+for all
+to service_role
+using (true)
+with check (true);
+
+create table if not exists public.question_supplement_reactions (
+  id bigint generated always as identity primary key,
+  question_id text not null,
+  reaction_type text not null check (reaction_type in ('pure_chaos')),
+  user_id uuid not null references auth.users (id) on delete cascade,
+  user_email text,
+  created_at timestamptz not null default now(),
+  unique (question_id, reaction_type, user_id)
+);
+
+create index if not exists question_supplement_reactions_question_idx
+on public.question_supplement_reactions (question_id, reaction_type);
+
+grant select, insert, update, delete
+  on public.question_supplement_reactions
+  to service_role;
+
+alter table public.question_supplement_reactions enable row level security;
+
+drop policy if exists "Service role can manage question supplement reactions" on public.question_supplement_reactions;
+
+create policy "Service role can manage question supplement reactions"
+on public.question_supplement_reactions
 for all
 to service_role
 using (true)

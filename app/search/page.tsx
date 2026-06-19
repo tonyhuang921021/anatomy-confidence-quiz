@@ -4,9 +4,9 @@ import Link from "next/link";
 import { useDeferredValue, useEffect, useMemo, useState } from "react";
 import { useAuth } from "@/components/AuthProvider";
 import { CopyQuestionPromptButton } from "@/components/CopyQuestionPromptButton";
+import { QuestionExplanationTabs } from "@/components/QuestionExplanationTabs";
 import { QuestionOptionBlock, QuestionStemBlock } from "@/components/QuestionMediaBlock";
 import { QuestionIssueReportButton } from "@/components/QuestionIssueReportButton";
-import { YangmingExplanationPanel } from "@/components/YangmingExplanationPanel";
 import {
   loadConfirmedQuestionClassificationOverrides,
   loadSharedQuestionExplanationOverrides,
@@ -566,6 +566,9 @@ export default function SearchPage() {
 
               <div className="mt-5 space-y-4 text-sm leading-7 text-slate-700">
                 <QuestionStemBlock question={renderedQuestion} />
+                <div className="flex flex-wrap items-center gap-2">
+                  <CopyQuestionPromptButton question={renderedQuestion} />
+                </div>
 
                 <div className="grid gap-3">
                   {OPTION_KEYS.filter((key) => typeof renderedQuestion.options[key] === "string").map((key) => (
@@ -600,7 +603,7 @@ export default function SearchPage() {
                   <span className="font-semibold">詳解：</span>
                   {renderedQuestion.explanation}
                 </p>
-                <YangmingExplanationPanel questionId={renderedQuestion.id} compact className="mt-3" />
+                <QuestionExplanationTabs question={renderedQuestion} compact className="mt-3" />
                 {renderedQuestion.optionAnalysis ? (
                   <div className="space-y-2.5">
                     {OPTION_KEYS.map((key) => {
@@ -631,7 +634,6 @@ export default function SearchPage() {
                   </div>
                 ) : null}
                 <div className="space-y-3">
-                  <CopyQuestionPromptButton question={renderedQuestion} />
                   {override ? (
                     <div className="flex flex-wrap items-center gap-3">
                       <span className="inline-flex rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-600">

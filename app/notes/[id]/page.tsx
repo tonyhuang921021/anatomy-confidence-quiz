@@ -1,17 +1,19 @@
 "use client";
 
 import Link from "next/link";
-import { useDeferredValue, useEffect, useMemo, useState, useTransition } from "react";
+import type { DragEvent } from "react";
+import { useDeferredValue, useEffect, useMemo, useRef, useState, useTransition } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { useAuth } from "@/components/AuthProvider";
 import { StudyNoteMarkdown } from "@/components/StudyNoteMarkdown";
 import { getCanonicalQuestionBank } from "@/data/med1QuestionBank";
 import { resolveStudyNoteQuestionLinks } from "@/lib/questionLinkResolver";
+import { loadRecentQuestionSupplementCards } from "@/lib/questionSupplementCards";
 import { DEFAULT_QUIZ_SETTINGS } from "@/lib/quizAnalysis";
 import { saveQuizSettings } from "@/lib/storage";
 import { buildStudyNoteQuestionLinkPrompt } from "@/lib/studyNotePrompt";
 import { deleteStudyNote, loadStudyNote, parseStudyNoteMetadata, parseStudyNoteQuestionLinkText, updateStudyNote } from "@/lib/studyNotes";
-import type { Question, StudyNoteDetail, StudyNoteQuestionLink } from "@/types/quiz";
+import type { Question, RecentQuestionSupplementCard, StudyNoteDetail, StudyNoteQuestionLink } from "@/types/quiz";
 
 function formatDate(value: string) {
   return new Intl.DateTimeFormat("zh-Hant", {
@@ -91,9 +93,14 @@ export default function StudyNoteDetailPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [message, setMessage] = useState("");
+  const [recentSupplementCards, setRecentSupplementCards] = useState<RecentQuestionSupplementCard[]>([]);
+  const [stickyDrawerOpen, setStickyDrawerOpen] = useState(false);
+  const [expandedStickyQuestionId, setExpandedStickyQuestionId] = useState<string | null>(null);
+  const [recentSupplementLoading, setRecentSupplementLoading] = useState(false);
   const [isPending, startTransition] = useTransition();
   const deferredQuestionSearch = useDeferredValue(questionSearch);
   const questionLinkPromptText = useMemo(() => buildStudyNoteQuestionLinkPrompt(8), []);
+  const markdownTextareaRef = useRef<HTMLTextAreaElement | null>(null);
 
   useEffect(() => {
     if (!configured || !session?.access_token || !params.id) {
@@ -127,6 +134,30 @@ export default function StudyNoteDetailPage() {
       cancelled = true;
     };
   }, [configured, params.id, session?.access_token]);
+
+  useEffect(() => {
+    if (!configured || !session?.access_token) {
+      setRecentSupplementCards([]);
+      return;
+    }
+
+    let cancelled = false;
+    setRecentSupplementLoading(true);
+    loadRecentQuestionSupplementCards(session.access_token, 18)
+      .then((cards) => {
+        if (!cancelled) setRecentSupplementCards(cards);
+      })
+      .catch(() => {
+        if (!cancelled) setRecentSupplementCards([]);
+      })
+      .finally(() => {
+        if (!cancelled) setRecentSupplementLoading(false);
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [configured, session?.access_token]);
 
   const allQuestions = useMemo(
     () =>
@@ -221,6 +252,60 @@ export default function StudyNoteDetailPage() {
         }
       ])
     );
+  }
+
+  function addSupplementQuestionLink(question: Question) {
+    setDraftQuestionLinks((current) =>
+      mergeUniqueLinks(current, [
+        {
+          questionId: question.id,
+          relationType: "explains",
+          reason: "由題目補充卡片加入"
+        }
+      ])
+    );
+  }
+
+  function insertQuestionShortcode(question: Question) {
+    const shortcode = `\n\n[question-note id="${question.id}"]\n\n`;
+    const textarea = markdownTextareaRef.current;
+    setDraftMarkdown((current) => {
+      if (!textarea) return `${current.trimEnd()}${shortcode}`;
+      const start = textarea.selectionStart ?? current.length;
+      const end = textarea.selectionEnd ?? current.length;
+      return `${current.slice(0, start)}${shortcode}${current.slice(end)}`;
+    });
+    addSupplementQuestionLink(question);
+    window.requestAnimationFrame(() => {
+      const nextPosition = (textarea?.selectionStart ?? draftMarkdown.length) + shortcode.length;
+      markdownTextareaRef.current?.focus();
+      markdownTextareaRef.current?.setSelectionRange(nextPosition, nextPosition);
+    });
+  }
+
+  function handleStickyInsert(question: Question) {
+    if (!editing) {
+      resetDraftsFromNote();
+      setEditing(true);
+      setDraftMarkdown(`${(note?.rawMarkdown ?? "").trimEnd()}\n\n[question-note id="${question.id}"]\n\n`);
+      addSupplementQuestionLink(question);
+      setMessage("已切到編輯模式並插入題目便利貼。");
+      setError("");
+      return;
+    }
+    insertQuestionShortcode(question);
+    setMessage("已插入題目便利貼。");
+    setError("");
+  }
+
+  function handleMarkdownDrop(event: DragEvent<HTMLTextAreaElement>) {
+    const questionId = event.dataTransfer.getData("application/x-question-id") || event.dataTransfer.getData("text/plain");
+    const question = questionMap.get(questionId);
+    if (!question) return;
+    event.preventDefault();
+    insertQuestionShortcode(question);
+    setMessage("已把題目便利貼放進筆記。");
+    setError("");
   }
 
   function removeQuestionLink(questionId: string) {
@@ -365,8 +450,11 @@ export default function StudyNoteDetailPage() {
               <label className="grid gap-2 text-sm font-semibold text-slate-700">
                 Markdown 內容
                 <textarea
+                  ref={markdownTextareaRef}
                   value={draftMarkdown}
                   onChange={(event) => setDraftMarkdown(event.target.value)}
+                  onDragOver={(event) => event.preventDefault()}
+                  onDrop={handleMarkdownDrop}
                   rows={24}
                   className="min-h-[620px] rounded-3xl border border-slate-200 bg-white px-4 py-3 font-mono text-sm leading-6 outline-none focus:border-teal-500"
                 />
@@ -547,6 +635,109 @@ export default function StudyNoteDetailPage() {
           ) : null}
         </aside>
       </section>
+
+      {note ? (
+        <div className="fixed bottom-5 right-5 z-40">
+          {stickyDrawerOpen ? (
+            <div className="mb-3 max-h-[72vh] w-[min(92vw,420px)] overflow-hidden rounded-3xl border border-teal-100 bg-white shadow-2xl ring-1 ring-slate-100">
+              <div className="flex items-start justify-between gap-3 border-b border-slate-100 p-4">
+                <div>
+                  <p className="text-sm font-black text-slate-950">題目便利貼</p>
+                  <p className="mt-1 text-xs leading-5 text-slate-500">
+                    最近做過補充卡片的題目。編輯時可拖到 Markdown 裡想放的位置。
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setStickyDrawerOpen(false)}
+                  className="rounded-full bg-slate-100 px-3 py-1.5 text-xs font-bold text-slate-700"
+                >
+                  收起
+                </button>
+              </div>
+              <div className="max-h-[58vh] overflow-auto p-3">
+                {recentSupplementLoading ? (
+                  <p className="rounded-2xl bg-slate-50 p-4 text-sm text-slate-500">載入便利貼中...</p>
+                ) : recentSupplementCards.length === 0 ? (
+                  <p className="rounded-2xl bg-slate-50 p-4 text-sm leading-6 text-slate-500">
+                    你最近還沒有做過題目補充卡片。
+                  </p>
+                ) : (
+                  <div className="grid gap-2">
+                    {recentSupplementCards.map((card) => {
+                      const question = questionMap.get(card.questionId);
+                      const linked = draftQuestionLinks.some((link) => link.questionId === card.questionId) ||
+                        note.questionLinks.some((link) => link.questionId === card.questionId);
+                      const expanded = expandedStickyQuestionId === card.questionId;
+                      return (
+                        <article
+                          key={card.id}
+                          draggable={Boolean(question)}
+                          onDragStart={(event) => {
+                            event.dataTransfer.setData("application/x-question-id", card.questionId);
+                            event.dataTransfer.setData("text/plain", card.questionId);
+                          }}
+                          className="rounded-2xl border border-slate-200 bg-slate-50 p-3 text-sm"
+                        >
+                          <div className="flex items-start justify-between gap-2">
+                            <div className="min-w-0">
+                              <p className="break-words font-black text-slate-950">{card.questionId}</p>
+                              <p className="mt-1 text-xs font-semibold text-slate-500">
+                                {card.subject ?? question?.subject ?? "未知科目"}
+                                {card.chapter ?? question?.chapter ? ` / ${card.chapter ?? question?.chapter}` : ""}
+                              </p>
+                            </div>
+                            <span className="shrink-0 rounded-full bg-white px-2 py-1 text-[11px] font-bold text-teal-700 ring-1 ring-teal-100">
+                              {linked ? "已加入" : "可拖曳"}
+                            </span>
+                          </div>
+                          <p className="mt-2 line-clamp-2 text-xs leading-5 text-slate-600">{card.contentPreview}</p>
+                          {expanded && question ? (
+                            <div className="mt-3 rounded-2xl bg-white p-3 text-xs leading-5 text-slate-700">
+                              <p className="font-bold text-slate-950">題幹</p>
+                              <p className="mt-1">{question.stem}</p>
+                              <p className="mt-2 font-bold text-slate-950">答案：{question.answer}</p>
+                              <p className="mt-2 font-bold text-slate-950">詳解</p>
+                              <p className="mt-1">{question.explanation}</p>
+                            </div>
+                          ) : null}
+                          <div className="mt-3 flex flex-wrap gap-2">
+                            <button
+                              type="button"
+                              onClick={() => setExpandedStickyQuestionId(expanded ? null : card.questionId)}
+                              className="rounded-full bg-white px-3 py-1.5 text-xs font-bold text-slate-700 ring-1 ring-slate-200"
+                            >
+                              {expanded ? "收起詳解" : "看詳解"}
+                            </button>
+                            {question ? (
+                              <button
+                                type="button"
+                                onClick={() => handleStickyInsert(question)}
+                                disabled={linked && editing}
+                                className="rounded-full bg-teal-600 px-3 py-1.5 text-xs font-black text-white transition hover:bg-teal-700 disabled:bg-slate-200 disabled:text-slate-500"
+                              >
+                                {linked ? "已加入" : editing ? "插入游標處" : "加入筆記"}
+                              </button>
+                            ) : null}
+                          </div>
+                        </article>
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
+            </div>
+          ) : null}
+          <button
+            type="button"
+            onClick={() => setStickyDrawerOpen((current) => !current)}
+            className="flex h-14 w-14 items-center justify-center rounded-full bg-teal-600 text-3xl font-black leading-none text-white shadow-2xl transition hover:bg-teal-700"
+            aria-label="開啟題目便利貼"
+          >
+            +
+          </button>
+        </div>
+      ) : null}
     </main>
   );
 }

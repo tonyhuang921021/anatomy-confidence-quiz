@@ -6,10 +6,10 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { useAuth } from "@/components/AuthProvider";
 import { CopyQuestionPromptButton } from "@/components/CopyQuestionPromptButton";
 import { QuestionOptionBlock, QuestionStemBlock } from "@/components/QuestionMediaBlock";
+import { QuestionExplanationTabs } from "@/components/QuestionExplanationTabs";
 import { QuestionIssueReportButton } from "@/components/QuestionIssueReportButton";
 import { ResultSummary } from "@/components/ResultSummary";
 import { WeaknessRanking } from "@/components/WeaknessRanking";
-import { YangmingExplanationPanel } from "@/components/YangmingExplanationPanel";
 import {
   loadQuestionCommunityStats,
   loadConfirmedQuestionClassificationOverrides,
@@ -1046,11 +1046,6 @@ function ResultsPageContent() {
   function renderExplanationFooter(question: Question, attempt: Attempt) {
     return (
       <div className="space-y-3">
-        <CopyQuestionPromptButton
-          question={question}
-          selectedAnswer={attempt.selectedAnswer}
-          correctAnswer={attempt.correctAnswer}
-        />
         {renderQuestionExplanationControls(question, attempt)}
       </div>
     );
@@ -1120,6 +1115,14 @@ function ResultsPageContent() {
     return (
       <div className="mt-4 min-w-0 space-y-3 overflow-hidden text-sm leading-7 text-slate-700 [overflow-wrap:anywhere]">
         <QuestionStemBlock question={question} />
+        <div className="flex flex-wrap items-center gap-2">
+          {renderQuestionCommunityBadge(question.id)}
+          <CopyQuestionPromptButton
+            question={question}
+            selectedAnswer={attempt.selectedAnswer}
+            correctAnswer={attempt.correctAnswer}
+          />
+        </div>
         <div className="grid gap-3">
           {getAvailableOptionKeys(question).map((key) => (
             <QuestionOptionBlock
@@ -1170,7 +1173,7 @@ function ResultsPageContent() {
           <span className="font-semibold">詳解：</span>
           {question.explanation}
         </p>
-        <YangmingExplanationPanel questionId={question.id} compact className="mt-3" />
+        <QuestionExplanationTabs question={question} compact className="mt-3" />
         {renderOptionAnalysis(question)}
         {question.memoryTip ? (
           <div className="memory-tip-box">

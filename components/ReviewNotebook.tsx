@@ -3,9 +3,9 @@
 import Link from "next/link";
 import { type ReactNode, useEffect, useMemo, useState } from "react";
 import { CopyQuestionPromptButton } from "@/components/CopyQuestionPromptButton";
+import { QuestionExplanationTabs } from "@/components/QuestionExplanationTabs";
 import { QuestionOptionBlock, QuestionStemBlock } from "@/components/QuestionMediaBlock";
 import { QuestionIssueReportButton } from "@/components/QuestionIssueReportButton";
-import { YangmingExplanationPanel } from "@/components/YangmingExplanationPanel";
 import {
   loadConfirmedQuestionClassificationOverrides,
   loadQuestionCommunityStats,
@@ -182,7 +182,7 @@ function renderQuestionReview(
         <span className="font-semibold">重點解析：</span>
         {renderedQuestion.explanation}
       </p>
-      <YangmingExplanationPanel questionId={renderedQuestion.id} compact className="mt-3" />
+      <QuestionExplanationTabs question={renderedQuestion} compact className="mt-3" />
       {renderedQuestion.optionAnalysis ? (
         <div className="space-y-2.5">
           {getOptionKeysFromQuestion(renderedQuestion).map((key) => {
@@ -262,7 +262,7 @@ function renderRelatedQuestions(question: Question, relatedQuestionIndex: Relate
               <span className="font-semibold">詳解：</span>
               {relatedQuestion.explanation}
             </p>
-            <YangmingExplanationPanel questionId={relatedQuestion.id} compact className="mt-3" />
+            <QuestionExplanationTabs question={relatedQuestion} compact className="mt-3" />
             {relatedQuestion.memoryTip ? (
               <div className="memory-tip-box">
                 <span className="font-semibold">快速記憶法：</span>
@@ -699,11 +699,11 @@ export function ReviewNotebook({
 
     return (
       <div className="space-y-3">
-        <CopyQuestionPromptButton
-          question={question}
-          correctAnswer={question.answer}
-        />
         <div className="flex flex-wrap items-center gap-2">
+          <CopyQuestionPromptButton
+            question={question}
+            correctAnswer={question.answer}
+          />
           {override ? (
             <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-600">
               已替換詳解・{override.model ?? "gpt-5.4-mini"}
