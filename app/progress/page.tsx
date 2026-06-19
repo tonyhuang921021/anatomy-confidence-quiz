@@ -25,6 +25,9 @@ type SubjectProgress = {
   label: string;
   totalQuestionsInBank: number;
   attemptedQuestions: number;
+  totalAttempts: number;
+  correctAttempts: number;
+  confidenceTotal: number;
   completionRate: number;
   correctRate: number;
   averageConfidence: number;
@@ -142,12 +145,15 @@ function calculateSubjectProgress(subject: SubjectName, sessions: QuizSession[])
     .sort((a, b) => a.chapter.localeCompare(b.chapter) || a.section.localeCompare(b.section));
 
   const attemptedQuestions = new Set(attempts.map((attempt) => attempt.questionId)).size;
+  const totalAttempts = attempts.length;
+  const correctAttempts = attempts.filter((attempt) => attempt.isCorrect).length;
+  const confidenceTotal = attempts.reduce((sum, attempt) => sum + attempt.confidence, 0);
   const completionRate =
     trackableQuestions.length === 0 ? 0 : round((attemptedQuestions / trackableQuestions.length) * 100);
   const correctRate =
-    attempts.length === 0 ? 0 : round((attempts.filter((attempt) => attempt.isCorrect).length / attempts.length) * 100);
+    totalAttempts === 0 ? 0 : round((correctAttempts / totalAttempts) * 100);
   const averageConfidence =
-    attempts.length === 0 ? 0 : round(attempts.reduce((sum, attempt) => sum + attempt.confidence, 0) / attempts.length);
+    totalAttempts === 0 ? 0 : round(confidenceTotal / totalAttempts);
   const masteryScore = round(
     completionRate * 0.4 + correctRate * 0.4 + (averageConfidence / 5) * 100 * 0.2
   );
@@ -157,6 +163,9 @@ function calculateSubjectProgress(subject: SubjectName, sessions: QuizSession[])
     label: subjectItem.label,
     totalQuestionsInBank: trackableQuestions.length,
     attemptedQuestions,
+    totalAttempts,
+    correctAttempts,
+    confidenceTotal,
     completionRate,
     correctRate,
     averageConfidence,
@@ -174,12 +183,15 @@ function aggregateGroup(
 ): GroupProgress {
   const totalQuestionsInBank = subjects.reduce((sum, subject) => sum + subject.totalQuestionsInBank, 0);
   const attemptedQuestions = subjects.reduce((sum, subject) => sum + subject.attemptedQuestions, 0);
+  const totalAttempts = subjects.reduce((sum, subject) => sum + subject.totalAttempts, 0);
+  const correctAttempts = subjects.reduce((sum, subject) => sum + subject.correctAttempts, 0);
+  const confidenceTotal = subjects.reduce((sum, subject) => sum + subject.confidenceTotal, 0);
   const completionRate =
     totalQuestionsInBank === 0 ? 0 : round((attemptedQuestions / totalQuestionsInBank) * 100);
   const correctRate =
-    subjects.length === 0 ? 0 : round(subjects.reduce((sum, subject) => sum + subject.correctRate, 0) / subjects.length);
+    totalAttempts === 0 ? 0 : round((correctAttempts / totalAttempts) * 100);
   const averageConfidence =
-    subjects.length === 0 ? 0 : round(subjects.reduce((sum, subject) => sum + subject.averageConfidence, 0) / subjects.length);
+    totalAttempts === 0 ? 0 : round(confidenceTotal / totalAttempts);
   const masteryScore = round(
     completionRate * 0.4 + correctRate * 0.4 + (averageConfidence / 5) * 100 * 0.2
   );
