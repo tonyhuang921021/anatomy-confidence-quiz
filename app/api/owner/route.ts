@@ -9,7 +9,6 @@ import type {
   OwnerQuestionIssueReportEntry,
   OwnerRecentAIAccountEntry,
   OwnerYangmingExplanationReportEntry,
-  OwnerYangmingModeActivationEntry,
   OwnerTopAttemptVisitorEntry
 } from "@/types/quiz";
 import { normalizeEmail } from "@/lib/aiAccountBan";
@@ -96,12 +95,6 @@ type QuestionIssueReportRow = {
   reviewed_at?: string | null;
   reviewed_by_email?: string | null;
   resolution_note?: string | null;
-};
-
-type YangmingModeActivationRow = {
-  user_email?: string | null;
-  visitor_id?: string | null;
-  enabled_at: string;
 };
 
 type YangmingExplanationReportRow = {
@@ -663,53 +656,6 @@ async function fetchOwnerQuestionIssueReports(
   }));
 }
 
-async function fetchOwnerYangmingModeActivations(
-  supabase: any,
-  limit = 80
-): Promise<OwnerYangmingModeActivationEntry[]> {
-  const { data, error } = await supabase
-    .from("yangming_mode_activations")
-    .select("user_email, visitor_id, enabled_at")
-    .order("enabled_at", { ascending: false })
-    .limit(1000);
-
-  if (error) {
-    const message = String(error.message ?? "");
-    if (message.includes("yangming_mode_activations") && (message.includes("does not exist") || message.includes("Could not find"))) {
-      return [];
-    }
-    throw error;
-  }
-
-  const grouped = new Map<string, OwnerYangmingModeActivationEntry>();
-  for (const row of ((data ?? []) as YangmingModeActivationRow[])) {
-    const userEmail = row.user_email?.trim().toLowerCase();
-    const visitorId = row.visitor_id?.trim();
-    const key = userEmail || visitorId || "unknown";
-    const current = grouped.get(key) ?? {
-      label: userEmail || formatVisitorLabel(visitorId),
-      userEmail: userEmail || undefined,
-      visitorId: visitorId || undefined,
-      activationCount: 0,
-      firstEnabledAt: row.enabled_at,
-      lastEnabledAt: row.enabled_at
-    };
-
-    current.activationCount += 1;
-    if (!current.firstEnabledAt || row.enabled_at < current.firstEnabledAt) {
-      current.firstEnabledAt = row.enabled_at;
-    }
-    if (!current.lastEnabledAt || row.enabled_at > current.lastEnabledAt) {
-      current.lastEnabledAt = row.enabled_at;
-    }
-    grouped.set(key, current);
-  }
-
-  return Array.from(grouped.values())
-    .sort((a, b) => (b.lastEnabledAt ?? "").localeCompare(a.lastEnabledAt ?? ""))
-    .slice(0, limit);
-}
-
 async function fetchOwnerYangmingExplanationReports(
   supabase: any,
   limit = 80
@@ -785,7 +731,6 @@ export async function POST(request: NextRequest) {
       classificationReports,
       questionIssueReports,
       recentAiAccounts,
-      yangmingModeActivations,
       yangmingExplanationReports
     ] = await withServerTimeout(
       Promise.all([
@@ -797,7 +742,6 @@ export async function POST(request: NextRequest) {
         fetchOwnerClassificationReports(supabase, 40),
         fetchOwnerQuestionIssueReports(supabase, 80),
         fetchRecentAIAccounts(supabase),
-        fetchOwnerYangmingModeActivations(supabase, 80),
         fetchOwnerYangmingExplanationReports(supabase, 80)
       ]),
       OWNER_QUERY_TIMEOUT_MS,
@@ -820,7 +764,6 @@ export async function POST(request: NextRequest) {
       classificationReports,
       questionIssueReports,
       recentAiAccounts,
-      yangmingModeActivations,
       yangmingExplanationReports
     });
   } catch (error) {

@@ -481,15 +481,6 @@ export type OwnerQuestionIssueReportEntry = {
   resolutionNote?: string;
 };
 
-export type OwnerYangmingModeActivationEntry = {
-  label: string;
-  userEmail?: string;
-  visitorId?: string;
-  activationCount: number;
-  firstEnabledAt?: string;
-  lastEnabledAt?: string;
-};
-
 export type OwnerYangmingExplanationReportEntry = {
   id: string;
   questionId: string;

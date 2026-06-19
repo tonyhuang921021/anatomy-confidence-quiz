@@ -13,7 +13,6 @@ import {
   OwnerQuestionIssueReportEntry,
   OwnerRecentAIAccountEntry,
   OwnerYangmingExplanationReportEntry,
-  OwnerYangmingModeActivationEntry,
   OwnerTopAttemptVisitorEntry
 } from "@/types/quiz";
 
@@ -42,7 +41,6 @@ type OwnerApiPayload = {
   topVisitors?: OwnerTopAttemptVisitorEntry[];
   classificationReports?: OwnerClassificationReportEntry[];
   questionIssueReports?: OwnerQuestionIssueReportEntry[];
-  yangmingModeActivations?: OwnerYangmingModeActivationEntry[];
   yangmingExplanationReports?: OwnerYangmingExplanationReportEntry[];
 };
 
@@ -57,6 +55,30 @@ function formatUpdatedAt(value: string) {
 
 function isBanActive(value?: string) {
   return Boolean(value && new Date(value).getTime() > Date.now());
+}
+
+function getYangmingReportStatus(report: OwnerYangmingExplanationReportEntry) {
+  if (report.reportType === "correction") {
+    return {
+      label: "同學修正版",
+      time: report.appliedAt,
+      className: "bg-teal-50 text-teal-800 ring-teal-100"
+    };
+  }
+
+  if (report.appliedAt) {
+    return {
+      label: "後台修復",
+      time: report.appliedAt,
+      className: "bg-emerald-50 text-emerald-700 ring-emerald-100"
+    };
+  }
+
+  return {
+    label: "待處理",
+    time: undefined,
+    className: "bg-rose-50 text-rose-700 ring-rose-100"
+  };
 }
 
 const GPT_5_4_MINI_INPUT_USD_PER_MILLION = 0.75;
@@ -221,7 +243,6 @@ export default function OwnerPage() {
   const [explanationUsage, setExplanationUsage] = useState<OwnerExplanationUsageEntry[]>([]);
   const [searchUsage, setSearchUsage] = useState<OwnerExplanationUsageEntry[]>([]);
   const [recentAiAccounts, setRecentAiAccounts] = useState<OwnerRecentAIAccountEntry[]>([]);
-  const [yangmingModeActivations, setYangmingModeActivations] = useState<OwnerYangmingModeActivationEntry[]>([]);
   const [yangmingExplanationReports, setYangmingExplanationReports] = useState<OwnerYangmingExplanationReportEntry[]>([]);
   const [topVisitors, setTopVisitors] = useState<OwnerTopAttemptVisitorEntry[]>([]);
   const [classificationReports, setClassificationReports] = useState<OwnerClassificationReportEntry[]>([]);
@@ -237,10 +258,14 @@ export default function OwnerPage() {
   const allowed = useMemo(() => isAllowedEmail(user?.email), [user?.email]);
   const hasAllowlist = getAllowedEmails().length > 0;
   const yangmingReportSummary = useMemo(() => {
-    const done = yangmingExplanationReports.filter((report) => Boolean(report.appliedAt)).length;
     return {
-      done,
-      pending: yangmingExplanationReports.length - done
+      pending: yangmingExplanationReports.filter(
+        (report) => report.reportType !== "correction" && !report.appliedAt
+      ).length,
+      backendFixed: yangmingExplanationReports.filter(
+        (report) => report.reportType !== "correction" && Boolean(report.appliedAt)
+      ).length,
+      userCorrections: yangmingExplanationReports.filter((report) => report.reportType === "correction").length
     };
   }, [yangmingExplanationReports]);
   const questionIssueSummary = useMemo(() => {
@@ -407,7 +432,6 @@ export default function OwnerPage() {
         setExplanationUsage(payload.explanationUsage ?? []);
         setSearchUsage(payload.searchUsage ?? []);
         setRecentAiAccounts(payload.recentAiAccounts ?? []);
-        setYangmingModeActivations(payload.yangmingModeActivations ?? []);
         setYangmingExplanationReports(payload.yangmingExplanationReports ?? []);
         setTopVisitors(payload.topVisitors ?? []);
         setClassificationReports(payload.classificationReports ?? []);
@@ -435,7 +459,6 @@ export default function OwnerPage() {
         setExplanationUsage(payload.explanationUsage ?? []);
         setSearchUsage(payload.searchUsage ?? []);
         setRecentAiAccounts(payload.recentAiAccounts ?? []);
-        setYangmingModeActivations(payload.yangmingModeActivations ?? []);
         setYangmingExplanationReports(payload.yangmingExplanationReports ?? []);
         setTopVisitors(payload.topVisitors ?? []);
         setClassificationReports(payload.classificationReports ?? []);
@@ -824,7 +847,10 @@ export default function OwnerPage() {
                     待處理 {yangmingReportSummary.pending}
                   </span>
                   <span className="rounded-full bg-emerald-50 px-3 py-1 text-xs font-bold text-emerald-700">
-                    已處理 {yangmingReportSummary.done}
+                    後台修復 {yangmingReportSummary.backendFixed}
+                  </span>
+                  <span className="rounded-full bg-teal-50 px-3 py-1 text-xs font-bold text-teal-800">
+                    同學修正版 {yangmingReportSummary.userCorrections}
                   </span>
                 </div>
               </div>
@@ -849,60 +875,61 @@ export default function OwnerPage() {
                         </td>
                       </tr>
                     ) : (
-                      yangmingExplanationReports.map((report) => (
-                        <tr key={report.id} className="border-b border-slate-100 last:border-b-0">
-                          <td className="whitespace-nowrap px-3 py-3 font-mono text-xs font-bold text-ink">
-                            {report.questionId}
-                          </td>
-                          <td className="whitespace-nowrap px-3 py-3">
-                            {report.appliedAt ? (
+                      yangmingExplanationReports.map((report) => {
+                        const status = getYangmingReportStatus(report);
+                        return (
+                          <tr key={report.id} className="border-b border-slate-100 last:border-b-0">
+                            <td className="whitespace-nowrap px-3 py-3 font-mono text-xs font-bold text-ink">
+                              {report.questionId}
+                            </td>
+                            <td className="whitespace-nowrap px-3 py-3">
                               <div className="flex flex-col gap-1">
-                                <span className="w-fit rounded-full bg-emerald-50 px-3 py-1 text-xs font-bold text-emerald-700 ring-1 ring-emerald-100">
-                                  已處理
+                                <span
+                                  className={`w-fit rounded-full px-3 py-1 text-xs font-bold ring-1 ${status.className}`}
+                                >
+                                  {status.label}
                                 </span>
-                                <span className="text-xs text-slate-400">{formatUpdatedAt(report.appliedAt)}</span>
+                                {status.time ? (
+                                  <span className="text-xs text-slate-400">{formatUpdatedAt(status.time)}</span>
+                                ) : null}
                               </div>
-                            ) : (
-                              <span className="rounded-full bg-rose-50 px-3 py-1 text-xs font-bold text-rose-700 ring-1 ring-rose-100">
-                                待處理
+                            </td>
+                            <td className="whitespace-nowrap px-3 py-3">
+                              <span
+                                className={`rounded-full px-3 py-1 text-xs font-bold ${
+                                  report.reportType === "correction"
+                                    ? "bg-teal-50 text-teal-800"
+                                    : "bg-amber-50 text-amber-800"
+                                }`}
+                              >
+                                {report.reportType === "correction" ? "修正版" : "回報"}
                               </span>
-                            )}
-                          </td>
-                          <td className="whitespace-nowrap px-3 py-3">
-                            <span
-                              className={`rounded-full px-3 py-1 text-xs font-bold ${
-                                report.reportType === "correction"
-                                  ? "bg-teal-50 text-teal-800"
-                                  : "bg-amber-50 text-amber-800"
-                              }`}
-                            >
-                              {report.reportType === "correction" ? "已採用修正" : "回報"}
-                            </span>
-                          </td>
-                          <td className="min-w-[260px] px-3 py-3 text-slate-700">
-                            <p>{report.reason}</p>
-                            {report.proposedBody ? (
-                              <details className="mt-2 rounded-2xl bg-slate-50 px-3 py-2 text-xs leading-5 text-slate-600">
-                                <summary className="cursor-pointer font-bold text-slate-800">
-                                  查看修正版
-                                </summary>
-                                <pre className="mt-2 max-h-64 overflow-auto whitespace-pre-wrap break-words font-sans">
-                                  {report.proposedBody}
-                                </pre>
-                              </details>
-                            ) : null}
-                          </td>
-                          <td className="whitespace-nowrap px-3 py-3 text-slate-500">
-                            {report.reporterLabel}
-                          </td>
-                          <td className="min-w-[180px] px-3 py-3 text-xs text-slate-400">
-                            {report.sourceLabel ?? report.sourceFile ?? "—"}
-                          </td>
-                          <td className="whitespace-nowrap px-3 py-3 text-slate-500">
-                            {formatUpdatedAt(report.createdAt)}
-                          </td>
-                        </tr>
-                      ))
+                            </td>
+                            <td className="min-w-[260px] px-3 py-3 text-slate-700">
+                              <p>{report.reason}</p>
+                              {report.proposedBody ? (
+                                <details className="mt-2 rounded-2xl bg-slate-50 px-3 py-2 text-xs leading-5 text-slate-600">
+                                  <summary className="cursor-pointer font-bold text-slate-800">
+                                    查看修正版
+                                  </summary>
+                                  <pre className="mt-2 max-h-64 overflow-auto whitespace-pre-wrap break-words font-sans">
+                                    {report.proposedBody}
+                                  </pre>
+                                </details>
+                              ) : null}
+                            </td>
+                            <td className="whitespace-nowrap px-3 py-3 text-slate-500">
+                              {report.reporterLabel}
+                            </td>
+                            <td className="min-w-[180px] px-3 py-3 text-xs text-slate-400">
+                              {report.sourceLabel ?? report.sourceFile ?? "—"}
+                            </td>
+                            <td className="whitespace-nowrap px-3 py-3 text-slate-500">
+                              {formatUpdatedAt(report.createdAt)}
+                            </td>
+                          </tr>
+                        );
+                      })
                     )}
                   </tbody>
                 </table>
@@ -984,54 +1011,6 @@ export default function OwnerPage() {
                           </tr>
                         );
                       })
-                    )}
-                  </tbody>
-                </table>
-              </div>
-            </section>
-
-            <section className="rounded-[2rem] bg-white p-6 shadow-card ring-1 ring-slate-100">
-              <div className="flex items-center justify-between gap-3">
-                <div>
-                  <h2 className="text-lg font-semibold text-ink">陽明詳解模式啟用紀錄</h2>
-                  <p className="mt-2 text-sm text-slate-500">
-                    只統計真正完成隱藏開關的人；未啟用者不會在公開頁看到任何提示。
-                  </p>
-                </div>
-              </div>
-              <div className="mt-4 overflow-x-auto">
-                <table className="min-w-full text-left text-sm">
-                  <thead className="text-slate-500">
-                    <tr className="border-b border-slate-200">
-                      <th className="px-3 py-3 font-semibold">使用者 / 裝置</th>
-                      <th className="px-3 py-3 font-semibold">啟用次數</th>
-                      <th className="px-3 py-3 font-semibold">第一次啟用</th>
-                      <th className="px-3 py-3 font-semibold">最後啟用</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {yangmingModeActivations.length === 0 ? (
-                      <tr>
-                        <td colSpan={4} className="px-3 py-6 text-center text-slate-500">
-                          目前還沒有啟用紀錄。
-                        </td>
-                      </tr>
-                    ) : (
-                      yangmingModeActivations.map((entry) => (
-                        <tr
-                          key={`${entry.userEmail ?? entry.visitorId ?? entry.label}-yangming`}
-                          className="border-b border-slate-100 last:border-b-0"
-                        >
-                          <td className="px-3 py-3 font-medium text-ink">{entry.label}</td>
-                          <td className="px-3 py-3 text-slate-700">{entry.activationCount}</td>
-                          <td className="px-3 py-3 text-slate-500">
-                            {entry.firstEnabledAt ? formatUpdatedAt(entry.firstEnabledAt) : "—"}
-                          </td>
-                          <td className="px-3 py-3 text-slate-500">
-                            {entry.lastEnabledAt ? formatUpdatedAt(entry.lastEnabledAt) : "—"}
-                          </td>
-                        </tr>
-                      ))
                     )}
                   </tbody>
                 </table>
