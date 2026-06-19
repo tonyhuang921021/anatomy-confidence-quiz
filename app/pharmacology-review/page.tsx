@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import type { MouseEvent, PointerEvent } from "react";
+import type { MouseEvent, PointerEvent, TouchEvent } from "react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useAuth } from "@/components/AuthProvider";
 import { PHARMACOLOGY_FLASHCARDS } from "@/data/pharmacologyFlashcards";
@@ -331,7 +331,7 @@ export default function PharmacologyReviewPage() {
   const cardElementRef = useRef<HTMLDivElement | null>(null);
   const knownBadgeRef = useRef<HTMLSpanElement | null>(null);
   const unknownBadgeRef = useRef<HTMLSpanElement | null>(null);
-  const pointerStartRef = useRef<{ pointerId: number; x: number; y: number; cardWidth: number } | null>(null);
+  const pointerStartRef = useRef<{ pointerId: number | null; x: number; y: number; cardWidth: number } | null>(null);
   const dragXRef = useRef(0);
   const pendingDragXRef = useRef(0);
   const dragFrameRef = useRef<number | null>(null);
@@ -475,6 +475,34 @@ export default function PharmacologyReviewPage() {
     });
   };
 
+  const settleDrag = (finalDragX: number, cardWidth: number, shouldFlipOnTap = true) => {
+    const threshold = getSwipeThreshold(cardWidth);
+    if (Math.abs(finalDragX) < 9) {
+      dragXRef.current = 0;
+      pendingDragXRef.current = 0;
+      applyDragVisual(0, true);
+      if (shouldFlipOnTap) flipCard();
+      return;
+    }
+
+    if (Math.abs(finalDragX) >= threshold) {
+      finishSwipe(finalDragX > 0 ? "unknown" : "known");
+      return;
+    }
+
+    dragXRef.current = 0;
+    pendingDragXRef.current = 0;
+    applyDragVisual(0, true);
+  };
+
+  const resetActiveDrag = () => {
+    pointerStartRef.current = null;
+    setIsDragging(false);
+    dragXRef.current = 0;
+    pendingDragXRef.current = 0;
+    applyDragVisual(0, true);
+  };
+
   const resetCardState = () => {
     setIsFlipped(false);
     setHasRevealedClass(false);
@@ -551,7 +579,7 @@ export default function PharmacologyReviewPage() {
 
   const handlePointerMove = (event: PointerEvent<HTMLDivElement>) => {
     const start = pointerStartRef.current;
-    if (!start || start.pointerId !== event.pointerId || isLeaving) return;
+    if (!start || start.pointerId === null || start.pointerId !== event.pointerId || isLeaving) return;
 
     const nextDragX = getPointerClientX(event) - start.x;
     const verticalDelta = Math.abs(getPointerClientY(event) - start.y);
@@ -565,39 +593,66 @@ export default function PharmacologyReviewPage() {
 
   const handlePointerEnd = (event: PointerEvent<HTMLDivElement>) => {
     const start = pointerStartRef.current;
-    if (!start || start.pointerId !== event.pointerId || isLeaving) return;
+    if (!start || start.pointerId === null || start.pointerId !== event.pointerId || isLeaving) return;
 
     pointerStartRef.current = null;
     setIsDragging(false);
     event.currentTarget.releasePointerCapture?.(event.pointerId);
-
-    const finalDragX = dragXRef.current;
-    const threshold = getSwipeThreshold(start.cardWidth);
-    if (Math.abs(finalDragX) < 9) {
-      dragXRef.current = 0;
-      pendingDragXRef.current = 0;
-      applyDragVisual(0, true);
-      flipCard();
-      return;
-    }
-
-    if (Math.abs(finalDragX) >= threshold) {
-      finishSwipe(finalDragX > 0 ? "unknown" : "known");
-      return;
-    }
-
-    dragXRef.current = 0;
-    pendingDragXRef.current = 0;
-    applyDragVisual(0, true);
+    settleDrag(dragXRef.current, start.cardWidth);
   };
 
   const handlePointerCancel = (event: PointerEvent<HTMLDivElement>) => {
     if (pointerStartRef.current?.pointerId === event.pointerId) {
-      pointerStartRef.current = null;
-      setIsDragging(false);
-      dragXRef.current = 0;
-      pendingDragXRef.current = 0;
-      applyDragVisual(0, true);
+      resetActiveDrag();
+    }
+  };
+
+  const handleTouchStart = (event: TouchEvent<HTMLDivElement>) => {
+    if (isLeaving) return;
+    const target = event.target as HTMLElement;
+    if (target.closest("button,a")) return;
+    const touch = event.touches[0];
+    if (!touch) return;
+
+    pointerStartRef.current = {
+      pointerId: null,
+      x: touch.clientX,
+      y: touch.clientY,
+      cardWidth: event.currentTarget.getBoundingClientRect().width
+    };
+    dragXRef.current = 0;
+    pendingDragXRef.current = 0;
+    applyDragVisual(0);
+    setIsDragging(true);
+  };
+
+  const handleTouchMove = (event: TouchEvent<HTMLDivElement>) => {
+    const start = pointerStartRef.current;
+    if (!start || start.pointerId !== null || isLeaving) return;
+    const touch = event.touches[0];
+    if (!touch) return;
+
+    event.preventDefault();
+    const nextDragX = touch.clientX - start.x;
+    dragXRef.current = nextDragX;
+    scheduleDragVisual(nextDragX);
+  };
+
+  const handleTouchEnd = (event: TouchEvent<HTMLDivElement>) => {
+    const start = pointerStartRef.current;
+    if (!start || start.pointerId !== null || isLeaving) return;
+
+    const touch = event.changedTouches[0];
+    const finalDragX = touch ? touch.clientX - start.x : dragXRef.current;
+    dragXRef.current = finalDragX;
+    pointerStartRef.current = null;
+    setIsDragging(false);
+    settleDrag(finalDragX, start.cardWidth);
+  };
+
+  const handleTouchCancel = () => {
+    if (pointerStartRef.current?.pointerId === null) {
+      resetActiveDrag();
     }
   };
 
@@ -626,7 +681,7 @@ export default function PharmacologyReviewPage() {
       </section>
 
       <section className="mt-6 space-y-5">
-        <div className="grid gap-3 sm:grid-cols-2">
+        <div className="hidden gap-3 sm:grid sm:grid-cols-2">
           <div className="surface-card-muted p-4">
             <p className="text-xs font-black text-brand-700">左滑</p>
             <p className="mt-2 text-lg font-black text-ink">會這個藥</p>
@@ -657,6 +712,10 @@ export default function PharmacologyReviewPage() {
             onPointerUp={handlePointerEnd}
             onPointerCancel={handlePointerCancel}
             onLostPointerCapture={handlePointerEnd}
+            onTouchStart={handleTouchStart}
+            onTouchMove={handleTouchMove}
+            onTouchEnd={handleTouchEnd}
+            onTouchCancel={handleTouchCancel}
             onKeyDown={(event) => {
               if (event.key === "Enter" || event.key === " ") {
                 event.preventDefault();

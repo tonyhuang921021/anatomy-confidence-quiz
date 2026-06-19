@@ -22,6 +22,16 @@ type YangmingExplanationResponse = {
 const yangmingExplanationCache = new Map<string, YangmingExplanationContent | null>();
 const yangmingExplanationPromiseCache = new Map<string, Promise<YangmingExplanationContent | null>>();
 
+const YANGMING_REPORT_REASON_PRESETS = [
+  "圖片被切掉",
+  "詳解少一頁",
+  "詳解對錯題",
+  "表格被截斷",
+  "圖片貼到下一題",
+  "圖片不對",
+  "缺少陽明詳解"
+];
+
 type YangmingTextRun = {
   text: string;
   script?: "super" | "sub";
@@ -788,6 +798,24 @@ export function YangmingExplanationPanel({
               <label className="text-sm font-bold text-slate-800" htmlFor="yangming-report-reason">
                 {reportMode === "correction" ? "修正原因" : "回報原因"}
               </label>
+              {reportMode === "report" ? (
+                <div className="mt-2 flex flex-wrap gap-2">
+                  {YANGMING_REPORT_REASON_PRESETS.map((preset) => (
+                    <button
+                      key={preset}
+                      type="button"
+                      onClick={() => setReportReason(preset)}
+                      className={`rounded-full px-3 py-1.5 text-xs font-bold ring-1 transition ${
+                        reportReason.trim() === preset
+                          ? "bg-amber-600 text-white ring-amber-600"
+                          : "bg-amber-50 text-amber-800 ring-amber-100 hover:bg-amber-100"
+                      }`}
+                    >
+                      {preset}
+                    </button>
+                  ))}
+                </div>
+              ) : null}
               <textarea
                 id="yangming-report-reason"
                 value={reportReason}
