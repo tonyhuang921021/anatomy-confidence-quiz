@@ -54,6 +54,11 @@ const QUICK_ENTRIES = [
 const HOME_RELEASE_NOTES = [
   {
     time: "06/20",
+    title: "首頁入口比較像樣了",
+    body: "按鈕保留短標題，但加上層次、角標和乾淨的卡片節奏；不再像白紙上貼幾塊豆腐。"
+  },
+  {
+    time: "06/20",
     title: "首頁少講一點廢話",
     body: "同步狀態統一成三種人話，入口卡片只留標題，留言板滑到附近才載；首頁終於不再像期末共筆全部貼第一頁。"
   },
@@ -303,7 +308,8 @@ export default function HomePage() {
                     className={action.tone === "primary" ? "home-action-card home-action-primary" : "home-action-card"}
                     style={{ "--home-delay": `${120 + index * 80}ms` } as HomeAnimationStyle}
                   >
-                    <span className="text-sm font-bold">{action.label}</span>
+                    <span className="home-action-mark" aria-hidden="true" />
+                    <span className="home-action-title">{action.label}</span>
                   </Link>
                 ))}
               </div>
@@ -384,15 +390,16 @@ export default function HomePage() {
                   className="home-entry-card"
                   style={{ "--home-delay": `${220 + index * 70}ms` } as HomeAnimationStyle}
                 >
-                  <span className="block text-lg font-black tracking-[-0.03em] text-ink">{entry.title}</span>
+                  <span className="home-entry-icon" aria-hidden="true" />
+                  <span className="home-entry-title">{entry.title}</span>
                 </Link>
               ))}
-              <div className="home-entry-card sm:col-span-2">
+              <div className="home-entry-card home-study-card sm:col-span-2">
                 <div className="grid gap-3 sm:grid-cols-2">
                   <ClientSectionBoundary title="學習筆記入口">
                     <OwnerOnlyNotesLink />
                   </ClientSectionBoundary>
-                  <Link href="/pharmacology-review" className="secondary-pill px-4">
+                  <Link href="/pharmacology-review" className="secondary-pill home-study-link px-4">
                     藥理複習
                   </Link>
                 </div>

@@ -256,17 +256,83 @@ select {
   }
 
   .home-action-card {
-    @apply flex min-h-24 min-w-0 flex-col justify-center rounded-[1.45rem] border px-5 py-4 transition;
+    @apply flex min-h-24 min-w-0 flex-col justify-between rounded-[1.45rem] border px-5 py-4 transition;
+    position: relative;
+    overflow: hidden;
     border-color: var(--line-soft);
-    background: rgba(255, 255, 255, 0.66);
+    background:
+      linear-gradient(145deg, rgba(255, 255, 255, 0.88), rgba(255, 255, 255, 0.58)),
+      radial-gradient(circle at 86% 18%, color-mix(in srgb, var(--brand-main) 10%, transparent), transparent 34%);
     color: var(--ink-main);
     box-shadow: 0 16px 38px rgba(19, 38, 32, 0.055);
+  }
+
+  .home-action-card::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background:
+      linear-gradient(90deg, color-mix(in srgb, var(--brand-main) 18%, transparent), transparent 42%),
+      radial-gradient(circle at 100% 100%, color-mix(in srgb, var(--accent-warm) 10%, transparent), transparent 38%);
+    opacity: 0;
+    transition: opacity 180ms ease;
+  }
+
+  .home-action-card::after {
+    content: "";
+    position: absolute;
+    right: 1.1rem;
+    bottom: 1.05rem;
+    width: 2.1rem;
+    height: 2.1rem;
+    border-radius: 999px;
+    border: 1px solid color-mix(in srgb, var(--brand-main) 16%, var(--line-soft));
+    background:
+      linear-gradient(135deg, rgba(255, 255, 255, 0.92), rgba(255, 255, 255, 0.48));
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.72);
   }
 
   .home-action-card:hover {
     transform: translateY(-3px);
     background: rgba(255, 255, 255, 0.9);
     box-shadow: 0 24px 52px rgba(19, 38, 32, 0.1);
+  }
+
+  .home-action-card:hover::before {
+    opacity: 1;
+  }
+
+  .home-action-mark {
+    position: relative;
+    z-index: 1;
+    display: inline-flex;
+    width: 2.35rem;
+    height: 2.35rem;
+    border-radius: 1rem;
+    background:
+      radial-gradient(circle at 34% 32%, rgba(255, 255, 255, 0.84), transparent 24%),
+      color-mix(in srgb, var(--brand-main) 13%, white);
+    border: 1px solid color-mix(in srgb, var(--brand-main) 16%, transparent);
+    box-shadow: 0 10px 22px rgba(19, 38, 32, 0.065);
+  }
+
+  .home-action-mark::after {
+    content: "";
+    position: absolute;
+    inset: 0.78rem;
+    border-radius: 999px;
+    background: var(--brand-main);
+  }
+
+  .home-action-title {
+    position: relative;
+    z-index: 1;
+    display: block;
+    padding-right: 2.5rem;
+    font-size: 0.98rem;
+    font-weight: 900;
+    letter-spacing: -0.03em;
   }
 
   .home-action-primary {
@@ -281,6 +347,21 @@ select {
     background:
       radial-gradient(circle at top right, rgba(255, 255, 255, 0.34), transparent 44%),
       linear-gradient(135deg, color-mix(in srgb, var(--brand-main) 92%, white), var(--brand-deep));
+  }
+
+  .home-action-primary::after {
+    border-color: rgba(255, 255, 255, 0.28);
+    background: rgba(255, 255, 255, 0.14);
+  }
+
+  .home-action-primary .home-action-mark {
+    background: rgba(255, 255, 255, 0.18);
+    border-color: rgba(255, 255, 255, 0.22);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.22);
+  }
+
+  .home-action-primary .home-action-mark::after {
+    background: white;
   }
 
   .home-mini-strip {
@@ -419,15 +500,135 @@ select {
 
   .home-entry-card {
     @apply min-w-0 rounded-[1.6rem] border p-5 transition;
-    border-color: var(--line-soft);
-    background: rgba(255, 255, 255, 0.64);
+    position: relative;
+    display: grid;
+    min-height: 7.2rem;
+    align-content: space-between;
+    overflow: hidden;
+    border-color: color-mix(in srgb, var(--brand-main) 10%, var(--line-soft));
+    background:
+      linear-gradient(145deg, rgba(255, 255, 255, 0.82), rgba(255, 255, 255, 0.54)),
+      radial-gradient(circle at 92% 18%, color-mix(in srgb, var(--brand-main) 9%, transparent), transparent 34%);
     box-shadow: 0 18px 44px rgba(19, 38, 32, 0.06);
+  }
+
+  .home-entry-card::before {
+    content: "";
+    position: absolute;
+    left: 1.15rem;
+    right: 1.15rem;
+    bottom: 1.05rem;
+    height: 3px;
+    border-radius: 999px;
+    background: linear-gradient(90deg, color-mix(in srgb, var(--brand-main) 50%, white), transparent);
+    opacity: 0.38;
+  }
+
+  .home-entry-card::after {
+    content: "";
+    position: absolute;
+    right: 1.1rem;
+    top: 1.1rem;
+    width: 0.62rem;
+    height: 0.62rem;
+    border-top: 2px solid color-mix(in srgb, var(--brand-main) 56%, var(--ink-main));
+    border-right: 2px solid color-mix(in srgb, var(--brand-main) 56%, var(--ink-main));
+    transform: rotate(45deg);
+    opacity: 0.42;
+    transition: transform 180ms ease, opacity 180ms ease;
   }
 
   .home-entry-card:hover {
     transform: translateY(-4px);
     background: rgba(255, 255, 255, 0.92);
     box-shadow: 0 28px 60px rgba(19, 38, 32, 0.1);
+  }
+
+  .home-entry-card:hover::after {
+    opacity: 0.72;
+    transform: translateX(2px) rotate(45deg);
+  }
+
+  .home-entry-icon {
+    position: relative;
+    z-index: 1;
+    display: block;
+    width: 2.4rem;
+    height: 2.4rem;
+    border-radius: 1rem;
+    border: 1px solid color-mix(in srgb, var(--brand-main) 16%, transparent);
+    background:
+      radial-gradient(circle at 34% 32%, rgba(255, 255, 255, 0.9), transparent 24%),
+      color-mix(in srgb, var(--brand-main) 10%, white);
+    box-shadow: 0 12px 24px rgba(19, 38, 32, 0.06);
+  }
+
+  .home-entry-icon::before,
+  .home-entry-icon::after {
+    content: "";
+    position: absolute;
+    border-radius: 999px;
+    background: color-mix(in srgb, var(--brand-main) 82%, var(--ink-main));
+  }
+
+  .home-entry-icon::before {
+    left: 0.72rem;
+    top: 0.82rem;
+    width: 0.96rem;
+    height: 0.22rem;
+  }
+
+  .home-entry-icon::after {
+    left: 0.72rem;
+    top: 1.22rem;
+    width: 0.68rem;
+    height: 0.22rem;
+  }
+
+  .home-entry-title {
+    position: relative;
+    z-index: 1;
+    display: block;
+    padding-right: 1.45rem;
+    font-size: 1.13rem;
+    font-weight: 900;
+    letter-spacing: -0.035em;
+    color: var(--ink-main);
+  }
+
+  .home-study-card {
+    min-height: auto;
+    padding: 1.3rem;
+    background:
+      linear-gradient(145deg, rgba(255, 255, 255, 0.78), rgba(255, 255, 255, 0.52)),
+      radial-gradient(circle at 10% 0%, color-mix(in srgb, var(--accent-warm) 9%, transparent), transparent 38%);
+  }
+
+  .home-study-card::before,
+  .home-study-card::after {
+    display: none;
+  }
+
+  .home-study-link {
+    position: relative;
+    min-height: 3.8rem;
+    justify-content: space-between;
+    padding-inline: 1.25rem;
+    overflow: hidden;
+    font-weight: 900;
+    letter-spacing: -0.02em;
+    background:
+      linear-gradient(145deg, rgba(255, 255, 255, 0.92), rgba(255, 255, 255, 0.58));
+  }
+
+  .home-study-link::after {
+    content: "";
+    width: 0.52rem;
+    height: 0.52rem;
+    border-top: 2px solid color-mix(in srgb, var(--brand-main) 52%, var(--ink-main));
+    border-right: 2px solid color-mix(in srgb, var(--brand-main) 52%, var(--ink-main));
+    transform: rotate(45deg);
+    opacity: 0.48;
   }
 
   .home-entry-mark {
@@ -956,7 +1157,47 @@ select {
   }
 
   .home-action-card {
-    min-height: 5.25rem;
+    min-height: 5.8rem;
+    padding: 1rem;
+  }
+
+  .home-action-mark,
+  .home-entry-icon {
+    width: 2rem;
+    height: 2rem;
+    border-radius: 0.82rem;
+  }
+
+  .home-action-mark::after {
+    inset: 0.67rem;
+  }
+
+  .home-action-card::after {
+    width: 1.85rem;
+    height: 1.85rem;
+    right: 0.9rem;
+    bottom: 0.9rem;
+  }
+
+  .home-action-title {
+    font-size: 0.92rem;
+  }
+
+  .home-entry-card {
+    min-height: 6.25rem;
+    padding: 1rem;
+  }
+
+  .home-entry-title {
+    font-size: 1rem;
+  }
+
+  .home-study-card {
+    padding: 1rem;
+  }
+
+  .home-study-link {
+    min-height: 3.35rem;
   }
 }
 
@@ -996,8 +1237,28 @@ html[data-theme="dark"] .secondary-pill:hover {
 html[data-theme="dark"] .home-action-card,
 html[data-theme="dark"] .home-entry-card,
 html[data-theme="dark"] .home-device-screen {
-  background: rgba(35, 43, 55, 0.68);
+  background:
+    linear-gradient(145deg, rgba(35, 43, 55, 0.78), rgba(35, 43, 55, 0.54)),
+    radial-gradient(circle at 92% 18%, rgba(138, 154, 184, 0.1), transparent 34%);
   border-color: var(--line-soft);
+}
+
+html[data-theme="dark"] .home-action-card::after,
+html[data-theme="dark"] .home-entry-icon,
+html[data-theme="dark"] .home-action-mark,
+html[data-theme="dark"] .home-study-link {
+  background: rgba(40, 48, 61, 0.72);
+  border-color: rgba(207, 214, 224, 0.08);
+}
+
+html[data-theme="dark"] .home-action-mark::after,
+html[data-theme="dark"] .home-entry-icon::before,
+html[data-theme="dark"] .home-entry-icon::after {
+  background: #dbe3ee;
+}
+
+html[data-theme="dark"] .home-entry-card::before {
+  background: linear-gradient(90deg, rgba(138, 154, 184, 0.42), transparent);
 }
 
 html[data-theme="dark"] .home-action-primary {
