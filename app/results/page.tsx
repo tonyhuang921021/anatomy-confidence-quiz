@@ -1075,6 +1075,12 @@ function ResultsPageContent() {
     const shouldShowLeadingSlash = !prefix.trim().endsWith("：");
     return (
       <span className="flex max-w-full min-w-0 items-center gap-2 align-top">
+        <span
+          aria-hidden="true"
+          className="inline-flex h-5 w-5 shrink-0 items-center justify-center text-xs transition-transform group-open:rotate-90"
+        >
+          ▶
+        </span>
         <span className="min-w-0 flex-1 overflow-hidden">
           <span className="flex min-w-0 flex-wrap items-baseline gap-x-1.5 gap-y-1">
             <span className="shrink-0">{prefix}</span>
@@ -1116,15 +1122,15 @@ function ResultsPageContent() {
   }) {
     return (
       <div className="mt-2 min-w-0 space-y-3 overflow-hidden text-sm leading-7 text-slate-700 [overflow-wrap:anywhere]">
-        <div className="flex justify-end">
+        <div className="flex min-w-0 items-start gap-3">
+          <QuestionStemBlock question={question} className="flex-1" />
           <CopyQuestionPromptButton
             question={question}
             selectedAnswer={attempt.selectedAnswer}
             correctAnswer={attempt.correctAnswer}
-            className="px-0"
+            className="shrink-0 px-0"
           />
         </div>
-        <QuestionStemBlock question={question} />
         <div className="grid gap-3">
           {getAvailableOptionKeys(question).map((key) => (
             <QuestionOptionBlock
@@ -1237,9 +1243,9 @@ function ResultsPageContent() {
                       key={detailKey}
                       open={isOpen}
                       onToggle={(event) => setReviewDetailOpen(detailKey, event.currentTarget.open)}
-                      className="overflow-hidden rounded-2xl bg-rose-50 p-3.5 sm:p-4"
+                      className="group overflow-hidden rounded-2xl bg-rose-50 p-3.5 sm:p-4"
                     >
-                      <summary className="block cursor-pointer overflow-hidden text-sm font-semibold text-rose-950">
+                      <summary className="cursor-pointer overflow-hidden text-sm font-semibold text-rose-950 list-none [&::-webkit-details-marker]:hidden">
                         {renderQuestionSummaryLine({
                           prefix: `錯題 ${index + 1}：`,
                           question
@@ -1276,9 +1282,9 @@ function ResultsPageContent() {
                       key={detailKey}
                       open={isOpen}
                       onToggle={(event) => setReviewDetailOpen(detailKey, event.currentTarget.open)}
-                      className="overflow-hidden rounded-2xl bg-amber-50 p-3.5 sm:p-4"
+                      className="group overflow-hidden rounded-2xl bg-amber-50 p-3.5 sm:p-4"
                     >
-                      <summary className="block cursor-pointer overflow-hidden text-sm font-semibold text-amber-950">
+                      <summary className="cursor-pointer overflow-hidden text-sm font-semibold text-amber-950 list-none [&::-webkit-details-marker]:hidden">
                         {renderQuestionSummaryLine({
                           prefix: `信心 ${attempt.confidence}｜${index + 1}：`,
                           question,
@@ -1312,9 +1318,9 @@ function ResultsPageContent() {
                     key={detailKey}
                     open={isOpen}
                     onToggle={(event) => setReviewDetailOpen(detailKey, event.currentTarget.open)}
-                    className="overflow-hidden rounded-2xl bg-slate-50 p-3.5 sm:p-4"
+                    className="group overflow-hidden rounded-2xl bg-slate-50 p-3.5 sm:p-4"
                   >
-                    <summary className="block cursor-pointer overflow-hidden text-sm font-semibold text-ink">
+                    <summary className="cursor-pointer overflow-hidden text-sm font-semibold text-ink list-none [&::-webkit-details-marker]:hidden">
                       {renderQuestionSummaryLine({
                         prefix: `第 ${index + 1} 題：${attempt.isCorrect ? "答對" : "答錯"}`,
                         question,
