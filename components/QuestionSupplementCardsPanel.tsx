@@ -227,7 +227,7 @@ export function QuestionSupplementCardsPanel({
 
   const pureChaosReaction = reactions.find((reaction) => reaction.type === "pure_chaos") ?? {
     type: "pure_chaos" as const,
-    label: "這題純搞",
+    label: "這題我們不要了",
     count: 0,
     active: false
   };
@@ -300,7 +300,7 @@ export function QuestionSupplementCardsPanel({
               className={`min-h-44 rounded-2xl border px-4 py-3 font-mono text-sm leading-6 outline-none transition focus:border-teal-400 focus:ring-4 focus:ring-teal-50 ${
                 draggingImage ? "border-teal-400 bg-teal-50/70 ring-4 ring-teal-50" : "border-slate-200 bg-white"
               }`}
-              placeholder="可以貼自己查到的資料、表格、記憶法，或補充這題為什麼根本純搞。支援 Markdown，也可以直接把圖片拖進來。"
+              placeholder="可以貼自己查到的資料、表格、記憶法，或補充這題為什麼我們不要了。支援 Markdown，也可以直接把圖片拖進來。"
             />
           </label>
           <div className="mt-3 flex flex-wrap items-center justify-between gap-2">

@@ -54,7 +54,7 @@ type SupplementCardBody = {
 };
 
 const REACTION_LABELS: Record<string, string> = {
-  pure_chaos: "這題純搞"
+  pure_chaos: "這題我們不要了"
 };
 
 function getServiceSupabaseClient() {

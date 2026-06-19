@@ -1115,8 +1115,8 @@ function ResultsPageContent() {
     showTestedConcept?: boolean;
   }) {
     return (
-      <div className="mt-4 min-w-0 space-y-3 overflow-hidden text-sm leading-7 text-slate-700 [overflow-wrap:anywhere]">
-        <div className="flex justify-end">
+      <div className="mt-5 min-w-0 space-y-4 overflow-hidden border-t border-white/70 pt-5 text-sm leading-7 text-slate-700 [overflow-wrap:anywhere] sm:mt-6 sm:pt-6">
+        <div className="flex justify-end pb-1">
           <CopyQuestionPromptButton
             question={question}
             selectedAnswer={attempt.selectedAnswer}
