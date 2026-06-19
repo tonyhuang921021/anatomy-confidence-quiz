@@ -927,6 +927,22 @@ med1ClassificationOverrideMap.set("MOEX-115020-1301-Q066", {
   subject: "生理學",
   topicSection: "腎臟生理／氨排泄與尿素循環"
 });
+med1ClassificationOverrideMap.set("MOEX-115020-1301-Q075", {
+  subject: "生物化學",
+  topicSection: "酵素動力學／Michaelis-Menten 與 kcat 計算"
+});
+med1ClassificationOverrideMap.set("MOEX-100140-1101-Q016", {
+  subject: "解剖學",
+  topicSection: "男性生殖／儲精囊關係"
+});
+med1ClassificationOverrideMap.set("MOEX-105020-6301-Q072", {
+  subject: "藥理學",
+  topicSection: "中樞神經藥理／酒精藥理"
+});
+med1ClassificationOverrideMap.set("MOEX-107020-5301-Q077", {
+  subject: "生物化學",
+  topicSection: "葉酸與一碳代謝"
+});
 med1ClassificationOverrideMap.set("MOEX-100030-2101-Q073", {
   subject: "藥理學",
   topicSection: "抗生素"
@@ -975,6 +991,32 @@ function applyQuestionMedia(question: Question): Question {
 }
 
 const questionTextOverrides: Record<string, QuestionTextOverride> = {
+  "MOEX-102030-2101-Q050": {
+    explanation:
+      "cDNA microarray 是用核酸探針偵測樣本中 mRNA/cDNA 的相對表現量，可同時比較大量基因表現；晶片上的 DNA 探針可用 PCR 產物點樣，也可用 photolithography 在晶片上合成。它測的是核酸層級的基因表現，不是直接偵測蛋白質表現，因此 D 為錯誤敘述。",
+    optionAnalysis: {
+      A: "正確敘述。cDNA microarray 可平行分析大量基因的相對表現量。",
+      B: "正確敘述。傳統 spotted microarray 可將 PCR 產物或合成 DNA 固定在玻片上。",
+      C: "正確敘述。寡核苷酸晶片可用 photolithography 等方式在晶片上合成探針。",
+      D: "錯誤敘述，為本題答案。cDNA microarray 主要偵測 mRNA/cDNA，蛋白質表現需用 Western blot、ELISA、protein array 或質譜等方法。"
+    },
+    testedConcept: "生物化學／分子生物學／cDNA microarray"
+  },
+  "MOEX-107020-5301-Q077": {
+    options: {
+      C: "四氫葉酸（H₄ folate）為一種具有生物活性的葉酸型式",
+      D: "四氫葉酸（H₄ folate）是由6-methylpterin、p-aminobenzoate與glutamate所組成"
+    },
+    explanation:
+      "葉酸以四氫葉酸（tetrahydrofolate, H₄ folate）形式攜帶一碳單位，參與 dTMP 與嘌呤合成；輔酶 A 則由 pantothenic acid、ADP 與 cysteamine 等結構組成，葉酸不是構成輔酶 A 的基本元素。因此 B 為錯誤敘述。",
+    optionAnalysis: {
+      A: "正確敘述。葉酸一碳代謝參與 dTMP 合成。",
+      B: "錯誤敘述，為本題答案。輔酶 A 的核心來源是 pantothenic acid，不是葉酸。",
+      C: "正確敘述。H₄ folate 是葉酸的活性還原型。",
+      D: "不選。題目要抓的是輔酶 A 組成錯誤；H₄ folate 與 pteridine/PABA/glutamate 骨架相關。"
+    },
+    testedConcept: "生物化學／葉酸與一碳代謝"
+  },
   "MOEX-100030-1101-Q050": {
     stem:
       "承上題：一名 60 歲患有糖尿病的農夫在夏季豪雨過後下田整理農地，三天後出現發燒和倦怠，送醫發現輕微肺炎症狀；血液檢體分離出革蘭氏陰性、不發酵糖類桿菌，最可能為類鼻疽（melioidosis）。此人所感染的致病菌在生理特徵和致病性方面與下列那種細菌最相近？",
@@ -1017,6 +1059,28 @@ const questionTextOverrides: Record<string, QuestionTextOverride> = {
       D: "正確。a-I gene 對 III，b-β-galactosidase 對 I，c-permease 對 II。"
     },
     testedConcept: "生物化學／分子生物學／lac operon"
+  },
+  "MOEX-105020-6301-Q072": {
+    explanation:
+      "本題問錯誤敘述。酒精可由胃腸道吸收，代謝在常見濃度下近似零級反應，且乙醛（acetaldehyde）是乙醇經 alcohol dehydrogenase 代謝後的初級產物。官方答案採 B，重點是女性血中酒精濃度較高的常考差異主要來自口服吸收、胃部 first-pass metabolism 與體水分比例等因素；題幹改成靜脈投與時，不能直接用胃腸吸收／胃部代謝差異解釋，因此 B 為最不適當敘述。",
+    optionAnalysis: {
+      A: "正確敘述。酒精可經胃腸道快速且幾乎完全吸收。",
+      B: "錯誤敘述，為本題答案。依官方題意，靜脈投與繞過胃腸吸收與胃部 first-pass metabolism，不能直接套用口服酒精的性別差異敘述。",
+      C: "正確敘述。酒精代謝酵素容易飽和，常以零級動力學考。",
+      D: "正確敘述。乙醇先代謝成 acetaldehyde，再轉為 acetate。"
+    },
+    testedConcept: "藥理學／酒精藥理／吸收與代謝"
+  },
+  "MOEX-105020-6301-Q075": {
+    explanation:
+      "承上題病童有短暫凝視與 3-Hz spike-and-wave，典型指向 absence seizure。Absence seizure 常用 ethosuximide、valproic acid 或 lamotrigine；phenytoin 對 absence seizure 沒有效，且可能使 absence 發作惡化。因此 C 為會增加發作風險的選項。",
+    optionAnalysis: {
+      A: "不選。Valproic acid 可用於 absence seizure，尤其合併其他癲癇型態時常被使用。",
+      B: "不選。Lamotrigine 可作為 absence seizure 的治療選項之一。",
+      C: "正確。Phenytoin 主要作用於 voltage-gated Na+ channel，對 absence seizure 不適合，可能加重發作。",
+      D: "不選。Ethosuximide 是典型 absence seizure 的第一線藥物，抑制 thalamic T-type Ca2+ channel。"
+    },
+    testedConcept: "藥理學／中樞神經藥理／absence seizure 與抗癲癇藥"
   },
   "MOEX-115020-1301-Q031": {
     stem: "下列何者的肌腱，不會通過跗骨隧道（tarsal tunnel）？",
@@ -1264,6 +1328,19 @@ const questionTextOverrides: Record<string, QuestionTextOverride> = {
     },
     testedConcept: "腎臟生理／氨排泄與尿素循環"
   },
+  "MOEX-115020-1301-Q075": {
+    stem:
+      "某酵素催化反應的 kcat = 600（單位 1/s），Km = 10 μM。當受質濃度是 50 μM，酵素濃度是 20 nM，此時測得之反應初速度（V0）約為多少 μM/s？",
+    explanation:
+      "本題先用 Michaelis-Menten 公式計算初速度：V0 = Vmax[S]/(Km + [S])。又 Vmax = kcat[E]total，酵素濃度 20 nM = 0.02 μM，所以 Vmax = 600 × 0.02 = 12 μM/s。代入 [S] = 50 μM、Km = 10 μM：V0 = 12 × 50 / (10 + 50) = 10 μM/s，因此答案為 B。",
+    optionAnalysis: {
+      A: "錯。1 μM/s 通常是單位換算或受質分率少算造成的低估。",
+      B: "正確。20 nM 先換成 0.02 μM，再代入 Michaelis-Menten 公式得到 10 μM/s。",
+      C: "錯。60 μM/s 超過本題 Vmax = 12 μM/s，不可能是初速度。",
+      D: "錯。500 μM/s 遠高於 Vmax，量級明顯不合。"
+    },
+    testedConcept: "生物化學／酵素動力學／Michaelis-Menten 與 kcat 計算"
+  },
   "MOEX-115020-1301-Q060": {
     stem: "有關腦部循環與血流調控之敘述，何者最為適當？",
     options: {
@@ -1461,6 +1538,7 @@ const manualInjectedQuestions: Question[] = [
       D: "尿素（urea）的再吸收是初級主動運輸通道表現上升，促使尿素的再吸收"
     },
     answer: "D",
+    acceptedAnswers: ["D"],
     answerCreditType: "standard",
     explanation:
       "尿素在腎臟中的再吸收主要透過尿素轉運蛋白，例如 UT-A 類轉運，屬於 facilitated diffusion，並受到 ADH／vasopressin 影響。它不是初級主動運輸。因此 D 最明顯不適當。代謝性酸中毒時，腎臟會增加 glutamine 代謝，產生 NH₄⁺ 排酸並生成新的 HCO₃⁻。",

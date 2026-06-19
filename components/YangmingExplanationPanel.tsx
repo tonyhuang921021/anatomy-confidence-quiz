@@ -697,7 +697,7 @@ export function YangmingExplanationPanel({
             />
           ) : checked ? (
             <div className="rounded-3xl bg-white/70 px-4 py-3 text-sm font-semibold text-slate-600 ring-1 ring-white/70 [overflow-wrap:anywhere]">
-              <p>此題沒有陽明詳解。</p>
+              <p>這題沒有詳解。</p>
               <button
                 type="button"
                 onClick={openReportDialog}
