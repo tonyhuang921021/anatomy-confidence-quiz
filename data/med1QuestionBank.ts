@@ -442,6 +442,10 @@ function getAvailableOptionKeys(options: Readonly<Record<string, string>>) {
   });
 }
 
+function dedupeOptionKeys(values: OptionKey[]) {
+  return Array.from(new Set(values));
+}
+
 const importedAnswerOverrideMap: Record<
   string,
   {
@@ -512,9 +516,10 @@ function resolveImportedAnswer(
 } | null {
   const primaryAnswer = answerCandidates[0];
   if (primaryAnswer && isOptionKey(primaryAnswer)) {
+    const acceptedAnswers = dedupeOptionKeys(answerCandidates);
     return {
       answer: primaryAnswer,
-      acceptedAnswers: answerCandidates.length > 0 ? answerCandidates : undefined,
+      acceptedAnswers: acceptedAnswers.length > 0 ? acceptedAnswers : undefined,
       answerCreditType
     };
   }
