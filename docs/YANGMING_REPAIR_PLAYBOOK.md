@@ -60,6 +60,64 @@ For user correction reports:
 - Do not keep only the first visually clean page if the next page contains the rest of the explanation.
 - Avoid crops that include only a previous or next question header without the target explanation.
 
+## Self-Cropping Workflow
+
+Do not conclude "no Yangming explanation" after checking only current DB rows,
+active-version assets, or `per_file/` paths. If the report points to a known
+Yangming source file, regenerate the crop from the local source PDF first.
+
+Default local source directory:
+
+```bash
+/Users/huangguanlun/Downloads/陽明詳解
+```
+
+For single-question repairs:
+
+1. Locate the source PDF from the report's `source_file`, local question ID, or
+   nearby active/legacy rows. Common merged sources include
+   `醫師國考詳解101-104(書籤版).pdf` and `醫師國考詳解096-100(書籤版).pdf`.
+2. Search the PDF visually/textually by stable stem keywords, not only by TOC.
+   Some PDF bookmarks have invalid page numbers such as `-1`.
+3. On the located page, choose the Yangming table whose extracted text contains
+   the target stem keyword and target 題號. When a page has multiple tables,
+   never crop the whole page by default.
+4. Render the detected table bbox to PNG at 2x scale, then visually inspect the
+   result before upload.
+5. Upload manual crops under the active version prefix, for example:
+   `versions/<activeVersion>/manual/user-provided/YYYYMMDD/<questionId>-yangming.png`.
+   Do not use a bare `manual/...` path: the API filters `question_snapshot`
+   assets unless the path is under a trusted `per_file/` or `versions/` prefix.
+6. Upsert the active `yangming_question_explanations_versioned` row with:
+   `body=''`, `kind='question_snapshot'`, one image section per asset, and a
+   `match_status` that states the source, such as
+   `manual_pdf_crop_YYYYMMDD` or `manual_user_provided_screenshot_YYYYMMDD`.
+7. Only mark the report applied after `/api/yangming-explanation` returns the
+   expected asset for the exact `questionId`.
+
+Minimal PyMuPDF proof-of-work pattern:
+
+```python
+from pathlib import Path
+import fitz
+
+pdf = Path("/Users/huangguanlun/Downloads/陽明詳解/醫師國考詳解101-104(書籤版).pdf")
+doc = fitz.open(pdf)
+target = {"question_id": "MOEX-101110-2101-Q046", "page": 202, "keyword": "puromycin"}
+page = doc[target["page"] - 1]
+
+for table in page.find_tables().tables:
+    text = " ".join(str(cell) for row in table.extract() for cell in row if cell)
+    if target["keyword"] in text and "題號" in text:
+        rect = fitz.Rect(*table.bbox)
+        pix = page.get_pixmap(matrix=fitz.Matrix(2, 2), clip=rect, alpha=False)
+        pix.save(f"/private/tmp/{target['question_id']}-yangming.png")
+        break
+```
+
+After upload, API validation is mandatory. A DB row with `assets.length > 0`
+is not enough; the route can still filter the asset.
+
 ## Text Fallback Rules
 
 Use text fallback only when:
