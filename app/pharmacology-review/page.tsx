@@ -116,6 +116,29 @@ function getWeaknessScore(item: (typeof PHARMACOLOGY_FLASHCARDS)[number], stats:
   return stats.unknown * 2.4 + Math.max(stats.unknown - stats.known, 0) * 1.15 + missRate * 2 + baseWeight * 0.08;
 }
 
+function getDrugNameLengthScore(name: string) {
+  return Array.from(name).reduce((score, character) => score + (character.charCodeAt(0) > 255 ? 1.3 : 1), 0);
+}
+
+function getFrontDrugNameSizeClass(name: string) {
+  const lengthScore = getDrugNameLengthScore(name);
+
+  if (lengthScore > 34) return "text-[clamp(1.35rem,6.8vw,3.5rem)] sm:text-[clamp(2.1rem,4.5vw,4.2rem)]";
+  if (lengthScore > 26) return "text-[clamp(1.55rem,7.8vw,3.9rem)] sm:text-[clamp(2.35rem,5.2vw,4.8rem)]";
+  if (lengthScore > 18) return "text-[clamp(1.8rem,9vw,4.3rem)] sm:text-[clamp(2.65rem,6vw,5.4rem)]";
+
+  return "text-[clamp(2rem,11vw,4.8rem)] sm:text-[clamp(3rem,7vw,6.2rem)]";
+}
+
+function getBackDrugNameSizeClass(name: string) {
+  const lengthScore = getDrugNameLengthScore(name);
+
+  if (lengthScore > 34) return "text-xl sm:text-2xl";
+  if (lengthScore > 24) return "text-2xl sm:text-[1.7rem]";
+
+  return "text-3xl";
+}
+
 function pickWeightedIndex(statsMap: DrugReviewStatsMap = {}, currentIndex?: number) {
   const totalWeight = PHARMACOLOGY_FLASHCARDS.reduce((sum, item, index) => {
     const weight = getReviewWeight(item, getReviewStats(statsMap, item));
@@ -776,7 +799,7 @@ export default function PharmacologyReviewPage() {
                 <span className="rounded-full bg-white/70 px-4 py-2 text-xs font-black uppercase tracking-[0.2em] text-brand-700">
                   Today's Random Drug
                 </span>
-                <span className="mt-10 block max-w-full text-center font-serif text-[clamp(2rem,11vw,4.8rem)] font-bold leading-[1.02] tracking-[-0.02em] text-ink [overflow-wrap:break-word] [word-break:normal] sm:text-[clamp(3rem,7vw,6.2rem)]">
+                <span className={`mt-10 block max-w-full text-center font-serif font-bold leading-[1.04] tracking-normal text-ink [overflow-wrap:anywhere] [word-break:normal] ${getFrontDrugNameSizeClass(card.name)}`}>
                   {card.name}
                 </span>
                 <span className="body-soft mt-8 block text-center text-sm font-semibold">點一下看機轉；抓住卡片拖到旁邊放手</span>
@@ -792,7 +815,7 @@ export default function PharmacologyReviewPage() {
                   <span className="flex flex-wrap items-start justify-between gap-3">
                     <span>
                       <span className="eyebrow text-[10px]">藥物</span>
-                      <span className="mt-1 block text-3xl font-black tracking-[-0.02em] text-ink [overflow-wrap:break-word] [word-break:normal]">{card.name}</span>
+                      <span className={`mt-1 block font-black leading-tight tracking-normal text-ink [overflow-wrap:anywhere] [word-break:normal] ${getBackDrugNameSizeClass(card.name)}`}>{card.name}</span>
                     </span>
                     <span className={`rounded-full border px-3 py-2 text-xs font-black ${levelMeta.className}`}>
                       {levelMeta.label}
