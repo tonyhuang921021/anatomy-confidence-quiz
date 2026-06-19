@@ -39,6 +39,7 @@ import {
   getSupabaseBrowserClient,
   isSupabaseConfigured
 } from "@/lib/supabase/client";
+import { normalizeQuestionExplanationOverride } from "@/lib/questionExplanationFormat";
 import { getRecoveryTimestamp, isSupabaseRecoveryMode } from "@/lib/supabase/recoveryMode";
 import { getOrCreateVisitorId } from "@/lib/visitor";
 
@@ -1060,7 +1061,15 @@ function mapQuestionAccuracyStatRow(row: QuestionAccuracyStatRow): QuestionCommu
 function mapQuestionExplanationOverrideRow(
   row: QuestionExplanationOverrideRow
 ): QuestionExplanationOverride {
-  return {
+  const normalized = normalizeQuestionExplanationOverride({
+    explanation: row.explanation,
+    optionAnalysis: row.option_analysis ?? {},
+    memoryTip: row.memory_tip ?? undefined,
+    model: row.model ?? undefined,
+    updatedAt: row.updated_at ?? new Date().toISOString()
+  });
+
+  return normalized ?? {
     explanation: row.explanation,
     optionAnalysis: row.option_analysis ?? {},
     memoryTip: row.memory_tip ?? undefined,

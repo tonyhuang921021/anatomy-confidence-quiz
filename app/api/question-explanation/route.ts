@@ -2,6 +2,10 @@ import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 import { createOpenAIText, isOpenAIConfigured } from "@/lib/openai";
 import { getActiveAIAccountBan } from "@/lib/aiAccountBan";
+import {
+  normalizeQuestionExplanationPayload,
+  normalizeQuestionOptionAnalysis
+} from "@/lib/questionExplanationFormat";
 import { isSupabaseRecoveryMode } from "@/lib/supabase/recoveryMode";
 import { isServerTimeoutError, withServerTimeout } from "@/lib/serverTimeout";
 
@@ -90,7 +94,9 @@ const QUESTION_EXPLANATION_PROMPT_PREFIX = [
   "你是台灣醫學系國考家教，請用繁體中文寫一份好讀、精準、偏精簡的單題解析。",
   "請嚴格只解釋這一題，不要延伸太多無關內容。",
   "主詳解請聚焦題目核心，不要把各選項的細節重複寫進主詳解。",
+  "主詳解 explanation 欄位只能放一般文字，絕對不能放 JSON 字串、物件字串或 optionAnalysis 內容。",
   "各選項的重要說明請放在 optionAnalysis。",
+  "輸出順序固定為：先 explanation 整題詳解，再 optionAnalysis 各選項解析，最後 memoryTip。",
   "不要根據任何單一使用者的作答情況來改變詳解內容。",
   "請只輸出 JSON，不要輸出 markdown，不要輸出 code block。",
   "請務必為本題每一個實際存在的選項都提供 optionAnalysis，不能漏掉任何一個選項。",
@@ -372,7 +378,7 @@ async function syncSharedExplanationOverrides(
       questionId,
       parsed: {
         explanation,
-        optionAnalysis: normalizeOptionAnalysis(item.optionAnalysis ?? {}),
+        optionAnalysis: normalizeQuestionOptionAnalysis(item.optionAnalysis ?? {}),
         memoryTip: item.memoryTip?.trim() ?? ""
       },
       model: item.model?.trim() || "gpt-5.4-mini",
@@ -547,73 +553,8 @@ function hasCompleteOptionAnalysis(
   return requiredKeys.every((key) => Boolean(payload.optionAnalysis?.[key]?.trim()));
 }
 
-function normalizeOptionAnalysis(value: unknown) {
-  if (!value || typeof value !== "object") return {};
-
-  if (Array.isArray(value)) {
-    return Object.fromEntries(
-      value
-        .map((item) => {
-          if (!item || typeof item !== "object") return null;
-          const record = item as Record<string, unknown>;
-          const key = typeof record.option === "string" ? record.option.trim().toUpperCase() : "";
-          const text =
-            typeof record.analysis === "string"
-              ? record.analysis.trim()
-              : typeof record.text === "string"
-                ? record.text.trim()
-                : "";
-          if (!key || !text || !isOptionKey(key)) return null;
-          return [key, text] as const;
-        })
-        .filter((entry): entry is readonly [string, string] => Boolean(entry))
-    );
-  }
-
-  return Object.fromEntries(
-    Object.entries(value as Record<string, unknown>)
-      .map(([key, item]) => {
-        if (typeof item !== "string") return null;
-        const normalizedKey = key.trim().toUpperCase();
-        const normalizedValue = item.trim();
-        if (!normalizedKey || !normalizedValue || !isOptionKey(normalizedKey)) return null;
-        return [normalizedKey, normalizedValue] as const;
-      })
-      .filter((entry): entry is readonly [string, string] => Boolean(entry))
-  );
-}
-
 function coerceParsedPayload(value: unknown): ParsedExplanationPayload | null {
-  if (!value || typeof value !== "object") return null;
-
-  const record = value as Record<string, unknown>;
-  const explanation =
-    typeof record.explanation === "string"
-      ? record.explanation.trim()
-      : typeof record.detailExplanation === "string"
-        ? record.detailExplanation.trim()
-        : typeof record.analysis === "string"
-          ? record.analysis.trim()
-          : "";
-
-  const memoryTip =
-    typeof record.memoryTip === "string"
-      ? record.memoryTip.trim()
-      : typeof record.memory_tip === "string"
-        ? record.memory_tip.trim()
-        : "";
-
-  const optionAnalysis = normalizeOptionAnalysis(
-    record.optionAnalysis ?? record.option_analysis ?? record.options
-  );
-
-  if (!explanation) return null;
-
-  return {
-    explanation,
-    optionAnalysis,
-    memoryTip
-  };
+  return normalizeQuestionExplanationPayload(value);
 }
 
 function parseExplanationPayload(text: string): ParsedExplanationPayload | null {
@@ -626,8 +567,13 @@ function parseExplanationPayload(text: string): ParsedExplanationPayload | null 
 
   for (const candidate of rawCandidates) {
     try {
-      const parsed = coerceParsedPayload(JSON.parse(candidate));
+      const rawParsed = JSON.parse(candidate);
+      const parsed = coerceParsedPayload(rawParsed);
       if (parsed) return parsed;
+      if (typeof rawParsed === "string" && rawParsed.trim() !== candidate.trim()) {
+        const nestedParsed = parseExplanationPayload(rawParsed);
+        if (nestedParsed) return nestedParsed;
+      }
     } catch {
       // continue to looser parsing
     }
@@ -636,8 +582,13 @@ function parseExplanationPayload(text: string): ParsedExplanationPayload | null 
     const end = candidate.lastIndexOf("}");
     if (start !== -1 && end !== -1 && end > start) {
       try {
-        const parsed = coerceParsedPayload(JSON.parse(candidate.slice(start, end + 1)));
+        const rawParsed = JSON.parse(candidate.slice(start, end + 1));
+        const parsed = coerceParsedPayload(rawParsed);
         if (parsed) return parsed;
+        if (typeof rawParsed === "string") {
+          const nestedParsed = parseExplanationPayload(rawParsed);
+          if (nestedParsed) return nestedParsed;
+        }
       } catch {
         // continue to looser parsing
       }

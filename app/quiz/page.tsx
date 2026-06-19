@@ -1688,7 +1688,7 @@ export default function QuizPage() {
                       <p>
                         testedConcept：<span className="font-semibold">{currentQuestion.testedConcept}</span>
                       </p>
-                      {shouldShowAiExplanationDetails ? <p>explanation：{currentQuestion.explanation}</p> : null}
+                      {shouldShowAiExplanationDetails ? <p>整題詳解：{currentQuestion.explanation}</p> : null}
                       <YangmingExplanationPanel
                         questionId={currentQuestion.id}
                         className="mt-3"

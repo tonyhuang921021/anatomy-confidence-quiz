@@ -7,6 +7,7 @@ import {
   QuizSession,
   QuizSettings
 } from "@/types/quiz";
+import { normalizeQuestionExplanationOverride as normalizeQuestionExplanationOverridePayload } from "@/lib/questionExplanationFormat";
 
 const CURRENT_SESSION_KEY = "anatomy-confidence-current-session";
 const COMPLETED_SESSIONS_KEY = "anatomy-confidence-completed-sessions";
@@ -364,53 +365,7 @@ export function compactSessionForStorage(session: QuizSession): QuizSession {
 function normalizeQuestionExplanationOverride(
   override?: QuestionExplanationOverride | null
 ): QuestionExplanationOverride | null {
-  if (!override) return null;
-
-  const rawExplanation = override.explanation?.trim() ?? "";
-  if (!rawExplanation) {
-    return {
-      ...override,
-      optionAnalysis: override.optionAnalysis ?? {}
-    };
-  }
-
-  const looksLikeJson =
-    rawExplanation.startsWith("{") &&
-    rawExplanation.includes("\"explanation\"") &&
-    rawExplanation.includes("\"optionAnalysis\"");
-
-  if (!looksLikeJson) {
-    return {
-      ...override,
-      optionAnalysis: override.optionAnalysis ?? {}
-    };
-  }
-
-  try {
-    const parsed = JSON.parse(rawExplanation) as {
-      explanation?: string;
-      optionAnalysis?: Partial<Record<"A" | "B" | "C" | "D" | "E", string>>;
-      memoryTip?: string;
-    };
-
-    return {
-      ...override,
-      explanation: typeof parsed.explanation === "string" ? parsed.explanation : rawExplanation,
-      optionAnalysis:
-        parsed.optionAnalysis && typeof parsed.optionAnalysis === "object"
-          ? parsed.optionAnalysis
-          : override.optionAnalysis ?? {},
-      memoryTip:
-        typeof parsed.memoryTip === "string"
-          ? parsed.memoryTip
-          : override.memoryTip
-    };
-  } catch {
-    return {
-      ...override,
-      optionAnalysis: override.optionAnalysis ?? {}
-    };
-  }
+  return normalizeQuestionExplanationOverridePayload(override);
 }
 
 export function setActiveStorageUser(userId?: string) {

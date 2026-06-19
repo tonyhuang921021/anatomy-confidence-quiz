@@ -65,6 +65,11 @@ const QUICK_ENTRIES = [
 const HOME_RELEASE_NOTES = [
   {
     time: "06/19",
+    title: "AI 詳解不再吐 JSON",
+    body: "GPT 詳解會先講整題、再講各選項；不再把程式骨架直接噴出來，畫面終於比較像人寫的，不像資料庫在告解。"
+  },
+  {
+    time: "06/19",
     title: "GPT 詳解可以重抽",
     body: "已替換的 GPT 詳解現在能再替換一次；不再被原本題庫爛詳解拉去同化，看到怪怪的就再按一次讓它重做人。"
   },
