@@ -767,7 +767,11 @@ function ResultsPageContent() {
     });
   }
 
-  async function handleGenerateQuestionExplanation(question: Question, attempt: Attempt) {
+  async function handleGenerateQuestionExplanation(
+    question: Question,
+    attempt: Attempt,
+    previousOverride?: QuestionExplanationOverride
+  ) {
     if (!session?.access_token) {
       setExplanationErrorMap((current) => ({
         ...current,
@@ -807,6 +811,7 @@ function ResultsPageContent() {
             testedConcept: question.testedConcept
           },
           previousQuestion: previousQuestion ? buildRelatedQuestionContext(previousQuestion) : undefined,
+          previousOverride,
           attempt: {
             selectedAnswer: attempt.selectedAnswer,
             confidence: attempt.confidence,
@@ -1009,9 +1014,19 @@ function ResultsPageContent() {
             </button>
           ) : null}
           {generated ? (
-            <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-600">
-              已替換詳解・{generated.model ?? "gpt-5.4-mini"}
-            </span>
+            <>
+              <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-600">
+                已替換詳解・{generated.model ?? "gpt-5.4-mini"}
+              </span>
+              <button
+                type="button"
+                onClick={() => void handleGenerateQuestionExplanation(question, attempt, generated)}
+                disabled={loading}
+                className="min-h-10 rounded-2xl bg-slate-900 px-4 py-2 text-sm font-semibold text-white transition hover:bg-black disabled:cursor-wait disabled:opacity-60"
+              >
+                {loading ? "重新生成中..." : "重新替換詳解"}
+              </button>
+            </>
           ) : null}
           <button
             type="button"

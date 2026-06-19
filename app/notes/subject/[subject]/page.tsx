@@ -917,7 +917,10 @@ export default function SubjectNotesPage() {
     }
   }
 
-  async function handleGenerateQuestionExplanation(question: Question) {
+  async function handleGenerateQuestionExplanation(
+    question: Question,
+    previousOverride?: QuestionExplanationOverride
+  ) {
     if (!session?.access_token) {
       setExplanationErrorMap((current) => ({
         ...current,
@@ -950,7 +953,8 @@ export default function SubjectNotesPage() {
             answerCreditType: question.answerCreditType,
             explanation: question.explanation,
             testedConcept: question.testedConcept
-          }
+          },
+          previousOverride
         })
       });
 
@@ -1738,9 +1742,19 @@ export default function SubjectNotesPage() {
                           </div>
                         </details>
                         {override ? (
-                          <span className="secondary-pill px-4 py-2 text-sm text-slate-600">
-                            已替換詳解・{override.model ?? "gpt-5.4-mini"}
-                          </span>
+                          <>
+                            <span className="secondary-pill px-4 py-2 text-sm text-slate-600">
+                              已替換詳解・{override.model ?? "gpt-5.4-mini"}
+                            </span>
+                            <button
+                              type="button"
+                              onClick={() => void handleGenerateQuestionExplanation(question, override)}
+                              disabled={explanationLoading}
+                              className="secondary-pill px-4 py-2 text-sm disabled:cursor-wait disabled:opacity-60"
+                            >
+                              {explanationLoading ? "重新生成中..." : "重新替換詳解"}
+                            </button>
+                          </>
                         ) : (
                           <button
                             type="button"

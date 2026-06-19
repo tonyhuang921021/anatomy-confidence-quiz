@@ -72,7 +72,8 @@ export function StudyNoteQuestionCard({ question, link, title }: Props) {
             answerCreditType: question.answerCreditType,
             explanation: question.explanation,
             testedConcept: question.testedConcept
-          }
+          },
+          previousOverride: explanationOverride
         })
       });
 
@@ -173,7 +174,13 @@ export function StudyNoteQuestionCard({ question, link, title }: Props) {
             disabled={explanationLoading}
             className="secondary-pill ml-2 mt-4 px-4 py-2 text-sm disabled:opacity-60"
           >
-            {explanationLoading ? "GPT-5.4-mini 生成中..." : "用 GPT-5.4-mini 補詳解"}
+            {explanationLoading
+              ? explanationOverride
+                ? "重新生成中..."
+                : "GPT-5.4-mini 生成中..."
+              : explanationOverride
+                ? "重新替換詳解"
+                : "用 GPT-5.4-mini 補詳解"}
           </button>
           {explanationError ? (
             <p className="mt-3 rounded-2xl bg-rose-50 px-3 py-2 text-xs font-semibold leading-5 text-rose-700">

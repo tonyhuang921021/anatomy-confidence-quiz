@@ -1104,7 +1104,11 @@ export default function QuizPage() {
     setSubmittedAttempt(updatedAttempt);
   }
 
-  async function handleGenerateQuestionExplanation(question: Question, attempt: Attempt) {
+  async function handleGenerateQuestionExplanation(
+    question: Question,
+    attempt: Attempt,
+    previousOverride?: QuestionExplanationOverride
+  ) {
     if (!authSession?.access_token) {
       setExplanationErrorMap((current) => ({
         ...current,
@@ -1141,6 +1145,7 @@ export default function QuizPage() {
             testedConcept: question.testedConcept
           },
           previousQuestion: previousQuestion ? buildRelatedQuestionContext(previousQuestion) : undefined,
+          previousOverride,
           attempt: {
             selectedAnswer: attempt.selectedAnswer,
             confidence: attempt.confidence,
@@ -1739,9 +1744,25 @@ export default function QuizPage() {
                   <div className="mt-5 space-y-3">
                     <div className="flex flex-wrap items-center gap-3">
                       {currentExplanationOverride ? (
-                        <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-600">
-                          已替換詳解・{currentExplanationOverride.model ?? "gpt-5.4-mini"}
-                        </span>
+                        <>
+                          <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-600">
+                            已替換詳解・{currentExplanationOverride.model ?? "gpt-5.4-mini"}
+                          </span>
+                          <button
+                            type="button"
+                            onClick={() =>
+                              void handleGenerateQuestionExplanation(
+                                currentQuestion,
+                                submittedAttempt,
+                                currentExplanationOverride
+                              )
+                            }
+                            disabled={currentExplanationLoading}
+                            className="min-h-10 rounded-2xl bg-slate-900 px-4 py-2 text-sm font-semibold text-white transition hover:bg-black disabled:cursor-wait disabled:opacity-60"
+                          >
+                            {currentExplanationLoading ? "重新生成中..." : "重新替換詳解"}
+                          </button>
+                        </>
                       ) : (
                         <button
                           type="button"

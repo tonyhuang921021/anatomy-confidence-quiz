@@ -521,7 +521,10 @@ export function ReviewNotebook({
     void fetchSharedExplanationOverrides();
   }, [visibleQuestionIdsKey]);
 
-  async function handleGenerateQuestionExplanation(question: Question) {
+  async function handleGenerateQuestionExplanation(
+    question: Question,
+    previousOverride?: QuestionExplanationOverride
+  ) {
     if (!session?.access_token) {
       setExplanationErrorMap((current) => ({
         ...current,
@@ -558,6 +561,7 @@ export function ReviewNotebook({
             testedConcept: question.testedConcept
           },
           previousQuestion: previousQuestion ? buildRelatedQuestionContext(previousQuestion) : undefined,
+          previousOverride,
           attempt: {
             selectedAnswer: question.answer,
             confidence: 3,
@@ -751,7 +755,16 @@ export function ReviewNotebook({
             >
               {loading ? "GPT-5.4-mini 生成中..." : "用 GPT-5.4-mini 補詳解"}
             </button>
-          ) : null}
+          ) : (
+            <button
+              type="button"
+              onClick={() => void handleGenerateQuestionExplanation(question, override)}
+              disabled={loading}
+              className="min-h-10 rounded-2xl bg-slate-900 px-4 py-2 text-sm font-semibold text-white transition hover:bg-black disabled:cursor-wait disabled:opacity-60"
+            >
+              {loading ? "重新生成中..." : "重新替換詳解"}
+            </button>
+          )}
           <button
             type="button"
             onClick={() => void handleReportClassification(question)}

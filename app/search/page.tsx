@@ -253,7 +253,10 @@ export default function SearchPage() {
     void fetchSharedExplanationOverrides();
   }, [pageResultIdsKey, pageResults]);
 
-  async function handleGenerateQuestionExplanation(question: Question) {
+  async function handleGenerateQuestionExplanation(
+    question: Question,
+    previousOverride?: QuestionExplanationOverride
+  ) {
     if (!session?.access_token) {
       setExplanationErrorMap((current) => ({
         ...current,
@@ -289,7 +292,8 @@ export default function SearchPage() {
             explanation: question.explanation,
             testedConcept: question.testedConcept
           },
-          previousQuestion: previousQuestion ? buildRelatedQuestionContext(previousQuestion) : undefined
+          previousQuestion: previousQuestion ? buildRelatedQuestionContext(previousQuestion) : undefined,
+          previousOverride
         })
       });
 
@@ -658,9 +662,19 @@ export default function SearchPage() {
                 <div className="space-y-3">
                   <CopyQuestionPromptButton question={renderedQuestion} />
                   {override ? (
-                    <span className="inline-flex rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-600">
-                      已替換詳解・{override.model ?? "gpt-5.4-mini"}
-                    </span>
+                    <div className="flex flex-wrap items-center gap-3">
+                      <span className="inline-flex rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-600">
+                        已替換詳解・{override.model ?? "gpt-5.4-mini"}
+                      </span>
+                      <button
+                        type="button"
+                        onClick={() => void handleGenerateQuestionExplanation(question, override)}
+                        disabled={loading}
+                        className="min-h-10 rounded-2xl bg-slate-900 px-4 py-2 text-sm font-semibold text-white transition hover:bg-black disabled:cursor-wait disabled:opacity-60"
+                      >
+                        {loading ? "重新生成中..." : "重新替換詳解"}
+                      </button>
+                    </div>
                   ) : (
                     <button
                       type="button"

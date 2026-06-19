@@ -38,6 +38,12 @@ type QuestionExplanationRequestBody = {
     confidence?: number;
     isCorrect?: boolean;
   };
+  previousOverride?: {
+    explanation?: string;
+    optionAnalysis?: Record<string, string>;
+    memoryTip?: string;
+    model?: string;
+  };
   override?: {
     questionId?: string;
     explanation?: string;
@@ -394,6 +400,7 @@ async function syncSharedExplanationOverrides(
 function buildQuestionExplanationPrompt(body: QuestionExplanationRequestBody) {
   const question = body.question;
   const previousQuestion = body.previousQuestion;
+  const previousOverride = body.previousOverride;
   const optionKeys = getRequiredOptionKeys(question?.options);
   const correctAnswerText =
     (question?.answerCreditType === "multiple_accepted" ||
@@ -439,7 +446,20 @@ function buildQuestionExplanationPrompt(body: QuestionExplanationRequestBody) {
     `本題實際存在的選項鍵：${optionKeys.join(", ")}`,
     `正確答案：${correctAnswerText}`,
     `判分方式：${question?.answerCreditType ?? "standard"}`,
-    `現有解析：${question?.explanation ?? ""}`
+    "",
+    previousOverride?.explanation
+      ? [
+          "這是重新產生詳解。上一版 GPT 覆蓋詳解如下，僅作為背景參考；請重新寫出一版完整、清楚、可直接替換的詳解：",
+          `上一版模型：${previousOverride.model ?? ""}`,
+          `上一版主詳解：${previousOverride.explanation ?? ""}`,
+          "上一版各選項解析：",
+          JSON.stringify(previousOverride.optionAnalysis ?? {}, null, 2),
+          `上一版記憶法：${previousOverride.memoryTip ?? ""}`,
+          "",
+          "請輸出新的完整 JSON。主詳解只放本題核心解析；各選項解析只放在 optionAnalysis；記憶法只放在 memoryTip。"
+        ].join("\n")
+      : "",
+    ""
   ].join("\n");
 }
 
@@ -513,7 +533,7 @@ function buildMissingOptionRetryPrompt(
     "目前已有的 optionAnalysis：",
     JSON.stringify(partial.optionAnalysis ?? {}, null, 2),
     "",
-    `現有解析：${question?.explanation ?? ""}`
+    ""
   ].join("\n");
 }
 
