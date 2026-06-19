@@ -426,7 +426,8 @@ export async function POST(request: NextRequest) {
 
     const expectedQuestionNo = getQuestionNumberFromId(row.question_id);
     const normalizedAssetBundle = normalizeAssets(supabase, row.assets, expectedQuestionNo);
-    if (normalizedAssetBundle.assets.length === 0) {
+    const explanationBody = isMeaningfulYangmingText(row.body) ? row.body?.trim() ?? "" : "";
+    if (normalizedAssetBundle.assets.length === 0 && !explanationBody) {
       return NextResponse.json({ ok: true, activeVersionId, explanation: null });
     }
     const normalizedSections = normalizeSections(row.sections, normalizedAssetBundle.assetIndexMap)
@@ -435,7 +436,7 @@ export async function POST(request: NextRequest) {
       ok: true,
       activeVersionId,
       explanation: {
-        body: "",
+        body: explanationBody,
         author: row.author ?? undefined,
         reviewer: row.reviewer ?? undefined,
         sourceLabel: row.source_label ?? undefined,
