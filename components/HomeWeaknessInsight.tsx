@@ -23,6 +23,8 @@ const MIN_TOTAL_ATTEMPTS_FOR_DIAGNOSIS = 10;
 const MIN_SECTION_ATTEMPTS_FOR_DIAGNOSIS = 2;
 const WEAKNESS_ROTATION_INTERVAL_MS = 6 * 60 * 60 * 1000;
 const MAX_ROTATING_WEAK_SECTIONS = 5;
+const MAX_HOME_WEAKNESS_SESSIONS = 80;
+const MAX_HOME_WEAKNESS_ATTEMPTS = 500;
 
 function round(value: number) {
   return Math.round(value * 10) / 10;
@@ -35,11 +37,12 @@ function getWeakSectionInsight(sessions: QuizSession[]): {
   const questions = getQuestionBankBySubjectFilter("全部");
   const questionMap = new Map(questions.map((question) => [question.id, question] as const));
   const sectionMap = new Map<string, WeakSectionInsight>();
-  const attempts = sessions.flatMap((session) => session.attempts);
+  let totalAttempts = 0;
 
-  attempts.forEach((attempt) => {
+  function trackAttempt(attempt: QuizSession["attempts"][number]) {
     const question = questionMap.get(attempt.questionId);
     if (!question) return;
+    totalAttempts += 1;
 
     const key = `${question.chapter}__${question.section}`;
     const current =
@@ -61,7 +64,22 @@ function getWeakSectionInsight(sessions: QuizSession[]): {
     current.lowConfidence += attempt.confidence <= 2 ? 1 : 0;
     current.overconfidence += !attempt.isCorrect && attempt.confidence >= 4 ? 1 : 0;
     sectionMap.set(key, current);
-  });
+  }
+
+  for (
+    let sessionIndex = sessions.length - 1, visitedSessions = 0;
+    sessionIndex >= 0 && visitedSessions < MAX_HOME_WEAKNESS_SESSIONS && totalAttempts < MAX_HOME_WEAKNESS_ATTEMPTS;
+    sessionIndex -= 1, visitedSessions += 1
+  ) {
+    const attempts = sessions[sessionIndex].attempts;
+    for (
+      let attemptIndex = attempts.length - 1;
+      attemptIndex >= 0 && totalAttempts < MAX_HOME_WEAKNESS_ATTEMPTS;
+      attemptIndex -= 1
+    ) {
+      trackAttempt(attempts[attemptIndex]);
+    }
+  }
 
   const ranked = Array.from(sectionMap.values())
     .filter((item) => item.total >= MIN_SECTION_ATTEMPTS_FOR_DIAGNOSIS)
@@ -92,8 +110,8 @@ function getWeakSectionInsight(sessions: QuizSession[]): {
     );
 
   return {
-    totalAttempts: attempts.length,
-    insights: attempts.length >= MIN_TOTAL_ATTEMPTS_FOR_DIAGNOSIS ? ranked : []
+    totalAttempts,
+    insights: totalAttempts >= MIN_TOTAL_ATTEMPTS_FOR_DIAGNOSIS ? ranked : []
   };
 }
 

@@ -43,24 +43,42 @@ function addDays(date: Date, days: number) {
   return next;
 }
 
-function getPersonalPaceStats(now = new Date()): PersonalPaceStats {
-  const sessions = [...loadCompletedSessions()];
-  const currentSession = loadCurrentSession();
-  if (currentSession?.attempts?.length) sessions.push(currentSession);
+const MAX_PERSONAL_PACE_SESSIONS = 80;
 
+function getPersonalPaceStats(now = new Date()): PersonalPaceStats {
   const todayKey = getTaipeiDateKey(now);
   const yesterdayKey = getTaipeiDateKey(addDays(now, -1));
   const recentKeys = new Set(Array.from({ length: 7 }, (_, index) => getTaipeiDateKey(addDays(now, -index))));
+  const oldestRecentKey = getTaipeiDateKey(addDays(now, -6));
   const dayCounts = new Map<string, { attempts: number; correct: number }>();
 
-  sessions.flatMap((session) => session.attempts).forEach((attempt) => {
+  function trackAttempt(attempt: { answeredAt: string; isCorrect: boolean }) {
     const key = getTaipeiDateKey(attempt.answeredAt);
     if (!key || !recentKeys.has(key)) return;
     const current = dayCounts.get(key) ?? { attempts: 0, correct: 0 };
     current.attempts += 1;
     current.correct += attempt.isCorrect ? 1 : 0;
     dayCounts.set(key, current);
-  });
+  }
+
+  const currentSession = loadCurrentSession();
+  currentSession?.attempts?.forEach(trackAttempt);
+
+  const sessions = loadCompletedSessions();
+  let visitedSessions = 0;
+  for (let index = sessions.length - 1; index >= 0 && visitedSessions < MAX_PERSONAL_PACE_SESSIONS; index -= 1) {
+    const session = sessions[index];
+    const sessionKey = getTaipeiDateKey(session.completedAt ?? session.startedAt);
+    if (sessionKey && sessionKey < oldestRecentKey) break;
+    visitedSessions += 1;
+
+    for (let attemptIndex = session.attempts.length - 1; attemptIndex >= 0; attemptIndex -= 1) {
+      const attempt = session.attempts[attemptIndex];
+      const attemptKey = getTaipeiDateKey(attempt.answeredAt);
+      if (attemptKey && attemptKey < oldestRecentKey) break;
+      trackAttempt(attempt);
+    }
+  }
 
   const today = dayCounts.get(todayKey) ?? { attempts: 0, correct: 0 };
   const yesterday = dayCounts.get(yesterdayKey) ?? { attempts: 0, correct: 0 };

@@ -1,7 +1,7 @@
 "use client";
 
 import dynamic from "next/dynamic";
-import { useEffect, useRef, useState } from "react";
+import { useState } from "react";
 
 const FeedbackBoard = dynamic(
   () => import("@/components/FeedbackBoard").then((mod) => mod.FeedbackBoard),
@@ -18,31 +18,10 @@ const FeedbackBoard = dynamic(
 );
 
 export function LazyFeedbackBoard() {
-  const sentinelRef = useRef<HTMLDivElement | null>(null);
   const [shouldLoad, setShouldLoad] = useState(false);
 
-  useEffect(() => {
-    if (shouldLoad) return;
-    const node = sentinelRef.current;
-    if (!node || typeof IntersectionObserver === "undefined") {
-      setShouldLoad(true);
-      return;
-    }
-
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (!entry?.isIntersecting) return;
-        setShouldLoad(true);
-        observer.disconnect();
-      },
-      { rootMargin: "96px 0px" }
-    );
-    observer.observe(node);
-    return () => observer.disconnect();
-  }, [shouldLoad]);
-
   return (
-    <div ref={sentinelRef} className="min-h-32">
+    <div>
       {shouldLoad ? (
         <FeedbackBoard />
       ) : (
@@ -50,7 +29,7 @@ export function LazyFeedbackBoard() {
           <p className="eyebrow">Feedback</p>
           <h2 className="display-title mt-2 text-3xl">留言板</h2>
           <p className="body-soft mt-3 text-sm leading-7">
-            滑到這裡才載入留言，首頁先把力氣留給刷題。
+            留言很多，手機先不要一滑到就硬扛；想看再按。
           </p>
           <button
             type="button"
