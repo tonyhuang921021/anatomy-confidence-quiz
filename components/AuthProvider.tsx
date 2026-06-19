@@ -42,7 +42,7 @@ type AuthContextValue = {
 };
 
 const AuthContext = createContext<AuthContextValue | null>(null);
-const CLOUD_RESUME_SYNC_TIMEOUT_MS = 4500;
+const CLOUD_RESUME_BACKGROUND_NOTICE_MS = 6500;
 const AUTH_SESSION_BOOTSTRAP_TIMEOUT_MS = 3500;
 const AUTH_SIGN_OUT_TIMEOUT_MS = 2500;
 const AUTH_SESSION_SNAPSHOT_KEY = "medQuizAuthSessionSnapshot";
@@ -180,11 +180,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     if (!configured || !userId || !effectiveUser) return;
 
     if (syncInFlightRef.current) {
-      await withTimeout(
-        syncInFlightRef.current,
-        CLOUD_RESUME_SYNC_TIMEOUT_MS,
-        "暫用本機，稍後補傳。雲端續寫同步仍在背景整理。"
-      ).catch(markLocalSyncFallback);
+      setSyncStatus("syncing");
+      setSyncError("");
       return;
     }
 
@@ -215,11 +212,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     try {
       await withTimeout(
         syncTask,
-        CLOUD_RESUME_SYNC_TIMEOUT_MS,
-        "暫用本機，稍後補傳。雲端續寫同步逾時。"
+        CLOUD_RESUME_BACKGROUND_NOTICE_MS,
+        "雲端同步仍在背景整理，可先使用本機紀錄。"
       );
     } catch (error) {
-      markLocalSyncFallback(error);
+      if (syncInFlightRef.current === syncTask) {
+        setSyncStatus("syncing");
+        setSyncError(getErrorMessage(error));
+      }
     }
   }, [configured, recoveryMode, user?.id]);
 

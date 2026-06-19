@@ -54,6 +54,11 @@ const QUICK_ENTRIES = [
 const HOME_RELEASE_NOTES = [
   {
     time: "06/20",
+    title: "同步狀態少嚇人",
+    body: "登入後雲端如果整理比較久，現在會留在同步中而不是直接喊本機備戰；網站少一點狼來了。"
+  },
+  {
+    time: "06/20",
     title: "手機首頁先不要自爆",
     body: "首頁重型區塊改成低衝擊載入，留言板和帳號設定要看再開；Safari 不用一邊滑一邊搬整棟題庫。"
   },

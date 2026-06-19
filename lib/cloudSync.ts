@@ -974,14 +974,17 @@ async function fetchQuizSessionByIdForUser(userId: string, sessionId: string) {
 }
 
 async function fetchResolvedQuizSessionsForUser(userId: string) {
-  const sessionRows = await fetchQuizSessionsForUser(userId);
+  const sessionRows = await withCloudFallback(fetchQuizSessionsForUser(userId), [] as QuizSessionRow[]);
   const sessionRowsNeedingAttemptRows = sessionRows.filter((row) => {
     const payloadAttempts = row.session_payload?.attempts ?? [];
     return payloadAttempts.length === 0;
   });
-  const attemptRows = await fetchSessionAttemptRowsForUser(
-    userId,
-    sessionRowsNeedingAttemptRows.map((row) => row.id)
+  const attemptRows = await withCloudFallback(
+    fetchSessionAttemptRowsForUser(
+      userId,
+      sessionRowsNeedingAttemptRows.map((row) => row.id)
+    ),
+    [] as QuizSessionAttemptRow[]
   );
   const attemptMap = buildAttemptMap(attemptRows);
 
@@ -1572,9 +1575,11 @@ export async function syncCurrentSessionForCurrentUser(userId: string) {
     }
   }
 
-  const remoteRow = await fetchActiveQuizSessionRow(userId);
+  const remoteRow = await withCloudFallback(fetchActiveQuizSessionRow(userId), null);
   const remoteAttemptMap = remoteRow
-    ? buildAttemptMap(await fetchSessionAttemptRowsForUser(userId, [remoteRow.id]))
+    ? buildAttemptMap(
+        await withCloudFallback(fetchSessionAttemptRowsForUser(userId, [remoteRow.id]), [] as QuizSessionAttemptRow[])
+      )
     : undefined;
   const remoteCurrentSession = remoteRow ? mapRowToSession(remoteRow, remoteAttemptMap) : null;
 
@@ -1591,7 +1596,10 @@ export async function syncCurrentSessionForCurrentUser(userId: string) {
   }
 
   if (winner && !winner.completedAt) {
-    await upsertSessionsForUser(userId, canonicalizeSessionsForUser(userId, [winner]));
+    await withCloudFallback(
+      upsertSessionsForUser(userId, canonicalizeSessionsForUser(userId, [winner])).then(() => true),
+      false
+    );
   }
 
   return winner ?? remoteCurrentSession ?? null;
