@@ -1072,7 +1072,9 @@ function ResultsPageContent() {
     suffix?: string;
   }) {
     const sourceBadge = getQuestionSourceBadgeLabel(question);
-    const shouldShowLeadingSlash = !prefix.trim().endsWith("：");
+    const trimmedPrefix = prefix.trim();
+    const shouldShowPrefix = trimmedPrefix.length > 0;
+    const shouldShowLeadingSlash = shouldShowPrefix && !trimmedPrefix.endsWith("：");
     return (
       <span className="flex max-w-full min-w-0 items-center gap-2 align-top">
         <span
@@ -1083,7 +1085,7 @@ function ResultsPageContent() {
         </span>
         <span className="min-w-0 flex-1 overflow-hidden">
           <span className="flex min-w-0 flex-wrap items-baseline gap-x-1.5 gap-y-1">
-            <span className="shrink-0">{prefix}</span>
+            {shouldShowPrefix ? <span className="shrink-0">{prefix}</span> : null}
             {shouldShowLeadingSlash ? <span className="shrink-0 text-slate-400">/</span> : null}
             <span className="shrink-0">{question.subject}</span>
             <span className="shrink-0 text-slate-400">/</span>
@@ -1286,7 +1288,7 @@ function ResultsPageContent() {
                     >
                       <summary className="cursor-pointer overflow-hidden text-sm font-semibold text-amber-950 list-none [&::-webkit-details-marker]:hidden">
                         {renderQuestionSummaryLine({
-                          prefix: `信心 ${attempt.confidence}｜${index + 1}：`,
+                          prefix: "",
                           question,
                           suffix: attempt.isCorrect ? "答對" : "答錯"
                         })}
