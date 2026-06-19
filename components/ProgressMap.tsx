@@ -49,16 +49,16 @@ function SectionCard({ section }: { section: SectionCompletionStats }) {
 
       <div className="mt-4 grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
         <p className="rounded-2xl bg-slate-50 px-4 py-3 text-sm text-slate-700">
-          completionRate <span className="font-semibold">{section.completionRate}%</span>
+          完成度 <span className="font-semibold">{section.completionRate}%</span>
         </p>
         <p className="rounded-2xl bg-slate-50 px-4 py-3 text-sm text-slate-700">
-          correctRate <span className="font-semibold">{section.correctRate}%</span>
+          答對率 <span className="font-semibold">{section.correctRate}%</span>
         </p>
         <p className="rounded-2xl bg-slate-50 px-4 py-3 text-sm text-slate-700">
-          averageConfidence <span className="font-semibold">{section.averageConfidence}</span>
+          平均信心 <span className="font-semibold">{section.averageConfidence}</span>
         </p>
         <p className="rounded-2xl bg-slate-50 px-4 py-3 text-sm text-slate-700">
-          masteryScore <span className="font-semibold">{section.masteryScore}</span>
+          掌握度 <span className="font-semibold">{section.masteryScore}</span>
         </p>
         <p className="rounded-2xl bg-slate-50 px-4 py-3 text-sm text-slate-700 sm:col-span-2 xl:col-span-2">
           最近一次作答 <span className="font-semibold">{formatTime(section.lastAttemptedAt)}</span>
@@ -92,7 +92,7 @@ export function ProgressMap({ chapters }: ProgressMapProps) {
               <div>
                 <h3 className="text-xl font-semibold text-ink">{chapter.chapter}</h3>
                 <p className="mt-2 text-sm text-slate-500">
-                  completionRate {chapter.completionRate}% ・ masteryScore {chapter.masteryScore}
+                  完成度 {chapter.completionRate}% ・ 掌握度 {chapter.masteryScore}
                 </p>
               </div>
               <div className="flex items-center gap-3">

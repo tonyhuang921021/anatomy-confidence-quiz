@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import { useAuth } from "@/components/AuthProvider";
+import { getSyncStatusText } from "@/components/syncStatusText";
 import { enabledSubjects, MED1_SUBJECTS, MED2_SUBJECTS } from "@/data/subjectRegistry";
 import {
   syncLeaderboardProfileForCurrentUser,
@@ -43,14 +44,7 @@ import { isSupabaseRecoveryMode } from "@/lib/supabase/recoveryMode";
 
 const AUTH_ACTION_TIMEOUT_MS = 15000;
 const AUTH_SESSION_RECOVERY_TIMEOUT_MS = 2500;
-const RECOVERY_MODE_MESSAGE = "雲端登入與同步維護中，先用訪客模式作答；目前紀錄會先留在本機。";
-
-function getSyncStatusLabel(status: "idle" | "syncing" | "ready" | "error") {
-  if (status === "syncing") return "雲端同步中";
-  if (status === "ready") return "已同步";
-  if (status === "error") return "雲端暫時忙碌";
-  return "本機可用";
-}
+const RECOVERY_MODE_MESSAGE = "暫用本機，稍後補傳。雲端登入與同步維護中，目前紀錄會先留在本機。";
 
 function withTimeout<T>(promise: Promise<T>, timeoutMs: number, message: string) {
   return new Promise<T>((resolve, reject) => {
@@ -572,7 +566,7 @@ export function AuthPanel() {
             <p className="mt-2 text-sm font-semibold text-slate-900 sm:text-base">{user.email}</p>
           </div>
           <div className="flex flex-wrap gap-2">
-            <div className="stat-chip">{getSyncStatusLabel(syncStatus)}</div>
+            <div className="stat-chip">{getSyncStatusText(syncStatus, Boolean(syncError))}</div>
             <div className="stat-chip">ID {user.id.slice(0, 8)}...</div>
           </div>
         </div>

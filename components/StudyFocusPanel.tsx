@@ -75,7 +75,7 @@ export function StudyFocusPanel({ stats, reviewItems }: StudyFocusPanelProps) {
                   </div>
                   <h3 className="mt-3 text-lg font-semibold text-ink">{section.section}</h3>
                   <p className="mt-2 text-sm text-slate-600">
-                    completionRate {section.completionRate}% ・ masteryScore {section.masteryScore} ・
+                    完成度 {section.completionRate}% ・ 掌握度 {section.masteryScore} ・
                     平均信心 {section.averageConfidence}
                   </p>
                 </div>
@@ -132,7 +132,7 @@ export function StudyFocusPanel({ stats, reviewItems }: StudyFocusPanelProps) {
                 <div key={`${section.chapter}-${section.section}`} className="rounded-2xl bg-slate-50 p-4 text-sm text-slate-700">
                   <p className="font-semibold">{section.section}</p>
                   <p className="mt-1 text-slate-500">{section.chapter}</p>
-                  <p className="mt-2">masteryScore {section.masteryScore}</p>
+                  <p className="mt-2">掌握度 {section.masteryScore}</p>
                 </div>
               ))
             )}
@@ -146,7 +146,7 @@ export function StudyFocusPanel({ stats, reviewItems }: StudyFocusPanelProps) {
               <div key={`${section.chapter}-${section.section}`} className="rounded-2xl bg-emerald-50 p-4 text-sm text-emerald-900">
                 <p className="font-semibold">{section.section}</p>
                 <p className="mt-1">{section.chapter}</p>
-                <p className="mt-2">masteryScore {section.masteryScore}</p>
+                <p className="mt-2">掌握度 {section.masteryScore}</p>
               </div>
             ))}
           </div>

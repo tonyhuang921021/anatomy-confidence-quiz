@@ -18,7 +18,7 @@ export function ChapterCompletionCard({ chapter }: ChapterCompletionCardProps) {
         <div>
           <h3 className="text-lg font-semibold text-ink">{chapter.chapter}</h3>
           <p className="mt-1 text-sm text-slate-500">
-            completionRate {chapter.completionRate}% ・ masteryScore {chapter.masteryScore}
+            完成度 {chapter.completionRate}% ・ 掌握度 {chapter.masteryScore}
           </p>
         </div>
         <span className={`rounded-full px-3 py-1 text-xs font-semibold ${statusClasses[chapter.status]}`}>

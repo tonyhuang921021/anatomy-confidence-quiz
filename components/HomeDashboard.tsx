@@ -44,7 +44,7 @@ export function HomeDashboard({ stats, historyCount, onClearHistory }: HomeDashb
           </p>
         </article>
         <article className="rounded-3xl bg-emerald-50 p-5 text-emerald-900">
-          <p className="text-sm font-medium">整體 masteryScore</p>
+          <p className="text-sm font-medium">整體掌握度</p>
           <p className="mt-2 text-3xl font-bold">{stats.overall.masteryScore}</p>
           <p className="mt-2 text-sm">答對率 {stats.overall.correctRate}%</p>
         </article>
@@ -79,7 +79,7 @@ export function HomeDashboard({ stats, historyCount, onClearHistory }: HomeDashb
               />
             </div>
             <p className="mt-3 text-sm text-slate-600">
-              completionRate {chapter.completionRate}% ・ correctRate {chapter.correctRate}%
+              完成度 {chapter.completionRate}% ・ 答對率 {chapter.correctRate}%
             </p>
           </article>
         ))}

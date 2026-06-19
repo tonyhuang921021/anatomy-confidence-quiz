@@ -16,8 +16,8 @@ export function QuestionExplanationTabs({
   compact = false,
   className = ""
 }: QuestionExplanationTabsProps) {
-  const [activeTab, setActiveTab] = useState<"yangming" | "supplement" | null>("yangming");
-  const [supplementCount, setSupplementCount] = useState(0);
+  const [activeTab, setActiveTab] = useState<"yangming" | "supplement" | null>(null);
+  const [supplementCount, setSupplementCount] = useState<number | null>(null);
   const handleCountChange = useCallback((count: number) => setSupplementCount(count), []);
 
   return (
@@ -45,21 +45,16 @@ export function QuestionExplanationTabs({
               : "bg-white text-slate-700 ring-slate-200 hover:bg-teal-50 hover:text-teal-800"
           }`}
         >
-          同學補充 {supplementCount}
+          同學補充{supplementCount === null ? "" : ` ${supplementCount}`}
         </button>
       </div>
-      <div className={activeTab === "yangming" ? "mt-3" : "hidden"}>
-        <YangmingExplanationPanel questionId={question.id} compact={compact} autoLoad hideButton />
-      </div>
-      <div className={activeTab === "supplement" ? "mt-3" : "hidden"}>
-        <QuestionSupplementCardsPanel
-          question={question}
-          compact={compact}
-          onCountChange={handleCountChange}
-        />
-      </div>
-      {activeTab !== "supplement" ? (
-        <div className="hidden">
+      {activeTab === "yangming" ? (
+        <div className="mt-3">
+          <YangmingExplanationPanel questionId={question.id} compact={compact} autoLoad hideButton />
+        </div>
+      ) : null}
+      {activeTab === "supplement" ? (
+        <div className="mt-3">
           <QuestionSupplementCardsPanel
             question={question}
             compact={compact}

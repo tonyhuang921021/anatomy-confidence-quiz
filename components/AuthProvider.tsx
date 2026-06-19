@@ -24,13 +24,15 @@ import {
 } from "@/lib/supabase/client";
 import { isSupabaseRecoveryMode } from "@/lib/supabase/recoveryMode";
 
+export type AuthSyncStatus = "idle" | "syncing" | "ready" | "error";
+
 type AuthContextValue = {
   user: User | null;
   session: Session | null;
   passwordRecovery: boolean;
   loading: boolean;
   configured: boolean;
-  syncStatus: "idle" | "syncing" | "ready" | "error";
+  syncStatus: AuthSyncStatus;
   syncVersion: number;
   syncError: string;
   applyAuthSession: (nextSession: Session | null) => void;
@@ -44,9 +46,9 @@ const CLOUD_RESUME_SYNC_TIMEOUT_MS = 4500;
 const AUTH_SESSION_BOOTSTRAP_TIMEOUT_MS = 3500;
 const AUTH_SIGN_OUT_TIMEOUT_MS = 2500;
 const AUTH_SESSION_SNAPSHOT_KEY = "medQuizAuthSessionSnapshot";
-const CLOUD_FALLBACK_MESSAGE = "雲端同步暫時連不上，先使用本機紀錄；稍後可再按一次同步。";
-const AUTH_FALLBACK_MESSAGE = "登入狀態讀取逾時，先以本機模式使用；如果剛剛已登入，請稍後再按一次同步。";
-const RECOVERY_MODE_MESSAGE = "雲端登入與同步維護中，先使用本機紀錄；作答不會被登入流程卡住。";
+const CLOUD_FALLBACK_MESSAGE = "暫用本機，稍後補傳。雲端同步暫時連不上，作答會先留在這台裝置。";
+const AUTH_FALLBACK_MESSAGE = "暫用本機，稍後補傳。登入狀態讀取逾時，如果剛剛已登入，稍後可再同步。";
+const RECOVERY_MODE_MESSAGE = "暫用本機，稍後補傳。雲端登入與同步維護中，作答不會被登入流程卡住。";
 
 function getErrorMessage(error: unknown) {
   if (error instanceof Error) return error.message;
@@ -181,7 +183,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       await withTimeout(
         syncInFlightRef.current,
         CLOUD_RESUME_SYNC_TIMEOUT_MS,
-        "雲端續寫同步仍在背景整理，先使用本機紀錄。"
+        "暫用本機，稍後補傳。雲端續寫同步仍在背景整理。"
       ).catch(markLocalSyncFallback);
       return;
     }
@@ -214,7 +216,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       await withTimeout(
         syncTask,
         CLOUD_RESUME_SYNC_TIMEOUT_MS,
-        "雲端續寫同步逾時，先使用本機紀錄。"
+        "暫用本機，稍後補傳。雲端續寫同步逾時。"
       );
     } catch (error) {
       markLocalSyncFallback(error);

@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useAuth } from "@/components/AuthProvider";
+import { getSyncStatusText, getSyncStatusTone } from "@/components/syncStatusText";
 
 export function UserStatusBar() {
   const pathname = usePathname();
@@ -12,12 +13,7 @@ export function UserStatusBar() {
     pathname === "/owner/bacteria-review" ||
     pathname === "/owner/virus-review" ||
     pathname === "/owner/biochemistry-review";
-  const syncLabel =
-    syncStatus === "syncing"
-      ? "雲端同步中"
-      : syncError
-        ? "本機可用"
-        : "已同步";
+  const syncTone = getSyncStatusTone(syncStatus, Boolean(syncError));
 
   if (isOwnerReviewPage) {
     return null;
@@ -42,15 +38,15 @@ export function UserStatusBar() {
           {configured && user ? (
             <span
               className={`rounded-full px-3 py-1 ring-1 ${
-                syncStatus === "syncing"
+                syncTone === "syncing"
                   ? "bg-amber-50 text-amber-800 ring-amber-100"
-                  : syncError
+                  : syncTone === "fallback"
                     ? "bg-slate-50 text-slate-600 ring-slate-200"
                     : "bg-emerald-50 text-emerald-800 ring-emerald-100 dark-success-chip"
               }`}
               title={syncError || undefined}
             >
-              {syncLabel}
+              {getSyncStatusText(syncStatus, Boolean(syncError))}
             </span>
           ) : null}
         </div>

@@ -304,7 +304,7 @@ export default function ProgressPage() {
                   答對率 <span className="font-semibold">{group.correctRate}%</span>
                 </p>
                 <p className="rounded-2xl bg-white px-4 py-3 text-sm text-slate-700">
-                  mastery <span className="font-semibold">{group.masteryScore}</span>
+                  掌握度 <span className="font-semibold">{group.masteryScore}</span>
                 </p>
               </div>
             </article>
@@ -319,7 +319,7 @@ export default function ProgressPage() {
             {lowCompletion.map((subject) => (
               <div key={subject.subject} className="rounded-2xl bg-slate-50 p-4 text-sm text-slate-700">
                 <p className="font-semibold">{subject.label}</p>
-                <p className="mt-2">completionRate {subject.completionRate}%</p>
+                <p className="mt-2">完成度 {subject.completionRate}%</p>
               </div>
             ))}
           </div>
@@ -334,7 +334,7 @@ export default function ProgressPage() {
               unstable.map((subject) => (
                 <div key={subject.subject} className="rounded-2xl bg-slate-50 p-4 text-sm text-slate-700">
                   <p className="font-semibold">{subject.label}</p>
-                  <p className="mt-2">masteryScore {subject.masteryScore}</p>
+                  <p className="mt-2">掌握度 {subject.masteryScore}</p>
                 </div>
               ))
             )}
@@ -350,7 +350,7 @@ export default function ProgressPage() {
               mastered.map((subject) => (
                 <div key={subject.subject} className="rounded-2xl bg-slate-50 p-4 text-sm text-slate-700">
                   <p className="font-semibold">{subject.label}</p>
-                  <p className="mt-2">masteryScore {subject.masteryScore}</p>
+                  <p className="mt-2">掌握度 {subject.masteryScore}</p>
                 </div>
               ))
             )}
@@ -376,7 +376,7 @@ export default function ProgressPage() {
                 <div>
                   <h2 className="text-2xl font-semibold text-ink">{group.label}</h2>
                   <p className="mt-2 text-sm text-slate-500">
-                    completionRate {group.completionRate}% ・ masteryScore {group.masteryScore}
+                    完成度 {group.completionRate}% ・ 掌握度 {group.masteryScore}
                   </p>
                 </div>
                 <span className="text-sm font-semibold text-brand-700">{isGroupOpen ? "收合" : "展開"}</span>
@@ -390,7 +390,7 @@ export default function ProgressPage() {
                         <div>
                           <h3 className="text-lg font-semibold text-ink">{subject.label}</h3>
                           <p className="mt-2 text-sm text-slate-500">
-                            已作答 {subject.attemptedQuestions} / {subject.totalQuestionsInBank} ・ correctRate {subject.correctRate}% ・ mastery {subject.masteryScore}
+                            已作答 {subject.attemptedQuestions} / {subject.totalQuestionsInBank} ・ 答對率 {subject.correctRate}% ・ 掌握度 {subject.masteryScore}
                           </p>
                         </div>
                         <span className={`rounded-full px-3 py-1 text-xs font-semibold ${statusClasses[subject.status]}`}>

@@ -4,9 +4,9 @@ import { AuthPanel } from "@/components/AuthPanel";
 import { ContinueQuizButton } from "@/components/ContinueQuizButton";
 import { ClientSectionBoundary } from "@/components/ClientSectionBoundary";
 import { ExamCountdown } from "@/components/ExamCountdown";
-import { FeedbackBoard } from "@/components/FeedbackBoard";
 import { HomeToneBanner } from "@/components/HomeToneBanner";
 import { HomeWeaknessInsight } from "@/components/HomeWeaknessInsight";
+import { LazyFeedbackBoard } from "@/components/LazyFeedbackBoard";
 import { OwnerOnlyNotesLink } from "@/components/OwnerOnlyNotesLink";
 import { isSupabaseRecoveryMode } from "@/lib/supabase/recoveryMode";
 
@@ -18,19 +18,16 @@ const HERO_ACTIONS = [
   {
     href: "/start",
     label: "開始測驗",
-    description: "平常散題刷題",
     tone: "primary"
   },
   {
     href: "/simulation",
     label: "開始一份考古題",
-    description: "整回計時練習",
     tone: "light"
   },
   {
     href: "/results",
     label: "查看結果",
-    description: "回顧每次作答",
     tone: "light"
   }
 ] as const;
@@ -38,31 +35,28 @@ const HERO_ACTIONS = [
 const QUICK_ENTRIES = [
   {
     href: "/review",
-    title: "錯題複習",
-    body: "把散題錯題與低信心題拉回來補。",
-    mark: "01"
+    title: "錯題複習"
   },
   {
     href: "/search",
-    title: "題目搜尋",
-    body: "用關鍵字、科目與年份回查考點。",
-    mark: "02"
+    title: "題目搜尋"
   },
   {
     href: "/custom-papers",
-    title: "自訂卷模式",
-    body: "主題卷、公開卷與 JSON 匯入都放這裡。",
-    mark: "03"
+    title: "自訂卷模式"
   },
   {
     href: "/leaderboard",
-    title: "刷題榜",
-    body: "看大家的節奏，也校準自己的進度。",
-    mark: "04"
+    title: "刷題榜"
   }
 ] as const;
 
 const HOME_RELEASE_NOTES = [
+  {
+    time: "06/20",
+    title: "首頁少講一點廢話",
+    body: "同步狀態統一成三種人話，入口卡片只留標題，留言板滑到附近才載；首頁終於不再像期末共筆全部貼第一頁。"
+  },
   {
     time: "06/20",
     title: "題目旁長出同學補充",
@@ -255,19 +249,15 @@ export default function HomePage() {
           <div className="mt-8 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
             <Link href="/start" className="home-action-card home-action-primary">
               <span className="text-sm font-bold">開始測驗</span>
-              <span className="mt-2 text-xs opacity-75">本機散題刷題</span>
             </Link>
             <Link href="/simulation" className="home-action-card">
               <span className="text-sm font-bold">開始一份考古題</span>
-              <span className="mt-2 text-xs opacity-75">整回練習</span>
             </Link>
             <Link href="/results" className="home-action-card">
               <span className="text-sm font-bold">查看本機結果</span>
-              <span className="mt-2 text-xs opacity-75">先看此裝置紀錄</span>
             </Link>
             <Link href="/search" className="home-action-card">
               <span className="text-sm font-bold">題目搜尋</span>
-              <span className="mt-2 text-xs opacity-75">查題與複習</span>
             </Link>
           </div>
           <div className="mt-8 rounded-[2rem] bg-amber-50/80 p-5 text-sm font-semibold leading-7 text-amber-900 ring-1 ring-amber-100">
@@ -314,7 +304,6 @@ export default function HomePage() {
                     style={{ "--home-delay": `${120 + index * 80}ms` } as HomeAnimationStyle}
                   >
                     <span className="text-sm font-bold">{action.label}</span>
-                    <span className="mt-2 text-xs opacity-75">{action.description}</span>
                   </Link>
                 ))}
               </div>
@@ -395,10 +384,7 @@ export default function HomePage() {
                   className="home-entry-card"
                   style={{ "--home-delay": `${220 + index * 70}ms` } as HomeAnimationStyle}
                 >
-                  <span className="home-entry-mark">{entry.mark}</span>
-                  <span className="mt-4 block text-lg font-black tracking-[-0.03em] text-ink">{entry.title}</span>
-                  <span className="body-soft mt-2 block text-sm leading-6">{entry.body}</span>
-                  <span className="mt-4 inline-flex text-sm font-bold text-brand-700">前往 →</span>
+                  <span className="block text-lg font-black tracking-[-0.03em] text-ink">{entry.title}</span>
                 </Link>
               ))}
               <div className="home-entry-card sm:col-span-2">
@@ -406,12 +392,10 @@ export default function HomePage() {
                   <ClientSectionBoundary title="學習筆記入口">
                     <OwnerOnlyNotesLink />
                   </ClientSectionBoundary>
-                  <Link href="/pharmacology-review" className="secondary-pill justify-between px-4">
+                  <Link href="/pharmacology-review" className="secondary-pill px-4">
                     藥理複習
-                    <span className="text-slate-400">→</span>
                   </Link>
                 </div>
-                <p className="body-soft mt-3 text-sm leading-6">筆記整理與藥理抽卡都放這裡，讀書時可以直接切換。</p>
               </div>
             </div>
           </div>
@@ -424,7 +408,7 @@ export default function HomePage() {
         </ClientSectionBoundary>
 
         <ClientSectionBoundary title="留言板">
-          <FeedbackBoard />
+          <LazyFeedbackBoard />
         </ClientSectionBoundary>
       </div>
     </main>
