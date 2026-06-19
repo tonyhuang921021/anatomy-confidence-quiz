@@ -236,6 +236,20 @@ export default function OwnerPage() {
   const [error, setError] = useState("");
   const allowed = useMemo(() => isAllowedEmail(user?.email), [user?.email]);
   const hasAllowlist = getAllowedEmails().length > 0;
+  const yangmingReportSummary = useMemo(() => {
+    const done = yangmingExplanationReports.filter((report) => Boolean(report.appliedAt)).length;
+    return {
+      done,
+      pending: yangmingExplanationReports.length - done
+    };
+  }, [yangmingExplanationReports]);
+  const questionIssueSummary = useMemo(() => {
+    const pending = questionIssueReports.filter((report) => report.reviewStatus === "pending").length;
+    return {
+      pending,
+      reviewed: questionIssueReports.length - pending
+    };
+  }, [questionIssueReports]);
 
   async function fetchOwnerData(accessToken: string) {
     const response = await fetch("/api/owner", {
@@ -802,15 +816,24 @@ export default function OwnerPage() {
                     同學在題目詳解右上角送出的圖片、表格、答案或對應錯誤回報。
                   </p>
                 </div>
-                <span className="rounded-full bg-amber-50 px-3 py-1 text-xs font-bold text-amber-800">
-                  {yangmingExplanationReports.length} 筆
-                </span>
+                <div className="flex flex-wrap justify-end gap-2">
+                  <span className="rounded-full bg-amber-50 px-3 py-1 text-xs font-bold text-amber-800">
+                    {yangmingExplanationReports.length} 筆
+                  </span>
+                  <span className="rounded-full bg-rose-50 px-3 py-1 text-xs font-bold text-rose-700">
+                    待處理 {yangmingReportSummary.pending}
+                  </span>
+                  <span className="rounded-full bg-emerald-50 px-3 py-1 text-xs font-bold text-emerald-700">
+                    已處理 {yangmingReportSummary.done}
+                  </span>
+                </div>
               </div>
               <div className="mt-4 overflow-x-auto">
                 <table className="min-w-full text-left text-sm">
                   <thead className="text-slate-500">
                     <tr className="border-b border-slate-200">
                       <th className="px-3 py-3 font-semibold">題號</th>
+                      <th className="px-3 py-3 font-semibold">狀態</th>
                       <th className="px-3 py-3 font-semibold">類型</th>
                       <th className="px-3 py-3 font-semibold">原因</th>
                       <th className="px-3 py-3 font-semibold">回報者</th>
@@ -821,7 +844,7 @@ export default function OwnerPage() {
                   <tbody>
                     {yangmingExplanationReports.length === 0 ? (
                       <tr>
-                        <td colSpan={6} className="px-3 py-6 text-center text-slate-500">
+                        <td colSpan={7} className="px-3 py-6 text-center text-slate-500">
                           目前還沒有陽明詳解回報。
                         </td>
                       </tr>
@@ -830,6 +853,20 @@ export default function OwnerPage() {
                         <tr key={report.id} className="border-b border-slate-100 last:border-b-0">
                           <td className="whitespace-nowrap px-3 py-3 font-mono text-xs font-bold text-ink">
                             {report.questionId}
+                          </td>
+                          <td className="whitespace-nowrap px-3 py-3">
+                            {report.appliedAt ? (
+                              <div className="flex flex-col gap-1">
+                                <span className="w-fit rounded-full bg-emerald-50 px-3 py-1 text-xs font-bold text-emerald-700 ring-1 ring-emerald-100">
+                                  已處理
+                                </span>
+                                <span className="text-xs text-slate-400">{formatUpdatedAt(report.appliedAt)}</span>
+                              </div>
+                            ) : (
+                              <span className="rounded-full bg-rose-50 px-3 py-1 text-xs font-bold text-rose-700 ring-1 ring-rose-100">
+                                待處理
+                              </span>
+                            )}
                           </td>
                           <td className="whitespace-nowrap px-3 py-3">
                             <span
@@ -1105,9 +1142,17 @@ export default function OwnerPage() {
                   <h2 className="text-lg font-semibold text-ink">題目瑕疵回報</h2>
                   <p className="mt-2 text-sm text-slate-500">同學回報題幹、選項、答案或圖片疑似有問題的題目，這裡整理成可直接複製的格式。</p>
                 </div>
-                <span className="rounded-full bg-amber-50 px-3 py-1 text-xs font-semibold text-amber-800 ring-1 ring-amber-100">
-                  {questionIssueReports.length} 筆
-                </span>
+                <div className="flex flex-wrap justify-end gap-2">
+                  <span className="rounded-full bg-amber-50 px-3 py-1 text-xs font-semibold text-amber-800 ring-1 ring-amber-100">
+                    {questionIssueReports.length} 筆
+                  </span>
+                  <span className="rounded-full bg-rose-50 px-3 py-1 text-xs font-semibold text-rose-700 ring-1 ring-rose-100">
+                    待處理 {questionIssueSummary.pending}
+                  </span>
+                  <span className="rounded-full bg-emerald-50 px-3 py-1 text-xs font-semibold text-emerald-700 ring-1 ring-emerald-100">
+                    已整理 {questionIssueSummary.reviewed}
+                  </span>
+                </div>
               </div>
               <div className="mt-4 grid gap-3">
                 {questionIssueReports.length === 0 ? (
