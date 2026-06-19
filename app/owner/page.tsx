@@ -89,6 +89,9 @@ function formatQuestionIssueReportForCopy(report: OwnerQuestionIssueReportEntry)
     `題號：${report.questionId}`,
     `回報：題目有瑕疵`,
     `目前分類：${classification || "未提供"}`,
+    report.reviewStatus ? `處理狀態：${report.reviewStatus}` : "",
+    report.reviewedAt ? `處理時間：${formatUpdatedAt(report.reviewedAt)}` : "",
+    report.resolutionNote ? `處理備註：${report.resolutionNote}` : "",
     `回報者：${report.reporterLabel}`,
     `時間：${formatUpdatedAt(report.createdAt)}`,
     "",
@@ -1121,9 +1124,18 @@ export default function OwnerPage() {
                             回報者：{report.reporterLabel} ・ {formatUpdatedAt(report.createdAt)}
                           </p>
                         </div>
-                        <span className="rounded-full bg-white px-3 py-1 text-xs font-semibold text-amber-800 ring-1 ring-amber-100">
-                          題目有瑕疵
-                        </span>
+                        <div className="flex flex-wrap justify-end gap-2">
+                          <span className="rounded-full bg-white px-3 py-1 text-xs font-semibold text-amber-800 ring-1 ring-amber-100">
+                            題目有瑕疵
+                          </span>
+                          <span className={`rounded-full px-3 py-1 text-xs font-semibold ring-1 ${
+                            report.reviewStatus === "pending"
+                              ? "bg-rose-50 text-rose-700 ring-rose-100"
+                              : "bg-emerald-50 text-emerald-700 ring-emerald-100"
+                          }`}>
+                            {report.reviewStatus === "pending" ? "待處理" : "已整理"}
+                          </span>
+                        </div>
                       </div>
                       <div className="mt-3 grid gap-2 text-sm text-slate-700">
                         <p>
@@ -1136,6 +1148,12 @@ export default function OwnerPage() {
                           <span className="font-semibold">題幹：</span>
                           {report.questionStem}
                         </p>
+                        {report.resolutionNote ? (
+                          <p className="break-words text-xs text-slate-500">
+                            <span className="font-semibold">處理備註：</span>
+                            {report.resolutionNote}
+                          </p>
+                        ) : null}
                       </div>
                       <details className="mt-3 rounded-2xl bg-white p-3 ring-1 ring-amber-100">
                         <summary className="cursor-pointer select-none text-xs font-semibold text-amber-800">

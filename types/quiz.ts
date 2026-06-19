@@ -475,6 +475,10 @@ export type OwnerQuestionIssueReportEntry = {
   reporterEmail?: string;
   visitorId?: string;
   createdAt: string;
+  reviewStatus?: string;
+  reviewedAt?: string;
+  reviewedByEmail?: string;
+  resolutionNote?: string;
 };
 
 export type OwnerYangmingModeActivationEntry = {

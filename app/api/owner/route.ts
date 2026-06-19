@@ -92,6 +92,10 @@ type QuestionIssueReportRow = {
   reporter_email?: string | null;
   visitor_id?: string | null;
   created_at: string;
+  review_status?: string | null;
+  reviewed_at?: string | null;
+  reviewed_by_email?: string | null;
+  resolution_note?: string | null;
 };
 
 type YangmingModeActivationRow = {
@@ -622,7 +626,7 @@ async function fetchOwnerQuestionIssueReports(
   const { data, error } = await supabase
     .from("question_issue_reports")
     .select(
-      "id, question_id, issue_type, current_subject, current_chapter, current_section, question_stem, question_options, answer, accepted_answers, explanation, tested_concept, reporter_email, visitor_id, created_at"
+      "id, question_id, issue_type, current_subject, current_chapter, current_section, question_stem, question_options, answer, accepted_answers, explanation, tested_concept, reporter_email, visitor_id, created_at, review_status, reviewed_at, reviewed_by_email, resolution_note"
     )
     .order("created_at", { ascending: false })
     .limit(limit);
@@ -651,7 +655,11 @@ async function fetchOwnerQuestionIssueReports(
     reporterLabel: row.reporter_email?.trim() || formatVisitorLabel(row.visitor_id),
     reporterEmail: row.reporter_email ?? undefined,
     visitorId: row.visitor_id ?? undefined,
-    createdAt: row.created_at
+    createdAt: row.created_at,
+    reviewStatus: row.review_status ?? undefined,
+    reviewedAt: row.reviewed_at ?? undefined,
+    reviewedByEmail: row.reviewed_by_email ?? undefined,
+    resolutionNote: row.resolution_note ?? undefined
   }));
 }
 

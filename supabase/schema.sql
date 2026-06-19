@@ -1190,8 +1190,24 @@ create table if not exists public.question_issue_reports (
   reporter_email text,
   user_id uuid references auth.users (id) on delete set null,
   visitor_id text,
-  created_at timestamptz not null default now()
+  created_at timestamptz not null default now(),
+  review_status text not null default 'pending',
+  reviewed_at timestamptz,
+  reviewed_by_email text,
+  resolution_note text
 );
+
+alter table public.question_issue_reports
+  add column if not exists review_status text not null default 'pending';
+
+alter table public.question_issue_reports
+  add column if not exists reviewed_at timestamptz;
+
+alter table public.question_issue_reports
+  add column if not exists reviewed_by_email text;
+
+alter table public.question_issue_reports
+  add column if not exists resolution_note text;
 
 create index if not exists question_issue_reports_created_at_idx
 on public.question_issue_reports (created_at desc);
@@ -1201,6 +1217,9 @@ on public.question_issue_reports (question_id);
 
 create index if not exists question_issue_reports_user_id_created_at_idx
 on public.question_issue_reports (user_id, created_at desc);
+
+create index if not exists question_issue_reports_review_status_created_at_idx
+on public.question_issue_reports (review_status, created_at desc);
 
 grant select, insert, update, delete
   on public.question_issue_reports
