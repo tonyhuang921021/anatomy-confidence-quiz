@@ -115,6 +115,11 @@
     .chips { display: flex; flex-wrap: wrap; gap: 6px; }
     .chip { background: var(--soft-2); color: #27635d; border: 1px solid #cce3df; border-radius: 999px; padding: .1rem .48rem; font-size: .76rem; }
     .mini { color: var(--muted); font-size: .9rem; }
+
+    .family-summary { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 6px 10px; color: var(--muted); font-size: .9rem; }
+    .family-summary strong { color: var(--accent); }
+    .family-card .virus-btn { margin: 2px 3px 2px 0; }
+    .family-note { color: #5d5146; font-size: .92rem; margin-top: 6px; }
     .split { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; padding: 18px; }
     .panel { border: 1px solid var(--line); border-radius: 18px; background: #fffaf2; padding: 16px; }
     .panel h3 { margin: 0 0 8px; color: var(--accent); }
@@ -169,6 +174,7 @@
         <span class="badge">病毒名可點</span>
         <span class="badge ok">專有名詞可點</span>
         <span class="badge">給 Codex 易改資料結構</span>
+        <span class="badge ok">新增病毒科別分類</span>
       </div>
     </div>
   </header>
@@ -177,7 +183,7 @@
     <div class="control-card">
       <input id="search" type="search" placeholder="搜尋：例如 EBV、owl eye、slapped cheek、流感、RSV、HBsAg、PML、Kaposi、登革、手足口、狂犬病、Prion...">
       <nav class="quick-nav">
-        <a href="#corrections">先修正</a><a href="#core-rules">總綱例外</a><a href="#triggers">一秒關鍵字</a><a href="#name-index">病毒索引</a><a href="#dna-table">DNA病毒</a><a href="#rna-family">RNA病毒</a><a href="#herpes">疱疹</a><a href="#hepatitis">肝炎</a><a href="#rash">紅疹</a><a href="#respiratory">呼吸道</a><a href="#gi">腸胃炎</a><a href="#arbovirus">蟲媒</a><a href="#oncovirus">致癌</a><a href="#antivirals">藥物疫苗</a><a href="#hiv">HIV</a>
+        <a href="#corrections">先修正</a><a href="#core-rules">總綱例外</a><a href="#triggers">一秒關鍵字</a><a href="#family-index">科別分類</a><a href="#name-index">病毒索引</a><a href="#dna-table">DNA病毒</a><a href="#rna-family">RNA病毒</a><a href="#herpes">疱疹</a><a href="#hepatitis">肝炎</a><a href="#rash">紅疹</a><a href="#respiratory">呼吸道</a><a href="#gi">腸胃炎</a><a href="#arbovirus">蟲媒</a><a href="#oncovirus">致癌</a><a href="#antivirals">藥物疫苗</a><a href="#hiv">HIV</a>
       </nav>
     </div>
   </div>
@@ -196,6 +202,13 @@
       <div class="trigger-grid" id="triggerGrid"></div>
     </section>
 
+
+    <section class="section" id="family-index">
+      <div class="section-head"><h2>病毒科別分類索引：先按「科」抓大方向</h2><p>國考讀病毒不要只背單隻病毒，先把同一科的基因體、套膜、複製位置與招牌疾病綁在一起。下面每個病毒名仍可點開看完整簡介。</p></div>
+      <div class="index-grid" id="familyIndex"></div>
+      <div class="table-wrap"><table class="data-table" id="familyMasterTable"></table></div>
+    </section>
+
     <section class="section" id="name-index">
       <div class="section-head"><h2>病毒名索引：每隻病毒都可以點開看簡介</h2><p>病毒名採「中文（English）」；點開會有結構、疾病、診斷、治療/疫苗與國考一句話。</p></div>
       <div class="index-grid" id="virusIndex"></div>
@@ -209,7 +222,7 @@
     <div id="comparisonSections"></div>
 
     <div class="footer">
-      <p>資料結構提示：本檔在 JavaScript 中保留 <code>VIRUSES</code>、<code>COMPARISONS</code>、<code>GLOSSARY</code> 三個物件，方便之後交給 Codex 上架、加篩選器或改UI。</p>
+      <p>資料結構提示：本檔在 JavaScript 中保留 <code>VIRUSES</code>、<code>COMPARISONS</code>、<code>GLOSSARY</code> 三個物件，並用 <code>family</code> 欄位自動生成病毒科別分類，方便之後交給 Codex 上架、加篩選器或改UI。</p>
     </div>
   </main>
 
@@ -256,6 +269,81 @@
         </article>`).join('');
     }
 
+
+    function familyExamNote(family, members) {
+      const name = family;
+      if (name.includes('疱疹')) return '全部有套膜、線型雙股DNA、核內複製、會潛伏；國考最愛問 HHV 1–8 對應疾病。';
+      if (name.includes('痘病毒')) return 'DNA病毒例外：在細胞質複製；天花/軟疣/mpox 都是這科。';
+      if (name.includes('小RNA') || name.includes('Picorn')) return '無套膜正股RNA；多糞口/呼吸道；Enterovirus、Rhinovirus、HAV 很常考。';
+      if (name.includes('黃病毒') || name.includes('Flavi')) return '有套膜正股RNA；蚊媒與HCV都在這群；登革/ADE、日本腦炎、Zika 是高頻。';
+      if (name.includes('正黏液')) return '流感科：有套膜、負股RNA、8段、核內複製；shift/drift 必考。';
+      if (name.includes('副黏液')) return '有套膜、負股RNA、不分段；麻疹/腮腺炎/副流感，F protein 與 syncytia 常考。';
+      if (name.includes('肺病毒')) return 'RSV/人類偏肺病毒；F protein、syncytia、嬰兒細支氣管炎。';
+      if (name.includes('冠狀')) return '有套膜正股RNA；Spike、ACE2/DPP4、呼吸道肺炎。';
+      if (name.includes('反轉錄')) return '有套膜RNA病毒；靠反轉錄酶與整合，HIV/HTLV 藥理與腫瘤高頻。';
+      if (name.includes('肝炎病毒科')) return 'HBV：DNA病毒但有反轉錄酶，血清標記與疫苗必背。';
+      if (name.includes('呼腸孤')) return '無套膜雙股RNA、分段；輪狀病毒幼兒冬季水瀉。';
+      if (name.includes('杯狀')) return '無套膜正股RNA；諾羅病毒群聚上吐下瀉，酒精較不可靠。';
+      if (name.includes('彈狀')) return '狂犬病：子彈狀、負股RNA、Negri body，暴露後還來得及PEP。';
+      if (name.includes('絲狀')) return 'Ebola/Marburg：出血熱、體液傳染、高致死率。';
+      if (name.includes('細小')) return 'B19：唯一常考單股DNA，打紅血球前驅細胞。';
+      if (name.includes('腺病毒')) return '無套膜線型雙股DNA；游泳池紅眼、40/41腸胃炎、出血性膀胱炎。';
+      if (name.includes('乳頭瘤')) return 'HPV：無套膜環狀雙股DNA；6/11疣，16/18癌，E6/E7。';
+      if (name.includes('多瘤')) return 'BK腎移植/膀胱炎、JC=PML；都偏免疫低下再活化。';
+      return members.map(v => v.exam).slice(0,2).join('；');
+    }
+    function deriveFamilyFeature(members) {
+      const text = members.map(v => v.genome).join('；');
+      const envelope = text.includes('有套膜') ? (text.includes('無套膜') ? '有/無套膜依病毒' : '有套膜') : (text.includes('無套膜') ? '無套膜' : '見各病毒');
+      let genome = '見各病毒';
+      if (text.includes('部分雙股環狀DNA')) genome = '部分雙股DNA + RT';
+      else if (text.includes('雙股DNA') || text.includes('dsDNA')) genome = '雙股DNA';
+      else if (text.includes('單股DNA') || text.includes('ssDNA')) genome = '單股DNA';
+      else if (text.includes('雙股RNA') || text.includes('dsRNA')) genome = '雙股RNA';
+      else if (text.includes('RNA(-)') || text.includes('負股') || text.includes('-ssRNA')) genome = '負股RNA';
+      else if (text.includes('RNA(+)') || text.includes('正股') || text.includes('+ssRNA')) genome = '正股RNA';
+      else if (text.includes('反轉錄')) genome = 'RNA + 反轉錄';
+      const site = text.includes('核內') || text.includes('核內複製') ? (text.includes('細胞質複製') ? '依病毒；注意例外' : '多核內複製') : (text.includes('細胞質') ? '多細胞質複製' : '見各病毒');
+      return { envelope, genome, site };
+    }
+    function familyGroups() {
+      const map = new Map();
+      for (const v of VIRUSES) {
+        if (!map.has(v.family)) map.set(v.family, []);
+        map.get(v.family).push(v);
+      }
+      const order = ['DNA病毒','RNA病毒','反轉錄病毒','Prion'];
+      return Array.from(map.entries()).sort((a,b) => {
+        const ca = order.indexOf(a[1][0].category), cb = order.indexOf(b[1][0].category);
+        return (ca === cb ? a[0].localeCompare(b[0], 'zh-Hant') : ca - cb);
+      });
+    }
+    function renderFamilyIndex() {
+      const groups = familyGroups();
+      $('#familyIndex').innerHTML = groups.map(([family, members]) => {
+        const f = deriveFamilyFeature(members);
+        const virusButtons = members.map(v => `<button class="virus-btn" data-virus="${esc(v.id)}">${esc(v.zh)}</button>`).join('');
+        const search = family + ' ' + members.map(searchTextVirus).join(' ');
+        return `<article class="virus-card family-card searchable" data-search="${esc(search)}">
+          <h3>${esc(family)}</h3>
+          <div class="family-summary"><span><strong>類別</strong> ${esc(members[0].category)}</span><span><strong>基因體</strong> ${esc(f.genome)}</span><span><strong>套膜</strong> ${esc(f.envelope)}</span><span><strong>複製</strong> ${esc(f.site)}</span></div>
+          <div class="mini">代表病毒：${virusButtons}</div>
+          <div class="family-note">${esc(familyExamNote(family, members))}</div>
+        </article>`;
+      }).join('');
+      const rows = groups.map(([family, members]) => {
+        const f = deriveFamilyFeature(members);
+        const reps = members.map(v => `<button class="virus-btn" data-virus="${esc(v.id)}">${esc(v.zh)}（<em>${esc(v.en)}</em>）</button>`).join('<br>');
+        return `<tr class="searchable" data-search="${esc(family + ' ' + members.map(searchTextVirus).join(' '))}">
+          <td><strong>${esc(family)}</strong><br><span class="mini">${esc(members[0].category)}</span></td>
+          <td>${esc(f.genome)}；${esc(f.envelope)}；${esc(f.site)}</td>
+          <td>${reps}</td>
+          <td>${esc(familyExamNote(family, members))}</td>
+        </tr>`;
+      }).join('');
+      $('#familyMasterTable').innerHTML = `<thead><tr><th>病毒科別</th><th>共通特性</th><th>代表病毒</th><th>國考抓法</th></tr></thead><tbody>${rows}</tbody>`;
+    }
+
     function renderIndex() {
       const groups = ["DNA病毒", "RNA病毒", "反轉錄病毒", "Prion"];
       const ordered = [...VIRUSES].sort((a,b) => groups.indexOf(a.category)-groups.indexOf(b.category) || a.family.localeCompare(b.family, 'zh-Hant'));
@@ -273,18 +361,19 @@
       let lastCat = '';
       for (const v of VIRUSES) {
         if (v.category !== lastCat) {
-          rows.push(`<tr class="searchable" data-search="${esc(v.category)}"><td colspan="5"><strong>${esc(v.category)}</strong></td></tr>`);
+          rows.push(`<tr class="searchable" data-search="${esc(v.category)}"><td colspan="6"><strong>${esc(v.category)}</strong></td></tr>`);
           lastCat = v.category;
         }
         rows.push(`<tr class="searchable" data-search="${esc(searchTextVirus(v))}">
-          <td><button class="virus-btn" data-virus="${esc(v.id)}">${esc(v.zh)}（<em>${esc(v.en)}</em>）</button><br><span class="mini">${esc(v.family)}</span></td>
+          <td><button class="virus-btn" data-virus="${esc(v.id)}">${esc(v.zh)}（<em>${esc(v.en)}</em>）</button></td>
+          <td>${esc(v.family)}<br><span class="mini">${esc(v.category)}</span></td>
           <td>${fmt(v.genome)}</td>
           <td>${fmt(v.diseases)}</td>
           <td>${fmt(v.dx)}<br><span class="mini">治療/疫苗：${fmt(v.tx)}；${fmt(v.vaccine)}</span></td>
           <td><strong>${fmt(v.exam)}</strong></td>
         </tr>`);
       }
-      $('#virusMasterTable').innerHTML = `<thead><tr><th>病毒</th><th>結構</th><th>疾病聯想</th><th>診斷/治療/疫苗</th><th>國考一句話</th></tr></thead><tbody>${rows.join('')}</tbody>`;
+      $('#virusMasterTable').innerHTML = `<thead><tr><th>病毒</th><th>病毒科別</th><th>結構</th><th>疾病聯想</th><th>診斷/治療/疫苗</th><th>國考一句話</th></tr></thead><tbody>${rows.join('')}</tbody>`;
     }
 
     function renderComparisons() {
@@ -305,6 +394,7 @@
       $('#modalBody').innerHTML = `
         <div class="chips" style="margin-bottom:12px">${(v.tags||[]).map(t => `<span class="chip">${esc(t)}</span>`).join('')}</div>
         <div class="detail-grid">
+          <div class="detail-item wide"><strong>病毒科別</strong><div>${esc(v.family)}｜${esc(v.category)}</div></div>
           <div class="detail-item wide"><strong>簡介</strong><div>${fmt(v.intro)}</div></div>
           <div class="detail-item"><strong>結構/基因體</strong><div>${fmt(v.genome)}</div></div>
           <div class="detail-item"><strong>複製/特性</strong><div>${fmt(v.replication)}</div></div>
@@ -354,7 +444,7 @@
     document.addEventListener('keydown', (e) => { if (e.key === 'Escape') { closeVirus(); hideTerm(); } });
     $('#search').addEventListener('input', applySearch);
 
-    renderTriggers(); renderIndex(); renderMasterTable(); renderComparisons();
+    renderTriggers(); renderFamilyIndex(); renderIndex(); renderMasterTable(); renderComparisons();
   </script>
 </body>
 </html>
