@@ -1,12 +1,12 @@
 import Link from "next/link";
 import type { CSSProperties } from "react";
-import { AuthPanel } from "@/components/AuthPanel";
 import { ContinueQuizButton } from "@/components/ContinueQuizButton";
 import { ClientSectionBoundary } from "@/components/ClientSectionBoundary";
 import { ExamCountdown } from "@/components/ExamCountdown";
 import { HomeToneBanner } from "@/components/HomeToneBanner";
-import { HomeWeaknessInsight } from "@/components/HomeWeaknessInsight";
+import { LazyAuthPanel } from "@/components/LazyAuthPanel";
 import { LazyFeedbackBoard } from "@/components/LazyFeedbackBoard";
+import { LazyHomeWeaknessInsight } from "@/components/LazyHomeWeaknessInsight";
 import { OwnerOnlyNotesLink } from "@/components/OwnerOnlyNotesLink";
 import { isSupabaseRecoveryMode } from "@/lib/supabase/recoveryMode";
 
@@ -369,7 +369,7 @@ export default function HomePage() {
                 </div>
                 <div className="mt-6 grid gap-3">
                   <ClientSectionBoundary title="首頁弱點判讀">
-                    <HomeWeaknessInsight />
+                    <LazyHomeWeaknessInsight />
                   </ClientSectionBoundary>
                   <ExamCountdown />
                 </div>
@@ -404,7 +404,7 @@ export default function HomePage() {
 
       <div className="home-reveal home-reveal-late mt-6 grid gap-6">
         <ClientSectionBoundary title="帳號區塊">
-          <AuthPanel />
+          <LazyAuthPanel />
         </ClientSectionBoundary>
 
         <ClientSectionBoundary title="留言板">

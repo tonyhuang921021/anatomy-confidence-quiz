@@ -47,8 +47,10 @@ export function HomeToneBanner() {
   const { user } = useAuth();
   const [mode, setMode] = useState<HomeToneMode>("calm");
   const [stats, setStats] = useState<{ date: string; attempts: number; correctRate: number }[]>([]);
+  const [calmLine, setCalmLine] = useState(CALM_LINES[0]);
 
   useEffect(() => {
+    setCalmLine(getCalmLine());
     setMode(getHomeToneModePreference(user?.user_metadata) ?? loadHomeToneMode());
 
     function handleModeChange(event: Event) {
@@ -99,7 +101,7 @@ export function HomeToneBanner() {
     if (mode === "calm") {
       return {
         label: "抗焦慮版",
-        body: getCalmLine()
+        body: calmLine
       };
     }
 
@@ -119,7 +121,7 @@ export function HomeToneBanner() {
           ? `${segments.join("；")}。${getAnxiousEncouragement(today?.attempts ?? 0)}`
           : "今天和昨天的整體作答還在整理中。先把自己的節奏穩住就好。"
     };
-  }, [mode, stats]);
+  }, [calmLine, mode, stats]);
 
   return (
     <div className="surface-card-muted mt-5 px-4 py-3">

@@ -37,9 +37,10 @@ function getCountdownParts(now: Date): CountdownParts {
 }
 
 export function ExamCountdown() {
-  const [now, setNow] = useState(() => new Date());
+  const [now, setNow] = useState<Date | null>(null);
 
   useEffect(() => {
+    setNow(new Date());
     const timer = window.setInterval(() => {
       setNow(new Date());
     }, 60 * 1000);
@@ -47,7 +48,7 @@ export function ExamCountdown() {
     return () => window.clearInterval(timer);
   }, []);
 
-  const countdown = useMemo(() => getCountdownParts(now), [now]);
+  const countdown = useMemo(() => (now ? getCountdownParts(now) : null), [now]);
 
   return (
     <div className="surface-card-muted p-4">
@@ -56,7 +57,9 @@ export function ExamCountdown() {
           <p className="eyebrow text-sm tracking-[0.16em]">Exam Countdown</p>
           <p className="body-soft mt-2 text-sm">國考時間：7/17 早上 8:40</p>
         </div>
-        {countdown.isPast ? (
+        {!countdown ? (
+          <span className="stat-chip px-3 py-2 text-sm">倒數整理中</span>
+        ) : countdown.isPast ? (
           <span className="stat-chip px-3 py-2 text-sm">
             國考時間已到
           </span>
