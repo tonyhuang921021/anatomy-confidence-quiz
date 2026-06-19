@@ -5,6 +5,7 @@ import { useDeferredValue, useEffect, useMemo, useState } from "react";
 import { useAuth } from "@/components/AuthProvider";
 import { CopyQuestionPromptButton } from "@/components/CopyQuestionPromptButton";
 import { QuestionOptionBlock, QuestionStemBlock } from "@/components/QuestionMediaBlock";
+import { QuestionIssueReportButton } from "@/components/QuestionIssueReportButton";
 import { YangmingExplanationPanel } from "@/components/YangmingExplanationPanel";
 import {
   loadConfirmedQuestionClassificationOverrides,
@@ -18,7 +19,6 @@ import {
   saveQuestionExplanationOverride,
   saveQuestionExplanationOverrides
 } from "@/lib/storage";
-import { submitQuestionIssueReport } from "@/lib/questionIssueReport";
 import { getOrCreateVisitorId } from "@/lib/visitor";
 import {
   buildRelatedQuestionContext,
@@ -119,7 +119,6 @@ export default function SearchPage() {
   const [explanationLoadingMap, setExplanationLoadingMap] = useState<Record<string, boolean>>({});
   const [explanationErrorMap, setExplanationErrorMap] = useState<Record<string, string>>({});
   const [classificationReportLoadingMap, setClassificationReportLoadingMap] = useState<Record<string, boolean>>({});
-  const [questionIssueReportLoadingMap, setQuestionIssueReportLoadingMap] = useState<Record<string, boolean>>({});
   const [classificationReportMessageMap, setClassificationReportMessageMap] = useState<Record<string, string>>({});
   const [classificationOverrides, setClassificationOverrides] = useState<Record<string, QuestionClassificationOverride>>({});
   const deferredKeyword = useDeferredValue(keyword);
@@ -418,34 +417,6 @@ export default function SearchPage() {
     }
   }
 
-  async function handleReportQuestionIssue(question: Question) {
-    if (!session?.access_token) {
-      setClassificationReportMessageMap((current) => ({
-        ...current,
-        [question.id]: "請先登入帳號，才能回報此題題目有瑕疵。"
-      }));
-      return;
-    }
-
-    setQuestionIssueReportLoadingMap((current) => ({ ...current, [question.id]: true }));
-    setClassificationReportMessageMap((current) => ({ ...current, [question.id]: "" }));
-
-    try {
-      const payload = await submitQuestionIssueReport(question, session.access_token);
-      setClassificationReportMessageMap((current) => ({
-        ...current,
-        [question.id]: payload.message ?? "已回報題目瑕疵，站長會在私有數據頁整理。"
-      }));
-    } catch (error) {
-      setClassificationReportMessageMap((current) => ({
-        ...current,
-        [question.id]: error instanceof Error ? error.message : "題目瑕疵回報送出失敗。"
-      }));
-    } finally {
-      setQuestionIssueReportLoadingMap((current) => ({ ...current, [question.id]: false }));
-    }
-  }
-
   return (
     <main className="shell">
       <section className="rounded-[2rem] bg-white p-5 shadow-card ring-1 ring-slate-100 sm:p-7">
@@ -688,19 +659,15 @@ export default function SearchPage() {
                   <button
                     type="button"
                     onClick={() => void handleReportClassification(renderedQuestion)}
-                    disabled={classificationReportLoadingMap[renderedQuestion.id] || questionIssueReportLoadingMap[renderedQuestion.id]}
+                    disabled={classificationReportLoadingMap[renderedQuestion.id]}
                     className="min-h-10 rounded-2xl bg-slate-100 px-4 py-2 text-sm font-semibold text-slate-800 transition hover:bg-slate-200 disabled:cursor-wait disabled:opacity-60"
                   >
                     {classificationReportLoadingMap[renderedQuestion.id] ? "回報中..." : "回報此題分類錯誤"}
                   </button>
-                  <button
-                    type="button"
-                    onClick={() => void handleReportQuestionIssue(renderedQuestion)}
-                    disabled={questionIssueReportLoadingMap[renderedQuestion.id] || classificationReportLoadingMap[renderedQuestion.id]}
-                    className="min-h-10 rounded-2xl bg-amber-50 px-4 py-2 text-sm font-semibold text-amber-900 ring-1 ring-amber-100 transition hover:bg-amber-100 disabled:cursor-wait disabled:opacity-60"
-                  >
-                    {questionIssueReportLoadingMap[renderedQuestion.id] ? "回報中..." : "回報此題題目有瑕疵"}
-                  </button>
+                  <QuestionIssueReportButton
+                    question={renderedQuestion}
+                    disabled={classificationReportLoadingMap[renderedQuestion.id]}
+                  />
                   {error ? <p className="text-sm font-medium text-rose-700">{error}</p> : null}
                   {classificationReportMessageMap[renderedQuestion.id] ? (
                     <p className="text-sm font-medium text-slate-600">

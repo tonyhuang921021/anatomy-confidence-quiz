@@ -6,6 +6,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { useAuth } from "@/components/AuthProvider";
 import { CopyQuestionPromptButton } from "@/components/CopyQuestionPromptButton";
 import { QuestionOptionBlock, QuestionStemBlock } from "@/components/QuestionMediaBlock";
+import { QuestionIssueReportButton } from "@/components/QuestionIssueReportButton";
 import { ResultSummary } from "@/components/ResultSummary";
 import { WeaknessRanking } from "@/components/WeaknessRanking";
 import { YangmingExplanationPanel } from "@/components/YangmingExplanationPanel";
@@ -44,7 +45,6 @@ import {
   saveQuizSettings
 } from "@/lib/storage";
 import { buildNewQuizHref } from "@/lib/startSettingsUrl";
-import { submitQuestionIssueReport } from "@/lib/questionIssueReport";
 import {
   Attempt,
   OptionKey,
@@ -224,7 +224,6 @@ function ResultsPageContent() {
   const [explanationLoadingMap, setExplanationLoadingMap] = useState<Record<string, boolean>>({});
   const [explanationErrorMap, setExplanationErrorMap] = useState<Record<string, string>>({});
   const [classificationReportLoadingMap, setClassificationReportLoadingMap] = useState<Record<string, boolean>>({});
-  const [questionIssueReportLoadingMap, setQuestionIssueReportLoadingMap] = useState<Record<string, boolean>>({});
   const [classificationReportMessageMap, setClassificationReportMessageMap] = useState<Record<string, string>>({});
   const [classificationOverrides, setClassificationOverrides] = useState<Record<string, QuestionClassificationOverride>>({});
   const [communityStatsMap, setCommunityStatsMap] = useState<Record<string, QuestionCommunityStats>>({});
@@ -335,34 +334,6 @@ function ResultsPageContent() {
       }));
     } finally {
       setClassificationReportLoadingMap((current) => ({ ...current, [question.id]: false }));
-    }
-  }
-
-  async function handleReportQuestionIssue(question: Question) {
-    if (!session?.access_token) {
-      setClassificationReportMessageMap((current) => ({
-        ...current,
-        [question.id]: "請先登入帳號，才能回報此題題目有瑕疵。"
-      }));
-      return;
-    }
-
-    setQuestionIssueReportLoadingMap((current) => ({ ...current, [question.id]: true }));
-    setClassificationReportMessageMap((current) => ({ ...current, [question.id]: "" }));
-
-    try {
-      const payload = await submitQuestionIssueReport(question, session.access_token);
-      setClassificationReportMessageMap((current) => ({
-        ...current,
-        [question.id]: payload.message ?? "已回報題目瑕疵，站長會在私有數據頁整理。"
-      }));
-    } catch (error) {
-      setClassificationReportMessageMap((current) => ({
-        ...current,
-        [question.id]: error instanceof Error ? error.message : "題目瑕疵回報送出失敗。"
-      }));
-    } finally {
-      setQuestionIssueReportLoadingMap((current) => ({ ...current, [question.id]: false }));
     }
   }
 
@@ -997,7 +968,6 @@ function ResultsPageContent() {
     const loading = explanationLoadingMap[question.id];
     const error = explanationErrorMap[question.id];
     const reportLoading = classificationReportLoadingMap[question.id];
-    const issueReportLoading = questionIssueReportLoadingMap[question.id];
     const reportMessage = classificationReportMessageMap[question.id];
 
     return (
@@ -1031,19 +1001,12 @@ function ResultsPageContent() {
           <button
             type="button"
             onClick={() => void handleReportClassification(question)}
-            disabled={reportLoading || issueReportLoading}
+            disabled={reportLoading}
             className="min-h-10 rounded-2xl bg-slate-100 px-4 py-2 text-sm font-semibold text-slate-800 transition hover:bg-slate-200 disabled:cursor-wait disabled:opacity-60"
           >
             {reportLoading ? "回報中..." : "回報此題分類錯誤"}
           </button>
-          <button
-            type="button"
-            onClick={() => void handleReportQuestionIssue(question)}
-            disabled={issueReportLoading || reportLoading}
-            className="min-h-10 rounded-2xl bg-amber-50 px-4 py-2 text-sm font-semibold text-amber-900 ring-1 ring-amber-100 transition hover:bg-amber-100 disabled:cursor-wait disabled:opacity-60"
-          >
-            {issueReportLoading ? "回報中..." : "回報此題題目有瑕疵"}
-          </button>
+          <QuestionIssueReportButton question={question} disabled={reportLoading} />
         </div>
         {error ? <p className="text-sm font-medium text-rose-700">{error}</p> : null}
         {reportMessage ? <p className="text-sm font-medium text-slate-600">{reportMessage}</p> : null}

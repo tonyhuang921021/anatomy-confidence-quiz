@@ -86,6 +86,8 @@ type QuestionIssueReportRow = {
   question_options?: Record<string, string> | null;
   answer?: string | null;
   accepted_answers?: string[] | null;
+  issue_category?: string | null;
+  issue_note?: string | null;
   explanation?: string | null;
   tested_concept?: string | null;
   reporter_email?: string | null;
@@ -118,6 +120,10 @@ const OWNER_MAX_ANALYTIC_ROWS = 5_000;
 const OWNER_ANALYTIC_LOOKBACK_DAYS = 30;
 const OWNER_TOP_VISITOR_LOOKBACK_DAYS = 7;
 const OWNER_TOP_VISITOR_MAX_ROWS = 2_000;
+const QUESTION_ISSUE_REPORT_SELECT_BASE =
+  "id, question_id, issue_type, current_subject, current_chapter, current_section, question_stem, question_options, answer, accepted_answers, explanation, tested_concept, reporter_email, visitor_id, created_at, review_status, reviewed_at, reviewed_by_email, resolution_note";
+const QUESTION_ISSUE_REPORT_SELECT_WITH_DETAILS =
+  "id, question_id, issue_type, current_subject, current_chapter, current_section, question_stem, question_options, answer, accepted_answers, issue_category, issue_note, explanation, tested_concept, reporter_email, visitor_id, created_at, review_status, reviewed_at, reviewed_by_email, resolution_note";
 const OWNER_QUERY_TIMEOUT_MS = 5_000;
 
 function getLookbackIsoString(days: number) {
@@ -616,13 +622,24 @@ async function fetchOwnerQuestionIssueReports(
   supabase: any,
   limit = 80
 ): Promise<OwnerQuestionIssueReportEntry[]> {
-  const { data, error } = await supabase
+  let { data, error } = await supabase
     .from("question_issue_reports")
-    .select(
-      "id, question_id, issue_type, current_subject, current_chapter, current_section, question_stem, question_options, answer, accepted_answers, explanation, tested_concept, reporter_email, visitor_id, created_at, review_status, reviewed_at, reviewed_by_email, resolution_note"
-    )
+    .select(QUESTION_ISSUE_REPORT_SELECT_WITH_DETAILS)
     .order("created_at", { ascending: false })
     .limit(limit);
+
+  if (error) {
+    const message = String(error.message ?? "");
+    if (message.includes("issue_category") || message.includes("issue_note") || message.includes("schema cache")) {
+      const retryResult = await supabase
+        .from("question_issue_reports")
+        .select(QUESTION_ISSUE_REPORT_SELECT_BASE)
+        .order("created_at", { ascending: false })
+        .limit(limit);
+      data = retryResult.data;
+      error = retryResult.error;
+    }
+  }
 
   if (error) {
     const message = String(error.message ?? "");
@@ -643,6 +660,8 @@ async function fetchOwnerQuestionIssueReports(
     questionOptions: row.question_options ?? undefined,
     answer: row.answer ?? undefined,
     acceptedAnswers: row.accepted_answers ?? undefined,
+    issueCategory: row.issue_category ?? undefined,
+    issueNote: row.issue_note ?? undefined,
     explanation: row.explanation ?? undefined,
     testedConcept: row.tested_concept ?? undefined,
     reporterLabel: row.reporter_email?.trim() || formatVisitorLabel(row.visitor_id),

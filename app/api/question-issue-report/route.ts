@@ -5,6 +5,8 @@ import { isSupabaseRecoveryMode } from "@/lib/supabase/recoveryMode";
 type QuestionIssueReportRequestBody = {
   visitorId?: string;
   accessToken?: string;
+  issueCategory?: string | null;
+  issueNote?: string | null;
   question?: {
     id?: string;
     subject?: string;
@@ -39,6 +41,11 @@ function formatUnknownError(error: unknown) {
   if (error instanceof Error && error.message.trim()) return error.message.trim();
   if (typeof error === "string" && error.trim()) return error.trim();
   return "題目瑕疵回報送出失敗。";
+}
+
+function isMissingIssueDetailColumnError(error: unknown) {
+  const message = String((error as { message?: unknown })?.message ?? error ?? "");
+  return message.includes("issue_category") || message.includes("issue_note") || message.includes("schema cache");
 }
 
 export async function POST(request: NextRequest) {
@@ -85,9 +92,11 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const { error } = await supabase.from("question_issue_reports").insert({
+    const insertPayload = {
       question_id: question.id,
       issue_type: "question_defect",
+      issue_category: body?.issueCategory?.trim() || null,
+      issue_note: body?.issueNote?.trim() || null,
       current_subject: question.subject ?? null,
       current_chapter: question.chapter ?? null,
       current_section: question.section ?? null,
@@ -100,7 +109,18 @@ export async function POST(request: NextRequest) {
       reporter_email: user.email,
       user_id: user.id,
       visitor_id: body?.visitorId?.trim() || null
-    });
+    };
+
+    let { error } = await supabase.from("question_issue_reports").insert(insertPayload);
+    if (error && isMissingIssueDetailColumnError(error)) {
+      const {
+        issue_category: _issueCategory,
+        issue_note: _issueNote,
+        ...legacyPayload
+      } = insertPayload;
+      const retryResult = await supabase.from("question_issue_reports").insert(legacyPayload);
+      error = retryResult.error;
+    }
 
     if (error) throw error;
 

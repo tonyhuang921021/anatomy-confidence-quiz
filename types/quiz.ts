@@ -469,6 +469,8 @@ export type OwnerQuestionIssueReportEntry = {
   questionOptions?: Record<string, string>;
   answer?: string;
   acceptedAnswers?: string[];
+  issueCategory?: string;
+  issueNote?: string;
   explanation?: string;
   testedConcept?: string;
   reporterLabel: string;

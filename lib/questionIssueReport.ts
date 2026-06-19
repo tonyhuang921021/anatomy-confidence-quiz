@@ -3,7 +3,16 @@
 import type { Question } from "@/types/quiz";
 import { getOrCreateVisitorId } from "@/lib/visitor";
 
-export async function submitQuestionIssueReport(question: Question, accessToken?: string | null) {
+export type QuestionIssueReportDetails = {
+  issueCategory?: string;
+  issueNote?: string;
+};
+
+export async function submitQuestionIssueReport(
+  question: Question,
+  accessToken?: string | null,
+  details: QuestionIssueReportDetails = {}
+) {
   const response = await fetch("/api/question-issue-report", {
     method: "POST",
     headers: {
@@ -12,6 +21,8 @@ export async function submitQuestionIssueReport(question: Question, accessToken?
     body: JSON.stringify({
       visitorId: getOrCreateVisitorId(),
       accessToken: accessToken ?? null,
+      issueCategory: details.issueCategory ?? null,
+      issueNote: details.issueNote ?? null,
       question: {
         id: question.id,
         subject: question.subject,

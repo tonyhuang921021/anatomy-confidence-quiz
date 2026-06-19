@@ -1185,6 +1185,8 @@ create table if not exists public.question_issue_reports (
   question_options jsonb not null default '{}'::jsonb,
   answer text,
   accepted_answers text[] not null default '{}'::text[],
+  issue_category text,
+  issue_note text,
   explanation text,
   tested_concept text,
   reporter_email text,
@@ -1208,6 +1210,12 @@ alter table public.question_issue_reports
 
 alter table public.question_issue_reports
   add column if not exists resolution_note text;
+
+alter table public.question_issue_reports
+  add column if not exists issue_category text;
+
+alter table public.question_issue_reports
+  add column if not exists issue_note text;
 
 create index if not exists question_issue_reports_created_at_idx
 on public.question_issue_reports (created_at desc);

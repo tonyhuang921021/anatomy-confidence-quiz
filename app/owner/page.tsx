@@ -97,6 +97,25 @@ function formatUsd(value?: number) {
   return `US$${value.toFixed(2)}`;
 }
 
+function formatQuestionIssueCategory(category?: string) {
+  switch (category) {
+    case "stem_layout":
+      return "題幹跑版 / OCR 錯字";
+    case "official_multiple_answers":
+      return "官方多重答案或給分疑義";
+    case "option_wording":
+      return "選項敘述問題";
+    case "answer_key":
+      return "答案疑似錯誤";
+    case "image_table":
+      return "圖片或表格問題";
+    case "other":
+      return "其他";
+    default:
+      return "未填寫";
+  }
+}
+
 function formatQuestionIssueReportForCopy(report: OwnerQuestionIssueReportEntry) {
   const classification = [
     report.currentSubject,
@@ -110,6 +129,8 @@ function formatQuestionIssueReportForCopy(report: OwnerQuestionIssueReportEntry)
   return [
     `題號：${report.questionId}`,
     `回報：題目有瑕疵`,
+    `問題類型：${formatQuestionIssueCategory(report.issueCategory)}`,
+    report.issueNote ? `補充理由：${report.issueNote}` : "",
     `目前分類：${classification || "未提供"}`,
     report.reviewStatus ? `處理狀態：${report.reviewStatus}` : "",
     report.reviewedAt ? `處理時間：${formatUpdatedAt(report.reviewedAt)}` : "",
@@ -1152,6 +1173,9 @@ export default function OwnerPage() {
                           <span className="rounded-full bg-white px-3 py-1 text-xs font-semibold text-amber-800 ring-1 ring-amber-100">
                             題目有瑕疵
                           </span>
+                          <span className="rounded-full bg-white px-3 py-1 text-xs font-semibold text-slate-700 ring-1 ring-slate-100">
+                            {formatQuestionIssueCategory(report.issueCategory)}
+                          </span>
                           <span className={`rounded-full px-3 py-1 text-xs font-semibold ring-1 ${
                             report.reviewStatus === "pending"
                               ? "bg-rose-50 text-rose-700 ring-rose-100"
@@ -1162,6 +1186,16 @@ export default function OwnerPage() {
                         </div>
                       </div>
                       <div className="mt-3 grid gap-2 text-sm text-slate-700">
+                        <p>
+                          <span className="font-semibold">問題類型：</span>
+                          {formatQuestionIssueCategory(report.issueCategory)}
+                        </p>
+                        {report.issueNote ? (
+                          <p className="break-words">
+                            <span className="font-semibold">補充理由：</span>
+                            {report.issueNote}
+                          </p>
+                        ) : null}
                         <p>
                           <span className="font-semibold">目前分類：</span>
                           {report.currentSubject ?? "未提供"}
