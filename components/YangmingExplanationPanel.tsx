@@ -10,6 +10,8 @@ type Props = {
   className?: string;
   buttonClassName?: string;
   compact?: boolean;
+  autoLoad?: boolean;
+  hideButton?: boolean;
 };
 
 type YangmingExplanationResponse = {
@@ -468,7 +470,9 @@ export function YangmingExplanationPanel({
   questionId,
   className = "",
   buttonClassName = "",
-  compact = false
+  compact = false,
+  autoLoad = false,
+  hideButton = false
 }: Props) {
   const { session } = useAuth();
   const activeQuestionIdRef = useRef(questionId);
@@ -658,22 +662,29 @@ export function YangmingExplanationPanel({
     }
   }
 
+  useEffect(() => {
+    if (!autoLoad || checked || loading) return;
+    void loadYangmingExplanation();
+  });
+
   return (
     <div className={`min-w-0 max-w-full overflow-hidden ${className}`}>
-      <button
-        type="button"
-        onClick={() => void loadYangmingExplanation()}
-        disabled={loading}
-        className={
-          buttonClassName ||
-          "min-h-10 rounded-2xl bg-amber-50 px-4 py-2 text-sm font-semibold text-amber-900 ring-1 ring-amber-100 transition hover:bg-amber-100 disabled:cursor-wait disabled:opacity-60"
-        }
-      >
-        {loading ? "陽明詳解載入中..." : expanded ? "收合陽明詳解" : "顯示陽明詳解"}
-      </button>
+      {hideButton ? null : (
+        <button
+          type="button"
+          onClick={() => void loadYangmingExplanation()}
+          disabled={loading}
+          className={
+            buttonClassName ||
+            "min-h-10 rounded-2xl bg-amber-50 px-4 py-2 text-sm font-semibold text-amber-900 ring-1 ring-amber-100 transition hover:bg-amber-100 disabled:cursor-wait disabled:opacity-60"
+          }
+        >
+          {loading ? "陽明詳解載入中..." : expanded ? "收合陽明詳解" : "顯示陽明詳解"}
+        </button>
+      )}
 
       {expanded ? (
-        <div className={`min-w-0 max-w-full overflow-hidden ${compact ? "mt-3" : "mt-4"}`}>
+        <div className={`min-w-0 max-w-full overflow-hidden ${hideButton ? "" : compact ? "mt-3" : "mt-4"}`}>
           {error ? (
             <div className="rounded-3xl bg-rose-50 px-4 py-3 text-sm font-semibold text-rose-700 ring-1 ring-rose-100 [overflow-wrap:anywhere]">
               {error}

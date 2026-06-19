@@ -16,7 +16,7 @@ export function QuestionExplanationTabs({
   compact = false,
   className = ""
 }: QuestionExplanationTabsProps) {
-  const [activeTab, setActiveTab] = useState<"yangming" | "supplement">("yangming");
+  const [activeTab, setActiveTab] = useState<"yangming" | "supplement" | null>("yangming");
   const [supplementCount, setSupplementCount] = useState(0);
   const handleCountChange = useCallback((count: number) => setSupplementCount(count), []);
 
@@ -25,7 +25,7 @@ export function QuestionExplanationTabs({
       <div className="flex flex-wrap gap-2">
         <button
           type="button"
-          onClick={() => setActiveTab("yangming")}
+          onClick={() => setActiveTab((current) => current === "yangming" ? null : "yangming")}
           aria-pressed={activeTab === "yangming"}
           className={`rounded-full px-3 py-1.5 text-xs font-black ring-1 transition ${
             activeTab === "yangming"
@@ -37,7 +37,7 @@ export function QuestionExplanationTabs({
         </button>
         <button
           type="button"
-          onClick={() => setActiveTab("supplement")}
+          onClick={() => setActiveTab((current) => current === "supplement" ? null : "supplement")}
           aria-pressed={activeTab === "supplement"}
           className={`rounded-full px-3 py-1.5 text-xs font-black ring-1 transition ${
             activeTab === "supplement"
@@ -49,7 +49,7 @@ export function QuestionExplanationTabs({
         </button>
       </div>
       <div className={activeTab === "yangming" ? "mt-3" : "hidden"}>
-        <YangmingExplanationPanel questionId={question.id} compact={compact} />
+        <YangmingExplanationPanel questionId={question.id} compact={compact} autoLoad hideButton />
       </div>
       <div className={activeTab === "supplement" ? "mt-3" : "hidden"}>
         <QuestionSupplementCardsPanel

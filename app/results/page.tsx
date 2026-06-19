@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import type { ReactNode } from "react";
 import { Suspense, useEffect, useMemo, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useAuth } from "@/components/AuthProvider";
@@ -1065,11 +1066,13 @@ function ResultsPageContent() {
   function renderQuestionSummaryLine({
     prefix,
     question,
-    suffix
+    suffix,
+    action
   }: {
     prefix: string;
     question: Question;
     suffix?: string;
+    action?: ReactNode;
   }) {
     const sourceBadge = getQuestionSourceBadgeLabel(question);
     const shouldShowLeadingSlash = !prefix.trim().endsWith("：");
@@ -1087,13 +1090,25 @@ function ResultsPageContent() {
             {suffix ? <span className="shrink-0 text-xs font-semibold text-slate-500">{suffix}</span> : null}
           </span>
         </span>
-        <span className="flex shrink-0 items-center gap-1.5">
-          {sourceBadge ? (
-            <span className="rounded-full bg-white/80 px-2.5 py-1 text-[11px] font-bold text-slate-600 ring-1 ring-slate-200">
-              {sourceBadge}
+        <span className="flex shrink-0 flex-col items-end gap-1.5">
+          <span className="flex items-center gap-1.5">
+            {sourceBadge ? (
+              <span className="rounded-full bg-white/80 px-2.5 py-1 text-[11px] font-bold text-slate-600 ring-1 ring-slate-200">
+                {sourceBadge}
+              </span>
+            ) : null}
+            {renderQuestionCommunityBadge(question.id)}
+          </span>
+          {action ? (
+            <span
+              onClick={(event) => {
+                event.preventDefault();
+                event.stopPropagation();
+              }}
+            >
+              {action}
             </span>
           ) : null}
-          {renderQuestionCommunityBadge(question.id)}
         </span>
       </span>
     );
@@ -1115,14 +1130,6 @@ function ResultsPageContent() {
     return (
       <div className="mt-4 min-w-0 space-y-3 overflow-hidden text-sm leading-7 text-slate-700 [overflow-wrap:anywhere]">
         <QuestionStemBlock question={question} />
-        <div className="flex flex-wrap items-center gap-2">
-          {renderQuestionCommunityBadge(question.id)}
-          <CopyQuestionPromptButton
-            question={question}
-            selectedAnswer={attempt.selectedAnswer}
-            correctAnswer={attempt.correctAnswer}
-          />
-        </div>
         <div className="grid gap-3">
           {getAvailableOptionKeys(question).map((key) => (
             <QuestionOptionBlock
@@ -1240,7 +1247,15 @@ function ResultsPageContent() {
                       <summary className="block cursor-pointer overflow-hidden text-sm font-semibold text-rose-950">
                         {renderQuestionSummaryLine({
                           prefix: `錯題 ${index + 1}：`,
-                          question
+                          question,
+                          action: (
+                            <CopyQuestionPromptButton
+                              question={question}
+                              selectedAnswer={attempt.selectedAnswer}
+                              correctAnswer={attempt.correctAnswer}
+                              className="px-3 py-1.5 text-xs"
+                            />
+                          )
                         })}
                       </summary>
                       {isOpen
@@ -1280,7 +1295,15 @@ function ResultsPageContent() {
                         {renderQuestionSummaryLine({
                           prefix: `信心 ${attempt.confidence}｜${index + 1}：`,
                           question,
-                          suffix: attempt.isCorrect ? "答對" : "答錯"
+                          suffix: attempt.isCorrect ? "答對" : "答錯",
+                          action: (
+                            <CopyQuestionPromptButton
+                              question={question}
+                              selectedAnswer={attempt.selectedAnswer}
+                              correctAnswer={attempt.correctAnswer}
+                              className="px-3 py-1.5 text-xs"
+                            />
+                          )
                         })}
                       </summary>
                       {isOpen
@@ -1316,7 +1339,15 @@ function ResultsPageContent() {
                       {renderQuestionSummaryLine({
                         prefix: `第 ${index + 1} 題：${attempt.isCorrect ? "答對" : "答錯"}`,
                         question,
-                        suffix: `信心 ${attempt.confidence}`
+                        suffix: `信心 ${attempt.confidence}`,
+                        action: (
+                          <CopyQuestionPromptButton
+                            question={question}
+                            selectedAnswer={attempt.selectedAnswer}
+                            correctAnswer={attempt.correctAnswer}
+                            className="px-3 py-1.5 text-xs"
+                          />
+                        )
                       })}
                     </summary>
                     {isOpen
