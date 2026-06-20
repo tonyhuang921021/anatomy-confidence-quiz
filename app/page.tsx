@@ -54,6 +54,11 @@ const QUICK_ENTRIES = [
 const HOME_RELEASE_NOTES = [
   {
     time: "06/20",
+    title: "首頁不要再排隊",
+    body: "帳號、弱點判讀和留言板改回進頁就載；少一點神祕等待，多一點正常網站。"
+  },
+  {
+    time: "06/20",
     title: "AI 詳解按鈕醒了",
     body: "重新替換詳解改成真的重寫，也不再被單一模型名字綁死；AI 如果又想裝死，現在比較難躲在按鈕後面。"
   },
