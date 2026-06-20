@@ -1140,6 +1140,18 @@ select {
 @media (max-width: 640px) {
   .home-shell::before {
     height: 320px;
+    filter: none;
+    opacity: 0.42;
+  }
+
+  .home-grain {
+    opacity: 0.46;
+  }
+
+  .home-orb {
+    animation: none;
+    filter: none;
+    opacity: 0.34;
   }
 
   .home-orb-one {

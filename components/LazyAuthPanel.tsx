@@ -52,14 +52,14 @@ export function LazyAuthPanel() {
         ? new IntersectionObserver(
             ([entry]) => {
               if (!entry?.isIntersecting) return;
-              queueLoad(240);
+              queueLoad(360);
             },
-            { rootMargin: "260px 0px" }
+            { rootMargin: "360px 0px" }
           )
         : null;
 
     if (observer && node) observer.observe(node);
-    autoTimerId = window.setTimeout(() => queueLoad(0), 2400);
+    autoTimerId = window.setTimeout(() => queueLoad(0), 6200);
 
     return () => {
       observer?.disconnect();

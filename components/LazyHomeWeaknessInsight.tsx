@@ -31,12 +31,26 @@ export function LazyHomeWeaknessInsight() {
   useEffect(() => {
     if (shouldLoad) return;
 
+    let idleId: number | null = null;
+    let frameId: number | null = null;
+    const idleWindow = window as typeof window & {
+      requestIdleCallback?: (callback: IdleRequestCallback, options?: IdleRequestOptions) => number;
+      cancelIdleCallback?: (handle: number) => void;
+    };
+
     const timeoutId = window.setTimeout(() => {
-      if (document.visibilityState === "visible") setShouldLoad(true);
-    }, 3500);
+      if (document.visibilityState !== "visible") return;
+      if (typeof idleWindow.requestIdleCallback === "function") {
+        idleId = idleWindow.requestIdleCallback(() => setShouldLoad(true), { timeout: 2400 });
+        return;
+      }
+      frameId = window.requestAnimationFrame(() => setShouldLoad(true));
+    }, 7200);
 
     return () => {
       window.clearTimeout(timeoutId);
+      if (frameId !== null) window.cancelAnimationFrame(frameId);
+      if (idleId !== null) idleWindow.cancelIdleCallback?.(idleId);
     };
   }, [shouldLoad]);
 

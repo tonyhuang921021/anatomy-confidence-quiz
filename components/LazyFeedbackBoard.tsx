@@ -52,14 +52,14 @@ export function LazyFeedbackBoard() {
         ? new IntersectionObserver(
             ([entry]) => {
               if (!entry?.isIntersecting) return;
-              queueLoad(520);
+              queueLoad(720);
             },
-            { rootMargin: "420px 0px" }
+            { rootMargin: "560px 0px" }
           )
         : null;
 
     if (observer && node) observer.observe(node);
-    autoTimerId = window.setTimeout(() => queueLoad(0), 5600);
+    autoTimerId = window.setTimeout(() => queueLoad(0), 12000);
 
     return () => {
       observer?.disconnect();

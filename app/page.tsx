@@ -54,6 +54,11 @@ const QUICK_ENTRIES = [
 const HOME_RELEASE_NOTES = [
   {
     time: "06/20",
+    title: "首頁少喘一點",
+    body: "更新列表只留最近幾則，下方資料晚點再進場，手機背景特效也收斂；首頁先像網站，不要像在開期末總複習包。"
+  },
+  {
+    time: "06/20",
     title: "首頁不用再按載入",
     body: "帳號區和留言板改成靠近就自動載，也會在空閒時預載；手機穩一點，但不用像通關密語一樣先按按鈕。"
   },
@@ -259,6 +264,8 @@ const HOME_RELEASE_NOTES = [
   }
 ] as const;
 
+const VISIBLE_HOME_RELEASE_NOTES = HOME_RELEASE_NOTES.slice(0, 8);
+
 export default function HomePage() {
   if (isSupabaseRecoveryMode()) {
     return (
@@ -351,7 +358,7 @@ export default function HomePage() {
                 </div>
               </div>
               <div className="home-release-scroll mt-3 space-y-2 pr-1">
-                {HOME_RELEASE_NOTES.map((note) => (
+                {VISIBLE_HOME_RELEASE_NOTES.map((note) => (
                   <article key={`${note.time}-${note.title}`} className="home-release-item">
                     <time className="text-[11px] font-black text-brand-700">{note.time}</time>
                     <div className="min-w-0">
