@@ -364,12 +364,6 @@ select {
     background: white;
   }
 
-  .home-mini-strip {
-    @apply rounded-[1.6rem] border px-5 py-4;
-    border-color: var(--line-soft);
-    background: color-mix(in srgb, var(--surface-muted) 78%, transparent);
-  }
-
   .home-release-notes {
     @apply rounded-[1.5rem] border p-3.5;
     border-color: color-mix(in srgb, var(--brand-main) 18%, var(--line-soft));
@@ -1295,6 +1289,16 @@ select {
     transform: none;
     box-shadow: none;
   }
+
+  .home-action-primary,
+  .home-action-primary:hover {
+    background: var(--brand-main);
+    color: white;
+  }
+
+  .home-action-primary .home-action-mark {
+    background: rgba(255, 255, 255, 0.18);
+  }
 }
 
 html[data-theme="dark"] .stat-chip,
@@ -1344,7 +1348,6 @@ html[data-theme="dark"] .home-action-primary {
     linear-gradient(135deg, rgba(84, 101, 128, 0.9), rgba(54, 65, 84, 0.95));
 }
 
-html[data-theme="dark"] .home-mini-strip,
 html[data-theme="dark"] .home-device-card,
 html[data-theme="dark"] .home-progress-card,
 html[data-theme="dark"] .home-progress-card-warm {

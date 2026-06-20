@@ -54,6 +54,11 @@ const QUICK_ENTRIES = [
 const HOME_RELEASE_NOTES = [
   {
     time: "06/21",
+    title: "補充數字先露臉",
+    body: "同學補充有幾張不用先點開才知道；首頁底下那排假裝很有資訊量的統計也收掉了。"
+  },
+  {
+    time: "06/21",
     title: "Safari 滑首頁少喘一點",
     body: "Safari 版首頁少算一些玻璃霧面和重陰影，先把滑動救順，特效不要在旁邊偷吃效能。"
   },
@@ -398,20 +403,6 @@ export default function HomePage() {
               </div>
             </section>
 
-            <div className="home-mini-strip mt-8 grid gap-3 sm:grid-cols-3">
-              <div>
-                <p className="text-2xl font-black text-ink">6,000+</p>
-                <p className="body-soft mt-1 text-xs font-semibold">考古題題池</p>
-              </div>
-              <div>
-                <p className="text-2xl font-black text-ink">錯題</p>
-                <p className="body-soft mt-1 text-xs font-semibold">依模式分流</p>
-              </div>
-              <div>
-                <p className="text-2xl font-black text-ink">筆記</p>
-                <p className="body-soft mt-1 text-xs font-semibold">連回相關題</p>
-              </div>
-            </div>
           </div>
 
           <div className="home-reveal home-reveal-late grid min-w-0 content-start gap-4 self-start">

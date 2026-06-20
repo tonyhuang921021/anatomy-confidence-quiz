@@ -11,6 +11,7 @@ import type {
 type QuestionSupplementResponse = {
   ok?: boolean;
   message?: string;
+  count?: number;
   cards?: QuestionSupplementCard[];
   reactions?: QuestionSupplementReactionSummary[];
 };
@@ -38,6 +39,15 @@ export async function loadQuestionSupplementCards(
     cards: payload.cards ?? [],
     reactions: payload.reactions ?? []
   };
+}
+
+export async function loadQuestionSupplementCount(questionId: string): Promise<number> {
+  const params = new URLSearchParams({ questionId, countOnly: "1" });
+  const response = await fetch(`/api/question-supplement-cards?${params.toString()}`, {
+    headers: { "Cache-Control": "no-store" }
+  });
+  const payload = await parseSupplementResponse<QuestionSupplementResponse>(response);
+  return Math.max(0, payload.count ?? 0);
 }
 
 export async function loadRecentQuestionSupplementCards(

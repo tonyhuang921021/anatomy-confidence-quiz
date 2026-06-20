@@ -1,8 +1,9 @@
 "use client";
 
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { QuestionSupplementCardsPanel } from "@/components/QuestionSupplementCardsPanel";
 import { YangmingExplanationPanel } from "@/components/YangmingExplanationPanel";
+import { loadQuestionSupplementCount } from "@/lib/questionSupplementCards";
 import type { Question } from "@/types/quiz";
 
 type QuestionExplanationTabsProps = {
@@ -19,6 +20,23 @@ export function QuestionExplanationTabs({
   const [activeTab, setActiveTab] = useState<"yangming" | "supplement" | null>(null);
   const [supplementCount, setSupplementCount] = useState<number | null>(null);
   const handleCountChange = useCallback((count: number) => setSupplementCount(count), []);
+
+  useEffect(() => {
+    let cancelled = false;
+    setSupplementCount(null);
+
+    loadQuestionSupplementCount(question.id)
+      .then((count) => {
+        if (!cancelled) setSupplementCount(count);
+      })
+      .catch(() => {
+        if (!cancelled) setSupplementCount(null);
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [question.id]);
 
   return (
     <section className={`rounded-3xl border border-slate-200 bg-white/70 p-3 ${className}`}>
@@ -45,7 +63,16 @@ export function QuestionExplanationTabs({
               : "bg-white text-slate-700 ring-slate-200 hover:bg-teal-50 hover:text-teal-800"
           }`}
         >
-          同學補充{supplementCount === null ? "" : ` ${supplementCount}`}
+          同學補充
+          {supplementCount && supplementCount > 0 ? (
+            <span
+              className={`ml-1.5 rounded-full px-1.5 py-0.5 text-[10px] ${
+                activeTab === "supplement" ? "bg-white/20 text-white" : "bg-teal-50 text-teal-800"
+              }`}
+            >
+              {supplementCount}
+            </span>
+          ) : null}
         </button>
       </div>
       {activeTab === "yangming" ? (

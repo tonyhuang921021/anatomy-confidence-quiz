@@ -197,6 +197,20 @@ async function loadCardsForQuestion(supabase: any, questionId: string, userId?: 
     });
 }
 
+async function countCardsForQuestion(supabase: any, questionId: string) {
+  const { count, error } = (await withServerTimeout(
+    supabase
+      .from("question_supplement_cards")
+      .select("id", { count: "exact", head: true })
+      .eq("question_id", questionId),
+    1400,
+    "補充卡片數量載入逾時"
+  )) as { count?: number | null; error?: unknown };
+
+  if (error) throw error;
+  return count ?? 0;
+}
+
 async function loadReactionsForQuestion(supabase: any, questionId: string, userId?: string | null) {
   const { data, error } = (await withServerTimeout(
     supabase
@@ -243,6 +257,7 @@ export async function GET(request: NextRequest) {
     const accessToken = request.nextUrl.searchParams.get("accessToken");
     const verifiedUser = await getVerifiedUser(supabase, accessToken);
     const recent = request.nextUrl.searchParams.get("recent") === "1";
+    const countOnly = request.nextUrl.searchParams.get("countOnly") === "1";
 
     if (recent) {
       if (!verifiedUser) {
@@ -282,11 +297,19 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ ok: false, message: "缺少題號。" }, { status: 400 });
     }
 
+    if (countOnly) {
+      const count = await countCardsForQuestion(supabase, questionId);
+      return NextResponse.json({ ok: true, count }, { headers: { "Cache-Control": "no-store" } });
+    }
+
     const payload = await buildQuestionPayload(supabase, questionId, verifiedUser?.id);
     return NextResponse.json({ ok: true, ...payload }, { headers: { "Cache-Control": "no-store" } });
   } catch (error) {
     if (isMissingRelationError(error, "question_supplement_cards")) {
-      return NextResponse.json({ ok: true, cards: [], reactions: [] }, { headers: { "Cache-Control": "no-store" } });
+      return NextResponse.json(
+        { ok: true, count: 0, cards: [], reactions: [] },
+        { headers: { "Cache-Control": "no-store" } }
+      );
     }
     const message = error instanceof Error ? error.message : "補充卡片載入失敗";
     return NextResponse.json({ ok: false, message }, { status: 500 });
