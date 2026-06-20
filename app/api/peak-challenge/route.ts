@@ -1066,12 +1066,11 @@ export async function POST(request: NextRequest) {
       let totalInputTokens = 0;
       let totalOutputTokens = 0;
       let totalTokens = 0;
-      let model = "gpt-5.4-mini";
+      let model = process.env.OPENAI_MODEL || "gpt-5.2";
       if (targetPastExamCount > 0 && pastExamCandidateSummaries.length > 0) {
         const selection = await createOpenAIText(
           buildPastExamSelectionPrompt(pastExamCandidateSummaries, targetPastExamCount),
-          500,
-          "gpt-5.4-mini"
+          500
         );
         totalInputTokens += selection.usage.inputTokens;
         totalOutputTokens += selection.usage.outputTokens;
@@ -1118,8 +1117,7 @@ export async function POST(request: NextRequest) {
               candidatePool: (shouldUseNewHardTrack ? hardPastCandidateSummaries : weaknessPastCandidateSummaries).slice(0, 18),
               selectedPastQuestions
             }),
-            Math.max(2600, remainingAiQuestionCount * 1200),
-            "gpt-5.4-mini"
+            Math.max(2600, remainingAiQuestionCount * 1200)
           );
           totalInputTokens += generation.usage.inputTokens;
           totalOutputTokens += generation.usage.outputTokens;

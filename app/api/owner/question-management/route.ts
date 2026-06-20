@@ -351,8 +351,7 @@ export async function POST(request: NextRequest) {
 
       const completion = await createOpenAIText(
         buildNeuroSuggestionPrompt(question, candidates),
-        1200,
-        "gpt-5.4-mini"
+        1200
       );
       const bundle = parseNeuroSuggestionResponse(completion.text);
       if (!bundle || bundle.questionId !== question.id) {

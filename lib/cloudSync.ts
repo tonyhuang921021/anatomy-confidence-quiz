@@ -1861,7 +1861,7 @@ export async function syncSharedQuestionExplanationOverrides(
       explanation: override.explanation,
       optionAnalysis: override.optionAnalysis ?? {},
       memoryTip: override.memoryTip ?? "",
-      model: override.model ?? "gpt-5.4-mini",
+      model: override.model ?? "gpt-5.2",
       updatedAt: override.updatedAt
     }))
     .filter((override) => override.questionId && override.explanation?.trim())

@@ -1366,7 +1366,7 @@ export default function OwnerPage() {
                 在線估算為最近 2 分鐘內仍有活動的裝置；作答裝置與題數只統計已同步到雲端的作答。
               </p>
               <p className="mt-2 text-sm text-slate-500">
-                AI 詳解與 AI 智慧檢索台幣換算都使用 GPT-5.4-mini 目前價格估算，並以 1 USD ≈ 32.5 TWD 粗估。
+                AI 詳解與 AI 智慧檢索台幣換算依目前設定模型估算，並以 1 USD ≈ 32.5 TWD 粗估。
               </p>
             </section>
           </div>

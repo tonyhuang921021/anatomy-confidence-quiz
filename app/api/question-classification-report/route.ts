@@ -397,7 +397,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const result = await createOpenAIText(buildClassificationPrompt(question), 600, "gpt-5.4-mini");
+    const result = await createOpenAIText(buildClassificationPrompt(question), 600);
     const parsed = parseClassificationPayload(result.text);
     if (!parsed?.subject) {
       throw new Error("AI 回傳的分類格式不完整，請再試一次。");

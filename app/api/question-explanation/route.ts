@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
-import { createOpenAIText, isOpenAIConfigured } from "@/lib/openai";
+import { createOpenAIText, getOpenAIModel, isOpenAIConfigured } from "@/lib/openai";
 import { getActiveAIAccountBan } from "@/lib/aiAccountBan";
 import {
   normalizeQuestionExplanationPayload,
@@ -90,6 +90,7 @@ const HOURLY_LIMIT = 30;
 const DAILY_LIMIT = 100;
 const MAX_SYNC_OVERRIDES_PER_REQUEST = 50;
 const GPT_5_MINI_MAX_OUTPUT_TOKENS = 1600;
+const QUESTION_EXPLANATION_MODEL = getOpenAIModel(process.env.QUESTION_EXPLANATION_MODEL);
 const QUESTION_EXPLANATION_PROMPT_PREFIX = [
   "你是台灣醫學系國考家教，請用繁體中文寫一份好讀、精準、偏精簡的單題解析。",
   "請嚴格只解釋這一題，不要延伸太多無關內容。",
@@ -163,7 +164,7 @@ function formatUnknownError(error: unknown) {
     return error.trim();
   }
 
-  return "GPT-5.4-mini 詳解產生失敗。";
+  return "AI 詳解產生失敗。";
 }
 
 function getAllowedBypassEmails() {
@@ -381,7 +382,7 @@ async function syncSharedExplanationOverrides(
         optionAnalysis: normalizeQuestionOptionAnalysis(item.optionAnalysis ?? {}),
         memoryTip: item.memoryTip?.trim() ?? ""
       },
-      model: item.model?.trim() || "gpt-5.4-mini",
+      model: item.model?.trim() || QUESTION_EXPLANATION_MODEL,
       updatedAt: item.updatedAt?.trim() || undefined
     });
   }
@@ -455,17 +456,65 @@ function buildQuestionExplanationPrompt(body: QuestionExplanationRequestBody) {
     "",
     previousOverride?.explanation
       ? [
-          "這是重新產生詳解。上一版 GPT 覆蓋詳解如下，僅作為背景參考；請重新寫出一版完整、清楚、可直接替換的詳解：",
+          "這是重新替換詳解。上一版 GPT 覆蓋詳解如下，只能用來避開重複錯誤；不可照抄上一版句子，也不可只微調同一段文字。",
           `上一版模型：${previousOverride.model ?? ""}`,
           `上一版主詳解：${previousOverride.explanation ?? ""}`,
           "上一版各選項解析：",
           JSON.stringify(previousOverride.optionAnalysis ?? {}, null, 2),
           `上一版記憶法：${previousOverride.memoryTip ?? ""}`,
           "",
-          "請輸出新的完整 JSON。主詳解只放本題核心解析；各選項解析只放在 optionAnalysis；記憶法只放在 memoryTip。"
+          "請輸出新的完整 JSON。主詳解只放本題核心解析；各選項解析只放在 optionAnalysis；記憶法只放在 memoryTip。",
+          "不要評論上一版，不要寫上一版哪裡不足，輸出內容本身就是可直接替換的新詳解。"
         ].join("\n")
       : "",
     ""
+  ].join("\n");
+}
+
+function normalizeComparisonText(value?: string) {
+  return (value ?? "")
+    .toLowerCase()
+    .replace(/\s+/g, "")
+    .replace(/[，。！？、；：「」『』（）()\[\]{}.,!?;:'"`~\-_/\\|]/g, "");
+}
+
+function getSimilarityRatio(a?: string, b?: string) {
+  const first = normalizeComparisonText(a);
+  const second = normalizeComparisonText(b);
+  if (!first || !second) return 0;
+  if (first === second) return 1;
+
+  const shorter = first.length <= second.length ? first : second;
+  const longer = first.length > second.length ? first : second;
+  if (longer.includes(shorter) && shorter.length / longer.length > 0.86) {
+    return shorter.length / longer.length;
+  }
+
+  return 0;
+}
+
+function isTooSimilarToPrevious(
+  parsed: ParsedExplanationPayload | null,
+  previousOverride?: QuestionExplanationRequestBody["previousOverride"]
+) {
+  if (!parsed?.explanation || !previousOverride?.explanation) return false;
+
+  const explanationSimilarity = getSimilarityRatio(parsed.explanation, previousOverride.explanation);
+  if (explanationSimilarity >= 0.86) return true;
+
+  const currentOptions = JSON.stringify(parsed.optionAnalysis ?? {});
+  const previousOptions = JSON.stringify(previousOverride.optionAnalysis ?? {});
+  return getSimilarityRatio(currentOptions, previousOptions) >= 0.92;
+}
+
+function buildRegenerationRetryPrompt(body: QuestionExplanationRequestBody) {
+  return [
+    buildQuestionExplanationPrompt(body),
+    "",
+    "系統檢查：你剛才輸出的新版詳解與上一版太相似，使用者按的是「重新替換詳解」，所以必須真的改寫。",
+    "請重新組織主詳解，用不同敘述順序說明核心機轉或判斷邏輯；醫學內容需正確，但不要照抄上一版句子。",
+    "各選項解析也請重新撰寫成更像真人老師會留下的判斷理由。",
+    "不要指出上一版不足，不要加入自我檢討文字。只輸出可直接替換的 JSON。"
   ].join("\n");
 }
 
@@ -748,7 +797,7 @@ export async function POST(request: NextRequest) {
       {
         ok: false,
         configured: false,
-        message: "OPENAI_API_KEY 尚未設定，無法產生 GPT-5.4-mini 詳解。"
+        message: "OPENAI_API_KEY 尚未設定，無法產生 AI 詳解。"
       },
       { status: 503 }
     );
@@ -770,7 +819,7 @@ export async function POST(request: NextRequest) {
         {
           ok: false,
           configured: true,
-          message: "請先登入帳號，才能使用 GPT-5.4-mini 補詳解。"
+          message: "請先登入帳號，才能使用 AI 補詳解。"
         },
         { status: 401 }
       );
@@ -832,13 +881,27 @@ export async function POST(request: NextRequest) {
     }
 
     const prompt = buildQuestionExplanationPrompt(body);
-    let result = await createOpenAIText(prompt, GPT_5_MINI_MAX_OUTPUT_TOKENS, "gpt-5.4-mini");
+    let result = await createOpenAIText(prompt, GPT_5_MINI_MAX_OUTPUT_TOKENS, QUESTION_EXPLANATION_MODEL);
     let parsed = parseExplanationPayload(result.text);
+
+    if (isTooSimilarToPrevious(parsed, body.previousOverride)) {
+      const retryPrompt = buildRegenerationRetryPrompt(body);
+      result = await createOpenAIText(
+        retryPrompt,
+        GPT_5_MINI_MAX_OUTPUT_TOKENS,
+        QUESTION_EXPLANATION_MODEL
+      );
+      parsed = parseExplanationPayload(result.text);
+    }
 
     const missingOptionKeys = getMissingOptionKeys(parsed, body.question?.options);
     if (parsed?.explanation && missingOptionKeys.length > 0) {
       const retryPrompt = buildMissingOptionRetryPrompt(body, parsed, missingOptionKeys);
-      result = await createOpenAIText(retryPrompt, GPT_5_MINI_MAX_OUTPUT_TOKENS, "gpt-5.4-mini");
+      result = await createOpenAIText(
+        retryPrompt,
+        GPT_5_MINI_MAX_OUTPUT_TOKENS,
+        QUESTION_EXPLANATION_MODEL
+      );
       parsed = parseExplanationPayload(result.text);
     }
 
@@ -855,7 +918,7 @@ export async function POST(request: NextRequest) {
         {
           ok: false,
           configured: true,
-          message: "GPT-5.4-mini 回傳格式不正確，無法儲存單題詳解。"
+          message: "AI 回傳格式不正確，無法儲存單題詳解。"
         },
         { status: 500 }
       );
