@@ -1241,64 +1241,74 @@ select {
   }
 }
 
+html[data-browser="safari"] {
+  --surface: rgba(255, 255, 255, 0.94);
+  --surface-muted: rgba(255, 255, 255, 0.82);
+}
+
 @supports (-webkit-touch-callout: none) {
   .home-shell::before,
   .home-grain {
     opacity: 0.18;
   }
+}
 
-  .home-shell .surface-card,
-  .home-shell .surface-card-muted,
-  .topbar-shell {
-    -webkit-backdrop-filter: none;
-    backdrop-filter: none;
-  }
+html[data-browser="safari"] .home-shell::before,
+html[data-browser="safari"] .home-grain {
+  opacity: 0.18;
+}
 
-  .home-hero,
-  .home-device-card,
-  .home-release-notes,
-  .home-action-card,
-  .home-entry-card,
-  .home-entry-icon,
-  .home-action-mark {
-    box-shadow: none;
-  }
+html[data-browser="safari"] .home-shell .surface-card,
+html[data-browser="safari"] .home-shell .surface-card-muted,
+html[data-browser="safari"] .topbar-shell {
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+}
 
-  .home-hero,
-  .home-device-card,
-  .home-device-screen,
-  .home-release-notes,
-  .home-action-card,
-  .home-entry-card {
-    background-image: none;
-  }
+html[data-browser="safari"] .home-hero,
+html[data-browser="safari"] .home-device-card,
+html[data-browser="safari"] .home-release-notes,
+html[data-browser="safari"] .home-action-card,
+html[data-browser="safari"] .home-entry-card,
+html[data-browser="safari"] .home-entry-icon,
+html[data-browser="safari"] .home-action-mark {
+  box-shadow: none;
+}
 
-  .home-title-accent {
-    text-shadow: none;
-  }
+html[data-browser="safari"] .home-hero,
+html[data-browser="safari"] .home-device-card,
+html[data-browser="safari"] .home-device-screen,
+html[data-browser="safari"] .home-release-notes,
+html[data-browser="safari"] .home-action-card,
+html[data-browser="safari"] .home-entry-card {
+  background-image: none;
+}
 
-  .home-action-card,
-  .home-entry-card,
-  .home-action-card::before,
-  .home-entry-card::after {
-    transition: none;
-  }
+html[data-browser="safari"] .home-title-accent {
+  text-shadow: none;
+}
 
-  .home-action-card:hover,
-  .home-entry-card:hover {
-    transform: none;
-    box-shadow: none;
-  }
+html[data-browser="safari"] .home-action-card,
+html[data-browser="safari"] .home-entry-card,
+html[data-browser="safari"] .home-action-card::before,
+html[data-browser="safari"] .home-entry-card::after {
+  transition: none;
+}
 
-  .home-action-primary,
-  .home-action-primary:hover {
-    background: var(--brand-main);
-    color: white;
-  }
+html[data-browser="safari"] .home-action-card:hover,
+html[data-browser="safari"] .home-entry-card:hover {
+  transform: none;
+  box-shadow: none;
+}
 
-  .home-action-primary .home-action-mark {
-    background: rgba(255, 255, 255, 0.18);
-  }
+html[data-browser="safari"] .home-action-primary,
+html[data-browser="safari"] .home-action-primary:hover {
+  background: var(--brand-main);
+  color: white;
+}
+
+html[data-browser="safari"] .home-action-primary .home-action-mark {
+  background: rgba(255, 255, 255, 0.18);
 }
 
 html[data-theme="dark"] .stat-chip,

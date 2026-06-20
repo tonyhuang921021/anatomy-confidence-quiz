@@ -41,6 +41,14 @@ export const viewport: Viewport = {
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html lang="zh-Hant">
+      <head>
+        <script
+          dangerouslySetInnerHTML={{
+            __html:
+              "try{var ua=navigator.userAgent;var isSafari=/Safari\\//.test(ua)&&!/Chrome|Chromium|CriOS|FxiOS|Edg\\//.test(ua);if(isSafari)document.documentElement.dataset.browser='safari'}catch(e){}"
+          }}
+        />
+      </head>
       <body>
         <AuthProvider>
           <PWARegistration />
