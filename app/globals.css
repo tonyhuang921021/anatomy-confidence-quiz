@@ -1247,6 +1247,56 @@ select {
   }
 }
 
+@supports (-webkit-touch-callout: none) {
+  .home-shell::before,
+  .home-grain {
+    opacity: 0.18;
+  }
+
+  .home-shell .surface-card,
+  .home-shell .surface-card-muted,
+  .topbar-shell {
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+  }
+
+  .home-hero,
+  .home-device-card,
+  .home-release-notes,
+  .home-action-card,
+  .home-entry-card,
+  .home-entry-icon,
+  .home-action-mark {
+    box-shadow: none;
+  }
+
+  .home-hero,
+  .home-device-card,
+  .home-device-screen,
+  .home-release-notes,
+  .home-action-card,
+  .home-entry-card {
+    background-image: none;
+  }
+
+  .home-title-accent {
+    text-shadow: none;
+  }
+
+  .home-action-card,
+  .home-entry-card,
+  .home-action-card::before,
+  .home-entry-card::after {
+    transition: none;
+  }
+
+  .home-action-card:hover,
+  .home-entry-card:hover {
+    transform: none;
+    box-shadow: none;
+  }
+}
+
 html[data-theme="dark"] .stat-chip,
 html[data-theme="dark"] .secondary-pill,
 html[data-theme="dark"] .surface-card input,

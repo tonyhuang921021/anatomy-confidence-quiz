@@ -54,6 +54,11 @@ const QUICK_ENTRIES = [
 const HOME_RELEASE_NOTES = [
   {
     time: "06/21",
+    title: "Safari 滑首頁少喘一點",
+    body: "Safari 版首頁少算一些玻璃霧面和重陰影，先把滑動救順，特效不要在旁邊偷吃效能。"
+  },
+  {
+    time: "06/21",
     title: "首頁更新區收短",
     body: "最近網站更新只留最前面幾則，首頁是拿來開始刷題的，不是拿來讀站史。"
   },
