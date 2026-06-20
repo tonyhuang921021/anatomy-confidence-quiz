@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { useAuth } from "@/components/AuthProvider";
-import { getQuestionBankBySubjectFilter } from "@/data/med1QuestionBank";
+import { questionWeaknessIndex } from "@/data/questionWeaknessIndex";
 import { loadCompletedSessions } from "@/lib/storage";
 import type { QuizSession } from "@/types/quiz";
 
@@ -34,8 +34,9 @@ function getWeakSectionInsight(sessions: QuizSession[]): {
   totalAttempts: number;
   insights: WeakSectionInsight[];
 } {
-  const questions = getQuestionBankBySubjectFilter("全部");
-  const questionMap = new Map(questions.map((question) => [question.id, question] as const));
+  const questionMap = new Map<string, { chapter: string; section: string }>(
+    questionWeaknessIndex.map(([id, chapter, section]) => [id, { chapter, section }] as const)
+  );
   const sectionMap = new Map<string, WeakSectionInsight>();
   let totalAttempts = 0;
 

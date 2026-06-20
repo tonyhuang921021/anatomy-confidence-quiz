@@ -4,7 +4,6 @@ import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import { useAuth } from "@/components/AuthProvider";
 import { getSyncStatusText } from "@/components/syncStatusText";
-import { enabledSubjects, MED1_SUBJECTS, MED2_SUBJECTS } from "@/data/subjectRegistry";
 import {
   syncLeaderboardProfileForCurrentUser,
   updateLeaderboardDisplayName
@@ -45,6 +44,11 @@ import { isSupabaseRecoveryMode } from "@/lib/supabase/recoveryMode";
 const AUTH_ACTION_TIMEOUT_MS = 15000;
 const AUTH_SESSION_RECOVERY_TIMEOUT_MS = 2500;
 const RECOVERY_MODE_MESSAGE = "暫用本機，稍後補傳。雲端登入與同步維護中，目前紀錄會先留在本機。";
+const PRACTICE_YEAR_OPTIONS = Array.from({ length: 16 }, (_, index) => 100 + index);
+const DEFAULT_PRACTICE_YEAR_RANGE: PracticeYearRange = {
+  yearFrom: PRACTICE_YEAR_OPTIONS[0],
+  yearTo: PRACTICE_YEAR_OPTIONS[PRACTICE_YEAR_OPTIONS.length - 1]
+};
 
 function withTimeout<T>(promise: Promise<T>, timeoutMs: number, message: string) {
   return new Promise<T>((resolve, reject) => {
@@ -103,35 +107,7 @@ export function AuthPanel() {
   const canViewOwnerPage = user?.email
     ? ownerAllowedEmails.includes(user.email.trim().toLowerCase())
     : false;
-  const selectableSubjects = useMemo(
-    () =>
-      enabledSubjects.filter(
-        (item) =>
-          item.subject !== "醫學（一）" &&
-          item.subject !== "醫學（二）" &&
-          (MED1_SUBJECTS.includes(item.subject) || MED2_SUBJECTS.includes(item.subject))
-      ),
-    []
-  );
-  const availableYears = useMemo(
-    () =>
-      Array.from(
-        new Set(
-          selectableSubjects
-            .flatMap((item) => item.questions.map((question) => question.sourceYear))
-            .filter((year): year is number => typeof year === "number")
-        )
-      ).sort((a, b) => a - b),
-    [selectableSubjects]
-  );
-  const defaultPracticeYearRange = useMemo<PracticeYearRange>(
-    () => ({
-      yearFrom: availableYears[0] ?? 100,
-      yearTo: availableYears[availableYears.length - 1] ?? 115
-    }),
-    [availableYears]
-  );
-  const [practiceYearRange, setPracticeYearRange] = useState<PracticeYearRange>(defaultPracticeYearRange);
+  const [practiceYearRange, setPracticeYearRange] = useState<PracticeYearRange>(DEFAULT_PRACTICE_YEAR_RANGE);
   const [practiceQuestionCount, setPracticeQuestionCount] = useState<PracticeQuestionCount>(10);
   const [practiceStopAfterReview, setPracticeStopAfterReview] = useState(false);
   const [practiceFastAnswerMode, setPracticeFastAnswerMode] = useState(false);
@@ -152,11 +128,11 @@ export function AuthPanel() {
   }, [user?.id, user?.user_metadata]);
 
   useEffect(() => {
-    const accountRange = getPracticeYearRangePreference(user?.user_metadata, defaultPracticeYearRange);
-    const nextRange = accountRange ?? loadPracticeYearRange(defaultPracticeYearRange) ?? defaultPracticeYearRange;
+    const accountRange = getPracticeYearRangePreference(user?.user_metadata, DEFAULT_PRACTICE_YEAR_RANGE);
+    const nextRange = accountRange ?? loadPracticeYearRange(DEFAULT_PRACTICE_YEAR_RANGE) ?? DEFAULT_PRACTICE_YEAR_RANGE;
     setPracticeYearRange(nextRange);
     if (accountRange) savePracticeYearRange(accountRange);
-  }, [defaultPracticeYearRange, user?.id, user?.user_metadata]);
+  }, [user?.id, user?.user_metadata]);
 
   useEffect(() => {
     const accountCount = getPracticeQuestionCountPreference(user?.user_metadata, 10);
@@ -653,7 +629,7 @@ export function AuthPanel() {
                           }}
                           className="min-h-12 rounded-2xl border border-slate-200 px-4 py-3 text-sm text-slate-800 outline-none"
                         >
-                          {availableYears.map((year) => (
+                          {PRACTICE_YEAR_OPTIONS.map((year) => (
                             <option key={`from-${year}`} value={year}>
                               {year}
                             </option>
@@ -673,7 +649,7 @@ export function AuthPanel() {
                           }}
                           className="min-h-12 rounded-2xl border border-slate-200 px-4 py-3 text-sm text-slate-800 outline-none"
                         >
-                          {availableYears.map((year) => (
+                          {PRACTICE_YEAR_OPTIONS.map((year) => (
                             <option key={`to-${year}`} value={year}>
                               {year}
                             </option>

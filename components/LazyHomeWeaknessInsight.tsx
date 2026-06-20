@@ -1,6 +1,7 @@
 "use client";
 
 import dynamic from "next/dynamic";
+import { useEffect, useState } from "react";
 
 const HomeWeaknessInsight = dynamic(
   () => import("@/components/HomeWeaknessInsight").then((mod) => mod.HomeWeaknessInsight),
@@ -25,5 +26,35 @@ const HomeWeaknessInsight = dynamic(
 );
 
 export function LazyHomeWeaknessInsight() {
-  return <HomeWeaknessInsight />;
+  const [shouldLoad, setShouldLoad] = useState(false);
+
+  useEffect(() => {
+    let frameId: number | null = null;
+    const timerId = window.setTimeout(() => {
+      frameId = window.requestAnimationFrame(() => setShouldLoad(true));
+    }, 1800);
+
+    return () => {
+      window.clearTimeout(timerId);
+      if (frameId !== null) window.cancelAnimationFrame(frameId);
+    };
+  }, []);
+
+  if (shouldLoad) return <HomeWeaknessInsight />;
+
+  return (
+    <div className="home-progress-card">
+      <div className="flex flex-wrap items-start justify-between gap-3">
+        <div>
+          <p className="text-xs font-bold text-slate-500">資料整理中</p>
+          <h3 className="mt-1 text-base font-black text-ink">弱點判讀準備中</h3>
+        </div>
+        <span className="home-entry-mark">稍等</span>
+      </div>
+      <div className="mt-4 h-2 overflow-hidden rounded-full bg-white/70">
+        <div className="h-full w-1/3 rounded-full bg-gradient-to-r from-brand-500 to-amber-500" />
+      </div>
+      <p className="body-soft mt-3 text-xs leading-6">首頁先穩住，再整理最近作答紀錄。</p>
+    </div>
+  );
 }
