@@ -25,7 +25,7 @@ export function isOpenAIConfigured() {
 }
 
 export function getOpenAIModel(modelOverride?: string) {
-  return modelOverride || process.env.OPENAI_MODEL || "gpt-5.2";
+  return modelOverride || process.env.OPENAI_MODEL || "gpt-5.4-mini";
 }
 
 export function extractOutputText(payload: OpenAIResponsePayload) {

@@ -63,6 +63,10 @@ import {
   buildRelatedQuestionContext,
   findPreviousQuestionForContinuation
 } from "@/lib/questionContext";
+import {
+  buildQuestionExplanationRequestQuestion,
+  findQuestionSource
+} from "@/lib/questionExplanationRequest";
 
 const allQuestions = Array.from(
   new Map(
@@ -758,6 +762,10 @@ function ResultsPageContent() {
       question,
       Array.from(questionMap.values())
     );
+    const sourceQuestion = findQuestionSource(question, [
+      ...allQuestions,
+      ...(activeSession?.generatedQuestions ?? [])
+    ]);
 
     try {
       const response = await fetch("/api/question-explanation", {
@@ -768,19 +776,7 @@ function ResultsPageContent() {
         body: JSON.stringify({
           visitorId: getOrCreateVisitorId(),
           accessToken: session?.access_token ?? null,
-          question: {
-            id: question.id,
-            subject: question.subject,
-            chapter: question.chapter,
-            section: question.section,
-            stem: question.stem,
-            options: question.options,
-            answer: question.answer,
-            acceptedAnswers: question.acceptedAnswers,
-            answerCreditType: question.answerCreditType,
-            explanation: question.explanation,
-            testedConcept: question.testedConcept
-          },
+          question: buildQuestionExplanationRequestQuestion(question, sourceQuestion),
           previousQuestion: previousQuestion ? buildRelatedQuestionContext(previousQuestion) : undefined,
           previousOverride,
           attempt: {
@@ -816,7 +812,7 @@ function ResultsPageContent() {
         explanation: payload.explanation ?? "",
         optionAnalysis: payload.optionAnalysis ?? {},
         memoryTip: payload.memoryTip ?? "",
-        model: payload.model ?? "gpt-5.2",
+        model: payload.model ?? "gpt-5.4-mini",
         updatedAt: new Date().toISOString()
       };
 
@@ -986,7 +982,7 @@ function ResultsPageContent() {
           {generated ? (
             <>
               <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-600">
-                已替換詳解・{generated.model ?? "gpt-5.2"}
+                已替換詳解・{generated.model ?? "gpt-5.4-mini"}
               </span>
               <button
                 type="button"

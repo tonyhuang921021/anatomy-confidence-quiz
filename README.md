@@ -29,7 +29,7 @@ npm run dev
 
 ```bash
 OPENAI_API_KEY=你的金鑰
-OPENAI_MODEL=gpt-5.2
+OPENAI_MODEL=gpt-5.4-mini
 ```
 
 7. 按 `Deploy`
@@ -143,7 +143,7 @@ OPENAI_MODEL=gpt-5.2
 
 ```bash
 OPENAI_API_KEY=你的金鑰
-OPENAI_MODEL=gpt-5.2
+OPENAI_MODEL=gpt-5.4-mini
 ```
 
 未設定金鑰時，結果頁仍可正常使用，只是不會真的呼叫 OpenAI，而是回傳可複製的 prompt。

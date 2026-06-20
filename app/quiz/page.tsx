@@ -36,6 +36,10 @@ import {
   findPreviousQuestionForContinuation
 } from "@/lib/questionContext";
 import {
+  buildQuestionExplanationRequestQuestion,
+  findQuestionSource
+} from "@/lib/questionExplanationRequest";
+import {
   isTrackSubject,
   questionMatchesSubjectTracks,
   type TrackSubject
@@ -1119,7 +1123,17 @@ export default function QuizPage() {
     setExplanationLoadingMap((current) => ({ ...current, [question.id]: true }));
     setExplanationErrorMap((current) => ({ ...current, [question.id]: "" }));
 
-    const previousQuestion = findPreviousQuestionForContinuation(question, questionSet);
+    const sourceQuestion = findQuestionSource(question, [
+      ...Array.from(allQuestionFallbackMap.values()),
+      ...(session?.generatedQuestions ?? [])
+    ]);
+    const sourceQuestionSet = questionSet.map((item) =>
+      findQuestionSource(item, [
+        ...Array.from(allQuestionFallbackMap.values()),
+        ...(session?.generatedQuestions ?? [])
+      ])
+    );
+    const previousQuestion = findPreviousQuestionForContinuation(sourceQuestion, sourceQuestionSet);
 
     try {
       const response = await fetch("/api/question-explanation", {
@@ -1130,19 +1144,7 @@ export default function QuizPage() {
         body: JSON.stringify({
           visitorId: getOrCreateVisitorId(),
           accessToken: authSession.access_token,
-          question: {
-            id: question.id,
-            subject: question.subject,
-            chapter: question.chapter,
-            section: question.section,
-            stem: question.stem,
-            options: question.options,
-            answer: question.answer,
-            acceptedAnswers: question.acceptedAnswers,
-            answerCreditType: question.answerCreditType,
-            explanation: question.explanation,
-            testedConcept: question.testedConcept
-          },
+          question: buildQuestionExplanationRequestQuestion(question, sourceQuestion),
           previousQuestion: previousQuestion ? buildRelatedQuestionContext(previousQuestion) : undefined,
           previousOverride,
           attempt: {
@@ -1178,7 +1180,7 @@ export default function QuizPage() {
         explanation: payload.explanation ?? "",
         optionAnalysis: payload.optionAnalysis ?? {},
         memoryTip: payload.memoryTip ?? "",
-        model: payload.model ?? "gpt-5.2",
+        model: payload.model ?? "gpt-5.4-mini",
         updatedAt: new Date().toISOString()
       };
 
@@ -1716,7 +1718,7 @@ export default function QuizPage() {
                       {currentExplanationOverride ? (
                         <>
                           <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-600">
-                            已替換詳解・{currentExplanationOverride.model ?? "gpt-5.2"}
+                            已替換詳解・{currentExplanationOverride.model ?? "gpt-5.4-mini"}
                           </span>
                           <button
                             type="button"

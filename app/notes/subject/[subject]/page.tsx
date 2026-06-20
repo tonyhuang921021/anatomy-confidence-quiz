@@ -33,6 +33,7 @@ import {
   updateStudyNoteCollection
 } from "@/lib/studyNotes";
 import { getOrCreateVisitorId } from "@/lib/visitor";
+import { buildQuestionExplanationRequestQuestion } from "@/lib/questionExplanationRequest";
 import type {
   OptionKey,
   Question,
@@ -941,19 +942,7 @@ export default function SubjectNotesPage() {
         body: JSON.stringify({
           visitorId: getOrCreateVisitorId(),
           accessToken: session.access_token,
-          question: {
-            id: question.id,
-            subject: question.subject,
-            chapter: question.chapter,
-            section: question.section,
-            stem: question.stem,
-            options: question.options,
-            answer: question.answer,
-            acceptedAnswers: question.acceptedAnswers,
-            answerCreditType: question.answerCreditType,
-            explanation: question.explanation,
-            testedConcept: question.testedConcept
-          },
+          question: buildQuestionExplanationRequestQuestion(question),
           previousOverride
         })
       });
@@ -983,7 +972,7 @@ export default function SubjectNotesPage() {
         explanation: payload.explanation,
         optionAnalysis: payload.optionAnalysis ?? {},
         memoryTip: payload.memoryTip ?? "",
-        model: payload.model ?? "gpt-5.2",
+        model: payload.model ?? "gpt-5.4-mini",
         updatedAt: new Date().toISOString()
       };
 
@@ -1744,7 +1733,7 @@ export default function SubjectNotesPage() {
                         {override ? (
                           <>
                             <span className="secondary-pill px-4 py-2 text-sm text-slate-600">
-                              已替換詳解・{override.model ?? "gpt-5.2"}
+                              已替換詳解・{override.model ?? "gpt-5.4-mini"}
                             </span>
                             <button
                               type="button"

@@ -25,6 +25,10 @@ import {
   findPreviousQuestionForContinuation
 } from "@/lib/questionContext";
 import {
+  buildQuestionExplanationRequestQuestion,
+  findQuestionSource
+} from "@/lib/questionExplanationRequest";
+import {
   applyQuestionClassificationOverride,
   getCanonicalQuestionBank
 } from "@/data/med1QuestionBank";
@@ -268,6 +272,7 @@ export default function SearchPage() {
     setExplanationErrorMap((current) => ({ ...current, [question.id]: "" }));
 
     const previousQuestion = findPreviousQuestionForContinuation(question, allQuestions);
+    const sourceQuestion = findQuestionSource(question, allQuestions);
 
     try {
       const response = await fetch("/api/question-explanation", {
@@ -278,19 +283,7 @@ export default function SearchPage() {
         body: JSON.stringify({
           visitorId: getOrCreateVisitorId(),
           accessToken: session.access_token,
-          question: {
-            id: question.id,
-            subject: question.subject,
-            chapter: question.chapter,
-            section: question.section,
-            stem: question.stem,
-            options: question.options,
-            answer: question.answer,
-            acceptedAnswers: question.acceptedAnswers,
-            answerCreditType: question.answerCreditType,
-            explanation: question.explanation,
-            testedConcept: question.testedConcept
-          },
+          question: buildQuestionExplanationRequestQuestion(question, sourceQuestion),
           previousQuestion: previousQuestion ? buildRelatedQuestionContext(previousQuestion) : undefined,
           previousOverride
         })
@@ -321,7 +314,7 @@ export default function SearchPage() {
         explanation: payload.explanation ?? "",
         optionAnalysis: payload.optionAnalysis ?? {},
         memoryTip: payload.memoryTip ?? "",
-        model: payload.model ?? "gpt-5.2",
+        model: payload.model ?? "gpt-5.4-mini",
         updatedAt: new Date().toISOString()
       };
 
@@ -637,7 +630,7 @@ export default function SearchPage() {
                   {override ? (
                     <div className="flex flex-wrap items-center gap-3">
                       <span className="inline-flex rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-600">
-                        已替換詳解・{override.model ?? "gpt-5.2"}
+                        已替換詳解・{override.model ?? "gpt-5.4-mini"}
                       </span>
                       <button
                         type="button"

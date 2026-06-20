@@ -25,6 +25,10 @@ import {
   findPreviousQuestionForContinuation
 } from "@/lib/questionContext";
 import {
+  buildQuestionExplanationRequestQuestion,
+  findQuestionSource
+} from "@/lib/questionExplanationRequest";
+import {
   OptionKey,
   Question,
   QuestionClassificationOverride,
@@ -536,6 +540,7 @@ export function ReviewNotebook({
     setExplanationErrorMap((current) => ({ ...current, [question.id]: "" }));
 
     const previousQuestion = findPreviousQuestionForContinuation(question, allQuestions);
+    const sourceQuestion = findQuestionSource(question, allQuestions);
 
     try {
       const response = await fetch("/api/question-explanation", {
@@ -546,19 +551,7 @@ export function ReviewNotebook({
         body: JSON.stringify({
           visitorId: getOrCreateVisitorId(),
           accessToken: session?.access_token ?? null,
-          question: {
-            id: question.id,
-            subject: question.subject,
-            chapter: question.chapter,
-            section: question.section,
-            stem: question.stem,
-            options: question.options,
-            answer: question.answer,
-            acceptedAnswers: question.acceptedAnswers,
-            answerCreditType: question.answerCreditType,
-            explanation: question.explanation,
-            testedConcept: question.testedConcept
-          },
+          question: buildQuestionExplanationRequestQuestion(question, sourceQuestion),
           previousQuestion: previousQuestion ? buildRelatedQuestionContext(previousQuestion) : undefined,
           previousOverride,
           attempt: {
@@ -593,7 +586,7 @@ export function ReviewNotebook({
         explanation: payload.explanation ?? "",
         optionAnalysis: payload.optionAnalysis ?? {},
         memoryTip: payload.memoryTip ?? "",
-        model: payload.model ?? "gpt-5.2",
+        model: payload.model ?? "gpt-5.4-mini",
         updatedAt: new Date().toISOString()
       };
 
@@ -706,7 +699,7 @@ export function ReviewNotebook({
           />
           {override ? (
             <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-600">
-              已替換詳解・{override.model ?? "gpt-5.2"}
+              已替換詳解・{override.model ?? "gpt-5.4-mini"}
             </span>
           ) : null}
           {communityStats && communityStats.totalAttempts > 0 ? (

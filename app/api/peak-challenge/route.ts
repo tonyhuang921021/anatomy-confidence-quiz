@@ -1066,7 +1066,7 @@ export async function POST(request: NextRequest) {
       let totalInputTokens = 0;
       let totalOutputTokens = 0;
       let totalTokens = 0;
-      let model = process.env.OPENAI_MODEL || "gpt-5.2";
+      let model = process.env.OPENAI_MODEL || "gpt-5.4-mini";
       if (targetPastExamCount > 0 && pastExamCandidateSummaries.length > 0) {
         const selection = await createOpenAIText(
           buildPastExamSelectionPrompt(pastExamCandidateSummaries, targetPastExamCount),

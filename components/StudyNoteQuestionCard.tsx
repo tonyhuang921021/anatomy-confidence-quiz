@@ -10,6 +10,7 @@ import {
   saveQuestionExplanationOverride
 } from "@/lib/storage";
 import { getOrCreateVisitorId } from "@/lib/visitor";
+import { buildQuestionExplanationRequestQuestion } from "@/lib/questionExplanationRequest";
 import type { OptionKey, Question, QuestionExplanationOverride, StudyNoteQuestionLink } from "@/types/quiz";
 
 type Props = {
@@ -60,19 +61,7 @@ export function StudyNoteQuestionCard({ question, link, title }: Props) {
         body: JSON.stringify({
           visitorId: getOrCreateVisitorId(),
           accessToken: session.access_token,
-          question: {
-            id: question.id,
-            subject: question.subject,
-            chapter: question.chapter,
-            section: question.section,
-            stem: question.stem,
-            options: question.options,
-            answer: question.answer,
-            acceptedAnswers: question.acceptedAnswers,
-            answerCreditType: question.answerCreditType,
-            explanation: question.explanation,
-            testedConcept: question.testedConcept
-          },
+          question: buildQuestionExplanationRequestQuestion(question),
           previousOverride: explanationOverride
         })
       });
@@ -99,7 +88,7 @@ export function StudyNoteQuestionCard({ question, link, title }: Props) {
         explanation: payload.explanation,
         optionAnalysis: payload.optionAnalysis ?? {},
         memoryTip: payload.memoryTip ?? "",
-        model: payload.model ?? "gpt-5.2",
+        model: payload.model ?? "gpt-5.4-mini",
         updatedAt: new Date().toISOString()
       };
 
