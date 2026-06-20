@@ -1,12 +1,12 @@
 import Link from "next/link";
 import type { CSSProperties } from "react";
-import { AuthPanel } from "@/components/AuthPanel";
 import { ContinueQuizButton } from "@/components/ContinueQuizButton";
 import { ClientSectionBoundary } from "@/components/ClientSectionBoundary";
 import { ExamCountdown } from "@/components/ExamCountdown";
-import { FeedbackBoard } from "@/components/FeedbackBoard";
 import { HomeToneBanner } from "@/components/HomeToneBanner";
 import { HomeWeaknessInsight } from "@/components/HomeWeaknessInsight";
+import { LazyAuthPanel } from "@/components/LazyAuthPanel";
+import { LazyFeedbackBoard } from "@/components/LazyFeedbackBoard";
 import { OwnerOnlyNotesLink } from "@/components/OwnerOnlyNotesLink";
 import { isSupabaseRecoveryMode } from "@/lib/supabase/recoveryMode";
 
@@ -55,7 +55,7 @@ const HOME_RELEASE_NOTES = [
   {
     time: "06/20",
     title: "首頁不要半路變背景",
-    body: "帳號、留言和弱點判讀改成穩定常駐，順手收掉漂浮特效和重陰影；滑首頁不用再等它補畫面。"
+    body: "帳號和留言改成靠近就自動載入，先用穩定卡片佔位，順手收掉漂浮特效和重陰影；滑首頁不用再等它補畫面。"
   },
   {
     time: "06/20",
@@ -456,11 +456,11 @@ export default function HomePage() {
 
       <div className="home-reveal home-reveal-late mt-6 grid gap-6">
         <ClientSectionBoundary title="帳號區塊">
-          <AuthPanel />
+          <LazyAuthPanel />
         </ClientSectionBoundary>
 
         <ClientSectionBoundary title="留言板">
-          <FeedbackBoard />
+          <LazyFeedbackBoard />
         </ClientSectionBoundary>
       </div>
     </main>
