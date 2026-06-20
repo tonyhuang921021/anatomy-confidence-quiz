@@ -425,6 +425,19 @@ export type OwnerDashboardStats = {
   updatedAt: string;
 };
 
+export type OwnerSupplementUsageStats = {
+  totalCards: number;
+  uniqueQuestions: number;
+  uniqueAuthors: number;
+  totalVotes: number;
+  helpfulVotes: number;
+  problematicVotes: number;
+  pureChaosReactions: number;
+  cardsLast7Days: number;
+  authorsLast7Days: number;
+  totalQuestionBankCount: number;
+};
+
 export type OpenAIBudgetStatus = {
   enabled: boolean;
   budgetUsd: number;

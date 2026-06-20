@@ -12,6 +12,7 @@ import {
   OpenAIBudgetStatus,
   OwnerQuestionIssueReportEntry,
   OwnerRecentAIAccountEntry,
+  OwnerSupplementUsageStats,
   OwnerYangmingExplanationReportEntry,
   OwnerTopAttemptVisitorEntry
 } from "@/types/quiz";
@@ -42,6 +43,7 @@ type OwnerApiPayload = {
   classificationReports?: OwnerClassificationReportEntry[];
   questionIssueReports?: OwnerQuestionIssueReportEntry[];
   yangmingExplanationReports?: OwnerYangmingExplanationReportEntry[];
+  supplementUsage?: OwnerSupplementUsageStats;
 };
 
 function formatUpdatedAt(value: string) {
@@ -268,6 +270,7 @@ export default function OwnerPage() {
   const [topVisitors, setTopVisitors] = useState<OwnerTopAttemptVisitorEntry[]>([]);
   const [classificationReports, setClassificationReports] = useState<OwnerClassificationReportEntry[]>([]);
   const [questionIssueReports, setQuestionIssueReports] = useState<OwnerQuestionIssueReportEntry[]>([]);
+  const [supplementUsage, setSupplementUsage] = useState<OwnerSupplementUsageStats | null>(null);
   const [openAIBudget, setOpenAIBudget] = useState<OpenAIBudgetStatus | null>(null);
   const [budgetInput, setBudgetInput] = useState("");
   const [budgetUsedInput, setBudgetUsedInput] = useState("");
@@ -457,6 +460,7 @@ export default function OwnerPage() {
         setTopVisitors(payload.topVisitors ?? []);
         setClassificationReports(payload.classificationReports ?? []);
         setQuestionIssueReports(payload.questionIssueReports ?? []);
+        setSupplementUsage(payload.supplementUsage ?? null);
         await fetchOpenAIBudget();
       } catch (fetchError) {
         setError(fetchError instanceof Error ? fetchError.message : "數據載入失敗");
@@ -484,6 +488,7 @@ export default function OwnerPage() {
         setTopVisitors(payload.topVisitors ?? []);
         setClassificationReports(payload.classificationReports ?? []);
         setQuestionIssueReports(payload.questionIssueReports ?? []);
+        setSupplementUsage(payload.supplementUsage ?? null);
         await fetchOpenAIBudget();
       } catch {
         // keep existing view
@@ -671,6 +676,57 @@ export default function OwnerPage() {
                 </div>
               </div>
             </section>
+
+            {supplementUsage ? (
+              <section className="rounded-[2rem] bg-white p-6 shadow-card ring-1 ring-slate-100">
+                <div className="flex flex-wrap items-start justify-between gap-4">
+                  <div>
+                    <h2 className="text-lg font-semibold text-ink">同學補充使用次數</h2>
+                    <p className="mt-2 text-sm text-slate-500">
+                      補充卡片、評價和快速標記的使用狀況。
+                    </p>
+                  </div>
+                  <span className="rounded-full bg-teal-50 px-3 py-1 text-xs font-bold text-teal-800">
+                    近 7 天新增 {supplementUsage.cardsLast7Days} 張
+                  </span>
+                </div>
+                <div className="mt-5 grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
+                  <article className="rounded-3xl bg-slate-50 p-4 ring-1 ring-slate-100">
+                    <p className="text-xs font-semibold text-slate-500">補充卡片總數</p>
+                    <p className="mt-2 text-3xl font-black text-ink">{supplementUsage.totalCards}</p>
+                  </article>
+                  <article className="rounded-3xl bg-slate-50 p-4 ring-1 ring-slate-100">
+                    <p className="text-xs font-semibold text-slate-500">有補充的題目數</p>
+                    <p className="mt-2 text-3xl font-black text-ink">{supplementUsage.uniqueQuestions}</p>
+                    <p className="mt-1 text-xs font-semibold text-slate-400">
+                      題庫共 {supplementUsage.totalQuestionBankCount} 題
+                    </p>
+                  </article>
+                  <article className="rounded-3xl bg-slate-50 p-4 ring-1 ring-slate-100">
+                    <p className="text-xs font-semibold text-slate-500">寫過補充的人數</p>
+                    <p className="mt-2 text-3xl font-black text-ink">{supplementUsage.uniqueAuthors}</p>
+                    <p className="mt-1 text-xs font-semibold text-slate-400">
+                      近 7 天 {supplementUsage.authorsLast7Days} 人
+                    </p>
+                  </article>
+                  <article className="rounded-3xl bg-slate-50 p-4 ring-1 ring-slate-100">
+                    <p className="text-xs font-semibold text-slate-500">評價總次數</p>
+                    <p className="mt-2 text-3xl font-black text-ink">{supplementUsage.totalVotes}</p>
+                    <p className="mt-1 text-xs font-semibold text-slate-400">
+                      有幫助 {supplementUsage.helpfulVotes} / 有問題 {supplementUsage.problematicVotes}
+                    </p>
+                  </article>
+                  <article className="rounded-3xl bg-slate-50 p-4 ring-1 ring-slate-100">
+                    <p className="text-xs font-semibold text-slate-500">「這題我們不要了」次數</p>
+                    <p className="mt-2 text-3xl font-black text-ink">{supplementUsage.pureChaosReactions}</p>
+                  </article>
+                  <article className="rounded-3xl bg-slate-50 p-4 ring-1 ring-slate-100">
+                    <p className="text-xs font-semibold text-slate-500">近 7 天補充卡片</p>
+                    <p className="mt-2 text-3xl font-black text-ink">{supplementUsage.cardsLast7Days}</p>
+                  </article>
+                </div>
+              </section>
+            ) : null}
 
             {(() => {
               const topHours = [...hourlySeries]

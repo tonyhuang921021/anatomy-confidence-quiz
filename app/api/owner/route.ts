@@ -8,9 +8,11 @@ import type {
   OwnerHourlyPoint,
   OwnerQuestionIssueReportEntry,
   OwnerRecentAIAccountEntry,
+  OwnerSupplementUsageStats,
   OwnerYangmingExplanationReportEntry,
   OwnerTopAttemptVisitorEntry
 } from "@/types/quiz";
+import { canonicalQuestionBank } from "@/data/med1QuestionBank";
 import { normalizeEmail } from "@/lib/aiAccountBan";
 import { isSupabaseRecoveryMode } from "@/lib/supabase/recoveryMode";
 import { withServerTimeout } from "@/lib/serverTimeout";
@@ -112,6 +114,16 @@ type YangmingExplanationReportRow = {
   source_label?: string | null;
   source_file?: string | null;
   created_at: string;
+};
+
+type SupplementCardAnalyticsRow = {
+  question_id: string;
+  user_id: string;
+  created_at: string;
+};
+
+type SupplementVoteAnalyticsRow = {
+  vote_value: "helpful" | "problematic";
 };
 
 const SUPABASE_PAGE_SIZE = 1000;
@@ -225,6 +237,19 @@ function isMissingCorrectAttemptsColumn(error: unknown) {
   );
 }
 
+function isMissingRelationError(error: unknown, relationName: string) {
+  const maybeError = error as { message?: string; details?: string; hint?: string } | null;
+  const haystack = [maybeError?.message, maybeError?.details, maybeError?.hint]
+    .filter(Boolean)
+    .join(" ")
+    .toLowerCase();
+
+  return (
+    haystack.includes(relationName.toLowerCase()) &&
+    (haystack.includes("does not exist") || haystack.includes("could not find"))
+  );
+}
+
 async function fetchAllRows<Row extends Record<string, unknown>>(
   supabase: any,
   table: string,
@@ -258,6 +283,93 @@ async function fetchAllRows<Row extends Record<string, unknown>>(
   }
 
   return rows;
+}
+
+async function fetchOwnerSupplementUsageStats(supabase: any): Promise<OwnerSupplementUsageStats> {
+  const since7Days = getLookbackIsoString(7);
+  const emptyStats = {
+    totalCards: 0,
+    uniqueQuestions: 0,
+    uniqueAuthors: 0,
+    totalVotes: 0,
+    helpfulVotes: 0,
+    problematicVotes: 0,
+    pureChaosReactions: 0,
+    cardsLast7Days: 0,
+    authorsLast7Days: 0,
+    totalQuestionBankCount: canonicalQuestionBank.length
+  };
+
+  try {
+    const [cardCountResult, recentCardCountResult, cardRows, recentCardRows, voteRows, reactionCountResult] =
+      await Promise.all([
+        supabase.from("question_supplement_cards").select("*", { count: "exact", head: true }),
+        supabase
+          .from("question_supplement_cards")
+          .select("*", { count: "exact", head: true })
+          .gte("created_at", since7Days),
+        fetchAllRows<SupplementCardAnalyticsRow>(
+          supabase,
+          "question_supplement_cards",
+          "question_id, user_id, created_at",
+          "created_at",
+          undefined,
+          10_000
+        ),
+        fetchAllRows<SupplementCardAnalyticsRow>(
+          supabase,
+          "question_supplement_cards",
+          "question_id, user_id, created_at",
+          "created_at",
+          (query) => query.gte("created_at", since7Days),
+          5_000
+        ),
+        fetchAllRows<SupplementVoteAnalyticsRow>(
+          supabase,
+          "question_supplement_card_votes",
+          "vote_value",
+          "vote_value",
+          undefined,
+          10_000
+        ),
+        supabase
+          .from("question_supplement_reactions")
+          .select("*", { count: "exact", head: true })
+          .eq("reaction_type", "pure_chaos")
+      ]);
+
+    const errors = [
+      cardCountResult.error,
+      recentCardCountResult.error,
+      reactionCountResult.error
+    ].filter(Boolean);
+    if (errors.length > 0) throw errors[0];
+
+    const helpfulVotes = voteRows.filter((row) => row.vote_value === "helpful").length;
+    const problematicVotes = voteRows.filter((row) => row.vote_value === "problematic").length;
+
+    return {
+      totalCards: cardCountResult.count ?? cardRows.length,
+      uniqueQuestions: new Set(cardRows.map((row) => row.question_id).filter(Boolean)).size,
+      uniqueAuthors: new Set(cardRows.map((row) => row.user_id).filter(Boolean)).size,
+      totalVotes: voteRows.length,
+      helpfulVotes,
+      problematicVotes,
+      pureChaosReactions: reactionCountResult.count ?? 0,
+      cardsLast7Days: recentCardCountResult.count ?? recentCardRows.length,
+      authorsLast7Days: new Set(recentCardRows.map((row) => row.user_id).filter(Boolean)).size,
+      totalQuestionBankCount: canonicalQuestionBank.length
+    };
+  } catch (error) {
+    if (
+      isMissingRelationError(error, "question_supplement_cards") ||
+      isMissingRelationError(error, "question_supplement_card_votes") ||
+      isMissingRelationError(error, "question_supplement_reactions")
+    ) {
+      return emptyStats;
+    }
+    throw error;
+  }
 }
 
 async function fetchOwnerDailySeries(
@@ -750,7 +862,8 @@ export async function POST(request: NextRequest) {
       classificationReports,
       questionIssueReports,
       recentAiAccounts,
-      yangmingExplanationReports
+      yangmingExplanationReports,
+      supplementUsage
     ] = await withServerTimeout(
       Promise.all([
         fetchOwnerDailySeries(supabase, 14),
@@ -761,7 +874,8 @@ export async function POST(request: NextRequest) {
         fetchOwnerClassificationReports(supabase, 40),
         fetchOwnerQuestionIssueReports(supabase, 80),
         fetchRecentAIAccounts(supabase),
-        fetchOwnerYangmingExplanationReports(supabase, 80)
+        fetchOwnerYangmingExplanationReports(supabase, 80),
+        fetchOwnerSupplementUsageStats(supabase)
       ]),
       OWNER_QUERY_TIMEOUT_MS,
       "私有數據查詢逾時"
@@ -783,7 +897,8 @@ export async function POST(request: NextRequest) {
       classificationReports,
       questionIssueReports,
       recentAiAccounts,
-      yangmingExplanationReports
+      yangmingExplanationReports,
+      supplementUsage
     });
   } catch (error) {
     const message = error instanceof Error ? error.message : "私有數據載入失敗";
