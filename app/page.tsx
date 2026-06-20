@@ -404,7 +404,7 @@ export default function HomePage() {
             </div>
           </div>
 
-          <div className="home-reveal home-reveal-late grid min-w-0 gap-4">
+          <div className="home-reveal home-reveal-late grid min-w-0 content-start gap-4 self-start">
             <div className="home-device-card">
               <div className="home-device-top">
                 <span />
@@ -427,7 +427,7 @@ export default function HomePage() {
               </div>
             </div>
 
-            <div className="grid gap-3 sm:grid-cols-2">
+            <div className="grid auto-rows-max items-start gap-3 sm:grid-cols-2">
               {QUICK_ENTRIES.map((entry, index) => (
                 <Link
                   key={entry.href}
