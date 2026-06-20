@@ -53,6 +53,11 @@ const QUICK_ENTRIES = [
 
 const HOME_RELEASE_NOTES = [
   {
+    time: "06/21",
+    title: "首頁更新區收短",
+    body: "最近網站更新只留最前面幾則，首頁是拿來開始刷題的，不是拿來讀站史。"
+  },
+  {
     time: "06/20",
     title: "首頁不要半路變背景",
     body: "帳號和留言改成靠近就自動載入，先用穩定卡片佔位，順手收掉漂浮特效和重陰影；滑首頁不用再等它補畫面。"
@@ -284,7 +289,7 @@ const HOME_RELEASE_NOTES = [
   }
 ] as const;
 
-const VISIBLE_HOME_RELEASE_NOTES = HOME_RELEASE_NOTES.slice(0, 8);
+const VISIBLE_HOME_RELEASE_NOTES = HOME_RELEASE_NOTES.slice(0, 4);
 
 export default function HomePage() {
   if (isSupabaseRecoveryMode()) {

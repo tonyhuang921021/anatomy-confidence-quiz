@@ -371,7 +371,7 @@ select {
   }
 
   .home-release-notes {
-    @apply rounded-[1.5rem] border p-4;
+    @apply rounded-[1.5rem] border p-3.5;
     border-color: color-mix(in srgb, var(--brand-main) 18%, var(--line-soft));
     background:
       radial-gradient(circle at 100% 0%, color-mix(in srgb, var(--brand-main) 8%, transparent), transparent 38%),
@@ -397,7 +397,7 @@ select {
   }
 
   .home-release-item {
-    @apply grid grid-cols-[3.7rem_minmax(0,1fr)] gap-2 rounded-[0.95rem] px-3 py-2;
+    @apply grid grid-cols-[3.35rem_minmax(0,1fr)] gap-2 rounded-[0.95rem] px-3 py-1.5;
     background: rgba(255, 255, 255, 0.56);
     border: 1px solid color-mix(in srgb, var(--line-soft) 70%, transparent);
   }
