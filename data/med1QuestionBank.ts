@@ -1318,13 +1318,15 @@ const questionTextOverrides: Record<string, QuestionTextOverride> = {
   },
   "MOEX-115020-1301-Q066": {
     answer: "D",
+    acceptedAnswers: ["A", "D"],
+    answerCreditType: "multiple_accepted",
     explanation:
-      "尿素在腎臟中的再吸收主要透過尿素轉運蛋白，例如 UT-A 類轉運，屬於 facilitated diffusion，並受到 ADH／vasopressin 影響。它不是初級主動運輸。因此 D 最明顯不適當。代謝性酸中毒時，腎臟會增加 glutamine 代謝，產生 NH₄⁺ 排酸並生成新的 HCO₃⁻。",
+      "本題開放 A、D 給分。D 不適當在於尿素再吸收主要透過尿素轉運蛋白，例如 UT-A 類轉運，屬於 facilitated diffusion，並受到 ADH／vasopressin 影響，並不是初級主動運輸。A 也可被採計，因為氨的跨器官處理與 glutamine 來源、腎臟代謝排酸的表述過度簡化，容易造成「兩者都是腎臟排出體外」的判讀爭議。代謝性酸中毒時，腎臟會增加 glutamine 代謝，產生 NH₄⁺ 排酸並生成新的 HCO₃⁻。",
     optionAnalysis: {
-      A: "大致可接受。氨可在肝臟轉成尿素，也可轉成 glutamine 形式運輸，最後由腎臟處理排出。",
+      A: "開放給分。尿素確實主要經腎臟排出，但 glutamine 的產生與腎臟代謝排酸較複雜，原句把兩者都描述成由肝臟轉成且都是腎臟直接排出，表述過度簡化。",
       B: "有爭議但方向可理解。ADH 增加內髓集合管尿素通透性，促進尿素再吸收與髓質高滲梯度，因此尿素排出可能下降。",
       C: "正確。代謝性酸中毒時，腎臟 glutamine 代謝增加，以產生 NH₄⁺ 排酸。",
-      D: "錯。尿素再吸收不是初級主動運輸，而是經尿素轉運蛋白進行 facilitated diffusion。"
+      D: "開放給分。尿素再吸收不是初級主動運輸，而是經尿素轉運蛋白進行 facilitated diffusion。"
     },
     testedConcept: "腎臟生理／氨排泄與尿素循環"
   },
@@ -1538,16 +1540,16 @@ const manualInjectedQuestions: Question[] = [
       D: "尿素（urea）的再吸收是初級主動運輸通道表現上升，促使尿素的再吸收"
     },
     answer: "D",
-    acceptedAnswers: ["D"],
-    answerCreditType: "standard",
+    acceptedAnswers: ["A", "D"],
+    answerCreditType: "multiple_accepted",
     explanation:
-      "尿素在腎臟中的再吸收主要透過尿素轉運蛋白，例如 UT-A 類轉運，屬於 facilitated diffusion，並受到 ADH／vasopressin 影響。它不是初級主動運輸。因此 D 最明顯不適當。代謝性酸中毒時，腎臟會增加 glutamine 代謝，產生 NH₄⁺ 排酸並生成新的 HCO₃⁻。",
+      "本題開放 A、D 給分。D 不適當在於尿素再吸收主要透過尿素轉運蛋白，例如 UT-A 類轉運，屬於 facilitated diffusion，並受到 ADH／vasopressin 影響，並不是初級主動運輸。A 也可被採計，因為氨的跨器官處理與 glutamine 來源、腎臟代謝排酸的表述過度簡化，容易造成「兩者都是腎臟排出體外」的判讀爭議。代謝性酸中毒時，腎臟會增加 glutamine 代謝，產生 NH₄⁺ 排酸並生成新的 HCO₃⁻。",
     testedConcept: "腎臟生理／氨排泄與尿素循環",
     optionAnalysis: {
-      A: "大致可接受。氨可在肝臟轉成尿素，也可轉成 glutamine 形式運輸，最後由腎臟處理排出。",
+      A: "開放給分。尿素確實主要經腎臟排出，但 glutamine 的產生與腎臟代謝排酸較複雜，原句把兩者都描述成由肝臟轉成且都是腎臟直接排出，表述過度簡化。",
       B: "有爭議但方向可理解。ADH 增加內髓集合管尿素通透性，促進尿素再吸收與髓質高滲梯度，因此尿素排出可能下降。",
       C: "正確。代謝性酸中毒時，腎臟 glutamine 代謝增加，以產生 NH₄⁺ 排酸。",
-      D: "錯。尿素再吸收不是初級主動運輸，而是經尿素轉運蛋白進行 facilitated diffusion。"
+      D: "開放給分。尿素再吸收不是初級主動運輸，而是經尿素轉運蛋白進行 facilitated diffusion。"
     },
     sourceType: "MOEX_PAST_EXAM",
     sourceCitation: "考選部 2026 第一次 醫學（一） 1301",
