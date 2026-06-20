@@ -1,12 +1,12 @@
 import Link from "next/link";
 import type { CSSProperties } from "react";
+import { AuthPanel } from "@/components/AuthPanel";
 import { ContinueQuizButton } from "@/components/ContinueQuizButton";
 import { ClientSectionBoundary } from "@/components/ClientSectionBoundary";
 import { ExamCountdown } from "@/components/ExamCountdown";
+import { FeedbackBoard } from "@/components/FeedbackBoard";
 import { HomeToneBanner } from "@/components/HomeToneBanner";
-import { LazyAuthPanel } from "@/components/LazyAuthPanel";
-import { LazyFeedbackBoard } from "@/components/LazyFeedbackBoard";
-import { LazyHomeWeaknessInsight } from "@/components/LazyHomeWeaknessInsight";
+import { HomeWeaknessInsight } from "@/components/HomeWeaknessInsight";
 import { OwnerOnlyNotesLink } from "@/components/OwnerOnlyNotesLink";
 import { isSupabaseRecoveryMode } from "@/lib/supabase/recoveryMode";
 
@@ -52,6 +52,11 @@ const QUICK_ENTRIES = [
 ] as const;
 
 const HOME_RELEASE_NOTES = [
+  {
+    time: "06/20",
+    title: "首頁不要半路變背景",
+    body: "帳號、留言和弱點判讀改成穩定常駐，順手收掉漂浮特效和重陰影；滑首頁不用再等它補畫面。"
+  },
   {
     time: "06/20",
     title: "首頁先別搬整包題庫",
@@ -318,8 +323,6 @@ export default function HomePage() {
   return (
     <main className="shell home-shell">
       <section className="home-hero surface-card overflow-hidden p-5 sm:p-7 lg:p-10">
-        <div className="home-orb home-orb-one" />
-        <div className="home-orb home-orb-two" />
         <div className="home-grain" />
 
         <div className="relative z-10 grid gap-8 xl:grid-cols-[minmax(0,1.08fr)_minmax(360px,0.92fr)] xl:items-stretch">
@@ -417,7 +420,7 @@ export default function HomePage() {
                 </div>
                 <div className="mt-6 grid gap-3">
                   <ClientSectionBoundary title="首頁弱點判讀">
-                    <LazyHomeWeaknessInsight />
+                    <HomeWeaknessInsight />
                   </ClientSectionBoundary>
                   <ExamCountdown />
                 </div>
@@ -453,11 +456,11 @@ export default function HomePage() {
 
       <div className="home-reveal home-reveal-late mt-6 grid gap-6">
         <ClientSectionBoundary title="帳號區塊">
-          <LazyAuthPanel />
+          <AuthPanel />
         </ClientSectionBoundary>
 
         <ClientSectionBoundary title="留言板">
-          <LazyFeedbackBoard />
+          <FeedbackBoard />
         </ClientSectionBoundary>
       </div>
     </main>
