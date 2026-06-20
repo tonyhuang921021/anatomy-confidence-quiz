@@ -3,7 +3,19 @@
 import dynamic from "next/dynamic";
 import { useEffect, useRef, useState } from "react";
 
-function useNearViewport(rootMargin = "900px") {
+const loadAuthPanel = () => import("@/components/AuthPanel").then((mod) => mod.AuthPanel);
+
+function scheduleIdleWork(callback: () => void, timeoutMs: number) {
+  if ("requestIdleCallback" in window) {
+    const idleId = window.requestIdleCallback(callback, { timeout: timeoutMs });
+    return () => window.cancelIdleCallback(idleId);
+  }
+
+  const timerId = globalThis.setTimeout(callback, timeoutMs);
+  return () => globalThis.clearTimeout(timerId);
+}
+
+function useNearViewport(rootMargin = "1600px") {
   const ref = useRef<HTMLDivElement | null>(null);
   const [shouldLoad, setShouldLoad] = useState(false);
 
@@ -45,7 +57,7 @@ function AuthPanelPlaceholder() {
 }
 
 const AuthPanel = dynamic(
-  () => import("@/components/AuthPanel").then((mod) => mod.AuthPanel),
+  loadAuthPanel,
   {
     ssr: false,
     loading: () => <AuthPanelPlaceholder />,
@@ -54,6 +66,12 @@ const AuthPanel = dynamic(
 
 export function LazyAuthPanel() {
   const { ref, shouldLoad } = useNearViewport();
+
+  useEffect(() => {
+    return scheduleIdleWork(() => {
+      void loadAuthPanel();
+    }, 1000);
+  }, []);
 
   if (!shouldLoad) {
     return (
