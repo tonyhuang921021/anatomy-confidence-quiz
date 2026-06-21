@@ -8,6 +8,9 @@ export const dynamic = "force-dynamic";
 export const revalidate = 0;
 
 const LEADERBOARD_CACHE_CONTROL = "public, s-maxage=60, stale-while-revalidate=300";
+const DEGRADED_CACHE_CONTROL = "no-store";
+
+const leaderboardCache = new Map<number, { leaderboard: LeaderboardEntry[]; updatedAt: string }>();
 
 type LeaderboardRow = {
   user_id: string;
@@ -55,9 +58,17 @@ export async function GET(request: Request) {
     : 50;
 
   if (isSupabaseRecoveryMode()) {
+    const cached = leaderboardCache.get(limit);
     return NextResponse.json(
-      { ok: true, leaderboard: [] },
-      { headers: { "Cache-Control": LEADERBOARD_CACHE_CONTROL } }
+      {
+        ok: true,
+        degraded: true,
+        stale: Boolean(cached),
+        message: "刷題榜維護中",
+        leaderboard: cached?.leaderboard ?? [],
+        updatedAt: cached?.updatedAt
+      },
+      { headers: { "Cache-Control": DEGRADED_CACHE_CONTROL } }
     );
   }
 
@@ -84,15 +95,27 @@ export async function GET(request: Request) {
 
     if (error) throw error;
 
+    const leaderboard = (data ?? []).map((row) => mapLeaderboardRow(row as LeaderboardRow));
+    const updatedAt = new Date().toISOString();
+    leaderboardCache.set(limit, { leaderboard, updatedAt });
+
     return NextResponse.json(
-      { ok: true, leaderboard: (data ?? []).map((row) => mapLeaderboardRow(row as LeaderboardRow)) },
+      { ok: true, leaderboard, updatedAt },
       { headers: { "Cache-Control": LEADERBOARD_CACHE_CONTROL } }
     );
   } catch (error) {
     const message = error instanceof Error ? error.message : "刷題榜載入失敗";
+    const cached = leaderboardCache.get(limit);
     return NextResponse.json(
-      { ok: true, degraded: true, message, leaderboard: [] },
-      { headers: { "Cache-Control": LEADERBOARD_CACHE_CONTROL } }
+      {
+        ok: true,
+        degraded: true,
+        stale: Boolean(cached),
+        message,
+        leaderboard: cached?.leaderboard ?? [],
+        updatedAt: cached?.updatedAt
+      },
+      { headers: { "Cache-Control": DEGRADED_CACHE_CONTROL } }
     );
   }
 }

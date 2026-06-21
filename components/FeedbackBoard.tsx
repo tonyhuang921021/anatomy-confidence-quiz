@@ -2,8 +2,10 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { useAuth } from "@/components/AuthProvider";
-import { createFeedbackMessage, loadFeedbackMessages, voteFeedbackMessage } from "@/lib/cloudSync";
+import { createFeedbackMessage, loadFeedbackMessagesResult, voteFeedbackMessage } from "@/lib/cloudSync";
 import type { FeedbackMessage, OpenAIBudgetStatus } from "@/types/quiz";
+
+const FEEDBACK_CACHE_KEY = "homeFeedbackLastGood";
 
 function formatCreatedAt(value: string) {
   return new Date(value).toLocaleString("zh-TW", {
@@ -50,6 +52,45 @@ function BudgetPinnedMessage({ budget }: { budget: OpenAIBudgetStatus }) {
       </p>
     </div>
   );
+}
+
+function FeedbackSkeleton() {
+  return (
+    <div className="space-y-3">
+      {Array.from({ length: 3 }, (_, index) => (
+        <div key={index} className="home-skeleton-card p-4">
+          <div className="home-skeleton-line h-4 w-32" />
+          <div className="home-skeleton-line mt-3 h-3 w-full" />
+          <div className="home-skeleton-line mt-2 h-3 w-2/3" />
+        </div>
+      ))}
+    </div>
+  );
+}
+
+function loadCachedFeedbackMessages() {
+  try {
+    const raw = window.localStorage.getItem(FEEDBACK_CACHE_KEY);
+    if (!raw) return [] as FeedbackMessage[];
+    const parsed = JSON.parse(raw) as { messages?: FeedbackMessage[] };
+    return Array.isArray(parsed.messages) ? parsed.messages : [];
+  } catch {
+    return [] as FeedbackMessage[];
+  }
+}
+
+function saveCachedFeedbackMessages(messages: FeedbackMessage[]) {
+  try {
+    window.localStorage.setItem(
+      FEEDBACK_CACHE_KEY,
+      JSON.stringify({
+        messages: messages.slice(0, 40),
+        updatedAt: new Date().toISOString()
+      })
+    );
+  } catch {
+    // Feedback should not depend on localStorage quota.
+  }
 }
 
 function FeedbackVoteControls({
@@ -109,6 +150,7 @@ export function FeedbackBoard() {
   const [votingMessageId, setVotingMessageId] = useState<string | null>(null);
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
+  const [readNotice, setReadNotice] = useState("");
 
   const nickname = useMemo(() => {
     const displayName =
@@ -125,11 +167,26 @@ export function FeedbackBoard() {
         return;
       }
 
+      const cachedRows = loadCachedFeedbackMessages();
+      if (cachedRows.length > 0) {
+        setMessages(cachedRows);
+        setLoading(false);
+        setReadNotice("留言正在更新，先顯示稍早資料。");
+      }
+
       try {
-        const rows = await loadFeedbackMessages();
-        setMessages(rows);
+        const result = await loadFeedbackMessagesResult();
+        if (result.messages.length > 0 || !result.degraded) {
+          setMessages(result.messages);
+          saveCachedFeedbackMessages(result.messages);
+        }
+        setReadNotice(
+          result.degraded
+            ? result.message || (result.stale ? "留言稍後更新，先顯示稍早資料。" : "留言稍後更新。")
+            : ""
+        );
       } catch (fetchError) {
-        setError(fetchError instanceof Error ? fetchError.message : "留言板載入失敗");
+        setReadNotice(fetchError instanceof Error ? fetchError.message : "留言稍後更新，先顯示稍早資料。");
       } finally {
         setLoading(false);
       }
@@ -171,7 +228,11 @@ export function FeedbackBoard() {
         isAnonymous: !user || isAnonymous,
         user
       });
-      setMessages((current) => [created, ...current].slice(0, 40));
+      setMessages((current) => {
+        const next = [created, ...current].slice(0, 40);
+        saveCachedFeedbackMessages(next);
+        return next;
+      });
       setContent("");
       setMessage("留言已送出，謝謝你的建議。");
     } catch (submitError) {
@@ -193,16 +254,18 @@ export function FeedbackBoard() {
         user,
         parentId
       });
-      setMessages((current) =>
-        current.map((entry) =>
+      setMessages((current) => {
+        const next = current.map((entry) =>
           entry.id === parentId
             ? {
                 ...entry,
                 replies: [...(entry.replies ?? []), created]
               }
             : entry
-        )
-      );
+        );
+        saveCachedFeedbackMessages(next);
+        return next;
+      });
       setReplyContent("");
       setReplyTargetId(null);
       setMessage("回覆已送出。");
@@ -232,9 +295,22 @@ export function FeedbackBoard() {
 
   async function handleVote(entry: FeedbackMessage, vote: 1 | -1) {
     const nextVote = entry.myVote === vote ? null : vote;
+    const previousMessages = messages;
+    const optimisticLikeDelta =
+      (nextVote === 1 ? 1 : 0) - (entry.myVote === 1 ? 1 : 0);
+    const optimisticDislikeDelta =
+      (nextVote === -1 ? 1 : 0) - (entry.myVote === -1 ? 1 : 0);
     setVotingMessageId(entry.id);
     setError("");
     setMessage("");
+    setMessages((current) =>
+      updateMessageVote(current, entry.id, (currentEntry) => ({
+        ...currentEntry,
+        myVote: nextVote,
+        likeCount: Math.max(0, (currentEntry.likeCount ?? 0) + optimisticLikeDelta),
+        dislikeCount: Math.max(0, (currentEntry.dislikeCount ?? 0) + optimisticDislikeDelta)
+      }))
+    );
 
     try {
       const result = await voteFeedbackMessage({
@@ -251,6 +327,7 @@ export function FeedbackBoard() {
         }))
       );
     } catch (voteError) {
+      setMessages(previousMessages);
       setError(voteError instanceof Error ? voteError.message : "留言投票失敗");
     } finally {
       setVotingMessageId(null);
@@ -336,9 +413,15 @@ export function FeedbackBoard() {
             ) : null}
           </div>
 
+          {readNotice ? (
+            <div className="mt-4 rounded-2xl bg-amber-50 px-4 py-3 text-sm font-semibold text-amber-900">
+              {readNotice}
+            </div>
+          ) : null}
+
           <div className="mt-5 max-h-[32rem] space-y-3 overflow-y-auto pr-1 sm:max-h-[36rem]">
             {loading ? (
-              <div className="surface-card-muted p-4 text-sm body-soft">正在載入留言...</div>
+              <FeedbackSkeleton />
             ) : messages.length === 0 ? (
               <div className="surface-card-muted p-4 text-sm body-soft">
                 還沒有留言，你可以成為第一個給建議的人。

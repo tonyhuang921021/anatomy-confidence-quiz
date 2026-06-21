@@ -34,6 +34,13 @@ type FeedbackVoteRow = {
 const FEEDBACK_HOURLY_LIMIT = 3;
 const FEEDBACK_DAILY_LIMIT = 10;
 const FEEDBACK_READ_CACHE_HEADER = "public, s-maxage=60, stale-while-revalidate=300";
+const FEEDBACK_DEGRADED_CACHE_HEADER = "no-store";
+
+type FeedbackResponseMessage = ReturnType<typeof mapFeedbackMessageRow> & {
+  replies?: ReturnType<typeof mapFeedbackMessageRow>[];
+};
+
+const feedbackReadCache = new Map<number, { messages: FeedbackResponseMessage[]; updatedAt: string }>();
 
 function getServiceSupabaseClient() {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
@@ -166,9 +173,18 @@ async function getVerifiedUser(supabase: any, accessToken?: string | null): Prom
 
 export async function GET(request: NextRequest) {
   if (isSupabaseRecoveryMode()) {
+    const cached = feedbackReadCache.get(20);
     return NextResponse.json(
-      { ok: true, messages: [], recovery: true },
-      { headers: { "Cache-Control": FEEDBACK_READ_CACHE_HEADER } }
+      {
+        ok: true,
+        messages: cached?.messages ?? [],
+        degraded: true,
+        recovery: true,
+        stale: Boolean(cached),
+        message: "留言板維護中",
+        updatedAt: cached?.updatedAt
+      },
+      { headers: { "Cache-Control": FEEDBACK_DEGRADED_CACHE_HEADER } }
     );
   }
 
@@ -203,15 +219,27 @@ export async function GET(request: NextRequest) {
       rows.map((row) => String(row.id))
     );
 
+    const messages = buildFeedbackTree(rows, limit, voteCounts);
+    const updatedAt = new Date().toISOString();
+    feedbackReadCache.set(limit, { messages, updatedAt });
+
     return NextResponse.json(
-      { ok: true, messages: buildFeedbackTree(rows, limit, voteCounts) },
+      { ok: true, messages, updatedAt },
       { headers: { "Cache-Control": FEEDBACK_READ_CACHE_HEADER } }
     );
   } catch (error) {
     const message = error instanceof Error ? error.message : "留言讀取失敗";
+    const cached = feedbackReadCache.get(limit);
     return NextResponse.json(
-      { ok: true, degraded: true, message, messages: [] },
-      { headers: { "Cache-Control": FEEDBACK_READ_CACHE_HEADER } }
+      {
+        ok: true,
+        degraded: true,
+        stale: Boolean(cached),
+        message,
+        messages: cached?.messages ?? [],
+        updatedAt: cached?.updatedAt
+      },
+      { headers: { "Cache-Control": FEEDBACK_DEGRADED_CACHE_HEADER } }
     );
   }
 }

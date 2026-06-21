@@ -2015,23 +2015,36 @@ export async function loadVisitorStats(): Promise<VisitorStats> {
   return payload.stats;
 }
 
-export async function loadFeedbackMessages(limit = 20): Promise<FeedbackMessage[]> {
+export async function loadFeedbackMessagesResult(limit = 20): Promise<{
+  messages: FeedbackMessage[];
+  degraded: boolean;
+  stale: boolean;
+  message?: string;
+}> {
   if (isSupabaseRecoveryMode() || !isSupabaseConfigured()) {
-    return [];
+    return { messages: [], degraded: true, stale: false, message: "留言板暫時維護中。" };
   }
 
-  const response = await fetch(`/api/feedback?limit=${encodeURIComponent(String(limit))}`, {
-    cache: "no-store"
-  });
+  const response = await fetch(`/api/feedback?limit=${encodeURIComponent(String(limit))}`);
   const payload = (await response.json().catch(() => null)) as
-    | { ok?: boolean; message?: string; messages?: FeedbackMessage[] }
+    | { ok?: boolean; degraded?: boolean; stale?: boolean; message?: string; messages?: FeedbackMessage[] }
     | null;
 
   if (!response.ok || !payload?.ok) {
     throw new Error(payload?.message || "留言讀取失敗");
   }
 
-  return payload.messages ?? [];
+  return {
+    messages: payload.messages ?? [],
+    degraded: Boolean(payload.degraded),
+    stale: Boolean(payload.stale),
+    message: payload.message
+  };
+}
+
+export async function loadFeedbackMessages(limit = 20): Promise<FeedbackMessage[]> {
+  const result = await loadFeedbackMessagesResult(limit);
+  return result.messages;
 }
 
 export async function createFeedbackMessage(input: {

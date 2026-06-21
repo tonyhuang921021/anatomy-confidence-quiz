@@ -263,11 +263,37 @@ function getLastPoint<T>(items: T[], fromEnd = 0) {
 }
 
 const ANXIOUS_STATS_REFRESH_MS = 60 * 60 * 1000;
+const HOME_COMMUNITY_STATS_CACHE_KEY = "homeCommunityStatsLastGood";
+
+type CommunityStatsPoint = { date: string; attempts: number; correctRate: number };
+
+function loadCachedCommunityStats() {
+  try {
+    const raw = window.localStorage.getItem(HOME_COMMUNITY_STATS_CACHE_KEY);
+    if (!raw) return [] as CommunityStatsPoint[];
+    const parsed = JSON.parse(raw) as { points?: CommunityStatsPoint[] };
+    return Array.isArray(parsed.points) ? parsed.points : [];
+  } catch {
+    return [] as CommunityStatsPoint[];
+  }
+}
+
+function saveCachedCommunityStats(points: CommunityStatsPoint[]) {
+  try {
+    window.localStorage.setItem(
+      HOME_COMMUNITY_STATS_CACHE_KEY,
+      JSON.stringify({ points, updatedAt: new Date().toISOString() })
+    );
+  } catch {
+    // Ignore localStorage quota/private mode issues.
+  }
+}
 
 export function HomeToneBanner() {
   const { user, syncVersion } = useAuth();
   const [mode, setMode] = useState<HomeToneMode>("calm");
-  const [stats, setStats] = useState<{ date: string; attempts: number; correctRate: number }[]>([]);
+  const [stats, setStats] = useState<CommunityStatsPoint[]>([]);
+  const [statsStatus, setStatsStatus] = useState<"idle" | "loading" | "ready" | "stale">("idle");
   const [calmLine, setCalmLine] = useState(CALM_LINES[0]);
   const [anxiousLineBucket, setAnxiousLineBucket] = useState(0);
   const [personalPace, setPersonalPace] = useState<PersonalPaceStats>(() => ({
@@ -321,19 +347,36 @@ export function HomeToneBanner() {
     if (mode !== "anxious") return;
 
     let cancelled = false;
+    const cached = loadCachedCommunityStats();
+    if (cached.length > 0) {
+      setStats(cached);
+      setStatsStatus("stale");
+    } else {
+      setStatsStatus("loading");
+    }
 
     async function refreshStats() {
       try {
         const response = await fetch("/api/community-stats?days=2");
         const payload = (await response.json().catch(() => null)) as
-          | { ok?: boolean; points?: { date: string; attempts: number; correctRate: number }[] }
+          | { ok?: boolean; degraded?: boolean; points?: CommunityStatsPoint[] }
           | null;
         if (!response.ok || !payload?.ok || !payload.points) {
           throw new Error("community-stats-unavailable");
         }
-        if (!cancelled) setStats(payload.points);
+        if (!cancelled) {
+          if (payload.points.length > 0) {
+            setStats(payload.points);
+            if (!payload.degraded) saveCachedCommunityStats(payload.points);
+          }
+          setStatsStatus(payload.degraded ? "stale" : "ready");
+        }
       } catch {
-        if (!cancelled) setStats([]);
+        if (!cancelled) {
+          const fallback = loadCachedCommunityStats();
+          if (fallback.length > 0) setStats(fallback);
+          setStatsStatus("stale");
+        }
       }
     }
 
@@ -371,14 +414,20 @@ export function HomeToneBanner() {
       label: "焦慮版",
       body:
         segments.length > 0
-          ? `${getPersonalAnxiousLine(personalPace, today?.attempts ?? 0, personalPace.todayAttempts + personalPace.sevenDayAttempts + (today?.attempts ?? 0) + anxiousLineBucket)} ${getTimePressureLine(personalPace.todayAttempts, anxiousLineBucket)} ${segments.join("；")}。`
+          ? `${getPersonalAnxiousLine(personalPace, today?.attempts ?? 0, personalPace.todayAttempts + personalPace.sevenDayAttempts + (today?.attempts ?? 0) + anxiousLineBucket)} ${getTimePressureLine(personalPace.todayAttempts, anxiousLineBucket)} ${segments.join("；")}${statsStatus === "stale" ? "（全站數據更新中）" : ""}。`
           : `${getPersonalAnxiousLine(personalPace, 0, personalPace.todayAttempts + personalPace.sevenDayAttempts + anxiousLineBucket)} ${getTimePressureLine(personalPace.todayAttempts, anxiousLineBucket)}`
     };
-  }, [anxiousLineBucket, calmLine, mode, personalPace, stats]);
+  }, [anxiousLineBucket, calmLine, mode, personalPace, stats, statsStatus]);
 
   return (
-    <div className="surface-card-muted mt-5 px-4 py-3">
+    <div className="surface-card-muted home-data-fade mt-5 px-4 py-3">
       <p className="body-soft text-sm leading-7 sm:text-[15px]">{content.body}</p>
+      {mode === "anxious" && statsStatus === "loading" ? (
+        <div className="mt-3 flex items-center gap-2 text-xs font-semibold text-brand-700">
+          <span className="home-loading-dot" />
+          全站數據整理中
+        </div>
+      ) : null}
     </div>
   );
 }

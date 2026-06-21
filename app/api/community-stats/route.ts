@@ -6,7 +6,16 @@ import { withServerTimeout } from "@/lib/serverTimeout";
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
 
-const COMMUNITY_STATS_CACHE_CONTROL = "public, s-maxage=900, stale-while-revalidate=1800";
+const COMMUNITY_STATS_CACHE_CONTROL = "public, s-maxage=300, stale-while-revalidate=600";
+const DEGRADED_CACHE_CONTROL = "no-store";
+
+type CommunityPoint = {
+  date: string;
+  attempts: number;
+  correctRate: number;
+};
+
+const communityStatsCache = new Map<number, { points: CommunityPoint[]; updatedAt: string }>();
 
 function getServiceSupabaseClient() {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
@@ -119,19 +128,18 @@ export async function GET(request: Request) {
     : 2;
 
   if (isSupabaseRecoveryMode()) {
-    const dayKeys = getRecentTaipeiDayKeys(days);
+    const cached = communityStatsCache.get(days);
     return NextResponse.json(
       {
         ok: true,
-        points: dayKeys.map((date) => ({
-          date,
-          attempts: 0,
-          correctRate: 0
-        }))
+        degraded: true,
+        stale: Boolean(cached),
+        message: "首頁社群統計維護中",
+        points: cached?.points ?? []
       },
       {
         headers: {
-          "Cache-Control": COMMUNITY_STATS_CACHE_CONTROL
+          "Cache-Control": DEGRADED_CACHE_CONTROL
         }
       }
     );
@@ -205,27 +213,31 @@ export async function GET(request: Request) {
       }
     }
 
+    const points = dayKeys.map((date) => {
+      const fallbackStats = fallbackCounts.get(date);
+      if (fallbackStats) {
+        return {
+          date,
+          attempts: fallbackStats.attempts,
+          correctRate: fallbackStats.correctRate
+        };
+      }
+      const stats = grouped.get(date);
+      const attempts = stats?.attempts ?? 0;
+      const correctAttempts = stats?.correctAttempts ?? 0;
+      return {
+        date,
+        attempts,
+        correctRate: attempts === 0 ? 0 : Number(((correctAttempts / attempts) * 100).toFixed(1))
+      };
+    });
+    communityStatsCache.set(days, { points, updatedAt: new Date().toISOString() });
+
     return NextResponse.json(
       {
         ok: true,
-        points: dayKeys.map((date) => {
-          const fallbackStats = fallbackCounts.get(date);
-          if (fallbackStats) {
-            return {
-              date,
-              attempts: fallbackStats.attempts,
-              correctRate: fallbackStats.correctRate
-            };
-          }
-          const stats = grouped.get(date);
-          const attempts = stats?.attempts ?? 0;
-          const correctAttempts = stats?.correctAttempts ?? 0;
-          return {
-            date,
-            attempts,
-            correctRate: attempts === 0 ? 0 : Number(((correctAttempts / attempts) * 100).toFixed(1))
-          };
-        })
+        points,
+        updatedAt: communityStatsCache.get(days)?.updatedAt
       },
       {
         headers: {
@@ -234,21 +246,19 @@ export async function GET(request: Request) {
       }
     );
   } catch (error) {
-    const dayKeys = getRecentTaipeiDayKeys(days);
+    const cached = communityStatsCache.get(days);
     return NextResponse.json(
       {
         ok: true,
         degraded: true,
+        stale: Boolean(cached),
         message: error instanceof Error ? error.message : "首頁社群統計載入失敗",
-        points: dayKeys.map((date) => ({
-          date,
-          attempts: 0,
-          correctRate: 0
-        }))
+        points: cached?.points ?? [],
+        updatedAt: cached?.updatedAt
       },
       {
         headers: {
-          "Cache-Control": COMMUNITY_STATS_CACHE_CONTROL
+          "Cache-Control": DEGRADED_CACHE_CONTROL
         }
       }
     );

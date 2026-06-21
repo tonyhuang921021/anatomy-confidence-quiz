@@ -474,12 +474,76 @@ select {
     background: color-mix(in srgb, var(--accent-warm) 10%, white);
   }
 
+  .home-data-fade {
+    animation: home-data-fade 260ms ease-out both;
+  }
+
+  .home-loading-dot {
+    width: 0.55rem;
+    height: 0.55rem;
+    border-radius: 999px;
+    background: var(--brand-main);
+    box-shadow: 0 0 0 0 color-mix(in srgb, var(--brand-main) 26%, transparent);
+    animation: home-loading-pulse 1.5s ease-in-out infinite;
+  }
+
+  .home-skeleton-card {
+    border-radius: 1.25rem;
+    border: 1px solid var(--line-soft);
+    background: rgba(255, 255, 255, 0.58);
+  }
+
+  .home-skeleton-line {
+    position: relative;
+    overflow: hidden;
+    border-radius: 999px;
+    background: color-mix(in srgb, var(--brand-main) 9%, white);
+  }
+
+  .home-skeleton-line::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    transform: translateX(-100%);
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.72), transparent);
+    animation: home-skeleton-shimmer 1.6s ease-in-out infinite;
+  }
+
   .home-progress-fill {
     height: 100%;
     border-radius: 999px;
     background: linear-gradient(90deg, var(--brand-main), color-mix(in srgb, var(--accent-warm) 70%, var(--brand-main)));
     animation: home-progress 1.2s cubic-bezier(0.22, 1, 0.36, 1) both 460ms;
     transform-origin: left center;
+  }
+
+  @keyframes home-data-fade {
+    from {
+      opacity: 0.66;
+      transform: translateY(4px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes home-loading-pulse {
+    0%,
+    100% {
+      opacity: 0.52;
+      box-shadow: 0 0 0 0 color-mix(in srgb, var(--brand-main) 26%, transparent);
+    }
+    50% {
+      opacity: 1;
+      box-shadow: 0 0 0 7px color-mix(in srgb, var(--brand-main) 0%, transparent);
+    }
+  }
+
+  @keyframes home-skeleton-shimmer {
+    100% {
+      transform: translateX(100%);
+    }
   }
 
   .home-risk-fill {

@@ -3,10 +3,10 @@ import type { CSSProperties } from "react";
 import { ContinueQuizButton } from "@/components/ContinueQuizButton";
 import { ClientSectionBoundary } from "@/components/ClientSectionBoundary";
 import { ExamCountdown } from "@/components/ExamCountdown";
+import { AuthPanel } from "@/components/AuthPanel";
+import { FeedbackBoard } from "@/components/FeedbackBoard";
 import { HomeToneBanner } from "@/components/HomeToneBanner";
 import { HomeWeaknessInsight } from "@/components/HomeWeaknessInsight";
-import { LazyAuthPanel } from "@/components/LazyAuthPanel";
-import { LazyFeedbackBoard } from "@/components/LazyFeedbackBoard";
 import { OwnerOnlyNotesLink } from "@/components/OwnerOnlyNotesLink";
 import { isSupabaseRecoveryMode } from "@/lib/supabase/recoveryMode";
 
@@ -52,6 +52,11 @@ const QUICK_ENTRIES = [
 ] as const;
 
 const HOME_RELEASE_NOTES = [
+  {
+    time: "06/21",
+    title: "首頁不再假裝大家都 0 題",
+    body: "留言、焦慮數字和弱點判讀改成先顯示舊資料再更新；資料庫慢一下，不會整頁開始裝失憶。"
+  },
   {
     time: "06/21",
     title: "陽明詳解不再一慢就躺",
@@ -519,11 +524,11 @@ export default function HomePage() {
 
       <div className="home-reveal home-reveal-late mt-6 grid gap-6">
         <ClientSectionBoundary title="帳號區塊">
-          <LazyAuthPanel />
+          <AuthPanel />
         </ClientSectionBoundary>
 
         <ClientSectionBoundary title="留言板">
-          <LazyFeedbackBoard />
+          <FeedbackBoard />
         </ClientSectionBoundary>
       </div>
     </main>
