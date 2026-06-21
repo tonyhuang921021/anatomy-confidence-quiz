@@ -1032,25 +1032,6 @@ function getLeaderboardDisplayName(user: Pick<User, "id" | "email" | "user_metad
   return `玩家-${user.id.slice(0, 6)}`;
 }
 
-function summarizeLeaderboardSessions(sessions: QuizSession[]) {
-  const completedSessions = sessions.filter(
-    (session) => Boolean(session.completedAt) && session.settings?.mode !== "peak_challenge"
-  );
-  const totalAttempts = completedSessions.reduce((sum, session) => sum + session.attempts.length, 0);
-  const correctAttempts = completedSessions.reduce(
-    (sum, session) => sum + session.attempts.filter((attempt) => attempt.isCorrect).length,
-    0
-  );
-  const correctRate = totalAttempts === 0 ? 0 : Number(((correctAttempts / totalAttempts) * 100).toFixed(1));
-
-  return {
-    totalAttempts,
-    correctAttempts,
-    correctRate,
-    totalSessions: completedSessions.length
-  };
-}
-
 function mapQuestionAccuracyStatRow(row: QuestionAccuracyStatRow): QuestionCommunityStats {
   return {
     questionId: row.question_id,
@@ -1729,24 +1710,29 @@ export async function syncLeaderboardProfileForCurrentUser(
   if (!isSupabaseConfigured()) return;
 
   const supabase = getSupabaseBrowserClient();
-  const sourceSessions = sessions ?? loadCompletedSessions();
-  const summary = summarizeLeaderboardSessions(sourceSessions);
+  const { data } = await supabase.auth.getSession();
+  const accessToken = data.session?.access_token;
+  if (!accessToken) return;
 
-  const { error } = await supabase.from("leaderboard_profiles").upsert(
+  const response = await fetchWithClientTimeout(
+    "/api/leaderboard/sync",
     {
-      user_id: user.id,
-      display_name: getLeaderboardDisplayName(user),
-      total_attempts: summary.totalAttempts,
-      correct_attempts: summary.correctAttempts,
-      correct_rate: summary.correctRate,
-      total_sessions: summary.totalSessions,
-      updated_at: new Date().toISOString()
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        accessToken,
+        displayName: getLeaderboardDisplayName(user)
+      })
     },
-    { onConflict: "user_id" }
+    8000,
+    "刷題榜雲端重算逾時"
   );
 
-  if (error) {
-    throw error;
+  const payload = (await response.json().catch(() => null)) as { ok?: boolean; message?: string } | null;
+  if (!response.ok || payload?.ok === false) {
+    throw new Error(payload?.message || "刷題榜雲端重算失敗");
   }
 }
 
@@ -1759,18 +1745,29 @@ export async function updateLeaderboardDisplayName(
 
   const supabase = getSupabaseBrowserClient();
   const trimmed = displayName.trim().slice(0, 24) || getLeaderboardDisplayName(user);
+  const { data } = await supabase.auth.getSession();
+  const accessToken = data.session?.access_token;
+  if (!accessToken) return;
 
-  const { error } = await supabase.from("leaderboard_profiles").upsert(
+  const response = await fetchWithClientTimeout(
+    "/api/leaderboard/sync",
     {
-      user_id: user.id,
-      display_name: trimmed,
-      updated_at: new Date().toISOString()
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        accessToken,
+        displayName: trimmed
+      })
     },
-    { onConflict: "user_id" }
+    8000,
+    "刷題榜暱稱同步逾時"
   );
 
-  if (error) {
-    throw error;
+  const payload = (await response.json().catch(() => null)) as { ok?: boolean; message?: string } | null;
+  if (!response.ok || payload?.ok === false) {
+    throw new Error(payload?.message || "刷題榜暱稱同步失敗");
   }
 }
 
