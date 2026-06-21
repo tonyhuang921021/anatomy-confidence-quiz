@@ -1310,6 +1310,14 @@ html[data-browser="safari"] {
   --surface-muted: rgba(255, 255, 255, 0.82);
 }
 
+html[data-browser="safari"] body {
+  background: linear-gradient(180deg, #f7f4eb 0%, #f8f7f2 48%, #edf3ee 100%);
+}
+
+html[data-browser="safari"] body::before {
+  display: none;
+}
+
 @supports (-webkit-touch-callout: none) {
   .home-shell::before,
   .home-grain {
@@ -1318,8 +1326,9 @@ html[data-browser="safari"] {
 }
 
 html[data-browser="safari"] .home-shell::before,
-html[data-browser="safari"] .home-grain {
-  opacity: 0.18;
+html[data-browser="safari"] .home-grain,
+html[data-browser="safari"] .home-orb {
+  display: none;
 }
 
 html[data-browser="safari"] .home-shell .surface-card,
@@ -1363,6 +1372,37 @@ html[data-browser="safari"] .home-action-card:hover,
 html[data-browser="safari"] .home-entry-card:hover {
   transform: none;
   box-shadow: none;
+}
+
+html[data-browser="safari"] .home-shell .surface-card,
+html[data-browser="safari"] .home-shell .surface-card-muted,
+html[data-browser="safari"] .home-hero,
+html[data-browser="safari"] .home-device-card,
+html[data-browser="safari"] .home-device-screen,
+html[data-browser="safari"] .home-release-notes,
+html[data-browser="safari"] .home-action-card,
+html[data-browser="safari"] .home-entry-card,
+html[data-browser="safari"] .home-study-link,
+html[data-browser="safari"] .home-progress-card,
+html[data-browser="safari"] .home-evidence-pill,
+html[data-browser="safari"] .home-skeleton-card {
+  background: #ffffff;
+}
+
+html[data-browser="safari"] .home-shell *,
+html[data-browser="safari"] .home-shell *::before,
+html[data-browser="safari"] .home-shell *::after {
+  animation: none !important;
+  transition: none !important;
+}
+
+html[data-browser="safari"] .home-data-fade,
+html[data-browser="safari"] .home-progress-fill {
+  transform: none;
+}
+
+html[data-browser="safari"] .home-skeleton-line::after {
+  display: none;
 }
 
 html[data-browser="safari"] .home-action-primary,

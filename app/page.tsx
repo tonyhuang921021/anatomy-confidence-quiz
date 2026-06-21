@@ -54,6 +54,11 @@ const QUICK_ENTRIES = [
 const HOME_RELEASE_NOTES = [
   {
     time: "06/21",
+    title: "Safari 捲首頁不再露底",
+    body: "Safari 首頁改成先求穩：關掉首輪重繪容易翻車的背景層、淡入和閃光骨架，讓滑動不要突然只剩一片背景。"
+  },
+  {
+    time: "06/21",
     title: "首頁不再假裝大家都 0 題",
     body: "留言、焦慮數字和弱點判讀改成先顯示舊資料再更新；資料庫慢一下，不會整頁開始裝失憶。"
   },
