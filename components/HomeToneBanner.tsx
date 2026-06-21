@@ -127,7 +127,8 @@ function getTimePressureLine(todayAttempts: number, seed: number) {
       [
         `清晨適合偷跑，不適合滑掉。先把今天第一輪刷起來。`,
         `早上腦子還沒被世界污染，拿來做題，不要拿來發呆。`,
-        `現在還早，今天先卡 ${Math.max(20 - todayAttempts, 0)} 題基本盤，不要一醒來就欠債。`
+        `現在還早，今天先卡 ${Math.max(20 - todayAttempts, 0)} 題基本盤，不要一醒來就欠債。`,
+        `阿米諾斯，早上腦袋還沒被世界污染，拿來做題，不要拿來發呆。`
       ],
       seed
     );
@@ -138,7 +139,8 @@ function getTimePressureLine(todayAttempts: number, seed: number) {
       [
         `上午已經在流走，你今天 ${todayAttempts} 題。不要把黃金時段拿去醞釀焦慮。`,
         `早上是最便宜的進度，現在不買，晚上會用焦慮加價買回來。`,
-        `上午先刷一輪，下午才有資格說自己今天有在動。`
+        `上午先刷一輪，下午才有資格說自己今天有在動。`,
+        `納尼尊嘟假嘟？你今天是在做題，還是在確認 App 能不能開？`
       ],
       seed
     );
@@ -149,7 +151,8 @@ function getTimePressureLine(todayAttempts: number, seed: number) {
       [
         `下午了，你今天 ${todayAttempts} 題。這個數字如果太小，晚上會變成睡前審判。`,
         `下午不是拿來重開讀書計畫的，是拿來把題目做掉的。`,
-        `現在補還來得及，但不要再跟自己開會了，直接按開始測驗。`
+        `現在補還來得及，但不要再跟自己開會了，直接按開始測驗。`,
+        `我嘞個豆，有動，但動得像國考不會來一樣。`
       ],
       seed
     );
@@ -160,7 +163,8 @@ function getTimePressureLine(todayAttempts: number, seed: number) {
       [
         `晚上到了，你今天 ${todayAttempts} 題。白天沒做的題，不會自己繁殖成進度。`,
         `現在再做一組，至少睡前不要被「今天才這樣」追殺。`,
-        `今天還能救。不是用祈禱救，是用再刷 20 題救。`
+        `今天還能救。不是用祈禱救，是用再刷 20 題救。`,
+        `歐買尬居蛇十塊，白天沒做的題，不會自己繁殖成進度。`
       ],
       seed
     );
@@ -170,7 +174,8 @@ function getTimePressureLine(todayAttempts: number, seed: number) {
     [
       `快半夜了，你今天 ${todayAttempts} 題。可以睡，但明天首頁會記得。`,
       `現在不是叫你熬夜爆刷，是提醒你：今天的進度已經定稿了。`,
-      `夜深了，焦慮開始值班。明天不要再讓它加班。`
+      `夜深了，焦慮開始值班。明天不要再讓它加班。`,
+      `今天不是創造奇蹟，是保存戰力；但明天不要繼續用這招。`
     ],
     seed
   );
@@ -188,7 +193,10 @@ function getPersonalAnxiousLine(personal: PersonalPaceStats, communityTodayAttem
         `${communityText}，你今天目前 0 題。不是沒救，是還沒開機，但再不開機就真的很像裝死。`,
         `你今天 0 題。國考不會因為你很會規劃就自動幫你加分，先按開始測驗。`,
         `${communityText}，你這邊還是 0 題。焦慮不是敵人，0 題才是。`,
-        `今天還沒留下任何作答紀錄。先做 10 題，至少讓焦慮有資料可以罵。`
+        `今天還沒留下任何作答紀錄。先做 10 題，至少讓焦慮有資料可以罵。`,
+        `阿米諾斯，今天的進度乾淨到像剛格式化。`,
+        `系統差點以為你轉系了。`,
+        `題庫沒有生氣，它只是默默變陌生。`
       ],
       seed
     );
@@ -200,7 +208,10 @@ function getPersonalAnxiousLine(personal: PersonalPaceStats, communityTodayAttem
         `你今天才 ${todayAttempts} 題而已。這個量比較像暖手，不像在準備國考。`,
         `${communityText}，你今天 ${todayAttempts} 題。可以，至少有呼吸，但不能只靠呼吸通過一階。`,
         `目前 ${todayAttempts} 題。這不是進度，這比較像跟題庫打招呼。再補到 20 題。`,
-        `今天 ${todayAttempts} 題${rateText}。不要急著感動，這只是起跑線旁邊的便利商店。`
+        `今天 ${todayAttempts} 題${rateText}。不要急著感動，這只是起跑線旁邊的便利商店。`,
+        `咩噗咩噗，這個進度不能說沒有，只能說國考委員還感受不到威脅。`,
+        `居蛇十塊，很強，但樣本數小到統計學想離席。`,
+        `熱身結束了，現在可以開始讀書了嗎？`
       ],
       seed
     );
@@ -212,7 +223,10 @@ function getPersonalAnxiousLine(personal: PersonalPaceStats, communityTodayAttem
         `你今天 ${todayAttempts} 題，有開始，但還不到能放心滑手機的量。`,
         `${communityText}，你今天 ${todayAttempts} 題。再湊一輪，讓今天不要只是象徵性刷題。`,
         `目前 ${todayAttempts} 題${rateText}。進度有影子了，但影子不能上考場。`,
-        `今天 ${todayAttempts} 題。再做一組錯題，讓焦慮從背景音變成燃料。`
+        `今天 ${todayAttempts} 題。再做一組錯題，讓焦慮從背景音變成燃料。`,
+        `運氣分已入帳，知識請補上。`,
+        `錯題不是收藏品，請不要只是放著欣賞。`,
+        `哈基米哈基米，請不要把「好像會」誤認成「真的會」。`
       ],
       seed
     );
@@ -223,7 +237,9 @@ function getPersonalAnxiousLine(personal: PersonalPaceStats, communityTodayAttem
       [
         `你今天 ${todayAttempts} 題，昨天 ${yesterdayAttempts} 題。昨天的你看起來比較想過國考。`,
         `今天 ${todayAttempts} 題，明顯輸給昨天的 ${yesterdayAttempts} 題。不要讓昨天的自己變成學霸前任。`,
-        `昨天 ${yesterdayAttempts} 題，今天 ${todayAttempts} 題。不是不能休息，但這個落差需要補一口。`
+        `昨天 ${yesterdayAttempts} 題，今天 ${todayAttempts} 題。不是不能休息，但這個落差需要補一口。`,
+        `全站都在變強，請不要只負責見證歷史。`,
+        `不要用昨天的努力當今天偷懶的免死金牌。`
       ],
       seed
     );
@@ -234,7 +250,10 @@ function getPersonalAnxiousLine(personal: PersonalPaceStats, communityTodayAttem
       [
         `近 7 天總共 ${sevenDayAttempts} 題、活躍 ${activeDays} 天${rateText}。這節奏很養生，但國考不是養生村。`,
         `近 7 天 ${sevenDayAttempts} 題。你不是沒有努力，是努力得太有禮貌了。`,
-        `這週 ${sevenDayAttempts} 題、${activeDays} 天有刷。再密一點，不然弱點會住下來。`
+        `這週 ${sevenDayAttempts} 題、${activeDays} 天有刷。再密一點，不然弱點會住下來。`,
+        `錯題沒有變難，是你忘得很有紀律。`,
+        `藥名目前在你腦中像一群沒有名牌的親戚。`,
+        `代謝路徑不是迷宮，是你今天沒帶地圖。`
       ],
       seed
     );
@@ -245,7 +264,11 @@ function getPersonalAnxiousLine(personal: PersonalPaceStats, communityTodayAttem
       `你今天 ${todayAttempts} 題，近 7 天 ${sevenDayAttempts} 題${rateText}。可以，但不要開始跟自己談判。`,
       `${communityText}，你今天 ${todayAttempts} 題。節奏有了，現在要把錯題追到它不敢再出現。`,
       `今天 ${todayAttempts} 題，這週 ${sevenDayAttempts} 題。很好，繼續，不要讓焦慮有翻盤機會。`,
-      `你今天 ${todayAttempts} 題${rateText}。這才像有在備考，接下來請把低信心題抓出來審問。`
+      `你今天 ${todayAttempts} 題${rateText}。這才像有在備考，接下來請把低信心題抓出來審問。`,
+      `蘇巴拉西，今天腦袋有上班，請趁熱把錯題抓去審問。`,
+      `牙白內，這個題量開始像要跟考選部談條件了。`,
+      `大發事件，你今天成為別人的焦慮來源。`,
+      `很好，但不要用今天的努力當明天偷懶的免死金牌。`
     ],
     seed
   );
