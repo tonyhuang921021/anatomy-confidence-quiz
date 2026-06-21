@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 import { isSupabaseRecoveryMode } from "@/lib/supabase/recoveryMode";
-import { withServerTimeout } from "@/lib/serverTimeout";
+import { isServerTimeoutError, withServerTimeout } from "@/lib/serverTimeout";
 
 type VerifiedUser = {
   id: string;
@@ -109,6 +109,32 @@ function isMissingRelationError(error: unknown, relationName: string) {
       ? String((error as { message?: unknown }).message ?? "")
       : String(error ?? "");
   return message.includes(relationName) && (message.includes("does not exist") || message.includes("Could not find"));
+}
+
+function isMissingSupplementRelationError(error: unknown) {
+  return [
+    "question_supplement_cards",
+    "question_supplement_card_votes",
+    "question_supplement_reactions"
+  ].some((relationName) => isMissingRelationError(error, relationName));
+}
+
+function getErrorMessage(error: unknown, fallback: string) {
+  return error instanceof Error ? error.message : fallback;
+}
+
+function emptySupplementPayload() {
+  return { count: 0, cards: [], reactions: [] };
+}
+
+function shouldDegradeSupplementRead(error: unknown) {
+  return isServerTimeoutError(error) || isMissingSupplementRelationError(error);
+}
+
+function logSupplementReadFallback(error: unknown) {
+  console.warn("[question-supplement-cards] optional read fallback", {
+    message: getErrorMessage(error, "補充卡片讀取失敗")
+  });
 }
 
 function normalizeAttachmentUrls(value: unknown) {
@@ -221,7 +247,10 @@ async function loadReactionsForQuestion(supabase: any, questionId: string, userI
     "題目快速標記載入逾時"
   )) as { data?: SupplementReactionRow[]; error?: unknown };
 
-  if (error) throw error;
+  if (error) {
+    if (isMissingRelationError(error, "question_supplement_reactions")) return [];
+    throw error;
+  }
 
   const rows = data ?? [];
   return Object.entries(REACTION_LABELS).map(([type, label]) => ({
@@ -309,13 +338,14 @@ export async function GET(request: NextRequest) {
     const payload = await buildQuestionPayload(supabase, questionId, verifiedUser?.id);
     return NextResponse.json({ ok: true, ...payload }, { headers: { "Cache-Control": "no-store" } });
   } catch (error) {
-    if (isMissingRelationError(error, "question_supplement_cards")) {
+    if (shouldDegradeSupplementRead(error)) {
+      logSupplementReadFallback(error);
       return NextResponse.json(
-        { ok: true, count: 0, cards: [], reactions: [] },
+        { ok: true, ...emptySupplementPayload() },
         { headers: { "Cache-Control": "no-store" } }
       );
     }
-    const message = error instanceof Error ? error.message : "補充卡片載入失敗";
+    const message = getErrorMessage(error, "補充卡片載入失敗");
     return NextResponse.json({ ok: false, message }, { status: 500 });
   }
 }
@@ -485,7 +515,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({ ok: false, message: "不支援的操作。" }, { status: 400 });
   } catch (error) {
-    const message = error instanceof Error ? error.message : "補充卡片操作失敗";
+    const message = getErrorMessage(error, "補充卡片操作失敗");
     return NextResponse.json({ ok: false, message }, { status: 500 });
   }
 }
