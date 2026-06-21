@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>醫師國考一階細菌總表｜互動老師版</title>
+  <title>醫師國考一階細菌總表｜互動老師版 v4（補類鼻疽）</title>
   <style>
     :root {
       --bg: #f7f4ef;
@@ -120,7 +120,7 @@
     .footer { color: var(--muted); font-size: .9rem; padding: 18px 4px 36px; }
     .hidden { display: none !important; }
     #popover {
-      position: fixed; z-index: 99; max-width: 380px; background: #fffdf8; border: 1px solid #d9c8b4;
+      position: fixed; z-index: 2147483000; max-width: 380px; background: #fffdf8; border: 1px solid #d9c8b4;
       border-radius: 16px; padding: 14px 15px; box-shadow: 0 18px 48px rgba(35,25,18,.22); display: none;
     }
     #popover strong { display: block; color: var(--accent); margin-bottom: 4px; }
@@ -177,7 +177,7 @@
     <div class="control-card">
       <input id="search" type="search" placeholder="搜尋：例如 coagulase、novobiocin、草莓舌、HUS、紅色果凍痰、BCYE、恙蟲、clue cell、RIPE、氣性壞疽...">
       <nav class="quick-nav">
-        <a href="#how-to-read">讀法</a><a href="#triggers">一秒關鍵字</a><a href="#bug-index">菌名索引</a><a href="#compare">各種比較</a><a href="#gpc">G+球菌</a><a href="#gpr">G+桿菌</a><a href="#acidfast">抗酸菌</a><a href="#gn-resp">G-呼吸</a><a href="#enterics">腸內菌</a><a href="#anaerobes">厭氧菌</a><a href="#spirochetes">螺旋體</a><a href="#atypical">非典型/胞內</a>
+        <a href="#how-to-read">讀法</a><a href="#triggers">一秒關鍵字</a><a href="#bug-index">菌名索引</a><a href="#compare">各種比較</a><a href="#gpc">G+球菌</a><a href="#gpr">G+桿菌</a><a href="#acidfast">抗酸菌</a><a href="#gn-resp">G-呼吸</a><a href="#enterics">腸內菌</a><a href="#nonfermenters">非發酵菌</a><a href="#anaerobes">厭氧菌</a><a href="#spirochetes">螺旋體</a><a href="#atypical">非典型/胞內</a>
       </nav>
     </div>
   </div>
@@ -204,7 +204,7 @@
     </section>
     <div id="compare"></div>
     <div id="bugSections"></div>
-    <div class="footer">整理依據：使用者提供的兩份細菌國考 PDF 架構與重點，加上醫師國考一階常見比較題整理；版型沿用前一份寄生蟲互動總表的可搜尋、可列印、popover 架構。建議讀法：先刷「一秒關鍵字」與「各種比較」，再回到各菌卡片補細節。</div>
+    <div class="footer">整理依據：使用者提供的兩份細菌國考 PDF 架構與重點，加上醫師國考一階常見比較題整理；本 v4 特別把 Pseudomonas、Burkholderia pseudomallei、Acinetobacter、Stenotrophomonas 拉出成「非發酵G-桿菌」區；版型沿用前一份寄生蟲互動總表的可搜尋、可列印、popover 架構。建議讀法：先刷「一秒關鍵字」與「各種比較」，再回到各菌卡片補細節。</div>
   </main>
   <div id="popover" role="dialog" aria-live="polite"><strong></strong><p></p></div>
   <dialog id="bugModal">
@@ -1001,21 +1001,35 @@
     "key": "pseudomonas",
     "zh": "綠膿桿菌",
     "en": "Pseudomonas aeruginosa",
-    "group": "腸內菌/彎曲桿菌",
+    "group": "非發酵G-桿菌",
+    "priority": "★★★★",
+    "intro": "院內感染超高頻菌：燒傷、囊性纖維化、中性球低下、呼吸器、導尿管、熱水浴、惡性外耳炎都要想到。國考抓葡萄味、藍綠色素、oxidase(+)、非乳糖發酵。",
+    "morph": "G- 桿菌；[[non_lactose|非乳糖發酵]]、[[oxidase|oxidase]](+)、嚴格需氧；MacConkey 無色；[[cetrimide|cetrimide agar]] 可促進藍綠色 [[pyocyanin|pyocyanin]] 與黃綠色 [[pyoverdin|pyoverdin]]。",
+    "virulence": "[[exotoxin_a|Exotoxin A]] 會 ADP-ribosylate [[ef2|EF-2]] 抑制蛋白質合成；[[alginate|alginate biofilm]] 幫助 CF 慢性感染；elastase、phospholipase C、LPS、type III secretion system。",
+    "clinical": "燒傷傷口感染與敗血症、[[ecthyma_gangrenosum|ecthyma gangrenosum]]、囊性纖維化慢性肺炎、呼吸器相關肺炎、[[malignant_otitis|惡性外耳炎]]、[[hot_tub|熱水浴毛囊炎]]、導尿管相關 UTI、角膜炎。",
+    "dx": "培養可見葡萄/水果味、藍綠色或黃綠色色素；oxidase(+)、non-lactose；臨床重點是做 culture + susceptibility，因抗藥性多。",
+    "tx": "抗綠膿 β-lactam：piperacillin-tazobactam、cefepime、ceftazidime、aztreonam、imipenem/meropenem（注意 ertapenem 不抗綠膿）；可依嚴重度加 aminoglycoside 或 ciprofloxacin/levofloxacin，最後依藥敏調整。",
+    "exam": "Pseudomonas = oxidase+、non-lactose、藍綠色素/葡萄味、燒傷/CF/熱水浴/惡性外耳炎。"
+  },
+  {
+    "key": "burkholderia_pseudomallei",
+    "zh": "類鼻疽桿菌",
+    "en": "Burkholderia pseudomallei",
+    "group": "非發酵G-桿菌",
     "priority": "★★★",
-    "intro": "院內、燒傷、中性球低下、囊性纖維化的重點菌。葡萄味、藍綠色素、oxidase+。",
-    "morph": "G- 桿菌；[[non_lactose|非乳糖發酵]]、oxidase(+)、嚴格需氧；藍綠色 pyocyanin、綠色 pyoverdin。",
-    "virulence": "Exotoxin A ADP-ribosylates EF-2；alginate biofilm、elastase、phospholipase。",
-    "clinical": "燒傷感染、ecthyma gangrenosum、CF 肺炎、呼吸器肺炎、惡性外耳炎、熱水浴毛囊炎、UTI。",
-    "dx": "培養有葡萄/水果味與色素；oxidase positive。",
-    "tx": "Piperacillin-tazobactam、cefepime/ceftazidime、carbapenem（非 ertapenem）、aztreonam、aminoglycoside、ciprofloxacin 等依藥敏。",
-    "exam": "Pseudomonas = oxidase+ non-lactose + blue-green + burns/CF。"
+    "intro": "土壤與水中的環境菌，造成類鼻疽 (melioidosis)。台灣南部、東南亞、澳洲北部與風災/豪雨後清掃環境題幹要特別想到；臨床可從皮膚膿瘍到肺炎、敗血症，變化很大。",
+    "morph": "G- 桿菌；non-fermenter；oxidase(+)；motile；可呈 [[bipolar_staining|安全別針樣雙極染色]]；在環境水土中存活。舊名可寫 Pseudomonas pseudomallei。",
+    "virulence": "可在吞噬細胞內存活，形成膿瘍與慢性/復發感染；具多重抗藥特性。",
+    "clinical": "[[melioidosis|類鼻疽]]：肺炎最常見，可像結核或社區型肺炎；也可皮膚潰瘍/膿瘍、肝脾/前列腺膿瘍、骨髓炎、敗血症與 septic shock。糖尿病、腎病、酒精使用、免疫低下是高風險。",
+    "dx": "血液、痰液、膿液或尿液培養；流行病學線索是接觸土壤/積水、赤腳傷口、風災後清掃；類鼻疽為需通報概念。",
+    "tx": "急性期常用 ceftazidime 或 meropenem；穩定後需 eradication phase，常用 TMP-SMX 連續數月，避免復發。舊講義可見『急性期 ceftazidime、後期四合一 20 週』的國考連結。",
+    "exam": "風災後清掃：肺炎/敗血症想到類鼻疽；黃疸腎炎想到鉤端螺旋體。類鼻疽 = 土壤水 + 糖尿病 + 肺炎/膿瘍/敗血症。"
   },
   {
     "key": "acinetobacter",
     "zh": "鮑氏不動桿菌",
     "en": "Acinetobacter baumannii",
-    "group": "腸內菌/彎曲桿菌",
+    "group": "非發酵G-桿菌",
     "priority": "★★",
     "intro": "ICU、呼吸器、戰傷與多重抗藥院內感染常考。",
     "morph": "G- coccobacillus；oxidase(-)、nonmotile、non-lactose；可長期存活環境。",
@@ -1029,7 +1043,7 @@
     "key": "stenotrophomonas",
     "zh": "嗜麥芽窄食單胞菌",
     "en": "Stenotrophomonas maltophilia",
-    "group": "腸內菌/彎曲桿菌",
+    "group": "非發酵G-桿菌",
     "priority": "★",
     "intro": "院內免疫低下、導管與呼吸器感染；天生對多種 β-lactam/carbapenem 抗性。",
     "morph": "G- non-fermenting 桿菌；oxidase(-)、non-lactose。",
@@ -1610,9 +1624,47 @@
       ],
       [
         "Non-fermenter",
-        "{{pseudomonas}}、{{acinetobacter}}、{{stenotrophomonas}}",
-        "Pseudomonas oxidase+；Acinetobacter/Stenotrophomonas oxidase-",
-        "院內感染、抗藥性、呼吸器/燒傷。"
+        "{{pseudomonas}}、{{burkholderia_pseudomallei}}、{{acinetobacter}}、{{stenotrophomonas}}",
+        "Pseudomonas 藍綠色素；Burkholderia = 土壤水/風災/類鼻疽；Acinetobacter/Stenotrophomonas oxidase-",
+        "院內感染、抗藥性、呼吸器/燒傷；風災後肺炎/敗血症。"
+      ]
+    ]
+  },
+
+  {
+    "id": "nonfermenters-detail",
+    "title": "非發酵G-桿菌比較：Pseudomonas 要獨立背",
+    "desc": "這組不是腸內菌，國考常放在院內感染、呼吸器、燒傷、導管、抗藥性題幹。",
+    "headers": [
+      "菌",
+      "最重要鑑別",
+      "高頻臨床情境",
+      "治療/陷阱"
+    ],
+    "rows": [
+      [
+        "{{pseudomonas}}",
+        "oxidase(+)；non-lactose；嚴格需氧；葡萄味；pyocyanin/pyoverdin 藍綠色素；Exotoxin A 抑制 EF-2",
+        "燒傷、CF、呼吸器肺炎、中性球低下、熱水浴毛囊炎、惡性外耳炎、ecthyma gangrenosum",
+        "抗綠膿 β-lactam：piperacillin-tazobactam、cefepime、ceftazidime、aztreonam、imipenem/meropenem；ertapenem 不抗綠膿。"
+      ],
+      [
+        "{{burkholderia_pseudomallei}}",
+        "oxidase(+)；non-fermenter；環境水土；可雙極染色；舊名 Pseudomonas pseudomallei",
+        "風災/豪雨後清掃、赤腳傷口接觸土壤或吸入；糖尿病高風險；肺炎、皮膚膿瘍、敗血症、內臟膿瘍",
+        "急性期 ceftazidime 或 meropenem；之後 TMP-SMX eradication phase 數月，避免復發。國考陷阱：風災後肺炎=類鼻疽，風災後黃疸腎炎=鉤端。"
+      ],
+      [
+        "{{acinetobacter}}",
+        "oxidase(-)；nonmotile；coccobacillus；環境可存活很久；MDR 常見",
+        "ICU、呼吸器相關肺炎、戰傷、導管、院內菌血症",
+        "依藥敏；可能用 sulbactam、carbapenem、polymyxin、cefiderocol 等。"
+      ],
+      [
+        "{{stenotrophomonas}}",
+        "oxidase(-)；non-fermenter；天生對 carbapenem 多有抗性",
+        "免疫低下、導管、呼吸器、長期廣效抗生素後感染",
+        "國考最常連 TMP-SMX；不要看到 G- 桿菌就直覺 carbapenem。"
       ]
     ]
   },
@@ -2170,6 +2222,14 @@
     "{{enterococcus}}；UTI、心內膜炎、VRE"
   ],
   [
+    "oxidase(+) + non-lactose + 藍綠色素",
+    "{{pseudomonas}}；燒傷、CF、熱水浴毛囊炎、惡性外耳炎、葡萄味"
+  ],
+  [
+    "hot tub folliculitis / malignant otitis externa",
+    "{{pseudomonas}}；抗綠膿 β-lactam，ertapenem 不抗綠膿"
+  ],
+  [
     "black eschar",
     "{{b_anthracis}}；炭疽黑色焦痂，不切開"
   ],
@@ -2270,6 +2330,10 @@
     "{{pseudomonas}}"
   ],
   [
+    "風災後清掃 + 肺炎/敗血症",
+    "{{burkholderia_pseudomallei}}；若是黃疸/腎炎則想 {{leptospira}}"
+  ],
+  [
     "cat bite cellulitis",
     "{{pasteurella}}"
   ],
@@ -2350,7 +2414,17 @@
   "weill_felix": "Weil-Felix：舊式立克次體血清試驗，利用 Proteus OX 抗原交叉反應；現代多用血清學/PCR。",
   "warthin_starry": "Warthin-Starry 銀染：可染 Bartonella、Helicobacter、spirochetes 等細菌。",
   "jarisch": "Jarisch-Herxheimer reaction：治療梅毒/疏螺旋體後因菌體裂解引起發燒、寒顫、症狀短暫惡化。",
-  "eschar": "焦痂 eschar：叮咬處壞死黑痂，恙蟲病常考；也可見於部分 rickettsiosis。"
+  "eschar": "焦痂 eschar：叮咬處壞死黑痂，恙蟲病常考；也可見於部分 rickettsiosis。",
+  "bipolar_staining": "雙極染色 bipolar staining：菌體兩端較深，外觀像安全別針。類鼻疽桿菌、鼠疫桿菌等題幹可能出現。",
+  "melioidosis": "類鼻疽 melioidosis：Burkholderia pseudomallei 感染，常來自土壤/水，風災後清掃、糖尿病患者肺炎或敗血症要想到。",
+  "cetrimide": "Cetrimide agar：選擇性培養 Pseudomonas aeruginosa，常促進色素產生。",
+  "pyocyanin": "Pyocyanin：Pseudomonas aeruginosa 的藍綠色色素，也是氧化壓力相關毒力因子；題幹常寫 blue-green pigment。",
+  "pyoverdin": "Pyoverdin：Pseudomonas 的黃綠色螢光 siderophore，可幫助攝鐵。",
+  "exotoxin_a": "Pseudomonas exotoxin A：ADP-ribosylate EF-2，抑制真核細胞蛋白質合成；機轉類似白喉毒素。",
+  "alginate": "Alginate biofilm：Pseudomonas 在囊性纖維化肺部形成黏液樣生物膜，造成慢性、難清除感染。",
+  "ecthyma_gangrenosum": "Ecthyma gangrenosum：Pseudomonas 敗血症時可見的壞死性皮膚病灶，常見於中性球低下或免疫低下。",
+  "malignant_otitis": "惡性外耳炎：多見於糖尿病或免疫低下，典型病原是 Pseudomonas，可侵犯顱底。",
+  "hot_tub": "熱水浴毛囊炎：hot tub/spa 水中 Pseudomonas 污染造成毛囊炎，通常和消毒不佳的溫水環境有關。"
 };
     const GROUP_ORDER = [
   [
@@ -2376,7 +2450,12 @@
   [
     "腸內菌/彎曲桿菌",
     "enterics",
-    "腸內菌、弧菌、彎曲桿菌與院內非發酵菌"
+    "腸內菌、弧菌、彎曲桿菌與幽門螺旋桿菌"
+  ],
+  [
+    "非發酵G-桿菌",
+    "nonfermenters",
+    "非發酵格蘭氏陰性桿菌：Pseudomonas、Burkholderia pseudomallei、Acinetobacter、Stenotrophomonas"
   ],
   [
     "厭氧菌",
@@ -2467,6 +2546,12 @@
       const key = button.dataset.term;
       const text = GLOSSARY[key] || '這個詞尚未建立解釋；請回到表格上下文判讀。';
       const pop = document.getElementById('popover');
+      const modal = document.getElementById('bugModal');
+      if (modal?.open && pop.parentElement !== modal) {
+        modal.appendChild(pop);
+      } else if (!modal?.open && pop.parentElement !== document.body) {
+        document.body.appendChild(pop);
+      }
       pop.querySelector('strong').textContent = button.textContent;
       pop.querySelector('p').textContent = text;
       const r = button.getBoundingClientRect();
@@ -2477,6 +2562,11 @@
       if (top + pop.offsetHeight > window.innerHeight - margin) top = Math.max(margin, r.top - pop.offsetHeight - 8);
       pop.style.left = left + 'px';
       pop.style.top = top + 'px';
+    }
+    function hidePopover() {
+      const pop = document.getElementById('popover');
+      pop.style.display = 'none';
+      if (pop.parentElement !== document.body) document.body.appendChild(pop);
     }
     function showBug(key) {
       const b = bugMap[key];
@@ -2493,8 +2583,10 @@
         <dt>國考一句話</dt><dd><strong>${inline(b.exam)}</strong></dd>
       </dl>`;
       const modal = document.getElementById('bugModal');
-      if (typeof modal.showModal === 'function') modal.showModal();
-      else modal.setAttribute('open', '');
+      if (!modal.open) {
+        if (typeof modal.showModal === 'function') modal.showModal();
+        else modal.setAttribute('open', '');
+      }
     }
     function setupSearch() {
       const search = document.getElementById('search');
@@ -2517,13 +2609,14 @@
     function setupEvents() {
       document.addEventListener('click', e => {
         const bugBtn = e.target.closest('.bug-link');
-        if (bugBtn) { e.preventDefault(); showBug(bugBtn.dataset.bug); document.getElementById('popover').style.display = 'none'; return; }
+        if (bugBtn) { e.preventDefault(); showBug(bugBtn.dataset.bug); hidePopover(); return; }
         const termBtn = e.target.closest('.term');
         if (termBtn) { e.preventDefault(); showTerm(termBtn); return; }
-        if (!e.target.closest('#popover')) document.getElementById('popover').style.display = 'none';
+        if (!e.target.closest('#popover')) hidePopover();
       });
       document.getElementById('closeModal').addEventListener('click', () => document.getElementById('bugModal').close());
-      document.addEventListener('keydown', e => { if (e.key === 'Escape') document.getElementById('popover').style.display = 'none'; });
+      document.getElementById('bugModal').addEventListener('close', hidePopover);
+      document.addEventListener('keydown', e => { if (e.key === 'Escape') hidePopover(); });
     }
     renderTriggers();
     renderBugIndex();

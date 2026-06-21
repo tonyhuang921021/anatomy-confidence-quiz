@@ -21,6 +21,7 @@ const OWNER_REVIEW_VIEWPORT_FIX = `
     max-height: min(55vh, 420px);
     overflow-y: auto;
     overscroll-behavior: contain;
+    z-index: 2147483000 !important;
   }
 
   @media (max-width: 700px) {
