@@ -6,6 +6,8 @@ import { createFeedbackMessage, loadFeedbackMessagesResult, voteFeedbackMessage 
 import type { FeedbackMessage, OpenAIBudgetStatus } from "@/types/quiz";
 
 const FEEDBACK_CACHE_KEY = "homeFeedbackLastGood";
+const HOME_FEEDBACK_LIMIT = 20;
+const INITIAL_RENDERED_MESSAGES = 6;
 
 function formatCreatedAt(value: string) {
   return new Date(value).toLocaleString("zh-TW", {
@@ -151,6 +153,7 @@ export function FeedbackBoard() {
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
   const [readNotice, setReadNotice] = useState("");
+  const [visibleMessageCount, setVisibleMessageCount] = useState(INITIAL_RENDERED_MESSAGES);
 
   const nickname = useMemo(() => {
     const displayName =
@@ -175,7 +178,7 @@ export function FeedbackBoard() {
       }
 
       try {
-        const result = await loadFeedbackMessagesResult();
+        const result = await loadFeedbackMessagesResult(HOME_FEEDBACK_LIMIT);
         if (result.messages.length > 0 || !result.degraded) {
           setMessages(result.messages);
           saveCachedFeedbackMessages(result.messages);
@@ -194,6 +197,16 @@ export function FeedbackBoard() {
 
     void fetchMessages();
   }, [configured]);
+
+  useEffect(() => {
+    if (loading || messages.length <= INITIAL_RENDERED_MESSAGES) return;
+
+    const timeoutId = window.setTimeout(() => {
+      setVisibleMessageCount(messages.length);
+    }, 900);
+
+    return () => window.clearTimeout(timeoutId);
+  }, [loading, messages.length]);
 
   useEffect(() => {
     async function fetchBudget() {
@@ -233,6 +246,7 @@ export function FeedbackBoard() {
         saveCachedFeedbackMessages(next);
         return next;
       });
+      setVisibleMessageCount((count) => Math.max(count + 1, INITIAL_RENDERED_MESSAGES));
       setContent("");
       setMessage("留言已送出，謝謝你的建議。");
     } catch (submitError) {
@@ -266,6 +280,7 @@ export function FeedbackBoard() {
         saveCachedFeedbackMessages(next);
         return next;
       });
+      setVisibleMessageCount((count) => Math.max(count, INITIAL_RENDERED_MESSAGES));
       setReplyContent("");
       setReplyTargetId(null);
       setMessage("回覆已送出。");
@@ -335,7 +350,7 @@ export function FeedbackBoard() {
   }
 
   return (
-    <section className="surface-card p-6">
+    <section className="surface-card home-feedback-board p-6">
       <div className="flex flex-wrap items-center justify-between gap-4">
         <div>
           <p className="eyebrow">Board</p>
@@ -419,7 +434,7 @@ export function FeedbackBoard() {
             </div>
           ) : null}
 
-          <div className="mt-5 max-h-[32rem] space-y-3 overflow-y-auto pr-1 sm:max-h-[36rem]">
+          <div className="mt-5 space-y-3">
             {loading ? (
               <FeedbackSkeleton />
             ) : messages.length === 0 ? (
@@ -427,85 +442,96 @@ export function FeedbackBoard() {
                 還沒有留言，你可以成為第一個給建議的人。
               </div>
             ) : (
-              messages.map((entry) => (
-                <article key={entry.id} className="surface-card-muted p-4">
-                  <div className="flex items-start justify-between gap-3">
-                    <div>
-                      <p className="text-sm font-semibold text-ink">
-                        {entry.isAnonymous ? "匿名使用者" : entry.displayName || "已登入使用者"}
-                      </p>
-                      <p className="mt-1 text-xs text-slate-500">{formatCreatedAt(entry.createdAt)}</p>
-                    </div>
-                  </div>
-                  <p className="mt-3 whitespace-pre-wrap text-sm leading-7 text-slate-700">{entry.content}</p>
-                  <div className="mt-3 flex flex-wrap items-center gap-2">
-                    <FeedbackVoteControls
-                      entry={entry}
-                      disabled={votingMessageId === entry.id}
-                      onVote={(target, vote) => void handleVote(target, vote)}
-                    />
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setReplyTargetId((current) => (current === entry.id ? null : entry.id));
-                        setReplyContent("");
-                      }}
-                      className="rounded-full bg-white px-3 py-1.5 text-xs font-semibold text-slate-600 ring-1 ring-slate-200 transition hover:bg-slate-100"
-                    >
-                      {replyTargetId === entry.id ? "收起回覆" : "回覆"}
-                    </button>
-                    {(entry.replies?.length ?? 0) > 0 ? (
-                      <span className="text-xs text-slate-500">{entry.replies?.length} 則回覆</span>
-                    ) : null}
-                  </div>
-
-                  {replyTargetId === entry.id ? (
-                    <div className="mt-3 rounded-2xl bg-white p-3 ring-1 ring-slate-200">
-                      <textarea
-                        value={replyContent}
-                        onChange={(event) => setReplyContent(event.target.value)}
-                        maxLength={800}
-                        placeholder="回覆這則留言..."
-                        className="min-h-24 w-full rounded-2xl border border-slate-200 bg-white p-3 text-sm leading-7 text-slate-800 outline-none"
-                      />
-                      <div className="mt-3 flex items-center justify-between gap-3">
-                        <p className="text-xs text-slate-500">{replyContent.length} / 800</p>
-                        <button
-                          type="button"
-                          onClick={() => void handleReply(entry.id)}
-                          disabled={submitting || !replyContent.trim()}
-                          className="min-h-10 rounded-2xl bg-slate-900 px-4 py-2 text-sm font-semibold text-white transition hover:bg-slate-800 disabled:cursor-not-allowed disabled:bg-slate-300"
-                        >
-                          {submitting ? "送出中..." : "送出回覆"}
-                        </button>
+              <>
+                {messages.slice(0, visibleMessageCount).map((entry) => (
+                  <article key={entry.id} className="surface-card-muted p-4">
+                    <div className="flex items-start justify-between gap-3">
+                      <div>
+                        <p className="text-sm font-semibold text-ink">
+                          {entry.isAnonymous ? "匿名使用者" : entry.displayName || "已登入使用者"}
+                        </p>
+                        <p className="mt-1 text-xs text-slate-500">{formatCreatedAt(entry.createdAt)}</p>
                       </div>
                     </div>
-                  ) : null}
-
-                  {(entry.replies?.length ?? 0) > 0 ? (
-                    <div className="mt-4 space-y-2 border-l border-slate-200 pl-3">
-                      {entry.replies?.map((reply) => (
-                        <div key={reply.id} className="rounded-2xl bg-white px-3 py-3 ring-1 ring-slate-200">
-                          <p className="text-sm font-semibold text-ink">
-                            {reply.isAnonymous ? "匿名使用者" : reply.displayName || "已登入使用者"}
-                          </p>
-                          <p className="mt-1 text-xs text-slate-500">{formatCreatedAt(reply.createdAt)}</p>
-                          <p className="mt-2 whitespace-pre-wrap text-sm leading-7 text-slate-700">
-                            {reply.content}
-                          </p>
-                          <div className="mt-3">
-                            <FeedbackVoteControls
-                              entry={reply}
-                              disabled={votingMessageId === reply.id}
-                              onVote={(target, vote) => void handleVote(target, vote)}
-                            />
-                          </div>
-                        </div>
-                      ))}
+                    <p className="mt-3 whitespace-pre-wrap text-sm leading-7 text-slate-700">{entry.content}</p>
+                    <div className="mt-3 flex flex-wrap items-center gap-2">
+                      <FeedbackVoteControls
+                        entry={entry}
+                        disabled={votingMessageId === entry.id}
+                        onVote={(target, vote) => void handleVote(target, vote)}
+                      />
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setReplyTargetId((current) => (current === entry.id ? null : entry.id));
+                          setReplyContent("");
+                        }}
+                        className="rounded-full bg-white px-3 py-1.5 text-xs font-semibold text-slate-600 ring-1 ring-slate-200 transition hover:bg-slate-100"
+                      >
+                        {replyTargetId === entry.id ? "收起回覆" : "回覆"}
+                      </button>
+                      {(entry.replies?.length ?? 0) > 0 ? (
+                        <span className="text-xs text-slate-500">{entry.replies?.length} 則回覆</span>
+                      ) : null}
                     </div>
-                  ) : null}
-                </article>
-              ))
+
+                    {replyTargetId === entry.id ? (
+                      <div className="mt-3 rounded-2xl bg-white p-3 ring-1 ring-slate-200">
+                        <textarea
+                          value={replyContent}
+                          onChange={(event) => setReplyContent(event.target.value)}
+                          maxLength={800}
+                          placeholder="回覆這則留言..."
+                          className="min-h-24 w-full rounded-2xl border border-slate-200 bg-white p-3 text-sm leading-7 text-slate-800 outline-none"
+                        />
+                        <div className="mt-3 flex items-center justify-between gap-3">
+                          <p className="text-xs text-slate-500">{replyContent.length} / 800</p>
+                          <button
+                            type="button"
+                            onClick={() => void handleReply(entry.id)}
+                            disabled={submitting || !replyContent.trim()}
+                            className="min-h-10 rounded-2xl bg-slate-900 px-4 py-2 text-sm font-semibold text-white transition hover:bg-slate-800 disabled:cursor-not-allowed disabled:bg-slate-300"
+                          >
+                            {submitting ? "送出中..." : "送出回覆"}
+                          </button>
+                        </div>
+                      </div>
+                    ) : null}
+
+                    {(entry.replies?.length ?? 0) > 0 ? (
+                      <div className="mt-4 space-y-2 border-l border-slate-200 pl-3">
+                        {entry.replies?.map((reply) => (
+                          <div key={reply.id} className="rounded-2xl bg-white px-3 py-3 ring-1 ring-slate-200">
+                            <p className="text-sm font-semibold text-ink">
+                              {reply.isAnonymous ? "匿名使用者" : reply.displayName || "已登入使用者"}
+                            </p>
+                            <p className="mt-1 text-xs text-slate-500">{formatCreatedAt(reply.createdAt)}</p>
+                            <p className="mt-2 whitespace-pre-wrap text-sm leading-7 text-slate-700">
+                              {reply.content}
+                            </p>
+                            <div className="mt-3">
+                              <FeedbackVoteControls
+                                entry={reply}
+                                disabled={votingMessageId === reply.id}
+                                onVote={(target, vote) => void handleVote(target, vote)}
+                              />
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    ) : null}
+                  </article>
+                ))}
+                {visibleMessageCount < messages.length ? (
+                  <button
+                    type="button"
+                    onClick={() => setVisibleMessageCount(messages.length)}
+                    className="secondary-pill w-full justify-center"
+                  >
+                    顯示其餘 {messages.length - visibleMessageCount} 則留言
+                  </button>
+                ) : null}
+              </>
             )}
           </div>
         </>

@@ -1338,6 +1338,15 @@ html[data-browser="safari"] .topbar-shell {
   backdrop-filter: none;
 }
 
+html[data-browser="safari"] .home-shell .surface-card,
+html[data-browser="safari"] .home-shell .surface-card-muted {
+  box-shadow: none;
+}
+
+html[data-browser="safari"] .home-feedback-board {
+  contain: paint;
+}
+
 html[data-browser="safari"] .home-hero,
 html[data-browser="safari"] .home-device-card,
 html[data-browser="safari"] .home-release-notes,

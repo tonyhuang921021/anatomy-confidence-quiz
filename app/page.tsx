@@ -54,6 +54,11 @@ const QUICK_ENTRIES = [
 const HOME_RELEASE_NOTES = [
   {
     time: "06/21",
+    title: "留言板先站穩再補人",
+    body: "首頁留言照樣自動抓，但 Safari 先畫前幾則、穩定後再補齊，避免一滑就出現大型空白哲學區。"
+  },
+  {
+    time: "06/21",
     title: "Safari 捲首頁不再露底",
     body: "Safari 首頁改成先求穩：關掉首輪重繪容易翻車的背景層、淡入和閃光骨架，讓滑動不要突然只剩一片背景。"
   },
