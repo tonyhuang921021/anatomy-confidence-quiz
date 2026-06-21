@@ -1201,14 +1201,16 @@ function ResultsPageContent() {
                   question={question}
                   optionKey={key}
                   labelClassName={optionState.labelClassName}
+                  trailingContent={
+                    optionState.badge ? (
+                      <span
+                        className={`inline-flex shrink-0 rounded-full px-2.5 py-0.5 text-[11px] font-bold leading-5 ${optionState.badgeClassName}`}
+                      >
+                        {optionState.badge}
+                      </span>
+                    ) : null
+                  }
                 />
-                {optionState.badge ? (
-                  <span
-                    className={`ml-11 mt-3 inline-flex rounded-full px-3 py-1 text-xs font-bold ${optionState.badgeClassName}`}
-                  >
-                    {optionState.badge}
-                  </span>
-                ) : null}
               </div>
             );
           })}

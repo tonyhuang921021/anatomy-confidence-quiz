@@ -1,3 +1,4 @@
+import { type ReactNode } from "react";
 import { OptionKey, Question } from "@/types/quiz";
 import { FormattedQuestionText } from "@/components/FormattedQuestionText";
 
@@ -12,6 +13,7 @@ type QuestionOptionBlockProps = {
   labelClassName?: string;
   textClassName?: string;
   wrapperClassName?: string;
+  trailingContent?: ReactNode;
 };
 
 function renderImage(src: string, alt: string) {
@@ -45,7 +47,8 @@ export function QuestionOptionBlock({
   optionKey,
   labelClassName,
   textClassName,
-  wrapperClassName
+  wrapperClassName,
+  trailingContent
 }: QuestionOptionBlockProps) {
   const optionText = question.options[optionKey];
   const optionImage = question.optionImages?.[optionKey];
@@ -66,14 +69,17 @@ export function QuestionOptionBlock({
           {optionKey}
         </span>
         <div className="min-w-0 flex-1">
-          <p
+          <div
             className={
               textClassName ??
               "min-w-0 text-sm font-medium leading-6 text-slate-800 [overflow-wrap:anywhere] sm:text-[15px] sm:leading-7"
             }
           >
-            <FormattedQuestionText text={optionText} />
-          </p>
+            <span>
+              <FormattedQuestionText text={optionText} />
+            </span>
+            {trailingContent ? <span className="ml-2 inline-flex align-middle">{trailingContent}</span> : null}
+          </div>
           {optionImage ? renderImage(optionImage, `${question.id} 選項 ${optionKey} 圖片`) : null}
         </div>
       </div>

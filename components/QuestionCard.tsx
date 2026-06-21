@@ -172,18 +172,20 @@ export function QuestionCard({
                   labelClassName
                 }`}
                 textClassName="min-w-0 break-words text-sm leading-7 text-slate-800 sm:text-base"
+                trailingContent={
+                  answerBadge ? (
+                    <span
+                      className={`inline-flex shrink-0 rounded-full px-2.5 py-0.5 text-[11px] font-bold leading-5 ${
+                        reviewTone === "wrong"
+                          ? "bg-rose-100 text-rose-800"
+                          : "bg-emerald-100 text-emerald-800"
+                      }`}
+                    >
+                      {answerBadge}
+                    </span>
+                  ) : null
+                }
               />
-              {answerBadge ? (
-                <span
-                  className={`ml-10 mt-3 inline-flex rounded-full px-3 py-1 text-xs font-bold ${
-                    reviewTone === "wrong"
-                      ? "bg-rose-100 text-rose-800"
-                      : "bg-emerald-100 text-emerald-800"
-                  }`}
-                >
-                  {answerBadge}
-                </span>
-              ) : null}
             </button>
           );
         })}
