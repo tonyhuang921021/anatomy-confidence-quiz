@@ -84,7 +84,7 @@ export function ContinueQuizButton() {
 
   return (
     <div className="flex flex-wrap items-center gap-3">
-      <Link href="/quiz" className="secondary-pill">
+      <Link href="/quiz" prefetch={false} className="secondary-pill">
         繼續測驗
       </Link>
       <p className="body-soft text-sm">

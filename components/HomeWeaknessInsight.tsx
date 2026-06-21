@@ -182,7 +182,7 @@ export function HomeWeaknessInsight() {
           至少累積 {MIN_TOTAL_ATTEMPTS_FOR_DIAGNOSIS} 題，且同一小節至少作答 {MIN_SECTION_ATTEMPTS_FOR_DIAGNOSIS} 題後，才會顯示「最容易漏」的判讀。
           {neededAttempts > 0 ? ` 還差 ${neededAttempts} 題。` : ""}
         </p>
-        <Link href="/start" className="mt-4 inline-flex text-sm font-bold text-brand-700">
+        <Link href="/start" prefetch={false} className="mt-4 inline-flex text-sm font-bold text-brand-700">
           先刷一輪 →
         </Link>
       </div>

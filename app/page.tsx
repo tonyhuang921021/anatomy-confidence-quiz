@@ -54,6 +54,11 @@ const QUICK_ENTRIES = [
 const HOME_RELEASE_NOTES = [
   {
     time: "06/21",
+    title: "首頁不再偷搬全站",
+    body: "入口先別急著預抓整包網站，帳號和留言也改成滑近才載；Safari 少一點卡頓，多一點做人。"
+  },
+  {
+    time: "06/21",
     title: "刷題榜改看雲端病歷",
     body: "排行榜改由雲端作答明細重算，不再被某台瀏覽器的本機記憶牽著走；榜一被傳送走這種事先收工。"
   },
@@ -339,16 +344,16 @@ export default function HomePage() {
             目前先暫停登入、留言板、跨裝置同步與雲端筆記，讓作答頁維持順暢。你仍然可以用訪客模式刷題，本機紀錄會留在這台裝置。
           </p>
           <div className="mt-8 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-            <Link href="/start" className="home-action-card home-action-primary">
+            <Link href="/start" prefetch={false} className="home-action-card home-action-primary">
               <span className="text-sm font-bold">開始測驗</span>
             </Link>
-            <Link href="/simulation" className="home-action-card">
+            <Link href="/simulation" prefetch={false} className="home-action-card">
               <span className="text-sm font-bold">開始一份考古題</span>
             </Link>
-            <Link href="/results" className="home-action-card">
+            <Link href="/results" prefetch={false} className="home-action-card">
               <span className="text-sm font-bold">查看本機結果</span>
             </Link>
-            <Link href="/search" className="home-action-card">
+            <Link href="/search" prefetch={false} className="home-action-card">
               <span className="text-sm font-bold">題目搜尋</span>
             </Link>
           </div>
@@ -390,6 +395,7 @@ export default function HomePage() {
                   <Link
                     key={action.href}
                     href={action.href}
+                    prefetch={false}
                     className={action.tone === "primary" ? "home-action-card home-action-primary" : "home-action-card"}
                     style={{ "--home-delay": `${120 + index * 80}ms` } as HomeAnimationStyle}
                   >
@@ -458,6 +464,7 @@ export default function HomePage() {
                 <Link
                   key={entry.href}
                   href={entry.href}
+                  prefetch={false}
                   className="home-entry-card"
                   style={{ "--home-delay": `${220 + index * 70}ms` } as HomeAnimationStyle}
                 >
@@ -470,7 +477,7 @@ export default function HomePage() {
                   <ClientSectionBoundary title="學習筆記入口">
                     <OwnerOnlyNotesLink />
                   </ClientSectionBoundary>
-                  <Link href="/pharmacology-review" className="secondary-pill home-study-link px-4">
+                  <Link href="/pharmacology-review" prefetch={false} className="secondary-pill home-study-link px-4">
                     藥理複習
                   </Link>
                 </div>
