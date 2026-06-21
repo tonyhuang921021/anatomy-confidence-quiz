@@ -742,9 +742,7 @@ function sortFollowUpQuestionIds(questionIds: string[], clusterMap: Map<string, 
 function keepFollowUpQuestionsTogether(questionIds: string[], questionMap: Map<string, Question>) {
   if (questionIds.length === 0) return questionIds;
 
-  const targetCount = questionIds.length;
   const selectedIds = new Set(questionIds);
-  const protectedIds = new Set<string>();
   const expandedIds: string[] = [];
   const pushUnique = (id: string) => {
     if (!expandedIds.includes(id)) expandedIds.push(id);
@@ -755,12 +753,7 @@ function keepFollowUpQuestionsTogether(questionIds: string[], questionMap: Map<s
     const previousQuestion = question ? getPreviousQuestionForFollowUp(question, questionMap) : null;
 
     if (previousQuestion && !selectedIds.has(previousQuestion.id)) {
-      protectedIds.add(previousQuestion.id);
       pushUnique(previousQuestion.id);
-    }
-
-    if (question && isFollowUpStem(question.stem)) {
-      protectedIds.add(id);
     }
 
     pushUnique(id);
@@ -770,16 +763,7 @@ function keepFollowUpQuestionsTogether(questionIds: string[], questionMap: Map<s
     expandedIds.map((id) => questionMap.get(id)).filter((question): question is Question => Boolean(question))
   );
 
-  const sorted = sortFollowUpQuestionIds(expandedIds, clusterMap);
-  if (sorted.length <= targetCount) return sorted;
-
-  const trimmed = [...sorted];
-  for (let index = trimmed.length - 1; index >= 0 && trimmed.length > targetCount; index -= 1) {
-    if (protectedIds.has(trimmed[index])) continue;
-    trimmed.splice(index, 1);
-  }
-
-  return protectedIds.size > targetCount ? trimmed : trimmed.slice(0, targetCount);
+  return sortFollowUpQuestionIds(expandedIds, clusterMap);
 }
 
 function getPrioritizedFreshPool(
@@ -943,7 +927,10 @@ export function createQuestionOrder(
   const customQuestionIds = settings.customQuestionIds ?? [];
   if ((settings.mode === "custom_paper" || settings.mode === "peak_challenge") && customQuestionIds.length > 0) {
     const questionMap = new Map(questions.map((question) => [question.id, question] as const));
-    return customQuestionIds.filter((id) => questionMap.has(id));
+    return keepFollowUpQuestionsTogether(
+      customQuestionIds.filter((id) => questionMap.has(id)),
+      questionMap
+    );
   }
 
   const filtered = filterQuestionPool(questions, settings);
@@ -954,7 +941,7 @@ export function createQuestionOrder(
   const repeatAwarePool = getRepeatAwarePool(sourcePool, allSessions, settings, requestedCount);
   const count = normalizeQuestionCount(settings.questionCount, repeatAwarePool.length);
   const scored = buildQuestionScoreMap(repeatAwarePool, allSessions, settings);
-  const sourceQuestionMap = new Map(repeatAwarePool.map((question) => [question.id, question] as const));
+  const sourceQuestionMap = new Map(sourcePool.map((question) => [question.id, question] as const));
 
   if (settings.mode === "random") {
     return keepFollowUpQuestionsTogether(
