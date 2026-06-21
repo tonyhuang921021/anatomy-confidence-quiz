@@ -23,6 +23,7 @@ type YangmingExplanationResponse = {
 
 const yangmingExplanationCache = new Map<string, YangmingExplanationContent | null>();
 const yangmingExplanationPromiseCache = new Map<string, Promise<YangmingExplanationContent | null>>();
+const TRANSIENT_YANGMING_ERROR_PATTERN = /逾時|timeout|timed out|temporarily|暫時/i;
 
 const YANGMING_REPORT_REASON_PRESETS = [
   "圖片被切掉",
@@ -33,6 +34,45 @@ const YANGMING_REPORT_REASON_PRESETS = [
   "圖片不對",
   "缺少陽明詳解"
 ];
+
+function waitForYangmingRetry(delayMs: number) {
+  return new Promise((resolve) => window.setTimeout(resolve, delayMs));
+}
+
+function isTransientYangmingError(message: string) {
+  return TRANSIENT_YANGMING_ERROR_PATTERN.test(message);
+}
+
+async function fetchYangmingExplanationWithRetry(questionId: string) {
+  let lastMessage = "陽明詳解載入失敗。";
+
+  for (let attempt = 0; attempt < 2; attempt += 1) {
+    const response = await fetch("/api/yangming-explanation", {
+      method: "POST",
+      cache: "no-store",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({ questionId })
+    });
+    const payload = (await response.json().catch(() => null)) as YangmingExplanationResponse | null;
+    if (!response.ok || !payload?.ok) {
+      lastMessage = payload?.message || "陽明詳解載入失敗。";
+    } else if (payload.degraded && !payload.explanation) {
+      lastMessage = payload.message || "陽明詳解暫時讀不到，晚點再試一次。";
+    } else {
+      return payload.explanation ?? null;
+    }
+
+    if (attempt === 0 && isTransientYangmingError(lastMessage)) {
+      await waitForYangmingRetry(450);
+      continue;
+    }
+    break;
+  }
+
+  throw new Error(lastMessage);
+}
 
 type YangmingTextRun = {
   text: string;
@@ -502,17 +542,18 @@ export function YangmingExplanationPanel({
 
   async function loadYangmingExplanation() {
     if (loading) return;
-    if (expanded && checked) {
+    const shouldRetryError = Boolean(error && checked);
+    if (expanded && checked && !shouldRetryError) {
       setExpanded(false);
       return;
     }
     setExpanded(true);
-    if (checked) return;
+    if (checked && !shouldRetryError) return;
 
     setLoading(true);
     setError("");
     try {
-      if (yangmingExplanationCache.has(questionId)) {
+      if (!shouldRetryError && yangmingExplanationCache.has(questionId)) {
         if (activeQuestionIdRef.current !== questionId) return;
         setContent(yangmingExplanationCache.get(questionId) ?? null);
         setChecked(true);
@@ -521,23 +562,7 @@ export function YangmingExplanationPanel({
 
       let pendingRequest = yangmingExplanationPromiseCache.get(questionId);
       if (!pendingRequest) {
-        pendingRequest = fetch("/api/yangming-explanation", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json"
-          },
-          body: JSON.stringify({ questionId })
-        })
-          .then(async (response) => {
-            const payload = (await response.json().catch(() => null)) as YangmingExplanationResponse | null;
-            if (!response.ok || !payload?.ok) {
-              throw new Error(payload?.message || "陽明詳解載入失敗。");
-            }
-            if (payload.degraded && !payload.explanation) {
-              throw new Error(payload.message || "陽明詳解暫時讀不到，晚點再試一次。");
-            }
-            return payload.explanation ?? null;
-          })
+        pendingRequest = fetchYangmingExplanationWithRetry(questionId)
           .then((nextContent) => {
             yangmingExplanationCache.set(questionId, nextContent);
             return nextContent;
@@ -687,7 +712,15 @@ export function YangmingExplanationPanel({
         <div className={`min-w-0 max-w-full overflow-hidden ${hideButton ? "" : compact ? "mt-3" : "mt-4"}`}>
           {error ? (
             <div className="rounded-3xl bg-rose-50 px-4 py-3 text-sm font-semibold text-rose-700 ring-1 ring-rose-100 [overflow-wrap:anywhere]">
-              {error}
+              <p>{error}</p>
+              <button
+                type="button"
+                onClick={() => void loadYangmingExplanation()}
+                disabled={loading}
+                className="mt-3 rounded-full bg-white px-3 py-1 text-[11px] font-bold text-rose-700 ring-1 ring-rose-100 transition hover:bg-rose-100 disabled:cursor-wait disabled:opacity-60"
+              >
+                {loading ? "重試中..." : "再試一次"}
+              </button>
             </div>
           ) : content ? (
             <YangmingExplanationContentBlock

@@ -233,7 +233,7 @@ async function fetchYangmingRows(
         .select(columns)
         .in("question_id", questionIdCandidates)
         .limit(questionIdCandidates.length);
-  return withServerTimeout(query, versionId ? 4200 : 4800, "陽明詳解讀取逾時") as Promise<SupabaseQueryResult>;
+  return withServerTimeout(query, versionId ? 6500 : 7200, "陽明詳解讀取逾時") as Promise<SupabaseQueryResult>;
 }
 
 function isMeaningfulYangmingText(text: string | null | undefined) {
@@ -454,7 +454,7 @@ export async function POST(request: NextRequest) {
       { ok: true, explanation: null, degraded: true, message },
       {
         headers: {
-          "Cache-Control": "public, s-maxage=30, stale-while-revalidate=120"
+          "Cache-Control": "no-store"
         }
       }
     );
