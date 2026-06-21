@@ -54,6 +54,11 @@ const QUICK_ENTRIES = [
 const HOME_RELEASE_NOTES = [
   {
     time: "06/21",
+    title: "刷題榜不再少算半場",
+    body: "有些場次明明 payload 裡有完整題目，明細卻只同步一半；現在改抓最完整紀錄，榜單別再裝失憶。"
+  },
+  {
+    time: "06/21",
     title: "首頁不再偷搬全站",
     body: "入口先別急著預抓整包網站，帳號和留言也改成滑近才載；Safari 少一點卡頓，多一點做人。"
   },

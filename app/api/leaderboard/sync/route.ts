@@ -66,6 +66,41 @@ function getFiniteCount(value: unknown) {
   return Number.isFinite(numberValue) ? numberValue : null;
 }
 
+function chooseBestSessionCount(
+  attemptCount: { total: number; correct: number } | undefined,
+  payloadAttempts: Array<{ isCorrect?: boolean; is_correct?: boolean }>,
+  storedQuestionCount: number | null,
+  storedCorrectCount: number | null
+) {
+  const payloadCorrectCount = payloadAttempts.filter(
+    (attempt) => attempt.isCorrect === true || attempt.is_correct === true
+  ).length;
+  const hasReasonableStoredQuestionCount =
+    storedQuestionCount !== null &&
+    storedQuestionCount > 0 &&
+    storedQuestionCount <= Math.max(MAX_REASONABLE_SESSION_QUESTION_COUNT, attemptCount?.total ?? 0, payloadAttempts.length);
+  const syncedCandidates = [
+    attemptCount && attemptCount.total > 0 ? { total: attemptCount.total, correct: attemptCount.correct } : null,
+    payloadAttempts.length > 0 ? { total: payloadAttempts.length, correct: payloadCorrectCount } : null
+  ].filter((candidate): candidate is { total: number; correct: number } => Boolean(candidate));
+
+  const bestSyncedCount = syncedCandidates.reduce(
+    (current, candidate) => (candidate.total > current.total ? candidate : current),
+    { total: 0, correct: 0 }
+  );
+  const best =
+    bestSyncedCount.total > 0
+      ? bestSyncedCount
+      : hasReasonableStoredQuestionCount
+        ? { total: storedQuestionCount, correct: storedCorrectCount ?? 0 }
+        : { total: 0, correct: 0 };
+
+  return {
+    total: best.total,
+    correct: Math.min(best.correct, best.total)
+  };
+}
+
 async function fetchCompletedSessionRows(supabase: any, userId: string) {
   const rows: QuizSessionSummaryRow[] = [];
 
@@ -140,25 +175,15 @@ async function summarizeCloudSessions(supabase: any, userId: string) {
     const attemptCount = attemptCounts.get(row.id);
     const storedQuestionCount = getFiniteCount(row.question_count);
     const storedCorrectCount = getFiniteCount(row.correct_count);
-    const hasReasonableStoredQuestionCount =
-      storedQuestionCount !== null &&
-      storedQuestionCount > 0 &&
-      storedQuestionCount <= Math.max(MAX_REASONABLE_SESSION_QUESTION_COUNT, attemptCount?.total ?? 0, payloadAttempts.length);
-    const questionCount =
-      attemptCount?.total || payloadAttempts.length || (hasReasonableStoredQuestionCount ? storedQuestionCount : 0);
-    const payloadCorrectCount = payloadAttempts.filter(
-      (attempt) => attempt.isCorrect === true || attempt.is_correct === true
-    ).length;
-    const correctCount =
-      attemptCount?.correct ??
-      (payloadAttempts.length > 0
-        ? payloadCorrectCount
-        : hasReasonableStoredQuestionCount
-          ? storedCorrectCount ?? 0
-          : 0);
+    const sessionCount = chooseBestSessionCount(
+      attemptCount,
+      payloadAttempts,
+      storedQuestionCount,
+      storedCorrectCount
+    );
 
-    totalAttempts += questionCount;
-    correctAttempts += Math.min(correctCount, questionCount);
+    totalAttempts += sessionCount.total;
+    correctAttempts += sessionCount.correct;
   }
 
   return {
