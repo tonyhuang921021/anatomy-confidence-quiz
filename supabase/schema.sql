@@ -144,11 +144,15 @@ create table if not exists public.leaderboard_profiles (
 create index if not exists leaderboard_profiles_total_attempts_idx
 on public.leaderboard_profiles (total_attempts desc, correct_rate desc);
 
+revoke all privileges
+  on public.leaderboard_profiles
+  from anon, authenticated, public;
+
 grant select
   on public.leaderboard_profiles
   to anon;
 
-grant select, insert, update, delete
+grant select
   on public.leaderboard_profiles
   to authenticated;
 
@@ -166,17 +170,6 @@ create policy "Anyone can read leaderboard profiles"
 on public.leaderboard_profiles
 for select
 using (true);
-
-create policy "Users can insert their own leaderboard profile"
-on public.leaderboard_profiles
-for insert
-with check ((select auth.uid()) = user_id);
-
-create policy "Users can update their own leaderboard profile"
-on public.leaderboard_profiles
-for update
-using ((select auth.uid()) = user_id)
-with check ((select auth.uid()) = user_id);
 
 create table if not exists public.site_visitors (
   visitor_id text primary key,
