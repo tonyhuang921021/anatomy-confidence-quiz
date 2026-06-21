@@ -14,6 +14,7 @@ import {
   updateCustomPaperMetadata
 } from "@/lib/cloudSync";
 import { DEFAULT_QUIZ_SETTINGS } from "@/lib/quizAnalysis";
+import { MAX_PRACTICE_SOURCE_YEAR, MIN_PRACTICE_SOURCE_YEAR } from "@/lib/practiceYears";
 import { loadCompletedSessions, saveQuizSettings } from "@/lib/storage";
 import { getOrCreateVisitorId } from "@/lib/visitor";
 import type {
@@ -77,8 +78,8 @@ const allSourceYears = Array.from(
   )
 ).sort((left, right) => left - right);
 
-const MIN_SOURCE_YEAR = allSourceYears[0] ?? 100;
-const MAX_SOURCE_YEAR = allSourceYears[allSourceYears.length - 1] ?? 115;
+const MIN_SOURCE_YEAR = allSourceYears[0] ?? MIN_PRACTICE_SOURCE_YEAR;
+const MAX_SOURCE_YEAR = allSourceYears[allSourceYears.length - 1] ?? MAX_PRACTICE_SOURCE_YEAR;
 
 const difficultyMeta: Record<CustomPaperDifficulty, { label: string; description: string }> = {
   easy: {

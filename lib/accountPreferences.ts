@@ -5,6 +5,7 @@ import type {
   PracticeYearRange,
   ThemeMode
 } from "@/lib/storage";
+import { normalizePracticeYearRange } from "@/lib/practiceYears";
 
 type MetadataSource = User["user_metadata"] | null | undefined;
 
@@ -34,10 +35,7 @@ export function getPracticeYearRangePreference(
   const yearTo = metadata?.practice_year_to;
 
   if (typeof yearFrom === "number" && Number.isFinite(yearFrom) && typeof yearTo === "number" && Number.isFinite(yearTo)) {
-    return {
-      yearFrom: Math.min(yearFrom, yearTo),
-      yearTo: Math.max(yearFrom, yearTo)
-    };
+    return normalizePracticeYearRange({ yearFrom, yearTo });
   }
 
   return defaultRange ?? null;

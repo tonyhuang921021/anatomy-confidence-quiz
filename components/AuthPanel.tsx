@@ -38,13 +38,13 @@ import {
   getThemeModePreference,
   type AccountPreferencePatch
 } from "@/lib/accountPreferences";
+import { PRACTICE_YEAR_OPTIONS, normalizePracticeYearRange } from "@/lib/practiceYears";
 import { getSupabaseBrowserClient } from "@/lib/supabase/client";
 import { isSupabaseRecoveryMode } from "@/lib/supabase/recoveryMode";
 
 const AUTH_ACTION_TIMEOUT_MS = 15000;
 const AUTH_SESSION_RECOVERY_TIMEOUT_MS = 2500;
 const RECOVERY_MODE_MESSAGE = "暫用本機，稍後補傳。雲端登入與同步維護中，目前紀錄會先留在本機。";
-const PRACTICE_YEAR_OPTIONS = Array.from({ length: 16 }, (_, index) => 100 + index);
 const DEFAULT_PRACTICE_YEAR_RANGE: PracticeYearRange = {
   yearFrom: PRACTICE_YEAR_OPTIONS[0],
   yearTo: PRACTICE_YEAR_OPTIONS[PRACTICE_YEAR_OPTIONS.length - 1]
@@ -201,10 +201,7 @@ export function AuthPanel() {
   }
 
   function handleChangePracticeYearRange(next: PracticeYearRange) {
-    const normalized = {
-      yearFrom: Math.min(next.yearFrom, next.yearTo),
-      yearTo: Math.max(next.yearFrom, next.yearTo)
-    };
+    const normalized = normalizePracticeYearRange(next);
     setPracticeYearRange(normalized);
     savePracticeYearRange(normalized);
     if (!user) return;

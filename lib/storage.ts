@@ -8,6 +8,7 @@ import {
   QuizSettings
 } from "@/types/quiz";
 import { normalizeQuestionExplanationOverride as normalizeQuestionExplanationOverridePayload } from "@/lib/questionExplanationFormat";
+import { normalizePracticeYearRange } from "@/lib/practiceYears";
 
 const CURRENT_SESSION_KEY = "anatomy-confidence-current-session";
 const COMPLETED_SESSIONS_KEY = "anatomy-confidence-completed-sessions";
@@ -723,10 +724,7 @@ export function loadThemeMode(): ThemeMode {
 
 export function savePracticeYearRange(range: PracticeYearRange) {
   if (!isBrowser()) return;
-  const normalized = {
-    yearFrom: Math.min(range.yearFrom, range.yearTo),
-    yearTo: Math.max(range.yearFrom, range.yearTo)
-  };
+  const normalized = normalizePracticeYearRange(range);
   safeLocalStorageSetItem(getScopedKey(PRACTICE_YEAR_RANGE_KEY), JSON.stringify(normalized));
   window.dispatchEvent(new CustomEvent("practice-year-range-change", { detail: normalized }));
 }
@@ -787,10 +785,10 @@ export function loadPracticeYearRange(defaultRange?: PracticeYearRange): Practic
       typeof parsed.yearTo === "number" &&
       Number.isFinite(parsed.yearTo)
     ) {
-      return {
-        yearFrom: Math.min(parsed.yearFrom, parsed.yearTo),
-        yearTo: Math.max(parsed.yearFrom, parsed.yearTo)
-      };
+      return normalizePracticeYearRange({
+        yearFrom: parsed.yearFrom,
+        yearTo: parsed.yearTo
+      });
     }
   } catch {
     return defaultRange ?? null;

@@ -16,6 +16,7 @@ import {
   SubjectName,
   SummaryStats
 } from "@/types/quiz";
+import { normalizePracticeYearRange } from "@/lib/practiceYears";
 
 type SectionAggregate = {
   chapter: string;
@@ -915,14 +916,19 @@ function buildQuestionScoreMap(
 }
 
 function filterQuestionPool(questions: Question[], settings: QuizSettings) {
+  const yearRange =
+    typeof settings.yearFrom === "number" && typeof settings.yearTo === "number"
+      ? normalizePracticeYearRange({ yearFrom: settings.yearFrom, yearTo: settings.yearTo })
+      : null;
+
   return questions.filter((question) => {
     if (settings.excludeAiGenerated && question.sourceType === "AI_GENERATED") return false;
     if (settings.chapter && question.chapter !== settings.chapter) return false;
     if (settings.section && question.section !== settings.section) return false;
-    if (typeof settings.yearFrom === "number" && typeof question.sourceYear === "number" && question.sourceYear < settings.yearFrom) {
+    if (yearRange && typeof question.sourceYear === "number" && question.sourceYear < yearRange.yearFrom) {
       return false;
     }
-    if (typeof settings.yearTo === "number" && typeof question.sourceYear === "number" && question.sourceYear > settings.yearTo) {
+    if (yearRange && typeof question.sourceYear === "number" && question.sourceYear > yearRange.yearTo) {
       return false;
     }
     return true;

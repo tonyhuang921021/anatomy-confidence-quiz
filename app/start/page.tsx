@@ -30,6 +30,7 @@ import {
   getPracticeStopAfterReviewPreference,
   getPracticeYearRangePreference
 } from "@/lib/accountPreferences";
+import { MAX_PRACTICE_SOURCE_YEAR, MIN_PRACTICE_SOURCE_YEAR, normalizePracticeYearRange } from "@/lib/practiceYears";
 import { buildNewQuizHref } from "@/lib/startSettingsUrl";
 import type { Question, QuizSettings, SubjectName } from "@/types/quiz";
 
@@ -67,8 +68,8 @@ export default function StartPage() {
   );
   const defaultPracticeYearRange = useMemo<PracticeYearRange>(
     () => ({
-      yearFrom: availableYears[0] ?? 100,
-      yearTo: availableYears[availableYears.length - 1] ?? 115
+      yearFrom: availableYears[0] ?? MIN_PRACTICE_SOURCE_YEAR,
+      yearTo: availableYears[availableYears.length - 1] ?? MAX_PRACTICE_SOURCE_YEAR
     }),
     [availableYears]
   );
@@ -82,7 +83,7 @@ export default function StartPage() {
   useEffect(() => {
     const accountRange = getPracticeYearRangePreference(user?.user_metadata, defaultPracticeYearRange);
     const nextRange = accountRange ?? loadPracticeYearRange(defaultPracticeYearRange) ?? defaultPracticeYearRange;
-    setPracticeYearRange(nextRange);
+    setPracticeYearRange(normalizePracticeYearRange(nextRange));
   }, [defaultPracticeYearRange, user?.id, user?.user_metadata]);
 
   useEffect(() => {

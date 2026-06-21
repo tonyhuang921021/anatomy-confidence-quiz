@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 import { createOpenAIText, isOpenAIConfigured } from "@/lib/openai";
 import { getActiveAIAccountBan } from "@/lib/aiAccountBan";
+import { MAX_PRACTICE_SOURCE_YEAR, MIN_PRACTICE_SOURCE_YEAR, normalizePracticeYearRange } from "@/lib/practiceYears";
 import { getRecoveryTimestamp, isSupabaseRecoveryMode } from "@/lib/supabase/recoveryMode";
 import { bundledCustomPaperSeeds } from "@/data/bundledCustomPapers";
 import {
@@ -1292,10 +1293,16 @@ export async function POST(request: NextRequest) {
       const selectedSubjects = getAllowedSubjectList(body.selectedSubjects);
       const effectiveSubjects =
         selectedSubjects.length > 0 ? selectedSubjects : Array.from(ALLOWED_SUBJECTS);
-      const normalizedYearFrom = Number.isFinite(body.yearFrom) ? Math.trunc(body.yearFrom as number) : 100;
-      const normalizedYearTo = Number.isFinite(body.yearTo) ? Math.trunc(body.yearTo as number) : 115;
-      const yearFrom = Math.min(normalizedYearFrom, normalizedYearTo);
-      const yearTo = Math.max(normalizedYearFrom, normalizedYearTo);
+      const normalizedYearFrom = Number.isFinite(body.yearFrom)
+        ? Math.trunc(body.yearFrom as number)
+        : MIN_PRACTICE_SOURCE_YEAR;
+      const normalizedYearTo = Number.isFinite(body.yearTo)
+        ? Math.trunc(body.yearTo as number)
+        : MAX_PRACTICE_SOURCE_YEAR;
+      const { yearFrom, yearTo } = normalizePracticeYearRange({
+        yearFrom: normalizedYearFrom,
+        yearTo: normalizedYearTo
+      });
       const actor = await resolveActor(supabase, body.accessToken, body.visitorId);
       if (!actor.userId || !actor.userEmail) {
         return NextResponse.json(
