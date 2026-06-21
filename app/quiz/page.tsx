@@ -1551,6 +1551,7 @@ export default function QuizPage() {
           <QuestionCard
             question={currentQuestion}
             selectedAnswer={selectedAnswer}
+            submittedResult={submittedAttempt ?? undefined}
             onSelect={handleSelectAnswer}
             showMetadata={session.settings?.mode !== "simulation"}
           />

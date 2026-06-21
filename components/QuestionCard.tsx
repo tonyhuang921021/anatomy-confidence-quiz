@@ -7,6 +7,11 @@ import { OptionKey, Question } from "@/types/quiz";
 type QuestionCardProps = {
   question: Question;
   selectedAnswer?: OptionKey;
+  submittedResult?: {
+    selectedAnswer: OptionKey;
+    correctAnswer: OptionKey;
+    isCorrect: boolean;
+  };
   onSelect: (value: OptionKey) => void;
   showMetadata?: boolean;
 };
@@ -38,9 +43,26 @@ function getStableHash(text: string) {
   return text.split("").reduce((sum, char, index) => sum + char.charCodeAt(0) * (index + 1), 0);
 }
 
+function getAcceptedAnswerSet(question: Question, fallbackAnswer: OptionKey) {
+  if (question.answerCreditType === "all_credit") {
+    return new Set<OptionKey>();
+  }
+
+  if (
+    (question.answerCreditType === "multiple_accepted" ||
+      question.answerCreditType === "multiple_answers") &&
+    question.acceptedAnswers?.length
+  ) {
+    return new Set(question.acceptedAnswers);
+  }
+
+  return new Set<OptionKey>([fallbackAnswer]);
+}
+
 export function QuestionCard({
   question,
   selectedAnswer,
+  submittedResult,
   onSelect,
   showMetadata = true
 }: QuestionCardProps) {
@@ -88,25 +110,80 @@ export function QuestionCard({
       <div className="mt-6 grid gap-3">
         {availableOptionKeys.map((key) => {
           const isSelected = selectedAnswer === key;
+          const acceptedAnswers = submittedResult
+            ? getAcceptedAnswerSet(question, submittedResult.correctAnswer)
+            : new Set<OptionKey>();
+          const isCorrectOption = acceptedAnswers.has(key);
+          const isSubmittedSelected = submittedResult?.selectedAnswer === key;
+          const isAllCreditSelected =
+            question.answerCreditType === "all_credit" && isSubmittedSelected;
+          const isCorrectSelected =
+            Boolean(submittedResult) && isSubmittedSelected && (submittedResult?.isCorrect || isCorrectOption);
+          const isWrongSelected =
+            Boolean(submittedResult) &&
+            isSubmittedSelected &&
+            !submittedResult?.isCorrect &&
+            !isCorrectOption &&
+            question.answerCreditType !== "all_credit";
+          const reviewTone = isWrongSelected
+            ? "wrong"
+            : isCorrectOption || isCorrectSelected || isAllCreditSelected
+              ? "correct"
+              : null;
+          const optionClassName = submittedResult
+            ? reviewTone === "wrong"
+              ? "border-rose-400 bg-rose-50 ring-2 ring-rose-200"
+              : reviewTone === "correct"
+                ? "border-emerald-500 bg-emerald-50 ring-2 ring-emerald-200"
+                : "border-slate-200 bg-white"
+            : isSelected
+              ? "border-brand-500 bg-brand-50 ring-2 ring-brand-200"
+              : "border-slate-200 bg-white hover:border-brand-300 hover:bg-brand-50/50";
+          const labelClassName = submittedResult
+            ? reviewTone === "wrong"
+              ? "bg-rose-600 text-white"
+              : reviewTone === "correct"
+                ? "bg-emerald-600 text-white"
+                : "bg-slate-100 text-slate-600"
+            : isSelected
+              ? "bg-brand-600 text-white"
+              : "bg-slate-100 text-slate-600";
+          const answerBadge =
+            submittedResult && isSubmittedSelected && (isCorrectOption || submittedResult.isCorrect)
+              ? question.answerCreditType === "all_credit"
+                ? "你的答案"
+                : "你的答案 / 正解"
+              : submittedResult && isSubmittedSelected
+                ? "你的答案"
+                : submittedResult && isCorrectOption
+                  ? "正解"
+                  : "";
           return (
             <button
               key={key}
               type="button"
               onClick={() => onSelect(key)}
-              className={`min-h-12 rounded-3xl border px-4 py-4 text-left transition sm:px-5 ${
-                isSelected
-                  ? "border-brand-500 bg-brand-50 ring-2 ring-brand-200"
-                  : "border-slate-200 bg-white hover:border-brand-300 hover:bg-brand-50/50"
-              }`}
+              className={`min-h-12 rounded-3xl border px-4 py-4 text-left transition sm:px-5 ${optionClassName}`}
             >
               <QuestionOptionBlock
                 question={question}
                 optionKey={key}
                 labelClassName={`mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-sm font-bold ${
-                  isSelected ? "bg-brand-600 text-white" : "bg-slate-100 text-slate-600"
+                  labelClassName
                 }`}
                 textClassName="min-w-0 break-words text-sm leading-7 text-slate-800 sm:text-base"
               />
+              {answerBadge ? (
+                <span
+                  className={`ml-10 mt-3 inline-flex rounded-full px-3 py-1 text-xs font-bold ${
+                    reviewTone === "wrong"
+                      ? "bg-rose-100 text-rose-800"
+                      : "bg-emerald-100 text-emerald-800"
+                  }`}
+                >
+                  {answerBadge}
+                </span>
+              ) : null}
             </button>
           );
         })}

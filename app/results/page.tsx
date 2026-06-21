@@ -118,6 +118,68 @@ function getAvailableOptionKeys(question: Question) {
   return optionKeys.filter((key) => typeof question.options[key] === "string");
 }
 
+function getAcceptedAnswerSet(question: Question, fallbackAnswer: OptionKey) {
+  if (question.answerCreditType === "all_credit") {
+    return new Set<OptionKey>();
+  }
+
+  if (
+    (question.answerCreditType === "multiple_accepted" ||
+      question.answerCreditType === "multiple_answers") &&
+    question.acceptedAnswers?.length
+  ) {
+    return new Set(question.acceptedAnswers);
+  }
+
+  return new Set<OptionKey>([fallbackAnswer]);
+}
+
+function getResultOptionState(question: Question, attempt: Attempt, optionKey: OptionKey) {
+  const acceptedAnswers = getAcceptedAnswerSet(question, attempt.correctAnswer);
+  const isSelected = attempt.selectedAnswer === optionKey;
+  const isCorrectOption = acceptedAnswers.has(optionKey);
+  const isAllCreditSelected = question.answerCreditType === "all_credit" && isSelected;
+  const isCorrectSelected = isSelected && (attempt.isCorrect || isCorrectOption);
+  const isWrongSelected =
+    isSelected &&
+    !attempt.isCorrect &&
+    !isCorrectOption &&
+    question.answerCreditType !== "all_credit";
+
+  if (isWrongSelected) {
+    return {
+      wrapperClassName: "rounded-2xl border border-rose-300 bg-rose-50 p-4 ring-2 ring-rose-100",
+      labelClassName:
+        "mt-0.5 inline-flex min-w-8 justify-center rounded-full bg-rose-600 px-2 py-1 text-xs font-semibold text-white",
+      badge: "你的答案",
+      badgeClassName: "bg-rose-100 text-rose-800"
+    };
+  }
+
+  if (isCorrectOption || isCorrectSelected || isAllCreditSelected) {
+    return {
+      wrapperClassName: "rounded-2xl border border-emerald-300 bg-emerald-50 p-4 ring-2 ring-emerald-100",
+      labelClassName:
+        "mt-0.5 inline-flex min-w-8 justify-center rounded-full bg-emerald-600 px-2 py-1 text-xs font-semibold text-white",
+      badge:
+        isSelected && (isCorrectOption || attempt.isCorrect)
+          ? question.answerCreditType === "all_credit"
+            ? "你的答案"
+            : "你的答案 / 正解"
+          : "正解",
+      badgeClassName: "bg-emerald-100 text-emerald-800"
+    };
+  }
+
+  return {
+    wrapperClassName: "rounded-2xl bg-white p-4",
+    labelClassName:
+      "mt-0.5 inline-flex min-w-8 justify-center rounded-full bg-white px-2 py-1 text-xs font-semibold text-slate-700 ring-1 ring-slate-200",
+    badge: "",
+    badgeClassName: ""
+  };
+}
+
 type ResultState = {
   session: QuizSession | null;
   sessions: QuizSession[];
@@ -1130,14 +1192,26 @@ function ResultsPageContent() {
           />
         </div>
         <div className="grid gap-3">
-          {getAvailableOptionKeys(question).map((key) => (
-            <QuestionOptionBlock
-              key={`${question.id}-${optionKeySuffix}-${key}`}
-              question={question}
-              optionKey={key}
-              wrapperClassName="rounded-2xl bg-white p-4"
-            />
-          ))}
+          {getAvailableOptionKeys(question).map((key) => {
+            const optionState = getResultOptionState(question, attempt, key);
+
+            return (
+              <div key={`${question.id}-${optionKeySuffix}-${key}`} className={optionState.wrapperClassName}>
+                <QuestionOptionBlock
+                  question={question}
+                  optionKey={key}
+                  labelClassName={optionState.labelClassName}
+                />
+                {optionState.badge ? (
+                  <span
+                    className={`ml-11 mt-3 inline-flex rounded-full px-3 py-1 text-xs font-bold ${optionState.badgeClassName}`}
+                  >
+                    {optionState.badge}
+                  </span>
+                ) : null}
+              </div>
+            );
+          })}
         </div>
         <p>
           <span className="font-semibold">我的答案：</span>
