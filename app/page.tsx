@@ -4,9 +4,9 @@ import { ContinueQuizButton } from "@/components/ContinueQuizButton";
 import { ClientSectionBoundary } from "@/components/ClientSectionBoundary";
 import { ExamCountdown } from "@/components/ExamCountdown";
 import { HomeToneBanner } from "@/components/HomeToneBanner";
+import { HomeWeaknessInsight } from "@/components/HomeWeaknessInsight";
 import { LazyAuthPanel } from "@/components/LazyAuthPanel";
 import { LazyFeedbackBoard } from "@/components/LazyFeedbackBoard";
-import { LazyHomeWeaknessInsight } from "@/components/LazyHomeWeaknessInsight";
 import { OwnerOnlyNotesLink } from "@/components/OwnerOnlyNotesLink";
 import { isSupabaseRecoveryMode } from "@/lib/supabase/recoveryMode";
 
@@ -52,11 +52,6 @@ const QUICK_ENTRIES = [
 ] as const;
 
 const HOME_RELEASE_NOTES = [
-  {
-    time: "06/21",
-    title: "首頁別再偷跑重東西",
-    body: "帳號和留言板不再趁你剛進首頁就偷偷搬家，弱點判讀也晚一拍再整理；先順，再焦慮。"
-  },
   {
     time: "06/21",
     title: "年份設定回到西元宇宙",
@@ -436,7 +431,7 @@ export default function HomePage() {
                 </div>
                 <div className="mt-6 grid gap-3">
                   <ClientSectionBoundary title="首頁弱點判讀">
-                    <LazyHomeWeaknessInsight />
+                    <HomeWeaknessInsight />
                   </ClientSectionBoundary>
                   <ExamCountdown />
                 </div>

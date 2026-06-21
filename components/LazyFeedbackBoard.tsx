@@ -5,7 +5,17 @@ import { useEffect, useRef, useState } from "react";
 
 const loadFeedbackBoard = () => import("@/components/FeedbackBoard").then((mod) => mod.FeedbackBoard);
 
-function useNearViewport(rootMargin = "760px") {
+function scheduleIdleWork(callback: () => void, timeoutMs: number) {
+  if ("requestIdleCallback" in window) {
+    const idleId = window.requestIdleCallback(callback, { timeout: timeoutMs });
+    return () => window.cancelIdleCallback(idleId);
+  }
+
+  const timerId = globalThis.setTimeout(callback, timeoutMs);
+  return () => globalThis.clearTimeout(timerId);
+}
+
+function useNearViewport(rootMargin = "2200px") {
   const ref = useRef<HTMLDivElement | null>(null);
   const [shouldLoad, setShouldLoad] = useState(false);
 
@@ -60,6 +70,12 @@ const FeedbackBoard = dynamic(
 
 export function LazyFeedbackBoard() {
   const { ref, shouldLoad } = useNearViewport();
+
+  useEffect(() => {
+    return scheduleIdleWork(() => {
+      void loadFeedbackBoard();
+    }, 1600);
+  }, []);
 
   if (!shouldLoad) {
     return (
