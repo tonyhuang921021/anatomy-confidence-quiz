@@ -991,6 +991,31 @@ function applyQuestionMedia(question: Question): Question {
 }
 
 const questionTextOverrides: Record<string, QuestionTextOverride> = {
+  "MOEX-111100-1301-Q076": {
+    stem:
+      "在一個符合 Michaelis-Menten equation 的酵素催化反應中，當受質（substrate）濃度極小於 Michaelis 常數（Km）時，此反應之速率常數應為下列何者？",
+    options: {
+      A: "Vmax",
+      B: "kcat / Km",
+      C: "1 / kcat",
+      D: "kcat × Km"
+    }
+  },
+  "MOEX-114090-1301-Q006": {
+    stem: "下列何者位於大腦額葉？",
+    options: {
+      A: "angular gyrus",
+      B: "Broca's area",
+      C: "transverse gyri of Heschl",
+      D: "cuneus"
+    },
+    optionAnalysis: {
+      A: "不選。Angular gyrus 位於頂葉，不是額葉。",
+      B: "正確／官方採計。Broca's area 位於優勢半球額下回後部，屬於額葉。",
+      C: "不選。Transverse gyri of Heschl 位於顳葉。",
+      D: "不選。Cuneus 位於枕葉。"
+    }
+  },
   "MOEX-102030-2101-Q050": {
     explanation:
       "cDNA microarray 是用核酸探針偵測樣本中 mRNA/cDNA 的相對表現量，可同時比較大量基因表現；晶片上的 DNA 探針可用 PCR 產物點樣，也可用 photolithography 在晶片上合成。它測的是核酸層級的基因表現，不是直接偵測蛋白質表現，因此 D 為錯誤敘述。",

@@ -53,6 +53,11 @@ const QUICK_ENTRIES = [
 
 const HOME_RELEASE_NOTES = [
   {
+    time: "06/22",
+    title: "題目空格被抓回來",
+    body: "修掉幾題 OCR 把英文和公式拆成碎片的問題，Broca 和 kcat/Km 不再像被鍵盤打散。"
+  },
+  {
     time: "06/21",
     title: "焦慮模式嘴力上修",
     body: "首頁焦慮文案新增一批網感碎念，會依題量和時間換嘴法；今天沒刷題，首頁會很有意見。"
