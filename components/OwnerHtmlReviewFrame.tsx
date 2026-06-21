@@ -11,6 +11,7 @@ type OwnerHtmlReviewFrameProps = {
 };
 
 const OWNER_REVIEW_VIEWPORT_FIX = `
+<base href="about:srcdoc">
 <style id="owner-review-viewport-fix">
   html,
   body {
@@ -58,6 +59,24 @@ const OWNER_REVIEW_VIEWPORT_FIX = `
     }
   }
 </style>
+<script id="owner-review-anchor-fix">
+  (() => {
+    document.addEventListener("click", (event) => {
+      const link = event.target.closest('a[href^="#"]');
+      if (!link) return;
+
+      const hash = link.getAttribute("href");
+      if (!hash || hash === "#") return;
+
+      const target = document.getElementById(decodeURIComponent(hash.slice(1)));
+      if (!target) return;
+
+      event.preventDefault();
+      target.scrollIntoView({ behavior: "smooth", block: "start" });
+      if (window.history?.replaceState) window.history.replaceState(null, "", hash);
+    });
+  })();
+</script>
 `;
 
 function applyOwnerReviewViewportFix(html: string) {
