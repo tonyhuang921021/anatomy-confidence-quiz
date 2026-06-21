@@ -76,7 +76,7 @@ export function StudyNoteQuestionCard({ question, link, title }: Props) {
         message?: string;
       };
 
-      if (!response.ok || !payload.ok || !payload.explanation || payload.sharedSaved === false) {
+      if (!response.ok || !payload.ok || !payload.explanation) {
         if (response.status === 429 && payload.message && typeof window !== "undefined") {
           window.alert(payload.message);
         }

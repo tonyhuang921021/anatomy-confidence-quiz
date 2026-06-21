@@ -367,7 +367,8 @@ function selectLocalQuestionSet(
 function getQuestionByOrder(
   session: QuizSession,
   fallbackMap: Map<string, Question>,
-  classificationOverrides: Record<string, QuestionClassificationOverride> = {}
+  classificationOverrides: Record<string, QuestionClassificationOverride> = {},
+  explanationOverrides: Record<string, QuestionExplanationOverride> = {}
 ) {
   const ids = session.questionOrder ?? [];
   const generatedMap = new Map(
@@ -380,9 +381,20 @@ function getQuestionByOrder(
     .map((id) => generatedMap.get(id) ?? fallbackMap.get(id))
     .map((question) =>
       question
-        ? applyQuestionExplanationOverride(
-            applyQuestionClassificationOverride(question, classificationOverrides[question.id])
-          )
+        ? (() => {
+            const storedQuestion = applyQuestionExplanationOverride(
+              applyQuestionClassificationOverride(question, classificationOverrides[question.id])
+            );
+            const override = explanationOverrides[question.id];
+            return override
+              ? {
+                  ...storedQuestion,
+                  explanation: override.explanation || storedQuestion.explanation,
+                  optionAnalysis: override.optionAnalysis ?? storedQuestion.optionAnalysis,
+                  memoryTip: override.memoryTip ?? storedQuestion.memoryTip
+                }
+              : storedQuestion;
+          })()
         : question
     )
     .filter((question): question is Question => Boolean(question));
@@ -756,10 +768,18 @@ export default function QuizPage() {
 
   const questionSet = useMemo(
     () =>
-      session ? getQuestionByOrder(session, allQuestionFallbackMap, classificationOverrides) : [],
+      session
+        ? getQuestionByOrder(
+            session,
+            allQuestionFallbackMap,
+            classificationOverrides,
+            explanationOverrides
+          )
+        : [],
     [
       allQuestionFallbackMap,
       classificationOverrides,
+      explanationOverrides,
       session?.generatedQuestions,
       session?.id,
       session?.questionOrder,
@@ -1165,7 +1185,7 @@ export default function QuizPage() {
         message?: string;
       };
 
-      if (!response.ok || !payload.ok || !payload.explanation || payload.sharedSaved === false) {
+      if (!response.ok || !payload.ok || !payload.explanation) {
         if (response.status === 429 && payload.message && typeof window !== "undefined") {
           window.alert(payload.message);
         }

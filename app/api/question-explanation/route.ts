@@ -936,12 +936,20 @@ export async function POST(request: NextRequest) {
       used_at: new Date().toISOString()
     }, body.accessToken);
 
-    await upsertSharedExplanationOverride(
-      body.question.id ?? body.question.stem.slice(0, 120),
-      parsed,
-      result.model,
-      body.accessToken
-    );
+    let sharedSaved = true;
+    let sharedSaveMessage: string | undefined;
+    try {
+      await upsertSharedExplanationOverride(
+        body.question.id ?? body.question.stem.slice(0, 120),
+        parsed,
+        result.model,
+        body.accessToken
+      );
+    } catch (error) {
+      sharedSaved = false;
+      sharedSaveMessage = formatUnknownError(error);
+      console.error("AI explanation shared override save skipped:", error);
+    }
 
     logQuestionExplanationRoute({
       action,
@@ -954,7 +962,8 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({
       ok: true,
       configured: true,
-      sharedSaved: true,
+      sharedSaved,
+      sharedSaveMessage,
       model: result.model,
       explanation: parsed.explanation,
       optionAnalysis: parsed.optionAnalysis ?? {},

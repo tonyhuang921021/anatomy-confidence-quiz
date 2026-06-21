@@ -477,7 +477,7 @@ export async function POST(request: NextRequest) {
           .eq("reaction_type", reactionType)
           .eq("user_id", verifiedUser.id)
           .maybeSingle(),
-        1600,
+        3600,
         "題目快速標記查詢逾時"
       )) as { data?: { id?: string | number } | null; error?: unknown };
 
@@ -489,7 +489,7 @@ export async function POST(request: NextRequest) {
             .from("question_supplement_reactions")
             .delete()
             .eq("id", existing.id),
-          1600,
+          3600,
           "題目快速標記取消逾時"
         )) as { error?: unknown };
         if (error) throw error;
@@ -503,7 +503,7 @@ export async function POST(request: NextRequest) {
               user_id: verifiedUser.id,
               user_email: verifiedUser.email ?? null
             }),
-          1600,
+          3600,
           "題目快速標記儲存逾時"
         )) as { error?: unknown };
         if (error) throw error;
