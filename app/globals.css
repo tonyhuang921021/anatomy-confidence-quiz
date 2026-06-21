@@ -1343,8 +1343,9 @@ html[data-browser="safari"] .home-shell .surface-card-muted {
   box-shadow: none;
 }
 
-html[data-browser="safari"] .home-feedback-board {
-  contain: paint;
+html[data-browser="safari"] .home-feedback-scroll {
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: auto;
 }
 
 html[data-browser="safari"] .home-hero,

@@ -54,8 +54,8 @@ const QUICK_ENTRIES = [
 const HOME_RELEASE_NOTES = [
   {
     time: "06/21",
-    title: "留言板先站穩再補人",
-    body: "首頁留言照樣自動抓，但 Safari 先畫前幾則、穩定後再補齊，避免一滑就出現大型空白哲學區。"
+    title: "首頁留言板收回短版",
+    body: "留言照樣自動抓，但不再一路把首頁撐長；首頁是拿來開始刷題的，不是拿來考古留言地層的。"
   },
   {
     time: "06/21",
