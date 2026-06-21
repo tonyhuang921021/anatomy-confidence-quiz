@@ -228,6 +228,7 @@ export default function ReviewPage() {
             onStartReview={handleStartPracticeReview}
             items={practiceItems}
             allQuestions={allQuestions}
+            manualEditScope="practice-review"
             headerAction={
               <button
                 type="button"
@@ -275,6 +276,7 @@ export default function ReviewPage() {
                 onStartReview={handleStartPracticeReview}
                 items={practiceItems}
                 allQuestions={allQuestions}
+                manualEditScope="practice-review"
                 fullscreenMobile
               />
             </div>

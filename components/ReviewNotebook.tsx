@@ -42,10 +42,60 @@ type RenderedReviewQuestionItem = ReviewQuestionItem & {
   renderedQuestion: Question;
 };
 
+type ManualReviewState = {
+  resolvedIds: Set<string>;
+  unresolvedIds: Set<string>;
+};
+
 type RelatedQuestionIndex = {
   byConcept: Map<string, Question[]>;
   bySection: Map<string, Question[]>;
 };
+
+function createEmptyManualReviewState(): ManualReviewState {
+  return {
+    resolvedIds: new Set<string>(),
+    unresolvedIds: new Set<string>()
+  };
+}
+
+function parseManualReviewState(rawValue: string | null): ManualReviewState {
+  if (!rawValue) return createEmptyManualReviewState();
+
+  try {
+    const parsed = JSON.parse(rawValue) as {
+      resolvedIds?: unknown;
+      unresolvedIds?: unknown;
+    };
+
+    return {
+      resolvedIds: new Set(
+        Array.isArray(parsed.resolvedIds)
+          ? parsed.resolvedIds.filter((id): id is string => typeof id === "string")
+          : []
+      ),
+      unresolvedIds: new Set(
+        Array.isArray(parsed.unresolvedIds)
+          ? parsed.unresolvedIds.filter((id): id is string => typeof id === "string")
+          : []
+      )
+    };
+  } catch {
+    return createEmptyManualReviewState();
+  }
+}
+
+function serializeManualReviewState(state: ManualReviewState) {
+  return JSON.stringify({
+    resolvedIds: Array.from(state.resolvedIds),
+    unresolvedIds: Array.from(state.unresolvedIds),
+    updatedAt: new Date().toISOString()
+  });
+}
+
+function getManualReviewStorageKey(scope: string) {
+  return `quiz-review-notebook-manual-state:${scope}`;
+}
 
 function formatTime(value?: string) {
   if (!value) return "尚未作答";
@@ -70,6 +120,44 @@ function isResolvedReviewItem(item: ReviewQuestionItem) {
     (item.history.wrong > 0 || item.history.lowConfidence > 0) &&
     item.history.correct >= 2 &&
     item.history.lastAttemptCorrect === true
+  );
+}
+
+function getMoveBackLabel(item: ReviewQuestionItem) {
+  return item.history.wrong > 0 ? "移回錯題庫" : "移回沒信心題";
+}
+
+function PencilIcon() {
+  return (
+    <svg aria-hidden="true" viewBox="0 0 24 24" className="h-5 w-5" fill="none">
+      <path
+        d="M4.75 19.25l4.45-1.05 9.65-9.65a2.1 2.1 0 0 0 0-2.98l-.42-.42a2.1 2.1 0 0 0-2.98 0L5.8 14.8l-1.05 4.45Z"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      <path
+        d="M14.25 6.35l3.4 3.4"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinecap="round"
+      />
+    </svg>
+  );
+}
+
+function CheckIcon() {
+  return (
+    <svg aria-hidden="true" viewBox="0 0 24 24" className="h-5 w-5" fill="none">
+      <path
+        d="M5 12.5l4.25 4.25L19.5 6.5"
+        stroke="currentColor"
+        strokeWidth="2.4"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
   );
 }
 
@@ -290,6 +378,7 @@ type ReviewNotebookProps = {
   onStartReview?: (items: ReviewQuestionItem[]) => void;
   fullscreenMobile?: boolean;
   headerAction?: ReactNode;
+  manualEditScope?: string;
 };
 
 export function ReviewNotebook({
@@ -301,7 +390,8 @@ export function ReviewNotebook({
   startHref = "/quiz?new=1",
   onStartReview,
   fullscreenMobile = false,
-  headerAction
+  headerAction,
+  manualEditScope
 }: ReviewNotebookProps) {
   const { session } = useAuth();
   const [explanationOverrides, setExplanationOverrides] = useState<Record<string, QuestionExplanationOverride>>({});
@@ -316,6 +406,12 @@ export function ReviewNotebook({
   const [activeCategory, setActiveCategory] = useState<"wrong" | "lowConfidence" | "resolved">("wrong");
   const [visibleCount, setVisibleCount] = useState(40);
   const [selectedSubjects, setSelectedSubjects] = useState<SubjectName[]>([]);
+  const [isManualEditMode, setIsManualEditMode] = useState(false);
+  const [manualReviewState, setManualReviewState] = useState<ManualReviewState>(() =>
+    createEmptyManualReviewState()
+  );
+  const manualEditingEnabled = Boolean(manualEditScope);
+  const manualReviewStorageKey = manualEditScope ? getManualReviewStorageKey(manualEditScope) : "";
   const questionIdsKey = useMemo(
     () => items.map((item) => item.question.id).join("|"),
     [items]
@@ -357,12 +453,25 @@ export function ReviewNotebook({
     [renderedItems, selectedSubjects]
   );
   const unresolvedItems = useMemo(
-    () => filteredItems.filter((item) => !isResolvedReviewItem(item)),
-    [filteredItems]
+    () =>
+      filteredItems.filter((item) => {
+        const questionId = item.question.id;
+        if (manualReviewState.resolvedIds.has(questionId)) return false;
+        if (manualReviewState.unresolvedIds.has(questionId)) return true;
+        return !isResolvedReviewItem(item);
+      }),
+    [filteredItems, manualReviewState]
   );
   const resolvedItems = useMemo(
-    () => sortByRecent(filteredItems.filter((item) => isResolvedReviewItem(item))),
-    [filteredItems]
+    () =>
+      sortByRecent(
+        filteredItems.filter((item) => {
+          const questionId = item.question.id;
+          if (manualReviewState.unresolvedIds.has(questionId)) return false;
+          return manualReviewState.resolvedIds.has(questionId) || isResolvedReviewItem(item);
+        })
+      ),
+    [filteredItems, manualReviewState]
   );
   const wrongItems = useMemo(
     () => sortByRecent(unresolvedItems.filter((item) => item.history.wrong > 0)),
@@ -432,6 +541,16 @@ export function ReviewNotebook({
     setSelectedSubjects((current) => current.filter((subject) => availableSubjects.includes(subject)));
   }, [availableSubjects]);
 
+  useEffect(() => {
+    if (!manualReviewStorageKey || typeof window === "undefined") {
+      setManualReviewState(createEmptyManualReviewState());
+      return;
+    }
+
+    setManualReviewState(parseManualReviewState(window.localStorage.getItem(manualReviewStorageKey)));
+    setIsManualEditMode(false);
+  }, [manualReviewStorageKey]);
+
   function toggleSubject(subject: SubjectName) {
     setSelectedSubjects((current) =>
       current.includes(subject)
@@ -442,6 +561,38 @@ export function ReviewNotebook({
 
   function clearSubjectFilter() {
     setSelectedSubjects([]);
+  }
+
+  function updateManualReviewState(updater: (current: ManualReviewState) => ManualReviewState) {
+    if (!manualReviewStorageKey) return;
+
+    setManualReviewState((current) => {
+      const next = updater(current);
+      if (typeof window !== "undefined") {
+        window.localStorage.setItem(manualReviewStorageKey, serializeManualReviewState(next));
+      }
+      return next;
+    });
+  }
+
+  function moveReviewItemToResolved(questionId: string) {
+    updateManualReviewState((current) => {
+      const resolvedIds = new Set(current.resolvedIds);
+      const unresolvedIds = new Set(current.unresolvedIds);
+      resolvedIds.add(questionId);
+      unresolvedIds.delete(questionId);
+      return { resolvedIds, unresolvedIds };
+    });
+  }
+
+  function moveReviewItemBackToQueue(questionId: string) {
+    updateManualReviewState((current) => {
+      const resolvedIds = new Set(current.resolvedIds);
+      const unresolvedIds = new Set(current.unresolvedIds);
+      resolvedIds.delete(questionId);
+      unresolvedIds.add(questionId);
+      return { resolvedIds, unresolvedIds };
+    });
   }
 
   function setQuestionDetailsOpen(questionId: string, isOpen: boolean) {
@@ -752,6 +903,21 @@ export function ReviewNotebook({
           : "rounded-[2rem] bg-white p-4 shadow-card ring-1 ring-slate-100 sm:p-6"
       }
     >
+      {manualEditingEnabled && items.length > 0 ? (
+        <button
+          type="button"
+          onClick={() => setIsManualEditMode((current) => !current)}
+          className={`fixed bottom-[calc(1.25rem+env(safe-area-inset-bottom))] right-[calc(1.25rem+env(safe-area-inset-right))] z-[60] inline-flex h-14 w-14 items-center justify-center rounded-full shadow-xl ring-1 transition focus:outline-none focus:ring-4 ${
+            isManualEditMode
+              ? "bg-emerald-600 text-white ring-emerald-200 hover:bg-emerald-700 focus:ring-emerald-200"
+              : "bg-slate-950 text-white ring-slate-300 hover:bg-slate-800 focus:ring-slate-200"
+          }`}
+          aria-label={isManualEditMode ? "完成編輯待複習題庫" : "編輯待複習題庫"}
+          title={isManualEditMode ? "完成" : "編輯"}
+        >
+          {isManualEditMode ? <CheckIcon /> : <PencilIcon />}
+        </button>
+      ) : null}
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
           <h2 className={`${fullscreenMobile ? "text-xl" : "text-2xl"} font-semibold text-ink`}>{title}</h2>
@@ -863,7 +1029,7 @@ export function ReviewNotebook({
                     : "bg-slate-100 text-slate-700 hover:bg-slate-200"
                 }`}
               >
-                已解決
+                完成區
                 <span className="ml-2 rounded-full bg-white/80 px-2 py-0.5 text-xs font-semibold">
                   {resolvedItems.length}
                 </span>
@@ -877,7 +1043,7 @@ export function ReviewNotebook({
                     ? "錯題區"
                     : activeCategory === "lowConfidence"
                       ? "沒信心題區"
-                      : "已解決錯題"}
+                      : "完成區"}
                 </h3>
                 <span
                   className={`rounded-full px-3 py-1 text-xs font-semibold ${
@@ -898,7 +1064,7 @@ export function ReviewNotebook({
                       ? "目前沒有符合篩選條件的錯題。"
                       : activeCategory === "lowConfidence"
                         ? "目前沒有符合篩選條件的低信心題。"
-                        : "目前還沒有答對兩次以上的已解決錯題。"}
+                        : "目前還沒有移到完成區的題目。"}
                   </div>
                 ) : (
                   visibleItems.map((item, index) => (
@@ -922,6 +1088,27 @@ export function ReviewNotebook({
                         return (
                           <>
                             <div className="space-y-4">
+                              {manualEditingEnabled && isManualEditMode ? (
+                                <div className="flex justify-end">
+                                  {activeCategory === "resolved" ? (
+                                    <button
+                                      type="button"
+                                      onClick={() => moveReviewItemBackToQueue(item.question.id)}
+                                      className="min-h-10 rounded-2xl bg-rose-600 px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-rose-700"
+                                    >
+                                      {getMoveBackLabel(item)}
+                                    </button>
+                                  ) : (
+                                    <button
+                                      type="button"
+                                      onClick={() => moveReviewItemToResolved(item.question.id)}
+                                      className="min-h-10 rounded-2xl bg-emerald-600 px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-emerald-700"
+                                    >
+                                      移去完成區
+                                    </button>
+                                  )}
+                                </div>
+                              ) : null}
                               <div className="space-y-3">
                                 <div className="flex items-start justify-between gap-3">
                                   <div className="flex min-w-0 flex-wrap items-center gap-3">
@@ -938,7 +1125,7 @@ export function ReviewNotebook({
                                         ? `錯題 ${index + 1}`
                                         : activeCategory === "lowConfidence"
                                           ? `沒信心 ${index + 1}`
-                                          : `已解決 ${index + 1}`}
+                                          : `完成 ${index + 1}`}
                                     </span>
                                     <span className="min-w-0 text-sm text-slate-500">
                                       {renderedQuestion.chapter} / {renderedQuestion.section}

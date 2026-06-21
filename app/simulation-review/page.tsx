@@ -107,6 +107,7 @@ export default function SimulationReviewPage() {
           onStartReview={handleStartSimulationReview}
           items={simulationItems}
           allQuestions={allQuestions}
+          manualEditScope="simulation-review"
         />
       </div>
     </main>
