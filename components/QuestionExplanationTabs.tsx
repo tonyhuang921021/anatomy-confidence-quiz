@@ -1,10 +1,11 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
+import { useAuth } from "@/components/AuthProvider";
 import { QuestionSupplementCardsPanel } from "@/components/QuestionSupplementCardsPanel";
 import { YangmingExplanationPanel } from "@/components/YangmingExplanationPanel";
-import { loadQuestionSupplementCount } from "@/lib/questionSupplementCards";
-import type { Question } from "@/types/quiz";
+import { loadQuestionSupplementMeta, toggleQuestionSupplementReaction } from "@/lib/questionSupplementCards";
+import type { Question, QuestionSupplementReactionSummary } from "@/types/quiz";
 
 type QuestionExplanationTabsProps = {
   question: Question;
@@ -17,26 +18,69 @@ export function QuestionExplanationTabs({
   compact = false,
   className = ""
 }: QuestionExplanationTabsProps) {
+  const { session } = useAuth();
   const [activeTab, setActiveTab] = useState<"yangming" | "supplement" | null>(null);
   const [supplementCount, setSupplementCount] = useState<number | null>(null);
+  const [reactions, setReactions] = useState<QuestionSupplementReactionSummary[]>([]);
+  const [reactionLoading, setReactionLoading] = useState(false);
+  const [reactionError, setReactionError] = useState("");
   const handleCountChange = useCallback((count: number) => setSupplementCount(count), []);
+  const handleReactionsChange = useCallback((nextReactions: QuestionSupplementReactionSummary[]) => {
+    setReactions(nextReactions);
+  }, []);
 
   useEffect(() => {
     let cancelled = false;
     setSupplementCount(null);
+    setReactions([]);
+    setReactionError("");
 
-    loadQuestionSupplementCount(question.id)
-      .then((count) => {
-        if (!cancelled) setSupplementCount(count);
+    loadQuestionSupplementMeta(question.id, session?.access_token)
+      .then((metadata) => {
+        if (cancelled) return;
+        setSupplementCount(metadata.count);
+        setReactions(metadata.reactions);
       })
       .catch(() => {
-        if (!cancelled) setSupplementCount(null);
+        if (!cancelled) {
+          setSupplementCount(null);
+          setReactions([]);
+        }
       });
 
     return () => {
       cancelled = true;
     };
-  }, [question.id]);
+  }, [question.id, session?.access_token]);
+
+  const pureChaosReaction = reactions.find((reaction) => reaction.type === "pure_chaos") ?? {
+    type: "pure_chaos" as const,
+    label: "這題我們不要了",
+    count: 0,
+    active: false
+  };
+
+  async function handleToggleReaction() {
+    if (!session?.access_token) {
+      setReactionError("請先登入，才能標記這題。");
+      return;
+    }
+    setReactionLoading(true);
+    setReactionError("");
+    try {
+      const payload = await toggleQuestionSupplementReaction({
+        question,
+        reactionType: "pure_chaos",
+        accessToken: session.access_token
+      });
+      setSupplementCount(payload.cards?.length ?? supplementCount ?? 0);
+      setReactions(payload.reactions ?? []);
+    } catch (rawError) {
+      setReactionError(rawError instanceof Error ? rawError.message : "題目標記失敗");
+    } finally {
+      setReactionLoading(false);
+    }
+  }
 
   return (
     <section className={`rounded-3xl border border-slate-200 bg-white/70 p-3 ${className}`}>
@@ -74,7 +118,30 @@ export function QuestionExplanationTabs({
             </span>
           ) : null}
         </button>
+        <button
+          type="button"
+          onClick={() => void handleToggleReaction()}
+          disabled={reactionLoading}
+          aria-pressed={pureChaosReaction.active}
+          className={`rounded-full px-3 py-1.5 text-xs font-black ring-1 transition disabled:cursor-wait disabled:opacity-60 ${
+            pureChaosReaction.active
+              ? "bg-rose-600 text-white ring-rose-600"
+              : "bg-rose-50 text-rose-800 ring-rose-100 hover:bg-rose-100"
+          }`}
+        >
+          {pureChaosReaction.label}
+          {pureChaosReaction.count > 0 ? (
+            <span
+              className={`ml-1.5 rounded-full px-1.5 py-0.5 text-[10px] ${
+                pureChaosReaction.active ? "bg-white/20 text-white" : "bg-white text-rose-800"
+              }`}
+            >
+              {pureChaosReaction.count}
+            </span>
+          ) : null}
+        </button>
       </div>
+      {reactionError ? <p className="mt-2 text-xs font-semibold text-rose-700">{reactionError}</p> : null}
       {activeTab === "yangming" ? (
         <div className="mt-3">
           <YangmingExplanationPanel questionId={question.id} compact={compact} autoLoad hideButton />
@@ -86,6 +153,7 @@ export function QuestionExplanationTabs({
             question={question}
             compact={compact}
             onCountChange={handleCountChange}
+            onReactionsChange={handleReactionsChange}
           />
         </div>
       ) : null}

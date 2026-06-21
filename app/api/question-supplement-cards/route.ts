@@ -258,6 +258,7 @@ export async function GET(request: NextRequest) {
     const verifiedUser = await getVerifiedUser(supabase, accessToken);
     const recent = request.nextUrl.searchParams.get("recent") === "1";
     const countOnly = request.nextUrl.searchParams.get("countOnly") === "1";
+    const includeReactions = request.nextUrl.searchParams.get("includeReactions") === "1";
 
     if (recent) {
       if (!verifiedUser) {
@@ -298,8 +299,11 @@ export async function GET(request: NextRequest) {
     }
 
     if (countOnly) {
-      const count = await countCardsForQuestion(supabase, questionId);
-      return NextResponse.json({ ok: true, count }, { headers: { "Cache-Control": "no-store" } });
+      const [count, reactions] = await Promise.all([
+        countCardsForQuestion(supabase, questionId),
+        includeReactions ? loadReactionsForQuestion(supabase, questionId, verifiedUser?.id) : Promise.resolve([])
+      ]);
+      return NextResponse.json({ ok: true, count, reactions }, { headers: { "Cache-Control": "no-store" } });
     }
 
     const payload = await buildQuestionPayload(supabase, questionId, verifiedUser?.id);

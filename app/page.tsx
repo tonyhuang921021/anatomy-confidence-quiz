@@ -54,6 +54,11 @@ const QUICK_ENTRIES = [
 const HOME_RELEASE_NOTES = [
   {
     time: "06/21",
+    title: "不要了按鈕搬家",
+    body: "「這題我們不要了」從補充卡片裡搬到同學補充旁邊，這種共識按鈕不用混在筆記堆裡裝乖。"
+  },
+  {
+    time: "06/21",
     title: "刷題榜不再少算半場",
     body: "有些場次明明 payload 裡有完整題目，明細卻只同步一半；現在改抓最完整紀錄，榜單別再裝失憶。"
   },

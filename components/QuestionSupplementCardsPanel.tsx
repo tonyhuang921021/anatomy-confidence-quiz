@@ -7,7 +7,6 @@ import remarkGfm from "remark-gfm";
 import { useAuth } from "@/components/AuthProvider";
 import {
   loadQuestionSupplementCards,
-  toggleQuestionSupplementReaction,
   uploadQuestionSupplementImage,
   upsertQuestionSupplementCard,
   voteQuestionSupplementCard
@@ -23,6 +22,7 @@ type QuestionSupplementCardsPanelProps = {
   question: Question;
   compact?: boolean;
   onCountChange?: (count: number) => void;
+  onReactionsChange?: (reactions: QuestionSupplementReactionSummary[]) => void;
 };
 
 function formatUpdatedAt(value: string) {
@@ -59,11 +59,11 @@ function SupplementMarkdown({ markdown }: { markdown: string }) {
 export function QuestionSupplementCardsPanel({
   question,
   compact = false,
-  onCountChange
+  onCountChange,
+  onReactionsChange
 }: QuestionSupplementCardsPanelProps) {
   const { session } = useAuth();
   const [cards, setCards] = useState<QuestionSupplementCard[]>([]);
-  const [reactions, setReactions] = useState<QuestionSupplementReactionSummary[]>([]);
   const [draftMarkdown, setDraftMarkdown] = useState("");
   const [editing, setEditing] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -71,7 +71,6 @@ export function QuestionSupplementCardsPanel({
   const [uploading, setUploading] = useState(false);
   const [draggingImage, setDraggingImage] = useState(false);
   const [votingCardId, setVotingCardId] = useState<string | null>(null);
-  const [reactionLoading, setReactionLoading] = useState(false);
   const [error, setError] = useState("");
   const [message, setMessage] = useState("");
 
@@ -85,8 +84,8 @@ export function QuestionSupplementCardsPanel({
       .then((payload) => {
         if (cancelled) return;
         setCards(payload.cards);
-        setReactions(payload.reactions);
         onCountChange?.(payload.cards.length);
+        onReactionsChange?.(payload.reactions);
       })
       .catch((rawError) => {
         if (!cancelled) setError(rawError instanceof Error ? rawError.message : "補充卡片載入失敗");
@@ -98,7 +97,7 @@ export function QuestionSupplementCardsPanel({
     return () => {
       cancelled = true;
     };
-  }, [onCountChange, question.id, session?.access_token]);
+  }, [onCountChange, onReactionsChange, question.id, session?.access_token]);
 
   function beginEdit() {
     if (!session?.access_token) {
@@ -128,8 +127,8 @@ export function QuestionSupplementCardsPanel({
         attachmentUrls: getImageUrlsFromMarkdown(draftMarkdown)
       });
       setCards(payload.cards ?? []);
-      setReactions(payload.reactions ?? []);
       onCountChange?.(payload.cards?.length ?? 0);
+      onReactionsChange?.(payload.reactions ?? []);
       setEditing(false);
       setMessage("補充卡片已儲存，這題的旁門左道又多一點光。");
     } catch (rawError) {
@@ -193,44 +192,14 @@ export function QuestionSupplementCardsPanel({
         accessToken: session.access_token
       });
       setCards(payload.cards ?? []);
-      setReactions(payload.reactions ?? []);
       onCountChange?.(payload.cards?.length ?? 0);
+      onReactionsChange?.(payload.reactions ?? []);
     } catch (rawError) {
       setError(rawError instanceof Error ? rawError.message : "補充卡片評價失敗");
     } finally {
       setVotingCardId(null);
     }
   }
-
-  async function handleToggleReaction() {
-    if (!session?.access_token) {
-      setError("請先登入，才能標記這題。");
-      return;
-    }
-    setReactionLoading(true);
-    setError("");
-    try {
-      const payload = await toggleQuestionSupplementReaction({
-        question,
-        reactionType: "pure_chaos",
-        accessToken: session.access_token
-      });
-      setCards(payload.cards ?? []);
-      setReactions(payload.reactions ?? []);
-      onCountChange?.(payload.cards?.length ?? 0);
-    } catch (rawError) {
-      setError(rawError instanceof Error ? rawError.message : "題目標記失敗");
-    } finally {
-      setReactionLoading(false);
-    }
-  }
-
-  const pureChaosReaction = reactions.find((reaction) => reaction.type === "pure_chaos") ?? {
-    type: "pure_chaos" as const,
-    label: "這題我們不要了",
-    count: 0,
-    active: false
-  };
 
   return (
     <div className={compact ? "space-y-3" : "space-y-4"}>
@@ -242,19 +211,6 @@ export function QuestionSupplementCardsPanel({
           </p>
         </div>
         <div className="flex flex-wrap items-center gap-2">
-          <button
-            type="button"
-            onClick={() => void handleToggleReaction()}
-            disabled={reactionLoading}
-            aria-pressed={pureChaosReaction.active}
-            className={`rounded-full px-3 py-1.5 text-xs font-black ring-1 transition disabled:cursor-wait disabled:opacity-60 ${
-              pureChaosReaction.active
-                ? "bg-rose-600 text-white ring-rose-600"
-                : "bg-rose-50 text-rose-800 ring-rose-100 hover:bg-rose-100"
-            }`}
-          >
-            {pureChaosReaction.label} {pureChaosReaction.count}
-          </button>
           <button
             type="button"
             onClick={beginEdit}

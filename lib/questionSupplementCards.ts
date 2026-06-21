@@ -50,6 +50,22 @@ export async function loadQuestionSupplementCount(questionId: string): Promise<n
   return Math.max(0, payload.count ?? 0);
 }
 
+export async function loadQuestionSupplementMeta(
+  questionId: string,
+  accessToken?: string | null
+): Promise<Required<Pick<QuestionSupplementResponse, "count" | "reactions">>> {
+  const params = new URLSearchParams({ questionId, countOnly: "1", includeReactions: "1" });
+  if (accessToken) params.set("accessToken", accessToken);
+  const response = await fetch(`/api/question-supplement-cards?${params.toString()}`, {
+    headers: { "Cache-Control": "no-store" }
+  });
+  const payload = await parseSupplementResponse<QuestionSupplementResponse>(response);
+  return {
+    count: Math.max(0, payload.count ?? 0),
+    reactions: payload.reactions ?? []
+  };
+}
+
 export async function loadRecentQuestionSupplementCards(
   accessToken?: string | null,
   limit = 12
