@@ -89,6 +89,9 @@ on public.quiz_session_attempts (user_id, answered_at desc);
 create index if not exists quiz_session_attempts_session_id_idx
 on public.quiz_session_attempts (session_id, question_order);
 
+create index if not exists quiz_session_attempts_user_id_session_id_question_order_idx
+on public.quiz_session_attempts (user_id, session_id, question_order);
+
 create index if not exists quiz_session_attempts_question_id_idx
 on public.quiz_session_attempts (question_id);
 
@@ -144,6 +147,9 @@ create table if not exists public.leaderboard_profiles (
 create index if not exists leaderboard_profiles_total_attempts_idx
 on public.leaderboard_profiles (total_attempts desc, correct_rate desc);
 
+create index if not exists leaderboard_profiles_rank_idx
+on public.leaderboard_profiles (total_attempts desc, correct_rate desc, updated_at desc);
+
 revoke all privileges
   on public.leaderboard_profiles
   from anon, authenticated, public;
@@ -170,6 +176,40 @@ create policy "Anyone can read leaderboard profiles"
 on public.leaderboard_profiles
 for select
 using (true);
+
+create table if not exists public.leaderboard_session_rollups (
+  session_id text primary key references public.quiz_sessions (id) on delete cascade,
+  user_id uuid not null references auth.users (id) on delete cascade,
+  mode text,
+  attempts integer not null default 0,
+  correct_attempts integer not null default 0,
+  completed_at timestamptz,
+  counted_at timestamptz not null default now()
+);
+
+create index if not exists leaderboard_session_rollups_user_id_counted_at_idx
+on public.leaderboard_session_rollups (user_id, counted_at desc);
+
+create index if not exists leaderboard_session_rollups_user_id_completed_at_idx
+on public.leaderboard_session_rollups (user_id, completed_at desc);
+
+revoke all privileges
+  on public.leaderboard_session_rollups
+  from anon, authenticated, public;
+
+grant select, insert, update, delete
+  on public.leaderboard_session_rollups
+  to service_role;
+
+alter table public.leaderboard_session_rollups enable row level security;
+
+drop policy if exists "Service role can manage leaderboard session rollups" on public.leaderboard_session_rollups;
+
+create policy "Service role can manage leaderboard session rollups"
+on public.leaderboard_session_rollups
+for all
+using ((select auth.role()) = 'service_role')
+with check ((select auth.role()) = 'service_role');
 
 create table if not exists public.site_visitors (
   visitor_id text primary key,

@@ -55,7 +55,7 @@ type QuizSessionRow = {
   average_confidence?: number | null;
   started_at: string;
   completed_at: string | null;
-  session_payload: Partial<QuizSession> | null;
+  session_payload?: Partial<QuizSession> | null;
   updated_at?: string | null;
 };
 
@@ -666,7 +666,7 @@ function buildSessionPayloadForCloud(session: QuizSession): Partial<QuizSession>
     generatedQuestions: shouldRetainGeneratedQuestions ? generatedQuestions : undefined,
     currentQuestionIndex: session.completedAt ? undefined : compacted.currentQuestionIndex,
     isReviewingAnswer: session.completedAt ? undefined : compacted.isReviewingAnswer,
-    attempts: compacted.attempts.length > 0 ? compacted.attempts : undefined
+    attempts: session.completedAt ? undefined : compacted.attempts.length > 0 ? compacted.attempts : undefined
   };
 }
 
@@ -846,6 +846,10 @@ function mapRowToSession(
 
   const payload = row.session_payload ?? {};
   const resolvedAttempts = attemptMap?.get(row.id) ?? payload.attempts ?? [];
+  const resolvedQuestionOrder =
+    payload.questionOrder && payload.questionOrder.length > 0
+      ? payload.questionOrder
+      : resolvedAttempts.map((attempt) => attempt.questionId);
 
   return normalizeSessions([
     {
@@ -853,8 +857,15 @@ function mapRowToSession(
       subject: (payload.subject as SubjectName | undefined) ?? (row.subject as SubjectName),
       startedAt: payload.startedAt ?? row.started_at,
       completedAt: payload.completedAt ?? row.completed_at ?? undefined,
-      settings: payload.settings,
-      questionOrder: payload.questionOrder ?? [],
+      settings:
+        payload.settings ??
+        (row.mode
+          ? ({
+              mode: row.mode,
+              questionCount: row.question_count ?? resolvedQuestionOrder.length
+            } as QuizSession["settings"])
+          : undefined),
+      questionOrder: resolvedQuestionOrder,
       generatedQuestions: payload.generatedQuestions ?? [],
       currentQuestionIndex: payload.currentQuestionIndex,
       isReviewingAnswer: payload.isReviewingAnswer,
@@ -932,7 +943,7 @@ async function fetchQuizSessionsForUser(userId: string) {
     const { data, error } = await supabase
       .from("quiz_sessions")
       .select(
-        "id, user_id, subject, mode, session_name, question_count, correct_count, wrong_count, average_confidence, started_at, completed_at, session_payload, updated_at"
+        "id, user_id, subject, mode, session_name, question_count, correct_count, wrong_count, average_confidence, started_at, completed_at, updated_at"
       )
       .eq("user_id", userId)
       .not("completed_at", "is", null)
@@ -975,14 +986,10 @@ async function fetchQuizSessionByIdForUser(userId: string, sessionId: string) {
 
 async function fetchResolvedQuizSessionsForUser(userId: string) {
   const sessionRows = await withCloudFallback(fetchQuizSessionsForUser(userId), [] as QuizSessionRow[]);
-  const sessionRowsNeedingAttemptRows = sessionRows.filter((row) => {
-    const payloadAttempts = row.session_payload?.attempts ?? [];
-    return payloadAttempts.length === 0;
-  });
   const attemptRows = await withCloudFallback(
     fetchSessionAttemptRowsForUser(
       userId,
-      sessionRowsNeedingAttemptRows.map((row) => row.id)
+      sessionRows.map((row) => row.id)
     ),
     [] as QuizSessionAttemptRow[]
   );

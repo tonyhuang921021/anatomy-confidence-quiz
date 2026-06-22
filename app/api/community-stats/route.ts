@@ -55,16 +55,6 @@ function getRecentTaipeiDayKeys(days: number) {
   return keys;
 }
 
-function getTaipeiDayRange(dayKey: string) {
-  const start = new Date(`${dayKey}T00:00:00+08:00`);
-  const end = new Date(start);
-  end.setDate(start.getDate() + 1);
-  return {
-    startIso: start.toISOString(),
-    endIso: end.toISOString()
-  };
-}
-
 function isMissingCorrectAttemptsColumn(error: unknown) {
   const maybeError = error as { code?: string; message?: string; details?: string; hint?: string } | null;
   const haystack = [
@@ -82,42 +72,6 @@ function isMissingCorrectAttemptsColumn(error: unknown) {
     haystack.includes("pgrst204") ||
     haystack.includes("42703")
   );
-}
-
-async function countAttemptsForDay(supabase: ReturnType<typeof getServiceSupabaseClient>, dayKey: string) {
-  if (!supabase) {
-    return { attempts: 0, correctRate: 0 };
-  }
-
-  const { startIso, endIso } = getTaipeiDayRange(dayKey);
-  const [attemptResult, correctResult] = await withServerTimeout(
-    Promise.all([
-      supabase
-        .from("question_attempt_logs")
-        .select("session_id", { count: "exact", head: true })
-        .gte("answered_at", startIso)
-        .lt("answered_at", endIso),
-      supabase
-        .from("question_attempt_logs")
-        .select("session_id", { count: "exact", head: true })
-        .eq("is_correct", true)
-        .gte("answered_at", startIso)
-        .lt("answered_at", endIso)
-    ]),
-    1600,
-    "首頁社群統計補查逾時"
-  );
-
-  if (attemptResult.error) throw attemptResult.error;
-  if (correctResult.error) throw correctResult.error;
-
-  const attempts = attemptResult.count ?? 0;
-  const correct = correctResult.count ?? 0;
-
-  return {
-    attempts,
-    correctRate: attempts === 0 ? 0 : Number(((correct / attempts) * 100).toFixed(1))
-  };
 }
 
 export async function GET(request: Request) {
@@ -191,37 +145,11 @@ export async function GET(request: Request) {
       ] as const)
     );
 
-    const fallbackDayKeys = dayKeys.filter((date) => {
-      const stats = grouped.get(date);
-      return !stats || stats.attempts === 0;
-    });
-    const fallbackCounts = new Map<string, { attempts: number; correctRate: number }>();
-
-    if (fallbackDayKeys.length > 0) {
-      const fallbackResults = await withServerTimeout(
-        Promise.all(
-          fallbackDayKeys
-            .slice(-2)
-            .map(async (date) => [date, await countAttemptsForDay(supabase, date)] as const)
-        ),
-        2200,
-        "首頁社群統計補查逾時"
-      );
-
-      for (const [date, stats] of fallbackResults) {
-        fallbackCounts.set(date, stats);
-      }
+    if (grouped.size === 0) {
+      throw new Error("首頁社群統計快照尚未更新");
     }
 
     const points = dayKeys.map((date) => {
-      const fallbackStats = fallbackCounts.get(date);
-      if (fallbackStats) {
-        return {
-          date,
-          attempts: fallbackStats.attempts,
-          correctRate: fallbackStats.correctRate
-        };
-      }
       const stats = grouped.get(date);
       const attempts = stats?.attempts ?? 0;
       const correctAttempts = stats?.correctAttempts ?? 0;

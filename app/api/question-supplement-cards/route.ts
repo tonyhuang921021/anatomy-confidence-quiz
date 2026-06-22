@@ -224,17 +224,18 @@ async function loadCardsForQuestion(supabase: any, questionId: string, userId?: 
 }
 
 async function countCardsForQuestion(supabase: any, questionId: string) {
-  const { count, error } = (await withServerTimeout(
+  const { data, error } = (await withServerTimeout(
     supabase
       .from("question_supplement_cards")
-      .select("id", { count: "exact", head: true })
-      .eq("question_id", questionId),
+      .select("id")
+      .eq("question_id", questionId)
+      .limit(50),
     1400,
     "補充卡片數量載入逾時"
-  )) as { count?: number | null; error?: unknown };
+  )) as { data?: Array<{ id: string }>; error?: unknown };
 
   if (error) throw error;
-  return count ?? 0;
+  return (data ?? []).length;
 }
 
 async function loadReactionsForQuestion(supabase: any, questionId: string, userId?: string | null) {

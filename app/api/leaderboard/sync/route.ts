@@ -9,6 +9,7 @@ export const revalidate = 0;
 type LeaderboardSyncBody = {
   accessToken?: string | null;
   displayName?: string | null;
+  forceFullRefresh?: boolean;
 };
 
 type QuizSessionSummaryRow = {
@@ -16,9 +17,7 @@ type QuizSessionSummaryRow = {
   mode?: string | null;
   question_count?: number | null;
   correct_count?: number | null;
-  session_payload?: {
-    attempts?: Array<{ isCorrect?: boolean; is_correct?: boolean }>;
-  } | null;
+  completed_at?: string | null;
 };
 
 type AttemptFallbackRow = {
@@ -26,8 +25,26 @@ type AttemptFallbackRow = {
   is_correct: boolean;
 };
 
-const SESSION_PAGE_SIZE = 1000;
+type LeaderboardProfileRow = {
+  display_name?: string | null;
+  total_attempts?: number | null;
+  correct_attempts?: number | null;
+  correct_rate?: number | null;
+  total_sessions?: number | null;
+  updated_at?: string | null;
+};
+
+type LeaderboardRollupRow = {
+  session_id: string;
+  attempts: number;
+  correct_attempts: number;
+};
+
+const RECENT_SESSION_ROLLUP_LIMIT = 80;
+const FULL_SESSION_ROLLUP_PAGE_SIZE = 1000;
 const ATTEMPT_FALLBACK_CHUNK_SIZE = 50;
+const ROLLUP_LOOKUP_CHUNK_SIZE = 200;
+const LEADERBOARD_PROFILE_MIN_REFRESH_MS = 60_000;
 const MAX_REASONABLE_SESSION_QUESTION_COUNT = 500;
 
 function getServiceSupabaseClient() {
@@ -68,20 +85,15 @@ function getFiniteCount(value: unknown) {
 
 function chooseBestSessionCount(
   attemptCount: { total: number; correct: number } | undefined,
-  payloadAttempts: Array<{ isCorrect?: boolean; is_correct?: boolean }>,
   storedQuestionCount: number | null,
   storedCorrectCount: number | null
 ) {
-  const payloadCorrectCount = payloadAttempts.filter(
-    (attempt) => attempt.isCorrect === true || attempt.is_correct === true
-  ).length;
   const hasReasonableStoredQuestionCount =
     storedQuestionCount !== null &&
     storedQuestionCount > 0 &&
-    storedQuestionCount <= Math.max(MAX_REASONABLE_SESSION_QUESTION_COUNT, attemptCount?.total ?? 0, payloadAttempts.length);
+    storedQuestionCount <= Math.max(MAX_REASONABLE_SESSION_QUESTION_COUNT, attemptCount?.total ?? 0);
   const syncedCandidates = [
-    attemptCount && attemptCount.total > 0 ? { total: attemptCount.total, correct: attemptCount.correct } : null,
-    payloadAttempts.length > 0 ? { total: payloadAttempts.length, correct: payloadCorrectCount } : null
+    attemptCount && attemptCount.total > 0 ? { total: attemptCount.total, correct: attemptCount.correct } : null
   ].filter((candidate): candidate is { total: number; correct: number } => Boolean(candidate));
 
   const bestSyncedCount = syncedCandidates.reduce(
@@ -101,17 +113,68 @@ function chooseBestSessionCount(
   };
 }
 
-async function fetchCompletedSessionRows(supabase: any, userId: string) {
+function isFreshProfile(profile: LeaderboardProfileRow | null | undefined) {
+  if (!profile?.updated_at) return false;
+  return Date.now() - new Date(profile.updated_at).getTime() < LEADERBOARD_PROFILE_MIN_REFRESH_MS;
+}
+
+function mapProfileToSummary(profile: LeaderboardProfileRow | null | undefined) {
+  const totalAttempts = Number(profile?.total_attempts ?? 0);
+  const correctAttempts = Number(profile?.correct_attempts ?? 0);
+  return {
+    totalAttempts,
+    correctAttempts,
+    correctRate: totalAttempts > 0 ? Number(profile?.correct_rate ?? 0) : 0,
+    totalSessions: Number(profile?.total_sessions ?? 0)
+  };
+}
+
+async function fetchProfile(supabase: any, userId: string) {
+  const { data, error } = (await withServerTimeout(
+    supabase
+      .from("leaderboard_profiles")
+      .select("display_name, total_attempts, correct_attempts, correct_rate, total_sessions, updated_at")
+      .eq("user_id", userId)
+      .maybeSingle(),
+    1600,
+    "刷題榜快照讀取逾時"
+  )) as { data?: LeaderboardProfileRow | null; error?: unknown };
+
+  if (error) throw error;
+  return data ?? null;
+}
+
+async function fetchRecentCompletedSessionRows(supabase: any, userId: string) {
+  const { data, error } = (await withServerTimeout(
+    supabase
+      .from("quiz_sessions")
+      .select("id, mode, question_count, correct_count, completed_at")
+      .eq("user_id", userId)
+      .not("completed_at", "is", null)
+      .or("mode.is.null,mode.neq.peak_challenge")
+      .order("completed_at", { ascending: false, nullsFirst: false })
+      .limit(RECENT_SESSION_ROLLUP_LIMIT),
+    2500,
+    "近期作答快照讀取逾時"
+  )) as { data?: QuizSessionSummaryRow[]; error?: unknown };
+
+  if (error) throw error;
+  return data ?? [];
+}
+
+async function fetchAllCompletedSessionRows(supabase: any, userId: string) {
   const rows: QuizSessionSummaryRow[] = [];
 
-  for (let from = 0; ; from += SESSION_PAGE_SIZE) {
+  for (let from = 0; ; from += FULL_SESSION_ROLLUP_PAGE_SIZE) {
     const { data, error } = (await withServerTimeout(
       supabase
         .from("quiz_sessions")
-        .select("id, mode, question_count, correct_count, session_payload")
+        .select("id, mode, question_count, correct_count, completed_at")
         .eq("user_id", userId)
         .not("completed_at", "is", null)
-        .range(from, from + SESSION_PAGE_SIZE - 1),
+        .or("mode.is.null,mode.neq.peak_challenge")
+        .order("completed_at", { ascending: false, nullsFirst: false })
+        .range(from, from + FULL_SESSION_ROLLUP_PAGE_SIZE - 1),
       4000,
       "雲端作答紀錄讀取逾時"
     )) as { data?: QuizSessionSummaryRow[]; error?: unknown };
@@ -120,10 +183,31 @@ async function fetchCompletedSessionRows(supabase: any, userId: string) {
 
     const page = data ?? [];
     rows.push(...page);
-    if (page.length < SESSION_PAGE_SIZE) break;
+    if (page.length < FULL_SESSION_ROLLUP_PAGE_SIZE) break;
   }
 
   return rows;
+}
+
+async function fetchExistingRollupIds(supabase: any, sessionIds: string[]) {
+  const ids = new Set<string>();
+
+  for (let index = 0; index < sessionIds.length; index += ROLLUP_LOOKUP_CHUNK_SIZE) {
+    const chunk = sessionIds.slice(index, index + ROLLUP_LOOKUP_CHUNK_SIZE);
+    const { data, error } = (await withServerTimeout(
+      supabase
+        .from("leaderboard_session_rollups")
+        .select("session_id")
+        .in("session_id", chunk),
+      2500,
+      "刷題榜 session 快照比對逾時"
+    )) as { data?: Array<{ session_id: string }>; error?: unknown };
+
+    if (error) throw error;
+    for (const row of data ?? []) ids.add(row.session_id);
+  }
+
+  return ids;
 }
 
 async function fetchAttemptCounts(supabase: any, userId: string, sessionIds: string[]) {
@@ -154,43 +238,116 @@ async function fetchAttemptCounts(supabase: any, userId: string, sessionIds: str
   return countMap;
 }
 
-async function summarizeCloudSessions(supabase: any, userId: string) {
-  const sessionRows = (await fetchCompletedSessionRows(supabase, userId)).filter(
-    (row) => row.mode !== "peak_challenge"
+async function upsertSessionRollups(
+  supabase: any,
+  userId: string,
+  sessionRows: QuizSessionSummaryRow[]
+) {
+  if (sessionRows.length === 0) return;
+
+  const attemptCounts = await fetchAttemptCounts(
+    supabase,
+    userId,
+    sessionRows.map((row) => row.id)
   );
-  const attemptCounts =
-    sessionRows.length > 0
-      ? await fetchAttemptCounts(
-          supabase,
-          userId,
-          sessionRows.map((row) => row.id)
-        )
-      : new Map<string, { total: number; correct: number }>();
+
+  const rows = sessionRows
+    .map((row) => {
+      const storedQuestionCount = getFiniteCount(row.question_count);
+      const storedCorrectCount = getFiniteCount(row.correct_count);
+      const sessionCount = chooseBestSessionCount(
+        attemptCounts.get(row.id),
+        storedQuestionCount,
+        storedCorrectCount
+      );
+
+      if (sessionCount.total <= 0) return null;
+
+      return {
+        session_id: row.id,
+        user_id: userId,
+        mode: row.mode ?? null,
+        attempts: sessionCount.total,
+        correct_attempts: sessionCount.correct,
+        completed_at: row.completed_at ?? null,
+        counted_at: new Date().toISOString()
+      };
+    })
+    .filter((row): row is NonNullable<typeof row> => Boolean(row));
+
+  if (rows.length === 0) return;
+
+  const { error } = await supabase
+    .from("leaderboard_session_rollups")
+    .upsert(rows, { onConflict: "session_id" });
+
+  if (error) throw error;
+}
+
+async function ensureSessionRollups(supabase: any, userId: string, fullRefresh: boolean) {
+  const sessionRows = fullRefresh
+    ? await fetchAllCompletedSessionRows(supabase, userId)
+    : await fetchRecentCompletedSessionRows(supabase, userId);
+  if (sessionRows.length === 0) return;
+
+  const existingIds = await fetchExistingRollupIds(
+    supabase,
+    sessionRows.map((row) => row.id)
+  );
+  const missingRows = sessionRows.filter((row) => !existingIds.has(row.id));
+  await upsertSessionRollups(supabase, userId, missingRows);
+}
+
+async function hasAnyRollup(supabase: any, userId: string) {
+  const { data, error } = (await withServerTimeout(
+    supabase
+      .from("leaderboard_session_rollups")
+      .select("session_id")
+      .eq("user_id", userId)
+      .limit(1),
+    1600,
+    "刷題榜快照檢查逾時"
+  )) as { data?: Array<{ session_id: string }>; error?: unknown };
+
+  if (error) throw error;
+  return (data ?? []).length > 0;
+}
+
+async function summarizeRollups(supabase: any, userId: string) {
+  const rows: LeaderboardRollupRow[] = [];
+
+  for (let from = 0; ; from += FULL_SESSION_ROLLUP_PAGE_SIZE) {
+    const { data, error } = (await withServerTimeout(
+      supabase
+        .from("leaderboard_session_rollups")
+        .select("session_id, attempts, correct_attempts")
+        .eq("user_id", userId)
+        .range(from, from + FULL_SESSION_ROLLUP_PAGE_SIZE - 1),
+      2500,
+      "刷題榜快照彙總逾時"
+    )) as { data?: LeaderboardRollupRow[]; error?: unknown };
+
+    if (error) throw error;
+    const page = data ?? [];
+    rows.push(...page);
+    if (page.length < FULL_SESSION_ROLLUP_PAGE_SIZE) break;
+  }
 
   let totalAttempts = 0;
   let correctAttempts = 0;
 
-  for (const row of sessionRows) {
-    const payloadAttempts = Array.isArray(row.session_payload?.attempts) ? row.session_payload.attempts : [];
-    const attemptCount = attemptCounts.get(row.id);
-    const storedQuestionCount = getFiniteCount(row.question_count);
-    const storedCorrectCount = getFiniteCount(row.correct_count);
-    const sessionCount = chooseBestSessionCount(
-      attemptCount,
-      payloadAttempts,
-      storedQuestionCount,
-      storedCorrectCount
-    );
-
-    totalAttempts += sessionCount.total;
-    correctAttempts += sessionCount.correct;
+  for (const row of rows) {
+    const attempts = Number(row.attempts ?? 0);
+    const correct = Number(row.correct_attempts ?? 0);
+    totalAttempts += attempts;
+    correctAttempts += Math.min(correct, attempts);
   }
 
   return {
     totalAttempts,
     correctAttempts,
     correctRate: totalAttempts > 0 ? Number(((correctAttempts / totalAttempts) * 100).toFixed(1)) : 0,
-    totalSessions: sessionRows.length
+    totalSessions: rows.length
   };
 }
 
@@ -227,8 +384,31 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ ok: false, message: "登入狀態已失效，請重新登入。" }, { status: 401 });
   }
 
-  const summary = await summarizeCloudSessions(supabase, user.id);
   const displayName = getDisplayName({ id: user.id, email: user.email, user_metadata: user.user_metadata }, body.displayName);
+  const existingProfile = await fetchProfile(supabase, user.id);
+
+  if (!body.forceFullRefresh && isFreshProfile(existingProfile)) {
+    if (existingProfile?.display_name !== displayName) {
+      const { error: nameError } = await supabase.from("leaderboard_profiles").upsert(
+        {
+          user_id: user.id,
+          display_name: displayName,
+          total_attempts: existingProfile?.total_attempts ?? 0,
+          correct_attempts: existingProfile?.correct_attempts ?? 0,
+          correct_rate: existingProfile?.correct_rate ?? 0,
+          total_sessions: existingProfile?.total_sessions ?? 0,
+          updated_at: existingProfile?.updated_at ?? new Date().toISOString()
+        },
+        { onConflict: "user_id" }
+      );
+      if (nameError) throw nameError;
+    }
+    return NextResponse.json({ ok: true, leaderboard: mapProfileToSummary(existingProfile), cached: true });
+  }
+
+  const shouldFullRefresh = body.forceFullRefresh || !(await hasAnyRollup(supabase, user.id));
+  await ensureSessionRollups(supabase, user.id, shouldFullRefresh);
+  const summary = await summarizeRollups(supabase, user.id);
 
   const { error } = await supabase.from("leaderboard_profiles").upsert(
     {
