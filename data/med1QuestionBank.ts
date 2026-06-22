@@ -469,11 +469,13 @@ const importedAnswerOverrideMap: Record<
   },
   "MOEX-114090-1301-Q049": {
     answer: "C",
-    answerCreditType: "standard"
+    acceptedAnswers: ["A", "C"],
+    answerCreditType: "multiple_accepted"
   },
   "MOEX-114090-1301-Q094": {
     answer: "C",
-    answerCreditType: "standard"
+    acceptedAnswers: ["C", "D"],
+    answerCreditType: "multiple_accepted"
   }
 };
 
@@ -991,6 +993,22 @@ function applyQuestionMedia(question: Question): Question {
 }
 
 const questionTextOverrides: Record<string, QuestionTextOverride> = {
+  "MOEX-103100-1101-Q086": {
+    options: {
+      D: "Spearman 等級相關係數（Spearman correlation coefficient）"
+    },
+    optionAnalysis: {
+      D: "正確。乳癌分期為有序類別，年齡又呈右偏分布，應使用非參數的 Spearman rank correlation，而非 Pearson。"
+    }
+  },
+  "MOEX-103100-1101-Q094": {
+    options: {
+      D: "A型行為人格"
+    },
+    optionAnalysis: {
+      D: "正確。超時工作與急性循環系統疾病常和睡眠剝奪、工作特點、心理困擾等交互作用；A型行為人格不是題幹所列「交互作用」的典型工作暴露因素。"
+    }
+  },
   "MOEX-111100-1301-Q076": {
     stem:
       "在一個符合 Michaelis-Menten equation 的酵素催化反應中，當受質（substrate）濃度極小於 Michaelis 常數（Km）時，此反應之速率常數應為下列何者？",
@@ -1319,25 +1337,29 @@ const questionTextOverrides: Record<string, QuestionTextOverride> = {
   },
   "MOEX-114090-1301-Q049": {
     answer: "C",
+    acceptedAnswers: ["A", "C"],
+    answerCreditType: "multiple_accepted",
     explanation:
-      "題幹重點是講話流利但閱讀困難。Broca 區病灶通常造成非流利失語，不合題幹。Wernicke 區病灶可造成流利但理解差的失語，但若題目特別強調閱讀困難，較典型與 angular gyrus 有關，因為 angular gyrus 參與視覺文字與語言理解的整合。Arcuate fasciculus 則較典型造成傳導性失語，重點是 repetition impaired。",
+      "本題官方開放 A、C 給分。若依典型神經定位判斷，題幹重點是講話流利但閱讀困難；Broca 區病灶通常造成非流利失語，不合題幹。Wernicke 區病灶可造成流利但理解差的失語，angular gyrus 則參與視覺文字與語言理解的整合；官方疑義因此開放 A、C。",
     optionAnalysis: {
-      A: "Wernicke 區：流利失語、理解差，但不是單純閱讀困難最典型位置。",
+      A: "開放給分。Wernicke 區病灶可造成流利但理解差的失語，若題目把閱讀困難納入理解障礙判讀，A 可被採計。",
       B: "Broca 區：非流利失語，與講話流利不合。",
-      C: "Angular gyrus：與閱讀、書寫、語言整合有關，是學理上最合理答案。",
+      C: "開放給分。Angular gyrus 與閱讀、書寫、語言整合有關，是閱讀困難最直接的典型定位。",
       D: "Arcuate fasciculus：傳導性失語，特徵是複誦困難。"
     },
     testedConcept: "神經生理／語言功能"
   },
   "MOEX-114090-1301-Q094": {
     answer: "C",
+    acceptedAnswers: ["C", "D"],
+    answerCreditType: "multiple_accepted",
     explanation:
-      "電子傳遞鏈中，complex I、III、IV 會將 H⁺ 從 matrix 泵到 intermembrane space，建立質子梯度。常見記法是每 2 個電子經過：complex I 泵 4H⁺、complex III 泵 4H⁺、complex IV 泵 2H⁺。所以 C 最符合標準教科書觀念。",
+      "本題官方開放 C、D 給分。電子傳遞鏈中，complex I、III、IV 會將 H⁺ 從 matrix 泵到 intermembrane space，建立質子梯度。常見記法是每 2 個電子經過：complex I 泵 4H⁺、complex III 泵 4H⁺、complex IV 泵 2H⁺；C 最符合標準記法，但官方疑義開放 D。",
     optionAnalysis: {
       A: "錯。complex I 是把 H⁺ 從 matrix 泵到膜間腔，不是到 matrix。",
       B: "錯。complex III 也是把 H⁺ 泵到膜間腔，不是到 matrix。",
-      C: "正確。complex III 約將 4H⁺ 移至 intermembrane space。",
-      D: "不精準。complex IV 通常是約 2H⁺ 被泵到膜間腔，不是 4H⁺。"
+      C: "開放給分。complex III 約將 4H⁺ 移至 intermembrane space。",
+      D: "開放給分。complex IV 泵氫方向為往膜間腔；雖然常見每 2 電子泵 2H⁺，官方疑義仍採計 D。"
     },
     testedConcept: "電子傳遞鏈與氧化磷酸化"
   },

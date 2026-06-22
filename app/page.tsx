@@ -54,6 +54,11 @@ const QUICK_ENTRIES = [
 const HOME_RELEASE_NOTES = [
   {
     time: "06/23",
+    title: "疑義題給分不裝沒事",
+    body: "補上兩題官方開放給分，順手把幾個選項 OCR 空格抓回來；Spearman 和 A型人格不用再自己腦補。"
+  },
+  {
+    time: "06/23",
     title: "自由測驗先別整包扛",
     body: "自由測驗改成先掛 10 題，快做完才偷偷補下一批；雲端補傳也更勤快，不用每次自己去拜託它上傳。"
   },
