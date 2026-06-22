@@ -54,6 +54,11 @@ const QUICK_ENTRIES = [
 const HOME_RELEASE_NOTES = [
   {
     time: "06/22",
+    title: "模擬考信心可以反悔",
+    body: "信心按錯不用跟它結婚，再按一次就取消；國考前先練習健康的反悔能力。"
+  },
+  {
+    time: "06/22",
     title: "Safari 開站先別自爆",
     body: "Safari 如果留了很肥的本機紀錄，首頁會先降載再慢慢同步，不再一開就重整到懷疑人生。"
   },

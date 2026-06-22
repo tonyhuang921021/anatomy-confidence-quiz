@@ -28,11 +28,25 @@ export function ConfidenceSelector({
   }, [expanded, value]);
 
   function handleExpand() {
+    if (localValue <= 3) {
+      setLocalValue(4);
+      setLocalExpanded(false);
+      onSelect(4);
+      return;
+    }
+
     setLocalExpanded((current) => !current);
     onExpand();
   }
 
   function handleSelect(value: ConfidenceLevel) {
+    if (localValue === value) {
+      setLocalValue(4);
+      setLocalExpanded(false);
+      onSelect(4);
+      return;
+    }
+
     setLocalValue(value);
     setLocalExpanded(value <= 3);
     onSelect(value);
