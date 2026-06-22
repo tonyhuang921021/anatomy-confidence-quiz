@@ -79,6 +79,9 @@ import {
   SubjectName
 } from "@/types/quiz";
 
+const FREE_PRACTICE_BATCH_SIZE = 10;
+const FREE_PRACTICE_PREFETCH_THRESHOLD = 3;
+
 function getQuestionSourceBadge(question: Question) {
   if (question.sourceType === "MOEX_PAST_EXAM") return "正式考古題";
   if (question.sourceType === "AI_GENERATED") return "AI 題庫";
@@ -169,6 +172,10 @@ function buildResultsHref(session: QuizSession) {
   return `${basePath}?sessionId=${encodeURIComponent(session.id)}`;
 }
 
+function isIncrementalPracticeSettings(settings?: QuizSettings | null): settings is QuizSettings {
+  return settings?.mode === "random" && Boolean(settings.stopAfterReview);
+}
+
 function createSession(
   questions: Question[],
   completedSessions: QuizSession[],
@@ -192,6 +199,15 @@ function createSession(
       normalizedSettings.paperMode === "random_past_paper")
       ? { ...normalizedSettings, questionCount: effectiveQuestions.length }
       : normalizedSettings;
+  const questionOrderSettings = isIncrementalPracticeSettings(effectiveSettings)
+    ? {
+        ...effectiveSettings,
+        questionCount: Math.min(
+          FREE_PRACTICE_BATCH_SIZE,
+          Math.max(1, effectiveSettings.questionCount)
+        )
+      }
+    : effectiveSettings;
   const questionOrder =
     effectiveSettings.mode === "simulation" &&
     (effectiveSettings.paperMode === "past_paper" ||
@@ -199,7 +215,7 @@ function createSession(
       ? [...effectiveQuestions]
           .sort((left, right) => (left.originalQuestionNumber ?? 0) - (right.originalQuestionNumber ?? 0))
           .map((question) => question.id)
-      : createQuestionOrder(effectiveQuestions, completedSessions, effectiveSettings);
+      : createQuestionOrder(effectiveQuestions, completedSessions, questionOrderSettings);
   const selectedQuestionMap = new Map(
     effectiveQuestions.map((question) => [question.id, question] as const)
   );
@@ -481,6 +497,7 @@ export default function QuizPage() {
   const completedSessionIdsRef = useRef(new Set<string>());
   const deferredCurrentSessionSaveRef = useRef<number | null>(null);
   const deferredCurrentSessionRef = useRef<QuizSession | null>(null);
+  const incrementalPracticePrefetchRef = useRef(false);
   const [mounted, setMounted] = useState(false);
   const [session, setSession] = useState<QuizSession | null>(null);
   const [classificationOverrides, setClassificationOverrides] = useState<Record<string, QuestionClassificationOverride>>({});
@@ -904,6 +921,32 @@ export default function QuizPage() {
     setErrorType(undefined);
   }, [currentQuestion?.id, session, submittedAttempt]);
 
+  useEffect(() => {
+    if (
+      !session ||
+      session.completedAt ||
+      !isIncrementalPracticeSettings(session.settings)
+    ) {
+      return;
+    }
+
+    const loadedQuestionCount = session.questionOrder?.length ?? 0;
+    const totalTargetCount = session.settings?.questionCount ?? loadedQuestionCount;
+    if (loadedQuestionCount >= totalTargetCount) return;
+
+    const bufferedQuestionsAfterCurrent = loadedQuestionCount - currentIndex - 1;
+    if (bufferedQuestionsAfterCurrent <= FREE_PRACTICE_PREFETCH_THRESHOLD) {
+      queueIncrementalPracticePrefetch();
+    }
+  }, [
+    classificationOverrides,
+    currentIndex,
+    session?.completedAt,
+    session?.id,
+    session?.questionOrder?.length,
+    session?.settings
+  ]);
+
   function persistSession(
     nextSession: QuizSession,
     options: { deferLocalSave?: boolean } = {}
@@ -920,6 +963,88 @@ export default function QuizPage() {
       deferredCurrentSessionSaveRef.current = null;
     }
     saveCurrentSession(nextSession);
+  }
+
+  function buildNextIncrementalPracticeSession(baseSession: QuizSession) {
+    const settings = baseSession.settings;
+    if (!isIncrementalPracticeSettings(settings)) return null;
+
+    const loadedQuestionIds = new Set(baseSession.questionOrder ?? []);
+    const totalTargetCount = settings.questionCount ?? loadedQuestionIds.size;
+    if (loadedQuestionIds.size >= totalTargetCount) return null;
+
+    const fallbackQuestions =
+      (settings.subjectFilters?.length ?? 0) > 0
+        ? getQuestionBankBySubjects(settings.subjectFilters ?? [], classificationOverrides)
+        : getQuestionBankBySubjectFilter(settings.subjectFilter ?? "解剖學", classificationOverrides);
+    const sourcePool = selectLocalQuestionSet(settings, fallbackQuestions, classificationOverrides);
+    const remainingPool = sourcePool.filter((question) => !loadedQuestionIds.has(question.id));
+    if (remainingPool.length === 0) return null;
+
+    const remainingTargetCount = Math.max(0, totalTargetCount - loadedQuestionIds.size);
+    const nextBatchSize = Math.min(
+      FREE_PRACTICE_BATCH_SIZE,
+      remainingTargetCount,
+      remainingPool.length
+    );
+    if (nextBatchSize <= 0) return null;
+
+    const batchQuestionIds = createQuestionOrder(
+      remainingPool,
+      [...loadCompletedSessions(), baseSession],
+      {
+        ...settings,
+        questionCount: nextBatchSize
+      }
+    ).filter((id) => !loadedQuestionIds.has(id));
+
+    if (batchQuestionIds.length === 0) return null;
+
+    const sourceQuestionMap = new Map(
+      [...sourcePool, ...Array.from(allQuestionFallbackMap.values())].map(
+        (question) => [question.id, question] as const
+      )
+    );
+    const batchQuestions = batchQuestionIds
+      .map((id) => sourceQuestionMap.get(id))
+      .filter((question): question is Question => Boolean(question));
+    const mergedGeneratedQuestions = Array.from(
+      new Map(
+        [...(baseSession.generatedQuestions ?? []), ...batchQuestions].map((question) => [
+          question.id,
+          question
+        ])
+      ).values()
+    );
+
+    return {
+      ...baseSession,
+      questionOrder: [...(baseSession.questionOrder ?? []), ...batchQuestionIds],
+      generatedQuestions: mergedGeneratedQuestions
+    } satisfies QuizSession;
+  }
+
+  function queueIncrementalPracticePrefetch() {
+    if (incrementalPracticePrefetchRef.current) return;
+    incrementalPracticePrefetchRef.current = true;
+
+    window.setTimeout(() => {
+      try {
+        setSession((current) => {
+          if (!current || current.completedAt) return current;
+          const nextSession = buildNextIncrementalPracticeSession(current);
+          if (!nextSession || nextSession.questionOrder?.length === current.questionOrder?.length) {
+            return current;
+          }
+
+          saveCurrentSession(nextSession);
+          void pushCurrentSessionToSupabase(nextSession);
+          return nextSession;
+        });
+      } finally {
+        incrementalPracticePrefetchRef.current = false;
+      }
+    }, 0);
   }
 
   function finalizeCompletedSession(completedSession: QuizSession) {
