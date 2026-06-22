@@ -3,7 +3,13 @@
 import { useEffect, useMemo, useState } from "react";
 import { useAuth } from "@/components/AuthProvider";
 import { getHomeToneModePreference } from "@/lib/accountPreferences";
-import { loadCompletedSessions, loadCurrentSession, loadHomeToneMode, type HomeToneMode } from "@/lib/storage";
+import {
+  getCompletedSessionsStorageLengthForUser,
+  loadCompletedSessions,
+  loadCurrentSession,
+  loadHomeToneMode,
+  type HomeToneMode
+} from "@/lib/storage";
 
 const CALM_LINES = [
   "現在的不穩，不代表你不行，只代表你正在把縫補起來。",
@@ -44,6 +50,17 @@ function addDays(date: Date, days: number) {
 }
 
 const MAX_PERSONAL_PACE_SESSIONS = 80;
+const SAFARI_HOME_HISTORY_READ_LIMIT = 750_000;
+
+function isSafariBrowser() {
+  if (typeof navigator === "undefined") return false;
+  const userAgent = navigator.userAgent;
+  return /Safari/i.test(userAgent) && !/Chrome|Chromium|CriOS|FxiOS|EdgiOS|Edg\//i.test(userAgent);
+}
+
+function shouldSkipHeavyHomeHistoryRead() {
+  return isSafariBrowser() && getCompletedSessionsStorageLengthForUser() > SAFARI_HOME_HISTORY_READ_LIMIT;
+}
 
 function getPersonalPaceStats(now = new Date()): PersonalPaceStats {
   const todayKey = getTaipeiDateKey(now);
@@ -64,7 +81,7 @@ function getPersonalPaceStats(now = new Date()): PersonalPaceStats {
   const currentSession = loadCurrentSession();
   currentSession?.attempts?.forEach(trackAttempt);
 
-  const sessions = loadCompletedSessions();
+  const sessions = shouldSkipHeavyHomeHistoryRead() ? [] : loadCompletedSessions();
   let visitedSessions = 0;
   for (let index = sessions.length - 1; index >= 0 && visitedSessions < MAX_PERSONAL_PACE_SESSIONS; index -= 1) {
     const session = sessions[index];

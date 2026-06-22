@@ -496,6 +496,13 @@ export function loadCompletedSessions(): QuizSession[] {
   return loadCompletedSessionsForUser(getActiveStorageUser());
 }
 
+export function getCompletedSessionsStorageLengthForUser(userId = getActiveStorageUser()) {
+  if (!isBrowser()) return 0;
+  const scopedRaw = safeLocalStorageGetItem(getScopedKeyForUser(COMPLETED_SESSIONS_KEY, userId));
+  const legacyRaw = userId === GUEST_USER_ID ? safeLocalStorageGetItem(COMPLETED_SESSIONS_KEY) : null;
+  return Math.max(scopedRaw?.length ?? 0, legacyRaw?.length ?? 0);
+}
+
 export function loadCompletedSessionsForUser(userId: string): QuizSession[] {
   if (!isBrowser()) return [];
   const cachedSessions = completedSessionsMemoryCache.get(userId);

@@ -38,10 +38,9 @@ function useNearViewport(rootMargin = "900px") {
 
 function FeedbackBoardPlaceholder() {
   return (
-    <section className="surface-card min-h-[14rem] p-5">
+    <section className="surface-card p-5">
       <p className="eyebrow">Feedback</p>
       <h2 className="display-title mt-2 text-3xl">留言板</h2>
-      <p className="body-soft mt-3 text-sm leading-7">留言板會在滑到附近時自動載入。</p>
       <div className="mt-5 space-y-2">
         <div className="surface-card-muted h-10 p-3" />
         <div className="surface-card-muted h-10 p-3" />

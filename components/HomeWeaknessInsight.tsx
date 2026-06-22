@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { useAuth } from "@/components/AuthProvider";
-import { loadCompletedSessions } from "@/lib/storage";
+import { getCompletedSessionsStorageLengthForUser, loadCompletedSessions } from "@/lib/storage";
 import {
   getHomeWeakSectionInsight,
   MAX_HOME_WEAKNESS_ATTEMPTS,
@@ -17,6 +17,7 @@ import type { QuizSession } from "@/types/quiz";
 const WEAKNESS_ROTATION_INTERVAL_MS = 6 * 60 * 60 * 1000;
 const MAX_HOME_WEAKNESS_SESSIONS = 80;
 const HOME_WEAKNESS_CACHE_KEY = "homeWeaknessLastGood";
+const SAFARI_HOME_HISTORY_READ_LIMIT = 750_000;
 
 type HomeWeaknessSnapshot = {
   totalAttempts: number;
@@ -91,6 +92,16 @@ function getNextWeaknessRotationDelay() {
   return Math.max(nextBoundary - Date.now(), 60_000);
 }
 
+function isSafariBrowser() {
+  if (typeof navigator === "undefined") return false;
+  const userAgent = navigator.userAgent;
+  return /Safari/i.test(userAgent) && !/Chrome|Chromium|CriOS|FxiOS|EdgiOS|Edg\//i.test(userAgent);
+}
+
+function shouldSkipHeavyHomeHistoryRead() {
+  return isSafariBrowser() && getCompletedSessionsStorageLengthForUser() > SAFARI_HOME_HISTORY_READ_LIMIT;
+}
+
 export function HomeWeaknessInsight() {
   const { session, syncVersion } = useAuth();
   const [sessions, setSessions] = useState<QuizSession[]>([]);
@@ -101,6 +112,11 @@ export function HomeWeaknessInsight() {
 
   useEffect(() => {
     function refreshSessions() {
+      if (shouldSkipHeavyHomeHistoryRead()) {
+        setSessions([]);
+        setCloudNotice("Safari 版首頁先略過本機弱點整理，避免開站卡住。");
+        return;
+      }
       setSessions(loadCompletedSessions());
     }
 

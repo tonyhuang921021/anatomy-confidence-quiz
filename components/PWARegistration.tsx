@@ -49,8 +49,13 @@ export function PWARegistration() {
 
     const register = async () => {
       try {
-        if (isSupabaseRecoveryMode() || isSafariBrowser()) {
+        if (isSupabaseRecoveryMode()) {
           await disableServiceWorker(true);
+          return;
+        }
+
+        if (isSafariBrowser()) {
+          await disableServiceWorker(false);
           return;
         }
 

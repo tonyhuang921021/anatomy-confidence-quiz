@@ -38,10 +38,10 @@ function useNearViewport(rootMargin = "760px") {
 
 function AuthPanelPlaceholder() {
   return (
-    <section className="surface-card min-h-[10rem] p-5">
+    <section className="surface-card p-5">
       <p className="eyebrow">Account</p>
       <h2 className="display-title mt-2 text-3xl">帳號與同步</h2>
-      <p className="body-soft mt-3 text-sm leading-7">帳號設定會在滑到附近時自動載入。</p>
+      <div className="surface-card-muted mt-5 h-10 p-3" />
     </section>
   );
 }
