@@ -400,6 +400,40 @@ function getQuestionByOrder(
     .filter((question): question is Question => Boolean(question));
 }
 
+function getResolvableQuestionIdsForSession(
+  session: QuizSession,
+  classificationOverrides: Record<string, QuestionClassificationOverride> = {}
+) {
+  const generatedIds = new Set(
+    (session.generatedQuestions ?? [])
+      .filter((question): question is Question => Boolean(question?.id))
+      .map((question) => question.id)
+  );
+  const fallbackIds = new Set(
+    getQuestionBankBySubjects(["醫學（一）", "醫學（二）"], classificationOverrides).map(
+      (question) => question.id
+    )
+  );
+
+  return (session.questionOrder ?? []).filter(
+    (id) => generatedIds.has(id) || fallbackIds.has(id)
+  );
+}
+
+function canReuseCurrentSession(
+  session: QuizSession | null,
+  classificationOverrides: Record<string, QuestionClassificationOverride> = {}
+) {
+  if (!session || session.completedAt) return false;
+  const resolvableIds = getResolvableQuestionIdsForSession(session, classificationOverrides);
+  const currentIndex = session.currentQuestionIndex ?? 0;
+  return (
+    resolvableIds.length > 0 &&
+    currentIndex >= 0 &&
+    currentIndex < resolvableIds.length
+  );
+}
+
 function normalizeLegacySettings(settings: QuizSettings): QuizSettings {
   if ((settings as { mode?: string }).mode !== "ai_fresh") return settings;
 
@@ -458,6 +492,7 @@ export default function QuizPage() {
   const [isSubmittingAnswer, setIsSubmittingAnswer] = useState(false);
   const [isPeakPrefetching, setIsPeakPrefetching] = useState(false);
   const [peakNextQuestionError, setPeakNextQuestionError] = useState("");
+  const [loadIssue, setLoadIssue] = useState("");
   const [fastAnswerMode, setFastAnswerMode] = useState(false);
   const [selectedAnswer, setSelectedAnswer] = useState<OptionKey | undefined>();
   const [confidence, setConfidence] = useState<ConfidenceLevel>(4);
@@ -593,119 +628,137 @@ export default function QuizPage() {
 
   useEffect(() => {
     async function initializeSession() {
-      const loadedOverrides = await loadConfirmedQuestionClassificationOverrides().catch(
-        () => ({} as Record<string, QuestionClassificationOverride>)
-      );
-      setClassificationOverrides(loadedOverrides);
+      try {
+        setLoadIssue("");
+        const loadedOverrides = await loadConfirmedQuestionClassificationOverrides().catch(
+          () => ({} as Record<string, QuestionClassificationOverride>)
+        );
+        setClassificationOverrides(loadedOverrides);
 
-      const existing = loadCurrentSession();
-      const params =
-        typeof window !== "undefined" ? new URLSearchParams(window.location.search) : null;
-      const preset = params?.get("preset");
-      const directSubject = params?.get("subject");
-      const startSettingsFromUrl = decodeStartSettingsFromUrl(params?.get("startSettings") ?? null);
-      const startPresetSettings: QuizSettings = {
-        ...DEFAULT_QUIZ_SETTINGS,
-        mode: "weakness",
-        questionCount: 10,
-        chapter: undefined,
-        section: undefined
-      };
-      const directSubjectSettings: QuizSettings | null = directSubject
-        ? {
-            ...DEFAULT_QUIZ_SETTINGS,
-            mode: "random",
-            subjectFilter: directSubject as SubjectName,
-            subjectFilters: [directSubject as SubjectName],
-            questionCount: 10,
-            chapter: undefined,
-            section: undefined
-          }
-        : null;
-      const med1PresetSettings: QuizSettings = {
-        ...DEFAULT_QUIZ_SETTINGS,
-        mode: "random",
-        subjectFilter: "醫學（一）",
-        questionCount: 10,
-        chapter: undefined,
-        section: undefined
-      };
-      const med2PresetSettings: QuizSettings = {
-        ...DEFAULT_QUIZ_SETTINGS,
-        mode: "random",
-        subjectFilter: "醫學（二）",
-        questionCount: 10,
-        chapter: undefined,
-        section: undefined
-      };
-      const rawSettings: QuizSettings =
-        startSettingsFromUrl ??
-        directSubjectSettings ??
-        (preset === "start"
-          ? startPresetSettings
-          : preset === "med1"
-            ? med1PresetSettings
-            : preset === "med2"
-              ? med2PresetSettings
-              : loadQuizSettings() ?? DEFAULT_QUIZ_SETTINGS);
-      const savedSettings = normalizeLegacySettings(rawSettings);
-      const completedSessions = loadCompletedSessions();
-      const shouldForceNewSession = params?.get("new") === "1";
-      const expectedSimulationQuestionCount = getExpectedSimulationQuestionCount(
-        savedSettings,
-        loadedOverrides
-      );
-      const existingSimulationQuestionCount =
-        existing?.settings?.mode === "simulation"
-          ? existing.questionOrder?.length ?? 0
+        const existing = loadCurrentSession();
+        const params =
+          typeof window !== "undefined" ? new URLSearchParams(window.location.search) : null;
+        const preset = params?.get("preset");
+        const directSubject = params?.get("subject");
+        const startSettingsFromUrl = decodeStartSettingsFromUrl(params?.get("startSettings") ?? null);
+        const startPresetSettings: QuizSettings = {
+          ...DEFAULT_QUIZ_SETTINGS,
+          mode: "weakness",
+          questionCount: 10,
+          chapter: undefined,
+          section: undefined
+        };
+        const directSubjectSettings: QuizSettings | null = directSubject
+          ? {
+              ...DEFAULT_QUIZ_SETTINGS,
+              mode: "random",
+              subjectFilter: directSubject as SubjectName,
+              subjectFilters: [directSubject as SubjectName],
+              questionCount: 10,
+              chapter: undefined,
+              section: undefined
+            }
           : null;
-      const shouldInvalidateExistingSimulationSession =
-        existing?.settings?.mode === "simulation" &&
-        savedSettings.mode === "simulation" &&
-        existingSimulationQuestionCount !== null &&
-        expectedSimulationQuestionCount > 0 &&
-        existingSimulationQuestionCount !== expectedSimulationQuestionCount;
-      const shouldReuseExisting =
-        !shouldForceNewSession &&
-        existing &&
-        !existing.completedAt &&
-        (existing.questionOrder?.length ?? 0) > 0 &&
-        !shouldInvalidateExistingSimulationSession;
-      const nextSession = shouldReuseExisting
-        ? existing
-        : createSession(
-            (savedSettings.subjectFilters?.length ?? 0) > 0
-              ? getQuestionBankBySubjects(savedSettings.subjectFilters ?? [], loadedOverrides)
-              : getQuestionBankBySubjectFilter(savedSettings.subjectFilter ?? "解剖學", loadedOverrides),
-            completedSessions,
-            savedSettings,
-            loadedOverrides
-          );
+        const med1PresetSettings: QuizSettings = {
+          ...DEFAULT_QUIZ_SETTINGS,
+          mode: "random",
+          subjectFilter: "醫學（一）",
+          questionCount: 10,
+          chapter: undefined,
+          section: undefined
+        };
+        const med2PresetSettings: QuizSettings = {
+          ...DEFAULT_QUIZ_SETTINGS,
+          mode: "random",
+          subjectFilter: "醫學（二）",
+          questionCount: 10,
+          chapter: undefined,
+          section: undefined
+        };
+        const rawSettings: QuizSettings =
+          startSettingsFromUrl ??
+          directSubjectSettings ??
+          (preset === "start"
+            ? startPresetSettings
+            : preset === "med1"
+              ? med1PresetSettings
+              : preset === "med2"
+                ? med2PresetSettings
+                : loadQuizSettings() ?? DEFAULT_QUIZ_SETTINGS);
+        const savedSettings = normalizeLegacySettings(rawSettings);
+        const completedSessions = loadCompletedSessions();
+        const shouldForceNewSession = params?.get("new") === "1";
+        const expectedSimulationQuestionCount = getExpectedSimulationQuestionCount(
+          savedSettings,
+          loadedOverrides
+        );
+        const existingSimulationQuestionCount =
+          existing?.settings?.mode === "simulation"
+            ? existing.questionOrder?.length ?? 0
+            : null;
+        const shouldInvalidateExistingSimulationSession =
+          existing?.settings?.mode === "simulation" &&
+          savedSettings.mode === "simulation" &&
+          existingSimulationQuestionCount !== null &&
+          expectedSimulationQuestionCount > 0 &&
+          existingSimulationQuestionCount !== expectedSimulationQuestionCount;
+        const canReuseExisting = canReuseCurrentSession(existing, loadedOverrides);
+        const shouldReuseExisting =
+          !shouldForceNewSession &&
+          canReuseExisting &&
+          !shouldInvalidateExistingSimulationSession;
+        const nextSession = shouldReuseExisting
+          ? existing
+          : createSession(
+              (savedSettings.subjectFilters?.length ?? 0) > 0
+                ? getQuestionBankBySubjects(savedSettings.subjectFilters ?? [], loadedOverrides)
+                : getQuestionBankBySubjectFilter(savedSettings.subjectFilter ?? "解剖學", loadedOverrides),
+              completedSessions,
+              savedSettings,
+              loadedOverrides
+            );
 
-      if (!shouldReuseExisting) {
+        if (!nextSession || (nextSession.questionOrder?.length ?? 0) === 0) {
+          clearCurrentSession();
+          setSession(null);
+          setLoadIssue("這組篩選暫時沒有抓到題目，請回到選科目頁重新選一次。");
+          resetQuestionUI();
+          return;
+        }
+
+        if (!shouldReuseExisting) {
+          clearCurrentSession();
+          if (existing && !shouldForceNewSession) {
+            setLoadIssue("這台電腦保留的舊作答狀態讀不到題目，已重新開一份。");
+          }
+        }
+
+        setSession(nextSession);
+        saveCurrentSession(nextSession);
+        void pushCurrentSessionToSupabase(nextSession);
+
+        if (shouldReuseExisting && existing?.isReviewingAnswer) {
+          const currentQuestionId = existing.questionOrder?.[existing.currentQuestionIndex ?? 0];
+          const currentAttempt =
+            existing.attempts.find((attempt) => attempt.questionId === currentQuestionId) ?? null;
+          setSubmittedAttempt(currentAttempt);
+          setSelectedAnswer(currentAttempt?.selectedAnswer);
+          const nextConfidence = currentAttempt?.confidence ?? 4;
+          confidenceRef.current = nextConfidence;
+          setConfidence(nextConfidence);
+          setConfidenceExpanded(nextConfidence <= 3);
+          setErrorType(currentAttempt?.errorType);
+        } else {
+          resetQuestionUI();
+        }
+      } catch {
         clearCurrentSession();
-      }
-
-      setSession(nextSession);
-      saveCurrentSession(nextSession);
-      void pushCurrentSessionToSupabase(nextSession);
-
-      if (shouldReuseExisting && existing?.isReviewingAnswer) {
-        const currentQuestionId = existing.questionOrder?.[existing.currentQuestionIndex ?? 0];
-        const currentAttempt =
-          existing.attempts.find((attempt) => attempt.questionId === currentQuestionId) ?? null;
-        setSubmittedAttempt(currentAttempt);
-        setSelectedAnswer(currentAttempt?.selectedAnswer);
-        const nextConfidence = currentAttempt?.confidence ?? 4;
-        confidenceRef.current = nextConfidence;
-        setConfidence(nextConfidence);
-        setConfidenceExpanded(nextConfidence <= 3);
-        setErrorType(currentAttempt?.errorType);
-      } else {
+        setSession(null);
+        setLoadIssue("題目載入時遇到本機狀態錯誤，請重新開始測驗。");
         resetQuestionUI();
+      } finally {
+        setMounted(true);
       }
-
-      setMounted(true);
     }
 
     void initializeSession();
@@ -788,6 +841,26 @@ export default function QuizPage() {
   );
   const currentIndex = session?.currentQuestionIndex ?? 0;
   const currentQuestion = questionSet[currentIndex];
+  useEffect(() => {
+    if (!session || questionSet.length === 0) return;
+    const safeIndex = Math.min(
+      Math.max(session.currentQuestionIndex ?? 0, 0),
+      questionSet.length - 1
+    );
+    if (safeIndex === session.currentQuestionIndex) return;
+
+    const nextSession = {
+      ...session,
+      currentQuestionIndex: safeIndex,
+      isReviewingAnswer: false
+    };
+    setSubmittedAttempt(null);
+    setSelectedAnswer(undefined);
+    setErrorType(undefined);
+    setSession(nextSession);
+    saveCurrentSession(nextSession);
+  }, [questionSet.length, session?.currentQuestionIndex, session?.id]);
+
   const targetCount =
     session?.settings?.mode === "simulation"
       ? questionSet.length
@@ -1474,12 +1547,46 @@ export default function QuizPage() {
       });
   }, [authSession?.access_token, currentIndex, currentQuestion, isPeakPrefetching, session, submittedAttempt]);
 
-  if (!mounted || !session || !currentQuestion) {
+  if (!mounted) {
     return (
       <main className="shell">
         <div className="rounded-[2rem] bg-white p-4 shadow-card ring-1 ring-slate-100 sm:p-6">
           載入中...
         </div>
+      </main>
+    );
+  }
+
+  if (!session || !currentQuestion) {
+    const message =
+      loadIssue ||
+      "這台裝置保留的作答狀態暫時讀不到題目，回到選科目頁重新開一份就可以。";
+
+    return (
+      <main className="shell">
+        <section className="rounded-[2rem] bg-white p-6 shadow-card ring-1 ring-slate-100 sm:p-8">
+          <p className="text-xs font-black uppercase tracking-[0.35em] text-emerald-700">
+            QUIZ RECOVERY
+          </p>
+          <h1 className="mt-3 text-3xl font-black text-slate-950">題目載入卡住了</h1>
+          <p className="mt-3 max-w-2xl text-base font-bold leading-8 text-slate-600">
+            {message}
+          </p>
+          <div className="mt-6 flex flex-wrap gap-3">
+            <Link
+              href="/start"
+              className="rounded-full bg-slate-950 px-5 py-3 text-sm font-black text-white shadow-card transition hover:-translate-y-0.5"
+            >
+              回選科目
+            </Link>
+            <Link
+              href="/quiz?new=1&preset=med1"
+              className="rounded-full bg-emerald-100 px-5 py-3 text-sm font-black text-emerald-950 ring-1 ring-emerald-200 transition hover:-translate-y-0.5"
+            >
+              先開醫學一
+            </Link>
+          </div>
+        </section>
       </main>
     );
   }

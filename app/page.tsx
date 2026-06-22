@@ -54,6 +54,11 @@ const QUICK_ENTRIES = [
 const HOME_RELEASE_NOTES = [
   {
     time: "06/22",
+    title: "電腦刷題載入中會自救",
+    body: "某台電腦如果留到壞掉的暫存卷，現在會自動清醒重開，不再對著載入中發呆。"
+  },
+  {
+    time: "06/22",
     title: "題目空格被抓回來",
     body: "修掉幾題 OCR 把英文和公式拆成碎片的問題，Broca 和 kcat/Km 不再像被鍵盤打散。"
   },
