@@ -37,6 +37,7 @@ import {
   loadCurrentSession,
   clearCurrentSession,
   getPendingQuestionExplanationOverrideSync,
+  getCanonicalSessionId,
   loadCompletedSessions,
   loadQuestionExplanationOverrides,
   saveCompletedSession,
@@ -244,6 +245,11 @@ function getSessionResultsHref(session: QuizSession) {
   return `${basePath}?sessionId=${encodeURIComponent(session.id)}`;
 }
 
+function isSameSessionId(left?: string | null, right?: string | null) {
+  if (!left || !right) return false;
+  return getCanonicalSessionId(left) === getCanonicalSessionId(right);
+}
+
 function getAccuracyTone(correctRate: number) {
   if (correctRate < 30) return "bg-rose-100 text-rose-800";
   if (correctRate <= 60) return "bg-amber-100 text-amber-800";
@@ -422,25 +428,30 @@ function ResultsPageContent() {
       const currentSession = loadCurrentSession();
       const fallbackCurrentSession =
         targetSessionId &&
-        currentSession?.id === targetSessionId &&
-        currentSession.completedAt
+        isSameSessionId(currentSession?.id, targetSessionId) &&
+        currentSession?.completedAt
           ? currentSession
           : null;
       const targetSession =
         targetSessionId
-          ? completedSessions.find((item) => item.id === targetSessionId) ?? fallbackCurrentSession ?? null
+          ? completedSessions.find((item) => isSameSessionId(item.id, targetSessionId)) ?? fallbackCurrentSession ?? null
           : null;
       let resolvedTargetSession = targetSession;
 
-      if (targetSessionId && !resolvedTargetSession?.completedAt && session?.user?.id) {
+      const shouldHydrateTargetFromCloud =
+        targetSessionId &&
+        session?.user?.id &&
+        (!resolvedTargetSession?.completedAt || resolvedTargetSession.attempts.length === 0);
+
+      if (shouldHydrateTargetFromCloud) {
         let cloudSession = await loadCompletedSessionFromSupabase(targetSessionId);
-        if (!cloudSession?.completedAt) {
+        if (!cloudSession?.completedAt || cloudSession.attempts.length === 0) {
           await new Promise((resolve) => window.setTimeout(resolve, 900));
           if (!cancelled) {
             cloudSession = await loadCompletedSessionFromSupabase(targetSessionId);
           }
         }
-        if (cloudSession?.completedAt) {
+        if (cloudSession?.completedAt && cloudSession.attempts.length > 0) {
           saveCompletedSession(cloudSession);
           completedSessions = loadCompletedSessions();
           scopedSessions = completedSessions.filter((sessionItem) =>
@@ -466,7 +477,7 @@ function ResultsPageContent() {
 
       if (
         fallbackCurrentSession &&
-        !completedSessions.some((item) => item.id === fallbackCurrentSession.id)
+        !completedSessions.some((item) => isSameSessionId(item.id, fallbackCurrentSession.id))
       ) {
         saveCompletedSession(fallbackCurrentSession);
       }

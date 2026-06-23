@@ -51,7 +51,7 @@ const CLOUD_FALLBACK_MESSAGE = "暫用本機，稍後補傳。雲端同步暫時
 const AUTH_FALLBACK_MESSAGE = "暫用本機，稍後補傳。登入狀態讀取逾時，如果剛剛已登入，稍後可再同步。";
 const RECOVERY_MODE_MESSAGE = "暫用本機，稍後補傳。雲端登入與同步維護中，作答不會被登入流程卡住。";
 const SAFARI_AUTO_SYNC_DEFERRED_MESSAGE =
-  "Safari 先暫用本機，雲端紀錄可到帳號區手動同步，作答完成也會補傳。";
+  "暫用本機，稍後補傳。雲端紀錄同步排程中，作答完成也會補傳。";
 
 function getErrorMessage(error: unknown) {
   if (error instanceof Error) return error.message;
@@ -88,16 +88,8 @@ function isPasswordRecoveryRoute() {
   );
 }
 
-function isSafariBrowser() {
-  if (typeof navigator === "undefined") return false;
-  const userAgent = navigator.userAgent;
-  return /Safari/i.test(userAgent) && !/Chrome|Chromium|CriOS|FxiOS|EdgiOS|Edg\//i.test(userAgent);
-}
-
 function shouldDeferAutomaticCloudSync() {
-  if (typeof window === "undefined") return false;
-  if (!isSafariBrowser()) return false;
-  return new URLSearchParams(window.location.search).get("forceCloudSync") !== "1";
+  return false;
 }
 
 function safeGetStorage(storage: Storage | undefined, key: string) {

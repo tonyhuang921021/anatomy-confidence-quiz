@@ -12,6 +12,7 @@ import { normalizePracticeYearRange } from "@/lib/practiceYears";
 
 const CURRENT_SESSION_KEY = "anatomy-confidence-current-session";
 const COMPLETED_SESSIONS_KEY = "anatomy-confidence-completed-sessions";
+const COMPLETED_QUESTION_HISTORY_KEY = "anatomy-confidence-completed-question-history";
 const QUIZ_SETTINGS_KEY = "anatomy-confidence-quiz-settings";
 const QUESTION_EXPLANATION_OVERRIDES_KEY = "anatomy-confidence-question-explanation-overrides";
 const PEAK_CHALLENGE_PRELOAD_KEY = "anatomy-confidence-peak-challenge-preload";
@@ -25,6 +26,23 @@ const ACTIVE_USER_KEY = "anatomy-confidence-active-user-id";
 const GUEST_USER_ID = "guest";
 const completedSessionsMemoryCache = new Map<string, QuizSession[]>();
 const completedSessionIdMemoryCache = new Map<string, Set<string>>();
+const completedQuestionHistoryMemoryCache = new Map<string, CompletedQuestionHistoryEntry[]>();
+const COMPLETED_SESSIONS_HEAVY_READ_LIMIT = 160_000;
+
+export type CompletedQuestionHistoryEntry = {
+  questionId: string;
+  attempts: number;
+  correct: number;
+  wrong: number;
+  lowConfidence: number;
+  overconfidence: number;
+  lastAttemptedAt: string;
+  lastAttemptCorrect: boolean;
+  latestErrorType?: ErrorType;
+  latestSelectedAnswer: OptionKey;
+  latestCorrectAnswer: OptionKey;
+  latestConfidence: ConfidenceLevel;
+};
 
 const isBrowser = () => typeof window !== "undefined";
 
@@ -117,6 +135,302 @@ function buildCompletedSessionIdSet(sessions: QuizSession[]) {
 function cacheCompletedSessionsForUser(userId: string, sessions: QuizSession[]) {
   completedSessionsMemoryCache.set(userId, sessions);
   completedSessionIdMemoryCache.set(userId, buildCompletedSessionIdSet(sessions));
+}
+
+function cacheCompletedQuestionHistoryForUser(userId: string, entries: CompletedQuestionHistoryEntry[]) {
+  completedQuestionHistoryMemoryCache.set(userId, entries);
+}
+
+function getCompletedQuestionHistoryScopedKeyForUser(userId: string) {
+  return getScopedKeyForUser(COMPLETED_QUESTION_HISTORY_KEY, userId);
+}
+
+function normalizeCompletedQuestionHistoryEntry(entry: unknown): CompletedQuestionHistoryEntry | null {
+  if (!entry || typeof entry !== "object") return null;
+  const raw = entry as Partial<CompletedQuestionHistoryEntry>;
+  const questionId = typeof raw.questionId === "string" ? raw.questionId.trim() : "";
+  const latestSelectedAnswer =
+    typeof raw.latestSelectedAnswer === "string" ? raw.latestSelectedAnswer.trim().toUpperCase() : "";
+  const latestCorrectAnswer =
+    typeof raw.latestCorrectAnswer === "string" ? raw.latestCorrectAnswer.trim().toUpperCase() : "";
+
+  if (!questionId || !isOptionKey(latestSelectedAnswer) || !isOptionKey(latestCorrectAnswer)) {
+    return null;
+  }
+
+  const correct = Math.max(0, Math.floor(Number(raw.correct) || 0));
+  const wrong = Math.max(0, Math.floor(Number(raw.wrong) || 0));
+  const lowConfidence = Math.max(0, Math.floor(Number(raw.lowConfidence) || 0));
+  const overconfidence = Math.max(0, Math.floor(Number(raw.overconfidence) || 0));
+  const attempts = Math.max(
+    1,
+    Math.floor(Number(raw.attempts) || 1),
+    correct + wrong,
+    lowConfidence,
+    overconfidence
+  );
+
+  return {
+    questionId,
+    attempts,
+    correct: Math.min(correct, attempts),
+    wrong: Math.min(wrong, attempts),
+    lowConfidence: Math.min(lowConfidence, attempts),
+    overconfidence: Math.min(overconfidence, attempts),
+    lastAttemptedAt:
+      typeof raw.lastAttemptedAt === "string" && raw.lastAttemptedAt.trim()
+        ? raw.lastAttemptedAt
+        : new Date(0).toISOString(),
+    lastAttemptCorrect: Boolean(raw.lastAttemptCorrect),
+    latestErrorType: normalizeErrorType(raw.latestErrorType),
+    latestSelectedAnswer,
+    latestCorrectAnswer,
+    latestConfidence: normalizeConfidenceLevel(raw.latestConfidence)
+  };
+}
+
+function mergeAttemptIntoCompletedQuestionHistory(
+  history: Map<string, CompletedQuestionHistoryEntry>,
+  attempt: QuizSession["attempts"][number]
+) {
+  const existing = history.get(attempt.questionId);
+  const base: CompletedQuestionHistoryEntry =
+    existing ?? {
+      questionId: attempt.questionId,
+      attempts: 0,
+      correct: 0,
+      wrong: 0,
+      lowConfidence: 0,
+      overconfidence: 0,
+      lastAttemptedAt: attempt.answeredAt,
+      lastAttemptCorrect: attempt.isCorrect,
+      latestErrorType: attempt.errorType,
+      latestSelectedAnswer: attempt.selectedAnswer,
+      latestCorrectAnswer: attempt.correctAnswer,
+      latestConfidence: attempt.confidence
+    };
+
+  base.attempts += 1;
+  base.correct += attempt.isCorrect ? 1 : 0;
+  base.wrong += attempt.isCorrect ? 0 : 1;
+  base.lowConfidence += attempt.confidence <= 2 ? 1 : 0;
+  base.overconfidence += !attempt.isCorrect && attempt.confidence >= 4 ? 1 : 0;
+
+  if (!base.lastAttemptedAt || attempt.answeredAt >= base.lastAttemptedAt) {
+    base.lastAttemptedAt = attempt.answeredAt;
+    base.lastAttemptCorrect = attempt.isCorrect;
+    base.latestErrorType = attempt.errorType;
+    base.latestSelectedAnswer = attempt.selectedAnswer;
+    base.latestCorrectAnswer = attempt.correctAnswer;
+    base.latestConfidence = attempt.confidence;
+  }
+
+  history.set(attempt.questionId, base);
+}
+
+export function buildCompletedQuestionHistoryEntriesFromSessions(
+  sessions: Pick<QuizSession, "attempts">[]
+) {
+  const history = new Map<string, CompletedQuestionHistoryEntry>();
+
+  for (const session of sessions) {
+    for (const attempt of session.attempts ?? []) {
+      mergeAttemptIntoCompletedQuestionHistory(history, attempt);
+    }
+  }
+
+  return Array.from(history.values()).sort((left, right) =>
+    right.lastAttemptedAt.localeCompare(left.lastAttemptedAt)
+  );
+}
+
+export function mergeCompletedQuestionHistoryEntries(
+  existing: CompletedQuestionHistoryEntry[],
+  next: CompletedQuestionHistoryEntry[]
+) {
+  const merged = new Map(existing.map((entry) => [entry.questionId, { ...entry }] as const));
+
+  for (const entry of next) {
+    const current = merged.get(entry.questionId);
+    if (!current) {
+      merged.set(entry.questionId, { ...entry });
+      continue;
+    }
+
+    const aggregateSource =
+      entry.attempts > current.attempts ? entry : current;
+    const latestSource =
+      entry.lastAttemptedAt >= current.lastAttemptedAt ? entry : current;
+
+    merged.set(entry.questionId, {
+      questionId: entry.questionId,
+      attempts: aggregateSource.attempts,
+      correct: aggregateSource.correct,
+      wrong: aggregateSource.wrong,
+      lowConfidence: aggregateSource.lowConfidence,
+      overconfidence: aggregateSource.overconfidence,
+      lastAttemptedAt: latestSource.lastAttemptedAt,
+      lastAttemptCorrect: latestSource.lastAttemptCorrect,
+      latestErrorType: latestSource.latestErrorType,
+      latestSelectedAnswer: latestSource.latestSelectedAnswer,
+      latestCorrectAnswer: latestSource.latestCorrectAnswer,
+      latestConfidence: latestSource.latestConfidence
+    });
+  }
+
+  return Array.from(merged.values()).sort((left, right) =>
+    right.lastAttemptedAt.localeCompare(left.lastAttemptedAt)
+  );
+}
+
+export function saveCompletedQuestionHistoryEntriesForUser(
+  userId: string,
+  entries: CompletedQuestionHistoryEntry[]
+) {
+  if (!isBrowser()) return false;
+  const normalized = entries
+    .map(normalizeCompletedQuestionHistoryEntry)
+    .filter((entry): entry is CompletedQuestionHistoryEntry => Boolean(entry));
+
+  cacheCompletedQuestionHistoryForUser(userId, normalized);
+  return safeLocalStorageSetItem(
+    getCompletedQuestionHistoryScopedKeyForUser(userId),
+    JSON.stringify(normalized)
+  );
+}
+
+export function mergeCompletedQuestionHistoryEntriesForUser(
+  userId: string,
+  entries: CompletedQuestionHistoryEntry[]
+) {
+  return saveCompletedQuestionHistoryEntriesForUser(
+    userId,
+    mergeCompletedQuestionHistoryEntries(loadCompletedQuestionHistoryEntriesForUser(userId), entries)
+  );
+}
+
+export function loadCompletedQuestionHistoryEntriesForUser(userId = getActiveStorageUser()) {
+  if (!isBrowser()) return [] as CompletedQuestionHistoryEntry[];
+  const cached = completedQuestionHistoryMemoryCache.get(userId);
+  if (cached) return cached;
+
+  const raw =
+    safeLocalStorageGetItem(getCompletedQuestionHistoryScopedKeyForUser(userId)) ??
+    (userId === GUEST_USER_ID ? safeLocalStorageGetItem(COMPLETED_QUESTION_HISTORY_KEY) : null);
+  if (!raw) {
+    cacheCompletedQuestionHistoryForUser(userId, []);
+    return [];
+  }
+
+  try {
+    const parsed = JSON.parse(raw) as unknown[];
+    const normalized = parsed
+      .map(normalizeCompletedQuestionHistoryEntry)
+      .filter((entry): entry is CompletedQuestionHistoryEntry => Boolean(entry));
+    cacheCompletedQuestionHistoryForUser(userId, normalized);
+    return normalized;
+  } catch {
+    cacheCompletedQuestionHistoryForUser(userId, []);
+    return [];
+  }
+}
+
+export function mergeCompletedQuestionHistoryFromSessionsForUser(
+  userId: string,
+  sessions: Pick<QuizSession, "attempts">[]
+) {
+  const existing = loadCompletedQuestionHistoryEntriesForUser(userId);
+  const next = buildCompletedQuestionHistoryEntriesFromSessions(sessions);
+  return saveCompletedQuestionHistoryEntriesForUser(
+    userId,
+    mergeCompletedQuestionHistoryEntries(existing, next)
+  );
+}
+
+function buildSyntheticAttemptsFromQuestionHistory(entries: CompletedQuestionHistoryEntry[]) {
+  const syntheticAttempts: QuizSession["attempts"] = [];
+  const epoch = new Date(0).toISOString();
+
+  for (const entry of entries) {
+    let wrongLowConfidence = Math.min(entry.wrong, entry.lowConfidence);
+    let wrongOverconfidence = Math.min(
+      Math.max(0, entry.wrong - wrongLowConfidence),
+      entry.overconfidence
+    );
+    let wrongRegular = Math.max(0, entry.wrong - wrongLowConfidence - wrongOverconfidence);
+    let correctLowConfidence = Math.min(
+      entry.correct,
+      Math.max(0, entry.lowConfidence - wrongLowConfidence)
+    );
+    let correctRegular = Math.max(0, entry.correct - correctLowConfidence);
+    const latestBucket = entry.lastAttemptCorrect
+      ? entry.latestConfidence <= 2
+        ? "correctLowConfidence"
+        : "correctRegular"
+      : entry.latestConfidence <= 2
+        ? "wrongLowConfidence"
+        : entry.latestConfidence >= 4
+          ? "wrongOverconfidence"
+          : "wrongRegular";
+
+    if (latestBucket === "correctLowConfidence" && correctLowConfidence > 0) correctLowConfidence -= 1;
+    if (latestBucket === "correctRegular" && correctRegular > 0) correctRegular -= 1;
+    if (latestBucket === "wrongLowConfidence" && wrongLowConfidence > 0) wrongLowConfidence -= 1;
+    if (latestBucket === "wrongOverconfidence" && wrongOverconfidence > 0) wrongOverconfidence -= 1;
+    if (latestBucket === "wrongRegular" && wrongRegular > 0) wrongRegular -= 1;
+
+    const pushAttempt = (
+      count: number,
+      isCorrect: boolean,
+      confidence: ConfidenceLevel,
+      answeredAt = epoch
+    ) => {
+      for (let index = 0; index < count; index += 1) {
+        syntheticAttempts.push({
+          questionId: entry.questionId,
+          selectedAnswer: entry.latestSelectedAnswer,
+          correctAnswer: entry.latestCorrectAnswer,
+          isCorrect,
+          confidence,
+          errorType: isCorrect ? undefined : entry.latestErrorType,
+          answeredAt
+        });
+      }
+    };
+
+    pushAttempt(wrongLowConfidence, false, 2);
+    pushAttempt(wrongOverconfidence, false, 4);
+    pushAttempt(wrongRegular, false, 3);
+    pushAttempt(correctLowConfidence, true, 2);
+    pushAttempt(correctRegular, true, 4);
+
+    if (entry.attempts > 0) {
+      syntheticAttempts.push({
+        questionId: entry.questionId,
+        selectedAnswer: entry.latestSelectedAnswer,
+        correctAnswer: entry.latestCorrectAnswer,
+        isCorrect: entry.lastAttemptCorrect,
+        confidence: entry.latestConfidence,
+        errorType: entry.lastAttemptCorrect ? undefined : entry.latestErrorType,
+        answeredAt: entry.lastAttemptedAt
+      });
+    }
+  }
+
+  return syntheticAttempts;
+}
+
+export function loadCompletedHistorySessionsForUser(userId = getActiveStorageUser()) {
+  const historyEntries = loadCompletedQuestionHistoryEntriesForUser(userId);
+  if (historyEntries.length > 0) {
+    return [{ attempts: buildSyntheticAttemptsFromQuestionHistory(historyEntries) }];
+  }
+
+  if (getCompletedSessionsStorageLengthForUser(userId) > COMPLETED_SESSIONS_HEAVY_READ_LIMIT) {
+    return [] as { attempts: QuizSession["attempts"] }[];
+  }
+
+  return loadCompletedSessionsForUser(userId);
 }
 
 function getLegacyOrScopedRaw(baseKey: string) {
@@ -453,6 +767,23 @@ export function clearMatchingCurrentSessions(sessionId: string, userIds: string[
 
 export function saveCompletedSession(session: QuizSession) {
   if (!isBrowser()) return;
+  const activeUser = getActiveStorageUser();
+  mergeCompletedQuestionHistoryFromSessionsForUser(activeUser, [session]);
+
+  if (
+    getCompletedSessionsStorageLengthForUser(activeUser) > COMPLETED_SESSIONS_HEAVY_READ_LIMIT &&
+    !completedSessionsMemoryCache.has(activeUser)
+  ) {
+    const normalized = dedupeSessionsByCanonicalId(normalizeSessions([session]))
+      .filter((item) => Boolean(item.completedAt));
+    cacheCompletedSessionsForUser(activeUser, normalized);
+    for (const item of normalized) {
+      clearMatchingCurrentSessions(item.id);
+    }
+    window.dispatchEvent(new CustomEvent("completed-sessions-change", { detail: normalized }));
+    return true;
+  }
+
   const sessions = loadCompletedSessions();
   const nextKey = sessionDedupeKey(session);
   const nextSessions = [...sessions.filter((item) => sessionDedupeKey(item) !== nextKey), session];
@@ -470,6 +801,10 @@ export function saveCompletedSessions(sessions: QuizSession[]) {
   );
 
   cacheCompletedSessionsForUser(activeUser, normalized);
+  saveCompletedQuestionHistoryEntriesForUser(
+    activeUser,
+    buildCompletedQuestionHistoryEntriesFromSessions(normalized)
+  );
 
   let persisted = normalized.map(compactSessionForStorage);
   let didPersist = safeLocalStorageSetItem(scopedKey, JSON.stringify(persisted));
@@ -532,7 +867,9 @@ export function clearHistory() {
   const activeUser = getActiveStorageUser();
   completedSessionsMemoryCache.delete(activeUser);
   completedSessionIdMemoryCache.delete(activeUser);
+  completedQuestionHistoryMemoryCache.delete(activeUser);
   safeLocalStorageRemoveItem(getScopedKey(COMPLETED_SESSIONS_KEY));
+  safeLocalStorageRemoveItem(getScopedKey(COMPLETED_QUESTION_HISTORY_KEY));
   safeLocalStorageRemoveItem(getScopedKey(CURRENT_SESSION_KEY));
 }
 

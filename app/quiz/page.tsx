@@ -54,8 +54,8 @@ import {
   applyQuestionExplanationOverride,
   clearMatchingCurrentSessions,
   clearCurrentSession,
-  getCompletedSessionsStorageLengthForUser,
   getPendingQuestionExplanationOverrideSync,
+  loadCompletedHistorySessionsForUser,
   loadCompletedSessions,
   loadCurrentSession,
   loadPracticeFastAnswerMode,
@@ -83,7 +83,6 @@ import {
 const FREE_PRACTICE_BATCH_SIZE = 10;
 const FREE_PRACTICE_PREFETCH_THRESHOLD = 3;
 const QUIZ_CLASSIFICATION_OVERRIDE_TIMEOUT_MS = 3200;
-const SAFARI_QUIZ_HISTORY_READ_LIMIT = 160_000;
 
 function getQuestionSourceBadge(question: Question) {
   if (question.sourceType === "MOEX_PAST_EXAM") return "正式考古題";
@@ -131,16 +130,6 @@ function withTimeoutFallback<T>(promise: Promise<T>, timeoutMs: number, fallback
       .catch(() => resolve(fallback))
       .finally(() => globalThis.clearTimeout(timeoutId));
   });
-}
-
-function isSafariBrowser() {
-  if (typeof navigator === "undefined") return false;
-  const userAgent = navigator.userAgent;
-  return /Safari/i.test(userAgent) && !/Chrome|Chromium|CriOS|FxiOS|EdgiOS|Edg\//i.test(userAgent);
-}
-
-function shouldSkipHeavyCompletedHistoryForQuizStart() {
-  return isSafariBrowser() && getCompletedSessionsStorageLengthForUser() > SAFARI_QUIZ_HISTORY_READ_LIMIT;
 }
 
 function evaluateAttempt(question: Question, selectedAnswer: OptionKey) {
@@ -201,7 +190,7 @@ function isIncrementalPracticeSettings(settings?: QuizSettings | null): settings
 
 function createSession(
   questions: Question[],
-  completedSessions: QuizSession[],
+  completedSessions: { attempts: Attempt[] }[],
   settings: QuizSettings,
   classificationOverrides: Record<string, QuestionClassificationOverride> = {}
 ): QuizSession {
@@ -729,9 +718,7 @@ export default function QuizPage() {
                 : loadQuizSettings() ?? DEFAULT_QUIZ_SETTINGS);
         const savedSettings = normalizeLegacySettings(rawSettings);
         const shouldForceNewSession = params?.get("new") === "1";
-        const skipHeavyCompletedHistory =
-          shouldForceNewSession && shouldSkipHeavyCompletedHistoryForQuizStart();
-        const completedSessions = skipHeavyCompletedHistory ? [] : loadCompletedSessions();
+        const completedSessions = loadCompletedHistorySessionsForUser();
         const expectedSimulationQuestionCount = getExpectedSimulationQuestionCount(
           savedSettings,
           loadedOverrides

@@ -54,8 +54,8 @@ const QUICK_ENTRIES = [
 const HOME_RELEASE_NOTES = [
   {
     time: "06/23",
-    title: "Safari 選科不要卡住",
-    body: "電腦 Safari 進刷題頁時，先不解析肥到爆的本機歷史，也不等分類雲端查詢慢慢走；先把題目端上來再說。"
+    title: "Safari 選科也要避重",
+    body: "本機歷史太肥時改讀輕量題號索引，先避開做過的題，再讓完整紀錄慢慢補雲端；治標藥丸先收起來。"
   },
   {
     time: "06/23",
