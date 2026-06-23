@@ -936,20 +936,28 @@ async function fetchSessionAttemptRowsForUser(userId: string, sessionIds: string
 
   for (let index = 0; index < sessionIds.length; index += CLOUD_ATTEMPT_SESSION_FETCH_CHUNK_SIZE) {
     const chunk = sessionIds.slice(index, index + CLOUD_ATTEMPT_SESSION_FETCH_CHUNK_SIZE);
-    const { data, error } = await supabase
-      .from("quiz_session_attempts")
-      .select(
-        "session_id, user_id, question_order, question_id, selected_answer, correct_answer, is_correct, confidence, error_type, answered_at, source_mode, subject_snapshot, chapter_snapshot, section_snapshot"
-      )
-      .eq("user_id", userId)
-      .in("session_id", chunk)
-      .order("question_order", { ascending: true });
 
-    if (error) {
-      throw error;
+    for (let from = 0; ; from += SUPABASE_PAGE_SIZE) {
+      const to = from + SUPABASE_PAGE_SIZE - 1;
+      const { data, error } = await supabase
+        .from("quiz_session_attempts")
+        .select(
+          "session_id, user_id, question_order, question_id, selected_answer, correct_answer, is_correct, confidence, error_type, answered_at, source_mode, subject_snapshot, chapter_snapshot, section_snapshot"
+        )
+        .eq("user_id", userId)
+        .in("session_id", chunk)
+        .order("session_id", { ascending: true })
+        .order("question_order", { ascending: true })
+        .range(from, to);
+
+      if (error) {
+        throw error;
+      }
+
+      const pageRows = (data ?? []) as QuizSessionAttemptRow[];
+      rows.push(...pageRows);
+      if (pageRows.length < SUPABASE_PAGE_SIZE) break;
     }
-
-    rows.push(...((data ?? []) as QuizSessionAttemptRow[]));
   }
 
   return rows;

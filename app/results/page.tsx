@@ -210,6 +210,21 @@ function isSimulationSession(session: QuizSession) {
   return session.settings?.mode === "simulation";
 }
 
+function getStoredQuestionCount(session: QuizSession) {
+  return Math.max(
+    session.questionOrder?.length ?? 0,
+    session.generatedQuestions?.length ?? 0
+  );
+}
+
+function shouldRefreshPossiblyTruncatedCloudSession(session: QuizSession | null) {
+  if (!session?.completedAt) return false;
+  if (!isSimulationSession(session) && session.settings?.mode !== "custom_paper") return false;
+
+  const storedQuestionCount = getStoredQuestionCount(session);
+  return storedQuestionCount > 0 && session.attempts.length > 0 && session.attempts.length < storedQuestionCount;
+}
+
 function getDefaultSimulationSessionName(session: QuizSession) {
   if (!isSimulationSession(session)) return null;
   const firstQuestion = session.generatedQuestions?.find(
@@ -441,7 +456,9 @@ function ResultsPageContent() {
       const shouldHydrateTargetFromCloud =
         targetSessionId &&
         session?.user?.id &&
-        (!resolvedTargetSession?.completedAt || resolvedTargetSession.attempts.length === 0);
+        (!resolvedTargetSession?.completedAt ||
+          resolvedTargetSession.attempts.length === 0 ||
+          shouldRefreshPossiblyTruncatedCloudSession(resolvedTargetSession));
 
       if (shouldHydrateTargetFromCloud) {
         let cloudSession = await loadCompletedSessionFromSupabase(targetSessionId);
