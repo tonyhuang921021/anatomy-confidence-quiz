@@ -1729,8 +1729,11 @@ export async function syncLocalCompletedSessionsForCurrentUser(userId: string) {
   const pendingCompletedSessionUploads = canonicalizeSessionsForUser(
     userId,
     mergeSessions(
-      loadPendingCompletedSessionUploadsForUser(userId),
-      loadRecentLocalCompletedSessionsForUploadForUser(userId)
+      mergeSessions(
+        loadPendingCompletedSessionUploadsForUser(userId),
+        loadRecentLocalCompletedSessionsForUploadForUser(userId)
+      ),
+      loadRecentLocalCompletedSessionsForUploadForUser("guest")
     ).filter(isCompletedQuizSession)
   );
 
@@ -1745,7 +1748,7 @@ export async function syncLocalCompletedSessionsForCurrentUser(userId: string) {
           .filter(isCompletedQuizSession)
       );
   const mergedSessions = hasHeavyLocalHistory
-    ? remoteSessions
+    ? mergeSessions(pendingCompletedSessionUploads, remoteSessions).filter(isCompletedQuizSession)
     : mergeSessions(localCompletedSessions, remoteSessions).filter(isCompletedQuizSession);
   const localSessionsToSync = getRecentSessionsWithinUploadBudget(
     [...localCompletedSessions].sort((left, right) =>
@@ -1755,8 +1758,9 @@ export async function syncLocalCompletedSessionsForCurrentUser(userId: string) {
     CLOUD_LIGHT_COMPLETED_ATTEMPT_UPLOAD_LIMIT
   );
 
-  if (remoteSessions.length > 0) {
-    saveCloudCompletedSessionsForUser(userId, remoteSessions);
+  const cloudCacheSessions = hasHeavyLocalHistory ? mergedSessions : remoteSessions;
+  if (cloudCacheSessions.length > 0) {
+    saveCloudCompletedSessionsForUser(userId, cloudCacheSessions);
   }
 
   if (hasHeavyLocalHistory) {

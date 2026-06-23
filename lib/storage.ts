@@ -434,7 +434,7 @@ export function loadCompletedHistorySessionsForUser(userId = getActiveStorageUse
     return [{ attempts: buildSyntheticAttemptsFromQuestionHistory(historyEntries) }];
   }
 
-  if (getCompletedSessionsStorageLengthForUser(userId) > COMPLETED_SESSIONS_HEAVY_READ_LIMIT) {
+  if (getCompletedSessionsStorageLengthForUser(userId) > COMPLETED_SESSIONS_UPLOAD_RECOVERY_READ_LIMIT) {
     return [] as { attempts: QuizSession["attempts"] }[];
   }
 
@@ -969,8 +969,17 @@ export function loadCompletedSessionsForUser(userId: string): QuizSession[] {
   }
 
   if (raw.length > COMPLETED_SESSIONS_HEAVY_READ_LIMIT) {
-    cacheCompletedSessionsForUser(userId, cloudSessions);
-    return cloudSessions;
+    if (raw.length > COMPLETED_SESSIONS_UPLOAD_RECOVERY_READ_LIMIT) {
+      cacheCompletedSessionsForUser(userId, cloudSessions);
+      return cloudSessions;
+    }
+
+    const normalized = normalizeCompletedSessionList([
+      ...parseCompletedSessionsRaw(raw),
+      ...cloudSessions
+    ]);
+    cacheCompletedSessionsForUser(userId, normalized);
+    return normalized;
   }
 
   const normalized = normalizeCompletedSessionList([
