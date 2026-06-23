@@ -563,9 +563,14 @@ function ResultsPageContent() {
       setMounted(true);
       } catch {
         if (cancelled) return;
+        const fallbackSessions = loadCompletedSessions();
+        const fallbackScope = searchParams.get("scope") === "simulation" ? "simulation" : "default";
+        const fallbackScopedSessions = fallbackSessions.filter((sessionItem) =>
+          fallbackScope === "simulation" ? isSimulationSession(sessionItem) : !isSimulationSession(sessionItem)
+        );
         setState({
           session: null,
-          sessions: [],
+          sessions: fallbackScopedSessions,
           summary: null,
           sectionStats: [],
           promptText: "",

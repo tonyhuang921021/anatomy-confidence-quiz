@@ -761,6 +761,19 @@ function buildAttemptMap(rows: QuizSessionAttemptRow[]) {
   return attemptMap;
 }
 
+function getSinglePastPaperKeyFromAttempts(attempts: Attempt[]) {
+  const paperKeys = new Set<string>();
+
+  for (const attempt of attempts) {
+    const match = attempt.questionId.match(/^MOEX-([^-]+)-([^-]+)-Q\d+/);
+    if (match) {
+      paperKeys.add(`${match[1]}-${match[2]}`);
+    }
+  }
+
+  return paperKeys.size === 1 ? Array.from(paperKeys)[0] : undefined;
+}
+
 function dedupeSessionRows(rows: QuizSessionRow[]) {
   const deduped = new Map<string, QuizSessionRow>();
 
@@ -880,6 +893,16 @@ function mapRowToSession(
     payload.questionOrder && payload.questionOrder.length > 0
       ? payload.questionOrder
       : resolvedAttempts.map((attempt) => attempt.questionId);
+  const inferredPastPaperKey =
+    row.mode === "simulation" ? getSinglePastPaperKeyFromAttempts(resolvedAttempts) : undefined;
+  const payloadSettings = payload.settings
+    ? ({
+        ...payload.settings,
+        sessionName: payload.settings.sessionName ?? row.session_name ?? undefined,
+        paperMode: payload.settings.paperMode ?? (inferredPastPaperKey ? "past_paper" : undefined),
+        selectedPaperKey: payload.settings.selectedPaperKey ?? inferredPastPaperKey
+      } as QuizSession["settings"])
+    : undefined;
 
   return normalizeSessions([
     {
@@ -888,10 +911,13 @@ function mapRowToSession(
       startedAt: payload.startedAt ?? row.started_at,
       completedAt: payload.completedAt ?? row.completed_at ?? undefined,
       settings:
-        payload.settings ??
+        payloadSettings ??
         (row.mode
           ? ({
               mode: row.mode,
+              sessionName: row.session_name ?? undefined,
+              paperMode: inferredPastPaperKey ? "past_paper" : undefined,
+              selectedPaperKey: inferredPastPaperKey,
               questionCount: row.question_count ?? resolvedQuestionOrder.length
             } as QuizSession["settings"])
           : undefined),

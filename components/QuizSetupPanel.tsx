@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
+import { useAuth } from "@/components/AuthProvider";
 import { getPastPaperOptions } from "@/data/med1QuestionBank";
 import { enabledSubjects, subjectRegistry } from "@/data/subjectRegistry";
 import {
@@ -77,6 +78,21 @@ const simulationSubjectOptions = [
   }
 ];
 
+function buildCompletedPaperCounts() {
+  const completedSessions = loadCompletedSessions();
+  return completedSessions.reduce<Record<string, number>>((accumulator, session) => {
+    const paperKey =
+      session.settings?.mode === "simulation" &&
+      session.settings?.paperMode === "past_paper"
+        ? session.settings?.selectedPaperKey
+        : undefined;
+
+    if (!paperKey) return accumulator;
+    accumulator[paperKey] = (accumulator[paperKey] ?? 0) + 1;
+    return accumulator;
+  }, {});
+}
+
 export function QuizSetupPanel({
   stats,
   simulationOnly = false,
@@ -84,6 +100,7 @@ export function QuizSetupPanel({
   description
 }: QuizSetupPanelProps) {
   const router = useRouter();
+  const { syncStatus, syncVersion } = useAuth();
   const [settings, setSettings] = useState<QuizSettings>(
         simulationOnly
       ? {
@@ -150,20 +167,16 @@ export function QuizSetupPanel({
     settings.subjectFilter === "醫學（二）" ? med2PaperOptions : med1PaperOptions;
 
   useEffect(() => {
-    const completedSessions = loadCompletedSessions();
-    const counts = completedSessions.reduce<Record<string, number>>((accumulator, session) => {
-      const paperKey =
-        session.settings?.mode === "simulation" &&
-        session.settings?.paperMode === "past_paper"
-          ? session.settings?.selectedPaperKey
-          : undefined;
+    setCompletedPaperCounts(buildCompletedPaperCounts());
+  }, [syncStatus, syncVersion]);
 
-      if (!paperKey) return accumulator;
-      accumulator[paperKey] = (accumulator[paperKey] ?? 0) + 1;
-      return accumulator;
-    }, {});
+  useEffect(() => {
+    function handleCompletedSessionsChange() {
+      setCompletedPaperCounts(buildCompletedPaperCounts());
+    }
 
-    setCompletedPaperCounts(counts);
+    window.addEventListener("completed-sessions-change", handleCompletedSessionsChange);
+    return () => window.removeEventListener("completed-sessions-change", handleCompletedSessionsChange);
   }, []);
 
   useEffect(() => {
