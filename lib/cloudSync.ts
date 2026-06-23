@@ -30,12 +30,16 @@ import {
   getCompletedSessionsStorageLengthForUser,
   getCanonicalSessionId,
   loadCompletedHistorySessionsForUser,
+  loadPendingCompletedSessionUploadsForUser,
   loadCurrentSession,
   loadCurrentSessionForUser,
   loadCompletedSessions,
   loadCompletedSessionsForUser,
   mergeCompletedQuestionHistoryFromSessionsForUser,
   normalizeSessions,
+  queuePendingCompletedSessionUploadForUser,
+  loadRecentLocalCompletedSessionsForUploadForUser,
+  removePendingCompletedSessionUploadsForUser,
   saveCurrentSession,
   saveCloudCompletedSessionsForUser,
   saveCompletedQuestionHistoryEntriesForUser,
@@ -1722,12 +1726,22 @@ export async function syncLocalCompletedSessionsForCurrentUser(userId: string) {
     userId,
     fetchedRemoteSessions.filter(isCompletedQuizSession)
   );
+  const pendingCompletedSessionUploads = canonicalizeSessionsForUser(
+    userId,
+    mergeSessions(
+      loadPendingCompletedSessionUploadsForUser(userId),
+      loadRecentLocalCompletedSessionsForUploadForUser(userId)
+    ).filter(isCompletedQuizSession)
+  );
 
   const localCompletedSessions = hasHeavyLocalHistory
-    ? []
+    ? pendingCompletedSessionUploads
     : canonicalizeSessionsForUser(
         userId,
-        mergeSessions(loadCompletedSessionsForUser("guest"), loadCompletedSessions())
+        mergeSessions(
+          mergeSessions(loadCompletedSessionsForUser("guest"), loadCompletedSessions()),
+          pendingCompletedSessionUploads
+        )
           .filter(isCompletedQuizSession)
       );
   const mergedSessions = hasHeavyLocalHistory
@@ -1776,6 +1790,7 @@ export async function syncLocalCompletedSessionsForCurrentUser(userId: string) {
       totalBudgetMs: CLOUD_SYNC_TOTAL_BUDGET_MS
     }
   );
+  removePendingCompletedSessionUploadsForUser(userId, sessionsToUpload);
 
   return mergedSessions;
 }
@@ -1867,6 +1882,7 @@ export async function pushCompletedSessionToSupabase(session: QuizSession) {
 
   if (data.user) {
     const canonicalSessions = canonicalizeSessionsForUser(data.user.id, [session]);
+    queuePendingCompletedSessionUploadForUser(data.user.id, canonicalSessions);
     mergeCompletedQuestionHistoryFromSessionsForUser(data.user.id, canonicalSessions);
     if (getCompletedSessionsStorageLengthForUser(data.user.id) <= CLOUD_HEAVY_LOCAL_HISTORY_READ_LIMIT) {
       saveCompletedSessions(
@@ -1881,6 +1897,7 @@ export async function pushCompletedSessionToSupabase(session: QuizSession) {
       CLOUD_SYNC_BATCH_TIMEOUT_MS,
       "完成紀錄雲端同步逾時，先保留本機紀錄。"
     );
+    removePendingCompletedSessionUploadsForUser(data.user.id, canonicalSessions);
     void syncLeaderboardProfileForCurrentUser(data.user, loadCompletedSessions()).catch((error) => {
       console.error("Leaderboard sync skipped:", error);
     });
