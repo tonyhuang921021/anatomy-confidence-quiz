@@ -12,8 +12,8 @@ import {
 } from "react";
 import type { Session, User } from "@supabase/supabase-js";
 import {
-  syncCompletedSessionsForCurrentUser,
-  syncCurrentSessionForCurrentUser,
+  syncLocalCompletedSessionsForCurrentUser,
+  syncLocalCurrentSessionForCurrentUser,
   syncLeaderboardProfileForCurrentUser
 } from "@/lib/cloudSync";
 import { setActiveStorageUser } from "@/lib/storage";
@@ -43,6 +43,7 @@ type AuthContextValue = {
 
 const AuthContext = createContext<AuthContextValue | null>(null);
 const CLOUD_RESUME_BACKGROUND_NOTICE_MS = 6500;
+const CLOUD_SYNC_HARD_TIMEOUT_MS = 9000;
 const AUTH_SESSION_BOOTSTRAP_TIMEOUT_MS = 3500;
 const AUTH_SIGN_OUT_TIMEOUT_MS = 2500;
 const AUTH_SESSION_SNAPSHOT_KEY = "medQuizAuthSessionSnapshot";
@@ -174,6 +175,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [syncVersion, setSyncVersion] = useState(0);
   const [syncError, setSyncError] = useState("");
   const syncInFlightRef = useRef<Promise<void> | null>(null);
+  const syncStartedAtRef = useRef(0);
 
   function markLocalSyncFallback(error: unknown) {
     setSyncStatus("ready");
@@ -193,26 +195,37 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const effectiveUser = targetUser ?? user;
     if (!configured || !userId || !effectiveUser) return;
 
-    if (syncInFlightRef.current) {
+    const now = Date.now();
+    if (syncInFlightRef.current && now - syncStartedAtRef.current <= CLOUD_SYNC_HARD_TIMEOUT_MS + 1000) {
       setSyncStatus("syncing");
       setSyncError("");
       return;
     }
 
+    if (syncInFlightRef.current) {
+      syncInFlightRef.current = null;
+    }
+
     setSyncStatus("syncing");
     setSyncError("");
 
-    const syncTask = syncCompletedSessionsForCurrentUser(userId)
+    syncStartedAtRef.current = now;
+
+    const syncTask = withTimeout(
+      syncLocalCompletedSessionsForCurrentUser(userId)
       .then((completedSessions) => {
         void syncLeaderboardProfileForCurrentUser(effectiveUser, completedSessions).catch((error) => {
           console.error("Leaderboard sync skipped:", error);
         });
-        return syncCurrentSessionForCurrentUser(userId);
+        return syncLocalCurrentSessionForCurrentUser(userId);
       })
       .then(() => {
         setSyncStatus("ready");
         setSyncVersion((value) => value + 1);
-      })
+      }),
+      CLOUD_SYNC_HARD_TIMEOUT_MS,
+      "雲端同步仍在背景整理，可先使用本機紀錄。"
+    )
       .catch((error) => {
         markLocalSyncFallback(error);
       })

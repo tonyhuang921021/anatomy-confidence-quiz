@@ -160,10 +160,14 @@ const CLOUD_COMPLETED_SESSION_FETCH_PAGE_SIZE = 300;
 const CLOUD_COMPLETED_SESSION_FETCH_MAX_ROWS = 3000;
 const CLOUD_COMPLETED_SESSION_UPLOAD_LIMIT = 3000;
 const CLOUD_COMPLETED_SESSION_UPLOAD_BATCH_SIZE = 25;
+const CLOUD_LIGHT_COMPLETED_SESSION_UPLOAD_LIMIT = 40;
+const CLOUD_LIGHT_COMPLETED_ATTEMPT_UPLOAD_LIMIT = 500;
 const CLOUD_ATTEMPT_SESSION_FETCH_CHUNK_SIZE = 20;
 const CURRENT_SESSION_SYNC_MIN_INTERVAL_MS = 10_000;
 const STATS_SYNC_ATTEMPT_BATCH_SIZE = 200;
 const CLOUD_SESSION_LOOKUP_TIMEOUT_MS = 3500;
+const CLOUD_SYNC_BATCH_TIMEOUT_MS = 3500;
+const CLOUD_SYNC_TOTAL_BUDGET_MS = 8500;
 const FEEDBACK_REQUEST_TIMEOUT_MS = 10000;
 const FEEDBACK_SESSION_TIMEOUT_MS = 2500;
 const QUESTION_EXPLANATION_SYNC_IN_FLIGHT_MS = 20_000;
@@ -838,6 +842,25 @@ function getSessionsNeedingUpload(localSessions: QuizSession[], remoteSessions: 
   });
 }
 
+function getRecentSessionsWithinUploadBudget(
+  sessions: QuizSession[],
+  maxSessions: number,
+  maxAttempts: number
+) {
+  const selected: QuizSession[] = [];
+  let attemptCount = 0;
+
+  for (const session of sessions) {
+    const nextAttemptCount = session.attempts.length;
+    if (selected.length >= maxSessions) break;
+    if (selected.length > 0 && attemptCount + nextAttemptCount > maxAttempts) break;
+    selected.push(session);
+    attemptCount += nextAttemptCount;
+  }
+
+  return selected;
+}
+
 function mapRowToSession(
   row: QuizSessionRow | null,
   attemptMap?: Map<string, Attempt[]>
@@ -1487,10 +1510,26 @@ async function upsertSessionsForUser(userId: string, sessions: QuizSession[]) {
 async function upsertSessionsForUserInBatches(
   userId: string,
   sessions: QuizSession[],
-  batchSize = CLOUD_COMPLETED_SESSION_UPLOAD_BATCH_SIZE
+  batchSize = CLOUD_COMPLETED_SESSION_UPLOAD_BATCH_SIZE,
+  options: {
+    batchTimeoutMs?: number;
+    totalBudgetMs?: number;
+  } = {}
 ) {
+  const startedAt = Date.now();
+
   for (let index = 0; index < sessions.length; index += batchSize) {
-    await upsertSessionsForUser(userId, sessions.slice(index, index + batchSize));
+    if (options.totalBudgetMs && Date.now() - startedAt > options.totalBudgetMs) {
+      throw new Error("雲端同步仍在背景整理，先保留本機紀錄。");
+    }
+
+    const batch = sessions.slice(index, index + batchSize);
+    const task = upsertSessionsForUser(userId, batch);
+    if (options.batchTimeoutMs) {
+      await withClientTimeout(task, options.batchTimeoutMs, "單批雲端同步逾時，先保留本機紀錄。");
+    } else {
+      await task;
+    }
   }
 }
 
@@ -1537,6 +1576,39 @@ export async function syncCompletedSessionsForCurrentUser(userId: string) {
   }
 
   return mergedSessions;
+}
+
+export async function syncLocalCompletedSessionsForCurrentUser(userId: string) {
+  const localCompletedSessions = canonicalizeSessionsForUser(
+    userId,
+    mergeSessions(loadCompletedSessionsForUser("guest"), loadCompletedSessions())
+      .filter(isCompletedQuizSession)
+  );
+  const localSessionsToSync = getRecentSessionsWithinUploadBudget(
+    [...localCompletedSessions].sort((left, right) =>
+      sessionFreshnessValue(right).localeCompare(sessionFreshnessValue(left))
+    ),
+    CLOUD_LIGHT_COMPLETED_SESSION_UPLOAD_LIMIT,
+    CLOUD_LIGHT_COMPLETED_ATTEMPT_UPLOAD_LIMIT
+  );
+
+  saveCompletedSessions(localCompletedSessions);
+
+  if (isSupabaseRecoveryMode() || !isSupabaseConfigured() || localSessionsToSync.length === 0) {
+    return localCompletedSessions;
+  }
+
+  await upsertSessionsForUserInBatches(
+    userId,
+    localSessionsToSync,
+    Math.min(10, CLOUD_COMPLETED_SESSION_UPLOAD_BATCH_SIZE),
+    {
+      batchTimeoutMs: CLOUD_SYNC_BATCH_TIMEOUT_MS,
+      totalBudgetMs: CLOUD_SYNC_TOTAL_BUDGET_MS
+    }
+  );
+
+  return localCompletedSessions;
 }
 
 export async function syncCurrentSessionForCurrentUser(userId: string) {
@@ -1593,6 +1665,30 @@ export async function syncCurrentSessionForCurrentUser(userId: string) {
   return winner ?? remoteCurrentSession ?? null;
 }
 
+export async function syncLocalCurrentSessionForCurrentUser(userId: string) {
+  if (isSupabaseRecoveryMode() || !isSupabaseConfigured()) {
+    return loadCurrentSession();
+  }
+
+  const guestSession = loadCurrentSessionForUser("guest");
+  const localUserSession = loadCurrentSessionForUser(userId);
+  const localCurrentSession =
+    [localUserSession, guestSession]
+      .filter((session): session is QuizSession => Boolean(session) && !session?.completedAt)
+      .sort((left, right) => sessionActivityValue(right).localeCompare(sessionActivityValue(left)))[0] ?? null;
+
+  if (!localCurrentSession) return null;
+
+  const canonicalSession = canonicalizeSessionsForUser(userId, [localCurrentSession])[0] ?? localCurrentSession;
+  await withClientTimeout(
+    upsertSessionsForUser(userId, [canonicalSession]),
+    CLOUD_SYNC_BATCH_TIMEOUT_MS,
+    "目前作答雲端同步逾時，先保留本機紀錄。"
+  );
+
+  return canonicalSession;
+}
+
 export async function pushCompletedSessionToSupabase(session: QuizSession) {
   if (isSupabaseRecoveryMode()) return;
   if (!isSupabaseConfigured()) return;
@@ -1608,8 +1704,14 @@ export async function pushCompletedSessionToSupabase(session: QuizSession) {
         canonicalSessions
       )
     );
-    await upsertSessionsForUser(data.user.id, canonicalSessions);
-    await syncLeaderboardProfileForCurrentUser(data.user, loadCompletedSessions());
+    await withClientTimeout(
+      upsertSessionsForUser(data.user.id, canonicalSessions),
+      CLOUD_SYNC_BATCH_TIMEOUT_MS,
+      "完成紀錄雲端同步逾時，先保留本機紀錄。"
+    );
+    void syncLeaderboardProfileForCurrentUser(data.user, loadCompletedSessions()).catch((error) => {
+      console.error("Leaderboard sync skipped:", error);
+    });
   }
 }
 
@@ -1658,7 +1760,11 @@ export async function pushCurrentSessionToSupabase(session: QuizSession) {
   if (existing?.lastSignature === signature) return;
 
   async function flush(nextSession: QuizSession, nextSignature: string) {
-    await upsertSessionsForUser(userId, [nextSession]);
+    await withClientTimeout(
+      upsertSessionsForUser(userId, [nextSession]),
+      CLOUD_SYNC_BATCH_TIMEOUT_MS,
+      "目前作答雲端同步逾時，先保留本機紀錄。"
+    );
     currentSessionSyncState.set(stateKey, {
       lastSyncedAt: Date.now(),
       lastSignature: nextSignature,

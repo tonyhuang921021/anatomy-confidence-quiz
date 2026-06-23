@@ -54,6 +54,11 @@ const QUICK_ENTRIES = [
 const HOME_RELEASE_NOTES = [
   {
     time: "06/23",
+    title: "同步鍵不再一拳打爆",
+    body: "手動同步改成短時限補傳最近紀錄，雲端慢就先留本機；不用按一下就跟資料庫互毆。"
+  },
+  {
+    time: "06/23",
     title: "疑義題給分不裝沒事",
     body: "補上兩題官方開放給分，順手把幾個選項 OCR 空格抓回來；Spearman 和 A型人格不用再自己腦補。"
   },

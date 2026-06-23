@@ -795,9 +795,10 @@ export function AuthPanel() {
           <button
             type="button"
             onClick={() => void refreshCloudData()}
-            className="primary-pill"
+            disabled={syncStatus === "syncing"}
+            className="primary-pill disabled:cursor-not-allowed disabled:opacity-60"
           >
-            立即同步雲端紀錄
+            {syncStatus === "syncing" ? "同步中..." : "立即同步雲端紀錄"}
           </button>
           <button
             type="button"
