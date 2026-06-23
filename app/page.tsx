@@ -54,6 +54,11 @@ const QUICK_ENTRIES = [
 const HOME_RELEASE_NOTES = [
   {
     time: "06/23",
+    title: "Safari 選科不要卡住",
+    body: "電腦 Safari 進刷題頁時，先不解析肥到爆的本機歷史，也不等分類雲端查詢慢慢走；先把題目端上來再說。"
+  },
+  {
+    time: "06/23",
     title: "少一張表格補回來",
     body: "醫學二那題病例對照研究的列聯表已補圖，現在不用靠通靈判斷要用哪個檢定。"
   },

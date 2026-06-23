@@ -54,6 +54,7 @@ import {
   applyQuestionExplanationOverride,
   clearMatchingCurrentSessions,
   clearCurrentSession,
+  getCompletedSessionsStorageLengthForUser,
   getPendingQuestionExplanationOverrideSync,
   loadCompletedSessions,
   loadCurrentSession,
@@ -81,6 +82,8 @@ import {
 
 const FREE_PRACTICE_BATCH_SIZE = 10;
 const FREE_PRACTICE_PREFETCH_THRESHOLD = 3;
+const QUIZ_CLASSIFICATION_OVERRIDE_TIMEOUT_MS = 3200;
+const SAFARI_QUIZ_HISTORY_READ_LIMIT = 160_000;
 
 function getQuestionSourceBadge(question: Question) {
   if (question.sourceType === "MOEX_PAST_EXAM") return "正式考古題";
@@ -118,6 +121,26 @@ function decodeStartSettingsFromUrl(encodedSettings: string | null): QuizSetting
   } catch {
     return null;
   }
+}
+
+function withTimeoutFallback<T>(promise: Promise<T>, timeoutMs: number, fallback: T) {
+  return new Promise<T>((resolve) => {
+    const timeoutId = globalThis.setTimeout(() => resolve(fallback), timeoutMs);
+    promise
+      .then(resolve)
+      .catch(() => resolve(fallback))
+      .finally(() => globalThis.clearTimeout(timeoutId));
+  });
+}
+
+function isSafariBrowser() {
+  if (typeof navigator === "undefined") return false;
+  const userAgent = navigator.userAgent;
+  return /Safari/i.test(userAgent) && !/Chrome|Chromium|CriOS|FxiOS|EdgiOS|Edg\//i.test(userAgent);
+}
+
+function shouldSkipHeavyCompletedHistoryForQuizStart() {
+  return isSafariBrowser() && getCompletedSessionsStorageLengthForUser() > SAFARI_QUIZ_HISTORY_READ_LIMIT;
 }
 
 function evaluateAttempt(question: Question, selectedAnswer: OptionKey) {
@@ -647,8 +670,10 @@ export default function QuizPage() {
     async function initializeSession() {
       try {
         setLoadIssue("");
-        const loadedOverrides = await loadConfirmedQuestionClassificationOverrides().catch(
-          () => ({} as Record<string, QuestionClassificationOverride>)
+        const loadedOverrides = await withTimeoutFallback(
+          loadConfirmedQuestionClassificationOverrides(),
+          QUIZ_CLASSIFICATION_OVERRIDE_TIMEOUT_MS,
+          {} as Record<string, QuestionClassificationOverride>
         );
         setClassificationOverrides(loadedOverrides);
 
@@ -703,8 +728,10 @@ export default function QuizPage() {
                 ? med2PresetSettings
                 : loadQuizSettings() ?? DEFAULT_QUIZ_SETTINGS);
         const savedSettings = normalizeLegacySettings(rawSettings);
-        const completedSessions = loadCompletedSessions();
         const shouldForceNewSession = params?.get("new") === "1";
+        const skipHeavyCompletedHistory =
+          shouldForceNewSession && shouldSkipHeavyCompletedHistoryForQuizStart();
+        const completedSessions = skipHeavyCompletedHistory ? [] : loadCompletedSessions();
         const expectedSimulationQuestionCount = getExpectedSimulationQuestionCount(
           savedSettings,
           loadedOverrides
