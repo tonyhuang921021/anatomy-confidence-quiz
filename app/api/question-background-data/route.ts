@@ -12,9 +12,9 @@ const MAX_IDS_BY_KIND: Record<BackgroundDataKind, number> = {
 };
 
 const CACHE_CONTROL_BY_KIND: Record<BackgroundDataKind, string> = {
-  stats: "public, s-maxage=1800, stale-while-revalidate=3600",
-  explanations: "public, s-maxage=300, stale-while-revalidate=900",
-  classifications: "public, s-maxage=300, stale-while-revalidate=900"
+  stats: "public, max-age=300, s-maxage=1800, stale-while-revalidate=3600",
+  explanations: "public, max-age=120, s-maxage=300, stale-while-revalidate=900",
+  classifications: "public, max-age=120, s-maxage=300, stale-while-revalidate=900"
 };
 
 function jsonWithCache(payload: unknown, kind: BackgroundDataKind, init?: ResponseInit) {

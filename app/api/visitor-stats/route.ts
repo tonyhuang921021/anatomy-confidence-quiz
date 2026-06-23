@@ -7,7 +7,7 @@ export const dynamic = "force-dynamic";
 export const revalidate = 0;
 
 const ONLINE_WINDOW_MS = 60 * 60 * 1000;
-const VISITOR_STATS_CACHE_CONTROL = "public, s-maxage=1800, stale-while-revalidate=3600";
+const VISITOR_STATS_CACHE_CONTROL = "public, max-age=300, s-maxage=1800, stale-while-revalidate=3600";
 
 function getServiceSupabaseClient() {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;

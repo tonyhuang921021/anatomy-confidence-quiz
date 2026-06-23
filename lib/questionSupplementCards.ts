@@ -31,9 +31,7 @@ export async function loadQuestionSupplementCards(
 ): Promise<Required<Pick<QuestionSupplementResponse, "cards" | "reactions">>> {
   const params = new URLSearchParams({ questionId });
   if (accessToken) params.set("accessToken", accessToken);
-  const response = await fetch(`/api/question-supplement-cards?${params.toString()}`, {
-    headers: { "Cache-Control": "no-store" }
-  });
+  const response = await fetch(`/api/question-supplement-cards?${params.toString()}`);
   const payload = await parseSupplementResponse<QuestionSupplementResponse>(response);
   return {
     cards: payload.cards ?? [],
@@ -43,9 +41,7 @@ export async function loadQuestionSupplementCards(
 
 export async function loadQuestionSupplementCount(questionId: string): Promise<number> {
   const params = new URLSearchParams({ questionId, countOnly: "1" });
-  const response = await fetch(`/api/question-supplement-cards?${params.toString()}`, {
-    headers: { "Cache-Control": "no-store" }
-  });
+  const response = await fetch(`/api/question-supplement-cards?${params.toString()}`);
   const payload = await parseSupplementResponse<QuestionSupplementResponse>(response);
   return Math.max(0, payload.count ?? 0);
 }
@@ -56,9 +52,7 @@ export async function loadQuestionSupplementMeta(
 ): Promise<Required<Pick<QuestionSupplementResponse, "count" | "reactions">>> {
   const params = new URLSearchParams({ questionId, countOnly: "1", includeReactions: "1" });
   if (accessToken) params.set("accessToken", accessToken);
-  const response = await fetch(`/api/question-supplement-cards?${params.toString()}`, {
-    headers: { "Cache-Control": "no-store" }
-  });
+  const response = await fetch(`/api/question-supplement-cards?${params.toString()}`);
   const payload = await parseSupplementResponse<QuestionSupplementResponse>(response);
   return {
     count: Math.max(0, payload.count ?? 0),
@@ -72,9 +66,7 @@ export async function loadRecentQuestionSupplementCards(
 ): Promise<RecentQuestionSupplementCard[]> {
   const params = new URLSearchParams({ recent: "1", limit: String(limit) });
   if (accessToken) params.set("accessToken", accessToken);
-  const response = await fetch(`/api/question-supplement-cards?${params.toString()}`, {
-    headers: { "Cache-Control": "no-store" }
-  });
+  const response = await fetch(`/api/question-supplement-cards?${params.toString()}`);
   const payload = await parseSupplementResponse<{
     ok?: boolean;
     recentCards?: RecentQuestionSupplementCard[];

@@ -33,7 +33,7 @@ type FeedbackVoteRow = {
 
 const FEEDBACK_HOURLY_LIMIT = 3;
 const FEEDBACK_DAILY_LIMIT = 10;
-const FEEDBACK_READ_CACHE_HEADER = "public, s-maxage=60, stale-while-revalidate=300";
+const FEEDBACK_READ_CACHE_HEADER = "public, max-age=30, s-maxage=60, stale-while-revalidate=300";
 const FEEDBACK_DEGRADED_CACHE_HEADER = "no-store";
 
 type FeedbackResponseMessage = ReturnType<typeof mapFeedbackMessageRow> & {

@@ -57,6 +57,10 @@ const REACTION_LABELS: Record<string, string> = {
   pure_chaos: "這題我們不要了"
 };
 
+const SUPPLEMENT_PUBLIC_CACHE_CONTROL = "public, max-age=120, s-maxage=300, stale-while-revalidate=600";
+const SUPPLEMENT_PRIVATE_CACHE_CONTROL = "private, max-age=45";
+const SUPPLEMENT_NO_STORE_CACHE_CONTROL = "no-store";
+
 function getServiceSupabaseClient() {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
@@ -132,6 +136,7 @@ function shouldDegradeSupplementRead(error: unknown) {
 }
 
 function logSupplementReadFallback(error: unknown) {
+  if (process.env.NODE_ENV !== "development") return;
   console.warn("[question-supplement-cards] optional read fallback", {
     message: getErrorMessage(error, "補充卡片讀取失敗")
   });
@@ -224,18 +229,17 @@ async function loadCardsForQuestion(supabase: any, questionId: string, userId?: 
 }
 
 async function countCardsForQuestion(supabase: any, questionId: string) {
-  const { data, error } = (await withServerTimeout(
+  const { count, error } = (await withServerTimeout(
     supabase
       .from("question_supplement_cards")
-      .select("id")
-      .eq("question_id", questionId)
-      .limit(50),
+      .select("id", { count: "exact", head: true })
+      .eq("question_id", questionId),
     1400,
     "補充卡片數量載入逾時"
-  )) as { data?: Array<{ id: string }>; error?: unknown };
+  )) as { count?: number | null; error?: unknown };
 
   if (error) throw error;
-  return (data ?? []).length;
+  return count ?? 0;
 }
 
 async function loadReactionsForQuestion(supabase: any, questionId: string, userId?: string | null) {
@@ -289,6 +293,7 @@ export async function GET(request: NextRequest) {
     const recent = request.nextUrl.searchParams.get("recent") === "1";
     const countOnly = request.nextUrl.searchParams.get("countOnly") === "1";
     const includeReactions = request.nextUrl.searchParams.get("includeReactions") === "1";
+    const readCacheControl = accessToken ? SUPPLEMENT_PRIVATE_CACHE_CONTROL : SUPPLEMENT_PUBLIC_CACHE_CONTROL;
 
     if (recent) {
       if (!verifiedUser) {
@@ -320,7 +325,7 @@ export async function GET(request: NextRequest) {
           contentPreview: summarizeContent(row.content_markdown),
           updatedAt: row.updated_at
         }))
-      });
+      }, { headers: { "Cache-Control": SUPPLEMENT_PRIVATE_CACHE_CONTROL } });
     }
 
     const questionId = request.nextUrl.searchParams.get("questionId")?.trim();
@@ -333,17 +338,17 @@ export async function GET(request: NextRequest) {
         countCardsForQuestion(supabase, questionId),
         includeReactions ? loadReactionsForQuestion(supabase, questionId, verifiedUser?.id) : Promise.resolve([])
       ]);
-      return NextResponse.json({ ok: true, count, reactions }, { headers: { "Cache-Control": "no-store" } });
+      return NextResponse.json({ ok: true, count, reactions }, { headers: { "Cache-Control": readCacheControl } });
     }
 
     const payload = await buildQuestionPayload(supabase, questionId, verifiedUser?.id);
-    return NextResponse.json({ ok: true, ...payload }, { headers: { "Cache-Control": "no-store" } });
+    return NextResponse.json({ ok: true, ...payload }, { headers: { "Cache-Control": readCacheControl } });
   } catch (error) {
     if (shouldDegradeSupplementRead(error)) {
       logSupplementReadFallback(error);
       return NextResponse.json(
         { ok: true, ...emptySupplementPayload() },
-        { headers: { "Cache-Control": "no-store" } }
+        { headers: { "Cache-Control": SUPPLEMENT_NO_STORE_CACHE_CONTROL } }
       );
     }
     const message = getErrorMessage(error, "補充卡片載入失敗");

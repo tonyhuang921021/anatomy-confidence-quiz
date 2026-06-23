@@ -54,6 +54,11 @@ const QUICK_ENTRIES = [
 const HOME_RELEASE_NOTES = [
   {
     time: "06/23",
+    title: "把帳單怪獸關小聲",
+    body: "全站不再把靜態檔當即拋用品，首頁統計和同學補充也會短暫快取；省錢順便讓 Safari 少發作。"
+  },
+  {
+    time: "06/23",
     title: "作答紀錄跨裝置補齊",
     body: "同步不只喊已同步，現在也會把雲端作答場次補進列表；第 67 筆卡住的劇情先下架。"
   },
