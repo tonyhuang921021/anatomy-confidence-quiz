@@ -53,6 +53,11 @@ const QUICK_ENTRIES = [
 
 const HOME_RELEASE_NOTES = [
   {
+    time: "06/24",
+    title: "表格跟缺字不再裝謎語",
+    body: "補回 IVIG、IL-10、寄生蟲宿主和診斷表格的掉字；選項不用再像被 PDF 咬過。"
+  },
+  {
     time: "06/23",
     title: "模擬考別再改名叫自己",
     body: "考古卷名稱會抓回年份、醫學一二和卷別；做過幾次也不再因為叫模擬考就假裝失憶。"

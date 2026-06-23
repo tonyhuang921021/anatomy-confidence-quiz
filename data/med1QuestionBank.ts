@@ -993,6 +993,64 @@ function applyQuestionMedia(question: Question): Question {
 }
 
 const questionTextOverrides: Record<string, QuestionTextOverride> = {
+  "MOEX-101030-1101-Q100": {
+    stem:
+      "依下表數據計算下列各指標，下列何者錯誤？\n\n疾病真實狀況\n診斷結果｜有｜無｜Total\n有｜68｜6｜74\n無｜12｜114｜126\nTotal｜80｜120｜200",
+    options: {
+      A: "敏感度為 85%",
+      B: "特異度為 95%",
+      C: "陽性預測值為 85%",
+      D: "陰性預測值為 90.5%"
+    }
+  },
+  "MOEX-103100-1101-Q070": {
+    options: {
+      A: "Common variable immunodeficiency",
+      B: "X-linked agammaglobulinemia",
+      D: "Selective IgA deficiency"
+    },
+    optionAnalysis: {
+      A: "不選。Common variable immunodeficiency 是 IVIG 的常見適應症之一。",
+      B: "不選。X-linked agammaglobulinemia 是抗體缺乏症，常需免疫球蛋白補充。",
+      C: "不選。Mu heavy chain 突變造成的 agammaglobulinemia 屬於抗體產生缺陷，可考慮免疫球蛋白補充。",
+      D: "正確。Selective IgA deficiency 通常不是 IVIG 的常規適應症，且部分病人可能因 anti-IgA antibody 產生輸注反應。"
+    }
+  },
+  "MOEX-103100-1101-Q072": {
+    options: {
+      A: "TNF-α",
+      B: "IL-10",
+      C: "IL-1",
+      D: "IFN-γ"
+    },
+    optionAnalysis: {
+      A: "不選。TNF-α 是促發炎 cytokine，不是本題問的抗發炎調節重點。",
+      B: "正確。IL-10 是重要抗發炎 cytokine，缺乏時可能造成腸道免疫調節失衡並引起 inflammatory bowel disease。",
+      C: "不選。IL-1 偏促發炎，不是本題最佳答案。",
+      D: "不選。IFN-γ 偏 Th1 免疫反應，不是本題最佳答案。"
+    }
+  },
+  "MOEX-103100-1101-Q077": {
+    stem:
+      "下列寄生蟲與其中間宿主之配對，共有幾項正確？\n①中華肝吸蟲（Clonorchis sinensis）--淡水魚\n②衛氏肺吸蟲（Paragonimus westermani）--毛蟹\n③薑片蟲（Fasciolopsis buski）--菱角\n④槍狀肝吸蟲（Dicrocoelium dendriticum）--螞蟻",
+    options: {
+      A: "1項",
+      B: "2項",
+      C: "3項",
+      D: "4項"
+    },
+    optionAnalysis: {
+      A: "不選。正確配對不只 1 項。",
+      B: "不選。中華肝吸蟲、衛氏肺吸蟲、薑片蟲與槍狀肝吸蟲的配對皆可成立。",
+      C: "不選。題目列出的 4 組配對皆可成立。",
+      D: "正確。中華肝吸蟲配淡水魚、衛氏肺吸蟲配蟹類、薑片蟲配水生植物、槍狀肝吸蟲配螞蟻，4 項皆正確。"
+    }
+  },
+  "MOEX-105020-5301-Q042": {
+    options: {
+      B: "可導致細胞內 cAMP 濃度增高"
+    }
+  },
   "MOEX-103100-1101-Q086": {
     options: {
       D: "Spearman 等級相關係數（Spearman correlation coefficient）"
