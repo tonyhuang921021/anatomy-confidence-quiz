@@ -54,8 +54,8 @@ const QUICK_ENTRIES = [
 const HOME_RELEASE_NOTES = [
   {
     time: "06/23",
-    title: "Safari 選科也要避重",
-    body: "本機歷史太肥時改讀輕量題號索引，先避開做過的題，再讓完整紀錄慢慢補雲端；治標藥丸先收起來。"
+    title: "作答紀錄跨裝置補齊",
+    body: "同步不只喊已同步，現在也會把雲端作答場次補進列表；第 67 筆卡住的劇情先下架。"
   },
   {
     time: "06/23",

@@ -34,10 +34,10 @@ import {
   loadCurrentSessionForUser,
   loadCompletedSessions,
   loadCompletedSessionsForUser,
-  mergeCompletedQuestionHistoryEntriesForUser,
   mergeCompletedQuestionHistoryFromSessionsForUser,
   normalizeSessions,
   saveCurrentSession,
+  saveCloudCompletedSessionsForUser,
   saveCompletedQuestionHistoryEntriesForUser,
   saveCompletedSessions
 } from "@/lib/storage";
@@ -175,7 +175,6 @@ const CLOUD_SESSION_LOOKUP_TIMEOUT_MS = 3500;
 const CLOUD_SYNC_BATCH_TIMEOUT_MS = 3500;
 const CLOUD_SYNC_TOTAL_BUDGET_MS = 8500;
 const CLOUD_HEAVY_LOCAL_HISTORY_READ_LIMIT = 160_000;
-const CLOUD_QUESTION_HISTORY_FETCH_MAX_ROWS = 12_000;
 const FEEDBACK_REQUEST_TIMEOUT_MS = 10000;
 const FEEDBACK_SESSION_TIMEOUT_MS = 2500;
 const QUESTION_EXPLANATION_SYNC_IN_FLIGHT_MS = 20_000;
@@ -956,45 +955,6 @@ async function fetchSessionAttemptRowsForUser(userId: string, sessionIds: string
   return rows;
 }
 
-async function fetchCompletedQuestionHistoryEntriesForUser(userId: string) {
-  if (isSupabaseRecoveryMode() || !isSupabaseConfigured()) {
-    return [];
-  }
-
-  const supabase = getSupabaseBrowserClient();
-  const rows: QuizSessionAttemptRow[] = [];
-
-  for (
-    let from = 0;
-    from < CLOUD_QUESTION_HISTORY_FETCH_MAX_ROWS;
-    from += SUPABASE_PAGE_SIZE
-  ) {
-    const to = Math.min(from + SUPABASE_PAGE_SIZE - 1, CLOUD_QUESTION_HISTORY_FETCH_MAX_ROWS - 1);
-    const { data, error } = await supabase
-      .from("quiz_session_attempts")
-      .select(
-        "session_id, user_id, question_order, question_id, selected_answer, correct_answer, is_correct, confidence, error_type, answered_at"
-      )
-      .eq("user_id", userId)
-      .order("answered_at", { ascending: false, nullsFirst: false })
-      .range(from, to);
-
-    if (error) {
-      throw error;
-    }
-
-    const pageRows = (data ?? []) as QuizSessionAttemptRow[];
-    rows.push(...pageRows);
-    if (pageRows.length < SUPABASE_PAGE_SIZE) break;
-  }
-
-  return buildCompletedQuestionHistoryEntriesFromSessions([
-    {
-      attempts: rows.map(mapCloudAttemptRowToAttempt)
-    }
-  ]);
-}
-
 async function fetchQuizSessionsForUser(userId: string) {
   if (isSupabaseRecoveryMode() || !isSupabaseConfigured()) return [] as QuizSessionRow[];
 
@@ -1651,14 +1611,14 @@ export async function syncLocalCompletedSessionsForCurrentUser(userId: string) {
   const hasHeavyLocalHistory =
     getCompletedSessionsStorageLengthForUser(userId) > CLOUD_HEAVY_LOCAL_HISTORY_READ_LIMIT ||
     getCompletedSessionsStorageLengthForUser("guest") > CLOUD_HEAVY_LOCAL_HISTORY_READ_LIMIT;
-  const remoteQuestionHistoryEntries =
+  const { sessions: fetchedRemoteSessions } =
     isSupabaseRecoveryMode() || !isSupabaseConfigured()
-      ? []
-      : await withCloudFallback(fetchCompletedQuestionHistoryEntriesForUser(userId), []);
-
-  if (remoteQuestionHistoryEntries.length > 0) {
-    mergeCompletedQuestionHistoryEntriesForUser(userId, remoteQuestionHistoryEntries);
-  }
+      ? { sessions: [] as QuizSession[] }
+      : await fetchResolvedQuizSessionsForUser(userId);
+  const remoteSessions = canonicalizeSessionsForUser(
+    userId,
+    fetchedRemoteSessions.filter(isCompletedQuizSession)
+  );
 
   const localCompletedSessions = hasHeavyLocalHistory
     ? []
@@ -1667,6 +1627,9 @@ export async function syncLocalCompletedSessionsForCurrentUser(userId: string) {
         mergeSessions(loadCompletedSessionsForUser("guest"), loadCompletedSessions())
           .filter(isCompletedQuizSession)
       );
+  const mergedSessions = hasHeavyLocalHistory
+    ? remoteSessions
+    : mergeSessions(localCompletedSessions, remoteSessions).filter(isCompletedQuizSession);
   const localSessionsToSync = getRecentSessionsWithinUploadBudget(
     [...localCompletedSessions].sort((left, right) =>
       sessionFreshnessValue(right).localeCompare(sessionFreshnessValue(left))
@@ -1675,25 +1638,35 @@ export async function syncLocalCompletedSessionsForCurrentUser(userId: string) {
     CLOUD_LIGHT_COMPLETED_ATTEMPT_UPLOAD_LIMIT
   );
 
+  if (remoteSessions.length > 0) {
+    saveCloudCompletedSessionsForUser(userId, remoteSessions);
+  }
+
   if (hasHeavyLocalHistory) {
     const historySessions = loadCompletedHistorySessionsForUser(userId);
-    if (historySessions.length === 0 && localCompletedSessions.length > 0) {
+    if (historySessions.length === 0 && remoteSessions.length > 0) {
       saveCompletedQuestionHistoryEntriesForUser(
         userId,
-        buildCompletedQuestionHistoryEntriesFromSessions(localCompletedSessions)
+        buildCompletedQuestionHistoryEntriesFromSessions(remoteSessions)
       );
     }
   } else {
-    saveCompletedSessions(localCompletedSessions);
+    saveCompletedSessions(mergedSessions);
+    saveCompletedQuestionHistoryEntriesForUser(
+      userId,
+      buildCompletedQuestionHistoryEntriesFromSessions(mergedSessions)
+    );
   }
 
-  if (isSupabaseRecoveryMode() || !isSupabaseConfigured() || localSessionsToSync.length === 0) {
-    return localCompletedSessions;
+  const sessionsToUpload = getSessionsNeedingUpload(localSessionsToSync, remoteSessions);
+
+  if (isSupabaseRecoveryMode() || !isSupabaseConfigured() || sessionsToUpload.length === 0) {
+    return mergedSessions;
   }
 
   await upsertSessionsForUserInBatches(
     userId,
-    localSessionsToSync,
+    sessionsToUpload,
     Math.min(10, CLOUD_COMPLETED_SESSION_UPLOAD_BATCH_SIZE),
     {
       batchTimeoutMs: CLOUD_SYNC_BATCH_TIMEOUT_MS,
@@ -1701,7 +1674,7 @@ export async function syncLocalCompletedSessionsForCurrentUser(userId: string) {
     }
   );
 
-  return localCompletedSessions;
+  return mergedSessions;
 }
 
 export async function syncCurrentSessionForCurrentUser(userId: string) {

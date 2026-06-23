@@ -12,6 +12,7 @@ import { normalizePracticeYearRange } from "@/lib/practiceYears";
 
 const CURRENT_SESSION_KEY = "anatomy-confidence-current-session";
 const COMPLETED_SESSIONS_KEY = "anatomy-confidence-completed-sessions";
+const CLOUD_COMPLETED_SESSIONS_KEY = "anatomy-confidence-cloud-completed-sessions";
 const COMPLETED_QUESTION_HISTORY_KEY = "anatomy-confidence-completed-question-history";
 const QUIZ_SETTINGS_KEY = "anatomy-confidence-quiz-settings";
 const QUESTION_EXPLANATION_OVERRIDES_KEY = "anatomy-confidence-question-explanation-overrides";
@@ -143,6 +144,10 @@ function cacheCompletedQuestionHistoryForUser(userId: string, entries: Completed
 
 function getCompletedQuestionHistoryScopedKeyForUser(userId: string) {
   return getScopedKeyForUser(COMPLETED_QUESTION_HISTORY_KEY, userId);
+}
+
+function getCloudCompletedSessionsScopedKeyForUser(userId: string) {
+  return getScopedKeyForUser(CLOUD_COMPLETED_SESSIONS_KEY, userId);
 }
 
 function normalizeCompletedQuestionHistoryEntry(entry: unknown): CompletedQuestionHistoryEntry | null {
@@ -633,6 +638,24 @@ function dedupeSessionsByCanonicalId(sessions: QuizSession[]) {
   return Array.from(dedupedBySession.values());
 }
 
+function normalizeCompletedSessionList(sessions: QuizSession[]) {
+  return dedupeSessionsByCanonicalId(normalizeSessions(sessions))
+    .filter((session) => Boolean(session.completedAt))
+    .sort((left, right) =>
+      (left.completedAt ?? left.startedAt).localeCompare(right.completedAt ?? right.startedAt)
+    );
+}
+
+function parseCompletedSessionsRaw(raw: string | null) {
+  if (!raw) return [] as QuizSession[];
+
+  try {
+    return normalizeCompletedSessionList(JSON.parse(raw) as QuizSession[]);
+  } catch {
+    return [] as QuizSession[];
+  }
+}
+
 export function compactQuestionForStorage(question: Question): Question {
   return {
     id: question.id,
@@ -774,8 +797,11 @@ export function saveCompletedSession(session: QuizSession) {
     getCompletedSessionsStorageLengthForUser(activeUser) > COMPLETED_SESSIONS_HEAVY_READ_LIMIT &&
     !completedSessionsMemoryCache.has(activeUser)
   ) {
-    const normalized = dedupeSessionsByCanonicalId(normalizeSessions([session]))
-      .filter((item) => Boolean(item.completedAt));
+    const normalized = normalizeCompletedSessionList([
+      ...loadCloudCompletedSessionsForUser(activeUser),
+      session
+    ]);
+    saveCloudCompletedSessionsForUser(activeUser, normalized);
     cacheCompletedSessionsForUser(activeUser, normalized);
     for (const item of normalized) {
       clearMatchingCurrentSessions(item.id);
@@ -794,11 +820,7 @@ export function saveCompletedSessions(sessions: QuizSession[]) {
   if (!isBrowser()) return;
   const scopedKey = getScopedKey(COMPLETED_SESSIONS_KEY);
   const activeUser = getActiveStorageUser();
-  const normalized = dedupeSessionsByCanonicalId(normalizeSessions(sessions))
-    .filter((session) => Boolean(session.completedAt))
-    .sort((left, right) =>
-    (left.completedAt ?? left.startedAt).localeCompare(right.completedAt ?? right.startedAt)
-  );
+  const normalized = normalizeCompletedSessionList(sessions);
 
   cacheCompletedSessionsForUser(activeUser, normalized);
   saveCompletedQuestionHistoryEntriesForUser(
@@ -838,28 +860,61 @@ export function getCompletedSessionsStorageLengthForUser(userId = getActiveStora
   return Math.max(scopedRaw?.length ?? 0, legacyRaw?.length ?? 0);
 }
 
+export function loadCloudCompletedSessionsForUser(userId = getActiveStorageUser()) {
+  if (!isBrowser()) return [] as QuizSession[];
+  return parseCompletedSessionsRaw(
+    safeLocalStorageGetItem(getCloudCompletedSessionsScopedKeyForUser(userId))
+  );
+}
+
+export function saveCloudCompletedSessionsForUser(userId: string, sessions: QuizSession[]) {
+  if (!isBrowser()) return false;
+  const normalized = normalizeCompletedSessionList(sessions);
+  const didPersist = safeLocalStorageSetItem(
+    getCloudCompletedSessionsScopedKeyForUser(userId),
+    JSON.stringify(normalized.map(compactSessionForStorage))
+  );
+
+  completedSessionsMemoryCache.delete(userId);
+  completedSessionIdMemoryCache.delete(userId);
+
+  if (userId === getActiveStorageUser()) {
+    window.dispatchEvent(
+      new CustomEvent("completed-sessions-change", {
+        detail: loadCompletedSessionsForUser(userId)
+      })
+    );
+  }
+
+  return didPersist;
+}
+
 export function loadCompletedSessionsForUser(userId: string): QuizSession[] {
   if (!isBrowser()) return [];
   const cachedSessions = completedSessionsMemoryCache.get(userId);
   if (cachedSessions) return cachedSessions;
 
+  const cloudSessions = loadCloudCompletedSessionsForUser(userId);
   const scopedKey = getScopedKeyForUser(COMPLETED_SESSIONS_KEY, userId);
   const raw =
     safeLocalStorageGetItem(scopedKey) ??
     (userId === GUEST_USER_ID ? getLegacyOrScopedRaw(COMPLETED_SESSIONS_KEY) : null);
   if (!raw) {
-    cacheCompletedSessionsForUser(userId, []);
-    return [];
+    cacheCompletedSessionsForUser(userId, cloudSessions);
+    return cloudSessions;
   }
 
-  try {
-    const normalized = dedupeSessionsByCanonicalId(normalizeSessions(JSON.parse(raw) as QuizSession[]));
-    cacheCompletedSessionsForUser(userId, normalized);
-    return normalized;
-  } catch {
-    cacheCompletedSessionsForUser(userId, []);
-    return [];
+  if (raw.length > COMPLETED_SESSIONS_HEAVY_READ_LIMIT) {
+    cacheCompletedSessionsForUser(userId, cloudSessions);
+    return cloudSessions;
   }
+
+  const normalized = normalizeCompletedSessionList([
+    ...parseCompletedSessionsRaw(raw),
+    ...cloudSessions
+  ]);
+  cacheCompletedSessionsForUser(userId, normalized);
+  return normalized;
 }
 
 export function clearHistory() {
@@ -869,6 +924,7 @@ export function clearHistory() {
   completedSessionIdMemoryCache.delete(activeUser);
   completedQuestionHistoryMemoryCache.delete(activeUser);
   safeLocalStorageRemoveItem(getScopedKey(COMPLETED_SESSIONS_KEY));
+  safeLocalStorageRemoveItem(getScopedKey(CLOUD_COMPLETED_SESSIONS_KEY));
   safeLocalStorageRemoveItem(getScopedKey(COMPLETED_QUESTION_HISTORY_KEY));
   safeLocalStorageRemoveItem(getScopedKey(CURRENT_SESSION_KEY));
 }
