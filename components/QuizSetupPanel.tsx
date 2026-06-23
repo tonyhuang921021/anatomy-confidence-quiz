@@ -78,14 +78,25 @@ const simulationSubjectOptions = [
   }
 ];
 
+function inferPastPaperKeyFromQuestionIds(questionIds: string[]) {
+  const paperKeys = new Set<string>();
+  for (const questionId of questionIds) {
+    const match = questionId.match(/^MOEX-([^-]+)-([^-]+)-Q\d+/);
+    if (match) paperKeys.add(`${match[1]}-${match[2]}`);
+  }
+  return paperKeys.size === 1 ? Array.from(paperKeys)[0] : undefined;
+}
+
 function buildCompletedPaperCounts() {
   const completedSessions = loadCompletedSessions();
   return completedSessions.reduce<Record<string, number>>((accumulator, session) => {
-    const paperKey =
-      session.settings?.mode === "simulation" &&
-      session.settings?.paperMode === "past_paper"
-        ? session.settings?.selectedPaperKey
-        : undefined;
+    const paperKey = session.settings?.mode === "simulation"
+      ? session.settings?.selectedPaperKey ??
+        inferPastPaperKeyFromQuestionIds([
+          ...(session.questionOrder ?? []),
+          ...session.attempts.map((attempt) => attempt.questionId)
+        ])
+      : undefined;
 
     if (!paperKey) return accumulator;
     accumulator[paperKey] = (accumulator[paperKey] ?? 0) + 1;

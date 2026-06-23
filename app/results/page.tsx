@@ -18,7 +18,7 @@ import {
   pushCompletedSessionToSupabase,
   syncSharedQuestionExplanationOverrides
 } from "@/lib/cloudSync";
-import { applyQuestionClassificationOverride } from "@/data/med1QuestionBank";
+import { applyQuestionClassificationOverride, getPastPaperOptions } from "@/data/med1QuestionBank";
 import { anatomyQuestions } from "@/data/anatomyQuestions";
 import { subjectRegistry } from "@/data/subjectRegistry";
 import {
@@ -210,6 +210,16 @@ function isSimulationSession(session: QuizSession) {
   return session.settings?.mode === "simulation";
 }
 
+function isGenericSimulationSessionName(name?: string | null) {
+  const normalized = name?.trim();
+  if (!normalized) return true;
+  return (
+    normalized === "模擬考" ||
+    normalized === "模擬考試卷" ||
+    /^\d{4}\s*年第\s*[12]\s*次試卷$/.test(normalized)
+  );
+}
+
 function getStoredQuestionCount(session: QuizSession) {
   return Math.max(
     session.questionOrder?.length ?? 0,
@@ -225,18 +235,52 @@ function shouldRefreshPossiblyTruncatedCloudSession(session: QuizSession | null)
   return storedQuestionCount > 0 && session.attempts.length > 0 && session.attempts.length < storedQuestionCount;
 }
 
+function getPastPaperKeyFromSession(session: QuizSession) {
+  if (session.settings?.selectedPaperKey) return session.settings.selectedPaperKey;
+  const firstQuestion = session.generatedQuestions?.find((question) => question.examCode && question.paperCode);
+  if (firstQuestion?.examCode && firstQuestion.paperCode) {
+    return `${firstQuestion.examCode}-${firstQuestion.paperCode}`;
+  }
+  const questionIds = [
+    ...(session.questionOrder ?? []),
+    ...session.attempts.map((attempt) => attempt.questionId)
+  ];
+  const paperKeys = new Set<string>();
+  for (const questionId of questionIds) {
+    const match = questionId.match(/^MOEX-([^-]+)-([^-]+)-Q\d+/);
+    if (match) paperKeys.add(`${match[1]}-${match[2]}`);
+  }
+  return paperKeys.size === 1 ? Array.from(paperKeys)[0] : undefined;
+}
+
 function getDefaultSimulationSessionName(session: QuizSession) {
   if (!isSimulationSession(session)) return null;
+  const paperKey = getPastPaperKeyFromSession(session);
+  const paperLabel = paperKey
+    ? getPastPaperOptions(session.settings?.subjectFilter ?? "全部").find((paper) => paper.key === paperKey)?.label ??
+      getPastPaperOptions("全部").find((paper) => paper.key === paperKey)?.label
+    : undefined;
+  if (paperLabel) return paperLabel;
+
   const firstQuestion = session.generatedQuestions?.find(
     (question) => typeof question.sourceYear === "number"
   );
   if (!firstQuestion?.sourceYear) return "模擬考試卷";
-  return `${firstQuestion.sourceYear} 年第 ${firstQuestion.sourceRound ?? 1} 次試卷`;
+  const subjectLabel =
+    firstQuestion.sourceCitation?.includes("醫學（二）") || session.settings?.subjectFilter === "醫學（二）"
+      ? "醫學（二）"
+      : firstQuestion.paperCode?.startsWith("2")
+        ? "醫學（二）"
+        : "醫學（一）";
+  return `${firstQuestion.sourceYear} 第${firstQuestion.sourceRound ?? 1}次 ${subjectLabel} ${firstQuestion.paperCode ?? ""}`.trim();
 }
 
 function getSessionDisplayName(session: QuizSession) {
   if (isSimulationSession(session)) {
-    return session.settings?.sessionName?.trim() || getDefaultSimulationSessionName(session) || "模擬考試卷";
+    const savedName = session.settings?.sessionName?.trim();
+    return !isGenericSimulationSessionName(savedName)
+      ? savedName ?? "模擬考試卷"
+      : getDefaultSimulationSessionName(session) || "模擬考試卷";
   }
 
   return `${session.subject} ${getSessionModeLabel(session)}`;
@@ -781,7 +825,9 @@ function ResultsPageContent() {
       settings: {
         ...(state.session.settings ?? DEFAULT_QUIZ_SETTINGS),
         mode: "simulation",
-        sessionName: nextName
+        sessionName: nextName,
+        paperMode: state.session.settings?.paperMode ?? (getPastPaperKeyFromSession(state.session) ? "past_paper" : undefined),
+        selectedPaperKey: state.session.settings?.selectedPaperKey ?? getPastPaperKeyFromSession(state.session)
       }
     };
 

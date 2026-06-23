@@ -151,9 +151,19 @@ function evaluateAttempt(question: Question, selectedAnswer: OptionKey) {
   return selectedAnswer === question.answer;
 }
 
+function isGenericSimulationSessionName(name?: string | null) {
+  const normalized = name?.trim();
+  if (!normalized) return true;
+  return (
+    normalized === "模擬考" ||
+    normalized === "模擬考試卷" ||
+    /^\d{4}\s*年第\s*[12]\s*次試卷$/.test(normalized)
+  );
+}
+
 function buildSimulationSessionName(settings: QuizSettings, questions: Question[]) {
   if (settings.mode !== "simulation") return settings.sessionName;
-  if (settings.sessionName?.trim()) return settings.sessionName.trim();
+  if (!isGenericSimulationSessionName(settings.sessionName)) return settings.sessionName?.trim();
   if (
     settings.paperMode !== "past_paper" &&
     settings.paperMode !== "random_past_paper"
@@ -161,12 +171,25 @@ function buildSimulationSessionName(settings: QuizSettings, questions: Question[
     return undefined;
   }
 
+  const selectedPaperKey = getSimulationSelectedPaperKey(settings, questions);
+  const paperLabel = selectedPaperKey
+    ? getPastPaperOptions(settings.subjectFilter ?? "全部").find((paper) => paper.key === selectedPaperKey)?.label ??
+      getPastPaperOptions("全部").find((paper) => paper.key === selectedPaperKey)?.label
+    : undefined;
+  if (paperLabel) return paperLabel;
+
   const firstQuestion = questions.find(
     (question) => typeof question.sourceYear === "number"
   );
 
   if (!firstQuestion?.sourceYear) return "模擬考試卷";
-  return `${firstQuestion.sourceYear} 年第 ${firstQuestion.sourceRound ?? 1} 次試卷`;
+  const subjectLabel =
+    firstQuestion.sourceCitation?.includes("醫學（二）") || settings.subjectFilter === "醫學（二）"
+      ? "醫學（二）"
+      : firstQuestion.paperCode?.startsWith("2")
+        ? "醫學（二）"
+        : "醫學（一）";
+  return `${firstQuestion.sourceYear} 第${firstQuestion.sourceRound ?? 1}次 ${subjectLabel} ${firstQuestion.paperCode ?? ""}`.trim();
 }
 
 function getSimulationSelectedPaperKey(settings: QuizSettings, questions: Question[]) {

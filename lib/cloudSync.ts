@@ -762,10 +762,14 @@ function buildAttemptMap(rows: QuizSessionAttemptRow[]) {
 }
 
 function getSinglePastPaperKeyFromAttempts(attempts: Attempt[]) {
+  return getSinglePastPaperKeyFromQuestionIds(attempts.map((attempt) => attempt.questionId));
+}
+
+function getSinglePastPaperKeyFromQuestionIds(questionIds: string[]) {
   const paperKeys = new Set<string>();
 
-  for (const attempt of attempts) {
-    const match = attempt.questionId.match(/^MOEX-([^-]+)-([^-]+)-Q\d+/);
+  for (const questionId of questionIds) {
+    const match = questionId.match(/^MOEX-([^-]+)-([^-]+)-Q\d+/);
     if (match) {
       paperKeys.add(`${match[1]}-${match[2]}`);
     }
@@ -806,6 +810,68 @@ function canonicalizeSessionsForUser(userId: string, sessions: QuizSession[]) {
   }));
 }
 
+function isGenericSimulationSessionName(name?: string | null) {
+  const normalized = name?.trim();
+  if (!normalized) return true;
+  return (
+    normalized === "模擬考" ||
+    normalized === "模擬考試卷" ||
+    /^\d{4}\s*年第\s*[12]\s*次試卷$/.test(normalized)
+  );
+}
+
+function getInferredPastPaperKey(session: QuizSession) {
+  return (
+    session.settings?.selectedPaperKey ??
+    getSinglePastPaperKeyFromAttempts(session.attempts) ??
+    getSinglePastPaperKeyFromQuestionIds(session.questionOrder ?? [])
+  );
+}
+
+function mergeSimulationMetadata(primary: QuizSession, secondary: QuizSession) {
+  if (primary.settings?.mode !== "simulation" || secondary.settings?.mode !== "simulation") {
+    return primary;
+  }
+
+  const primaryName = primary.settings.sessionName?.trim();
+  const secondaryName = secondary.settings.sessionName?.trim();
+  const primaryPaperKey = getInferredPastPaperKey(primary);
+  const secondaryPaperKey = getInferredPastPaperKey(secondary);
+  const shouldUseSecondaryName =
+    isGenericSimulationSessionName(primaryName) && !isGenericSimulationSessionName(secondaryName);
+  const selectedPaperKey = primaryPaperKey ?? secondaryPaperKey;
+
+  if (!shouldUseSecondaryName && primary.settings.selectedPaperKey && primary.settings.paperMode) {
+    return primary;
+  }
+
+  return {
+    ...primary,
+    settings: {
+      ...primary.settings,
+      sessionName: shouldUseSecondaryName ? secondaryName : primary.settings.sessionName,
+      paperMode: primary.settings.paperMode ?? (selectedPaperKey ? "past_paper" : secondary.settings.paperMode),
+      selectedPaperKey
+    }
+  };
+}
+
+function hasBetterSimulationMetadata(localSession: QuizSession, remoteSession: QuizSession) {
+  if (localSession.settings?.mode !== "simulation" || remoteSession.settings?.mode !== "simulation") {
+    return false;
+  }
+
+  const localName = localSession.settings.sessionName?.trim();
+  const remoteName = remoteSession.settings.sessionName?.trim();
+  const localPaperKey = getInferredPastPaperKey(localSession);
+  const remotePaperKey = getInferredPastPaperKey(remoteSession);
+
+  return (
+    (!isGenericSimulationSessionName(localName) && isGenericSimulationSessionName(remoteName)) ||
+    Boolean(localPaperKey && !remotePaperKey)
+  );
+}
+
 function mergeSessions(localSessions: QuizSession[], remoteSessions: QuizSession[]) {
   const merged = new Map<string, QuizSession>();
 
@@ -835,7 +901,9 @@ function mergeSessions(localSessions: QuizSession[], remoteSessions: QuizSession
       nextFreshness > currentFreshness ||
       (nextFreshness === currentFreshness && nextAttempts >= currentAttempts)
     ) {
-      merged.set(key, session);
+      merged.set(key, mergeSimulationMetadata(session, current));
+    } else {
+      merged.set(key, mergeSimulationMetadata(current, session));
     }
   }
 
@@ -857,6 +925,7 @@ function getSessionsNeedingUpload(localSessions: QuizSession[], remoteSessions: 
     const remoteFreshness = sessionFreshnessValue(remoteSession);
     if (localFreshness > remoteFreshness) return true;
     if (localFreshness < remoteFreshness) return false;
+    if (hasBetterSimulationMetadata(localSession, remoteSession)) return true;
 
     return localSession.attempts.length > remoteSession.attempts.length;
   });
