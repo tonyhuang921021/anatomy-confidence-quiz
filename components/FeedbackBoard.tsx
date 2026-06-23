@@ -137,6 +137,12 @@ function FeedbackVoteControls({
   );
 }
 
+function getFeedbackAuthorLabel(entry: FeedbackMessage) {
+  const displayName = entry.displayName?.trim();
+  if (displayName) return displayName;
+  return entry.isAnonymous ? "匿名使用者" : "已登入使用者";
+}
+
 export function FeedbackBoard() {
   const { configured, user } = useAuth();
   const [messages, setMessages] = useState<FeedbackMessage[]>([]);
@@ -432,7 +438,7 @@ export function FeedbackBoard() {
                   <div className="flex items-start justify-between gap-3">
                     <div>
                       <p className="text-sm font-semibold text-ink">
-                        {entry.isAnonymous ? "匿名使用者" : entry.displayName || "已登入使用者"}
+                        {getFeedbackAuthorLabel(entry)}
                       </p>
                       <p className="mt-1 text-xs text-slate-500">{formatCreatedAt(entry.createdAt)}</p>
                     </div>
@@ -487,7 +493,7 @@ export function FeedbackBoard() {
                       {entry.replies?.map((reply) => (
                         <div key={reply.id} className="rounded-2xl bg-white px-3 py-3 ring-1 ring-slate-200">
                           <p className="text-sm font-semibold text-ink">
-                            {reply.isAnonymous ? "匿名使用者" : reply.displayName || "已登入使用者"}
+                            {getFeedbackAuthorLabel(reply)}
                           </p>
                           <p className="mt-1 text-xs text-slate-500">{formatCreatedAt(reply.createdAt)}</p>
                           <p className="mt-2 whitespace-pre-wrap text-sm leading-7 text-slate-700">
