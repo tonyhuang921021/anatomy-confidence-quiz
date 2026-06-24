@@ -57,9 +57,10 @@ const REACTION_LABELS: Record<string, string> = {
   pure_chaos: "這題我們不要了"
 };
 
-const SUPPLEMENT_PUBLIC_CACHE_CONTROL = "public, max-age=120, s-maxage=300, stale-while-revalidate=600";
+const SUPPLEMENT_PUBLIC_CACHE_CONTROL = "public, max-age=300, s-maxage=900, stale-while-revalidate=3600";
 const SUPPLEMENT_PRIVATE_CACHE_CONTROL = "private, max-age=45";
 const SUPPLEMENT_NO_STORE_CACHE_CONTROL = "no-store";
+const SUPPLEMENT_COUNT_LOOKUP_LIMIT = 50;
 
 function getServiceSupabaseClient() {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
@@ -229,17 +230,18 @@ async function loadCardsForQuestion(supabase: any, questionId: string, userId?: 
 }
 
 async function countCardsForQuestion(supabase: any, questionId: string) {
-  const { count, error } = (await withServerTimeout(
+  const { data, error } = (await withServerTimeout(
     supabase
       .from("question_supplement_cards")
-      .select("id", { count: "exact", head: true })
-      .eq("question_id", questionId),
+      .select("id")
+      .eq("question_id", questionId)
+      .limit(SUPPLEMENT_COUNT_LOOKUP_LIMIT),
     1400,
     "補充卡片數量載入逾時"
-  )) as { count?: number | null; error?: unknown };
+  )) as { data?: Array<{ id?: string | number }>; error?: unknown };
 
   if (error) throw error;
-  return count ?? 0;
+  return data?.length ?? 0;
 }
 
 async function loadReactionsForQuestion(supabase: any, questionId: string, userId?: string | null) {

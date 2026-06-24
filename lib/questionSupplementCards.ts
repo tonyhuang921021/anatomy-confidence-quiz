@@ -24,8 +24,9 @@ type SupplementCacheEntry<T> = {
 type SupplementCardsPayload = Required<Pick<QuestionSupplementResponse, "cards" | "reactions">>;
 type SupplementMetaPayload = Required<Pick<QuestionSupplementResponse, "count" | "reactions">>;
 
-const SUPPLEMENT_META_CACHE_TTL_MS = 2 * 60 * 1000;
+const SUPPLEMENT_META_CACHE_TTL_MS = 5 * 60 * 1000;
 const SUPPLEMENT_CARDS_CACHE_TTL_MS = 60 * 1000;
+const SUPPLEMENT_META_SESSION_PREFIX = "aq:supplement-meta:v2:";
 const supplementMetaCache = new Map<string, SupplementCacheEntry<SupplementMetaPayload>>();
 const supplementCardsCache = new Map<string, SupplementCacheEntry<SupplementCardsPayload>>();
 const supplementRequestsInFlight = new Map<string, Promise<unknown>>();
@@ -61,10 +62,77 @@ function writeSupplementCache<T>(cache: Map<string, SupplementCacheEntry<T>>, ke
   });
 }
 
+function getSupplementSessionStorage() {
+  if (typeof window === "undefined") return null;
+  try {
+    return window.sessionStorage;
+  } catch {
+    return null;
+  }
+}
+
+function readSupplementMetaCache(key: string) {
+  const cached = readSupplementCache(supplementMetaCache, key);
+  if (cached) return cached;
+
+  const storage = getSupplementSessionStorage();
+  if (!storage) return undefined;
+
+  try {
+    const storageKey = `${SUPPLEMENT_META_SESSION_PREFIX}${key}`;
+    const rawValue = storage.getItem(storageKey);
+    if (!rawValue) return undefined;
+
+    const entry = JSON.parse(rawValue) as SupplementCacheEntry<SupplementMetaPayload>;
+    if (!entry || typeof entry.expiresAt !== "number" || entry.expiresAt <= Date.now()) {
+      storage.removeItem(storageKey);
+      return undefined;
+    }
+
+    supplementMetaCache.set(key, entry);
+    return entry.value;
+  } catch {
+    return undefined;
+  }
+}
+
+function writeSupplementMetaCache(key: string, value: SupplementMetaPayload, ttlMs: number) {
+  writeSupplementCache(supplementMetaCache, key, value, ttlMs);
+
+  const storage = getSupplementSessionStorage();
+  if (!storage) return;
+
+  try {
+    const entry = supplementMetaCache.get(key);
+    if (!entry) return;
+    storage.setItem(`${SUPPLEMENT_META_SESSION_PREFIX}${key}`, JSON.stringify(entry));
+  } catch {
+    // Session cache is only a request reducer; failing to write it should not block the page.
+  }
+}
+
+function invalidateQuestionSupplementMetaSessionCache(questionId: string) {
+  const storage = getSupplementSessionStorage();
+  if (!storage) return;
+
+  try {
+    const keyPrefix = `${SUPPLEMENT_META_SESSION_PREFIX}${questionId}:`;
+    for (let index = storage.length - 1; index >= 0; index -= 1) {
+      const storageKey = storage.key(index);
+      if (storageKey?.startsWith(keyPrefix)) {
+        storage.removeItem(storageKey);
+      }
+    }
+  } catch {
+    // Best-effort invalidation only.
+  }
+}
+
 function invalidateQuestionSupplementCaches(questionId: string) {
   for (const key of Array.from(supplementMetaCache.keys())) {
     if (key.startsWith(`${questionId}:`)) supplementMetaCache.delete(key);
   }
+  invalidateQuestionSupplementMetaSessionCache(questionId);
   for (const key of Array.from(supplementCardsCache.keys())) {
     if (key.startsWith(`${questionId}:`)) supplementCardsCache.delete(key);
   }
@@ -90,8 +158,7 @@ function rememberSupplementPayload(questionId: string, accessToken: string | nul
   }
 
   if (typeof payload.count === "number" || payload.cards || payload.reactions) {
-    writeSupplementCache(
-      supplementMetaCache,
+    writeSupplementMetaCache(
       cacheKey,
       {
         count: Math.max(0, payload.count ?? cards.length),
@@ -147,7 +214,7 @@ export async function loadQuestionSupplementCards(
 }
 
 export async function loadQuestionSupplementCount(questionId: string): Promise<number> {
-  const cached = readSupplementCache(supplementMetaCache, getSupplementCacheKey(questionId));
+  const cached = readSupplementMetaCache(getSupplementCacheKey(questionId));
   if (cached) return cached.count;
 
   const params = new URLSearchParams({ questionId, countOnly: "1" });
@@ -165,7 +232,7 @@ export async function loadQuestionSupplementMeta(
   accessToken?: string | null
 ): Promise<Required<Pick<QuestionSupplementResponse, "count" | "reactions">>> {
   const cacheKey = getSupplementCacheKey(questionId, accessToken);
-  const cached = readSupplementCache(supplementMetaCache, cacheKey);
+  const cached = readSupplementMetaCache(cacheKey);
   if (cached) return cached;
 
   const params = new URLSearchParams({ questionId, countOnly: "1", includeReactions: "1" });

@@ -13,18 +13,28 @@ const MAX_IDS_BY_KIND: Record<BackgroundDataKind, number> = {
 
 const CACHE_CONTROL_BY_KIND: Record<BackgroundDataKind, string> = {
   stats: "public, max-age=300, s-maxage=1800, stale-while-revalidate=3600",
-  explanations: "public, max-age=120, s-maxage=300, stale-while-revalidate=900",
-  classifications: "public, max-age=120, s-maxage=300, stale-while-revalidate=900"
+  explanations: "public, max-age=300, s-maxage=1800, stale-while-revalidate=7200",
+  classifications: "public, max-age=1800, s-maxage=21600, stale-while-revalidate=86400"
 };
+const NO_STORE_CACHE_CONTROL = "no-store";
 
-function jsonWithCache(payload: unknown, kind: BackgroundDataKind, init?: ResponseInit) {
+function jsonWithCache(
+  payload: unknown,
+  kind: BackgroundDataKind,
+  init?: ResponseInit,
+  cacheControl = CACHE_CONTROL_BY_KIND[kind]
+) {
   const headers = new Headers(init?.headers);
-  headers.set("Cache-Control", CACHE_CONTROL_BY_KIND[kind]);
+  headers.set("Cache-Control", cacheControl);
 
   return NextResponse.json(payload, {
     ...init,
     headers
   });
+}
+
+function jsonNoStore(payload: unknown, kind: BackgroundDataKind, init?: ResponseInit) {
+  return jsonWithCache(payload, kind, init, NO_STORE_CACHE_CONTROL);
 }
 
 function getServiceSupabaseClient() {
@@ -85,7 +95,7 @@ export async function GET(request: NextRequest) {
   }
 
   if (isSupabaseRecoveryMode()) {
-    return jsonWithCache(emptyPayload(kind, true), kind);
+    return jsonNoStore(emptyPayload(kind, true), kind);
   }
 
   const loadAllClassifications = kind === "classifications" && shouldLoadAllClassifications(request);
@@ -96,7 +106,7 @@ export async function GET(request: NextRequest) {
 
   const supabase = getServiceSupabaseClient();
   if (!supabase) {
-    return jsonWithCache(emptyPayload(kind), kind);
+    return jsonNoStore(emptyPayload(kind), kind);
   }
 
   try {
@@ -146,6 +156,6 @@ export async function GET(request: NextRequest) {
     return jsonWithCache({ ok: true, overrides: data ?? [] }, kind);
   } catch (error) {
     const message = error instanceof Error ? error.message : "背景資料讀取失敗";
-    return jsonWithCache(degradedPayload(kind, message), kind);
+    return jsonNoStore(degradedPayload(kind, message), kind);
   }
 }

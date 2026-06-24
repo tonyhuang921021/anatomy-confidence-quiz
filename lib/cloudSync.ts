@@ -2134,8 +2134,9 @@ export async function loadLeaderboard(limit = 50, options: { signal?: AbortSigna
 
 const BACKGROUND_STATS_LOOKUP_LIMIT = 40;
 const BACKGROUND_CLASSIFICATION_LOOKUP_LIMIT = 500;
-const BACKGROUND_DATA_CACHE_VERSION = "v3";
-const BACKGROUND_DATA_SESSION_PREFIX = `aq:bg:${BACKGROUND_DATA_CACHE_VERSION}:`;
+const BACKGROUND_DATA_CACHE_VERSION = "v4";
+const BACKGROUND_DATA_STORAGE_PREFIX = `aq:bg:${BACKGROUND_DATA_CACHE_VERSION}:`;
+const BACKGROUND_DATA_LOCAL_STORAGE_MAX_BYTES = 180_000;
 const BACKGROUND_DATA_TTL_MS = {
   stats: 5 * 60 * 1000,
   explanations: 30 * 60 * 1000,
@@ -2158,8 +2159,65 @@ type BackgroundCacheEntry<T> = {
 const backgroundDataMemoryCache = new Map<string, BackgroundCacheEntry<unknown>>();
 const backgroundDataRequestsInFlight = new Map<string, Promise<unknown>>();
 
-function isBrowserStorageAvailable() {
-  return typeof window !== "undefined" && typeof window.sessionStorage !== "undefined";
+function getBackgroundStorage(storageName: "sessionStorage" | "localStorage") {
+  if (typeof window === "undefined") return null;
+  try {
+    return window[storageName] ?? null;
+  } catch {
+    return null;
+  }
+}
+
+function readBackgroundStorageCache<T>(
+  storageName: "sessionStorage" | "localStorage",
+  key: string,
+  now: number
+): T | undefined {
+  const storage = getBackgroundStorage(storageName);
+  if (!storage) return undefined;
+
+  try {
+    const storageKey = `${BACKGROUND_DATA_STORAGE_PREFIX}${key}`;
+    const rawValue = storage.getItem(storageKey);
+    if (!rawValue) return undefined;
+    const entry = JSON.parse(rawValue) as BackgroundCacheEntry<T>;
+    if (!entry || typeof entry.expiresAt !== "number" || entry.expiresAt <= now) {
+      storage.removeItem(storageKey);
+      return undefined;
+    }
+    backgroundDataMemoryCache.set(key, entry as BackgroundCacheEntry<unknown>);
+    return entry.value;
+  } catch {
+    return undefined;
+  }
+}
+
+function shouldPersistBackgroundCacheInLocalStorage(key: string) {
+  return (
+    key === "classification:all" ||
+    key.startsWith("classification:") ||
+    key.startsWith("explanation:") ||
+    key.startsWith("stats:")
+  );
+}
+
+function writeBackgroundStorageCache<T>(
+  storageName: "sessionStorage" | "localStorage",
+  key: string,
+  entry: BackgroundCacheEntry<T>
+) {
+  const storage = getBackgroundStorage(storageName);
+  if (!storage) return;
+
+  try {
+    const serialized = JSON.stringify(entry);
+    if (storageName === "localStorage" && serialized.length > BACKGROUND_DATA_LOCAL_STORAGE_MAX_BYTES) {
+      return;
+    }
+    storage.setItem(`${BACKGROUND_DATA_STORAGE_PREFIX}${key}`, serialized);
+  } catch {
+    // Browser storage is best-effort. Memory cache still handles the current page.
+  }
 }
 
 function readBackgroundCache<T>(key: string): T | undefined {
@@ -2170,21 +2228,10 @@ function readBackgroundCache<T>(key: string): T | undefined {
     backgroundDataMemoryCache.delete(key);
   }
 
-  if (!isBrowserStorageAvailable()) return undefined;
+  const sessionValue = readBackgroundStorageCache<T>("sessionStorage", key, now);
+  if (sessionValue !== undefined) return sessionValue;
 
-  try {
-    const rawValue = window.sessionStorage.getItem(`${BACKGROUND_DATA_SESSION_PREFIX}${key}`);
-    if (!rawValue) return undefined;
-    const entry = JSON.parse(rawValue) as BackgroundCacheEntry<T>;
-    if (!entry || typeof entry.expiresAt !== "number" || entry.expiresAt <= now) {
-      window.sessionStorage.removeItem(`${BACKGROUND_DATA_SESSION_PREFIX}${key}`);
-      return undefined;
-    }
-    backgroundDataMemoryCache.set(key, entry as BackgroundCacheEntry<unknown>);
-    return entry.value;
-  } catch {
-    return undefined;
-  }
+  return readBackgroundStorageCache<T>("localStorage", key, now);
 }
 
 function writeBackgroundCache<T>(key: string, value: T, ttlMs: number) {
@@ -2194,12 +2241,9 @@ function writeBackgroundCache<T>(key: string, value: T, ttlMs: number) {
   };
   backgroundDataMemoryCache.set(key, entry as BackgroundCacheEntry<unknown>);
 
-  if (!isBrowserStorageAvailable()) return;
-
-  try {
-    window.sessionStorage.setItem(`${BACKGROUND_DATA_SESSION_PREFIX}${key}`, JSON.stringify(entry));
-  } catch {
-    // Session storage is a best-effort request reducer. If it is full, memory cache still helps this page.
+  writeBackgroundStorageCache("sessionStorage", key, entry);
+  if (shouldPersistBackgroundCacheInLocalStorage(key)) {
+    writeBackgroundStorageCache("localStorage", key, entry);
   }
 }
 

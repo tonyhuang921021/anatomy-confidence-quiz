@@ -223,6 +223,17 @@ function isAcceptedFavoriteAnswer(question: Question, answer: OptionKey) {
   return question.answer === answer;
 }
 
+function useDebouncedValue<T>(value: T, delayMs: number) {
+  const [debouncedValue, setDebouncedValue] = useState(value);
+
+  useEffect(() => {
+    const timer = window.setTimeout(() => setDebouncedValue(value), delayMs);
+    return () => window.clearTimeout(timer);
+  }, [delayMs, value]);
+
+  return debouncedValue;
+}
+
 export default function SearchPage() {
   const { session } = useAuth();
   const [selectedSubject, setSelectedSubject] = useState("全部");
@@ -242,8 +253,9 @@ export default function SearchPage() {
   const [favoriteSelectedAnswer, setFavoriteSelectedAnswer] = useState<OptionKey | null>(null);
   const [favoriteAnswerFeedback, setFavoriteAnswerFeedback] = useState<FavoriteAnswerFeedback | null>(null);
   const [expandedQuestionIds, setExpandedQuestionIds] = useState<Record<string, boolean>>({});
-  const deferredKeyword = useDeferredValue(keyword);
-  const isKeywordPending = keyword !== deferredKeyword;
+  const debouncedKeyword = useDebouncedValue(keyword, 220);
+  const deferredKeyword = useDeferredValue(debouncedKeyword);
+  const isKeywordPending = keyword !== debouncedKeyword || debouncedKeyword !== deferredKeyword;
 
   const normalizedKeyword = normalizeSearchText(deferredKeyword);
   const compactKeyword = compactSearchText(deferredKeyword);
