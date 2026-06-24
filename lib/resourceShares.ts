@@ -43,6 +43,16 @@ export const loadResourceShareDetail = async (
   return parseJsonResponse<{ resource: ResourceShare }>(response, "資源內容讀取失敗");
 };
 
+export const loadResourceShareHtml = async (resourceId: string, accessToken: string): Promise<string> => {
+  const params = new URLSearchParams({ resourceId });
+  const response = await fetch(`/api/resource-shares/html?${params.toString()}`, {
+    cache: "no-store",
+    headers: { Authorization: `Bearer ${accessToken}` },
+  });
+  const payload = await parseJsonResponse<{ html?: string }>(response, "HTML 資源讀取失敗");
+  return typeof payload.html === "string" ? payload.html : "";
+};
+
 export const uploadResourceShare = async ({
   accessToken,
   file,

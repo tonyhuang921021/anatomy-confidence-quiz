@@ -54,6 +54,11 @@ const QUICK_ENTRIES = [
 const HOME_RELEASE_NOTES = [
   {
     time: "06/24",
+    title: "HTML 資源直接開全螢幕",
+    body: "交流區的 HTML 不再變原始碼瀑布，點開就是互動頁；不用先考古 <style> 才能讀書。"
+  },
+  {
+    time: "06/24",
     title: "交流區終於像交流區",
     body: "口訣、考點提醒可以直接發，檔案改成附件；不用每次都把一句話包成大型上傳儀式。"
   },
