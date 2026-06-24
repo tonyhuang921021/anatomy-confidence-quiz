@@ -51,14 +51,14 @@ export const uploadResourceShare = async ({
   category,
 }: {
   accessToken: string;
-  file: File;
+  file?: File | null;
   title: string;
   description?: string;
   category?: string;
 }): Promise<{ resource: ResourceShare }> => {
   const formData = new FormData();
-  formData.set("file", file);
-  formData.set("title", title);
+  if (file) formData.set("file", file);
+  if (title) formData.set("title", title);
   if (description) formData.set("description", description);
   if (category) formData.set("category", category);
   const response = await fetch("/api/resource-shares/upload", {

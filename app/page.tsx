@@ -54,6 +54,11 @@ const QUICK_ENTRIES = [
 const HOME_RELEASE_NOTES = [
   {
     time: "06/24",
+    title: "交流區終於像交流區",
+    body: "口訣、考點提醒可以直接發，檔案改成附件；不用每次都把一句話包成大型上傳儀式。"
+  },
+  {
+    time: "06/24",
     title: "資源分享區開張",
     body: "講義、PDF、圖片和 HTML 都可以丟進交流區；不匿名，按讚留言自己承擔學術熱情。"
   },

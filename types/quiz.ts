@@ -572,7 +572,7 @@ export type FeedbackMessage = {
   replies?: FeedbackMessage[];
 };
 
-export type ResourceShareFileKind = "html" | "pdf" | "image" | "other";
+export type ResourceShareFileKind = "text" | "html" | "pdf" | "image" | "other";
 
 export type ResourceShareComment = {
   id: string;
@@ -588,10 +588,11 @@ export type ResourceShare = {
   title: string;
   description?: string;
   category?: string;
-  fileName: string;
+  shareType: "text" | "file";
+  fileName?: string;
   filePath?: string;
   fileUrl?: string;
-  fileMimeType: string;
+  fileMimeType?: string;
   fileKind: ResourceShareFileKind;
   fileSizeBytes: number;
   authorLabel: string;

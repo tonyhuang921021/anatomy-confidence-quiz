@@ -1419,10 +1419,11 @@ create table if not exists public.resource_shares (
   title text not null,
   description text,
   category text,
-  file_name text not null,
-  file_path text not null,
-  file_mime_type text not null,
-  file_size_bytes bigint not null check (file_size_bytes >= 0),
+  share_type text not null default 'file' check (share_type in ('file', 'text')),
+  file_name text,
+  file_path text,
+  file_mime_type text,
+  file_size_bytes bigint not null default 0 check (file_size_bytes >= 0),
   author_label text not null,
   author_email text,
   user_id uuid not null references auth.users(id) on delete cascade,
@@ -1438,6 +1439,9 @@ on public.resource_shares (user_id, created_at desc);
 
 create index if not exists resource_shares_mime_created_idx
 on public.resource_shares (file_mime_type, created_at desc);
+
+create index if not exists resource_shares_type_created_idx
+on public.resource_shares (share_type, created_at desc);
 
 create table if not exists public.resource_share_likes (
   id bigint generated always as identity primary key,

@@ -58,7 +58,7 @@ export async function GET(request: NextRequest) {
         "互動資料讀取逾時"
       )) as [{ data?: any[] | null }, { data?: any[] | null }];
 
-      const signedUrl = await createResourceSignedUrl(supabase, row.file_path);
+      const signedUrl = row.file_path ? await createResourceSignedUrl(supabase, row.file_path) : undefined;
       const mappedComments = (comments ?? []).map(mapResourceShareComment);
       const likeRows = likes ?? [];
       const resource = mapResourceShare(row, {

@@ -69,6 +69,11 @@ export function ResourceShareViewer({ resourceId }: { resourceId: string }) {
     );
   }
 
+  const hasAttachment = resource.shareType === "file" && Boolean(resource.fileUrl);
+  const metaText = hasAttachment
+    ? `${resource.authorLabel} · ${resource.fileName ?? "附件"} · ${formatFileSize(resource.fileSizeBytes)}`
+    : `${resource.authorLabel} · 文字分享`;
+
   return (
     <section className="space-y-5">
       <div className="rounded-[2rem] border border-slate-100 bg-white p-6 shadow-sm">
@@ -80,23 +85,32 @@ export function ResourceShareViewer({ resourceId }: { resourceId: string }) {
             <p className="text-xs font-black uppercase tracking-[0.3em] text-emerald-700">Resource</p>
             <h1 className="mt-2 break-words text-3xl font-black text-emerald-950 md:text-4xl">{resource.title}</h1>
             <p className="mt-2 text-sm font-bold text-slate-500">
-              {resource.authorLabel} · {resource.fileName} · {formatFileSize(resource.fileSizeBytes)}
+              {metaText}
             </p>
           </div>
-          <a
-            href={resource.fileUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="rounded-full bg-slate-950 px-5 py-3 text-center text-sm font-black text-white"
-          >
-            新分頁開啟
-          </a>
+          {hasAttachment ? (
+            <a
+              href={resource.fileUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="rounded-full bg-slate-950 px-5 py-3 text-center text-sm font-black text-white"
+            >
+              新分頁開啟
+            </a>
+          ) : null}
         </div>
         {resource.description ? <p className="mt-4 whitespace-pre-wrap font-bold leading-7 text-slate-700">{resource.description}</p> : null}
       </div>
 
       <div className="overflow-hidden rounded-[2rem] border border-slate-100 bg-white shadow-sm">
-        {resource.fileKind === "image" ? (
+        {!hasAttachment ? (
+          <div className="p-8">
+            <p className="text-sm font-black uppercase tracking-[0.3em] text-emerald-700">Text Share</p>
+            <p className="mt-3 whitespace-pre-wrap text-lg font-bold leading-8 text-slate-700">
+              {resource.description || "這則分享沒有附件，也沒有留下更多文字。"}
+            </p>
+          </div>
+        ) : resource.fileKind === "image" ? (
           <div className="bg-slate-50 p-4">
             <img src={resource.fileUrl} alt={resource.title} className="mx-auto max-h-[78vh] max-w-full rounded-2xl object-contain" />
           </div>

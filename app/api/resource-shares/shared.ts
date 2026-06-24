@@ -81,7 +81,8 @@ export const getVerifiedResourceUser = async (
   }
 };
 
-export const getResourceShareFileKind = (mimeType: string): ResourceShareFileKind => {
+export const getResourceShareFileKind = (mimeType: string, filePath?: string | null): ResourceShareFileKind => {
+  if (!filePath) return "text";
   if (mimeType === "text/html" || mimeType === "application/xhtml+xml") return "html";
   if (mimeType === "application/pdf") return "pdf";
   if (mimeType.startsWith("image/")) return "image";
@@ -140,11 +141,12 @@ export const mapResourceShare = (
   title: String(row.title ?? "未命名資源"),
   description: typeof row.description === "string" && row.description.trim() ? row.description : undefined,
   category: typeof row.category === "string" && row.category.trim() ? row.category : undefined,
-  fileName: String(row.file_name ?? "resource"),
+  shareType: row.share_type === "text" || !row.file_path ? "text" : "file",
+  fileName: typeof row.file_name === "string" && row.file_name.trim() ? row.file_name : undefined,
   filePath: typeof row.file_path === "string" ? row.file_path : undefined,
   fileUrl: options.fileUrl,
-  fileMimeType: String(row.file_mime_type ?? "application/octet-stream"),
-  fileKind: getResourceShareFileKind(String(row.file_mime_type ?? "")),
+  fileMimeType: typeof row.file_mime_type === "string" && row.file_mime_type.trim() ? row.file_mime_type : undefined,
+  fileKind: getResourceShareFileKind(String(row.file_mime_type ?? ""), row.file_path),
   fileSizeBytes: Number(row.file_size_bytes ?? 0),
   authorLabel: String(row.author_label ?? "同學"),
   authorEmail: typeof row.author_email === "string" ? row.author_email : undefined,

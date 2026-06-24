@@ -15,7 +15,7 @@ import type { ResourceShare } from "@/types/quiz";
 const CATEGORIES = ["總複習", "微生物免疫", "藥理", "生理", "病理", "解剖", "生化", "其他"];
 
 const formatFileSize = (bytes: number) => {
-  if (!Number.isFinite(bytes) || bytes <= 0) return "0 KB";
+  if (!Number.isFinite(bytes) || bytes <= 0) return "文字";
   if (bytes < 1024 * 1024) return `${Math.max(1, Math.round(bytes / 1024))} KB`;
   return `${(bytes / (1024 * 1024)).toFixed(bytes >= 10 * 1024 * 1024 ? 0 : 1)} MB`;
 };
@@ -32,11 +32,14 @@ const formatDate = (iso: string) => {
 };
 
 const fileKindLabel = (resource: ResourceShare) => {
+  if (resource.fileKind === "text") return "文字";
   if (resource.fileKind === "html") return "HTML";
   if (resource.fileKind === "pdf") return "PDF";
   if (resource.fileKind === "image") return "圖片";
   return "檔案";
 };
+
+const avatarLabel = (label: string) => label.trim().slice(0, 1) || "學";
 
 export function ResourceShareHub() {
   const { configured, loading: authLoading, session, user } = useAuth();
@@ -46,6 +49,7 @@ export function ResourceShareHub() {
   const [loading, setLoading] = useState(false);
   const [detailLoadingId, setDetailLoadingId] = useState<string | null>(null);
   const [error, setError] = useState("");
+  const [composerOpen, setComposerOpen] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [dragging, setDragging] = useState(false);
   const [title, setTitle] = useState("");
@@ -57,6 +61,7 @@ export function ResourceShareHub() {
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
   const canUseResources = configured && Boolean(accessToken) && Boolean(user);
+  const canSubmitPost = Boolean(description.trim()) || Boolean(file);
 
   const refreshResources = useCallback(async () => {
     if (!accessToken) return;
@@ -76,7 +81,10 @@ export function ResourceShareHub() {
     if (canUseResources) void refreshResources();
   }, [canUseResources, refreshResources]);
 
-  const recentFiles = useMemo(() => resources.slice(0, 12), [resources]);
+  const recentAttachments = useMemo(
+    () => resources.filter((resource) => resource.shareType === "file").slice(0, 12),
+    [resources]
+  );
 
   const handleFile = (nextFile: File | null) => {
     setFile(nextFile);
@@ -85,8 +93,17 @@ export function ResourceShareHub() {
     }
   };
 
+  const resetComposer = () => {
+    setTitle("");
+    setDescription("");
+    setCategory(CATEGORIES[0]);
+    setFile(null);
+    setDragging(false);
+    if (fileInputRef.current) fileInputRef.current.value = "";
+  };
+
   const submitUpload = async () => {
-    if (!accessToken || !file || !title.trim()) return;
+    if (!accessToken || !canSubmitPost) return;
     setUploading(true);
     setError("");
     try {
@@ -99,13 +116,10 @@ export function ResourceShareHub() {
       });
       setResources((prev) => [payload.resource, ...prev.filter((item) => item.id !== payload.resource.id)]);
       setSelected(payload.resource);
-      setTitle("");
-      setDescription("");
-      setCategory(CATEGORIES[0]);
-      setFile(null);
-      if (fileInputRef.current) fileInputRef.current.value = "";
+      resetComposer();
+      setComposerOpen(false);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "資源上傳失敗");
+      setError(err instanceof Error ? err.message : "分享送出失敗");
     } finally {
       setUploading(false);
     }
@@ -113,7 +127,7 @@ export function ResourceShareHub() {
 
   const openDetail = async (resource: ResourceShare) => {
     if (!accessToken) return;
-    if (selected?.id === resource.id && selected.fileUrl) {
+    if (selected?.id === resource.id) {
       setSelected(null);
       return;
     }
@@ -214,90 +228,24 @@ export function ResourceShareHub() {
   }
 
   return (
-    <section className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_360px]">
+    <section className="relative grid gap-6 xl:grid-cols-[minmax(0,1fr)_360px]">
       <div className="space-y-6">
         <div className="rounded-[2rem] border border-emerald-100 bg-white p-6 shadow-sm md:p-8">
-          <p className="text-sm font-black uppercase tracking-[0.35em] text-emerald-700">Resources</p>
+          <p className="text-sm font-black uppercase tracking-[0.35em] text-emerald-700">Board Chat</p>
           <div className="mt-3 flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
             <div>
-              <h1 className="text-4xl font-black text-emerald-950">資源分享</h1>
-              <p className="mt-3 text-base font-bold text-slate-600">丟檔、留言、按讚。國考大型群組聊天室，但是比較不吵。</p>
+              <h1 className="text-4xl font-black text-emerald-950">國考交流區</h1>
+              <p className="mt-3 text-base font-bold leading-7 text-slate-600">
+                口訣、考點提醒、講義、圖片都丟這裡。像群組，但比較不會把重點洗掉。
+              </p>
             </div>
-            <div className="rounded-full border border-emerald-100 bg-emerald-50 px-4 py-2 text-sm font-black text-emerald-800">
-              已登入
-            </div>
-          </div>
-
-          <div
-            className={`mt-6 rounded-[1.5rem] border-2 border-dashed p-4 transition ${
-              dragging ? "border-emerald-400 bg-emerald-50" : "border-slate-200 bg-slate-50"
-            }`}
-            onDragOver={(event) => {
-              event.preventDefault();
-              setDragging(true);
-            }}
-            onDragLeave={() => setDragging(false)}
-            onDrop={(event) => {
-              event.preventDefault();
-              setDragging(false);
-              handleFile(event.dataTransfer.files?.[0] ?? null);
-            }}
-          >
-            <div className="grid gap-3 md:grid-cols-[minmax(0,1fr)_180px]">
-              <input
-                value={title}
-                onChange={(event) => setTitle(event.target.value)}
-                className="rounded-2xl border border-slate-200 bg-white px-4 py-3 font-bold text-slate-800 outline-none focus:border-emerald-300"
-                placeholder="資源標題"
-                maxLength={90}
-              />
-              <select
-                value={category}
-                onChange={(event) => setCategory(event.target.value)}
-                className="rounded-2xl border border-slate-200 bg-white px-4 py-3 font-bold text-slate-800 outline-none focus:border-emerald-300"
-              >
-                {CATEGORIES.map((item) => (
-                  <option key={item} value={item}>
-                    {item}
-                  </option>
-                ))}
-              </select>
-            </div>
-            <textarea
-              value={description}
-              onChange={(event) => setDescription(event.target.value)}
-              className="mt-3 min-h-[96px] w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 font-bold text-slate-700 outline-none focus:border-emerald-300"
-              placeholder="補一句這份檔案在幹嘛，或直接空著也可以。"
-              maxLength={800}
-            />
-            <div className="mt-3 flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
-              <div className="flex flex-wrap items-center gap-3">
-                <input
-                  ref={fileInputRef}
-                  type="file"
-                  accept=".pdf,.html,.htm,.xhtml,.png,.jpg,.jpeg,.webp,.gif,application/pdf,text/html,application/xhtml+xml,image/png,image/jpeg,image/webp,image/gif"
-                  className="hidden"
-                  onChange={(event) => handleFile(event.target.files?.[0] ?? null)}
-                />
-                <button
-                  type="button"
-                  onClick={() => fileInputRef.current?.click()}
-                  className="rounded-full border border-slate-200 bg-white px-5 py-3 text-sm font-black text-slate-700 shadow-sm transition hover:border-emerald-200 hover:text-emerald-800"
-                >
-                  選檔案
-                </button>
-                <span className="text-sm font-bold text-slate-500">
-                  {file ? `${file.name} · ${formatFileSize(file.size)}` : "PDF / HTML / 圖片，12MB 以內"}
-                </span>
-              </div>
-              <button
-                type="button"
-                disabled={!file || !title.trim() || uploading}
-                onClick={submitUpload}
-                className="rounded-full bg-slate-950 px-6 py-3 text-sm font-black text-white shadow-lg transition hover:-translate-y-0.5 disabled:cursor-not-allowed disabled:bg-slate-300"
-              >
-                {uploading ? "上傳中" : "分享出去"}
-              </button>
+            <div className="flex flex-wrap gap-2">
+              <span className="rounded-full border border-emerald-100 bg-emerald-50 px-4 py-2 text-sm font-black text-emerald-800">
+                不匿名
+              </span>
+              <span className="rounded-full border border-slate-200 bg-white px-4 py-2 text-sm font-black text-slate-600">
+                {resources.length} 則
+              </span>
             </div>
           </div>
         </div>
@@ -316,6 +264,7 @@ export function ResourceShareHub() {
           ) : resources.length ? (
             resources.map((resource) => {
               const isSelected = selected?.id === resource.id;
+              const hasAttachment = resource.shareType === "file";
               return (
                 <article
                   key={resource.id}
@@ -323,49 +272,72 @@ export function ResourceShareHub() {
                     isSelected ? "border-emerald-200 ring-2 ring-emerald-100" : "border-slate-100 hover:border-emerald-100"
                   }`}
                 >
-                  <div className="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
-                    <div className="min-w-0">
+                  <div className="flex gap-3">
+                    <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-emerald-50 text-base font-black text-emerald-800">
+                      {avatarLabel(resource.authorLabel)}
+                    </div>
+                    <div className="min-w-0 flex-1">
                       <div className="flex flex-wrap items-center gap-2">
-                        <span className="rounded-full bg-emerald-50 px-3 py-1 text-xs font-black text-emerald-800">
+                        <span className="font-black text-emerald-950">{resource.authorLabel}</span>
+                        <span className="text-xs font-black text-slate-400">{formatDate(resource.createdAt)}</span>
+                        <span className="rounded-full bg-slate-100 px-2.5 py-1 text-xs font-black text-slate-600">
                           {resource.category ?? "資源"}
                         </span>
-                        <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-black text-slate-600">
-                          {fileKindLabel(resource)} · {formatFileSize(resource.fileSizeBytes)}
+                        <span className="rounded-full bg-emerald-50 px-2.5 py-1 text-xs font-black text-emerald-700">
+                          {fileKindLabel(resource)}
                         </span>
                       </div>
-                      <h2 className="mt-3 truncate text-xl font-black text-emerald-950">{resource.title}</h2>
+
+                      <h2 className="mt-3 break-words text-xl font-black text-slate-950">{resource.title}</h2>
                       {resource.description ? (
-                        <p className="mt-2 line-clamp-2 text-sm font-bold leading-6 text-slate-600">{resource.description}</p>
+                        <p className="mt-2 whitespace-pre-wrap break-words text-sm font-bold leading-7 text-slate-700">
+                          {resource.description}
+                        </p>
                       ) : null}
-                      <p className="mt-3 text-xs font-black text-slate-400">
-                        {resource.authorLabel} · {formatDate(resource.createdAt)}
-                      </p>
-                    </div>
-                    <div className="flex shrink-0 flex-wrap items-center gap-2">
-                      <button
-                        type="button"
-                        onClick={() => toggleLike(resource)}
-                        className={`rounded-full px-4 py-2 text-sm font-black transition ${
-                          resource.myLiked
-                            ? "bg-emerald-700 text-white"
-                            : "border border-slate-200 bg-white text-slate-700 hover:border-emerald-200"
-                        }`}
-                      >
-                        讚 {resource.likeCount || ""}
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => openDetail(resource)}
-                        className="rounded-full border border-slate-200 bg-white px-4 py-2 text-sm font-black text-slate-700 transition hover:border-emerald-200"
-                      >
-                        {detailLoadingId === resource.id ? "讀取中" : `留言 ${resource.commentCount || ""}`}
-                      </button>
-                      <Link
-                        href={`/resources/${resource.id}`}
-                        className="rounded-full bg-slate-950 px-4 py-2 text-sm font-black text-white transition hover:-translate-y-0.5"
-                      >
-                        打開
-                      </Link>
+
+                      {hasAttachment ? (
+                        <Link
+                          href={`/resources/${resource.id}`}
+                          className="mt-4 flex max-w-xl items-center justify-between gap-3 rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-left transition hover:border-emerald-200 hover:bg-emerald-50"
+                        >
+                          <div className="min-w-0">
+                            <p className="truncate text-sm font-black text-slate-800">{resource.fileName ?? resource.title}</p>
+                            <p className="mt-1 text-xs font-bold text-slate-500">
+                              {fileKindLabel(resource)} · {formatFileSize(resource.fileSizeBytes)}
+                            </p>
+                          </div>
+                          <span className="shrink-0 rounded-full bg-white px-3 py-1 text-xs font-black text-emerald-800">
+                            開附件
+                          </span>
+                        </Link>
+                      ) : null}
+
+                      <div className="mt-4 flex flex-wrap items-center gap-2">
+                        <button
+                          type="button"
+                          onClick={() => toggleLike(resource)}
+                          className={`rounded-full px-4 py-2 text-sm font-black transition ${
+                            resource.myLiked
+                              ? "bg-emerald-700 text-white"
+                              : "border border-slate-200 bg-white text-slate-700 hover:border-emerald-200"
+                          }`}
+                        >
+                          讚 {resource.likeCount || ""}
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => openDetail(resource)}
+                          className="rounded-full border border-slate-200 bg-white px-4 py-2 text-sm font-black text-slate-700 transition hover:border-emerald-200"
+                        >
+                          {detailLoadingId === resource.id ? "讀取中" : `留言 ${resource.commentCount || ""}`}
+                        </button>
+                        <Link
+                          href={`/resources/${resource.id}`}
+                          className="rounded-full bg-slate-950 px-4 py-2 text-sm font-black text-white transition hover:-translate-y-0.5"
+                        >
+                          {hasAttachment ? "閱讀" : "單篇"}
+                        </Link>
+                      </div>
                     </div>
                   </div>
 
@@ -384,7 +356,7 @@ export function ResourceShareHub() {
                           ))
                         ) : (
                           <div className="rounded-2xl bg-white px-4 py-3 text-sm font-bold text-slate-500">
-                            還沒有人留言，這裡目前很安靜。
+                            還沒有人留言，第一句可以很有用，也可以很短。
                           </div>
                         )}
                       </div>
@@ -393,7 +365,7 @@ export function ResourceShareHub() {
                           value={commentDraft}
                           onChange={(event) => setCommentDraft(event.target.value)}
                           className="min-w-0 flex-1 rounded-full border border-slate-200 bg-white px-4 py-3 text-sm font-bold text-slate-700 outline-none focus:border-emerald-300"
-                          placeholder="回一下這份資源"
+                          placeholder="回覆這則分享"
                           maxLength={1000}
                         />
                         <button
@@ -412,7 +384,7 @@ export function ResourceShareHub() {
             })
           ) : (
             <div className="rounded-[1.5rem] border border-slate-100 bg-white p-8 text-center text-sm font-bold text-slate-500">
-              還沒有資源，第一份講義的位置還在發光。
+              還沒有分享。第一則口訣的位置空著，壓力很有禮貌地坐在旁邊。
             </div>
           )}
         </div>
@@ -422,19 +394,18 @@ export function ResourceShareHub() {
         <div className="rounded-[2rem] border border-emerald-100 bg-white p-6 shadow-sm">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-xs font-black uppercase tracking-[0.3em] text-emerald-700">Files</p>
-              <h2 className="mt-2 text-2xl font-black text-emerald-950">交流區檔案</h2>
+              <p className="text-xs font-black uppercase tracking-[0.3em] text-emerald-700">Attachments</p>
+              <h2 className="mt-2 text-2xl font-black text-emerald-950">最近附件</h2>
             </div>
             {loading ? <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-black text-slate-500">更新中</span> : null}
           </div>
           <div className="mt-5 space-y-3">
-            {recentFiles.length ? (
-              recentFiles.map((resource) => (
-                <button
+            {recentAttachments.length ? (
+              recentAttachments.map((resource) => (
+                <Link
                   key={resource.id}
-                  type="button"
-                  onClick={() => openDetail(resource)}
-                  className="w-full rounded-2xl border border-slate-100 bg-slate-50 px-4 py-3 text-left transition hover:border-emerald-200 hover:bg-emerald-50"
+                  href={`/resources/${resource.id}`}
+                  className="block w-full rounded-2xl border border-slate-100 bg-slate-50 px-4 py-3 text-left transition hover:border-emerald-200 hover:bg-emerald-50"
                 >
                   <div className="flex items-center justify-between gap-3">
                     <p className="truncate text-sm font-black text-slate-800">{resource.title}</p>
@@ -443,16 +414,121 @@ export function ResourceShareHub() {
                     </span>
                   </div>
                   <p className="mt-1 text-xs font-bold text-slate-400">{resource.authorLabel}</p>
-                </button>
+                </Link>
               ))
             ) : (
               <p className="rounded-2xl bg-slate-50 px-4 py-3 text-sm font-bold text-slate-500">
-                這裡會列出最近被丟進交流區的檔案。
+                有人附檔案時，會放在這裡方便快速撿。
               </p>
             )}
           </div>
         </div>
       </aside>
+
+      <button
+        type="button"
+        onClick={() => setComposerOpen(true)}
+        className="fixed bottom-6 right-6 z-40 flex h-16 w-16 items-center justify-center rounded-full bg-emerald-700 text-3xl font-black text-white shadow-2xl shadow-emerald-900/20 transition hover:-translate-y-1 hover:bg-emerald-800"
+        aria-label="新增分享"
+      >
+        +
+      </button>
+
+      {composerOpen ? (
+        <div className="fixed inset-0 z-50 flex items-end bg-slate-950/30 p-4 backdrop-blur-sm md:items-center md:justify-center">
+          <div className="w-full max-w-2xl rounded-[2rem] border border-emerald-100 bg-white p-5 shadow-2xl md:p-6">
+            <div className="flex items-start justify-between gap-3">
+              <div>
+                <p className="text-xs font-black uppercase tracking-[0.3em] text-emerald-700">New Post</p>
+                <h2 className="mt-2 text-2xl font-black text-emerald-950">發到交流區</h2>
+              </div>
+              <button
+                type="button"
+                onClick={() => {
+                  setComposerOpen(false);
+                  resetComposer();
+                }}
+                className="rounded-full border border-slate-200 bg-white px-4 py-2 text-sm font-black text-slate-600"
+              >
+                關閉
+              </button>
+            </div>
+
+            <div
+              className={`mt-5 rounded-[1.5rem] border-2 border-dashed p-4 transition ${
+                dragging ? "border-emerald-400 bg-emerald-50" : "border-slate-200 bg-slate-50"
+              }`}
+              onDragOver={(event) => {
+                event.preventDefault();
+                setDragging(true);
+              }}
+              onDragLeave={() => setDragging(false)}
+              onDrop={(event) => {
+                event.preventDefault();
+                setDragging(false);
+                handleFile(event.dataTransfer.files?.[0] ?? null);
+              }}
+            >
+              <div className="grid gap-3 md:grid-cols-[minmax(0,1fr)_180px]">
+                <input
+                  value={title}
+                  onChange={(event) => setTitle(event.target.value)}
+                  className="rounded-2xl border border-slate-200 bg-white px-4 py-3 font-bold text-slate-800 outline-none focus:border-emerald-300"
+                  placeholder="標題，可空"
+                  maxLength={90}
+                />
+                <select
+                  value={category}
+                  onChange={(event) => setCategory(event.target.value)}
+                  className="rounded-2xl border border-slate-200 bg-white px-4 py-3 font-bold text-slate-800 outline-none focus:border-emerald-300"
+                >
+                  {CATEGORIES.map((item) => (
+                    <option key={item} value={item}>
+                      {item}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <textarea
+                value={description}
+                onChange={(event) => setDescription(event.target.value)}
+                className="mt-3 min-h-[150px] w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 font-bold text-slate-700 outline-none focus:border-emerald-300"
+                placeholder="口訣、考點提醒、補充資訊，或說明這份檔案在幹嘛。"
+                maxLength={1800}
+              />
+              <div className="mt-3 flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+                <div className="flex flex-wrap items-center gap-3">
+                  <input
+                    ref={fileInputRef}
+                    type="file"
+                    accept=".pdf,.html,.htm,.xhtml,.png,.jpg,.jpeg,.webp,.gif,application/pdf,text/html,application/xhtml+xml,image/png,image/jpeg,image/webp,image/gif"
+                    className="hidden"
+                    onChange={(event) => handleFile(event.target.files?.[0] ?? null)}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => fileInputRef.current?.click()}
+                    className="rounded-full border border-slate-200 bg-white px-5 py-3 text-sm font-black text-slate-700 shadow-sm transition hover:border-emerald-200 hover:text-emerald-800"
+                  >
+                    加附件
+                  </button>
+                  <span className="text-sm font-bold text-slate-500">
+                    {file ? `${file.name} · ${formatFileSize(file.size)}` : "可不附檔，PDF / HTML / 圖片 12MB 以內"}
+                  </span>
+                </div>
+                <button
+                  type="button"
+                  disabled={!canSubmitPost || uploading}
+                  onClick={submitUpload}
+                  className="rounded-full bg-slate-950 px-6 py-3 text-sm font-black text-white shadow-lg transition hover:-translate-y-0.5 disabled:cursor-not-allowed disabled:bg-slate-300"
+                >
+                  {uploading ? "送出中" : "發一則"}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      ) : null}
     </section>
   );
 }

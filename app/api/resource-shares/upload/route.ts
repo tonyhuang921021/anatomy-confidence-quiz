@@ -33,48 +33,60 @@ export async function POST(request: NextRequest) {
   try {
     const formData = await request.formData();
     const accessToken = getResourceAccessToken(request, trimText(formData.get("accessToken"), 4000));
-    const title = trimText(formData.get("title"), 90);
-    const description = trimText(formData.get("description"), 800);
+    const rawTitle = trimText(formData.get("title"), 90);
+    const description = trimText(formData.get("description"), 1800);
     const category = trimText(formData.get("category"), 40);
-    const file = formData.get("file");
+    const rawFile = formData.get("file");
+    const file = rawFile instanceof File && rawFile.size > 0 ? rawFile : null;
     const verifiedUser = await getVerifiedResourceUser(supabase, accessToken);
 
     if (!verifiedUser) {
       return NextResponse.json({ ok: false, error: "請先登入。" }, { status: 401 });
     }
+    if (!file && !description) {
+      return NextResponse.json({ ok: false, error: "請輸入口訣、補充，或選擇要分享的檔案。" }, { status: 400 });
+    }
+
+    const inferredTextTitle = description.split(/\r?\n/).find((line) => line.trim())?.trim().slice(0, 60) ?? "";
+    const title = rawTitle || (file ? file.name.replace(/\.[^.]+$/, "").slice(0, 80) : inferredTextTitle);
     if (!title) {
-      return NextResponse.json({ ok: false, error: "請替資源取個標題。" }, { status: 400 });
-    }
-    if (!(file instanceof File)) {
-      return NextResponse.json({ ok: false, error: "請選擇要分享的檔案。" }, { status: 400 });
+      return NextResponse.json({ ok: false, error: "請替分享內容取個標題，或至少輸入一段文字。" }, { status: 400 });
     }
 
-    const mimeType = normalizeResourceMimeType(file);
-    if (!ALLOWED_RESOURCE_MIME_TYPES.has(mimeType)) {
-      return NextResponse.json(
-        { ok: false, error: "目前支援 PDF、HTML、PNG、JPEG、WebP、GIF。" },
-        { status: 400 }
+    let safeFileName: string | null = null;
+    let objectPath: string | null = null;
+    let mimeType: string | null = null;
+    let fileSizeBytes = 0;
+
+    if (file) {
+      mimeType = normalizeResourceMimeType(file);
+      if (!ALLOWED_RESOURCE_MIME_TYPES.has(mimeType)) {
+        return NextResponse.json(
+          { ok: false, error: "目前支援 PDF、HTML、PNG、JPEG、WebP、GIF。" },
+          { status: 400 }
+        );
+      }
+      if (file.size > RESOURCE_SHARE_MAX_FILE_SIZE) {
+        return NextResponse.json({ ok: false, error: "檔案請壓到 12MB 以內。" }, { status: 400 });
+      }
+
+      safeFileName = sanitizeResourceFileName(file.name);
+      const extension = extensionForResourceMimeType(mimeType, safeFileName);
+      const month = new Date().toISOString().slice(0, 7);
+      objectPath = `${verifiedUser.id}/${month}/${Date.now()}-${crypto.randomUUID()}.${extension}`;
+      fileSizeBytes = file.size;
+      const arrayBuffer = await file.arrayBuffer();
+
+      const { error: uploadError } = await withServerTimeout(
+        supabase.storage.from(RESOURCE_SHARE_BUCKET).upload(objectPath, arrayBuffer, {
+          contentType: mimeType,
+          upsert: false,
+        }),
+        8000,
+        "檔案上傳逾時"
       );
+      if (uploadError) throw uploadError;
     }
-    if (file.size > RESOURCE_SHARE_MAX_FILE_SIZE) {
-      return NextResponse.json({ ok: false, error: "檔案請壓到 12MB 以內。" }, { status: 400 });
-    }
-
-    const safeFileName = sanitizeResourceFileName(file.name);
-    const extension = extensionForResourceMimeType(mimeType, safeFileName);
-    const month = new Date().toISOString().slice(0, 7);
-    const objectPath = `${verifiedUser.id}/${month}/${Date.now()}-${crypto.randomUUID()}.${extension}`;
-    const arrayBuffer = await file.arrayBuffer();
-
-    const { error: uploadError } = await withServerTimeout(
-      supabase.storage.from(RESOURCE_SHARE_BUCKET).upload(objectPath, arrayBuffer, {
-        contentType: mimeType,
-        upsert: false,
-      }),
-      8000,
-      "檔案上傳逾時"
-    );
-    if (uploadError) throw uploadError;
 
     const { data: inserted, error: insertError } = (await withServerTimeout(
       supabase
@@ -83,10 +95,11 @@ export async function POST(request: NextRequest) {
           title,
           description: description || null,
           category: category || null,
+          share_type: file ? "file" : "text",
           file_name: safeFileName,
           file_path: objectPath,
           file_mime_type: mimeType,
-          file_size_bytes: file.size,
+          file_size_bytes: fileSizeBytes,
           author_label: verifiedUser.label,
           author_email: verifiedUser.email ?? null,
           user_id: verifiedUser.id,
