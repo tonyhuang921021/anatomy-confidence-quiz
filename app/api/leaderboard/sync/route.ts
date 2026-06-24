@@ -35,7 +35,6 @@ type LeaderboardProfileRow = {
 };
 
 type LeaderboardRollupRow = {
-  session_id: string;
   attempts: number;
   correct_attempts: number;
 };
@@ -44,7 +43,7 @@ const RECENT_SESSION_ROLLUP_LIMIT = 80;
 const FULL_SESSION_ROLLUP_PAGE_SIZE = 1000;
 const ATTEMPT_FALLBACK_CHUNK_SIZE = 50;
 const ROLLUP_LOOKUP_CHUNK_SIZE = 200;
-const LEADERBOARD_PROFILE_MIN_REFRESH_MS = 60_000;
+const LEADERBOARD_PROFILE_MIN_REFRESH_MS = 5 * 60_000;
 const MAX_REASONABLE_SESSION_QUESTION_COUNT = 500;
 
 function getServiceSupabaseClient() {
@@ -81,6 +80,20 @@ function getDisplayName(
 function getFiniteCount(value: unknown) {
   const numberValue = Number(value);
   return Number.isFinite(numberValue) ? numberValue : null;
+}
+
+function hasReasonableStoredSessionCount(
+  storedQuestionCount: number | null,
+  storedCorrectCount: number | null
+) {
+  return (
+    storedQuestionCount !== null &&
+    storedQuestionCount > 0 &&
+    storedQuestionCount <= MAX_REASONABLE_SESSION_QUESTION_COUNT &&
+    storedCorrectCount !== null &&
+    storedCorrectCount >= 0 &&
+    storedCorrectCount <= storedQuestionCount
+  );
 }
 
 function chooseBestSessionCount(
@@ -245,10 +258,15 @@ async function upsertSessionRollups(
 ) {
   if (sessionRows.length === 0) return;
 
+  const rowsNeedingAttemptFallback = sessionRows.filter((row) => {
+    const storedQuestionCount = getFiniteCount(row.question_count);
+    const storedCorrectCount = getFiniteCount(row.correct_count);
+    return !hasReasonableStoredSessionCount(storedQuestionCount, storedCorrectCount);
+  });
   const attemptCounts = await fetchAttemptCounts(
     supabase,
     userId,
-    sessionRows.map((row) => row.id)
+    rowsNeedingAttemptFallback.map((row) => row.id)
   );
 
   const rows = sessionRows
@@ -320,7 +338,7 @@ async function summarizeRollups(supabase: any, userId: string) {
     const { data, error } = (await withServerTimeout(
       supabase
         .from("leaderboard_session_rollups")
-        .select("session_id, attempts, correct_attempts")
+        .select("attempts, correct_attempts")
         .eq("user_id", userId)
         .range(from, from + FULL_SESSION_ROLLUP_PAGE_SIZE - 1),
       2500,

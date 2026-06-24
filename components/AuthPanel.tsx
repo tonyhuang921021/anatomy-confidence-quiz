@@ -4,10 +4,7 @@ import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import { useAuth } from "@/components/AuthProvider";
 import { getSyncStatusText } from "@/components/syncStatusText";
-import {
-  syncLeaderboardProfileForCurrentUser,
-  updateLeaderboardDisplayName
-} from "@/lib/cloudSync";
+import { updateLeaderboardDisplayName } from "@/lib/cloudSync";
 import {
   loadPracticeQuestionCount,
   loadPracticeFastAnswerMode,
@@ -430,7 +427,6 @@ export function AuthPanel() {
       }
 
       await updateLeaderboardDisplayName(data.user ?? user, trimmed);
-      await syncLeaderboardProfileForCurrentUser(data.user ?? user);
       await refreshCloudData();
       setMessage("暱稱已更新，排行榜會顯示新的名稱。");
     } finally {

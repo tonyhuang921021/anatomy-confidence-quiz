@@ -178,6 +178,8 @@ const STATS_SYNC_ATTEMPT_BATCH_SIZE = 200;
 const CLOUD_SESSION_LOOKUP_TIMEOUT_MS = 3500;
 const CLOUD_SYNC_BATCH_TIMEOUT_MS = 3500;
 const CLOUD_SYNC_TOTAL_BUDGET_MS = 8500;
+const LEADERBOARD_PROFILE_CLIENT_SYNC_MIN_INTERVAL_MS = 5 * 60 * 1000;
+const LEADERBOARD_PROFILE_SYNC_MARKER_PREFIX = "leaderboardProfileSync:";
 const CLOUD_HEAVY_LOCAL_HISTORY_READ_LIMIT = 160_000;
 const FEEDBACK_REQUEST_TIMEOUT_MS = 10000;
 const FEEDBACK_SESSION_TIMEOUT_MS = 2500;
@@ -338,6 +340,29 @@ function readQuestionExplanationSyncMarker(signature: string) {
     return parsed;
   } catch {
     return null;
+  }
+}
+
+function getLeaderboardProfileSyncMarkerKey(userId: string) {
+  return `${LEADERBOARD_PROFILE_SYNC_MARKER_PREFIX}${userId}`;
+}
+
+function readLeaderboardProfileSyncMarker(userId: string) {
+  if (typeof window === "undefined") return 0;
+  try {
+    const value = Number(window.localStorage.getItem(getLeaderboardProfileSyncMarkerKey(userId)) ?? "0");
+    return Number.isFinite(value) ? value : 0;
+  } catch {
+    return 0;
+  }
+}
+
+function writeLeaderboardProfileSyncMarker(userId: string) {
+  if (typeof window === "undefined") return;
+  try {
+    window.localStorage.setItem(getLeaderboardProfileSyncMarkerKey(userId), String(Date.now()));
+  } catch {
+    // Leaderboard freshness is best-effort; storage quota should not block quiz sync.
   }
 }
 
@@ -2010,10 +2035,18 @@ export async function pushCurrentSessionToSupabase(session: QuizSession) {
 
 export async function syncLeaderboardProfileForCurrentUser(
   user: Pick<User, "id" | "email" | "user_metadata">,
-  sessions?: QuizSession[]
+  sessions?: QuizSession[],
+  options: { force?: boolean } = {}
 ) {
   if (isSupabaseRecoveryMode()) return;
   if (!isSupabaseConfigured()) return;
+
+  if (!options.force) {
+    const lastSyncedAt = readLeaderboardProfileSyncMarker(user.id);
+    if (Date.now() - lastSyncedAt < LEADERBOARD_PROFILE_CLIENT_SYNC_MIN_INTERVAL_MS) {
+      return;
+    }
+  }
 
   const supabase = getSupabaseBrowserClient();
   const { data } = await supabase.auth.getSession();
@@ -2040,6 +2073,7 @@ export async function syncLeaderboardProfileForCurrentUser(
   if (!response.ok || payload?.ok === false) {
     throw new Error(payload?.message || "刷題榜雲端重算失敗");
   }
+  writeLeaderboardProfileSyncMarker(user.id);
 }
 
 export async function updateLeaderboardDisplayName(
@@ -2075,6 +2109,7 @@ export async function updateLeaderboardDisplayName(
   if (!response.ok || payload?.ok === false) {
     throw new Error(payload?.message || "刷題榜暱稱同步失敗");
   }
+  writeLeaderboardProfileSyncMarker(user.id);
 }
 
 export async function loadLeaderboard(limit = 50, options: { signal?: AbortSignal } = {}) {
