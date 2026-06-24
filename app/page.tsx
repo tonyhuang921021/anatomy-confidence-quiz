@@ -53,6 +53,11 @@ const QUICK_ENTRIES = [
 
 const HOME_RELEASE_NOTES = [
   {
+    time: "06/25",
+    title: "藥理詳解不再裝熟",
+    body: "修正 sirolimus 詳解，順手把酵素效率和甲狀腺素選項的下標排版抓回來。"
+  },
+  {
     time: "06/24",
     title: "交流區手機不要橫著逃跑",
     body: "資源分享和 HTML 預覽補上手機寬度保護，長檔名、表格和神祕 HTML 先乖乖待在螢幕裡。"

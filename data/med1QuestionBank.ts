@@ -1051,6 +1051,25 @@ const questionTextOverrides: Record<string, QuestionTextOverride> = {
       B: "可導致細胞內 cAMP 濃度增高"
     }
   },
+  "MOEX-106020-6301-Q052": {
+    explanation:
+      "Sirolimus（rapamycin）會先結合 FK506-binding protein（FKBP-12），但此複合體抑制的是 mTOR，阻斷 IL-2 訊號後的 T 細胞增生與蛋白質合成。Tacrolimus 雖然也結合 FKBP，卻是抑制 calcineurin，降低 IL-2 轉錄；sirolimus 不抑制 calcineurin。因此 B 把 sirolimus 說成和 tacrolimus 一樣抑制 calcineurin，是錯誤敘述。",
+    optionAnalysis: {
+      A: "不選。Sirolimus 會結合 FKBP-12，這點正確。",
+      B: "正確。Sirolimus-FKBP 複合體抑制 mTOR，不像 tacrolimus-FKBP 複合體抑制 calcineurin。",
+      C: "不選。Sirolimus 一般較少造成 cyclosporine 典型的腎毒性。",
+      D: "不選。Sirolimus 抑制 mTOR，進而抑制細胞週期進展與蛋白質合成相關訊號。"
+    },
+    testedConcept: "免疫抑制劑／sirolimus 抑制 mTOR，不抑制 calcineurin"
+  },
+  "MOEX-110101-1301-Q075": {
+    options: {
+      A: "1 / kcat",
+      B: "Km",
+      C: "kcat / Km",
+      D: "Km / kcat"
+    }
+  },
   "MOEX-103100-1101-Q086": {
     options: {
       D: "Spearman 等級相關係數（Spearman correlation coefficient）"
@@ -1091,6 +1110,24 @@ const questionTextOverrides: Record<string, QuestionTextOverride> = {
       C: "不選。Transverse gyri of Heschl 位於顳葉。",
       D: "不選。Cuneus 位於枕葉。"
     }
+  },
+  "MOEX-114020-1301-Q070": {
+    stem: "有關甲狀腺荷爾蒙（thyroid hormone）的敘述，下列何者最不適當？",
+    options: {
+      A: "促甲狀腺荷爾蒙（thyroid-stimulating hormone, TSH）會促進甲狀球蛋白（thyroglobulin）分解而釋放甲狀腺荷爾蒙",
+      B: "甲狀腺分泌的甲狀腺荷爾蒙主要是 thyroxine（T4）",
+      C: "在血液中 thyroxine（T4）主要會與血漿蛋白結合，triiodothyronine（T3）則以游離型（free-form）居多",
+      D: "在目標細胞內與甲狀腺荷爾蒙受器（thyroid hormone receptor）結合的分子主要為 triiodothyronine（T3）"
+    },
+    explanation:
+      "本題問甲狀腺荷爾蒙敘述何者最不適當。甲狀腺分泌的主要形式是 T4，而在周邊組織與目標細胞中，真正和甲狀腺荷爾蒙受器結合、作用力較強的是 T3。血中甲狀腺荷爾蒙大多與血漿蛋白結合，游離型比例很低；其中 T4 和 T3 都是如此，不是只有 T4 結合、T3 反而以游離型居多。因此 C 的敘述錯在把 T3 說成主要以游離型存在，這是最不適當的選項。",
+    optionAnalysis: {
+      A: "不選。TSH 會促進甲狀腺濾泡細胞攝碘、合成與釋放甲狀腺荷爾蒙，方向正確。",
+      B: "不選。甲狀腺分泌的主要荷爾蒙形式是 T4。",
+      C: "正確。T4 與 T3 在血中大多都與血漿蛋白結合，游離型比例都很低；T3 不是以游離型居多。",
+      D: "不選。目標細胞內主要與受器結合並發揮較強生物作用的是 T3。"
+    },
+    testedConcept: "甲狀腺荷爾蒙／T4、T3 與血漿蛋白結合"
   },
   "MOEX-102030-2101-Q050": {
     explanation:
