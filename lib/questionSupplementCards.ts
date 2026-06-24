@@ -16,6 +16,105 @@ type QuestionSupplementResponse = {
   reactions?: QuestionSupplementReactionSummary[];
 };
 
+type SupplementCacheEntry<T> = {
+  expiresAt: number;
+  value: T;
+};
+
+type SupplementCardsPayload = Required<Pick<QuestionSupplementResponse, "cards" | "reactions">>;
+type SupplementMetaPayload = Required<Pick<QuestionSupplementResponse, "count" | "reactions">>;
+
+const SUPPLEMENT_META_CACHE_TTL_MS = 2 * 60 * 1000;
+const SUPPLEMENT_CARDS_CACHE_TTL_MS = 60 * 1000;
+const supplementMetaCache = new Map<string, SupplementCacheEntry<SupplementMetaPayload>>();
+const supplementCardsCache = new Map<string, SupplementCacheEntry<SupplementCardsPayload>>();
+const supplementRequestsInFlight = new Map<string, Promise<unknown>>();
+
+function getAccessTokenScope(accessToken?: string | null) {
+  if (!accessToken) return "public";
+
+  let hash = 0;
+  for (let index = 0; index < accessToken.length; index += 1) {
+    hash = ((hash << 5) - hash + accessToken.charCodeAt(index)) | 0;
+  }
+  return `auth:${Math.abs(hash)}`;
+}
+
+function getSupplementCacheKey(questionId: string, accessToken?: string | null) {
+  return `${questionId}:${getAccessTokenScope(accessToken)}`;
+}
+
+function readSupplementCache<T>(cache: Map<string, SupplementCacheEntry<T>>, key: string) {
+  const cached = cache.get(key);
+  if (!cached) return undefined;
+  if (cached.expiresAt <= Date.now()) {
+    cache.delete(key);
+    return undefined;
+  }
+  return cached.value;
+}
+
+function writeSupplementCache<T>(cache: Map<string, SupplementCacheEntry<T>>, key: string, value: T, ttlMs: number) {
+  cache.set(key, {
+    expiresAt: Date.now() + ttlMs,
+    value
+  });
+}
+
+function invalidateQuestionSupplementCaches(questionId: string) {
+  for (const key of Array.from(supplementMetaCache.keys())) {
+    if (key.startsWith(`${questionId}:`)) supplementMetaCache.delete(key);
+  }
+  for (const key of Array.from(supplementCardsCache.keys())) {
+    if (key.startsWith(`${questionId}:`)) supplementCardsCache.delete(key);
+  }
+  for (const key of Array.from(supplementRequestsInFlight.keys())) {
+    if (key.includes(`:${questionId}:`) || key === `count:${questionId}`) {
+      supplementRequestsInFlight.delete(key);
+    }
+  }
+}
+
+function rememberSupplementPayload(questionId: string, accessToken: string | null | undefined, payload: QuestionSupplementResponse) {
+  const cacheKey = getSupplementCacheKey(questionId, accessToken);
+  const cards = payload.cards ?? [];
+  const reactions = payload.reactions ?? [];
+
+  if (payload.cards) {
+    writeSupplementCache(
+      supplementCardsCache,
+      cacheKey,
+      { cards, reactions },
+      SUPPLEMENT_CARDS_CACHE_TTL_MS
+    );
+  }
+
+  if (typeof payload.count === "number" || payload.cards || payload.reactions) {
+    writeSupplementCache(
+      supplementMetaCache,
+      cacheKey,
+      {
+        count: Math.max(0, payload.count ?? cards.length),
+        reactions
+      },
+      SUPPLEMENT_META_CACHE_TTL_MS
+    );
+  }
+}
+
+async function reuseSupplementRequest<T>(key: string, taskFactory: () => Promise<T>): Promise<T> {
+  const existing = supplementRequestsInFlight.get(key) as Promise<T> | undefined;
+  if (existing) return existing;
+
+  const task = taskFactory();
+  supplementRequestsInFlight.set(key, task);
+  try {
+    return await task;
+  } finally {
+    supplementRequestsInFlight.delete(key);
+  }
+}
+
 async function parseSupplementResponse<T>(response: Response): Promise<T> {
   const rawText = await response.text();
   const payload = (rawText ? JSON.parse(rawText) : null) as (T & { ok?: boolean; message?: string }) | null;
@@ -29,35 +128,58 @@ export async function loadQuestionSupplementCards(
   questionId: string,
   accessToken?: string | null
 ): Promise<Required<Pick<QuestionSupplementResponse, "cards" | "reactions">>> {
+  const cacheKey = getSupplementCacheKey(questionId, accessToken);
+  const cached = readSupplementCache(supplementCardsCache, cacheKey);
+  if (cached) return cached;
+
   const params = new URLSearchParams({ questionId });
   if (accessToken) params.set("accessToken", accessToken);
-  const response = await fetch(`/api/question-supplement-cards?${params.toString()}`);
-  const payload = await parseSupplementResponse<QuestionSupplementResponse>(response);
-  return {
-    cards: payload.cards ?? [],
-    reactions: payload.reactions ?? []
-  };
+  return reuseSupplementRequest(`cards:${cacheKey}`, async () => {
+    const response = await fetch(`/api/question-supplement-cards?${params.toString()}`);
+    const payload = await parseSupplementResponse<QuestionSupplementResponse>(response);
+    const result = {
+      cards: payload.cards ?? [],
+      reactions: payload.reactions ?? []
+    };
+    rememberSupplementPayload(questionId, accessToken, result);
+    return result;
+  });
 }
 
 export async function loadQuestionSupplementCount(questionId: string): Promise<number> {
+  const cached = readSupplementCache(supplementMetaCache, getSupplementCacheKey(questionId));
+  if (cached) return cached.count;
+
   const params = new URLSearchParams({ questionId, countOnly: "1" });
-  const response = await fetch(`/api/question-supplement-cards?${params.toString()}`);
-  const payload = await parseSupplementResponse<QuestionSupplementResponse>(response);
-  return Math.max(0, payload.count ?? 0);
+  return reuseSupplementRequest(`count:${questionId}`, async () => {
+    const response = await fetch(`/api/question-supplement-cards?${params.toString()}`);
+    const payload = await parseSupplementResponse<QuestionSupplementResponse>(response);
+    const count = Math.max(0, payload.count ?? 0);
+    rememberSupplementPayload(questionId, null, { count, reactions: [] });
+    return count;
+  });
 }
 
 export async function loadQuestionSupplementMeta(
   questionId: string,
   accessToken?: string | null
 ): Promise<Required<Pick<QuestionSupplementResponse, "count" | "reactions">>> {
+  const cacheKey = getSupplementCacheKey(questionId, accessToken);
+  const cached = readSupplementCache(supplementMetaCache, cacheKey);
+  if (cached) return cached;
+
   const params = new URLSearchParams({ questionId, countOnly: "1", includeReactions: "1" });
   if (accessToken) params.set("accessToken", accessToken);
-  const response = await fetch(`/api/question-supplement-cards?${params.toString()}`);
-  const payload = await parseSupplementResponse<QuestionSupplementResponse>(response);
-  return {
-    count: Math.max(0, payload.count ?? 0),
-    reactions: payload.reactions ?? []
-  };
+  return reuseSupplementRequest(`meta:${cacheKey}`, async () => {
+    const response = await fetch(`/api/question-supplement-cards?${params.toString()}`);
+    const payload = await parseSupplementResponse<QuestionSupplementResponse>(response);
+    const result = {
+      count: Math.max(0, payload.count ?? 0),
+      reactions: payload.reactions ?? []
+    };
+    rememberSupplementPayload(questionId, accessToken, result);
+    return result;
+  });
 }
 
 export async function loadRecentQuestionSupplementCards(
@@ -97,7 +219,10 @@ export async function upsertQuestionSupplementCard(input: {
       attachmentUrls: input.attachmentUrls ?? []
     })
   });
-  return parseSupplementResponse<QuestionSupplementResponse>(response);
+  const payload = await parseSupplementResponse<QuestionSupplementResponse>(response);
+  invalidateQuestionSupplementCaches(input.question.id);
+  rememberSupplementPayload(input.question.id, input.accessToken, payload);
+  return payload;
 }
 
 export async function voteQuestionSupplementCard(input: {
@@ -115,7 +240,13 @@ export async function voteQuestionSupplementCard(input: {
       vote: input.vote
     })
   });
-  return parseSupplementResponse<QuestionSupplementResponse>(response);
+  const payload = await parseSupplementResponse<QuestionSupplementResponse>(response);
+  const questionId = payload.cards?.[0]?.questionId;
+  if (questionId) {
+    invalidateQuestionSupplementCaches(questionId);
+    rememberSupplementPayload(questionId, input.accessToken, payload);
+  }
+  return payload;
 }
 
 export async function toggleQuestionSupplementReaction(input: {
@@ -139,7 +270,10 @@ export async function toggleQuestionSupplementReaction(input: {
       reactionType: input.reactionType
     })
   });
-  return parseSupplementResponse<QuestionSupplementResponse>(response);
+  const payload = await parseSupplementResponse<QuestionSupplementResponse>(response);
+  invalidateQuestionSupplementCaches(input.question.id);
+  rememberSupplementPayload(input.question.id, input.accessToken, payload);
+  return payload;
 }
 
 export async function uploadQuestionSupplementImage(input: {

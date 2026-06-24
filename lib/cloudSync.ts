@@ -2133,6 +2133,99 @@ export async function loadLeaderboard(limit = 50, options: { signal?: AbortSigna
 
 const BACKGROUND_STATS_LOOKUP_LIMIT = 40;
 const BACKGROUND_CLASSIFICATION_LOOKUP_LIMIT = 500;
+const BACKGROUND_DATA_CACHE_VERSION = "v3";
+const BACKGROUND_DATA_SESSION_PREFIX = `aq:bg:${BACKGROUND_DATA_CACHE_VERSION}:`;
+const BACKGROUND_DATA_TTL_MS = {
+  stats: 5 * 60 * 1000,
+  explanations: 30 * 60 * 1000,
+  classifications: 30 * 60 * 1000,
+  allClassifications: 6 * 60 * 60 * 1000
+};
+
+type BackgroundPayloadBase = {
+  ok?: boolean;
+  message?: string;
+  degraded?: boolean;
+  recovery?: boolean;
+};
+
+type BackgroundCacheEntry<T> = {
+  expiresAt: number;
+  value: T;
+};
+
+const backgroundDataMemoryCache = new Map<string, BackgroundCacheEntry<unknown>>();
+const backgroundDataRequestsInFlight = new Map<string, Promise<unknown>>();
+
+function isBrowserStorageAvailable() {
+  return typeof window !== "undefined" && typeof window.sessionStorage !== "undefined";
+}
+
+function readBackgroundCache<T>(key: string): T | undefined {
+  const now = Date.now();
+  const memoryEntry = backgroundDataMemoryCache.get(key) as BackgroundCacheEntry<T> | undefined;
+  if (memoryEntry) {
+    if (memoryEntry.expiresAt > now) return memoryEntry.value;
+    backgroundDataMemoryCache.delete(key);
+  }
+
+  if (!isBrowserStorageAvailable()) return undefined;
+
+  try {
+    const rawValue = window.sessionStorage.getItem(`${BACKGROUND_DATA_SESSION_PREFIX}${key}`);
+    if (!rawValue) return undefined;
+    const entry = JSON.parse(rawValue) as BackgroundCacheEntry<T>;
+    if (!entry || typeof entry.expiresAt !== "number" || entry.expiresAt <= now) {
+      window.sessionStorage.removeItem(`${BACKGROUND_DATA_SESSION_PREFIX}${key}`);
+      return undefined;
+    }
+    backgroundDataMemoryCache.set(key, entry as BackgroundCacheEntry<unknown>);
+    return entry.value;
+  } catch {
+    return undefined;
+  }
+}
+
+function writeBackgroundCache<T>(key: string, value: T, ttlMs: number) {
+  const entry: BackgroundCacheEntry<T> = {
+    expiresAt: Date.now() + ttlMs,
+    value
+  };
+  backgroundDataMemoryCache.set(key, entry as BackgroundCacheEntry<unknown>);
+
+  if (!isBrowserStorageAvailable()) return;
+
+  try {
+    window.sessionStorage.setItem(`${BACKGROUND_DATA_SESSION_PREFIX}${key}`, JSON.stringify(entry));
+  } catch {
+    // Session storage is a best-effort request reducer. If it is full, memory cache still helps this page.
+  }
+}
+
+function isFreshBackgroundPayload(payload: BackgroundPayloadBase | null | undefined) {
+  return Boolean(payload?.ok && !payload.degraded && !payload.recovery);
+}
+
+async function fetchBackgroundData<T extends BackgroundPayloadBase>(cacheKey: string, url: string): Promise<T> {
+  const existing = backgroundDataRequestsInFlight.get(cacheKey) as Promise<T> | undefined;
+  if (existing) return existing;
+
+  const request = (async () => {
+    const response = await fetch(url);
+    const payload = (await response.json().catch(() => null)) as T | null;
+    if (!response.ok || !payload?.ok) {
+      throw new Error(payload?.message || "背景資料讀取失敗");
+    }
+    return payload;
+  })();
+
+  backgroundDataRequestsInFlight.set(cacheKey, request);
+  try {
+    return await request;
+  } finally {
+    backgroundDataRequestsInFlight.delete(cacheKey);
+  }
+}
 
 export async function loadQuestionCommunityStats(questionIds: string[]) {
   if (isSupabaseRecoveryMode() || !isSupabaseConfigured() || questionIds.length === 0) {
@@ -2140,18 +2233,53 @@ export async function loadQuestionCommunityStats(questionIds: string[]) {
   }
 
   const uniqueQuestionIds = Array.from(new Set(questionIds)).slice(0, BACKGROUND_STATS_LOOKUP_LIMIT);
-  const response = await fetch(
-    `/api/question-background-data?kind=stats&ids=${encodeURIComponent(uniqueQuestionIds.join(","))}`
-  );
-  const payload = (await response.json().catch(() => null)) as
-    | { ok?: boolean; message?: string; stats?: QuestionAccuracyStatRow[] }
-    | null;
+  const cachedStats = new Map<string, QuestionCommunityStats | null>();
+  const missingQuestionIds = uniqueQuestionIds.filter((questionId) => {
+    const cachedValue = readBackgroundCache<QuestionCommunityStats | null>(`stats:${questionId}`);
+    if (cachedValue !== undefined) {
+      cachedStats.set(questionId, cachedValue);
+      return false;
+    }
+    return true;
+  });
 
-  if (!response.ok || !payload?.ok) {
-    throw new Error(payload?.message || "題目統計讀取失敗");
+  if (missingQuestionIds.length > 0) {
+    try {
+      const requestIds = [...missingQuestionIds].sort();
+      const payload = await fetchBackgroundData<
+        BackgroundPayloadBase & { stats?: QuestionAccuracyStatRow[] }
+      >(
+        `stats:${requestIds.join(",")}`,
+        `/api/question-background-data?kind=stats&ids=${encodeURIComponent(requestIds.join(","))}`
+      );
+      const mappedStats = (payload.stats ?? []).map((row) =>
+        mapQuestionAccuracyStatRow(row as QuestionAccuracyStatRow)
+      );
+      const mappedStatsByQuestionId = new Map(mappedStats.map((row) => [row.questionId, row] as const));
+
+      if (isFreshBackgroundPayload(payload)) {
+        for (const questionId of missingQuestionIds) {
+          writeBackgroundCache(
+            `stats:${questionId}`,
+            mappedStatsByQuestionId.get(questionId) ?? null,
+            BACKGROUND_DATA_TTL_MS.stats
+          );
+        }
+      }
+
+      for (const stat of mappedStats) {
+        cachedStats.set(stat.questionId, stat);
+      }
+    } catch (error) {
+      if (cachedStats.size === 0) {
+        throw error;
+      }
+    }
   }
 
-  return (payload.stats ?? []).map((row) => mapQuestionAccuracyStatRow(row as QuestionAccuracyStatRow));
+  return uniqueQuestionIds
+    .map((questionId) => cachedStats.get(questionId))
+    .filter((item): item is QuestionCommunityStats => Boolean(item));
 }
 
 export async function loadSharedQuestionExplanationOverrides(questionIds: string[]) {
@@ -2160,22 +2288,56 @@ export async function loadSharedQuestionExplanationOverrides(questionIds: string
   }
 
   const uniqueQuestionIds = Array.from(new Set(questionIds)).slice(0, 20);
-  const response = await fetch(
-    `/api/question-background-data?kind=explanations&ids=${encodeURIComponent(uniqueQuestionIds.join(","))}`
-  );
-  const payload = (await response.json().catch(() => null)) as
-    | { ok?: boolean; message?: string; overrides?: QuestionExplanationOverrideRow[] }
-    | null;
+  const cachedOverrides = new Map<string, QuestionExplanationOverride | null>();
+  const missingQuestionIds = uniqueQuestionIds.filter((questionId) => {
+    const cachedValue = readBackgroundCache<QuestionExplanationOverride | null>(`explanation:${questionId}`);
+    if (cachedValue !== undefined) {
+      cachedOverrides.set(questionId, cachedValue);
+      return false;
+    }
+    return true;
+  });
 
-  if (!response.ok || !payload?.ok) {
-    throw new Error(payload?.message || "共享詳解讀取失敗");
+  if (missingQuestionIds.length > 0) {
+    try {
+      const requestIds = [...missingQuestionIds].sort();
+      const payload = await fetchBackgroundData<
+        BackgroundPayloadBase & { overrides?: QuestionExplanationOverrideRow[] }
+      >(
+        `explanations:${requestIds.join(",")}`,
+        `/api/question-background-data?kind=explanations&ids=${encodeURIComponent(requestIds.join(","))}`
+      );
+      const mappedOverrides = new Map(
+        (payload.overrides ?? []).map((row) => {
+          const typedRow = row as QuestionExplanationOverrideRow;
+          return [typedRow.question_id, mapQuestionExplanationOverrideRow(typedRow)] as const;
+        })
+      );
+
+      if (isFreshBackgroundPayload(payload)) {
+        for (const questionId of missingQuestionIds) {
+          writeBackgroundCache(
+            `explanation:${questionId}`,
+            mappedOverrides.get(questionId) ?? null,
+            BACKGROUND_DATA_TTL_MS.explanations
+          );
+        }
+      }
+
+      for (const [questionId, override] of mappedOverrides.entries()) {
+        cachedOverrides.set(questionId, override);
+      }
+    } catch (error) {
+      if (cachedOverrides.size === 0) {
+        throw error;
+      }
+    }
   }
 
   return Object.fromEntries(
-    (payload.overrides ?? []).map((row) => {
-      const typedRow = row as QuestionExplanationOverrideRow;
-      return [typedRow.question_id, mapQuestionExplanationOverrideRow(typedRow)] as const;
-    })
+    uniqueQuestionIds
+      .map((questionId) => [questionId, cachedOverrides.get(questionId)] as const)
+      .filter((entry): entry is readonly [string, QuestionExplanationOverride] => Boolean(entry[1]))
   );
 }
 
@@ -2287,26 +2449,80 @@ export async function loadConfirmedQuestionClassificationOverrides(questionIds?:
     return {} as Record<string, QuestionClassificationOverride>;
   }
 
-  const query = hasExplicitQuestionIds
-    ? `ids=${encodeURIComponent(uniqueQuestionIds.join(","))}`
-    : "all=1";
+  if (!hasExplicitQuestionIds) {
+    const cachedAll = readBackgroundCache<Record<string, QuestionClassificationOverride>>("classification:all");
+    if (cachedAll !== undefined) return cachedAll;
 
-  const response = await fetch(
-    `/api/question-background-data?kind=classifications&${query}`
-  );
-  const payload = (await response.json().catch(() => null)) as
-    | { ok?: boolean; message?: string; overrides?: QuestionClassificationOverrideRow[] }
-    | null;
+    const payload = await fetchBackgroundData<
+      BackgroundPayloadBase & { overrides?: QuestionClassificationOverrideRow[] }
+    >("classifications:all", "/api/question-background-data?kind=classifications&all=1");
+    const mappedOverrides = Object.fromEntries(
+      (payload.overrides ?? []).map((row) => {
+        const typedRow = row as QuestionClassificationOverrideRow;
+        return [typedRow.question_id, mapQuestionClassificationOverrideRow(typedRow)] as const;
+      })
+    );
 
-  if (!response.ok || !payload?.ok) {
-    throw new Error(payload?.message || "分類覆蓋讀取失敗");
+    if (isFreshBackgroundPayload(payload)) {
+      writeBackgroundCache("classification:all", mappedOverrides, BACKGROUND_DATA_TTL_MS.allClassifications);
+      for (const [questionId, override] of Object.entries(mappedOverrides)) {
+        writeBackgroundCache(`classification:${questionId}`, override, BACKGROUND_DATA_TTL_MS.classifications);
+      }
+    }
+
+    return mappedOverrides;
+  }
+
+  const cachedOverrides = new Map<string, QuestionClassificationOverride | null>();
+  const missingQuestionIds = uniqueQuestionIds.filter((questionId) => {
+    const cachedValue = readBackgroundCache<QuestionClassificationOverride | null>(`classification:${questionId}`);
+    if (cachedValue !== undefined) {
+      cachedOverrides.set(questionId, cachedValue);
+      return false;
+    }
+    return true;
+  });
+
+  if (missingQuestionIds.length > 0) {
+    try {
+      const requestIds = [...missingQuestionIds].sort();
+      const payload = await fetchBackgroundData<
+        BackgroundPayloadBase & { overrides?: QuestionClassificationOverrideRow[] }
+      >(
+        `classifications:${requestIds.join(",")}`,
+        `/api/question-background-data?kind=classifications&ids=${encodeURIComponent(requestIds.join(","))}`
+      );
+      const mappedOverrides = new Map(
+        (payload.overrides ?? []).map((row) => {
+          const typedRow = row as QuestionClassificationOverrideRow;
+          return [typedRow.question_id, mapQuestionClassificationOverrideRow(typedRow)] as const;
+        })
+      );
+
+      if (isFreshBackgroundPayload(payload)) {
+        for (const questionId of missingQuestionIds) {
+          writeBackgroundCache(
+            `classification:${questionId}`,
+            mappedOverrides.get(questionId) ?? null,
+            BACKGROUND_DATA_TTL_MS.classifications
+          );
+        }
+      }
+
+      for (const [questionId, override] of mappedOverrides.entries()) {
+        cachedOverrides.set(questionId, override);
+      }
+    } catch (error) {
+      if (cachedOverrides.size === 0) {
+        throw error;
+      }
+    }
   }
 
   return Object.fromEntries(
-    (payload.overrides ?? []).map((row) => {
-      const typedRow = row as QuestionClassificationOverrideRow;
-      return [typedRow.question_id, mapQuestionClassificationOverrideRow(typedRow)] as const;
-    })
+    uniqueQuestionIds
+      .map((questionId) => [questionId, cachedOverrides.get(questionId)] as const)
+      .filter((entry): entry is readonly [string, QuestionClassificationOverride] => Boolean(entry[1]))
   );
 }
 
