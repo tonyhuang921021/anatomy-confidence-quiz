@@ -435,7 +435,7 @@ export function loadCompletedHistorySessionsForUser(userId = getActiveStorageUse
   }
 
   if (getCompletedSessionsStorageLengthForUser(userId) > COMPLETED_SESSIONS_UPLOAD_RECOVERY_READ_LIMIT) {
-    return [] as { attempts: QuizSession["attempts"] }[];
+    return loadRecentLocalCompletedSessionsForUploadForUser(userId);
   }
 
   return loadCompletedSessionsForUser(userId);
@@ -659,6 +659,79 @@ function parseCompletedSessionsRaw(raw: string | null) {
   }
 }
 
+function isJsonWhitespace(char: string) {
+  return char === " " || char === "\n" || char === "\r" || char === "\t";
+}
+
+function isEscapedJsonQuote(raw: string, quoteIndex: number) {
+  let slashCount = 0;
+  for (let index = quoteIndex - 1; index >= 0 && raw[index] === "\\"; index -= 1) {
+    slashCount += 1;
+  }
+  return slashCount % 2 === 1;
+}
+
+function shouldSkipRecoveredSession(session: QuizSession, excludedSessionIds?: Set<string>) {
+  return excludedSessionIds?.has(getCanonicalSessionId(session.id)) ?? false;
+}
+
+function parseRecentCompletedSessionsFromRaw(
+  raw: string | null,
+  limit = PENDING_COMPLETED_SESSION_UPLOAD_LIMIT,
+  excludedSessionIds?: Set<string>
+) {
+  if (!raw || limit <= 0) return [] as QuizSession[];
+  if (raw.length <= COMPLETED_SESSIONS_UPLOAD_RECOVERY_READ_LIMIT) {
+    return parseCompletedSessionsRaw(raw)
+      .filter((session) => !shouldSkipRecoveredSession(session, excludedSessionIds))
+      .slice(-limit);
+  }
+
+  const sessions: QuizSession[] = [];
+  let scanEnd = raw.length - 1;
+
+  while (scanEnd >= 0 && isJsonWhitespace(raw[scanEnd])) scanEnd -= 1;
+  if (raw[scanEnd] === "]") scanEnd -= 1;
+
+  let depth = 0;
+  let inString = false;
+  let objectEnd = -1;
+
+  for (let index = scanEnd; index >= 0 && sessions.length < limit; index -= 1) {
+    const char = raw[index];
+
+    if (char === "\"" && !isEscapedJsonQuote(raw, index)) {
+      inString = !inString;
+      continue;
+    }
+
+    if (inString) continue;
+
+    if (char === "}") {
+      if (depth === 0) objectEnd = index + 1;
+      depth += 1;
+      continue;
+    }
+
+    if (char === "{") {
+      depth -= 1;
+      if (depth === 0 && objectEnd > index) {
+        try {
+          const session = normalizeSession(JSON.parse(raw.slice(index, objectEnd)) as QuizSession);
+          if (session.completedAt && !shouldSkipRecoveredSession(session, excludedSessionIds)) {
+            sessions.push(session);
+          }
+        } catch {
+          // Keep scanning older sessions when one tail object is malformed.
+        }
+        objectEnd = -1;
+      }
+    }
+  }
+
+  return normalizeCompletedSessionList(sessions.reverse()).slice(-limit);
+}
+
 export function compactQuestionForStorage(question: Question): Question {
   return {
     id: question.id,
@@ -865,7 +938,8 @@ export function getCompletedSessionsStorageLengthForUser(userId = getActiveStora
 
 export function loadRecentLocalCompletedSessionsForUploadForUser(
   userId = getActiveStorageUser(),
-  limit = PENDING_COMPLETED_SESSION_UPLOAD_LIMIT
+  limit = PENDING_COMPLETED_SESSION_UPLOAD_LIMIT,
+  excludedSessionIds?: Set<string>
 ) {
   if (!isBrowser()) return [] as QuizSession[];
   const rawValues = [
@@ -873,8 +947,7 @@ export function loadRecentLocalCompletedSessionsForUploadForUser(
     userId === GUEST_USER_ID ? safeLocalStorageGetItem(COMPLETED_SESSIONS_KEY) : null
   ].filter((raw): raw is string => Boolean(raw));
   const recoverableSessions = rawValues
-    .filter((raw) => raw.length <= COMPLETED_SESSIONS_UPLOAD_RECOVERY_READ_LIMIT)
-    .flatMap((raw) => parseCompletedSessionsRaw(raw));
+    .flatMap((raw) => parseRecentCompletedSessionsFromRaw(raw, limit, excludedSessionIds));
 
   return normalizeCompletedSessionList(recoverableSessions).slice(-limit);
 }
@@ -970,8 +1043,12 @@ export function loadCompletedSessionsForUser(userId: string): QuizSession[] {
 
   if (raw.length > COMPLETED_SESSIONS_HEAVY_READ_LIMIT) {
     if (raw.length > COMPLETED_SESSIONS_UPLOAD_RECOVERY_READ_LIMIT) {
-      cacheCompletedSessionsForUser(userId, cloudSessions);
-      return cloudSessions;
+      const normalized = normalizeCompletedSessionList([
+        ...cloudSessions,
+        ...loadRecentLocalCompletedSessionsForUploadForUser(userId)
+      ]);
+      cacheCompletedSessionsForUser(userId, normalized);
+      return normalized;
     }
 
     const normalized = normalizeCompletedSessionList([

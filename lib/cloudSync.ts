@@ -1751,14 +1751,15 @@ export async function syncLocalCompletedSessionsForCurrentUser(userId: string) {
     userId,
     fetchedRemoteSessions.filter(isCompletedQuizSession)
   );
+  const remoteSessionIds = new Set(remoteSessions.map((session) => getCanonicalSessionId(session.id)));
   const pendingCompletedSessionUploads = canonicalizeSessionsForUser(
     userId,
     mergeSessions(
       mergeSessions(
         loadPendingCompletedSessionUploadsForUser(userId),
-        loadRecentLocalCompletedSessionsForUploadForUser(userId)
+        loadRecentLocalCompletedSessionsForUploadForUser(userId, undefined, remoteSessionIds)
       ),
-      loadRecentLocalCompletedSessionsForUploadForUser("guest")
+      loadRecentLocalCompletedSessionsForUploadForUser("guest", undefined, remoteSessionIds)
     ).filter(isCompletedQuizSession)
   );
 
