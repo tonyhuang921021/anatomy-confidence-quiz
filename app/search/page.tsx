@@ -53,6 +53,12 @@ const OPTION_KEYS = ["A", "B", "C", "D", "E"] as const;
 const PAGE_SIZE = 30;
 const SEARCH_FAVORITES_STORAGE_KEY = "anatomy-confidence-search-favorites:v1";
 
+type SearchIndexEntry = {
+  question: Question;
+  normalizedTerms: string;
+  compactTerms: string;
+};
+
 type SearchFavoriteRecord = {
   questionId: string;
   addedAt: string;
@@ -102,15 +108,57 @@ function getSearchTerms(question: Question) {
   ].filter((value): value is string => Boolean(value));
 }
 
-function matchesQuestion(question: Question, normalizedKeyword: string, compactKeyword: string) {
+function buildSearchIndexEntry(question: Question): SearchIndexEntry {
+  const joinedTerms = getSearchTerms(question).join(" ");
+  return {
+    question,
+    normalizedTerms: normalizeSearchText(joinedTerms),
+    compactTerms: compactSearchText(joinedTerms)
+  };
+}
+
+function matchesSearchIndexEntry(entry: SearchIndexEntry, normalizedKeyword: string, compactKeyword: string) {
   if (!normalizedKeyword) return true;
 
-  const terms = getSearchTerms(question);
-  const joinedTerms = normalizeSearchText(terms.join(" "));
-  if (joinedTerms.includes(normalizedKeyword)) return true;
+  if (entry.normalizedTerms.includes(normalizedKeyword)) return true;
 
-  const compactTerms = compactSearchText(terms.join(""));
-  return compactKeyword.length > 0 && compactTerms.includes(compactKeyword);
+  return compactKeyword.length > 0 && entry.compactTerms.includes(compactKeyword);
+}
+
+function compareQuestionsForSearch(left: Question, right: Question, yearSortOrder: "desc" | "asc") {
+  const yearLeft = left.sourceYear ?? (yearSortOrder === "desc" ? -Infinity : Infinity);
+  const yearRight = right.sourceYear ?? (yearSortOrder === "desc" ? -Infinity : Infinity);
+  if (yearLeft !== yearRight) {
+    return yearSortOrder === "desc" ? yearRight - yearLeft : yearLeft - yearRight;
+  }
+
+  const examLeft = left.examCode ?? "";
+  const examRight = right.examCode ?? "";
+  if (examLeft !== examRight) {
+    return yearSortOrder === "desc"
+      ? examRight.localeCompare(examLeft)
+      : examLeft.localeCompare(examRight);
+  }
+
+  const paperLeft = left.paperCode ?? "";
+  const paperRight = right.paperCode ?? "";
+  if (paperLeft !== paperRight) {
+    return yearSortOrder === "desc"
+      ? paperRight.localeCompare(paperLeft)
+      : paperLeft.localeCompare(paperRight);
+  }
+
+  const questionNoLeft = left.originalQuestionNumber ?? (yearSortOrder === "desc" ? -Infinity : Infinity);
+  const questionNoRight = right.originalQuestionNumber ?? (yearSortOrder === "desc" ? -Infinity : Infinity);
+  if (questionNoLeft !== questionNoRight) {
+    return yearSortOrder === "desc"
+      ? questionNoRight - questionNoLeft
+      : questionNoLeft - questionNoRight;
+  }
+
+  return yearSortOrder === "desc"
+    ? right.id.localeCompare(left.id)
+    : left.id.localeCompare(right.id);
 }
 
 function mergeQuestionExplanationOverride(
@@ -193,7 +241,9 @@ export default function SearchPage() {
   const [favoritePracticeQuestionId, setFavoritePracticeQuestionId] = useState<string | null>(null);
   const [favoriteSelectedAnswer, setFavoriteSelectedAnswer] = useState<OptionKey | null>(null);
   const [favoriteAnswerFeedback, setFavoriteAnswerFeedback] = useState<FavoriteAnswerFeedback | null>(null);
+  const [expandedQuestionIds, setExpandedQuestionIds] = useState<Record<string, boolean>>({});
   const deferredKeyword = useDeferredValue(keyword);
+  const isKeywordPending = keyword !== deferredKeyword;
 
   const normalizedKeyword = normalizeSearchText(deferredKeyword);
   const compactKeyword = compactSearchText(deferredKeyword);
@@ -209,6 +259,17 @@ export default function SearchPage() {
     [classificationOverrides]
   );
   const questionById = useMemo(() => new Map(allQuestions.map((question) => [question.id, question])), [allQuestions]);
+  const searchIndex = useMemo(
+    () => allQuestions.map((question) => buildSearchIndexEntry(question)),
+    [allQuestions]
+  );
+  const sortedSearchIndex = useMemo(
+    () =>
+      [...searchIndex].sort((left, right) =>
+        compareQuestionsForSearch(left.question, right.question, yearSortOrder)
+      ),
+    [searchIndex, yearSortOrder]
+  );
   const yearOptions = useMemo(
     () =>
       Array.from(
@@ -242,65 +303,37 @@ export default function SearchPage() {
   }, []);
 
   const filteredResults = useMemo(() => {
-    return allQuestions
-      .filter((question) => {
+    return sortedSearchIndex
+      .filter((entry) => {
+        const { question } = entry;
         if (selectedSubject !== "全部" && question.subject !== selectedSubject) return false;
         if (selectedYear !== "全部" && String(question.sourceYear ?? "") !== selectedYear) return false;
-        return matchesQuestion(question, normalizedKeyword, compactKeyword);
+        return matchesSearchIndexEntry(entry, normalizedKeyword, compactKeyword);
       })
-      .sort((left, right) => {
-        const yearLeft = left.sourceYear ?? (yearSortOrder === "desc" ? -Infinity : Infinity);
-        const yearRight = right.sourceYear ?? (yearSortOrder === "desc" ? -Infinity : Infinity);
-        if (yearLeft !== yearRight) {
-          return yearSortOrder === "desc" ? yearRight - yearLeft : yearLeft - yearRight;
-        }
-
-        const examLeft = left.examCode ?? "";
-        const examRight = right.examCode ?? "";
-        if (examLeft !== examRight) {
-          return yearSortOrder === "desc"
-            ? examRight.localeCompare(examLeft)
-            : examLeft.localeCompare(examRight);
-        }
-
-        const paperLeft = left.paperCode ?? "";
-        const paperRight = right.paperCode ?? "";
-        if (paperLeft !== paperRight) {
-          return yearSortOrder === "desc"
-            ? paperRight.localeCompare(paperLeft)
-            : paperLeft.localeCompare(paperRight);
-        }
-
-        const questionNoLeft = left.originalQuestionNumber ?? (yearSortOrder === "desc" ? -Infinity : Infinity);
-        const questionNoRight = right.originalQuestionNumber ?? (yearSortOrder === "desc" ? -Infinity : Infinity);
-        if (questionNoLeft !== questionNoRight) {
-          return yearSortOrder === "desc"
-            ? questionNoRight - questionNoLeft
-            : questionNoLeft - questionNoRight;
-        }
-
-        return yearSortOrder === "desc"
-          ? right.id.localeCompare(left.id)
-          : left.id.localeCompare(right.id);
-      });
-  }, [allQuestions, compactKeyword, normalizedKeyword, selectedSubject, selectedYear, yearSortOrder]);
+      .map((entry) => entry.question);
+  }, [compactKeyword, normalizedKeyword, selectedSubject, selectedYear, sortedSearchIndex]);
 
   const totalMatches = filteredResults.length;
   const totalPages = Math.max(1, Math.ceil(totalMatches / PAGE_SIZE));
   const safeCurrentPage = Math.min(currentPage, totalPages);
   const pageStart = (safeCurrentPage - 1) * PAGE_SIZE;
-  const pageResults = filteredResults.slice(pageStart, pageStart + PAGE_SIZE);
-  const pageResultIdsKey = useMemo(
-    () => pageResults.map((question) => question.id).join("|"),
-    [pageResults]
+  const pageResults = useMemo(
+    () => filteredResults.slice(pageStart, pageStart + PAGE_SIZE),
+    [filteredResults, pageStart]
+  );
+  const expandedPageQuestionIds = useMemo(
+    () => pageResults
+      .filter((question) => expandedQuestionIds[question.id])
+      .map((question) => question.id),
+    [expandedQuestionIds, pageResults]
   );
 
   useEffect(() => {
     async function fetchSharedExplanationOverrides() {
-      if (pageResults.length === 0) return;
+      if (expandedPageQuestionIds.length === 0) return;
 
       try {
-        const questionIds = pageResults.map((question) => question.id);
+        const questionIds = expandedPageQuestionIds;
         const sharedOverrides = await loadSharedQuestionExplanationOverrides(
           questionIds
         );
@@ -327,7 +360,7 @@ export default function SearchPage() {
     }
 
     void fetchSharedExplanationOverrides();
-  }, [pageResultIdsKey, pageResults]);
+  }, [expandedPageQuestionIds, session?.access_token]);
 
   const favoriteItems = useMemo(
     () =>
@@ -701,6 +734,11 @@ export default function SearchPage() {
         </div>
 
         <div className="mt-5 flex flex-wrap gap-2 text-sm font-semibold">
+          {isKeywordPending ? (
+            <span className="rounded-full bg-amber-50 px-3 py-1 text-amber-800 ring-1 ring-amber-100">
+              搜尋整理中
+            </span>
+          ) : null}
           <span className="rounded-full bg-slate-100 px-3 py-1 text-slate-700">找到 {totalMatches} 題</span>
           <span className="rounded-full bg-slate-100 px-3 py-1 text-slate-700">
             第 {safeCurrentPage} / {totalPages} 頁
@@ -725,10 +763,21 @@ export default function SearchPage() {
             const favoriteRecord = searchFavorites[renderedQuestion.id];
             const isFavorited = Boolean(favoriteRecord);
             const isFavoriteCompleted = isQuestionCompletedInFavoriteBank(favoriteRecord);
+            const isExpanded = Boolean(expandedQuestionIds[renderedQuestion.id]);
 
             return (
             <details
               key={renderedQuestion.id}
+              onToggle={(event) => {
+                const open = event.currentTarget.open;
+                setExpandedQuestionIds((current) => {
+                  if (current[renderedQuestion.id] === open) return current;
+                  return {
+                    ...current,
+                    [renderedQuestion.id]: open
+                  };
+                });
+              }}
               className="rounded-[2rem] bg-white p-4 shadow-card ring-1 ring-slate-100 sm:p-5"
             >
               <summary className="cursor-pointer list-none">
@@ -745,7 +794,7 @@ export default function SearchPage() {
                         {renderedQuestion.chapter}
                       </span>
                     </div>
-                    <p className="mt-3 break-words text-base font-semibold leading-7 text-ink">
+                    <p className="mt-3 whitespace-pre-wrap break-words text-base font-semibold leading-7 text-ink">
                       {renderedQuestion.stem}
                     </p>
                     <p className="mt-2 text-xs text-slate-500">
@@ -761,6 +810,7 @@ export default function SearchPage() {
                 </div>
               </summary>
 
+              {isExpanded ? (
               <div className="mt-5 space-y-4 text-sm leading-7 text-slate-700">
                 <QuestionStemBlock question={renderedQuestion} />
                 <div className="flex flex-wrap items-center gap-2">
@@ -899,6 +949,7 @@ export default function SearchPage() {
                   ) : null}
                 </div>
               </div>
+              ) : null}
             </details>
           );
           })
