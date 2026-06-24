@@ -975,6 +975,28 @@ set
   file_size_limit = excluded.file_size_limit,
   allowed_mime_types = excluded.allowed_mime_types;
 
+insert into storage.buckets (id, name, public, file_size_limit, allowed_mime_types)
+values (
+  'resource-share-files',
+  'resource-share-files',
+  false,
+  12582912,
+  array[
+    'application/pdf',
+    'text/html',
+    'application/xhtml+xml',
+    'image/png',
+    'image/jpeg',
+    'image/webp',
+    'image/gif'
+  ]
+)
+on conflict (id) do update
+set
+  public = excluded.public,
+  file_size_limit = excluded.file_size_limit,
+  allowed_mime_types = excluded.allowed_mime_types;
+
 create table if not exists public.yangming_explanation_reports (
   id bigint generated always as identity primary key,
   question_id text not null,
@@ -1387,6 +1409,113 @@ drop policy if exists "Service role can manage question supplement reactions" on
 
 create policy "Service role can manage question supplement reactions"
 on public.question_supplement_reactions
+for all
+to service_role
+using (true)
+with check (true);
+
+create table if not exists public.resource_shares (
+  id uuid primary key default gen_random_uuid(),
+  title text not null,
+  description text,
+  category text,
+  file_name text not null,
+  file_path text not null,
+  file_mime_type text not null,
+  file_size_bytes bigint not null check (file_size_bytes >= 0),
+  author_label text not null,
+  author_email text,
+  user_id uuid not null references auth.users(id) on delete cascade,
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now()
+);
+
+create index if not exists resource_shares_created_idx
+on public.resource_shares (created_at desc);
+
+create index if not exists resource_shares_user_created_idx
+on public.resource_shares (user_id, created_at desc);
+
+create index if not exists resource_shares_mime_created_idx
+on public.resource_shares (file_mime_type, created_at desc);
+
+create table if not exists public.resource_share_likes (
+  id bigint generated always as identity primary key,
+  resource_id uuid not null references public.resource_shares(id) on delete cascade,
+  user_id uuid not null references auth.users(id) on delete cascade,
+  created_at timestamptz not null default now(),
+  unique (resource_id, user_id)
+);
+
+create index if not exists resource_share_likes_resource_idx
+on public.resource_share_likes (resource_id);
+
+create table if not exists public.resource_share_comments (
+  id bigint generated always as identity primary key,
+  resource_id uuid not null references public.resource_shares(id) on delete cascade,
+  content text not null,
+  author_label text not null,
+  author_email text,
+  user_id uuid not null references auth.users(id) on delete cascade,
+  created_at timestamptz not null default now()
+);
+
+create index if not exists resource_share_comments_resource_created_idx
+on public.resource_share_comments (resource_id, created_at asc);
+
+create index if not exists resource_share_comments_user_created_idx
+on public.resource_share_comments (user_id, created_at desc);
+
+revoke all on public.resource_shares from anon, authenticated;
+revoke all on public.resource_share_likes from anon, authenticated;
+revoke all on public.resource_share_comments from anon, authenticated;
+
+grant select, insert, update, delete
+  on public.resource_shares
+  to service_role;
+
+grant select, insert, update, delete
+  on public.resource_share_likes
+  to service_role;
+
+grant select, insert, update, delete
+  on public.resource_share_comments
+  to service_role;
+
+grant usage, select
+  on sequence public.resource_share_likes_id_seq
+  to service_role;
+
+grant usage, select
+  on sequence public.resource_share_comments_id_seq
+  to service_role;
+
+alter table public.resource_shares enable row level security;
+alter table public.resource_share_likes enable row level security;
+alter table public.resource_share_comments enable row level security;
+
+drop policy if exists "Service role can manage resource shares" on public.resource_shares;
+
+create policy "Service role can manage resource shares"
+on public.resource_shares
+for all
+to service_role
+using (true)
+with check (true);
+
+drop policy if exists "Service role can manage resource share likes" on public.resource_share_likes;
+
+create policy "Service role can manage resource share likes"
+on public.resource_share_likes
+for all
+to service_role
+using (true)
+with check (true);
+
+drop policy if exists "Service role can manage resource share comments" on public.resource_share_comments;
+
+create policy "Service role can manage resource share comments"
+on public.resource_share_comments
 for all
 to service_role
 using (true)

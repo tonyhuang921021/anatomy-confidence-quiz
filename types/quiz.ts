@@ -572,6 +572,38 @@ export type FeedbackMessage = {
   replies?: FeedbackMessage[];
 };
 
+export type ResourceShareFileKind = "html" | "pdf" | "image" | "other";
+
+export type ResourceShareComment = {
+  id: string;
+  resourceId: string;
+  content: string;
+  authorLabel: string;
+  authorEmail?: string;
+  createdAt: string;
+};
+
+export type ResourceShare = {
+  id: string;
+  title: string;
+  description?: string;
+  category?: string;
+  fileName: string;
+  filePath?: string;
+  fileUrl?: string;
+  fileMimeType: string;
+  fileKind: ResourceShareFileKind;
+  fileSizeBytes: number;
+  authorLabel: string;
+  authorEmail?: string;
+  createdAt: string;
+  updatedAt: string;
+  likeCount: number;
+  commentCount: number;
+  myLiked: boolean;
+  comments?: ResourceShareComment[];
+};
+
 export type CustomPaperParticipant = {
   sessionId: string;
   label: string;

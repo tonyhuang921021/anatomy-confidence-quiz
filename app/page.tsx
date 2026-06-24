@@ -54,6 +54,11 @@ const QUICK_ENTRIES = [
 const HOME_RELEASE_NOTES = [
   {
     time: "06/24",
+    title: "資源分享區開張",
+    body: "講義、PDF、圖片和 HTML 都可以丟進交流區；不匿名，按讚留言自己承擔學術熱情。"
+  },
+  {
+    time: "06/24",
     title: "網站少一點自燃",
     body: "背景資料和同學補充先吃快取，搜尋框也不要每打一字就叫醒半個題庫；省流量，也省資料庫的命。"
   },
@@ -614,9 +619,14 @@ export default function HomePage() {
               ))}
               <div className="home-entry-card home-study-card sm:col-span-2">
                 <div className="grid gap-3 sm:grid-cols-2">
-                  <ClientSectionBoundary title="學習筆記入口">
-                    <OwnerOnlyNotesLink />
-                  </ClientSectionBoundary>
+                  <div className="grid gap-3">
+                    <ClientSectionBoundary title="學習筆記入口">
+                      <OwnerOnlyNotesLink />
+                    </ClientSectionBoundary>
+                    <Link href="/resources" prefetch={false} className="secondary-pill home-study-link px-4">
+                      資源分享
+                    </Link>
+                  </div>
                   <Link href="/pharmacology-review" prefetch={false} className="secondary-pill home-study-link px-4">
                     藥理複習
                   </Link>
