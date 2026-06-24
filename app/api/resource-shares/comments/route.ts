@@ -53,7 +53,7 @@ export async function POST(request: NextRequest) {
           author_email: verifiedUser.email ?? null,
           user_id: verifiedUser.id,
         })
-        .select("id, resource_id, content, author_label, author_email, created_at")
+        .select("id, resource_id, content, author_label, author_email, user_id, created_at")
         .single(),
       2800,
       "留言寫入逾時"

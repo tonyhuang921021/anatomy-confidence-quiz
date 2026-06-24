@@ -4,10 +4,12 @@ import { withServerTimeout } from "@/lib/serverTimeout";
 import {
   createResourceSignedUrl,
   getResourceAccessToken,
+  getResourceAuthorLabelMap,
   getResourceShareServiceClient,
   getVerifiedResourceUser,
   mapResourceShare,
   mapResourceShareComment,
+  withResourceAuthorLabel,
 } from "./shared";
 
 export async function GET(request: NextRequest) {
@@ -49,7 +51,7 @@ export async function GET(request: NextRequest) {
           supabase.from("resource_share_likes").select("user_id").eq("resource_id", resourceId).limit(1000),
           supabase
             .from("resource_share_comments")
-            .select("id, resource_id, content, author_label, author_email, created_at")
+            .select("id, resource_id, content, author_label, author_email, user_id, created_at")
             .eq("resource_id", resourceId)
             .order("created_at", { ascending: true })
             .limit(120),
@@ -59,9 +61,16 @@ export async function GET(request: NextRequest) {
       )) as [{ data?: any[] | null }, { data?: any[] | null }];
 
       const signedUrl = row.file_path ? await createResourceSignedUrl(supabase, row.file_path) : undefined;
-      const mappedComments = (comments ?? []).map(mapResourceShareComment);
+      const authorLabelMap = await getResourceAuthorLabelMap(supabase, [
+        row.user_id,
+        ...(comments ?? []).map((comment) => comment.user_id),
+      ]);
+      const normalizedRow = withResourceAuthorLabel(row, authorLabelMap);
+      const mappedComments = (comments ?? []).map((comment) =>
+        mapResourceShareComment(withResourceAuthorLabel(comment, authorLabelMap))
+      );
       const likeRows = likes ?? [];
-      const resource = mapResourceShare(row, {
+      const resource = mapResourceShare(normalizedRow, {
         fileUrl: signedUrl,
         likeCount: likeRows.length,
         commentCount: mappedComments.length,
@@ -94,6 +103,10 @@ export async function GET(request: NextRequest) {
     const likeCountMap = new Map<string, number>();
     const commentCountMap = new Map<string, number>();
     const myLikedIds = new Set<string>();
+    const authorLabelMap = await getResourceAuthorLabelMap(
+      supabase,
+      resourcesRows.map((row) => row.user_id)
+    );
 
     if (ids.length) {
       const [{ data: likes }, { data: comments }] = (await withServerTimeout(
@@ -117,7 +130,7 @@ export async function GET(request: NextRequest) {
     }
 
     const resources = resourcesRows.map((row) =>
-      mapResourceShare(row, {
+      mapResourceShare(withResourceAuthorLabel(row, authorLabelMap), {
         likeCount: likeCountMap.get(String(row.id)) ?? 0,
         commentCount: commentCountMap.get(String(row.id)) ?? 0,
         myLiked: myLikedIds.has(String(row.id)),

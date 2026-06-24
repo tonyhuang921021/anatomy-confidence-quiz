@@ -24,6 +24,10 @@ type VerifiedResourceUser = {
 };
 
 type SupabaseClientLike = any;
+type ResourceAuthorRow = {
+  user_id?: string | null;
+  author_label?: string | null;
+};
 
 export const getResourceAccessToken = (request: NextRequest, fallback?: string | null) => {
   const authorization = request.headers.get("authorization") ?? "";
@@ -67,18 +71,64 @@ export const getVerifiedResourceUser = async (
     if (error || !user?.id) return null;
     const metadata = user.user_metadata ?? {};
     const rawLabel =
-      typeof metadata.full_name === "string"
+      typeof metadata.display_name === "string"
+        ? metadata.display_name
+        : typeof metadata.full_name === "string"
         ? metadata.full_name
         : typeof metadata.name === "string"
           ? metadata.name
           : typeof metadata.nickname === "string"
             ? metadata.nickname
             : "";
-    const label = rawLabel.trim() || user.email?.split("@")[0] || "同學";
+    const label = normalizeResourceAuthorLabel(rawLabel) || normalizeResourceAuthorLabel(user.email?.split("@")[0]) || "同學";
     return { id: user.id, email: user.email, label };
   } catch {
     return null;
   }
+};
+
+export const normalizeResourceAuthorLabel = (value?: string | null) => {
+  const label = typeof value === "string" ? value.trim() : "";
+  return label ? label.slice(0, 24) : "";
+};
+
+export const getResourceAuthorLabelMap = async (
+  supabase: SupabaseClientLike,
+  userIds: Array<string | null | undefined>
+) => {
+  const uniqueUserIds = Array.from(
+    new Set(userIds.filter((id): id is string => typeof id === "string" && Boolean(id.trim())).map((id) => id.trim()))
+  ).slice(0, 100);
+  const labelMap = new Map<string, string>();
+  if (!uniqueUserIds.length) return labelMap;
+
+  try {
+    const { data, error } = (await withServerTimeout(
+      supabase
+        .from("leaderboard_profiles")
+        .select("user_id, display_name")
+        .in("user_id", uniqueUserIds),
+      1400,
+      "暱稱讀取逾時"
+    )) as { data?: Array<{ user_id?: string | null; display_name?: string | null }> | null; error?: unknown };
+
+    if (error) return labelMap;
+    for (const row of data ?? []) {
+      const userId = typeof row.user_id === "string" ? row.user_id : "";
+      const displayName = normalizeResourceAuthorLabel(row.display_name);
+      if (userId && displayName) labelMap.set(userId, displayName);
+    }
+  } catch {
+    return labelMap;
+  }
+
+  return labelMap;
+};
+
+export const withResourceAuthorLabel = <T extends ResourceAuthorRow>(row: T, labelMap: Map<string, string>): T => {
+  const userId = typeof row.user_id === "string" ? row.user_id : "";
+  const displayName = userId ? labelMap.get(userId) : "";
+  return displayName ? ({ ...row, author_label: displayName } as T) : row;
 };
 
 export const getResourceShareFileKind = (mimeType: string, filePath?: string | null): ResourceShareFileKind => {
@@ -122,7 +172,7 @@ export const mapResourceShareComment = (row: any): ResourceShareComment => ({
   id: String(row.id),
   resourceId: String(row.resource_id),
   content: String(row.content ?? ""),
-  authorLabel: String(row.author_label ?? "同學"),
+  authorLabel: normalizeResourceAuthorLabel(row.author_label) || "同學",
   authorEmail: typeof row.author_email === "string" ? row.author_email : undefined,
   createdAt: String(row.created_at ?? new Date().toISOString()),
 });
@@ -148,7 +198,7 @@ export const mapResourceShare = (
   fileMimeType: typeof row.file_mime_type === "string" && row.file_mime_type.trim() ? row.file_mime_type : undefined,
   fileKind: getResourceShareFileKind(String(row.file_mime_type ?? ""), row.file_path),
   fileSizeBytes: Number(row.file_size_bytes ?? 0),
-  authorLabel: String(row.author_label ?? "同學"),
+  authorLabel: normalizeResourceAuthorLabel(row.author_label) || "同學",
   authorEmail: typeof row.author_email === "string" ? row.author_email : undefined,
   createdAt: String(row.created_at ?? new Date().toISOString()),
   updatedAt: String(row.updated_at ?? row.created_at ?? new Date().toISOString()),
