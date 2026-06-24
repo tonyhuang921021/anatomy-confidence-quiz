@@ -54,6 +54,11 @@ const QUICK_ENTRIES = [
 const HOME_RELEASE_NOTES = [
   {
     time: "06/24",
+    title: "交流區手機不要橫著逃跑",
+    body: "資源分享和 HTML 預覽補上手機寬度保護，長檔名、表格和神祕 HTML 先乖乖待在螢幕裡。"
+  },
+  {
+    time: "06/24",
     title: "交流區開始認暱稱",
     body: "發文和留言會優先顯示你設定的暱稱，不再像資料庫點名一樣冷冰冰。"
   },

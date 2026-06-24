@@ -12,6 +12,98 @@ const formatFileSize = (bytes: number) => {
   return `${(bytes / (1024 * 1024)).toFixed(bytes >= 10 * 1024 * 1024 ? 0 : 1)} MB`;
 };
 
+const RESOURCE_HTML_VIEWPORT_FIX = `
+<base href="about:srcdoc">
+<style id="resource-share-viewport-fix">
+  html,
+  body {
+    width: 100% !important;
+    max-width: 100% !important;
+    min-width: 0 !important;
+    overflow-x: hidden !important;
+    -webkit-text-size-adjust: 100%;
+  }
+
+  *,
+  *::before,
+  *::after {
+    box-sizing: border-box !important;
+  }
+
+  body {
+    margin-left: auto !important;
+    margin-right: auto !important;
+  }
+
+  img,
+  video,
+  canvas,
+  svg,
+  iframe {
+    max-width: 100% !important;
+  }
+
+  pre,
+  code {
+    max-width: 100% !important;
+    overflow-x: auto !important;
+    white-space: pre-wrap !important;
+    overflow-wrap: anywhere !important;
+  }
+
+  table {
+    display: block !important;
+    max-width: 100% !important;
+    overflow-x: auto !important;
+    white-space: normal !important;
+  }
+
+  #popover {
+    max-width: min(420px, calc(100vw - 24px)) !important;
+    max-height: min(70dvh, 520px) !important;
+    overflow-y: auto !important;
+    z-index: 2147483000 !important;
+  }
+
+  @media (max-width: 760px) {
+    body > * {
+      max-width: 100vw !important;
+    }
+
+    main,
+    section,
+    article,
+    .container,
+    .hero-inner,
+    .toolbar,
+    .grid,
+    [class*="grid"],
+    [class*="wrap"],
+    [class*="container"] {
+      max-width: 100% !important;
+      min-width: 0 !important;
+    }
+
+    #popover {
+      position: fixed !important;
+      left: max(12px, env(safe-area-inset-left)) !important;
+      right: max(12px, env(safe-area-inset-right)) !important;
+      top: 50% !important;
+      bottom: auto !important;
+      transform: translateY(-50%) !important;
+    }
+  }
+</style>
+`;
+
+function applyResourceHtmlViewportFix(html: string) {
+  if (!html || html.includes("resource-share-viewport-fix")) return html;
+  if (html.includes("</head>")) {
+    return html.replace("</head>", `${RESOURCE_HTML_VIEWPORT_FIX}</head>`);
+  }
+  return `${RESOURCE_HTML_VIEWPORT_FIX}${html}`;
+}
+
 export function ResourceShareViewer({ resourceId }: { resourceId: string }) {
   const { configured, loading: authLoading, session, user } = useAuth();
   const accessToken = session?.access_token ?? "";
@@ -108,7 +200,7 @@ export function ResourceShareViewer({ resourceId }: { resourceId: string }) {
 
   if (hasAttachment && resource.fileKind === "html") {
     return (
-      <section className="fixed inset-0 z-50 bg-white">
+      <section className="fixed inset-0 z-50 h-[100dvh] w-full overflow-hidden bg-white">
         <div className="pointer-events-none fixed inset-x-0 top-0 z-20 flex flex-wrap items-start justify-between gap-3 p-3 md:p-4">
           <div className="pointer-events-auto flex flex-wrap gap-2">
             <Link
@@ -134,7 +226,7 @@ export function ResourceShareViewer({ resourceId }: { resourceId: string }) {
         </div>
 
         {htmlLoading ? (
-          <div className="flex h-screen w-screen items-center justify-center bg-slate-50">
+          <div className="flex h-full w-full items-center justify-center bg-slate-50">
             <div className="w-[min(520px,calc(100vw-2rem))] rounded-[2rem] border border-slate-100 bg-white p-6 shadow-sm">
               <div className="h-5 w-40 animate-pulse rounded-full bg-emerald-100" />
               <div className="mt-5 h-4 w-full animate-pulse rounded-full bg-slate-100" />
@@ -143,7 +235,7 @@ export function ResourceShareViewer({ resourceId }: { resourceId: string }) {
             </div>
           </div>
         ) : htmlError ? (
-          <div className="flex h-screen w-screen items-center justify-center bg-rose-50 p-6">
+          <div className="flex h-full w-full items-center justify-center bg-rose-50 p-6">
             <div className="w-[min(560px,calc(100vw-2rem))] rounded-[2rem] border border-rose-100 bg-white p-7 shadow-sm">
               <p className="text-xs font-black uppercase tracking-[0.3em] text-rose-600">HTML</p>
               <h1 className="mt-2 text-3xl font-black text-rose-900">HTML 讀取失敗</h1>
@@ -162,10 +254,10 @@ export function ResourceShareViewer({ resourceId }: { resourceId: string }) {
           </div>
         ) : (
           <iframe
-            srcDoc={htmlSource}
+            srcDoc={applyResourceHtmlViewportFix(htmlSource)}
             title={resource.title}
             sandbox="allow-downloads allow-forms allow-modals allow-popups allow-scripts"
-            className="h-screen w-screen border-0 bg-white"
+            className="absolute inset-0 h-full w-full border-0 bg-white"
           />
         )}
       </section>
@@ -173,16 +265,16 @@ export function ResourceShareViewer({ resourceId }: { resourceId: string }) {
   }
 
   return (
-    <section className="space-y-5">
-      <div className="rounded-[2rem] border border-slate-100 bg-white p-6 shadow-sm">
+    <section className="min-w-0 max-w-full space-y-5 overflow-hidden">
+      <div className="min-w-0 overflow-hidden rounded-[2rem] border border-slate-100 bg-white p-6 shadow-sm">
         <Link href="/resources" className="text-sm font-black text-slate-500 hover:text-emerald-800">
           ← 回資源分享
         </Link>
         <div className="mt-4 flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
           <div className="min-w-0">
             <p className="text-xs font-black uppercase tracking-[0.3em] text-emerald-700">Resource</p>
-            <h1 className="mt-2 break-words text-3xl font-black text-emerald-950 md:text-4xl">{resource.title}</h1>
-            <p className="mt-2 text-sm font-bold text-slate-500">
+            <h1 className="mt-2 break-words text-3xl font-black text-emerald-950 [overflow-wrap:anywhere] md:text-4xl">{resource.title}</h1>
+            <p className="mt-2 break-words text-sm font-bold text-slate-500 [overflow-wrap:anywhere]">
               {metaText}
             </p>
           </div>
@@ -197,14 +289,14 @@ export function ResourceShareViewer({ resourceId }: { resourceId: string }) {
             </a>
           ) : null}
         </div>
-        {resource.description ? <p className="mt-4 whitespace-pre-wrap font-bold leading-7 text-slate-700">{resource.description}</p> : null}
+        {resource.description ? <p className="mt-4 whitespace-pre-wrap break-words font-bold leading-7 text-slate-700 [overflow-wrap:anywhere]">{resource.description}</p> : null}
       </div>
 
       <div className="overflow-hidden rounded-[2rem] border border-slate-100 bg-white shadow-sm">
         {!hasAttachment ? (
           <div className="p-8">
             <p className="text-sm font-black uppercase tracking-[0.3em] text-emerald-700">Text Share</p>
-            <p className="mt-3 whitespace-pre-wrap text-lg font-bold leading-8 text-slate-700">
+            <p className="mt-3 whitespace-pre-wrap break-words text-lg font-bold leading-8 text-slate-700 [overflow-wrap:anywhere]">
               {resource.description || "這則分享沒有附件，也沒有留下更多文字。"}
             </p>
           </div>
@@ -213,7 +305,7 @@ export function ResourceShareViewer({ resourceId }: { resourceId: string }) {
             <img src={resource.fileUrl} alt={resource.title} className="mx-auto max-h-[78vh] max-w-full rounded-2xl object-contain" />
           </div>
         ) : resource.fileKind === "pdf" ? (
-          <iframe src={resource.fileUrl} title={resource.title} className="h-[78vh] w-full bg-slate-50" />
+          <iframe src={resource.fileUrl} title={resource.title} className="h-[78vh] w-full max-w-full bg-slate-50" />
         ) : (
           <div className="p-8 text-center">
             <p className="font-bold text-slate-600">這個檔案格式不支援站內預覽。</p>

@@ -228,9 +228,9 @@ export function ResourceShareHub() {
   }
 
   return (
-    <section className="relative grid gap-6 xl:grid-cols-[minmax(0,1fr)_360px]">
-      <div className="space-y-6">
-        <div className="rounded-[2rem] border border-emerald-100 bg-white p-6 shadow-sm md:p-8">
+    <section className="relative grid min-w-0 max-w-full gap-6 overflow-x-hidden xl:grid-cols-[minmax(0,1fr)_360px]">
+      <div className="min-w-0 space-y-6">
+        <div className="min-w-0 overflow-hidden rounded-[2rem] border border-emerald-100 bg-white p-6 shadow-sm md:p-8">
           <p className="text-sm font-black uppercase tracking-[0.35em] text-emerald-700">Board Chat</p>
           <div className="mt-3 flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
             <div>
@@ -268,11 +268,11 @@ export function ResourceShareHub() {
               return (
                 <article
                   key={resource.id}
-                  className={`rounded-[1.5rem] border bg-white p-5 shadow-sm transition ${
+                  className={`min-w-0 overflow-hidden rounded-[1.5rem] border bg-white p-5 shadow-sm transition ${
                     isSelected ? "border-emerald-200 ring-2 ring-emerald-100" : "border-slate-100 hover:border-emerald-100"
                   }`}
                 >
-                  <div className="flex gap-3">
+                  <div className="flex min-w-0 gap-3">
                     <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-emerald-50 text-base font-black text-emerald-800">
                       {avatarLabel(resource.authorLabel)}
                     </div>
@@ -288,9 +288,9 @@ export function ResourceShareHub() {
                         </span>
                       </div>
 
-                      <h2 className="mt-3 break-words text-xl font-black text-slate-950">{resource.title}</h2>
+                      <h2 className="mt-3 break-words text-xl font-black text-slate-950 [overflow-wrap:anywhere]">{resource.title}</h2>
                       {resource.description ? (
-                        <p className="mt-2 whitespace-pre-wrap break-words text-sm font-bold leading-7 text-slate-700">
+                        <p className="mt-2 whitespace-pre-wrap break-words text-sm font-bold leading-7 text-slate-700 [overflow-wrap:anywhere]">
                           {resource.description}
                         </p>
                       ) : null}
@@ -298,7 +298,7 @@ export function ResourceShareHub() {
                       {hasAttachment ? (
                         <Link
                           href={`/resources/${resource.id}`}
-                          className="mt-4 flex max-w-xl items-center justify-between gap-3 rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-left transition hover:border-emerald-200 hover:bg-emerald-50"
+                          className="mt-4 flex min-w-0 max-w-full items-center justify-between gap-3 overflow-hidden rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-left transition hover:border-emerald-200 hover:bg-emerald-50 md:max-w-xl"
                         >
                           <div className="min-w-0">
                             <p className="truncate text-sm font-black text-slate-800">{resource.fileName ?? resource.title}</p>
@@ -342,16 +342,16 @@ export function ResourceShareHub() {
                   </div>
 
                   {isSelected ? (
-                    <div className="mt-5 rounded-3xl border border-slate-100 bg-slate-50 p-4">
+                    <div className="mt-5 min-w-0 overflow-hidden rounded-3xl border border-slate-100 bg-slate-50 p-4">
                       <div className="space-y-3">
                         {(selected.comments ?? []).length ? (
                           selected.comments?.map((comment) => (
-                            <div key={comment.id} className="rounded-2xl bg-white px-4 py-3">
+                            <div key={comment.id} className="min-w-0 overflow-hidden rounded-2xl bg-white px-4 py-3">
                               <div className="flex flex-wrap items-center gap-2 text-xs font-black text-slate-400">
                                 <span className="text-emerald-800">{comment.authorLabel}</span>
                                 <span>{formatDate(comment.createdAt)}</span>
                               </div>
-                              <p className="mt-2 whitespace-pre-wrap text-sm font-bold leading-6 text-slate-700">{comment.content}</p>
+                              <p className="mt-2 whitespace-pre-wrap break-words text-sm font-bold leading-6 text-slate-700 [overflow-wrap:anywhere]">{comment.content}</p>
                             </div>
                           ))
                         ) : (
@@ -390,8 +390,8 @@ export function ResourceShareHub() {
         </div>
       </div>
 
-      <aside className="xl:sticky xl:top-6 xl:self-start">
-        <div className="rounded-[2rem] border border-emerald-100 bg-white p-6 shadow-sm">
+      <aside className="min-w-0 xl:sticky xl:top-6 xl:self-start">
+        <div className="min-w-0 overflow-hidden rounded-[2rem] border border-emerald-100 bg-white p-6 shadow-sm">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-xs font-black uppercase tracking-[0.3em] text-emerald-700">Attachments</p>
@@ -428,15 +428,15 @@ export function ResourceShareHub() {
       <button
         type="button"
         onClick={() => setComposerOpen(true)}
-        className="fixed bottom-6 right-6 z-40 flex h-16 w-16 items-center justify-center rounded-full bg-emerald-700 text-3xl font-black text-white shadow-2xl shadow-emerald-900/20 transition hover:-translate-y-1 hover:bg-emerald-800"
+        className="fixed bottom-[max(1.5rem,env(safe-area-inset-bottom))] right-[max(1.5rem,env(safe-area-inset-right))] z-40 flex h-16 w-16 items-center justify-center rounded-full bg-emerald-700 text-3xl font-black text-white shadow-2xl shadow-emerald-900/20 transition hover:-translate-y-1 hover:bg-emerald-800"
         aria-label="新增分享"
       >
         +
       </button>
 
       {composerOpen ? (
-        <div className="fixed inset-0 z-50 flex items-end bg-slate-950/30 p-4 backdrop-blur-sm md:items-center md:justify-center">
-          <div className="w-full max-w-2xl rounded-[2rem] border border-emerald-100 bg-white p-5 shadow-2xl md:p-6">
+        <div className="fixed inset-0 z-50 flex items-end overflow-hidden bg-slate-950/30 p-4 backdrop-blur-sm md:items-center md:justify-center">
+          <div className="max-h-[calc(100dvh-2rem)] w-full max-w-[calc(100vw-2rem)] overflow-y-auto rounded-[2rem] border border-emerald-100 bg-white p-5 shadow-2xl md:max-w-2xl md:p-6">
             <div className="flex items-start justify-between gap-3">
               <div>
                 <p className="text-xs font-black uppercase tracking-[0.3em] text-emerald-700">New Post</p>
@@ -473,14 +473,14 @@ export function ResourceShareHub() {
                 <input
                   value={title}
                   onChange={(event) => setTitle(event.target.value)}
-                  className="rounded-2xl border border-slate-200 bg-white px-4 py-3 font-bold text-slate-800 outline-none focus:border-emerald-300"
+                  className="min-w-0 rounded-2xl border border-slate-200 bg-white px-4 py-3 font-bold text-slate-800 outline-none focus:border-emerald-300"
                   placeholder="標題，可空"
                   maxLength={90}
                 />
                 <select
                   value={category}
                   onChange={(event) => setCategory(event.target.value)}
-                  className="rounded-2xl border border-slate-200 bg-white px-4 py-3 font-bold text-slate-800 outline-none focus:border-emerald-300"
+                  className="min-w-0 rounded-2xl border border-slate-200 bg-white px-4 py-3 font-bold text-slate-800 outline-none focus:border-emerald-300"
                 >
                   {CATEGORIES.map((item) => (
                     <option key={item} value={item}>
@@ -492,12 +492,12 @@ export function ResourceShareHub() {
               <textarea
                 value={description}
                 onChange={(event) => setDescription(event.target.value)}
-                className="mt-3 min-h-[150px] w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 font-bold text-slate-700 outline-none focus:border-emerald-300"
+                className="mt-3 min-h-[150px] w-full min-w-0 rounded-2xl border border-slate-200 bg-white px-4 py-3 font-bold text-slate-700 outline-none focus:border-emerald-300"
                 placeholder="口訣、考點提醒、補充資訊，或說明這份檔案在幹嘛。"
                 maxLength={1800}
               />
               <div className="mt-3 flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
-                <div className="flex flex-wrap items-center gap-3">
+                <div className="flex min-w-0 flex-wrap items-center gap-3">
                   <input
                     ref={fileInputRef}
                     type="file"
@@ -512,7 +512,7 @@ export function ResourceShareHub() {
                   >
                     加附件
                   </button>
-                  <span className="text-sm font-bold text-slate-500">
+                  <span className="min-w-0 break-words text-sm font-bold text-slate-500 [overflow-wrap:anywhere]">
                     {file ? `${file.name} · ${formatFileSize(file.size)}` : "可不附檔，PDF / HTML / 圖片 12MB 以內"}
                   </span>
                 </div>
