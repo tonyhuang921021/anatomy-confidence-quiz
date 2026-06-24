@@ -54,6 +54,11 @@ const QUICK_ENTRIES = [
 const HOME_RELEASE_NOTES = [
   {
     time: "06/24",
+    title: "陽明詳解補回正確截圖",
+    body: "補齊 16 題被切錯、頁面不對或缺頁的陽明詳解；該看圖的地方現在不再考驗想像力。"
+  },
+  {
+    time: "06/24",
     title: "表格跟缺字不再裝謎語",
     body: "補回 IVIG、IL-10、寄生蟲宿主和診斷表格的掉字；選項不用再像被 PDF 咬過。"
   },
