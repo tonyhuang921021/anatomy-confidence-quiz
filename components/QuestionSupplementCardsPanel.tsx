@@ -1,10 +1,8 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import ReactMarkdown from "react-markdown";
-import rehypeSanitize from "rehype-sanitize";
-import remarkGfm from "remark-gfm";
 import { useAuth } from "@/components/AuthProvider";
+import { StudyNoteMarkdown } from "@/components/StudyNoteMarkdown";
 import {
   loadQuestionSupplementCards,
   uploadQuestionSupplementImage,
@@ -48,10 +46,8 @@ function getImageUrlsFromMarkdown(markdown: string) {
 
 function SupplementMarkdown({ markdown }: { markdown: string }) {
   return (
-    <div className="note-markdown text-sm leading-7 text-slate-700">
-      <ReactMarkdown remarkPlugins={[remarkGfm]} rehypePlugins={[rehypeSanitize]}>
-        {markdown}
-      </ReactMarkdown>
+    <div className="question-supplement-markdown">
+      <StudyNoteMarkdown markdown={markdown} />
     </div>
   );
 }

@@ -1104,6 +1104,24 @@ select {
     border-color: var(--line-soft);
   }
 
+  .question-supplement-markdown .note-markdown {
+    @apply text-sm leading-7 sm:text-base;
+    color: var(--ink-main);
+  }
+
+  .question-supplement-markdown .note-markdown > :first-child {
+    margin-top: 0;
+  }
+
+  .question-supplement-markdown .note-markdown p {
+    @apply leading-7;
+  }
+
+  .question-supplement-markdown .note-markdown img {
+    @apply mt-3 max-h-[28rem] rounded-2xl border object-contain shadow-sm;
+    border-color: var(--line-soft);
+  }
+
   .note-text-color-red {
     color: #ff1744;
   }
