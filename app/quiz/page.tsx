@@ -126,7 +126,11 @@ function getSimulationNavigatorButtonClass(confidenceLevel: ConfidenceLevel | nu
     return `${baseClass} border-yellow-300 bg-yellow-300 text-yellow-950 ring-yellow-200 hover:bg-yellow-400`;
   }
 
-  return `${baseClass} border-emerald-200 bg-emerald-100 text-emerald-950 ring-emerald-200 hover:bg-emerald-200`;
+  if (confidenceLevel === 4 || confidenceLevel === 5) {
+    return `${baseClass} border-emerald-200 bg-emerald-100 text-emerald-950 ring-emerald-200 hover:bg-emerald-200`;
+  }
+
+  return `${baseClass} border-slate-200 bg-white text-slate-600 ring-slate-200 hover:bg-slate-100`;
 }
 
 function decodeStartSettingsFromUrl(encodedSettings: string | null): QuizSettings | null {
@@ -2189,11 +2193,10 @@ export default function QuizPage() {
                   {questionSet.map((question, index) => {
                     const existingAttempt = session.attempts.find((attempt) => attempt.questionId === question.id);
                     const isCurrent = index === currentIndex;
-                    const navigatorConfidence =
-                      existingAttempt?.confidence ?? (isCurrent ? displayedConfidence : undefined);
+                    const navigatorConfidence = existingAttempt?.confidence;
                     const confidenceLabel = navigatorConfidence
                       ? getConfidenceLabel(navigatorConfidence)
-                      : "尚未標註，預設有把握";
+                      : "尚未作答";
                     return (
                       <button
                         key={question.id}
