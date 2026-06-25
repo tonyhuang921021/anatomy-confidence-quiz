@@ -2132,7 +2132,8 @@ export async function loadLeaderboard(limit = 50, options: { signal?: AbortSigna
   return payload.leaderboard;
 }
 
-const BACKGROUND_STATS_LOOKUP_LIMIT = 40;
+const BACKGROUND_STATS_LOOKUP_CHUNK_SIZE = 40;
+const BACKGROUND_STATS_LOOKUP_LIMIT = 160;
 const BACKGROUND_CLASSIFICATION_LOOKUP_LIMIT = 500;
 const BACKGROUND_DATA_CACHE_VERSION = "v4";
 const BACKGROUND_DATA_STORAGE_PREFIX = `aq:bg:${BACKGROUND_DATA_CACHE_VERSION}:`;
@@ -2288,9 +2289,12 @@ export async function loadQuestionCommunityStats(questionIds: string[]) {
     return true;
   });
 
-  if (missingQuestionIds.length > 0) {
+  for (let index = 0; index < missingQuestionIds.length; index += BACKGROUND_STATS_LOOKUP_CHUNK_SIZE) {
+    const requestIds = missingQuestionIds
+      .slice(index, index + BACKGROUND_STATS_LOOKUP_CHUNK_SIZE)
+      .sort();
+
     try {
-      const requestIds = [...missingQuestionIds].sort();
       const payload = await fetchBackgroundData<
         BackgroundPayloadBase & { stats?: QuestionAccuracyStatRow[] }
       >(
@@ -2303,7 +2307,7 @@ export async function loadQuestionCommunityStats(questionIds: string[]) {
       const mappedStatsByQuestionId = new Map(mappedStats.map((row) => [row.questionId, row] as const));
 
       if (isFreshBackgroundPayload(payload)) {
-        for (const questionId of missingQuestionIds) {
+        for (const questionId of requestIds) {
           writeBackgroundCache(
             `stats:${questionId}`,
             mappedStatsByQuestionId.get(questionId) ?? null,
@@ -2319,6 +2323,7 @@ export async function loadQuestionCommunityStats(questionIds: string[]) {
       if (cachedStats.size === 0) {
         throw error;
       }
+      break;
     }
   }
 
