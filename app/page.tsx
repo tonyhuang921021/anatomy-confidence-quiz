@@ -54,6 +54,11 @@ const QUICK_ENTRIES = [
 const HOME_RELEASE_NOTES = [
   {
     time: "06/25",
+    title: "線上同學省流回歸",
+    body: "頂端可以看現在幾個人在線，點一下才抓名單；不用即時查勤燒錢，也能知道誰還在跟國考互毆。"
+  },
+  {
+    time: "06/25",
     title: "藥理詳解不再裝熟",
     body: "修正 sirolimus 詳解，順手把酵素效率和甲狀腺素選項的下標排版抓回來。"
   },

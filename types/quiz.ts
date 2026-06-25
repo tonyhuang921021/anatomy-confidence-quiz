@@ -348,10 +348,20 @@ export type LeaderboardEntry = {
   updatedAt?: string;
 };
 
+export type OnlineVisitor = {
+  visitorId: string;
+  userId?: string;
+  label: string;
+  lastSeenAt: string;
+};
+
 export type VisitorStats = {
   totalVisitors: number;
   onlineVisitors: number;
   updatedAt: string;
+  online?: OnlineVisitor[];
+  degraded?: boolean;
+  stale?: boolean;
 };
 
 export type QuestionCommunityStats = {

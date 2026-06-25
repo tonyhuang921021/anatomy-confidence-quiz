@@ -1,12 +1,12 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { loadVisitorStats } from "@/lib/cloudSync";
 import { isSupabaseConfigured } from "@/lib/supabase/client";
 import { isSupabaseRecoveryMode, getRecoveryTimestamp } from "@/lib/supabase/recoveryMode";
-import type { VisitorStats } from "@/types/quiz";
+import type { OnlineVisitor, VisitorStats } from "@/types/quiz";
 
-const REFRESH_INTERVAL_MS = 60 * 60 * 1000;
+const REFRESH_INTERVAL_MS = 5 * 60 * 1000;
 
 const emptyStats: VisitorStats = {
   totalVisitors: 0,
@@ -18,10 +18,71 @@ type VisitorStatsPanelProps = {
   compact?: boolean;
 };
 
+function formatLastSeen(lastSeenAt: string) {
+  const timestamp = Date.parse(lastSeenAt);
+  if (!Number.isFinite(timestamp)) return "剛剛";
+  const minutes = Math.max(0, Math.floor((Date.now() - timestamp) / 60_000));
+  if (minutes < 1) return "剛剛";
+  return `${minutes} 分鐘前`;
+}
+
+function OnlineVisitorList({
+  visitors,
+  loading,
+  error,
+  stale
+}: {
+  visitors: OnlineVisitor[];
+  loading: boolean;
+  error: string;
+  stale: boolean;
+}) {
+  return (
+    <div className="absolute right-0 top-full z-[70] mt-2 w-[min(18rem,calc(100vw-2rem))] rounded-3xl border border-slate-200 bg-white p-3 text-left shadow-2xl shadow-slate-200/70">
+      <div className="flex items-center justify-between gap-3">
+        <p className="text-sm font-bold text-ink">現在在線</p>
+        {loading || stale ? (
+          <span className="rounded-full bg-amber-50 px-2 py-0.5 text-[10px] font-bold text-amber-700">
+            更新中
+          </span>
+        ) : null}
+      </div>
+      {error ? <p className="mt-2 text-xs font-semibold text-rose-600">{error}</p> : null}
+      <div className="mt-3 space-y-2">
+        {visitors.length > 0 ? (
+          visitors.map((visitor) => (
+            <div
+              key={`${visitor.visitorId}-${visitor.userId ?? "guest"}`}
+              className="flex min-w-0 items-center justify-between gap-3 rounded-2xl bg-slate-50 px-3 py-2"
+            >
+              <span className="min-w-0 truncate text-sm font-semibold text-slate-800">
+                {visitor.label}
+              </span>
+              <span className="shrink-0 text-[11px] font-semibold text-slate-500">
+                {formatLastSeen(visitor.lastSeenAt)}
+              </span>
+            </div>
+          ))
+        ) : (
+          <p className="rounded-2xl bg-slate-50 px-3 py-3 text-xs font-semibold text-slate-500">
+            目前沒有抓到登入中的同學。
+          </p>
+        )}
+      </div>
+      <p className="mt-3 text-[11px] leading-relaxed text-slate-500">
+        為了省流量，名單只在點開時更新；10 分鐘內有登入心跳才算在線。
+      </p>
+    </div>
+  );
+}
+
 export function VisitorStatsPanel({ compact = false }: VisitorStatsPanelProps) {
   const [stats, setStats] = useState<VisitorStats>(emptyStats);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [open, setOpen] = useState(false);
+  const [listLoading, setListLoading] = useState(false);
+  const wrapperRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
     if (isSupabaseRecoveryMode()) {
@@ -30,11 +91,6 @@ export function VisitorStatsPanel({ compact = false }: VisitorStatsPanelProps) {
         onlineVisitors: 0,
         updatedAt: getRecoveryTimestamp()
       });
-      setLoading(false);
-      return;
-    }
-
-    if (compact) {
       setLoading(false);
       return;
     }
@@ -50,7 +106,11 @@ export function VisitorStatsPanel({ compact = false }: VisitorStatsPanelProps) {
       try {
         const nextStats = await loadVisitorStats();
         if (!cancelled) {
-          setStats(nextStats);
+          setStats((previous) => ({
+            ...previous,
+            ...nextStats,
+            online: previous.online
+          }));
           setError("");
           setLoading(false);
         }
@@ -73,7 +133,42 @@ export function VisitorStatsPanel({ compact = false }: VisitorStatsPanelProps) {
       cancelled = true;
       window.clearInterval(intervalId);
     };
-  }, [compact]);
+  }, []);
+
+  useEffect(() => {
+    if (!open) return;
+
+    function handlePointerDown(event: PointerEvent) {
+      if (!wrapperRef.current?.contains(event.target as Node)) {
+        setOpen(false);
+      }
+    }
+
+    document.addEventListener("pointerdown", handlePointerDown);
+    return () => document.removeEventListener("pointerdown", handlePointerDown);
+  }, [open]);
+
+  async function refreshOnlineList() {
+    if (!isSupabaseConfigured() || isSupabaseRecoveryMode()) return;
+    setListLoading(true);
+    try {
+      const nextStats = await loadVisitorStats({ includeOnline: true });
+      setStats(nextStats);
+      setError("");
+    } catch (nextError) {
+      setError(nextError instanceof Error ? nextError.message : "線上名單稍後更新");
+    } finally {
+      setLoading(false);
+      setListLoading(false);
+    }
+  }
+
+  function toggleOnlineList() {
+    setOpen((current) => !current);
+    if (!open) {
+      void refreshOnlineList();
+    }
+  }
 
   if (!isSupabaseConfigured()) {
     if (compact) return null;
@@ -87,18 +182,24 @@ export function VisitorStatsPanel({ compact = false }: VisitorStatsPanelProps) {
   }
 
   if (compact) {
-    if (loading) {
-      return null;
-    }
-
     return (
-      <div className="flex min-w-0 flex-wrap items-center justify-end gap-2 text-xs font-semibold">
-        <span className="rounded-full bg-slate-100 px-3 py-1 text-slate-700">
-          累積訪客 {stats.totalVisitors}
-        </span>
-        <span className="rounded-full bg-slate-100 px-3 py-1 text-slate-700">
-          在線估算 {stats.onlineVisitors}
-        </span>
+      <div ref={wrapperRef} className="relative shrink-0">
+        <button
+          type="button"
+          onClick={toggleOnlineList}
+          className="rounded-full bg-emerald-50 px-3 py-1 text-[11px] font-bold text-emerald-800 ring-1 ring-emerald-100 transition hover:bg-emerald-100"
+          aria-expanded={open}
+        >
+          {loading ? "線上讀取中" : `線上 ${stats.onlineVisitors} 人`}
+        </button>
+        {open ? (
+          <OnlineVisitorList
+            visitors={stats.online ?? []}
+            loading={listLoading}
+            error={error}
+            stale={Boolean(stats.stale || stats.degraded)}
+          />
+        ) : null}
       </div>
     );
   }
@@ -106,17 +207,17 @@ export function VisitorStatsPanel({ compact = false }: VisitorStatsPanelProps) {
   return (
     <>
       <div className="rounded-3xl bg-slate-50 p-4">
-        <p className="text-sm text-slate-500">累積訪客</p>
-        <p className="mt-2 text-2xl font-bold text-ink">
-          {loading ? "..." : stats.totalVisitors}
-        </p>
-      </div>
-      <div className="rounded-3xl bg-slate-50 p-4">
-        <p className="text-sm text-slate-500">目前在線估算</p>
+        <p className="text-sm text-slate-500">目前在線</p>
         <p className="mt-2 text-2xl font-bold text-ink">
           {loading ? "..." : stats.onlineVisitors}
         </p>
-        <p className="mt-1 text-xs text-slate-500">以最近 2 分鐘內仍有活動的裝置估算</p>
+      </div>
+      <div className="rounded-3xl bg-slate-50 p-4">
+        <p className="text-sm text-slate-500">在線名單</p>
+        <p className="mt-2 text-2xl font-bold text-ink">
+          {stats.online?.length ?? 0}
+        </p>
+        <p className="mt-1 text-xs text-slate-500">以最近 10 分鐘登入心跳估算</p>
         {error ? <p className="mt-1 text-xs text-rose-600">{error}</p> : null}
       </div>
     </>

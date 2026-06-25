@@ -2571,9 +2571,10 @@ export async function loadConfirmedQuestionClassificationOverrides(questionIds?:
   );
 }
 
-export async function trackVisitorPresence(userId?: string | null) {
+export async function trackVisitorPresence(user?: User | null, accessToken?: string | null) {
   if (isSupabaseRecoveryMode()) return;
   if (!isSupabaseConfigured()) return;
+  if (!user?.id || !accessToken) return;
 
   const visitorId = getVisitorId();
   if (!visitorId) return;
@@ -2585,7 +2586,7 @@ export async function trackVisitorPresence(userId?: string | null) {
     },
     body: JSON.stringify({
       visitorId,
-      userId: userId ?? null
+      accessToken
     }),
     cache: "no-store"
   });
@@ -2596,7 +2597,7 @@ export async function trackVisitorPresence(userId?: string | null) {
   }
 }
 
-export async function loadVisitorStats(): Promise<VisitorStats> {
+export async function loadVisitorStats(options: { includeOnline?: boolean } = {}): Promise<VisitorStats> {
   if (isSupabaseRecoveryMode() || !isSupabaseConfigured()) {
     return {
       totalVisitors: 0,
@@ -2605,7 +2606,8 @@ export async function loadVisitorStats(): Promise<VisitorStats> {
     };
   }
 
-  const response = await fetch("/api/visitor-stats");
+  const query = options.includeOnline ? "?includeOnline=1" : "";
+  const response = await fetch(`/api/visitor-stats${query}`);
   const payload = (await response.json().catch(() => null)) as
     | { ok?: boolean; message?: string; stats?: VisitorStats }
     | null;

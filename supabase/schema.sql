@@ -214,15 +214,25 @@ with check ((select auth.role()) = 'service_role');
 create table if not exists public.site_visitors (
   visitor_id text primary key,
   user_id uuid references auth.users (id) on delete set null,
+  display_name text,
+  email text,
   first_seen_at timestamptz not null default now(),
   last_seen_at timestamptz not null default now()
 );
+
+alter table public.site_visitors
+  add column if not exists display_name text,
+  add column if not exists email text;
 
 create index if not exists site_visitors_last_seen_at_idx
 on public.site_visitors (last_seen_at desc);
 
 create index if not exists site_visitors_user_id_idx
 on public.site_visitors (user_id);
+
+create index if not exists site_visitors_online_users_idx
+on public.site_visitors (last_seen_at desc, user_id)
+where user_id is not null;
 
 revoke all on public.site_visitors from anon;
 revoke all on public.site_visitors from authenticated;

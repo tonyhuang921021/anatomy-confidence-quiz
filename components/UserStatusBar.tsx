@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useAuth } from "@/components/AuthProvider";
 import { getSyncStatusText, getSyncStatusTone } from "@/components/syncStatusText";
+import { VisitorStatsPanel } from "@/components/VisitorStatsPanel";
 
 export function UserStatusBar() {
   const pathname = usePathname();
@@ -30,6 +31,7 @@ export function UserStatusBar() {
         </Link>
         <div className="flex min-w-0 flex-wrap items-center justify-end gap-2 text-[11px] font-semibold">
           {!configured ? <span className="stat-chip">Supabase 未設定</span> : null}
+          {configured ? <VisitorStatsPanel compact /> : null}
           {!loading ? (
             <span className="stat-chip max-w-full break-all">
               {user?.email ?? "訪客模式"}
