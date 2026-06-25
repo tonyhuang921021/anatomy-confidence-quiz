@@ -108,6 +108,27 @@ function getDifficultyBadge(question: Question) {
   return null;
 }
 
+function getSimulationNavigatorButtonClass(confidenceLevel: ConfidenceLevel | null | undefined, isCurrent: boolean) {
+  const currentRing = isCurrent
+    ? "ring-2 ring-slate-950 ring-offset-2 ring-offset-white"
+    : "ring-1";
+  const baseClass = `min-h-10 rounded-xl text-sm font-black transition border ${currentRing}`;
+
+  if (confidenceLevel === 1) {
+    return `${baseClass} border-rose-300 bg-rose-500 text-white ring-rose-200 hover:bg-rose-600`;
+  }
+
+  if (confidenceLevel === 2) {
+    return `${baseClass} border-orange-300 bg-orange-400 text-white ring-orange-200 hover:bg-orange-500`;
+  }
+
+  if (confidenceLevel === 3) {
+    return `${baseClass} border-yellow-300 bg-yellow-300 text-yellow-950 ring-yellow-200 hover:bg-yellow-400`;
+  }
+
+  return `${baseClass} border-emerald-200 bg-emerald-100 text-emerald-950 ring-emerald-200 hover:bg-emerald-200`;
+}
+
 function decodeStartSettingsFromUrl(encodedSettings: string | null): QuizSettings | null {
   if (!encodedSettings) return null;
 
@@ -2168,20 +2189,23 @@ export default function QuizPage() {
                   {questionSet.map((question, index) => {
                     const existingAttempt = session.attempts.find((attempt) => attempt.questionId === question.id);
                     const isCurrent = index === currentIndex;
+                    const navigatorConfidence =
+                      existingAttempt?.confidence ?? (isCurrent ? displayedConfidence : undefined);
+                    const confidenceLabel = navigatorConfidence
+                      ? getConfidenceLabel(navigatorConfidence)
+                      : "尚未標註，預設有把握";
                     return (
                       <button
                         key={question.id}
                         type="button"
                         onClick={() => handleJumpToQuestion(index)}
                         disabled={isSubmittingAnswer}
-                        className={`min-h-10 rounded-xl text-sm font-semibold transition ${
+                        className={`${getSimulationNavigatorButtonClass(
+                          navigatorConfidence,
                           isCurrent
-                            ? "bg-brand-600 text-white"
-                            : existingAttempt
-                              ? "bg-slate-200 text-slate-800 hover:bg-slate-300"
-                              : "bg-white text-slate-600 ring-1 ring-slate-200 hover:bg-slate-100"
-                        } disabled:cursor-not-allowed disabled:opacity-60`}
-                        aria-label={`前往第 ${index + 1} 題`}
+                        )} disabled:cursor-not-allowed disabled:opacity-60`}
+                        aria-label={`前往第 ${index + 1} 題，${confidenceLabel}`}
+                        title={`第 ${index + 1} 題・${confidenceLabel}`}
                       >
                         {index + 1}
                       </button>
