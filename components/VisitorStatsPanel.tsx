@@ -52,7 +52,7 @@ function OnlineVisitorList({
         {visitors.length > 0 ? (
           visitors.map((visitor) => (
             <div
-              key={`${visitor.visitorId}-${visitor.userId ?? "guest"}`}
+              key={visitor.userId ?? visitor.visitorId}
               className="flex min-w-0 items-center justify-between gap-3 rounded-2xl bg-slate-50 px-3 py-2"
             >
               <span className="min-w-0 truncate text-sm font-semibold text-slate-800">

@@ -7,7 +7,8 @@ export const dynamic = "force-dynamic";
 export const revalidate = 0;
 
 const ONLINE_WINDOW_MS = 10 * 60 * 1000;
-const ONLINE_VISITOR_LIMIT = 30;
+const ONLINE_VISITOR_LIST_LIMIT = 30;
+const ONLINE_VISITOR_SCAN_LIMIT = 120;
 const VISITOR_STATS_CACHE_CONTROL = "public, max-age=30, s-maxage=60, stale-while-revalidate=300";
 const VISITOR_STATS_MEMORY_CACHE_MS = 45 * 1000;
 const VISITOR_STATS_DETAIL_MEMORY_CACHE_MS = 60 * 1000;
@@ -95,16 +96,26 @@ function getVisitorLabel(row: SiteVisitorRow) {
   return "已登入同學";
 }
 
-function mapOnlineVisitors(rows: SiteVisitorRow[] | null | undefined) {
-  return (rows ?? []).map((row) => ({
-    visitorId: row.visitor_id,
-    userId: row.user_id ?? undefined,
-    label: getVisitorLabel(row),
-    lastSeenAt: row.last_seen_at
-  }));
+function collectUniqueOnlineVisitors(rows: SiteVisitorRow[] | null | undefined) {
+  const seen = new Set<string>();
+  const visitors: NonNullable<VisitorStatsPayload["online"]> = [];
+
+  for (const row of rows ?? []) {
+    const key = row.user_id ?? row.visitor_id;
+    if (!key || seen.has(key)) continue;
+    seen.add(key);
+    visitors.push({
+      visitorId: row.visitor_id,
+      userId: row.user_id ?? undefined,
+      label: getVisitorLabel(row),
+      lastSeenAt: row.last_seen_at
+    });
+  }
+
+  return visitors;
 }
 
-function fetchOnlineVisitorCount(
+function fetchRecentOnlineVisitorRows(
   supabase: ReturnType<typeof getServiceSupabaseClient>,
   onlineSince: string
 ): Promise<VisitorStatsQueryResult> {
@@ -113,28 +124,11 @@ function fetchOnlineVisitorCount(
   return withServerTimeout(
     client
       .from("site_visitors")
-      .select("visitor_id", { count: "exact", head: true })
-      .not("user_id", "is", null)
-      .gte("last_seen_at", onlineSince),
-    1400,
-    "訪客統計讀取逾時"
-  );
-}
-
-function fetchOnlineVisitorList(
-  supabase: ReturnType<typeof getServiceSupabaseClient>,
-  onlineSince: string
-): Promise<VisitorStatsQueryResult> {
-  if (!supabase) throw new Error("Supabase 尚未設定");
-  const client = supabase as any;
-  return withServerTimeout(
-    client
-      .from("site_visitors")
-      .select("visitor_id,user_id,display_name,email,last_seen_at", { count: "exact" })
+      .select("visitor_id,user_id,display_name,email,last_seen_at")
       .not("user_id", "is", null)
       .gte("last_seen_at", onlineSince)
       .order("last_seen_at", { ascending: false })
-      .limit(ONLINE_VISITOR_LIMIT),
+      .limit(ONLINE_VISITOR_SCAN_LIMIT),
     1400,
     "訪客統計讀取逾時"
   );
@@ -181,18 +175,17 @@ export async function GET(request: NextRequest) {
 
   try {
     const onlineSince = new Date(Date.now() - ONLINE_WINDOW_MS).toISOString();
-    const result = includeOnline
-      ? await fetchOnlineVisitorList(supabase, onlineSince)
-      : await fetchOnlineVisitorCount(supabase, onlineSince);
+    const result = await fetchRecentOnlineVisitorRows(supabase, onlineSince);
 
     if (result.error) throw result.error;
 
-    const rows = includeOnline ? ((result.data ?? []) as SiteVisitorRow[]) : [];
+    const rows = (result.data ?? []) as SiteVisitorRow[];
+    const online = collectUniqueOnlineVisitors(rows);
     const stats: VisitorStatsPayload = {
       totalVisitors: 0,
-      onlineVisitors: result.count ?? rows.length,
+      onlineVisitors: online.length,
       updatedAt: new Date().toISOString(),
-      ...(includeOnline ? { online: mapOnlineVisitors(rows) } : {})
+      ...(includeOnline ? { online: online.slice(0, ONLINE_VISITOR_LIST_LIMIT) } : {})
     };
     setCachedStats(includeOnline, stats);
 
