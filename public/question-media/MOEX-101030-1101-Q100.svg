@@ -1,0 +1,40 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="840" height="430" viewBox="0 0 840 430" role="img" aria-label="診斷結果與疾病真實狀況表格">
+  <rect width="840" height="430" fill="#ffffff"/>
+  <style>
+    text { font-family: "PingFang TC", "Noto Sans CJK TC", "Microsoft JhengHei", sans-serif; fill: #0f172a; }
+    .title { font-size: 28px; font-weight: 700; }
+    .head { font-size: 23px; font-weight: 700; }
+    .cell { font-size: 25px; font-weight: 600; }
+    .line { stroke: #334155; stroke-width: 2; }
+    .shade { fill: #e2e8f0; }
+  </style>
+  <text class="title" x="510" y="56" text-anchor="middle">疾病真實狀況</text>
+  <rect class="shade" x="60" y="90" width="720" height="60"/>
+  <line class="line" x1="60" y1="90" x2="780" y2="90"/>
+  <line class="line" x1="60" y1="150" x2="780" y2="150"/>
+  <line class="line" x1="60" y1="210" x2="780" y2="210"/>
+  <line class="line" x1="60" y1="270" x2="780" y2="270"/>
+  <line class="line" x1="60" y1="330" x2="780" y2="330"/>
+  <line class="line" x1="60" y1="390" x2="780" y2="390"/>
+  <line class="line" x1="60" y1="90" x2="60" y2="390"/>
+  <line class="line" x1="260" y1="90" x2="260" y2="390"/>
+  <line class="line" x1="430" y1="90" x2="430" y2="390"/>
+  <line class="line" x1="600" y1="90" x2="600" y2="390"/>
+  <line class="line" x1="780" y1="90" x2="780" y2="390"/>
+  <text class="head" x="160" y="128" text-anchor="middle">診斷結果</text>
+  <text class="head" x="345" y="128" text-anchor="middle">有</text>
+  <text class="head" x="515" y="128" text-anchor="middle">無</text>
+  <text class="head" x="690" y="128" text-anchor="middle">Total</text>
+  <text class="head" x="160" y="188" text-anchor="middle">有</text>
+  <text class="cell" x="345" y="188" text-anchor="middle">68</text>
+  <text class="cell" x="515" y="188" text-anchor="middle">6</text>
+  <text class="cell" x="690" y="188" text-anchor="middle">74</text>
+  <text class="head" x="160" y="248" text-anchor="middle">無</text>
+  <text class="cell" x="345" y="248" text-anchor="middle">12</text>
+  <text class="cell" x="515" y="248" text-anchor="middle">114</text>
+  <text class="cell" x="690" y="248" text-anchor="middle">126</text>
+  <text class="head" x="160" y="308" text-anchor="middle">Total</text>
+  <text class="cell" x="345" y="308" text-anchor="middle">80</text>
+  <text class="cell" x="515" y="308" text-anchor="middle">120</text>
+  <text class="cell" x="690" y="308" text-anchor="middle">200</text>
+</svg>

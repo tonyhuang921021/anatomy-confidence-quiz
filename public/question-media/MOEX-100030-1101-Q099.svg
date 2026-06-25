@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="760" height="360" viewBox="0 0 760 360" role="img" aria-label="疾病篩選結果 2x2 表格">
+  <rect width="760" height="360" fill="#ffffff"/>
+  <style>
+    text { font-family: "PingFang TC", "Noto Sans CJK TC", "Microsoft JhengHei", sans-serif; fill: #0f172a; }
+    .title { font-size: 28px; font-weight: 700; }
+    .head { font-size: 24px; font-weight: 700; }
+    .cell { font-size: 26px; font-weight: 600; }
+    .line { stroke: #334155; stroke-width: 2; }
+    .shade { fill: #e2e8f0; }
+  </style>
+  <text class="title" x="380" y="56" text-anchor="middle">疾病狀態</text>
+  <rect class="shade" x="60" y="90" width="640" height="62"/>
+  <line class="line" x1="60" y1="90" x2="700" y2="90"/>
+  <line class="line" x1="60" y1="152" x2="700" y2="152"/>
+  <line class="line" x1="60" y1="214" x2="700" y2="214"/>
+  <line class="line" x1="60" y1="276" x2="700" y2="276"/>
+  <line class="line" x1="60" y1="338" x2="700" y2="338"/>
+  <line class="line" x1="60" y1="90" x2="60" y2="338"/>
+  <line class="line" x1="260" y1="90" x2="260" y2="338"/>
+  <line class="line" x1="480" y1="90" x2="480" y2="338"/>
+  <line class="line" x1="700" y1="90" x2="700" y2="338"/>
+  <text class="head" x="160" y="130" text-anchor="middle">篩檢結果</text>
+  <text class="head" x="370" y="130" text-anchor="middle">有病</text>
+  <text class="head" x="590" y="130" text-anchor="middle">無病</text>
+  <text class="head" x="160" y="192" text-anchor="middle">陽性</text>
+  <text class="cell" x="370" y="192" text-anchor="middle">a</text>
+  <text class="cell" x="590" y="192" text-anchor="middle">c</text>
+  <text class="head" x="160" y="254" text-anchor="middle">陰性</text>
+  <text class="cell" x="370" y="254" text-anchor="middle">b</text>
+  <text class="cell" x="590" y="254" text-anchor="middle">d</text>
+</svg>

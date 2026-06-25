@@ -1,6 +1,12 @@
 {
+  "MOEX-100030-1101-Q099": {
+    "stemImage": "/question-media/MOEX-100030-1101-Q099.svg"
+  },
   "MOEX-100030-2101-Q093": {
     "stemImage": "/question-media/MOEX-100030-2101-Q093.png"
+  },
+  "MOEX-101030-1101-Q100": {
+    "stemImage": "/question-media/MOEX-101030-1101-Q100.svg"
   },
   "MOEX-100140-1101-Q079": {
     "stemImage": "/question-media/MOEX-100140-1101-Q079.png"

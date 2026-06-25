@@ -993,6 +993,17 @@ function applyQuestionMedia(question: Question): Question {
 }
 
 const questionTextOverrides: Record<string, QuestionTextOverride> = {
+  "MOEX-100030-1101-Q099": {
+    stem:
+      "某種疾病的篩選方法研究結果如下表，則下列那一個是假陽性率（false positivity）？\n\n疾病狀態\n篩檢結果｜有病｜無病\n陽性｜a｜c\n陰性｜b｜d",
+    options: {
+      A: "a/(a+b)",
+      B: "a/(a+c)",
+      C: "d/(b+d)",
+      D: "c/(c+d)"
+    },
+    testedConcept: "假陽性率為沒有病者中篩檢陽性的比例，即 c/(c+d)。"
+  },
   "MOEX-101030-1101-Q100": {
     stem:
       "依下表數據計算下列各指標，下列何者錯誤？\n\n疾病真實狀況\n診斷結果｜有｜無｜Total\n有｜68｜6｜74\n無｜12｜114｜126\nTotal｜80｜120｜200",
@@ -1001,6 +1012,32 @@ const questionTextOverrides: Record<string, QuestionTextOverride> = {
       B: "特異度為 95%",
       C: "陽性預測值為 85%",
       D: "陰性預測值為 90.5%"
+    }
+  },
+  "MOEX-107100-1301-Q058": {
+    options: {
+      A: "活化小動脈血管平滑肌 β1 腎上腺素型受器（β1 adrenergic receptors）",
+      B: "開啟小動脈血管平滑肌細胞上鈣離子通道（calcium channel）",
+      C: "增加小動脈一氧化氮（NO）的量",
+      D: "活化血管張力素轉換酶（angiotensin-converting enzyme）"
+    }
+  },
+  "MOEX-110020-1301-Q057": {
+    options: {
+      A: "胎兒與母體的血紅素皆為 α2β2 chain，因此氧氣量相同",
+      B: "母體的血紅素為 α2β2 chain，胎兒的血紅素為 ε2ζ2 chain，因此母體血紅素較易接合氧氣",
+      C: "母體的血紅素為 α2β2 chain，胎兒的血紅素為 α4 chain，因此胎兒血紅素較易接合氧氣",
+      D: "母體的血紅素為 α2β2 chain，胎兒的血紅素為 α2γ2 chain，因此胎兒血紅素較易接合氧氣"
+    }
+  },
+  "MOEX-111100-1301-Q066": {
+    stem:
+      "計算純水清除率（clearance of free-water, C_H2O）的公式是 C_H2O = V（urine flow rate）- C_osm（clearance of osmoles）。而 C_osm 之定義為：V x (U_osm/P_osm)，其中 U_osm 與 P_osm 分別為尿液與血漿之 osmolality。下列何種生理狀態，最可能使純水清除率（C_H2O）成為負值？",
+    options: {
+      A: "飲用大量純水之後",
+      B: "腎小球濾過率（glomerular filtration rate）增加",
+      C: "血中抗利尿荷爾蒙（antidiuretic hormone）增加",
+      D: "溶質清除率（C_osm）減少"
     }
   },
   "MOEX-103100-1101-Q070": {
