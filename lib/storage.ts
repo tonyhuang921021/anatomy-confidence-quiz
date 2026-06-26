@@ -1000,11 +1000,24 @@ function savePendingCompletedSessionUploadsForUser(userId: string, sessions: Qui
     .slice(-PENDING_COMPLETED_SESSION_UPLOAD_LIMIT);
   const payload = JSON.stringify(normalized.map(compactSessionForStorage));
   const didPersist = safeLocalStorageSetItem(scopedKey, payload);
+  const didStore = didPersist ? true : safeSessionStorageSetItem(scopedKey, payload);
+
   if (didPersist) {
     safeSessionStorageRemoveItem(scopedKey);
-    return true;
   }
-  return safeSessionStorageSetItem(scopedKey, payload);
+
+  completedSessionsMemoryCache.delete(userId);
+  completedSessionIdMemoryCache.delete(userId);
+
+  if (userId === getActiveStorageUser()) {
+    window.dispatchEvent(
+      new CustomEvent("completed-sessions-change", {
+        detail: loadCompletedSessionsForUser(userId)
+      })
+    );
+  }
+
+  return didStore;
 }
 
 export function queuePendingCompletedSessionUploadForUser(userId: string, sessions: QuizSession | QuizSession[]) {
@@ -1032,19 +1045,22 @@ export function loadCompletedSessionsForUser(userId: string): QuizSession[] {
   if (cachedSessions) return cachedSessions;
 
   const cloudSessions = loadCloudCompletedSessionsForUser(userId);
+  const pendingSessions = loadPendingCompletedSessionUploadsForUser(userId);
   const scopedKey = getScopedKeyForUser(COMPLETED_SESSIONS_KEY, userId);
   const raw =
     safeLocalStorageGetItem(scopedKey) ??
     (userId === GUEST_USER_ID ? getLegacyOrScopedRaw(COMPLETED_SESSIONS_KEY) : null);
   if (!raw) {
-    cacheCompletedSessionsForUser(userId, cloudSessions);
-    return cloudSessions;
+    const normalized = normalizeCompletedSessionList([...cloudSessions, ...pendingSessions]);
+    cacheCompletedSessionsForUser(userId, normalized);
+    return normalized;
   }
 
   if (raw.length > COMPLETED_SESSIONS_HEAVY_READ_LIMIT) {
     if (raw.length > COMPLETED_SESSIONS_UPLOAD_RECOVERY_READ_LIMIT) {
       const normalized = normalizeCompletedSessionList([
         ...cloudSessions,
+        ...pendingSessions,
         ...loadRecentLocalCompletedSessionsForUploadForUser(userId)
       ]);
       cacheCompletedSessionsForUser(userId, normalized);
@@ -1053,7 +1069,8 @@ export function loadCompletedSessionsForUser(userId: string): QuizSession[] {
 
     const normalized = normalizeCompletedSessionList([
       ...parseCompletedSessionsRaw(raw),
-      ...cloudSessions
+      ...cloudSessions,
+      ...pendingSessions
     ]);
     cacheCompletedSessionsForUser(userId, normalized);
     return normalized;
@@ -1061,7 +1078,8 @@ export function loadCompletedSessionsForUser(userId: string): QuizSession[] {
 
   const normalized = normalizeCompletedSessionList([
     ...parseCompletedSessionsRaw(raw),
-    ...cloudSessions
+    ...cloudSessions,
+    ...pendingSessions
   ]);
   cacheCompletedSessionsForUser(userId, normalized);
   return normalized;

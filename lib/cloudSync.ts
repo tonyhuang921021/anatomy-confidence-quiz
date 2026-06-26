@@ -30,6 +30,7 @@ import {
   getCompletedSessionsStorageLengthForUser,
   getCanonicalSessionId,
   loadCompletedHistorySessionsForUser,
+  loadCloudCompletedSessionsForUser,
   loadPendingCompletedSessionUploadsForUser,
   loadCurrentSession,
   loadCurrentSessionForUser,
@@ -1926,6 +1927,10 @@ export async function pushCompletedSessionToSupabase(session: QuizSession) {
       upsertSessionsForUser(data.user.id, canonicalSessions),
       CLOUD_SYNC_BATCH_TIMEOUT_MS,
       "完成紀錄雲端同步逾時，先保留本機紀錄。"
+    );
+    saveCloudCompletedSessionsForUser(
+      data.user.id,
+      mergeSessions(loadCloudCompletedSessionsForUser(data.user.id), canonicalSessions)
     );
     removePendingCompletedSessionUploadsForUser(data.user.id, canonicalSessions);
     void syncLeaderboardProfileForCurrentUser(data.user, loadCompletedSessions()).catch((error) => {
