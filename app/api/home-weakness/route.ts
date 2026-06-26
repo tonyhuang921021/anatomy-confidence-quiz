@@ -9,7 +9,7 @@ export const revalidate = 0;
 
 const HOME_WEAKNESS_CACHE_TTL_MS = 12 * 60 * 60 * 1000;
 const ACTIVE_USER_WINDOW_MS = 12 * 60 * 60 * 1000;
-const HOME_WEAKNESS_CACHE_CONTROL = "private, max-age=60";
+const HOME_WEAKNESS_CACHE_CONTROL = "private, max-age=1800, stale-while-revalidate=3600";
 
 type WeaknessSnapshot = {
   totalAttempts: number;

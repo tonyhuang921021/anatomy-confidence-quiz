@@ -12,9 +12,9 @@ const MAX_IDS_BY_KIND: Record<BackgroundDataKind, number> = {
 };
 
 const CACHE_CONTROL_BY_KIND: Record<BackgroundDataKind, string> = {
-  stats: "public, max-age=300, s-maxage=1800, stale-while-revalidate=3600",
-  explanations: "public, max-age=300, s-maxage=1800, stale-while-revalidate=7200",
-  classifications: "public, max-age=1800, s-maxage=21600, stale-while-revalidate=86400"
+  stats: "public, max-age=900, s-maxage=3600, stale-while-revalidate=21600",
+  explanations: "public, max-age=1800, s-maxage=21600, stale-while-revalidate=86400",
+  classifications: "public, max-age=21600, s-maxage=86400, stale-while-revalidate=172800"
 };
 const NO_STORE_CACHE_CONTROL = "no-store";
 
@@ -67,7 +67,7 @@ function getQuestionIds(request: NextRequest, kind: BackgroundDataKind) {
     .map((id) => id.trim())
     .filter(Boolean) ?? [];
 
-  return Array.from(new Set(ids)).slice(0, MAX_IDS_BY_KIND[kind]);
+  return Array.from(new Set(ids)).sort().slice(0, MAX_IDS_BY_KIND[kind]);
 }
 
 function shouldLoadAllClassifications(request: NextRequest) {

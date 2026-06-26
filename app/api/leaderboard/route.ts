@@ -7,7 +7,7 @@ import type { LeaderboardEntry } from "@/types/quiz";
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
 
-const LEADERBOARD_CACHE_CONTROL = "public, max-age=30, s-maxage=60, stale-while-revalidate=300";
+const LEADERBOARD_CACHE_CONTROL = "public, max-age=60, s-maxage=300, stale-while-revalidate=900";
 const DEGRADED_CACHE_CONTROL = "no-store";
 
 const leaderboardCache = new Map<number, { leaderboard: LeaderboardEntry[]; updatedAt: string }>();

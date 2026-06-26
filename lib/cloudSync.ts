@@ -2139,10 +2139,10 @@ const BACKGROUND_DATA_CACHE_VERSION = "v4";
 const BACKGROUND_DATA_STORAGE_PREFIX = `aq:bg:${BACKGROUND_DATA_CACHE_VERSION}:`;
 const BACKGROUND_DATA_LOCAL_STORAGE_MAX_BYTES = 180_000;
 const BACKGROUND_DATA_TTL_MS = {
-  stats: 5 * 60 * 1000,
-  explanations: 30 * 60 * 1000,
-  classifications: 30 * 60 * 1000,
-  allClassifications: 6 * 60 * 60 * 1000
+  stats: 30 * 60 * 1000,
+  explanations: 6 * 60 * 60 * 1000,
+  classifications: 12 * 60 * 60 * 1000,
+  allClassifications: 24 * 60 * 60 * 1000
 };
 
 type BackgroundPayloadBase = {

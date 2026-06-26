@@ -43,7 +43,7 @@ const RECENT_SESSION_ROLLUP_LIMIT = 80;
 const FULL_SESSION_ROLLUP_PAGE_SIZE = 1000;
 const ATTEMPT_FALLBACK_CHUNK_SIZE = 50;
 const ROLLUP_LOOKUP_CHUNK_SIZE = 200;
-const LEADERBOARD_PROFILE_MIN_REFRESH_MS = 5 * 60_000;
+const LEADERBOARD_PROFILE_MIN_REFRESH_MS = 15 * 60_000;
 const MAX_REASONABLE_SESSION_QUESTION_COUNT = 500;
 
 function getServiceSupabaseClient() {
@@ -424,7 +424,8 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ ok: true, leaderboard: mapProfileToSummary(existingProfile), cached: true });
   }
 
-  const shouldFullRefresh = body.forceFullRefresh || !(await hasAnyRollup(supabase, user.id));
+  const profileAlreadyHasRollups = Number(existingProfile?.total_sessions ?? 0) > 0;
+  const shouldFullRefresh = body.forceFullRefresh || (!profileAlreadyHasRollups && !(await hasAnyRollup(supabase, user.id)));
   await ensureSessionRollups(supabase, user.id, shouldFullRefresh);
   const summary = await summarizeRollups(supabase, user.id);
 
