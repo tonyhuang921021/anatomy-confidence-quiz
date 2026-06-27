@@ -904,13 +904,8 @@ export function saveCompletedSessions(sessions: QuizSession[]) {
     buildCompletedQuestionHistoryEntriesFromSessions(normalized)
   );
 
-  let persisted = normalized.map(compactSessionForStorage);
-  let didPersist = safeLocalStorageSetItem(scopedKey, JSON.stringify(persisted));
-
-  while (!didPersist && persisted.length > 1) {
-    persisted = persisted.slice(1);
-    didPersist = safeLocalStorageSetItem(scopedKey, JSON.stringify(persisted));
-  }
+  const persisted = normalized.map(compactSessionForStorage);
+  const didPersist = safeLocalStorageSetItem(scopedKey, JSON.stringify(persisted));
 
   if (!didPersist) {
     window.dispatchEvent(new CustomEvent("completed-sessions-change", { detail: normalized }));
@@ -967,8 +962,19 @@ export function saveCloudCompletedSessionsForUser(userId: string, sessions: Quiz
     JSON.stringify(normalized.map(compactSessionForStorage))
   );
 
-  completedSessionsMemoryCache.delete(userId);
-  completedSessionIdMemoryCache.delete(userId);
+  if (didPersist) {
+    completedSessionsMemoryCache.delete(userId);
+    completedSessionIdMemoryCache.delete(userId);
+  } else {
+    cacheCompletedSessionsForUser(
+      userId,
+      normalizeCompletedSessionList([
+        ...(completedSessionsMemoryCache.get(userId) ?? []),
+        ...normalized,
+        ...loadPendingCompletedSessionUploadsForUser(userId)
+      ])
+    );
+  }
 
   if (userId === getActiveStorageUser()) {
     window.dispatchEvent(

@@ -707,7 +707,7 @@ function buildSessionPayloadForCloud(session: QuizSession): Partial<QuizSession>
     generatedQuestions: shouldRetainGeneratedQuestions ? generatedQuestions : undefined,
     currentQuestionIndex: session.completedAt ? undefined : compacted.currentQuestionIndex,
     isReviewingAnswer: session.completedAt ? undefined : compacted.isReviewingAnswer,
-    attempts: session.completedAt ? undefined : compacted.attempts.length > 0 ? compacted.attempts : undefined
+    attempts: compacted.attempts.length > 0 ? compacted.attempts : undefined
   };
 }
 
