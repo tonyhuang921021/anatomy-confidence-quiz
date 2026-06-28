@@ -922,6 +922,26 @@ function buildQuestionScoreMap(
   });
 }
 
+type ScoredQuestionItem = ReturnType<typeof buildQuestionScoreMap>[number];
+
+function selectFreshQuestionIdsBeforeReviewFill(
+  scored: ScoredQuestionItem[],
+  count: number
+) {
+  const sorted = [...scored].sort((a, b) => b.score - a.score);
+  const fresh = sorted.filter((item) => !item.history);
+  const reviewFill = sorted.filter((item) => item.history);
+  const selected = diversifyBySection(fresh, Math.min(count, fresh.length), 4);
+
+  if (selected.length < count) {
+    selected.push(
+      ...diversifyBySection(reviewFill, count - selected.length, 4)
+    );
+  }
+
+  return selected.slice(0, count).map((item) => item.question.id);
+}
+
 function filterQuestionPool(questions: Question[], settings: QuizSettings) {
   const yearRange =
     typeof settings.yearFrom === "number" && typeof settings.yearTo === "number"
@@ -1004,14 +1024,16 @@ export function createQuestionOrder(
     );
   }
 
-  return keepFollowUpQuestionsTogether(
-    diversifyBySection(
-      scored.sort((a, b) => b.score - a.score),
-      count,
-      4
-    ).map((item) => item.question.id),
-    sourceQuestionMap
-  );
+  const questionIds =
+    settings.excludePreviouslyAnswered
+      ? selectFreshQuestionIdsBeforeReviewFill(scored, count)
+      : diversifyBySection(
+          scored.sort((a, b) => b.score - a.score),
+          count,
+          4
+        ).map((item) => item.question.id);
+
+  return keepFollowUpQuestionsTogether(questionIds, sourceQuestionMap);
 }
 
 export function getReviewQuestionItems(
