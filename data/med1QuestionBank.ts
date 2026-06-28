@@ -459,6 +459,16 @@ const importedAnswerOverrideMap: Record<
     acceptedAnswers: ["A", "B"],
     answerCreditType: "multiple_accepted"
   },
+  "MOEX-113090-2301-Q034": {
+    answer: "D",
+    acceptedAnswers: ["B", "D"],
+    answerCreditType: "multiple_accepted"
+  },
+  "MOEX-113090-2301-Q083": {
+    answer: "B",
+    acceptedAnswers: ["B", "C", "D"],
+    answerCreditType: "multiple_accepted"
+  },
   "MOEX-111100-1301-Q062": {
     answer: "A",
     answerCreditType: "all_credit"
@@ -993,6 +1003,42 @@ function applyQuestionMedia(question: Question): Question {
 }
 
 const questionTextOverrides: Record<string, QuestionTextOverride> = {
+  "MOEX-109100-2301-Q021": {
+    stem:
+      "抗體多變區（variable domain）基因 V、D、J 片段重組（recombination）是產生多樣性抗體的主要機制，下列哪一種酵素沒有參與這一部分抗體基因重組的過程？",
+    options: {
+      A: "activation-induced cytidine deaminase（AID）",
+      B: "DNA-dependent protein kinase（DNA-PK）",
+      C: "recombination-activating gene（RAG）",
+      D: "DNA ligase IV"
+    }
+  },
+  "MOEX-113090-2301-Q034": {
+    answer: "D",
+    acceptedAnswers: ["B", "D"],
+    answerCreditType: "multiple_accepted",
+    explanation:
+      "本題官方開放 B、D 給分。Cryptosporidium 主要以 oocyst 經糞口／水源傳播，寄生於腸道上皮刷狀緣附近；腹瀉糞便中典型診斷重點是 oocyst，不是大量活動體（trophozoites）。因此 D 明確可採計；B 的「僅存在於」表述過度絕對，官方也開放給分。",
+    optionAnalysis: {
+      A: "不選。C. hominis 與 C. parvum 是人類感染常見種。",
+      B: "開放給分。Cryptosporidium 與腸道上皮刷狀緣相關，但「僅存在於」表述過度絕對。",
+      C: "不選。水源傳播是 cryptosporidiosis 的重要傳播方式。",
+      D: "開放給分。診斷重點是 oocyst；把腹瀉糞便中大量 trophozoites 當作特徵不適當。"
+    }
+  },
+  "MOEX-113090-2301-Q083": {
+    answer: "B",
+    acceptedAnswers: ["B", "C", "D"],
+    answerCreditType: "multiple_accepted",
+    explanation:
+      "本題官方開放 B、C、D 給分。Microscopic polyangiitis 是小血管壞死性血管炎，典型為非肉芽腫性發炎；Kawasaki disease 與 Buerger disease 也不是以顯微鏡下肉芽腫性發炎為主要典型表現。故依官方疑義採計 B、C、D。",
+    optionAnalysis: {
+      A: "不選。Churg-Strauss syndrome（eosinophilic granulomatosis with polyangiitis）可見肉芽腫性發炎，較不符合「最少出現」。",
+      B: "開放給分。Microscopic polyangiitis 典型為非肉芽腫性小血管炎。",
+      C: "開放給分。Kawasaki disease 不是以肉芽腫性發炎為典型病理。",
+      D: "開放給分。Buerger disease 主要為節段性血栓性血管炎，非典型肉芽腫性血管炎。"
+    }
+  },
   "MOEX-100030-1101-Q099": {
     stem:
       "某種疾病的篩選方法研究結果如下表，則下列那一個是假陽性率（false positivity）？\n\n疾病狀態\n篩檢結果｜有病｜無病\n陽性｜a｜c\n陰性｜b｜d",
@@ -1014,6 +1060,12 @@ const questionTextOverrides: Record<string, QuestionTextOverride> = {
       D: "陰性預測值為 90.5%"
     }
   },
+  "MOEX-103100-1101-Q039": {
+    options: {
+      C: "腦下垂體前葉內，分泌激乳素（prolactin）或生長激素（growth hormone）的細胞是嗜酸性細胞（acidophil）",
+      D: "嬰兒吸吮母親乳頭會刺激催產素（oxytocin）之釋放"
+    }
+  },
   "MOEX-107100-1301-Q058": {
     options: {
       A: "活化小動脈血管平滑肌 β1 腎上腺素型受器（β1 adrenergic receptors）",
@@ -1022,12 +1074,42 @@ const questionTextOverrides: Record<string, QuestionTextOverride> = {
       D: "活化血管張力素轉換酶（angiotensin-converting enzyme）"
     }
   },
+  "MOEX-107020-5301-Q095": {
+    stem: "粒線體氧化磷酸化的過程所產生 H2O2，可由下列哪一種酵素去除？",
+    explanation:
+      "Glutathione peroxidase 利用還原型 glutathione 將 H2O2 還原為水；glutathione reductase 則再生 GSH。"
+  },
   "MOEX-110020-1301-Q057": {
     options: {
       A: "胎兒與母體的血紅素皆為 α2β2 chain，因此氧氣量相同",
       B: "母體的血紅素為 α2β2 chain，胎兒的血紅素為 ε2ζ2 chain，因此母體血紅素較易接合氧氣",
       C: "母體的血紅素為 α2β2 chain，胎兒的血紅素為 α4 chain，因此胎兒血紅素較易接合氧氣",
       D: "母體的血紅素為 α2β2 chain，胎兒的血紅素為 α2γ2 chain，因此胎兒血紅素較易接合氧氣"
+    }
+  },
+  "MOEX-115020-1301-Q062": {
+    options: {
+      A: "此區域的肺泡內二氧化碳分壓（PACO2）升高，進入此區域肺泡之通氣量（ventilation, V）增加",
+      B: "此區域的肺泡內二氧化碳分壓（PACO2）升高，進入此區域肺泡之通氣量（ventilation, V）減少",
+      C: "此區域的肺泡內二氧化碳分壓（PACO2）降低，進入此區域肺泡之通氣量（ventilation, V）增加",
+      D: "此區域的肺泡內二氧化碳分壓（PACO2）降低，進入此區域肺泡之通氣量（ventilation, V）減少"
+    }
+  },
+  "MOEX-115020-1301-Q077": {
+    stem: "有關 vitamin D3 代謝和功能，下列敘述何者最適切？",
+    options: {
+      A: "1α,25-二羥基維生素 D3（1α,25-dihydroxyvitamin D3）可經由陽光紫外線在皮膚中形成膽鈣化醇（cholecalciferol）",
+      B: "1α,25-二羥基維生素 D3（1α,25-dihydroxyvitamin D3）與特定核受體蛋白相互作用來調節基因表現",
+      C: "7-脫氫膽固醇（7-dehydrocholesterol）調節腸道鈣吸收",
+      D: "calcitriol 在肝和腎臟中形成 vitamin D3"
+    }
+  },
+  "MOEX-106100-2301-Q023": {
+    options: {
+      A: "第一型輔助性 T 細胞（Th1）",
+      B: "第一型調節性 T 細胞（Tr1）",
+      C: "第十七型輔助性 T 細胞（Th17）",
+      D: "CD4+ CD25+ T 細胞"
     }
   },
   "MOEX-111100-1301-Q066": {
