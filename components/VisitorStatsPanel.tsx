@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, type CSSProperties } from "react";
 import { loadVisitorStats } from "@/lib/cloudSync";
 import { isSupabaseConfigured } from "@/lib/supabase/client";
 import { isSupabaseRecoveryMode, getRecoveryTimestamp } from "@/lib/supabase/recoveryMode";
@@ -30,15 +30,20 @@ function OnlineVisitorList({
   visitors,
   loading,
   error,
-  stale
+  stale,
+  style
 }: {
   visitors: OnlineVisitor[];
   loading: boolean;
   error: string;
   stale: boolean;
+  style?: CSSProperties;
 }) {
   return (
-    <div className="absolute right-0 top-full z-[70] mt-2 w-[min(18rem,calc(100vw-2rem))] rounded-3xl border border-slate-200 bg-white p-3 text-left shadow-2xl shadow-slate-200/70">
+    <div
+      className="fixed z-[120] max-h-[calc(100dvh-5rem)] w-[min(18rem,calc(100vw-2rem))] overflow-y-auto rounded-3xl border border-slate-200 bg-white p-3 text-left shadow-2xl shadow-slate-200/70"
+      style={style}
+    >
       <div className="flex items-center justify-between gap-3">
         <p className="text-sm font-bold text-ink">現在在線</p>
         {loading || stale ? (
@@ -82,7 +87,9 @@ export function VisitorStatsPanel({ compact = false }: VisitorStatsPanelProps) {
   const [error, setError] = useState("");
   const [open, setOpen] = useState(false);
   const [listLoading, setListLoading] = useState(false);
+  const [panelPosition, setPanelPosition] = useState<CSSProperties>({ right: 16, top: 56 });
   const wrapperRef = useRef<HTMLDivElement | null>(null);
+  const buttonRef = useRef<HTMLButtonElement | null>(null);
 
   useEffect(() => {
     if (isSupabaseRecoveryMode()) {
@@ -138,6 +145,26 @@ export function VisitorStatsPanel({ compact = false }: VisitorStatsPanelProps) {
   useEffect(() => {
     if (!open) return;
 
+    function updatePanelPosition() {
+      const button = buttonRef.current;
+      if (!button) return;
+
+      const rect = button.getBoundingClientRect();
+      const margin = 16;
+      const panelWidth = Math.min(288, Math.max(0, window.innerWidth - margin * 2));
+      const maxRight = Math.max(margin, window.innerWidth - panelWidth - margin);
+      const preferredRight = window.innerWidth - rect.right;
+
+      setPanelPosition({
+        top: Math.max(margin, rect.bottom + 8),
+        right: Math.min(Math.max(preferredRight, margin), maxRight)
+      });
+    }
+
+    updatePanelPosition();
+    window.addEventListener("resize", updatePanelPosition);
+    window.addEventListener("scroll", updatePanelPosition, true);
+
     function handlePointerDown(event: PointerEvent) {
       if (!wrapperRef.current?.contains(event.target as Node)) {
         setOpen(false);
@@ -145,7 +172,11 @@ export function VisitorStatsPanel({ compact = false }: VisitorStatsPanelProps) {
     }
 
     document.addEventListener("pointerdown", handlePointerDown);
-    return () => document.removeEventListener("pointerdown", handlePointerDown);
+    return () => {
+      window.removeEventListener("resize", updatePanelPosition);
+      window.removeEventListener("scroll", updatePanelPosition, true);
+      document.removeEventListener("pointerdown", handlePointerDown);
+    };
   }, [open]);
 
   async function refreshOnlineList() {
@@ -164,7 +195,27 @@ export function VisitorStatsPanel({ compact = false }: VisitorStatsPanelProps) {
   }
 
   function toggleOnlineList() {
-    setOpen((current) => !current);
+    setOpen((current) => {
+      const nextOpen = !current;
+      if (nextOpen) {
+        window.requestAnimationFrame(() => {
+          const button = buttonRef.current;
+          if (!button) return;
+
+          const rect = button.getBoundingClientRect();
+          const margin = 16;
+          const panelWidth = Math.min(288, Math.max(0, window.innerWidth - margin * 2));
+          const maxRight = Math.max(margin, window.innerWidth - panelWidth - margin);
+          const preferredRight = window.innerWidth - rect.right;
+
+          setPanelPosition({
+            top: Math.max(margin, rect.bottom + 8),
+            right: Math.min(Math.max(preferredRight, margin), maxRight)
+          });
+        });
+      }
+      return nextOpen;
+    });
     if (!open) {
       void refreshOnlineList();
     }
@@ -185,6 +236,7 @@ export function VisitorStatsPanel({ compact = false }: VisitorStatsPanelProps) {
     return (
       <div ref={wrapperRef} className="relative shrink-0">
         <button
+          ref={buttonRef}
           type="button"
           onClick={toggleOnlineList}
           className="rounded-full bg-emerald-50 px-3 py-1 text-[11px] font-bold text-emerald-800 ring-1 ring-emerald-100 transition hover:bg-emerald-100"
@@ -198,6 +250,7 @@ export function VisitorStatsPanel({ compact = false }: VisitorStatsPanelProps) {
             loading={listLoading}
             error={error}
             stale={Boolean(stats.stale || stats.degraded)}
+            style={panelPosition}
           />
         ) : null}
       </div>
