@@ -61,7 +61,7 @@ export default function SimulationPage() {
           stats={stats}
           simulationOnly
           title="整份模擬考設定"
-          description="可指定真實考古卷、隨機抽一整份真實考古卷，或讓系統依真實卷分布模擬整份考卷。"
+          description="可指定真實考古卷、AI 原創模擬卷、隨機抽一整份真實考古卷，或讓系統依真實卷分布模擬整份考卷。"
         />
       </div>
     </main>

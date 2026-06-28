@@ -52,6 +52,11 @@ const QUICK_ENTRIES = [
 
 const HOME_RELEASE_NOTES = [
   {
+    time: "06/29",
+    title: "模擬考多一格 AI 出題",
+    body: "整份模擬考新增 AI 原創卷來源，先放上醫學（一）近三年趨勢卷；醫學二等題目到齊再開桌。"
+  },
+  {
     time: "06/28",
     title: "同步變輕一點",
     body: "作答中改成較少、較小包的雲端同步，完成紀錄照樣即時保護；資料要穩，帳單也要冷靜。"

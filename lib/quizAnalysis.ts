@@ -997,7 +997,9 @@ export function createQuestionOrder(
 
   if (settings.mode === "simulation") {
     const simulationPool =
-      settings.paperMode === "past_paper" || settings.paperMode === "random_past_paper"
+      settings.paperMode === "past_paper" ||
+      settings.paperMode === "ai_paper" ||
+      settings.paperMode === "random_past_paper"
         ? repeatAwarePool
         : shuffle(repeatAwarePool);
 

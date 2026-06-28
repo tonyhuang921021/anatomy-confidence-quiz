@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/components/AuthProvider";
-import { getPastPaperOptions } from "@/data/med1QuestionBank";
+import { getAISimulationPaperOptions, getPastPaperOptions } from "@/data/med1QuestionBank";
 import { enabledSubjects, subjectRegistry } from "@/data/subjectRegistry";
 import {
   DEFAULT_QUIZ_SETTINGS,
@@ -31,7 +31,7 @@ const modeDescriptions: Record<QuizMode, string> = {
   weakness: "優先抽你最弱、最不穩、最需要補進度的小節。",
   random: "平均刷題，適合維持手感與快速暖機。",
   review: "優先抽歷史錯題、低信心題與高風險題。",
-  simulation: "像正式考試一樣，可選真實考古卷或電腦隨機整份卷。",
+  simulation: "像正式考試一樣，可選真實考古卷、AI 模擬卷或電腦隨機整份卷。",
   custom_paper: "自訂卷模式會用專屬頁面產卷或輸入考卷碼。",
   peak_challenge: "巔峰賽會從你的高風險題與 AI 新題組成闖關卷，答錯立刻結束。"
 };
@@ -53,6 +53,7 @@ const feedbackModeDescriptions: Record<SimulationFeedbackMode, string> = {
 const paperModeLabels: Record<SimulationPaperMode, string> = {
   random_set: "電腦隨機抽一份",
   past_paper: "指定真實考古題",
+  ai_paper: "指定 AI 模擬卷",
   random_past_paper: "隨機抽一份真實考古題"
 };
 
@@ -61,6 +62,8 @@ const paperModeDescriptions: Record<SimulationPaperMode, string> = {
     "系統會依你選的醫學（一）或醫學（二）正式科目比例，重組一份 100 題新模擬卷。",
   past_paper:
     "直接指定某一年、某一次、某一卷別的真實考古卷，維持原始題序，最適合完整模考。",
+  ai_paper:
+    "使用 AI 原創的整份模擬卷，依醫學（一）或醫學（二）分開整理，維持 100 題完整題序。",
   random_past_paper:
     "從你選的醫學（一）或醫學（二）真實考古卷中隨機抽一整份來寫，保留真實卷題序。"
 };
@@ -83,6 +86,9 @@ function inferPastPaperKeyFromQuestionIds(questionIds: string[]) {
   for (const questionId of questionIds) {
     const match = questionId.match(/^MOEX-([^-]+)-([^-]+)-Q\d+/);
     if (match) paperKeys.add(`${match[1]}-${match[2]}`);
+
+    const aiMatch = questionId.match(/^(AI-[A-Z0-9-]+)-Q\d+$/);
+    if (aiMatch) paperKeys.add(aiMatch[1]);
   }
   return paperKeys.size === 1 ? Array.from(paperKeys)[0] : undefined;
 }
@@ -148,8 +154,10 @@ export function QuizSetupPanel({
 
   const paperOptions = useMemo(() => {
     if (settings.mode !== "simulation") return [];
-    return getPastPaperOptions(settings.subjectFilter ?? "醫學（一）");
-  }, [settings.mode, settings.subjectFilter]);
+    return settings.paperMode === "ai_paper"
+      ? getAISimulationPaperOptions(settings.subjectFilter ?? "醫學（一）")
+      : getPastPaperOptions(settings.subjectFilter ?? "醫學（一）");
+  }, [settings.mode, settings.paperMode, settings.subjectFilter]);
   const med1PaperOptions = useMemo(
     () =>
       [...paperOptions]
@@ -176,6 +184,9 @@ export function QuizSetupPanel({
   );
   const selectedPaperOptions =
     settings.subjectFilter === "醫學（二）" ? med2PaperOptions : med1PaperOptions;
+  const activePaperMode = settings.paperMode ?? "random_set";
+  const isSelectablePaperMode = activePaperMode === "past_paper" || activePaperMode === "ai_paper";
+  const canStart = !isSelectablePaperMode || Boolean(settings.selectedPaperKey);
 
   useEffect(() => {
     setCompletedPaperCounts(buildCompletedPaperCounts());
@@ -191,15 +202,23 @@ export function QuizSetupPanel({
   }, []);
 
   useEffect(() => {
-    if (settings.mode !== "simulation" || settings.paperMode !== "past_paper") return;
-    if (selectedPaperOptions.length === 0) return;
+    if (settings.mode !== "simulation" || !isSelectablePaperMode) return;
+    if (selectedPaperOptions.length === 0) {
+      if (settings.selectedPaperKey) {
+        setSettings((current) => ({
+          ...current,
+          selectedPaperKey: undefined
+        }));
+      }
+      return;
+    }
     const stillAvailable = selectedPaperOptions.some((paper) => paper.key === settings.selectedPaperKey);
     if (stillAvailable) return;
     setSettings((current) => ({
       ...current,
       selectedPaperKey: selectedPaperOptions[0]?.key
     }));
-  }, [selectedPaperOptions, settings.mode, settings.paperMode, settings.selectedPaperKey]);
+  }, [isSelectablePaperMode, selectedPaperOptions, settings.mode, settings.selectedPaperKey]);
 
   function updateSettings(next: Partial<QuizSettings>) {
     setSettings((current) => {
@@ -246,7 +265,9 @@ export function QuizSetupPanel({
             questionCount: 100,
             subjectFilter: simulationSubject,
             selectedPaperKey:
-              settings.paperMode === "past_paper" ? settings.selectedPaperKey : undefined
+              settings.paperMode === "past_paper" || settings.paperMode === "ai_paper"
+                ? settings.selectedPaperKey
+                : undefined
           }
         : settings;
     saveQuizSettings(nextSettings);
@@ -277,7 +298,7 @@ export function QuizSetupPanel({
           <p className="mt-2 text-sm leading-7 text-slate-500">
             {description ??
               (simulationOnly
-                ? "模擬考模式會固定用整份考卷邏輯出題，所以不提供科目、題數、章節與小節篩選，避免把模考做成一般刷題模式。先選擇作答後顯示方式，再決定要做系統模擬卷、指定真實考古題，或隨機抽一份真實考古題。"
+                ? "模擬考模式會固定用整份考卷邏輯出題，所以不提供科目、題數、章節與小節篩選，避免把模考做成一般刷題模式。先選擇作答後顯示方式，再決定要做 AI 模擬卷、系統模擬卷、指定真實考古題，或隨機抽一份真實考古題。"
                 : "現在可切換單科刷題與醫學（一）多科模擬考，並選擇即時看詳解或整份做完再批改。")}
           </p>
         </div>
@@ -454,7 +475,7 @@ export function QuizSetupPanel({
               <div className="rounded-2xl bg-white p-4 ring-1 ring-slate-200">
                 <p className="text-sm font-medium text-slate-500">模擬考卷來源</p>
                 <div className="mt-3 grid gap-3">
-                  {(["past_paper", "random_past_paper", "random_set"] as SimulationPaperMode[]).map((mode) => (
+                  {(["past_paper", "ai_paper", "random_past_paper", "random_set"] as SimulationPaperMode[]).map((mode) => (
                     <button
                       key={mode}
                       type="button"
@@ -474,10 +495,12 @@ export function QuizSetupPanel({
                 </div>
               </div>
 
-              {(settings.paperMode ?? "random_set") === "past_paper" ? (
+              {isSelectablePaperMode ? (
                 <div className="space-y-4">
                   <div className="rounded-2xl bg-slate-50 px-4 py-3 text-sm leading-7 text-slate-600">
-                    請直接點選要做的卷別。已做過的卷會標示次數，方便你分辨哪些卷已經寫過。
+                    {activePaperMode === "ai_paper"
+                      ? "請選擇要做的 AI 原創模擬卷。醫學（一）與醫學（二）會分開整理，之後新增醫學（二）AI 卷也會出現在這裡。"
+                      : "請直接點選要做的卷別。已做過的卷會標示次數，方便你分辨哪些卷已經寫過。"}
                   </div>
 
                   <div className="grid gap-4 lg:grid-cols-2">
@@ -492,50 +515,56 @@ export function QuizSetupPanel({
                           <span className="text-xs text-slate-500">{papers.length} 份考卷</span>
                         </div>
                         <div className="mt-3 grid gap-3">
-                          {papers.map((paper) => {
-                            const isSelected = settings.selectedPaperKey === paper.key;
-                            const completedCount = completedPaperCounts[paper.key] ?? 0;
-                            const accentClasses =
-                              accent === "amber"
-                                ? isSelected
-                                  ? "border-amber-400 bg-amber-50 ring-2 ring-amber-200"
-                                  : "border-slate-200 bg-white hover:border-amber-200 hover:bg-amber-50/60"
-                                : isSelected
-                                  ? "border-sky-400 bg-sky-50 ring-2 ring-sky-200"
-                                  : "border-slate-200 bg-white hover:border-sky-200 hover:bg-sky-50/60";
+                          {papers.length === 0 ? (
+                            <div className="rounded-2xl border border-dashed border-slate-200 bg-white px-4 py-6 text-sm leading-7 text-slate-500">
+                              目前還沒有{groupTitle}的{activePaperMode === "ai_paper" ? " AI 模擬卷" : "完整考古卷"}。
+                            </div>
+                          ) : (
+                            papers.map((paper) => {
+                              const isSelected = settings.selectedPaperKey === paper.key;
+                              const completedCount = completedPaperCounts[paper.key] ?? 0;
+                              const accentClasses =
+                                accent === "amber"
+                                  ? isSelected
+                                    ? "border-amber-400 bg-amber-50 ring-2 ring-amber-200"
+                                    : "border-slate-200 bg-white hover:border-amber-200 hover:bg-amber-50/60"
+                                  : isSelected
+                                    ? "border-sky-400 bg-sky-50 ring-2 ring-sky-200"
+                                    : "border-slate-200 bg-white hover:border-sky-200 hover:bg-sky-50/60";
 
-                            return (
-                              <button
-                                key={paper.key}
-                                type="button"
-                                onClick={() => updateSettings({ selectedPaperKey: paper.key })}
-                                className={`rounded-2xl border px-4 py-4 text-left transition ${accentClasses}`}
-                              >
-                                <div className="flex flex-wrap items-start justify-between gap-3">
-                                  <div>
-                                    <p className="text-sm font-semibold text-ink">{paper.label}</p>
-                                    <p className="mt-1 text-xs text-slate-500">{paper.questionCount} 題完整考卷</p>
+                              return (
+                                <button
+                                  key={paper.key}
+                                  type="button"
+                                  onClick={() => updateSettings({ selectedPaperKey: paper.key })}
+                                  className={`rounded-2xl border px-4 py-4 text-left transition ${accentClasses}`}
+                                >
+                                  <div className="flex flex-wrap items-start justify-between gap-3">
+                                    <div>
+                                      <p className="text-sm font-semibold text-ink">{paper.label}</p>
+                                      <p className="mt-1 text-xs text-slate-500">{paper.questionCount} 題完整考卷</p>
+                                    </div>
+                                    <div className="flex flex-wrap gap-2">
+                                      {completedCount > 0 ? (
+                                        <span className="rounded-full bg-emerald-100 px-3 py-1 text-xs font-semibold text-emerald-700">
+                                          已做過 {completedCount} 次
+                                        </span>
+                                      ) : (
+                                        <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-500">
+                                          尚未作答
+                                        </span>
+                                      )}
+                                      {isSelected ? (
+                                        <span className="rounded-full bg-brand-600 px-3 py-1 text-xs font-semibold text-white">
+                                          目前選取
+                                        </span>
+                                      ) : null}
+                                    </div>
                                   </div>
-                                  <div className="flex flex-wrap gap-2">
-                                    {completedCount > 0 ? (
-                                      <span className="rounded-full bg-emerald-100 px-3 py-1 text-xs font-semibold text-emerald-700">
-                                        已做過 {completedCount} 次
-                                      </span>
-                                    ) : (
-                                      <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-500">
-                                        尚未作答
-                                      </span>
-                                    )}
-                                    {isSelected ? (
-                                      <span className="rounded-full bg-brand-600 px-3 py-1 text-xs font-semibold text-white">
-                                        目前選取
-                                      </span>
-                                    ) : null}
-                                  </div>
-                                </div>
-                              </button>
-                            );
-                          })}
+                                </button>
+                              );
+                            })
+                          )}
                         </div>
                       </div>
                     ))}
@@ -563,7 +592,10 @@ export function QuizSetupPanel({
         <button
           type="button"
           onClick={handleStart}
-          className="min-h-12 rounded-2xl bg-brand-600 px-5 py-4 text-sm font-semibold text-white transition hover:bg-brand-700"
+          disabled={!canStart}
+          className={`min-h-12 rounded-2xl px-5 py-4 text-sm font-semibold text-white transition ${
+            canStart ? "bg-brand-600 hover:bg-brand-700" : "cursor-not-allowed bg-slate-300"
+          }`}
         >
           用這個設定開始
         </button>

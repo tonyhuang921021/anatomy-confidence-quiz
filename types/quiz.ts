@@ -93,7 +93,7 @@ export type QuizMode =
 
 export type SubjectFilter = SubjectName | "全部";
 export type SimulationFeedbackMode = "full" | "answer_only" | "none";
-export type SimulationPaperMode = "random_set" | "past_paper" | "random_past_paper";
+export type SimulationPaperMode = "random_set" | "past_paper" | "ai_paper" | "random_past_paper";
 
 export type QuizSettings = {
   mode: QuizMode;

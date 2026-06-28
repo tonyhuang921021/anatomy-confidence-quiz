@@ -19,7 +19,11 @@ import {
   pushCompletedSessionToSupabase,
   syncSharedQuestionExplanationOverrides
 } from "@/lib/cloudSync";
-import { applyQuestionClassificationOverride, getPastPaperOptions } from "@/data/med1QuestionBank";
+import {
+  applyQuestionClassificationOverride,
+  getAISimulationPaperLabel,
+  getPastPaperOptions
+} from "@/data/med1QuestionBank";
 import { anatomyQuestions } from "@/data/anatomyQuestions";
 import { subjectRegistry } from "@/data/subjectRegistry";
 import {
@@ -259,17 +263,29 @@ function getPastPaperKeyFromSession(session: QuizSession) {
   for (const questionId of questionIds) {
     const match = questionId.match(/^MOEX-([^-]+)-([^-]+)-Q\d+/);
     if (match) paperKeys.add(`${match[1]}-${match[2]}`);
+
+    const aiMatch = questionId.match(/^(AI-[A-Z0-9-]+)-Q\d+$/);
+    if (aiMatch) paperKeys.add(aiMatch[1]);
   }
   return paperKeys.size === 1 ? Array.from(paperKeys)[0] : undefined;
+}
+
+function getPaperModeFromPaperKey(paperKey?: string | null) {
+  if (!paperKey) return undefined;
+  return paperKey.startsWith("AI-") ? "ai_paper" : "past_paper";
 }
 
 function getDefaultSimulationSessionName(session: QuizSession) {
   if (!isSimulationSession(session)) return null;
   const paperKey = getPastPaperKeyFromSession(session);
-  const paperLabel = paperKey
-    ? getPastPaperOptions(session.settings?.subjectFilter ?? "全部").find((paper) => paper.key === paperKey)?.label ??
-      getPastPaperOptions("全部").find((paper) => paper.key === paperKey)?.label
-    : undefined;
+  const paperLabel =
+    paperKey && paperKey.startsWith("AI-")
+      ? getAISimulationPaperLabel(paperKey, session.settings?.subjectFilter ?? "全部") ??
+        getAISimulationPaperLabel(paperKey, "全部")
+      : paperKey
+        ? getPastPaperOptions(session.settings?.subjectFilter ?? "全部").find((paper) => paper.key === paperKey)?.label ??
+          getPastPaperOptions("全部").find((paper) => paper.key === paperKey)?.label
+        : undefined;
   if (paperLabel) return paperLabel;
 
   const firstQuestion = session.generatedQuestions?.find(
@@ -857,7 +873,9 @@ function ResultsPageContent() {
         ...(state.session.settings ?? DEFAULT_QUIZ_SETTINGS),
         mode: "simulation",
         sessionName: nextName,
-        paperMode: state.session.settings?.paperMode ?? (getPastPaperKeyFromSession(state.session) ? "past_paper" : undefined),
+        paperMode:
+          state.session.settings?.paperMode ??
+          getPaperModeFromPaperKey(getPastPaperKeyFromSession(state.session)),
         selectedPaperKey: state.session.settings?.selectedPaperKey ?? getPastPaperKeyFromSession(state.session)
       }
     };

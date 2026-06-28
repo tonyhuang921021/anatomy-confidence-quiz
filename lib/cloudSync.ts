@@ -854,6 +854,11 @@ function getSinglePastPaperKeyFromQuestionIds(questionIds: string[]) {
     if (match) {
       paperKeys.add(`${match[1]}-${match[2]}`);
     }
+
+    const aiMatch = questionId.match(/^(AI-[A-Z0-9-]+)-Q\d+$/);
+    if (aiMatch) {
+      paperKeys.add(aiMatch[1]);
+    }
   }
 
   return paperKeys.size === 1 ? Array.from(paperKeys)[0] : undefined;
@@ -921,6 +926,11 @@ function mergeSimulationMetadata(primary: QuizSession, secondary: QuizSession) {
   const shouldUseSecondaryName =
     isGenericSimulationSessionName(primaryName) && !isGenericSimulationSessionName(secondaryName);
   const selectedPaperKey = primaryPaperKey ?? secondaryPaperKey;
+  const inferredPaperMode = selectedPaperKey
+    ? selectedPaperKey.startsWith("AI-")
+      ? "ai_paper"
+      : "past_paper"
+    : secondary.settings.paperMode;
 
   if (!shouldUseSecondaryName && primary.settings.selectedPaperKey && primary.settings.paperMode) {
     return primary;
@@ -931,7 +941,7 @@ function mergeSimulationMetadata(primary: QuizSession, secondary: QuizSession) {
     settings: {
       ...primary.settings,
       sessionName: shouldUseSecondaryName ? secondaryName : primary.settings.sessionName,
-      paperMode: primary.settings.paperMode ?? (selectedPaperKey ? "past_paper" : secondary.settings.paperMode),
+      paperMode: primary.settings.paperMode ?? inferredPaperMode,
       selectedPaperKey
     }
   };
@@ -1112,11 +1122,16 @@ function mapRowToSession(
       : resolvedAttempts.map((attempt) => attempt.questionId);
   const inferredPastPaperKey =
     row.mode === "simulation" ? getSinglePastPaperKeyFromAttempts(resolvedAttempts) : undefined;
+  const inferredPaperMode = inferredPastPaperKey
+    ? inferredPastPaperKey.startsWith("AI-")
+      ? "ai_paper"
+      : "past_paper"
+    : undefined;
   const payloadSettings = payload.settings
     ? ({
         ...payload.settings,
         sessionName: payload.settings.sessionName ?? row.session_name ?? undefined,
-        paperMode: payload.settings.paperMode ?? (inferredPastPaperKey ? "past_paper" : undefined),
+        paperMode: payload.settings.paperMode ?? inferredPaperMode,
         selectedPaperKey: payload.settings.selectedPaperKey ?? inferredPastPaperKey
       } as QuizSession["settings"])
     : undefined;
@@ -1133,7 +1148,7 @@ function mapRowToSession(
           ? ({
               mode: row.mode,
               sessionName: row.session_name ?? undefined,
-              paperMode: inferredPastPaperKey ? "past_paper" : undefined,
+              paperMode: inferredPaperMode,
               selectedPaperKey: inferredPastPaperKey,
               questionCount: row.question_count ?? resolvedQuestionOrder.length
             } as QuizSession["settings"])

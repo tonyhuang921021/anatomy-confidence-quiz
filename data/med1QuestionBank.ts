@@ -2069,6 +2069,12 @@ export function getCanonicalQuestionBank(
 }
 
 export { getImportedCustomPaperQuestionsByIds } from "@/data/importedCustomPaperQuestions";
+export {
+  getAISimulationPaperLabel,
+  getAISimulationPaperOptions,
+  getQuestionsForAISimulationPaper
+} from "@/data/aiSimulationPapers";
+export type { AISimulationPaperOption } from "@/data/aiSimulationPapers";
 
 function getWholePastPaperBank(
   overrides: Record<string, QuestionClassificationOverride> = {}

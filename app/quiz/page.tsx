@@ -14,10 +14,13 @@ import { SavedQuestionButton } from "@/components/SavedQuestionButton";
 import {
   applyQuestionClassificationOverride,
   buildExamLikeRandomSet,
+  getAISimulationPaperLabel,
+  getAISimulationPaperOptions,
   getPastPaperOptions,
   getImportedCustomPaperQuestionsByIds,
   getQuestionBankBySubjects,
   getQuestionBankBySubjectFilter,
+  getQuestionsForAISimulationPaper,
   getQuestionsForPastPaper,
   getSeasonalLimitedQuestions
 } from "@/data/med1QuestionBank";
@@ -192,16 +195,21 @@ function buildSimulationSessionName(settings: QuizSettings, questions: Question[
   if (!isGenericSimulationSessionName(settings.sessionName)) return settings.sessionName?.trim();
   if (
     settings.paperMode !== "past_paper" &&
+    settings.paperMode !== "ai_paper" &&
     settings.paperMode !== "random_past_paper"
   ) {
     return undefined;
   }
 
   const selectedPaperKey = getSimulationSelectedPaperKey(settings, questions);
-  const paperLabel = selectedPaperKey
-    ? getPastPaperOptions(settings.subjectFilter ?? "全部").find((paper) => paper.key === selectedPaperKey)?.label ??
-      getPastPaperOptions("全部").find((paper) => paper.key === selectedPaperKey)?.label
-    : undefined;
+  const paperLabel =
+    selectedPaperKey && settings.paperMode === "ai_paper"
+      ? getAISimulationPaperLabel(selectedPaperKey, settings.subjectFilter ?? "全部") ??
+        getAISimulationPaperLabel(selectedPaperKey, "全部")
+      : selectedPaperKey
+        ? getPastPaperOptions(settings.subjectFilter ?? "全部").find((paper) => paper.key === selectedPaperKey)?.label ??
+          getPastPaperOptions("全部").find((paper) => paper.key === selectedPaperKey)?.label
+        : undefined;
   if (paperLabel) return paperLabel;
 
   const firstQuestion = questions.find(
@@ -250,13 +258,16 @@ function createSession(
     classificationOverrides
   );
   const shouldRespectEmptyLocalQuestionSet =
-    hasActiveSubjectTrackFilter(normalizedSettings) || Boolean(normalizedSettings.strictCustomQuestionPool);
+    hasActiveSubjectTrackFilter(normalizedSettings) ||
+    Boolean(normalizedSettings.strictCustomQuestionPool) ||
+    (normalizedSettings.mode === "simulation" && normalizedSettings.paperMode === "ai_paper");
   const effectiveQuestions =
     localQuestionSet.length > 0 || shouldRespectEmptyLocalQuestionSet ? localQuestionSet : questions;
   const selectedSubjects = normalizedSettings.subjectFilters?.filter(Boolean) ?? [];
   const effectiveSettings =
     normalizedSettings.mode === "simulation" &&
     (normalizedSettings.paperMode === "past_paper" ||
+      normalizedSettings.paperMode === "ai_paper" ||
       normalizedSettings.paperMode === "random_past_paper")
       ? { ...normalizedSettings, questionCount: effectiveQuestions.length }
       : normalizedSettings;
@@ -272,6 +283,7 @@ function createSession(
   const questionOrder =
     effectiveSettings.mode === "simulation" &&
     (effectiveSettings.paperMode === "past_paper" ||
+      effectiveSettings.paperMode === "ai_paper" ||
       effectiveSettings.paperMode === "random_past_paper")
       ? [...effectiveQuestions]
           .sort((left, right) => (left.originalQuestionNumber ?? 0) - (right.originalQuestionNumber ?? 0))
@@ -430,6 +442,19 @@ function selectLocalQuestionSet(
     return paperQuestions.length > 0 ? paperQuestions : sourceBank;
   }
 
+  if (paperMode === "ai_paper") {
+    const fallbackPaper = getAISimulationPaperOptions(subjectFilter).sort((left, right) => {
+      if ((right.sourceYear ?? 0) !== (left.sourceYear ?? 0)) {
+        return (right.sourceYear ?? 0) - (left.sourceYear ?? 0);
+      }
+      return left.label.localeCompare(right.label);
+    })[0];
+    const paperKey = settings.selectedPaperKey ?? fallbackPaper?.key;
+    if (!paperKey) return [];
+    const paperQuestions = getQuestionsForAISimulationPaper(paperKey, subjectFilter);
+    return paperQuestions.length > 0 ? paperQuestions : [];
+  }
+
   if (paperMode === "random_past_paper") {
     const papers = getPastPaperOptions(subjectFilter, classificationOverrides);
     if (papers.length === 0) return sourceBank;
@@ -537,9 +562,18 @@ function getExpectedSimulationQuestionCount(
   if (settings.mode !== "simulation") return settings.questionCount;
 
   if (
-    (settings.paperMode === "past_paper" || settings.paperMode === "random_past_paper") &&
+    (settings.paperMode === "past_paper" ||
+      settings.paperMode === "ai_paper" ||
+      settings.paperMode === "random_past_paper") &&
     settings.selectedPaperKey
   ) {
+    if (settings.paperMode === "ai_paper") {
+      return getQuestionsForAISimulationPaper(
+        settings.selectedPaperKey,
+        settings.subjectFilter ?? "醫學（一）"
+      ).length;
+    }
+
     return getQuestionsForPastPaper(
       settings.selectedPaperKey,
       settings.subjectFilter ?? "醫學（一）",
