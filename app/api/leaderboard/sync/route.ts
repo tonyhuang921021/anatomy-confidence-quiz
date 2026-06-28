@@ -256,7 +256,7 @@ async function upsertSessionRollups(
   userId: string,
   sessionRows: QuizSessionSummaryRow[]
 ) {
-  if (sessionRows.length === 0) return;
+  if (sessionRows.length === 0) return 0;
 
   const rowsNeedingAttemptFallback = sessionRows.filter((row) => {
     const storedQuestionCount = getFiniteCount(row.question_count);
@@ -293,27 +293,28 @@ async function upsertSessionRollups(
     })
     .filter((row): row is NonNullable<typeof row> => Boolean(row));
 
-  if (rows.length === 0) return;
+  if (rows.length === 0) return 0;
 
   const { error } = await supabase
     .from("leaderboard_session_rollups")
     .upsert(rows, { onConflict: "session_id" });
 
   if (error) throw error;
+  return rows.length;
 }
 
 async function ensureSessionRollups(supabase: any, userId: string, fullRefresh: boolean) {
   const sessionRows = fullRefresh
     ? await fetchAllCompletedSessionRows(supabase, userId)
     : await fetchRecentCompletedSessionRows(supabase, userId);
-  if (sessionRows.length === 0) return;
+  if (sessionRows.length === 0) return 0;
 
   const existingIds = await fetchExistingRollupIds(
     supabase,
     sessionRows.map((row) => row.id)
   );
   const missingRows = sessionRows.filter((row) => !existingIds.has(row.id));
-  await upsertSessionRollups(supabase, userId, missingRows);
+  return upsertSessionRollups(supabase, userId, missingRows);
 }
 
 async function hasAnyRollup(supabase: any, userId: string) {
@@ -426,7 +427,32 @@ export async function POST(request: NextRequest) {
 
   const profileAlreadyHasRollups = Number(existingProfile?.total_sessions ?? 0) > 0;
   const shouldFullRefresh = body.forceFullRefresh || (!profileAlreadyHasRollups && !(await hasAnyRollup(supabase, user.id)));
-  await ensureSessionRollups(supabase, user.id, shouldFullRefresh);
+  const addedRollupCount = await ensureSessionRollups(supabase, user.id, shouldFullRefresh);
+
+  if (!body.forceFullRefresh && existingProfile && addedRollupCount === 0) {
+    const refreshedAt = new Date().toISOString();
+    const { error: refreshError } = await supabase.from("leaderboard_profiles").upsert(
+      {
+        user_id: user.id,
+        display_name: displayName,
+        total_attempts: existingProfile.total_attempts ?? 0,
+        correct_attempts: existingProfile.correct_attempts ?? 0,
+        correct_rate: existingProfile.correct_rate ?? 0,
+        total_sessions: existingProfile.total_sessions ?? 0,
+        updated_at: refreshedAt
+      },
+      { onConflict: "user_id" }
+    );
+
+    if (refreshError) throw refreshError;
+
+    return NextResponse.json({
+      ok: true,
+      leaderboard: mapProfileToSummary({ ...existingProfile, display_name: displayName, updated_at: refreshedAt }),
+      cached: true
+    });
+  }
+
   const summary = await summarizeRollups(supabase, user.id);
 
   const { error } = await supabase.from("leaderboard_profiles").upsert(

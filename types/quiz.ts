@@ -327,6 +327,7 @@ export type QuestionHistoryStats = {
   correct: number;
   lowConfidence: number;
   overconfidence: number;
+  correctStreakAfterLatestRisk: number;
   lastAttemptedAt?: string;
   lastAttemptCorrect?: boolean;
   latestErrorType?: ErrorType;

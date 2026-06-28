@@ -58,7 +58,7 @@ const REACTION_LABELS: Record<string, string> = {
 };
 
 const SUPPLEMENT_PUBLIC_CACHE_CONTROL = "public, max-age=300, s-maxage=900, stale-while-revalidate=3600";
-const SUPPLEMENT_PRIVATE_CACHE_CONTROL = "private, max-age=45";
+const SUPPLEMENT_PRIVATE_CACHE_CONTROL = "private, max-age=120, stale-while-revalidate=300";
 const SUPPLEMENT_NO_STORE_CACHE_CONTROL = "no-store";
 const SUPPLEMENT_COUNT_LOOKUP_LIMIT = 50;
 

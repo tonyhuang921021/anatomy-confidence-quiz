@@ -227,6 +227,15 @@ function getStoredQuestionCount(session: QuizSession) {
   );
 }
 
+function isMoreCompleteResultSession(candidate: QuizSession, current: QuizSession | null) {
+  if (!candidate.completedAt || candidate.attempts.length === 0) return false;
+  if (!current?.completedAt) return true;
+  if (candidate.attempts.length !== current.attempts.length) {
+    return candidate.attempts.length > current.attempts.length;
+  }
+  return (candidate.completedAt ?? candidate.startedAt).localeCompare(current.completedAt ?? current.startedAt) >= 0;
+}
+
 function shouldRefreshPossiblyTruncatedCloudSession(session: QuizSession | null) {
   if (!session?.completedAt) return false;
   if (!isSimulationSession(session) && session.settings?.mode !== "custom_paper") return false;
@@ -366,6 +375,7 @@ function ResultsPageContent() {
   const [resultsScope, setResultsScope] = useState<"default" | "simulation">("default");
   const [editableSessionName, setEditableSessionName] = useState("");
   const [sessionNameNotice, setSessionNameNotice] = useState("");
+  const [resultRecordNotice, setResultRecordNotice] = useState("");
   const [isSavingSessionName, setIsSavingSessionName] = useState(false);
   const [state, setState] = useState<ResultState>({
     session: null,
@@ -478,6 +488,7 @@ function ResultsPageContent() {
       if (!cancelled) {
         setResultsScope(nextScope);
         setRequestedSessionId(targetSessionId);
+        setResultRecordNotice("");
       }
 
       let completedSessions = loadCompletedSessions();
@@ -512,13 +523,15 @@ function ResultsPageContent() {
             cloudSession = await loadCompletedSessionFromSupabase(targetSessionId);
           }
         }
-        if (cloudSession?.completedAt && cloudSession.attempts.length > 0) {
+        if (cloudSession?.completedAt && isMoreCompleteResultSession(cloudSession, resolvedTargetSession)) {
           saveCompletedSession(cloudSession);
           completedSessions = loadCompletedSessions();
           scopedSessions = completedSessions.filter((sessionItem) =>
             nextScope === "simulation" ? isSimulationSession(sessionItem) : !isSimulationSession(sessionItem)
           );
           resolvedTargetSession = cloudSession;
+        } else if (cloudSession?.completedAt && cloudSession.attempts.length === 0 && !resolvedTargetSession?.attempts.length) {
+          setResultRecordNotice("這筆紀錄的題目明細還在整理中，先不顯示 0 題結果。請稍後重新整理或回作答紀錄。");
         }
       }
 
@@ -541,6 +554,23 @@ function ResultsPageContent() {
         !completedSessions.some((item) => isSameSessionId(item.id, fallbackCurrentSession.id))
       ) {
         saveCompletedSession(fallbackCurrentSession);
+      }
+
+      if (resolvedTargetSession?.completedAt && resolvedTargetSession.attempts.length === 0) {
+        setResultRecordNotice("這筆紀錄的題目明細還在整理中，先不顯示 0 題結果。請稍後重新整理或回作答紀錄。");
+        setState((current) => ({
+          ...current,
+          session: null,
+          sessions: scopedSessions,
+          summary: null,
+          sectionStats: [],
+          promptText: "",
+          lowCompletion: [],
+          unstableSections: [],
+          completionStats: null
+        }));
+        setMounted(true);
+        return;
       }
 
       if (!resolvedTargetSession?.completedAt) {
@@ -1080,7 +1110,9 @@ function ResultsPageContent() {
       <main className="shell">
         <section className="rounded-[2rem] bg-white p-5 text-center shadow-card ring-1 ring-slate-100 sm:p-8">
           <h1 className="text-2xl font-semibold text-ink">找不到這次作答紀錄</h1>
-          <p className="mt-3 text-slate-500">這筆結果可能已被清除，或尚未完成作答。</p>
+          <p className="mt-3 text-slate-500">
+            {resultRecordNotice || "這筆結果可能已被清除，或尚未完成作答。"}
+          </p>
           <div className="mt-6 flex flex-col justify-center gap-3 sm:flex-row">
             <Link
               href={resultsScope === "simulation" ? "/simulation-results" : "/results"}

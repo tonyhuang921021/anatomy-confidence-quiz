@@ -118,8 +118,7 @@ function sortByRecent<T extends ReviewQuestionItem>(items: T[]) {
 function isResolvedReviewItem(item: ReviewQuestionItem) {
   return (
     (item.history.wrong > 0 || item.history.lowConfidence > 0) &&
-    item.history.correct >= 2 &&
-    item.history.lastAttemptCorrect === true
+    item.history.correctStreakAfterLatestRisk >= 2
   );
 }
 

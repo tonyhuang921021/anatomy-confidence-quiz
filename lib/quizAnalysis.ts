@@ -608,6 +608,7 @@ export function getModeLabel(mode: QuizMode) {
 
 export function buildQuestionHistoryMap(allSessions: { attempts: Attempt[] }[]) {
   const map = new Map<string, QuestionHistoryStats>();
+  const attemptsByQuestionId = new Map<string, Attempt[]>();
 
   allSessions.forEach((session) => {
     session.attempts.forEach((attempt) => {
@@ -619,7 +620,8 @@ export function buildQuestionHistoryMap(allSessions: { attempts: Attempt[] }[]) 
           wrong: 0,
           correct: 0,
           lowConfidence: 0,
-          overconfidence: 0
+          overconfidence: 0,
+          correctStreakAfterLatestRisk: 0
         } satisfies QuestionHistoryStats);
 
       current.attempts += 1;
@@ -635,7 +637,28 @@ export function buildQuestionHistoryMap(allSessions: { attempts: Attempt[] }[]) 
       }
 
       map.set(attempt.questionId, current);
+
+      const bucket = attemptsByQuestionId.get(attempt.questionId) ?? [];
+      bucket.push(attempt);
+      attemptsByQuestionId.set(attempt.questionId, bucket);
     });
+  });
+
+  attemptsByQuestionId.forEach((attempts, questionId) => {
+    let correctStreakAfterLatestRisk = 0;
+
+    attempts
+      .filter((attempt) => Boolean(attempt.answeredAt))
+      .sort((left, right) => left.answeredAt.localeCompare(right.answeredAt))
+      .forEach((attempt) => {
+        const isRiskAttempt = !attempt.isCorrect || attempt.confidence <= 2;
+        correctStreakAfterLatestRisk = isRiskAttempt ? 0 : correctStreakAfterLatestRisk + 1;
+      });
+
+    const history = map.get(questionId);
+    if (history) {
+      history.correctStreakAfterLatestRisk = correctStreakAfterLatestRisk;
+    }
   });
 
   return map;

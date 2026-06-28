@@ -24,8 +24,8 @@ type SupplementCacheEntry<T> = {
 type SupplementCardsPayload = Required<Pick<QuestionSupplementResponse, "cards" | "reactions">>;
 type SupplementMetaPayload = Required<Pick<QuestionSupplementResponse, "count" | "reactions">>;
 
-const SUPPLEMENT_META_CACHE_TTL_MS = 30 * 60 * 1000;
-const SUPPLEMENT_CARDS_CACHE_TTL_MS = 5 * 60 * 1000;
+const SUPPLEMENT_META_CACHE_TTL_MS = 60 * 60 * 1000;
+const SUPPLEMENT_CARDS_CACHE_TTL_MS = 15 * 60 * 1000;
 const SUPPLEMENT_META_SESSION_PREFIX = "aq:supplement-meta:v2:";
 const supplementMetaCache = new Map<string, SupplementCacheEntry<SupplementMetaPayload>>();
 const supplementCardsCache = new Map<string, SupplementCacheEntry<SupplementCardsPayload>>();

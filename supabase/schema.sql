@@ -1173,6 +1173,9 @@ where user_id is null and visitor_id is not null;
 create index if not exists feedback_message_votes_message_id_idx
 on public.feedback_message_votes (message_id);
 
+create index if not exists feedback_message_votes_user_id_idx
+on public.feedback_message_votes (user_id);
+
 grant select
   on public.feedback_message_votes
   to anon;
@@ -1381,6 +1384,9 @@ on public.question_supplement_card_votes (card_id);
 create index if not exists question_supplement_card_votes_question_id_idx
 on public.question_supplement_card_votes (question_id);
 
+create index if not exists question_supplement_card_votes_user_id_idx
+on public.question_supplement_card_votes (user_id);
+
 grant select, insert, update, delete
   on public.question_supplement_card_votes
   to service_role;
@@ -1408,6 +1414,9 @@ create table if not exists public.question_supplement_reactions (
 
 create index if not exists question_supplement_reactions_question_idx
 on public.question_supplement_reactions (question_id, reaction_type);
+
+create index if not exists question_supplement_reactions_user_id_idx
+on public.question_supplement_reactions (user_id);
 
 grant select, insert, update, delete
   on public.question_supplement_reactions
@@ -1463,6 +1472,9 @@ create table if not exists public.resource_share_likes (
 
 create index if not exists resource_share_likes_resource_idx
 on public.resource_share_likes (resource_id);
+
+create index if not exists resource_share_likes_user_id_idx
+on public.resource_share_likes (user_id);
 
 create table if not exists public.resource_share_comments (
   id bigint generated always as identity primary key,

@@ -886,6 +886,61 @@ function mergeSimulationMetadata(primary: QuizSession, secondary: QuizSession) {
   };
 }
 
+function mergeQuestionListById(primary?: Question[], secondary?: Question[]) {
+  const merged = new Map<string, Question>();
+
+  for (const question of secondary ?? []) {
+    if (question?.id) merged.set(question.id, question);
+  }
+
+  for (const question of primary ?? []) {
+    if (question?.id) merged.set(question.id, question);
+  }
+
+  return Array.from(merged.values());
+}
+
+function mergeQuestionOrder(primary?: string[], secondary?: string[]) {
+  const base = (primary?.length ?? 0) >= (secondary?.length ?? 0) ? primary ?? [] : secondary ?? [];
+  const extra = base === primary ? secondary ?? [] : primary ?? [];
+  return Array.from(new Set([...base, ...extra].filter(Boolean)));
+}
+
+function mergeSessionDetails(primary: QuizSession, secondary: QuizSession) {
+  const generatedQuestions = mergeQuestionListById(primary.generatedQuestions, secondary.generatedQuestions);
+  const customQuestionPayload = mergeQuestionListById(
+    primary.settings?.customQuestionPayload,
+    secondary.settings?.customQuestionPayload
+  );
+  const questionOrder = mergeQuestionOrder(primary.questionOrder, secondary.questionOrder);
+  const attempts = primary.attempts.length >= secondary.attempts.length ? primary.attempts : secondary.attempts;
+  const baseSettings = primary.settings ?? secondary.settings;
+  const settings = baseSettings
+    ? {
+        ...(secondary.settings ?? {}),
+        ...(primary.settings ?? {}),
+        mode: baseSettings.mode,
+        questionCount: baseSettings.questionCount,
+        customQuestionIds: mergeQuestionOrder(
+          primary.settings?.customQuestionIds,
+          secondary.settings?.customQuestionIds
+        ),
+        customQuestionPayload: customQuestionPayload.length > 0 ? customQuestionPayload : undefined
+      }
+    : undefined;
+
+  const merged: QuizSession = {
+    ...secondary,
+    ...primary,
+    settings,
+    questionOrder: questionOrder.length > 0 ? questionOrder : undefined,
+    generatedQuestions: generatedQuestions.length > 0 ? generatedQuestions : undefined,
+    attempts
+  };
+
+  return mergeSimulationMetadata(merged, secondary);
+}
+
 function hasBetterSimulationMetadata(localSession: QuizSession, remoteSession: QuizSession) {
   if (localSession.settings?.mode !== "simulation" || remoteSession.settings?.mode !== "simulation") {
     return false;
@@ -927,13 +982,23 @@ function mergeSessions(localSessions: QuizSession[], remoteSessions: QuizSession
     const nextAttempts = session.attempts.length;
     const currentAttempts = current.attempts.length;
 
+    if (isCompletedQuizSession(current) && isCompletedQuizSession(session) && nextAttempts !== currentAttempts) {
+      merged.set(
+        key,
+        nextAttempts > currentAttempts
+          ? mergeSessionDetails(session, current)
+          : mergeSessionDetails(current, session)
+      );
+      continue;
+    }
+
     if (
       nextFreshness > currentFreshness ||
       (nextFreshness === currentFreshness && nextAttempts >= currentAttempts)
     ) {
-      merged.set(key, mergeSimulationMetadata(session, current));
+      merged.set(key, mergeSessionDetails(session, current));
     } else {
-      merged.set(key, mergeSimulationMetadata(current, session));
+      merged.set(key, mergeSessionDetails(current, session));
     }
   }
 
@@ -950,6 +1015,8 @@ function getSessionsNeedingUpload(localSessions: QuizSession[], remoteSessions: 
     if (!remoteSession) return true;
     if (!isCompletedQuizSession(localSession) && isCompletedQuizSession(remoteSession)) return false;
     if (isCompletedQuizSession(localSession) && !isCompletedQuizSession(remoteSession)) return true;
+    if (localSession.attempts.length > remoteSession.attempts.length) return true;
+    if (localSession.attempts.length < remoteSession.attempts.length) return false;
 
     const localFreshness = sessionFreshnessValue(localSession);
     const remoteFreshness = sessionFreshnessValue(remoteSession);
@@ -2137,8 +2204,8 @@ export async function loadLeaderboard(limit = 50, options: { signal?: AbortSigna
   return payload.leaderboard;
 }
 
-const BACKGROUND_STATS_LOOKUP_CHUNK_SIZE = 40;
-const BACKGROUND_STATS_LOOKUP_LIMIT = 160;
+const BACKGROUND_STATS_LOOKUP_CHUNK_SIZE = 100;
+const BACKGROUND_STATS_LOOKUP_LIMIT = 200;
 const BACKGROUND_CLASSIFICATION_LOOKUP_LIMIT = 500;
 const BACKGROUND_DATA_CACHE_VERSION = "v4";
 const BACKGROUND_DATA_STORAGE_PREFIX = `aq:bg:${BACKGROUND_DATA_CACHE_VERSION}:`;

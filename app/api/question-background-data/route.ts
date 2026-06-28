@@ -6,7 +6,7 @@ import { withServerTimeout } from "@/lib/serverTimeout";
 type BackgroundDataKind = "stats" | "explanations" | "classifications";
 
 const MAX_IDS_BY_KIND: Record<BackgroundDataKind, number> = {
-  stats: 40,
+  stats: 100,
   explanations: 20,
   classifications: 500
 };

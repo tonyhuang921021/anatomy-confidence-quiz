@@ -6,7 +6,6 @@ import { ExamCountdown } from "@/components/ExamCountdown";
 import { LazyAuthPanel } from "@/components/LazyAuthPanel";
 import { LazyFeedbackBoard } from "@/components/LazyFeedbackBoard";
 import { HomeToneBanner } from "@/components/HomeToneBanner";
-import { LazyHomeWeaknessInsight } from "@/components/LazyHomeWeaknessInsight";
 import { OwnerOnlyNotesLink } from "@/components/OwnerOnlyNotesLink";
 import { isSupabaseRecoveryMode } from "@/lib/supabase/recoveryMode";
 
@@ -52,6 +51,11 @@ const QUICK_ENTRIES = [
 ] as const;
 
 const HOME_RELEASE_NOTES = [
+  {
+    time: "06/28",
+    title: "同步紀錄多一層保險",
+    body: "跨裝置合併更偏向保留完整作答明細，錯題答對兩次也會乖乖進完成區；首頁入口順手重排，不再空一塊。"
+  },
   {
     time: "06/28",
     title: "陽明截圖跟題目補洞",
@@ -646,32 +650,31 @@ export default function HomePage() {
               <div className="home-device-screen">
                 <div className="flex items-center justify-between gap-3">
                   <div>
-                    <p className="eyebrow text-[10px]">Today Focus</p>
-                    <h2 className="mt-2 text-2xl font-black tracking-[-0.04em] text-ink">先補最會漏的洞</h2>
+                    <p className="eyebrow text-[10px]">Next Step</p>
+                    <h2 className="mt-2 text-2xl font-black tracking-[-0.04em] text-ink">今天直接進題目</h2>
                   </div>
                 </div>
-                <div className="mt-6 grid gap-3">
-                  <ClientSectionBoundary title="首頁弱點判讀">
-                    <LazyHomeWeaknessInsight />
-                  </ClientSectionBoundary>
+                <div className="mt-6 grid gap-4">
                   <ExamCountdown />
+                  <div className="grid auto-rows-max items-start gap-3 sm:grid-cols-2">
+                    {QUICK_ENTRIES.map((entry, index) => (
+                      <Link
+                        key={entry.href}
+                        href={entry.href}
+                        prefetch={false}
+                        className="home-entry-card"
+                        style={{ "--home-delay": `${220 + index * 70}ms` } as HomeAnimationStyle}
+                      >
+                        <span className="home-entry-icon" aria-hidden="true" />
+                        <span className="home-entry-title">{entry.title}</span>
+                      </Link>
+                    ))}
+                  </div>
                 </div>
               </div>
             </div>
 
             <div className="grid auto-rows-max items-start gap-3 sm:grid-cols-2">
-              {QUICK_ENTRIES.map((entry, index) => (
-                <Link
-                  key={entry.href}
-                  href={entry.href}
-                  prefetch={false}
-                  className="home-entry-card"
-                  style={{ "--home-delay": `${220 + index * 70}ms` } as HomeAnimationStyle}
-                >
-                  <span className="home-entry-icon" aria-hidden="true" />
-                  <span className="home-entry-title">{entry.title}</span>
-                </Link>
-              ))}
               <div className="home-entry-card home-study-card sm:col-span-2">
                 <div className="grid gap-3 sm:grid-cols-2">
                   <div className="grid gap-3">
