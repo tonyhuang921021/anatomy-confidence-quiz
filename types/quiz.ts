@@ -654,3 +654,20 @@ export type PeakChallengeLeaderboardEntry = {
   latestScore: number;
   latestCompletedAt?: string;
 };
+
+export type SavedQuestionSource = "search" | "quiz" | "results" | "review" | "saved";
+
+export type SavedQuestionRecord = {
+  questionId: string;
+  addedAt: string;
+  updatedAt: string;
+  correctCount: number;
+  attempts: number;
+  lastAnsweredAt?: string;
+  source?: SavedQuestionSource;
+};
+
+export type SavedQuestionTombstone = {
+  questionId: string;
+  deletedAt: string;
+};

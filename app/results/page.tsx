@@ -9,6 +9,7 @@ import { QuestionOptionBlock, QuestionStemBlock } from "@/components/QuestionMed
 import { QuestionExplanationTabs } from "@/components/QuestionExplanationTabs";
 import { QuestionIssueReportButton } from "@/components/QuestionIssueReportButton";
 import { ResultSummary } from "@/components/ResultSummary";
+import { SavedQuestionButton } from "@/components/SavedQuestionButton";
 import { WeaknessRanking } from "@/components/WeaknessRanking";
 import {
   loadQuestionCommunityStats,
@@ -1295,12 +1296,15 @@ function ResultsPageContent() {
       <div className="mt-2 min-w-0 space-y-3 overflow-hidden text-sm leading-7 text-slate-700 [overflow-wrap:anywhere]">
         <div className="flex min-w-0 items-start gap-3">
           <QuestionStemBlock question={question} className="flex-1" />
-          <CopyQuestionPromptButton
-            question={question}
-            selectedAnswer={attempt.selectedAnswer}
-            correctAnswer={attempt.correctAnswer}
-            className="shrink-0 px-0"
-          />
+          <div className="flex shrink-0 flex-wrap items-center justify-end gap-2">
+            <SavedQuestionButton questionId={question.id} source="results" />
+            <CopyQuestionPromptButton
+              question={question}
+              selectedAnswer={attempt.selectedAnswer}
+              correctAnswer={attempt.correctAnswer}
+              className="px-0"
+            />
+          </div>
         </div>
         <div className="grid gap-3">
           {getAvailableOptionKeys(question).map((key) => {

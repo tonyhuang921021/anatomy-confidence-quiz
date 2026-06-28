@@ -10,6 +10,7 @@ import { ErrorTypeSelector } from "@/components/ErrorTypeSelector";
 import { QuestionCard } from "@/components/QuestionCard";
 import { QuestionIssueReportButton } from "@/components/QuestionIssueReportButton";
 import { QuestionExplanationTabs } from "@/components/QuestionExplanationTabs";
+import { SavedQuestionButton } from "@/components/SavedQuestionButton";
 import {
   applyQuestionClassificationOverride,
   buildExamLikeRandomSet,
@@ -1950,12 +1951,14 @@ export default function QuizPage() {
                       難度 {difficultyBadge.text}
                     </span>
                   ) : null}
-                  <CopyQuestionPromptButton
-                    question={currentQuestion}
-                    selectedAnswer={submittedAttempt.selectedAnswer}
-                    correctAnswer={submittedAttempt.correctAnswer}
-                    className="ml-auto"
-                  />
+                  <div className="ml-auto flex flex-wrap items-center gap-2">
+                    <SavedQuestionButton questionId={currentQuestion.id} source="quiz" />
+                    <CopyQuestionPromptButton
+                      question={currentQuestion}
+                      selectedAnswer={submittedAttempt.selectedAnswer}
+                      correctAnswer={submittedAttempt.correctAnswer}
+                    />
+                  </div>
                 </div>
                 <div className="mt-4 space-y-3 text-sm leading-7">
                   {shouldShowCorrectAnswer ? (

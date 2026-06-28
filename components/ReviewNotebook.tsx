@@ -6,6 +6,7 @@ import { CopyQuestionPromptButton } from "@/components/CopyQuestionPromptButton"
 import { QuestionExplanationTabs } from "@/components/QuestionExplanationTabs";
 import { QuestionOptionBlock, QuestionStemBlock } from "@/components/QuestionMediaBlock";
 import { QuestionIssueReportButton } from "@/components/QuestionIssueReportButton";
+import { SavedQuestionButton } from "@/components/SavedQuestionButton";
 import {
   loadConfirmedQuestionClassificationOverrides,
   loadQuestionCommunityStats,
@@ -843,6 +844,7 @@ export function ReviewNotebook({
     return (
       <div className="space-y-3">
         <div className="flex flex-wrap items-center gap-2">
+          <SavedQuestionButton questionId={question.id} source="review" />
           <CopyQuestionPromptButton
             question={question}
             correctAnswer={question.answer}

@@ -53,6 +53,11 @@ const QUICK_ENTRIES = [
 const HOME_RELEASE_NOTES = [
   {
     time: "06/28",
+    title: "題目可以先按書籤",
+    body: "散題、模擬考、結果和錯題複習都能儲存題目，首頁也多了儲存題目入口；想到要補的題不用再靠腦內便利貼。"
+  },
+  {
+    time: "06/28",
     title: "同步紀錄多一層保險",
     body: "跨裝置合併更偏向保留完整作答明細，錯題答對兩次也會乖乖進完成區；首頁入口順手重排，不再空一塊。"
   },
@@ -685,9 +690,14 @@ export default function HomePage() {
                       資源分享
                     </Link>
                   </div>
-                  <Link href="/pharmacology-review" prefetch={false} className="secondary-pill home-study-link px-4">
-                    藥理複習
-                  </Link>
+                  <div className="grid gap-3">
+                    <Link href="/pharmacology-review" prefetch={false} className="secondary-pill home-study-link px-4">
+                      藥理複習
+                    </Link>
+                    <Link href="/saved-questions" prefetch={false} className="secondary-pill home-study-link px-4">
+                      儲存題目
+                    </Link>
+                  </div>
                 </div>
               </div>
             </div>

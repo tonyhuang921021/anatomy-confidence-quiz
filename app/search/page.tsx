@@ -7,6 +7,7 @@ import { CopyQuestionPromptButton } from "@/components/CopyQuestionPromptButton"
 import { QuestionExplanationTabs } from "@/components/QuestionExplanationTabs";
 import { QuestionOptionBlock, QuestionStemBlock } from "@/components/QuestionMediaBlock";
 import { QuestionIssueReportButton } from "@/components/QuestionIssueReportButton";
+import { SavedQuestionButton } from "@/components/SavedQuestionButton";
 import {
   loadConfirmedQuestionClassificationOverrides,
   loadSharedQuestionExplanationOverrides,
@@ -19,6 +20,13 @@ import {
   saveQuestionExplanationOverride,
   saveQuestionExplanationOverrides
 } from "@/lib/storage";
+import {
+  isAcceptedSavedQuestionAnswer,
+  isSavedQuestionCompleted,
+  recordSavedQuestionAnswer,
+  removeSavedQuestionRecord,
+  useSavedQuestionRecords
+} from "@/lib/savedQuestions";
 import { getOrCreateVisitorId } from "@/lib/visitor";
 import {
   buildRelatedQuestionContext,
@@ -37,7 +45,8 @@ import {
   OptionKey,
   Question,
   QuestionClassificationOverride,
-  QuestionExplanationOverride
+  QuestionExplanationOverride,
+  SavedQuestionRecord
 } from "@/types/quiz";
 
 const SEARCHABLE_SUBJECTS = Object.values(subjectRegistry)
@@ -51,7 +60,6 @@ const SEARCHABLE_SUBJECTS = Object.values(subjectRegistry)
 
 const OPTION_KEYS = ["A", "B", "C", "D", "E"] as const;
 const PAGE_SIZE = 30;
-const SEARCH_FAVORITES_STORAGE_KEY = "anatomy-confidence-search-favorites:v1";
 
 type SearchIndexEntry = {
   question: Question;
@@ -59,13 +67,7 @@ type SearchIndexEntry = {
   compactTerms: string;
 };
 
-type SearchFavoriteRecord = {
-  questionId: string;
-  addedAt: string;
-  correctCount: number;
-  attempts: number;
-  lastAnsweredAt?: string;
-};
+type SearchFavoriteRecord = SavedQuestionRecord;
 
 type FavoriteAnswerFeedback = {
   questionId: string;
@@ -175,52 +177,12 @@ function mergeQuestionExplanationOverride(
   };
 }
 
-function loadSearchFavorites() {
-  if (typeof window === "undefined") return {};
-
-  try {
-    const raw = window.localStorage.getItem(SEARCH_FAVORITES_STORAGE_KEY);
-    if (!raw) return {};
-    const parsed = JSON.parse(raw) as Record<string, SearchFavoriteRecord>;
-    return Object.fromEntries(
-      Object.entries(parsed)
-        .filter(([questionId, record]) => questionId && record?.questionId)
-        .map(([questionId, record]) => [
-          questionId,
-          {
-            questionId,
-            addedAt: record.addedAt || new Date().toISOString(),
-            correctCount: Math.max(0, Number(record.correctCount) || 0),
-            attempts: Math.max(0, Number(record.attempts) || 0),
-            lastAnsweredAt: record.lastAnsweredAt
-          }
-        ])
-    );
-  } catch {
-    return {};
-  }
-}
-
-function saveSearchFavorites(favorites: Record<string, SearchFavoriteRecord>) {
-  if (typeof window === "undefined") return;
-  window.localStorage.setItem(SEARCH_FAVORITES_STORAGE_KEY, JSON.stringify(favorites));
-}
-
 function isQuestionCompletedInFavoriteBank(record?: SearchFavoriteRecord) {
-  return (record?.correctCount ?? 0) >= 2;
+  return isSavedQuestionCompleted(record);
 }
 
 function isAcceptedFavoriteAnswer(question: Question, answer: OptionKey) {
-  if (question.answerCreditType === "all_credit") return true;
-  if (
-    (question.answerCreditType === "multiple_accepted" ||
-      question.answerCreditType === "multiple_answers") &&
-    question.acceptedAnswers?.length
-  ) {
-    return question.acceptedAnswers.includes(answer);
-  }
-
-  return question.answer === answer;
+  return isAcceptedSavedQuestionAnswer(question, answer);
 }
 
 function useDebouncedValue<T>(value: T, delayMs: number) {
@@ -248,7 +210,7 @@ export default function SearchPage() {
   const [classificationReportMessageMap, setClassificationReportMessageMap] = useState<Record<string, string>>({});
   const [classificationOverrides, setClassificationOverrides] = useState<Record<string, QuestionClassificationOverride>>({});
   const [favoriteBankOpen, setFavoriteBankOpen] = useState(false);
-  const [searchFavorites, setSearchFavorites] = useState<Record<string, SearchFavoriteRecord>>({});
+  const searchFavorites = useSavedQuestionRecords(session?.access_token);
   const [favoritePracticeQuestionId, setFavoritePracticeQuestionId] = useState<string | null>(null);
   const [favoriteSelectedAnswer, setFavoriteSelectedAnswer] = useState<OptionKey | null>(null);
   const [favoriteAnswerFeedback, setFavoriteAnswerFeedback] = useState<FavoriteAnswerFeedback | null>(null);
@@ -300,10 +262,6 @@ export default function SearchPage() {
 
   useEffect(() => {
     setExplanationOverrides(loadQuestionExplanationOverrides());
-  }, []);
-
-  useEffect(() => {
-    setSearchFavorites(loadSearchFavorites());
   }, []);
 
   useEffect(() => {
@@ -425,42 +383,8 @@ export default function SearchPage() {
     }
   }, [favoritePracticeItem, favoritePracticeQuestionId]);
 
-  function updateSearchFavorites(
-    updater: (current: Record<string, SearchFavoriteRecord>) => Record<string, SearchFavoriteRecord>
-  ) {
-    setSearchFavorites((current) => {
-      const next = updater(current);
-      saveSearchFavorites(next);
-      return next;
-    });
-  }
-
-  function handleToggleSearchFavorite(question: Question) {
-    updateSearchFavorites((current) => {
-      if (current[question.id]) {
-        const next = { ...current };
-        delete next[question.id];
-        return next;
-      }
-
-      return {
-        ...current,
-        [question.id]: {
-          questionId: question.id,
-          addedAt: new Date().toISOString(),
-          correctCount: 0,
-          attempts: 0
-        }
-      };
-    });
-  }
-
   function handleRemoveSearchFavorite(questionId: string) {
-    updateSearchFavorites((current) => {
-      const next = { ...current };
-      delete next[questionId];
-      return next;
-    });
+    removeSavedQuestionRecord(questionId, session?.access_token);
     if (favoritePracticeQuestionId === questionId) {
       setFavoritePracticeQuestionId(null);
       setFavoriteSelectedAnswer(null);
@@ -483,15 +407,7 @@ export default function SearchPage() {
       ? Math.min(2, favoritePracticeItem.record.correctCount + 1)
       : favoritePracticeItem.record.correctCount;
 
-    updateSearchFavorites((current) => ({
-      ...current,
-      [questionId]: {
-        ...favoritePracticeItem.record,
-        attempts: favoritePracticeItem.record.attempts + 1,
-        correctCount: nextCorrectCount,
-        lastAnsweredAt: new Date().toISOString()
-      }
-    }));
+    recordSavedQuestionAnswer(questionId, isCorrect, session?.access_token);
     setFavoriteAnswerFeedback({
       questionId,
       answer: favoriteSelectedAnswer,
@@ -774,7 +690,6 @@ export default function SearchPage() {
             const error = explanationErrorMap[question.id];
             const favoriteRecord = searchFavorites[renderedQuestion.id];
             const isFavorited = Boolean(favoriteRecord);
-            const isFavoriteCompleted = isQuestionCompletedInFavoriteBank(favoriteRecord);
             const isExpanded = Boolean(expandedQuestionIds[renderedQuestion.id]);
 
             return (
@@ -894,23 +809,7 @@ export default function SearchPage() {
                 ) : null}
                 <div className="space-y-3">
                   <div className="flex flex-wrap items-center gap-2">
-                    <button
-                      type="button"
-                      onClick={() => handleToggleSearchFavorite(renderedQuestion)}
-                      className={`min-h-10 rounded-2xl px-4 py-2 text-sm font-semibold transition ${
-                        isFavoriteCompleted
-                          ? "bg-emerald-100 text-emerald-800 ring-1 ring-emerald-200 hover:bg-emerald-200"
-                          : isFavorited
-                            ? "bg-amber-100 text-amber-800 ring-1 ring-amber-200 hover:bg-amber-200"
-                            : "bg-white text-slate-800 ring-1 ring-slate-200 hover:bg-slate-50"
-                      }`}
-                    >
-                      {isFavoriteCompleted
-                        ? "已完成收藏"
-                        : isFavorited
-                          ? "已收藏"
-                          : "收藏到題庫"}
-                    </button>
+                    <SavedQuestionButton questionId={renderedQuestion.id} source="search" showLabel />
                     {isFavorited ? (
                       <span className="text-xs font-semibold text-slate-500">
                         答對 {favoriteRecord.correctCount} / 2
@@ -996,7 +895,7 @@ export default function SearchPage() {
         type="button"
         onClick={() => setFavoriteBankOpen(true)}
         className="fixed bottom-[max(1.25rem,env(safe-area-inset-bottom))] right-5 z-40 inline-flex h-14 w-14 items-center justify-center rounded-full bg-slate-950 text-white shadow-2xl ring-1 ring-white/40 transition hover:-translate-y-0.5 hover:bg-black focus:outline-none focus:ring-4 focus:ring-brand-100"
-        aria-label="開啟收藏題庫"
+        aria-label="開啟儲存題目"
       >
         <span className="text-xl leading-none">☆</span>
         {favoriteItems.length > 0 ? (
@@ -1011,7 +910,7 @@ export default function SearchPage() {
           className="fixed inset-0 z-50 bg-slate-950/35 p-3 backdrop-blur-sm sm:p-5"
           role="dialog"
           aria-modal="true"
-          aria-label="搜尋收藏題庫"
+          aria-label="搜尋儲存題目"
           onClick={() => setFavoriteBankOpen(false)}
         >
           <section
@@ -1021,12 +920,12 @@ export default function SearchPage() {
             <div className="flex items-start justify-between gap-3 border-b border-slate-100 p-5">
               <div>
                 <p className="text-xs font-semibold uppercase tracking-[0.2em] text-brand-700">Saved Bank</p>
-                <h2 className="mt-1 text-2xl font-bold text-ink">收藏題庫</h2>
+                <h2 className="mt-1 text-2xl font-bold text-ink">儲存題目</h2>
                 <p className="mt-2 text-sm text-slate-500">
                   {activeFavoriteItems.length > 0
                     ? `還有 ${activeFavoriteItems.length} 題待練，${completedFavoriteCount} 題已答對兩次。`
                     : favoriteItems.length > 0
-                      ? "收藏題都答對兩次了，這區暫時很乖。"
+                      ? "儲存題都答對兩次了，這區暫時很乖。"
                       : "搜尋頁看到想補的題，就先丟進來。"}
                 </p>
               </div>
@@ -1034,7 +933,7 @@ export default function SearchPage() {
                 type="button"
                 onClick={() => setFavoriteBankOpen(false)}
                 className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-slate-100 text-xl font-bold text-slate-700 transition hover:bg-slate-200"
-                aria-label="關閉收藏題庫"
+                aria-label="關閉儲存題目"
               >
                 ×
               </button>
@@ -1148,13 +1047,13 @@ export default function SearchPage() {
                 </section>
               ) : (
                 <section className="rounded-[1.5rem] border border-dashed border-slate-200 bg-slate-50 p-5 text-sm font-medium text-slate-500">
-                  {favoriteItems.length > 0 ? "目前沒有待練題。已答對兩次的題目會待在下面完成區。" : "收藏題庫還是空的。"}
+                  {favoriteItems.length > 0 ? "目前沒有待練題。已答對兩次的題目會待在下面完成區。" : "儲存題目還是空的。"}
                 </section>
               )}
 
               {favoriteItems.length > 0 ? (
                 <section className="space-y-2">
-                  <h3 className="text-sm font-bold text-ink">全部收藏</h3>
+                  <h3 className="text-sm font-bold text-ink">全部儲存</h3>
                   {favoriteItems.map(({ question, record }) => {
                     const completed = isQuestionCompletedInFavoriteBank(record);
                     return (
