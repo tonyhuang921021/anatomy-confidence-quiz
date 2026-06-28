@@ -174,7 +174,7 @@ const CLOUD_COMPLETED_SESSION_UPLOAD_BATCH_SIZE = 25;
 const CLOUD_LIGHT_COMPLETED_SESSION_UPLOAD_LIMIT = 40;
 const CLOUD_LIGHT_COMPLETED_ATTEMPT_UPLOAD_LIMIT = 500;
 const CLOUD_ATTEMPT_SESSION_FETCH_CHUNK_SIZE = 20;
-const CURRENT_SESSION_SYNC_MIN_INTERVAL_MS = 10_000;
+const CURRENT_SESSION_SYNC_MIN_INTERVAL_MS = 45_000;
 const STATS_SYNC_ATTEMPT_BATCH_SIZE = 200;
 const CLOUD_SESSION_LOOKUP_TIMEOUT_MS = 3500;
 const CLOUD_SYNC_BATCH_TIMEOUT_MS = 3500;
@@ -191,6 +191,7 @@ const QUESTION_EXPLANATION_SYNC_MARKER_PREFIX = "questionExplanationSync:";
 type CurrentSessionSyncState = {
   lastSyncedAt: number;
   lastSignature: string;
+  syncedAttemptSignatures: Map<number, string>;
   pendingTimer: ReturnType<typeof setTimeout> | null;
   pendingSession: QuizSession | null;
   pendingSignature: string;
@@ -691,9 +692,13 @@ function compactQuestionForCloud(question: Question): Question {
   return compactQuestionForStorage(question);
 }
 
-function buildSessionPayloadForCloud(session: QuizSession): Partial<QuizSession> {
+function buildSessionPayloadForCloud(
+  session: QuizSession,
+  options: { includeAttempts?: boolean } = {}
+): Partial<QuizSession> {
   const compacted = compactSessionForStorage(session);
   const generatedQuestions = (compacted.generatedQuestions ?? []).map(compactQuestionForCloud);
+  const includeAttempts = options.includeAttempts ?? true;
   const shouldRetainGeneratedQuestions =
     generatedQuestions.length > 0 &&
     (session.settings?.mode === "custom_paper" ||
@@ -707,13 +712,19 @@ function buildSessionPayloadForCloud(session: QuizSession): Partial<QuizSession>
     generatedQuestions: shouldRetainGeneratedQuestions ? generatedQuestions : undefined,
     currentQuestionIndex: session.completedAt ? undefined : compacted.currentQuestionIndex,
     isReviewingAnswer: session.completedAt ? undefined : compacted.isReviewingAnswer,
-    attempts: compacted.attempts.length > 0 ? compacted.attempts : undefined
+    attempts: includeAttempts && compacted.attempts.length > 0 ? compacted.attempts : undefined
   };
 }
 
-function buildSessionRowForCloud(userId: string, session: QuizSession): QuizSessionRow {
+function buildSessionRowForCloud(
+  userId: string,
+  session: QuizSession,
+  options: { includeAttemptsInPayload?: boolean } = {}
+): QuizSessionRow {
   const correctCount = session.attempts.filter((attempt) => attempt.isCorrect).length;
   const wrongCount = session.attempts.length - correctCount;
+  const includeAttemptsInPayload =
+    options.includeAttemptsInPayload ?? Boolean(session.completedAt);
 
   return {
     id: session.id,
@@ -731,7 +742,9 @@ function buildSessionRowForCloud(userId: string, session: QuizSession): QuizSess
     average_confidence: calculateAverageConfidence(session.attempts),
     started_at: session.startedAt,
     completed_at: session.completedAt ?? null,
-    session_payload: buildSessionPayloadForCloud(session)
+    session_payload: buildSessionPayloadForCloud(session, {
+      includeAttempts: includeAttemptsInPayload
+    })
   };
 }
 
@@ -755,6 +768,44 @@ function mapAttemptToCloudRow(userId: string, session: QuizSession, attempt: Att
     chapter_snapshot: generatedQuestion?.chapter ?? null,
     section_snapshot: generatedQuestion?.section ?? null
   };
+}
+
+function getAttemptUploadSignature(attempt: Attempt) {
+  return [
+    attempt.questionId,
+    attempt.selectedAnswer,
+    attempt.correctAnswer,
+    attempt.isCorrect ? "1" : "0",
+    attempt.confidence,
+    attempt.errorType ?? "",
+    attempt.answeredAt
+  ].join("|");
+}
+
+function getAttemptRowsNeedingUpload(
+  userId: string,
+  session: QuizSession,
+  syncedAttemptSignatures?: Map<number, string>
+) {
+  return session.attempts
+    .map((attempt, index) => {
+      const signature = getAttemptUploadSignature(attempt);
+      if (syncedAttemptSignatures?.get(index) === signature) return null;
+      return {
+        row: mapAttemptToCloudRow(userId, session, attempt, index),
+        index,
+        signature
+      };
+    })
+    .filter(
+      (
+        item
+      ): item is {
+        row: ReturnType<typeof mapAttemptToCloudRow>;
+        index: number;
+        signature: string;
+      } => Boolean(item)
+    );
 }
 
 function mapCloudAttemptRowToAttempt(row: QuizSessionAttemptRow): Attempt {
@@ -1666,13 +1717,26 @@ async function refreshOwnerDailyStatsForDates(activityDates: string[]) {
   if (error) throw error;
 }
 
-async function upsertSessionsForUser(userId: string, sessions: QuizSession[]) {
+async function upsertSessionsForUser(
+  userId: string,
+  sessions: QuizSession[],
+  options: {
+    activeCheckpoint?: boolean;
+    syncedAttemptSignatures?: Map<number, string>;
+  } = {}
+) {
   if (isSupabaseRecoveryMode()) return;
   if (!isSupabaseConfigured() || sessions.length === 0) return;
 
   const supabase = getSupabaseBrowserClient();
   const namespacedSessions = canonicalizeSessionsForUser(userId, sessions);
-  const rows = dedupeSessionRows(namespacedSessions.map((session) => buildSessionRowForCloud(userId, session)));
+  const rows = dedupeSessionRows(
+    namespacedSessions.map((session) =>
+      buildSessionRowForCloud(userId, session, {
+        includeAttemptsInPayload: !options.activeCheckpoint || Boolean(session.completedAt)
+      })
+    )
+  );
   const incompleteSessionIds = rows
     .filter((row) => !isCompletedQuizSessionRow(row))
     .map((row) => row.id);
@@ -1715,11 +1779,18 @@ async function upsertSessionsForUser(userId: string, sessions: QuizSession[]) {
     throw error;
   }
 
-  const attemptRows = dedupeSessionAttemptRows(
-    safeSessions.flatMap((session) =>
-      session.attempts.map((attempt, index) => mapAttemptToCloudRow(userId, session, attempt, index))
-    )
-  );
+  const attemptRowsWithSignatures = safeSessions.flatMap((session) => {
+    if (options.activeCheckpoint && !session.completedAt) {
+      return getAttemptRowsNeedingUpload(userId, session, options.syncedAttemptSignatures);
+    }
+
+    return session.attempts.map((attempt, index) => ({
+      row: mapAttemptToCloudRow(userId, session, attempt, index),
+      index,
+      signature: getAttemptUploadSignature(attempt)
+    }));
+  });
+  const attemptRows = dedupeSessionAttemptRows(attemptRowsWithSignatures.map((item) => item.row));
 
   if (attemptRows.length === 0) return;
 
@@ -1729,6 +1800,12 @@ async function upsertSessionsForUser(userId: string, sessions: QuizSession[]) {
 
   if (attemptError) {
     throw attemptError;
+  }
+
+  if (options.activeCheckpoint && options.syncedAttemptSignatures) {
+    for (const item of attemptRowsWithSignatures) {
+      options.syncedAttemptSignatures.set(item.index, item.signature);
+    }
   }
 }
 
@@ -1764,6 +1841,19 @@ async function upsertSessionsForUserInBatchesSafely(userId: string, sessions: Qu
   } catch (error) {
     console.error("Completed session backfill skipped:", error);
   }
+}
+
+function getCurrentSessionSyncStateKey(userId: string, sessionId: string) {
+  return `${userId}:${namespaceSessionIdForUser(userId, sessionId)}`;
+}
+
+function clearCurrentSessionSyncStateForSession(userId: string, sessionId: string) {
+  const stateKey = getCurrentSessionSyncStateKey(userId, sessionId);
+  const existing = currentSessionSyncState.get(stateKey);
+  if (existing?.pendingTimer) {
+    clearTimeout(existing.pendingTimer);
+  }
+  currentSessionSyncState.delete(stateKey);
 }
 
 export async function syncCompletedSessionsForCurrentUser(userId: string) {
@@ -1939,7 +2029,9 @@ export async function syncCurrentSessionForCurrentUser(userId: string) {
 
   if (winner && !winner.completedAt) {
     await withCloudFallback(
-      upsertSessionsForUser(userId, canonicalizeSessionsForUser(userId, [winner])).then(() => true),
+      upsertSessionsForUser(userId, canonicalizeSessionsForUser(userId, [winner]), {
+        activeCheckpoint: true
+      }).then(() => true),
       false
     );
   }
@@ -1963,7 +2055,9 @@ export async function syncLocalCurrentSessionForCurrentUser(userId: string) {
 
   const canonicalSession = canonicalizeSessionsForUser(userId, [localCurrentSession])[0] ?? localCurrentSession;
   await withClientTimeout(
-    upsertSessionsForUser(userId, [canonicalSession]),
+    upsertSessionsForUser(userId, [canonicalSession], {
+      activeCheckpoint: true
+    }),
     CLOUD_SYNC_BATCH_TIMEOUT_MS,
     "目前作答雲端同步逾時，先保留本機紀錄。"
   );
@@ -1980,6 +2074,9 @@ export async function pushCompletedSessionToSupabase(session: QuizSession) {
 
   if (data.user) {
     const canonicalSessions = canonicalizeSessionsForUser(data.user.id, [session]);
+    for (const canonicalSession of canonicalSessions) {
+      clearCurrentSessionSyncStateForSession(data.user.id, canonicalSession.id);
+    }
     queuePendingCompletedSessionUploadForUser(data.user.id, canonicalSessions);
     mergeCompletedQuestionHistoryFromSessionsForUser(data.user.id, canonicalSessions);
     if (getCompletedSessionsStorageLengthForUser(data.user.id) <= CLOUD_HEAVY_LOCAL_HISTORY_READ_LIMIT) {
@@ -2019,7 +2116,10 @@ export async function pushQuestionStatsSnapshotToSupabase(session: QuizSession) 
   await syncQuestionStatsForSessionsSafely([latestAttemptSession]);
 }
 
-export async function pushCurrentSessionToSupabase(session: QuizSession) {
+export async function pushCurrentSessionToSupabase(
+  session: QuizSession,
+  options: { force?: boolean } = {}
+) {
   if (isSupabaseRecoveryMode()) return;
   if (!isSupabaseConfigured() || session.completedAt) return;
 
@@ -2039,37 +2139,47 @@ export async function pushCurrentSessionToSupabase(session: QuizSession) {
   const signature = [
     canonicalSession.id,
     canonicalSession.currentQuestionIndex ?? 0,
-    canonicalSession.isReviewingAnswer ? "reviewing" : "answering",
     canonicalSession.attempts.length,
-    latestAttemptAt,
-    canonicalSession.questionOrder?.length ?? 0
+    latestAttemptAt
   ].join("|");
-  const stateKey = `${userId}:${canonicalSession.id}`;
+  const stateKey = getCurrentSessionSyncStateKey(userId, canonicalSession.id);
   const now = Date.now();
   const existing = currentSessionSyncState.get(stateKey);
 
-  if (existing?.lastSignature === signature) return;
+  if (!options.force && existing?.lastSignature === signature) return;
 
-  async function flush(nextSession: QuizSession, nextSignature: string) {
+  async function flush(
+    nextSession: QuizSession,
+    nextSignature: string,
+    syncedAttemptSignatures: Map<number, string>
+  ) {
     await withClientTimeout(
-      upsertSessionsForUser(userId, [nextSession]),
+      upsertSessionsForUser(userId, [nextSession], {
+        activeCheckpoint: true,
+        syncedAttemptSignatures
+      }),
       CLOUD_SYNC_BATCH_TIMEOUT_MS,
       "目前作答雲端同步逾時，先保留本機紀錄。"
     );
     currentSessionSyncState.set(stateKey, {
       lastSyncedAt: Date.now(),
       lastSignature: nextSignature,
+      syncedAttemptSignatures,
       pendingTimer: null,
       pendingSession: null,
       pendingSignature: ""
     });
   }
 
-  if (!existing || now - existing.lastSyncedAt >= CURRENT_SESSION_SYNC_MIN_INTERVAL_MS) {
+  if (options.force || !existing || now - existing.lastSyncedAt >= CURRENT_SESSION_SYNC_MIN_INTERVAL_MS) {
     if (existing?.pendingTimer) {
       clearTimeout(existing.pendingTimer);
     }
-    await flush(canonicalSession, signature);
+    await flush(
+      canonicalSession,
+      signature,
+      existing?.syncedAttemptSignatures ?? new Map<number, string>()
+    );
     return;
   }
 
@@ -2091,11 +2201,17 @@ export async function pushCurrentSessionToSupabase(session: QuizSession) {
       const pendingSignature = latestState?.pendingSignature || signature;
       latestState?.pendingTimer && clearTimeout(latestState.pendingTimer);
       if (!pendingSession) return;
-      void flush(pendingSession, pendingSignature).catch((error) => {
+      void flush(
+        pendingSession,
+        pendingSignature,
+        latestState?.syncedAttemptSignatures ?? new Map<number, string>()
+      ).catch((error) => {
         console.error("Current session cloud sync skipped:", error);
         currentSessionSyncState.set(stateKey, {
           lastSyncedAt: latestState?.lastSyncedAt ?? 0,
           lastSignature: latestState?.lastSignature ?? "",
+          syncedAttemptSignatures:
+            latestState?.syncedAttemptSignatures ?? new Map<number, string>(),
           pendingTimer: null,
           pendingSession: pendingSession,
           pendingSignature

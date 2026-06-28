@@ -27,18 +27,6 @@ type StatsSyncBody = {
   }[];
 };
 
-type QuestionAttemptLogRow = {
-  session_id: string;
-  question_id: string;
-  is_correct: boolean;
-  answered_at: string;
-};
-
-type QuestionAttemptDeviceDailyRow = {
-  visitor_id?: string;
-  activity_date: string;
-};
-
 type NormalizedAttemptRow = NonNullable<StatsSyncBody["attemptRows"]>[number];
 type NormalizedDeviceDailyRow = NonNullable<StatsSyncBody["deviceDailyRows"]>[number];
 
@@ -47,34 +35,6 @@ const MAX_ATTEMPT_ROWS_PER_REQUEST = 250;
 const MAX_DEVICE_DAILY_ROWS_PER_REQUEST = 90;
 const MAX_DEVICE_IDS_PER_LOOKUP = 50;
 const STATS_SYNC_TIMEOUT_MS = 4500;
-
-function isMissingCorrectAttemptsColumn(error: unknown) {
-  const maybeError = error as { code?: string; message?: string; details?: string; hint?: string } | null;
-  const haystack = [
-    maybeError?.code,
-    maybeError?.message,
-    maybeError?.details,
-    maybeError?.hint
-  ]
-    .filter(Boolean)
-    .join(" ")
-    .toLowerCase();
-
-  return (
-    haystack.includes("correct_attempts") ||
-    haystack.includes("pgrst204") ||
-    haystack.includes("42703")
-  );
-}
-
-function getTaipeiDayKey(date: Date) {
-  return new Intl.DateTimeFormat("en-CA", {
-    timeZone: "Asia/Taipei",
-    year: "numeric",
-    month: "2-digit",
-    day: "2-digit"
-  }).format(date);
-}
 
 function getServiceSupabaseClient() {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
@@ -148,68 +108,6 @@ async function getNewAttemptRows(
   return rows.filter((row) => !existingKeys.has(getAttemptKey(row)));
 }
 
-async function refreshQuestionAccuracyStatsFromAttempts(
-  supabase: any,
-  attemptRows: NormalizedAttemptRow[]
-) {
-  const uniqueQuestionIds = Array.from(
-    new Set(attemptRows.map((row) => row.question_id.trim()).filter(Boolean))
-  );
-  if (uniqueQuestionIds.length === 0) return;
-
-  const { data, error } = await supabase
-    .from("question_accuracy_stats")
-    .select("question_id, total_attempts, correct_attempts")
-    .in("question_id", uniqueQuestionIds);
-
-  if (error) throw error;
-
-  const currentStats = new Map(
-    ((data ?? []) as { question_id: string; total_attempts: number; correct_attempts: number }[]).map((row) => [
-      row.question_id,
-      {
-        total: Number(row.total_attempts ?? 0),
-        correct: Number(row.correct_attempts ?? 0)
-      }
-    ] as const)
-  );
-
-  const grouped = new Map<string, { total: number; correct: number }>();
-  for (const questionId of uniqueQuestionIds) {
-    grouped.set(questionId, { total: 0, correct: 0 });
-  }
-
-  for (const row of attemptRows) {
-    const current = grouped.get(row.question_id) ?? { total: 0, correct: 0 };
-    current.total += 1;
-    if (row.is_correct) current.correct += 1;
-    grouped.set(row.question_id, current);
-  }
-
-  const now = new Date().toISOString();
-  const rows = uniqueQuestionIds.map((questionId) => {
-    const current = currentStats.get(questionId) ?? { total: 0, correct: 0 };
-    const increment = grouped.get(questionId) ?? { total: 0, correct: 0 };
-    const stats = {
-      total: current.total + increment.total,
-      correct: current.correct + increment.correct
-    };
-    return {
-      question_id: questionId,
-      total_attempts: stats.total,
-      correct_attempts: stats.correct,
-      correct_rate: stats.total === 0 ? 0 : Number(((stats.correct / stats.total) * 100).toFixed(1)),
-      updated_at: now
-    };
-  });
-
-  const { error: upsertError } = await supabase
-    .from("question_accuracy_stats")
-    .upsert(rows as any, { onConflict: "question_id" });
-
-  if (upsertError) throw upsertError;
-}
-
 async function upsertAttemptRows(
   supabase: any,
   rows: NonNullable<StatsSyncBody["attemptRows"]>
@@ -275,94 +173,14 @@ async function upsertAttemptDeviceDaily(
   const newRows = normalizedRows.filter(
     (row) => !existingKeys.has(`${row.visitor_id}::${row.activity_date}`)
   );
+  if (newRows.length === 0) return [];
 
   const { error } = await supabase
     .from("question_attempt_device_daily")
-    .upsert(normalizedRows as any, { onConflict: "visitor_id,activity_date" });
+    .upsert(newRows as any, { onConflict: "visitor_id,activity_date" });
 
   if (error) throw error;
   return newRows;
-}
-
-async function refreshOwnerDailyStatsFromAttempts(
-  supabase: any,
-  attemptRows: NormalizedAttemptRow[],
-  deviceDailyRows: NormalizedDeviceDailyRow[]
-) {
-  const uniqueDates = Array.from(
-    new Set([
-      ...attemptRows.map((row) => getTaipeiDayKey(new Date(row.answered_at))),
-      ...deviceDailyRows.map((row) => row.activity_date)
-    ])
-  ).sort();
-  if (uniqueDates.length === 0) return;
-
-  let supportsCorrectAttempts = true;
-  let { data, error } = await supabase
-    .from("owner_daily_stats")
-    .select("activity_date, attempts, correct_attempts, devices")
-    .in("activity_date", uniqueDates);
-
-  if (error && isMissingCorrectAttemptsColumn(error)) {
-    supportsCorrectAttempts = false;
-    const fallbackResult = await supabase
-      .from("owner_daily_stats")
-      .select("activity_date, attempts, devices")
-      .in("activity_date", uniqueDates);
-    data = fallbackResult.data;
-    error = fallbackResult.error;
-  }
-
-  if (error) throw error;
-
-  const currentStats = new Map(
-    ((data ?? []) as { activity_date: string; attempts: number; correct_attempts?: number | null; devices: number }[]).map((row) => [
-      row.activity_date,
-      {
-        attempts: Number(row.attempts ?? 0),
-        correctAttempts: Number(row.correct_attempts ?? 0),
-        devices: Number(row.devices ?? 0)
-      }
-    ] as const)
-  );
-  const attemptMap = new Map<string, number>();
-  const correctAttemptMap = new Map<string, number>();
-  const deviceMap = new Map<string, number>();
-
-  for (const row of attemptRows) {
-    const dayKey = getTaipeiDayKey(new Date(row.answered_at));
-    attemptMap.set(dayKey, (attemptMap.get(dayKey) ?? 0) + 1);
-    if (row.is_correct) {
-      correctAttemptMap.set(dayKey, (correctAttemptMap.get(dayKey) ?? 0) + 1);
-    }
-  }
-
-  for (const row of deviceDailyRows) {
-    deviceMap.set(row.activity_date, (deviceMap.get(row.activity_date) ?? 0) + 1);
-  }
-
-  const rows = uniqueDates.map((activityDate) => {
-    const baseRow = {
-      activity_date: activityDate,
-      attempts: (currentStats.get(activityDate)?.attempts ?? 0) + (attemptMap.get(activityDate) ?? 0),
-      devices: (currentStats.get(activityDate)?.devices ?? 0) + (deviceMap.get(activityDate) ?? 0),
-      updated_at: new Date().toISOString()
-    };
-
-    if (!supportsCorrectAttempts) return baseRow;
-
-    return {
-      ...baseRow,
-      correct_attempts:
-        (currentStats.get(activityDate)?.correctAttempts ?? 0) + (correctAttemptMap.get(activityDate) ?? 0)
-    };
-  });
-
-  const { error: upsertError } = await supabase
-    .from("owner_daily_stats")
-    .upsert(rows as any, { onConflict: "activity_date" });
-
-  if (upsertError) throw upsertError;
 }
 
 export async function POST(request: NextRequest) {
@@ -409,23 +227,18 @@ export async function POST(request: NextRequest) {
 
     await withServerTimeout(
       (async () => {
-        const newAttemptRows = await upsertAttemptRows(supabase, attemptRows);
-
-        const [, newDeviceDailyRows] = await Promise.all([
-          body.deviceRow ? upsertAttemptDevice(supabase, body.deviceRow) : Promise.resolve(),
-          upsertAttemptDeviceDaily(supabase, deviceDailyRows)
-        ]);
+        await upsertAttemptRows(supabase, attemptRows);
 
         await Promise.all([
-          refreshQuestionAccuracyStatsFromAttempts(supabase, newAttemptRows),
-          refreshOwnerDailyStatsFromAttempts(supabase, newAttemptRows, newDeviceDailyRows)
+          body.deviceRow ? upsertAttemptDevice(supabase, body.deviceRow) : Promise.resolve(),
+          upsertAttemptDeviceDaily(supabase, deviceDailyRows)
         ]);
       })(),
       STATS_SYNC_TIMEOUT_MS,
       "統計同步逾時，已改為稍後再補"
     );
 
-    return NextResponse.json({ ok: true });
+    return NextResponse.json({ ok: true, rollupDeferred: true });
   } catch (error) {
     const message = error instanceof Error ? error.message : "統計同步失敗";
     if (

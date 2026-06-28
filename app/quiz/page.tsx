@@ -889,6 +889,26 @@ export default function QuizPage() {
     };
   }, [authSession?.user?.id, mounted, session]);
 
+  useEffect(() => {
+    if (!authSession?.user?.id || !session || session.completedAt || !mounted) return;
+
+    const flushCurrentSession = () => {
+      void pushCurrentSessionToSupabase(session, { force: true });
+    };
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === "hidden") {
+        flushCurrentSession();
+      }
+    };
+
+    document.addEventListener("visibilitychange", handleVisibilityChange);
+    window.addEventListener("pagehide", flushCurrentSession);
+    return () => {
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
+      window.removeEventListener("pagehide", flushCurrentSession);
+    };
+  }, [authSession?.user?.id, mounted, session]);
+
   const allQuestionFallbackMap = useMemo(
     () =>
       new Map(

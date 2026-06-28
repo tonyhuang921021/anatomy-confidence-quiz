@@ -430,25 +430,17 @@ export async function POST(request: NextRequest) {
   const addedRollupCount = await ensureSessionRollups(supabase, user.id, shouldFullRefresh);
 
   if (!body.forceFullRefresh && existingProfile && addedRollupCount === 0) {
-    const refreshedAt = new Date().toISOString();
-    const { error: refreshError } = await supabase.from("leaderboard_profiles").upsert(
-      {
-        user_id: user.id,
-        display_name: displayName,
-        total_attempts: existingProfile.total_attempts ?? 0,
-        correct_attempts: existingProfile.correct_attempts ?? 0,
-        correct_rate: existingProfile.correct_rate ?? 0,
-        total_sessions: existingProfile.total_sessions ?? 0,
-        updated_at: refreshedAt
-      },
-      { onConflict: "user_id" }
-    );
+    if (existingProfile.display_name !== displayName) {
+      const { error: refreshError } = await supabase.from("leaderboard_profiles").update({
+        display_name: displayName
+      }).eq("user_id", user.id);
 
-    if (refreshError) throw refreshError;
+      if (refreshError) throw refreshError;
+    }
 
     return NextResponse.json({
       ok: true,
-      leaderboard: mapProfileToSummary({ ...existingProfile, display_name: displayName, updated_at: refreshedAt }),
+      leaderboard: mapProfileToSummary({ ...existingProfile, display_name: displayName }),
       cached: true
     });
   }

@@ -1,4 +1,10 @@
 {
+  "crons": [
+    {
+      "path": "/api/cron/rollup-stats",
+      "schedule": "*/5 * * * *"
+    }
+  ],
   "headers": [
     {
       "source": "/sw.js",
