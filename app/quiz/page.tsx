@@ -634,7 +634,7 @@ export default function QuizPage() {
     });
   }
 
-  function flushDeferredCurrentSessionSave() {
+  function takeDeferredCurrentSessionSave() {
     if (deferredCurrentSessionSaveRef.current !== null) {
       window.clearTimeout(deferredCurrentSessionSaveRef.current);
       deferredCurrentSessionSaveRef.current = null;
@@ -642,6 +642,11 @@ export default function QuizPage() {
 
     const pendingSession = deferredCurrentSessionRef.current;
     deferredCurrentSessionRef.current = null;
+    return pendingSession;
+  }
+
+  function flushDeferredCurrentSessionSave() {
+    const pendingSession = takeDeferredCurrentSessionSave();
     if (pendingSession) {
       saveCurrentSession(pendingSession);
     }
@@ -1165,6 +1170,7 @@ export default function QuizPage() {
   }
 
   function finalizeCompletedSession(completedSession: QuizSession) {
+    takeDeferredCurrentSessionSave();
     const completedKey = completedSession.id.replace(/^user-[^:]+:/, "");
     if (completedSessionIdsRef.current.has(completedKey)) {
       return false;
@@ -1177,6 +1183,34 @@ export default function QuizPage() {
       clearMatchingCurrentSessions(completedSession.id, [authSession?.user?.id ?? ""]);
     }
     return saved !== false;
+  }
+
+  function getSessionReadyForCompletion(baseSession: QuizSession) {
+    const pendingSession =
+      deferredCurrentSessionRef.current?.id === baseSession.id
+        ? deferredCurrentSessionRef.current
+        : baseSession;
+
+    if (!submittedAttempt) return pendingSession;
+
+    const latestAttempt: Attempt = {
+      ...submittedAttempt,
+      confidence: confidenceRef.current,
+      errorType: errorType ?? submittedAttempt.errorType
+    };
+    const hasAttempt = pendingSession.attempts.some(
+      (attempt) => attempt.questionId === latestAttempt.questionId
+    );
+    const attempts = hasAttempt
+      ? pendingSession.attempts.map((attempt) =>
+          attempt.questionId === latestAttempt.questionId ? latestAttempt : attempt
+        )
+      : [...pendingSession.attempts, latestAttempt];
+
+    return {
+      ...pendingSession,
+      attempts
+    } satisfies QuizSession;
   }
 
   function handleSelectConfidence(value: ConfidenceLevel) {
@@ -1614,8 +1648,9 @@ export default function QuizPage() {
     const isLast = currentIndex >= targetCount - 1;
 
     if (isLast) {
+      const completionSession = getSessionReadyForCompletion(session);
       const completedSession: QuizSession = {
-        ...session,
+        ...completionSession,
         completedAt: new Date().toISOString(),
         isReviewingAnswer: false
       };
@@ -1651,8 +1686,9 @@ export default function QuizPage() {
   function handleEndAfterReview() {
     if (!session) return;
 
+    const completionSession = getSessionReadyForCompletion(session);
     const completedSession: QuizSession = {
-      ...session,
+      ...completionSession,
       completedAt: new Date().toISOString(),
       isReviewingAnswer: false
     };

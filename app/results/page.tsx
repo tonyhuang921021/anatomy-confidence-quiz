@@ -74,6 +74,11 @@ import {
   buildQuestionExplanationRequestQuestion,
   findQuestionSource
 } from "@/lib/questionExplanationRequest";
+import {
+  analyzeMastery,
+  getMasteryCategoryLabelForAnswer,
+  type MasteryCategoryKey
+} from "@/lib/masteryAnalysis";
 
 const allQuestions = Array.from(
   new Map(
@@ -84,6 +89,7 @@ const allQuestions = Array.from(
 );
 
 const optionKeys: OptionKey[] = ["A", "B", "C", "D", "E"];
+const MAX_OPEN_REVIEW_DETAILS = 2;
 
 function getQuestionMap(
   session: QuizSession,
@@ -394,6 +400,38 @@ function getConfidenceOverviewLabel(confidence: number) {
   return `信心 ${Math.min(Math.max(Math.round(confidence), 1), 4)}`;
 }
 
+function getMasteryToneClass(tone: string) {
+  if (tone === "emerald") return "border-emerald-200 bg-emerald-50 text-emerald-950";
+  if (tone === "sky") return "border-sky-200 bg-sky-50 text-sky-950";
+  if (tone === "yellow") return "border-yellow-200 bg-yellow-50 text-yellow-950";
+  if (tone === "rose") return "border-rose-200 bg-rose-50 text-rose-950";
+  if (tone === "orange") return "border-orange-200 bg-orange-50 text-orange-950";
+  return "border-slate-200 bg-slate-50 text-slate-900";
+}
+
+function getMasteryAccentClass(tone: string) {
+  if (tone === "emerald") return "bg-emerald-500";
+  if (tone === "sky") return "bg-sky-500";
+  if (tone === "yellow") return "bg-yellow-400";
+  if (tone === "rose") return "bg-rose-500";
+  if (tone === "orange") return "bg-orange-400";
+  return "bg-slate-400";
+}
+
+function getMasteryBadgeClass(label: string) {
+  if (label === "錯誤自信") return "bg-rose-100 text-rose-800 ring-rose-200";
+  if (label === "概念不穩") return "bg-orange-100 text-orange-800 ring-orange-200";
+  if (label === "基礎缺口") return "bg-slate-100 text-slate-700 ring-slate-200";
+  if (label === "猜對風險") return "bg-yellow-100 text-yellow-900 ring-yellow-200";
+  if (label === "接近掌握") return "bg-sky-100 text-sky-800 ring-sky-200";
+  if (label === "穩定掌握") return "bg-emerald-100 text-emerald-800 ring-emerald-200";
+  return "bg-slate-100 text-slate-700 ring-slate-200";
+}
+
+function formatNullablePercent(value: number | null) {
+  return value === null ? "—" : `${value}%`;
+}
+
 function normalizeSummaryStem(stem: string) {
   return stem.replace(/\s+/g, " ").trim();
 }
@@ -428,6 +466,7 @@ function ResultsPageContent() {
   const [isFullscreenReview, setIsFullscreenReview] = useState(false);
   const [isFullscreenReviewVisible, setIsFullscreenReviewVisible] = useState(false);
   const [openReviewDetailKeys, setOpenReviewDetailKeys] = useState<Set<string>>(() => new Set());
+  const [isConfidenceCalibrationOpen, setIsConfidenceCalibrationOpen] = useState(false);
   const [visibleHistoryCount, setVisibleHistoryCount] = useState(RESULTS_HISTORY_PAGE_SIZE);
   const [resultsScope, setResultsScope] = useState<"default" | "simulation">("default");
   const [editableSessionName, setEditableSessionName] = useState("");
@@ -745,6 +784,10 @@ function ResultsPageContent() {
   }, [requestedSessionId]);
 
   useEffect(() => {
+    setIsConfidenceCalibrationOpen(false);
+  }, [requestedSessionId]);
+
+  useEffect(() => {
     if (!state.session) {
       setEditableSessionName("");
       setSessionNameNotice("");
@@ -892,6 +935,23 @@ function ResultsPageContent() {
       })),
     [orderedReviewedAttempts, questionNumberMap]
   );
+  const masteryAnalysis = useMemo(
+    () =>
+      analyzeMastery(
+        confidenceOverviewItems.map(({ attempt, question, questionNumber }) => ({
+          questionId: attempt.questionId,
+          isCorrect: attempt.isCorrect,
+          confidence: attempt.confidence,
+          questionNumber,
+          question
+        }))
+      ),
+    [confidenceOverviewItems]
+  );
+  const masteryReviewItemMap = useMemo(
+    () => new Map(masteryAnalysis.reviewItems.map((item) => [item.questionId, item] as const)),
+    [masteryAnalysis.reviewItems]
+  );
   const wrongAttempts = useMemo(
     () => orderedReviewedAttempts.filter((item) => !item.attempt.isCorrect),
     [orderedReviewedAttempts]
@@ -1000,7 +1060,13 @@ function ResultsPageContent() {
     setOpenReviewDetailKeys((current) => {
       const next = new Set(current);
       if (isOpen) {
+        next.delete(key);
         next.add(key);
+        while (next.size > MAX_OPEN_REVIEW_DETAILS) {
+          const oldestKey = next.values().next().value;
+          if (!oldestKey) break;
+          next.delete(oldestKey);
+        }
       } else {
         next.delete(key);
       }
@@ -1014,6 +1080,33 @@ function ResultsPageContent() {
 
     window.setTimeout(() => {
       document.getElementById(`review-${detailKey}`)?.scrollIntoView({
+        behavior: "smooth",
+        block: "center"
+      });
+    }, 0);
+  }
+
+  function openMasteryQuestion(questionId: string) {
+    const item = confidenceOverviewItems.find(({ attempt }) => attempt.questionId === questionId);
+    if (!item) return;
+    openQuestionReviewDetail(`all-${item.attempt.questionId}-${item.questionNumber}`);
+  }
+
+  function openMasteryCategory(categoryKey: MasteryCategoryKey) {
+    const category = masteryAnalysis.categories.find((item) => item.key === categoryKey);
+    if (!category || category.questionIds.length === 0) return;
+    const questionIds = new Set(category.questionIds);
+    const detailKeys = confidenceOverviewItems
+      .filter(({ attempt }) => questionIds.has(attempt.questionId))
+      .map(({ attempt, questionNumber }) => `all-${attempt.questionId}-${questionNumber}`);
+    const firstDetailKey = detailKeys[0];
+    if (!firstDetailKey) return;
+
+    setOpenReviewDetailKeys(new Set(detailKeys.slice(0, MAX_OPEN_REVIEW_DETAILS)));
+
+    if (typeof window === "undefined") return;
+    window.setTimeout(() => {
+      document.getElementById(`review-${firstDetailKey}`)?.scrollIntoView({
         behavior: "smooth",
         block: "center"
       });
@@ -1342,11 +1435,13 @@ function ResultsPageContent() {
   function renderQuestionSummaryLine({
     prefix,
     question,
-    suffix
+    suffix,
+    correctness
   }: {
     prefix: string;
     question: Question;
     suffix?: string;
+    correctness?: boolean;
   }) {
     const sourceBadge = getQuestionSourceBadgeLabel(question);
     const trimmedPrefix = prefix.trim();
@@ -1374,6 +1469,17 @@ function ResultsPageContent() {
         </span>
         <span className="flex shrink-0 flex-col items-end gap-1.5">
           <span className="flex items-center gap-1.5">
+            {typeof correctness === "boolean" ? (
+              <span
+                className={`rounded-full px-3 py-1 text-[12px] font-black ring-1 ${
+                  correctness
+                    ? "bg-emerald-100 text-emerald-800 ring-emerald-200"
+                    : "bg-rose-100 text-rose-800 ring-rose-200"
+                }`}
+              >
+                {correctness ? "答對" : "答錯"}
+              </span>
+            ) : null}
             {sourceBadge ? (
               <span className="rounded-full bg-white/80 px-2.5 py-1 text-[11px] font-bold text-slate-600 ring-1 ring-slate-200">
                 {sourceBadge}
@@ -1399,6 +1505,10 @@ function ResultsPageContent() {
     showCorrectness?: boolean;
     showTestedConcept?: boolean;
   }) {
+    const masteryLabel =
+      masteryReviewItemMap.get(attempt.questionId)?.categoryLabel ??
+      getMasteryCategoryLabelForAnswer(attempt);
+
     return (
       <div className="mt-2 min-w-0 space-y-3 overflow-hidden text-sm leading-7 text-slate-700 [overflow-wrap:anywhere]">
         <div className="flex min-w-0 items-start gap-3">
@@ -1457,6 +1567,12 @@ function ResultsPageContent() {
             {attempt.isCorrect ? "答對" : "答錯"}
           </p>
         ) : null}
+        <p>
+          <span className="font-semibold">本題狀態：</span>
+          <span className={`ml-1 rounded-full px-2.5 py-1 text-xs font-bold ring-1 ${getMasteryBadgeClass(masteryLabel)}`}>
+            {masteryLabel}
+          </span>
+        </p>
         {showTestedConcept ? (
           <p>
             <span className="font-semibold">testedConcept：</span>
@@ -1487,6 +1603,255 @@ function ResultsPageContent() {
         ) : null}
         {renderExplanationFooter(question, attempt)}
       </div>
+    );
+  }
+
+  function renderConfidenceCalibrationSection() {
+    if (masteryAnalysis.total === 0) return null;
+    const priorityItems = masteryAnalysis.reviewItems.filter((item) => item.priority > 0).slice(0, 5);
+    const visibleTopicStats = masteryAnalysis.topicStats.slice(0, 3);
+    const overconfidenceCategory = masteryAnalysis.categories.find(
+      (category) => category.key === "overconfidence_error"
+    );
+
+    return (
+      <section className="mt-4 rounded-[2rem] bg-white p-4 shadow-card ring-1 ring-slate-100 sm:p-5">
+        <button
+          type="button"
+          onClick={() => setIsConfidenceCalibrationOpen((current) => !current)}
+          aria-expanded={isConfidenceCalibrationOpen}
+          className="flex w-full flex-wrap items-center justify-between gap-3 text-left"
+        >
+          <div className="min-w-0">
+            <p className="text-sm font-semibold text-ink">信心校準</p>
+            <p className="mt-1 text-sm text-slate-500">
+              {masteryAnalysis.masteryLevel.label}・校準後 {formatNullablePercent(masteryAnalysis.calibratedMasteryPercent)}
+            </p>
+          </div>
+          <div className="flex items-center gap-2">
+            <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-700">
+              建議先回顧 {masteryAnalysis.reviewCount} 題
+            </span>
+            <span className="rounded-full bg-slate-900 px-3 py-1 text-xs font-semibold text-white transition">
+              {isConfidenceCalibrationOpen ? "收起" : "展開"}
+            </span>
+          </div>
+        </button>
+
+        <div
+          className={`grid transition-[grid-template-rows,opacity] duration-500 ease-out ${
+            isConfidenceCalibrationOpen ? "grid-rows-[1fr] opacity-100" : "grid-rows-[0fr] opacity-0"
+          }`}
+        >
+          <div className="min-h-0 overflow-hidden">
+            <div className="mt-4 space-y-4">
+              <div className="grid gap-4 lg:grid-cols-[0.9fr_1.1fr] lg:items-start">
+                <div className="space-y-3">
+                  <div className="rounded-2xl bg-slate-50 p-4">
+                    <div className="flex flex-wrap items-center justify-between gap-2">
+                      <p className="text-sm font-black text-ink">本輪判讀</p>
+                      <span className="rounded-full bg-white px-3 py-1 text-xs font-bold text-slate-600 ring-1 ring-slate-200">
+                        信心校準：{masteryAnalysis.calibrationLabel}
+                      </span>
+                    </div>
+                    <div className="mt-3 space-y-2 text-sm leading-6 text-slate-700">
+                      {masteryAnalysis.summarySentences.map((sentence) => (
+                        <p key={sentence}>{sentence}</p>
+                      ))}
+                    </div>
+                    <div className="mt-3 rounded-2xl bg-white px-4 py-3 text-xs font-semibold leading-5 text-slate-600 ring-1 ring-slate-200">
+                      {masteryAnalysis.sampleMessage}
+                      {masteryAnalysis.hasMissingConfidence ? (
+                        <span className="mt-1 block text-amber-700">
+                          有 {masteryAnalysis.missingConfidenceCount} 題缺少 1-4 信心資料，掌握度僅供參考。
+                        </span>
+                      ) : null}
+                    </div>
+                  </div>
+
+                  {overconfidenceCategory && overconfidenceCategory.count > 0 ? (
+                    <button
+                      type="button"
+                      onClick={() => openMasteryCategory("overconfidence_error")}
+                      className="w-full rounded-2xl border border-rose-200 bg-rose-50 p-4 text-left text-sm font-semibold leading-6 text-rose-950 transition hover:-translate-y-0.5 hover:shadow-sm"
+                    >
+                      優先處理信心 4 但答錯的題目，這類題最容易在正式考試中穩定失分。
+                      <span className="mt-2 block text-xs font-black">打開 {overconfidenceCategory.count} 題錯誤自信</span>
+                    </button>
+                  ) : null}
+
+                  <div className="rounded-2xl border border-slate-200 bg-white p-3">
+                    <div className="flex items-center justify-between gap-3 px-1">
+                      <p className="text-sm font-black text-ink">優先回顧</p>
+                      <p className="text-[11px] font-semibold text-slate-500">點一下打開題目</p>
+                    </div>
+                    <div className="mt-3 space-y-2">
+                      {priorityItems.length === 0 ? (
+                        <div className="rounded-2xl bg-emerald-50 px-3 py-3 text-sm font-semibold text-emerald-900">
+                          這輪沒有需要優先處理的高風險題。
+                        </div>
+                      ) : (
+                        priorityItems.map((item, index) => (
+                          <button
+                            key={`${item.questionId}-${item.priority}`}
+                            type="button"
+                            onClick={() => openMasteryQuestion(item.questionId)}
+                            className={`flex w-full items-center gap-3 rounded-2xl border px-3 py-2.5 text-left transition hover:-translate-y-0.5 hover:shadow-sm ${getMasteryToneClass(
+                              masteryAnalysis.categories.find((category) => category.key === item.categoryKey)?.tone ?? "slate"
+                            )}`}
+                          >
+                            <span className="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-white/75 text-sm font-black shadow-sm">
+                              {index + 1}
+                            </span>
+                            <span className="min-w-0 flex-1">
+                              <span className="block text-sm font-black">{item.categoryLabel}</span>
+                              <span className="block truncate text-xs font-semibold opacity-75">
+                                第 {item.questionNumber ?? "—"} 題・信心 {item.confidence}
+                              </span>
+                            </span>
+                            <span className="shrink-0 text-xs font-black">優先 {item.priority}</span>
+                          </button>
+                        ))
+                      )}
+                    </div>
+                  </div>
+                </div>
+
+                <div className="space-y-3">
+                  <div className="grid grid-cols-2 gap-2">
+                    {[
+                      { label: "穩定掌握率", value: formatNullablePercent(masteryAnalysis.stableMasteryPercent) },
+                      { label: "基礎缺口", value: formatNullablePercent(masteryAnalysis.basicGapPercent) },
+                      { label: "概念不穩", value: formatNullablePercent(masteryAnalysis.shakyConceptPercent) },
+                      { label: "不穩答對", value: formatNullablePercent(masteryAnalysis.unstableCorrectPercent) }
+                    ].map((item) => (
+                      <div key={item.label} className="rounded-2xl bg-slate-50 px-4 py-3 ring-1 ring-slate-200">
+                        <p className="text-[11px] font-bold text-slate-500">{item.label}</p>
+                        <p className="mt-1 text-2xl font-black text-ink">{item.value}</p>
+                      </div>
+                    ))}
+                  </div>
+
+                  <div className="rounded-2xl bg-slate-50 p-3">
+                    <div className="flex flex-wrap items-end justify-between gap-2 px-1 pb-3">
+                      <div>
+                        <p className="text-sm font-black text-ink">六分類地圖</p>
+                        <p className="mt-1 text-xs font-medium text-slate-500">
+                          每類都可以點開對應題目。
+                        </p>
+                      </div>
+                    </div>
+                    <div className="grid gap-2 sm:grid-cols-2">
+                      {masteryAnalysis.categories.map((category, index) => (
+                        <button
+                          key={category.key}
+                          type="button"
+                          onClick={() => openMasteryCategory(category.key)}
+                          disabled={category.count === 0}
+                          className={`relative overflow-hidden rounded-2xl border p-3 text-left transition hover:-translate-y-0.5 hover:shadow-sm disabled:cursor-default disabled:opacity-55 disabled:hover:translate-y-0 disabled:hover:shadow-none ${getMasteryToneClass(category.tone)}`}
+                          style={{
+                            transitionDelay: isConfidenceCalibrationOpen ? `${index * 35}ms` : "0ms"
+                          }}
+                        >
+                          <div className="flex items-start justify-between gap-3">
+                            <div className="min-w-0">
+                              <p className="text-sm font-black">{category.label}</p>
+                              <p className="mt-1 line-clamp-2 text-[11px] font-semibold leading-4 opacity-75">
+                                {category.action}
+                              </p>
+                            </div>
+                            <span className="shrink-0 rounded-full bg-white/80 px-2.5 py-1 text-sm font-black shadow-sm">
+                              {category.count}
+                            </span>
+                          </div>
+                          <div className="mt-3 h-1.5 overflow-hidden rounded-full bg-white/70">
+                            <span
+                              className={`block h-full rounded-full ${getMasteryAccentClass(category.tone)} transition-transform duration-700`}
+                              style={{
+                                transform: isConfidenceCalibrationOpen ? "scaleX(1)" : "scaleX(0)",
+                                transformOrigin: "left"
+                              }}
+                            />
+                          </div>
+                          <p className="mt-2 text-[11px] font-bold opacity-75">
+                            佔可校準題 {formatNullablePercent(category.percent)}
+                          </p>
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="grid gap-4 lg:grid-cols-[1fr_0.9fr]">
+                <div className="rounded-2xl border border-slate-200 bg-white p-4">
+                  <div className="flex flex-wrap items-end justify-between gap-2">
+                    <div>
+                      <p className="text-sm font-black text-ink">信心分層</p>
+                      <p className="mt-1 text-xs font-medium text-slate-500">
+                        信心越高，答對率理論上應該越高。
+                      </p>
+                    </div>
+                    <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-bold text-slate-600">
+                      {masteryAnalysis.biasLabel}
+                    </span>
+                  </div>
+                  <div className="mt-3 overflow-hidden rounded-2xl border border-slate-200">
+                    {masteryAnalysis.confidenceLayers.map((layer) => (
+                      <div
+                        key={layer.confidence}
+                        className="grid grid-cols-[4.5rem_1fr] gap-3 border-b border-slate-100 px-3 py-3 last:border-b-0 sm:grid-cols-[5rem_1fr_5rem_5rem_6rem]"
+                      >
+                        <p className="text-sm font-black text-ink">信心 {layer.confidence}</p>
+                        <p className="text-xs font-semibold text-slate-500">
+                          {layer.total === 0
+                            ? "目前沒有此類題目"
+                            : `${layer.total} 題・答對 ${layer.correct}・答錯 ${layer.wrong}`}
+                        </p>
+                        <p className="hidden text-sm font-black text-ink sm:block">
+                          {formatNullablePercent(layer.observedAccuracyPercent)}
+                        </p>
+                        <p className="hidden text-xs font-semibold text-slate-500 sm:block">
+                          預期 {Math.round(layer.expectedProbability * 100)}%
+                        </p>
+                        <p className="text-xs font-black text-slate-600 sm:text-right">{layer.status}</p>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {visibleTopicStats.length > 0 ? (
+                  <div className="rounded-2xl border border-slate-200 bg-white p-4">
+                    <p className="text-sm font-black text-ink">最需要補強的單元</p>
+                    <div className="mt-3 space-y-2">
+                      {visibleTopicStats.map((topic) => (
+                        <div key={topic.key} className="rounded-2xl bg-slate-50 px-3 py-3">
+                          <div className="flex items-start justify-between gap-3">
+                            <div className="min-w-0">
+                              <p className="truncate text-sm font-black text-ink">
+                                {topic.chapter} / {topic.section}
+                              </p>
+                              <p className="mt-1 text-xs font-semibold text-slate-500">
+                                {topic.subject}・{topic.total} 題
+                              </p>
+                            </div>
+                            <span className="shrink-0 rounded-full bg-white px-2.5 py-1 text-xs font-black text-slate-700 ring-1 ring-slate-200">
+                              掌握 {formatNullablePercent(topic.calibratedMasteryPercent)}
+                            </span>
+                          </div>
+                          <p className="mt-2 text-xs font-semibold text-slate-500">
+                            錯誤自信 {topic.overconfidenceCount} 題・猜對風險 {topic.guessingRiskCount} 題
+                          </p>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                ) : null}
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
     );
   }
 
@@ -1577,6 +1942,7 @@ function ResultsPageContent() {
                 ⛶ 滿版模式
               </button>
             ) : null}
+            <span className="rounded-full bg-slate-100 px-3 py-1 text-slate-600">最多展開 2 題</span>
             <span className="rounded-full bg-rose-100 px-3 py-1 text-rose-900">錯題 {wrongAttempts.length}</span>
             <span className="rounded-full bg-slate-100 px-3 py-1 text-slate-700">全部 {reviewedAttempts.length}</span>
           </div>
@@ -1594,6 +1960,9 @@ function ResultsPageContent() {
                 wrongAttempts.map(({ attempt, question }, index) => {
                   const detailKey = `wrong-${attempt.questionId}-${index}`;
                   const isOpen = openReviewDetailKeys.has(detailKey);
+                  const masteryLabel =
+                    masteryReviewItemMap.get(attempt.questionId)?.categoryLabel ??
+                    getMasteryCategoryLabelForAnswer(attempt);
 
                   return (
                     <details
@@ -1605,7 +1974,9 @@ function ResultsPageContent() {
                       <summary className="cursor-pointer overflow-hidden text-sm font-semibold text-rose-950 list-none [&::-webkit-details-marker]:hidden">
                         {renderQuestionSummaryLine({
                           prefix: `錯題 ${index + 1}：`,
-                          question
+                          question,
+                          suffix: masteryLabel,
+                          correctness: attempt.isCorrect
                         })}
                       </summary>
                       {isOpen
@@ -1634,6 +2005,9 @@ function ResultsPageContent() {
                   const detailKey = `low-confidence-${attempt.questionId}-${index}`;
                   const isOpen = openReviewDetailKeys.has(detailKey);
                   const questionNumber = questionNumberMap.get(attempt.questionId) ?? index + 1;
+                  const masteryLabel =
+                    masteryReviewItemMap.get(attempt.questionId)?.categoryLabel ??
+                    getMasteryCategoryLabelForAnswer(attempt);
 
                   return (
                     <details
@@ -1646,7 +2020,8 @@ function ResultsPageContent() {
                         {renderQuestionSummaryLine({
                           prefix: `第 ${questionNumber} 題：`,
                           question,
-                          suffix: attempt.isCorrect ? "答對" : "答錯"
+                          suffix: masteryLabel,
+                          correctness: attempt.isCorrect
                         })}
                       </summary>
                       {isOpen
@@ -1670,6 +2045,9 @@ function ResultsPageContent() {
               {confidenceOverviewItems.map(({ attempt, question, questionNumber }) => {
                 const detailKey = `all-${attempt.questionId}-${questionNumber}`;
                 const isOpen = openReviewDetailKeys.has(detailKey);
+                const masteryLabel =
+                  masteryReviewItemMap.get(attempt.questionId)?.categoryLabel ??
+                  getMasteryCategoryLabelForAnswer(attempt);
 
                 return (
                   <details
@@ -1681,9 +2059,10 @@ function ResultsPageContent() {
                   >
                     <summary className="cursor-pointer overflow-hidden text-sm font-semibold text-ink list-none [&::-webkit-details-marker]:hidden">
                       {renderQuestionSummaryLine({
-                        prefix: `第 ${questionNumber} 題：${attempt.isCorrect ? "答對" : "答錯"}`,
+                        prefix: `第 ${questionNumber} 題：`,
                         question,
-                        suffix: getConfidenceOverviewLabel(attempt.confidence)
+                        suffix: `${masteryLabel}・${getConfidenceOverviewLabel(attempt.confidence)}`,
+                        correctness: attempt.isCorrect
                       })}
                     </summary>
                     {isOpen
@@ -1770,7 +2149,8 @@ function ResultsPageContent() {
       </div>
 
       <div className="mt-6">
-        <ResultSummary summary={state.summary} />
+        <ResultSummary summary={state.summary} masteryAnalysis={masteryAnalysis} />
+        {renderConfidenceCalibrationSection()}
         {simulationSubjectScores.length > 0 ? (
           <section className="mt-4 rounded-[2rem] bg-white p-5 shadow-card ring-1 ring-slate-100 sm:p-6">
             <div className="flex flex-wrap items-end justify-between gap-3">
