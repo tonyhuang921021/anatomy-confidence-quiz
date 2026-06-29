@@ -383,6 +383,14 @@ function getQuestionSourceBadgeLabel(question: Question) {
   return "";
 }
 
+function getConfidenceTileClass(confidence: number) {
+  if (confidence <= 1) return "border-rose-200 bg-rose-500 text-white shadow-rose-100";
+  if (confidence === 2) return "border-orange-200 bg-orange-400 text-white shadow-orange-100";
+  if (confidence === 3) return "border-yellow-200 bg-yellow-300 text-slate-950 shadow-yellow-100";
+  if (confidence === 4) return "border-emerald-200 bg-emerald-100 text-emerald-950 shadow-emerald-100";
+  return "border-emerald-300 bg-emerald-200 text-emerald-950 shadow-emerald-100";
+}
+
 function normalizeSummaryStem(stem: string) {
   return stem.replace(/\s+/g, " ").trim();
 }
@@ -856,9 +864,34 @@ function ResultsPageContent() {
         .filter((item): item is { attempt: Attempt; question: Question } => Boolean(item.question)),
     [activeSession?.attempts, questionMap]
   );
+  const questionNumberMap = useMemo(() => {
+    const orderedQuestionIds =
+      activeSession?.questionOrder && activeSession.questionOrder.length > 0
+        ? activeSession.questionOrder
+        : activeSession?.attempts.map((attempt) => attempt.questionId) ?? [];
+
+    return new Map(orderedQuestionIds.map((questionId, index) => [questionId, index + 1] as const));
+  }, [activeSession?.attempts, activeSession?.questionOrder]);
+  const orderedReviewedAttempts = useMemo(
+    () =>
+      [...reviewedAttempts].sort((left, right) => {
+        const leftNumber = questionNumberMap.get(left.attempt.questionId) ?? Number.MAX_SAFE_INTEGER;
+        const rightNumber = questionNumberMap.get(right.attempt.questionId) ?? Number.MAX_SAFE_INTEGER;
+        return leftNumber - rightNumber;
+      }),
+    [questionNumberMap, reviewedAttempts]
+  );
+  const confidenceOverviewItems = useMemo(
+    () =>
+      orderedReviewedAttempts.map((item, index) => ({
+        ...item,
+        questionNumber: questionNumberMap.get(item.attempt.questionId) ?? index + 1
+      })),
+    [orderedReviewedAttempts, questionNumberMap]
+  );
   const wrongAttempts = useMemo(
-    () => reviewedAttempts.filter((item) => !item.attempt.isCorrect),
-    [reviewedAttempts]
+    () => orderedReviewedAttempts.filter((item) => !item.attempt.isCorrect),
+    [orderedReviewedAttempts]
   );
   const derivedSectionStats = useMemo(
     () =>
@@ -868,15 +901,10 @@ function ResultsPageContent() {
   const topWeakSections = useMemo(() => getTopWeakSections(derivedSectionStats, 3), [derivedSectionStats]);
   const lowConfidenceAttempts = useMemo(() => {
     const wrongAttemptIds = new Set(wrongAttempts.map((item) => item.attempt.questionId));
-    return reviewedAttempts
-      .filter((item) => item.attempt.confidence <= 3 && !wrongAttemptIds.has(item.attempt.questionId))
-      .sort((a, b) => {
-        if (a.attempt.confidence !== b.attempt.confidence) {
-          return a.attempt.confidence - b.attempt.confidence;
-        }
-        return a.question.chapter.localeCompare(b.question.chapter) || a.question.section.localeCompare(b.question.section);
-      });
-  }, [reviewedAttempts, wrongAttempts]);
+    return orderedReviewedAttempts.filter(
+      (item) => item.attempt.confidence <= 3 && !wrongAttemptIds.has(item.attempt.questionId)
+    );
+  }, [orderedReviewedAttempts, wrongAttempts]);
   const simulationSubjectScores = useMemo(() => {
     if (activeSession?.settings?.mode !== "simulation") return [];
 
@@ -975,6 +1003,18 @@ function ResultsPageContent() {
       }
       return next;
     });
+  }
+
+  function openQuestionReviewDetail(detailKey: string) {
+    setReviewDetailOpen(detailKey, true);
+    if (typeof window === "undefined") return;
+
+    window.setTimeout(() => {
+      document.getElementById(`review-${detailKey}`)?.scrollIntoView({
+        behavior: "smooth",
+        block: "center"
+      });
+    }, 0);
   }
 
   async function handleGenerateQuestionExplanation(
@@ -1447,6 +1487,62 @@ function ResultsPageContent() {
     );
   }
 
+  function renderConfidenceOverviewSection() {
+    return (
+      <section className="rounded-[2rem] bg-white p-4 shadow-card ring-1 ring-slate-100 sm:p-6">
+        <div className="flex flex-wrap items-start justify-between gap-3">
+          <div>
+            <h2 className="text-xl font-semibold text-ink">信心度總覽</h2>
+            <p className="mt-2 text-sm text-slate-500">依正式題號排列，色塊代表信心 1 到 5。</p>
+          </div>
+          <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-700">
+            {confidenceOverviewItems.length} 題
+          </span>
+        </div>
+
+        <div className="mt-4 flex flex-wrap gap-2 text-[11px] font-bold">
+          {[1, 2, 3, 4, 5].map((confidenceValue) => (
+            <span
+              key={confidenceValue}
+              className={`inline-flex h-7 min-w-7 items-center justify-center rounded-lg border shadow-sm ${getConfidenceTileClass(confidenceValue)}`}
+            >
+              {confidenceValue}
+            </span>
+          ))}
+        </div>
+
+        <div className="mt-4 grid grid-cols-5 gap-2">
+          {confidenceOverviewItems.map(({ attempt, questionNumber }) => {
+            const detailKey = `all-${attempt.questionId}-${questionNumber}`;
+            return (
+              <button
+                key={detailKey}
+                type="button"
+                onClick={() => openQuestionReviewDetail(detailKey)}
+                title={`第 ${questionNumber} 題・${attempt.isCorrect ? "答對" : "答錯"}・信心 ${attempt.confidence}`}
+                aria-label={`第 ${questionNumber} 題，${attempt.isCorrect ? "答對" : "答錯"}，信心 ${attempt.confidence}`}
+                className={`relative aspect-square min-h-12 rounded-2xl border-2 text-center text-base font-black shadow-sm transition hover:-translate-y-0.5 hover:shadow-md focus:outline-none focus:ring-2 focus:ring-slate-950 focus:ring-offset-2 ${getConfidenceTileClass(attempt.confidence)}`}
+              >
+                <span
+                  className={`absolute right-1.5 top-1.5 rounded-full px-1.5 py-0.5 text-[10px] font-black leading-none ${
+                    attempt.isCorrect
+                      ? "bg-white/85 text-emerald-700"
+                      : "bg-white/90 text-rose-700"
+                  }`}
+                >
+                  {attempt.isCorrect ? "對" : "錯"}
+                </span>
+                <span className="flex h-full items-center justify-center pt-1">
+                  {questionNumber}
+                </span>
+              </button>
+            );
+          })}
+        </div>
+      </section>
+    );
+  }
+
   function renderReviewSection(fullscreenMobile = false) {
     return (
       <section
@@ -1529,6 +1625,7 @@ function ResultsPageContent() {
                 lowConfidenceAttempts.map(({ attempt, question }, index) => {
                   const detailKey = `low-confidence-${attempt.questionId}-${index}`;
                   const isOpen = openReviewDetailKeys.has(detailKey);
+                  const questionNumber = questionNumberMap.get(attempt.questionId) ?? index + 1;
 
                   return (
                     <details
@@ -1539,7 +1636,7 @@ function ResultsPageContent() {
                     >
                       <summary className="cursor-pointer overflow-hidden text-sm font-semibold text-amber-950 list-none [&::-webkit-details-marker]:hidden">
                         {renderQuestionSummaryLine({
-                          prefix: "",
+                          prefix: `第 ${questionNumber} 題：`,
                           question,
                           suffix: attempt.isCorrect ? "答對" : "答錯"
                         })}
@@ -1562,20 +1659,21 @@ function ResultsPageContent() {
           <div>
             <h3 className="text-base font-semibold text-ink">全部題目回顧</h3>
             <div className="mt-3 grid gap-3">
-              {reviewedAttempts.map(({ attempt, question }, index) => {
-                const detailKey = `all-${attempt.questionId}-${index}`;
+              {confidenceOverviewItems.map(({ attempt, question, questionNumber }) => {
+                const detailKey = `all-${attempt.questionId}-${questionNumber}`;
                 const isOpen = openReviewDetailKeys.has(detailKey);
 
                 return (
                   <details
                     key={detailKey}
+                    id={`review-${detailKey}`}
                     open={isOpen}
                     onToggle={(event) => setReviewDetailOpen(detailKey, event.currentTarget.open)}
                     className="group overflow-hidden rounded-2xl bg-slate-50 p-3.5 sm:p-4"
                   >
                     <summary className="cursor-pointer overflow-hidden text-sm font-semibold text-ink list-none [&::-webkit-details-marker]:hidden">
                       {renderQuestionSummaryLine({
-                        prefix: `第 ${index + 1} 題：${attempt.isCorrect ? "答對" : "答錯"}`,
+                        prefix: `第 ${questionNumber} 題：${attempt.isCorrect ? "答對" : "答錯"}`,
                         question,
                         suffix: `信心 ${attempt.confidence}`
                       })}
@@ -1774,6 +1872,9 @@ function ResultsPageContent() {
               </button>
             </div>
           </section>
+          {isSimulationSession(state.session) && confidenceOverviewItems.length > 0
+            ? renderConfidenceOverviewSection()
+            : null}
         </aside>
       </div>
       {copyPromptNotice ? (
