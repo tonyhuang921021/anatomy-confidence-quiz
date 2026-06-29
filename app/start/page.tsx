@@ -213,6 +213,35 @@ export default function StartPage() {
     );
   }
 
+  function isSubjectGroupFullySelected(subjects: typeof selectableSubjects) {
+    return subjects.every((item) => {
+      if (!isTrackSubject(item.subject)) return selectedSubjects.includes(item.subject);
+      const selectedKeys = getSelectedTrackKeys(item.subject);
+      return selectedKeys.length === getAllSubjectTrackKeys(item.subject).length;
+    });
+  }
+
+  function toggleSubjectGroup(subjects: typeof selectableSubjects) {
+    const isFullySelected = isSubjectGroupFullySelected(subjects);
+    const groupSubjectNames = subjects.map((item) => item.subject);
+    const regularSubjectNames = groupSubjectNames.filter((subject) => !isTrackSubject(subject));
+    const hasMicrobiology = groupSubjectNames.includes(MICROBIOLOGY_SUBJECT);
+
+    setSelectedSubjects((current) => {
+      const withoutGroup = current.filter((subject) => !groupSubjectNames.includes(subject));
+      return isFullySelected
+        ? withoutGroup
+        : Array.from(new Set([...withoutGroup, ...regularSubjectNames]));
+    });
+
+    if (hasMicrobiology) {
+      setSelectedMicrobiologyTracks(
+        isFullySelected ? [] : getAllSubjectTrackKeys(MICROBIOLOGY_SUBJECT)
+      );
+      setMicrobiologyExpanded(!isFullySelected);
+    }
+  }
+
   function selectAllSubjects() {
     setSelectedSubjects(
       selectableSubjects
@@ -227,10 +256,23 @@ export default function StartPage() {
     title: string,
     subjects: typeof selectableSubjects
   ) {
+    const groupFullySelected = isSubjectGroupFullySelected(subjects);
+
     return (
       <section className="surface-card-muted p-5">
-        <div>
+        <div className="flex flex-wrap items-center justify-between gap-3">
           <h2 className="font-serif text-2xl font-semibold tracking-[-0.03em] text-ink">{title}</h2>
+          <button
+            type="button"
+            onClick={() => toggleSubjectGroup(subjects)}
+            className={`min-h-10 rounded-full px-4 py-2 text-sm font-semibold transition ${
+              groupFullySelected
+                ? "bg-brand-600 text-white hover:bg-brand-700"
+                : "bg-white text-slate-700 ring-1 ring-slate-200 hover:bg-slate-50"
+            }`}
+          >
+            {groupFullySelected ? `取消${title}` : `全選${title}`}
+          </button>
         </div>
 
         <div className="mt-4 grid gap-4 sm:grid-cols-2 xl:grid-cols-3">

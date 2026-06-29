@@ -53,6 +53,11 @@ const QUICK_ENTRIES = [
 const HOME_RELEASE_NOTES = [
   {
     time: "06/29",
+    title: "散題選科更快",
+    body: "開始測驗的醫學一、醫學二區塊各自多了全選按鈕，想混刷整包不用再一科一科點。"
+  },
+  {
+    time: "06/29",
     title: "AI 補弱 Prompt 可選長短",
     body: "結果頁複製給 AI 時可以選簡略或詳細；詳細版會把相近錯題串成一段區塊複習，模擬考信心按鈕也不再殘留上一題。"
   },
