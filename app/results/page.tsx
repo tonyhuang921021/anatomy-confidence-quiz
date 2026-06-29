@@ -22,6 +22,7 @@ import {
 import {
   applyQuestionClassificationOverride,
   getAISimulationPaperLabel,
+  getQuestionsForAISimulationPaper,
   getPastPaperOptions
 } from "@/data/med1QuestionBank";
 import { anatomyQuestions } from "@/data/anatomyQuestions";
@@ -92,7 +93,7 @@ function getQuestionMap(
   const requiredQuestionIds = new Set(session.attempts.map((attempt) => attempt.questionId));
 
   return new Map(
-    [...allQuestions, ...(session.generatedQuestions ?? [])]
+    getResultQuestionSources(session)
       .filter(
         (question): question is Question =>
           Boolean(question?.id) && requiredQuestionIds.has(question.id)
@@ -117,6 +118,28 @@ function getQuestionMap(
             : storedQuestion
         ] as const;
       })
+  );
+}
+
+function getAISimulationQuestionsForSession(session: QuizSession) {
+  const paperKey = getPastPaperKeyFromSession(session);
+  if (!paperKey?.startsWith("AI-")) return [];
+
+  return getQuestionsForAISimulationPaper(
+    paperKey,
+    session.settings?.subjectFilter ?? "全部"
+  );
+}
+
+function getResultQuestionSources(session: QuizSession) {
+  return Array.from(
+    new Map(
+      [
+        ...allQuestions,
+        ...getAISimulationQuestionsForSession(session),
+        ...(session.generatedQuestions ?? [])
+      ].map((question) => [question.id, question] as const)
+    ).values()
   );
 }
 
@@ -606,16 +629,21 @@ function ResultsPageContent() {
         return;
       }
 
+      const aiSimulationQuestions = getAISimulationQuestionsForSession(resolvedTargetSession);
       const currentQuestions =
         resolvedTargetSession.generatedQuestions && resolvedTargetSession.generatedQuestions.length > 0
           ? resolvedTargetSession.generatedQuestions
-          : anatomyQuestions;
+          : aiSimulationQuestions.length > 0
+            ? aiSimulationQuestions
+            : anatomyQuestions;
       const promptQuestions = Array.from(
         new Map(
-          [...allQuestions, ...currentQuestions, ...(resolvedTargetSession.generatedQuestions ?? [])].map((question) => [
-            question.id,
-            question
-          ] as const)
+          [
+            ...allQuestions,
+            ...aiSimulationQuestions,
+            ...currentQuestions,
+            ...(resolvedTargetSession.generatedQuestions ?? [])
+          ].map((question) => [question.id, question] as const)
         ).values()
       );
       const promptQuestionMap = new Map(promptQuestions.map((question) => [question.id, question] as const));
@@ -954,6 +982,7 @@ function ResultsPageContent() {
     );
     const sourceQuestion = findQuestionSource(question, [
       ...allQuestions,
+      ...(activeSession ? getAISimulationQuestionsForSession(activeSession) : []),
       ...(activeSession?.generatedQuestions ?? [])
     ]);
 

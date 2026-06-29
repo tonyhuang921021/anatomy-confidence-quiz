@@ -53,6 +53,11 @@ const QUICK_ENTRIES = [
 const HOME_RELEASE_NOTES = [
   {
     time: "06/29",
+    title: "AI 模擬卷結果修正",
+    body: "AI 原創卷做完後，結果頁會用試卷 key 自動補回題目；就算雲端只先回傳答題紀錄，也不會看不到解析。"
+  },
+  {
+    time: "06/29",
     title: "回報題庫又補了一輪",
     body: "修正 2 題題目文字格式，並把一批陽明詳解改回原始截圖；該看圖的地方就讓圖自己說話。"
   },
