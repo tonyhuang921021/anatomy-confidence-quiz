@@ -1066,6 +1066,19 @@ const questionTextOverrides: Record<string, QuestionTextOverride> = {
       D: "嬰兒吸吮母親乳頭會刺激催產素（oxytocin）之釋放"
     }
   },
+  "MOEX-103100-1101-Q052": {
+    options: {
+      A: "Tat 與運送病毒 RNA 到細胞質有關",
+      B: "Vif 可以拮抗細胞中 APOBEC-3G 的作用",
+      C: "Vpu 可以降低細胞上 CD4 的表現",
+      D: "gp41 幫助病毒與細胞膜的融合"
+    }
+  },
+  "MOEX-105020-5301-Q043": {
+    options: {
+      D: "引發感染需要超過 10⁸ 的菌量"
+    }
+  },
   "MOEX-107100-1301-Q058": {
     options: {
       A: "活化小動脈血管平滑肌 β1 腎上腺素型受器（β1 adrenergic receptors）",

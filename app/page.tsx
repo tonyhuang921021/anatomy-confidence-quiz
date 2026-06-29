@@ -53,6 +53,11 @@ const QUICK_ENTRIES = [
 const HOME_RELEASE_NOTES = [
   {
     time: "06/29",
+    title: "回報題庫又補了一輪",
+    body: "修正 2 題題目文字格式，並把一批陽明詳解改回原始截圖；該看圖的地方就讓圖自己說話。"
+  },
+  {
+    time: "06/29",
     title: "模擬考多一格 AI 出題",
     body: "整份模擬考新增 AI 原創卷來源，醫學（一）進階 B 卷和醫學（二）進階卷都能直接開寫。"
   },
