@@ -1435,13 +1435,11 @@ function ResultsPageContent() {
   function renderQuestionSummaryLine({
     prefix,
     question,
-    suffix,
-    correctness
+    suffix
   }: {
     prefix: string;
     question: Question;
     suffix?: string;
-    correctness?: boolean;
   }) {
     const sourceBadge = getQuestionSourceBadgeLabel(question);
     const trimmedPrefix = prefix.trim();
@@ -1469,17 +1467,6 @@ function ResultsPageContent() {
         </span>
         <span className="flex shrink-0 flex-col items-end gap-1.5">
           <span className="flex items-center gap-1.5">
-            {typeof correctness === "boolean" ? (
-              <span
-                className={`rounded-full px-3 py-1 text-[12px] font-black ring-1 ${
-                  correctness
-                    ? "bg-emerald-100 text-emerald-800 ring-emerald-200"
-                    : "bg-rose-100 text-rose-800 ring-rose-200"
-                }`}
-              >
-                {correctness ? "答對" : "答錯"}
-              </span>
-            ) : null}
             {sourceBadge ? (
               <span className="rounded-full bg-white/80 px-2.5 py-1 text-[11px] font-bold text-slate-600 ring-1 ring-slate-200">
                 {sourceBadge}
@@ -1496,13 +1483,11 @@ function ResultsPageContent() {
     attempt,
     question,
     optionKeySuffix,
-    showCorrectness = false,
     showTestedConcept = false
   }: {
     attempt: Attempt;
     question: Question;
     optionKeySuffix: string;
-    showCorrectness?: boolean;
     showTestedConcept?: boolean;
   }) {
     const masteryLabel =
@@ -1561,12 +1546,6 @@ function ResultsPageContent() {
               ? "本題一律給分"
               : attempt.correctAnswer}
         </p>
-        {showCorrectness ? (
-          <p>
-            <span className="font-semibold">是否答對：</span>
-            {attempt.isCorrect ? "答對" : "答錯"}
-          </p>
-        ) : null}
         <p>
           <span className="font-semibold">本題狀態：</span>
           <span className={`ml-1 rounded-full px-2.5 py-1 text-xs font-bold ring-1 ${getMasteryBadgeClass(masteryLabel)}`}>
@@ -1975,8 +1954,7 @@ function ResultsPageContent() {
                         {renderQuestionSummaryLine({
                           prefix: `錯題 ${index + 1}：`,
                           question,
-                          suffix: masteryLabel,
-                          correctness: attempt.isCorrect
+                          suffix: masteryLabel
                         })}
                       </summary>
                       {isOpen
@@ -2020,16 +1998,14 @@ function ResultsPageContent() {
                         {renderQuestionSummaryLine({
                           prefix: `第 ${questionNumber} 題：`,
                           question,
-                          suffix: masteryLabel,
-                          correctness: attempt.isCorrect
+                          suffix: masteryLabel
                         })}
                       </summary>
                       {isOpen
                         ? renderAttemptReviewDetails({
                             attempt,
                             question,
-                            optionKeySuffix: "low",
-                            showCorrectness: true
+                            optionKeySuffix: "low"
                           })
                         : null}
                     </details>
@@ -2061,8 +2037,7 @@ function ResultsPageContent() {
                       {renderQuestionSummaryLine({
                         prefix: `第 ${questionNumber} 題：`,
                         question,
-                        suffix: `${masteryLabel}・${getConfidenceOverviewLabel(attempt.confidence)}`,
-                        correctness: attempt.isCorrect
+                        suffix: `${masteryLabel}・${getConfidenceOverviewLabel(attempt.confidence)}`
                       })}
                     </summary>
                     {isOpen
