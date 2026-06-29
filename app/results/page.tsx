@@ -214,10 +214,15 @@ type ResultState = {
   sessions: QuizSession[];
   summary: SummaryStats | null;
   sectionStats: SectionStats[];
-  promptText: string;
+  promptTexts: Record<"concise" | "detailed", string>;
   lowCompletion: SectionCompletionStats[];
   unstableSections: SectionCompletionStats[];
   completionStats: ReturnType<typeof calculateCompletionStats> | null;
+};
+
+const EMPTY_PROMPT_TEXTS: ResultState["promptTexts"] = {
+  concise: "",
+  detailed: ""
 };
 
 function getSessionModeLabel(session: QuizSession) {
@@ -408,6 +413,7 @@ function ResultsPageContent() {
   const [classificationOverrides, setClassificationOverrides] = useState<Record<string, QuestionClassificationOverride>>({});
   const [communityStatsMap, setCommunityStatsMap] = useState<Record<string, QuestionCommunityStats>>({});
   const [copyPromptNotice, setCopyPromptNotice] = useState(false);
+  const [aiPromptDetailLevel, setAiPromptDetailLevel] = useState<"concise" | "detailed">("detailed");
   const [isFullscreenReview, setIsFullscreenReview] = useState(false);
   const [isFullscreenReviewVisible, setIsFullscreenReviewVisible] = useState(false);
   const [openReviewDetailKeys, setOpenReviewDetailKeys] = useState<Set<string>>(() => new Set());
@@ -422,17 +428,18 @@ function ResultsPageContent() {
     sessions: [],
     summary: null,
     sectionStats: [],
-    promptText: "",
+    promptTexts: EMPTY_PROMPT_TEXTS,
     lowCompletion: [],
     unstableSections: [],
     completionStats: null
   });
 
   async function handleCopyAIPrompt() {
-    if (!state.promptText) return;
+    const promptText = state.promptTexts[aiPromptDetailLevel];
+    if (!promptText) return;
 
     try {
-      await navigator.clipboard.writeText(state.promptText);
+      await navigator.clipboard.writeText(promptText);
       setCopyPromptNotice(true);
       window.setTimeout(() => setCopyPromptNotice(false), 1800);
     } catch {
@@ -604,7 +611,7 @@ function ResultsPageContent() {
           sessions: scopedSessions,
           summary: null,
           sectionStats: [],
-          promptText: "",
+          promptTexts: EMPTY_PROMPT_TEXTS,
           lowCompletion: [],
           unstableSections: [],
           completionStats: null
@@ -620,7 +627,7 @@ function ResultsPageContent() {
           sessions: scopedSessions,
           summary: null,
           sectionStats: [],
-          promptText: "",
+          promptTexts: EMPTY_PROMPT_TEXTS,
           lowCompletion: [],
           unstableSections: [],
           completionStats: null
@@ -669,12 +676,22 @@ function ResultsPageContent() {
         sessions: scopedSessions,
         summary: calculateSummary(resolvedTargetSession.attempts, resolvedAnalysisQuestions),
         sectionStats: sessionSectionStats,
-        promptText: generateAIPrompt(
-          resolvedTargetSession.attempts,
-          resolvedAnalysisQuestions,
-          completedSessions,
-          promptQuestions
-        ),
+        promptTexts: {
+          concise: generateAIPrompt(
+            resolvedTargetSession.attempts,
+            resolvedAnalysisQuestions,
+            completedSessions,
+            promptQuestions,
+            { detailLevel: "concise" }
+          ),
+          detailed: generateAIPrompt(
+            resolvedTargetSession.attempts,
+            resolvedAnalysisQuestions,
+            completedSessions,
+            promptQuestions,
+            { detailLevel: "detailed" }
+          )
+        },
         lowCompletion: getLowCompletionSections(completionStats.sections, 5),
         unstableSections: getUnstableCompletedSections(completionStats.sections, 5),
         completionStats
@@ -692,7 +709,7 @@ function ResultsPageContent() {
           sessions: fallbackScopedSessions,
           summary: null,
           sectionStats: [],
-          promptText: "",
+          promptTexts: EMPTY_PROMPT_TEXTS,
           lowCompletion: [],
           unstableSections: [],
           completionStats: null
@@ -1721,12 +1738,39 @@ function ResultsPageContent() {
               >
                 先看錯題複習頁
               </Link>
+              <div className="grid grid-cols-2 gap-2" role="group" aria-label="AI 補弱 Prompt 版本">
+                <button
+                  type="button"
+                  aria-pressed={aiPromptDetailLevel === "concise"}
+                  onClick={() => setAiPromptDetailLevel("concise")}
+                  className={`min-h-11 rounded-2xl px-4 py-3 text-sm font-semibold transition ${
+                    aiPromptDetailLevel === "concise"
+                      ? "bg-slate-900 text-white"
+                      : "bg-slate-100 text-slate-700 hover:bg-slate-200"
+                  }`}
+                >
+                  簡略
+                </button>
+                <button
+                  type="button"
+                  aria-pressed={aiPromptDetailLevel === "detailed"}
+                  onClick={() => setAiPromptDetailLevel("detailed")}
+                  className={`min-h-11 rounded-2xl px-4 py-3 text-sm font-semibold transition ${
+                    aiPromptDetailLevel === "detailed"
+                      ? "bg-slate-900 text-white"
+                      : "bg-slate-100 text-slate-700 hover:bg-slate-200"
+                  }`}
+                >
+                  詳細
+                </button>
+              </div>
               <button
                 type="button"
                 onClick={() => void handleCopyAIPrompt()}
-                className="min-h-12 rounded-2xl bg-slate-900 px-4 py-4 text-center text-sm font-semibold text-white transition hover:bg-black"
+                disabled={!state.promptTexts[aiPromptDetailLevel]}
+                className="min-h-12 rounded-2xl bg-slate-900 px-4 py-4 text-center text-sm font-semibold text-white transition hover:bg-black disabled:cursor-not-allowed disabled:bg-slate-300"
               >
-                複製 AI 補弱 Prompt
+                複製{aiPromptDetailLevel === "detailed" ? "詳細" : "簡略"}版 AI 補弱 Prompt
               </button>
             </div>
           </section>

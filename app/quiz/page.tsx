@@ -1181,6 +1181,8 @@ export default function QuizPage() {
 
   function handleSelectConfidence(value: ConfidenceLevel) {
     confidenceRef.current = value;
+    setConfidence(value);
+    setConfidenceExpanded(value <= 3);
 
     if (!session || !submittedAttempt) return;
 
@@ -1928,6 +1930,7 @@ export default function QuizPage() {
           {!submittedAttempt ? (
             <>
               <ConfidenceSelector
+                key={`answer-${currentQuestion.id}`}
                 value={displayedConfidence}
                 expanded={confidenceExpanded || displayedConfidence <= 3}
                 onExpand={() => undefined}
@@ -2141,6 +2144,7 @@ export default function QuizPage() {
               </div>
 
               <ConfidenceSelector
+                key={`review-${currentQuestion.id}`}
                 value={displayedConfidence}
                 expanded={confidenceExpanded || displayedConfidence <= 3}
                 onExpand={() => undefined}

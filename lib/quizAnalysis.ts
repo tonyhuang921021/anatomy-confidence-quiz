@@ -348,12 +348,20 @@ export function getNextRecommendedSections(
     .slice(0, limit);
 }
 
+export type AIPromptDetailLevel = "concise" | "detailed";
+
+type GenerateAIPromptOptions = {
+  detailLevel?: AIPromptDetailLevel;
+};
+
 export function generateAIPrompt(
   attempts: Attempt[],
   questions: Question[],
   allSessions: { attempts: Attempt[] }[],
-  lookupQuestions: Question[] = questions
+  lookupQuestions: Question[] = questions,
+  options: GenerateAIPromptOptions = {}
 ) {
+  const detailLevel = options.detailLevel ?? "detailed";
   const questionMap = new Map([...lookupQuestions, ...questions].map((question) => [question.id, question]));
   const formatMissingQuestionAttempt = (attempt: Attempt, label: string) =>
     `${label}｜題號 ${attempt.questionId}｜題目資料暫時未載入｜信心 ${attempt.confidence}｜我的答案 ${attempt.selectedAnswer}｜正解 ${attempt.correctAnswer}｜錯因 ${attempt.errorType ?? "未填"}`;
@@ -502,11 +510,48 @@ export function generateAIPrompt(
     return `${section.chapter} / ${section.section}｜建議補強層級：${scope}｜最低信心 ${lowestConfidence}｜低信心答錯 ${lowConfidenceWrongCount} 題｜補法：${scopeInstruction}`;
   });
 
+  if (detailLevel === "concise") {
+    return `以下是我的${subjectLabel}醫師國考測驗紀錄。請你做「簡略版弱點補強」，只處理答錯題與低信心題，不要稱讚、不要人格分析、不要讀書計畫。
+
+回答規則：
+1. 請把相近 testedConcept 或同一 section 的錯題合併成一組，但每組最多 6 行。
+2. 每組請用：為什麼錯、30 秒核心觀念、最常混淆點、下次判斷口訣。
+3. 如果只是低信心但答對，請用 1 到 2 行補穩，不要展開成整章。
+4. 不要重貼題目全文；需要引用時只列題號與 testedConcept。
+5. 請用台灣醫學生準備醫師國考一階的語氣與深度回答，直接開始。
+
+本輪統計：
+總題數：${summary.total}
+答對題數：${summary.correct}
+答對率：${summary.correctRate}%
+平均信心：${summary.averageConfidence}
+錯誤自信數：${summary.overconfidenceCount}
+猜對風險數：${summary.guessRiskCount}
+優先補弱數：${summary.priorityWeaknessCount}
+
+所有答錯題：
+${wrongLines.join("\n") || "目前沒有資料"}
+
+錯誤自信題：
+${overconfidenceLines.join("\n") || "目前沒有資料"}
+
+低信心題（包含答對但不穩）：
+${lowConfidenceLines.join("\n") || "目前沒有資料"}
+
+依信心程度建議的補強範圍：
+${confidenceScopedWeaknessLines.join("\n") || "目前沒有資料"}
+
+本輪作答紀錄摘要：
+${attemptLines.join("\n")}
+
+請直接輸出簡略版弱點補強。`;
+  }
+
   return `以下是我的${subjectLabel}醫師國考測驗紀錄。請你只做「弱點知識補強」，不要稱讚我、不要總結我哪裡做得不錯、不要輸出太多與補弱無關的分析，也不要重複貼回原始統計。
 
 回答規則：
 1. 必須覆蓋我所有答錯題，以及所有低信心題（confidence <= 3），不能漏掉任何一題。
-2. 如果多題屬於同一個 testedConcept 或同一組高度相關觀念，可以合併講解，但要在標題中清楚列出你正在講哪些題目或哪些 testedConcept。
+2. 請先把所有答錯題依同 chapter、同 section、相近 testedConcept、共同鑑別診斷或共同機轉自動分組；同一組不要逐題碎念，要串成一段「整個區塊複習」，像正在幫我補這塊觀念。
 3. 不要先寫整體表現總結，直接從需要補的題目或觀念開始講。
 4. 每一組輸出的補強範圍要依我的信心程度決定：
    - 如果建議補強層級是「單一知識點」，就只補那個 testedConcept，不要擴寫太多。
@@ -514,7 +559,9 @@ export function generateAIPrompt(
    - 如果建議補強層級是「相關考點群」，就補同一 section 常一起考的考點群，但不要講整個章節。
    - 如果建議補強層級是「整個相關段落」，就從基礎架構開始補到該段落的高頻觀念與陷阱。
 5. 每一組只回答以下內容：
-   - 這一題或這一組題為什麼需要補
+   - 本組包含哪些題號與 testedConcept
+   - 為什麼這些錯題其實在考同一串觀念
+   - 這個區塊的完整複習講解
    - 30 秒核心觀念
    - 國考高頻考點
    - 最常錯的陷阱與混淆點

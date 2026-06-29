@@ -53,6 +53,11 @@ const QUICK_ENTRIES = [
 const HOME_RELEASE_NOTES = [
   {
     time: "06/29",
+    title: "AI 補弱 Prompt 可選長短",
+    body: "結果頁複製給 AI 時可以選簡略或詳細；詳細版會把相近錯題串成一段區塊複習，模擬考信心按鈕也不再殘留上一題。"
+  },
+  {
+    time: "06/29",
     title: "手機登入比較黏了",
     body: "帳號區新增記住 Email，手機切去查資料再回來時也會主動刷新登入狀態，不再一下就被丟回訪客。"
   },
