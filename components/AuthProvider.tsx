@@ -45,10 +45,14 @@ const AuthContext = createContext<AuthContextValue | null>(null);
 const CLOUD_RESUME_BACKGROUND_NOTICE_MS = 6500;
 const CLOUD_SYNC_HARD_TIMEOUT_MS = 9000;
 const AUTH_SESSION_BOOTSTRAP_TIMEOUT_MS = 3500;
+const AUTH_SESSION_REFRESH_TIMEOUT_MS = 6000;
+const AUTH_SESSION_REFRESH_LEEWAY_MS = 90_000;
+const AUTH_SESSION_RESUME_COOLDOWN_MS = 15_000;
 const AUTH_SIGN_OUT_TIMEOUT_MS = 2500;
 const AUTH_SESSION_SNAPSHOT_KEY = "medQuizAuthSessionSnapshot";
 const CLOUD_FALLBACK_MESSAGE = "暫用本機，稍後補傳。雲端同步暫時連不上，作答會先留在這台裝置。";
 const AUTH_FALLBACK_MESSAGE = "暫用本機，稍後補傳。登入狀態讀取逾時，如果剛剛已登入，稍後可再同步。";
+const AUTH_REFRESH_FALLBACK_MESSAGE = "暫用本機，稍後補傳。登入狀態刷新逾時，切回網站時會再試一次。";
 const RECOVERY_MODE_MESSAGE = "暫用本機，稍後補傳。雲端登入與同步維護中，作答不會被登入流程卡住。";
 const SAFARI_AUTO_SYNC_DEFERRED_MESSAGE =
   "暫用本機，稍後補傳。雲端紀錄同步排程中，作答完成也會補傳。";
@@ -120,7 +124,12 @@ function safeRemoveStorage(storage: Storage | undefined, key: string) {
   }
 }
 
-function loadAuthSessionSnapshot(): Session | null {
+function isAuthSessionExpiring(session: Session | null, leewayMs = 30_000) {
+  if (!session?.expires_at) return false;
+  return session.expires_at * 1000 <= Date.now() + leewayMs;
+}
+
+function loadAuthSessionSnapshot(options: { allowExpiring?: boolean } = {}): Session | null {
   if (typeof window === "undefined") return null;
   const raw =
     safeGetStorage(window.localStorage, AUTH_SESSION_SNAPSHOT_KEY) ??
@@ -130,12 +139,59 @@ function loadAuthSessionSnapshot(): Session | null {
   try {
     const session = JSON.parse(raw) as Session;
     if (!session?.user?.id || !session.access_token) return null;
-    if (typeof session.expires_at === "number" && session.expires_at * 1000 <= Date.now() + 30_000) {
+    if (!options.allowExpiring && isAuthSessionExpiring(session)) {
       return null;
     }
     return session;
   } catch {
     return null;
+  }
+}
+
+async function refreshAuthSessionIfNeeded(
+  supabase: ReturnType<typeof getSupabaseBrowserClient>,
+  candidateSession: Session | null
+) {
+  if (!candidateSession) return null;
+  if (!isAuthSessionExpiring(candidateSession, AUTH_SESSION_REFRESH_LEEWAY_MS)) {
+    return candidateSession;
+  }
+
+  try {
+    const { data, error } = await withTimeout(
+      supabase.auth.refreshSession(candidateSession),
+      AUTH_SESSION_REFRESH_TIMEOUT_MS,
+      AUTH_REFRESH_FALLBACK_MESSAGE
+    );
+
+    if (error || !data.session) {
+      return candidateSession;
+    }
+
+    return data.session;
+  } catch {
+    return candidateSession;
+  }
+}
+
+async function resolveBrowserAuthSession(
+  supabase: ReturnType<typeof getSupabaseBrowserClient>,
+  timeoutMs: number,
+  timeoutMessage: string
+) {
+  try {
+    const {
+      data: { session: storedSession }
+    } = await withTimeout(supabase.auth.getSession(), timeoutMs, timeoutMessage);
+
+    const candidateSession = storedSession ?? loadAuthSessionSnapshot({ allowExpiring: true });
+    return refreshAuthSessionIfNeeded(supabase, candidateSession);
+  } catch (error) {
+    const recoveredSession = loadAuthSessionSnapshot({ allowExpiring: true });
+    if (recoveredSession) {
+      return refreshAuthSessionIfNeeded(supabase, recoveredSession);
+    }
+    throw error;
   }
 }
 
@@ -168,6 +224,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [syncError, setSyncError] = useState("");
   const syncInFlightRef = useRef<Promise<void> | null>(null);
   const syncStartedAtRef = useRef(0);
+  const sessionRef = useRef<Session | null>(null);
+  const resumeRefreshAtRef = useRef(0);
+
+  useEffect(() => {
+    sessionRef.current = session;
+  }, [session]);
 
   function markLocalSyncFallback(error: unknown) {
     setSyncStatus("ready");
@@ -312,17 +374,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     async function bootstrap() {
       try {
-        const {
-          data: { session: initialSession }
-        } = await withTimeout(
-          supabase.auth.getSession(),
+        const recoveredSession = await resolveBrowserAuthSession(
+          supabase,
           AUTH_SESSION_BOOTSTRAP_TIMEOUT_MS,
           AUTH_FALLBACK_MESSAGE
         );
 
         if (cancelled) return;
-
-        const recoveredSession = initialSession ?? loadAuthSessionSnapshot();
 
         setSession(recoveredSession);
         setUser(recoveredSession?.user ?? null);
@@ -375,8 +433,46 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       applyAuthSession(nextSession);
     });
 
+    async function refreshSessionAfterResume() {
+      if (document.visibilityState === "hidden") return;
+      const now = Date.now();
+      if (now - resumeRefreshAtRef.current < AUTH_SESSION_RESUME_COOLDOWN_MS) return;
+      resumeRefreshAtRef.current = now;
+
+      try {
+        const refreshedSession = await resolveBrowserAuthSession(
+          supabase,
+          AUTH_SESSION_REFRESH_TIMEOUT_MS,
+          AUTH_REFRESH_FALLBACK_MESSAGE
+        );
+        if (cancelled || !refreshedSession?.user?.id) return;
+
+        const currentSession = sessionRef.current;
+        if (
+          currentSession?.access_token !== refreshedSession.access_token ||
+          currentSession?.user?.id !== refreshedSession.user.id
+        ) {
+          applyAuthSession(refreshedSession);
+        } else {
+          saveAuthSessionSnapshot(refreshedSession);
+        }
+      } catch (error) {
+        if (!cancelled && sessionRef.current?.user) {
+          setSyncStatus("ready");
+          setSyncError(getErrorMessage(error) || AUTH_REFRESH_FALLBACK_MESSAGE);
+        }
+      }
+    }
+
+    window.addEventListener("focus", refreshSessionAfterResume);
+    window.addEventListener("pageshow", refreshSessionAfterResume);
+    document.addEventListener("visibilitychange", refreshSessionAfterResume);
+
     return () => {
       cancelled = true;
+      window.removeEventListener("focus", refreshSessionAfterResume);
+      window.removeEventListener("pageshow", refreshSessionAfterResume);
+      document.removeEventListener("visibilitychange", refreshSessionAfterResume);
       subscription.unsubscribe();
     };
   }, [configured, recoveryMode]);

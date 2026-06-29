@@ -41,6 +41,8 @@ import { isSupabaseRecoveryMode } from "@/lib/supabase/recoveryMode";
 
 const AUTH_ACTION_TIMEOUT_MS = 15000;
 const AUTH_SESSION_RECOVERY_TIMEOUT_MS = 2500;
+const REMEMBER_ACCOUNT_KEY = "medQuizRememberAccount";
+const REMEMBERED_EMAIL_KEY = "medQuizRememberedEmail";
 const RECOVERY_MODE_MESSAGE = "暫用本機，稍後補傳。雲端登入與同步維護中，目前紀錄會先留在本機。";
 const DEFAULT_PRACTICE_YEAR_RANGE: PracticeYearRange = {
   yearFrom: PRACTICE_YEAR_OPTIONS[0],
@@ -55,6 +57,37 @@ function withTimeout<T>(promise: Promise<T>, timeoutMs: number, message: string)
       .catch(reject)
       .finally(() => window.clearTimeout(timeoutId));
   });
+}
+
+function safeReadLocalStorage(key: string) {
+  if (typeof window === "undefined") return null;
+  try {
+    return window.localStorage.getItem(key);
+  } catch {
+    return null;
+  }
+}
+
+function safeWriteLocalStorage(key: string, value: string) {
+  if (typeof window === "undefined") return;
+  try {
+    window.localStorage.setItem(key, value);
+  } catch {
+    // Ignore browsers that block storage; Supabase session storage still handles auth.
+  }
+}
+
+function safeRemoveLocalStorage(key: string) {
+  if (typeof window === "undefined") return;
+  try {
+    window.localStorage.removeItem(key);
+  } catch {
+    // Ignore browsers that block storage.
+  }
+}
+
+function loadRememberAccountPreference() {
+  return safeReadLocalStorage(REMEMBER_ACCOUNT_KEY) !== "false";
 }
 
 async function getRecoveredAuthSession() {
@@ -88,6 +121,7 @@ export function AuthPanel() {
   } = useAuth();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [rememberAccount, setRememberAccount] = useState(true);
   const [newPassword, setNewPassword] = useState("");
   const [nickname, setNickname] = useState("");
   const [message, setMessage] = useState("");
@@ -108,6 +142,34 @@ export function AuthPanel() {
   const [practiceQuestionCount, setPracticeQuestionCount] = useState<PracticeQuestionCount>(10);
   const [practiceStopAfterReview, setPracticeStopAfterReview] = useState(false);
   const [practiceFastAnswerMode, setPracticeFastAnswerMode] = useState(false);
+
+  useEffect(() => {
+    const shouldRemember = loadRememberAccountPreference();
+    setRememberAccount(shouldRemember);
+    if (shouldRemember) {
+      const rememberedEmail = safeReadLocalStorage(REMEMBERED_EMAIL_KEY);
+      if (rememberedEmail) {
+        setEmail((current) => current || rememberedEmail);
+      }
+    }
+  }, []);
+
+  useEffect(() => {
+    if (!user?.email) return;
+    setEmail(user.email);
+    if (rememberAccount) {
+      safeWriteLocalStorage(REMEMBERED_EMAIL_KEY, user.email);
+    }
+  }, [rememberAccount, user?.email]);
+
+  function persistRememberedEmail(nextEmail: string) {
+    safeWriteLocalStorage(REMEMBER_ACCOUNT_KEY, rememberAccount ? "true" : "false");
+    if (rememberAccount) {
+      safeWriteLocalStorage(REMEMBERED_EMAIL_KEY, nextEmail.trim());
+    } else {
+      safeRemoveLocalStorage(REMEMBERED_EMAIL_KEY);
+    }
+  }
 
   useEffect(() => {
     setNickname(typeof user?.user_metadata?.display_name === "string" ? user.user_metadata.display_name : "");
@@ -256,11 +318,13 @@ export function AuthPanel() {
     setSubmitting(true);
     setMessage("");
     setError("");
+    const trimmedEmail = email.trim();
+    persistRememberedEmail(trimmedEmail);
 
     try {
       const { data, error: signInError } = await withTimeout(
         getSupabaseBrowserClient().auth.signInWithPassword({
-          email,
+          email: trimmedEmail,
           password
         }),
         AUTH_ACTION_TIMEOUT_MS,
@@ -297,11 +361,13 @@ export function AuthPanel() {
     setSubmitting(true);
     setMessage("");
     setError("");
+    const trimmedEmail = email.trim();
+    persistRememberedEmail(trimmedEmail);
 
     try {
       const { error: signUpError } = await withTimeout(
         getSupabaseBrowserClient().auth.signUp({
-          email,
+          email: trimmedEmail,
           password,
           options: {
             emailRedirectTo:
@@ -337,6 +403,7 @@ export function AuthPanel() {
       setError("請先輸入 Email。");
       return;
     }
+    persistRememberedEmail(trimmedEmail);
 
     setSubmitting(true);
     setMessage("");
@@ -838,6 +905,29 @@ export function AuthPanel() {
           placeholder="Password"
           className="min-h-12 rounded-2xl border border-slate-200 px-4 py-3 text-sm text-slate-800 outline-none"
         />
+        <label className="flex items-start gap-3 rounded-2xl bg-slate-50 px-4 py-3 text-sm text-slate-700">
+          <input
+            type="checkbox"
+            checked={rememberAccount}
+            onChange={(event) => {
+              const checked = event.target.checked;
+              setRememberAccount(checked);
+              safeWriteLocalStorage(REMEMBER_ACCOUNT_KEY, checked ? "true" : "false");
+              if (!checked) {
+                safeRemoveLocalStorage(REMEMBERED_EMAIL_KEY);
+              } else if (email.trim()) {
+                safeWriteLocalStorage(REMEMBERED_EMAIL_KEY, email.trim());
+              }
+            }}
+            className="mt-1 h-4 w-4 rounded border-slate-300 text-brand-600"
+          />
+          <span>
+            記住這台裝置的帳號
+            <span className="block text-xs leading-6 text-slate-500">
+              下次會自動帶入 Email，切回網站時也會主動刷新登入狀態。
+            </span>
+          </span>
+        </label>
       </div>
 
       {message ? (
@@ -854,7 +944,7 @@ export function AuthPanel() {
         <button
           type="button"
           onClick={() => void handleSignIn()}
-          disabled={submitting || !email || !password}
+          disabled={submitting || !email.trim() || !password}
           className="primary-pill disabled:cursor-not-allowed disabled:bg-slate-300"
         >
           以 Email 登入
@@ -862,7 +952,7 @@ export function AuthPanel() {
         <button
           type="button"
           onClick={() => void handleSignUp()}
-          disabled={submitting || !email || !password}
+          disabled={submitting || !email.trim() || !password}
           className="secondary-pill disabled:cursor-not-allowed disabled:bg-slate-100"
         >
           註冊新帳號
@@ -870,7 +960,7 @@ export function AuthPanel() {
         <button
           type="button"
           onClick={() => void handleSendPasswordReset()}
-          disabled={submitting || !email}
+          disabled={submitting || !email.trim()}
           className="secondary-pill disabled:cursor-not-allowed disabled:bg-slate-100"
         >
           忘記密碼

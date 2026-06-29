@@ -53,6 +53,11 @@ const QUICK_ENTRIES = [
 const HOME_RELEASE_NOTES = [
   {
     time: "06/29",
+    title: "手機登入比較黏了",
+    body: "帳號區新增記住 Email，手機切去查資料再回來時也會主動刷新登入狀態，不再一下就被丟回訪客。"
+  },
+  {
+    time: "06/29",
     title: "AI 模擬卷結果修正",
     body: "AI 原創卷做完後，結果頁會用試卷 key 自動補回題目；就算雲端只先回傳答題紀錄，也不會看不到解析。"
   },
