@@ -387,8 +387,11 @@ function getConfidenceTileClass(confidence: number) {
   if (confidence <= 1) return "border-rose-200 bg-rose-500 text-white shadow-rose-100";
   if (confidence === 2) return "border-orange-200 bg-orange-400 text-white shadow-orange-100";
   if (confidence === 3) return "border-yellow-200 bg-yellow-300 text-slate-950 shadow-yellow-100";
-  if (confidence === 4) return "border-emerald-200 bg-emerald-100 text-emerald-950 shadow-emerald-100";
-  return "border-emerald-300 bg-emerald-200 text-emerald-950 shadow-emerald-100";
+  return "border-emerald-200 bg-emerald-100 text-emerald-950 shadow-emerald-100";
+}
+
+function getConfidenceOverviewLabel(confidence: number) {
+  return `信心 ${Math.min(Math.max(Math.round(confidence), 1), 4)}`;
 }
 
 function normalizeSummaryStem(stem: string) {
@@ -1462,7 +1465,7 @@ function ResultsPageContent() {
         ) : null}
         <p>
           <span className="font-semibold">信心：</span>
-          {attempt.confidence}
+          {getConfidenceOverviewLabel(attempt.confidence)}
         </p>
         {attempt.errorType ? (
           <p>
@@ -1493,7 +1496,7 @@ function ResultsPageContent() {
         <div className="flex flex-wrap items-start justify-between gap-3">
           <div>
             <h2 className="text-xl font-semibold text-ink">信心度總覽</h2>
-            <p className="mt-2 text-sm text-slate-500">依正式題號排列，色塊代表信心 1 到 5。</p>
+            <p className="mt-2 text-sm text-slate-500">依正式題號排列，色塊代表信心 1-4。</p>
           </div>
           <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-700">
             {confidenceOverviewItems.length} 題
@@ -1501,12 +1504,17 @@ function ResultsPageContent() {
         </div>
 
         <div className="mt-4 flex flex-wrap gap-2 text-[11px] font-bold">
-          {[1, 2, 3, 4, 5].map((confidenceValue) => (
+          {[
+            { label: "1", value: 1 },
+            { label: "2", value: 2 },
+            { label: "3", value: 3 },
+            { label: "4", value: 4 }
+          ].map((confidenceValue) => (
             <span
-              key={confidenceValue}
-              className={`inline-flex h-7 min-w-7 items-center justify-center rounded-lg border shadow-sm ${getConfidenceTileClass(confidenceValue)}`}
+              key={confidenceValue.label}
+              className={`inline-flex h-7 min-w-7 items-center justify-center rounded-lg border px-2 shadow-sm ${getConfidenceTileClass(confidenceValue.value)}`}
             >
-              {confidenceValue}
+              {confidenceValue.label}
             </span>
           ))}
         </div>
@@ -1519,8 +1527,8 @@ function ResultsPageContent() {
                 key={detailKey}
                 type="button"
                 onClick={() => openQuestionReviewDetail(detailKey)}
-                title={`第 ${questionNumber} 題・${attempt.isCorrect ? "答對" : "答錯"}・信心 ${attempt.confidence}`}
-                aria-label={`第 ${questionNumber} 題，${attempt.isCorrect ? "答對" : "答錯"}，信心 ${attempt.confidence}`}
+                title={`第 ${questionNumber} 題・${attempt.isCorrect ? "答對" : "答錯"}・${getConfidenceOverviewLabel(attempt.confidence)}`}
+                aria-label={`第 ${questionNumber} 題，${attempt.isCorrect ? "答對" : "答錯"}，${getConfidenceOverviewLabel(attempt.confidence)}`}
                 className={`relative aspect-square min-h-12 rounded-2xl border-2 text-center text-base font-black shadow-sm transition hover:-translate-y-0.5 hover:shadow-md focus:outline-none focus:ring-2 focus:ring-slate-950 focus:ring-offset-2 ${getConfidenceTileClass(attempt.confidence)}`}
               >
                 <span
@@ -1675,7 +1683,7 @@ function ResultsPageContent() {
                       {renderQuestionSummaryLine({
                         prefix: `第 ${questionNumber} 題：${attempt.isCorrect ? "答對" : "答錯"}`,
                         question,
-                        suffix: `信心 ${attempt.confidence}`
+                        suffix: getConfidenceOverviewLabel(attempt.confidence)
                       })}
                     </summary>
                     {isOpen
