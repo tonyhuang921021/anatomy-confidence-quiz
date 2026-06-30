@@ -27,7 +27,6 @@ import {
   clearMatchingCurrentSessions,
   getCompletedSessionsStorageLengthForUser,
   getCanonicalSessionId,
-  loadCompletedHistorySessionsForUser,
   loadCloudCompletedSessionsForUser,
   loadPendingCompletedSessionUploadsForUser,
   loadCurrentSession,
@@ -1960,13 +1959,7 @@ export async function syncLocalCompletedSessionsForCurrentUser(userId: string) {
   }
 
   if (hasHeavyLocalHistory) {
-    const historySessions = loadCompletedHistorySessionsForUser(userId);
-    if (historySessions.length === 0 && remoteSessions.length > 0) {
-      saveCompletedQuestionHistoryEntriesForUser(
-        userId,
-        buildCompletedQuestionHistoryEntriesFromSessions(remoteSessions)
-      );
-    }
+    mergeCompletedQuestionHistoryFromSessionsForUser(userId, mergedSessions);
   } else {
     saveCompletedSessions(mergedSessions);
     saveCompletedQuestionHistoryEntriesForUser(

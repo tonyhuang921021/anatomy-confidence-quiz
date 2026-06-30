@@ -86,7 +86,7 @@ export default function StartPage() {
     const refreshAttemptedQuestionIds = () => {
       setAttemptedQuestionIds(
         new Set(
-          loadCompletedHistorySessionsForUser()
+          loadCompletedHistorySessionsForUser(user?.id)
             .flatMap((session) => session.attempts ?? [])
             .map((attempt) => attempt.questionId)
         )

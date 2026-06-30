@@ -6,9 +6,9 @@ import {
   QuestionExplanationOverride,
   QuizSession,
   QuizSettings
-} from "@/types/quiz";
-import { normalizeQuestionExplanationOverride as normalizeQuestionExplanationOverridePayload } from "@/lib/questionExplanationFormat";
-import { normalizePracticeYearRange } from "@/lib/practiceYears";
+} from "../types/quiz";
+import { normalizeQuestionExplanationOverride as normalizeQuestionExplanationOverridePayload } from "./questionExplanationFormat";
+import { normalizePracticeYearRange } from "./practiceYears";
 
 const CURRENT_SESSION_KEY = "anatomy-confidence-current-session";
 const COMPLETED_SESSIONS_KEY = "anatomy-confidence-completed-sessions";
@@ -468,11 +468,26 @@ function buildSyntheticAttemptsFromQuestionHistory(entries: CompletedQuestionHis
 
 export function loadCompletedHistorySessionsForUser(userId = getActiveStorageUser()) {
   const historyEntries = loadCompletedQuestionHistoryEntriesForUser(userId);
-  if (historyEntries.length > 0) {
-    return [{ attempts: buildSyntheticAttemptsFromQuestionHistory(historyEntries) }];
+  const shouldUseTailRecovery =
+    getCompletedSessionsStorageLengthForUser(userId) > COMPLETED_SESSIONS_UPLOAD_RECOVERY_READ_LIMIT;
+  const localSessions = shouldUseTailRecovery
+    ? loadRecentLocalCompletedSessionsForUploadForUser(userId)
+    : loadCompletedSessionsForUser(userId);
+  const sessionDerivedEntries = buildCompletedQuestionHistoryEntriesFromSessions([
+    ...localSessions,
+    ...loadCloudCompletedSessionsForUser(userId),
+    ...loadPendingCompletedSessionUploadsForUser(userId)
+  ]);
+  const mergedEntries = mergeCompletedQuestionHistoryEntries(historyEntries, sessionDerivedEntries);
+
+  if (mergedEntries.length > 0) {
+    if (mergedEntries.length !== historyEntries.length || sessionDerivedEntries.length > 0) {
+      saveCompletedQuestionHistoryEntriesForUser(userId, mergedEntries);
+    }
+    return [{ attempts: buildSyntheticAttemptsFromQuestionHistory(mergedEntries) }];
   }
 
-  if (getCompletedSessionsStorageLengthForUser(userId) > COMPLETED_SESSIONS_UPLOAD_RECOVERY_READ_LIMIT) {
+  if (shouldUseTailRecovery) {
     return loadRecentLocalCompletedSessionsForUploadForUser(userId);
   }
 

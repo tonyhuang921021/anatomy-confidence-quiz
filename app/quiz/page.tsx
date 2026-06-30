@@ -59,7 +59,6 @@ import {
   clearCurrentSession,
   getPendingQuestionExplanationOverrideSync,
   loadCompletedHistorySessionsForUser,
-  loadCompletedSessions,
   loadCurrentSession,
   loadPracticeFastAnswerMode,
   loadQuestionExplanationOverrides,
@@ -739,7 +738,7 @@ export default function QuizPage() {
                 : loadQuizSettings() ?? DEFAULT_QUIZ_SETTINGS);
         const savedSettings = normalizeLegacySettings(rawSettings);
         const shouldForceNewSession = params?.get("new") === "1";
-        const completedSessions = loadCompletedHistorySessionsForUser();
+        const completedSessions = loadCompletedHistorySessionsForUser(authSession?.user?.id);
         const expectedSimulationQuestionCount = getExpectedSimulationQuestionCount(
           savedSettings,
           loadedOverrides
@@ -1042,9 +1041,10 @@ export default function QuizPage() {
     );
     if (nextBatchSize <= 0) return null;
 
+    const completedHistorySessions = loadCompletedHistorySessionsForUser(authSession?.user?.id);
     const batchQuestionIds = createQuestionOrder(
       remainingPool,
-      [...loadCompletedSessions(), baseSession],
+      [...completedHistorySessions, baseSession],
       {
         ...settings,
         questionCount: nextBatchSize

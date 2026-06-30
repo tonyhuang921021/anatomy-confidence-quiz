@@ -12,9 +12,12 @@
   "include": [
     "next-env.d.ts",
     "data/anatomyQuestions.ts",
+    "lib/questionExplanationFormat.ts",
     "lib/practiceYears.ts",
     "lib/quizAnalysis.ts",
     "lib/quizAnalysis.selection.test.ts",
+    "lib/storage.ts",
+    "lib/storage.completed-history.test.ts",
     "types/quiz.ts"
   ]
 }

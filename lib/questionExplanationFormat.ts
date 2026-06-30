@@ -1,4 +1,4 @@
-import type { OptionKey, QuestionExplanationOverride } from "@/types/quiz";
+import type { OptionKey, QuestionExplanationOverride } from "../types/quiz";
 
 type ExplanationPayloadInput = {
   explanation?: unknown;
