@@ -25,10 +25,8 @@ import {
   getSeasonalLimitedQuestions
 } from "@/data/med1QuestionBank";
 import {
-  generatePeakChallengeSession,
   loadConfirmedQuestionClassificationOverrides,
   recordCustomPaperAttempt,
-  recordPeakChallengeRun,
   pushCurrentSessionToSupabase,
   loadSharedQuestionExplanationOverrides,
   syncSharedQuestionExplanationOverrides,
@@ -311,8 +309,6 @@ function createSession(
         ? selectedSubjects[0]
         : normalizedSettings.mode === "custom_paper" && selectedSubjects.length > 0
           ? selectedSubjects[0]
-        : normalizedSettings.mode === "peak_challenge" && selectedSubjects.length > 0
-          ? selectedSubjects[0]
         : (effectiveSettings.subjectFilter && effectiveSettings.subjectFilter !== "全部"
             ? effectiveSettings.subjectFilter
             : "醫學（一）") || "解剖學",
@@ -403,11 +399,7 @@ function selectLocalQuestionSet(
         return mergedCustomQuestions;
       }
 
-      if (
-        settings.mode === "custom_paper" ||
-        settings.mode === "peak_challenge" ||
-        selectedSubjects.length === 0
-      ) {
+      if (settings.mode === "custom_paper" || selectedSubjects.length === 0) {
         return mergedCustomQuestions;
       }
 
@@ -551,10 +543,6 @@ function isCustomPaperSession(session: QuizSession) {
   return session.settings?.mode === "custom_paper" && Boolean(session.settings?.customPaperCode);
 }
 
-function isPeakChallengeSession(session: QuizSession) {
-  return session.settings?.mode === "peak_challenge";
-}
-
 function getExpectedSimulationQuestionCount(
   settings: QuizSettings,
   classificationOverrides: Record<string, QuestionClassificationOverride> = {}
@@ -602,8 +590,6 @@ export default function QuizPage() {
   const [classificationReportLoadingMap, setClassificationReportLoadingMap] = useState<Record<string, boolean>>({});
   const [classificationReportMessageMap, setClassificationReportMessageMap] = useState<Record<string, string>>({});
   const [isSubmittingAnswer, setIsSubmittingAnswer] = useState(false);
-  const [isPeakPrefetching, setIsPeakPrefetching] = useState(false);
-  const [peakNextQuestionError, setPeakNextQuestionError] = useState("");
   const [loadIssue, setLoadIssue] = useState("");
   const [fastAnswerMode, setFastAnswerMode] = useState(false);
   const [selectedAnswer, setSelectedAnswer] = useState<OptionKey | undefined>();
@@ -620,16 +606,6 @@ export default function QuizPage() {
       accessToken: authSession?.access_token ?? null,
       visitorId: getOrCreateVisitorId() ?? "",
       paperCode: completedSession.settings?.customPaperCode ?? "",
-      session: completedSession
-    });
-  }
-
-  function syncCompletedPeakChallenge(completedSession: QuizSession) {
-    if (!isPeakChallengeSession(completedSession)) return;
-
-    void recordPeakChallengeRun({
-      accessToken: authSession?.access_token ?? null,
-      visitorId: getOrCreateVisitorId() ?? "",
       session: completedSession
     });
   }
@@ -664,50 +640,6 @@ export default function QuizPage() {
         saveCurrentSession(pendingSession);
       }
     }, 120);
-  }
-
-  async function requestNextPeakChallengeBatch(baseSession: QuizSession) {
-    const peakCandidates = baseSession.settings?.peakWrongPoolCandidates ?? [];
-    const doneQuestionIds = Array.from(
-      new Set([
-        ...(baseSession.questionOrder ?? []),
-        ...loadCompletedSessions()
-          .filter((item) => item.settings?.mode === "peak_challenge")
-          .flatMap((item) => item.attempts.map((entry) => entry.questionId))
-      ])
-    );
-
-    return generatePeakChallengeSession({
-      accessToken: authSession?.access_token ?? null,
-      visitorId: getOrCreateVisitorId() ?? "",
-      wrongPoolCandidates: peakCandidates,
-      doneQuestionIds,
-      desiredCount: 1,
-      existingSourceBreakdown: baseSession.settings?.peakSourceBreakdown ?? { pastExam: 0, aiGenerated: 0 },
-      practicedSubjects: baseSession.settings?.subjectFilters ?? [],
-      nextQuestionIndex: baseSession.questionOrder?.length ?? 0
-    });
-  }
-
-  async function requestNextPeakChallengeBatchWithRetry(
-    baseSession: QuizSession,
-    retries = 2
-  ) {
-    let lastError: unknown;
-
-    for (let attempt = 0; attempt <= retries; attempt += 1) {
-      try {
-        return await requestNextPeakChallengeBatch(baseSession);
-      } catch (error) {
-        lastError = error;
-
-        if (attempt < retries) {
-          await new Promise((resolve) => window.setTimeout(resolve, 500 * (attempt + 1)));
-        }
-      }
-    }
-
-    throw lastError instanceof Error ? lastError : new Error("下一題產生失敗，請再試一次。");
   }
 
   useEffect(() => {
@@ -1003,8 +935,6 @@ export default function QuizPage() {
   const targetCount =
     session?.settings?.mode === "simulation"
       ? questionSet.length
-      : session?.settings?.mode === "peak_challenge"
-      ? questionSet.length
       : session?.settings?.questionCount ?? questionSet.length;
   const progress =
     targetCount === 0 ? 0 : ((currentIndex + (submittedAttempt ? 1 : 0)) / targetCount) * 100;
@@ -1235,7 +1165,6 @@ export default function QuizPage() {
     if (!session || !currentQuestion || !answerToSubmit || isSubmittingAnswer) return;
     setSelectedAnswer(answerToSubmit);
     setIsSubmittingAnswer(true);
-    setPeakNextQuestionError("");
 
     const attempt: Attempt = {
       questionId: currentQuestion.id,
@@ -1251,108 +1180,6 @@ export default function QuizPage() {
       attempts: [...session.attempts.filter((item) => item.questionId !== currentQuestion.id), attempt],
       isReviewingAnswer: session.settings?.feedbackMode === "none" ? false : true
     };
-
-    if (session.settings?.mode === "peak_challenge") {
-      if (!attempt.isCorrect) {
-        const completedSession: QuizSession = {
-          ...nextSessionBase,
-          completedAt: new Date().toISOString(),
-          isReviewingAnswer: false
-        };
-        finalizeCompletedSession(completedSession);
-        void pushCompletedSessionToSupabase(completedSession);
-        void pushQuestionStatsSnapshotToSupabase(completedSession);
-        syncCompletedPeakChallenge(completedSession);
-        router.push(buildResultsHref(completedSession));
-        return;
-      }
-
-      const hasBufferedNextQuestion = (nextSessionBase.questionOrder?.length ?? 0) > currentIndex + 1;
-      const accumulatedBreakdown = {
-        pastExam: nextSessionBase.settings?.peakSourceBreakdown?.pastExam ?? 0,
-        aiGenerated: nextSessionBase.settings?.peakSourceBreakdown?.aiGenerated ?? 0
-      };
-      if (hasBufferedNextQuestion) {
-        const advancedSession: QuizSession = {
-          ...nextSessionBase,
-          currentQuestionIndex: currentIndex + 1,
-          isReviewingAnswer: false
-        };
-        persistSession(advancedSession);
-        resetQuestionUI();
-        setIsSubmittingAnswer(false);
-        window.requestAnimationFrame(() => {
-          const target =
-            typeof window !== "undefined" && window.innerWidth >= 1280
-              ? contentTopRef.current
-              : questionTopRef.current;
-
-          target?.scrollIntoView({
-            behavior: "smooth",
-            block: "start"
-          });
-        });
-        return;
-      }
-
-      void (async () => {
-        try {
-          const nextQuestionBatch = await requestNextPeakChallengeBatchWithRetry(nextSessionBase);
-
-          const mergedGeneratedQuestions = Array.from(
-            new Map(
-              [...(nextSessionBase.generatedQuestions ?? []), ...nextQuestionBatch.questions].map((question) => [
-                question.id,
-                question
-              ])
-            ).values()
-          );
-          const mergedQuestionOrder = Array.from(
-            new Set([...(nextSessionBase.questionOrder ?? []), ...nextQuestionBatch.questionIds])
-          );
-          const advancedSession: QuizSession = {
-            ...nextSessionBase,
-            generatedQuestions: mergedGeneratedQuestions,
-            questionOrder: mergedQuestionOrder,
-            currentQuestionIndex: currentIndex + 1,
-            isReviewingAnswer: false,
-            settings: {
-              ...nextSessionBase.settings,
-              mode: "peak_challenge",
-              questionCount: mergedQuestionOrder.length,
-              peakSourceBreakdown: {
-                pastExam: accumulatedBreakdown.pastExam + (nextQuestionBatch.sourceBreakdown.pastExam ?? 0),
-                aiGenerated: accumulatedBreakdown.aiGenerated + (nextQuestionBatch.sourceBreakdown.aiGenerated ?? 0)
-              }
-            }
-          };
-
-          persistSession(advancedSession);
-          setPeakNextQuestionError("");
-          resetQuestionUI();
-          setIsSubmittingAnswer(false);
-          window.requestAnimationFrame(() => {
-            const target =
-              typeof window !== "undefined" && window.innerWidth >= 1280
-                ? contentTopRef.current
-                : questionTopRef.current;
-
-            target?.scrollIntoView({
-              behavior: "smooth",
-              block: "start"
-            });
-          });
-        } catch (error) {
-          persistSession(nextSessionBase);
-          setSubmittedAttempt(attempt);
-          setPeakNextQuestionError(
-            error instanceof Error ? error.message : "下一題產生失敗，請再試一次。"
-          );
-          setIsSubmittingAnswer(false);
-        }
-      })();
-      return;
-    }
 
     if (session.settings?.mode === "simulation" && session.settings?.feedbackMode === "none") {
       const isLast = currentIndex >= targetCount - 1;
@@ -1417,7 +1244,6 @@ export default function QuizPage() {
     };
     persistSession(previousSession, { deferLocalSave: true });
     setSubmittedAttempt(null);
-    setPeakNextQuestionError("");
 
     window.requestAnimationFrame(() => {
       const target =
@@ -1450,7 +1276,6 @@ export default function QuizPage() {
     };
     persistSession(jumpedSession, { deferLocalSave: true });
     setSubmittedAttempt(null);
-    setPeakNextQuestionError("");
 
     window.requestAnimationFrame(() => {
       const target =
@@ -1699,134 +1524,6 @@ export default function QuizPage() {
     router.push(buildResultsHref(completedSession));
   }
 
-  async function handleRetryPeakNextQuestion() {
-    if (!session || session.settings?.mode !== "peak_challenge" || !submittedAttempt?.isCorrect) return;
-
-    try {
-      setIsSubmittingAnswer(true);
-      setPeakNextQuestionError("");
-      const nextQuestionBatch = await requestNextPeakChallengeBatchWithRetry(session);
-      const mergedGeneratedQuestions = Array.from(
-        new Map(
-          [...(session.generatedQuestions ?? []), ...nextQuestionBatch.questions].map((question) => [
-            question.id,
-            question
-          ])
-        ).values()
-      );
-      const mergedQuestionOrder = Array.from(
-        new Set([...(session.questionOrder ?? []), ...nextQuestionBatch.questionIds])
-      );
-      const advancedSession: QuizSession = {
-        ...session,
-        generatedQuestions: mergedGeneratedQuestions,
-        questionOrder: mergedQuestionOrder,
-        currentQuestionIndex: currentIndex + 1,
-        isReviewingAnswer: false,
-        settings: {
-          ...session.settings,
-          mode: "peak_challenge",
-          questionCount: mergedQuestionOrder.length,
-          peakSourceBreakdown: {
-            pastExam:
-              (session.settings?.peakSourceBreakdown?.pastExam ?? 0) +
-              (nextQuestionBatch.sourceBreakdown.pastExam ?? 0),
-            aiGenerated:
-              (session.settings?.peakSourceBreakdown?.aiGenerated ?? 0) +
-              (nextQuestionBatch.sourceBreakdown.aiGenerated ?? 0)
-          }
-        }
-      };
-
-      persistSession(advancedSession);
-      resetQuestionUI();
-      setPeakNextQuestionError("");
-      setIsSubmittingAnswer(false);
-      window.requestAnimationFrame(() => {
-        const target =
-          typeof window !== "undefined" && window.innerWidth >= 1280
-            ? contentTopRef.current
-            : questionTopRef.current;
-
-        target?.scrollIntoView({
-          behavior: "smooth",
-          block: "start"
-        });
-      });
-    } catch (error) {
-      setPeakNextQuestionError(error instanceof Error ? error.message : "下一題產生失敗，請再試一次。");
-      setIsSubmittingAnswer(false);
-    }
-  }
-
-  useEffect(() => {
-    if (
-      session?.settings?.mode !== "peak_challenge" ||
-      !session ||
-      !currentQuestion ||
-      submittedAttempt ||
-      session.completedAt ||
-      isPeakPrefetching
-    ) {
-      return;
-    }
-
-    const hasBufferedNextQuestion = (session.questionOrder?.length ?? 0) > currentIndex + 1;
-    if (hasBufferedNextQuestion) return;
-
-    const peakCandidates = session.settings?.peakWrongPoolCandidates ?? [];
-    if (peakCandidates.length === 0) return;
-
-    setIsPeakPrefetching(true);
-    void requestNextPeakChallengeBatchWithRetry(session)
-      .then((nextQuestionBatch) => {
-        setSession((current) => {
-          if (!current || current.id !== session.id || current.completedAt) return current;
-          if ((current.questionOrder?.length ?? 0) > currentIndex + 1) return current;
-
-          const mergedGeneratedQuestions = Array.from(
-            new Map(
-              [...(current.generatedQuestions ?? []), ...nextQuestionBatch.questions].map((question) => [
-                question.id,
-                question
-              ])
-            ).values()
-          );
-          const mergedQuestionOrder = Array.from(
-            new Set([...(current.questionOrder ?? []), ...nextQuestionBatch.questionIds])
-          );
-          const nextSession: QuizSession = {
-            ...current,
-            generatedQuestions: mergedGeneratedQuestions,
-            questionOrder: mergedQuestionOrder,
-            settings: {
-              ...current.settings,
-              mode: "peak_challenge",
-              questionCount: mergedQuestionOrder.length,
-              peakSourceBreakdown: {
-                pastExam:
-                  (current.settings?.peakSourceBreakdown?.pastExam ?? 0) +
-                  (nextQuestionBatch.sourceBreakdown.pastExam ?? 0),
-                aiGenerated:
-                  (current.settings?.peakSourceBreakdown?.aiGenerated ?? 0) +
-                  (nextQuestionBatch.sourceBreakdown.aiGenerated ?? 0)
-              }
-            }
-          };
-          saveCurrentSession(nextSession);
-          void pushCurrentSessionToSupabase(nextSession);
-          setPeakNextQuestionError("");
-          return nextSession;
-        });
-      })
-      .catch(() => {
-        // prefetch failure should not block current question
-      })
-      .finally(() => {
-        setIsPeakPrefetching(false);
-      });
-  }, [authSession?.access_token, currentIndex, currentQuestion, isPeakPrefetching, session, submittedAttempt]);
-
   if (!mounted) {
     return (
       <main className="shell">
@@ -1872,8 +1569,7 @@ export default function QuizPage() {
   }
 
   const confidenceTrackingEnabled =
-    session.settings?.mode !== "peak_challenge" &&
-    (session.settings?.mode !== "simulation" || (session.settings?.enableConfidenceCalibration ?? true));
+    session.settings?.mode !== "simulation" || (session.settings?.enableConfidenceCalibration ?? true);
   const confidenceCalibrationEnabled =
     session.settings?.mode === "simulation" && (session.settings?.enableConfidenceCalibration ?? true);
   const flag =
@@ -1890,9 +1586,8 @@ export default function QuizPage() {
   const feedbackMode = session.settings?.feedbackMode ?? "full";
   const isBlindSimulation =
     session.settings?.mode === "simulation" && feedbackMode === "none";
-  const isPeakChallenge = session.settings?.mode === "peak_challenge";
-  const shouldShowExplanation = !isPeakChallenge && feedbackMode === "full";
-  const shouldShowCorrectAnswer = !isPeakChallenge && (feedbackMode === "full" || feedbackMode === "answer_only");
+  const shouldShowExplanation = feedbackMode === "full";
+  const shouldShowCorrectAnswer = feedbackMode === "full" || feedbackMode === "answer_only";
   const currentExplanationOverride = explanationOverrides[currentQuestion.id];
   const currentExplanationLoading = explanationLoadingMap[currentQuestion.id];
   const currentExplanationError = explanationErrorMap[currentQuestion.id];
@@ -1983,9 +1678,9 @@ export default function QuizPage() {
               <div className="rounded-[2rem] bg-white p-4 shadow-card ring-1 ring-slate-100 sm:p-5">
                 <div className="grid gap-3 sm:grid-cols-3">
                   <p className="rounded-2xl bg-slate-50 px-4 py-3 text-sm text-slate-700">
-                    {isPeakChallenge ? "目前分數" : "已答題數"} <span className="font-semibold">{answeredCount}</span>
+                    已答題數 <span className="font-semibold">{answeredCount}</span>
                   </p>
-                  {!isBlindSimulation && !isPeakChallenge ? (
+                  {!isBlindSimulation ? (
                     <p className="rounded-2xl bg-slate-50 px-4 py-3 text-sm text-slate-700">
                       目前答對數 <span className="font-semibold">{correctCount}</span>
                     </p>
@@ -2016,9 +1711,7 @@ export default function QuizPage() {
                     }`}
                   >
                     {isSubmittingAnswer
-                      ? isPeakChallenge
-                        ? "巔峰賽生成下一題中..."
-                        : "送出中..."
+                      ? "送出中..."
                       : isBlindSimulation
                         ? currentIndex === targetCount - 1
                           ? "完成並看結果"
@@ -2090,11 +1783,6 @@ export default function QuizPage() {
                   {confidenceTrackingEnabled ? (
                     <p>
                       本題信心：<span className="font-semibold">{getConfidenceLabel(submittedAttempt.confidence)}</span>
-                    </p>
-                  ) : null}
-                  {isPeakChallenge && peakNextQuestionError ? (
-                    <p className="rounded-2xl bg-amber-100/70 px-4 py-3 text-amber-950">
-                      {peakNextQuestionError}
                     </p>
                   ) : null}
                   {specialScoringNote ? (
@@ -2204,27 +1892,15 @@ export default function QuizPage() {
               ) : null}
 
               <div className="grid gap-3">
-                {isPeakChallenge && submittedAttempt.isCorrect && peakNextQuestionError ? (
-                  <button
-                    type="button"
-                    onClick={() => void handleRetryPeakNextQuestion()}
-                    disabled={isSubmittingAnswer}
-                    className="min-h-12 w-full rounded-2xl bg-ink px-4 py-4 text-sm font-semibold text-white transition hover:bg-slate-900 disabled:cursor-not-allowed disabled:bg-slate-300"
-                  >
-                    {isSubmittingAnswer ? "巔峰賽生成下一題中..." : "重試生成下一題"}
-                  </button>
-                ) : (
-                  <button
-                    type="button"
-                    onClick={handleNext}
-                    className="min-h-12 w-full rounded-2xl bg-ink px-4 py-4 text-sm font-semibold text-white transition hover:bg-slate-900"
-                  >
-                    {currentIndex === targetCount - 1 ? "查看結果" : "下一題"}
-                  </button>
-                )}
+                <button
+                  type="button"
+                  onClick={handleNext}
+                  className="min-h-12 w-full rounded-2xl bg-ink px-4 py-4 text-sm font-semibold text-white transition hover:bg-slate-900"
+                >
+                  {currentIndex === targetCount - 1 ? "查看結果" : "下一題"}
+                </button>
                 {((session.settings?.mode === "random" && session.settings?.stopAfterReview) ||
                   session.settings?.mode === "custom_paper") &&
-                !isPeakChallenge &&
                 currentIndex < targetCount - 1 ? (
                   <button
                     type="button"
@@ -2249,10 +1925,6 @@ export default function QuizPage() {
                         ? "每題只看正確答案"
                         : "每題看正確與詳解"
                   }
-                </div>
-              ) : isPeakChallenge ? (
-                <div className="flex min-h-12 items-center rounded-2xl bg-rose-50 px-4 py-3 text-sm text-rose-900">
-                  巔峰賽規則：答對 1 題得 1 分，答錯立刻結束；本輪混合考古題與 AI 難題。
                 </div>
               ) : null}
             </div>
@@ -2279,14 +1951,14 @@ export default function QuizPage() {
                   </p>
                 ) : null}
                 <p className="rounded-2xl bg-slate-50 px-4 py-3 text-sm text-slate-700">
-                  {isPeakChallenge ? "目前分數" : "已答題數"} <span className="font-semibold">{answeredCount}</span>
+                  已答題數 <span className="font-semibold">{answeredCount}</span>
                 </p>
                 <p className="rounded-2xl bg-slate-50 px-4 py-3 text-sm text-slate-700">
                   本輪模式 <span className="font-semibold">{getModeLabel(session.settings?.mode ?? "weakness")}</span>
                 </p>
               </>
             )}
-            {!isBlindSimulation && !isPeakChallenge ? (
+            {!isBlindSimulation ? (
               <p className="rounded-2xl bg-slate-50 px-4 py-3 text-sm text-slate-700">
                 暫時答對率{" "}
                 <span className="font-semibold">

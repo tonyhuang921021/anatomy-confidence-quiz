@@ -18,10 +18,8 @@ function isPracticeReviewSession(session: QuizSession) {
   return (
     session.settings?.mode !== "simulation" &&
     session.settings?.mode !== "custom_paper" &&
-    session.settings?.mode !== "peak_challenge" &&
     session.settings?.customPoolLabel !== "模擬考錯題庫" &&
-    session.settings?.customPoolLabel !== "自訂卷錯題庫" &&
-    session.settings?.customPoolLabel !== "巔峰賽錯題庫"
+    session.settings?.customPoolLabel !== "自訂卷錯題庫"
   );
 }
 

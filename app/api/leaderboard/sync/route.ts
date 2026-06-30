@@ -45,6 +45,11 @@ const ATTEMPT_FALLBACK_CHUNK_SIZE = 50;
 const ROLLUP_LOOKUP_CHUNK_SIZE = 200;
 const LEADERBOARD_PROFILE_MIN_REFRESH_MS = 15 * 60_000;
 const MAX_REASONABLE_SESSION_QUESTION_COUNT = 500;
+const LEADERBOARD_ELIGIBLE_MODES = new Set(["random", "weakness", "review", "simulation", "custom_paper"]);
+
+function isLeaderboardEligibleSessionMode(mode?: string | null) {
+  return !mode || LEADERBOARD_ELIGIBLE_MODES.has(mode);
+}
 
 function getServiceSupabaseClient() {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
@@ -164,15 +169,14 @@ async function fetchRecentCompletedSessionRows(supabase: any, userId: string) {
       .select("id, mode, question_count, correct_count, completed_at")
       .eq("user_id", userId)
       .not("completed_at", "is", null)
-      .or("mode.is.null,mode.neq.peak_challenge")
       .order("completed_at", { ascending: false, nullsFirst: false })
-      .limit(RECENT_SESSION_ROLLUP_LIMIT),
+      .limit(RECENT_SESSION_ROLLUP_LIMIT * 2),
     2500,
     "近期作答快照讀取逾時"
   )) as { data?: QuizSessionSummaryRow[]; error?: unknown };
 
   if (error) throw error;
-  return data ?? [];
+  return (data ?? []).filter((row) => isLeaderboardEligibleSessionMode(row.mode)).slice(0, RECENT_SESSION_ROLLUP_LIMIT);
 }
 
 async function fetchAllCompletedSessionRows(supabase: any, userId: string) {
@@ -185,7 +189,6 @@ async function fetchAllCompletedSessionRows(supabase: any, userId: string) {
         .select("id, mode, question_count, correct_count, completed_at")
         .eq("user_id", userId)
         .not("completed_at", "is", null)
-        .or("mode.is.null,mode.neq.peak_challenge")
         .order("completed_at", { ascending: false, nullsFirst: false })
         .range(from, from + FULL_SESSION_ROLLUP_PAGE_SIZE - 1),
       4000,
@@ -195,7 +198,7 @@ async function fetchAllCompletedSessionRows(supabase: any, userId: string) {
     if (error) throw error;
 
     const page = data ?? [];
-    rows.push(...page);
+    rows.push(...page.filter((row) => isLeaderboardEligibleSessionMode(row.mode)));
     if (page.length < FULL_SESSION_ROLLUP_PAGE_SIZE) break;
   }
 

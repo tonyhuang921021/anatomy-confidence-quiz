@@ -88,8 +88,7 @@ export type QuizMode =
   | "weakness"
   | "review"
   | "simulation"
-  | "custom_paper"
-  | "peak_challenge";
+  | "custom_paper";
 
 export type SubjectFilter = SubjectName | "全部";
 export type SimulationFeedbackMode = "full" | "answer_only" | "none";
@@ -121,22 +120,6 @@ export type QuizSettings = {
   customPaperName?: string;
   customPaperDifficulty?: CustomPaperDifficulty;
   customPaperIsPublic?: boolean;
-  peakWrongPoolCandidates?: {
-    questionId: string;
-    subject: SubjectName;
-    chapter: string;
-    section: string;
-    stem: string;
-    testedConcept?: string;
-    riskScore?: number;
-    wrongCount?: number;
-    lowConfidenceCount?: number;
-    sourceType?: QuestionSourceType;
-  }[];
-  peakSourceBreakdown?: {
-    pastExam?: number;
-    aiGenerated?: number;
-  };
 };
 
 export type QuizSession = {
@@ -645,15 +628,6 @@ export type CustomPaperDetail = CustomPaperSummary & {
   questionIds: string[];
   questions?: Question[];
   participants: CustomPaperParticipant[];
-};
-
-export type PeakChallengeLeaderboardEntry = {
-  label: string;
-  userEmail?: string;
-  bestScore: number;
-  runCount: number;
-  latestScore: number;
-  latestCompletedAt?: string;
 };
 
 export type SavedQuestionSource = "search" | "quiz" | "results" | "review" | "saved";

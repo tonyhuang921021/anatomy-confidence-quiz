@@ -17,7 +17,6 @@ const PENDING_COMPLETED_SESSION_UPLOADS_KEY = "anatomy-confidence-pending-comple
 const COMPLETED_QUESTION_HISTORY_KEY = "anatomy-confidence-completed-question-history";
 const QUIZ_SETTINGS_KEY = "anatomy-confidence-quiz-settings";
 const QUESTION_EXPLANATION_OVERRIDES_KEY = "anatomy-confidence-question-explanation-overrides";
-const PEAK_CHALLENGE_PRELOAD_KEY = "anatomy-confidence-peak-challenge-preload";
 const HOME_TONE_MODE_KEY = "anatomy-confidence-home-tone-mode";
 const THEME_MODE_KEY = "anatomy-confidence-theme-mode";
 const PRACTICE_YEAR_RANGE_KEY = "anatomy-confidence-practice-year-range";
@@ -125,8 +124,7 @@ export function freeLocalStorageSpaceForAuth() {
   if (!isBrowser()) return 0;
 
   const removableBaseKeys = [
-    CLOUD_COMPLETED_SESSIONS_KEY,
-    PEAK_CHALLENGE_PRELOAD_KEY
+    CLOUD_COMPLETED_SESSIONS_KEY
   ] as const;
   const activeUserId = safeLocalStorageGetItem(ACTIVE_USER_KEY) || GUEST_USER_ID;
   const removableKeys = new Set<string>();
@@ -1275,14 +1273,6 @@ export function saveQuestionExplanationOverrides(
   safeLocalStorageSetItem(getScopedKey(QUESTION_EXPLANATION_OVERRIDES_KEY), JSON.stringify(next));
 }
 
-export type PeakChallengePreload = {
-  fingerprint: string;
-  questionIds: string[];
-  questions: Question[];
-  sourceBreakdown: { pastExam?: number; aiGenerated?: number };
-  preparedAt: string;
-};
-
 export type HomeToneMode = "calm" | "anxious";
 export type ThemeMode = "light" | "dark";
 export type PracticeYearRange = {
@@ -1291,28 +1281,6 @@ export type PracticeYearRange = {
 };
 
 export type PracticeQuestionCount = 5 | 10 | 15 | 20 | 25 | 30 | 35 | 40 | 45 | 50;
-
-export function savePeakChallengePreload(preload: PeakChallengePreload) {
-  if (!isBrowser()) return;
-  safeLocalStorageSetItem(getScopedKey(PEAK_CHALLENGE_PRELOAD_KEY), JSON.stringify(preload));
-}
-
-export function loadPeakChallengePreload(): PeakChallengePreload | null {
-  if (!isBrowser()) return null;
-  const raw = getLegacyOrScopedRaw(PEAK_CHALLENGE_PRELOAD_KEY);
-  if (!raw) return null;
-
-  try {
-    return JSON.parse(raw) as PeakChallengePreload;
-  } catch {
-    return null;
-  }
-}
-
-export function clearPeakChallengePreload() {
-  if (!isBrowser()) return;
-  safeLocalStorageRemoveItem(getScopedKey(PEAK_CHALLENGE_PRELOAD_KEY));
-}
 
 export function saveHomeToneMode(mode: HomeToneMode) {
   if (!isBrowser()) return;

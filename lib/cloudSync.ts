@@ -11,12 +11,10 @@ import type {
   OwnerExplanationUsageEntry,
   OwnerHourlyPoint,
   OwnerTopAttemptVisitorEntry,
-  PeakChallengeLeaderboardEntry,
   QuestionClassificationOverride,
   QuestionExplanationOverride,
   QuestionCommunityStats,
   Question,
-  QuestionSourceType,
   SubjectName,
   QuizSession,
   VisitorStats
@@ -703,7 +701,6 @@ function buildSessionPayloadForCloud(
     generatedQuestions.length > 0 &&
     (session.settings?.mode === "custom_paper" ||
       session.settings?.mode === "simulation" ||
-      session.settings?.mode === "peak_challenge" ||
       generatedQuestions.some((question) => question.sourceType !== "MOEX_PAST_EXAM"));
 
   return {
@@ -3280,175 +3277,4 @@ export async function updateCustomPaperMetadata(
   }
 
   return payload.paper;
-}
-
-type PeakChallengeCandidateInput = {
-  questionId: string;
-  subject: SubjectName;
-  chapter: string;
-  section: string;
-  stem: string;
-  testedConcept?: string;
-  riskScore?: number;
-  wrongCount?: number;
-  lowConfidenceCount?: number;
-  sourceType?: QuestionSourceType;
-};
-
-async function buildSupabaseAuthHeader() {
-  if (isSupabaseRecoveryMode() || !isSupabaseConfigured()) return null;
-  const client = getSupabaseBrowserClient();
-  const { data } = await client.auth.getSession();
-  const token = data.session?.access_token;
-  return token ? `Bearer ${token}` : null;
-}
-
-export async function loadPeakChallengeLeaderboard(): Promise<PeakChallengeLeaderboardEntry[]> {
-  const authHeader = await buildSupabaseAuthHeader();
-  const response = await fetch("/api/peak-challenge", {
-    headers: authHeader ? { Authorization: authHeader } : undefined,
-    cache: "no-store"
-  });
-  const rawText = await response.text();
-  const payload = tryParseJson<
-    | {
-        ok?: boolean;
-        message?: string;
-        leaderboard?: PeakChallengeLeaderboardEntry[];
-      }
-  >(rawText);
-
-  if (!response.ok || !payload?.ok || !payload.leaderboard) {
-    throw new Error(payload?.message || rawText || "巔峰賽榜單載入失敗");
-  }
-
-  return payload.leaderboard;
-}
-
-export async function loadPeakChallengeAccessStatus() {
-  const authHeader = await buildSupabaseAuthHeader();
-  const response = await fetch("/api/peak-challenge", {
-    headers: authHeader ? { Authorization: authHeader } : undefined,
-    cache: "no-store"
-  });
-  const rawText = await response.text();
-  const payload = tryParseJson<
-    | {
-        ok?: boolean;
-        message?: string;
-        attemptStatus?: {
-          dailyLimit: number;
-          usedAttempts: number;
-          remainingAttempts: number | null;
-          isOwnerBypass: boolean;
-        } | null;
-      }
-  >(rawText);
-
-  if (!response.ok || !payload?.ok) {
-    throw new Error(payload?.message || rawText || "巔峰賽狀態載入失敗");
-  }
-
-  return payload.attemptStatus ?? null;
-}
-
-export async function claimPeakChallengeStart(input: {
-  accessToken?: string | null;
-  visitorId?: string;
-}) {
-  const response = await fetch("/api/peak-challenge", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json"
-    },
-    body: JSON.stringify({
-      action: "start_gate",
-      ...input
-    })
-  });
-
-  const rawText = await response.text();
-  const payload = tryParseJson<{ ok?: boolean; message?: string; remainingAttempts?: number | null }>(rawText);
-
-  if (!response.ok || !payload?.ok) {
-    throw new Error(payload?.message || rawText || "巔峰賽開始失敗");
-  }
-
-  return {
-    remainingAttempts:
-      typeof payload.remainingAttempts === "number" ? payload.remainingAttempts : null
-  };
-}
-
-export async function generatePeakChallengeSession(input: {
-  accessToken?: string | null;
-  visitorId?: string;
-  wrongPoolCandidates: PeakChallengeCandidateInput[];
-  doneQuestionIds: string[];
-  desiredCount?: number;
-  existingSourceBreakdown?: { pastExam?: number; aiGenerated?: number };
-  practicedSubjects?: SubjectName[];
-  nextQuestionIndex?: number;
-  consumeAttempt?: boolean;
-}) {
-  const response = await fetch("/api/peak-challenge", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json"
-    },
-    body: JSON.stringify({
-      action: "generate",
-      ...input
-    })
-  });
-
-  const rawText = await response.text();
-  const payload = tryParseJson<
-    | {
-        ok?: boolean;
-        message?: string;
-        sessionTitle?: string;
-        questionIds?: string[];
-        questions?: CustomPaperDetail["questions"];
-        sourceBreakdown?: { pastExam?: number; aiGenerated?: number };
-        remainingAttempts?: number | null;
-      }
-  >(rawText);
-
-  if (!response.ok || !payload?.ok || !payload.questionIds || !payload.questions) {
-    throw new Error(payload?.message || rawText || "巔峰賽題目產生失敗");
-  }
-
-  return {
-    sessionTitle: payload.sessionTitle ?? "巔峰賽",
-    questionIds: payload.questionIds,
-    questions: payload.questions,
-    sourceBreakdown: payload.sourceBreakdown ?? {},
-    remainingAttempts:
-      typeof payload.remainingAttempts === "number" ? payload.remainingAttempts : null
-  };
-}
-
-export async function recordPeakChallengeRun(input: {
-  accessToken?: string | null;
-  visitorId?: string;
-  session: QuizSession;
-}) {
-  const response = await fetch("/api/peak-challenge", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json"
-    },
-    body: JSON.stringify({
-      action: "submit",
-      ...input
-    })
-  });
-
-  const rawText = await response.text();
-  const payload = tryParseJson<{ ok?: boolean; message?: string }>(rawText);
-
-  if (!response.ok || !payload?.ok) {
-    throw new Error(payload?.message || rawText || "巔峰賽成績同步失敗");
-  }
 }
