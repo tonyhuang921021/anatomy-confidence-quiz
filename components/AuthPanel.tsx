@@ -834,7 +834,7 @@ export function AuthPanel() {
                       </button>
                     </div>
                     <p className="mt-2 text-xs leading-5 text-slate-500">
-                      只影響模擬考作答與結果頁；散題固定不詢問信心，專心做題就好。
+                      只影響模擬考校準分析；散題仍會詢問信心，低信心題會照常留到複習。
                     </p>
                   </div>
 

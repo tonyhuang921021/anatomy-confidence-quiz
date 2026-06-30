@@ -1871,6 +1871,9 @@ export default function QuizPage() {
     );
   }
 
+  const confidenceTrackingEnabled =
+    session.settings?.mode !== "peak_challenge" &&
+    (session.settings?.mode !== "simulation" || (session.settings?.enableConfidenceCalibration ?? true));
   const confidenceCalibrationEnabled =
     session.settings?.mode === "simulation" && (session.settings?.enableConfidenceCalibration ?? true);
   const flag =
@@ -1967,7 +1970,7 @@ export default function QuizPage() {
 
           {!submittedAttempt ? (
             <>
-              {confidenceCalibrationEnabled ? (
+              {confidenceTrackingEnabled ? (
                 <ConfidenceSelector
                   key={`answer-${currentQuestion.id}`}
                   value={displayedConfidence}
@@ -1987,7 +1990,7 @@ export default function QuizPage() {
                       目前答對數 <span className="font-semibold">{correctCount}</span>
                     </p>
                   ) : null}
-                  {confidenceCalibrationEnabled ? (
+                  {confidenceTrackingEnabled ? (
                     <p className="rounded-2xl bg-slate-50 px-4 py-3 text-sm text-slate-700">
                       本輪平均信心 <span className="font-semibold">{averageConfidence}</span>
                     </p>
@@ -2084,7 +2087,7 @@ export default function QuizPage() {
                       />
                     </>
                   ) : null}
-                  {confidenceCalibrationEnabled ? (
+                  {confidenceTrackingEnabled ? (
                     <p>
                       本題信心：<span className="font-semibold">{getConfidenceLabel(submittedAttempt.confidence)}</span>
                     </p>
@@ -2187,7 +2190,7 @@ export default function QuizPage() {
                 ) : null}
               </div>
 
-              {confidenceCalibrationEnabled ? (
+              {confidenceTrackingEnabled ? (
                 <ConfidenceSelector
                   key={`review-${currentQuestion.id}`}
                   value={displayedConfidence}
@@ -2270,7 +2273,7 @@ export default function QuizPage() {
                 <p className="rounded-2xl bg-slate-50 px-4 py-3 text-sm text-slate-700">
                   目前小節 <span className="font-semibold">{currentQuestion.section}</span>
                 </p>
-                {confidenceCalibrationEnabled ? (
+                {confidenceTrackingEnabled ? (
                   <p className="rounded-2xl bg-slate-50 px-4 py-3 text-sm text-slate-700">
                     目前信心 <span className="font-semibold">{getConfidenceLabel(displayedConfidence)}</span>
                   </p>

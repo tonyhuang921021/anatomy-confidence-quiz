@@ -94,9 +94,14 @@ function inferPastPaperKeyFromQuestionIds(questionIds: string[]) {
   return paperKeys.size === 1 ? Array.from(paperKeys)[0] : undefined;
 }
 
-function buildCompletedPaperCounts() {
+type CompletedPaperSummary = {
+  lastScore: number;
+  lastCompletedAt: string;
+};
+
+function buildCompletedPaperSummaries() {
   const completedSessions = loadCompletedSessions();
-  return completedSessions.reduce<Record<string, number>>((accumulator, session) => {
+  return completedSessions.reduce<Record<string, CompletedPaperSummary>>((accumulator, session) => {
     const paperKey = session.settings?.mode === "simulation"
       ? session.settings?.selectedPaperKey ??
         inferPastPaperKeyFromQuestionIds([
@@ -106,7 +111,22 @@ function buildCompletedPaperCounts() {
       : undefined;
 
     if (!paperKey) return accumulator;
-    accumulator[paperKey] = (accumulator[paperKey] ?? 0) + 1;
+    const total = session.attempts.length;
+    if (total <= 0) return accumulator;
+
+    const correct = session.attempts.filter((attempt) => attempt.isCorrect).length;
+    const completedAt = session.completedAt ?? session.startedAt;
+    const current = accumulator[paperKey];
+    const lastScore = Math.round((correct / total) * 100);
+
+    accumulator[paperKey] = {
+      lastScore: !current || completedAt.localeCompare(current.lastCompletedAt) >= 0
+        ? lastScore
+        : current.lastScore,
+      lastCompletedAt: !current || completedAt.localeCompare(current.lastCompletedAt) >= 0
+        ? completedAt
+        : current.lastCompletedAt
+    };
     return accumulator;
   }, {});
 }
@@ -135,7 +155,7 @@ export function QuizSetupPanel({
         }
       : DEFAULT_QUIZ_SETTINGS
   );
-  const [completedPaperCounts, setCompletedPaperCounts] = useState<Record<string, number>>({});
+  const [completedPaperSummaries, setCompletedPaperSummaries] = useState<Record<string, CompletedPaperSummary>>({});
   const selectedSubject = (settings.subjectFilter ?? "解剖學") as SubjectFilter;
   const subjectItem =
     selectedSubject === "全部"
@@ -194,7 +214,7 @@ export function QuizSetupPanel({
   const canStart = !isSelectablePaperMode || Boolean(settings.selectedPaperKey);
 
   useEffect(() => {
-    setCompletedPaperCounts(buildCompletedPaperCounts());
+    setCompletedPaperSummaries(buildCompletedPaperSummaries());
   }, [syncStatus, syncVersion]);
 
   useEffect(() => {
@@ -211,7 +231,7 @@ export function QuizSetupPanel({
 
   useEffect(() => {
     function handleCompletedSessionsChange() {
-      setCompletedPaperCounts(buildCompletedPaperCounts());
+      setCompletedPaperSummaries(buildCompletedPaperSummaries());
     }
 
     window.addEventListener("completed-sessions-change", handleCompletedSessionsChange);
@@ -525,8 +545,8 @@ export function QuizSetupPanel({
                 <div className="space-y-4">
                   <div className="rounded-2xl bg-slate-50 px-4 py-3 text-sm leading-7 text-slate-600">
                     {activePaperMode === "ai_paper"
-                      ? "請選擇要做的 AI 原創模擬卷。醫學（一）與醫學（二）會分開整理，之後新增醫學（二）AI 卷也會出現在這裡。"
-                      : "請直接點選要做的卷別。已做過的卷會標示次數，方便你分辨哪些卷已經寫過。"}
+                      ? "請選擇要做的 AI 原創模擬卷。做過的卷會標示上次分數，方便你挑想重刷的考卷。"
+                      : "請直接點選要做的卷別。已做過的卷會標示上次分數，方便你挑想重刷的考卷。"}
                   </div>
 
                   <div className="grid gap-4 lg:grid-cols-2">
@@ -548,7 +568,7 @@ export function QuizSetupPanel({
                           ) : (
                             papers.map((paper) => {
                               const isSelected = settings.selectedPaperKey === paper.key;
-                              const completedCount = completedPaperCounts[paper.key] ?? 0;
+                              const completedSummary = completedPaperSummaries[paper.key];
                               const accentClasses =
                                 accent === "amber"
                                   ? isSelected
@@ -571,9 +591,9 @@ export function QuizSetupPanel({
                                       <p className="mt-1 text-xs text-slate-500">{paper.questionCount} 題完整考卷</p>
                                     </div>
                                     <div className="flex flex-wrap gap-2">
-                                      {completedCount > 0 ? (
+                                      {completedSummary ? (
                                         <span className="rounded-full bg-emerald-100 px-3 py-1 text-xs font-semibold text-emerald-700">
-                                          已做過 {completedCount} 次
+                                          上次 {completedSummary.lastScore} 分
                                         </span>
                                       ) : (
                                         <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-500">
@@ -598,7 +618,7 @@ export function QuizSetupPanel({
                 </div>
               ) : null}
               <p className="text-xs leading-6 text-slate-500">
-                信心校準目前{simulationConfidenceCalibration ? "開啟" : "關閉"}。想調整時可回首頁設定；散題則固定不詢問信心。
+                信心校準目前{simulationConfidenceCalibration ? "開啟" : "關閉"}。想調整時可回首頁設定；散題仍會問信心，但不顯示校準分析。
               </p>
             </div>
           ) : null}

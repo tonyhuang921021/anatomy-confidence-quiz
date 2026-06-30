@@ -925,6 +925,10 @@ function ResultsPageContent() {
     [recentCompletedSessions, visibleHistoryCount]
   );
   const activeSession = state.session;
+  const confidenceTrackingEnabled =
+    activeSession !== null &&
+    activeSession.settings?.mode !== "peak_challenge" &&
+    (!isSimulationSession(activeSession) || (activeSession.settings?.enableConfidenceCalibration ?? true));
   const confidenceCalibrationEnabled =
     activeSession !== null &&
     isSimulationSession(activeSession) &&
@@ -1597,7 +1601,7 @@ function ResultsPageContent() {
             {question.testedConcept}
           </p>
         ) : null}
-        {confidenceCalibrationEnabled ? (
+        {confidenceTrackingEnabled ? (
           <p>
             <span className="font-semibold">信心：</span>
             {getConfidenceOverviewLabel(attempt.confidence)}
@@ -2013,7 +2017,7 @@ function ResultsPageContent() {
             </div>
           </div>
 
-          {confidenceCalibrationEnabled ? (
+          {confidenceTrackingEnabled ? (
             <div>
               <h3 className="text-base font-semibold text-ink">沒信心題目回顧</h3>
               <div className="mt-3 grid gap-3">
@@ -2041,7 +2045,7 @@ function ResultsPageContent() {
                           {renderQuestionSummaryLine({
                             prefix: `第 ${questionNumber} 題：`,
                             question,
-                            suffix: masteryLabel
+                            suffix: confidenceCalibrationEnabled ? masteryLabel : undefined
                           })}
                         </summary>
                         {isOpen
