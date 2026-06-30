@@ -8,6 +8,7 @@ import { QuestionExplanationTabs } from "@/components/QuestionExplanationTabs";
 import { QuestionOptionBlock, QuestionStemBlock } from "@/components/QuestionMediaBlock";
 import { QuestionIssueReportButton } from "@/components/QuestionIssueReportButton";
 import { SavedQuestionButton } from "@/components/SavedQuestionButton";
+import { StructuredExplanationText } from "@/components/StructuredExplanationText";
 import {
   loadConfirmedQuestionClassificationOverrides,
   loadSharedQuestionExplanationOverrides,
@@ -773,10 +774,7 @@ export default function SearchPage() {
                   <span className="font-semibold">考點：</span>
                   {renderedQuestion.testedConcept}
                 </p>
-                <p>
-                  <span className="font-semibold">詳解：</span>
-                  {renderedQuestion.explanation}
-                </p>
+                <StructuredExplanationText text={renderedQuestion.explanation} label="詳解" compact />
                 <QuestionExplanationTabs question={renderedQuestion} compact className="mt-3" />
                 {renderedQuestion.optionAnalysis ? (
                   <div className="space-y-2.5">

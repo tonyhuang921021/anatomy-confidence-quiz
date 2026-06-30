@@ -5,6 +5,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { useParams, useSearchParams } from "next/navigation";
 import { useAuth } from "@/components/AuthProvider";
 import { StudyNoteMarkdown } from "@/components/StudyNoteMarkdown";
+import { StructuredExplanationText } from "@/components/StructuredExplanationText";
 import { YangmingExplanationPanel } from "@/components/YangmingExplanationPanel";
 import { getCanonicalQuestionBank } from "@/data/med1QuestionBank";
 import { MED1_SUBJECTS, MED2_SUBJECTS, subjectRegistry } from "@/data/subjectRegistry";
@@ -1704,7 +1705,13 @@ export default function SubjectNotesPage() {
                           </summary>
                           <div className="mt-3 min-w-0 overflow-hidden break-words rounded-2xl bg-slate-950 px-4 py-3 text-sm leading-7 text-white">
                             <p className="font-bold">答案：{question.answer}</p>
-                            <p className="mt-2 text-slate-100">{explanation}</p>
+                            <StructuredExplanationText
+                              text={explanation}
+                              label="詳解"
+                              compact
+                              tone="dark"
+                              className="mt-3"
+                            />
                             <YangmingExplanationPanel
                               questionId={question.id}
                               compact

@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { CopyQuestionPromptButton } from "@/components/CopyQuestionPromptButton";
 import { FormattedQuestionText } from "@/components/FormattedQuestionText";
+import { StructuredExplanationText } from "@/components/StructuredExplanationText";
 import { useAuth } from "@/components/AuthProvider";
 import { YangmingExplanationPanel } from "@/components/YangmingExplanationPanel";
 import {
@@ -179,7 +180,13 @@ export function StudyNoteQuestionCard({ question, link, title }: Props) {
           {showAnswer ? (
             <div className="mt-3 min-w-0 overflow-hidden break-words rounded-2xl bg-slate-950 px-4 py-3 text-sm leading-7 text-white">
               <p className="font-bold">答案：{question.answer}</p>
-              <p className="mt-2 text-slate-100">{explanation}</p>
+              <StructuredExplanationText
+                text={explanation}
+                label="詳解"
+                compact
+                tone="dark"
+                className="mt-3"
+              />
               <YangmingExplanationPanel
                 questionId={question.id}
                 compact

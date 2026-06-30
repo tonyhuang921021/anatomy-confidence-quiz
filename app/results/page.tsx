@@ -10,6 +10,7 @@ import { QuestionExplanationTabs } from "@/components/QuestionExplanationTabs";
 import { QuestionIssueReportButton } from "@/components/QuestionIssueReportButton";
 import { ResultSummary } from "@/components/ResultSummary";
 import { SavedQuestionButton } from "@/components/SavedQuestionButton";
+import { StructuredExplanationText } from "@/components/StructuredExplanationText";
 import { WeaknessRanking } from "@/components/WeaknessRanking";
 import {
   loadQuestionCommunityStats,
@@ -1610,10 +1611,7 @@ function ResultsPageContent() {
             {attempt.errorType}
           </p>
         ) : null}
-        <p>
-          <span className="font-semibold">詳解：</span>
-          {question.explanation}
-        </p>
+        <StructuredExplanationText text={question.explanation} label="詳解" compact />
         <QuestionExplanationTabs question={question} compact className="mt-3" />
         {renderOptionAnalysis(question)}
         {question.memoryTip ? (

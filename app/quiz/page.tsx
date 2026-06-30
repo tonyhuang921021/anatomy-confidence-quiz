@@ -11,6 +11,7 @@ import { QuestionCard } from "@/components/QuestionCard";
 import { QuestionIssueReportButton } from "@/components/QuestionIssueReportButton";
 import { QuestionExplanationTabs } from "@/components/QuestionExplanationTabs";
 import { SavedQuestionButton } from "@/components/SavedQuestionButton";
+import { StructuredExplanationText } from "@/components/StructuredExplanationText";
 import {
   applyQuestionClassificationOverride,
   buildExamLikeRandomSet,
@@ -1773,7 +1774,9 @@ export default function QuizPage() {
                       <p>
                         testedConcept：<span className="font-semibold">{currentQuestion.testedConcept}</span>
                       </p>
-                      {shouldShowAiExplanationDetails ? <p>整題詳解：{currentQuestion.explanation}</p> : null}
+                      {shouldShowAiExplanationDetails ? (
+                        <StructuredExplanationText text={currentQuestion.explanation} label="整題詳解" compact />
+                      ) : null}
                       <QuestionExplanationTabs
                         question={currentQuestion}
                         className="mt-3"

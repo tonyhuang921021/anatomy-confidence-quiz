@@ -6,6 +6,7 @@ import { useAuth } from "@/components/AuthProvider";
 import { QuestionExplanationTabs } from "@/components/QuestionExplanationTabs";
 import { QuestionOptionBlock, QuestionStemBlock } from "@/components/QuestionMediaBlock";
 import { SavedQuestionButton } from "@/components/SavedQuestionButton";
+import { StructuredExplanationText } from "@/components/StructuredExplanationText";
 import {
   applyQuestionClassificationOverride,
   getCanonicalQuestionBank
@@ -365,10 +366,7 @@ export default function SavedQuestionsPage() {
                     <span className="font-semibold">考點：</span>
                     {selectedItem.question.testedConcept}
                   </p>
-                  <p>
-                    <span className="font-semibold">詳解：</span>
-                    {selectedItem.question.explanation}
-                  </p>
+                  <StructuredExplanationText text={selectedItem.question.explanation} label="詳解" compact />
                   <QuestionExplanationTabs question={selectedItem.question} compact className="mt-3" />
                   {selectedItem.question.memoryTip ? (
                     <div className="memory-tip-box">

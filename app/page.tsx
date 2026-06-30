@@ -53,6 +53,11 @@ const QUICK_ENTRIES = [
 const HOME_RELEASE_NOTES = [
   {
     time: "06/30",
+    title: "AI 詳解講多一點",
+    body: "單題 AI 詳解會分段講本題核心、判斷邏輯、相近概念和常見混淆；各選項解析保留，太短會自動請 AI 重講。"
+  },
+  {
+    time: "06/30",
     title: "AI 補弱改看題目本身",
     body: "複製給 AI 的補弱 Prompt 不再餵題庫概念標籤，改用題幹、選項、正解與詳解線索推真正考點。"
   },

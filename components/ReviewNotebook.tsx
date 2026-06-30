@@ -7,6 +7,7 @@ import { QuestionExplanationTabs } from "@/components/QuestionExplanationTabs";
 import { QuestionOptionBlock, QuestionStemBlock } from "@/components/QuestionMediaBlock";
 import { QuestionIssueReportButton } from "@/components/QuestionIssueReportButton";
 import { SavedQuestionButton } from "@/components/SavedQuestionButton";
+import { StructuredExplanationText } from "@/components/StructuredExplanationText";
 import {
   loadConfirmedQuestionClassificationOverrides,
   loadQuestionCommunityStats,
@@ -270,10 +271,7 @@ function renderQuestionReview(
             ? "本題一律給分"
             : renderedQuestion.answer}
       </p>
-      <p>
-        <span className="font-semibold">重點解析：</span>
-        {renderedQuestion.explanation}
-      </p>
+      <StructuredExplanationText text={renderedQuestion.explanation} label="重點解析" compact />
       <QuestionExplanationTabs question={renderedQuestion} compact className="mt-3" />
       {renderedQuestion.optionAnalysis ? (
         <div className="space-y-2.5">
@@ -350,10 +348,7 @@ function renderRelatedQuestions(question: Question, relatedQuestionIndex: Relate
                   ? "本題一律給分"
                   : relatedQuestion.answer}
             </p>
-            <p>
-              <span className="font-semibold">詳解：</span>
-              {relatedQuestion.explanation}
-            </p>
+            <StructuredExplanationText text={relatedQuestion.explanation} label="詳解" compact />
             <QuestionExplanationTabs question={relatedQuestion} compact className="mt-3" />
             {relatedQuestion.memoryTip ? (
               <div className="memory-tip-box">

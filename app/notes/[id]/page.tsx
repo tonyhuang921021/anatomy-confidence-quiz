@@ -6,6 +6,7 @@ import { useDeferredValue, useEffect, useMemo, useRef, useState, useTransition }
 import { useParams, useRouter } from "next/navigation";
 import { useAuth } from "@/components/AuthProvider";
 import { StudyNoteMarkdown } from "@/components/StudyNoteMarkdown";
+import { StructuredExplanationText } from "@/components/StructuredExplanationText";
 import { getCanonicalQuestionBank } from "@/data/med1QuestionBank";
 import { resolveStudyNoteQuestionLinks } from "@/lib/questionLinkResolver";
 import { loadRecentQuestionSupplementCards } from "@/lib/questionSupplementCards";
@@ -697,8 +698,12 @@ export default function StudyNoteDetailPage() {
                               <p className="font-bold text-slate-950">題幹</p>
                               <p className="mt-1">{question.stem}</p>
                               <p className="mt-2 font-bold text-slate-950">答案：{question.answer}</p>
-                              <p className="mt-2 font-bold text-slate-950">詳解</p>
-                              <p className="mt-1">{question.explanation}</p>
+                              <StructuredExplanationText
+                                text={question.explanation}
+                                label="詳解"
+                                compact
+                                className="mt-3"
+                              />
                             </div>
                           ) : null}
                           <div className="mt-3 flex flex-wrap gap-2">

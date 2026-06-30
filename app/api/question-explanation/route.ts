@@ -89,14 +89,21 @@ const AI_EXPLANATION_USAGE_PREFIX = "AI_EXPLANATION:";
 const HOURLY_LIMIT = 30;
 const DAILY_LIMIT = 100;
 const MAX_SYNC_OVERRIDES_PER_REQUEST = 50;
-const GPT_5_MINI_MAX_OUTPUT_TOKENS = 1600;
+const GPT_5_MINI_MAX_OUTPUT_TOKENS = 2400;
 const QUESTION_EXPLANATION_MODEL = getOpenAIModel(process.env.QUESTION_EXPLANATION_MODEL);
 const QUESTION_EXPLANATION_PROMPT_PREFIX = [
-  "你是台灣醫學系國考家教，請用繁體中文寫一份好讀、精準、偏精簡的單題解析。",
-  "請嚴格只解釋這一題，不要延伸太多無關內容。",
-  "主詳解請聚焦題目核心，不要把各選項的細節重複寫進主詳解。",
+  "你是台灣醫學系國考家教，請用繁體中文寫一份好讀、精準、完整但不冗長的單題解析。",
+  "目標是讓學生看完這一題時，同時補起本題本來該知道的核心知識，以及最容易一起考、最容易混淆的一小圈相近概念。",
+  "請嚴格以本題為中心延伸；不要離題到整個章節，也不要空泛背誦課本。延伸內容必須能幫學生下次判斷相近題。",
+  "題庫提供的考點標籤可能不準，只能當參考。請優先相信題幹、選項、正確答案和判分方式，不要照抄或被錯誤標籤帶偏。",
+  "主詳解 explanation 請固定用四個段落標籤，且每個標籤另起一行：本題核心、判斷邏輯、觸類旁通、常見混淆。",
+  "本題核心：交代本題本來該知道的核心知識與正解為何成立。",
+  "判斷邏輯：說明如何從題幹線索走到答案，包含關鍵排除點。",
+  "觸類旁通：補 2-4 個高相關、會一起考或容易混在一起的相近概念。",
+  "常見混淆：點出學生最容易錯認的地方或考場提醒。",
+  "每個段落標籤請用「本題核心：」這種純文字小標，不要使用 Markdown、HTML 或編號清單。",
   "主詳解 explanation 欄位只能放一般文字，絕對不能放 JSON 字串、物件字串或 optionAnalysis 內容。",
-  "各選項的重要說明請放在 optionAnalysis。",
+  "各選項的重要說明請放在 optionAnalysis；每個實際存在的選項都要說明為什麼對或為什麼不對，不要只寫「正確」或「錯誤」。",
   "輸出順序固定為：先 explanation 整題詳解，再 optionAnalysis 各選項解析，最後 memoryTip。",
   "不要根據任何單一使用者的作答情況來改變詳解內容。",
   "請只輸出 JSON，不要輸出 markdown，不要輸出 code block。",
@@ -421,7 +428,7 @@ function buildQuestionExplanationPrompt(body: QuestionExplanationRequestBody) {
     "",
     `科目：${question?.subject ?? ""}`,
     `章節：${question?.chapter ?? ""} / ${question?.section ?? ""}`,
-    `考點：${question?.testedConcept ?? ""}`,
+    `題庫考點標籤（可能不準，只能參考）：${question?.testedConcept ?? ""}`,
     "",
     `題目：${question?.stem ?? ""}`,
     "",
@@ -430,7 +437,7 @@ function buildQuestionExplanationPrompt(body: QuestionExplanationRequestBody) {
           "上一題資訊（本題為承上題時請務必一併參考）：",
           `上一題來源：${previousQuestion.sourceLabel ?? ""}`,
           `上一題題號：${previousQuestion.id ?? ""}`,
-          `上一題考點：${previousQuestion.testedConcept ?? ""}`,
+          `上一題題庫考點標籤（可能不準，只能參考）：${previousQuestion.testedConcept ?? ""}`,
           `上一題題目：${previousQuestion.stem ?? ""}`,
           "上一題選項：",
           ...Object.entries(previousQuestion.options ?? {}).map(
@@ -463,7 +470,7 @@ function buildQuestionExplanationPrompt(body: QuestionExplanationRequestBody) {
           JSON.stringify(previousOverride.optionAnalysis ?? {}, null, 2),
           `上一版記憶法：${previousOverride.memoryTip ?? ""}`,
           "",
-          "請輸出新的完整 JSON。主詳解只放本題核心解析；各選項解析只放在 optionAnalysis；記憶法只放在 memoryTip。",
+          "請輸出新的完整 JSON。主詳解要保留本題核心、判斷邏輯與高相關延伸；各選項解析只放在 optionAnalysis；記憶法只放在 memoryTip。",
           "不要評論上一版，不要寫上一版哪裡不足，輸出內容本身就是可直接替換的新詳解。"
         ].join("\n")
       : "",
@@ -512,9 +519,56 @@ function buildRegenerationRetryPrompt(body: QuestionExplanationRequestBody) {
     buildQuestionExplanationPrompt(body),
     "",
     "系統檢查：你剛才輸出的新版詳解與上一版太相似，使用者按的是「重新替換詳解」，所以必須真的改寫。",
-    "請重新組織主詳解，用不同敘述順序說明核心機轉或判斷邏輯；醫學內容需正確，但不要照抄上一版句子。",
+    "請重新組織主詳解，用不同敘述順序說明核心機轉或判斷邏輯，並補上高相關觸類旁通知識；醫學內容需正確，但不要照抄上一版句子。",
     "各選項解析也請重新撰寫成更像真人老師會留下的判斷理由。",
     "不要指出上一版不足，不要加入自我檢討文字。只輸出可直接替換的 JSON。"
+  ].join("\n");
+}
+
+function compactTextLength(value?: string) {
+  return (value ?? "").replace(/\s+/g, "").length;
+}
+
+function getExplanationDepthIssues(
+  payload: ParsedExplanationPayload | null,
+  options?: Record<string, string | undefined>
+) {
+  if (!payload?.explanation) return [];
+
+  const issues: string[] = [];
+  if (compactTextLength(payload.explanation) < 220) {
+    issues.push("主詳解太短，沒有把本題核心、判斷邏輯、觸類旁通和常見混淆講完整");
+  }
+
+  const requiredKeys = getRequiredOptionKeys(options);
+  const shortOptionKeys = requiredKeys.filter((key) => compactTextLength(payload.optionAnalysis?.[key]) < 28);
+  if (requiredKeys.length > 0 && shortOptionKeys.length >= Math.ceil(requiredKeys.length / 2)) {
+    issues.push(`選項解析過短：${shortOptionKeys.join(", ")}`);
+  }
+
+  return issues;
+}
+
+function buildExplanationDepthRetryPrompt(
+  body: QuestionExplanationRequestBody,
+  partial: ParsedExplanationPayload,
+  issues: string[]
+) {
+  return [
+    buildQuestionExplanationPrompt(body),
+    "",
+    "系統檢查：你剛才的詳解太簡略，沒有達到教學用途。",
+    `不足處：${issues.join("；")}`,
+    "請重寫成更像醫學系國考家教會講給學生聽的版本：",
+    "1. explanation 要固定用四個段落小標：本題核心、判斷邏輯、觸類旁通、常見混淆。",
+    "2. explanation 要清楚交代本題本來該知道的知識、題幹到答案的判斷邏輯、正解為何成立。",
+    "3. explanation 要補 2-4 個高相關觸類旁通知識或相近概念，但只補本題旁邊會一起考的內容，不要擴張到整章課本。",
+    "4. explanation 要點出最常混淆的地方或考場提醒。",
+    "5. optionAnalysis 要逐一說明每個選項為什麼對或不對，不能只寫正確/錯誤。",
+    "6. 請維持純 JSON 格式，不要輸出 markdown，不要輸出 code block。",
+    "",
+    "剛才過短的輸出如下，只能用來知道哪些地方需要補足，請不要照抄：",
+    JSON.stringify(partial, null, 2)
   ].join("\n");
 }
 
@@ -545,12 +599,12 @@ function buildMissingOptionRetryPrompt(
     "",
     "你上一版的主詳解可沿用，但 optionAnalysis 不完整。",
     `請只補齊缺少的選項解析：${missingKeys.join(", ")}。`,
-    "已經有的 optionAnalysis 可以保留原意，但整體仍請輸出完整 JSON。",
+    "已經有的 optionAnalysis 可以保留原意，但整體仍請輸出完整 JSON；缺少的選項解析要說明為什麼對或為什麼不對，不要只寫正確/錯誤。",
     "不要新增 A-E 以外的 key，不要省略任何實際存在的選項。",
     "",
     `科目：${question?.subject ?? ""}`,
     `章節：${question?.chapter ?? ""} / ${question?.section ?? ""}`,
-    `考點：${question?.testedConcept ?? ""}`,
+    `題庫考點標籤（可能不準，只能參考）：${question?.testedConcept ?? ""}`,
     "",
     `題目：${question?.stem ?? ""}`,
     "",
@@ -559,7 +613,7 @@ function buildMissingOptionRetryPrompt(
           "上一題資訊（本題為承上題時請務必一併參考）：",
           `上一題來源：${previousQuestion.sourceLabel ?? ""}`,
           `上一題題號：${previousQuestion.id ?? ""}`,
-          `上一題考點：${previousQuestion.testedConcept ?? ""}`,
+          `上一題題庫考點標籤（可能不準，只能參考）：${previousQuestion.testedConcept ?? ""}`,
           `上一題題目：${previousQuestion.stem ?? ""}`,
           "上一題選項：",
           ...Object.entries(previousQuestion.options ?? {}).map(
@@ -897,6 +951,32 @@ export async function POST(request: NextRequest) {
     const missingOptionKeys = getMissingOptionKeys(parsed, body.question?.options);
     if (parsed?.explanation && missingOptionKeys.length > 0) {
       const retryPrompt = buildMissingOptionRetryPrompt(body, parsed, missingOptionKeys);
+      result = await createOpenAIText(
+        retryPrompt,
+        GPT_5_MINI_MAX_OUTPUT_TOKENS,
+        QUESTION_EXPLANATION_MODEL
+      );
+      parsed = parseExplanationPayload(result.text);
+    }
+
+    const depthIssues = getExplanationDepthIssues(parsed, body.question?.options);
+    if (parsed?.explanation && depthIssues.length > 0) {
+      const retryPrompt = buildExplanationDepthRetryPrompt(body, parsed, depthIssues);
+      const depthResult = await createOpenAIText(
+        retryPrompt,
+        GPT_5_MINI_MAX_OUTPUT_TOKENS,
+        QUESTION_EXPLANATION_MODEL
+      );
+      const depthParsed = parseExplanationPayload(depthResult.text);
+      if (depthParsed?.explanation) {
+        result = depthResult;
+        parsed = depthParsed;
+      }
+    }
+
+    const missingOptionKeysAfterDepthRetry = getMissingOptionKeys(parsed, body.question?.options);
+    if (parsed?.explanation && missingOptionKeysAfterDepthRetry.length > 0) {
+      const retryPrompt = buildMissingOptionRetryPrompt(body, parsed, missingOptionKeysAfterDepthRetry);
       result = await createOpenAIText(
         retryPrompt,
         GPT_5_MINI_MAX_OUTPUT_TOKENS,
