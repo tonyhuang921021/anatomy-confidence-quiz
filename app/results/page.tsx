@@ -433,6 +433,10 @@ function formatNullablePercent(value: number | null) {
   return value === null ? "—" : `${value}%`;
 }
 
+function formatExamScore(value: number) {
+  return Number.isInteger(value) ? `${value}` : value.toFixed(1);
+}
+
 function normalizeSummaryStem(stem: string) {
   return stem.replace(/\s+/g, " ").trim();
 }
@@ -1633,6 +1637,8 @@ function ResultsPageContent() {
     const overconfidenceCategory = masteryAnalysis.categories.find(
       (category) => category.key === "overconfidence_error"
     );
+    const examEstimate = masteryAnalysis.examPassEstimate;
+    const examBadgeLabel = examEstimate.sampleWarning ?? examEstimate.passBadgeLabel;
 
     return (
       <section className="mt-4 rounded-[2rem] bg-white p-4 shadow-card ring-1 ring-slate-100 sm:p-5">
@@ -1645,10 +1651,13 @@ function ResultsPageContent() {
           <div className="min-w-0">
             <p className="text-sm font-semibold text-ink">信心校準</p>
             <p className="mt-1 text-sm text-slate-500">
-              {masteryAnalysis.masteryLevel.label}・校準後 {formatNullablePercent(masteryAnalysis.calibratedMasteryPercent)}
+              {masteryAnalysis.masteryLevel.label}・正式考 60 分機率 {examEstimate.predictivePassProbabilityPercent}%
             </p>
           </div>
-          <div className="flex items-center gap-2">
+          <div className="flex flex-wrap items-center justify-end gap-2">
+            <span className="rounded-full bg-emerald-50 px-3 py-1 text-xs font-semibold text-emerald-800 ring-1 ring-emerald-100">
+              {examBadgeLabel}
+            </span>
             <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-700">
               建議先回顧 {masteryAnalysis.reviewCount} 題
             </span>
@@ -1678,6 +1687,46 @@ function ResultsPageContent() {
                       {masteryAnalysis.summarySentences.map((sentence) => (
                         <p key={sentence}>{sentence}</p>
                       ))}
+                    </div>
+                    <div className="mt-3 grid gap-2 sm:grid-cols-2">
+                      {examEstimate.currentMockScore !== null ? (
+                        <div className="rounded-2xl bg-white px-4 py-3 ring-1 ring-slate-200">
+                          <p className="text-[11px] font-black text-slate-500">本次模擬考分數</p>
+                          <p className="mt-1 text-xl font-black text-ink">
+                            {examEstimate.currentMockScore} / 100
+                          </p>
+                          <p className="mt-1 text-xs font-semibold text-slate-500">
+                            {examEstimate.currentMockPassed ? "本次已達 60 分及格線" : "本次尚未達 60 分及格線"}
+                          </p>
+                        </div>
+                      ) : null}
+                      <div className="rounded-2xl bg-white px-4 py-3 ring-1 ring-slate-200">
+                        <p className="text-[11px] font-black text-slate-500">正式考 60 分及格機率估計</p>
+                        <p className="mt-1 text-xl font-black text-ink">
+                          {examEstimate.predictivePassProbabilityPercent}%
+                        </p>
+                        <p className="mt-1 text-xs font-semibold text-slate-500">
+                          假設正式考卷與本次練習的範圍、難度、題型相近
+                        </p>
+                      </div>
+                      <div className="rounded-2xl bg-white px-4 py-3 ring-1 ring-slate-200">
+                        <p className="text-[11px] font-black text-slate-500">預估正式考分數</p>
+                        <p className="mt-1 text-xl font-black text-ink">
+                          {formatExamScore(examEstimate.expectedExamScore)} / 100
+                        </p>
+                        <p className="mt-1 text-xs font-semibold text-slate-500">
+                          80% 可能範圍：{examEstimate.scoreRange80[0]}–{examEstimate.scoreRange80[1]} 分
+                        </p>
+                      </div>
+                      <div className="rounded-2xl bg-white px-4 py-3 ring-1 ring-slate-200">
+                        <p className="text-[11px] font-black text-slate-500">能力超過 60% 的機率</p>
+                        <p className="mt-1 text-xl font-black text-ink">
+                          {examEstimate.abilityAbovePassProbabilityPercent}%
+                        </p>
+                        <p className="mt-1 text-xs font-semibold text-slate-500">
+                          根據目前題目估計真實答對能力是否已超過及格線
+                        </p>
+                      </div>
                     </div>
                     <div className="mt-3 rounded-2xl bg-white px-4 py-3 text-xs font-semibold leading-5 text-slate-600 ring-1 ring-slate-200">
                       {masteryAnalysis.sampleMessage}

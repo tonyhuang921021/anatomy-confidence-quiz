@@ -10,6 +10,10 @@ function formatPercent(value: number | null) {
   return value === null ? "—" : `${value}%`;
 }
 
+function formatExamScore(value: number) {
+  return Number.isInteger(value) ? `${value}` : value.toFixed(1);
+}
+
 const cards = (summary: SummaryStats, masteryAnalysis?: MasteryAnalysis) => {
   if (!masteryAnalysis) {
     return [
@@ -20,31 +24,52 @@ const cards = (summary: SummaryStats, masteryAnalysis?: MasteryAnalysis) => {
     ];
   }
 
+  const examEstimate = masteryAnalysis.examPassEstimate;
+  const passTone =
+    examEstimate.predictivePassProbability >= 0.85
+      ? "emerald"
+      : examEstimate.predictivePassProbability >= 0.65
+        ? "sky"
+        : examEstimate.predictivePassProbability >= 0.45
+          ? "amber"
+          : "rose";
+
   return [
     {
-      label: "答對率",
+      label: "本次答對率",
       value: `${summary.correctRate}%`,
-      helper: "表面成績",
-      tone: "slate"
+      helper:
+        examEstimate.currentMockScore !== null
+          ? `本次模擬考分數：${examEstimate.currentMockScore} / 100`
+          : "本次練習表面成績",
+      tone: "slate",
+      badge:
+        examEstimate.currentMockPassed === null
+          ? undefined
+          : examEstimate.currentMockPassed
+            ? "本次已達 60 分"
+            : "本次未達 60 分"
     },
     {
-      label: "校準後掌握指數",
+      label: "校準後掌握",
       value: formatPercent(masteryAnalysis.calibratedMasteryPercent),
       helper: "扣除猜對不穩與高信心錯誤後的掌握估計",
-      tone: "brand",
-      featured: true
+      tone: "brand"
     },
     {
-      label: "高信心錯誤率",
-      value: formatPercent(masteryAnalysis.highConfidenceErrorPercent),
-      helper: masteryAnalysis.counts[4].total === 0 ? "本次沒有信心 4 的題目" : "信心 4 題目中答錯的比例",
-      tone: "rose"
+      label: "正式考及格機率",
+      value: `${examEstimate.predictivePassProbabilityPercent}%`,
+      helper:
+        examEstimate.sampleWarning ?? "預估正式考 100 題中達到 60 題以上的機率",
+      tone: passTone,
+      featured: true,
+      badge: examEstimate.sampleWarning ?? examEstimate.passBadgeLabel
     },
     {
-      label: "猜對風險率",
-      value: formatPercent(masteryAnalysis.guessingRiskPercent),
-      helper: summary.correct === 0 ? "本次沒有答對題" : "答對題目中信心 1-2 的比例",
-      tone: "yellow"
+      label: "預估正式考分數",
+      value: `${formatExamScore(examEstimate.expectedExamScore)} / 100`,
+      helper: `80% 可能範圍：${examEstimate.scoreRange80[0]}–${examEstimate.scoreRange80[1]} 分`,
+      tone: "sky"
     }
   ];
 };
@@ -55,6 +80,7 @@ const toneClasses: Record<string, string> = {
   brand: "bg-emerald-50 text-emerald-900 ring-emerald-300",
   amber: "bg-amber-50 text-amber-800 ring-amber-200",
   rose: "bg-rose-50 text-rose-800 ring-rose-200",
+  sky: "bg-sky-50 text-sky-900 ring-sky-200",
   yellow: "bg-yellow-50 text-yellow-800 ring-yellow-200",
   orange: "bg-orange-50 text-orange-800 ring-orange-200"
 };
@@ -69,7 +95,14 @@ export function ResultSummary({ summary, masteryAnalysis }: ResultSummaryProps) 
             card.featured ? "shadow-emerald-100 ring-2" : ""
           }`}
         >
-          <p className="text-sm font-medium opacity-80">{card.label}</p>
+          <div className="flex min-h-6 flex-wrap items-center justify-between gap-2">
+            <p className="text-sm font-medium opacity-80">{card.label}</p>
+            {"badge" in card && card.badge ? (
+              <span className="rounded-full bg-white/80 px-2.5 py-1 text-[11px] font-black shadow-sm ring-1 ring-current/10">
+                {card.badge}
+              </span>
+            ) : null}
+          </div>
           <p className="mt-3 text-3xl font-bold">{card.value}</p>
           <p className="mt-2 text-xs font-semibold leading-5 opacity-75">{card.helper}</p>
         </article>

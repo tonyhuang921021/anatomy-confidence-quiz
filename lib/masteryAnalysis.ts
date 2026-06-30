@@ -73,6 +73,42 @@ export type MasteryTopicStats = {
   questionIds: string[];
 };
 
+export type ExamPassReliabilityLevel = "insufficient" | "low" | "medium" | "high";
+
+export type ExamPassBadgeLabel =
+  | "及格把握高"
+  | "有機會，但仍需穩定"
+  | "五五波"
+  | "及格風險偏高";
+
+export type ExamPassEstimate = {
+  examQuestionCount: number;
+  passThreshold: number;
+  passQuestionCount: number;
+  sampleQuestionCount: number;
+  sampleCorrectCount: number;
+  priorAlpha: number;
+  priorBeta: number;
+  posteriorAlpha: number;
+  posteriorBeta: number;
+  posteriorMeanAccuracy: number;
+  posteriorMeanAccuracyPercent: number;
+  abilityAbovePassProbability: number;
+  abilityAbovePassProbabilityPercent: number;
+  predictivePassProbability: number;
+  predictivePassProbabilityPercent: number;
+  expectedExamScore: number;
+  expectedExamScoreRounded: number;
+  scoreRange80: [number, number];
+  scoreRange90: [number, number];
+  reliabilityLevel: ExamPassReliabilityLevel;
+  reliabilityMessage: string;
+  passBadgeLabel: ExamPassBadgeLabel;
+  sampleWarning: string | null;
+  currentMockScore: number | null;
+  currentMockPassed: boolean | null;
+};
+
 export type MasteryAnalysis = {
   total: number;
   correct: number;
@@ -117,6 +153,7 @@ export type MasteryAnalysis = {
     label: string;
     description: string;
   };
+  examPassEstimate: ExamPassEstimate;
   sampleMessage: string;
   summarySentences: string[];
   confidenceLayers: ConfidenceLayerStats[];
@@ -133,6 +170,12 @@ export const confidenceExpectedProbability: Record<ValidMasteryConfidence, numbe
   4: 0.9
 };
 
+export const EXAM_QUESTION_COUNT = 100;
+export const PASS_THRESHOLD = 0.6;
+export const PASS_QUESTION_COUNT = 60;
+
+const PRIOR_ALPHA = 1;
+const PRIOR_BETA = 1;
 const confidenceValues: ValidMasteryConfidence[] = [1, 2, 3, 4];
 
 const categoryDefinitions: Record<
@@ -203,6 +246,224 @@ function clamp(value: number, min: number, max: number) {
 
 function toPercent(value: number | null) {
   return value === null ? null : Math.round(value * 100);
+}
+
+function roundToOneDecimal(value: number) {
+  return Math.round(value * 10) / 10;
+}
+
+const lanczosCoefficients = [
+  676.5203681218851,
+  -1259.1392167224028,
+  771.3234287776531,
+  -176.6150291621406,
+  12.507343278686905,
+  -0.13857109526572012,
+  9.984369578019572e-6,
+  1.5056327351493116e-7
+];
+
+function logGamma(value: number): number {
+  if (value < 0.5) {
+    return Math.log(Math.PI) - Math.log(Math.sin(Math.PI * value)) - logGamma(1 - value);
+  }
+
+  const z = value - 1;
+  let x = 0.9999999999998099;
+  for (let index = 0; index < lanczosCoefficients.length; index += 1) {
+    x += lanczosCoefficients[index] / (z + index + 1);
+  }
+
+  const t = z + lanczosCoefficients.length - 0.5;
+  return 0.5 * Math.log(2 * Math.PI) + (z + 0.5) * Math.log(t) - t + Math.log(x);
+}
+
+function logCombination(n: number, k: number) {
+  if (k < 0 || k > n) return Number.NEGATIVE_INFINITY;
+  return logGamma(n + 1) - logGamma(k + 1) - logGamma(n - k + 1);
+}
+
+function logBeta(alpha: number, beta: number) {
+  return logGamma(alpha) + logGamma(beta) - logGamma(alpha + beta);
+}
+
+function betaContinuedFraction(alpha: number, beta: number, x: number) {
+  const maxIterations = 200;
+  const epsilon = 3e-12;
+  const tiny = 1e-30;
+  const qab = alpha + beta;
+  const qap = alpha + 1;
+  const qam = alpha - 1;
+  let c = 1;
+  let d = 1 - (qab * x) / qap;
+  if (Math.abs(d) < tiny) d = tiny;
+  d = 1 / d;
+  let h = d;
+
+  for (let m = 1; m <= maxIterations; m += 1) {
+    const m2 = 2 * m;
+    let aa = (m * (beta - m) * x) / ((qam + m2) * (alpha + m2));
+    d = 1 + aa * d;
+    if (Math.abs(d) < tiny) d = tiny;
+    c = 1 + aa / c;
+    if (Math.abs(c) < tiny) c = tiny;
+    d = 1 / d;
+    h *= d * c;
+
+    aa = (-(alpha + m) * (qab + m) * x) / ((alpha + m2) * (qap + m2));
+    d = 1 + aa * d;
+    if (Math.abs(d) < tiny) d = tiny;
+    c = 1 + aa / c;
+    if (Math.abs(c) < tiny) c = tiny;
+    d = 1 / d;
+    const delta = d * c;
+    h *= delta;
+    if (Math.abs(delta - 1) < epsilon) break;
+  }
+
+  return h;
+}
+
+function regularizedIncompleteBeta(x: number, alpha: number, beta: number) {
+  if (x <= 0) return 0;
+  if (x >= 1) return 1;
+
+  const logTerm =
+    logGamma(alpha + beta) -
+    logGamma(alpha) -
+    logGamma(beta) +
+    alpha * Math.log(x) +
+    beta * Math.log1p(-x);
+  const betaTerm = Math.exp(logTerm);
+
+  if (x < (alpha + 1) / (alpha + beta + 2)) {
+    return clamp((betaTerm * betaContinuedFraction(alpha, beta, x)) / alpha, 0, 1);
+  }
+
+  return clamp(1 - (betaTerm * betaContinuedFraction(beta, alpha, 1 - x)) / beta, 0, 1);
+}
+
+function getPredictiveQuantile(probabilities: number[], quantile: number) {
+  let cumulative = 0;
+  for (let score = 0; score < probabilities.length; score += 1) {
+    cumulative += probabilities[score];
+    if (cumulative >= quantile) return score;
+  }
+  return probabilities.length - 1;
+}
+
+function getExamPassReliability(sampleQuestionCount: number): Pick<
+  ExamPassEstimate,
+  "reliabilityLevel" | "reliabilityMessage" | "sampleWarning"
+> {
+  if (sampleQuestionCount < 10) {
+    return {
+      reliabilityLevel: "insufficient",
+      reliabilityMessage: "本次題數太少，及格機率僅供參考。",
+      sampleWarning: "題數不足，機率僅供參考"
+    };
+  }
+  if (sampleQuestionCount < 30) {
+    return {
+      reliabilityLevel: "low",
+      reliabilityMessage: "題數偏少，機率波動較大，建議累積更多題目。",
+      sampleWarning: null
+    };
+  }
+  if (sampleQuestionCount < EXAM_QUESTION_COUNT) {
+    return {
+      reliabilityLevel: "medium",
+      reliabilityMessage: "可作為初步判斷，但仍建議搭配完整 100 題模擬考。",
+      sampleWarning: null
+    };
+  }
+  return {
+    reliabilityLevel: "high",
+    reliabilityMessage: "本次題數已達正式考規模，可作為較穩定的及格機率估計。",
+    sampleWarning: null
+  };
+}
+
+function getExamPassBadgeLabel(passProbability: number): ExamPassBadgeLabel {
+  if (passProbability >= 0.85) return "及格把握高";
+  if (passProbability >= 0.65) return "有機會，但仍需穩定";
+  if (passProbability >= 0.45) return "五五波";
+  return "及格風險偏高";
+}
+
+export function estimateExamPassProbability(
+  sampleQuestionCount: number,
+  sampleCorrectCount: number,
+  options: {
+    examQuestionCount?: number;
+    passQuestionCount?: number;
+    priorAlpha?: number;
+    priorBeta?: number;
+  } = {}
+): ExamPassEstimate {
+  const examQuestionCount = options.examQuestionCount ?? EXAM_QUESTION_COUNT;
+  const passQuestionCount = options.passQuestionCount ?? PASS_QUESTION_COUNT;
+  const priorAlpha = options.priorAlpha ?? PRIOR_ALPHA;
+  const priorBeta = options.priorBeta ?? PRIOR_BETA;
+  const posteriorAlpha = priorAlpha + sampleCorrectCount;
+  const posteriorBeta = priorBeta + sampleQuestionCount - sampleCorrectCount;
+  const posteriorMeanAccuracy = posteriorAlpha / (posteriorAlpha + posteriorBeta);
+  const logDenominator = logBeta(posteriorAlpha, posteriorBeta);
+  const logProbabilities = Array.from({ length: examQuestionCount + 1 }, (_, score) =>
+    logCombination(examQuestionCount, score) +
+    logBeta(score + posteriorAlpha, examQuestionCount - score + posteriorBeta) -
+    logDenominator
+  );
+  const maxLogProbability = Math.max(...logProbabilities);
+  const weights = logProbabilities.map((logProbability) => Math.exp(logProbability - maxLogProbability));
+  const totalWeight = weights.reduce((sum, weight) => sum + weight, 0);
+  const probabilities = weights.map((weight) => weight / totalWeight);
+  const predictivePassProbability = probabilities
+    .slice(passQuestionCount)
+    .reduce((sum, probability) => sum + probability, 0);
+  const expectedExamScore = probabilities.reduce(
+    (sum, probability, score) => sum + score * probability,
+    0
+  );
+  const reliability = getExamPassReliability(sampleQuestionCount);
+  const abilityAbovePassProbability = 1 - regularizedIncompleteBeta(
+    PASS_THRESHOLD,
+    posteriorAlpha,
+    posteriorBeta
+  );
+
+  return {
+    examQuestionCount,
+    passThreshold: PASS_THRESHOLD,
+    passQuestionCount,
+    sampleQuestionCount,
+    sampleCorrectCount,
+    priorAlpha,
+    priorBeta,
+    posteriorAlpha,
+    posteriorBeta,
+    posteriorMeanAccuracy,
+    posteriorMeanAccuracyPercent: toPercent(posteriorMeanAccuracy) ?? 0,
+    abilityAbovePassProbability,
+    abilityAbovePassProbabilityPercent: toPercent(abilityAbovePassProbability) ?? 0,
+    predictivePassProbability,
+    predictivePassProbabilityPercent: toPercent(predictivePassProbability) ?? 0,
+    expectedExamScore: roundToOneDecimal(expectedExamScore),
+    expectedExamScoreRounded: Math.round(expectedExamScore),
+    scoreRange80: [
+      getPredictiveQuantile(probabilities, 0.1),
+      getPredictiveQuantile(probabilities, 0.9)
+    ],
+    scoreRange90: [
+      getPredictiveQuantile(probabilities, 0.05),
+      getPredictiveQuantile(probabilities, 0.95)
+    ],
+    ...reliability,
+    passBadgeLabel: getExamPassBadgeLabel(predictivePassProbability),
+    currentMockScore: sampleQuestionCount === EXAM_QUESTION_COUNT ? sampleCorrectCount : null,
+    currentMockPassed:
+      sampleQuestionCount === EXAM_QUESTION_COUNT ? sampleCorrectCount >= passQuestionCount : null
+  };
 }
 
 function isValidConfidence(confidence: number | null | undefined): confidence is ValidMasteryConfidence {
@@ -296,6 +557,7 @@ function getSampleMessage(total: number) {
 function buildSummarySentences(params: {
   accuracyPercent: number | null;
   calibratedMasteryPercent: number | null;
+  examPassEstimate: ExamPassEstimate;
   highConfidenceWrongCount: number;
   guessingRiskRate: number | null;
   highConfidenceErrorRate: number | null;
@@ -303,21 +565,31 @@ function buildSummarySentences(params: {
   const {
     accuracyPercent,
     calibratedMasteryPercent,
+    examPassEstimate,
     highConfidenceWrongCount,
     guessingRiskRate,
     highConfidenceErrorRate
   } = params;
 
   if (accuracyPercent === null) return ["目前沒有可分析的題目。"];
-  if (calibratedMasteryPercent === null) {
-    return [`本次表面答對率為 ${accuracyPercent}%，但信心資料不足，暫時無法估算校準後掌握。`];
-  }
-
+  const masteryClause =
+    calibratedMasteryPercent === null
+      ? "但信心資料不足，暫時無法估算校準後掌握"
+      : `校準後掌握約 ${calibratedMasteryPercent}%`;
   const sentences = [
-    `本次表面答對率為 ${accuracyPercent}%，校準後掌握約 ${calibratedMasteryPercent}%。`
+    `本次答對率為 ${accuracyPercent}%，${masteryClause}；模型預估若正式考卷與本次練習相近，達到 ${PASS_QUESTION_COUNT} / ${EXAM_QUESTION_COUNT} 的機率約為 ${examPassEstimate.predictivePassProbabilityPercent}%。`,
+    `預估正式考分數約為 ${examPassEstimate.expectedExamScoreRounded} 分，80% 可能範圍為 ${examPassEstimate.scoreRange80[0]}–${examPassEstimate.scoreRange80[1]} 分。`
   ];
 
-  if (calibratedMasteryPercent <= accuracyPercent - 10) {
+  if (examPassEstimate.sampleQuestionCount < 10) {
+    sentences.push(
+      `但本次只有 ${examPassEstimate.sampleQuestionCount} 題，百分比波動很大，建議累積更多題目或完成一次 100 題模擬考後再判斷。`
+    );
+  } else if (examPassEstimate.sampleQuestionCount < EXAM_QUESTION_COUNT) {
+    sentences.push("目前題數尚未達完整正式考規模，因此機率應視為初步估計。");
+  }
+
+  if (calibratedMasteryPercent !== null && calibratedMasteryPercent <= accuracyPercent - 10) {
     sentences.push("代表有些答對題仍不穩，或存在高信心答錯，因此真實掌握度低於表面成績。");
   }
   if (highConfidenceWrongCount > 0) {
@@ -329,9 +601,17 @@ function buildSummarySentences(params: {
     sentences.push("答對題中有不少低信心題，建議快速回顧，避免下次換問法失分。");
   }
   if (highConfidenceErrorRate !== null && highConfidenceErrorRate >= 0.3) {
-    sentences.push("你的高信心錯誤率偏高，表示目前最大的問題不是單純不會，而是有些觀念被錯誤地記牢。");
+    sentences.push("此外，高信心錯誤率偏高，代表有些自認會的觀念其實不穩，正式考分數可能被高估。");
   }
   if (
+    calibratedMasteryPercent !== null &&
+    calibratedMasteryPercent < 60 &&
+    examPassEstimate.predictivePassProbability >= 0.65
+  ) {
+    sentences.push("雖然及格機率看起來不低，但穩定掌握尚未達 60%，建議不要只看表面分數。");
+  }
+  if (
+    calibratedMasteryPercent !== null &&
     calibratedMasteryPercent >= 85 &&
     highConfidenceErrorRate !== null &&
     highConfidenceErrorRate <= 0.1
@@ -339,7 +619,7 @@ function buildSummarySentences(params: {
     sentences.push("整體掌握穩定，可以把重點放在少數不熟題與考前維持。");
   }
 
-  return sentences.slice(0, 4);
+  return sentences;
 }
 
 function calculateCalibratedMastery(
@@ -538,6 +818,7 @@ export function analyzeMastery(answers: MasteryAnswerInput[]): MasteryAnalysis {
   const accuracyPercent = toPercent(accuracy);
   const calibratedMasteryPercent = toPercent(calibratedMasteryIndex);
   const masteryLevel = getMasteryLevel(calibratedMasteryPercent);
+  const examPassEstimate = estimateExamPassProbability(total, correct);
 
   let calibrationLabel: MasteryAnalysis["calibrationLabel"] = "資料不足";
   let biasLabel: MasteryAnalysis["biasLabel"] = "資料不足";
@@ -596,10 +877,12 @@ export function analyzeMastery(answers: MasteryAnswerInput[]): MasteryAnalysis {
     calibrationLabel,
     biasLabel,
     masteryLevel,
-    sampleMessage: getSampleMessage(total),
+    examPassEstimate,
+    sampleMessage: examPassEstimate.reliabilityMessage || getSampleMessage(total),
     summarySentences: buildSummarySentences({
       accuracyPercent,
       calibratedMasteryPercent,
+      examPassEstimate,
       highConfidenceWrongCount: counts[4].wrong,
       guessingRiskRate,
       highConfidenceErrorRate
