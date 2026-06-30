@@ -120,6 +120,17 @@ function getScopedKeyForUser(baseKey: string, userId: string) {
   return `${baseKey}:${userId || GUEST_USER_ID}`;
 }
 
+function getCompletedHistorySourceUserIds(userId: string) {
+  const targetUserId = userId || getActiveStorageUser();
+  const sourceUserIds = [targetUserId];
+
+  if (targetUserId !== GUEST_USER_ID) {
+    sourceUserIds.push(GUEST_USER_ID);
+  }
+
+  return Array.from(new Set(sourceUserIds));
+}
+
 export function freeLocalStorageSpaceForAuth() {
   if (!isBrowser()) return 0;
 
@@ -338,11 +349,20 @@ export function saveCompletedQuestionHistoryEntriesForUser(
     .map(normalizeCompletedQuestionHistoryEntry)
     .filter((entry): entry is CompletedQuestionHistoryEntry => Boolean(entry));
 
+  const scopedKey = getCompletedQuestionHistoryScopedKeyForUser(userId);
+  const serialized = JSON.stringify(normalized);
+  const changed = safeLocalStorageGetItem(scopedKey) !== serialized;
+
   cacheCompletedQuestionHistoryForUser(userId, normalized);
-  return safeLocalStorageSetItem(
-    getCompletedQuestionHistoryScopedKeyForUser(userId),
-    JSON.stringify(normalized)
-  );
+  const didPersist = safeLocalStorageSetItem(scopedKey, serialized);
+
+  if (changed && userId === getActiveStorageUser()) {
+    window.dispatchEvent(
+      new CustomEvent("completed-question-history-change", { detail: { userId } })
+    );
+  }
+
+  return didPersist;
 }
 
 export function mergeCompletedQuestionHistoryEntriesForUser(
@@ -467,31 +487,47 @@ function buildSyntheticAttemptsFromQuestionHistory(entries: CompletedQuestionHis
 }
 
 export function loadCompletedHistorySessionsForUser(userId = getActiveStorageUser()) {
-  const historyEntries = loadCompletedQuestionHistoryEntriesForUser(userId);
+  const sourceUserIds = getCompletedHistorySourceUserIds(userId);
+  const historyEntries = mergeCompletedQuestionHistoryEntries(
+    [],
+    sourceUserIds.flatMap((sourceUserId) =>
+      loadCompletedQuestionHistoryEntriesForUser(sourceUserId)
+    )
+  );
   const shouldUseTailRecovery =
-    getCompletedSessionsStorageLengthForUser(userId) > COMPLETED_SESSIONS_UPLOAD_RECOVERY_READ_LIMIT;
-  const localSessions = shouldUseTailRecovery
-    ? loadRecentLocalCompletedSessionsForUploadForUser(userId)
-    : loadCompletedSessionsForUser(userId);
+    sourceUserIds.some(
+      (sourceUserId) =>
+        getCompletedSessionsStorageLengthForUser(sourceUserId) >
+        COMPLETED_SESSIONS_UPLOAD_RECOVERY_READ_LIMIT
+    );
+  const localSessions = sourceUserIds.flatMap((sourceUserId) =>
+    shouldUseTailRecovery
+      ? loadRecentLocalCompletedSessionsForUploadForUser(sourceUserId)
+      : loadCompletedSessionsForUser(sourceUserId)
+  );
   const sessionDerivedEntries = buildCompletedQuestionHistoryEntriesFromSessions([
     ...localSessions,
-    ...loadCloudCompletedSessionsForUser(userId),
-    ...loadPendingCompletedSessionUploadsForUser(userId)
+    ...sourceUserIds.flatMap((sourceUserId) => loadCloudCompletedSessionsForUser(sourceUserId)),
+    ...sourceUserIds.flatMap((sourceUserId) =>
+      loadPendingCompletedSessionUploadsForUser(sourceUserId)
+    )
   ]);
   const mergedEntries = mergeCompletedQuestionHistoryEntries(historyEntries, sessionDerivedEntries);
 
   if (mergedEntries.length > 0) {
-    if (mergedEntries.length !== historyEntries.length || sessionDerivedEntries.length > 0) {
+    if (JSON.stringify(mergedEntries) !== JSON.stringify(historyEntries)) {
       saveCompletedQuestionHistoryEntriesForUser(userId, mergedEntries);
     }
     return [{ attempts: buildSyntheticAttemptsFromQuestionHistory(mergedEntries) }];
   }
 
   if (shouldUseTailRecovery) {
-    return loadRecentLocalCompletedSessionsForUploadForUser(userId);
+    return sourceUserIds.flatMap((sourceUserId) =>
+      loadRecentLocalCompletedSessionsForUploadForUser(sourceUserId)
+    );
   }
 
-  return loadCompletedSessionsForUser(userId);
+  return sourceUserIds.flatMap((sourceUserId) => loadCompletedSessionsForUser(sourceUserId));
 }
 
 function getLegacyOrScopedRaw(baseKey: string) {

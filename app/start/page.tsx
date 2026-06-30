@@ -44,7 +44,7 @@ const selectableSubjects = enabledSubjects.filter(
 
 export default function StartPage() {
   const router = useRouter();
-  const { user } = useAuth();
+  const { user, syncVersion } = useAuth();
   const med1Subjects = selectableSubjects.filter((item) => MED1_SUBJECTS.includes(item.subject));
   const med2Subjects = selectableSubjects.filter((item) => MED2_SUBJECTS.includes(item.subject));
   const [selectedSubjects, setSelectedSubjects] = useState<SubjectName[]>([]);
@@ -95,12 +95,14 @@ export default function StartPage() {
 
     refreshAttemptedQuestionIds();
     window.addEventListener("completed-sessions-change", refreshAttemptedQuestionIds);
+    window.addEventListener("completed-question-history-change", refreshAttemptedQuestionIds);
     window.addEventListener("storage", refreshAttemptedQuestionIds);
     return () => {
       window.removeEventListener("completed-sessions-change", refreshAttemptedQuestionIds);
+      window.removeEventListener("completed-question-history-change", refreshAttemptedQuestionIds);
       window.removeEventListener("storage", refreshAttemptedQuestionIds);
     };
-  }, [user?.id]);
+  }, [syncVersion, user?.id]);
 
   useEffect(() => {
     const accountRange = getPracticeYearRangePreference(user?.user_metadata, defaultPracticeYearRange);

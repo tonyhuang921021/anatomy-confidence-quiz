@@ -63,6 +63,8 @@ import {
   loadPracticeFastAnswerMode,
   loadQuestionExplanationOverrides,
   loadQuizSettings,
+  mergeCompletedQuestionHistoryFromSessionsForUser,
+  queuePendingCompletedSessionUploadForUser,
   saveCompletedSession,
   saveCurrentSession,
   saveQuestionExplanationOverride,
@@ -1110,6 +1112,10 @@ export default function QuizPage() {
     setSession(completedSession);
     saveCurrentSession(completedSession);
     const saved = saveCompletedSession(completedSession);
+    if (authSession?.user?.id) {
+      mergeCompletedQuestionHistoryFromSessionsForUser(authSession.user.id, [completedSession]);
+      queuePendingCompletedSessionUploadForUser(authSession.user.id, [completedSession]);
+    }
     if (saved !== false) {
       clearMatchingCurrentSessions(completedSession.id, [authSession?.user?.id ?? ""]);
     }
