@@ -1872,7 +1872,7 @@ export default function QuizPage() {
   }
 
   const confidenceCalibrationEnabled =
-    session.settings?.enableConfidenceCalibration ?? session.settings?.mode === "simulation";
+    session.settings?.mode === "simulation" && (session.settings?.enableConfidenceCalibration ?? true);
   const flag =
     confidenceCalibrationEnabled && submittedAttempt && submittedAttempt.isCorrect && submittedAttempt.confidence <= 2
       ? { text: "猜對風險", style: "bg-amber-100 text-amber-900" }

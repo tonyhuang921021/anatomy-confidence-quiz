@@ -7,14 +7,14 @@ import { getSyncStatusText } from "@/components/syncStatusText";
 import { updateLeaderboardDisplayName } from "@/lib/cloudSync";
 import {
   loadPracticeQuestionCount,
-  loadPracticeConfidenceCalibration,
+  loadSimulationConfidenceCalibration,
   loadPracticeFastAnswerMode,
   loadPracticeStopAfterReview,
   loadPracticeYearRange,
   loadHomeToneMode,
   loadThemeMode,
   savePracticeQuestionCount,
-  savePracticeConfidenceCalibration,
+  saveSimulationConfidenceCalibration,
   savePracticeFastAnswerMode,
   savePracticeStopAfterReview,
   savePracticeYearRange,
@@ -28,10 +28,10 @@ import {
 import {
   getHomeToneModePreference,
   hasPracticeQuestionCountPreference,
-  hasPracticeConfidenceCalibrationPreference,
+  hasSimulationConfidenceCalibrationPreference,
   hasPracticeFastAnswerModePreference,
   hasPracticeStopAfterReviewPreference,
-  getPracticeConfidenceCalibrationPreference,
+  getSimulationConfidenceCalibrationPreference,
   getPracticeFastAnswerModePreference,
   getPracticeQuestionCountPreference,
   getPracticeStopAfterReviewPreference,
@@ -146,7 +146,9 @@ export function AuthPanel() {
   const [practiceQuestionCount, setPracticeQuestionCount] = useState<PracticeQuestionCount>(10);
   const [practiceStopAfterReview, setPracticeStopAfterReview] = useState(false);
   const [practiceFastAnswerMode, setPracticeFastAnswerMode] = useState(false);
-  const [practiceConfidenceCalibration, setPracticeConfidenceCalibration] = useState(false);
+  const [simulationConfidenceCalibration, setSimulationConfidenceCalibration] = useState(() =>
+    loadSimulationConfidenceCalibration(true)
+  );
 
   useEffect(() => {
     const shouldRemember = loadRememberAccountPreference();
@@ -202,44 +204,44 @@ export function AuthPanel() {
     const accountCount = getPracticeQuestionCountPreference(user?.user_metadata, 10);
     const accountStopAfterReview = getPracticeStopAfterReviewPreference(user?.user_metadata, false);
     const accountFastAnswerMode = getPracticeFastAnswerModePreference(user?.user_metadata, false);
-    const accountConfidenceCalibration = getPracticeConfidenceCalibrationPreference(user?.user_metadata, false);
+    const accountSimulationConfidenceCalibration = getSimulationConfidenceCalibrationPreference(user?.user_metadata, true);
     const nextCount = user ? accountCount : loadPracticeQuestionCount(10);
     const nextStopAfterReview = user ? accountStopAfterReview : loadPracticeStopAfterReview(false);
     const nextFastAnswerMode = user ? accountFastAnswerMode : loadPracticeFastAnswerMode(false);
-    const nextConfidenceCalibration = user
-      ? accountConfidenceCalibration
-      : loadPracticeConfidenceCalibration(false);
+    const nextSimulationConfidenceCalibration = user
+      ? accountSimulationConfidenceCalibration
+      : loadSimulationConfidenceCalibration(true);
     setPracticeQuestionCount(nextCount);
     setPracticeStopAfterReview(nextStopAfterReview);
     setPracticeFastAnswerMode(nextFastAnswerMode);
-    setPracticeConfidenceCalibration(nextConfidenceCalibration);
+    setSimulationConfidenceCalibration(nextSimulationConfidenceCalibration);
     if (user) {
       savePracticeQuestionCount(accountCount);
       savePracticeStopAfterReview(accountStopAfterReview);
       savePracticeFastAnswerMode(accountFastAnswerMode);
-      savePracticeConfidenceCalibration(accountConfidenceCalibration);
+      saveSimulationConfidenceCalibration(accountSimulationConfidenceCalibration);
       const missingQuestionCount = !hasPracticeQuestionCountPreference(user.user_metadata);
       const missingStopAfterReview = !hasPracticeStopAfterReviewPreference(user.user_metadata);
       const missingFastAnswerMode = !hasPracticeFastAnswerModePreference(user.user_metadata);
-      const missingConfidenceCalibration = !hasPracticeConfidenceCalibrationPreference(user.user_metadata);
+      const missingSimulationConfidenceCalibration = !hasSimulationConfidenceCalibrationPreference(user.user_metadata);
       if (
         missingQuestionCount ||
         missingStopAfterReview ||
         missingFastAnswerMode ||
-        missingConfidenceCalibration
+        missingSimulationConfidenceCalibration
       ) {
         const patch: AccountPreferencePatch = {};
         if (missingQuestionCount) patch.practice_question_count = 10;
         if (missingStopAfterReview) patch.practice_stop_after_review = false;
         if (missingFastAnswerMode) patch.practice_fast_answer_mode = false;
-        if (missingConfidenceCalibration) patch.practice_confidence_calibration = false;
+        if (missingSimulationConfidenceCalibration) patch.simulation_confidence_calibration = true;
         void persistAccountPreferences(patch).catch(() => {});
       }
     } else {
       savePracticeQuestionCount(nextCount);
       savePracticeStopAfterReview(nextStopAfterReview);
       savePracticeFastAnswerMode(nextFastAnswerMode);
-      savePracticeConfidenceCalibration(nextConfidenceCalibration);
+      saveSimulationConfidenceCalibration(nextSimulationConfidenceCalibration);
     }
   }, [user?.id, user?.user_metadata]);
 
@@ -328,13 +330,13 @@ export function AuthPanel() {
     });
   }
 
-  function handleChangePracticeConfidenceCalibration(enabled: boolean) {
-    setPracticeConfidenceCalibration(enabled);
-    savePracticeConfidenceCalibration(enabled);
+  function handleChangeSimulationConfidenceCalibration(enabled: boolean) {
+    setSimulationConfidenceCalibration(enabled);
+    saveSimulationConfidenceCalibration(enabled);
     if (!user) return;
     setError("");
     void persistAccountPreferences({
-      practice_confidence_calibration: enabled
+      simulation_confidence_calibration: enabled
     }).catch((persistError) => {
       setError(persistError instanceof Error ? persistError.message : "信心校準設定同步失敗");
     });
@@ -801,38 +803,38 @@ export function AuthPanel() {
                       </button>
                     </div>
                     <p className="mt-2 text-xs leading-5 text-slate-500">
-                      極速模式會在點選選項後直接作答，作答後仍可看詳解；若有開信心校準，也可調整信心與記錄錯因。
+                      極速模式會在點選選項後直接作答，作答後仍可看詳解。
                     </p>
                   </div>
 
                   <div>
-                    <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">散題信心校準</p>
+                    <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">模擬考信心校準</p>
                     <div className="mt-3 flex flex-wrap gap-2">
                       <button
                         type="button"
-                        onClick={() => handleChangePracticeConfidenceCalibration(false)}
+                        onClick={() => handleChangeSimulationConfidenceCalibration(true)}
                         className={`min-h-11 rounded-full px-4 py-2 text-sm font-semibold transition ${
-                          !practiceConfidenceCalibration
+                          simulationConfidenceCalibration
                             ? "bg-brand-600 text-white"
                             : "bg-slate-100 text-slate-700 hover:bg-slate-200"
                         }`}
                       >
-                        關閉，不每題問信心
+                        開啟，保留校準分析
                       </button>
                       <button
                         type="button"
-                        onClick={() => handleChangePracticeConfidenceCalibration(true)}
+                        onClick={() => handleChangeSimulationConfidenceCalibration(false)}
                         className={`min-h-11 rounded-full px-4 py-2 text-sm font-semibold transition ${
-                          practiceConfidenceCalibration
+                          !simulationConfidenceCalibration
                             ? "bg-amber-100 text-amber-900 ring-1 ring-amber-300"
                             : "bg-slate-100 text-slate-700 hover:bg-slate-200"
                         }`}
                       >
-                        開啟信心校準
+                        關閉，只看答題結果
                       </button>
                     </div>
                     <p className="mt-2 text-xs leading-5 text-slate-500">
-                      關閉時散題會直接做題與看詳解，不顯示信心選擇；模擬考仍保留信心紀錄。
+                      只影響模擬考作答與結果頁；散題固定不詢問信心，專心做題就好。
                     </p>
                   </div>
 

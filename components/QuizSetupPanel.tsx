@@ -9,7 +9,8 @@ import {
   DEFAULT_QUIZ_SETTINGS,
   getModeLabel
 } from "@/lib/quizAnalysis";
-import { loadCompletedSessions, saveQuizSettings } from "@/lib/storage";
+import { loadCompletedSessions, loadSimulationConfidenceCalibration, saveQuizSettings } from "@/lib/storage";
+import { getSimulationConfidenceCalibrationPreference } from "@/lib/accountPreferences";
 import { buildNewQuizHref } from "@/lib/startSettingsUrl";
 import {
   CompletionStatsBundle,
@@ -117,7 +118,10 @@ export function QuizSetupPanel({
   description
 }: QuizSetupPanelProps) {
   const router = useRouter();
-  const { syncStatus, syncVersion } = useAuth();
+  const { user, syncStatus, syncVersion } = useAuth();
+  const [simulationConfidenceCalibration, setSimulationConfidenceCalibration] = useState(() =>
+    loadSimulationConfidenceCalibration(true)
+  );
   const [settings, setSettings] = useState<QuizSettings>(
         simulationOnly
       ? {
@@ -127,7 +131,7 @@ export function QuizSetupPanel({
           questionCount: 100,
           feedbackMode: "none",
           paperMode: "past_paper",
-          enableConfidenceCalibration: true
+          enableConfidenceCalibration: simulationConfidenceCalibration
         }
       : DEFAULT_QUIZ_SETTINGS
   );
@@ -194,6 +198,18 @@ export function QuizSetupPanel({
   }, [syncStatus, syncVersion]);
 
   useEffect(() => {
+    const nextSimulationConfidenceCalibration = user
+      ? getSimulationConfidenceCalibrationPreference(user.user_metadata, true)
+      : loadSimulationConfidenceCalibration(true);
+    setSimulationConfidenceCalibration(nextSimulationConfidenceCalibration);
+    setSettings((current) =>
+      current.mode === "simulation"
+        ? { ...current, enableConfidenceCalibration: nextSimulationConfidenceCalibration }
+        : current
+    );
+  }, [user?.id, user?.user_metadata]);
+
+  useEffect(() => {
     function handleCompletedSessionsChange() {
       setCompletedPaperCounts(buildCompletedPaperCounts());
     }
@@ -231,7 +247,7 @@ export function QuizSetupPanel({
         merged.section = undefined;
         merged.paperMode = "past_paper";
         merged.selectedPaperKey = undefined;
-        merged.enableConfidenceCalibration = true;
+        merged.enableConfidenceCalibration = simulationConfidenceCalibration;
       }
       if (next.mode && next.mode !== "simulation" && current.mode === "simulation") {
         merged.enableConfidenceCalibration = false;
@@ -269,13 +285,16 @@ export function QuizSetupPanel({
             sessionName: undefined,
             questionCount: 100,
             subjectFilter: simulationSubject,
-            enableConfidenceCalibration: true,
+            enableConfidenceCalibration: simulationConfidenceCalibration,
             selectedPaperKey:
               settings.paperMode === "past_paper" || settings.paperMode === "ai_paper"
                 ? settings.selectedPaperKey
                 : undefined
           }
-        : settings;
+        : {
+            ...settings,
+            enableConfidenceCalibration: false
+          };
     saveQuizSettings(nextSettings);
     router.push(buildNewQuizHref(nextSettings));
   }
@@ -418,20 +437,6 @@ export function QuizSetupPanel({
                   <span className="block font-semibold text-ink">優先避開已做過的題目</span>
                   <span className="mt-1 block leading-6 text-slate-500">
                     題池夠時不重複；若篩選範圍太小，才補最久以前做過的題。
-                  </span>
-                </span>
-              </label>
-              <label className="mt-3 flex cursor-pointer items-start gap-3 rounded-2xl bg-white p-4 text-sm text-slate-700 ring-1 ring-slate-200">
-                <input
-                  type="checkbox"
-                  checked={settings.enableConfidenceCalibration ?? false}
-                  onChange={(event) => updateSettings({ enableConfidenceCalibration: event.target.checked })}
-                  className="mt-1 h-4 w-4 rounded border-slate-300 text-brand-600"
-                />
-                <span>
-                  <span className="block font-semibold text-ink">散題也啟用信心校準</span>
-                  <span className="mt-1 block leading-6 text-slate-500">
-                    開啟後每題會詢問信心，結果頁才會顯示校準後掌握分析。
                   </span>
                 </span>
               </label>
@@ -593,7 +598,7 @@ export function QuizSetupPanel({
                 </div>
               ) : null}
               <p className="text-xs leading-6 text-slate-500">
-                不論你選哪一種模擬考模式，作答時都還是可以填寫信心程度，方便之後做弱點分析。
+                信心校準目前{simulationConfidenceCalibration ? "開啟" : "關閉"}。想調整時可回首頁設定；散題則固定不詢問信心。
               </p>
             </div>
           ) : null}
@@ -609,7 +614,7 @@ export function QuizSetupPanel({
             : `・${subjectItem?.label ?? settings.subjectFilter ?? "解剖學"}・${settings.questionCount} 題`}
           {settings.mode !== "simulation" && settings.chapter ? `・${settings.chapter}` : ""}
           {settings.mode !== "simulation" && settings.section ? ` / ${settings.section}` : ""}
-          {settings.mode !== "simulation" && settings.enableConfidenceCalibration ? "・信心校準" : ""}
+          {settings.mode === "simulation" ? (simulationConfidenceCalibration ? "・信心校準" : "・不記信心") : ""}
         </p>
         <button
           type="button"

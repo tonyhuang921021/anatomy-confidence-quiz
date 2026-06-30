@@ -53,8 +53,8 @@ const QUICK_ENTRIES = [
 const HOME_RELEASE_NOTES = [
   {
     time: "06/30",
-    title: "散題先專心做題",
-    body: "散題預設不再每題詢問信心；想做校準分析的人，可以到設定裡把信心校準打開。"
+    title: "模擬考信心可自己決定",
+    body: "設定裡可以開關模擬考信心校準；散題維持專心做題，不再多問信心。"
   },
   {
     time: "06/29",

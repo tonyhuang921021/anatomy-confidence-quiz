@@ -49,8 +49,10 @@ import {
   saveCompletedSession,
   saveQuestionExplanationOverride,
   saveQuestionExplanationOverrides,
-  saveQuizSettings
+  saveQuizSettings,
+  loadSimulationConfidenceCalibration
 } from "@/lib/storage";
+import { getSimulationConfidenceCalibrationPreference } from "@/lib/accountPreferences";
 import { buildNewQuizHref } from "@/lib/startSettingsUrl";
 import {
   Attempt,
@@ -451,7 +453,7 @@ const RESULTS_HISTORY_PAGE_SIZE = 30;
 function ResultsPageContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const { syncVersion, session } = useAuth();
+  const { user, syncVersion, session } = useAuth();
   const [mounted, setMounted] = useState(false);
   const [requestedSessionId, setRequestedSessionId] = useState<string | null>(null);
   const [explanationOverrides, setExplanationOverrides] = useState<Record<string, QuestionExplanationOverride>>({});
@@ -467,6 +469,9 @@ function ResultsPageContent() {
   const [isFullscreenReviewVisible, setIsFullscreenReviewVisible] = useState(false);
   const [openReviewDetailKeys, setOpenReviewDetailKeys] = useState<Set<string>>(() => new Set());
   const [isConfidenceCalibrationOpen, setIsConfidenceCalibrationOpen] = useState(false);
+  const [simulationConfidenceCalibration, setSimulationConfidenceCalibration] = useState(() =>
+    loadSimulationConfidenceCalibration(true)
+  );
   const [visibleHistoryCount, setVisibleHistoryCount] = useState(RESULTS_HISTORY_PAGE_SIZE);
   const [resultsScope, setResultsScope] = useState<"default" | "simulation">("default");
   const [editableSessionName, setEditableSessionName] = useState("");
@@ -483,6 +488,33 @@ function ResultsPageContent() {
     unstableSections: [],
     completionStats: null
   });
+
+  useEffect(() => {
+    const nextSimulationConfidenceCalibration = user
+      ? getSimulationConfidenceCalibrationPreference(user.user_metadata, true)
+      : loadSimulationConfidenceCalibration(true);
+    setSimulationConfidenceCalibration(nextSimulationConfidenceCalibration);
+  }, [user?.id, user?.user_metadata]);
+
+  useEffect(() => {
+    function handleSimulationConfidenceCalibrationChange(event: Event) {
+      const detail = (event as CustomEvent<boolean>).detail;
+      if (typeof detail === "boolean") {
+        setSimulationConfidenceCalibration(detail);
+      }
+    }
+
+    window.addEventListener(
+      "simulation-confidence-calibration-change",
+      handleSimulationConfidenceCalibrationChange
+    );
+    return () => {
+      window.removeEventListener(
+        "simulation-confidence-calibration-change",
+        handleSimulationConfidenceCalibrationChange
+      );
+    };
+  }, []);
 
   async function handleCopyAIPrompt() {
     const promptText = state.promptTexts[aiPromptDetailLevel];
@@ -894,8 +926,10 @@ function ResultsPageContent() {
   );
   const activeSession = state.session;
   const confidenceCalibrationEnabled =
-    activeSession?.settings?.enableConfidenceCalibration ??
-    (activeSession ? isSimulationSession(activeSession) : false);
+    activeSession !== null &&
+    isSimulationSession(activeSession) &&
+    simulationConfidenceCalibration &&
+    (activeSession?.settings?.enableConfidenceCalibration ?? true);
   const questionMap = useMemo(
     () =>
       activeSession
