@@ -1,4 +1,4 @@
-import { anatomyOutline } from "@/data/anatomyQuestions";
+import { anatomyOutline } from "../data/anatomyQuestions";
 import {
   Attempt,
   ChapterCompletionStats,
@@ -16,8 +16,8 @@ import {
   SectionStats,
   SubjectName,
   SummaryStats
-} from "@/types/quiz";
-import { normalizePracticeYearRange } from "@/lib/practiceYears";
+} from "../types/quiz";
+import { normalizePracticeYearRange } from "./practiceYears";
 
 type SectionAggregate = {
   chapter: string;

@@ -21,6 +21,7 @@ import {
   loadPracticeQuestionCount,
   loadPracticeStopAfterReview,
   loadPracticeYearRange,
+  loadCompletedHistorySessionsForUser,
   saveQuizSettings,
   type PracticeQuestionCount,
   type PracticeYearRange
@@ -76,9 +77,30 @@ export default function StartPage() {
   const [practiceYearRange, setPracticeYearRange] = useState<PracticeYearRange>(defaultPracticeYearRange);
   const [practiceQuestionCount, setPracticeQuestionCount] = useState<PracticeQuestionCount>(10);
   const [practiceStopAfterReview, setPracticeStopAfterReview] = useState(false);
+  const [attemptedQuestionIds, setAttemptedQuestionIds] = useState<Set<string>>(() => new Set());
   const excludeAiGenerated = true;
   const seasonalDeadline = new Date("2026-05-15T09:00:00+08:00");
   const seasonalAvailable = new Date() < seasonalDeadline;
+
+  useEffect(() => {
+    const refreshAttemptedQuestionIds = () => {
+      setAttemptedQuestionIds(
+        new Set(
+          loadCompletedHistorySessionsForUser()
+            .flatMap((session) => session.attempts ?? [])
+            .map((attempt) => attempt.questionId)
+        )
+      );
+    };
+
+    refreshAttemptedQuestionIds();
+    window.addEventListener("completed-sessions-change", refreshAttemptedQuestionIds);
+    window.addEventListener("storage", refreshAttemptedQuestionIds);
+    return () => {
+      window.removeEventListener("completed-sessions-change", refreshAttemptedQuestionIds);
+      window.removeEventListener("storage", refreshAttemptedQuestionIds);
+    };
+  }, [user?.id]);
 
   useEffect(() => {
     const accountRange = getPracticeYearRangePreference(user?.user_metadata, defaultPracticeYearRange);
@@ -121,7 +143,7 @@ export default function StartPage() {
       });
   }, [effectiveSelectedSubjects, selectedMicrobiologyTracks]);
 
-  const availableQuestionCount = useMemo(() => {
+  const availableQuestions = useMemo(() => {
     const filteredSubjectQuestions = selectedSubjectQuestionPool.filter((question) => {
       if (excludeAiGenerated && question.sourceType === "AI_GENERATED") return false;
       if (
@@ -148,7 +170,7 @@ export default function StartPage() {
 
     return new Set(
       [...filteredSubjectQuestions, ...seasonalQuestions].map((question) => question.id)
-    ).size;
+    );
   }, [
     excludeAiGenerated,
     includeSeasonalLimited,
@@ -157,9 +179,20 @@ export default function StartPage() {
     seasonalLimitedQuestions,
     selectedSubjectQuestionPool
   ]);
+  const availableQuestionCount = availableQuestions.size;
+  const unattemptedAvailableQuestionCount = useMemo(() => {
+    let count = 0;
+    availableQuestions.forEach((questionId) => {
+      if (!attemptedQuestionIds.has(questionId)) count += 1;
+    });
+    return count;
+  }, [attemptedQuestionIds, availableQuestions]);
   const effectiveQuestionCount = practiceStopAfterReview
     ? availableQuestionCount
     : Math.min(practiceQuestionCount, availableQuestionCount);
+  const willFillWithSeenQuestions =
+    availableQuestionCount > 0 &&
+    unattemptedAvailableQuestionCount < effectiveQuestionCount;
 
   function toggleSubject(subject: SubjectName) {
     if (subject === MICROBIOLOGY_SUBJECT) {
@@ -534,8 +567,16 @@ export default function StartPage() {
             已選 <span className="font-semibold text-ink">{effectiveSelectedSubjects.length + (includeSeasonalLimited ? 1 : 0)}</span> 個範圍・
             {practiceYearRange.yearFrom} 到 {practiceYearRange.yearTo} 年共{" "}
             <span className="font-semibold text-ink">{availableQuestionCount}</span> 題
+            ・未做 <span className="font-semibold text-ink">{unattemptedAvailableQuestionCount}</span> 題
             ・優先不重複已做題
             {practiceStopAfterReview ? "・自由測驗・每題詳解後可結束" : `・每次抽 ${practiceQuestionCount} 題`}
+            {willFillWithSeenQuestions ? (
+              <span className="mt-1 block text-xs font-semibold text-amber-700">
+                {unattemptedAvailableQuestionCount === 0
+                  ? "這個篩選範圍已沒有未做題，接下來會從最久以前做過的題目補題。"
+                  : `未做題不足本輪題數，會先出完 ${unattemptedAvailableQuestionCount} 題未做，再用舊題補滿。`}
+              </span>
+            ) : null}
           </p>
           <div className="flex flex-wrap gap-3">
             <button
