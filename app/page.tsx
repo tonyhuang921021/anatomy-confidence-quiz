@@ -53,8 +53,8 @@ const QUICK_ENTRIES = [
 const HOME_RELEASE_NOTES = [
   {
     time: "06/30",
-    title: "AI 詳解講多一點",
-    body: "單題 AI 詳解會分段講本題核心、判斷邏輯、相近概念和常見混淆；各選項解析保留，太短會自動請 AI 重講。"
+    title: "AI 詳解更好讀",
+    body: "單題 AI 詳解會分段講本題核心、判斷邏輯、相近概念和常見混淆；需要比較時也能生成表格，眼睛不用橫跨整片螢幕。"
   },
   {
     time: "06/30",

@@ -16,7 +16,17 @@ type ExplanationBlock =
   | {
       type: "paragraph";
       text: string;
+    }
+  | {
+      type: "table";
+      headers: string[];
+      rows: string[][];
     };
+
+type ExplanationSection = {
+  title?: string;
+  blocks: Array<Extract<ExplanationBlock, { type: "paragraph" | "table" }>>;
+};
 
 const STRUCTURED_HEADING_ALIASES = new Set([
   "本題核心",
@@ -71,9 +81,29 @@ function parseHeadingLine(line: string) {
   return null;
 }
 
+function splitMarkdownTableRow(line: string) {
+  const trimmed = line.trim().replace(/^\|/, "").replace(/\|$/, "");
+  return trimmed.split("|").map((cell) => cell.trim());
+}
+
+function isMarkdownTableSeparator(line?: string) {
+  if (!line) return false;
+  const cells = splitMarkdownTableRow(line);
+  return (
+    cells.length >= 2 &&
+    cells.every((cell) => /^:?-{3,}:?$/.test(cell.replace(/\s+/g, "")))
+  );
+}
+
+function isPotentialMarkdownTableRow(line?: string) {
+  if (!line) return false;
+  return splitMarkdownTableRow(line).length >= 2 && line.includes("|");
+}
+
 function parseExplanationBlocks(text: string): ExplanationBlock[] {
   const blocks: ExplanationBlock[] = [];
   const paragraphLines: string[] = [];
+  const lines = text.replace(/\r\n/g, "\n").split("\n");
 
   function flushParagraph() {
     const text = paragraphLines.join("\n").trim();
@@ -83,10 +113,32 @@ function parseExplanationBlocks(text: string): ExplanationBlock[] {
     paragraphLines.length = 0;
   }
 
-  for (const line of text.replace(/\r\n/g, "\n").split("\n")) {
+  for (let index = 0; index < lines.length; index += 1) {
+    const line = lines[index];
     if (!line.trim()) {
       flushParagraph();
       continue;
+    }
+
+    if (
+      isPotentialMarkdownTableRow(line) &&
+      isMarkdownTableSeparator(lines[index + 1])
+    ) {
+      const headers = splitMarkdownTableRow(line);
+      const rows: string[][] = [];
+      index += 2;
+
+      while (index < lines.length && isPotentialMarkdownTableRow(lines[index])) {
+        rows.push(splitMarkdownTableRow(lines[index]));
+        index += 1;
+      }
+
+      index -= 1;
+      if (headers.length > 0 && rows.length > 0) {
+        flushParagraph();
+        blocks.push({ type: "table", headers, rows });
+        continue;
+      }
     }
 
     const heading = parseHeadingLine(line);
@@ -107,6 +159,26 @@ function parseExplanationBlocks(text: string): ExplanationBlock[] {
   return blocks.length > 0 ? blocks : [{ type: "paragraph", text }];
 }
 
+function buildExplanationSections(blocks: ExplanationBlock[]): ExplanationSection[] {
+  const sections: ExplanationSection[] = [];
+
+  for (const block of blocks) {
+    if (block.type === "heading") {
+      sections.push({ title: block.title, blocks: [] });
+      continue;
+    }
+
+    const currentSection = sections[sections.length - 1];
+    if (currentSection) {
+      currentSection.blocks.push(block);
+    } else {
+      sections.push({ blocks: [block] });
+    }
+  }
+
+  return sections.filter((section) => section.title || section.blocks.length > 0);
+}
+
 export function StructuredExplanationText({
   text,
   label = "詳解",
@@ -118,39 +190,103 @@ export function StructuredExplanationText({
   if (!trimmedText) return null;
 
   const blocks = parseExplanationBlocks(trimmedText);
+  const sections = buildExplanationSections(blocks);
 
   const labelClassName = tone === "dark" ? "text-white" : "text-ink";
-  const headingClassName =
+  const sectionClassName =
     tone === "dark"
-      ? "bg-white/10 text-teal-50 ring-white/15"
-      : "bg-teal-50 text-teal-800 ring-teal-100";
-  const paragraphClassName = tone === "dark" ? "text-slate-100" : "text-slate-700";
+      ? "border-white/20"
+      : "border-teal-200";
+  const headingClassName = tone === "dark" ? "text-teal-50" : "text-teal-900";
+  const paragraphClassName = tone === "dark" ? "text-slate-50" : "text-slate-800";
+  const leadBackgroundClassName = tone === "dark" ? "bg-white/5" : "bg-white/60";
+  const tableShellClassName =
+    tone === "dark"
+      ? "border-white/15 bg-white/5"
+      : "border-slate-200 bg-white/80";
+  const tableHeadClassName =
+    tone === "dark"
+      ? "bg-white/10 text-teal-50"
+      : "bg-teal-50 text-teal-950";
+  const tableCellClassName =
+    tone === "dark"
+      ? "border-white/10 text-slate-50"
+      : "border-slate-200 text-slate-800";
 
   return (
-    <div className={`structured-explanation-text min-w-0 space-y-3 ${className}`}>
-      {label ? <p className={`text-sm font-black ${labelClassName}`}>{label}</p> : null}
-      <div className={compact ? "space-y-2.5" : "space-y-3"}>
-        {blocks.map((block, index) => {
-          if (block.type === "heading") {
-            return (
-              <h4
-                key={`heading-${block.title}-${index}`}
-                className={`inline-flex rounded-full px-3 py-1 text-xs font-black ring-1 ${headingClassName}`}
-              >
-                {block.title}
+    <div className={`structured-explanation-text w-full min-w-0 ${className}`}>
+      {label ? (
+        <p className={`mb-3 text-[15px] font-black leading-6 ${labelClassName}`}>
+          {label}
+        </p>
+      ) : null}
+      <div className="w-full max-w-[52rem] space-y-4 sm:space-y-5">
+        {sections.map((section, index) => (
+          <section
+            key={`${section.title ?? "section"}-${index}`}
+            className={`w-full min-w-0 border-l-4 pl-3 sm:pl-4 ${sectionClassName}`}
+          >
+            {section.title ? (
+              <h4 className={`mb-2 text-[16px] font-black leading-7 sm:text-[17px] ${headingClassName}`}>
+                {section.title}
               </h4>
-            );
-          }
+            ) : null}
+            {section.blocks.length > 0 ? (
+              <div className={`w-full min-w-0 rounded-2xl px-3 py-3 sm:px-4 ${leadBackgroundClassName}`}>
+                <div className="space-y-3">
+                  {section.blocks.map((block, blockIndex) => {
+                    if (block.type === "table") {
+                      return (
+                        <div
+                          key={`${section.title ?? "table"}-${blockIndex}`}
+                          className={`max-w-full touch-pan-x overflow-x-auto rounded-2xl border shadow-[inset_-18px_0_18px_-20px_rgba(15,23,42,0.65)] [-webkit-overflow-scrolling:touch] ${tableShellClassName}`}
+                        >
+                          <table className="min-w-[34rem] border-collapse text-left text-[15px] leading-7 sm:min-w-full">
+                            <thead className={tableHeadClassName}>
+                              <tr>
+                                {block.headers.map((header, headerIndex) => (
+                                  <th
+                                    key={`${header}-${headerIndex}`}
+                                    className={`border-b px-3 py-2.5 font-black [word-break:keep-all] ${tableCellClassName}`}
+                                  >
+                                    {header}
+                                  </th>
+                                ))}
+                              </tr>
+                            </thead>
+                            <tbody>
+                              {block.rows.map((row, rowIndex) => (
+                                <tr key={`row-${rowIndex}`}>
+                                  {block.headers.map((_, cellIndex) => (
+                                    <td
+                                      key={`cell-${rowIndex}-${cellIndex}`}
+                                      className={`border-t px-3 py-2.5 align-top font-medium [word-break:keep-all] ${tableCellClassName}`}
+                                    >
+                                      {row[cellIndex] ?? ""}
+                                    </td>
+                                  ))}
+                                </tr>
+                              ))}
+                            </tbody>
+                          </table>
+                        </div>
+                      );
+                    }
 
-          return (
-            <p
-              key={`paragraph-${index}`}
-              className={`${compact ? "text-sm leading-7" : "text-[15px] leading-8"} whitespace-pre-line ${paragraphClassName} [overflow-wrap:anywhere]`}
-            >
-              {block.text}
-            </p>
-          );
-        })}
+                    return (
+                      <p
+                        key={`${section.title ?? "paragraph"}-${blockIndex}`}
+                        className={`${compact ? "text-[16px] leading-8" : "text-[17px] leading-9"} whitespace-pre-line font-medium ${paragraphClassName} [overflow-wrap:anywhere]`}
+                      >
+                        {block.text}
+                      </p>
+                    );
+                  })}
+                </div>
+              </div>
+            ) : null}
+          </section>
+        ))}
       </div>
     </div>
   );
