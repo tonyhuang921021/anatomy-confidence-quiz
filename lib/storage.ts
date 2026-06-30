@@ -121,6 +121,45 @@ function getScopedKeyForUser(baseKey: string, userId: string) {
   return `${baseKey}:${userId || GUEST_USER_ID}`;
 }
 
+export function freeLocalStorageSpaceForAuth() {
+  if (!isBrowser()) return 0;
+
+  const removableBaseKeys = [
+    CLOUD_COMPLETED_SESSIONS_KEY,
+    PEAK_CHALLENGE_PRELOAD_KEY
+  ] as const;
+  const activeUserId = safeLocalStorageGetItem(ACTIVE_USER_KEY) || GUEST_USER_ID;
+  const removableKeys = new Set<string>();
+
+  for (const baseKey of removableBaseKeys) {
+    removableKeys.add(baseKey);
+    removableKeys.add(getScopedKeyForUser(baseKey, activeUserId));
+    removableKeys.add(getScopedKeyForUser(baseKey, GUEST_USER_ID));
+  }
+
+  const existingKeys: string[] = [];
+  try {
+    for (let index = 0; index < window.localStorage.length; index += 1) {
+      const key = window.localStorage.key(index);
+      if (key) existingKeys.push(key);
+    }
+  } catch {
+    return 0;
+  }
+
+  let removedCount = 0;
+  for (const key of existingKeys) {
+    const canRemove =
+      removableKeys.has(key) ||
+      removableBaseKeys.some((baseKey) => key.startsWith(`${baseKey}:`));
+    if (canRemove && safeLocalStorageRemoveItem(key)) {
+      removedCount += 1;
+    }
+  }
+
+  return removedCount;
+}
+
 export function getCanonicalSessionId(sessionId: string) {
   return sessionId.replace(/^user-[^:]+:/, "");
 }

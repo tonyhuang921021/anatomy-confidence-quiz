@@ -986,9 +986,9 @@ export function AuthPanel() {
             className="mt-1 h-4 w-4 rounded border-slate-300 text-brand-600"
           />
           <span>
-            記住這台裝置的帳號
+            維持這台裝置的登入狀態
             <span className="block text-xs leading-6 text-slate-500">
-              下次會自動帶入 Email，切回網站時也會主動刷新登入狀態。
+              會記住 Email，並把登入狀態盡量存在可長期保留的位置；切回網站時也會主動刷新。
             </span>
           </span>
         </label>

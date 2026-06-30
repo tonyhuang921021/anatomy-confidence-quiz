@@ -1,13 +1,23 @@
 import { createClient, type SupabaseClient } from "@supabase/supabase-js";
+import { freeLocalStorageSpaceForAuth } from "@/lib/storage";
 import { isSupabaseRecoveryMode } from "@/lib/supabase/recoveryMode";
 
 let browserClient: SupabaseClient | null = null;
 
+type MaybePromise<T> = T | Promise<T>;
+
 type BrowserAuthStorage = {
-  getItem: (key: string) => string | null;
-  setItem: (key: string, value: string) => void;
-  removeItem: (key: string) => void;
+  getItem: (key: string) => MaybePromise<string | null>;
+  setItem: (key: string, value: string) => MaybePromise<void>;
+  removeItem: (key: string) => MaybePromise<void>;
 };
+
+type AuthStorageLocation = "localStorage" | "indexedDB" | "sessionStorage" | "unavailable";
+
+const AUTH_INDEXED_DB_NAME = "anatomy-confidence-auth";
+const AUTH_INDEXED_DB_STORE = "supabase-auth";
+
+let authIndexedDbPromise: Promise<IDBDatabase | null> | null = null;
 
 function isBrowser() {
   return typeof window !== "undefined";
@@ -43,31 +53,177 @@ function safelyRemove(storage: Storage | undefined, key: string) {
   }
 }
 
+function notifyAuthStorageLocation(storage: AuthStorageLocation, reason?: string) {
+  if (!isBrowser()) return;
+  window.dispatchEvent(
+    new CustomEvent("medquiz-auth-storage-location-change", {
+      detail: { storage, reason }
+    })
+  );
+}
+
+function tryWriteLocalStorage(key: string, value: string) {
+  try {
+    window.localStorage.setItem(key, value);
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+function getAuthIndexedDb() {
+  if (!isBrowser() || !("indexedDB" in window)) {
+    return Promise.resolve(null);
+  }
+
+  if (!authIndexedDbPromise) {
+    authIndexedDbPromise = new Promise<IDBDatabase | null>((resolve) => {
+      try {
+        const request = window.indexedDB.open(AUTH_INDEXED_DB_NAME, 1);
+
+        request.onupgradeneeded = () => {
+          const db = request.result;
+          if (!db.objectStoreNames.contains(AUTH_INDEXED_DB_STORE)) {
+            db.createObjectStore(AUTH_INDEXED_DB_STORE);
+          }
+        };
+
+        request.onsuccess = () => {
+          const db = request.result;
+          db.onversionchange = () => {
+            db.close();
+            authIndexedDbPromise = null;
+          };
+          resolve(db);
+        };
+
+        request.onerror = () => resolve(null);
+        request.onblocked = () => resolve(null);
+      } catch {
+        resolve(null);
+      }
+    });
+  }
+
+  return authIndexedDbPromise;
+}
+
+async function readIndexedDbAuthItem(key: string) {
+  const db = await getAuthIndexedDb();
+  if (!db) return null;
+
+  return new Promise<string | null>((resolve) => {
+    try {
+      const transaction = db.transaction(AUTH_INDEXED_DB_STORE, "readonly");
+      const request = transaction.objectStore(AUTH_INDEXED_DB_STORE).get(key);
+      request.onsuccess = () => {
+        resolve(typeof request.result === "string" ? request.result : null);
+      };
+      request.onerror = () => resolve(null);
+    } catch {
+      resolve(null);
+    }
+  });
+}
+
+async function writeIndexedDbAuthItem(key: string, value: string) {
+  const db = await getAuthIndexedDb();
+  if (!db) return false;
+
+  return new Promise<boolean>((resolve) => {
+    let settled = false;
+    const finish = (saved: boolean) => {
+      if (!settled) {
+        settled = true;
+        resolve(saved);
+      }
+    };
+
+    try {
+      const transaction = db.transaction(AUTH_INDEXED_DB_STORE, "readwrite");
+      transaction.oncomplete = () => finish(true);
+      transaction.onerror = () => finish(false);
+      transaction.onabort = () => finish(false);
+      transaction.objectStore(AUTH_INDEXED_DB_STORE).put(value, key);
+    } catch {
+      finish(false);
+    }
+  });
+}
+
+async function removeIndexedDbAuthItem(key: string) {
+  const db = await getAuthIndexedDb();
+  if (!db) return;
+
+  await new Promise<void>((resolve) => {
+    let settled = false;
+    const finish = () => {
+      if (!settled) {
+        settled = true;
+        resolve();
+      }
+    };
+
+    try {
+      const transaction = db.transaction(AUTH_INDEXED_DB_STORE, "readwrite");
+      transaction.oncomplete = finish;
+      transaction.onerror = finish;
+      transaction.onabort = finish;
+      transaction.objectStore(AUTH_INDEXED_DB_STORE).delete(key);
+    } catch {
+      finish();
+    }
+  });
+}
+
 function createResilientAuthStorage(): BrowserAuthStorage | undefined {
   if (!isBrowser()) return undefined;
 
   return {
-    getItem(key) {
-      return safelyRead(window.localStorage, key) ?? safelyRead(window.sessionStorage, key);
+    async getItem(key) {
+      const localValue = safelyRead(window.localStorage, key);
+      if (localValue) return localValue;
+
+      const indexedDbValue = await readIndexedDbAuthItem(key);
+      if (indexedDbValue) return indexedDbValue;
+
+      return safelyRead(window.sessionStorage, key);
     },
-    setItem(key, value) {
-      try {
-        window.localStorage.setItem(key, value);
+    async setItem(key, value) {
+      if (tryWriteLocalStorage(key, value)) {
+        void removeIndexedDbAuthItem(key);
         safelyRemove(window.sessionStorage, key);
+        notifyAuthStorageLocation("localStorage");
         return;
-      } catch (error) {
-        if (!isQuotaExceededError(error)) {
-          throw error;
-        }
       }
 
-      // If old quiz history has filled localStorage, keep auth usable without
-      // deleting local-only quiz records. The session survives this tab/window.
-      window.sessionStorage.setItem(key, value);
+      const recoveredKeys = freeLocalStorageSpaceForAuth();
+      if (recoveredKeys > 0 && tryWriteLocalStorage(key, value)) {
+        void removeIndexedDbAuthItem(key);
+        safelyRemove(window.sessionStorage, key);
+        notifyAuthStorageLocation("localStorage", "recovered-space");
+        return;
+      }
+
+      if (await writeIndexedDbAuthItem(key, value)) {
+        safelyRemove(window.localStorage, key);
+        safelyRemove(window.sessionStorage, key);
+        notifyAuthStorageLocation("indexedDB", "local-storage-unavailable");
+        return;
+      }
+
+      try {
+        window.sessionStorage.setItem(key, value);
+        notifyAuthStorageLocation("sessionStorage", "persistent-storage-unavailable");
+      } catch (error) {
+        notifyAuthStorageLocation("unavailable", isQuotaExceededError(error) ? "quota-exceeded" : "blocked");
+        throw error;
+      }
     },
     removeItem(key) {
       safelyRemove(window.localStorage, key);
       safelyRemove(window.sessionStorage, key);
+      void removeIndexedDbAuthItem(key);
     }
   };
 }
@@ -125,5 +281,6 @@ export function clearSupabaseBrowserAuthStorage() {
   for (const key of getSupabaseAuthStorageKeys()) {
     safelyRemove(window.localStorage, key);
     safelyRemove(window.sessionStorage, key);
+    void removeIndexedDbAuthItem(key);
   }
 }

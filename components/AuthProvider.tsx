@@ -16,7 +16,7 @@ import {
   syncLocalCurrentSessionForCurrentUser,
   syncLeaderboardProfileForCurrentUser
 } from "@/lib/cloudSync";
-import { setActiveStorageUser } from "@/lib/storage";
+import { freeLocalStorageSpaceForAuth, setActiveStorageUser } from "@/lib/storage";
 import {
   clearSupabaseBrowserAuthStorage,
   getSupabaseBrowserClient,
@@ -205,7 +205,11 @@ function saveAuthSessionSnapshot(nextSession: Session | null) {
   }
 
   const serialized = JSON.stringify(nextSession);
-  if (!safeSetStorage(window.localStorage, AUTH_SESSION_SNAPSHOT_KEY, serialized)) {
+  if (
+    !safeSetStorage(window.localStorage, AUTH_SESSION_SNAPSHOT_KEY, serialized) &&
+    (freeLocalStorageSpaceForAuth() === 0 ||
+      !safeSetStorage(window.localStorage, AUTH_SESSION_SNAPSHOT_KEY, serialized))
+  ) {
     safeSetStorage(window.sessionStorage, AUTH_SESSION_SNAPSHOT_KEY, serialized);
   } else {
     safeRemoveStorage(window.sessionStorage, AUTH_SESSION_SNAPSHOT_KEY);
