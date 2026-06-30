@@ -1871,14 +1871,16 @@ export default function QuizPage() {
     );
   }
 
+  const confidenceCalibrationEnabled =
+    session.settings?.enableConfidenceCalibration ?? session.settings?.mode === "simulation";
   const flag =
-    submittedAttempt && submittedAttempt.isCorrect && submittedAttempt.confidence <= 2
+    confidenceCalibrationEnabled && submittedAttempt && submittedAttempt.isCorrect && submittedAttempt.confidence <= 2
       ? { text: "猜對風險", style: "bg-amber-100 text-amber-900" }
-      : submittedAttempt && !submittedAttempt.isCorrect && submittedAttempt.confidence >= 4
+      : confidenceCalibrationEnabled && submittedAttempt && !submittedAttempt.isCorrect && submittedAttempt.confidence >= 4
         ? { text: "錯誤自信", style: "bg-rose-100 text-rose-900" }
-        : submittedAttempt && !submittedAttempt.isCorrect && submittedAttempt.confidence <= 2
+        : confidenceCalibrationEnabled && submittedAttempt && !submittedAttempt.isCorrect && submittedAttempt.confidence <= 2
           ? { text: "優先補弱", style: "bg-orange-100 text-orange-900" }
-          : submittedAttempt && submittedAttempt.confidence <= 3
+          : confidenceCalibrationEnabled && submittedAttempt && submittedAttempt.confidence <= 3
             ? { text: "低信心", style: "bg-yellow-100 text-yellow-900" }
           : null;
   const difficultyBadge = submittedAttempt ? getDifficultyBadge(currentQuestion) : null;
@@ -1965,13 +1967,15 @@ export default function QuizPage() {
 
           {!submittedAttempt ? (
             <>
-              <ConfidenceSelector
-                key={`answer-${currentQuestion.id}`}
-                value={displayedConfidence}
-                expanded={confidenceExpanded || displayedConfidence <= 3}
-                onExpand={() => undefined}
-                onSelect={handleSelectConfidence}
-              />
+              {confidenceCalibrationEnabled ? (
+                <ConfidenceSelector
+                  key={`answer-${currentQuestion.id}`}
+                  value={displayedConfidence}
+                  expanded={confidenceExpanded || displayedConfidence <= 3}
+                  onExpand={() => undefined}
+                  onSelect={handleSelectConfidence}
+                />
+              ) : null}
 
               <div className="rounded-[2rem] bg-white p-4 shadow-card ring-1 ring-slate-100 sm:p-5">
                 <div className="grid gap-3 sm:grid-cols-3">
@@ -1983,9 +1987,11 @@ export default function QuizPage() {
                       目前答對數 <span className="font-semibold">{correctCount}</span>
                     </p>
                   ) : null}
-                  <p className="rounded-2xl bg-slate-50 px-4 py-3 text-sm text-slate-700">
-                    本輪平均信心 <span className="font-semibold">{averageConfidence}</span>
-                  </p>
+                  {confidenceCalibrationEnabled ? (
+                    <p className="rounded-2xl bg-slate-50 px-4 py-3 text-sm text-slate-700">
+                      本輪平均信心 <span className="font-semibold">{averageConfidence}</span>
+                    </p>
+                  ) : null}
                 </div>
                 <div className="mt-5 grid gap-3 sm:grid-cols-2">
                   {isBlindSimulation ? (
@@ -2078,9 +2084,11 @@ export default function QuizPage() {
                       />
                     </>
                   ) : null}
-                  <p>
-                    本題信心：<span className="font-semibold">{getConfidenceLabel(submittedAttempt.confidence)}</span>
-                  </p>
+                  {confidenceCalibrationEnabled ? (
+                    <p>
+                      本題信心：<span className="font-semibold">{getConfidenceLabel(submittedAttempt.confidence)}</span>
+                    </p>
+                  ) : null}
                   {isPeakChallenge && peakNextQuestionError ? (
                     <p className="rounded-2xl bg-amber-100/70 px-4 py-3 text-amber-950">
                       {peakNextQuestionError}
@@ -2179,13 +2187,15 @@ export default function QuizPage() {
                 ) : null}
               </div>
 
-              <ConfidenceSelector
-                key={`review-${currentQuestion.id}`}
-                value={displayedConfidence}
-                expanded={confidenceExpanded || displayedConfidence <= 3}
-                onExpand={() => undefined}
-                onSelect={handleSelectConfidence}
-              />
+              {confidenceCalibrationEnabled ? (
+                <ConfidenceSelector
+                  key={`review-${currentQuestion.id}`}
+                  value={displayedConfidence}
+                  expanded={confidenceExpanded || displayedConfidence <= 3}
+                  onExpand={() => undefined}
+                  onSelect={handleSelectConfidence}
+                />
+              ) : null}
               {!submittedAttempt.isCorrect && shouldShowExplanation ? (
                 <ErrorTypeSelector value={errorType} onSelect={handleErrorTypeSelect} />
               ) : null}
@@ -2260,9 +2270,11 @@ export default function QuizPage() {
                 <p className="rounded-2xl bg-slate-50 px-4 py-3 text-sm text-slate-700">
                   目前小節 <span className="font-semibold">{currentQuestion.section}</span>
                 </p>
-                <p className="rounded-2xl bg-slate-50 px-4 py-3 text-sm text-slate-700">
-                  目前信心 <span className="font-semibold">{getConfidenceLabel(displayedConfidence)}</span>
-                </p>
+                {confidenceCalibrationEnabled ? (
+                  <p className="rounded-2xl bg-slate-50 px-4 py-3 text-sm text-slate-700">
+                    目前信心 <span className="font-semibold">{getConfidenceLabel(displayedConfidence)}</span>
+                  </p>
+                ) : null}
                 <p className="rounded-2xl bg-slate-50 px-4 py-3 text-sm text-slate-700">
                   {isPeakChallenge ? "目前分數" : "已答題數"} <span className="font-semibold">{answeredCount}</span>
                 </p>

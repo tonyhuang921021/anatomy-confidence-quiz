@@ -126,7 +126,8 @@ export function QuizSetupPanel({
           subjectFilter: "醫學（一）",
           questionCount: 100,
           feedbackMode: "none",
-          paperMode: "past_paper"
+          paperMode: "past_paper",
+          enableConfidenceCalibration: true
         }
       : DEFAULT_QUIZ_SETTINGS
   );
@@ -230,6 +231,10 @@ export function QuizSetupPanel({
         merged.section = undefined;
         merged.paperMode = "past_paper";
         merged.selectedPaperKey = undefined;
+        merged.enableConfidenceCalibration = true;
+      }
+      if (next.mode && next.mode !== "simulation" && current.mode === "simulation") {
+        merged.enableConfidenceCalibration = false;
       }
       if (next.chapter && next.chapter !== current.chapter) {
         merged.section = undefined;
@@ -264,6 +269,7 @@ export function QuizSetupPanel({
             sessionName: undefined,
             questionCount: 100,
             subjectFilter: simulationSubject,
+            enableConfidenceCalibration: true,
             selectedPaperKey:
               settings.paperMode === "past_paper" || settings.paperMode === "ai_paper"
                 ? settings.selectedPaperKey
@@ -280,6 +286,7 @@ export function QuizSetupPanel({
       questionCount: 10,
       subjectFilter: "解剖學",
       excludePreviouslyAnswered: true,
+      enableConfidenceCalibration: false,
       chapter: weakestSection?.chapter,
       section: weakestSection?.section
     };
@@ -411,6 +418,20 @@ export function QuizSetupPanel({
                   <span className="block font-semibold text-ink">優先避開已做過的題目</span>
                   <span className="mt-1 block leading-6 text-slate-500">
                     題池夠時不重複；若篩選範圍太小，才補最久以前做過的題。
+                  </span>
+                </span>
+              </label>
+              <label className="mt-3 flex cursor-pointer items-start gap-3 rounded-2xl bg-white p-4 text-sm text-slate-700 ring-1 ring-slate-200">
+                <input
+                  type="checkbox"
+                  checked={settings.enableConfidenceCalibration ?? false}
+                  onChange={(event) => updateSettings({ enableConfidenceCalibration: event.target.checked })}
+                  className="mt-1 h-4 w-4 rounded border-slate-300 text-brand-600"
+                />
+                <span>
+                  <span className="block font-semibold text-ink">散題也啟用信心校準</span>
+                  <span className="mt-1 block leading-6 text-slate-500">
+                    開啟後每題會詢問信心，結果頁才會顯示校準後掌握分析。
                   </span>
                 </span>
               </label>
@@ -588,6 +609,7 @@ export function QuizSetupPanel({
             : `・${subjectItem?.label ?? settings.subjectFilter ?? "解剖學"}・${settings.questionCount} 題`}
           {settings.mode !== "simulation" && settings.chapter ? `・${settings.chapter}` : ""}
           {settings.mode !== "simulation" && settings.section ? ` / ${settings.section}` : ""}
+          {settings.mode !== "simulation" && settings.enableConfidenceCalibration ? "・信心校準" : ""}
         </p>
         <button
           type="button"

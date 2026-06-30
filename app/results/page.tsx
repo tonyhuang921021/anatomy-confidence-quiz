@@ -893,6 +893,9 @@ function ResultsPageContent() {
     [recentCompletedSessions, visibleHistoryCount]
   );
   const activeSession = state.session;
+  const confidenceCalibrationEnabled =
+    activeSession?.settings?.enableConfidenceCalibration ??
+    (activeSession ? isSimulationSession(activeSession) : false);
   const questionMap = useMemo(
     () =>
       activeSession
@@ -1546,22 +1549,26 @@ function ResultsPageContent() {
               ? "本題一律給分"
               : attempt.correctAnswer}
         </p>
-        <p>
-          <span className="font-semibold">本題狀態：</span>
-          <span className={`ml-1 rounded-full px-2.5 py-1 text-xs font-bold ring-1 ${getMasteryBadgeClass(masteryLabel)}`}>
-            {masteryLabel}
-          </span>
-        </p>
+        {confidenceCalibrationEnabled ? (
+          <p>
+            <span className="font-semibold">本題狀態：</span>
+            <span className={`ml-1 rounded-full px-2.5 py-1 text-xs font-bold ring-1 ${getMasteryBadgeClass(masteryLabel)}`}>
+              {masteryLabel}
+            </span>
+          </p>
+        ) : null}
         {showTestedConcept ? (
           <p>
             <span className="font-semibold">testedConcept：</span>
             {question.testedConcept}
           </p>
         ) : null}
-        <p>
-          <span className="font-semibold">信心：</span>
-          {getConfidenceOverviewLabel(attempt.confidence)}
-        </p>
+        {confidenceCalibrationEnabled ? (
+          <p>
+            <span className="font-semibold">信心：</span>
+            {getConfidenceOverviewLabel(attempt.confidence)}
+          </p>
+        ) : null}
         {attempt.errorType ? (
           <p>
             <span className="font-semibold">錯因：</span>
@@ -1586,6 +1593,7 @@ function ResultsPageContent() {
   }
 
   function renderConfidenceCalibrationSection() {
+    if (!confidenceCalibrationEnabled) return null;
     if (masteryAnalysis.total === 0) return null;
     const priorityItems = masteryAnalysis.reviewItems.filter((item) => item.priority > 0).slice(0, 5);
     const visibleTopicStats = masteryAnalysis.topicStats.slice(0, 3);
@@ -1954,7 +1962,7 @@ function ResultsPageContent() {
                         {renderQuestionSummaryLine({
                           prefix: `錯題 ${index + 1}：`,
                           question,
-                          suffix: masteryLabel
+                          suffix: confidenceCalibrationEnabled ? masteryLabel : undefined
                         })}
                       </summary>
                       {isOpen
@@ -1971,49 +1979,51 @@ function ResultsPageContent() {
             </div>
           </div>
 
-          <div>
-            <h3 className="text-base font-semibold text-ink">沒信心題目回顧</h3>
-            <div className="mt-3 grid gap-3">
-              {lowConfidenceAttempts.length === 0 ? (
-                <div className="rounded-2xl bg-sky-50 p-4 text-sm text-sky-900">
-                  這輪沒有標記為低信心的題目。
-                </div>
-              ) : (
-                lowConfidenceAttempts.map(({ attempt, question }, index) => {
-                  const detailKey = `low-confidence-${attempt.questionId}-${index}`;
-                  const isOpen = openReviewDetailKeys.has(detailKey);
-                  const questionNumber = questionNumberMap.get(attempt.questionId) ?? index + 1;
-                  const masteryLabel =
-                    masteryReviewItemMap.get(attempt.questionId)?.categoryLabel ??
-                    getMasteryCategoryLabelForAnswer(attempt);
+          {confidenceCalibrationEnabled ? (
+            <div>
+              <h3 className="text-base font-semibold text-ink">沒信心題目回顧</h3>
+              <div className="mt-3 grid gap-3">
+                {lowConfidenceAttempts.length === 0 ? (
+                  <div className="rounded-2xl bg-sky-50 p-4 text-sm text-sky-900">
+                    這輪沒有標記為低信心的題目。
+                  </div>
+                ) : (
+                  lowConfidenceAttempts.map(({ attempt, question }, index) => {
+                    const detailKey = `low-confidence-${attempt.questionId}-${index}`;
+                    const isOpen = openReviewDetailKeys.has(detailKey);
+                    const questionNumber = questionNumberMap.get(attempt.questionId) ?? index + 1;
+                    const masteryLabel =
+                      masteryReviewItemMap.get(attempt.questionId)?.categoryLabel ??
+                      getMasteryCategoryLabelForAnswer(attempt);
 
-                  return (
-                    <details
-                      key={detailKey}
-                      open={isOpen}
-                      onToggle={(event) => setReviewDetailOpen(detailKey, event.currentTarget.open)}
-                      className="group overflow-hidden rounded-2xl bg-amber-50 p-3.5 sm:p-4"
-                    >
-                      <summary className="cursor-pointer overflow-hidden text-sm font-semibold text-amber-950 list-none [&::-webkit-details-marker]:hidden">
-                        {renderQuestionSummaryLine({
-                          prefix: `第 ${questionNumber} 題：`,
-                          question,
-                          suffix: masteryLabel
-                        })}
-                      </summary>
-                      {isOpen
-                        ? renderAttemptReviewDetails({
-                            attempt,
+                    return (
+                      <details
+                        key={detailKey}
+                        open={isOpen}
+                        onToggle={(event) => setReviewDetailOpen(detailKey, event.currentTarget.open)}
+                        className="group overflow-hidden rounded-2xl bg-amber-50 p-3.5 sm:p-4"
+                      >
+                        <summary className="cursor-pointer overflow-hidden text-sm font-semibold text-amber-950 list-none [&::-webkit-details-marker]:hidden">
+                          {renderQuestionSummaryLine({
+                            prefix: `第 ${questionNumber} 題：`,
                             question,
-                            optionKeySuffix: "low"
-                          })
-                        : null}
-                    </details>
-                  );
-                })
-              )}
+                            suffix: masteryLabel
+                          })}
+                        </summary>
+                        {isOpen
+                          ? renderAttemptReviewDetails({
+                              attempt,
+                              question,
+                              optionKeySuffix: "low"
+                            })
+                          : null}
+                      </details>
+                    );
+                  })
+                )}
+              </div>
             </div>
-          </div>
+          ) : null}
 
           <div>
             <h3 className="text-base font-semibold text-ink">全部題目回顧</h3>
@@ -2037,7 +2047,9 @@ function ResultsPageContent() {
                       {renderQuestionSummaryLine({
                         prefix: `第 ${questionNumber} 題：`,
                         question,
-                        suffix: `${masteryLabel}・${getConfidenceOverviewLabel(attempt.confidence)}`
+                        suffix: confidenceCalibrationEnabled
+                          ? `${masteryLabel}・${getConfidenceOverviewLabel(attempt.confidence)}`
+                          : undefined
                       })}
                     </summary>
                     {isOpen
@@ -2124,7 +2136,10 @@ function ResultsPageContent() {
       </div>
 
       <div className="mt-6">
-        <ResultSummary summary={state.summary} masteryAnalysis={masteryAnalysis} />
+        <ResultSummary
+          summary={state.summary}
+          masteryAnalysis={confidenceCalibrationEnabled ? masteryAnalysis : undefined}
+        />
         {renderConfidenceCalibrationSection()}
         {simulationSubjectScores.length > 0 ? (
           <section className="mt-4 rounded-[2rem] bg-white p-5 shadow-card ring-1 ring-slate-100 sm:p-6">
@@ -2235,7 +2250,7 @@ function ResultsPageContent() {
               </button>
             </div>
           </section>
-          {isSimulationSession(state.session) && confidenceOverviewItems.length > 0
+          {confidenceCalibrationEnabled && isSimulationSession(state.session) && confidenceOverviewItems.length > 0
             ? renderConfidenceOverviewSection()
             : null}
         </aside>

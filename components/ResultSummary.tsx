@@ -3,40 +3,51 @@ import type { MasteryAnalysis } from "@/lib/masteryAnalysis";
 
 type ResultSummaryProps = {
   summary: SummaryStats;
-  masteryAnalysis: MasteryAnalysis;
+  masteryAnalysis?: MasteryAnalysis;
 };
 
 function formatPercent(value: number | null) {
   return value === null ? "—" : `${value}%`;
 }
 
-const cards = (summary: SummaryStats, masteryAnalysis: MasteryAnalysis) => [
-  {
-    label: "答對率",
-    value: `${summary.correctRate}%`,
-    helper: "表面成績",
-    tone: "slate"
-  },
-  {
-    label: "校準後掌握指數",
-    value: formatPercent(masteryAnalysis.calibratedMasteryPercent),
-    helper: "扣除猜對不穩與高信心錯誤後的掌握估計",
-    tone: "brand",
-    featured: true
-  },
-  {
-    label: "高信心錯誤率",
-    value: formatPercent(masteryAnalysis.highConfidenceErrorPercent),
-    helper: masteryAnalysis.counts[4].total === 0 ? "本次沒有信心 4 的題目" : "信心 4 題目中答錯的比例",
-    tone: "rose"
-  },
-  {
-    label: "猜對風險率",
-    value: formatPercent(masteryAnalysis.guessingRiskPercent),
-    helper: summary.correct === 0 ? "本次沒有答對題" : "答對題目中信心 1-2 的比例",
-    tone: "yellow"
+const cards = (summary: SummaryStats, masteryAnalysis?: MasteryAnalysis) => {
+  if (!masteryAnalysis) {
+    return [
+      { label: "總題數", value: summary.total, helper: "本輪完成題數", tone: "slate" },
+      { label: "答對題數", value: summary.correct, helper: "答對的題目數", tone: "emerald" },
+      { label: "答對率", value: `${summary.correctRate}%`, helper: "本輪正確率", tone: "brand", featured: true },
+      { label: "答錯題數", value: summary.wrong, helper: "需要回顧的題目數", tone: "rose" }
+    ];
   }
-];
+
+  return [
+    {
+      label: "答對率",
+      value: `${summary.correctRate}%`,
+      helper: "表面成績",
+      tone: "slate"
+    },
+    {
+      label: "校準後掌握指數",
+      value: formatPercent(masteryAnalysis.calibratedMasteryPercent),
+      helper: "扣除猜對不穩與高信心錯誤後的掌握估計",
+      tone: "brand",
+      featured: true
+    },
+    {
+      label: "高信心錯誤率",
+      value: formatPercent(masteryAnalysis.highConfidenceErrorPercent),
+      helper: masteryAnalysis.counts[4].total === 0 ? "本次沒有信心 4 的題目" : "信心 4 題目中答錯的比例",
+      tone: "rose"
+    },
+    {
+      label: "猜對風險率",
+      value: formatPercent(masteryAnalysis.guessingRiskPercent),
+      helper: summary.correct === 0 ? "本次沒有答對題" : "答對題目中信心 1-2 的比例",
+      tone: "yellow"
+    }
+  ];
+};
 
 const toneClasses: Record<string, string> = {
   slate: "bg-slate-50 text-slate-800 ring-slate-200",

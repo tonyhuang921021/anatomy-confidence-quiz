@@ -19,6 +19,7 @@ import {
 } from "@/lib/questionTrackFilters";
 import {
   loadPracticeQuestionCount,
+  loadPracticeConfidenceCalibration,
   loadPracticeStopAfterReview,
   loadPracticeYearRange,
   saveQuizSettings,
@@ -27,6 +28,7 @@ import {
 } from "@/lib/storage";
 import {
   getPracticeQuestionCountPreference,
+  getPracticeConfidenceCalibrationPreference,
   getPracticeStopAfterReviewPreference,
   getPracticeYearRangePreference
 } from "@/lib/accountPreferences";
@@ -76,6 +78,7 @@ export default function StartPage() {
   const [practiceYearRange, setPracticeYearRange] = useState<PracticeYearRange>(defaultPracticeYearRange);
   const [practiceQuestionCount, setPracticeQuestionCount] = useState<PracticeQuestionCount>(10);
   const [practiceStopAfterReview, setPracticeStopAfterReview] = useState(false);
+  const [practiceConfidenceCalibration, setPracticeConfidenceCalibration] = useState(false);
   const excludeAiGenerated = true;
   const seasonalDeadline = new Date("2026-05-15T09:00:00+08:00");
   const seasonalAvailable = new Date() < seasonalDeadline;
@@ -93,8 +96,12 @@ export default function StartPage() {
     const nextStopAfterReview = user
       ? getPracticeStopAfterReviewPreference(user?.user_metadata, false)
       : loadPracticeStopAfterReview(false);
+    const nextConfidenceCalibration = user
+      ? getPracticeConfidenceCalibrationPreference(user?.user_metadata, false)
+      : loadPracticeConfidenceCalibration(false);
     setPracticeQuestionCount(nextCount);
     setPracticeStopAfterReview(nextStopAfterReview);
+    setPracticeConfidenceCalibration(nextConfidenceCalibration);
   }, [user?.id, user?.user_metadata]);
 
   const effectiveSelectedSubjects = useMemo(() => {
@@ -439,6 +446,7 @@ export default function StartPage() {
       subjectTracks: selectedSubjectTracks,
       excludeAiGenerated,
       excludePreviouslyAnswered: true,
+      enableConfidenceCalibration: practiceConfidenceCalibration,
       customQuestionIds: seasonalQuestionIds,
       strictCustomQuestionPool: false,
       customPoolLabel: hasMicrobiologyTrackFilter
@@ -535,6 +543,7 @@ export default function StartPage() {
             <span className="font-semibold text-ink">{availableQuestionCount}</span> 題
             ・優先不重複已做題
             {practiceStopAfterReview ? "・自由測驗・每題詳解後可結束" : `・每次抽 ${practiceQuestionCount} 題`}
+            {practiceConfidenceCalibration ? "・信心校準開啟" : ""}
           </p>
           <div className="flex flex-wrap gap-3">
             <button

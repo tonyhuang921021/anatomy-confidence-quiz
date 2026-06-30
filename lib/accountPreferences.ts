@@ -17,6 +17,7 @@ export type AccountPreferencePatch = {
   practice_question_count?: PracticeQuestionCount;
   practice_stop_after_review?: boolean;
   practice_fast_answer_mode?: boolean;
+  practice_confidence_calibration?: boolean;
 };
 
 export function getHomeToneModePreference(metadata: MetadataSource): HomeToneMode | null {
@@ -63,6 +64,12 @@ export function getPracticeFastAnswerModePreference(metadata: MetadataSource, de
     : defaultValue;
 }
 
+export function getPracticeConfidenceCalibrationPreference(metadata: MetadataSource, defaultValue = false) {
+  return typeof metadata?.practice_confidence_calibration === "boolean"
+    ? metadata.practice_confidence_calibration
+    : defaultValue;
+}
+
 export function hasPracticeQuestionCountPreference(metadata: MetadataSource) {
   return typeof metadata?.practice_question_count === "number";
 }
@@ -73,4 +80,8 @@ export function hasPracticeStopAfterReviewPreference(metadata: MetadataSource) {
 
 export function hasPracticeFastAnswerModePreference(metadata: MetadataSource) {
   return typeof metadata?.practice_fast_answer_mode === "boolean";
+}
+
+export function hasPracticeConfidenceCalibrationPreference(metadata: MetadataSource) {
+  return typeof metadata?.practice_confidence_calibration === "boolean";
 }

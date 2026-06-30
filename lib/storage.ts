@@ -24,6 +24,7 @@ const PRACTICE_YEAR_RANGE_KEY = "anatomy-confidence-practice-year-range";
 const PRACTICE_QUESTION_COUNT_KEY = "anatomy-confidence-practice-question-count";
 const PRACTICE_STOP_AFTER_REVIEW_KEY = "anatomy-confidence-practice-stop-after-review";
 const PRACTICE_FAST_ANSWER_MODE_KEY = "anatomy-confidence-practice-fast-answer-mode";
+const PRACTICE_CONFIDENCE_CALIBRATION_KEY = "anatomy-confidence-practice-confidence-calibration";
 const ACTIVE_USER_KEY = "anatomy-confidence-active-user-id";
 const GUEST_USER_ID = "guest";
 const completedSessionsMemoryCache = new Map<string, QuizSession[]>();
@@ -1343,6 +1344,20 @@ export function savePracticeFastAnswerMode(enabled: boolean) {
 export function loadPracticeFastAnswerMode(defaultValue = false) {
   if (!isBrowser()) return defaultValue;
   const raw = getLegacyOrScopedRaw(PRACTICE_FAST_ANSWER_MODE_KEY);
+  if (raw === "true") return true;
+  if (raw === "false") return false;
+  return defaultValue;
+}
+
+export function savePracticeConfidenceCalibration(enabled: boolean) {
+  if (!isBrowser()) return;
+  safeLocalStorageSetItem(getScopedKey(PRACTICE_CONFIDENCE_CALIBRATION_KEY), enabled ? "true" : "false");
+  window.dispatchEvent(new CustomEvent("practice-confidence-calibration-change", { detail: enabled }));
+}
+
+export function loadPracticeConfidenceCalibration(defaultValue = false) {
+  if (!isBrowser()) return defaultValue;
+  const raw = getLegacyOrScopedRaw(PRACTICE_CONFIDENCE_CALIBRATION_KEY);
   if (raw === "true") return true;
   if (raw === "false") return false;
   return defaultValue;

@@ -630,6 +630,7 @@ export const DEFAULT_QUIZ_SETTINGS: QuizSettings = {
   subjectFilter: "解剖學",
   excludeAiGenerated: true,
   excludePreviouslyAnswered: true,
+  enableConfidenceCalibration: false,
   feedbackMode: "full",
   paperMode: "random_set"
 };
