@@ -53,6 +53,11 @@ const QUICK_ENTRIES = [
 const HOME_RELEASE_NOTES = [
   {
     time: "06/30",
+    title: "AI 補弱改看題目本身",
+    body: "複製給 AI 的補弱 Prompt 不再餵題庫概念標籤，改用題幹、選項、正解與詳解線索推真正考點。"
+  },
+  {
+    time: "06/30",
     title: "巔峰賽先下架",
     body: "巔峰賽模式已從入口與後端移除，網站先回到散題、模擬考、自訂卷與錯題複習這幾條主線。"
   },

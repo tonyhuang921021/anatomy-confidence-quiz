@@ -5,6 +5,7 @@ import {
   CompletionStatsBundle,
   CompletionStatus,
   OverallCompletionStats,
+  OptionKey,
   Question,
   QuestionHistoryStats,
   QuizSession,
@@ -354,6 +355,50 @@ type GenerateAIPromptOptions = {
   detailLevel?: AIPromptDetailLevel;
 };
 
+const MEDICINE_ONE_SUBJECTS = new Set<SubjectName>([
+  "醫學（一）",
+  "解剖學",
+  "生理學",
+  "生物化學",
+  "胚胎學",
+  "組織學",
+  "細胞生物學",
+  "分子生物學",
+  "其他醫學一"
+]);
+
+const MEDICINE_TWO_SUBJECTS = new Set<SubjectName>([
+  "醫學（二）",
+  "微生物免疫學",
+  "藥理學",
+  "病理學",
+  "寄生蟲學",
+  "公共衛生學"
+]);
+
+function inferAIPromptSubjectLabel(subjects: SubjectName[]) {
+  if (subjects.length === 0) return "醫學（一）";
+  if (subjects.length === 1 && (subjects[0] === "醫學（一）" || subjects[0] === "醫學（二）")) {
+    return subjects[0];
+  }
+
+  const allMedicineOne = subjects.every((subject) => MEDICINE_ONE_SUBJECTS.has(subject));
+  const allMedicineTwo = subjects.every((subject) => MEDICINE_TWO_SUBJECTS.has(subject));
+  if (allMedicineOne && !allMedicineTwo) return "醫學（一）";
+  if (allMedicineTwo && !allMedicineOne) return "醫學（二）";
+  return "醫學（一）/醫學（二）";
+}
+
+function compactPromptText(value: string | undefined, maxLength: number) {
+  const normalized = (value ?? "").replace(/\s+/g, " ").trim();
+  if (!normalized) return "未提供";
+  return normalized.length > maxLength ? `${normalized.slice(0, maxLength)}...` : normalized;
+}
+
+function formatPromptOption(question: Question, optionKey: OptionKey) {
+  return `${optionKey}. ${compactPromptText(question.options[optionKey], 90)}`;
+}
+
 export function generateAIPrompt(
   attempts: Attempt[],
   questions: Question[],
@@ -374,9 +419,7 @@ export function generateAIPrompt(
       )
     );
 
-    if (subjects.length === 0) return "解剖學";
-    if (subjects.length === 1) return subjects[0];
-    return "醫學（一）";
+    return inferAIPromptSubjectLabel(subjects);
   })();
   const summary = calculateSummary(attempts, questions);
   const sectionStats = calculateSectionStats(attempts, questions);
@@ -384,12 +427,16 @@ export function generateAIPrompt(
   const completionStats = calculateCompletionStats(questions, allSessions);
   const lowCompletionSections = getLowCompletionSections(completionStats.sections, 5);
   const unstableSections = getUnstableCompletedSections(completionStats.sections, 5);
+  const targetAttempts = attempts.filter((attempt) => !attempt.isCorrect || attempt.confidence <= 3);
+  const attemptOrdinalMap = new Map(attempts.map((attempt, index) => [attempt.questionId, index + 1] as const));
 
-  const attemptLines = attempts.map((attempt, index) => {
+  const formatAttemptKnowledgeSignal = (attempt: Attempt) => {
     const question = questionMap.get(attempt.questionId);
+    const ordinal = attemptOrdinalMap.get(attempt.questionId) ?? "?";
     if (!question) {
       return [
-        `${index + 1}. 題號：${attempt.questionId}`,
+        `題序：${ordinal}`,
+        `題號：${attempt.questionId}`,
         "題目資料：暫時未載入",
         `我的答案：${attempt.selectedAnswer}`,
         `正確答案：${attempt.correctAnswer}`,
@@ -399,22 +446,50 @@ export function generateAIPrompt(
         `errorType：${attempt.errorType ?? "未填"}`
       ].join("｜");
     }
+
+    const selectedAnalysis = question.optionAnalysis?.[attempt.selectedAnswer];
+    const correctAnalysis = question.optionAnalysis?.[attempt.correctAnswer];
+    const optionAnalysisLine =
+      selectedAnalysis || correctAnalysis
+        ? `選項解析線索：我的答案 ${attempt.selectedAnswer}：${compactPromptText(selectedAnalysis, 110)}；正解 ${attempt.correctAnswer}：${compactPromptText(correctAnalysis, 110)}`
+        : "";
+
     return [
-      `${index + 1}. 題號：${question.id}`,
+      `題序：${ordinal}`,
+      `題號：${question.id}`,
       `來源：${question.sourceType ?? (question.source === "past-exam-inspired" ? "PAST_EXAM_STYLE" : question.source === "ai-generated" ? "AI_GENERATED" : "LOCAL_BANK")}`,
       `來源註記：${question.sourceCitation ?? "未提供"}`,
       `chapter：${question.chapter}`,
       `section：${question.section}`,
-      `testedConcept：${question.testedConcept}`,
-      `我的答案：${attempt.selectedAnswer}`,
-      `正確答案：${attempt.correctAnswer}`,
+      `題幹重點：${compactPromptText(question.stem, 180)}`,
+      `我的答案：${formatPromptOption(question, attempt.selectedAnswer)}`,
+      `正確答案：${formatPromptOption(question, attempt.correctAnswer)}`,
       `是否答對：${attempt.isCorrect ? "答對" : "答錯"}`,
       `confidence：${attempt.confidence}`,
       `信心文字：${getConfidenceLabel(attempt.confidence)}`,
       `errorType：${attempt.errorType ?? "未填"}`,
-      `explanation 摘要：${question.explanation}`
+      `詳解線索：${compactPromptText(question.explanation, 220)}`,
+      optionAnalysisLine
+    ].filter(Boolean).join("｜");
+  };
+
+  const formatAttemptSummaryLine = (attempt: Attempt, label: string) => {
+    const question = questionMap.get(attempt.questionId);
+    const ordinal = attemptOrdinalMap.get(attempt.questionId) ?? "?";
+    if (!question) return formatMissingQuestionAttempt(attempt, `題序 ${ordinal}｜${label}`);
+    return [
+      `${question.chapter} / ${question.section}`,
+      `題序 ${ordinal}`,
+      `題號 ${question.id}`,
+      label,
+      `題幹：${compactPromptText(question.stem, 110)}`,
+      `我的答案 ${formatPromptOption(question, attempt.selectedAnswer)}`,
+      `正解 ${formatPromptOption(question, attempt.correctAnswer)}`,
+      `詳解線索：${compactPromptText(question.explanation, 140)}`
     ].join("｜");
-  });
+  };
+
+  const targetAttemptLines = targetAttempts.map(formatAttemptKnowledgeSignal);
 
   const chapterLines = completionStats.chapters.map((chapter) => {
     return `${chapter.chapter}：completionRate ${chapter.completionRate}%｜masteryScore ${chapter.masteryScore}｜status ${chapter.status}`;
@@ -439,41 +514,31 @@ export function generateAIPrompt(
   const overconfidenceLines = attempts
     .filter((attempt) => !attempt.isCorrect && attempt.confidence >= 4)
     .map((attempt) => {
-      const question = questionMap.get(attempt.questionId);
-      if (!question) return formatMissingQuestionAttempt(attempt, "題目資料暫時未載入｜答錯但信心高");
-      return `${question.chapter} / ${question.section}｜${question.testedConcept}｜答錯但信心高（${attempt.confidence}）｜我的答案 ${attempt.selectedAnswer}｜正解 ${attempt.correctAnswer}`;
+      return formatAttemptSummaryLine(attempt, `答錯但信心高（${attempt.confidence}）`);
     })
     .filter(Boolean);
 
   const priorityWeaknessLines = attempts
     .filter((attempt) => !attempt.isCorrect && attempt.confidence <= 2)
     .map((attempt) => {
-      const question = questionMap.get(attempt.questionId);
-      if (!question) return formatMissingQuestionAttempt(attempt, "題目資料暫時未載入｜答錯且低信心");
-      return `${question.chapter} / ${question.section}｜${question.testedConcept}｜答錯且低信心（${attempt.confidence}）｜錯因 ${attempt.errorType ?? "未填"}`;
+      return `${formatAttemptSummaryLine(attempt, `答錯且低信心（${attempt.confidence}）`)}｜錯因 ${attempt.errorType ?? "未填"}`;
     })
     .filter(Boolean);
 
   const wrongLines = attempts
     .filter((attempt) => !attempt.isCorrect)
     .map((attempt) => {
-      const question = questionMap.get(attempt.questionId);
-      if (!question) return formatMissingQuestionAttempt(attempt, "題目資料暫時未載入｜答錯");
-      return `${question.chapter} / ${question.section}｜${question.testedConcept}｜信心 ${attempt.confidence}｜我的答案 ${attempt.selectedAnswer}｜正解 ${attempt.correctAnswer}｜錯因 ${attempt.errorType ?? "未填"}`;
+      return `${formatAttemptSummaryLine(attempt, `答錯｜信心 ${attempt.confidence}`)}｜錯因 ${attempt.errorType ?? "未填"}`;
     })
     .filter(Boolean);
 
   const lowConfidenceLines = attempts
     .filter((attempt) => attempt.confidence <= 3)
     .map((attempt) => {
-      const question = questionMap.get(attempt.questionId);
-      if (!question) {
-        return formatMissingQuestionAttempt(
-          attempt,
-          `題目資料暫時未載入｜${attempt.isCorrect ? "答對但沒信心" : "答錯且沒信心"}`
-        );
-      }
-      return `${question.chapter} / ${question.section}｜${question.testedConcept}｜${attempt.isCorrect ? "答對但沒信心" : "答錯且沒信心"}（${attempt.confidence}）｜我的答案 ${attempt.selectedAnswer}｜正解 ${attempt.correctAnswer}`;
+      return formatAttemptSummaryLine(
+        attempt,
+        `${attempt.isCorrect ? "答對但沒信心" : "答錯且沒信心"}（${attempt.confidence}）`
+      );
     })
     .filter(Boolean);
 
@@ -491,7 +556,12 @@ export function generateAIPrompt(
     ).length;
 
     let scope = "單一知識點";
-    let scopeInstruction = "請只補最直接的 testedConcept，外加 1 個最容易混淆的相鄰考點。";
+    const relatedQuestionRefs = relatedAttempts
+      .slice(0, 8)
+      .map((attempt) => `題序 ${attemptOrdinalMap.get(attempt.questionId) ?? "?"}`)
+      .join("、");
+
+    let scopeInstruction = "請先從題幹、正解與錯選推論最直接的真實考點，再外加 1 個最容易混淆的相鄰考點。";
 
     if (lowestConfidence === 1 || lowConfidenceWrongCount >= 2) {
       scope = "整個相關段落";
@@ -500,25 +570,27 @@ export function generateAIPrompt(
     } else if (lowestConfidence === 2) {
       scope = "相關考點群";
       scopeInstruction =
-        "請以 testedConcept 為核心，延伸到同一 section 最常一起考的相關考點群，但不要擴張到整個章節。";
+        "請先推論這些題真正共同在考什麼，再延伸到同一 section 最常一起考的相關考點群，但不要擴張到整個章節。";
     } else if (lowestConfidence === 3) {
       scope = "單一知識點加相鄰考點";
       scopeInstruction =
         "請聚焦在這題對應知識點，並補 1 到 2 個最常一起混淆的相鄰考點。";
     }
 
-    return `${section.chapter} / ${section.section}｜建議補強層級：${scope}｜最低信心 ${lowestConfidence}｜低信心答錯 ${lowConfidenceWrongCount} 題｜補法：${scopeInstruction}`;
+    return `${section.chapter} / ${section.section}｜關聯題：${relatedQuestionRefs || "目前沒有資料"}｜建議補強層級：${scope}｜最低信心 ${lowestConfidence}｜低信心答錯 ${lowConfidenceWrongCount} 題｜補法：${scopeInstruction}`;
   });
 
   if (detailLevel === "concise") {
     return `以下是我的${subjectLabel}醫師國考測驗紀錄。請你做「簡略版弱點補強」，只處理答錯題與低信心題，不要稱讚、不要人格分析、不要讀書計畫。
 
 回答規則：
-1. 請把相近 testedConcept 或同一 section 的錯題合併成一組，但每組最多 6 行。
-2. 每組請用：為什麼錯、30 秒核心觀念、最常混淆點、下次判斷口訣。
-3. 如果只是低信心但答對，請用 1 到 2 行補穩，不要展開成整章。
-4. 不要重貼題目全文；需要引用時只列題號與 testedConcept。
-5. 請用台灣醫學生準備醫師國考一階的語氣與深度回答，直接開始。
+1. 不要依賴或引用題庫原本的概念標籤；那些標籤可能是錯的。請以題幹、選項文字、我的答案、正確答案、詳解線索、chapter/section 來自行判斷真實考點。
+2. 請把同一 section、共同鑑別診斷、共同機轉、共同藥物/病原/病理變化的題目合併成一組，但每組最多 6 行。
+3. 每組請用：題序/題號、真實考點、為什麼錯、30 秒核心觀念、最常混淆點、下次判斷口訣。
+4. 如果資料看起來互相矛盾，請相信題幹、選項、正解與詳解線索，不要相信概念標籤。
+5. 不要重貼題目全文；需要引用時只列題序、題號和你自行推論出的真實考點。
+6. 如果只是低信心但答對，請用 1 到 2 行補穩，不要展開成整章。
+7. 請用台灣醫學生準備醫師國考一階的語氣與深度回答，直接開始。
 
 本輪統計：
 總題數：${summary.total}
@@ -541,8 +613,8 @@ ${lowConfidenceLines.join("\n") || "目前沒有資料"}
 依信心程度建議的補強範圍：
 ${confidenceScopedWeaknessLines.join("\n") || "目前沒有資料"}
 
-本輪作答紀錄摘要：
-${attemptLines.join("\n")}
+答錯與低信心題的判讀資料：
+${targetAttemptLines.join("\n") || "目前沒有資料"}
 
 請直接輸出簡略版弱點補強。`;
   }
@@ -551,15 +623,16 @@ ${attemptLines.join("\n")}
 
 回答規則：
 1. 必須覆蓋我所有答錯題，以及所有低信心題（confidence <= 3），不能漏掉任何一題。
-2. 請先把所有答錯題依同 chapter、同 section、相近 testedConcept、共同鑑別診斷或共同機轉自動分組；同一組不要逐題碎念，要串成一段「整個區塊複習」，像正在幫我補這塊觀念。
-3. 不要先寫整體表現總結，直接從需要補的題目或觀念開始講。
-4. 每一組輸出的補強範圍要依我的信心程度決定：
-   - 如果建議補強層級是「單一知識點」，就只補那個 testedConcept，不要擴寫太多。
+2. 不要依賴或引用題庫原本的概念標籤；那些標籤可能是錯的。請以題幹、選項文字、我的答案、正確答案、詳解線索、chapter/section 來自行判斷真實考點。
+3. 請先把所有答錯題依同 chapter、同 section、共同鑑別診斷、共同機轉、共同藥物/病原/病理變化自動分組；同一組不要逐題碎念，要串成一段「整個區塊複習」，像正在幫我補這塊觀念。
+4. 不要先寫整體表現總結，直接從需要補的題目或觀念開始講。
+5. 每一組輸出的補強範圍要依我的信心程度決定：
+   - 如果建議補強層級是「單一知識點」，就只補你從題幹、選項與正解推論出的真實考點，不要擴寫太多。
    - 如果建議補強層級是「單一知識點加相鄰考點」，就補核心知識點外加 1 到 2 個常混淆考點。
    - 如果建議補強層級是「相關考點群」，就補同一 section 常一起考的考點群，但不要講整個章節。
    - 如果建議補強層級是「整個相關段落」，就從基礎架構開始補到該段落的高頻觀念與陷阱。
-5. 每一組只回答以下內容：
-   - 本組包含哪些題號與 testedConcept
+6. 每一組只回答以下內容：
+   - 本組包含哪些題序/題號，以及你自行推論出的真實考點
    - 為什麼這些錯題其實在考同一串觀念
    - 這個區塊的完整複習講解
    - 30 秒核心觀念
@@ -568,12 +641,13 @@ ${attemptLines.join("\n")}
    - 容易混淆比較表
    - 快速記憶法
    - 3 題立即小測驗（附答案）
-6. 如果我有錯誤自信，請特別指出我觀念錯在哪裡。
-7. 如果我有低信心答錯，請用更基礎、可快速重建的方式教。
-8. 如果我有低信心但答對的題，請一起補講，因為代表我會做但不穩。
-9. 你可以依照「所有錯題」與「所有低信心題」整理成有條理的段落，但不要只挑前幾個 section 來講。
-10. 不要另外安排鼓勵、讀書計畫、人格分析、整體優缺點、稱讚或與弱點無關的延伸內容。
-11. 請用台灣醫學生準備醫師國考一階的語氣與深度回答，重點放在知識本身，越精準越好。
+7. 如果我有錯誤自信，請特別指出我觀念錯在哪裡。
+8. 如果我有低信心答錯，請用更基礎、可快速重建的方式教。
+9. 如果我有低信心但答對的題，請一起補講，因為代表我會做但不穩。
+10. 你可以依照「所有錯題」與「所有低信心題」整理成有條理的段落，但不要只挑前幾個 section 來講。
+11. 如果資料看起來互相矛盾，請相信題幹、選項、正解與詳解線索，不要相信概念標籤。
+12. 不要另外安排鼓勵、讀書計畫、人格分析、整體優缺點、稱讚或與弱點無關的延伸內容。
+13. 請用台灣醫學生準備醫師國考一階的語氣與深度回答，重點放在知識本身，越精準越好。
 
 以下是本輪整體統計：
 總題數：${summary.total}
@@ -584,8 +658,8 @@ ${attemptLines.join("\n")}
 猜對風險數：${summary.guessRiskCount}
 優先補弱數：${summary.priorityWeaknessCount}
 
-以下是本輪作答紀錄：
-${attemptLines.join("\n")}
+以下是答錯與低信心題的判讀資料：
+${targetAttemptLines.join("\n") || "目前沒有資料"}
 
 以下是所有答錯題：
 ${wrongLines.join("\n") || "目前沒有資料"}
