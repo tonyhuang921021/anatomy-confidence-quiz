@@ -107145,12 +107145,12 @@ export const moexMed1Questions100to115 = [
     "anatomy_region": "",
     "stem": "下列有關輔因子參與酶催化之含碳原子團轉移反應的敘述，何者錯誤？",
     "options": {
-      "A": "Tetrahydrofolate 可參與不同氧化態的一個碳轉移，如 CH -, CH OH-, and CHO- 3 2",
+      "A": "Tetrahydrofolate 可參與不同氧化態的一個碳轉移，如 CH3-、CH2OH-、CHO-",
       "B": "S-adenosylmethionine（adoMet）由 ATP 和 methionine 合成，參與甲基（methyl group）轉移",
       "C": "Biotin 與 cysteine 結合，參與 pyruvate carboxylase 催化 pyruvate 的 carboxylation，形成 oxaloacetate",
       "D": "Thiamine pyrophosphate（TPP）參與 pyruvate dehydrogenase 反應，促使 pyruvate 形成 acetyl-CoA"
     },
-    "option_A": "Tetrahydrofolate 可參與不同氧化態的一個碳轉移，如 CH -, CH OH-, and CHO- 3 2",
+    "option_A": "Tetrahydrofolate 可參與不同氧化態的一個碳轉移，如 CH3-、CH2OH-、CHO-",
     "option_B": "S-adenosylmethionine（adoMet）由 ATP 和 methionine 合成，參與甲基（methyl group）轉移",
     "option_C": "Biotin 與 cysteine 結合，參與 pyruvate carboxylase 催化 pyruvate 的 carboxylation，形成 oxaloacetate",
     "option_D": "Thiamine pyrophosphate（TPP）參與 pyruvate dehydrogenase 反應，促使 pyruvate 形成 acetyl-CoA",
