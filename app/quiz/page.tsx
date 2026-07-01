@@ -576,9 +576,15 @@ function getExpectedSimulationQuestionCount(
 
 export default function QuizPage() {
   const router = useRouter();
-  const { session: authSession } = useAuth();
+  const {
+    session: authSession,
+    loading: authLoading,
+    syncStatus,
+    syncVersion
+  } = useAuth();
   const questionTopRef = useRef<HTMLDivElement | null>(null);
   const contentTopRef = useRef<HTMLDivElement | null>(null);
+  const initializedSessionRef = useRef(false);
   const completedSessionIdsRef = useRef(new Set<string>());
   const deferredCurrentSessionSaveRef = useRef<number | null>(null);
   const deferredCurrentSessionRef = useRef<QuizSession | null>(null);
@@ -678,6 +684,13 @@ export default function QuizPage() {
   }, []);
 
   useEffect(() => {
+    if (initializedSessionRef.current) return;
+    if (authLoading) return;
+    if (authSession?.user?.id && syncStatus !== "ready" && syncStatus !== "error") return;
+
+    initializedSessionRef.current = true;
+    let cancelled = false;
+
     async function initializeSession() {
       try {
         setLoadIssue("");
@@ -786,6 +799,8 @@ export default function QuizPage() {
           }
         }
 
+        if (cancelled) return;
+
         setSession(nextSession);
         saveCurrentSession(nextSession);
         void pushCurrentSessionToSupabase(nextSession);
@@ -805,17 +820,24 @@ export default function QuizPage() {
           resetQuestionUI();
         }
       } catch {
+        initializedSessionRef.current = false;
+        if (cancelled) return;
         clearCurrentSession();
         setSession(null);
         setLoadIssue("題目載入時遇到本機狀態錯誤，請重新開始測驗。");
         resetQuestionUI();
       } finally {
-        setMounted(true);
+        if (!cancelled) {
+          setMounted(true);
+        }
       }
     }
 
     void initializeSession();
-  }, []);
+    return () => {
+      cancelled = true;
+    };
+  }, [authLoading, authSession?.user?.id, syncStatus, syncVersion]);
 
   useEffect(() => {
     setExplanationOverrides(loadQuestionExplanationOverrides());
@@ -937,7 +959,7 @@ export default function QuizPage() {
   const targetCount =
     session?.settings?.mode === "simulation"
       ? questionSet.length
-      : session?.settings?.questionCount ?? questionSet.length;
+      : Math.max(questionSet.length, session?.settings?.questionCount ?? questionSet.length);
   const progress =
     targetCount === 0 ? 0 : ((currentIndex + (submittedAttempt ? 1 : 0)) / targetCount) * 100;
   const answeredCount = session?.attempts.length ?? 0;
