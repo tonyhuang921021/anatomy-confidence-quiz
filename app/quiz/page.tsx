@@ -1799,9 +1799,6 @@ export default function QuizPage() {
                   ) : null}
                   {shouldShowExplanation ? (
                     <>
-                      <p>
-                        testedConcept：<span className="font-semibold">{currentQuestion.testedConcept}</span>
-                      </p>
                       {shouldShowAiExplanationDetails ? (
                         <StructuredExplanationText text={currentQuestion.explanation} label="整題詳解" compact />
                       ) : null}

@@ -362,10 +362,6 @@ export default function SavedQuestionsPage() {
                         ? "本題一律給分"
                         : selectedItem.question.answer}
                   </p>
-                  <p>
-                    <span className="font-semibold">考點：</span>
-                    {selectedItem.question.testedConcept}
-                  </p>
                   <StructuredExplanationText text={selectedItem.question.explanation} label="詳解" compact />
                   <QuestionExplanationTabs question={selectedItem.question} compact className="mt-3" />
                   {selectedItem.question.memoryTip ? (

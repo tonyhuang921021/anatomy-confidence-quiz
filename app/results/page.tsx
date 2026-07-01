@@ -1768,13 +1768,11 @@ function ResultsPageContent() {
   function renderAttemptReviewDetails({
     attempt,
     question,
-    optionKeySuffix,
-    showTestedConcept = false
+    optionKeySuffix
   }: {
     attempt: Attempt;
     question: Question;
     optionKeySuffix: string;
-    showTestedConcept?: boolean;
   }) {
     const masteryLabel =
       masteryReviewItemMap.get(attempt.questionId)?.categoryLabel ??
@@ -1838,12 +1836,6 @@ function ResultsPageContent() {
             <span className={`ml-1 rounded-full px-2.5 py-1 text-xs font-bold ring-1 ${getMasteryBadgeClass(masteryLabel)}`}>
               {masteryLabel}
             </span>
-          </p>
-        ) : null}
-        {showTestedConcept ? (
-          <p>
-            <span className="font-semibold">testedConcept：</span>
-            {question.testedConcept}
           </p>
         ) : null}
         {confidenceTrackingEnabled ? (
@@ -2390,8 +2382,7 @@ function ResultsPageContent() {
                       ? renderAttemptReviewDetails({
                           attempt,
                           question,
-                          optionKeySuffix: "all",
-                          showTestedConcept: true
+                          optionKeySuffix: "all"
                         })
                       : null}
                   </details>

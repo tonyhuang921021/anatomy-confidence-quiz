@@ -53,6 +53,11 @@ const QUICK_ENTRIES = [
 const HOME_RELEASE_NOTES = [
   {
     time: "07/01",
+    title: "詳解少一個雜訊",
+    body: "每題詳解不再顯示題庫內部的 testedConcept 標籤，畫面會直接進入答案、解析與選項說明。"
+  },
+  {
+    time: "07/01",
     title: "信心度總覽可下載",
     body: "模擬考結果頁的信心度總覽新增截圖按鈕，可以直接下載乾淨版圖片，方便存起來或分享。"
   },

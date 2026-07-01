@@ -770,10 +770,6 @@ export default function SearchPage() {
                   <span className="font-semibold">章節：</span>
                   {renderedQuestion.chapter} / {renderedQuestion.section}
                 </p>
-                <p>
-                  <span className="font-semibold">考點：</span>
-                  {renderedQuestion.testedConcept}
-                </p>
                 <StructuredExplanationText text={renderedQuestion.explanation} label="詳解" compact />
                 <QuestionExplanationTabs question={renderedQuestion} compact className="mt-3" />
                 {renderedQuestion.optionAnalysis ? (
