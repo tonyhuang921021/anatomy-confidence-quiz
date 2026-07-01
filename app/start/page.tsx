@@ -5,7 +5,8 @@ import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/components/AuthProvider";
 import { enabledSubjects, MED1_SUBJECTS, MED2_SUBJECTS } from "@/data/subjectRegistry";
-import { getSeasonalLimitedQuestions } from "@/data/med1QuestionBank";
+import { getQuestionBankBySubjects, getSeasonalLimitedQuestions } from "@/data/med1QuestionBank";
+import { loadConfirmedQuestionClassificationOverrides } from "@/lib/cloudSync";
 import { DEFAULT_QUIZ_SETTINGS } from "@/lib/quizAnalysis";
 import {
   getAllSubjectTrackKeys,
@@ -33,7 +34,7 @@ import {
 } from "@/lib/accountPreferences";
 import { MAX_PRACTICE_SOURCE_YEAR, MIN_PRACTICE_SOURCE_YEAR, normalizePracticeYearRange } from "@/lib/practiceYears";
 import { buildNewQuizHref } from "@/lib/startSettingsUrl";
-import type { Question, QuizSettings, SubjectName } from "@/types/quiz";
+import type { Question, QuestionClassificationOverride, QuizSettings, SubjectName } from "@/types/quiz";
 
 const selectableSubjects = enabledSubjects.filter(
   (item) =>
@@ -78,6 +79,7 @@ export default function StartPage() {
   const [practiceQuestionCount, setPracticeQuestionCount] = useState<PracticeQuestionCount>(10);
   const [practiceStopAfterReview, setPracticeStopAfterReview] = useState(false);
   const [attemptedQuestionIds, setAttemptedQuestionIds] = useState<Set<string>>(() => new Set());
+  const [classificationOverrides, setClassificationOverrides] = useState<Record<string, QuestionClassificationOverride>>({});
   const excludeAiGenerated = true;
   const seasonalDeadline = new Date("2026-05-15T09:00:00+08:00");
   const seasonalAvailable = new Date() < seasonalDeadline;
@@ -121,6 +123,25 @@ export default function StartPage() {
     setPracticeStopAfterReview(nextStopAfterReview);
   }, [user?.id, user?.user_metadata]);
 
+  useEffect(() => {
+    let cancelled = false;
+
+    async function refreshClassificationOverrides() {
+      try {
+        const overrides = await loadConfirmedQuestionClassificationOverrides();
+        if (!cancelled) setClassificationOverrides(overrides);
+      } catch {
+        if (!cancelled) setClassificationOverrides({});
+      }
+    }
+
+    void refreshClassificationOverrides();
+
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
   const effectiveSelectedSubjects = useMemo(() => {
     const baseSubjects = selectedSubjects.filter((subject) => subject !== MICROBIOLOGY_SUBJECT);
 
@@ -132,18 +153,20 @@ export default function StartPage() {
   const selectedSubjectQuestionPool = useMemo(() => {
     if (effectiveSelectedSubjects.length === 0) return [];
 
-    return selectableSubjects
-      .filter((item) => effectiveSelectedSubjects.includes(item.subject))
-      .flatMap((item) => {
-        if (item.subject === MICROBIOLOGY_SUBJECT && selectedMicrobiologyTracks.length > 0) {
-          return item.questions.filter((question) =>
-            questionMatchesSubjectTracks(question, MICROBIOLOGY_SUBJECT, selectedMicrobiologyTracks)
-          );
-        }
+    const runtimeSubjectQuestions = getQuestionBankBySubjects(
+      effectiveSelectedSubjects,
+      classificationOverrides
+    );
 
-        return item.questions;
-      });
-  }, [effectiveSelectedSubjects, selectedMicrobiologyTracks]);
+    if (selectedMicrobiologyTracks.length === 0 || !effectiveSelectedSubjects.includes(MICROBIOLOGY_SUBJECT)) {
+      return runtimeSubjectQuestions;
+    }
+
+    return runtimeSubjectQuestions.filter((question) => {
+      if (question.subject !== MICROBIOLOGY_SUBJECT) return true;
+      return questionMatchesSubjectTracks(question, MICROBIOLOGY_SUBJECT, selectedMicrobiologyTracks);
+    });
+  }, [classificationOverrides, effectiveSelectedSubjects, selectedMicrobiologyTracks]);
 
   const availableQuestions = useMemo(() => {
     const filteredSubjectQuestions = selectedSubjectQuestionPool.filter((question) => {
