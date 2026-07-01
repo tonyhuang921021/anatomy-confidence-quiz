@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { Suspense, useEffect, useMemo, useState } from "react";
+import { Suspense, useEffect, useMemo, useRef, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useAuth } from "@/components/AuthProvider";
 import { CopyQuestionPromptButton } from "@/components/CopyQuestionPromptButton";
@@ -401,6 +401,78 @@ function getConfidenceOverviewLabel(confidence: number) {
   return `信心 ${Math.min(Math.max(Math.round(confidence), 1), 4)}`;
 }
 
+function copyComputedStyles(source: Element, target: Element) {
+  const computed = window.getComputedStyle(source);
+  const cssText = Array.from(computed)
+    .map((propertyName) => `${propertyName}:${computed.getPropertyValue(propertyName)};`)
+    .join("");
+  const inlineStyle = target.getAttribute("style") ?? "";
+  target.setAttribute("style", `${cssText}${inlineStyle ? `;${inlineStyle}` : ""}`);
+
+  Array.from(source.children).forEach((sourceChild, index) => {
+    const targetChild = target.children.item(index);
+    if (targetChild) {
+      copyComputedStyles(sourceChild, targetChild);
+    }
+  });
+}
+
+async function downloadElementAsPng(element: HTMLElement, filename: string) {
+  const rect = element.getBoundingClientRect();
+  const width = Math.ceil(rect.width);
+  const height = Math.ceil(rect.height);
+  if (width <= 0 || height <= 0) return;
+
+  const clone = element.cloneNode(true) as HTMLElement;
+  copyComputedStyles(element, clone);
+  clone
+    .querySelectorAll("[data-confidence-overview-download-button]")
+    .forEach((node) => node.remove());
+  clone.setAttribute("xmlns", "http://www.w3.org/1999/xhtml");
+  clone.style.width = `${width}px`;
+  clone.style.minHeight = `${height}px`;
+  clone.style.margin = "0";
+
+  const serialized = new XMLSerializer().serializeToString(clone);
+  const svg = [
+    `<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}" viewBox="0 0 ${width} ${height}">`,
+    `<foreignObject width="100%" height="100%">${serialized}</foreignObject>`,
+    "</svg>"
+  ].join("");
+  const svgUrl = URL.createObjectURL(new Blob([svg], { type: "image/svg+xml;charset=utf-8" }));
+
+  try {
+    const image = new Image();
+    image.decoding = "async";
+    await new Promise<void>((resolve, reject) => {
+      image.onload = () => resolve();
+      image.onerror = () => reject(new Error("信心度總覽截圖產生失敗"));
+      image.src = svgUrl;
+    });
+
+    const scale = Math.min(3, Math.max(2, window.devicePixelRatio || 2));
+    const canvas = document.createElement("canvas");
+    canvas.width = Math.ceil(width * scale);
+    canvas.height = Math.ceil(height * scale);
+    const context = canvas.getContext("2d");
+    if (!context) throw new Error("瀏覽器不支援圖片輸出");
+    context.scale(scale, scale);
+    context.fillStyle = "#ffffff";
+    context.fillRect(0, 0, width, height);
+    context.drawImage(image, 0, 0, width, height);
+
+    const pngUrl = canvas.toDataURL("image/png");
+    const link = document.createElement("a");
+    link.href = pngUrl;
+    link.download = filename;
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+  } finally {
+    URL.revokeObjectURL(svgUrl);
+  }
+}
+
 function getMasteryToneClass(tone: string) {
   if (tone === "emerald") return "border-emerald-200 bg-emerald-50 text-emerald-950";
   if (tone === "sky") return "border-sky-200 bg-sky-50 text-sky-950";
@@ -467,6 +539,7 @@ function ResultsPageContent() {
   const [classificationOverrides, setClassificationOverrides] = useState<Record<string, QuestionClassificationOverride>>({});
   const [communityStatsMap, setCommunityStatsMap] = useState<Record<string, QuestionCommunityStats>>({});
   const [copyPromptNotice, setCopyPromptNotice] = useState(false);
+  const [confidenceOverviewDownloadNotice, setConfidenceOverviewDownloadNotice] = useState(false);
   const [aiPromptDetailLevel, setAiPromptDetailLevel] = useState<"concise" | "detailed">("detailed");
   const [isFullscreenReview, setIsFullscreenReview] = useState(false);
   const [isFullscreenReviewVisible, setIsFullscreenReviewVisible] = useState(false);
@@ -481,6 +554,7 @@ function ResultsPageContent() {
   const [sessionNameNotice, setSessionNameNotice] = useState("");
   const [resultRecordNotice, setResultRecordNotice] = useState("");
   const [isSavingSessionName, setIsSavingSessionName] = useState(false);
+  const confidenceOverviewRef = useRef<HTMLElement | null>(null);
   const [state, setState] = useState<ResultState>({
     session: null,
     sessions: [],
@@ -529,6 +603,22 @@ function ResultsPageContent() {
       window.setTimeout(() => setCopyPromptNotice(false), 1800);
     } catch {
       setCopyPromptNotice(false);
+    }
+  }
+
+  async function handleDownloadConfidenceOverview() {
+    const element = confidenceOverviewRef.current;
+    if (!element || !state.session) return;
+
+    try {
+      await downloadElementAsPng(
+        element,
+        `confidence-overview-${getCanonicalSessionId(state.session.id)}.png`
+      );
+      setConfidenceOverviewDownloadNotice(true);
+      window.setTimeout(() => setConfidenceOverviewDownloadNotice(false), 1800);
+    } catch {
+      setConfidenceOverviewDownloadNotice(false);
     }
   }
 
@@ -1926,7 +2016,7 @@ function ResultsPageContent() {
 
   function renderConfidenceOverviewSection() {
     return (
-      <section className="rounded-[2rem] bg-white p-4 shadow-card ring-1 ring-slate-100 sm:p-6">
+      <section ref={confidenceOverviewRef} className="rounded-[2rem] bg-white p-4 shadow-card ring-1 ring-slate-100 sm:p-6">
         <div className="flex flex-wrap items-start justify-between gap-3">
           <div>
             <h2 className="text-xl font-semibold text-ink">信心度總覽</h2>
@@ -1937,20 +2027,30 @@ function ResultsPageContent() {
           </span>
         </div>
 
-        <div className="mt-4 flex flex-wrap gap-2 text-[11px] font-bold">
-          {[
-            { label: "1", value: 1 },
-            { label: "2", value: 2 },
-            { label: "3", value: 3 },
-            { label: "4", value: 4 }
-          ].map((confidenceValue) => (
-            <span
-              key={confidenceValue.label}
-              className={`inline-flex h-7 min-w-7 items-center justify-center rounded-lg border px-2 shadow-sm ${getConfidenceTileClass(confidenceValue.value)}`}
-            >
-              {confidenceValue.label}
-            </span>
-          ))}
+        <div className="mt-4 flex flex-wrap items-center justify-between gap-2">
+          <div className="flex flex-wrap gap-2 text-[11px] font-bold">
+            {[
+              { label: "1", value: 1 },
+              { label: "2", value: 2 },
+              { label: "3", value: 3 },
+              { label: "4", value: 4 }
+            ].map((confidenceValue) => (
+              <span
+                key={confidenceValue.label}
+                className={`inline-flex h-7 min-w-7 items-center justify-center rounded-lg border px-2 shadow-sm ${getConfidenceTileClass(confidenceValue.value)}`}
+              >
+                {confidenceValue.label}
+              </span>
+            ))}
+          </div>
+          <button
+            type="button"
+            onClick={() => void handleDownloadConfidenceOverview()}
+            data-confidence-overview-download-button
+            className="inline-flex min-h-9 items-center justify-center rounded-full bg-slate-900 px-3 py-2 text-xs font-semibold text-white shadow-sm transition hover:bg-slate-950 focus:outline-none focus:ring-2 focus:ring-slate-400"
+          >
+            截圖
+          </button>
         </div>
 
         <div className="mt-4 grid grid-cols-5 gap-2">
@@ -2341,6 +2441,13 @@ function ResultsPageContent() {
         <div className="pointer-events-none fixed inset-0 z-50 flex items-center justify-center px-6">
           <div className="rounded-2xl bg-slate-950 px-5 py-3 text-base font-semibold text-white shadow-2xl ring-1 ring-white/10">
             已經複製，可以貼進自己的 AI
+          </div>
+        </div>
+      ) : null}
+      {confidenceOverviewDownloadNotice ? (
+        <div className="pointer-events-none fixed inset-0 z-50 flex items-center justify-center px-6">
+          <div className="rounded-2xl bg-slate-950 px-5 py-3 text-base font-semibold text-white shadow-2xl ring-1 ring-white/10">
+            已下載信心度總覽
           </div>
         </div>
       ) : null}
