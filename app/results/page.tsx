@@ -428,14 +428,33 @@ async function downloadElementAsPng(element: HTMLElement, filename: string) {
   clone
     .querySelectorAll("[data-confidence-overview-download-button]")
     .forEach((node) => node.remove());
+  clone
+    .querySelectorAll<HTMLElement>("[data-confidence-overview-export-only]")
+    .forEach((node) => {
+      node.style.display = node.dataset.exportDisplay || "block";
+      node.style.visibility = "visible";
+    });
   clone.setAttribute("xmlns", "http://www.w3.org/1999/xhtml");
   clone.style.width = `${width}px`;
-  clone.style.minHeight = `${height}px`;
   clone.style.margin = "0";
 
+  const measureRoot = document.createElement("div");
+  measureRoot.style.position = "fixed";
+  measureRoot.style.left = "-10000px";
+  measureRoot.style.top = "0";
+  measureRoot.style.width = `${width}px`;
+  measureRoot.style.pointerEvents = "none";
+  measureRoot.style.opacity = "0";
+  measureRoot.appendChild(clone);
+  document.body.appendChild(measureRoot);
+
+  const exportWidth = Math.ceil(clone.getBoundingClientRect().width || width);
+  const exportHeight = Math.ceil(clone.getBoundingClientRect().height || height);
+
   const serialized = new XMLSerializer().serializeToString(clone);
+  measureRoot.remove();
   const svg = [
-    `<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}" viewBox="0 0 ${width} ${height}">`,
+    `<svg xmlns="http://www.w3.org/2000/svg" width="${exportWidth}" height="${exportHeight}" viewBox="0 0 ${exportWidth} ${exportHeight}">`,
     `<foreignObject width="100%" height="100%">${serialized}</foreignObject>`,
     "</svg>"
   ].join("");
@@ -452,14 +471,14 @@ async function downloadElementAsPng(element: HTMLElement, filename: string) {
 
     const scale = Math.min(3, Math.max(2, window.devicePixelRatio || 2));
     const canvas = document.createElement("canvas");
-    canvas.width = Math.ceil(width * scale);
-    canvas.height = Math.ceil(height * scale);
+    canvas.width = Math.ceil(exportWidth * scale);
+    canvas.height = Math.ceil(exportHeight * scale);
     const context = canvas.getContext("2d");
     if (!context) throw new Error("瀏覽器不支援圖片輸出");
     context.scale(scale, scale);
     context.fillStyle = "#ffffff";
-    context.fillRect(0, 0, width, height);
-    context.drawImage(image, 0, 0, width, height);
+    context.fillRect(0, 0, exportWidth, exportHeight);
+    context.drawImage(image, 0, 0, exportWidth, exportHeight);
 
     const pngUrl = canvas.toDataURL("image/png");
     const link = document.createElement("a");
@@ -2015,10 +2034,21 @@ function ResultsPageContent() {
   }
 
   function renderConfidenceOverviewSection() {
+    const exportSessionName = state.session ? getSessionDisplayName(state.session) : "模擬考結果";
+    const exportCorrectCount =
+      state.summary?.correct ?? confidenceOverviewItems.filter(({ attempt }) => attempt.isCorrect).length;
+
     return (
       <section ref={confidenceOverviewRef} className="rounded-[2rem] bg-white p-4 shadow-card ring-1 ring-slate-100 sm:p-6">
         <div className="flex flex-wrap items-start justify-between gap-3">
           <div>
+            <p
+              data-confidence-overview-export-only
+              data-export-display="block"
+              className="hidden text-[11px] font-black tracking-[0.16em] text-slate-500"
+            >
+              {exportSessionName}
+            </p>
             <h2 className="text-xl font-semibold text-ink">信心度總覽</h2>
             <p className="mt-2 text-sm text-slate-500">依正式題號排列，色塊代表信心 1-4。</p>
           </div>
@@ -2043,6 +2073,13 @@ function ResultsPageContent() {
               </span>
             ))}
           </div>
+          <span
+            data-confidence-overview-export-only
+            data-export-display="inline-flex"
+            className="hidden min-h-9 items-center justify-center rounded-full bg-slate-100 px-3 py-2 text-xs font-black text-slate-800 ring-1 ring-slate-200"
+          >
+            答對 {exportCorrectCount}/100
+          </span>
           <button
             type="button"
             onClick={() => void handleDownloadConfidenceOverview()}
