@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { Suspense, useEffect, useMemo, useRef, useState } from "react";
+import { Suspense, useEffect, useMemo, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useAuth } from "@/components/AuthProvider";
 import { CopyQuestionPromptButton } from "@/components/CopyQuestionPromptButton";
@@ -401,95 +401,221 @@ function getConfidenceOverviewLabel(confidence: number) {
   return `信心 ${Math.min(Math.max(Math.round(confidence), 1), 4)}`;
 }
 
-function copyComputedStyles(source: Element, target: Element) {
-  const computed = window.getComputedStyle(source);
-  const cssText = Array.from(computed)
-    .map((propertyName) => `${propertyName}:${computed.getPropertyValue(propertyName)};`)
-    .join("");
-  const inlineStyle = target.getAttribute("style") ?? "";
-  target.setAttribute("style", `${cssText}${inlineStyle ? `;${inlineStyle}` : ""}`);
+type ConfidenceOverviewExportItem = {
+  questionNumber: number;
+  confidence: number;
+  isCorrect: boolean;
+};
 
-  Array.from(source.children).forEach((sourceChild, index) => {
-    const targetChild = target.children.item(index);
-    if (targetChild) {
-      copyComputedStyles(sourceChild, targetChild);
-    }
-  });
+function getConfidenceOverviewExportTone(confidence: number) {
+  if (confidence <= 1) {
+    return { fill: "#f43f5e", stroke: "#fecdd3", text: "#ffffff", shadow: "#fecdd3" };
+  }
+  if (confidence === 2) {
+    return { fill: "#fb923c", stroke: "#fed7aa", text: "#ffffff", shadow: "#fed7aa" };
+  }
+  if (confidence === 3) {
+    return { fill: "#fde047", stroke: "#fde68a", text: "#0f172a", shadow: "#fde68a" };
+  }
+  return { fill: "#dcfce7", stroke: "#a7f3d0", text: "#052e2b", shadow: "#a7f3d0" };
 }
 
-async function downloadElementAsPng(element: HTMLElement, filename: string) {
-  const rect = element.getBoundingClientRect();
-  const width = Math.ceil(rect.width);
-  const height = Math.ceil(rect.height);
-  if (width <= 0 || height <= 0) return;
+function drawRoundedRect(
+  context: CanvasRenderingContext2D,
+  x: number,
+  y: number,
+  width: number,
+  height: number,
+  radius: number
+) {
+  const safeRadius = Math.min(radius, width / 2, height / 2);
+  context.beginPath();
+  context.moveTo(x + safeRadius, y);
+  context.arcTo(x + width, y, x + width, y + height, safeRadius);
+  context.arcTo(x + width, y + height, x, y + height, safeRadius);
+  context.arcTo(x, y + height, x, y, safeRadius);
+  context.arcTo(x, y, x + width, y, safeRadius);
+  context.closePath();
+}
 
-  const clone = element.cloneNode(true) as HTMLElement;
-  copyComputedStyles(element, clone);
-  clone
-    .querySelectorAll("[data-confidence-overview-download-button]")
-    .forEach((node) => node.remove());
-  clone
-    .querySelectorAll<HTMLElement>("[data-confidence-overview-export-only]")
-    .forEach((node) => {
-      node.style.display = node.dataset.exportDisplay || "block";
-      node.style.visibility = "visible";
-    });
-  clone.setAttribute("xmlns", "http://www.w3.org/1999/xhtml");
-  clone.style.width = `${width}px`;
-  clone.style.margin = "0";
-
-  const measureRoot = document.createElement("div");
-  measureRoot.style.position = "fixed";
-  measureRoot.style.left = "-10000px";
-  measureRoot.style.top = "0";
-  measureRoot.style.width = `${width}px`;
-  measureRoot.style.pointerEvents = "none";
-  measureRoot.style.opacity = "0";
-  measureRoot.appendChild(clone);
-  document.body.appendChild(measureRoot);
-
-  const exportWidth = Math.ceil(clone.getBoundingClientRect().width || width);
-  const exportHeight = Math.ceil(clone.getBoundingClientRect().height || height);
-
-  const serialized = new XMLSerializer().serializeToString(clone);
-  measureRoot.remove();
-  const svg = [
-    `<svg xmlns="http://www.w3.org/2000/svg" width="${exportWidth}" height="${exportHeight}" viewBox="0 0 ${exportWidth} ${exportHeight}">`,
-    `<foreignObject width="100%" height="100%">${serialized}</foreignObject>`,
-    "</svg>"
-  ].join("");
-  const svgUrl = URL.createObjectURL(new Blob([svg], { type: "image/svg+xml;charset=utf-8" }));
-
-  try {
-    const image = new Image();
-    image.decoding = "async";
-    await new Promise<void>((resolve, reject) => {
-      image.onload = () => resolve();
-      image.onerror = () => reject(new Error("信心度總覽截圖產生失敗"));
-      image.src = svgUrl;
-    });
-
-    const scale = Math.min(3, Math.max(2, window.devicePixelRatio || 2));
-    const canvas = document.createElement("canvas");
-    canvas.width = Math.ceil(exportWidth * scale);
-    canvas.height = Math.ceil(exportHeight * scale);
-    const context = canvas.getContext("2d");
-    if (!context) throw new Error("瀏覽器不支援圖片輸出");
-    context.scale(scale, scale);
-    context.fillStyle = "#ffffff";
-    context.fillRect(0, 0, exportWidth, exportHeight);
-    context.drawImage(image, 0, 0, exportWidth, exportHeight);
-
-    const pngUrl = canvas.toDataURL("image/png");
-    const link = document.createElement("a");
-    link.href = pngUrl;
-    link.download = filename;
-    document.body.appendChild(link);
-    link.click();
-    link.remove();
-  } finally {
-    URL.revokeObjectURL(svgUrl);
+function drawTextEllipsis(
+  context: CanvasRenderingContext2D,
+  text: string,
+  x: number,
+  y: number,
+  maxWidth: number
+) {
+  if (context.measureText(text).width <= maxWidth) {
+    context.fillText(text, x, y);
+    return;
   }
+
+  let nextText = text;
+  while (nextText.length > 0 && context.measureText(`${nextText}...`).width > maxWidth) {
+    nextText = nextText.slice(0, -1);
+  }
+  context.fillText(`${nextText}...`, x, y);
+}
+
+function triggerPngDownload(canvas: HTMLCanvasElement, filename: string) {
+  const pngUrl = canvas.toDataURL("image/png");
+  const link = document.createElement("a");
+  link.href = pngUrl;
+  link.download = filename;
+  link.target = "_blank";
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+}
+
+function getConfidenceOverviewExportWidth() {
+  if (typeof window === "undefined") return 420;
+
+  const viewportWidth = window.innerWidth || 420;
+  if (viewportWidth < 480) return Math.max(320, viewportWidth - 28);
+  if (viewportWidth < 768) return Math.min(520, viewportWidth - 48);
+  return 420;
+}
+
+function downloadConfidenceOverviewAsPng({
+  width,
+  filename,
+  sessionName,
+  correctCount,
+  totalCount,
+  items
+}: {
+  width: number;
+  filename: string;
+  sessionName: string;
+  correctCount: number;
+  totalCount: number;
+  items: ConfidenceOverviewExportItem[];
+}) {
+  const logicalWidth = Math.max(320, Math.min(720, Math.ceil(width || 420)));
+  const padding = logicalWidth < 420 ? 22 : 28;
+  const contentWidth = logicalWidth - padding * 2;
+  const gridGap = Math.max(8, Math.min(16, Math.floor(contentWidth * 0.035)));
+  const tileSize = Math.floor((contentWidth - gridGap * 4) / 5);
+  const rowCount = Math.max(1, Math.ceil(items.length / 5));
+  const gridTop = padding + 138;
+  const logicalHeight = gridTop + rowCount * tileSize + Math.max(0, rowCount - 1) * gridGap + padding;
+  const scale = Math.min(3, Math.max(2, window.devicePixelRatio || 2));
+
+  const canvas = document.createElement("canvas");
+  canvas.width = Math.ceil(logicalWidth * scale);
+  canvas.height = Math.ceil(logicalHeight * scale);
+  const context = canvas.getContext("2d");
+  if (!context) throw new Error("瀏覽器不支援圖片輸出");
+  context.scale(scale, scale);
+
+  context.fillStyle = "#ffffff";
+  context.fillRect(0, 0, logicalWidth, logicalHeight);
+  context.save();
+  context.shadowColor = "rgba(15, 23, 42, 0.08)";
+  context.shadowBlur = 18;
+  context.shadowOffsetY = 8;
+  drawRoundedRect(context, 0, 0, logicalWidth, logicalHeight, 32);
+  context.fillStyle = "#ffffff";
+  context.fill();
+  context.restore();
+
+  context.font = "900 11px system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif";
+  context.fillStyle = "#64748b";
+  drawTextEllipsis(context, sessionName, padding, padding + 10, contentWidth - 86);
+
+  context.font = "800 28px system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif";
+  context.fillStyle = "#062c22";
+  context.fillText("信心度總覽", padding, padding + 46);
+
+  const countPillWidth = 74;
+  drawRoundedRect(context, logicalWidth - padding - countPillWidth, padding + 18, countPillWidth, 32, 16);
+  context.fillStyle = "#f1f5f9";
+  context.fill();
+  context.font = "800 14px system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif";
+  context.fillStyle = "#334155";
+  context.textAlign = "center";
+  context.fillText(`${totalCount} 題`, logicalWidth - padding - countPillWidth / 2, padding + 39);
+  context.textAlign = "left";
+
+  context.font = "700 15px system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif";
+  context.fillStyle = "#64748b";
+  context.fillText("依正式題號排列，色塊代表信心 1-4。", padding, padding + 76);
+
+  const legendTop = padding + 98;
+  [1, 2, 3, 4].forEach((confidence, index) => {
+    const tone = getConfidenceOverviewExportTone(confidence);
+    const x = padding + index * 36;
+    context.save();
+    context.shadowColor = tone.shadow;
+    context.shadowBlur = 5;
+    drawRoundedRect(context, x, legendTop, 28, 28, 8);
+    context.fillStyle = tone.fill;
+    context.fill();
+    context.strokeStyle = tone.stroke;
+    context.lineWidth = 2;
+    context.stroke();
+    context.restore();
+
+    context.font = "900 13px system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif";
+    context.fillStyle = tone.text;
+    context.textAlign = "center";
+    context.fillText(String(confidence), x + 14, legendTop + 19);
+    context.textAlign = "left";
+  });
+
+  const scoreText = `答對 ${correctCount}/${totalCount || 100}`;
+  context.font = "900 13px system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif";
+  const scoreWidth = Math.ceil(context.measureText(scoreText).width) + 28;
+  const scoreX = logicalWidth - padding - scoreWidth;
+  drawRoundedRect(context, scoreX, legendTop - 2, scoreWidth, 32, 16);
+  context.fillStyle = "#f1f5f9";
+  context.fill();
+  context.strokeStyle = "#e2e8f0";
+  context.lineWidth = 1;
+  context.stroke();
+  context.fillStyle = "#1e293b";
+  context.fillText(scoreText, scoreX + 14, legendTop + 19);
+
+  items.forEach((item, index) => {
+    const row = Math.floor(index / 5);
+    const column = index % 5;
+    const x = padding + column * (tileSize + gridGap);
+    const y = gridTop + row * (tileSize + gridGap);
+    const tone = getConfidenceOverviewExportTone(item.confidence);
+
+    context.save();
+    context.shadowColor = tone.shadow;
+    context.shadowBlur = 5;
+    context.shadowOffsetY = 2;
+    drawRoundedRect(context, x, y, tileSize, tileSize, Math.max(14, tileSize * 0.2));
+    context.fillStyle = tone.fill;
+    context.fill();
+    context.strokeStyle = tone.stroke;
+    context.lineWidth = Math.max(2, tileSize * 0.04);
+    context.stroke();
+    context.restore();
+
+    const badgeText = item.isCorrect ? "對" : "錯";
+    const badgeWidth = Math.max(25, tileSize * 0.34);
+    const badgeHeight = Math.max(18, tileSize * 0.23);
+    const badgeX = x + tileSize - badgeWidth - 8;
+    const badgeY = y + 7;
+    drawRoundedRect(context, badgeX, badgeY, badgeWidth, badgeHeight, badgeHeight / 2);
+    context.fillStyle = "rgba(255, 255, 255, 0.9)";
+    context.fill();
+    context.font = `900 ${Math.max(11, Math.floor(tileSize * 0.16))}px system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif`;
+    context.fillStyle = item.isCorrect ? "#047857" : "#be123c";
+    context.textAlign = "center";
+    context.fillText(badgeText, badgeX + badgeWidth / 2, badgeY + badgeHeight * 0.7);
+
+    context.font = `900 ${Math.max(18, Math.floor(tileSize * 0.33))}px system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif`;
+    context.fillStyle = tone.text;
+    context.fillText(String(item.questionNumber), x + tileSize / 2, y + tileSize * 0.64);
+    context.textAlign = "left";
+  });
+
+  triggerPngDownload(canvas, filename);
 }
 
 function getMasteryToneClass(tone: string) {
@@ -573,7 +699,6 @@ function ResultsPageContent() {
   const [sessionNameNotice, setSessionNameNotice] = useState("");
   const [resultRecordNotice, setResultRecordNotice] = useState("");
   const [isSavingSessionName, setIsSavingSessionName] = useState(false);
-  const confidenceOverviewRef = useRef<HTMLElement | null>(null);
   const [state, setState] = useState<ResultState>({
     session: null,
     sessions: [],
@@ -625,15 +750,24 @@ function ResultsPageContent() {
     }
   }
 
-  async function handleDownloadConfidenceOverview() {
-    const element = confidenceOverviewRef.current;
-    if (!element || !state.session) return;
+  function handleDownloadConfidenceOverview() {
+    if (!state.session || confidenceOverviewItems.length === 0) return;
 
     try {
-      await downloadElementAsPng(
-        element,
-        `confidence-overview-${getCanonicalSessionId(state.session.id)}.png`
-      );
+      downloadConfidenceOverviewAsPng({
+        width: getConfidenceOverviewExportWidth(),
+        filename: `confidence-overview-${getCanonicalSessionId(state.session.id)}.png`,
+        sessionName: getSessionDisplayName(state.session),
+        correctCount:
+          state.summary?.correct ??
+          confidenceOverviewItems.filter(({ attempt }) => attempt.isCorrect).length,
+        totalCount: confidenceOverviewItems.length || 100,
+        items: confidenceOverviewItems.map(({ attempt, questionNumber }) => ({
+          questionNumber,
+          confidence: Number.isFinite(attempt.confidence) ? attempt.confidence : 4,
+          isCorrect: attempt.isCorrect
+        }))
+      });
       setConfidenceOverviewDownloadNotice(true);
       window.setTimeout(() => setConfidenceOverviewDownloadNotice(false), 1800);
     } catch {
@@ -2034,21 +2168,10 @@ function ResultsPageContent() {
   }
 
   function renderConfidenceOverviewSection() {
-    const exportSessionName = state.session ? getSessionDisplayName(state.session) : "模擬考結果";
-    const exportCorrectCount =
-      state.summary?.correct ?? confidenceOverviewItems.filter(({ attempt }) => attempt.isCorrect).length;
-
     return (
-      <section ref={confidenceOverviewRef} className="rounded-[2rem] bg-white p-4 shadow-card ring-1 ring-slate-100 sm:p-6">
+      <section className="rounded-[2rem] bg-white p-4 shadow-card ring-1 ring-slate-100 sm:p-6">
         <div className="flex flex-wrap items-start justify-between gap-3">
           <div>
-            <p
-              data-confidence-overview-export-only
-              data-export-display="block"
-              className="hidden text-[11px] font-black tracking-[0.16em] text-slate-500"
-            >
-              {exportSessionName}
-            </p>
             <h2 className="text-xl font-semibold text-ink">信心度總覽</h2>
             <p className="mt-2 text-sm text-slate-500">依正式題號排列，色塊代表信心 1-4。</p>
           </div>
@@ -2073,17 +2196,9 @@ function ResultsPageContent() {
               </span>
             ))}
           </div>
-          <span
-            data-confidence-overview-export-only
-            data-export-display="inline-flex"
-            className="hidden min-h-9 items-center justify-center rounded-full bg-slate-100 px-3 py-2 text-xs font-black text-slate-800 ring-1 ring-slate-200"
-          >
-            答對 {exportCorrectCount}/100
-          </span>
           <button
             type="button"
             onClick={() => void handleDownloadConfidenceOverview()}
-            data-confidence-overview-download-button
             className="inline-flex min-h-9 items-center justify-center rounded-full bg-slate-900 px-3 py-2 text-xs font-semibold text-white shadow-sm transition hover:bg-slate-950 focus:outline-none focus:ring-2 focus:ring-slate-400"
           >
             截圖
