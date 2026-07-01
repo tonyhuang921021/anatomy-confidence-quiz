@@ -2306,23 +2306,49 @@ export async function updateLeaderboardDisplayName(
   writeLeaderboardProfileSyncMarker(user.id);
 }
 
-export async function loadLeaderboard(limit = 50, options: { signal?: AbortSignal } = {}) {
+type LeaderboardLoadResult = {
+  leaderboard: LeaderboardEntry[];
+  currentUserEntry: LeaderboardEntry | null;
+};
+
+export async function loadLeaderboardResult(
+  limit = 50,
+  options: { signal?: AbortSignal; currentUserId?: string } = {}
+): Promise<LeaderboardLoadResult> {
   if (isSupabaseRecoveryMode() || !isSupabaseConfigured()) {
-    return [] as LeaderboardEntry[];
+    return { leaderboard: [], currentUserEntry: null };
   }
 
-  const response = await fetch(`/api/leaderboard?limit=${encodeURIComponent(String(limit))}`, {
+  const params = new URLSearchParams({ limit: String(limit) });
+  if (options.currentUserId) {
+    params.set("currentUserId", options.currentUserId);
+  }
+
+  const response = await fetch(`/api/leaderboard?${params.toString()}`, {
     signal: options.signal
   });
   const payload = (await response.json().catch(() => null)) as
-    | { ok?: boolean; message?: string; leaderboard?: LeaderboardEntry[] }
+    | {
+        ok?: boolean;
+        message?: string;
+        leaderboard?: LeaderboardEntry[];
+        currentUserEntry?: LeaderboardEntry | null;
+      }
     | null;
 
   if (!response.ok || !payload?.ok || !payload.leaderboard) {
     throw new Error(payload?.message || "刷題榜載入失敗");
   }
 
-  return payload.leaderboard;
+  return {
+    leaderboard: payload.leaderboard,
+    currentUserEntry: payload.currentUserEntry ?? null
+  };
+}
+
+export async function loadLeaderboard(limit = 50, options: { signal?: AbortSignal } = {}) {
+  const result = await loadLeaderboardResult(limit, options);
+  return result.leaderboard;
 }
 
 const BACKGROUND_STATS_LOOKUP_CHUNK_SIZE = 100;

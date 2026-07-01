@@ -4,14 +4,25 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { LeaderboardTable } from "@/components/LeaderboardTable";
 import { useAuth } from "@/components/AuthProvider";
-import { loadLeaderboard } from "@/lib/cloudSync";
+import { loadLeaderboardResult } from "@/lib/cloudSync";
 import { LeaderboardEntry } from "@/types/quiz";
 
 const LEADERBOARD_LOAD_TIMEOUT_MS = 5000;
 
+function formatUpdatedAt(value?: string) {
+  if (!value) return "尚未同步";
+  return new Date(value).toLocaleString("zh-TW", {
+    month: "2-digit",
+    day: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit"
+  });
+}
+
 export default function LeaderboardPage() {
   const { configured, user, syncVersion } = useAuth();
   const [entries, setEntries] = useState<LeaderboardEntry[]>([]);
+  const [currentUserEntry, setCurrentUserEntry] = useState<LeaderboardEntry | null>(null);
   const [sortMode, setSortMode] = useState<"attempts" | "accuracy">("attempts");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -27,6 +38,7 @@ export default function LeaderboardPage() {
     async function fetchLeaderboard() {
       if (!configured) {
         setEntries([]);
+        setCurrentUserEntry(null);
         setLoading(false);
         window.clearTimeout(timeoutId);
         return;
@@ -35,9 +47,13 @@ export default function LeaderboardPage() {
       try {
         setLoading(true);
         setError("");
-        const data = await loadLeaderboard(50, { signal: controller.signal });
+        const data = await loadLeaderboardResult(50, {
+          signal: controller.signal,
+          currentUserId: user?.id
+        });
         if (!isActive) return;
-        setEntries(data);
+        setEntries(data.leaderboard);
+        setCurrentUserEntry(data.currentUserEntry);
       } catch (fetchError) {
         if (!isActive) return;
         const isAbortError =
@@ -65,7 +81,7 @@ export default function LeaderboardPage() {
       window.clearTimeout(timeoutId);
       controller.abort();
     };
-  }, [configured, reloadKey, syncVersion]);
+  }, [configured, reloadKey, syncVersion, user?.id]);
 
   const sortedEntries = [...entries].sort((a, b) => {
     if (sortMode === "accuracy") {
@@ -82,6 +98,9 @@ export default function LeaderboardPage() {
       b.correctAttempts - a.correctAttempts
     );
   });
+  const shouldShowCurrentUserCard =
+    Boolean(currentUserEntry && user?.id === currentUserEntry.userId) &&
+    !sortedEntries.some((entry) => entry.userId === currentUserEntry?.userId);
 
   return (
     <main className="shell">
@@ -167,6 +186,36 @@ export default function LeaderboardPage() {
                 </button>
               </div>
             </section>
+
+            {shouldShowCurrentUserCard && currentUserEntry ? (
+              <section className="rounded-[2rem] border border-brand-100 bg-brand-50/70 p-6 shadow-card">
+                <div className="flex flex-wrap items-start justify-between gap-4">
+                  <div>
+                    <p className="text-sm font-semibold text-brand-700">你的刷題榜紀錄</p>
+                    <h2 className="mt-2 text-2xl font-bold text-ink">
+                      目前第 {currentUserEntry.rankPosition ?? "?"} 名
+                    </h2>
+                    <p className="mt-2 text-sm leading-6 text-slate-600">
+                      已經有計入刷題榜；只是列表先顯示前 50 名，所以這裡單獨補上你的名次。
+                    </p>
+                  </div>
+                  <div className="rounded-2xl bg-white px-4 py-3 text-sm font-semibold text-brand-800 ring-1 ring-brand-100">
+                    最近同步：{formatUpdatedAt(currentUserEntry.updatedAt)}
+                  </div>
+                </div>
+                <div className="mt-4 grid gap-3 sm:grid-cols-3">
+                  <p className="rounded-2xl bg-white px-4 py-3 text-sm text-slate-700">
+                    總答題量 <span className="font-semibold">{currentUserEntry.totalAttempts}</span>
+                  </p>
+                  <p className="rounded-2xl bg-white px-4 py-3 text-sm text-slate-700">
+                    正確率 <span className="font-semibold">{currentUserEntry.correctRate}%</span>
+                  </p>
+                  <p className="rounded-2xl bg-white px-4 py-3 text-sm text-slate-700">
+                    完成場次 <span className="font-semibold">{currentUserEntry.totalSessions}</span>
+                  </p>
+                </div>
+              </section>
+            ) : null}
 
             <LeaderboardTable
               entries={sortedEntries}

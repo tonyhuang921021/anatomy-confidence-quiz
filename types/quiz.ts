@@ -106,6 +106,7 @@ export type QuizSettings = {
   subjectTracks?: Partial<Record<SubjectName, string[]>>;
   excludeAiGenerated?: boolean;
   excludePreviouslyAnswered?: boolean;
+  priorityQuestionIds?: string[];
   customQuestionIds?: string[];
   customQuestionPayload?: Question[];
   customPoolLabel?: string;
@@ -330,6 +331,7 @@ export type LeaderboardEntry = {
   correctAttempts: number;
   correctRate: number;
   totalSessions: number;
+  rankPosition?: number;
   updatedAt?: string;
 };
 

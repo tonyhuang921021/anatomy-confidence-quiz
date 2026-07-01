@@ -951,6 +951,28 @@ function getRepeatAwarePool(
   return [...unseen, ...seenByOldestFirst];
 }
 
+function getPriorityFreshQuestionIds(
+  questions: Question[],
+  allSessions: { attempts: Attempt[] }[],
+  settings: QuizSettings
+) {
+  if (!settings.excludePreviouslyAnswered) return [];
+  if (settings.mode !== "random" && settings.mode !== "weakness") return [];
+
+  const priorityQuestionIds = settings.priorityQuestionIds ?? [];
+  if (priorityQuestionIds.length === 0) return [];
+
+  const questionMap = new Map(questions.map((question) => [question.id, question] as const));
+  const historyMap = buildQuestionHistoryMap(allSessions);
+  const seenPriorityIds = new Set<string>();
+
+  return priorityQuestionIds.filter((id) => {
+    if (seenPriorityIds.has(id)) return false;
+    seenPriorityIds.add(id);
+    return questionMap.has(id) && !historyMap.has(id);
+  });
+}
+
 function diversifyBySection<T extends { question: Question; score: number }>(
   items: T[],
   count: number,
@@ -1107,6 +1129,20 @@ export function createQuestionOrder(
   const sourceQuestionMap = new Map(sourcePool.map((question) => [question.id, question] as const));
 
   if (settings.mode === "random") {
+    const priorityFreshIds = getPriorityFreshQuestionIds(sourcePool, allSessions, settings).slice(0, count);
+    if (priorityFreshIds.length > 0) {
+      const priorityFreshIdSet = new Set(priorityFreshIds);
+      const remainingIds = getPrioritizedFreshPool(
+        repeatAwarePool.filter((question) => !priorityFreshIdSet.has(question.id)),
+        allSessions
+      ).map((question) => question.id);
+
+      return keepFollowUpQuestionsTogether(
+        [...priorityFreshIds, ...remainingIds].slice(0, count),
+        sourceQuestionMap
+      );
+    }
+
     return keepFollowUpQuestionsTogether(
       getPrioritizedFreshPool(repeatAwarePool, allSessions)
       .slice(0, count)

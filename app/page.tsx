@@ -53,6 +53,11 @@ const QUICK_ENTRIES = [
 const HOME_RELEASE_NOTES = [
   {
     time: "07/01",
+    title: "快收尾的科目更會收尾",
+    body: "散題快刷完時，開始頁看到的未做題會優先帶進下一回；刷題榜也會補上自己的名次，不會因為不在前 50 就像沒同步。"
+  },
+  {
+    time: "07/01",
     title: "詳解少一個雜訊",
     body: "每題詳解不再顯示題庫內部的 testedConcept 標籤，畫面會直接進入答案、解析與選項說明。"
   },

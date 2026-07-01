@@ -182,13 +182,14 @@ export default function StartPage() {
     selectedSubjectQuestionPool
   ]);
   const availableQuestionCount = availableQuestions.size;
-  const unattemptedAvailableQuestionCount = useMemo(() => {
-    let count = 0;
+  const unattemptedAvailableQuestionIds = useMemo(() => {
+    const ids: string[] = [];
     availableQuestions.forEach((questionId) => {
-      if (!attemptedQuestionIds.has(questionId)) count += 1;
+      if (!attemptedQuestionIds.has(questionId)) ids.push(questionId);
     });
-    return count;
+    return ids;
   }, [attemptedQuestionIds, availableQuestions]);
+  const unattemptedAvailableQuestionCount = unattemptedAvailableQuestionIds.length;
   const effectiveQuestionCount = practiceStopAfterReview
     ? availableQuestionCount
     : Math.min(practiceQuestionCount, availableQuestionCount);
@@ -460,6 +461,10 @@ export default function StartPage() {
           .filter((question) => !excludeAiGenerated || question.sourceType !== "AI_GENERATED")
           .map((question) => question.id)
       : undefined;
+    const priorityQuestionIds =
+      unattemptedAvailableQuestionIds.length > 0 && unattemptedAvailableQuestionIds.length <= 80
+        ? unattemptedAvailableQuestionIds
+        : undefined;
 
     const nextSettings: QuizSettings = {
       ...DEFAULT_QUIZ_SETTINGS,
@@ -474,6 +479,7 @@ export default function StartPage() {
       subjectTracks: selectedSubjectTracks,
       excludeAiGenerated,
       excludePreviouslyAnswered: true,
+      priorityQuestionIds,
       enableConfidenceCalibration: false,
       customQuestionIds: seasonalQuestionIds,
       strictCustomQuestionPool: false,

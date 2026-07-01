@@ -76,3 +76,37 @@ test("弱點補強快完成時，也要先抓未做題再用舊題補滿", () =>
     assert.ok(order.includes(id), `${id} should be included before old questions fill the round`);
   }
 });
+
+test("開始頁帶入剩餘未做題時，散題要優先照這批題目往前排", () => {
+  const questions = Array.from({ length: 30 }, (_, index) => makeQuestion(`q-${index + 1}`));
+  const attemptedIds = questions.slice(0, 22).map((question) => question.id);
+  const priorityQuestionIds = ["q-30", "q-29", "q-28", "q-27", "q-26", "q-25", "q-24", "q-23"];
+  const order = createQuestionOrder(
+    questions,
+    [{ attempts: attemptedIds.map(makeAttempt) }],
+    {
+      ...baseSettings,
+      priorityQuestionIds
+    }
+  );
+
+  assert.deepEqual(order.slice(0, priorityQuestionIds.length), priorityQuestionIds);
+});
+
+test("剩餘未做題已在上一回答過後，不會再被 priority 當作未做題排入", () => {
+  const questions = Array.from({ length: 30 }, (_, index) => makeQuestion(`q-${index + 1}`));
+  const attemptedIds = questions.slice(0, 22).map((question) => question.id);
+  const justAnsweredId = "q-30";
+  const priorityQuestionIds = ["q-30", "q-29", "q-28", "q-27", "q-26", "q-25", "q-24", "q-23"];
+  const order = createQuestionOrder(
+    questions,
+    [{ attempts: [...attemptedIds, justAnsweredId].map(makeAttempt) }],
+    {
+      ...baseSettings,
+      priorityQuestionIds
+    }
+  );
+
+  assert.equal(order.includes(justAnsweredId), false);
+  assert.deepEqual(order.slice(0, priorityQuestionIds.length - 1), priorityQuestionIds.slice(1));
+});
