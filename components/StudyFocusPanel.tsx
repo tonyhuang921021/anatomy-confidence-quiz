@@ -121,7 +121,7 @@ export function StudyFocusPanel({ stats, reviewItems }: StudyFocusPanelProps) {
         </section>
 
         <section className="rounded-[2rem] bg-white p-6 shadow-card ring-1 ring-slate-100">
-          <h2 className="text-xl font-semibold text-ink">已完成但不穩</h2>
+          <h2 className="text-xl font-semibold text-ink">練過但不穩</h2>
           <div className="mt-4 grid gap-3">
             {unstable.length === 0 ? (
               <p className="rounded-2xl bg-slate-50 p-4 text-sm text-slate-600">

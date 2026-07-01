@@ -1,14 +1,11 @@
-import { ChapterCompletionStats, CompletionStatus } from "@/types/quiz";
+import {
+  completionStatusClasses,
+  getCompletionStatusLabel
+} from "@/lib/completionStatusDisplay";
+import { ChapterCompletionStats } from "@/types/quiz";
 
 type ChapterCompletionCardProps = {
   chapter: ChapterCompletionStats;
-};
-
-const statusClasses: Record<CompletionStatus, string> = {
-  未開始: "bg-slate-100 text-slate-700",
-  進行中: "bg-sky-100 text-sky-800",
-  已完成但不穩: "bg-amber-100 text-amber-900",
-  已完成且穩定: "bg-emerald-100 text-emerald-800"
 };
 
 export function ChapterCompletionCard({ chapter }: ChapterCompletionCardProps) {
@@ -21,8 +18,8 @@ export function ChapterCompletionCard({ chapter }: ChapterCompletionCardProps) {
             完成度 {chapter.completionRate}% ・ 掌握度 {chapter.masteryScore}
           </p>
         </div>
-        <span className={`rounded-full px-3 py-1 text-xs font-semibold ${statusClasses[chapter.status]}`}>
-          {chapter.status}
+        <span className={`rounded-full px-3 py-1 text-xs font-semibold ${completionStatusClasses[chapter.status]}`}>
+          {getCompletionStatusLabel(chapter.status)}
         </span>
       </div>
       <div className="mt-4 h-3 overflow-hidden rounded-full bg-white">

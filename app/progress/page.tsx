@@ -3,9 +3,17 @@
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import { useAuth } from "@/components/AuthProvider";
-import { enabledSubjects, MED1_SUBJECTS, MED2_SUBJECTS, subjectRegistry } from "@/data/subjectRegistry";
-import { loadCompletedSessions } from "@/lib/storage";
-import type { Attempt, CompletionStatus, QuizSession, SubjectName } from "@/types/quiz";
+import { MED1_SUBJECTS, MED2_SUBJECTS, subjectRegistry } from "@/data/subjectRegistry";
+import {
+  completionStatusClasses,
+  getCompletionStatusLabel
+} from "@/lib/completionStatusDisplay";
+import { loadCompletedHistorySessionsForUser } from "@/lib/storage";
+import type { Attempt, CompletionStatus, SubjectName } from "@/types/quiz";
+
+type ProgressHistorySession = {
+  attempts: Attempt[];
+};
 
 type SectionProgress = {
   chapter: string;
@@ -50,15 +58,12 @@ type GroupProgress = {
   subjects: SubjectProgress[];
 };
 
-const statusClasses: Record<CompletionStatus, string> = {
-  未開始: "bg-slate-100 text-slate-700",
-  進行中: "bg-sky-100 text-sky-800",
-  已完成但不穩: "bg-amber-100 text-amber-900",
-  已完成且穩定: "bg-emerald-100 text-emerald-800"
-};
-
 function round(value: number) {
   return Math.round(value * 10) / 10;
+}
+
+function getRemainingQuestions(item: { totalQuestionsInBank: number; attemptedQuestions: number }) {
+  return Math.max(0, item.totalQuestionsInBank - item.attemptedQuestions);
 }
 
 function getStatus(completionRate: number, masteryScore: number): CompletionStatus {
@@ -121,7 +126,7 @@ function calculateSectionProgress(
   };
 }
 
-function calculateSubjectProgress(subject: SubjectName, sessions: QuizSession[]): SubjectProgress {
+function calculateSubjectProgress(subject: SubjectName, sessions: ProgressHistorySession[]): SubjectProgress {
   const subjectItem = subjectRegistry[subject];
   const trackableQuestions = subjectItem.questions.filter((question) => question.sourceType !== "AI_GENERATED");
   const questionMap = new Map(trackableQuestions.map((question) => [question.id, question] as const));
@@ -212,13 +217,25 @@ function aggregateGroup(
 }
 
 export default function ProgressPage() {
-  const { syncVersion } = useAuth();
-  const [sessions, setSessions] = useState<QuizSession[]>([]);
+  const { user, syncVersion } = useAuth();
+  const [sessions, setSessions] = useState<ProgressHistorySession[]>([]);
   const [openGroups, setOpenGroups] = useState<Record<string, boolean>>({ med1: true, med2: true });
 
   useEffect(() => {
-    setSessions(loadCompletedSessions());
-  }, [syncVersion]);
+    const refreshSessions = () => {
+      setSessions(loadCompletedHistorySessionsForUser(user?.id));
+    };
+
+    refreshSessions();
+    window.addEventListener("completed-sessions-change", refreshSessions);
+    window.addEventListener("completed-question-history-change", refreshSessions);
+    window.addEventListener("storage", refreshSessions);
+    return () => {
+      window.removeEventListener("completed-sessions-change", refreshSessions);
+      window.removeEventListener("completed-question-history-change", refreshSessions);
+      window.removeEventListener("storage", refreshSessions);
+    };
+  }, [syncVersion, user?.id]);
 
   const med1Progress = useMemo(
     () => MED1_SUBJECTS.map((subject) => calculateSubjectProgress(subject, sessions)).filter((subject) => subject.totalQuestionsInBank > 0),
@@ -286,8 +303,8 @@ export default function ProgressPage() {
                   <p className="mt-2 text-3xl font-bold text-ink">{group.completionRate}%</p>
                   <p className="mt-2 text-sm text-slate-600">{group.description}</p>
                 </div>
-                <span className={`rounded-full px-3 py-1 text-xs font-semibold ${statusClasses[group.status]}`}>
-                  {group.status}
+                <span className={`rounded-full px-3 py-1 text-xs font-semibold ${completionStatusClasses[group.status]}`}>
+                  {getCompletionStatusLabel(group.status)}
                 </span>
               </div>
               <div className="mt-4 h-3 overflow-hidden rounded-full bg-white">
@@ -299,6 +316,7 @@ export default function ProgressPage() {
               <div className="mt-4 grid gap-3 sm:grid-cols-3">
                 <p className="rounded-2xl bg-white px-4 py-3 text-sm text-slate-700">
                   已作答 <span className="font-semibold">{group.attemptedQuestions}</span> / {group.totalQuestionsInBank}
+                  <span className="mt-1 block text-xs text-slate-500">剩 {getRemainingQuestions(group)} 題</span>
                 </p>
                 <p className="rounded-2xl bg-white px-4 py-3 text-sm text-slate-700">
                   答對率 <span className="font-semibold">{group.correctRate}%</span>
@@ -319,14 +337,14 @@ export default function ProgressPage() {
             {lowCompletion.map((subject) => (
               <div key={subject.subject} className="rounded-2xl bg-slate-50 p-4 text-sm text-slate-700">
                 <p className="font-semibold">{subject.label}</p>
-                <p className="mt-2">完成度 {subject.completionRate}%</p>
+                <p className="mt-2">完成度 {subject.completionRate}% ・ 剩 {getRemainingQuestions(subject)} 題</p>
               </div>
             ))}
           </div>
         </div>
 
         <div className="rounded-[2rem] bg-white p-6 shadow-card ring-1 ring-slate-100">
-          <h2 className="text-xl font-semibold text-ink">已完成但不穩的科目</h2>
+          <h2 className="text-xl font-semibold text-ink">練過但不穩的科目</h2>
           <div className="mt-4 grid gap-3">
             {unstable.length === 0 ? (
               <p className="rounded-2xl bg-slate-50 p-4 text-sm text-slate-600">目前沒有落在這個區間的科目。</p>
@@ -390,11 +408,13 @@ export default function ProgressPage() {
                         <div>
                           <h3 className="text-lg font-semibold text-ink">{subject.label}</h3>
                           <p className="mt-2 text-sm text-slate-500">
-                            已作答 {subject.attemptedQuestions} / {subject.totalQuestionsInBank} ・ 答對率 {subject.correctRate}% ・ 掌握度 {subject.masteryScore}
+                            已作答 {subject.attemptedQuestions} / {subject.totalQuestionsInBank}
+                            ・ 剩 {getRemainingQuestions(subject)} 題
+                            ・ 答對率 {subject.correctRate}% ・ 掌握度 {subject.masteryScore}
                           </p>
                         </div>
-                        <span className={`rounded-full px-3 py-1 text-xs font-semibold ${statusClasses[subject.status]}`}>
-                          {subject.status}
+                        <span className={`rounded-full px-3 py-1 text-xs font-semibold ${completionStatusClasses[subject.status]}`}>
+                          {getCompletionStatusLabel(subject.status)}
                         </span>
                       </div>
                     </article>

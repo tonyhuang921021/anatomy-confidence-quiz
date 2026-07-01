@@ -1,5 +1,6 @@
 "use client";
 
+import { getCompletionStatusLabel } from "@/lib/completionStatusDisplay";
 import { CompletionStatsBundle } from "@/types/quiz";
 
 type HomeDashboardProps = {
@@ -66,7 +67,7 @@ export function HomeDashboard({ stats, historyCount, onClearHistory }: HomeDashb
             <div className="flex items-start justify-between gap-3">
               <div>
                 <h3 className="text-base font-semibold text-ink">{chapter.chapter}</h3>
-                <p className="mt-1 text-sm text-slate-500">{chapter.status}</p>
+                <p className="mt-1 text-sm text-slate-500">{getCompletionStatusLabel(chapter.status)}</p>
               </div>
               <span className="rounded-full bg-white px-3 py-1 text-xs font-semibold text-slate-700">
                 {chapter.masteryScore}

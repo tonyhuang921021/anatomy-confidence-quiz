@@ -1,17 +1,14 @@
 "use client";
 
 import { useState } from "react";
-import { ChapterCompletionStats, CompletionStatus, SectionCompletionStats } from "@/types/quiz";
+import {
+  completionStatusClasses,
+  getCompletionStatusLabel
+} from "@/lib/completionStatusDisplay";
+import { ChapterCompletionStats, SectionCompletionStats } from "@/types/quiz";
 
 type ProgressMapProps = {
   chapters: ChapterCompletionStats[];
-};
-
-const statusClasses: Record<CompletionStatus, string> = {
-  未開始: "bg-slate-100 text-slate-700",
-  進行中: "bg-sky-100 text-sky-800",
-  已完成但不穩: "bg-amber-100 text-amber-900",
-  已完成且穩定: "bg-emerald-100 text-emerald-800"
 };
 
 function formatTime(value?: string) {
@@ -35,8 +32,8 @@ function SectionCard({ section }: { section: SectionCompletionStats }) {
             已作答題數 {section.attemptedQuestions} / 題庫題數 {section.totalQuestionsInBank}
           </p>
         </div>
-        <span className={`rounded-full px-3 py-1 text-xs font-semibold ${statusClasses[section.status]}`}>
-          {section.status}
+        <span className={`rounded-full px-3 py-1 text-xs font-semibold ${completionStatusClasses[section.status]}`}>
+          {getCompletionStatusLabel(section.status)}
         </span>
       </div>
 
@@ -96,8 +93,8 @@ export function ProgressMap({ chapters }: ProgressMapProps) {
                 </p>
               </div>
               <div className="flex items-center gap-3">
-                <span className={`rounded-full px-3 py-1 text-xs font-semibold ${statusClasses[chapter.status]}`}>
-                  {chapter.status}
+                <span className={`rounded-full px-3 py-1 text-xs font-semibold ${completionStatusClasses[chapter.status]}`}>
+                  {getCompletionStatusLabel(chapter.status)}
                 </span>
                 <span className="text-sm font-semibold text-brand-700">{isOpen ? "收合" : "展開"}</span>
               </div>
