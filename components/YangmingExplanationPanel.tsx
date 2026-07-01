@@ -35,6 +35,30 @@ const YANGMING_REPORT_REASON_PRESETS = [
   "缺少陽明詳解"
 ];
 
+const YANGMING_MISSING_SOURCE_QUESTION_IDS = new Set([
+  "MOEX-112100-2301-Q075",
+  "MOEX-102030-2101-Q031",
+  "MOEX-115020-1301-Q030",
+  "MOEX-106020-5301-Q005",
+  "MOEX-106020-6301-Q045",
+  "MOEX-106020-6301-Q048",
+  "MOEX-115020-1301-Q027",
+  "MOEX-115020-1301-Q029",
+  "moex-med1-supplement-v5-106020-5301-035",
+  "MOEX-115020-1301-Q031",
+  "MOEX-115020-1301-Q046",
+  "MOEX-100140-2101-Q066",
+  "MOEX-106020-5301-Q006",
+  "MOEX-102030-2101-Q035",
+  "MOEX-106020-5301-Q094",
+  "MOEX-106020-5301-Q095",
+  "MOEX-107020-6301-Q034",
+  "MOEX-102110-1101-Q100",
+  "MOEX-107020-6301-Q035",
+  "MOEX-100140-2101-Q065",
+  "MOEX-106020-5301-Q039"
+]);
+
 function waitForYangmingRetry(delayMs: number) {
   return new Promise((resolve) => window.setTimeout(resolve, delayMs));
 }
@@ -528,6 +552,7 @@ export function YangmingExplanationPanel({
   const [keptAssetIndexes, setKeptAssetIndexes] = useState<number[]>([]);
   const [reportLoading, setReportLoading] = useState(false);
   const [reportMessage, setReportMessage] = useState("");
+  const isMissingSourceQuestion = YANGMING_MISSING_SOURCE_QUESTION_IDS.has(questionId);
 
   useEffect(() => {
     activeQuestionIdRef.current = questionId;
@@ -730,7 +755,18 @@ export function YangmingExplanationPanel({
             />
           ) : checked ? (
             <div className="rounded-3xl bg-white/70 px-4 py-3 text-sm font-semibold text-slate-600 ring-1 ring-white/70 [overflow-wrap:anywhere]">
-              <p>這題沒有詳解。</p>
+              {isMissingSourceQuestion ? (
+                <div className="space-y-2">
+                  <p className="inline-flex rounded-full bg-amber-50 px-3 py-1 text-[11px] font-bold text-amber-800 ring-1 ring-amber-100">
+                    找不到這題
+                  </p>
+                  <p>
+                    目前找不到這題可信的陽明詳解截圖；如果你有找到，歡迎在留言區回報，或按下方回報陽明詳解。
+                  </p>
+                </div>
+              ) : (
+                <p>這題沒有詳解。</p>
+              )}
               <button
                 type="button"
                 onClick={openReportDialog}
