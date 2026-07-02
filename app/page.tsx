@@ -53,6 +53,11 @@ const QUICK_ENTRIES = [
 const HOME_RELEASE_NOTES = [
   {
     time: "07/02",
+    title: "暗夜模式補對比",
+    body: "藥理翻卡與半透明卡片在暗夜模式下改成深色底，Safari 也不會再把暗夜卡片強制洗回亮底。"
+  },
+  {
+    time: "07/02",
     title: "錯題完成判定再收緊",
     body: "錯題測驗會用最近一次答錯後連續答對兩次判定完成；開始待複習也不會把完成區題目塞回去。"
   },
