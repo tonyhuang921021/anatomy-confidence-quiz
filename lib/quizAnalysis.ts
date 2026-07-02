@@ -741,6 +741,7 @@ export function buildQuestionHistoryMap(allSessions: { attempts: Attempt[] }[]) 
           correct: 0,
           lowConfidence: 0,
           overconfidence: 0,
+          correctStreakAfterLatestWrong: 0,
           correctStreakAfterLatestRisk: 0
         } satisfies QuestionHistoryStats);
 
@@ -765,6 +766,7 @@ export function buildQuestionHistoryMap(allSessions: { attempts: Attempt[] }[]) 
   });
 
   attemptsByQuestionId.forEach((attempts, questionId) => {
+    let correctStreakAfterLatestWrong = 0;
     let correctStreakAfterLatestRisk = 0;
 
     attempts
@@ -772,11 +774,13 @@ export function buildQuestionHistoryMap(allSessions: { attempts: Attempt[] }[]) 
       .sort((left, right) => left.answeredAt.localeCompare(right.answeredAt))
       .forEach((attempt) => {
         const isRiskAttempt = !attempt.isCorrect || attempt.confidence <= 2;
+        correctStreakAfterLatestWrong = attempt.isCorrect ? correctStreakAfterLatestWrong + 1 : 0;
         correctStreakAfterLatestRisk = isRiskAttempt ? 0 : correctStreakAfterLatestRisk + 1;
       });
 
     const history = map.get(questionId);
     if (history) {
+      history.correctStreakAfterLatestWrong = correctStreakAfterLatestWrong;
       history.correctStreakAfterLatestRisk = correctStreakAfterLatestRisk;
     }
   });

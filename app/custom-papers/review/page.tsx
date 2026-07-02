@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { useAuth } from "@/components/AuthProvider";
-import { ReviewNotebook } from "@/components/ReviewNotebook";
+import { ReviewNotebook, getUnresolvedReviewItems } from "@/components/ReviewNotebook";
 import { getQuestionBankBySubjectFilter } from "@/data/med1QuestionBank";
 import {
   DEFAULT_QUIZ_SETTINGS,
@@ -26,19 +26,21 @@ export default function CustomPaperReviewPage() {
     setCustomPaperItems(getReviewQuestionItems(reviewQuestions, customPaperSessions, Number.MAX_SAFE_INTEGER));
   }, [syncVersion]);
 
-  function handleStartCustomPaperReview() {
+  function handleStartCustomPaperReview(filteredItems: ReviewQuestionItem[] = customPaperItems) {
     saveQuizSettings({
       ...DEFAULT_QUIZ_SETTINGS,
       mode: "review",
       questionCount: 10,
       subjectFilter: "全部",
-      customQuestionIds: customPaperItems.map((item) => item.question.id),
-      customQuestionPayload: customPaperItems.map((item) => item.question),
+      strictCustomQuestionPool: true,
+      customQuestionIds: filteredItems.map((item) => item.question.id),
+      customQuestionPayload: filteredItems.map((item) => item.question),
       customPoolLabel: "自訂卷錯題庫"
     });
   }
 
-  const snapshot = getReviewSnapshot(customPaperItems);
+  const unresolvedCustomPaperItems = getUnresolvedReviewItems(customPaperItems);
+  const snapshot = getReviewSnapshot(unresolvedCustomPaperItems);
 
   return (
     <main className="shell">
@@ -60,8 +62,19 @@ export default function CustomPaperReviewPage() {
             </Link>
             <Link
               href="/quiz?new=1"
-              onClick={handleStartCustomPaperReview}
-              className="min-h-12 rounded-2xl bg-brand-600 px-5 py-4 text-sm font-semibold text-white transition hover:bg-brand-700"
+              onClick={(event) => {
+                if (unresolvedCustomPaperItems.length === 0) {
+                  event.preventDefault();
+                  return;
+                }
+                handleStartCustomPaperReview(unresolvedCustomPaperItems);
+              }}
+              aria-disabled={unresolvedCustomPaperItems.length === 0}
+              className={`min-h-12 rounded-2xl px-5 py-4 text-sm font-semibold transition ${
+                unresolvedCustomPaperItems.length === 0
+                  ? "pointer-events-none bg-slate-200 text-slate-500"
+                  : "bg-brand-600 text-white hover:bg-brand-700"
+              }`}
             >
               開始自訂卷錯題複習
             </Link>

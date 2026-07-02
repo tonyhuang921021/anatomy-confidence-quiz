@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import { useAuth } from "@/components/AuthProvider";
-import { ReviewNotebook } from "@/components/ReviewNotebook";
+import { ReviewNotebook, getUnresolvedReviewItems } from "@/components/ReviewNotebook";
 import { applyQuestionClassificationOverride, getQuestionBankBySubjectFilter } from "@/data/med1QuestionBank";
 import { loadConfirmedQuestionClassificationOverrides } from "@/lib/cloudSync";
 import {
@@ -51,13 +51,18 @@ export default function SimulationReviewPage() {
       mode: "review",
       questionCount: Math.max(1, filteredItems.length),
       subjectFilter: "全部",
+      strictCustomQuestionPool: true,
       customQuestionIds: filteredItems.map((item) => item.question.id),
       customQuestionPayload: filteredItems.map((item) => item.question),
       customPoolLabel: "模擬考錯題庫"
     });
   }
 
-  const simulationSnapshot = getReviewSnapshot(simulationItems);
+  const unresolvedSimulationItems = useMemo(
+    () => getUnresolvedReviewItems(simulationItems),
+    [simulationItems]
+  );
+  const simulationSnapshot = getReviewSnapshot(unresolvedSimulationItems);
 
   return (
     <main className="shell">
@@ -79,8 +84,19 @@ export default function SimulationReviewPage() {
             </Link>
             <Link
               href="/quiz?new=1"
-              onClick={() => handleStartSimulationReview()}
-              className="min-h-12 rounded-2xl bg-amber-500 px-5 py-4 text-sm font-semibold text-white transition hover:bg-amber-600"
+              onClick={(event) => {
+                if (unresolvedSimulationItems.length === 0) {
+                  event.preventDefault();
+                  return;
+                }
+                handleStartSimulationReview(unresolvedSimulationItems);
+              }}
+              aria-disabled={unresolvedSimulationItems.length === 0}
+              className={`min-h-12 rounded-2xl px-5 py-4 text-sm font-semibold transition ${
+                unresolvedSimulationItems.length === 0
+                  ? "pointer-events-none bg-slate-200 text-slate-500"
+                  : "bg-amber-500 text-white hover:bg-amber-600"
+              }`}
             >
               開始模擬考待複習
             </Link>

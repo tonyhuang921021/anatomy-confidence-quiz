@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useAuth } from "@/components/AuthProvider";
-import { ReviewNotebook } from "@/components/ReviewNotebook";
+import { ReviewNotebook, getUnresolvedReviewItems } from "@/components/ReviewNotebook";
 import { applyQuestionClassificationOverride, getQuestionBankBySubjectFilter } from "@/data/med1QuestionBank";
 import { loadConfirmedQuestionClassificationOverrides } from "@/lib/cloudSync";
 import {
@@ -151,6 +151,7 @@ export default function ReviewPage() {
       mode: "review",
       questionCount: 10,
       subjectFilter: "全部",
+      strictCustomQuestionPool: true,
       customQuestionIds: filteredItems.map((item) => item.question.id),
       customQuestionPayload: filteredItems.map((item) => item.question),
       customPoolLabel: "散題錯題庫"
@@ -174,8 +175,12 @@ export default function ReviewPage() {
     setIsFullscreenReview(true);
   }
 
-  const reviewCount = practiceItems.length;
-  const lowConfidenceCount = practiceItems.filter((item) => item.history.lowConfidence > 0).length;
+  const unresolvedPracticeItems = useMemo(
+    () => getUnresolvedReviewItems(practiceItems),
+    [practiceItems]
+  );
+  const reviewCount = unresolvedPracticeItems.length;
+  const lowConfidenceCount = unresolvedPracticeItems.filter((item) => item.history.lowConfidence > 0).length;
 
   return (
     <main className="shell">
@@ -197,8 +202,19 @@ export default function ReviewPage() {
             </Link>
             <Link
               href="/quiz?new=1"
-              onClick={() => handleStartPracticeReview()}
-              className="min-h-12 rounded-2xl bg-brand-600 px-5 py-4 text-sm font-semibold text-white transition hover:bg-brand-700"
+              onClick={(event) => {
+                if (unresolvedPracticeItems.length === 0) {
+                  event.preventDefault();
+                  return;
+                }
+                handleStartPracticeReview(unresolvedPracticeItems);
+              }}
+              aria-disabled={unresolvedPracticeItems.length === 0}
+              className={`min-h-12 rounded-2xl px-5 py-4 text-sm font-semibold transition ${
+                unresolvedPracticeItems.length === 0
+                  ? "pointer-events-none bg-slate-200 text-slate-500"
+                  : "bg-brand-600 text-white hover:bg-brand-700"
+              }`}
             >
               開始散題待複習
             </Link>

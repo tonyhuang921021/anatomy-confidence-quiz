@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { createQuestionOrder } from "./quizAnalysis";
+import { buildQuestionHistoryMap, createQuestionOrder } from "./quizAnalysis";
 import type { Attempt, Question, QuizSettings } from "../types/quiz";
 
 function makeQuestion(id: string): Question {
@@ -109,4 +109,41 @@ test("剩餘未做題已在上一回答過後，不會再被 priority 當作未�
 
   assert.equal(order.includes(justAnsweredId), false);
   assert.deepEqual(order.slice(0, priorityQuestionIds.length - 1), priorityQuestionIds.slice(1));
+});
+
+test("錯題完成 streak 只看最近一次答錯後的連續答對，不被低信心答對重置", () => {
+  const questionId = "q-wrong-review";
+  const attempts: Attempt[] = [
+    {
+      questionId,
+      selectedAnswer: "B",
+      correctAnswer: "A",
+      isCorrect: false,
+      confidence: 4,
+      answeredAt: new Date(Date.UTC(2026, 0, 1)).toISOString()
+    },
+    {
+      questionId,
+      selectedAnswer: "A",
+      correctAnswer: "A",
+      isCorrect: true,
+      confidence: 2,
+      answeredAt: new Date(Date.UTC(2026, 0, 2)).toISOString()
+    },
+    {
+      questionId,
+      selectedAnswer: "A",
+      correctAnswer: "A",
+      isCorrect: true,
+      confidence: 2,
+      answeredAt: new Date(Date.UTC(2026, 0, 3)).toISOString()
+    }
+  ];
+
+  const history = buildQuestionHistoryMap([{ attempts }]).get(questionId);
+
+  assert.equal(history?.wrong, 1);
+  assert.equal(history?.correct, 2);
+  assert.equal(history?.correctStreakAfterLatestWrong, 2);
+  assert.equal(history?.correctStreakAfterLatestRisk, 0);
 });

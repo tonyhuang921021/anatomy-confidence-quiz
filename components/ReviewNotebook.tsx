@@ -117,11 +117,16 @@ function sortByRecent<T extends ReviewQuestionItem>(items: T[]) {
   });
 }
 
-function isResolvedReviewItem(item: ReviewQuestionItem) {
-  return (
-    (item.history.wrong > 0 || item.history.lowConfidence > 0) &&
-    item.history.correctStreakAfterLatestRisk >= 2
-  );
+export function isResolvedReviewItem(item: ReviewQuestionItem) {
+  if (item.history.wrong > 0) {
+    return item.history.correctStreakAfterLatestWrong >= 2;
+  }
+
+  return item.history.lowConfidence > 0 && item.history.correctStreakAfterLatestRisk >= 2;
+}
+
+export function getUnresolvedReviewItems(items: ReviewQuestionItem[]) {
+  return items.filter((item) => !isResolvedReviewItem(item));
 }
 
 function getMoveBackLabel(item: ReviewQuestionItem) {
