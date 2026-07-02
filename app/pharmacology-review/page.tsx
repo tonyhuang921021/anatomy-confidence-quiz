@@ -5,6 +5,8 @@ import type { MouseEvent, PointerEvent, TouchEvent } from "react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useAuth } from "@/components/AuthProvider";
 import { PHARMACOLOGY_FLASHCARDS } from "@/data/pharmacologyFlashcards";
+import { getPharmacologyReverseSwipePreference } from "@/lib/accountPreferences";
+import { loadPharmacologyReverseSwipe, savePharmacologyReverseSwipe } from "@/lib/storage";
 
 const REVIEW_STATS_STORAGE_KEY = "pharmacology-review-stats-v1";
 const CLOUD_SYNC_DEBOUNCE_MS = 1600;
@@ -63,6 +65,32 @@ const LEVEL_META = {
     className: "border-zinc-200 bg-zinc-100 text-zinc-600"
   }
 } as const;
+
+const REVIEW_DIRECTION_META: Record<
+  ReviewDirection,
+  {
+    label: string;
+    actionLabel: string;
+    helper: string;
+    className: string;
+    eyebrowClassName: string;
+  }
+> = {
+  known: {
+    label: "會",
+    actionLabel: "會這個藥",
+    helper: "降低近期權重，但仍保留最低複習率。",
+    className: "border-emerald-200 bg-emerald-50/95 text-emerald-800",
+    eyebrowClassName: "text-brand-700"
+  },
+  unknown: {
+    label: "不會",
+    actionLabel: "不會這個藥",
+    helper: "提高長期機率，但剛刷過會先冷卻。",
+    className: "border-rose-200 bg-rose-50/95 text-rose-800",
+    eyebrowClassName: "text-rose-700"
+  }
+};
 
 function getDrugKey(item: (typeof PHARMACOLOGY_FLASHCARDS)[number]) {
   return `${item.name}__${item.category}`;
@@ -340,20 +368,21 @@ async function copyText(text: string) {
 }
 
 export default function PharmacologyReviewPage() {
-  const { configured, session } = useAuth();
+  const { configured, session, user } = useAuth();
   const [cardIndex, setCardIndex] = useState(0);
   const [isFlipped, setIsFlipped] = useState(false);
   const [hasRevealedClass, setHasRevealedClass] = useState(false);
   const [copied, setCopied] = useState(false);
   const [reviewStats, setReviewStats] = useState<DrugReviewStatsMap>({});
+  const [reverseSwipe, setReverseSwipe] = useState(() => loadPharmacologyReverseSwipe(false));
   const [isDragging, setIsDragging] = useState(false);
   const [isLeaving, setIsLeaving] = useState(false);
   const [swipeResult, setSwipeResult] = useState<ReviewDirection | null>(null);
   const [showWeakList, setShowWeakList] = useState(false);
   const [, setCloudSyncStatus] = useState<CloudSyncStatus>("idle");
   const cardElementRef = useRef<HTMLDivElement | null>(null);
-  const knownBadgeRef = useRef<HTMLSpanElement | null>(null);
-  const unknownBadgeRef = useRef<HTMLSpanElement | null>(null);
+  const leftBadgeRef = useRef<HTMLSpanElement | null>(null);
+  const rightBadgeRef = useRef<HTMLSpanElement | null>(null);
   const pointerStartRef = useRef<{ pointerId: number | null; x: number; y: number; cardWidth: number } | null>(null);
   const dragIntentRef = useRef<"horizontal" | "vertical" | null>(null);
   const dragXRef = useRef(0);
@@ -366,6 +395,11 @@ export default function PharmacologyReviewPage() {
 
   const card = PHARMACOLOGY_FLASHCARDS[cardIndex] ?? PHARMACOLOGY_FLASHCARDS[0];
   const levelMeta = LEVEL_META[card.examLevel] ?? LEVEL_META.D;
+  const leftSwipeDirection: ReviewDirection = reverseSwipe ? "unknown" : "known";
+  const rightSwipeDirection: ReviewDirection = reverseSwipe ? "known" : "unknown";
+  const leftSwipeMeta = REVIEW_DIRECTION_META[leftSwipeDirection];
+  const rightSwipeMeta = REVIEW_DIRECTION_META[rightSwipeDirection];
+  const swipeInstruction = `左${leftSwipeMeta.label}、右${rightSwipeMeta.label}`;
   const sameCategoryCards = PHARMACOLOGY_FLASHCARDS.filter((item) => item.category === card.category).sort(
     (first, second) => second.drawWeight - first.drawWeight || first.name.localeCompare(second.name)
   );
@@ -408,6 +442,16 @@ export default function PharmacologyReviewPage() {
   useEffect(() => {
     accessTokenRef.current = session?.access_token ?? "";
   }, [session?.access_token]);
+
+  useEffect(() => {
+    const nextReverseSwipe = user
+      ? getPharmacologyReverseSwipePreference(user.user_metadata, false)
+      : loadPharmacologyReverseSwipe(false);
+    setReverseSwipe(nextReverseSwipe);
+    if (user) {
+      savePharmacologyReverseSwipe(nextReverseSwipe);
+    }
+  }, [user?.id, user?.user_metadata]);
 
   const syncStatsToCloud = useCallback(async (statsMap: DrugReviewStatsMap) => {
     if (!configured || !accessTokenRef.current) {
@@ -481,11 +525,11 @@ export default function PharmacologyReviewPage() {
     cardElement.style.transition = animated ? `transform ${SWIPE_OUT_MS}ms cubic-bezier(0.22, 1, 0.36, 1)` : "none";
     cardElement.style.transform = `translate3d(${nextDragX}px, 0, 0) rotate(${clamp(nextDragX / 16, -15, 15)}deg)`;
 
-    if (knownBadgeRef.current) {
-      knownBadgeRef.current.style.opacity = String(clamp(-nextDragX / previewDistance, 0, 1));
+    if (leftBadgeRef.current) {
+      leftBadgeRef.current.style.opacity = String(clamp(-nextDragX / previewDistance, 0, 1));
     }
-    if (unknownBadgeRef.current) {
-      unknownBadgeRef.current.style.opacity = String(clamp(nextDragX / previewDistance, 0, 1));
+    if (rightBadgeRef.current) {
+      rightBadgeRef.current.style.opacity = String(clamp(nextDragX / previewDistance, 0, 1));
     }
   };
 
@@ -510,7 +554,7 @@ export default function PharmacologyReviewPage() {
     }
 
     if (Math.abs(finalDragX) >= threshold) {
-      finishSwipe(finalDragX > 0 ? "unknown" : "known");
+      finishSwipe(finalDragX > 0 ? rightSwipeDirection : leftSwipeDirection);
       return;
     }
 
@@ -569,7 +613,8 @@ export default function PharmacologyReviewPage() {
     setSwipeResult(direction);
     setIsDragging(false);
     setIsLeaving(true);
-    const nextDragX = direction === "known" ? -window.innerWidth * 1.08 : window.innerWidth * 1.08;
+    const nextDragX =
+      direction === rightSwipeDirection ? window.innerWidth * 1.08 : -window.innerWidth * 1.08;
     dragXRef.current = nextDragX;
     applyDragVisual(nextDragX, true);
 
@@ -721,7 +766,7 @@ export default function PharmacologyReviewPage() {
             <p className="eyebrow">Pharmacology Cards</p>
             <h1 className="display-title mt-3 text-4xl sm:text-6xl">藥理複習</h1>
             <p className="body-soft mt-3 max-w-2xl text-base leading-8">
-              隨機抽一個藥名，點卡片翻面看分類、機轉、適應症、國考考點、副作用禁忌、口訣和官方出現考期。拖到左邊代表會、拖到右邊代表不會，抽卡會依照重要度和你的不熟程度自動調整。
+              隨機抽一個藥名，點卡片翻面看分類、機轉、適應症、國考考點、副作用禁忌、口訣和官方出現考期。拖到旁邊放手代表{swipeInstruction}，抽卡會依照重要度和你的不熟程度自動調整。
             </p>
           </div>
           <Link href="/" className="secondary-pill">
@@ -733,14 +778,14 @@ export default function PharmacologyReviewPage() {
       <section className="mt-6 space-y-5">
         <div className="hidden gap-3 sm:grid sm:grid-cols-2">
           <div className="surface-card-muted p-4">
-            <p className="text-xs font-black text-brand-700">左滑</p>
-            <p className="mt-2 text-lg font-black text-ink">會這個藥</p>
-            <p className="body-soft mt-1 text-sm leading-6">降低近期權重，但仍保留最低複習率。</p>
+            <p className={`text-xs font-black ${leftSwipeMeta.eyebrowClassName}`}>左滑</p>
+            <p className="mt-2 text-lg font-black text-ink">{leftSwipeMeta.actionLabel}</p>
+            <p className="body-soft mt-1 text-sm leading-6">{leftSwipeMeta.helper}</p>
           </div>
           <div className="surface-card-muted p-4">
-            <p className="text-xs font-black text-rose-700">右滑</p>
-            <p className="mt-2 text-lg font-black text-ink">不會這個藥</p>
-            <p className="body-soft mt-1 text-sm leading-6">提高長期機率，但剛刷過會先冷卻。</p>
+            <p className={`text-xs font-black ${rightSwipeMeta.eyebrowClassName}`}>右滑</p>
+            <p className="mt-2 text-lg font-black text-ink">{rightSwipeMeta.actionLabel}</p>
+            <p className="body-soft mt-1 text-sm leading-6">{rightSwipeMeta.helper}</p>
           </div>
         </div>
 
@@ -749,7 +794,7 @@ export default function PharmacologyReviewPage() {
             <p className="text-xs font-black uppercase tracking-[0.22em] text-brand-700">
               口訣來自國防國考藥訣 4.2 demo
             </p>
-            <p className="body-soft text-xs font-bold">抓住卡片滑動：左會、右不會</p>
+            <p className="body-soft text-xs font-bold">抓住卡片滑動：{swipeInstruction}</p>
           </div>
 
           <div
@@ -772,27 +817,27 @@ export default function PharmacologyReviewPage() {
                 flipCard();
               } else if (event.key === "ArrowLeft") {
                 event.preventDefault();
-                finishSwipe("known");
+                finishSwipe(leftSwipeDirection);
               } else if (event.key === "ArrowRight") {
                 event.preventDefault();
-                finishSwipe("unknown");
+                finishSwipe(rightSwipeDirection);
               }
             }}
             aria-label="翻轉藥理複習卡"
           >
             <span
-              ref={knownBadgeRef}
-              className="pointer-events-none absolute left-5 top-5 z-30 rounded-full border border-emerald-200 bg-emerald-50/95 px-4 py-2 text-sm font-black text-emerald-800 shadow-lg"
+              ref={leftBadgeRef}
+              className={`pointer-events-none absolute left-5 top-5 z-30 rounded-full border px-4 py-2 text-sm font-black shadow-lg ${leftSwipeMeta.className}`}
               style={{ opacity: 0 }}
             >
-              會
+              {leftSwipeMeta.label}
             </span>
             <span
-              ref={unknownBadgeRef}
-              className="pointer-events-none absolute right-5 top-5 z-30 rounded-full border border-rose-200 bg-rose-50/95 px-4 py-2 text-sm font-black text-rose-800 shadow-lg"
+              ref={rightBadgeRef}
+              className={`pointer-events-none absolute right-5 top-5 z-30 rounded-full border px-4 py-2 text-sm font-black shadow-lg ${rightSwipeMeta.className}`}
               style={{ opacity: 0 }}
             >
-              不會
+              {rightSwipeMeta.label}
             </span>
             <span className="drug-flip-inner">
               <span className="drug-flip-face drug-flip-front">

@@ -7,6 +7,7 @@ import { getSyncStatusText } from "@/components/syncStatusText";
 import { updateLeaderboardDisplayName } from "@/lib/cloudSync";
 import {
   loadPracticeQuestionCount,
+  loadPharmacologyReverseSwipe,
   loadSimulationConfidenceCalibration,
   loadPracticeFastAnswerMode,
   loadPracticeStopAfterReview,
@@ -14,6 +15,7 @@ import {
   loadHomeToneMode,
   loadThemeMode,
   savePracticeQuestionCount,
+  savePharmacologyReverseSwipe,
   saveSimulationConfidenceCalibration,
   savePracticeFastAnswerMode,
   savePracticeStopAfterReview,
@@ -27,7 +29,9 @@ import {
 } from "@/lib/storage";
 import {
   getHomeToneModePreference,
+  getPharmacologyReverseSwipePreference,
   hasPracticeQuestionCountPreference,
+  hasPharmacologyReverseSwipePreference,
   hasSimulationConfidenceCalibrationPreference,
   hasPracticeFastAnswerModePreference,
   hasPracticeStopAfterReviewPreference,
@@ -149,6 +153,9 @@ export function AuthPanel() {
   const [simulationConfidenceCalibration, setSimulationConfidenceCalibration] = useState(() =>
     loadSimulationConfidenceCalibration(true)
   );
+  const [pharmacologyReverseSwipe, setPharmacologyReverseSwipe] = useState(() =>
+    loadPharmacologyReverseSwipe(false)
+  );
 
   useEffect(() => {
     const shouldRemember = loadRememberAccountPreference();
@@ -205,36 +212,45 @@ export function AuthPanel() {
     const accountStopAfterReview = getPracticeStopAfterReviewPreference(user?.user_metadata, false);
     const accountFastAnswerMode = getPracticeFastAnswerModePreference(user?.user_metadata, false);
     const accountSimulationConfidenceCalibration = getSimulationConfidenceCalibrationPreference(user?.user_metadata, true);
+    const accountPharmacologyReverseSwipe = getPharmacologyReverseSwipePreference(user?.user_metadata, false);
     const nextCount = user ? accountCount : loadPracticeQuestionCount(10);
     const nextStopAfterReview = user ? accountStopAfterReview : loadPracticeStopAfterReview(false);
     const nextFastAnswerMode = user ? accountFastAnswerMode : loadPracticeFastAnswerMode(false);
     const nextSimulationConfidenceCalibration = user
       ? accountSimulationConfidenceCalibration
       : loadSimulationConfidenceCalibration(true);
+    const nextPharmacologyReverseSwipe = user
+      ? accountPharmacologyReverseSwipe
+      : loadPharmacologyReverseSwipe(false);
     setPracticeQuestionCount(nextCount);
     setPracticeStopAfterReview(nextStopAfterReview);
     setPracticeFastAnswerMode(nextFastAnswerMode);
     setSimulationConfidenceCalibration(nextSimulationConfidenceCalibration);
+    setPharmacologyReverseSwipe(nextPharmacologyReverseSwipe);
     if (user) {
       savePracticeQuestionCount(accountCount);
       savePracticeStopAfterReview(accountStopAfterReview);
       savePracticeFastAnswerMode(accountFastAnswerMode);
       saveSimulationConfidenceCalibration(accountSimulationConfidenceCalibration);
+      savePharmacologyReverseSwipe(accountPharmacologyReverseSwipe);
       const missingQuestionCount = !hasPracticeQuestionCountPreference(user.user_metadata);
       const missingStopAfterReview = !hasPracticeStopAfterReviewPreference(user.user_metadata);
       const missingFastAnswerMode = !hasPracticeFastAnswerModePreference(user.user_metadata);
       const missingSimulationConfidenceCalibration = !hasSimulationConfidenceCalibrationPreference(user.user_metadata);
+      const missingPharmacologyReverseSwipe = !hasPharmacologyReverseSwipePreference(user.user_metadata);
       if (
         missingQuestionCount ||
         missingStopAfterReview ||
         missingFastAnswerMode ||
-        missingSimulationConfidenceCalibration
+        missingSimulationConfidenceCalibration ||
+        missingPharmacologyReverseSwipe
       ) {
         const patch: AccountPreferencePatch = {};
         if (missingQuestionCount) patch.practice_question_count = 10;
         if (missingStopAfterReview) patch.practice_stop_after_review = false;
         if (missingFastAnswerMode) patch.practice_fast_answer_mode = false;
         if (missingSimulationConfidenceCalibration) patch.simulation_confidence_calibration = true;
+        if (missingPharmacologyReverseSwipe) patch.pharmacology_reverse_swipe = false;
         void persistAccountPreferences(patch).catch(() => {});
       }
     } else {
@@ -242,6 +258,7 @@ export function AuthPanel() {
       savePracticeStopAfterReview(nextStopAfterReview);
       savePracticeFastAnswerMode(nextFastAnswerMode);
       saveSimulationConfidenceCalibration(nextSimulationConfidenceCalibration);
+      savePharmacologyReverseSwipe(nextPharmacologyReverseSwipe);
     }
   }, [user?.id, user?.user_metadata]);
 
@@ -339,6 +356,18 @@ export function AuthPanel() {
       simulation_confidence_calibration: enabled
     }).catch((persistError) => {
       setError(persistError instanceof Error ? persistError.message : "信心校準設定同步失敗");
+    });
+  }
+
+  function handleChangePharmacologyReverseSwipe(enabled: boolean) {
+    setPharmacologyReverseSwipe(enabled);
+    savePharmacologyReverseSwipe(enabled);
+    if (!user) return;
+    setError("");
+    void persistAccountPreferences({
+      pharmacology_reverse_swipe: enabled
+    }).catch((persistError) => {
+      setError(persistError instanceof Error ? persistError.message : "藥理卡滑動設定同步失敗");
     });
   }
 
@@ -657,7 +686,7 @@ export function AuthPanel() {
             >
               <div>
                 <p className="text-sm font-semibold text-ink">設定</p>
-                <p className="mt-1 text-xs text-slate-500">首頁模式、暗夜模式、開始測驗設定</p>
+                <p className="mt-1 text-xs text-slate-500">首頁模式、暗夜模式、刷題與藥理卡設定</p>
               </div>
               <span className="text-sm font-semibold text-slate-500">{settingsOpen ? "收合" : "展開"}</span>
             </button>
@@ -835,6 +864,37 @@ export function AuthPanel() {
                     </div>
                     <p className="mt-2 text-xs leading-5 text-slate-500">
                       只影響模擬考校準分析；散題仍會詢問信心，低信心題會照常留到複習。
+                    </p>
+                  </div>
+
+                  <div>
+                    <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">藥理卡滑動方向</p>
+                    <div className="mt-3 flex flex-wrap gap-2">
+                      <button
+                        type="button"
+                        onClick={() => handleChangePharmacologyReverseSwipe(false)}
+                        className={`min-h-11 rounded-full px-4 py-2 text-sm font-semibold transition ${
+                          !pharmacologyReverseSwipe
+                            ? "bg-brand-600 text-white"
+                            : "bg-slate-100 text-slate-700 hover:bg-slate-200"
+                        }`}
+                      >
+                        預設：左會、右不會
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => handleChangePharmacologyReverseSwipe(true)}
+                        className={`min-h-11 rounded-full px-4 py-2 text-sm font-semibold transition ${
+                          pharmacologyReverseSwipe
+                            ? "bg-fuchsia-100 text-fuchsia-950 ring-1 ring-fuchsia-300"
+                            : "bg-slate-100 text-slate-700 hover:bg-slate-200"
+                        }`}
+                      >
+                        反向：左不會、右會
+                      </button>
+                    </div>
+                    <p className="mt-2 text-xs leading-5 text-slate-500">
+                      只影響藥理複習卡；抽卡權重仍照你的「會 / 不會」紀錄計算。
                     </p>
                   </div>
 

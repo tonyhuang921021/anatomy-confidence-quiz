@@ -24,6 +24,7 @@ const PRACTICE_QUESTION_COUNT_KEY = "anatomy-confidence-practice-question-count"
 const PRACTICE_STOP_AFTER_REVIEW_KEY = "anatomy-confidence-practice-stop-after-review";
 const PRACTICE_FAST_ANSWER_MODE_KEY = "anatomy-confidence-practice-fast-answer-mode";
 const SIMULATION_CONFIDENCE_CALIBRATION_KEY = "anatomy-confidence-simulation-confidence-calibration";
+const PHARMACOLOGY_REVERSE_SWIPE_KEY = "anatomy-confidence-pharmacology-reverse-swipe";
 const ACTIVE_USER_KEY = "anatomy-confidence-active-user-id";
 const GUEST_USER_ID = "guest";
 const completedSessionsMemoryCache = new Map<string, QuizSession[]>();
@@ -1416,6 +1417,20 @@ export function saveSimulationConfidenceCalibration(enabled: boolean) {
 export function loadSimulationConfidenceCalibration(defaultValue = true) {
   if (!isBrowser()) return defaultValue;
   const raw = getLegacyOrScopedRaw(SIMULATION_CONFIDENCE_CALIBRATION_KEY);
+  if (raw === "true") return true;
+  if (raw === "false") return false;
+  return defaultValue;
+}
+
+export function savePharmacologyReverseSwipe(enabled: boolean) {
+  if (!isBrowser()) return;
+  safeLocalStorageSetItem(getScopedKey(PHARMACOLOGY_REVERSE_SWIPE_KEY), enabled ? "true" : "false");
+  window.dispatchEvent(new CustomEvent("pharmacology-reverse-swipe-change", { detail: enabled }));
+}
+
+export function loadPharmacologyReverseSwipe(defaultValue = false) {
+  if (!isBrowser()) return defaultValue;
+  const raw = getLegacyOrScopedRaw(PHARMACOLOGY_REVERSE_SWIPE_KEY);
   if (raw === "true") return true;
   if (raw === "false") return false;
   return defaultValue;

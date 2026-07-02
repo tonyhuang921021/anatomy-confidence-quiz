@@ -18,6 +18,7 @@ export type AccountPreferencePatch = {
   practice_stop_after_review?: boolean;
   practice_fast_answer_mode?: boolean;
   simulation_confidence_calibration?: boolean;
+  pharmacology_reverse_swipe?: boolean;
 };
 
 export function getHomeToneModePreference(metadata: MetadataSource): HomeToneMode | null {
@@ -70,6 +71,12 @@ export function getSimulationConfidenceCalibrationPreference(metadata: MetadataS
     : defaultValue;
 }
 
+export function getPharmacologyReverseSwipePreference(metadata: MetadataSource, defaultValue = false) {
+  return typeof metadata?.pharmacology_reverse_swipe === "boolean"
+    ? metadata.pharmacology_reverse_swipe
+    : defaultValue;
+}
+
 export function hasPracticeQuestionCountPreference(metadata: MetadataSource) {
   return typeof metadata?.practice_question_count === "number";
 }
@@ -84,4 +91,8 @@ export function hasPracticeFastAnswerModePreference(metadata: MetadataSource) {
 
 export function hasSimulationConfidenceCalibrationPreference(metadata: MetadataSource) {
   return typeof metadata?.simulation_confidence_calibration === "boolean";
+}
+
+export function hasPharmacologyReverseSwipePreference(metadata: MetadataSource) {
+  return typeof metadata?.pharmacology_reverse_swipe === "boolean";
 }
