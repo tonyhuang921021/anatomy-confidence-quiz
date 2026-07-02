@@ -45,7 +45,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
         <script
           dangerouslySetInnerHTML={{
             __html:
-              "try{var ua=navigator.userAgent;var isSafari=/Safari\\//.test(ua)&&!/Chrome|Chromium|CriOS|FxiOS|Edg\\//.test(ua);if(isSafari)document.documentElement.dataset.browser='safari'}catch(e){}"
+              "try{var d=document.documentElement;var ua=navigator.userAgent;var isSafari=/Safari\\//.test(ua)&&!/Chrome|Chromium|CriOS|FxiOS|Edg\\//.test(ua);if(isSafari)d.dataset.browser='safari';var s=window.localStorage;var u=s.getItem('anatomy-confidence-active-user-id')||'guest';var t=s.getItem('anatomy-confidence-theme-mode:'+u)||s.getItem('anatomy-confidence-theme-mode:guest')||s.getItem('anatomy-confidence-theme-mode');if(t==='dark'||t==='light')d.dataset.theme=t}catch(e){}"
           }}
         />
       </head>

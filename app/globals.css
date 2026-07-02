@@ -1490,6 +1490,32 @@ html[data-theme="dark"] .home-device-screen {
   border-color: var(--line-soft);
 }
 
+html[data-theme="dark"] .home-release-notes {
+  background:
+    radial-gradient(circle at 100% 0%, rgba(138, 154, 184, 0.12), transparent 38%),
+    linear-gradient(145deg, rgba(30, 38, 50, 0.82), rgba(27, 34, 45, 0.68));
+  border-color: rgba(207, 214, 224, 0.1);
+  box-shadow: 0 18px 42px rgba(4, 8, 15, 0.22);
+}
+
+html[data-theme="dark"] .home-release-item {
+  background: rgba(39, 48, 63, 0.76);
+  border-color: rgba(207, 214, 224, 0.08);
+  color: var(--ink-main);
+}
+
+html[data-theme="dark"] .home-release-item time {
+  color: #b7c8dc;
+}
+
+html[data-theme="dark"] .home-release-item h3 {
+  color: var(--ink-main);
+}
+
+html[data-theme="dark"] .home-release-item p {
+  color: var(--ink-muted);
+}
+
 html[data-theme="dark"] .home-action-card::after,
 html[data-theme="dark"] .home-entry-icon,
 html[data-theme="dark"] .home-action-mark,
