@@ -25,6 +25,8 @@ const PRACTICE_STOP_AFTER_REVIEW_KEY = "anatomy-confidence-practice-stop-after-r
 const PRACTICE_FAST_ANSWER_MODE_KEY = "anatomy-confidence-practice-fast-answer-mode";
 const SIMULATION_CONFIDENCE_CALIBRATION_KEY = "anatomy-confidence-simulation-confidence-calibration";
 const PHARMACOLOGY_REVERSE_SWIPE_KEY = "anatomy-confidence-pharmacology-reverse-swipe";
+const KEYBOARD_QUESTION_NAVIGATION_KEY = "anatomy-confidence-keyboard-question-navigation";
+const SIMULATION_OPTION_ELIMINATION_KEY = "anatomy-confidence-simulation-option-elimination";
 const ACTIVE_USER_KEY = "anatomy-confidence-active-user-id";
 const GUEST_USER_ID = "guest";
 const completedSessionsMemoryCache = new Map<string, QuizSession[]>();
@@ -573,6 +575,30 @@ function isOptionKey(value: unknown): value is OptionKey {
   return value === "A" || value === "B" || value === "C" || value === "D" || value === "E";
 }
 
+function normalizeOptionKeys(value: unknown): OptionKey[] | undefined {
+  if (!Array.isArray(value)) return undefined;
+  const options = Array.from(
+    new Set(
+      value
+        .map((item) => (typeof item === "string" ? item.trim().toUpperCase() : ""))
+        .filter((item): item is OptionKey => isOptionKey(item))
+    )
+  );
+  return options.length > 0 ? options : undefined;
+}
+
+function normalizeOptionEliminationMap(value: unknown): QuizSession["optionEliminationMap"] | undefined {
+  if (!value || typeof value !== "object" || Array.isArray(value)) return undefined;
+  const entries = Object.entries(value as Record<string, unknown>)
+    .map(([questionId, options]) => {
+      const normalizedOptions = normalizeOptionKeys(options);
+      return questionId.trim() && normalizedOptions ? [questionId.trim(), normalizedOptions] as const : null;
+    })
+    .filter((entry): entry is readonly [string, OptionKey[]] => Boolean(entry));
+
+  return entries.length > 0 ? Object.fromEntries(entries) : undefined;
+}
+
 function normalizeStoredQuestion(question: unknown): Question | null {
   if (!question || typeof question !== "object") return null;
 
@@ -667,6 +693,7 @@ function normalizeStoredAttempt(attempt: unknown) {
     isCorrect: Boolean(raw.isCorrect),
     confidence: normalizeConfidenceLevel(raw.confidence),
     errorType: normalizeErrorType(raw.errorType),
+    eliminatedOptions: normalizeOptionKeys(raw.eliminatedOptions),
     answeredAt
   };
 }
@@ -697,6 +724,7 @@ function normalizeSession(session: QuizSession): QuizSession {
     generatedQuestions: (session.generatedQuestions ?? [])
       .map(normalizeStoredQuestion)
       .filter((question): question is Question => Boolean(question)),
+    optionEliminationMap: normalizeOptionEliminationMap(session.optionEliminationMap),
     currentQuestionIndex:
       typeof session.currentQuestionIndex === "number" && session.currentQuestionIndex >= 0
         ? session.currentQuestionIndex
@@ -1408,6 +1436,20 @@ export function loadPracticeFastAnswerMode(defaultValue = false) {
   return defaultValue;
 }
 
+export function saveKeyboardQuestionNavigation(enabled: boolean) {
+  if (!isBrowser()) return;
+  safeLocalStorageSetItem(getScopedKey(KEYBOARD_QUESTION_NAVIGATION_KEY), enabled ? "true" : "false");
+  window.dispatchEvent(new CustomEvent("keyboard-question-navigation-change", { detail: enabled }));
+}
+
+export function loadKeyboardQuestionNavigation(defaultValue = false) {
+  if (!isBrowser()) return defaultValue;
+  const raw = getLegacyOrScopedRaw(KEYBOARD_QUESTION_NAVIGATION_KEY);
+  if (raw === "true") return true;
+  if (raw === "false") return false;
+  return defaultValue;
+}
+
 export function saveSimulationConfidenceCalibration(enabled: boolean) {
   if (!isBrowser()) return;
   safeLocalStorageSetItem(getScopedKey(SIMULATION_CONFIDENCE_CALIBRATION_KEY), enabled ? "true" : "false");
@@ -1417,6 +1459,20 @@ export function saveSimulationConfidenceCalibration(enabled: boolean) {
 export function loadSimulationConfidenceCalibration(defaultValue = true) {
   if (!isBrowser()) return defaultValue;
   const raw = getLegacyOrScopedRaw(SIMULATION_CONFIDENCE_CALIBRATION_KEY);
+  if (raw === "true") return true;
+  if (raw === "false") return false;
+  return defaultValue;
+}
+
+export function saveSimulationOptionElimination(enabled: boolean) {
+  if (!isBrowser()) return;
+  safeLocalStorageSetItem(getScopedKey(SIMULATION_OPTION_ELIMINATION_KEY), enabled ? "true" : "false");
+  window.dispatchEvent(new CustomEvent("simulation-option-elimination-change", { detail: enabled }));
+}
+
+export function loadSimulationOptionElimination(defaultValue = false) {
+  if (!isBrowser()) return defaultValue;
+  const raw = getLegacyOrScopedRaw(SIMULATION_OPTION_ELIMINATION_KEY);
   if (raw === "true") return true;
   if (raw === "false") return false;
   return defaultValue;

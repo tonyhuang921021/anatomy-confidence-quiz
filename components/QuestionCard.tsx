@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo } from "react";
+import { type MouseEvent, useMemo } from "react";
 import { QuestionOptionBlock, QuestionStemBlock } from "@/components/QuestionMediaBlock";
 import { OptionKey, Question } from "@/types/quiz";
 
@@ -12,7 +12,11 @@ type QuestionCardProps = {
     correctAnswer: OptionKey;
     isCorrect: boolean;
   };
+  eliminatedOptions?: OptionKey[];
+  showEliminationControls?: boolean;
+  eliminationDisabled?: boolean;
   onSelect: (value: OptionKey) => void;
+  onToggleEliminatedOption?: (value: OptionKey) => void;
   showMetadata?: boolean;
 };
 
@@ -63,7 +67,11 @@ export function QuestionCard({
   question,
   selectedAnswer,
   submittedResult,
+  eliminatedOptions = [],
+  showEliminationControls = false,
+  eliminationDisabled = false,
   onSelect,
+  onToggleEliminatedOption,
   showMetadata = true
 }: QuestionCardProps) {
   const availableOptionKeys = useMemo(
@@ -156,37 +164,65 @@ export function QuestionCard({
               : submittedResult && isSubmittedSelected
                 ? "你的答案"
                 : submittedResult && isCorrectOption
-                  ? "正解"
+                ? "正解"
                   : "";
+          const isEliminated = eliminatedOptions.includes(key);
+          const showEliminationButton = showEliminationControls && Boolean(onToggleEliminatedOption);
+          const handleToggleElimination = (event: MouseEvent<HTMLButtonElement>) => {
+            event.preventDefault();
+            event.stopPropagation();
+            onToggleEliminatedOption?.(key);
+          };
           return (
-            <button
+            <div
               key={key}
-              type="button"
-              onClick={() => onSelect(key)}
-              className={`min-h-12 rounded-3xl border px-4 py-4 text-left transition sm:px-5 ${optionClassName}`}
+              className={`flex min-h-12 items-start gap-3 rounded-3xl border px-4 py-4 transition sm:px-5 ${optionClassName}`}
             >
-              <QuestionOptionBlock
-                question={question}
-                optionKey={key}
-                labelClassName={`mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-sm font-bold ${
-                  labelClassName
-                }`}
-                textClassName="min-w-0 break-words text-sm leading-7 text-slate-800 sm:text-base"
-                trailingContent={
-                  answerBadge ? (
-                    <span
-                      className={`inline-flex shrink-0 rounded-full px-2.5 py-0.5 text-[11px] font-bold leading-5 ${
-                        reviewTone === "wrong"
-                          ? "bg-rose-100 text-rose-800"
-                          : "bg-emerald-100 text-emerald-800"
-                      }`}
-                    >
-                      {answerBadge}
-                    </span>
-                  ) : null
-                }
-              />
-            </button>
+              <button
+                type="button"
+                onClick={() => onSelect(key)}
+                className="min-w-0 flex-1 text-left"
+              >
+                <QuestionOptionBlock
+                  question={question}
+                  optionKey={key}
+                  labelClassName={`mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-sm font-bold ${
+                    labelClassName
+                  }`}
+                  textClassName="min-w-0 break-words text-sm leading-7 text-slate-800 sm:text-base"
+                  trailingContent={
+                    answerBadge ? (
+                      <span
+                        className={`inline-flex shrink-0 rounded-full px-2.5 py-0.5 text-[11px] font-bold leading-5 ${
+                          reviewTone === "wrong"
+                            ? "bg-rose-100 text-rose-800"
+                            : "bg-emerald-100 text-emerald-800"
+                        }`}
+                      >
+                        {answerBadge}
+                      </span>
+                    ) : null
+                  }
+                />
+              </button>
+              {showEliminationButton ? (
+                <button
+                  type="button"
+                  aria-label={`${isEliminated ? "取消排除" : "排除"}選項 ${key}`}
+                  aria-pressed={isEliminated}
+                  title={`${isEliminated ? "取消排除" : "排除"}選項 ${key}`}
+                  disabled={eliminationDisabled}
+                  onClick={handleToggleElimination}
+                  className={`mt-0.5 inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-full border text-sm font-black transition disabled:cursor-not-allowed disabled:opacity-50 ${
+                    isEliminated
+                      ? "border-rose-300 bg-rose-100 text-rose-700 shadow-sm"
+                      : "border-slate-200 bg-white/90 text-slate-400 hover:border-rose-200 hover:bg-rose-50 hover:text-rose-600"
+                  }`}
+                >
+                  X
+                </button>
+              ) : null}
+            </div>
           );
         })}
       </div>

@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { buildQuestionHistoryMap, createQuestionOrder } from "./quizAnalysis";
+import { buildQuestionHistoryMap, createQuestionOrder, generateAIPrompt } from "./quizAnalysis";
 import type { Attempt, Question, QuizSettings } from "../types/quiz";
 
 function makeQuestion(id: string): Question {
@@ -146,4 +146,23 @@ test("錯題完成 streak 只看最近一次答錯後的連續答對，不被低
   assert.equal(history?.correct, 2);
   assert.equal(history?.correctStreakAfterLatestWrong, 2);
   assert.equal(history?.correctStreakAfterLatestRisk, 0);
+});
+
+test("AI prompt 會保留模擬考作答時打叉排除的選項", () => {
+  const question = makeQuestion("q-elimination");
+  const attempt: Attempt = {
+    questionId: question.id,
+    selectedAnswer: "B",
+    correctAnswer: "A",
+    isCorrect: false,
+    confidence: 4,
+    eliminatedOptions: ["C", "D"],
+    answeredAt: new Date(Date.UTC(2026, 0, 4)).toISOString()
+  };
+
+  const prompt = generateAIPrompt([attempt], [question], [{ attempts: [attempt] }], [question], {
+    detailLevel: "concise"
+  });
+
+  assert.match(prompt, /作答時打叉排除：C、D/);
 });

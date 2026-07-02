@@ -7,6 +7,7 @@ type CopyQuestionPromptButtonProps = {
   question: Question;
   selectedAnswer?: OptionKey;
   correctAnswer?: OptionKey;
+  eliminatedOptions?: OptionKey[];
   className?: string;
   compact?: boolean;
 };
@@ -27,11 +28,13 @@ function getQuestionSourceLine(question: Question) {
 function buildQuestionPrompt({
   question,
   selectedAnswer,
-  correctAnswer
+  correctAnswer,
+  eliminatedOptions = []
 }: {
   question: Question;
   selectedAnswer?: OptionKey;
   correctAnswer?: OptionKey;
+  eliminatedOptions?: OptionKey[];
 }) {
   const optionsText = optionKeys
     .filter((key) => typeof question.options[key] === "string")
@@ -62,7 +65,8 @@ function buildQuestionPrompt({
     optionsText,
     "",
     `正確答案：${acceptedAnswerText}`,
-    selectedAnswer ? `我的答案：${selectedAnswer}` : null
+    selectedAnswer ? `我的答案：${selectedAnswer}` : null,
+    eliminatedOptions.length > 0 ? `我作答時打叉排除的選項：${eliminatedOptions.join("、")}` : null
   ]
     .filter((line): line is string => typeof line === "string")
     .join("\n");
@@ -89,13 +93,14 @@ export function CopyQuestionPromptButton({
   question,
   selectedAnswer,
   correctAnswer,
+  eliminatedOptions,
   className = "",
   compact = false
 }: CopyQuestionPromptButtonProps) {
   const [copied, setCopied] = useState(false);
 
   async function handleCopy() {
-    await copyToClipboard(buildQuestionPrompt({ question, selectedAnswer, correctAnswer }));
+    await copyToClipboard(buildQuestionPrompt({ question, selectedAnswer, correctAnswer, eliminatedOptions }));
     setCopied(true);
     window.setTimeout(() => setCopied(false), 1400);
   }

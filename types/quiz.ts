@@ -80,6 +80,7 @@ export type Attempt = {
   isCorrect: boolean;
   confidence: ConfidenceLevel;
   errorType?: ErrorType;
+  eliminatedOptions?: OptionKey[];
   answeredAt: string;
 };
 
@@ -131,6 +132,7 @@ export type QuizSession = {
   settings?: QuizSettings;
   questionOrder?: string[];
   generatedQuestions?: Question[];
+  optionEliminationMap?: Partial<Record<string, OptionKey[]>>;
   currentQuestionIndex?: number;
   isReviewingAnswer?: boolean;
   attempts: Attempt[];

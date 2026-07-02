@@ -60,9 +60,11 @@ import {
   getPendingQuestionExplanationOverrideSync,
   loadCompletedHistorySessionsForUser,
   loadCurrentSession,
+  loadKeyboardQuestionNavigation,
   loadPracticeFastAnswerMode,
   loadQuestionExplanationOverrides,
   loadQuizSettings,
+  loadSimulationOptionElimination,
   mergeCompletedQuestionHistoryFromSessionsForUser,
   queuePendingCompletedSessionUploadForUser,
   saveCompletedSession,
@@ -178,6 +180,18 @@ function evaluateAttempt(question: Question, selectedAnswer: OptionKey) {
   }
 
   return selectedAnswer === question.answer;
+}
+
+function normalizeEliminatedOptions(options?: OptionKey[]) {
+  return Array.from(new Set((options ?? []).filter((option): option is OptionKey => Boolean(option))));
+}
+
+function shouldIgnoreKeyboardNavigationTarget(target: EventTarget | null) {
+  if (!(target instanceof HTMLElement)) return false;
+  if (target.isContentEditable) return true;
+
+  const tagName = target.tagName.toLowerCase();
+  return tagName === "input" || tagName === "textarea" || tagName === "select";
 }
 
 function isGenericSimulationSessionName(name?: string | null) {
@@ -600,6 +614,8 @@ export default function QuizPage() {
   const [isSubmittingAnswer, setIsSubmittingAnswer] = useState(false);
   const [loadIssue, setLoadIssue] = useState("");
   const [fastAnswerMode, setFastAnswerMode] = useState(false);
+  const [keyboardNavigationEnabled, setKeyboardNavigationEnabled] = useState(false);
+  const [simulationOptionEliminationEnabled, setSimulationOptionEliminationEnabled] = useState(false);
   const [selectedAnswer, setSelectedAnswer] = useState<OptionKey | undefined>();
   const [confidence, setConfidence] = useState<ConfidenceLevel>(4);
   const [confidenceExpanded, setConfidenceExpanded] = useState(false);
@@ -652,16 +668,32 @@ export default function QuizPage() {
 
   useEffect(() => {
     setFastAnswerMode(loadPracticeFastAnswerMode(false));
+    setKeyboardNavigationEnabled(loadKeyboardQuestionNavigation(false));
+    setSimulationOptionEliminationEnabled(loadSimulationOptionElimination(false));
 
     function handleFastAnswerModeChange(event: Event) {
       const customEvent = event as CustomEvent<boolean>;
       setFastAnswerMode(Boolean(customEvent.detail));
     }
 
+    function handleKeyboardNavigationChange(event: Event) {
+      const customEvent = event as CustomEvent<boolean>;
+      setKeyboardNavigationEnabled(Boolean(customEvent.detail));
+    }
+
+    function handleSimulationOptionEliminationChange(event: Event) {
+      const customEvent = event as CustomEvent<boolean>;
+      setSimulationOptionEliminationEnabled(Boolean(customEvent.detail));
+    }
+
     window.addEventListener("practice-fast-answer-mode-change", handleFastAnswerModeChange);
+    window.addEventListener("keyboard-question-navigation-change", handleKeyboardNavigationChange);
+    window.addEventListener("simulation-option-elimination-change", handleSimulationOptionEliminationChange);
 
     return () => {
       window.removeEventListener("practice-fast-answer-mode-change", handleFastAnswerModeChange);
+      window.removeEventListener("keyboard-question-navigation-change", handleKeyboardNavigationChange);
+      window.removeEventListener("simulation-option-elimination-change", handleSimulationOptionEliminationChange);
     };
   }, []);
 
@@ -1023,6 +1055,56 @@ export default function QuizPage() {
     session?.settings
   ]);
 
+  useEffect(() => {
+    if (!keyboardNavigationEnabled || !session || session.completedAt || !mounted) return;
+
+    function handleKeyboardNavigation(event: KeyboardEvent) {
+      if (event.key !== "ArrowLeft" && event.key !== "ArrowRight") return;
+      if (isSubmittingAnswer) return;
+      if (event.altKey || event.ctrlKey || event.metaKey || event.shiftKey) return;
+      if (shouldIgnoreKeyboardNavigationTarget(event.target)) return;
+      const activeSession = session;
+      if (!activeSession || activeSession.completedAt) return;
+
+      if (event.key === "ArrowRight") {
+        event.preventDefault();
+        if (activeSession.settings?.mode === "simulation") {
+          if (currentIndex >= targetCount - 1) return;
+          navigateSimulationToQuestion(currentIndex + 1);
+          return;
+        }
+
+        if (!submittedAttempt || currentIndex >= targetCount - 1) return;
+        handleNext();
+        return;
+      }
+
+      event.preventDefault();
+      if (activeSession.settings?.mode === "simulation") {
+        if (currentIndex <= 0) return;
+        navigateSimulationToQuestion(currentIndex - 1);
+        return;
+      }
+
+      navigatePracticeToPreviousQuestion();
+    }
+
+    window.addEventListener("keydown", handleKeyboardNavigation);
+    return () => {
+      window.removeEventListener("keydown", handleKeyboardNavigation);
+    };
+  }, [
+    currentIndex,
+    errorType,
+    isSubmittingAnswer,
+    keyboardNavigationEnabled,
+    mounted,
+    selectedAnswer,
+    session,
+    submittedAttempt,
+    targetCount
+  ]);
+
   function persistSession(
     nextSession: QuizSession,
     options: { deferLocalSave?: boolean } = {}
@@ -1039,6 +1121,156 @@ export default function QuizPage() {
       deferredCurrentSessionSaveRef.current = null;
     }
     saveCurrentSession(nextSession);
+  }
+
+  function getEliminatedOptionsForQuestion(questionId: string, sourceSession: QuizSession | null = session) {
+    const fromMap = sourceSession?.optionEliminationMap?.[questionId];
+    if (fromMap) return normalizeEliminatedOptions(fromMap);
+
+    const fromAttempt = sourceSession?.attempts.find((attempt) => attempt.questionId === questionId)?.eliminatedOptions;
+    return normalizeEliminatedOptions(fromAttempt);
+  }
+
+  function setQuestionEliminatedOptions(
+    baseSession: QuizSession,
+    questionId: string,
+    options: OptionKey[]
+  ) {
+    const normalizedOptions = normalizeEliminatedOptions(options);
+    const nextOptionEliminationMap = {
+      ...(baseSession.optionEliminationMap ?? {})
+    };
+
+    if (normalizedOptions.length > 0) {
+      nextOptionEliminationMap[questionId] = normalizedOptions;
+    } else {
+      delete nextOptionEliminationMap[questionId];
+    }
+
+    return {
+      ...baseSession,
+      optionEliminationMap:
+        Object.keys(nextOptionEliminationMap).length > 0 ? nextOptionEliminationMap : undefined,
+      attempts: baseSession.attempts.map((attempt) =>
+        attempt.questionId === questionId
+          ? {
+              ...attempt,
+              eliminatedOptions: normalizedOptions.length > 0 ? normalizedOptions : undefined
+            }
+          : attempt
+      )
+    } satisfies QuizSession;
+  }
+
+  function getSessionWithCurrentDraft(baseSession: QuizSession) {
+    if (!currentQuestion) return baseSession;
+
+    const eliminatedOptions = getEliminatedOptionsForQuestion(currentQuestion.id, baseSession);
+    let nextSession = setQuestionEliminatedOptions(
+      baseSession,
+      currentQuestion.id,
+      eliminatedOptions
+    );
+    const existingAttempt =
+      nextSession.attempts.find((attempt) => attempt.questionId === currentQuestion.id) ?? null;
+    const attemptToPersist =
+      submittedAttempt ??
+      (selectedAnswer
+        ? ({
+            ...(existingAttempt ?? {}),
+            questionId: currentQuestion.id,
+            selectedAnswer,
+            correctAnswer: currentQuestion.answer,
+            isCorrect: evaluateAttempt(currentQuestion, selectedAnswer),
+            confidence: confidenceRef.current,
+            errorType: errorType ?? existingAttempt?.errorType,
+            answeredAt: existingAttempt?.answeredAt ?? new Date().toISOString(),
+            eliminatedOptions: eliminatedOptions.length > 0 ? eliminatedOptions : undefined
+          } satisfies Attempt)
+        : null);
+
+    if (!attemptToPersist) return nextSession;
+
+    const normalizedAttempt: Attempt = {
+      ...attemptToPersist,
+      confidence: confidenceRef.current,
+      errorType: errorType ?? attemptToPersist.errorType,
+      eliminatedOptions: eliminatedOptions.length > 0 ? eliminatedOptions : undefined
+    };
+    const hasAttempt = nextSession.attempts.some(
+      (attempt) => attempt.questionId === normalizedAttempt.questionId
+    );
+
+    nextSession = {
+      ...nextSession,
+      attempts: hasAttempt
+        ? nextSession.attempts.map((attempt) =>
+            attempt.questionId === normalizedAttempt.questionId ? normalizedAttempt : attempt
+          )
+        : [...nextSession.attempts, normalizedAttempt]
+    };
+
+    return nextSession;
+  }
+
+  function scrollQuestionIntoView() {
+    window.requestAnimationFrame(() => {
+      const target =
+        typeof window !== "undefined" && window.innerWidth >= 1280
+          ? contentTopRef.current
+          : questionTopRef.current;
+
+      target?.scrollIntoView({
+        behavior: "smooth",
+        block: "start"
+      });
+    });
+  }
+
+  function restoreQuestionUiFromAttempt(attempt: Attempt | null) {
+    setSubmittedAttempt(attempt);
+    setSelectedAnswer(attempt?.selectedAnswer);
+    const nextConfidence = attempt?.confidence ?? 4;
+    confidenceRef.current = nextConfidence;
+    setConfidence(nextConfidence);
+    setConfidenceExpanded(nextConfidence <= 3);
+    setErrorType(attempt?.errorType);
+  }
+
+  function navigateSimulationToQuestion(targetIndex: number) {
+    if (!session || targetIndex < 0 || targetIndex >= questionSet.length || targetIndex === currentIndex) {
+      return;
+    }
+
+    const nextSession: QuizSession = {
+      ...getSessionWithCurrentDraft(session),
+      currentQuestionIndex: targetIndex,
+      isReviewingAnswer: false
+    };
+    persistSession(nextSession, { deferLocalSave: true });
+    const targetQuestionId = nextSession.questionOrder?.[targetIndex];
+    const targetAttempt =
+      nextSession.attempts.find((attempt) => attempt.questionId === targetQuestionId) ?? null;
+    restoreQuestionUiFromAttempt(targetAttempt);
+    scrollQuestionIntoView();
+  }
+
+  function navigatePracticeToPreviousQuestion() {
+    if (!session || currentIndex <= 0 || !currentQuestion) return;
+
+    const targetIndex = currentIndex - 1;
+    const targetQuestionId = session.questionOrder?.[targetIndex];
+    const targetAttempt = session.attempts.find((attempt) => attempt.questionId === targetQuestionId) ?? null;
+    if (!targetAttempt) return;
+
+    const nextSession: QuizSession = {
+      ...getSessionWithCurrentDraft(session),
+      currentQuestionIndex: targetIndex,
+      isReviewingAnswer: true
+    };
+    persistSession(nextSession, { deferLocalSave: true });
+    restoreQuestionUiFromAttempt(targetAttempt);
+    scrollQuestionIntoView();
   }
 
   function buildNextIncrementalPracticeSession(baseSession: QuizSession) {
@@ -1149,25 +1381,33 @@ export default function QuizPage() {
       deferredCurrentSessionRef.current?.id === baseSession.id
         ? deferredCurrentSessionRef.current
         : baseSession;
+    const sessionWithDraft = getSessionWithCurrentDraft(pendingSession);
 
-    if (!submittedAttempt) return pendingSession;
+    if (!submittedAttempt) return sessionWithDraft;
 
+    const currentEliminatedOptions = currentQuestion
+      ? getEliminatedOptionsForQuestion(currentQuestion.id, sessionWithDraft)
+      : [];
     const latestAttempt: Attempt = {
       ...submittedAttempt,
       confidence: confidenceRef.current,
-      errorType: errorType ?? submittedAttempt.errorType
+      errorType: errorType ?? submittedAttempt.errorType,
+      eliminatedOptions:
+        currentEliminatedOptions.length > 0
+          ? currentEliminatedOptions
+          : submittedAttempt.eliminatedOptions
     };
-    const hasAttempt = pendingSession.attempts.some(
+    const hasAttempt = sessionWithDraft.attempts.some(
       (attempt) => attempt.questionId === latestAttempt.questionId
     );
     const attempts = hasAttempt
-      ? pendingSession.attempts.map((attempt) =>
+      ? sessionWithDraft.attempts.map((attempt) =>
           attempt.questionId === latestAttempt.questionId ? latestAttempt : attempt
         )
-      : [...pendingSession.attempts, latestAttempt];
+      : [...sessionWithDraft.attempts, latestAttempt];
 
     return {
-      ...pendingSession,
+      ...sessionWithDraft,
       attempts
     } satisfies QuizSession;
   }
@@ -1194,6 +1434,7 @@ export default function QuizPage() {
     if (!session || !currentQuestion || !answerToSubmit || isSubmittingAnswer) return;
     setSelectedAnswer(answerToSubmit);
     setIsSubmittingAnswer(true);
+    const eliminatedOptions = getEliminatedOptionsForQuestion(currentQuestion.id);
 
     const attempt: Attempt = {
       questionId: currentQuestion.id,
@@ -1201,11 +1442,16 @@ export default function QuizPage() {
       correctAnswer: currentQuestion.answer,
       isCorrect: evaluateAttempt(currentQuestion, answerToSubmit),
       confidence: confidenceRef.current,
+      eliminatedOptions: eliminatedOptions.length > 0 ? eliminatedOptions : undefined,
       answeredAt: new Date().toISOString()
     };
 
     const nextSessionBase: QuizSession = {
-      ...session,
+      ...setQuestionEliminatedOptions(
+        session,
+        currentQuestion.id,
+        eliminatedOptions
+      ),
       attempts: [...session.attempts.filter((item) => item.questionId !== currentQuestion.id), attempt],
       isReviewingAnswer: session.settings?.feedbackMode === "none" ? false : true
     };
@@ -1263,28 +1509,49 @@ export default function QuizPage() {
     }
   }
 
+  function handleToggleEliminatedOption(value: OptionKey) {
+    if (
+      !session ||
+      !currentQuestion ||
+      session.settings?.mode !== "simulation" ||
+      !simulationOptionEliminationEnabled ||
+      isSubmittingAnswer
+    ) {
+      return;
+    }
+
+    const currentOptions = getEliminatedOptionsForQuestion(currentQuestion.id);
+    const nextOptions = currentOptions.includes(value)
+      ? currentOptions.filter((option) => option !== value)
+      : [...currentOptions, value];
+    const nextSession = setQuestionEliminatedOptions(
+      session,
+      currentQuestion.id,
+      nextOptions
+    );
+    persistSession(nextSession, { deferLocalSave: true });
+    if (submittedAttempt) {
+      setSubmittedAttempt({
+        ...submittedAttempt,
+        eliminatedOptions: nextOptions.length > 0 ? normalizeEliminatedOptions(nextOptions) : undefined
+      });
+    }
+  }
+
   function handleBlindSimulationPrevious() {
     if (!session || !isBlindSimulation || currentIndex === 0) return;
 
     const previousSession: QuizSession = {
-      ...session,
+      ...getSessionWithCurrentDraft(session),
       currentQuestionIndex: currentIndex - 1,
       isReviewingAnswer: false
     };
     persistSession(previousSession, { deferLocalSave: true });
-    setSubmittedAttempt(null);
-
-    window.requestAnimationFrame(() => {
-      const target =
-        typeof window !== "undefined" && window.innerWidth >= 1280
-          ? contentTopRef.current
-          : questionTopRef.current;
-
-      target?.scrollIntoView({
-        behavior: "smooth",
-        block: "start"
-      });
-    });
+    const previousQuestionId = previousSession.questionOrder?.[currentIndex - 1];
+    const previousAttempt =
+      previousSession.attempts.find((attempt) => attempt.questionId === previousQuestionId) ?? null;
+    restoreQuestionUiFromAttempt(previousAttempt);
+    scrollQuestionIntoView();
   }
 
   function handleJumpToQuestion(targetIndex: number) {
@@ -1299,24 +1566,16 @@ export default function QuizPage() {
     }
 
     const jumpedSession: QuizSession = {
-      ...session,
+      ...getSessionWithCurrentDraft(session),
       currentQuestionIndex: targetIndex,
       isReviewingAnswer: false
     };
     persistSession(jumpedSession, { deferLocalSave: true });
-    setSubmittedAttempt(null);
-
-    window.requestAnimationFrame(() => {
-      const target =
-        typeof window !== "undefined" && window.innerWidth >= 1280
-          ? contentTopRef.current
-          : questionTopRef.current;
-
-      target?.scrollIntoView({
-        behavior: "smooth",
-        block: "start"
-      });
-    });
+    const targetQuestionId = jumpedSession.questionOrder?.[targetIndex];
+    const targetAttempt =
+      jumpedSession.attempts.find((attempt) => attempt.questionId === targetQuestionId) ?? null;
+    restoreQuestionUiFromAttempt(targetAttempt);
+    scrollQuestionIntoView();
   }
 
   function handleErrorTypeSelect(value: ErrorType) {
@@ -1517,7 +1776,7 @@ export default function QuizPage() {
     }
 
     const nextSession: QuizSession = {
-      ...session,
+      ...getSessionWithCurrentDraft(session),
       currentQuestionIndex: currentIndex + 1,
       isReviewingAnswer: false
     };
@@ -1688,7 +1947,13 @@ export default function QuizPage() {
             question={currentQuestion}
             selectedAnswer={selectedAnswer}
             submittedResult={submittedAttempt ?? undefined}
+            eliminatedOptions={getEliminatedOptionsForQuestion(currentQuestion.id)}
+            showEliminationControls={
+              session.settings?.mode === "simulation" && simulationOptionEliminationEnabled
+            }
+            eliminationDisabled={isSubmittingAnswer}
             onSelect={handleSelectAnswer}
+            onToggleEliminatedOption={handleToggleEliminatedOption}
             showMetadata={session.settings?.mode !== "simulation"}
           />
 
@@ -1781,6 +2046,7 @@ export default function QuizPage() {
                       question={currentQuestion}
                       selectedAnswer={submittedAttempt.selectedAnswer}
                       correctAnswer={submittedAttempt.correctAnswer}
+                      eliminatedOptions={submittedAttempt.eliminatedOptions}
                     />
                   </div>
                 </div>

@@ -17,7 +17,9 @@ export type AccountPreferencePatch = {
   practice_question_count?: PracticeQuestionCount;
   practice_stop_after_review?: boolean;
   practice_fast_answer_mode?: boolean;
+  keyboard_question_navigation?: boolean;
   simulation_confidence_calibration?: boolean;
+  simulation_option_elimination?: boolean;
   pharmacology_reverse_swipe?: boolean;
 };
 
@@ -65,9 +67,21 @@ export function getPracticeFastAnswerModePreference(metadata: MetadataSource, de
     : defaultValue;
 }
 
+export function getKeyboardQuestionNavigationPreference(metadata: MetadataSource, defaultValue = false) {
+  return typeof metadata?.keyboard_question_navigation === "boolean"
+    ? metadata.keyboard_question_navigation
+    : defaultValue;
+}
+
 export function getSimulationConfidenceCalibrationPreference(metadata: MetadataSource, defaultValue = true) {
   return typeof metadata?.simulation_confidence_calibration === "boolean"
     ? metadata.simulation_confidence_calibration
+    : defaultValue;
+}
+
+export function getSimulationOptionEliminationPreference(metadata: MetadataSource, defaultValue = false) {
+  return typeof metadata?.simulation_option_elimination === "boolean"
+    ? metadata.simulation_option_elimination
     : defaultValue;
 }
 
@@ -89,8 +103,16 @@ export function hasPracticeFastAnswerModePreference(metadata: MetadataSource) {
   return typeof metadata?.practice_fast_answer_mode === "boolean";
 }
 
+export function hasKeyboardQuestionNavigationPreference(metadata: MetadataSource) {
+  return typeof metadata?.keyboard_question_navigation === "boolean";
+}
+
 export function hasSimulationConfidenceCalibrationPreference(metadata: MetadataSource) {
   return typeof metadata?.simulation_confidence_calibration === "boolean";
+}
+
+export function hasSimulationOptionEliminationPreference(metadata: MetadataSource) {
+  return typeof metadata?.simulation_option_elimination === "boolean";
 }
 
 export function hasPharmacologyReverseSwipePreference(metadata: MetadataSource) {

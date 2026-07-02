@@ -53,6 +53,11 @@ const QUICK_ENTRIES = [
 const HOME_RELEASE_NOTES = [
   {
     time: "07/02",
+    title: "模擬考多兩個小工具",
+    body: "設定裡可以開方向鍵切題；模擬考也能在選項右側打叉，結果與 AI Prompt 會一起帶出。"
+  },
+  {
+    time: "07/02",
     title: "暗夜模式補對比",
     body: "藥理翻卡與半透明卡片在暗夜模式下改成深色底，Safari 也不會再把暗夜卡片強制洗回亮底。"
   },

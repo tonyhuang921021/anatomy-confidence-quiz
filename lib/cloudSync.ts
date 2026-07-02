@@ -705,6 +705,7 @@ function buildSessionPayloadForCloud(
   return {
     settings: compacted.settings,
     questionOrder: compacted.questionOrder,
+    optionEliminationMap: compacted.optionEliminationMap,
     generatedQuestions: shouldRetainGeneratedQuestions ? generatedQuestions : undefined,
     currentQuestionIndex: session.completedAt ? undefined : compacted.currentQuestionIndex,
     isReviewingAnswer: session.completedAt ? undefined : compacted.isReviewingAnswer,
@@ -963,6 +964,47 @@ function mergeQuestionOrder(primary?: string[], secondary?: string[]) {
   return Array.from(new Set([...base, ...extra].filter(Boolean)));
 }
 
+function normalizeAttemptEliminatedOptions(options?: Attempt["eliminatedOptions"]): NonNullable<Attempt["eliminatedOptions"]> {
+  return Array.from(new Set((options ?? []).filter(Boolean))) as NonNullable<Attempt["eliminatedOptions"]>;
+}
+
+function mergeAttemptListMetadata(primary: Attempt[], secondary: Attempt[]) {
+  const secondaryByQuestionId = new Map(secondary.map((attempt) => [attempt.questionId, attempt] as const));
+
+  return primary.map((attempt, index) => {
+    const metadataSource = secondaryByQuestionId.get(attempt.questionId) ?? secondary[index];
+    const eliminatedOptions = normalizeAttemptEliminatedOptions(
+      attempt.eliminatedOptions?.length ? attempt.eliminatedOptions : metadataSource?.eliminatedOptions
+    );
+
+    return {
+      ...attempt,
+      eliminatedOptions: eliminatedOptions.length > 0 ? eliminatedOptions : undefined
+    };
+  });
+}
+
+function mergeOptionEliminationMap(
+  primary?: QuizSession["optionEliminationMap"],
+  secondary?: QuizSession["optionEliminationMap"]
+) {
+  const merged = {
+    ...(secondary ?? {}),
+    ...(primary ?? {})
+  };
+
+  for (const [questionId, options] of Object.entries(merged)) {
+    const normalizedOptions = normalizeAttemptEliminatedOptions(options);
+    if (normalizedOptions.length > 0) {
+      merged[questionId] = normalizedOptions;
+    } else {
+      delete merged[questionId];
+    }
+  }
+
+  return Object.keys(merged).length > 0 ? merged : undefined;
+}
+
 function mergeSessionDetails(primary: QuizSession, secondary: QuizSession) {
   const generatedQuestions = mergeQuestionListById(primary.generatedQuestions, secondary.generatedQuestions);
   const customQuestionPayload = mergeQuestionListById(
@@ -970,7 +1012,14 @@ function mergeSessionDetails(primary: QuizSession, secondary: QuizSession) {
     secondary.settings?.customQuestionPayload
   );
   const questionOrder = mergeQuestionOrder(primary.questionOrder, secondary.questionOrder);
-  const attempts = primary.attempts.length >= secondary.attempts.length ? primary.attempts : secondary.attempts;
+  const attempts =
+    primary.attempts.length >= secondary.attempts.length
+      ? mergeAttemptListMetadata(primary.attempts, secondary.attempts)
+      : mergeAttemptListMetadata(secondary.attempts, primary.attempts);
+  const optionEliminationMap = mergeOptionEliminationMap(
+    primary.optionEliminationMap,
+    secondary.optionEliminationMap
+  );
   const baseSettings = primary.settings ?? secondary.settings;
   const settings = baseSettings
     ? {
@@ -992,6 +1041,7 @@ function mergeSessionDetails(primary: QuizSession, secondary: QuizSession) {
     settings,
     questionOrder: questionOrder.length > 0 ? questionOrder : undefined,
     generatedQuestions: generatedQuestions.length > 0 ? generatedQuestions : undefined,
+    optionEliminationMap,
     attempts
   };
 
@@ -1111,7 +1161,10 @@ function mapRowToSession(
   if (!row) return null;
 
   const payload = row.session_payload ?? {};
-  const resolvedAttempts = attemptMap?.get(row.id) ?? payload.attempts ?? [];
+  const payloadAttempts = payload.attempts ?? [];
+  const resolvedAttempts = attemptMap?.get(row.id)
+    ? mergeAttemptListMetadata(attemptMap.get(row.id) ?? [], payloadAttempts)
+    : payloadAttempts;
   const resolvedQuestionOrder =
     payload.questionOrder && payload.questionOrder.length > 0
       ? payload.questionOrder
@@ -1151,6 +1204,7 @@ function mapRowToSession(
           : undefined),
       questionOrder: resolvedQuestionOrder,
       generatedQuestions: payload.generatedQuestions ?? [],
+      optionEliminationMap: payload.optionEliminationMap,
       currentQuestionIndex: payload.currentQuestionIndex,
       isReviewingAnswer: payload.isReviewingAnswer,
       attempts: resolvedAttempts

@@ -7,16 +7,20 @@ import { getSyncStatusText } from "@/components/syncStatusText";
 import { updateLeaderboardDisplayName } from "@/lib/cloudSync";
 import {
   loadPracticeQuestionCount,
+  loadKeyboardQuestionNavigation,
   loadPharmacologyReverseSwipe,
   loadSimulationConfidenceCalibration,
+  loadSimulationOptionElimination,
   loadPracticeFastAnswerMode,
   loadPracticeStopAfterReview,
   loadPracticeYearRange,
   loadHomeToneMode,
   loadThemeMode,
   savePracticeQuestionCount,
+  saveKeyboardQuestionNavigation,
   savePharmacologyReverseSwipe,
   saveSimulationConfidenceCalibration,
+  saveSimulationOptionElimination,
   savePracticeFastAnswerMode,
   savePracticeStopAfterReview,
   savePracticeYearRange,
@@ -29,13 +33,17 @@ import {
 } from "@/lib/storage";
 import {
   getHomeToneModePreference,
+  getKeyboardQuestionNavigationPreference,
   getPharmacologyReverseSwipePreference,
   hasPracticeQuestionCountPreference,
+  hasKeyboardQuestionNavigationPreference,
   hasPharmacologyReverseSwipePreference,
   hasSimulationConfidenceCalibrationPreference,
+  hasSimulationOptionEliminationPreference,
   hasPracticeFastAnswerModePreference,
   hasPracticeStopAfterReviewPreference,
   getSimulationConfidenceCalibrationPreference,
+  getSimulationOptionEliminationPreference,
   getPracticeFastAnswerModePreference,
   getPracticeQuestionCountPreference,
   getPracticeStopAfterReviewPreference,
@@ -150,8 +158,12 @@ export function AuthPanel() {
   const [practiceQuestionCount, setPracticeQuestionCount] = useState<PracticeQuestionCount>(10);
   const [practiceStopAfterReview, setPracticeStopAfterReview] = useState(false);
   const [practiceFastAnswerMode, setPracticeFastAnswerMode] = useState(false);
+  const [keyboardQuestionNavigation, setKeyboardQuestionNavigation] = useState(false);
   const [simulationConfidenceCalibration, setSimulationConfidenceCalibration] = useState(() =>
     loadSimulationConfidenceCalibration(true)
+  );
+  const [simulationOptionElimination, setSimulationOptionElimination] = useState(() =>
+    loadSimulationOptionElimination(false)
   );
   const [pharmacologyReverseSwipe, setPharmacologyReverseSwipe] = useState(() =>
     loadPharmacologyReverseSwipe(false)
@@ -211,45 +223,63 @@ export function AuthPanel() {
     const accountCount = getPracticeQuestionCountPreference(user?.user_metadata, 10);
     const accountStopAfterReview = getPracticeStopAfterReviewPreference(user?.user_metadata, false);
     const accountFastAnswerMode = getPracticeFastAnswerModePreference(user?.user_metadata, false);
+    const accountKeyboardQuestionNavigation = getKeyboardQuestionNavigationPreference(user?.user_metadata, false);
     const accountSimulationConfidenceCalibration = getSimulationConfidenceCalibrationPreference(user?.user_metadata, true);
+    const accountSimulationOptionElimination = getSimulationOptionEliminationPreference(user?.user_metadata, false);
     const accountPharmacologyReverseSwipe = getPharmacologyReverseSwipePreference(user?.user_metadata, false);
     const nextCount = user ? accountCount : loadPracticeQuestionCount(10);
     const nextStopAfterReview = user ? accountStopAfterReview : loadPracticeStopAfterReview(false);
     const nextFastAnswerMode = user ? accountFastAnswerMode : loadPracticeFastAnswerMode(false);
+    const nextKeyboardQuestionNavigation = user
+      ? accountKeyboardQuestionNavigation
+      : loadKeyboardQuestionNavigation(false);
     const nextSimulationConfidenceCalibration = user
       ? accountSimulationConfidenceCalibration
       : loadSimulationConfidenceCalibration(true);
+    const nextSimulationOptionElimination = user
+      ? accountSimulationOptionElimination
+      : loadSimulationOptionElimination(false);
     const nextPharmacologyReverseSwipe = user
       ? accountPharmacologyReverseSwipe
       : loadPharmacologyReverseSwipe(false);
     setPracticeQuestionCount(nextCount);
     setPracticeStopAfterReview(nextStopAfterReview);
     setPracticeFastAnswerMode(nextFastAnswerMode);
+    setKeyboardQuestionNavigation(nextKeyboardQuestionNavigation);
     setSimulationConfidenceCalibration(nextSimulationConfidenceCalibration);
+    setSimulationOptionElimination(nextSimulationOptionElimination);
     setPharmacologyReverseSwipe(nextPharmacologyReverseSwipe);
     if (user) {
       savePracticeQuestionCount(accountCount);
       savePracticeStopAfterReview(accountStopAfterReview);
       savePracticeFastAnswerMode(accountFastAnswerMode);
+      saveKeyboardQuestionNavigation(accountKeyboardQuestionNavigation);
       saveSimulationConfidenceCalibration(accountSimulationConfidenceCalibration);
+      saveSimulationOptionElimination(accountSimulationOptionElimination);
       savePharmacologyReverseSwipe(accountPharmacologyReverseSwipe);
       const missingQuestionCount = !hasPracticeQuestionCountPreference(user.user_metadata);
       const missingStopAfterReview = !hasPracticeStopAfterReviewPreference(user.user_metadata);
       const missingFastAnswerMode = !hasPracticeFastAnswerModePreference(user.user_metadata);
+      const missingKeyboardQuestionNavigation = !hasKeyboardQuestionNavigationPreference(user.user_metadata);
       const missingSimulationConfidenceCalibration = !hasSimulationConfidenceCalibrationPreference(user.user_metadata);
+      const missingSimulationOptionElimination = !hasSimulationOptionEliminationPreference(user.user_metadata);
       const missingPharmacologyReverseSwipe = !hasPharmacologyReverseSwipePreference(user.user_metadata);
       if (
         missingQuestionCount ||
         missingStopAfterReview ||
         missingFastAnswerMode ||
+        missingKeyboardQuestionNavigation ||
         missingSimulationConfidenceCalibration ||
+        missingSimulationOptionElimination ||
         missingPharmacologyReverseSwipe
       ) {
         const patch: AccountPreferencePatch = {};
         if (missingQuestionCount) patch.practice_question_count = 10;
         if (missingStopAfterReview) patch.practice_stop_after_review = false;
         if (missingFastAnswerMode) patch.practice_fast_answer_mode = false;
+        if (missingKeyboardQuestionNavigation) patch.keyboard_question_navigation = false;
         if (missingSimulationConfidenceCalibration) patch.simulation_confidence_calibration = true;
+        if (missingSimulationOptionElimination) patch.simulation_option_elimination = false;
         if (missingPharmacologyReverseSwipe) patch.pharmacology_reverse_swipe = false;
         void persistAccountPreferences(patch).catch(() => {});
       }
@@ -257,7 +287,9 @@ export function AuthPanel() {
       savePracticeQuestionCount(nextCount);
       savePracticeStopAfterReview(nextStopAfterReview);
       savePracticeFastAnswerMode(nextFastAnswerMode);
+      saveKeyboardQuestionNavigation(nextKeyboardQuestionNavigation);
       saveSimulationConfidenceCalibration(nextSimulationConfidenceCalibration);
+      saveSimulationOptionElimination(nextSimulationOptionElimination);
       savePharmacologyReverseSwipe(nextPharmacologyReverseSwipe);
     }
   }, [user?.id, user?.user_metadata]);
@@ -347,6 +379,18 @@ export function AuthPanel() {
     });
   }
 
+  function handleChangeKeyboardQuestionNavigation(enabled: boolean) {
+    setKeyboardQuestionNavigation(enabled);
+    saveKeyboardQuestionNavigation(enabled);
+    if (!user) return;
+    setError("");
+    void persistAccountPreferences({
+      keyboard_question_navigation: enabled
+    }).catch((persistError) => {
+      setError(persistError instanceof Error ? persistError.message : "方向鍵設定同步失敗");
+    });
+  }
+
   function handleChangeSimulationConfidenceCalibration(enabled: boolean) {
     setSimulationConfidenceCalibration(enabled);
     saveSimulationConfidenceCalibration(enabled);
@@ -356,6 +400,18 @@ export function AuthPanel() {
       simulation_confidence_calibration: enabled
     }).catch((persistError) => {
       setError(persistError instanceof Error ? persistError.message : "信心校準設定同步失敗");
+    });
+  }
+
+  function handleChangeSimulationOptionElimination(enabled: boolean) {
+    setSimulationOptionElimination(enabled);
+    saveSimulationOptionElimination(enabled);
+    if (!user) return;
+    setError("");
+    void persistAccountPreferences({
+      simulation_option_elimination: enabled
+    }).catch((persistError) => {
+      setError(persistError instanceof Error ? persistError.message : "選項打叉設定同步失敗");
     });
   }
 
@@ -686,15 +742,15 @@ export function AuthPanel() {
             >
               <div>
                 <p className="text-sm font-semibold text-ink">設定</p>
-                <p className="mt-1 text-xs text-slate-500">首頁模式、暗夜模式、刷題與藥理卡設定</p>
+                <p className="mt-1 text-xs text-slate-500">首頁、散題、模擬考與藥理複習設定</p>
               </div>
               <span className="text-sm font-semibold text-slate-500">{settingsOpen ? "收合" : "展開"}</span>
             </button>
             {settingsOpen ? (
               <div className="border-t border-slate-200 px-4 py-4">
-                <div className="space-y-4">
-                  <div>
-                    <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">首頁模式</p>
+                <div className="grid gap-5 lg:grid-cols-2">
+                  <div className="rounded-2xl bg-slate-50/80 p-4">
+                    <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">顯示與首頁</p>
                     <div className="mt-3 flex flex-wrap items-center gap-2">
                       <button
                         type="button"
@@ -732,7 +788,7 @@ export function AuthPanel() {
                     </div>
                   </div>
 
-                  <div>
+                  <div className="rounded-2xl bg-slate-50/80 p-4">
                     <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">開始測驗抽題年份</p>
                     <p className="mt-2 text-sm text-slate-600">
                       目前設定：{practiceYearRange.yearFrom} 年到 {practiceYearRange.yearTo} 年
@@ -781,8 +837,8 @@ export function AuthPanel() {
                     </div>
                   </div>
 
-                  <div>
-                    <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">作答節奏</p>
+                  <div className="rounded-2xl bg-slate-50/80 p-4">
+                    <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">散題作答</p>
                     <div className="mt-3 flex flex-wrap gap-2">
                       <button
                         type="button"
@@ -834,10 +890,37 @@ export function AuthPanel() {
                     <p className="mt-2 text-xs leading-5 text-slate-500">
                       極速模式會在點選選項後直接作答，作答後仍可看詳解。
                     </p>
+                    <div className="mt-4 flex flex-wrap gap-2">
+                      <button
+                        type="button"
+                        onClick={() => handleChangeKeyboardQuestionNavigation(false)}
+                        className={`min-h-11 rounded-full px-4 py-2 text-sm font-semibold transition ${
+                          !keyboardQuestionNavigation
+                            ? "bg-brand-600 text-white"
+                            : "bg-slate-100 text-slate-700 hover:bg-slate-200"
+                        }`}
+                      >
+                        方向鍵關閉
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => handleChangeKeyboardQuestionNavigation(true)}
+                        className={`min-h-11 rounded-full px-4 py-2 text-sm font-semibold transition ${
+                          keyboardQuestionNavigation
+                            ? "bg-cyan-100 text-cyan-950 ring-1 ring-cyan-300"
+                            : "bg-slate-100 text-slate-700 hover:bg-slate-200"
+                        }`}
+                      >
+                        左右鍵切題
+                      </button>
+                    </div>
+                    <p className="mt-2 text-xs leading-5 text-slate-500">
+                      散題需先送出答案才能用右鍵下一題；方向鍵不會交卷或直接進結果。
+                    </p>
                   </div>
 
-                  <div>
-                    <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">模擬考信心校準</p>
+                  <div className="rounded-2xl bg-slate-50/80 p-4">
+                    <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">模擬考工具</p>
                     <div className="mt-3 flex flex-wrap gap-2">
                       <button
                         type="button"
@@ -865,9 +948,36 @@ export function AuthPanel() {
                     <p className="mt-2 text-xs leading-5 text-slate-500">
                       只影響模擬考校準分析；散題仍會詢問信心，低信心題會照常留到複習。
                     </p>
+                    <div className="mt-4 flex flex-wrap gap-2">
+                      <button
+                        type="button"
+                        onClick={() => handleChangeSimulationOptionElimination(false)}
+                        className={`min-h-11 rounded-full px-4 py-2 text-sm font-semibold transition ${
+                          !simulationOptionElimination
+                            ? "bg-brand-600 text-white"
+                            : "bg-slate-100 text-slate-700 hover:bg-slate-200"
+                        }`}
+                      >
+                        選項打叉關閉
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => handleChangeSimulationOptionElimination(true)}
+                        className={`min-h-11 rounded-full px-4 py-2 text-sm font-semibold transition ${
+                          simulationOptionElimination
+                            ? "bg-rose-100 text-rose-950 ring-1 ring-rose-300"
+                            : "bg-slate-100 text-slate-700 hover:bg-slate-200"
+                        }`}
+                      >
+                        開啟選項打叉
+                      </button>
+                    </div>
+                    <p className="mt-2 text-xs leading-5 text-slate-500">
+                      只在模擬考選項右側顯示，可標記先排除的選項；結果與 AI Prompt 會一起帶出。
+                    </p>
                   </div>
 
-                  <div>
+                  <div className="rounded-2xl bg-slate-50/80 p-4">
                     <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">藥理卡滑動方向</p>
                     <div className="mt-3 flex flex-wrap gap-2">
                       <button
@@ -899,7 +1009,7 @@ export function AuthPanel() {
                   </div>
 
                   {!practiceStopAfterReview ? (
-                    <div>
+                    <div className="rounded-2xl bg-slate-50/80 p-4">
                       <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">開始測驗題數</p>
                       <p className="mt-2 text-sm text-slate-600">目前設定：每次 {practiceQuestionCount} 題</p>
                       <label className="mt-3 grid gap-2 text-sm text-slate-700 sm:max-w-xs">

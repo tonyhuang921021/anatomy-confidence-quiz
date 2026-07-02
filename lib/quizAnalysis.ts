@@ -408,8 +408,12 @@ export function generateAIPrompt(
 ) {
   const detailLevel = options.detailLevel ?? "detailed";
   const questionMap = new Map([...lookupQuestions, ...questions].map((question) => [question.id, question]));
+  const formatEliminatedOptions = (attempt: Attempt) =>
+    attempt.eliminatedOptions?.length
+      ? `作答時打叉排除：${attempt.eliminatedOptions.join("、")}`
+      : "作答時打叉排除：未標記";
   const formatMissingQuestionAttempt = (attempt: Attempt, label: string) =>
-    `${label}｜題號 ${attempt.questionId}｜題目資料暫時未載入｜信心 ${attempt.confidence}｜我的答案 ${attempt.selectedAnswer}｜正解 ${attempt.correctAnswer}｜錯因 ${attempt.errorType ?? "未填"}`;
+    `${label}｜題號 ${attempt.questionId}｜題目資料暫時未載入｜信心 ${attempt.confidence}｜我的答案 ${attempt.selectedAnswer}｜正解 ${attempt.correctAnswer}｜${formatEliminatedOptions(attempt)}｜錯因 ${attempt.errorType ?? "未填"}`;
   const subjectLabel = (() => {
     const subjects = Array.from(
       new Set(
@@ -443,6 +447,7 @@ export function generateAIPrompt(
         `是否答對：${attempt.isCorrect ? "答對" : "答錯"}`,
         `confidence：${attempt.confidence}`,
         `信心文字：${getConfidenceLabel(attempt.confidence)}`,
+        formatEliminatedOptions(attempt),
         `errorType：${attempt.errorType ?? "未填"}`
       ].join("｜");
     }
@@ -467,6 +472,7 @@ export function generateAIPrompt(
       `是否答對：${attempt.isCorrect ? "答對" : "答錯"}`,
       `confidence：${attempt.confidence}`,
       `信心文字：${getConfidenceLabel(attempt.confidence)}`,
+      formatEliminatedOptions(attempt),
       `errorType：${attempt.errorType ?? "未填"}`,
       `詳解線索：${compactPromptText(question.explanation, 220)}`,
       optionAnalysisLine
@@ -485,6 +491,7 @@ export function generateAIPrompt(
       `題幹：${compactPromptText(question.stem, 110)}`,
       `我的答案 ${formatPromptOption(question, attempt.selectedAnswer)}`,
       `正解 ${formatPromptOption(question, attempt.correctAnswer)}`,
+      formatEliminatedOptions(attempt),
       `詳解線索：${compactPromptText(question.explanation, 140)}`
     ].join("｜");
   };

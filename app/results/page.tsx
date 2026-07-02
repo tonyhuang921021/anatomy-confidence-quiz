@@ -1788,6 +1788,7 @@ function ResultsPageContent() {
               question={question}
               selectedAnswer={attempt.selectedAnswer}
               correctAnswer={attempt.correctAnswer}
+              eliminatedOptions={attempt.eliminatedOptions}
               className="px-0"
             />
           </div>
@@ -1795,6 +1796,7 @@ function ResultsPageContent() {
         <div className="grid gap-3">
           {getAvailableOptionKeys(question).map((key) => {
             const optionState = getResultOptionState(question, attempt, key);
+            const isEliminated = attempt.eliminatedOptions?.includes(key);
 
             return (
               <div key={`${question.id}-${optionKeySuffix}-${key}`} className={optionState.wrapperClassName}>
@@ -1803,12 +1805,21 @@ function ResultsPageContent() {
                   optionKey={key}
                   labelClassName={optionState.labelClassName}
                   trailingContent={
-                    optionState.badge ? (
-                      <span
-                        className={`inline-flex shrink-0 rounded-full px-2.5 py-0.5 text-[11px] font-bold leading-5 ${optionState.badgeClassName}`}
-                      >
-                        {optionState.badge}
-                      </span>
+                    optionState.badge || isEliminated ? (
+                      <>
+                        {isEliminated ? (
+                          <span className="inline-flex shrink-0 rounded-full bg-slate-100 px-2.5 py-0.5 text-[11px] font-bold leading-5 text-slate-600 ring-1 ring-slate-200">
+                            已排除
+                          </span>
+                        ) : null}
+                        {optionState.badge ? (
+                          <span
+                            className={`inline-flex shrink-0 rounded-full px-2.5 py-0.5 text-[11px] font-bold leading-5 ${optionState.badgeClassName}`}
+                          >
+                            {optionState.badge}
+                          </span>
+                        ) : null}
+                      </>
                     ) : null
                   }
                 />
@@ -1848,6 +1859,12 @@ function ResultsPageContent() {
           <p>
             <span className="font-semibold">錯因：</span>
             {attempt.errorType}
+          </p>
+        ) : null}
+        {attempt.eliminatedOptions?.length ? (
+          <p>
+            <span className="font-semibold">作答時排除：</span>
+            {attempt.eliminatedOptions.join("、")}
           </p>
         ) : null}
         <StructuredExplanationText text={question.explanation} label="詳解" compact />
