@@ -1087,6 +1087,18 @@ const questionTextOverrides: Record<string, QuestionTextOverride> = {
       D: "活化血管張力素轉換酶（angiotensin-converting enzyme）"
     }
   },
+  "MOEX-110101-1301-Q028": {
+    options: {
+      C: "屈拇長肌（flexor hallucis longus）與屈趾長肌（flexor digitorum longus）",
+      D: "屈拇短肌（flexor hallucis brevis）與屈趾短肌（flexor digitorum brevis）"
+    },
+    explanation:
+      "足底內側的交叉常稱 Henry 結，為屈拇長肌（flexor hallucis longus, FHL）與屈趾長肌（flexor digitorum longus, FDL）肌腱交叉處。",
+    optionAnalysis: {
+      C: "正確／官方採計。足底內側的交叉常稱 Henry 結，為屈拇長肌（flexor hallucis longus, FHL）與屈趾長肌（flexor digitorum longus, FDL）肌腱交叉處。",
+      D: "不選。屈拇短肌（flexor hallucis brevis）與屈趾短肌（flexor digitorum brevis）不是本題最符合的答案；本題重點是 Knot of Henry：FHL crosses FDL in medial plantar foot。"
+    }
+  },
   "MOEX-107020-5301-Q095": {
     stem: "粒線體氧化磷酸化的過程所產生 H2O2，可由下列哪一種酵素去除？",
     explanation:
