@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { Suspense, useEffect, useMemo, useState } from "react";
+import { Suspense, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useAuth } from "@/components/AuthProvider";
 import { CopyQuestionPromptButton } from "@/components/CopyQuestionPromptButton";
@@ -689,6 +689,8 @@ function ResultsPageContent() {
   const [isFullscreenReview, setIsFullscreenReview] = useState(false);
   const [isFullscreenReviewVisible, setIsFullscreenReviewVisible] = useState(false);
   const [openReviewDetailKeys, setOpenReviewDetailKeys] = useState<Set<string>>(() => new Set());
+  const reviewDetailElementMapRef = useRef<Record<string, HTMLDetailsElement | null>>({});
+  const pendingReviewScrollAnchorRef = useRef<{ key: string; top: number } | null>(null);
   const [isConfidenceCalibrationOpen, setIsConfidenceCalibrationOpen] = useState(false);
   const [simulationConfidenceCalibration, setSimulationConfidenceCalibration] = useState(() =>
     loadSimulationConfidenceCalibration(true)
@@ -736,6 +738,23 @@ function ResultsPageContent() {
       );
     };
   }, []);
+
+  useLayoutEffect(() => {
+    const anchor = pendingReviewScrollAnchorRef.current;
+    if (!anchor || typeof window === "undefined") return;
+    pendingReviewScrollAnchorRef.current = null;
+
+    const element =
+      reviewDetailElementMapRef.current[anchor.key] ??
+      document.getElementById(`review-${anchor.key}`);
+    if (!element) return;
+
+    const nextTop = element.getBoundingClientRect().top;
+    const offset = nextTop - anchor.top;
+    if (Math.abs(offset) > 1) {
+      window.scrollBy({ top: offset, left: 0, behavior: "auto" });
+    }
+  }, [openReviewDetailKeys]);
 
   async function handleCopyAIPrompt() {
     const promptText = state.promptTexts[aiPromptDetailLevel];
@@ -1355,6 +1374,38 @@ function ResultsPageContent() {
         }
       } else {
         next.delete(key);
+      }
+      return next;
+    });
+  }
+
+  function rememberReviewScrollAnchor(key: string) {
+    if (typeof window === "undefined") return;
+
+    const element =
+      reviewDetailElementMapRef.current[key] ?? document.getElementById(`review-${key}`);
+    if (!element) return;
+
+    pendingReviewScrollAnchorRef.current = {
+      key,
+      top: element.getBoundingClientRect().top
+    };
+  }
+
+  function toggleReviewDetailOpen(key: string) {
+    rememberReviewScrollAnchor(key);
+    setOpenReviewDetailKeys((current) => {
+      const next = new Set(current);
+      if (next.has(key)) {
+        next.delete(key);
+        return next;
+      }
+
+      next.add(key);
+      while (next.size > MAX_OPEN_REVIEW_DETAILS) {
+        const oldestKey = next.values().next().value;
+        if (!oldestKey) break;
+        next.delete(oldestKey);
       }
       return next;
     });
@@ -2297,11 +2348,20 @@ function ResultsPageContent() {
                   return (
                     <details
                       key={detailKey}
+                      id={`review-${detailKey}`}
+                      ref={(node) => {
+                        reviewDetailElementMapRef.current[detailKey] = node;
+                      }}
                       open={isOpen}
-                      onToggle={(event) => setReviewDetailOpen(detailKey, event.currentTarget.open)}
                       className="group overflow-hidden rounded-2xl bg-rose-50 p-3.5 sm:p-4"
                     >
-                      <summary className="cursor-pointer overflow-hidden text-sm font-semibold text-rose-950 list-none [&::-webkit-details-marker]:hidden">
+                      <summary
+                        onClick={(event) => {
+                          event.preventDefault();
+                          toggleReviewDetailOpen(detailKey);
+                        }}
+                        className="cursor-pointer overflow-hidden text-sm font-semibold text-rose-950 list-none [&::-webkit-details-marker]:hidden"
+                      >
                         {renderQuestionSummaryLine({
                           prefix: `錯題 ${index + 1}：`,
                           question,
@@ -2342,11 +2402,20 @@ function ResultsPageContent() {
                     return (
                       <details
                         key={detailKey}
+                        id={`review-${detailKey}`}
+                        ref={(node) => {
+                          reviewDetailElementMapRef.current[detailKey] = node;
+                        }}
                         open={isOpen}
-                        onToggle={(event) => setReviewDetailOpen(detailKey, event.currentTarget.open)}
                         className="group overflow-hidden rounded-2xl bg-amber-50 p-3.5 sm:p-4"
                       >
-                        <summary className="cursor-pointer overflow-hidden text-sm font-semibold text-amber-950 list-none [&::-webkit-details-marker]:hidden">
+                        <summary
+                          onClick={(event) => {
+                            event.preventDefault();
+                            toggleReviewDetailOpen(detailKey);
+                          }}
+                          className="cursor-pointer overflow-hidden text-sm font-semibold text-amber-950 list-none [&::-webkit-details-marker]:hidden"
+                        >
                           {renderQuestionSummaryLine({
                             prefix: `第 ${questionNumber} 題：`,
                             question,
@@ -2382,11 +2451,19 @@ function ResultsPageContent() {
                   <details
                     key={detailKey}
                     id={`review-${detailKey}`}
+                    ref={(node) => {
+                      reviewDetailElementMapRef.current[detailKey] = node;
+                    }}
                     open={isOpen}
-                    onToggle={(event) => setReviewDetailOpen(detailKey, event.currentTarget.open)}
                     className="group overflow-hidden rounded-2xl bg-slate-50 p-3.5 sm:p-4"
                   >
-                    <summary className="cursor-pointer overflow-hidden text-sm font-semibold text-ink list-none [&::-webkit-details-marker]:hidden">
+                    <summary
+                      onClick={(event) => {
+                        event.preventDefault();
+                        toggleReviewDetailOpen(detailKey);
+                      }}
+                      className="cursor-pointer overflow-hidden text-sm font-semibold text-ink list-none [&::-webkit-details-marker]:hidden"
+                    >
                       {renderQuestionSummaryLine({
                         prefix: `第 ${questionNumber} 題：`,
                         question,

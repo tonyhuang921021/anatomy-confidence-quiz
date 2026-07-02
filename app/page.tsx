@@ -53,6 +53,11 @@ const QUICK_ENTRIES = [
 const HOME_RELEASE_NOTES = [
   {
     time: "07/02",
+    title: "結果頁展開不跳走",
+    body: "模擬考回顧仍最多展開兩題；點下方題目時，畫面會穩穩留在剛點的那一題。"
+  },
+  {
+    time: "07/02",
     title: "Safari 模擬考更順",
     body: "模擬考切題時減少 Safari 的重繪負擔，題號導覽和作答功能維持原本的用法。"
   },
