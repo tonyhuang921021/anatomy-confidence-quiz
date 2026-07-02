@@ -53,6 +53,11 @@ const QUICK_ENTRIES = [
 const HOME_RELEASE_NOTES = [
   {
     time: "07/03",
+    title: "詳解截圖補到更完整",
+    body: "一批被切掉、貼錯頁或多帶空白頁的陽明詳解已換成原頁截圖；疑義給分題也同步補上可採計答案。"
+  },
+  {
+    time: "07/03",
     title: "Safari 作答減壓",
     body: "作答中仍會本機即時存，但雲端改成較輕的 checkpoint；Safari 切題時少做背景同步，比較不拖手感。"
   },

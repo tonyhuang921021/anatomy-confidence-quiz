@@ -1538,12 +1538,14 @@ const questionTextOverrides: Record<string, QuestionTextOverride> = {
   },
   "MOEX-111100-1301-Q040": {
     answer: "B",
+    acceptedAnswers: ["B", "C"],
+    answerCreditType: "multiple_accepted",
     explanation:
-      "壺腹嵴（crista ampullaris）位於半規管的壺腹，感受角加速度，其上方是 cupula。但 cupula 本身沒有耳石。耳石（otolith／otoconia）位於橢圓囊與球囊的耳石膜，用來感受直線加速度與頭部位置變化。所以 B 把 cupula 和 otolith 混在一起，是最明顯錯誤。",
+      "本題官方採計 B、C 皆可給分。B 的錯誤在於 cupula 本身沒有耳石；耳石（otolith／otoconia）位於橢圓囊與球囊的耳石膜，用來感受直線加速度與頭部位置變化。C 敘述在概念上通常視為正確，但因官方疑義採計，作答時 B 或 C 都算對。",
     optionAnalysis: {
       A: "正確。壺腹嵴感受旋轉造成的角加速度。",
-      B: "錯。cupula 沒有耳石；耳石在 utricle 與 saccule 的 macula 上。",
-      C: "正確。scala vestibuli 和 scala tympani 在 helicotrema 相通。",
+      B: "可採計。cupula 沒有耳石；耳石在 utricle 與 saccule 的 macula 上。",
+      C: "可採計。scala vestibuli 和 scala tympani 在 helicotrema 相通，原句因官方疑義也給分。",
       D: "正確。cochlear duct 又稱 scala media，內含 endolymph。"
     },
     testedConcept: "內耳組織／特殊感覺"
@@ -1794,14 +1796,15 @@ const manualInjectedQuestions: Question[] = [
       D: "耳蝸導管（cochlear duct）內，流動的液體為內淋巴液（endolymph）"
     },
     answer: "B",
-    answerCreditType: "standard",
+    acceptedAnswers: ["B", "C"],
+    answerCreditType: "multiple_accepted",
     explanation:
-      "壺腹嵴（crista ampullaris）位於半規管的壺腹，感受角加速度，其上方是 cupula。但 cupula 本身沒有耳石。耳石（otolith／otoconia）位於橢圓囊與球囊的耳石膜，用來感受直線加速度與頭部位置變化。所以 B 把 cupula 和 otolith 混在一起，是最明顯錯誤。",
+      "本題官方採計 B、C 皆可給分。B 的錯誤在於 cupula 本身沒有耳石；耳石（otolith／otoconia）位於橢圓囊與球囊的耳石膜，用來感受直線加速度與頭部位置變化。C 敘述在概念上通常視為正確，但因官方疑義採計，作答時 B 或 C 都算對。",
     testedConcept: "內耳組織／特殊感覺",
     optionAnalysis: {
       A: "正確。壺腹嵴感受旋轉造成的角加速度。",
-      B: "錯。cupula 沒有耳石；耳石在 utricle 與 saccule 的 macula 上。",
-      C: "正確。scala vestibuli 和 scala tympani 在 helicotrema 相通。",
+      B: "可採計。cupula 沒有耳石；耳石在 utricle 與 saccule 的 macula 上。",
+      C: "可採計。scala vestibuli 和 scala tympani 在 helicotrema 相通，原句因官方疑義也給分。",
       D: "正確。cochlear duct 又稱 scala media，內含 endolymph。"
     },
     sourceType: "MOEX_PAST_EXAM",
