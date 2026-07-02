@@ -2420,12 +2420,12 @@ export async function loadLeaderboard(limit = 50, options: { signal?: AbortSigna
 const BACKGROUND_STATS_LOOKUP_CHUNK_SIZE = 100;
 const BACKGROUND_STATS_LOOKUP_LIMIT = 200;
 const BACKGROUND_CLASSIFICATION_LOOKUP_LIMIT = 500;
-const BACKGROUND_DATA_CACHE_VERSION = "v4";
+const BACKGROUND_DATA_CACHE_VERSION = "v5";
 const BACKGROUND_DATA_STORAGE_PREFIX = `aq:bg:${BACKGROUND_DATA_CACHE_VERSION}:`;
 const BACKGROUND_DATA_LOCAL_STORAGE_MAX_BYTES = 180_000;
 const BACKGROUND_DATA_TTL_MS = {
   stats: 30 * 60 * 1000,
-  explanations: 6 * 60 * 60 * 1000,
+  explanations: 60 * 1000,
   classifications: 12 * 60 * 60 * 1000,
   allClassifications: 24 * 60 * 60 * 1000
 };
@@ -2530,6 +2530,39 @@ function writeBackgroundCache<T>(key: string, value: T, ttlMs: number) {
   writeBackgroundStorageCache("sessionStorage", key, entry);
   if (shouldPersistBackgroundCacheInLocalStorage(key)) {
     writeBackgroundStorageCache("localStorage", key, entry);
+  }
+}
+
+function removeBackgroundStorageCache(storageName: "sessionStorage" | "localStorage", key: string) {
+  const storage = getBackgroundStorage(storageName);
+  if (!storage) return;
+
+  try {
+    storage.removeItem(`${BACKGROUND_DATA_STORAGE_PREFIX}${key}`);
+  } catch {
+    // Browser storage is best-effort.
+  }
+}
+
+export function clearQuestionExplanationBackgroundCache(questionIds: string | string[]) {
+  const ids = Array.isArray(questionIds) ? questionIds : [questionIds];
+  const normalizedIds = ids.map((questionId) => questionId.trim()).filter(Boolean);
+  if (normalizedIds.length === 0) return;
+
+  for (const questionId of normalizedIds) {
+    const key = `explanation:${questionId}`;
+    backgroundDataMemoryCache.delete(key);
+    removeBackgroundStorageCache("sessionStorage", key);
+    removeBackgroundStorageCache("localStorage", key);
+  }
+
+  for (const cacheKey of Array.from(backgroundDataRequestsInFlight.keys())) {
+    if (
+      cacheKey.startsWith("explanations:") &&
+      normalizedIds.some((questionId) => cacheKey.includes(questionId))
+    ) {
+      backgroundDataRequestsInFlight.delete(cacheKey);
+    }
   }
 }
 
@@ -2754,6 +2787,9 @@ export async function syncSharedQuestionExplanationOverrides(
     const completedAt = Date.now();
     recentSharedQuestionExplanationSyncs.set(signature, completedAt);
     writeQuestionExplanationSyncMarker(signature, { completedAt });
+    clearQuestionExplanationBackgroundCache(
+      normalizedOverrides.map((override) => override.questionId)
+    );
 
     return {
       syncedCount: payload.syncedCount ?? 0

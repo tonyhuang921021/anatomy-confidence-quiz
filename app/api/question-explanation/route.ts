@@ -350,6 +350,27 @@ async function upsertSharedExplanationOverride(
     throw new Error("找不到可寫入共享詳解的 Supabase 憑證。");
   }
 
+  const nextUpdatedAt = updatedAt || new Date().toISOString();
+  const nextUpdatedAtTime = Date.parse(nextUpdatedAt);
+  const { data: existingRow, error: existingError } = await supabase
+    .from("question_explanation_overrides")
+    .select("updated_at")
+    .eq("question_id", questionId)
+    .maybeSingle();
+
+  if (existingError) {
+    throw new Error(`共享詳解版本檢查失敗：${formatUnknownError(existingError)}`);
+  }
+
+  const existingUpdatedAtTime = Date.parse(existingRow?.updated_at ?? "");
+  if (
+    Number.isFinite(existingUpdatedAtTime) &&
+    Number.isFinite(nextUpdatedAtTime) &&
+    nextUpdatedAtTime < existingUpdatedAtTime
+  ) {
+    return false;
+  }
+
   const { error } = await supabase.from("question_explanation_overrides").upsert(
     {
       question_id: questionId,
@@ -357,7 +378,7 @@ async function upsertSharedExplanationOverride(
       option_analysis: parsed.optionAnalysis ?? {},
       memory_tip: parsed.memoryTip ?? "",
       model,
-      updated_at: updatedAt || new Date().toISOString()
+      updated_at: nextUpdatedAt
     },
     { onConflict: "question_id" }
   );
@@ -365,6 +386,8 @@ async function upsertSharedExplanationOverride(
   if (error) {
     throw new Error(`共享詳解寫入失敗：${formatUnknownError(error)}`);
   }
+
+  return true;
 }
 
 async function syncSharedExplanationOverrides(
@@ -399,17 +422,19 @@ async function syncSharedExplanationOverrides(
     return 0;
   }
 
+  let syncedCount = 0;
   for (const item of normalizedOverrides) {
-    await upsertSharedExplanationOverride(
+    const didSync = await upsertSharedExplanationOverride(
       item.questionId,
       item.parsed,
       item.model,
       accessToken,
       item.updatedAt
     );
+    if (didSync) syncedCount += 1;
   }
 
-  return normalizedOverrides.length;
+  return syncedCount;
 }
 
 function buildQuestionExplanationPrompt(body: QuestionExplanationRequestBody) {

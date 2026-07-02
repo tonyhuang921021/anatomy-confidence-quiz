@@ -3,9 +3,13 @@ import test from "node:test";
 import {
   buildCompletedQuestionHistoryEntriesFromSessions,
   loadCompletedHistorySessionsForUser,
+  loadQuestionExplanationOverride,
   mergeCompletedQuestionHistoryEntries,
+  mergeQuestionExplanationOverrides,
   saveCompletedQuestionHistoryEntriesForUser,
   saveCompletedSession,
+  saveQuestionExplanationOverride,
+  saveQuestionExplanationOverrides,
   setActiveStorageUser
 } from "./storage";
 import type { Attempt, QuizSession } from "../types/quiz";
@@ -117,4 +121,58 @@ test("登入帳號讀已做題時，也要合併同裝置 guest 暫存紀錄", (
 
   assert.ok(attemptedIds.has("q-user"));
   assert.ok(attemptedIds.has("q-guest"));
+});
+
+test("共享詳解較舊時，不會覆蓋本機較新的 AI 詳解", () => {
+  const merged = mergeQuestionExplanationOverrides(
+    {
+      "q-explanation": {
+        explanation: "新的詳解",
+        optionAnalysis: {},
+        memoryTip: "新記憶點",
+        model: "gpt-5.4-mini",
+        updatedAt: "2026-07-03T00:10:00.000Z"
+      }
+    },
+    {
+      "q-explanation": {
+        explanation: "舊的詳解",
+        optionAnalysis: {},
+        memoryTip: "舊記憶點",
+        model: "gpt-5.4-mini",
+        updatedAt: "2026-07-03T00:00:00.000Z"
+      }
+    }
+  );
+
+  assert.equal(merged["q-explanation"].explanation, "新的詳解");
+  assert.equal(merged["q-explanation"].memoryTip, "新記憶點");
+});
+
+test("儲存共享詳解時，也要保護已存在的較新本機詳解", () => {
+  installBrowserStorage();
+  setActiveStorageUser("user-1");
+
+  saveQuestionExplanationOverride("q-stored-explanation", {
+    explanation: "本機剛生成的新詳解",
+    optionAnalysis: {},
+    memoryTip: "",
+    model: "gpt-5.4-mini",
+    updatedAt: "2026-07-03T00:10:00.000Z"
+  });
+
+  saveQuestionExplanationOverrides({
+    "q-stored-explanation": {
+      explanation: "背景同步回來的舊詳解",
+      optionAnalysis: {},
+      memoryTip: "",
+      model: "gpt-5.4-mini",
+      updatedAt: "2026-07-03T00:00:00.000Z"
+    }
+  });
+
+  assert.equal(
+    loadQuestionExplanationOverride("q-stored-explanation")?.explanation,
+    "本機剛生成的新詳解"
+  );
 });

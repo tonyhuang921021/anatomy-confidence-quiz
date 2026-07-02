@@ -27,6 +27,7 @@ import {
 } from "@/data/med1QuestionBank";
 import {
   loadConfirmedQuestionClassificationOverrides,
+  clearQuestionExplanationBackgroundCache,
   recordCustomPaperAttempt,
   pushCurrentSessionToSupabase,
   loadSharedQuestionExplanationOverrides,
@@ -65,6 +66,7 @@ import {
   loadQuestionExplanationOverrides,
   loadQuizSettings,
   loadSimulationOptionElimination,
+  mergeQuestionExplanationOverrides,
   mergeCompletedQuestionHistoryFromSessionsForUser,
   queuePendingCompletedSessionUploadForUser,
   saveCompletedSession,
@@ -937,7 +939,9 @@ export default function QuizPage() {
         const sharedOverrides = await loadSharedQuestionExplanationOverrides(session.questionOrder);
         if (Object.keys(sharedOverrides).length > 0) {
           saveQuestionExplanationOverrides(sharedOverrides);
-          setExplanationOverrides((current) => ({ ...current, ...sharedOverrides }));
+          setExplanationOverrides((current) =>
+            mergeQuestionExplanationOverrides(current, sharedOverrides)
+          );
           setSession((current) => (current ? { ...current } : current));
         }
 
@@ -1726,6 +1730,7 @@ export default function QuizPage() {
         updatedAt: new Date().toISOString()
       };
 
+      clearQuestionExplanationBackgroundCache(question.id);
       saveQuestionExplanationOverride(question.id, override);
       setExplanationOverrides((current) => ({ ...current, [question.id]: override }));
       setSession((current) => (current ? { ...current } : current));

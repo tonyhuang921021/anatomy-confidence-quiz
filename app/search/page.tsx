@@ -11,6 +11,7 @@ import { SavedQuestionButton } from "@/components/SavedQuestionButton";
 import { StructuredExplanationText } from "@/components/StructuredExplanationText";
 import {
   loadConfirmedQuestionClassificationOverrides,
+  clearQuestionExplanationBackgroundCache,
   loadSharedQuestionExplanationOverrides,
   syncSharedQuestionExplanationOverrides
 } from "@/lib/cloudSync";
@@ -18,6 +19,7 @@ import {
   applyQuestionExplanationOverride,
   getPendingQuestionExplanationOverrideSync,
   loadQuestionExplanationOverrides,
+  mergeQuestionExplanationOverrides,
   saveQuestionExplanationOverride,
   saveQuestionExplanationOverrides
 } from "@/lib/storage";
@@ -310,10 +312,9 @@ export default function SearchPage() {
         );
         if (Object.keys(sharedOverrides).length > 0) {
           saveQuestionExplanationOverrides(sharedOverrides);
-          setExplanationOverrides((current) => ({
-            ...current,
-            ...sharedOverrides
-          }));
+          setExplanationOverrides((current) =>
+            mergeQuestionExplanationOverrides(current, sharedOverrides)
+          );
         }
 
         if (session?.access_token) {
@@ -481,6 +482,7 @@ export default function SearchPage() {
         updatedAt: new Date().toISOString()
       };
 
+      clearQuestionExplanationBackgroundCache(question.id);
       saveQuestionExplanationOverride(question.id, override);
       setExplanationOverrides((current) => ({
         ...current,

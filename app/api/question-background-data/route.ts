@@ -11,12 +11,13 @@ const MAX_IDS_BY_KIND: Record<BackgroundDataKind, number> = {
   classifications: 500
 };
 
+const NO_STORE_CACHE_CONTROL = "no-store";
+
 const CACHE_CONTROL_BY_KIND: Record<BackgroundDataKind, string> = {
   stats: "public, max-age=900, s-maxage=3600, stale-while-revalidate=21600",
-  explanations: "public, max-age=1800, s-maxage=21600, stale-while-revalidate=86400",
+  explanations: NO_STORE_CACHE_CONTROL,
   classifications: "public, max-age=21600, s-maxage=86400, stale-while-revalidate=172800"
 };
-const NO_STORE_CACHE_CONTROL = "no-store";
 
 function jsonWithCache(
   payload: unknown,

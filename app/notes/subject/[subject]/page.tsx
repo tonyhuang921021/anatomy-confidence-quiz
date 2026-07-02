@@ -16,6 +16,7 @@ import {
   isMicrobiologyImmunologySubject,
   MICROBIOLOGY_IMMUNOLOGY_CATEGORIES
 } from "@/lib/noteSubjectCategories";
+import { clearQuestionExplanationBackgroundCache } from "@/lib/cloudSync";
 import {
   loadQuestionExplanationOverridesForIds,
   saveQuestionExplanationOverride
@@ -977,6 +978,7 @@ export default function SubjectNotesPage() {
         updatedAt: new Date().toISOString()
       };
 
+      clearQuestionExplanationBackgroundCache(question.id);
       saveQuestionExplanationOverride(question.id, override);
       setExplanationOverrides((current) => ({ ...current, [question.id]: override }));
     } catch {

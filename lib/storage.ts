@@ -900,6 +900,49 @@ function normalizeQuestionExplanationOverride(
   return normalizeQuestionExplanationOverridePayload(override);
 }
 
+function getQuestionExplanationOverrideTime(override?: QuestionExplanationOverride | null) {
+  const rawValue = override?.updatedAt;
+  if (!rawValue) return null;
+  const timestamp = Date.parse(rawValue);
+  return Number.isFinite(timestamp) ? timestamp : null;
+}
+
+function shouldReplaceQuestionExplanationOverride(
+  currentOverride?: QuestionExplanationOverride | null,
+  nextOverride?: QuestionExplanationOverride | null
+) {
+  if (!nextOverride) return false;
+  if (!currentOverride) return true;
+
+  const currentTime = getQuestionExplanationOverrideTime(currentOverride);
+  const nextTime = getQuestionExplanationOverrideTime(nextOverride);
+
+  if (currentTime !== null && nextTime !== null) {
+    return nextTime >= currentTime;
+  }
+
+  if (currentTime !== null && nextTime === null) {
+    return false;
+  }
+
+  return true;
+}
+
+export function mergeQuestionExplanationOverrides(
+  currentOverrides: Record<string, QuestionExplanationOverride>,
+  incomingOverrides: Record<string, QuestionExplanationOverride>
+) {
+  const merged = { ...currentOverrides };
+
+  for (const [questionId, incomingOverride] of Object.entries(incomingOverrides)) {
+    if (shouldReplaceQuestionExplanationOverride(merged[questionId], incomingOverride)) {
+      merged[questionId] = incomingOverride;
+    }
+  }
+
+  return merged;
+}
+
 export function setActiveStorageUser(userId?: string) {
   if (!isBrowser()) return;
   safeLocalStorageSetItem(ACTIVE_USER_KEY, userId || GUEST_USER_ID);
@@ -1338,18 +1381,16 @@ export function saveQuestionExplanationOverrides(
 ) {
   if (!isBrowser()) return;
   const current = loadQuestionExplanationOverrides();
-  const next = {
-    ...current,
-    ...Object.fromEntries(
-      Object.entries(overrides)
-        .map(([questionId, override]) => {
-          const normalized = normalizeQuestionExplanationOverride(override);
-          if (!normalized) return null;
-          return [questionId, normalized] as const;
-        })
-        .filter((entry): entry is readonly [string, QuestionExplanationOverride] => Boolean(entry))
-    )
-  };
+  const normalizedIncoming = Object.fromEntries(
+    Object.entries(overrides)
+      .map(([questionId, override]) => {
+        const normalized = normalizeQuestionExplanationOverride(override);
+        if (!normalized) return null;
+        return [questionId, normalized] as const;
+      })
+      .filter((entry): entry is readonly [string, QuestionExplanationOverride] => Boolean(entry))
+  );
+  const next = mergeQuestionExplanationOverrides(current, normalizedIncoming);
   safeLocalStorageSetItem(getScopedKey(QUESTION_EXPLANATION_OVERRIDES_KEY), JSON.stringify(next));
 }
 

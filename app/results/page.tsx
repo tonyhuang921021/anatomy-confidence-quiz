@@ -16,6 +16,7 @@ import {
   loadQuestionCommunityStats,
   loadConfirmedQuestionClassificationOverrides,
   loadCompletedSessionFromSupabase,
+  clearQuestionExplanationBackgroundCache,
   loadSharedQuestionExplanationOverrides,
   pushCompletedSessionToSupabase,
   syncSharedQuestionExplanationOverrides
@@ -47,6 +48,7 @@ import {
   getCanonicalSessionId,
   loadCompletedSessions,
   loadQuestionExplanationOverrides,
+  mergeQuestionExplanationOverrides,
   saveCompletedSession,
   saveQuestionExplanationOverride,
   saveQuestionExplanationOverrides,
@@ -1153,10 +1155,9 @@ function ResultsPageContent() {
         );
         if (Object.keys(sharedOverrides).length > 0) {
           saveQuestionExplanationOverrides(sharedOverrides);
-          setExplanationOverrides((current) => ({
-            ...current,
-            ...sharedOverrides
-          }));
+          setExplanationOverrides((current) =>
+            mergeQuestionExplanationOverrides(current, sharedOverrides)
+          );
         }
 
         if (session?.access_token) {
@@ -1525,6 +1526,7 @@ function ResultsPageContent() {
         updatedAt: new Date().toISOString()
       };
 
+      clearQuestionExplanationBackgroundCache(question.id);
       saveQuestionExplanationOverride(question.id, override);
       setExplanationOverrides((current) => ({
         ...current,

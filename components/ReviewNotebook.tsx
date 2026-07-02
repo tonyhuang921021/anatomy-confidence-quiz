@@ -9,6 +9,7 @@ import { QuestionIssueReportButton } from "@/components/QuestionIssueReportButto
 import { SavedQuestionButton } from "@/components/SavedQuestionButton";
 import { StructuredExplanationText } from "@/components/StructuredExplanationText";
 import {
+  clearQuestionExplanationBackgroundCache,
   loadConfirmedQuestionClassificationOverrides,
   loadQuestionCommunityStats,
   loadSharedQuestionExplanationOverrides
@@ -17,6 +18,7 @@ import { applyQuestionClassificationOverride } from "@/data/med1QuestionBank";
 import {
   applyQuestionExplanationOverride,
   loadQuestionExplanationOverrides,
+  mergeQuestionExplanationOverrides,
   saveQuestionExplanationOverride,
   saveQuestionExplanationOverrides
 } from "@/lib/storage";
@@ -663,10 +665,9 @@ export function ReviewNotebook({
         if (Object.keys(sharedOverrides).length === 0) return;
 
         saveQuestionExplanationOverrides(sharedOverrides);
-        setExplanationOverrides((current) => ({
-          ...current,
-          ...sharedOverrides
-        }));
+        setExplanationOverrides((current) =>
+          mergeQuestionExplanationOverrides(current, sharedOverrides)
+        );
       } catch {
         // keep local overrides only
       }
@@ -741,6 +742,7 @@ export function ReviewNotebook({
         updatedAt: new Date().toISOString()
       };
 
+      clearQuestionExplanationBackgroundCache(question.id);
       saveQuestionExplanationOverride(question.id, override);
       setExplanationOverrides((current) => ({
         ...current,

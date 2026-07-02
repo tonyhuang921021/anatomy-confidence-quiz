@@ -6,6 +6,7 @@ import { FormattedQuestionText } from "@/components/FormattedQuestionText";
 import { StructuredExplanationText } from "@/components/StructuredExplanationText";
 import { useAuth } from "@/components/AuthProvider";
 import { YangmingExplanationPanel } from "@/components/YangmingExplanationPanel";
+import { clearQuestionExplanationBackgroundCache } from "@/lib/cloudSync";
 import {
   loadQuestionExplanationOverride,
   saveQuestionExplanationOverride
@@ -93,6 +94,7 @@ export function StudyNoteQuestionCard({ question, link, title }: Props) {
         updatedAt: new Date().toISOString()
       };
 
+      clearQuestionExplanationBackgroundCache(question.id);
       saveQuestionExplanationOverride(question.id, override);
       setExplanationOverride(override);
       setShowAnswer(true);

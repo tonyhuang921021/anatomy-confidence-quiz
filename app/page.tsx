@@ -52,6 +52,11 @@ const QUICK_ENTRIES = [
 
 const HOME_RELEASE_NOTES = [
   {
+    time: "07/03",
+    title: "AI 詳解不倒退",
+    body: "新補的詳解會用更新時間保護；背景同步或快取讀到舊版時，不會再把剛生成的內容蓋回去。"
+  },
+  {
     time: "07/02",
     title: "結果頁展開不跳走",
     body: "模擬考回顧仍最多展開兩題；點下方題目時，畫面會穩穩留在剛點的那一題。"
