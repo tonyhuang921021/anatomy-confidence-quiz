@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import test from "node:test";
 import {
   buildCompletedQuestionHistoryEntriesFromSessions,
+  getPendingQuestionExplanationOverrideSync,
   loadCompletedHistorySessionsForUser,
   loadQuestionExplanationOverride,
   mergeCompletedQuestionHistoryEntries,
@@ -175,4 +176,22 @@ test("儲存共享詳解時，也要保護已存在的較新本機詳解", () =>
     loadQuestionExplanationOverride("q-stored-explanation")?.explanation,
     "本機剛生成的新詳解"
   );
+});
+
+test("第 20 題之後的新詳解也要排入共享同步", () => {
+  installBrowserStorage();
+  setActiveStorageUser("user-1");
+
+  const questionIds = Array.from({ length: 25 }, (_, index) => `q-${index + 1}`);
+  saveQuestionExplanationOverride("q-25", {
+    explanation: "第 25 題的新詳解",
+    optionAnalysis: {},
+    memoryTip: "",
+    model: "gpt-5.4-mini",
+    updatedAt: "2026-07-03T01:20:00.000Z"
+  });
+
+  const pendingOverrides = getPendingQuestionExplanationOverrideSync(questionIds, {});
+
+  assert.ok(pendingOverrides.some((item) => item.questionId === "q-25"));
 });

@@ -1332,13 +1332,15 @@ export function loadQuestionExplanationOverridesForIds(questionIds: string[]) {
   );
 }
 
-const QUESTION_EXPLANATION_BACKGROUND_LOOKUP_LIMIT = 20;
+const QUESTION_EXPLANATION_PENDING_SYNC_LIMIT = 200;
 
 export function getPendingQuestionExplanationOverrideSync(
   questionIds: string[],
   sharedOverrides: Record<string, QuestionExplanationOverride>
 ) {
-  const lookupQuestionIds = questionIds.slice(0, QUESTION_EXPLANATION_BACKGROUND_LOOKUP_LIMIT);
+  const lookupQuestionIds = Array.from(
+    new Set(questionIds.map((questionId) => questionId.trim()).filter(Boolean))
+  ).slice(0, QUESTION_EXPLANATION_PENDING_SYNC_LIMIT);
   const localOverrides = loadQuestionExplanationOverridesForIds(lookupQuestionIds);
 
   return Object.entries(localOverrides)

@@ -2420,6 +2420,8 @@ export async function loadLeaderboard(limit = 50, options: { signal?: AbortSigna
 const BACKGROUND_STATS_LOOKUP_CHUNK_SIZE = 100;
 const BACKGROUND_STATS_LOOKUP_LIMIT = 200;
 const BACKGROUND_CLASSIFICATION_LOOKUP_LIMIT = 500;
+const BACKGROUND_EXPLANATION_LOOKUP_CHUNK_SIZE = 20;
+const BACKGROUND_EXPLANATION_SYNC_CHUNK_SIZE = 50;
 const BACKGROUND_DATA_CACHE_VERSION = "v5";
 const BACKGROUND_DATA_STORAGE_PREFIX = `aq:bg:${BACKGROUND_DATA_CACHE_VERSION}:`;
 const BACKGROUND_DATA_LOCAL_STORAGE_MAX_BYTES = 180_000;
@@ -2655,7 +2657,7 @@ export async function loadSharedQuestionExplanationOverrides(questionIds: string
     return {} as Record<string, QuestionExplanationOverride>;
   }
 
-  const uniqueQuestionIds = Array.from(new Set(questionIds)).slice(0, 20);
+  const uniqueQuestionIds = Array.from(new Set(questionIds.map((questionId) => questionId.trim()).filter(Boolean)));
   const cachedOverrides = new Map<string, QuestionExplanationOverride | null>();
   const missingQuestionIds = uniqueQuestionIds.filter((questionId) => {
     const cachedValue = readBackgroundCache<QuestionExplanationOverride | null>(`explanation:${questionId}`);
@@ -2666,9 +2668,11 @@ export async function loadSharedQuestionExplanationOverrides(questionIds: string
     return true;
   });
 
-  if (missingQuestionIds.length > 0) {
+  for (let start = 0; start < missingQuestionIds.length; start += BACKGROUND_EXPLANATION_LOOKUP_CHUNK_SIZE) {
     try {
-      const requestIds = [...missingQuestionIds].sort();
+      const requestIds = missingQuestionIds
+        .slice(start, start + BACKGROUND_EXPLANATION_LOOKUP_CHUNK_SIZE)
+        .sort();
       const payload = await fetchBackgroundData<
         BackgroundPayloadBase & { overrides?: QuestionExplanationOverrideRow[] }
       >(
@@ -2699,6 +2703,7 @@ export async function loadSharedQuestionExplanationOverrides(questionIds: string
       if (cachedOverrides.size === 0) {
         throw error;
       }
+      break;
     }
   }
 
@@ -2753,35 +2758,41 @@ export async function syncSharedQuestionExplanationOverrides(
   writeQuestionExplanationSyncMarker(signature, { startedAt: now });
 
   const syncTask = (async () => {
-    const response = await fetch("/api/question-explanation", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({
-        action: "sync_overrides",
-        accessToken,
-        overrides: normalizedOverrides.map((override) => ({
-          questionId: override.questionId,
-          explanation: override.explanation,
-          optionAnalysis: override.optionAnalysis,
-          memoryTip: override.memoryTip,
-          model: override.model,
-          updatedAt: override.updatedAt
-        }))
-      })
-    });
+    let syncedCount = 0;
+    for (let start = 0; start < normalizedOverrides.length; start += BACKGROUND_EXPLANATION_SYNC_CHUNK_SIZE) {
+      const chunk = normalizedOverrides.slice(start, start + BACKGROUND_EXPLANATION_SYNC_CHUNK_SIZE);
+      const response = await fetch("/api/question-explanation", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          action: "sync_overrides",
+          accessToken,
+          overrides: chunk.map((override) => ({
+            questionId: override.questionId,
+            explanation: override.explanation,
+            optionAnalysis: override.optionAnalysis,
+            memoryTip: override.memoryTip,
+            model: override.model,
+            updatedAt: override.updatedAt
+          }))
+        })
+      });
 
-    const rawText = await response.text();
-    const payload = (rawText ? JSON.parse(rawText) : null) as {
-      ok?: boolean;
-      syncedCount?: number;
-      message?: string;
-    } | null;
+      const rawText = await response.text();
+      const payload = (rawText ? JSON.parse(rawText) : null) as {
+        ok?: boolean;
+        syncedCount?: number;
+        message?: string;
+      } | null;
 
-    if (!response.ok || !payload?.ok) {
-      clearQuestionExplanationSyncMarker(signature);
-      throw new Error(payload?.message || "共享詳解同步失敗。");
+      if (!response.ok || !payload?.ok) {
+        clearQuestionExplanationSyncMarker(signature);
+        throw new Error(payload?.message || "共享詳解同步失敗。");
+      }
+
+      syncedCount += payload.syncedCount ?? 0;
     }
 
     const completedAt = Date.now();
@@ -2792,7 +2803,7 @@ export async function syncSharedQuestionExplanationOverrides(
     );
 
     return {
-      syncedCount: payload.syncedCount ?? 0
+      syncedCount
     };
   })();
 
