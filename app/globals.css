@@ -1417,13 +1417,23 @@ html[data-browser="safari"]:not([data-theme="dark"]) .home-hero,
 html[data-browser="safari"]:not([data-theme="dark"]) .home-device-card,
 html[data-browser="safari"]:not([data-theme="dark"]) .home-device-screen,
 html[data-browser="safari"]:not([data-theme="dark"]) .home-release-notes,
-html[data-browser="safari"]:not([data-theme="dark"]) .home-action-card,
+html[data-browser="safari"]:not([data-theme="dark"]) .home-action-card:not(.home-action-primary),
 html[data-browser="safari"]:not([data-theme="dark"]) .home-entry-card,
 html[data-browser="safari"]:not([data-theme="dark"]) .home-study-link,
 html[data-browser="safari"]:not([data-theme="dark"]) .home-progress-card,
 html[data-browser="safari"]:not([data-theme="dark"]) .home-evidence-pill,
 html[data-browser="safari"]:not([data-theme="dark"]) .home-skeleton-card {
   background: #ffffff;
+}
+
+html[data-browser="safari"]:not([data-theme="dark"]) .home-action-primary,
+html[data-browser="safari"]:not([data-theme="dark"]) .home-action-primary:hover {
+  background: var(--brand-main);
+  color: white;
+}
+
+html[data-browser="safari"]:not([data-theme="dark"]) .home-action-primary .home-action-mark {
+  background: rgba(255, 255, 255, 0.18);
 }
 
 html[data-browser="safari"][data-theme="dark"] .home-shell .surface-card,
@@ -1441,6 +1451,19 @@ html[data-browser="safari"][data-theme="dark"] .home-skeleton-card {
   background: rgba(35, 43, 55, 0.72);
 }
 
+html[data-browser="safari"][data-theme="dark"] .home-action-primary,
+html[data-browser="safari"][data-theme="dark"] .home-action-primary:hover {
+  background:
+    radial-gradient(circle at top right, rgba(255, 255, 255, 0.08), transparent 42%),
+    linear-gradient(135deg, rgba(84, 101, 128, 0.9), rgba(54, 65, 84, 0.95));
+  color: var(--ink-main);
+}
+
+html[data-browser="safari"][data-theme="dark"] .home-action-primary .home-action-mark {
+  background: rgba(40, 48, 61, 0.72);
+  border-color: rgba(207, 214, 224, 0.08);
+}
+
 html[data-browser="safari"] .home-shell *,
 html[data-browser="safari"] .home-shell *::before,
 html[data-browser="safari"] .home-shell *::after {
@@ -1455,16 +1478,6 @@ html[data-browser="safari"] .home-progress-fill {
 
 html[data-browser="safari"] .home-skeleton-line::after {
   display: none;
-}
-
-html[data-browser="safari"] .home-action-primary,
-html[data-browser="safari"] .home-action-primary:hover {
-  background: var(--brand-main);
-  color: white;
-}
-
-html[data-browser="safari"] .home-action-primary .home-action-mark {
-  background: rgba(255, 255, 255, 0.18);
 }
 
 html[data-theme="dark"] .stat-chip,
