@@ -53,6 +53,11 @@ const QUICK_ENTRIES = [
 const HOME_RELEASE_NOTES = [
   {
     time: "07/03",
+    title: "Safari 作答減壓",
+    body: "作答中仍會本機即時存，但雲端改成較輕的 checkpoint；Safari 切題時少做背景同步，比較不拖手感。"
+  },
+  {
+    time: "07/03",
     title: "AI 詳解不倒退",
     body: "新補的詳解會用更新時間保護；100 題結果頁後段題目也會分批讀到新版詳解，不再卡在舊短版。"
   },

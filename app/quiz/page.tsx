@@ -1,17 +1,13 @@
 "use client";
 
+import dynamic from "next/dynamic";
 import Link from "next/link";
 import { memo, useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/components/AuthProvider";
 import { ConfidenceSelector } from "@/components/ConfidenceSelector";
-import { CopyQuestionPromptButton } from "@/components/CopyQuestionPromptButton";
 import { ErrorTypeSelector } from "@/components/ErrorTypeSelector";
 import { QuestionCard } from "@/components/QuestionCard";
-import { QuestionIssueReportButton } from "@/components/QuestionIssueReportButton";
-import { QuestionExplanationTabs } from "@/components/QuestionExplanationTabs";
-import { SavedQuestionButton } from "@/components/SavedQuestionButton";
-import { StructuredExplanationText } from "@/components/StructuredExplanationText";
 import {
   applyQuestionClassificationOverride,
   buildExamLikeRandomSet,
@@ -88,9 +84,32 @@ import {
   SubjectName
 } from "@/types/quiz";
 
+const CopyQuestionPromptButton = dynamic(
+  () => import("@/components/CopyQuestionPromptButton").then((mod) => mod.CopyQuestionPromptButton),
+  { ssr: false }
+);
+const QuestionExplanationTabs = dynamic(
+  () => import("@/components/QuestionExplanationTabs").then((mod) => mod.QuestionExplanationTabs),
+  { ssr: false }
+);
+const QuestionIssueReportButton = dynamic(
+  () => import("@/components/QuestionIssueReportButton").then((mod) => mod.QuestionIssueReportButton),
+  { ssr: false }
+);
+const SavedQuestionButton = dynamic(
+  () => import("@/components/SavedQuestionButton").then((mod) => mod.SavedQuestionButton),
+  { ssr: false }
+);
+const StructuredExplanationText = dynamic(
+  () => import("@/components/StructuredExplanationText").then((mod) => mod.StructuredExplanationText),
+  { ssr: false }
+);
+
 const FREE_PRACTICE_BATCH_SIZE = 10;
 const FREE_PRACTICE_PREFETCH_THRESHOLD = 3;
 const QUIZ_CLASSIFICATION_OVERRIDE_TIMEOUT_MS = 3200;
+const CURRENT_SESSION_CLOUD_CHECKPOINT_MS = 45_000;
+const CURRENT_SESSION_CLOUD_IDLE_DELAY_MS = 1_500;
 
 function getQuestionSourceBadge(question: Question) {
   if (question.sourceType === "MOEX_PAST_EXAM") return "正式考古題";
@@ -658,6 +677,10 @@ export default function QuizPage() {
   const completedSessionIdsRef = useRef(new Set<string>());
   const deferredCurrentSessionSaveRef = useRef<number | null>(null);
   const deferredCurrentSessionRef = useRef<QuizSession | null>(null);
+  const currentSessionCloudSyncTimerRef = useRef<number | null>(null);
+  const currentSessionCloudPendingRef = useRef<QuizSession | null>(null);
+  const currentSessionCloudLastQueuedAtRef = useRef(0);
+  const latestCurrentSessionRef = useRef<QuizSession | null>(null);
   const incrementalPracticePrefetchRef = useRef(false);
   const [mounted, setMounted] = useState(false);
   const [session, setSession] = useState<QuizSession | null>(null);
@@ -722,6 +745,52 @@ export default function QuizPage() {
     }, 120);
   }
 
+  function clearScheduledCurrentSessionCloudSync() {
+    if (currentSessionCloudSyncTimerRef.current !== null) {
+      window.clearTimeout(currentSessionCloudSyncTimerRef.current);
+      currentSessionCloudSyncTimerRef.current = null;
+    }
+  }
+
+  function scheduleCurrentSessionCloudSync(nextSession: QuizSession) {
+    latestCurrentSessionRef.current = nextSession;
+    if (!authSession?.user?.id || nextSession.completedAt) return;
+
+    currentSessionCloudPendingRef.current = nextSession;
+    if (currentSessionCloudSyncTimerRef.current !== null) return;
+
+    const now = Date.now();
+    const lastQueuedAt = currentSessionCloudLastQueuedAtRef.current;
+    const delay =
+      lastQueuedAt === 0
+        ? CURRENT_SESSION_CLOUD_IDLE_DELAY_MS
+        : Math.max(
+            CURRENT_SESSION_CLOUD_IDLE_DELAY_MS,
+            CURRENT_SESSION_CLOUD_CHECKPOINT_MS - (now - lastQueuedAt)
+          );
+
+    currentSessionCloudSyncTimerRef.current = window.setTimeout(() => {
+      currentSessionCloudSyncTimerRef.current = null;
+      const pendingSession = currentSessionCloudPendingRef.current;
+      currentSessionCloudPendingRef.current = null;
+      if (!pendingSession || pendingSession.completedAt) return;
+
+      currentSessionCloudLastQueuedAtRef.current = Date.now();
+      void pushCurrentSessionToSupabase(pendingSession);
+    }, delay);
+  }
+
+  function flushCurrentSessionCloudSync(forceSession?: QuizSession | null) {
+    clearScheduledCurrentSessionCloudSync();
+    const pendingSession =
+      forceSession ?? currentSessionCloudPendingRef.current ?? latestCurrentSessionRef.current;
+    currentSessionCloudPendingRef.current = null;
+    if (!authSession?.user?.id || !pendingSession || pendingSession.completedAt) return;
+
+    currentSessionCloudLastQueuedAtRef.current = Date.now();
+    void pushCurrentSessionToSupabase(pendingSession, { force: true });
+  }
+
   useEffect(() => {
     setFastAnswerMode(loadPracticeFastAnswerMode(false));
     setKeyboardNavigationEnabled(loadKeyboardQuestionNavigation(false));
@@ -770,6 +839,32 @@ export default function QuizPage() {
       flushDeferredCurrentSessionSave();
     };
   }, []);
+
+  useEffect(() => {
+    latestCurrentSessionRef.current = session;
+  }, [session]);
+
+  useEffect(() => {
+    if (!authSession?.user?.id || !mounted) return;
+
+    const flushPendingCloudSession = () => {
+      flushCurrentSessionCloudSync();
+    };
+    const flushCloudWhenHidden = () => {
+      if (document.visibilityState === "hidden") {
+        flushCurrentSessionCloudSync();
+      }
+    };
+
+    window.addEventListener("pagehide", flushPendingCloudSession);
+    document.addEventListener("visibilitychange", flushCloudWhenHidden);
+
+    return () => {
+      window.removeEventListener("pagehide", flushPendingCloudSession);
+      document.removeEventListener("visibilitychange", flushCloudWhenHidden);
+      flushCurrentSessionCloudSync();
+    };
+  }, [authSession?.user?.id, mounted]);
 
   useEffect(() => {
     if (initializedSessionRef.current) return;
@@ -889,9 +984,10 @@ export default function QuizPage() {
 
         if (cancelled) return;
 
+        latestCurrentSessionRef.current = nextSession;
         setSession(nextSession);
         saveCurrentSession(nextSession);
-        void pushCurrentSessionToSupabase(nextSession);
+        scheduleCurrentSessionCloudSync(nextSession);
 
         if (shouldReuseExisting && existing?.isReviewingAnswer) {
           const currentQuestionId = existing.questionOrder?.[existing.currentQuestionIndex ?? 0];
@@ -962,38 +1058,6 @@ export default function QuizPage() {
     void fetchSharedExplanationOverrides();
   }, [authSession?.access_token, session?.id, session?.questionOrder]);
 
-  useEffect(() => {
-    if (!authSession?.user?.id || !session || session.completedAt || !mounted) return;
-
-    const timer = window.setTimeout(() => {
-      void pushCurrentSessionToSupabase(session);
-    }, 500);
-
-    return () => {
-      window.clearTimeout(timer);
-    };
-  }, [authSession?.user?.id, mounted, session]);
-
-  useEffect(() => {
-    if (!authSession?.user?.id || !session || session.completedAt || !mounted) return;
-
-    const flushCurrentSession = () => {
-      void pushCurrentSessionToSupabase(session, { force: true });
-    };
-    const handleVisibilityChange = () => {
-      if (document.visibilityState === "hidden") {
-        flushCurrentSession();
-      }
-    };
-
-    document.addEventListener("visibilitychange", handleVisibilityChange);
-    window.addEventListener("pagehide", flushCurrentSession);
-    return () => {
-      document.removeEventListener("visibilitychange", handleVisibilityChange);
-      window.removeEventListener("pagehide", flushCurrentSession);
-    };
-  }, [authSession?.user?.id, mounted, session]);
-
   const allQuestionFallbackMap = useMemo(
     () =>
       new Map(
@@ -1042,8 +1106,10 @@ export default function QuizPage() {
     setSubmittedAttempt(null);
     setSelectedAnswer(undefined);
     setErrorType(undefined);
+    latestCurrentSessionRef.current = nextSession;
     setSession(nextSession);
     saveCurrentSession(nextSession);
+    scheduleCurrentSessionCloudSync(nextSession);
   }, [questionSet.length, session?.currentQuestionIndex, session?.id]);
 
   const targetCount =
@@ -1171,7 +1237,9 @@ export default function QuizPage() {
     nextSession: QuizSession,
     options: { deferLocalSave?: boolean } = {}
   ) {
+    latestCurrentSessionRef.current = nextSession;
     setSession(nextSession);
+    scheduleCurrentSessionCloudSync(nextSession);
     if (options.deferLocalSave) {
       scheduleCurrentSessionSave(nextSession);
       return;
@@ -1409,7 +1477,7 @@ export default function QuizPage() {
           }
 
           saveCurrentSession(nextSession);
-          void pushCurrentSessionToSupabase(nextSession);
+          scheduleCurrentSessionCloudSync(nextSession);
           return nextSession;
         });
       } finally {
