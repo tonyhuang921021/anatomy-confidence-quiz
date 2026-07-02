@@ -1631,6 +1631,10 @@ html[data-theme="dark"] .bg-\[rgba\(255\2c 255\2c 255\2c 0\.72\)\] {
   background-color: rgba(35, 43, 55, 0.66);
 }
 
+html[data-theme="dark"] .bg-slate-200 {
+  background-color: rgba(49, 59, 74, 0.78);
+}
+
 html[data-theme="dark"] .border-slate-200,
 html[data-theme="dark"] .border-slate-100 {
   border-color: var(--line-soft);
@@ -1670,6 +1674,14 @@ html[data-theme="dark"] .bg-amber-100\/15,
 html[data-theme="dark"] .bg-amber-100\/25,
 html[data-theme="dark"] .bg-amber-100\/70 {
   background-color: rgba(53, 47, 41, 0.72);
+}
+
+html[data-theme="dark"] .bg-amber-500 {
+  background-color: #8f4f16;
+}
+
+html[data-theme="dark"] .hover\:bg-amber-600:hover {
+  background-color: #783f12;
 }
 
 html[data-theme="dark"] .text-emerald-900,
