@@ -671,6 +671,16 @@ function sessionActivityValue(session: QuizSession, fallbackUpdatedAt?: string |
   );
 }
 
+function sessionUpdatedAtValueForCloud(session: QuizSession) {
+  const values = [
+    session.startedAt,
+    session.completedAt,
+    ...session.attempts.map((attempt) => attempt.answeredAt)
+  ].filter((value): value is string => Boolean(value));
+
+  return values.sort().at(-1) ?? new Date().toISOString();
+}
+
 function isCompletedQuizSession(session: QuizSession) {
   return Boolean(session.completedAt);
 }
@@ -739,6 +749,7 @@ function buildSessionRowForCloud(
     average_confidence: calculateAverageConfidence(session.attempts),
     started_at: session.startedAt,
     completed_at: session.completedAt ?? null,
+    updated_at: sessionUpdatedAtValueForCloud(session),
     session_payload: buildSessionPayloadForCloud(session, {
       includeAttempts: includeAttemptsInPayload
     })
@@ -1224,6 +1235,7 @@ async function fetchActiveQuizSessionRow(userId: string) {
     .eq("user_id", userId)
     .is("completed_at", null)
     .order("updated_at", { ascending: false })
+    .order("started_at", { ascending: false })
     .limit(1)
     .maybeSingle();
 
