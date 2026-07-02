@@ -1173,6 +1173,15 @@ select {
   .note-color-tool[data-open="true"] .note-color-palette-toggle {
     transform: rotate(180deg);
   }
+
+  .simulation-status-sidebar,
+  .simulation-question-navigator {
+    contain: layout paint;
+  }
+
+  .simulation-navigator-button {
+    contain: paint;
+  }
 }
 
 @keyframes home-rise {
@@ -1478,6 +1487,15 @@ html[data-browser="safari"] .home-progress-fill {
 
 html[data-browser="safari"] .home-skeleton-line::after {
   display: none;
+}
+
+html[data-browser="safari"] .simulation-status-sidebar {
+  box-shadow: none;
+}
+
+html[data-browser="safari"] .simulation-navigator-button {
+  transition: none;
+  box-shadow: none;
 }
 
 html[data-theme="dark"] .stat-chip,

@@ -53,6 +53,11 @@ const QUICK_ENTRIES = [
 const HOME_RELEASE_NOTES = [
   {
     time: "07/02",
+    title: "Safari 模擬考更順",
+    body: "模擬考切題時減少 Safari 的重繪負擔，題號導覽和作答功能維持原本的用法。"
+  },
+  {
+    time: "07/02",
     title: "雲端紀錄時間補正",
     body: "修正完成紀錄的雲端更新時間，進度瀏覽比較不會突然跳回幾個小時前的狀態。"
   },

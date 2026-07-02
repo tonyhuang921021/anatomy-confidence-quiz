@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { memo, useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/components/AuthProvider";
 import { ConfidenceSelector } from "@/components/ConfidenceSelector";
@@ -139,6 +139,51 @@ function getSimulationNavigatorButtonClass(confidenceLevel: ConfidenceLevel | nu
   return `${baseClass} border-slate-200 bg-white text-slate-600 ring-slate-200 hover:bg-slate-100`;
 }
 
+type SimulationQuestionNavigatorProps = {
+  attemptsByQuestionId: Map<string, Attempt>;
+  currentIndex: number;
+  disabled: boolean;
+  onJump: (index: number) => void;
+  questions: Question[];
+};
+
+const SimulationQuestionNavigator = memo(function SimulationQuestionNavigator({
+  attemptsByQuestionId,
+  currentIndex,
+  disabled,
+  onJump,
+  questions
+}: SimulationQuestionNavigatorProps) {
+  return (
+    <div className="simulation-question-navigator mt-3 grid grid-cols-5 gap-2">
+      {questions.map((question, index) => {
+        const existingAttempt = attemptsByQuestionId.get(question.id);
+        const isCurrent = index === currentIndex;
+        const navigatorConfidence = existingAttempt?.confidence;
+        const confidenceLabel = navigatorConfidence
+          ? getConfidenceLabel(navigatorConfidence)
+          : "尚未作答";
+        return (
+          <button
+            key={question.id}
+            type="button"
+            onClick={() => onJump(index)}
+            disabled={disabled}
+            className={`${getSimulationNavigatorButtonClass(
+              navigatorConfidence,
+              isCurrent
+            )} simulation-navigator-button disabled:cursor-not-allowed disabled:opacity-60`}
+            aria-label={`前往第 ${index + 1} 題，${confidenceLabel}`}
+            title={`第 ${index + 1} 題・${confidenceLabel}`}
+          >
+            {index + 1}
+          </button>
+        );
+      })}
+    </div>
+  );
+});
+
 function decodeStartSettingsFromUrl(encodedSettings: string | null): QuizSettings | null {
   if (!encodedSettings) return null;
 
@@ -192,6 +237,15 @@ function shouldIgnoreKeyboardNavigationTarget(target: EventTarget | null) {
 
   const tagName = target.tagName.toLowerCase();
   return tagName === "input" || tagName === "textarea" || tagName === "select";
+}
+
+function isSafariBrowser() {
+  if (typeof navigator === "undefined") return false;
+  return /Safari\//.test(navigator.userAgent) && !/Chrome|Chromium|CriOS|FxiOS|Edg\//.test(navigator.userAgent);
+}
+
+function getQuestionScrollBehavior(): ScrollBehavior {
+  return isSafariBrowser() ? "auto" : "smooth";
 }
 
 function isGenericSimulationSessionName(name?: string | null) {
@@ -996,6 +1050,10 @@ export default function QuizPage() {
     targetCount === 0 ? 0 : ((currentIndex + (submittedAttempt ? 1 : 0)) / targetCount) * 100;
   const answeredCount = session?.attempts.length ?? 0;
   const correctCount = session?.attempts.filter((attempt) => attempt.isCorrect).length ?? 0;
+  const attemptsByQuestionId = useMemo(
+    () => new Map((session?.attempts ?? []).map((attempt) => [attempt.questionId, attempt] as const)),
+    [session?.attempts]
+  );
   const displayedConfidence = submittedAttempt?.confidence ?? confidence;
   const averageConfidence =
     answeredCount === 0
@@ -1221,7 +1279,7 @@ export default function QuizPage() {
           : questionTopRef.current;
 
       target?.scrollIntoView({
-        behavior: "smooth",
+        behavior: getQuestionScrollBehavior(),
         block: "start"
       });
     });
@@ -1488,7 +1546,7 @@ export default function QuizPage() {
             : questionTopRef.current;
 
         target?.scrollIntoView({
-          behavior: "smooth",
+          behavior: getQuestionScrollBehavior(),
           block: "start"
         });
       });
@@ -1790,7 +1848,7 @@ export default function QuizPage() {
           : questionTopRef.current;
 
       target?.scrollIntoView({
-        behavior: "smooth",
+        behavior: getQuestionScrollBehavior(),
         block: "start"
       });
     });
@@ -2225,7 +2283,7 @@ export default function QuizPage() {
           </div>
         </div>
 
-        <aside className="h-fit rounded-[2rem] bg-white p-4 shadow-card ring-1 ring-slate-100 sm:p-5 xl:sticky xl:top-6">
+        <aside className="simulation-status-sidebar h-fit rounded-[2rem] bg-white p-4 shadow-card ring-1 ring-slate-100 sm:p-5 xl:sticky xl:top-6">
           <h2 className="text-lg font-semibold text-ink">本輪狀態</h2>
           <div className="mt-4 grid gap-3">
             <p className="rounded-2xl bg-slate-50 px-4 py-3 text-sm text-slate-700">
@@ -2267,32 +2325,13 @@ export default function QuizPage() {
               <div className="rounded-[1.6rem] bg-slate-50 p-4">
                 <p className="text-sm font-semibold text-ink">題號導覽</p>
                 <p className="mt-1 text-xs text-slate-500">可直接跳回前面檢查或修改答案。</p>
-                <div className="mt-3 grid grid-cols-5 gap-2">
-                  {questionSet.map((question, index) => {
-                    const existingAttempt = session.attempts.find((attempt) => attempt.questionId === question.id);
-                    const isCurrent = index === currentIndex;
-                    const navigatorConfidence = existingAttempt?.confidence;
-                    const confidenceLabel = navigatorConfidence
-                      ? getConfidenceLabel(navigatorConfidence)
-                      : "尚未作答";
-                    return (
-                      <button
-                        key={question.id}
-                        type="button"
-                        onClick={() => handleJumpToQuestion(index)}
-                        disabled={isSubmittingAnswer}
-                        className={`${getSimulationNavigatorButtonClass(
-                          navigatorConfidence,
-                          isCurrent
-                        )} disabled:cursor-not-allowed disabled:opacity-60`}
-                        aria-label={`前往第 ${index + 1} 題，${confidenceLabel}`}
-                        title={`第 ${index + 1} 題・${confidenceLabel}`}
-                      >
-                        {index + 1}
-                      </button>
-                    );
-                  })}
-                </div>
+                <SimulationQuestionNavigator
+                  attemptsByQuestionId={attemptsByQuestionId}
+                  currentIndex={currentIndex}
+                  disabled={isSubmittingAnswer}
+                  onJump={handleJumpToQuestion}
+                  questions={questionSet}
+                />
               </div>
             </div>
           ) : null}
