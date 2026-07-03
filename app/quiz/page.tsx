@@ -111,6 +111,21 @@ const QUIZ_CLASSIFICATION_OVERRIDE_TIMEOUT_MS = 3200;
 const CURRENT_SESSION_CLOUD_CHECKPOINT_MS = 45_000;
 const CURRENT_SESSION_CLOUD_IDLE_DELAY_MS = 1_500;
 
+function getEffectiveFeedbackMode(settings?: QuizSettings | null) {
+  if (settings?.mode === "simulation") {
+    return settings.feedbackMode ?? "none";
+  }
+
+  return settings?.feedbackMode ?? "full";
+}
+
+function shouldRevealAttemptFeedback(session?: QuizSession | null) {
+  return !(
+    session?.settings?.mode === "simulation" &&
+    getEffectiveFeedbackMode(session.settings) === "none"
+  );
+}
+
 function getQuestionSourceBadge(question: Question) {
   if (question.sourceType === "MOEX_PAST_EXAM") return "正式考古題";
   if (question.sourceType === "AI_GENERATED") return "AI 題庫";
@@ -989,11 +1004,14 @@ export default function QuizPage() {
         saveCurrentSession(nextSession);
         scheduleCurrentSessionCloudSync(nextSession);
 
-        if (shouldReuseExisting && existing?.isReviewingAnswer) {
-          const currentQuestionId = existing.questionOrder?.[existing.currentQuestionIndex ?? 0];
-          const currentAttempt =
-            existing.attempts.find((attempt) => attempt.questionId === currentQuestionId) ?? null;
-          setSubmittedAttempt(currentAttempt);
+        const currentQuestionId = nextSession.questionOrder?.[nextSession.currentQuestionIndex ?? 0];
+        const currentAttempt =
+          nextSession.attempts.find((attempt) => attempt.questionId === currentQuestionId) ?? null;
+
+        if (shouldReuseExisting && currentAttempt) {
+          const shouldRevealCurrentAttempt =
+            nextSession.isReviewingAnswer && shouldRevealAttemptFeedback(nextSession);
+          setSubmittedAttempt(shouldRevealCurrentAttempt ? currentAttempt : null);
           setSelectedAnswer(currentAttempt?.selectedAnswer);
           const nextConfidence = currentAttempt?.confidence ?? 4;
           confidenceRef.current = nextConfidence;
@@ -1357,8 +1375,12 @@ export default function QuizPage() {
     });
   }
 
-  function restoreQuestionUiFromAttempt(attempt: Attempt | null) {
-    setSubmittedAttempt(attempt);
+  function restoreQuestionUiFromAttempt(
+    attempt: Attempt | null,
+    options: { revealFeedback?: boolean } = {}
+  ) {
+    const shouldReveal = options.revealFeedback ?? true;
+    setSubmittedAttempt(shouldReveal ? attempt : null);
     setSelectedAnswer(attempt?.selectedAnswer);
     const nextConfidence = attempt?.confidence ?? 4;
     confidenceRef.current = nextConfidence;
@@ -1381,7 +1403,9 @@ export default function QuizPage() {
     const targetQuestionId = nextSession.questionOrder?.[targetIndex];
     const targetAttempt =
       nextSession.attempts.find((attempt) => attempt.questionId === targetQuestionId) ?? null;
-    restoreQuestionUiFromAttempt(targetAttempt);
+    restoreQuestionUiFromAttempt(targetAttempt, {
+      revealFeedback: shouldRevealAttemptFeedback(nextSession)
+    });
     scrollQuestionIntoView();
   }
 
@@ -1565,6 +1589,7 @@ export default function QuizPage() {
     setSelectedAnswer(answerToSubmit);
     setIsSubmittingAnswer(true);
     const eliminatedOptions = getEliminatedOptionsForQuestion(currentQuestion.id);
+    const effectiveFeedbackMode = getEffectiveFeedbackMode(session.settings);
 
     const attempt: Attempt = {
       questionId: currentQuestion.id,
@@ -1583,10 +1608,10 @@ export default function QuizPage() {
         eliminatedOptions
       ),
       attempts: [...session.attempts.filter((item) => item.questionId !== currentQuestion.id), attempt],
-      isReviewingAnswer: session.settings?.feedbackMode === "none" ? false : true
+      isReviewingAnswer: effectiveFeedbackMode === "none" ? false : true
     };
 
-    if (session.settings?.mode === "simulation" && session.settings?.feedbackMode === "none") {
+    if (session.settings?.mode === "simulation" && effectiveFeedbackMode === "none") {
       const isLast = currentIndex >= targetCount - 1;
 
       if (isLast) {
@@ -1680,7 +1705,7 @@ export default function QuizPage() {
     const previousQuestionId = previousSession.questionOrder?.[currentIndex - 1];
     const previousAttempt =
       previousSession.attempts.find((attempt) => attempt.questionId === previousQuestionId) ?? null;
-    restoreQuestionUiFromAttempt(previousAttempt);
+    restoreQuestionUiFromAttempt(previousAttempt, { revealFeedback: false });
     scrollQuestionIntoView();
   }
 
@@ -1704,7 +1729,9 @@ export default function QuizPage() {
     const targetQuestionId = jumpedSession.questionOrder?.[targetIndex];
     const targetAttempt =
       jumpedSession.attempts.find((attempt) => attempt.questionId === targetQuestionId) ?? null;
-    restoreQuestionUiFromAttempt(targetAttempt);
+    restoreQuestionUiFromAttempt(targetAttempt, {
+      revealFeedback: shouldRevealAttemptFeedback(jumpedSession)
+    });
     scrollQuestionIntoView();
   }
 
@@ -2002,7 +2029,7 @@ export default function QuizPage() {
             ? { text: "低信心", style: "bg-yellow-100 text-yellow-900" }
           : null;
   const difficultyBadge = submittedAttempt ? getDifficultyBadge(currentQuestion) : null;
-  const feedbackMode = session.settings?.feedbackMode ?? "full";
+  const feedbackMode = getEffectiveFeedbackMode(session.settings);
   const isBlindSimulation =
     session.settings?.mode === "simulation" && feedbackMode === "none";
   const shouldShowExplanation = feedbackMode === "full";
