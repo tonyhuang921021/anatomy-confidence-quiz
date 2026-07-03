@@ -968,10 +968,49 @@ select {
     @apply mt-3 text-base font-semibold leading-8 text-slate-500;
   }
 
+  .pre-exam-survey-review-board {
+    @apply min-w-0 rounded-[1.25rem] border p-4 sm:p-5;
+    display: grid;
+    gap: 1rem;
+    border-color: color-mix(in srgb, var(--brand-main) 13%, var(--line-soft));
+    background:
+      radial-gradient(circle at 92% 0%, color-mix(in srgb, var(--accent-warm) 12%, transparent), transparent 28%),
+      linear-gradient(180deg, rgba(255, 255, 255, 0.88), rgba(255, 255, 255, 0.7)),
+      color-mix(in srgb, var(--brand-main) 4%, white);
+  }
+
+  .pre-exam-survey-review-board-header {
+    @apply grid gap-3 rounded-[1rem] border p-4 sm:grid-cols-[auto_minmax(0,1fr)] sm:items-end;
+    border-color: color-mix(in srgb, var(--brand-main) 10%, var(--line-soft));
+    background: rgba(255, 255, 255, 0.62);
+  }
+
+  .pre-exam-survey-review-board-header span {
+    @apply block text-xs font-black uppercase text-brand-700;
+    letter-spacing: 0.12em;
+  }
+
+  .pre-exam-survey-review-board-header strong {
+    @apply mt-1 block text-3xl font-black leading-none text-ink sm:text-4xl;
+    font-family: var(--survey-display);
+    letter-spacing: 0;
+  }
+
+  .pre-exam-survey-review-board-header p {
+    @apply m-0 text-sm font-semibold leading-7 text-slate-500 sm:justify-self-end sm:text-right;
+    max-width: 34rem;
+  }
+
   .pre-exam-survey-review-deck {
     @apply mt-5 flex gap-3 overflow-x-auto pb-2;
     scroll-snap-type: x mandatory;
     scrollbar-width: thin;
+  }
+
+  .pre-exam-survey-review-deck-grid {
+    @apply mt-0 grid gap-3 overflow-visible pb-0;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    scroll-snap-type: none;
   }
 
   .pre-exam-survey-review-card {
@@ -983,6 +1022,11 @@ select {
     background: rgba(255, 255, 255, 0.78);
     animation: survey-slide-card-in 420ms cubic-bezier(0.22, 1, 0.36, 1) both;
     animation-delay: var(--survey-review-delay, 0ms);
+  }
+
+  .pre-exam-survey-review-deck-grid .pre-exam-survey-review-card {
+    flex: none;
+    min-height: 12rem;
   }
 
   .pre-exam-survey-review-card-hero,
@@ -2966,6 +3010,8 @@ html[data-theme="dark"] .pre-exam-survey-trend-visual,
 html[data-theme="dark"] .pre-exam-survey-trend-legend span,
 html[data-theme="dark"] .pre-exam-survey-intro-copy,
 html[data-theme="dark"] .pre-exam-survey-review,
+html[data-theme="dark"] .pre-exam-survey-review-board,
+html[data-theme="dark"] .pre-exam-survey-review-board-header,
 html[data-theme="dark"] .pre-exam-survey-review-card,
 html[data-theme="dark"] .pre-exam-survey-intro-grid div,
 html[data-theme="dark"] .pre-exam-survey-bars,
@@ -3003,6 +3049,7 @@ html[data-theme="dark"] .pre-exam-survey-rating-topline span,
 html[data-theme="dark"] .pre-exam-survey-slider-scale,
 html[data-theme="dark"] .pre-exam-survey-intro-copy p,
 html[data-theme="dark"] .pre-exam-survey-review-heading p,
+html[data-theme="dark"] .pre-exam-survey-review-board-header p,
 html[data-theme="dark"] .pre-exam-survey-review-card p,
 html[data-theme="dark"] .pre-exam-survey-review-metrics small,
 html[data-theme="dark"] .pre-exam-survey-intro-grid small,
@@ -3018,6 +3065,7 @@ html[data-theme="dark"] .pre-exam-survey-trend-header span,
 html[data-theme="dark"] .pre-exam-survey-reflection-item > span,
 html[data-theme="dark"] .pre-exam-survey-intro-copy > span,
 html[data-theme="dark"] .pre-exam-survey-review-heading > span,
+html[data-theme="dark"] .pre-exam-survey-review-board-header span,
 html[data-theme="dark"] .pre-exam-survey-review-card > span,
 html[data-theme="dark"] .pre-exam-survey-review-chip-row em,
 html[data-theme="dark"] .pre-exam-survey-question-index,
@@ -3340,6 +3388,26 @@ html[data-browser="safari"] .pre-exam-survey-trend-attempts {
     padding: 1rem;
   }
 
+  .pre-exam-survey-review-board {
+    gap: 0.75rem;
+    padding: 0.9rem;
+  }
+
+  .pre-exam-survey-review-board-header {
+    gap: 0.55rem;
+    padding: 0.9rem;
+    border-radius: 0.9rem;
+  }
+
+  .pre-exam-survey-review-board-header strong {
+    font-size: 1.9rem;
+  }
+
+  .pre-exam-survey-review-board-header p {
+    font-size: 0.86rem;
+    line-height: 1.65;
+  }
+
   .pre-exam-survey-intro-copy h3,
   .pre-exam-survey-review-heading h3 {
     font-size: 1.35rem;
@@ -3359,6 +3427,13 @@ html[data-browser="safari"] .pre-exam-survey-trend-attempts {
     padding-inline: 0.1rem;
   }
 
+  .pre-exam-survey-review-deck-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    margin-inline: 0;
+    padding-inline: 0;
+  }
+
   .pre-exam-survey-review-card-hero,
   .pre-exam-survey-review-card-final {
     flex-basis: 88%;
@@ -3368,6 +3443,10 @@ html[data-browser="safari"] .pre-exam-survey-trend-attempts {
     flex-basis: 88%;
     min-height: 15.25rem;
     padding: 0.95rem;
+  }
+
+  .pre-exam-survey-review-deck-grid .pre-exam-survey-review-card {
+    min-height: 0;
   }
 
   .pre-exam-survey-intro-grid {

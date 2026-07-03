@@ -882,7 +882,6 @@ export function PreExamSprintSurvey() {
   );
   const usageMetrics = usageReview?.metrics ?? null;
   const usagePersona = useMemo(() => getPersona(usageMetrics), [usageMetrics]);
-  const reviewStyle = useMemo(() => getReviewStyle(usageMetrics), [usageMetrics]);
   const maxAttempts = Math.max(...communityPoints.map((point) => Number(point.attempts || 0)), 1);
   const hasCommunityStats = communityPoints.some((point) => Number(point.attempts || 0) > 0);
   const currentQuestion = SURVEY_QUESTIONS[formQuestionIndex] ?? SURVEY_QUESTIONS[0];
@@ -1354,9 +1353,30 @@ export function PreExamSprintSurvey() {
   function renderIntroSlide() {
     const totalAttempts = usageMetrics?.totalAttempts ?? 0;
     const hasUsageAttempts = totalAttempts > 0;
+    const wrongQuestionCount = Number(usageMetrics?.wrongQuestionCount ?? 0);
+    const lowConfidenceQuestionCount = Number(usageMetrics?.lowConfidenceQuestionCount ?? 0);
+    const mockExamCount = Number(usageMetrics?.mockExamCount ?? 0);
+    const fullLengthSessionCount = Number(usageMetrics?.fullLengthSessionCount ?? 0);
+    const savedQuestionCount = Number(usageMetrics?.savedQuestionCount ?? 0);
+    const noteCount = Number(usageMetrics?.noteCount ?? 0);
+    const reviewSignalCount = wrongQuestionCount + lowConfidenceQuestionCount;
+    const reviewHeadline =
+      reviewSignalCount > 0
+        ? `${reviewSignalCount.toLocaleString("zh-TW")} 個線索`
+        : fullLengthSessionCount > 0
+          ? `${fullLengthSessionCount.toLocaleString("zh-TW")} 回完整紀錄`
+          : mockExamCount > 0
+            ? `${mockExamCount.toLocaleString("zh-TW")} 回模擬考`
+            : savedQuestionCount + noteCount > 0
+              ? `${(savedQuestionCount + noteCount).toLocaleString("zh-TW")} 個自留項目`
+              : "正在累積";
     const hasReviewSignals =
-      Number(usageMetrics?.wrongQuestionCount ?? 0) > 0 ||
-      Number(usageMetrics?.lowConfidenceQuestionCount ?? 0) > 0;
+      wrongQuestionCount > 0 ||
+      lowConfidenceQuestionCount > 0 ||
+      mockExamCount > 0 ||
+      fullLengthSessionCount > 0 ||
+      savedQuestionCount > 0 ||
+      noteCount > 0;
     const trendPoints =
       communityPoints.length > 0
         ? communityPoints
@@ -1642,24 +1662,70 @@ export function PreExamSprintSurvey() {
       return (
         <section key="signals" className="pre-exam-survey-slide">
           <div className="pre-exam-survey-slide-copy">
-            <span>04 / 複習訊號</span>
-            <h3>{reviewStyle.title}</h3>
-            <p>{reviewStyle.body}</p>
+            <span>04 / 可回頭複習</span>
+            <h3>這些不是壓力，是考前可以再拿回來的分數。</h3>
+            <p>網站已經把你做錯、沒把握、整回合作答的地方留下來；接下來要優先修哪裡，就靠這些線索。</p>
           </div>
 
-          <div className="pre-exam-survey-slide-panel pre-exam-survey-slide-panel-main">
-            <span>回頭看的線索</span>
-            <h4>{hasReviewSignals ? "這些地方值得被網站帶回來" : "先不用急著被數字定義"}</h4>
+          <div className="pre-exam-survey-review-board">
+            <div className="pre-exam-survey-review-board-header">
+              <div>
+                <span>目前可用的複習材料</span>
+                <strong>{hasReviewSignals ? reviewHeadline : "正在累積"}</strong>
+              </div>
+              <p>
+                {hasReviewSignals
+                  ? "如果今天只剩一小段時間，先看錯題，再看低信心題，最後回顧整回合。"
+                  : "等你多做幾回，這裡會整理錯題、低信心題和完整測驗紀錄。"}
+              </p>
+            </div>
+
+            <div className="pre-exam-survey-review-deck pre-exam-survey-review-deck-grid">
+              <article className="pre-exam-survey-review-card">
+                <span>先拿回分數</span>
+                <h4>{wrongQuestionCount > 0 ? `${wrongQuestionCount.toLocaleString("zh-TW")} 題曾答錯` : "錯題正在累積"}</h4>
+                <p>
+                  {wrongQuestionCount > 0
+                    ? "這些題目最適合先訂正，因為每一題都曾經真的扣過分，回頭看通常最有感。"
+                    : "等有錯題後，這裡會幫你把最值得先訂正的題目集中起來。"}
+                </p>
+              </article>
+
+              <article className="pre-exam-survey-review-card">
+                <span>抓出心虛</span>
+                <h4>
+                  {lowConfidenceQuestionCount > 0
+                    ? `${lowConfidenceQuestionCount.toLocaleString("zh-TW")} 題低信心`
+                    : "低信心題會在這裡"}
+                </h4>
+                <p>
+                  {lowConfidenceQuestionCount > 0
+                    ? "有些題目就算答對，當下其實也不穩。這區可以幫你把那些容易飄掉的觀念找回來。"
+                    : "之後按下沒信心的題目，會變成考前很實用的回顧清單。"}
+                </p>
+              </article>
+
+              <article className="pre-exam-survey-review-card pre-exam-survey-review-card-hero">
+                <span>看整回合</span>
+                <h4>
+                  {fullLengthSessionCount > 0
+                    ? `${fullLengthSessionCount.toLocaleString("zh-TW")} 回完整回合`
+                    : mockExamCount > 0
+                      ? `${mockExamCount.toLocaleString("zh-TW")} 回模擬考`
+                      : "完整測驗會在這裡"}
+                </h4>
+                <p>
+                  {fullLengthSessionCount > 0 || mockExamCount > 0
+                    ? `其中 ${mockExamCount.toLocaleString("zh-TW")} 回是正式模擬考。結果頁可以拿來看整張考卷的錯題、低信心題和補強建議。`
+                    : "做完完整回合後，結果頁會幫你把整份考卷整理成可以回頭看的紀錄。"}
+                </p>
+              </article>
+            </div>
+
             <div className="pre-exam-survey-review-chip-row">
-              {hasReviewSignals ? (
-                <>
-                  <em>{(usageMetrics?.wrongQuestionCount ?? 0).toLocaleString("zh-TW")} 題曾答錯</em>
-                  <em>{(usageMetrics?.lowConfidenceQuestionCount ?? 0).toLocaleString("zh-TW")} 題低信心</em>
-                  <em>{(usageMetrics?.mockExamCount ?? 0).toLocaleString("zh-TW")} 回模擬考</em>
-                </>
-              ) : (
-                <em>等你多做幾回，這裡會整理錯題、低信心題和模擬考訊號。</em>
-              )}
+              <em>{savedQuestionCount.toLocaleString("zh-TW")} 題已儲存</em>
+              <em>{noteCount.toLocaleString("zh-TW")} 則筆記</em>
+              <em>{mockExamCount.toLocaleString("zh-TW")} 回正式模擬考</em>
             </div>
           </div>
         </section>
