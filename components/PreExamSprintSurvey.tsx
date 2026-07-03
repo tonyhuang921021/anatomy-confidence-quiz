@@ -388,10 +388,17 @@ const SURVEY_SECTIONS: SurveySection[] = [
   },
   {
     id: "feedback",
-    eyebrow: "07 / 一句話回饋",
-    title: "最後一句話就好。",
-    description: "可以稱讚、吐槽、或直接說哪裡最需要先修。短短一句也很有用。",
-    questionIds: ["unacceptable_issues", "open_feedback"]
+    eyebrow: "07 / 考前優先",
+    title: "考前最需要先守住什麼？",
+    description: "這題會直接影響接下來先修同步、手機、詳解或模擬考。",
+    questionIds: ["unacceptable_issues"]
+  },
+  {
+    id: "open-feedback",
+    eyebrow: "08 / 自由回饋",
+    title: "最後想聽你多說一點。",
+    description: "可以稱讚、吐槽、或直接說哪裡最需要先修。越具體，我越能照著排優先順序。",
+    questionIds: ["open_feedback"]
   }
 ];
 
@@ -1820,7 +1827,9 @@ export function PreExamSprintSurvey() {
                       <div>
                         <strong>{formPageIndex >= SURVEY_SECTIONS.length - 1 ? "最後一頁" : "照現在的感覺選就好"}</strong>
                         <span>
-                          {completedRequiredCount === requiredQuestions.length
+                          {formPageIndex >= SURVEY_SECTIONS.length - 1
+                            ? "這題選填，但寫得越具體，越能直接進到考前修正清單。"
+                            : completedRequiredCount === requiredQuestions.length
                             ? "必填題都完成了，可以送出。"
                             : `這頁有 ${currentSectionQuestions.length} 題，選最接近你現在使用狀態的答案。`}
                         </span>
