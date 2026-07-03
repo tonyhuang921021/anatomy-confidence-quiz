@@ -14,6 +14,7 @@ const CURRENT_SESSION_KEY = "anatomy-confidence-current-session";
 const COMPLETED_SESSIONS_KEY = "anatomy-confidence-completed-sessions";
 const CLOUD_COMPLETED_SESSIONS_KEY = "anatomy-confidence-cloud-completed-sessions";
 const PENDING_COMPLETED_SESSION_UPLOADS_KEY = "anatomy-confidence-pending-completed-session-uploads";
+const RECENT_COMPLETED_SESSION_HANDOFF_KEY = "anatomy-confidence-recent-completed-session-handoff";
 const COMPLETED_QUESTION_HISTORY_KEY = "anatomy-confidence-completed-question-history";
 const QUIZ_SETTINGS_KEY = "anatomy-confidence-quiz-settings";
 const QUESTION_EXPLANATION_OVERRIDES_KEY = "anatomy-confidence-question-explanation-overrides";
@@ -37,6 +38,7 @@ const COMPLETED_SESSIONS_UPLOAD_RECOVERY_READ_LIMIT = 1_500_000;
 const COMPLETED_SESSIONS_RECENT_RECOVERY_LIMIT = 240;
 const CLOUD_COMPLETED_SESSIONS_FALLBACK_LIMITS = [500, 300, 180, 90] as const;
 const PENDING_COMPLETED_SESSION_UPLOAD_LIMIT = 80;
+const RECENT_COMPLETED_SESSION_HANDOFF_LIMIT = 24;
 
 export type CompletedQuestionHistoryEntry = {
   questionId: string;
@@ -205,6 +207,10 @@ function getCompletedQuestionHistoryScopedKeyForUser(userId: string) {
 
 function getCloudCompletedSessionsScopedKeyForUser(userId: string) {
   return getScopedKeyForUser(CLOUD_COMPLETED_SESSIONS_KEY, userId);
+}
+
+function getRecentCompletedSessionHandoffScopedKeyForUser(userId: string) {
+  return getScopedKeyForUser(RECENT_COMPLETED_SESSION_HANDOFF_KEY, userId);
 }
 
 function tryPersistJsonToLocalStorageWithSessionFallback(key: string, value: string) {
@@ -1078,6 +1084,7 @@ export function clearMatchingCurrentSessions(sessionId: string, userIds: string[
 export function saveCompletedSession(session: QuizSession) {
   if (!isBrowser()) return;
   const activeUser = getActiveStorageUser();
+  saveRecentCompletedSessionHandoffForUser(activeUser, session);
   mergeCompletedQuestionHistoryFromSessionsForUser(activeUser, [session]);
 
   if (
@@ -1175,6 +1182,46 @@ export function loadCloudCompletedSessionsForUser(userId = getActiveStorageUser(
     ...parseCompletedSessionsRaw(safeLocalStorageGetItem(scopedKey)),
     ...parseCompletedSessionsRaw(safeSessionStorageGetItem(scopedKey))
   ]);
+}
+
+export function loadRecentCompletedSessionHandoffForUser(userId = getActiveStorageUser()) {
+  if (!isBrowser()) return [] as QuizSession[];
+  const scopedKey = getRecentCompletedSessionHandoffScopedKeyForUser(userId);
+  return normalizeCompletedSessionList([
+    ...parseCompletedSessionsRaw(safeLocalStorageGetItem(scopedKey)),
+    ...parseCompletedSessionsRaw(safeSessionStorageGetItem(scopedKey)),
+    ...(userId === GUEST_USER_ID
+      ? parseCompletedSessionsRaw(safeLocalStorageGetItem(RECENT_COMPLETED_SESSION_HANDOFF_KEY))
+      : []),
+    ...(userId === GUEST_USER_ID
+      ? parseCompletedSessionsRaw(safeSessionStorageGetItem(RECENT_COMPLETED_SESSION_HANDOFF_KEY))
+      : [])
+  ]);
+}
+
+export function saveRecentCompletedSessionHandoffForUser(
+  userId: string,
+  sessions: QuizSession | QuizSession[]
+) {
+  if (!isBrowser()) return false;
+  const incoming = Array.isArray(sessions) ? sessions : [sessions];
+  const normalized = normalizeCompletedSessionList([
+    ...loadRecentCompletedSessionHandoffForUser(userId),
+    ...incoming
+  ]).slice(-RECENT_COMPLETED_SESSION_HANDOFF_LIMIT);
+  const scopedKey = getRecentCompletedSessionHandoffScopedKeyForUser(userId);
+  const payload = JSON.stringify(normalized.map(compactSessionForStorage));
+  const didPersist = safeLocalStorageSetItem(scopedKey, payload);
+  const didStore = didPersist ? true : safeSessionStorageSetItem(scopedKey, payload);
+
+  if (didPersist) {
+    safeSessionStorageRemoveItem(scopedKey);
+  }
+
+  completedSessionsMemoryCache.delete(userId);
+  completedSessionIdMemoryCache.delete(userId);
+
+  return didStore;
 }
 
 export function saveCloudCompletedSessionsForUser(userId: string, sessions: QuizSession[]) {
@@ -1291,6 +1338,7 @@ export function loadCompletedSessionsForUser(userId: string): QuizSession[] {
   if (cachedSessions) return cachedSessions;
 
   const cloudSessions = loadCloudCompletedSessionsForUser(userId);
+  const handoffSessions = loadRecentCompletedSessionHandoffForUser(userId);
   const pendingSessions = loadPendingCompletedSessionUploadsForUser(userId);
   const scopedKey = getScopedKeyForUser(COMPLETED_SESSIONS_KEY, userId);
   const sessionStorageSessions = [
@@ -1305,6 +1353,7 @@ export function loadCompletedSessionsForUser(userId: string): QuizSession[] {
   if (!raw) {
     const normalized = normalizeCompletedSessionList([
       ...sessionStorageSessions,
+      ...handoffSessions,
       ...cloudSessions,
       ...pendingSessions
     ]);
@@ -1316,6 +1365,7 @@ export function loadCompletedSessionsForUser(userId: string): QuizSession[] {
     if (raw.length > COMPLETED_SESSIONS_UPLOAD_RECOVERY_READ_LIMIT) {
       const normalized = normalizeCompletedSessionList([
         ...sessionStorageSessions,
+        ...handoffSessions,
         ...cloudSessions,
         ...pendingSessions,
         ...loadRecentLocalCompletedSessionsForUploadForUser(
@@ -1330,6 +1380,7 @@ export function loadCompletedSessionsForUser(userId: string): QuizSession[] {
     const normalized = normalizeCompletedSessionList([
       ...parseCompletedSessionsRaw(raw),
       ...sessionStorageSessions,
+      ...handoffSessions,
       ...cloudSessions,
       ...pendingSessions
     ]);
@@ -1340,6 +1391,7 @@ export function loadCompletedSessionsForUser(userId: string): QuizSession[] {
   const normalized = normalizeCompletedSessionList([
     ...parseCompletedSessionsRaw(raw),
     ...sessionStorageSessions,
+    ...handoffSessions,
     ...cloudSessions,
     ...pendingSessions
   ]);
@@ -1356,9 +1408,11 @@ export function clearHistory() {
   safeLocalStorageRemoveItem(getScopedKey(COMPLETED_SESSIONS_KEY));
   safeLocalStorageRemoveItem(getScopedKey(CLOUD_COMPLETED_SESSIONS_KEY));
   safeLocalStorageRemoveItem(getScopedKey(PENDING_COMPLETED_SESSION_UPLOADS_KEY));
+  safeLocalStorageRemoveItem(getScopedKey(RECENT_COMPLETED_SESSION_HANDOFF_KEY));
   safeSessionStorageRemoveItem(getScopedKey(COMPLETED_SESSIONS_KEY));
   safeSessionStorageRemoveItem(getScopedKey(CLOUD_COMPLETED_SESSIONS_KEY));
   safeSessionStorageRemoveItem(getScopedKey(PENDING_COMPLETED_SESSION_UPLOADS_KEY));
+  safeSessionStorageRemoveItem(getScopedKey(RECENT_COMPLETED_SESSION_HANDOFF_KEY));
   safeLocalStorageRemoveItem(getScopedKey(COMPLETED_QUESTION_HISTORY_KEY));
   safeSessionStorageRemoveItem(getScopedKey(COMPLETED_QUESTION_HISTORY_KEY));
   safeLocalStorageRemoveItem(getScopedKey(CURRENT_SESSION_KEY));

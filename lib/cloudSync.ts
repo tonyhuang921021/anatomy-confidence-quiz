@@ -41,7 +41,8 @@ import {
   saveCurrentSession,
   saveCloudCompletedSessionsForUser,
   saveCompletedQuestionHistoryEntriesForUser,
-  saveCompletedSessions
+  saveCompletedSessions,
+  saveRecentCompletedSessionHandoffForUser
 } from "@/lib/storage";
 import {
   getSupabaseBrowserClient,
@@ -166,6 +167,7 @@ const AI_SEARCH_USAGE_PREFIX = "AI_SEARCH:";
 const SUPABASE_PAGE_SIZE = 1000;
 const CLOUD_COMPLETED_SESSION_FETCH_PAGE_SIZE = 300;
 const CLOUD_COMPLETED_SESSION_FETCH_MAX_ROWS = 3000;
+const CLOUD_COMPLETED_SESSION_PAYLOAD_FALLBACK_LIMIT = 120;
 const CLOUD_COMPLETED_SESSION_UPLOAD_LIMIT = 3000;
 const CLOUD_COMPLETED_SESSION_UPLOAD_BATCH_SIZE = 25;
 const CLOUD_LIGHT_COMPLETED_SESSION_UPLOAD_LIMIT = 40;
@@ -1355,6 +1357,35 @@ async function fetchQuizSessionByIdForUser(userId: string, sessionId: string) {
   return exactMatch ?? namespacedMatch ?? canonicalMatch ?? null;
 }
 
+async function fetchQuizSessionPayloadRowsForUser(userId: string, sessionIds: string[]) {
+  if (isSupabaseRecoveryMode() || !isSupabaseConfigured() || sessionIds.length === 0) {
+    return [] as QuizSessionRow[];
+  }
+
+  const supabase = getSupabaseBrowserClient();
+  const rows: QuizSessionRow[] = [];
+  const uniqueSessionIds = Array.from(new Set(sessionIds)).slice(0, CLOUD_COMPLETED_SESSION_PAYLOAD_FALLBACK_LIMIT);
+
+  for (let index = 0; index < uniqueSessionIds.length; index += CLOUD_ATTEMPT_SESSION_FETCH_CHUNK_SIZE) {
+    const chunk = uniqueSessionIds.slice(index, index + CLOUD_ATTEMPT_SESSION_FETCH_CHUNK_SIZE);
+    const { data, error } = await supabase
+      .from("quiz_sessions")
+      .select(
+        "id, user_id, subject, mode, session_name, question_count, correct_count, wrong_count, average_confidence, started_at, completed_at, session_payload, updated_at"
+      )
+      .eq("user_id", userId)
+      .in("id", chunk);
+
+    if (error) {
+      throw error;
+    }
+
+    rows.push(...((data ?? []) as QuizSessionRow[]));
+  }
+
+  return rows;
+}
+
 async function fetchResolvedQuizSessionsForUser(userId: string) {
   const sessionRows = await withCloudFallback(fetchQuizSessionsForUser(userId), [] as QuizSessionRow[]);
   const attemptRows = await withCloudFallback(
@@ -1365,20 +1396,40 @@ async function fetchResolvedQuizSessionsForUser(userId: string) {
     [] as QuizSessionAttemptRow[]
   );
   const attemptMap = buildAttemptMap(attemptRows);
+  const rowsMissingAttemptRows = sessionRows.filter((row) => {
+    const expectedAttempts = Math.max(0, row.question_count ?? 0);
+    if (expectedAttempts === 0) return false;
+    const attempts = attemptMap.get(row.id);
+    return !attempts?.length;
+  });
+  const payloadFallbackRows = await withCloudFallback(
+    fetchQuizSessionPayloadRowsForUser(
+      userId,
+      rowsMissingAttemptRows.map((row) => row.id)
+    ),
+    [] as QuizSessionRow[]
+  );
+  const payloadFallbackById = new Map(payloadFallbackRows.map((row) => [row.id, row] as const));
 
   const sessions = sessionRows
-    .filter((row) => {
+    .map((row) => {
       const expectedAttempts = Math.max(0, row.question_count ?? 0);
-      if (expectedAttempts === 0) return true;
+      const hydratedRow = payloadFallbackById.get(row.id) ?? row;
+      const session = mapRowToSession(hydratedRow, attemptMap);
+      if (!session) return null;
+      if (expectedAttempts === 0) return session;
       const attempts = attemptMap.get(row.id);
-      return Boolean(attempts?.length);
+      if (attempts?.length || session.attempts.length > 0) return session;
+      return null;
     })
-    .map((row) => mapRowToSession(row, attemptMap))
     .filter((session): session is QuizSession => Boolean(session));
+  const sessionsMissingAttemptRows = payloadFallbackRows
+    .map((row) => mapRowToSession(row))
+    .filter((session): session is QuizSession => Boolean(session?.completedAt && session.attempts.length > 0));
 
   return {
     sessions,
-    sessionsMissingAttemptRows: [] as QuizSession[]
+    sessionsMissingAttemptRows
   };
 }
 
@@ -2167,6 +2218,7 @@ export async function pushCompletedSessionToSupabase(session: QuizSession) {
     for (const canonicalSession of canonicalSessions) {
       clearCurrentSessionSyncStateForSession(data.user.id, canonicalSession.id);
     }
+    saveRecentCompletedSessionHandoffForUser(data.user.id, canonicalSessions);
     queuePendingCompletedSessionUploadForUser(data.user.id, canonicalSessions);
     mergeCompletedQuestionHistoryFromSessionsForUser(data.user.id, canonicalSessions);
     if (getCompletedSessionsStorageLengthForUser(data.user.id) <= CLOUD_HEAVY_LOCAL_HISTORY_READ_LIMIT) {

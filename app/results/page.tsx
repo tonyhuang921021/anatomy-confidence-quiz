@@ -47,6 +47,7 @@ import {
   getPendingQuestionExplanationOverrideSync,
   getCanonicalSessionId,
   loadCompletedSessions,
+  loadRecentCompletedSessionHandoffForUser,
   loadQuestionExplanationOverrides,
   mergeQuestionExplanationOverrides,
   saveCompletedSession,
@@ -370,6 +371,37 @@ function getSessionResultsHref(session: QuizSession) {
 function isSameSessionId(left?: string | null, right?: string | null) {
   if (!left || !right) return false;
   return getCanonicalSessionId(left) === getCanonicalSessionId(right);
+}
+
+function getResultSessionFreshness(session: QuizSession) {
+  return session.completedAt || session.attempts.at(-1)?.answeredAt || session.startedAt || "";
+}
+
+function mergeResultSessionSources(...sources: QuizSession[][]) {
+  const merged = new Map<string, QuizSession>();
+
+  for (const session of sources.flat()) {
+    if (!session?.completedAt) continue;
+    const key = getCanonicalSessionId(session.id);
+    const current = merged.get(key);
+    if (!current) {
+      merged.set(key, session);
+      continue;
+    }
+
+    const nextIsBetter =
+      session.attempts.length > current.attempts.length ||
+      (session.attempts.length === current.attempts.length &&
+        getResultSessionFreshness(session) >= getResultSessionFreshness(current));
+
+    if (nextIsBetter) {
+      merged.set(key, session);
+    }
+  }
+
+  return Array.from(merged.values()).sort((left, right) =>
+    getResultSessionFreshness(right).localeCompare(getResultSessionFreshness(left))
+  );
 }
 
 function getAccuracyTone(correctRate: number) {
@@ -898,7 +930,11 @@ function ResultsPageContent() {
         setResultRecordNotice("");
       }
 
-      let completedSessions = loadCompletedSessions();
+      const handoffSessions = mergeResultSessionSources(
+        session?.user?.id ? loadRecentCompletedSessionHandoffForUser(session.user.id) : [],
+        loadRecentCompletedSessionHandoffForUser()
+      );
+      let completedSessions = mergeResultSessionSources(loadCompletedSessions(), handoffSessions);
       let scopedSessions = completedSessions.filter((sessionItem) =>
         nextScope === "simulation" ? isSimulationSession(sessionItem) : !isSimulationSession(sessionItem)
       );
@@ -911,7 +947,10 @@ function ResultsPageContent() {
           : null;
       const targetSession =
         targetSessionId
-          ? completedSessions.find((item) => isSameSessionId(item.id, targetSessionId)) ?? fallbackCurrentSession ?? null
+          ? completedSessions.find((item) => isSameSessionId(item.id, targetSessionId)) ??
+            handoffSessions.find((item) => isSameSessionId(item.id, targetSessionId)) ??
+            fallbackCurrentSession ??
+            null
           : null;
       let resolvedTargetSession = targetSession;
 
@@ -932,7 +971,7 @@ function ResultsPageContent() {
         }
         if (cloudSession?.completedAt && isMoreCompleteResultSession(cloudSession, resolvedTargetSession)) {
           saveCompletedSession(cloudSession);
-          completedSessions = loadCompletedSessions();
+          completedSessions = mergeResultSessionSources(loadCompletedSessions(), handoffSessions, [cloudSession]);
           scopedSessions = completedSessions.filter((sessionItem) =>
             nextScope === "simulation" ? isSimulationSession(sessionItem) : !isSimulationSession(sessionItem)
           );
@@ -961,6 +1000,10 @@ function ResultsPageContent() {
         !completedSessions.some((item) => isSameSessionId(item.id, fallbackCurrentSession.id))
       ) {
         saveCompletedSession(fallbackCurrentSession);
+        completedSessions = mergeResultSessionSources(loadCompletedSessions(), handoffSessions, [fallbackCurrentSession]);
+        scopedSessions = completedSessions.filter((sessionItem) =>
+          nextScope === "simulation" ? isSimulationSession(sessionItem) : !isSimulationSession(sessionItem)
+        );
       }
 
       if (resolvedTargetSession?.completedAt && resolvedTargetSession.attempts.length === 0) {

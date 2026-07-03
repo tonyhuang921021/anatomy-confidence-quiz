@@ -7,12 +7,14 @@ import {
   loadCompletedQuestionHistoryEntriesForUser,
   loadCompletedHistorySessionsForUser,
   loadCompletedSessionsForUser,
+  loadRecentCompletedSessionHandoffForUser,
   loadQuestionExplanationOverride,
   mergeCompletedQuestionHistoryEntries,
   mergeQuestionExplanationOverrides,
   saveCloudCompletedSessionsForUser,
   saveCompletedQuestionHistoryEntriesForUser,
   saveCompletedSession,
+  saveRecentCompletedSessionHandoffForUser,
   saveQuestionExplanationOverride,
   saveQuestionExplanationOverrides,
   setActiveStorageUser
@@ -198,6 +200,24 @@ test("讀完成場次時，要合併 sessionStorage 的雲端與本機快取", (
     loadCompletedSessionsForUser("user-completed-read").some(
       (session) => session.id === "local-session-read"
     )
+  );
+});
+
+test("剛完成 handoff 也要被進度歷史讀到", () => {
+  installBrowserStorage();
+  const session = makeSession("handoff-session-read", ["q-handoff-read"]);
+
+  saveRecentCompletedSessionHandoffForUser("user-handoff-read", session);
+
+  assert.ok(
+    loadRecentCompletedSessionHandoffForUser("user-handoff-read").some(
+      (item) => item.id === "handoff-session-read"
+    )
+  );
+  assert.ok(
+    loadCompletedHistorySessionsForUser("user-handoff-read")
+      .flatMap((item) => item.attempts)
+      .some((attempt) => attempt.questionId === "q-handoff-read")
   );
 });
 
