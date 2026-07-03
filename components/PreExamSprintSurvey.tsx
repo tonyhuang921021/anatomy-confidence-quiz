@@ -51,6 +51,14 @@ type SurveyQuestion = SingleQuestion | MultipleQuestion | RatingQuestion | TextQ
 
 type SurveyAnswerValue = string | string[] | number;
 
+type SurveySection = {
+  id: string;
+  eyebrow: string;
+  title: string;
+  description: string;
+  questionIds: string[];
+};
+
 type SerializedAnswer = {
   questionId: string;
   questionTitle: string;
@@ -130,7 +138,7 @@ const PENDING_STORAGE_KEY = `acq-survey-pending:${SURVEY_ID}`;
 const STATS_CACHE_KEY = `acq-survey-stats-cache:v5:${SURVEY_ID}`;
 const DISMISS_MS = 6 * 60 * 60 * 1000;
 const STATS_CACHE_MS = 6 * 60 * 60 * 1000;
-const INTRO_SLIDE_COUNT = 5;
+const INTRO_SLIDE_COUNT = 4;
 
 const SURVEY_QUESTIONS: SurveyQuestion[] = [
   {
@@ -185,17 +193,47 @@ const SURVEY_QUESTIONS: SurveyQuestion[] = [
     ]
   },
   {
-    id: "primary_environment",
+    id: "primary_device",
     type: "single",
-    title: "你最常在哪個環境使用？",
+    title: "你最常用哪種裝置刷題？",
+    required: true,
+    options: [
+      { value: "phone", label: "手機" },
+      { value: "tablet", label: "iPad / 平板" },
+      { value: "desktop", label: "電腦" },
+      { value: "mixed", label: "手機、平板、電腦都會用" },
+      { value: "other", label: "其他（可自行填寫）", needsText: true }
+    ]
+  },
+  {
+    id: "primary_browser",
+    type: "single",
+    title: "你最常用哪個瀏覽器？",
     hint: "這題會幫我排 Safari、手機和平板的修正優先順序。",
     required: true,
     options: [
-      { value: "phone_safari", label: "手機 Safari" },
-      { value: "phone_chrome", label: "手機 Chrome" },
-      { value: "ipad_safari", label: "iPad Safari" },
-      { value: "desktop_chrome", label: "電腦 Chrome" },
-      { value: "desktop_safari", label: "電腦 Safari" },
+      { value: "safari", label: "Safari" },
+      { value: "chrome", label: "Chrome" },
+      { value: "line_in_app", label: "LINE 內建瀏覽器" },
+      { value: "edge", label: "Edge" },
+      { value: "other", label: "其他（可自行填寫）", needsText: true }
+    ]
+  },
+  {
+    id: "most_used_features",
+    type: "multiple",
+    title: "你最常打開哪些功能？",
+    hint: "最多選 3 個。這題是看你平常真的會用哪裡。",
+    required: true,
+    maxSelections: 3,
+    options: [
+      { value: "random_quiz", label: "刷題" },
+      { value: "simulation", label: "模擬考 / 考古題" },
+      { value: "review", label: "錯題複習" },
+      { value: "search", label: "題目搜尋" },
+      { value: "saved_questions", label: "收藏題目" },
+      { value: "pharmacology", label: "藥理字卡" },
+      { value: "progress", label: "進度瀏覽" },
       { value: "other", label: "其他（可自行填寫）", needsText: true }
     ]
   },
@@ -207,19 +245,17 @@ const SURVEY_QUESTIONS: SurveyQuestion[] = [
     required: true,
     maxSelections: 3,
     options: [
-      { value: "random_quiz", label: "散題刷題" },
-      { value: "simulation", label: "模擬考 / 考古卷" },
+      { value: "random_quiz", label: "刷題" },
+      { value: "simulation", label: "模擬考 / 考古題" },
       { value: "review", label: "錯題複習" },
       { value: "yangming_explanations", label: "陽明詳解" },
-      { value: "formatted_ai_explanations", label: "排版過的 AI 詳解" },
-      { value: "ai_weakness_prompt", label: "複製給 AI 的補弱 Prompt" },
+      { value: "ai_explanations", label: "AI 詳解" },
       { value: "peer_supplements", label: "同學補充 / 同學筆記" },
-      { value: "personal_notes", label: "自己的學習筆記" },
+      { value: "personal_notes", label: "自己的筆記" },
       { value: "search", label: "題目搜尋" },
       { value: "confidence", label: "信心度總覽" },
-      { value: "saved_questions", label: "儲存題目" },
-      { value: "pharmacology", label: "藥名卡 / 藥理複習" },
-      { value: "custom_papers", label: "自訂卷模式" },
+      { value: "saved_questions", label: "收藏題目" },
+      { value: "pharmacology", label: "藥理字卡" },
       { value: "progress", label: "進度瀏覽" },
       { value: "other", label: "其他（可自行填寫）", needsText: true }
     ]
@@ -233,10 +269,10 @@ const SURVEY_QUESTIONS: SurveyQuestion[] = [
     maxSelections: 3,
     options: [
       { value: "explanation_stack", label: "同一題能看陽明、AI、同學補充和自己的筆記" },
-      { value: "readable_ai", label: "AI 詳解被排版整理後比較像能讀的講義" },
+      { value: "readable_ai", label: "AI 詳解比較像能讀的講義" },
       { value: "review_loop", label: "錯題、沒信心題、儲存題目會被帶回來複習" },
       { value: "exam_feedback", label: "模擬考後能看到信心度和補弱方向" },
-      { value: "pharmacology_cards", label: "藥名卡把藥理變成可以滑的複習" },
+      { value: "pharmacology_cards", label: "藥理字卡可以拿來快速複習" },
       { value: "community_memory", label: "同學補充讓題目不是只有一份冷冰冰答案" },
       { value: "personal_system", label: "可以把搜尋、筆記、儲存題目整理成自己的系統" },
       { value: "cross_device", label: "手機、平板、電腦可以接著讀" },
@@ -252,7 +288,7 @@ const SURVEY_QUESTIONS: SurveyQuestion[] = [
     required: true,
     lowLabel: "幾乎沒影響",
     highLabel: "考前會慌",
-    scaleLabels: ["幾乎沒影響", "有點不方便", "會影響安排", "會很困擾", "考前會慌"]
+    scaleLabels: ["幾乎沒影響", "有點可惜", "可以用其他網站替代", "會少一個重要工具", "考前會慌"]
   },
   {
     id: "recommendation_intent",
@@ -301,13 +337,66 @@ const SURVEY_QUESTIONS: SurveyQuestion[] = [
   {
     id: "open_feedback",
     type: "text",
-    title: "最後，如果只能留一句話給版主，你會希望我先改什麼？",
+    title: "最後一句話就好：最想稱讚、吐槽、或希望立刻改善的一件事？",
     placeholder: "例如：某頁很卡、某功能最有用、某種題目很需要補強...",
     maxLength: 420
   }
 ];
 
-const TOTAL_SLIDE_COUNT = INTRO_SLIDE_COUNT + SURVEY_QUESTIONS.length;
+const SURVEY_SECTIONS: SurveySection[] = [
+  {
+    id: "context",
+    eyebrow: "01 / 來源",
+    title: "先了解你從哪裡來。",
+    description: "只用來看大家的使用分布，不會公開個人資料。",
+    questionIds: ["school", "awareness_source"]
+  },
+  {
+    id: "environment",
+    eyebrow: "02 / 使用環境",
+    title: "你都在哪裡刷題？",
+    description: "這會幫我排 Safari、手機和平板的修正優先順序。",
+    questionIds: ["primary_device", "primary_browser"]
+  },
+  {
+    id: "usage",
+    eyebrow: "03 / 使用習慣",
+    title: "哪些功能真的有被用到？",
+    description: "不用選看起來最完整的，選你考前真的會打開的地方就好。",
+    questionIds: ["usage_frequency", "most_used_features"]
+  },
+  {
+    id: "helpful",
+    eyebrow: "04 / 真的有幫助",
+    title: "哪幾個地方值得留下來？",
+    description: "這題會幫我分清楚哪些功能只是有趣，哪些真的能幫上考前複習。",
+    questionIds: ["most_helpful_features", "comparative_value"]
+  },
+  {
+    id: "value",
+    eyebrow: "05 / 存在必要性",
+    title: "如果沒有這個網站，差別大嗎？",
+    description: "這一頁想知道本站跟其他刷題方式相比，到底有沒有留下來的理由。",
+    questionIds: ["disappearance_impact", "recommendation_intent"]
+  },
+  {
+    id: "stability",
+    eyebrow: "06 / 考前穩定度",
+    title: "考前最怕的不是功能少，是東西不穩。",
+    description: "這幾題會直接影響接下來優先修同步、手機、詳解或模擬考。",
+    questionIds: ["practice_review_smoothness", "sync_confidence"]
+  },
+  {
+    id: "feedback",
+    eyebrow: "07 / 一句話回饋",
+    title: "最後一句話就好。",
+    description: "可以稱讚、吐槽、或直接說哪裡最需要先修。短短一句也很有用。",
+    questionIds: ["unacceptable_issues", "open_feedback"]
+  }
+];
+
+const QUESTION_BY_ID = new Map(SURVEY_QUESTIONS.map((question) => [question.id, question]));
+const TOTAL_SLIDE_COUNT = INTRO_SLIDE_COUNT + SURVEY_SECTIONS.length;
 
 function safeGetStorage(key: string) {
   if (typeof window === "undefined") return null;
@@ -434,71 +523,6 @@ function getWeightedCorrectRate(points: Array<{ attempts: number; correctRate: n
   return Number((weightedCorrect / attempts).toFixed(1));
 }
 
-function getOptimisticActivityPercentile(
-  totalAttempts: number,
-  recentAttempts: number,
-  averageActiveAttempts: number | null
-) {
-  if (totalAttempts <= 0 && recentAttempts <= 0) return null;
-
-  let percentile = 45;
-  if (totalAttempts >= 1500) percentile = 91;
-  else if (totalAttempts >= 1000) percentile = 88;
-  else if (totalAttempts >= 600) percentile = 82;
-  else if (totalAttempts >= 300) percentile = 72;
-  else if (totalAttempts >= 120) percentile = 62;
-  else if (totalAttempts >= 30) percentile = 52;
-
-  if (averageActiveAttempts && averageActiveAttempts > 0) {
-    const multiplier = recentAttempts / averageActiveAttempts;
-    if (multiplier >= 3) percentile = Math.max(percentile, 94);
-    else if (multiplier >= 2) percentile = Math.max(percentile, 89);
-    else if (multiplier >= 1.25) percentile = Math.max(percentile, 78);
-    else if (multiplier >= 0.75) percentile = Math.max(percentile, 66);
-  }
-
-  return Math.min(97, percentile);
-}
-
-function formatMultiplier(value: number | null) {
-  if (!value || !Number.isFinite(value)) return null;
-  return `${value.toFixed(value >= 10 ? 0 : 1).replace(/\.0$/, "")} 倍`;
-}
-
-function getPersonalTrendTakeaway(options: {
-  totalAttempts: number;
-  recentAttempts: number;
-  activeDays: number;
-  averageActiveAttempts: number | null;
-  optimisticPercentile: number | null;
-  recentCorrectRate: number | null;
-}) {
-  const { totalAttempts, recentAttempts, activeDays, averageActiveAttempts, optimisticPercentile, recentCorrectRate } =
-    options;
-  const multiplier =
-    averageActiveAttempts && averageActiveAttempts > 0 ? recentAttempts / averageActiveAttempts : null;
-  const multiplierText = formatMultiplier(multiplier);
-  const percentileText = optimisticPercentile ? `高於約 ${optimisticPercentile}% 的活躍同學` : "已經很有份量";
-
-  if (totalAttempts >= 1000) {
-    return `這已經不是「有打開一下」的程度了；你累積的是扎實題量，樂觀估計${percentileText}。`;
-  }
-
-  if (recentCorrectRate != null && recentCorrectRate >= 75 && recentAttempts >= 30) {
-    return `近兩週答對率有 ${recentCorrectRate}%，而且不是只做幾題，這種穩定度很值得留下來。`;
-  }
-
-  if (recentAttempts > 0 && multiplierText) {
-    return `近兩週約是平均活躍同學的 ${multiplierText}，這段衝刺不是感覺而已，有被紀錄下來。`;
-  }
-
-  if (activeDays >= 10) {
-    return `你有 ${activeDays} 天回來作答，能一再回來接上題目，本身就是很難得的穩定。`;
-  }
-
-  return "現在最重要的是讓下一次回來作答更順，紀錄會慢慢累積成你的個人節奏。";
-}
-
 function getTrendTakeaway(points: CommunityPoint[]) {
   const activePoints = points.filter((point) => Number(point.attempts || 0) > 0);
   if (activePoints.length === 0) {
@@ -593,12 +617,6 @@ function formatShortDate(value?: string | null) {
   const key = getTaipeiDateKey(value);
   if (!key) return "還沒留下紀錄";
   return formatDateLabel(key);
-}
-
-function formatHourLabel(hour?: number | null) {
-  if (typeof hour !== "number" || !Number.isFinite(hour)) return "還沒有明顯時段";
-  const next = (hour + 1) % 24;
-  return `${String(hour).padStart(2, "0")}:00-${String(next).padStart(2, "0")}:00`;
 }
 
 function bucketNumber(value: number, buckets: Array<[number, string]>, fallback: string) {
@@ -862,7 +880,8 @@ export function PreExamSprintSurvey() {
   const [submitMessage, setSubmitMessage] = useState("");
   const [startedAt, setStartedAt] = useState<number | null>(null);
   const [introSlideIndex, setIntroSlideIndex] = useState(0);
-  const [formQuestionIndex, setFormQuestionIndex] = useState(0);
+  const [formPageIndex, setFormPageIndex] = useState(0);
+  const [localPreviewAllowed, setLocalPreviewAllowed] = useState(false);
   const isPreviewAllowed = SURVEY_PREVIEW_EMAILS.has(normalizeEmail(session?.user?.email));
 
   const requiredQuestions = useMemo(
@@ -881,16 +900,20 @@ export function PreExamSprintSurvey() {
     [communityPoints]
   );
   const usageMetrics = usageReview?.metrics ?? null;
-  const usagePersona = useMemo(() => getPersona(usageMetrics), [usageMetrics]);
   const maxAttempts = Math.max(...communityPoints.map((point) => Number(point.attempts || 0)), 1);
   const hasCommunityStats = communityPoints.some((point) => Number(point.attempts || 0) > 0);
-  const currentQuestion = SURVEY_QUESTIONS[formQuestionIndex] ?? SURVEY_QUESTIONS[0];
-  const currentSlideNumber =
-    surveyStep === "intro" ? introSlideIndex + 1 : INTRO_SLIDE_COUNT + formQuestionIndex + 1;
+  const currentSection = SURVEY_SECTIONS[formPageIndex] ?? SURVEY_SECTIONS[0];
+  const currentSectionQuestions = useMemo(
+    () =>
+      currentSection.questionIds
+        .map((questionId) => QUESTION_BY_ID.get(questionId))
+        .filter((question): question is SurveyQuestion => Boolean(question)),
+    [currentSection]
+  );
   const surveyProgressPercent =
     surveyStep === "intro"
       ? ((introSlideIndex + 1) / TOTAL_SLIDE_COUNT) * 100
-      : ((INTRO_SLIDE_COUNT + formQuestionIndex + 1) / TOTAL_SLIDE_COUNT) * 100;
+      : ((INTRO_SLIDE_COUNT + formPageIndex + 1) / TOTAL_SLIDE_COUNT) * 100;
 
   const loadStats = useCallback(async () => {
     const cachedRaw = safeGetStorage(STATS_CACHE_KEY);
@@ -964,11 +987,14 @@ export function PreExamSprintSurvey() {
   useEffect(() => {
     setMounted(true);
     setHasSubmitted(Boolean(safeGetStorage(SUBMITTED_STORAGE_KEY)));
+    if (process.env.NODE_ENV !== "production" && typeof window !== "undefined") {
+      setLocalPreviewAllowed(new URLSearchParams(window.location.search).get("preExamSurvey") === "1");
+    }
   }, []);
 
   useEffect(() => {
     if (!mounted) return;
-    if (loading || !isPreviewAllowed) return;
+    if (loading || (!isPreviewAllowed && !localPreviewAllowed)) return;
     if (safeGetStorage(SUBMITTED_STORAGE_KEY)) return;
     const dismissedUntil = Number(safeGetStorage(DISMISS_STORAGE_KEY) ?? 0);
     if (Number.isFinite(dismissedUntil) && dismissedUntil > Date.now()) return;
@@ -979,7 +1005,7 @@ export function PreExamSprintSurvey() {
       setIsOpen(true);
     }, 900);
     return () => window.clearTimeout(timer);
-  }, [isPreviewAllowed, loading, mounted]);
+  }, [isPreviewAllowed, loading, localPreviewAllowed, mounted]);
 
   useEffect(() => {
     if (!isOpen) return;
@@ -995,6 +1021,14 @@ export function PreExamSprintSurvey() {
       document.body.style.overflow = previousOverflow;
     };
   }, [isOpen]);
+
+  useEffect(() => {
+    if (!isOpen || typeof document === "undefined") return;
+    window.requestAnimationFrame(() => {
+      document.querySelector(".pre-exam-survey-slide")?.scrollTo({ top: 0 });
+      document.querySelector(".pre-exam-survey-form-stage")?.scrollTo({ top: 0 });
+    });
+  }, [formPageIndex, introSlideIndex, isOpen, surveyStep]);
 
   useEffect(() => {
     if (!isOpen) return;
@@ -1030,7 +1064,7 @@ export function PreExamSprintSurvey() {
 
   function startSurvey() {
     setSurveyStep("form");
-    setFormQuestionIndex(0);
+    setFormPageIndex(0);
     setStartedAt((current) => current ?? Date.now());
     setSubmitMessage("");
   }
@@ -1109,36 +1143,52 @@ export function PreExamSprintSurvey() {
     return Object.keys(nextErrors).length === 0;
   }
 
-  function validateQuestion(question: SurveyQuestion) {
-    const value = answers[question.id];
-    const otherText = otherTexts[question.id];
-    if (!isAnswered(question, value, otherText)) {
-      setErrors((current) => ({ ...current, [question.id]: "這題先幫我選一下。" }));
-      setSubmitMessage("這題先補一下再往下。");
+  function validateSection(sectionQuestions: SurveyQuestion[]) {
+    const nextErrors: Record<string, string> = {};
+    for (const question of sectionQuestions) {
+      const value = answers[question.id];
+      const otherText = otherTexts[question.id];
+      if (!isAnswered(question, value, otherText)) {
+        nextErrors[question.id] = question.required ? "這題先幫我選一下。" : "";
+        continue;
+      }
+      if (question.type === "multiple" && Array.isArray(value) && question.maxSelections && value.length > question.maxSelections) {
+        nextErrors[question.id] = `最多選 ${question.maxSelections} 個。`;
+      }
+    }
+
+    const filteredErrors = Object.fromEntries(
+      Object.entries(nextErrors).filter(([, message]) => Boolean(message))
+    );
+    if (Object.keys(filteredErrors).length > 0) {
+      setErrors((current) => ({ ...current, ...filteredErrors }));
+      setSubmitMessage("這一頁還有題目需要先補一下。");
       return false;
     }
-    if (question.type === "multiple" && Array.isArray(value) && question.maxSelections && value.length > question.maxSelections) {
-      setErrors((current) => ({ ...current, [question.id]: `最多選 ${question.maxSelections} 個。` }));
-      setSubmitMessage(`這題最多選 ${question.maxSelections} 個。`);
-      return false;
-    }
-    setErrors((current) => ({ ...current, [question.id]: "" }));
+
+    setErrors((current) => {
+      const next = { ...current };
+      sectionQuestions.forEach((question) => {
+        delete next[question.id];
+      });
+      return next;
+    });
     setSubmitMessage("");
     return true;
   }
 
-  function goToPreviousFormQuestion() {
+  function goToPreviousFormPage() {
     setSubmitMessage("");
-    setFormQuestionIndex((current) => Math.max(0, current - 1));
+    setFormPageIndex((current) => Math.max(0, current - 1));
   }
 
-  function goToNextFormQuestion() {
-    if (!validateQuestion(currentQuestion)) return;
-    if (formQuestionIndex >= SURVEY_QUESTIONS.length - 1) {
+  function goToNextFormPage() {
+    if (!validateSection(currentSectionQuestions)) return;
+    if (formPageIndex >= SURVEY_SECTIONS.length - 1) {
       void handleSubmit();
       return;
     }
-    setFormQuestionIndex((current) => Math.min(SURVEY_QUESTIONS.length - 1, current + 1));
+    setFormPageIndex((current) => Math.min(SURVEY_SECTIONS.length - 1, current + 1));
   }
 
   async function handleSubmit() {
@@ -1294,41 +1344,26 @@ export function PreExamSprintSurvey() {
 
         {question.type === "rating" ? (
           <div className="pre-exam-survey-rating">
-            <div className="pre-exam-survey-rating-topline">
-              <span>{question.lowLabel}</span>
-              <strong>
-                {typeof value === "number"
-                  ? `${value}：${question.scaleLabels?.[value - 1] ?? ""}`
-                  : "請拖曳選擇"}
-              </strong>
-              <span>{question.highLabel}</span>
-            </div>
-            <div
-              className="pre-exam-survey-slider-wrap"
-              style={
-                {
-                  "--survey-slider-progress": `${(((typeof value === "number" ? value : 3) - 1) / 4) * 100}%`
-                } as CSSProperties
-              }
-            >
-              <input
-                type="range"
-                min="1"
-                max="5"
-                step="1"
-                value={typeof value === "number" ? value : 3}
-                aria-label={question.title}
-                onChange={(event) => {
-                  setAnswers((current) => ({ ...current, [question.id]: Number(event.target.value) }));
-                  setErrors((current) => ({ ...current, [question.id]: "" }));
-                }}
-              />
-              <div className="pre-exam-survey-slider-scale" aria-hidden="true">
-                {[1, 2, 3, 4, 5].map((rating) => (
-                  <span key={rating}>{rating}</span>
-                ))}
-              </div>
-            </div>
+            {(question.scaleLabels ?? [question.lowLabel, "2", "3", "4", question.highLabel]).map((label, ratingIndex) => {
+              const rating = ratingIndex + 1;
+              const selected = value === rating;
+              return (
+                <button
+                  key={label}
+                  type="button"
+                  className="pre-exam-survey-rating-choice"
+                  data-selected={selected ? "true" : "false"}
+                  aria-pressed={selected}
+                  onClick={() => {
+                    setAnswers((current) => ({ ...current, [question.id]: rating }));
+                    setErrors((current) => ({ ...current, [question.id]: "" }));
+                  }}
+                >
+                  <b>{rating}</b>
+                  <span>{label}</span>
+                </button>
+              );
+            })}
           </div>
         ) : null}
 
@@ -1358,15 +1393,7 @@ export function PreExamSprintSurvey() {
     const mockExamCount = Number(usageMetrics?.mockExamCount ?? 0);
     const savedQuestionCount = Number(usageMetrics?.savedQuestionCount ?? 0);
     const noteCount = Number(usageMetrics?.noteCount ?? 0);
-    const reviewSignalCount = wrongQuestionCount + lowConfidenceQuestionCount;
-    const reviewHeadline =
-      reviewSignalCount > 0
-        ? `${reviewSignalCount.toLocaleString("zh-TW")} 個線索`
-        : mockExamCount > 0
-          ? `${mockExamCount.toLocaleString("zh-TW")} 回正式模擬考`
-          : savedQuestionCount + noteCount > 0
-            ? `${(savedQuestionCount + noteCount).toLocaleString("zh-TW")} 個自留項目`
-            : "正在累積";
+    const reviewableCount = wrongQuestionCount + lowConfidenceQuestionCount + mockExamCount + savedQuestionCount;
     const hasReviewSignals =
       wrongQuestionCount > 0 ||
       lowConfidenceQuestionCount > 0 ||
@@ -1387,12 +1414,12 @@ export function PreExamSprintSurvey() {
       (point) => Number(point.attempts || 0),
       maxAttempts
     );
-    const ratePolylinePoints = getTrendPolylinePoints(
-      trendPoints,
-      (point) => Number(point.correctRate || 0),
-      100
-    );
     const trendTakeaway = getTrendTakeaway(communityPoints);
+    const communityActivePoints = communityPoints.filter((point) => Number(point.attempts || 0) > 0);
+    const communityPeakPoint =
+      [...communityActivePoints].sort((left, right) => Number(right.attempts || 0) - Number(left.attempts || 0))[0] ??
+      null;
+    const communityLatestPoint = communityActivePoints[communityActivePoints.length - 1] ?? null;
     const personalTrendPoints =
       usageMetrics?.dailyPoints && usageMetrics.dailyPoints.length > 0
         ? usageMetrics.dailyPoints.slice(-14)
@@ -1407,50 +1434,66 @@ export function PreExamSprintSurvey() {
       (point) => Number(point.attempts || 0),
       maxPersonalAttempts
     );
-    const personalRatePolylinePoints = getTrendPolylinePoints(
-      personalTrendPoints,
-      (point) => Number(point.correctRate || 0),
-      100
-    );
     const recentPersonalAttempts = sumAttempts(personalTrendPoints);
-    const averageActiveAttempts =
-      communityActiveUsers && communityActiveUsers > 0 && statsSummary.attempts > 0
-        ? statsSummary.attempts / communityActiveUsers
-        : null;
-    const optimisticPercentile = getOptimisticActivityPercentile(
-      totalAttempts,
-      recentPersonalAttempts,
-      averageActiveAttempts
-    );
     const personalRecentRate = getWeightedCorrectRate(personalTrendPoints);
-    const personalTrendTakeaway = getPersonalTrendTakeaway({
-      totalAttempts,
-      recentAttempts: recentPersonalAttempts,
-      activeDays: usageMetrics?.activeDays ?? 0,
-      averageActiveAttempts,
-      optimisticPercentile,
-      recentCorrectRate: personalRecentRate
-    });
-    const averageActiveAttemptsText = averageActiveAttempts
-      ? Math.round(averageActiveAttempts).toLocaleString("zh-TW")
-      : "—";
-    const averageActiveAttemptsClause = averageActiveAttempts
-      ? `；全站活躍同學近兩週平均約 ${averageActiveAttemptsText} 題`
-      : "";
+    const personalActivePoints = personalTrendPoints.filter((point) => Number(point.attempts || 0) > 0);
+    const personalPeakPoint =
+      [...personalActivePoints].sort((left, right) => Number(right.attempts || 0) - Number(left.attempts || 0))[0] ??
+      null;
+    const personalLatestPoint = personalActivePoints[personalActivePoints.length - 1] ?? null;
+    const displayName = usageReview?.userDisplayName;
+    const reviewCards = [
+      wrongQuestionCount > 0
+        ? {
+            title: "答錯過的題",
+            value: `${wrongQuestionCount.toLocaleString("zh-TW")} 題`,
+            text: "最適合最後回頭確認，因為你曾經真的被它卡住。"
+          }
+        : null,
+      lowConfidenceQuestionCount > 0
+        ? {
+            title: "低信心題",
+            value: `${lowConfidenceQuestionCount.toLocaleString("zh-TW")} 題`,
+            text: "有些題目就算答對，心裡其實還是不穩，值得再看一次。"
+          }
+        : null,
+      mockExamCount > 0
+        ? {
+            title: "模擬考紀錄",
+            value: `${mockExamCount.toLocaleString("zh-TW")} 回`,
+            text: "可以回顧整份考卷的節奏，而不是只看單題。"
+          }
+        : null,
+      savedQuestionCount > 0
+        ? {
+            title: "收藏題目",
+            value: `${savedQuestionCount.toLocaleString("zh-TW")} 題`,
+            text: "你自己標起來的題目，通常最知道為什麼重要。"
+          }
+        : null
+    ].filter((card): card is { title: string; value: string; text: string } => Boolean(card));
+
+    const isCommunityHighlight = (point: CommunityPoint) =>
+      Boolean(
+        hasCommunityStats &&
+          (point.date === communityPeakPoint?.date || point.date === communityLatestPoint?.date)
+      );
+    const isPersonalHighlight = (point: UsageDailyPoint) =>
+      Boolean(hasUsageAttempts && (point.date === personalPeakPoint?.date || point.date === personalLatestPoint?.date));
 
     if (introSlideIndex === 0) {
       return (
         <section key="global" className="pre-exam-survey-slide pre-exam-survey-slide-hero">
           <div className="pre-exam-survey-slide-copy">
-            <span>01 / 全站回顧</span>
-            <h3>最近兩週，大家一起把題目往前推。</h3>
-            <p>先看整體刷題節奏，再進到你的個人回顧。</p>
+            <span>01 / 大家的衝刺近況</span>
+            <h3>這兩週，大家都還在往前刷。</h3>
+            <p>考前最後一段路，你不是一個人在準備。</p>
           </div>
 
           <div className="pre-exam-survey-trend-card">
             <div className="pre-exam-survey-trend-header">
               <div>
-                <span>最近 14 天</span>
+                <span>近 14 天，全站一起完成</span>
                 <strong>
                   {(statsLoading || !hasCommunityStats) && statsSummary.attempts === 0
                     ? "資料整理中"
@@ -1462,61 +1505,55 @@ export function PreExamSprintSurvey() {
 
             <div className="pre-exam-survey-trend-visual" aria-label="最近十四天全站刷題趨勢圖">
               <svg viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
-                <polyline className="pre-exam-survey-trend-rate" points={ratePolylinePoints} />
                 <polyline className="pre-exam-survey-trend-attempts" points={attemptPolylinePoints} />
               </svg>
               <div className="pre-exam-survey-trend-bars" aria-hidden="true">
-                {trendPoints.map((point, index) => (
-                  <span
-                    key={`${point.date}-${index}`}
-                    style={
-                      {
-                        "--survey-bar-height": `${Math.max(7, Math.round((Number(point.attempts || 0) / maxAttempts) * 100))}%`
-                      } as CSSProperties
-                    }
-                  >
-                    <b>
-                      <span className="pre-exam-survey-bar-label-full">
-                        {hasCommunityStats ? formatBarCountLabel(Number(point.attempts || 0)) : "—"}
-                      </span>
-                      <span className="pre-exam-survey-bar-label-compact">
-                        {hasCommunityStats ? formatCompactBarCountLabel(Number(point.attempts || 0)) : "—"}
-                      </span>
-                    </b>
-                    <i>
-                      {hasCommunityStats && (index === 0 || index === trendPoints.length - 1 || index % 4 === 3)
-                        ? formatDateLabel(point.date)
-                        : ""}
-                    </i>
-                  </span>
-                ))}
+                {trendPoints.map((point, index) => {
+                  const highlighted = isCommunityHighlight(point);
+                  return (
+                    <span
+                      key={`${point.date}-${index}`}
+                      data-highlight={highlighted ? "true" : "false"}
+                      style={
+                        {
+                          "--survey-bar-height": `${Math.max(7, Math.round((Number(point.attempts || 0) / maxAttempts) * 100))}%`
+                        } as CSSProperties
+                      }
+                    >
+                      {highlighted ? (
+                        <b>
+                          <span className="pre-exam-survey-bar-label-full">
+                            {formatBarCountLabel(Number(point.attempts || 0))}
+                          </span>
+                          <span className="pre-exam-survey-bar-label-compact">
+                            {formatCompactBarCountLabel(Number(point.attempts || 0))}
+                          </span>
+                        </b>
+                      ) : null}
+                      <i>{highlighted ? formatDateLabel(point.date) : ""}</i>
+                    </span>
+                  );
+                })}
               </div>
-            </div>
-
-            <div className="pre-exam-survey-trend-legend">
-              <span data-tone="volume">作答量</span>
-              <span data-tone="rate">答對率</span>
-              <span>近兩週</span>
             </div>
 
             <div className="pre-exam-survey-mini-stats">
               <span>
-                <b>{hasCommunityStats ? statsSummary.participantDays.toLocaleString("zh-TW") : "—"}</b>
-                參與同學人次
-              </span>
-              <span>
                 <b>{communityActiveUsers == null ? "—" : communityActiveUsers.toLocaleString("zh-TW")}</b>
-                近14天上線活躍人數
+                位同學有回來刷題
               </span>
               <span>
                 <b>{hasCommunityStats ? statsSummary.peakAttempts.toLocaleString("zh-TW") : "—"}</b>
-                單日最高題數
+                最高單日題數
               </span>
               <span>
-                <b>{statsSummary.correctRate == null ? "—" : `${statsSummary.correctRate}%`}</b>
-                平均答對率
+                <b>{communityLatestPoint ? Number(communityLatestPoint.attempts || 0).toLocaleString("zh-TW") : "—"}</b>
+                最近一天題數
               </span>
             </div>
+            <p className="pre-exam-survey-gentle-note">
+              這不是排名，只是想讓你知道：這段時間還有很多人跟你一樣在撐。
+            </p>
           </div>
         </section>
       );
@@ -1524,19 +1561,19 @@ export function PreExamSprintSurvey() {
 
     if (introSlideIndex === 1) {
       return (
-        <section key="personal" className="pre-exam-survey-slide">
+        <section key="personal" className="pre-exam-survey-slide pre-exam-survey-slide-personal">
           <div className="pre-exam-survey-slide-copy">
-            <span>02 / 你的備戰小回顧</span>
+            <span>02 / 你的刷題足跡</span>
             <h3>
               {usageReviewLoading
                 ? "正在整理你的刷題足跡"
                 : usageReview?.hasEnoughData
-                  ? `${usageReview.userDisplayName ? `${usageReview.userDisplayName} 的` : "你的"}作答累積`
+                  ? "這是你這段時間留下的刷題足跡。"
                   : "先用一份小回顧開始"}
             </h3>
             <p>
               {usageReview?.hasEnoughData
-                ? personalTrendTakeaway
+                ? `${displayName ? `${displayName}，` : ""}你不是只有打開一下而已，這些都是你真的碰過的題目。`
                 : usageReview?.loggedIn
                   ? "目前抓到的紀錄還不多，所以先顯示輕量版回顧。新使用者的感受同樣重要。"
                   : "目前抓不到完整跨裝置紀錄，先用這台裝置與全站狀態做簡短回顧。"}
@@ -1546,65 +1583,62 @@ export function PreExamSprintSurvey() {
           <div className="pre-exam-survey-trend-card pre-exam-survey-personal-trend">
             <div className="pre-exam-survey-trend-header">
               <div>
-                <span>你的近 14 天</span>
+                <span>你的近 14 天作答</span>
                 <strong>{hasUsageAttempts ? `${recentPersonalAttempts.toLocaleString("zh-TW")} 題` : "正在累積"}</strong>
               </div>
-              <p>
-                {hasUsageAttempts && optimisticPercentile
-                  ? `樂觀估計高於約 ${optimisticPercentile}% 的活躍同學${averageActiveAttemptsClause}。`
-                  : "等紀錄多一點，這裡會顯示你自己的作答趨勢。"}
-              </p>
+              <p>{hasUsageAttempts ? "有些題目你答過一次，有些題目你回來看了很多次。這些都算數。" : "等紀錄多一點，這裡會顯示你自己的作答趨勢。"}</p>
             </div>
 
             <div className="pre-exam-survey-trend-visual" aria-label="你的近十四天作答趨勢圖">
               <svg viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
-                <polyline className="pre-exam-survey-trend-rate" points={personalRatePolylinePoints} />
                 <polyline className="pre-exam-survey-trend-attempts" points={personalAttemptPolylinePoints} />
               </svg>
               <div className="pre-exam-survey-trend-bars" aria-hidden="true">
-                {personalTrendPoints.map((point, index) => (
-                  <span
-                    key={`${point.date}-${index}`}
-                    style={
-                      {
-                        "--survey-bar-height": `${Math.max(7, Math.round((Number(point.attempts || 0) / maxPersonalAttempts) * 100))}%`
-                      } as CSSProperties
-                    }
-                  >
-                    <b>
-                      <span className="pre-exam-survey-bar-label-full">
-                        {hasUsageAttempts ? formatBarCountLabel(Number(point.attempts || 0)) : "—"}
-                      </span>
-                      <span className="pre-exam-survey-bar-label-compact">
-                        {hasUsageAttempts ? formatCompactBarCountLabel(Number(point.attempts || 0)) : "—"}
-                      </span>
-                    </b>
-                    <i>
-                      {hasUsageAttempts && (index === 0 || index === personalTrendPoints.length - 1 || index % 4 === 3)
-                        ? formatDateLabel(point.date)
-                        : ""}
-                    </i>
-                  </span>
-                ))}
+                {personalTrendPoints.map((point, index) => {
+                  const highlighted = isPersonalHighlight(point);
+                  return (
+                    <span
+                      key={`${point.date}-${index}`}
+                      data-highlight={highlighted ? "true" : "false"}
+                      style={
+                        {
+                          "--survey-bar-height": `${Math.max(7, Math.round((Number(point.attempts || 0) / maxPersonalAttempts) * 100))}%`
+                        } as CSSProperties
+                      }
+                    >
+                      {highlighted ? (
+                        <b>
+                          <span className="pre-exam-survey-bar-label-full">
+                            {formatBarCountLabel(Number(point.attempts || 0))}
+                          </span>
+                          <span className="pre-exam-survey-bar-label-compact">
+                            {formatCompactBarCountLabel(Number(point.attempts || 0))}
+                          </span>
+                        </b>
+                      ) : null}
+                      <i>{highlighted ? formatDateLabel(point.date) : ""}</i>
+                    </span>
+                  );
+                })}
               </div>
             </div>
 
             <div className="pre-exam-survey-mini-stats">
               <span>
                 <b>{hasUsageAttempts ? totalAttempts.toLocaleString("zh-TW") : "—"}</b>
-                總作答次數
+                總作答
               </span>
               <span>
                 <b>{hasUsageAttempts ? (usageMetrics?.uniqueQuestionsAnswered ?? 0).toLocaleString("zh-TW") : "—"}</b>
-                不同題目
+                碰過的題目
+              </span>
+              <span>
+                <b>{hasUsageAttempts ? `${(usageMetrics?.activeDays ?? 0).toLocaleString("zh-TW")} 天` : "—"}</b>
+                回來刷題
               </span>
               <span>
                 <b>{personalRecentRate == null ? "—" : `${personalRecentRate}%`}</b>
                 近14天答對率
-              </span>
-              <span>
-                <b>{optimisticPercentile ? `高於 ${optimisticPercentile}%` : "—"}</b>
-                樂觀位置
               </span>
             </div>
           </div>
@@ -1614,113 +1648,40 @@ export function PreExamSprintSurvey() {
 
     if (introSlideIndex === 2) {
       return (
-        <section key="track" className="pre-exam-survey-slide">
+        <section key="signals" className="pre-exam-survey-slide pre-exam-survey-slide-signals">
           <div className="pre-exam-survey-slide-copy">
-            <span>03 / 題目軌跡</span>
-            <h3>你刷題時留下的節奏。</h3>
-            <p>這不是成績單，只是把做題、看詳解、回來複習的路徑整理成一張簡短的圖像。</p>
-          </div>
-
-          <div className="pre-exam-survey-slide-grid">
-            <div className="pre-exam-survey-slide-panel">
-              <span>總作答</span>
-              <h4>
-                {hasUsageAttempts
-                  ? totalAttempts.toLocaleString("zh-TW")
-                  : "還在累積"}
-              </h4>
-              <p>
-                包含重做與複習。這個數字比較接近你真正投入過的題量，不會再跟「不同題目數」混在一起。
-              </p>
-            </div>
-            <div className="pre-exam-survey-slide-panel">
-              <span>不同題目</span>
-              <h4>{hasUsageAttempts ? (usageMetrics?.uniqueQuestionsAnswered ?? 0).toLocaleString("zh-TW") : "—"}</h4>
-              <p>
-                代表你實際碰過的題目範圍。這會慢慢長成你的個人複習地圖，也比單純天數更直觀。
-              </p>
-            </div>
-            <div className="pre-exam-survey-slide-panel">
-              <span>回來作答</span>
-              <h4>{hasUsageAttempts ? `${(usageMetrics?.activeDays ?? 0).toLocaleString("zh-TW")} 天` : "—"}</h4>
-              <p>
-                {usageMetrics?.mostPracticedSubject
-                  ? `最常練的是 ${usageMetrics.mostPracticedSubject}；常出沒時段大約是 ${formatHourLabel(usageMetrics.mostActiveHour)}。`
-                  : "不用每天很多，重點是你有一次次回來把題目接上。"}
-              </p>
-            </div>
-          </div>
-        </section>
-      );
-    }
-
-    if (introSlideIndex === 3) {
-      return (
-        <section key="signals" className="pre-exam-survey-slide">
-          <div className="pre-exam-survey-slide-copy">
-            <span>04 / 可回頭複習</span>
-            <h3>這些不是壓力，是考前可以再拿回來的分數。</h3>
-            <p>網站已經把你做錯、沒把握、做過整份考卷的地方留下來；接下來要優先修哪裡，就靠這些線索。</p>
+            <span>03 / 考前可以再撿回來的題</span>
+            <h3>這些不是壓力，是最後可以回頭看的線索。</h3>
+            <p>錯題、低信心、模擬考紀錄，都是考前最值得被整理的地方。</p>
           </div>
 
           <div className="pre-exam-survey-review-board">
             <div className="pre-exam-survey-review-board-header">
               <div>
-                <span>目前可用的複習材料</span>
-                <strong>{hasReviewSignals ? reviewHeadline : "正在累積"}</strong>
+                <span>目前留下的複習線索</span>
+                <strong>{hasReviewSignals ? `${reviewableCount.toLocaleString("zh-TW")} 個` : "正在累積"}</strong>
               </div>
-              <p>
-                {hasReviewSignals
-                  ? "如果今天只剩一小段時間，先看錯題，再看低信心題，最後看整份考卷紀錄。"
-                  : "等你多做幾回，這裡會整理錯題、低信心題和完整測驗紀錄。"}
-              </p>
+              <p>{hasReviewSignals ? "最後幾天不用全部重來，先把最有機會補起來的地方抓回來。" : "目前留下的複習線索還不多，沒關係，這份問卷照現在感覺填就好。"}</p>
             </div>
 
             <div className="pre-exam-survey-review-deck pre-exam-survey-review-deck-grid">
-              <article className="pre-exam-survey-review-card">
-                <span>先拿回分數</span>
-                <h4>{wrongQuestionCount > 0 ? `${wrongQuestionCount.toLocaleString("zh-TW")} 題曾答錯` : "錯題正在累積"}</h4>
-                <p>
-                  {wrongQuestionCount > 0
-                    ? "這些題目最適合先訂正，因為每一題都曾經真的扣過分，回頭看通常最有感。"
-                    : "等有錯題後，這裡會幫你把最值得先訂正的題目集中起來。"}
-                </p>
-              </article>
-
-              <article className="pre-exam-survey-review-card">
-                <span>抓出心虛</span>
-                <h4>
-                  {lowConfidenceQuestionCount > 0
-                    ? `${lowConfidenceQuestionCount.toLocaleString("zh-TW")} 題低信心`
-                    : "低信心題會在這裡"}
-                </h4>
-                <p>
-                  {lowConfidenceQuestionCount > 0
-                    ? "有些題目就算答對，當下其實也不穩。這區可以幫你把那些容易飄掉的觀念找回來。"
-                    : "之後按下沒信心的題目，會變成考前很實用的回顧清單。"}
-                </p>
-              </article>
-
-              <article className="pre-exam-survey-review-card pre-exam-survey-review-card-hero">
-                <span>看整份考卷</span>
-                <h4>
-                  {mockExamCount > 0
-                    ? `${mockExamCount.toLocaleString("zh-TW")} 回正式模擬考`
-                    : "正式模擬考會在這裡"}
-                </h4>
-                <p>
-                  {mockExamCount > 0
-                    ? "這裡只算你真的用模擬考功能完成的回合；結果頁可以拿來看整張考卷的錯題、低信心題和補強建議。"
-                    : "做完完整回合後，結果頁會幫你把整份考卷整理成可以回頭看的紀錄。"}
-                </p>
-              </article>
+              {reviewCards.length > 0 ? (
+                reviewCards.map((card) => (
+                  <article key={card.title} className="pre-exam-survey-review-card">
+                    <span>{card.title}</span>
+                    <h4>{card.value}</h4>
+                    <p>{card.text}</p>
+                  </article>
+                ))
+              ) : (
+                <article className="pre-exam-survey-review-card pre-exam-survey-review-card-hero">
+                  <span>剛開始也沒關係</span>
+                  <h4>線索會慢慢留下來</h4>
+                  <p>等你多做幾回，錯題、低信心題、收藏題目和模擬考紀錄會在這裡整理成考前清單。</p>
+                </article>
+              )}
             </div>
-
-            <div className="pre-exam-survey-review-chip-row">
-              <em>{savedQuestionCount.toLocaleString("zh-TW")} 題已儲存</em>
-              <em>{noteCount.toLocaleString("zh-TW")} 則筆記</em>
-              <em>{mockExamCount.toLocaleString("zh-TW")} 回正式模擬考</em>
-            </div>
+            {noteCount > 0 ? <p className="pre-exam-survey-gentle-note">另外還有 {noteCount.toLocaleString("zh-TW")} 則筆記，之後也會一起成為你的考前索引。</p> : null}
           </div>
         </section>
       );
@@ -1729,11 +1690,10 @@ export function PreExamSprintSurvey() {
     return (
       <section key="next" className="pre-exam-survey-slide pre-exam-survey-slide-final">
         <div className="pre-exam-survey-slide-copy pre-exam-survey-slide-copy-center">
-          <span>05 / 回顧到這裡</span>
-          <h3>每個人的考前用法，其實都不太一樣。</h3>
+          <span>04 / 為什麼想問你</span>
+          <h3>最後，想請你幫我們判斷一件事。</h3>
           <p>
-            有人每天先做幾題暖機，有人專心翻詳解，有人把藥名卡當睡前複習。接下來這份小問卷，
-            只是想更清楚地理解這些使用方式。
+            現在已經有很多刷題網站了。我們想知道，這個網站到底有沒有提供其他地方沒有的價值。
           </p>
         </div>
 
@@ -1742,22 +1702,22 @@ export function PreExamSprintSurvey() {
           <div className="pre-exam-survey-reflection-item">
             <span>01</span>
             <div>
-              <h4>你最常打開的地方</h4>
-              <p>是散題、模擬考、錯題複習、搜尋、詳解，還是藥名卡。</p>
+              <h4>哪些功能真的有幫你</h4>
+              <p>不是看起來很酷，而是考前真的會打開來用。</p>
             </div>
           </div>
           <div className="pre-exam-survey-reflection-item">
             <span>02</span>
             <div>
-              <h4>你真正覺得有幫助的功能</h4>
-              <p>陽明詳解、排版過的 AI 詳解、同學補充、自己的筆記，都可以被選進來。</p>
+              <h4>哪些地方一定要穩住</h4>
+              <p>例如作答紀錄、錯題庫、同步、詳解和手機版。</p>
             </div>
           </div>
           <div className="pre-exam-survey-reflection-item">
             <span>03</span>
             <div>
-              <h4>你希望考前保留的節奏</h4>
-              <p>不用回答得很正式，只要照你現在的使用感覺選就好。</p>
+              <h4>值不值得推薦給下一屆</h4>
+              <p>如果你願意推薦，代表這個網站真的有留下來的理由。</p>
             </div>
           </div>
         </div>
@@ -1765,7 +1725,7 @@ export function PreExamSprintSurvey() {
     );
   }
 
-  if (!mounted || loading || !isPreviewAllowed) {
+  if (!mounted || loading || (!isPreviewAllowed && !localPreviewAllowed)) {
     return null;
   }
 
@@ -1845,18 +1805,24 @@ export function PreExamSprintSurvey() {
                   <>
                     <div className="pre-exam-survey-form-stage">
                       <div className="pre-exam-survey-form-kicker">
-                        <span>{String(currentSlideNumber).padStart(2, "0")} / 快速問卷</span>
-                        <b>{currentQuestion.required ? "必填" : "選填"}</b>
+                        <span>{currentSection.eyebrow}</span>
+                        <b>{currentSectionQuestions.some((question) => question.required) ? "有必填題" : "選填"}</b>
                       </div>
-                      {renderQuestion(currentQuestion, formQuestionIndex)}
+                      <div className="pre-exam-survey-section-heading">
+                        <h3>{currentSection.title}</h3>
+                        <p>{currentSection.description}</p>
+                      </div>
+                      <div className="pre-exam-survey-question-stack">
+                        {currentSectionQuestions.map((question, index) => renderQuestion(question, index))}
+                      </div>
                     </div>
                     <div className="pre-exam-survey-footer">
                       <div>
-                        <strong>{formQuestionIndex >= SURVEY_QUESTIONS.length - 1 ? "最後一題" : "照現在的感覺選就好"}</strong>
+                        <strong>{formPageIndex >= SURVEY_SECTIONS.length - 1 ? "最後一頁" : "照現在的感覺選就好"}</strong>
                         <span>
                           {completedRequiredCount === requiredQuestions.length
                             ? "必填題都完成了，可以送出。"
-                            : "不用寫很長，選最接近你現在使用狀態的答案。"}
+                            : `這頁有 ${currentSectionQuestions.length} 題，選最接近你現在使用狀態的答案。`}
                         </span>
                         {submitMessage ? <p>{submitMessage}</p> : null}
                       </div>
@@ -1864,25 +1830,25 @@ export function PreExamSprintSurvey() {
                         <button
                           type="button"
                           className="pre-exam-survey-secondary"
-                          onClick={goToPreviousFormQuestion}
-                          disabled={formQuestionIndex === 0 || submitState === "sending"}
+                          onClick={goToPreviousFormPage}
+                          disabled={formPageIndex === 0 || submitState === "sending"}
                         >
-                          上一題
+                          上一頁
                         </button>
                         <button
                           type="button"
                           className="pre-exam-survey-submit"
                           data-state={submitState}
                           disabled={submitState === "sending"}
-                          onClick={goToNextFormQuestion}
+                          onClick={goToNextFormPage}
                         >
                           {submitState === "sending"
                             ? "送出中"
-                            : formQuestionIndex >= SURVEY_QUESTIONS.length - 1
+                            : formPageIndex >= SURVEY_SECTIONS.length - 1
                               ? submitState === "saved-local"
                                 ? "再送一次"
                                 : "送出問卷"
-                              : "下一題"}
+                              : "下一頁"}
                         </button>
                       </div>
                     </div>
