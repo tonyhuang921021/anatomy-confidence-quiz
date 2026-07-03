@@ -35,6 +35,7 @@ const completedQuestionHistoryMemoryCache = new Map<string, CompletedQuestionHis
 const COMPLETED_SESSIONS_HEAVY_READ_LIMIT = 160_000;
 const COMPLETED_SESSIONS_UPLOAD_RECOVERY_READ_LIMIT = 1_500_000;
 const COMPLETED_SESSIONS_RECENT_RECOVERY_LIMIT = 240;
+const CLOUD_COMPLETED_SESSIONS_FALLBACK_LIMITS = [500, 300, 180, 90] as const;
 const PENDING_COMPLETED_SESSION_UPLOAD_LIMIT = 80;
 
 export type CompletedQuestionHistoryEntry = {
@@ -206,6 +207,15 @@ function getCloudCompletedSessionsScopedKeyForUser(userId: string) {
   return getScopedKeyForUser(CLOUD_COMPLETED_SESSIONS_KEY, userId);
 }
 
+function tryPersistJsonToLocalStorageWithSessionFallback(key: string, value: string) {
+  if (safeLocalStorageSetItem(key, value)) {
+    safeSessionStorageRemoveItem(key);
+    return true;
+  }
+
+  return Boolean(safeSessionStorageSetItem(key, value));
+}
+
 function normalizeCompletedQuestionHistoryEntry(entry: unknown): CompletedQuestionHistoryEntry | null {
   if (!entry || typeof entry !== "object") return null;
   const raw = entry as Partial<CompletedQuestionHistoryEntry>;
@@ -358,7 +368,7 @@ export function saveCompletedQuestionHistoryEntriesForUser(
   const changed = safeLocalStorageGetItem(scopedKey) !== serialized;
 
   cacheCompletedQuestionHistoryForUser(userId, normalized);
-  const didPersist = safeLocalStorageSetItem(scopedKey, serialized);
+  const didPersist = tryPersistJsonToLocalStorageWithSessionFallback(scopedKey, serialized);
 
   if (changed && userId === getActiveStorageUser()) {
     window.dispatchEvent(
@@ -384,25 +394,38 @@ export function loadCompletedQuestionHistoryEntriesForUser(userId = getActiveSto
   const cached = completedQuestionHistoryMemoryCache.get(userId);
   if (cached) return cached;
 
-  const raw =
+  const rawValues = [
     safeLocalStorageGetItem(getCompletedQuestionHistoryScopedKeyForUser(userId)) ??
-    (userId === GUEST_USER_ID ? safeLocalStorageGetItem(COMPLETED_QUESTION_HISTORY_KEY) : null);
-  if (!raw) {
+      null,
+    safeSessionStorageGetItem(getCompletedQuestionHistoryScopedKeyForUser(userId)) ?? null,
+    userId === GUEST_USER_ID ? safeLocalStorageGetItem(COMPLETED_QUESTION_HISTORY_KEY) : null,
+    userId === GUEST_USER_ID ? safeSessionStorageGetItem(COMPLETED_QUESTION_HISTORY_KEY) : null
+  ].filter((raw): raw is string => Boolean(raw));
+
+  if (rawValues.length === 0) {
     cacheCompletedQuestionHistoryForUser(userId, []);
     return [];
   }
 
-  try {
-    const parsed = JSON.parse(raw) as unknown[];
-    const normalized = parsed
-      .map(normalizeCompletedQuestionHistoryEntry)
-      .filter((entry): entry is CompletedQuestionHistoryEntry => Boolean(entry));
-    cacheCompletedQuestionHistoryForUser(userId, normalized);
-    return normalized;
-  } catch {
+  const entries = rawValues.flatMap((raw) => {
+    try {
+      const parsed = JSON.parse(raw) as unknown[];
+      return parsed
+        .map(normalizeCompletedQuestionHistoryEntry)
+        .filter((entry): entry is CompletedQuestionHistoryEntry => Boolean(entry));
+    } catch {
+      return [] as CompletedQuestionHistoryEntry[];
+    }
+  });
+
+  if (entries.length === 0) {
     cacheCompletedQuestionHistoryForUser(userId, []);
     return [];
   }
+
+  const normalized = mergeCompletedQuestionHistoryEntries([], entries);
+  cacheCompletedQuestionHistoryForUser(userId, normalized);
+  return normalized;
 }
 
 export function mergeCompletedQuestionHistoryFromSessionsForUser(
@@ -1098,7 +1121,10 @@ export function saveCompletedSessions(sessions: QuizSession[]) {
   );
 
   const persisted = normalized.map(compactSessionForStorage);
-  const didPersist = safeLocalStorageSetItem(scopedKey, JSON.stringify(persisted));
+  const didPersist = tryPersistJsonToLocalStorageWithSessionFallback(
+    scopedKey,
+    JSON.stringify(persisted)
+  );
 
   if (!didPersist) {
     window.dispatchEvent(new CustomEvent("completed-sessions-change", { detail: normalized }));
@@ -1132,7 +1158,9 @@ export function loadRecentLocalCompletedSessionsForUploadForUser(
   if (!isBrowser()) return [] as QuizSession[];
   const rawValues = [
     safeLocalStorageGetItem(getScopedKeyForUser(COMPLETED_SESSIONS_KEY, userId)),
-    userId === GUEST_USER_ID ? safeLocalStorageGetItem(COMPLETED_SESSIONS_KEY) : null
+    safeSessionStorageGetItem(getScopedKeyForUser(COMPLETED_SESSIONS_KEY, userId)),
+    userId === GUEST_USER_ID ? safeLocalStorageGetItem(COMPLETED_SESSIONS_KEY) : null,
+    userId === GUEST_USER_ID ? safeSessionStorageGetItem(COMPLETED_SESSIONS_KEY) : null
   ].filter((raw): raw is string => Boolean(raw));
   const recoverableSessions = rawValues
     .flatMap((raw) => parseRecentCompletedSessionsFromRaw(raw, limit, excludedSessionIds));
@@ -1142,18 +1170,37 @@ export function loadRecentLocalCompletedSessionsForUploadForUser(
 
 export function loadCloudCompletedSessionsForUser(userId = getActiveStorageUser()) {
   if (!isBrowser()) return [] as QuizSession[];
-  return parseCompletedSessionsRaw(
-    safeLocalStorageGetItem(getCloudCompletedSessionsScopedKeyForUser(userId))
-  );
+  const scopedKey = getCloudCompletedSessionsScopedKeyForUser(userId);
+  return normalizeCompletedSessionList([
+    ...parseCompletedSessionsRaw(safeLocalStorageGetItem(scopedKey)),
+    ...parseCompletedSessionsRaw(safeSessionStorageGetItem(scopedKey))
+  ]);
 }
 
 export function saveCloudCompletedSessionsForUser(userId: string, sessions: QuizSession[]) {
   if (!isBrowser()) return false;
   const normalized = normalizeCompletedSessionList(sessions);
-  const didPersist = safeLocalStorageSetItem(
-    getCloudCompletedSessionsScopedKeyForUser(userId),
-    JSON.stringify(normalized.map(compactSessionForStorage))
-  );
+  const scopedKey = getCloudCompletedSessionsScopedKeyForUser(userId);
+  const fullPayload = JSON.stringify(normalized.map(compactSessionForStorage));
+  let didPersist = safeLocalStorageSetItem(scopedKey, fullPayload);
+
+  if (didPersist) {
+    safeSessionStorageRemoveItem(scopedKey);
+  } else {
+    didPersist = Boolean(safeSessionStorageSetItem(scopedKey, fullPayload));
+
+    for (const limit of CLOUD_COMPLETED_SESSIONS_FALLBACK_LIMITS) {
+      if (normalized.length <= limit) continue;
+
+      const fallbackPayload = JSON.stringify(
+        normalized.slice(-limit).map(compactSessionForStorage)
+      );
+      if (safeLocalStorageSetItem(scopedKey, fallbackPayload)) {
+        didPersist = true;
+        break;
+      }
+    }
+  }
 
   if (didPersist) {
     completedSessionsMemoryCache.delete(userId);
@@ -1246,11 +1293,21 @@ export function loadCompletedSessionsForUser(userId: string): QuizSession[] {
   const cloudSessions = loadCloudCompletedSessionsForUser(userId);
   const pendingSessions = loadPendingCompletedSessionUploadsForUser(userId);
   const scopedKey = getScopedKeyForUser(COMPLETED_SESSIONS_KEY, userId);
+  const sessionStorageSessions = [
+    ...parseCompletedSessionsRaw(safeSessionStorageGetItem(scopedKey)),
+    ...parseCompletedSessionsRaw(
+      userId === GUEST_USER_ID ? safeSessionStorageGetItem(COMPLETED_SESSIONS_KEY) : null
+    )
+  ];
   const raw =
     safeLocalStorageGetItem(scopedKey) ??
     (userId === GUEST_USER_ID ? getLegacyOrScopedRaw(COMPLETED_SESSIONS_KEY) : null);
   if (!raw) {
-    const normalized = normalizeCompletedSessionList([...cloudSessions, ...pendingSessions]);
+    const normalized = normalizeCompletedSessionList([
+      ...sessionStorageSessions,
+      ...cloudSessions,
+      ...pendingSessions
+    ]);
     cacheCompletedSessionsForUser(userId, normalized);
     return normalized;
   }
@@ -1258,6 +1315,7 @@ export function loadCompletedSessionsForUser(userId: string): QuizSession[] {
   if (raw.length > COMPLETED_SESSIONS_HEAVY_READ_LIMIT) {
     if (raw.length > COMPLETED_SESSIONS_UPLOAD_RECOVERY_READ_LIMIT) {
       const normalized = normalizeCompletedSessionList([
+        ...sessionStorageSessions,
         ...cloudSessions,
         ...pendingSessions,
         ...loadRecentLocalCompletedSessionsForUploadForUser(
@@ -1271,6 +1329,7 @@ export function loadCompletedSessionsForUser(userId: string): QuizSession[] {
 
     const normalized = normalizeCompletedSessionList([
       ...parseCompletedSessionsRaw(raw),
+      ...sessionStorageSessions,
       ...cloudSessions,
       ...pendingSessions
     ]);
@@ -1280,6 +1339,7 @@ export function loadCompletedSessionsForUser(userId: string): QuizSession[] {
 
   const normalized = normalizeCompletedSessionList([
     ...parseCompletedSessionsRaw(raw),
+    ...sessionStorageSessions,
     ...cloudSessions,
     ...pendingSessions
   ]);
@@ -1296,9 +1356,13 @@ export function clearHistory() {
   safeLocalStorageRemoveItem(getScopedKey(COMPLETED_SESSIONS_KEY));
   safeLocalStorageRemoveItem(getScopedKey(CLOUD_COMPLETED_SESSIONS_KEY));
   safeLocalStorageRemoveItem(getScopedKey(PENDING_COMPLETED_SESSION_UPLOADS_KEY));
+  safeSessionStorageRemoveItem(getScopedKey(COMPLETED_SESSIONS_KEY));
+  safeSessionStorageRemoveItem(getScopedKey(CLOUD_COMPLETED_SESSIONS_KEY));
   safeSessionStorageRemoveItem(getScopedKey(PENDING_COMPLETED_SESSION_UPLOADS_KEY));
   safeLocalStorageRemoveItem(getScopedKey(COMPLETED_QUESTION_HISTORY_KEY));
+  safeSessionStorageRemoveItem(getScopedKey(COMPLETED_QUESTION_HISTORY_KEY));
   safeLocalStorageRemoveItem(getScopedKey(CURRENT_SESSION_KEY));
+  safeSessionStorageRemoveItem(getScopedKey(CURRENT_SESSION_KEY));
 }
 
 export function saveQuizSettings(settings: QuizSettings) {
