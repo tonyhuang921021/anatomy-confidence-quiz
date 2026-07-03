@@ -181,6 +181,7 @@ type SimulationQuestionNavigatorProps = {
   disabled: boolean;
   onJump: (index: number) => void;
   questions: Question[];
+  variant?: "sidebar" | "bottom";
 };
 
 const SimulationQuestionNavigator = memo(function SimulationQuestionNavigator({
@@ -188,10 +189,15 @@ const SimulationQuestionNavigator = memo(function SimulationQuestionNavigator({
   currentIndex,
   disabled,
   onJump,
-  questions
+  questions,
+  variant = "sidebar"
 }: SimulationQuestionNavigatorProps) {
   return (
-    <div className="simulation-question-navigator mt-3 grid grid-cols-5 gap-2">
+    <div
+      className={`simulation-question-navigator mt-3 grid gap-2 ${
+        variant === "bottom" ? "simulation-question-navigator--bottom" : "grid-cols-5"
+      }`}
+    >
       {questions.map((question, index) => {
         const existingAttempt = attemptsByQuestionId.get(question.id);
         const isCurrent = index === currentIndex;
@@ -2075,8 +2081,8 @@ export default function QuizPage() {
         />
       </div>
 
-      <div ref={contentTopRef} className="mt-6 grid gap-6 xl:grid-cols-[minmax(0,1fr)_340px]">
-        <div className="space-y-6">
+      <div ref={contentTopRef} className="mt-6 grid min-w-0 gap-6 xl:grid-cols-[minmax(0,1fr)_340px]">
+        <div className="min-w-0 space-y-6">
           <div className="flex flex-wrap gap-2 text-xs font-semibold">
             {session.settings?.mode === "simulation" ? (
               <>
@@ -2390,7 +2396,7 @@ export default function QuizPage() {
           </div>
         </div>
 
-        <aside className="simulation-status-sidebar h-fit rounded-[2rem] bg-white p-4 shadow-card ring-1 ring-slate-100 sm:p-5 xl:sticky xl:top-6">
+        <aside className="simulation-status-sidebar h-fit min-w-0 rounded-[2rem] bg-white p-4 shadow-card ring-1 ring-slate-100 sm:p-5 xl:sticky xl:top-6">
           <h2 className="text-lg font-semibold text-ink">本輪狀態</h2>
           <div className="mt-4 grid gap-3">
             <p className="rounded-2xl bg-slate-50 px-4 py-3 text-sm text-slate-700">
@@ -2444,6 +2450,28 @@ export default function QuizPage() {
           ) : null}
         </aside>
       </div>
+
+      {session.settings?.mode === "simulation" ? (
+        <section className="mt-6 min-w-0 rounded-[2rem] bg-white p-4 shadow-card ring-1 ring-slate-100 sm:p-5 xl:hidden">
+          <div className="flex flex-wrap items-center justify-between gap-2">
+            <div>
+              <p className="text-sm font-semibold text-ink">題號選擇</p>
+              <p className="mt-1 text-xs text-slate-500">點題號可以直接跳到那一題。</p>
+            </div>
+            <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-600">
+              {currentIndex + 1} / {targetCount}
+            </span>
+          </div>
+          <SimulationQuestionNavigator
+            attemptsByQuestionId={attemptsByQuestionId}
+            currentIndex={currentIndex}
+            disabled={isSubmittingAnswer}
+            onJump={handleJumpToQuestion}
+            questions={questionSet}
+            variant="bottom"
+          />
+        </section>
+      ) : null}
     </main>
   );
 }

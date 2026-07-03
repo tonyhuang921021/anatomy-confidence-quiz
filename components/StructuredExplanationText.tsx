@@ -213,20 +213,20 @@ export function StructuredExplanationText({
       ? "border-white/10 text-slate-50"
       : "border-slate-200 text-slate-800";
   const tableTextWrapClassName =
-    "min-w-[8.5rem] max-w-[18rem] whitespace-normal break-words [overflow-wrap:anywhere] [word-break:normal]";
+    "structured-explanation-table-cell min-w-[7.5rem] max-w-[16rem] whitespace-normal break-words [overflow-wrap:anywhere] [word-break:normal] sm:min-w-[8.5rem] sm:max-w-[18rem]";
 
   return (
-    <div className={`structured-explanation-text w-full min-w-0 ${className}`}>
+    <div className={`structured-explanation-text w-full max-w-full min-w-0 ${className}`}>
       {label ? (
         <p className={`mb-3 text-[15px] font-black leading-6 ${labelClassName}`}>
           {label}
         </p>
       ) : null}
-      <div className="w-full max-w-[52rem] space-y-4 sm:space-y-5">
+      <div className="w-full max-w-[52rem] min-w-0 space-y-4 sm:space-y-5">
         {sections.map((section, index) => (
           <section
             key={`${section.title ?? "section"}-${index}`}
-            className={`w-full min-w-0 border-l-4 pl-3 sm:pl-4 ${sectionClassName}`}
+            className={`w-full max-w-full min-w-0 border-l-4 pl-3 sm:pl-4 ${sectionClassName}`}
           >
             {section.title ? (
               <h4 className={`mb-2 text-[16px] font-black leading-7 sm:text-[17px] ${headingClassName}`}>
@@ -241,9 +241,9 @@ export function StructuredExplanationText({
                       return (
                         <div
                           key={`${section.title ?? "table"}-${blockIndex}`}
-                          className={`w-full max-w-full touch-pan-x overscroll-x-contain overflow-x-auto rounded-2xl border shadow-[inset_-18px_0_18px_-20px_rgba(15,23,42,0.65)] [-webkit-overflow-scrolling:touch] ${tableShellClassName}`}
+                          className={`structured-explanation-table-shell w-full max-w-full touch-pan-x overscroll-x-contain overflow-x-auto rounded-2xl border shadow-[inset_-18px_0_18px_-20px_rgba(15,23,42,0.65)] [-webkit-overflow-scrolling:touch] ${tableShellClassName}`}
                         >
-                          <table className="w-max min-w-full max-w-none table-auto border-collapse text-left text-[14px] leading-7 sm:text-[15px]">
+                          <table className="structured-explanation-table w-full min-w-max max-w-none table-auto border-collapse text-left text-[14px] leading-7 sm:text-[15px]">
                             <thead className={tableHeadClassName}>
                               <tr>
                                 {block.headers.map((header, headerIndex) => (

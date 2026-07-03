@@ -21,7 +21,7 @@ function renderImage(src: string, alt: string) {
     <img
       src={src}
       alt={alt}
-      className="mt-3 block max-h-[480px] max-w-full rounded-2xl border border-slate-200 bg-slate-50 object-contain"
+      className="mt-3 block h-auto max-h-[480px] max-w-full rounded-2xl border border-slate-200 bg-slate-50 object-contain"
       style={{
         width: "auto",
         height: "auto"
@@ -33,8 +33,8 @@ function renderImage(src: string, alt: string) {
 
 export function QuestionStemBlock({ question, className }: QuestionStemBlockProps) {
   return (
-    <div className={`min-w-0 ${className ?? ""}`}>
-      <p className="min-w-0 font-semibold text-slate-900 [overflow-wrap:anywhere]">
+    <div className={`min-w-0 max-w-full ${className ?? ""}`}>
+      <p className="min-w-0 max-w-full font-semibold text-slate-900 [overflow-wrap:anywhere]">
         <FormattedQuestionText text={question.stem} />
       </p>
       {question.stemImage ? renderImage(question.stemImage, `${question.id} 題目圖片`) : null}
@@ -58,12 +58,13 @@ export function QuestionOptionBlock({
   }
 
   return (
-    <div className={wrapperClassName}>
-      <div className="flex items-start gap-3">
+    <div className={`min-w-0 max-w-full ${wrapperClassName ?? ""}`}>
+      <div className="flex min-w-0 max-w-full items-start gap-3">
         <span
           className={
-            labelClassName ??
-            "mt-0.5 inline-flex min-w-8 justify-center rounded-full bg-white px-2 py-1 text-xs font-semibold text-slate-700 ring-1 ring-slate-200"
+            labelClassName
+              ? `${labelClassName} shrink-0`
+              : "mt-0.5 inline-flex min-w-8 shrink-0 justify-center rounded-full bg-white px-2 py-1 text-xs font-semibold text-slate-700 ring-1 ring-slate-200"
           }
         >
           {optionKey}
@@ -72,10 +73,10 @@ export function QuestionOptionBlock({
           <div
             className={
               textClassName ??
-              "min-w-0 text-sm font-medium leading-6 text-slate-800 [overflow-wrap:anywhere] sm:text-[15px] sm:leading-7"
+              "min-w-0 max-w-full text-sm font-medium leading-6 text-slate-800 [overflow-wrap:anywhere] sm:text-[15px] sm:leading-7"
             }
           >
-            <span>
+            <span className="min-w-0 max-w-full [overflow-wrap:anywhere]">
               <FormattedQuestionText text={optionText} />
             </span>
             {trailingContent ? <span className="ml-2 inline-flex align-middle">{trailingContent}</span> : null}

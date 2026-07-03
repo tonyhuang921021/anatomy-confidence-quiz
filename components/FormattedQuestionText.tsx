@@ -54,7 +54,7 @@ export function FormattedQuestionText({ text }: FormattedQuestionTextProps) {
   return (
     <>
       {tokenize(text).map((token, index) => (
-        <span key={`${token.text}-${index}`}>
+        <span key={`${token.text}-${index}`} className="[overflow-wrap:anywhere]">
           {token.text}
           {token.subscript ? <sub className="text-[0.72em]">{token.subscript}</sub> : null}
         </span>

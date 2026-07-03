@@ -577,8 +577,8 @@ export default function SearchPage() {
   }
 
   return (
-    <main className="shell">
-      <section className="rounded-[2rem] bg-white p-5 shadow-card ring-1 ring-slate-100 sm:p-7">
+    <main className="shell search-page">
+      <section className="min-w-0 max-w-full rounded-[2rem] bg-white p-5 shadow-card ring-1 ring-slate-100 sm:p-7">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div>
             <p className="text-sm font-semibold uppercase tracking-[0.2em] text-brand-700">Question Search</p>
@@ -595,7 +595,7 @@ export default function SearchPage() {
           </Link>
         </div>
 
-        <div className="mt-6 grid gap-4 lg:grid-cols-[1.2fr_1fr_0.8fr_1fr]">
+        <div className="mt-6 grid min-w-0 gap-4 lg:grid-cols-[minmax(0,1.2fr)_minmax(0,1fr)_minmax(0,0.8fr)_minmax(0,1fr)]">
           <label className="space-y-2">
             <span className="text-sm font-semibold text-slate-700">關鍵字</span>
             <input
@@ -678,7 +678,7 @@ export default function SearchPage() {
         </div>
       </section>
 
-      <section className="mt-6 grid gap-4">
+      <section className="search-results-list mt-6 grid min-w-0 gap-4">
         {pageResults.length === 0 ? (
           <div className="rounded-[2rem] bg-white p-6 text-sm text-slate-500 shadow-card ring-1 ring-slate-100">
             目前沒有符合條件的題目。
@@ -709,10 +709,10 @@ export default function SearchPage() {
                   };
                 });
               }}
-              className="rounded-[2rem] bg-white p-4 shadow-card ring-1 ring-slate-100 sm:p-5"
+              className="search-result-card min-w-0 max-w-full overflow-hidden rounded-[2rem] bg-white p-4 shadow-card ring-1 ring-slate-100 sm:p-5"
             >
-              <summary className="cursor-pointer list-none">
-                <div className="flex flex-wrap items-start justify-between gap-3">
+              <summary className="min-w-0 cursor-pointer list-none">
+                <div className="flex min-w-0 flex-wrap items-start justify-between gap-3">
                   <div className="min-w-0 flex-1">
                     <div className="flex flex-wrap gap-2 text-xs font-semibold">
                       <span className="rounded-full bg-brand-100 px-3 py-1 text-brand-800">
@@ -742,7 +742,7 @@ export default function SearchPage() {
               </summary>
 
               {isExpanded ? (
-              <div className="mt-5 space-y-4 text-sm leading-7 text-slate-700">
+              <div className="mt-5 min-w-0 max-w-full space-y-4 text-sm leading-7 text-slate-700">
                 <QuestionStemBlock question={renderedQuestion} />
                 <div className="flex flex-wrap items-center gap-2">
                   <CopyQuestionPromptButton question={renderedQuestion} />

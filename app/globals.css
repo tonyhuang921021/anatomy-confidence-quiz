@@ -433,6 +433,949 @@ select {
       rgba(255, 255, 255, 0.68);
   }
 
+  .pre-exam-survey-trigger {
+    @apply inline-flex shrink-0 items-center gap-2 rounded-full border px-2.5 py-2 text-sm font-extrabold;
+    border-color: color-mix(in srgb, var(--brand-main) 22%, var(--line-soft));
+    background: color-mix(in srgb, var(--brand-main) 9%, white);
+    color: var(--brand-deep);
+    box-shadow: 0 10px 22px rgba(19, 38, 32, 0.055);
+    appearance: none;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .pre-exam-survey-trigger:hover {
+    background: color-mix(in srgb, var(--brand-main) 14%, white);
+  }
+
+  .pre-exam-survey-trigger-mark {
+    @apply inline-flex h-8 w-8 items-center justify-center rounded-full text-sm font-black;
+    background: var(--brand-main);
+    color: white;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.22);
+  }
+
+  .pre-exam-survey-backdrop {
+    position: fixed;
+    z-index: 80;
+    inset: 0;
+    display: grid;
+    place-items: center;
+    padding: 1rem;
+    background: rgba(15, 23, 42, 0.28);
+    backdrop-filter: blur(8px);
+    animation: survey-backdrop-in 160ms ease-out both;
+  }
+
+  .pre-exam-survey-dialog {
+    --survey-sans: "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", system-ui, sans-serif;
+    --survey-display: var(--survey-sans);
+    width: min(1120px, calc(100vw - 2rem));
+    max-height: calc(100dvh - 2rem);
+    overflow: hidden;
+    border: 1px solid color-mix(in srgb, var(--brand-main) 16%, var(--line-soft));
+    border-radius: 1.35rem;
+    background: linear-gradient(145deg, rgba(255, 255, 255, 0.985), rgba(249, 251, 248, 0.965));
+    box-shadow: 0 24px 64px rgba(19, 38, 32, 0.16);
+    animation: survey-dialog-in 220ms cubic-bezier(0.22, 1, 0.36, 1) both;
+    font-family: var(--survey-sans);
+  }
+
+  .pre-exam-survey-header {
+    @apply flex items-start justify-between gap-4 border-b px-5 py-4 sm:px-6;
+    border-color: var(--line-soft);
+  }
+
+  .pre-exam-survey-header h2 {
+    @apply mt-1.5 text-2xl font-extrabold text-ink sm:text-[1.85rem];
+    letter-spacing: 0;
+  }
+
+  .pre-exam-survey-header p:not(.eyebrow) {
+    @apply mt-1.5 max-w-2xl text-sm font-semibold leading-6 text-slate-500;
+  }
+
+  .pre-exam-survey-close {
+    @apply inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-full border text-2xl font-black leading-none;
+    border-color: var(--line-soft);
+    background: rgba(255, 255, 255, 0.74);
+    color: var(--ink-main);
+    appearance: none;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .pre-exam-survey-progress {
+    height: 5px;
+    background: color-mix(in srgb, var(--brand-main) 8%, white);
+  }
+
+  .pre-exam-survey-progress span {
+    display: block;
+    width: var(--survey-progress);
+    height: 100%;
+    border-radius: 999px;
+    background: linear-gradient(90deg, var(--brand-main), color-mix(in srgb, var(--accent-warm) 70%, var(--brand-main)));
+    transition: width 180ms ease;
+  }
+
+  .pre-exam-survey-body {
+    max-height: calc(100dvh - 7.75rem);
+    overflow: auto;
+    padding: 1rem 1rem 1.1rem;
+    overscroll-behavior: contain;
+  }
+
+  .pre-exam-survey-body-intro {
+    height: calc(100dvh - 7.75rem);
+    max-height: calc(100dvh - 7.75rem);
+    overflow: hidden;
+  }
+
+  .pre-exam-survey-intro {
+    display: grid;
+    gap: 1rem;
+    align-items: stretch;
+    height: 100%;
+    grid-template-rows: minmax(0, 1fr) auto;
+  }
+
+  .pre-exam-survey-slide {
+    @apply min-w-0 rounded-[1.15rem] border p-5 sm:px-6 sm:py-5;
+    min-height: 0;
+    overflow: hidden;
+    display: grid;
+    grid-template-rows: auto minmax(0, 1fr);
+    gap: clamp(0.75rem, 1.8vw, 1.15rem);
+    align-content: stretch;
+    justify-items: stretch;
+    border-color: color-mix(in srgb, var(--brand-main) 14%, var(--line-soft));
+    background: linear-gradient(145deg, rgba(255, 255, 255, 0.98), rgba(251, 252, 250, 0.91));
+    box-shadow: 0 12px 30px rgba(19, 38, 32, 0.048);
+    animation: survey-ppt-slide-in 240ms cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+
+  .pre-exam-survey-slide-hero {
+    grid-template-columns: 1fr;
+    align-items: stretch;
+  }
+
+  .pre-exam-survey-slide-final {
+    align-content: stretch;
+    grid-template-rows: auto 1fr;
+  }
+
+  .pre-exam-survey-slide-copy {
+    @apply min-w-0;
+    max-width: 52rem;
+  }
+
+  .pre-exam-survey-slide-copy-center {
+    max-width: 58rem;
+  }
+
+  .pre-exam-survey-slide-copy > span,
+  .pre-exam-survey-slide-panel > span {
+    @apply inline-flex rounded-full px-3 py-1 text-[11px] font-extrabold uppercase text-brand-700;
+    letter-spacing: 0.1em;
+    background: color-mix(in srgb, var(--brand-main) 10%, white);
+  }
+
+  .pre-exam-survey-slide-copy h3 {
+    @apply mt-3 font-black leading-tight text-ink;
+    font-family: var(--survey-display);
+    font-size: clamp(1.8rem, 3vw, 2.7rem);
+    letter-spacing: 0;
+    text-wrap: balance;
+  }
+
+  .pre-exam-survey-slide-copy p {
+    @apply mt-3 max-w-3xl text-base font-medium leading-7 text-slate-500;
+    text-wrap: pretty;
+  }
+
+  .pre-exam-survey-status-wide {
+    height: 100%;
+    max-width: 44rem;
+  }
+
+  .pre-exam-survey-slide-grid {
+    @apply grid gap-3 sm:grid-cols-3;
+  }
+
+  .pre-exam-survey-slide-grid-compact {
+    align-content: stretch;
+  }
+
+  .pre-exam-survey-slide-panel {
+    @apply min-w-0 rounded-[1rem] border p-4;
+    border-color: color-mix(in srgb, var(--brand-main) 13%, var(--line-soft));
+    background: rgba(255, 255, 255, 0.76);
+  }
+
+  .pre-exam-survey-slide-panel-main {
+    @apply p-5 sm:p-6;
+    min-height: 14rem;
+    display: grid;
+    align-content: center;
+  }
+
+  .pre-exam-survey-slide-panel h4 {
+    @apply mt-3 text-2xl font-black leading-tight text-ink sm:text-3xl;
+    font-family: var(--survey-display);
+    letter-spacing: 0;
+    text-wrap: balance;
+  }
+
+  .pre-exam-survey-slide-panel p {
+    @apply mt-3 text-sm font-medium leading-7 text-slate-500 sm:text-base;
+    text-wrap: pretty;
+  }
+
+  .pre-exam-survey-reflection {
+    position: relative;
+    display: grid;
+    gap: 0.85rem;
+    max-width: 60rem;
+  }
+
+  .pre-exam-survey-reflection-line {
+    position: absolute;
+    left: 1.35rem;
+    top: 1.25rem;
+    bottom: 1.25rem;
+    width: 1px;
+    background: linear-gradient(
+      180deg,
+      transparent,
+      color-mix(in srgb, var(--brand-main) 24%, var(--line-soft)),
+      transparent
+    );
+  }
+
+  .pre-exam-survey-reflection-item {
+    position: relative;
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    gap: 1rem;
+    align-items: start;
+    padding: 1rem 1.1rem;
+    border: 1px solid color-mix(in srgb, var(--brand-main) 12%, var(--line-soft));
+    border-radius: 1.1rem;
+    background: rgba(255, 255, 255, 0.74);
+    box-shadow: 0 10px 24px rgba(19, 38, 32, 0.045);
+  }
+
+  .pre-exam-survey-reflection-item > span {
+    position: relative;
+    z-index: 1;
+    display: inline-flex;
+    width: 2.7rem;
+    height: 2.7rem;
+    align-items: center;
+    justify-content: center;
+    border-radius: 999px;
+    background: color-mix(in srgb, var(--brand-main) 11%, white);
+    color: var(--brand-deep);
+    font-size: 0.82rem;
+    font-weight: 900;
+    letter-spacing: 0.06em;
+    box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--brand-main) 20%, transparent);
+  }
+
+  .pre-exam-survey-reflection-item h4 {
+    @apply text-xl font-black leading-tight text-ink sm:text-2xl;
+    font-family: var(--survey-display);
+    letter-spacing: 0;
+  }
+
+  .pre-exam-survey-reflection-item p {
+    @apply mt-2 text-sm font-medium leading-7 text-slate-500 sm:text-base;
+    text-wrap: pretty;
+  }
+
+  .pre-exam-survey-slide-controls {
+    @apply flex flex-col gap-3 rounded-[1.2rem] border p-3 sm:flex-row sm:items-center sm:justify-between;
+    border-color: var(--line-soft);
+    background: rgba(255, 255, 255, 0.72);
+  }
+
+  .pre-exam-survey-slide-actions {
+    @apply flex flex-col gap-2 sm:flex-row sm:items-center;
+  }
+
+  .pre-exam-survey-slide-dots {
+    @apply flex items-center justify-center gap-2;
+  }
+
+  .pre-exam-survey-slide-dots span {
+    width: 0.58rem;
+    height: 0.58rem;
+    border-radius: 999px;
+    background: color-mix(in srgb, var(--brand-main) 18%, white);
+    transition: width 160ms ease, background 160ms ease;
+  }
+
+  .pre-exam-survey-slide-dots span[data-active="true"] {
+    width: 1.85rem;
+    background: var(--brand-main);
+  }
+
+  .pre-exam-survey-status {
+    @apply grid content-start gap-4 rounded-[1.3rem] border p-4;
+    min-width: 0;
+    border-color: color-mix(in srgb, var(--brand-main) 14%, var(--line-soft));
+    background: color-mix(in srgb, var(--brand-main) 6%, white);
+  }
+
+  .pre-exam-survey-status p {
+    @apply text-xs font-black uppercase text-brand-700;
+    letter-spacing: 0.12em;
+  }
+
+  .pre-exam-survey-status strong {
+    @apply mt-2 block text-4xl font-black text-ink;
+  }
+
+  .pre-exam-survey-status span {
+    @apply mt-1 block text-sm font-semibold leading-6 text-slate-500;
+  }
+
+  .pre-exam-survey-mini-stats {
+    @apply grid grid-cols-2 gap-2 sm:grid-cols-4;
+  }
+
+  .pre-exam-survey-mini-stats span {
+    @apply m-0 rounded-2xl border px-3 py-2 text-center text-[11px] font-black text-slate-500;
+    border-color: var(--line-soft);
+    background: rgba(255, 255, 255, 0.66);
+  }
+
+  .pre-exam-survey-mini-stats b {
+    @apply mb-1 block text-base text-ink sm:text-lg;
+  }
+
+  .pre-exam-survey-trend-card {
+    @apply min-w-0 rounded-[1.25rem] border p-4;
+    border-color: color-mix(in srgb, var(--brand-main) 14%, var(--line-soft));
+    background: color-mix(in srgb, var(--brand-main) 3.5%, white);
+  }
+
+  .pre-exam-survey-trend-header {
+    @apply grid gap-3 sm:grid-cols-[auto_minmax(0,1fr)] sm:items-end sm:justify-between;
+  }
+
+  .pre-exam-survey-trend-header span {
+    @apply block text-xs font-extrabold uppercase text-brand-700;
+    letter-spacing: 0.1em;
+  }
+
+  .pre-exam-survey-trend-header strong {
+    @apply mt-1 block text-3xl font-black leading-none text-ink;
+    font-family: var(--survey-display);
+    letter-spacing: 0;
+  }
+
+  .pre-exam-survey-trend-header p {
+    @apply m-0 max-w-xl text-sm font-medium leading-7 text-slate-500 sm:justify-self-end sm:text-right;
+  }
+
+  .pre-exam-survey-trend-visual {
+    position: relative;
+    margin-top: 0.8rem;
+    min-height: 10.5rem;
+    overflow: hidden;
+    border: 1px solid color-mix(in srgb, var(--brand-main) 11%, var(--line-soft));
+    border-radius: 1.05rem;
+    background:
+      linear-gradient(180deg, transparent 24%, rgba(15, 23, 42, 0.045) 24.5%, transparent 25%),
+      linear-gradient(180deg, transparent 49%, rgba(15, 23, 42, 0.045) 49.5%, transparent 50%),
+      linear-gradient(180deg, transparent 74%, rgba(15, 23, 42, 0.045) 74.5%, transparent 75%),
+      rgba(255, 255, 255, 0.58);
+  }
+
+  .pre-exam-survey-trend-visual svg {
+    position: absolute;
+    z-index: 2;
+    inset: 2.15rem 1rem 3.35rem;
+    width: calc(100% - 2rem);
+    height: calc(100% - 5.5rem);
+    pointer-events: none;
+    overflow: visible;
+  }
+
+  .pre-exam-survey-trend-visual polyline {
+    fill: none;
+    vector-effect: non-scaling-stroke;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+
+  .pre-exam-survey-trend-attempts {
+    stroke: var(--brand-main);
+    stroke-width: 3.4;
+    filter: drop-shadow(0 4px 8px rgba(18, 105, 83, 0.18));
+  }
+
+  .pre-exam-survey-trend-rate {
+    stroke: color-mix(in srgb, var(--accent-warm) 82%, var(--brand-main));
+    stroke-width: 2.4;
+    stroke-dasharray: 5 5;
+    opacity: 0.82;
+  }
+
+  .pre-exam-survey-trend-bars {
+    position: absolute;
+    z-index: 1;
+    inset: 2.15rem 1rem 2.2rem;
+    display: grid;
+    grid-template-columns: repeat(14, minmax(0, 1fr));
+    gap: 0.32rem;
+    align-items: end;
+  }
+
+  .pre-exam-survey-trend-bars > span {
+    position: relative;
+    display: block;
+    min-width: 0;
+    height: var(--survey-bar-height, 8%);
+    min-height: 0.7rem;
+    border-radius: 999px 999px 0.38rem 0.38rem;
+    background: linear-gradient(
+      180deg,
+      color-mix(in srgb, var(--brand-main) 54%, white),
+      color-mix(in srgb, var(--brand-main) 78%, var(--accent-warm))
+    );
+    opacity: 0.74;
+  }
+
+  .pre-exam-survey-trend-bars b {
+    position: absolute;
+    left: 50%;
+    top: -1.35rem;
+    transform: translateX(-50%);
+    color: var(--brand-deep);
+    font-size: 0.66rem;
+    font-weight: 900;
+    line-height: 1;
+    white-space: nowrap;
+  }
+
+  .pre-exam-survey-bar-label-compact {
+    display: none;
+  }
+
+  .pre-exam-survey-trend-bars i {
+    position: absolute;
+    right: 50%;
+    bottom: -1.55rem;
+    transform: translateX(50%);
+    color: color-mix(in srgb, var(--ink-soft) 86%, transparent);
+    font-size: 0.68rem;
+    font-style: normal;
+    font-weight: 800;
+    white-space: nowrap;
+  }
+
+  .pre-exam-survey-trend-legend {
+    @apply mt-3 flex flex-wrap items-center gap-2 text-xs font-extrabold text-slate-500;
+  }
+
+  .pre-exam-survey-trend-legend span {
+    @apply inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1;
+    border-color: color-mix(in srgb, var(--brand-main) 12%, var(--line-soft));
+    background: rgba(255, 255, 255, 0.66);
+  }
+
+  .pre-exam-survey-trend-legend span::before {
+    content: "";
+    width: 0.55rem;
+    height: 0.55rem;
+    border-radius: 999px;
+    background: color-mix(in srgb, var(--line-soft) 70%, var(--ink-soft));
+  }
+
+  .pre-exam-survey-trend-legend span[data-tone="volume"]::before {
+    background: var(--brand-main);
+  }
+
+  .pre-exam-survey-trend-legend span[data-tone="rate"]::before {
+    background: color-mix(in srgb, var(--accent-warm) 82%, var(--brand-main));
+  }
+
+  .pre-exam-survey-bars {
+    @apply flex h-24 items-end gap-2 rounded-[1.15rem] border p-3;
+    border-color: var(--line-soft);
+    background: rgba(255, 255, 255, 0.58);
+  }
+
+  .pre-exam-survey-bars span {
+    flex: 1 1 0;
+    min-width: 0;
+    height: var(--survey-bar-height, 18%);
+    border-radius: 999px 999px 0.45rem 0.45rem;
+    background: linear-gradient(180deg, color-mix(in srgb, var(--brand-main) 72%, var(--accent-warm)), var(--brand-main));
+    opacity: 0.88;
+  }
+
+  .pre-exam-survey-status-note {
+    @apply rounded-2xl border px-3 py-2 text-xs font-bold leading-5 normal-case;
+    letter-spacing: 0 !important;
+    border-color: color-mix(in srgb, var(--accent-warm) 22%, var(--line-soft));
+    background: color-mix(in srgb, var(--accent-warm) 10%, white);
+    color: var(--ink-main) !important;
+  }
+
+  .pre-exam-survey-intro-copy {
+    @apply rounded-[1.3rem] border p-5 sm:p-6;
+    border-color: var(--line-soft);
+    background: rgba(255, 255, 255, 0.78);
+  }
+
+  .pre-exam-survey-intro-copy > span {
+    @apply inline-flex rounded-full px-3 py-1 text-xs font-black uppercase text-brand-700;
+    letter-spacing: 0.12em;
+    background: color-mix(in srgb, var(--brand-main) 10%, white);
+  }
+
+  .pre-exam-survey-intro-copy h3 {
+    @apply mt-4 text-2xl font-black leading-tight text-ink sm:text-3xl;
+    letter-spacing: 0;
+  }
+
+  .pre-exam-survey-intro-copy p {
+    @apply mt-3 text-base font-semibold leading-8 text-slate-500;
+  }
+
+  .pre-exam-survey-review {
+    @apply min-w-0 rounded-[1.3rem] border p-5 sm:p-6;
+    border-color: var(--line-soft);
+    background:
+      linear-gradient(180deg, rgba(255, 255, 255, 0.84), rgba(255, 255, 255, 0.72)),
+      color-mix(in srgb, var(--brand-main) 4%, white);
+  }
+
+  .pre-exam-survey-review-heading > span {
+    @apply inline-flex rounded-full px-3 py-1 text-xs font-black uppercase text-brand-700;
+    letter-spacing: 0.12em;
+    background: color-mix(in srgb, var(--brand-main) 10%, white);
+  }
+
+  .pre-exam-survey-review-heading h3 {
+    @apply mt-4 text-2xl font-black leading-tight text-ink sm:text-3xl;
+    letter-spacing: 0;
+  }
+
+  .pre-exam-survey-review-heading p {
+    @apply mt-3 text-base font-semibold leading-8 text-slate-500;
+  }
+
+  .pre-exam-survey-review-deck {
+    @apply mt-5 flex gap-3 overflow-x-auto pb-2;
+    scroll-snap-type: x mandatory;
+    scrollbar-width: thin;
+  }
+
+  .pre-exam-survey-review-card {
+    @apply min-w-0 rounded-[1rem] border p-4;
+    flex: 0 0 min(29rem, 86%);
+    min-height: 16.5rem;
+    scroll-snap-align: start;
+    border-color: color-mix(in srgb, var(--brand-main) 13%, var(--line-soft));
+    background: rgba(255, 255, 255, 0.78);
+    animation: survey-slide-card-in 420ms cubic-bezier(0.22, 1, 0.36, 1) both;
+    animation-delay: var(--survey-review-delay, 0ms);
+  }
+
+  .pre-exam-survey-review-card-hero,
+  .pre-exam-survey-review-card-final {
+    flex-basis: min(32rem, 88%);
+  }
+
+  .pre-exam-survey-review-card-hero {
+    background:
+      radial-gradient(circle at 92% 12%, color-mix(in srgb, var(--accent-warm) 18%, transparent), transparent 30%),
+      color-mix(in srgb, var(--brand-main) 8%, white);
+  }
+
+  .pre-exam-survey-review-card > span {
+    @apply inline-flex rounded-full px-2.5 py-1 text-[10px] font-black uppercase text-brand-700;
+    letter-spacing: 0.12em;
+    background: color-mix(in srgb, var(--brand-main) 9%, white);
+  }
+
+  .pre-exam-survey-review-card h4 {
+    @apply mt-3 text-xl font-black leading-8 text-ink;
+    letter-spacing: 0;
+  }
+
+  .pre-exam-survey-review-card p {
+    @apply mt-3 text-sm font-semibold leading-7 text-slate-500;
+  }
+
+  .pre-exam-survey-review-metrics {
+    @apply mt-3 grid grid-cols-[auto_minmax(0,1fr)_auto_minmax(0,1fr)] items-end gap-x-2 gap-y-1;
+  }
+
+  .pre-exam-survey-review-metrics b {
+    @apply text-2xl font-black text-ink;
+  }
+
+  .pre-exam-survey-review-metrics small {
+    @apply pb-1 text-xs font-black text-slate-500;
+  }
+
+  .pre-exam-survey-review-chip-row {
+    @apply mt-3 flex flex-wrap gap-2;
+  }
+
+  .pre-exam-survey-review-chip-row em {
+    @apply rounded-full px-3 py-1 text-xs font-black not-italic;
+    background: color-mix(in srgb, var(--brand-main) 9%, white);
+    color: var(--brand-deep);
+  }
+
+  .pre-exam-survey-intro-grid {
+    @apply mt-5 grid gap-3 sm:grid-cols-3;
+  }
+
+  .pre-exam-survey-intro-grid div {
+    @apply rounded-[1rem] border px-4 py-3;
+    border-color: var(--line-soft);
+    background: color-mix(in srgb, var(--brand-main) 5%, white);
+  }
+
+  .pre-exam-survey-intro-grid b {
+    @apply block text-2xl font-black text-ink;
+  }
+
+  .pre-exam-survey-intro-grid small {
+    @apply mt-1 block text-xs font-bold leading-5 text-slate-500;
+  }
+
+  .pre-exam-survey-intro-actions {
+    @apply mt-6 flex flex-col gap-3 sm:flex-row sm:items-center;
+  }
+
+  .pre-exam-survey-form {
+    @apply grid min-w-0 gap-3;
+    height: calc(100dvh - 7.75rem);
+    grid-template-rows: minmax(0, 1fr) auto;
+    padding-bottom: 0.25rem;
+  }
+
+  .pre-exam-survey-form-stage {
+    @apply min-w-0 rounded-[1.15rem] border p-4 sm:p-5;
+    min-height: 0;
+    overflow: auto;
+    display: grid;
+    grid-template-rows: auto minmax(0, 1fr);
+    gap: 1rem;
+    align-content: stretch;
+    border-color: color-mix(in srgb, var(--brand-main) 13%, var(--line-soft));
+    background: linear-gradient(145deg, rgba(255, 255, 255, 0.98), rgba(251, 252, 250, 0.92));
+    animation: survey-ppt-slide-in 220ms cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+
+  .pre-exam-survey-form-kicker {
+    @apply flex flex-wrap items-center justify-between gap-2;
+  }
+
+  .pre-exam-survey-form-kicker span,
+  .pre-exam-survey-form-kicker b {
+    @apply inline-flex rounded-full px-3 py-1 text-xs font-black uppercase text-brand-700;
+    letter-spacing: 0.1em;
+    background: color-mix(in srgb, var(--brand-main) 10%, white);
+  }
+
+  .pre-exam-survey-form-kicker b {
+    color: var(--ink-soft);
+    background: color-mix(in srgb, var(--line-soft) 64%, white);
+  }
+
+  .pre-exam-survey-question,
+  .pre-exam-survey-success {
+    @apply rounded-[1.05rem] border p-4;
+    border-color: var(--line-soft);
+    background: rgba(255, 255, 255, 0.76);
+  }
+
+  .pre-exam-survey-form-stage .pre-exam-survey-question {
+    min-height: 100%;
+    display: grid;
+    align-content: start;
+    box-shadow: none;
+  }
+
+  .pre-exam-survey-question-index {
+    @apply inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-sm font-black;
+    background: color-mix(in srgb, var(--brand-main) 12%, white);
+    color: var(--brand-deep);
+  }
+
+  .pre-exam-survey-question h3 {
+    @apply text-base font-black leading-7 text-ink sm:text-lg;
+    letter-spacing: 0;
+  }
+
+  .pre-exam-survey-question p {
+    @apply mt-1 text-sm font-semibold leading-6 text-slate-500;
+  }
+
+  .pre-exam-survey-options {
+    @apply mt-4 grid gap-2 sm:grid-cols-2;
+  }
+
+  .pre-exam-survey-select-block {
+    @apply mt-4 grid gap-2;
+  }
+
+  .pre-exam-survey-select {
+    @apply min-h-12 w-full rounded-[1rem] border px-4 py-3 text-sm font-black outline-none;
+    border-color: var(--line-soft);
+    background: rgba(255, 255, 255, 0.78);
+    color: var(--ink-main);
+    appearance: none;
+    background-image:
+      linear-gradient(45deg, transparent 50%, var(--brand-deep) 50%),
+      linear-gradient(135deg, var(--brand-deep) 50%, transparent 50%);
+    background-position:
+      calc(100% - 1.25rem) 50%,
+      calc(100% - 0.9rem) 50%;
+    background-size:
+      0.42rem 0.42rem,
+      0.42rem 0.42rem;
+    background-repeat: no-repeat;
+  }
+
+  .pre-exam-survey-option {
+    @apply min-w-0 rounded-[1rem] border px-3 py-2.5 text-left text-sm font-black;
+    border-color: var(--line-soft);
+    background: rgba(255, 255, 255, 0.74);
+    color: var(--ink-main);
+    appearance: none;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .pre-exam-survey-option small {
+    @apply mt-1 block text-xs font-semibold leading-5 text-slate-500;
+  }
+
+  .pre-exam-survey-option[data-selected="true"] {
+    border-color: color-mix(in srgb, var(--brand-main) 45%, var(--line-soft));
+    background: color-mix(in srgb, var(--brand-main) 13%, white);
+    color: var(--brand-deep);
+    box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--brand-main) 14%, transparent);
+  }
+
+  .pre-exam-survey-other-input,
+  .pre-exam-survey-textarea {
+    @apply w-full rounded-[1rem] border px-4 py-3 text-sm font-semibold outline-none;
+    border-color: var(--line-soft);
+    background: rgba(255, 255, 255, 0.82);
+    color: var(--ink-main);
+  }
+
+  .pre-exam-survey-other-input {
+    @apply sm:col-span-2;
+  }
+
+  .pre-exam-survey-textarea {
+    @apply mt-4 min-h-28 resize-y leading-7;
+  }
+
+  .pre-exam-survey-rating {
+    @apply mt-4 grid gap-4 rounded-[1rem] border p-4;
+    border-color: var(--line-soft);
+    background: color-mix(in srgb, var(--brand-main) 4%, white);
+  }
+
+  .pre-exam-survey-rating-topline {
+    @apply grid grid-cols-[1fr_auto_1fr] items-center gap-2;
+  }
+
+  .pre-exam-survey-rating-topline span {
+    @apply text-xs font-black text-slate-500;
+  }
+
+  .pre-exam-survey-rating-topline span:last-child {
+    @apply text-right;
+  }
+
+  .pre-exam-survey-rating-topline strong {
+    @apply rounded-full px-3 py-1 text-center text-sm font-black;
+    background: color-mix(in srgb, var(--brand-main) 12%, white);
+    color: var(--brand-deep);
+  }
+
+  .pre-exam-survey-slider-wrap {
+    @apply grid gap-3;
+  }
+
+  .pre-exam-survey-slider-wrap input[type="range"] {
+    width: 100%;
+    min-height: 2rem;
+    accent-color: var(--brand-main);
+  }
+
+  .pre-exam-survey-slider-wrap input[type="range"]::-webkit-slider-runnable-track {
+    height: 0.6rem;
+    border-radius: 999px;
+    background:
+      linear-gradient(90deg, var(--brand-main) var(--survey-slider-progress), rgba(226, 232, 240, 0.95) 0);
+  }
+
+  .pre-exam-survey-slider-wrap input[type="range"]::-webkit-slider-thumb {
+    appearance: none;
+    -webkit-appearance: none;
+    width: 1.6rem;
+    height: 1.6rem;
+    margin-top: -0.5rem;
+    border: 3px solid white;
+    border-radius: 999px;
+    background: var(--brand-main);
+    box-shadow: 0 6px 14px rgba(19, 38, 32, 0.18);
+  }
+
+  .pre-exam-survey-slider-wrap input[type="range"]::-moz-range-track {
+    height: 0.6rem;
+    border-radius: 999px;
+    background: rgba(226, 232, 240, 0.95);
+  }
+
+  .pre-exam-survey-slider-wrap input[type="range"]::-moz-range-progress {
+    height: 0.6rem;
+    border-radius: 999px;
+    background: var(--brand-main);
+  }
+
+  .pre-exam-survey-slider-wrap input[type="range"]::-moz-range-thumb {
+    width: 1.25rem;
+    height: 1.25rem;
+    border: 3px solid white;
+    border-radius: 999px;
+    background: var(--brand-main);
+  }
+
+  .pre-exam-survey-slider-scale {
+    @apply grid grid-cols-5 text-center text-xs font-black text-slate-500;
+  }
+
+  .pre-exam-survey-error {
+    @apply mt-3 rounded-full px-3 py-1 text-xs font-black;
+    width: fit-content;
+    background: color-mix(in srgb, #e11d48 12%, white);
+    color: #be123c;
+  }
+
+  .pre-exam-survey-footer {
+    @apply sticky bottom-0 mt-1 flex flex-col gap-3 rounded-[1.25rem] border p-4 sm:flex-row sm:items-center sm:justify-between;
+    border-color: color-mix(in srgb, var(--brand-main) 15%, var(--line-soft));
+    background: color-mix(in srgb, white 88%, var(--brand-tint));
+    box-shadow: 0 -10px 30px rgba(19, 38, 32, 0.06);
+  }
+
+  .pre-exam-survey-form-actions {
+    @apply flex flex-col gap-2 sm:flex-row sm:items-center;
+  }
+
+  .pre-exam-survey-footer strong {
+    @apply mr-2 text-lg font-black text-ink;
+  }
+
+  .pre-exam-survey-footer span,
+  .pre-exam-survey-footer p {
+    @apply text-sm font-semibold leading-6 text-slate-500;
+  }
+
+  .pre-exam-survey-submit {
+    @apply inline-flex min-h-12 items-center justify-center rounded-full px-5 text-sm font-black text-white;
+    background: var(--brand-main);
+    color: white;
+    appearance: none;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .pre-exam-survey-submit:disabled {
+    opacity: 0.62;
+  }
+
+  .pre-exam-survey-submit[data-state="saved-local"] {
+    background: color-mix(in srgb, var(--accent-warm) 78%, var(--brand-main));
+  }
+
+  .pre-exam-survey-secondary {
+    @apply inline-flex min-h-12 items-center justify-center rounded-full border px-5 text-sm font-black;
+    border-color: var(--line-soft);
+    background: rgba(255, 255, 255, 0.72);
+    color: var(--ink-main);
+    appearance: none;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .pre-exam-survey-secondary:disabled {
+    cursor: default;
+    opacity: 0.46;
+  }
+
+  .pre-exam-survey-success {
+    @apply grid min-h-[24rem] place-items-center text-center;
+  }
+
+  .pre-exam-survey-success span {
+    @apply inline-flex rounded-full px-4 py-2 text-sm font-black;
+    background: color-mix(in srgb, var(--brand-main) 12%, white);
+    color: var(--brand-deep);
+  }
+
+  .pre-exam-survey-success h3 {
+    @apply mt-5 text-2xl font-black text-ink;
+  }
+
+  .pre-exam-survey-success p {
+    @apply mx-auto mt-3 max-w-md text-base font-semibold leading-7 text-slate-500;
+  }
+
+  @keyframes survey-backdrop-in {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+
+  @keyframes survey-dialog-in {
+    from {
+      opacity: 0;
+      transform: translateY(14px) scale(0.985);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+    }
+  }
+
+  @keyframes survey-slide-card-in {
+    from {
+      opacity: 0;
+      transform: translateY(18px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes survey-ppt-slide-in {
+    from {
+      opacity: 0;
+      transform: translateX(14px);
+    }
+    to {
+      opacity: 1;
+      transform: translateX(0);
+    }
+  }
+
   .home-pulse-dot {
     display: block;
     width: 14px;
@@ -1179,8 +2122,58 @@ select {
     contain: layout paint;
   }
 
+  .simulation-question-navigator--bottom {
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+  }
+
+  @media (min-width: 480px) {
+    .simulation-question-navigator--bottom {
+      grid-template-columns: repeat(8, minmax(0, 1fr));
+    }
+  }
+
+  @media (min-width: 768px) {
+    .simulation-question-navigator--bottom {
+      grid-template-columns: repeat(10, minmax(0, 1fr));
+    }
+  }
+
   .simulation-navigator-button {
     contain: paint;
+  }
+
+  .structured-explanation-text {
+    overflow-wrap: anywhere;
+  }
+
+  .structured-explanation-text,
+  .structured-explanation-text > *,
+  .structured-explanation-text section,
+  .structured-explanation-text p,
+  .structured-explanation-text h4 {
+    min-width: 0;
+    max-width: 100%;
+  }
+
+  .structured-explanation-table-shell {
+    max-width: min(100%, calc(100vw - 2rem));
+  }
+
+  .structured-explanation-table {
+    width: max-content;
+  }
+
+  @media (max-width: 640px) {
+    .structured-explanation-table-cell {
+      min-width: 7rem;
+      max-width: 14rem;
+      padding-left: 0.65rem;
+      padding-right: 0.65rem;
+    }
+
+    .search-result-card {
+      border-radius: 1.35rem;
+    }
   }
 }
 
@@ -1934,5 +2927,504 @@ html[data-theme="dark"] .drug-flip-face .bg-rose-50\/90 {
   .drug-flip-card {
     margin-inline: -0.25rem;
     width: calc(100% + 0.5rem);
+  }
+}
+
+html[data-theme="dark"] .pre-exam-survey-trigger {
+  border-color: rgba(207, 214, 224, 0.09);
+  background: rgba(40, 48, 61, 0.76);
+  color: var(--ink-main);
+  box-shadow: none;
+}
+
+html[data-theme="dark"] .pre-exam-survey-trigger-mark {
+  background: rgba(138, 154, 184, 0.82);
+  color: #111827;
+}
+
+html[data-theme="dark"] .pre-exam-survey-backdrop {
+  background: rgba(4, 8, 15, 0.58);
+}
+
+html[data-theme="dark"] .pre-exam-survey-dialog {
+  border-color: rgba(207, 214, 224, 0.09);
+  background: linear-gradient(145deg, rgba(27, 34, 45, 0.985), rgba(22, 28, 38, 0.965));
+  box-shadow: 0 24px 72px rgba(4, 8, 15, 0.46);
+}
+
+html[data-theme="dark"] .pre-exam-survey-header,
+html[data-theme="dark"] .pre-exam-survey-footer,
+html[data-theme="dark"] .pre-exam-survey-question,
+html[data-theme="dark"] .pre-exam-survey-success,
+html[data-theme="dark"] .pre-exam-survey-slide,
+html[data-theme="dark"] .pre-exam-survey-slide-panel,
+html[data-theme="dark"] .pre-exam-survey-slide-controls,
+html[data-theme="dark"] .pre-exam-survey-reflection-item,
+html[data-theme="dark"] .pre-exam-survey-status,
+html[data-theme="dark"] .pre-exam-survey-trend-card,
+html[data-theme="dark"] .pre-exam-survey-trend-visual,
+html[data-theme="dark"] .pre-exam-survey-trend-legend span,
+html[data-theme="dark"] .pre-exam-survey-intro-copy,
+html[data-theme="dark"] .pre-exam-survey-review,
+html[data-theme="dark"] .pre-exam-survey-review-card,
+html[data-theme="dark"] .pre-exam-survey-intro-grid div,
+html[data-theme="dark"] .pre-exam-survey-bars,
+html[data-theme="dark"] .pre-exam-survey-mini-stats span,
+html[data-theme="dark"] .pre-exam-survey-form-stage,
+html[data-theme="dark"] .pre-exam-survey-form-kicker span,
+html[data-theme="dark"] .pre-exam-survey-form-kicker b,
+html[data-theme="dark"] .pre-exam-survey-select,
+html[data-theme="dark"] .pre-exam-survey-option,
+html[data-theme="dark"] .pre-exam-survey-other-input,
+html[data-theme="dark"] .pre-exam-survey-textarea,
+html[data-theme="dark"] .pre-exam-survey-rating,
+html[data-theme="dark"] .pre-exam-survey-secondary,
+html[data-theme="dark"] .pre-exam-survey-close {
+  border-color: rgba(207, 214, 224, 0.09);
+  background: rgba(35, 43, 55, 0.76);
+  color: var(--ink-main);
+}
+
+html[data-theme="dark"] .pre-exam-survey-header p:not(.eyebrow),
+html[data-theme="dark"] .pre-exam-survey-question p,
+html[data-theme="dark"] .pre-exam-survey-footer span,
+html[data-theme="dark"] .pre-exam-survey-footer p,
+html[data-theme="dark"] .pre-exam-survey-success p,
+html[data-theme="dark"] .pre-exam-survey-slide-copy p,
+html[data-theme="dark"] .pre-exam-survey-slide-panel p,
+html[data-theme="dark"] .pre-exam-survey-reflection-item p,
+html[data-theme="dark"] .pre-exam-survey-status span,
+html[data-theme="dark"] .pre-exam-survey-trend-header p,
+html[data-theme="dark"] .pre-exam-survey-trend-legend,
+html[data-theme="dark"] .pre-exam-survey-trend-bars i,
+html[data-theme="dark"] .pre-exam-survey-trend-bars b,
+html[data-theme="dark"] .pre-exam-survey-mini-stats span,
+html[data-theme="dark"] .pre-exam-survey-rating-topline span,
+html[data-theme="dark"] .pre-exam-survey-slider-scale,
+html[data-theme="dark"] .pre-exam-survey-intro-copy p,
+html[data-theme="dark"] .pre-exam-survey-review-heading p,
+html[data-theme="dark"] .pre-exam-survey-review-card p,
+html[data-theme="dark"] .pre-exam-survey-review-metrics small,
+html[data-theme="dark"] .pre-exam-survey-intro-grid small,
+html[data-theme="dark"] .pre-exam-survey-option small {
+  color: var(--ink-soft);
+}
+
+html[data-theme="dark"] .pre-exam-survey-status p,
+html[data-theme="dark"] .pre-exam-survey-status-note,
+html[data-theme="dark"] .pre-exam-survey-slide-copy > span,
+html[data-theme="dark"] .pre-exam-survey-slide-panel > span,
+html[data-theme="dark"] .pre-exam-survey-trend-header span,
+html[data-theme="dark"] .pre-exam-survey-reflection-item > span,
+html[data-theme="dark"] .pre-exam-survey-intro-copy > span,
+html[data-theme="dark"] .pre-exam-survey-review-heading > span,
+html[data-theme="dark"] .pre-exam-survey-review-card > span,
+html[data-theme="dark"] .pre-exam-survey-review-chip-row em,
+html[data-theme="dark"] .pre-exam-survey-question-index,
+html[data-theme="dark"] .pre-exam-survey-success span,
+html[data-theme="dark"] .pre-exam-survey-rating-topline strong,
+html[data-theme="dark"] .pre-exam-survey-form-kicker span,
+html[data-theme="dark"] .pre-exam-survey-form-kicker b {
+  background: rgba(138, 154, 184, 0.12);
+  color: var(--ink-main) !important;
+}
+
+html[data-theme="dark"] .pre-exam-survey-option[data-selected="true"] {
+  border-color: rgba(138, 154, 184, 0.34);
+  background: rgba(63, 74, 93, 0.84);
+  color: var(--ink-main);
+}
+
+html[data-theme="dark"] .pre-exam-survey-progress {
+  background: rgba(207, 214, 224, 0.08);
+}
+
+html[data-theme="dark"] .pre-exam-survey-slide-dots span {
+  background: rgba(207, 214, 224, 0.14);
+}
+
+html[data-theme="dark"] .pre-exam-survey-slide-dots span[data-active="true"] {
+  background: rgba(138, 154, 184, 0.94);
+}
+
+html[data-theme="dark"] .pre-exam-survey-reflection-line {
+  background: linear-gradient(
+    180deg,
+    transparent,
+    rgba(207, 214, 224, 0.18),
+    transparent
+  );
+}
+
+html[data-theme="dark"] .pre-exam-survey-trend-visual {
+  background:
+    linear-gradient(180deg, transparent 24%, rgba(207, 214, 224, 0.08) 24.5%, transparent 25%),
+    linear-gradient(180deg, transparent 49%, rgba(207, 214, 224, 0.08) 49.5%, transparent 50%),
+    linear-gradient(180deg, transparent 74%, rgba(207, 214, 224, 0.08) 74.5%, transparent 75%),
+    rgba(27, 34, 45, 0.82);
+}
+
+html[data-theme="dark"] .pre-exam-survey-trend-bars > span {
+  background: linear-gradient(180deg, rgba(138, 154, 184, 0.58), rgba(138, 154, 184, 0.82));
+}
+
+html[data-theme="dark"] .pre-exam-survey-trend-attempts {
+  stroke: rgba(138, 154, 184, 0.95);
+}
+
+html[data-theme="dark"] .pre-exam-survey-trend-rate {
+  stroke: rgba(251, 191, 36, 0.82);
+}
+
+html[data-theme="dark"] .pre-exam-survey-slider-wrap input[type="range"]::-webkit-slider-runnable-track {
+  background:
+    linear-gradient(90deg, rgba(138, 154, 184, 0.88) var(--survey-slider-progress), rgba(207, 214, 224, 0.12) 0);
+}
+
+html[data-theme="dark"] .pre-exam-survey-slider-wrap input[type="range"]::-webkit-slider-thumb {
+  border-color: rgba(27, 34, 45, 0.98);
+  background: rgba(138, 154, 184, 0.95);
+}
+
+html[data-theme="dark"] .pre-exam-survey-slider-wrap input[type="range"]::-moz-range-track {
+  background: rgba(207, 214, 224, 0.12);
+}
+
+html[data-theme="dark"] .pre-exam-survey-slider-wrap input[type="range"]::-moz-range-progress {
+  background: rgba(138, 154, 184, 0.88);
+}
+
+html[data-theme="dark"] .pre-exam-survey-slider-wrap input[type="range"]::-moz-range-thumb {
+  border-color: rgba(27, 34, 45, 0.98);
+  background: rgba(138, 154, 184, 0.95);
+}
+
+html[data-theme="dark"] .pre-exam-survey-submit {
+  background: rgba(138, 154, 184, 0.88);
+  color: #111827;
+}
+
+html[data-theme="dark"] .pre-exam-survey-select {
+  background-image:
+    linear-gradient(45deg, transparent 50%, var(--ink-main) 50%),
+    linear-gradient(135deg, var(--ink-main) 50%, transparent 50%);
+}
+
+html[data-browser="safari"] .pre-exam-survey-backdrop {
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+}
+
+html[data-browser="safari"] .pre-exam-survey-dialog,
+html[data-browser="safari"] .pre-exam-survey-trigger,
+html[data-browser="safari"] .pre-exam-survey-footer,
+html[data-browser="safari"] .pre-exam-survey-question,
+html[data-browser="safari"] .pre-exam-survey-slide,
+html[data-browser="safari"] .pre-exam-survey-slide-panel,
+html[data-browser="safari"] .pre-exam-survey-slide-controls,
+html[data-browser="safari"] .pre-exam-survey-status,
+html[data-browser="safari"] .pre-exam-survey-trend-card,
+html[data-browser="safari"] .pre-exam-survey-form-stage,
+html[data-browser="safari"] .pre-exam-survey-review,
+html[data-browser="safari"] .pre-exam-survey-review-card {
+  box-shadow: none;
+}
+
+html[data-browser="safari"] .pre-exam-survey-body {
+  -webkit-overflow-scrolling: auto;
+}
+
+html[data-browser="safari"] .pre-exam-survey-trend-attempts {
+  filter: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pre-exam-survey-backdrop,
+  .pre-exam-survey-dialog,
+  .pre-exam-survey-slide,
+  .pre-exam-survey-progress span {
+    animation: none;
+    transition: none;
+  }
+
+  .pre-exam-survey-review-card,
+  .pre-exam-survey-slide-dots span {
+    animation: none;
+    transition: none;
+  }
+}
+
+@media (max-width: 760px) {
+  .pre-exam-survey-backdrop {
+    align-items: stretch;
+    padding: 0;
+  }
+
+  .pre-exam-survey-dialog {
+    width: 100%;
+    max-height: 100dvh;
+    border-width: 0;
+    border-radius: 0;
+  }
+
+  .pre-exam-survey-header {
+    position: static;
+    background: rgba(255, 255, 255, 0.94);
+  }
+
+  html[data-theme="dark"] .pre-exam-survey-header {
+    background: rgba(27, 34, 45, 0.98);
+  }
+
+  .pre-exam-survey-header h2 {
+    font-size: 1.6rem;
+    line-height: 1.2;
+  }
+
+  .pre-exam-survey-body {
+    max-height: calc(100dvh - 7.6rem);
+    padding: 0.75rem;
+  }
+
+  .pre-exam-survey-body-intro {
+    max-height: calc(100dvh - 7.6rem);
+  }
+
+  .pre-exam-survey-intro {
+    gap: 0.75rem;
+  }
+
+  .pre-exam-survey-slide {
+    min-height: 0;
+    grid-template-rows: auto minmax(0, 1fr);
+    padding: 1rem;
+    border-radius: 1.05rem;
+    align-content: start;
+    gap: 0.9rem;
+  }
+
+  .pre-exam-survey-slide-hero {
+    grid-template-columns: 1fr;
+  }
+
+  .pre-exam-survey-slide-copy h3 {
+    font-size: clamp(1.65rem, 8vw, 2.1rem);
+    line-height: 1.2;
+  }
+
+  .pre-exam-survey-slide-copy p {
+    font-size: 0.95rem;
+    line-height: 1.75;
+  }
+
+  .pre-exam-survey-trend-card {
+    padding: 0.9rem;
+    border-radius: 1rem;
+  }
+
+  .pre-exam-survey-trend-header {
+    gap: 0.5rem;
+  }
+
+  .pre-exam-survey-trend-header strong {
+    font-size: 2rem;
+  }
+
+  .pre-exam-survey-trend-header p {
+    font-size: 0.86rem;
+    line-height: 1.65;
+  }
+
+  .pre-exam-survey-trend-visual {
+    min-height: 12.75rem;
+    border-radius: 0.9rem;
+  }
+
+  .pre-exam-survey-trend-bars {
+    gap: 0.18rem;
+  }
+
+  .pre-exam-survey-trend-bars b {
+    top: -1.15rem;
+    font-size: 0.58rem;
+  }
+
+  .pre-exam-survey-bar-label-full {
+    display: none;
+  }
+
+  .pre-exam-survey-bar-label-compact {
+    display: inline;
+  }
+
+  .pre-exam-survey-trend-bars i {
+    font-size: 0.62rem;
+  }
+
+  .pre-exam-survey-trend-legend {
+    gap: 0.45rem;
+  }
+
+  .pre-exam-survey-slide-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .pre-exam-survey-slide-panel {
+    padding: 0.95rem;
+  }
+
+  .pre-exam-survey-slide-panel h4 {
+    font-size: 1.35rem;
+    line-height: 1.3;
+  }
+
+  .pre-exam-survey-reflection {
+    gap: 0.65rem;
+  }
+
+  .pre-exam-survey-reflection-line {
+    left: 1.1rem;
+  }
+
+  .pre-exam-survey-reflection-item {
+    gap: 0.75rem;
+    padding: 0.85rem;
+    border-radius: 0.95rem;
+  }
+
+  .pre-exam-survey-reflection-item > span {
+    width: 2.25rem;
+    height: 2.25rem;
+    font-size: 0.72rem;
+  }
+
+  .pre-exam-survey-reflection-item h4 {
+    font-size: 1.08rem;
+    line-height: 1.35;
+  }
+
+  .pre-exam-survey-reflection-item p {
+    margin-top: 0.35rem;
+    font-size: 0.9rem;
+    line-height: 1.65;
+  }
+
+  .pre-exam-survey-slide-controls {
+    border-radius: 1.05rem;
+    padding: 0.75rem;
+  }
+
+  .pre-exam-survey-slide-controls > .pre-exam-survey-secondary {
+    width: 100%;
+  }
+
+  .pre-exam-survey-slide-actions {
+    width: 100%;
+  }
+
+  .pre-exam-survey-slide-actions .pre-exam-survey-secondary,
+  .pre-exam-survey-slide-actions .pre-exam-survey-submit {
+    width: 100%;
+  }
+
+  .pre-exam-survey-status {
+    position: relative;
+    top: auto;
+  }
+
+  .pre-exam-survey-intro-copy {
+    padding: 1rem;
+  }
+
+  .pre-exam-survey-review {
+    padding: 1rem;
+  }
+
+  .pre-exam-survey-intro-copy h3,
+  .pre-exam-survey-review-heading h3 {
+    font-size: 1.35rem;
+    line-height: 1.3;
+  }
+
+  .pre-exam-survey-intro-copy p,
+  .pre-exam-survey-review-heading p {
+    font-size: 0.95rem;
+    line-height: 1.75;
+  }
+
+  .pre-exam-survey-review-deck {
+    display: flex;
+    gap: 0.75rem;
+    margin-inline: -0.1rem;
+    padding-inline: 0.1rem;
+  }
+
+  .pre-exam-survey-review-card-hero,
+  .pre-exam-survey-review-card-final {
+    flex-basis: 88%;
+  }
+
+  .pre-exam-survey-review-card {
+    flex-basis: 88%;
+    min-height: 15.25rem;
+    padding: 0.95rem;
+  }
+
+  .pre-exam-survey-intro-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .pre-exam-survey-mini-stats {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .pre-exam-survey-mini-stats span {
+    padding-inline: 0.45rem;
+  }
+
+  .pre-exam-survey-options {
+    grid-template-columns: 1fr;
+  }
+
+  .pre-exam-survey-rating {
+    padding: 0.9rem;
+  }
+
+  .pre-exam-survey-rating-topline {
+    grid-template-columns: 1fr;
+    text-align: left;
+  }
+
+  .pre-exam-survey-rating-topline span:last-child {
+    text-align: left;
+  }
+
+  .pre-exam-survey-question,
+  .pre-exam-survey-success,
+  .pre-exam-survey-status,
+  .pre-exam-survey-form-stage,
+  .pre-exam-survey-review,
+  .pre-exam-survey-review-card,
+  .pre-exam-survey-footer {
+    border-radius: 1.05rem;
+  }
+
+  .pre-exam-survey-form-stage {
+    min-height: 0;
+    padding: 0.9rem;
+  }
+
+  .pre-exam-survey-form-actions {
+    width: 100%;
+  }
+
+  .pre-exam-survey-form-actions .pre-exam-survey-secondary,
+  .pre-exam-survey-form-actions .pre-exam-survey-submit {
+    width: 100%;
+  }
+
+  .pre-exam-survey-footer {
+    position: sticky;
+    bottom: 0.5rem;
   }
 }

@@ -7,6 +7,7 @@ import { LazyAuthPanel } from "@/components/LazyAuthPanel";
 import { LazyFeedbackBoard } from "@/components/LazyFeedbackBoard";
 import { HomeToneBanner } from "@/components/HomeToneBanner";
 import { OwnerOnlyNotesLink } from "@/components/OwnerOnlyNotesLink";
+import { PreExamSprintSurvey } from "@/components/PreExamSprintSurvey";
 import { isSupabaseRecoveryMode } from "@/lib/supabase/recoveryMode";
 
 type HomeAnimationStyle = CSSProperties & {
@@ -51,6 +52,11 @@ const QUICK_ENTRIES = [
 ] as const;
 
 const HOME_RELEASE_NOTES = [
+  {
+    time: "07/03",
+    title: "考前回饋小問卷",
+    body: "首頁新增考前衝刺快速問卷；先看全站與自己的刷題小回顧，再告訴我考前最該守住哪些功能。"
+  },
   {
     time: "07/03",
     title: "詳解截圖補到更完整",
@@ -848,6 +854,7 @@ export default function HomePage() {
                     <p className="eyebrow text-[10px]">Next Step</p>
                     <h2 className="mt-2 text-2xl font-black tracking-[-0.04em] text-ink">今天直接進題目</h2>
                   </div>
+                  <PreExamSprintSurvey />
                 </div>
                 <div className="mt-6 grid gap-4">
                   <ExamCountdown />

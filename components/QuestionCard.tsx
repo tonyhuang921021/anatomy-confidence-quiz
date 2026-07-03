@@ -176,12 +176,12 @@ export function QuestionCard({
           return (
             <div
               key={key}
-              className={`flex min-h-12 items-start gap-3 rounded-3xl border px-4 py-4 transition sm:px-5 ${optionClassName}`}
+              className={`flex min-h-12 min-w-0 max-w-full items-start gap-3 rounded-3xl border px-4 py-4 transition sm:px-5 ${optionClassName}`}
             >
               <button
                 type="button"
                 onClick={() => onSelect(key)}
-                className="min-w-0 flex-1 text-left"
+                className="min-w-0 max-w-full flex-1 text-left"
               >
                 <QuestionOptionBlock
                   question={question}
@@ -189,7 +189,7 @@ export function QuestionCard({
                   labelClassName={`mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-sm font-bold ${
                     labelClassName
                   }`}
-                  textClassName="min-w-0 break-words text-sm leading-7 text-slate-800 sm:text-base"
+                  textClassName="min-w-0 max-w-full break-words text-sm leading-7 text-slate-800 [overflow-wrap:anywhere] sm:text-base"
                   trailingContent={
                     answerBadge ? (
                       <span
