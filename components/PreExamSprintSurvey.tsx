@@ -72,6 +72,12 @@ type CommunityStatsPayload = {
   activeUsers14d?: number | null;
 };
 
+type UsageDailyPoint = {
+  date: string;
+  attempts: number;
+  correctRate: number;
+};
+
 type UsageReviewMetrics = {
   totalAttempts: number;
   uniqueQuestionsAnswered: number;
@@ -83,7 +89,9 @@ type UsageReviewMetrics = {
   lowConfidenceQuestionCount: number;
   wrongQuestionCount: number;
   mockExamCount: number;
+  fullLengthSessionCount?: number;
   customExamCount: number;
+  dailyPoints?: UsageDailyPoint[];
   savedQuestionCount?: number | null;
   noteCount?: number | null;
   explanationViewCount?: number | null;
@@ -247,6 +255,15 @@ const SURVEY_QUESTIONS: SurveyQuestion[] = [
     scaleLabels: ["幾乎沒影響", "有點不方便", "會影響安排", "會很困擾", "考前會慌"]
   },
   {
+    id: "recommendation_intent",
+    type: "rating",
+    title: "你會把這個網站推薦給其他人或之後的學弟妹嗎？",
+    required: true,
+    lowLabel: "不太會",
+    highLabel: "很願意",
+    scaleLabels: ["不太會", "可能不會", "看情況", "會推薦", "很願意推薦"]
+  },
+  {
     id: "practice_review_smoothness",
     type: "rating",
     title: "整體刷題與看詳解的順暢度",
@@ -387,8 +404,8 @@ function getStatsSummary(points: CommunityPoint[]) {
 }
 
 function getTrendPolylinePoints(
-  points: CommunityPoint[],
-  valueGetter: (point: CommunityPoint) => number,
+  points: Array<{ attempts: number; correctRate: number }>,
+  valueGetter: (point: { attempts: number; correctRate: number }) => number,
   maxValue: number
 ) {
   if (points.length === 0) return "";
@@ -401,6 +418,85 @@ function getTrendPolylinePoints(
       return `${x.toFixed(2)},${y.toFixed(2)}`;
     })
     .join(" ");
+}
+
+function sumAttempts(points: Array<{ attempts: number }>) {
+  return points.reduce((sum, point) => sum + Number(point.attempts || 0), 0);
+}
+
+function getWeightedCorrectRate(points: Array<{ attempts: number; correctRate: number }>) {
+  const attempts = sumAttempts(points);
+  if (attempts <= 0) return null;
+  const weightedCorrect = points.reduce(
+    (sum, point) => sum + Number(point.attempts || 0) * Number(point.correctRate || 0),
+    0
+  );
+  return Number((weightedCorrect / attempts).toFixed(1));
+}
+
+function getOptimisticActivityPercentile(
+  totalAttempts: number,
+  recentAttempts: number,
+  averageActiveAttempts: number | null
+) {
+  if (totalAttempts <= 0 && recentAttempts <= 0) return null;
+
+  let percentile = 45;
+  if (totalAttempts >= 1500) percentile = 91;
+  else if (totalAttempts >= 1000) percentile = 88;
+  else if (totalAttempts >= 600) percentile = 82;
+  else if (totalAttempts >= 300) percentile = 72;
+  else if (totalAttempts >= 120) percentile = 62;
+  else if (totalAttempts >= 30) percentile = 52;
+
+  if (averageActiveAttempts && averageActiveAttempts > 0) {
+    const multiplier = recentAttempts / averageActiveAttempts;
+    if (multiplier >= 3) percentile = Math.max(percentile, 94);
+    else if (multiplier >= 2) percentile = Math.max(percentile, 89);
+    else if (multiplier >= 1.25) percentile = Math.max(percentile, 78);
+    else if (multiplier >= 0.75) percentile = Math.max(percentile, 66);
+  }
+
+  return Math.min(97, percentile);
+}
+
+function formatMultiplier(value: number | null) {
+  if (!value || !Number.isFinite(value)) return null;
+  return `${value.toFixed(value >= 10 ? 0 : 1).replace(/\.0$/, "")} 倍`;
+}
+
+function getPersonalTrendTakeaway(options: {
+  totalAttempts: number;
+  recentAttempts: number;
+  activeDays: number;
+  averageActiveAttempts: number | null;
+  optimisticPercentile: number | null;
+  recentCorrectRate: number | null;
+}) {
+  const { totalAttempts, recentAttempts, activeDays, averageActiveAttempts, optimisticPercentile, recentCorrectRate } =
+    options;
+  const multiplier =
+    averageActiveAttempts && averageActiveAttempts > 0 ? recentAttempts / averageActiveAttempts : null;
+  const multiplierText = formatMultiplier(multiplier);
+  const percentileText = optimisticPercentile ? `高於約 ${optimisticPercentile}% 的活躍同學` : "已經很有份量";
+
+  if (totalAttempts >= 1000) {
+    return `這已經不是「有打開一下」的程度了；你累積的是扎實題量，樂觀估計${percentileText}。`;
+  }
+
+  if (recentCorrectRate != null && recentCorrectRate >= 75 && recentAttempts >= 30) {
+    return `近兩週答對率有 ${recentCorrectRate}%，而且不是只做幾題，這種穩定度很值得留下來。`;
+  }
+
+  if (recentAttempts > 0 && multiplierText) {
+    return `近兩週約是平均活躍同學的 ${multiplierText}，這段衝刺不是感覺而已，有被紀錄下來。`;
+  }
+
+  if (activeDays >= 10) {
+    return `你有 ${activeDays} 天回來作答，能一再回來接上題目，本身就是很難得的穩定。`;
+  }
+
+  return "現在最重要的是讓下一次回來作答更順，紀錄會慢慢累積成你的個人節奏。";
 }
 
 function getTrendTakeaway(points: CommunityPoint[]) {
@@ -437,6 +533,47 @@ function getTaipeiDateKey(value?: string | null) {
     month: "2-digit",
     day: "2-digit"
   }).format(date);
+}
+
+function getRecentTaipeiDayKeys(days: number) {
+  const today = new Date();
+  const keys: string[] = [];
+
+  for (let offset = days - 1; offset >= 0; offset -= 1) {
+    const current = new Date(today);
+    current.setDate(today.getDate() - offset);
+    keys.push(getTaipeiDateKey(current.toISOString()) ?? current.toISOString().slice(0, 10));
+  }
+
+  return keys;
+}
+
+function buildUsageDailyPoints(
+  attempts: Array<{ answeredAt?: string | null; isCorrect?: boolean | null }>,
+  days = 30
+): UsageDailyPoint[] {
+  const dayKeys = getRecentTaipeiDayKeys(days);
+  const grouped = new Map<string, { attempts: number; correctAttempts: number }>();
+
+  dayKeys.forEach((dayKey) => grouped.set(dayKey, { attempts: 0, correctAttempts: 0 }));
+
+  attempts.forEach((attempt) => {
+    const dayKey = getTaipeiDateKey(attempt.answeredAt);
+    if (!dayKey || !grouped.has(dayKey)) return;
+    const stats = grouped.get(dayKey) ?? { attempts: 0, correctAttempts: 0 };
+    stats.attempts += 1;
+    if (attempt.isCorrect) stats.correctAttempts += 1;
+    grouped.set(dayKey, stats);
+  });
+
+  return dayKeys.map((date) => {
+    const stats = grouped.get(date) ?? { attempts: 0, correctAttempts: 0 };
+    return {
+      date,
+      attempts: stats.attempts,
+      correctRate: stats.attempts > 0 ? Number(((stats.correctAttempts / stats.attempts) * 100).toFixed(1)) : 0
+    };
+  });
 }
 
 function getTaipeiHour(value?: string | null) {
@@ -586,15 +723,19 @@ function buildLocalUsageReview(email?: string | null): UsageReviewResponse {
   let firstAnsweredAt: string | null = null;
   let lastAnsweredAt: string | null = null;
   let mockExamCount = 0;
+  let fullLengthSessionCount = 0;
   let customExamCount = 0;
+  const localAttemptsForTrend: Array<{ answeredAt?: string | null; isCorrect?: boolean | null }> = [];
 
   for (const session of sessions) {
     if (session.settings?.mode === "simulation") mockExamCount += 1;
+    if ((session.generatedQuestions?.length ?? session.attempts?.length ?? 0) >= 80) fullLengthSessionCount += 1;
     if (session.settings?.mode === "custom_paper") customExamCount += 1;
     const questionById = new Map((session.generatedQuestions ?? []).map((question) => [question.id, question]));
 
     for (const attempt of session.attempts ?? []) {
       totalAttempts += 1;
+      localAttemptsForTrend.push({ answeredAt: attempt.answeredAt, isCorrect: attempt.isCorrect });
       if (attempt.isCorrect) correctAttempts += 1;
       if (attempt.questionId) uniqueQuestions.add(attempt.questionId);
       if (!attempt.isCorrect && attempt.questionId) wrongQuestions.add(attempt.questionId);
@@ -640,7 +781,9 @@ function buildLocalUsageReview(email?: string | null): UsageReviewResponse {
     lowConfidenceQuestionCount: lowConfidenceQuestions.size,
     wrongQuestionCount: wrongQuestions.size,
     mockExamCount,
+    fullLengthSessionCount,
     customExamCount,
+    dailyPoints: buildUsageDailyPoints(localAttemptsForTrend),
     mostPracticedSubject,
     weakestSubject,
     mostActiveHour,
@@ -1234,6 +1377,50 @@ export function PreExamSprintSurvey() {
       100
     );
     const trendTakeaway = getTrendTakeaway(communityPoints);
+    const personalTrendPoints =
+      usageMetrics?.dailyPoints && usageMetrics.dailyPoints.length > 0
+        ? usageMetrics.dailyPoints.slice(-14)
+        : Array.from({ length: 14 }, (_, index) => ({
+            date: `day-${index + 1}`,
+            attempts: 0,
+            correctRate: 0
+          }));
+    const maxPersonalAttempts = Math.max(...personalTrendPoints.map((point) => Number(point.attempts || 0)), 1);
+    const personalAttemptPolylinePoints = getTrendPolylinePoints(
+      personalTrendPoints,
+      (point) => Number(point.attempts || 0),
+      maxPersonalAttempts
+    );
+    const personalRatePolylinePoints = getTrendPolylinePoints(
+      personalTrendPoints,
+      (point) => Number(point.correctRate || 0),
+      100
+    );
+    const recentPersonalAttempts = sumAttempts(personalTrendPoints);
+    const averageActiveAttempts =
+      communityActiveUsers && communityActiveUsers > 0 && statsSummary.attempts > 0
+        ? statsSummary.attempts / communityActiveUsers
+        : null;
+    const optimisticPercentile = getOptimisticActivityPercentile(
+      totalAttempts,
+      recentPersonalAttempts,
+      averageActiveAttempts
+    );
+    const personalRecentRate = getWeightedCorrectRate(personalTrendPoints);
+    const personalTrendTakeaway = getPersonalTrendTakeaway({
+      totalAttempts,
+      recentAttempts: recentPersonalAttempts,
+      activeDays: usageMetrics?.activeDays ?? 0,
+      averageActiveAttempts,
+      optimisticPercentile,
+      recentCorrectRate: personalRecentRate
+    });
+    const averageActiveAttemptsText = averageActiveAttempts
+      ? Math.round(averageActiveAttempts).toLocaleString("zh-TW")
+      : "—";
+    const averageActiveAttemptsClause = averageActiveAttempts
+      ? `；全站活躍同學近兩週平均約 ${averageActiveAttemptsText} 題`
+      : "";
 
     if (introSlideIndex === 0) {
       return (
@@ -1328,30 +1515,82 @@ export function PreExamSprintSurvey() {
               {usageReviewLoading
                 ? "正在整理你的刷題足跡"
                 : usageReview?.hasEnoughData
-                  ? `${usageReview.userDisplayName ? `${usageReview.userDisplayName} 的` : "你的"}刷題回顧`
+                  ? `${usageReview.userDisplayName ? `${usageReview.userDisplayName} 的` : "你的"}作答累積`
                   : "先用一份小回顧開始"}
             </h3>
             <p>
               {usageReview?.hasEnoughData
-                ? "這段只抓大方向，讓你在填問卷前先看見自己怎麼使用這個網站。"
+                ? personalTrendTakeaway
                 : usageReview?.loggedIn
                   ? "目前抓到的紀錄還不多，所以先顯示輕量版回顧。新使用者的感受同樣重要。"
                   : "目前抓不到完整跨裝置紀錄，先用這台裝置與全站狀態做簡短回顧。"}
             </p>
           </div>
 
-          <div className="pre-exam-survey-slide-panel pre-exam-survey-slide-panel-main">
-            <span>使用足跡</span>
-            <h4>
-              {hasUsageAttempts
-                ? `你已經留下 ${totalAttempts.toLocaleString("zh-TW")} 次作答紀錄`
-                : "你的備考紀錄才剛開始建立"}
-            </h4>
-            <p>
-              {usageMetrics?.lastAnsweredAt
-                ? `最近一次作答在 ${formatShortDate(usageMetrics.lastAnsweredAt)}。這些足跡會幫你看見自己考前的使用節奏。`
-                : "即使還沒有足夠紀錄，你也可以直接告訴我一進站最需要什麼。"}
-            </p>
+          <div className="pre-exam-survey-trend-card pre-exam-survey-personal-trend">
+            <div className="pre-exam-survey-trend-header">
+              <div>
+                <span>你的近 14 天</span>
+                <strong>{hasUsageAttempts ? `${recentPersonalAttempts.toLocaleString("zh-TW")} 題` : "正在累積"}</strong>
+              </div>
+              <p>
+                {hasUsageAttempts && optimisticPercentile
+                  ? `樂觀估計高於約 ${optimisticPercentile}% 的活躍同學${averageActiveAttemptsClause}。`
+                  : "等紀錄多一點，這裡會顯示你自己的作答趨勢。"}
+              </p>
+            </div>
+
+            <div className="pre-exam-survey-trend-visual" aria-label="你的近十四天作答趨勢圖">
+              <svg viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
+                <polyline className="pre-exam-survey-trend-rate" points={personalRatePolylinePoints} />
+                <polyline className="pre-exam-survey-trend-attempts" points={personalAttemptPolylinePoints} />
+              </svg>
+              <div className="pre-exam-survey-trend-bars" aria-hidden="true">
+                {personalTrendPoints.map((point, index) => (
+                  <span
+                    key={`${point.date}-${index}`}
+                    style={
+                      {
+                        "--survey-bar-height": `${Math.max(7, Math.round((Number(point.attempts || 0) / maxPersonalAttempts) * 100))}%`
+                      } as CSSProperties
+                    }
+                  >
+                    <b>
+                      <span className="pre-exam-survey-bar-label-full">
+                        {hasUsageAttempts ? formatBarCountLabel(Number(point.attempts || 0)) : "—"}
+                      </span>
+                      <span className="pre-exam-survey-bar-label-compact">
+                        {hasUsageAttempts ? formatCompactBarCountLabel(Number(point.attempts || 0)) : "—"}
+                      </span>
+                    </b>
+                    <i>
+                      {hasUsageAttempts && (index === 0 || index === personalTrendPoints.length - 1 || index % 4 === 3)
+                        ? formatDateLabel(point.date)
+                        : ""}
+                    </i>
+                  </span>
+                ))}
+              </div>
+            </div>
+
+            <div className="pre-exam-survey-mini-stats">
+              <span>
+                <b>{hasUsageAttempts ? totalAttempts.toLocaleString("zh-TW") : "—"}</b>
+                總作答次數
+              </span>
+              <span>
+                <b>{hasUsageAttempts ? (usageMetrics?.uniqueQuestionsAnswered ?? 0).toLocaleString("zh-TW") : "—"}</b>
+                不同題目
+              </span>
+              <span>
+                <b>{personalRecentRate == null ? "—" : `${personalRecentRate}%`}</b>
+                近14天答對率
+              </span>
+              <span>
+                <b>{optimisticPercentile ? `高於 ${optimisticPercentile}%` : "—"}</b>
+                樂觀位置
+              </span>
+            </div>
           </div>
         </section>
       );
@@ -1368,26 +1607,30 @@ export function PreExamSprintSurvey() {
 
           <div className="pre-exam-survey-slide-grid">
             <div className="pre-exam-survey-slide-panel">
-              <span>做過題目</span>
+              <span>總作答</span>
               <h4>
                 {hasUsageAttempts
-                  ? (usageMetrics?.uniqueQuestionsAnswered ?? 0).toLocaleString("zh-TW")
+                  ? totalAttempts.toLocaleString("zh-TW")
                   : "還在累積"}
               </h4>
-              <p>代表你已經碰過多少不同題目，也會慢慢變成你的個人複習地圖。</p>
-            </div>
-            <div className="pre-exam-survey-slide-panel">
-              <span>活躍天數</span>
-              <h4>{hasUsageAttempts ? (usageMetrics?.activeDays ?? 0).toLocaleString("zh-TW") : "—"}</h4>
-              <p>不用每天很多，這裡只是記錄你有幾天回來作答。</p>
-            </div>
-            <div className="pre-exam-survey-slide-panel">
-              <span>常練科目</span>
-              <h4>{usageMetrics?.mostPracticedSubject ?? "還沒有明顯科目"}</h4>
               <p>
-                {typeof usageMetrics?.mostActiveHour === "number"
-                  ? `常出沒時段大約是 ${formatHourLabel(usageMetrics.mostActiveHour)}。`
-                  : "等紀錄多一點，這裡會看得出你最常練的區塊。"}
+                包含重做與複習。這個數字比較接近你真正投入過的題量，不會再跟「不同題目數」混在一起。
+              </p>
+            </div>
+            <div className="pre-exam-survey-slide-panel">
+              <span>不同題目</span>
+              <h4>{hasUsageAttempts ? (usageMetrics?.uniqueQuestionsAnswered ?? 0).toLocaleString("zh-TW") : "—"}</h4>
+              <p>
+                代表你實際碰過的題目範圍。這會慢慢長成你的個人複習地圖，也比單純天數更直觀。
+              </p>
+            </div>
+            <div className="pre-exam-survey-slide-panel">
+              <span>回來作答</span>
+              <h4>{hasUsageAttempts ? `${(usageMetrics?.activeDays ?? 0).toLocaleString("zh-TW")} 天` : "—"}</h4>
+              <p>
+                {usageMetrics?.mostPracticedSubject
+                  ? `最常練的是 ${usageMetrics.mostPracticedSubject}；常出沒時段大約是 ${formatHourLabel(usageMetrics.mostActiveHour)}。`
+                  : "不用每天很多，重點是你有一次次回來把題目接上。"}
               </p>
             </div>
           </div>

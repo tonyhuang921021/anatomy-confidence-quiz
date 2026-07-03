@@ -52,6 +52,12 @@ type UsageSessionRow = {
   completed_at: string | null;
 };
 
+type UsageDailyPoint = {
+  date: string;
+  attempts: number;
+  correctRate: number;
+};
+
 const SURVEY_ID = "med_exam_qbank_pre_exam_feedback_2026";
 const SURVEY_RATE_LIMIT_WINDOW_MS = 60 * 60 * 1000;
 const SURVEY_RATE_LIMIT_MAX = 4;
@@ -167,6 +173,7 @@ function buildAnswerSummary(answers: SurveyAnswerPayload[]) {
     mostHelpfulFeatures: getValue("most_helpful_features"),
     comparativeValue: getValue("comparative_value"),
     disappearanceImpact: getValue("disappearance_impact"),
+    recommendationIntent: getValue("recommendation_intent"),
     practiceReviewSmoothness: getValue("practice_review_smoothness"),
     syncConfidence: getValue("sync_confidence"),
     unacceptableIssues: getValue("unacceptable_issues")
@@ -222,6 +229,46 @@ function getTaipeiDateKey(value?: string | null) {
     month: "2-digit",
     day: "2-digit"
   }).format(date);
+}
+
+function getRecentTaipeiDayKeys(days: number) {
+  const today = new Date();
+  const keys: string[] = [];
+
+  for (let offset = days - 1; offset >= 0; offset -= 1) {
+    const current = new Date(today);
+    current.setDate(today.getDate() - offset);
+    keys.push(getTaipeiDateKey(current.toISOString()) ?? current.toISOString().slice(0, 10));
+  }
+
+  return keys;
+}
+
+function buildDailyPoints(attemptRows: UsageAttemptRow[], days = 30): UsageDailyPoint[] {
+  const dayKeys = getRecentTaipeiDayKeys(days);
+  const grouped = new Map<string, { attempts: number; correctAttempts: number }>();
+
+  for (const dayKey of dayKeys) {
+    grouped.set(dayKey, { attempts: 0, correctAttempts: 0 });
+  }
+
+  for (const row of attemptRows) {
+    const dayKey = getTaipeiDateKey(row.answered_at);
+    if (!dayKey || !grouped.has(dayKey)) continue;
+    const stats = grouped.get(dayKey) ?? { attempts: 0, correctAttempts: 0 };
+    stats.attempts += 1;
+    if (row.is_correct) stats.correctAttempts += 1;
+    grouped.set(dayKey, stats);
+  }
+
+  return dayKeys.map((date) => {
+    const stats = grouped.get(date) ?? { attempts: 0, correctAttempts: 0 };
+    return {
+      date,
+      attempts: stats.attempts,
+      correctRate: stats.attempts > 0 ? Number(((stats.correctAttempts / stats.attempts) * 100).toFixed(1)) : 0
+    };
+  });
 }
 
 function getTaipeiHour(value?: string | null) {
@@ -352,9 +399,9 @@ export async function GET(request: NextRequest) {
     }
 
     const totalAttempts = attemptResult.count ?? attemptRows.length;
-    const mockExamCount = sessionRows.filter(
-      (row) => row.mode === "simulation" || Number(row.question_count ?? 0) >= 80
-    ).length;
+    const dailyPoints = buildDailyPoints(attemptRows);
+    const mockExamCount = sessionRows.filter((row) => row.mode === "simulation").length;
+    const fullLengthSessionCount = sessionRows.filter((row) => Number(row.question_count ?? 0) >= 80).length;
     const customExamCount = sessionRows.filter((row) => row.mode === "custom_paper").length;
     const mostPracticedSubject =
       [...subjectCounts.entries()].sort((left, right) => right[1] - left[1])[0]?.[0] ?? null;
@@ -387,7 +434,9 @@ export async function GET(request: NextRequest) {
           lowConfidenceQuestionCount: lowConfidenceQuestions.size,
           wrongQuestionCount: wrongQuestions.size,
           mockExamCount,
+          fullLengthSessionCount,
           customExamCount,
+          dailyPoints,
           savedQuestionCount,
           noteCount,
           mostPracticedSubject,
