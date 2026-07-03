@@ -173,6 +173,8 @@ const CLOUD_COMPLETED_SESSION_UPLOAD_BATCH_SIZE = 25;
 const CLOUD_LIGHT_COMPLETED_SESSION_UPLOAD_LIMIT = 40;
 const CLOUD_LIGHT_COMPLETED_ATTEMPT_UPLOAD_LIMIT = 500;
 const CLOUD_ATTEMPT_SESSION_FETCH_CHUNK_SIZE = 20;
+const CLOUD_RECOVERABLE_REVIEW_SESSION_FETCH_LIMIT = 160;
+const CLOUD_RECOVERABLE_REVIEW_SESSION_GRACE_MS = 90_000;
 const CURRENT_SESSION_SYNC_MIN_INTERVAL_MS = 45_000;
 const STATS_SYNC_ATTEMPT_BATCH_SIZE = 200;
 const CLOUD_SESSION_LOOKUP_TIMEOUT_MS = 3500;
@@ -1183,6 +1185,10 @@ function mapRowToSession(
     payload.questionOrder && payload.questionOrder.length > 0
       ? payload.questionOrder
       : resolvedAttempts.map((attempt) => attempt.questionId);
+  const completedAt =
+    payload.completedAt ??
+    row.completed_at ??
+    getRecoverableReviewSessionCompletedAt(row, resolvedAttempts);
   const inferredPastPaperKey =
     row.mode === "simulation" ? getSinglePastPaperKeyFromAttempts(resolvedAttempts) : undefined;
   const inferredPaperMode = inferredPastPaperKey
@@ -1204,7 +1210,7 @@ function mapRowToSession(
       id: row.id,
       subject: (payload.subject as SubjectName | undefined) ?? (row.subject as SubjectName),
       startedAt: payload.startedAt ?? row.started_at,
-      completedAt: payload.completedAt ?? row.completed_at ?? undefined,
+      completedAt: completedAt ?? undefined,
       settings:
         payloadSettings ??
         (row.mode
@@ -1224,6 +1230,29 @@ function mapRowToSession(
       attempts: resolvedAttempts
     }
   ])[0] ?? null;
+}
+
+function getLatestAttemptAnsweredAt(attempts: Attempt[]) {
+  return attempts
+    .map((attempt) => attempt.answeredAt)
+    .filter(Boolean)
+    .sort((left, right) => left.localeCompare(right))
+    .at(-1);
+}
+
+function getRecoverableReviewSessionCompletedAt(row: QuizSessionRow, attempts: Attempt[]) {
+  if (row.completed_at || row.session_payload?.completedAt) return undefined;
+  if (row.mode !== "review") return undefined;
+
+  const expectedAttempts = Math.max(0, Number(row.question_count ?? 0));
+  if (expectedAttempts === 0 || attempts.length < expectedAttempts) return undefined;
+
+  const updatedAtTime = row.updated_at ? new Date(row.updated_at).getTime() : 0;
+  if (updatedAtTime && Date.now() - updatedAtTime < CLOUD_RECOVERABLE_REVIEW_SESSION_GRACE_MS) {
+    return undefined;
+  }
+
+  return getLatestAttemptAnsweredAt(attempts) ?? row.updated_at ?? row.started_at;
 }
 
 async function fetchActiveQuizSessionRow(userId: string) {
@@ -1325,6 +1354,29 @@ async function fetchQuizSessionsForUser(userId: string) {
   return rows;
 }
 
+async function fetchRecoverableReviewSessionRowsForUser(userId: string) {
+  if (isSupabaseRecoveryMode() || !isSupabaseConfigured()) return [] as QuizSessionRow[];
+
+  const supabase = getSupabaseBrowserClient();
+  const { data, error } = await supabase
+    .from("quiz_sessions")
+    .select(
+      "id, user_id, subject, mode, session_name, question_count, correct_count, wrong_count, average_confidence, started_at, completed_at, session_payload, updated_at"
+    )
+    .eq("user_id", userId)
+    .eq("mode", "review")
+    .is("completed_at", null)
+    .gt("question_count", 0)
+    .order("updated_at", { ascending: false })
+    .limit(CLOUD_RECOVERABLE_REVIEW_SESSION_FETCH_LIMIT);
+
+  if (error) {
+    throw error;
+  }
+
+  return (data ?? []) as QuizSessionRow[];
+}
+
 async function fetchQuizSessionByIdForUser(userId: string, sessionId: string) {
   if (isSupabaseRecoveryMode() || !isSupabaseConfigured() || !sessionId) return null;
 
@@ -1388,15 +1440,22 @@ async function fetchQuizSessionPayloadRowsForUser(userId: string, sessionIds: st
 
 async function fetchResolvedQuizSessionsForUser(userId: string) {
   const sessionRows = await withCloudFallback(fetchQuizSessionsForUser(userId), [] as QuizSessionRow[]);
+  const recoverableReviewRows = await withCloudFallback(
+    fetchRecoverableReviewSessionRowsForUser(userId),
+    [] as QuizSessionRow[]
+  );
+  const allSessionRows = Array.from(
+    new Map([...sessionRows, ...recoverableReviewRows].map((row) => [row.id, row] as const)).values()
+  );
   const attemptRows = await withCloudFallback(
     fetchSessionAttemptRowsForUser(
       userId,
-      sessionRows.map((row) => row.id)
+      allSessionRows.map((row) => row.id)
     ),
     [] as QuizSessionAttemptRow[]
   );
   const attemptMap = buildAttemptMap(attemptRows);
-  const rowsMissingAttemptRows = sessionRows.filter((row) => {
+  const rowsMissingAttemptRows = allSessionRows.filter((row) => {
     const expectedAttempts = Math.max(0, row.question_count ?? 0);
     if (expectedAttempts === 0) return false;
     const attempts = attemptMap.get(row.id);
@@ -1411,7 +1470,7 @@ async function fetchResolvedQuizSessionsForUser(userId: string) {
   );
   const payloadFallbackById = new Map(payloadFallbackRows.map((row) => [row.id, row] as const));
 
-  const sessions = sessionRows
+  const sessions = allSessionRows
     .map((row) => {
       const expectedAttempts = Math.max(0, row.question_count ?? 0);
       const hydratedRow = payloadFallbackById.get(row.id) ?? row;
@@ -1426,10 +1485,14 @@ async function fetchResolvedQuizSessionsForUser(userId: string) {
   const sessionsMissingAttemptRows = payloadFallbackRows
     .map((row) => mapRowToSession(row))
     .filter((session): session is QuizSession => Boolean(session?.completedAt && session.attempts.length > 0));
+  const recoveredCompletionSessions = recoverableReviewRows
+    .map((row) => mapRowToSession(payloadFallbackById.get(row.id) ?? row, attemptMap))
+    .filter((session): session is QuizSession => Boolean(session?.completedAt && session.attempts.length > 0));
 
   return {
     sessions,
-    sessionsMissingAttemptRows
+    sessionsMissingAttemptRows,
+    recoveredCompletionSessions
   };
 }
 
@@ -1445,10 +1508,11 @@ export async function loadCompletedSessionFromSupabase(sessionId: string) {
       if (!userId) return null;
 
       const row = await fetchQuizSessionByIdForUser(userId, sessionId);
-      if (!row?.completed_at) return null;
+      if (!row) return null;
 
       const attemptRows = await fetchSessionAttemptRowsForUser(userId, [row.id]);
       const session = mapRowToSession(row, buildAttemptMap(attemptRows));
+      if (!session?.completedAt) return null;
       return session ? canonicalizeSessionsForUser(userId, [session])[0] ?? session : null;
     })(),
     null
@@ -1998,8 +2062,11 @@ export async function syncCompletedSessionsForCurrentUser(userId: string) {
   const localSessionsToSync = [...localCompletedSessions]
     .sort((left, right) => sessionFreshnessValue(right).localeCompare(sessionFreshnessValue(left)))
     .slice(0, CLOUD_COMPLETED_SESSION_UPLOAD_LIMIT);
-  const { sessions: fetchedRemoteSessions, sessionsMissingAttemptRows } =
-    await fetchResolvedQuizSessionsForUser(userId);
+  const {
+    sessions: fetchedRemoteSessions,
+    sessionsMissingAttemptRows,
+    recoveredCompletionSessions
+  } = await fetchResolvedQuizSessionsForUser(userId);
   const remoteSessions = canonicalizeSessionsForUser(
     userId,
     fetchedRemoteSessions.filter(isCompletedQuizSession)
@@ -2010,6 +2077,10 @@ export async function syncCompletedSessionsForCurrentUser(userId: string) {
     userId,
     sessionsMissingAttemptRows.filter(isCompletedQuizSession)
   );
+  const sessionsToRepair = canonicalizeSessionsForUser(
+    userId,
+    recoveredCompletionSessions.filter(isCompletedQuizSession)
+  );
 
   saveCompletedSessions(mergedSessions);
   saveCompletedQuestionHistoryEntriesForUser(
@@ -2018,6 +2089,9 @@ export async function syncCompletedSessionsForCurrentUser(userId: string) {
   );
   if (sessionsToBackfill.length > 0) {
     void upsertSessionsForUserInBatchesSafely(userId, sessionsToBackfill);
+  }
+  if (sessionsToRepair.length > 0) {
+    void upsertSessionsForUserInBatchesSafely(userId, sessionsToRepair);
   }
   if (sessionsToUpload.length > 0) {
     void upsertSessionsForUserInBatchesSafely(userId, sessionsToUpload);

@@ -1514,6 +1514,9 @@ export default function QuizPage() {
 
   function finalizeCompletedSession(completedSession: QuizSession) {
     takeDeferredCurrentSessionSave();
+    clearScheduledCurrentSessionCloudSync();
+    currentSessionCloudPendingRef.current = null;
+    latestCurrentSessionRef.current = completedSession;
     const completedKey = completedSession.id.replace(/^user-[^:]+:/, "");
     if (completedSessionIdsRef.current.has(completedKey)) {
       return false;
@@ -1530,6 +1533,18 @@ export default function QuizPage() {
       clearMatchingCurrentSessions(completedSession.id, [authSession?.user?.id ?? ""]);
     }
     return saved !== false;
+  }
+
+  async function completeSessionAndNavigate(completedSession: QuizSession) {
+    finalizeCompletedSession(completedSession);
+    try {
+      await pushCompletedSessionToSupabase(completedSession);
+    } catch (error) {
+      console.error("Completed session cloud handoff skipped; pending queue kept local copy:", error);
+    }
+    void pushQuestionStatsSnapshotToSupabase(completedSession);
+    syncCompletedCustomPaper(completedSession);
+    router.push(buildResultsHref(completedSession));
   }
 
   function getSessionReadyForCompletion(baseSession: QuizSession) {
@@ -1622,11 +1637,7 @@ export default function QuizPage() {
           completedAt: new Date().toISOString(),
           isReviewingAnswer: false
         };
-        finalizeCompletedSession(completedSession);
-        void pushCompletedSessionToSupabase(completedSession);
-        void pushQuestionStatsSnapshotToSupabase(completedSession);
-        syncCompletedCustomPaper(completedSession);
-        router.push(buildResultsHref(completedSession));
+        void completeSessionAndNavigate(completedSession);
         return;
       }
 
@@ -1929,11 +1940,7 @@ export default function QuizPage() {
         completedAt: new Date().toISOString(),
         isReviewingAnswer: false
       };
-      finalizeCompletedSession(completedSession);
-      void pushCompletedSessionToSupabase(completedSession);
-      void pushQuestionStatsSnapshotToSupabase(completedSession);
-      syncCompletedCustomPaper(completedSession);
-      router.push(buildResultsHref(completedSession));
+      void completeSessionAndNavigate(completedSession);
       return;
     }
 
@@ -1967,11 +1974,7 @@ export default function QuizPage() {
       completedAt: new Date().toISOString(),
       isReviewingAnswer: false
     };
-    finalizeCompletedSession(completedSession);
-    void pushCompletedSessionToSupabase(completedSession);
-    void pushQuestionStatsSnapshotToSupabase(completedSession);
-    syncCompletedCustomPaper(completedSession);
-    router.push(buildResultsHref(completedSession));
+    void completeSessionAndNavigate(completedSession);
   }
 
   if (!mounted) {
