@@ -264,7 +264,9 @@ export default function SearchPage() {
   }, [keyword, selectedSubject, selectedYear, yearSortOrder]);
 
   useEffect(() => {
-    setExplanationOverrides(loadQuestionExplanationOverrides());
+    setExplanationOverrides((current) =>
+      mergeQuestionExplanationOverrides(current, loadQuestionExplanationOverrides())
+    );
   }, []);
 
   useEffect(() => {
@@ -484,10 +486,9 @@ export default function SearchPage() {
 
       clearQuestionExplanationBackgroundCache(question.id);
       saveQuestionExplanationOverride(question.id, override);
-      setExplanationOverrides((current) => ({
-        ...current,
-        [question.id]: override
-      }));
+      setExplanationOverrides((current) =>
+        mergeQuestionExplanationOverrides(current, { [question.id]: override })
+      );
     } catch {
       setExplanationErrorMap((current) => ({
         ...current,

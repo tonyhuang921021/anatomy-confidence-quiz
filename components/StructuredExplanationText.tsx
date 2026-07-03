@@ -212,6 +212,8 @@ export function StructuredExplanationText({
     tone === "dark"
       ? "border-white/10 text-slate-50"
       : "border-slate-200 text-slate-800";
+  const tableTextWrapClassName =
+    "min-w-[8.5rem] max-w-[18rem] whitespace-normal break-words [overflow-wrap:anywhere] [word-break:normal]";
 
   return (
     <div className={`structured-explanation-text w-full min-w-0 ${className}`}>
@@ -239,15 +241,15 @@ export function StructuredExplanationText({
                       return (
                         <div
                           key={`${section.title ?? "table"}-${blockIndex}`}
-                          className={`max-w-full touch-pan-x overflow-x-auto rounded-2xl border shadow-[inset_-18px_0_18px_-20px_rgba(15,23,42,0.65)] [-webkit-overflow-scrolling:touch] ${tableShellClassName}`}
+                          className={`w-full max-w-full touch-pan-x overscroll-x-contain overflow-x-auto rounded-2xl border shadow-[inset_-18px_0_18px_-20px_rgba(15,23,42,0.65)] [-webkit-overflow-scrolling:touch] ${tableShellClassName}`}
                         >
-                          <table className="min-w-[34rem] border-collapse text-left text-[15px] leading-7 sm:min-w-full">
+                          <table className="w-max min-w-full max-w-none table-auto border-collapse text-left text-[14px] leading-7 sm:text-[15px]">
                             <thead className={tableHeadClassName}>
                               <tr>
                                 {block.headers.map((header, headerIndex) => (
                                   <th
                                     key={`${header}-${headerIndex}`}
-                                    className={`border-b px-3 py-2.5 font-black [word-break:keep-all] ${tableCellClassName}`}
+                                    className={`border-b px-3 py-2.5 font-black ${tableCellClassName} ${tableTextWrapClassName}`}
                                   >
                                     {header}
                                   </th>
@@ -260,7 +262,7 @@ export function StructuredExplanationText({
                                   {block.headers.map((_, cellIndex) => (
                                     <td
                                       key={`cell-${rowIndex}-${cellIndex}`}
-                                      className={`border-t px-3 py-2.5 align-top font-medium [word-break:keep-all] ${tableCellClassName}`}
+                                      className={`border-t px-3 py-2.5 align-top font-medium ${tableCellClassName} ${tableTextWrapClassName}`}
                                     >
                                       {row[cellIndex] ?? ""}
                                     </td>

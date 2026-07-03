@@ -1042,7 +1042,9 @@ export default function QuizPage() {
   }, [authLoading, authSession?.user?.id, syncStatus, syncVersion]);
 
   useEffect(() => {
-    setExplanationOverrides(loadQuestionExplanationOverrides());
+    setExplanationOverrides((current) =>
+      mergeQuestionExplanationOverrides(current, loadQuestionExplanationOverrides())
+    );
   }, []);
 
   useEffect(() => {
@@ -1827,7 +1829,9 @@ export default function QuizPage() {
 
       clearQuestionExplanationBackgroundCache(question.id);
       saveQuestionExplanationOverride(question.id, override);
-      setExplanationOverrides((current) => ({ ...current, [question.id]: override }));
+      setExplanationOverrides((current) =>
+        mergeQuestionExplanationOverrides(current, { [question.id]: override })
+      );
       setSession((current) => (current ? { ...current } : current));
     } catch {
       setExplanationErrorMap((current) => ({

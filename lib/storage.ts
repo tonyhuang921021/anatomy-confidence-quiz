@@ -34,6 +34,7 @@ const completedSessionIdMemoryCache = new Map<string, Set<string>>();
 const completedQuestionHistoryMemoryCache = new Map<string, CompletedQuestionHistoryEntry[]>();
 const COMPLETED_SESSIONS_HEAVY_READ_LIMIT = 160_000;
 const COMPLETED_SESSIONS_UPLOAD_RECOVERY_READ_LIMIT = 1_500_000;
+const COMPLETED_SESSIONS_RECENT_RECOVERY_LIMIT = 240;
 const PENDING_COMPLETED_SESSION_UPLOAD_LIMIT = 80;
 
 export type CompletedQuestionHistoryEntry = {
@@ -505,7 +506,10 @@ export function loadCompletedHistorySessionsForUser(userId = getActiveStorageUse
     );
   const localSessions = sourceUserIds.flatMap((sourceUserId) =>
     shouldUseTailRecovery
-      ? loadRecentLocalCompletedSessionsForUploadForUser(sourceUserId)
+      ? loadRecentLocalCompletedSessionsForUploadForUser(
+          sourceUserId,
+          COMPLETED_SESSIONS_RECENT_RECOVERY_LIMIT
+        )
       : loadCompletedSessionsForUser(sourceUserId)
   );
   const sessionDerivedEntries = buildCompletedQuestionHistoryEntriesFromSessions([
@@ -526,7 +530,10 @@ export function loadCompletedHistorySessionsForUser(userId = getActiveStorageUse
 
   if (shouldUseTailRecovery) {
     return sourceUserIds.flatMap((sourceUserId) =>
-      loadRecentLocalCompletedSessionsForUploadForUser(sourceUserId)
+      loadRecentLocalCompletedSessionsForUploadForUser(
+        sourceUserId,
+        COMPLETED_SESSIONS_RECENT_RECOVERY_LIMIT
+      )
     );
   }
 
@@ -928,19 +935,39 @@ function shouldReplaceQuestionExplanationOverride(
   return true;
 }
 
+function areQuestionExplanationOverridesEqual(
+  leftOverride?: QuestionExplanationOverride | null,
+  rightOverride?: QuestionExplanationOverride | null
+) {
+  if (!leftOverride || !rightOverride) return leftOverride === rightOverride;
+  return (
+    leftOverride.explanation === rightOverride.explanation &&
+    (leftOverride.memoryTip ?? "") === (rightOverride.memoryTip ?? "") &&
+    (leftOverride.model ?? "") === (rightOverride.model ?? "") &&
+    (leftOverride.updatedAt ?? "") === (rightOverride.updatedAt ?? "") &&
+    JSON.stringify(leftOverride.optionAnalysis ?? {}) ===
+      JSON.stringify(rightOverride.optionAnalysis ?? {})
+  );
+}
+
 export function mergeQuestionExplanationOverrides(
   currentOverrides: Record<string, QuestionExplanationOverride>,
   incomingOverrides: Record<string, QuestionExplanationOverride>
 ) {
   const merged = { ...currentOverrides };
+  let changed = false;
 
   for (const [questionId, incomingOverride] of Object.entries(incomingOverrides)) {
-    if (shouldReplaceQuestionExplanationOverride(merged[questionId], incomingOverride)) {
+    if (
+      shouldReplaceQuestionExplanationOverride(merged[questionId], incomingOverride) &&
+      !areQuestionExplanationOverridesEqual(merged[questionId], incomingOverride)
+    ) {
       merged[questionId] = incomingOverride;
+      changed = true;
     }
   }
 
-  return merged;
+  return changed ? merged : currentOverrides;
 }
 
 export function setActiveStorageUser(userId?: string) {
@@ -1036,6 +1063,11 @@ export function saveCompletedSession(session: QuizSession) {
   ) {
     const normalized = normalizeCompletedSessionList([
       ...loadCloudCompletedSessionsForUser(activeUser),
+      ...loadPendingCompletedSessionUploadsForUser(activeUser),
+      ...loadRecentLocalCompletedSessionsForUploadForUser(
+        activeUser,
+        COMPLETED_SESSIONS_RECENT_RECOVERY_LIMIT
+      ),
       session
     ]);
     saveCloudCompletedSessionsForUser(activeUser, normalized);
@@ -1228,7 +1260,10 @@ export function loadCompletedSessionsForUser(userId: string): QuizSession[] {
       const normalized = normalizeCompletedSessionList([
         ...cloudSessions,
         ...pendingSessions,
-        ...loadRecentLocalCompletedSessionsForUploadForUser(userId)
+        ...loadRecentLocalCompletedSessionsForUploadForUser(
+          userId,
+          COMPLETED_SESSIONS_RECENT_RECOVERY_LIMIT
+        )
       ]);
       cacheCompletedSessionsForUser(userId, normalized);
       return normalized;

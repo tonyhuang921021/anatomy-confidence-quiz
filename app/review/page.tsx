@@ -70,6 +70,7 @@ export default function ReviewPage() {
   >({});
   const [isFullscreenReview, setIsFullscreenReview] = useState(false);
   const [isFullscreenReviewVisible, setIsFullscreenReviewVisible] = useState(false);
+  const [localHistoryVersion, setLocalHistoryVersion] = useState(0);
   const { syncVersion } = useAuth();
   const pageScrollYRef = useRef(0);
   const baseQuestions = useMemo(() => getQuestionBankBySubjectFilter("全部"), []);
@@ -98,7 +99,17 @@ export default function ReviewPage() {
       classificationOverrides
     );
     setPracticeItems(getReviewQuestionItems(reviewQuestions, practiceSessions, Number.MAX_SAFE_INTEGER));
-  }, [allQuestions, classificationOverrides, syncVersion]);
+  }, [allQuestions, classificationOverrides, syncVersion, localHistoryVersion]);
+
+  useEffect(() => {
+    const refreshLocalHistory = () => setLocalHistoryVersion((version) => version + 1);
+    window.addEventListener("completed-sessions-change", refreshLocalHistory);
+    window.addEventListener("completed-question-history-change", refreshLocalHistory);
+    return () => {
+      window.removeEventListener("completed-sessions-change", refreshLocalHistory);
+      window.removeEventListener("completed-question-history-change", refreshLocalHistory);
+    };
+  }, []);
 
   useEffect(() => {
     if (typeof document === "undefined" || typeof window === "undefined") return;

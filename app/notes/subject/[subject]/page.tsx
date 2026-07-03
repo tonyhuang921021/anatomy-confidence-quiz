@@ -19,6 +19,7 @@ import {
 import { clearQuestionExplanationBackgroundCache } from "@/lib/cloudSync";
 import {
   loadQuestionExplanationOverridesForIds,
+  mergeQuestionExplanationOverrides,
   saveQuestionExplanationOverride
 } from "@/lib/storage";
 import {
@@ -337,10 +338,9 @@ export default function SubjectNotesPage() {
   useEffect(() => {
     const questionIds = activeRelatedQuestions.map((item) => item.question.id);
     if (questionIds.length === 0) return;
-    setExplanationOverrides((current) => ({
-      ...current,
-      ...loadQuestionExplanationOverridesForIds(questionIds)
-    }));
+    setExplanationOverrides((current) =>
+      mergeQuestionExplanationOverrides(current, loadQuestionExplanationOverridesForIds(questionIds))
+    );
   }, [activeRelatedQuestions]);
 
   useEffect(() => {
@@ -980,7 +980,9 @@ export default function SubjectNotesPage() {
 
       clearQuestionExplanationBackgroundCache(question.id);
       saveQuestionExplanationOverride(question.id, override);
-      setExplanationOverrides((current) => ({ ...current, [question.id]: override }));
+      setExplanationOverrides((current) =>
+        mergeQuestionExplanationOverrides(current, { [question.id]: override })
+      );
     } catch {
       setExplanationErrorMap((current) => ({
         ...current,

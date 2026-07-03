@@ -20,7 +20,8 @@ import {
   useSavedQuestionRecords
 } from "@/lib/savedQuestions";
 import {
-  loadQuestionExplanationOverrides
+  loadQuestionExplanationOverrides,
+  mergeQuestionExplanationOverrides
 } from "@/lib/storage";
 import {
   OptionKey,
@@ -93,7 +94,9 @@ export default function SavedQuestionsPage() {
   const [feedback, setFeedback] = useState<SavedQuestionFeedback | null>(null);
 
   useEffect(() => {
-    setExplanationOverrides(loadQuestionExplanationOverrides());
+    setExplanationOverrides((current) =>
+      mergeQuestionExplanationOverrides(current, loadQuestionExplanationOverrides())
+    );
   }, []);
 
   useEffect(() => {

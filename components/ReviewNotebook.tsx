@@ -643,7 +643,9 @@ export function ReviewNotebook({
   }, [visibleQuestionIdsKey]);
 
   useEffect(() => {
-    setExplanationOverrides(loadQuestionExplanationOverrides());
+    setExplanationOverrides((current) =>
+      mergeQuestionExplanationOverrides(current, loadQuestionExplanationOverrides())
+    );
   }, [items, questionIdsKey]);
 
   useEffect(() => {
@@ -744,10 +746,9 @@ export function ReviewNotebook({
 
       clearQuestionExplanationBackgroundCache(question.id);
       saveQuestionExplanationOverride(question.id, override);
-      setExplanationOverrides((current) => ({
-        ...current,
-        [question.id]: override
-      }));
+      setExplanationOverrides((current) =>
+        mergeQuestionExplanationOverrides(current, { [question.id]: override })
+      );
     } catch {
       setExplanationErrorMap((current) => ({
         ...current,

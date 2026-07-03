@@ -699,6 +699,7 @@ function ResultsPageContent() {
   );
   const [visibleHistoryCount, setVisibleHistoryCount] = useState(RESULTS_HISTORY_PAGE_SIZE);
   const [resultsScope, setResultsScope] = useState<"default" | "simulation">("default");
+  const [localHistoryVersion, setLocalHistoryVersion] = useState(0);
   const [editableSessionName, setEditableSessionName] = useState("");
   const [sessionNameNotice, setSessionNameNotice] = useState("");
   const [resultRecordNotice, setResultRecordNotice] = useState("");
@@ -873,6 +874,16 @@ function ResultsPageContent() {
       setClassificationReportLoadingMap((current) => ({ ...current, [question.id]: false }));
     }
   }
+
+  useEffect(() => {
+    const refreshLocalHistory = () => setLocalHistoryVersion((version) => version + 1);
+    window.addEventListener("completed-sessions-change", refreshLocalHistory);
+    window.addEventListener("completed-question-history-change", refreshLocalHistory);
+    return () => {
+      window.removeEventListener("completed-sessions-change", refreshLocalHistory);
+      window.removeEventListener("completed-question-history-change", refreshLocalHistory);
+    };
+  }, []);
 
   useEffect(() => {
     let cancelled = false;
@@ -1072,11 +1083,11 @@ function ResultsPageContent() {
     return () => {
       cancelled = true;
     };
-  }, [router, searchParams, session?.user?.id, syncVersion]);
+  }, [router, searchParams, session?.user?.id, syncVersion, localHistoryVersion]);
 
   useEffect(() => {
     setVisibleHistoryCount(RESULTS_HISTORY_PAGE_SIZE);
-  }, [syncVersion, requestedSessionId]);
+  }, [syncVersion, localHistoryVersion, requestedSessionId]);
 
   useEffect(() => {
     setOpenReviewDetailKeys(new Set());
@@ -1098,7 +1109,9 @@ function ResultsPageContent() {
   }, [state.session]);
 
   useEffect(() => {
-    setExplanationOverrides(loadQuestionExplanationOverrides());
+    setExplanationOverrides((current) =>
+      mergeQuestionExplanationOverrides(current, loadQuestionExplanationOverrides())
+    );
   }, [syncVersion]);
 
   useEffect(() => {
@@ -1528,10 +1541,9 @@ function ResultsPageContent() {
 
       clearQuestionExplanationBackgroundCache(question.id);
       saveQuestionExplanationOverride(question.id, override);
-      setExplanationOverrides((current) => ({
-        ...current,
-        [question.id]: override
-      }));
+      setExplanationOverrides((current) =>
+        mergeQuestionExplanationOverrides(current, { [question.id]: override })
+      );
     } catch {
       setExplanationErrorMap((current) => ({
         ...current,

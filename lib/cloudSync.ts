@@ -179,6 +179,7 @@ const CLOUD_SYNC_TOTAL_BUDGET_MS = 8500;
 const LEADERBOARD_PROFILE_CLIENT_SYNC_MIN_INTERVAL_MS = 5 * 60 * 1000;
 const LEADERBOARD_PROFILE_SYNC_MARKER_PREFIX = "leaderboardProfileSync:";
 const CLOUD_HEAVY_LOCAL_HISTORY_READ_LIMIT = 160_000;
+const CLOUD_HEAVY_LOCAL_HISTORY_RECOVERY_LIMIT = 240;
 const FEEDBACK_REQUEST_TIMEOUT_MS = 10000;
 const FEEDBACK_SESSION_TIMEOUT_MS = 2500;
 const QUESTION_EXPLANATION_SYNC_IN_FLIGHT_MS = 20_000;
@@ -1978,23 +1979,41 @@ export async function syncLocalCompletedSessionsForCurrentUser(userId: string) {
   const hasHeavyLocalHistory =
     getCompletedSessionsStorageLengthForUser(userId) > CLOUD_HEAVY_LOCAL_HISTORY_READ_LIMIT ||
     getCompletedSessionsStorageLengthForUser("guest") > CLOUD_HEAVY_LOCAL_HISTORY_READ_LIMIT;
-  const { sessions: fetchedRemoteSessions } =
-    isSupabaseRecoveryMode() || !isSupabaseConfigured()
-      ? { sessions: [] as QuizSession[] }
-      : await fetchResolvedQuizSessionsForUser(userId);
+  let fetchedRemoteSessions: QuizSession[] = [];
+  let shouldUploadLocalSessions = !isSupabaseRecoveryMode() && isSupabaseConfigured();
+
+  if (shouldUploadLocalSessions) {
+    try {
+      const resolved = await fetchResolvedQuizSessionsForUser(userId);
+      fetchedRemoteSessions = resolved.sessions;
+    } catch (error) {
+      shouldUploadLocalSessions = false;
+      fetchedRemoteSessions = loadCloudCompletedSessionsForUser(userId);
+      console.warn("Completed session cloud read failed; keeping local history visible.", error);
+    }
+  }
   const remoteSessions = canonicalizeSessionsForUser(
     userId,
     fetchedRemoteSessions.filter(isCompletedQuizSession)
   );
-  const remoteSessionIds = new Set(remoteSessions.map((session) => getCanonicalSessionId(session.id)));
+  const recentLocalCompletedSessions = canonicalizeSessionsForUser(
+    userId,
+    mergeSessions(
+      loadRecentLocalCompletedSessionsForUploadForUser(
+        userId,
+        CLOUD_HEAVY_LOCAL_HISTORY_RECOVERY_LIMIT
+      ),
+      loadRecentLocalCompletedSessionsForUploadForUser(
+        "guest",
+        CLOUD_HEAVY_LOCAL_HISTORY_RECOVERY_LIMIT
+      )
+    ).filter(isCompletedQuizSession)
+  );
   const pendingCompletedSessionUploads = canonicalizeSessionsForUser(
     userId,
     mergeSessions(
-      mergeSessions(
-        loadPendingCompletedSessionUploadsForUser(userId),
-        loadRecentLocalCompletedSessionsForUploadForUser(userId, undefined, remoteSessionIds)
-      ),
-      loadRecentLocalCompletedSessionsForUploadForUser("guest", undefined, remoteSessionIds)
+      loadPendingCompletedSessionUploadsForUser(userId),
+      recentLocalCompletedSessions
     ).filter(isCompletedQuizSession)
   );
 
@@ -2036,7 +2055,7 @@ export async function syncLocalCompletedSessionsForCurrentUser(userId: string) {
 
   const sessionsToUpload = getSessionsNeedingUpload(localSessionsToSync, remoteSessions);
 
-  if (isSupabaseRecoveryMode() || !isSupabaseConfigured() || sessionsToUpload.length === 0) {
+  if (!shouldUploadLocalSessions || sessionsToUpload.length === 0) {
     return mergedSessions;
   }
 
@@ -2687,7 +2706,7 @@ export async function loadSharedQuestionExplanationOverrides(questionIds: string
       );
 
       if (isFreshBackgroundPayload(payload)) {
-        for (const questionId of missingQuestionIds) {
+        for (const questionId of requestIds) {
           writeBackgroundCache(
             `explanation:${questionId}`,
             mappedOverrides.get(questionId) ?? null,

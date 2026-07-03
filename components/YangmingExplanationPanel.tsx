@@ -567,10 +567,11 @@ export function YangmingExplanationPanel({
     setReportMessage("");
   }, [questionId]);
 
-  async function loadYangmingExplanation() {
+  async function loadYangmingExplanation(options: { mode?: "open" | "toggle" } = {}) {
     if (loading) return;
     const shouldRetryError = Boolean(error && checked);
-    if (expanded && checked && !shouldRetryError) {
+    const mode = options.mode ?? "toggle";
+    if (mode === "toggle" && expanded && checked && !shouldRetryError) {
       setExpanded(false);
       return;
     }
@@ -716,15 +717,15 @@ export function YangmingExplanationPanel({
 
   useEffect(() => {
     if (!autoLoad || checked || loading) return;
-    void loadYangmingExplanation();
-  });
+    void loadYangmingExplanation({ mode: "open" });
+  }, [autoLoad, checked, loading, questionId]);
 
   return (
     <div className={`min-w-0 max-w-full overflow-hidden ${className}`}>
       {hideButton ? null : (
         <button
           type="button"
-          onClick={() => void loadYangmingExplanation()}
+          onClick={() => void loadYangmingExplanation({ mode: "toggle" })}
           disabled={loading}
           className={
             buttonClassName ||
@@ -742,7 +743,7 @@ export function YangmingExplanationPanel({
               <p>{error}</p>
               <button
                 type="button"
-                onClick={() => void loadYangmingExplanation()}
+                onClick={() => void loadYangmingExplanation({ mode: "open" })}
                 disabled={loading}
                 className="mt-3 rounded-full bg-white px-3 py-1 text-[11px] font-bold text-rose-700 ring-1 ring-rose-100 transition hover:bg-rose-100 disabled:cursor-wait disabled:opacity-60"
               >
