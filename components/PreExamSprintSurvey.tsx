@@ -1356,26 +1356,21 @@ export function PreExamSprintSurvey() {
     const wrongQuestionCount = Number(usageMetrics?.wrongQuestionCount ?? 0);
     const lowConfidenceQuestionCount = Number(usageMetrics?.lowConfidenceQuestionCount ?? 0);
     const mockExamCount = Number(usageMetrics?.mockExamCount ?? 0);
-    const fullLengthSessionCount = Number(usageMetrics?.fullLengthSessionCount ?? 0);
-    const otherLongSessionCount = Math.max(0, fullLengthSessionCount - mockExamCount);
     const savedQuestionCount = Number(usageMetrics?.savedQuestionCount ?? 0);
     const noteCount = Number(usageMetrics?.noteCount ?? 0);
     const reviewSignalCount = wrongQuestionCount + lowConfidenceQuestionCount;
     const reviewHeadline =
       reviewSignalCount > 0
         ? `${reviewSignalCount.toLocaleString("zh-TW")} 個線索`
-        : fullLengthSessionCount > 0
-          ? `${fullLengthSessionCount.toLocaleString("zh-TW")} 回完整紀錄`
-          : mockExamCount > 0
-            ? `${mockExamCount.toLocaleString("zh-TW")} 回模擬考`
-            : savedQuestionCount + noteCount > 0
-              ? `${(savedQuestionCount + noteCount).toLocaleString("zh-TW")} 個自留項目`
-              : "正在累積";
+        : mockExamCount > 0
+          ? `${mockExamCount.toLocaleString("zh-TW")} 回正式模擬考`
+          : savedQuestionCount + noteCount > 0
+            ? `${(savedQuestionCount + noteCount).toLocaleString("zh-TW")} 個自留項目`
+            : "正在累積";
     const hasReviewSignals =
       wrongQuestionCount > 0 ||
       lowConfidenceQuestionCount > 0 ||
       mockExamCount > 0 ||
-      fullLengthSessionCount > 0 ||
       savedQuestionCount > 0 ||
       noteCount > 0;
     const trendPoints =
@@ -1711,15 +1706,11 @@ export function PreExamSprintSurvey() {
                 <h4>
                   {mockExamCount > 0
                     ? `${mockExamCount.toLocaleString("zh-TW")} 回正式模擬考`
-                    : fullLengthSessionCount > 0
-                      ? `${fullLengthSessionCount.toLocaleString("zh-TW")} 回 80 題以上長回合`
-                      : "完整測驗會在這裡"}
+                    : "正式模擬考會在這裡"}
                 </h4>
                 <p>
                   {mockExamCount > 0
-                    ? `結果頁可以拿來看整張考卷的錯題、低信心題和補強建議${otherLongSessionCount > 0 ? `；另外還有 ${otherLongSessionCount.toLocaleString("zh-TW")} 回 80 題以上長回合，我不把它算成正式模擬考` : ""}。`
-                    : fullLengthSessionCount > 0
-                      ? "這些是 80 題以上的長回合紀錄，不等於正式模擬考，但仍可用來回頭看錯題和低信心題。"
+                    ? "這裡只算你真的用模擬考功能完成的回合；結果頁可以拿來看整張考卷的錯題、低信心題和補強建議。"
                     : "做完完整回合後，結果頁會幫你把整份考卷整理成可以回頭看的紀錄。"}
                 </p>
               </article>
