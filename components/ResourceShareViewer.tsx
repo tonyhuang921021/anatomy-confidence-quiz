@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useAuth } from "@/components/AuthProvider";
 import { getCachedResourceShareHtml, loadResourceShareDetail, loadResourceShareHtml } from "@/lib/resourceShares";
 import type { ResourceShare } from "@/types/quiz";
@@ -107,22 +107,37 @@ function applyResourceHtmlViewportFix(html: string) {
 export function ResourceShareViewer({ resourceId }: { resourceId: string }) {
   const { configured, loading: authLoading, session, user } = useAuth();
   const accessToken = session?.access_token ?? "";
+  const userId = user?.id ?? "";
   const [resource, setResource] = useState<ResourceShare | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [htmlSource, setHtmlSource] = useState(() => getCachedResourceShareHtml(resourceId) ?? "");
   const [htmlLoading, setHtmlLoading] = useState(false);
   const [htmlError, setHtmlError] = useState("");
+  const loadedResourceKeyRef = useRef("");
   const framedHtmlSource = useMemo(() => applyResourceHtmlViewportFix(htmlSource), [htmlSource]);
 
   useEffect(() => {
-    if (!configured || !user || !accessToken || !resourceId) return;
+    loadedResourceKeyRef.current = "";
+    setResource((current) => (current?.id === resourceId ? current : null));
+    setHtmlSource(getCachedResourceShareHtml(resourceId) ?? "");
+    setHtmlError("");
+    setHtmlLoading(false);
+  }, [resourceId]);
+
+  useEffect(() => {
+    if (!configured || !userId || !accessToken || !resourceId) return;
+    const resourceKey = `${userId}:${resourceId}`;
+    if (resource?.id === resourceId && loadedResourceKeyRef.current === resourceKey) return;
+
     let alive = true;
-    setLoading(true);
+    setLoading(resource?.id !== resourceId);
     setError("");
     loadResourceShareDetail(resourceId, accessToken)
       .then((payload) => {
-        if (alive) setResource(payload.resource);
+        if (!alive) return;
+        loadedResourceKeyRef.current = resourceKey;
+        setResource(payload.resource);
       })
       .catch((err) => {
         if (alive) setError(err instanceof Error ? err.message : "資源讀取失敗");
@@ -133,11 +148,11 @@ export function ResourceShareViewer({ resourceId }: { resourceId: string }) {
     return () => {
       alive = false;
     };
-  }, [accessToken, configured, resourceId, user]);
+  }, [accessToken, configured, resource?.id, resourceId, userId]);
 
   useEffect(() => {
     const shouldLoadHtml =
-      configured && Boolean(user) && Boolean(accessToken) && resource?.shareType === "file" && resource.fileKind === "html";
+      configured && Boolean(userId) && Boolean(accessToken) && resource?.shareType === "file" && resource.fileKind === "html";
     if (!shouldLoadHtml) {
       if (resource) setHtmlSource("");
       setHtmlError("");
@@ -147,18 +162,18 @@ export function ResourceShareViewer({ resourceId }: { resourceId: string }) {
 
     const cachedHtml = getCachedResourceShareHtml(resource.id);
     if (cachedHtml !== null) {
-      setHtmlSource(cachedHtml);
+      setHtmlSource((current) => (current === cachedHtml ? current : cachedHtml));
       setHtmlError("");
       setHtmlLoading(false);
       return;
     }
 
     let alive = true;
-    setHtmlLoading(true);
+    setHtmlLoading(htmlSource.length === 0);
     setHtmlError("");
     loadResourceShareHtml(resource.id, accessToken)
       .then((html) => {
-        if (alive) setHtmlSource(html);
+        if (alive) setHtmlSource((current) => (current === html ? current : html));
       })
       .catch((err) => {
         if (alive) setHtmlError(err instanceof Error ? err.message : "HTML 資源讀取失敗");
@@ -170,9 +185,9 @@ export function ResourceShareViewer({ resourceId }: { resourceId: string }) {
     return () => {
       alive = false;
     };
-  }, [accessToken, configured, resource, user]);
+  }, [accessToken, configured, htmlSource.length, resource?.fileKind, resource?.id, resource?.shareType, userId]);
 
-  if (authLoading || loading) {
+  if ((authLoading || loading) && !resource) {
     return (
       <section className="rounded-[2rem] border border-slate-100 bg-white p-8 shadow-sm">
         <div className="h-8 w-48 animate-pulse rounded-full bg-slate-100" />
@@ -190,7 +205,7 @@ export function ResourceShareViewer({ resourceId }: { resourceId: string }) {
     );
   }
 
-  if (error || !resource) {
+  if (!resource) {
     return (
       <section className="rounded-[2rem] border border-rose-100 bg-rose-50 p-8 shadow-sm">
         <h1 className="text-3xl font-black text-rose-800">資源讀取失敗</h1>
@@ -234,7 +249,7 @@ export function ResourceShareViewer({ resourceId }: { resourceId: string }) {
           </div>
         </div>
 
-        {htmlLoading ? (
+        {htmlLoading && !framedHtmlSource ? (
           <div className="flex h-full w-full items-center justify-center bg-slate-50">
             <div className="w-[min(520px,calc(100vw-2rem))] rounded-[2rem] border border-slate-100 bg-white p-6 shadow-sm">
               <div className="h-5 w-40 animate-pulse rounded-full bg-emerald-100" />

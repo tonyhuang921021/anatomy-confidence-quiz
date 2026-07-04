@@ -54,6 +54,11 @@ const QUICK_ENTRIES = [
 const HOME_RELEASE_NOTES = [
   {
     time: "07/04",
+    title: "HTML 資源不重開",
+    body: "資源交流區的 HTML 預覽切到別的視窗再回來，會保留原本 iframe，不再因登入刷新整頁重載。"
+  },
+  {
+    time: "07/04",
     title: "錯題複習入口修正",
     body: "開始散題待複習會把錯題池直接帶進網址；就算瀏覽器暫存慢半拍，也不會跳成一般散題。"
   },
