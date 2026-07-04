@@ -1,9 +1,9 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useAuth } from "@/components/AuthProvider";
-import { loadResourceShareDetail, loadResourceShareHtml } from "@/lib/resourceShares";
+import { getCachedResourceShareHtml, loadResourceShareDetail, loadResourceShareHtml } from "@/lib/resourceShares";
 import type { ResourceShare } from "@/types/quiz";
 
 const formatFileSize = (bytes: number) => {
@@ -110,9 +110,10 @@ export function ResourceShareViewer({ resourceId }: { resourceId: string }) {
   const [resource, setResource] = useState<ResourceShare | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
-  const [htmlSource, setHtmlSource] = useState("");
+  const [htmlSource, setHtmlSource] = useState(() => getCachedResourceShareHtml(resourceId) ?? "");
   const [htmlLoading, setHtmlLoading] = useState(false);
   const [htmlError, setHtmlError] = useState("");
+  const framedHtmlSource = useMemo(() => applyResourceHtmlViewportFix(htmlSource), [htmlSource]);
 
   useEffect(() => {
     if (!configured || !user || !accessToken || !resourceId) return;
@@ -138,7 +139,15 @@ export function ResourceShareViewer({ resourceId }: { resourceId: string }) {
     const shouldLoadHtml =
       configured && Boolean(user) && Boolean(accessToken) && resource?.shareType === "file" && resource.fileKind === "html";
     if (!shouldLoadHtml) {
-      setHtmlSource("");
+      if (resource) setHtmlSource("");
+      setHtmlError("");
+      setHtmlLoading(false);
+      return;
+    }
+
+    const cachedHtml = getCachedResourceShareHtml(resource.id);
+    if (cachedHtml !== null) {
+      setHtmlSource(cachedHtml);
       setHtmlError("");
       setHtmlLoading(false);
       return;
@@ -254,7 +263,7 @@ export function ResourceShareViewer({ resourceId }: { resourceId: string }) {
           </div>
         ) : (
           <iframe
-            srcDoc={applyResourceHtmlViewportFix(htmlSource)}
+            srcDoc={framedHtmlSource}
             title={resource.title}
             sandbox="allow-downloads allow-forms allow-modals allow-popups allow-scripts"
             className="absolute inset-0 h-full w-full border-0 bg-white"

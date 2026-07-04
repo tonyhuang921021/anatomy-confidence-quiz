@@ -53,6 +53,11 @@ const QUICK_ENTRIES = [
 
 const HOME_RELEASE_NOTES = [
   {
+    time: "07/04",
+    title: "資源分享 HTML 不白跑",
+    body: "看過的 HTML 附件會在同一個分頁內暫存；回到同一份資源時少一次重載，切頁比較穩。"
+  },
+  {
     time: "07/03",
     title: "考前回饋小問卷",
     body: "首頁新增考前衝刺快速問卷；先看全站與自己的刷題小回顧，再告訴我考前最該守住哪些功能。"
