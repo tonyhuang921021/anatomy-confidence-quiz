@@ -5,9 +5,13 @@ import { type ReactNode, useEffect, useMemo, useState } from "react";
 import { CopyQuestionPromptButton } from "@/components/CopyQuestionPromptButton";
 import { QuestionExplanationTabs } from "@/components/QuestionExplanationTabs";
 import { QuestionOptionBlock, QuestionStemBlock } from "@/components/QuestionMediaBlock";
-import { QuestionIssueReportButton } from "@/components/QuestionIssueReportButton";
+import { QuestionReportButton } from "@/components/QuestionIssueReportButton";
 import { SavedQuestionButton } from "@/components/SavedQuestionButton";
-import { StructuredExplanationText } from "@/components/StructuredExplanationText";
+import {
+  StructuredExplanationText,
+  hasCollapsibleStructuredExplanation,
+  isDefaultInlineExplanationSectionTitle
+} from "@/components/StructuredExplanationText";
 import {
   clearQuestionExplanationBackgroundCache,
   loadConfirmedQuestionClassificationOverrides,
@@ -367,11 +371,26 @@ function getRelatedQuestions(currentQuestion: Question, index: RelatedQuestionIn
 function renderQuestionReview(
   item: ReviewQuestionItem,
   renderedQuestion: Question,
+  headerActions: ReactNode,
   footer: ReactNode
 ) {
+  const shouldCollapseAiExplanation = hasCollapsibleStructuredExplanation(renderedQuestion.explanation);
+  const aiExplanationContent = shouldCollapseAiExplanation ? (
+    <StructuredExplanationText
+      text={renderedQuestion.explanation}
+      label=""
+      compact
+      sectionFilter={(section) => !isDefaultInlineExplanationSectionTitle(section.title)}
+      fallbackToFullText={false}
+    />
+  ) : undefined;
+
   return (
     <div className="mt-4 space-y-3 leading-7">
-      <QuestionStemBlock question={renderedQuestion} />
+      <div className="flex min-w-0 flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+        <QuestionStemBlock question={renderedQuestion} className="min-w-0 flex-1" />
+        {headerActions}
+      </div>
       <p>
         <span className="font-semibold">最後錯因：</span>
         {item.history.latestErrorType ?? "未填"}
@@ -396,8 +415,16 @@ function renderQuestionReview(
             ? "本題一律給分"
             : renderedQuestion.answer}
       </p>
-      <StructuredExplanationText text={renderedQuestion.explanation} label="重點解析" compact />
-      <QuestionExplanationTabs question={renderedQuestion} compact className="mt-3" />
+      <StructuredExplanationText
+        text={renderedQuestion.explanation}
+        label="重點解析"
+        compact
+        sectionFilter={
+          shouldCollapseAiExplanation
+            ? (section) => isDefaultInlineExplanationSectionTitle(section.title)
+            : undefined
+        }
+      />
       {renderedQuestion.optionAnalysis ? (
         <div className="space-y-2.5">
           {getOptionKeysFromQuestion(renderedQuestion).map((key) => {
@@ -421,12 +448,12 @@ function renderQuestionReview(
           })}
         </div>
       ) : null}
-      {renderedQuestion.memoryTip ? (
-        <div className="memory-tip-box">
-          <span className="font-semibold">快速記憶法：</span>
-          {renderedQuestion.memoryTip}
-        </div>
-      ) : null}
+      <QuestionExplanationTabs
+        question={renderedQuestion}
+        compact
+        className="mt-3"
+        aiExplanationContent={aiExplanationContent}
+      />
       {footer}
     </div>
   );
@@ -445,45 +472,66 @@ function renderRelatedQuestions(question: Question, relatedQuestionIndex: Relate
 
   return (
     <div className="mt-4 grid gap-3">
-      {relatedQuestions.map((relatedQuestion, index) => (
-        <details key={`${question.id}-related-${relatedQuestion.id}`} className="rounded-2xl bg-slate-50 p-4">
-          <summary className="cursor-pointer font-semibold text-ink">
-            類似題 {index + 1}：{relatedQuestion.chapter} / {relatedQuestion.section}
-          </summary>
-          <div className="mt-3 space-y-3 text-sm leading-7 text-slate-700">
-            <QuestionStemBlock question={relatedQuestion} />
-            <div className="space-y-2.5">
-              {getOptionKeysFromQuestion(relatedQuestion).map((key) => (
-                <QuestionOptionBlock
-                  key={`${relatedQuestion.id}-${key}`}
-                  question={relatedQuestion}
-                  optionKey={key}
-                  wrapperClassName="rounded-2xl border border-slate-200 bg-white px-3 py-3 sm:px-4"
-                  labelClassName="mt-0.5 inline-flex min-w-8 justify-center rounded-full bg-slate-50 px-2 py-1 text-xs font-semibold text-slate-700 ring-1 ring-slate-200"
-                />
-              ))}
-            </div>
-            <p>
-              <span className="font-semibold">正確答案：</span>
-              {(relatedQuestion.answerCreditType === "multiple_accepted" ||
-                relatedQuestion.answerCreditType === "multiple_answers") &&
-              relatedQuestion.acceptedAnswers?.length
-                ? `${relatedQuestion.acceptedAnswers.join("/")} 皆可`
-                : relatedQuestion.answerCreditType === "all_credit"
-                  ? "本題一律給分"
-                  : relatedQuestion.answer}
-            </p>
-            <StructuredExplanationText text={relatedQuestion.explanation} label="詳解" compact />
-            <QuestionExplanationTabs question={relatedQuestion} compact className="mt-3" />
-            {relatedQuestion.memoryTip ? (
-              <div className="memory-tip-box">
-                <span className="font-semibold">快速記憶法：</span>
-                {relatedQuestion.memoryTip}
+      {relatedQuestions.map((relatedQuestion, index) => {
+        const shouldCollapseAiExplanation = hasCollapsibleStructuredExplanation(relatedQuestion.explanation);
+        const aiExplanationContent = shouldCollapseAiExplanation ? (
+          <StructuredExplanationText
+            text={relatedQuestion.explanation}
+            label=""
+            compact
+            sectionFilter={(section) => !isDefaultInlineExplanationSectionTitle(section.title)}
+            fallbackToFullText={false}
+          />
+        ) : undefined;
+
+        return (
+          <details key={`${question.id}-related-${relatedQuestion.id}`} className="rounded-2xl bg-slate-50 p-4">
+            <summary className="cursor-pointer font-semibold text-ink">
+              類似題 {index + 1}：{relatedQuestion.chapter} / {relatedQuestion.section}
+            </summary>
+            <div className="mt-3 space-y-3 text-sm leading-7 text-slate-700">
+              <QuestionStemBlock question={relatedQuestion} />
+              <div className="space-y-2.5">
+                {getOptionKeysFromQuestion(relatedQuestion).map((key) => (
+                  <QuestionOptionBlock
+                    key={`${relatedQuestion.id}-${key}`}
+                    question={relatedQuestion}
+                    optionKey={key}
+                    wrapperClassName="rounded-2xl border border-slate-200 bg-white px-3 py-3 sm:px-4"
+                    labelClassName="mt-0.5 inline-flex min-w-8 justify-center rounded-full bg-slate-50 px-2 py-1 text-xs font-semibold text-slate-700 ring-1 ring-slate-200"
+                  />
+                ))}
               </div>
-            ) : null}
-          </div>
-        </details>
-      ))}
+              <p>
+                <span className="font-semibold">正確答案：</span>
+                {(relatedQuestion.answerCreditType === "multiple_accepted" ||
+                  relatedQuestion.answerCreditType === "multiple_answers") &&
+                relatedQuestion.acceptedAnswers?.length
+                  ? `${relatedQuestion.acceptedAnswers.join("/")} 皆可`
+                  : relatedQuestion.answerCreditType === "all_credit"
+                    ? "本題一律給分"
+                    : relatedQuestion.answer}
+              </p>
+              <StructuredExplanationText
+                text={relatedQuestion.explanation}
+                label="重點解析"
+                compact
+                sectionFilter={
+                  shouldCollapseAiExplanation
+                    ? (section) => isDefaultInlineExplanationSectionTitle(section.title)
+                    : undefined
+                }
+              />
+              <QuestionExplanationTabs
+                question={relatedQuestion}
+                compact
+                className="mt-3"
+                aiExplanationContent={aiExplanationContent}
+              />
+            </div>
+          </details>
+        );
+      })}
     </div>
   );
 }
@@ -987,34 +1035,40 @@ export function ReviewNotebook({
     }
   }
 
+  function renderQuestionTopActions(question: Question) {
+    const communityStats = communityStatsMap[question.id];
+
+    return (
+      <div className="flex shrink-0 flex-wrap items-center gap-2 sm:max-w-[45%] sm:justify-end">
+        <SavedQuestionButton questionId={question.id} source="review" />
+        <CopyQuestionPromptButton
+          question={question}
+          correctAnswer={question.answer}
+        />
+        {communityStats && communityStats.totalAttempts > 0 ? (
+          <span className="rounded-full bg-sky-50 px-3 py-1 text-xs font-semibold text-sky-800 ring-1 ring-sky-200">
+            全站答對率 {communityStats.correctRate}% ・ {communityStats.totalAttempts} 人作答
+          </span>
+        ) : null}
+      </div>
+    );
+  }
+
   function renderExplanationFooter(question: Question) {
     const override = explanationOverrides[question.id];
     const loading = explanationLoadingMap[question.id];
     const error = explanationErrorMap[question.id];
     const reportLoading = classificationReportLoadingMap[question.id];
     const reportMessage = classificationReportMessageMap[question.id];
-    const communityStats = communityStatsMap[question.id];
 
     return (
-      <div className="space-y-3">
+      <div className="space-y-2 rounded-2xl bg-white/80 p-3 ring-1 ring-slate-100">
         <div className="flex flex-wrap items-center gap-2">
-          <SavedQuestionButton questionId={question.id} source="review" />
-          <CopyQuestionPromptButton
-            question={question}
-            correctAnswer={question.answer}
-          />
           {override ? (
             <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-600">
               已替換詳解・{override.model ?? "gpt-5.4-mini"}
             </span>
           ) : null}
-          {communityStats && communityStats.totalAttempts > 0 ? (
-            <span className="rounded-full bg-sky-50 px-3 py-1 text-xs font-semibold text-sky-800 ring-1 ring-sky-200">
-              全站答對率 {communityStats.correctRate}% ・ {communityStats.totalAttempts} 人作答
-            </span>
-          ) : null}
-        </div>
-        <div className="flex flex-wrap items-center gap-3">
           {!override ? (
             <button
               type="button"
@@ -1034,18 +1088,15 @@ export function ReviewNotebook({
               {loading ? "重新生成中..." : "重新替換詳解"}
             </button>
           )}
-          <button
-            type="button"
-            onClick={() => void handleReportClassification(question)}
+          <QuestionReportButton
+            question={question}
             disabled={reportLoading}
-            className="min-h-10 rounded-2xl bg-slate-100 px-4 py-2 text-sm font-semibold text-slate-800 transition hover:bg-slate-200 disabled:cursor-wait disabled:opacity-60"
-          >
-            {reportLoading ? "回報中..." : "回報此題分類錯誤"}
-          </button>
-          <QuestionIssueReportButton question={question} disabled={reportLoading} />
+            classificationLoading={reportLoading}
+            classificationMessage={reportMessage}
+            onReportClassification={() => void handleReportClassification(question)}
+          />
         </div>
         {error ? <p className="text-sm font-medium text-rose-700">{error}</p> : null}
-        {reportMessage ? <p className="text-sm font-medium text-slate-600">{reportMessage}</p> : null}
       </div>
     );
   }
@@ -1310,6 +1361,7 @@ export function ReviewNotebook({
                                   ? renderQuestionReview(
                                       item,
                                       renderedQuestion,
+                                      renderQuestionTopActions(renderedQuestion),
                                       renderExplanationFooter(renderedQuestion)
                                     )
                                   : null}

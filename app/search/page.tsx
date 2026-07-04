@@ -6,7 +6,7 @@ import { useAuth } from "@/components/AuthProvider";
 import { CopyQuestionPromptButton } from "@/components/CopyQuestionPromptButton";
 import { QuestionExplanationTabs } from "@/components/QuestionExplanationTabs";
 import { QuestionOptionBlock, QuestionStemBlock } from "@/components/QuestionMediaBlock";
-import { QuestionIssueReportButton } from "@/components/QuestionIssueReportButton";
+import { QuestionReportButton } from "@/components/QuestionIssueReportButton";
 import { SavedQuestionButton } from "@/components/SavedQuestionButton";
 import { StructuredExplanationText } from "@/components/StructuredExplanationText";
 import {
@@ -837,24 +837,14 @@ export default function SearchPage() {
                       {loading ? "AI 生成中..." : "用 AI 補詳解"}
                     </button>
                   )}
-                  <button
-                    type="button"
-                    onClick={() => void handleReportClassification(renderedQuestion)}
-                    disabled={classificationReportLoadingMap[renderedQuestion.id]}
-                    className="min-h-10 rounded-2xl bg-slate-100 px-4 py-2 text-sm font-semibold text-slate-800 transition hover:bg-slate-200 disabled:cursor-wait disabled:opacity-60"
-                  >
-                    {classificationReportLoadingMap[renderedQuestion.id] ? "回報中..." : "回報此題分類錯誤"}
-                  </button>
-                  <QuestionIssueReportButton
+                  <QuestionReportButton
                     question={renderedQuestion}
                     disabled={classificationReportLoadingMap[renderedQuestion.id]}
+                    classificationLoading={classificationReportLoadingMap[renderedQuestion.id]}
+                    classificationMessage={classificationReportMessageMap[renderedQuestion.id]}
+                    onReportClassification={() => void handleReportClassification(renderedQuestion)}
                   />
                   {error ? <p className="text-sm font-medium text-rose-700">{error}</p> : null}
-                  {classificationReportMessageMap[renderedQuestion.id] ? (
-                    <p className="text-sm font-medium text-slate-600">
-                      {classificationReportMessageMap[renderedQuestion.id]}
-                    </p>
-                  ) : null}
                 </div>
               </div>
               ) : null}

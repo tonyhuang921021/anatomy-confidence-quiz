@@ -92,8 +92,8 @@ const QuestionExplanationTabs = dynamic(
   () => import("@/components/QuestionExplanationTabs").then((mod) => mod.QuestionExplanationTabs),
   { ssr: false }
 );
-const QuestionIssueReportButton = dynamic(
-  () => import("@/components/QuestionIssueReportButton").then((mod) => mod.QuestionIssueReportButton),
+const QuestionReportButton = dynamic(
+  () => import("@/components/QuestionIssueReportButton").then((mod) => mod.QuestionReportButton),
   { ssr: false }
 );
 const SavedQuestionButton = dynamic(
@@ -2320,24 +2320,16 @@ export default function QuizPage() {
                           {currentExplanationLoading ? "AI 生成中..." : "用 AI 補詳解"}
                         </button>
                       )}
-                      <button
-                        type="button"
-                        onClick={() => void handleReportClassification(currentQuestion)}
-                        disabled={currentClassificationReportLoading}
-                        className="min-h-10 rounded-2xl bg-slate-100 px-4 py-2 text-sm font-semibold text-slate-800 transition hover:bg-slate-200 disabled:cursor-wait disabled:opacity-60"
-                      >
-                        {currentClassificationReportLoading ? "回報中..." : "回報此題分類錯誤"}
-                      </button>
-                      <QuestionIssueReportButton
+                      <QuestionReportButton
                         question={currentQuestion}
                         disabled={currentClassificationReportLoading}
+                        classificationLoading={currentClassificationReportLoading}
+                        classificationMessage={currentClassificationReportMessage}
+                        onReportClassification={() => void handleReportClassification(currentQuestion)}
                       />
                     </div>
                     {currentExplanationError ? (
                       <p className="text-sm font-medium text-rose-700">{currentExplanationError}</p>
-                    ) : null}
-                    {currentClassificationReportMessage ? (
-                      <p className="text-sm font-medium text-slate-600">{currentClassificationReportMessage}</p>
                     ) : null}
                   </div>
                 ) : null}

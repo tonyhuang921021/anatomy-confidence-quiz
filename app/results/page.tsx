@@ -7,12 +7,13 @@ import { useAuth } from "@/components/AuthProvider";
 import { CopyQuestionPromptButton } from "@/components/CopyQuestionPromptButton";
 import { QuestionOptionBlock, QuestionStemBlock } from "@/components/QuestionMediaBlock";
 import { QuestionExplanationTabs } from "@/components/QuestionExplanationTabs";
-import { QuestionIssueReportButton } from "@/components/QuestionIssueReportButton";
+import { QuestionReportButton } from "@/components/QuestionIssueReportButton";
 import { ResultSummary } from "@/components/ResultSummary";
 import { SavedQuestionButton } from "@/components/SavedQuestionButton";
 import {
   StructuredExplanationText,
-  getStructuredExplanationSectionTitles
+  hasCollapsibleStructuredExplanation,
+  isDefaultInlineExplanationSectionTitle
 } from "@/components/StructuredExplanationText";
 import { WeaknessRanking } from "@/components/WeaknessRanking";
 import {
@@ -436,21 +437,6 @@ function getConfidenceTileClass(confidence: number) {
 
 function getConfidenceOverviewLabel(confidence: number) {
   return `信心 ${Math.min(Math.max(Math.round(confidence), 1), 4)}`;
-}
-
-const RESULT_INLINE_EXPLANATION_TITLES = new Set(["本題核心", "核心知識", "解題關鍵"]);
-
-function isInlineResultExplanationSection(title?: string) {
-  return !title || RESULT_INLINE_EXPLANATION_TITLES.has(title);
-}
-
-function hasCollapsibleResultAiExplanation(text?: string | null) {
-  const titles = getStructuredExplanationSectionTitles(text);
-  return (
-    titles.length > 0 &&
-    titles.some((title) => !isInlineResultExplanationSection(title)) &&
-    titles.some((title) => isInlineResultExplanationSection(title))
-  );
 }
 
 type ConfidenceOverviewExportItem = {
@@ -1780,18 +1766,15 @@ function ResultsPageContent() {
               </button>
             </>
           ) : null}
-          <button
-            type="button"
-            onClick={() => void handleReportClassification(question)}
+          <QuestionReportButton
+            question={question}
             disabled={reportLoading}
-            className="min-h-10 rounded-2xl bg-slate-100 px-4 py-2 text-sm font-semibold text-slate-800 transition hover:bg-slate-200 disabled:cursor-wait disabled:opacity-60"
-          >
-            {reportLoading ? "回報中..." : "回報此題分類錯誤"}
-          </button>
-          <QuestionIssueReportButton question={question} disabled={reportLoading} />
+            classificationLoading={reportLoading}
+            classificationMessage={reportMessage}
+            onReportClassification={() => void handleReportClassification(question)}
+          />
         </div>
         {error ? <p className="text-sm font-medium text-rose-700">{error}</p> : null}
-        {reportMessage ? <p className="text-sm font-medium text-slate-600">{reportMessage}</p> : null}
       </div>
     );
   }
@@ -1903,13 +1886,13 @@ function ResultsPageContent() {
     const masteryLabel =
       masteryReviewItemMap.get(attempt.questionId)?.categoryLabel ??
       getMasteryCategoryLabelForAnswer(attempt);
-    const shouldCollapseAiExplanation = hasCollapsibleResultAiExplanation(question.explanation);
+    const shouldCollapseAiExplanation = hasCollapsibleStructuredExplanation(question.explanation);
     const aiExplanationContent = shouldCollapseAiExplanation ? (
       <StructuredExplanationText
         text={question.explanation}
         label=""
         compact
-        sectionFilter={(section) => !isInlineResultExplanationSection(section.title)}
+        sectionFilter={(section) => !isDefaultInlineExplanationSectionTitle(section.title)}
         fallbackToFullText={false}
       />
     ) : undefined;
@@ -2020,7 +2003,7 @@ function ResultsPageContent() {
           compact
           sectionFilter={
             shouldCollapseAiExplanation
-              ? (section) => isInlineResultExplanationSection(section.title)
+              ? (section) => isDefaultInlineExplanationSectionTitle(section.title)
               : undefined
           }
         />

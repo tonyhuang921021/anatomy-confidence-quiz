@@ -181,10 +181,6 @@ function compactYangmingText(text: string) {
     .replace(/[、，,.:：;；`'"「」『』()（）\[\]{}<>《》|\\/_\-—~。．·•]/g, "");
 }
 
-function hasMeaningfulCorrectionText(text: string | null | undefined) {
-  return normalizeYangmingPlainText(text ?? "").length >= 10;
-}
-
 function getSectionPlainText(sections: NonNullable<YangmingExplanationContent["sections"]>) {
   return sections
     .map((section) => {
@@ -653,15 +649,6 @@ export function YangmingExplanationPanel({
       setReportMessage("請簡單填一下回報原因。");
       return;
     }
-    const hasCorrectionText =
-      reportMode === "correction" &&
-      (hasMeaningfulCorrectionText(correctionDraft) || hasMeaningfulCorrectionText(content?.body));
-    const hasKeptAssets = reportMode === "correction" && keptAssetIndexes.length > 0;
-    if (reportMode === "correction" && !hasCorrectionText && !hasKeptAssets) {
-      setReportMessage("請至少保留一張詳解圖片，或填入主要詳解文字。");
-      return;
-    }
-
     setReportLoading(true);
     setReportMessage("");
     try {
@@ -676,12 +663,7 @@ export function YangmingExplanationPanel({
           questionId,
           reason: reportReason,
           reportType: reportMode,
-          proposedBody:
-            reportMode === "correction"
-              ? hasMeaningfulCorrectionText(correctionDraft)
-                ? correctionDraft
-                : content?.body ?? ""
-              : undefined,
+          proposedBody: reportMode === "correction" ? correctionDraft : undefined,
           keptAssetIndexes: reportMode === "correction" ? keptAssetIndexes : undefined,
           sourceLabel: content?.sourceLabel,
           sourceFile: content?.sourceFile
@@ -697,9 +679,7 @@ export function YangmingExplanationPanel({
       if (reportMode === "correction" && content) {
         const correctedContent = {
           ...content,
-          body: hasMeaningfulCorrectionText(correctionDraft)
-            ? correctionDraft.trim()
-            : content.body ?? "",
+          body: correctionDraft.trim(),
           sections: [],
           assets: (content.assets ?? []).filter((_, index) => keptAssetIndexes.includes(index))
         };
@@ -803,7 +783,7 @@ export function YangmingExplanationPanel({
                 </h2>
                 <p className="mt-2 break-words text-sm leading-6 text-slate-500 [overflow-wrap:anywhere]">
                   {reportMode === "correction"
-                    ? "修正版會立刻套用到這題詳解，同時保留原文與修訂紀錄。"
+                    ? "修正版會立刻套用到這題詳解；只有圖片也可以修，取消勾選就能移除多餘截圖。"
                     : "可以寫「圖片不對」「表格漏掉」「詳解對錯題」這種原因。"}
                 </p>
               </div>
@@ -870,7 +850,7 @@ export function YangmingExplanationPanel({
                       })}
                     </div>
                     <p className="mt-2 text-xs leading-5 text-amber-800">
-                      取消勾選只會移除這題詳解裡的圖片引用，不會刪掉原始檔。
+                      取消勾選只會移除這題詳解裡的圖片引用，不會刪掉原始檔；沒有文字也可以只用圖片清單完成修正。
                     </p>
                   </div>
                 ) : null}

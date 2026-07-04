@@ -42,6 +42,8 @@ const STRUCTURED_HEADING_ALIASES = new Set([
   "小結"
 ]);
 
+const DEFAULT_INLINE_EXPLANATION_TITLES = new Set(["本題核心", "核心知識", "解題關鍵"]);
+
 function normalizeHeadingTitle(value: string) {
   return value
     .replace(/^#+\s*/, "")
@@ -187,6 +189,19 @@ export function getStructuredExplanationSectionTitles(text?: string | null) {
   return buildExplanationSections(parseExplanationBlocks(trimmedText))
     .map((section) => section.title)
     .filter((title): title is string => Boolean(title));
+}
+
+export function isDefaultInlineExplanationSectionTitle(title?: string) {
+  return !title || DEFAULT_INLINE_EXPLANATION_TITLES.has(title);
+}
+
+export function hasCollapsibleStructuredExplanation(text?: string | null) {
+  const titles = getStructuredExplanationSectionTitles(text);
+  return (
+    titles.length > 0 &&
+    titles.some((title) => !isDefaultInlineExplanationSectionTitle(title)) &&
+    titles.some((title) => isDefaultInlineExplanationSectionTitle(title))
+  );
 }
 
 export function StructuredExplanationText({

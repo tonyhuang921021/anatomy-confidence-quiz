@@ -16,7 +16,6 @@ type YangmingExplanationReportRequestBody = {
 
 const MAX_REASON_LENGTH = 1200;
 const MAX_PROPOSED_BODY_LENGTH = 30000;
-const MIN_CORRECTION_BODY_LENGTH = 10;
 
 function getServiceSupabaseClient() {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
@@ -69,10 +68,6 @@ function getQuestionIdLookupCandidates(questionId: string) {
   return Array.from(new Set([trimmed, normalized]));
 }
 
-function hasMeaningfulCorrectionText(text: string | null | undefined) {
-  return (text ?? "").replace(/\s+/g, "").length >= MIN_CORRECTION_BODY_LENGTH;
-}
-
 export async function POST(request: NextRequest) {
   if (isSupabaseRecoveryMode()) {
     return NextResponse.json(
@@ -94,7 +89,8 @@ export async function POST(request: NextRequest) {
     const questionId = body.questionId?.trim() ?? "";
     const reason = body.reason?.trim() ?? "";
     const reportType = body.reportType === "correction" ? "correction" : "report";
-    const proposedBody = body.proposedBody?.trim() ?? "";
+    const hasProposedBody = Object.prototype.hasOwnProperty.call(body, "proposedBody");
+    const proposedBody = typeof body.proposedBody === "string" ? body.proposedBody.trim() : "";
     const requestedKeptAssetIndexes = Array.isArray(body.keptAssetIndexes)
       ? body.keptAssetIndexes.filter((index) => Number.isInteger(index) && index >= 0)
       : null;
@@ -134,22 +130,11 @@ export async function POST(request: NextRequest) {
       typeof currentExplanation?.body === "string" ? currentExplanation.body : null;
     const previousAssets = Array.isArray(currentExplanation?.assets) ? currentExplanation.assets : [];
     const effectiveProposedBody =
-      reportType === "correction" && hasMeaningfulCorrectionText(proposedBody)
-        ? proposedBody
+      reportType === "correction"
+        ? hasProposedBody
+          ? proposedBody
+          : previousBody ?? ""
         : previousBody ?? "";
-    const hasCorrectionText =
-      reportType === "correction" && hasMeaningfulCorrectionText(effectiveProposedBody);
-    const hasKeptAssets =
-      reportType === "correction" &&
-      (requestedKeptAssetIndexes === null
-        ? previousAssets.length > 0
-        : requestedKeptAssetIndexes.some((index) => index >= 0 && index < previousAssets.length));
-    if (reportType === "correction" && !hasCorrectionText && !hasKeptAssets) {
-      return NextResponse.json(
-        { ok: false, message: "請至少保留一張詳解圖片，或填入主要詳解文字。" },
-        { status: 400 }
-      );
-    }
     const clippedProposedBody =
       reportType === "correction" ? effectiveProposedBody.slice(0, MAX_PROPOSED_BODY_LENGTH) : null;
     const appliedAt = reportType === "correction" ? new Date().toISOString() : null;
