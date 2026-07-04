@@ -1550,6 +1550,15 @@ const questionTextOverrides: Record<string, QuestionTextOverride> = {
     },
     testedConcept: "內耳組織／特殊感覺"
   },
+  "MOEX-112100-1301-Q056": {
+    stem: "下列何者與二氧化碳（CO₂）在血液運送的機制最無關？",
+    options: {
+      A: "CO₂ 溶解於血漿（plasma）中",
+      B: "CO₂ 經碳酸酐酶（carbonic anhydrase）轉化成 H₂CO₃",
+      C: "紅血球醣解作用產物 2,3-bisphosphoglycerate（2,3-BPG）減少，可增加 O₂ 與 Fe²⁺ 結合",
+      D: "紅血球之血紅素（hemoglobin）可結合 CO₂"
+    }
+  },
   "MOEX-111100-1301-Q062": {
     answer: "A",
     answerCreditType: "all_credit",

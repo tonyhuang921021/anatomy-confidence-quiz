@@ -54,6 +54,11 @@ const QUICK_ENTRIES = [
 const HOME_RELEASE_NOTES = [
   {
     time: "07/04",
+    title: "陽明詳解續頁補齊",
+    body: "今天補上一批少頁、截斷與貼錯頁的陽明原頁截圖；CO₂ 題的上標亂碼也整理回可讀格式。"
+  },
+  {
+    time: "07/04",
     title: "資源分享 HTML 不白跑",
     body: "看過的 HTML 附件會在同一個分頁內暫存；回到同一份資源時少一次重載，切頁比較穩。"
   },
