@@ -6,6 +6,7 @@ import {
   loadCloudCompletedSessionsForUser,
   loadCompletedQuestionHistoryEntriesForUser,
   loadCompletedHistorySessionsForUser,
+  loadCompletedSessions,
   loadCompletedSessionsForUser,
   loadRecentCompletedSessionHandoffForUser,
   loadQuestionExplanationOverride,
@@ -155,6 +156,22 @@ test("指定帳號儲存完成回合時，不依賴目前 active user", () => {
     ),
     false
   );
+});
+
+test("登入帳號讀完成回合時，也要看得到同裝置 guest 完成紀錄", () => {
+  installBrowserStorage();
+
+  setActiveStorageUser("guest");
+  saveCompletedSession(makeSession("guest-completed-session", ["q-guest-completed"]));
+
+  setActiveStorageUser("user-merged-completed");
+  saveCompletedSession(makeSession("user-completed-session", ["q-user-completed"]));
+
+  const loaded = loadCompletedSessions();
+  const loadedIds = new Set(loaded.map((session) => session.id));
+
+  assert.ok(loadedIds.has("guest-completed-session"));
+  assert.ok(loadedIds.has("user-completed-session"));
 });
 
 test("localStorage 寫不下時，完成題目歷史要落到 sessionStorage", () => {

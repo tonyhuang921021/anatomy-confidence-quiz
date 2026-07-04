@@ -101,6 +101,25 @@ function getManualReviewStorageKey(scope: string) {
   return `quiz-review-notebook-manual-state:${scope}`;
 }
 
+function safeReadManualReviewState(key: string) {
+  if (typeof window === "undefined") return null;
+  try {
+    return window.localStorage.getItem(key);
+  } catch {
+    return null;
+  }
+}
+
+function safeSaveManualReviewState(key: string, state: ManualReviewState) {
+  if (typeof window === "undefined") return false;
+  try {
+    window.localStorage.setItem(key, serializeManualReviewState(state));
+    return true;
+  } catch {
+    return false;
+  }
+}
+
 function formatTime(value?: string) {
   if (!value) return "尚未作答";
   return new Date(value).toLocaleString("zh-TW", {
@@ -198,11 +217,11 @@ function getOptionKeysFromQuestion(question: Question) {
 }
 
 function normalizeRelatedConcept(question: Question) {
-  return question.testedConcept.trim().toLowerCase();
+  return (question.testedConcept ?? "").trim().toLowerCase();
 }
 
 function getSectionKey(question: Question) {
-  return `${question.chapter}__${question.section}`;
+  return `${question.chapter ?? ""}__${question.section ?? ""}`;
 }
 
 function buildRelatedQuestionIndex(allQuestions: Question[]): RelatedQuestionIndex {
@@ -549,7 +568,7 @@ export function ReviewNotebook({
       return;
     }
 
-    setManualReviewState(parseManualReviewState(window.localStorage.getItem(manualReviewStorageKey)));
+    setManualReviewState(parseManualReviewState(safeReadManualReviewState(manualReviewStorageKey)));
     setIsManualEditMode(false);
   }, [manualReviewStorageKey]);
 
@@ -570,9 +589,7 @@ export function ReviewNotebook({
 
     setManualReviewState((current) => {
       const next = updater(current);
-      if (typeof window !== "undefined") {
-        window.localStorage.setItem(manualReviewStorageKey, serializeManualReviewState(next));
-      }
+      safeSaveManualReviewState(manualReviewStorageKey, next);
       return next;
     });
   }
@@ -1146,9 +1163,10 @@ export function ReviewNotebook({
 
                               <details
                                 open={isQuestionOpen}
-                                onToggle={(event) =>
-                                  setQuestionDetailsOpen(item.question.id, event.currentTarget.open)
-                                }
+                                onToggle={(event) => {
+                                  if (event.currentTarget !== event.target) return;
+                                  setQuestionDetailsOpen(item.question.id, event.currentTarget.open);
+                                }}
                                 className="rounded-2xl bg-white p-3.5 text-sm text-slate-700 sm:p-4"
                               >
                                 <summary className="cursor-pointer font-semibold text-ink">
@@ -1165,9 +1183,10 @@ export function ReviewNotebook({
 
                               <details
                                 open={isRelatedOpen}
-                                onToggle={(event) =>
-                                  setRelatedDetailsOpen(item.question.id, event.currentTarget.open)
-                                }
+                                onToggle={(event) => {
+                                  if (event.currentTarget !== event.target) return;
+                                  setRelatedDetailsOpen(item.question.id, event.currentTarget.open);
+                                }}
                                 className="rounded-2xl bg-white p-3.5 text-sm text-slate-700 sm:p-4"
                               >
                                 <summary className="cursor-pointer font-semibold text-ink">
