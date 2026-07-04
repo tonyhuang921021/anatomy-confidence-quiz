@@ -1116,9 +1116,13 @@ export function saveCompletedSession(session: QuizSession) {
 }
 
 export function saveCompletedSessions(sessions: QuizSession[]) {
+  return saveCompletedSessionsForUser(getActiveStorageUser(), sessions);
+}
+
+export function saveCompletedSessionsForUser(userId: string, sessions: QuizSession[]) {
   if (!isBrowser()) return;
-  const scopedKey = getScopedKey(COMPLETED_SESSIONS_KEY);
-  const activeUser = getActiveStorageUser();
+  const activeUser = userId || GUEST_USER_ID;
+  const scopedKey = getScopedKeyForUser(COMPLETED_SESSIONS_KEY, activeUser);
   const normalized = normalizeCompletedSessionList(sessions);
 
   cacheCompletedSessionsForUser(activeUser, normalized);
@@ -1134,15 +1138,19 @@ export function saveCompletedSessions(sessions: QuizSession[]) {
   );
 
   if (!didPersist) {
-    window.dispatchEvent(new CustomEvent("completed-sessions-change", { detail: normalized }));
+    if (activeUser === getActiveStorageUser()) {
+      window.dispatchEvent(new CustomEvent("completed-sessions-change", { detail: normalized }));
+    }
     return false;
   }
 
   for (const session of persisted) {
-    clearMatchingCurrentSessions(session.id);
+    clearMatchingCurrentSessions(session.id, [activeUser]);
   }
 
-  window.dispatchEvent(new CustomEvent("completed-sessions-change", { detail: normalized }));
+  if (activeUser === getActiveStorageUser()) {
+    window.dispatchEvent(new CustomEvent("completed-sessions-change", { detail: normalized }));
+  }
   return true;
 }
 

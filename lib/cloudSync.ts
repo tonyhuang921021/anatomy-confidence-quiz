@@ -29,6 +29,7 @@ import {
   getCanonicalSessionId,
   loadCloudCompletedSessionsForUser,
   loadPendingCompletedSessionUploadsForUser,
+  loadRecentCompletedSessionHandoffForUser,
   loadCurrentSession,
   loadCurrentSessionForUser,
   loadCompletedSessions,
@@ -41,7 +42,7 @@ import {
   saveCurrentSession,
   saveCloudCompletedSessionsForUser,
   saveCompletedQuestionHistoryEntriesForUser,
-  saveCompletedSessions,
+  saveCompletedSessionsForUser,
   saveRecentCompletedSessionHandoffForUser
 } from "@/lib/storage";
 import {
@@ -1170,6 +1171,32 @@ function getRecentSessionsWithinUploadBudget(
   return selected;
 }
 
+function getCompletedSessionSourceUserIds(userId: string) {
+  return Array.from(new Set([userId || "guest", userId === "guest" ? null : "guest"].filter(Boolean))) as string[];
+}
+
+function mergeSessionLists(lists: QuizSession[][]) {
+  return lists.reduce<QuizSession[]>((merged, list) => mergeSessions(merged, list), []);
+}
+
+function getConfirmedPendingSessions(
+  pendingSessions: QuizSession[],
+  remoteSessions: QuizSession[]
+) {
+  const remoteById = new Map(
+    remoteSessions.map((session) => [getCanonicalSessionId(session.id), session] as const)
+  );
+
+  return pendingSessions.filter((pendingSession) => {
+    if (!isCompletedQuizSession(pendingSession)) return false;
+    const remoteSession = remoteById.get(getCanonicalSessionId(pendingSession.id));
+    return Boolean(
+      remoteSession?.completedAt &&
+        remoteSession.attempts.length >= pendingSession.attempts.length
+    );
+  });
+}
+
 function mapRowToSession(
   row: QuizSessionRow | null,
   attemptMap?: Map<string, Attempt[]>
@@ -2054,9 +2081,10 @@ export async function syncCompletedSessionsForCurrentUser(userId: string) {
     return loadCompletedSessions();
   }
 
+  const sourceUserIds = getCompletedSessionSourceUserIds(userId);
   const localCompletedSessions = canonicalizeSessionsForUser(
     userId,
-    mergeSessions(loadCompletedSessionsForUser("guest"), loadCompletedSessions())
+    mergeSessionLists(sourceUserIds.map((sourceUserId) => loadCompletedSessionsForUser(sourceUserId)))
       .filter(isCompletedQuizSession)
   );
   const localSessionsToSync = [...localCompletedSessions]
@@ -2082,7 +2110,7 @@ export async function syncCompletedSessionsForCurrentUser(userId: string) {
     recoveredCompletionSessions.filter(isCompletedQuizSession)
   );
 
-  saveCompletedSessions(mergedSessions);
+  saveCompletedSessionsForUser(userId, mergedSessions);
   saveCompletedQuestionHistoryEntriesForUser(
     userId,
     buildCompletedQuestionHistoryEntriesFromSessions(mergedSessions)
@@ -2101,9 +2129,12 @@ export async function syncCompletedSessionsForCurrentUser(userId: string) {
 }
 
 export async function syncLocalCompletedSessionsForCurrentUser(userId: string) {
+  const sourceUserIds = getCompletedSessionSourceUserIds(userId);
   const hasHeavyLocalHistory =
-    getCompletedSessionsStorageLengthForUser(userId) > CLOUD_HEAVY_LOCAL_HISTORY_READ_LIMIT ||
-    getCompletedSessionsStorageLengthForUser("guest") > CLOUD_HEAVY_LOCAL_HISTORY_READ_LIMIT;
+    sourceUserIds.some(
+      (sourceUserId) =>
+        getCompletedSessionsStorageLengthForUser(sourceUserId) > CLOUD_HEAVY_LOCAL_HISTORY_READ_LIMIT
+    );
   let fetchedRemoteSessions: QuizSession[] = [];
   let shouldUploadLocalSessions = !isSupabaseRecoveryMode() && isSupabaseConfigured();
 
@@ -2121,35 +2152,51 @@ export async function syncLocalCompletedSessionsForCurrentUser(userId: string) {
     userId,
     fetchedRemoteSessions.filter(isCompletedQuizSession)
   );
+  const rawPendingUploadSessions = canonicalizeSessionsForUser(
+    userId,
+    loadPendingCompletedSessionUploadsForUser(userId).filter(isCompletedQuizSession)
+  );
+  const confirmedPendingSessions = getConfirmedPendingSessions(rawPendingUploadSessions, remoteSessions);
+  if (confirmedPendingSessions.length > 0) {
+    removePendingCompletedSessionUploadsForUser(userId, confirmedPendingSessions);
+  }
+
   const recentLocalCompletedSessions = canonicalizeSessionsForUser(
     userId,
-    mergeSessions(
-      loadRecentLocalCompletedSessionsForUploadForUser(
-        userId,
-        CLOUD_HEAVY_LOCAL_HISTORY_RECOVERY_LIMIT
-      ),
-      loadRecentLocalCompletedSessionsForUploadForUser(
-        "guest",
-        CLOUD_HEAVY_LOCAL_HISTORY_RECOVERY_LIMIT
+    mergeSessionLists(
+      sourceUserIds.map((sourceUserId) =>
+        loadRecentLocalCompletedSessionsForUploadForUser(
+          sourceUserId,
+          CLOUD_HEAVY_LOCAL_HISTORY_RECOVERY_LIMIT
+        )
+      )
+    ).filter(isCompletedQuizSession)
+  );
+  const recentHandoffSessions = canonicalizeSessionsForUser(
+    userId,
+    mergeSessionLists(
+      sourceUserIds.map((sourceUserId) =>
+        loadRecentCompletedSessionHandoffForUser(sourceUserId)
       )
     ).filter(isCompletedQuizSession)
   );
   const pendingCompletedSessionUploads = canonicalizeSessionsForUser(
     userId,
-    mergeSessions(
-      loadPendingCompletedSessionUploadsForUser(userId),
-      recentLocalCompletedSessions
-    ).filter(isCompletedQuizSession)
+    mergeSessionLists([
+      ...sourceUserIds.map((sourceUserId) => loadPendingCompletedSessionUploadsForUser(sourceUserId)),
+      recentLocalCompletedSessions,
+      recentHandoffSessions
+    ]).filter(isCompletedQuizSession)
   );
 
   const localCompletedSessions = hasHeavyLocalHistory
     ? pendingCompletedSessionUploads
     : canonicalizeSessionsForUser(
         userId,
-        mergeSessions(
-          mergeSessions(loadCompletedSessionsForUser("guest"), loadCompletedSessions()),
+        mergeSessionLists([
+          ...sourceUserIds.map((sourceUserId) => loadCompletedSessionsForUser(sourceUserId)),
           pendingCompletedSessionUploads
-        )
+        ])
           .filter(isCompletedQuizSession)
       );
   const mergedSessions = hasHeavyLocalHistory
@@ -2171,7 +2218,7 @@ export async function syncLocalCompletedSessionsForCurrentUser(userId: string) {
   if (hasHeavyLocalHistory) {
     mergeCompletedQuestionHistoryFromSessionsForUser(userId, mergedSessions);
   } else {
-    saveCompletedSessions(mergedSessions);
+    saveCompletedSessionsForUser(userId, mergedSessions);
     saveCompletedQuestionHistoryEntriesForUser(
       userId,
       buildCompletedQuestionHistoryEntriesFromSessions(mergedSessions)
@@ -2193,7 +2240,6 @@ export async function syncLocalCompletedSessionsForCurrentUser(userId: string) {
       totalBudgetMs: CLOUD_SYNC_TOTAL_BUDGET_MS
     }
   );
-  removePendingCompletedSessionUploadsForUser(userId, sessionsToUpload);
 
   return mergedSessions;
 }
@@ -2296,9 +2342,10 @@ export async function pushCompletedSessionToSupabase(session: QuizSession) {
     queuePendingCompletedSessionUploadForUser(data.user.id, canonicalSessions);
     mergeCompletedQuestionHistoryFromSessionsForUser(data.user.id, canonicalSessions);
     if (getCompletedSessionsStorageLengthForUser(data.user.id) <= CLOUD_HEAVY_LOCAL_HISTORY_READ_LIMIT) {
-      saveCompletedSessions(
+      saveCompletedSessionsForUser(
+        data.user.id,
         mergeSessions(
-          loadCompletedSessions(),
+          loadCompletedSessionsForUser(data.user.id),
           canonicalSessions
         )
       );
@@ -2312,8 +2359,7 @@ export async function pushCompletedSessionToSupabase(session: QuizSession) {
       data.user.id,
       mergeSessions(loadCloudCompletedSessionsForUser(data.user.id), canonicalSessions)
     );
-    removePendingCompletedSessionUploadsForUser(data.user.id, canonicalSessions);
-    void syncLeaderboardProfileForCurrentUser(data.user, loadCompletedSessions()).catch((error) => {
+    void syncLeaderboardProfileForCurrentUser(data.user, loadCompletedSessionsForUser(data.user.id)).catch((error) => {
       console.error("Leaderboard sync skipped:", error);
     });
   }

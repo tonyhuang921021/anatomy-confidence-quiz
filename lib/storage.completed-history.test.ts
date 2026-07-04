@@ -14,6 +14,7 @@ import {
   saveCloudCompletedSessionsForUser,
   saveCompletedQuestionHistoryEntriesForUser,
   saveCompletedSession,
+  saveCompletedSessionsForUser,
   saveRecentCompletedSessionHandoffForUser,
   saveQuestionExplanationOverride,
   saveQuestionExplanationOverrides,
@@ -133,6 +134,27 @@ test("登入帳號讀已做題時，也要合併同裝置 guest 暫存紀錄", (
 
   assert.ok(attemptedIds.has("q-user"));
   assert.ok(attemptedIds.has("q-guest"));
+});
+
+test("指定帳號儲存完成回合時，不依賴目前 active user", () => {
+  installBrowserStorage();
+  setActiveStorageUser("guest");
+
+  saveCompletedSessionsForUser("user-target", [
+    makeSession("target-session", ["q-target"])
+  ]);
+
+  assert.ok(
+    loadCompletedSessionsForUser("user-target").some(
+      (session) => session.id === "target-session"
+    )
+  );
+  assert.equal(
+    loadCompletedSessionsForUser("guest").some(
+      (session) => session.id === "target-session"
+    ),
+    false
+  );
 });
 
 test("localStorage 寫不下時，完成題目歷史要落到 sessionStorage", () => {
