@@ -23,6 +23,21 @@ function makeQuestion(id: string): Question {
   };
 }
 
+function makePaperQuestion(
+  id: string,
+  paperCode: string,
+  originalQuestionNumber: number,
+  stem = `題目 ${id}`
+): Question {
+  return {
+    ...makeQuestion(id),
+    stem,
+    examCode: "TEST",
+    paperCode,
+    originalQuestionNumber
+  };
+}
+
 function makeAttempt(questionId: string, index: number): Attempt {
   return {
     questionId,
@@ -91,6 +106,57 @@ test("開始頁帶入剩餘未做題時，散題要優先照這批題目往前�
   );
 
   assert.deepEqual(order.slice(0, priorityQuestionIds.length), priorityQuestionIds);
+});
+
+test("開始頁帶入剩餘未做題時，散題會交錯不同考卷來源", () => {
+  const questions = [
+    makePaperQuestion("p1-q1", "P1", 1),
+    makePaperQuestion("p1-q2", "P1", 2),
+    makePaperQuestion("p1-q3", "P1", 3),
+    makePaperQuestion("p2-q1", "P2", 1),
+    makePaperQuestion("p2-q2", "P2", 2),
+    makePaperQuestion("p2-q3", "P2", 3),
+    makePaperQuestion("p3-q1", "P3", 1),
+    makePaperQuestion("p3-q2", "P3", 2),
+    makePaperQuestion("p3-q3", "P3", 3)
+  ];
+  const questionMap = new Map(questions.map((question) => [question.id, question] as const));
+  const order = createQuestionOrder(questions, [], {
+    ...baseSettings,
+    questionCount: 6,
+    priorityQuestionIds: questions.map((question) => question.id)
+  });
+
+  assert.deepEqual(
+    order.map((id) => questionMap.get(id)?.paperCode),
+    ["P1", "P2", "P3", "P1", "P2", "P3"]
+  );
+});
+
+test("括號開頭的承上題會和前題綁在同一輪", () => {
+  const parent = makePaperQuestion("case-parent", "P1", 20, "病人前情提要");
+  const followUp = makePaperQuestion("case-follow-up", "P1", 21, "（承上題）下一步最適合的處置是？");
+  const order = createQuestionOrder([parent, followUp], [], {
+    ...baseSettings,
+    questionCount: 1,
+    priorityQuestionIds: [followUp.id]
+  });
+
+  assert.deepEqual(order, [parent.id, followUp.id]);
+});
+
+test("抽到題組第一題時，也會帶入後續連續承上題", () => {
+  const parent = makePaperQuestion("case-start", "P1", 30, "病人前情提要");
+  const followUpOne = makePaperQuestion("case-follow-up-1", "P1", 31, "承上題，最可能的診斷是？");
+  const followUpTwo = makePaperQuestion("case-follow-up-2", "P1", 32, "承上題，最適合的治療是？");
+  const distractor = makePaperQuestion("other-question", "P2", 1);
+  const order = createQuestionOrder([parent, followUpOne, followUpTwo, distractor], [], {
+    ...baseSettings,
+    questionCount: 3,
+    priorityQuestionIds: [parent.id, distractor.id]
+  });
+
+  assert.deepEqual(order, [parent.id, followUpOne.id, followUpTwo.id]);
 });
 
 test("剩餘未做題已在上一回答過後，不會再被 priority 當作未做題排入", () => {

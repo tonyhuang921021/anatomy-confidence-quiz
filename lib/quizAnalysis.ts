@@ -809,7 +809,17 @@ function normalizeStemForGrouping(stem: string) {
 
 function isFollowUpStem(stem: string) {
   const normalized = normalizeStemForGrouping(stem);
-  return normalized.startsWith("承上題");
+  return /^[（(【［\[]*承上題/.test(normalized);
+}
+
+function getQuestionPaperKey(question: Question) {
+  if (question.examCode && question.paperCode) {
+    return `${question.examCode}-${question.paperCode}`;
+  }
+  if (question.sourceYear && question.sourceRound) {
+    return `${question.sourceYear}-${question.sourceRound}-${question.subject}`;
+  }
+  return `${question.subject}-${question.chapter}-${question.section}`;
 }
 
 function getFollowUpClusterMap(questions: Question[]) {
@@ -817,8 +827,8 @@ function getFollowUpClusterMap(questions: Question[]) {
 
   const grouped = new Map<string, Question[]>();
   questions.forEach((question) => {
-    if (!question.examCode || !question.paperCode || !question.originalQuestionNumber) return;
-    const paperKey = `${question.examCode}-${question.paperCode}`;
+    if (!question.originalQuestionNumber) return;
+    const paperKey = getQuestionPaperKey(question);
     const bucket = grouped.get(paperKey) ?? [];
     bucket.push(question);
     grouped.set(paperKey, bucket);
@@ -861,24 +871,6 @@ function getFollowUpClusterMap(questions: Question[]) {
   return clusterByQuestionId;
 }
 
-function getPreviousQuestionForFollowUp(question: Question, questionMap: Map<string, Question>) {
-  if (!isFollowUpStem(question.stem)) return null;
-  if (!question.examCode || !question.paperCode || !question.originalQuestionNumber) return null;
-
-  const previousQuestionNumber = question.originalQuestionNumber - 1;
-  if (previousQuestionNumber < 1) return null;
-
-  for (const candidate of questionMap.values()) {
-    if (candidate.id === question.id) continue;
-    if (candidate.examCode !== question.examCode) continue;
-    if (candidate.paperCode !== question.paperCode) continue;
-    if (candidate.originalQuestionNumber !== previousQuestionNumber) continue;
-    return candidate;
-  }
-
-  return null;
-}
-
 function sortFollowUpQuestionIds(questionIds: string[], clusterMap: Map<string, { key: string; order: number }>) {
   return [...questionIds].sort((leftId, rightId) => {
     const leftCluster = clusterMap.get(leftId);
@@ -893,29 +885,91 @@ function sortFollowUpQuestionIds(questionIds: string[], clusterMap: Map<string, 
   });
 }
 
-function keepFollowUpQuestionsTogether(questionIds: string[], questionMap: Map<string, Question>) {
-  if (questionIds.length === 0) return questionIds;
+function getFollowUpClusterIds(
+  questionId: string,
+  questionMap: Map<string, Question>,
+  clusterMap: Map<string, { key: string; order: number }>
+) {
+  const cluster = clusterMap.get(questionId);
+  if (!cluster) return [questionId];
 
-  const selectedIds = new Set(questionIds);
-  const expandedIds: string[] = [];
-  const pushUnique = (id: string) => {
-    if (!expandedIds.includes(id)) expandedIds.push(id);
-  };
+  return Array.from(questionMap.values())
+    .filter((question) => clusterMap.get(question.id)?.key === cluster.key)
+    .sort((left, right) => {
+      const leftOrder = clusterMap.get(left.id)?.order ?? 0;
+      const rightOrder = clusterMap.get(right.id)?.order ?? 0;
+      return leftOrder - rightOrder;
+    })
+    .map((question) => question.id);
+}
+
+function interleaveQuestionIdsByPaper(questionIds: string[], questionMap: Map<string, Question>) {
+  const buckets = new Map<string, string[]>();
+  const seenIds = new Set<string>();
 
   questionIds.forEach((id) => {
+    if (seenIds.has(id)) return;
+    seenIds.add(id);
     const question = questionMap.get(id);
-    const previousQuestion = question ? getPreviousQuestionForFollowUp(question, questionMap) : null;
-
-    if (previousQuestion && !selectedIds.has(previousQuestion.id)) {
-      pushUnique(previousQuestion.id);
-    }
-
-    pushUnique(id);
+    const paperKey = question ? getQuestionPaperKey(question) : id;
+    const bucket = buckets.get(paperKey) ?? [];
+    bucket.push(id);
+    buckets.set(paperKey, bucket);
   });
 
-  const clusterMap = getFollowUpClusterMap(
-    expandedIds.map((id) => questionMap.get(id)).filter((question): question is Question => Boolean(question))
-  );
+  const result: string[] = [];
+  const paperKeys = Array.from(buckets.keys());
+
+  while (buckets.size > 0) {
+    for (const key of paperKeys) {
+      const bucket = buckets.get(key);
+      if (!bucket || bucket.length === 0) {
+        buckets.delete(key);
+        continue;
+      }
+
+      const nextId = bucket.shift();
+      if (nextId) result.push(nextId);
+
+      if (bucket.length === 0) {
+        buckets.delete(key);
+      }
+    }
+  }
+
+  return result;
+}
+
+function keepFollowUpQuestionsTogether(
+  questionIds: string[],
+  questionMap: Map<string, Question>,
+  limit = questionIds.length
+) {
+  if (questionIds.length === 0) return questionIds;
+
+  const expandedIds: string[] = [];
+  const expandedIdSet = new Set<string>();
+  const pushUnique = (id: string) => {
+    if (expandedIdSet.has(id)) return;
+    expandedIdSet.add(id);
+    expandedIds.push(id);
+  };
+  const clusterMap = getFollowUpClusterMap(Array.from(questionMap.values()));
+
+  for (const id of questionIds) {
+    if (expandedIds.length >= limit) break;
+    if (!questionMap.has(id) || expandedIdSet.has(id)) continue;
+
+    const clusterIds = getFollowUpClusterIds(id, questionMap, clusterMap).filter(
+      (clusterId) => questionMap.has(clusterId) && !expandedIdSet.has(clusterId)
+    );
+    if (clusterIds.length === 0) continue;
+
+    const wouldExceedLimit = expandedIds.length + clusterIds.length > limit;
+    if (wouldExceedLimit && expandedIds.length > 0) continue;
+
+    clusterIds.forEach(pushUnique);
+  }
 
   return sortFollowUpQuestionIds(expandedIds, clusterMap);
 }
@@ -1137,28 +1191,37 @@ export function createQuestionOrder(
   const repeatAwarePool = getRepeatAwarePool(sourcePool, allSessions, settings, requestedCount);
   const count = normalizeQuestionCount(settings.questionCount, repeatAwarePool.length);
   const scored = buildQuestionScoreMap(repeatAwarePool, allSessions, settings);
-  const sourceQuestionMap = new Map(sourcePool.map((question) => [question.id, question] as const));
+  const allQuestionMap = new Map(questions.map((question) => [question.id, question] as const));
 
   if (settings.mode === "random") {
-    const priorityFreshIds = getPriorityFreshQuestionIds(sourcePool, allSessions, settings).slice(0, count);
+    const priorityFreshIds = interleaveQuestionIdsByPaper(
+      getPriorityFreshQuestionIds(sourcePool, allSessions, settings),
+      allQuestionMap
+    );
     if (priorityFreshIds.length > 0) {
       const priorityFreshIdSet = new Set(priorityFreshIds);
-      const remainingIds = getPrioritizedFreshPool(
-        repeatAwarePool.filter((question) => !priorityFreshIdSet.has(question.id)),
-        allSessions
-      ).map((question) => question.id);
+      const remainingIds = interleaveQuestionIdsByPaper(
+        getPrioritizedFreshPool(
+          repeatAwarePool.filter((question) => !priorityFreshIdSet.has(question.id)),
+          allSessions
+        ).map((question) => question.id),
+        allQuestionMap
+      );
 
       return keepFollowUpQuestionsTogether(
-        [...priorityFreshIds, ...remainingIds].slice(0, count),
-        sourceQuestionMap
+        [...priorityFreshIds, ...remainingIds],
+        allQuestionMap,
+        count
       );
     }
 
     return keepFollowUpQuestionsTogether(
-      getPrioritizedFreshPool(repeatAwarePool, allSessions)
-      .slice(0, count)
-      .map((question) => question.id),
-      sourceQuestionMap
+      interleaveQuestionIdsByPaper(
+        getPrioritizedFreshPool(repeatAwarePool, allSessions).map((question) => question.id),
+        allQuestionMap
+      ),
+      allQuestionMap,
+      count
     );
   }
 
@@ -1172,7 +1235,7 @@ export function createQuestionOrder(
 
     return keepFollowUpQuestionsTogether(
       simulationPool.slice(0, count).map((question) => question.id),
-      sourceQuestionMap
+      allQuestionMap
     );
   }
 
@@ -1187,9 +1250,9 @@ export function createQuestionOrder(
 
     return keepFollowUpQuestionsTogether(
       [...diversifyBySection(reviewFirst, count, 3), ...diversifyBySection(fallback, count, 3)]
-        .slice(0, count)
         .map((item) => item.question.id),
-      sourceQuestionMap
+      allQuestionMap,
+      count
     );
   }
 
@@ -1202,7 +1265,7 @@ export function createQuestionOrder(
           4
         ).map((item) => item.question.id);
 
-  return keepFollowUpQuestionsTogether(questionIds, sourceQuestionMap);
+  return keepFollowUpQuestionsTogether(questionIds, allQuestionMap, count);
 }
 
 export function getReviewQuestionItems(

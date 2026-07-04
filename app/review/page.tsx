@@ -3,7 +3,13 @@
 import Link from "next/link";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useAuth } from "@/components/AuthProvider";
-import { ReviewNotebook, getUnresolvedReviewItems } from "@/components/ReviewNotebook";
+import {
+  MANUAL_REVIEW_STATE_CHANGE_EVENT,
+  ReviewNotebook,
+  getUnresolvedReviewItems,
+  readManualReviewStateForScope,
+  type ManualReviewState
+} from "@/components/ReviewNotebook";
 import { applyQuestionClassificationOverride, getQuestionBankBySubjectFilter } from "@/data/med1QuestionBank";
 import { loadConfirmedQuestionClassificationOverrides } from "@/lib/cloudSync";
 import { buildNewQuizHref } from "@/lib/startSettingsUrl";
@@ -94,6 +100,9 @@ export default function ReviewPage() {
   const [isFullscreenReview, setIsFullscreenReview] = useState(false);
   const [isFullscreenReviewVisible, setIsFullscreenReviewVisible] = useState(false);
   const [localHistoryVersion, setLocalHistoryVersion] = useState(0);
+  const [manualReviewState, setManualReviewState] = useState<ManualReviewState>(() =>
+    readManualReviewStateForScope("practice-review", "guest")
+  );
   const { user, syncVersion } = useAuth();
   const pageScrollYRef = useRef(0);
   const baseQuestions = useMemo(() => getQuestionBankBySubjectFilter("全部"), []);
@@ -133,6 +142,24 @@ export default function ReviewPage() {
       window.removeEventListener("completed-question-history-change", refreshLocalHistory);
     };
   }, []);
+
+  useEffect(() => {
+    const userId = user?.id ?? "guest";
+    setManualReviewState(readManualReviewStateForScope("practice-review", userId));
+
+    if (typeof window === "undefined") return;
+    const handleManualReviewStateChange = (event: Event) => {
+      const detail = (event as CustomEvent<{ scope?: string; userId?: string }>).detail;
+      if (detail?.scope && detail.scope !== "practice-review") return;
+      if (detail?.userId && detail.userId !== userId) return;
+      setManualReviewState(readManualReviewStateForScope("practice-review", userId));
+    };
+
+    window.addEventListener(MANUAL_REVIEW_STATE_CHANGE_EVENT, handleManualReviewStateChange);
+    return () => {
+      window.removeEventListener(MANUAL_REVIEW_STATE_CHANGE_EVENT, handleManualReviewStateChange);
+    };
+  }, [user?.id]);
 
   useEffect(() => {
     if (typeof document === "undefined" || typeof window === "undefined") return;
@@ -206,8 +233,8 @@ export default function ReviewPage() {
   }
 
   const unresolvedPracticeItems = useMemo(
-    () => getUnresolvedReviewItems(practiceItems),
-    [practiceItems]
+    () => getUnresolvedReviewItems(practiceItems, manualReviewState),
+    [manualReviewState, practiceItems]
   );
   const reviewCount = unresolvedPracticeItems.length;
   const lowConfidenceCount = unresolvedPracticeItems.filter((item) => item.history.lowConfidence > 0).length;

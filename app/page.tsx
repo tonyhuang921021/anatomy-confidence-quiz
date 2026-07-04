@@ -54,6 +54,11 @@ const QUICK_ENTRIES = [
 const HOME_RELEASE_NOTES = [
   {
     time: "07/04",
+    title: "錯題完成區再收穩",
+    body: "移去完成區會立刻排在前面，也會同步影響開始待複習的題庫；顯示更多題時不再把完成狀態看起來弄丟。"
+  },
+  {
+    time: "07/04",
     title: "HTML 資源不重開",
     body: "資源交流區的 HTML 預覽切到別的視窗再回來，會保留原本 iframe，不再因登入刷新整頁重載。"
   },

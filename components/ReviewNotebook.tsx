@@ -46,9 +46,11 @@ type RenderedReviewQuestionItem = ReviewQuestionItem & {
   renderedQuestion: Question;
 };
 
-type ManualReviewState = {
+export type ManualReviewState = {
   resolvedIds: Set<string>;
   unresolvedIds: Set<string>;
+  resolvedAtById: Map<string, string>;
+  unresolvedAtById: Map<string, string>;
 };
 
 type RelatedQuestionIndex = {
@@ -59,7 +61,9 @@ type RelatedQuestionIndex = {
 function createEmptyManualReviewState(): ManualReviewState {
   return {
     resolvedIds: new Set<string>(),
-    unresolvedIds: new Set<string>()
+    unresolvedIds: new Set<string>(),
+    resolvedAtById: new Map<string, string>(),
+    unresolvedAtById: new Map<string, string>()
   };
 }
 
@@ -70,19 +74,34 @@ function parseManualReviewState(rawValue: string | null): ManualReviewState {
     const parsed = JSON.parse(rawValue) as {
       resolvedIds?: unknown;
       unresolvedIds?: unknown;
+      resolvedAtById?: unknown;
+      unresolvedAtById?: unknown;
+    };
+    const resolvedIds = new Set(
+      Array.isArray(parsed.resolvedIds)
+        ? parsed.resolvedIds.filter((id): id is string => typeof id === "string")
+        : []
+    );
+    const unresolvedIds = new Set(
+      Array.isArray(parsed.unresolvedIds)
+        ? parsed.unresolvedIds.filter((id): id is string => typeof id === "string")
+        : []
+    );
+    const parseTimestampMap = (value: unknown, allowedIds: Set<string>) => {
+      if (!value || typeof value !== "object" || Array.isArray(value)) return new Map<string, string>();
+      return new Map(
+        Object.entries(value as Record<string, unknown>).filter(
+          (entry): entry is [string, string] =>
+            allowedIds.has(entry[0]) && typeof entry[1] === "string" && entry[1].trim().length > 0
+        )
+      );
     };
 
     return {
-      resolvedIds: new Set(
-        Array.isArray(parsed.resolvedIds)
-          ? parsed.resolvedIds.filter((id): id is string => typeof id === "string")
-          : []
-      ),
-      unresolvedIds: new Set(
-        Array.isArray(parsed.unresolvedIds)
-          ? parsed.unresolvedIds.filter((id): id is string => typeof id === "string")
-          : []
-      )
+      resolvedIds,
+      unresolvedIds,
+      resolvedAtById: parseTimestampMap(parsed.resolvedAtById, resolvedIds),
+      unresolvedAtById: parseTimestampMap(parsed.unresolvedAtById, unresolvedIds)
     };
   } catch {
     return createEmptyManualReviewState();
@@ -93,11 +112,20 @@ function serializeManualReviewState(state: ManualReviewState) {
   return JSON.stringify({
     resolvedIds: Array.from(state.resolvedIds),
     unresolvedIds: Array.from(state.unresolvedIds),
+    resolvedAtById: Object.fromEntries(state.resolvedAtById),
+    unresolvedAtById: Object.fromEntries(state.unresolvedAtById),
     updatedAt: new Date().toISOString()
   });
 }
 
-function getManualReviewStorageKey(scope: string) {
+export const MANUAL_REVIEW_STATE_CHANGE_EVENT = "manual-review-state-change";
+
+function getManualReviewStorageKey(scope: string, userId?: string | null) {
+  const normalizedUserId = userId?.trim() || "guest";
+  return `quiz-review-notebook-manual-state:${scope}:${normalizedUserId}`;
+}
+
+function getLegacyManualReviewStorageKey(scope: string) {
   return `quiz-review-notebook-manual-state:${scope}`;
 }
 
@@ -110,6 +138,41 @@ function safeReadManualReviewState(key: string) {
   }
 }
 
+function mergeManualReviewStates(states: ManualReviewState[]) {
+  const merged = createEmptyManualReviewState();
+
+  states.forEach((state) => {
+    state.resolvedIds.forEach((id) => {
+      merged.unresolvedIds.delete(id);
+      merged.unresolvedAtById.delete(id);
+      merged.resolvedIds.add(id);
+      const timestamp = state.resolvedAtById.get(id);
+      if (timestamp && timestamp.localeCompare(merged.resolvedAtById.get(id) ?? "") > 0) {
+        merged.resolvedAtById.set(id, timestamp);
+      }
+    });
+    state.unresolvedIds.forEach((id) => {
+      merged.resolvedIds.delete(id);
+      merged.resolvedAtById.delete(id);
+      merged.unresolvedIds.add(id);
+      const timestamp = state.unresolvedAtById.get(id);
+      if (timestamp && timestamp.localeCompare(merged.unresolvedAtById.get(id) ?? "") > 0) {
+        merged.unresolvedAtById.set(id, timestamp);
+      }
+    });
+  });
+
+  return merged;
+}
+
+export function readManualReviewStateForScope(scope: string, userId?: string | null) {
+  if (typeof window === "undefined") return createEmptyManualReviewState();
+  return mergeManualReviewStates([
+    parseManualReviewState(safeReadManualReviewState(getLegacyManualReviewStorageKey(scope))),
+    parseManualReviewState(safeReadManualReviewState(getManualReviewStorageKey(scope, userId)))
+  ]);
+}
+
 function safeSaveManualReviewState(key: string, state: ManualReviewState) {
   if (typeof window === "undefined") return false;
   try {
@@ -118,6 +181,20 @@ function safeSaveManualReviewState(key: string, state: ManualReviewState) {
   } catch {
     return false;
   }
+}
+
+function dispatchManualReviewStateChange(scope: string, userId: string, state: ManualReviewState) {
+  if (typeof window === "undefined") return;
+  window.dispatchEvent(
+    new CustomEvent(MANUAL_REVIEW_STATE_CHANGE_EVENT, {
+      detail: {
+        scope,
+        userId,
+        resolvedIds: Array.from(state.resolvedIds),
+        unresolvedIds: Array.from(state.unresolvedIds)
+      }
+    })
+  );
 }
 
 function formatTime(value?: string) {
@@ -130,12 +207,14 @@ function formatTime(value?: string) {
   });
 }
 
+function compareByRecent(a: ReviewQuestionItem, b: ReviewQuestionItem) {
+  const timeA = a.history.lastAttemptedAt ? new Date(a.history.lastAttemptedAt).getTime() : 0;
+  const timeB = b.history.lastAttemptedAt ? new Date(b.history.lastAttemptedAt).getTime() : 0;
+  return timeB - timeA || b.riskScore - a.riskScore || b.history.wrong - a.history.wrong;
+}
+
 function sortByRecent<T extends ReviewQuestionItem>(items: T[]) {
-  return [...items].sort((a, b) => {
-    const timeA = a.history.lastAttemptedAt ? new Date(a.history.lastAttemptedAt).getTime() : 0;
-    const timeB = b.history.lastAttemptedAt ? new Date(b.history.lastAttemptedAt).getTime() : 0;
-    return timeB - timeA || b.riskScore - a.riskScore || b.history.wrong - a.history.wrong;
-  });
+  return [...items].sort(compareByRecent);
 }
 
 export function isResolvedReviewItem(item: ReviewQuestionItem) {
@@ -146,8 +225,28 @@ export function isResolvedReviewItem(item: ReviewQuestionItem) {
   return item.history.lowConfidence > 0 && item.history.correctStreakAfterLatestRisk >= 2;
 }
 
-export function getUnresolvedReviewItems(items: ReviewQuestionItem[]) {
-  return items.filter((item) => !isResolvedReviewItem(item));
+export function isReviewItemResolved(item: ReviewQuestionItem, manualState?: ManualReviewState) {
+  const questionId = item.question.id;
+  if (manualState?.unresolvedIds.has(questionId)) return false;
+  if (manualState?.resolvedIds.has(questionId)) return true;
+  return isResolvedReviewItem(item);
+}
+
+export function getUnresolvedReviewItems(items: ReviewQuestionItem[], manualState?: ManualReviewState) {
+  return items.filter((item) => !isReviewItemResolved(item, manualState));
+}
+
+function sortResolvedItems<T extends ReviewQuestionItem>(items: T[], manualState: ManualReviewState) {
+  return [...items].sort((a, b) => {
+    const manualResolvedAtA = manualState.resolvedAtById.get(a.question.id) ?? "";
+    const manualResolvedAtB = manualState.resolvedAtById.get(b.question.id) ?? "";
+
+    if (manualResolvedAtA || manualResolvedAtB) {
+      return manualResolvedAtB.localeCompare(manualResolvedAtA) || compareByRecent(a, b);
+    }
+
+    return compareByRecent(a, b);
+  });
 }
 
 function getMoveBackLabel(item: ReviewQuestionItem) {
@@ -416,7 +515,7 @@ export function ReviewNotebook({
   headerAction,
   manualEditScope
 }: ReviewNotebookProps) {
-  const { session } = useAuth();
+  const { session, user } = useAuth();
   const [explanationOverrides, setExplanationOverrides] = useState<Record<string, QuestionExplanationOverride>>({});
   const [explanationLoadingMap, setExplanationLoadingMap] = useState<Record<string, boolean>>({});
   const [explanationErrorMap, setExplanationErrorMap] = useState<Record<string, string>>({});
@@ -427,14 +526,21 @@ export function ReviewNotebook({
   const [openQuestionIds, setOpenQuestionIds] = useState<Set<string>>(() => new Set());
   const [openRelatedQuestionIds, setOpenRelatedQuestionIds] = useState<Set<string>>(() => new Set());
   const [activeCategory, setActiveCategory] = useState<"wrong" | "lowConfidence" | "resolved">("wrong");
-  const [visibleCount, setVisibleCount] = useState(40);
+  const [visibleCountByCategory, setVisibleCountByCategory] = useState({
+    wrong: 40,
+    lowConfidence: 40,
+    resolved: 40
+  });
   const [selectedSubjects, setSelectedSubjects] = useState<SubjectName[]>([]);
   const [isManualEditMode, setIsManualEditMode] = useState(false);
   const [manualReviewState, setManualReviewState] = useState<ManualReviewState>(() =>
     createEmptyManualReviewState()
   );
   const manualEditingEnabled = Boolean(manualEditScope);
-  const manualReviewStorageKey = manualEditScope ? getManualReviewStorageKey(manualEditScope) : "";
+  const manualReviewUserId = user?.id ?? "guest";
+  const manualReviewStorageKey = manualEditScope
+    ? getManualReviewStorageKey(manualEditScope, manualReviewUserId)
+    : "";
   const questionIdsKey = useMemo(
     () => items.map((item) => item.question.id).join("|"),
     [items]
@@ -477,22 +583,14 @@ export function ReviewNotebook({
   );
   const unresolvedItems = useMemo(
     () =>
-      filteredItems.filter((item) => {
-        const questionId = item.question.id;
-        if (manualReviewState.resolvedIds.has(questionId)) return false;
-        if (manualReviewState.unresolvedIds.has(questionId)) return true;
-        return !isResolvedReviewItem(item);
-      }),
+      filteredItems.filter((item) => !isReviewItemResolved(item, manualReviewState)),
     [filteredItems, manualReviewState]
   );
   const resolvedItems = useMemo(
     () =>
-      sortByRecent(
-        filteredItems.filter((item) => {
-          const questionId = item.question.id;
-          if (manualReviewState.unresolvedIds.has(questionId)) return false;
-          return manualReviewState.resolvedIds.has(questionId) || isResolvedReviewItem(item);
-        })
+      sortResolvedItems(
+        filteredItems.filter((item) => isReviewItemResolved(item, manualReviewState)),
+        manualReviewState
       ),
     [filteredItems, manualReviewState]
   );
@@ -513,6 +611,7 @@ export function ReviewNotebook({
           : resolvedItems,
     [activeCategory, lowConfidenceItems, resolvedItems, wrongItems]
   );
+  const visibleCount = visibleCountByCategory[activeCategory] ?? 40;
   const visibleItems = useMemo(
     () => activeItems.slice(0, visibleCount),
     [activeItems, visibleCount]
@@ -561,22 +660,42 @@ export function ReviewNotebook({
   }, [activeCategory, lowConfidenceItems.length, resolvedItems.length, wrongItems.length]);
 
   useEffect(() => {
-    setVisibleCount(40);
-  }, [activeCategory, questionIdsKey, selectedSubjects]);
+    setVisibleCountByCategory({
+      wrong: 40,
+      lowConfidence: 40,
+      resolved: 40
+    });
+  }, [questionIdsKey, selectedSubjects]);
 
   useEffect(() => {
     setSelectedSubjects((current) => current.filter((subject) => availableSubjects.includes(subject)));
   }, [availableSubjects]);
 
   useEffect(() => {
-    if (!manualReviewStorageKey || typeof window === "undefined") {
+    if (!manualEditScope || !manualReviewStorageKey || typeof window === "undefined") {
       setManualReviewState(createEmptyManualReviewState());
       return;
     }
 
-    setManualReviewState(parseManualReviewState(safeReadManualReviewState(manualReviewStorageKey)));
+    setManualReviewState(readManualReviewStateForScope(manualEditScope, manualReviewUserId));
     setIsManualEditMode(false);
-  }, [manualReviewStorageKey]);
+  }, [manualEditScope, manualReviewStorageKey, manualReviewUserId]);
+
+  useEffect(() => {
+    if (!manualEditScope || typeof window === "undefined") return;
+
+    const handleManualReviewStateChange = (event: Event) => {
+      const detail = (event as CustomEvent<{ scope?: string; userId?: string }>).detail;
+      if (detail?.scope && detail.scope !== manualEditScope) return;
+      if (detail?.userId && detail.userId !== manualReviewUserId) return;
+      setManualReviewState(readManualReviewStateForScope(manualEditScope, manualReviewUserId));
+    };
+
+    window.addEventListener(MANUAL_REVIEW_STATE_CHANGE_EVENT, handleManualReviewStateChange);
+    return () => {
+      window.removeEventListener(MANUAL_REVIEW_STATE_CHANGE_EVENT, handleManualReviewStateChange);
+    };
+  }, [manualEditScope, manualReviewUserId]);
 
   function toggleSubject(subject: SubjectName) {
     setSelectedSubjects((current) =>
@@ -591,11 +710,12 @@ export function ReviewNotebook({
   }
 
   function updateManualReviewState(updater: (current: ManualReviewState) => ManualReviewState) {
-    if (!manualReviewStorageKey) return;
+    if (!manualReviewStorageKey || !manualEditScope) return;
 
     setManualReviewState((current) => {
       const next = updater(current);
       safeSaveManualReviewState(manualReviewStorageKey, next);
+      dispatchManualReviewStateChange(manualEditScope, manualReviewUserId, next);
       return next;
     });
   }
@@ -604,9 +724,13 @@ export function ReviewNotebook({
     updateManualReviewState((current) => {
       const resolvedIds = new Set(current.resolvedIds);
       const unresolvedIds = new Set(current.unresolvedIds);
+      const resolvedAtById = new Map(current.resolvedAtById);
+      const unresolvedAtById = new Map(current.unresolvedAtById);
       resolvedIds.add(questionId);
       unresolvedIds.delete(questionId);
-      return { resolvedIds, unresolvedIds };
+      resolvedAtById.set(questionId, new Date().toISOString());
+      unresolvedAtById.delete(questionId);
+      return { resolvedIds, unresolvedIds, resolvedAtById, unresolvedAtById };
     });
   }
 
@@ -614,9 +738,13 @@ export function ReviewNotebook({
     updateManualReviewState((current) => {
       const resolvedIds = new Set(current.resolvedIds);
       const unresolvedIds = new Set(current.unresolvedIds);
+      const resolvedAtById = new Map(current.resolvedAtById);
+      const unresolvedAtById = new Map(current.unresolvedAtById);
       resolvedIds.delete(questionId);
       unresolvedIds.add(questionId);
-      return { resolvedIds, unresolvedIds };
+      resolvedAtById.delete(questionId);
+      unresolvedAtById.set(questionId, new Date().toISOString());
+      return { resolvedIds, unresolvedIds, resolvedAtById, unresolvedAtById };
     });
   }
 
@@ -1214,7 +1342,12 @@ export function ReviewNotebook({
                 <div className="mt-4 flex justify-center">
                   <button
                     type="button"
-                    onClick={() => setVisibleCount((current) => current + 40)}
+                    onClick={() =>
+                      setVisibleCountByCategory((current) => ({
+                        ...current,
+                        [activeCategory]: (current[activeCategory] ?? 40) + 40
+                      }))
+                    }
                     className="min-h-11 rounded-2xl bg-slate-100 px-4 py-2 text-sm font-semibold text-slate-800 transition hover:bg-slate-200"
                   >
                     再顯示 40 題
