@@ -6,6 +6,8 @@ type StructuredExplanationTextProps = {
   compact?: boolean;
   tone?: "light" | "dark";
   className?: string;
+  sectionFilter?: (section: ExplanationSection, index: number) => boolean;
+  fallbackToFullText?: boolean;
 };
 
 type ExplanationBlock =
@@ -179,18 +181,35 @@ function buildExplanationSections(blocks: ExplanationBlock[]): ExplanationSectio
   return sections.filter((section) => section.title || section.blocks.length > 0);
 }
 
+export function getStructuredExplanationSectionTitles(text?: string | null) {
+  const trimmedText = text?.trim();
+  if (!trimmedText) return [];
+  return buildExplanationSections(parseExplanationBlocks(trimmedText))
+    .map((section) => section.title)
+    .filter((title): title is string => Boolean(title));
+}
+
 export function StructuredExplanationText({
   text,
   label = "詳解",
   compact = false,
   tone = "light",
-  className = ""
+  className = "",
+  sectionFilter,
+  fallbackToFullText = true
 }: StructuredExplanationTextProps) {
   const trimmedText = text?.trim();
   if (!trimmedText) return null;
 
   const blocks = parseExplanationBlocks(trimmedText);
-  const sections = buildExplanationSections(blocks);
+  const allSections = buildExplanationSections(blocks);
+  let sections = sectionFilter
+    ? allSections.filter((section, index) => sectionFilter(section, index))
+    : allSections;
+  if (sections.length === 0) {
+    if (!fallbackToFullText) return null;
+    sections = allSections;
+  }
 
   const labelClassName = tone === "dark" ? "text-white" : "text-ink";
   const sectionClassName =

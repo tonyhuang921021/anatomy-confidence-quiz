@@ -10,7 +10,10 @@ import { QuestionExplanationTabs } from "@/components/QuestionExplanationTabs";
 import { QuestionIssueReportButton } from "@/components/QuestionIssueReportButton";
 import { ResultSummary } from "@/components/ResultSummary";
 import { SavedQuestionButton } from "@/components/SavedQuestionButton";
-import { StructuredExplanationText } from "@/components/StructuredExplanationText";
+import {
+  StructuredExplanationText,
+  getStructuredExplanationSectionTitles
+} from "@/components/StructuredExplanationText";
 import { WeaknessRanking } from "@/components/WeaknessRanking";
 import {
   loadQuestionCommunityStats,
@@ -433,6 +436,21 @@ function getConfidenceTileClass(confidence: number) {
 
 function getConfidenceOverviewLabel(confidence: number) {
   return `信心 ${Math.min(Math.max(Math.round(confidence), 1), 4)}`;
+}
+
+const RESULT_INLINE_EXPLANATION_TITLES = new Set(["本題核心", "核心知識", "解題關鍵"]);
+
+function isInlineResultExplanationSection(title?: string) {
+  return !title || RESULT_INLINE_EXPLANATION_TITLES.has(title);
+}
+
+function hasCollapsibleResultAiExplanation(text?: string | null) {
+  const titles = getStructuredExplanationSectionTitles(text);
+  return (
+    titles.length > 0 &&
+    titles.some((title) => !isInlineResultExplanationSection(title)) &&
+    titles.some((title) => isInlineResultExplanationSection(title))
+  );
 }
 
 type ConfidenceOverviewExportItem = {
@@ -1885,6 +1903,16 @@ function ResultsPageContent() {
     const masteryLabel =
       masteryReviewItemMap.get(attempt.questionId)?.categoryLabel ??
       getMasteryCategoryLabelForAnswer(attempt);
+    const shouldCollapseAiExplanation = hasCollapsibleResultAiExplanation(question.explanation);
+    const aiExplanationContent = shouldCollapseAiExplanation ? (
+      <StructuredExplanationText
+        text={question.explanation}
+        label=""
+        compact
+        sectionFilter={(section) => !isInlineResultExplanationSection(section.title)}
+        fallbackToFullText={false}
+      />
+    ) : undefined;
 
     return (
       <div className="mt-2 min-w-0 space-y-3 overflow-hidden text-sm leading-7 text-slate-700 [overflow-wrap:anywhere]">
@@ -1935,55 +1963,74 @@ function ResultsPageContent() {
             );
           })}
         </div>
-        <p>
-          <span className="font-semibold">我的答案：</span>
-          {attempt.selectedAnswer}
-        </p>
-        <p>
-          <span className="font-semibold">正確答案：</span>
-          {question.acceptedAnswers?.length &&
-          (question.answerCreditType === "multiple_accepted" ||
-            question.answerCreditType === "multiple_answers")
-            ? `${question.acceptedAnswers.join("/")} 皆可`
-            : question.answerCreditType === "all_credit"
-              ? "本題一律給分"
-              : attempt.correctAnswer}
-        </p>
-        {confidenceCalibrationEnabled ? (
-          <p>
-            <span className="font-semibold">本題狀態：</span>
-            <span className={`ml-1 rounded-full px-2.5 py-1 text-xs font-bold ring-1 ${getMasteryBadgeClass(masteryLabel)}`}>
-              {masteryLabel}
-            </span>
-          </p>
-        ) : null}
-        {confidenceTrackingEnabled ? (
-          <p>
-            <span className="font-semibold">信心：</span>
-            {getConfidenceOverviewLabel(attempt.confidence)}
-          </p>
-        ) : null}
-        {attempt.errorType ? (
-          <p>
-            <span className="font-semibold">錯因：</span>
-            {attempt.errorType}
-          </p>
-        ) : null}
-        {attempt.eliminatedOptions?.length ? (
-          <p>
-            <span className="font-semibold">作答時排除：</span>
-            {attempt.eliminatedOptions.join("、")}
-          </p>
-        ) : null}
-        <StructuredExplanationText text={question.explanation} label="詳解" compact />
-        <QuestionExplanationTabs question={question} compact className="mt-3" />
-        {renderOptionAnalysis(question)}
-        {question.memoryTip ? (
-          <div className="memory-tip-box">
-            <span className="font-semibold">快速記憶法：</span>
-            {question.memoryTip}
+        <div className="rounded-3xl border border-slate-200 bg-white/70 px-3 py-3 shadow-sm sm:px-4">
+          <div className="flex min-w-0 flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
+            <div className="flex min-w-0 flex-wrap items-center gap-x-5 gap-y-2">
+              <p className="min-w-0 text-sm font-semibold text-slate-800 sm:text-[15px]">
+                我的答案：<span className="font-black text-ink">{attempt.selectedAnswer}</span>
+              </p>
+              <p className="min-w-0 text-sm font-semibold text-slate-800 sm:text-[15px]">
+                正確答案：
+                <span className="font-black text-ink">
+                  {question.acceptedAnswers?.length &&
+                  (question.answerCreditType === "multiple_accepted" ||
+                    question.answerCreditType === "multiple_answers")
+                    ? `${question.acceptedAnswers.join("/")} 皆可`
+                    : question.answerCreditType === "all_credit"
+                      ? "本題一律給分"
+                      : attempt.correctAnswer}
+                </span>
+              </p>
+            </div>
+            <div className="flex min-w-0 flex-wrap items-center gap-2 lg:justify-end">
+              {confidenceCalibrationEnabled ? (
+                <span className="inline-flex max-w-full items-center gap-1.5 rounded-full bg-white px-2.5 py-1 text-xs font-black text-slate-700 ring-1 ring-slate-200">
+                  <span className="shrink-0 text-slate-500">本題狀態</span>
+                  <span className={`rounded-full px-2 py-0.5 ring-1 ${getMasteryBadgeClass(masteryLabel)}`}>
+                    {masteryLabel}
+                  </span>
+                </span>
+              ) : null}
+              {confidenceTrackingEnabled ? (
+                <span className="inline-flex items-center gap-1.5 rounded-full bg-white px-2.5 py-1 text-xs font-black text-slate-700 ring-1 ring-slate-200">
+                  <span className="text-slate-500">信心</span>
+                  <span className="text-ink">{getConfidenceOverviewLabel(attempt.confidence).replace("信心 ", "")}</span>
+                </span>
+              ) : null}
+            </div>
           </div>
-        ) : null}
+          {attempt.errorType || attempt.eliminatedOptions?.length ? (
+            <div className="mt-3 flex flex-wrap gap-2">
+              {attempt.errorType ? (
+                <span className="rounded-full bg-slate-100 px-2.5 py-1 text-xs font-bold text-slate-700">
+                  錯因：{attempt.errorType}
+                </span>
+              ) : null}
+              {attempt.eliminatedOptions?.length ? (
+                <span className="rounded-full bg-slate-100 px-2.5 py-1 text-xs font-bold text-slate-700">
+                  作答時排除：{attempt.eliminatedOptions.join("、")}
+                </span>
+              ) : null}
+            </div>
+          ) : null}
+        </div>
+        <StructuredExplanationText
+          text={question.explanation}
+          label="詳解"
+          compact
+          sectionFilter={
+            shouldCollapseAiExplanation
+              ? (section) => isInlineResultExplanationSection(section.title)
+              : undefined
+          }
+        />
+        {renderOptionAnalysis(question)}
+        <QuestionExplanationTabs
+          question={question}
+          compact
+          className="mt-3"
+          aiExplanationContent={aiExplanationContent}
+        />
         {renderExplanationFooter(question, attempt)}
       </div>
     );

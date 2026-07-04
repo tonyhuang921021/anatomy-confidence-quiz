@@ -1,5 +1,6 @@
 "use client";
 
+import type { ReactNode } from "react";
 import { useCallback, useEffect, useState } from "react";
 import { useAuth } from "@/components/AuthProvider";
 import { QuestionSupplementCardsPanel } from "@/components/QuestionSupplementCardsPanel";
@@ -11,19 +12,22 @@ type QuestionExplanationTabsProps = {
   question: Question;
   compact?: boolean;
   className?: string;
+  aiExplanationContent?: ReactNode;
 };
 
 export function QuestionExplanationTabs({
   question,
   compact = false,
-  className = ""
+  className = "",
+  aiExplanationContent
 }: QuestionExplanationTabsProps) {
   const { session } = useAuth();
-  const [activeTab, setActiveTab] = useState<"yangming" | "supplement" | null>(null);
+  const [activeTab, setActiveTab] = useState<"ai" | "yangming" | "supplement" | null>(null);
   const [supplementCount, setSupplementCount] = useState<number | null>(null);
   const [reactions, setReactions] = useState<QuestionSupplementReactionSummary[]>([]);
   const [reactionLoading, setReactionLoading] = useState(false);
   const [reactionError, setReactionError] = useState("");
+  const hasAiExplanationContent = Boolean(aiExplanationContent);
   const handleCountChange = useCallback((count: number) => setSupplementCount(count), []);
   const handleReactionsChange = useCallback((nextReactions: QuestionSupplementReactionSummary[]) => {
     setReactions(nextReactions);
@@ -52,6 +56,10 @@ export function QuestionExplanationTabs({
       cancelled = true;
     };
   }, [question.id, session?.access_token]);
+
+  useEffect(() => {
+    setActiveTab((current) => (current === "ai" && !hasAiExplanationContent ? null : current));
+  }, [hasAiExplanationContent, question.id]);
 
   const pureChaosReaction = reactions.find((reaction) => reaction.type === "pure_chaos") ?? {
     type: "pure_chaos" as const,
@@ -85,6 +93,20 @@ export function QuestionExplanationTabs({
   return (
     <section className={`rounded-3xl border border-slate-200 bg-white/70 p-3 ${className}`}>
       <div className="flex flex-wrap gap-2">
+        {hasAiExplanationContent ? (
+          <button
+            type="button"
+            onClick={() => setActiveTab((current) => current === "ai" ? null : "ai")}
+            aria-pressed={activeTab === "ai"}
+            className={`rounded-full px-3 py-1.5 text-xs font-black ring-1 transition ${
+              activeTab === "ai"
+                ? "bg-slate-900 text-white ring-slate-900"
+                : "bg-white text-slate-700 ring-slate-200 hover:bg-slate-50"
+            }`}
+          >
+            AI 詳解
+          </button>
+        ) : null}
         <button
           type="button"
           onClick={() => setActiveTab((current) => current === "yangming" ? null : "yangming")}
@@ -142,6 +164,11 @@ export function QuestionExplanationTabs({
         </button>
       </div>
       {reactionError ? <p className="mt-2 text-xs font-semibold text-rose-700">{reactionError}</p> : null}
+      {activeTab === "ai" && aiExplanationContent ? (
+        <div className="mt-3">
+          {aiExplanationContent}
+        </div>
+      ) : null}
       {activeTab === "yangming" ? (
         <div className="mt-3">
           <YangmingExplanationPanel questionId={question.id} compact={compact} autoLoad hideButton />
