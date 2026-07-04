@@ -1,11 +1,18 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useAuth } from "@/components/AuthProvider";
-import { ReviewNotebook, getUnresolvedReviewItems } from "@/components/ReviewNotebook";
+import {
+  MANUAL_REVIEW_STATE_CHANGE_EVENT,
+  ReviewNotebook,
+  getUnresolvedReviewItems,
+  readManualReviewStateForScope,
+  type ManualReviewState
+} from "@/components/ReviewNotebook";
 import { applyQuestionClassificationOverride, getQuestionBankBySubjectFilter } from "@/data/med1QuestionBank";
 import { loadConfirmedQuestionClassificationOverrides } from "@/lib/cloudSync";
+import { buildNewQuizHref } from "@/lib/startSettingsUrl";
 import {
   DEFAULT_QUIZ_SETTINGS,
   getReviewQuestionItems,
@@ -13,14 +20,94 @@ import {
   mergeQuestionsWithSessionSnapshots
 } from "@/lib/quizAnalysis";
 import { loadCompletedSessions, saveQuizSettings } from "@/lib/storage";
-import { QuestionClassificationOverride, ReviewQuestionItem } from "@/types/quiz";
+import { QuestionClassificationOverride, QuizSession, QuizSettings, ReviewQuestionItem } from "@/types/quiz";
+
+const SIMULATION_REVIEW_SCOPE = "simulation-review";
+const SIMULATION_REVIEW_POOL_LABEL = "模擬考錯題庫";
+const SIMULATION_LIKE_MIN_QUESTION_COUNT = 60;
+
+function getSessionQuestionFootprint(session: QuizSession) {
+  return Math.max(
+    session.questionOrder?.length ?? 0,
+    session.generatedQuestions?.length ?? 0,
+    session.attempts.length
+  );
+}
+
+function getSessionPaperKeys(session: QuizSession) {
+  const paperKeys = new Set<string>();
+
+  for (const question of session.generatedQuestions ?? []) {
+    if (question.examCode && question.paperCode) {
+      paperKeys.add(`${question.examCode}-${question.paperCode}`);
+    }
+  }
+
+  for (const questionId of [
+    ...(session.questionOrder ?? []),
+    ...session.attempts.map((attempt) => attempt.questionId)
+  ]) {
+    const moexMatch = questionId.match(/^MOEX-([^-]+)-([^-]+)-Q\d+/);
+    if (moexMatch) paperKeys.add(`${moexMatch[1]}-${moexMatch[2]}`);
+
+    const aiMatch = questionId.match(/^(AI-[A-Z0-9-]+)-Q\d+$/);
+    if (aiMatch) paperKeys.add(aiMatch[1]);
+  }
+
+  return paperKeys;
+}
+
+function isSimulationSourceSession(session: QuizSession) {
+  const settings = session.settings;
+  const mode = settings?.mode as string | undefined;
+
+  if (settings?.customPoolLabel === SIMULATION_REVIEW_POOL_LABEL || settings?.customPoolLabel === "散題錯題庫") {
+    return false;
+  }
+
+  if (mode === "simulation") return true;
+  if (mode) return false;
+
+  const paperMode = settings?.paperMode;
+  if (paperMode === "past_paper" || paperMode === "ai_paper" || paperMode === "random_past_paper") {
+    return true;
+  }
+
+  if (getSessionPaperKeys(session).size === 1) return true;
+
+  return !settings && getSessionQuestionFootprint(session) >= SIMULATION_LIKE_MIN_QUESTION_COUNT;
+}
+
+function buildSimulationReviewSettings(items: ReviewQuestionItem[]): QuizSettings {
+  return {
+    ...DEFAULT_QUIZ_SETTINGS,
+    mode: "review",
+    questionCount: Math.max(1, items.length),
+    subjectFilter: "全部",
+    strictCustomQuestionPool: true,
+    customQuestionIds: items.map((item) => item.question.id),
+    customQuestionPayload: items.map((item) => item.question),
+    customPoolLabel: SIMULATION_REVIEW_POOL_LABEL
+  };
+}
+
+function buildSimulationReviewUrlSettings(items: ReviewQuestionItem[]): QuizSettings {
+  return {
+    ...buildSimulationReviewSettings(items.slice(0, 40)),
+    customQuestionPayload: undefined
+  };
+}
 
 export default function SimulationReviewPage() {
   const [simulationItems, setSimulationItems] = useState<ReviewQuestionItem[]>([]);
   const [classificationOverrides, setClassificationOverrides] = useState<
     Record<string, QuestionClassificationOverride>
   >({});
-  const { syncVersion } = useAuth();
+  const [localHistoryVersion, setLocalHistoryVersion] = useState(0);
+  const [manualReviewState, setManualReviewState] = useState<ManualReviewState>(() =>
+    readManualReviewStateForScope(SIMULATION_REVIEW_SCOPE, "guest")
+  );
+  const { user, syncVersion } = useAuth();
   const baseQuestions = useMemo(() => getQuestionBankBySubjectFilter("全部"), []);
   const allQuestions = useMemo(
     () =>
@@ -40,27 +127,51 @@ export default function SimulationReviewPage() {
 
   useEffect(() => {
     const sessions = loadCompletedSessions();
-    const simulationSessions = sessions.filter((session) => session.settings?.mode === "simulation");
+    const simulationSessions = sessions.filter(isSimulationSourceSession);
     const reviewQuestions = mergeQuestionsWithSessionSnapshots(allQuestions, simulationSessions);
     setSimulationItems(getReviewQuestionItems(reviewQuestions, simulationSessions, Number.MAX_SAFE_INTEGER));
-  }, [allQuestions, syncVersion]);
+  }, [allQuestions, syncVersion, localHistoryVersion, user?.id]);
+
+  useEffect(() => {
+    const refreshLocalHistory = () => setLocalHistoryVersion((version) => version + 1);
+    window.addEventListener("completed-sessions-change", refreshLocalHistory);
+    window.addEventListener("completed-question-history-change", refreshLocalHistory);
+    return () => {
+      window.removeEventListener("completed-sessions-change", refreshLocalHistory);
+      window.removeEventListener("completed-question-history-change", refreshLocalHistory);
+    };
+  }, []);
+
+  useEffect(() => {
+    const userId = user?.id ?? "guest";
+    setManualReviewState(readManualReviewStateForScope(SIMULATION_REVIEW_SCOPE, userId));
+
+    if (typeof window === "undefined") return;
+    const handleManualReviewStateChange = (event: Event) => {
+      const detail = (event as CustomEvent<{ scope?: string; userId?: string }>).detail;
+      if (detail?.scope && detail.scope !== SIMULATION_REVIEW_SCOPE) return;
+      if (detail?.userId && detail.userId !== userId) return;
+      setManualReviewState(readManualReviewStateForScope(SIMULATION_REVIEW_SCOPE, userId));
+    };
+
+    window.addEventListener(MANUAL_REVIEW_STATE_CHANGE_EVENT, handleManualReviewStateChange);
+    return () => {
+      window.removeEventListener(MANUAL_REVIEW_STATE_CHANGE_EVENT, handleManualReviewStateChange);
+    };
+  }, [user?.id]);
 
   function handleStartSimulationReview(filteredItems: ReviewQuestionItem[] = simulationItems) {
-    saveQuizSettings({
-      ...DEFAULT_QUIZ_SETTINGS,
-      mode: "review",
-      questionCount: Math.max(1, filteredItems.length),
-      subjectFilter: "全部",
-      strictCustomQuestionPool: true,
-      customQuestionIds: filteredItems.map((item) => item.question.id),
-      customQuestionPayload: filteredItems.map((item) => item.question),
-      customPoolLabel: "模擬考錯題庫"
-    });
+    saveQuizSettings(buildSimulationReviewSettings(filteredItems));
   }
 
+  const getSimulationReviewHref = useCallback(
+    (items: ReviewQuestionItem[]) => buildNewQuizHref(buildSimulationReviewUrlSettings(items)),
+    []
+  );
+
   const unresolvedSimulationItems = useMemo(
-    () => getUnresolvedReviewItems(simulationItems),
-    [simulationItems]
+    () => getUnresolvedReviewItems(simulationItems, manualReviewState),
+    [manualReviewState, simulationItems]
   );
   const simulationSnapshot = getReviewSnapshot(unresolvedSimulationItems);
 
@@ -83,7 +194,7 @@ export default function SimulationReviewPage() {
               返回模擬考專區
             </Link>
             <Link
-              href="/quiz?new=1"
+              href={getSimulationReviewHref(unresolvedSimulationItems)}
               onClick={(event) => {
                 if (unresolvedSimulationItems.length === 0) {
                   event.preventDefault();
@@ -120,10 +231,11 @@ export default function SimulationReviewPage() {
           title="模擬考待複習題庫"
           description="這裡只整理整份模擬考做出來的錯題與低信心題。"
           startLabel="開始模擬考待複習"
+          getStartHref={getSimulationReviewHref}
           onStartReview={handleStartSimulationReview}
           items={simulationItems}
           allQuestions={allQuestions}
-          manualEditScope="simulation-review"
+          manualEditScope={SIMULATION_REVIEW_SCOPE}
         />
       </div>
     </main>
