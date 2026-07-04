@@ -1050,6 +1050,16 @@ const questionTextOverrides: Record<string, QuestionTextOverride> = {
     },
     testedConcept: "假陽性率為沒有病者中篩檢陽性的比例，即 c/(c+d)。"
   },
+  "MOEX-100030-1101-Q073": {
+    stem:
+      "某些人類白血球抗原（Human Leukocyte Antigens, HLA）基因在某自體免疫疾病患者中的存在有較為增高現象，是為有較高的「相較性的危險值」（relative risk），引起自體免疫致病性。有關 HLA-B27 與疾病之相關性，下列那一項敘述正確？",
+    options: {
+      A: "對於第一型糖尿病（type 1 diabetes mellitus）",
+      B: "對於葛瑞夫氏症（Graves' disease）",
+      C: "對於尋常天疱瘡（pemphigus vulgaris）",
+      D: "對於僵直性脊椎炎（ankylosing spondylitis）"
+    }
+  },
   "MOEX-101030-1101-Q100": {
     stem:
       "依下表數據計算下列各指標，下列何者錯誤？\n\n疾病真實狀況\n診斷結果｜有｜無｜Total\n有｜68｜6｜74\n無｜12｜114｜126\nTotal｜80｜120｜200",
@@ -1072,6 +1082,14 @@ const questionTextOverrides: Record<string, QuestionTextOverride> = {
       B: "Vif 可以拮抗細胞中 APOBEC-3G 的作用",
       C: "Vpu 可以降低細胞上 CD4 的表現",
       D: "gp41 幫助病毒與細胞膜的融合"
+    }
+  },
+  "MOEX-103100-2101-Q042": {
+    options: {
+      A: "細胞中合成膽固醇的前驅物為乙醯輔酶（acetyl-CoA）",
+      B: "運送由食物攝取之三酸甘油酯（triacylglycerol）的主要脂蛋白（lipoprotein），為超低密度脂蛋白（VLDL, very low density lipoprotein）",
+      C: "低密度脂蛋白（LDL, low density lipoprotein）主要功能是將膽固醇送到周邊組織，易增加膽固醇在血管內壁堆積的風險，因此被稱為壞膽固醇（bad cholesterol）",
+      D: "高密度脂蛋白（HDL, high density lipoprotein）主要功能是將膽固醇從周邊組織運回肝臟代謝，因此被稱為好膽固醇（good cholesterol）"
     }
   },
   "MOEX-105020-5301-Q043": {
