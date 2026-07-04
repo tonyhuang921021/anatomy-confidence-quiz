@@ -1,18 +1,19 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useAuth } from "@/components/AuthProvider";
 import { ReviewNotebook, getUnresolvedReviewItems } from "@/components/ReviewNotebook";
 import { applyQuestionClassificationOverride, getQuestionBankBySubjectFilter } from "@/data/med1QuestionBank";
 import { loadConfirmedQuestionClassificationOverrides } from "@/lib/cloudSync";
+import { buildNewQuizHref } from "@/lib/startSettingsUrl";
 import {
   DEFAULT_QUIZ_SETTINGS,
   buildQuestionHistoryMap,
   getReviewQuestionItems,
 } from "@/lib/quizAnalysis";
 import { loadCompletedSessions, saveQuizSettings } from "@/lib/storage";
-import { Question, QuestionClassificationOverride, QuizSession, ReviewQuestionItem } from "@/types/quiz";
+import { Question, QuestionClassificationOverride, QuizSession, QuizSettings, ReviewQuestionItem } from "@/types/quiz";
 
 function isPracticeReviewSession(session: QuizSession) {
   return (
@@ -61,6 +62,28 @@ function buildReviewCandidateQuestions(
   }
 
   return Array.from(merged.values());
+}
+
+function buildPracticeReviewSettings(items: ReviewQuestionItem[]): QuizSettings {
+  const questionIds = items.map((item) => item.question.id);
+
+  return {
+    ...DEFAULT_QUIZ_SETTINGS,
+    mode: "review",
+    questionCount: 10,
+    subjectFilter: "全部",
+    strictCustomQuestionPool: true,
+    customQuestionIds: questionIds,
+    customQuestionPayload: items.map((item) => item.question),
+    customPoolLabel: "散題錯題庫"
+  };
+}
+
+function buildPracticeReviewUrlSettings(items: ReviewQuestionItem[]): QuizSettings {
+  return {
+    ...buildPracticeReviewSettings(items.slice(0, 40)),
+    customQuestionPayload: undefined
+  };
 }
 
 export default function ReviewPage() {
@@ -157,17 +180,13 @@ export default function ReviewPage() {
   }, [isFullscreenReview]);
 
   function handleStartPracticeReview(filteredItems: ReviewQuestionItem[] = practiceItems) {
-    saveQuizSettings({
-      ...DEFAULT_QUIZ_SETTINGS,
-      mode: "review",
-      questionCount: 10,
-      subjectFilter: "全部",
-      strictCustomQuestionPool: true,
-      customQuestionIds: filteredItems.map((item) => item.question.id),
-      customQuestionPayload: filteredItems.map((item) => item.question),
-      customPoolLabel: "散題錯題庫"
-    });
+    saveQuizSettings(buildPracticeReviewSettings(filteredItems));
   }
+
+  const getPracticeReviewHref = useCallback(
+    (items: ReviewQuestionItem[]) => buildNewQuizHref(buildPracticeReviewUrlSettings(items)),
+    []
+  );
 
   function handleCloseFullscreenReview() {
     setIsFullscreenReviewVisible(false);
@@ -212,7 +231,7 @@ export default function ReviewPage() {
               返回首頁
             </Link>
             <Link
-              href="/quiz?new=1"
+              href={getPracticeReviewHref(unresolvedPracticeItems)}
               onClick={(event) => {
                 if (unresolvedPracticeItems.length === 0) {
                   event.preventDefault();
@@ -250,6 +269,7 @@ export default function ReviewPage() {
             title="散題待複習題庫"
             description="這裡只整理平常零散刷題累積下來的錯題與低信心題。"
             startLabel="開始散題待複習"
+            getStartHref={getPracticeReviewHref}
             onStartReview={handleStartPracticeReview}
             items={practiceItems}
             allQuestions={allQuestions}
@@ -298,6 +318,7 @@ export default function ReviewPage() {
                 title="散題待複習題庫"
                 description="手機滿版複習模式。看完可按右上角返回頁面。"
                 startLabel="開始散題待複習"
+                getStartHref={getPracticeReviewHref}
                 onStartReview={handleStartPracticeReview}
                 items={practiceItems}
                 allQuestions={allQuestions}

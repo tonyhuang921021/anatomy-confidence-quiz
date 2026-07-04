@@ -148,6 +148,37 @@ test("錯題完成 streak 只看最近一次答錯後的連續答對，不被低
   assert.equal(history?.correctStreakAfterLatestRisk, 0);
 });
 
+test("錯題複習只收到錯題池時，不會用未做過題目補滿", () => {
+  const reviewQuestion = makeQuestion("q-review-only");
+  const order = createQuestionOrder(
+    [reviewQuestion],
+    [
+      {
+        attempts: [
+          {
+            questionId: reviewQuestion.id,
+            selectedAnswer: "B",
+            correctAnswer: "A",
+            isCorrect: false,
+            confidence: 4,
+            answeredAt: new Date(Date.UTC(2026, 0, 4)).toISOString()
+          }
+        ]
+      }
+    ],
+    {
+      ...baseSettings,
+      mode: "review",
+      questionCount: 10,
+      strictCustomQuestionPool: true,
+      customQuestionIds: [reviewQuestion.id],
+      customPoolLabel: "散題錯題庫"
+    }
+  );
+
+  assert.deepEqual(order, [reviewQuestion.id]);
+});
+
 test("AI prompt 會保留模擬考作答時打叉排除的選項", () => {
   const question = makeQuestion("q-elimination");
   const attempt: Attempt = {

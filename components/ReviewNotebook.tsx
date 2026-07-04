@@ -396,6 +396,7 @@ type ReviewNotebookProps = {
   description?: string;
   startLabel?: string;
   startHref?: string;
+  getStartHref?: (items: ReviewQuestionItem[]) => string;
   onStartReview?: (items: ReviewQuestionItem[]) => void;
   fullscreenMobile?: boolean;
   headerAction?: ReactNode;
@@ -409,6 +410,7 @@ export function ReviewNotebook({
   description = "先把錯題和沒信心的題目分開看，每區都依最近作答時間排序。",
   startLabel = "開始錯題複習",
   startHref = "/quiz?new=1",
+  getStartHref,
   onStartReview,
   fullscreenMobile = false,
   headerAction,
@@ -520,6 +522,10 @@ export function ReviewNotebook({
     [visibleItems]
   );
   const visibleQuestionIdsKey = useMemo(() => visibleQuestionIds.join("|"), [visibleQuestionIds]);
+  const effectiveStartHref = useMemo(
+    () => getStartHref?.(unresolvedItems) ?? startHref,
+    [getStartHref, startHref, unresolvedItems]
+  );
 
   useEffect(() => {
     if (activeCategory === "resolved" && resolvedItems.length === 0) {
@@ -947,7 +953,7 @@ export function ReviewNotebook({
         <div className="flex flex-wrap items-center gap-3">
           {headerAction}
           <Link
-            href={startHref}
+            href={effectiveStartHref}
             onClick={(event) => {
               if (unresolvedItems.length === 0) {
                 event.preventDefault();
