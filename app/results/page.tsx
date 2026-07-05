@@ -1849,9 +1849,9 @@ function ResultsPageContent() {
       <span className="flex max-w-full min-w-0 items-center gap-2 align-top">
         <span
           aria-hidden="true"
-          className={`inline-flex h-5 w-5 shrink-0 items-center justify-center text-xs transition duration-150 group-open:rotate-90 ${triangleClass}`}
+          className={`inline-flex h-5 w-5 shrink-0 items-center justify-center transition duration-150 group-open:rotate-90 ${triangleClass}`}
         >
-          ▶
+          <span className="block h-0 w-0 border-y-[6px] border-l-[9px] border-y-transparent border-l-current" />
         </span>
         <span className="min-w-0 flex-1 overflow-hidden">
           <span className="flex min-w-0 flex-wrap items-baseline gap-x-1.5 gap-y-1">
