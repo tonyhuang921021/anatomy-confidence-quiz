@@ -14,6 +14,10 @@ function normalizeQuestionText(text: string) {
   return text
     .replaceAll("", "酶")
     .replace(/([\u4e00-\u9fff])\s+([\u4e00-\u9fff])/gu, "$1$2")
+    .replace(/下\s*2\s*列/g, "下列")
+    .replace(/\b(\d)\s+(\d)(?=\d|\s*(?:mL|L|dL|g|mg|mmHg|mEq|IU|U|%|％)\b)/g, "$1$2")
+    .replace(/\b(CO|O|HCO|H|N|NO|SO|SiO)\s+(\d)(?=\b|[-+])/g, "$1$2")
+    .replace(/\bO\s+bound\s+to\s+hemoglobin\b/gi, "O2 bound to hemoglobin")
     .replace(/\b([A-Z])\s+([A-Z]{2,})\b/g, "$1$2")
     .replace(/\bV\s+下降，K\s+下降\s+max\s+M\b/g, "Vmax 下降，KM 下降")
     .replace(/\bV\s+不變，K\s+下降\s+max\s+M\b/g, "Vmax 不變，KM 下降")
