@@ -13,7 +13,7 @@ import {
 import type { Session, User } from "@supabase/supabase-js";
 import {
   syncLocalCompletedSessionsForCurrentUser,
-  syncLocalCurrentSessionForCurrentUser,
+  syncCurrentSessionForCurrentUser,
   syncLeaderboardProfileForCurrentUser
 } from "@/lib/cloudSync";
 import { freeLocalStorageSpaceForAuth, setActiveStorageUser } from "@/lib/storage";
@@ -275,7 +275,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         void syncLeaderboardProfileForCurrentUser(effectiveUser, completedSessions).catch((error) => {
           console.error("Leaderboard sync skipped:", error);
         });
-        return syncLocalCurrentSessionForCurrentUser(userId);
+        return syncCurrentSessionForCurrentUser(userId);
       })
       .then(() => {
         setSyncStatus("ready");
