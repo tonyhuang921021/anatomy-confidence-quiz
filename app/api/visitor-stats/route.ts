@@ -7,7 +7,6 @@ export const dynamic = "force-dynamic";
 export const revalidate = 0;
 
 const ONLINE_WINDOW_MS = 10 * 60 * 1000;
-const ONLINE_VISITOR_LIST_LIMIT = 30;
 const ONLINE_VISITOR_SCAN_LIMIT = 120;
 const VISITOR_STATS_CACHE_CONTROL = "public, max-age=30, s-maxage=60, stale-while-revalidate=300";
 const VISITOR_STATS_MEMORY_CACHE_MS = 45 * 1000;
@@ -185,7 +184,7 @@ export async function GET(request: NextRequest) {
       totalVisitors: 0,
       onlineVisitors: online.length,
       updatedAt: new Date().toISOString(),
-      ...(includeOnline ? { online: online.slice(0, ONLINE_VISITOR_LIST_LIMIT) } : {})
+      ...(includeOnline ? { online } : {})
     };
     setCachedStats(includeOnline, stats);
 

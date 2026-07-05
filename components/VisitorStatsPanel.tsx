@@ -90,6 +90,7 @@ export function VisitorStatsPanel({ compact = false }: VisitorStatsPanelProps) {
   const [panelPosition, setPanelPosition] = useState<CSSProperties>({ right: 16, top: 56 });
   const wrapperRef = useRef<HTMLDivElement | null>(null);
   const buttonRef = useRef<HTMLButtonElement | null>(null);
+  const compactOnlineCount = open && stats.online ? stats.online.length : stats.onlineVisitors;
 
   useEffect(() => {
     if (isSupabaseRecoveryMode()) {
@@ -242,7 +243,7 @@ export function VisitorStatsPanel({ compact = false }: VisitorStatsPanelProps) {
           className="rounded-full bg-emerald-50 px-3 py-1 text-[11px] font-bold text-emerald-800 ring-1 ring-emerald-100 transition hover:bg-emerald-100"
           aria-expanded={open}
         >
-          {loading ? "線上讀取中" : `線上 ${stats.onlineVisitors} 人`}
+          {loading ? "線上讀取中" : `線上 ${compactOnlineCount} 人`}
         </button>
         {open ? (
           <OnlineVisitorList
