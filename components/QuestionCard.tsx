@@ -49,7 +49,7 @@ function getStableHash(text: string) {
 
 function getAcceptedAnswerSet(question: Question, fallbackAnswer: OptionKey) {
   if (question.answerCreditType === "all_credit") {
-    return new Set<OptionKey>();
+    return new Set(optionKeys.filter((key) => typeof question.options[key] === "string"));
   }
 
   if (

@@ -42,10 +42,13 @@ function buildQuestionPrompt({
     .join("\n");
 
   const acceptedAnswerText =
-    (question.answerCreditType === "multiple_accepted" || question.answerCreditType === "multiple_answers") &&
-    question.acceptedAnswers?.length
-      ? `${question.acceptedAnswers.join(" / ")} 皆可`
-      : correctAnswer ?? question.answer;
+    question.answerCreditType === "all_credit"
+      ? `${optionKeys.filter((key) => typeof question.options[key] === "string").join(" / ")} 皆可（官方送分）`
+      : (question.answerCreditType === "multiple_accepted" ||
+            question.answerCreditType === "multiple_answers") &&
+          question.acceptedAnswers?.length
+        ? `${question.acceptedAnswers.join(" / ")} 皆可`
+        : correctAnswer ?? question.answer;
 
   return [
     "請用繁體中文詳細解釋這題，請包含：",
