@@ -39,6 +39,24 @@ const COMPLETED_SESSIONS_RECENT_RECOVERY_LIMIT = 240;
 const CLOUD_COMPLETED_SESSIONS_FALLBACK_LIMITS = [500, 300, 180, 90] as const;
 const PENDING_COMPLETED_SESSION_UPLOAD_LIMIT = 80;
 const RECENT_COMPLETED_SESSION_HANDOFF_LIMIT = 24;
+const COMPLETED_STORAGE_SYNC_CHANNEL = "anatomy-confidence-completed-storage-sync";
+const COMPLETED_STORAGE_SYNC_SOURCE_ID = `tab-${Date.now().toString(36)}-${Math.random()
+  .toString(36)
+  .slice(2)}`;
+
+type CompletedStorageSyncChange = {
+  sourceId: string;
+  userId?: string;
+  sessions?: boolean;
+  history?: boolean;
+  current?: boolean;
+  completedSessions?: QuizSession[];
+  historyEntries?: CompletedQuestionHistoryEntry[];
+};
+
+let completedStorageSyncInstalled = false;
+let completedStorageSyncInstalledWindow: Window | null = null;
+let completedStorageSyncChannel: BroadcastChannel | null | undefined;
 
 export type CompletedQuestionHistoryEntry = {
   questionId: string;
@@ -126,6 +144,160 @@ function getScopedKey(baseKey: string) {
 function getScopedKeyForUser(baseKey: string, userId: string) {
   return `${baseKey}:${userId || GUEST_USER_ID}`;
 }
+
+function getUserIdFromScopedStorageKey(key: string, baseKey: string) {
+  if (key === baseKey) return GUEST_USER_ID;
+  const prefix = `${baseKey}:`;
+  return key.startsWith(prefix) ? key.slice(prefix.length) || GUEST_USER_ID : null;
+}
+
+function getCompletedStorageChangeFromKey(key: string | null): Omit<CompletedStorageSyncChange, "sourceId"> | null {
+  if (!key) return null;
+
+  const sessionUserId =
+    getUserIdFromScopedStorageKey(key, COMPLETED_SESSIONS_KEY) ??
+    getUserIdFromScopedStorageKey(key, CLOUD_COMPLETED_SESSIONS_KEY) ??
+    getUserIdFromScopedStorageKey(key, PENDING_COMPLETED_SESSION_UPLOADS_KEY) ??
+    getUserIdFromScopedStorageKey(key, RECENT_COMPLETED_SESSION_HANDOFF_KEY);
+  if (sessionUserId) return { userId: sessionUserId, sessions: true, history: true };
+
+  const historyUserId = getUserIdFromScopedStorageKey(key, COMPLETED_QUESTION_HISTORY_KEY);
+  if (historyUserId) return { userId: historyUserId, history: true };
+
+  const currentUserId = getUserIdFromScopedStorageKey(key, CURRENT_SESSION_KEY);
+  if (currentUserId) return { userId: currentUserId, current: true };
+
+  return null;
+}
+
+function invalidateCompletedStorageCaches(userId?: string) {
+  if (!userId) {
+    completedSessionsMemoryCache.clear();
+    completedSessionIdMemoryCache.clear();
+    completedQuestionHistoryMemoryCache.clear();
+    return;
+  }
+
+  completedSessionsMemoryCache.delete(userId);
+  completedSessionIdMemoryCache.delete(userId);
+  completedQuestionHistoryMemoryCache.delete(userId);
+}
+
+function getCompletedSessionBroadcastPayload(sessions: QuizSession[]) {
+  return sessions
+    .filter((session) => Boolean(session.completedAt))
+    .slice(-32)
+    .map(compactSessionForStorage);
+}
+
+function getCompletedHistoryBroadcastPayload(entries: CompletedQuestionHistoryEntry[]) {
+  return mergeCompletedQuestionHistoryEntries([], entries).slice(0, 120);
+}
+
+function applyExternalCompletedStoragePayload(change: CompletedStorageSyncChange) {
+  if (!change.userId) return;
+
+  const incomingSessions = normalizeCompletedSessionList(change.completedSessions ?? []);
+  if (incomingSessions.length > 0) {
+    const existingSessions = loadCompletedSessionsForUser(change.userId);
+    const mergedSessions = normalizeCompletedSessionList([
+      ...existingSessions,
+      ...incomingSessions
+    ]);
+    cacheCompletedSessionsForUser(change.userId, mergedSessions);
+
+    const existingHistory = loadCompletedQuestionHistoryEntriesForUser(change.userId);
+    const incomingHistory = buildCompletedQuestionHistoryEntriesFromSessions(incomingSessions);
+    cacheCompletedQuestionHistoryForUser(
+      change.userId,
+      mergeCompletedQuestionHistoryEntries(existingHistory, incomingHistory)
+    );
+  }
+
+  const incomingHistory = getCompletedHistoryBroadcastPayload(change.historyEntries ?? []);
+  if (incomingHistory.length > 0) {
+    const existingHistory = loadCompletedQuestionHistoryEntriesForUser(change.userId);
+    cacheCompletedQuestionHistoryForUser(
+      change.userId,
+      mergeCompletedQuestionHistoryEntries(existingHistory, incomingHistory)
+    );
+  }
+}
+
+function dispatchCompletedStorageChange(change: Omit<CompletedStorageSyncChange, "sourceId">) {
+  if (!isBrowser()) return;
+  const userId = change.userId || getActiveStorageUser();
+
+  if (change.sessions) {
+    window.dispatchEvent(new CustomEvent("completed-sessions-change", { detail: { userId } }));
+  }
+
+  if (change.history) {
+    window.dispatchEvent(new CustomEvent("completed-question-history-change", { detail: { userId } }));
+  }
+
+  if (change.current) {
+    window.dispatchEvent(new CustomEvent("current-session-change", { detail: null }));
+  }
+}
+
+function handleExternalCompletedStorageChange(change: CompletedStorageSyncChange) {
+  if (!isBrowser() || change.sourceId === COMPLETED_STORAGE_SYNC_SOURCE_ID) return;
+  invalidateCompletedStorageCaches(change.userId);
+  applyExternalCompletedStoragePayload(change);
+  dispatchCompletedStorageChange(change);
+}
+
+function getCompletedStorageSyncChannel() {
+  if (!isBrowser() || typeof BroadcastChannel === "undefined") return null;
+  if (completedStorageSyncChannel !== undefined) return completedStorageSyncChannel;
+
+  try {
+    completedStorageSyncChannel = new BroadcastChannel(COMPLETED_STORAGE_SYNC_CHANNEL);
+    (completedStorageSyncChannel as BroadcastChannel & { unref?: () => void }).unref?.();
+    completedStorageSyncChannel.onmessage = (event) => {
+      const change = event.data as CompletedStorageSyncChange | undefined;
+      if (!change || typeof change !== "object") return;
+      handleExternalCompletedStorageChange(change);
+    };
+  } catch {
+    completedStorageSyncChannel = null;
+  }
+
+  return completedStorageSyncChannel;
+}
+
+function installCompletedStorageCrossTabSync() {
+  if (!isBrowser()) return;
+  if (completedStorageSyncInstalled && completedStorageSyncInstalledWindow === window) return;
+  completedStorageSyncInstalled = true;
+  completedStorageSyncInstalledWindow = window;
+
+  getCompletedStorageSyncChannel();
+  window.addEventListener("storage", (event) => {
+    const change = getCompletedStorageChangeFromKey(event.key);
+    if (!change) return;
+    invalidateCompletedStorageCaches(change.userId);
+    dispatchCompletedStorageChange(change);
+  });
+}
+
+function broadcastCompletedStorageChange(change: Omit<CompletedStorageSyncChange, "sourceId">) {
+  if (!isBrowser()) return;
+  installCompletedStorageCrossTabSync();
+  const payload: CompletedStorageSyncChange = {
+    sourceId: COMPLETED_STORAGE_SYNC_SOURCE_ID,
+    ...change
+  };
+
+  try {
+    getCompletedStorageSyncChannel()?.postMessage(payload);
+  } catch {
+    // BroadcastChannel is a freshness hint; local writes still remain durable.
+  }
+}
+
+installCompletedStorageCrossTabSync();
 
 function getCompletedHistorySourceUserIds(userId: string) {
   const targetUserId = userId || getActiveStorageUser();
@@ -380,6 +552,14 @@ export function saveCompletedQuestionHistoryEntriesForUser(
     window.dispatchEvent(
       new CustomEvent("completed-question-history-change", { detail: { userId } })
     );
+  }
+
+  if (changed) {
+    broadcastCompletedStorageChange({
+      userId,
+      history: true,
+      historyEntries: getCompletedHistoryBroadcastPayload(normalized)
+    });
   }
 
   return didPersist;
@@ -1022,6 +1202,7 @@ export function saveCurrentSession(session: QuizSession) {
 
   safeLocalStorageSetItem(getScopedKey(CURRENT_SESSION_KEY), JSON.stringify(compactSessionForStorage(session)));
   window.dispatchEvent(new CustomEvent("current-session-change", { detail: session }));
+  broadcastCompletedStorageChange({ userId: activeUser, current: true });
 }
 
 export function loadCurrentSession(): QuizSession | null {
@@ -1045,13 +1226,16 @@ export function loadCurrentSessionForUser(userId: string): QuizSession | null {
 
 export function clearCurrentSession() {
   if (!isBrowser()) return;
+  const activeUser = getActiveStorageUser();
   safeLocalStorageRemoveItem(getScopedKey(CURRENT_SESSION_KEY));
   window.dispatchEvent(new CustomEvent("current-session-change", { detail: null }));
+  broadcastCompletedStorageChange({ userId: activeUser, current: true });
 }
 
 export function clearCurrentSessionForUser(userId: string) {
   if (!isBrowser()) return;
   safeLocalStorageRemoveItem(getScopedKeyForUser(CURRENT_SESSION_KEY, userId));
+  broadcastCompletedStorageChange({ userId, current: true });
 }
 
 export function clearMatchingCurrentSessions(sessionId: string, userIds: string[] = []) {
@@ -1079,6 +1263,9 @@ export function clearMatchingCurrentSessions(sessionId: string, userIds: string[
   }
 
   window.dispatchEvent(new CustomEvent("current-session-change", { detail: null }));
+  for (const userId of scopedUserIds) {
+    broadcastCompletedStorageChange({ userId, current: true });
+  }
 }
 
 export function saveCompletedSession(session: QuizSession) {
@@ -1106,6 +1293,13 @@ export function saveCompletedSession(session: QuizSession) {
       clearMatchingCurrentSessions(item.id);
     }
     window.dispatchEvent(new CustomEvent("completed-sessions-change", { detail: normalized }));
+    broadcastCompletedStorageChange({
+      userId: activeUser,
+      sessions: true,
+      history: true,
+      current: true,
+      completedSessions: getCompletedSessionBroadcastPayload(normalized)
+    });
     return true;
   }
 
@@ -1152,6 +1346,13 @@ export function saveCompletedSessionsForUser(userId: string, sessions: QuizSessi
     if (activeUser === getActiveStorageUser()) {
       window.dispatchEvent(new CustomEvent("completed-sessions-change", { detail: normalized }));
     }
+    broadcastCompletedStorageChange({
+      userId: activeUser,
+      sessions: true,
+      history: true,
+      current: true,
+      completedSessions: getCompletedSessionBroadcastPayload(normalized)
+    });
     return false;
   }
 
@@ -1162,6 +1363,13 @@ export function saveCompletedSessionsForUser(userId: string, sessions: QuizSessi
   if (activeUser === getActiveStorageUser()) {
     window.dispatchEvent(new CustomEvent("completed-sessions-change", { detail: normalized }));
   }
+  broadcastCompletedStorageChange({
+    userId: activeUser,
+    sessions: true,
+    history: true,
+    current: true,
+    completedSessions: getCompletedSessionBroadcastPayload(normalized)
+  });
   return true;
 }
 
@@ -1239,6 +1447,12 @@ export function saveRecentCompletedSessionHandoffForUser(
 
   completedSessionsMemoryCache.delete(userId);
   completedSessionIdMemoryCache.delete(userId);
+  broadcastCompletedStorageChange({
+    userId,
+    sessions: true,
+    history: true,
+    completedSessions: getCompletedSessionBroadcastPayload(normalized)
+  });
 
   return didStore;
 }
@@ -1294,6 +1508,12 @@ export function saveCloudCompletedSessionsForUser(userId: string, sessions: Quiz
     );
   }
 
+  broadcastCompletedStorageChange({
+    userId,
+    sessions: true,
+    history: true,
+    completedSessions: getCompletedSessionBroadcastPayload(normalized)
+  });
   return didPersist;
 }
 
@@ -1333,6 +1553,12 @@ function savePendingCompletedSessionUploadsForUser(userId: string, sessions: Qui
     );
   }
 
+  broadcastCompletedStorageChange({
+    userId,
+    sessions: true,
+    history: true,
+    completedSessions: getCompletedSessionBroadcastPayload(normalized)
+  });
   return didStore;
 }
 
@@ -1449,6 +1675,12 @@ export function clearHistory() {
   safeSessionStorageRemoveItem(getScopedKey(COMPLETED_QUESTION_HISTORY_KEY));
   safeLocalStorageRemoveItem(getScopedKey(CURRENT_SESSION_KEY));
   safeSessionStorageRemoveItem(getScopedKey(CURRENT_SESSION_KEY));
+  broadcastCompletedStorageChange({
+    userId: activeUser,
+    sessions: true,
+    history: true,
+    current: true
+  });
 }
 
 export function saveQuizSettings(settings: QuizSettings) {

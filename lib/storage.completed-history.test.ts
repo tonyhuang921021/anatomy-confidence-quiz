@@ -54,10 +54,25 @@ function createStorageMock(options: { failWrites?: boolean } = {}): Storage {
 function installBrowserStorage(options: { failLocalWrites?: boolean } = {}) {
   const localStorage = createStorageMock({ failWrites: options.failLocalWrites });
   const sessionStorage = createStorageMock();
+  const listeners = new Map<string, Set<EventListener>>();
   const windowMock = {
     localStorage,
     sessionStorage,
-    dispatchEvent: () => true
+    addEventListener(type: string, listener: EventListener) {
+      const bucket = listeners.get(type) ?? new Set<EventListener>();
+      bucket.add(listener);
+      listeners.set(type, bucket);
+    },
+    removeEventListener(type: string, listener: EventListener) {
+      listeners.get(type)?.delete(listener);
+    },
+    dispatchEvent(event: Event) {
+      const type = event.type;
+      for (const listener of listeners.get(type) ?? []) {
+        listener(event);
+      }
+      return true;
+    }
   } as unknown as Window & typeof globalThis;
 
   Object.defineProperty(globalThis, "window", {
@@ -201,6 +216,28 @@ test("儲存較短完成回合清單時，也不縮掉既有作答紀錄清單",
 
   assert.ok(loadedSessionIds.has("existing-session"));
   assert.ok(loadedSessionIds.has("new-session"));
+});
+
+test("跨分頁 storage 事件要清掉完成回合記憶體快取", () => {
+  const { localStorage } = installBrowserStorage();
+  const userId = "user-cross-tab-cache";
+  const storageKey = `anatomy-confidence-completed-sessions:${userId}`;
+  const firstSession = makeSession("first-tab-session", ["q-first"]);
+  const secondSession = makeSession("second-tab-session", ["q-second"]);
+
+  setActiveStorageUser(userId);
+  saveCompletedSessionsForUser(userId, [firstSession]);
+  assert.equal(loadCompletedSessionsForUser(userId).length, 1);
+
+  localStorage.setItem(storageKey, JSON.stringify([firstSession, secondSession]));
+  window.dispatchEvent({ type: "storage", key: storageKey } as unknown as Event);
+
+  const loadedSessionIds = new Set(
+    loadCompletedSessionsForUser(userId).map((session) => session.id)
+  );
+
+  assert.ok(loadedSessionIds.has("first-tab-session"));
+  assert.ok(loadedSessionIds.has("second-tab-session"));
 });
 
 test("雲端完成回合快取也要合併進每題歷史，不可讓舊快取倒退進度", () => {
