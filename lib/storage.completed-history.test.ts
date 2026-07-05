@@ -158,6 +158,76 @@ test("指定帳號儲存完成回合時，不依賴目前 active user", () => {
   );
 });
 
+test("儲存較短完成回合清單時，不覆蓋已存在的每題歷史", () => {
+  installBrowserStorage();
+  setActiveStorageUser("user-history-merge");
+
+  saveCompletedQuestionHistoryEntriesForUser(
+    "user-history-merge",
+    buildCompletedQuestionHistoryEntriesFromSessions([
+      { attempts: [makeAttempt("q-existing", 1), makeAttempt("q-newer", 2)] }
+    ])
+  );
+
+  saveCompletedSessionsForUser("user-history-merge", [
+    makeSession("shorter-session", ["q-existing"])
+  ]);
+
+  const loadedIds = new Set(
+    loadCompletedQuestionHistoryEntriesForUser("user-history-merge").map(
+      (entry) => entry.questionId
+    )
+  );
+
+  assert.ok(loadedIds.has("q-existing"));
+  assert.ok(loadedIds.has("q-newer"));
+});
+
+test("儲存較短完成回合清單時，也不縮掉既有作答紀錄清單", () => {
+  installBrowserStorage();
+  setActiveStorageUser("user-session-list-merge");
+
+  saveCompletedSessionsForUser("user-session-list-merge", [
+    makeSession("existing-session", ["q-existing"])
+  ]);
+
+  saveCompletedSessionsForUser("user-session-list-merge", [
+    makeSession("new-session", ["q-new"])
+  ]);
+
+  const loadedSessionIds = new Set(
+    loadCompletedSessionsForUser("user-session-list-merge").map((session) => session.id)
+  );
+
+  assert.ok(loadedSessionIds.has("existing-session"));
+  assert.ok(loadedSessionIds.has("new-session"));
+});
+
+test("雲端完成回合快取也要合併進每題歷史，不可讓舊快取倒退進度", () => {
+  installBrowserStorage();
+  setActiveStorageUser("user-cloud-history-merge");
+
+  saveCompletedQuestionHistoryEntriesForUser(
+    "user-cloud-history-merge",
+    buildCompletedQuestionHistoryEntriesFromSessions([
+      { attempts: [makeAttempt("q-local-latest", 3)] }
+    ])
+  );
+
+  saveCloudCompletedSessionsForUser("user-cloud-history-merge", [
+    makeSession("cloud-session", ["q-cloud"])
+  ]);
+
+  const loadedIds = new Set(
+    loadCompletedQuestionHistoryEntriesForUser("user-cloud-history-merge").map(
+      (entry) => entry.questionId
+    )
+  );
+
+  assert.ok(loadedIds.has("q-local-latest"));
+  assert.ok(loadedIds.has("q-cloud"));
+});
+
 test("登入帳號讀完成回合時，也要看得到同裝置 guest 完成紀錄", () => {
   installBrowserStorage();
 

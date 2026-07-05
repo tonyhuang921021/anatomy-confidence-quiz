@@ -23,7 +23,6 @@ import {
   compactGeneratedQuestionsForStorage,
   compactQuestionForStorage,
   compactSessionForStorage,
-  buildCompletedQuestionHistoryEntriesFromSessions,
   clearMatchingCurrentSessions,
   getCompletedSessionsStorageLengthForUser,
   getCanonicalSessionId,
@@ -41,7 +40,6 @@ import {
   removePendingCompletedSessionUploadsForUser,
   saveCurrentSession,
   saveCloudCompletedSessionsForUser,
-  saveCompletedQuestionHistoryEntriesForUser,
   saveCompletedSessionsForUser,
   saveRecentCompletedSessionHandoffForUser
 } from "@/lib/storage";
@@ -2110,11 +2108,10 @@ export async function syncCompletedSessionsForCurrentUser(userId: string) {
     recoveredCompletionSessions.filter(isCompletedQuizSession)
   );
 
-  saveCompletedSessionsForUser(userId, mergedSessions);
-  saveCompletedQuestionHistoryEntriesForUser(
-    userId,
-    buildCompletedQuestionHistoryEntriesFromSessions(mergedSessions)
-  );
+  if (mergedSessions.length > 0) {
+    saveCompletedSessionsForUser(userId, mergedSessions);
+    mergeCompletedQuestionHistoryFromSessionsForUser(userId, mergedSessions);
+  }
   if (sessionsToBackfill.length > 0) {
     void upsertSessionsForUserInBatchesSafely(userId, sessionsToBackfill);
   }
@@ -2216,13 +2213,14 @@ export async function syncLocalCompletedSessionsForCurrentUser(userId: string) {
   }
 
   if (hasHeavyLocalHistory) {
-    mergeCompletedQuestionHistoryFromSessionsForUser(userId, mergedSessions);
+    if (mergedSessions.length > 0) {
+      mergeCompletedQuestionHistoryFromSessionsForUser(userId, mergedSessions);
+    }
   } else {
-    saveCompletedSessionsForUser(userId, mergedSessions);
-    saveCompletedQuestionHistoryEntriesForUser(
-      userId,
-      buildCompletedQuestionHistoryEntriesFromSessions(mergedSessions)
-    );
+    if (mergedSessions.length > 0) {
+      saveCompletedSessionsForUser(userId, mergedSessions);
+      mergeCompletedQuestionHistoryFromSessionsForUser(userId, mergedSessions);
+    }
   }
 
   const sessionsToUpload = getSessionsNeedingUpload(localSessionsToSync, remoteSessions);

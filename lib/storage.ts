@@ -1123,13 +1123,24 @@ export function saveCompletedSessionsForUser(userId: string, sessions: QuizSessi
   if (!isBrowser()) return;
   const activeUser = userId || GUEST_USER_ID;
   const scopedKey = getScopedKeyForUser(COMPLETED_SESSIONS_KEY, activeUser);
-  const normalized = normalizeCompletedSessionList(sessions);
+  const incoming = normalizeCompletedSessionList(sessions);
+  const normalized =
+    incoming.length > 0
+      ? normalizeCompletedSessionList([
+          ...(completedSessionsMemoryCache.get(activeUser) ?? []),
+          ...loadCloudCompletedSessionsForUser(activeUser),
+          ...loadPendingCompletedSessionUploadsForUser(activeUser),
+          ...loadRecentCompletedSessionHandoffForUser(activeUser),
+          ...incoming
+        ])
+      : incoming;
 
   cacheCompletedSessionsForUser(activeUser, normalized);
-  saveCompletedQuestionHistoryEntriesForUser(
-    activeUser,
-    buildCompletedQuestionHistoryEntriesFromSessions(normalized)
-  );
+  if (normalized.length > 0) {
+    mergeCompletedQuestionHistoryFromSessionsForUser(activeUser, normalized);
+  } else {
+    saveCompletedQuestionHistoryEntriesForUser(activeUser, []);
+  }
 
   const persisted = normalized.map(compactSessionForStorage);
   const didPersist = tryPersistJsonToLocalStorageWithSessionFallback(
@@ -1269,6 +1280,10 @@ export function saveCloudCompletedSessionsForUser(userId: string, sessions: Quiz
         ...loadPendingCompletedSessionUploadsForUser(userId)
       ])
     );
+  }
+
+  if (normalized.length > 0) {
+    mergeCompletedQuestionHistoryFromSessionsForUser(userId, normalized);
   }
 
   if (userId === getActiveStorageUser()) {

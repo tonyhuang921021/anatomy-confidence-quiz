@@ -133,38 +133,82 @@ function getLegacyManualReviewStorageKey(scope: string) {
   return `quiz-review-notebook-manual-state:${scope}`;
 }
 
-function safeReadManualReviewState(key: string) {
-  if (typeof window === "undefined") return null;
+function safeReadManualReviewStateValues(key: string) {
+  if (typeof window === "undefined") return [] as string[];
+  const values: string[] = [];
+
   try {
-    return window.localStorage.getItem(key);
+    const localValue = window.localStorage.getItem(key);
+    if (localValue) values.push(localValue);
   } catch {
-    return null;
+    // localStorage can fail in private mode or when storage is full.
   }
+
+  try {
+    const sessionValue = window.sessionStorage.getItem(key);
+    if (sessionValue) values.push(sessionValue);
+  } catch {
+    // sessionStorage fallback is best-effort.
+  }
+
+  return Array.from(new Set(values));
 }
 
 function mergeManualReviewStates(states: ManualReviewState[]) {
-  const merged = createEmptyManualReviewState();
+  type ManualAction = {
+    status: "resolved" | "unresolved";
+    timestamp: string;
+    order: number;
+  };
 
-  states.forEach((state) => {
-    state.resolvedIds.forEach((id) => {
-      merged.unresolvedIds.delete(id);
-      merged.unresolvedAtById.delete(id);
+  const actions = new Map<string, ManualAction>();
+  let order = 0;
+
+  const shouldReplace = (current: ManualAction | undefined, next: ManualAction) => {
+    if (!current) return true;
+    if (next.timestamp && current.timestamp && next.timestamp !== current.timestamp) {
+      return next.timestamp > current.timestamp;
+    }
+    if (next.timestamp && !current.timestamp) return true;
+    if (!next.timestamp && current.timestamp) return false;
+    return next.order >= current.order;
+  };
+
+  const consider = (id: string, action: ManualAction) => {
+    const current = actions.get(id);
+    if (shouldReplace(current, action)) {
+      actions.set(id, action);
+    }
+  };
+
+  for (const state of states) {
+    for (const id of state.resolvedIds) {
+      consider(id, {
+        status: "resolved",
+        timestamp: state.resolvedAtById.get(id) ?? "",
+        order: order++
+      });
+    }
+
+    for (const id of state.unresolvedIds) {
+      consider(id, {
+        status: "unresolved",
+        timestamp: state.unresolvedAtById.get(id) ?? "",
+        order: order++
+      });
+    }
+  }
+
+  const merged = createEmptyManualReviewState();
+  for (const [id, action] of actions) {
+    if (action.status === "resolved") {
       merged.resolvedIds.add(id);
-      const timestamp = state.resolvedAtById.get(id);
-      if (timestamp && timestamp.localeCompare(merged.resolvedAtById.get(id) ?? "") > 0) {
-        merged.resolvedAtById.set(id, timestamp);
-      }
-    });
-    state.unresolvedIds.forEach((id) => {
-      merged.resolvedIds.delete(id);
-      merged.resolvedAtById.delete(id);
+      if (action.timestamp) merged.resolvedAtById.set(id, action.timestamp);
+    } else {
       merged.unresolvedIds.add(id);
-      const timestamp = state.unresolvedAtById.get(id);
-      if (timestamp && timestamp.localeCompare(merged.unresolvedAtById.get(id) ?? "") > 0) {
-        merged.unresolvedAtById.set(id, timestamp);
-      }
-    });
-  });
+      if (action.timestamp) merged.unresolvedAtById.set(id, action.timestamp);
+    }
+  }
 
   return merged;
 }
@@ -172,18 +216,30 @@ function mergeManualReviewStates(states: ManualReviewState[]) {
 export function readManualReviewStateForScope(scope: string, userId?: string | null) {
   if (typeof window === "undefined") return createEmptyManualReviewState();
   return mergeManualReviewStates([
-    parseManualReviewState(safeReadManualReviewState(getLegacyManualReviewStorageKey(scope))),
-    parseManualReviewState(safeReadManualReviewState(getManualReviewStorageKey(scope, userId)))
+    ...safeReadManualReviewStateValues(getLegacyManualReviewStorageKey(scope)).map(parseManualReviewState),
+    ...safeReadManualReviewStateValues(getManualReviewStorageKey(scope, userId)).map(parseManualReviewState)
   ]);
 }
 
 function safeSaveManualReviewState(key: string, state: ManualReviewState) {
   if (typeof window === "undefined") return false;
+  const serialized = serializeManualReviewState(state);
+
   try {
-    window.localStorage.setItem(key, serializeManualReviewState(state));
+    window.localStorage.setItem(key, serialized);
+    try {
+      window.sessionStorage.removeItem(key);
+    } catch {
+      // Ignore cleanup failures.
+    }
     return true;
   } catch {
-    return false;
+    try {
+      window.sessionStorage.setItem(key, serialized);
+      return true;
+    } catch {
+      return false;
+    }
   }
 }
 
