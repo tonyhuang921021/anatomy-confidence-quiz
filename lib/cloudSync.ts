@@ -820,6 +820,26 @@ function getAttemptRowsNeedingUpload(
     );
 }
 
+function getCurrentSessionSyncSignature(session: QuizSession) {
+  const latestAttemptAt =
+    session.attempts
+      .map((attempt) => attempt.answeredAt)
+      .sort((left, right) => right.localeCompare(left))[0] ?? "";
+
+  return [
+    session.id,
+    session.currentQuestionIndex ?? 0,
+    session.attempts.length,
+    latestAttemptAt
+  ].join("|");
+}
+
+function buildSyncedAttemptSignatureMap(session: QuizSession) {
+  return new Map(
+    session.attempts.map((attempt, index) => [index, getAttemptUploadSignature(attempt)])
+  );
+}
+
 function mapCloudAttemptRowToAttempt(row: QuizSessionAttemptRow): Attempt {
   return {
     questionId: row.question_id,
@@ -2074,6 +2094,27 @@ function clearCurrentSessionSyncStateForSession(userId: string, sessionId: strin
   currentSessionSyncState.delete(stateKey);
 }
 
+function rememberSyncedCurrentSessionState(
+  userId: string,
+  session: QuizSession,
+  syncedAttemptSignatures = buildSyncedAttemptSignatureMap(session)
+) {
+  const stateKey = getCurrentSessionSyncStateKey(userId, session.id);
+  const existing = currentSessionSyncState.get(stateKey);
+  if (existing?.pendingTimer) {
+    clearTimeout(existing.pendingTimer);
+  }
+
+  currentSessionSyncState.set(stateKey, {
+    lastSyncedAt: Date.now(),
+    lastSignature: getCurrentSessionSyncSignature(session),
+    syncedAttemptSignatures,
+    pendingTimer: null,
+    pendingSession: null,
+    pendingSignature: ""
+  });
+}
+
 export async function syncCompletedSessionsForCurrentUser(userId: string) {
   if (isSupabaseRecoveryMode() || !isSupabaseConfigured()) {
     return loadCompletedSessions();
@@ -2273,6 +2314,9 @@ export async function syncCurrentSessionForCurrentUser(userId: string) {
       )
     : undefined;
   const remoteCurrentSession = remoteRow ? mapRowToSession(remoteRow, remoteAttemptMap) : null;
+  const remoteSyncedAttemptSignatures = remoteCurrentSession
+    ? buildSyncedAttemptSignatureMap(remoteCurrentSession)
+    : new Map<number, string>();
 
   const localActivity = localCurrentSession ? sessionActivityValue(localCurrentSession) : "";
   const remoteActivity = remoteCurrentSession
@@ -2280,19 +2324,35 @@ export async function syncCurrentSessionForCurrentUser(userId: string) {
     : "";
 
   let winner = localCurrentSession;
+  let shouldUploadWinner =
+    Boolean(localCurrentSession) &&
+    (!remoteCurrentSession || localActivity > remoteActivity);
 
   if (remoteCurrentSession && (!winner || remoteActivity > localActivity)) {
     winner = canonicalizeSessionsForUser(userId, [remoteCurrentSession])[0] ?? remoteCurrentSession;
     saveCurrentSession(winner);
+    shouldUploadWinner = false;
+    rememberSyncedCurrentSessionState(userId, winner, remoteSyncedAttemptSignatures);
   }
 
-  if (winner && !winner.completedAt) {
+  if (winner && !winner.completedAt && shouldUploadWinner) {
+    const syncedAttemptSignatures =
+      remoteCurrentSession &&
+      getCanonicalSessionId(remoteCurrentSession.id) === getCanonicalSessionId(winner.id)
+        ? remoteSyncedAttemptSignatures
+        : new Map<number, string>();
+    const canonicalWinner = canonicalizeSessionsForUser(userId, [winner]);
     await withCloudFallback(
-      upsertSessionsForUser(userId, canonicalizeSessionsForUser(userId, [winner]), {
-        activeCheckpoint: true
+      upsertSessionsForUser(userId, canonicalWinner, {
+        activeCheckpoint: true,
+        syncedAttemptSignatures
       }).then(() => true),
       false
     );
+    const syncedWinner = canonicalWinner[0];
+    if (syncedWinner) {
+      rememberSyncedCurrentSessionState(userId, syncedWinner, syncedAttemptSignatures);
+    }
   }
 
   return winner ?? remoteCurrentSession ?? null;
@@ -2392,16 +2452,7 @@ export async function pushCurrentSessionToSupabase(
   const canonicalSession = canonicalizeSessionsForUser(userId, [session])[0];
   if (!canonicalSession) return;
 
-  const latestAttemptAt =
-    canonicalSession.attempts
-      .map((attempt) => attempt.answeredAt)
-      .sort((left, right) => right.localeCompare(left))[0] ?? "";
-  const signature = [
-    canonicalSession.id,
-    canonicalSession.currentQuestionIndex ?? 0,
-    canonicalSession.attempts.length,
-    latestAttemptAt
-  ].join("|");
+  const signature = getCurrentSessionSyncSignature(canonicalSession);
   const stateKey = getCurrentSessionSyncStateKey(userId, canonicalSession.id);
   const now = Date.now();
   const existing = currentSessionSyncState.get(stateKey);
