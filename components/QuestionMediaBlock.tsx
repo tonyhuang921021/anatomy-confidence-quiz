@@ -73,11 +73,11 @@ export function QuestionOptionBlock({
           <div
             className={
               textClassName ??
-              "min-w-0 max-w-full text-sm font-medium leading-6 text-slate-800 [overflow-wrap:anywhere] sm:text-[15px] sm:leading-7"
+              "min-w-0 max-w-full break-words text-sm font-medium leading-6 text-slate-800 [overflow-wrap:break-word] [word-break:normal] sm:text-[15px] sm:leading-7"
             }
           >
-            <span className="min-w-0 max-w-full [overflow-wrap:anywhere]">
-              <FormattedQuestionText text={optionText} />
+            <span className="min-w-0 max-w-full break-words [overflow-wrap:break-word] [word-break:normal]">
+              <FormattedQuestionText text={optionText} preserveWords />
             </span>
             {trailingContent ? <span className="ml-2 inline-flex align-middle">{trailingContent}</span> : null}
           </div>

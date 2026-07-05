@@ -2,6 +2,7 @@
 
 type FormattedQuestionTextProps = {
   text: string;
+  preserveWords?: boolean;
 };
 
 type TextToken = {
@@ -12,6 +13,8 @@ type TextToken = {
 function normalizeQuestionText(text: string) {
   return text
     .replaceAll("", "酶")
+    .replace(/([\u4e00-\u9fff])\s+([\u4e00-\u9fff])/gu, "$1$2")
+    .replace(/\b([A-Z])\s+([A-Z]{2,})\b/g, "$1$2")
     .replace(/\bV\s+下降，K\s+下降\s+max\s+M\b/g, "Vmax 下降，KM 下降")
     .replace(/\bV\s+不變，K\s+下降\s+max\s+M\b/g, "Vmax 不變，KM 下降")
     .replace(/\bV\s+下降，K\s+上升\s+max\s+M\b/g, "Vmax 下降，KM 上升")
@@ -50,11 +53,15 @@ function tokenize(text: string): TextToken[] {
   return tokens;
 }
 
-export function FormattedQuestionText({ text }: FormattedQuestionTextProps) {
+export function FormattedQuestionText({ text, preserveWords = false }: FormattedQuestionTextProps) {
+  const tokenClassName = preserveWords
+    ? "break-words [overflow-wrap:break-word] [word-break:normal]"
+    : "[overflow-wrap:anywhere]";
+
   return (
     <>
       {tokenize(text).map((token, index) => (
-        <span key={`${token.text}-${index}`} className="[overflow-wrap:anywhere]">
+        <span key={`${token.text}-${index}`} className={tokenClassName}>
           {token.text}
           {token.subscript ? <sub className="text-[0.72em]">{token.subscript}</sub> : null}
         </span>

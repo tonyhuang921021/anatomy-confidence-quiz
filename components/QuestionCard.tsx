@@ -176,12 +176,12 @@ export function QuestionCard({
           return (
             <div
               key={key}
-              className={`flex min-h-12 min-w-0 max-w-full items-start gap-3 rounded-3xl border px-4 py-4 transition sm:px-5 ${optionClassName}`}
+              className={`flex min-h-12 min-w-0 max-w-full items-stretch overflow-hidden rounded-3xl border transition ${optionClassName}`}
             >
               <button
                 type="button"
                 onClick={() => onSelect(key)}
-                className="min-w-0 max-w-full flex-1 text-left"
+                className="min-w-0 max-w-full flex-1 rounded-[inherit] px-4 py-4 text-left transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-400 focus-visible:ring-offset-2 sm:px-5"
               >
                 <QuestionOptionBlock
                   question={question}
@@ -189,7 +189,7 @@ export function QuestionCard({
                   labelClassName={`mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-sm font-bold ${
                     labelClassName
                   }`}
-                  textClassName="min-w-0 max-w-full break-words text-sm leading-7 text-slate-800 [overflow-wrap:anywhere] sm:text-base"
+                  textClassName="min-w-0 max-w-full break-words text-sm leading-7 text-slate-800 [overflow-wrap:break-word] [word-break:normal] sm:text-base"
                   trailingContent={
                     answerBadge ? (
                       <span
@@ -206,21 +206,23 @@ export function QuestionCard({
                 />
               </button>
               {showEliminationButton ? (
-                <button
-                  type="button"
-                  aria-label={`${isEliminated ? "取消排除" : "排除"}選項 ${key}`}
-                  aria-pressed={isEliminated}
-                  title={`${isEliminated ? "取消排除" : "排除"}選項 ${key}`}
-                  disabled={eliminationDisabled}
-                  onClick={handleToggleElimination}
-                  className={`mt-0.5 inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-full border text-sm font-black transition disabled:cursor-not-allowed disabled:opacity-50 ${
-                    isEliminated
-                      ? "border-rose-300 bg-rose-100 text-rose-700 shadow-sm"
-                      : "border-slate-200 bg-white/90 text-slate-400 hover:border-rose-200 hover:bg-rose-50 hover:text-rose-600"
-                  }`}
-                >
-                  X
-                </button>
+                <div className="flex shrink-0 items-center px-3 py-3 sm:px-4">
+                  <button
+                    type="button"
+                    aria-label={`${isEliminated ? "取消排除" : "排除"}選項 ${key}`}
+                    aria-pressed={isEliminated}
+                    title={`${isEliminated ? "取消排除" : "排除"}選項 ${key}`}
+                    disabled={eliminationDisabled}
+                    onClick={handleToggleElimination}
+                    className={`inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-full border text-base font-black transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rose-300 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 ${
+                      isEliminated
+                        ? "border-rose-300 bg-rose-100 text-rose-700 shadow-sm"
+                        : "border-slate-200 bg-white/90 text-slate-400 hover:border-rose-200 hover:bg-rose-50 hover:text-rose-600"
+                    }`}
+                  >
+                    X
+                  </button>
+                </div>
               ) : null}
             </div>
           );

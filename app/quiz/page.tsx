@@ -720,6 +720,7 @@ export default function QuizPage() {
   const [confidence, setConfidence] = useState<ConfidenceLevel>(4);
   const [confidenceExpanded, setConfidenceExpanded] = useState(false);
   const confidenceRef = useRef<ConfidenceLevel>(4);
+  const restoredQuestionUiKeyRef = useRef<string | null>(null);
   const [submittedAttempt, setSubmittedAttempt] = useState<Attempt | null>(null);
   const [errorType, setErrorType] = useState<ErrorType | undefined>();
 
@@ -1163,6 +1164,9 @@ export default function QuizPage() {
 
   useEffect(() => {
     if (!session || !currentQuestion || submittedAttempt) return;
+    const restoreKey = `${session.id}:${currentQuestion.id}`;
+    if (restoredQuestionUiKeyRef.current === restoreKey) return;
+    restoredQuestionUiKeyRef.current = restoreKey;
 
     const existingAttempt =
       session.attempts.find((attempt) => attempt.questionId === currentQuestion.id) ?? null;
@@ -1694,7 +1698,7 @@ export default function QuizPage() {
       return;
     }
 
-    const currentOptions = getEliminatedOptionsForQuestion(currentQuestion.id);
+    const currentOptions = getEliminatedOptionsForQuestion(currentQuestion.id, session);
     const nextOptions = currentOptions.includes(value)
       ? currentOptions.filter((option) => option !== value)
       : [...currentOptions, value];
