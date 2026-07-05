@@ -1830,21 +1830,26 @@ function ResultsPageContent() {
   function renderQuestionSummaryLine({
     prefix,
     question,
+    isCorrect,
     suffix
   }: {
     prefix: string;
     question: Question;
+    isCorrect: boolean;
     suffix?: string;
   }) {
     const sourceBadge = getQuestionSourceBadgeLabel(question);
     const trimmedPrefix = prefix.trim();
     const shouldShowPrefix = trimmedPrefix.length > 0;
     const shouldShowLeadingSlash = shouldShowPrefix && !trimmedPrefix.endsWith("：");
+    const triangleClass = isCorrect
+      ? "text-emerald-600 group-open:text-emerald-700"
+      : "text-rose-500 group-open:text-rose-600";
     return (
       <span className="flex max-w-full min-w-0 items-center gap-2 align-top">
         <span
           aria-hidden="true"
-          className="inline-flex h-5 w-5 shrink-0 items-center justify-center text-xs transition-transform group-open:rotate-90"
+          className={`inline-flex h-5 w-5 shrink-0 items-center justify-center text-xs transition duration-150 group-open:rotate-90 ${triangleClass}`}
         >
           ▶
         </span>
@@ -2452,6 +2457,7 @@ function ResultsPageContent() {
                         {renderQuestionSummaryLine({
                           prefix: `錯題 ${index + 1}：`,
                           question,
+                          isCorrect: attempt.isCorrect,
                           suffix: confidenceCalibrationEnabled ? masteryLabel : undefined
                         })}
                       </summary>
@@ -2506,6 +2512,7 @@ function ResultsPageContent() {
                           {renderQuestionSummaryLine({
                             prefix: `第 ${questionNumber} 題：`,
                             question,
+                            isCorrect: attempt.isCorrect,
                             suffix: confidenceCalibrationEnabled ? masteryLabel : undefined
                           })}
                         </summary>
@@ -2554,6 +2561,7 @@ function ResultsPageContent() {
                       {renderQuestionSummaryLine({
                         prefix: `第 ${questionNumber} 題：`,
                         question,
+                        isCorrect: attempt.isCorrect,
                         suffix: confidenceCalibrationEnabled
                           ? `${masteryLabel}・${getConfidenceOverviewLabel(attempt.confidence)}`
                           : undefined
