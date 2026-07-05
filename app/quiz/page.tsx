@@ -368,6 +368,7 @@ function createSession(
     classificationOverrides
   );
   const shouldRespectEmptyLocalQuestionSet =
+    hasExplicitSubjectPool(normalizedSettings) ||
     hasActiveSubjectTrackFilter(normalizedSettings) ||
     Boolean(normalizedSettings.strictCustomQuestionPool) ||
     (normalizedSettings.mode === "simulation" && normalizedSettings.paperMode === "ai_paper");
@@ -451,6 +452,12 @@ function getActiveSubjectTrackEntries(settings: QuizSettings): [TrackSubject, st
 
 function hasActiveSubjectTrackFilter(settings: QuizSettings) {
   return getActiveSubjectTrackEntries(settings).length > 0;
+}
+
+function hasExplicitSubjectPool(settings: QuizSettings) {
+  const selectedSubjects = settings.subjectFilters?.filter(Boolean) ?? [];
+  if (selectedSubjects.length > 0) return true;
+  return Boolean(settings.subjectFilter && settings.subjectFilter !== "全部");
 }
 
 function applySubjectTrackFilters(questions: Question[], settings: QuizSettings) {
@@ -732,6 +739,8 @@ export default function QuizPage() {
       visitorId: getOrCreateVisitorId() ?? "",
       paperCode: completedSession.settings?.customPaperCode ?? "",
       session: completedSession
+    }).catch((error) => {
+      console.error("Custom paper completion sync skipped after local completion:", error);
     });
   }
 
@@ -1047,6 +1056,40 @@ export default function QuizPage() {
       cancelled = true;
     };
   }, [authLoading, authSession?.user?.id, syncStatus, syncVersion]);
+
+  useEffect(() => {
+    if (Object.keys(classificationOverrides).length > 0) return;
+    let cancelled = false;
+    let retryTimer: number | null = null;
+
+    function scheduleRetry(attempt: number) {
+      if (cancelled || attempt >= 2) return;
+      retryTimer = window.setTimeout(() => {
+        void refreshClassificationOverrides(attempt + 1);
+      }, 2500);
+    }
+
+    async function refreshClassificationOverrides(attempt = 0) {
+      try {
+        const overrides = await loadConfirmedQuestionClassificationOverrides();
+        if (cancelled) return;
+        if (Object.keys(overrides).length > 0) {
+          setClassificationOverrides(overrides);
+          return;
+        }
+        scheduleRetry(attempt);
+      } catch {
+        scheduleRetry(attempt);
+      }
+    }
+
+    void refreshClassificationOverrides();
+
+    return () => {
+      cancelled = true;
+      if (retryTimer !== null) window.clearTimeout(retryTimer);
+    };
+  }, [classificationOverrides]);
 
   useEffect(() => {
     setExplanationOverrides((current) =>
@@ -1545,15 +1588,18 @@ export default function QuizPage() {
     return saved !== false;
   }
 
-  async function completeSessionAndNavigate(completedSession: QuizSession) {
-    finalizeCompletedSession(completedSession);
-    try {
-      await pushCompletedSessionToSupabase(completedSession);
-    } catch (error) {
+  function completeSessionAndNavigate(completedSession: QuizSession) {
+    const savedLocally = finalizeCompletedSession(completedSession);
+    void pushCompletedSessionToSupabase(completedSession).catch((error) => {
       console.error("Completed session cloud handoff skipped; pending queue kept local copy:", error);
-    }
-    void pushQuestionStatsSnapshotToSupabase(completedSession);
+    });
+    void pushQuestionStatsSnapshotToSupabase(completedSession).catch((error) => {
+      console.error("Question stats sync skipped after local completion:", error);
+    });
     syncCompletedCustomPaper(completedSession);
+    if (!savedLocally) {
+      console.warn("Completed session could not be fully persisted locally; routing with in-memory handoff.");
+    }
     router.push(buildResultsHref(completedSession));
   }
 

@@ -729,6 +729,7 @@ function ResultsPageContent() {
   const [openReviewDetailKeys, setOpenReviewDetailKeys] = useState<Set<string>>(() => new Set());
   const reviewDetailElementMapRef = useRef<Record<string, HTMLDetailsElement | null>>({});
   const pendingReviewScrollAnchorRef = useRef<{ key: string; top: number } | null>(null);
+  const resultCloudHandoffSessionKeysRef = useRef(new Set<string>());
   const [isConfidenceCalibrationOpen, setIsConfidenceCalibrationOpen] = useState(false);
   const [simulationConfidenceCalibration, setSimulationConfidenceCalibration] = useState(() =>
     loadSimulationConfidenceCalibration(true)
@@ -750,6 +751,23 @@ function ResultsPageContent() {
     unstableSections: [],
     completionStats: null
   });
+
+  function queueResultCloudHandoff(resultSession: QuizSession) {
+    if (!resultSession.completedAt || resultSession.attempts.length === 0) return;
+
+    const handoffKey = [
+      getCanonicalSessionId(resultSession.id),
+      resultSession.completedAt,
+      resultSession.attempts.length
+    ].join(":");
+
+    if (resultCloudHandoffSessionKeysRef.current.has(handoffKey)) return;
+    resultCloudHandoffSessionKeysRef.current.add(handoffKey);
+
+    void pushCompletedSessionToSupabase(resultSession).catch((error) => {
+      console.error("Result session cloud handoff skipped; pending queue kept local copy:", error);
+    });
+  }
 
   useEffect(() => {
     const nextSimulationConfidenceCalibration = user
@@ -1025,6 +1043,10 @@ function ResultsPageContent() {
         }));
         setMounted(true);
         return;
+      }
+
+      if (resolvedTargetSession?.completedAt) {
+        queueResultCloudHandoff(resolvedTargetSession);
       }
 
       if (!resolvedTargetSession?.completedAt) {
