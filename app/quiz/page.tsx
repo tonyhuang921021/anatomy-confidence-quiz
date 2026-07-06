@@ -1367,6 +1367,44 @@ export default function QuizPage() {
     } satisfies QuizSession;
   }
 
+  function getSessionWithHydratedEliminatedOptions(baseSession: QuizSession) {
+    const nextOptionEliminationMap: NonNullable<QuizSession["optionEliminationMap"]> = {
+      ...(baseSession.optionEliminationMap ?? {})
+    };
+
+    for (const attempt of baseSession.attempts) {
+      const normalizedOptions = normalizeEliminatedOptions(attempt.eliminatedOptions);
+      if (normalizedOptions.length > 0) {
+        nextOptionEliminationMap[attempt.questionId] = normalizeEliminatedOptions([
+          ...(nextOptionEliminationMap[attempt.questionId] ?? []),
+          ...normalizedOptions
+        ]);
+      }
+    }
+
+    const attempts = baseSession.attempts.map((attempt) => {
+      const normalizedOptions = normalizeEliminatedOptions(nextOptionEliminationMap[attempt.questionId]);
+      return {
+        ...attempt,
+        eliminatedOptions: normalizedOptions.length > 0 ? normalizedOptions : undefined
+      };
+    });
+
+    const normalizedMapEntries = Object.entries(nextOptionEliminationMap)
+      .map(([questionId, options]) => {
+        const normalizedOptions = normalizeEliminatedOptions(options);
+        return normalizedOptions.length > 0 ? [questionId, normalizedOptions] as const : null;
+      })
+      .filter((entry): entry is readonly [string, OptionKey[]] => Boolean(entry));
+
+    return {
+      ...baseSession,
+      optionEliminationMap:
+        normalizedMapEntries.length > 0 ? Object.fromEntries(normalizedMapEntries) : undefined,
+      attempts
+    } satisfies QuizSession;
+  }
+
   function getSessionWithCurrentDraft(baseSession: QuizSession) {
     if (!currentQuestion) return baseSession;
 
@@ -1588,41 +1626,43 @@ export default function QuizPage() {
   }
 
   function finalizeCompletedSession(completedSession: QuizSession) {
+    const completedSessionWithEliminations = getSessionWithHydratedEliminatedOptions(completedSession);
     takeDeferredCurrentSessionSave();
     clearScheduledCurrentSessionCloudSync();
     currentSessionCloudPendingRef.current = null;
-    latestCurrentSessionRef.current = completedSession;
-    const completedKey = completedSession.id.replace(/^user-[^:]+:/, "");
+    latestCurrentSessionRef.current = completedSessionWithEliminations;
+    const completedKey = completedSessionWithEliminations.id.replace(/^user-[^:]+:/, "");
     if (completedSessionIdsRef.current.has(completedKey)) {
       return false;
     }
     completedSessionIdsRef.current.add(completedKey);
-    setSession(completedSession);
-    saveCurrentSession(completedSession);
-    const saved = saveCompletedSession(completedSession);
+    setSession(completedSessionWithEliminations);
+    saveCurrentSession(completedSessionWithEliminations);
+    const saved = saveCompletedSession(completedSessionWithEliminations);
     if (authSession?.user?.id) {
-      mergeCompletedQuestionHistoryFromSessionsForUser(authSession.user.id, [completedSession]);
-      queuePendingCompletedSessionUploadForUser(authSession.user.id, [completedSession]);
+      mergeCompletedQuestionHistoryFromSessionsForUser(authSession.user.id, [completedSessionWithEliminations]);
+      queuePendingCompletedSessionUploadForUser(authSession.user.id, [completedSessionWithEliminations]);
     }
     if (saved !== false) {
-      clearMatchingCurrentSessions(completedSession.id, [authSession?.user?.id ?? ""]);
+      clearMatchingCurrentSessions(completedSessionWithEliminations.id, [authSession?.user?.id ?? ""]);
     }
     return saved !== false;
   }
 
   function completeSessionAndNavigate(completedSession: QuizSession) {
-    const savedLocally = finalizeCompletedSession(completedSession);
-    void pushCompletedSessionToSupabase(completedSession).catch((error) => {
+    const completedSessionWithEliminations = getSessionWithHydratedEliminatedOptions(completedSession);
+    const savedLocally = finalizeCompletedSession(completedSessionWithEliminations);
+    void pushCompletedSessionToSupabase(completedSessionWithEliminations).catch((error) => {
       console.error("Completed session cloud handoff skipped; pending queue kept local copy:", error);
     });
-    void pushQuestionStatsSnapshotToSupabase(completedSession).catch((error) => {
+    void pushQuestionStatsSnapshotToSupabase(completedSessionWithEliminations).catch((error) => {
       console.error("Question stats sync skipped after local completion:", error);
     });
-    syncCompletedCustomPaper(completedSession);
+    syncCompletedCustomPaper(completedSessionWithEliminations);
     if (!savedLocally) {
       console.warn("Completed session could not be fully persisted locally; routing with in-memory handoff.");
     }
-    router.push(buildResultsHref(completedSession));
+    router.push(buildResultsHref(completedSessionWithEliminations));
   }
 
   function getSessionReadyForCompletion(baseSession: QuizSession) {

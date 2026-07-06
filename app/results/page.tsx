@@ -167,6 +167,120 @@ function normalizeResultEliminatedOptions(options?: OptionKey[]) {
   return Array.from(new Set((options ?? []).filter((key): key is OptionKey => optionKeys.includes(key))));
 }
 
+function getResultSessionEliminationMap(session: QuizSession | null | undefined) {
+  if (!session) return undefined;
+
+  const eliminationMap: NonNullable<QuizSession["optionEliminationMap"]> = {
+    ...(session.optionEliminationMap ?? {})
+  };
+
+  for (const attempt of session.attempts) {
+    const normalizedOptions = normalizeResultEliminatedOptions(attempt.eliminatedOptions);
+    if (normalizedOptions.length > 0) {
+      eliminationMap[attempt.questionId] = normalizeResultEliminatedOptions([
+        ...(eliminationMap[attempt.questionId] ?? []),
+        ...normalizedOptions
+      ]);
+    }
+  }
+
+  const normalizedEntries = Object.entries(eliminationMap)
+    .map(([questionId, options]) => {
+      const normalizedOptions = normalizeResultEliminatedOptions(options);
+      return normalizedOptions.length > 0 ? [questionId, normalizedOptions] as const : null;
+    })
+    .filter((entry): entry is readonly [string, OptionKey[]] => Boolean(entry));
+
+  return normalizedEntries.length > 0 ? Object.fromEntries(normalizedEntries) : undefined;
+}
+
+function getResultSessionEliminatedOptionCount(session: QuizSession | null | undefined) {
+  const eliminationMap = getResultSessionEliminationMap(session);
+  if (!eliminationMap) return 0;
+  return Object.values(eliminationMap).reduce((sum, options) => sum + normalizeResultEliminatedOptions(options).length, 0);
+}
+
+function mergeResultOptionEliminationMap(
+  primary: QuizSession | null | undefined,
+  secondary: QuizSession | null | undefined
+) {
+  const primaryMap = getResultSessionEliminationMap(primary);
+  const secondaryMap = getResultSessionEliminationMap(secondary);
+  const questionIds = new Set([
+    ...Object.keys(primaryMap ?? {}),
+    ...Object.keys(secondaryMap ?? {})
+  ]);
+
+  const merged: NonNullable<QuizSession["optionEliminationMap"]> = {};
+  for (const questionId of questionIds) {
+    const normalizedOptions = normalizeResultEliminatedOptions([
+      ...(secondaryMap?.[questionId] ?? []),
+      ...(primaryMap?.[questionId] ?? [])
+    ]);
+    if (normalizedOptions.length > 0) {
+      merged[questionId] = normalizedOptions;
+    }
+  }
+
+  return Object.keys(merged).length > 0 ? merged : undefined;
+}
+
+function mergeResultAttemptEliminations(
+  primaryAttempts: Attempt[],
+  secondaryAttempts: Attempt[],
+  eliminationMap?: QuizSession["optionEliminationMap"]
+) {
+  const secondaryByQuestionId = new Map(
+    secondaryAttempts.map((attempt) => [attempt.questionId, attempt] as const)
+  );
+
+  return primaryAttempts.map((attempt, index) => {
+    const secondaryAttempt = secondaryByQuestionId.get(attempt.questionId) ?? secondaryAttempts[index];
+    const normalizedOptions = normalizeResultEliminatedOptions([
+      ...(secondaryAttempt?.eliminatedOptions ?? []),
+      ...(attempt.eliminatedOptions ?? []),
+      ...(eliminationMap?.[attempt.questionId] ?? [])
+    ]);
+
+    return {
+      ...attempt,
+      eliminatedOptions: normalizedOptions.length > 0 ? normalizedOptions : undefined
+    };
+  });
+}
+
+function mergeResultSessionMetadata(primary: QuizSession, secondary: QuizSession | null | undefined): QuizSession {
+  if (!secondary) return primary;
+
+  const eliminationMap = mergeResultOptionEliminationMap(primary, secondary);
+  const primaryHasMoreAttempts = primary.attempts.length >= secondary.attempts.length;
+  const attemptBase = primaryHasMoreAttempts ? primary.attempts : secondary.attempts;
+  const attemptFallback = primaryHasMoreAttempts ? secondary.attempts : primary.attempts;
+  const settings =
+    primary.settings || secondary.settings
+      ? ({
+          ...(secondary.settings ?? {}),
+          ...(primary.settings ?? {})
+        } as QuizSession["settings"])
+      : undefined;
+
+  return {
+    ...secondary,
+    ...primary,
+    settings,
+    questionOrder:
+      (primary.questionOrder?.length ?? 0) >= (secondary.questionOrder?.length ?? 0)
+        ? primary.questionOrder
+        : secondary.questionOrder,
+    generatedQuestions:
+      (primary.generatedQuestions?.length ?? 0) >= (secondary.generatedQuestions?.length ?? 0)
+        ? primary.generatedQuestions
+        : secondary.generatedQuestions,
+    optionEliminationMap: eliminationMap,
+    attempts: mergeResultAttemptEliminations(attemptBase, attemptFallback, eliminationMap)
+  } satisfies QuizSession;
+}
+
 function getResultAttemptEliminatedOptions(session: QuizSession, attempt: Attempt) {
   return normalizeResultEliminatedOptions([
     ...(attempt.eliminatedOptions ?? []),
@@ -291,6 +405,11 @@ function isMoreCompleteResultSession(candidate: QuizSession, current: QuizSessio
   if (candidate.attempts.length !== current.attempts.length) {
     return candidate.attempts.length > current.attempts.length;
   }
+  const candidateEliminationCount = getResultSessionEliminatedOptionCount(candidate);
+  const currentEliminationCount = getResultSessionEliminatedOptionCount(current);
+  if (candidateEliminationCount !== currentEliminationCount) {
+    return candidateEliminationCount > currentEliminationCount;
+  }
   return (candidate.completedAt ?? candidate.startedAt).localeCompare(current.completedAt ?? current.startedAt) >= 0;
 }
 
@@ -404,13 +523,19 @@ function mergeResultSessionSources(...sources: QuizSession[][]) {
       continue;
     }
 
+    const sessionEliminationCount = getResultSessionEliminatedOptionCount(session);
+    const currentEliminationCount = getResultSessionEliminatedOptionCount(current);
     const nextIsBetter =
       session.attempts.length > current.attempts.length ||
       (session.attempts.length === current.attempts.length &&
-        getResultSessionFreshness(session) >= getResultSessionFreshness(current));
+        (sessionEliminationCount > currentEliminationCount ||
+          (sessionEliminationCount === currentEliminationCount &&
+            getResultSessionFreshness(session) >= getResultSessionFreshness(current))));
 
     if (nextIsBetter) {
-      merged.set(key, session);
+      merged.set(key, mergeResultSessionMetadata(session, current));
+    } else {
+      merged.set(key, mergeResultSessionMetadata(current, session));
     }
   }
 
@@ -992,7 +1117,10 @@ function ResultsPageContent() {
         session?.user?.id &&
         (!resolvedTargetSession?.completedAt ||
           resolvedTargetSession.attempts.length === 0 ||
-          shouldRefreshPossiblyTruncatedCloudSession(resolvedTargetSession));
+          shouldRefreshPossiblyTruncatedCloudSession(resolvedTargetSession) ||
+          (resolvedTargetSession?.completedAt &&
+            isSimulationSession(resolvedTargetSession) &&
+            getResultSessionEliminatedOptionCount(resolvedTargetSession) === 0));
 
       if (shouldHydrateTargetFromCloud) {
         let cloudSession = await loadCompletedSessionFromSupabase(targetSessionId);
@@ -1002,15 +1130,29 @@ function ResultsPageContent() {
             cloudSession = await loadCompletedSessionFromSupabase(targetSessionId);
           }
         }
-        if (cloudSession?.completedAt && isMoreCompleteResultSession(cloudSession, resolvedTargetSession)) {
-          saveCompletedSession(cloudSession);
-          completedSessions = mergeResultSessionSources(loadCompletedSessions(), handoffSessions, [cloudSession]);
+        const mergedCloudSession =
+          cloudSession?.completedAt && resolvedTargetSession?.completedAt
+            ? mergeResultSessionMetadata(cloudSession, resolvedTargetSession)
+            : cloudSession;
+        if (mergedCloudSession?.completedAt && isMoreCompleteResultSession(mergedCloudSession, resolvedTargetSession)) {
+          saveCompletedSession(mergedCloudSession);
+          completedSessions = mergeResultSessionSources(loadCompletedSessions(), handoffSessions, [mergedCloudSession]);
           scopedSessions = completedSessions.filter((sessionItem) =>
             nextScope === "simulation" ? isSimulationSession(sessionItem) : !isSimulationSession(sessionItem)
           );
-          resolvedTargetSession = cloudSession;
+          resolvedTargetSession = mergedCloudSession;
         } else if (cloudSession?.completedAt && cloudSession.attempts.length === 0 && !resolvedTargetSession?.attempts.length) {
           setResultRecordNotice("這筆紀錄的題目明細還在整理中，先不顯示 0 題結果。請稍後重新整理或回作答紀錄。");
+        } else if (mergedCloudSession?.completedAt && resolvedTargetSession?.completedAt) {
+          const mergedTargetSession = mergeResultSessionMetadata(resolvedTargetSession, mergedCloudSession);
+          if (getResultSessionEliminatedOptionCount(mergedTargetSession) > getResultSessionEliminatedOptionCount(resolvedTargetSession)) {
+            saveCompletedSession(mergedTargetSession);
+            completedSessions = mergeResultSessionSources(loadCompletedSessions(), handoffSessions, [mergedTargetSession]);
+            scopedSessions = completedSessions.filter((sessionItem) =>
+              nextScope === "simulation" ? isSimulationSession(sessionItem) : !isSimulationSession(sessionItem)
+            );
+            resolvedTargetSession = mergedTargetSession;
+          }
         }
       }
 
