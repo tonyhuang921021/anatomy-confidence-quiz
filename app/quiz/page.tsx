@@ -1710,12 +1710,10 @@ export default function QuizPage() {
       const isLast = currentIndex >= targetCount - 1;
 
       if (isLast) {
-        const completedSession: QuizSession = {
-          ...nextSessionBase,
-          completedAt: new Date().toISOString(),
-          isReviewingAnswer: false
-        };
-        void completeSessionAndNavigate(completedSession);
+        persistSession(nextSessionBase);
+        setSubmittedAttempt(null);
+        setErrorType(undefined);
+        setIsSubmittingAnswer(false);
         return;
       }
 
@@ -2075,6 +2073,32 @@ export default function QuizPage() {
       completedAt: new Date().toISOString(),
       isReviewingAnswer: false
     };
+    setIsSubmittingAnswer(true);
+    void completeSessionAndNavigate(completedSession);
+  }
+
+  function handleFinishSimulationExam() {
+    if (!session || session.settings?.mode !== "simulation") return;
+
+    const completionSession = getSessionReadyForCompletion(session);
+    const orderedQuestionIds = completionSession.questionOrder?.slice(0, targetCount) ?? [];
+    const answeredQuestionIds = new Set(completionSession.attempts.map((attempt) => attempt.questionId));
+    const unansweredCount = orderedQuestionIds.filter((questionId) => !answeredQuestionIds.has(questionId)).length;
+
+    if (
+      unansweredCount > 0 &&
+      typeof window !== "undefined" &&
+      !window.confirm(`還有 ${unansweredCount} 題尚未作答，確定要交卷嗎？`)
+    ) {
+      return;
+    }
+
+    const completedSession: QuizSession = {
+      ...completionSession,
+      completedAt: new Date().toISOString(),
+      isReviewingAnswer: false
+    };
+    setIsSubmittingAnswer(true);
     void completeSessionAndNavigate(completedSession);
   }
 
@@ -2140,6 +2164,7 @@ export default function QuizPage() {
   const feedbackMode = getEffectiveFeedbackMode(session.settings);
   const isBlindSimulation =
     session.settings?.mode === "simulation" && feedbackMode === "none";
+  const isBlindSimulationLastQuestion = isBlindSimulation && currentIndex >= targetCount - 1;
   const shouldShowExplanation = feedbackMode === "full";
   const shouldShowCorrectAnswer = feedbackMode === "full" || feedbackMode === "answer_only";
   const canEndAfterSubmittedQuestion =
@@ -2259,7 +2284,7 @@ export default function QuizPage() {
                     </p>
                   ) : null}
                 </div>
-                <div className="mt-5 grid gap-3 sm:grid-cols-2">
+                <div className={`mt-5 grid gap-3 ${isBlindSimulationLastQuestion ? "sm:grid-cols-3" : "sm:grid-cols-2"}`}>
                   {isBlindSimulation ? (
                     <button
                       type="button"
@@ -2279,13 +2304,25 @@ export default function QuizPage() {
                     }`}
                   >
                     {isSubmittingAnswer
-                      ? "送出中..."
+                      ? isBlindSimulationLastQuestion
+                        ? "儲存中..."
+                        : "送出中..."
                       : isBlindSimulation
-                        ? currentIndex === targetCount - 1
-                          ? "完成並看結果"
+                        ? isBlindSimulationLastQuestion
+                          ? "儲存"
                           : "儲存並下一題"
                         : "送出答案"}
                   </button>
+                  {isBlindSimulationLastQuestion ? (
+                    <button
+                      type="button"
+                      onClick={handleFinishSimulationExam}
+                      disabled={isSubmittingAnswer}
+                      className="min-h-12 w-full rounded-2xl bg-ink px-4 py-4 text-sm font-semibold text-white transition hover:bg-slate-900 disabled:cursor-not-allowed disabled:bg-slate-300"
+                    >
+                      交卷
+                    </button>
+                  ) : null}
                 </div>
               </div>
             </>
