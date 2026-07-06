@@ -163,6 +163,17 @@ function getAvailableOptionKeys(question: Question) {
   return optionKeys.filter((key) => typeof question.options[key] === "string");
 }
 
+function normalizeResultEliminatedOptions(options?: OptionKey[]) {
+  return Array.from(new Set((options ?? []).filter((key): key is OptionKey => optionKeys.includes(key))));
+}
+
+function getResultAttemptEliminatedOptions(session: QuizSession, attempt: Attempt) {
+  return normalizeResultEliminatedOptions([
+    ...(attempt.eliminatedOptions ?? []),
+    ...(session.optionEliminationMap?.[attempt.questionId] ?? [])
+  ]);
+}
+
 function getAcceptedAnswerSet(question: Question, fallbackAnswer: OptionKey) {
   if (question.answerCreditType === "all_credit") {
     return new Set(getAvailableOptionKeys(question));
@@ -1753,6 +1764,8 @@ function ResultsPageContent() {
     );
   }
 
+  const resultSession = state.session;
+
   function renderQuestionExplanationControls(question: Question, attempt: Attempt) {
     const generated = explanationOverrides[question.id];
     const loading = explanationLoadingMap[question.id];
@@ -1904,10 +1917,12 @@ function ResultsPageContent() {
   function renderAttemptReviewDetails({
     attempt,
     question,
+    resultSession,
     optionKeySuffix
   }: {
     attempt: Attempt;
     question: Question;
+    resultSession: QuizSession;
     optionKeySuffix: string;
   }) {
     const masteryLabel =
@@ -1923,6 +1938,7 @@ function ResultsPageContent() {
         fallbackToFullText={false}
       />
     ) : undefined;
+    const displayEliminatedOptions = getResultAttemptEliminatedOptions(resultSession, attempt);
 
     return (
       <div className="mt-2 min-w-0 space-y-3 overflow-hidden text-sm leading-7 text-slate-700 [overflow-wrap:anywhere]">
@@ -1934,7 +1950,7 @@ function ResultsPageContent() {
               question={question}
               selectedAnswer={attempt.selectedAnswer}
               correctAnswer={attempt.correctAnswer}
-              eliminatedOptions={attempt.eliminatedOptions}
+              eliminatedOptions={displayEliminatedOptions}
               className="px-0"
             />
           </div>
@@ -1942,7 +1958,7 @@ function ResultsPageContent() {
         <div className="grid gap-3">
           {getAvailableOptionKeys(question).map((key) => {
             const optionState = getResultOptionState(question, attempt, key);
-            const isEliminated = attempt.eliminatedOptions?.includes(key);
+            const isEliminated = displayEliminatedOptions.includes(key);
 
             return (
               <div key={`${question.id}-${optionKeySuffix}-${key}`} className={optionState.wrapperClassName}>
@@ -1954,8 +1970,12 @@ function ResultsPageContent() {
                     optionState.badge || isEliminated ? (
                       <>
                         {isEliminated ? (
-                          <span className="inline-flex shrink-0 rounded-full bg-slate-100 px-2.5 py-0.5 text-[11px] font-bold leading-5 text-slate-600 ring-1 ring-slate-200">
-                            已排除
+                          <span
+                            aria-label="作答時排除"
+                            title="作答時排除"
+                            className="inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-rose-50 text-[13px] font-black leading-none text-rose-700 ring-1 ring-rose-200"
+                          >
+                            ×
                           </span>
                         ) : null}
                         {optionState.badge ? (
@@ -2009,16 +2029,16 @@ function ResultsPageContent() {
               ) : null}
             </div>
           </div>
-          {attempt.errorType || attempt.eliminatedOptions?.length ? (
+          {attempt.errorType || displayEliminatedOptions.length ? (
             <div className="mt-3 flex flex-wrap gap-2">
               {attempt.errorType ? (
                 <span className="rounded-full bg-slate-100 px-2.5 py-1 text-xs font-bold text-slate-700">
                   錯因：{attempt.errorType}
                 </span>
               ) : null}
-              {attempt.eliminatedOptions?.length ? (
+              {displayEliminatedOptions.length ? (
                 <span className="rounded-full bg-slate-100 px-2.5 py-1 text-xs font-bold text-slate-700">
-                  作答時排除：{attempt.eliminatedOptions.join("、")}
+                  作答時排除：{displayEliminatedOptions.join("、")}
                 </span>
               ) : null}
             </div>
@@ -2487,6 +2507,7 @@ function ResultsPageContent() {
                         ? renderAttemptReviewDetails({
                             attempt,
                             question,
+                            resultSession,
                             optionKeySuffix: "wrong"
                           })
                         : null}
@@ -2542,6 +2563,7 @@ function ResultsPageContent() {
                           ? renderAttemptReviewDetails({
                               attempt,
                               question,
+                              resultSession,
                               optionKeySuffix: "low"
                             })
                           : null}
@@ -2593,6 +2615,7 @@ function ResultsPageContent() {
                       ? renderAttemptReviewDetails({
                           attempt,
                           question,
+                          resultSession,
                           optionKeySuffix: "all"
                         })
                       : null}
