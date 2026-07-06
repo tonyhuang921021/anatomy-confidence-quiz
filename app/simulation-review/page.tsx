@@ -8,6 +8,7 @@ import {
   ReviewNotebook,
   getUnresolvedReviewItems,
   readManualReviewStateForScope,
+  useReviewCompletionThreshold,
   type ManualReviewState
 } from "@/components/ReviewNotebook";
 import { applyQuestionClassificationOverride, getQuestionBankBySubjectFilter } from "@/data/med1QuestionBank";
@@ -113,6 +114,7 @@ export default function SimulationReviewPage() {
     readManualReviewStateForScope(SIMULATION_REVIEW_SCOPE, "guest")
   );
   const { user, syncVersion } = useAuth();
+  const reviewCompletionThreshold = useReviewCompletionThreshold();
   const baseQuestions = useMemo(() => getQuestionBankBySubjectFilter("全部"), []);
   const allQuestions = useMemo(
     () =>
@@ -175,8 +177,8 @@ export default function SimulationReviewPage() {
   );
 
   const unresolvedSimulationItems = useMemo(
-    () => getUnresolvedReviewItems(simulationItems, manualReviewState),
-    [manualReviewState, simulationItems]
+    () => getUnresolvedReviewItems(simulationItems, manualReviewState, reviewCompletionThreshold),
+    [manualReviewState, reviewCompletionThreshold, simulationItems]
   );
   const simulationSnapshot = getReviewSnapshot(unresolvedSimulationItems);
 
@@ -241,6 +243,7 @@ export default function SimulationReviewPage() {
           items={simulationItems}
           allQuestions={allQuestions}
           manualEditScope={SIMULATION_REVIEW_SCOPE}
+          completionThreshold={reviewCompletionThreshold}
         />
       </div>
     </main>

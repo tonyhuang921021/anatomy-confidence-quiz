@@ -8,6 +8,7 @@ import {
   ReviewNotebook,
   getUnresolvedReviewItems,
   readManualReviewStateForScope,
+  useReviewCompletionThreshold,
   type ManualReviewState
 } from "@/components/ReviewNotebook";
 import { applyQuestionClassificationOverride, getQuestionBankBySubjectFilter } from "@/data/med1QuestionBank";
@@ -104,6 +105,7 @@ export default function ReviewPage() {
     readManualReviewStateForScope("practice-review", "guest")
   );
   const { user, syncVersion } = useAuth();
+  const reviewCompletionThreshold = useReviewCompletionThreshold();
   const pageScrollYRef = useRef(0);
   const baseQuestions = useMemo(() => getQuestionBankBySubjectFilter("全部"), []);
   const allQuestions = useMemo(
@@ -233,8 +235,8 @@ export default function ReviewPage() {
   }
 
   const unresolvedPracticeItems = useMemo(
-    () => getUnresolvedReviewItems(practiceItems, manualReviewState),
-    [manualReviewState, practiceItems]
+    () => getUnresolvedReviewItems(practiceItems, manualReviewState, reviewCompletionThreshold),
+    [manualReviewState, practiceItems, reviewCompletionThreshold]
   );
   const reviewCount = unresolvedPracticeItems.length;
   const lowConfidenceCount = unresolvedPracticeItems.filter((item) => item.history.lowConfidence > 0).length;
@@ -301,6 +303,7 @@ export default function ReviewPage() {
             items={practiceItems}
             allQuestions={allQuestions}
             manualEditScope="practice-review"
+            completionThreshold={reviewCompletionThreshold}
             headerAction={
               <button
                 type="button"
@@ -350,6 +353,7 @@ export default function ReviewPage() {
                 items={practiceItems}
                 allQuestions={allQuestions}
                 manualEditScope="practice-review"
+                completionThreshold={reviewCompletionThreshold}
                 fullscreenMobile
               />
             </div>

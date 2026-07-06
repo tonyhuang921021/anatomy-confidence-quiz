@@ -13,6 +13,7 @@ import {
   loadSimulationOptionElimination,
   loadPracticeFastAnswerMode,
   loadPracticeStopAfterReview,
+  loadReviewCompletionThreshold,
   loadPracticeYearRange,
   loadHomeToneMode,
   loadThemeMode,
@@ -23,11 +24,13 @@ import {
   saveSimulationOptionElimination,
   savePracticeFastAnswerMode,
   savePracticeStopAfterReview,
+  saveReviewCompletionThreshold,
   savePracticeYearRange,
   saveHomeToneMode,
   saveThemeMode,
   type PracticeQuestionCount,
   type PracticeYearRange,
+  type ReviewCompletionThreshold,
   type HomeToneMode,
   type ThemeMode
 } from "@/lib/storage";
@@ -42,11 +45,13 @@ import {
   hasSimulationOptionEliminationPreference,
   hasPracticeFastAnswerModePreference,
   hasPracticeStopAfterReviewPreference,
+  hasReviewCompletionThresholdPreference,
   getSimulationConfidenceCalibrationPreference,
   getSimulationOptionEliminationPreference,
   getPracticeFastAnswerModePreference,
   getPracticeQuestionCountPreference,
   getPracticeStopAfterReviewPreference,
+  getReviewCompletionThresholdPreference,
   getPracticeYearRangePreference,
   getThemeModePreference,
   type AccountPreferencePatch
@@ -158,6 +163,9 @@ export function AuthPanel() {
   const [practiceQuestionCount, setPracticeQuestionCount] = useState<PracticeQuestionCount>(10);
   const [practiceStopAfterReview, setPracticeStopAfterReview] = useState(false);
   const [practiceFastAnswerMode, setPracticeFastAnswerMode] = useState(false);
+  const [reviewCompletionThreshold, setReviewCompletionThreshold] = useState<ReviewCompletionThreshold>(() =>
+    loadReviewCompletionThreshold(2)
+  );
   const [keyboardQuestionNavigation, setKeyboardQuestionNavigation] = useState(false);
   const [simulationConfidenceCalibration, setSimulationConfidenceCalibration] = useState(() =>
     loadSimulationConfidenceCalibration(true)
@@ -223,6 +231,7 @@ export function AuthPanel() {
     const accountCount = getPracticeQuestionCountPreference(user?.user_metadata, 10);
     const accountStopAfterReview = getPracticeStopAfterReviewPreference(user?.user_metadata, false);
     const accountFastAnswerMode = getPracticeFastAnswerModePreference(user?.user_metadata, false);
+    const accountReviewCompletionThreshold = getReviewCompletionThresholdPreference(user?.user_metadata, 2);
     const accountKeyboardQuestionNavigation = getKeyboardQuestionNavigationPreference(user?.user_metadata, false);
     const accountSimulationConfidenceCalibration = getSimulationConfidenceCalibrationPreference(user?.user_metadata, true);
     const accountSimulationOptionElimination = getSimulationOptionEliminationPreference(user?.user_metadata, false);
@@ -230,6 +239,9 @@ export function AuthPanel() {
     const nextCount = user ? accountCount : loadPracticeQuestionCount(10);
     const nextStopAfterReview = user ? accountStopAfterReview : loadPracticeStopAfterReview(false);
     const nextFastAnswerMode = user ? accountFastAnswerMode : loadPracticeFastAnswerMode(false);
+    const nextReviewCompletionThreshold = user
+      ? accountReviewCompletionThreshold
+      : loadReviewCompletionThreshold(2);
     const nextKeyboardQuestionNavigation = user
       ? accountKeyboardQuestionNavigation
       : loadKeyboardQuestionNavigation(false);
@@ -245,6 +257,7 @@ export function AuthPanel() {
     setPracticeQuestionCount(nextCount);
     setPracticeStopAfterReview(nextStopAfterReview);
     setPracticeFastAnswerMode(nextFastAnswerMode);
+    setReviewCompletionThreshold(nextReviewCompletionThreshold);
     setKeyboardQuestionNavigation(nextKeyboardQuestionNavigation);
     setSimulationConfidenceCalibration(nextSimulationConfidenceCalibration);
     setSimulationOptionElimination(nextSimulationOptionElimination);
@@ -253,6 +266,7 @@ export function AuthPanel() {
       savePracticeQuestionCount(accountCount);
       savePracticeStopAfterReview(accountStopAfterReview);
       savePracticeFastAnswerMode(accountFastAnswerMode);
+      saveReviewCompletionThreshold(accountReviewCompletionThreshold);
       saveKeyboardQuestionNavigation(accountKeyboardQuestionNavigation);
       saveSimulationConfidenceCalibration(accountSimulationConfidenceCalibration);
       saveSimulationOptionElimination(accountSimulationOptionElimination);
@@ -260,6 +274,7 @@ export function AuthPanel() {
       const missingQuestionCount = !hasPracticeQuestionCountPreference(user.user_metadata);
       const missingStopAfterReview = !hasPracticeStopAfterReviewPreference(user.user_metadata);
       const missingFastAnswerMode = !hasPracticeFastAnswerModePreference(user.user_metadata);
+      const missingReviewCompletionThreshold = !hasReviewCompletionThresholdPreference(user.user_metadata);
       const missingKeyboardQuestionNavigation = !hasKeyboardQuestionNavigationPreference(user.user_metadata);
       const missingSimulationConfidenceCalibration = !hasSimulationConfidenceCalibrationPreference(user.user_metadata);
       const missingSimulationOptionElimination = !hasSimulationOptionEliminationPreference(user.user_metadata);
@@ -268,6 +283,7 @@ export function AuthPanel() {
         missingQuestionCount ||
         missingStopAfterReview ||
         missingFastAnswerMode ||
+        missingReviewCompletionThreshold ||
         missingKeyboardQuestionNavigation ||
         missingSimulationConfidenceCalibration ||
         missingSimulationOptionElimination ||
@@ -277,6 +293,7 @@ export function AuthPanel() {
         if (missingQuestionCount) patch.practice_question_count = 10;
         if (missingStopAfterReview) patch.practice_stop_after_review = false;
         if (missingFastAnswerMode) patch.practice_fast_answer_mode = false;
+        if (missingReviewCompletionThreshold) patch.review_completion_threshold = 2;
         if (missingKeyboardQuestionNavigation) patch.keyboard_question_navigation = false;
         if (missingSimulationConfidenceCalibration) patch.simulation_confidence_calibration = true;
         if (missingSimulationOptionElimination) patch.simulation_option_elimination = false;
@@ -287,6 +304,7 @@ export function AuthPanel() {
       savePracticeQuestionCount(nextCount);
       savePracticeStopAfterReview(nextStopAfterReview);
       savePracticeFastAnswerMode(nextFastAnswerMode);
+      saveReviewCompletionThreshold(nextReviewCompletionThreshold);
       saveKeyboardQuestionNavigation(nextKeyboardQuestionNavigation);
       saveSimulationConfidenceCalibration(nextSimulationConfidenceCalibration);
       saveSimulationOptionElimination(nextSimulationOptionElimination);
@@ -376,6 +394,18 @@ export function AuthPanel() {
       practice_fast_answer_mode: enabled
     }).catch((persistError) => {
       setError(persistError instanceof Error ? persistError.message : "極速模式設定同步失敗");
+    });
+  }
+
+  function handleChangeReviewCompletionThreshold(threshold: ReviewCompletionThreshold) {
+    setReviewCompletionThreshold(threshold);
+    saveReviewCompletionThreshold(threshold);
+    if (!user) return;
+    setError("");
+    void persistAccountPreferences({
+      review_completion_threshold: threshold
+    }).catch((persistError) => {
+      setError(persistError instanceof Error ? persistError.message : "複習完成條件同步失敗");
     });
   }
 
@@ -890,6 +920,38 @@ export function AuthPanel() {
                     <p className="mt-2 text-xs leading-5 text-slate-500">
                       極速模式會在點選選項後直接作答，作答後仍可看詳解。
                     </p>
+                    <div className="mt-4 rounded-2xl border border-slate-200 bg-white/80 p-3">
+                      <p className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-500">
+                        複習完成條件
+                      </p>
+                      <div className="mt-3 flex flex-wrap gap-2">
+                        <button
+                          type="button"
+                          onClick={() => handleChangeReviewCompletionThreshold(1)}
+                          className={`min-h-11 rounded-full px-4 py-2 text-sm font-semibold transition ${
+                            reviewCompletionThreshold === 1
+                              ? "bg-emerald-100 text-emerald-950 ring-1 ring-emerald-300"
+                              : "bg-slate-100 text-slate-700 hover:bg-slate-200"
+                          }`}
+                        >
+                          答對 1 次就完成
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => handleChangeReviewCompletionThreshold(2)}
+                          className={`min-h-11 rounded-full px-4 py-2 text-sm font-semibold transition ${
+                            reviewCompletionThreshold === 2
+                              ? "bg-brand-600 text-white"
+                              : "bg-slate-100 text-slate-700 hover:bg-slate-200"
+                          }`}
+                        >
+                          答對 2 次才完成
+                        </button>
+                      </div>
+                      <p className="mt-2 text-xs leading-5 text-slate-500">
+                        同時影響錯題與沒信心題；手動移入或移回完成區仍會優先保留。
+                      </p>
+                    </div>
                     <div className="mt-4 flex flex-wrap gap-2">
                       <button
                         type="button"

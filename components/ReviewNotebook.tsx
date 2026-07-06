@@ -21,11 +21,14 @@ import {
 import { applyQuestionClassificationOverride } from "@/data/med1QuestionBank";
 import {
   applyQuestionExplanationOverride,
+  loadReviewCompletionThreshold,
   loadQuestionExplanationOverrides,
   mergeQuestionExplanationOverrides,
+  type ReviewCompletionThreshold,
   saveQuestionExplanationOverride,
   saveQuestionExplanationOverrides
 } from "@/lib/storage";
+import { getReviewCompletionThresholdPreference } from "@/lib/accountPreferences";
 import { getOrCreateVisitorId } from "@/lib/visitor";
 import { useAuth } from "@/components/AuthProvider";
 import {
@@ -277,23 +280,64 @@ function sortByRecent<T extends ReviewQuestionItem>(items: T[]) {
   return [...items].sort(compareByRecent);
 }
 
-export function isResolvedReviewItem(item: ReviewQuestionItem) {
-  if (item.history.wrong > 0) {
-    return item.history.correctStreakAfterLatestWrong >= 2;
-  }
+export function useReviewCompletionThreshold() {
+  const { user } = useAuth();
+  const [threshold, setThreshold] = useState<ReviewCompletionThreshold>(() =>
+    loadReviewCompletionThreshold(2)
+  );
 
-  return item.history.lowConfidence > 0 && item.history.correctStreakAfterLatestRisk >= 2;
+  useEffect(() => {
+    const nextThreshold = user
+      ? getReviewCompletionThresholdPreference(user.user_metadata, 2)
+      : loadReviewCompletionThreshold(2);
+    setThreshold(nextThreshold);
+  }, [user?.id, user?.user_metadata]);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+
+    const handleThresholdChange = (event: Event) => {
+      const detail = (event as CustomEvent<ReviewCompletionThreshold>).detail;
+      setThreshold(detail === 1 || detail === 2 ? detail : loadReviewCompletionThreshold(2));
+    };
+
+    window.addEventListener("review-completion-threshold-change", handleThresholdChange);
+    return () => {
+      window.removeEventListener("review-completion-threshold-change", handleThresholdChange);
+    };
+  }, []);
+
+  return threshold;
 }
 
-export function isReviewItemResolved(item: ReviewQuestionItem, manualState?: ManualReviewState) {
+export function isResolvedReviewItem(
+  item: ReviewQuestionItem,
+  completionThreshold: ReviewCompletionThreshold = 2
+) {
+  if (item.history.wrong > 0) {
+    return item.history.correctStreakAfterLatestWrong >= completionThreshold;
+  }
+
+  return item.history.lowConfidence > 0 && item.history.correctStreakAfterLatestRisk >= completionThreshold;
+}
+
+export function isReviewItemResolved(
+  item: ReviewQuestionItem,
+  manualState?: ManualReviewState,
+  completionThreshold: ReviewCompletionThreshold = 2
+) {
   const questionId = item.question.id;
   if (manualState?.unresolvedIds.has(questionId)) return false;
   if (manualState?.resolvedIds.has(questionId)) return true;
-  return isResolvedReviewItem(item);
+  return isResolvedReviewItem(item, completionThreshold);
 }
 
-export function getUnresolvedReviewItems(items: ReviewQuestionItem[], manualState?: ManualReviewState) {
-  return items.filter((item) => !isReviewItemResolved(item, manualState));
+export function getUnresolvedReviewItems(
+  items: ReviewQuestionItem[],
+  manualState?: ManualReviewState,
+  completionThreshold: ReviewCompletionThreshold = 2
+) {
+  return items.filter((item) => !isReviewItemResolved(item, manualState, completionThreshold));
 }
 
 function sortResolvedItems<T extends ReviewQuestionItem>(items: T[], manualState: ManualReviewState) {
@@ -604,6 +648,7 @@ type ReviewNotebookProps = {
   fullscreenMobile?: boolean;
   headerAction?: ReactNode;
   manualEditScope?: string;
+  completionThreshold?: ReviewCompletionThreshold;
 };
 
 export function ReviewNotebook({
@@ -617,9 +662,12 @@ export function ReviewNotebook({
   onStartReview,
   fullscreenMobile = false,
   headerAction,
-  manualEditScope
+  manualEditScope,
+  completionThreshold
 }: ReviewNotebookProps) {
   const { session, user } = useAuth();
+  const accountCompletionThreshold = useReviewCompletionThreshold();
+  const effectiveCompletionThreshold = completionThreshold ?? accountCompletionThreshold;
   const [explanationOverrides, setExplanationOverrides] = useState<Record<string, QuestionExplanationOverride>>({});
   const [explanationLoadingMap, setExplanationLoadingMap] = useState<Record<string, boolean>>({});
   const [explanationErrorMap, setExplanationErrorMap] = useState<Record<string, string>>({});
@@ -687,16 +735,20 @@ export function ReviewNotebook({
   );
   const unresolvedItems = useMemo(
     () =>
-      filteredItems.filter((item) => !isReviewItemResolved(item, manualReviewState)),
-    [filteredItems, manualReviewState]
+      filteredItems.filter((item) =>
+        !isReviewItemResolved(item, manualReviewState, effectiveCompletionThreshold)
+      ),
+    [effectiveCompletionThreshold, filteredItems, manualReviewState]
   );
   const resolvedItems = useMemo(
     () =>
       sortResolvedItems(
-        filteredItems.filter((item) => isReviewItemResolved(item, manualReviewState)),
+        filteredItems.filter((item) =>
+          isReviewItemResolved(item, manualReviewState, effectiveCompletionThreshold)
+        ),
         manualReviewState
       ),
-    [filteredItems, manualReviewState]
+    [effectiveCompletionThreshold, filteredItems, manualReviewState]
   );
   const wrongItems = useMemo(
     () => sortByRecent(unresolvedItems.filter((item) => item.history.wrong > 0)),

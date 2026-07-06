@@ -24,6 +24,7 @@ const PRACTICE_YEAR_RANGE_KEY = "anatomy-confidence-practice-year-range";
 const PRACTICE_QUESTION_COUNT_KEY = "anatomy-confidence-practice-question-count";
 const PRACTICE_STOP_AFTER_REVIEW_KEY = "anatomy-confidence-practice-stop-after-review";
 const PRACTICE_FAST_ANSWER_MODE_KEY = "anatomy-confidence-practice-fast-answer-mode";
+const REVIEW_COMPLETION_THRESHOLD_KEY = "anatomy-confidence-review-completion-threshold";
 const SIMULATION_CONFIDENCE_CALIBRATION_KEY = "anatomy-confidence-simulation-confidence-calibration";
 const PHARMACOLOGY_REVERSE_SWIPE_KEY = "anatomy-confidence-pharmacology-reverse-swipe";
 const KEYBOARD_QUESTION_NAVIGATION_KEY = "anatomy-confidence-keyboard-question-navigation";
@@ -1821,6 +1822,7 @@ export type PracticeYearRange = {
 };
 
 export type PracticeQuestionCount = 5 | 10 | 15 | 20 | 25 | 30 | 35 | 40 | 45 | 50;
+export type ReviewCompletionThreshold = 1 | 2;
 
 export function saveHomeToneMode(mode: HomeToneMode) {
   if (!isBrowser()) return;
@@ -1894,6 +1896,20 @@ export function loadPracticeFastAnswerMode(defaultValue = false) {
   if (raw === "true") return true;
   if (raw === "false") return false;
   return defaultValue;
+}
+
+export function saveReviewCompletionThreshold(threshold: ReviewCompletionThreshold) {
+  if (!isBrowser()) return;
+  safeLocalStorageSetItem(getScopedKey(REVIEW_COMPLETION_THRESHOLD_KEY), String(threshold));
+  window.dispatchEvent(new CustomEvent("review-completion-threshold-change", { detail: threshold }));
+}
+
+export function loadReviewCompletionThreshold(
+  defaultValue: ReviewCompletionThreshold = 2
+): ReviewCompletionThreshold {
+  if (!isBrowser()) return defaultValue;
+  const raw = getLegacyOrScopedRaw(REVIEW_COMPLETION_THRESHOLD_KEY);
+  return raw === "1" || raw === "2" ? (Number(raw) as ReviewCompletionThreshold) : defaultValue;
 }
 
 export function saveKeyboardQuestionNavigation(enabled: boolean) {

@@ -3,7 +3,11 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { useAuth } from "@/components/AuthProvider";
-import { ReviewNotebook, getUnresolvedReviewItems } from "@/components/ReviewNotebook";
+import {
+  ReviewNotebook,
+  getUnresolvedReviewItems,
+  useReviewCompletionThreshold
+} from "@/components/ReviewNotebook";
 import { getQuestionBankBySubjectFilter } from "@/data/med1QuestionBank";
 import {
   DEFAULT_QUIZ_SETTINGS,
@@ -17,6 +21,7 @@ import { ReviewQuestionItem } from "@/types/quiz";
 export default function CustomPaperReviewPage() {
   const [customPaperItems, setCustomPaperItems] = useState<ReviewQuestionItem[]>([]);
   const { syncVersion } = useAuth();
+  const reviewCompletionThreshold = useReviewCompletionThreshold();
   const allQuestions = getQuestionBankBySubjectFilter("全部");
 
   useEffect(() => {
@@ -39,7 +44,11 @@ export default function CustomPaperReviewPage() {
     });
   }
 
-  const unresolvedCustomPaperItems = getUnresolvedReviewItems(customPaperItems);
+  const unresolvedCustomPaperItems = getUnresolvedReviewItems(
+    customPaperItems,
+    undefined,
+    reviewCompletionThreshold
+  );
   const snapshot = getReviewSnapshot(unresolvedCustomPaperItems);
 
   return (
@@ -101,6 +110,7 @@ export default function CustomPaperReviewPage() {
           onStartReview={handleStartCustomPaperReview}
           items={customPaperItems}
           allQuestions={allQuestions}
+          completionThreshold={reviewCompletionThreshold}
         />
       </div>
     </main>

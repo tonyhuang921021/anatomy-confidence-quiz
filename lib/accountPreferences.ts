@@ -3,6 +3,7 @@ import type {
   HomeToneMode,
   PracticeQuestionCount,
   PracticeYearRange,
+  ReviewCompletionThreshold,
   ThemeMode
 } from "@/lib/storage";
 import { normalizePracticeYearRange } from "@/lib/practiceYears";
@@ -17,6 +18,7 @@ export type AccountPreferencePatch = {
   practice_question_count?: PracticeQuestionCount;
   practice_stop_after_review?: boolean;
   practice_fast_answer_mode?: boolean;
+  review_completion_threshold?: ReviewCompletionThreshold;
   keyboard_question_navigation?: boolean;
   simulation_confidence_calibration?: boolean;
   simulation_option_elimination?: boolean;
@@ -67,6 +69,14 @@ export function getPracticeFastAnswerModePreference(metadata: MetadataSource, de
     : defaultValue;
 }
 
+export function getReviewCompletionThresholdPreference(
+  metadata: MetadataSource,
+  defaultValue: ReviewCompletionThreshold = 2
+): ReviewCompletionThreshold {
+  const value = metadata?.review_completion_threshold;
+  return value === 1 || value === 2 ? value : defaultValue;
+}
+
 export function getKeyboardQuestionNavigationPreference(metadata: MetadataSource, defaultValue = false) {
   return typeof metadata?.keyboard_question_navigation === "boolean"
     ? metadata.keyboard_question_navigation
@@ -101,6 +111,10 @@ export function hasPracticeStopAfterReviewPreference(metadata: MetadataSource) {
 
 export function hasPracticeFastAnswerModePreference(metadata: MetadataSource) {
   return typeof metadata?.practice_fast_answer_mode === "boolean";
+}
+
+export function hasReviewCompletionThresholdPreference(metadata: MetadataSource) {
+  return metadata?.review_completion_threshold === 1 || metadata?.review_completion_threshold === 2;
 }
 
 export function hasKeyboardQuestionNavigationPreference(metadata: MetadataSource) {
