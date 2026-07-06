@@ -1809,8 +1809,17 @@ export default function QuizPage() {
       return;
     }
 
+    const navigationSession =
+      currentQuestion
+        ? setQuestionEliminatedOptions(
+            session,
+            currentQuestion.id,
+            getEliminatedOptionsForQuestion(currentQuestion.id, session)
+          )
+        : session;
+
     const jumpedSession: QuizSession = {
-      ...getSessionWithCurrentDraft(session),
+      ...navigationSession,
       currentQuestionIndex: targetIndex,
       isReviewingAnswer: false
     };
