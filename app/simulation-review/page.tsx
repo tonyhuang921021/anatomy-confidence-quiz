@@ -84,6 +84,13 @@ function isSimulationSourceSession(session: QuizSession) {
   return !settings && getSessionQuestionFootprint(session) >= SIMULATION_LIKE_MIN_QUESTION_COUNT;
 }
 
+function isSimulationReviewCompletionSession(session: QuizSession) {
+  return (
+    session.settings?.mode === "review" &&
+    session.settings?.customPoolLabel === SIMULATION_REVIEW_POOL_LABEL
+  );
+}
+
 function buildSimulationReviewSettings(items: ReviewQuestionItem[]): QuizSettings {
   return {
     ...DEFAULT_QUIZ_SETTINGS,
@@ -134,9 +141,12 @@ export default function SimulationReviewPage() {
 
   useEffect(() => {
     const sessions = loadCompletedSessions();
-    const simulationSessions = sessions.filter(isSimulationSourceSession);
-    const reviewQuestions = mergeQuestionsWithSessionSnapshots(allQuestions, simulationSessions);
-    setSimulationItems(getReviewQuestionItems(reviewQuestions, simulationSessions, Number.MAX_SAFE_INTEGER));
+    const simulationSourceSessions = sessions.filter(isSimulationSourceSession);
+    const historySessions = sessions.filter(
+      (session) => isSimulationSourceSession(session) || isSimulationReviewCompletionSession(session)
+    );
+    const reviewQuestions = mergeQuestionsWithSessionSnapshots(allQuestions, simulationSourceSessions);
+    setSimulationItems(getReviewQuestionItems(reviewQuestions, historySessions, Number.MAX_SAFE_INTEGER));
   }, [allQuestions, syncVersion, localHistoryVersion, user?.id]);
 
   useEffect(() => {

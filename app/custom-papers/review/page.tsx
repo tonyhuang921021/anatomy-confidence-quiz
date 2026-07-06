@@ -1,12 +1,15 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useAuth } from "@/components/AuthProvider";
 import {
+  MANUAL_REVIEW_STATE_CHANGE_EVENT,
   ReviewNotebook,
   getUnresolvedReviewItems,
-  useReviewCompletionThreshold
+  readManualReviewStateForScope,
+  useReviewCompletionThreshold,
+  type ManualReviewState
 } from "@/components/ReviewNotebook";
 import { getQuestionBankBySubjectFilter } from "@/data/med1QuestionBank";
 import {
@@ -16,20 +19,58 @@ import {
   mergeQuestionsWithSessionSnapshots
 } from "@/lib/quizAnalysis";
 import { loadCompletedSessions, saveQuizSettings } from "@/lib/storage";
-import { ReviewQuestionItem } from "@/types/quiz";
+import { QuizSession, ReviewQuestionItem } from "@/types/quiz";
+
+const CUSTOM_PAPER_REVIEW_SCOPE = "custom-paper-review";
+const CUSTOM_PAPER_REVIEW_POOL_LABEL = "自訂卷錯題庫";
+
+function isCustomPaperSourceSession(session: QuizSession) {
+  return session.settings?.mode === "custom_paper";
+}
+
+function isCustomPaperReviewCompletionSession(session: QuizSession) {
+  return (
+    session.settings?.mode === "review" &&
+    session.settings?.customPoolLabel === CUSTOM_PAPER_REVIEW_POOL_LABEL
+  );
+}
 
 export default function CustomPaperReviewPage() {
   const [customPaperItems, setCustomPaperItems] = useState<ReviewQuestionItem[]>([]);
-  const { syncVersion } = useAuth();
+  const [manualReviewState, setManualReviewState] = useState<ManualReviewState>(() =>
+    readManualReviewStateForScope(CUSTOM_PAPER_REVIEW_SCOPE, "guest")
+  );
+  const { user, syncVersion } = useAuth();
   const reviewCompletionThreshold = useReviewCompletionThreshold();
   const allQuestions = getQuestionBankBySubjectFilter("全部");
 
   useEffect(() => {
     const sessions = loadCompletedSessions();
-    const customPaperSessions = sessions.filter((session) => session.settings?.mode === "custom_paper");
-    const reviewQuestions = mergeQuestionsWithSessionSnapshots(allQuestions, customPaperSessions);
-    setCustomPaperItems(getReviewQuestionItems(reviewQuestions, customPaperSessions, Number.MAX_SAFE_INTEGER));
+    const customPaperSourceSessions = sessions.filter(isCustomPaperSourceSession);
+    const historySessions = sessions.filter(
+      (session) => isCustomPaperSourceSession(session) || isCustomPaperReviewCompletionSession(session)
+    );
+    const reviewQuestions = mergeQuestionsWithSessionSnapshots(allQuestions, customPaperSourceSessions);
+    setCustomPaperItems(getReviewQuestionItems(reviewQuestions, historySessions, Number.MAX_SAFE_INTEGER));
   }, [syncVersion]);
+
+  useEffect(() => {
+    const userId = user?.id ?? "guest";
+    setManualReviewState(readManualReviewStateForScope(CUSTOM_PAPER_REVIEW_SCOPE, userId));
+
+    if (typeof window === "undefined") return;
+    const handleManualReviewStateChange = (event: Event) => {
+      const detail = (event as CustomEvent<{ scope?: string; userId?: string }>).detail;
+      if (detail?.scope && detail.scope !== CUSTOM_PAPER_REVIEW_SCOPE) return;
+      if (detail?.userId && detail.userId !== userId) return;
+      setManualReviewState(readManualReviewStateForScope(CUSTOM_PAPER_REVIEW_SCOPE, userId));
+    };
+
+    window.addEventListener(MANUAL_REVIEW_STATE_CHANGE_EVENT, handleManualReviewStateChange);
+    return () => {
+      window.removeEventListener(MANUAL_REVIEW_STATE_CHANGE_EVENT, handleManualReviewStateChange);
+    };
+  }, [user?.id]);
 
   function handleStartCustomPaperReview(filteredItems: ReviewQuestionItem[] = customPaperItems) {
     saveQuizSettings({
@@ -40,14 +81,13 @@ export default function CustomPaperReviewPage() {
       strictCustomQuestionPool: true,
       customQuestionIds: filteredItems.map((item) => item.question.id),
       customQuestionPayload: filteredItems.map((item) => item.question),
-      customPoolLabel: "自訂卷錯題庫"
+      customPoolLabel: CUSTOM_PAPER_REVIEW_POOL_LABEL
     });
   }
 
-  const unresolvedCustomPaperItems = getUnresolvedReviewItems(
-    customPaperItems,
-    undefined,
-    reviewCompletionThreshold
+  const unresolvedCustomPaperItems = useMemo(
+    () => getUnresolvedReviewItems(customPaperItems, manualReviewState, reviewCompletionThreshold),
+    [customPaperItems, manualReviewState, reviewCompletionThreshold]
   );
   const snapshot = getReviewSnapshot(unresolvedCustomPaperItems);
 
@@ -110,6 +150,7 @@ export default function CustomPaperReviewPage() {
           onStartReview={handleStartCustomPaperReview}
           items={customPaperItems}
           allQuestions={allQuestions}
+          manualEditScope={CUSTOM_PAPER_REVIEW_SCOPE}
           completionThreshold={reviewCompletionThreshold}
         />
       </div>

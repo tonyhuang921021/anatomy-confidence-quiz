@@ -60,6 +60,13 @@ export type ManualReviewState = {
   unresolvedAtById: Map<string, string>;
 };
 
+type RemoteManualReviewStateRecord = {
+  scope: string;
+  questionId: string;
+  state: "resolved" | "unresolved";
+  updatedAt: string;
+};
+
 type RelatedQuestionIndex = {
   byConcept: Map<string, Question[]>;
   bySection: Map<string, Question[]>;
@@ -258,6 +265,83 @@ function dispatchManualReviewStateChange(scope: string, userId: string, state: M
       }
     })
   );
+}
+
+function manualReviewStateToRemoteRecords(scope: string, state: ManualReviewState) {
+  const records: RemoteManualReviewStateRecord[] = [];
+  const now = new Date().toISOString();
+
+  for (const questionId of state.resolvedIds) {
+    records.push({
+      scope,
+      questionId,
+      state: "resolved",
+      updatedAt: state.resolvedAtById.get(questionId) ?? now
+    });
+  }
+
+  for (const questionId of state.unresolvedIds) {
+    records.push({
+      scope,
+      questionId,
+      state: "unresolved",
+      updatedAt: state.unresolvedAtById.get(questionId) ?? now
+    });
+  }
+
+  return records;
+}
+
+function remoteRecordsToManualReviewState(records: RemoteManualReviewStateRecord[], scope: string) {
+  const state = createEmptyManualReviewState();
+
+  for (const record of records) {
+    if (record.scope !== scope || !record.questionId) continue;
+    const updatedAt = typeof record.updatedAt === "string" ? record.updatedAt : "";
+    if (record.state === "resolved") {
+      state.resolvedIds.add(record.questionId);
+      if (updatedAt) state.resolvedAtById.set(record.questionId, updatedAt);
+      continue;
+    }
+
+    if (record.state === "unresolved") {
+      state.unresolvedIds.add(record.questionId);
+      if (updatedAt) state.unresolvedAtById.set(record.questionId, updatedAt);
+    }
+  }
+
+  return state;
+}
+
+async function syncManualReviewStateWithCloud(
+  scope: string,
+  accessToken: string,
+  state: ManualReviewState
+) {
+  const response = await fetch("/api/review-question-states", {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${accessToken}`,
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+      action: "sync",
+      scope,
+      records: manualReviewStateToRemoteRecords(scope, state)
+    })
+  });
+
+  const payload = (await response.json().catch(() => null)) as {
+    ok?: boolean;
+    message?: string;
+    records?: RemoteManualReviewStateRecord[];
+  } | null;
+
+  if (!response.ok || !payload?.ok) {
+    throw new Error(payload?.message || "複習完成區雲端同步失敗。");
+  }
+
+  return remoteRecordsToManualReviewState(Array.isArray(payload.records) ? payload.records : [], scope);
 }
 
 function formatTime(value?: string) {
@@ -685,6 +769,7 @@ export function ReviewNotebook({
   });
   const [selectedSubjects, setSelectedSubjects] = useState<SubjectName[]>([]);
   const [isManualEditMode, setIsManualEditMode] = useState(false);
+  const [manualReviewPersistenceError, setManualReviewPersistenceError] = useState("");
   const [manualReviewState, setManualReviewState] = useState<ManualReviewState>(() =>
     createEmptyManualReviewState()
   );
@@ -830,12 +915,41 @@ export function ReviewNotebook({
   useEffect(() => {
     if (!manualEditScope || !manualReviewStorageKey || typeof window === "undefined") {
       setManualReviewState(createEmptyManualReviewState());
+      setManualReviewPersistenceError("");
       return;
     }
 
-    setManualReviewState(readManualReviewStateForScope(manualEditScope, manualReviewUserId));
+    const localState = readManualReviewStateForScope(manualEditScope, manualReviewUserId);
+    setManualReviewState(localState);
     setIsManualEditMode(false);
-  }, [manualEditScope, manualReviewStorageKey, manualReviewUserId]);
+    setManualReviewPersistenceError("");
+
+    if (!session?.access_token) return;
+
+    let cancelled = false;
+    void syncManualReviewStateWithCloud(manualEditScope, session.access_token, localState)
+      .then((cloudState) => {
+        if (cancelled) return;
+        const latestLocalState = readManualReviewStateForScope(manualEditScope, manualReviewUserId);
+        const mergedState = mergeManualReviewStates([latestLocalState, cloudState]);
+        safeSaveManualReviewState(manualReviewStorageKey, mergedState);
+        setManualReviewState(mergedState);
+        dispatchManualReviewStateChange(manualEditScope, manualReviewUserId, mergedState);
+        setManualReviewPersistenceError("");
+      })
+      .catch((error) => {
+        if (cancelled) return;
+        setManualReviewPersistenceError(
+          error instanceof Error && error.message.trim()
+            ? error.message
+            : "完成區會先保存在這台裝置，稍後再同步雲端。"
+        );
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [manualEditScope, manualReviewStorageKey, manualReviewUserId, session?.access_token]);
 
   useEffect(() => {
     if (!manualEditScope || typeof window === "undefined") return;
@@ -867,11 +981,36 @@ export function ReviewNotebook({
 
   function updateManualReviewState(updater: (current: ManualReviewState) => ManualReviewState) {
     if (!manualReviewStorageKey || !manualEditScope) return;
+    const accessToken = session?.access_token;
 
     setManualReviewState((current) => {
-      const next = updater(current);
-      safeSaveManualReviewState(manualReviewStorageKey, next);
+      const persisted = readManualReviewStateForScope(manualEditScope, manualReviewUserId);
+      const next = updater(mergeManualReviewStates([persisted, current]));
+      const savedLocally = safeSaveManualReviewState(manualReviewStorageKey, next);
+      setManualReviewPersistenceError(
+        savedLocally ? "" : "完成區暫時無法寫入瀏覽器儲存，請先不要關閉這個分頁。"
+      );
       dispatchManualReviewStateChange(manualEditScope, manualReviewUserId, next);
+
+      if (accessToken) {
+        void syncManualReviewStateWithCloud(manualEditScope, accessToken, next)
+          .then((cloudState) => {
+            const latestLocalState = readManualReviewStateForScope(manualEditScope, manualReviewUserId);
+            const mergedState = mergeManualReviewStates([latestLocalState, cloudState]);
+            safeSaveManualReviewState(manualReviewStorageKey, mergedState);
+            setManualReviewState(mergedState);
+            dispatchManualReviewStateChange(manualEditScope, manualReviewUserId, mergedState);
+            setManualReviewPersistenceError("");
+          })
+          .catch((error) => {
+            setManualReviewPersistenceError(
+              error instanceof Error && error.message.trim()
+                ? error.message
+                : "完成區已先保存在這台裝置，雲端同步稍後會再試。"
+            );
+          });
+      }
+
       return next;
     });
   }
@@ -1371,7 +1510,12 @@ export function ReviewNotebook({
                   {activeItems.length} 題
                 </span>
               </div>
-                <div className="mt-4 grid gap-3 sm:gap-4">
+              {manualReviewPersistenceError ? (
+                <p className="mt-3 rounded-2xl bg-amber-50 px-4 py-3 text-sm font-semibold text-amber-900 ring-1 ring-amber-100">
+                  {manualReviewPersistenceError}
+                </p>
+              ) : null}
+              <div className="mt-4 grid gap-3 sm:gap-4">
                 {activeItems.length === 0 ? (
                   <div className="rounded-3xl bg-slate-50 p-5 text-sm text-slate-500">
                     {activeCategory === "wrong"

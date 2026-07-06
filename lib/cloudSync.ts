@@ -177,8 +177,10 @@ const CLOUD_RECOVERABLE_REVIEW_SESSION_GRACE_MS = 90_000;
 const CURRENT_SESSION_SYNC_MIN_INTERVAL_MS = 45_000;
 const STATS_SYNC_ATTEMPT_BATCH_SIZE = 200;
 const CLOUD_SESSION_LOOKUP_TIMEOUT_MS = 3500;
-const CLOUD_SYNC_BATCH_TIMEOUT_MS = 3500;
-const CLOUD_SYNC_TOTAL_BUDGET_MS = 8500;
+const CLOUD_SYNC_BATCH_TIMEOUT_MS = 24000;
+const CLOUD_DIRECT_SYNC_TIMEOUT_MS = 7000;
+const CLOUD_SERVER_SYNC_TIMEOUT_MS = 12000;
+const CLOUD_SYNC_TOTAL_BUDGET_MS = 45000;
 const LEADERBOARD_PROFILE_CLIENT_SYNC_MIN_INTERVAL_MS = 5 * 60 * 1000;
 const LEADERBOARD_PROFILE_SYNC_MARKER_PREFIX = "leaderboardProfileSync:";
 const CLOUD_HEAVY_LOCAL_HISTORY_READ_LIMIT = 160_000;
@@ -794,6 +796,22 @@ function getAttemptUploadSignature(attempt: Attempt) {
   ].join("|");
 }
 
+function getAttemptRowUploadSignature(row: QuizSessionAttemptRow) {
+  return [
+    row.question_id,
+    row.selected_answer,
+    row.correct_answer,
+    row.is_correct ? "1" : "0",
+    row.confidence,
+    row.error_type ?? "",
+    row.answered_at,
+    row.source_mode ?? "",
+    row.subject_snapshot ?? "",
+    row.chapter_snapshot ?? "",
+    row.section_snapshot ?? ""
+  ].join("|");
+}
+
 function getAttemptRowsNeedingUpload(
   userId: string,
   session: QuizSession,
@@ -818,6 +836,73 @@ function getAttemptRowsNeedingUpload(
         signature: string;
       } => Boolean(item)
     );
+}
+
+async function fetchExistingAttemptSignatureMap(
+  userId: string,
+  sessionIds: string[]
+) {
+  if (sessionIds.length === 0) return new Map<string, string>();
+
+  const supabase = getSupabaseBrowserClient();
+  const { data, error } = await supabase
+    .from("quiz_session_attempts")
+    .select(
+      "session_id, question_order, question_id, selected_answer, correct_answer, is_correct, confidence, error_type, answered_at"
+    )
+    .eq("user_id", userId)
+    .in("session_id", sessionIds);
+
+  if (error) throw error;
+
+  return new Map(
+    ((data ?? []) as Array<QuizSessionAttemptRow & { question_order: number }>).map((row) => [
+      `${row.session_id}::${row.question_order}`,
+      getAttemptRowUploadSignature(row)
+    ])
+  );
+}
+
+async function getCloudSessionSyncAccessToken() {
+  const supabase = getSupabaseBrowserClient();
+  const { data } = await supabase.auth.getSession();
+  return data.session?.access_token ?? null;
+}
+
+async function syncSessionsThroughServer(
+  sessions: QuizSession[],
+  options: { activeCheckpoint?: boolean } = {}
+) {
+  const accessToken = await getCloudSessionSyncAccessToken();
+  if (!accessToken) {
+    throw new Error("登入狀態讀取失敗，先保留本機紀錄。");
+  }
+
+  const response = await fetchWithClientTimeout(
+    "/api/quiz-session-sync",
+    {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        activeCheckpoint: Boolean(options.activeCheckpoint),
+        sessions
+      })
+    },
+    CLOUD_SERVER_SYNC_TIMEOUT_MS,
+    "伺服器雲端同步逾時，先保留本機紀錄。"
+  );
+
+  const payload = (await response.json().catch(() => null)) as {
+    ok?: boolean;
+    message?: string;
+  } | null;
+
+  if (!response.ok || !payload?.ok) {
+    throw new Error(payload?.message || "伺服器雲端同步失敗。");
+  }
 }
 
 function getCurrentSessionSyncSignature(session: QuizSession) {
@@ -1966,6 +2051,8 @@ async function upsertSessionsForUser(
   if (isSupabaseRecoveryMode()) return;
   if (!isSupabaseConfigured() || sessions.length === 0) return;
 
+  const shouldUseServerFallback = typeof window !== "undefined";
+  const runDirectUpsert = async () => {
   const supabase = getSupabaseBrowserClient();
   const namespacedSessions = canonicalizeSessionsForUser(userId, sessions);
   const rows = dedupeSessionRows(
@@ -2028,7 +2115,26 @@ async function upsertSessionsForUser(
       signature: getAttemptUploadSignature(attempt)
     }));
   });
-  const attemptRows = dedupeSessionAttemptRows(attemptRowsWithSignatures.map((item) => item.row));
+  const dedupedAttemptRowsWithSignatures = Array.from(
+    attemptRowsWithSignatures
+      .reduce((map, item) => {
+        map.set(`${item.row.session_id}::${item.row.question_order}`, item);
+        return map;
+      }, new Map<string, (typeof attemptRowsWithSignatures)[number]>())
+      .values()
+  );
+  let attemptRows = dedupeSessionAttemptRows(dedupedAttemptRowsWithSignatures.map((item) => item.row));
+
+  if (!options.activeCheckpoint && attemptRows.length > 0) {
+    const existingAttemptSignatures = await fetchExistingAttemptSignatureMap(
+      userId,
+      Array.from(new Set(attemptRows.map((row) => row.session_id)))
+    );
+    attemptRows = attemptRows.filter((row) => {
+      const existingSignature = existingAttemptSignatures.get(`${row.session_id}::${row.question_order}`);
+      return existingSignature !== getAttemptRowUploadSignature(row);
+    });
+  }
 
   if (attemptRows.length === 0) return;
 
@@ -2041,9 +2147,29 @@ async function upsertSessionsForUser(
   }
 
   if (options.activeCheckpoint && options.syncedAttemptSignatures) {
-    for (const item of attemptRowsWithSignatures) {
+    for (const item of dedupedAttemptRowsWithSignatures) {
       options.syncedAttemptSignatures.set(item.index, item.signature);
     }
+  }
+  };
+
+  if (shouldUseServerFallback && !options.activeCheckpoint) {
+    try {
+      await syncSessionsThroughServer(sessions, {
+        activeCheckpoint: false
+      });
+      return;
+    } catch (serverError) {
+      console.warn("Server session sync failed; falling back to direct browser sync.", serverError);
+      await runDirectUpsert();
+      return;
+    }
+  }
+
+  try {
+    await runDirectUpsert();
+  } catch (error) {
+    throw error;
   }
 }
 
