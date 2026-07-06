@@ -58,10 +58,13 @@ type UsageDailyPoint = {
   correctRate: number;
 };
 
+type SurveySubmissionRow = {
+  submitted_at: string | null;
+};
+
 const SURVEY_ID = "med_exam_qbank_pre_exam_feedback_2026";
 const SURVEY_RATE_LIMIT_WINDOW_MS = 60 * 60 * 1000;
 const SURVEY_RATE_LIMIT_MAX = 4;
-const SURVEY_PREVIEW_EMAILS = new Set(["tonyhuang921021@gmail.com"]);
 
 function getServiceSupabaseClient() {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
@@ -82,14 +85,6 @@ function getServiceSupabaseClient() {
 function sanitizeString(value: unknown, maxLength: number) {
   if (typeof value !== "string") return "";
   return value.trim().slice(0, maxLength);
-}
-
-function normalizeEmail(value?: string | null) {
-  return value?.trim().toLowerCase() ?? "";
-}
-
-function isSurveyPreviewAllowed(email?: string | null) {
-  return SURVEY_PREVIEW_EMAILS.has(normalizeEmail(email));
 }
 
 function sanitizeAnswerValue(value: unknown) {
@@ -169,7 +164,8 @@ function buildAnswerSummary(answers: SurveyAnswerPayload[]) {
     school: getValue("school"),
     awarenessSource: getValue("awareness_source"),
     usageFrequency: getValue("usage_frequency"),
-    primaryEnvironment: getValue("primary_environment"),
+    primaryDevice: getValue("primary_device"),
+    primaryBrowser: getValue("primary_browser"),
     mostHelpfulFeatures: getValue("most_helpful_features"),
     comparativeValue: getValue("comparative_value"),
     disappearanceImpact: getValue("disappearance_impact"),
@@ -299,13 +295,18 @@ async function safeCountByUser(supabase: any, tableName: string, column: string,
 }
 
 export async function GET(request: NextRequest) {
-  if (request.nextUrl.searchParams.get("usageReview") !== "1") {
+  const wantsUsageReview = request.nextUrl.searchParams.get("usageReview") === "1";
+  const wantsSubmissionStatus = request.nextUrl.searchParams.get("submissionStatus") === "1";
+
+  if (!wantsUsageReview && !wantsSubmissionStatus) {
     return NextResponse.json({ ok: false, message: "Unsupported survey GET request." }, { status: 404 });
   }
 
   if (isSupabaseRecoveryMode()) {
     return NextResponse.json(
-      { ok: true, loggedIn: false, hasEnoughData: false, source: "fallback" },
+      wantsSubmissionStatus
+        ? { ok: true, loggedIn: false, submitted: false, source: "fallback" }
+        : { ok: true, loggedIn: false, hasEnoughData: false, source: "fallback" },
       { headers: { "Cache-Control": "no-store" } }
     );
   }
@@ -313,7 +314,9 @@ export async function GET(request: NextRequest) {
   const supabase = getServiceSupabaseClient();
   if (!supabase) {
     return NextResponse.json(
-      { ok: true, loggedIn: false, hasEnoughData: false, source: "fallback" },
+      wantsSubmissionStatus
+        ? { ok: true, loggedIn: false, submitted: false, source: "fallback" }
+        : { ok: true, loggedIn: false, hasEnoughData: false, source: "fallback" },
       { headers: { "Cache-Control": "no-store" } }
     );
   }
@@ -321,9 +324,50 @@ export async function GET(request: NextRequest) {
   const verifiedUser = await getVerifiedUser(supabase, getBearerToken(request));
   if (!verifiedUser) {
     return NextResponse.json(
-      { ok: true, loggedIn: false, hasEnoughData: false, source: "fallback" },
+      wantsSubmissionStatus
+        ? { ok: true, loggedIn: false, submitted: false, source: "fallback" }
+        : { ok: true, loggedIn: false, hasEnoughData: false, source: "fallback" },
       { headers: { "Cache-Control": "no-store" } }
     );
+  }
+
+  if (wantsSubmissionStatus) {
+    try {
+      const submissionResult = await withServerTimeout(
+        supabase
+          .from("pre_exam_survey_responses")
+          .select("submitted_at")
+          .eq("survey_id", SURVEY_ID)
+          .eq("user_id", verifiedUser.id)
+          .order("submitted_at", { ascending: false })
+          .limit(1),
+        1400,
+        "問卷送出狀態讀取逾時"
+      );
+      if (submissionResult.error) throw submissionResult.error;
+      const rows = ((submissionResult.data ?? []) as SurveySubmissionRow[]).filter((row) => row.submitted_at);
+      return NextResponse.json(
+        {
+          ok: true,
+          loggedIn: true,
+          submitted: rows.length > 0,
+          submittedAt: rows[0]?.submitted_at ?? null,
+          source: "cloud"
+        },
+        { headers: { "Cache-Control": "no-store" } }
+      );
+    } catch (error) {
+      return NextResponse.json(
+        {
+          ok: false,
+          loggedIn: true,
+          submitted: false,
+          source: "fallback",
+          message: error instanceof Error ? error.message : "問卷送出狀態讀取失敗"
+        },
+        { status: 503, headers: { "Cache-Control": "no-store" } }
+      );
+    }
   }
 
   try {
@@ -491,15 +535,36 @@ export async function POST(request: NextRequest) {
 
     const visitorId = sanitizeString(body?.visitorId, 128) || null;
     const verifiedUser = await getVerifiedUser(supabase, body?.accessToken);
-    if (!isSurveyPreviewAllowed(verifiedUser?.email)) {
-      return NextResponse.json({ ok: false, message: "問卷目前只開放預覽帳號。" }, { status: 403 });
+    if (!verifiedUser?.id) {
+      return NextResponse.json({ ok: false, message: "問卷目前只開放登入使用者。" }, { status: 401 });
     }
 
-    const actorColumn = verifiedUser?.id ? "user_id" : "visitor_id";
-    const actorValue = verifiedUser?.id ?? visitorId;
+    const actorColumn = "user_id";
+    const actorValue = verifiedUser.id;
 
     if (!actorValue) {
       return NextResponse.json({ ok: false, message: "目前無法識別問卷來源，請稍後再試。" }, { status: 400 });
+    }
+
+    const existingResult = await withServerTimeout(
+      supabase
+        .from("pre_exam_survey_responses")
+        .select("submitted_at")
+        .eq("survey_id", SURVEY_ID)
+        .eq("user_id", actorValue)
+        .order("submitted_at", { ascending: false })
+        .limit(1),
+      1400,
+      "問卷送出狀態檢查逾時"
+    );
+    if (existingResult.error) throw existingResult.error;
+    const existingRows = ((existingResult.data ?? []) as SurveySubmissionRow[]).filter((row) => row.submitted_at);
+    if (existingRows.length > 0) {
+      return NextResponse.json({
+        ok: true,
+        alreadySubmitted: true,
+        submittedAt: existingRows[0]?.submitted_at ?? null
+      });
     }
 
     const since = new Date(Date.now() - SURVEY_RATE_LIMIT_WINDOW_MS).toISOString();
@@ -527,8 +592,8 @@ export async function POST(request: NextRequest) {
       supabase.from("pre_exam_survey_responses").insert({
         survey_id: SURVEY_ID,
         visitor_id: visitorId,
-        user_id: verifiedUser?.id ?? null,
-        user_email: verifiedUser?.email ?? null,
+        user_id: verifiedUser.id,
+        user_email: verifiedUser.email ?? null,
         answers,
         answer_summary: buildAnswerSummary(answers),
         page_path: clientMeta.pagePath,

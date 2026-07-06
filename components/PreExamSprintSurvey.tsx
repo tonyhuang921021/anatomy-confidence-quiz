@@ -120,6 +120,15 @@ type UsageReviewResponse = {
   message?: string;
 };
 
+type SubmissionStatusResponse = {
+  ok?: boolean;
+  loggedIn?: boolean;
+  submitted?: boolean;
+  submittedAt?: string | null;
+  source?: "cloud" | "fallback";
+  message?: string;
+};
+
 type UsageReviewSnapshot = {
   loggedIn: boolean;
   hasEnoughData: boolean;
@@ -131,12 +140,11 @@ type UsageReviewSnapshot = {
 };
 
 const SURVEY_ID = "med_exam_qbank_pre_exam_feedback_2026";
-const SURVEY_PREVIEW_EMAILS = new Set(["tonyhuang921021@gmail.com"]);
 const DISMISS_STORAGE_KEY = `acq-survey-dismissed-until:${SURVEY_ID}`;
 const SUBMITTED_STORAGE_KEY = `acq-survey-submitted:${SURVEY_ID}`;
 const PENDING_STORAGE_KEY = `acq-survey-pending:${SURVEY_ID}`;
 const STATS_CACHE_KEY = `acq-survey-stats-cache:v5:${SURVEY_ID}`;
-const DISMISS_MS = 6 * 60 * 60 * 1000;
+const DISMISS_MS = 24 * 60 * 60 * 1000;
 const STATS_CACHE_MS = 6 * 60 * 60 * 1000;
 const INTRO_SLIDE_COUNT = 4;
 
@@ -412,10 +420,6 @@ function safeGetStorage(key: string) {
   } catch {
     return null;
   }
-}
-
-function normalizeEmail(value?: string | null) {
-  return value?.trim().toLowerCase() ?? "";
 }
 
 function safeSetStorage(key: string, value: string) {
@@ -888,8 +892,8 @@ export function PreExamSprintSurvey() {
   const [startedAt, setStartedAt] = useState<number | null>(null);
   const [introSlideIndex, setIntroSlideIndex] = useState(0);
   const [formPageIndex, setFormPageIndex] = useState(0);
-  const [localPreviewAllowed, setLocalPreviewAllowed] = useState(false);
-  const isPreviewAllowed = SURVEY_PREVIEW_EMAILS.has(normalizeEmail(session?.user?.email));
+  const [submissionStatusChecked, setSubmissionStatusChecked] = useState(false);
+  const isLoggedIn = Boolean(session?.user?.id && session?.access_token);
 
   const requiredQuestions = useMemo(
     () => SURVEY_QUESTIONS.filter((question) => question.required),
@@ -994,15 +998,57 @@ export function PreExamSprintSurvey() {
   useEffect(() => {
     setMounted(true);
     setHasSubmitted(Boolean(safeGetStorage(SUBMITTED_STORAGE_KEY)));
-    if (process.env.NODE_ENV !== "production" && typeof window !== "undefined") {
-      setLocalPreviewAllowed(new URLSearchParams(window.location.search).get("preExamSurvey") === "1");
-    }
   }, []);
 
   useEffect(() => {
+    if (!mounted || loading) return;
+    if (!isLoggedIn || !session?.access_token) {
+      setSubmissionStatusChecked(true);
+      return;
+    }
+
+    let cancelled = false;
+    setSubmissionStatusChecked(false);
+
+    async function loadSubmissionStatus() {
+      try {
+        const response = await fetch("/api/pre-exam-survey?submissionStatus=1", {
+          cache: "no-store",
+          headers: {
+            Authorization: `Bearer ${session?.access_token ?? ""}`
+          }
+        });
+        const data = (await response.json().catch(() => null)) as SubmissionStatusResponse | null;
+        if (cancelled) return;
+        if (!response.ok || data?.ok === false) {
+          throw new Error(data?.message ?? "問卷送出狀態讀取失敗");
+        }
+        if (response.ok && data?.submitted) {
+          safeSetStorage(SUBMITTED_STORAGE_KEY, data.submittedAt ?? new Date().toISOString());
+          setHasSubmitted(true);
+          setIsOpen(false);
+        } else {
+          safeRemoveStorage(SUBMITTED_STORAGE_KEY);
+          setHasSubmitted(false);
+        }
+      } catch {
+        if (!cancelled) {
+          setHasSubmitted(Boolean(safeGetStorage(SUBMITTED_STORAGE_KEY)));
+        }
+      } finally {
+        if (!cancelled) setSubmissionStatusChecked(true);
+      }
+    }
+
+    void loadSubmissionStatus();
+    return () => {
+      cancelled = true;
+    };
+  }, [isLoggedIn, loading, mounted, session?.access_token]);
+
+  useEffect(() => {
     if (!mounted) return;
-    if (loading || (!isPreviewAllowed && !localPreviewAllowed)) return;
-    if (safeGetStorage(SUBMITTED_STORAGE_KEY)) return;
+    if (loading || !isLoggedIn || !submissionStatusChecked || hasSubmitted) return;
     const dismissedUntil = Number(safeGetStorage(DISMISS_STORAGE_KEY) ?? 0);
     if (Number.isFinite(dismissedUntil) && dismissedUntil > Date.now()) return;
 
@@ -1012,7 +1058,7 @@ export function PreExamSprintSurvey() {
       setIsOpen(true);
     }, 900);
     return () => window.clearTimeout(timer);
-  }, [isPreviewAllowed, loading, localPreviewAllowed, mounted]);
+  }, [hasSubmitted, isLoggedIn, loading, mounted, submissionStatusChecked]);
 
   useEffect(() => {
     if (!isOpen) return;
@@ -1240,6 +1286,7 @@ export function PreExamSprintSurvey() {
       safeSetStorage(SUBMITTED_STORAGE_KEY, new Date().toISOString());
       safeRemoveStorage(PENDING_STORAGE_KEY);
       setHasSubmitted(true);
+      setIsOpen(false);
       setSubmitState("sent");
       setSubmitMessage("已送出，謝謝你幫這個網站一起長大。");
     } catch (error) {
@@ -1732,7 +1779,7 @@ export function PreExamSprintSurvey() {
     );
   }
 
-  if (!mounted || loading || (!isPreviewAllowed && !localPreviewAllowed)) {
+  if (!mounted || loading || !isLoggedIn || !submissionStatusChecked || hasSubmitted) {
     return null;
   }
 
