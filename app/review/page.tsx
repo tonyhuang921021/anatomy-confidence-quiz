@@ -76,18 +76,18 @@ function buildPracticeReviewSettings(items: ReviewQuestionItem[]): QuizSettings 
   return {
     ...DEFAULT_QUIZ_SETTINGS,
     mode: "review",
-    questionCount: 10,
+    questionCount: Math.max(1, items.length),
     subjectFilter: "全部",
     strictCustomQuestionPool: true,
     customQuestionIds: questionIds,
     customQuestionPayload: items.map((item) => item.question),
-    customPoolLabel: "散題錯題庫"
+    customPoolLabel: "散題待複習題庫"
   };
 }
 
 function buildPracticeReviewUrlSettings(items: ReviewQuestionItem[]): QuizSettings {
   return {
-    ...buildPracticeReviewSettings(items.slice(0, 40)),
+    ...buildPracticeReviewSettings(items),
     customQuestionPayload: undefined
   };
 }
@@ -247,7 +247,7 @@ export default function ReviewPage() {
             <p className="text-sm font-semibold uppercase tracking-[0.2em] text-brand-700">Review</p>
             <h1 className="mt-2 text-3xl font-bold text-ink sm:text-4xl">錯題複習與沒信心題</h1>
             <p className="mt-3 text-slate-500">
-              這裡只整理平常散題刷題累積下來的錯題與低信心題。
+              這裡只整理平常散題刷題累積下來的錯題與低信心題；開始複習時可以一起帶進同一回合。
             </p>
           </div>
           <div className="flex flex-wrap gap-3">
@@ -294,7 +294,7 @@ export default function ReviewPage() {
         <div id="practice-review" className="scroll-mt-24">
           <ReviewNotebook
             title="散題待複習題庫"
-            description="這裡只整理平常零散刷題累積下來的錯題與低信心題。"
+            description="錯題和沒信心題分開整理；按開始複習會一起帶進同一回合。"
             startLabel="開始散題待複習"
             getStartHref={getPracticeReviewHref}
             onStartReview={handleStartPracticeReview}
@@ -306,8 +306,8 @@ export default function ReviewPage() {
                 type="button"
                 onClick={handleOpenFullscreenReview}
                 className="inline-flex min-h-12 items-center justify-center rounded-2xl bg-slate-100 px-4 py-3 text-sm font-semibold text-slate-800 transition hover:bg-slate-200 sm:hidden"
-                aria-label="開啟滿版錯題複習"
-                title="開啟滿版錯題複習"
+                aria-label="開啟滿版待複習題"
+                title="開啟滿版待複習題"
               >
                 ⛶ 滿版模式
               </button>

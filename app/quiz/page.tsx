@@ -351,8 +351,10 @@ function buildResultsHref(session: QuizSession) {
   return `${basePath}?sessionId=${encodeURIComponent(session.id)}`;
 }
 
-function isIncrementalPracticeSettings(settings?: QuizSettings | null): settings is QuizSettings {
-  return settings?.mode === "random" && Boolean(settings.stopAfterReview);
+function shouldLoadQuestionsIncrementally(settings?: QuizSettings | null): settings is QuizSettings {
+  if (!settings) return false;
+  if (settings.mode === "review") return true;
+  return settings.mode === "random" && Boolean(settings.stopAfterReview);
 }
 
 function createSession(
@@ -382,7 +384,7 @@ function createSession(
       normalizedSettings.paperMode === "random_past_paper")
       ? { ...normalizedSettings, questionCount: effectiveQuestions.length }
       : normalizedSettings;
-  const questionOrderSettings = isIncrementalPracticeSettings(effectiveSettings)
+  const questionOrderSettings = shouldLoadQuestionsIncrementally(effectiveSettings)
     ? {
         ...effectiveSettings,
         questionCount: Math.min(
@@ -1234,7 +1236,7 @@ export default function QuizPage() {
     if (
       !session ||
       session.completedAt ||
-      !isIncrementalPracticeSettings(session.settings)
+      !shouldLoadQuestionsIncrementally(session.settings)
     ) {
       return;
     }
@@ -1484,7 +1486,7 @@ export default function QuizPage() {
 
   function buildNextIncrementalPracticeSession(baseSession: QuizSession) {
     const settings = baseSession.settings;
-    if (!isIncrementalPracticeSettings(settings)) return null;
+    if (!shouldLoadQuestionsIncrementally(settings)) return null;
 
     const loadedQuestionIds = new Set(baseSession.questionOrder ?? []);
     const totalTargetCount = settings.questionCount ?? loadedQuestionIds.size;
@@ -1540,6 +1542,26 @@ export default function QuizPage() {
       questionOrder: [...(baseSession.questionOrder ?? []), ...batchQuestionIds],
       generatedQuestions: mergedGeneratedQuestions
     } satisfies QuizSession;
+  }
+
+  function ensureIncrementalQuestionsLoadedForIndex(baseSession: QuizSession, targetIndex: number) {
+    if (!shouldLoadQuestionsIncrementally(baseSession.settings)) return baseSession;
+
+    let nextSession = baseSession;
+    let previousLoadedCount = nextSession.questionOrder?.length ?? 0;
+
+    while (
+      targetIndex >= previousLoadedCount &&
+      previousLoadedCount < (nextSession.settings?.questionCount ?? previousLoadedCount)
+    ) {
+      const expandedSession = buildNextIncrementalPracticeSession(nextSession);
+      const nextLoadedCount = expandedSession?.questionOrder?.length ?? previousLoadedCount;
+      if (!expandedSession || nextLoadedCount <= previousLoadedCount) break;
+      nextSession = expandedSession;
+      previousLoadedCount = nextLoadedCount;
+    }
+
+    return nextSession;
   }
 
   function queueIncrementalPracticePrefetch() {
@@ -2000,9 +2022,32 @@ export default function QuizPage() {
       return;
     }
 
+    const targetIndex = currentIndex + 1;
+    const draftSession = getSessionWithCurrentDraft(session);
+    const sessionWithNextQuestion = ensureIncrementalQuestionsLoadedForIndex(
+      draftSession,
+      targetIndex
+    );
+    const loadedQuestionCount = sessionWithNextQuestion.questionOrder?.length ?? 0;
+    if (targetIndex >= loadedQuestionCount) {
+      const completedSession: QuizSession = {
+        ...sessionWithNextQuestion,
+        settings: sessionWithNextQuestion.settings
+          ? {
+              ...sessionWithNextQuestion.settings,
+              questionCount: Math.max(loadedQuestionCount, sessionWithNextQuestion.attempts.length)
+            }
+          : sessionWithNextQuestion.settings,
+        completedAt: new Date().toISOString(),
+        isReviewingAnswer: false
+      };
+      void completeSessionAndNavigate(completedSession);
+      return;
+    }
+
     const nextSession: QuizSession = {
-      ...getSessionWithCurrentDraft(session),
-      currentQuestionIndex: currentIndex + 1,
+      ...sessionWithNextQuestion,
+      currentQuestionIndex: targetIndex,
       isReviewingAnswer: false
     };
     persistSession(nextSession, { deferLocalSave: true });

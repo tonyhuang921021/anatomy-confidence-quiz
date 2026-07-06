@@ -1458,7 +1458,7 @@ export function ReviewNotebook({
                     }
                     className="min-h-11 rounded-2xl bg-slate-100 px-4 py-2 text-sm font-semibold text-slate-800 transition hover:bg-slate-200"
                   >
-                    再顯示 40 題
+                    再顯示下一批
                   </button>
                 </div>
               ) : null}

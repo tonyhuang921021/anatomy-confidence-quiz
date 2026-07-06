@@ -61,7 +61,12 @@ function isSimulationSourceSession(session: QuizSession) {
   const settings = session.settings;
   const mode = settings?.mode as string | undefined;
 
-  if (settings?.customPoolLabel === SIMULATION_REVIEW_POOL_LABEL || settings?.customPoolLabel === "散題錯題庫") {
+  if (
+    settings?.customPoolLabel === SIMULATION_REVIEW_POOL_LABEL ||
+    settings?.customPoolLabel === "散題錯題庫" ||
+    settings?.customPoolLabel === "散題錯題與沒信心題庫" ||
+    settings?.customPoolLabel === "散題待複習題庫"
+  ) {
     return false;
   }
 
@@ -93,7 +98,7 @@ function buildSimulationReviewSettings(items: ReviewQuestionItem[]): QuizSetting
 
 function buildSimulationReviewUrlSettings(items: ReviewQuestionItem[]): QuizSettings {
   return {
-    ...buildSimulationReviewSettings(items.slice(0, 40)),
+    ...buildSimulationReviewSettings(items),
     customQuestionPayload: undefined
   };
 }
@@ -183,7 +188,7 @@ export default function SimulationReviewPage() {
             <p className="text-sm font-semibold uppercase tracking-[0.2em] text-brand-700">Simulation Review</p>
             <h1 className="mt-2 text-3xl font-bold text-ink sm:text-4xl">模擬考錯題與沒信心題</h1>
             <p className="mt-3 text-slate-500">
-              這裡只整理整份模擬考做出來的錯題與低信心題，不會和平常散題刷題混在一起。
+              這裡只整理整份模擬考做出來的錯題與低信心題；開始複習時可以一起帶進同一回合，不會和平常散題刷題混在一起。
             </p>
           </div>
           <div className="flex flex-wrap gap-3">
@@ -229,7 +234,7 @@ export default function SimulationReviewPage() {
       <div className="mt-8">
         <ReviewNotebook
           title="模擬考待複習題庫"
-          description="這裡只整理整份模擬考做出來的錯題與低信心題。"
+          description="錯題和沒信心題分開整理；按開始複習會一起帶進同一回合。"
           startLabel="開始模擬考待複習"
           getStartHref={getSimulationReviewHref}
           onStartReview={handleStartSimulationReview}
