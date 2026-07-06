@@ -2142,6 +2142,14 @@ export default function QuizPage() {
     session.settings?.mode === "simulation" && feedbackMode === "none";
   const shouldShowExplanation = feedbackMode === "full";
   const shouldShowCorrectAnswer = feedbackMode === "full" || feedbackMode === "answer_only";
+  const canEndAfterSubmittedQuestion =
+    session.settings?.mode === "review" &&
+    [
+      "散題錯題庫",
+      "散題錯題與沒信心題庫",
+      "散題待複習題庫",
+      "模擬考錯題庫"
+    ].includes(session.settings.customPoolLabel ?? "");
   const currentExplanationOverride = explanationOverrides[currentQuestion.id];
   const currentExplanationLoading = explanationLoadingMap[currentQuestion.id];
   const currentExplanationError = explanationErrorMap[currentQuestion.id];
@@ -2443,7 +2451,7 @@ export default function QuizPage() {
                 <ErrorTypeSelector value={errorType} onSelect={handleErrorTypeSelect} />
               ) : null}
 
-              <div className="grid gap-3">
+              <div className={`grid gap-3 ${canEndAfterSubmittedQuestion ? "sm:grid-cols-2" : ""}`}>
                 <button
                   type="button"
                   onClick={handleNext}
@@ -2451,9 +2459,7 @@ export default function QuizPage() {
                 >
                   {currentIndex === targetCount - 1 ? "查看結果" : "下一題"}
                 </button>
-                {((session.settings?.mode === "random" && session.settings?.stopAfterReview) ||
-                  session.settings?.mode === "custom_paper") &&
-                currentIndex < targetCount - 1 ? (
+                {canEndAfterSubmittedQuestion ? (
                   <button
                     type="button"
                     onClick={handleEndAfterReview}
