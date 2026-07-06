@@ -13,21 +13,24 @@ type QuestionExplanationTabsProps = {
   compact?: boolean;
   className?: string;
   aiExplanationContent?: ReactNode;
+  relatedQuestionsContent?: () => ReactNode;
 };
 
 export function QuestionExplanationTabs({
   question,
   compact = false,
   className = "",
-  aiExplanationContent
+  aiExplanationContent,
+  relatedQuestionsContent
 }: QuestionExplanationTabsProps) {
   const { session } = useAuth();
-  const [activeTab, setActiveTab] = useState<"ai" | "yangming" | "supplement" | null>(null);
+  const [activeTab, setActiveTab] = useState<"ai" | "yangming" | "supplement" | "related" | null>(null);
   const [supplementCount, setSupplementCount] = useState<number | null>(null);
   const [reactions, setReactions] = useState<QuestionSupplementReactionSummary[]>([]);
   const [reactionLoading, setReactionLoading] = useState(false);
   const [reactionError, setReactionError] = useState("");
   const hasAiExplanationContent = Boolean(aiExplanationContent);
+  const hasRelatedQuestionsContent = Boolean(relatedQuestionsContent);
   const handleCountChange = useCallback((count: number) => setSupplementCount(count), []);
   const handleReactionsChange = useCallback((nextReactions: QuestionSupplementReactionSummary[]) => {
     setReactions(nextReactions);
@@ -58,8 +61,12 @@ export function QuestionExplanationTabs({
   }, [question.id, session?.access_token]);
 
   useEffect(() => {
-    setActiveTab((current) => (current === "ai" && !hasAiExplanationContent ? null : current));
-  }, [hasAiExplanationContent, question.id]);
+    setActiveTab((current) => {
+      if (current === "ai" && !hasAiExplanationContent) return null;
+      if (current === "related" && !hasRelatedQuestionsContent) return null;
+      return current;
+    });
+  }, [hasAiExplanationContent, hasRelatedQuestionsContent, question.id]);
 
   const pureChaosReaction = reactions.find((reaction) => reaction.type === "pure_chaos") ?? {
     type: "pure_chaos" as const,
@@ -162,6 +169,20 @@ export function QuestionExplanationTabs({
             </span>
           ) : null}
         </button>
+        {hasRelatedQuestionsContent ? (
+          <button
+            type="button"
+            onClick={() => setActiveTab((current) => current === "related" ? null : "related")}
+            aria-pressed={activeTab === "related"}
+            className={`rounded-full px-3 py-1.5 text-xs font-black ring-1 transition ${
+              activeTab === "related"
+                ? "bg-sky-700 text-white ring-sky-700"
+                : "bg-sky-50 text-sky-800 ring-sky-100 hover:bg-sky-100"
+            }`}
+          >
+            相同觀念類似題
+          </button>
+        ) : null}
       </div>
       {reactionError ? <p className="mt-2 text-xs font-semibold text-rose-700">{reactionError}</p> : null}
       {activeTab === "ai" && aiExplanationContent ? (
@@ -182,6 +203,11 @@ export function QuestionExplanationTabs({
             onCountChange={handleCountChange}
             onReactionsChange={handleReactionsChange}
           />
+        </div>
+      ) : null}
+      {activeTab === "related" && relatedQuestionsContent ? (
+        <div className="mt-3">
+          {relatedQuestionsContent()}
         </div>
       ) : null}
     </section>

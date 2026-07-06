@@ -942,6 +942,18 @@ function normalizeSession(session: QuizSession): QuizSession {
       .map(normalizeStoredQuestion)
       .filter((question): question is Question => Boolean(question)),
     optionEliminationMap: normalizeOptionEliminationMap(session.optionEliminationMap),
+    simulationElapsedSeconds:
+      typeof session.simulationElapsedSeconds === "number" &&
+      Number.isFinite(session.simulationElapsedSeconds) &&
+      session.simulationElapsedSeconds > 0
+        ? Math.floor(session.simulationElapsedSeconds)
+        : undefined,
+    simulationTimerDurationSeconds:
+      typeof session.simulationTimerDurationSeconds === "number" &&
+      Number.isFinite(session.simulationTimerDurationSeconds) &&
+      session.simulationTimerDurationSeconds > 0
+        ? Math.floor(session.simulationTimerDurationSeconds)
+        : undefined,
     currentQuestionIndex:
       typeof session.currentQuestionIndex === "number" && session.currentQuestionIndex >= 0
         ? session.currentQuestionIndex

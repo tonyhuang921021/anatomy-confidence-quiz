@@ -723,6 +723,8 @@ function buildSessionPayloadForCloud(
     settings: compacted.settings,
     questionOrder: compacted.questionOrder,
     optionEliminationMap: compacted.optionEliminationMap,
+    simulationElapsedSeconds: compacted.simulationElapsedSeconds,
+    simulationTimerDurationSeconds: compacted.simulationTimerDurationSeconds,
     generatedQuestions: shouldRetainGeneratedQuestions ? generatedQuestions : undefined,
     currentQuestionIndex: session.completedAt ? undefined : compacted.currentQuestionIndex,
     isReviewingAnswer: session.completedAt ? undefined : compacted.isReviewingAnswer,
@@ -1356,6 +1358,8 @@ function mapRowToSession(
       questionOrder: resolvedQuestionOrder,
       generatedQuestions: payload.generatedQuestions ?? [],
       optionEliminationMap: payload.optionEliminationMap,
+      simulationElapsedSeconds: payload.simulationElapsedSeconds,
+      simulationTimerDurationSeconds: payload.simulationTimerDurationSeconds,
       currentQuestionIndex: payload.currentQuestionIndex,
       isReviewingAnswer: payload.isReviewingAnswer,
       attempts: resolvedAttempts

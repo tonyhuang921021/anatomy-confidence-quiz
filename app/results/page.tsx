@@ -277,6 +277,14 @@ function mergeResultSessionMetadata(primary: QuizSession, secondary: QuizSession
         ? primary.generatedQuestions
         : secondary.generatedQuestions,
     optionEliminationMap: eliminationMap,
+    simulationElapsedSeconds:
+      normalizeResultTimerSeconds(primary.simulationElapsedSeconds) > 0
+        ? primary.simulationElapsedSeconds
+        : secondary.simulationElapsedSeconds,
+    simulationTimerDurationSeconds:
+      normalizeResultTimerSeconds(primary.simulationTimerDurationSeconds) > 0
+        ? primary.simulationTimerDurationSeconds
+        : secondary.simulationTimerDurationSeconds,
     attempts: mergeResultAttemptEliminations(attemptBase, attemptFallback, eliminationMap)
   } satisfies QuizSession;
 }
@@ -826,6 +834,33 @@ function formatNullablePercent(value: number | null) {
 
 function formatExamScore(value: number) {
   return Number.isInteger(value) ? `${value}` : value.toFixed(1);
+}
+
+function normalizeResultTimerSeconds(value: unknown) {
+  return typeof value === "number" && Number.isFinite(value) && value > 0 ? Math.floor(value) : 0;
+}
+
+function formatResultDurationClock(totalSeconds: number) {
+  const safeSeconds = Math.max(0, Math.floor(totalSeconds));
+  const hours = Math.floor(safeSeconds / 3600);
+  const minutes = Math.floor((safeSeconds % 3600) / 60);
+  const seconds = safeSeconds % 60;
+  return [hours, minutes, seconds].map((value) => String(value).padStart(2, "0")).join(":");
+}
+
+function getSimulationResultElapsedSeconds(session: QuizSession) {
+  if (!isSimulationSession(session)) return null;
+
+  const storedElapsedSeconds = normalizeResultTimerSeconds(session.simulationElapsedSeconds);
+  if (storedElapsedSeconds > 0) return storedElapsedSeconds;
+
+  const startedAt = Date.parse(session.startedAt);
+  const completedAt = Date.parse(session.completedAt ?? "");
+  if (!Number.isFinite(startedAt) || !Number.isFinite(completedAt) || completedAt <= startedAt) {
+    return null;
+  }
+
+  return Math.floor((completedAt - startedAt) / 1000);
 }
 
 function normalizeSummaryStem(stem: string) {
@@ -1907,6 +1942,7 @@ function ResultsPageContent() {
   }
 
   const resultSession = state.session;
+  const simulationElapsedSeconds = getSimulationResultElapsedSeconds(resultSession);
 
   function renderQuestionExplanationControls(question: Question, attempt: Attempt) {
     const generated = explanationOverrides[question.id];
@@ -2791,6 +2827,14 @@ function ResultsPageContent() {
               minute: "2-digit"
             })}
           </p>
+          {simulationElapsedSeconds !== null ? (
+            <p className="mt-1 text-sm text-slate-500">
+              作答時間：
+              <span className="font-mono font-semibold tabular-nums text-slate-700">
+                {formatResultDurationClock(simulationElapsedSeconds)}
+              </span>
+            </p>
+          ) : null}
           {isSimulationSession(state.session) ? (
             <div className="mt-4 flex flex-col gap-3 sm:max-w-xl sm:flex-row sm:items-center">
               <input

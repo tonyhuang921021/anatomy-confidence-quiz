@@ -110,6 +110,120 @@ const FREE_PRACTICE_PREFETCH_THRESHOLD = 3;
 const QUIZ_CLASSIFICATION_OVERRIDE_TIMEOUT_MS = 3200;
 const CURRENT_SESSION_CLOUD_CHECKPOINT_MS = 45_000;
 const CURRENT_SESSION_CLOUD_IDLE_DELAY_MS = 1_500;
+const SIMULATION_EXAM_TIMER_DURATION_SECONDS = 2 * 60 * 60;
+const SIMULATION_EXAM_TIMER_STORAGE_PREFIX = "simulation-exam-timer:";
+
+type SimulationExamTimerState = {
+  durationSeconds: number;
+  accumulatedSeconds: number;
+  runningSince: number | null;
+  paused: boolean;
+  updatedAt: number;
+};
+
+function getSimulationExamTimerStorageKey(sessionId: string) {
+  return `${SIMULATION_EXAM_TIMER_STORAGE_PREFIX}${sessionId}`;
+}
+
+function normalizeTimerSeconds(value: unknown) {
+  return typeof value === "number" && Number.isFinite(value) && value > 0
+    ? Math.floor(value)
+    : 0;
+}
+
+function getSimulationExamTimerElapsedSeconds(
+  timerState: SimulationExamTimerState | null,
+  now = Date.now()
+) {
+  if (!timerState) return 0;
+  const accumulatedSeconds = Math.max(0, Math.floor(timerState.accumulatedSeconds));
+  if (timerState.paused || !timerState.runningSince) return accumulatedSeconds;
+  return Math.max(0, accumulatedSeconds + Math.floor((now - timerState.runningSince) / 1000));
+}
+
+function formatDurationClock(totalSeconds: number) {
+  const safeSeconds = Math.max(0, Math.floor(totalSeconds));
+  const hours = Math.floor(safeSeconds / 3600);
+  const minutes = Math.floor((safeSeconds % 3600) / 60);
+  const seconds = safeSeconds % 60;
+  return [hours, minutes, seconds].map((value) => String(value).padStart(2, "0")).join(":");
+}
+
+function loadSimulationExamTimerState(session: QuizSession): SimulationExamTimerState {
+  const fallbackElapsedSeconds = normalizeTimerSeconds(session.simulationElapsedSeconds);
+  if (typeof window === "undefined") {
+    return {
+      durationSeconds: SIMULATION_EXAM_TIMER_DURATION_SECONDS,
+      accumulatedSeconds: fallbackElapsedSeconds,
+      runningSince: Date.now(),
+      paused: false,
+      updatedAt: Date.now()
+    };
+  }
+
+  const storageKey = getSimulationExamTimerStorageKey(session.id);
+  try {
+    const raw = window.localStorage.getItem(storageKey);
+    if (raw) {
+      const parsed = JSON.parse(raw) as Partial<SimulationExamTimerState>;
+      const durationSeconds =
+        normalizeTimerSeconds(parsed.durationSeconds) || SIMULATION_EXAM_TIMER_DURATION_SECONDS;
+      const accumulatedSeconds = Math.max(
+        fallbackElapsedSeconds,
+        normalizeTimerSeconds(parsed.accumulatedSeconds)
+      );
+      const paused = Boolean(parsed.paused);
+      const runningSince =
+        typeof parsed.runningSince === "number" && Number.isFinite(parsed.runningSince)
+          ? parsed.runningSince
+          : paused
+            ? null
+            : Date.now();
+
+      return {
+        durationSeconds,
+        accumulatedSeconds,
+        runningSince: paused ? null : runningSince,
+        paused,
+        updatedAt:
+          typeof parsed.updatedAt === "number" && Number.isFinite(parsed.updatedAt)
+            ? parsed.updatedAt
+            : Date.now()
+      };
+    }
+  } catch {
+    // Ignore malformed timer state and start a clean local timer.
+  }
+
+  return {
+    durationSeconds: SIMULATION_EXAM_TIMER_DURATION_SECONDS,
+    accumulatedSeconds: fallbackElapsedSeconds,
+    runningSince: Date.now(),
+    paused: false,
+    updatedAt: Date.now()
+  };
+}
+
+function saveSimulationExamTimerState(sessionId: string, timerState: SimulationExamTimerState) {
+  if (typeof window === "undefined") return;
+  try {
+    window.localStorage.setItem(
+      getSimulationExamTimerStorageKey(sessionId),
+      JSON.stringify({ ...timerState, updatedAt: Date.now() })
+    );
+  } catch {
+    // Timer persistence is best-effort; the answer record itself is saved elsewhere.
+  }
+}
+
+function clearSimulationExamTimerState(sessionId: string) {
+  if (typeof window === "undefined") return;
+  try {
+    window.localStorage.removeItem(getSimulationExamTimerStorageKey(sessionId));
+  } catch {
+    // Ignore storage cleanup failures.
+  }
+}
 
 function getEffectiveFeedbackMode(settings?: QuizSettings | null) {
   if (settings?.mode === "simulation") {
@@ -712,6 +826,8 @@ export default function QuizPage() {
   const currentSessionCloudLastQueuedAtRef = useRef(0);
   const latestCurrentSessionRef = useRef<QuizSession | null>(null);
   const incrementalPracticePrefetchRef = useRef(false);
+  const simulationExamTimerStateRef = useRef<SimulationExamTimerState | null>(null);
+  const simulationExamTimerSessionIdRef = useRef<string | null>(null);
   const [mounted, setMounted] = useState(false);
   const [session, setSession] = useState<QuizSession | null>(null);
   const [classificationOverrides, setClassificationOverrides] = useState<Record<string, QuestionClassificationOverride>>({});
@@ -725,6 +841,8 @@ export default function QuizPage() {
   const [fastAnswerMode, setFastAnswerMode] = useState(false);
   const [keyboardNavigationEnabled, setKeyboardNavigationEnabled] = useState(false);
   const [simulationOptionEliminationEnabled, setSimulationOptionEliminationEnabled] = useState(false);
+  const [simulationTimerElapsedSeconds, setSimulationTimerElapsedSeconds] = useState(0);
+  const [simulationTimerPaused, setSimulationTimerPaused] = useState(false);
   const [selectedAnswer, setSelectedAnswer] = useState<OptionKey | undefined>();
   const [confidence, setConfidence] = useState<ConfidenceLevel>(4);
   const [confidenceExpanded, setConfidenceExpanded] = useState(false);
@@ -1060,6 +1178,57 @@ export default function QuizPage() {
   }, [authLoading, authSession?.user?.id, syncStatus, syncVersion]);
 
   useEffect(() => {
+    if (!session || session.settings?.mode !== "simulation" || session.completedAt) {
+      simulationExamTimerStateRef.current = null;
+      simulationExamTimerSessionIdRef.current = null;
+      setSimulationTimerElapsedSeconds(0);
+      setSimulationTimerPaused(false);
+      return;
+    }
+
+    const timerState = loadSimulationExamTimerState(session);
+    simulationExamTimerStateRef.current = timerState;
+    simulationExamTimerSessionIdRef.current = session.id;
+    setSimulationTimerPaused(timerState.paused);
+    setSimulationTimerElapsedSeconds(getSimulationExamTimerElapsedSeconds(timerState));
+    saveSimulationExamTimerState(session.id, timerState);
+
+    const refreshTimer = () => {
+      const currentTimerState = simulationExamTimerStateRef.current;
+      if (!currentTimerState) return;
+      setSimulationTimerElapsedSeconds(getSimulationExamTimerElapsedSeconds(currentTimerState));
+      setSimulationTimerPaused(currentTimerState.paused);
+    };
+
+    const persistTimer = () => {
+      const currentTimerState = simulationExamTimerStateRef.current;
+      const currentSessionId = simulationExamTimerSessionIdRef.current;
+      if (!currentTimerState || !currentSessionId) return;
+      saveSimulationExamTimerState(currentSessionId, currentTimerState);
+    };
+
+    const intervalId = window.setInterval(refreshTimer, 1000);
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === "hidden") {
+        persistTimer();
+      } else {
+        refreshTimer();
+      }
+    };
+    window.addEventListener("pagehide", persistTimer);
+    window.addEventListener("beforeunload", persistTimer);
+    document.addEventListener("visibilitychange", handleVisibilityChange);
+
+    return () => {
+      window.clearInterval(intervalId);
+      persistTimer();
+      window.removeEventListener("pagehide", persistTimer);
+      window.removeEventListener("beforeunload", persistTimer);
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
+    };
+  }, [session?.completedAt, session?.id, session?.settings?.mode]);
+
+  useEffect(() => {
     if (Object.keys(classificationOverrides).length > 0) return;
     let cancelled = false;
     let retryTimer: number | null = null;
@@ -1326,6 +1495,62 @@ export default function QuizPage() {
       deferredCurrentSessionSaveRef.current = null;
     }
     saveCurrentSession(nextSession);
+  }
+
+  function getCurrentSimulationExamElapsedSeconds(baseSession: QuizSession) {
+    if (baseSession.settings?.mode !== "simulation") return undefined;
+
+    const timerState =
+      simulationExamTimerSessionIdRef.current === baseSession.id
+        ? simulationExamTimerStateRef.current
+        : loadSimulationExamTimerState(baseSession);
+    const timerElapsedSeconds = getSimulationExamTimerElapsedSeconds(timerState);
+    const storedElapsedSeconds = normalizeTimerSeconds(baseSession.simulationElapsedSeconds);
+    return Math.max(storedElapsedSeconds, timerElapsedSeconds);
+  }
+
+  function getSessionWithSimulationTiming(baseSession: QuizSession) {
+    if (baseSession.settings?.mode !== "simulation") return baseSession;
+
+    const elapsedSeconds = getCurrentSimulationExamElapsedSeconds(baseSession) ?? 0;
+    return {
+      ...baseSession,
+      simulationElapsedSeconds: elapsedSeconds,
+      simulationTimerDurationSeconds:
+        baseSession.simulationTimerDurationSeconds ?? SIMULATION_EXAM_TIMER_DURATION_SECONDS
+    } satisfies QuizSession;
+  }
+
+  function handleToggleSimulationTimerPaused() {
+    if (!session || session.settings?.mode !== "simulation") return;
+
+    const currentTimerState =
+      simulationExamTimerSessionIdRef.current === session.id
+        ? simulationExamTimerStateRef.current
+        : loadSimulationExamTimerState(session);
+    const elapsedSeconds = getSimulationExamTimerElapsedSeconds(currentTimerState);
+    const nextTimerState: SimulationExamTimerState = currentTimerState?.paused
+      ? {
+          durationSeconds: currentTimerState.durationSeconds,
+          accumulatedSeconds: elapsedSeconds,
+          runningSince: Date.now(),
+          paused: false,
+          updatedAt: Date.now()
+        }
+      : {
+          durationSeconds:
+            currentTimerState?.durationSeconds ?? SIMULATION_EXAM_TIMER_DURATION_SECONDS,
+          accumulatedSeconds: elapsedSeconds,
+          runningSince: null,
+          paused: true,
+          updatedAt: Date.now()
+        };
+
+    simulationExamTimerStateRef.current = nextTimerState;
+    simulationExamTimerSessionIdRef.current = session.id;
+    setSimulationTimerElapsedSeconds(elapsedSeconds);
+    setSimulationTimerPaused(nextTimerState.paused);
+    saveSimulationExamTimerState(session.id, nextTimerState);
   }
 
   function getEliminatedOptionsForQuestion(questionId: string, sourceSession: QuizSession | null = session) {
@@ -1626,7 +1851,9 @@ export default function QuizPage() {
   }
 
   function finalizeCompletedSession(completedSession: QuizSession) {
-    const completedSessionWithEliminations = getSessionWithHydratedEliminatedOptions(completedSession);
+    const completedSessionWithEliminations = getSessionWithHydratedEliminatedOptions(
+      getSessionWithSimulationTiming(completedSession)
+    );
     takeDeferredCurrentSessionSave();
     clearScheduledCurrentSessionCloudSync();
     currentSessionCloudPendingRef.current = null;
@@ -1650,7 +1877,9 @@ export default function QuizPage() {
   }
 
   function completeSessionAndNavigate(completedSession: QuizSession) {
-    const completedSessionWithEliminations = getSessionWithHydratedEliminatedOptions(completedSession);
+    const completedSessionWithEliminations = getSessionWithHydratedEliminatedOptions(
+      getSessionWithSimulationTiming(completedSession)
+    );
     const savedLocally = finalizeCompletedSession(completedSessionWithEliminations);
     void pushCompletedSessionToSupabase(completedSessionWithEliminations).catch((error) => {
       console.error("Completed session cloud handoff skipped; pending queue kept local copy:", error);
@@ -1661,6 +1890,9 @@ export default function QuizPage() {
     syncCompletedCustomPaper(completedSessionWithEliminations);
     if (!savedLocally) {
       console.warn("Completed session could not be fully persisted locally; routing with in-memory handoff.");
+    }
+    if (completedSessionWithEliminations.settings?.mode === "simulation") {
+      clearSimulationExamTimerState(completedSessionWithEliminations.id);
     }
     router.push(buildResultsHref(completedSessionWithEliminations));
   }
@@ -2216,6 +2448,19 @@ export default function QuizPage() {
   const isBlindSimulationLastQuestion = isBlindSimulation && currentIndex >= targetCount - 1;
   const shouldShowExplanation = feedbackMode === "full";
   const shouldShowCorrectAnswer = feedbackMode === "full" || feedbackMode === "answer_only";
+  const simulationTimerDurationSeconds =
+    session.simulationTimerDurationSeconds ?? SIMULATION_EXAM_TIMER_DURATION_SECONDS;
+  const simulationTimerRemainingSeconds = Math.max(
+    0,
+    simulationTimerDurationSeconds - simulationTimerElapsedSeconds
+  );
+  const simulationTimerProgress = Math.min(
+    100,
+    Math.max(0, (simulationTimerElapsedSeconds / simulationTimerDurationSeconds) * 100)
+  );
+  const simulationTimerExpired =
+    session.settings?.mode === "simulation" &&
+    simulationTimerElapsedSeconds >= simulationTimerDurationSeconds;
   const canEndAfterSubmittedQuestion =
     session.settings?.mode === "review" &&
     [
@@ -2578,6 +2823,42 @@ export default function QuizPage() {
         <aside className="simulation-status-sidebar h-fit min-w-0 rounded-[2rem] bg-white p-4 shadow-card ring-1 ring-slate-100 sm:p-5 xl:sticky xl:top-6">
           <h2 className="text-lg font-semibold text-ink">本輪狀態</h2>
           <div className="mt-4 grid gap-3">
+            {session.settings?.mode === "simulation" ? (
+              <div className="rounded-3xl border border-emerald-100 bg-gradient-to-br from-emerald-50/90 via-white to-sky-50/80 px-4 py-4 text-ink shadow-sm">
+                <div className="flex items-start justify-between gap-3">
+                  <div className="min-w-0">
+                    <p className="text-xs font-black tracking-[0.18em] text-emerald-700">
+                      2 小時倒數
+                    </p>
+                    <p className="mt-2 font-mono text-3xl font-black leading-none text-slate-950 tabular-nums">
+                      {formatDurationClock(simulationTimerRemainingSeconds)}
+                    </p>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={handleToggleSimulationTimerPaused}
+                    className="shrink-0 rounded-full bg-white px-3 py-2 text-xs font-black text-emerald-800 shadow-sm ring-1 ring-emerald-200 transition hover:bg-emerald-50"
+                  >
+                    {simulationTimerPaused ? "繼續" : "暫停"}
+                  </button>
+                </div>
+                <div className="mt-4 h-2 overflow-hidden rounded-full bg-emerald-100">
+                  <div
+                    className={`h-full rounded-full ${
+                      simulationTimerExpired ? "bg-amber-400" : "bg-emerald-500"
+                    }`}
+                    style={{ width: `${simulationTimerProgress}%` }}
+                  />
+                </div>
+                <p className="mt-3 text-xs font-semibold leading-5 text-slate-600">
+                  {simulationTimerExpired
+                    ? "時間到也不會自動交卷，可以繼續寫完。"
+                    : simulationTimerPaused
+                      ? "已暫停，按繼續後才會接著計時。"
+                      : "只用來控時，不會自動交卷。"}
+                </p>
+              </div>
+            ) : null}
             <p className="rounded-2xl bg-slate-50 px-4 py-3 text-sm text-slate-700">
               本輪進度 <span className="font-semibold">{currentIndex + 1} / {targetCount}</span>
             </p>

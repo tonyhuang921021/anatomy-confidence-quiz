@@ -133,6 +133,8 @@ export type QuizSession = {
   questionOrder?: string[];
   generatedQuestions?: Question[];
   optionEliminationMap?: Partial<Record<string, OptionKey[]>>;
+  simulationElapsedSeconds?: number;
+  simulationTimerDurationSeconds?: number;
   currentQuestionIndex?: number;
   isReviewingAnswer?: boolean;
   attempts: Attempt[];

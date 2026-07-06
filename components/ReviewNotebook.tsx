@@ -508,6 +508,10 @@ function normalizeRelatedConcept(question: Question) {
   return (question.testedConcept ?? "").trim().toLowerCase();
 }
 
+function isPastExamQuestion(question: Question) {
+  return question.sourceType === "MOEX_PAST_EXAM";
+}
+
 function getSectionKey(question: Question) {
   return `${question.chapter ?? ""}__${question.section ?? ""}`;
 }
@@ -517,12 +521,16 @@ function buildRelatedQuestionIndex(allQuestions: Question[]): RelatedQuestionInd
   const bySection = new Map<string, Question[]>();
 
   for (const question of allQuestions) {
+    if (!isPastExamQuestion(question)) continue;
+
     const conceptKey = normalizeRelatedConcept(question);
-    const conceptQuestions = byConcept.get(conceptKey);
-    if (conceptQuestions) {
-      conceptQuestions.push(question);
-    } else {
-      byConcept.set(conceptKey, [question]);
+    if (conceptKey) {
+      const conceptQuestions = byConcept.get(conceptKey);
+      if (conceptQuestions) {
+        conceptQuestions.push(question);
+      } else {
+        byConcept.set(conceptKey, [question]);
+      }
     }
 
     const sectionKey = getSectionKey(question);
@@ -557,7 +565,8 @@ function renderQuestionReview(
   item: ReviewQuestionItem,
   renderedQuestion: Question,
   headerActions: ReactNode,
-  footer: ReactNode
+  footer: ReactNode,
+  relatedQuestionsContent?: () => ReactNode
 ) {
   const shouldCollapseAiExplanation = hasCollapsibleStructuredExplanation(renderedQuestion.explanation);
   const aiExplanationContent = shouldCollapseAiExplanation ? (
@@ -638,6 +647,7 @@ function renderQuestionReview(
         compact
         className="mt-3"
         aiExplanationContent={aiExplanationContent}
+        relatedQuestionsContent={relatedQuestionsContent}
       />
       {footer}
     </div>
@@ -761,7 +771,6 @@ export function ReviewNotebook({
   const [classificationOverrides, setClassificationOverrides] = useState<Record<string, QuestionClassificationOverride>>({});
   const [communityStatsMap, setCommunityStatsMap] = useState<Record<string, QuestionCommunityStats>>({});
   const [openQuestionIds, setOpenQuestionIds] = useState<Set<string>>(() => new Set());
-  const [openRelatedQuestionIds, setOpenRelatedQuestionIds] = useState<Set<string>>(() => new Set());
   const [activeCategory, setActiveCategory] = useState<"wrong" | "lowConfidence" | "resolved">("wrong");
   const [visibleCountByCategory, setVisibleCountByCategory] = useState({
     wrong: 40,
@@ -1089,18 +1098,6 @@ export function ReviewNotebook({
 
   function setQuestionDetailsOpen(questionId: string, isOpen: boolean) {
     setOpenQuestionIds((current) => {
-      const next = new Set(current);
-      if (isOpen) {
-        next.add(questionId);
-      } else {
-        next.delete(questionId);
-      }
-      return next;
-    });
-  }
-
-  function setRelatedDetailsOpen(questionId: string, isOpen: boolean) {
-    setOpenRelatedQuestionIds((current) => {
       const next = new Set(current);
       if (isOpen) {
         next.add(questionId);
@@ -1586,7 +1583,6 @@ export function ReviewNotebook({
                           explanationOverrides[item.question.id]
                         );
                         const isQuestionOpen = openQuestionIds.has(item.question.id);
-                        const isRelatedOpen = openRelatedQuestionIds.has(item.question.id);
                         return (
                           <>
                             <div className="space-y-4">
@@ -1658,24 +1654,9 @@ export function ReviewNotebook({
                                       item,
                                       renderedQuestion,
                                       renderQuestionTopActions(renderedQuestion),
-                                      renderExplanationFooter(renderedQuestion)
+                                      renderExplanationFooter(renderedQuestion),
+                                      () => renderRelatedQuestions(renderedQuestion, relatedQuestionIndex)
                                     )
-                                  : null}
-                              </details>
-
-                              <details
-                                open={isRelatedOpen}
-                                onToggle={(event) => {
-                                  if (event.currentTarget !== event.target) return;
-                                  setRelatedDetailsOpen(item.question.id, event.currentTarget.open);
-                                }}
-                                className="rounded-2xl bg-white p-3.5 text-sm text-slate-700 sm:p-4"
-                              >
-                                <summary className="cursor-pointer font-semibold text-ink">
-                                  看相同觀念類似題
-                                </summary>
-                                {isRelatedOpen
-                                  ? renderRelatedQuestions(renderedQuestion, relatedQuestionIndex)
                                   : null}
                               </details>
                             </div>
