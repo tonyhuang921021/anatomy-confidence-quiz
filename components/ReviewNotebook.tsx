@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { type ReactNode, useEffect, useMemo, useState } from "react";
+import { type ReactNode, useEffect, useMemo, useRef, useState } from "react";
 import { CopyQuestionPromptButton } from "@/components/CopyQuestionPromptButton";
 import { QuestionExplanationTabs } from "@/components/QuestionExplanationTabs";
 import { QuestionOptionBlock, QuestionStemBlock } from "@/components/QuestionMediaBlock";
@@ -133,6 +133,7 @@ function serializeManualReviewState(state: ManualReviewState) {
 }
 
 export const MANUAL_REVIEW_STATE_CHANGE_EVENT = "manual-review-state-change";
+const MANUAL_REVIEW_CLOUD_RETRY_MS = 15_000;
 
 function getManualReviewStorageKey(scope: string, userId?: string | null) {
   const normalizedUserId = userId?.trim() || "guest";
@@ -773,6 +774,7 @@ export function ReviewNotebook({
   const [manualReviewState, setManualReviewState] = useState<ManualReviewState>(() =>
     createEmptyManualReviewState()
   );
+  const manualReviewRetryTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const manualEditingEnabled = Boolean(manualEditScope);
   const manualReviewUserId = user?.id ?? "guest";
   const manualReviewStorageKey = manualEditScope
@@ -912,11 +914,59 @@ export function ReviewNotebook({
     setSelectedSubjects((current) => current.filter((subject) => availableSubjects.includes(subject)));
   }, [availableSubjects]);
 
+  function applyManualReviewCloudState(cloudState: ManualReviewState) {
+    if (!manualEditScope || !manualReviewStorageKey) return;
+    const latestLocalState = readManualReviewStateForScope(manualEditScope, manualReviewUserId);
+    const mergedState = mergeManualReviewStates([latestLocalState, cloudState]);
+    safeSaveManualReviewState(manualReviewStorageKey, mergedState);
+    setManualReviewState(mergedState);
+    dispatchManualReviewStateChange(manualEditScope, manualReviewUserId, mergedState);
+    setManualReviewPersistenceError("");
+  }
+
+  function scheduleManualReviewCloudRetry(accessToken: string) {
+    if (!manualEditScope || !manualReviewStorageKey || typeof window === "undefined") return;
+    if (manualReviewRetryTimerRef.current) return;
+
+    manualReviewRetryTimerRef.current = setTimeout(() => {
+      manualReviewRetryTimerRef.current = null;
+      const latestLocalState = readManualReviewStateForScope(manualEditScope, manualReviewUserId);
+      void syncManualReviewStateWithCloud(manualEditScope, accessToken, latestLocalState)
+        .then(applyManualReviewCloudState)
+        .catch((error) => {
+          setManualReviewPersistenceError(
+            error instanceof Error && error.message.trim()
+              ? error.message
+              : "完成區已先保存在這台裝置，雲端同步稍後會再試。"
+          );
+          scheduleManualReviewCloudRetry(accessToken);
+        });
+    }, MANUAL_REVIEW_CLOUD_RETRY_MS);
+  }
+
+  useEffect(() => {
+    return () => {
+      if (manualReviewRetryTimerRef.current) {
+        clearTimeout(manualReviewRetryTimerRef.current);
+        manualReviewRetryTimerRef.current = null;
+      }
+    };
+  }, []);
+
   useEffect(() => {
     if (!manualEditScope || !manualReviewStorageKey || typeof window === "undefined") {
+      if (manualReviewRetryTimerRef.current) {
+        clearTimeout(manualReviewRetryTimerRef.current);
+        manualReviewRetryTimerRef.current = null;
+      }
       setManualReviewState(createEmptyManualReviewState());
       setManualReviewPersistenceError("");
       return;
+    }
+
+    if (manualReviewRetryTimerRef.current) {
+      clearTimeout(manualReviewRetryTimerRef.current);
+      manualReviewRetryTimerRef.current = null;
     }
 
     const localState = readManualReviewStateForScope(manualEditScope, manualReviewUserId);
@@ -930,12 +980,7 @@ export function ReviewNotebook({
     void syncManualReviewStateWithCloud(manualEditScope, session.access_token, localState)
       .then((cloudState) => {
         if (cancelled) return;
-        const latestLocalState = readManualReviewStateForScope(manualEditScope, manualReviewUserId);
-        const mergedState = mergeManualReviewStates([latestLocalState, cloudState]);
-        safeSaveManualReviewState(manualReviewStorageKey, mergedState);
-        setManualReviewState(mergedState);
-        dispatchManualReviewStateChange(manualEditScope, manualReviewUserId, mergedState);
-        setManualReviewPersistenceError("");
+        applyManualReviewCloudState(cloudState);
       })
       .catch((error) => {
         if (cancelled) return;
@@ -944,10 +989,15 @@ export function ReviewNotebook({
             ? error.message
             : "完成區會先保存在這台裝置，稍後再同步雲端。"
         );
+        scheduleManualReviewCloudRetry(session.access_token);
       });
 
     return () => {
       cancelled = true;
+      if (manualReviewRetryTimerRef.current) {
+        clearTimeout(manualReviewRetryTimerRef.current);
+        manualReviewRetryTimerRef.current = null;
+      }
     };
   }, [manualEditScope, manualReviewStorageKey, manualReviewUserId, session?.access_token]);
 
@@ -994,20 +1044,14 @@ export function ReviewNotebook({
 
       if (accessToken) {
         void syncManualReviewStateWithCloud(manualEditScope, accessToken, next)
-          .then((cloudState) => {
-            const latestLocalState = readManualReviewStateForScope(manualEditScope, manualReviewUserId);
-            const mergedState = mergeManualReviewStates([latestLocalState, cloudState]);
-            safeSaveManualReviewState(manualReviewStorageKey, mergedState);
-            setManualReviewState(mergedState);
-            dispatchManualReviewStateChange(manualEditScope, manualReviewUserId, mergedState);
-            setManualReviewPersistenceError("");
-          })
+          .then(applyManualReviewCloudState)
           .catch((error) => {
             setManualReviewPersistenceError(
               error instanceof Error && error.message.trim()
                 ? error.message
                 : "完成區已先保存在這台裝置，雲端同步稍後會再試。"
             );
+            scheduleManualReviewCloudRetry(accessToken);
           });
       }
 

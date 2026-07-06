@@ -168,7 +168,8 @@ const CLOUD_COMPLETED_SESSION_FETCH_PAGE_SIZE = 300;
 const CLOUD_COMPLETED_SESSION_FETCH_MAX_ROWS = 3000;
 const CLOUD_COMPLETED_SESSION_PAYLOAD_FALLBACK_LIMIT = 120;
 const CLOUD_COMPLETED_SESSION_UPLOAD_LIMIT = 3000;
-const CLOUD_COMPLETED_SESSION_UPLOAD_BATCH_SIZE = 25;
+const CLOUD_COMPLETED_SESSION_UPLOAD_BATCH_SIZE = 8;
+const CLOUD_COMPLETED_SESSION_UPLOAD_ATTEMPT_BATCH_SIZE = 800;
 const CLOUD_LIGHT_COMPLETED_SESSION_UPLOAD_LIMIT = 40;
 const CLOUD_LIGHT_COMPLETED_ATTEMPT_UPLOAD_LIMIT = 500;
 const CLOUD_ATTEMPT_SESSION_FETCH_CHUNK_SIZE = 20;
@@ -2178,18 +2179,43 @@ async function upsertSessionsForUserInBatches(
   sessions: QuizSession[],
   batchSize = CLOUD_COMPLETED_SESSION_UPLOAD_BATCH_SIZE,
   options: {
+    batchAttemptLimit?: number;
     batchTimeoutMs?: number;
     totalBudgetMs?: number;
   } = {}
 ) {
   const startedAt = Date.now();
+  const batchAttemptLimit = options.batchAttemptLimit ?? CLOUD_COMPLETED_SESSION_UPLOAD_ATTEMPT_BATCH_SIZE;
 
-  for (let index = 0; index < sessions.length; index += batchSize) {
+  for (let index = 0; index < sessions.length;) {
     if (options.totalBudgetMs && Date.now() - startedAt > options.totalBudgetMs) {
       throw new Error("雲端同步仍在背景整理，先保留本機紀錄。");
     }
 
-    const batch = sessions.slice(index, index + batchSize);
+    const batch: QuizSession[] = [];
+    let batchAttemptCount = 0;
+
+    while (index < sessions.length && batch.length < batchSize) {
+      const session = sessions[index];
+      const attemptCount = session.attempts.length;
+      if (batch.length > 0 && batchAttemptCount + attemptCount > batchAttemptLimit) {
+        break;
+      }
+
+      batch.push(session);
+      batchAttemptCount += attemptCount;
+      index += 1;
+
+      if (attemptCount >= batchAttemptLimit) {
+        break;
+      }
+    }
+
+    if (batch.length === 0) {
+      index += 1;
+      continue;
+    }
+
     const task = upsertSessionsForUser(userId, batch);
     if (options.batchTimeoutMs) {
       await withClientTimeout(task, options.batchTimeoutMs, "單批雲端同步逾時，先保留本機紀錄。");
@@ -2534,15 +2560,20 @@ export async function pushCompletedSessionToSupabase(session: QuizSession) {
         )
       );
     }
-    await withClientTimeout(
-      upsertSessionsForUser(data.user.id, canonicalSessions),
-      CLOUD_SYNC_BATCH_TIMEOUT_MS,
-      "完成紀錄雲端同步逾時，先保留本機紀錄。"
-    );
-    saveCloudCompletedSessionsForUser(
-      data.user.id,
-      mergeSessions(loadCloudCompletedSessionsForUser(data.user.id), canonicalSessions)
-    );
+    try {
+      await withClientTimeout(
+        upsertSessionsForUser(data.user.id, canonicalSessions),
+        CLOUD_SYNC_BATCH_TIMEOUT_MS,
+        "完成紀錄雲端同步逾時，先保留本機紀錄。"
+      );
+      removePendingCompletedSessionUploadsForUser(data.user.id, canonicalSessions);
+      saveCloudCompletedSessionsForUser(
+        data.user.id,
+        mergeSessions(loadCloudCompletedSessionsForUser(data.user.id), canonicalSessions)
+      );
+    } catch (error) {
+      console.error("Completed session cloud upload deferred:", error);
+    }
     void syncLeaderboardProfileForCurrentUser(data.user, loadCompletedSessionsForUser(data.user.id)).catch((error) => {
       console.error("Leaderboard sync skipped:", error);
     });
