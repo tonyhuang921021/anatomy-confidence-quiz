@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import { useAuth } from "@/components/AuthProvider";
+import { useCloudHistoryHydration } from "@/components/useCloudHistoryHydration";
 import {
   MANUAL_REVIEW_STATE_CHANGE_EVENT,
   ReviewNotebook,
@@ -41,6 +42,7 @@ export default function CustomPaperReviewPage() {
     readManualReviewStateForScope(CUSTOM_PAPER_REVIEW_SCOPE, "guest")
   );
   const { user, syncVersion } = useAuth();
+  useCloudHistoryHydration();
   const reviewCompletionThreshold = useReviewCompletionThreshold();
   const allQuestions = getQuestionBankBySubjectFilter("全部");
 

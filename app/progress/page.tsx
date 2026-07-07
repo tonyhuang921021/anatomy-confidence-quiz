@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import { useAuth } from "@/components/AuthProvider";
+import { useCloudHistoryHydration } from "@/components/useCloudHistoryHydration";
 import { MED1_SUBJECTS, MED2_SUBJECTS, subjectRegistry } from "@/data/subjectRegistry";
 import {
   completionStatusClasses,
@@ -218,6 +219,7 @@ function aggregateGroup(
 
 export default function ProgressPage() {
   const { user, syncVersion } = useAuth();
+  useCloudHistoryHydration();
   const [sessions, setSessions] = useState<ProgressHistorySession[]>([]);
   const [openGroups, setOpenGroups] = useState<Record<string, boolean>>({ med1: true, med2: true });
 

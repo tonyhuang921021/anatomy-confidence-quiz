@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useAuth } from "@/components/AuthProvider";
+import { useCloudHistoryHydration } from "@/components/useCloudHistoryHydration";
 import {
   MANUAL_REVIEW_STATE_CHANGE_EVENT,
   ReviewNotebook,
@@ -121,6 +122,7 @@ export default function SimulationReviewPage() {
     readManualReviewStateForScope(SIMULATION_REVIEW_SCOPE, "guest")
   );
   const { user, syncVersion } = useAuth();
+  useCloudHistoryHydration();
   const reviewCompletionThreshold = useReviewCompletionThreshold();
   const baseQuestions = useMemo(() => getQuestionBankBySubjectFilter("全部"), []);
   const allQuestions = useMemo(

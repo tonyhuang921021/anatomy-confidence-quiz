@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/components/AuthProvider";
+import { useCloudHistoryHydration } from "@/components/useCloudHistoryHydration";
 import { getAISimulationPaperOptions, getPastPaperOptions } from "@/data/med1QuestionBank";
 import { enabledSubjects, subjectRegistry } from "@/data/subjectRegistry";
 import {
@@ -138,6 +139,7 @@ export function QuizSetupPanel({
 }: QuizSetupPanelProps) {
   const router = useRouter();
   const { user, syncStatus, syncVersion } = useAuth();
+  useCloudHistoryHydration();
   const [simulationConfidenceCalibration, setSimulationConfidenceCalibration] = useState(() =>
     loadSimulationConfidenceCalibration(true)
   );

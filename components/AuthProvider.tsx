@@ -45,6 +45,7 @@ type RefreshCloudDataOptions = {
   hydrateRemoteHistory?: boolean;
   automatic?: boolean;
   uploadAllPending?: boolean;
+  historyHydration?: boolean;
 };
 
 const AuthContext = createContext<AuthContextValue | null>(null);
@@ -53,6 +54,7 @@ const CLOUD_SYNC_HARD_TIMEOUT_MS = 24000;
 const CLOUD_MANUAL_SYNC_HARD_TIMEOUT_MS = 60000;
 const CLOUD_MANUAL_RESUME_BACKGROUND_NOTICE_MS = 10000;
 const AUTOMATIC_CLOUD_SYNC_COOLDOWN_MS = 5 * 60 * 1000;
+const HISTORY_CLOUD_SYNC_COOLDOWN_MS = 15 * 60 * 1000;
 const AUTH_SESSION_BOOTSTRAP_TIMEOUT_MS = 3500;
 const AUTH_SESSION_REFRESH_TIMEOUT_MS = 6000;
 const AUTH_SESSION_REFRESH_LEEWAY_MS = 90_000;
@@ -66,6 +68,7 @@ const RECOVERY_MODE_MESSAGE = "暫用本機，稍後補傳。雲端登入與同�
 const SAFARI_AUTO_SYNC_DEFERRED_MESSAGE =
   "暫用本機，稍後補傳。雲端紀錄同步排程中，作答完成也會補傳。";
 const AUTOMATIC_CLOUD_SYNC_MARKER_PREFIX = "medQuizAutomaticCloudSync:";
+const HISTORY_CLOUD_SYNC_MARKER_PREFIX = "medQuizHistoryCloudSync:";
 
 function getErrorMessage(error: unknown) {
   if (error instanceof Error) return error.message;
@@ -138,21 +141,46 @@ function getAutomaticCloudSyncMarkerKey(userId: string) {
   return `${AUTOMATIC_CLOUD_SYNC_MARKER_PREFIX}${userId}`;
 }
 
-function readAutomaticCloudSyncMarker(userId: string) {
+function getHistoryCloudSyncMarkerKey(userId: string) {
+  return `${HISTORY_CLOUD_SYNC_MARKER_PREFIX}${userId}`;
+}
+
+function readCloudSyncMarker(key: string) {
   if (typeof window === "undefined") return 0;
-  const raw = safeGetStorage(window.localStorage, getAutomaticCloudSyncMarkerKey(userId));
+  const raw = safeGetStorage(window.localStorage, key);
   const value = Number(raw ?? "0");
   return Number.isFinite(value) ? value : 0;
 }
 
-function writeAutomaticCloudSyncMarker(userId: string, timestamp = Date.now()) {
+function writeCloudSyncMarker(key: string, timestamp = Date.now()) {
   if (typeof window === "undefined") return;
-  safeSetStorage(window.localStorage, getAutomaticCloudSyncMarkerKey(userId), String(timestamp));
+  safeSetStorage(window.localStorage, key, String(timestamp));
+}
+
+function readAutomaticCloudSyncMarker(userId: string) {
+  return readCloudSyncMarker(getAutomaticCloudSyncMarkerKey(userId));
+}
+
+function readHistoryCloudSyncMarker(userId: string) {
+  return readCloudSyncMarker(getHistoryCloudSyncMarkerKey(userId));
+}
+
+function writeAutomaticCloudSyncMarker(userId: string, timestamp = Date.now()) {
+  writeCloudSyncMarker(getAutomaticCloudSyncMarkerKey(userId), timestamp);
+}
+
+function writeHistoryCloudSyncMarker(userId: string, timestamp = Date.now()) {
+  writeCloudSyncMarker(getHistoryCloudSyncMarkerKey(userId), timestamp);
 }
 
 function shouldSkipAutomaticCloudSync(userId: string, now = Date.now()) {
   const lastStartedAt = readAutomaticCloudSyncMarker(userId);
   return lastStartedAt > 0 && now - lastStartedAt < AUTOMATIC_CLOUD_SYNC_COOLDOWN_MS;
+}
+
+function shouldSkipHistoryCloudSync(userId: string, now = Date.now()) {
+  const lastStartedAt = readHistoryCloudSyncMarker(userId);
+  return lastStartedAt > 0 && now - lastStartedAt < HISTORY_CLOUD_SYNC_COOLDOWN_MS;
 }
 
 function isAuthSessionExpiring(session: Session | null, leewayMs = 30_000) {
@@ -295,10 +323,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     if (!configured || !userId || !effectiveUser) return;
 
     const now = Date.now();
-    const hardTimeoutMs = explicitOptions.uploadAllPending
+    const isHistoryHydration = explicitOptions.historyHydration === true;
+    const hardTimeoutMs = explicitOptions.uploadAllPending || isHistoryHydration
       ? CLOUD_MANUAL_SYNC_HARD_TIMEOUT_MS
       : CLOUD_SYNC_HARD_TIMEOUT_MS;
-    const backgroundNoticeMs = explicitOptions.uploadAllPending
+    const backgroundNoticeMs = explicitOptions.uploadAllPending || isHistoryHydration
       ? CLOUD_MANUAL_RESUME_BACKGROUND_NOTICE_MS
       : CLOUD_RESUME_BACKGROUND_NOTICE_MS;
 
@@ -312,7 +341,22 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       syncInFlightRef.current = null;
     }
 
-    if (explicitOptions.automatic && shouldSkipAutomaticCloudSync(userId, now)) {
+    if (
+      explicitOptions.automatic &&
+      isHistoryHydration &&
+      shouldSkipHistoryCloudSync(userId, now)
+    ) {
+      setSyncStatus("ready");
+      setSyncError("");
+      setSyncVersion((value) => value + 1);
+      return;
+    }
+
+    if (
+      explicitOptions.automatic &&
+      !isHistoryHydration &&
+      shouldSkipAutomaticCloudSync(userId, now)
+    ) {
       setSyncStatus("ready");
       setSyncError("");
       setSyncVersion((value) => value + 1);
@@ -320,6 +364,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
 
     if (explicitOptions.automatic) {
+      if (isHistoryHydration) {
+        writeHistoryCloudSyncMarker(userId, now);
+      }
       writeAutomaticCloudSyncMarker(userId, now);
     }
 
