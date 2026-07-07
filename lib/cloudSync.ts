@@ -2415,11 +2415,13 @@ export async function syncLocalCompletedSessionsForCurrentUser(
     );
   let fetchedRemoteSessions: QuizSession[] = [];
   let shouldUploadLocalSessions = !isSupabaseRecoveryMode() && isSupabaseConfigured();
+  let hasVerifiedRemoteSessions = false;
 
   if (shouldUploadLocalSessions && hydrateRemoteHistory) {
     try {
       const resolved = await fetchResolvedQuizSessionsForUser(userId);
       fetchedRemoteSessions = resolved.sessions;
+      hasVerifiedRemoteSessions = true;
     } catch (error) {
       shouldUploadLocalSessions = false;
       fetchedRemoteSessions = loadCloudCompletedSessionsForUser(userId);
@@ -2436,7 +2438,9 @@ export async function syncLocalCompletedSessionsForCurrentUser(
     userId,
     loadPendingCompletedSessionUploadsForUser(userId).filter(isCompletedQuizSession)
   );
-  const confirmedPendingSessions = getConfirmedPendingSessions(rawPendingUploadSessions, remoteSessions);
+  const confirmedPendingSessions = hasVerifiedRemoteSessions
+    ? getConfirmedPendingSessions(rawPendingUploadSessions, remoteSessions)
+    : [];
   if (confirmedPendingSessions.length > 0) {
     removePendingCompletedSessionUploadsForUser(userId, confirmedPendingSessions);
   }
