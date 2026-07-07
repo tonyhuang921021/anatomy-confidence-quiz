@@ -182,6 +182,7 @@ const CLOUD_SYNC_BATCH_TIMEOUT_MS = 24000;
 const CLOUD_DIRECT_SYNC_TIMEOUT_MS = 7000;
 const CLOUD_SERVER_SYNC_TIMEOUT_MS = 12000;
 const CLOUD_SYNC_TOTAL_BUDGET_MS = 45000;
+const CLOUD_MANUAL_SYNC_TOTAL_BUDGET_MS = 55000;
 const LEADERBOARD_PROFILE_CLIENT_SYNC_MIN_INTERVAL_MS = 5 * 60 * 1000;
 const LEADERBOARD_PROFILE_SYNC_MARKER_PREFIX = "leaderboardProfileSync:";
 const COMPLETED_SESSION_UPLOAD_MARKER_PREFIX = "completedSessionUpload:";
@@ -204,6 +205,7 @@ type CurrentSessionSyncState = {
 
 type CompletedSessionSyncOptions = {
   hydrateRemoteHistory?: boolean;
+  uploadAllPending?: boolean;
 };
 
 const currentSessionSyncState = new Map<string, CurrentSessionSyncState>();
@@ -2406,7 +2408,8 @@ export async function syncLocalCompletedSessionsForCurrentUser(
   userId: string,
   options: CompletedSessionSyncOptions = {}
 ) {
-  const hydrateRemoteHistory = options.hydrateRemoteHistory ?? true;
+  const uploadAllPending = options.uploadAllPending === true;
+  const hydrateRemoteHistory = options.hydrateRemoteHistory ?? !uploadAllPending;
   const sourceUserIds = getCompletedSessionSourceUserIds(userId);
   const hasHeavyLocalHistory =
     sourceUserIds.some(
@@ -2493,6 +2496,9 @@ export async function syncLocalCompletedSessionsForCurrentUser(
     CLOUD_LIGHT_COMPLETED_SESSION_UPLOAD_LIMIT,
     CLOUD_LIGHT_COMPLETED_ATTEMPT_UPLOAD_LIMIT
   );
+  const pendingSessionsToUpload = [...pendingCompletedSessionUploads]
+    .sort((left, right) => sessionFreshnessValue(right).localeCompare(sessionFreshnessValue(left)))
+    .slice(0, CLOUD_COMPLETED_SESSION_UPLOAD_LIMIT);
 
   const cloudCacheSessions = hasHeavyLocalHistory ? mergedSessions : remoteSessions;
   if (cloudCacheSessions.length > 0) {
@@ -2510,13 +2516,15 @@ export async function syncLocalCompletedSessionsForCurrentUser(
     }
   }
 
-  const sessionsToUpload = hydrateRemoteHistory
-    ? getSessionsNeedingUpload(localSessionsToSync, remoteSessions)
-    : getRecentSessionsWithinUploadBudget(
-        pendingCompletedSessionUploads,
-        CLOUD_LIGHT_COMPLETED_SESSION_UPLOAD_LIMIT,
-        CLOUD_LIGHT_COMPLETED_ATTEMPT_UPLOAD_LIMIT
-      );
+  const sessionsToUpload = uploadAllPending
+    ? pendingSessionsToUpload
+    : hydrateRemoteHistory
+      ? getSessionsNeedingUpload(localSessionsToSync, remoteSessions)
+      : getRecentSessionsWithinUploadBudget(
+          pendingCompletedSessionUploads,
+          CLOUD_LIGHT_COMPLETED_SESSION_UPLOAD_LIMIT,
+          CLOUD_LIGHT_COMPLETED_ATTEMPT_UPLOAD_LIMIT
+        );
 
   if (!shouldUploadLocalSessions || sessionsToUpload.length === 0) {
     return mergedSessions;
@@ -2528,7 +2536,7 @@ export async function syncLocalCompletedSessionsForCurrentUser(
     Math.min(10, CLOUD_COMPLETED_SESSION_UPLOAD_BATCH_SIZE),
     {
       batchTimeoutMs: CLOUD_SYNC_BATCH_TIMEOUT_MS,
-      totalBudgetMs: CLOUD_SYNC_TOTAL_BUDGET_MS
+      totalBudgetMs: uploadAllPending ? CLOUD_MANUAL_SYNC_TOTAL_BUDGET_MS : CLOUD_SYNC_TOTAL_BUDGET_MS
     }
   );
   removePendingCompletedSessionUploadsForUser(userId, sessionsToUpload);

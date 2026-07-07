@@ -44,11 +44,14 @@ type AuthContextValue = {
 type RefreshCloudDataOptions = {
   hydrateRemoteHistory?: boolean;
   automatic?: boolean;
+  uploadAllPending?: boolean;
 };
 
 const AuthContext = createContext<AuthContextValue | null>(null);
 const CLOUD_RESUME_BACKGROUND_NOTICE_MS = 6500;
 const CLOUD_SYNC_HARD_TIMEOUT_MS = 24000;
+const CLOUD_MANUAL_SYNC_HARD_TIMEOUT_MS = 60000;
+const CLOUD_MANUAL_RESUME_BACKGROUND_NOTICE_MS = 10000;
 const AUTOMATIC_CLOUD_SYNC_COOLDOWN_MS = 5 * 60 * 1000;
 const AUTH_SESSION_BOOTSTRAP_TIMEOUT_MS = 3500;
 const AUTH_SESSION_REFRESH_TIMEOUT_MS = 6000;
@@ -292,7 +295,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     if (!configured || !userId || !effectiveUser) return;
 
     const now = Date.now();
-    if (syncInFlightRef.current && now - syncStartedAtRef.current <= CLOUD_SYNC_HARD_TIMEOUT_MS + 1000) {
+    const hardTimeoutMs = explicitOptions.uploadAllPending
+      ? CLOUD_MANUAL_SYNC_HARD_TIMEOUT_MS
+      : CLOUD_SYNC_HARD_TIMEOUT_MS;
+    const backgroundNoticeMs = explicitOptions.uploadAllPending
+      ? CLOUD_MANUAL_RESUME_BACKGROUND_NOTICE_MS
+      : CLOUD_RESUME_BACKGROUND_NOTICE_MS;
+
+    if (syncInFlightRef.current && now - syncStartedAtRef.current <= hardTimeoutMs + 1000) {
       setSyncStatus("syncing");
       setSyncError("");
       return;
@@ -317,10 +327,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setSyncError("");
 
     syncStartedAtRef.current = now;
-    const hydrateRemoteHistory = explicitOptions.hydrateRemoteHistory ?? true;
+    const uploadAllPending = explicitOptions.uploadAllPending === true;
+    const hydrateRemoteHistory = explicitOptions.hydrateRemoteHistory ?? !uploadAllPending;
 
     const syncTask = withTimeout(
-      syncLocalCompletedSessionsForCurrentUser(userId, { hydrateRemoteHistory })
+      syncLocalCompletedSessionsForCurrentUser(userId, { hydrateRemoteHistory, uploadAllPending })
       .then((completedSessions) => {
         void syncLeaderboardProfileForCurrentUser(effectiveUser, completedSessions).catch((error) => {
           console.error("Leaderboard sync skipped:", error);
@@ -331,7 +342,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         setSyncStatus("ready");
         setSyncVersion((value) => value + 1);
       }),
-      CLOUD_SYNC_HARD_TIMEOUT_MS,
+      hardTimeoutMs,
       "雲端同步仍在背景整理，可先使用本機紀錄。"
     )
       .catch((error) => {
@@ -347,7 +358,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     try {
       await withTimeout(
         syncTask,
-        CLOUD_RESUME_BACKGROUND_NOTICE_MS,
+        backgroundNoticeMs,
         "雲端同步仍在背景整理，可先使用本機紀錄。"
       );
     } catch (error) {

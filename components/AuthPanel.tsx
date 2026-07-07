@@ -1153,7 +1153,7 @@ export function AuthPanel() {
           </button>
           <button
             type="button"
-            onClick={() => void refreshCloudData({ hydrateRemoteHistory: false })}
+            onClick={() => void refreshCloudData({ hydrateRemoteHistory: false, uploadAllPending: true })}
             disabled={syncStatus === "syncing"}
             className="primary-pill disabled:cursor-not-allowed disabled:opacity-60"
           >
