@@ -2461,6 +2461,15 @@ export default function QuizPage() {
   const simulationTimerExpired =
     session.settings?.mode === "simulation" &&
     simulationTimerElapsedSeconds >= simulationTimerDurationSeconds;
+  const canEndReviewPracticeAfterSubmitted =
+    session.settings?.mode === "review" &&
+    [
+      "散題錯題庫",
+      "散題錯題與沒信心題庫",
+      "散題待複習題庫",
+      "模擬考錯題庫"
+    ].includes(session.settings.customPoolLabel ?? "") &&
+    currentIndex < targetCount - 1;
   const canEndOpenEndedPracticeAfterSubmitted =
     session.settings?.mode === "random" &&
     Boolean(session.settings.stopAfterReview) &&
@@ -2469,7 +2478,9 @@ export default function QuizPage() {
     session.settings?.mode === "custom_paper" &&
     currentIndex < targetCount - 1;
   const canEndAfterSubmittedQuestion =
-    canEndOpenEndedPracticeAfterSubmitted || canEndCustomPaperAfterSubmitted;
+    canEndReviewPracticeAfterSubmitted ||
+    canEndOpenEndedPracticeAfterSubmitted ||
+    canEndCustomPaperAfterSubmitted;
   const currentExplanationOverride = explanationOverrides[currentQuestion.id];
   const currentExplanationLoading = explanationLoadingMap[currentQuestion.id];
   const currentExplanationError = explanationErrorMap[currentQuestion.id];
