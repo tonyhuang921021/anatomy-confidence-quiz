@@ -94,6 +94,10 @@ function buildPracticeReviewUrlSettings(items: ReviewQuestionItem[]): QuizSettin
   };
 }
 
+function loadReviewCompletedSessions() {
+  return loadCompletedSessions({ includeFullLocalHistory: true });
+}
+
 export default function ReviewPage() {
   const [practiceItems, setPracticeItems] = useState<ReviewQuestionItem[]>([]);
   const [classificationOverrides, setClassificationOverrides] = useState<
@@ -127,7 +131,7 @@ export default function ReviewPage() {
   }, [baseQuestions, syncVersion]);
 
   useEffect(() => {
-    const sessions = loadCompletedSessions();
+    const sessions = loadReviewCompletedSessions();
     const practiceSessions = sessions.filter(isPracticeReviewSession);
     const reviewQuestions = buildReviewCandidateQuestions(
       allQuestions,

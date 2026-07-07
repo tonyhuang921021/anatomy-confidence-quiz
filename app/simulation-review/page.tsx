@@ -112,6 +112,10 @@ function buildSimulationReviewUrlSettings(items: ReviewQuestionItem[]): QuizSett
   };
 }
 
+function loadReviewCompletedSessions() {
+  return loadCompletedSessions({ includeFullLocalHistory: true });
+}
+
 export default function SimulationReviewPage() {
   const [simulationItems, setSimulationItems] = useState<ReviewQuestionItem[]>([]);
   const [classificationOverrides, setClassificationOverrides] = useState<
@@ -142,7 +146,7 @@ export default function SimulationReviewPage() {
   }, [baseQuestions, syncVersion]);
 
   useEffect(() => {
-    const sessions = loadCompletedSessions();
+    const sessions = loadReviewCompletedSessions();
     const simulationSourceSessions = sessions.filter(isSimulationSourceSession);
     const historySessions = sessions.filter(
       (session) => isSimulationSourceSession(session) || isSimulationReviewCompletionSession(session)

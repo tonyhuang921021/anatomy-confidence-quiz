@@ -2476,19 +2476,25 @@ export async function syncLocalCompletedSessionsForCurrentUser(
     ]).filter(isCompletedQuizSession)
   );
 
-  const localCompletedSessions = hasHeavyLocalHistory
-    ? pendingCompletedSessionUploads
-    : canonicalizeSessionsForUser(
-        userId,
-        mergeSessionLists([
-          ...sourceUserIds.map((sourceUserId) => loadCompletedSessionsForUser(sourceUserId)),
-          pendingCompletedSessionUploads
-        ])
-          .filter(isCompletedQuizSession)
-      );
-  const mergedSessions = hasHeavyLocalHistory
-    ? mergeSessions(pendingCompletedSessionUploads, remoteSessions).filter(isCompletedQuizSession)
-    : mergeSessions(localCompletedSessions, remoteSessions).filter(isCompletedQuizSession);
+  const localCompletedSessions =
+    hasHeavyLocalHistory && !uploadAllPending
+      ? pendingCompletedSessionUploads
+      : canonicalizeSessionsForUser(
+          userId,
+          mergeSessionLists([
+            ...sourceUserIds.map((sourceUserId) =>
+              loadCompletedSessionsForUser(sourceUserId, {
+                includeFullLocalHistory: uploadAllPending
+              })
+            ),
+            pendingCompletedSessionUploads
+          ])
+            .filter(isCompletedQuizSession)
+        );
+  const mergedSessions =
+    hasHeavyLocalHistory && !uploadAllPending
+      ? mergeSessions(pendingCompletedSessionUploads, remoteSessions).filter(isCompletedQuizSession)
+      : mergeSessions(localCompletedSessions, remoteSessions).filter(isCompletedQuizSession);
   const localSessionsToSync = getRecentSessionsWithinUploadBudget(
     [...localCompletedSessions].sort((left, right) =>
       sessionFreshnessValue(right).localeCompare(sessionFreshnessValue(left))
@@ -2496,11 +2502,12 @@ export async function syncLocalCompletedSessionsForCurrentUser(
     CLOUD_LIGHT_COMPLETED_SESSION_UPLOAD_LIMIT,
     CLOUD_LIGHT_COMPLETED_ATTEMPT_UPLOAD_LIMIT
   );
-  const pendingSessionsToUpload = [...pendingCompletedSessionUploads]
-    .sort((left, right) => sessionFreshnessValue(right).localeCompare(sessionFreshnessValue(left)))
-    .slice(0, CLOUD_COMPLETED_SESSION_UPLOAD_LIMIT);
-
-  const cloudCacheSessions = hasHeavyLocalHistory ? mergedSessions : remoteSessions;
+  const cloudCacheSessions =
+    hasHeavyLocalHistory && uploadAllPending
+      ? remoteSessions
+      : hasHeavyLocalHistory
+        ? mergedSessions
+        : remoteSessions;
   if (cloudCacheSessions.length > 0) {
     saveCloudCompletedSessionsForUser(userId, cloudCacheSessions);
   }
@@ -2517,7 +2524,12 @@ export async function syncLocalCompletedSessionsForCurrentUser(
   }
 
   const sessionsToUpload = uploadAllPending
-    ? pendingSessionsToUpload
+    ? getSessionsNeedingUpload(
+        [...localCompletedSessions].sort((left, right) =>
+          sessionFreshnessValue(right).localeCompare(sessionFreshnessValue(left))
+        ),
+        remoteSessions
+      ).slice(0, CLOUD_COMPLETED_SESSION_UPLOAD_LIMIT)
     : hydrateRemoteHistory
       ? getSessionsNeedingUpload(localSessionsToSync, remoteSessions)
       : getRecentSessionsWithinUploadBudget(

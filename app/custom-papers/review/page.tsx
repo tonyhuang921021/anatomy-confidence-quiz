@@ -36,6 +36,10 @@ function isCustomPaperReviewCompletionSession(session: QuizSession) {
   );
 }
 
+function loadReviewCompletedSessions() {
+  return loadCompletedSessions({ includeFullLocalHistory: true });
+}
+
 export default function CustomPaperReviewPage() {
   const [customPaperItems, setCustomPaperItems] = useState<ReviewQuestionItem[]>([]);
   const [manualReviewState, setManualReviewState] = useState<ManualReviewState>(() =>
@@ -47,7 +51,7 @@ export default function CustomPaperReviewPage() {
   const allQuestions = getQuestionBankBySubjectFilter("全部");
 
   useEffect(() => {
-    const sessions = loadCompletedSessions();
+    const sessions = loadReviewCompletedSessions();
     const customPaperSourceSessions = sessions.filter(isCustomPaperSourceSession);
     const historySessions = sessions.filter(
       (session) => isCustomPaperSourceSession(session) || isCustomPaperReviewCompletionSession(session)
