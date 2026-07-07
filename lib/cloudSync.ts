@@ -201,7 +201,14 @@ type CurrentSessionSyncState = {
   pendingSignature: string;
 };
 
+type CompletedSessionSyncOptions = {
+  hydrateRemoteHistory?: boolean;
+};
+
 const currentSessionSyncState = new Map<string, CurrentSessionSyncState>();
+const COMPLETED_SESSION_UPLOAD_DEDUPE_MS = 2 * 60 * 1000;
+const completedSessionUploadsInFlight = new Map<string, Promise<void>>();
+const recentCompletedSessionUploads = new Map<string, number>();
 const sharedQuestionExplanationSyncsInFlight = new Map<
   string,
   Promise<SharedQuestionExplanationSyncResult>
@@ -815,6 +822,44 @@ function getAttemptRowUploadSignature(row: QuizSessionAttemptRow) {
   ].join("|");
 }
 
+function hashSyncSignature(value: string) {
+  let hash = 0;
+  for (let index = 0; index < value.length; index += 1) {
+    hash = (hash * 31 + value.charCodeAt(index)) >>> 0;
+  }
+  return hash.toString(36);
+}
+
+function getCompletedSessionUploadKey(userId: string, sessions: QuizSession[]) {
+  const sessionSignatures = sessions
+    .map((session) => {
+      const attemptSignature = session.attempts.map(getAttemptUploadSignature).join("\n");
+      return [
+        getCanonicalSessionId(session.id),
+        session.completedAt ?? "",
+        session.settings?.mode ?? "",
+        session.attempts.length,
+        hashSyncSignature(attemptSignature)
+      ].join(":");
+    })
+    .sort()
+    .join("|");
+
+  return `${userId}:${sessionSignatures}`;
+}
+
+function pruneRecentCompletedSessionUploads(now = Date.now()) {
+  for (const [key, uploadedAt] of recentCompletedSessionUploads) {
+    if (now - uploadedAt > COMPLETED_SESSION_UPLOAD_DEDUPE_MS) {
+      recentCompletedSessionUploads.delete(key);
+    }
+  }
+}
+
+function isCloudSyncTimeoutError(error: unknown) {
+  return error instanceof Error && error.message.includes("逾時");
+}
+
 function getAttemptRowsNeedingUpload(
   userId: string,
   session: QuizSession,
@@ -851,7 +896,7 @@ async function fetchExistingAttemptSignatureMap(
   const { data, error } = await supabase
     .from("quiz_session_attempts")
     .select(
-      "session_id, question_order, question_id, selected_answer, correct_answer, is_correct, confidence, error_type, answered_at"
+      "session_id, question_order, question_id, selected_answer, correct_answer, is_correct, confidence, error_type, answered_at, source_mode, subject_snapshot, chapter_snapshot, section_snapshot"
     )
     .eq("user_id", userId)
     .in("session_id", sessionIds);
@@ -2165,6 +2210,9 @@ async function upsertSessionsForUser(
       });
       return;
     } catch (serverError) {
+      if (isCloudSyncTimeoutError(serverError)) {
+        throw serverError;
+      }
       console.warn("Server session sync failed; falling back to direct browser sync.", serverError);
       await runDirectUpsert();
       return;
@@ -2322,7 +2370,11 @@ export async function syncCompletedSessionsForCurrentUser(userId: string) {
   return mergedSessions;
 }
 
-export async function syncLocalCompletedSessionsForCurrentUser(userId: string) {
+export async function syncLocalCompletedSessionsForCurrentUser(
+  userId: string,
+  options: CompletedSessionSyncOptions = {}
+) {
+  const hydrateRemoteHistory = options.hydrateRemoteHistory ?? true;
   const sourceUserIds = getCompletedSessionSourceUserIds(userId);
   const hasHeavyLocalHistory =
     sourceUserIds.some(
@@ -2332,7 +2384,7 @@ export async function syncLocalCompletedSessionsForCurrentUser(userId: string) {
   let fetchedRemoteSessions: QuizSession[] = [];
   let shouldUploadLocalSessions = !isSupabaseRecoveryMode() && isSupabaseConfigured();
 
-  if (shouldUploadLocalSessions) {
+  if (shouldUploadLocalSessions && hydrateRemoteHistory) {
     try {
       const resolved = await fetchResolvedQuizSessionsForUser(userId);
       fetchedRemoteSessions = resolved.sessions;
@@ -2341,6 +2393,8 @@ export async function syncLocalCompletedSessionsForCurrentUser(userId: string) {
       fetchedRemoteSessions = loadCloudCompletedSessionsForUser(userId);
       console.warn("Completed session cloud read failed; keeping local history visible.", error);
     }
+  } else if (shouldUploadLocalSessions) {
+    fetchedRemoteSessions = loadCloudCompletedSessionsForUser(userId);
   }
   const remoteSessions = canonicalizeSessionsForUser(
     userId,
@@ -2420,7 +2474,13 @@ export async function syncLocalCompletedSessionsForCurrentUser(userId: string) {
     }
   }
 
-  const sessionsToUpload = getSessionsNeedingUpload(localSessionsToSync, remoteSessions);
+  const sessionsToUpload = hydrateRemoteHistory
+    ? getSessionsNeedingUpload(localSessionsToSync, remoteSessions)
+    : getRecentSessionsWithinUploadBudget(
+        pendingCompletedSessionUploads,
+        CLOUD_LIGHT_COMPLETED_SESSION_UPLOAD_LIMIT,
+        CLOUD_LIGHT_COMPLETED_ATTEMPT_UPLOAD_LIMIT
+      );
 
   if (!shouldUploadLocalSessions || sessionsToUpload.length === 0) {
     return mergedSessions;
@@ -2434,6 +2494,11 @@ export async function syncLocalCompletedSessionsForCurrentUser(userId: string) {
       batchTimeoutMs: CLOUD_SYNC_BATCH_TIMEOUT_MS,
       totalBudgetMs: CLOUD_SYNC_TOTAL_BUDGET_MS
     }
+  );
+  removePendingCompletedSessionUploadsForUser(userId, sessionsToUpload);
+  saveCloudCompletedSessionsForUser(
+    userId,
+    mergeSessions(loadCloudCompletedSessionsForUser(userId), sessionsToUpload)
   );
 
   return mergedSessions;
@@ -2564,12 +2629,36 @@ export async function pushCompletedSessionToSupabase(session: QuizSession) {
         )
       );
     }
+
+    const uploadKey = getCompletedSessionUploadKey(data.user.id, canonicalSessions);
+    const now = Date.now();
+    pruneRecentCompletedSessionUploads(now);
     try {
-      await withClientTimeout(
-        upsertSessionsForUser(data.user.id, canonicalSessions),
-        CLOUD_SYNC_BATCH_TIMEOUT_MS,
-        "完成紀錄雲端同步逾時，先保留本機紀錄。"
-      );
+      const recentUploadedAt = recentCompletedSessionUploads.get(uploadKey);
+      if (recentUploadedAt && now - recentUploadedAt <= COMPLETED_SESSION_UPLOAD_DEDUPE_MS) {
+        removePendingCompletedSessionUploadsForUser(data.user.id, canonicalSessions);
+        saveCloudCompletedSessionsForUser(
+          data.user.id,
+          mergeSessions(loadCloudCompletedSessionsForUser(data.user.id), canonicalSessions)
+        );
+      } else {
+        let uploadTask = completedSessionUploadsInFlight.get(uploadKey);
+        if (!uploadTask) {
+          const nextUploadTask = withClientTimeout(
+            upsertSessionsForUser(data.user.id, canonicalSessions),
+            CLOUD_SYNC_BATCH_TIMEOUT_MS,
+            "完成紀錄雲端同步逾時，先保留本機紀錄。"
+          ).then(() => {
+            recentCompletedSessionUploads.set(uploadKey, Date.now());
+          });
+          uploadTask = nextUploadTask.finally(() => {
+            completedSessionUploadsInFlight.delete(uploadKey);
+          });
+          completedSessionUploadsInFlight.set(uploadKey, uploadTask);
+        }
+
+        await uploadTask;
+      }
       removePendingCompletedSessionUploadsForUser(data.user.id, canonicalSessions);
       saveCloudCompletedSessionsForUser(
         data.user.id,

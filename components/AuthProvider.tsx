@@ -241,7 +241,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setSyncVersion((value) => value + 1);
   }
 
-  const refreshCloudData = useCallback(async (targetUserId?: string, targetUser?: User | null) => {
+  const refreshCloudData = useCallback(async (
+    targetUserId?: string,
+    targetUser?: User | null,
+    options: { hydrateRemoteHistory?: boolean } = {}
+  ) => {
     if (recoveryMode) {
       setSyncStatus("ready");
       setSyncError(RECOVERY_MODE_MESSAGE);
@@ -268,9 +272,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setSyncError("");
 
     syncStartedAtRef.current = now;
+    const hydrateRemoteHistory = options.hydrateRemoteHistory ?? true;
 
     const syncTask = withTimeout(
-      syncLocalCompletedSessionsForCurrentUser(userId)
+      syncLocalCompletedSessionsForCurrentUser(userId, { hydrateRemoteHistory })
       .then((completedSessions) => {
         void syncLeaderboardProfileForCurrentUser(effectiveUser, completedSessions).catch((error) => {
           console.error("Leaderboard sync skipped:", error);
@@ -322,7 +327,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         setSyncVersion((value) => value + 1);
         return;
       }
-      void refreshCloudData(nextSession.user.id, nextSession.user);
+      void refreshCloudData(nextSession.user.id, nextSession.user, { hydrateRemoteHistory: false });
     } else {
       setPasswordRecovery(false);
       setSyncStatus("idle");
@@ -400,7 +405,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             setSyncVersion((value) => value + 1);
             return;
           }
-          void refreshCloudData(recoveredSession.user.id, recoveredSession.user);
+          void refreshCloudData(recoveredSession.user.id, recoveredSession.user, { hydrateRemoteHistory: false });
         }
       } catch (error) {
         if (cancelled) return;
@@ -419,7 +424,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             setSyncVersion((value) => value + 1);
             return;
           }
-          void refreshCloudData(recoveredSession.user.id, recoveredSession.user);
+          void refreshCloudData(recoveredSession.user.id, recoveredSession.user, { hydrateRemoteHistory: false });
         }
       }
     }

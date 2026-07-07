@@ -227,7 +227,7 @@ async function fetchExistingAttemptSignatureMap(
   const { data, error } = await supabase
     .from("quiz_session_attempts")
     .select(
-      "session_id, question_order, question_id, selected_answer, correct_answer, is_correct, confidence, error_type, answered_at"
+      "session_id, question_order, question_id, selected_answer, correct_answer, is_correct, confidence, error_type, answered_at, source_mode, subject_snapshot, chapter_snapshot, section_snapshot"
     )
     .eq("user_id", userId)
     .in("session_id", sessionIds);
