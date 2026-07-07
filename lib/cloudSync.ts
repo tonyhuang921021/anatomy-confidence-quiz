@@ -184,6 +184,7 @@ const CLOUD_SERVER_SYNC_TIMEOUT_MS = 12000;
 const CLOUD_SYNC_TOTAL_BUDGET_MS = 45000;
 const LEADERBOARD_PROFILE_CLIENT_SYNC_MIN_INTERVAL_MS = 5 * 60 * 1000;
 const LEADERBOARD_PROFILE_SYNC_MARKER_PREFIX = "leaderboardProfileSync:";
+const COMPLETED_SESSION_UPLOAD_MARKER_PREFIX = "completedSessionUpload:";
 const CLOUD_HEAVY_LOCAL_HISTORY_READ_LIMIT = 160_000;
 const CLOUD_HEAVY_LOCAL_HISTORY_RECOVERY_LIMIT = 240;
 const FEEDBACK_REQUEST_TIMEOUT_MS = 10000;
@@ -207,6 +208,7 @@ type CompletedSessionSyncOptions = {
 
 const currentSessionSyncState = new Map<string, CurrentSessionSyncState>();
 const COMPLETED_SESSION_UPLOAD_DEDUPE_MS = 2 * 60 * 1000;
+const COMPLETED_SESSION_UPLOAD_IN_FLIGHT_MARKER_MS = CLOUD_SYNC_BATCH_TIMEOUT_MS + 10_000;
 const completedSessionUploadsInFlight = new Map<string, Promise<void>>();
 const recentCompletedSessionUploads = new Map<string, number>();
 const sharedQuestionExplanationSyncsInFlight = new Map<
@@ -846,6 +848,36 @@ function getCompletedSessionUploadKey(userId: string, sessions: QuizSession[]) {
     .join("|");
 
   return `${userId}:${sessionSignatures}`;
+}
+
+function getCompletedSessionUploadMarkerKey(uploadKey: string) {
+  return `${COMPLETED_SESSION_UPLOAD_MARKER_PREFIX}${hashSyncSignature(uploadKey)}`;
+}
+
+function readCompletedSessionUploadMarker(uploadKey: string) {
+  if (typeof window === "undefined") return null;
+  try {
+    const raw = window.localStorage.getItem(getCompletedSessionUploadMarkerKey(uploadKey));
+    if (!raw) return null;
+    return JSON.parse(raw) as {
+      startedAt?: number;
+      completedAt?: number;
+    };
+  } catch {
+    return null;
+  }
+}
+
+function writeCompletedSessionUploadMarker(
+  uploadKey: string,
+  marker: { startedAt?: number; completedAt?: number }
+) {
+  if (typeof window === "undefined") return;
+  try {
+    window.localStorage.setItem(getCompletedSessionUploadMarkerKey(uploadKey), JSON.stringify(marker));
+  } catch {
+    // Browser storage is best-effort; in-memory dedupe still protects this tab.
+  }
 }
 
 function pruneRecentCompletedSessionUploads(now = Date.now()) {
@@ -2635,13 +2667,25 @@ export async function pushCompletedSessionToSupabase(session: QuizSession) {
     pruneRecentCompletedSessionUploads(now);
     try {
       const recentUploadedAt = recentCompletedSessionUploads.get(uploadKey);
-      if (recentUploadedAt && now - recentUploadedAt <= COMPLETED_SESSION_UPLOAD_DEDUPE_MS) {
+      const uploadMarker = readCompletedSessionUploadMarker(uploadKey);
+      const markerCompletedAt = Number(uploadMarker?.completedAt ?? 0);
+      const markerStartedAt = Number(uploadMarker?.startedAt ?? 0);
+      if (
+        (recentUploadedAt && now - recentUploadedAt <= COMPLETED_SESSION_UPLOAD_DEDUPE_MS) ||
+        (markerCompletedAt > 0 && now - markerCompletedAt <= COMPLETED_SESSION_UPLOAD_DEDUPE_MS)
+      ) {
         removePendingCompletedSessionUploadsForUser(data.user.id, canonicalSessions);
         saveCloudCompletedSessionsForUser(
           data.user.id,
           mergeSessions(loadCloudCompletedSessionsForUser(data.user.id), canonicalSessions)
         );
+      } else if (
+        markerStartedAt > 0 &&
+        now - markerStartedAt <= COMPLETED_SESSION_UPLOAD_IN_FLIGHT_MARKER_MS
+      ) {
+        return;
       } else {
+        writeCompletedSessionUploadMarker(uploadKey, { startedAt: now });
         let uploadTask = completedSessionUploadsInFlight.get(uploadKey);
         if (!uploadTask) {
           const nextUploadTask = withClientTimeout(
@@ -2649,7 +2693,9 @@ export async function pushCompletedSessionToSupabase(session: QuizSession) {
             CLOUD_SYNC_BATCH_TIMEOUT_MS,
             "完成紀錄雲端同步逾時，先保留本機紀錄。"
           ).then(() => {
-            recentCompletedSessionUploads.set(uploadKey, Date.now());
+            const completedAt = Date.now();
+            recentCompletedSessionUploads.set(uploadKey, completedAt);
+            writeCompletedSessionUploadMarker(uploadKey, { startedAt: now, completedAt });
           });
           uploadTask = nextUploadTask.finally(() => {
             completedSessionUploadsInFlight.delete(uploadKey);

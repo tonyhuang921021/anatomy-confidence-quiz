@@ -37,13 +37,19 @@ type AuthContextValue = {
   syncError: string;
   applyAuthSession: (nextSession: Session | null) => void;
   finishPasswordRecovery: () => void;
-  refreshCloudData: () => Promise<void>;
+  refreshCloudData: (options?: RefreshCloudDataOptions) => Promise<void>;
   signOut: () => Promise<void>;
+};
+
+type RefreshCloudDataOptions = {
+  hydrateRemoteHistory?: boolean;
+  automatic?: boolean;
 };
 
 const AuthContext = createContext<AuthContextValue | null>(null);
 const CLOUD_RESUME_BACKGROUND_NOTICE_MS = 6500;
 const CLOUD_SYNC_HARD_TIMEOUT_MS = 24000;
+const AUTOMATIC_CLOUD_SYNC_COOLDOWN_MS = 5 * 60 * 1000;
 const AUTH_SESSION_BOOTSTRAP_TIMEOUT_MS = 3500;
 const AUTH_SESSION_REFRESH_TIMEOUT_MS = 6000;
 const AUTH_SESSION_REFRESH_LEEWAY_MS = 90_000;
@@ -56,6 +62,7 @@ const AUTH_REFRESH_FALLBACK_MESSAGE = "暫用本機，稍後補傳。登入狀�
 const RECOVERY_MODE_MESSAGE = "暫用本機，稍後補傳。雲端登入與同步維護中，作答不會被登入流程卡住。";
 const SAFARI_AUTO_SYNC_DEFERRED_MESSAGE =
   "暫用本機，稍後補傳。雲端紀錄同步排程中，作答完成也會補傳。";
+const AUTOMATIC_CLOUD_SYNC_MARKER_PREFIX = "medQuizAutomaticCloudSync:";
 
 function getErrorMessage(error: unknown) {
   if (error instanceof Error) return error.message;
@@ -122,6 +129,27 @@ function safeRemoveStorage(storage: Storage | undefined, key: string) {
   } catch {
     // Ignore browsers that block storage access.
   }
+}
+
+function getAutomaticCloudSyncMarkerKey(userId: string) {
+  return `${AUTOMATIC_CLOUD_SYNC_MARKER_PREFIX}${userId}`;
+}
+
+function readAutomaticCloudSyncMarker(userId: string) {
+  if (typeof window === "undefined") return 0;
+  const raw = safeGetStorage(window.localStorage, getAutomaticCloudSyncMarkerKey(userId));
+  const value = Number(raw ?? "0");
+  return Number.isFinite(value) ? value : 0;
+}
+
+function writeAutomaticCloudSyncMarker(userId: string, timestamp = Date.now()) {
+  if (typeof window === "undefined") return;
+  safeSetStorage(window.localStorage, getAutomaticCloudSyncMarkerKey(userId), String(timestamp));
+}
+
+function shouldSkipAutomaticCloudSync(userId: string, now = Date.now()) {
+  const lastStartedAt = readAutomaticCloudSyncMarker(userId);
+  return lastStartedAt > 0 && now - lastStartedAt < AUTOMATIC_CLOUD_SYNC_COOLDOWN_MS;
 }
 
 function isAuthSessionExpiring(session: Session | null, leewayMs = 30_000) {
@@ -242,9 +270,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }
 
   const refreshCloudData = useCallback(async (
-    targetUserId?: string,
+    targetUserIdOrOptions?: string | RefreshCloudDataOptions,
     targetUser?: User | null,
-    options: { hydrateRemoteHistory?: boolean } = {}
+    options: RefreshCloudDataOptions = {}
   ) => {
     if (recoveryMode) {
       setSyncStatus("ready");
@@ -253,6 +281,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       return;
     }
 
+    const explicitOptions =
+      typeof targetUserIdOrOptions === "object" && targetUserIdOrOptions !== null
+        ? targetUserIdOrOptions
+        : options;
+    const targetUserId =
+      typeof targetUserIdOrOptions === "string" ? targetUserIdOrOptions : undefined;
     const userId = targetUserId || user?.id;
     const effectiveUser = targetUser ?? user;
     if (!configured || !userId || !effectiveUser) return;
@@ -268,11 +302,22 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       syncInFlightRef.current = null;
     }
 
+    if (explicitOptions.automatic && shouldSkipAutomaticCloudSync(userId, now)) {
+      setSyncStatus("ready");
+      setSyncError("");
+      setSyncVersion((value) => value + 1);
+      return;
+    }
+
+    if (explicitOptions.automatic) {
+      writeAutomaticCloudSyncMarker(userId, now);
+    }
+
     setSyncStatus("syncing");
     setSyncError("");
 
     syncStartedAtRef.current = now;
-    const hydrateRemoteHistory = options.hydrateRemoteHistory ?? true;
+    const hydrateRemoteHistory = explicitOptions.hydrateRemoteHistory ?? true;
 
     const syncTask = withTimeout(
       syncLocalCompletedSessionsForCurrentUser(userId, { hydrateRemoteHistory })
@@ -327,7 +372,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         setSyncVersion((value) => value + 1);
         return;
       }
-      void refreshCloudData(nextSession.user.id, nextSession.user, { hydrateRemoteHistory: false });
+      void refreshCloudData(nextSession.user.id, nextSession.user, {
+        hydrateRemoteHistory: false,
+        automatic: true
+      });
     } else {
       setPasswordRecovery(false);
       setSyncStatus("idle");
@@ -405,7 +453,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             setSyncVersion((value) => value + 1);
             return;
           }
-          void refreshCloudData(recoveredSession.user.id, recoveredSession.user, { hydrateRemoteHistory: false });
+          void refreshCloudData(recoveredSession.user.id, recoveredSession.user, {
+            hydrateRemoteHistory: false,
+            automatic: true
+          });
         }
       } catch (error) {
         if (cancelled) return;
@@ -424,7 +475,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             setSyncVersion((value) => value + 1);
             return;
           }
-          void refreshCloudData(recoveredSession.user.id, recoveredSession.user, { hydrateRemoteHistory: false });
+          void refreshCloudData(recoveredSession.user.id, recoveredSession.user, {
+            hydrateRemoteHistory: false,
+            automatic: true
+          });
         }
       }
     }

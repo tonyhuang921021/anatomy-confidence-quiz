@@ -642,7 +642,7 @@ export function AuthPanel() {
       }
 
       await updateLeaderboardDisplayName(data.user ?? user, trimmed);
-      await refreshCloudData();
+      await refreshCloudData({ hydrateRemoteHistory: false });
       setMessage("暱稱已更新，排行榜會顯示新的名稱。");
     } finally {
       setSubmitting(false);
@@ -1153,7 +1153,7 @@ export function AuthPanel() {
           </button>
           <button
             type="button"
-            onClick={() => void refreshCloudData()}
+            onClick={() => void refreshCloudData({ hydrateRemoteHistory: false })}
             disabled={syncStatus === "syncing"}
             className="primary-pill disabled:cursor-not-allowed disabled:opacity-60"
           >
