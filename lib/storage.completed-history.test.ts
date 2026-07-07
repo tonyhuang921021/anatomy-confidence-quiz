@@ -349,6 +349,35 @@ test("讀完成場次時，要合併 sessionStorage 的雲端與本機快取", (
   );
 });
 
+test("完整讀取完成場次時，不會被超大本機歷史的最近 recovery 快取截短", () => {
+  const { localStorage } = installBrowserStorage();
+  const userId = "user-heavy-full-history";
+  const heavySessions = Array.from({ length: 260 }, (_, index) => {
+    const session = makeSession(`heavy-session-${index}`, [`q-heavy-${index}`]);
+    return {
+      ...session,
+      settings: {
+        ...session.settings!,
+        sessionName: `heavy-${index}-${"x".repeat(6500)}`
+      }
+    } satisfies QuizSession;
+  });
+
+  localStorage.setItem(
+    `anatomy-confidence-completed-sessions:${userId}`,
+    JSON.stringify(heavySessions)
+  );
+
+  const defaultIds = loadCompletedSessionsForUser(userId).map((session) => session.id);
+  assert.ok(!defaultIds.includes("heavy-session-0"));
+
+  const fullIds = loadCompletedSessionsForUser(userId, { includeFullLocalHistory: true }).map(
+    (session) => session.id
+  );
+  assert.ok(fullIds.includes("heavy-session-0"));
+  assert.ok(fullIds.includes("heavy-session-259"));
+});
+
 test("剛完成 handoff 也要被進度歷史讀到", () => {
   installBrowserStorage();
   const session = makeSession("handoff-session-read", ["q-handoff-read"]);

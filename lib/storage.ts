@@ -55,6 +55,10 @@ type CompletedStorageSyncChange = {
   historyEntries?: CompletedQuestionHistoryEntry[];
 };
 
+type LoadCompletedSessionsOptions = {
+  includeFullLocalHistory?: boolean;
+};
+
 let completedStorageSyncInstalled = false;
 let completedStorageSyncInstalledWindow: Window | null = null;
 let completedStorageSyncChannel: BroadcastChannel | null | undefined;
@@ -1386,8 +1390,8 @@ export function saveCompletedSessionsForUser(userId: string, sessions: QuizSessi
   return true;
 }
 
-export function loadCompletedSessions(): QuizSession[] {
-  return loadCompletedSessionsAcrossUserScopes(getActiveStorageUser());
+export function loadCompletedSessions(options: LoadCompletedSessionsOptions = {}): QuizSession[] {
+  return loadCompletedSessionsAcrossUserScopes(getActiveStorageUser(), options);
 }
 
 export function getCompletedSessionsStorageLengthForUser(userId = getActiveStorageUser()) {
@@ -1594,10 +1598,13 @@ export function removePendingCompletedSessionUploadsForUser(userId: string, sess
   return savePendingCompletedSessionUploadsForUser(userId, remaining);
 }
 
-export function loadCompletedSessionsForUser(userId: string): QuizSession[] {
+export function loadCompletedSessionsForUser(
+  userId: string,
+  options: LoadCompletedSessionsOptions = {}
+): QuizSession[] {
   if (!isBrowser()) return [];
   const cachedSessions = completedSessionsMemoryCache.get(userId);
-  if (cachedSessions) return cachedSessions;
+  if (cachedSessions && !options.includeFullLocalHistory) return cachedSessions;
 
   const cloudSessions = loadCloudCompletedSessionsForUser(userId);
   const handoffSessions = loadRecentCompletedSessionHandoffForUser(userId);
@@ -1624,7 +1631,7 @@ export function loadCompletedSessionsForUser(userId: string): QuizSession[] {
   }
 
   if (raw.length > COMPLETED_SESSIONS_HEAVY_READ_LIMIT) {
-    if (raw.length > COMPLETED_SESSIONS_UPLOAD_RECOVERY_READ_LIMIT) {
+    if (raw.length > COMPLETED_SESSIONS_UPLOAD_RECOVERY_READ_LIMIT && !options.includeFullLocalHistory) {
       const normalized = normalizeCompletedSessionList([
         ...sessionStorageSessions,
         ...handoffSessions,
@@ -1661,11 +1668,14 @@ export function loadCompletedSessionsForUser(userId: string): QuizSession[] {
   return normalized;
 }
 
-export function loadCompletedSessionsAcrossUserScopes(userId = getActiveStorageUser()) {
+export function loadCompletedSessionsAcrossUserScopes(
+  userId = getActiveStorageUser(),
+  options: LoadCompletedSessionsOptions = {}
+) {
   if (!isBrowser()) return [] as QuizSession[];
   return normalizeCompletedSessionList(
     getCompletedHistorySourceUserIds(userId).flatMap((sourceUserId) =>
-      loadCompletedSessionsForUser(sourceUserId)
+      loadCompletedSessionsForUser(sourceUserId, options)
     )
   );
 }

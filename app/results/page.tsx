@@ -880,6 +880,10 @@ function getSubjectStatOrder(subject: string) {
 
 const RESULTS_HISTORY_PAGE_SIZE = 30;
 
+function loadResultCompletedSessions() {
+  return loadCompletedSessions({ includeFullLocalHistory: true });
+}
+
 function ResultsPageContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -1129,7 +1133,7 @@ function ResultsPageContent() {
         session?.user?.id ? loadRecentCompletedSessionHandoffForUser(session.user.id) : [],
         loadRecentCompletedSessionHandoffForUser()
       );
-      let completedSessions = mergeResultSessionSources(loadCompletedSessions(), handoffSessions);
+      let completedSessions = mergeResultSessionSources(loadResultCompletedSessions(), handoffSessions);
       let scopedSessions = completedSessions.filter((sessionItem) =>
         nextScope === "simulation" ? isSimulationSession(sessionItem) : !isSimulationSession(sessionItem)
       );
@@ -1173,7 +1177,7 @@ function ResultsPageContent() {
             : cloudSession;
         if (mergedCloudSession?.completedAt && isMoreCompleteResultSession(mergedCloudSession, resolvedTargetSession)) {
           saveCompletedSession(mergedCloudSession);
-          completedSessions = mergeResultSessionSources(loadCompletedSessions(), handoffSessions, [mergedCloudSession]);
+          completedSessions = mergeResultSessionSources(loadResultCompletedSessions(), handoffSessions, [mergedCloudSession]);
           scopedSessions = completedSessions.filter((sessionItem) =>
             nextScope === "simulation" ? isSimulationSession(sessionItem) : !isSimulationSession(sessionItem)
           );
@@ -1184,7 +1188,7 @@ function ResultsPageContent() {
           const mergedTargetSession = mergeResultSessionMetadata(resolvedTargetSession, mergedCloudSession);
           if (getResultSessionEliminatedOptionCount(mergedTargetSession) > getResultSessionEliminatedOptionCount(resolvedTargetSession)) {
             saveCompletedSession(mergedTargetSession);
-            completedSessions = mergeResultSessionSources(loadCompletedSessions(), handoffSessions, [mergedTargetSession]);
+            completedSessions = mergeResultSessionSources(loadResultCompletedSessions(), handoffSessions, [mergedTargetSession]);
             scopedSessions = completedSessions.filter((sessionItem) =>
               nextScope === "simulation" ? isSimulationSession(sessionItem) : !isSimulationSession(sessionItem)
             );
@@ -1212,7 +1216,7 @@ function ResultsPageContent() {
         !completedSessions.some((item) => isSameSessionId(item.id, fallbackCurrentSession.id))
       ) {
         saveCompletedSession(fallbackCurrentSession);
-        completedSessions = mergeResultSessionSources(loadCompletedSessions(), handoffSessions, [fallbackCurrentSession]);
+        completedSessions = mergeResultSessionSources(loadResultCompletedSessions(), handoffSessions, [fallbackCurrentSession]);
         scopedSessions = completedSessions.filter((sessionItem) =>
           nextScope === "simulation" ? isSimulationSession(sessionItem) : !isSimulationSession(sessionItem)
         );
@@ -1318,7 +1322,7 @@ function ResultsPageContent() {
       setMounted(true);
       } catch {
         if (cancelled) return;
-        const fallbackSessions = loadCompletedSessions();
+        const fallbackSessions = loadResultCompletedSessions();
         const fallbackScope = searchParams.get("scope") === "simulation" ? "simulation" : "default";
         const fallbackScopedSessions = fallbackSessions.filter((sessionItem) =>
           fallbackScope === "simulation" ? isSimulationSession(sessionItem) : !isSimulationSession(sessionItem)
