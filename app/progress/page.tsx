@@ -219,7 +219,7 @@ function aggregateGroup(
 
 export default function ProgressPage() {
   const { user, syncVersion } = useAuth();
-  useCloudHistoryHydration();
+  const cloudHistoryHydrating = useCloudHistoryHydration();
   const [sessions, setSessions] = useState<ProgressHistorySession[]>([]);
   const [openGroups, setOpenGroups] = useState<Record<string, boolean>>({ med1: true, med2: true });
 
@@ -268,6 +268,7 @@ export default function ProgressPage() {
     .filter((subject) => subject.attemptedQuestions > 0)
     .sort((a, b) => b.masteryScore - a.masteryScore)
     .slice(0, 5);
+  const showCloudHistoryLoading = Boolean(user?.id && cloudHistoryHydrating && sessions.length === 0);
 
   return (
     <main className="shell">
@@ -296,137 +297,147 @@ export default function ProgressPage() {
           </div>
         </div>
 
-        <div className="mt-6 grid gap-4 lg:grid-cols-2">
-          {groups.map((group) => (
-            <article key={group.key} className="rounded-3xl bg-slate-50 p-5">
-              <div className="flex items-start justify-between gap-4">
-                <div>
-                  <p className="text-sm font-medium text-slate-500">{group.label}</p>
-                  <p className="mt-2 text-3xl font-bold text-ink">{group.completionRate}%</p>
-                  <p className="mt-2 text-sm text-slate-600">{group.description}</p>
-                </div>
-                <span className={`rounded-full px-3 py-1 text-xs font-semibold ${completionStatusClasses[group.status]}`}>
-                  {getCompletionStatusLabel(group.status)}
-                </span>
-              </div>
-              <div className="mt-4 h-3 overflow-hidden rounded-full bg-white">
-                <div
-                  className="h-full rounded-full bg-gradient-to-r from-brand-500 to-emerald-400"
-                  style={{ width: `${group.completionRate}%` }}
-                />
-              </div>
-              <div className="mt-4 grid gap-3 sm:grid-cols-3">
-                <p className="rounded-2xl bg-white px-4 py-3 text-sm text-slate-700">
-                  已作答 <span className="font-semibold">{group.attemptedQuestions}</span> / {group.totalQuestionsInBank}
-                  <span className="mt-1 block text-xs text-slate-500">剩 {getRemainingQuestions(group)} 題</span>
-                </p>
-                <p className="rounded-2xl bg-white px-4 py-3 text-sm text-slate-700">
-                  答對率 <span className="font-semibold">{group.correctRate}%</span>
-                </p>
-                <p className="rounded-2xl bg-white px-4 py-3 text-sm text-slate-700">
-                  掌握度 <span className="font-semibold">{group.masteryScore}</span>
-                </p>
-              </div>
-            </article>
-          ))}
-        </div>
-      </section>
-
-      <section className="mt-8 grid gap-6 xl:grid-cols-3">
-        <div className="rounded-[2rem] bg-white p-6 shadow-card ring-1 ring-slate-100">
-          <h2 className="text-xl font-semibold text-ink">完成度最低的科目</h2>
-          <div className="mt-4 grid gap-3">
-            {lowCompletion.map((subject) => (
-              <div key={subject.subject} className="rounded-2xl bg-slate-50 p-4 text-sm text-slate-700">
-                <p className="font-semibold">{subject.label}</p>
-                <p className="mt-2">完成度 {subject.completionRate}% ・ 剩 {getRemainingQuestions(subject)} 題</p>
-              </div>
-            ))}
+        {showCloudHistoryLoading ? (
+          <div className="mt-6 rounded-3xl bg-slate-50 p-5 text-sm text-slate-700">
+            正在讀取雲端作答紀錄，完成後會更新進度總覽。
           </div>
-        </div>
-
-        <div className="rounded-[2rem] bg-white p-6 shadow-card ring-1 ring-slate-100">
-          <h2 className="text-xl font-semibold text-ink">練過但不穩的科目</h2>
-          <div className="mt-4 grid gap-3">
-            {unstable.length === 0 ? (
-              <p className="rounded-2xl bg-slate-50 p-4 text-sm text-slate-600">目前沒有落在這個區間的科目。</p>
-            ) : (
-              unstable.map((subject) => (
-                <div key={subject.subject} className="rounded-2xl bg-slate-50 p-4 text-sm text-slate-700">
-                  <p className="font-semibold">{subject.label}</p>
-                  <p className="mt-2">掌握度 {subject.masteryScore}</p>
+        ) : (
+          <div className="mt-6 grid gap-4 lg:grid-cols-2">
+            {groups.map((group) => (
+              <article key={group.key} className="rounded-3xl bg-slate-50 p-5">
+                <div className="flex items-start justify-between gap-4">
+                  <div>
+                    <p className="text-sm font-medium text-slate-500">{group.label}</p>
+                    <p className="mt-2 text-3xl font-bold text-ink">{group.completionRate}%</p>
+                    <p className="mt-2 text-sm text-slate-600">{group.description}</p>
+                  </div>
+                  <span className={`rounded-full px-3 py-1 text-xs font-semibold ${completionStatusClasses[group.status]}`}>
+                    {getCompletionStatusLabel(group.status)}
+                  </span>
                 </div>
-              ))
-            )}
-          </div>
-        </div>
-
-        <div className="rounded-[2rem] bg-white p-6 shadow-card ring-1 ring-slate-100">
-          <h2 className="text-xl font-semibold text-ink">掌握度最高的科目</h2>
-          <div className="mt-4 grid gap-3">
-            {mastered.length === 0 ? (
-              <p className="rounded-2xl bg-slate-50 p-4 text-sm text-slate-600">還沒有足夠資料可判定。</p>
-            ) : (
-              mastered.map((subject) => (
-                <div key={subject.subject} className="rounded-2xl bg-slate-50 p-4 text-sm text-slate-700">
-                  <p className="font-semibold">{subject.label}</p>
-                  <p className="mt-2">掌握度 {subject.masteryScore}</p>
+                <div className="mt-4 h-3 overflow-hidden rounded-full bg-white">
+                  <div
+                    className="h-full rounded-full bg-gradient-to-r from-brand-500 to-emerald-400"
+                    style={{ width: `${group.completionRate}%` }}
+                  />
                 </div>
-              ))
-            )}
-          </div>
-        </div>
-      </section>
-
-      <div className="mt-8 space-y-5">
-        {groups.map((group) => {
-          const isGroupOpen = openGroups[group.key];
-          return (
-            <section key={group.key} className="rounded-[2rem] bg-white p-5 shadow-card ring-1 ring-slate-100">
-              <button
-                type="button"
-                onClick={() =>
-                  setOpenGroups((current) => ({
-                    ...current,
-                    [group.key]: !current[group.key]
-                  }))
-                }
-                className="flex w-full items-center justify-between gap-4 text-left"
-              >
-                <div>
-                  <h2 className="text-2xl font-semibold text-ink">{group.label}</h2>
-                  <p className="mt-2 text-sm text-slate-500">
-                    完成度 {group.completionRate}% ・ 掌握度 {group.masteryScore}
+                <div className="mt-4 grid gap-3 sm:grid-cols-3">
+                  <p className="rounded-2xl bg-white px-4 py-3 text-sm text-slate-700">
+                    已作答 <span className="font-semibold">{group.attemptedQuestions}</span> / {group.totalQuestionsInBank}
+                    <span className="mt-1 block text-xs text-slate-500">剩 {getRemainingQuestions(group)} 題</span>
+                  </p>
+                  <p className="rounded-2xl bg-white px-4 py-3 text-sm text-slate-700">
+                    答對率 <span className="font-semibold">{group.correctRate}%</span>
+                  </p>
+                  <p className="rounded-2xl bg-white px-4 py-3 text-sm text-slate-700">
+                    掌握度 <span className="font-semibold">{group.masteryScore}</span>
                   </p>
                 </div>
-                <span className="text-sm font-semibold text-brand-700">{isGroupOpen ? "收合" : "展開"}</span>
-              </button>
+              </article>
+            ))}
+          </div>
+        )}
+      </section>
 
-              {isGroupOpen ? (
-                <div className="mt-5 space-y-4">
-                  {group.subjects.map((subject) => (
-                    <article key={subject.subject} className="rounded-3xl border border-slate-200 bg-slate-50 p-4">
-                      <div className="flex items-start justify-between gap-4">
-                        <div>
-                          <h3 className="text-lg font-semibold text-ink">{subject.label}</h3>
-                          <p className="mt-2 text-sm text-slate-500">
-                            已作答 {subject.attemptedQuestions} / {subject.totalQuestionsInBank}
-                            ・ 剩 {getRemainingQuestions(subject)} 題
-                            ・ 答對率 {subject.correctRate}% ・ 掌握度 {subject.masteryScore}
-                          </p>
-                        </div>
-                        <span className={`rounded-full px-3 py-1 text-xs font-semibold ${completionStatusClasses[subject.status]}`}>
-                          {getCompletionStatusLabel(subject.status)}
-                        </span>
-                      </div>
-                    </article>
-                  ))}
-                </div>
-              ) : null}
-            </section>
-          );
-        })}
-      </div>
+      {showCloudHistoryLoading ? null : (
+        <>
+          <section className="mt-8 grid gap-6 xl:grid-cols-3">
+            <div className="rounded-[2rem] bg-white p-6 shadow-card ring-1 ring-slate-100">
+              <h2 className="text-xl font-semibold text-ink">完成度最低的科目</h2>
+              <div className="mt-4 grid gap-3">
+                {lowCompletion.map((subject) => (
+                  <div key={subject.subject} className="rounded-2xl bg-slate-50 p-4 text-sm text-slate-700">
+                    <p className="font-semibold">{subject.label}</p>
+                    <p className="mt-2">完成度 {subject.completionRate}% ・ 剩 {getRemainingQuestions(subject)} 題</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div className="rounded-[2rem] bg-white p-6 shadow-card ring-1 ring-slate-100">
+              <h2 className="text-xl font-semibold text-ink">練過但不穩的科目</h2>
+              <div className="mt-4 grid gap-3">
+                {unstable.length === 0 ? (
+                  <p className="rounded-2xl bg-slate-50 p-4 text-sm text-slate-600">目前沒有落在這個區間的科目。</p>
+                ) : (
+                  unstable.map((subject) => (
+                    <div key={subject.subject} className="rounded-2xl bg-slate-50 p-4 text-sm text-slate-700">
+                      <p className="font-semibold">{subject.label}</p>
+                      <p className="mt-2">掌握度 {subject.masteryScore}</p>
+                    </div>
+                  ))
+                )}
+              </div>
+            </div>
+
+            <div className="rounded-[2rem] bg-white p-6 shadow-card ring-1 ring-slate-100">
+              <h2 className="text-xl font-semibold text-ink">掌握度最高的科目</h2>
+              <div className="mt-4 grid gap-3">
+                {mastered.length === 0 ? (
+                  <p className="rounded-2xl bg-slate-50 p-4 text-sm text-slate-600">還沒有足夠資料可判定。</p>
+                ) : (
+                  mastered.map((subject) => (
+                    <div key={subject.subject} className="rounded-2xl bg-slate-50 p-4 text-sm text-slate-700">
+                      <p className="font-semibold">{subject.label}</p>
+                      <p className="mt-2">掌握度 {subject.masteryScore}</p>
+                    </div>
+                  ))
+                )}
+              </div>
+            </div>
+          </section>
+
+          <div className="mt-8 space-y-5">
+            {groups.map((group) => {
+              const isGroupOpen = openGroups[group.key];
+              return (
+                <section key={group.key} className="rounded-[2rem] bg-white p-5 shadow-card ring-1 ring-slate-100">
+                  <button
+                    type="button"
+                    onClick={() =>
+                      setOpenGroups((current) => ({
+                        ...current,
+                        [group.key]: !current[group.key]
+                      }))
+                    }
+                    className="flex w-full items-center justify-between gap-4 text-left"
+                  >
+                    <div>
+                      <h2 className="text-2xl font-semibold text-ink">{group.label}</h2>
+                      <p className="mt-2 text-sm text-slate-500">
+                        完成度 {group.completionRate}% ・ 掌握度 {group.masteryScore}
+                      </p>
+                    </div>
+                    <span className="text-sm font-semibold text-brand-700">{isGroupOpen ? "收合" : "展開"}</span>
+                  </button>
+
+                  {isGroupOpen ? (
+                    <div className="mt-5 space-y-4">
+                      {group.subjects.map((subject) => (
+                        <article key={subject.subject} className="rounded-3xl border border-slate-200 bg-slate-50 p-4">
+                          <div className="flex items-start justify-between gap-4">
+                            <div>
+                              <h3 className="text-lg font-semibold text-ink">{subject.label}</h3>
+                              <p className="mt-2 text-sm text-slate-500">
+                                已作答 {subject.attemptedQuestions} / {subject.totalQuestionsInBank}
+                                ・ 剩 {getRemainingQuestions(subject)} 題
+                                ・ 答對率 {subject.correctRate}% ・ 掌握度 {subject.masteryScore}
+                              </p>
+                            </div>
+                            <span className={`rounded-full px-3 py-1 text-xs font-semibold ${completionStatusClasses[subject.status]}`}>
+                              {getCompletionStatusLabel(subject.status)}
+                            </span>
+                          </div>
+                        </article>
+                      ))}
+                    </div>
+                  ) : null}
+                </section>
+              );
+            })}
+          </div>
+        </>
+      )}
     </main>
   );
 }

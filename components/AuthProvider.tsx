@@ -364,9 +364,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
 
     if (explicitOptions.automatic) {
-      if (isHistoryHydration) {
-        writeHistoryCloudSyncMarker(userId, now);
-      }
       writeAutomaticCloudSyncMarker(userId, now);
     }
 
@@ -386,6 +383,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         return syncCurrentSessionForCurrentUser(userId);
       })
       .then(() => {
+        if (explicitOptions.automatic && isHistoryHydration) {
+          writeHistoryCloudSyncMarker(userId);
+        }
         setSyncStatus("ready");
         setSyncVersion((value) => value + 1);
       }),
