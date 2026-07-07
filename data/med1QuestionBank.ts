@@ -1577,6 +1577,14 @@ const questionTextOverrides: Record<string, QuestionTextOverride> = {
       D: "紅血球之血紅素（hemoglobin）可結合 CO₂"
     }
   },
+  "MOEX-113090-1301-Q094": {
+    stem:
+      "下列何種胺基酸可代謝產生丙酮酸（pyruvate）及硫化氫（hydrogen sulfide, H₂S）？"
+  },
+  "MOEX-103030-2101-Q035": {
+    stem:
+      "請在下列各原核細胞 RNA 聚合酶（RNA polymerase）次單元（subunit）中配對出其專一的功能？\n\n次單元｜功能\n a. α｜I. 具啟動子序列的專一辨識能力\n b. β｜II. 生合成的延伸（elongation）作用，並能與調控蛋白互動（interaction）\n c. σ｜III. 負責生合成的起始（initiation）與延伸（elongation）作用"
+  },
   "MOEX-111100-1301-Q062": {
     answer: "A",
     answerCreditType: "all_credit",
