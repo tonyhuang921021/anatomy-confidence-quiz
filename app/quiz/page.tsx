@@ -234,6 +234,8 @@ function getEffectiveFeedbackMode(settings?: QuizSettings | null) {
 }
 
 function shouldRevealAttemptFeedback(session?: QuizSession | null) {
+  if (!session?.isReviewingAnswer) return false;
+
   return !(
     session?.settings?.mode === "simulation" &&
     getEffectiveFeedbackMode(session.settings) === "none"
