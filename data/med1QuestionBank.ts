@@ -1585,6 +1585,24 @@ const questionTextOverrides: Record<string, QuestionTextOverride> = {
     stem:
       "請在下列各原核細胞 RNA 聚合酶（RNA polymerase）次單元（subunit）中配對出其專一的功能？\n\n次單元｜功能\n a. α｜I. 具啟動子序列的專一辨識能力\n b. β｜II. 生合成的延伸（elongation）作用，並能與調控蛋白互動（interaction）\n c. σ｜III. 負責生合成的起始（initiation）與延伸（elongation）作用"
   },
+  "MOEX-111100-1301-Q028": {
+    options: {
+      A: "屈拇長肌（flexor hallucis longus）",
+      C: "屈拇短肌（flexor hallucis brevis）"
+    }
+  },
+  "MOEX-113090-1301-Q078": {
+    options: {
+      A: "vitamin D₃ 作為類固醇激素，經代謝後可調節鈣和磷的體內平衡",
+      B: "vitamin D₃ 可經由陽光照射皮膚中的 7-dehydrocholesterol 來生成",
+      D: "vitamin K 參與血液凝結及 K⁺ 結合"
+    }
+  },
+  "MOEX-113090-2301-Q014": {
+    options: {
+      B: "遺傳基因為正股（+）RNA"
+    }
+  },
   "MOEX-111100-1301-Q062": {
     answer: "A",
     answerCreditType: "all_credit",
