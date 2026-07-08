@@ -9,6 +9,7 @@ import { CopyQuestionPromptButton } from "@/components/CopyQuestionPromptButton"
 import { QuestionOptionBlock, QuestionStemBlock } from "@/components/QuestionMediaBlock";
 import { QuestionExplanationTabs } from "@/components/QuestionExplanationTabs";
 import { QuestionReportButton } from "@/components/QuestionIssueReportButton";
+import { RelatedQuestionsPanel } from "@/components/RelatedQuestionsPanel";
 import { ResultSummary } from "@/components/ResultSummary";
 import { SavedQuestionButton } from "@/components/SavedQuestionButton";
 import {
@@ -81,6 +82,7 @@ import {
   buildRelatedQuestionContext,
   findPreviousQuestionForContinuation
 } from "@/lib/questionContext";
+import { buildRelatedQuestionIndex } from "@/lib/relatedQuestions";
 import {
   buildQuestionExplanationRequestQuestion,
   findQuestionSource
@@ -1482,6 +1484,27 @@ function ResultsPageContent() {
         : new Map<string, Question>(),
     [activeSession, classificationOverrides, explanationOverrides]
   );
+  const relatedQuestionIndex = useMemo(() => {
+    const relatedQuestionCatalog = allQuestions.map((question) => {
+      const classifiedQuestion = applyQuestionClassificationOverride(
+        question,
+        classificationOverrides[question.id]
+      );
+      const storedQuestion = applyQuestionExplanationOverride(classifiedQuestion);
+      const override = explanationOverrides[question.id];
+
+      return override
+        ? {
+            ...storedQuestion,
+            explanation: override.explanation || storedQuestion.explanation,
+            optionAnalysis: override.optionAnalysis ?? storedQuestion.optionAnalysis,
+            memoryTip: override.memoryTip || storedQuestion.memoryTip
+          }
+        : storedQuestion;
+    });
+
+    return buildRelatedQuestionIndex(relatedQuestionCatalog);
+  }, [classificationOverrides, explanationOverrides]);
   const reviewedAttempts = useMemo(
     () =>
       (activeSession?.attempts ?? [])
@@ -2244,6 +2267,12 @@ function ResultsPageContent() {
           compact
           className="mt-3"
           aiExplanationContent={aiExplanationContent}
+          relatedQuestionsContent={() => (
+            <RelatedQuestionsPanel
+              question={question}
+              relatedQuestionIndex={relatedQuestionIndex}
+            />
+          )}
         />
         {renderExplanationFooter(question, attempt)}
       </div>
@@ -2958,9 +2987,6 @@ function ResultsPageContent() {
               </Link>
               <Link
                 href="/review"
-                onClick={() =>
-                  saveQuizSettings({ ...DEFAULT_QUIZ_SETTINGS, mode: "review", questionCount: 10 })
-                }
                 className="min-h-12 rounded-2xl bg-slate-100 px-4 py-4 text-center text-sm font-semibold text-slate-800 transition hover:bg-slate-200"
               >
                 先看錯題複習頁

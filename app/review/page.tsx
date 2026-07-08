@@ -21,7 +21,14 @@ import {
   getReviewQuestionItems,
 } from "@/lib/quizAnalysis";
 import { loadCompletedSessions, saveQuizSettings } from "@/lib/storage";
-import { Question, QuestionClassificationOverride, QuizSession, QuizSettings, ReviewQuestionItem } from "@/types/quiz";
+import {
+  Question,
+  QuestionClassificationOverride,
+  QuizSession,
+  QuizSettings,
+  ReviewQuestionItem,
+  SubjectName
+} from "@/types/quiz";
 
 function isPracticeReviewSession(session: QuizSession) {
   return (
@@ -74,12 +81,16 @@ function buildReviewCandidateQuestions(
 
 function buildPracticeReviewSettings(items: ReviewQuestionItem[]): QuizSettings {
   const questionIds = items.map((item) => item.question.id);
+  const subjectFilters = Array.from(
+    new Set(items.map((item) => item.question.subject))
+  ) as SubjectName[];
 
   return {
     ...DEFAULT_QUIZ_SETTINGS,
     mode: "review",
     questionCount: Math.max(1, items.length),
-    subjectFilter: "全部",
+    subjectFilter: subjectFilters.length === 1 ? subjectFilters[0] : "全部",
+    subjectFilters,
     strictCustomQuestionPool: true,
     customQuestionIds: questionIds,
     customQuestionPayload: items.map((item) => item.question),
@@ -88,10 +99,7 @@ function buildPracticeReviewSettings(items: ReviewQuestionItem[]): QuizSettings 
 }
 
 function buildPracticeReviewUrlSettings(items: ReviewQuestionItem[]): QuizSettings {
-  return {
-    ...buildPracticeReviewSettings(items),
-    customQuestionPayload: undefined
-  };
+  return buildPracticeReviewSettings(items);
 }
 
 function loadReviewCompletedSessions() {

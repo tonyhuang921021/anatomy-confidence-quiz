@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useAuth } from "@/components/AuthProvider";
 import { useCloudHistoryHydration } from "@/components/useCloudHistoryHydration";
 import {
@@ -19,8 +19,9 @@ import {
   getReviewSnapshot,
   mergeQuestionsWithSessionSnapshots
 } from "@/lib/quizAnalysis";
+import { buildNewQuizHref } from "@/lib/startSettingsUrl";
 import { loadCompletedSessions, saveQuizSettings } from "@/lib/storage";
-import { QuizSession, ReviewQuestionItem } from "@/types/quiz";
+import { QuizSession, QuizSettings, ReviewQuestionItem, SubjectName } from "@/types/quiz";
 
 const CUSTOM_PAPER_REVIEW_SCOPE = "custom-paper-review";
 const CUSTOM_PAPER_REVIEW_POOL_LABEL = "自訂卷錯題庫";
@@ -38,6 +39,24 @@ function isCustomPaperReviewCompletionSession(session: QuizSession) {
 
 function loadReviewCompletedSessions() {
   return loadCompletedSessions({ includeFullLocalHistory: true });
+}
+
+function buildCustomPaperReviewSettings(items: ReviewQuestionItem[]): QuizSettings {
+  const subjectFilters = Array.from(
+    new Set(items.map((item) => item.question.subject))
+  ) as SubjectName[];
+
+  return {
+    ...DEFAULT_QUIZ_SETTINGS,
+    mode: "review",
+    questionCount: Math.max(1, items.length),
+    subjectFilter: subjectFilters.length === 1 ? subjectFilters[0] : "全部",
+    subjectFilters,
+    strictCustomQuestionPool: true,
+    customQuestionIds: items.map((item) => item.question.id),
+    customQuestionPayload: items.map((item) => item.question),
+    customPoolLabel: CUSTOM_PAPER_REVIEW_POOL_LABEL
+  };
 }
 
 export default function CustomPaperReviewPage() {
@@ -79,17 +98,13 @@ export default function CustomPaperReviewPage() {
   }, [user?.id]);
 
   function handleStartCustomPaperReview(filteredItems: ReviewQuestionItem[] = customPaperItems) {
-    saveQuizSettings({
-      ...DEFAULT_QUIZ_SETTINGS,
-      mode: "review",
-      questionCount: 10,
-      subjectFilter: "全部",
-      strictCustomQuestionPool: true,
-      customQuestionIds: filteredItems.map((item) => item.question.id),
-      customQuestionPayload: filteredItems.map((item) => item.question),
-      customPoolLabel: CUSTOM_PAPER_REVIEW_POOL_LABEL
-    });
+    saveQuizSettings(buildCustomPaperReviewSettings(filteredItems));
   }
+
+  const getCustomPaperReviewHref = useCallback(
+    (items: ReviewQuestionItem[]) => buildNewQuizHref(buildCustomPaperReviewSettings(items)),
+    []
+  );
 
   const unresolvedCustomPaperItems = useMemo(
     () => getUnresolvedReviewItems(customPaperItems, manualReviewState, reviewCompletionThreshold),
@@ -116,7 +131,7 @@ export default function CustomPaperReviewPage() {
               返回自訂卷模式
             </Link>
             <Link
-              href="/quiz?new=1"
+              href={getCustomPaperReviewHref(unresolvedCustomPaperItems)}
               onClick={(event) => {
                 if (unresolvedCustomPaperItems.length === 0) {
                   event.preventDefault();
@@ -153,6 +168,7 @@ export default function CustomPaperReviewPage() {
           title="自訂卷錯題庫"
           description="這裡只整理自訂卷模式做出來的錯題與低信心題。"
           startLabel="開始自訂卷錯題複習"
+          getStartHref={getCustomPaperReviewHref}
           onStartReview={handleStartCustomPaperReview}
           items={customPaperItems}
           allQuestions={allQuestions}

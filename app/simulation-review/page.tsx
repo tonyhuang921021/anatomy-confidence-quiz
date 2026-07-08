@@ -22,7 +22,13 @@ import {
   mergeQuestionsWithSessionSnapshots
 } from "@/lib/quizAnalysis";
 import { loadCompletedSessions, saveQuizSettings } from "@/lib/storage";
-import { QuestionClassificationOverride, QuizSession, QuizSettings, ReviewQuestionItem } from "@/types/quiz";
+import {
+  QuestionClassificationOverride,
+  QuizSession,
+  QuizSettings,
+  ReviewQuestionItem,
+  SubjectName
+} from "@/types/quiz";
 
 const SIMULATION_REVIEW_SCOPE = "simulation-review";
 const SIMULATION_REVIEW_POOL_LABEL = "模擬考錯題庫";
@@ -93,11 +99,16 @@ function isSimulationReviewCompletionSession(session: QuizSession) {
 }
 
 function buildSimulationReviewSettings(items: ReviewQuestionItem[]): QuizSettings {
+  const subjectFilters = Array.from(
+    new Set(items.map((item) => item.question.subject))
+  ) as SubjectName[];
+
   return {
     ...DEFAULT_QUIZ_SETTINGS,
     mode: "review",
     questionCount: Math.max(1, items.length),
-    subjectFilter: "全部",
+    subjectFilter: subjectFilters.length === 1 ? subjectFilters[0] : "全部",
+    subjectFilters,
     strictCustomQuestionPool: true,
     customQuestionIds: items.map((item) => item.question.id),
     customQuestionPayload: items.map((item) => item.question),
@@ -106,10 +117,7 @@ function buildSimulationReviewSettings(items: ReviewQuestionItem[]): QuizSetting
 }
 
 function buildSimulationReviewUrlSettings(items: ReviewQuestionItem[]): QuizSettings {
-  return {
-    ...buildSimulationReviewSettings(items),
-    customQuestionPayload: undefined
-  };
+  return buildSimulationReviewSettings(items);
 }
 
 function loadReviewCompletedSessions() {

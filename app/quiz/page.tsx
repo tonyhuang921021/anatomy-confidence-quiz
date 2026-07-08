@@ -50,6 +50,7 @@ import {
   getConfidenceLabel,
   getModeLabel
 } from "@/lib/quizAnalysis";
+import { resolveStartSettingsFromSearchParams } from "@/lib/startSettingsUrl";
 import {
   applyQuestionExplanationOverride,
   clearMatchingCurrentSessions,
@@ -341,20 +342,6 @@ const SimulationQuestionNavigator = memo(function SimulationQuestionNavigator({
     </div>
   );
 });
-
-function decodeStartSettingsFromUrl(encodedSettings: string | null): QuizSettings | null {
-  if (!encodedSettings) return null;
-
-  try {
-    const normalized = encodedSettings.replace(/-/g, "+").replace(/_/g, "/");
-    const padded = normalized.padEnd(normalized.length + ((4 - (normalized.length % 4)) % 4), "=");
-    const binary = atob(padded);
-    const bytes = Uint8Array.from(binary, (character) => character.charCodeAt(0));
-    return JSON.parse(new TextDecoder().decode(bytes)) as QuizSettings;
-  } catch {
-    return null;
-  }
-}
 
 function withTimeoutFallback<T>(promise: Promise<T>, timeoutMs: number, fallback: T) {
   return new Promise<T>((resolve) => {
@@ -1042,7 +1029,21 @@ export default function QuizPage() {
           typeof window !== "undefined" ? new URLSearchParams(window.location.search) : null;
         const preset = params?.get("preset");
         const directSubject = params?.get("subject");
-        const startSettingsFromUrl = decodeStartSettingsFromUrl(params?.get("startSettings") ?? null);
+        const startSettingsResolution = resolveStartSettingsFromSearchParams(params);
+        if (startSettingsResolution.error) {
+          clearCurrentSession();
+          setSession(null);
+          const message =
+            startSettingsResolution.error === "too-large"
+              ? "這次待複習題池太大，瀏覽器暫時無法交接到測驗頁；請回到錯題複習頁再按一次開始。"
+              : startSettingsResolution.error === "missing-handoff"
+                ? "這次待複習題池的暫存交接已失效，請回到錯題複習頁重新開始。"
+                : "這次測驗設定讀取失敗，請回到上一頁重新開始。";
+          setLoadIssue(message);
+          resetQuestionUI();
+          return;
+        }
+        const startSettingsFromUrl = startSettingsResolution.settings;
         const startPresetSettings: QuizSettings = {
           ...DEFAULT_QUIZ_SETTINGS,
           mode: "weakness",

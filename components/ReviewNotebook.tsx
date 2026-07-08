@@ -6,6 +6,7 @@ import { CopyQuestionPromptButton } from "@/components/CopyQuestionPromptButton"
 import { QuestionExplanationTabs } from "@/components/QuestionExplanationTabs";
 import { QuestionOptionBlock, QuestionStemBlock } from "@/components/QuestionMediaBlock";
 import { QuestionReportButton } from "@/components/QuestionIssueReportButton";
+import { RelatedQuestionsPanel } from "@/components/RelatedQuestionsPanel";
 import { SavedQuestionButton } from "@/components/SavedQuestionButton";
 import {
   StructuredExplanationText,
@@ -35,6 +36,7 @@ import {
   buildRelatedQuestionContext,
   findPreviousQuestionForContinuation
 } from "@/lib/questionContext";
+import { buildRelatedQuestionIndex } from "@/lib/relatedQuestions";
 import {
   buildQuestionExplanationRequestQuestion,
   findQuestionSource
@@ -65,11 +67,6 @@ type RemoteManualReviewStateRecord = {
   questionId: string;
   state: "resolved" | "unresolved";
   updatedAt: string;
-};
-
-type RelatedQuestionIndex = {
-  byConcept: Map<string, Question[]>;
-  bySection: Map<string, Question[]>;
 };
 
 function createEmptyManualReviewState(): ManualReviewState {
@@ -504,63 +501,6 @@ function getOptionKeysFromQuestion(question: Question) {
   );
 }
 
-function normalizeRelatedConcept(question: Question) {
-  return (question.testedConcept ?? "").trim().toLowerCase();
-}
-
-function isPastExamQuestion(question: Question) {
-  return question.sourceType === "MOEX_PAST_EXAM";
-}
-
-function getSectionKey(question: Question) {
-  return `${question.chapter ?? ""}__${question.section ?? ""}`;
-}
-
-function buildRelatedQuestionIndex(allQuestions: Question[]): RelatedQuestionIndex {
-  const byConcept = new Map<string, Question[]>();
-  const bySection = new Map<string, Question[]>();
-
-  for (const question of allQuestions) {
-    if (!isPastExamQuestion(question)) continue;
-
-    const conceptKey = normalizeRelatedConcept(question);
-    if (conceptKey) {
-      const conceptQuestions = byConcept.get(conceptKey);
-      if (conceptQuestions) {
-        conceptQuestions.push(question);
-      } else {
-        byConcept.set(conceptKey, [question]);
-      }
-    }
-
-    const sectionKey = getSectionKey(question);
-    const sectionQuestions = bySection.get(sectionKey);
-    if (sectionQuestions) {
-      sectionQuestions.push(question);
-    } else {
-      bySection.set(sectionKey, [question]);
-    }
-  }
-
-  return { byConcept, bySection };
-}
-
-function getRelatedQuestions(currentQuestion: Question, index: RelatedQuestionIndex, limit = 4) {
-  const normalizedConcept = normalizeRelatedConcept(currentQuestion);
-
-  const sameConcept = (index.byConcept.get(normalizedConcept) ?? []).filter(
-    (question) => question.id !== currentQuestion.id
-  );
-
-  const sameSection = (index.bySection.get(getSectionKey(currentQuestion)) ?? []).filter(
-    (question) =>
-      question.id !== currentQuestion.id &&
-      normalizeRelatedConcept(question) !== normalizedConcept
-  );
-
-  return [...sameConcept, ...sameSection].slice(0, limit);
-}
-
 function renderQuestionReview(
   item: ReviewQuestionItem,
   renderedQuestion: Question,
@@ -650,83 +590,6 @@ function renderQuestionReview(
         relatedQuestionsContent={relatedQuestionsContent}
       />
       {footer}
-    </div>
-  );
-}
-
-function renderRelatedQuestions(question: Question, relatedQuestionIndex: RelatedQuestionIndex) {
-  const relatedQuestions = getRelatedQuestions(question, relatedQuestionIndex);
-
-  if (relatedQuestions.length === 0) {
-    return (
-      <div className="mt-4 rounded-2xl bg-slate-50 p-4 text-sm text-slate-500">
-        目前還找不到同觀念的類似題。
-      </div>
-    );
-  }
-
-  return (
-    <div className="mt-4 grid gap-3">
-      {relatedQuestions.map((relatedQuestion, index) => {
-        const shouldCollapseAiExplanation = hasCollapsibleStructuredExplanation(relatedQuestion.explanation);
-        const aiExplanationContent = shouldCollapseAiExplanation ? (
-          <StructuredExplanationText
-            text={relatedQuestion.explanation}
-            label=""
-            compact
-            sectionFilter={(section) => !isDefaultInlineExplanationSectionTitle(section.title)}
-            fallbackToFullText={false}
-          />
-        ) : undefined;
-
-        return (
-          <details key={`${question.id}-related-${relatedQuestion.id}`} className="rounded-2xl bg-slate-50 p-4">
-            <summary className="cursor-pointer font-semibold text-ink">
-              類似題 {index + 1}：{relatedQuestion.chapter} / {relatedQuestion.section}
-            </summary>
-            <div className="mt-3 space-y-3 text-sm leading-7 text-slate-700">
-              <QuestionStemBlock question={relatedQuestion} />
-              <div className="space-y-2.5">
-                {getOptionKeysFromQuestion(relatedQuestion).map((key) => (
-                  <QuestionOptionBlock
-                    key={`${relatedQuestion.id}-${key}`}
-                    question={relatedQuestion}
-                    optionKey={key}
-                    wrapperClassName="rounded-2xl border border-slate-200 bg-white px-3 py-3 sm:px-4"
-                    labelClassName="mt-0.5 inline-flex min-w-8 justify-center rounded-full bg-slate-50 px-2 py-1 text-xs font-semibold text-slate-700 ring-1 ring-slate-200"
-                  />
-                ))}
-              </div>
-              <p>
-                <span className="font-semibold">正確答案：</span>
-                {(relatedQuestion.answerCreditType === "multiple_accepted" ||
-                  relatedQuestion.answerCreditType === "multiple_answers") &&
-                relatedQuestion.acceptedAnswers?.length
-                  ? `${relatedQuestion.acceptedAnswers.join("/")} 皆可`
-                  : relatedQuestion.answerCreditType === "all_credit"
-                    ? "本題一律給分"
-                    : relatedQuestion.answer}
-              </p>
-              <StructuredExplanationText
-                text={relatedQuestion.explanation}
-                label="重點解析"
-                compact
-                sectionFilter={
-                  shouldCollapseAiExplanation
-                    ? (section) => isDefaultInlineExplanationSectionTitle(section.title)
-                    : undefined
-                }
-              />
-              <QuestionExplanationTabs
-                question={relatedQuestion}
-                compact
-                className="mt-3"
-                aiExplanationContent={aiExplanationContent}
-              />
-            </div>
-          </details>
-        );
-      })}
     </div>
   );
 }
@@ -1655,7 +1518,12 @@ export function ReviewNotebook({
                                       renderedQuestion,
                                       renderQuestionTopActions(renderedQuestion),
                                       renderExplanationFooter(renderedQuestion),
-                                      () => renderRelatedQuestions(renderedQuestion, relatedQuestionIndex)
+                                      () => (
+                                        <RelatedQuestionsPanel
+                                          question={renderedQuestion}
+                                          relatedQuestionIndex={relatedQuestionIndex}
+                                        />
+                                      )
                                     )
                                   : null}
                               </details>
