@@ -1242,10 +1242,10 @@ const questionTextOverrides: Record<string, QuestionTextOverride> = {
   },
   "MOEX-103100-1101-Q094": {
     options: {
-      D: "A型行為人格"
+      D: "B 型行為人格"
     },
     optionAnalysis: {
-      D: "正確。超時工作與急性循環系統疾病常和睡眠剝奪、工作特點、心理困擾等交互作用；A型行為人格不是題幹所列「交互作用」的典型工作暴露因素。"
+      D: "正確。超時工作與急性循環系統疾病常和睡眠剝奪、工作特點、心理困擾等交互作用；B 型行為人格不是題幹所列交互作用因素。"
     }
   },
   "MOEX-111100-1301-Q076": {
@@ -1573,7 +1573,7 @@ const questionTextOverrides: Record<string, QuestionTextOverride> = {
     options: {
       A: "CO₂ 溶解於血漿（plasma）中",
       B: "CO₂ 經碳酸酐酶（carbonic anhydrase）轉化成 H₂CO₃",
-      C: "紅血球醣解作用產物 2,3-bisphosphoglycerate（2,3-BPG）減少，可增加 O₂ 與 Fe²⁺ 結合",
+      C: "紅血球醣解作用產物 2,3-bisphosphoglycerate（2,3-BPG）減少，可增加 CO₂ 與 Fe²⁺ 結合",
       D: "紅血球之血紅素（hemoglobin）可結合 CO₂"
     }
   },
@@ -1601,6 +1601,33 @@ const questionTextOverrides: Record<string, QuestionTextOverride> = {
   "MOEX-113090-2301-Q014": {
     options: {
       B: "遺傳基因為正股（+）RNA"
+    }
+  },
+  "MOEX-114020-1301-Q054": {
+    stem:
+      "因釋放正腎上腺素（norepinephrine），而與白天的清醒程度最有關之神經細胞，其細胞體主要位於腦內何處？",
+    options: {
+      A: "reticular activating system",
+      B: "hypothalamus",
+      C: "amygdala",
+      D: "medial prefrontal cortex"
+    },
+    optionAnalysis: {
+      A: "正確。與清醒程度和 norepinephrine 釋放密切相關的是腦幹網狀活化系統，尤其藍斑核投射。"
+    }
+  },
+  "MOEX-114020-1301-Q062": {
+    stem: "下列何種刺激最可能會造成支氣管收縮（bronchoconstriction）？",
+    options: {
+      A: "鄰近的肺小動脈（pulmonary arteriole）被阻塞",
+      B: "肺泡（alveolus）內二氧化碳分壓（PCO₂）上升",
+      C: "吸氣（inspiration）",
+      D: "支氣管平滑肌（smooth muscle）的 β₂ 腎上腺素受器（adrenergic receptor）被刺激"
+    },
+    optionAnalysis: {
+      A: "正確。肺小動脈阻塞時該區通氣沒有灌流，局部 CO₂ 下降會造成支氣管收縮，以降低無效通氣。",
+      B: "不選。肺泡 CO₂ 上升通常造成支氣管擴張。",
+      D: "不選。β₂ 腎上腺素受器被刺激通常造成支氣管擴張。"
     }
   },
   "MOEX-111100-1301-Q062": {
