@@ -195,7 +195,7 @@ export default function SimulationReviewPage() {
   }, [user?.id]);
 
   function handleStartSimulationReview(filteredItems: ReviewQuestionItem[] = simulationItems) {
-    saveQuizSettings(buildSimulationReviewSettings(filteredItems));
+    saveQuizSettings(buildSimulationReviewUrlSettings(filteredItems));
   }
 
   const getSimulationReviewHref = useCallback(

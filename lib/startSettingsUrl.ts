@@ -2,6 +2,13 @@ import type { QuizSettings } from "@/types/quiz";
 
 const START_SETTINGS_HANDOFF_PREFIX = "anatomy-confidence-start-settings:";
 const START_SETTINGS_HANDOFF_TTL_MS = 10 * 60 * 1000;
+const MAX_INLINE_START_SETTINGS_LENGTH = 12_000;
+const CUSTOM_QUESTION_ID_SEPARATOR = "|";
+
+type StartSettingsTransport = Omit<QuizSettings, "customQuestionIds"> & {
+  customQuestionIds?: string[];
+  customQuestionIdsPacked?: string;
+};
 
 type StartSettingsHandoffPayload = {
   createdAt: number;
@@ -13,13 +20,36 @@ export type StartSettingsResolution = {
   error?: "invalid" | "missing-handoff" | "too-large";
 };
 
+function packStartSettings(settings: QuizSettings): StartSettingsTransport {
+  if ((settings.customQuestionIds?.length ?? 0) <= 20) return settings;
+
+  const { customQuestionIds, ...rest } = settings;
+  return {
+    ...rest,
+    customQuestionIdsPacked: customQuestionIds?.join(CUSTOM_QUESTION_ID_SEPARATOR)
+  };
+}
+
+function unpackStartSettings(settings: StartSettingsTransport): QuizSettings {
+  if (!settings.customQuestionIdsPacked) return settings as QuizSettings;
+
+  const { customQuestionIdsPacked, ...rest } = settings;
+  return {
+    ...rest,
+    customQuestionIds: customQuestionIdsPacked
+      .split(CUSTOM_QUESTION_ID_SEPARATOR)
+      .map((id) => id.trim())
+      .filter(Boolean)
+  } as QuizSettings;
+}
+
 export function encodeStartSettingsForUrl(settings: QuizSettings) {
   try {
-    const json = JSON.stringify(settings);
+    const json = JSON.stringify(packStartSettings(settings));
     const bytes = new TextEncoder().encode(json);
     const binary = Array.from(bytes, (byte) => String.fromCharCode(byte)).join("");
     const encoded = btoa(binary).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/g, "");
-    return encoded.length <= 1800 ? encoded : null;
+    return encoded.length <= MAX_INLINE_START_SETTINGS_LENGTH ? encoded : null;
   } catch {
     return null;
   }
@@ -33,7 +63,7 @@ export function decodeStartSettingsFromUrl(encodedSettings: string | null): Quiz
     const padded = normalized.padEnd(normalized.length + ((4 - (normalized.length % 4)) % 4), "=");
     const binary = atob(padded);
     const bytes = Uint8Array.from(binary, (character) => character.charCodeAt(0));
-    return JSON.parse(new TextDecoder().decode(bytes)) as QuizSettings;
+    return unpackStartSettings(JSON.parse(new TextDecoder().decode(bytes)) as StartSettingsTransport);
   } catch {
     return null;
   }

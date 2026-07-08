@@ -226,7 +226,7 @@ export default function ReviewPage() {
   }, [isFullscreenReview]);
 
   function handleStartPracticeReview(filteredItems: ReviewQuestionItem[] = practiceItems) {
-    saveQuizSettings(buildPracticeReviewSettings(filteredItems));
+    saveQuizSettings(buildPracticeReviewUrlSettings(filteredItems));
   }
 
   const getPracticeReviewHref = useCallback(
