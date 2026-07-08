@@ -1,5 +1,6 @@
 "use client";
 
+import { useMemo } from "react";
 import { QuestionExplanationTabs } from "@/components/QuestionExplanationTabs";
 import { QuestionOptionBlock, QuestionStemBlock } from "@/components/QuestionMediaBlock";
 import {
@@ -7,12 +8,12 @@ import {
   hasCollapsibleStructuredExplanation,
   isDefaultInlineExplanationSectionTitle
 } from "@/components/StructuredExplanationText";
-import { getRelatedQuestions, type RelatedQuestionIndex } from "@/lib/relatedQuestions";
+import { buildRelatedQuestionIndex, getRelatedQuestions } from "@/lib/relatedQuestions";
 import type { OptionKey, Question } from "@/types/quiz";
 
 type RelatedQuestionsPanelProps = {
   question: Question;
-  relatedQuestionIndex: RelatedQuestionIndex;
+  relatedQuestions: Question[];
 };
 
 function getOptionKeysFromQuestion(question: Question) {
@@ -34,7 +35,11 @@ function getAnswerLabel(question: Question) {
   return question.answer;
 }
 
-export function RelatedQuestionsPanel({ question, relatedQuestionIndex }: RelatedQuestionsPanelProps) {
+export function RelatedQuestionsPanel({ question, relatedQuestions: questionCatalog }: RelatedQuestionsPanelProps) {
+  const relatedQuestionIndex = useMemo(
+    () => buildRelatedQuestionIndex(questionCatalog),
+    [questionCatalog]
+  );
   const relatedQuestions = getRelatedQuestions(question, relatedQuestionIndex);
 
   if (relatedQuestions.length === 0) {

@@ -5,7 +5,6 @@ type RelatedQuestionCandidate = {
   conceptKey: string;
   chapterKey: string;
   sectionKey: string;
-  tokens: Set<string>;
 };
 
 export type RelatedQuestionIndex = {
@@ -125,7 +124,7 @@ function getRelatedQuestionScore(currentQuestion: Question, currentTokens: Set<s
   const sameConcept = Boolean(conceptKey && conceptKey === candidate.conceptKey);
   const sameChapter = getChapterKey(currentQuestion) === candidate.chapterKey;
   const sameSection = getSectionKey(currentQuestion) === candidate.sectionKey;
-  const tokenScore = getTokenOverlapScore(currentTokens, candidate.tokens);
+  const tokenScore = getTokenOverlapScore(currentTokens, buildQuestionTokens(candidateQuestion));
   const conceptHasTextSupport = sameSection || sameChapter || tokenScore >= 16;
 
   if (!sameSection && tokenScore < 16) return 0;
@@ -145,8 +144,7 @@ export function buildRelatedQuestionIndex(allQuestions: Question[]): RelatedQues
       question,
       conceptKey: getConceptKey(question),
       chapterKey: getChapterKey(question),
-      sectionKey: getSectionKey(question),
-      tokens: buildQuestionTokens(question)
+      sectionKey: getSectionKey(question)
     }));
 
   return { candidates };
@@ -155,6 +153,7 @@ export function buildRelatedQuestionIndex(allQuestions: Question[]): RelatedQues
 export function getRelatedQuestions(currentQuestion: Question, index: RelatedQuestionIndex, limit = 4) {
   const currentTokens = buildQuestionTokens(currentQuestion);
   const ranked = index.candidates
+    .filter((candidate) => candidate.question.subject === currentQuestion.subject)
     .map((candidate) => ({
       question: candidate.question,
       score: getRelatedQuestionScore(currentQuestion, currentTokens, candidate)

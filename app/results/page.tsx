@@ -82,7 +82,6 @@ import {
   buildRelatedQuestionContext,
   findPreviousQuestionForContinuation
 } from "@/lib/questionContext";
-import { buildRelatedQuestionIndex } from "@/lib/relatedQuestions";
 import {
   buildQuestionExplanationRequestQuestion,
   findQuestionSource
@@ -1484,27 +1483,6 @@ function ResultsPageContent() {
         : new Map<string, Question>(),
     [activeSession, classificationOverrides, explanationOverrides]
   );
-  const relatedQuestionIndex = useMemo(() => {
-    const relatedQuestionCatalog = allQuestions.map((question) => {
-      const classifiedQuestion = applyQuestionClassificationOverride(
-        question,
-        classificationOverrides[question.id]
-      );
-      const storedQuestion = applyQuestionExplanationOverride(classifiedQuestion);
-      const override = explanationOverrides[question.id];
-
-      return override
-        ? {
-            ...storedQuestion,
-            explanation: override.explanation || storedQuestion.explanation,
-            optionAnalysis: override.optionAnalysis ?? storedQuestion.optionAnalysis,
-            memoryTip: override.memoryTip || storedQuestion.memoryTip
-          }
-        : storedQuestion;
-    });
-
-    return buildRelatedQuestionIndex(relatedQuestionCatalog);
-  }, [classificationOverrides, explanationOverrides]);
   const reviewedAttempts = useMemo(
     () =>
       (activeSession?.attempts ?? [])
@@ -2270,7 +2248,7 @@ function ResultsPageContent() {
           relatedQuestionsContent={() => (
             <RelatedQuestionsPanel
               question={question}
-              relatedQuestionIndex={relatedQuestionIndex}
+              relatedQuestions={allQuestions}
             />
           )}
         />

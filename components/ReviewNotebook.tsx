@@ -36,7 +36,6 @@ import {
   buildRelatedQuestionContext,
   findPreviousQuestionForContinuation
 } from "@/lib/questionContext";
-import { buildRelatedQuestionIndex } from "@/lib/relatedQuestions";
 import {
   buildQuestionExplanationRequestQuestion,
   findQuestionSource
@@ -673,10 +672,6 @@ export function ReviewNotebook({
         )
       })),
     [items, classificationOverrides]
-  );
-  const relatedQuestionIndex = useMemo(
-    () => buildRelatedQuestionIndex(renderedAllQuestions),
-    [renderedAllQuestions]
   );
   const availableSubjects = useMemo(
     () =>
@@ -1521,7 +1516,7 @@ export function ReviewNotebook({
                                       () => (
                                         <RelatedQuestionsPanel
                                           question={renderedQuestion}
-                                          relatedQuestionIndex={relatedQuestionIndex}
+                                          relatedQuestions={renderedAllQuestions}
                                         />
                                       )
                                     )
