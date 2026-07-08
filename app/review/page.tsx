@@ -99,7 +99,10 @@ function buildPracticeReviewSettings(items: ReviewQuestionItem[]): QuizSettings 
 }
 
 function buildPracticeReviewUrlSettings(items: ReviewQuestionItem[]): QuizSettings {
-  return buildPracticeReviewSettings(items);
+  return {
+    ...buildPracticeReviewSettings(items),
+    customQuestionPayload: undefined
+  };
 }
 
 function loadReviewCompletedSessions() {

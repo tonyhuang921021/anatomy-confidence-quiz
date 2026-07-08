@@ -59,6 +59,13 @@ function buildCustomPaperReviewSettings(items: ReviewQuestionItem[]): QuizSettin
   };
 }
 
+function buildCustomPaperReviewUrlSettings(items: ReviewQuestionItem[]): QuizSettings {
+  return {
+    ...buildCustomPaperReviewSettings(items),
+    customQuestionPayload: undefined
+  };
+}
+
 export default function CustomPaperReviewPage() {
   const [customPaperItems, setCustomPaperItems] = useState<ReviewQuestionItem[]>([]);
   const [manualReviewState, setManualReviewState] = useState<ManualReviewState>(() =>
@@ -102,7 +109,7 @@ export default function CustomPaperReviewPage() {
   }
 
   const getCustomPaperReviewHref = useCallback(
-    (items: ReviewQuestionItem[]) => buildNewQuizHref(buildCustomPaperReviewSettings(items)),
+    (items: ReviewQuestionItem[]) => buildNewQuizHref(buildCustomPaperReviewUrlSettings(items)),
     []
   );
 

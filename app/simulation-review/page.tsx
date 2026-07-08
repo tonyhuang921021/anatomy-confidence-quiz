@@ -117,7 +117,10 @@ function buildSimulationReviewSettings(items: ReviewQuestionItem[]): QuizSetting
 }
 
 function buildSimulationReviewUrlSettings(items: ReviewQuestionItem[]): QuizSettings {
-  return buildSimulationReviewSettings(items);
+  return {
+    ...buildSimulationReviewSettings(items),
+    customQuestionPayload: undefined
+  };
 }
 
 function loadReviewCompletedSessions() {
