@@ -2249,6 +2249,7 @@ function ResultsPageContent() {
             <RelatedQuestionsPanel
               question={question}
               relatedQuestions={allQuestions}
+              savedQuestionSource="results"
             />
           )}
         />

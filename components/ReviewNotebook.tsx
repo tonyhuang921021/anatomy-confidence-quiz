@@ -1517,6 +1517,7 @@ export function ReviewNotebook({
                                         <RelatedQuestionsPanel
                                           question={renderedQuestion}
                                           relatedQuestions={renderedAllQuestions}
+                                          savedQuestionSource="review"
                                         />
                                       )
                                     )

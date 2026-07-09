@@ -1,19 +1,22 @@
 "use client";
 
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { QuestionExplanationTabs } from "@/components/QuestionExplanationTabs";
 import { QuestionOptionBlock, QuestionStemBlock } from "@/components/QuestionMediaBlock";
+import { SavedQuestionButton } from "@/components/SavedQuestionButton";
 import {
   StructuredExplanationText,
   hasCollapsibleStructuredExplanation,
   isDefaultInlineExplanationSectionTitle
 } from "@/components/StructuredExplanationText";
 import { buildRelatedQuestionIndex, getRelatedQuestions } from "@/lib/relatedQuestions";
-import type { OptionKey, Question } from "@/types/quiz";
+import { isAcceptedSavedQuestionAnswer } from "@/lib/savedQuestions";
+import type { OptionKey, Question, SavedQuestionSource } from "@/types/quiz";
 
 type RelatedQuestionsPanelProps = {
   question: Question;
   relatedQuestions: Question[];
+  savedQuestionSource?: SavedQuestionSource;
 };
 
 function getOptionKeysFromQuestion(question: Question) {
@@ -35,12 +38,24 @@ function getAnswerLabel(question: Question) {
   return question.answer;
 }
 
-export function RelatedQuestionsPanel({ question, relatedQuestions: questionCatalog }: RelatedQuestionsPanelProps) {
+export function RelatedQuestionsPanel({
+  question,
+  relatedQuestions: questionCatalog,
+  savedQuestionSource = "review"
+}: RelatedQuestionsPanelProps) {
+  const [submittedAnswers, setSubmittedAnswers] = useState<Record<string, OptionKey>>({});
   const relatedQuestionIndex = useMemo(
     () => buildRelatedQuestionIndex(questionCatalog),
     [questionCatalog]
   );
   const relatedQuestions = getRelatedQuestions(question, relatedQuestionIndex);
+
+  function submitRelatedAnswer(questionId: string, answer: OptionKey) {
+    setSubmittedAnswers((current) => ({
+      ...current,
+      [questionId]: answer
+    }));
+  }
 
   if (relatedQuestions.length === 0) {
     return (
@@ -53,6 +68,11 @@ export function RelatedQuestionsPanel({ question, relatedQuestions: questionCata
   return (
     <div className="mt-4 grid gap-3">
       {relatedQuestions.map((relatedQuestion, index) => {
+        const submittedAnswer = submittedAnswers[relatedQuestion.id];
+        const hasSubmittedAnswer = Boolean(submittedAnswer);
+        const isSubmittedAnswerCorrect = submittedAnswer
+          ? isAcceptedSavedQuestionAnswer(relatedQuestion, submittedAnswer)
+          : false;
         const shouldCollapseAiExplanation = hasCollapsibleStructuredExplanation(relatedQuestion.explanation);
         const aiExplanationContent = shouldCollapseAiExplanation ? (
           <StructuredExplanationText
@@ -70,38 +90,99 @@ export function RelatedQuestionsPanel({ question, relatedQuestions: questionCata
               類似題 {index + 1}：{relatedQuestion.chapter} / {relatedQuestion.section}
             </summary>
             <div className="mt-3 space-y-3 text-sm leading-7 text-slate-700">
-              <QuestionStemBlock question={relatedQuestion} />
-              <div className="space-y-2.5">
-                {getOptionKeysFromQuestion(relatedQuestion).map((key) => (
-                  <QuestionOptionBlock
-                    key={`${relatedQuestion.id}-${key}`}
-                    question={relatedQuestion}
-                    optionKey={key}
-                    wrapperClassName="rounded-2xl border border-slate-200 bg-white px-3 py-3 sm:px-4"
-                    labelClassName="mt-0.5 inline-flex min-w-8 justify-center rounded-full bg-slate-50 px-2 py-1 text-xs font-semibold text-slate-700 ring-1 ring-slate-200"
-                  />
-                ))}
+              <div className="flex min-w-0 items-start gap-3">
+                <QuestionStemBlock question={relatedQuestion} className="flex-1" />
+                <SavedQuestionButton questionId={relatedQuestion.id} source={savedQuestionSource} />
               </div>
-              <p>
-                <span className="font-semibold">正確答案：</span>
-                {getAnswerLabel(relatedQuestion)}
-              </p>
-              <StructuredExplanationText
-                text={relatedQuestion.explanation}
-                label="重點解析"
-                compact
-                sectionFilter={
-                  shouldCollapseAiExplanation
-                    ? (section) => isDefaultInlineExplanationSectionTitle(section.title)
-                    : undefined
-                }
-              />
-              <QuestionExplanationTabs
-                question={relatedQuestion}
-                compact
-                className="mt-3"
-                aiExplanationContent={aiExplanationContent}
-              />
+              <div className="space-y-2.5">
+                {getOptionKeysFromQuestion(relatedQuestion).map((key) => {
+                  const isSelected = submittedAnswer === key;
+                  const isCorrectOption = isAcceptedSavedQuestionAnswer(relatedQuestion, key);
+                  const isWrongSelected =
+                    hasSubmittedAnswer &&
+                    isSelected &&
+                    !isSubmittedAnswerCorrect;
+                  const showCorrect =
+                    hasSubmittedAnswer &&
+                    (isCorrectOption || (relatedQuestion.answerCreditType === "all_credit" && isSelected));
+                  const optionClassName = isWrongSelected
+                    ? "border-rose-300 bg-rose-50"
+                    : showCorrect
+                      ? "border-emerald-300 bg-emerald-50"
+                      : isSelected
+                        ? "border-slate-900 bg-white"
+                        : "border-slate-200 bg-white hover:border-brand-200 hover:bg-brand-50/40";
+                  const labelClassName = `mt-0.5 inline-flex min-w-8 justify-center rounded-full px-2 py-1 text-xs font-semibold ring-1 ${
+                    isWrongSelected
+                      ? "bg-rose-600 text-white ring-rose-600"
+                      : showCorrect
+                        ? "bg-emerald-600 text-white ring-emerald-600"
+                        : "bg-white text-slate-700 ring-slate-200"
+                  }`;
+
+                  return (
+                    <button
+                      key={`${relatedQuestion.id}-${key}`}
+                      type="button"
+                      onClick={() => submitRelatedAnswer(relatedQuestion.id, key)}
+                      className={`w-full rounded-2xl border text-left transition ${optionClassName}`}
+                    >
+                      <QuestionOptionBlock
+                        question={relatedQuestion}
+                        optionKey={key}
+                        wrapperClassName="px-3 py-3 sm:px-4"
+                        labelClassName={labelClassName}
+                        trailingContent={
+                          isWrongSelected ? (
+                            <span className="rounded-full bg-rose-100 px-2 py-0.5 text-xs font-semibold text-rose-700">
+                              你的答案
+                            </span>
+                          ) : showCorrect ? (
+                            <span className="rounded-full bg-emerald-100 px-2 py-0.5 text-xs font-semibold text-emerald-700">
+                              正解
+                            </span>
+                          ) : null
+                        }
+                      />
+                    </button>
+                  );
+                })}
+              </div>
+              {hasSubmittedAnswer ? (
+                <div className="space-y-3 rounded-2xl bg-white p-3 text-sm leading-7 ring-1 ring-slate-200 sm:p-4">
+                  <div className="flex flex-wrap items-center gap-2">
+                    <span
+                      className={`rounded-full px-3 py-1 text-xs font-semibold ${
+                        isSubmittedAnswerCorrect
+                          ? "bg-emerald-100 text-emerald-800"
+                          : "bg-rose-100 text-rose-800"
+                      }`}
+                    >
+                      {isSubmittedAnswerCorrect ? "答對了" : "答錯了"}
+                    </span>
+                    <p>
+                      <span className="font-semibold">正確答案：</span>
+                      {getAnswerLabel(relatedQuestion)}
+                    </p>
+                  </div>
+                  <StructuredExplanationText
+                    text={relatedQuestion.explanation}
+                    label="重點解析"
+                    compact
+                    sectionFilter={
+                      shouldCollapseAiExplanation
+                        ? (section) => isDefaultInlineExplanationSectionTitle(section.title)
+                        : undefined
+                    }
+                  />
+                  <QuestionExplanationTabs
+                    question={relatedQuestion}
+                    compact
+                    className="mt-3"
+                    aiExplanationContent={aiExplanationContent}
+                  />
+                </div>
+              ) : null}
             </div>
           </details>
         );
