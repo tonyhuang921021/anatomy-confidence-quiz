@@ -31,7 +31,6 @@ type FeedbackVoteRow = {
   vote_value: number;
 };
 
-const FEEDBACK_HOURLY_LIMIT = 3;
 const FEEDBACK_DAILY_LIMIT = 10;
 const FEEDBACK_READ_CACHE_HEADER = "public, max-age=30, s-maxage=60, stale-while-revalidate=300";
 const FEEDBACK_DEGRADED_CACHE_HEADER = "no-store";
@@ -279,31 +278,19 @@ export async function POST(request: NextRequest) {
 
     if (!isLoggedIn) {
       const now = Date.now();
-      const hourAgo = new Date(now - 60 * 60 * 1000).toISOString();
       const dayAgo = new Date(now - 24 * 60 * 60 * 1000).toISOString();
 
-      const [hourResult, dayResult] = await withServerTimeout(Promise.all([
+      const dayResult = await withServerTimeout(
         supabase
           .from("feedback_messages")
-          .select("*", { count: "exact", head: true })
+          .select("id", { count: "exact", head: true })
           .eq(actorColumn, actorValue)
-          .gte("created_at", hourAgo),
-        supabase
-          .from("feedback_messages")
-          .select("*", { count: "exact", head: true })
-          .eq(actorColumn, actorValue)
-          .gte("created_at", dayAgo)
-      ]), 1600, "留言頻率檢查逾時");
+          .gte("created_at", dayAgo),
+        1600,
+        "留言頻率檢查逾時"
+      );
 
-      if (hourResult.error) throw hourResult.error;
       if (dayResult.error) throw dayResult.error;
-
-      if ((hourResult.count ?? 0) >= FEEDBACK_HOURLY_LIMIT) {
-        return NextResponse.json(
-          { ok: false, message: `留言太快了，1 小時內最多 ${FEEDBACK_HOURLY_LIMIT} 則，請稍後再試。` },
-          { status: 429 }
-        );
-      }
 
       if ((dayResult.count ?? 0) >= FEEDBACK_DAILY_LIMIT) {
         return NextResponse.json(

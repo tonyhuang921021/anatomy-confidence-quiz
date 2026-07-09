@@ -893,6 +893,7 @@ export function PreExamSprintSurvey() {
   const [introSlideIndex, setIntroSlideIndex] = useState(0);
   const [formPageIndex, setFormPageIndex] = useState(0);
   const [submissionStatusChecked, setSubmissionStatusChecked] = useState(false);
+  const [submissionStatusSource, setSubmissionStatusSource] = useState<"unknown" | "cloud" | "fallback">("unknown");
   const isLoggedIn = Boolean(session?.user?.id && session?.access_token);
 
   const requiredQuestions = useMemo(
@@ -1003,15 +1004,18 @@ export function PreExamSprintSurvey() {
   useEffect(() => {
     if (!mounted || loading) return;
     if (!isLoggedIn || !session?.access_token) {
+      setSubmissionStatusSource("fallback");
       setSubmissionStatusChecked(true);
       return;
     }
 
     let cancelled = false;
     setSubmissionStatusChecked(false);
+    setSubmissionStatusSource("unknown");
 
     async function loadSubmissionStatus() {
       try {
+        const hasLocalSubmittedMarker = Boolean(safeGetStorage(SUBMITTED_STORAGE_KEY));
         const response = await fetch("/api/pre-exam-survey?submissionStatus=1", {
           cache: "no-store",
           headers: {
@@ -1025,14 +1029,19 @@ export function PreExamSprintSurvey() {
         }
         if (response.ok && data?.submitted) {
           safeSetStorage(SUBMITTED_STORAGE_KEY, data.submittedAt ?? new Date().toISOString());
+          setSubmissionStatusSource("cloud");
           setHasSubmitted(true);
           setIsOpen(false);
+        } else if (data?.source === "cloud" && data.loggedIn !== false) {
+          setSubmissionStatusSource("cloud");
+          setHasSubmitted(hasLocalSubmittedMarker);
         } else {
-          safeRemoveStorage(SUBMITTED_STORAGE_KEY);
-          setHasSubmitted(false);
+          setSubmissionStatusSource("fallback");
+          setHasSubmitted(hasLocalSubmittedMarker);
         }
       } catch {
         if (!cancelled) {
+          setSubmissionStatusSource("fallback");
           setHasSubmitted(Boolean(safeGetStorage(SUBMITTED_STORAGE_KEY)));
         }
       } finally {
@@ -1048,7 +1057,7 @@ export function PreExamSprintSurvey() {
 
   useEffect(() => {
     if (!mounted) return;
-    if (loading || !isLoggedIn || !submissionStatusChecked || hasSubmitted) return;
+    if (loading || !isLoggedIn || !submissionStatusChecked || submissionStatusSource !== "cloud" || hasSubmitted) return;
     const dismissedUntil = Number(safeGetStorage(DISMISS_STORAGE_KEY) ?? 0);
     if (Number.isFinite(dismissedUntil) && dismissedUntil > Date.now()) return;
 
@@ -1058,7 +1067,7 @@ export function PreExamSprintSurvey() {
       setIsOpen(true);
     }, 900);
     return () => window.clearTimeout(timer);
-  }, [hasSubmitted, isLoggedIn, loading, mounted, submissionStatusChecked]);
+  }, [hasSubmitted, isLoggedIn, loading, mounted, submissionStatusChecked, submissionStatusSource]);
 
   useEffect(() => {
     if (!isOpen) return;
@@ -1779,7 +1788,7 @@ export function PreExamSprintSurvey() {
     );
   }
 
-  if (!mounted || loading || !isLoggedIn || !submissionStatusChecked || hasSubmitted) {
+  if (!mounted || loading || !isLoggedIn || !submissionStatusChecked || submissionStatusSource !== "cloud" || hasSubmitted) {
     return null;
   }
 
