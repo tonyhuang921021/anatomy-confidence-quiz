@@ -47,6 +47,7 @@ import {
   getSupabaseBrowserClient,
   isSupabaseConfigured
 } from "@/lib/supabase/client";
+import { chooseMoreCompleteSessionForSameWork } from "@/lib/currentSessionSelection";
 import { normalizeQuestionExplanationOverride } from "@/lib/questionExplanationFormat";
 import { getRecoveryTimestamp, isSupabaseRecoveryMode } from "@/lib/supabase/recoveryMode";
 import { getOrCreateVisitorId } from "@/lib/visitor";
@@ -175,6 +176,7 @@ const CLOUD_LIGHT_COMPLETED_ATTEMPT_UPLOAD_LIMIT = 500;
 const CLOUD_ATTEMPT_SESSION_FETCH_CHUNK_SIZE = 20;
 const CLOUD_RECOVERABLE_REVIEW_SESSION_FETCH_LIMIT = 160;
 const CLOUD_RECOVERABLE_REVIEW_SESSION_GRACE_MS = 90_000;
+const CLOUD_ACTIVE_SESSION_COMPARE_LIMIT = 8;
 const CURRENT_SESSION_SYNC_MIN_INTERVAL_MS = 45_000;
 const STATS_SYNC_ATTEMPT_BATCH_SIZE = 200;
 const CLOUD_SESSION_LOOKUP_TIMEOUT_MS = 3500;
@@ -1469,8 +1471,8 @@ function getRecoverableReviewSessionCompletedAt(row: QuizSessionRow, attempts: A
   return getLatestAttemptAnsweredAt(attempts) ?? row.updated_at ?? row.started_at;
 }
 
-async function fetchActiveQuizSessionRow(userId: string) {
-  if (isSupabaseRecoveryMode() || !isSupabaseConfigured()) return null;
+async function fetchActiveQuizSessionRowsForUser(userId: string) {
+  if (isSupabaseRecoveryMode() || !isSupabaseConfigured()) return [] as QuizSessionRow[];
 
   const supabase = getSupabaseBrowserClient();
   const { data, error } = await supabase
@@ -1482,14 +1484,13 @@ async function fetchActiveQuizSessionRow(userId: string) {
     .is("completed_at", null)
     .order("updated_at", { ascending: false })
     .order("started_at", { ascending: false })
-    .limit(1)
-    .maybeSingle();
+    .limit(CLOUD_ACTIVE_SESSION_COMPARE_LIMIT);
 
   if (error) {
     throw error;
   }
 
-  return (data as QuizSessionRow | null) ?? null;
+  return (data ?? []) as QuizSessionRow[];
 }
 
 async function fetchSessionAttemptRowsForUser(userId: string, sessionIds: string[]) {
@@ -1527,6 +1528,19 @@ async function fetchSessionAttemptRowsForUser(userId: string, sessionIds: string
   }
 
   return rows;
+}
+
+async function fetchActiveQuizSessionsForUser(userId: string) {
+  const rows = await fetchActiveQuizSessionRowsForUser(userId);
+  const attemptRows = await fetchSessionAttemptRowsForUser(
+    userId,
+    rows.map((row) => row.id)
+  );
+  const attemptMap = buildAttemptMap(attemptRows);
+
+  return rows
+    .map((row) => mapRowToSession(row, attemptMap))
+    .filter((session): session is QuizSession => Boolean(session));
 }
 
 async function fetchQuizSessionsForUser(userId: string) {
@@ -2584,21 +2598,35 @@ export async function syncCurrentSessionForCurrentUser(userId: string) {
     }
   }
 
-  const remoteRow = await withCloudFallback(fetchActiveQuizSessionRow(userId), null);
-  const remoteAttemptMap = remoteRow
-    ? buildAttemptMap(
-        await withCloudFallback(fetchSessionAttemptRowsForUser(userId, [remoteRow.id]), [] as QuizSessionAttemptRow[])
-      )
-    : undefined;
-  const remoteCurrentSession = remoteRow ? mapRowToSession(remoteRow, remoteAttemptMap) : null;
+  const remoteActiveSessions = await withCloudFallback<QuizSession[] | null>(
+    fetchActiveQuizSessionsForUser(userId),
+    null
+  );
+  if (!remoteActiveSessions) {
+    return localCurrentSession;
+  }
+  const latestRemoteCurrentSession = remoteActiveSessions[0] ?? null;
+  const betterRemoteForLatest = latestRemoteCurrentSession
+    ? chooseMoreCompleteSessionForSameWork(latestRemoteCurrentSession, remoteActiveSessions)
+    : null;
+  const betterRemoteForLocal = localCurrentSession
+    ? chooseMoreCompleteSessionForSameWork(localCurrentSession, remoteActiveSessions)
+    : null;
+  const remoteCurrentSession =
+    betterRemoteForLocal ?? betterRemoteForLatest ?? latestRemoteCurrentSession;
   const remoteSyncedAttemptSignatures = remoteCurrentSession
     ? buildSyncedAttemptSignatureMap(remoteCurrentSession)
     : new Map<number, string>();
 
+  if (betterRemoteForLocal) {
+    const winner = canonicalizeSessionsForUser(userId, [betterRemoteForLocal])[0] ?? betterRemoteForLocal;
+    saveCurrentSession(winner);
+    rememberSyncedCurrentSessionState(userId, winner, remoteSyncedAttemptSignatures);
+    return winner;
+  }
+
   const localActivity = localCurrentSession ? sessionActivityValue(localCurrentSession) : "";
-  const remoteActivity = remoteCurrentSession
-    ? sessionActivityValue(remoteCurrentSession, remoteRow?.updated_at)
-    : "";
+  const remoteActivity = remoteCurrentSession ? sessionActivityValue(remoteCurrentSession) : "";
 
   let winner = localCurrentSession;
   let shouldUploadWinner =
@@ -2650,6 +2678,29 @@ export async function syncLocalCurrentSessionForCurrentUser(userId: string) {
   if (!localCurrentSession) return null;
 
   const canonicalSession = canonicalizeSessionsForUser(userId, [localCurrentSession])[0] ?? localCurrentSession;
+  const remoteActiveSessions = await withCloudFallback<QuizSession[] | null>(
+    fetchActiveQuizSessionsForUser(userId),
+    null
+  );
+  if (!remoteActiveSessions) {
+    return canonicalSession;
+  }
+
+  const moreCompleteRemoteSession = chooseMoreCompleteSessionForSameWork(
+    canonicalSession,
+    remoteActiveSessions
+  );
+  if (moreCompleteRemoteSession) {
+    const winner = canonicalizeSessionsForUser(userId, [moreCompleteRemoteSession])[0] ?? moreCompleteRemoteSession;
+    saveCurrentSession(winner);
+    rememberSyncedCurrentSessionState(
+      userId,
+      winner,
+      buildSyncedAttemptSignatureMap(winner)
+    );
+    return winner;
+  }
+
   await withClientTimeout(
     upsertSessionsForUser(userId, [canonicalSession], {
       activeCheckpoint: true
@@ -2771,6 +2822,28 @@ export async function pushCurrentSessionToSupabase(
 
   const canonicalSession = canonicalizeSessionsForUser(userId, [session])[0];
   if (!canonicalSession) return;
+
+  const remoteActiveSessions = await withCloudFallback<QuizSession[] | null>(
+    fetchActiveQuizSessionsForUser(userId),
+    null
+  );
+  if (!remoteActiveSessions) {
+    return;
+  }
+  const moreCompleteRemoteSession = chooseMoreCompleteSessionForSameWork(
+    canonicalSession,
+    remoteActiveSessions
+  );
+  if (moreCompleteRemoteSession) {
+    const winner = canonicalizeSessionsForUser(userId, [moreCompleteRemoteSession])[0] ?? moreCompleteRemoteSession;
+    saveCurrentSession(winner);
+    rememberSyncedCurrentSessionState(
+      userId,
+      winner,
+      buildSyncedAttemptSignatureMap(winner)
+    );
+    return;
+  }
 
   const signature = getCurrentSessionSyncSignature(canonicalSession);
   const stateKey = getCurrentSessionSyncStateKey(userId, canonicalSession.id);
