@@ -208,6 +208,7 @@ type CurrentSessionSyncState = {
 type CompletedSessionSyncOptions = {
   hydrateRemoteHistory?: boolean;
   uploadAllPending?: boolean;
+  readRemoteOnly?: boolean;
 };
 
 const currentSessionSyncState = new Map<string, CurrentSessionSyncState>();
@@ -2424,6 +2425,7 @@ export async function syncLocalCompletedSessionsForCurrentUser(
 ) {
   const uploadAllPending = options.uploadAllPending === true;
   const hydrateRemoteHistory = options.hydrateRemoteHistory ?? !uploadAllPending;
+  const readRemoteOnly = options.readRemoteOnly === true;
   const sourceUserIds = getCompletedSessionSourceUserIds(userId);
   const hasHeavyLocalHistory =
     sourceUserIds.some(
@@ -2431,10 +2433,11 @@ export async function syncLocalCompletedSessionsForCurrentUser(
         getCompletedSessionsStorageLengthForUser(sourceUserId) > CLOUD_HEAVY_LOCAL_HISTORY_READ_LIMIT
     );
   let fetchedRemoteSessions: QuizSession[] = [];
-  let shouldUploadLocalSessions = !isSupabaseRecoveryMode() && isSupabaseConfigured();
+  const canReachCloud = !isSupabaseRecoveryMode() && isSupabaseConfigured();
+  let shouldUploadLocalSessions = canReachCloud && !readRemoteOnly;
   let hasVerifiedRemoteSessions = false;
 
-  if (shouldUploadLocalSessions && hydrateRemoteHistory) {
+  if (canReachCloud && hydrateRemoteHistory) {
     try {
       const resolved = await fetchResolvedQuizSessionsForUser(userId);
       fetchedRemoteSessions = resolved.sessions;
@@ -2444,7 +2447,7 @@ export async function syncLocalCompletedSessionsForCurrentUser(
       fetchedRemoteSessions = loadCloudCompletedSessionsForUser(userId);
       console.warn("Completed session cloud read failed; keeping local history visible.", error);
     }
-  } else if (shouldUploadLocalSessions) {
+  } else if (canReachCloud) {
     fetchedRemoteSessions = loadCloudCompletedSessionsForUser(userId);
   }
   const remoteSessions = canonicalizeSessionsForUser(
@@ -2552,7 +2555,7 @@ export async function syncLocalCompletedSessionsForCurrentUser(
           CLOUD_LIGHT_COMPLETED_ATTEMPT_UPLOAD_LIMIT
         );
 
-  if (!shouldUploadLocalSessions || sessionsToUpload.length === 0) {
+  if (readRemoteOnly || !shouldUploadLocalSessions || sessionsToUpload.length === 0) {
     return mergedSessions;
   }
 

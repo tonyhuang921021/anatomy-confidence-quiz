@@ -889,7 +889,11 @@ function ResultsPageContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { user, syncVersion, session } = useAuth();
-  useCloudHistoryHydration();
+  const forceSimulationHistoryHydration = searchParams.get("scope") === "simulation";
+  useCloudHistoryHydration(true, {
+    force: forceSimulationHistoryHydration,
+    readRemoteOnly: forceSimulationHistoryHydration
+  });
   const [mounted, setMounted] = useState(false);
   const [requestedSessionId, setRequestedSessionId] = useState<string | null>(null);
   const [explanationOverrides, setExplanationOverrides] = useState<Record<string, QuestionExplanationOverride>>({});

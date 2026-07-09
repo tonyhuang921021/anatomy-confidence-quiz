@@ -46,6 +46,8 @@ type RefreshCloudDataOptions = {
   automatic?: boolean;
   uploadAllPending?: boolean;
   historyHydration?: boolean;
+  force?: boolean;
+  readRemoteOnly?: boolean;
 };
 
 const AuthContext = createContext<AuthContextValue | null>(null);
@@ -324,6 +326,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     const now = Date.now();
     const isHistoryHydration = explicitOptions.historyHydration === true;
+    const forceSync = explicitOptions.force === true;
+    const readRemoteOnly = explicitOptions.readRemoteOnly === true;
     const hardTimeoutMs = explicitOptions.uploadAllPending || isHistoryHydration
       ? CLOUD_MANUAL_SYNC_HARD_TIMEOUT_MS
       : CLOUD_SYNC_HARD_TIMEOUT_MS;
@@ -342,6 +346,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
 
     if (
+      !forceSync &&
       explicitOptions.automatic &&
       isHistoryHydration &&
       shouldSkipHistoryCloudSync(userId, now)
@@ -353,6 +358,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
 
     if (
+      !forceSync &&
       explicitOptions.automatic &&
       !isHistoryHydration &&
       shouldSkipAutomaticCloudSync(userId, now)
@@ -375,8 +381,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const hydrateRemoteHistory = explicitOptions.hydrateRemoteHistory ?? !uploadAllPending;
 
     const syncTask = withTimeout(
-      syncLocalCompletedSessionsForCurrentUser(userId, { hydrateRemoteHistory, uploadAllPending })
+      syncLocalCompletedSessionsForCurrentUser(userId, {
+        hydrateRemoteHistory,
+        uploadAllPending,
+        readRemoteOnly
+      })
       .then((completedSessions) => {
+        if (readRemoteOnly) return undefined;
         void syncLeaderboardProfileForCurrentUser(effectiveUser, completedSessions).catch((error) => {
           console.error("Leaderboard sync skipped:", error);
         });
