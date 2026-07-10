@@ -22,9 +22,12 @@ import {
 } from "@/lib/savedQuestions";
 import {
   loadQuestionExplanationOverrides,
-  mergeQuestionExplanationOverrides
+  mergeQuestionExplanationOverrides,
+  saveQuizSettings
 } from "@/lib/storage";
 import { shouldDisplaySubjectBesidePrimaryTag } from "@/lib/analysisPrimaryTag";
+import { buildNewQuizHref } from "@/lib/startSettingsUrl";
+import { buildSavedQuestionReviewSettings } from "@/lib/savedQuestionReview";
 import {
   OptionKey,
   Question,
@@ -146,6 +149,14 @@ export default function SavedQuestionsPage() {
     () => savedItems.filter((item) => !isSavedQuestionCompleted(item.record)),
     [savedItems]
   );
+  const savedQuestionReviewSettings = useMemo(
+    () => buildSavedQuestionReviewSettings(activeItems.map((item) => item.question)),
+    [activeItems]
+  );
+  const savedQuestionReviewHref = useMemo(
+    () => buildNewQuizHref(savedQuestionReviewSettings),
+    [savedQuestionReviewSettings]
+  );
   const completedCount = savedItems.length - activeItems.length;
   const selectedItem = useMemo(
     () =>
@@ -200,9 +211,9 @@ export default function SavedQuestionsPage() {
   return (
     <main className="shell">
       <section className="rounded-[2rem] bg-white p-5 shadow-card ring-1 ring-slate-100 sm:p-7">
-        <div className="flex flex-wrap items-center justify-between gap-4">
-          <div>
-            <p className="text-sm font-semibold uppercase tracking-[0.2em] text-brand-700">Saved Questions</p>
+        <div className="grid gap-4 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-center">
+          <div className="min-w-0">
+            <p className="max-w-full break-words text-sm font-semibold uppercase tracking-[0.2em] text-brand-700">Saved Questions</p>
             <h1 className="mt-2 text-3xl font-bold text-ink sm:text-4xl">儲存題目</h1>
             <p className="mt-3 text-sm leading-7 text-slate-500">
               {activeItems.length > 0
@@ -212,18 +223,30 @@ export default function SavedQuestionsPage() {
                   : "看到想補的題目，就按書籤放進來。"}
             </p>
           </div>
-          <div className="flex flex-wrap gap-3">
+          <div className="grid w-full gap-3 sm:w-auto sm:grid-cols-2">
             <Link
               href="/"
-              className="min-h-12 rounded-2xl bg-slate-100 px-5 py-4 text-sm font-semibold text-slate-800 transition hover:bg-slate-200"
+              className="min-h-12 w-full rounded-2xl bg-slate-100 px-5 py-4 text-center text-sm font-semibold text-slate-800 transition hover:bg-slate-200"
             >
               返回首頁
             </Link>
             <Link
-              href="/quiz?new=1"
-              className="min-h-12 rounded-2xl bg-brand-600 px-5 py-4 text-sm font-semibold text-white transition hover:bg-brand-700"
+              href={savedQuestionReviewHref}
+              onClick={(event) => {
+                if (activeItems.length === 0) {
+                  event.preventDefault();
+                  return;
+                }
+                saveQuizSettings(savedQuestionReviewSettings);
+              }}
+              aria-disabled={activeItems.length === 0}
+              className={`min-h-12 w-full rounded-2xl px-5 py-4 text-center text-sm font-semibold transition ${
+                activeItems.length === 0
+                  ? "pointer-events-none bg-slate-200 text-slate-500"
+                  : "bg-brand-600 text-white hover:bg-brand-700"
+              }`}
             >
-              去刷題
+              開始儲存題目複習
             </Link>
           </div>
         </div>

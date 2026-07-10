@@ -74,6 +74,12 @@ import {
 import { getOrCreateVisitorId } from "@/lib/visitor";
 import { getQuestionPrimaryTag } from "@/lib/analysisPrimaryTag";
 import {
+  queueSavedQuestionsCloudSync,
+  recordSavedQuestionAnswer,
+  useSavedQuestionRecords
+} from "@/lib/savedQuestions";
+import { isSavedQuestionReviewSettings } from "@/lib/savedQuestionReview";
+import {
   Attempt,
   ConfidenceLevel,
   ErrorType,
@@ -840,6 +846,10 @@ export default function QuizPage() {
   const restoredQuestionUiKeyRef = useRef<string | null>(null);
   const [submittedAttempt, setSubmittedAttempt] = useState<Attempt | null>(null);
   const [errorType, setErrorType] = useState<ErrorType | undefined>();
+  const isSavedQuestionReview = isSavedQuestionReviewSettings(session?.settings);
+  const savedQuestionRecords = useSavedQuestionRecords(
+    isSavedQuestionReview ? authSession?.access_token : null
+  );
 
   function syncCompletedCustomPaper(completedSession: QuizSession) {
     if (!isCustomPaperSession(completedSession)) return;
@@ -1335,6 +1345,12 @@ export default function QuizPage() {
   );
   const currentIndex = session?.currentQuestionIndex ?? 0;
   const currentQuestion = questionSet[currentIndex];
+  const currentSavedQuestionRecord = currentQuestion
+    ? savedQuestionRecords[currentQuestion.id]
+    : undefined;
+  const modeLabel = isSavedQuestionReview
+    ? "儲存題目複習"
+    : getModeLabel(session?.settings?.mode ?? "weakness");
   useEffect(() => {
     if (!session || questionSet.length === 0) return;
     const safeIndex = Math.min(
@@ -1892,6 +1908,12 @@ export default function QuizPage() {
       console.error("Question stats sync skipped after local completion:", error);
     });
     syncCompletedCustomPaper(completedSessionWithEliminations);
+    if (
+      isSavedQuestionReviewSettings(completedSessionWithEliminations.settings) &&
+      authSession?.access_token
+    ) {
+      void queueSavedQuestionsCloudSync(authSession.access_token, { force: true });
+    }
     if (!savedLocally) {
       console.warn("Completed session could not be fully persisted locally; routing with in-memory handoff.");
     }
@@ -1971,6 +1993,15 @@ export default function QuizPage() {
       eliminatedOptions: eliminatedOptions.length > 0 ? eliminatedOptions : undefined,
       answeredAt: new Date().toISOString()
     };
+
+    if (isSavedQuestionReviewSettings(session.settings)) {
+      recordSavedQuestionAnswer(
+        currentQuestion.id,
+        attempt.isCorrect,
+        authSession?.access_token,
+        { forceCloudSync: false }
+      );
+    }
 
     const nextSessionBase: QuizSession = {
       ...setQuestionEliminatedOptions(
@@ -2475,6 +2506,8 @@ export default function QuizPage() {
       "模擬考錯題庫"
     ].includes(session.settings.customPoolLabel ?? "") &&
     currentIndex < targetCount - 1;
+  const canEndSavedQuestionReviewAfterSubmitted =
+    isSavedQuestionReview && currentIndex < targetCount - 1;
   const canEndOpenEndedPracticeAfterSubmitted =
     session.settings?.mode === "random" &&
     Boolean(session.settings.stopAfterReview) &&
@@ -2484,6 +2517,7 @@ export default function QuizPage() {
     currentIndex < targetCount - 1;
   const canEndAfterSubmittedQuestion =
     canEndReviewPracticeAfterSubmitted ||
+    canEndSavedQuestionReviewAfterSubmitted ||
     canEndOpenEndedPracticeAfterSubmitted ||
     canEndCustomPaperAfterSubmitted;
   const currentExplanationOverride = explanationOverrides[currentQuestion.id];
@@ -2526,7 +2560,7 @@ export default function QuizPage() {
             {session.settings?.mode === "simulation" ? (
               <>
                 <span className="rounded-full bg-brand-100 px-3 py-1 text-brand-800">
-                  {getModeLabel(session.settings?.mode ?? "weakness")}
+                  {modeLabel}
                 </span>
                 <span className="rounded-full bg-slate-100 px-3 py-1 text-slate-700">
                   {targetCount} 題
@@ -2535,7 +2569,7 @@ export default function QuizPage() {
             ) : (
               <>
                 <span className="rounded-full bg-brand-100 px-3 py-1 text-brand-800">
-                  {getModeLabel(session.settings?.mode ?? "weakness")}
+                  {modeLabel}
                 </span>
                 <span className="rounded-full bg-slate-100 px-3 py-1 text-slate-700">
                   {targetCount} 題
@@ -2565,6 +2599,13 @@ export default function QuizPage() {
             onSelect={handleSelectAnswer}
             onToggleEliminatedOption={handleToggleEliminatedOption}
             showMetadata={session.settings?.mode !== "simulation"}
+            metadataExtra={
+              isSavedQuestionReview ? (
+                <span className="max-w-full break-words rounded-full bg-amber-50 px-3 py-1 text-amber-800 ring-1 ring-amber-100">
+                  答對 {currentSavedQuestionRecord?.correctCount ?? 0} / 2
+                </span>
+              ) : null
+            }
           />
 
           {!submittedAttempt ? (
@@ -2704,6 +2745,11 @@ export default function QuizPage() {
                   {specialScoringNote ? (
                     <p className="rounded-2xl bg-amber-100/70 px-4 py-3 text-amber-950">
                       {specialScoringNote}
+                    </p>
+                  ) : null}
+                  {isSavedQuestionReview ? (
+                    <p className="rounded-2xl bg-white/70 px-4 py-3 font-semibold text-slate-700 ring-1 ring-white/70">
+                      儲存題目進度：答對 {currentSavedQuestionRecord?.correctCount ?? 0} / 2
                     </p>
                   ) : null}
                 </div>
@@ -2896,7 +2942,7 @@ export default function QuizPage() {
                   已答題數 <span className="font-semibold">{answeredCount}</span>
                 </p>
                 <p className="rounded-2xl bg-slate-50 px-4 py-3 text-sm text-slate-700">
-                  本輪模式 <span className="font-semibold">{getModeLabel(session.settings?.mode ?? "weakness")}</span>
+                  本輪模式 <span className="font-semibold">{modeLabel}</span>
                 </p>
               </>
             )}

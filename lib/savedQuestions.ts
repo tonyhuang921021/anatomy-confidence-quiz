@@ -360,7 +360,8 @@ export function removeSavedQuestionRecord(questionId: string, accessToken?: stri
 export function recordSavedQuestionAnswer(
   questionId: string,
   isCorrect: boolean,
-  accessToken?: string | null
+  accessToken?: string | null,
+  options: { forceCloudSync?: boolean } = {}
 ) {
   const normalizedQuestionId = questionId.trim();
   if (!normalizedQuestionId) return;
@@ -387,7 +388,11 @@ export function recordSavedQuestionAnswer(
   };
 
   setRecordsCache(nextRecords);
-  if (accessToken) void queueSavedQuestionsCloudSync(accessToken, { force: true });
+  if (accessToken) {
+    void queueSavedQuestionsCloudSync(accessToken, {
+      force: options.forceCloudSync ?? true
+    });
+  }
 }
 
 export function useSavedQuestionRecords(accessToken?: string | null) {

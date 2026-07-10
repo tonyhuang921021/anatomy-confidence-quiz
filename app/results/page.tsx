@@ -96,6 +96,7 @@ import {
   getQuestionPrimaryTag,
   primaryTagIncludesSubject
 } from "@/lib/analysisPrimaryTag";
+import { isSavedQuestionReviewSettings } from "@/lib/savedQuestionReview";
 
 const allQuestions = Array.from(
   new Map(
@@ -382,6 +383,7 @@ const EMPTY_PROMPT_TEXTS: ResultState["promptTexts"] = {
 };
 
 function getSessionModeLabel(session: QuizSession) {
+  if (isSavedQuestionReviewSettings(session.settings)) return "儲存題目複習";
   return session.settings?.mode === "simulation"
     ? "模擬考"
     : session.settings?.mode === "custom_paper"
@@ -2867,7 +2869,7 @@ function ResultsPageContent() {
             {getSessionSubjectLabel(state.session, reviewedAttempts)}
           </h1>
           <p className="mt-2 text-sm text-slate-500">
-            本輪模式：{getModeLabel(state.session.settings?.mode ?? "weakness")}
+            本輪模式：{getSessionModeLabel(state.session)}
           </p>
           <p className="mt-1 text-sm text-slate-500">
             完成時間：
@@ -2984,29 +2986,40 @@ function ResultsPageContent() {
               </div>
             </div>
             <div className="mt-5 grid gap-3">
-              <Link
-                href={buildNewQuizHref({
-                  ...DEFAULT_QUIZ_SETTINGS,
-                  ...(activeSession?.settings ?? state.session?.settings ?? {}),
-                  sessionName: undefined
-                })}
-                onClick={() =>
-                  saveQuizSettings({
-                    ...DEFAULT_QUIZ_SETTINGS,
-                    ...(activeSession?.settings ?? state.session?.settings ?? {}),
-                    sessionName: undefined
-                  })
-                }
-                className="min-h-12 rounded-2xl bg-brand-600 px-4 py-4 text-center text-sm font-semibold text-white transition hover:bg-brand-700"
-              >
-                用同一設定再刷一次
-              </Link>
-              <Link
-                href="/review"
-                className="min-h-12 rounded-2xl bg-slate-100 px-4 py-4 text-center text-sm font-semibold text-slate-800 transition hover:bg-slate-200"
-              >
-                先看錯題複習頁
-              </Link>
+              {isSavedQuestionReviewSettings(state.session.settings) ? (
+                <Link
+                  href="/saved-questions"
+                  className="min-h-12 rounded-2xl bg-brand-600 px-4 py-4 text-center text-sm font-semibold text-white transition hover:bg-brand-700"
+                >
+                  回儲存題目繼續
+                </Link>
+              ) : (
+                <>
+                  <Link
+                    href={buildNewQuizHref({
+                      ...DEFAULT_QUIZ_SETTINGS,
+                      ...(activeSession?.settings ?? state.session?.settings ?? {}),
+                      sessionName: undefined
+                    })}
+                    onClick={() =>
+                      saveQuizSettings({
+                        ...DEFAULT_QUIZ_SETTINGS,
+                        ...(activeSession?.settings ?? state.session?.settings ?? {}),
+                        sessionName: undefined
+                      })
+                    }
+                    className="min-h-12 rounded-2xl bg-brand-600 px-4 py-4 text-center text-sm font-semibold text-white transition hover:bg-brand-700"
+                  >
+                    用同一設定再刷一次
+                  </Link>
+                  <Link
+                    href="/review"
+                    className="min-h-12 rounded-2xl bg-slate-100 px-4 py-4 text-center text-sm font-semibold text-slate-800 transition hover:bg-slate-200"
+                  >
+                    先看錯題複習頁
+                  </Link>
+                </>
+              )}
               <div className="grid grid-cols-2 gap-2" role="group" aria-label="AI 補弱 Prompt 版本">
                 <button
                   type="button"

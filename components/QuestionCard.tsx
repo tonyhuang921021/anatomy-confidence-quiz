@@ -1,6 +1,6 @@
 "use client";
 
-import { type MouseEvent, useMemo } from "react";
+import { type MouseEvent, type ReactNode, useMemo } from "react";
 import { QuestionOptionBlock, QuestionStemBlock } from "@/components/QuestionMediaBlock";
 import { QuestionPrimaryTagBadge } from "@/components/QuestionPrimaryTagBadge";
 import { getQuestionPrimaryTag, primaryTagIncludesSubject } from "@/lib/analysisPrimaryTag";
@@ -20,6 +20,7 @@ type QuestionCardProps = {
   onSelect: (value: OptionKey) => void;
   onToggleEliminatedOption?: (value: OptionKey) => void;
   showMetadata?: boolean;
+  metadataExtra?: ReactNode;
 };
 
 const optionKeys: OptionKey[] = ["A", "B", "C", "D", "E"];
@@ -74,7 +75,8 @@ export function QuestionCard({
   eliminationDisabled = false,
   onSelect,
   onToggleEliminatedOption,
-  showMetadata = true
+  showMetadata = true,
+  metadataExtra
 }: QuestionCardProps) {
   const primaryTag = getQuestionPrimaryTag(question);
   const availableOptionKeys = useMemo(
@@ -113,6 +115,7 @@ export function QuestionCard({
             <span className="max-w-full break-words rounded-full bg-emerald-100 px-3 py-1 text-emerald-800">
               {getSourceLabel(question)}
             </span>
+            {metadataExtra}
           </div>
 
           {question.sourceCitation ? (

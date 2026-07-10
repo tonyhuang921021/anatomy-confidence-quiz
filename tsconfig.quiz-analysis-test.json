@@ -26,6 +26,8 @@
     "lib/quizAnalysis.selection.test.ts",
     "lib/relatedQuestions.ts",
     "lib/relatedQuestions.test.ts",
+    "lib/savedQuestionReview.ts",
+    "lib/savedQuestionReview.test.ts",
     "lib/startSettingsUrl.ts",
     "lib/startSettingsUrl.test.ts",
     "lib/storage.ts",
