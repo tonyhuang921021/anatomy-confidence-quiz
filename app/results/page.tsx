@@ -97,6 +97,10 @@ import {
   primaryTagIncludesSubject
 } from "@/lib/analysisPrimaryTag";
 import { isSavedQuestionReviewSettings } from "@/lib/savedQuestionReview";
+import {
+  buildWeaknessPracticeSettings,
+  buildWeaknessQuestionOrder
+} from "@/lib/weaknessAnalysis";
 
 const allQuestions = Array.from(
   new Map(
@@ -1633,6 +1637,33 @@ function ResultsPageContent() {
     router.push(buildNewQuizHref(nextSettings));
   }
 
+  function handleStartWeaknessReview(section: SectionStats) {
+    const sourceQuestion = allQuestions.find(
+      (question) =>
+        question.subject === section.chapter &&
+        getQuestionPrimaryTag(question) === section.section
+    );
+    if (!sourceQuestion) return;
+
+    const questionOrder = buildWeaknessQuestionOrder({
+      questions: allQuestions,
+      sessions: state.sessions,
+      subject: sourceQuestion.subject,
+      primaryTag: section.section
+    });
+    if (questionOrder.length === 0) return;
+
+    router.push(
+      buildNewQuizHref(
+        buildWeaknessPracticeSettings({
+          subject: sourceQuestion.subject,
+          primaryTag: section.section,
+          questionOrder
+        })
+      )
+    );
+  }
+
   async function handleSaveSimulationSessionName() {
     if (!state.session || !isSimulationSession(state.session)) return;
 
@@ -3044,7 +3075,10 @@ function ResultsPageContent() {
       <div className="mt-8 grid gap-6 xl:grid-cols-[minmax(0,1fr)_360px]">
         <div className="space-y-6">
           {renderReviewSection()}
-          <WeaknessRanking sections={topWeakSections} />
+          <WeaknessRanking
+            sections={topWeakSections}
+            onStartReview={handleStartWeaknessReview}
+          />
         </div>
 
         <aside className="space-y-6">

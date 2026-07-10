@@ -26,7 +26,12 @@ function repeatsSubject(section: SectionStats) {
   return section.section.replace(/\s+/g, "").startsWith(section.chapter.replace(/\s+/g, ""));
 }
 
-export function WeaknessRanking({ sections }: { sections: SectionStats[] }) {
+type WeaknessRankingProps = {
+  sections: SectionStats[];
+  onStartReview?: (section: SectionStats) => void;
+};
+
+export function WeaknessRanking({ sections, onStartReview }: WeaknessRankingProps) {
   return (
     <section className="rounded-[2rem] bg-white p-6 shadow-card ring-1 ring-slate-100">
       <div className="flex flex-wrap items-center justify-between gap-3">
@@ -80,6 +85,17 @@ export function WeaknessRanking({ sections }: { sections: SectionStats[] }) {
                   ))
                 )}
               </div>
+              {onStartReview ? (
+                <div className="mt-5 border-t border-slate-200 pt-4 text-right">
+                  <button
+                    type="button"
+                    onClick={() => onStartReview(section)}
+                    className="min-h-12 rounded-2xl bg-ink px-5 py-3 text-sm font-semibold text-white transition hover:bg-slate-900"
+                  >
+                    開始複習
+                  </button>
+                </div>
+              ) : null}
             </article>
           ))
         )}

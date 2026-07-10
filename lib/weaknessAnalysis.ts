@@ -1,5 +1,11 @@
 import { getQuestionPrimaryTag } from "./analysisPrimaryTag";
-import type { Attempt, Question, QuizSession, SubjectName } from "../types/quiz";
+import type {
+  Attempt,
+  Question,
+  QuizSession,
+  QuizSettings,
+  SubjectName
+} from "../types/quiz";
 
 const DAY_MS = 24 * 60 * 60 * 1000;
 const DEFAULT_RECENT_DAYS = 14;
@@ -47,6 +53,12 @@ export type WeaknessAnalysisResult = {
   recentUniqueQuestions: number;
   subjectSummaries: WeaknessSubjectSummary[];
   concepts: WeaknessConcept[];
+};
+
+type WeaknessPracticeSettingsInput = {
+  subject: SubjectName;
+  primaryTag: string;
+  questionOrder: string[];
 };
 
 type WeaknessAnalysisInput = {
@@ -291,6 +303,28 @@ export function analyzeRecentWeakness({
           right.repeatedWrong - left.repeatedWrong ||
           left.primaryTag.localeCompare(right.primaryTag)
       )
+  };
+}
+
+export function buildWeaknessPracticeSettings({
+  subject,
+  primaryTag,
+  questionOrder
+}: WeaknessPracticeSettingsInput): QuizSettings {
+  return {
+    mode: "random",
+    questionCount: questionOrder.length,
+    sessionName: primaryTag,
+    stopAfterReview: true,
+    subjectFilter: subject,
+    subjectFilters: [subject],
+    excludeAiGenerated: true,
+    customQuestionIds: questionOrder,
+    priorityQuestionIds: questionOrder,
+    customPoolLabel: `考前弱點：${primaryTag}`,
+    strictCustomQuestionPool: true,
+    preserveCustomQuestionOrder: true,
+    enableConfidenceCalibration: true
   };
 }
 

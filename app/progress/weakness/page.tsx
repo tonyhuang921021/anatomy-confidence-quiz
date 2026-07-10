@@ -10,6 +10,7 @@ import { buildNewQuizHref } from "@/lib/startSettingsUrl";
 import { loadCompletedSessionsAcrossUserScopes } from "@/lib/storage";
 import {
   analyzeRecentWeakness,
+  buildWeaknessPracticeSettings,
   buildWeaknessQuestionOrder,
   type WeaknessAnalysisResult,
   type WeaknessConcept
@@ -17,13 +18,11 @@ import {
 import type { Question, QuizSession, SubjectName } from "@/types/quiz";
 
 const ANALYSIS_SUBJECTS = [...MED1_SUBJECTS, ...MED2_SUBJECTS];
-const ANALYSIS_SUBJECT_STORAGE_KEY = "preExamWeaknessSelectedSubjectsV1";
 const ALL_ANALYSIS_QUESTIONS = ANALYSIS_SUBJECTS.flatMap(
   (subject) => subjectRegistry[subject].questions
 );
 
 type AnalysisStage =
-  | "selecting"
   | "syncing"
   | "loading"
   | "indexing"
@@ -47,30 +46,6 @@ function formatDateTime(value: string | null) {
   });
 }
 
-function readStoredSubjects() {
-  try {
-    const raw = window.localStorage.getItem(ANALYSIS_SUBJECT_STORAGE_KEY);
-    if (!raw) return [] as SubjectName[];
-    const parsed = JSON.parse(raw) as unknown;
-    if (!Array.isArray(parsed)) return [];
-    const allowed = new Set<SubjectName>(ANALYSIS_SUBJECTS);
-    return parsed.filter(
-      (subject): subject is SubjectName =>
-        typeof subject === "string" && allowed.has(subject as SubjectName)
-    );
-  } catch {
-    return [] as SubjectName[];
-  }
-}
-
-function saveStoredSubjects(subjects: SubjectName[]) {
-  try {
-    window.localStorage.setItem(ANALYSIS_SUBJECT_STORAGE_KEY, JSON.stringify(subjects));
-  } catch {
-    // The current visit can still use the selected subjects when storage is unavailable.
-  }
-}
-
 function nextPaint() {
   return new Promise<void>((resolve) => window.setTimeout(resolve, 0));
 }
@@ -85,38 +60,23 @@ export default function WeaknessAnalysisPage() {
     syncVersion,
     refreshCloudData
   } = useAuth();
-  const [selectionReady, setSelectionReady] = useState(false);
-  const [draftSubjects, setDraftSubjects] = useState<SubjectName[]>([]);
-  const [activeSubjects, setActiveSubjects] = useState<SubjectName[]>([]);
   const [analysisRevision, setAnalysisRevision] = useState(0);
   const [sessions, setSessions] = useState<QuizSession[]>([]);
   const [result, setResult] = useState<WeaknessAnalysisResult | null>(null);
   const [expandedSubject, setExpandedSubject] = useState<SubjectName | null>(null);
   const [progress, setProgress] = useState<AnalysisProgress>({
-    stage: "selecting",
-    message: "選擇要納入分析的科目",
-    progress: 0
+    stage: "syncing",
+    message: "正在讀取完整作答紀錄",
+    progress: 12
   });
   const lastAnalysisKeyRef = useRef("");
-  const activeSubjectKey = activeSubjects.join("|");
-  const hasAnalysisScope = selectionReady && activeSubjects.length > 0;
-  const cloudHydrating = useCloudHistoryHydration(
-    hasAnalysisScope && Boolean(user?.id),
-    { force: true, readRemoteOnly: true }
-  );
+  const cloudHydrating = useCloudHistoryHydration(Boolean(user?.id), {
+    force: true,
+    readRemoteOnly: true
+  });
 
   useEffect(() => {
-    const storedSubjects = readStoredSubjects();
-    setDraftSubjects(storedSubjects);
-    setActiveSubjects(storedSubjects);
-    setSelectionReady(true);
-    if (storedSubjects.length > 0) {
-      setProgress({ stage: "syncing", message: "正在讀取完整作答紀錄", progress: 12 });
-    }
-  }, []);
-
-  useEffect(() => {
-    if (!selectionReady || activeSubjects.length === 0 || authLoading) return;
+    if (authLoading) return;
     if (cloudHydrating || (user?.id && syncStatus === "syncing")) {
       setProgress({ stage: "syncing", message: "正在讀取完整雲端作答紀錄", progress: 12 });
       return;
@@ -131,7 +91,7 @@ export default function WeaknessAnalysisPage() {
       return;
     }
 
-    const analysisKey = `${user?.id ?? "guest"}:${syncVersion}:${activeSubjectKey}:${analysisRevision}`;
+    const analysisKey = `${user?.id ?? "guest"}:${syncVersion}:${analysisRevision}`;
     if (lastAnalysisKeyRef.current === analysisKey) return;
     lastAnalysisKeyRef.current = analysisKey;
     let cancelled = false;
@@ -161,7 +121,7 @@ export default function WeaknessAnalysisPage() {
 
       setProgress({
         stage: "calculating",
-        message: `正在分析 ${activeSubjects.length} 科的近 14 天作答`,
+        message: "正在分析全部 10 科的近 14 天作答",
         progress: 86
       });
       await nextPaint();
@@ -170,7 +130,7 @@ export default function WeaknessAnalysisPage() {
       const nextResult = analyzeRecentWeakness({
         questions: ALL_ANALYSIS_QUESTIONS,
         sessions: completedSessions,
-        selectedSubjects: activeSubjects
+        selectedSubjects: ANALYSIS_SUBJECTS
       });
       if (cancelled) return;
       setResult(nextResult);
@@ -182,23 +142,15 @@ export default function WeaknessAnalysisPage() {
       cancelled = true;
     };
   }, [
-    activeSubjectKey,
-    activeSubjects,
     analysisRevision,
     authLoading,
     cloudHydrating,
-    selectionReady,
     syncError,
     syncStatus,
     syncVersion,
     user?.id
   ]);
 
-  const hasPendingScopeChange = useMemo(
-    () =>
-      [...draftSubjects].sort().join("|") !== [...activeSubjects].sort().join("|"),
-    [activeSubjects, draftSubjects]
-  );
   const expandedConcepts = useMemo(
     () =>
       expandedSubject && result
@@ -208,23 +160,6 @@ export default function WeaknessAnalysisPage() {
         : [],
     [expandedSubject, result]
   );
-
-  function toggleSubject(subject: SubjectName) {
-    setDraftSubjects((current) =>
-      current.includes(subject)
-        ? current.filter((item) => item !== subject)
-        : ANALYSIS_SUBJECTS.filter((item) => item === subject || current.includes(item))
-    );
-  }
-
-  function applySubjectScope() {
-    if (draftSubjects.length === 0) return;
-    const nextSubjects = ANALYSIS_SUBJECTS.filter((subject) => draftSubjects.includes(subject));
-    saveStoredSubjects(nextSubjects);
-    setExpandedSubject(null);
-    setActiveSubjects(nextSubjects);
-    setAnalysisRevision((value) => value + 1);
-  }
 
   async function retryCloudRead() {
     if (!user?.id) {
@@ -251,21 +186,13 @@ export default function WeaknessAnalysisPage() {
     if (questionOrder.length === 0) return;
 
     router.push(
-      buildNewQuizHref({
-        mode: "random",
-        questionCount: questionOrder.length,
-        sessionName: concept.primaryTag,
-        stopAfterReview: true,
-        subjectFilter: concept.subject,
-        subjectFilters: [concept.subject],
-        excludeAiGenerated: true,
-        customQuestionIds: questionOrder,
-        priorityQuestionIds: questionOrder,
-        customPoolLabel: `考前弱點：${concept.primaryTag}`,
-        strictCustomQuestionPool: true,
-        preserveCustomQuestionOrder: true,
-        enableConfidenceCalibration: true
-      })
+      buildNewQuizHref(
+        buildWeaknessPracticeSettings({
+          subject: concept.subject,
+          primaryTag: concept.primaryTag,
+          questionOrder
+        })
+      )
     );
   }
 
@@ -284,64 +211,7 @@ export default function WeaknessAnalysisPage() {
         </Link>
       </header>
 
-      <section className="border-b border-slate-200 py-7">
-        <div className="flex flex-wrap items-end justify-between gap-4">
-          <div>
-            <h2 className="text-xl font-semibold text-ink">分析科目</h2>
-            {activeSubjects.length > 0 ? (
-              <p className="mt-2 text-sm text-slate-500">已選 {activeSubjects.length} 科</p>
-            ) : null}
-          </div>
-          <div className="flex gap-2">
-            <button
-              type="button"
-              onClick={() => setDraftSubjects([...ANALYSIS_SUBJECTS])}
-              className="min-h-10 px-3 text-sm font-semibold text-brand-700"
-            >
-              全選
-            </button>
-            <button
-              type="button"
-              onClick={() => setDraftSubjects([])}
-              className="min-h-10 px-3 text-sm font-semibold text-slate-600"
-            >
-              清除
-            </button>
-          </div>
-        </div>
-
-        <div className="mt-4 flex flex-wrap gap-2">
-          {ANALYSIS_SUBJECTS.map((subject) => {
-            const selected = draftSubjects.includes(subject);
-            return (
-              <button
-                key={subject}
-                type="button"
-                aria-pressed={selected}
-                onClick={() => toggleSubject(subject)}
-                className={`min-h-11 rounded-full px-4 py-2 text-sm font-semibold transition ${
-                  selected
-                    ? "bg-ink text-white"
-                    : "bg-white text-slate-600 ring-1 ring-slate-200 hover:bg-slate-50"
-                }`}
-              >
-                {subjectRegistry[subject].label.replace("（歸醫學二）", "")}
-              </button>
-            );
-          })}
-        </div>
-
-        <button
-          type="button"
-          disabled={draftSubjects.length === 0 || (!hasPendingScopeChange && Boolean(result))}
-          onClick={applySubjectScope}
-          className="mt-5 min-h-12 rounded-2xl bg-brand-600 px-5 py-3 text-sm font-semibold text-white transition hover:bg-brand-700 disabled:cursor-not-allowed disabled:opacity-40"
-        >
-          {activeSubjects.length === 0 ? "開始分析" : "套用分析科目"}
-        </button>
-      </section>
-
-      {activeSubjects.length > 0 && progress.stage !== "ready" ? (
+      {progress.stage !== "ready" ? (
         <section className="py-10">
           <div className="mx-auto max-w-2xl">
             <p className="text-center text-base font-semibold text-ink">{progress.message}</p>

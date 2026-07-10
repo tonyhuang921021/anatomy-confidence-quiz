@@ -3,6 +3,7 @@ import test from "node:test";
 import type { Attempt, Question, QuizSession } from "../types/quiz";
 import {
   analyzeRecentWeakness,
+  buildWeaknessPracticeSettings,
   buildWeaknessQuestionOrder
 } from "./weaknessAnalysis";
 
@@ -190,6 +191,22 @@ test("複習題目先看近年，再以未做題為主並穿插仍易錯題", ()
   });
 
   assert.deepEqual(order, ["new-1", "new-2", "risk", "new-3", "stable", "older-new"]);
+});
+
+test("弱點複習使用可中斷且會正常記錄的獨立題池設定", () => {
+  const settings = buildWeaknessPracticeSettings({
+    subject: "生理學",
+    primaryTag: "生理學－腎臟、水電解質與酸鹼",
+    questionOrder: ["q-1", "q-2", "q-3"]
+  });
+
+  assert.equal(settings.mode, "random");
+  assert.equal(settings.stopAfterReview, true);
+  assert.equal(settings.strictCustomQuestionPool, true);
+  assert.equal(settings.preserveCustomQuestionOrder, true);
+  assert.equal(settings.questionCount, 3);
+  assert.deepEqual(settings.customQuestionIds, ["q-1", "q-2", "q-3"]);
+  assert.equal(settings.customPoolLabel, "考前弱點：生理學－腎臟、水電解質與酸鹼");
 });
 
 test("九千筆歷史仍完整納入，但近期排名只看不同題目", () => {

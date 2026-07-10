@@ -1,14 +1,17 @@
+import { getQuestionPrimaryTag } from "./analysisPrimaryTag";
 import type { Question } from "@/types/quiz";
 
 type RelatedQuestionCandidate = {
   question: Question;
   conceptKey: string;
+  primaryTagKey: string;
   chapterKey: string;
   sectionKey: string;
 };
 
 export type RelatedQuestionIndex = {
-  candidates: RelatedQuestionCandidate[];
+  candidatesByPrimaryTag: Map<string, RelatedQuestionCandidate[]>;
+  candidatesBySection: Map<string, RelatedQuestionCandidate[]>;
 };
 
 const RELATED_QUESTION_STOP_TOKENS = new Set([
@@ -48,6 +51,11 @@ function getConceptKey(question: Question) {
 
 function getChapterKey(question: Question) {
   return `${question.subject ?? ""}__${question.chapter ?? ""}`;
+}
+
+function getPrimaryTagKey(question: Question) {
+  const primaryTag = getQuestionPrimaryTag(question);
+  return primaryTag ? `${question.subject ?? ""}__${primaryTag}` : "";
 }
 
 function getSectionKey(question: Question) {
@@ -122,16 +130,22 @@ function getRelatedQuestionScore(currentQuestion: Question, currentTokens: Set<s
 
   const conceptKey = getConceptKey(currentQuestion);
   const sameConcept = Boolean(conceptKey && conceptKey === candidate.conceptKey);
+  const currentPrimaryTagKey = getPrimaryTagKey(currentQuestion);
+  const samePrimaryTag = Boolean(
+    currentPrimaryTagKey && currentPrimaryTagKey === candidate.primaryTagKey
+  );
   const sameChapter = getChapterKey(currentQuestion) === candidate.chapterKey;
   const sameSection = getSectionKey(currentQuestion) === candidate.sectionKey;
   const tokenScore = getTokenOverlapScore(currentTokens, buildQuestionTokens(candidateQuestion));
-  const conceptHasTextSupport = sameSection || sameChapter || tokenScore >= 16;
+  const conceptHasTextSupport = samePrimaryTag || sameSection || sameChapter || tokenScore >= 16;
 
-  if (!sameSection && tokenScore < 16) return 0;
-  if (!sameSection && !sameChapter && tokenScore < 22) return 0;
+  if (samePrimaryTag && tokenScore < 6) return 0;
+  if (!samePrimaryTag && !sameSection && tokenScore < 16) return 0;
+  if (!samePrimaryTag && !sameSection && !sameChapter && tokenScore < 22) return 0;
 
   let score = tokenScore;
-  if (sameSection) score += 32;
+  if (samePrimaryTag) score += 40;
+  else if (sameSection) score += 32;
   else if (sameChapter) score += 12;
   if (sameConcept && conceptHasTextSupport) score += 8;
   return score;
@@ -143,16 +157,35 @@ export function buildRelatedQuestionIndex(allQuestions: Question[]): RelatedQues
     .map((question) => ({
       question,
       conceptKey: getConceptKey(question),
+      primaryTagKey: getPrimaryTagKey(question),
       chapterKey: getChapterKey(question),
       sectionKey: getSectionKey(question)
     }));
+  const candidatesByPrimaryTag = new Map<string, RelatedQuestionCandidate[]>();
+  const candidatesBySection = new Map<string, RelatedQuestionCandidate[]>();
 
-  return { candidates };
+  for (const candidate of candidates) {
+    if (candidate.primaryTagKey) {
+      const primaryTagBucket = candidatesByPrimaryTag.get(candidate.primaryTagKey) ?? [];
+      primaryTagBucket.push(candidate);
+      candidatesByPrimaryTag.set(candidate.primaryTagKey, primaryTagBucket);
+    }
+    const sectionBucket = candidatesBySection.get(candidate.sectionKey) ?? [];
+    sectionBucket.push(candidate);
+    candidatesBySection.set(candidate.sectionKey, sectionBucket);
+  }
+
+  return { candidatesByPrimaryTag, candidatesBySection };
 }
 
 export function getRelatedQuestions(currentQuestion: Question, index: RelatedQuestionIndex, limit = 4) {
   const currentTokens = buildQuestionTokens(currentQuestion);
-  const ranked = index.candidates
+  const primaryTagKey = getPrimaryTagKey(currentQuestion);
+  const sectionKey = getSectionKey(currentQuestion);
+  const candidatePool = primaryTagKey
+    ? index.candidatesByPrimaryTag.get(primaryTagKey) ?? []
+    : index.candidatesBySection.get(sectionKey) ?? [];
+  const ranked = candidatePool
     .filter((candidate) => candidate.question.subject === currentQuestion.subject)
     .map((candidate) => ({
       question: candidate.question,
