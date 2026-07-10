@@ -55,11 +55,14 @@ type WeaknessAnalysisInput = {
   selectedSubjects: SubjectName[];
   now?: Date;
   recentDays?: number;
-  conceptLimit?: number;
 };
 
 function round(value: number) {
   return Math.round(value * 10) / 10;
+}
+
+function conceptKey(subject: SubjectName, primaryTag: string) {
+  return `${subject}\u0000${primaryTag}`;
 }
 
 function attemptTime(attempt?: Attempt | null) {
@@ -144,10 +147,8 @@ export function analyzeRecentWeakness({
   sessions,
   selectedSubjects,
   now = new Date(),
-  recentDays = DEFAULT_RECENT_DAYS,
-  conceptLimit = 5
+  recentDays = DEFAULT_RECENT_DAYS
 }: WeaknessAnalysisInput): WeaknessAnalysisResult {
-  const selectedSubjectSet = new Set(selectedSubjects);
   const eligibleQuestions = questions.filter(
     (question) => question.sourceType !== "AI_GENERATED"
   );
@@ -169,9 +170,10 @@ export function analyzeRecentWeakness({
   for (const question of eligibleQuestions) {
     const primaryTag = getQuestionPrimaryTag(question);
     if (!primaryTag) continue;
+    const key = conceptKey(question.subject, primaryTag);
     availableQuestionCountByTag.set(
-      primaryTag,
-      (availableQuestionCountByTag.get(primaryTag) ?? 0) + 1
+      key,
+      (availableQuestionCountByTag.get(key) ?? 0) + 1
     );
   }
 
@@ -239,7 +241,8 @@ export function analyzeRecentWeakness({
         certainWrong,
         uncertainCorrect,
         evidence,
-        availableQuestionCount: availableQuestionCountByTag.get(primaryTag) ?? 0,
+        availableQuestionCount:
+          availableQuestionCountByTag.get(conceptKey(subject, primaryTag)) ?? 0,
         score: round(score)
       });
       eligibleConceptCountBySubject.set(
@@ -281,7 +284,6 @@ export function analyzeRecentWeakness({
     recentUniqueQuestions: recentItems.length,
     subjectSummaries,
     concepts: conceptCandidates
-      .filter((concept) => selectedSubjectSet.has(concept.subject))
       .sort(
         (left, right) =>
           right.score - left.score ||
@@ -289,7 +291,6 @@ export function analyzeRecentWeakness({
           right.repeatedWrong - left.repeatedWrong ||
           left.primaryTag.localeCompare(right.primaryTag)
       )
-      .slice(0, Math.max(1, conceptLimit))
   };
 }
 
