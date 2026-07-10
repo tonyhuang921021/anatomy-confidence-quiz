@@ -113,6 +113,7 @@ export type QuizSettings = {
   customQuestionPayload?: Question[];
   customPoolLabel?: string;
   strictCustomQuestionPool?: boolean;
+  preserveCustomQuestionOrder?: boolean;
   enableConfidenceCalibration?: boolean;
   chapter?: string;
   section?: string;

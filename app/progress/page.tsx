@@ -256,18 +256,6 @@ export default function ProgressPage() {
     [med1Progress, med2Progress]
   );
 
-  const allSubjects = [...med1Progress, ...med2Progress];
-  const lowCompletion = [...allSubjects]
-    .sort((a, b) => a.completionRate - b.completionRate || a.masteryScore - b.masteryScore)
-    .slice(0, 5);
-  const unstable = allSubjects
-    .filter((subject) => subject.completionRate >= 80 && subject.masteryScore < 70)
-    .sort((a, b) => a.masteryScore - b.masteryScore)
-    .slice(0, 5);
-  const mastered = [...allSubjects]
-    .filter((subject) => subject.attemptedQuestions > 0)
-    .sort((a, b) => b.masteryScore - a.masteryScore)
-    .slice(0, 5);
   const showCloudHistoryLoading = Boolean(user?.id && cloudHistoryHydrating && sessions.length === 0);
 
   return (
@@ -289,10 +277,10 @@ export default function ProgressPage() {
               返回首頁
             </Link>
             <Link
-              href="/start"
+              href="/progress/weakness"
               className="min-h-12 rounded-2xl bg-brand-600 px-5 py-4 text-sm font-semibold text-white transition hover:bg-brand-700"
             >
-              開始測驗
+              弱點分析
             </Link>
           </div>
         </div>
@@ -341,52 +329,6 @@ export default function ProgressPage() {
 
       {showCloudHistoryLoading ? null : (
         <>
-          <section className="mt-8 grid gap-6 xl:grid-cols-3">
-            <div className="rounded-[2rem] bg-white p-6 shadow-card ring-1 ring-slate-100">
-              <h2 className="text-xl font-semibold text-ink">完成度最低的科目</h2>
-              <div className="mt-4 grid gap-3">
-                {lowCompletion.map((subject) => (
-                  <div key={subject.subject} className="rounded-2xl bg-slate-50 p-4 text-sm text-slate-700">
-                    <p className="font-semibold">{subject.label}</p>
-                    <p className="mt-2">完成度 {subject.completionRate}% ・ 剩 {getRemainingQuestions(subject)} 題</p>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            <div className="rounded-[2rem] bg-white p-6 shadow-card ring-1 ring-slate-100">
-              <h2 className="text-xl font-semibold text-ink">練過但不穩的科目</h2>
-              <div className="mt-4 grid gap-3">
-                {unstable.length === 0 ? (
-                  <p className="rounded-2xl bg-slate-50 p-4 text-sm text-slate-600">目前沒有落在這個區間的科目。</p>
-                ) : (
-                  unstable.map((subject) => (
-                    <div key={subject.subject} className="rounded-2xl bg-slate-50 p-4 text-sm text-slate-700">
-                      <p className="font-semibold">{subject.label}</p>
-                      <p className="mt-2">掌握度 {subject.masteryScore}</p>
-                    </div>
-                  ))
-                )}
-              </div>
-            </div>
-
-            <div className="rounded-[2rem] bg-white p-6 shadow-card ring-1 ring-slate-100">
-              <h2 className="text-xl font-semibold text-ink">掌握度最高的科目</h2>
-              <div className="mt-4 grid gap-3">
-                {mastered.length === 0 ? (
-                  <p className="rounded-2xl bg-slate-50 p-4 text-sm text-slate-600">還沒有足夠資料可判定。</p>
-                ) : (
-                  mastered.map((subject) => (
-                    <div key={subject.subject} className="rounded-2xl bg-slate-50 p-4 text-sm text-slate-700">
-                      <p className="font-semibold">{subject.label}</p>
-                      <p className="mt-2">掌握度 {subject.masteryScore}</p>
-                    </div>
-                  ))
-                )}
-              </div>
-            </div>
-          </section>
-
           <div className="mt-8 space-y-5">
             {groups.map((group) => {
               const isGroupOpen = openGroups[group.key];

@@ -108,6 +108,32 @@ test("開始頁帶入剩餘未做題時，散題要優先照這批題目往前�
   assert.deepEqual(order.slice(0, priorityQuestionIds.length), priorityQuestionIds);
 });
 
+test("弱點分析指定的整池順序不會被散題隨機排序洗掉", () => {
+  const questions = Array.from({ length: 12 }, (_, index) => makeQuestion(`focus-${index + 1}`));
+  const customQuestionIds = [
+    "focus-12",
+    "focus-10",
+    "focus-8",
+    "focus-6",
+    "focus-4",
+    "focus-2",
+    "focus-11",
+    "focus-9",
+    "focus-7",
+    "focus-5",
+    "focus-3",
+    "focus-1"
+  ];
+  const order = createQuestionOrder(questions, [], {
+    ...baseSettings,
+    questionCount: 10,
+    customQuestionIds,
+    preserveCustomQuestionOrder: true
+  });
+
+  assert.deepEqual(order, customQuestionIds.slice(0, 10));
+});
+
 test("開始頁帶入剩餘未做題時，散題會交錯不同考卷來源", () => {
   const questions = [
     makePaperQuestion("p1-q1", "P1", 1),
