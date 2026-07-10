@@ -100,7 +100,20 @@ test("大型 ID 清單即使暫存失敗也能從 URL 還原", () => {
   });
 });
 
-test("真的超大且暫存失敗時會回傳錯誤參數，避免測驗頁讀舊設定", () => {
+test("上千題的共同題號前綴會壓縮後直接交接", () => {
+  withMockWindow(new MemoryStorage(), () => {
+    const settings = makeReviewSettings(1600);
+    const href = buildNewQuizHref(settings);
+
+    assert.match(href, /startSettings=/);
+    const resolved = resolveStartSettingsFromSearchParams(getHrefSearchParams(href));
+    assert.equal(resolved.error, undefined);
+    assert.equal(resolved.settings?.customQuestionIds?.length, 1600);
+    assert.equal(resolved.settings?.customQuestionIds?.at(-1), "MOEX-TEST-PHARMA-Q1600");
+  });
+});
+
+test("真的超大且暫存失敗時仍可用同頁記憶體交接", () => {
   const failingStorage = {
     getItem: () => null,
     setItem: () => {
@@ -131,10 +144,35 @@ test("真的超大且暫存失敗時會回傳錯誤參數，避免測驗頁讀�
     };
     const href = buildNewQuizHref(hugeSettings);
 
-    assert.match(href, /startSettingsError=too-large/);
+    assert.match(href, /startSettingsToken=/);
 
     const resolved = resolveStartSettingsFromSearchParams(getHrefSearchParams(href));
-    assert.equal(resolved.settings, null);
-    assert.equal(resolved.error, "too-large");
+    assert.equal(resolved.error, undefined);
+    assert.equal(resolved.settings?.customQuestionPayload?.length, 80);
   });
+});
+
+test("沒有瀏覽器環境時，無法交接的巨大資料仍明確回報錯誤", () => {
+  const hugeSettings: QuizSettings = {
+    ...makeReviewSettings(80),
+    customQuestionPayload: Array.from({ length: 80 }, (_, index) => ({
+      id: `SSR-HUGE-Q${index}`,
+      subject: "藥理學",
+      chapter: "大型題池",
+      section: "暫存測試",
+      stem: "很長的題幹".repeat(80),
+      options: {
+        A: "A".repeat(80),
+        B: "B".repeat(80),
+        C: "C".repeat(80),
+        D: "D".repeat(80)
+      },
+      answer: "A",
+      explanation: "很長的詳解".repeat(80),
+      testedConcept: "大型設定測試"
+    }))
+  };
+
+  const href = buildNewQuizHref(hugeSettings);
+  assert.match(href, /startSettingsError=too-large/);
 });

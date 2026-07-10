@@ -9,6 +9,10 @@ import moexMed1ReclassifiedV5 from "@/data/sources/moex_med1_100_115_reclassifie
 import moexMed1Requested149ReclassificationPatch from "@/data/sources/moex_med1_requested_149_reclassification_patch.json";
 import moexMedStage2Merged0013100 from "@/data/sources/moex_med_stage2_detailed_merged_001_3100_classified_v3.json";
 import questionMediaManifest from "@/data/sources/question_media_manifest.json";
+import {
+  applyAnalysisPrimaryTagClassification,
+  applyClassificationOverrideWithPrimaryTagPriority
+} from "@/lib/analysisPrimaryTag";
 import type {
   OptionKey,
   Question,
@@ -1941,7 +1945,7 @@ export const canonicalQuestionBank: Question[] = dedupeQuestionBank([
   ...med1RequestedPatchQuestions,
   ...medStage2Questions,
   ...manualInjectedQuestions
-]);
+]).map(applyAnalysisPrimaryTagClassification);
 
 export const allAnatomyQuestions: Question[] = canonicalQuestionBank.filter(
   (question) => question.subject === "解剖學"
@@ -2127,15 +2131,7 @@ export function applyQuestionClassificationOverride(
   question: Question,
   override?: QuestionClassificationOverride | null
 ) {
-  if (!override) return question;
-
-  return {
-    ...question,
-    subject: override.subject,
-    chapter: override.chapter,
-    section: override.section,
-    primaryTag: override.section
-  };
+  return applyClassificationOverrideWithPrimaryTagPriority(question, override);
 }
 
 export function applyQuestionClassificationOverrides(

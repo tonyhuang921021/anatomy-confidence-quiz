@@ -5,9 +5,15 @@ const START_SETTINGS_HANDOFF_TTL_MS = 10 * 60 * 1000;
 const MAX_INLINE_START_SETTINGS_LENGTH = 12_000;
 const CUSTOM_QUESTION_ID_SEPARATOR = "|";
 
+type PackedQuestionIdSequence = {
+  version: 2;
+  prefixes: Array<[prefix: string, numberWidth: number]>;
+  sequence: string;
+};
+
 type StartSettingsTransport = Omit<QuizSettings, "customQuestionIds"> & {
   customQuestionIds?: string[];
-  customQuestionIdsPacked?: string;
+  customQuestionIdsPacked?: string | PackedQuestionIdSequence;
 };
 
 type StartSettingsHandoffPayload = {
@@ -15,10 +21,73 @@ type StartSettingsHandoffPayload = {
   settings: QuizSettings;
 };
 
+const memoryHandoffs = new Map<string, StartSettingsHandoffPayload>();
+
 export type StartSettingsResolution = {
   settings: QuizSettings | null;
   error?: "invalid" | "missing-handoff" | "too-large";
 };
+
+function packQuestionIds(questionIds: string[]): PackedQuestionIdSequence {
+  const prefixes: Array<[string, number]> = [];
+  const prefixIndexMap = new Map<string, number>();
+  const sequence = questionIds.map((questionId) => {
+    const match = questionId.match(/^(.*-Q)(\d+)$/);
+    if (!match) return `!${encodeURIComponent(questionId)}`;
+
+    const prefix = match[1];
+    const numberWidth = match[2].length;
+    const prefixKey = `${prefix}\u0000${numberWidth}`;
+    let prefixIndex = prefixIndexMap.get(prefixKey);
+    if (prefixIndex === undefined) {
+      prefixIndex = prefixes.length;
+      prefixIndexMap.set(prefixKey, prefixIndex);
+      prefixes.push([prefix, numberWidth]);
+    }
+
+    return `${prefixIndex.toString(36)}.${Number.parseInt(match[2], 10).toString(36)}`;
+  });
+
+  return {
+    version: 2,
+    prefixes,
+    sequence: sequence.join(",")
+  };
+}
+
+function unpackQuestionIds(packed: string | PackedQuestionIdSequence) {
+  if (typeof packed === "string") {
+    return packed
+      .split(CUSTOM_QUESTION_ID_SEPARATOR)
+      .map((id) => id.trim())
+      .filter(Boolean);
+  }
+
+  if (packed.version !== 2 || !Array.isArray(packed.prefixes) || typeof packed.sequence !== "string") {
+    return [];
+  }
+
+  return packed.sequence
+    .split(",")
+    .filter(Boolean)
+    .map((token) => {
+      if (token.startsWith("!")) {
+        try {
+          return decodeURIComponent(token.slice(1));
+        } catch {
+          return "";
+        }
+      }
+
+      const [prefixIndexText, questionNumberText] = token.split(".");
+      const prefixIndex = Number.parseInt(prefixIndexText, 36);
+      const questionNumber = Number.parseInt(questionNumberText, 36);
+      const prefixItem = packed.prefixes[prefixIndex];
+      if (!prefixItem || !Number.isFinite(questionNumber)) return "";
+      return `${prefixItem[0]}${String(questionNumber).padStart(prefixItem[1], "0")}`;
+    })
+    .filter(Boolean);
+}
 
 function packStartSettings(settings: QuizSettings): StartSettingsTransport {
   if ((settings.customQuestionIds?.length ?? 0) <= 20) return settings;
@@ -26,7 +95,7 @@ function packStartSettings(settings: QuizSettings): StartSettingsTransport {
   const { customQuestionIds, ...rest } = settings;
   return {
     ...rest,
-    customQuestionIdsPacked: customQuestionIds?.join(CUSTOM_QUESTION_ID_SEPARATOR)
+    customQuestionIdsPacked: packQuestionIds(customQuestionIds ?? [])
   };
 }
 
@@ -36,10 +105,7 @@ function unpackStartSettings(settings: StartSettingsTransport): QuizSettings {
   const { customQuestionIdsPacked, ...rest } = settings;
   return {
     ...rest,
-    customQuestionIds: customQuestionIdsPacked
-      .split(CUSTOM_QUESTION_ID_SEPARATOR)
-      .map((id) => id.trim())
-      .filter(Boolean)
+    customQuestionIds: unpackQuestionIds(customQuestionIdsPacked)
   } as QuizSettings;
 }
 
@@ -84,17 +150,20 @@ function createStartSettingsHandoffToken() {
 export function saveStartSettingsHandoff(settings: QuizSettings) {
   if (typeof window === "undefined") return null;
 
+  const token = createStartSettingsHandoffToken();
+  const payload: StartSettingsHandoffPayload = {
+    createdAt: Date.now(),
+    settings
+  };
+  memoryHandoffs.set(token, payload);
+
   try {
-    const token = createStartSettingsHandoffToken();
-    const payload: StartSettingsHandoffPayload = {
-      createdAt: Date.now(),
-      settings
-    };
     window.sessionStorage.setItem(getStartSettingsHandoffKey(token), JSON.stringify(payload));
-    return token;
   } catch {
-    return null;
+    // Same-tab navigation can still use the in-memory handoff when browser storage is full.
   }
+
+  return token;
 }
 
 export function loadStartSettingsHandoff(token: string | null) {
@@ -102,6 +171,13 @@ export function loadStartSettingsHandoff(token: string | null) {
   if (!/^[A-Za-z0-9._:-]+$/.test(token)) return null;
 
   const key = getStartSettingsHandoffKey(token);
+  const memoryPayload = memoryHandoffs.get(token);
+  if (memoryPayload) {
+    if (Date.now() - memoryPayload.createdAt <= START_SETTINGS_HANDOFF_TTL_MS) {
+      return memoryPayload.settings;
+    }
+    memoryHandoffs.delete(token);
+  }
 
   try {
     const raw = window.sessionStorage.getItem(key);
