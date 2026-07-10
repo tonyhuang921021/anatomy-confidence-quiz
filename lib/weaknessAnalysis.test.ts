@@ -132,6 +132,40 @@ test("少量或單一答錯不會硬湊成觀念群弱點", () => {
   assert.equal(result.subjectSummaries[0].dataStatus, "資料有限");
 });
 
+test("不同科目的可分析觀念不會被全站前五名截掉", () => {
+  const physiologyQuestions = Array.from({ length: 30 }, (_, index) =>
+    makeQuestion(`physiology-${index}`, `生理學－測試觀念 ${Math.floor(index / 5) + 1}`)
+  );
+  const pathologyQuestions = Array.from({ length: 5 }, (_, index) => ({
+    ...makeQuestion(`pathology-${index}`, "病理學－腫瘤病理"),
+    subject: "病理學" as const
+  }));
+  const questions = [...physiologyQuestions, ...pathologyQuestions];
+  const sessions = [
+    makeSession(
+      "many-concepts",
+      questions.map((question, index) =>
+        makeAttempt(
+          question.id,
+          index % 5 >= 2,
+          new Date(NOW.getTime() - index * 1_000).toISOString(),
+          4
+        )
+      )
+    )
+  ];
+
+  const result = analyzeRecentWeakness({
+    questions,
+    sessions,
+    selectedSubjects: ["生理學", "病理學"],
+    now: NOW
+  });
+
+  assert.equal(result.concepts.length, 7);
+  assert.equal(result.concepts.filter((concept) => concept.subject === "病理學").length, 1);
+});
+
 test("複習題目先看近年，再以未做題為主並穿插仍易錯題", () => {
   const questions = [
     makeQuestion("new-1", undefined, 2026, 1),

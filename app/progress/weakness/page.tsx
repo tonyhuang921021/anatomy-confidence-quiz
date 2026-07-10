@@ -91,6 +91,7 @@ export default function WeaknessAnalysisPage() {
   const [analysisRevision, setAnalysisRevision] = useState(0);
   const [sessions, setSessions] = useState<QuizSession[]>([]);
   const [result, setResult] = useState<WeaknessAnalysisResult | null>(null);
+  const [expandedSubject, setExpandedSubject] = useState<SubjectName | null>(null);
   const [progress, setProgress] = useState<AnalysisProgress>({
     stage: "selecting",
     message: "選擇要納入分析的科目",
@@ -198,6 +199,15 @@ export default function WeaknessAnalysisPage() {
       [...draftSubjects].sort().join("|") !== [...activeSubjects].sort().join("|"),
     [activeSubjects, draftSubjects]
   );
+  const expandedConcepts = useMemo(
+    () =>
+      expandedSubject && result
+        ? result.concepts
+            .filter((concept) => concept.subject === expandedSubject)
+            .slice(0, 5)
+        : [],
+    [expandedSubject, result]
+  );
 
   function toggleSubject(subject: SubjectName) {
     setDraftSubjects((current) =>
@@ -211,6 +221,7 @@ export default function WeaknessAnalysisPage() {
     if (draftSubjects.length === 0) return;
     const nextSubjects = ANALYSIS_SUBJECTS.filter((subject) => draftSubjects.includes(subject));
     saveStoredSubjects(nextSubjects);
+    setExpandedSubject(null);
     setActiveSubjects(nextSubjects);
     setAnalysisRevision((value) => value + 1);
   }
@@ -369,96 +380,148 @@ export default function WeaknessAnalysisPage() {
               資料截至 {formatDateTime(result.dataThrough)} ・ 完整紀錄 {result.totalHistoryAttempts.toLocaleString("zh-TW")} 筆
               ・ 近 14 天 {result.recentUniqueQuestions.toLocaleString("zh-TW")} 題不同題目
             </p>
-            <div className="mt-5 grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
-              {result.subjectSummaries.map((summary) => (
-                <article key={summary.subject} className="rounded-lg border border-slate-200 bg-white p-4">
-                  <div className="flex items-start justify-between gap-3">
-                    <h2 className="text-lg font-semibold text-ink">{subjectRegistry[summary.subject].label}</h2>
-                    <span className="text-xs font-semibold text-slate-500">{summary.dataStatus}</span>
-                  </div>
-                  <p className="mt-4 text-2xl font-bold text-ink">{summary.correctRate}%</p>
-                  <p className="mt-1 text-sm text-slate-600">
-                    {summary.uniqueQuestions} 題 ・ 答錯 {summary.wrong} 題
-                  </p>
-                  <p className="mt-3 text-xs text-slate-500">
-                    可分析觀念群 {summary.eligibleConceptCount} 個
-                  </p>
-                </article>
-              ))}
-            </div>
-          </section>
-
-          <section className="py-8">
-            <div className="flex flex-wrap items-end justify-between gap-3">
-              <div>
-                <p className="text-sm font-semibold uppercase tracking-[0.18em] text-brand-700">Priority Concepts</p>
-                <h2 className="mt-2 text-2xl font-bold text-ink">優先處理的觀念群</h2>
-              </div>
-              <span className="text-sm text-slate-500">最多顯示 5 個</span>
-            </div>
-
-            {result.concepts.length === 0 ? (
-              <p className="mt-6 rounded-lg border border-slate-200 bg-white p-5 text-sm text-slate-600">
-                目前沒有同時符合近期題數與答錯證據門檻的觀念群。
-              </p>
-            ) : (
-              <div className="mt-6 grid gap-4 lg:grid-cols-2">
-                {result.concepts.map((concept) => (
-                  <article key={`${concept.subject}-${concept.primaryTag}`} className="rounded-lg border border-slate-200 bg-white p-5">
-                    <div className="flex items-start justify-between gap-4">
-                      <div className="min-w-0">
-                        <p className="text-sm font-medium text-slate-500">{concept.subject}</p>
-                        <h3 className="mt-2 break-words text-lg font-semibold text-ink">{concept.primaryTag}</h3>
-                      </div>
-                      <span className="shrink-0 rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-600">
-                        證據{concept.evidence}
+            <div className="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
+              {result.subjectSummaries.map((summary) => {
+                const expanded = expandedSubject === summary.subject;
+                return (
+                  <button
+                    key={summary.subject}
+                    type="button"
+                    aria-expanded={expanded}
+                    aria-controls="expanded-weakness-concepts"
+                    onClick={() =>
+                      setExpandedSubject((current) =>
+                        current === summary.subject ? null : summary.subject
+                      )
+                    }
+                    className={`min-h-[190px] rounded-lg border p-4 text-left transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 focus-visible:ring-offset-2 ${
+                      expanded
+                        ? "border-brand-500 bg-brand-50 shadow-sm"
+                        : "border-slate-200 bg-white hover:border-brand-300 hover:bg-slate-50"
+                    }`}
+                  >
+                    <div className="flex items-start justify-between gap-3">
+                      <h2 className="text-base font-semibold text-ink">
+                        {subjectRegistry[summary.subject].label}
+                      </h2>
+                      <span className="text-xs font-semibold text-slate-500">
+                        {summary.dataStatus}
                       </span>
                     </div>
-
-                    <div className="mt-5 grid grid-cols-2 gap-3 text-sm sm:grid-cols-4">
-                      <div>
-                        <p className="text-slate-500">近 14 天</p>
-                        <p className="mt-1 font-semibold text-ink">{concept.uniqueQuestions} 題</p>
-                      </div>
-                      <div>
-                        <p className="text-slate-500">答對率</p>
-                        <p className="mt-1 font-semibold text-ink">{concept.correctRate}%</p>
-                      </div>
-                      <div>
-                        <p className="text-slate-500">答錯</p>
-                        <p className="mt-1 font-semibold text-ink">{concept.wrong} 題</p>
-                      </div>
-                      <div>
-                        <p className="text-slate-500">重複答錯</p>
-                        <p className="mt-1 font-semibold text-ink">{concept.repeatedWrong} 題</p>
-                      </div>
-                    </div>
-
-                    {concept.certainWrong > 0 || concept.uncertainCorrect > 0 ? (
-                      <p className="mt-4 text-sm text-slate-500">
-                        {concept.certainWrong > 0 ? `很確定但答錯 ${concept.certainWrong} 題` : ""}
-                        {concept.certainWrong > 0 && concept.uncertainCorrect > 0 ? " ・ " : ""}
-                        {concept.uncertainCorrect > 0 ? `不確定但答對 ${concept.uncertainCorrect} 題` : ""}
+                    <p className="mt-4 text-2xl font-bold text-ink">{summary.correctRate}%</p>
+                    <p className="mt-1 text-sm text-slate-600">
+                      {summary.uniqueQuestions} 題 ・ 答錯 {summary.wrong} 題
+                    </p>
+                    <div className="mt-3 flex items-end justify-between gap-3 text-xs">
+                      <p className="text-slate-500">
+                        可分析觀念群 {summary.eligibleConceptCount} 個
                       </p>
-                    ) : null}
-
-                    <div className="mt-5 flex flex-wrap items-center justify-between gap-3 border-t border-slate-100 pt-4">
-                      <span className="text-sm text-slate-500">
-                        共 {concept.availableQuestionCount} 題，可隨時結束
-                      </span>
-                      <button
-                        type="button"
-                        onClick={() => startConceptPractice(concept)}
-                        className="min-h-12 rounded-2xl bg-ink px-5 py-3 text-sm font-semibold text-white transition hover:bg-slate-900"
+                      <span
+                        className={`shrink-0 font-semibold ${
+                          expanded ? "text-brand-700" : "text-slate-500"
+                        }`}
                       >
-                        開始複習
-                      </button>
+                        {expanded ? "收合" : "查看"}
+                      </span>
                     </div>
-                  </article>
-                ))}
-              </div>
-            )}
+                  </button>
+                );
+              })}
+            </div>
           </section>
+
+          {expandedSubject ? (
+            <section id="expanded-weakness-concepts" className="py-8">
+              <div className="flex flex-wrap items-end justify-between gap-3">
+                <div>
+                  <p className="text-sm font-semibold uppercase tracking-[0.18em] text-brand-700">
+                    Priority Concepts
+                  </p>
+                  <h2 className="mt-2 text-2xl font-bold text-ink">
+                    {subjectRegistry[expandedSubject].label}需要複習的觀念
+                  </h2>
+                </div>
+                <span className="text-sm text-slate-500">最多顯示 5 個</span>
+              </div>
+
+              {expandedConcepts.length === 0 ? (
+                <p className="mt-6 rounded-lg border border-slate-200 bg-white p-5 text-sm text-slate-600">
+                  這科目前沒有同時符合近期題數與答錯證據門檻的觀念群。
+                </p>
+              ) : (
+                <div className="mt-6 grid gap-4 lg:grid-cols-2">
+                  {expandedConcepts.map((concept) => (
+                    <article
+                      key={`${concept.subject}-${concept.primaryTag}`}
+                      className="rounded-lg border border-slate-200 bg-white p-5"
+                    >
+                      <div className="flex items-start justify-between gap-4">
+                        <div className="min-w-0">
+                          <p className="text-sm font-medium text-slate-500">{concept.subject}</p>
+                          <h3 className="mt-2 break-words text-lg font-semibold text-ink">
+                            {concept.primaryTag}
+                          </h3>
+                        </div>
+                        <span className="shrink-0 rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-600">
+                          證據{concept.evidence}
+                        </span>
+                      </div>
+
+                      <div className="mt-5 grid grid-cols-2 gap-3 text-sm sm:grid-cols-4">
+                        <div>
+                          <p className="text-slate-500">近 14 天</p>
+                          <p className="mt-1 font-semibold text-ink">
+                            {concept.uniqueQuestions} 題
+                          </p>
+                        </div>
+                        <div>
+                          <p className="text-slate-500">答對率</p>
+                          <p className="mt-1 font-semibold text-ink">{concept.correctRate}%</p>
+                        </div>
+                        <div>
+                          <p className="text-slate-500">答錯</p>
+                          <p className="mt-1 font-semibold text-ink">{concept.wrong} 題</p>
+                        </div>
+                        <div>
+                          <p className="text-slate-500">重複答錯</p>
+                          <p className="mt-1 font-semibold text-ink">
+                            {concept.repeatedWrong} 題
+                          </p>
+                        </div>
+                      </div>
+
+                      {concept.certainWrong > 0 || concept.uncertainCorrect > 0 ? (
+                        <p className="mt-4 text-sm text-slate-500">
+                          {concept.certainWrong > 0
+                            ? `很確定但答錯 ${concept.certainWrong} 題`
+                            : ""}
+                          {concept.certainWrong > 0 && concept.uncertainCorrect > 0
+                            ? " ・ "
+                            : ""}
+                          {concept.uncertainCorrect > 0
+                            ? `不確定但答對 ${concept.uncertainCorrect} 題`
+                            : ""}
+                        </p>
+                      ) : null}
+
+                      <div className="mt-5 flex flex-wrap items-center justify-between gap-3 border-t border-slate-100 pt-4">
+                        <span className="text-sm text-slate-500">
+                          共 {concept.availableQuestionCount} 題，可隨時結束
+                        </span>
+                        <button
+                          type="button"
+                          onClick={() => startConceptPractice(concept)}
+                          className="min-h-12 rounded-2xl bg-ink px-5 py-3 text-sm font-semibold text-white transition hover:bg-slate-900"
+                        >
+                          開始複習
+                        </button>
+                      </div>
+                    </article>
+                  ))}
+                </div>
+              )}
+            </section>
+          ) : null}
         </>
       ) : null}
     </main>
