@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { CopyQuestionPromptButton } from "@/components/CopyQuestionPromptButton";
 import { FormattedQuestionText } from "@/components/FormattedQuestionText";
+import { QuestionPrimaryTagBadge } from "@/components/QuestionPrimaryTagBadge";
 import { StructuredExplanationText } from "@/components/StructuredExplanationText";
 import { useAuth } from "@/components/AuthProvider";
 import { YangmingExplanationPanel } from "@/components/YangmingExplanationPanel";
@@ -13,6 +14,7 @@ import {
 } from "@/lib/storage";
 import { getOrCreateVisitorId } from "@/lib/visitor";
 import { buildQuestionExplanationRequestQuestion } from "@/lib/questionExplanationRequest";
+import { getQuestionPrimaryTag, primaryTagIncludesSubject } from "@/lib/analysisPrimaryTag";
 import type { OptionKey, Question, QuestionExplanationOverride, StudyNoteQuestionLink } from "@/types/quiz";
 
 type Props = {
@@ -40,6 +42,7 @@ export function StudyNoteQuestionCard({ question, link, title }: Props) {
   }
 
   const optionEntries = Object.entries(question.options).filter(([, value]) => Boolean(value));
+  const primaryTag = getQuestionPrimaryTag(question);
   const explanation = explanationOverride?.explanation || question.explanation;
   const optionAnalysis = explanationOverride?.optionAnalysis ?? question.optionAnalysis;
   const memoryTip = explanationOverride?.memoryTip ?? question.memoryTip;
@@ -127,9 +130,13 @@ export function StudyNoteQuestionCard({ question, link, title }: Props) {
         <div className="mt-3 min-w-0 overflow-hidden break-words rounded-2xl bg-white p-4 text-sm leading-7 text-slate-700">
           <div className="flex flex-wrap gap-2 text-xs font-semibold text-slate-500">
             <span>{question.id}</span>
-            <span>{question.subject}</span>
-            <span>{question.chapter}</span>
-            <span>{question.section}</span>
+            {!primaryTag || !primaryTagIncludesSubject(primaryTag, question.subject) ? (
+              <span>{question.subject}</span>
+            ) : null}
+            <QuestionPrimaryTagBadge
+              question={question}
+              className="rounded-full bg-sky-50 px-2.5 py-0.5 text-sky-800 ring-1 ring-sky-100"
+            />
           </div>
           <p className="mt-3 break-words font-semibold text-slate-900">
             <FormattedQuestionText text={question.stem} />

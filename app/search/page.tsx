@@ -6,6 +6,7 @@ import { useAuth } from "@/components/AuthProvider";
 import { CopyQuestionPromptButton } from "@/components/CopyQuestionPromptButton";
 import { QuestionExplanationTabs } from "@/components/QuestionExplanationTabs";
 import { QuestionOptionBlock, QuestionStemBlock } from "@/components/QuestionMediaBlock";
+import { QuestionPrimaryTagBadge } from "@/components/QuestionPrimaryTagBadge";
 import { QuestionReportButton } from "@/components/QuestionIssueReportButton";
 import { SavedQuestionButton } from "@/components/SavedQuestionButton";
 import { StructuredExplanationText } from "@/components/StructuredExplanationText";
@@ -31,6 +32,10 @@ import {
   useSavedQuestionRecords
 } from "@/lib/savedQuestions";
 import { getOrCreateVisitorId } from "@/lib/visitor";
+import {
+  getQuestionPrimaryTag,
+  shouldDisplaySubjectBesidePrimaryTag
+} from "@/lib/analysisPrimaryTag";
 import {
   buildRelatedQuestionContext,
   findPreviousQuestionForContinuation
@@ -104,6 +109,7 @@ function getSearchTerms(question: Question) {
     question.subject,
     question.chapter,
     question.section,
+    getQuestionPrimaryTag(question),
     question.testedConcept,
     question.stem,
     question.explanation,
@@ -524,6 +530,7 @@ export default function SearchPage() {
             subject: question.subject,
             chapter: question.chapter,
             section: question.section,
+            primaryTag: getQuestionPrimaryTag(question),
             stem: question.stem,
             options: question.options,
             explanation: question.explanation,
@@ -715,15 +722,15 @@ export default function SearchPage() {
                 <div className="flex min-w-0 flex-wrap items-start justify-between gap-3">
                   <div className="min-w-0 flex-1">
                     <div className="flex flex-wrap gap-2 text-xs font-semibold">
-                      <span className="rounded-full bg-brand-100 px-3 py-1 text-brand-800">
-                        {question.subject}
-                      </span>
+                      {shouldDisplaySubjectBesidePrimaryTag(renderedQuestion) ? (
+                        <span className="rounded-full bg-brand-100 px-3 py-1 text-brand-800">
+                          {question.subject}
+                        </span>
+                      ) : null}
                       <span className="rounded-full bg-slate-100 px-3 py-1 text-slate-700">
                         {renderedQuestion.sourceYear ?? "未知年份"}
                       </span>
-                      <span className="rounded-full bg-slate-100 px-3 py-1 text-slate-700">
-                        {renderedQuestion.chapter}
-                      </span>
+                      <QuestionPrimaryTagBadge question={renderedQuestion} />
                     </div>
                     <p className="mt-3 whitespace-pre-wrap break-words text-base font-semibold leading-7 text-ink">
                       {renderedQuestion.stem}
@@ -769,9 +776,8 @@ export default function SearchPage() {
                       ? "ALL"
                       : renderedQuestion.answer}
                 </p>
-                <p>
-                  <span className="font-semibold">章節：</span>
-                  {renderedQuestion.chapter} / {renderedQuestion.section}
+                <p className="flex flex-wrap items-center gap-2">
+                  <QuestionPrimaryTagBadge question={renderedQuestion} />
                 </p>
                 <StructuredExplanationText text={renderedQuestion.explanation} label="詳解" compact />
                 <QuestionExplanationTabs question={renderedQuestion} compact className="mt-3" />
@@ -937,9 +943,16 @@ export default function SearchPage() {
                       <span className="rounded-full bg-white px-3 py-1 text-slate-600 ring-1 ring-slate-200">
                         答對 {favoritePracticeItem.record.correctCount} / 2
                       </span>
-                      <span className="rounded-full bg-white px-3 py-1 text-slate-600 ring-1 ring-slate-200">
-                        {favoritePracticeItem.question.subject}
-                      </span>
+                      {shouldDisplaySubjectBesidePrimaryTag(favoritePracticeItem.question) ? (
+                        <span className="rounded-full bg-white px-3 py-1 text-slate-600 ring-1 ring-slate-200">
+                          {favoritePracticeItem.question.subject}
+                        </span>
+                      ) : null}
+                      <QuestionPrimaryTagBadge
+                        question={favoritePracticeItem.question}
+                        prefix=""
+                        className="rounded-full bg-sky-50 px-3 py-1 text-sky-800 ring-1 ring-sky-100"
+                      />
                     </div>
                     <button
                       type="button"
@@ -1066,6 +1079,11 @@ export default function SearchPage() {
                               </span>
                               <span className="text-slate-400">{question.sourceYear ?? "未知年份"}</span>
                               <span className="text-slate-400">{question.subject}</span>
+                              <QuestionPrimaryTagBadge
+                                question={question}
+                                prefix=""
+                                className="text-sky-700"
+                              />
                             </div>
                             <p className="line-clamp-2 break-words text-sm font-semibold leading-6 text-slate-800">
                               {question.stem}

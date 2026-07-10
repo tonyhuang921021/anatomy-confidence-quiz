@@ -7,7 +7,7 @@ export type MasteryAnswerInput = {
   isCorrect: boolean;
   confidence?: number | null;
   questionNumber?: number;
-  question?: Pick<Question, "id" | "subject" | "chapter" | "section"> | null;
+  question?: Pick<Question, "id" | "subject" | "chapter" | "section" | "primaryTag"> | null;
 };
 
 export type MasteryCategoryKey =
@@ -62,6 +62,8 @@ export type MasteryTopicStats = {
   subject: string;
   chapter: string;
   section: string;
+  label: string;
+  usesPrimaryTag: boolean;
   total: number;
   correct: number;
   accuracy: number | null;
@@ -652,6 +654,8 @@ function analyzeTopicStats(answers: MasteryAnswerInput[]): MasteryTopicStats[] {
       subject: string;
       chapter: string;
       section: string;
+      label: string;
+      usesPrimaryTag: boolean;
       answers: MasteryAnswerInput[];
       questionIds: string[];
     }
@@ -659,14 +663,20 @@ function analyzeTopicStats(answers: MasteryAnswerInput[]): MasteryTopicStats[] {
 
   for (const answer of answers) {
     const question = answer.question;
-    if (!question?.subject || !question.chapter || !question.section) continue;
-    const key = `${question.subject}__${question.chapter}__${question.section}`;
+    if (!question?.subject) continue;
+    const primaryTag = question.primaryTag?.trim();
+    if (!primaryTag && (!question.chapter || !question.section)) continue;
+    const key = primaryTag
+      ? `primary-tag__${question.subject}__${primaryTag}`
+      : `legacy__${question.subject}__${question.chapter}__${question.section}`;
     const current =
       topicMap.get(key) ??
       {
         subject: question.subject,
-        chapter: question.chapter,
-        section: question.section,
+        chapter: primaryTag ? "" : question.chapter,
+        section: primaryTag ?? question.section,
+        label: primaryTag ?? `${question.chapter} / ${question.section}`,
+        usesPrimaryTag: Boolean(primaryTag),
         answers: [],
         questionIds: []
       };
@@ -703,6 +713,8 @@ function analyzeTopicStats(answers: MasteryAnswerInput[]): MasteryTopicStats[] {
         subject: topic.subject,
         chapter: topic.chapter,
         section: topic.section,
+        label: topic.label,
+        usesPrimaryTag: topic.usesPrimaryTag,
         total: topic.answers.length,
         correct,
         accuracy,

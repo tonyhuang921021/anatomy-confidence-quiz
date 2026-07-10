@@ -6,6 +6,7 @@ import { CopyQuestionPromptButton } from "@/components/CopyQuestionPromptButton"
 import { getCloudSyncRetryDelayMs } from "@/lib/cloudSyncWriteGuard";
 import { QuestionExplanationTabs } from "@/components/QuestionExplanationTabs";
 import { QuestionOptionBlock, QuestionStemBlock } from "@/components/QuestionMediaBlock";
+import { QuestionPrimaryTagBadge } from "@/components/QuestionPrimaryTagBadge";
 import { QuestionReportButton } from "@/components/QuestionIssueReportButton";
 import { RelatedQuestionsPanel } from "@/components/RelatedQuestionsPanel";
 import { SavedQuestionButton } from "@/components/SavedQuestionButton";
@@ -32,6 +33,7 @@ import {
 } from "@/lib/storage";
 import { getReviewCompletionThresholdPreference } from "@/lib/accountPreferences";
 import { getOrCreateVisitorId } from "@/lib/visitor";
+import { getQuestionPrimaryTag, primaryTagIncludesSubject } from "@/lib/analysisPrimaryTag";
 import { useAuth } from "@/components/AuthProvider";
 import {
   buildRelatedQuestionContext,
@@ -507,6 +509,7 @@ function renderQuestionReview(
   footer: ReactNode,
   relatedQuestionsContent?: () => ReactNode
 ) {
+  const primaryTag = getQuestionPrimaryTag(renderedQuestion);
   const shouldCollapseAiExplanation = hasCollapsibleStructuredExplanation(renderedQuestion.explanation);
   const aiExplanationContent = shouldCollapseAiExplanation ? (
     <StructuredExplanationText
@@ -520,6 +523,14 @@ function renderQuestionReview(
 
   return (
     <div className="mt-4 space-y-3 leading-7">
+      <div className="flex flex-wrap gap-2 text-xs font-semibold">
+        {!primaryTag || !primaryTagIncludesSubject(primaryTag, renderedQuestion.subject) ? (
+          <span className="rounded-full bg-brand-100 px-3 py-1 text-brand-800">
+            {renderedQuestion.subject}
+          </span>
+        ) : null}
+        <QuestionPrimaryTagBadge question={renderedQuestion} />
+      </div>
       <div className="flex min-w-0 flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
         <QuestionStemBlock question={renderedQuestion} className="min-w-0 flex-1" />
         {headerActions}
@@ -1138,6 +1149,7 @@ export function ReviewNotebook({
             subject: question.subject,
             chapter: question.chapter,
             section: question.section,
+            primaryTag: getQuestionPrimaryTag(question),
             stem: question.stem,
             options: question.options,
             explanation: question.explanation,
@@ -1492,9 +1504,10 @@ export function ReviewNotebook({
                                           ? `沒信心 ${index + 1}`
                                           : `完成 ${index + 1}`}
                                     </span>
-                                    <span className="min-w-0 text-sm text-slate-500">
-                                      {renderedQuestion.chapter} / {renderedQuestion.section}
-                                    </span>
+                                    <QuestionPrimaryTagBadge
+                                      question={renderedQuestion}
+                                      className="min-w-0 text-sm text-sky-700"
+                                    />
                                   </div>
                                   <span className="shrink-0 pt-0.5 text-[11px] font-medium text-slate-400 sm:text-xs">
                                     最近作答 {formatTime(item.history.lastAttemptedAt)}

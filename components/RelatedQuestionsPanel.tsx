@@ -3,6 +3,7 @@
 import { useMemo, useState } from "react";
 import { QuestionExplanationTabs } from "@/components/QuestionExplanationTabs";
 import { QuestionOptionBlock, QuestionStemBlock } from "@/components/QuestionMediaBlock";
+import { QuestionPrimaryTagBadge } from "@/components/QuestionPrimaryTagBadge";
 import { SavedQuestionButton } from "@/components/SavedQuestionButton";
 import {
   StructuredExplanationText,
@@ -87,7 +88,12 @@ export function RelatedQuestionsPanel({
         return (
           <details key={`${question.id}-related-${relatedQuestion.id}`} className="rounded-2xl bg-slate-50 p-4">
             <summary className="cursor-pointer font-semibold text-ink">
-              類似題 {index + 1}：{relatedQuestion.chapter} / {relatedQuestion.section}
+              <span>類似題 {index + 1}</span>
+              <QuestionPrimaryTagBadge
+                question={relatedQuestion}
+                prefix=""
+                className="ml-2 inline-flex rounded-full bg-sky-50 px-2.5 py-0.5 text-xs text-sky-800 ring-1 ring-sky-100"
+              />
             </summary>
             <div className="mt-3 space-y-3 text-sm leading-7 text-slate-700">
               <div className="flex min-w-0 items-start gap-3">

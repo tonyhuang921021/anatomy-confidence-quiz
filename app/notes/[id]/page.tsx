@@ -13,6 +13,10 @@ import { loadRecentQuestionSupplementCards } from "@/lib/questionSupplementCards
 import { DEFAULT_QUIZ_SETTINGS } from "@/lib/quizAnalysis";
 import { saveQuizSettings } from "@/lib/storage";
 import { buildStudyNoteQuestionLinkPrompt } from "@/lib/studyNotePrompt";
+import {
+  getQuestionClassificationLabel,
+  getQuestionPrimaryTag
+} from "@/lib/analysisPrimaryTag";
 import { deleteStudyNote, loadStudyNote, parseStudyNoteMetadata, parseStudyNoteQuestionLinkText, updateStudyNote } from "@/lib/studyNotes";
 import type { Question, RecentQuestionSupplementCard, StudyNoteDetail, StudyNoteQuestionLink } from "@/types/quiz";
 
@@ -32,6 +36,7 @@ function buildQuestionSearchText(question: Question) {
     question.subject,
     question.chapter,
     question.section,
+    getQuestionPrimaryTag(question),
     question.testedConcept,
     question.stem,
     question.explanation,
@@ -523,7 +528,7 @@ export default function StudyNoteDetailPage() {
                           {selected ? "已加入 · " : ""}
                           {question.id}
                         </span>
-                        <span className="block break-words">{question.subject} / {question.chapter} / {question.section}</span>
+                        <span className="block break-words">{getQuestionClassificationLabel(question)}</span>
                         <span className="block line-clamp-2">{question.stem}</span>
                       </button>
                     );
@@ -536,7 +541,7 @@ export default function StudyNoteDetailPage() {
                         <div className="flex items-start justify-between gap-2">
                           <div className="min-w-0">
                             <p className="font-bold">{question.id}</p>
-                            <p className="mt-1 text-teal-800">{question.subject} / {question.chapter} / {question.section}</p>
+                            <p className="mt-1 text-teal-800">{getQuestionClassificationLabel(question)}</p>
                           </div>
                           <button type="button" onClick={() => removeQuestionLink(question.id)} className="shrink-0 font-semibold text-rose-700">
                             移除
@@ -612,7 +617,7 @@ export default function StudyNoteDetailPage() {
                           {typeof link.confidence === "number" ? <span className="stat-chip">{Math.round(link.confidence * 100)}%</span> : null}
                         </div>
                         <p className="mt-2 text-xs font-semibold text-slate-500">
-                          {question.subject} / {question.chapter} / {question.section}
+                          {getQuestionClassificationLabel(question)}
                         </p>
                         <p className="mt-2 line-clamp-3 text-sm leading-6 text-slate-700">{question.stem}</p>
                         {link.reason ? <p className="mt-2 rounded-2xl bg-slate-50 px-3 py-2 text-xs leading-5 text-slate-600">{link.reason}</p> : null}

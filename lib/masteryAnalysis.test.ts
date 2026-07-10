@@ -151,3 +151,37 @@ test("答對率達標但高信心錯誤偏高時，摘要提醒正式考分數�
   assert.ok((analysis.highConfidenceErrorRate ?? 0) >= 0.3);
   assert.ok(analysis.summarySentences.join(" ").includes("正式考分數可能被高估"));
 });
+
+test("結果頁弱點會把不同舊小節但相同 primaryTag 的題目合併", () => {
+  const analysis = analyzeMastery([
+    {
+      questionId: "q-renal-1",
+      isCorrect: false,
+      confidence: 4,
+      question: {
+        id: "q-renal-1",
+        subject: "生理學",
+        chapter: "泌尿",
+        section: "腎小球",
+        primaryTag: "腎臟生理"
+      }
+    },
+    {
+      questionId: "q-renal-2",
+      isCorrect: true,
+      confidence: 2,
+      question: {
+        id: "q-renal-2",
+        subject: "生理學",
+        chapter: "體液",
+        section: "清除率",
+        primaryTag: "腎臟生理"
+      }
+    }
+  ]);
+
+  assert.equal(analysis.topicStats.length, 1);
+  assert.equal(analysis.topicStats[0].label, "腎臟生理");
+  assert.equal(analysis.topicStats[0].usesPrimaryTag, true);
+  assert.equal(analysis.topicStats[0].total, 2);
+});

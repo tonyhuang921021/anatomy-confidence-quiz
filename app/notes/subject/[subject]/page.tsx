@@ -37,6 +37,7 @@ import {
 } from "@/lib/studyNotes";
 import { getOrCreateVisitorId } from "@/lib/visitor";
 import { buildQuestionExplanationRequestQuestion } from "@/lib/questionExplanationRequest";
+import { getQuestionPrimaryTag } from "@/lib/analysisPrimaryTag";
 import type {
   OptionKey,
   Question,
@@ -1687,8 +1688,9 @@ export default function SubjectNotesPage() {
                       <div className="flex flex-wrap items-center gap-2 text-xs font-semibold text-slate-500">
                         <span className="font-bold text-slate-950">{question.id}</span>
                         <span>{question.subject}</span>
-                        <span>{question.chapter}</span>
-                        <span>{question.section}</span>
+                        <span className="text-sky-700">
+                          {getQuestionPrimaryTag(question) ?? `${question.chapter} / ${question.section}`}
+                        </span>
                       </div>
                       <p className="mt-3 break-words font-bold text-slate-950">{question.stem}</p>
                       <div className="mt-3 grid gap-2">

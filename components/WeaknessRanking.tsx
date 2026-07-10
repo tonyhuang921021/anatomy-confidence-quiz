@@ -22,13 +22,17 @@ function getSectionTags(section: SectionStats) {
   return tags;
 }
 
+function repeatsSubject(section: SectionStats) {
+  return section.section.replace(/\s+/g, "").startsWith(section.chapter.replace(/\s+/g, ""));
+}
+
 export function WeaknessRanking({ sections }: { sections: SectionStats[] }) {
   return (
     <section className="rounded-[2rem] bg-white p-6 shadow-card ring-1 ring-slate-100">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
           <h2 className="text-xl font-semibold text-ink">弱點排行</h2>
-          <p className="mt-2 text-sm text-slate-500">只保留最需要補強的小節與風險標籤。</p>
+          <p className="mt-2 text-sm text-slate-500">依新的考點分類整理本輪最需要補強的地方。</p>
         </div>
       </div>
 
@@ -49,12 +53,14 @@ export function WeaknessRanking({ sections }: { sections: SectionStats[] }) {
                     <span className="rounded-full bg-brand-100 px-3 py-1 text-xs font-semibold text-brand-800">
                       Top {index + 1}
                     </span>
-                    <span className="text-sm text-slate-500">{section.chapter}</span>
+                    {!repeatsSubject(section) ? (
+                      <span className="text-sm text-slate-500">{section.chapter}</span>
+                    ) : null}
                   </div>
                   <h3 className="mt-3 text-lg font-semibold text-ink">{section.section}</h3>
                 </div>
                 <div className="rounded-2xl bg-white px-4 py-3 text-sm font-semibold text-slate-700">
-                  priorityScore {section.priorityScore}
+                  優先分數 {section.priorityScore}
                 </div>
               </div>
 

@@ -43,6 +43,7 @@ export type Question = {
   answerCreditType?: AnswerCreditType;
   explanation: string;
   testedConcept: string;
+  primaryTag?: string;
   optionAnalysis?: Partial<Record<OptionKey, string>>;
   memoryTip?: string;
   clinicalLink?: string;

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { getQuestionClassificationLabel } from "@/lib/analysisPrimaryTag";
 import { OptionKey, Question } from "@/types/quiz";
 
 type CopyQuestionPromptButtonProps = {
@@ -59,7 +60,7 @@ function buildQuestionPrompt({
     "",
     `題目代碼：${question.id}`,
     `來源：${getQuestionSourceLine(question)}`,
-    `分類：${question.subject} / ${question.chapter} / ${question.section}`,
+    `分類：${getQuestionClassificationLabel(question)}`,
     "",
     "題目：",
     question.stem,

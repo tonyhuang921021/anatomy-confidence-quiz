@@ -72,6 +72,7 @@ import {
   saveQuestionExplanationOverrides
 } from "@/lib/storage";
 import { getOrCreateVisitorId } from "@/lib/visitor";
+import { getQuestionPrimaryTag } from "@/lib/analysisPrimaryTag";
 import {
   Attempt,
   ConfidenceLevel,
@@ -2239,6 +2240,7 @@ export default function QuizPage() {
             subject: question.subject,
             chapter: question.chapter,
             section: question.section,
+            primaryTag: getQuestionPrimaryTag(question),
             stem: question.stem,
             options: question.options,
             explanation: question.explanation,

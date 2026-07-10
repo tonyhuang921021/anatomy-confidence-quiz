@@ -5,6 +5,7 @@ import { useEffect, useMemo, useState } from "react";
 import { useAuth } from "@/components/AuthProvider";
 import { QuestionExplanationTabs } from "@/components/QuestionExplanationTabs";
 import { QuestionOptionBlock, QuestionStemBlock } from "@/components/QuestionMediaBlock";
+import { QuestionPrimaryTagBadge } from "@/components/QuestionPrimaryTagBadge";
 import { SavedQuestionButton } from "@/components/SavedQuestionButton";
 import { StructuredExplanationText } from "@/components/StructuredExplanationText";
 import {
@@ -23,6 +24,7 @@ import {
   loadQuestionExplanationOverrides,
   mergeQuestionExplanationOverrides
 } from "@/lib/storage";
+import { shouldDisplaySubjectBesidePrimaryTag } from "@/lib/analysisPrimaryTag";
 import {
   OptionKey,
   Question,
@@ -255,12 +257,12 @@ export default function SavedQuestionsPage() {
               <div className="flex flex-wrap items-start justify-between gap-3">
                 <div className="min-w-0">
                   <div className="flex flex-wrap gap-2 text-xs font-semibold">
-                    <span className="rounded-full bg-brand-100 px-3 py-1 text-brand-800">
-                      {selectedItem.question.subject}
-                    </span>
-                    <span className="rounded-full bg-slate-100 px-3 py-1 text-slate-700">
-                      {selectedItem.question.chapter}
-                    </span>
+                    {shouldDisplaySubjectBesidePrimaryTag(selectedItem.question) ? (
+                      <span className="rounded-full bg-brand-100 px-3 py-1 text-brand-800">
+                        {selectedItem.question.subject}
+                      </span>
+                    ) : null}
+                    <QuestionPrimaryTagBadge question={selectedItem.question} />
                     <span className="rounded-full bg-slate-100 px-3 py-1 text-slate-700">
                       {getSourceLabel(selectedItem.question)}
                     </span>

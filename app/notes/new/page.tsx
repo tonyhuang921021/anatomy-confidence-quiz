@@ -9,6 +9,10 @@ import { MED1_SUBJECTS, MED2_SUBJECTS, subjectRegistry } from "@/data/subjectReg
 import { resolveStudyNoteQuestionLinks } from "@/lib/questionLinkResolver";
 import { buildStudyNoteFormatPrompt, buildStudyNoteQuestionLinkPrompt } from "@/lib/studyNotePrompt";
 import {
+  getQuestionClassificationLabel,
+  getQuestionPrimaryTag
+} from "@/lib/analysisPrimaryTag";
+import {
   createStudyNote,
   inferStudyNoteTitle,
   normalizeStudyNoteMarkdown,
@@ -26,6 +30,7 @@ function buildQuestionSearchText(question: Question) {
     question.subject,
     question.chapter,
     question.section,
+    getQuestionPrimaryTag(question),
     question.testedConcept,
     question.stem,
     question.explanation,
@@ -468,7 +473,7 @@ export default function NewStudyNotePage() {
                         className="min-w-0 rounded-2xl border border-slate-200 bg-slate-50 px-3 py-2 text-left text-xs leading-5 text-slate-700 disabled:opacity-60"
                       >
                         <span className="block break-words font-bold text-slate-950">{selected ? "已加入 · " : ""}{question.id}</span>
-                        <span className="block break-words">{question.subject} / {question.chapter} / {question.section}</span>
+                        <span className="block break-words">{getQuestionClassificationLabel(question)}</span>
                         <span className="block line-clamp-2">{question.stem}</span>
                       </button>
                     );

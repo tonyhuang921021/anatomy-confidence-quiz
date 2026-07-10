@@ -7,6 +7,7 @@ import { useAuth } from "@/components/AuthProvider";
 import { useCloudHistoryHydration } from "@/components/useCloudHistoryHydration";
 import { CopyQuestionPromptButton } from "@/components/CopyQuestionPromptButton";
 import { QuestionOptionBlock, QuestionStemBlock } from "@/components/QuestionMediaBlock";
+import { QuestionPrimaryTagBadge } from "@/components/QuestionPrimaryTagBadge";
 import { QuestionExplanationTabs } from "@/components/QuestionExplanationTabs";
 import { QuestionReportButton } from "@/components/QuestionIssueReportButton";
 import { RelatedQuestionsPanel } from "@/components/RelatedQuestionsPanel";
@@ -91,6 +92,10 @@ import {
   getMasteryCategoryLabelForAnswer,
   type MasteryCategoryKey
 } from "@/lib/masteryAnalysis";
+import {
+  getQuestionPrimaryTag,
+  primaryTagIncludesSubject
+} from "@/lib/analysisPrimaryTag";
 
 const allQuestions = Array.from(
   new Map(
@@ -1058,6 +1063,7 @@ function ResultsPageContent() {
             subject: question.subject,
             chapter: question.chapter,
             section: question.section,
+            primaryTag: getQuestionPrimaryTag(question),
             stem: question.stem,
             options: question.options,
             explanation: question.explanation,
@@ -1530,7 +1536,10 @@ function ResultsPageContent() {
           isCorrect: attempt.isCorrect,
           confidence: attempt.confidence,
           questionNumber,
-          question
+          question: {
+            ...question,
+            primaryTag: getQuestionPrimaryTag(question) ?? undefined
+          }
         }))
       ),
     [confidenceOverviewItems]
@@ -1545,7 +1554,17 @@ function ResultsPageContent() {
   );
   const derivedSectionStats = useMemo(
     () =>
-      activeSession ? calculateSectionStats(activeSession.attempts, reviewedAttempts.map((item) => item.question)) : [],
+      activeSession
+        ? calculateSectionStats(
+            activeSession.attempts,
+            reviewedAttempts.map(({ question }) => {
+              const primaryTag = getQuestionPrimaryTag(question);
+              return primaryTag
+                ? { ...question, chapter: question.subject, section: primaryTag }
+                : question;
+            })
+          )
+        : [],
     [activeSession, reviewedAttempts]
   );
   const topWeakSections = useMemo(() => getTopWeakSections(derivedSectionStats, 3), [derivedSectionStats]);
@@ -2063,6 +2082,7 @@ function ResultsPageContent() {
     suffix?: string;
   }) {
     const sourceBadge = getQuestionSourceBadgeLabel(question);
+    const primaryTag = getQuestionPrimaryTag(question);
     const trimmedPrefix = prefix.trim();
     const shouldShowPrefix = trimmedPrefix.length > 0;
     const shouldShowLeadingSlash = shouldShowPrefix && !trimmedPrefix.endsWith("：");
@@ -2081,7 +2101,19 @@ function ResultsPageContent() {
           <span className="flex min-w-0 flex-wrap items-baseline gap-x-1.5 gap-y-1">
             {shouldShowPrefix ? <span className="shrink-0">{prefix}</span> : null}
             {shouldShowLeadingSlash ? <span className="shrink-0 text-slate-400">/</span> : null}
-            <span className="shrink-0">{question.subject}</span>
+            {!primaryTag || !primaryTagIncludesSubject(primaryTag, question.subject) ? (
+              <span className="shrink-0">{question.subject}</span>
+            ) : null}
+            {primaryTag ? (
+              <>
+                {!primaryTagIncludesSubject(primaryTag, question.subject) ? (
+                  <span className="shrink-0 text-slate-400">/</span>
+                ) : null}
+                <span className="max-w-[12rem] truncate text-xs font-semibold text-sky-700">
+                  {primaryTag}
+                </span>
+              </>
+            ) : null}
             <span className="shrink-0 text-slate-400">/</span>
             <span className="min-w-[8rem] flex-1 truncate font-semibold">
               {normalizeSummaryStem(question.stem)}
@@ -2131,6 +2163,9 @@ function ResultsPageContent() {
 
     return (
       <div className="mt-2 min-w-0 space-y-3 overflow-hidden text-sm leading-7 text-slate-700 [overflow-wrap:anywhere]">
+        <div className="flex flex-wrap gap-2 text-xs font-semibold">
+          <QuestionPrimaryTagBadge question={question} />
+        </div>
         <div className="flex min-w-0 items-start gap-3">
           <QuestionStemBlock question={question} className="flex-1" />
           <div className="flex shrink-0 flex-wrap items-center justify-end gap-2">
@@ -2530,9 +2565,7 @@ function ResultsPageContent() {
                         <div key={topic.key} className="rounded-2xl bg-slate-50 px-3 py-3">
                           <div className="flex items-start justify-between gap-3">
                             <div className="min-w-0">
-                              <p className="truncate text-sm font-black text-ink">
-                                {topic.chapter} / {topic.section}
-                              </p>
+                              <p className="truncate text-sm font-black text-ink">{topic.label}</p>
                               <p className="mt-1 text-xs font-semibold text-slate-500">
                                 {topic.subject}・{topic.total} 題
                               </p>

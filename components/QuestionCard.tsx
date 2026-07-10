@@ -2,6 +2,8 @@
 
 import { type MouseEvent, useMemo } from "react";
 import { QuestionOptionBlock, QuestionStemBlock } from "@/components/QuestionMediaBlock";
+import { QuestionPrimaryTagBadge } from "@/components/QuestionPrimaryTagBadge";
+import { getQuestionPrimaryTag, primaryTagIncludesSubject } from "@/lib/analysisPrimaryTag";
 import { OptionKey, Question } from "@/types/quiz";
 
 type QuestionCardProps = {
@@ -74,6 +76,7 @@ export function QuestionCard({
   onToggleEliminatedOption,
   showMetadata = true
 }: QuestionCardProps) {
+  const primaryTag = getQuestionPrimaryTag(question);
   const availableOptionKeys = useMemo(
     () =>
       optionKeys
@@ -90,15 +93,23 @@ export function QuestionCard({
       {showMetadata ? (
         <>
           <div className="flex flex-wrap gap-2 text-xs font-semibold">
-            <span className="max-w-full break-words rounded-full bg-brand-100 px-3 py-1 text-brand-800">
-              {question.subject}
-            </span>
-            <span className="max-w-full break-words rounded-full bg-slate-100 px-3 py-1 text-slate-700">
-              {question.chapter}
-            </span>
-            <span className="max-w-full break-words rounded-full bg-slate-100 px-3 py-1 text-slate-700">
-              {question.section}
-            </span>
+            {!primaryTag || !primaryTagIncludesSubject(primaryTag, question.subject) ? (
+              <span className="max-w-full break-words rounded-full bg-brand-100 px-3 py-1 text-brand-800">
+                {question.subject}
+              </span>
+            ) : null}
+            {primaryTag ? (
+              <QuestionPrimaryTagBadge question={question} />
+            ) : (
+              <>
+                <span className="max-w-full break-words rounded-full bg-slate-100 px-3 py-1 text-slate-700">
+                  {question.chapter}
+                </span>
+                <span className="max-w-full break-words rounded-full bg-slate-100 px-3 py-1 text-slate-700">
+                  {question.section}
+                </span>
+              </>
+            )}
             <span className="max-w-full break-words rounded-full bg-emerald-100 px-3 py-1 text-emerald-800">
               {getSourceLabel(question)}
             </span>

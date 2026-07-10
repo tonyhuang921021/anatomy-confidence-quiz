@@ -1,0 +1,51 @@
+{
+  "schemaVersion": "1.0.0",
+  "reviewedAt": "2026-07-10",
+  "reviewPolicy": "Manual review of deterministic per-tag and per-subject samples against taxonomy boundary rules.",
+  "overrides": {
+    "MOEX-108100-1301-Q023": {
+      "primaryTagId": "ANAT_THORAX",
+      "reason": "The question tests one thoracic surface landmark; the general orientation tag excludes single-region questions."
+    },
+    "MOEX-106100-1301-Q087": {
+      "primaryTagId": "BIOC_CARBOHYDRATE_METABOLISM",
+      "reason": "The tested concept is tissue-specific gluconeogenesis and glucose-6-phosphatase."
+    },
+    "MOEX-103100-2101-Q071": {
+      "primaryTagId": "PHAR_CNS_NEUROPSYCH",
+      "reason": "The question asks which cannabis constituent has the strongest psychoactive effect."
+    },
+    "MOEX-113020-2301-Q029": {
+      "primaryTagId": "PARA_NEMATODES",
+      "reason": "Every named parasite in the comparison is a nematode."
+    },
+    "MOEX-102030-1101-Q076": {
+      "primaryTagId": "PARA_NEMATODES",
+      "reason": "The question is specifically about Anisakis transmission."
+    },
+    "MOEX-111100-1301-Q042": {
+      "primaryTagId": "HIST_GI_HEPATOBILIARY_PANCREAS",
+      "reason": "Circumvallate papillae are oral histology; the selected special-senses tag only covers skin, eye, and inner ear."
+    },
+    "MOEX-109100-1301-Q041": {
+      "primaryTagId": "HIST_CARDIOVASCULAR_RESPIRATORY",
+      "reason": "The question tests lymphatic capillary structure."
+    },
+    "MOEX-104090-6301-Q030": {
+      "primaryTagId": "BIOC_CARBOHYDRATE_METABOLISM",
+      "reason": "2,3-BPG is produced by the erythrocyte glycolytic shunt, not oxidative phosphorylation."
+    },
+    "MOEX-104090-5301-Q054": {
+      "primaryTagId": "VIRO_RNA_VIRUSES",
+      "reason": "The question requires recognizing Paramyxoviridae; the general-virus tag excludes a specific family."
+    },
+    "MOEX-103030-2101-Q042": {
+      "primaryTagId": "BIOC_BIOMEMBRANES_TRANSPORT",
+      "reason": "The expanded taxonomy now has a dedicated biomembrane and transport chapter for facilitated diffusion."
+    },
+    "MOEX-104090-6301-Q090": {
+      "primaryTagId": "PATH_NEOPLASIA",
+      "reason": "The salivary pleomorphic adenoma question tests general tumor morphology, not reproductive or breast pathology."
+    }
+  }
+}

@@ -2133,7 +2133,8 @@ export function applyQuestionClassificationOverride(
     ...question,
     subject: override.subject,
     chapter: override.chapter,
-    section: override.section
+    section: override.section,
+    primaryTag: override.section
   };
 }
 

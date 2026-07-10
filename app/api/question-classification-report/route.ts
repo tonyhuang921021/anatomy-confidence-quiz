@@ -7,6 +7,7 @@ import {
   AUTO_CLASSIFICATION_APPROVER,
   autoApplyQuestionClassification
 } from "@/lib/questionClassificationAutoApply";
+import primaryTagTaxonomy from "@/data/analysisPrimaryTagTaxonomy.json";
 
 type ClassificationReportRequestBody = {
   visitorId?: string;
@@ -16,6 +17,7 @@ type ClassificationReportRequestBody = {
     subject?: string;
     chapter?: string;
     section?: string;
+    primaryTag?: string | null;
     stem?: string;
     options?: Record<string, string | undefined>;
     explanation?: string;
@@ -32,6 +34,7 @@ type ParsedClassificationPayload = {
   subject?: string;
   chapter?: string;
   section?: string;
+  primaryTag?: string;
   reason?: string;
 };
 
@@ -53,6 +56,21 @@ const CLASSIFICATION_SUBJECTS = [
   "分子生物學",
   "其他醫學一"
 ].join("、");
+const PRIMARY_TAGS = primaryTagTaxonomy.primaryTags.map((tag) => ({
+  name: tag.name.trim(),
+  subject: tag.subject.trim()
+}));
+const PRIMARY_TAG_BY_NAME = new Map(PRIMARY_TAGS.map((tag) => [tag.name, tag] as const));
+const PRIMARY_TAG_CATALOG = Array.from(
+  PRIMARY_TAGS.reduce((groups, tag) => {
+    const tags = groups.get(tag.subject) ?? [];
+    tags.push(tag.name);
+    groups.set(tag.subject, tags);
+    return groups;
+  }, new Map<string, string[]>()).entries()
+)
+  .map(([subject, tags]) => `${subject}：${tags.join("、")}`)
+  .join("\n");
 
 function getSupabaseServerClient() {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
@@ -104,6 +122,12 @@ function coerceParsedClassificationPayload(value: unknown): ParsedClassification
       : typeof record.topic === "string"
         ? record.topic.trim()
         : "";
+  const primaryTag =
+    typeof record.primaryTag === "string"
+      ? record.primaryTag.trim()
+      : typeof record.primary_tag === "string"
+        ? record.primary_tag.trim()
+        : section;
   const reason =
     typeof record.reason === "string"
       ? record.reason.trim()
@@ -117,6 +141,7 @@ function coerceParsedClassificationPayload(value: unknown): ParsedClassification
     subject,
     chapter,
     section,
+    primaryTag,
     reason
   };
 }
@@ -154,6 +179,7 @@ function parseClassificationPayload(text: string): ParsedClassificationPayload |
   const subjectMatch = trimmed.match(/(?:^|\n)\s*(?:subject|科目)\s*["']?\s*[:：]\s*["']?([^\n"'}，,]+)["']?/i);
   const chapterMatch = trimmed.match(/(?:^|\n)\s*(?:chapter|章節)\s*["']?\s*[:：]\s*["']?([^\n"'}]+?)["']?(?=\n|$)/i);
   const sectionMatch = trimmed.match(/(?:^|\n)\s*(?:section|小節)\s*["']?\s*[:：]\s*["']?([^\n"'}]+?)["']?(?=\n|$)/i);
+  const primaryTagMatch = trimmed.match(/(?:^|\n)\s*(?:primaryTag|primary_tag|考點分類)\s*["']?\s*[:：]\s*["']?([^\n"'}]+?)["']?(?=\n|$)/i);
   const reasonMatch = trimmed.match(/(?:^|\n)\s*(?:reason|理由)\s*["']?\s*[:：]\s*["']?([\s\S]+?)["']?(?=\n\s*[A-Za-z\u4e00-\u9fff_]+\s*[:：]|\s*$)/i);
 
   const subject = subjectMatch?.[1]?.trim() ?? "";
@@ -163,6 +189,7 @@ function parseClassificationPayload(text: string): ParsedClassificationPayload |
     subject,
     chapter: chapterMatch?.[1]?.trim() ?? "",
     section: sectionMatch?.[1]?.trim() ?? "",
+    primaryTag: primaryTagMatch?.[1]?.trim() ?? sectionMatch?.[1]?.trim() ?? "",
     reason: reasonMatch?.[1]?.trim() ?? ""
   };
 }
@@ -283,8 +310,10 @@ function buildClassificationPrompt(question: NonNullable<ClassificationReportReq
     .join("\n");
 
   return [
-    "你是台灣醫學系國考題庫整理助手，請幫這一題重新判斷最適合的科目分類。",
+    "你是台灣醫學系國考題庫整理助手，請幫這一題重新判斷最適合的科目與 primaryTag。",
     `只能從以下科目擇一：${CLASSIFICATION_SUBJECTS}`,
+    "primaryTag 必須逐字從下方固定清單擇一，不可自行創造新名稱：",
+    PRIMARY_TAG_CATALOG,
     "請優先依核心考點分類，不要只看器官名稱。",
     "請只輸出 JSON，不要輸出 markdown，不要輸出 code block。",
     "",
@@ -292,7 +321,7 @@ function buildClassificationPrompt(question: NonNullable<ClassificationReportReq
     "{",
     '  "subject": "科目",',
     '  "chapter": "章節",',
-    '  "section": "小節",',
+    '  "primaryTag": "固定清單中的考點分類",',
     '  "reason": "一句到兩句，簡短說明為什麼這題應該分到這科"',
     "}",
     "",
@@ -300,6 +329,7 @@ function buildClassificationPrompt(question: NonNullable<ClassificationReportReq
     `目前科目：${question.subject ?? ""}`,
     `目前章節：${question.chapter ?? ""}`,
     `目前小節：${question.section ?? ""}`,
+    `目前 primaryTag：${question.primaryTag ?? ""}`,
     `testedConcept：${question.testedConcept ?? ""}`,
     `題幹：${question.stem ?? ""}`,
     "選項：",
@@ -399,18 +429,22 @@ export async function POST(request: NextRequest) {
 
     const result = await createOpenAIText(buildClassificationPrompt(question), 600);
     const parsed = parseClassificationPayload(result.text);
-    if (!parsed?.subject) {
+    if (!parsed?.subject || !parsed.primaryTag) {
       throw new Error("AI 回傳的分類格式不完整，請再試一次。");
+    }
+    const selectedPrimaryTag = PRIMARY_TAG_BY_NAME.get(parsed.primaryTag.trim());
+    if (!selectedPrimaryTag) {
+      throw new Error("AI 回傳的 primaryTag 不在固定分類清單，請再試一次。");
     }
 
     const insertPayload = {
       question_id: question.id,
       current_subject: question.subject,
       current_chapter: question.chapter ?? null,
-      current_section: question.section ?? null,
-      suggested_subject: parsed.subject?.trim() || null,
+      current_section: question.primaryTag?.trim() || question.section || null,
+      suggested_subject: selectedPrimaryTag.subject,
       suggested_chapter: parsed.chapter?.trim() || null,
-      suggested_section: parsed.section?.trim() || null,
+      suggested_section: selectedPrimaryTag.name,
       reason: parsed.reason?.trim() || null,
       model: result.model,
       reporter_email: verifiedUser?.email ?? null,
@@ -451,6 +485,7 @@ export async function POST(request: NextRequest) {
       suggestedSubject: insertPayload.suggested_subject,
       suggestedChapter: insertPayload.suggested_chapter,
       suggestedSection: insertPayload.suggested_section,
+      suggestedPrimaryTag: insertPayload.suggested_section,
       reason: insertPayload.reason,
       appliedAt: autoApplied.appliedAt,
       approvedByEmail: autoApplied.approvedByEmail,

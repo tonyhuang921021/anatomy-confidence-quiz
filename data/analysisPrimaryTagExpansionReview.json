@@ -1,0 +1,37 @@
+{
+  "schemaVersion": "1.0.0",
+  "reviewedAt": "2026-07-10",
+  "sourceDesign": "taxonomy-gap-design-144-gpt-5.4-primary-tag-taxonomy-gap-design-v1-493ef358-result.json",
+  "policy": "Accept reusable chapter-level gaps. Reject single-question proposals that are already covered by a broader existing chapter or would create a misleading weakness dimension.",
+  "rejected": {
+    "PHYS_IMMUNE_CYTOKINE_REGULATION": "One off-subject cytokine question does not justify a physiology weakness chapter.",
+    "PHYS_INTERMEDIARY_METABOLISM": "The single ketone-body question can be handled by the existing endocrine and metabolism chapter without a new one-question dimension."
+  },
+  "tagOverrides": {
+    "ANAT_HISTO_NERVOUS_TISSUE": {
+      "id": "ANAT_NERVOUS_CELLULAR_ORGANIZATION",
+      "name": "解剖學－神經系統細胞與組織",
+      "definition": "涵蓋神經系統的細胞與組織層次，包括神經元、神經膠細胞、突觸基本構造、小腦與大腦皮質分層、腦室管膜及脈絡叢；用於名目解剖題中解題核心位於細胞或顯微組織層次者。",
+      "include": [
+        "神經元、神經膠細胞與突觸的基本細胞組織",
+        "大腦與小腦皮質的細胞層次",
+        "腦室管膜、脈絡叢與中樞神經相關顯微構造"
+      ],
+      "exclude": [
+        "長傳導路徑、核團位置與病灶側化",
+        "突觸電流、神經傳遞物釋放的完整功能機轉",
+        "神經退化、腫瘤與脫髓鞘疾病"
+      ],
+      "aliases": [
+        "神經組織學",
+        "neural tissue",
+        "neurohistology"
+      ],
+      "borderlineRules": [
+        "若答案依賴細胞種類、皮質分層或顯微結構，選本標籤。",
+        "若需追蹤路徑、交叉與核團，選中樞神經傳導路徑。",
+        "若核心是突觸傳遞與電生理功能，選生理學相關標籤。"
+      ]
+    }
+  }
+}
