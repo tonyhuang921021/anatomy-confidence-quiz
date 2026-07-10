@@ -1175,6 +1175,14 @@ export function createQuestionOrder(
   settings: QuizSettings
 ) {
   const customQuestionIds = settings.customQuestionIds ?? [];
+  if (settings.preserveCustomQuestionOrder && customQuestionIds.length > 0) {
+    const questionMap = new Map(questions.map((question) => [question.id, question] as const));
+    return keepFollowUpQuestionsTogether(
+      customQuestionIds.filter((id) => questionMap.has(id)),
+      questionMap,
+      normalizeQuestionCount(settings.questionCount, questions.length)
+    );
+  }
   if (settings.mode === "custom_paper" && customQuestionIds.length > 0) {
     const questionMap = new Map(questions.map((question) => [question.id, question] as const));
     return keepFollowUpQuestionsTogether(

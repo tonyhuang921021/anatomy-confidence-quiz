@@ -509,6 +509,11 @@ function getSessionSubjectLabel(
     return `${getSessionDisplayName(session)}結果分析`;
   }
 
+  if (session.settings?.customPoolLabel?.startsWith("考前弱點：")) {
+    const primaryTag = session.settings.sessionName?.trim();
+    return primaryTag ? `${primaryTag}複習結果` : "觀念群複習結果";
+  }
+
   const subjects = Array.from(new Set(reviewedAttempts.map((item) => item.question.subject).filter(Boolean)));
   const subject = subjects.length === 1 ? subjects[0] : session.subject;
   return `本輪${subject}結果分析`;
@@ -1594,6 +1599,28 @@ function ResultsPageContent() {
       return left.subject.localeCompare(right.subject);
     });
   }, [activeSession?.settings?.mode, reviewedAttempts]);
+  const weaknessPracticeFeedback = useMemo(() => {
+    if (!activeSession?.settings?.customPoolLabel?.startsWith("考前弱點：")) return null;
+    const total = reviewedAttempts.length;
+    const correct = reviewedAttempts.filter((item) => item.attempt.isCorrect).length;
+    const wrong = total - correct;
+    const certainWrong = reviewedAttempts.filter(
+      (item) => !item.attempt.isCorrect && item.attempt.confidence === 5
+    ).length;
+    const uncertainCorrect = reviewedAttempts.filter(
+      (item) => item.attempt.isCorrect && item.attempt.confidence <= 3
+    ).length;
+
+    return {
+      primaryTag: activeSession.settings.sessionName?.trim() || "本觀念群",
+      total,
+      wrong,
+      correctRate: total === 0 ? 0 : Math.round((correct / total) * 100),
+      certainWrong,
+      uncertainCorrect,
+      unresolved: wrong + uncertainCorrect
+    };
+  }, [activeSession?.settings?.customPoolLabel, activeSession?.settings?.sessionName, reviewedAttempts]);
 
   function handleRestart() {
     const nextSettings: QuizSettings = {
@@ -2938,6 +2965,55 @@ function ResultsPageContent() {
           summary={state.summary}
           masteryAnalysis={confidenceCalibrationEnabled ? masteryAnalysis : undefined}
         />
+        {weaknessPracticeFeedback ? (
+          <section className="mt-4 border-y border-slate-200 py-5">
+            <div className="flex flex-wrap items-start justify-between gap-4">
+              <div>
+                <p className="text-sm font-medium text-slate-500">觀念群複習</p>
+                <h2 className="mt-1 break-words text-xl font-semibold text-ink">
+                  {weaknessPracticeFeedback.primaryTag}
+                </h2>
+              </div>
+              <Link
+                href="/progress/weakness"
+                className="min-h-12 rounded-2xl bg-slate-100 px-5 py-3 text-sm font-semibold text-slate-800 transition hover:bg-slate-200"
+              >
+                返回弱點分析
+              </Link>
+            </div>
+            <div className="mt-5 grid grid-cols-2 gap-4 sm:grid-cols-4">
+              <div>
+                <p className="text-sm text-slate-500">本輪</p>
+                <p className="mt-1 text-lg font-semibold text-ink">{weaknessPracticeFeedback.total} 題</p>
+              </div>
+              <div>
+                <p className="text-sm text-slate-500">答對率</p>
+                <p className="mt-1 text-lg font-semibold text-ink">{weaknessPracticeFeedback.correctRate}%</p>
+              </div>
+              <div>
+                <p className="text-sm text-slate-500">答錯</p>
+                <p className="mt-1 text-lg font-semibold text-ink">{weaknessPracticeFeedback.wrong} 題</p>
+              </div>
+              <div>
+                <p className="text-sm text-slate-500">仍需查看</p>
+                <p className="mt-1 text-lg font-semibold text-ink">{weaknessPracticeFeedback.unresolved} 題</p>
+              </div>
+            </div>
+            {weaknessPracticeFeedback.certainWrong > 0 || weaknessPracticeFeedback.uncertainCorrect > 0 ? (
+              <p className="mt-4 text-sm text-slate-500">
+                {weaknessPracticeFeedback.certainWrong > 0
+                  ? `很確定但答錯 ${weaknessPracticeFeedback.certainWrong} 題`
+                  : ""}
+                {weaknessPracticeFeedback.certainWrong > 0 && weaknessPracticeFeedback.uncertainCorrect > 0
+                  ? " ・ "
+                  : ""}
+                {weaknessPracticeFeedback.uncertainCorrect > 0
+                  ? `不確定但答對 ${weaknessPracticeFeedback.uncertainCorrect} 題`
+                  : ""}
+              </p>
+            ) : null}
+          </section>
+        ) : null}
         {renderConfidenceCalibrationSection()}
         {simulationSubjectScores.length > 0 ? (
           <section className="mt-4 rounded-[2rem] bg-white p-5 shadow-card ring-1 ring-slate-100 sm:p-6">

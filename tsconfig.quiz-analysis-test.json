@@ -17,6 +17,8 @@
     "lib/questionTextFormat.test.ts",
     "lib/analysisPrimaryTag.ts",
     "lib/analysisPrimaryTag.test.ts",
+    "lib/weaknessAnalysis.ts",
+    "lib/weaknessAnalysis.test.ts",
     "lib/currentSessionSelection.ts",
     "lib/currentSessionSelection.test.ts",
     "lib/cloudHistorySync.ts",
