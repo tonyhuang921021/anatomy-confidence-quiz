@@ -1661,6 +1661,13 @@ const questionTextOverrides: Record<string, QuestionTextOverride> = {
     testedConcept: "腎臟生理／酸鹼平衡"
   },
   "MOEX-114090-1301-Q049": {
+    stem: "某一病人罹患中風後講話流利，但卻出現閱讀上的困難，下列何者最有可能是發生病變的位置？",
+    options: {
+      A: "Wernicke's area",
+      B: "Broca's area",
+      C: "angular gyrus",
+      D: "arcuate fasciculus"
+    },
     answer: "C",
     acceptedAnswers: ["A", "C"],
     answerCreditType: "multiple_accepted",
@@ -1673,6 +1680,15 @@ const questionTextOverrides: Record<string, QuestionTextOverride> = {
       D: "Arcuate fasciculus：傳導性失語，特徵是複誦困難。"
     },
     testedConcept: "神經生理／語言功能"
+  },
+  "MOEX-114090-1301-Q052": {
+    stem: "神經傳導物質（neurotransmitter）與其相對應的代謝型受體（metabotropic receptor）之配對，何者正確？",
+    options: {
+      A: "norepinephrine → α1 receptor",
+      B: "histamine → 5-HT1 receptor",
+      C: "acetylcholine → nicotinic receptor",
+      D: "glutamate → AMPA receptor"
+    }
   },
   "MOEX-114090-1301-Q094": {
     answer: "C",
