@@ -8,11 +8,13 @@ import {
   SavedQuestionSource,
   SavedQuestionTombstone
 } from "@/types/quiz";
+import { getCloudSyncRetryDelayMs } from "@/lib/cloudSyncWriteGuard";
 
 const SAVED_QUESTIONS_STORAGE_KEY = "anatomy-confidence-saved-questions:v1";
 const SAVED_QUESTION_TOMBSTONES_STORAGE_KEY = "anatomy-confidence-saved-question-tombstones:v1";
 const LEGACY_SEARCH_FAVORITES_STORAGE_KEY = "anatomy-confidence-search-favorites:v1";
 const CLOUD_SYNC_MIN_INTERVAL_MS = 30_000;
+const CLOUD_SYNC_FAILURE_MARKER_KEY = "anatomy-confidence-saved-questions-sync-retry:v1";
 const MAX_SYNC_RECORDS = 1500;
 
 type LegacySearchFavoriteRecord = {
@@ -34,7 +36,10 @@ let recordsCache: Record<string, SavedQuestionRecord> | null = null;
 let tombstonesCache: Record<string, SavedQuestionTombstone> | null = null;
 let cloudSyncPromise: Promise<void> | null = null;
 let queuedCloudSyncToken: string | null = null;
+let queuedCloudSyncForce = false;
 let lastCloudSyncAt = 0;
+let cloudSyncFailureCount = 0;
+let nextCloudSyncAllowedAt = 0;
 let localRevision = 0;
 
 const listeners = new Set<() => void>();
@@ -402,7 +407,12 @@ export function useSavedQuestionRecords(accessToken?: string | null) {
 
 export async function ensureSavedQuestionsCloudSynced(accessToken: string) {
   if (!accessToken) return;
-  if (Date.now() - lastCloudSyncAt < CLOUD_SYNC_MIN_INTERVAL_MS) return;
+  const now = Date.now();
+  const persistedRetryAt = Number(safeGetItem(CLOUD_SYNC_FAILURE_MARKER_KEY)) || 0;
+  if (
+    now - lastCloudSyncAt < CLOUD_SYNC_MIN_INTERVAL_MS ||
+    now < Math.max(nextCloudSyncAllowedAt, persistedRetryAt)
+  ) return;
   await queueSavedQuestionsCloudSync(accessToken);
 }
 
@@ -411,17 +421,23 @@ export async function queueSavedQuestionsCloudSync(
   options: { force?: boolean } = {}
 ) {
   if (!accessToken || !isBrowser()) return;
-  if (!options.force && Date.now() - lastCloudSyncAt < CLOUD_SYNC_MIN_INTERVAL_MS) return;
+  const now = Date.now();
+  const persistedRetryAt = Number(safeGetItem(CLOUD_SYNC_FAILURE_MARKER_KEY)) || 0;
+  if (now < Math.max(nextCloudSyncAllowedAt, persistedRetryAt)) return;
+  if (!options.force && now - lastCloudSyncAt < CLOUD_SYNC_MIN_INTERVAL_MS) return;
 
   if (cloudSyncPromise) {
     queuedCloudSyncToken = accessToken;
+    queuedCloudSyncForce ||= Boolean(options.force);
     return cloudSyncPromise;
   }
 
   const syncStartedRevision = localRevision;
   cloudSyncPromise = syncSavedQuestionsWithCloud(accessToken)
     .then((response) => {
-      if (!response.ok || !Array.isArray(response.records)) return;
+      if (!response.ok || !Array.isArray(response.records)) {
+        throw new Error(response.message || "儲存題目同步失敗。");
+      }
 
       const cloudRecords = recordsArrayToMap(response.records);
       const currentRecords = getRecordsCache();
@@ -440,16 +456,23 @@ export async function queueSavedQuestionsCloudSync(
         setTombstonesCache(nextTombstones);
       }
       lastCloudSyncAt = Date.now();
+      cloudSyncFailureCount = 0;
+      nextCloudSyncAllowedAt = 0;
+      safeSetItem(CLOUD_SYNC_FAILURE_MARKER_KEY, "0");
     })
     .catch(() => {
-      // Keep local state; the next authenticated page will retry.
+      cloudSyncFailureCount += 1;
+      nextCloudSyncAllowedAt = Date.now() + getCloudSyncRetryDelayMs(cloudSyncFailureCount - 1);
+      safeSetItem(CLOUD_SYNC_FAILURE_MARKER_KEY, String(nextCloudSyncAllowedAt));
     })
     .finally(() => {
       cloudSyncPromise = null;
       const queuedToken = queuedCloudSyncToken;
+      const queuedForce = queuedCloudSyncForce;
       queuedCloudSyncToken = null;
+      queuedCloudSyncForce = false;
       if (queuedToken) {
-        void queueSavedQuestionsCloudSync(queuedToken, { force: true });
+        void queueSavedQuestionsCloudSync(queuedToken, { force: queuedForce });
       }
     });
 

@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { type ReactNode, useEffect, useMemo, useRef, useState } from "react";
 import { CopyQuestionPromptButton } from "@/components/CopyQuestionPromptButton";
+import { getCloudSyncRetryDelayMs } from "@/lib/cloudSyncWriteGuard";
 import { QuestionExplanationTabs } from "@/components/QuestionExplanationTabs";
 import { QuestionOptionBlock, QuestionStemBlock } from "@/components/QuestionMediaBlock";
 import { QuestionReportButton } from "@/components/QuestionIssueReportButton";
@@ -129,7 +130,6 @@ function serializeManualReviewState(state: ManualReviewState) {
 }
 
 export const MANUAL_REVIEW_STATE_CHANGE_EVENT = "manual-review-state-change";
-const MANUAL_REVIEW_CLOUD_RETRY_MS = 15_000;
 
 function getManualReviewStorageKey(scope: string, userId?: string | null) {
   const normalizedUserId = userId?.trim() || "guest";
@@ -646,6 +646,7 @@ export function ReviewNotebook({
     createEmptyManualReviewState()
   );
   const manualReviewRetryTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const manualReviewRetryFailureCountRef = useRef(0);
   const manualEditingEnabled = Boolean(manualEditScope);
   const manualReviewUserId = user?.id ?? "guest";
   const manualReviewStorageKey = manualEditScope
@@ -789,11 +790,17 @@ export function ReviewNotebook({
     setManualReviewState(mergedState);
     dispatchManualReviewStateChange(manualEditScope, manualReviewUserId, mergedState);
     setManualReviewPersistenceError("");
+    manualReviewRetryFailureCountRef.current = 0;
   }
 
   function scheduleManualReviewCloudRetry(accessToken: string) {
     if (!manualEditScope || !manualReviewStorageKey || typeof window === "undefined") return;
     if (manualReviewRetryTimerRef.current) return;
+
+    const retryDelayMs = getCloudSyncRetryDelayMs(
+      manualReviewRetryFailureCountRef.current
+    );
+    manualReviewRetryFailureCountRef.current += 1;
 
     manualReviewRetryTimerRef.current = setTimeout(() => {
       manualReviewRetryTimerRef.current = null;
@@ -808,7 +815,7 @@ export function ReviewNotebook({
           );
           scheduleManualReviewCloudRetry(accessToken);
         });
-    }, MANUAL_REVIEW_CLOUD_RETRY_MS);
+    }, retryDelayMs);
   }
 
   useEffect(() => {
@@ -828,6 +835,7 @@ export function ReviewNotebook({
       }
       setManualReviewState(createEmptyManualReviewState());
       setManualReviewPersistenceError("");
+      manualReviewRetryFailureCountRef.current = 0;
       return;
     }
 
@@ -837,6 +845,7 @@ export function ReviewNotebook({
     }
 
     const localState = readManualReviewStateForScope(manualEditScope, manualReviewUserId);
+    manualReviewRetryFailureCountRef.current = 0;
     setManualReviewState(localState);
     setIsManualEditMode(false);
     setManualReviewPersistenceError("");

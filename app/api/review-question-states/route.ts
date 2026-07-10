@@ -1,6 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 import { isSupabaseRecoveryMode } from "@/lib/supabase/recoveryMode";
+import {
+  chooseNewestTimestampedRecord,
+  shouldUpsertLocalRecord
+} from "@/lib/cloudSyncWriteGuard";
 
 type ReviewQuestionState = "resolved" | "unresolved";
 
@@ -119,13 +123,13 @@ function recordToUpsertRow(userId: string, record: ReviewQuestionStateRecord): R
   };
 }
 
-function chooseNewerRecord(
-  left: ReviewQuestionStateRecord | undefined,
-  right: ReviewQuestionStateRecord | undefined
+function reviewQuestionStateRecordsAreEqual(
+  left: ReviewQuestionStateRecord,
+  right: ReviewQuestionStateRecord
 ) {
-  if (!left) return right ?? null;
-  if (!right) return left;
-  return right.updatedAt >= left.updatedAt ? right : left;
+  return left.scope === right.scope &&
+    left.questionId === right.questionId &&
+    left.state === right.state;
 }
 
 function getRecordKey(record: Pick<ReviewQuestionStateRecord, "scope" | "questionId">) {
@@ -273,10 +277,13 @@ export async function POST(request: NextRequest) {
     recordKeys.forEach((key) => {
       const localRecord = localRecords.get(key);
       const cloudRecord = cloudRecords.get(key);
-      const latestRecord = chooseNewerRecord(cloudRecord, localRecord);
+      const latestRecord = chooseNewestTimestampedRecord(cloudRecord, localRecord);
       if (!latestRecord) return;
 
-      if (localRecord && (!cloudRecord || localRecord.updatedAt >= cloudRecord.updatedAt)) {
+      if (
+        localRecord &&
+        shouldUpsertLocalRecord(latestRecord, cloudRecord, reviewQuestionStateRecordsAreEqual)
+      ) {
         recordsToUpsert.push(recordToUpsertRow(userId, latestRecord));
       }
       mergedRecords.push(latestRecord);

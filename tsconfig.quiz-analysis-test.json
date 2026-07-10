@@ -19,6 +19,8 @@
     "lib/currentSessionSelection.test.ts",
     "lib/cloudHistorySync.ts",
     "lib/cloudHistorySync.test.ts",
+    "lib/cloudSyncWriteGuard.ts",
+    "lib/cloudSyncWriteGuard.test.ts",
     "lib/practiceYears.ts",
     "lib/quizAnalysis.ts",
     "lib/quizAnalysis.selection.test.ts",

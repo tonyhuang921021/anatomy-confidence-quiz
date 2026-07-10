@@ -378,6 +378,20 @@ test("完整讀取完成場次時，不會被超大本機歷史的最近 recover
   assert.ok(fullIds.includes("heavy-session-259"));
 });
 
+test("九千筆作答壓縮後仍保留完整題目與作答次數", () => {
+  const attempts = Array.from({ length: 9000 }, (_, index) => ({
+    ...makeAttempt(`q-heavy-attempt-${index % 6000}`, index % 28),
+    answeredAt: new Date(Date.UTC(2026, 6, 1, 0, index)).toISOString()
+  }));
+
+  const entries = buildCompletedQuestionHistoryEntriesFromSessions([{ attempts }]);
+
+  assert.equal(entries.length, 6000);
+  assert.equal(entries.reduce((sum, entry) => sum + entry.attempts, 0), 9000);
+  assert.ok(entries.some((entry) => entry.questionId === "q-heavy-attempt-0"));
+  assert.ok(entries.some((entry) => entry.questionId === "q-heavy-attempt-5999"));
+});
+
 test("剛完成 handoff 也要被進度歷史讀到", () => {
   installBrowserStorage();
   const session = makeSession("handoff-session-read", ["q-handoff-read"]);

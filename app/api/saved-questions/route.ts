@@ -2,6 +2,10 @@ import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 import { isSupabaseRecoveryMode } from "@/lib/supabase/recoveryMode";
 import {
+  mergeSavedQuestionSyncRecords,
+  shouldUpsertLocalRecord
+} from "@/lib/cloudSyncWriteGuard";
+import {
   SavedQuestionRecord,
   SavedQuestionSource,
   SavedQuestionTombstone
@@ -142,23 +146,16 @@ function recordToUpsertRow(userId: string, record: SavedQuestionRecord): SavedQu
   };
 }
 
-function chooseNewerRecord(
-  left: SavedQuestionRecord | undefined,
-  right: SavedQuestionRecord | undefined
+function savedQuestionRecordsAreEqual(
+  left: SavedQuestionRecord,
+  right: SavedQuestionRecord
 ) {
-  if (!left) return right ?? null;
-  if (!right) return left;
-  return right.updatedAt >= left.updatedAt
-    ? {
-        ...left,
-        ...right,
-        addedAt: left.addedAt <= right.addedAt ? left.addedAt : right.addedAt
-      }
-    : {
-        ...right,
-        ...left,
-        addedAt: left.addedAt <= right.addedAt ? left.addedAt : right.addedAt
-      };
+  return left.questionId === right.questionId &&
+    left.source === right.source &&
+    left.correctCount === right.correctCount &&
+    left.attempts === right.attempts &&
+    left.lastAnsweredAt === right.lastAnsweredAt &&
+    left.addedAt === right.addedAt;
 }
 
 function formatError(error: unknown) {
@@ -264,7 +261,7 @@ export async function POST(request: NextRequest) {
       const localRecord = localRecords.get(questionId);
       const cloudRecord = cloudRecords[questionId];
       const tombstone = tombstones.get(questionId);
-      const latestRecord = chooseNewerRecord(cloudRecord, localRecord);
+      const latestRecord = mergeSavedQuestionSyncRecords(cloudRecord, localRecord);
 
       if (tombstone && (!latestRecord || tombstone.deletedAt >= latestRecord.updatedAt)) {
         if (cloudRecord) questionIdsToDelete.push(questionId);
@@ -274,7 +271,10 @@ export async function POST(request: NextRequest) {
 
       if (!latestRecord) return;
 
-      if (localRecord && (!cloudRecord || localRecord.updatedAt >= cloudRecord.updatedAt)) {
+      if (
+        localRecord &&
+        shouldUpsertLocalRecord(latestRecord, cloudRecord, savedQuestionRecordsAreEqual)
+      ) {
         recordsToUpsert.push(recordToUpsertRow(user.id, latestRecord));
       }
       mergedRecords.push(latestRecord);
