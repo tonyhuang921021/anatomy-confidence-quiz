@@ -48,6 +48,10 @@ import {
   isSupabaseConfigured
 } from "@/lib/supabase/client";
 import { chooseMoreCompleteSessionForSameWork } from "@/lib/currentSessionSelection";
+import {
+  buildCloudAttemptSessionChunks,
+  findUnresolvedCompletedSessionIds
+} from "@/lib/cloudHistorySync";
 import { normalizeQuestionExplanationOverride } from "@/lib/questionExplanationFormat";
 import { getRecoveryTimestamp, isSupabaseRecoveryMode } from "@/lib/supabase/recoveryMode";
 import { getOrCreateVisitorId } from "@/lib/visitor";
@@ -168,18 +172,19 @@ const SUPABASE_PAGE_SIZE = 1000;
 const CLOUD_COMPLETED_SESSION_FETCH_PAGE_SIZE = 300;
 const CLOUD_COMPLETED_SESSION_FETCH_MAX_ROWS = 3000;
 const CLOUD_COMPLETED_SESSION_PAYLOAD_FALLBACK_LIMIT = 120;
+const CLOUD_SESSION_PAYLOAD_FETCH_CHUNK_SIZE = 20;
 const CLOUD_COMPLETED_SESSION_UPLOAD_LIMIT = 3000;
 const CLOUD_COMPLETED_SESSION_UPLOAD_BATCH_SIZE = 8;
 const CLOUD_COMPLETED_SESSION_UPLOAD_ATTEMPT_BATCH_SIZE = 800;
 const CLOUD_LIGHT_COMPLETED_SESSION_UPLOAD_LIMIT = 40;
 const CLOUD_LIGHT_COMPLETED_ATTEMPT_UPLOAD_LIMIT = 500;
-const CLOUD_ATTEMPT_SESSION_FETCH_CHUNK_SIZE = 20;
 const CLOUD_RECOVERABLE_REVIEW_SESSION_FETCH_LIMIT = 160;
 const CLOUD_RECOVERABLE_REVIEW_SESSION_GRACE_MS = 90_000;
 const CLOUD_ACTIVE_SESSION_COMPARE_LIMIT = 8;
 const CURRENT_SESSION_SYNC_MIN_INTERVAL_MS = 45_000;
 const STATS_SYNC_ATTEMPT_BATCH_SIZE = 200;
 const CLOUD_SESSION_LOOKUP_TIMEOUT_MS = 3500;
+const CLOUD_COMPLETED_HISTORY_READ_TIMEOUT_MS = 20_000;
 const CLOUD_SYNC_BATCH_TIMEOUT_MS = 24000;
 const CLOUD_DIRECT_SYNC_TIMEOUT_MS = 7000;
 const CLOUD_SERVER_SYNC_TIMEOUT_MS = 12000;
@@ -1502,9 +1507,7 @@ async function fetchSessionAttemptRowsForUser(userId: string, sessionIds: string
   const supabase = getSupabaseBrowserClient();
   const rows: QuizSessionAttemptRow[] = [];
 
-  for (let index = 0; index < sessionIds.length; index += CLOUD_ATTEMPT_SESSION_FETCH_CHUNK_SIZE) {
-    const chunk = sessionIds.slice(index, index + CLOUD_ATTEMPT_SESSION_FETCH_CHUNK_SIZE);
-
+  for (const chunk of buildCloudAttemptSessionChunks(sessionIds)) {
     for (let from = 0; ; from += SUPABASE_PAGE_SIZE) {
       const to = from + SUPABASE_PAGE_SIZE - 1;
       const { data, error } = await supabase
@@ -1647,8 +1650,10 @@ async function fetchQuizSessionPayloadRowsForUser(userId: string, sessionIds: st
   const rows: QuizSessionRow[] = [];
   const uniqueSessionIds = Array.from(new Set(sessionIds)).slice(0, CLOUD_COMPLETED_SESSION_PAYLOAD_FALLBACK_LIMIT);
 
-  for (let index = 0; index < uniqueSessionIds.length; index += CLOUD_ATTEMPT_SESSION_FETCH_CHUNK_SIZE) {
-    const chunk = uniqueSessionIds.slice(index, index + CLOUD_ATTEMPT_SESSION_FETCH_CHUNK_SIZE);
+  for (const chunk of buildCloudAttemptSessionChunks(
+    uniqueSessionIds,
+    CLOUD_SESSION_PAYLOAD_FETCH_CHUNK_SIZE
+  )) {
     const { data, error } = await supabase
       .from("quiz_sessions")
       .select(
@@ -1668,20 +1673,14 @@ async function fetchQuizSessionPayloadRowsForUser(userId: string, sessionIds: st
 }
 
 async function fetchResolvedQuizSessionsForUser(userId: string) {
-  const sessionRows = await withCloudFallback(fetchQuizSessionsForUser(userId), [] as QuizSessionRow[]);
-  const recoverableReviewRows = await withCloudFallback(
-    fetchRecoverableReviewSessionRowsForUser(userId),
-    [] as QuizSessionRow[]
-  );
+  const sessionRows = await fetchQuizSessionsForUser(userId);
+  const recoverableReviewRows = await fetchRecoverableReviewSessionRowsForUser(userId);
   const allSessionRows = Array.from(
     new Map([...sessionRows, ...recoverableReviewRows].map((row) => [row.id, row] as const)).values()
   );
-  const attemptRows = await withCloudFallback(
-    fetchSessionAttemptRowsForUser(
-      userId,
-      allSessionRows.map((row) => row.id)
-    ),
-    [] as QuizSessionAttemptRow[]
+  const attemptRows = await fetchSessionAttemptRowsForUser(
+    userId,
+    allSessionRows.map((row) => row.id)
   );
   const attemptMap = buildAttemptMap(attemptRows);
   const rowsMissingAttemptRows = allSessionRows.filter((row) => {
@@ -1690,14 +1689,28 @@ async function fetchResolvedQuizSessionsForUser(userId: string) {
     const attempts = attemptMap.get(row.id);
     return !attempts?.length;
   });
-  const payloadFallbackRows = await withCloudFallback(
-    fetchQuizSessionPayloadRowsForUser(
+  const payloadFallbackRows = rowsMissingAttemptRows.length > 0
+    ? await fetchQuizSessionPayloadRowsForUser(
       userId,
       rowsMissingAttemptRows.map((row) => row.id)
-    ),
-    [] as QuizSessionRow[]
-  );
+    )
+    : [];
   const payloadFallbackById = new Map(payloadFallbackRows.map((row) => [row.id, row] as const));
+  const unresolvedCompletedSessionIds = findUnresolvedCompletedSessionIds(
+    sessionRows.map((row) => ({ id: row.id, questionCount: row.question_count })),
+    Array.from(attemptMap.entries())
+      .filter(([, attempts]) => attempts.length > 0)
+      .map(([sessionId]) => sessionId),
+    payloadFallbackRows
+      .filter((row) => (row.session_payload?.attempts?.length ?? 0) > 0)
+      .map((row) => row.id)
+  );
+
+  if (unresolvedCompletedSessionIds.length > 0) {
+    throw new Error(
+      `完整雲端紀錄尚有 ${unresolvedCompletedSessionIds.length} 回未讀到作答明細，已保留原有本機與雲端快取。`
+    );
+  }
 
   const sessions = allSessionRows
     .map((row) => {
@@ -2436,14 +2449,20 @@ export async function syncLocalCompletedSessionsForCurrentUser(
   const canReachCloud = !isSupabaseRecoveryMode() && isSupabaseConfigured();
   let shouldUploadLocalSessions = canReachCloud && !readRemoteOnly;
   let hasVerifiedRemoteSessions = false;
+  let remoteHistoryReadError: unknown = null;
 
   if (canReachCloud && hydrateRemoteHistory) {
     try {
-      const resolved = await fetchResolvedQuizSessionsForUser(userId);
+      const resolved = await withClientTimeout(
+        fetchResolvedQuizSessionsForUser(userId),
+        CLOUD_COMPLETED_HISTORY_READ_TIMEOUT_MS,
+        "完整雲端紀錄讀取逾時，已保留這台裝置的紀錄與待補傳佇列。"
+      );
       fetchedRemoteSessions = resolved.sessions;
       hasVerifiedRemoteSessions = true;
     } catch (error) {
       shouldUploadLocalSessions = false;
+      remoteHistoryReadError = error;
       fetchedRemoteSessions = loadCloudCompletedSessionsForUser(userId);
       console.warn("Completed session cloud read failed; keeping local history visible.", error);
     }
@@ -2538,6 +2557,10 @@ export async function syncLocalCompletedSessionsForCurrentUser(
       saveCompletedSessionsForUser(userId, mergedSessions);
       mergeCompletedQuestionHistoryFromSessionsForUser(userId, mergedSessions);
     }
+  }
+
+  if (remoteHistoryReadError) {
+    throw remoteHistoryReadError;
   }
 
   const sessionsToUpload = uploadAllPending

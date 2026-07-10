@@ -17,6 +17,8 @@
     "lib/questionTextFormat.test.ts",
     "lib/currentSessionSelection.ts",
     "lib/currentSessionSelection.test.ts",
+    "lib/cloudHistorySync.ts",
+    "lib/cloudHistorySync.test.ts",
     "lib/practiceYears.ts",
     "lib/quizAnalysis.ts",
     "lib/quizAnalysis.selection.test.ts",
