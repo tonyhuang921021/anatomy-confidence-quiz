@@ -3,7 +3,9 @@ import test from "node:test";
 import {
   CLOUD_ATTEMPT_SESSION_FETCH_CHUNK_SIZE,
   buildCloudAttemptSessionChunks,
-  findUnresolvedCompletedSessionIds
+  findUnresolvedCompletedSessionIds,
+  getExpectedCloudAttemptCount,
+  getSessionIdsNeedingAttemptRows
 } from "./cloudHistorySync";
 
 test("large cloud history uses a small number of bounded attempt queries", () => {
@@ -21,17 +23,41 @@ test("cloud attempt query chunks keep order and remove duplicate session ids", (
   ]);
 });
 
-test("completed history is unresolved unless attempts or legacy payload were fully read", () => {
+test("中途結束的完成回合以實際答題數判斷，不把整張題卷長度當成缺漏", () => {
+  assert.equal(
+    getExpectedCloudAttemptCount({
+      id: "ended-early",
+      questionCount: 100,
+      correctCount: 2,
+      wrongCount: 1
+    }),
+    3
+  );
+});
+
+test("只有 payload 不完整的回合需要補查 attempts", () => {
+  const sessions = [
+    { id: "complete-payload", correctCount: 7, wrongCount: 3, payloadAttemptCount: 10 },
+    { id: "missing-payload", correctCount: 7, wrongCount: 3, payloadAttemptCount: 4 },
+    { id: "empty-completed", questionCount: 10, correctCount: 0, wrongCount: 0, payloadAttemptCount: 0 }
+  ];
+
+  assert.deepEqual(getSessionIdsNeedingAttemptRows(sessions), ["missing-payload"]);
+});
+
+test("completed history is unresolved unless payload or attempt rows are complete", () => {
   const unresolved = findUnresolvedCompletedSessionIds(
     [
-      { id: "attempt-row", questionCount: 10 },
-      { id: "legacy-payload", questionCount: 10 },
-      { id: "missing", questionCount: 10 },
-      { id: "empty-session", questionCount: 0 }
+      { id: "attempt-rows", correctCount: 8, wrongCount: 2, payloadAttemptCount: 0 },
+      { id: "complete-payload", correctCount: 8, wrongCount: 2, payloadAttemptCount: 10 },
+      { id: "partial-everywhere", correctCount: 8, wrongCount: 2, payloadAttemptCount: 4 },
+      { id: "empty-session", correctCount: 0, wrongCount: 0, payloadAttemptCount: 0 }
     ],
-    ["attempt-row"],
-    ["legacy-payload"]
+    [
+      ["attempt-rows", 10],
+      ["partial-everywhere", 6]
+    ]
   );
 
-  assert.deepEqual(unresolved, ["missing"]);
+  assert.deepEqual(unresolved, ["partial-everywhere"]);
 });

@@ -1,5 +1,33 @@
 export const CLOUD_ATTEMPT_SESSION_FETCH_CHUNK_SIZE = 60;
 
+export type CloudSessionAttemptSummary = {
+  id: string;
+  questionCount?: number | null;
+  correctCount?: number | null;
+  wrongCount?: number | null;
+  payloadAttemptCount?: number | null;
+};
+
+export function getExpectedCloudAttemptCount(session: CloudSessionAttemptSummary) {
+  const hasOutcomeCounts =
+    typeof session.correctCount === "number" || typeof session.wrongCount === "number";
+
+  if (hasOutcomeCounts) {
+    return Math.max(0, (session.correctCount ?? 0) + (session.wrongCount ?? 0));
+  }
+
+  return Math.max(0, session.questionCount ?? 0);
+}
+
+export function getSessionIdsNeedingAttemptRows(sessions: CloudSessionAttemptSummary[]) {
+  return sessions
+    .filter(
+      (session) =>
+        Math.max(0, session.payloadAttemptCount ?? 0) < getExpectedCloudAttemptCount(session)
+    )
+    .map((session) => session.id);
+}
+
 export function buildCloudAttemptSessionChunks(
   sessionIds: string[],
   chunkSize = CLOUD_ATTEMPT_SESSION_FETCH_CHUNK_SIZE
@@ -16,17 +44,19 @@ export function buildCloudAttemptSessionChunks(
 }
 
 export function findUnresolvedCompletedSessionIds(
-  sessions: Array<{ id: string; questionCount?: number | null }>,
-  attemptSessionIds: Iterable<string>,
-  payloadSessionIds: Iterable<string>
+  sessions: CloudSessionAttemptSummary[],
+  attemptCounts: Iterable<readonly [string, number]>
 ) {
-  const attemptIds = new Set(attemptSessionIds);
-  const payloadIds = new Set(payloadSessionIds);
+  const attemptCountBySession = new Map(attemptCounts);
 
   return sessions
     .filter((session) => {
-      const expectedAttempts = Math.max(0, session.questionCount ?? 0);
-      return expectedAttempts > 0 && !attemptIds.has(session.id) && !payloadIds.has(session.id);
+      const expectedAttempts = getExpectedCloudAttemptCount(session);
+      const resolvedAttempts = Math.max(
+        Math.max(0, session.payloadAttemptCount ?? 0),
+        Math.max(0, attemptCountBySession.get(session.id) ?? 0)
+      );
+      return resolvedAttempts < expectedAttempts;
     })
     .map((session) => session.id);
 }

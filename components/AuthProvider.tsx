@@ -57,6 +57,7 @@ const CLOUD_MANUAL_SYNC_HARD_TIMEOUT_MS = 60000;
 const CLOUD_MANUAL_RESUME_BACKGROUND_NOTICE_MS = 10000;
 const AUTOMATIC_CLOUD_SYNC_COOLDOWN_MS = 5 * 60 * 1000;
 const HISTORY_CLOUD_SYNC_COOLDOWN_MS = 15 * 60 * 1000;
+const HISTORY_CLOUD_SYNC_ATTEMPT_COOLDOWN_MS = 90 * 1000;
 const AUTH_SESSION_BOOTSTRAP_TIMEOUT_MS = 3500;
 const AUTH_SESSION_REFRESH_TIMEOUT_MS = 6000;
 const AUTH_SESSION_REFRESH_LEEWAY_MS = 90_000;
@@ -71,6 +72,7 @@ const SAFARI_AUTO_SYNC_DEFERRED_MESSAGE =
   "暫用本機，稍後補傳。雲端紀錄同步排程中，作答完成也會補傳。";
 const AUTOMATIC_CLOUD_SYNC_MARKER_PREFIX = "medQuizAutomaticCloudSync:";
 const HISTORY_CLOUD_SYNC_MARKER_PREFIX = "medQuizHistoryCloudSync:";
+const HISTORY_CLOUD_SYNC_ATTEMPT_MARKER_PREFIX = "medQuizHistoryCloudSyncAttempt:";
 
 function getErrorMessage(error: unknown) {
   if (error instanceof Error) return error.message;
@@ -147,6 +149,10 @@ function getHistoryCloudSyncMarkerKey(userId: string) {
   return `${HISTORY_CLOUD_SYNC_MARKER_PREFIX}${userId}`;
 }
 
+function getHistoryCloudSyncAttemptMarkerKey(userId: string) {
+  return `${HISTORY_CLOUD_SYNC_ATTEMPT_MARKER_PREFIX}${userId}`;
+}
+
 function readCloudSyncMarker(key: string) {
   if (typeof window === "undefined") return 0;
   const raw = safeGetStorage(window.localStorage, key);
@@ -167,12 +173,25 @@ function readHistoryCloudSyncMarker(userId: string) {
   return readCloudSyncMarker(getHistoryCloudSyncMarkerKey(userId));
 }
 
+function readHistoryCloudSyncAttemptMarker(userId: string) {
+  return readCloudSyncMarker(getHistoryCloudSyncAttemptMarkerKey(userId));
+}
+
 function writeAutomaticCloudSyncMarker(userId: string, timestamp = Date.now()) {
   writeCloudSyncMarker(getAutomaticCloudSyncMarkerKey(userId), timestamp);
 }
 
 function writeHistoryCloudSyncMarker(userId: string, timestamp = Date.now()) {
   writeCloudSyncMarker(getHistoryCloudSyncMarkerKey(userId), timestamp);
+}
+
+function writeHistoryCloudSyncAttemptMarker(userId: string, timestamp = Date.now()) {
+  writeCloudSyncMarker(getHistoryCloudSyncAttemptMarkerKey(userId), timestamp);
+}
+
+function clearHistoryCloudSyncAttemptMarker(userId: string) {
+  if (typeof window === "undefined") return;
+  safeRemoveStorage(window.localStorage, getHistoryCloudSyncAttemptMarkerKey(userId));
 }
 
 function shouldSkipAutomaticCloudSync(userId: string, now = Date.now()) {
@@ -183,6 +202,11 @@ function shouldSkipAutomaticCloudSync(userId: string, now = Date.now()) {
 function shouldSkipHistoryCloudSync(userId: string, now = Date.now()) {
   const lastStartedAt = readHistoryCloudSyncMarker(userId);
   return lastStartedAt > 0 && now - lastStartedAt < HISTORY_CLOUD_SYNC_COOLDOWN_MS;
+}
+
+function shouldSkipRecentHistoryCloudSyncAttempt(userId: string, now = Date.now()) {
+  const lastStartedAt = readHistoryCloudSyncAttemptMarker(userId);
+  return lastStartedAt > 0 && now - lastStartedAt < HISTORY_CLOUD_SYNC_ATTEMPT_COOLDOWN_MS;
 }
 
 function isAuthSessionExpiring(session: Session | null, leewayMs = 30_000) {
@@ -360,6 +384,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     if (
       !forceSync &&
       explicitOptions.automatic &&
+      isHistoryHydration &&
+      shouldSkipRecentHistoryCloudSyncAttempt(userId, now)
+    ) {
+      setSyncStatus("ready");
+      return;
+    }
+
+    if (
+      !forceSync &&
+      explicitOptions.automatic &&
       !isHistoryHydration &&
       shouldSkipAutomaticCloudSync(userId, now)
     ) {
@@ -371,6 +405,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     if (explicitOptions.automatic) {
       writeAutomaticCloudSyncMarker(userId, now);
+      if (isHistoryHydration) {
+        writeHistoryCloudSyncAttemptMarker(userId, now);
+      }
     }
 
     setSyncStatus("syncing");
@@ -396,6 +433,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       .then(() => {
         if (explicitOptions.automatic && isHistoryHydration) {
           writeHistoryCloudSyncMarker(userId);
+          clearHistoryCloudSyncAttemptMarker(userId);
         }
         setSyncStatus("ready");
         setSyncVersion((value) => value + 1);

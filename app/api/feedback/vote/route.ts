@@ -14,6 +14,15 @@ type VerifiedUser = {
   id: string;
 };
 
+const FEEDBACK_AUTH_VERIFY_TIMEOUT_MS = 4000;
+
+class FeedbackAuthError extends Error {
+  constructor(message: string, readonly status: 401 | 503) {
+    super(message);
+    this.name = "FeedbackAuthError";
+  }
+}
+
 function getServiceSupabaseClient() {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
@@ -30,20 +39,30 @@ function getServiceSupabaseClient() {
   });
 }
 
+function getBearerToken(request: NextRequest) {
+  const authorization = request.headers.get("authorization") ?? "";
+  return authorization.toLowerCase().startsWith("bearer ")
+    ? authorization.slice(7).trim()
+    : "";
+}
+
 async function getVerifiedUser(supabase: any, accessToken?: string | null): Promise<VerifiedUser | null> {
   if (!accessToken) return null;
 
   try {
     const { data, error } = (await withServerTimeout(
       supabase.auth.getUser(accessToken),
-      1200,
+      FEEDBACK_AUTH_VERIFY_TIMEOUT_MS,
       "登入狀態驗證逾時"
     )) as { data?: { user?: { id?: string } | null }; error?: unknown };
-    if (error || !data?.user?.id) return null;
+    if (error || !data?.user?.id) {
+      throw new FeedbackAuthError("登入狀態已失效，投票尚未送出，請重新整理後再試。", 401);
+    }
 
     return { id: data.user.id };
-  } catch {
-    return null;
+  } catch (error) {
+    if (error instanceof FeedbackAuthError) throw error;
+    throw new FeedbackAuthError("登入驗證暫時逾時，投票尚未送出，請稍後再試。", 503);
   }
 }
 
@@ -110,7 +129,8 @@ export async function POST(request: NextRequest) {
     }
 
     const visitorId = body?.visitorId?.trim() || null;
-    const verifiedUser = await getVerifiedUser(supabase, body?.accessToken);
+    const accessToken = getBearerToken(request) || body?.accessToken?.trim() || "";
+    const verifiedUser = accessToken ? await getVerifiedUser(supabase, accessToken) : null;
     const actorColumn = verifiedUser?.id ? "user_id" : "visitor_id";
     const actorValue = verifiedUser?.id ?? visitorId;
 
@@ -154,6 +174,12 @@ export async function POST(request: NextRequest) {
       ...counts
     });
   } catch (error) {
+    if (error instanceof FeedbackAuthError) {
+      return NextResponse.json(
+        { ok: false, message: error.message },
+        { status: error.status }
+      );
+    }
     if (isMissingRelationError(error, "feedback_message_votes")) {
       return NextResponse.json(
         { ok: false, message: "Supabase 還沒建立 feedback_message_votes 資料表，請先更新 schema。" },

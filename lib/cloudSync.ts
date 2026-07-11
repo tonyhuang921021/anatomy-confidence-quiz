@@ -50,9 +50,14 @@ import {
 import { chooseMoreCompleteSessionForSameWork } from "@/lib/currentSessionSelection";
 import {
   buildCloudAttemptSessionChunks,
-  findUnresolvedCompletedSessionIds
+  findUnresolvedCompletedSessionIds,
+  getSessionIdsNeedingAttemptRows
 } from "@/lib/cloudHistorySync";
 import { normalizeQuestionExplanationOverride } from "@/lib/questionExplanationFormat";
+import {
+  getFeedbackAuthorizationHeaders,
+  getFeedbackIdentityIntent
+} from "@/lib/feedbackAuth";
 import { getRecoveryTimestamp, isSupabaseRecoveryMode } from "@/lib/supabase/recoveryMode";
 import { getOrCreateVisitorId } from "@/lib/visitor";
 
@@ -171,8 +176,6 @@ const AI_SEARCH_USAGE_PREFIX = "AI_SEARCH:";
 const SUPABASE_PAGE_SIZE = 1000;
 const CLOUD_COMPLETED_SESSION_FETCH_PAGE_SIZE = 300;
 const CLOUD_COMPLETED_SESSION_FETCH_MAX_ROWS = 3000;
-const CLOUD_COMPLETED_SESSION_PAYLOAD_FALLBACK_LIMIT = 120;
-const CLOUD_SESSION_PAYLOAD_FETCH_CHUNK_SIZE = 20;
 const CLOUD_COMPLETED_SESSION_UPLOAD_LIMIT = 3000;
 const CLOUD_COMPLETED_SESSION_UPLOAD_BATCH_SIZE = 8;
 const CLOUD_COMPLETED_SESSION_UPLOAD_ATTEMPT_BATCH_SIZE = 800;
@@ -196,7 +199,7 @@ const COMPLETED_SESSION_UPLOAD_MARKER_PREFIX = "completedSessionUpload:";
 const CLOUD_HEAVY_LOCAL_HISTORY_READ_LIMIT = 160_000;
 const CLOUD_HEAVY_LOCAL_HISTORY_RECOVERY_LIMIT = 240;
 const FEEDBACK_REQUEST_TIMEOUT_MS = 10000;
-const FEEDBACK_SESSION_TIMEOUT_MS = 2500;
+const FEEDBACK_AUTH_REFRESH_TIMEOUT_MS = 6000;
 const QUESTION_EXPLANATION_SYNC_IN_FLIGHT_MS = 20_000;
 const QUESTION_EXPLANATION_SYNC_COOLDOWN_MS = 60_000;
 const QUESTION_EXPLANATION_SYNC_MARKER_PREFIX = "questionExplanationSync:";
@@ -280,6 +283,26 @@ function withClientTimeout<T>(task: Promise<T>, timeoutMs: number, message: stri
   });
 }
 
+async function withAbortableClientTimeout<T>(
+  task: (signal: AbortSignal) => Promise<T>,
+  timeoutMs: number,
+  message: string
+) {
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
+
+  try {
+    return await task(controller.signal);
+  } catch (error) {
+    if (controller.signal.aborted) {
+      throw new Error(message);
+    }
+    throw error;
+  } finally {
+    clearTimeout(timeoutId);
+  }
+}
+
 async function fetchWithClientTimeout(
   input: RequestInfo | URL,
   init: RequestInit,
@@ -308,6 +331,49 @@ async function fetchWithClientTimeout(
   } finally {
     if (timeoutId) clearTimeout(timeoutId);
   }
+}
+
+async function refreshFeedbackAccessToken() {
+  try {
+    const { data, error } = await withClientTimeout(
+      getSupabaseBrowserClient().auth.refreshSession(),
+      FEEDBACK_AUTH_REFRESH_TIMEOUT_MS,
+      "登入狀態刷新逾時"
+    );
+    if (error) return null;
+    return data.session?.access_token ?? null;
+  } catch {
+    return null;
+  }
+}
+
+async function postFeedbackRequest(
+  url: string,
+  body: Record<string, unknown>,
+  accessToken: string | null | undefined,
+  timeoutMessage: string
+) {
+  const send = (token?: string | null) =>
+    fetchWithClientTimeout(url, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        ...getFeedbackAuthorizationHeaders(token)
+      },
+      body: JSON.stringify({
+        ...body,
+        accessToken: token ?? null
+      })
+    }, FEEDBACK_REQUEST_TIMEOUT_MS, timeoutMessage);
+
+  let response = await send(accessToken);
+  if (response.status !== 401 || !accessToken) return response;
+
+  const refreshedAccessToken = await refreshFeedbackAccessToken();
+  if (!refreshedAccessToken || refreshedAccessToken === accessToken) return response;
+
+  response = await send(refreshedAccessToken);
+  return response;
 }
 
 function hashText(value: string) {
@@ -434,20 +500,6 @@ function shouldSkipRecentQuestionExplanationSync(signature: string, now: number)
   return Boolean(
     marker.startedAt && now - marker.startedAt < QUESTION_EXPLANATION_SYNC_IN_FLIGHT_MS
   );
-}
-
-async function getFeedbackAccessToken(user?: Pick<User, "id" | "email" | "user_metadata"> | null) {
-  if (!user) return null;
-
-  try {
-    return await withClientTimeout(
-      getSupabaseBrowserClient().auth.getSession().then((result) => result.data.session?.access_token ?? null),
-      FEEDBACK_SESSION_TIMEOUT_MS,
-      "登入狀態讀取逾時，已先用匿名身分送出。"
-    );
-  } catch {
-    return null;
-  }
 }
 
 async function fetchAIExplanationUsageRows() {
@@ -1499,7 +1551,11 @@ async function fetchActiveQuizSessionRowsForUser(userId: string) {
   return (data ?? []) as QuizSessionRow[];
 }
 
-async function fetchSessionAttemptRowsForUser(userId: string, sessionIds: string[]) {
+async function fetchSessionAttemptRowsForUser(
+  userId: string,
+  sessionIds: string[],
+  signal?: AbortSignal
+) {
   if (isSupabaseRecoveryMode() || !isSupabaseConfigured() || sessionIds.length === 0) {
     return [] as QuizSessionAttemptRow[];
   }
@@ -1509,8 +1565,9 @@ async function fetchSessionAttemptRowsForUser(userId: string, sessionIds: string
 
   for (const chunk of buildCloudAttemptSessionChunks(sessionIds)) {
     for (let from = 0; ; from += SUPABASE_PAGE_SIZE) {
+      if (signal?.aborted) throw new Error("雲端紀錄讀取已中止");
       const to = from + SUPABASE_PAGE_SIZE - 1;
-      const { data, error } = await supabase
+      let query = supabase
         .from("quiz_session_attempts")
         .select(
           "session_id, user_id, question_order, question_id, selected_answer, correct_answer, is_correct, confidence, error_type, answered_at, source_mode, subject_snapshot, chapter_snapshot, section_snapshot"
@@ -1520,6 +1577,8 @@ async function fetchSessionAttemptRowsForUser(userId: string, sessionIds: string
         .order("session_id", { ascending: true })
         .order("question_order", { ascending: true })
         .range(from, to);
+      if (signal) query = query.abortSignal(signal);
+      const { data, error } = await query;
 
       if (error) {
         throw error;
@@ -1547,7 +1606,7 @@ async function fetchActiveQuizSessionsForUser(userId: string) {
     .filter((session): session is QuizSession => Boolean(session));
 }
 
-async function fetchQuizSessionsForUser(userId: string) {
+async function fetchQuizSessionsForUser(userId: string, signal?: AbortSignal) {
   if (isSupabaseRecoveryMode() || !isSupabaseConfigured()) return [] as QuizSessionRow[];
 
   const supabase = getSupabaseBrowserClient();
@@ -1558,19 +1617,22 @@ async function fetchQuizSessionsForUser(userId: string) {
     from < CLOUD_COMPLETED_SESSION_FETCH_MAX_ROWS;
     from += CLOUD_COMPLETED_SESSION_FETCH_PAGE_SIZE
   ) {
+    if (signal?.aborted) throw new Error("雲端紀錄讀取已中止");
     const to = Math.min(
       from + CLOUD_COMPLETED_SESSION_FETCH_PAGE_SIZE - 1,
       CLOUD_COMPLETED_SESSION_FETCH_MAX_ROWS - 1
     );
-    const { data, error } = await supabase
+    let query = supabase
       .from("quiz_sessions")
       .select(
-        "id, user_id, subject, mode, session_name, question_count, correct_count, wrong_count, average_confidence, started_at, completed_at, updated_at"
+        "id, user_id, subject, mode, session_name, question_count, correct_count, wrong_count, average_confidence, started_at, completed_at, session_payload, updated_at"
       )
       .eq("user_id", userId)
       .not("completed_at", "is", null)
       .order("completed_at", { ascending: false, nullsFirst: false })
       .range(from, to);
+    if (signal) query = query.abortSignal(signal);
+    const { data, error } = await query;
 
     if (error) {
       throw error;
@@ -1586,11 +1648,11 @@ async function fetchQuizSessionsForUser(userId: string) {
   return rows;
 }
 
-async function fetchRecoverableReviewSessionRowsForUser(userId: string) {
+async function fetchRecoverableReviewSessionRowsForUser(userId: string, signal?: AbortSignal) {
   if (isSupabaseRecoveryMode() || !isSupabaseConfigured()) return [] as QuizSessionRow[];
 
   const supabase = getSupabaseBrowserClient();
-  const { data, error } = await supabase
+  let query = supabase
     .from("quiz_sessions")
     .select(
       "id, user_id, subject, mode, session_name, question_count, correct_count, wrong_count, average_confidence, started_at, completed_at, session_payload, updated_at"
@@ -1601,6 +1663,8 @@ async function fetchRecoverableReviewSessionRowsForUser(userId: string) {
     .gt("question_count", 0)
     .order("updated_at", { ascending: false })
     .limit(CLOUD_RECOVERABLE_REVIEW_SESSION_FETCH_LIMIT);
+  if (signal) query = query.abortSignal(signal);
+  const { data, error } = await query;
 
   if (error) {
     throw error;
@@ -1641,69 +1705,43 @@ async function fetchQuizSessionByIdForUser(userId: string, sessionId: string) {
   return exactMatch ?? namespacedMatch ?? canonicalMatch ?? null;
 }
 
-async function fetchQuizSessionPayloadRowsForUser(userId: string, sessionIds: string[]) {
-  if (isSupabaseRecoveryMode() || !isSupabaseConfigured() || sessionIds.length === 0) {
-    return [] as QuizSessionRow[];
-  }
-
-  const supabase = getSupabaseBrowserClient();
-  const rows: QuizSessionRow[] = [];
-  const uniqueSessionIds = Array.from(new Set(sessionIds)).slice(0, CLOUD_COMPLETED_SESSION_PAYLOAD_FALLBACK_LIMIT);
-
-  for (const chunk of buildCloudAttemptSessionChunks(
-    uniqueSessionIds,
-    CLOUD_SESSION_PAYLOAD_FETCH_CHUNK_SIZE
-  )) {
-    const { data, error } = await supabase
-      .from("quiz_sessions")
-      .select(
-        "id, user_id, subject, mode, session_name, question_count, correct_count, wrong_count, average_confidence, started_at, completed_at, session_payload, updated_at"
-      )
-      .eq("user_id", userId)
-      .in("id", chunk);
-
-    if (error) {
-      throw error;
-    }
-
-    rows.push(...((data ?? []) as QuizSessionRow[]));
-  }
-
-  return rows;
+function getCloudSessionAttemptSummary(row: QuizSessionRow) {
+  return {
+    id: row.id,
+    questionCount: row.question_count,
+    correctCount: row.correct_count,
+    wrongCount: row.wrong_count,
+    payloadAttemptCount: row.session_payload?.attempts?.length ?? 0
+  };
 }
 
-async function fetchResolvedQuizSessionsForUser(userId: string) {
-  const sessionRows = await fetchQuizSessionsForUser(userId);
-  const recoverableReviewRows = await fetchRecoverableReviewSessionRowsForUser(userId);
+async function fetchResolvedQuizSessionsForUser(userId: string, signal?: AbortSignal) {
+  const sessionRows = await fetchQuizSessionsForUser(userId, signal);
+  const recoverableReviewRows = await fetchRecoverableReviewSessionRowsForUser(userId, signal);
   const allSessionRows = Array.from(
     new Map([...sessionRows, ...recoverableReviewRows].map((row) => [row.id, row] as const)).values()
   );
+  const sessionIdsNeedingAttemptRows = getSessionIdsNeedingAttemptRows(
+    sessionRows.map(getCloudSessionAttemptSummary)
+  );
+  const attemptSessionIds = Array.from(
+    new Set([
+      ...sessionIdsNeedingAttemptRows,
+      ...recoverableReviewRows.map((row) => row.id)
+    ])
+  );
   const attemptRows = await fetchSessionAttemptRowsForUser(
     userId,
-    allSessionRows.map((row) => row.id)
+    attemptSessionIds,
+    signal
   );
   const attemptMap = buildAttemptMap(attemptRows);
-  const rowsMissingAttemptRows = allSessionRows.filter((row) => {
-    const expectedAttempts = Math.max(0, row.question_count ?? 0);
-    if (expectedAttempts === 0) return false;
-    const attempts = attemptMap.get(row.id);
-    return !attempts?.length;
-  });
-  const payloadFallbackRows = rowsMissingAttemptRows.length > 0
-    ? await fetchQuizSessionPayloadRowsForUser(
-      userId,
-      rowsMissingAttemptRows.map((row) => row.id)
-    )
-    : [];
-  const payloadFallbackById = new Map(payloadFallbackRows.map((row) => [row.id, row] as const));
   const unresolvedCompletedSessionIds = findUnresolvedCompletedSessionIds(
-    sessionRows.map((row) => ({ id: row.id, questionCount: row.question_count })),
-    Array.from(attemptMap.entries())
-      .filter(([, attempts]) => attempts.length > 0)
-      .map(([sessionId]) => sessionId),
-    payloadFallbackRows
-      .filter((row) => (row.session_payload?.attempts?.length ?? 0) > 0)
-      .map((row) => row.id)
+    sessionRows.map(getCloudSessionAttemptSummary),
+    Array.from(attemptMap.entries()).map(([sessionId, attempts]) => [
+      sessionId,
+      attempts.length
+    ] as const)
   );
 
   if (unresolvedCompletedSessionIds.length > 0) {
@@ -1713,27 +1751,15 @@ async function fetchResolvedQuizSessionsForUser(userId: string) {
   }
 
   const sessions = allSessionRows
-    .map((row) => {
-      const expectedAttempts = Math.max(0, row.question_count ?? 0);
-      const hydratedRow = payloadFallbackById.get(row.id) ?? row;
-      const session = mapRowToSession(hydratedRow, attemptMap);
-      if (!session) return null;
-      if (expectedAttempts === 0) return session;
-      const attempts = attemptMap.get(row.id);
-      if (attempts?.length || session.attempts.length > 0) return session;
-      return null;
-    })
+    .map((row) => mapRowToSession(row, attemptMap))
     .filter((session): session is QuizSession => Boolean(session));
-  const sessionsMissingAttemptRows = payloadFallbackRows
-    .map((row) => mapRowToSession(row))
-    .filter((session): session is QuizSession => Boolean(session?.completedAt && session.attempts.length > 0));
   const recoveredCompletionSessions = recoverableReviewRows
-    .map((row) => mapRowToSession(payloadFallbackById.get(row.id) ?? row, attemptMap))
+    .map((row) => mapRowToSession(row, attemptMap))
     .filter((session): session is QuizSession => Boolean(session?.completedAt && session.attempts.length > 0));
 
   return {
     sessions,
-    sessionsMissingAttemptRows,
+    sessionsMissingAttemptRows: [] as QuizSession[],
     recoveredCompletionSessions
   };
 }
@@ -2453,8 +2479,8 @@ export async function syncLocalCompletedSessionsForCurrentUser(
 
   if (canReachCloud && hydrateRemoteHistory) {
     try {
-      const resolved = await withClientTimeout(
-        fetchResolvedQuizSessionsForUser(userId),
+      const resolved = await withAbortableClientTimeout(
+        (signal) => fetchResolvedQuizSessionsForUser(userId, signal),
         CLOUD_COMPLETED_HISTORY_READ_TIMEOUT_MS,
         "完整雲端紀錄讀取逾時，已保留這台裝置的紀錄與待補傳佇列。"
       );
@@ -3650,6 +3676,7 @@ export async function loadFeedbackMessages(limit = 20): Promise<FeedbackMessage[
 export async function createFeedbackMessage(input: {
   content: string;
   isAnonymous: boolean;
+  accessToken?: string | null;
   user?: Pick<User, "id" | "email" | "user_metadata"> | null;
   parentId?: string | null;
 }) {
@@ -3665,21 +3692,27 @@ export async function createFeedbackMessage(input: {
     throw new Error("留言內容不能是空白。");
   }
 
-  const accessToken = await getFeedbackAccessToken(input.user);
+  const identityIntent = getFeedbackIdentityIntent({
+    isAnonymous: input.isAnonymous,
+    hasUser: Boolean(input.user?.id),
+    accessToken: input.accessToken
+  });
+  if (identityIntent === "authentication-pending") {
+    throw new Error("登入狀態正在刷新，這則留言尚未送出，請稍後再試。");
+  }
+  const accessToken = identityIntent === "authenticated" ? input.accessToken : null;
 
-  const response = await fetchWithClientTimeout("/api/feedback", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json"
-    },
-    body: JSON.stringify({
-      accessToken,
+  const response = await postFeedbackRequest(
+    "/api/feedback",
+    {
       visitorId: getVisitorId(),
       content,
       isAnonymous: input.isAnonymous,
       parentId: input.parentId ?? null
-    })
-  }, FEEDBACK_REQUEST_TIMEOUT_MS, "留言送出逾時，請稍後再試。");
+    },
+    accessToken,
+    "留言送出逾時，請稍後再試。"
+  );
 
   const payload = (await response.json().catch(() => null)) as
     | {
@@ -3700,6 +3733,7 @@ export async function createFeedbackMessage(input: {
 export async function voteFeedbackMessage(input: {
   messageId: string;
   vote: 1 | -1 | null;
+  accessToken?: string | null;
   user?: Pick<User, "id" | "email" | "user_metadata"> | null;
 }) {
   if (isSupabaseRecoveryMode()) {
@@ -3709,20 +3743,26 @@ export async function voteFeedbackMessage(input: {
     throw new Error("Supabase 尚未設定，暫時無法投票。");
   }
 
-  const accessToken = await getFeedbackAccessToken(input.user);
+  const identityIntent = getFeedbackIdentityIntent({
+    isAnonymous: false,
+    hasUser: Boolean(input.user?.id),
+    accessToken: input.accessToken
+  });
+  if (identityIntent === "authentication-pending") {
+    throw new Error("登入狀態正在刷新，這次投票尚未送出，請稍後再試。");
+  }
+  const accessToken = identityIntent === "authenticated" ? input.accessToken : null;
 
-  const response = await fetchWithClientTimeout("/api/feedback/vote", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json"
-    },
-    body: JSON.stringify({
-      accessToken,
+  const response = await postFeedbackRequest(
+    "/api/feedback/vote",
+    {
       visitorId: getVisitorId(),
       messageId: input.messageId,
       vote: input.vote
-    })
-  }, FEEDBACK_REQUEST_TIMEOUT_MS, "留言投票逾時，請稍後再試。");
+    },
+    accessToken,
+    "留言投票逾時，請稍後再試。"
+  );
 
   const payload = (await response.json().catch(() => null)) as
     | {

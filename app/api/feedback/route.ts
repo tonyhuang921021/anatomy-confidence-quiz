@@ -32,6 +32,7 @@ type FeedbackVoteRow = {
 };
 
 const FEEDBACK_DAILY_LIMIT = 10;
+const FEEDBACK_AUTH_VERIFY_TIMEOUT_MS = 4000;
 const FEEDBACK_READ_CACHE_HEADER = "public, max-age=30, s-maxage=60, stale-while-revalidate=300";
 const FEEDBACK_DEGRADED_CACHE_HEADER = "no-store";
 
@@ -40,6 +41,13 @@ type FeedbackResponseMessage = ReturnType<typeof mapFeedbackMessageRow> & {
 };
 
 const feedbackReadCache = new Map<number, { messages: FeedbackResponseMessage[]; updatedAt: string }>();
+
+class FeedbackAuthError extends Error {
+  constructor(message: string, readonly status: 401 | 503) {
+    super(message);
+    this.name = "FeedbackAuthError";
+  }
+}
 
 function getServiceSupabaseClient() {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
@@ -55,6 +63,13 @@ function getServiceSupabaseClient() {
       autoRefreshToken: false
     }
   });
+}
+
+function getBearerToken(request: NextRequest) {
+  const authorization = request.headers.get("authorization") ?? "";
+  return authorization.toLowerCase().startsWith("bearer ")
+    ? authorization.slice(7).trim()
+    : "";
 }
 
 function isMissingRelationError(error: unknown, relationName: string) {
@@ -152,10 +167,12 @@ async function getVerifiedUser(supabase: any, accessToken?: string | null): Prom
   try {
     const { data, error } = (await withServerTimeout(
       supabase.auth.getUser(accessToken),
-      1200,
+      FEEDBACK_AUTH_VERIFY_TIMEOUT_MS,
       "登入狀態驗證逾時"
     )) as { data?: { user?: { id?: string; email?: string; user_metadata?: Record<string, unknown> } | null }; error?: unknown };
-    if (error || !data?.user?.id) return null;
+    if (error || !data?.user?.id) {
+      throw new FeedbackAuthError("登入狀態已失效，留言尚未送出，請重新整理後再試。", 401);
+    }
 
     return {
       id: data.user.id,
@@ -165,8 +182,9 @@ async function getVerifiedUser(supabase: any, accessToken?: string | null): Prom
           ? data.user.user_metadata.display_name
           : null
     };
-  } catch {
-    return null;
+  } catch (error) {
+    if (error instanceof FeedbackAuthError) throw error;
+    throw new FeedbackAuthError("登入驗證暫時逾時，留言尚未送出，請稍後再試。", 503);
   }
 }
 
@@ -267,7 +285,17 @@ export async function POST(request: NextRequest) {
     }
 
     const visitorId = body?.visitorId?.trim() || null;
-    const verifiedUser = await getVerifiedUser(supabase, body?.accessToken);
+    const requestedAnonymous = body?.isAnonymous !== false;
+    const accessToken = getBearerToken(request) || body?.accessToken?.trim() || "";
+    if (!requestedAnonymous && !accessToken) {
+      return NextResponse.json(
+        { ok: false, message: "登入狀態正在刷新，留言尚未送出，請稍後再試。" },
+        { status: 401 }
+      );
+    }
+    const verifiedUser = requestedAnonymous
+      ? null
+      : await getVerifiedUser(supabase, accessToken);
     const isLoggedIn = Boolean(verifiedUser?.id);
     const actorColumn = isLoggedIn ? "user_id" : "visitor_id";
     const actorValue = isLoggedIn ? verifiedUser?.id ?? null : visitorId;
@@ -300,7 +328,7 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    const isAnonymous = !verifiedUser || Boolean(body?.isAnonymous);
+    const isAnonymous = requestedAnonymous;
     const displayName = isAnonymous || !verifiedUser ? null : getFeedbackDisplayName(verifiedUser);
 
     const { data, error } = await withServerTimeout(
@@ -327,6 +355,12 @@ export async function POST(request: NextRequest) {
       message: mapFeedbackMessageRow(data as FeedbackMessageRow)
     });
   } catch (error) {
+    if (error instanceof FeedbackAuthError) {
+      return NextResponse.json(
+        { ok: false, message: error.message },
+        { status: error.status }
+      );
+    }
     const message = error instanceof Error ? error.message : "留言送出失敗";
     return NextResponse.json({ ok: false, message }, { status: 500 });
   }

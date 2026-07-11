@@ -144,13 +144,13 @@ function getFeedbackAuthorLabel(entry: FeedbackMessage) {
 }
 
 export function FeedbackBoard() {
-  const { configured, user } = useAuth();
+  const { configured, session, user } = useAuth();
   const [messages, setMessages] = useState<FeedbackMessage[]>([]);
   const [budget, setBudget] = useState<OpenAIBudgetStatus | null>(null);
   const [content, setContent] = useState("");
   const [replyTargetId, setReplyTargetId] = useState<string | null>(null);
   const [replyContent, setReplyContent] = useState("");
-  const [isAnonymous, setIsAnonymous] = useState(true);
+  const [isAnonymous, setIsAnonymous] = useState(false);
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [votingMessageId, setVotingMessageId] = useState<string | null>(null);
@@ -232,6 +232,7 @@ export function FeedbackBoard() {
       const created = await createFeedbackMessage({
         content,
         isAnonymous: !user || isAnonymous,
+        accessToken: session?.access_token,
         user
       });
       setMessages((current) => {
@@ -257,6 +258,7 @@ export function FeedbackBoard() {
       const created = await createFeedbackMessage({
         content: replyContent,
         isAnonymous: !user || isAnonymous,
+        accessToken: session?.access_token,
         user,
         parentId
       });
@@ -322,6 +324,7 @@ export function FeedbackBoard() {
       const result = await voteFeedbackMessage({
         messageId: entry.id,
         vote: nextVote,
+        accessToken: session?.access_token,
         user
       });
       setMessages((current) =>
