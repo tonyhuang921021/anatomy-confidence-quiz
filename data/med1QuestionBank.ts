@@ -1768,26 +1768,28 @@ function applyQuestionTextOverride(question: Question): Question {
   };
 }
 
+function finalizeQuestion(question: Question) {
+  return applyQuestionMedia(
+    applyQuestionTextOverride(
+      applyClassificationOverride(sanitizeQuestionText(question))
+    )
+  );
+}
+
 const remainingQuestionsRaw = (
   moexMed1RemainingDetailedV4Merged0011827Raw as DetailedQuestionSource
 ).questions;
 export const med1RemainingQuestions: Question[] = remainingQuestionsRaw
   .map(toQuestion)
   .filter((question): question is Question => Boolean(question))
-  .map(sanitizeQuestionText)
-  .map(applyClassificationOverride)
-  .map(applyQuestionTextOverride)
-  .map(applyQuestionMedia);
+  .map(finalizeQuestion);
 
 const missingQuestionsRaw =
   moexMed1Missing22QuestionsDetailedV5 as readonly MissingQuestionRaw[];
 export const med1MissingQuestions: Question[] = missingQuestionsRaw
   .map(toMissingQuestion)
   .filter((question): question is Question => Boolean(question))
-  .map(sanitizeQuestionText)
-  .map(applyClassificationOverride)
-  .map(applyQuestionTextOverride)
-  .map(applyQuestionMedia);
+  .map(finalizeQuestion);
 
 const missingBatch1Raw =
   (moexMed1MissingBatch1 as { questions: DetailedMissingBatchQuestionRaw[] })
@@ -1795,10 +1797,7 @@ const missingBatch1Raw =
 export const med1MissingBatch1Questions: Question[] = missingBatch1Raw
   .map(toDetailedMissingBatchQuestion)
   .filter((question): question is Question => Boolean(question))
-  .map(sanitizeQuestionText)
-  .map(applyClassificationOverride)
-  .map(applyQuestionTextOverride)
-  .map(applyQuestionMedia);
+  .map(finalizeQuestion);
 
 const missingBatch2Raw =
   (moexMed1MissingBatch2 as { questions: DetailedMissingBatchQuestionRaw[] })
@@ -1806,45 +1805,30 @@ const missingBatch2Raw =
 export const med1MissingBatch2Questions: Question[] = missingBatch2Raw
   .map(toDetailedMissingBatchQuestion)
   .filter((question): question is Question => Boolean(question))
-  .map(sanitizeQuestionText)
-  .map(applyClassificationOverride)
-  .map(applyQuestionTextOverride)
-  .map(applyQuestionMedia);
+  .map(finalizeQuestion);
 
 const missingBatch3Raw = moexMed1MissingBatch3 as readonly Batch3QuestionRaw[];
 export const med1MissingBatch3Questions: Question[] = missingBatch3Raw
   .map(toBatch3Question)
   .filter((question): question is Question => Boolean(question))
-  .map(sanitizeQuestionText)
-  .map(applyClassificationOverride)
-  .map(applyQuestionTextOverride)
-  .map(applyQuestionMedia);
+  .map(finalizeQuestion);
 
 const requestedPatchQuestionsRaw =
   moexMed1Requested71QuestionsDetailedPatchV5.questions as readonly RequestedPatchQuestionRaw[];
 export const med1RequestedPatchQuestions: Question[] = requestedPatchQuestionsRaw
   .map(toRequestedPatchQuestion)
   .filter((question): question is Question => Boolean(question))
-  .map(sanitizeQuestionText)
-  .map(applyClassificationOverride)
-  .map(applyQuestionTextOverride)
-  .map(applyQuestionMedia);
+  .map(finalizeQuestion);
 
 const stage2QuestionsRaw =
   moexMedStage2Merged0013100.questions as readonly Stage2QuestionRaw[];
 export const medStage2Questions: Question[] = stage2QuestionsRaw
   .map(toStage2Question)
   .filter((question): question is Question => Boolean(question))
-  .map(sanitizeQuestionText)
-  .map(applyClassificationOverride)
-  .map(applyQuestionTextOverride)
-  .map(applyQuestionMedia);
+  .map(finalizeQuestion);
 
 const anatomyQuestionsWithOverrides: Question[] = anatomyQuestions
-  .map(sanitizeQuestionText)
-  .map(applyClassificationOverride)
-  .map(applyQuestionTextOverride)
-  .map(applyQuestionMedia);
+  .map(finalizeQuestion);
 
 const MED1_CANONICAL_SUBJECTS = new Set<SubjectName>([
   "解剖學",
@@ -1963,35 +1947,46 @@ export const canonicalQuestionBank: Question[] = dedupeQuestionBank([
   ...manualInjectedQuestions
 ]).map(applyAnalysisPrimaryTagClassification);
 
-export const allAnatomyQuestions: Question[] = canonicalQuestionBank.filter(
-  (question) => question.subject === "解剖學"
-);
+const QUESTION_BANK_SUBJECTS: SubjectName[] = [
+  "醫學（一）",
+  "醫學（二）",
+  "解剖學",
+  "生理學",
+  "生物化學",
+  "藥理學",
+  "病理學",
+  "微生物免疫學",
+  "胚胎學",
+  "組織學",
+  "寄生蟲學",
+  "公共衛生學",
+  "細胞生物學",
+  "分子生物學",
+  "其他醫學一"
+];
 
-const med1CoreQuestions: Question[] = canonicalQuestionBank.filter((question) =>
-  MED1_CANONICAL_SUBJECTS.has(question.subject)
-);
+function buildQuestionsBySubject(questionBank: Question[]) {
+  const questionMap = Object.fromEntries(
+    QUESTION_BANK_SUBJECTS.map((subject) => [subject, [] as Question[]])
+  ) as Record<SubjectName, Question[]>;
 
-const med2CoreQuestions: Question[] = canonicalQuestionBank.filter((question) =>
-  MED2_CANONICAL_SUBJECTS.has(question.subject)
-);
+  for (const question of questionBank) {
+    if (MED1_CANONICAL_SUBJECTS.has(question.subject)) {
+      questionMap["醫學（一）"].push(question);
+    }
+    if (MED2_CANONICAL_SUBJECTS.has(question.subject)) {
+      questionMap["醫學（二）"].push(question);
+    }
+    if (question.subject !== "醫學（一）" && question.subject !== "醫學（二）") {
+      questionMap[question.subject]?.push(question);
+    }
+  }
 
-export const med1QuestionsBySubject: Record<SubjectName, Question[]> = {
-  "醫學（一）": med1CoreQuestions,
-  "醫學（二）": med2CoreQuestions,
-  "解剖學": allAnatomyQuestions,
-  "生理學": canonicalQuestionBank.filter((question) => question.subject === "生理學"),
-  "生物化學": canonicalQuestionBank.filter((question) => question.subject === "生物化學"),
-  "藥理學": canonicalQuestionBank.filter((question) => question.subject === "藥理學"),
-  "病理學": canonicalQuestionBank.filter((question) => question.subject === "病理學"),
-  "微生物免疫學": canonicalQuestionBank.filter((question) => question.subject === "微生物免疫學"),
-  "胚胎學": canonicalQuestionBank.filter((question) => question.subject === "胚胎學"),
-  "組織學": canonicalQuestionBank.filter((question) => question.subject === "組織學"),
-  "寄生蟲學": canonicalQuestionBank.filter((question) => question.subject === "寄生蟲學"),
-  "公共衛生學": canonicalQuestionBank.filter((question) => question.subject === "公共衛生學"),
-  "細胞生物學": canonicalQuestionBank.filter((question) => question.subject === "細胞生物學"),
-  "分子生物學": canonicalQuestionBank.filter((question) => question.subject === "分子生物學"),
-  "其他醫學一": canonicalQuestionBank.filter((question) => question.subject === "其他醫學一")
-};
+  return questionMap;
+}
+
+export const med1QuestionsBySubject = buildQuestionsBySubject(canonicalQuestionBank);
+export const allAnatomyQuestions = med1QuestionsBySubject["解剖學"];
 
 function buildOutline(questions: Question[]): SubjectOutlineEntry[] {
   const chapterMap = new Map<string, Set<string>>();
@@ -2010,23 +2005,29 @@ function buildOutline(questions: Question[]): SubjectOutlineEntry[] {
     .sort((a, b) => a.chapter.localeCompare(b.chapter, "zh-Hant"));
 }
 
-export const med1OutlinesBySubject: Record<SubjectName, SubjectOutlineEntry[]> = {
-  "醫學（一）": buildOutline(med1QuestionsBySubject["醫學（一）"]),
-  "醫學（二）": buildOutline(med1QuestionsBySubject["醫學（二）"]),
-  "解剖學": anatomyOutline.map((item) => ({ chapter: item.chapter, sections: [...item.sections] })),
-  "生理學": buildOutline(med1QuestionsBySubject["生理學"]),
-  "生物化學": buildOutline(med1QuestionsBySubject["生物化學"]),
-  "藥理學": buildOutline(med1QuestionsBySubject["藥理學"]),
-  "病理學": buildOutline(med1QuestionsBySubject["病理學"]),
-  "微生物免疫學": buildOutline(med1QuestionsBySubject["微生物免疫學"]),
-  "胚胎學": buildOutline(med1QuestionsBySubject["胚胎學"]),
-  "組織學": buildOutline(med1QuestionsBySubject["組織學"]),
-  "寄生蟲學": buildOutline(med1QuestionsBySubject["寄生蟲學"]),
-  "公共衛生學": buildOutline(med1QuestionsBySubject["公共衛生學"]),
-  "細胞生物學": buildOutline(med1QuestionsBySubject["細胞生物學"]),
-  "分子生物學": buildOutline(med1QuestionsBySubject["分子生物學"]),
-  "其他醫學一": buildOutline(med1QuestionsBySubject["其他醫學一"])
-};
+const outlineCache = new Map<SubjectName, SubjectOutlineEntry[]>();
+export const med1OutlinesBySubject = {} as Record<SubjectName, SubjectOutlineEntry[]>;
+
+for (const subject of QUESTION_BANK_SUBJECTS) {
+  Object.defineProperty(med1OutlinesBySubject, subject, {
+    configurable: false,
+    enumerable: true,
+    get() {
+      const cached = outlineCache.get(subject);
+      if (cached) return cached;
+
+      const outline =
+        subject === "解剖學"
+          ? anatomyOutline.map((item) => ({
+              chapter: item.chapter,
+              sections: [...item.sections]
+            }))
+          : buildOutline(med1QuestionsBySubject[subject]);
+      outlineCache.set(subject, outline);
+      return outline;
+    }
+  });
+}
 
 export type PastPaperOption = {
   key: string;
@@ -2141,7 +2142,7 @@ function buildWholePastPaperBankFromBank(questionBank: Question[]) {
     });
 }
 
-const wholePastPaperBank = buildWholePastPaperBankFromBank(canonicalQuestionBank);
+let wholePastPaperBankCache: Question[] | null = null;
 
 export function applyQuestionClassificationOverride(
   question: Question,
@@ -2200,7 +2201,10 @@ export type { AISimulationPaperOption } from "@/data/aiSimulationPapers";
 function getWholePastPaperBank(
   overrides: Record<string, QuestionClassificationOverride> = {}
 ) {
-  if (Object.keys(overrides).length === 0) return wholePastPaperBank;
+  if (Object.keys(overrides).length === 0) {
+    wholePastPaperBankCache ??= buildWholePastPaperBankFromBank(canonicalQuestionBank);
+    return wholePastPaperBankCache;
+  }
 
   return buildWholePastPaperBankFromBank(getCanonicalQuestionBank(overrides));
 }

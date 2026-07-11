@@ -63,6 +63,8 @@ const AUTH_SESSION_REFRESH_TIMEOUT_MS = 6000;
 const AUTH_SESSION_REFRESH_LEEWAY_MS = 90_000;
 const AUTH_SESSION_RESUME_COOLDOWN_MS = 15_000;
 const AUTH_SIGN_OUT_TIMEOUT_MS = 2500;
+const AUTOMATIC_CLOUD_SYNC_START_DELAY_MS = 800;
+const AUTOMATIC_CLOUD_SYNC_IDLE_TIMEOUT_MS = 3000;
 const AUTH_SESSION_SNAPSHOT_KEY = "medQuizAuthSessionSnapshot";
 const CLOUD_FALLBACK_MESSAGE = "暫用本機，稍後補傳。雲端同步暫時連不上，作答會先留在這台裝置。";
 const AUTH_FALLBACK_MESSAGE = "暫用本機，稍後補傳。登入狀態讀取逾時，如果剛剛已登入，稍後可再同步。";
@@ -315,10 +317,47 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const syncStartedAtRef = useRef(0);
   const sessionRef = useRef<Session | null>(null);
   const resumeRefreshAtRef = useRef(0);
+  const automaticSyncTimerRef = useRef<
+    { kind: "idle" | "timeout"; id: number } | null
+  >(null);
 
   useEffect(() => {
     sessionRef.current = session;
   }, [session]);
+
+  const cancelScheduledAutomaticCloudSync = useCallback(() => {
+    const pending = automaticSyncTimerRef.current;
+    if (!pending) return;
+    const cancelIdleCallback = window.cancelIdleCallback;
+    if (pending.kind === "idle" && typeof cancelIdleCallback === "function") {
+      cancelIdleCallback.call(window, pending.id);
+    } else {
+      window.clearTimeout(pending.id);
+    }
+    automaticSyncTimerRef.current = null;
+  }, []);
+
+  const scheduleAutomaticCloudSync = useCallback((task: () => void) => {
+    cancelScheduledAutomaticCloudSync();
+    const runTask = () => {
+      automaticSyncTimerRef.current = null;
+      task();
+    };
+    const requestIdleCallback = window.requestIdleCallback;
+    if (typeof requestIdleCallback === "function") {
+      automaticSyncTimerRef.current = {
+        kind: "idle",
+        id: requestIdleCallback.call(window, runTask, {
+          timeout: AUTOMATIC_CLOUD_SYNC_IDLE_TIMEOUT_MS
+        })
+      };
+      return;
+    }
+    automaticSyncTimerRef.current = {
+      kind: "timeout",
+      id: window.setTimeout(runTask, AUTOMATIC_CLOUD_SYNC_START_DELAY_MS)
+    };
+  }, [cancelScheduledAutomaticCloudSync]);
 
   function markLocalSyncFallback(error: unknown) {
     setSyncStatus("ready");
@@ -479,16 +518,19 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         setSyncVersion((value) => value + 1);
         return;
       }
-      void refreshCloudData(nextSession.user.id, nextSession.user, {
-        hydrateRemoteHistory: false,
-        automatic: true
+      scheduleAutomaticCloudSync(() => {
+        void refreshCloudData(nextSession.user.id, nextSession.user, {
+          hydrateRemoteHistory: false,
+          automatic: true
+        });
       });
     } else {
+      cancelScheduledAutomaticCloudSync();
       setPasswordRecovery(false);
       setSyncStatus("idle");
       setSyncError("");
     }
-  }, [refreshCloudData]);
+  }, [cancelScheduledAutomaticCloudSync, refreshCloudData, scheduleAutomaticCloudSync]);
 
   const finishPasswordRecovery = useCallback(() => {
     setPasswordRecovery(false);
@@ -504,6 +546,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setPasswordRecovery(false);
     setSyncStatus("idle");
     setSyncError("");
+    cancelScheduledAutomaticCloudSync();
     clearSupabaseBrowserAuthStorage();
 
     if (recoveryMode) {
@@ -519,7 +562,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     ).catch(() => {
       clearSupabaseBrowserAuthStorage();
     });
-  }, [configured, recoveryMode]);
+  }, [cancelScheduledAutomaticCloudSync, configured, recoveryMode]);
 
   useEffect(() => {
     if (!configured || recoveryMode) {
@@ -560,9 +603,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             setSyncVersion((value) => value + 1);
             return;
           }
-          void refreshCloudData(recoveredSession.user.id, recoveredSession.user, {
-            hydrateRemoteHistory: false,
-            automatic: true
+          scheduleAutomaticCloudSync(() => {
+            void refreshCloudData(recoveredSession.user.id, recoveredSession.user, {
+              hydrateRemoteHistory: false,
+              automatic: true
+            });
           });
         }
       } catch (error) {
@@ -582,9 +627,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             setSyncVersion((value) => value + 1);
             return;
           }
-          void refreshCloudData(recoveredSession.user.id, recoveredSession.user, {
-            hydrateRemoteHistory: false,
-            automatic: true
+          scheduleAutomaticCloudSync(() => {
+            void refreshCloudData(recoveredSession.user.id, recoveredSession.user, {
+              hydrateRemoteHistory: false,
+              automatic: true
+            });
           });
         }
       }
@@ -643,9 +690,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       window.removeEventListener("focus", refreshSessionAfterResume);
       window.removeEventListener("pageshow", refreshSessionAfterResume);
       document.removeEventListener("visibilitychange", refreshSessionAfterResume);
+      cancelScheduledAutomaticCloudSync();
       subscription.unsubscribe();
     };
-  }, [configured, recoveryMode]);
+  }, [cancelScheduledAutomaticCloudSync, configured, recoveryMode, scheduleAutomaticCloudSync]);
 
   const value = useMemo<AuthContextValue>(
     () => ({

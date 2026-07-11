@@ -2217,6 +2217,13 @@ select {
     contain: paint;
   }
 
+  @supports (content-visibility: auto) {
+    .result-review-item {
+      content-visibility: auto;
+      contain-intrinsic-block-size: auto 4.5rem;
+    }
+  }
+
   .structured-explanation-text {
     overflow-wrap: anywhere;
   }

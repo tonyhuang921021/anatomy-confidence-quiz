@@ -7,6 +7,7 @@ import { isSupabaseRecoveryMode, getRecoveryTimestamp } from "@/lib/supabase/rec
 import type { OnlineVisitor, VisitorStats } from "@/types/quiz";
 
 const REFRESH_INTERVAL_MS = 5 * 60 * 1000;
+const INITIAL_REFRESH_DELAY_MS = 700;
 
 const emptyStats: VisitorStats = {
   totalVisitors: 0,
@@ -130,7 +131,9 @@ export function VisitorStatsPanel({ compact = false }: VisitorStatsPanelProps) {
       }
     }
 
-    void refresh();
+    const initialTimeoutId = window.setTimeout(() => {
+      void refresh();
+    }, INITIAL_REFRESH_DELAY_MS);
     const intervalId = window.setInterval(() => {
       if (typeof document === "undefined" || document.visibilityState === "visible") {
         void refresh();
@@ -139,6 +142,7 @@ export function VisitorStatsPanel({ compact = false }: VisitorStatsPanelProps) {
 
     return () => {
       cancelled = true;
+      window.clearTimeout(initialTimeoutId);
       window.clearInterval(intervalId);
     };
   }, []);
