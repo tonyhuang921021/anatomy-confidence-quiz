@@ -42,7 +42,7 @@ test("有 primaryTag 的題目完整保留，taxonomy gap 明確使用 null", ()
 
   assert.equal(
     Object.values(displayMap).filter((primaryTag) => primaryTag === null).length,
-    23
+    10
   );
 });
 

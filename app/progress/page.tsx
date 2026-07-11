@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 import { useAuth } from "@/components/AuthProvider";
 import { useCloudHistoryHydration } from "@/components/useCloudHistoryHydration";
@@ -15,10 +16,16 @@ import {
   getProgressStatus,
   type ProgressBlock
 } from "@/lib/progressMetrics";
+import { buildNewQuizHref } from "@/lib/startSettingsUrl";
 import { loadCompletedHistorySessionsForUser } from "@/lib/storage";
+import {
+  buildWeaknessPracticeSettings,
+  buildWeaknessQuestionOrder
+} from "@/lib/weaknessAnalysis";
 import type { Attempt, CompletionStatus, SubjectName } from "@/types/quiz";
 
 type ProgressHistorySession = {
+  id: string;
   attempts: Attempt[];
 };
 
@@ -103,6 +110,7 @@ function aggregateGroup(
 }
 
 export default function ProgressPage() {
+  const router = useRouter();
   const { user, syncVersion } = useAuth();
   const cloudHistoryHydrating = useCloudHistoryHydration();
   const [sessions, setSessions] = useState<ProgressHistorySession[]>([]);
@@ -113,7 +121,12 @@ export default function ProgressPage() {
 
   useEffect(() => {
     const refreshSessions = () => {
-      setSessions(loadCompletedHistorySessionsForUser(user?.id));
+      setSessions(
+        loadCompletedHistorySessionsForUser(user?.id).map((session, index) => ({
+          id: "id" in session ? session.id : `progress-history-${index}`,
+          attempts: session.attempts
+        }))
+      );
       setHistoryOwnerKey(activeHistoryOwnerKey);
     };
 
@@ -148,6 +161,30 @@ export default function ProgressPage() {
   const localHistoryReady = historyOwnerKey === activeHistoryOwnerKey;
   const showHistoryLoading =
     !localHistoryReady || Boolean(user?.id && cloudHistoryHydrating && sessions.length === 0);
+
+  function startBlockPractice(subject: SubjectName, block: ProgressBlock) {
+    const practiceLabel =
+      block.fullLabel === subject ? `${subject}－尚未細分` : block.fullLabel;
+    const questionOrder = buildWeaknessQuestionOrder({
+      questions: subjectRegistry[subject].questions,
+      sessions,
+      subject,
+      primaryTag: practiceLabel,
+      questionIds: block.questionIds
+    });
+    if (questionOrder.length === 0) return;
+
+    router.push(
+      buildNewQuizHref(
+        buildWeaknessPracticeSettings({
+          subject,
+          primaryTag: practiceLabel,
+          questionOrder,
+          customPoolLabel: `進度區塊：${practiceLabel}`
+        })
+      )
+    );
+  }
 
   return (
     <main className="shell">
@@ -276,30 +313,42 @@ export default function ProgressPage() {
 
                             {isSubjectOpen ? (
                               <div className="border-t border-slate-200 bg-white px-4 pb-2">
-                                <div className="hidden grid-cols-[minmax(0,1fr)_9rem_7rem_7rem] gap-4 border-b border-slate-100 py-3 text-xs font-semibold text-slate-500 md:grid">
+                                <div className="hidden grid-cols-[minmax(0,1fr)_9rem_7rem_7rem_3rem] gap-4 border-b border-slate-100 py-3 text-xs font-semibold text-slate-500 md:grid">
                                   <span>區塊</span>
                                   <span>已作答</span>
                                   <span>完成度</span>
                                   <span>答對率</span>
+                                  <span className="sr-only">做題</span>
                                 </div>
                                 {subject.blocks.map((block) => (
                                   <div
                                     key={block.key}
-                                    className="grid gap-2 border-b border-slate-100 py-4 last:border-b-0 md:grid-cols-[minmax(0,1fr)_9rem_7rem_7rem] md:items-center md:gap-4"
+                                    className="grid grid-cols-[minmax(0,1fr)_2.75rem] gap-2 border-b border-slate-100 py-4 last:border-b-0 md:grid-cols-[minmax(0,1fr)_9rem_7rem_7rem_3rem] md:items-center md:gap-4"
                                   >
                                     <p className="min-w-0 font-semibold text-ink">{block.label}</p>
-                                    <p className="text-sm text-slate-600">
-                                      <span className="md:hidden">已作答 </span>
+                                    <p className="hidden text-sm text-slate-600 md:block">
                                       {block.attemptedQuestions} / {block.totalQuestionsInBank}
                                     </p>
-                                    <p className="text-sm text-slate-600">
-                                      <span className="md:hidden">完成度 </span>
+                                    <p className="hidden text-sm text-slate-600 md:block">
                                       {block.completionRate}%
                                     </p>
-                                    <p className="text-sm text-slate-600">
-                                      <span className="md:hidden">答對率 </span>
+                                    <p className="hidden text-sm text-slate-600 md:block">
                                       {block.totalAttempts > 0 ? `${block.correctRate}%` : "尚未作答"}
                                     </p>
+                                    <p className="col-span-2 text-sm leading-6 text-slate-600 md:hidden">
+                                      已作答 {block.attemptedQuestions} / {block.totalQuestionsInBank}
+                                      ・ 完成度 {block.completionRate}%
+                                      ・ 答對率 {block.totalAttempts > 0 ? `${block.correctRate}%` : "尚未作答"}
+                                    </p>
+                                    <button
+                                      type="button"
+                                      onClick={() => startBlockPractice(subject.subject, block)}
+                                      className="col-start-2 row-start-1 flex h-10 w-10 items-center justify-center rounded-full bg-brand-600 text-sm text-white transition hover:bg-brand-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-700 md:col-start-5"
+                                      aria-label={`開始做${subject.label}的${block.label}題目`}
+                                      title="開始做這個區塊"
+                                    >
+                                      <span aria-hidden="true">▶</span>
+                                    </button>
                                   </div>
                                 ))}
                               </div>

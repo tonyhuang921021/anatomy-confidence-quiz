@@ -209,6 +209,38 @@ test("弱點複習使用可中斷且會正常記錄的獨立題池設定", () =>
   assert.equal(settings.customPoolLabel, "考前弱點：生理學－腎臟、水電解質與酸鹼");
 });
 
+test("進度區塊可沿用弱點排序並限制在指定題號", () => {
+  const questions = [
+    makeQuestion("target-new", "生理學－心臟與循環", 2026, 1),
+    makeQuestion("target-risk", "生理學－腎臟、水電解質與酸鹼", 2026, 2),
+    makeQuestion("outside", "生理學－心臟與循環", 2026, 3)
+  ];
+  const sessions = [
+    makeSession("history", [
+      makeAttempt("target-risk", false, "2026-07-01T12:00:00.000Z", 4)
+    ])
+  ];
+
+  const order = buildWeaknessQuestionOrder({
+    questions,
+    sessions,
+    subject: "生理學",
+    primaryTag: "生理學－尚未細分",
+    questionIds: ["target-new", "target-risk"]
+  });
+  const settings = buildWeaknessPracticeSettings({
+    subject: "生理學",
+    primaryTag: "生理學－尚未細分",
+    questionOrder: order,
+    customPoolLabel: "進度區塊：生理學－尚未細分"
+  });
+
+  assert.deepEqual(order, ["target-new", "target-risk"]);
+  assert.deepEqual(settings.customQuestionIds, ["target-new", "target-risk"]);
+  assert.equal(settings.customPoolLabel, "進度區塊：生理學－尚未細分");
+  assert.equal(settings.stopAfterReview, true);
+});
+
 test("九千筆歷史仍完整納入，但近期排名只看不同題目", () => {
   const questions = Array.from({ length: 100 }, (_, index) => makeQuestion(`heavy-${index}`));
   const sessions = Array.from({ length: 9000 }, (_, index) =>

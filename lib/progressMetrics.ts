@@ -14,6 +14,7 @@ export type ProgressBlock = ProgressMetrics & {
   key: string;
   label: string;
   fullLabel: string;
+  questionIds: string[];
 };
 
 const round = (value: number) => Math.round(value * 10) / 10;
@@ -71,6 +72,7 @@ export function buildProgressBlocks(questions: Question[], attempts: Attempt[]):
         key,
         label: formatProgressBlockLabel(bucket.label, subject),
         fullLabel: bucket.label,
+        questionIds: Array.from(bucket.ids),
         ...metrics
       };
     })

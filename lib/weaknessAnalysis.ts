@@ -59,6 +59,7 @@ type WeaknessPracticeSettingsInput = {
   subject: SubjectName;
   primaryTag: string;
   questionOrder: string[];
+  customPoolLabel?: string;
 };
 
 type WeaknessAnalysisInput = {
@@ -309,7 +310,8 @@ export function analyzeRecentWeakness({
 export function buildWeaknessPracticeSettings({
   subject,
   primaryTag,
-  questionOrder
+  questionOrder,
+  customPoolLabel
 }: WeaknessPracticeSettingsInput): QuizSettings {
   return {
     mode: "random",
@@ -321,7 +323,7 @@ export function buildWeaknessPracticeSettings({
     excludeAiGenerated: true,
     customQuestionIds: questionOrder,
     priorityQuestionIds: questionOrder,
-    customPoolLabel: `考前弱點：${primaryTag}`,
+    customPoolLabel: customPoolLabel ?? `考前弱點：${primaryTag}`,
     strictCustomQuestionPool: true,
     preserveCustomQuestionOrder: true,
     enableConfidenceCalibration: true
@@ -333,19 +335,24 @@ type WeaknessQuestionOrderInput = {
   sessions: Pick<QuizSession, "id" | "attempts">[];
   subject: SubjectName;
   primaryTag: string;
+  questionIds?: string[];
 };
 
 export function buildWeaknessQuestionOrder({
   questions,
   sessions,
   subject,
-  primaryTag
+  primaryTag,
+  questionIds
 }: WeaknessQuestionOrderInput) {
+  const explicitQuestionIds = questionIds ? new Set(questionIds) : null;
   const candidates = questions.filter(
     (question) =>
       question.sourceType !== "AI_GENERATED" &&
       question.subject === subject &&
-      getQuestionPrimaryTag(question) === primaryTag
+      (explicitQuestionIds
+        ? explicitQuestionIds.has(question.id)
+        : getQuestionPrimaryTag(question) === primaryTag)
   );
   const questionMap = new Map(candidates.map((question) => [question.id, question] as const));
   const history = buildQuestionHistory(dedupeSessionAttempts(sessions, questionMap));

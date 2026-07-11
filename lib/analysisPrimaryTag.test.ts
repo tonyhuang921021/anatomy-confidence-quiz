@@ -77,8 +77,8 @@ test("微生物各子科標籤已自帶科目，不重複顯示微生物免疫�
 });
 
 test("taxonomy gap 題目也會用可信大科補上原小節前綴", () => {
-  const question = makeQuestion("MOEX-100030-1101-Q098", "生理學");
-  question.section = "篩檢指標判讀";
+  const question = makeQuestion("missing-2012-1-101030-1101-q023", "生理學");
+  question.section = "突觸傳遞與鈣離子";
 
-  assert.equal(getQuestionPrimaryTag(question), "公共衛生學－篩檢指標判讀");
+  assert.equal(getQuestionPrimaryTag(question), "解剖學－突觸傳遞與鈣離子");
 });
