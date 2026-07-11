@@ -9,24 +9,17 @@ import {
   completionStatusClasses,
   getCompletionStatusLabel
 } from "@/lib/completionStatusDisplay";
+import {
+  buildProgressBlocks,
+  calculateProgressMetrics,
+  getProgressStatus,
+  type ProgressBlock
+} from "@/lib/progressMetrics";
 import { loadCompletedHistorySessionsForUser } from "@/lib/storage";
 import type { Attempt, CompletionStatus, SubjectName } from "@/types/quiz";
 
 type ProgressHistorySession = {
   attempts: Attempt[];
-};
-
-type SectionProgress = {
-  chapter: string;
-  section: string;
-  totalQuestionsInBank: number;
-  attemptedQuestions: number;
-  completionRate: number;
-  correctRate: number;
-  averageConfidence: number;
-  masteryScore: number;
-  status: CompletionStatus;
-  lastAttemptedAt?: string;
 };
 
 type SubjectProgress = {
@@ -36,13 +29,10 @@ type SubjectProgress = {
   attemptedQuestions: number;
   totalAttempts: number;
   correctAttempts: number;
-  confidenceTotal: number;
   completionRate: number;
   correctRate: number;
-  averageConfidence: number;
-  masteryScore: number;
   status: CompletionStatus;
-  sections: SectionProgress[];
+  blocks: ProgressBlock[];
 };
 
 type GroupProgress = {
@@ -51,80 +41,16 @@ type GroupProgress = {
   description: string;
   totalQuestionsInBank: number;
   attemptedQuestions: number;
+  totalAttempts: number;
+  correctAttempts: number;
   completionRate: number;
   correctRate: number;
-  averageConfidence: number;
-  masteryScore: number;
   status: CompletionStatus;
   subjects: SubjectProgress[];
 };
 
-function round(value: number) {
-  return Math.round(value * 10) / 10;
-}
-
 function getRemainingQuestions(item: { totalQuestionsInBank: number; attemptedQuestions: number }) {
   return Math.max(0, item.totalQuestionsInBank - item.attemptedQuestions);
-}
-
-function getStatus(completionRate: number, masteryScore: number): CompletionStatus {
-  if (completionRate === 0) return "未開始";
-  if (completionRate < 80) return "進行中";
-  if (masteryScore < 70) return "已完成但不穩";
-  return "已完成且穩定";
-}
-
-function formatTime(value?: string) {
-  if (!value) return "尚未作答";
-  return new Date(value).toLocaleString("zh-TW", {
-    year: "numeric",
-    month: "2-digit",
-    day: "2-digit",
-    hour: "2-digit",
-    minute: "2-digit"
-  });
-}
-
-function calculateSectionProgress(
-  questionIds: Set<string>,
-  attempts: Attempt[],
-  chapter: string,
-  section: string
-): SectionProgress {
-  const sectionAttempts = attempts.filter((attempt) => questionIds.has(attempt.questionId));
-  const attemptedQuestions = new Set(sectionAttempts.map((attempt) => attempt.questionId)).size;
-  const completionRate =
-    questionIds.size === 0 ? 0 : round((attemptedQuestions / questionIds.size) * 100);
-  const correctRate =
-    sectionAttempts.length === 0
-      ? 0
-      : round((sectionAttempts.filter((attempt) => attempt.isCorrect).length / sectionAttempts.length) * 100);
-  const averageConfidence =
-    sectionAttempts.length === 0
-      ? 0
-      : round(
-          sectionAttempts.reduce((sum, attempt) => sum + attempt.confidence, 0) / sectionAttempts.length
-        );
-  const masteryScore = round(
-    completionRate * 0.4 + correctRate * 0.4 + (averageConfidence / 5) * 100 * 0.2
-  );
-  const lastAttemptedAt = sectionAttempts
-    .map((attempt) => attempt.answeredAt)
-    .sort()
-    .at(-1);
-
-  return {
-    chapter,
-    section,
-    totalQuestionsInBank: questionIds.size,
-    attemptedQuestions,
-    completionRate,
-    correctRate,
-    averageConfidence,
-    masteryScore,
-    status: getStatus(completionRate, masteryScore),
-    lastAttemptedAt
-  };
 }
 
 function calculateSubjectProgress(subject: SubjectName, sessions: ProgressHistorySession[]): SubjectProgress {
@@ -135,49 +61,14 @@ function calculateSubjectProgress(subject: SubjectName, sessions: ProgressHistor
     .flatMap((session) => session.attempts)
     .filter((attempt) => questionMap.has(attempt.questionId));
 
-  const sectionBuckets = new Map<string, Set<string>>();
-  trackableQuestions.forEach((question) => {
-    const key = `${question.chapter}__${question.section}`;
-    const bucket = sectionBuckets.get(key) ?? new Set<string>();
-    bucket.add(question.id);
-    sectionBuckets.set(key, bucket);
-  });
-
-  const sections = Array.from(sectionBuckets.entries())
-    .map(([key, ids]) => {
-      const [chapter, section] = key.split("__");
-      return calculateSectionProgress(ids, attempts, chapter, section);
-    })
-    .sort((a, b) => a.chapter.localeCompare(b.chapter) || a.section.localeCompare(b.section));
-
-  const attemptedQuestions = new Set(attempts.map((attempt) => attempt.questionId)).size;
-  const totalAttempts = attempts.length;
-  const correctAttempts = attempts.filter((attempt) => attempt.isCorrect).length;
-  const confidenceTotal = attempts.reduce((sum, attempt) => sum + attempt.confidence, 0);
-  const completionRate =
-    trackableQuestions.length === 0 ? 0 : round((attemptedQuestions / trackableQuestions.length) * 100);
-  const correctRate =
-    totalAttempts === 0 ? 0 : round((correctAttempts / totalAttempts) * 100);
-  const averageConfidence =
-    totalAttempts === 0 ? 0 : round(confidenceTotal / totalAttempts);
-  const masteryScore = round(
-    completionRate * 0.4 + correctRate * 0.4 + (averageConfidence / 5) * 100 * 0.2
-  );
+  const metrics = calculateProgressMetrics(new Set(trackableQuestions.map((question) => question.id)), attempts);
 
   return {
     subject,
     label: subjectItem.label,
-    totalQuestionsInBank: trackableQuestions.length,
-    attemptedQuestions,
-    totalAttempts,
-    correctAttempts,
-    confidenceTotal,
-    completionRate,
-    correctRate,
-    averageConfidence,
-    masteryScore,
-    status: getStatus(completionRate, masteryScore),
-    sections
+    ...metrics,
+    status: getProgressStatus(metrics.completionRate, metrics.correctRate),
+    blocks: buildProgressBlocks(trackableQuestions, attempts)
   };
 }
 
@@ -191,16 +82,10 @@ function aggregateGroup(
   const attemptedQuestions = subjects.reduce((sum, subject) => sum + subject.attemptedQuestions, 0);
   const totalAttempts = subjects.reduce((sum, subject) => sum + subject.totalAttempts, 0);
   const correctAttempts = subjects.reduce((sum, subject) => sum + subject.correctAttempts, 0);
-  const confidenceTotal = subjects.reduce((sum, subject) => sum + subject.confidenceTotal, 0);
   const completionRate =
-    totalQuestionsInBank === 0 ? 0 : round((attemptedQuestions / totalQuestionsInBank) * 100);
+    totalQuestionsInBank === 0 ? 0 : Math.round((attemptedQuestions / totalQuestionsInBank) * 1000) / 10;
   const correctRate =
-    totalAttempts === 0 ? 0 : round((correctAttempts / totalAttempts) * 100);
-  const averageConfidence =
-    totalAttempts === 0 ? 0 : round(confidenceTotal / totalAttempts);
-  const masteryScore = round(
-    completionRate * 0.4 + correctRate * 0.4 + (averageConfidence / 5) * 100 * 0.2
-  );
+    totalAttempts === 0 ? 0 : Math.round((correctAttempts / totalAttempts) * 1000) / 10;
 
   return {
     key,
@@ -208,11 +93,11 @@ function aggregateGroup(
     description,
     totalQuestionsInBank,
     attemptedQuestions,
+    totalAttempts,
+    correctAttempts,
     completionRate,
     correctRate,
-    averageConfidence,
-    masteryScore,
-    status: getStatus(completionRate, masteryScore),
+    status: getProgressStatus(completionRate, correctRate),
     subjects
   };
 }
@@ -221,11 +106,15 @@ export default function ProgressPage() {
   const { user, syncVersion } = useAuth();
   const cloudHistoryHydrating = useCloudHistoryHydration();
   const [sessions, setSessions] = useState<ProgressHistorySession[]>([]);
+  const [historyOwnerKey, setHistoryOwnerKey] = useState<string | null>(null);
   const [openGroups, setOpenGroups] = useState<Record<string, boolean>>({ med1: true, med2: true });
+  const [openSubjects, setOpenSubjects] = useState<Record<string, boolean>>({});
+  const activeHistoryOwnerKey = user?.id ?? "__guest__";
 
   useEffect(() => {
     const refreshSessions = () => {
       setSessions(loadCompletedHistorySessionsForUser(user?.id));
+      setHistoryOwnerKey(activeHistoryOwnerKey);
     };
 
     refreshSessions();
@@ -237,7 +126,7 @@ export default function ProgressPage() {
       window.removeEventListener("completed-question-history-change", refreshSessions);
       window.removeEventListener("storage", refreshSessions);
     };
-  }, [syncVersion, user?.id]);
+  }, [activeHistoryOwnerKey, syncVersion, user?.id]);
 
   const med1Progress = useMemo(
     () => MED1_SUBJECTS.map((subject) => calculateSubjectProgress(subject, sessions)).filter((subject) => subject.totalQuestionsInBank > 0),
@@ -256,7 +145,9 @@ export default function ProgressPage() {
     [med1Progress, med2Progress]
   );
 
-  const showCloudHistoryLoading = Boolean(user?.id && cloudHistoryHydrating && sessions.length === 0);
+  const localHistoryReady = historyOwnerKey === activeHistoryOwnerKey;
+  const showHistoryLoading =
+    !localHistoryReady || Boolean(user?.id && cloudHistoryHydrating && sessions.length === 0);
 
   return (
     <main className="shell">
@@ -285,9 +176,9 @@ export default function ProgressPage() {
           </div>
         </div>
 
-        {showCloudHistoryLoading ? (
+        {showHistoryLoading ? (
           <div className="mt-6 rounded-3xl bg-slate-50 p-5 text-sm text-slate-700">
-            正在讀取雲端作答紀錄，完成後會更新進度總覽。
+            正在讀取完整作答紀錄，完成後會更新進度總覽。
           </div>
         ) : (
           <div className="mt-6 grid gap-4 lg:grid-cols-2">
@@ -309,16 +200,14 @@ export default function ProgressPage() {
                     style={{ width: `${group.completionRate}%` }}
                   />
                 </div>
-                <div className="mt-4 grid gap-3 sm:grid-cols-3">
+                <div className="mt-4 grid gap-3 sm:grid-cols-2">
                   <p className="rounded-2xl bg-white px-4 py-3 text-sm text-slate-700">
                     已作答 <span className="font-semibold">{group.attemptedQuestions}</span> / {group.totalQuestionsInBank}
                     <span className="mt-1 block text-xs text-slate-500">剩 {getRemainingQuestions(group)} 題</span>
                   </p>
                   <p className="rounded-2xl bg-white px-4 py-3 text-sm text-slate-700">
-                    答對率 <span className="font-semibold">{group.correctRate}%</span>
-                  </p>
-                  <p className="rounded-2xl bg-white px-4 py-3 text-sm text-slate-700">
-                    掌握度 <span className="font-semibold">{group.masteryScore}</span>
+                    答對率 <span className="font-semibold">{group.totalAttempts > 0 ? `${group.correctRate}%` : "尚未作答"}</span>
+                    <span className="mt-1 block text-xs text-slate-500">共 {group.totalAttempts} 次作答</span>
                   </p>
                 </div>
               </article>
@@ -327,7 +216,7 @@ export default function ProgressPage() {
         )}
       </section>
 
-      {showCloudHistoryLoading ? null : (
+      {showHistoryLoading ? null : (
         <>
           <div className="mt-8 space-y-5">
             {groups.map((group) => {
@@ -347,7 +236,7 @@ export default function ProgressPage() {
                     <div>
                       <h2 className="text-2xl font-semibold text-ink">{group.label}</h2>
                       <p className="mt-2 text-sm text-slate-500">
-                        完成度 {group.completionRate}% ・ 掌握度 {group.masteryScore}
+                        完成度 {group.completionRate}% ・ 答對率 {group.totalAttempts > 0 ? `${group.correctRate}%` : "尚未作答"}
                       </p>
                     </div>
                     <span className="text-sm font-semibold text-brand-700">{isGroupOpen ? "收合" : "展開"}</span>
@@ -355,23 +244,69 @@ export default function ProgressPage() {
 
                   {isGroupOpen ? (
                     <div className="mt-5 space-y-4">
-                      {group.subjects.map((subject) => (
-                        <article key={subject.subject} className="rounded-3xl border border-slate-200 bg-slate-50 p-4">
-                          <div className="flex items-start justify-between gap-4">
-                            <div>
-                              <h3 className="text-lg font-semibold text-ink">{subject.label}</h3>
-                              <p className="mt-2 text-sm text-slate-500">
-                                已作答 {subject.attemptedQuestions} / {subject.totalQuestionsInBank}
-                                ・ 剩 {getRemainingQuestions(subject)} 題
-                                ・ 答對率 {subject.correctRate}% ・ 掌握度 {subject.masteryScore}
-                              </p>
-                            </div>
-                            <span className={`rounded-full px-3 py-1 text-xs font-semibold ${completionStatusClasses[subject.status]}`}>
-                              {getCompletionStatusLabel(subject.status)}
-                            </span>
-                          </div>
-                        </article>
-                      ))}
+                      {group.subjects.map((subject) => {
+                        const isSubjectOpen = Boolean(openSubjects[subject.subject]);
+                        return (
+                          <article key={subject.subject} className="overflow-hidden rounded-3xl border border-slate-200 bg-slate-50">
+                            <button
+                              type="button"
+                              onClick={() =>
+                                setOpenSubjects((current) => ({
+                                  ...current,
+                                  [subject.subject]: !current[subject.subject]
+                                }))
+                              }
+                              className="flex w-full items-start justify-between gap-4 p-4 text-left transition hover:bg-slate-100"
+                              aria-expanded={isSubjectOpen}
+                            >
+                              <div className="min-w-0">
+                                <h3 className="text-lg font-semibold text-ink">{subject.label}</h3>
+                                <p className="mt-2 text-sm leading-6 text-slate-500">
+                                  完成度 {subject.completionRate}% ・ 已作答 {subject.attemptedQuestions} / {subject.totalQuestionsInBank}
+                                  ・ 答對率 {subject.totalAttempts > 0 ? `${subject.correctRate}%` : "尚未作答"}
+                                </p>
+                                <p className="mt-1 text-xs font-medium text-brand-700">
+                                  {isSubjectOpen ? "收合區塊" : `查看 ${subject.blocks.length} 個區塊`}
+                                </p>
+                              </div>
+                              <span className={`shrink-0 rounded-full px-3 py-1 text-xs font-semibold ${completionStatusClasses[subject.status]}`}>
+                                {getCompletionStatusLabel(subject.status)}
+                              </span>
+                            </button>
+
+                            {isSubjectOpen ? (
+                              <div className="border-t border-slate-200 bg-white px-4 pb-2">
+                                <div className="hidden grid-cols-[minmax(0,1fr)_9rem_7rem_7rem] gap-4 border-b border-slate-100 py-3 text-xs font-semibold text-slate-500 md:grid">
+                                  <span>區塊</span>
+                                  <span>已作答</span>
+                                  <span>完成度</span>
+                                  <span>答對率</span>
+                                </div>
+                                {subject.blocks.map((block) => (
+                                  <div
+                                    key={block.key}
+                                    className="grid gap-2 border-b border-slate-100 py-4 last:border-b-0 md:grid-cols-[minmax(0,1fr)_9rem_7rem_7rem] md:items-center md:gap-4"
+                                  >
+                                    <p className="min-w-0 font-semibold text-ink">{block.label}</p>
+                                    <p className="text-sm text-slate-600">
+                                      <span className="md:hidden">已作答 </span>
+                                      {block.attemptedQuestions} / {block.totalQuestionsInBank}
+                                    </p>
+                                    <p className="text-sm text-slate-600">
+                                      <span className="md:hidden">完成度 </span>
+                                      {block.completionRate}%
+                                    </p>
+                                    <p className="text-sm text-slate-600">
+                                      <span className="md:hidden">答對率 </span>
+                                      {block.totalAttempts > 0 ? `${block.correctRate}%` : "尚未作答"}
+                                    </p>
+                                  </div>
+                                ))}
+                              </div>
+                            ) : null}
+                          </article>
+                        );
+                      })}
                     </div>
                   ) : null}
                 </section>

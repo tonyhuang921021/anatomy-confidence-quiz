@@ -26,6 +26,8 @@
     "lib/cloudSyncWriteGuard.ts",
     "lib/cloudSyncWriteGuard.test.ts",
     "lib/practiceYears.ts",
+    "lib/progressMetrics.ts",
+    "lib/progressMetrics.test.ts",
     "lib/quizAnalysis.ts",
     "lib/quizAnalysis.selection.test.ts",
     "lib/relatedQuestions.ts",
