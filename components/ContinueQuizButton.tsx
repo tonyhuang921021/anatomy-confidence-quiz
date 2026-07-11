@@ -5,9 +5,10 @@ import { createPortal } from "react-dom";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/components/AuthProvider";
 import {
+  createResumableQuizSessionListItem,
   getCanonicalResumableSessionId,
-  getResumableSessionActivity,
-  isResumableQuizSession
+  isResumableQuizSession,
+  type ResumableQuizSessionListItem
 } from "@/lib/resumableSessions";
 import { loadCurrentSession, saveCurrentSession } from "@/lib/storage";
 import type { QuizMode, QuizSession } from "@/types/quiz";
@@ -33,8 +34,7 @@ function getSessionTitle(session: QuizSession) {
   );
 }
 
-function formatActivityTime(session: QuizSession) {
-  const value = getResumableSessionActivity(session);
+function formatActivityTime(value: string) {
   if (!value) return "尚無作答時間";
   const date = new Date(value);
   if (Number.isNaN(date.getTime())) return "尚無作答時間";
@@ -46,9 +46,9 @@ function formatActivityTime(session: QuizSession) {
   });
 }
 
-function sessionProgress(session: QuizSession) {
-  const total = session.questionOrder?.length ?? session.generatedQuestions?.length ?? 0;
-  const answered = Math.min(total, session.attempts.length);
+function sessionProgress(item: ResumableQuizSessionListItem) {
+  const total = item.totalCount;
+  const answered = Math.min(total, item.answeredCount);
   return {
     answered,
     total,
@@ -62,12 +62,13 @@ export function ContinueQuizButton() {
   const [mounted, setMounted] = useState(false);
   const [open, setOpen] = useState(false);
   const [localSession, setLocalSession] = useState<QuizSession | null>(null);
-  const [sessions, setSessions] = useState<QuizSession[]>([]);
+  const [items, setItems] = useState<ResumableQuizSessionListItem[]>([]);
   const [loading, setLoading] = useState(false);
   const [cloudError, setCloudError] = useState("");
-  const [deleteError, setDeleteError] = useState("");
+  const [actionError, setActionError] = useState("");
   const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null);
   const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [resumingId, setResumingId] = useState<string | null>(null);
 
   const refreshSessions = useCallback(async () => {
     try {
@@ -77,7 +78,7 @@ export function ContinueQuizButton() {
       const result = await loadResumableQuizSessionsForCurrentUser(
         authSession?.user?.id ?? null
       );
-      setSessions(result.sessions);
+      setItems(result.items);
       setCloudError(result.cloudError ?? "");
     } catch (error) {
       setCloudError(
@@ -131,41 +132,58 @@ export function ContinueQuizButton() {
 
   const localResumeMeta = useMemo(() => {
     if (!isResumableQuizSession(localSession)) return null;
-    return sessionProgress(localSession);
+    return sessionProgress(createResumableQuizSessionListItem(localSession));
   }, [localSession]);
 
   function handleOpen() {
-    setDeleteError("");
+    setActionError("");
     setConfirmDeleteId(null);
     setOpen(true);
   }
 
-  function handleResume(session: QuizSession) {
-    saveCurrentSession(session);
-    setOpen(false);
-    router.push("/quiz");
+  async function handleResume(item: ResumableQuizSessionListItem) {
+    const canonicalId = getCanonicalResumableSessionId(item.session.id);
+    try {
+      setResumingId(canonicalId);
+      setActionError("");
+      const session = item.needsCloudHydration
+        ? await import("@/lib/cloudSync").then(({ loadResumableQuizSessionForCurrentUser }) =>
+            loadResumableQuizSessionForCurrentUser({
+              sessionId: item.session.id,
+              userId: authSession?.user?.id ?? null
+            })
+          )
+        : item.session;
+      saveCurrentSession(session);
+      setOpen(false);
+      router.push("/quiz?resume=1");
+    } catch (error) {
+      setActionError(error instanceof Error ? error.message : "完整測驗紀錄讀取失敗，請稍後再試。");
+    } finally {
+      setResumingId(null);
+    }
   }
 
   async function handleDelete(session: QuizSession) {
     const canonicalId = getCanonicalResumableSessionId(session.id);
     try {
       setDeletingId(canonicalId);
-      setDeleteError("");
+      setActionError("");
       const { deleteResumableQuizSession } = await import("@/lib/cloudSync");
       await deleteResumableQuizSession({
         sessionId: session.id,
         userId: authSession?.user?.id ?? null,
         accessToken: authSession?.access_token ?? null
       });
-      setSessions((current) =>
+      setItems((current) =>
         current.filter(
-          (item) => getCanonicalResumableSessionId(item.id) !== canonicalId
+          (item) => getCanonicalResumableSessionId(item.session.id) !== canonicalId
         )
       );
       setLocalSession(loadCurrentSession());
       setConfirmDeleteId(null);
     } catch (error) {
-      setDeleteError(error instanceof Error ? error.message : "刪除進行中測驗失敗。");
+      setActionError(error instanceof Error ? error.message : "刪除進行中測驗失敗。");
     } finally {
       setDeletingId(null);
     }
@@ -179,29 +197,31 @@ export function ContinueQuizButton() {
         <header className="flex items-start justify-between gap-4 border-b border-slate-200 px-5 py-4 sm:px-6">
           <div>
             <h2 id="resume-dialog-title" className="text-xl font-semibold text-ink">可繼續的測驗</h2>
-            <p aria-live="polite" className="mt-1 text-sm text-slate-500">{loading ? "正在整理..." : `${sessions.length} 份進行中`}</p>
+            <p aria-live="polite" className="mt-1 text-sm text-slate-500">{loading ? "正在整理..." : `${items.length} 份進行中`}</p>
           </div>
           <button type="button" onClick={() => setOpen(false)} aria-label="關閉可繼續測驗" title="關閉" className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-xl text-slate-500 transition hover:bg-slate-100 hover:text-slate-900">×</button>
         </header>
 
         <div className="overflow-y-auto px-5 py-2 sm:px-6">
           {cloudError ? <p className="my-3 rounded-lg bg-amber-50 px-3 py-2 text-sm text-amber-900">{cloudError}</p> : null}
-          {deleteError ? <p className="my-3 rounded-lg bg-rose-50 px-3 py-2 text-sm text-rose-900">{deleteError}</p> : null}
+          {actionError ? <p className="my-3 rounded-lg bg-rose-50 px-3 py-2 text-sm text-rose-900">{actionError}</p> : null}
 
-          {loading && sessions.length === 0 ? (
+          {loading && items.length === 0 ? (
             <div className="py-12 text-center text-sm text-slate-500">正在讀取進行中的測驗...</div>
-          ) : sessions.length === 0 ? (
+          ) : items.length === 0 ? (
             <div className="py-12 text-center">
               <p className="font-semibold text-ink">目前沒有進行中的測驗</p>
               <p className="mt-1 text-sm text-slate-500">開始作答後，尚未完成的測驗會出現在這裡。</p>
             </div>
           ) : (
             <div className="divide-y divide-slate-200">
-              {sessions.map((session) => {
+              {items.map((item) => {
+                const session = item.session;
                 const id = getCanonicalResumableSessionId(session.id);
-                const progress = sessionProgress(session);
+                const progress = sessionProgress(item);
                 const confirming = confirmDeleteId === id;
                 const deleting = deletingId === id;
+                const resuming = resumingId === id;
                 return (
                   <article key={id} className="py-4">
                     <div className="flex flex-wrap items-start justify-between gap-3">
@@ -210,7 +230,7 @@ export function ContinueQuizButton() {
                           <span className="rounded-full bg-slate-100 px-2.5 py-1 text-[11px] font-semibold text-slate-600">{getSessionModeLabel(session)}</span>
                           <h3 className="min-w-0 truncate text-base font-semibold text-ink">{getSessionTitle(session)}</h3>
                         </div>
-                        <p className="mt-2 text-sm text-slate-600">已答 {progress.answered} / {progress.total} 題・最後作答 {formatActivityTime(session)}</p>
+                        <p className="mt-2 text-sm text-slate-600">已答 {progress.answered} / {progress.total} 題・最後作答 {formatActivityTime(item.lastActivityAt)}</p>
                         <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-slate-100">
                           <div className="h-full rounded-full bg-brand-600" style={{ width: `${progress.percent}%` }} />
                         </div>
@@ -227,8 +247,8 @@ export function ContinueQuizButton() {
                       </div>
                     ) : (
                       <div className="mt-3 flex items-center justify-end gap-2">
-                        <button type="button" onClick={() => setConfirmDeleteId(id)} className="min-h-10 rounded-lg px-3 text-sm font-semibold text-rose-700 transition hover:bg-rose-50">刪除</button>
-                        <button type="button" onClick={() => handleResume(session)} className="min-h-10 rounded-lg bg-brand-600 px-4 text-sm font-semibold text-white transition hover:bg-brand-700">繼續作答</button>
+                        <button type="button" onClick={() => setConfirmDeleteId(id)} disabled={Boolean(resumingId)} className="min-h-10 rounded-lg px-3 text-sm font-semibold text-rose-700 transition hover:bg-rose-50 disabled:text-slate-300">刪除</button>
+                        <button type="button" onClick={() => void handleResume(item)} disabled={Boolean(resumingId)} className="min-h-10 rounded-lg bg-brand-600 px-4 text-sm font-semibold text-white transition hover:bg-brand-700 disabled:bg-slate-300">{resuming ? "讀取中..." : "繼續作答"}</button>
                       </div>
                     )}
                   </article>

@@ -3,7 +3,8 @@ import assert from "node:assert/strict";
 import type { Attempt, QuizSession } from "../types/quiz";
 import {
   chooseMoreCompleteSessionForSameWork,
-  getCurrentSessionWorkKey
+  getCurrentSessionWorkKey,
+  isMeaningfullyMoreCompleteProgress
 } from "./currentSessionSelection";
 
 function makeAttempts(count: number, startedAt: string): Attempt[] {
@@ -122,4 +123,10 @@ test("同一份考卷但候選只多一兩題時不會覆蓋目前 session", () 
   });
 
   assert.equal(chooseMoreCompleteSessionForSameWork(current, [onlySlightlyLonger]), null);
+});
+
+test("只有摘要計數時也沿用相同的完整度門檻", () => {
+  assert.equal(isMeaningfullyMoreCompleteProgress(10, 8), false);
+  assert.equal(isMeaningfullyMoreCompleteProgress(12, 8), true);
+  assert.equal(isMeaningfullyMoreCompleteProgress(87, 2), true);
 });

@@ -50,8 +50,15 @@ import {
   getSupabaseBrowserClient,
   isSupabaseConfigured
 } from "@/lib/supabase/client";
-import { chooseMoreCompleteSessionForSameWork } from "@/lib/currentSessionSelection";
-import { mergeResumableQuizSessions } from "@/lib/resumableSessions";
+import {
+  chooseMoreCompleteResumableSessionItem,
+  createResumableQuizSessionListItem,
+  getCanonicalResumableSessionId,
+  isResumableQuizSession,
+  mergeResumableQuizSessionItems,
+  mergeResumableQuizSessions,
+  type ResumableQuizSessionListItem
+} from "@/lib/resumableSessions";
 import {
   buildCloudAttemptSessionChunks,
   findUnresolvedCompletedSessionIds,
@@ -191,6 +198,7 @@ const CLOUD_ACTIVE_SESSION_COMPARE_LIMIT = 8;
 const CURRENT_SESSION_SYNC_MIN_INTERVAL_MS = 45_000;
 const STATS_SYNC_ATTEMPT_BATCH_SIZE = 200;
 const CLOUD_SESSION_LOOKUP_TIMEOUT_MS = 3500;
+const CLOUD_RESUMABLE_LIST_TIMEOUT_MS = 6000;
 const CLOUD_COMPLETED_HISTORY_READ_TIMEOUT_MS = 20_000;
 const CLOUD_SYNC_BATCH_TIMEOUT_MS = 24000;
 const CLOUD_DIRECT_SYNC_TIMEOUT_MS = 7000;
@@ -1481,7 +1489,8 @@ function removePendingCompletedSessionUploadsAcrossSources(
 
 function mapRowToSession(
   row: QuizSessionRow | null,
-  attemptMap?: Map<string, Attempt[]>
+  attemptMap?: Map<string, Attempt[]>,
+  options: { inferRecoverableCompletion?: boolean } = {}
 ) {
   if (!row) return null;
 
@@ -1497,7 +1506,9 @@ function mapRowToSession(
   const completedAt =
     payload.completedAt ??
     row.completed_at ??
-    getRecoverableReviewSessionCompletedAt(row, resolvedAttempts);
+    (options.inferRecoverableCompletion === false
+      ? undefined
+      : getRecoverableReviewSessionCompletedAt(row, resolvedAttempts));
   const inferredPastPaperKey =
     row.mode === "simulation" ? getSinglePastPaperKeyFromAttempts(resolvedAttempts) : undefined;
   const inferredPaperMode = inferredPastPaperKey
@@ -1589,6 +1600,83 @@ async function fetchActiveQuizSessionRowsForUser(userId: string) {
   return (data ?? []) as QuizSessionRow[];
 }
 
+async function fetchActiveQuizSessionRowForUser(userId: string, sessionId: string) {
+  if (isSupabaseRecoveryMode() || !isSupabaseConfigured()) return null;
+
+  const namespacedSessionId = namespaceSessionIdForUser(userId, sessionId);
+  const { data, error } = await getSupabaseBrowserClient()
+    .from("quiz_sessions")
+    .select(
+      "id, user_id, subject, mode, session_name, question_count, correct_count, wrong_count, average_confidence, started_at, completed_at, session_payload, updated_at"
+    )
+    .eq("user_id", userId)
+    .eq("id", namespacedSessionId)
+    .is("completed_at", null)
+    .maybeSingle();
+
+  if (error) throw error;
+  const row = data as QuizSessionRow | null;
+  return row?.mode === "discarded" ? null : row;
+}
+
+function mapActiveQuizSessionRowToListItem(
+  row: QuizSessionRow
+): ResumableQuizSessionListItem | null {
+  const session = mapRowToSession(row, undefined, { inferRecoverableCompletion: false });
+  if (!session || session.completedAt) return null;
+
+  const answeredCount = Math.max(
+    session.attempts.length,
+    Math.max(0, row.correct_count ?? 0) + Math.max(0, row.wrong_count ?? 0)
+  );
+  const item = createResumableQuizSessionListItem(session, {
+    answeredCount,
+    totalCount: Math.max(
+      session.settings?.questionCount ?? 0,
+      row.question_count ?? 0,
+      session.questionOrder?.length ?? 0,
+      session.generatedQuestions?.length ?? 0
+    ),
+    lastActivityAt: row.updated_at ?? session.startedAt,
+    needsCloudHydration:
+      session.attempts.length < answeredCount || (session.questionOrder?.length ?? 0) === 0
+  });
+  return item.totalCount > 0 ? item : null;
+}
+
+function mapActiveQuizSessionRowsToListItems(
+  rows: QuizSessionRow[],
+  userId: string
+) {
+  return rows
+    .filter((row) => !isCurrentSessionDiscarded(row.id, userId))
+    .map(mapActiveQuizSessionRowToListItem)
+    .filter((item): item is ResumableQuizSessionListItem => Boolean(item));
+}
+
+function isExplicitNewQuizNavigation() {
+  if (typeof window === "undefined" || window.location.pathname !== "/quiz") return false;
+  return new URLSearchParams(window.location.search).get("new") === "1";
+}
+
+async function hydrateResumableQuizSessionListItem(
+  userId: string,
+  item: ResumableQuizSessionListItem
+) {
+  if (!item.needsCloudHydration) return item.session;
+  return fetchHydratedActiveQuizSessionForUser(userId, item.session.id);
+}
+
+async function fetchHydratedActiveQuizSessionForUser(
+  userId: string,
+  sessionId: string
+) {
+  const row = await fetchActiveQuizSessionRowForUser(userId, sessionId);
+  if (!row) return null;
+  const attemptRows = await fetchSessionAttemptRowsForUser(userId, [row.id]);
+  return mapRowToSession(row, buildAttemptMap(attemptRows));
+}
+
 async function fetchSessionAttemptRowsForUser(
   userId: string,
   sessionIds: string[],
@@ -1631,51 +1719,78 @@ async function fetchSessionAttemptRowsForUser(
   return rows;
 }
 
-async function fetchActiveQuizSessionsForUser(userId: string) {
-  const rows = await fetchActiveQuizSessionRowsForUser(userId);
-  const attemptRows = await fetchSessionAttemptRowsForUser(
-    userId,
-    rows.map((row) => row.id)
-  );
-  const attemptMap = buildAttemptMap(attemptRows);
-
-  return rows
-    .map((row) => mapRowToSession(row, attemptMap))
-    .filter((session): session is QuizSession => Boolean(session));
-}
-
 export async function loadResumableQuizSessionsForCurrentUser(userId?: string | null) {
   const localSessions = [
     userId ? loadCurrentSessionForUser(userId) : null,
     loadCurrentSessionForUser("guest")
   ];
+  const localItems = localSessions
+    .filter(isResumableQuizSession)
+    .map((session) => createResumableQuizSessionListItem(session));
 
   if (!userId || isSupabaseRecoveryMode() || !isSupabaseConfigured()) {
     return {
-      sessions: mergeResumableQuizSessions(localSessions, []),
+      items: mergeResumableQuizSessionItems(localItems),
       cloudError: undefined as string | undefined
     };
   }
 
   try {
-    const cloudSessions = await withClientTimeout(
-      fetchActiveQuizSessionsForUser(userId),
-      CLOUD_SERVER_SYNC_TIMEOUT_MS,
+    const cloudRows = await withClientTimeout(
+      fetchActiveQuizSessionRowsForUser(userId),
+      CLOUD_RESUMABLE_LIST_TIMEOUT_MS,
       "可繼續測驗清單讀取逾時，先顯示這台裝置的紀錄。"
     );
-    const visibleCloudSessions = cloudSessions.filter(
-      (session) => !isCurrentSessionDiscarded(session.id, userId)
-    );
+    const cloudItems = mapActiveQuizSessionRowsToListItems(cloudRows, userId);
     return {
-      sessions: mergeResumableQuizSessions(localSessions, visibleCloudSessions),
+      items: mergeResumableQuizSessionItems([...localItems, ...cloudItems]),
       cloudError: undefined as string | undefined
     };
   } catch (error) {
     return {
-      sessions: mergeResumableQuizSessions(localSessions, []),
+      items: mergeResumableQuizSessionItems(localItems),
       cloudError: error instanceof Error ? error.message : "雲端清單讀取失敗，先顯示這台裝置的紀錄。"
     };
   }
+}
+
+export async function loadResumableQuizSessionForCurrentUser(input: {
+  sessionId: string;
+  userId?: string | null;
+}) {
+  const userId = input.userId;
+  const localSessions = [
+    userId ? loadCurrentSessionForUser(userId) : null,
+    loadCurrentSessionForUser("guest")
+  ];
+  const canonicalId = getCanonicalResumableSessionId(input.sessionId);
+  const matchingLocalSession = localSessions.find(
+    (session) =>
+      isResumableQuizSession(session) &&
+      getCanonicalResumableSessionId(session.id) === canonicalId
+  );
+
+  if (!userId || isSupabaseRecoveryMode() || !isSupabaseConfigured()) {
+    if (matchingLocalSession) return matchingLocalSession;
+    throw new Error("這份測驗目前不在這台裝置上，請稍後再試。");
+  }
+
+  const cloudSession = await withClientTimeout(
+    fetchHydratedActiveQuizSessionForUser(userId, input.sessionId),
+    CLOUD_SERVER_SYNC_TIMEOUT_MS,
+    "這份測驗完整紀錄讀取逾時，原紀錄仍保留，請稍後再試。"
+  );
+
+  if (!isResumableQuizSession(cloudSession)) {
+    if (matchingLocalSession) return matchingLocalSession;
+    throw new Error("這份測驗可能已在另一台裝置完成或刪除，請重新整理清單。");
+  }
+
+  return mergeResumableQuizSessions(
+    matchingLocalSession ? [matchingLocalSession] : [],
+    [cloudSession],
+    1
+  )[0] ?? cloudSession;
 }
 
 export async function deleteResumableQuizSession(input: {
@@ -2383,7 +2498,10 @@ async function upsertSessionsForUser(
   );
   let attemptRows = dedupeSessionAttemptRows(dedupedAttemptRowsWithSignatures.map((item) => item.row));
 
-  if (!options.activeCheckpoint && attemptRows.length > 0) {
+  if (
+    attemptRows.length > 0 &&
+    (!options.activeCheckpoint || !options.syncedAttemptSignatures)
+  ) {
     const existingAttemptSignatures = await fetchExistingAttemptSignatureMap(
       userId,
       Array.from(new Set(attemptRows.map((row) => row.session_id)))
@@ -2824,40 +2942,52 @@ export async function syncCurrentSessionForCurrentUser(userId: string) {
     }
   }
 
-  const remoteActiveSessions = await withCloudFallback<QuizSession[] | null>(
-    fetchActiveQuizSessionsForUser(userId),
+  const remoteActiveRows = await withCloudFallback<QuizSessionRow[] | null>(
+    fetchActiveQuizSessionRowsForUser(userId),
     null
   );
-  if (!remoteActiveSessions) {
+  if (!remoteActiveRows) {
     return localCurrentSession;
   }
-  const latestRemoteCurrentSession = remoteActiveSessions[0] ?? null;
-  const betterRemoteForLatest = latestRemoteCurrentSession
-    ? chooseMoreCompleteSessionForSameWork(latestRemoteCurrentSession, remoteActiveSessions)
+  const remoteItems = mapActiveQuizSessionRowsToListItems(remoteActiveRows, userId);
+  const preserveExplicitNewSession = isExplicitNewQuizNavigation();
+  const latestRemoteItem = preserveExplicitNewSession
+    ? null
+    : ([...remoteItems].sort((left, right) =>
+        right.lastActivityAt.localeCompare(left.lastActivityAt)
+      )[0] ?? null);
+  const betterRemoteForLocal = localCurrentSession && !preserveExplicitNewSession
+    ? chooseMoreCompleteResumableSessionItem(localCurrentSession, remoteItems)
     : null;
-  const betterRemoteForLocal = localCurrentSession
-    ? chooseMoreCompleteSessionForSameWork(localCurrentSession, remoteActiveSessions)
+  const localActivity = localCurrentSession ? sessionActivityValue(localCurrentSession) : "";
+  const remoteCandidate = betterRemoteForLocal ?? latestRemoteItem;
+  const shouldHydrateRemote = Boolean(
+    remoteCandidate &&
+      (betterRemoteForLocal || !localCurrentSession || remoteCandidate.lastActivityAt > localActivity)
+  );
+  const remoteCurrentSession = shouldHydrateRemote && remoteCandidate
+    ? await withCloudFallback<QuizSession | null>(
+        hydrateResumableQuizSessionListItem(userId, remoteCandidate),
+        null
+      )
     : null;
-  const remoteCurrentSession =
-    betterRemoteForLocal ?? betterRemoteForLatest ?? latestRemoteCurrentSession;
   const remoteSyncedAttemptSignatures = remoteCurrentSession
     ? buildSyncedAttemptSignatureMap(remoteCurrentSession)
     : new Map<number, string>();
 
-  if (betterRemoteForLocal) {
-    const winner = canonicalizeSessionsForUser(userId, [betterRemoteForLocal])[0] ?? betterRemoteForLocal;
+  if (betterRemoteForLocal && remoteCurrentSession) {
+    const winner = canonicalizeSessionsForUser(userId, [remoteCurrentSession])[0] ?? remoteCurrentSession;
     saveCurrentSession(winner);
     rememberSyncedCurrentSessionState(userId, winner, remoteSyncedAttemptSignatures);
     return winner;
   }
 
-  const localActivity = localCurrentSession ? sessionActivityValue(localCurrentSession) : "";
-  const remoteActivity = remoteCurrentSession ? sessionActivityValue(remoteCurrentSession) : "";
+  const remoteActivity = remoteCandidate?.lastActivityAt ?? "";
 
   let winner = localCurrentSession;
   let shouldUploadWinner =
     Boolean(localCurrentSession) &&
-    (!remoteCurrentSession || localActivity > remoteActivity);
+    (!remoteCandidate || localActivity > remoteActivity);
 
   if (remoteCurrentSession && (!winner || remoteActivity > localActivity)) {
     winner = canonicalizeSessionsForUser(userId, [remoteCurrentSession])[0] ?? remoteCurrentSession;
@@ -2871,7 +3001,7 @@ export async function syncCurrentSessionForCurrentUser(userId: string) {
       remoteCurrentSession &&
       getCanonicalSessionId(remoteCurrentSession.id) === getCanonicalSessionId(winner.id)
         ? remoteSyncedAttemptSignatures
-        : new Map<number, string>();
+        : undefined;
     const canonicalWinner = canonicalizeSessionsForUser(userId, [winner]);
     await withCloudFallback(
       upsertSessionsForUser(userId, canonicalWinner, {
@@ -2882,7 +3012,11 @@ export async function syncCurrentSessionForCurrentUser(userId: string) {
     );
     const syncedWinner = canonicalWinner[0];
     if (syncedWinner) {
-      rememberSyncedCurrentSessionState(userId, syncedWinner, syncedAttemptSignatures);
+      rememberSyncedCurrentSessionState(
+        userId,
+        syncedWinner,
+        syncedAttemptSignatures ?? buildSyncedAttemptSignatureMap(syncedWinner)
+      );
     }
   }
 
@@ -2904,18 +3038,29 @@ export async function syncLocalCurrentSessionForCurrentUser(userId: string) {
   if (!localCurrentSession) return null;
 
   const canonicalSession = canonicalizeSessionsForUser(userId, [localCurrentSession])[0] ?? localCurrentSession;
-  const remoteActiveSessions = await withCloudFallback<QuizSession[] | null>(
-    fetchActiveQuizSessionsForUser(userId),
+  const remoteActiveRows = await withCloudFallback<QuizSessionRow[] | null>(
+    fetchActiveQuizSessionRowsForUser(userId),
     null
   );
-  if (!remoteActiveSessions) {
+  if (!remoteActiveRows) {
     return canonicalSession;
   }
 
-  const moreCompleteRemoteSession = chooseMoreCompleteSessionForSameWork(
-    canonicalSession,
-    remoteActiveSessions
-  );
+  const moreCompleteRemoteItem = isExplicitNewQuizNavigation()
+    ? null
+    : chooseMoreCompleteResumableSessionItem(
+        canonicalSession,
+        mapActiveQuizSessionRowsToListItems(remoteActiveRows, userId)
+      );
+  const moreCompleteRemoteSession = moreCompleteRemoteItem
+    ? await withCloudFallback<QuizSession | null>(
+        hydrateResumableQuizSessionListItem(userId, moreCompleteRemoteItem),
+        null
+      )
+    : null;
+  if (moreCompleteRemoteItem && !moreCompleteRemoteSession) {
+    return canonicalSession;
+  }
   if (moreCompleteRemoteSession) {
     const winner = canonicalizeSessionsForUser(userId, [moreCompleteRemoteSession])[0] ?? moreCompleteRemoteSession;
     saveCurrentSession(winner);
@@ -3050,17 +3195,28 @@ export async function pushCurrentSessionToSupabase(
   const canonicalSession = canonicalizeSessionsForUser(userId, [session])[0];
   if (!canonicalSession) return;
 
-  const remoteActiveSessions = await withCloudFallback<QuizSession[] | null>(
-    fetchActiveQuizSessionsForUser(userId),
+  const remoteActiveRows = await withCloudFallback<QuizSessionRow[] | null>(
+    fetchActiveQuizSessionRowsForUser(userId),
     null
   );
-  if (!remoteActiveSessions) {
+  if (!remoteActiveRows) {
     return;
   }
-  const moreCompleteRemoteSession = chooseMoreCompleteSessionForSameWork(
-    canonicalSession,
-    remoteActiveSessions
-  );
+  const moreCompleteRemoteItem = isExplicitNewQuizNavigation()
+    ? null
+    : chooseMoreCompleteResumableSessionItem(
+        canonicalSession,
+        mapActiveQuizSessionRowsToListItems(remoteActiveRows, userId)
+      );
+  const moreCompleteRemoteSession = moreCompleteRemoteItem
+    ? await withCloudFallback<QuizSession | null>(
+        hydrateResumableQuizSessionListItem(userId, moreCompleteRemoteItem),
+        null
+      )
+    : null;
+  if (moreCompleteRemoteItem && !moreCompleteRemoteSession) {
+    return;
+  }
   if (moreCompleteRemoteSession) {
     const winner = canonicalizeSessionsForUser(userId, [moreCompleteRemoteSession])[0] ?? moreCompleteRemoteSession;
     saveCurrentSession(winner);
@@ -3082,7 +3238,7 @@ export async function pushCurrentSessionToSupabase(
   async function flush(
     nextSession: QuizSession,
     nextSignature: string,
-    syncedAttemptSignatures: Map<number, string>
+    syncedAttemptSignatures?: Map<number, string>
   ) {
     await withClientTimeout(
       upsertSessionsForUser(userId, [nextSession], {
@@ -3095,7 +3251,8 @@ export async function pushCurrentSessionToSupabase(
     currentSessionSyncState.set(stateKey, {
       lastSyncedAt: Date.now(),
       lastSignature: nextSignature,
-      syncedAttemptSignatures,
+      syncedAttemptSignatures:
+        syncedAttemptSignatures ?? buildSyncedAttemptSignatureMap(nextSession),
       pendingTimer: null,
       pendingSession: null,
       pendingSignature: ""
@@ -3109,7 +3266,7 @@ export async function pushCurrentSessionToSupabase(
     await flush(
       canonicalSession,
       signature,
-      existing?.syncedAttemptSignatures ?? new Map<number, string>()
+      existing?.syncedAttemptSignatures
     );
     return;
   }

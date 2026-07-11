@@ -52,9 +52,10 @@ function getCanonicalSessionId(sessionId: string) {
   return sessionId.replace(/^user-[^:]+:/, "");
 }
 
-function isMeaningfullyMoreComplete(candidate: QuizSession, current: QuizSession) {
-  const candidateAttempts = candidate.attempts.length;
-  const currentAttempts = current.attempts.length;
+export function isMeaningfullyMoreCompleteProgress(
+  candidateAttempts: number,
+  currentAttempts: number
+) {
   if (candidateAttempts <= currentAttempts) return false;
   if (candidateAttempts - currentAttempts < COMPLETION_ADVANTAGE_MIN_ATTEMPTS) return false;
   if (candidateAttempts >= 10) return true;
@@ -73,7 +74,9 @@ export function chooseMoreCompleteSessionForSameWork(
     .filter((candidate) => getCanonicalSessionId(candidate.id) !== currentId)
     .filter((candidate) => !candidate.completedAt)
     .filter((candidate) => getCurrentSessionWorkKey(candidate) === currentKey)
-    .filter((candidate) => isMeaningfullyMoreComplete(candidate, current))
+    .filter((candidate) =>
+      isMeaningfullyMoreCompleteProgress(candidate.attempts.length, current.attempts.length)
+    )
     .sort((left, right) => {
       if (right.attempts.length !== left.attempts.length) {
         return right.attempts.length - left.attempts.length;

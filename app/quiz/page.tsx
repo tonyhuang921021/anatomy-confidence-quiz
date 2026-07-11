@@ -808,7 +808,6 @@ export default function QuizPage() {
   const {
     session: authSession,
     loading: authLoading,
-    syncStatus,
     syncVersion
   } = useAuth();
   const questionTopRef = useRef<HTMLDivElement | null>(null);
@@ -1020,7 +1019,6 @@ export default function QuizPage() {
   useEffect(() => {
     if (initializedSessionRef.current) return;
     if (authLoading) return;
-    if (authSession?.user?.id && syncStatus !== "ready" && syncStatus !== "error") return;
 
     initializedSessionRef.current = true;
     let cancelled = false;
@@ -1101,7 +1099,6 @@ export default function QuizPage() {
                 : loadQuizSettings() ?? DEFAULT_QUIZ_SETTINGS);
         const savedSettings = normalizeLegacySettings(rawSettings);
         const shouldForceNewSession = params?.get("new") === "1";
-        const completedSessions = loadCompletedHistorySessionsForUser(authSession?.user?.id);
         const expectedSimulationQuestionCount = getExpectedSimulationQuestionCount(
           savedSettings,
           loadedOverrides
@@ -1127,7 +1124,7 @@ export default function QuizPage() {
               (savedSettings.subjectFilters?.length ?? 0) > 0
                 ? getQuestionBankBySubjects(savedSettings.subjectFilters ?? [], loadedOverrides)
                 : getQuestionBankBySubjectFilter(savedSettings.subjectFilter ?? "解剖學", loadedOverrides),
-              completedSessions,
+              loadCompletedHistorySessionsForUser(authSession?.user?.id),
               savedSettings,
               loadedOverrides
             );
@@ -1189,7 +1186,7 @@ export default function QuizPage() {
     return () => {
       cancelled = true;
     };
-  }, [authLoading, authSession?.user?.id, syncStatus, syncVersion]);
+  }, [authLoading, authSession?.user?.id, syncVersion]);
 
   useEffect(() => {
     if (!session || session.settings?.mode !== "simulation" || session.completedAt) {
