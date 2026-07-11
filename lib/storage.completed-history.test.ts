@@ -8,10 +8,12 @@ import {
   loadCompletedHistorySessionsForUser,
   loadCompletedSessions,
   loadCompletedSessionsForUser,
+  loadPendingCompletedSessionUploadsForUser,
   loadRecentCompletedSessionHandoffForUser,
   loadQuestionExplanationOverride,
   mergeCompletedQuestionHistoryEntries,
   mergeQuestionExplanationOverrides,
+  queuePendingCompletedSessionUploadForUser,
   saveCloudCompletedSessionsForUser,
   saveCompletedQuestionHistoryEntriesForUser,
   saveCompletedSession,
@@ -23,7 +25,7 @@ import {
 } from "./storage";
 import type { Attempt, QuizSession } from "../types/quiz";
 
-function createStorageMock(options: { failWrites?: boolean } = {}): Storage {
+function createStorageMock(options: { failWrites?: boolean; maxBytes?: number } = {}): Storage {
   const data = new Map<string, string>();
 
   return {
@@ -46,13 +48,29 @@ function createStorageMock(options: { failWrites?: boolean } = {}): Storage {
       if (options.failWrites) {
         throw new Error("storage quota exceeded");
       }
+      const currentBytes = Array.from(data.entries()).reduce(
+        (sum, [storedKey, storedValue]) => sum + storedKey.length + storedValue.length,
+        0
+      );
+      const existingValue = data.get(key);
+      const nextBytes =
+        currentBytes -
+        (existingValue ? key.length + existingValue.length : 0) +
+        key.length +
+        value.length;
+      if (options.maxBytes && nextBytes > options.maxBytes) {
+        throw new Error("storage quota exceeded");
+      }
       data.set(key, value);
     }
   } as Storage;
 }
 
-function installBrowserStorage(options: { failLocalWrites?: boolean } = {}) {
-  const localStorage = createStorageMock({ failWrites: options.failLocalWrites });
+function installBrowserStorage(options: { failLocalWrites?: boolean; maxLocalBytes?: number } = {}) {
+  const localStorage = createStorageMock({
+    failWrites: options.failLocalWrites,
+    maxBytes: options.maxLocalBytes
+  });
   const sessionStorage = createStorageMock();
   const listeners = new Map<string, Set<EventListener>>();
   const windowMock = {
@@ -407,6 +425,52 @@ test("剛完成 handoff 也要被進度歷史讀到", () => {
     loadCompletedHistorySessionsForUser("user-handoff-read")
       .flatMap((item) => item.attempts)
       .some((attempt) => attempt.questionId === "q-handoff-read")
+  );
+});
+
+test("待補傳佇列可保留超過舊版八十回的離線紀錄", () => {
+  installBrowserStorage();
+  const userId = "user-large-pending-queue";
+  const sessions = Array.from({ length: 120 }, (_, index) =>
+    makeSession(`pending-session-${index}`, [`q-pending-${index}`])
+  );
+
+  queuePendingCompletedSessionUploadForUser(userId, sessions);
+
+  assert.equal(loadPendingCompletedSessionUploadsForUser(userId).length, 120);
+});
+
+test("儲存空間不足時優先清除可重抓雲端快取並保住待補傳紀錄", () => {
+  const { localStorage, sessionStorage } = installBrowserStorage({ maxLocalBytes: 9_000 });
+  const userId = "user-critical-pending";
+  const cloudSession = {
+    ...makeSession("cloud-cache-session", ["q-cloud-cache"]),
+    settings: {
+      ...makeSession("cloud-cache-session", ["q-cloud-cache"]).settings!,
+      sessionName: "c".repeat(6_000)
+    }
+  } satisfies QuizSession;
+  const pendingSession = {
+    ...makeSession("critical-pending-session", ["q-critical-pending"]),
+    settings: {
+      ...makeSession("critical-pending-session", ["q-critical-pending"]).settings!,
+      sessionName: "p".repeat(3_000)
+    }
+  } satisfies QuizSession;
+
+  saveCloudCompletedSessionsForUser(userId, [cloudSession]);
+  queuePendingCompletedSessionUploadForUser(userId, pendingSession);
+
+  assert.equal(
+    localStorage.getItem(`anatomy-confidence-cloud-completed-sessions:${userId}`),
+    null
+  );
+  assert.ok(
+    localStorage.getItem(`anatomy-confidence-pending-completed-session-uploads:${userId}`)
+  );
+  assert.equal(
+    sessionStorage.getItem(`anatomy-confidence-pending-completed-session-uploads:${userId}`),
+    null
   );
 });
 

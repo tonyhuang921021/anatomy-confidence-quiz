@@ -38,7 +38,7 @@ const COMPLETED_SESSIONS_HEAVY_READ_LIMIT = 160_000;
 const COMPLETED_SESSIONS_UPLOAD_RECOVERY_READ_LIMIT = 1_500_000;
 const COMPLETED_SESSIONS_RECENT_RECOVERY_LIMIT = 240;
 const CLOUD_COMPLETED_SESSIONS_FALLBACK_LIMITS = [500, 300, 180, 90] as const;
-const PENDING_COMPLETED_SESSION_UPLOAD_LIMIT = 80;
+const PENDING_COMPLETED_SESSION_UPLOAD_LIMIT = 240;
 const RECENT_COMPLETED_SESSION_HANDOFF_LIMIT = 24;
 const COMPLETED_STORAGE_SYNC_CHANNEL = "anatomy-confidence-completed-storage-sync";
 const COMPLETED_STORAGE_SYNC_SOURCE_ID = `tab-${Date.now().toString(36)}-${Math.random()
@@ -388,6 +388,26 @@ function getCloudCompletedSessionsScopedKeyForUser(userId: string) {
 
 function getRecentCompletedSessionHandoffScopedKeyForUser(userId: string) {
   return getScopedKeyForUser(RECENT_COMPLETED_SESSION_HANDOFF_KEY, userId);
+}
+
+function persistCriticalCompletedSessionPayload(userId: string, key: string, payload: string) {
+  if (safeLocalStorageSetItem(key, payload)) {
+    safeSessionStorageRemoveItem(key);
+    return true;
+  }
+
+  // The cloud cache is replaceable. Pending/handoff records are not, so free it
+  // before falling back to tab-scoped sessionStorage.
+  const cloudCacheKey = getCloudCompletedSessionsScopedKeyForUser(userId);
+  if (cloudCacheKey !== key && safeLocalStorageGetItem(cloudCacheKey)) {
+    safeLocalStorageRemoveItem(cloudCacheKey);
+    if (safeLocalStorageSetItem(key, payload)) {
+      safeSessionStorageRemoveItem(key);
+      return true;
+    }
+  }
+
+  return Boolean(safeSessionStorageSetItem(key, payload));
 }
 
 function tryPersistJsonToLocalStorageWithSessionFallback(key: string, value: string) {
@@ -1455,12 +1475,7 @@ export function saveRecentCompletedSessionHandoffForUser(
   ]).slice(-RECENT_COMPLETED_SESSION_HANDOFF_LIMIT);
   const scopedKey = getRecentCompletedSessionHandoffScopedKeyForUser(userId);
   const payload = JSON.stringify(normalized.map(compactSessionForStorage));
-  const didPersist = safeLocalStorageSetItem(scopedKey, payload);
-  const didStore = didPersist ? true : safeSessionStorageSetItem(scopedKey, payload);
-
-  if (didPersist) {
-    safeSessionStorageRemoveItem(scopedKey);
-  }
+  const didStore = persistCriticalCompletedSessionPayload(userId, scopedKey, payload);
 
   completedSessionsMemoryCache.delete(userId);
   completedSessionIdMemoryCache.delete(userId);
@@ -1552,12 +1567,7 @@ function savePendingCompletedSessionUploadsForUser(userId: string, sessions: Qui
   const normalized = normalizeCompletedSessionList(sessions)
     .slice(-PENDING_COMPLETED_SESSION_UPLOAD_LIMIT);
   const payload = JSON.stringify(normalized.map(compactSessionForStorage));
-  const didPersist = safeLocalStorageSetItem(scopedKey, payload);
-  const didStore = didPersist ? true : safeSessionStorageSetItem(scopedKey, payload);
-
-  if (didPersist) {
-    safeSessionStorageRemoveItem(scopedKey);
-  }
+  const didStore = persistCriticalCompletedSessionPayload(userId, scopedKey, payload);
 
   completedSessionsMemoryCache.delete(userId);
   completedSessionIdMemoryCache.delete(userId);

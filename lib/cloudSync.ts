@@ -1011,31 +1011,55 @@ async function getCloudSessionSyncAccessToken() {
   return data.session?.access_token ?? null;
 }
 
+async function refreshCloudSessionSyncAccessToken() {
+  try {
+    const { data, error } = await withClientTimeout(
+      getSupabaseBrowserClient().auth.refreshSession(),
+      FEEDBACK_AUTH_REFRESH_TIMEOUT_MS,
+      "登入狀態刷新逾時"
+    );
+    if (error) return null;
+    return data.session?.access_token ?? null;
+  } catch {
+    return null;
+  }
+}
+
 async function syncSessionsThroughServer(
   sessions: QuizSession[],
   options: { activeCheckpoint?: boolean } = {}
 ) {
-  const accessToken = await getCloudSessionSyncAccessToken();
+  let accessToken = await getCloudSessionSyncAccessToken();
   if (!accessToken) {
     throw new Error("登入狀態讀取失敗，先保留本機紀錄。");
   }
 
-  const response = await fetchWithClientTimeout(
-    "/api/quiz-session-sync",
-    {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
-        "Content-Type": "application/json"
+  const sendRequest = (token: string) =>
+    fetchWithClientTimeout(
+      "/api/quiz-session-sync",
+      {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          activeCheckpoint: Boolean(options.activeCheckpoint),
+          sessions
+        })
       },
-      body: JSON.stringify({
-        activeCheckpoint: Boolean(options.activeCheckpoint),
-        sessions
-      })
-    },
-    CLOUD_SERVER_SYNC_TIMEOUT_MS,
-    "伺服器雲端同步逾時，先保留本機紀錄。"
-  );
+      CLOUD_SERVER_SYNC_TIMEOUT_MS,
+      "伺服器雲端同步逾時，先保留本機紀錄。"
+    );
+
+  let response = await sendRequest(accessToken);
+  if (response.status === 401) {
+    const refreshedAccessToken = await refreshCloudSessionSyncAccessToken();
+    if (refreshedAccessToken) {
+      accessToken = refreshedAccessToken;
+      response = await sendRequest(accessToken);
+    }
+  }
 
   const payload = (await response.json().catch(() => null)) as {
     ok?: boolean;
@@ -1440,6 +1464,15 @@ function getConfirmedPendingSessions(
         remoteSession.attempts.length >= pendingSession.attempts.length
     );
   });
+}
+
+function removePendingCompletedSessionUploadsAcrossSources(
+  sourceUserIds: string[],
+  sessions: QuizSession[]
+) {
+  for (const sourceUserId of sourceUserIds) {
+    removePendingCompletedSessionUploadsForUser(sourceUserId, sessions);
+  }
 }
 
 function mapRowToSession(
@@ -2184,6 +2217,7 @@ async function upsertSessionsForUser(
   options: {
     activeCheckpoint?: boolean;
     syncedAttemptSignatures?: Map<number, string>;
+    protectedServerOnly?: boolean;
   } = {}
 ) {
   if (isSupabaseRecoveryMode()) return;
@@ -2298,7 +2332,7 @@ async function upsertSessionsForUser(
       });
       return;
     } catch (serverError) {
-      if (isCloudSyncTimeoutError(serverError)) {
+      if (options.protectedServerOnly || isCloudSyncTimeoutError(serverError)) {
         throw serverError;
       }
       console.warn("Server session sync failed; falling back to direct browser sync.", serverError);
@@ -2322,6 +2356,7 @@ async function upsertSessionsForUserInBatches(
     batchAttemptLimit?: number;
     batchTimeoutMs?: number;
     totalBudgetMs?: number;
+    protectedServerOnly?: boolean;
   } = {}
 ) {
   const startedAt = Date.now();
@@ -2356,7 +2391,9 @@ async function upsertSessionsForUserInBatches(
       continue;
     }
 
-    const task = upsertSessionsForUser(userId, batch);
+    const task = upsertSessionsForUser(userId, batch, {
+      protectedServerOnly: options.protectedServerOnly
+    });
     if (options.batchTimeoutMs) {
       await withClientTimeout(task, options.batchTimeoutMs, "單批雲端同步逾時，先保留本機紀錄。");
     } else {
@@ -2476,6 +2513,58 @@ export async function syncLocalCompletedSessionsForCurrentUser(
   let shouldUploadLocalSessions = canReachCloud && !readRemoteOnly;
   let hasVerifiedRemoteSessions = false;
   let remoteHistoryReadError: unknown = null;
+  const rawPendingUploadSessions = canonicalizeSessionsForUser(
+    userId,
+    mergeSessionLists(
+      sourceUserIds.map((sourceUserId) =>
+        loadPendingCompletedSessionUploadsForUser(sourceUserId)
+      )
+    ).filter(isCompletedQuizSession)
+  );
+
+  if (shouldUploadLocalSessions && rawPendingUploadSessions.length > 0) {
+    const pendingSessionsToUpload = uploadAllPending
+      ? [...rawPendingUploadSessions]
+          .sort((left, right) =>
+            sessionFreshnessValue(right).localeCompare(sessionFreshnessValue(left))
+          )
+          .slice(0, CLOUD_COMPLETED_SESSION_UPLOAD_LIMIT)
+      : getRecentSessionsWithinUploadBudget(
+          [...rawPendingUploadSessions].sort((left, right) =>
+            sessionFreshnessValue(right).localeCompare(sessionFreshnessValue(left))
+          ),
+          CLOUD_LIGHT_COMPLETED_SESSION_UPLOAD_LIMIT,
+          CLOUD_LIGHT_COMPLETED_ATTEMPT_UPLOAD_LIMIT
+        );
+
+    try {
+      await upsertSessionsForUserInBatches(
+        userId,
+        pendingSessionsToUpload,
+        Math.min(10, CLOUD_COMPLETED_SESSION_UPLOAD_BATCH_SIZE),
+        {
+          batchTimeoutMs: CLOUD_SYNC_BATCH_TIMEOUT_MS,
+          totalBudgetMs: uploadAllPending
+            ? CLOUD_MANUAL_SYNC_TOTAL_BUDGET_MS
+            : CLOUD_SYNC_TOTAL_BUDGET_MS,
+          protectedServerOnly: true
+        }
+      );
+      removePendingCompletedSessionUploadsAcrossSources(
+        sourceUserIds,
+        pendingSessionsToUpload
+      );
+      saveCloudCompletedSessionsForUser(
+        userId,
+        mergeSessions(
+          loadCloudCompletedSessionsForUser(userId),
+          pendingSessionsToUpload
+        )
+      );
+    } catch (error) {
+      console.warn("Pending completed sessions remain queued for retry.", error);
+    }
+  }
 
   if (canReachCloud && hydrateRemoteHistory) {
     try {
@@ -2499,15 +2588,14 @@ export async function syncLocalCompletedSessionsForCurrentUser(
     userId,
     fetchedRemoteSessions.filter(isCompletedQuizSession)
   );
-  const rawPendingUploadSessions = canonicalizeSessionsForUser(
-    userId,
-    loadPendingCompletedSessionUploadsForUser(userId).filter(isCompletedQuizSession)
-  );
   const confirmedPendingSessions = hasVerifiedRemoteSessions
     ? getConfirmedPendingSessions(rawPendingUploadSessions, remoteSessions)
     : [];
   if (confirmedPendingSessions.length > 0) {
-    removePendingCompletedSessionUploadsForUser(userId, confirmedPendingSessions);
+    removePendingCompletedSessionUploadsAcrossSources(
+      sourceUserIds,
+      confirmedPendingSessions
+    );
   }
 
   const recentLocalCompletedSessions = canonicalizeSessionsForUser(
@@ -2617,7 +2705,7 @@ export async function syncLocalCompletedSessionsForCurrentUser(
       totalBudgetMs: uploadAllPending ? CLOUD_MANUAL_SYNC_TOTAL_BUDGET_MS : CLOUD_SYNC_TOTAL_BUDGET_MS
     }
   );
-  removePendingCompletedSessionUploadsForUser(userId, sessionsToUpload);
+  removePendingCompletedSessionUploadsAcrossSources(sourceUserIds, sessionsToUpload);
   saveCloudCompletedSessionsForUser(
     userId,
     mergeSessions(loadCloudCompletedSessionsForUser(userId), sessionsToUpload)

@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 import { compactQuestionForStorage, compactSessionForStorage, normalizeSessions } from "@/lib/storage";
 import { isSupabaseRecoveryMode } from "@/lib/supabase/recoveryMode";
+import { shouldProtectExistingCompletedSession } from "@/lib/quizSessionSyncSafety";
 import { Attempt, Question, QuizSession } from "@/types/quiz";
 
 type QuizSessionRow = {
@@ -82,10 +83,6 @@ function canonicalizeSessionsForUser(userId: string, sessions: QuizSession[]) {
 
 function isCompletedQuizSession(session: QuizSession) {
   return Boolean(session.completedAt);
-}
-
-function isCompletedQuizSessionRow(row: Pick<QuizSessionRow, "completed_at" | "session_payload">) {
-  return Boolean(row.completed_at || row.session_payload?.completedAt);
 }
 
 function sessionUpdatedAtValueForCloud(session: QuizSession) {
@@ -319,23 +316,42 @@ export async function POST(request: NextRequest) {
         })
       )
     );
-    const incompleteSessionIds = rows
-      .filter((row) => !isCompletedQuizSessionRow(row))
-      .map((row) => row.id);
     const protectedCompletedSessionIds = new Set<string>();
 
-    if (incompleteSessionIds.length > 0) {
+    if (rows.length > 0) {
       const { data, error: existingError } = await supabase
         .from("quiz_sessions")
-        .select("id, completed_at, session_payload")
+        .select("id, completed_at, correct_count, wrong_count, session_payload, updated_at")
         .eq("user_id", userId)
-        .in("id", incompleteSessionIds);
+        .in("id", rows.map((row) => row.id));
 
       if (existingError) throw existingError;
 
-      for (const row of (data ?? []) as Pick<QuizSessionRow, "id" | "completed_at" | "session_payload">[]) {
-        if (isCompletedQuizSessionRow(row)) {
-          protectedCompletedSessionIds.add(row.id);
+      const incomingRowsById = new Map(rows.map((row) => [row.id, row] as const));
+      for (const existingRow of (data ?? []) as QuizSessionRow[]) {
+        const incomingRow = incomingRowsById.get(existingRow.id);
+        if (
+          incomingRow &&
+          shouldProtectExistingCompletedSession(
+            {
+              completedAt: existingRow.completed_at,
+              payloadCompletedAt: existingRow.session_payload?.completedAt,
+              correctCount: existingRow.correct_count,
+              wrongCount: existingRow.wrong_count,
+              payloadAttemptCount: existingRow.session_payload?.attempts?.length,
+              updatedAt: existingRow.updated_at
+            },
+            {
+              completedAt: incomingRow.completed_at,
+              payloadCompletedAt: incomingRow.session_payload?.completedAt,
+              correctCount: incomingRow.correct_count,
+              wrongCount: incomingRow.wrong_count,
+              payloadAttemptCount: incomingRow.session_payload?.attempts?.length,
+              updatedAt: incomingRow.updated_at
+            }
+          )
+        ) {
+          protectedCompletedSessionIds.add(existingRow.id);
         }
       }
     }
