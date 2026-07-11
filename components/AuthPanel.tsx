@@ -1036,24 +1036,6 @@ export function AuthPanel() {
               >
                 私有數據頁
               </Link>
-              <Link
-                href="/owner/parasitology-review"
-                className="secondary-pill text-center"
-              >
-                寄生蟲複習
-              </Link>
-              <Link
-                href="/owner/bacteria-review"
-                className="secondary-pill text-center"
-              >
-                細菌複習
-              </Link>
-              <Link
-                href="/owner/virus-review"
-                className="secondary-pill text-center"
-              >
-                病毒複習
-              </Link>
             </>
           ) : null}
           <Link
