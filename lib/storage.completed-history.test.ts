@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import test from "node:test";
 import {
   buildCompletedQuestionHistoryEntriesFromSessions,
+  discardCurrentSession,
   getPendingQuestionExplanationOverrideSync,
   loadCloudCompletedSessionsForUser,
   loadCompletedQuestionHistoryEntriesForUser,
@@ -11,6 +12,7 @@ import {
   loadPendingCompletedSessionUploadsForUser,
   loadRecentCompletedSessionHandoffForUser,
   loadQuestionExplanationOverride,
+  loadCurrentSession,
   mergeCompletedQuestionHistoryEntries,
   mergeQuestionExplanationOverrides,
   queuePendingCompletedSessionUploadForUser,
@@ -21,6 +23,7 @@ import {
   saveRecentCompletedSessionHandoffForUser,
   saveQuestionExplanationOverride,
   saveQuestionExplanationOverrides,
+  saveCurrentSession,
   setActiveStorageUser
 } from "./storage";
 import type { Attempt, QuizSession } from "../types/quiz";
@@ -544,4 +547,21 @@ test("第 20 題之後的新詳解也要排入共享同步", () => {
   const pendingOverrides = getPendingQuestionExplanationOverrideSync(questionIds, {});
 
   assert.ok(pendingOverrides.some((item) => item.questionId === "q-25"));
+});
+
+test("刪除進行中測驗後，舊分頁不能把同一 session 寫回本機", () => {
+  installBrowserStorage();
+  setActiveStorageUser("user-1");
+  const activeSession = {
+    ...makeSession("active-session", ["q-1", "q-2"]),
+    completedAt: undefined
+  } satisfies QuizSession;
+
+  saveCurrentSession(activeSession);
+  assert.equal(loadCurrentSession()?.id, "active-session");
+
+  discardCurrentSession(activeSession.id, ["user-1"]);
+  saveCurrentSession({ ...activeSession, currentQuestionIndex: 1 });
+
+  assert.equal(loadCurrentSession(), null);
 });

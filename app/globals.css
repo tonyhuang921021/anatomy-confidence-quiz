@@ -364,6 +364,37 @@ select {
     background: white;
   }
 
+  .home-continue-button {
+    @apply relative flex min-h-24 w-full items-center gap-4 rounded-[1.45rem] border px-5 py-4 text-left transition;
+    border-color: color-mix(in srgb, var(--brand-main) 22%, var(--line-soft));
+    background: color-mix(in srgb, var(--brand-main) 7%, white);
+    color: var(--ink-main);
+    box-shadow: 0 10px 24px rgba(19, 38, 32, 0.04);
+  }
+
+  .home-continue-button:hover {
+    border-color: color-mix(in srgb, var(--brand-main) 42%, var(--line-soft));
+    background: color-mix(in srgb, var(--brand-main) 11%, white);
+    transform: translateY(-2px);
+    box-shadow: 0 14px 28px rgba(19, 38, 32, 0.07);
+  }
+
+  .home-continue-label {
+    @apply shrink-0 text-sm font-black;
+    letter-spacing: 0;
+  }
+
+  .home-continue-meta {
+    @apply min-w-0 flex-1 text-xs font-semibold leading-5 text-slate-500;
+  }
+
+  .home-continue-arrow {
+    @apply flex h-9 w-9 shrink-0 items-center justify-center rounded-full border text-2xl;
+    border-color: color-mix(in srgb, var(--brand-main) 20%, var(--line-soft));
+    color: var(--brand-deep);
+    background: rgba(255, 255, 255, 0.72);
+  }
+
   .home-release-notes {
     @apply rounded-[1.5rem] border p-3.5;
     border-color: color-mix(in srgb, var(--brand-main) 18%, var(--line-soft));
@@ -2425,6 +2456,7 @@ html[data-browser="safari"] .home-hero,
 html[data-browser="safari"] .home-device-card,
 html[data-browser="safari"] .home-release-notes,
 html[data-browser="safari"] .home-action-card,
+html[data-browser="safari"] .home-continue-button,
 html[data-browser="safari"] .home-entry-card,
 html[data-browser="safari"] .home-entry-icon,
 html[data-browser="safari"] .home-action-mark {
@@ -2452,6 +2484,7 @@ html[data-browser="safari"] .home-entry-card::after {
 }
 
 html[data-browser="safari"] .home-action-card:hover,
+html[data-browser="safari"] .home-continue-button:hover,
 html[data-browser="safari"] .home-entry-card:hover {
   transform: none;
   box-shadow: none;
@@ -2464,6 +2497,7 @@ html[data-browser="safari"]:not([data-theme="dark"]) .home-device-card,
 html[data-browser="safari"]:not([data-theme="dark"]) .home-device-screen,
 html[data-browser="safari"]:not([data-theme="dark"]) .home-release-notes,
 html[data-browser="safari"]:not([data-theme="dark"]) .home-action-card:not(.home-action-primary),
+html[data-browser="safari"]:not([data-theme="dark"]) .home-continue-button,
 html[data-browser="safari"]:not([data-theme="dark"]) .home-entry-card,
 html[data-browser="safari"]:not([data-theme="dark"]) .home-study-link,
 html[data-browser="safari"]:not([data-theme="dark"]) .home-progress-card,
@@ -2550,12 +2584,27 @@ html[data-theme="dark"] .secondary-pill:hover {
 }
 
 html[data-theme="dark"] .home-action-card,
+html[data-theme="dark"] .home-continue-button,
 html[data-theme="dark"] .home-entry-card,
 html[data-theme="dark"] .home-device-screen {
   background:
     linear-gradient(145deg, rgba(35, 43, 55, 0.78), rgba(35, 43, 55, 0.54)),
     radial-gradient(circle at 92% 18%, rgba(138, 154, 184, 0.1), transparent 34%);
   border-color: var(--line-soft);
+}
+
+html[data-theme="dark"] .home-continue-button {
+  background: rgba(35, 43, 55, 0.72);
+}
+
+html[data-theme="dark"] .home-continue-meta {
+  color: var(--ink-muted);
+}
+
+html[data-theme="dark"] .home-continue-arrow {
+  background: rgba(21, 28, 38, 0.72);
+  border-color: var(--line-soft);
+  color: var(--ink-main);
 }
 
 html[data-theme="dark"] .home-release-notes {

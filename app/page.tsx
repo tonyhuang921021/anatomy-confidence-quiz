@@ -53,6 +53,11 @@ const QUICK_ENTRIES = [
 
 const HOME_RELEASE_NOTES = [
   {
+    time: "07/12",
+    title: "進行中的測驗可以自己管理",
+    body: "首頁的繼續測驗會列出這台裝置與雲端尚未完成的考卷，可以挑一份接著寫，也能刪掉不要的進度。"
+  },
+  {
     time: "07/11",
     title: "自訂卷工作台重新整理",
     body: "快速組卷、智慧搜題、公開卷與匯入流程都更精簡；AI 搜題會先列出完整題目，確認、刪掉不相關題目後才建立考卷。"
@@ -990,25 +995,35 @@ export default function HomePage() {
                 <HomeToneBanner />
               </ClientSectionBoundary>
 
-              <div className="mt-7 grid gap-3 sm:grid-cols-3">
-                {HERO_ACTIONS.map((action, index) => (
+              <div className="mt-7 grid gap-3 sm:grid-cols-2">
+                <div className="grid gap-3">
                   <Link
-                    key={action.href}
-                    href={action.href}
+                    href={HERO_ACTIONS[0].href}
                     prefetch={false}
-                    className={action.tone === "primary" ? "home-action-card home-action-primary" : "home-action-card"}
-                    style={{ "--home-delay": `${120 + index * 80}ms` } as HomeAnimationStyle}
+                    className="home-action-card home-action-primary"
+                    style={{ "--home-delay": "120ms" } as HomeAnimationStyle}
                   >
                     <span className="home-action-mark" aria-hidden="true" />
-                    <span className="home-action-title">{action.label}</span>
+                    <span className="home-action-title">{HERO_ACTIONS[0].label}</span>
                   </Link>
-                ))}
-              </div>
-
-              <div className="mt-3">
-                <ClientSectionBoundary title="繼續測驗">
-                  <ContinueQuizButton />
-                </ClientSectionBoundary>
+                  <ClientSectionBoundary title="繼續測驗">
+                    <ContinueQuizButton />
+                  </ClientSectionBoundary>
+                </div>
+                <div className="grid gap-3">
+                  {HERO_ACTIONS.slice(1).map((action, index) => (
+                    <Link
+                      key={action.href}
+                      href={action.href}
+                      prefetch={false}
+                      className="home-action-card"
+                      style={{ "--home-delay": `${280 + index * 80}ms` } as HomeAnimationStyle}
+                    >
+                      <span className="home-action-mark" aria-hidden="true" />
+                      <span className="home-action-title">{action.label}</span>
+                    </Link>
+                  ))}
+                </div>
               </div>
             </div>
 

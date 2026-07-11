@@ -11,6 +11,7 @@ import { normalizeQuestionExplanationOverride as normalizeQuestionExplanationOve
 import { normalizePracticeYearRange } from "./practiceYears";
 
 const CURRENT_SESSION_KEY = "anatomy-confidence-current-session";
+const CURRENT_SESSION_DISCARDS_KEY = "anatomy-confidence-current-session-discards";
 const COMPLETED_SESSIONS_KEY = "anatomy-confidence-completed-sessions";
 const CLOUD_COMPLETED_SESSIONS_KEY = "anatomy-confidence-cloud-completed-sessions";
 const PENDING_COMPLETED_SESSION_UPLOADS_KEY = "anatomy-confidence-pending-completed-session-uploads";
@@ -44,6 +45,7 @@ const COMPLETED_STORAGE_SYNC_CHANNEL = "anatomy-confidence-completed-storage-syn
 const COMPLETED_STORAGE_SYNC_SOURCE_ID = `tab-${Date.now().toString(36)}-${Math.random()
   .toString(36)
   .slice(2)}`;
+const CURRENT_SESSION_DISCARD_TTL_MS = 7 * 24 * 60 * 60 * 1000;
 
 type CompletedStorageSyncChange = {
   sourceId: string;
@@ -1226,11 +1228,65 @@ export function getActiveStorageUser() {
   return safeLocalStorageGetItem(ACTIVE_USER_KEY) || GUEST_USER_ID;
 }
 
+function loadCurrentSessionDiscardMap(userId: string) {
+  const raw = safeLocalStorageGetItem(
+    getScopedKeyForUser(CURRENT_SESSION_DISCARDS_KEY, userId || GUEST_USER_ID)
+  );
+  if (!raw) return {} as Record<string, number>;
+
+  try {
+    const parsed = JSON.parse(raw) as Record<string, unknown>;
+    const cutoff = Date.now() - CURRENT_SESSION_DISCARD_TTL_MS;
+    return Object.fromEntries(
+      Object.entries(parsed).filter(
+        ([sessionId, discardedAt]) =>
+          Boolean(sessionId) && typeof discardedAt === "number" && discardedAt >= cutoff
+      )
+    ) as Record<string, number>;
+  } catch {
+    return {} as Record<string, number>;
+  }
+}
+
+export function isCurrentSessionDiscarded(
+  sessionId: string,
+  userId = getActiveStorageUser()
+) {
+  if (!isBrowser() || !sessionId) return false;
+  return Boolean(loadCurrentSessionDiscardMap(userId)[getCanonicalSessionId(sessionId)]);
+}
+
+function markCurrentSessionDiscardedForUser(sessionId: string, userId: string) {
+  const canonicalId = getCanonicalSessionId(sessionId);
+  const discardMap = loadCurrentSessionDiscardMap(userId);
+  discardMap[canonicalId] = Date.now();
+  safeLocalStorageSetItem(
+    getScopedKeyForUser(CURRENT_SESSION_DISCARDS_KEY, userId || GUEST_USER_ID),
+    JSON.stringify(discardMap)
+  );
+}
+
+export function discardCurrentSession(sessionId: string, userIds: string[] = []) {
+  if (!isBrowser() || !sessionId) return;
+  const scopedUserIds = Array.from(
+    new Set([getActiveStorageUser(), GUEST_USER_ID, ...userIds].filter(Boolean))
+  );
+  for (const userId of scopedUserIds) {
+    markCurrentSessionDiscardedForUser(sessionId, userId);
+  }
+  clearMatchingCurrentSessions(sessionId, userIds);
+}
+
 export function saveCurrentSession(session: QuizSession) {
   if (!isBrowser()) return;
   const activeUser = getActiveStorageUser();
   const canonicalId = getCanonicalSessionId(session.id);
   const alreadyCompleted = completedSessionIdMemoryCache.get(activeUser)?.has(canonicalId) ?? false;
+
+  if (!session.completedAt && isCurrentSessionDiscarded(session.id, activeUser)) {
+    clearMatchingCurrentSessions(session.id, [activeUser]);
+    return;
+  }
 
   if (!session.completedAt && alreadyCompleted) {
     clearMatchingCurrentSessions(session.id);
@@ -1255,7 +1311,12 @@ export function loadCurrentSessionForUser(userId: string): QuizSession | null {
   if (!raw) return null;
 
   try {
-    return normalizeSession(JSON.parse(raw) as QuizSession);
+    const session = normalizeSession(JSON.parse(raw) as QuizSession);
+    if (session && !session.completedAt && isCurrentSessionDiscarded(session.id, userId)) {
+      safeLocalStorageRemoveItem(scopedKey);
+      return null;
+    }
+    return session;
   } catch {
     return null;
   }
@@ -1708,6 +1769,7 @@ export function clearHistory() {
   safeSessionStorageRemoveItem(getScopedKey(COMPLETED_QUESTION_HISTORY_KEY));
   safeLocalStorageRemoveItem(getScopedKey(CURRENT_SESSION_KEY));
   safeSessionStorageRemoveItem(getScopedKey(CURRENT_SESSION_KEY));
+  safeLocalStorageRemoveItem(getScopedKey(CURRENT_SESSION_DISCARDS_KEY));
   broadcastCompletedStorageChange({
     userId: activeUser,
     sessions: true,

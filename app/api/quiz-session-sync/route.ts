@@ -43,6 +43,10 @@ type QuizSessionSyncRequestBody = {
   activeCheckpoint?: unknown;
 };
 
+type QuizSessionDeleteRequestBody = {
+  sessionId?: unknown;
+};
+
 type ServiceSupabaseClient = any;
 
 const MAX_SYNC_SESSIONS = 80;
@@ -79,10 +83,6 @@ function canonicalizeSessionsForUser(userId: string, sessions: QuizSession[]) {
     ...session,
     id: namespaceSessionIdForUser(userId, session.id)
   }));
-}
-
-function isCompletedQuizSession(session: QuizSession) {
-  return Boolean(session.completedAt);
 }
 
 function sessionUpdatedAtValueForCloud(session: QuizSession) {
@@ -317,11 +317,12 @@ export async function POST(request: NextRequest) {
       )
     );
     const protectedCompletedSessionIds = new Set<string>();
+    const discardedSessionIds = new Set<string>();
 
     if (rows.length > 0) {
       const { data, error: existingError } = await supabase
         .from("quiz_sessions")
-        .select("id, completed_at, correct_count, wrong_count, session_payload, updated_at")
+        .select("id, mode, completed_at, correct_count, wrong_count, session_payload, updated_at")
         .eq("user_id", userId)
         .in("id", rows.map((row) => row.id));
 
@@ -329,6 +330,10 @@ export async function POST(request: NextRequest) {
 
       const incomingRowsById = new Map(rows.map((row) => [row.id, row] as const));
       for (const existingRow of (data ?? []) as QuizSessionRow[]) {
+        if (existingRow.mode === "discarded") {
+          discardedSessionIds.add(existingRow.id);
+          continue;
+        }
         const incomingRow = incomingRowsById.get(existingRow.id);
         if (
           incomingRow &&
@@ -357,9 +362,15 @@ export async function POST(request: NextRequest) {
     }
 
     const safeSessions = sessions.filter(
-      (session) => isCompletedQuizSession(session) || !protectedCompletedSessionIds.has(session.id)
+      (session) =>
+        !discardedSessionIds.has(session.id) &&
+        !protectedCompletedSessionIds.has(session.id)
     );
-    const safeRows = rows.filter((row) => !protectedCompletedSessionIds.has(row.id));
+    const safeRows = rows.filter(
+      (row) =>
+        !discardedSessionIds.has(row.id) &&
+        !protectedCompletedSessionIds.has(row.id)
+    );
 
     if (safeRows.length === 0) {
       return NextResponse.json(
@@ -407,6 +418,63 @@ export async function POST(request: NextRequest) {
   } catch (syncError) {
     return NextResponse.json(
       { ok: false, message: formatError(syncError) },
+      { status: 500, headers: { "Cache-Control": "no-store" } }
+    );
+  }
+}
+
+export async function DELETE(request: NextRequest) {
+  if (isSupabaseRecoveryMode()) {
+    return NextResponse.json(
+      { ok: false, message: "雲端同步維護中，暫時不能刪除進行中測驗。" },
+      { status: 503, headers: { "Cache-Control": "no-store" } }
+    );
+  }
+
+  const supabase = getServiceSupabaseClient();
+  if (!supabase) {
+    return NextResponse.json(
+      { ok: false, message: "Supabase 尚未設定，暫時不能刪除雲端測驗。" },
+      { status: 503, headers: { "Cache-Control": "no-store" } }
+    );
+  }
+
+  const { userId, error } = await getAuthedUser(request, supabase);
+  if (error) return error;
+
+  try {
+    const body = (await request.json().catch(() => null)) as QuizSessionDeleteRequestBody | null;
+    const rawSessionId = typeof body?.sessionId === "string" ? body.sessionId.trim() : "";
+    if (!rawSessionId || rawSessionId.length > 180) {
+      return NextResponse.json(
+        { ok: false, message: "缺少有效的進行中測驗編號。" },
+        { status: 400, headers: { "Cache-Control": "no-store" } }
+      );
+    }
+
+    const sessionId = namespaceSessionIdForUser(userId, rawSessionId);
+    const { error: deleteError } = await supabase
+      .from("quiz_sessions")
+      .update({
+        mode: "discarded",
+        session_name: null,
+        question_count: 0,
+        session_payload: { discardedAt: new Date().toISOString() },
+        updated_at: new Date().toISOString()
+      })
+      .eq("id", sessionId)
+      .eq("user_id", userId)
+      .is("completed_at", null);
+
+    if (deleteError) throw deleteError;
+
+    return NextResponse.json(
+      { ok: true },
+      { headers: { "Cache-Control": "no-store" } }
+    );
+  } catch (deleteError) {
+    return NextResponse.json(
+      { ok: false, message: formatError(deleteError) },
       { status: 500, headers: { "Cache-Control": "no-store" } }
     );
   }

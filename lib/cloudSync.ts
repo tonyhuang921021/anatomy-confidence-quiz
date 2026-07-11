@@ -25,6 +25,7 @@ import {
   compactQuestionForStorage,
   compactSessionForStorage,
   clearMatchingCurrentSessions,
+  discardCurrentSession,
   getCompletedSessionsStorageLengthForUser,
   getCanonicalSessionId,
   loadCloudCompletedSessionsForUser,
@@ -36,6 +37,7 @@ import {
   loadCompletedSessionsForUser,
   mergeCompletedQuestionHistoryFromSessionsForUser,
   normalizeSessions,
+  isCurrentSessionDiscarded,
   queuePendingCompletedSessionUploadForUser,
   loadRecentLocalCompletedSessionsForUploadForUser,
   removePendingCompletedSessionUploadsForUser,
@@ -49,6 +51,7 @@ import {
   isSupabaseConfigured
 } from "@/lib/supabase/client";
 import { chooseMoreCompleteSessionForSameWork } from "@/lib/currentSessionSelection";
+import { mergeResumableQuizSessions } from "@/lib/resumableSessions";
 import {
   buildCloudAttemptSessionChunks,
   findUnresolvedCompletedSessionIds,
@@ -1574,6 +1577,7 @@ async function fetchActiveQuizSessionRowsForUser(userId: string) {
     )
     .eq("user_id", userId)
     .is("completed_at", null)
+    .or("mode.neq.discarded,mode.is.null")
     .order("updated_at", { ascending: false })
     .order("started_at", { ascending: false })
     .limit(CLOUD_ACTIVE_SESSION_COMPARE_LIMIT);
@@ -1638,6 +1642,78 @@ async function fetchActiveQuizSessionsForUser(userId: string) {
   return rows
     .map((row) => mapRowToSession(row, attemptMap))
     .filter((session): session is QuizSession => Boolean(session));
+}
+
+export async function loadResumableQuizSessionsForCurrentUser(userId?: string | null) {
+  const localSessions = [
+    userId ? loadCurrentSessionForUser(userId) : null,
+    loadCurrentSessionForUser("guest")
+  ];
+
+  if (!userId || isSupabaseRecoveryMode() || !isSupabaseConfigured()) {
+    return {
+      sessions: mergeResumableQuizSessions(localSessions, []),
+      cloudError: undefined as string | undefined
+    };
+  }
+
+  try {
+    const cloudSessions = await withClientTimeout(
+      fetchActiveQuizSessionsForUser(userId),
+      CLOUD_SERVER_SYNC_TIMEOUT_MS,
+      "可繼續測驗清單讀取逾時，先顯示這台裝置的紀錄。"
+    );
+    const visibleCloudSessions = cloudSessions.filter(
+      (session) => !isCurrentSessionDiscarded(session.id, userId)
+    );
+    return {
+      sessions: mergeResumableQuizSessions(localSessions, visibleCloudSessions),
+      cloudError: undefined as string | undefined
+    };
+  } catch (error) {
+    return {
+      sessions: mergeResumableQuizSessions(localSessions, []),
+      cloudError: error instanceof Error ? error.message : "雲端清單讀取失敗，先顯示這台裝置的紀錄。"
+    };
+  }
+}
+
+export async function deleteResumableQuizSession(input: {
+  sessionId: string;
+  userId?: string | null;
+  accessToken?: string | null;
+}) {
+  if (!input.sessionId) return;
+
+  if (input.userId && isSupabaseConfigured()) {
+    if (isSupabaseRecoveryMode()) {
+      throw new Error("雲端同步維護中，暫時不能刪除這份進行中測驗。");
+    }
+    if (!input.accessToken) {
+      throw new Error("登入狀態已過期，請重新登入後再刪除。");
+    }
+
+    const response = await fetchWithClientTimeout(
+      "/api/quiz-session-sync",
+      {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${input.accessToken}`
+        },
+        body: JSON.stringify({ sessionId: input.sessionId })
+      },
+      CLOUD_SERVER_SYNC_TIMEOUT_MS,
+      "刪除進行中測驗逾時，原紀錄仍保留。"
+    );
+    const rawText = await response.text();
+    const payload = tryParseJson<{ ok?: boolean; message?: string }>(rawText);
+    if (!response.ok || !payload?.ok) {
+      throw new Error(payload?.message || rawText || "刪除進行中測驗失敗。");
+    }
+  }
+
+  discardCurrentSession(input.sessionId, input.userId ? [input.userId] : []);
 }
 
 async function fetchQuizSessionsForUser(userId: string, signal?: AbortSignal) {
@@ -2239,11 +2315,12 @@ async function upsertSessionsForUser(
     .filter((row) => !isCompletedQuizSessionRow(row))
     .map((row) => row.id);
   const protectedCompletedSessionIds = new Set<string>();
+  const discardedSessionIds = new Set<string>();
 
   if (incompleteSessionIds.length > 0) {
     const { data, error: existingError } = await supabase
       .from("quiz_sessions")
-      .select("id, completed_at, session_payload")
+      .select("id, mode, completed_at, session_payload")
       .eq("user_id", userId)
       .in("id", incompleteSessionIds);
 
@@ -2251,17 +2328,25 @@ async function upsertSessionsForUser(
       throw existingError;
     }
 
-    for (const row of (data ?? []) as Pick<QuizSessionRow, "id" | "completed_at" | "session_payload">[]) {
-      if (isCompletedQuizSessionRow(row)) {
+    for (const row of (data ?? []) as Pick<QuizSessionRow, "id" | "mode" | "completed_at" | "session_payload">[]) {
+      if (row.mode === "discarded") {
+        discardedSessionIds.add(row.id);
+      } else if (isCompletedQuizSessionRow(row)) {
         protectedCompletedSessionIds.add(row.id);
       }
     }
   }
 
   const safeSessions = namespacedSessions.filter(
-    (session) => isCompletedQuizSession(session) || !protectedCompletedSessionIds.has(session.id)
+    (session) =>
+      !discardedSessionIds.has(session.id) &&
+      !protectedCompletedSessionIds.has(session.id)
   );
-  const safeRows = rows.filter((row) => !protectedCompletedSessionIds.has(row.id));
+  const safeRows = rows.filter(
+    (row) =>
+      !discardedSessionIds.has(row.id) &&
+      !protectedCompletedSessionIds.has(row.id)
+  );
 
   for (const sessionId of protectedCompletedSessionIds) {
     clearMatchingCurrentSessions(sessionId, [userId]);
@@ -2954,6 +3039,7 @@ export async function pushCurrentSessionToSupabase(
 ) {
   if (isSupabaseRecoveryMode()) return;
   if (!isSupabaseConfigured() || session.completedAt) return;
+  if (isCurrentSessionDiscarded(session.id)) return;
 
   const supabase = getSupabaseBrowserClient();
   const { data } = await supabase.auth.getSession();
