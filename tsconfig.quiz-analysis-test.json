@@ -29,6 +29,8 @@
     "lib/feedbackAuth.test.ts",
     "lib/cloudSyncWriteGuard.ts",
     "lib/cloudSyncWriteGuard.test.ts",
+    "lib/customPaperSearch.ts",
+    "lib/customPaperSearch.test.ts",
     "lib/quizSessionSyncSafety.ts",
     "lib/quizSessionSyncSafety.test.ts",
     "lib/practiceYears.ts",

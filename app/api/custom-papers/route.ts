@@ -2,6 +2,11 @@ import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 import { createOpenAIText, isOpenAIConfigured } from "@/lib/openai";
 import { getActiveAIAccountBan } from "@/lib/aiAccountBan";
+import {
+  expandCustomPaperSearchTerms,
+  orderCustomPaperSearchResults,
+  rankCustomPaperSearchCandidates
+} from "@/lib/customPaperSearch";
 import { MAX_PRACTICE_SOURCE_YEAR, MIN_PRACTICE_SOURCE_YEAR, normalizePracticeYearRange } from "@/lib/practiceYears";
 import { getRecoveryTimestamp, isSupabaseRecoveryMode } from "@/lib/supabase/recoveryMode";
 import { bundledCustomPaperSeeds } from "@/data/bundledCustomPapers";
@@ -13,6 +18,7 @@ import type {
   CustomPaperDetail,
   CustomPaperDifficulty,
   CustomPaperParticipant,
+  CustomPaperSearchPreview,
   CustomPaperSummary,
   Question,
   QuestionClassificationOverride,
@@ -84,6 +90,20 @@ type GenerateAISearchBody = {
   yearTo?: number;
 };
 
+type PreviewAISearchBody = Omit<GenerateAISearchBody, "action" | "name" | "isPublic"> & {
+  action: "preview_ai_search";
+};
+
+type CreateAISearchPaperBody = {
+  action: "create_ai_search_paper";
+  accessToken?: string | null;
+  visitorId?: string | null;
+  questionIds?: string[];
+  query?: string;
+  name?: string;
+  isPublic?: boolean;
+};
+
 type SubmitAttemptBody = {
   action: "submit_attempt";
   accessToken?: string | null;
@@ -134,6 +154,11 @@ const CUSTOM_PAPER_SELECT_WITH_PAYLOAD =
 const CUSTOM_PAPER_SELECT_BASE =
   "paper_code, name, question_ids, subject_filters, difficulty, is_public, created_by_user_id, created_by_email, created_by_label, visitor_id, created_at";
 const CUSTOM_PAPER_RECOVERY_MESSAGE = "自訂卷雲端資料維護中，先顯示網站內建卷；新增、公開與作答排名暫時不寫入雲端。";
+const MAX_IMPORTED_CUSTOM_PAPER_QUESTIONS = 200;
+const MAX_IMPORTED_CUSTOM_PAPER_JSON_CHARS = 800_000;
+const BUNDLED_SEED_CHECK_TTL_MS = 10 * 60 * 1000;
+let bundledSeedCheckedAt = 0;
+let bundledSeedCheckInFlight: Promise<void> | null = null;
 
 function bundledSeedToCustomPaperRow(seed: (typeof bundledCustomPaperSeeds)[number]): CustomPaperRow {
   return {
@@ -180,7 +205,7 @@ function getServiceSupabaseClient() {
   });
 }
 
-async function ensureBundledCustomPapersSeeded(supabase: any) {
+async function inspectBundledCustomPapers(supabase: any) {
   if (bundledCustomPaperSeeds.length === 0) return;
 
   const paperCodes = bundledCustomPaperSeeds.map((seed) => seed.paperCode);
@@ -245,6 +270,21 @@ async function ensureBundledCustomPapersSeeded(supabase: any) {
       }
     })
   );
+}
+
+async function ensureBundledCustomPapersSeeded(supabase: any) {
+  if (Date.now() - bundledSeedCheckedAt < BUNDLED_SEED_CHECK_TTL_MS) return;
+  if (bundledSeedCheckInFlight) return bundledSeedCheckInFlight;
+
+  bundledSeedCheckInFlight = inspectBundledCustomPapers(supabase)
+    .then(() => {
+      bundledSeedCheckedAt = Date.now();
+    })
+    .finally(() => {
+      bundledSeedCheckInFlight = null;
+    });
+
+  return bundledSeedCheckInFlight;
 }
 
 async function insertAIUsageLog(supabase: any, row: AIUsageLogRow) {
@@ -330,69 +370,6 @@ function extractJsonObjectCandidate(raw: string) {
   const end = raw.lastIndexOf("}");
   if (start === -1 || end === -1 || end <= start) return null;
   return raw.slice(start, end + 1);
-}
-
-function normalizeSearchText(text: string) {
-  return text.toLowerCase().trim();
-}
-
-function compactSearchText(text: string) {
-  return text.toLowerCase().replace(/[\s\-_/，。、；：（）()]+/g, "");
-}
-
-const MEDICAL_SEARCH_FRAGMENTS = [
-  "血液",
-  "腫瘤",
-  "腫瘤學",
-  "凝血",
-  "貧血",
-  "白血病",
-  "淋巴",
-  "骨髓",
-  "免疫",
-  "感染",
-  "發炎",
-  "代謝",
-  "內分泌",
-  "呼吸",
-  "循環",
-  "腎臟",
-  "肝臟",
-  "心臟",
-  "神經",
-  "消化",
-  "胃腸"
-];
-
-function expandAISearchTerms(terms: string[]) {
-  const expanded = new Set<string>();
-
-  for (const rawTerm of terms) {
-    const term = rawTerm.trim();
-    if (!term) continue;
-    expanded.add(term);
-
-    const strippedStudySuffix = term.replace(/學$/u, "").trim();
-    if (strippedStudySuffix && strippedStudySuffix !== term) {
-      expanded.add(strippedStudySuffix);
-    }
-
-    const compactTerm = compactSearchText(term);
-    for (const fragment of MEDICAL_SEARCH_FRAGMENTS) {
-      if (compactTerm.includes(compactSearchText(fragment))) {
-        expanded.add(fragment);
-      }
-    }
-
-    if (/^[\p{Script=Han}A-Za-z0-9]+$/u.test(term)) {
-      const slashSplit = term.split(/[／/、・·]/).map((item) => item.trim()).filter(Boolean);
-      for (const item of slashSplit) {
-        expanded.add(item);
-      }
-    }
-  }
-
-  return Array.from(expanded);
 }
 
 function sample<T>(items: T[], count: number) {
@@ -510,51 +487,12 @@ function parseAISearchPlan(raw: string): AISearchPlan {
   };
 }
 
-function buildQuestionSearchCorpus(question: Question) {
-  return [
-    question.subject,
-    question.chapter,
-    question.section,
-    question.testedConcept,
-    question.stem,
-    question.explanation,
-    question.memoryTip,
-    ...Object.values(question.options ?? {}),
-    ...Object.values(question.optionAnalysis ?? {})
-  ]
-    .filter(Boolean)
-    .join("\n");
-}
-
-function scoreQuestionAgainstSearchTerms(question: Question, terms: string[]) {
-  const normalizedCorpus = normalizeSearchText(buildQuestionSearchCorpus(question));
-  const compactCorpus = compactSearchText(normalizedCorpus);
-  let score = 0;
-
-  for (const rawTerm of terms) {
-    const term = normalizeSearchText(rawTerm);
-    if (!term) continue;
-    const compactTerm = compactSearchText(term);
-
-    if (question.subject.toLowerCase().includes(term)) score += 8;
-    if ((question.chapter ?? "").toLowerCase().includes(term)) score += 7;
-    if ((question.section ?? "").toLowerCase().includes(term)) score += 7;
-    if ((question.testedConcept ?? "").toLowerCase().includes(term)) score += 7;
-    if (normalizeSearchText(question.stem).includes(term)) score += 6;
-    if (normalizeSearchText(question.explanation ?? "").includes(term)) score += 4;
-    if (compactTerm && compactCorpus.includes(compactTerm)) score += 3;
-  }
-
-  return score;
-}
-
 function summarizeQuestionForAISearch(question: Question) {
   return [
     `id=${question.id}`,
     `subject=${question.subject}`,
     `chapter=${question.chapter ?? ""}`,
     `section=${question.section ?? ""}`,
-    `concept=${question.testedConcept ?? ""}`,
     `stem=${question.stem.replace(/\s+/g, " ").slice(0, 140)}`
   ].join(" | ");
 }
@@ -763,7 +701,7 @@ async function generateUniquePaperCode(supabase: any) {
 
 function toPaperSummary(
   row: CustomPaperRow,
-  attempts: CustomPaperAttemptRow[]
+  attempts: Array<Pick<CustomPaperAttemptRow, "accuracy_rate">>
 ): CustomPaperSummary {
   const participantCount = attempts.length;
   const averageAccuracyRate =
@@ -792,7 +730,8 @@ function toPaperSummary(
 
 function toPaperDetail(
   row: CustomPaperRow,
-  attempts: CustomPaperAttemptRow[]
+  attempts: CustomPaperAttemptRow[],
+  canEdit = false
 ): CustomPaperDetail {
   const summary = toPaperSummary(row, attempts);
   const participants: CustomPaperParticipant[] = attempts
@@ -812,7 +751,8 @@ function toPaperDetail(
     ...summary,
     questionIds: Array.isArray(row.question_ids) ? row.question_ids : [],
     questions: Array.isArray(row.question_payload) ? row.question_payload : undefined,
-    participants
+    participants,
+    canEdit
   };
 }
 
@@ -884,6 +824,9 @@ function normalizeImportedCustomPaperQuestions(rawJson: string, paperCode: strin
 
   if (!Array.isArray(parsed) || parsed.length === 0) {
     throw new Error("請貼一個至少包含 1 題的 JSON 陣列。");
+  }
+  if (parsed.length > MAX_IMPORTED_CUSTOM_PAPER_QUESTIONS) {
+    throw new Error(`單份匯入卷最多 ${MAX_IMPORTED_CUSTOM_PAPER_QUESTIONS} 題，請拆成多份後再匯入。`);
   }
 
   return parsed.map((item, index) => {
@@ -982,6 +925,20 @@ async function loadPaperAttempts(supabase: any, paperCode: string) {
   return (data ?? []) as CustomPaperAttemptRow[];
 }
 
+async function loadPaperAttemptSummariesForCodes(supabase: any, paperCodes: string[]) {
+  if (paperCodes.length === 0) {
+    return [] as Array<Pick<CustomPaperAttemptRow, "paper_code" | "accuracy_rate">>;
+  }
+
+  const { data, error } = await supabase
+    .from("custom_paper_attempts")
+    .select("paper_code, accuracy_rate")
+    .in("paper_code", paperCodes);
+
+  if (error) throw error;
+  return (data ?? []) as Array<Pick<CustomPaperAttemptRow, "paper_code" | "accuracy_rate">>;
+}
+
 async function loadCustomPaperByCode(supabase: any, paperCode: string) {
   let { data, error } = await supabase
     .from("custom_papers")
@@ -1002,21 +959,12 @@ async function loadCustomPaperByCode(supabase: any, paperCode: string) {
 }
 
 async function loadPublicCustomPaperRows(supabase: any) {
-  let { data, error } = await supabase
+  const { data, error } = await supabase
     .from("custom_papers")
-    .select(CUSTOM_PAPER_SELECT_WITH_PAYLOAD)
+    .select(CUSTOM_PAPER_SELECT_BASE)
     .eq("is_public", true)
     .order("created_at", { ascending: false })
     .limit(PUBLIC_PAPER_LIMIT);
-
-  if (error && String(error.message ?? "").includes("question_payload")) {
-    ({ data, error } = await supabase
-      .from("custom_papers")
-      .select(CUSTOM_PAPER_SELECT_BASE)
-      .eq("is_public", true)
-      .order("created_at", { ascending: false })
-      .limit(PUBLIC_PAPER_LIMIT));
-  }
 
   if (error) throw error;
   return (data ?? []) as CustomPaperRow[];
@@ -1126,15 +1074,35 @@ export async function GET(request: NextRequest) {
       }
 
       const attempts = await loadPaperAttempts(supabase, paperCode);
+      const accessToken = request.headers.get("authorization")?.replace(/^Bearer\s+/i, "") ?? null;
+      const visitorId = request.headers.get("x-visitor-id");
+      const actor = await resolveActor(supabase, accessToken, visitorId);
       return NextResponse.json({
         ok: true,
-        paper: toPaperDetail(data as CustomPaperRow, attempts)
+        paper: toPaperDetail(
+          data as CustomPaperRow,
+          attempts,
+          canEditPaper(data as CustomPaperRow, actor, visitorId)
+        )
       });
     }
 
     const rows = await loadPublicCustomPaperRows(supabase);
-    const papers = await Promise.all(
-      rows.map(async (row) => toPaperSummary(row, await loadPaperAttempts(supabase, row.paper_code)))
+    const attempts = await loadPaperAttemptSummariesForCodes(
+      supabase,
+      rows.map((row) => row.paper_code)
+    );
+    const attemptsByPaperCode = new Map<
+      string,
+      Array<Pick<CustomPaperAttemptRow, "accuracy_rate">>
+    >();
+    for (const attempt of attempts) {
+      const paperAttempts = attemptsByPaperCode.get(attempt.paper_code) ?? [];
+      paperAttempts.push(attempt);
+      attemptsByPaperCode.set(attempt.paper_code, paperAttempts);
+    }
+    const papers = rows.map((row) =>
+      toPaperSummary(row, attemptsByPaperCode.get(row.paper_code) ?? [])
     );
 
     return NextResponse.json({ ok: true, papers });
@@ -1149,6 +1117,8 @@ export async function POST(request: NextRequest) {
     const body = (await request.json().catch(() => null)) as
       | GenerateBody
       | GenerateAISearchBody
+      | PreviewAISearchBody
+      | CreateAISearchPaperBody
       | ImportJsonBody
       | SubmitAttemptBody
       | UpdateMetadataBody
@@ -1186,6 +1156,8 @@ export async function POST(request: NextRequest) {
     const body = (await request.json().catch(() => null)) as
       | GenerateBody
       | GenerateAISearchBody
+      | PreviewAISearchBody
+      | CreateAISearchPaperBody
       | ImportJsonBody
       | SubmitAttemptBody
       | UpdateMetadataBody
@@ -1265,12 +1237,13 @@ export async function POST(request: NextRequest) {
           averageAccuracyRate: 0,
           participantCount: 0,
           questionIds: selectedQuestions.map((question) => question.id),
-          participants: []
+          participants: [],
+          canEdit: true
         } satisfies CustomPaperDetail
       });
     }
 
-    if (body.action === "generate_ai_search") {
+    if (body.action === "generate_ai_search" || body.action === "preview_ai_search") {
       if (!isOpenAIConfigured()) {
         return NextResponse.json(
           { ok: false, message: "OPENAI_API_KEY 尚未設定，暫時無法使用 AI 智慧檢索。" },
@@ -1350,7 +1323,7 @@ export async function POST(request: NextRequest) {
         500
       );
       const plan = parseAISearchPlan(expansion.text);
-      const searchTerms = expandAISearchTerms(
+      const searchTerms = expandCustomPaperSearchTerms(
         Array.from(
           new Set(
             [query, ...(plan.searchTerms ?? []), ...(plan.relatedConcepts ?? [])]
@@ -1360,15 +1333,9 @@ export async function POST(request: NextRequest) {
         )
       );
 
-      const scoredCandidates = bank
-        .map((question) => ({
-          question,
-          score: scoreQuestionAgainstSearchTerms(question, searchTerms)
-        }))
-        .filter((item) => item.score > 0)
-        .sort((left, right) => right.score - left.score || left.question.id.localeCompare(right.question.id));
-
-      const candidateQuestions = scoredCandidates.slice(0, 80).map((item) => item.question);
+      const candidateQuestions = rankCustomPaperSearchCandidates(bank, searchTerms, 80).map(
+        (item) => item.question
+      );
       if (candidateQuestions.length === 0) {
         return NextResponse.json(
           {
@@ -1384,17 +1351,62 @@ export async function POST(request: NextRequest) {
         900
       );
       const relevant = parseRelevantIds(rerank.text);
-      const relevantIdSet = new Set(relevant.relevantIds);
-      const orderedRelevantQuestions = candidateQuestions.filter((question) => relevantIdSet.has(question.id));
-      const finalQuestions =
-        orderedRelevantQuestions.length > 0 ? orderedRelevantQuestions : candidateQuestions.slice(0, 20);
+      const finalQuestions = orderCustomPaperSearchResults(
+        candidateQuestions,
+        relevant.relevantIds
+      );
+      if (finalQuestions.length === 0) {
+        return NextResponse.json(
+          {
+            ok: false,
+            message: `目前在 ${yearFrom} 到 ${yearTo} 年、你選的科目範圍內，沒有找到足夠明確的相關題目。請改用更具體的章節、疾病或機轉再搜尋。`
+          },
+          { status: 400 }
+        );
+      }
+      const subjectLabels = Array.from(
+        new Set(finalQuestions.map((question) => question.subject))
+      );
+
+      if (body.action === "preview_ai_search") {
+        await insertAIUsageLog(supabase, {
+          rate_key: `ai-search:${actor.userEmail.trim().toLowerCase()}`,
+          visitor_id: body.visitorId ?? null,
+          user_email: actor.userEmail,
+          question_id: `${AI_SEARCH_USAGE_PREFIX}PREVIEW:${Date.now()}`,
+          model: rerank.model,
+          input_tokens: expansion.usage.inputTokens + rerank.usage.inputTokens,
+          output_tokens: expansion.usage.outputTokens + rerank.usage.outputTokens,
+          total_tokens: expansion.usage.totalTokens + rerank.usage.totalTokens,
+          used_at: new Date().toISOString()
+        });
+
+        return NextResponse.json({
+          ok: true,
+          search: {
+            title: plan.title?.slice(0, 60) || `AI 檢索：${query.slice(0, 24)}`,
+            reason: relevant.reason || undefined,
+            query,
+            questions: finalQuestions.map((question) => ({
+              id: question.id,
+              subject: question.subject,
+              chapter: question.chapter,
+              section: question.section,
+              stem: question.stem,
+              sourceYear: question.sourceYear,
+              sourceRound: question.sourceRound,
+              originalQuestionNumber: question.originalQuestionNumber
+            }))
+          } satisfies CustomPaperSearchPreview
+        });
+      }
 
       const paperCode = await generateUniquePaperCode(supabase);
       const insertRow = {
         paper_code: paperCode,
         name: body.name?.trim().slice(0, 60) || plan.title?.slice(0, 60) || `AI 檢索：${query.slice(0, 24)}`,
         question_ids: finalQuestions.map((question) => question.id),
-        subject_filters: selectedSubjects,
+        subject_filters: subjectLabels,
         difficulty: "ai_search" as CustomPaperDifficulty,
         is_public: Boolean(body.isPublic),
         created_by_user_id: actor.userId,
@@ -1423,7 +1435,7 @@ export async function POST(request: NextRequest) {
         paper: {
           paperCode,
           name: insertRow.name ?? undefined,
-          subjectLabels: selectedSubjects,
+          subjectLabels,
           difficulty: "ai_search" as CustomPaperDifficulty,
           isPublic: insertRow.is_public,
           questionCount: finalQuestions.length,
@@ -1433,7 +1445,120 @@ export async function POST(request: NextRequest) {
           participantCount: 0,
           questionIds: finalQuestions.map((question) => question.id),
           questions: finalQuestions,
-          participants: []
+          participants: [],
+          canEdit: true
+        } satisfies CustomPaperDetail
+      });
+    }
+
+    if (body.action === "create_ai_search_paper") {
+      if (!body.accessToken) {
+        return NextResponse.json(
+          { ok: false, message: "請先登入帳號，才能建立搜題自訂卷。" },
+          { status: 401 }
+        );
+      }
+
+      const actor = await resolveActor(supabase, body.accessToken, body.visitorId);
+      if (!actor.userId || !actor.userEmail) {
+        return NextResponse.json(
+          { ok: false, message: "登入狀態已過期，請重新登入後再建立自訂卷。" },
+          { status: 401 }
+        );
+      }
+      if (!isAccountOlderThanDays(actor.createdAt, 7)) {
+        return NextResponse.json(
+          { ok: false, message: "AI 智慧檢索目前只開放給註冊滿 7 天的帳號使用。" },
+          { status: 403 }
+        );
+      }
+
+      const activeBan = await getActiveAIAccountBan(supabase, actor.userEmail);
+      if (activeBan) {
+        return NextResponse.json(
+          {
+            ok: false,
+            message: `這個帳號的 AI 功能已被暫停到 ${new Date(activeBan.banned_until).toLocaleString("zh-TW")} 。`
+          },
+          { status: 429 }
+        );
+      }
+
+      const inputQuestionIds = Array.isArray(body.questionIds) ? body.questionIds : [];
+      const questionIds = Array.from(
+        new Set(
+          inputQuestionIds
+            .map((questionId) => questionId.trim())
+            .filter(Boolean)
+        )
+      );
+      if (questionIds.length === 0) {
+        return NextResponse.json(
+          { ok: false, message: "請至少保留一題再建立自訂卷。" },
+          { status: 400 }
+        );
+      }
+      if (questionIds.length > 80 || inputQuestionIds.length > 80) {
+        return NextResponse.json(
+          { ok: false, message: "單份搜題自訂卷最多保留 80 題。" },
+          { status: 400 }
+        );
+      }
+
+      const classificationOverrides = await loadClassificationOverrides(supabase);
+      const questionMap = new Map(
+        getQuestionBankWithOverrides(classificationOverrides)
+          .filter((question) => question.sourceType !== "AI_GENERATED")
+          .map((question) => [question.id, question] as const)
+      );
+      const selectedQuestions = questionIds
+        .map((questionId) => questionMap.get(questionId))
+        .filter((question): question is Question => Boolean(question));
+      if (selectedQuestions.length !== questionIds.length) {
+        return NextResponse.json(
+          { ok: false, message: "部分搜尋結果已更新，請重新搜尋後再建立自訂卷。" },
+          { status: 409 }
+        );
+      }
+
+      const subjectLabels = Array.from(
+        new Set(selectedQuestions.map((question) => question.subject))
+      );
+      const paperCode = await generateUniquePaperCode(supabase);
+      const insertRow = {
+        paper_code: paperCode,
+        name:
+          body.name?.trim().slice(0, 60) ||
+          `AI 檢索：${body.query?.trim().slice(0, 24) || paperCode}`,
+        question_ids: questionIds,
+        subject_filters: subjectLabels,
+        difficulty: "ai_search" as CustomPaperDifficulty,
+        is_public: Boolean(body.isPublic),
+        created_by_user_id: actor.userId,
+        created_by_email: actor.userEmail,
+        created_by_label: actor.label,
+        visitor_id: body.visitorId ?? null
+      };
+
+      const { error: insertError } = await supabase.from("custom_papers").insert(insertRow);
+      if (insertError) throw insertError;
+
+      return NextResponse.json({
+        ok: true,
+        paper: {
+          paperCode,
+          name: insertRow.name,
+          subjectLabels,
+          difficulty: "ai_search" as CustomPaperDifficulty,
+          isPublic: insertRow.is_public,
+          questionCount: questionIds.length,
+          createdAt: new Date().toISOString(),
+          createdByLabel: actor.label,
+          averageAccuracyRate: 0,
+          participantCount: 0,
+          questionIds,
+          participants: [],
+          canEdit: true
         } satisfies CustomPaperDetail
       });
     }
@@ -1443,6 +1568,12 @@ export async function POST(request: NextRequest) {
       const rawJson = importBody.rawJson?.trim() ?? "";
       if (!rawJson) {
         return NextResponse.json({ ok: false, message: "請先貼上要匯入的 JSON。" }, { status: 400 });
+      }
+      if (rawJson.length > MAX_IMPORTED_CUSTOM_PAPER_JSON_CHARS) {
+        return NextResponse.json(
+          { ok: false, message: "這份 JSON 過大，請拆成多份後再匯入。" },
+          { status: 413 }
+        );
       }
 
       const actor = await resolveActor(supabase, importBody.accessToken, importBody.visitorId);
@@ -1491,7 +1622,8 @@ export async function POST(request: NextRequest) {
           participantCount: 0,
           questionIds: importedQuestions.map((question) => question.id),
           questions: importedQuestions,
-          participants: []
+          participants: [],
+          canEdit: true
         } satisfies CustomPaperDetail
       });
     }
@@ -1534,9 +1666,14 @@ export async function POST(request: NextRequest) {
             name: nextName,
             is_public: nextIsPublic
           },
-          attempts
+          attempts,
+          true
         )
       });
+    }
+
+    if (body.action !== "submit_attempt") {
+      return NextResponse.json({ ok: false, message: "不支援的自訂卷操作。" }, { status: 400 });
     }
 
     const submitBody = body as SubmitAttemptBody;

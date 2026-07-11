@@ -3,6 +3,7 @@ import type {
   Attempt,
   CustomPaperDetail,
   CustomPaperDifficulty,
+  CustomPaperSearchPreview,
   CustomPaperSummary,
   FeedbackMessage,
   LeaderboardEntry,
@@ -4009,6 +4010,20 @@ type GenerateAISearchCustomPaperInput = {
   yearTo?: number;
 };
 
+type PreviewAISearchCustomPaperInput = Omit<
+  GenerateAISearchCustomPaperInput,
+  "name" | "isPublic"
+>;
+
+type CreateAISearchCustomPaperInput = {
+  accessToken?: string | null;
+  visitorId: string;
+  questionIds: string[];
+  query: string;
+  name?: string;
+  isPublic: boolean;
+};
+
 type ImportJsonCustomPaperInput = {
   accessToken?: string | null;
   visitorId: string;
@@ -4045,16 +4060,21 @@ function tryParseJson<T>(rawText: string): T | null {
 export async function generateCustomPaper(
   input: GenerateCustomPaperInput
 ): Promise<CustomPaperDetail> {
-  const response = await fetch("/api/custom-papers", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json"
+  const response = await fetchWithClientTimeout(
+    "/api/custom-papers",
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        action: "generate",
+        ...input
+      })
     },
-    body: JSON.stringify({
-      action: "generate",
-      ...input
-    })
-  });
+    20_000,
+    "自訂卷產生逾時，請稍後再試。"
+  );
 
   const rawText = await response.text();
   const payload = tryParseJson<
@@ -4071,16 +4091,21 @@ export async function generateCustomPaper(
 export async function generateAISearchCustomPaper(
   input: GenerateAISearchCustomPaperInput
 ): Promise<CustomPaperDetail> {
-  const response = await fetch("/api/custom-papers", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json"
+  const response = await fetchWithClientTimeout(
+    "/api/custom-papers",
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        action: "generate_ai_search",
+        ...input
+      })
     },
-    body: JSON.stringify({
-      action: "generate_ai_search",
-      ...input
-    })
-  });
+    60_000,
+    "AI 智慧檢索逾時，請縮小年份或科目範圍後再試。"
+  );
 
   const rawText = await response.text();
   const payload = tryParseJson<
@@ -4094,19 +4119,90 @@ export async function generateAISearchCustomPaper(
   return payload.paper;
 }
 
+export async function previewAISearchCustomPaper(
+  input: PreviewAISearchCustomPaperInput
+): Promise<CustomPaperSearchPreview> {
+  const response = await fetchWithClientTimeout(
+    "/api/custom-papers",
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        action: "preview_ai_search",
+        ...input
+      })
+    },
+    60_000,
+    "AI 搜題逾時，請縮小年份或科目範圍後再試。"
+  );
+
+  const rawText = await response.text();
+  const payload = tryParseJson<{
+    ok?: boolean;
+    message?: string;
+    search?: CustomPaperSearchPreview;
+  }>(rawText);
+
+  if (!response.ok || !payload?.ok || !payload.search) {
+    throw new Error(payload?.message || rawText || "AI 搜題預覽失敗");
+  }
+
+  return payload.search;
+}
+
+export async function createAISearchCustomPaper(
+  input: CreateAISearchCustomPaperInput
+): Promise<CustomPaperDetail> {
+  const response = await fetchWithClientTimeout(
+    "/api/custom-papers",
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        action: "create_ai_search_paper",
+        ...input
+      })
+    },
+    20_000,
+    "建立自訂卷逾時，搜尋結果仍保留在畫面上，可以稍後再試。"
+  );
+
+  const rawText = await response.text();
+  const payload = tryParseJson<{
+    ok?: boolean;
+    message?: string;
+    paper?: CustomPaperDetail;
+  }>(rawText);
+
+  if (!response.ok || !payload?.ok || !payload.paper) {
+    throw new Error(payload?.message || rawText || "AI 搜題建卷失敗");
+  }
+
+  return payload.paper;
+}
+
 export async function importJsonCustomPaper(
   input: ImportJsonCustomPaperInput
 ): Promise<CustomPaperDetail> {
-  const response = await fetch("/api/custom-papers", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json"
+  const response = await fetchWithClientTimeout(
+    "/api/custom-papers",
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        action: "import_json",
+        ...input
+      })
     },
-    body: JSON.stringify({
-      action: "import_json",
-      ...input
-    })
-  });
+    20_000,
+    "JSON 自訂卷匯入逾時，原始內容仍保留在畫面上。"
+  );
 
   const rawText = await response.text();
   const payload = tryParseJson<
@@ -4120,8 +4216,22 @@ export async function importJsonCustomPaper(
   return payload.paper;
 }
 
-export async function lookupCustomPaper(paperCode: string): Promise<CustomPaperDetail> {
-  const response = await fetch(`/api/custom-papers?paperCode=${encodeURIComponent(paperCode)}`);
+export async function lookupCustomPaper(
+  paperCode: string,
+  accessToken?: string | null,
+  visitorId?: string | null
+): Promise<CustomPaperDetail> {
+  const response = await fetchWithClientTimeout(
+    `/api/custom-papers?paperCode=${encodeURIComponent(paperCode)}`,
+    {
+      headers: {
+        ...(accessToken ? { Authorization: `Bearer ${accessToken}` } : {}),
+        ...(visitorId ? { "X-Visitor-ID": visitorId } : {})
+      }
+    },
+    15_000,
+    "自訂卷讀取逾時，請稍後再試。"
+  );
   const rawText = await response.text();
   const payload = tryParseJson<
     | { ok?: boolean; message?: string; paper?: CustomPaperDetail }
@@ -4135,7 +4245,12 @@ export async function lookupCustomPaper(paperCode: string): Promise<CustomPaperD
 }
 
 export async function loadPublicCustomPapers(): Promise<CustomPaperSummary[]> {
-  const response = await fetch("/api/custom-papers");
+  const response = await fetchWithClientTimeout(
+    "/api/custom-papers",
+    {},
+    15_000,
+    "公開卷讀取逾時，請稍後再試。"
+  );
   const rawText = await response.text();
   const payload = tryParseJson<
     | { ok?: boolean; message?: string; papers?: CustomPaperSummary[] }

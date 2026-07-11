@@ -113,6 +113,28 @@ test("上千題的共同題號前綴會壓縮後直接交接", () => {
   });
 });
 
+test("自訂卷開刷會保留指定順序與嚴格題池設定", () => {
+  const settings: QuizSettings = {
+    mode: "custom_paper",
+    questionCount: 3,
+    subjectFilter: "全部",
+    subjectFilters: ["病理學", "生理學"],
+    customQuestionIds: ["CUSTOM-Q3", "CUSTOM-Q1", "CUSTOM-Q2"],
+    customPoolLabel: "自訂卷：測試卷",
+    strictCustomQuestionPool: true,
+    preserveCustomQuestionOrder: true,
+    customPaperCode: "T3ST1"
+  };
+
+  const href = buildNewQuizHref(settings);
+  const resolved = resolveStartSettingsFromSearchParams(getHrefSearchParams(href));
+
+  assert.equal(resolved.settings?.mode, "custom_paper");
+  assert.deepEqual(resolved.settings?.customQuestionIds, settings.customQuestionIds);
+  assert.equal(resolved.settings?.strictCustomQuestionPool, true);
+  assert.equal(resolved.settings?.preserveCustomQuestionOrder, true);
+});
+
 test("真的超大且暫存失敗時仍可用同頁記憶體交接", () => {
   const failingStorage = {
     getItem: () => null,

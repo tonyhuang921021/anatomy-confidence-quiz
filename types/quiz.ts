@@ -637,6 +637,26 @@ export type CustomPaperDetail = CustomPaperSummary & {
   questionIds: string[];
   questions?: Question[];
   participants: CustomPaperParticipant[];
+  canEdit?: boolean;
+};
+
+export type CustomPaperSearchQuestion = Pick<
+  Question,
+  | "id"
+  | "subject"
+  | "chapter"
+  | "section"
+  | "stem"
+  | "sourceYear"
+  | "sourceRound"
+  | "originalQuestionNumber"
+>;
+
+export type CustomPaperSearchPreview = {
+  title: string;
+  reason?: string;
+  query: string;
+  questions: CustomPaperSearchQuestion[];
 };
 
 export type SavedQuestionSource = "search" | "quiz" | "results" | "review" | "saved";
