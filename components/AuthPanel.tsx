@@ -14,7 +14,6 @@ import {
   loadPracticeFastAnswerMode,
   loadPracticeStopAfterReview,
   loadReviewCompletionThreshold,
-  loadPracticeYearRange,
   loadHomeToneMode,
   loadThemeMode,
   savePracticeQuestionCount,
@@ -25,11 +24,9 @@ import {
   savePracticeFastAnswerMode,
   savePracticeStopAfterReview,
   saveReviewCompletionThreshold,
-  savePracticeYearRange,
   saveHomeToneMode,
   saveThemeMode,
   type PracticeQuestionCount,
-  type PracticeYearRange,
   type ReviewCompletionThreshold,
   type HomeToneMode,
   type ThemeMode
@@ -52,11 +49,9 @@ import {
   getPracticeQuestionCountPreference,
   getPracticeStopAfterReviewPreference,
   getReviewCompletionThresholdPreference,
-  getPracticeYearRangePreference,
   getThemeModePreference,
   type AccountPreferencePatch
 } from "@/lib/accountPreferences";
-import { PRACTICE_YEAR_OPTIONS, normalizePracticeYearRange } from "@/lib/practiceYears";
 import { getSupabaseBrowserClient } from "@/lib/supabase/client";
 import { isSupabaseRecoveryMode } from "@/lib/supabase/recoveryMode";
 
@@ -65,11 +60,6 @@ const AUTH_SESSION_RECOVERY_TIMEOUT_MS = 2500;
 const REMEMBER_ACCOUNT_KEY = "medQuizRememberAccount";
 const REMEMBERED_EMAIL_KEY = "medQuizRememberedEmail";
 const RECOVERY_MODE_MESSAGE = "暫用本機，稍後補傳。雲端登入與同步維護中，目前紀錄會先留在本機。";
-const DEFAULT_PRACTICE_YEAR_RANGE: PracticeYearRange = {
-  yearFrom: PRACTICE_YEAR_OPTIONS[0],
-  yearTo: PRACTICE_YEAR_OPTIONS[PRACTICE_YEAR_OPTIONS.length - 1]
-};
-
 function withTimeout<T>(promise: Promise<T>, timeoutMs: number, message: string) {
   return new Promise<T>((resolve, reject) => {
     const timeoutId = window.setTimeout(() => reject(new Error(message)), timeoutMs);
@@ -159,7 +149,6 @@ export function AuthPanel() {
   const canViewOwnerPage = user?.email
     ? ownerAllowedEmails.includes(user.email.trim().toLowerCase())
     : false;
-  const [practiceYearRange, setPracticeYearRange] = useState<PracticeYearRange>(DEFAULT_PRACTICE_YEAR_RANGE);
   const [practiceQuestionCount, setPracticeQuestionCount] = useState<PracticeQuestionCount>(10);
   const [practiceStopAfterReview, setPracticeStopAfterReview] = useState(false);
   const [practiceFastAnswerMode, setPracticeFastAnswerMode] = useState(false);
@@ -218,13 +207,6 @@ export function AuthPanel() {
     setThemeMode(nextThemeMode);
     if (accountToneMode) saveHomeToneMode(accountToneMode);
     if (accountThemeMode) saveThemeMode(accountThemeMode);
-  }, [user?.id, user?.user_metadata]);
-
-  useEffect(() => {
-    const accountRange = getPracticeYearRangePreference(user?.user_metadata, DEFAULT_PRACTICE_YEAR_RANGE);
-    const nextRange = accountRange ?? loadPracticeYearRange(DEFAULT_PRACTICE_YEAR_RANGE) ?? DEFAULT_PRACTICE_YEAR_RANGE;
-    setPracticeYearRange(nextRange);
-    if (accountRange) savePracticeYearRange(accountRange);
   }, [user?.id, user?.user_metadata]);
 
   useEffect(() => {
@@ -344,20 +326,6 @@ export function AuthPanel() {
     setError("");
     void persistAccountPreferences({ theme_mode: mode }).catch((persistError) => {
       setError(persistError instanceof Error ? persistError.message : "暗夜模式同步失敗");
-    });
-  }
-
-  function handleChangePracticeYearRange(next: PracticeYearRange) {
-    const normalized = normalizePracticeYearRange(next);
-    setPracticeYearRange(normalized);
-    savePracticeYearRange(normalized);
-    if (!user) return;
-    setError("");
-    void persistAccountPreferences({
-      practice_year_from: normalized.yearFrom,
-      practice_year_to: normalized.yearTo
-    }).catch((persistError) => {
-      setError(persistError instanceof Error ? persistError.message : "年份設定同步失敗");
     });
   }
 
@@ -815,55 +783,6 @@ export function AuthPanel() {
                       >
                         暗夜模式
                       </button>
-                    </div>
-                  </div>
-
-                  <div className="rounded-2xl bg-slate-50/80 p-4">
-                    <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">開始測驗抽題年份</p>
-                    <p className="mt-2 text-sm text-slate-600">
-                      目前設定：{practiceYearRange.yearFrom} 年到 {practiceYearRange.yearTo} 年
-                    </p>
-                    <div className="mt-3 grid gap-3 sm:grid-cols-2">
-                      <label className="grid gap-2 text-sm text-slate-700">
-                        從哪一年開始
-                        <select
-                          value={practiceYearRange.yearFrom}
-                          onChange={(event) => {
-                            const nextFrom = Number(event.target.value);
-                            handleChangePracticeYearRange({
-                              yearFrom: nextFrom,
-                              yearTo: Math.max(nextFrom, practiceYearRange.yearTo)
-                            });
-                          }}
-                          className="min-h-12 rounded-2xl border border-slate-200 px-4 py-3 text-sm text-slate-800 outline-none"
-                        >
-                          {PRACTICE_YEAR_OPTIONS.map((year) => (
-                            <option key={`from-${year}`} value={year}>
-                              {year}
-                            </option>
-                          ))}
-                        </select>
-                      </label>
-                      <label className="grid gap-2 text-sm text-slate-700">
-                        到哪一年結束
-                        <select
-                          value={practiceYearRange.yearTo}
-                          onChange={(event) => {
-                            const nextTo = Number(event.target.value);
-                            handleChangePracticeYearRange({
-                              yearFrom: Math.min(practiceYearRange.yearFrom, nextTo),
-                              yearTo: nextTo
-                            });
-                          }}
-                          className="min-h-12 rounded-2xl border border-slate-200 px-4 py-3 text-sm text-slate-800 outline-none"
-                        >
-                          {PRACTICE_YEAR_OPTIONS.map((year) => (
-                            <option key={`to-${year}`} value={year}>
-                              {year}
-                            </option>
-                          ))}
-                        </select>
-                      </label>
                     </div>
                   </div>
 

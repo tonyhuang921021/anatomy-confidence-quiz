@@ -24,6 +24,7 @@ import {
   loadPracticeStopAfterReview,
   loadPracticeYearRange,
   loadCompletedHistorySessionsForUser,
+  savePracticeYearRange,
   saveQuizSettings,
   type PracticeQuestionCount,
   type PracticeYearRange
@@ -33,8 +34,14 @@ import {
   getPracticeStopAfterReviewPreference,
   getPracticeYearRangePreference
 } from "@/lib/accountPreferences";
-import { MAX_PRACTICE_SOURCE_YEAR, MIN_PRACTICE_SOURCE_YEAR, normalizePracticeYearRange } from "@/lib/practiceYears";
+import {
+  MAX_PRACTICE_SOURCE_YEAR,
+  MIN_PRACTICE_SOURCE_YEAR,
+  PRACTICE_YEAR_OPTIONS,
+  normalizePracticeYearRange
+} from "@/lib/practiceYears";
 import { buildNewQuizHref } from "@/lib/startSettingsUrl";
+import { getSupabaseBrowserClient } from "@/lib/supabase/client";
 import type { Question, QuestionClassificationOverride, QuizSettings, SubjectName } from "@/types/quiz";
 
 const selectableSubjects = enabledSubjects.filter(
@@ -109,7 +116,9 @@ export default function StartPage() {
   }, [syncVersion, user?.id]);
 
   useEffect(() => {
-    const accountRange = getPracticeYearRangePreference(user?.user_metadata, defaultPracticeYearRange);
+    const accountRange = user
+      ? getPracticeYearRangePreference(user.user_metadata)
+      : null;
     const nextRange = accountRange ?? loadPracticeYearRange(defaultPracticeYearRange) ?? defaultPracticeYearRange;
     setPracticeYearRange(normalizePracticeYearRange(nextRange));
   }, [defaultPracticeYearRange, user?.id, user?.user_metadata]);
@@ -311,6 +320,25 @@ export default function StartPage() {
     );
     setSelectedMicrobiologyTracks(getAllSubjectTrackKeys(MICROBIOLOGY_SUBJECT));
     setMicrobiologyExpanded(true);
+  }
+
+  function handlePracticeYearRangeChange(nextRange: PracticeYearRange) {
+    const normalized = normalizePracticeYearRange(nextRange);
+    setPracticeYearRange(normalized);
+    savePracticeYearRange(normalized);
+    if (!user) return;
+
+    void getSupabaseBrowserClient().auth.updateUser({
+      data: {
+        ...user.user_metadata,
+        practice_year_from: normalized.yearFrom,
+        practice_year_to: normalized.yearTo
+      }
+    }).then(({ error }) => {
+      if (error) console.error("Practice year preference sync skipped:", error);
+    }).catch((error) => {
+      console.error("Practice year preference sync skipped:", error);
+    });
   }
 
   function renderSubjectGroup(
@@ -595,22 +623,76 @@ export default function StartPage() {
           ) : null}
         </div>
 
-        <div className="surface-card-muted mt-6 flex flex-col gap-3 p-5 sm:flex-row sm:items-center sm:justify-between">
-          <p className="text-sm text-slate-700">
-            已選 <span className="font-semibold text-ink">{effectiveSelectedSubjects.length + (includeSeasonalLimited ? 1 : 0)}</span> 個範圍・
-            {practiceYearRange.yearFrom} 到 {practiceYearRange.yearTo} 年共{" "}
-            <span className="font-semibold text-ink">{availableQuestionCount}</span> 題
-            ・未做 <span className="font-semibold text-ink">{unattemptedAvailableQuestionCount}</span> 題
-            ・優先不重複已做題
-            {practiceStopAfterReview ? "・自由測驗・每題詳解後可結束" : `・每次抽 ${practiceQuestionCount} 題`}
+        <div className="surface-card-muted mt-6 flex flex-col gap-4 p-5 xl:flex-row xl:items-end xl:justify-between">
+          <div className="min-w-0 space-y-2">
+            <div className="flex flex-wrap items-center gap-x-2 gap-y-2 text-sm text-slate-700">
+              <details className="group relative">
+                <summary className="flex min-h-10 cursor-pointer list-none items-center gap-2 rounded-xl border border-slate-200 bg-white px-3 py-2 font-semibold text-ink shadow-sm transition hover:border-brand-300 hover:bg-brand-50/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-200 [&::-webkit-details-marker]:hidden">
+                  <span className="text-xs font-semibold text-slate-500">年份</span>
+                  <span>{practiceYearRange.yearFrom}–{practiceYearRange.yearTo}</span>
+                  <span className="text-xs text-slate-400 transition group-open:rotate-180" aria-hidden="true">⌄</span>
+                </summary>
+                <div className="absolute bottom-[calc(100%+0.55rem)] left-0 z-20 w-[min(19rem,calc(100vw-4rem))] rounded-2xl border border-slate-200 bg-white p-4 shadow-xl">
+                  <p className="text-sm font-semibold text-ink">抽題年份</p>
+                  <div className="mt-3 grid grid-cols-2 gap-3">
+                    <label className="grid gap-1.5 text-xs font-semibold text-slate-500" htmlFor="practice-year-from">
+                      起始年份
+                      <select
+                        id="practice-year-from"
+                        value={practiceYearRange.yearFrom}
+                        onChange={(event) => {
+                          const nextFrom = Number(event.target.value);
+                          handlePracticeYearRangeChange({
+                            yearFrom: nextFrom,
+                            yearTo: Math.max(nextFrom, practiceYearRange.yearTo)
+                          });
+                        }}
+                        className="min-h-11 rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm font-semibold text-ink outline-none transition focus:border-brand-500 focus:ring-2 focus:ring-brand-100"
+                      >
+                        {PRACTICE_YEAR_OPTIONS.map((year) => (
+                          <option key={`start-from-${year}`} value={year}>{year}</option>
+                        ))}
+                      </select>
+                    </label>
+                    <label className="grid gap-1.5 text-xs font-semibold text-slate-500" htmlFor="practice-year-to">
+                      結束年份
+                      <select
+                        id="practice-year-to"
+                        value={practiceYearRange.yearTo}
+                        onChange={(event) => {
+                          const nextTo = Number(event.target.value);
+                          handlePracticeYearRangeChange({
+                            yearFrom: Math.min(practiceYearRange.yearFrom, nextTo),
+                            yearTo: nextTo
+                          });
+                        }}
+                        className="min-h-11 rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm font-semibold text-ink outline-none transition focus:border-brand-500 focus:ring-2 focus:ring-brand-100"
+                      >
+                        {PRACTICE_YEAR_OPTIONS.map((year) => (
+                          <option key={`start-to-${year}`} value={year}>{year}</option>
+                        ))}
+                      </select>
+                    </label>
+                  </div>
+                </div>
+              </details>
+              <span className="hidden h-5 w-px bg-slate-200 sm:block" aria-hidden="true" />
+              <span>
+                已選 <span className="font-semibold text-ink">{effectiveSelectedSubjects.length + (includeSeasonalLimited ? 1 : 0)}</span> 個範圍・
+                共 <span className="font-semibold text-ink">{availableQuestionCount}</span> 題・
+                未做 <span className="font-semibold text-ink">{unattemptedAvailableQuestionCount}</span> 題・
+                優先不重複已做題
+                {practiceStopAfterReview ? "・自由測驗・每題詳解後可結束" : `・每次抽 ${practiceQuestionCount} 題`}
+              </span>
+            </div>
             {willFillWithSeenQuestions ? (
-              <span className="mt-1 block text-xs font-semibold text-amber-700">
+              <p className="text-xs font-semibold text-amber-700">
                 {unattemptedAvailableQuestionCount === 0
                   ? "這個篩選範圍已沒有未做題，接下來會從最久以前做過的題目補題。"
                   : `未做題不足本輪題數，會先出完 ${unattemptedAvailableQuestionCount} 題未做，再用舊題補滿。`}
-              </span>
+              </p>
             ) : null}
-          </p>
+          </div>
           <div className="flex flex-wrap gap-3">
             <button
               type="button"
