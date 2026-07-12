@@ -923,6 +923,7 @@ function ResultsPageContent() {
   const reviewDetailElementMapRef = useRef<Record<string, HTMLDetailsElement | null>>({});
   const reviewSectionRef = useRef<HTMLElement | null>(null);
   const pendingReviewScrollAnchorRef = useRef<{ key: string; top: number } | null>(null);
+  const pendingReviewScrollTargetRef = useRef<string | null>(null);
   const resultCloudHandoffSessionKeysRef = useRef(new Set<string>());
   const [isConfidenceCalibrationOpen, setIsConfidenceCalibrationOpen] = useState(false);
   const [isReviewNavigatorVisible, setIsReviewNavigatorVisible] = useState(false);
@@ -994,6 +995,32 @@ function ResultsPageContent() {
   }, []);
 
   useLayoutEffect(() => {
+    const targetKey = pendingReviewScrollTargetRef.current;
+    if (targetKey && typeof window !== "undefined") {
+      pendingReviewScrollTargetRef.current = null;
+      pendingReviewScrollAnchorRef.current = null;
+
+      let secondFrameId = 0;
+      const firstFrameId = window.requestAnimationFrame(() => {
+        secondFrameId = window.requestAnimationFrame(() => {
+          const element =
+            reviewDetailElementMapRef.current[targetKey] ??
+            document.getElementById(`review-${targetKey}`);
+          const summary = element?.querySelector(":scope > summary") ?? element;
+          if (!summary) return;
+
+          const readingTop = window.innerWidth >= 640 ? 112 : 84;
+          const targetTop = window.scrollY + summary.getBoundingClientRect().top - readingTop;
+          window.scrollTo({ top: Math.max(0, targetTop), left: 0, behavior: "smooth" });
+        });
+      });
+
+      return () => {
+        window.cancelAnimationFrame(firstFrameId);
+        if (secondFrameId) window.cancelAnimationFrame(secondFrameId);
+      };
+    }
+
     const anchor = pendingReviewScrollAnchorRef.current;
     if (!anchor || typeof window === "undefined") return;
     pendingReviewScrollAnchorRef.current = null;
@@ -1844,29 +1871,10 @@ function ResultsPageContent() {
     });
   }
 
-  function scrollReviewDetailToReadingPosition(detailKey: string) {
-    if (typeof window === "undefined") return;
-
-    window.setTimeout(() => {
-      const element =
-        reviewDetailElementMapRef.current[detailKey] ??
-        document.getElementById(`review-${detailKey}`);
-      const summary = element?.querySelector(":scope > summary") ?? element;
-      if (!summary) return;
-
-      const topbarBottom =
-        document.querySelector<HTMLElement>(".topbar-shell")?.getBoundingClientRect().bottom ?? 0;
-      const readingGap = window.innerWidth >= 640 ? 44 : 20;
-      const targetTop =
-        window.scrollY + summary.getBoundingClientRect().top - topbarBottom - readingGap;
-      window.scrollTo({ top: Math.max(0, targetTop), left: 0, behavior: "smooth" });
-    }, 0);
-  }
-
   function openQuestionReviewDetail(detailKey: string) {
+    pendingReviewScrollTargetRef.current = detailKey;
     setActiveReviewDetailKey(detailKey);
     setReviewDetailOpen(detailKey, true);
-    scrollReviewDetailToReadingPosition(detailKey);
   }
 
   function navigateReviewQuestion(direction: -1 | 1) {
@@ -1880,9 +1888,9 @@ function ResultsPageContent() {
     const target = reviewNavigationItems[targetIndex];
     if (!target) return;
 
+    pendingReviewScrollTargetRef.current = target.detailKey;
     setActiveReviewDetailKey(target.detailKey);
     setOpenReviewDetailKeys(new Set([target.detailKey]));
-    scrollReviewDetailToReadingPosition(target.detailKey);
   }
 
   function openMasteryQuestion(questionId: string) {
@@ -1901,9 +1909,9 @@ function ResultsPageContent() {
     const firstDetailKey = detailKeys[0];
     if (!firstDetailKey) return;
 
+    pendingReviewScrollTargetRef.current = firstDetailKey;
     setOpenReviewDetailKeys(new Set(detailKeys.slice(0, MAX_OPEN_REVIEW_DETAILS)));
     setActiveReviewDetailKey(firstDetailKey);
-    scrollReviewDetailToReadingPosition(firstDetailKey);
   }
 
   async function handleGenerateQuestionExplanation(
