@@ -663,12 +663,7 @@ function triggerPngDownload(canvas: HTMLCanvasElement, filename: string) {
 }
 
 function getConfidenceOverviewExportWidth() {
-  if (typeof window === "undefined") return 420;
-
-  const viewportWidth = window.innerWidth || 420;
-  if (viewportWidth < 480) return Math.max(320, viewportWidth - 28);
-  if (viewportWidth < 768) return Math.min(520, viewportWidth - 48);
-  return 420;
+  return 720;
 }
 
 function downloadConfidenceOverviewAsPng({
@@ -689,12 +684,13 @@ function downloadConfidenceOverviewAsPng({
   const logicalWidth = Math.max(320, Math.min(720, Math.ceil(width || 420)));
   const padding = logicalWidth < 420 ? 22 : 28;
   const contentWidth = logicalWidth - padding * 2;
-  const gridGap = Math.max(8, Math.min(16, Math.floor(contentWidth * 0.035)));
-  const tileSize = Math.floor((contentWidth - gridGap * 4) / 5);
-  const rowCount = Math.max(1, Math.ceil(items.length / 5));
+  const columnCount = 10;
+  const gridGap = 8;
+  const tileSize = Math.floor((contentWidth - gridGap * (columnCount - 1)) / columnCount);
+  const rowCount = Math.max(1, Math.ceil(items.length / columnCount));
   const gridTop = padding + 138;
   const logicalHeight = gridTop + rowCount * tileSize + Math.max(0, rowCount - 1) * gridGap + padding;
-  const scale = Math.min(3, Math.max(2, window.devicePixelRatio || 2));
+  const scale = 2;
 
   const canvas = document.createElement("canvas");
   canvas.width = Math.ceil(logicalWidth * scale);
@@ -772,8 +768,8 @@ function downloadConfidenceOverviewAsPng({
   context.fillText(scoreText, scoreX + 14, legendTop + 19);
 
   items.forEach((item, index) => {
-    const row = Math.floor(index / 5);
-    const column = index % 5;
+    const row = Math.floor(index / columnCount);
+    const column = index % columnCount;
     const x = padding + column * (tileSize + gridGap);
     const y = gridTop + row * (tileSize + gridGap);
     const tone = getConfidenceOverviewExportTone(item.confidence);
@@ -923,6 +919,8 @@ function ResultsPageContent() {
   const pendingReviewScrollAnchorRef = useRef<{ key: string; top: number } | null>(null);
   const resultCloudHandoffSessionKeysRef = useRef(new Set<string>());
   const [isConfidenceCalibrationOpen, setIsConfidenceCalibrationOpen] = useState(false);
+  const [isStudyRecommendationsOpen, setIsStudyRecommendationsOpen] = useState(false);
+  const [isConfidenceOverviewOpen, setIsConfidenceOverviewOpen] = useState(false);
   const [simulationConfidenceCalibration, setSimulationConfidenceCalibration] = useState(() =>
     loadSimulationConfidenceCalibration(true)
   );
@@ -1380,6 +1378,8 @@ function ResultsPageContent() {
 
   useEffect(() => {
     setIsConfidenceCalibrationOpen(false);
+    setIsStudyRecommendationsOpen(false);
+    setIsConfidenceOverviewOpen(false);
   }, [requestedSessionId]);
 
   useEffect(() => {
@@ -2667,69 +2667,93 @@ function ResultsPageContent() {
   function renderConfidenceOverviewSection() {
     return (
       <section className="min-w-0 rounded-[2rem] bg-white p-4 shadow-card ring-1 ring-slate-100 sm:p-5">
-        <div className="flex flex-wrap items-start justify-between gap-3">
-          <div>
+        <button
+          type="button"
+          onClick={() => {
+            setIsConfidenceOverviewOpen((current) => !current);
+            setIsStudyRecommendationsOpen(false);
+          }}
+          aria-expanded={isConfidenceOverviewOpen}
+          className="flex w-full items-center justify-between gap-4 text-left"
+        >
+          <div className="min-w-0">
             <h2 className="text-lg font-semibold text-ink">信心度總覽</h2>
-            <p className="mt-1 text-sm text-slate-500">點題號可直接展開下方回顧。</p>
+            <p className="mt-1 truncate text-sm text-slate-500">
+              {confidenceOverviewItems.length} 題・答錯 {wrongAttempts.length} 題・依正式題號排列
+            </p>
           </div>
-          <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-700">
-            {confidenceOverviewItems.length} 題
-          </span>
-        </div>
-
-        <div className="mt-4 flex flex-wrap items-center justify-between gap-2">
-          <div className="flex flex-wrap gap-2 text-[11px] font-bold">
-            {[
-              { label: "1", value: 1 },
-              { label: "2", value: 2 },
-              { label: "3", value: 3 },
-              { label: "4", value: 4 }
-            ].map((confidenceValue) => (
-              <span
-                key={confidenceValue.label}
-                className={`inline-flex h-7 min-w-7 items-center justify-center rounded-lg border px-2 shadow-sm ${getConfidenceTileClass(confidenceValue.value)}`}
-              >
-                {confidenceValue.label}
-              </span>
-            ))}
-          </div>
-          <button
-            type="button"
-            onClick={() => void handleDownloadConfidenceOverview()}
-            className="inline-flex min-h-9 items-center justify-center rounded-full bg-slate-900 px-3 py-2 text-xs font-semibold text-white shadow-sm transition hover:bg-slate-950 focus:outline-none focus:ring-2 focus:ring-slate-400"
-          >
-            截圖
-          </button>
-        </div>
-
-        <div className="mt-4 grid grid-cols-5 gap-2 sm:grid-cols-10 xl:grid-cols-[repeat(15,minmax(0,1fr))]">
-          {confidenceOverviewItems.map(({ attempt, questionNumber }) => {
-            const detailKey = `all-${attempt.questionId}-${questionNumber}`;
-            return (
-              <button
-                key={detailKey}
-                type="button"
-                onClick={() => openQuestionReviewDetail(detailKey)}
-                title={`第 ${questionNumber} 題・${attempt.isCorrect ? "答對" : "答錯"}・${getConfidenceOverviewLabel(attempt.confidence)}`}
-                aria-label={`第 ${questionNumber} 題，${attempt.isCorrect ? "答對" : "答錯"}，${getConfidenceOverviewLabel(attempt.confidence)}`}
-                className={`relative aspect-square min-h-10 rounded-xl border-2 text-center text-sm font-black shadow-sm transition hover:-translate-y-0.5 hover:shadow-md focus:outline-none focus:ring-2 focus:ring-slate-950 focus:ring-offset-2 ${getConfidenceTileClass(attempt.confidence)}`}
-              >
+          <div className="flex shrink-0 items-center gap-2">
+            <div className="hidden items-center gap-1 sm:flex" aria-hidden="true">
+              {[1, 2, 3, 4].map((confidenceValue) => (
                 <span
-                  className={`absolute right-1.5 top-1.5 rounded-full px-1.5 py-0.5 text-[10px] font-black leading-none ${
-                    attempt.isCorrect
-                      ? "bg-white/85 text-emerald-700"
-                      : "bg-white/90 text-rose-700"
-                  }`}
-                >
-                  {attempt.isCorrect ? "對" : "錯"}
-                </span>
-                <span className="flex h-full items-center justify-center pt-1">
-                  {questionNumber}
-                </span>
+                  key={confidenceValue}
+                  className={`h-5 w-5 rounded-md border ${getConfidenceTileClass(confidenceValue)}`}
+                />
+              ))}
+            </div>
+            <span className="rounded-full bg-slate-900 px-3 py-1.5 text-xs font-semibold text-white">
+              {isConfidenceOverviewOpen ? "收起" : "展開"}
+            </span>
+          </div>
+        </button>
+
+        {isConfidenceOverviewOpen ? (
+          <div className="mt-4 border-t border-slate-100 pt-4">
+            <div className="flex flex-wrap items-center justify-between gap-2">
+              <div className="flex flex-wrap gap-2 text-[11px] font-bold">
+                {[
+                  { label: "1", value: 1 },
+                  { label: "2", value: 2 },
+                  { label: "3", value: 3 },
+                  { label: "4", value: 4 }
+                ].map((confidenceValue) => (
+                  <span
+                    key={confidenceValue.label}
+                    className={`inline-flex h-7 min-w-7 items-center justify-center rounded-lg border px-2 shadow-sm ${getConfidenceTileClass(confidenceValue.value)}`}
+                  >
+                    {confidenceValue.label}
+                  </span>
+                ))}
+              </div>
+              <button
+                type="button"
+                onClick={() => void handleDownloadConfidenceOverview()}
+                className="inline-flex min-h-9 items-center justify-center rounded-full bg-slate-900 px-3 py-2 text-xs font-semibold text-white shadow-sm transition hover:bg-slate-950 focus:outline-none focus:ring-2 focus:ring-slate-400"
+              >
+                截圖
               </button>
-            );
-          })}
-        </div>
+            </div>
+
+            <div className="mt-4 grid grid-cols-5 gap-2 sm:grid-cols-10">
+              {confidenceOverviewItems.map(({ attempt, questionNumber }) => {
+                const detailKey = `all-${attempt.questionId}-${questionNumber}`;
+                return (
+                  <button
+                    key={detailKey}
+                    type="button"
+                    onClick={() => openQuestionReviewDetail(detailKey)}
+                    title={`第 ${questionNumber} 題・${attempt.isCorrect ? "答對" : "答錯"}・${getConfidenceOverviewLabel(attempt.confidence)}`}
+                    aria-label={`第 ${questionNumber} 題，${attempt.isCorrect ? "答對" : "答錯"}，${getConfidenceOverviewLabel(attempt.confidence)}`}
+                    className={`relative aspect-square min-h-10 rounded-xl border-2 text-center text-sm font-black shadow-sm transition hover:-translate-y-0.5 hover:shadow-md focus:outline-none focus:ring-2 focus:ring-slate-950 focus:ring-offset-2 ${getConfidenceTileClass(attempt.confidence)}`}
+                  >
+                    <span
+                      className={`absolute right-1.5 top-1.5 rounded-full px-1.5 py-0.5 text-[10px] font-black leading-none ${
+                        attempt.isCorrect
+                          ? "bg-white/85 text-emerald-700"
+                          : "bg-white/90 text-rose-700"
+                      }`}
+                    >
+                      {attempt.isCorrect ? "對" : "錯"}
+                    </span>
+                    <span className="flex h-full items-center justify-center pt-1">
+                      {questionNumber}
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        ) : null}
       </section>
     );
   }
@@ -3088,17 +3112,45 @@ function ResultsPageContent() {
 
       <div className="mt-8 space-y-6">
         <div
-          className={`grid gap-6 ${
+          className={`grid gap-3 ${
             confidenceCalibrationEnabled &&
             isSimulationSession(state.session) &&
-            confidenceOverviewItems.length > 0
-              ? "xl:grid-cols-[minmax(320px,0.72fr)_minmax(0,1.5fr)] xl:items-start"
+            confidenceOverviewItems.length > 0 &&
+            !isStudyRecommendationsOpen &&
+            !isConfidenceOverviewOpen
+              ? "xl:grid-cols-2"
               : ""
           }`}
         >
           <section className="min-w-0 rounded-[2rem] bg-white p-4 shadow-card ring-1 ring-slate-100 sm:p-5">
-            <h2 className="text-lg font-semibold text-ink">補強建議</h2>
-            <div className="mt-4 grid gap-3">
+            <button
+              type="button"
+              onClick={() => {
+                setIsStudyRecommendationsOpen((current) => !current);
+                setIsConfidenceOverviewOpen(false);
+              }}
+              aria-expanded={isStudyRecommendationsOpen}
+              className="flex w-full items-center justify-between gap-4 text-left"
+            >
+              <div className="min-w-0">
+                <h2 className="text-lg font-semibold text-ink">補強建議</h2>
+                <p className="mt-1 truncate text-sm text-slate-500">
+                  優先補強：{topWeakSections[0]?.section ?? state.lowCompletion[0]?.section ?? "目前無資料"}
+                </p>
+              </div>
+              <div className="flex shrink-0 items-center gap-2">
+                <span className="hidden rounded-full bg-rose-50 px-3 py-1 text-xs font-semibold text-rose-800 sm:inline-flex">
+                  {topWeakSections.length > 0 ? `${topWeakSections.length} 個弱項` : "摘要"}
+                </span>
+                <span className="rounded-full bg-slate-900 px-3 py-1.5 text-xs font-semibold text-white">
+                  {isStudyRecommendationsOpen ? "收起" : "展開"}
+                </span>
+              </div>
+            </button>
+
+            {isStudyRecommendationsOpen ? (
+              <div className="mt-4 border-t border-slate-100 pt-4">
+                <div className="grid gap-3 lg:grid-cols-3">
               <div className="rounded-2xl bg-rose-50 px-4 py-3 text-sm leading-6 text-rose-900">
                 最需要補弱的小節：{topWeakSections.map((section) => section.section).join("、") || "目前無資料"}
               </div>
@@ -3108,12 +3160,12 @@ function ResultsPageContent() {
               <div className="rounded-2xl bg-amber-50 px-4 py-3 text-sm leading-6 text-amber-900">
                 已完成但不穩：{state.unstableSections.map((section) => section.section).join("、") || "目前無資料"}
               </div>
-            </div>
-            <div className="mt-4 grid gap-2 sm:grid-cols-2 xl:grid-cols-1">
+                </div>
+                <div className="mt-4 grid gap-2 md:grid-cols-2 xl:grid-cols-4">
               {isSavedQuestionReviewSettings(state.session.settings) ? (
                 <Link
                   href="/saved-questions"
-                  className="min-h-11 rounded-2xl bg-brand-600 px-4 py-3 text-center text-sm font-semibold text-white transition hover:bg-brand-700 sm:col-span-2 xl:col-span-1"
+                  className="min-h-11 rounded-2xl bg-brand-600 px-4 py-3 text-center text-sm font-semibold text-white transition hover:bg-brand-700"
                 >
                   回儲存題目繼續
                 </Link>
@@ -3144,7 +3196,7 @@ function ResultsPageContent() {
                   </Link>
                 </>
               )}
-              <div className="grid grid-cols-2 gap-2 sm:col-span-2 xl:col-span-1" role="group" aria-label="AI 補弱 Prompt 版本">
+              <div className="grid grid-cols-2 gap-2" role="group" aria-label="AI 補弱 Prompt 版本">
                 <button
                   type="button"
                   aria-pressed={aiPromptDetailLevel === "concise"}
@@ -3174,11 +3226,13 @@ function ResultsPageContent() {
                 type="button"
                 onClick={() => void handleCopyAIPrompt()}
                 disabled={!state.promptTexts[aiPromptDetailLevel]}
-                className="min-h-11 rounded-2xl bg-slate-900 px-4 py-3 text-center text-sm font-semibold text-white transition hover:bg-black disabled:cursor-not-allowed disabled:bg-slate-300 sm:col-span-2 xl:col-span-1"
+                className="min-h-11 rounded-2xl bg-slate-900 px-4 py-3 text-center text-sm font-semibold text-white transition hover:bg-black disabled:cursor-not-allowed disabled:bg-slate-300"
               >
                 複製{aiPromptDetailLevel === "detailed" ? "詳細" : "簡略"}版 AI 補弱 Prompt
               </button>
-            </div>
+                </div>
+              </div>
+            ) : null}
           </section>
           {confidenceCalibrationEnabled && isSimulationSession(state.session) && confidenceOverviewItems.length > 0
             ? renderConfidenceOverviewSection()
