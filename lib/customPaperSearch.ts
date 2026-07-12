@@ -1,4 +1,5 @@
 import type { Question } from "@/types/quiz";
+import { compactSearchText, normalizeSearchText } from "./searchTextNormalization";
 
 const MEDICAL_SEARCH_FRAGMENTS = [
   "上肢",
@@ -22,19 +23,6 @@ const MEDICAL_SEARCH_FRAGMENTS = [
   "生化",
   "代謝"
 ] as const;
-
-function normalizeSearchText(value: string) {
-  return value
-    .normalize("NFKC")
-    .toLowerCase()
-    .replace(/[‐‑‒–—―]/g, "-")
-    .replace(/\s+/g, " ")
-    .trim();
-}
-
-function compactSearchText(value: string) {
-  return normalizeSearchText(value).replace(/[\s\-_,，、/／()（）]+/g, "");
-}
 
 function addSearchTerm(target: Set<string>, rawTerm: string) {
   const term = normalizeSearchText(rawTerm);

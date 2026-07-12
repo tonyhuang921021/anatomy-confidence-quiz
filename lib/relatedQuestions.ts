@@ -1,4 +1,5 @@
 import { getQuestionPrimaryTag } from "./analysisPrimaryTag";
+import { normalizeSearchText } from "./searchTextNormalization";
 import type { Question } from "@/types/quiz";
 
 type RelatedQuestionCandidate = {
@@ -12,7 +13,11 @@ type RelatedQuestionCandidate = {
 export type RelatedQuestionIndex = {
   candidatesByPrimaryTag: Map<string, RelatedQuestionCandidate[]>;
   candidatesBySection: Map<string, RelatedQuestionCandidate[]>;
+  candidatesBySubject: Map<string, RelatedQuestionCandidate[]>;
 };
+
+const relatedQuestionIndexCache = new WeakMap<Question[], RelatedQuestionIndex>();
+const relatedQuestionTokenCache = new WeakMap<Question, Set<string>>();
 
 const RELATED_QUESTION_STOP_TOKENS = new Set([
   "下列",
@@ -42,7 +47,7 @@ const RELATED_QUESTION_STOP_TOKENS = new Set([
 ]);
 
 function normalizeRelatedText(text?: string | null) {
-  return (text ?? "").trim().toLowerCase();
+  return normalizeSearchText(text).replace(/([\u4e00-\u9fff])\s+(?=[\u4e00-\u9fff])/gu, "$1");
 }
 
 function getConceptKey(question: Question) {
@@ -98,6 +103,9 @@ function buildQuestionSearchText(question: Question) {
 }
 
 function buildQuestionTokens(question: Question) {
+  const cached = relatedQuestionTokenCache.get(question);
+  if (cached) return cached;
+
   const tokens = new Set<string>();
   const text = buildQuestionSearchText(question);
   const normalizedText = normalizeRelatedText(text);
@@ -107,6 +115,7 @@ function buildQuestionTokens(question: Question) {
     addToken(tokens, match[0]);
   }
 
+  relatedQuestionTokenCache.set(question, tokens);
   return tokens;
 }
 
@@ -114,13 +123,21 @@ function getTokenOverlapScore(currentTokens: Set<string>, candidateTokens: Set<s
   if (currentTokens.size === 0 || candidateTokens.size === 0) return 0;
 
   let overlap = 0;
+  let anchorScore = 0;
   for (const token of currentTokens) {
-    if (candidateTokens.has(token)) overlap += 1;
+    if (!candidateTokens.has(token)) continue;
+    overlap += 1;
+    if (/^[a-z0-9]/i.test(token) && token.length >= 5) {
+      anchorScore += 6;
+    } else if (/^[\u4e00-\u9fff]+$/u.test(token) && token.length >= 4) {
+      anchorScore += 2;
+    }
   }
 
   if (overlap === 0) return 0;
   const denominator = Math.max(8, Math.min(currentTokens.size, candidateTokens.size));
-  return Math.min(35, Math.round((overlap / denominator) * 35));
+  const broadOverlapScore = Math.round((overlap / denominator) * 35);
+  return Math.min(35, Math.max(broadOverlapScore, anchorScore));
 }
 
 function getRelatedQuestionScore(currentQuestion: Question, currentTokens: Set<string>, candidate: RelatedQuestionCandidate) {
@@ -144,14 +161,17 @@ function getRelatedQuestionScore(currentQuestion: Question, currentTokens: Set<s
   if (!samePrimaryTag && !sameSection && !sameChapter && tokenScore < 22) return 0;
 
   let score = tokenScore;
-  if (samePrimaryTag) score += 40;
-  else if (sameSection) score += 32;
-  else if (sameChapter) score += 12;
+  if (samePrimaryTag) score += 18;
+  else if (sameSection) score += 12;
+  else if (sameChapter) score += 4;
   if (sameConcept && conceptHasTextSupport) score += 8;
   return score;
 }
 
 export function buildRelatedQuestionIndex(allQuestions: Question[]): RelatedQuestionIndex {
+  const cached = relatedQuestionIndexCache.get(allQuestions);
+  if (cached) return cached;
+
   const candidates = allQuestions
     .filter(isPastExamQuestion)
     .map((question) => ({
@@ -163,6 +183,7 @@ export function buildRelatedQuestionIndex(allQuestions: Question[]): RelatedQues
     }));
   const candidatesByPrimaryTag = new Map<string, RelatedQuestionCandidate[]>();
   const candidatesBySection = new Map<string, RelatedQuestionCandidate[]>();
+  const candidatesBySubject = new Map<string, RelatedQuestionCandidate[]>();
 
   for (const candidate of candidates) {
     if (candidate.primaryTagKey) {
@@ -173,18 +194,20 @@ export function buildRelatedQuestionIndex(allQuestions: Question[]): RelatedQues
     const sectionBucket = candidatesBySection.get(candidate.sectionKey) ?? [];
     sectionBucket.push(candidate);
     candidatesBySection.set(candidate.sectionKey, sectionBucket);
+
+    const subjectBucket = candidatesBySubject.get(candidate.question.subject) ?? [];
+    subjectBucket.push(candidate);
+    candidatesBySubject.set(candidate.question.subject, subjectBucket);
   }
 
-  return { candidatesByPrimaryTag, candidatesBySection };
+  const index = { candidatesByPrimaryTag, candidatesBySection, candidatesBySubject };
+  relatedQuestionIndexCache.set(allQuestions, index);
+  return index;
 }
 
 export function getRelatedQuestions(currentQuestion: Question, index: RelatedQuestionIndex, limit = 4) {
   const currentTokens = buildQuestionTokens(currentQuestion);
-  const primaryTagKey = getPrimaryTagKey(currentQuestion);
-  const sectionKey = getSectionKey(currentQuestion);
-  const candidatePool = primaryTagKey
-    ? index.candidatesByPrimaryTag.get(primaryTagKey) ?? []
-    : index.candidatesBySection.get(sectionKey) ?? [];
+  const candidatePool = index.candidatesBySubject.get(currentQuestion.subject) ?? [];
   const ranked = candidatePool
     .filter((candidate) => candidate.question.subject === currentQuestion.subject)
     .map((candidate) => ({

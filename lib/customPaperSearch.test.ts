@@ -50,6 +50,19 @@ test("新分類與題幹命中優先，不讓詳解偶然提及單獨拉題", ()
   assert.deepEqual(ranked.map((item) => item.question.id), ["direct"]);
 });
 
+test("搜題會忽略題幹開頭的不可見字元並統一 OCR 相容字形", () => {
+  const hiddenOcrText = makeQuestion("hidden-ocr", {
+    stem: "\u200B\uFEFF下列何種蛋⽩質純化方法的專一性最好？"
+  });
+
+  const ranked = rankCustomPaperSearchCandidates(
+    [hiddenOcrText],
+    expandCustomPaperSearchTerms(["下列何種蛋白質純化方法"])
+  );
+
+  assert.deepEqual(ranked.map((item) => item.question.id), ["hidden-ocr"]);
+});
+
 test("AI 回傳題號順序會保留，無效與重複題號會被忽略", () => {
   const q1 = makeQuestion("q1");
   const q2 = makeQuestion("q2");

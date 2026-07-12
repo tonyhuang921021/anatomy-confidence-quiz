@@ -49,7 +49,10 @@ export function RelatedQuestionsPanel({
     () => buildRelatedQuestionIndex(questionCatalog),
     [questionCatalog]
   );
-  const relatedQuestions = getRelatedQuestions(question, relatedQuestionIndex);
+  const relatedQuestions = useMemo(
+    () => getRelatedQuestions(question, relatedQuestionIndex),
+    [question, relatedQuestionIndex]
+  );
 
   function submitRelatedAnswer(questionId: string, answer: OptionKey) {
     setSubmittedAnswers((current) => ({

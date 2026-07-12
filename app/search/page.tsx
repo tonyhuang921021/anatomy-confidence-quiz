@@ -49,6 +49,7 @@ import {
   getCanonicalQuestionBank
 } from "@/data/med1QuestionBank";
 import { subjectRegistry } from "@/data/subjectRegistry";
+import { compactSearchText, normalizeSearchText } from "@/lib/searchTextNormalization";
 import {
   OptionKey,
   Question,
@@ -82,14 +83,6 @@ type FavoriteAnswerFeedback = {
   answer: OptionKey;
   isCorrect: boolean;
 };
-
-function normalizeSearchText(text: string) {
-  return text.toLowerCase().trim();
-}
-
-function compactSearchText(text: string) {
-  return text.toLowerCase().replace(/[\s\-_/]+/g, "");
-}
 
 function getSearchTerms(question: Question) {
   const examCode = question.examCode ? String(question.examCode) : "";
