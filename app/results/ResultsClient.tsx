@@ -101,6 +101,10 @@ import {
   buildWeaknessPracticeSettings,
   buildWeaknessQuestionOrder
 } from "@/lib/weaknessAnalysis";
+import {
+  buildResultReviewNavigation,
+  getResultReviewNavigationTargetIndex
+} from "@/lib/resultReviewNavigation";
 
 const allQuestions = getCanonicalQuestionBank();
 
@@ -915,7 +919,7 @@ function ResultsPageContent() {
   const [isFullscreenReview, setIsFullscreenReview] = useState(false);
   const [isFullscreenReviewVisible, setIsFullscreenReviewVisible] = useState(false);
   const [openReviewDetailKeys, setOpenReviewDetailKeys] = useState<Set<string>>(() => new Set());
-  const [activeReviewQuestionId, setActiveReviewQuestionId] = useState<string | null>(null);
+  const [activeReviewDetailKey, setActiveReviewDetailKey] = useState<string | null>(null);
   const reviewDetailElementMapRef = useRef<Record<string, HTMLDetailsElement | null>>({});
   const reviewSectionRef = useRef<HTMLElement | null>(null);
   const pendingReviewScrollAnchorRef = useRef<{ key: string; top: number } | null>(null);
@@ -1390,7 +1394,7 @@ function ResultsPageContent() {
 
   useEffect(() => {
     setOpenReviewDetailKeys(new Set());
-    setActiveReviewQuestionId(null);
+    setActiveReviewDetailKey(null);
   }, [requestedSessionId]);
 
   useEffect(() => {
@@ -1556,11 +1560,6 @@ function ResultsPageContent() {
       })),
     [orderedReviewedAttempts, questionNumberMap]
   );
-  const activeReviewQuestionIndex = activeReviewQuestionId
-    ? confidenceOverviewItems.findIndex(
-        ({ attempt }) => attempt.questionId === activeReviewQuestionId
-      )
-    : -1;
   const masteryAnalysis = useMemo(
     () =>
       analyzeMastery(
@@ -1607,6 +1606,42 @@ function ResultsPageContent() {
       (item) => item.attempt.confidence <= 3 && !wrongAttemptIds.has(item.attempt.questionId)
     );
   }, [orderedReviewedAttempts, wrongAttempts]);
+  const reviewNavigationItems = useMemo(() => {
+    return buildResultReviewNavigation([
+      {
+        label: "錯題",
+        detailKeys: wrongAttempts.map(
+          ({ attempt }, index) => `wrong-${attempt.questionId}-${index}`
+        )
+      },
+      ...(confidenceTrackingEnabled
+        ? [
+            {
+              label: "沒信心",
+              detailKeys: lowConfidenceAttempts.map(
+                ({ attempt }, index) => `low-confidence-${attempt.questionId}-${index}`
+              )
+            }
+          ]
+        : []),
+      {
+        label: "全部",
+        detailKeys: confidenceOverviewItems.map(
+          ({ attempt, questionNumber }) => `all-${attempt.questionId}-${questionNumber}`
+        )
+      }
+    ]);
+  }, [confidenceOverviewItems, confidenceTrackingEnabled, lowConfidenceAttempts, wrongAttempts]);
+  const reviewNavigationIndexMap = useMemo(
+    () =>
+      new Map(reviewNavigationItems.map((item, index) => [item.detailKey, index] as const)),
+    [reviewNavigationItems]
+  );
+  const activeReviewQuestionIndex = activeReviewDetailKey
+    ? reviewNavigationIndexMap.get(activeReviewDetailKey) ?? -1
+    : -1;
+  const activeReviewNavigationItem =
+    activeReviewQuestionIndex >= 0 ? reviewNavigationItems[activeReviewQuestionIndex] : null;
   const simulationSubjectScores = useMemo(() => {
     if (activeSession?.settings?.mode !== "simulation") return [];
 
@@ -1744,25 +1779,19 @@ function ResultsPageContent() {
     }
   }
 
-  function getReviewDetailDocumentTop(key: string) {
-    if (typeof window === "undefined") return null;
-    const element =
-      reviewDetailElementMapRef.current[key] ?? document.getElementById(`review-${key}`);
-    if (!element) return null;
-    return element.getBoundingClientRect().top + window.scrollY;
-  }
-
   function trimDistantReviewDetails(next: Set<string>, anchorKey: string) {
-    const anchorTop = getReviewDetailDocumentTop(anchorKey);
+    const anchorIndex = reviewNavigationIndexMap.get(anchorKey);
     while (next.size > MAX_OPEN_REVIEW_DETAILS) {
       const candidates = Array.from(next).filter((candidateKey) => candidateKey !== anchorKey);
       const farthestKey = candidates.reduce<string | null>((selectedKey, candidateKey) => {
         if (!selectedKey) return candidateKey;
-        if (anchorTop === null) return selectedKey;
-        const selectedTop = getReviewDetailDocumentTop(selectedKey);
-        const candidateTop = getReviewDetailDocumentTop(candidateKey);
-        const selectedDistance = selectedTop === null ? -1 : Math.abs(selectedTop - anchorTop);
-        const candidateDistance = candidateTop === null ? -1 : Math.abs(candidateTop - anchorTop);
+        if (anchorIndex === undefined) return selectedKey;
+        const selectedIndex = reviewNavigationIndexMap.get(selectedKey);
+        const candidateIndex = reviewNavigationIndexMap.get(candidateKey);
+        const selectedDistance =
+          selectedIndex === undefined ? -1 : Math.abs(selectedIndex - anchorIndex);
+        const candidateDistance =
+          candidateIndex === undefined ? -1 : Math.abs(candidateIndex - anchorIndex);
         return candidateDistance > selectedDistance ? candidateKey : selectedKey;
       }, null);
       if (!farthestKey) break;
@@ -1799,9 +1828,9 @@ function ResultsPageContent() {
     };
   }
 
-  function toggleReviewDetailOpen(key: string, questionId: string) {
+  function toggleReviewDetailOpen(key: string) {
     rememberReviewScrollAnchor(key);
-    setActiveReviewQuestionId(questionId);
+    setActiveReviewDetailKey(key);
     setOpenReviewDetailKeys((current) => {
       const next = new Set(current);
       if (next.has(key)) {
@@ -1815,8 +1844,8 @@ function ResultsPageContent() {
     });
   }
 
-  function openQuestionReviewDetail(detailKey: string, questionId: string) {
-    setActiveReviewQuestionId(questionId);
+  function openQuestionReviewDetail(detailKey: string) {
+    setActiveReviewDetailKey(detailKey);
     setReviewDetailOpen(detailKey, true);
     if (typeof window === "undefined") return;
 
@@ -1829,28 +1858,24 @@ function ResultsPageContent() {
   }
 
   function navigateReviewQuestion(direction: -1 | 1) {
-    if (confidenceOverviewItems.length === 0) return;
+    if (reviewNavigationItems.length === 0) return;
 
-    const fallbackIndex = direction > 0 ? 0 : confidenceOverviewItems.length - 1;
-    const targetIndex =
-      activeReviewQuestionIndex < 0
-        ? fallbackIndex
-        : Math.min(
-            confidenceOverviewItems.length - 1,
-            Math.max(0, activeReviewQuestionIndex + direction)
-          );
-    const target = confidenceOverviewItems[targetIndex];
+    const targetIndex = getResultReviewNavigationTargetIndex(
+      reviewNavigationItems.length,
+      activeReviewQuestionIndex,
+      direction
+    );
+    const target = reviewNavigationItems[targetIndex];
     if (!target) return;
 
-    const detailKey = `all-${target.attempt.questionId}-${target.questionNumber}`;
-    setActiveReviewQuestionId(target.attempt.questionId);
-    setOpenReviewDetailKeys(new Set([detailKey]));
+    setActiveReviewDetailKey(target.detailKey);
+    setOpenReviewDetailKeys(new Set([target.detailKey]));
 
     if (typeof window === "undefined") return;
     window.setTimeout(() => {
       const element =
-        reviewDetailElementMapRef.current[detailKey] ??
-        document.getElementById(`review-${detailKey}`);
+        reviewDetailElementMapRef.current[target.detailKey] ??
+        document.getElementById(`review-${target.detailKey}`);
       const summary = element?.querySelector(":scope > summary") ?? element;
       summary?.scrollIntoView({ behavior: "smooth", block: "center" });
     }, 0);
@@ -1859,10 +1884,7 @@ function ResultsPageContent() {
   function openMasteryQuestion(questionId: string) {
     const item = confidenceOverviewItems.find(({ attempt }) => attempt.questionId === questionId);
     if (!item) return;
-    openQuestionReviewDetail(
-      `all-${item.attempt.questionId}-${item.questionNumber}`,
-      item.attempt.questionId
-    );
+    openQuestionReviewDetail(`all-${item.attempt.questionId}-${item.questionNumber}`);
   }
 
   function openMasteryCategory(categoryKey: MasteryCategoryKey) {
@@ -1876,10 +1898,7 @@ function ResultsPageContent() {
     if (!firstDetailKey) return;
 
     setOpenReviewDetailKeys(new Set(detailKeys.slice(0, MAX_OPEN_REVIEW_DETAILS)));
-    setActiveReviewQuestionId(
-      confidenceOverviewItems.find(({ attempt }) => questionIds.has(attempt.questionId))?.attempt
-        .questionId ?? null
-    );
+    setActiveReviewDetailKey(firstDetailKey);
 
     if (typeof window === "undefined") return;
     window.setTimeout(() => {
@@ -2796,7 +2815,7 @@ function ResultsPageContent() {
                   <button
                     key={detailKey}
                     type="button"
-                    onClick={() => openQuestionReviewDetail(detailKey, attempt.questionId)}
+                    onClick={() => openQuestionReviewDetail(detailKey)}
                     title={`第 ${questionNumber} 題・${attempt.isCorrect ? "答對" : "答錯"}・${getConfidenceOverviewLabel(attempt.confidence)}`}
                     aria-label={`第 ${questionNumber} 題，${attempt.isCorrect ? "答對" : "答錯"}，${getConfidenceOverviewLabel(attempt.confidence)}`}
                     className={`relative aspect-square min-h-10 rounded-xl border-2 text-center text-sm font-black shadow-sm transition hover:-translate-y-0.5 hover:shadow-md focus:outline-none focus:ring-2 focus:ring-slate-950 focus:ring-offset-2 ${getConfidenceTileClass(attempt.confidence)}`}
@@ -2885,7 +2904,7 @@ function ResultsPageContent() {
                       <summary
                         onClick={(event) => {
                           event.preventDefault();
-                          toggleReviewDetailOpen(detailKey, attempt.questionId);
+                          toggleReviewDetailOpen(detailKey);
                         }}
                         className="cursor-pointer overflow-hidden text-sm font-semibold text-rose-950 list-none [&::-webkit-details-marker]:hidden"
                       >
@@ -2941,7 +2960,7 @@ function ResultsPageContent() {
                         <summary
                           onClick={(event) => {
                             event.preventDefault();
-                            toggleReviewDetailOpen(detailKey, attempt.questionId);
+                            toggleReviewDetailOpen(detailKey);
                           }}
                           className="cursor-pointer overflow-hidden text-sm font-semibold text-amber-950 list-none [&::-webkit-details-marker]:hidden"
                         >
@@ -2991,7 +3010,7 @@ function ResultsPageContent() {
                     <summary
                       onClick={(event) => {
                         event.preventDefault();
-                        toggleReviewDetailOpen(detailKey, attempt.questionId);
+                        toggleReviewDetailOpen(detailKey);
                       }}
                       className="cursor-pointer overflow-hidden text-sm font-semibold text-ink list-none [&::-webkit-details-marker]:hidden"
                     >
@@ -3326,15 +3345,23 @@ function ResultsPageContent() {
           >
             ↑
           </button>
-          <span className="max-w-full truncate px-1 text-[10px] font-black tabular-nums text-slate-500">
-            {activeReviewQuestionIndex >= 0
-              ? `${activeReviewQuestionIndex + 1}/${confidenceOverviewItems.length}`
-              : "題目"}
+          <span
+            aria-live="polite"
+            className="flex max-w-full flex-col items-center px-0.5 text-center font-black leading-tight text-slate-500"
+          >
+            <span className="max-w-full truncate text-[9px]">
+              {activeReviewNavigationItem?.sectionLabel ?? "題目"}
+            </span>
+            <span className="text-[10px] tabular-nums">
+              {activeReviewNavigationItem
+                ? `${activeReviewNavigationItem.sectionIndex + 1}/${activeReviewNavigationItem.sectionTotal}`
+                : "—"}
+            </span>
           </span>
           <button
             type="button"
             onClick={() => navigateReviewQuestion(1)}
-            disabled={activeReviewQuestionIndex === confidenceOverviewItems.length - 1}
+            disabled={activeReviewQuestionIndex === reviewNavigationItems.length - 1}
             aria-label="展開下一題"
             title="展開下一題"
             className="flex h-11 w-11 items-center justify-center rounded-xl bg-slate-900 text-xl font-black text-white transition hover:bg-black focus:outline-none focus:ring-2 focus:ring-slate-400 disabled:cursor-not-allowed disabled:opacity-35"

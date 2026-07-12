@@ -42,6 +42,8 @@
     "lib/relatedQuestions.test.ts",
     "lib/resumableSessions.ts",
     "lib/resumableSessions.test.ts",
+    "lib/resultReviewNavigation.ts",
+    "lib/resultReviewNavigation.test.ts",
     "lib/savedQuestionReview.ts",
     "lib/savedQuestionReview.test.ts",
     "lib/startSettingsUrl.ts",
