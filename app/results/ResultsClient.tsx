@@ -915,10 +915,13 @@ function ResultsPageContent() {
   const [isFullscreenReview, setIsFullscreenReview] = useState(false);
   const [isFullscreenReviewVisible, setIsFullscreenReviewVisible] = useState(false);
   const [openReviewDetailKeys, setOpenReviewDetailKeys] = useState<Set<string>>(() => new Set());
+  const [activeReviewQuestionId, setActiveReviewQuestionId] = useState<string | null>(null);
   const reviewDetailElementMapRef = useRef<Record<string, HTMLDetailsElement | null>>({});
+  const reviewSectionRef = useRef<HTMLElement | null>(null);
   const pendingReviewScrollAnchorRef = useRef<{ key: string; top: number } | null>(null);
   const resultCloudHandoffSessionKeysRef = useRef(new Set<string>());
   const [isConfidenceCalibrationOpen, setIsConfidenceCalibrationOpen] = useState(false);
+  const [isReviewNavigatorVisible, setIsReviewNavigatorVisible] = useState(false);
   const [isStudyRecommendationsOpen, setIsStudyRecommendationsOpen] = useState(false);
   const [isConfidenceOverviewOpen, setIsConfidenceOverviewOpen] = useState(false);
   const [simulationConfidenceCalibration, setSimulationConfidenceCalibration] = useState(() =>
@@ -1008,6 +1011,19 @@ function ResultsPageContent() {
     const frameId = window.requestAnimationFrame(keepAnchorInPlace);
     return () => window.cancelAnimationFrame(frameId);
   }, [openReviewDetailKeys]);
+
+  useEffect(() => {
+    const element = reviewSectionRef.current;
+    setIsReviewNavigatorVisible(false);
+    if (!element || typeof IntersectionObserver === "undefined") return;
+
+    const observer = new IntersectionObserver(
+      ([entry]) => setIsReviewNavigatorVisible(entry?.isIntersecting ?? false),
+      { rootMargin: "120px 0px 120px" }
+    );
+    observer.observe(element);
+    return () => observer.disconnect();
+  }, [state.session?.id]);
 
   async function handleCopyAIPrompt() {
     const promptText = state.promptTexts[aiPromptDetailLevel];
@@ -1374,6 +1390,7 @@ function ResultsPageContent() {
 
   useEffect(() => {
     setOpenReviewDetailKeys(new Set());
+    setActiveReviewQuestionId(null);
   }, [requestedSessionId]);
 
   useEffect(() => {
@@ -1539,6 +1556,11 @@ function ResultsPageContent() {
       })),
     [orderedReviewedAttempts, questionNumberMap]
   );
+  const activeReviewQuestionIndex = activeReviewQuestionId
+    ? confidenceOverviewItems.findIndex(
+        ({ attempt }) => attempt.questionId === activeReviewQuestionId
+      )
+    : -1;
   const masteryAnalysis = useMemo(
     () =>
       analyzeMastery(
@@ -1722,17 +1744,40 @@ function ResultsPageContent() {
     }
   }
 
+  function getReviewDetailDocumentTop(key: string) {
+    if (typeof window === "undefined") return null;
+    const element =
+      reviewDetailElementMapRef.current[key] ?? document.getElementById(`review-${key}`);
+    if (!element) return null;
+    return element.getBoundingClientRect().top + window.scrollY;
+  }
+
+  function trimDistantReviewDetails(next: Set<string>, anchorKey: string) {
+    const anchorTop = getReviewDetailDocumentTop(anchorKey);
+    while (next.size > MAX_OPEN_REVIEW_DETAILS) {
+      const candidates = Array.from(next).filter((candidateKey) => candidateKey !== anchorKey);
+      const farthestKey = candidates.reduce<string | null>((selectedKey, candidateKey) => {
+        if (!selectedKey) return candidateKey;
+        if (anchorTop === null) return selectedKey;
+        const selectedTop = getReviewDetailDocumentTop(selectedKey);
+        const candidateTop = getReviewDetailDocumentTop(candidateKey);
+        const selectedDistance = selectedTop === null ? -1 : Math.abs(selectedTop - anchorTop);
+        const candidateDistance = candidateTop === null ? -1 : Math.abs(candidateTop - anchorTop);
+        return candidateDistance > selectedDistance ? candidateKey : selectedKey;
+      }, null);
+      if (!farthestKey) break;
+      next.delete(farthestKey);
+    }
+    return next;
+  }
+
   function setReviewDetailOpen(key: string, isOpen: boolean) {
     setOpenReviewDetailKeys((current) => {
       const next = new Set(current);
       if (isOpen) {
         next.delete(key);
         next.add(key);
-        while (next.size > MAX_OPEN_REVIEW_DETAILS) {
-          const oldestKey = next.values().next().value;
-          if (!oldestKey) break;
-          next.delete(oldestKey);
-        }
+        trimDistantReviewDetails(next, key);
       } else {
         next.delete(key);
       }
@@ -1754,14 +1799,9 @@ function ResultsPageContent() {
     };
   }
 
-  function getReviewDetailRenderedHeight(key: string) {
-    const element =
-      reviewDetailElementMapRef.current[key] ?? document.getElementById(`review-${key}`);
-    return element?.getBoundingClientRect().height ?? 0;
-  }
-
-  function toggleReviewDetailOpen(key: string) {
+  function toggleReviewDetailOpen(key: string, questionId: string) {
     rememberReviewScrollAnchor(key);
+    setActiveReviewQuestionId(questionId);
     setOpenReviewDetailKeys((current) => {
       const next = new Set(current);
       if (next.has(key)) {
@@ -1770,23 +1810,13 @@ function ResultsPageContent() {
       }
 
       next.add(key);
-      while (next.size > MAX_OPEN_REVIEW_DETAILS) {
-        const candidates = Array.from(next).filter((candidateKey) => candidateKey !== key);
-        const tallestKey = candidates.reduce<string | null>((selectedKey, candidateKey) => {
-          if (!selectedKey) return candidateKey;
-          return getReviewDetailRenderedHeight(candidateKey) >
-            getReviewDetailRenderedHeight(selectedKey)
-            ? candidateKey
-            : selectedKey;
-        }, null);
-        if (!tallestKey) break;
-        next.delete(tallestKey);
-      }
+      trimDistantReviewDetails(next, key);
       return next;
     });
   }
 
-  function openQuestionReviewDetail(detailKey: string) {
+  function openQuestionReviewDetail(detailKey: string, questionId: string) {
+    setActiveReviewQuestionId(questionId);
     setReviewDetailOpen(detailKey, true);
     if (typeof window === "undefined") return;
 
@@ -1798,10 +1828,41 @@ function ResultsPageContent() {
     }, 0);
   }
 
+  function navigateReviewQuestion(direction: -1 | 1) {
+    if (confidenceOverviewItems.length === 0) return;
+
+    const fallbackIndex = direction > 0 ? 0 : confidenceOverviewItems.length - 1;
+    const targetIndex =
+      activeReviewQuestionIndex < 0
+        ? fallbackIndex
+        : Math.min(
+            confidenceOverviewItems.length - 1,
+            Math.max(0, activeReviewQuestionIndex + direction)
+          );
+    const target = confidenceOverviewItems[targetIndex];
+    if (!target) return;
+
+    const detailKey = `all-${target.attempt.questionId}-${target.questionNumber}`;
+    setActiveReviewQuestionId(target.attempt.questionId);
+    setOpenReviewDetailKeys(new Set([detailKey]));
+
+    if (typeof window === "undefined") return;
+    window.setTimeout(() => {
+      const element =
+        reviewDetailElementMapRef.current[detailKey] ??
+        document.getElementById(`review-${detailKey}`);
+      const summary = element?.querySelector(":scope > summary") ?? element;
+      summary?.scrollIntoView({ behavior: "smooth", block: "center" });
+    }, 0);
+  }
+
   function openMasteryQuestion(questionId: string) {
     const item = confidenceOverviewItems.find(({ attempt }) => attempt.questionId === questionId);
     if (!item) return;
-    openQuestionReviewDetail(`all-${item.attempt.questionId}-${item.questionNumber}`);
+    openQuestionReviewDetail(
+      `all-${item.attempt.questionId}-${item.questionNumber}`,
+      item.attempt.questionId
+    );
   }
 
   function openMasteryCategory(categoryKey: MasteryCategoryKey) {
@@ -1815,6 +1876,10 @@ function ResultsPageContent() {
     if (!firstDetailKey) return;
 
     setOpenReviewDetailKeys(new Set(detailKeys.slice(0, MAX_OPEN_REVIEW_DETAILS)));
+    setActiveReviewQuestionId(
+      confidenceOverviewItems.find(({ attempt }) => questionIds.has(attempt.questionId))?.attempt
+        .questionId ?? null
+    );
 
     if (typeof window === "undefined") return;
     window.setTimeout(() => {
@@ -2731,7 +2796,7 @@ function ResultsPageContent() {
                   <button
                     key={detailKey}
                     type="button"
-                    onClick={() => openQuestionReviewDetail(detailKey)}
+                    onClick={() => openQuestionReviewDetail(detailKey, attempt.questionId)}
                     title={`第 ${questionNumber} 題・${attempt.isCorrect ? "答對" : "答錯"}・${getConfidenceOverviewLabel(attempt.confidence)}`}
                     aria-label={`第 ${questionNumber} 題，${attempt.isCorrect ? "答對" : "答錯"}，${getConfidenceOverviewLabel(attempt.confidence)}`}
                     className={`relative aspect-square min-h-10 rounded-xl border-2 text-center text-sm font-black shadow-sm transition hover:-translate-y-0.5 hover:shadow-md focus:outline-none focus:ring-2 focus:ring-slate-950 focus:ring-offset-2 ${getConfidenceTileClass(attempt.confidence)}`}
@@ -2761,6 +2826,7 @@ function ResultsPageContent() {
   function renderReviewSection(fullscreenMobile = false) {
     return (
       <section
+        ref={fullscreenMobile ? undefined : reviewSectionRef}
         className={
           fullscreenMobile
             ? "bg-transparent p-0 shadow-none ring-0"
@@ -2819,7 +2885,7 @@ function ResultsPageContent() {
                       <summary
                         onClick={(event) => {
                           event.preventDefault();
-                          toggleReviewDetailOpen(detailKey);
+                          toggleReviewDetailOpen(detailKey, attempt.questionId);
                         }}
                         className="cursor-pointer overflow-hidden text-sm font-semibold text-rose-950 list-none [&::-webkit-details-marker]:hidden"
                       >
@@ -2875,7 +2941,7 @@ function ResultsPageContent() {
                         <summary
                           onClick={(event) => {
                             event.preventDefault();
-                            toggleReviewDetailOpen(detailKey);
+                            toggleReviewDetailOpen(detailKey, attempt.questionId);
                           }}
                           className="cursor-pointer overflow-hidden text-sm font-semibold text-amber-950 list-none [&::-webkit-details-marker]:hidden"
                         >
@@ -2925,7 +2991,7 @@ function ResultsPageContent() {
                     <summary
                       onClick={(event) => {
                         event.preventDefault();
-                        toggleReviewDetailOpen(detailKey);
+                        toggleReviewDetailOpen(detailKey, attempt.questionId);
                       }}
                       className="cursor-pointer overflow-hidden text-sm font-semibold text-ink list-none [&::-webkit-details-marker]:hidden"
                     >
@@ -3245,6 +3311,38 @@ function ResultsPageContent() {
           onStartReview={handleStartWeaknessReview}
         />
       </div>
+      {confidenceOverviewItems.length > 0 && !isFullscreenReview && isReviewNavigatorVisible ? (
+        <nav
+          aria-label="題目回顧快速導覽"
+          className="fixed bottom-[calc(env(safe-area-inset-bottom)+1rem)] right-4 z-40 flex w-14 flex-col items-center gap-1.5 rounded-2xl bg-white p-1.5 shadow-2xl ring-1 ring-slate-200 sm:right-6"
+        >
+          <button
+            type="button"
+            onClick={() => navigateReviewQuestion(-1)}
+            disabled={activeReviewQuestionIndex === 0}
+            aria-label="展開上一題"
+            title="展開上一題"
+            className="flex h-11 w-11 items-center justify-center rounded-xl bg-slate-100 text-xl font-black text-slate-800 transition hover:bg-slate-200 focus:outline-none focus:ring-2 focus:ring-slate-400 disabled:cursor-not-allowed disabled:opacity-35"
+          >
+            ↑
+          </button>
+          <span className="max-w-full truncate px-1 text-[10px] font-black tabular-nums text-slate-500">
+            {activeReviewQuestionIndex >= 0
+              ? `${activeReviewQuestionIndex + 1}/${confidenceOverviewItems.length}`
+              : "題目"}
+          </span>
+          <button
+            type="button"
+            onClick={() => navigateReviewQuestion(1)}
+            disabled={activeReviewQuestionIndex === confidenceOverviewItems.length - 1}
+            aria-label="展開下一題"
+            title="展開下一題"
+            className="flex h-11 w-11 items-center justify-center rounded-xl bg-slate-900 text-xl font-black text-white transition hover:bg-black focus:outline-none focus:ring-2 focus:ring-slate-400 disabled:cursor-not-allowed disabled:opacity-35"
+          >
+            ↓
+          </button>
+        </nav>
+      ) : null}
       {copyPromptNotice ? (
         <div className="pointer-events-none fixed inset-0 z-50 flex items-center justify-center px-6">
           <div className="rounded-2xl bg-slate-950 px-5 py-3 text-base font-semibold text-white shadow-2xl ring-1 ring-white/10">
