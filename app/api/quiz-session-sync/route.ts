@@ -3,6 +3,12 @@ import { createClient } from "@supabase/supabase-js";
 import { compactQuestionForStorage, compactSessionForStorage, normalizeSessions } from "@/lib/storage";
 import { isSupabaseRecoveryMode } from "@/lib/supabase/recoveryMode";
 import { shouldProtectExistingCompletedSession } from "@/lib/quizSessionSyncSafety";
+import {
+  buildQuizSessionProgressPayload,
+  hasQuizSessionDefinitionChanged,
+  omitHeavySessionPayload,
+  type QuizSessionProgressPayload
+} from "@/lib/quizSessionCheckpoint";
 import { Attempt, Question, QuizSession } from "@/types/quiz";
 
 type QuizSessionRow = {
@@ -18,6 +24,7 @@ type QuizSessionRow = {
   started_at: string;
   completed_at: string | null;
   session_payload?: Partial<QuizSession> | null;
+  progress_payload?: QuizSessionProgressPayload | null;
   updated_at?: string | null;
 };
 
@@ -51,6 +58,12 @@ type ServiceSupabaseClient = any;
 
 const MAX_SYNC_SESSIONS = 80;
 const MAX_SYNC_ATTEMPTS = 2000;
+
+function isCompletedQuizSessionRow(
+  row: Pick<QuizSessionRow, "completed_at" | "session_payload">
+) {
+  return Boolean(row.completed_at || row.session_payload?.completedAt);
+}
 
 function getServiceSupabaseClient() {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
@@ -158,6 +171,7 @@ function buildSessionRowForCloud(
     started_at: session.startedAt,
     completed_at: session.completedAt ?? null,
     updated_at: sessionUpdatedAtValueForCloud(session),
+    progress_payload: buildQuizSessionProgressPayload(session),
     session_payload: buildSessionPayloadForCloud(session, {
       includeAttempts: includeAttemptsInPayload
     })
@@ -318,6 +332,8 @@ export async function POST(request: NextRequest) {
     );
     const protectedCompletedSessionIds = new Set<string>();
     const discardedSessionIds = new Set<string>();
+    const existingActiveSessionIds = new Set<string>();
+    const sessionsRequiringFullPayloadIds = new Set<string>();
 
     if (rows.length > 0) {
       const { data, error: existingError } = await supabase
@@ -357,6 +373,16 @@ export async function POST(request: NextRequest) {
           )
         ) {
           protectedCompletedSessionIds.add(existingRow.id);
+        } else if (!isCompletedQuizSessionRow(existingRow)) {
+          existingActiveSessionIds.add(existingRow.id);
+          if (
+            hasQuizSessionDefinitionChanged(
+              existingRow.session_payload,
+              incomingRowsById.get(existingRow.id)?.session_payload
+            )
+          ) {
+            sessionsRequiringFullPayloadIds.add(existingRow.id);
+          }
         }
       }
     }
@@ -379,11 +405,38 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const { error: sessionError } = await supabase
-      .from("quiz_sessions")
-      .upsert(safeRows, { onConflict: "id" });
+    if (activeCheckpoint) {
+      const fullRows = safeRows.filter(
+        (row) =>
+          !existingActiveSessionIds.has(row.id) ||
+          sessionsRequiringFullPayloadIds.has(row.id)
+      );
+      if (fullRows.length > 0) {
+        const { error: sessionError } = await supabase
+          .from("quiz_sessions")
+          .upsert(fullRows, { onConflict: "id" });
+        if (sessionError) throw sessionError;
+      }
 
-    if (sessionError) throw sessionError;
+      for (const row of safeRows.filter(
+        (candidate) =>
+          existingActiveSessionIds.has(candidate.id) &&
+          !sessionsRequiringFullPayloadIds.has(candidate.id)
+      )) {
+        const { error: sessionError } = await supabase
+          .from("quiz_sessions")
+          .update(omitHeavySessionPayload(row))
+          .eq("id", row.id)
+          .eq("user_id", userId)
+          .is("completed_at", null);
+        if (sessionError) throw sessionError;
+      }
+    } else {
+      const { error: sessionError } = await supabase
+        .from("quiz_sessions")
+        .upsert(safeRows, { onConflict: "id" });
+      if (sessionError) throw sessionError;
+    }
 
     let attemptRows = dedupeSessionAttemptRows(
       safeSessions.flatMap((session) =>

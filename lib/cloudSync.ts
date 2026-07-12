@@ -71,6 +71,13 @@ import {
 } from "@/lib/feedbackAuth";
 import { getRecoveryTimestamp, isSupabaseRecoveryMode } from "@/lib/supabase/recoveryMode";
 import { getOrCreateVisitorId } from "@/lib/visitor";
+import {
+  buildQuizSessionProgressPayload,
+  hasQuizSessionDefinitionChanged,
+  mergeQuizSessionProgressPayload,
+  omitHeavySessionPayload,
+  type QuizSessionProgressPayload
+} from "@/lib/quizSessionCheckpoint";
 
 type QuizSessionRow = {
   id: string;
@@ -85,6 +92,7 @@ type QuizSessionRow = {
   started_at: string;
   completed_at: string | null;
   session_payload?: Partial<QuizSession> | null;
+  progress_payload?: QuizSessionProgressPayload | null;
   updated_at?: string | null;
 };
 
@@ -842,6 +850,7 @@ function buildSessionRowForCloud(
     started_at: session.startedAt,
     completed_at: session.completedAt ?? null,
     updated_at: sessionUpdatedAtValueForCloud(session),
+    progress_payload: buildQuizSessionProgressPayload(session),
     session_payload: buildSessionPayloadForCloud(session, {
       includeAttempts: includeAttemptsInPayload
     })
@@ -1494,7 +1503,10 @@ function mapRowToSession(
 ) {
   if (!row) return null;
 
-  const payload = row.session_payload ?? {};
+  const payload = mergeQuizSessionProgressPayload(
+    row.session_payload,
+    row.progress_payload
+  );
   const payloadAttempts = payload.attempts ?? [];
   const resolvedAttempts = attemptMap?.get(row.id)
     ? mergeAttemptListMetadata(attemptMap.get(row.id) ?? [], payloadAttempts)
@@ -1584,7 +1596,7 @@ async function fetchActiveQuizSessionRowsForUser(userId: string) {
   const { data, error } = await supabase
     .from("quiz_sessions")
     .select(
-      "id, user_id, subject, mode, session_name, question_count, correct_count, wrong_count, average_confidence, started_at, completed_at, session_payload, updated_at"
+      "id, user_id, subject, mode, session_name, question_count, correct_count, wrong_count, average_confidence, started_at, completed_at, session_payload, progress_payload, updated_at"
     )
     .eq("user_id", userId)
     .is("completed_at", null)
@@ -1607,7 +1619,7 @@ async function fetchActiveQuizSessionRowForUser(userId: string, sessionId: strin
   const { data, error } = await getSupabaseBrowserClient()
     .from("quiz_sessions")
     .select(
-      "id, user_id, subject, mode, session_name, question_count, correct_count, wrong_count, average_confidence, started_at, completed_at, session_payload, updated_at"
+      "id, user_id, subject, mode, session_name, question_count, correct_count, wrong_count, average_confidence, started_at, completed_at, session_payload, progress_payload, updated_at"
     )
     .eq("user_id", userId)
     .eq("id", namespacedSessionId)
@@ -1850,7 +1862,7 @@ async function fetchQuizSessionsForUser(userId: string, signal?: AbortSignal) {
     let query = supabase
       .from("quiz_sessions")
       .select(
-        "id, user_id, subject, mode, session_name, question_count, correct_count, wrong_count, average_confidence, started_at, completed_at, session_payload, updated_at"
+        "id, user_id, subject, mode, session_name, question_count, correct_count, wrong_count, average_confidence, started_at, completed_at, session_payload, progress_payload, updated_at"
       )
       .eq("user_id", userId)
       .not("completed_at", "is", null)
@@ -1880,7 +1892,7 @@ async function fetchRecoverableReviewSessionRowsForUser(userId: string, signal?:
   let query = supabase
     .from("quiz_sessions")
     .select(
-      "id, user_id, subject, mode, session_name, question_count, correct_count, wrong_count, average_confidence, started_at, completed_at, session_payload, updated_at"
+      "id, user_id, subject, mode, session_name, question_count, correct_count, wrong_count, average_confidence, started_at, completed_at, session_payload, progress_payload, updated_at"
     )
     .eq("user_id", userId)
     .eq("mode", "review")
@@ -1914,7 +1926,7 @@ async function fetchQuizSessionByIdForUser(userId: string, sessionId: string) {
   const { data, error } = await supabase
     .from("quiz_sessions")
     .select(
-      "id, user_id, subject, mode, session_name, question_count, correct_count, wrong_count, average_confidence, started_at, completed_at, session_payload, updated_at"
+      "id, user_id, subject, mode, session_name, question_count, correct_count, wrong_count, average_confidence, started_at, completed_at, session_payload, progress_payload, updated_at"
     )
     .eq("user_id", userId)
     .in("id", candidateIds);
@@ -2431,6 +2443,9 @@ async function upsertSessionsForUser(
     .map((row) => row.id);
   const protectedCompletedSessionIds = new Set<string>();
   const discardedSessionIds = new Set<string>();
+  const existingActiveSessionIds = new Set<string>();
+  const sessionsRequiringFullPayloadIds = new Set<string>();
+  const incomingRowsById = new Map(rows.map((row) => [row.id, row] as const));
 
   if (incompleteSessionIds.length > 0) {
     const { data, error: existingError } = await supabase
@@ -2448,6 +2463,16 @@ async function upsertSessionsForUser(
         discardedSessionIds.add(row.id);
       } else if (isCompletedQuizSessionRow(row)) {
         protectedCompletedSessionIds.add(row.id);
+      } else {
+        existingActiveSessionIds.add(row.id);
+        if (
+          hasQuizSessionDefinitionChanged(
+            row.session_payload,
+            incomingRowsById.get(row.id)?.session_payload
+          )
+        ) {
+          sessionsRequiringFullPayloadIds.add(row.id);
+        }
       }
     }
   }
@@ -2469,12 +2494,38 @@ async function upsertSessionsForUser(
 
   if (safeRows.length === 0) return;
 
-  const { error } = await supabase
-    .from("quiz_sessions")
-    .upsert(safeRows, { onConflict: "id" });
+  if (options.activeCheckpoint) {
+    const fullRows = safeRows.filter(
+      (row) =>
+        !existingActiveSessionIds.has(row.id) ||
+        sessionsRequiringFullPayloadIds.has(row.id)
+    );
+    if (fullRows.length > 0) {
+      const { error } = await supabase
+        .from("quiz_sessions")
+        .upsert(fullRows, { onConflict: "id" });
+      if (error) throw error;
+    }
 
-  if (error) {
-    throw error;
+    for (const row of safeRows.filter(
+      (candidate) =>
+        existingActiveSessionIds.has(candidate.id) &&
+        !sessionsRequiringFullPayloadIds.has(candidate.id)
+    )) {
+      const checkpointRow = omitHeavySessionPayload(row);
+      const { error } = await supabase
+        .from("quiz_sessions")
+        .update(checkpointRow)
+        .eq("id", row.id)
+        .eq("user_id", userId)
+        .is("completed_at", null);
+      if (error) throw error;
+    }
+  } else {
+    const { error } = await supabase
+      .from("quiz_sessions")
+      .upsert(safeRows, { onConflict: "id" });
+    if (error) throw error;
   }
 
   const attemptRowsWithSignatures = safeSessions.flatMap((session) => {

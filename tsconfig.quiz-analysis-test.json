@@ -33,6 +33,8 @@
     "lib/customPaperSearch.test.ts",
     "lib/quizSessionSyncSafety.ts",
     "lib/quizSessionSyncSafety.test.ts",
+    "lib/quizSessionCheckpoint.ts",
+    "lib/quizSessionCheckpoint.test.ts",
     "lib/practiceYears.ts",
     "lib/progressMetrics.ts",
     "lib/progressMetrics.test.ts",
