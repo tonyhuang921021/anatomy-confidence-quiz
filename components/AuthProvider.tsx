@@ -373,7 +373,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     if (recoveryMode) {
       setSyncStatus("ready");
       setSyncError(RECOVERY_MODE_MESSAGE);
-      setSyncVersion((value) => value + 1);
       return;
     }
 
@@ -416,7 +415,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     ) {
       setSyncStatus("ready");
       setSyncError("");
-      setSyncVersion((value) => value + 1);
       return;
     }
 
@@ -438,7 +436,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     ) {
       setSyncStatus("ready");
       setSyncError("");
-      setSyncVersion((value) => value + 1);
       return;
     }
 
@@ -515,7 +512,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setSyncError("");
       if (shouldDeferAutomaticCloudSync()) {
         setSyncError(SAFARI_AUTO_SYNC_DEFERRED_MESSAGE);
-        setSyncVersion((value) => value + 1);
         return;
       }
       scheduleAutomaticCloudSync(() => {
@@ -600,7 +596,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           if (shouldDeferAutomaticCloudSync()) {
             setSyncStatus("ready");
             setSyncError(SAFARI_AUTO_SYNC_DEFERRED_MESSAGE);
-            setSyncVersion((value) => value + 1);
             return;
           }
           scheduleAutomaticCloudSync(() => {
@@ -624,7 +619,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           if (shouldDeferAutomaticCloudSync()) {
             setSyncStatus("ready");
             setSyncError(SAFARI_AUTO_SYNC_DEFERRED_MESSAGE);
-            setSyncVersion((value) => value + 1);
             return;
           }
           scheduleAutomaticCloudSync(() => {

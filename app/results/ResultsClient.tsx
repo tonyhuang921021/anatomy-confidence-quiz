@@ -2770,7 +2770,7 @@ function ResultsPageContent() {
                         reviewDetailElementMapRef.current[detailKey] = node;
                       }}
                       open={isOpen}
-                      className="result-review-item group overflow-hidden rounded-2xl bg-rose-50 p-3.5 sm:p-4"
+                      className="group overflow-hidden rounded-2xl bg-rose-50 p-3.5 sm:p-4"
                     >
                       <summary
                         onClick={(event) => {
@@ -2826,7 +2826,7 @@ function ResultsPageContent() {
                           reviewDetailElementMapRef.current[detailKey] = node;
                         }}
                         open={isOpen}
-                        className="result-review-item group overflow-hidden rounded-2xl bg-amber-50 p-3.5 sm:p-4"
+                        className="group overflow-hidden rounded-2xl bg-amber-50 p-3.5 sm:p-4"
                       >
                         <summary
                           onClick={(event) => {
@@ -2876,7 +2876,7 @@ function ResultsPageContent() {
                       reviewDetailElementMapRef.current[detailKey] = node;
                     }}
                     open={isOpen}
-                    className="result-review-item group overflow-hidden rounded-2xl bg-slate-50 p-3.5 sm:p-4"
+                    className="group overflow-hidden rounded-2xl bg-slate-50 p-3.5 sm:p-4"
                   >
                     <summary
                       onClick={(event) => {
