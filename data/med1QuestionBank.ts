@@ -1007,6 +1007,40 @@ function applyQuestionMedia(question: Question): Question {
 }
 
 const questionTextOverrides: Record<string, QuestionTextOverride> = {
+  "MOEX-107100-2301-Q041": {
+    stem:
+      "某研究收集30人的收縮壓（mmHg）及年齡的隨機樣本資料，計算皮爾森氏相關係數（Pearson’s correlation coefficient）得0.7。假若同樣的資料，以血壓當依變項（Y；dependent variable），以年齡當自變項（X；independent variable），可得到直線迴歸線 Y = a + bX。下列何者正確？"
+  },
+  "MOEX-114090-1301-Q085": {
+    stem:
+      "原核生物中，調控基因表現的操縱組（operon）其中操作子（operator）序列主要是由下列何種分子進行結合？",
+    options: {
+      A: "suppressor tRNA",
+      B: "miRNA",
+      C: "inducer",
+      D: "repressor"
+    }
+  },
+  "MOEX-114090-1301-Q088": {
+    stem:
+      "下列何者為結構型多醣（structural polysaccharide）而非儲存型多醣（storage polysaccharide）？",
+    options: {
+      A: "cellulose",
+      B: "amylose",
+      C: "amylopectin",
+      D: "glycogen"
+    }
+  },
+  "MOEX-114090-1301-Q097": {
+    stem:
+      "Phosphoinositide 3-kinase（PI3K）主要以磷酸化細胞膜上的哪一個分子來傳遞訊息？",
+    options: {
+      A: "Ras",
+      B: "PKC",
+      C: "PIP2",
+      D: "PKB"
+    }
+  },
   "MOEX-109100-2301-Q021": {
     stem:
       "抗體多變區（variable domain）基因 V、D、J 片段重組（recombination）是產生多樣性抗體的主要機制，下列哪一種酵素沒有參與這一部分抗體基因重組的過程？",

@@ -53,6 +53,11 @@ const QUICK_ENTRIES = [
 
 const HOME_RELEASE_NOTES = [
   {
+    time: "07/13",
+    title: "題目字縫修好",
+    body: "幾題生化與公衛題目的原始字樣補回來，公式和專有名詞不再被空格拆開。"
+  },
+  {
     time: "07/12",
     title: "新增 gpt5.6 醫學一模擬卷",
     body: "AI 模擬考新增一份 100 題醫學（一）原創卷，從整份模擬考設定選「gpt5.6出的醫學一」就能開始。"
