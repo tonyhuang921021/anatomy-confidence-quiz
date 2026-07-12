@@ -993,16 +993,22 @@ function ResultsPageContent() {
     if (!anchor || typeof window === "undefined") return;
     pendingReviewScrollAnchorRef.current = null;
 
-    const element =
-      reviewDetailElementMapRef.current[anchor.key] ??
-      document.getElementById(`review-${anchor.key}`);
-    if (!element) return;
+    const keepAnchorInPlace = () => {
+      const element =
+        reviewDetailElementMapRef.current[anchor.key] ??
+        document.getElementById(`review-${anchor.key}`);
+      const summary = element?.querySelector(":scope > summary") ?? element;
+      if (!summary) return;
 
-    const nextTop = element.getBoundingClientRect().top;
-    const offset = nextTop - anchor.top;
-    if (Math.abs(offset) > 1) {
-      window.scrollBy({ top: offset, left: 0, behavior: "auto" });
-    }
+      const offset = summary.getBoundingClientRect().top - anchor.top;
+      if (Math.abs(offset) > 1) {
+        window.scrollBy({ top: offset, left: 0, behavior: "auto" });
+      }
+    };
+
+    keepAnchorInPlace();
+    const frameId = window.requestAnimationFrame(keepAnchorInPlace);
+    return () => window.cancelAnimationFrame(frameId);
   }, [openReviewDetailKeys]);
 
   async function handleCopyAIPrompt() {
@@ -1739,12 +1745,19 @@ function ResultsPageContent() {
 
     const element =
       reviewDetailElementMapRef.current[key] ?? document.getElementById(`review-${key}`);
-    if (!element) return;
+    const summary = element?.querySelector(":scope > summary") ?? element;
+    if (!summary) return;
 
     pendingReviewScrollAnchorRef.current = {
       key,
-      top: element.getBoundingClientRect().top
+      top: summary.getBoundingClientRect().top
     };
+  }
+
+  function getReviewDetailRenderedHeight(key: string) {
+    const element =
+      reviewDetailElementMapRef.current[key] ?? document.getElementById(`review-${key}`);
+    return element?.getBoundingClientRect().height ?? 0;
   }
 
   function toggleReviewDetailOpen(key: string) {
@@ -1758,9 +1771,16 @@ function ResultsPageContent() {
 
       next.add(key);
       while (next.size > MAX_OPEN_REVIEW_DETAILS) {
-        const oldestKey = next.values().next().value;
-        if (!oldestKey) break;
-        next.delete(oldestKey);
+        const candidates = Array.from(next).filter((candidateKey) => candidateKey !== key);
+        const tallestKey = candidates.reduce<string | null>((selectedKey, candidateKey) => {
+          if (!selectedKey) return candidateKey;
+          return getReviewDetailRenderedHeight(candidateKey) >
+            getReviewDetailRenderedHeight(selectedKey)
+            ? candidateKey
+            : selectedKey;
+        }, null);
+        if (!tallestKey) break;
+        next.delete(tallestKey);
       }
       return next;
     });
@@ -2646,11 +2666,11 @@ function ResultsPageContent() {
 
   function renderConfidenceOverviewSection() {
     return (
-      <section className="rounded-[2rem] bg-white p-4 shadow-card ring-1 ring-slate-100 sm:p-6">
+      <section className="min-w-0 rounded-[2rem] bg-white p-4 shadow-card ring-1 ring-slate-100 sm:p-5">
         <div className="flex flex-wrap items-start justify-between gap-3">
           <div>
-            <h2 className="text-xl font-semibold text-ink">信心度總覽</h2>
-            <p className="mt-2 text-sm text-slate-500">依正式題號排列，色塊代表信心 1-4。</p>
+            <h2 className="text-lg font-semibold text-ink">信心度總覽</h2>
+            <p className="mt-1 text-sm text-slate-500">點題號可直接展開下方回顧。</p>
           </div>
           <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-700">
             {confidenceOverviewItems.length} 題
@@ -2682,7 +2702,7 @@ function ResultsPageContent() {
           </button>
         </div>
 
-        <div className="mt-4 grid grid-cols-5 gap-2">
+        <div className="mt-4 grid grid-cols-5 gap-2 sm:grid-cols-10 xl:grid-cols-[repeat(15,minmax(0,1fr))]">
           {confidenceOverviewItems.map(({ attempt, questionNumber }) => {
             const detailKey = `all-${attempt.questionId}-${questionNumber}`;
             return (
@@ -2692,7 +2712,7 @@ function ResultsPageContent() {
                 onClick={() => openQuestionReviewDetail(detailKey)}
                 title={`第 ${questionNumber} 題・${attempt.isCorrect ? "答對" : "答錯"}・${getConfidenceOverviewLabel(attempt.confidence)}`}
                 aria-label={`第 ${questionNumber} 題，${attempt.isCorrect ? "答對" : "答錯"}，${getConfidenceOverviewLabel(attempt.confidence)}`}
-                className={`relative aspect-square min-h-12 rounded-2xl border-2 text-center text-base font-black shadow-sm transition hover:-translate-y-0.5 hover:shadow-md focus:outline-none focus:ring-2 focus:ring-slate-950 focus:ring-offset-2 ${getConfidenceTileClass(attempt.confidence)}`}
+                className={`relative aspect-square min-h-10 rounded-xl border-2 text-center text-sm font-black shadow-sm transition hover:-translate-y-0.5 hover:shadow-md focus:outline-none focus:ring-2 focus:ring-slate-950 focus:ring-offset-2 ${getConfidenceTileClass(attempt.confidence)}`}
               >
                 <span
                   className={`absolute right-1.5 top-1.5 rounded-full px-1.5 py-0.5 text-[10px] font-black leading-none ${
@@ -3041,21 +3061,21 @@ function ResultsPageContent() {
         ) : null}
         {renderConfidenceCalibrationSection()}
         {simulationSubjectScores.length > 0 ? (
-          <section className="mt-4 rounded-[2rem] bg-white p-5 shadow-card ring-1 ring-slate-100 sm:p-6">
+          <section className="mt-4 rounded-[2rem] bg-white p-4 shadow-card ring-1 ring-slate-100 sm:p-5">
             <div className="flex flex-wrap items-end justify-between gap-3">
               <div>
                 <h2 className="text-lg font-semibold text-ink">模擬考分科得分</h2>
-                <p className="mt-2 text-sm text-slate-500">每科顯示本次作答答對題數 / 該科總題數，五科加總滿分 100。</p>
+                <p className="mt-1 text-sm text-slate-500">本次各科答對題數 / 該科總題數。</p>
               </div>
               <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-700">
                 總分 {state.summary.correct} / {state.summary.total}
               </span>
             </div>
-            <div className="mt-4 grid gap-3 sm:grid-cols-2 xl:grid-cols-5">
+            <div className="mt-3 grid grid-cols-2 gap-2 lg:grid-cols-5">
               {simulationSubjectScores.map((item) => (
-                <article key={item.subject} className="rounded-2xl bg-slate-50 px-4 py-4 ring-1 ring-slate-200">
+                <article key={item.subject} className="rounded-2xl bg-slate-50 px-3 py-3 ring-1 ring-slate-200 last:col-span-2 lg:last:col-span-1">
                   <p className="text-sm font-medium text-slate-500">{item.subject}</p>
-                  <p className="mt-2 text-2xl font-bold text-ink">
+                  <p className="mt-1 text-xl font-bold text-ink">
                     {item.correct}
                     <span className="ml-1 text-base font-semibold text-slate-500">/ {item.total}</span>
                   </p>
@@ -3066,34 +3086,34 @@ function ResultsPageContent() {
         ) : null}
       </div>
 
-      <div className="mt-8 grid gap-6 xl:grid-cols-[minmax(0,1fr)_360px]">
-        <div className="space-y-6">
-          {renderReviewSection()}
-          <WeaknessRanking
-            sections={topWeakSections}
-            onStartReview={handleStartWeaknessReview}
-          />
-        </div>
-
-        <aside className="space-y-6">
-          <section className="rounded-[2rem] bg-white p-4 shadow-card ring-1 ring-slate-100 sm:p-6">
-            <h2 className="text-xl font-semibold text-ink">補強建議</h2>
+      <div className="mt-8 space-y-6">
+        <div
+          className={`grid gap-6 ${
+            confidenceCalibrationEnabled &&
+            isSimulationSession(state.session) &&
+            confidenceOverviewItems.length > 0
+              ? "xl:grid-cols-[minmax(320px,0.72fr)_minmax(0,1.5fr)] xl:items-start"
+              : ""
+          }`}
+        >
+          <section className="min-w-0 rounded-[2rem] bg-white p-4 shadow-card ring-1 ring-slate-100 sm:p-5">
+            <h2 className="text-lg font-semibold text-ink">補強建議</h2>
             <div className="mt-4 grid gap-3">
-              <div className="rounded-2xl bg-rose-50 p-4 text-sm text-rose-900">
+              <div className="rounded-2xl bg-rose-50 px-4 py-3 text-sm leading-6 text-rose-900">
                 最需要補弱的小節：{topWeakSections.map((section) => section.section).join("、") || "目前無資料"}
               </div>
-              <div className="rounded-2xl bg-sky-50 p-4 text-sm text-sky-900">
+              <div className="rounded-2xl bg-sky-50 px-4 py-3 text-sm leading-6 text-sky-900">
                 最需要補進度：{state.lowCompletion.map((section) => section.section).join("、") || "目前無資料"}
               </div>
-              <div className="rounded-2xl bg-amber-50 p-4 text-sm text-amber-900">
+              <div className="rounded-2xl bg-amber-50 px-4 py-3 text-sm leading-6 text-amber-900">
                 已完成但不穩：{state.unstableSections.map((section) => section.section).join("、") || "目前無資料"}
               </div>
             </div>
-            <div className="mt-5 grid gap-3">
+            <div className="mt-4 grid gap-2 sm:grid-cols-2 xl:grid-cols-1">
               {isSavedQuestionReviewSettings(state.session.settings) ? (
                 <Link
                   href="/saved-questions"
-                  className="min-h-12 rounded-2xl bg-brand-600 px-4 py-4 text-center text-sm font-semibold text-white transition hover:bg-brand-700"
+                  className="min-h-11 rounded-2xl bg-brand-600 px-4 py-3 text-center text-sm font-semibold text-white transition hover:bg-brand-700 sm:col-span-2 xl:col-span-1"
                 >
                   回儲存題目繼續
                 </Link>
@@ -3112,19 +3132,19 @@ function ResultsPageContent() {
                         sessionName: undefined
                       })
                     }
-                    className="min-h-12 rounded-2xl bg-brand-600 px-4 py-4 text-center text-sm font-semibold text-white transition hover:bg-brand-700"
+                    className="min-h-11 rounded-2xl bg-brand-600 px-4 py-3 text-center text-sm font-semibold text-white transition hover:bg-brand-700"
                   >
                     用同一設定再刷一次
                   </Link>
                   <Link
                     href="/review"
-                    className="min-h-12 rounded-2xl bg-slate-100 px-4 py-4 text-center text-sm font-semibold text-slate-800 transition hover:bg-slate-200"
+                    className="min-h-11 rounded-2xl bg-slate-100 px-4 py-3 text-center text-sm font-semibold text-slate-800 transition hover:bg-slate-200"
                   >
                     先看錯題複習頁
                   </Link>
                 </>
               )}
-              <div className="grid grid-cols-2 gap-2" role="group" aria-label="AI 補弱 Prompt 版本">
+              <div className="grid grid-cols-2 gap-2 sm:col-span-2 xl:col-span-1" role="group" aria-label="AI 補弱 Prompt 版本">
                 <button
                   type="button"
                   aria-pressed={aiPromptDetailLevel === "concise"}
@@ -3154,7 +3174,7 @@ function ResultsPageContent() {
                 type="button"
                 onClick={() => void handleCopyAIPrompt()}
                 disabled={!state.promptTexts[aiPromptDetailLevel]}
-                className="min-h-12 rounded-2xl bg-slate-900 px-4 py-4 text-center text-sm font-semibold text-white transition hover:bg-black disabled:cursor-not-allowed disabled:bg-slate-300"
+                className="min-h-11 rounded-2xl bg-slate-900 px-4 py-3 text-center text-sm font-semibold text-white transition hover:bg-black disabled:cursor-not-allowed disabled:bg-slate-300 sm:col-span-2 xl:col-span-1"
               >
                 複製{aiPromptDetailLevel === "detailed" ? "詳細" : "簡略"}版 AI 補弱 Prompt
               </button>
@@ -3163,7 +3183,13 @@ function ResultsPageContent() {
           {confidenceCalibrationEnabled && isSimulationSession(state.session) && confidenceOverviewItems.length > 0
             ? renderConfidenceOverviewSection()
             : null}
-        </aside>
+        </div>
+
+        {renderReviewSection()}
+        <WeaknessRanking
+          sections={topWeakSections}
+          onStartReview={handleStartWeaknessReview}
+        />
       </div>
       {copyPromptNotice ? (
         <div className="pointer-events-none fixed inset-0 z-50 flex items-center justify-center px-6">

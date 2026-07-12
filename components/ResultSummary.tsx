@@ -6,10 +6,6 @@ type ResultSummaryProps = {
   masteryAnalysis?: MasteryAnalysis;
 };
 
-function formatPercent(value: number | null) {
-  return value === null ? "—" : `${value}%`;
-}
-
 function formatExamScore(value: number) {
   return Number.isInteger(value) ? `${value}` : value.toFixed(1);
 }
@@ -51,12 +47,6 @@ const cards = (summary: SummaryStats, masteryAnalysis?: MasteryAnalysis) => {
             : "本次未達 60 分"
     },
     {
-      label: "校準後掌握",
-      value: formatPercent(masteryAnalysis.calibratedMasteryPercent),
-      helper: "扣除猜對不穩與高信心錯誤後的掌握估計",
-      tone: "brand"
-    },
-    {
       label: "正式考及格機率",
       value: `${examEstimate.predictivePassProbabilityPercent}%`,
       helper:
@@ -87,7 +77,7 @@ const toneClasses: Record<string, string> = {
 
 export function ResultSummary({ summary, masteryAnalysis }: ResultSummaryProps) {
   return (
-    <section className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+    <section className={`grid gap-4 sm:grid-cols-2 ${masteryAnalysis ? "xl:grid-cols-3" : "xl:grid-cols-4"}`}>
       {cards(summary, masteryAnalysis).map((card) => (
         <article
           key={card.label}
