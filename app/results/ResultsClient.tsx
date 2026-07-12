@@ -1844,17 +1844,29 @@ function ResultsPageContent() {
     });
   }
 
-  function openQuestionReviewDetail(detailKey: string) {
-    setActiveReviewDetailKey(detailKey);
-    setReviewDetailOpen(detailKey, true);
+  function scrollReviewDetailToReadingPosition(detailKey: string) {
     if (typeof window === "undefined") return;
 
     window.setTimeout(() => {
-      document.getElementById(`review-${detailKey}`)?.scrollIntoView({
-        behavior: "smooth",
-        block: "center"
-      });
+      const element =
+        reviewDetailElementMapRef.current[detailKey] ??
+        document.getElementById(`review-${detailKey}`);
+      const summary = element?.querySelector(":scope > summary") ?? element;
+      if (!summary) return;
+
+      const topbarBottom =
+        document.querySelector<HTMLElement>(".topbar-shell")?.getBoundingClientRect().bottom ?? 0;
+      const readingGap = window.innerWidth >= 640 ? 44 : 20;
+      const targetTop =
+        window.scrollY + summary.getBoundingClientRect().top - topbarBottom - readingGap;
+      window.scrollTo({ top: Math.max(0, targetTop), left: 0, behavior: "smooth" });
     }, 0);
+  }
+
+  function openQuestionReviewDetail(detailKey: string) {
+    setActiveReviewDetailKey(detailKey);
+    setReviewDetailOpen(detailKey, true);
+    scrollReviewDetailToReadingPosition(detailKey);
   }
 
   function navigateReviewQuestion(direction: -1 | 1) {
@@ -1870,15 +1882,7 @@ function ResultsPageContent() {
 
     setActiveReviewDetailKey(target.detailKey);
     setOpenReviewDetailKeys(new Set([target.detailKey]));
-
-    if (typeof window === "undefined") return;
-    window.setTimeout(() => {
-      const element =
-        reviewDetailElementMapRef.current[target.detailKey] ??
-        document.getElementById(`review-${target.detailKey}`);
-      const summary = element?.querySelector(":scope > summary") ?? element;
-      summary?.scrollIntoView({ behavior: "smooth", block: "center" });
-    }, 0);
+    scrollReviewDetailToReadingPosition(target.detailKey);
   }
 
   function openMasteryQuestion(questionId: string) {
@@ -1899,14 +1903,7 @@ function ResultsPageContent() {
 
     setOpenReviewDetailKeys(new Set(detailKeys.slice(0, MAX_OPEN_REVIEW_DETAILS)));
     setActiveReviewDetailKey(firstDetailKey);
-
-    if (typeof window === "undefined") return;
-    window.setTimeout(() => {
-      document.getElementById(`review-${firstDetailKey}`)?.scrollIntoView({
-        behavior: "smooth",
-        block: "center"
-      });
-    }, 0);
+    scrollReviewDetailToReadingPosition(firstDetailKey);
   }
 
   async function handleGenerateQuestionExplanation(
