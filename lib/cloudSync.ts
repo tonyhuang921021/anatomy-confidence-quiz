@@ -40,7 +40,7 @@ import {
   isCurrentSessionDiscarded,
   queuePendingCompletedSessionUploadForUser,
   loadRecentLocalCompletedSessionsForUploadForUser,
-  removePendingCompletedSessionUploadsForUser,
+  commitUploadedCompletedSessionsForUser,
   saveCurrentSession,
   saveCloudCompletedSessionsForUser,
   saveCompletedSessionsForUser,
@@ -1504,15 +1504,6 @@ function getConfirmedPendingSessions(
   });
 }
 
-function removePendingCompletedSessionUploadsAcrossSources(
-  sourceUserIds: string[],
-  sessions: QuizSession[]
-) {
-  for (const sourceUserId of sourceUserIds) {
-    removePendingCompletedSessionUploadsForUser(sourceUserId, sessions);
-  }
-}
-
 function mapRowToSession(
   row: QuizSessionRow | null,
   attemptMap?: Map<string, Attempt[]>,
@@ -2867,16 +2858,10 @@ export async function syncLocalCompletedSessionsForCurrentUser(
           protectedServerOnly: true
         }
       );
-      removePendingCompletedSessionUploadsAcrossSources(
-        sourceUserIds,
-        pendingSessionsToUpload
-      );
-      saveCloudCompletedSessionsForUser(
+      commitUploadedCompletedSessionsForUser(
         userId,
-        mergeSessions(
-          loadCloudCompletedSessionsForUser(userId),
-          pendingSessionsToUpload
-        )
+        pendingSessionsToUpload,
+        sourceUserIds
       );
     } catch (error) {
       console.warn("Pending completed sessions remain queued for retry.", error);
@@ -2909,9 +2894,10 @@ export async function syncLocalCompletedSessionsForCurrentUser(
     ? getConfirmedPendingSessions(rawPendingUploadSessions, remoteSessions)
     : [];
   if (confirmedPendingSessions.length > 0) {
-    removePendingCompletedSessionUploadsAcrossSources(
-      sourceUserIds,
-      confirmedPendingSessions
+    commitUploadedCompletedSessionsForUser(
+      userId,
+      confirmedPendingSessions,
+      sourceUserIds
     );
   }
 
@@ -3025,10 +3011,10 @@ export async function syncLocalCompletedSessionsForCurrentUser(
       totalBudgetMs: uploadAllPending ? CLOUD_MANUAL_SYNC_TOTAL_BUDGET_MS : CLOUD_SYNC_TOTAL_BUDGET_MS
     }
   );
-  removePendingCompletedSessionUploadsAcrossSources(sourceUserIds, sessionsToUpload);
-  saveCloudCompletedSessionsForUser(
+  commitUploadedCompletedSessionsForUser(
     userId,
-    mergeSessions(loadCloudCompletedSessionsForUser(userId), sessionsToUpload)
+    sessionsToUpload,
+    sourceUserIds
   );
 
   return mergedSessions;
@@ -3239,21 +3225,19 @@ export async function pushCompletedSessionToSupabase(session: QuizSession) {
       const uploadMarker = readCompletedSessionUploadMarker(uploadKey);
       const markerCompletedAt = Number(uploadMarker?.completedAt ?? 0);
       const markerStartedAt = Number(uploadMarker?.startedAt ?? 0);
-      if (
+      const wasRecentlyUploaded = Boolean(
         (recentUploadedAt && now - recentUploadedAt <= COMPLETED_SESSION_UPLOAD_DEDUPE_MS) ||
         (markerCompletedAt > 0 && now - markerCompletedAt <= COMPLETED_SESSION_UPLOAD_DEDUPE_MS)
-      ) {
-        removePendingCompletedSessionUploadsForUser(data.user.id, canonicalSessions);
-        saveCloudCompletedSessionsForUser(
-          data.user.id,
-          mergeSessions(loadCloudCompletedSessionsForUser(data.user.id), canonicalSessions)
-        );
-      } else if (
-        markerStartedAt > 0 &&
-        now - markerStartedAt <= COMPLETED_SESSION_UPLOAD_IN_FLIGHT_MARKER_MS
-      ) {
-        return;
-      } else {
+      );
+
+      if (!wasRecentlyUploaded) {
+        if (
+          markerStartedAt > 0 &&
+          now - markerStartedAt <= COMPLETED_SESSION_UPLOAD_IN_FLIGHT_MARKER_MS
+        ) {
+          return;
+        }
+
         writeCompletedSessionUploadMarker(uploadKey, { startedAt: now });
         let uploadTask = completedSessionUploadsInFlight.get(uploadKey);
         if (!uploadTask) {
@@ -3274,10 +3258,9 @@ export async function pushCompletedSessionToSupabase(session: QuizSession) {
 
         await uploadTask;
       }
-      removePendingCompletedSessionUploadsForUser(data.user.id, canonicalSessions);
-      saveCloudCompletedSessionsForUser(
+      commitUploadedCompletedSessionsForUser(
         data.user.id,
-        mergeSessions(loadCloudCompletedSessionsForUser(data.user.id), canonicalSessions)
+        canonicalSessions
       );
     } catch (error) {
       console.error("Completed session cloud upload deferred:", error);

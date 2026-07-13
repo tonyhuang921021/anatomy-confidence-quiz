@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import test from "node:test";
 import {
   buildCompletedQuestionHistoryEntriesFromSessions,
+  commitUploadedCompletedSessionsForUser,
   discardCurrentSession,
   getPendingQuestionExplanationOverrideSync,
   loadCloudCompletedSessionsForUser,
@@ -514,6 +515,83 @@ test("瀏覽器空間已滿時完整歷史仍保留記憶體中的最新雲端�
   );
   assert.ok(loadedIds.has("older-local-session"));
   assert.ok(loadedIds.has("latest-cloud-session"));
+});
+
+test("確認完成紀錄上傳時不會因清除待補傳佇列讓最新紀錄消失", () => {
+  installBrowserStorage({
+    maxLocalBytes: 4_000,
+    failSessionWrites: true
+  });
+  const userId = "user-atomic-completed-sync";
+  const olderSession = makeSession("older-persisted-session", ["q-older"]);
+  const uploadedSession = {
+    ...makeSession("fresh-uploaded-session", ["q-fresh"]),
+    completedAt: new Date(Date.UTC(2026, 6, 13, 3, 33)).toISOString(),
+    settings: {
+      ...makeSession("fresh-uploaded-session", ["q-fresh"]).settings!,
+      sessionName: "最新完成紀錄".repeat(350)
+    }
+  } satisfies QuizSession;
+
+  setActiveStorageUser(userId);
+  saveCompletedSessionsForUser(userId, [olderSession]);
+  queuePendingCompletedSessionUploadForUser(userId, uploadedSession);
+  assert.equal(loadPendingCompletedSessionUploadsForUser(userId).length, 1);
+
+  const visibleSnapshots: string[][] = [];
+  window.addEventListener("completed-sessions-change", () => {
+    visibleSnapshots.push(
+      loadCompletedSessionsForUser(userId, { includeFullLocalHistory: true }).map(
+        (session) => session.id
+      )
+    );
+  });
+
+  assert.equal(
+    commitUploadedCompletedSessionsForUser(userId, uploadedSession),
+    false
+  );
+
+  assert.equal(loadPendingCompletedSessionUploadsForUser(userId).length, 0);
+  assert.ok(
+    loadCompletedSessionsForUser(userId, { includeFullLocalHistory: true }).some(
+      (session) => session.id === uploadedSession.id
+    )
+  );
+  assert.ok(
+    visibleSnapshots.every((sessionIds) => sessionIds.includes(uploadedSession.id))
+  );
+  assert.equal(visibleSnapshots.length, 1);
+});
+
+test("其他分頁清除待補傳佇列時不會清掉本分頁的記憶體完成紀錄", () => {
+  installBrowserStorage({
+    maxLocalBytes: 4_000,
+    failSessionWrites: true
+  });
+  const userId = "user-cross-tab-pending-clear";
+  const uploadedSession = {
+    ...makeSession("cross-tab-uploaded-session", ["q-cross-tab"]),
+    settings: {
+      ...makeSession("cross-tab-uploaded-session", ["q-cross-tab"]).settings!,
+      sessionName: "跨分頁最新完成紀錄".repeat(350)
+    }
+  } satisfies QuizSession;
+
+  setActiveStorageUser(userId);
+  queuePendingCompletedSessionUploadForUser(userId, uploadedSession);
+  assert.equal(saveCloudCompletedSessionsForUser(userId, [uploadedSession]), false);
+
+  window.dispatchEvent({
+    type: "storage",
+    key: `anatomy-confidence-pending-completed-session-uploads:${userId}`
+  } as unknown as Event);
+
+  assert.ok(
+    loadCompletedSessionsForUser(userId, { includeFullLocalHistory: true }).some(
+      (session) => session.id === uploadedSession.id
+    )
+  );
 });
 
 test("共享詳解較舊時，不會覆蓋本機較新的 AI 詳解", () => {

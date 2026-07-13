@@ -51,10 +51,17 @@ type CompletedStorageSyncChange = {
   sourceId: string;
   userId?: string;
   sessions?: boolean;
+  pending?: boolean;
   history?: boolean;
   current?: boolean;
   completedSessions?: QuizSession[];
   historyEntries?: CompletedQuestionHistoryEntry[];
+};
+
+type CompletedSessionStorageMutationOptions = {
+  notify?: boolean;
+  broadcast?: boolean;
+  preserveCompletedSessionCache?: boolean;
 };
 
 type LoadCompletedSessionsOptions = {
@@ -161,10 +168,17 @@ function getUserIdFromScopedStorageKey(key: string, baseKey: string) {
 function getCompletedStorageChangeFromKey(key: string | null): Omit<CompletedStorageSyncChange, "sourceId"> | null {
   if (!key) return null;
 
+  const pendingUserId = getUserIdFromScopedStorageKey(
+    key,
+    PENDING_COMPLETED_SESSION_UPLOADS_KEY
+  );
+  if (pendingUserId) {
+    return { userId: pendingUserId, sessions: true, pending: true, history: true };
+  }
+
   const sessionUserId =
     getUserIdFromScopedStorageKey(key, COMPLETED_SESSIONS_KEY) ??
     getUserIdFromScopedStorageKey(key, CLOUD_COMPLETED_SESSIONS_KEY) ??
-    getUserIdFromScopedStorageKey(key, PENDING_COMPLETED_SESSION_UPLOADS_KEY) ??
     getUserIdFromScopedStorageKey(key, RECENT_COMPLETED_SESSION_HANDOFF_KEY);
   if (sessionUserId) return { userId: sessionUserId, sessions: true, history: true };
 
@@ -250,7 +264,12 @@ function dispatchCompletedStorageChange(change: Omit<CompletedStorageSyncChange,
 
 function handleExternalCompletedStorageChange(change: CompletedStorageSyncChange) {
   if (!isBrowser() || change.sourceId === COMPLETED_STORAGE_SYNC_SOURCE_ID) return;
-  invalidateCompletedStorageCaches(change.userId);
+  // Pending queue updates must not evict memory-only completed sessions. This is
+  // especially important in Safari when localStorage is full and the latest
+  // cloud snapshot can only live in memory for the current tab.
+  if (!change.pending) {
+    invalidateCompletedStorageCaches(change.userId);
+  }
   applyExternalCompletedStoragePayload(change);
   dispatchCompletedStorageChange(change);
 }
@@ -284,7 +303,9 @@ function installCompletedStorageCrossTabSync() {
   window.addEventListener("storage", (event) => {
     const change = getCompletedStorageChangeFromKey(event.key);
     if (!change) return;
-    invalidateCompletedStorageCaches(change.userId);
+    if (!change.pending) {
+      invalidateCompletedStorageCaches(change.userId);
+    }
     dispatchCompletedStorageChange(change);
   });
 }
@@ -1550,7 +1571,11 @@ export function saveRecentCompletedSessionHandoffForUser(
   return didStore;
 }
 
-export function saveCloudCompletedSessionsForUser(userId: string, sessions: QuizSession[]) {
+export function saveCloudCompletedSessionsForUser(
+  userId: string,
+  sessions: QuizSession[],
+  options: CompletedSessionStorageMutationOptions = {}
+) {
   if (!isBrowser()) return false;
   const normalized = normalizeCompletedSessionList(sessions);
   const scopedKey = getCloudCompletedSessionsScopedKeyForUser(userId);
@@ -1593,7 +1618,7 @@ export function saveCloudCompletedSessionsForUser(userId: string, sessions: Quiz
     mergeCompletedQuestionHistoryFromSessionsForUser(userId, normalized);
   }
 
-  if (userId === getActiveStorageUser()) {
+  if (options.notify !== false && userId === getActiveStorageUser()) {
     window.dispatchEvent(
       new CustomEvent("completed-sessions-change", {
         detail: loadCompletedSessionsForUser(userId)
@@ -1601,12 +1626,14 @@ export function saveCloudCompletedSessionsForUser(userId: string, sessions: Quiz
     );
   }
 
-  broadcastCompletedStorageChange({
-    userId,
-    sessions: true,
-    history: true,
-    completedSessions: getCompletedSessionBroadcastPayload(normalized)
-  });
+  if (options.broadcast !== false) {
+    broadcastCompletedStorageChange({
+      userId,
+      sessions: true,
+      history: true,
+      completedSessions: getCompletedSessionBroadcastPayload(normalized)
+    });
+  }
   return didPersist;
 }
 
@@ -1622,7 +1649,11 @@ export function loadPendingCompletedSessionUploadsForUser(userId = getActiveStor
   return normalizeCompletedSessionList([...localSessions, ...sessionSessions]);
 }
 
-function savePendingCompletedSessionUploadsForUser(userId: string, sessions: QuizSession[]) {
+function savePendingCompletedSessionUploadsForUser(
+  userId: string,
+  sessions: QuizSession[],
+  options: CompletedSessionStorageMutationOptions = {}
+) {
   if (!isBrowser()) return false;
   const scopedKey = getPendingCompletedSessionUploadsScopedKeyForUser(userId);
   const normalized = normalizeCompletedSessionList(sessions)
@@ -1630,10 +1661,12 @@ function savePendingCompletedSessionUploadsForUser(userId: string, sessions: Qui
   const payload = JSON.stringify(normalized.map(compactSessionForStorage));
   const didStore = persistCriticalCompletedSessionPayload(userId, scopedKey, payload);
 
-  completedSessionsMemoryCache.delete(userId);
-  completedSessionIdMemoryCache.delete(userId);
+  if (!options.preserveCompletedSessionCache) {
+    completedSessionsMemoryCache.delete(userId);
+    completedSessionIdMemoryCache.delete(userId);
+  }
 
-  if (userId === getActiveStorageUser()) {
+  if (options.notify !== false && userId === getActiveStorageUser()) {
     window.dispatchEvent(
       new CustomEvent("completed-sessions-change", {
         detail: loadCompletedSessionsForUser(userId)
@@ -1641,12 +1674,15 @@ function savePendingCompletedSessionUploadsForUser(userId: string, sessions: Qui
     );
   }
 
-  broadcastCompletedStorageChange({
-    userId,
-    sessions: true,
-    history: true,
-    completedSessions: getCompletedSessionBroadcastPayload(normalized)
-  });
+  if (options.broadcast !== false) {
+    broadcastCompletedStorageChange({
+      userId,
+      sessions: true,
+      pending: true,
+      history: true,
+      completedSessions: getCompletedSessionBroadcastPayload(normalized)
+    });
+  }
   return didStore;
 }
 
@@ -1660,13 +1696,63 @@ export function queuePendingCompletedSessionUploadForUser(userId: string, sessio
   return savePendingCompletedSessionUploadsForUser(userId, nextSessions);
 }
 
-export function removePendingCompletedSessionUploadsForUser(userId: string, sessions: QuizSession | QuizSession[]) {
+export function removePendingCompletedSessionUploadsForUser(
+  userId: string,
+  sessions: QuizSession | QuizSession[],
+  options: CompletedSessionStorageMutationOptions = {}
+) {
   if (!isBrowser()) return false;
   const sessionList = Array.isArray(sessions) ? sessions : [sessions];
   const completedIds = new Set(sessionList.map((session) => getCanonicalSessionId(session.id)));
   const remaining = loadPendingCompletedSessionUploadsForUser(userId)
     .filter((session) => !completedIds.has(getCanonicalSessionId(session.id)));
-  return savePendingCompletedSessionUploadsForUser(userId, remaining);
+  return savePendingCompletedSessionUploadsForUser(userId, remaining, options);
+}
+
+export function commitUploadedCompletedSessionsForUser(
+  userId: string,
+  sessions: QuizSession | QuizSession[],
+  pendingSourceUserIds: string[] = [userId]
+) {
+  if (!isBrowser()) return false;
+  const incoming = normalizeCompletedSessionList(
+    Array.isArray(sessions) ? sessions : [sessions]
+  );
+  if (incoming.length === 0) return false;
+
+  const didPersist = saveCloudCompletedSessionsForUser(
+    userId,
+    normalizeCompletedSessionList([
+      ...loadCloudCompletedSessionsForUser(userId),
+      ...incoming
+    ]),
+    { notify: false, broadcast: false }
+  );
+
+  for (const sourceUserId of Array.from(new Set(pendingSourceUserIds.filter(Boolean)))) {
+    removePendingCompletedSessionUploadsForUser(sourceUserId, incoming, {
+      notify: false,
+      broadcast: false,
+      preserveCompletedSessionCache: true
+    });
+  }
+
+  if (userId === getActiveStorageUser()) {
+    window.dispatchEvent(
+      new CustomEvent("completed-sessions-change", {
+        detail: loadCompletedSessionsForUser(userId, { includeFullLocalHistory: true })
+      })
+    );
+  }
+
+  broadcastCompletedStorageChange({
+    userId,
+    sessions: true,
+    history: true,
+    completedSessions: getCompletedSessionBroadcastPayload(incoming)
+  });
+
+  return didPersist;
 }
 
 export function loadCompletedSessionsForUser(
