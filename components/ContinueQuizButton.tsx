@@ -150,7 +150,8 @@ export function ContinueQuizButton() {
         ? await import("@/lib/cloudSync").then(({ loadResumableQuizSessionForCurrentUser }) =>
             loadResumableQuizSessionForCurrentUser({
               sessionId: item.session.id,
-              userId: authSession?.user?.id ?? null
+              userId: authSession?.user?.id ?? null,
+              expectedAnsweredCount: item.answeredCount
             })
           )
         : item.session;

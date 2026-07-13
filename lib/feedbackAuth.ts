@@ -5,8 +5,9 @@ export function getFeedbackIdentityIntent(input: {
   hasUser: boolean;
   accessToken?: string | null;
 }): FeedbackIdentityIntent {
-  if (input.isAnonymous || !input.hasUser) return "anonymous";
-  return input.accessToken?.trim() ? "authenticated" : "authentication-pending";
+  if (!input.hasUser) return "anonymous";
+  if (input.accessToken?.trim()) return "authenticated";
+  return "authentication-pending";
 }
 
 export function getFeedbackAuthorizationHeaders(accessToken?: string | null): Record<string, string> {

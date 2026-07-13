@@ -3,6 +3,7 @@ import test from "node:test";
 import {
   chooseMoreCompleteResumableSessionItem,
   createResumableQuizSessionListItem,
+  isResumableSessionHydrationComplete,
   mergeResumableQuizSessionItems,
   mergeResumableQuizSessions
 } from "./resumableSessions";
@@ -128,4 +129,14 @@ test("摘要較完整但屬於不同散題時，不會覆蓋目前測驗", () =>
   });
 
   assert.equal(chooseMoreCompleteResumableSessionItem(current, [otherSummary]), null);
+});
+
+test("清單顯示 13 題但明細只有 6 題時不可視為完整續作紀錄", () => {
+  const partial = makeSession("partial", {
+    questionOrder: Array.from({ length: 20 }, (_, index) => `Q${index + 1}`),
+    attempts: attempts(6)
+  });
+
+  assert.equal(isResumableSessionHydrationComplete(partial, 13), false);
+  assert.equal(isResumableSessionHydrationComplete(partial, 6), true);
 });

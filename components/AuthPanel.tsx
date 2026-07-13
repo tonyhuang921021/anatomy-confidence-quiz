@@ -125,6 +125,7 @@ export function AuthPanel() {
     passwordRecovery,
     syncStatus,
     syncError,
+    pendingCompletedUploadCount,
     applyAuthSession,
     finishPasswordRecovery,
     refreshCloudData,
@@ -718,7 +719,13 @@ export function AuthPanel() {
             <p className="mt-2 text-sm font-semibold text-slate-900 sm:text-base">{user.email}</p>
           </div>
           <div className="flex flex-wrap gap-2">
-            <div className="stat-chip">{getSyncStatusText(syncStatus, Boolean(syncError))}</div>
+            <div className="stat-chip">
+              {getSyncStatusText(
+                syncStatus,
+                Boolean(syncError),
+                pendingCompletedUploadCount
+              )}
+            </div>
             <div className="stat-chip">ID {user.id.slice(0, 8)}...</div>
           </div>
         </div>

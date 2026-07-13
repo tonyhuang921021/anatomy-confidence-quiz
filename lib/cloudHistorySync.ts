@@ -60,3 +60,11 @@ export function findUnresolvedCompletedSessionIds(
     })
     .map((session) => session.id);
 }
+
+export function filterResolvedCompletedSessionIds(
+  sessionIds: string[],
+  unresolvedSessionIds: string[]
+) {
+  const unresolved = new Set(unresolvedSessionIds);
+  return sessionIds.filter((sessionId) => !unresolved.has(sessionId));
+}

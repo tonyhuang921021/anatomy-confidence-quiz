@@ -3,6 +3,7 @@ import test from "node:test";
 import {
   CLOUD_ATTEMPT_SESSION_FETCH_CHUNK_SIZE,
   buildCloudAttemptSessionChunks,
+  filterResolvedCompletedSessionIds,
   findUnresolvedCompletedSessionIds,
   getExpectedCloudAttemptCount,
   getSessionIdsNeedingAttemptRows
@@ -60,4 +61,14 @@ test("completed history is unresolved unless payload or attempt rows are complet
   );
 
   assert.deepEqual(unresolved, ["partial-everywhere"]);
+});
+
+test("單一不完整舊回合不會擋住同批完整的新結果", () => {
+  assert.deepEqual(
+    filterResolvedCompletedSessionIds(
+      ["fresh-complete", "old-partial", "another-complete"],
+      ["old-partial"]
+    ),
+    ["fresh-complete", "another-complete"]
+  );
 });

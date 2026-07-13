@@ -55,12 +55,14 @@ import {
   createResumableQuizSessionListItem,
   getCanonicalResumableSessionId,
   isResumableQuizSession,
+  isResumableSessionHydrationComplete,
   mergeResumableQuizSessionItems,
   mergeResumableQuizSessions,
   type ResumableQuizSessionListItem
 } from "@/lib/resumableSessions";
 import {
   buildCloudAttemptSessionChunks,
+  filterResolvedCompletedSessionIds,
   findUnresolvedCompletedSessionIds,
   getSessionIdsNeedingAttemptRows
 } from "@/lib/cloudHistorySync";
@@ -237,6 +239,7 @@ type CompletedSessionSyncOptions = {
   hydrateRemoteHistory?: boolean;
   uploadAllPending?: boolean;
   readRemoteOnly?: boolean;
+  historyMode?: "simulation";
 };
 
 const currentSessionSyncState = new Map<string, CurrentSessionSyncState>();
@@ -854,6 +857,20 @@ function buildSessionRowForCloud(
     session_payload: buildSessionPayloadForCloud(session, {
       includeAttempts: includeAttemptsInPayload
     })
+  };
+}
+
+function buildActiveSessionDefinitionRow(
+  row: QuizSessionRow,
+  existing?: QuizSessionRow
+): QuizSessionRow {
+  return {
+    ...row,
+    correct_count: existing?.correct_count ?? 0,
+    wrong_count: existing?.wrong_count ?? 0,
+    average_confidence: existing?.average_confidence ?? null,
+    updated_at: existing?.updated_at ?? row.started_at,
+    progress_payload: existing?.progress_payload ?? row.progress_payload
   };
 }
 
@@ -1650,8 +1667,9 @@ function mapActiveQuizSessionRowToListItem(
       session.generatedQuestions?.length ?? 0
     ),
     lastActivityAt: row.updated_at ?? session.startedAt,
-    needsCloudHydration:
-      session.attempts.length < answeredCount || (session.questionOrder?.length ?? 0) === 0
+    // Header counts and attempt rows are separate writes. Always hydrate the
+    // selected cloud item before resuming so a lagging header cannot hide rows.
+    needsCloudHydration: true
   });
   return item.totalCount > 0 ? item : null;
 }
@@ -1676,7 +1694,10 @@ async function hydrateResumableQuizSessionListItem(
   item: ResumableQuizSessionListItem
 ) {
   if (!item.needsCloudHydration) return item.session;
-  return fetchHydratedActiveQuizSessionForUser(userId, item.session.id);
+  const hydrated = await fetchHydratedActiveQuizSessionForUser(userId, item.session.id);
+  return isResumableSessionHydrationComplete(hydrated, item.answeredCount)
+    ? hydrated
+    : null;
 }
 
 async function fetchHydratedActiveQuizSessionForUser(
@@ -1769,6 +1790,7 @@ export async function loadResumableQuizSessionsForCurrentUser(userId?: string | 
 export async function loadResumableQuizSessionForCurrentUser(input: {
   sessionId: string;
   userId?: string | null;
+  expectedAnsweredCount?: number;
 }) {
   const userId = input.userId;
   const localSessions = [
@@ -1798,11 +1820,24 @@ export async function loadResumableQuizSessionForCurrentUser(input: {
     throw new Error("這份測驗可能已在另一台裝置完成或刪除，請重新整理清單。");
   }
 
-  return mergeResumableQuizSessions(
+  const resolvedSession = mergeResumableQuizSessions(
     matchingLocalSession ? [matchingLocalSession] : [],
     [cloudSession],
     1
   )[0] ?? cloudSession;
+  const expectedAnsweredCount = Math.max(
+    0,
+    input.expectedAnsweredCount ?? 0,
+    matchingLocalSession?.attempts.length ?? 0
+  );
+
+  if (!isResumableSessionHydrationComplete(resolvedSession, expectedAnsweredCount)) {
+    throw new Error(
+      `清單顯示已答 ${expectedAnsweredCount} 題，但雲端明細目前只讀到 ${resolvedSession.attempts.length} 題。已保留原紀錄，不會用較短版本覆蓋；請回原裝置同步或稍後再試。`
+    );
+  }
+
+  return resolvedSession;
 }
 
 export async function deleteResumableQuizSession(input: {
@@ -1843,7 +1878,11 @@ export async function deleteResumableQuizSession(input: {
   discardCurrentSession(input.sessionId, input.userId ? [input.userId] : []);
 }
 
-async function fetchQuizSessionsForUser(userId: string, signal?: AbortSignal) {
+async function fetchQuizSessionsForUser(
+  userId: string,
+  signal?: AbortSignal,
+  historyMode?: CompletedSessionSyncOptions["historyMode"]
+) {
   if (isSupabaseRecoveryMode() || !isSupabaseConfigured()) return [] as QuizSessionRow[];
 
   const supabase = getSupabaseBrowserClient();
@@ -1868,6 +1907,7 @@ async function fetchQuizSessionsForUser(userId: string, signal?: AbortSignal) {
       .not("completed_at", "is", null)
       .order("completed_at", { ascending: false, nullsFirst: false })
       .range(from, to);
+    if (historyMode) query = query.eq("mode", historyMode);
     if (signal) query = query.abortSignal(signal);
     const { data, error } = await query;
 
@@ -1952,9 +1992,15 @@ function getCloudSessionAttemptSummary(row: QuizSessionRow) {
   };
 }
 
-async function fetchResolvedQuizSessionsForUser(userId: string, signal?: AbortSignal) {
-  const sessionRows = await fetchQuizSessionsForUser(userId, signal);
-  const recoverableReviewRows = await fetchRecoverableReviewSessionRowsForUser(userId, signal);
+async function fetchResolvedQuizSessionsForUser(
+  userId: string,
+  signal?: AbortSignal,
+  historyMode?: CompletedSessionSyncOptions["historyMode"]
+) {
+  const sessionRows = await fetchQuizSessionsForUser(userId, signal, historyMode);
+  const recoverableReviewRows = historyMode
+    ? []
+    : await fetchRecoverableReviewSessionRowsForUser(userId, signal);
   const allSessionRows = Array.from(
     new Map([...sessionRows, ...recoverableReviewRows].map((row) => [row.id, row] as const)).values()
   );
@@ -1981,13 +2027,23 @@ async function fetchResolvedQuizSessionsForUser(userId: string, signal?: AbortSi
     ] as const)
   );
 
+  const resolvedCompletedSessionIds = new Set(
+    filterResolvedCompletedSessionIds(
+      sessionRows.map((row) => row.id),
+      unresolvedCompletedSessionIds
+    )
+  );
   if (unresolvedCompletedSessionIds.length > 0) {
-    throw new Error(
-      `完整雲端紀錄尚有 ${unresolvedCompletedSessionIds.length} 回未讀到作答明細，已保留原有本機與雲端快取。`
+    console.warn(
+      `Skipped ${unresolvedCompletedSessionIds.length} incomplete cloud sessions while keeping resolved history visible.`
     );
   }
 
   const sessions = allSessionRows
+    .filter(
+      (row) =>
+        !row.completed_at || resolvedCompletedSessionIds.has(row.id)
+    )
     .map((row) => mapRowToSession(row, attemptMap))
     .filter((session): session is QuizSession => Boolean(session));
   const recoveredCompletionSessions = recoverableReviewRows
@@ -1997,7 +2053,8 @@ async function fetchResolvedQuizSessionsForUser(userId: string, signal?: AbortSi
   return {
     sessions,
     sessionsMissingAttemptRows: [] as QuizSession[],
-    recoveredCompletionSessions
+    recoveredCompletionSessions,
+    unresolvedCompletedSessionIds
   };
 }
 
@@ -2445,12 +2502,13 @@ async function upsertSessionsForUser(
   const discardedSessionIds = new Set<string>();
   const existingActiveSessionIds = new Set<string>();
   const sessionsRequiringFullPayloadIds = new Set<string>();
+  const existingActiveRowsById = new Map<string, QuizSessionRow>();
   const incomingRowsById = new Map(rows.map((row) => [row.id, row] as const));
 
   if (incompleteSessionIds.length > 0) {
     const { data, error: existingError } = await supabase
       .from("quiz_sessions")
-      .select("id, mode, completed_at, session_payload")
+      .select("id, mode, completed_at, correct_count, wrong_count, average_confidence, started_at, session_payload, progress_payload, updated_at")
       .eq("user_id", userId)
       .in("id", incompleteSessionIds);
 
@@ -2458,13 +2516,14 @@ async function upsertSessionsForUser(
       throw existingError;
     }
 
-    for (const row of (data ?? []) as Pick<QuizSessionRow, "id" | "mode" | "completed_at" | "session_payload">[]) {
+    for (const row of (data ?? []) as QuizSessionRow[]) {
       if (row.mode === "discarded") {
         discardedSessionIds.add(row.id);
       } else if (isCompletedQuizSessionRow(row)) {
         protectedCompletedSessionIds.add(row.id);
       } else {
         existingActiveSessionIds.add(row.id);
+        existingActiveRowsById.set(row.id, row);
         if (
           hasQuizSessionDefinitionChanged(
             row.session_payload,
@@ -2503,22 +2562,12 @@ async function upsertSessionsForUser(
     if (fullRows.length > 0) {
       const { error } = await supabase
         .from("quiz_sessions")
-        .upsert(fullRows, { onConflict: "id" });
-      if (error) throw error;
-    }
-
-    for (const row of safeRows.filter(
-      (candidate) =>
-        existingActiveSessionIds.has(candidate.id) &&
-        !sessionsRequiringFullPayloadIds.has(candidate.id)
-    )) {
-      const checkpointRow = omitHeavySessionPayload(row);
-      const { error } = await supabase
-        .from("quiz_sessions")
-        .update(checkpointRow)
-        .eq("id", row.id)
-        .eq("user_id", userId)
-        .is("completed_at", null);
+        .upsert(
+          fullRows.map((row) =>
+            buildActiveSessionDefinitionRow(row, existingActiveRowsById.get(row.id))
+          ),
+          { onConflict: "id" }
+        );
       if (error) throw error;
     }
   } else {
@@ -2563,14 +2612,27 @@ async function upsertSessionsForUser(
     });
   }
 
-  if (attemptRows.length === 0) return;
+  if (attemptRows.length > 0) {
+    const { error: attemptError } = await supabase
+      .from("quiz_session_attempts")
+      .upsert(attemptRows, { onConflict: "session_id,question_order" });
 
-  const { error: attemptError } = await supabase
-    .from("quiz_session_attempts")
-    .upsert(attemptRows, { onConflict: "session_id,question_order" });
+    if (attemptError) {
+      throw attemptError;
+    }
+  }
 
-  if (attemptError) {
-    throw attemptError;
+  if (options.activeCheckpoint) {
+    for (const row of safeRows) {
+      const checkpointRow = omitHeavySessionPayload(row);
+      const { error } = await supabase
+        .from("quiz_sessions")
+        .update(checkpointRow)
+        .eq("id", row.id)
+        .eq("user_id", userId)
+        .is("completed_at", null);
+      if (error) throw error;
+    }
   }
 
   if (options.activeCheckpoint && options.syncedAttemptSignatures) {
@@ -2824,7 +2886,7 @@ export async function syncLocalCompletedSessionsForCurrentUser(
   if (canReachCloud && hydrateRemoteHistory) {
     try {
       const resolved = await withAbortableClientTimeout(
-        (signal) => fetchResolvedQuizSessionsForUser(userId, signal),
+        (signal) => fetchResolvedQuizSessionsForUser(userId, signal, options.historyMode),
         CLOUD_COMPLETED_HISTORY_READ_TIMEOUT_MS,
         "完整雲端紀錄讀取逾時，已保留這台裝置的紀錄與待補傳佇列。"
       );
@@ -2914,7 +2976,10 @@ export async function syncLocalCompletedSessionsForCurrentUser(
         ? mergedSessions
         : remoteSessions;
   if (cloudCacheSessions.length > 0) {
-    saveCloudCompletedSessionsForUser(userId, cloudCacheSessions);
+    saveCloudCompletedSessionsForUser(
+      userId,
+      mergeSessions(loadCloudCompletedSessionsForUser(userId), cloudCacheSessions)
+    );
   }
 
   if (hasHeavyLocalHistory) {
@@ -3022,6 +3087,12 @@ export async function syncCurrentSessionForCurrentUser(userId: string) {
         null
       )
     : null;
+  const remoteHydrationIncomplete = Boolean(
+    shouldHydrateRemote &&
+      remoteCandidate &&
+      !remoteCurrentSession &&
+      remoteCandidate.answeredCount > (localCurrentSession?.attempts.length ?? 0)
+  );
   const remoteSyncedAttemptSignatures = remoteCurrentSession
     ? buildSyncedAttemptSignatureMap(remoteCurrentSession)
     : new Map<number, string>();
@@ -3033,12 +3104,13 @@ export async function syncCurrentSessionForCurrentUser(userId: string) {
     return winner;
   }
 
-  const remoteActivity = remoteCandidate?.lastActivityAt ?? "";
+  const remoteActivity = remoteCurrentSession ? remoteCandidate?.lastActivityAt ?? "" : "";
 
   let winner = localCurrentSession;
   let shouldUploadWinner =
     Boolean(localCurrentSession) &&
-    (!remoteCandidate || localActivity > remoteActivity);
+    !remoteHydrationIncomplete &&
+    (!remoteCandidate || !remoteCurrentSession || localActivity > remoteActivity);
 
   if (remoteCurrentSession && (!winner || remoteActivity > localActivity)) {
     winner = canonicalizeSessionsForUser(userId, [remoteCurrentSession])[0] ?? remoteCurrentSession;

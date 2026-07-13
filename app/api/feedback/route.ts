@@ -293,9 +293,9 @@ export async function POST(request: NextRequest) {
         { status: 401 }
       );
     }
-    const verifiedUser = requestedAnonymous
-      ? null
-      : await getVerifiedUser(supabase, accessToken);
+    const verifiedUser = accessToken
+      ? await getVerifiedUser(supabase, accessToken)
+      : null;
     const isLoggedIn = Boolean(verifiedUser?.id);
     const actorColumn = isLoggedIn ? "user_id" : "visitor_id";
     const actorValue = isLoggedIn ? verifiedUser?.id ?? null : visitorId;

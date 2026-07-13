@@ -12,11 +12,18 @@ test("已登入且選暱稱時沒有 token 不可降級成匿名", () => {
   );
 });
 
-test("只有訪客或明確選匿名時才使用匿名身分", () => {
+test("已登入匿名留言仍帶登入 token，公開顯示與版主識別分開", () => {
   assert.equal(
     getFeedbackIdentityIntent({ isAnonymous: true, hasUser: true, accessToken: "token" }),
-    "anonymous"
+    "authenticated"
   );
+  assert.equal(
+    getFeedbackIdentityIntent({ isAnonymous: true, hasUser: true, accessToken: null }),
+    "authentication-pending"
+  );
+});
+
+test("訪客留言使用匿名身分", () => {
   assert.equal(
     getFeedbackIdentityIntent({ isAnonymous: false, hasUser: false, accessToken: null }),
     "anonymous"

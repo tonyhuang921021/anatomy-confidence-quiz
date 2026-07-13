@@ -178,6 +178,20 @@ function buildSessionRowForCloud(
   };
 }
 
+function buildActiveSessionDefinitionRow(
+  row: QuizSessionRow,
+  existing?: QuizSessionRow
+): QuizSessionRow {
+  return {
+    ...row,
+    correct_count: existing?.correct_count ?? 0,
+    wrong_count: existing?.wrong_count ?? 0,
+    average_confidence: existing?.average_confidence ?? null,
+    updated_at: existing?.updated_at ?? row.started_at,
+    progress_payload: existing?.progress_payload ?? row.progress_payload
+  };
+}
+
 function mapAttemptToCloudRow(userId: string, session: QuizSession, attempt: Attempt, index: number): QuizSessionAttemptRow {
   const generatedQuestion =
     session.generatedQuestions?.find((question) => question.id === attempt.questionId) ?? null;
@@ -334,11 +348,12 @@ export async function POST(request: NextRequest) {
     const discardedSessionIds = new Set<string>();
     const existingActiveSessionIds = new Set<string>();
     const sessionsRequiringFullPayloadIds = new Set<string>();
+    const existingActiveRowsById = new Map<string, QuizSessionRow>();
 
     if (rows.length > 0) {
       const { data, error: existingError } = await supabase
         .from("quiz_sessions")
-        .select("id, mode, completed_at, correct_count, wrong_count, session_payload, updated_at")
+        .select("id, mode, completed_at, correct_count, wrong_count, average_confidence, started_at, session_payload, progress_payload, updated_at")
         .eq("user_id", userId)
         .in("id", rows.map((row) => row.id));
 
@@ -375,6 +390,7 @@ export async function POST(request: NextRequest) {
           protectedCompletedSessionIds.add(existingRow.id);
         } else if (!isCompletedQuizSessionRow(existingRow)) {
           existingActiveSessionIds.add(existingRow.id);
+          existingActiveRowsById.set(existingRow.id, existingRow);
           if (
             hasQuizSessionDefinitionChanged(
               existingRow.session_payload,
@@ -414,21 +430,12 @@ export async function POST(request: NextRequest) {
       if (fullRows.length > 0) {
         const { error: sessionError } = await supabase
           .from("quiz_sessions")
-          .upsert(fullRows, { onConflict: "id" });
-        if (sessionError) throw sessionError;
-      }
-
-      for (const row of safeRows.filter(
-        (candidate) =>
-          existingActiveSessionIds.has(candidate.id) &&
-          !sessionsRequiringFullPayloadIds.has(candidate.id)
-      )) {
-        const { error: sessionError } = await supabase
-          .from("quiz_sessions")
-          .update(omitHeavySessionPayload(row))
-          .eq("id", row.id)
-          .eq("user_id", userId)
-          .is("completed_at", null);
+          .upsert(
+            fullRows.map((row) =>
+              buildActiveSessionDefinitionRow(row, existingActiveRowsById.get(row.id))
+            ),
+            { onConflict: "id" }
+          );
         if (sessionError) throw sessionError;
       }
     } else {
@@ -462,6 +469,18 @@ export async function POST(request: NextRequest) {
         .upsert(attemptRows, { onConflict: "session_id,question_order" });
 
       if (attemptError) throw attemptError;
+    }
+
+    if (activeCheckpoint) {
+      for (const row of safeRows) {
+        const { error: sessionError } = await supabase
+          .from("quiz_sessions")
+          .update(omitHeavySessionPayload(row))
+          .eq("id", row.id)
+          .eq("user_id", userId)
+          .is("completed_at", null);
+        if (sessionError) throw sessionError;
+      }
     }
 
     return NextResponse.json(

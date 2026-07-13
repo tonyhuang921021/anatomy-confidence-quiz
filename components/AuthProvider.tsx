@@ -16,7 +16,11 @@ import {
   syncCurrentSessionForCurrentUser,
   syncLeaderboardProfileForCurrentUser
 } from "@/lib/cloudSync";
-import { freeLocalStorageSpaceForAuth, setActiveStorageUser } from "@/lib/storage";
+import {
+  freeLocalStorageSpaceForAuth,
+  loadPendingCompletedSessionUploadsForUser,
+  setActiveStorageUser
+} from "@/lib/storage";
 import {
   clearSupabaseBrowserAuthStorage,
   getSupabaseBrowserClient,
@@ -35,6 +39,7 @@ type AuthContextValue = {
   syncStatus: AuthSyncStatus;
   syncVersion: number;
   syncError: string;
+  pendingCompletedUploadCount: number;
   applyAuthSession: (nextSession: Session | null) => void;
   finishPasswordRecovery: () => void;
   refreshCloudData: (options?: RefreshCloudDataOptions) => Promise<void>;
@@ -48,6 +53,7 @@ type RefreshCloudDataOptions = {
   historyHydration?: boolean;
   force?: boolean;
   readRemoteOnly?: boolean;
+  historyMode?: "simulation";
 };
 
 const AuthContext = createContext<AuthContextValue | null>(null);
@@ -313,6 +319,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [syncStatus, setSyncStatus] = useState<AuthContextValue["syncStatus"]>("idle");
   const [syncVersion, setSyncVersion] = useState(0);
   const [syncError, setSyncError] = useState("");
+  const [pendingCompletedUploadCount, setPendingCompletedUploadCount] = useState(0);
   const syncInFlightRef = useRef<Promise<void> | null>(null);
   const syncStartedAtRef = useRef(0);
   const sessionRef = useRef<Session | null>(null);
@@ -324,6 +331,32 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     sessionRef.current = session;
   }, [session]);
+
+  useEffect(() => {
+    const updatePendingCount = () => {
+      const pendingSessions = user?.id
+        ? [
+            ...loadPendingCompletedSessionUploadsForUser(user.id),
+            ...loadPendingCompletedSessionUploadsForUser("guest")
+          ]
+        : [];
+      setPendingCompletedUploadCount(
+        new Set(
+          pendingSessions.map((pendingSession) =>
+            pendingSession.id.replace(/^user-[^:]+:/, "")
+          )
+        ).size
+      );
+    };
+
+    updatePendingCount();
+    window.addEventListener("completed-sessions-change", updatePendingCount);
+    window.addEventListener("storage", updatePendingCount);
+    return () => {
+      window.removeEventListener("completed-sessions-change", updatePendingCount);
+      window.removeEventListener("storage", updatePendingCount);
+    };
+  }, [syncVersion, user?.id]);
 
   const cancelScheduledAutomaticCloudSync = useCallback(() => {
     const pending = automaticSyncTimerRef.current;
@@ -400,7 +433,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     if (syncInFlightRef.current && now - syncStartedAtRef.current <= hardTimeoutMs + 1000) {
       setSyncStatus("syncing");
       setSyncError("");
-      return;
+      if (!forceSync) return;
+
+      const previousSyncTask = syncInFlightRef.current;
+      await previousSyncTask.catch(() => undefined);
+      if (syncInFlightRef.current === previousSyncTask) {
+        syncInFlightRef.current = null;
+      }
     }
 
     if (syncInFlightRef.current) {
@@ -449,7 +488,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setSyncStatus("syncing");
     setSyncError("");
 
-    syncStartedAtRef.current = now;
+    syncStartedAtRef.current = Date.now();
     const uploadAllPending = explicitOptions.uploadAllPending === true;
     const hydrateRemoteHistory = explicitOptions.hydrateRemoteHistory ?? !uploadAllPending;
 
@@ -457,7 +496,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       syncLocalCompletedSessionsForCurrentUser(userId, {
         hydrateRemoteHistory,
         uploadAllPending,
-        readRemoteOnly
+        readRemoteOnly,
+        historyMode: explicitOptions.historyMode
       })
       .then((completedSessions) => {
         if (readRemoteOnly) return undefined;
@@ -699,12 +739,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       syncStatus,
       syncVersion,
       syncError,
+      pendingCompletedUploadCount,
       applyAuthSession,
       finishPasswordRecovery,
       refreshCloudData,
       signOut: handleSignOut
     }),
-    [applyAuthSession, configured, finishPasswordRecovery, handleSignOut, loading, passwordRecovery, refreshCloudData, session, syncError, syncStatus, syncVersion, user]
+    [applyAuthSession, configured, finishPasswordRecovery, handleSignOut, loading, passwordRecovery, pendingCompletedUploadCount, refreshCloudData, session, syncError, syncStatus, syncVersion, user]
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

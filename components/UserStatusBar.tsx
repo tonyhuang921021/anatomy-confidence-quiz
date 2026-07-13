@@ -8,13 +8,24 @@ import { VisitorStatsPanel } from "@/components/VisitorStatsPanel";
 
 export function UserStatusBar() {
   const pathname = usePathname();
-  const { configured, loading, user, syncStatus, syncError } = useAuth();
+  const {
+    configured,
+    loading,
+    user,
+    syncStatus,
+    syncError,
+    pendingCompletedUploadCount
+  } = useAuth();
   const isOwnerReviewPage =
     pathname === "/owner/parasitology-review" ||
     pathname === "/owner/bacteria-review" ||
     pathname === "/owner/virus-review" ||
     pathname === "/owner/biochemistry-review";
-  const syncTone = getSyncStatusTone(syncStatus, Boolean(syncError));
+  const syncTone = getSyncStatusTone(
+    syncStatus,
+    Boolean(syncError),
+    pendingCompletedUploadCount
+  );
 
   if (isOwnerReviewPage) {
     return null;
@@ -48,7 +59,11 @@ export function UserStatusBar() {
               }`}
               title={syncError || undefined}
             >
-              {getSyncStatusText(syncStatus, Boolean(syncError))}
+              {getSyncStatusText(
+                syncStatus,
+                Boolean(syncError),
+                pendingCompletedUploadCount
+              )}
             </span>
           ) : null}
         </div>

@@ -36,6 +36,16 @@ export function isResumableQuizSession(session?: QuizSession | null): session is
   );
 }
 
+export function isResumableSessionHydrationComplete(
+  session: QuizSession | null | undefined,
+  expectedAnsweredCount: number
+) {
+  return Boolean(
+    isResumableQuizSession(session) &&
+      session.attempts.length >= Math.max(0, expectedAnsweredCount)
+  );
+}
+
 export function createResumableQuizSessionListItem(
   session: QuizSession,
   overrides: Partial<Omit<ResumableQuizSessionListItem, "session">> = {}

@@ -6,6 +6,7 @@ import { useAuth } from "@/components/AuthProvider";
 type CloudHistoryHydrationOptions = {
   force?: boolean;
   readRemoteOnly?: boolean;
+  historyMode?: "simulation";
 };
 
 export function useCloudHistoryHydration(
@@ -19,8 +20,9 @@ export function useCloudHistoryHydration(
   const userId = user?.id ?? null;
   const force = options.force === true;
   const readRemoteOnly = options.readRemoteOnly === true;
+  const historyMode = options.historyMode;
   const hydrationKey = userId
-    ? `${userId}:${force ? "forced" : "auto"}:${readRemoteOnly ? "read" : "sync"}`
+    ? `${userId}:${force ? "forced" : "auto"}:${readRemoteOnly ? "read" : "sync"}:${historyMode ?? "all"}`
     : null;
 
   useEffect(() => {
@@ -34,14 +36,15 @@ export function useCloudHistoryHydration(
       historyHydration: true,
       automatic: !force,
       force,
-      readRemoteOnly
+      readRemoteOnly,
+      historyMode
     }).finally(() => {
       if (hydratingUserRef.current !== hydrationKey) return;
       hydratingUserRef.current = null;
       hydratedUserRef.current = hydrationKey;
       setHydratingUserId((current) => (current === hydrationKey ? null : current));
     });
-  }, [enabled, force, hydrationKey, readRemoteOnly, refreshCloudData, syncStatus, userId]);
+  }, [enabled, force, historyMode, hydrationKey, readRemoteOnly, refreshCloudData, syncStatus, userId]);
 
   return Boolean(
     enabled &&
