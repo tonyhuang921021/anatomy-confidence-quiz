@@ -1,5 +1,6 @@
 import type { Question, SubjectFilter } from "@/types/quiz";
 import gpt56Med1PaperData from "./aiSimulationPaperGpt56Med1.json";
+import gpt56Med2PaperData from "./aiSimulationPaperGpt56Med2.json";
 
 export type AISimulationPaperOption = {
   key: string;
@@ -19,7 +20,9 @@ type AISimulationPaper = AISimulationPaperOption & {
 const MED1_ADVANCED_B_AI_PAPER_KEY = "AI-MED1-ADV-B-001";
 const MED2_ADVANCED_AI_PAPER_KEY = "AI-MED2-ADV-001";
 const GPT56_MED1_AI_PAPER_KEY = gpt56Med1PaperData.paper.key;
+const GPT56_MED2_AI_PAPER_KEY = gpt56Med2PaperData.paper.key;
 const gpt56Med1AiPaperQuestions = gpt56Med1PaperData.questions as unknown as Question[];
+const gpt56Med2AiPaperQuestions = gpt56Med2PaperData.questions as unknown as Question[];
 
 const med1AdvancedBAiPaperQuestions: Question[] = [
   {
@@ -5538,6 +5541,17 @@ const aiSimulationPapers: AISimulationPaper[] = [
     sourceYear: 2026,
     sourceRound: 1,
     questions: gpt56Med1AiPaperQuestions
+  },
+  {
+    key: GPT56_MED2_AI_PAPER_KEY,
+    label: "gpt5.6出的醫學二",
+    subject: "醫學（二）",
+    questionCount: gpt56Med2AiPaperQuestions.length,
+    missingNumbers: [],
+    isComplete: true,
+    sourceYear: 2026,
+    sourceRound: 1,
+    questions: gpt56Med2AiPaperQuestions
   },
   {
     key: MED1_ADVANCED_B_AI_PAPER_KEY,
