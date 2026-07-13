@@ -28,6 +28,26 @@ function makeQuestion(overrides: Partial<Question> & Pick<Question, "id" | "stem
   };
 }
 
+function makeUnrelatedPastExamQuestions(count: number, subject: Question["subject"] = "解剖學") {
+  return Array.from({ length: count }, (_, index) =>
+    makeQuestion({
+      id: `unrelated-${subject}-${index}`,
+      subject,
+      chapter: "腹部解剖",
+      section: "腹膜與腸繫膜",
+      primaryTag: `${subject}－腹部`,
+      stem: `腹膜反摺與腸繫膜附著位置的基礎題 ${index}`,
+      options: {
+        A: "greater omentum",
+        B: "lesser omentum",
+        C: "transverse mesocolon",
+        D: "sigmoid mesocolon"
+      },
+      testedConcept: "腹膜反摺與腸繫膜"
+    })
+  );
+}
+
 test("類似題以題幹與選項文字為主，不讓不可信 testedConcept 單獨拉題", () => {
   const current = makeQuestion({
     id: "current",
@@ -70,7 +90,8 @@ test("類似題只取同科考古題，不混入 AI 題或其他科目", () => {
   const current = makeQuestion({
     id: "current",
     stem: "acetylcholine 對支氣管平滑肌的影響為何？",
-    testedConcept: "bronchoconstriction"
+    testedConcept: "bronchoconstriction",
+    sourceType: "AI_GENERATED"
   });
   const pastExamSameSubject = makeQuestion({
     id: "past-exam-same-subject",
@@ -98,6 +119,240 @@ test("類似題只取同科考古題，不混入 AI 題或其他科目", () => {
     related.map((question) => question.id),
     ["past-exam-same-subject"]
   );
+});
+
+test("AI 題可用正確選項與核心考點跨分類找到考古題，且不硬湊旁支題", () => {
+  const current = makeQuestion({
+    id: "ai-thyroid-surgery",
+    subject: "解剖學",
+    chapter: "AI 模擬卷",
+    section: "AI 模擬卷",
+    primaryTag: "解剖學－甲狀腺手術",
+    sourceType: "AI_GENERATED",
+    stem: "甲狀腺上極手術後無法唱高音，最可能受傷的構造為何？",
+    options: {
+      A: "喉返神經與後環杓肌",
+      B: "上喉神經外支與環甲肌",
+      C: "舌下神經與頦舌肌",
+      D: "迷走神經與莖突咽肌"
+    },
+    answer: "B",
+    testedConcept: "上喉神經外支支配環甲肌，受傷會造成高音困難"
+  });
+  const sameConcept = makeQuestion({
+    id: "past-exam-superior-laryngeal",
+    subject: "解剖學",
+    chapter: "頭頸部",
+    section: "喉部神經",
+    primaryTag: "解剖學－頭頸部",
+    stem: "上喉神經外支受損時，下列何種肌肉功能最容易受到影響？",
+    options: {
+      A: "環甲肌",
+      B: "後環杓肌",
+      C: "眼輪匝肌",
+      D: "莖突咽肌"
+    },
+    testedConcept: "imported concept is intentionally ignored"
+  });
+  const sameRegionWrongConcept = makeQuestion({
+    id: "past-exam-superior-thyroid-vein",
+    subject: "解剖學",
+    chapter: "頭頸部",
+    section: "頭頸血管",
+    primaryTag: "解剖學－頭頸部",
+    stem: "上甲狀腺靜脈通常注入下列何者？",
+    options: {
+      A: "外頸靜脈",
+      B: "內頸靜脈",
+      C: "頭臂靜脈",
+      D: "前頸靜脈"
+    }
+  });
+  const index = buildRelatedQuestionIndex([
+    sameConcept,
+    sameRegionWrongConcept,
+    ...makeUnrelatedPastExamQuestions(30)
+  ]);
+
+  const related = getRelatedQuestions(current, index);
+
+  assert.deepEqual(related.map((question) => question.id), [sameConcept.id]);
+});
+
+test("AI 補題不使用候選題 testedConcept 單獨建立關聯", () => {
+  const current = makeQuestion({
+    id: "ai-current-concept",
+    subject: "解剖學",
+    chapter: "AI 模擬卷",
+    section: "AI 模擬卷",
+    sourceType: "AI_GENERATED",
+    stem: "後交通動脈瘤壓迫動眼神經時的瞳孔變化為何？",
+    options: {
+      A: "同側瞳孔散大",
+      B: "同側瞳孔縮小",
+      C: "雙側瞳孔縮小",
+      D: "瞳孔不受影響"
+    },
+    answer: "A",
+    testedConcept: "後交通動脈瘤壓迫動眼神經會使同側瞳孔散大"
+  });
+  const misleadingCandidate = makeQuestion({
+    id: "misleading-imported-concept",
+    subject: "解剖學",
+    chapter: "腹部解剖",
+    section: "腎臟血管",
+    primaryTag: "解剖學－腹部",
+    stem: "腎動脈進入腎門前通常如何分支？",
+    options: {
+      A: "segmental arteries",
+      B: "interlobar veins",
+      C: "arcuate veins",
+      D: "cortical radiate veins"
+    },
+    testedConcept: "後交通動脈瘤壓迫動眼神經會使同側瞳孔散大"
+  });
+  const index = buildRelatedQuestionIndex([
+    misleadingCandidate,
+    ...makeUnrelatedPastExamQuestions(30)
+  ]);
+
+  assert.deepEqual(getRelatedQuestions(current, index), []);
+});
+
+test("AI 補題不把只在候選干擾選項出現一次的詞當成同考點", () => {
+  const current = makeQuestion({
+    id: "ai-external-laryngeal-current",
+    subject: "解剖學",
+    chapter: "AI 模擬卷",
+    section: "AI 模擬卷",
+    sourceType: "AI_GENERATED",
+    stem: "甲狀腺手術後無法唱高音，最可能受傷的神經為何？",
+    options: {
+      A: "喉返神經",
+      B: "上喉神經外支",
+      C: "舌下神經",
+      D: "舌咽神經"
+    },
+    answer: "B",
+    testedConcept: "上喉神經外支支配環甲肌並控制高音"
+  });
+  const distractorOnlyCandidate = makeQuestion({
+    id: "hyoglossus-distractor-only",
+    subject: "解剖學",
+    chapter: "頭頸部",
+    section: "舌骨舌肌",
+    primaryTag: "解剖學－頭頸部",
+    stem: "下列何者走在舌骨舌肌外表面並向前進入下頷舌骨肌深層？",
+    options: {
+      A: "舌動脈",
+      B: "舌咽神經",
+      C: "舌下神經",
+      D: "上喉神經"
+    }
+  });
+  const index = buildRelatedQuestionIndex([
+    distractorOnlyCandidate,
+    ...makeUnrelatedPastExamQuestions(30)
+  ]);
+
+  assert.deepEqual(getRelatedQuestions(current, index), []);
+});
+
+test("AI 補題讓 B19 這類精確識別詞優先於泛用前驅細胞題", () => {
+  const current = makeQuestion({
+    id: "ai-b19-current",
+    subject: "微生物免疫學",
+    chapter: "AI 模擬卷",
+    section: "AI 模擬卷",
+    primaryTag: "病毒學－DNA 病毒",
+    sourceType: "AI_GENERATED",
+    stem: "鐮刀型紅血球疾病患者突然出現再生不良危象，最可能的病毒作用為何？",
+    options: {
+      A: "感染成熟嗜中性球",
+      B: "抑制巨核細胞",
+      C: "感染並抑制紅系前驅細胞",
+      D: "破壞成熟血小板"
+    },
+    answer: "C",
+    testedConcept: "辨認 B19 對紅系前驅細胞的嗜性"
+  });
+  const exactB19Candidate = makeQuestion({
+    id: "past-exam-b19",
+    subject: "微生物免疫學",
+    chapter: "病毒學",
+    section: "DNA 病毒",
+    primaryTag: "病毒學－DNA 病毒",
+    stem: "有關 parvovirus B19 的敘述，下列何者最適當？",
+    options: {
+      A: "為雙股 DNA 病毒",
+      B: "主要經糞口傳染",
+      C: "感染紅血球先驅細胞",
+      D: "造成嬰兒玫瑰疹"
+    },
+    answer: "C"
+  });
+  const genericPrecursorCandidate = makeQuestion({
+    id: "generic-precursor",
+    subject: "微生物免疫學",
+    chapter: "免疫學",
+    section: "造血細胞",
+    primaryTag: "免疫學－免疫細胞",
+    stem: "骨髓系與淋巴系前驅細胞可共同產生下列何種細胞？",
+    options: {
+      A: "樹突細胞",
+      B: "紅血球",
+      C: "血小板",
+      D: "嗜中性球"
+    }
+  });
+  const index = buildRelatedQuestionIndex([
+    exactB19Candidate,
+    genericPrecursorCandidate,
+    ...makeUnrelatedPastExamQuestions(60, "微生物免疫學")
+  ]);
+
+  const related = getRelatedQuestions(current, index);
+
+  assert.equal(related[0]?.id, exactB19Candidate.id);
+});
+
+test("非 AI 題不啟用第二階段補題", () => {
+  const current = makeQuestion({
+    id: "past-exam-current",
+    subject: "解剖學",
+    chapter: "AI 模擬卷",
+    section: "AI 模擬卷",
+    sourceType: "MOEX_PAST_EXAM",
+    stem: "甲狀腺上極手術後無法唱高音，最可能受傷的構造為何？",
+    options: {
+      A: "喉返神經",
+      B: "上喉神經外支",
+      C: "舌下神經",
+      D: "舌咽神經"
+    },
+    answer: "B",
+    testedConcept: "上喉神經外支受傷會造成高音困難"
+  });
+  const fallbackOnlyCandidate = makeQuestion({
+    id: "fallback-only-candidate",
+    subject: "解剖學",
+    chapter: "頭頸部",
+    section: "喉部神經",
+    primaryTag: "解剖學－頭頸部",
+    stem: "上喉神經外支受損時最直接影響何種肌肉？",
+    options: {
+      A: "環甲肌",
+      B: "後環杓肌",
+      C: "眼輪匝肌",
+      D: "頦舌肌"
+    }
+  });
+  const index = buildRelatedQuestionIndex([
+    fallbackOnlyCandidate,
+    ...makeUnrelatedPastExamQuestions(30)
+  ]);
+
+  assert.deepEqual(getRelatedQuestions(current, index), []);
 });
 
 test("類似題優先使用新考點分類，也允許文字證據充分的跨標籤題目", () => {
