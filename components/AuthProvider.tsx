@@ -58,8 +58,6 @@ type RefreshCloudDataOptions = {
 
 const AuthContext = createContext<AuthContextValue | null>(null);
 const CLOUD_RESUME_BACKGROUND_NOTICE_MS = 6500;
-const CLOUD_SYNC_HARD_TIMEOUT_MS = 24000;
-const CLOUD_MANUAL_SYNC_HARD_TIMEOUT_MS = 60000;
 const CLOUD_MANUAL_RESUME_BACKGROUND_NOTICE_MS = 10000;
 const AUTOMATIC_CLOUD_SYNC_COOLDOWN_MS = 5 * 60 * 1000;
 const HISTORY_CLOUD_SYNC_COOLDOWN_MS = 15 * 60 * 1000;
@@ -106,6 +104,10 @@ function withTimeout<T>(promise: Promise<T>, timeoutMs: number, message: string)
       .catch(reject)
       .finally(() => window.clearTimeout(timeoutId));
   });
+}
+
+function hasInFlightSync(syncRef: { current: Promise<void> | null }) {
+  return syncRef.current !== null;
 }
 
 function isPasswordRecoveryRoute() {
@@ -321,7 +323,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [syncError, setSyncError] = useState("");
   const [pendingCompletedUploadCount, setPendingCompletedUploadCount] = useState(0);
   const syncInFlightRef = useRef<Promise<void> | null>(null);
-  const syncStartedAtRef = useRef(0);
   const sessionRef = useRef<Session | null>(null);
   const resumeRefreshAtRef = useRef(0);
   const automaticSyncTimerRef = useRef<
@@ -423,27 +424,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const isHistoryHydration = explicitOptions.historyHydration === true;
     const forceSync = explicitOptions.force === true;
     const readRemoteOnly = explicitOptions.readRemoteOnly === true;
-    const hardTimeoutMs = explicitOptions.uploadAllPending || isHistoryHydration
-      ? CLOUD_MANUAL_SYNC_HARD_TIMEOUT_MS
-      : CLOUD_SYNC_HARD_TIMEOUT_MS;
     const backgroundNoticeMs = explicitOptions.uploadAllPending || isHistoryHydration
       ? CLOUD_MANUAL_RESUME_BACKGROUND_NOTICE_MS
       : CLOUD_RESUME_BACKGROUND_NOTICE_MS;
 
-    if (syncInFlightRef.current && now - syncStartedAtRef.current <= hardTimeoutMs + 1000) {
+    if (syncInFlightRef.current) {
       setSyncStatus("syncing");
       setSyncError("");
       if (!forceSync) return;
 
       const previousSyncTask = syncInFlightRef.current;
       await previousSyncTask.catch(() => undefined);
-      if (syncInFlightRef.current === previousSyncTask) {
-        syncInFlightRef.current = null;
-      }
-    }
-
-    if (syncInFlightRef.current) {
-      syncInFlightRef.current = null;
+      if (hasInFlightSync(syncInFlightRef)) return;
     }
 
     if (
@@ -488,43 +480,40 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setSyncStatus("syncing");
     setSyncError("");
 
-    syncStartedAtRef.current = Date.now();
     const uploadAllPending = explicitOptions.uploadAllPending === true;
     const hydrateRemoteHistory = explicitOptions.hydrateRemoteHistory ?? !uploadAllPending;
 
-    const syncTask = withTimeout(
-      syncLocalCompletedSessionsForCurrentUser(userId, {
-        hydrateRemoteHistory,
-        uploadAllPending,
-        readRemoteOnly,
-        historyMode: explicitOptions.historyMode
-      })
-      .then((completedSessions) => {
-        if (readRemoteOnly) return undefined;
-        void syncLeaderboardProfileForCurrentUser(effectiveUser, completedSessions).catch((error) => {
-          console.error("Leaderboard sync skipped:", error);
+    let syncTask: Promise<void> | null = null;
+    syncTask = (async () => {
+      try {
+        const completedSessions = await syncLocalCompletedSessionsForCurrentUser(userId, {
+          hydrateRemoteHistory,
+          uploadAllPending,
+          readRemoteOnly,
+          historyMode: explicitOptions.historyMode
         });
-        return syncCurrentSessionForCurrentUser(userId);
-      })
-      .then(() => {
+
+        if (!readRemoteOnly) {
+          void syncLeaderboardProfileForCurrentUser(effectiveUser, completedSessions).catch((error) => {
+            console.error("Leaderboard sync skipped:", error);
+          });
+          await syncCurrentSessionForCurrentUser(userId);
+        }
+
         if (explicitOptions.automatic && isHistoryHydration) {
           writeHistoryCloudSyncMarker(userId);
           clearHistoryCloudSyncAttemptMarker(userId);
         }
         setSyncStatus("ready");
         setSyncVersion((value) => value + 1);
-      }),
-      hardTimeoutMs,
-      "雲端同步仍在背景整理，可先使用本機紀錄。"
-    )
-      .catch((error) => {
+      } catch (error) {
         markLocalSyncFallback(error);
-      })
-      .finally(() => {
-        if (syncInFlightRef.current === syncTask) {
+      } finally {
+        if (syncTask && syncInFlightRef.current === syncTask) {
           syncInFlightRef.current = null;
         }
-      });
+      }
+    })();
 
     syncInFlightRef.current = syncTask;
     try {

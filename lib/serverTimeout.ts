@@ -25,3 +25,25 @@ export async function withServerTimeout<T>(
     if (timeoutId) clearTimeout(timeoutId);
   }
 }
+
+export async function withAbortableServerTimeout<T>(
+  task: (signal: AbortSignal) => Promise<T>,
+  timeoutMs: number,
+  message = "伺服器讀取逾時"
+) {
+  const controller = new AbortController();
+  let timeoutId: ReturnType<typeof setTimeout> | undefined;
+  const timeoutPromise = new Promise<never>((_, reject) => {
+    timeoutId = setTimeout(() => {
+      controller.abort();
+      reject(new ServerTimeoutError(message));
+    }, timeoutMs);
+  });
+
+  try {
+    return await Promise.race([task(controller.signal), timeoutPromise]);
+  } finally {
+    if (timeoutId) clearTimeout(timeoutId);
+    controller.abort();
+  }
+}

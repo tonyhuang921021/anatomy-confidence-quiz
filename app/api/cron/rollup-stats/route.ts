@@ -1,7 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
+import { randomUUID } from "node:crypto";
 import { createClient } from "@supabase/supabase-js";
 import { isSupabaseRecoveryMode } from "@/lib/supabase/recoveryMode";
-import { withServerTimeout } from "@/lib/serverTimeout";
+import {
+  isServerTimeoutError,
+  withAbortableServerTimeout
+} from "@/lib/serverTimeout";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
@@ -22,8 +26,9 @@ const INITIAL_LOOKBACK_MS = 24 * 60 * 60 * 1000;
 const CURSOR_OVERLAP_MS = 2 * 60 * 1000;
 const ROLLUP_PAGE_SIZE = 1000;
 const MAX_CHANGED_ATTEMPTS_PER_RUN = 5000;
-const QUESTION_ID_CHUNK_SIZE = 100;
-const ROLLUP_TIMEOUT_MS = 9000;
+const QUESTION_ID_CHUNK_SIZE = 250;
+const ROLLUP_TIMEOUT_MS = 20_000;
+const ROLLUP_LEASE_SECONDS = 180;
 
 function getServiceSupabaseClient() {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
@@ -66,19 +71,20 @@ function normalizeIsoTimestamp(value: unknown) {
   return Number.isNaN(parsed.getTime()) ? null : parsed.toISOString();
 }
 
-async function readRollupCursor(supabase: any) {
+async function readRollupCursor(supabase: any, signal: AbortSignal) {
   const { data, error } = await supabase
     .from("site_settings")
     .select("value")
     .eq("setting_key", ROLLUP_SETTING_KEY)
-    .maybeSingle();
+    .maybeSingle()
+    .abortSignal(signal);
 
   if (error) throw error;
   const value = data?.value as { lastCreatedAt?: unknown } | null | undefined;
   return normalizeIsoTimestamp(value?.lastCreatedAt);
 }
 
-async function writeRollupCursor(supabase: any, lastCreatedAt: string) {
+async function writeRollupCursor(supabase: any, lastCreatedAt: string, signal: AbortSignal) {
   const { error } = await supabase
     .from("site_settings")
     .upsert(
@@ -88,12 +94,18 @@ async function writeRollupCursor(supabase: any, lastCreatedAt: string) {
         updated_at: new Date().toISOString()
       },
       { onConflict: "setting_key" }
-    );
+    )
+    .abortSignal(signal);
 
   if (error) throw error;
 }
 
-async function fetchChangedAttemptRows(supabase: any, since: string, until: string) {
+async function fetchChangedAttemptRows(
+  supabase: any,
+  since: string,
+  until: string,
+  signal: AbortSignal
+) {
   const rows: ChangedAttemptRow[] = [];
 
   for (let from = 0; rows.length < MAX_CHANGED_ATTEMPTS_PER_RUN; from += ROLLUP_PAGE_SIZE) {
@@ -103,7 +115,8 @@ async function fetchChangedAttemptRows(supabase: any, since: string, until: stri
       .gte("created_at", since)
       .lte("created_at", until)
       .order("created_at", { ascending: true })
-      .range(from, from + ROLLUP_PAGE_SIZE - 1);
+      .range(from, from + ROLLUP_PAGE_SIZE - 1)
+      .abortSignal(signal);
 
     if (error) throw error;
 
@@ -115,7 +128,11 @@ async function fetchChangedAttemptRows(supabase: any, since: string, until: stri
   return rows.slice(0, MAX_CHANGED_ATTEMPTS_PER_RUN);
 }
 
-async function refreshQuestionAccuracyStats(supabase: any, questionIds: string[]) {
+async function refreshQuestionAccuracyStats(
+  supabase: any,
+  questionIds: string[],
+  signal: AbortSignal
+) {
   const uniqueQuestionIds = Array.from(new Set(questionIds.map((id) => id.trim()).filter(Boolean)));
   if (uniqueQuestionIds.length === 0) return 0;
 
@@ -132,7 +149,8 @@ async function refreshQuestionAccuracyStats(supabase: any, questionIds: string[]
         .from("question_attempt_logs")
         .select("question_id, is_correct")
         .in("question_id", chunk)
-        .range(from, from + ROLLUP_PAGE_SIZE - 1);
+        .range(from, from + ROLLUP_PAGE_SIZE - 1)
+        .abortSignal(signal);
 
       if (error) throw error;
 
@@ -174,7 +192,11 @@ async function countRows(supabaseQuery: Promise<{ count: number | null; error: u
   return count ?? 0;
 }
 
-async function refreshOwnerDailyStats(supabase: any, dayKeys: string[]) {
+async function refreshOwnerDailyStats(
+  supabase: any,
+  dayKeys: string[],
+  signal: AbortSignal
+) {
   const uniqueDayKeys = Array.from(new Set(dayKeys)).sort();
   if (uniqueDayKeys.length === 0) return 0;
 
@@ -188,6 +210,7 @@ async function refreshOwnerDailyStats(supabase: any, dayKeys: string[]) {
           .select("*", { count: "exact", head: true })
           .gte("answered_at", range.start)
           .lt("answered_at", range.end)
+          .abortSignal(signal)
       ),
       countRows(
         supabase
@@ -196,12 +219,14 @@ async function refreshOwnerDailyStats(supabase: any, dayKeys: string[]) {
           .gte("answered_at", range.start)
           .lt("answered_at", range.end)
           .eq("is_correct", true)
+          .abortSignal(signal)
       ),
       countRows(
         supabase
           .from("question_attempt_device_daily")
           .select("*", { count: "exact", head: true })
           .eq("activity_date", dayKey)
+          .abortSignal(signal)
       )
     ]);
 
@@ -216,10 +241,27 @@ async function refreshOwnerDailyStats(supabase: any, dayKeys: string[]) {
 
   const { error } = await supabase
     .from("owner_daily_stats")
-    .upsert(rows, { onConflict: "activity_date" });
+    .upsert(rows, { onConflict: "activity_date" })
+    .abortSignal(signal);
 
   if (error) throw error;
   return rows.length;
+}
+
+async function acquireRollupLease(supabase: any, owner: string, signal: AbortSignal) {
+  const { data, error } = await supabase.rpc("try_acquire_stats_rollup_lease", {
+    p_owner: owner,
+    p_lease_seconds: ROLLUP_LEASE_SECONDS
+  }).abortSignal(signal);
+  if (error) throw error;
+  return data === true;
+}
+
+async function releaseRollupLease(supabase: any, owner: string, signal: AbortSignal) {
+  const { error } = await supabase.rpc("release_stats_rollup_lease", {
+    p_owner: owner
+  }).abortSignal(signal);
+  if (error) throw error;
 }
 
 export async function GET(request: NextRequest) {
@@ -254,30 +296,46 @@ export async function GET(request: NextRequest) {
     );
   }
 
+  const leaseOwner = randomUUID();
+  let leaseAcquired = false;
+  let timedOut = false;
+
   try {
-    const result = await withServerTimeout(
-      (async () => {
-        const previousCursor = await readRollupCursor(supabase);
+    leaseAcquired = await withAbortableServerTimeout(
+      (signal) => acquireRollupLease(supabase, leaseOwner, signal),
+      5000,
+      "統計彙總 lease 取得逾時"
+    );
+    if (!leaseAcquired) {
+      return NextResponse.json(
+        { ok: true, skipped: true, reason: "lease_busy" },
+        { headers: { "Cache-Control": "no-store" } }
+      );
+    }
+
+    const result = await withAbortableServerTimeout(
+      async (signal) => {
+        const previousCursor = await readRollupCursor(supabase, signal);
         const until = new Date().toISOString();
         const since = new Date(
           previousCursor
             ? new Date(previousCursor).getTime() - CURSOR_OVERLAP_MS
             : Date.now() - INITIAL_LOOKBACK_MS
         ).toISOString();
-        const changedRows = await fetchChangedAttemptRows(supabase, since, until);
+        const changedRows = await fetchChangedAttemptRows(supabase, since, until, signal);
         const questionIds = changedRows.map((row) => row.question_id);
         const dayKeys = changedRows.map((row) => getTaipeiDayKey(new Date(row.answered_at)));
 
         const [questionStatsUpdated, ownerDailyStatsUpdated] = await Promise.all([
-          refreshQuestionAccuracyStats(supabase, questionIds),
-          refreshOwnerDailyStats(supabase, dayKeys)
+          refreshQuestionAccuracyStats(supabase, questionIds, signal),
+          refreshOwnerDailyStats(supabase, dayKeys, signal)
         ]);
 
         const nextCursor =
           changedRows.length >= MAX_CHANGED_ATTEMPTS_PER_RUN
             ? changedRows.at(-1)?.created_at ?? until
             : until;
-        await writeRollupCursor(supabase, nextCursor);
+        await writeRollupCursor(supabase, nextCursor, signal);
 
         return {
           previousCursor,
@@ -286,7 +344,7 @@ export async function GET(request: NextRequest) {
           questionStatsUpdated,
           ownerDailyStatsUpdated
         };
-      })(),
+      },
       ROLLUP_TIMEOUT_MS,
       "統計背景彙總逾時"
     );
@@ -296,10 +354,29 @@ export async function GET(request: NextRequest) {
       { headers: { "Cache-Control": "no-store" } }
     );
   } catch (error) {
+    if (isServerTimeoutError(error)) {
+      timedOut = true;
+      return NextResponse.json(
+        { ok: false, deferred: true, message: error.message },
+        { status: 202, headers: { "Cache-Control": "no-store" } }
+      );
+    }
     const message = error instanceof Error ? error.message : "統計背景彙總失敗";
     return NextResponse.json(
       { ok: false, message },
       { status: 500, headers: { "Cache-Control": "no-store" } }
     );
+  } finally {
+    if (leaseAcquired && !timedOut) {
+      try {
+        await withAbortableServerTimeout(
+          (signal) => releaseRollupLease(supabase, leaseOwner, signal),
+          3000,
+          "統計彙總 lease 釋放逾時"
+        );
+      } catch (releaseError) {
+        console.error("統計彙總 lease 釋放失敗：", releaseError);
+      }
+    }
   }
 }
