@@ -336,6 +336,7 @@ type WeaknessQuestionOrderInput = {
   subject: SubjectName;
   primaryTag: string;
   questionIds?: string[];
+  prioritizeUnseen?: boolean;
 };
 
 export function buildWeaknessQuestionOrder({
@@ -343,7 +344,8 @@ export function buildWeaknessQuestionOrder({
   sessions,
   subject,
   primaryTag,
-  questionIds
+  questionIds,
+  prioritizeUnseen = false
 }: WeaknessQuestionOrderInput) {
   const explicitQuestionIds = questionIds ? new Set(questionIds) : null;
   const candidates = questions.filter(
@@ -412,5 +414,10 @@ export function buildWeaknessQuestionOrder({
     order.push(...stableSeen.map((question) => question.id));
   }
 
-  return order;
+  if (!prioritizeUnseen) return order;
+
+  return [
+    ...order.filter((questionId) => !history.has(questionId)),
+    ...order.filter((questionId) => history.has(questionId))
+  ];
 }

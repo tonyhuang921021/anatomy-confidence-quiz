@@ -4,6 +4,10 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 import { useAuth } from "@/components/AuthProvider";
+import {
+  QuestionOrderModeControl,
+  useQuestionOrderMode
+} from "@/components/QuestionOrderModeControl";
 import { useCloudHistoryHydration } from "@/components/useCloudHistoryHydration";
 import { MED1_SUBJECTS, MED2_SUBJECTS, subjectRegistry } from "@/data/subjectRegistry";
 import {
@@ -117,6 +121,8 @@ export default function ProgressPage() {
   const [historyOwnerKey, setHistoryOwnerKey] = useState<string | null>(null);
   const [openGroups, setOpenGroups] = useState<Record<string, boolean>>({ med1: true, med2: true });
   const [openSubjects, setOpenSubjects] = useState<Record<string, boolean>>({});
+  const { mode: questionOrderMode, setMode: setQuestionOrderMode, prioritizeUnseen } =
+    useQuestionOrderMode();
   const activeHistoryOwnerKey = user?.id ?? "__guest__";
 
   useEffect(() => {
@@ -170,7 +176,8 @@ export default function ProgressPage() {
       sessions,
       subject,
       primaryTag: practiceLabel,
-      questionIds: block.questionIds
+      questionIds: block.questionIds,
+      prioritizeUnseen
     });
     if (questionOrder.length === 0) return;
 
@@ -212,6 +219,12 @@ export default function ProgressPage() {
             </Link>
           </div>
         </div>
+
+        <QuestionOrderModeControl
+          mode={questionOrderMode}
+          onChange={setQuestionOrderMode}
+          className="mt-6 border-y border-slate-100 py-5"
+        />
 
         {showHistoryLoading ? (
           <div className="mt-6 rounded-3xl bg-slate-50 p-5 text-sm text-slate-700">

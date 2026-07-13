@@ -4,6 +4,10 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useAuth } from "@/components/AuthProvider";
+import {
+  QuestionOrderModeControl,
+  useQuestionOrderMode
+} from "@/components/QuestionOrderModeControl";
 import { useCloudHistoryHydration } from "@/components/useCloudHistoryHydration";
 import { MED1_SUBJECTS, MED2_SUBJECTS, subjectRegistry } from "@/data/subjectRegistry";
 import { buildNewQuizHref } from "@/lib/startSettingsUrl";
@@ -64,6 +68,8 @@ export default function WeaknessAnalysisPage() {
   const [sessions, setSessions] = useState<QuizSession[]>([]);
   const [result, setResult] = useState<WeaknessAnalysisResult | null>(null);
   const [expandedSubject, setExpandedSubject] = useState<SubjectName | null>(null);
+  const { mode: questionOrderMode, setMode: setQuestionOrderMode, prioritizeUnseen } =
+    useQuestionOrderMode();
   const [progress, setProgress] = useState<AnalysisProgress>({
     stage: "syncing",
     message: "正在讀取完整作答紀錄",
@@ -181,7 +187,8 @@ export default function WeaknessAnalysisPage() {
       questions: ALL_ANALYSIS_QUESTIONS,
       sessions,
       subject: concept.subject,
-      primaryTag: concept.primaryTag
+      primaryTag: concept.primaryTag,
+      prioritizeUnseen
     });
     if (questionOrder.length === 0) return;
 
@@ -250,6 +257,11 @@ export default function WeaknessAnalysisPage() {
               資料截至 {formatDateTime(result.dataThrough)} ・ 完整紀錄 {result.totalHistoryAttempts.toLocaleString("zh-TW")} 筆
               ・ 近 14 天 {result.recentUniqueQuestions.toLocaleString("zh-TW")} 題不同題目
             </p>
+            <QuestionOrderModeControl
+              mode={questionOrderMode}
+              onChange={setQuestionOrderMode}
+              className="mt-5 border-y border-slate-200 py-5"
+            />
             <div className="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
               {result.subjectSummaries.map((summary) => {
                 const expanded = expandedSubject === summary.subject;

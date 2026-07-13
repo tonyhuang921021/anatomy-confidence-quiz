@@ -193,6 +193,30 @@ test("複習題目先看近年，再以未做題為主並穿插仍易錯題", ()
   assert.deepEqual(order, ["new-1", "new-2", "risk", "new-3", "stable", "older-new"]);
 });
 
+test("開啟未做題優先時，跨年份也會先排從未作答的題目", () => {
+  const questions = [
+    makeQuestion("recent-risk", undefined, 2026, 1),
+    makeQuestion("recent-stable", undefined, 2026, 2),
+    makeQuestion("older-new", undefined, 2025, 1)
+  ];
+  const sessions = [
+    makeSession("history", [
+      makeAttempt("recent-risk", false, "2026-07-01T12:00:00.000Z", 4),
+      makeAttempt("recent-stable", true, "2026-07-01T12:00:00.000Z", 4)
+    ])
+  ];
+
+  const order = buildWeaknessQuestionOrder({
+    questions,
+    sessions,
+    subject: "生理學",
+    primaryTag: "生理學－腎臟、水電解質與酸鹼",
+    prioritizeUnseen: true
+  });
+
+  assert.deepEqual(order, ["older-new", "recent-risk", "recent-stable"]);
+});
+
 test("弱點複習使用可中斷且會正常記錄的獨立題池設定", () => {
   const settings = buildWeaknessPracticeSettings({
     subject: "生理學",
