@@ -1676,6 +1676,7 @@ export function loadCompletedSessionsForUser(
   if (!isBrowser()) return [];
   const cachedSessions = completedSessionsMemoryCache.get(userId);
   if (cachedSessions && !options.includeFullLocalHistory) return cachedSessions;
+  const memorySessions = cachedSessions ?? [];
 
   const cloudSessions = loadCloudCompletedSessionsForUser(userId);
   const handoffSessions = loadRecentCompletedSessionHandoffForUser(userId);
@@ -1692,6 +1693,7 @@ export function loadCompletedSessionsForUser(
     (userId === GUEST_USER_ID ? getLegacyOrScopedRaw(COMPLETED_SESSIONS_KEY) : null);
   if (!raw) {
     const normalized = normalizeCompletedSessionList([
+      ...memorySessions,
       ...sessionStorageSessions,
       ...handoffSessions,
       ...cloudSessions,
@@ -1704,6 +1706,7 @@ export function loadCompletedSessionsForUser(
   if (raw.length > COMPLETED_SESSIONS_HEAVY_READ_LIMIT) {
     if (raw.length > COMPLETED_SESSIONS_UPLOAD_RECOVERY_READ_LIMIT && !options.includeFullLocalHistory) {
       const normalized = normalizeCompletedSessionList([
+        ...memorySessions,
         ...sessionStorageSessions,
         ...handoffSessions,
         ...cloudSessions,
@@ -1718,6 +1721,7 @@ export function loadCompletedSessionsForUser(
     }
 
     const normalized = normalizeCompletedSessionList([
+      ...memorySessions,
       ...parseCompletedSessionsRaw(raw),
       ...sessionStorageSessions,
       ...handoffSessions,
@@ -1729,6 +1733,7 @@ export function loadCompletedSessionsForUser(
   }
 
   const normalized = normalizeCompletedSessionList([
+    ...memorySessions,
     ...parseCompletedSessionsRaw(raw),
     ...sessionStorageSessions,
     ...handoffSessions,

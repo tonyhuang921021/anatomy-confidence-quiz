@@ -69,12 +69,20 @@ function createStorageMock(options: { failWrites?: boolean; maxBytes?: number } 
   } as Storage;
 }
 
-function installBrowserStorage(options: { failLocalWrites?: boolean; maxLocalBytes?: number } = {}) {
+function installBrowserStorage(options: {
+  failLocalWrites?: boolean;
+  failSessionWrites?: boolean;
+  maxLocalBytes?: number;
+  maxSessionBytes?: number;
+} = {}) {
   const localStorage = createStorageMock({
     failWrites: options.failLocalWrites,
     maxBytes: options.maxLocalBytes
   });
-  const sessionStorage = createStorageMock();
+  const sessionStorage = createStorageMock({
+    failWrites: options.failSessionWrites,
+    maxBytes: options.maxSessionBytes
+  });
   const listeners = new Map<string, Set<EventListener>>();
   const windowMock = {
     localStorage,
@@ -475,6 +483,37 @@ test("儲存空間不足時優先清除可重抓雲端快取並保住待補傳�
     sessionStorage.getItem(`anatomy-confidence-pending-completed-session-uploads:${userId}`),
     null
   );
+});
+
+test("瀏覽器空間已滿時完整歷史仍保留記憶體中的最新雲端結果", () => {
+  const { localStorage } = installBrowserStorage({
+    maxLocalBytes: 4_000,
+    maxSessionBytes: 1_000
+  });
+  const userId = "user-memory-cloud-results";
+  const olderSession = makeSession("older-local-session", ["q-older"]);
+  const latestCloudSession = {
+    ...makeSession("latest-cloud-session", ["q-latest"]),
+    completedAt: new Date(Date.UTC(2026, 6, 13)).toISOString(),
+    settings: {
+      ...makeSession("latest-cloud-session", ["q-latest"]).settings!,
+      mode: "simulation" as const,
+      sessionName: "最新雲端模擬考".repeat(500)
+    }
+  } satisfies QuizSession;
+
+  saveCompletedSessionsForUser(userId, [olderSession]);
+  assert.ok(localStorage.getItem(`anatomy-confidence-completed-sessions:${userId}`));
+
+  assert.equal(saveCloudCompletedSessionsForUser(userId, [latestCloudSession]), false);
+
+  const loadedIds = new Set(
+    loadCompletedSessionsForUser(userId, { includeFullLocalHistory: true }).map(
+      (session) => session.id
+    )
+  );
+  assert.ok(loadedIds.has("older-local-session"));
+  assert.ok(loadedIds.has("latest-cloud-session"));
 });
 
 test("共享詳解較舊時，不會覆蓋本機較新的 AI 詳解", () => {
