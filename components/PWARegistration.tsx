@@ -4,6 +4,7 @@ import { useEffect } from "react";
 import { isSupabaseRecoveryMode } from "@/lib/supabase/recoveryMode";
 
 const RECOVERY_SW_RELOAD_KEY = "pwa-recovery-sw-reload-v2";
+const SAFARI_SW_RELOAD_KEY = "pwa-safari-sw-reload-v1";
 
 function isSafariBrowser() {
   if (typeof navigator === "undefined") return false;
@@ -27,7 +28,10 @@ export function PWARegistration() {
       return;
     }
 
-    const disableServiceWorker = async (reloadControlledPage = false) => {
+    const disableServiceWorker = async (
+      reloadControlledPage = false,
+      reloadKey = RECOVERY_SW_RELOAD_KEY
+    ) => {
       const hasController = Boolean(navigator.serviceWorker.controller);
       try {
         const registrations = await navigator.serviceWorker.getRegistrations();
@@ -39,8 +43,8 @@ export function PWARegistration() {
 
       if (!reloadControlledPage || !hasController) return;
       try {
-        if (sessionStorage.getItem(RECOVERY_SW_RELOAD_KEY) === "done") return;
-        sessionStorage.setItem(RECOVERY_SW_RELOAD_KEY, "done");
+        if (sessionStorage.getItem(reloadKey) === "done") return;
+        sessionStorage.setItem(reloadKey, "done");
         window.location.reload();
       } catch {
         window.location.reload();
@@ -55,7 +59,7 @@ export function PWARegistration() {
         }
 
         if (isSafariBrowser()) {
-          await disableServiceWorker(false);
+          await disableServiceWorker(true, SAFARI_SW_RELOAD_KEY);
           return;
         }
 
