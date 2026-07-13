@@ -49,7 +49,14 @@ import {
   getCanonicalQuestionBank
 } from "@/data/med1QuestionBank";
 import { subjectRegistry } from "@/data/subjectRegistry";
-import { compactSearchText, normalizeSearchText } from "@/lib/searchTextNormalization";
+import {
+  buildQuestionSearchIndexEntry,
+  filterAndSortQuestionSearch,
+  isQuestionSearchStatsSort,
+  type QuestionSearchRanking,
+  type QuestionSearchSort
+} from "@/lib/questionSearch";
+import { loadQuestionSearchRankings } from "@/lib/questionSearchRankings";
 import {
   OptionKey,
   Question,
@@ -70,12 +77,6 @@ const SEARCHABLE_SUBJECTS = Object.values(subjectRegistry)
 const OPTION_KEYS = ["A", "B", "C", "D", "E"] as const;
 const PAGE_SIZE = 30;
 
-type SearchIndexEntry = {
-  question: Question;
-  normalizedTerms: string;
-  compactTerms: string;
-};
-
 type SearchFavoriteRecord = SavedQuestionRecord;
 
 type FavoriteAnswerFeedback = {
@@ -83,87 +84,6 @@ type FavoriteAnswerFeedback = {
   answer: OptionKey;
   isCorrect: boolean;
 };
-
-function getSearchTerms(question: Question) {
-  const examCode = question.examCode ? String(question.examCode) : "";
-  const paperCode = question.paperCode ? String(question.paperCode) : "";
-  const questionCode = question.id.match(/Q\d+$/)?.[0] ?? "";
-
-  return [
-    question.id,
-    question.sourceCitation,
-    examCode,
-    paperCode,
-    examCode && paperCode ? `${examCode}-${paperCode}` : "",
-    examCode && paperCode ? `${examCode}_${paperCode}` : "",
-    examCode && paperCode ? `${examCode} ${paperCode}` : "",
-    examCode && paperCode ? `${examCode}${paperCode}` : "",
-    questionCode,
-    question.subject,
-    question.chapter,
-    question.section,
-    getQuestionPrimaryTag(question),
-    question.testedConcept,
-    question.stem,
-    question.explanation,
-    question.memoryTip,
-    ...Object.values(question.optionAnalysis ?? {}),
-    ...Object.values(question.options)
-  ].filter((value): value is string => Boolean(value));
-}
-
-function buildSearchIndexEntry(question: Question): SearchIndexEntry {
-  const joinedTerms = getSearchTerms(question).join(" ");
-  return {
-    question,
-    normalizedTerms: normalizeSearchText(joinedTerms),
-    compactTerms: compactSearchText(joinedTerms)
-  };
-}
-
-function matchesSearchIndexEntry(entry: SearchIndexEntry, normalizedKeyword: string, compactKeyword: string) {
-  if (!normalizedKeyword) return true;
-
-  if (entry.normalizedTerms.includes(normalizedKeyword)) return true;
-
-  return compactKeyword.length > 0 && entry.compactTerms.includes(compactKeyword);
-}
-
-function compareQuestionsForSearch(left: Question, right: Question, yearSortOrder: "desc" | "asc") {
-  const yearLeft = left.sourceYear ?? (yearSortOrder === "desc" ? -Infinity : Infinity);
-  const yearRight = right.sourceYear ?? (yearSortOrder === "desc" ? -Infinity : Infinity);
-  if (yearLeft !== yearRight) {
-    return yearSortOrder === "desc" ? yearRight - yearLeft : yearLeft - yearRight;
-  }
-
-  const examLeft = left.examCode ?? "";
-  const examRight = right.examCode ?? "";
-  if (examLeft !== examRight) {
-    return yearSortOrder === "desc"
-      ? examRight.localeCompare(examLeft)
-      : examLeft.localeCompare(examRight);
-  }
-
-  const paperLeft = left.paperCode ?? "";
-  const paperRight = right.paperCode ?? "";
-  if (paperLeft !== paperRight) {
-    return yearSortOrder === "desc"
-      ? paperRight.localeCompare(paperLeft)
-      : paperLeft.localeCompare(paperRight);
-  }
-
-  const questionNoLeft = left.originalQuestionNumber ?? (yearSortOrder === "desc" ? -Infinity : Infinity);
-  const questionNoRight = right.originalQuestionNumber ?? (yearSortOrder === "desc" ? -Infinity : Infinity);
-  if (questionNoLeft !== questionNoRight) {
-    return yearSortOrder === "desc"
-      ? questionNoRight - questionNoLeft
-      : questionNoLeft - questionNoRight;
-  }
-
-  return yearSortOrder === "desc"
-    ? right.id.localeCompare(left.id)
-    : left.id.localeCompare(right.id);
-}
 
 function mergeQuestionExplanationOverride(
   question: Question,
@@ -203,7 +123,11 @@ export default function SearchPage() {
   const [selectedSubject, setSelectedSubject] = useState("全部");
   const [keyword, setKeyword] = useState("");
   const [selectedYear, setSelectedYear] = useState("全部");
-  const [yearSortOrder, setYearSortOrder] = useState<"desc" | "asc">("desc");
+  const [sortMode, setSortMode] = useState<QuestionSearchSort>("recent");
+  const [rankingStats, setRankingStats] = useState<Record<string, QuestionSearchRanking>>({});
+  const [rankingStatsAttempted, setRankingStatsAttempted] = useState(false);
+  const [rankingStatsLoading, setRankingStatsLoading] = useState(false);
+  const [rankingStatsError, setRankingStatsError] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [explanationOverrides, setExplanationOverrides] = useState<Record<string, QuestionExplanationOverride>>({});
   const [explanationLoadingMap, setExplanationLoadingMap] = useState<Record<string, boolean>>({});
@@ -221,8 +145,6 @@ export default function SearchPage() {
   const deferredKeyword = useDeferredValue(debouncedKeyword);
   const isKeywordPending = keyword !== debouncedKeyword || debouncedKeyword !== deferredKeyword;
 
-  const normalizedKeyword = normalizeSearchText(deferredKeyword);
-  const compactKeyword = compactSearchText(deferredKeyword);
   const allQuestions = useMemo(
     () =>
       Array.from(
@@ -236,15 +158,8 @@ export default function SearchPage() {
   );
   const questionById = useMemo(() => new Map(allQuestions.map((question) => [question.id, question])), [allQuestions]);
   const searchIndex = useMemo(
-    () => allQuestions.map((question) => buildSearchIndexEntry(question)),
+    () => allQuestions.map((question) => buildQuestionSearchIndexEntry(question)),
     [allQuestions]
-  );
-  const sortedSearchIndex = useMemo(
-    () =>
-      [...searchIndex].sort((left, right) =>
-        compareQuestionsForSearch(left.question, right.question, yearSortOrder)
-      ),
-    [searchIndex, yearSortOrder]
   );
   const yearOptions = useMemo(
     () =>
@@ -254,13 +169,39 @@ export default function SearchPage() {
             (year): year is number => typeof year === "number"
           )
         )
-      ).sort((a, b) => (yearSortOrder === "desc" ? b - a : a - b)),
-    [allQuestions, yearSortOrder]
+      ).sort((a, b) => b - a),
+    [allQuestions]
   );
 
   useEffect(() => {
     setCurrentPage(1);
-  }, [keyword, selectedSubject, selectedYear, yearSortOrder]);
+  }, [keyword, selectedSubject, selectedYear, sortMode]);
+
+  useEffect(() => {
+    if (!isQuestionSearchStatsSort(sortMode) || rankingStatsAttempted) return;
+    let cancelled = false;
+    setRankingStatsLoading(true);
+    setRankingStatsError("");
+    void loadQuestionSearchRankings()
+      .then((payload) => {
+        if (cancelled) return;
+        setRankingStats(payload.rankings);
+        setRankingStatsAttempted(true);
+        setRankingStatsError(payload.degraded ? payload.message || "統計排序暫時無法載入。" : "");
+      })
+      .catch((error) => {
+        if (!cancelled) {
+          setRankingStatsAttempted(true);
+          setRankingStatsError(error instanceof Error ? error.message : "統計排序暫時無法載入。");
+        }
+      })
+      .finally(() => {
+        if (!cancelled) setRankingStatsLoading(false);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [rankingStatsAttempted, sortMode]);
 
   useEffect(() => {
     setExplanationOverrides((current) =>
@@ -277,15 +218,15 @@ export default function SearchPage() {
   }, []);
 
   const filteredResults = useMemo(() => {
-    return sortedSearchIndex
-      .filter((entry) => {
-        const { question } = entry;
-        if (selectedSubject !== "全部" && question.subject !== selectedSubject) return false;
-        if (selectedYear !== "全部" && String(question.sourceYear ?? "") !== selectedYear) return false;
-        return matchesSearchIndexEntry(entry, normalizedKeyword, compactKeyword);
-      })
-      .map((entry) => entry.question);
-  }, [compactKeyword, normalizedKeyword, selectedSubject, selectedYear, sortedSearchIndex]);
+    return filterAndSortQuestionSearch({
+      entries: searchIndex,
+      keyword: deferredKeyword,
+      subject: selectedSubject,
+      year: selectedYear,
+      sort: sortMode,
+      rankings: rankingStats
+    });
+  }, [deferredKeyword, rankingStats, searchIndex, selectedSubject, selectedYear, sortMode]);
 
   const totalMatches = filteredResults.length;
   const totalPages = Math.max(1, Math.ceil(totalMatches / PAGE_SIZE));
@@ -576,34 +517,63 @@ export default function SearchPage() {
     }
   }
 
+  const hasActiveSearchFilters =
+    keyword.trim().length > 0 ||
+    selectedSubject !== "全部" ||
+    selectedYear !== "全部" ||
+    sortMode !== "recent";
+
+  function resetSearchFilters() {
+    setKeyword("");
+    setSelectedSubject("全部");
+    setSelectedYear("全部");
+    setSortMode("recent");
+  }
+
+  function retryRankingStats() {
+    setRankingStatsError("");
+    setRankingStatsAttempted(false);
+  }
+
   return (
     <main className="shell search-page">
-      <section className="min-w-0 max-w-full rounded-[2rem] bg-white p-5 shadow-card ring-1 ring-slate-100 sm:p-7">
-        <div className="flex flex-wrap items-center justify-between gap-3">
-          <div>
-            <p className="text-sm font-semibold uppercase tracking-[0.2em] text-brand-700">Question Search</p>
-            <h1 className="mt-2 text-3xl font-bold text-ink sm:text-4xl">題目搜尋</h1>
-            <p className="mt-3 text-sm leading-7 text-slate-500">
-              可先分科目，也可以直接用關鍵字和年份找題。
-            </p>
+      <section className="min-w-0 max-w-full overflow-hidden rounded-2xl bg-white shadow-card ring-1 ring-slate-200/70">
+        <div className="border-b border-slate-100 px-5 py-5 sm:px-7 sm:py-6">
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <div>
+              <p className="text-xs font-semibold uppercase tracking-[0.2em] text-brand-700">Question Search</p>
+              <h1 className="mt-1 text-2xl font-bold text-ink sm:text-3xl">題目搜尋</h1>
+            </div>
+            <Link
+              href="/"
+              className="inline-flex min-h-11 items-center rounded-xl bg-slate-100 px-4 py-2 text-sm font-semibold text-slate-800 transition hover:bg-slate-200"
+            >
+              返回首頁
+            </Link>
           </div>
-          <Link
-            href="/"
-            className="min-h-12 rounded-2xl bg-slate-100 px-4 py-3 text-sm font-semibold text-slate-800 transition hover:bg-slate-200"
-          >
-            返回首頁
-          </Link>
         </div>
 
-        <div className="mt-6 grid min-w-0 gap-4 lg:grid-cols-[minmax(0,1.2fr)_minmax(0,1fr)_minmax(0,0.8fr)_minmax(0,1fr)]">
-          <label className="space-y-2">
+        <div className="grid min-w-0 gap-4 px-5 py-5 sm:px-7 sm:py-6 lg:grid-cols-[minmax(16rem,1.45fr)_minmax(10rem,0.8fr)_minmax(9rem,0.62fr)_minmax(13rem,0.95fr)]">
+          <label className="min-w-0 space-y-2">
             <span className="text-sm font-semibold text-slate-700">關鍵字</span>
-            <input
-              value={keyword}
-              onChange={(event) => setKeyword(event.target.value)}
-              placeholder="可搜題幹、選項、章節、考點"
-              className="min-h-12 w-full rounded-2xl border border-slate-200 px-4 py-3 text-sm text-slate-800 outline-none transition focus:border-brand-400 focus:ring-2 focus:ring-brand-100"
-            />
+            <span className="relative block">
+              <input
+                value={keyword}
+                onChange={(event) => setKeyword(event.target.value)}
+                placeholder="題幹、選項、章節或題號"
+                className="min-h-12 w-full rounded-xl border border-slate-200 bg-slate-50/70 px-4 py-3 pr-14 text-sm text-slate-800 outline-none transition focus:border-brand-400 focus:bg-white focus:ring-2 focus:ring-brand-100"
+              />
+              {keyword ? (
+                <button
+                  type="button"
+                  onClick={() => setKeyword("")}
+                  className="absolute right-2 top-1/2 min-h-9 -translate-y-1/2 rounded-lg px-3 text-xs font-semibold text-slate-500 transition hover:bg-slate-200 hover:text-slate-800"
+                  aria-label="清除關鍵字"
+                >
+                  清除
+                </button>
+              ) : null}
+            </span>
           </label>
 
           <label className="space-y-2">
@@ -611,7 +581,7 @@ export default function SearchPage() {
             <select
               value={selectedSubject}
               onChange={(event) => setSelectedSubject(event.target.value)}
-              className="min-h-12 w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-800 outline-none transition focus:border-brand-400 focus:ring-2 focus:ring-brand-100"
+              className="min-h-12 w-full rounded-xl border border-slate-200 bg-slate-50/70 px-4 py-3 text-sm text-slate-800 outline-none transition focus:border-brand-400 focus:bg-white focus:ring-2 focus:ring-brand-100"
             >
               <option value="全部">全部科目</option>
               {SEARCHABLE_SUBJECTS.map((subject) => (
@@ -627,7 +597,7 @@ export default function SearchPage() {
             <select
               value={selectedYear}
               onChange={(event) => setSelectedYear(event.target.value)}
-              className="min-h-12 w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-800 outline-none transition focus:border-brand-400 focus:ring-2 focus:ring-brand-100"
+              className="min-h-12 w-full rounded-xl border border-slate-200 bg-slate-50/70 px-4 py-3 text-sm text-slate-800 outline-none transition focus:border-brand-400 focus:bg-white focus:ring-2 focus:ring-brand-100"
             >
               <option value="全部">全部年份</option>
               {yearOptions.map((year) => (
@@ -638,43 +608,46 @@ export default function SearchPage() {
             </select>
           </label>
 
-          <fieldset className="space-y-2">
-            <legend className="text-sm font-semibold text-slate-700">年份排序</legend>
-            <div className="grid min-h-12 grid-cols-2 gap-2 rounded-2xl border border-slate-200 bg-slate-50 p-2">
-              <label className="flex cursor-pointer items-center gap-2 rounded-xl bg-white px-3 py-2 text-sm text-slate-700 ring-1 ring-slate-200">
-                <input
-                  type="radio"
-                  name="year-sort-order"
-                  checked={yearSortOrder === "desc"}
-                  onChange={() => setYearSortOrder("desc")}
-                  className="h-4 w-4 accent-slate-900"
-                />
-                由近至遠
-              </label>
-              <label className="flex cursor-pointer items-center gap-2 rounded-xl bg-white px-3 py-2 text-sm text-slate-700 ring-1 ring-slate-200">
-                <input
-                  type="radio"
-                  name="year-sort-order"
-                  checked={yearSortOrder === "asc"}
-                  onChange={() => setYearSortOrder("asc")}
-                  className="h-4 w-4 accent-slate-900"
-                />
-                由遠至近
-              </label>
-            </div>
-          </fieldset>
+          <label className="space-y-2">
+            <span className="text-sm font-semibold text-slate-700">排序</span>
+            <select
+              value={sortMode}
+              onChange={(event) => setSortMode(event.target.value as QuestionSearchSort)}
+              className="min-h-12 w-full rounded-xl border border-slate-200 bg-slate-50/70 px-4 py-3 text-sm text-slate-800 outline-none transition focus:border-brand-400 focus:bg-white focus:ring-2 focus:ring-brand-100"
+            >
+              <option value="recent">近年優先</option>
+              <option value="oldest">早年優先</option>
+              <option value="accuracy_asc">答對率低到高</option>
+              <option value="accuracy_desc">答對率高到低</option>
+              <option value="chaos_desc">最多人「這題我們不要了」</option>
+            </select>
+          </label>
         </div>
 
-        <div className="mt-5 flex flex-wrap gap-2 text-sm font-semibold">
-          {isKeywordPending ? (
-            <span className="rounded-full bg-amber-50 px-3 py-1 text-amber-800 ring-1 ring-amber-100">
-              搜尋整理中
-            </span>
+        <div className="flex min-h-14 flex-wrap items-center justify-between gap-3 border-t border-slate-100 bg-slate-50/70 px-5 py-3 sm:px-7">
+          <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-sm">
+            <span className="font-semibold text-slate-800">找到 {totalMatches} 題</span>
+            <span className="text-slate-500">第 {safeCurrentPage} / {totalPages} 頁</span>
+            {isKeywordPending ? <span className="font-semibold text-amber-700">搜尋整理中</span> : null}
+            {rankingStatsLoading ? <span className="font-semibold text-brand-700">排行載入中</span> : null}
+            {rankingStatsError ? (
+              <span className="flex flex-wrap items-center gap-2 text-amber-800">
+                <span>{rankingStatsError}</span>
+                <button type="button" onClick={retryRankingStats} className="font-semibold underline underline-offset-2">
+                  重試
+                </button>
+              </span>
+            ) : null}
+          </div>
+          {hasActiveSearchFilters ? (
+            <button
+              type="button"
+              onClick={resetSearchFilters}
+              className="min-h-10 rounded-xl bg-white px-4 py-2 text-sm font-semibold text-slate-700 ring-1 ring-slate-200 transition hover:bg-slate-100"
+            >
+              清除篩選
+            </button>
           ) : null}
-          <span className="rounded-full bg-slate-100 px-3 py-1 text-slate-700">找到 {totalMatches} 題</span>
-          <span className="rounded-full bg-slate-100 px-3 py-1 text-slate-700">
-            第 {safeCurrentPage} / {totalPages} 頁
-          </span>
         </div>
       </section>
 
@@ -695,6 +668,7 @@ export default function SearchPage() {
             const favoriteRecord = searchFavorites[renderedQuestion.id];
             const isFavorited = Boolean(favoriteRecord);
             const isExpanded = Boolean(expandedQuestionIds[renderedQuestion.id]);
+            const ranking = rankingStats[renderedQuestion.id];
 
             return (
             <details
@@ -709,10 +683,10 @@ export default function SearchPage() {
                   };
                 });
               }}
-              className="search-result-card min-w-0 max-w-full overflow-hidden rounded-[2rem] bg-white p-4 shadow-card ring-1 ring-slate-100 sm:p-5"
+              className="search-result-card min-w-0 max-w-full overflow-hidden rounded-2xl bg-white shadow-card ring-1 ring-slate-200/70"
             >
-              <summary className="min-w-0 cursor-pointer list-none">
-                <div className="flex min-w-0 flex-wrap items-start justify-between gap-3">
+              <summary className="min-w-0 cursor-pointer list-none px-4 py-4 transition hover:bg-slate-50/70 sm:px-5">
+                <div className="flex min-w-0 flex-wrap items-start justify-between gap-4">
                   <div className="min-w-0 flex-1">
                     <div className="flex flex-wrap gap-2 text-xs font-semibold">
                       {shouldDisplaySubjectBesidePrimaryTag(renderedQuestion) ? (
@@ -725,7 +699,7 @@ export default function SearchPage() {
                       </span>
                       <QuestionPrimaryTagBadge question={renderedQuestion} />
                     </div>
-                    <p className="mt-3 whitespace-pre-wrap break-words text-base font-semibold leading-7 text-ink">
+                    <p className={`mt-3 whitespace-pre-wrap break-words text-base font-semibold leading-7 text-ink ${isExpanded ? "" : "line-clamp-2"}`}>
                       {renderedQuestion.stem}
                     </p>
                     <p className="mt-2 text-xs text-slate-500">
@@ -735,14 +709,26 @@ export default function SearchPage() {
                         : ""}
                     </p>
                   </div>
-                  <span className="rounded-full bg-slate-900 px-3 py-1 text-xs font-semibold text-white">
-                    展開
-                  </span>
+                  <div className="flex w-full flex-wrap items-center gap-2 text-xs font-semibold sm:w-auto sm:shrink-0 sm:justify-end">
+                    {ranking && ranking.totalAttempts > 0 ? (
+                      <span className="rounded-lg bg-sky-50 px-2.5 py-1.5 text-sky-800 ring-1 ring-sky-100">
+                        答對率 {ranking.correctRate.toFixed(1)}% ・ {ranking.totalAttempts} 人次
+                      </span>
+                    ) : null}
+                    {ranking && ranking.chaosCount > 0 ? (
+                      <span className="rounded-lg bg-rose-50 px-2.5 py-1.5 text-rose-800 ring-1 ring-rose-100">
+                        不要了 {ranking.chaosCount} 人
+                      </span>
+                    ) : null}
+                    <span className="rounded-lg bg-slate-900 px-3 py-1.5 text-white">
+                      {isExpanded ? "收合" : "展開"}
+                    </span>
+                  </div>
                 </div>
               </summary>
 
               {isExpanded ? (
-              <div className="mt-5 min-w-0 max-w-full space-y-4 text-sm leading-7 text-slate-700">
+              <div className="min-w-0 max-w-full space-y-4 border-t border-slate-100 px-4 py-5 text-sm leading-7 text-slate-700 sm:px-5">
                 <QuestionStemBlock question={renderedQuestion} />
                 <div className="flex flex-wrap items-center gap-2">
                   <CopyQuestionPromptButton question={renderedQuestion} />
