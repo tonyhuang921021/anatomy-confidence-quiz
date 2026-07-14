@@ -18,6 +18,7 @@ export function buildSavedQuestionReviewSettings(questions: Question[]): QuizSet
     sessionName: "儲存題目複習",
     subjectFilter: subjectFilters.length === 1 ? subjectFilters[0] : "全部",
     subjectFilters,
+    excludeAiGenerated: false,
     excludePreviouslyAnswered: false,
     strictCustomQuestionPool: true,
     customQuestionIds: uniqueQuestions.map((question) => question.id),

@@ -30,6 +30,7 @@ test("儲存題目複習只建立獨立 review 題池並保留完整題號", () 
   assert.equal(settings.mode, "review");
   assert.equal(settings.customPoolLabel, SAVED_QUESTION_REVIEW_POOL_LABEL);
   assert.equal(settings.strictCustomQuestionPool, true);
+  assert.equal(settings.excludeAiGenerated, false);
   assert.equal(settings.excludePreviouslyAnswered, false);
   assert.equal(settings.questionCount, 205);
   assert.equal(settings.customQuestionIds?.length, 205);

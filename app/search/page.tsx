@@ -10,6 +10,7 @@ import { QuestionPrimaryTagBadge } from "@/components/QuestionPrimaryTagBadge";
 import { QuestionReportButton } from "@/components/QuestionIssueReportButton";
 import { SavedQuestionButton } from "@/components/SavedQuestionButton";
 import { StructuredExplanationText } from "@/components/StructuredExplanationText";
+import { useSavedAISimulationQuestions } from "@/components/useSavedAISimulationQuestions";
 import {
   loadConfirmedQuestionClassificationOverrides,
   clearQuestionExplanationBackgroundCache,
@@ -137,6 +138,14 @@ export default function SearchPage() {
   const [classificationOverrides, setClassificationOverrides] = useState<Record<string, QuestionClassificationOverride>>({});
   const [favoriteBankOpen, setFavoriteBankOpen] = useState(false);
   const searchFavorites = useSavedQuestionRecords(session?.access_token);
+  const searchFavoriteIds = useMemo(
+    () => Object.keys(searchFavorites),
+    [searchFavorites]
+  );
+  const {
+    questions: savedAISimulationQuestions,
+    isLoading: savedAISimulationQuestionsLoading
+  } = useSavedAISimulationQuestions(searchFavoriteIds);
   const [favoritePracticeQuestionId, setFavoritePracticeQuestionId] = useState<string | null>(null);
   const [favoriteSelectedAnswer, setFavoriteSelectedAnswer] = useState<OptionKey | null>(null);
   const [favoriteAnswerFeedback, setFavoriteAnswerFeedback] = useState<FavoriteAnswerFeedback | null>(null);
@@ -145,18 +154,30 @@ export default function SearchPage() {
   const deferredKeyword = useDeferredValue(debouncedKeyword);
   const isKeywordPending = keyword !== debouncedKeyword || debouncedKeyword !== deferredKeyword;
 
-  const allQuestions = useMemo(
+  const canonicalQuestions = useMemo(
     () =>
       Array.from(
         new Map(
           getCanonicalQuestionBank(classificationOverrides)
-            .filter((question) => question.sourceType !== "AI_GENERATED")
             .map((question) => [question.id, question] as const)
         ).values()
       ),
     [classificationOverrides]
   );
+  const allQuestions = useMemo(
+    () => canonicalQuestions.filter((question) => question.sourceType !== "AI_GENERATED"),
+    [canonicalQuestions]
+  );
   const questionById = useMemo(() => new Map(allQuestions.map((question) => [question.id, question])), [allQuestions]);
+  const savedQuestionById = useMemo(
+    () =>
+      new Map(
+        [...canonicalQuestions, ...savedAISimulationQuestions].map(
+          (question) => [question.id, question] as const
+        )
+      ),
+    [canonicalQuestions, savedAISimulationQuestions]
+  );
   const searchIndex = useMemo(
     () => allQuestions.map((question) => buildQuestionSearchIndexEntry(question)),
     [allQuestions]
@@ -280,7 +301,7 @@ export default function SearchPage() {
     () =>
       Object.values(searchFavorites)
         .map((record) => {
-          const question = questionById.get(record.questionId);
+          const question = savedQuestionById.get(record.questionId);
           if (!question) return null;
           return {
             record,
@@ -300,17 +321,26 @@ export default function SearchPage() {
           if (leftDone !== rightDone) return leftDone ? 1 : -1;
           return right.record.addedAt.localeCompare(left.record.addedAt);
         }),
-    [classificationOverrides, explanationOverrides, questionById, searchFavorites]
+    [classificationOverrides, explanationOverrides, savedQuestionById, searchFavorites]
   );
   const activeFavoriteItems = useMemo(
     () => favoriteItems.filter((item) => !isQuestionCompletedInFavoriteBank(item.record)),
     [favoriteItems]
   );
-  const completedFavoriteCount = favoriteItems.length - activeFavoriteItems.length;
+  const searchFavoriteRecords = useMemo(
+    () => Object.values(searchFavorites),
+    [searchFavorites]
+  );
+  const completedFavoriteCount = useMemo(
+    () => searchFavoriteRecords.filter(isQuestionCompletedInFavoriteBank).length,
+    [searchFavoriteRecords]
+  );
+  const activeFavoriteCount = searchFavoriteRecords.length - completedFavoriteCount;
   const favoritePracticeItem = useMemo(() => {
+    if (savedAISimulationQuestionsLoading) return null;
     const selected = activeFavoriteItems.find((item) => item.question.id === favoritePracticeQuestionId);
     return selected ?? activeFavoriteItems[0] ?? null;
-  }, [activeFavoriteItems, favoritePracticeQuestionId]);
+  }, [activeFavoriteItems, favoritePracticeQuestionId, savedAISimulationQuestionsLoading]);
 
   useEffect(() => {
     if (!favoritePracticeItem) {
@@ -870,9 +900,9 @@ export default function SearchPage() {
         aria-label="開啟儲存題目"
       >
         <span className="text-xl leading-none">☆</span>
-        {favoriteItems.length > 0 ? (
+        {searchFavoriteRecords.length > 0 ? (
           <span className="absolute -right-1 -top-1 inline-flex min-w-6 justify-center rounded-full bg-brand-500 px-1.5 py-0.5 text-[11px] font-bold text-white ring-2 ring-white">
-            {favoriteItems.length}
+            {searchFavoriteRecords.length}
           </span>
         ) : null}
       </button>
@@ -894,9 +924,9 @@ export default function SearchPage() {
                 <p className="text-xs font-semibold uppercase tracking-[0.2em] text-brand-700">Saved Bank</p>
                 <h2 className="mt-1 text-2xl font-bold text-ink">儲存題目</h2>
                 <p className="mt-2 text-sm text-slate-500">
-                  {activeFavoriteItems.length > 0
-                    ? `還有 ${activeFavoriteItems.length} 題待練，${completedFavoriteCount} 題已答對兩次。`
-                    : favoriteItems.length > 0
+                  {activeFavoriteCount > 0
+                    ? `還有 ${activeFavoriteCount} 題待練，${completedFavoriteCount} 題已答對兩次。`
+                    : searchFavoriteRecords.length > 0
                       ? "儲存題都答對兩次了，這區暫時很乖。"
                       : "搜尋頁看到想補的題，就先丟進來。"}
                 </p>
@@ -1026,11 +1056,15 @@ export default function SearchPage() {
                 </section>
               ) : (
                 <section className="rounded-[1.5rem] border border-dashed border-slate-200 bg-slate-50 p-5 text-sm font-medium text-slate-500">
-                  {favoriteItems.length > 0 ? "目前沒有待練題。已答對兩次的題目會待在下面完成區。" : "儲存題目還是空的。"}
+                  {savedAISimulationQuestionsLoading
+                    ? "正在整理儲存題目。"
+                    : searchFavoriteRecords.length > 0
+                      ? "目前沒有待練題。已答對兩次的題目會待在下面完成區。"
+                      : "儲存題目還是空的。"}
                 </section>
               )}
 
-              {favoriteItems.length > 0 ? (
+              {!savedAISimulationQuestionsLoading && favoriteItems.length > 0 ? (
                 <section className="space-y-2">
                   <h3 className="text-sm font-bold text-ink">全部儲存</h3>
                   {favoriteItems.map(({ question, record }) => {

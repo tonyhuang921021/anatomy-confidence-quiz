@@ -8,10 +8,12 @@ import { QuestionOptionBlock, QuestionStemBlock } from "@/components/QuestionMed
 import { QuestionPrimaryTagBadge } from "@/components/QuestionPrimaryTagBadge";
 import { SavedQuestionButton } from "@/components/SavedQuestionButton";
 import { StructuredExplanationText } from "@/components/StructuredExplanationText";
+import { useSavedAISimulationQuestions } from "@/components/useSavedAISimulationQuestions";
 import {
   applyQuestionClassificationOverride,
   getCanonicalQuestionBank
 } from "@/data/med1QuestionBank";
+import { getAISimulationPaperKeyFromQuestionId } from "@/lib/savedQuestionBank";
 import { loadConfirmedQuestionClassificationOverrides } from "@/lib/cloudSync";
 import {
   isAcceptedSavedQuestionAnswer,
@@ -86,7 +88,11 @@ function getSourceLabel(question: Question) {
     ].filter(Boolean).join(" ");
   }
 
-  return question.sourceType === "AI_GENERATED" ? "AI 補題" : "本地題庫";
+  if (question.sourceType === "AI_GENERATED") {
+    return getAISimulationPaperKeyFromQuestionId(question.id) ? "AI 模擬卷" : "AI 補題";
+  }
+
+  return "本地題庫";
 }
 
 export default function SavedQuestionsPage() {
@@ -97,6 +103,14 @@ export default function SavedQuestionsPage() {
   const [selectedQuestionId, setSelectedQuestionId] = useState<string | null>(null);
   const [selectedAnswer, setSelectedAnswer] = useState<OptionKey | null>(null);
   const [feedback, setFeedback] = useState<SavedQuestionFeedback | null>(null);
+  const savedQuestionIds = useMemo(
+    () => Object.keys(savedQuestionRecords),
+    [savedQuestionRecords]
+  );
+  const {
+    questions: savedAISimulationQuestions,
+    isLoading: savedAISimulationQuestionsLoading
+  } = useSavedAISimulationQuestions(savedQuestionIds);
 
   useEffect(() => {
     setExplanationOverrides((current) =>
@@ -113,9 +127,10 @@ export default function SavedQuestionsPage() {
   }, []);
 
   const questionById = useMemo(() => {
-    const questions = getCanonicalQuestionBank(classificationOverrides).filter(
-      (question) => question.sourceType !== "AI_GENERATED"
-    );
+    const questions = [
+      ...getCanonicalQuestionBank(classificationOverrides),
+      ...savedAISimulationQuestions
+    ];
     return new Map(
       questions.map((question) => [
         question.id,
@@ -125,7 +140,7 @@ export default function SavedQuestionsPage() {
         )
       ] as const)
     );
-  }, [classificationOverrides, explanationOverrides]);
+  }, [classificationOverrides, explanationOverrides, savedAISimulationQuestions]);
 
   const savedItems = useMemo<SavedQuestionItem[]>(
     () =>
@@ -144,11 +159,22 @@ export default function SavedQuestionsPage() {
     [questionById, savedQuestionRecords]
   );
 
-  const missingQuestionCount = Math.max(0, Object.keys(savedQuestionRecords).length - savedItems.length);
+  const missingQuestionCount = savedAISimulationQuestionsLoading
+    ? 0
+    : Math.max(0, Object.keys(savedQuestionRecords).length - savedItems.length);
   const activeItems = useMemo(
     () => savedItems.filter((item) => !isSavedQuestionCompleted(item.record)),
     [savedItems]
   );
+  const savedRecordList = useMemo(
+    () => Object.values(savedQuestionRecords),
+    [savedQuestionRecords]
+  );
+  const completedRecordCount = useMemo(
+    () => savedRecordList.filter(isSavedQuestionCompleted).length,
+    [savedRecordList]
+  );
+  const activeRecordCount = savedRecordList.length - completedRecordCount;
   const savedQuestionReviewSettings = useMemo(
     () => buildSavedQuestionReviewSettings(activeItems.map((item) => item.question)),
     [activeItems]
@@ -157,7 +183,6 @@ export default function SavedQuestionsPage() {
     () => buildNewQuizHref(savedQuestionReviewSettings),
     [savedQuestionReviewSettings]
   );
-  const completedCount = savedItems.length - activeItems.length;
   const selectedItem = useMemo(
     () =>
       savedItems.find((item) => item.question.id === selectedQuestionId) ??
@@ -216,9 +241,9 @@ export default function SavedQuestionsPage() {
             <p className="max-w-full break-words text-sm font-semibold uppercase tracking-[0.2em] text-brand-700">Saved Questions</p>
             <h1 className="mt-2 text-3xl font-bold text-ink sm:text-4xl">儲存題目</h1>
             <p className="mt-3 text-sm leading-7 text-slate-500">
-              {activeItems.length > 0
-                ? `還有 ${activeItems.length} 題待練，${completedCount} 題已答對兩次。`
-                : savedItems.length > 0
+              {activeRecordCount > 0
+                ? `還有 ${activeRecordCount} 題待練，${completedRecordCount} 題已答對兩次。`
+                : savedRecordList.length > 0
                   ? "目前儲存題都答對兩次了。"
                   : "看到想補的題目，就按書籤放進來。"}
             </p>
@@ -233,20 +258,20 @@ export default function SavedQuestionsPage() {
             <Link
               href={savedQuestionReviewHref}
               onClick={(event) => {
-                if (activeItems.length === 0) {
+                if (activeItems.length === 0 || savedAISimulationQuestionsLoading) {
                   event.preventDefault();
                   return;
                 }
                 saveQuizSettings(savedQuestionReviewSettings);
               }}
-              aria-disabled={activeItems.length === 0}
+              aria-disabled={activeItems.length === 0 || savedAISimulationQuestionsLoading}
               className={`min-h-12 w-full rounded-2xl px-5 py-4 text-center text-sm font-semibold transition ${
-                activeItems.length === 0
+                activeItems.length === 0 || savedAISimulationQuestionsLoading
                   ? "pointer-events-none bg-slate-200 text-slate-500"
                   : "bg-brand-600 text-white hover:bg-brand-700"
               }`}
             >
-              開始儲存題目複習
+              {savedAISimulationQuestionsLoading ? "正在整理儲存題目" : "開始儲存題目複習"}
             </Link>
           </div>
         </div>
@@ -255,15 +280,15 @@ export default function SavedQuestionsPage() {
       <section className="mt-6 grid gap-4 sm:grid-cols-3">
         <article className="rounded-3xl bg-white p-5 shadow-card ring-1 ring-slate-100">
           <p className="text-sm font-semibold text-slate-500">全部儲存</p>
-          <p className="mt-2 text-3xl font-bold text-ink">{savedItems.length}</p>
+          <p className="mt-2 text-3xl font-bold text-ink">{savedRecordList.length}</p>
         </article>
         <article className="rounded-3xl bg-amber-50 p-5 text-amber-900 ring-1 ring-amber-100">
           <p className="text-sm font-semibold">待練題目</p>
-          <p className="mt-2 text-3xl font-bold">{activeItems.length}</p>
+          <p className="mt-2 text-3xl font-bold">{activeRecordCount}</p>
         </article>
         <article className="rounded-3xl bg-emerald-50 p-5 text-emerald-900 ring-1 ring-emerald-100">
           <p className="text-sm font-semibold">已答對兩次</p>
-          <p className="mt-2 text-3xl font-bold">{completedCount}</p>
+          <p className="mt-2 text-3xl font-bold">{completedRecordCount}</p>
         </article>
       </section>
 

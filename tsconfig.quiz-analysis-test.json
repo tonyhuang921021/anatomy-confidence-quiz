@@ -55,6 +55,8 @@
     "lib/resultReviewNavigation.test.ts",
     "lib/savedQuestionReview.ts",
     "lib/savedQuestionReview.test.ts",
+    "lib/savedQuestionBank.ts",
+    "lib/savedQuestionBank.test.ts",
     "lib/startSettingsUrl.ts",
     "lib/startSettingsUrl.test.ts",
     "lib/storage.ts",

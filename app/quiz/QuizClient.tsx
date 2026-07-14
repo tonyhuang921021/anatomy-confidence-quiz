@@ -83,6 +83,7 @@ import {
   recordSavedQuestionAnswer,
   useSavedQuestionRecords
 } from "@/lib/savedQuestions";
+import { getAISimulationPaperKeyFromQuestionId } from "@/lib/savedQuestionBank";
 import { isSavedQuestionReviewSettings } from "@/lib/savedQuestionReview";
 import {
   Attempt,
@@ -613,13 +614,25 @@ function selectLocalQuestionSet(
     )
   );
 
-  if ((settings.customQuestionIds?.length ?? 0) > 0) {
+  const customQuestionIds = settings.customQuestionIds ?? [];
+  const savedAISimulationPaperKeys = new Set(
+    customQuestionIds
+      .map(getAISimulationPaperKeyFromQuestionId)
+      .filter((paperKey): paperKey is string => Boolean(paperKey))
+  );
+  savedAISimulationPaperKeys.forEach((paperKey) => {
+    getQuestionsForAISimulationPaper(paperKey).forEach((question) => {
+      runtimeQuestionMap.set(question.id, question);
+    });
+  });
+
+  if (customQuestionIds.length > 0) {
     const inlineCustomQuestions = (settings.customQuestionPayload ?? []).filter(Boolean);
     const importedCustomQuestions = getImportedCustomPaperQuestionsByIds(
-      settings.customQuestionIds ?? []
+      customQuestionIds
     );
-    const customQuestions = settings.customQuestionIds
-      ?.map((id) => runtimeQuestionMap.get(id))
+    const customQuestions = customQuestionIds
+      .map((id) => runtimeQuestionMap.get(id))
       .filter((question): question is Question => Boolean(question));
     const mergedCustomQuestions = Array.from(
       new Map(
