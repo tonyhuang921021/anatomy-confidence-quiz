@@ -60,7 +60,9 @@ function buildUnavailableStats(
 
 function mapStatsRow(paperKey: string, row?: SimulationPaperStatsRow | null) {
   const sampleCount = toCount(row?.sample_count);
-  const averageScoreValue = Number(row?.average_score);
+  const rawAverageScore = row?.average_score;
+  const averageScoreValue =
+    rawAverageScore == null ? Number.NaN : Number(rawAverageScore);
   const averageScore = Number.isFinite(averageScoreValue)
     ? Math.round(averageScoreValue * 10) / 10
     : null;
