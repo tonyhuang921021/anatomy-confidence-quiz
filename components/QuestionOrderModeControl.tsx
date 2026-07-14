@@ -55,7 +55,7 @@ type QuestionOrderModeControlProps = {
 };
 
 const MODE_DESCRIPTION: Record<QuestionOrderMode, string> = {
-  recent: "先排近年題，每年內穿插沒做過與容易錯的題目。",
+  recent: "每 3–4 題穿插 1 題近年複習，其餘優先放沒做過的題目。",
   unseen: "所有沒做過的題目跨年份排前，做過的題目排後。"
 };
 

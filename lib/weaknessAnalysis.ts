@@ -414,10 +414,36 @@ export function buildWeaknessQuestionOrder({
     order.push(...stableSeen.map((question) => question.id));
   }
 
-  if (!prioritizeUnseen) return order;
+  const unseenOrder = order.filter((questionId) => !history.has(questionId));
+  const seenOrder = order.filter((questionId) => history.has(questionId));
+
+  if (prioritizeUnseen) return [...unseenOrder, ...seenOrder];
+
+  const mixedOrder: string[] = [];
+  const unseenBurstSizes = [2, 3];
+  let unseenIndex = 0;
+  let seenIndex = 0;
+  let burstIndex = 0;
+
+  while (unseenIndex < unseenOrder.length && seenIndex < seenOrder.length) {
+    const burstSize = unseenBurstSizes[burstIndex % unseenBurstSizes.length];
+    for (
+      let index = 0;
+      index < burstSize && unseenIndex < unseenOrder.length;
+      index += 1
+    ) {
+      mixedOrder.push(unseenOrder[unseenIndex]);
+      unseenIndex += 1;
+    }
+
+    mixedOrder.push(seenOrder[seenIndex]);
+    seenIndex += 1;
+    burstIndex += 1;
+  }
 
   return [
-    ...order.filter((questionId) => !history.has(questionId)),
-    ...order.filter((questionId) => history.has(questionId))
+    ...mixedOrder,
+    ...unseenOrder.slice(unseenIndex),
+    ...seenOrder.slice(seenIndex)
   ];
 }

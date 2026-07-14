@@ -167,7 +167,7 @@ test("不同科目的可分析觀念不會被全站前五名截掉", () => {
   assert.equal(result.concepts.filter((concept) => concept.subject === "病理學").length, 1);
 });
 
-test("複習題目先看近年，再以未做題為主並穿插仍易錯題", () => {
+test("近年模式每三到四題穿插一題近期複習，其餘優先放未做題", () => {
   const questions = [
     makeQuestion("new-1", undefined, 2026, 1),
     makeQuestion("new-2", undefined, 2026, 2),
@@ -190,7 +190,44 @@ test("複習題目先看近年，再以未做題為主並穿插仍易錯題", ()
     primaryTag: "生理學－腎臟、水電解質與酸鹼"
   });
 
-  assert.deepEqual(order, ["new-1", "new-2", "risk", "new-3", "stable", "older-new"]);
+  assert.deepEqual(order, ["new-1", "new-2", "risk", "new-3", "older-new", "stable"]);
+});
+
+test("近年模式交替安排兩題與三題未做題後再放一題近期複習", () => {
+  const questions = [
+    makeQuestion("recent-risk-1", undefined, 2026, 1),
+    makeQuestion("recent-risk-2", undefined, 2026, 2),
+    makeQuestion("unseen-1", undefined, 2025, 1),
+    makeQuestion("unseen-2", undefined, 2025, 2),
+    makeQuestion("unseen-3", undefined, 2024, 1),
+    makeQuestion("unseen-4", undefined, 2024, 2),
+    makeQuestion("unseen-5", undefined, 2023, 1),
+    makeQuestion("unseen-6", undefined, 2023, 2)
+  ];
+  const sessions = [
+    makeSession("history", [
+      makeAttempt("recent-risk-1", false, "2026-07-01T12:00:00.000Z", 4),
+      makeAttempt("recent-risk-2", false, "2026-07-01T12:01:00.000Z", 4)
+    ])
+  ];
+
+  const order = buildWeaknessQuestionOrder({
+    questions,
+    sessions,
+    subject: "生理學",
+    primaryTag: "生理學－腎臟、水電解質與酸鹼"
+  });
+
+  assert.deepEqual(order, [
+    "unseen-1",
+    "unseen-2",
+    "recent-risk-1",
+    "unseen-3",
+    "unseen-4",
+    "unseen-5",
+    "recent-risk-2",
+    "unseen-6"
+  ]);
 });
 
 test("開啟未做題優先時，跨年份也會先排從未作答的題目", () => {
