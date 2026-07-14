@@ -1007,6 +1007,30 @@ function applyQuestionMedia(question: Question): Question {
 }
 
 const questionTextOverrides: Record<string, QuestionTextOverride> = {
+  "MOEX-106100-2301-Q021": {
+    options: {
+      B: "IL-6 與 TGF-β 可以幫助 CD4+ T 細胞分化成第十七型輔助性 T 細胞（Th17）",
+      D: "IL-4 與 IL-5 主要由第二型輔助性 T 細胞（Th2）分泌而來，可以一起幫助 B 細胞產生 IgE 抗體"
+    }
+  },
+  "MOEX-108100-1301-Q076": {
+    options: {
+      A: "NH₃⁺—CH₂—COOH",
+      B: "NH₂—CH₂—COO⁻",
+      C: "NH₂—CH₃⁺—COO⁻",
+      D: "NH₃⁺—CH₂—COO⁻"
+    }
+  },
+  "MOEX-113020-2301-Q012": {
+    stem:
+      "藉由血清學的方式無法檢驗出正常的 prion（PrPᶜ）與異常的 prion（PrPˢᶜ）的差異。一種新的檢驗方式稱作 real-time quaking-induced conversion（RT-QuIC），可以快速檢驗出檢體內是否含有 PrPˢᶜ。這是利用 prion 的哪一種特性？",
+    options: {
+      A: "PrPᶜ 會聚集成纖絲（prion fibril）",
+      B: "PrPˢᶜ 會聚集成纖絲（prion fibril）",
+      C: "PrPᶜ 會將 PrPˢᶜ 轉換成 PrPᶜ",
+      D: "PrPˢᶜ 的蛋白質半衰期較 PrPᶜ 短"
+    }
+  },
   "MOEX-107100-2301-Q041": {
     stem:
       "某研究收集30人的收縮壓（mmHg）及年齡的隨機樣本資料，計算皮爾森氏相關係數（Pearson’s correlation coefficient）得0.7。假若同樣的資料，以血壓當依變項（Y；dependent variable），以年齡當自變項（X；independent variable），可得到直線迴歸線 Y = a + bX。下列何者正確？"
