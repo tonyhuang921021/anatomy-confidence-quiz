@@ -9,7 +9,7 @@ import {
 
 type SelectedSimulationPaperPanelProps = {
   paper: AISimulationPaperOption;
-  hasCompletedPaper: boolean;
+  canViewDetailedStats: boolean;
 };
 
 const BUCKET_COLORS = [
@@ -31,7 +31,7 @@ function EmptyStats({ message }: { message: string }) {
 
 export function SelectedSimulationPaperPanel({
   paper,
-  hasCompletedPaper
+  canViewDetailedStats
 }: SelectedSimulationPaperPanelProps) {
   const [stats, setStats] = useState<SimulationPaperStats | null>(null);
   const [statsState, setStatsState] = useState<"loading" | "ready" | "error">("loading");
@@ -39,12 +39,6 @@ export function SelectedSimulationPaperPanel({
   useEffect(() => {
     const controller = new AbortController();
     setStats(null);
-
-    if (!hasCompletedPaper) {
-      setStatsState("loading");
-      return () => controller.abort();
-    }
-
     setStatsState("loading");
 
     fetch(`/api/simulation-paper-stats?paperKey=${encodeURIComponent(paper.key)}`, {
@@ -64,7 +58,7 @@ export function SelectedSimulationPaperPanel({
       });
 
     return () => controller.abort();
-  }, [hasCompletedPaper, paper.key]);
+  }, [paper.key]);
 
   return (
     <aside className="self-start rounded-lg border border-amber-200 bg-white p-5 shadow-sm">
@@ -78,78 +72,90 @@ export function SelectedSimulationPaperPanel({
         </span>
       </div>
 
-      {hasCompletedPaper ? (
       <section className="mt-4" aria-live="polite">
-        <div className="mb-4 flex items-end justify-between gap-3">
+        <div className="flex items-end justify-between gap-3">
           <div>
-            <p className="text-sm font-bold text-ink">平均與級距</p>
+            <p className="text-sm font-bold text-ink">有效完成紀錄</p>
             <p className="mt-1 text-xs text-slate-500">有效樣本，排除 3 分以下誤送</p>
           </div>
-          {stats?.available && stats.averageScore !== null ? (
-            <div className="text-right">
-              <p className="text-2xl font-black text-ink">
-                {stats.averageScore}
-                <span className="ml-1 text-xs font-bold text-slate-500">分</span>
-              </p>
-              <p className="text-xs font-semibold text-slate-500">{stats.sampleCount} 份</p>
-            </div>
-          ) : null}
+          {statsState === "loading" ? (
+            <div className="h-7 w-16 animate-pulse rounded bg-slate-200" />
+          ) : statsState === "error" ? (
+            <span className="text-xs font-semibold text-slate-400">暫時無法讀取</span>
+          ) : (
+            <p className="text-2xl font-black text-ink">
+              {stats?.sampleCount ?? 0}
+              <span className="ml-1 text-xs font-bold text-slate-500">份</span>
+            </p>
+          )}
         </div>
 
-        {statsState === "loading" ? (
-          <div className="space-y-3 py-2">
-            <div className="h-3 w-28 animate-pulse rounded-full bg-slate-200" />
-            <div className="h-3 w-full animate-pulse rounded-full bg-slate-200" />
-            <div className="h-3 w-4/5 animate-pulse rounded-full bg-slate-200" />
+        {canViewDetailedStats ? (
+          <div className="mt-4 border-t border-slate-100 pt-4">
+            <div className="mb-4 flex items-end justify-between gap-3">
+              <p className="text-sm font-bold text-ink">平均與級距</p>
+              {stats?.available && stats.averageScore !== null ? (
+                <p className="text-2xl font-black text-ink">
+                  {stats.averageScore}
+                  <span className="ml-1 text-xs font-bold text-slate-500">分</span>
+                </p>
+              ) : null}
+            </div>
+
+            {statsState === "loading" ? (
+              <div className="space-y-3 py-2">
+                <div className="h-3 w-full animate-pulse rounded-full bg-slate-200" />
+                <div className="h-3 w-4/5 animate-pulse rounded-full bg-slate-200" />
+              </div>
+            ) : statsState === "error" ? (
+              <EmptyStats message="級距暫時讀不到，不影響開始作答。" />
+            ) : !stats?.available ? (
+              <EmptyStats
+                message={
+                  stats?.unavailableReason ??
+                  `有效完成紀錄滿 ${stats?.minimumSampleSize ?? 5} 份後顯示平均與級距。`
+                }
+              />
+            ) : (
+              <div>
+                <div className="flex h-2.5 overflow-hidden rounded-full bg-slate-200">
+                  {SIMULATION_PAPER_SCORE_BUCKETS.map((bucket, index) => {
+                    const count = stats.buckets[bucket.key];
+                    if (count <= 0) return null;
+                    return (
+                      <span
+                        key={bucket.key}
+                        className={BUCKET_COLORS[index]}
+                        style={{ width: `${(count / stats.sampleCount) * 100}%` }}
+                        title={`${bucket.label} 分：${count} 份`}
+                      />
+                    );
+                  })}
+                </div>
+                <div className="mt-4 grid grid-cols-2 gap-x-5 gap-y-3 sm:grid-cols-3 lg:grid-cols-2 xl:grid-cols-3">
+                  {SIMULATION_PAPER_SCORE_BUCKETS.map((bucket, index) => {
+                    const count = stats.buckets[bucket.key];
+                    const percentage = Math.round((count / stats.sampleCount) * 100);
+                    return (
+                      <div key={bucket.key} className="flex items-center justify-between gap-2 text-xs">
+                        <span className="inline-flex items-center gap-2 font-semibold text-slate-600">
+                          <span className={`h-2.5 w-2.5 rounded-full ${BUCKET_COLORS[index]}`} />
+                          {bucket.label}
+                        </span>
+                        <span className="font-black text-slate-800">{percentage}%</span>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
           </div>
-        ) : statsState === "error" ? (
-          <EmptyStats message="級距暫時讀不到，不影響開始作答。" />
-        ) : !stats?.available ? (
-          <EmptyStats
-            message={
-              stats?.unavailableReason ??
-              `目前累積 ${stats?.sampleCount ?? 0} 份有效成績；滿 ${stats?.minimumSampleSize ?? 5} 份後顯示。`
-            }
-          />
         ) : (
-          <div>
-            <div className="flex h-2.5 overflow-hidden rounded-full bg-slate-200">
-              {SIMULATION_PAPER_SCORE_BUCKETS.map((bucket, index) => {
-                const count = stats.buckets[bucket.key];
-                if (count <= 0) return null;
-                return (
-                  <span
-                    key={bucket.key}
-                    className={BUCKET_COLORS[index]}
-                    style={{ width: `${(count / stats.sampleCount) * 100}%` }}
-                    title={`${bucket.label} 分：${count} 份`}
-                  />
-                );
-              })}
-            </div>
-            <div className="mt-4 grid grid-cols-2 gap-x-5 gap-y-3 sm:grid-cols-3 lg:grid-cols-2 xl:grid-cols-3">
-              {SIMULATION_PAPER_SCORE_BUCKETS.map((bucket, index) => {
-                const count = stats.buckets[bucket.key];
-                const percentage = Math.round((count / stats.sampleCount) * 100);
-                return (
-                  <div key={bucket.key} className="flex items-center justify-between gap-2 text-xs">
-                    <span className="inline-flex items-center gap-2 font-semibold text-slate-600">
-                      <span className={`h-2.5 w-2.5 rounded-full ${BUCKET_COLORS[index]}`} />
-                      {bucket.label}
-                    </span>
-                    <span className="font-black text-slate-800">{percentage}%</span>
-                  </div>
-                );
-              })}
-            </div>
-          </div>
+          <p className="mt-4 border-l-2 border-amber-300 pl-3 text-sm leading-6 text-slate-500">
+            完成這份考卷後，可查看全站平均與成績級距。
+          </p>
         )}
       </section>
-      ) : (
-        <p className="mt-4 border-l-2 border-amber-300 pl-3 text-sm leading-6 text-slate-500">
-          完成這份考卷後，可查看全站平均與成績級距。
-        </p>
-      )}
 
       {paper.info ? (
         <section className="mt-5 border-t border-slate-100 pt-5">

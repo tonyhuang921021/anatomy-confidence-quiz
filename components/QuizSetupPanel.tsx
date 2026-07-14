@@ -7,6 +7,7 @@ import { SelectedSimulationPaperPanel } from "@/components/SelectedSimulationPap
 import { useCloudHistoryHydration } from "@/components/useCloudHistoryHydration";
 import { getAISimulationPaperOptions, getPastPaperOptions } from "@/data/med1QuestionBank";
 import { enabledSubjects, subjectRegistry } from "@/data/subjectRegistry";
+import { isAdminEmail } from "@/lib/adminAccess";
 import {
   DEFAULT_QUIZ_SETTINGS,
   getModeLabel
@@ -213,6 +214,10 @@ export function QuizSetupPanel({
     settings.subjectFilter === "醫學（二）" ? med2PaperOptions : med1PaperOptions;
   const selectedPaper = selectedPaperOptions.find(
     (paper) => paper.key === settings.selectedPaperKey
+  );
+  const canViewSelectedPaperDetails = Boolean(
+    selectedPaper &&
+      (completedPaperSummaries[selectedPaper.key] || isAdminEmail(user?.email))
   );
   const activePaperMode = settings.paperMode ?? "random_set";
   const isSelectablePaperMode = activePaperMode === "past_paper" || activePaperMode === "ai_paper";
@@ -629,9 +634,7 @@ export function QuizSetupPanel({
                       <SelectedSimulationPaperPanel
                         key={selectedPaper.key}
                         paper={selectedPaper}
-                        hasCompletedPaper={Boolean(
-                          completedPaperSummaries[selectedPaper.key]
-                        )}
+                        canViewDetailedStats={canViewSelectedPaperDetails}
                       />
                     ) : null}
                   </div>
