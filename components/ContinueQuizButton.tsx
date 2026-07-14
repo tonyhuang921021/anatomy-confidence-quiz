@@ -155,9 +155,19 @@ export function ContinueQuizButton() {
             })
           )
         : item.session;
-      saveCurrentSession(session);
+      const didPersist = saveCurrentSession(session);
+      const persistedSession = loadCurrentSession();
+      if (
+        !didPersist ||
+        !persistedSession ||
+        getCanonicalResumableSessionId(persistedSession.id) !== canonicalId
+      ) {
+        throw new Error(
+          "瀏覽器目前無法暫存這份測驗，已保留原紀錄，不會改開其他題組。請清出瀏覽器儲存空間後再試。"
+        );
+      }
       setOpen(false);
-      router.push("/quiz?resume=1");
+      router.push(`/quiz?resume=1&sessionId=${encodeURIComponent(canonicalId)}`);
     } catch (error) {
       setActionError(error instanceof Error ? error.message : "完整測驗紀錄讀取失敗，請稍後再試。");
     } finally {

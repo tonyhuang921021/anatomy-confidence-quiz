@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import test from "node:test";
 import {
   buildCompletedQuestionHistoryEntriesFromSessions,
+  clearCurrentSession,
   commitUploadedCompletedSessionsForUser,
   discardCurrentSession,
   getPendingQuestionExplanationOverrideSync,
@@ -680,5 +681,63 @@ test("刪除進行中測驗後，舊分頁不能把同一 session 寫回本機",
   discardCurrentSession(activeSession.id, ["user-1"]);
   saveCurrentSession({ ...activeSession, currentQuestionIndex: 1 });
 
+  assert.equal(loadCurrentSession(), null);
+});
+
+test("localStorage 空間不足時，49 題續作要改存 sessionStorage 並蓋過舊測驗", () => {
+  const { localStorage, sessionStorage } = installBrowserStorage({ maxLocalBytes: 1_500 });
+  const userId = "user-resume-fallback";
+  setActiveStorageUser(userId);
+
+  const oldSession = {
+    ...makeSession("old-random-session", ["q-old"]),
+    completedAt: undefined,
+    attempts: []
+  } satisfies QuizSession;
+  assert.equal(saveCurrentSession(oldSession), true);
+
+  const customQuestionIds = Array.from(
+    { length: 49 },
+    (_, index) => `MOEX-112020_2301-Q${String(index + 1).padStart(3, "0")}`
+  );
+  const resumedSession = {
+    ...makeSession("session-antibiotics", customQuestionIds.slice(0, 10)),
+    completedAt: undefined,
+    settings: {
+      mode: "random" as const,
+      questionCount: 49,
+      subjectFilter: "藥理學" as const,
+      customPoolLabel: "進度區塊：藥理學－抗細菌藥",
+      customQuestionIds,
+      strictCustomQuestionPool: true,
+      stopAfterReview: true
+    },
+    attempts: customQuestionIds.slice(0, 3).map(makeAttempt)
+  } satisfies QuizSession;
+
+  assert.equal(saveCurrentSession(resumedSession), true);
+
+  const scopedKey = `anatomy-confidence-current-session:${userId}`;
+  assert.equal(JSON.parse(localStorage.getItem(scopedKey) ?? "null")?.id, oldSession.id);
+  assert.equal(
+    JSON.parse(sessionStorage.getItem(scopedKey) ?? "null")?.id,
+    resumedSession.id
+  );
+  assert.equal(loadCurrentSession()?.id, resumedSession.id);
+
+  clearCurrentSession();
+  assert.equal(localStorage.getItem(scopedKey), null);
+  assert.equal(sessionStorage.getItem(scopedKey), null);
+});
+
+test("current session 無法寫入任何瀏覽器儲存時要回報失敗", () => {
+  installBrowserStorage({ failLocalWrites: true, failSessionWrites: true });
+  const activeSession = {
+    ...makeSession("unpersisted-session", ["q-1"]),
+    completedAt: undefined,
+    attempts: []
+  } satisfies QuizSession;
+
+  assert.equal(saveCurrentSession(activeSession), false);
   assert.equal(loadCurrentSession(), null);
 });

@@ -1299,24 +1299,31 @@ export function discardCurrentSession(sessionId: string, userIds: string[] = [])
 }
 
 export function saveCurrentSession(session: QuizSession) {
-  if (!isBrowser()) return;
+  if (!isBrowser()) return false;
   const activeUser = getActiveStorageUser();
   const canonicalId = getCanonicalSessionId(session.id);
   const alreadyCompleted = completedSessionIdMemoryCache.get(activeUser)?.has(canonicalId) ?? false;
 
   if (!session.completedAt && isCurrentSessionDiscarded(session.id, activeUser)) {
     clearMatchingCurrentSessions(session.id, [activeUser]);
-    return;
+    return false;
   }
 
   if (!session.completedAt && alreadyCompleted) {
     clearMatchingCurrentSessions(session.id);
-    return;
+    return false;
   }
 
-  safeLocalStorageSetItem(getScopedKey(CURRENT_SESSION_KEY), JSON.stringify(compactSessionForStorage(session)));
+  const scopedKey = getScopedKey(CURRENT_SESSION_KEY);
+  const didPersist = tryPersistJsonToLocalStorageWithSessionFallback(
+    scopedKey,
+    JSON.stringify(compactSessionForStorage(session))
+  );
+  if (!didPersist) return false;
+
   window.dispatchEvent(new CustomEvent("current-session-change", { detail: session }));
   broadcastCompletedStorageChange({ userId: activeUser, current: true });
+  return true;
 }
 
 export function loadCurrentSession(): QuizSession | null {
@@ -1326,34 +1333,44 @@ export function loadCurrentSession(): QuizSession | null {
 export function loadCurrentSessionForUser(userId: string): QuizSession | null {
   if (!isBrowser()) return null;
   const scopedKey = getScopedKeyForUser(CURRENT_SESSION_KEY, userId);
-  const raw =
-    safeLocalStorageGetItem(scopedKey) ??
-    (userId === GUEST_USER_ID ? getLegacyOrScopedRaw(CURRENT_SESSION_KEY) : null);
-  if (!raw) return null;
+  const rawCandidates = [
+    safeSessionStorageGetItem(scopedKey),
+    safeLocalStorageGetItem(scopedKey),
+    userId === GUEST_USER_ID ? safeLocalStorageGetItem(CURRENT_SESSION_KEY) : null
+  ].filter((raw): raw is string => Boolean(raw));
 
-  try {
-    const session = normalizeSession(JSON.parse(raw) as QuizSession);
-    if (session && !session.completedAt && isCurrentSessionDiscarded(session.id, userId)) {
-      safeLocalStorageRemoveItem(scopedKey);
-      return null;
+  for (const raw of Array.from(new Set(rawCandidates))) {
+    try {
+      const session = normalizeSession(JSON.parse(raw) as QuizSession);
+      if (session && !session.completedAt && isCurrentSessionDiscarded(session.id, userId)) {
+        safeLocalStorageRemoveItem(scopedKey);
+        safeSessionStorageRemoveItem(scopedKey);
+        return null;
+      }
+      return session;
+    } catch {
+      // A malformed fallback must not hide a valid copy in the other storage.
     }
-    return session;
-  } catch {
-    return null;
   }
+
+  return null;
 }
 
 export function clearCurrentSession() {
   if (!isBrowser()) return;
   const activeUser = getActiveStorageUser();
-  safeLocalStorageRemoveItem(getScopedKey(CURRENT_SESSION_KEY));
+  const scopedKey = getScopedKey(CURRENT_SESSION_KEY);
+  safeLocalStorageRemoveItem(scopedKey);
+  safeSessionStorageRemoveItem(scopedKey);
   window.dispatchEvent(new CustomEvent("current-session-change", { detail: null }));
   broadcastCompletedStorageChange({ userId: activeUser, current: true });
 }
 
 export function clearCurrentSessionForUser(userId: string) {
   if (!isBrowser()) return;
-  safeLocalStorageRemoveItem(getScopedKeyForUser(CURRENT_SESSION_KEY, userId));
+  const scopedKey = getScopedKeyForUser(CURRENT_SESSION_KEY, userId);
+  safeLocalStorageRemoveItem(scopedKey);
+  safeSessionStorageRemoveItem(scopedKey);
   broadcastCompletedStorageChange({ userId, current: true });
 }
 
@@ -1365,7 +1382,9 @@ export function clearMatchingCurrentSessions(sessionId: string, userIds: string[
   for (const userId of scopedUserIds) {
     const current = loadCurrentSessionForUser(userId);
     if (current && getCanonicalSessionId(current.id) === canonicalId) {
-      safeLocalStorageRemoveItem(getScopedKeyForUser(CURRENT_SESSION_KEY, userId));
+      const scopedKey = getScopedKeyForUser(CURRENT_SESSION_KEY, userId);
+      safeLocalStorageRemoveItem(scopedKey);
+      safeSessionStorageRemoveItem(scopedKey);
     }
   }
 
@@ -1375,6 +1394,7 @@ export function clearMatchingCurrentSessions(sessionId: string, userIds: string[
       const legacySession = normalizeSession(JSON.parse(legacyRaw) as QuizSession);
       if (getCanonicalSessionId(legacySession.id) === canonicalId) {
         safeLocalStorageRemoveItem(CURRENT_SESSION_KEY);
+        safeSessionStorageRemoveItem(CURRENT_SESSION_KEY);
       }
     } catch {
       // Ignore malformed legacy current sessions.

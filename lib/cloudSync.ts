@@ -80,6 +80,10 @@ import {
   omitHeavySessionPayload,
   type QuizSessionProgressPayload
 } from "@/lib/quizSessionCheckpoint";
+import {
+  getQuizSessionNavigationIntent,
+  shouldPreserveSelectedQuizSession
+} from "@/lib/quizSessionNavigation";
 
 type QuizSessionRow = {
   id: string;
@@ -1675,9 +1679,11 @@ function mapActiveQuizSessionRowsToListItems(
     .filter((item): item is ResumableQuizSessionListItem => Boolean(item));
 }
 
-function isExplicitNewQuizNavigation() {
+function isExplicitQuizSessionNavigation() {
   if (typeof window === "undefined" || window.location.pathname !== "/quiz") return false;
-  return new URLSearchParams(window.location.search).get("new") === "1";
+  return shouldPreserveSelectedQuizSession(
+    getQuizSessionNavigationIntent(new URLSearchParams(window.location.search))
+  );
 }
 
 async function hydrateResumableQuizSessionListItem(
@@ -3052,13 +3058,13 @@ export async function syncCurrentSessionForCurrentUser(userId: string) {
     return localCurrentSession;
   }
   const remoteItems = mapActiveQuizSessionRowsToListItems(remoteActiveRows, userId);
-  const preserveExplicitNewSession = isExplicitNewQuizNavigation();
-  const latestRemoteItem = preserveExplicitNewSession
+  const preserveExplicitSessionSelection = isExplicitQuizSessionNavigation();
+  const latestRemoteItem = preserveExplicitSessionSelection
     ? null
     : ([...remoteItems].sort((left, right) =>
         right.lastActivityAt.localeCompare(left.lastActivityAt)
       )[0] ?? null);
-  const betterRemoteForLocal = localCurrentSession && !preserveExplicitNewSession
+  const betterRemoteForLocal = localCurrentSession && !preserveExplicitSessionSelection
     ? chooseMoreCompleteResumableSessionItem(localCurrentSession, remoteItems)
     : null;
   const localActivity = localCurrentSession ? sessionActivityValue(localCurrentSession) : "";
@@ -3155,7 +3161,7 @@ export async function syncLocalCurrentSessionForCurrentUser(userId: string) {
     return canonicalSession;
   }
 
-  const moreCompleteRemoteItem = isExplicitNewQuizNavigation()
+  const moreCompleteRemoteItem = isExplicitQuizSessionNavigation()
     ? null
     : chooseMoreCompleteResumableSessionItem(
         canonicalSession,
@@ -3308,7 +3314,7 @@ export async function pushCurrentSessionToSupabase(
   if (!remoteActiveRows) {
     return;
   }
-  const moreCompleteRemoteItem = isExplicitNewQuizNavigation()
+  const moreCompleteRemoteItem = isExplicitQuizSessionNavigation()
     ? null
     : chooseMoreCompleteResumableSessionItem(
         canonicalSession,

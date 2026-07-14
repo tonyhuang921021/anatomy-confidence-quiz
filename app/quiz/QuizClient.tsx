@@ -50,6 +50,10 @@ import {
   getConfidenceLabel,
   getModeLabel
 } from "@/lib/quizAnalysis";
+import {
+  getQuizSessionNavigationIntent,
+  getRequestedResumeStatus
+} from "@/lib/quizSessionNavigation";
 import { resolveStartSettingsFromSearchParams } from "@/lib/startSettingsUrl";
 import {
   applyQuestionExplanationOverride,
@@ -1036,6 +1040,7 @@ export default function QuizPage() {
         const existing = loadCurrentSession();
         const params =
           typeof window !== "undefined" ? new URLSearchParams(window.location.search) : null;
+        const navigationIntent = getQuizSessionNavigationIntent(params);
         const preset = params?.get("preset");
         const directSubject = params?.get("subject");
         const startSettingsResolution = resolveStartSettingsFromSearchParams(params);
@@ -1098,7 +1103,7 @@ export default function QuizPage() {
                 ? med2PresetSettings
                 : loadQuizSettings() ?? DEFAULT_QUIZ_SETTINGS);
         const savedSettings = normalizeLegacySettings(rawSettings);
-        const shouldForceNewSession = params?.get("new") === "1";
+        const shouldForceNewSession = navigationIntent.forceNew;
         const expectedSimulationQuestionCount = getExpectedSimulationQuestionCount(
           savedSettings,
           loadedOverrides
@@ -1114,10 +1119,27 @@ export default function QuizPage() {
           expectedSimulationQuestionCount > 0 &&
           existingSimulationQuestionCount !== expectedSimulationQuestionCount;
         const canReuseExisting = canReuseCurrentSession(existing, loadedOverrides);
+        const requestedResumeStatus = getRequestedResumeStatus({
+          intent: navigationIntent,
+          session: existing,
+          reusable: canReuseExisting
+        });
+        if (
+          requestedResumeStatus !== "not-requested" &&
+          requestedResumeStatus !== "ready"
+        ) {
+          setSession(null);
+          setLoadIssue(
+            "剛才選的進行中測驗沒有安全載入，原紀錄仍保留，也不會改開隨機題組。請回首頁再按一次繼續作答。"
+          );
+          resetQuestionUI();
+          return;
+        }
         const shouldReuseExisting =
-          !shouldForceNewSession &&
-          canReuseExisting &&
-          !shouldInvalidateExistingSimulationSession;
+          requestedResumeStatus === "ready" ||
+          (!shouldForceNewSession &&
+            canReuseExisting &&
+            !shouldInvalidateExistingSimulationSession);
         const nextSession = shouldReuseExisting
           ? existing
           : createSession(

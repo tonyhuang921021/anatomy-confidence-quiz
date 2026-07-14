@@ -23,6 +23,8 @@
     "lib/weaknessAnalysis.test.ts",
     "lib/currentSessionSelection.ts",
     "lib/currentSessionSelection.test.ts",
+    "lib/quizSessionNavigation.ts",
+    "lib/quizSessionNavigation.test.ts",
     "lib/cloudHistorySync.ts",
     "lib/cloudHistorySync.test.ts",
     "lib/feedbackAuth.ts",
