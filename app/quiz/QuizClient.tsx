@@ -8,6 +8,7 @@ import { useAuth } from "@/components/AuthProvider";
 import { ConfidenceSelector } from "@/components/ConfidenceSelector";
 import { ErrorTypeSelector } from "@/components/ErrorTypeSelector";
 import { QuestionCard } from "@/components/QuestionCard";
+import { QuestionAiMetadataBadges } from "@/components/QuestionAiMetadataBadges";
 import {
   applyQuestionClassificationOverride,
   buildExamLikeRandomSet,
@@ -2496,7 +2497,13 @@ export default function QuizPage() {
           : confidenceCalibrationEnabled && submittedAttempt && submittedAttempt.confidence <= 3
             ? { text: "低信心", style: "bg-yellow-100 text-yellow-900" }
           : null;
-  const difficultyBadge = submittedAttempt ? getDifficultyBadge(currentQuestion) : null;
+  const isAiGeneratedQuestion =
+    currentQuestion.sourceType === "AI_GENERATED" ||
+    currentQuestion.source === "ai-generated";
+  const difficultyBadge =
+    submittedAttempt && !isAiGeneratedQuestion
+      ? getDifficultyBadge(currentQuestion)
+      : null;
   const feedbackMode = getEffectiveFeedbackMode(session.settings);
   const isBlindSimulation =
     session.settings?.mode === "simulation" && feedbackMode === "none";
@@ -2747,6 +2754,10 @@ export default function QuizPage() {
                   ) : null}
                   {shouldShowExplanation ? (
                     <>
+                      <QuestionAiMetadataBadges
+                        question={currentQuestion}
+                        className="mb-3"
+                      />
                       {shouldShowAiExplanationDetails ? (
                         <StructuredExplanationText text={currentQuestion.explanation} label="整題詳解" compact />
                       ) : null}

@@ -3,6 +3,7 @@ import { createClient } from "@supabase/supabase-js";
 import { compactQuestionForStorage, compactSessionForStorage, normalizeSessions } from "@/lib/storage";
 import { isSupabaseRecoveryMode } from "@/lib/supabase/recoveryMode";
 import { shouldProtectExistingCompletedSession } from "@/lib/quizSessionSyncSafety";
+import { buildSimulationPaperScoreRow } from "@/lib/simulationPaperStats";
 import {
   buildQuizSessionProgressPayload,
   hasQuizSessionDefinitionChanged,
@@ -226,6 +227,29 @@ function dedupeSessionAttemptRows(rows: QuizSessionAttemptRow[]) {
   return Array.from(deduped.values());
 }
 
+async function storeSimulationPaperScores(
+  supabase: ServiceSupabaseClient,
+  sessions: QuizSession[]
+) {
+  const rows = sessions
+    .map(buildSimulationPaperScoreRow)
+    .filter((row): row is NonNullable<typeof row> => Boolean(row));
+  if (rows.length === 0) return;
+
+  try {
+    const { error } = await supabase
+      .from("simulation_paper_scores")
+      .upsert(rows, {
+        onConflict: "session_id",
+        ignoreDuplicates: true
+      });
+    if (error) throw error;
+  } catch (error) {
+    // Public score statistics are best effort and must never block quiz history sync.
+    console.warn("[simulation-paper-stats] write skipped", error);
+  }
+}
+
 function getAttemptRowUploadSignature(row: QuizSessionAttemptRow) {
   return [
     row.question_id,
@@ -413,8 +437,12 @@ export async function POST(request: NextRequest) {
         !discardedSessionIds.has(row.id) &&
         !protectedCompletedSessionIds.has(row.id)
     );
+    const scoreSummarySessions = sessions.filter(
+      (session) => !discardedSessionIds.has(session.id)
+    );
 
     if (safeRows.length === 0) {
+      await storeSimulationPaperScores(supabase, scoreSummarySessions);
       return NextResponse.json(
         { ok: true, uploadedSessions: 0, uploadedAttempts: 0 },
         { headers: { "Cache-Control": "no-store" } }
@@ -482,6 +510,8 @@ export async function POST(request: NextRequest) {
         if (sessionError) throw sessionError;
       }
     }
+
+    await storeSimulationPaperScores(supabase, scoreSummarySessions);
 
     return NextResponse.json(
       { ok: true, uploadedSessions: safeRows.length, uploadedAttempts: attemptRows.length },

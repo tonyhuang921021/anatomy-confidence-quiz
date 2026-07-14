@@ -1,6 +1,16 @@
 import type { Question, SubjectFilter } from "@/types/quiz";
 import gpt56Med1PaperData from "./aiSimulationPaperGpt56Med1.json";
+import gpt56Med1PaperV2Data from "./aiSimulationPaperGpt56Med1V2.json";
 import gpt56Med2PaperData from "./aiSimulationPaperGpt56Med2.json";
+
+export type AISimulationPaperInfo = {
+  summary: string;
+  highlights: Array<{
+    title: string;
+    body: string;
+  }>;
+  validationNote?: string;
+};
 
 export type AISimulationPaperOption = {
   key: string;
@@ -11,6 +21,7 @@ export type AISimulationPaperOption = {
   isComplete?: boolean;
   sourceYear?: number;
   sourceRound?: 1 | 2;
+  info?: AISimulationPaperInfo;
 };
 
 type AISimulationPaper = AISimulationPaperOption & {
@@ -20,9 +31,49 @@ type AISimulationPaper = AISimulationPaperOption & {
 const MED1_ADVANCED_B_AI_PAPER_KEY = "AI-MED1-ADV-B-001";
 const MED2_ADVANCED_AI_PAPER_KEY = "AI-MED2-ADV-001";
 const GPT56_MED1_AI_PAPER_KEY = gpt56Med1PaperData.paper.key;
+const GPT56_MED1_V2_AI_PAPER_KEY = gpt56Med1PaperV2Data.paper.key;
 const GPT56_MED2_AI_PAPER_KEY = gpt56Med2PaperData.paper.key;
 const gpt56Med1AiPaperQuestions = gpt56Med1PaperData.questions as unknown as Question[];
+const GPT56_MED1_V2_DETAIL_QUESTION_NUMBERS = new Set([
+  3, 8, 18, 20, 34, 37, 43, 49, 56, 61, 68, 75, 82, 90, 94
+]);
+const gpt56Med1V2AiPaperQuestions = (
+  gpt56Med1PaperV2Data.questions as unknown as Question[]
+).map((question) => ({
+  ...question,
+  isDetailQuestion: GPT56_MED1_V2_DETAIL_QUESTION_NUMBERS.has(
+    question.originalQuestionNumber ?? -1
+  )
+}));
 const gpt56Med2AiPaperQuestions = gpt56Med2PaperData.questions as unknown as Question[];
+
+const GPT56_MED1_V2_INFO: AISimulationPaperInfo = {
+  summary:
+    "延續上一版的完整 JSON schema、科目排序、題數與詳解格式，但 100 題的題幹、情境、選項及解析皆重新撰寫。paperCode 為 002，不會與上一卷混淆。",
+  highlights: [
+    {
+      title: "簡單題不再等於送分題",
+      body:
+        "基礎題仍考核心知識，但選項會盡量放在同一解剖區域、同類細胞、同條代謝路徑或同組生理參數中比較。"
+    },
+    {
+      title: "干擾選項改為部分吻合",
+      body:
+        "臨床題會在病灶高度、保留功能、神經分支或感覺範圍上設陷阱；生化題則使用相鄰酵素、輔因子、區室與相反調控方向。"
+    },
+    {
+      title: "難題改考整合",
+      body:
+        "主要同時整合兩至三個資訊，例如位置與功能、壓力變化與代償、酵素與區室及調控物，不靠冷僻名詞堆疊。"
+    },
+    {
+      title: "排除形式提示",
+      body:
+        "全卷沒有「以上皆是／以上皆非」，也未偵測到明顯選項長度異常。"
+    }
+  ],
+  validationNote: "正確選項平均 23.26 字；干擾選項平均 21.81 字。"
+};
 
 const med1AdvancedBAiPaperQuestions: Question[] = [
   {
@@ -5531,6 +5582,18 @@ const med2AdvancedAiPaperQuestions: Question[] = [
 ];
 
 const aiSimulationPapers: AISimulationPaper[] = [
+  {
+    key: GPT56_MED1_V2_AI_PAPER_KEY,
+    label: "第二份gpt5.6出的醫學一（有改良）",
+    subject: "醫學（一）",
+    questionCount: gpt56Med1V2AiPaperQuestions.length,
+    missingNumbers: [],
+    isComplete: true,
+    sourceYear: 2026,
+    sourceRound: 1,
+    info: GPT56_MED1_V2_INFO,
+    questions: gpt56Med1V2AiPaperQuestions
+  },
   {
     key: GPT56_MED1_AI_PAPER_KEY,
     label: "gpt5.6出的醫學一",

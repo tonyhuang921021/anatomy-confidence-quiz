@@ -6,6 +6,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { useAuth } from "@/components/AuthProvider";
 import { useCloudHistoryHydration } from "@/components/useCloudHistoryHydration";
 import { CopyQuestionPromptButton } from "@/components/CopyQuestionPromptButton";
+import { QuestionAiMetadataBadges } from "@/components/QuestionAiMetadataBadges";
 import { QuestionOptionBlock, QuestionStemBlock } from "@/components/QuestionMediaBlock";
 import { QuestionPrimaryTagBadge } from "@/components/QuestionPrimaryTagBadge";
 import { QuestionExplanationTabs } from "@/components/QuestionExplanationTabs";
@@ -2432,6 +2433,7 @@ function ResultsPageContent() {
             </div>
           ) : null}
         </div>
+        <QuestionAiMetadataBadges question={question} className="mb-3" />
         <StructuredExplanationText
           text={question.explanation}
           label="詳解"

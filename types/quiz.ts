@@ -61,6 +61,7 @@ export type Question = {
   paperCode?: string;
   examSessionLabel?: string;
   difficulty?: DifficultyLevel;
+  isDetailQuestion?: boolean;
 };
 
 export type ConfidenceLevel = 1 | 2 | 3 | 4 | 5;

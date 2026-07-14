@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/components/AuthProvider";
+import { SelectedSimulationPaperPanel } from "@/components/SelectedSimulationPaperPanel";
 import { useCloudHistoryHydration } from "@/components/useCloudHistoryHydration";
 import { getAISimulationPaperOptions, getPastPaperOptions } from "@/data/med1QuestionBank";
 import { enabledSubjects, subjectRegistry } from "@/data/subjectRegistry";
@@ -210,6 +211,9 @@ export function QuizSetupPanel({
   );
   const selectedPaperOptions =
     settings.subjectFilter === "醫學（二）" ? med2PaperOptions : med1PaperOptions;
+  const selectedPaper = selectedPaperOptions.find(
+    (paper) => paper.key === settings.selectedPaperKey
+  );
   const activePaperMode = settings.paperMode ?? "random_set";
   const isSelectablePaperMode = activePaperMode === "past_paper" || activePaperMode === "ai_paper";
   const canStart = !isSelectablePaperMode || Boolean(settings.selectedPaperKey);
@@ -550,7 +554,13 @@ export function QuizSetupPanel({
                       : "請直接點選要做的卷別。已做過的卷會標示上次分數，方便你挑想重刷的考卷。"}
                   </div>
 
-                  <div className="grid gap-4 lg:grid-cols-2">
+                  <div
+                    className={`grid gap-4 ${
+                      selectedPaper
+                        ? "lg:grid-cols-[minmax(0,0.95fr)_minmax(0,1.05fr)]"
+                        : "grid-cols-1"
+                    }`}
+                  >
                     {([
                       settings.subjectFilter === "醫學（二）"
                         ? { title: "醫學（二）", papers: selectedPaperOptions, accent: "sky" }
@@ -615,6 +625,15 @@ export function QuizSetupPanel({
                         </div>
                       </div>
                     ))}
+                    {selectedPaper ? (
+                      <SelectedSimulationPaperPanel
+                        key={selectedPaper.key}
+                        paper={selectedPaper}
+                        hasCompletedPaper={Boolean(
+                          completedPaperSummaries[selectedPaper.key]
+                        )}
+                      />
+                    ) : null}
                   </div>
                 </div>
               ) : null}

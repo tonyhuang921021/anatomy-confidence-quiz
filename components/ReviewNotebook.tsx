@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { type ReactNode, useEffect, useMemo, useRef, useState } from "react";
 import { CopyQuestionPromptButton } from "@/components/CopyQuestionPromptButton";
+import { QuestionAiMetadataBadges } from "@/components/QuestionAiMetadataBadges";
 import { getCloudSyncRetryDelayMs } from "@/lib/cloudSyncWriteGuard";
 import { QuestionExplanationTabs } from "@/components/QuestionExplanationTabs";
 import { QuestionOptionBlock, QuestionStemBlock } from "@/components/QuestionMediaBlock";
@@ -559,6 +560,7 @@ function renderQuestionReview(
             ? "本題一律給分"
             : renderedQuestion.answer}
       </p>
+      <QuestionAiMetadataBadges question={renderedQuestion} />
       <StructuredExplanationText
         text={renderedQuestion.explanation}
         label="重點解析"
