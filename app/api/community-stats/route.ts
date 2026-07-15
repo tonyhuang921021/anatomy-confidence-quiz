@@ -6,7 +6,7 @@ import { withServerTimeout } from "@/lib/serverTimeout";
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
 
-const COMMUNITY_STATS_CACHE_CONTROL = "public, max-age=900, s-maxage=21600, stale-while-revalidate=86400";
+const COMMUNITY_STATS_CACHE_CONTROL = "public, max-age=60, s-maxage=300, stale-while-revalidate=900";
 const DEGRADED_CACHE_CONTROL = "no-store";
 
 type CommunityPoint = {
@@ -196,16 +196,19 @@ export async function GET(request: Request) {
       activeUsers14d = null;
     }
 
-    const points = dayKeys.map((date) => {
+    const points = dayKeys.flatMap((date) => {
       const stats = grouped.get(date);
-      const attempts = stats?.attempts ?? 0;
-      const correctAttempts = stats?.correctAttempts ?? 0;
-      return {
+      if (!stats) return [];
+
+      return [{
         date,
-        attempts,
-        devices: stats?.devices ?? 0,
-        correctRate: attempts === 0 ? 0 : Number(((correctAttempts / attempts) * 100).toFixed(1))
-      };
+        attempts: stats.attempts,
+        devices: stats.devices,
+        correctRate:
+          stats.attempts === 0
+            ? 0
+            : Number(((stats.correctAttempts / stats.attempts) * 100).toFixed(1))
+      }];
     });
     communityStatsCache.set(days, { points, updatedAt: new Date().toISOString(), activeUsers14d });
 

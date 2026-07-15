@@ -1719,6 +1719,50 @@ select {
     opacity: 0.48;
   }
 
+  .home-exam-contact {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-top: 1rem;
+    padding: 1rem 0.15rem 0.1rem;
+    border-top: 1px solid color-mix(in srgb, var(--brand-main) 15%, var(--line-soft));
+  }
+
+  .home-exam-contact-copy {
+    max-width: 34rem;
+    color: var(--ink-muted);
+    font-size: 0.86rem;
+    font-weight: 700;
+    line-height: 1.65;
+  }
+
+  .home-exam-contact-link {
+    display: inline-flex;
+    min-height: 2.55rem;
+    flex: 0 0 auto;
+    align-items: center;
+    justify-content: center;
+    gap: 0.45rem;
+    border: 1px solid color-mix(in srgb, var(--brand-main) 24%, var(--line-soft));
+    border-radius: 999px;
+    padding: 0.58rem 0.82rem;
+    background: color-mix(in srgb, var(--brand-main) 7%, rgba(255, 255, 255, 0.9));
+    color: var(--brand-deep);
+    font-size: 0.84rem;
+    font-weight: 900;
+    transition:
+      border-color 160ms ease,
+      background-color 160ms ease,
+      color 160ms ease;
+  }
+
+  .home-exam-contact-link:hover {
+    border-color: color-mix(in srgb, var(--brand-main) 46%, var(--line-soft));
+    background: color-mix(in srgb, var(--brand-main) 12%, rgba(255, 255, 255, 0.9));
+    color: var(--ink-main);
+  }
+
   .home-entry-mark {
     @apply inline-flex rounded-full px-3 py-1 text-xs font-black;
     background: color-mix(in srgb, var(--brand-main) 12%, white);
@@ -2379,6 +2423,12 @@ select {
   .home-study-link {
     min-height: 3.35rem;
   }
+
+  .home-exam-contact {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 0.7rem;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -2639,6 +2689,12 @@ html[data-theme="dark"] .home-action-mark,
 html[data-theme="dark"] .home-study-link {
   background: rgba(40, 48, 61, 0.72);
   border-color: rgba(207, 214, 224, 0.08);
+}
+
+html[data-theme="dark"] .home-exam-contact-link {
+  border-color: rgba(207, 214, 224, 0.12);
+  background: rgba(40, 48, 61, 0.72);
+  color: var(--ink-main);
 }
 
 html[data-theme="dark"] .home-action-mark::after,

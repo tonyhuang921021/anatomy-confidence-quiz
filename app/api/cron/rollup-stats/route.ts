@@ -16,17 +16,11 @@ type ChangedAttemptRow = {
   created_at: string;
 };
 
-type AttemptCorrectnessRow = {
-  question_id: string;
-  is_correct: boolean;
-};
-
 const ROLLUP_SETTING_KEY = "stats_rollup_cursor";
 const INITIAL_LOOKBACK_MS = 24 * 60 * 60 * 1000;
 const CURSOR_OVERLAP_MS = 2 * 60 * 1000;
 const ROLLUP_PAGE_SIZE = 1000;
-const MAX_CHANGED_ATTEMPTS_PER_RUN = 5000;
-const QUESTION_ID_CHUNK_SIZE = 250;
+const MAX_CHANGED_ATTEMPTS_PER_RUN = 500;
 const ROLLUP_TIMEOUT_MS = 20_000;
 const ROLLUP_LEASE_SECONDS = 180;
 
@@ -69,6 +63,15 @@ function normalizeIsoTimestamp(value: unknown) {
   if (typeof value !== "string" || !value.trim()) return null;
   const parsed = new Date(value);
   return Number.isNaN(parsed.getTime()) ? null : parsed.toISOString();
+}
+
+function getErrorMessage(error: unknown, fallback: string) {
+  if (error instanceof Error && error.message) return error.message;
+  if (error && typeof error === "object" && "message" in error) {
+    const message = (error as { message?: unknown }).message;
+    if (typeof message === "string" && message.trim()) return message;
+  }
+  return fallback;
 }
 
 async function readRollupCursor(supabase: any, signal: AbortSignal) {
@@ -136,54 +139,14 @@ async function refreshQuestionAccuracyStats(
   const uniqueQuestionIds = Array.from(new Set(questionIds.map((id) => id.trim()).filter(Boolean)));
   if (uniqueQuestionIds.length === 0) return 0;
 
-  const grouped = new Map<string, { total: number; correct: number }>();
-  for (const questionId of uniqueQuestionIds) {
-    grouped.set(questionId, { total: 0, correct: 0 });
-  }
-
-  for (let index = 0; index < uniqueQuestionIds.length; index += QUESTION_ID_CHUNK_SIZE) {
-    const chunk = uniqueQuestionIds.slice(index, index + QUESTION_ID_CHUNK_SIZE);
-
-    for (let from = 0; ; from += ROLLUP_PAGE_SIZE) {
-      const { data, error } = await supabase
-        .from("question_attempt_logs")
-        .select("question_id, is_correct")
-        .in("question_id", chunk)
-        .range(from, from + ROLLUP_PAGE_SIZE - 1)
-        .abortSignal(signal);
-
-      if (error) throw error;
-
-      const page = (data ?? []) as AttemptCorrectnessRow[];
-      for (const row of page) {
-        const current = grouped.get(row.question_id) ?? { total: 0, correct: 0 };
-        current.total += 1;
-        if (row.is_correct) current.correct += 1;
-        grouped.set(row.question_id, current);
-      }
-
-      if (page.length < ROLLUP_PAGE_SIZE) break;
-    }
-  }
-
-  const now = new Date().toISOString();
-  const rows = uniqueQuestionIds.map((questionId) => {
-    const stats = grouped.get(questionId) ?? { total: 0, correct: 0 };
-    return {
-      question_id: questionId,
-      total_attempts: stats.total,
-      correct_attempts: stats.correct,
-      correct_rate: stats.total === 0 ? 0 : Number(((stats.correct / stats.total) * 100).toFixed(1)),
-      updated_at: now
-    };
-  });
-
-  const { error } = await supabase
-    .from("question_accuracy_stats")
-    .upsert(rows, { onConflict: "question_id" });
+  const { data, error } = await supabase
+    .rpc("refresh_question_accuracy_stats_for_questions", {
+      p_question_ids: uniqueQuestionIds
+    })
+    .abortSignal(signal);
 
   if (error) throw error;
-  return rows.length;
+  return Number(data ?? 0);
 }
 
 async function countRows(supabaseQuery: Promise<{ count: number | null; error: unknown }>) {
@@ -324,7 +287,10 @@ export async function GET(request: NextRequest) {
         ).toISOString();
         const changedRows = await fetchChangedAttemptRows(supabase, since, until, signal);
         const questionIds = changedRows.map((row) => row.question_id);
-        const dayKeys = changedRows.map((row) => getTaipeiDayKey(new Date(row.answered_at)));
+        const dayKeys = [
+          getTaipeiDayKey(new Date()),
+          ...changedRows.map((row) => getTaipeiDayKey(new Date(row.answered_at)))
+        ];
 
         const [questionStatsUpdated, ownerDailyStatsUpdated] = await Promise.all([
           refreshQuestionAccuracyStats(supabase, questionIds, signal),
@@ -361,7 +327,8 @@ export async function GET(request: NextRequest) {
         { status: 202, headers: { "Cache-Control": "no-store" } }
       );
     }
-    const message = error instanceof Error ? error.message : "統計背景彙總失敗";
+    const message = getErrorMessage(error, "統計背景彙總失敗");
+    console.error("統計背景彙總失敗：", error);
     return NextResponse.json(
       { ok: false, message },
       { status: 500, headers: { "Cache-Control": "no-store" } }

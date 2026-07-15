@@ -53,6 +53,11 @@ const QUICK_ENTRIES = [
 
 const HOME_RELEASE_NOTES = [
   {
+    time: "07/15",
+    title: "考前兩天，一起穩住",
+    body: "焦慮與抗焦慮文案換成最後兩天版本；首頁題數缺資料不再誤顯示 0，也能直接找到聯絡方式。"
+  },
+  {
     time: "07/14",
     title: "題目格式回報修好了",
     body: "免疫、胺基酸與 prion 題的上下標和多出的字元已整理，題目現在會照原本格式顯示。"
@@ -1175,6 +1180,21 @@ export default function HomePage() {
                       儲存題目
                     </Link>
                   </div>
+                </div>
+                <div className="home-exam-contact">
+                  <p className="home-exam-contact-copy">
+                    考前兩天，若有急或不急的事，或有什麼資料需要，都可以直接聯絡 IG。
+                  </p>
+                  <a
+                    href="https://www.instagram.com/yphe_uc?igsh=OWJqZjJqd2o2cGpi&utm_source=qr"
+                    target="_blank"
+                    rel="noreferrer"
+                    className="home-exam-contact-link"
+                    aria-label="前往 Instagram 聯絡 yphe_uc"
+                  >
+                    @yphe_uc
+                    <span aria-hidden="true">↗</span>
+                  </a>
                 </div>
               </div>
             </div>
