@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useAuth } from "@/components/AuthProvider";
+import { ReviewYearRangeFilter } from "@/components/ReviewYearRangeFilter";
 import { useCloudHistoryHydration } from "@/components/useCloudHistoryHydration";
 import {
   MANUAL_REVIEW_STATE_CHANGE_EVENT,
@@ -15,6 +16,16 @@ import {
 import { applyQuestionClassificationOverride, getQuestionBankBySubjectFilter } from "@/data/med1QuestionBank";
 import { loadConfirmedQuestionClassificationOverrides } from "@/lib/cloudSync";
 import { buildNewQuizHref } from "@/lib/startSettingsUrl";
+import {
+  DEFAULT_REVIEW_YEAR_RANGE,
+  filterReviewItemsByYear,
+  normalizeReviewYearRange,
+  type ReviewYearRange
+} from "@/lib/reviewYearFilter";
+import {
+  buildLatestReviewAttemptMap,
+  orderReviewItemsForNextRound
+} from "@/lib/reviewQuestionOrder";
 import {
   DEFAULT_QUIZ_SETTINGS,
   getReviewQuestionItems,
@@ -98,7 +109,13 @@ function isSimulationReviewCompletionSession(session: QuizSession) {
   );
 }
 
-function buildSimulationReviewSettings(items: ReviewQuestionItem[]): QuizSettings {
+function buildSimulationReviewSettings(
+  items: ReviewQuestionItem[],
+  yearRange: ReviewYearRange,
+  latestReviewAttemptByQuestionId: ReadonlyMap<string, string>
+): QuizSettings {
+  const orderedItems = orderReviewItemsForNextRound(items, latestReviewAttemptByQuestionId);
+  const normalizedYearRange = normalizeReviewYearRange(yearRange);
   const subjectFilters = Array.from(
     new Set(items.map((item) => item.question.subject))
   ) as SubjectName[];
@@ -107,18 +124,25 @@ function buildSimulationReviewSettings(items: ReviewQuestionItem[]): QuizSetting
     ...DEFAULT_QUIZ_SETTINGS,
     mode: "review",
     questionCount: Math.max(1, items.length),
+    yearFrom: normalizedYearRange.yearFrom,
+    yearTo: normalizedYearRange.yearTo,
     subjectFilter: subjectFilters.length === 1 ? subjectFilters[0] : "全部",
     subjectFilters,
     strictCustomQuestionPool: true,
-    customQuestionIds: items.map((item) => item.question.id),
-    customQuestionPayload: items.map((item) => item.question),
+    preserveCustomQuestionOrder: true,
+    customQuestionIds: orderedItems.map((item) => item.question.id),
+    customQuestionPayload: orderedItems.map((item) => item.question),
     customPoolLabel: SIMULATION_REVIEW_POOL_LABEL
   };
 }
 
-function buildSimulationReviewUrlSettings(items: ReviewQuestionItem[]): QuizSettings {
+function buildSimulationReviewUrlSettings(
+  items: ReviewQuestionItem[],
+  yearRange: ReviewYearRange,
+  latestReviewAttemptByQuestionId: ReadonlyMap<string, string>
+): QuizSettings {
   return {
-    ...buildSimulationReviewSettings(items),
+    ...buildSimulationReviewSettings(items, yearRange, latestReviewAttemptByQuestionId),
     customQuestionPayload: undefined
   };
 }
@@ -129,10 +153,16 @@ function loadReviewCompletedSessions() {
 
 export default function SimulationReviewPage() {
   const [simulationItems, setSimulationItems] = useState<ReviewQuestionItem[]>([]);
+  const [latestReviewAttemptByQuestionId, setLatestReviewAttemptByQuestionId] = useState<
+    ReadonlyMap<string, string>
+  >(() => new Map());
   const [classificationOverrides, setClassificationOverrides] = useState<
     Record<string, QuestionClassificationOverride>
   >({});
   const [localHistoryVersion, setLocalHistoryVersion] = useState(0);
+  const [reviewYearRange, setReviewYearRange] = useState<ReviewYearRange>(() => ({
+    ...DEFAULT_REVIEW_YEAR_RANGE
+  }));
   const [manualReviewState, setManualReviewState] = useState<ManualReviewState>(() =>
     readManualReviewStateForScope(SIMULATION_REVIEW_SCOPE, "guest")
   );
@@ -164,6 +194,9 @@ export default function SimulationReviewPage() {
     );
     const reviewQuestions = mergeQuestionsWithSessionSnapshots(allQuestions, simulationSourceSessions);
     setSimulationItems(getReviewQuestionItems(reviewQuestions, historySessions, Number.MAX_SAFE_INTEGER));
+    setLatestReviewAttemptByQuestionId(
+      buildLatestReviewAttemptMap(sessions, [SIMULATION_REVIEW_POOL_LABEL])
+    );
   }, [allQuestions, syncVersion, localHistoryVersion, user?.id]);
 
   useEffect(() => {
@@ -194,18 +227,40 @@ export default function SimulationReviewPage() {
     };
   }, [user?.id]);
 
-  function handleStartSimulationReview(filteredItems: ReviewQuestionItem[] = simulationItems) {
-    saveQuizSettings(buildSimulationReviewUrlSettings(filteredItems));
+  function handleStartSimulationReview(filteredItems: ReviewQuestionItem[]) {
+    saveQuizSettings(
+      buildSimulationReviewUrlSettings(
+        filteredItems,
+        reviewYearRange,
+        latestReviewAttemptByQuestionId
+      )
+    );
   }
 
   const getSimulationReviewHref = useCallback(
-    (items: ReviewQuestionItem[]) => buildNewQuizHref(buildSimulationReviewUrlSettings(items)),
-    []
+    (items: ReviewQuestionItem[]) =>
+      buildNewQuizHref(
+        buildSimulationReviewUrlSettings(items, reviewYearRange, latestReviewAttemptByQuestionId)
+      ),
+    [latestReviewAttemptByQuestionId, reviewYearRange]
   );
 
-  const unresolvedSimulationItems = useMemo(
+  const allUnresolvedSimulationItems = useMemo(
     () => getUnresolvedReviewItems(simulationItems, manualReviewState, reviewCompletionThreshold),
     [manualReviewState, reviewCompletionThreshold, simulationItems]
+  );
+  const yearFilteredSimulationItems = useMemo(
+    () => filterReviewItemsByYear(simulationItems, reviewYearRange),
+    [reviewYearRange, simulationItems]
+  );
+  const unresolvedSimulationItems = useMemo(
+    () =>
+      getUnresolvedReviewItems(
+        yearFilteredSimulationItems,
+        manualReviewState,
+        reviewCompletionThreshold
+      ),
+    [manualReviewState, reviewCompletionThreshold, yearFilteredSimulationItems]
   );
   const simulationSnapshot = getReviewSnapshot(unresolvedSimulationItems);
 
@@ -249,6 +304,15 @@ export default function SimulationReviewPage() {
         </div>
       </section>
 
+      <ReviewYearRangeFilter
+        idPrefix="simulation-review"
+        value={reviewYearRange}
+        onChange={setReviewYearRange}
+        filteredCount={simulationSnapshot.total}
+        totalCount={allUnresolvedSimulationItems.length}
+        poolLabel="模擬考待複習題庫"
+      />
+
       <section className="mt-8 grid gap-4 lg:grid-cols-2">
         <article className="rounded-3xl bg-sky-50 p-5 text-sky-900">
           <p className="text-sm font-medium">模考待複習題</p>
@@ -267,10 +331,11 @@ export default function SimulationReviewPage() {
           startLabel="開始模擬考待複習"
           getStartHref={getSimulationReviewHref}
           onStartReview={handleStartSimulationReview}
-          items={simulationItems}
+          items={yearFilteredSimulationItems}
           allQuestions={allQuestions}
           manualEditScope={SIMULATION_REVIEW_SCOPE}
           completionThreshold={reviewCompletionThreshold}
+          emptyMessage="這個年份區間目前沒有模擬考待複習題，可以調整上方年份。"
         />
       </div>
     </main>

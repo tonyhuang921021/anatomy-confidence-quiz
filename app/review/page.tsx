@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useAuth } from "@/components/AuthProvider";
+import { ReviewYearRangeFilter } from "@/components/ReviewYearRangeFilter";
 import { useCloudHistoryHydration } from "@/components/useCloudHistoryHydration";
 import {
   MANUAL_REVIEW_STATE_CHANGE_EVENT,
@@ -15,6 +16,16 @@ import {
 import { applyQuestionClassificationOverride, getQuestionBankBySubjectFilter } from "@/data/med1QuestionBank";
 import { loadConfirmedQuestionClassificationOverrides } from "@/lib/cloudSync";
 import { buildNewQuizHref } from "@/lib/startSettingsUrl";
+import {
+  DEFAULT_REVIEW_YEAR_RANGE,
+  filterReviewItemsByYear,
+  normalizeReviewYearRange,
+  type ReviewYearRange
+} from "@/lib/reviewYearFilter";
+import {
+  buildLatestReviewAttemptMap,
+  orderReviewItemsForNextRound
+} from "@/lib/reviewQuestionOrder";
 import {
   DEFAULT_QUIZ_SETTINGS,
   buildQuestionHistoryMap,
@@ -38,6 +49,12 @@ function isPracticeReviewSession(session: QuizSession) {
     session.settings?.customPoolLabel !== "自訂卷錯題庫"
   );
 }
+
+const PRACTICE_REVIEW_POOL_LABELS = [
+  "散題錯題庫",
+  "散題錯題與沒信心題庫",
+  "散題待複習題庫"
+] as const;
 
 function buildReviewCandidateQuestions(
   questions: Question[],
@@ -79,8 +96,14 @@ function buildReviewCandidateQuestions(
   return Array.from(merged.values());
 }
 
-function buildPracticeReviewSettings(items: ReviewQuestionItem[]): QuizSettings {
-  const questionIds = items.map((item) => item.question.id);
+function buildPracticeReviewSettings(
+  items: ReviewQuestionItem[],
+  yearRange: ReviewYearRange,
+  latestReviewAttemptByQuestionId: ReadonlyMap<string, string>
+): QuizSettings {
+  const orderedItems = orderReviewItemsForNextRound(items, latestReviewAttemptByQuestionId);
+  const questionIds = orderedItems.map((item) => item.question.id);
+  const normalizedYearRange = normalizeReviewYearRange(yearRange);
   const subjectFilters = Array.from(
     new Set(items.map((item) => item.question.subject))
   ) as SubjectName[];
@@ -89,18 +112,25 @@ function buildPracticeReviewSettings(items: ReviewQuestionItem[]): QuizSettings 
     ...DEFAULT_QUIZ_SETTINGS,
     mode: "review",
     questionCount: Math.max(1, items.length),
+    yearFrom: normalizedYearRange.yearFrom,
+    yearTo: normalizedYearRange.yearTo,
     subjectFilter: subjectFilters.length === 1 ? subjectFilters[0] : "全部",
     subjectFilters,
     strictCustomQuestionPool: true,
+    preserveCustomQuestionOrder: true,
     customQuestionIds: questionIds,
-    customQuestionPayload: items.map((item) => item.question),
+    customQuestionPayload: orderedItems.map((item) => item.question),
     customPoolLabel: "散題待複習題庫"
   };
 }
 
-function buildPracticeReviewUrlSettings(items: ReviewQuestionItem[]): QuizSettings {
+function buildPracticeReviewUrlSettings(
+  items: ReviewQuestionItem[],
+  yearRange: ReviewYearRange,
+  latestReviewAttemptByQuestionId: ReadonlyMap<string, string>
+): QuizSettings {
   return {
-    ...buildPracticeReviewSettings(items),
+    ...buildPracticeReviewSettings(items, yearRange, latestReviewAttemptByQuestionId),
     customQuestionPayload: undefined
   };
 }
@@ -111,12 +141,18 @@ function loadReviewCompletedSessions() {
 
 export default function ReviewPage() {
   const [practiceItems, setPracticeItems] = useState<ReviewQuestionItem[]>([]);
+  const [latestReviewAttemptByQuestionId, setLatestReviewAttemptByQuestionId] = useState<
+    ReadonlyMap<string, string>
+  >(() => new Map());
   const [classificationOverrides, setClassificationOverrides] = useState<
     Record<string, QuestionClassificationOverride>
   >({});
   const [isFullscreenReview, setIsFullscreenReview] = useState(false);
   const [isFullscreenReviewVisible, setIsFullscreenReviewVisible] = useState(false);
   const [localHistoryVersion, setLocalHistoryVersion] = useState(0);
+  const [reviewYearRange, setReviewYearRange] = useState<ReviewYearRange>(() => ({
+    ...DEFAULT_REVIEW_YEAR_RANGE
+  }));
   const [manualReviewState, setManualReviewState] = useState<ManualReviewState>(() =>
     readManualReviewStateForScope("practice-review", "guest")
   );
@@ -150,6 +186,9 @@ export default function ReviewPage() {
       classificationOverrides
     );
     setPracticeItems(getReviewQuestionItems(reviewQuestions, practiceSessions, Number.MAX_SAFE_INTEGER));
+    setLatestReviewAttemptByQuestionId(
+      buildLatestReviewAttemptMap(sessions, PRACTICE_REVIEW_POOL_LABELS)
+    );
   }, [allQuestions, classificationOverrides, syncVersion, localHistoryVersion, user?.id]);
 
   useEffect(() => {
@@ -225,13 +264,22 @@ export default function ReviewPage() {
     };
   }, [isFullscreenReview]);
 
-  function handleStartPracticeReview(filteredItems: ReviewQuestionItem[] = practiceItems) {
-    saveQuizSettings(buildPracticeReviewUrlSettings(filteredItems));
+  function handleStartPracticeReview(filteredItems: ReviewQuestionItem[]) {
+    saveQuizSettings(
+      buildPracticeReviewUrlSettings(
+        filteredItems,
+        reviewYearRange,
+        latestReviewAttemptByQuestionId
+      )
+    );
   }
 
   const getPracticeReviewHref = useCallback(
-    (items: ReviewQuestionItem[]) => buildNewQuizHref(buildPracticeReviewUrlSettings(items)),
-    []
+    (items: ReviewQuestionItem[]) =>
+      buildNewQuizHref(
+        buildPracticeReviewUrlSettings(items, reviewYearRange, latestReviewAttemptByQuestionId)
+      ),
+    [latestReviewAttemptByQuestionId, reviewYearRange]
   );
 
   function handleCloseFullscreenReview() {
@@ -251,9 +299,22 @@ export default function ReviewPage() {
     setIsFullscreenReview(true);
   }
 
-  const unresolvedPracticeItems = useMemo(
+  const allUnresolvedPracticeItems = useMemo(
     () => getUnresolvedReviewItems(practiceItems, manualReviewState, reviewCompletionThreshold),
     [manualReviewState, practiceItems, reviewCompletionThreshold]
+  );
+  const yearFilteredPracticeItems = useMemo(
+    () => filterReviewItemsByYear(practiceItems, reviewYearRange),
+    [practiceItems, reviewYearRange]
+  );
+  const unresolvedPracticeItems = useMemo(
+    () =>
+      getUnresolvedReviewItems(
+        yearFilteredPracticeItems,
+        manualReviewState,
+        reviewCompletionThreshold
+      ),
+    [manualReviewState, reviewCompletionThreshold, yearFilteredPracticeItems]
   );
   const reviewCount = unresolvedPracticeItems.length;
   const lowConfidenceCount = unresolvedPracticeItems.filter((item) => item.history.lowConfidence > 0).length;
@@ -298,6 +359,15 @@ export default function ReviewPage() {
         </div>
       </section>
 
+      <ReviewYearRangeFilter
+        idPrefix="practice-review"
+        value={reviewYearRange}
+        onChange={setReviewYearRange}
+        filteredCount={reviewCount}
+        totalCount={allUnresolvedPracticeItems.length}
+        poolLabel="散題待複習題庫"
+      />
+
       <section className="mt-8 grid gap-4 lg:grid-cols-2">
         <article className="rounded-3xl bg-rose-50 p-5 text-rose-900">
           <p className="text-sm font-medium">散題待複習題</p>
@@ -317,10 +387,11 @@ export default function ReviewPage() {
             startLabel="開始散題待複習"
             getStartHref={getPracticeReviewHref}
             onStartReview={handleStartPracticeReview}
-            items={practiceItems}
+            items={yearFilteredPracticeItems}
             allQuestions={allQuestions}
             manualEditScope="practice-review"
             completionThreshold={reviewCompletionThreshold}
+            emptyMessage="這個年份區間目前沒有散題待複習題，可以調整上方年份。"
             headerAction={
               <button
                 type="button"
@@ -367,10 +438,11 @@ export default function ReviewPage() {
                 startLabel="開始散題待複習"
                 getStartHref={getPracticeReviewHref}
                 onStartReview={handleStartPracticeReview}
-                items={practiceItems}
+                items={yearFilteredPracticeItems}
                 allQuestions={allQuestions}
                 manualEditScope="practice-review"
                 completionThreshold={reviewCompletionThreshold}
+                emptyMessage="這個年份區間目前沒有散題待複習題，可以返回頁面調整年份。"
                 fullscreenMobile
               />
             </div>

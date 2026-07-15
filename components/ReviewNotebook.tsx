@@ -619,6 +619,7 @@ type ReviewNotebookProps = {
   headerAction?: ReactNode;
   manualEditScope?: string;
   completionThreshold?: ReviewCompletionThreshold;
+  emptyMessage?: string;
 };
 
 export function ReviewNotebook({
@@ -633,7 +634,8 @@ export function ReviewNotebook({
   fullscreenMobile = false,
   headerAction,
   manualEditScope,
-  completionThreshold
+  completionThreshold,
+  emptyMessage = "目前還沒有累積錯題或低信心題，先去刷一輪題目吧。"
 }: ReviewNotebookProps) {
   const { session, user } = useAuth();
   const accountCompletionThreshold = useReviewCompletionThreshold();
@@ -1324,7 +1326,7 @@ export function ReviewNotebook({
       <div className={`${fullscreenMobile ? "mt-4" : "mt-6"} grid gap-8`}>
         {items.length === 0 ? (
           <div className="rounded-3xl bg-slate-50 p-5 text-sm text-slate-500">
-            目前還沒有累積錯題或低信心題，先去刷一輪題目吧。
+            {emptyMessage}
           </div>
         ) : (
           <>
