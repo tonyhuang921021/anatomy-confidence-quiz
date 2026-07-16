@@ -1179,6 +1179,35 @@ const questionTextOverrides: Record<string, QuestionTextOverride> = {
       D: "不選。屈拇短肌（flexor hallucis brevis）與屈趾短肌（flexor digitorum brevis）不是本題最符合的答案；本題重點是 Knot of Henry：FHL crosses FDL in medial plantar foot。"
     }
   },
+  "MOEX-106100-1301-Q074": {
+    options: {
+      A: "kcat",
+      B: "kcat × Km",
+      C: "Vmax / Km",
+      D: "1 / Km"
+    }
+  },
+  "MOEX-113090-1301-Q099": {
+    stem:
+      "磷脂酶C（phospholipase C）水解phosphatidylinositol 4,5-bisphosphate（PIP₂），直接產生的次級訊息傳遞者（second messenger）包括下列何者？"
+  },
+  "MOEX-111100-1301-Q094": {
+    options: {
+      D: "葉酸（folate）及維生素B12可作為同半胱胺酸代謝的輔酶"
+    }
+  },
+  "MOEX-111020-1301-Q064": {
+    stem:
+      "相較於正常換氣（normal ventilation），過度換氣（hyperventilation）時可見：①肺泡內氧分壓（ ）顯著上升 ②肺泡內二氧化碳分壓（ ）顯著下降 ③體動脈血中二氧化碳總含量（total content of CO₂）顯著下降"
+  },
+  "MOEX-110101-1301-Q088": {
+    options: {
+      A: "acetyl-CoA, CO₂, NADH",
+      B: "acetyl-CoA, CO₂, FADH₂",
+      C: "CO₂, FADH₂, acetyl-CoA",
+      D: "CO₂, acetyl-CoA, NADH"
+    }
+  },
   "MOEX-107020-5301-Q095": {
     stem: "粒線體氧化磷酸化的過程所產生 H2O2，可由下列哪一種酵素去除？",
     explanation:
