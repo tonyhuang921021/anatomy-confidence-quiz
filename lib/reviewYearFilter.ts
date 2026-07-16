@@ -42,6 +42,10 @@ export function isFullReviewYearRange(range: ReviewYearRange) {
 }
 
 export function getReviewItemSourceYear(item: ReviewQuestionItem) {
+  if (item.question.sourceType === "AI_GENERATED" || item.question.source === "ai-generated") {
+    return null;
+  }
+
   const sourceYear = item.question.sourceYear;
   if (typeof sourceYear !== "number" || !Number.isFinite(sourceYear)) return null;
 

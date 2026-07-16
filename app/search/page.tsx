@@ -1090,7 +1090,11 @@ export default function SearchPage() {
                               >
                                 {completed ? "已完成" : `答對 ${record.correctCount} / 2`}
                               </span>
-                              <span className="text-slate-400">{question.sourceYear ?? "未知年份"}</span>
+                              <span className="text-slate-400">
+                                {question.sourceType === "AI_GENERATED" || question.source === "ai-generated"
+                                  ? "AI 模擬卷"
+                                  : question.sourceYear ?? "未知年份"}
+                              </span>
                               <span className="text-slate-400">{question.subject}</span>
                               <QuestionPrimaryTagBadge
                                 question={question}

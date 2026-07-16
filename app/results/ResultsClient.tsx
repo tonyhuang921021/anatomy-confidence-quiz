@@ -576,6 +576,9 @@ function getAccuracyTone(correctRate: number) {
 }
 
 function getQuestionSourceBadgeLabel(question: Question) {
+  if (question.sourceType === "AI_GENERATED" || question.source === "ai-generated") {
+    return question.originalQuestionNumber ? `AI 題 Q${question.originalQuestionNumber}` : "AI 題";
+  }
   if (question.sourceYear && question.sourceRound && question.originalQuestionNumber) {
     return `${question.sourceYear} 第${question.sourceRound}次 Q${question.originalQuestionNumber}`;
   }
@@ -585,7 +588,6 @@ function getQuestionSourceBadgeLabel(question: Question) {
   if (question.originalQuestionNumber) {
     return `Q${question.originalQuestionNumber}`;
   }
-  if (question.sourceType === "AI_GENERATED") return "AI 題";
   return "";
 }
 

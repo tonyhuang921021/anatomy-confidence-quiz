@@ -22,6 +22,20 @@ test("第二份 GPT 5.6 醫學一完整註冊且細節題標記正確", () => {
   assert.equal(new Set(questions.map((question) => question.id)).size, 100);
   assert.equal(questions.filter((question) => question.isDetailQuestion).length, 15);
   assert.ok(questions.every((question) => question.paperCode === "002"));
+  assert.ok(questions.every((question) => question.sourceYear === undefined));
+  assert.ok(questions.every((question) => question.sourceRound === undefined));
+});
+
+test("AI 模擬卷不會帶正式考古題的年份與梯次", () => {
+  for (const paper of getAISimulationPaperOptions("全部")) {
+    const questions = getQuestionsForAISimulationPaper(paper.key, paper.subject);
+    assert.equal(paper.sourceYear, undefined);
+    assert.equal(paper.sourceRound, undefined);
+    assert.ok(questions.length > 0);
+    assert.ok(questions.every((question) => question.sourceType === "AI_GENERATED"));
+    assert.ok(questions.every((question) => question.sourceYear === undefined));
+    assert.ok(questions.every((question) => question.sourceRound === undefined));
+  }
 });
 
 test("改良卷可用題幹、選項與觀念連到同科考古題", () => {

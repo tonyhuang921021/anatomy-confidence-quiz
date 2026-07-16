@@ -7,7 +7,11 @@ import {
   normalizeReviewYearRange
 } from "./reviewYearFilter";
 
-function makeItem(id: string, sourceYear?: number): ReviewQuestionItem {
+function makeItem(
+  id: string,
+  sourceYear?: number,
+  sourceType?: Question["sourceType"]
+): ReviewQuestionItem {
   const question: Question = {
     id,
     subject: "生理學",
@@ -18,7 +22,8 @@ function makeItem(id: string, sourceYear?: number): ReviewQuestionItem {
     answer: "A",
     explanation: "詳解",
     testedConcept: "血壓",
-    sourceYear
+    sourceYear,
+    sourceType
   };
 
   return {
@@ -58,6 +63,26 @@ test("縮小年份時排除無年份題，全年份時保留以避免舊紀錄�
       (item) => item.question.id
     ),
     ["known", "unknown"]
+  );
+});
+
+test("舊紀錄中的 AI 題即使帶 2026 也不會被當成正式考古年份", () => {
+  const items = [
+    makeItem("official-2026", 2026, "MOEX_PAST_EXAM"),
+    makeItem("stale-ai-2026", 2026, "AI_GENERATED")
+  ];
+
+  assert.deepEqual(
+    filterReviewItemsByYear(items, { yearFrom: 2026, yearTo: 2026 }).map(
+      (item) => item.question.id
+    ),
+    ["official-2026"]
+  );
+  assert.deepEqual(
+    filterReviewItemsByYear(items, DEFAULT_REVIEW_YEAR_RANGE).map(
+      (item) => item.question.id
+    ),
+    ["official-2026", "stale-ai-2026"]
   );
 });
 

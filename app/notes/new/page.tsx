@@ -91,6 +91,12 @@ function findQuestionLinksByKeywords(
 }
 
 function getQuestionLabel(question: Question) {
+  if (question.sourceType === "AI_GENERATED" || question.source === "ai-generated") {
+    return [
+      question.examSessionLabel ?? "AI 模擬題",
+      question.originalQuestionNumber ? `第 ${question.originalQuestionNumber} 題` : null
+    ].filter(Boolean).join(" ");
+  }
   if (question.sourceYear && question.sourceRound && question.originalQuestionNumber) {
     return `${question.sourceYear} 第 ${question.sourceRound} 次第 ${question.originalQuestionNumber} 題`;
   }

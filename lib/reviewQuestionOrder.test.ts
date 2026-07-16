@@ -6,7 +6,11 @@ import {
   orderReviewItemsForNextRound
 } from "./reviewQuestionOrder";
 
-function makeItem(id: string, subject: Question["subject"] = "生理學"): ReviewQuestionItem {
+function makeItem(
+  id: string,
+  subject: Question["subject"] = "生理學",
+  lastAttemptedAt?: string
+): ReviewQuestionItem {
   const question: Question = {
     id,
     subject,
@@ -30,7 +34,8 @@ function makeItem(id: string, subject: Question["subject"] = "生理學"): Revie
       lowConfidence: 0,
       overconfidence: 0,
       correctStreakAfterLatestWrong: 0,
-      correctStreakAfterLatestRisk: 0
+      correctStreakAfterLatestRisk: 0,
+      lastAttemptedAt
     }
   };
 }
@@ -83,6 +88,20 @@ test("下一輪先出尚未在該複習題池做過的題目", () => {
     ),
     ["fresh-1", "fresh-2", "recent"]
   );
+});
+
+test("尚未複習的題目中，剛做錯的新題會排在較舊錯題後面", () => {
+  const items = [
+    makeItem("recent-ai", "生理學", "2026-07-16T10:00:00.000Z"),
+    makeItem("older-past-exam", "生理學", "2026-07-10T10:00:00.000Z"),
+    makeItem("oldest-past-exam", "解剖學", "2026-07-01T10:00:00.000Z")
+  ];
+
+  const order = orderReviewItemsForNextRound(items, new Map()).map(
+    (item) => item.question.id
+  );
+
+  assert.deepEqual(order, ["oldest-past-exam", "older-past-exam", "recent-ai"]);
 });
 
 test("都複習過時仍維持較舊的時間區段在前", () => {

@@ -88,7 +88,7 @@ function getSourceLabel(question: Question) {
     ].filter(Boolean).join(" ");
   }
 
-  if (question.sourceType === "AI_GENERATED") {
+  if (question.sourceType === "AI_GENERATED" || question.source === "ai-generated") {
     return getAISimulationPaperKeyFromQuestionId(question.id) ? "AI 模擬卷" : "AI 補題";
   }
 
@@ -473,7 +473,7 @@ export default function SavedQuestionsPage() {
                       >
                         {completed ? "已完成" : `答對 ${record.correctCount} / 2`}
                       </span>
-                      <span className="text-slate-400">{question.sourceYear ?? "未知年份"}</span>
+                      <span className="text-slate-400">{getSourceLabel(question)}</span>
                       <span className="text-slate-400">{question.subject}</span>
                     </div>
                     <p className="mt-2 line-clamp-2 break-words text-sm font-semibold leading-6 text-slate-800">

@@ -16,6 +16,13 @@ type CopyQuestionPromptButtonProps = {
 const optionKeys: OptionKey[] = ["A", "B", "C", "D", "E"];
 
 function getQuestionSourceLine(question: Question) {
+  if (question.sourceType === "AI_GENERATED" || question.source === "ai-generated") {
+    return [
+      question.examSessionLabel ?? "AI 模擬題",
+      question.originalQuestionNumber ? `第 ${question.originalQuestionNumber} 題` : null
+    ].filter(Boolean).join(" ");
+  }
+
   const parts = [
     question.sourceYear ? `${question.sourceYear} 年` : null,
     question.sourceRound ? `第 ${question.sourceRound} 次` : null,
