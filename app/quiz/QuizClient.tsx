@@ -106,6 +106,10 @@ const QuestionExplanationTabs = dynamic(
   () => import("@/components/QuestionExplanationTabs").then((mod) => mod.QuestionExplanationTabs),
   { ssr: false }
 );
+const RelatedQuestionsPanel = dynamic(
+  () => import("@/components/RelatedQuestionsPanel").then((mod) => mod.RelatedQuestionsPanel),
+  { ssr: false }
+);
 const QuestionReportButton = dynamic(
   () => import("@/components/QuestionIssueReportButton").then((mod) => mod.QuestionReportButton),
   { ssr: false }
@@ -1354,6 +1358,10 @@ export default function QuizPage() {
         )
       ),
     [classificationOverrides]
+  );
+  const relatedQuestionCatalog = useMemo(
+    () => Array.from(allQuestionFallbackMap.values()),
+    [allQuestionFallbackMap]
   );
 
   const questionSet = useMemo(
@@ -2777,6 +2785,13 @@ export default function QuizPage() {
                       <QuestionExplanationTabs
                         question={currentQuestion}
                         className="mt-3"
+                        relatedQuestionsContent={() => (
+                          <RelatedQuestionsPanel
+                            question={currentQuestion}
+                            relatedQuestions={relatedQuestionCatalog}
+                            savedQuestionSource="quiz"
+                          />
+                        )}
                       />
                     </>
                   ) : null}
