@@ -6,10 +6,10 @@ import {
   orderReviewItemsForNextRound
 } from "./reviewQuestionOrder";
 
-function makeItem(id: string): ReviewQuestionItem {
+function makeItem(id: string, subject: Question["subject"] = "生理學"): ReviewQuestionItem {
   const question: Question = {
     id,
-    subject: "生理學",
+    subject,
     chapter: "循環",
     section: "血壓",
     stem: `${id} 題幹`,
@@ -85,13 +85,13 @@ test("下一輪先出尚未在該複習題池做過的題目", () => {
   );
 });
 
-test("都複習過時先出隔最久的題目，最近做過的排最後", () => {
+test("都複習過時仍維持較舊的時間區段在前", () => {
   const items = [makeItem("newest"), makeItem("oldest"), makeItem("middle")];
   const sessions = [
     makeSession("review-1", "散題錯題庫", [
-      makeAttempt("newest", "2026-07-15T03:00:00.000Z"),
+      makeAttempt("newest", "2026-07-15T15:00:00.000Z"),
       makeAttempt("oldest", "2026-07-15T01:00:00.000Z"),
-      makeAttempt("middle", "2026-07-15T02:00:00.000Z")
+      makeAttempt("middle", "2026-07-15T08:00:00.000Z")
     ])
   ];
 
@@ -106,6 +106,67 @@ test("都複習過時先出隔最久的題目，最近做過的排最後", () =>
   );
 });
 
+test("複習時間相近的題目會穩定打散並交錯不同科目", () => {
+  const items = [
+    makeItem("anatomy-1", "解剖學"),
+    makeItem("anatomy-2", "解剖學"),
+    makeItem("anatomy-3", "解剖學"),
+    makeItem("physiology-1", "生理學"),
+    makeItem("physiology-2", "生理學"),
+    makeItem("biochemistry-1", "生物化學")
+  ];
+  const attempts = items.map((item, index) =>
+    makeAttempt(
+      item.question.id,
+      new Date(Date.UTC(2026, 6, 15, 1, index * 10)).toISOString()
+    )
+  );
+  const latestAttempts = buildLatestReviewAttemptMap(
+    [makeSession("review-nearby", "散題待複習題庫", attempts)],
+    ["散題待複習題庫"]
+  );
+  const firstOrder = orderReviewItemsForNextRound(items, latestAttempts);
+  const secondOrder = orderReviewItemsForNextRound(items, latestAttempts);
+  const firstFourSubjects = firstOrder.slice(0, 4).map((item) => item.question.subject);
+
+  assert.deepEqual(
+    firstOrder.map((item) => item.question.id),
+    secondOrder.map((item) => item.question.id)
+  );
+  assert.ok(new Set(firstFourSubjects).size >= 2);
+  assert.notEqual(firstOrder[0]?.question.subject, firstOrder[1]?.question.subject);
+});
+
+test("相隔超過六小時仍維持較久未複習的批次在前", () => {
+  const items = [
+    makeItem("recent-anatomy", "解剖學"),
+    makeItem("old-physiology", "生理學"),
+    makeItem("recent-biochemistry", "生物化學"),
+    makeItem("old-anatomy", "解剖學")
+  ];
+  const sessions = [
+    makeSession("review-separated", "散題待複習題庫", [
+      makeAttempt("recent-anatomy", "2026-07-15T18:00:00.000Z"),
+      makeAttempt("old-physiology", "2026-07-15T01:00:00.000Z"),
+      makeAttempt("recent-biochemistry", "2026-07-15T18:20:00.000Z"),
+      makeAttempt("old-anatomy", "2026-07-15T01:20:00.000Z")
+    ])
+  ];
+  const order = orderReviewItemsForNextRound(
+    items,
+    buildLatestReviewAttemptMap(sessions, ["散題待複習題庫"])
+  );
+
+  assert.deepEqual(
+    new Set(order.slice(0, 2).map((item) => item.question.id)),
+    new Set(["old-physiology", "old-anatomy"])
+  );
+  assert.deepEqual(
+    new Set(order.slice(2).map((item) => item.question.id)),
+    new Set(["recent-anatomy", "recent-biochemistry"])
+  );
+});
+
 test("散題與模擬考複習紀錄不會互相影響排序", () => {
   const items = [makeItem("practice-question"), makeItem("simulation-question")];
   const sessions = [
@@ -117,13 +178,12 @@ test("散題與模擬考複習紀錄不會互相影響排序", () => {
     ], "simulation")
   ];
 
+  const latestAttempts = buildLatestReviewAttemptMap(sessions, ["散題待複習題庫"]);
+  const order = orderReviewItemsForNextRound(items, latestAttempts);
+
+  assert.equal(latestAttempts.size, 0);
   assert.deepEqual(
-    orderReviewItemsForNextRound(
-      items,
-      buildLatestReviewAttemptMap(sessions, ["散題待複習題庫"])
-    ).map(
-      (item) => item.question.id
-    ),
-    ["practice-question", "simulation-question"]
+    new Set(order.map((item) => item.question.id)),
+    new Set(["practice-question", "simulation-question"])
   );
 });
