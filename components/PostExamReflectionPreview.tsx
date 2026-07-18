@@ -42,6 +42,7 @@ type RecapResponse = {
 type SurveyResponse = {
   ok?: boolean;
   submitted?: boolean;
+  alreadySubmitted?: boolean;
   answers?: PostExamSurveyAnswers | null;
   submittedAt?: string | null;
   updatedAt?: string | null;
@@ -342,10 +343,18 @@ export function PostExamReflectionPreview() {
           })
         })) as SurveyResponse;
         safeRemoveStorage(pendingKey);
-        setSurveyAnswers(data.answers ?? validation.data);
+        setSurveyAnswers(
+          validatePostExamSurveyAnswers(data.answers ?? validation.data).data
+        );
         setSurveySubmitted(true);
         setSurveySubmittedAt(data.updatedAt ?? data.submittedAt ?? new Date().toISOString());
-        setSurveyStatus(silent ? "先前待補傳的回覆已送出。" : "回覆已儲存，之後仍可修改。");
+        setSurveyStatus(
+          data.alreadySubmitted
+            ? "這個帳號已送出回覆，已載入第一次送出的內容。"
+            : silent
+              ? "先前待補傳的回覆已送出。"
+              : "回覆已送出。"
+        );
         return true;
       } catch (error) {
         setSurveyStatus(
@@ -381,8 +390,20 @@ export function PostExamReflectionPreview() {
           headers: { Authorization: `Bearer ${accessToken}` }
         })) as SurveyResponse;
         if (!active) return;
-        setSurveySubmitted(Boolean(data.submitted));
+        const submitted = Boolean(data.submitted);
+        setSurveySubmitted(submitted);
         setSurveySubmittedAt(data.updatedAt ?? data.submittedAt ?? null);
+        if (submitted && data.answers) {
+          const normalizedRemote = validatePostExamSurveyAnswers(data.answers).data;
+          safeRemoveStorage(pendingKey);
+          safeWriteStorage(draftKey, {
+            answers: normalizedRemote,
+            updatedAt: data.updatedAt ?? data.submittedAt ?? new Date().toISOString()
+          } satisfies StoredSurveyDraft);
+          setSurveyAnswers(normalizedRemote);
+          setSurveyStatus("這個帳號已送出回覆，表單已鎖定。");
+          return;
+        }
         if (data.answers && !surveyTouchedRef.current && !pending) {
           const remoteUpdatedAt = Date.parse(data.updatedAt ?? data.submittedAt ?? "");
           const localUpdatedAt = Date.parse(localDraft?.updatedAt ?? "");
@@ -499,7 +520,7 @@ export function PostExamReflectionPreview() {
             <p className="eyebrow">Post-exam preview</p>
             <h1 className="mt-3 text-3xl font-bold text-ink sm:text-5xl">考後回顧與經驗傳承</h1>
             <p className="mt-4 text-sm leading-7 text-slate-600 sm:text-base">
-              圖表固定統計到 2026/7/17 15:00，問卷可先留白、送出後也能修改。
+              圖表固定統計到 2026/7/17 15:00，問卷可先留白，每個帳號限送一次。
             </p>
           </div>
           <div className="flex flex-wrap gap-3">
@@ -569,10 +590,11 @@ export function PostExamReflectionPreview() {
                   id="post-exam-alias"
                   type="text"
                   maxLength={20}
+                  disabled={surveySubmitted}
                   value={surveyAnswers.publicAlias}
                   onChange={(event) => updateSurvey("publicAlias", event.target.value)}
                   placeholder="留白時顯示匿名考生"
-                  className="mt-2 min-h-12 w-full rounded-lg border border-slate-300 bg-white px-4 text-slate-900 outline-none transition focus:border-brand-600 focus:ring-2 focus:ring-brand-100"
+                  className="mt-2 min-h-12 w-full rounded-lg border border-slate-300 bg-white px-4 text-slate-900 outline-none transition focus:border-brand-600 focus:ring-2 focus:ring-brand-100 disabled:bg-slate-50 disabled:text-slate-500"
                 />
                 <div className="mt-2 flex justify-between gap-3 text-xs text-slate-500">
                   <span>不需唯一；不能填 email、網址或電話。</span>
@@ -591,9 +613,10 @@ export function PostExamReflectionPreview() {
                       min={0}
                       max={100}
                       step={1}
+                      disabled={surveySubmitted}
                       value={surveyAnswers.med1Score ?? ""}
                       onChange={(event) => updateSurvey("med1Score", event.target.value === "" ? null : Number(event.target.value))}
-                      className="mt-2 min-h-12 w-full rounded-lg border border-slate-300 px-4 tabular-nums outline-none focus:border-brand-600 focus:ring-2 focus:ring-brand-100"
+                      className="mt-2 min-h-12 w-full rounded-lg border border-slate-300 px-4 tabular-nums outline-none focus:border-brand-600 focus:ring-2 focus:ring-brand-100 disabled:bg-slate-50 disabled:text-slate-500"
                     />
                     {surveyErrors.med1Score ? <span className="mt-1 block text-xs text-rose-700">{surveyErrors.med1Score}</span> : null}
                   </label>
@@ -604,9 +627,10 @@ export function PostExamReflectionPreview() {
                       min={0}
                       max={100}
                       step={1}
+                      disabled={surveySubmitted}
                       value={surveyAnswers.med2Score ?? ""}
                       onChange={(event) => updateSurvey("med2Score", event.target.value === "" ? null : Number(event.target.value))}
-                      className="mt-2 min-h-12 w-full rounded-lg border border-slate-300 px-4 tabular-nums outline-none focus:border-brand-600 focus:ring-2 focus:ring-brand-100"
+                      className="mt-2 min-h-12 w-full rounded-lg border border-slate-300 px-4 tabular-nums outline-none focus:border-brand-600 focus:ring-2 focus:ring-brand-100 disabled:bg-slate-50 disabled:text-slate-500"
                     />
                     {surveyErrors.med2Score ? <span className="mt-1 block text-xs text-rose-700">{surveyErrors.med2Score}</span> : null}
                   </label>
@@ -614,6 +638,7 @@ export function PostExamReflectionPreview() {
                 <div className="mt-4">
                   <SurveyCheckbox
                     checked={surveyAnswers.shareScores}
+                    disabled={surveySubmitted}
                     onChange={(checked) => updateSurvey("shareScores", checked)}
                     label="願意匿名分享分數"
                     description="分數將作為日後學弟妹的學習軌跡參考；公開整理時會依照上方填寫的暱稱顯示。"
@@ -628,10 +653,11 @@ export function PostExamReflectionPreview() {
                 <textarea
                   rows={7}
                   maxLength={2000}
+                  disabled={surveySubmitted}
                   value={surveyAnswers.studyReflection}
                   onChange={(event) => updateSurvey("studyReflection", event.target.value)}
                   placeholder="選填"
-                  className="mt-2 w-full resize-y rounded-lg border border-slate-300 p-4 leading-7 text-slate-900 outline-none focus:border-brand-600 focus:ring-2 focus:ring-brand-100"
+                  className="mt-2 w-full resize-y rounded-lg border border-slate-300 p-4 leading-7 text-slate-900 outline-none focus:border-brand-600 focus:ring-2 focus:ring-brand-100 disabled:bg-slate-50 disabled:text-slate-500"
                 />
                 <span className="mt-1 block text-right text-xs font-normal text-slate-500">{surveyAnswers.studyReflection.length}/2000</span>
               </label>
@@ -640,10 +666,11 @@ export function PostExamReflectionPreview() {
                 <textarea
                   rows={5}
                   maxLength={2000}
+                  disabled={surveySubmitted}
                   value={surveyAnswers.encouragement}
                   onChange={(event) => updateSurvey("encouragement", event.target.value)}
                   placeholder="選填"
-                  className="mt-2 w-full resize-y rounded-lg border border-slate-300 p-4 leading-7 text-slate-900 outline-none focus:border-brand-600 focus:ring-2 focus:ring-brand-100"
+                  className="mt-2 w-full resize-y rounded-lg border border-slate-300 p-4 leading-7 text-slate-900 outline-none focus:border-brand-600 focus:ring-2 focus:ring-brand-100 disabled:bg-slate-50 disabled:text-slate-500"
                 />
                 <span className="mt-1 block text-right text-xs font-normal text-slate-500">{surveyAnswers.encouragement.length}/2000</span>
               </label>
@@ -652,7 +679,7 @@ export function PostExamReflectionPreview() {
 
           <div className="mt-8 flex flex-wrap items-center justify-between gap-4 border-t border-slate-200 pt-6">
             <div className="text-xs leading-5 text-slate-500">
-              <p>草稿會自動留在這台裝置；送出失敗時保留待補傳內容。</p>
+              <p>每個帳號限送一次；送出前草稿會留在這台裝置，失敗時保留待補傳內容。</p>
               {surveySubmittedAt ? (
                 <p className="mt-1">上次儲存：{new Date(surveySubmittedAt).toLocaleString("zh-TW")}</p>
               ) : null}
@@ -660,10 +687,10 @@ export function PostExamReflectionPreview() {
             </div>
             <button
               type="submit"
-              disabled={!surveyHydrated || surveySubmitting}
+              disabled={!surveyHydrated || surveySubmitting || surveySubmitted}
               className="min-h-12 rounded-lg bg-brand-600 px-6 text-sm font-semibold text-white disabled:cursor-not-allowed disabled:opacity-45"
             >
-              {surveySubmitting ? "儲存中" : surveySubmitted ? "更新回覆" : "送出回覆"}
+              {surveySubmitting ? "儲存中" : surveySubmitted ? "已送出" : "送出回覆"}
             </button>
           </div>
         </form>

@@ -12,6 +12,8 @@ export const dynamic = "force-dynamic";
 export const revalidate = 0;
 
 const NO_STORE_HEADERS = { "Cache-Control": "private, no-store, max-age=0" };
+const SURVEY_SELECT_FIELDS =
+  "public_alias, med1_score, med2_score, share_scores, study_reflection, encouragement, submitted_at, updated_at";
 
 function getServiceSupabaseClient() {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
@@ -94,6 +96,15 @@ function errorResponse(error: unknown) {
   );
 }
 
+function isUniqueViolation(error: unknown) {
+  return Boolean(
+    error &&
+      typeof error === "object" &&
+      "code" in error &&
+      (error as { code?: unknown }).code === "23505"
+  );
+}
+
 export async function GET(request: NextRequest) {
   const supabase = getServiceSupabaseClient();
   if (!supabase) {
@@ -114,9 +125,7 @@ export async function GET(request: NextRequest) {
     const { data, error } = (await withServerTimeout(
       supabase
         .from("post_exam_survey_responses")
-        .select(
-          "public_alias, med1_score, med2_score, share_scores, study_reflection, encouragement, submitted_at, updated_at"
-        )
+        .select(SURVEY_SELECT_FIELDS)
         .eq("survey_id", POST_EXAM_SURVEY_ID)
         .eq("user_id", user.id)
         .maybeSingle(),
@@ -170,31 +179,65 @@ export async function POST(request: NextRequest) {
 
     const now = new Date().toISOString();
     const answers = validation.data;
-    const { error } = await withServerTimeout(
-      supabase.from("post_exam_survey_responses").upsert(
-        {
-          survey_id: POST_EXAM_SURVEY_ID,
-          user_id: user.id,
-          public_alias: answers.publicAlias,
-          disclose_scores: true,
-          med1_score: answers.med1Score,
-          med2_score: answers.med2Score,
-          share_scores: answers.shareScores,
-          study_reflection: answers.studyReflection,
-          encouragement: answers.encouragement,
-          client_meta: sanitizeClientMeta(body.clientMeta),
-          submitted_at: now,
-          updated_at: now
-        },
-        { onConflict: "survey_id,user_id" }
-      ),
+    const submission = {
+      survey_id: POST_EXAM_SURVEY_ID,
+      user_id: user.id,
+      public_alias: answers.publicAlias,
+      disclose_scores: true,
+      med1_score: answers.med1Score,
+      med2_score: answers.med2Score,
+      share_scores: answers.shareScores,
+      study_reflection: answers.studyReflection,
+      encouragement: answers.encouragement,
+      client_meta: sanitizeClientMeta(body.clientMeta),
+      submitted_at: now,
+      updated_at: now
+    };
+    const { data, error } = (await withServerTimeout(
+      supabase
+        .from("post_exam_survey_responses")
+        .insert(submission)
+        .select(SURVEY_SELECT_FIELDS)
+        .single(),
       2200,
       "考後問卷儲存逾時"
-    );
-    if (error) throw error;
+    )) as { data?: Record<string, unknown> | null; error?: unknown };
+    if (error && !isUniqueViolation(error)) throw error;
+
+    if (isUniqueViolation(error)) {
+      const { data: existing, error: existingError } = (await withServerTimeout(
+        supabase
+          .from("post_exam_survey_responses")
+          .select(SURVEY_SELECT_FIELDS)
+          .eq("survey_id", POST_EXAM_SURVEY_ID)
+          .eq("user_id", user.id)
+          .single(),
+        1800,
+        "既有考後問卷讀取逾時"
+      )) as { data?: Record<string, unknown> | null; error?: unknown };
+      if (existingError || !existing) throw existingError ?? new Error("找不到既有問卷回覆");
+      return NextResponse.json(
+        {
+          ok: true,
+          submitted: true,
+          alreadySubmitted: true,
+          answers: mapRowToAnswers(existing),
+          submittedAt: existing.submitted_at ?? null,
+          updatedAt: existing.updated_at ?? null
+        },
+        { headers: NO_STORE_HEADERS }
+      );
+    }
 
     return NextResponse.json(
-      { ok: true, submitted: true, answers, submittedAt: now, updatedAt: now },
+      {
+        ok: true,
+        submitted: true,
+        alreadySubmitted: false,
+        answers: data ? mapRowToAnswers(data) : answers,
+        submittedAt: data?.submitted_at ?? now,
+        updatedAt: data?.updated_at ?? now
+      },
       { headers: NO_STORE_HEADERS }
     );
   } catch (error) {
