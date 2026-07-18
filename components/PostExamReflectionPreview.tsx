@@ -1,0 +1,688 @@
+"use client";
+
+import Link from "next/link";
+import {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  type FormEvent
+} from "react";
+import { useAuth } from "@/components/AuthProvider";
+import {
+  PersonalCumulativeChart,
+  SeasonActivityChart,
+  SimulationScoreChart,
+  downloadPostExamRecapPng
+} from "@/components/PostExamCharts";
+import { POST_EXAM_SEASON_SNAPSHOT } from "@/data/postExamSeasonSnapshot";
+import {
+  POST_EXAM_PREVIEW_EMAIL,
+  POST_EXAM_SNAPSHOT_VERSION,
+  POST_EXAM_SURVEY_ID,
+  buildPostExamCumulativePoints,
+  getDefaultPostExamSurveyAnswers,
+  hasPostExamSurveyErrors,
+  mergePostExamSnapshotWithLocal,
+  normalizePostExamPersonalSnapshot,
+  summarizeLocalPostExamSessions,
+  validatePostExamSurveyAnswers,
+  type PostExamPersonalSnapshot,
+  type PostExamSurveyAnswers
+} from "@/lib/postExamReflection";
+import { loadCompletedSessions } from "@/lib/storage";
+
+type RecapResponse = {
+  ok?: boolean;
+  snapshot?: unknown;
+  message?: string;
+};
+
+type SurveyResponse = {
+  ok?: boolean;
+  submitted?: boolean;
+  answers?: PostExamSurveyAnswers | null;
+  submittedAt?: string | null;
+  updatedAt?: string | null;
+  message?: string;
+  errors?: Partial<Record<keyof PostExamSurveyAnswers, string>>;
+};
+
+type StoredSurveyDraft = {
+  answers: PostExamSurveyAnswers;
+  updatedAt: string;
+};
+
+const REQUEST_TIMEOUT_MS = 10_000;
+const RECAP_REQUEST_TIMEOUT_MS = 30_000;
+
+function safeReadStorage<T>(key: string): T | null {
+  for (const getStorage of [
+    () => window.localStorage,
+    () => window.sessionStorage
+  ]) {
+    try {
+      const storage = getStorage();
+      const raw = storage.getItem(key);
+      if (raw) return JSON.parse(raw) as T;
+    } catch {
+      // Try the next browser storage when Safari blocks one of them.
+    }
+  }
+  return null;
+}
+
+function safeWriteStorage(key: string, value: unknown) {
+  try {
+    window.localStorage.setItem(key, JSON.stringify(value));
+    return true;
+  } catch {
+    try {
+      window.sessionStorage.setItem(key, JSON.stringify(value));
+      return true;
+    } catch {
+      return false;
+    }
+  }
+}
+
+function safeRemoveStorage(key: string) {
+  for (const getStorage of [
+    () => window.localStorage,
+    () => window.sessionStorage
+  ]) {
+    try {
+      getStorage().removeItem(key);
+    } catch {
+      // Storage cleanup is best effort only.
+    }
+  }
+}
+
+function getSnapshotCacheKey(userId: string) {
+  return `acq-post-exam-snapshot:${POST_EXAM_SNAPSHOT_VERSION}:${userId}`;
+}
+
+function getSnapshotPendingKey(userId: string) {
+  return `acq-post-exam-snapshot-pending:${POST_EXAM_SNAPSHOT_VERSION}:${userId}`;
+}
+
+function getSurveyDraftKey(userId: string) {
+  return `acq-post-exam-survey-draft:${POST_EXAM_SURVEY_ID}:${userId}`;
+}
+
+function getSurveyPendingKey(userId: string) {
+  return `acq-post-exam-survey-pending:${POST_EXAM_SURVEY_ID}:${userId}`;
+}
+
+async function fetchJsonWithTimeout(
+  input: RequestInfo | URL,
+  init: RequestInit,
+  timeoutMs = REQUEST_TIMEOUT_MS
+) {
+  const controller = new AbortController();
+  const timeoutId = window.setTimeout(() => controller.abort(), timeoutMs);
+  try {
+    const response = await fetch(input, { ...init, signal: controller.signal });
+    const data = (await response.json().catch(() => ({}))) as Record<string, unknown>;
+    if (!response.ok) {
+      throw new Error(typeof data.message === "string" ? data.message : "讀取失敗");
+    }
+    return data;
+  } finally {
+    window.clearTimeout(timeoutId);
+  }
+}
+
+function hasLocalSurveyContent(value: StoredSurveyDraft | null) {
+  if (!value) return false;
+  const answers = value.answers;
+  return Boolean(
+    answers.publicAlias.trim() ||
+      answers.med1Score != null ||
+      answers.med2Score != null ||
+      answers.studyReflection.trim() ||
+      answers.encouragement.trim()
+  );
+}
+
+function SurveyCheckbox({
+  checked,
+  onChange,
+  label,
+  description,
+  disabled = false
+}: {
+  checked: boolean;
+  onChange: (checked: boolean) => void;
+  label: string;
+  description?: string;
+  disabled?: boolean;
+}) {
+  return (
+    <label className={`flex cursor-pointer items-start gap-3 py-2 ${disabled ? "cursor-not-allowed opacity-50" : ""}`}>
+      <input
+        type="checkbox"
+        checked={checked}
+        disabled={disabled}
+        onChange={(event) => onChange(event.target.checked)}
+        className="mt-1 h-5 w-5 accent-brand-600"
+      />
+      <span>
+        <span className="block text-sm font-semibold text-slate-800">{label}</span>
+        {description ? <span className="mt-1 block text-xs leading-5 text-slate-500">{description}</span> : null}
+      </span>
+    </label>
+  );
+}
+
+export function PostExamReflectionPreview() {
+  const { configured, loading: authLoading, user, session } = useAuth();
+  const [snapshot, setSnapshot] = useState<PostExamPersonalSnapshot | null>(null);
+  const [recapPhase, setRecapPhase] = useState("等待登入狀態");
+  const [recapError, setRecapError] = useState("");
+  const [pngStatus, setPngStatus] = useState("");
+  const [surveyAnswers, setSurveyAnswers] = useState<PostExamSurveyAnswers>(
+    getDefaultPostExamSurveyAnswers
+  );
+  const [surveyHydrated, setSurveyHydrated] = useState(false);
+  const [surveySubmitted, setSurveySubmitted] = useState(false);
+  const [surveySubmittedAt, setSurveySubmittedAt] = useState<string | null>(null);
+  const [surveyStatus, setSurveyStatus] = useState("");
+  const [surveySubmitting, setSurveySubmitting] = useState(false);
+  const [surveyErrors, setSurveyErrors] = useState<
+    Partial<Record<keyof PostExamSurveyAnswers, string>>
+  >({});
+  const surveyTouchedRef = useRef(false);
+  const surveyRetryRef = useRef(false);
+
+  const isPreviewUser =
+    user?.email?.trim().toLowerCase() === POST_EXAM_PREVIEW_EMAIL.toLowerCase();
+  const accessToken = session?.access_token ?? "";
+  const cumulativePoints = useMemo(
+    () => buildPostExamCumulativePoints(snapshot?.sessions ?? []),
+    [snapshot?.sessions]
+  );
+
+  const reconcilePendingSnapshot = useCallback(
+    async (userId: string, pending: { sessions: unknown[]; simulations: unknown[] }) => {
+      if (!accessToken) return;
+      try {
+        const data = (await fetchJsonWithTimeout("/api/post-exam-recap", {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify(pending)
+        })) as RecapResponse;
+        const normalized = normalizePostExamPersonalSnapshot(data.snapshot);
+        if (!normalized) return;
+        setSnapshot(normalized);
+        safeWriteStorage(getSnapshotCacheKey(userId), normalized);
+        safeRemoveStorage(getSnapshotPendingKey(userId));
+      } catch {
+        // The compact additive payload remains local for a later retry.
+      }
+    },
+    [accessToken]
+  );
+
+  useEffect(() => {
+    if (authLoading) return;
+    if (!configured) {
+      setRecapPhase("");
+      setRecapError("Supabase 尚未設定，無法建立個人固定快照。");
+      return;
+    }
+    if (!user || !accessToken || !isPreviewUser) {
+      setRecapPhase("");
+      setSnapshot(null);
+      return;
+    }
+
+    let active = true;
+    const userId = user.id;
+    const cacheKey = getSnapshotCacheKey(userId);
+    const pendingKey = getSnapshotPendingKey(userId);
+    const cached = normalizePostExamPersonalSnapshot(safeReadStorage(cacheKey));
+    if (cached) {
+      setSnapshot(cached);
+      setRecapError("");
+      setRecapPhase("已載入固定快照");
+      const pending = safeReadStorage<{ sessions: unknown[]; simulations: unknown[] }>(pendingKey);
+      if (pending) void reconcilePendingSnapshot(userId, pending);
+      return;
+    }
+
+    async function loadSnapshot() {
+      try {
+        setRecapPhase("讀取雲端固定快照");
+        setRecapError("");
+        const data = (await fetchJsonWithTimeout(
+          "/api/post-exam-recap",
+          {
+            method: "GET",
+            headers: { Authorization: `Bearer ${accessToken}` }
+          },
+          RECAP_REQUEST_TIMEOUT_MS
+        )) as RecapResponse;
+        if (!active) return;
+        const cloudSnapshot = normalizePostExamPersonalSnapshot(data.snapshot);
+        if (!cloudSnapshot) throw new Error("雲端回傳的考後快照格式不完整。");
+
+        setRecapPhase("整合這台裝置的完整紀錄");
+        await new Promise<void>((resolve) => window.setTimeout(resolve, 0));
+        if (!active) return;
+        const local = summarizeLocalPostExamSessions(
+          loadCompletedSessions({ includeFullLocalHistory: true })
+        );
+        const merged = mergePostExamSnapshotWithLocal(cloudSnapshot, local);
+        setSnapshot(merged);
+        setRecapPhase("已建立固定快照");
+        safeWriteStorage(cacheKey, merged);
+
+        if (
+          merged.sessions.length > cloudSnapshot.sessions.length ||
+          merged.simulations.length > cloudSnapshot.simulations.length
+        ) {
+          const pending = { sessions: local.sessions, simulations: local.simulations };
+          safeWriteStorage(pendingKey, pending);
+          void reconcilePendingSnapshot(userId, pending);
+        }
+      } catch (error) {
+        if (!active) return;
+        setRecapPhase("");
+        setRecapError(
+          error instanceof Error
+            ? error.message
+            : "個人回顧暫時無法載入，本機紀錄沒有被修改。"
+        );
+      }
+    }
+
+    void loadSnapshot();
+    return () => {
+      active = false;
+    };
+  }, [accessToken, authLoading, configured, isPreviewUser, reconcilePendingSnapshot, user?.id]);
+
+  const submitSurveyAnswers = useCallback(
+    async (answers: PostExamSurveyAnswers, silent = false) => {
+      if (!user?.id || !accessToken) return false;
+      const validation = validatePostExamSurveyAnswers(answers);
+      setSurveyErrors(validation.errors);
+      if (hasPostExamSurveyErrors(validation)) {
+        if (!silent) setSurveyStatus("請先修正標示的欄位。");
+        return false;
+      }
+
+      const pendingKey = getSurveyPendingKey(user.id);
+      safeWriteStorage(pendingKey, {
+        answers: validation.data,
+        updatedAt: new Date().toISOString()
+      });
+      if (!silent) {
+        setSurveySubmitting(true);
+        setSurveyStatus("送出中");
+      }
+      try {
+        const data = (await fetchJsonWithTimeout("/api/post-exam-survey", {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({
+            answers: validation.data,
+            clientMeta: {
+              viewport: { width: window.innerWidth, height: window.innerHeight }
+            }
+          })
+        })) as SurveyResponse;
+        safeRemoveStorage(pendingKey);
+        setSurveyAnswers(data.answers ?? validation.data);
+        setSurveySubmitted(true);
+        setSurveySubmittedAt(data.updatedAt ?? data.submittedAt ?? new Date().toISOString());
+        setSurveyStatus(silent ? "先前待補傳的回覆已送出。" : "回覆已儲存，之後仍可修改。");
+        return true;
+      } catch (error) {
+        setSurveyStatus(
+          error instanceof Error
+            ? `${error.message} 草稿與待補傳內容仍在這台裝置。`
+            : "送出失敗，草稿與待補傳內容仍在這台裝置。"
+        );
+        return false;
+      } finally {
+        if (!silent) setSurveySubmitting(false);
+      }
+    },
+    [accessToken, user?.id]
+  );
+
+  useEffect(() => {
+    if (authLoading || !user?.id || !accessToken || !isPreviewUser) return;
+    let active = true;
+    const draftKey = getSurveyDraftKey(user.id);
+    const pendingKey = getSurveyPendingKey(user.id);
+    const localDraft = safeReadStorage<StoredSurveyDraft>(draftKey);
+    const pending = safeReadStorage<StoredSurveyDraft>(pendingKey);
+    const preferredLocal = pending ?? localDraft;
+    if (preferredLocal?.answers) {
+      setSurveyAnswers(preferredLocal.answers);
+    }
+    setSurveyHydrated(true);
+
+    async function loadSubmission() {
+      try {
+        const data = (await fetchJsonWithTimeout("/api/post-exam-survey", {
+          method: "GET",
+          headers: { Authorization: `Bearer ${accessToken}` }
+        })) as SurveyResponse;
+        if (!active) return;
+        setSurveySubmitted(Boolean(data.submitted));
+        setSurveySubmittedAt(data.updatedAt ?? data.submittedAt ?? null);
+        if (data.answers && !surveyTouchedRef.current && !pending) {
+          const remoteUpdatedAt = Date.parse(data.updatedAt ?? data.submittedAt ?? "");
+          const localUpdatedAt = Date.parse(localDraft?.updatedAt ?? "");
+          if (
+            !hasLocalSurveyContent(localDraft) ||
+            !Number.isFinite(localUpdatedAt) ||
+            (Number.isFinite(remoteUpdatedAt) && remoteUpdatedAt >= localUpdatedAt)
+          ) {
+            setSurveyAnswers(data.answers);
+          }
+        }
+        if (pending && !surveyRetryRef.current) {
+          surveyRetryRef.current = true;
+          void submitSurveyAnswers(pending.answers, true);
+        }
+      } catch (error) {
+        if (!active) return;
+        setSurveyStatus(
+          error instanceof Error
+            ? `${error.message} 仍可先填寫，內容會留在本機。`
+            : "問卷暫時無法連線，仍可先填寫。"
+        );
+      }
+    }
+
+    void loadSubmission();
+    return () => {
+      active = false;
+    };
+  }, [accessToken, authLoading, isPreviewUser, submitSurveyAnswers, user?.id]);
+
+  useEffect(() => {
+    if (!surveyHydrated || !user?.id || !isPreviewUser) return;
+    safeWriteStorage(getSurveyDraftKey(user.id), {
+      answers: surveyAnswers,
+      updatedAt: new Date().toISOString()
+    } satisfies StoredSurveyDraft);
+  }, [isPreviewUser, surveyAnswers, surveyHydrated, user?.id]);
+
+  function updateSurvey<K extends keyof PostExamSurveyAnswers>(
+    key: K,
+    value: PostExamSurveyAnswers[K]
+  ) {
+    surveyTouchedRef.current = true;
+    setSurveyAnswers((current) => ({ ...current, [key]: value }));
+    setSurveyErrors((current) => ({ ...current, [key]: undefined }));
+  }
+
+  async function handleSurveySubmit(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    await submitSurveyAnswers(surveyAnswers);
+  }
+
+  async function handleDownloadPng() {
+    if (!snapshot) return;
+    try {
+      setPngStatus("產生完整回顧圖中");
+      await downloadPostExamRecapPng({
+        snapshot,
+        cumulativePoints,
+        seasonDaily: POST_EXAM_SEASON_SNAPSHOT.daily,
+        seasonTotalAttempts: POST_EXAM_SEASON_SNAPSHOT.totalAttempts,
+        seasonCorrectAttempts: POST_EXAM_SEASON_SNAPSHOT.correctAttempts
+      });
+      setPngStatus("完整回顧圖已下載");
+    } catch (error) {
+      setPngStatus(error instanceof Error ? error.message : "PNG 產生失敗");
+    }
+  }
+
+  if (authLoading) {
+    return (
+      <main className="mx-auto min-h-screen max-w-[1280px] px-4 py-16 sm:px-6">
+        <p className="text-sm font-semibold text-slate-600">讀取登入狀態中...</p>
+      </main>
+    );
+  }
+
+  if (!user) {
+    return (
+      <main className="mx-auto min-h-screen max-w-[960px] px-4 py-16 sm:px-6">
+        <section className="rounded-lg border border-slate-200 bg-white p-6 sm:p-8">
+          <p className="eyebrow">Preview</p>
+          <h1 className="mt-3 text-3xl font-bold text-ink">請先登入預覽帳號</h1>
+          <p className="mt-3 text-sm leading-7 text-slate-600">登入後才會建立個人的固定回顧快照。</p>
+          <Link href="/" className="mt-6 inline-flex min-h-12 items-center rounded-lg bg-brand-600 px-5 font-semibold text-white">
+            返回首頁登入
+          </Link>
+        </section>
+      </main>
+    );
+  }
+
+  if (!isPreviewUser) {
+    return (
+      <main className="mx-auto min-h-screen max-w-[960px] px-4 py-16 sm:px-6">
+        <section className="rounded-lg border border-slate-200 bg-white p-6 sm:p-8">
+          <p className="eyebrow">Preview</p>
+          <h1 className="mt-3 text-3xl font-bold text-ink">此頁尚未公開</h1>
+          <p className="mt-3 text-sm leading-7 text-slate-600">目前只開放指定管理員帳號驗收。</p>
+          <Link href="/" className="mt-6 inline-flex min-h-12 items-center rounded-lg bg-slate-100 px-5 font-semibold text-slate-800">
+            返回首頁
+          </Link>
+        </section>
+      </main>
+    );
+  }
+
+  return (
+    <main className="mx-auto min-h-screen max-w-[1280px] px-4 pb-20 pt-10 sm:px-6 sm:pt-14">
+      <header className="border-b border-slate-200 pb-8">
+        <div className="flex flex-wrap items-start justify-between gap-5">
+          <div className="max-w-3xl">
+            <p className="eyebrow">Post-exam preview</p>
+            <h1 className="mt-3 text-3xl font-bold text-ink sm:text-5xl">考後回顧與經驗傳承</h1>
+            <p className="mt-4 text-sm leading-7 text-slate-600 sm:text-base">
+              圖表固定統計到 2026/7/17 15:00，問卷可先留白、送出後也能修改。
+            </p>
+          </div>
+          <div className="flex flex-wrap gap-3">
+            <Link href="/" className="inline-flex min-h-12 items-center rounded-lg border border-slate-200 bg-white px-5 text-sm font-semibold text-slate-700">
+              返回首頁
+            </Link>
+            <button
+              type="button"
+              disabled={!snapshot}
+              onClick={() => void handleDownloadPng()}
+              className="min-h-12 rounded-lg bg-brand-600 px-5 text-sm font-semibold text-white disabled:cursor-not-allowed disabled:opacity-45"
+            >
+              下載完整回顧圖
+            </button>
+          </div>
+        </div>
+        {pngStatus ? <p className="mt-3 text-right text-xs font-semibold text-slate-500">{pngStatus}</p> : null}
+      </header>
+
+      <section className="border-b border-slate-200 py-10">
+        <SeasonActivityChart
+          daily={POST_EXAM_SEASON_SNAPSHOT.daily}
+          totalAttempts={POST_EXAM_SEASON_SNAPSHOT.totalAttempts}
+          correctAttempts={POST_EXAM_SEASON_SNAPSHOT.correctAttempts}
+        />
+      </section>
+
+      <section className="border-b border-slate-200 py-10">
+        {snapshot ? (
+          <PersonalCumulativeChart points={cumulativePoints} />
+        ) : recapError ? (
+          <div className="rounded-lg border border-amber-200 bg-amber-50 p-5">
+            <h2 className="text-xl font-bold text-ink">個人回顧尚未載入</h2>
+            <p className="mt-2 text-sm leading-6 text-amber-900">{recapError}</p>
+          </div>
+        ) : (
+          <div aria-live="polite">
+            <div className="h-2 overflow-hidden rounded-full bg-slate-200">
+              <div className="h-full w-2/3 animate-pulse rounded-full bg-brand-600" />
+            </div>
+            <p className="mt-3 text-sm font-semibold text-slate-600">{recapPhase || "建立固定快照中"}</p>
+          </div>
+        )}
+      </section>
+
+      {snapshot ? (
+        <section className="border-b border-slate-200 py-10">
+          <SimulationScoreChart results={snapshot.simulations} />
+        </section>
+      ) : null}
+
+      <section className="py-10" aria-labelledby="post-exam-survey-title">
+        <div className="mb-7 max-w-3xl">
+          <p className="eyebrow">Legacy survey</p>
+          <h2 id="post-exam-survey-title" className="mt-2 text-2xl font-bold text-ink sm:text-3xl">考後問卷</h2>
+          <p className="mt-3 text-sm leading-7 text-slate-600">
+            建議與鼓勵為選填；若公開整理，會統一使用你選的暱稱，不顯示帳號資訊。
+          </p>
+        </div>
+
+        <form onSubmit={handleSurveySubmit} className="rounded-lg border border-slate-200 bg-white p-5 sm:p-8">
+          <div className="grid gap-8 lg:grid-cols-[minmax(0,0.8fr)_minmax(0,1.2fr)]">
+            <div className="space-y-7">
+              <div>
+                <label htmlFor="post-exam-alias" className="text-sm font-bold text-slate-800">公開暱稱</label>
+                <input
+                  id="post-exam-alias"
+                  type="text"
+                  maxLength={20}
+                  value={surveyAnswers.publicAlias}
+                  onChange={(event) => updateSurvey("publicAlias", event.target.value)}
+                  placeholder="留白時顯示匿名考生"
+                  className="mt-2 min-h-12 w-full rounded-lg border border-slate-300 bg-white px-4 text-slate-900 outline-none transition focus:border-brand-600 focus:ring-2 focus:ring-brand-100"
+                />
+                <div className="mt-2 flex justify-between gap-3 text-xs text-slate-500">
+                  <span>不需唯一；不能填 email、網址或電話。</span>
+                  <span>{Array.from(surveyAnswers.publicAlias).length}/20</span>
+                </div>
+                {surveyErrors.publicAlias ? <p className="mt-2 text-xs font-semibold text-rose-700">{surveyErrors.publicAlias}</p> : null}
+              </div>
+
+              <div className="border-t border-slate-200 pt-5">
+                <SurveyCheckbox
+                  checked={surveyAnswers.discloseScores}
+                  onChange={(checked) => {
+                    updateSurvey("discloseScores", checked);
+                    if (!checked) {
+                      updateSurvey("med1Score", null);
+                      updateSurvey("med2Score", null);
+                      updateSurvey("shareScores", false);
+                    }
+                  }}
+                  label="願意留下國考分數"
+                  description="預設同意；分數可先留白，之後再回來修改。"
+                />
+                {surveyAnswers.discloseScores ? (
+                  <div className="mt-4 grid grid-cols-2 gap-3">
+                    <label className="text-sm font-semibold text-slate-700">
+                      醫學（一）
+                      <input
+                        type="number"
+                        min={0}
+                        max={100}
+                        step={1}
+                        value={surveyAnswers.med1Score ?? ""}
+                        onChange={(event) => updateSurvey("med1Score", event.target.value === "" ? null : Number(event.target.value))}
+                        className="mt-2 min-h-12 w-full rounded-lg border border-slate-300 px-4 tabular-nums outline-none focus:border-brand-600 focus:ring-2 focus:ring-brand-100"
+                      />
+                      {surveyErrors.med1Score ? <span className="mt-1 block text-xs text-rose-700">{surveyErrors.med1Score}</span> : null}
+                    </label>
+                    <label className="text-sm font-semibold text-slate-700">
+                      醫學（二）
+                      <input
+                        type="number"
+                        min={0}
+                        max={100}
+                        step={1}
+                        value={surveyAnswers.med2Score ?? ""}
+                        onChange={(event) => updateSurvey("med2Score", event.target.value === "" ? null : Number(event.target.value))}
+                        className="mt-2 min-h-12 w-full rounded-lg border border-slate-300 px-4 tabular-nums outline-none focus:border-brand-600 focus:ring-2 focus:ring-brand-100"
+                      />
+                      {surveyErrors.med2Score ? <span className="mt-1 block text-xs text-rose-700">{surveyErrors.med2Score}</span> : null}
+                    </label>
+                  </div>
+                ) : null}
+                <div className="mt-4">
+                  <SurveyCheckbox
+                    checked={surveyAnswers.shareScores}
+                    disabled={!surveyAnswers.discloseScores}
+                    onChange={(checked) => updateSurvey("shareScores", checked)}
+                    label="願意匿名分享分數"
+                    description="公開整理時只使用你選的暱稱。"
+                  />
+                </div>
+              </div>
+            </div>
+
+            <div className="space-y-6">
+              <label className="block text-sm font-bold text-slate-800">
+                建議的讀書方向，或這次準備中可以改進的地方
+                <textarea
+                  rows={7}
+                  maxLength={2000}
+                  value={surveyAnswers.studyReflection}
+                  onChange={(event) => updateSurvey("studyReflection", event.target.value)}
+                  placeholder="選填"
+                  className="mt-2 w-full resize-y rounded-lg border border-slate-300 p-4 leading-7 text-slate-900 outline-none focus:border-brand-600 focus:ring-2 focus:ring-brand-100"
+                />
+                <span className="mt-1 block text-right text-xs font-normal text-slate-500">{surveyAnswers.studyReflection.length}/2000</span>
+              </label>
+              <label className="block text-sm font-bold text-slate-800">
+                有沒有想留給學弟妹的一句鼓勵？
+                <textarea
+                  rows={5}
+                  maxLength={2000}
+                  value={surveyAnswers.encouragement}
+                  onChange={(event) => updateSurvey("encouragement", event.target.value)}
+                  placeholder="選填"
+                  className="mt-2 w-full resize-y rounded-lg border border-slate-300 p-4 leading-7 text-slate-900 outline-none focus:border-brand-600 focus:ring-2 focus:ring-brand-100"
+                />
+                <span className="mt-1 block text-right text-xs font-normal text-slate-500">{surveyAnswers.encouragement.length}/2000</span>
+              </label>
+            </div>
+          </div>
+
+          <div className="mt-8 flex flex-wrap items-center justify-between gap-4 border-t border-slate-200 pt-6">
+            <div className="text-xs leading-5 text-slate-500">
+              <p>草稿會自動留在這台裝置；送出失敗時保留待補傳內容。</p>
+              {surveySubmittedAt ? (
+                <p className="mt-1">上次儲存：{new Date(surveySubmittedAt).toLocaleString("zh-TW")}</p>
+              ) : null}
+              {surveyStatus ? <p className="mt-1 font-semibold text-slate-700">{surveyStatus}</p> : null}
+            </div>
+            <button
+              type="submit"
+              disabled={!surveyHydrated || surveySubmitting}
+              className="min-h-12 rounded-lg bg-brand-600 px-6 text-sm font-semibold text-white disabled:cursor-not-allowed disabled:opacity-45"
+            >
+              {surveySubmitting ? "儲存中" : surveySubmitted ? "更新回覆" : "送出回覆"}
+            </button>
+          </div>
+        </form>
+      </section>
+    </main>
+  );
+}
