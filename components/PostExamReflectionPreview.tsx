@@ -370,7 +370,7 @@ export function PostExamReflectionPreview() {
     const pending = safeReadStorage<StoredSurveyDraft>(pendingKey);
     const preferredLocal = pending ?? localDraft;
     if (preferredLocal?.answers) {
-      setSurveyAnswers(preferredLocal.answers);
+      setSurveyAnswers(validatePostExamSurveyAnswers(preferredLocal.answers).data);
     }
     setSurveyHydrated(true);
 
@@ -391,7 +391,7 @@ export function PostExamReflectionPreview() {
             !Number.isFinite(localUpdatedAt) ||
             (Number.isFinite(remoteUpdatedAt) && remoteUpdatedAt >= localUpdatedAt)
           ) {
-            setSurveyAnswers(data.answers);
+            setSurveyAnswers(validatePostExamSurveyAnswers(data.answers).data);
           }
         }
         if (pending && !surveyRetryRef.current) {
@@ -582,56 +582,41 @@ export function PostExamReflectionPreview() {
               </div>
 
               <div className="border-t border-slate-200 pt-5">
-                <SurveyCheckbox
-                  checked={surveyAnswers.discloseScores}
-                  onChange={(checked) => {
-                    updateSurvey("discloseScores", checked);
-                    if (!checked) {
-                      updateSurvey("med1Score", null);
-                      updateSurvey("med2Score", null);
-                      updateSurvey("shareScores", false);
-                    }
-                  }}
-                  label="願意留下國考分數"
-                  description="預設同意；分數可先留白，之後再回來修改。"
-                />
-                {surveyAnswers.discloseScores ? (
-                  <div className="mt-4 grid grid-cols-2 gap-3">
-                    <label className="text-sm font-semibold text-slate-700">
-                      醫學（一）
-                      <input
-                        type="number"
-                        min={0}
-                        max={100}
-                        step={1}
-                        value={surveyAnswers.med1Score ?? ""}
-                        onChange={(event) => updateSurvey("med1Score", event.target.value === "" ? null : Number(event.target.value))}
-                        className="mt-2 min-h-12 w-full rounded-lg border border-slate-300 px-4 tabular-nums outline-none focus:border-brand-600 focus:ring-2 focus:ring-brand-100"
-                      />
-                      {surveyErrors.med1Score ? <span className="mt-1 block text-xs text-rose-700">{surveyErrors.med1Score}</span> : null}
-                    </label>
-                    <label className="text-sm font-semibold text-slate-700">
-                      醫學（二）
-                      <input
-                        type="number"
-                        min={0}
-                        max={100}
-                        step={1}
-                        value={surveyAnswers.med2Score ?? ""}
-                        onChange={(event) => updateSurvey("med2Score", event.target.value === "" ? null : Number(event.target.value))}
-                        className="mt-2 min-h-12 w-full rounded-lg border border-slate-300 px-4 tabular-nums outline-none focus:border-brand-600 focus:ring-2 focus:ring-brand-100"
-                      />
-                      {surveyErrors.med2Score ? <span className="mt-1 block text-xs text-rose-700">{surveyErrors.med2Score}</span> : null}
-                    </label>
-                  </div>
-                ) : null}
+                <p className="mb-3 text-sm font-bold text-slate-800">國考分數</p>
+                <div className="grid grid-cols-2 gap-3">
+                  <label className="text-sm font-semibold text-slate-700">
+                    醫學（一）
+                    <input
+                      type="number"
+                      min={0}
+                      max={100}
+                      step={1}
+                      value={surveyAnswers.med1Score ?? ""}
+                      onChange={(event) => updateSurvey("med1Score", event.target.value === "" ? null : Number(event.target.value))}
+                      className="mt-2 min-h-12 w-full rounded-lg border border-slate-300 px-4 tabular-nums outline-none focus:border-brand-600 focus:ring-2 focus:ring-brand-100"
+                    />
+                    {surveyErrors.med1Score ? <span className="mt-1 block text-xs text-rose-700">{surveyErrors.med1Score}</span> : null}
+                  </label>
+                  <label className="text-sm font-semibold text-slate-700">
+                    醫學（二）
+                    <input
+                      type="number"
+                      min={0}
+                      max={100}
+                      step={1}
+                      value={surveyAnswers.med2Score ?? ""}
+                      onChange={(event) => updateSurvey("med2Score", event.target.value === "" ? null : Number(event.target.value))}
+                      className="mt-2 min-h-12 w-full rounded-lg border border-slate-300 px-4 tabular-nums outline-none focus:border-brand-600 focus:ring-2 focus:ring-brand-100"
+                    />
+                    {surveyErrors.med2Score ? <span className="mt-1 block text-xs text-rose-700">{surveyErrors.med2Score}</span> : null}
+                  </label>
+                </div>
                 <div className="mt-4">
                   <SurveyCheckbox
                     checked={surveyAnswers.shareScores}
-                    disabled={!surveyAnswers.discloseScores}
                     onChange={(checked) => updateSurvey("shareScores", checked)}
                     label="願意匿名分享分數"
-                    description="公開整理時只使用你選的暱稱。"
+                    description="分數將作為日後學弟妹的學習軌跡參考；公開整理時會依照上方填寫的暱稱顯示。"
                   />
                 </div>
               </div>

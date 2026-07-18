@@ -50,7 +50,6 @@ export type PostExamCumulativePoint = {
 
 export type PostExamSurveyAnswers = {
   publicAlias: string;
-  discloseScores: boolean;
   med1Score: number | null;
   med2Score: number | null;
   shareScores: boolean;
@@ -449,10 +448,9 @@ function normalizeOptionalScore(value: unknown) {
 export function validatePostExamSurveyAnswers(input: unknown): PostExamSurveyValidation {
   const value = input && typeof input === "object" ? (input as Record<string, unknown>) : {};
   const rawAlias = normalizePlainText(value.publicAlias, ALIAS_MAX_LENGTH);
-  const discloseScores = value.discloseScores !== false;
-  const shareScores = discloseScores && value.shareScores !== false;
-  const med1Score = discloseScores ? normalizeOptionalScore(value.med1Score) : null;
-  const med2Score = discloseScores ? normalizeOptionalScore(value.med2Score) : null;
+  const shareScores = value.shareScores !== false;
+  const med1Score = normalizeOptionalScore(value.med1Score);
+  const med2Score = normalizeOptionalScore(value.med2Score);
   const errors: PostExamSurveyValidation["errors"] = {};
 
   if (typeof value.publicAlias === "string" && Array.from(value.publicAlias.trim()).length > ALIAS_MAX_LENGTH) {
@@ -460,17 +458,16 @@ export function validatePostExamSurveyAnswers(input: unknown): PostExamSurveyVal
   } else if (rawAlias && containsObviousPersonalInfo(rawAlias)) {
     errors.publicAlias = "公開暱稱不能包含 email、網址、電話或帳號等明顯個資。";
   }
-  if (discloseScores && value.med1Score !== "" && value.med1Score != null && med1Score === null) {
+  if (value.med1Score !== "" && value.med1Score != null && med1Score === null) {
     errors.med1Score = "醫學（一）分數需為 0 到 100 的整數。";
   }
-  if (discloseScores && value.med2Score !== "" && value.med2Score != null && med2Score === null) {
+  if (value.med2Score !== "" && value.med2Score != null && med2Score === null) {
     errors.med2Score = "醫學（二）分數需為 0 到 100 的整數。";
   }
 
   return {
     data: {
       publicAlias: rawAlias || DEFAULT_PUBLIC_ALIAS,
-      discloseScores,
       med1Score,
       med2Score,
       shareScores,
@@ -488,7 +485,6 @@ export function hasPostExamSurveyErrors(validation: PostExamSurveyValidation) {
 export function getDefaultPostExamSurveyAnswers(): PostExamSurveyAnswers {
   return {
     publicAlias: "",
-    discloseScores: true,
     med1Score: null,
     med2Score: null,
     shareScores: true,

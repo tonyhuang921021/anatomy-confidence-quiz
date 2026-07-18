@@ -206,16 +206,16 @@ test("公開暱稱留白可匿名，明顯個資與非法分數會被阻擋", ()
   }
 });
 
-test("不同意留下分數時不保留分數，也不分享", () => {
+test("舊草稿的留下分數欄位不再影響分數與匿名分享設定", () => {
   const result = validatePostExamSurveyAnswers({
     discloseScores: false,
     shareScores: true,
     med1Score: 90,
     med2Score: 80
   });
-  assert.equal(result.data.med1Score, null);
-  assert.equal(result.data.med2Score, null);
-  assert.equal(result.data.shareScores, false);
+  assert.equal(result.data.med1Score, 90);
+  assert.equal(result.data.med2Score, 80);
+  assert.equal(result.data.shareScores, true);
 });
 
 test("讀書建議與鼓勵保留段落換行並清除控制字元", () => {

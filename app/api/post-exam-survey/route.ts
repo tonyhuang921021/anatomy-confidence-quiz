@@ -69,7 +69,6 @@ function sanitizeClientMeta(input: unknown) {
 function mapRowToAnswers(row: Record<string, unknown>) {
   return {
     publicAlias: typeof row.public_alias === "string" ? row.public_alias : "",
-    discloseScores: row.disclose_scores !== false,
     med1Score: typeof row.med1_score === "number" ? row.med1_score : null,
     med2Score: typeof row.med2_score === "number" ? row.med2_score : null,
     shareScores: row.share_scores !== false,
@@ -116,7 +115,7 @@ export async function GET(request: NextRequest) {
       supabase
         .from("post_exam_survey_responses")
         .select(
-          "public_alias, disclose_scores, med1_score, med2_score, share_scores, study_reflection, encouragement, submitted_at, updated_at"
+          "public_alias, med1_score, med2_score, share_scores, study_reflection, encouragement, submitted_at, updated_at"
         )
         .eq("survey_id", POST_EXAM_SURVEY_ID)
         .eq("user_id", user.id)
@@ -177,7 +176,7 @@ export async function POST(request: NextRequest) {
           survey_id: POST_EXAM_SURVEY_ID,
           user_id: user.id,
           public_alias: answers.publicAlias,
-          disclose_scores: answers.discloseScores,
+          disclose_scores: true,
           med1_score: answers.med1Score,
           med2_score: answers.med2Score,
           share_scores: answers.shareScores,
