@@ -1,9 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 import {
-  POST_EXAM_PREVIEW_EMAIL,
+  POST_EXAM_CUTOFF_AT,
+  POST_EXAM_MINIMUM_ATTEMPTS,
+  POST_EXAM_SNAPSHOT_VERSION,
   POST_EXAM_SURVEY_ID,
   hasPostExamSurveyErrors,
+  isPostExamSnapshotEligible,
+  normalizePostExamPersonalSnapshot,
   validatePostExamSurveyAnswers
 } from "@/lib/postExamReflection";
 import { withServerTimeout } from "@/lib/serverTimeout";
@@ -29,7 +33,7 @@ function getBearerToken(request: NextRequest) {
   return authorization.match(/^Bearer\s+(.+)$/i)?.[1]?.trim() ?? "";
 }
 
-async function verifyPreviewUser(supabase: any, request: NextRequest) {
+async function verifySignedInUser(supabase: any, request: NextRequest) {
   const token = getBearerToken(request);
   if (!token) return null;
   const { data, error } = (await withServerTimeout(
@@ -41,10 +45,46 @@ async function verifyPreviewUser(supabase: any, request: NextRequest) {
     error?: unknown;
   };
   const email = data?.user?.email?.trim().toLowerCase() ?? "";
-  if (error || !data?.user?.id || email !== POST_EXAM_PREVIEW_EMAIL.toLowerCase()) {
+  if (error || !data?.user?.id || !email) {
     return null;
   }
   return { id: data.user.id };
+}
+
+async function hasPostExamSurveyAccess(supabase: any, userId: string) {
+  const { data: snapshotRow, error: snapshotError } = (await withServerTimeout(
+    supabase
+      .from("post_exam_recap_snapshots")
+      .select("snapshot")
+      .eq("user_id", userId)
+      .eq("snapshot_version", POST_EXAM_SNAPSHOT_VERSION)
+      .maybeSingle(),
+    1800,
+    "考後回顧資格讀取逾時"
+  )) as { data?: { snapshot?: unknown } | null; error?: unknown };
+  if (snapshotError) throw snapshotError;
+  const snapshot = normalizePostExamPersonalSnapshot(snapshotRow?.snapshot);
+  if (snapshot && isPostExamSnapshotEligible(snapshot)) return true;
+
+  const { data: rollups, error: rollupError } = (await withServerTimeout(
+    supabase
+      .from("leaderboard_session_rollups")
+      .select("attempts")
+      .eq("user_id", userId)
+      .not("completed_at", "is", null)
+      .lte("completed_at", POST_EXAM_CUTOFF_AT)
+      .gt("attempts", 0)
+      .order("completed_at", { ascending: true })
+      .limit(POST_EXAM_MINIMUM_ATTEMPTS + 1),
+    2200,
+    "考後問卷資格檢查逾時"
+  )) as { data?: Array<{ attempts?: number | null }>; error?: unknown };
+  if (rollupError) throw rollupError;
+  const totalAttempts = (rollups ?? []).reduce(
+    (sum, row) => sum + Math.max(0, Number(row.attempts ?? 0)),
+    0
+  );
+  return totalAttempts > POST_EXAM_MINIMUM_ATTEMPTS;
 }
 
 function sanitizeClientMeta(input: unknown) {
@@ -56,8 +96,8 @@ function sanitizeClientMeta(input: unknown) {
   const width = Number(viewport.width);
   const height = Number(viewport.height);
   return {
-    previewVersion: "post-exam-2026-v1",
-    pagePath: "/post-exam-preview",
+    pageVersion: POST_EXAM_SNAPSHOT_VERSION,
+    pagePath: "/post-exam",
     viewport:
       Number.isFinite(width) && Number.isFinite(height)
         ? {
@@ -115,10 +155,16 @@ export async function GET(request: NextRequest) {
   }
 
   try {
-    const user = await verifyPreviewUser(supabase, request);
+    const user = await verifySignedInUser(supabase, request);
     if (!user) {
       return NextResponse.json(
-        { ok: false, message: "此預覽目前只開放指定管理員帳號。" },
+        { ok: false, message: "請先登入後再查看考後問卷。" },
+        { status: 401, headers: NO_STORE_HEADERS }
+      );
+    }
+    if (!(await hasPostExamSurveyAccess(supabase, user.id))) {
+      return NextResponse.json(
+        { ok: false, message: "考後回顧與問卷開放給累積作答超過 200 題的使用者。" },
         { status: 403, headers: NO_STORE_HEADERS }
       );
     }
@@ -158,10 +204,16 @@ export async function POST(request: NextRequest) {
   }
 
   try {
-    const user = await verifyPreviewUser(supabase, request);
+    const user = await verifySignedInUser(supabase, request);
     if (!user) {
       return NextResponse.json(
-        { ok: false, message: "此預覽目前只開放指定管理員帳號。" },
+        { ok: false, message: "請先登入後再送出考後問卷。" },
+        { status: 401, headers: NO_STORE_HEADERS }
+      );
+    }
+    if (!(await hasPostExamSurveyAccess(supabase, user.id))) {
+      return NextResponse.json(
+        { ok: false, message: "考後回顧與問卷開放給累積作答超過 200 題的使用者。" },
         { status: 403, headers: NO_STORE_HEADERS }
       );
     }

@@ -3,7 +3,7 @@ import type { QuizSession } from "@/types/quiz";
 export const POST_EXAM_CUTOFF_AT = "2026-07-17T07:00:00.000Z";
 export const POST_EXAM_SNAPSHOT_VERSION = "post-exam-2026-v1";
 export const POST_EXAM_SURVEY_ID = "med_exam_post_exam_legacy_2026";
-export const POST_EXAM_PREVIEW_EMAIL = "tonyhuang921021@gmail.com";
+export const POST_EXAM_MINIMUM_ATTEMPTS = 200;
 
 export type PostExamSubject = "醫學（一）" | "醫學（二）";
 
@@ -367,6 +367,17 @@ export function mergePostExamSnapshotWithLocal(
     simulations: mergePostExamSimulations(snapshot.simulations, local.simulations),
     localReconciledAt: normalizeDate(reconciledAt) || new Date().toISOString()
   } satisfies PostExamPersonalSnapshot;
+}
+
+export function getPostExamTotalAttempts(sessions: PostExamSessionRollup[]) {
+  return mergePostExamSessionRollups([], sessions).reduce(
+    (sum, session) => sum + session.attempts,
+    0
+  );
+}
+
+export function isPostExamSnapshotEligible(snapshot: PostExamPersonalSnapshot) {
+  return getPostExamTotalAttempts(snapshot.sessions) > POST_EXAM_MINIMUM_ATTEMPTS;
 }
 
 function getTaipeiDateKey(value: string) {

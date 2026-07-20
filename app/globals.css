@@ -485,6 +485,20 @@ select {
     box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.22);
   }
 
+  .post-exam-survey-trigger {
+    border-color: rgba(217, 119, 6, 0.24);
+    background: #fff7e8;
+    color: #7c3f0d;
+  }
+
+  .post-exam-survey-trigger:hover {
+    background: #ffefd0;
+  }
+
+  .post-exam-survey-trigger .pre-exam-survey-trigger-mark {
+    background: #d97706;
+  }
+
   .pre-exam-survey-backdrop {
     position: fixed;
     z-index: 80;
@@ -3089,6 +3103,17 @@ html[data-theme="dark"] .pre-exam-survey-trigger {
 html[data-theme="dark"] .pre-exam-survey-trigger-mark {
   background: rgba(138, 154, 184, 0.82);
   color: #111827;
+}
+
+html[data-theme="dark"] .post-exam-survey-trigger {
+  border-color: rgba(251, 191, 36, 0.2);
+  background: rgba(120, 69, 18, 0.38);
+  color: #fde7b0;
+}
+
+html[data-theme="dark"] .post-exam-survey-trigger .pre-exam-survey-trigger-mark {
+  background: #d99a35;
+  color: #241506;
 }
 
 html[data-theme="dark"] .pre-exam-survey-backdrop {

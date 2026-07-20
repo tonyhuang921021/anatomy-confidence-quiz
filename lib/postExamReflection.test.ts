@@ -3,10 +3,13 @@ import test from "node:test";
 import { POST_EXAM_SEASON_SNAPSHOT } from "../data/postExamSeasonSnapshot";
 import {
   POST_EXAM_CUTOFF_AT,
+  POST_EXAM_MINIMUM_ATTEMPTS,
   buildPostExamCumulativePoints,
   buildPostExamPersonalSnapshot,
+  getPostExamTotalAttempts,
   groupPostExamSimulationsByYear,
   inferPostExamSubject,
+  isPostExamSnapshotEligible,
   mergePostExamSnapshotWithLocal,
   summarizeLocalPostExamSessions,
   validatePostExamSurveyAnswers
@@ -73,6 +76,45 @@ test("截止時間之後的 session 不會進入個人快照", () => {
     []
   );
   assert.deepEqual(snapshot.sessions.map((session) => session.sessionId), ["before"]);
+});
+
+test("考後回顧資格嚴格要求超過 200 題", () => {
+  const atThreshold = buildPostExamPersonalSnapshot(
+    [
+      {
+        session_id: "exactly-200",
+        mode: "random",
+        attempts: POST_EXAM_MINIMUM_ATTEMPTS,
+        correct_attempts: 150,
+        completed_at: POST_EXAM_CUTOFF_AT
+      }
+    ],
+    []
+  );
+  const overThreshold = buildPostExamPersonalSnapshot(
+    [
+      {
+        session_id: "exactly-200",
+        mode: "random",
+        attempts: POST_EXAM_MINIMUM_ATTEMPTS,
+        correct_attempts: 150,
+        completed_at: POST_EXAM_CUTOFF_AT
+      },
+      {
+        session_id: "one-more",
+        mode: "random",
+        attempts: 1,
+        correct_attempts: 1,
+        completed_at: POST_EXAM_CUTOFF_AT
+      }
+    ],
+    []
+  );
+
+  assert.equal(getPostExamTotalAttempts(atThreshold.sessions), 200);
+  assert.equal(isPostExamSnapshotEligible(atThreshold), false);
+  assert.equal(getPostExamTotalAttempts(overThreshold.sessions), 201);
+  assert.equal(isPostExamSnapshotEligible(overThreshold), true);
 });
 
 test("本機合併只補缺少的 session，不覆蓋同 ID 雲端紀錄", () => {

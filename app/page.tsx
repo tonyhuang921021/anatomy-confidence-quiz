@@ -7,7 +7,6 @@ import { LazyAuthPanel } from "@/components/LazyAuthPanel";
 import { LazyFeedbackBoard } from "@/components/LazyFeedbackBoard";
 import { HomeToneBanner } from "@/components/HomeToneBanner";
 import { OwnerOnlyNotesLink } from "@/components/OwnerOnlyNotesLink";
-import { PreExamSprintSurvey } from "@/components/PreExamSprintSurvey";
 import { isSupabaseRecoveryMode } from "@/lib/supabase/recoveryMode";
 
 type HomeAnimationStyle = CSSProperties & {
@@ -52,6 +51,11 @@ const QUICK_ENTRIES = [
 ] as const;
 
 const HOME_RELEASE_NOTES = [
+  {
+    time: "07/20",
+    title: "考後回顧開放了",
+    body: "考試結束前累積作答超過 200 題，就能整理自己的刷題軌跡與模擬考成績；問卷每個帳號限送一次，送出後仍可回來查看。"
+  },
   {
     time: "07/20",
     title: "115 年第二次考古題到站",
@@ -1164,7 +1168,15 @@ export default function HomePage() {
                     <p className="eyebrow text-[10px]">Next Step</p>
                     <h2 className="mt-2 text-2xl font-black tracking-[-0.04em] text-ink">今天直接進題目</h2>
                   </div>
-                  <PreExamSprintSurvey />
+                  <Link
+                    href="/post-exam"
+                    prefetch={false}
+                    className="pre-exam-survey-trigger post-exam-survey-trigger"
+                    aria-label="打開考後回顧與問卷"
+                  >
+                    <span className="pre-exam-survey-trigger-mark" aria-hidden="true">回</span>
+                    <span className="hidden sm:inline">考後回顧</span>
+                  </Link>
                 </div>
                 <div className="mt-6 grid gap-4">
                   <ExamCountdown />

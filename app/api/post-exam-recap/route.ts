@@ -2,9 +2,10 @@ import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 import {
   POST_EXAM_CUTOFF_AT,
-  POST_EXAM_PREVIEW_EMAIL,
   POST_EXAM_SNAPSHOT_VERSION,
   buildPostExamPersonalSnapshot,
+  getPostExamTotalAttempts,
+  isPostExamSnapshotEligible,
   mergePostExamSnapshotWithLocal,
   normalizePostExamPersonalSnapshot,
   type PostExamPersonalSnapshot
@@ -14,7 +15,7 @@ import { withServerTimeout } from "@/lib/serverTimeout";
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
 
-type VerifiedPreviewUser = {
+type VerifiedPostExamUser = {
   id: string;
   email: string;
 };
@@ -51,7 +52,7 @@ function getBearerToken(request: NextRequest) {
   return match?.[1]?.trim() ?? "";
 }
 
-async function verifyPreviewUser(supabase: any, request: NextRequest) {
+async function verifySignedInUser(supabase: any, request: NextRequest) {
   const accessToken = getBearerToken(request);
   if (!accessToken) return null;
   const { data, error } = (await withServerTimeout(
@@ -63,14 +64,10 @@ async function verifyPreviewUser(supabase: any, request: NextRequest) {
     error?: unknown;
   };
   const email = data?.user?.email?.trim().toLowerCase() ?? "";
-  if (
-    error ||
-    !data?.user?.id ||
-    email !== POST_EXAM_PREVIEW_EMAIL.toLowerCase()
-  ) {
+  if (error || !data?.user?.id || !email) {
     return null;
   }
-  return { id: data.user.id, email } satisfies VerifiedPreviewUser;
+  return { id: data.user.id, email } satisfies VerifiedPostExamUser;
 }
 
 async function readStoredSnapshot(supabase: any, userId: string) {
@@ -169,7 +166,7 @@ function errorResponse(error: unknown) {
     {
       ok: false,
       message: migrationMissing
-        ? "考後回顧資料表尚未建立，請先套用預覽版 migration。"
+        ? "考後回顧資料表尚未建立，請先套用考後回顧 migration。"
         : "考後回顧暫時無法載入，本機紀錄沒有被修改。"
     },
     { status: 503, headers: NO_STORE_HEADERS }
@@ -186,15 +183,23 @@ export async function GET(request: NextRequest) {
   }
 
   try {
-    const user = await verifyPreviewUser(supabase, request);
+    const user = await verifySignedInUser(supabase, request);
     if (!user) {
       return NextResponse.json(
-        { ok: false, message: "此預覽目前只開放指定管理員帳號。" },
-        { status: 403, headers: NO_STORE_HEADERS }
+        { ok: false, message: "請先登入後再查看考後回顧。" },
+        { status: 401, headers: NO_STORE_HEADERS }
       );
     }
     const result = await getOrCreateSnapshot(supabase, user.id);
-    return NextResponse.json({ ok: true, ...result }, { headers: NO_STORE_HEADERS });
+    return NextResponse.json(
+      {
+        ok: true,
+        ...result,
+        eligible: isPostExamSnapshotEligible(result.snapshot),
+        totalAttempts: getPostExamTotalAttempts(result.snapshot.sessions)
+      },
+      { headers: NO_STORE_HEADERS }
+    );
   } catch (error) {
     return errorResponse(error);
   }
@@ -210,11 +215,11 @@ export async function POST(request: NextRequest) {
   }
 
   try {
-    const user = await verifyPreviewUser(supabase, request);
+    const user = await verifySignedInUser(supabase, request);
     if (!user) {
       return NextResponse.json(
-        { ok: false, message: "此預覽目前只開放指定管理員帳號。" },
-        { status: 403, headers: NO_STORE_HEADERS }
+        { ok: false, message: "請先登入後再查看考後回顧。" },
+        { status: 401, headers: NO_STORE_HEADERS }
       );
     }
     const body = (await request.json().catch(() => ({}))) as {
@@ -238,7 +243,14 @@ export async function POST(request: NextRequest) {
       await persistSnapshot(supabase, user.id, snapshot);
     }
     return NextResponse.json(
-      { ok: true, snapshot, addedSessions, addedSimulations },
+      {
+        ok: true,
+        snapshot,
+        addedSessions,
+        addedSimulations,
+        eligible: isPostExamSnapshotEligible(snapshot),
+        totalAttempts: getPostExamTotalAttempts(snapshot.sessions)
+      },
       { headers: NO_STORE_HEADERS }
     );
   } catch (error) {
