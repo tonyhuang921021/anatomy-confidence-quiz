@@ -8,6 +8,7 @@ import moexMed1RemainingDetailedV4Merged0011827Raw from "@/data/sources/moex_med
 import moexMed1ReclassifiedV5 from "@/data/sources/moex_med1_100_115_reclassified_v5_compact.json";
 import moexMed1Requested149ReclassificationPatch from "@/data/sources/moex_med1_requested_149_reclassification_patch.json";
 import moexMedStage2Merged0013100 from "@/data/sources/moex_med_stage2_detailed_merged_001_3100_classified_v3.json";
+import moex115090OfficialQuestions from "@/data/sources/moex_115090_official_questions.json";
 import questionMediaManifest from "@/data/sources/question_media_manifest.json";
 import {
   applyAnalysisPrimaryTagClassification,
@@ -1914,6 +1915,19 @@ export const medStage2Questions: Question[] = stage2QuestionsRaw
   .filter((question): question is Question => Boolean(question))
   .map(finalizeQuestion);
 
+const moex115090QuestionsRaw = moex115090OfficialQuestions as {
+  med1Questions: RawQuestion[];
+  med2Questions: Stage2QuestionRaw[];
+};
+export const moex115090Med1Questions: Question[] = moex115090QuestionsRaw.med1Questions
+  .map(toQuestion)
+  .filter((question): question is Question => Boolean(question))
+  .map(finalizeQuestion);
+export const moex115090Med2Questions: Question[] = moex115090QuestionsRaw.med2Questions
+  .map(toStage2Question)
+  .filter((question): question is Question => Boolean(question))
+  .map(finalizeQuestion);
+
 const anatomyQuestionsWithOverrides: Question[] = anatomyQuestions
   .map(finalizeQuestion);
 
@@ -2031,6 +2045,8 @@ export const canonicalQuestionBank: Question[] = dedupeQuestionBank([
   ...med1MissingBatch3Questions,
   ...med1RequestedPatchQuestions,
   ...medStage2Questions,
+  ...moex115090Med1Questions,
+  ...moex115090Med2Questions,
   ...manualInjectedQuestions
 ]).map(applyAnalysisPrimaryTagClassification);
 
