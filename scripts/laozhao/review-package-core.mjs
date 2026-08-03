@@ -60,6 +60,21 @@ function readField(record, aliases) {
   return undefined;
 }
 
+export function isLikelyTranscriptLoop(text) {
+  if (typeof text !== "string") return false;
+  const compact = text.normalize("NFKC").replace(/[\s、，,。！？!?；;：:]+/gu, "");
+  if (compact.length < 8) return false;
+  const maxUnitLength = Math.min(32, Math.floor(compact.length / 4));
+  for (let unitLength = 2; unitLength <= maxUnitLength; unitLength += 1) {
+    if (compact.length % unitLength !== 0) continue;
+    const repeatCount = compact.length / unitLength;
+    if (repeatCount < 4) continue;
+    const unit = compact.slice(0, unitLength);
+    if (unit.repeat(repeatCount) === compact) return true;
+  }
+  return false;
+}
+
 export function normalizeTranscriptSegments(raw, { durationSec = null } = {}) {
   const warnings = [];
   const segments = [];
@@ -78,6 +93,10 @@ export function normalizeTranscriptSegments(raw, { durationSec = null } = {}) {
       : "";
     if (startSec === null || endSec === null || endSec <= startSec || !text) {
       warnings.push(`第 ${sourceIndex + 1} 段缺少有效時間或文字，已略過。`);
+      return;
+    }
+    if (isLikelyTranscriptLoop(text)) {
+      warnings.push(`第 ${sourceIndex + 1} 段疑似重複循環幻覺，已略過。`);
       return;
     }
     if (durationSec !== null && startSec >= durationSec + 1) {

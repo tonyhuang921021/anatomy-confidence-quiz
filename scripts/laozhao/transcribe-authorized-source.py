@@ -10,6 +10,7 @@ import argparse
 import hashlib
 import importlib.util
 import json
+import math
 import os
 import re
 import sys
@@ -55,6 +56,17 @@ def sha256_file(path: Path) -> str:
     return digest.hexdigest()
 
 
+def sanitize_json_value(value):
+    """Replace non-standard JSON floats without changing transcript text."""
+    if isinstance(value, float) and not math.isfinite(value):
+        return None
+    if isinstance(value, list):
+        return [sanitize_json_value(item) for item in value]
+    if isinstance(value, dict):
+        return {key: sanitize_json_value(item) for key, item in value.items()}
+    return value
+
+
 def add_source_identity(output: Path, source: Path, video_id: str) -> None:
     try:
         payload = json.loads(output.read_text(encoding="utf-8"))
@@ -62,6 +74,7 @@ def add_source_identity(output: Path, source: Path, video_id: str) -> None:
         raise SystemExit(f"轉錄工具沒有產生可解析的 JSON：{output}") from exc
     if not isinstance(payload, dict):
         raise SystemExit("Whisper 輸出必須是 JSON 物件，無法加入來源驗證資料。")
+    payload = sanitize_json_value(payload)
     payload["_laozhao"] = {
         "videoId": video_id,
         "sourceMediaSha256": sha256_file(source),
@@ -69,7 +82,10 @@ def add_source_identity(output: Path, source: Path, video_id: str) -> None:
         "sourceSizeBytes": source.stat().st_size,
     }
     temporary = output.with_name(f"{output.name}.tmp-{os.getpid()}")
-    temporary.write_text(json.dumps(payload, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+    temporary.write_text(
+        json.dumps(payload, ensure_ascii=False, indent=2, allow_nan=False) + "\n",
+        encoding="utf-8",
+    )
     temporary.replace(output)
 
 

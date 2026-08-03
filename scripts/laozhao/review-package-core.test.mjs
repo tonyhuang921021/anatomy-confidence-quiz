@@ -2,10 +2,17 @@ import assert from "node:assert/strict";
 import test from "node:test";
 import {
   formatClock,
+  isLikelyTranscriptLoop,
   normalizeTranscriptSegments,
   transcriptToMarkdown,
   validateAndNormalizeChapterDraft
 } from "./review-package-core.mjs";
+
+test("只排除四次以上的完整重複循環，不誤刪正常重述", () => {
+  assert.equal(isLikelyTranscriptLoop("缺了解剖、缺了解剖、缺了解剖、缺了解剖"), true);
+  assert.equal(isLikelyTranscriptLoop("臂神經叢分成根、幹、束與分支"), false);
+  assert.equal(isLikelyTranscriptLoop("這個很重要、這個很重要"), false);
+});
 
 test("逐字稿時間可正規化並保留繁中醫學文字", () => {
   const result = normalizeTranscriptSegments(

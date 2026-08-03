@@ -1,6 +1,6 @@
 # 老趙解剖學私人內容協作流程
 
-這套流程只處理已取得授權的本機原始影片。YouTube Data API 只同步官方清單與 metadata，不負責下載影片、音訊、逐字稿或板書。
+這套流程只處理已取得授權的影片。YouTube Data API 只同步官方清單與 metadata；私人下載工具則依指定 video ID 逐部取得授權來源，不會在網頁瀏覽時下載影片。
 
 所有中間產物預設放在 `data/laozhao/staging/`，該目錄已被 Git 忽略，不會進入 Vercel 或公開網站。
 
@@ -43,7 +43,19 @@ python3 -m venv .venv-laozhao
 ATFBb25QRNw.mp4
 ```
 
-不要把原始影片放進 Git repo。
+取得授權後，也可以直接從官方播放清單逐部下載：
+
+```bash
+npm run download:laozhao -- --video-id ATFBb25QRNw
+```
+
+下載工具會拒絕未出現在官方 manifest 的影片、未確認授權的環境，以及整份播放清單一次下載。預設最高抓到 1080p；若來源最高只有 720p，就保留 720p。輸出固定放在：
+
+```text
+data/laozhao/staging/ATFBb25QRNw/source/ATFBb25QRNw.mp4
+```
+
+不要把原始影片放進 Git、Vercel 或公開分享區。
 
 ## 2. 產生含時間戳的逐字稿
 
