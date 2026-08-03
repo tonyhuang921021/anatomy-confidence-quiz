@@ -22,7 +22,7 @@ async function clearPwaCaches() {
   }
 }
 
-export function PWARegistration() {
+export function PWARegistration({ cleanupOnly = false }: { cleanupOnly?: boolean } = {}) {
   useEffect(() => {
     if (typeof window === "undefined" || !("serviceWorker" in navigator)) {
       return;
@@ -53,6 +53,13 @@ export function PWARegistration() {
 
     const register = async () => {
       try {
+        if (cleanupOnly) {
+          if (isSafariBrowser()) {
+            await disableServiceWorker(true, SAFARI_SW_RELOAD_KEY);
+          }
+          return;
+        }
+
         if (isSupabaseRecoveryMode()) {
           await disableServiceWorker(true);
           return;
@@ -79,7 +86,7 @@ export function PWARegistration() {
     };
     window.addEventListener("load", onLoad);
     return () => window.removeEventListener("load", onLoad);
-  }, []);
+  }, [cleanupOnly]);
 
   return null;
 }

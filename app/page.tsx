@@ -52,6 +52,11 @@ const QUICK_ENTRIES = [
 
 const HOME_RELEASE_NOTES = [
   {
+    time: "08/03",
+    title: "老趙解剖學影片整理中",
+    body: "影片清單、章節跳轉、觀看進度和時間戳筆記先進預覽；章節會逐支確認，不拿還沒審過的內容充數。"
+  },
+  {
     time: "07/20",
     title: "考後回顧開放了",
     body: "考試結束前累積作答超過 200 題，就能整理自己的刷題軌跡與模擬考成績；問卷每個帳號限送一次，送出後仍可回來查看。"
@@ -1052,7 +1057,7 @@ export default function HomePage() {
           <p className="body-soft mt-5 max-w-3xl text-base leading-8 sm:text-lg">
             目前先暫停登入、留言板、跨裝置同步與雲端筆記，讓作答頁維持順暢。你仍然可以用訪客模式刷題，本機紀錄會留在這台裝置。
           </p>
-          <div className="mt-8 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+          <div className="mt-8 grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
             <Link href="/start" prefetch={false} className="home-action-card home-action-primary">
               <span className="text-sm font-bold">開始測驗</span>
             </Link>
@@ -1064,6 +1069,9 @@ export default function HomePage() {
             </Link>
             <Link href="/search" prefetch={false} className="home-action-card">
               <span className="text-sm font-bold">題目搜尋</span>
+            </Link>
+            <Link href="/courses/laozhao-anatomy" prefetch={false} className="home-action-card">
+              <span className="text-sm font-bold">老趙解剖學影片</span>
             </Link>
           </div>
           <div className="mt-8 rounded-[2rem] bg-amber-50/80 p-5 text-sm font-semibold leading-7 text-amber-900 ring-1 ring-amber-100">
@@ -1200,6 +1208,13 @@ export default function HomePage() {
 
             <div className="grid auto-rows-max items-start gap-3 sm:grid-cols-2">
               <div className="home-entry-card home-study-card sm:col-span-2">
+                <Link
+                  href="/courses/laozhao-anatomy"
+                  prefetch={false}
+                  className="secondary-pill home-study-link mb-3 w-full px-4"
+                >
+                  老趙解剖學影片
+                </Link>
                 <div className="grid gap-3 sm:grid-cols-2">
                   <div className="grid gap-3">
                     <ClientSectionBoundary title="學習筆記入口">
