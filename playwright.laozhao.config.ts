@@ -17,7 +17,12 @@ export default defineConfig({
   webServer: {
     command: "./node_modules/.bin/next dev --hostname 127.0.0.1 --port 3003",
     url: "http://127.0.0.1:3003/courses/laozhao-anatomy",
-    reuseExistingServer: true,
+    env: {
+      ...process.env,
+      LAOZHAO_PREVIEW_CONTENT: "1",
+      VERCEL_ENV: "preview"
+    },
+    reuseExistingServer: false,
     timeout: 120_000
   },
   projects: [
@@ -31,7 +36,15 @@ export default defineConfig({
     {
       name: "chromium-mobile",
       use: {
-        ...devices["iPhone 13"]
+        ...devices["iPhone 13"],
+        viewport: { width: 390, height: 844 }
+      }
+    },
+    {
+      name: "chromium-mobile-360",
+      use: {
+        ...devices["iPhone 13"],
+        viewport: { width: 360, height: 800 }
       }
     },
     {

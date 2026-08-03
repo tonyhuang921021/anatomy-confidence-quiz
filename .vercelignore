@@ -32,3 +32,13 @@ data/laozhao/**/*.vtt
 data/laozhao/**/*.wav
 data/laozhao/**/*.webm
 data/laozhao/**/*.zip
+
+# Paused GitHub handoff drafts are local-only and must never enter a deployment upload.
+docs/LAOZHAO_GITHUB_HANDOFF.md
+scripts/laozhao/github-handoff-core.mjs
+scripts/laozhao/github-handoff-core.test.mjs
+scripts/laozhao/import-github-handoff.mjs
+scripts/laozhao/prepare-github-handoff.mjs
+scripts/laozhao/record-github-handoff-progress.mjs
+scripts/laozhao/scaffold-github-handoff.mjs
+templates

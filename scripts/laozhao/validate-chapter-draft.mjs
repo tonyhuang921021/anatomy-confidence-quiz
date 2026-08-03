@@ -30,7 +30,7 @@ async function writeAtomic(pathname, content) {
 }
 
 function usage() {
-  return "用法：npm run validate:laozhao-chapters -- --transcript <transcript.private.json> --draft <Chat 回傳 JSON>";
+  return "用法：npm run validate:laozhao-chapters -- --transcript <transcript.private.json> --draft <Chat 回傳 JSON> [--output <chapters.validated.private.json>]";
 }
 
 async function readJson(pathname, label) {
@@ -67,7 +67,9 @@ async function main() {
     return;
   }
 
-  const outputPath = resolve(dirname(transcriptPath), "chapters.validated.private.json");
+  const outputPath = typeof args.output === "string"
+    ? resolve(args.output)
+    : resolve(dirname(transcriptPath), "chapters.validated.private.json");
   assertPrivatePath(outputPath, "章節驗證結果");
   const output = {
     schemaVersion: "1.0.0",

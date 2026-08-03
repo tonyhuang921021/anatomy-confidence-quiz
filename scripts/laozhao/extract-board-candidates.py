@@ -1,10 +1,13 @@
 #!/usr/bin/env python3
+from __future__ import annotations
+
 """Extract private, chapter-aligned board-frame candidates from local media.
 
 The script reuses the existing slide detector for board ROI and sampled-frame
 decoding. It selects real frames only; it does not reconstruct, inpaint, or
-invent pixels. Occlusion is a motion/residual estimate and every result requires
-human review before publication.
+invent pixels. Foreground and occlusion are luminance/residual estimates, not
+person or clothing detection, and every result requires human review before
+publication.
 """
 
 import argparse
@@ -37,6 +40,23 @@ class Sample:
     occlusion: float = 0.0
     motion: float = 0.0
     score: float = 0.0
+    foreground_area: float = 0.0
+    largest_foreground_component: float = 0.0
+    board_background_coverage: float = 0.0
+    foreground_component_count: int = 0
+    foreground_residual_area: float = 0.0
+
+
+@dataclass(frozen=True)
+class ForegroundEstimate:
+    """Image-only foreground metrics for one board crop."""
+
+    residual_area: float
+    foreground_area: float
+    largest_component: float
+    background_coverage: float
+    component_count: int
+    occlusion: float
 
 
 def load_module(path: Path):
@@ -107,14 +127,124 @@ def normalize(values: list[float], inverse: bool = False) -> list[float]:
     return [1.0 - value for value in result] if inverse else result
 
 
+def clamp_unit(value: float) -> float:
+    return float(max(0.0, min(1.0, value)))
+
+
+def _odd_kernel_size(value: int, limit: int) -> int:
+    """Return an odd morphology kernel that fits even tiny test images."""
+
+    if limit < 3:
+        return 1
+    size = max(3, int(value))
+    if size % 2 == 0:
+        size += 1
+    if size > limit:
+        size = limit if limit % 2 else limit - 1
+    return max(1, size)
+
+
+def _uint8_gray(image: np.ndarray) -> np.ndarray:
+    if image.ndim != 2:
+        raise ValueError("板書前景估計需要單通道灰階影像。")
+    if image.dtype == np.uint8:
+        return image
+    return cv2.normalize(image, None, 0, 255, cv2.NORM_MINMAX).astype(np.uint8)
+
+
+def estimate_foreground_occlusion(
+    gray: np.ndarray,
+    background: np.ndarray | None = None,
+) -> ForegroundEstimate:
+    """Estimate board occlusion from a frame and a robust board reference.
+
+    The reference is normally a temporal median of nearby board crops. A
+    residual mask is opened to discard thin writing/pointer marks, closed to
+    join a real foreground region, then reduced to large connected components.
+    The background coverage uses local texture in the reference, so it is
+    based on the board region rather than any particular foreground colour.
+    """
+
+    current = _uint8_gray(gray)
+    if background is None:
+        sigma = max(1.2, min(current.shape) * 0.035)
+        reference = cv2.GaussianBlur(current, (0, 0), sigmaX=sigma)
+    else:
+        reference = _uint8_gray(background)
+        if reference.shape != current.shape:
+            reference = cv2.resize(reference, (current.shape[1], current.shape[0]), interpolation=cv2.INTER_AREA)
+
+    current_smooth = cv2.GaussianBlur(current, (3, 3), 0)
+    reference_smooth = cv2.GaussianBlur(reference, (3, 3), 0)
+    residual = cv2.absdiff(current_smooth, reference_smooth)
+    residual_values = residual.astype(np.float32)
+    residual_median = float(np.median(residual_values))
+    residual_mad = float(np.median(np.abs(residual_values - residual_median)))
+    residual_threshold = max(10.0, residual_median + 5.0 * max(1.0, residual_mad))
+    raw_mask = (residual.astype(np.float32) >= residual_threshold).astype(np.uint8) * 255
+
+    minimum_dimension = min(current.shape)
+    open_size = _odd_kernel_size(round(minimum_dimension * 0.025), minimum_dimension)
+    close_size = _odd_kernel_size(round(minimum_dimension * 0.055), minimum_dimension)
+    opened = cv2.morphologyEx(raw_mask, cv2.MORPH_OPEN, np.ones((open_size, open_size), np.uint8))
+    foreground_mask = cv2.morphologyEx(opened, cv2.MORPH_CLOSE, np.ones((close_size, close_size), np.uint8))
+
+    component_count, labels, stats, _ = cv2.connectedComponentsWithStats(foreground_mask, 8)
+    total_pixels = float(current.size)
+    minimum_component_area = max(32, int(round(total_pixels * 0.012)))
+    component_areas = [
+        float(stats[index, cv2.CC_STAT_AREA])
+        for index in range(1, component_count)
+        if int(stats[index, cv2.CC_STAT_AREA]) >= minimum_component_area
+    ]
+    foreground_area = sum(component_areas) / total_pixels if component_areas else 0.0
+    largest_component = max(component_areas, default=0.0) / total_pixels
+
+    texture_kernel_size = _odd_kernel_size(round(minimum_dimension * 0.045), minimum_dimension)
+    reference_texture = cv2.morphologyEx(
+        reference_smooth,
+        cv2.MORPH_GRADIENT,
+        np.ones((texture_kernel_size, texture_kernel_size), np.uint8),
+    )
+    texture_threshold = max(4.0, float(np.percentile(reference_texture, 65)))
+    background_mask = (reference_texture <= texture_threshold) & (residual < residual_threshold)
+    background_coverage = float(np.mean(background_mask))
+
+    # Small ink has little area after morphology. A large component and loss of
+    # board background both need to agree before the estimate becomes severe.
+    area_signal = clamp_unit((foreground_area - 0.012) / 0.18)
+    component_signal = clamp_unit(largest_component / 0.12)
+    coverage_signal = clamp_unit((0.58 - background_coverage) / 0.58)
+    occlusion = clamp_unit(
+        area_signal * 0.55 + component_signal * 0.30 + coverage_signal * 0.15
+    )
+    return ForegroundEstimate(
+        residual_area=float(np.mean(raw_mask > 0)),
+        foreground_area=foreground_area,
+        largest_component=largest_component,
+        background_coverage=background_coverage,
+        component_count=len(component_areas),
+        occlusion=occlusion,
+    )
+
+
+def _absolute_quality(value: float, reference: float) -> float:
+    return clamp_unit(value / reference) if reference > 0 else 0.0
+
+
 def score_samples(samples: list[Sample], target_sec: float | None) -> None:
     for index, sample in enumerate(samples):
         left = max(0, index - 6)
         right = min(len(samples), index + 7)
         neighborhood = np.stack([item.gray for item in samples[left:right]], axis=0)
         median = np.median(neighborhood, axis=0).astype(np.uint8)
-        residual = cv2.absdiff(sample.gray, median)
-        sample.occlusion = float(np.mean(residual > 26))
+        foreground = estimate_foreground_occlusion(sample.gray, median)
+        sample.occlusion = foreground.occlusion
+        sample.foreground_area = foreground.foreground_area
+        sample.largest_foreground_component = foreground.largest_component
+        sample.board_background_coverage = foreground.background_coverage
+        sample.foreground_component_count = foreground.component_count
+        sample.foreground_residual_area = foreground.residual_area
         motions = []
         if index:
             motions.append(float(np.mean(cv2.absdiff(sample.gray, samples[index - 1].gray) > 20)))
@@ -122,11 +252,23 @@ def score_samples(samples: list[Sample], target_sec: float | None) -> None:
             motions.append(float(np.mean(cv2.absdiff(sample.gray, samples[index + 1].gray) > 20)))
         sample.motion = sum(motions) / len(motions) if motions else 0.0
 
-    content_scores = normalize([item.content for item in samples])
-    sharpness_scores = normalize([item.sharpness for item in samples])
-    contrast_scores = normalize([item.contrast for item in samples])
-    clear_scores = normalize([item.occlusion for item in samples], inverse=True)
-    still_scores = normalize([item.motion for item in samples], inverse=True)
+    content_relative = normalize([item.content for item in samples])
+    content_scores = [
+        relative * 0.45 + _absolute_quality(item.content, 0.04) * 0.55
+        for relative, item in zip(content_relative, samples)
+    ]
+    sharpness_relative = normalize([item.sharpness for item in samples])
+    sharpness_scores = [
+        relative * 0.65 + _absolute_quality(item.sharpness, 80.0) * 0.35
+        for relative, item in zip(sharpness_relative, samples)
+    ]
+    contrast_relative = normalize([item.contrast for item in samples])
+    contrast_scores = [
+        relative * 0.55 + _absolute_quality(item.contrast, 28.0) * 0.45
+        for relative, item in zip(contrast_relative, samples)
+    ]
+    clear_scores = [math.exp(-4.0 * clamp_unit(item.occlusion)) for item in samples]
+    still_scores = [math.exp(-4.0 * clamp_unit(item.motion)) for item in samples]
     chapter_span = max(1.0, samples[-1].timestamp - samples[0].timestamp) if samples else 1.0
 
     for index, sample in enumerate(samples):
@@ -136,8 +278,8 @@ def score_samples(samples: list[Sample], target_sec: float | None) -> None:
         sample.score = (
             content_scores[index] * 0.25
             + sharpness_scores[index] * 0.18
-            + contrast_scores[index] * 0.12
-            + clear_scores[index] * 0.30
+            + contrast_scores[index] * 0.10
+            + clear_scores[index] * 0.32
             + still_scores[index] * 0.10
             + target_bonus * 0.05
         )
@@ -300,9 +442,17 @@ def main() -> None:
                     "timestampSec": round(candidate.timestamp, 3),
                     "imagePath": str(image_path.relative_to(output_dir)),
                     "selectionScore": round(candidate.score, 4),
-                    "sceneResidualEstimate": round(candidate.occlusion, 4),
+                    "sceneResidualEstimate": round(candidate.foreground_residual_area, 4),
+                    "foregroundResidualAreaEstimate": round(candidate.foreground_residual_area, 4),
+                    "occlusionEstimate": round(candidate.occlusion, 4),
+                    "foregroundAreaEstimate": round(candidate.foreground_area, 4),
+                    "largestForegroundComponentEstimate": round(candidate.largest_foreground_component, 4),
+                    "boardBackgroundCoverageEstimate": round(candidate.board_background_coverage, 4),
+                    "foregroundComponentCount": candidate.foreground_component_count,
                     "motionEstimate": round(candidate.motion, 4),
                     "sharpness": round(candidate.sharpness, 2),
+                    "content": round(candidate.content, 4),
+                    "contrast": round(candidate.contrast, 2),
                     "actualFrame": True,
                     "composite": False,
                     "reviewStatus": "unreviewed",
@@ -322,7 +472,7 @@ def main() -> None:
 
     output = {
         "schemaVersion": "1.0.0",
-        "pipelineVersion": "laozhao-board-candidates-v1",
+        "pipelineVersion": "laozhao-board-candidates-v2",
         "generatedAt": datetime.now(timezone.utc).isoformat(),
         "videoId": package["videoId"],
         "videoTitle": package.get("videoTitle"),
@@ -332,7 +482,7 @@ def main() -> None:
         "rightsStatus": "private_only",
         "reviewStatus": "unreviewed",
         "requiresHumanReview": True,
-        "selectionMethod": "real-frame motion/residual heuristic",
+        "selectionMethod": "real-frame clarity/content/foreground-occlusion/motion/target heuristic",
         "boardCrop": {"x": board_box[0], "y": board_box[1], "width": board_box[2], "height": board_box[3]},
         "chapters": output_chapters,
     }

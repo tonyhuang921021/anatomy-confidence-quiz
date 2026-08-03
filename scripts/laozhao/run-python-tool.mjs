@@ -4,6 +4,10 @@ import { existsSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 
 const repoRoot = resolve(dirname(fileURLToPath(import.meta.url)), "../..");
+const localEnvPath = resolve(repoRoot, ".env.local");
+if (existsSync(localEnvPath) && typeof process.loadEnvFile === "function") {
+  process.loadEnvFile(localEnvPath);
+}
 const toolName = process.argv[2];
 const forwardedArgs = process.argv.slice(3);
 const toolConfig = {
@@ -13,6 +17,10 @@ const toolConfig = {
   },
   board: {
     script: resolve(repoRoot, "scripts/laozhao/extract-board-candidates.py"),
+    imports: ["cv2", "numpy", "PIL"]
+  },
+  "board-test": {
+    script: resolve(repoRoot, "scripts/laozhao/extract-board-candidates.test.py"),
     imports: ["cv2", "numpy", "PIL"]
   }
 };
@@ -74,7 +82,7 @@ function main() {
     return;
   }
   const config = toolConfig[toolName];
-  if (!config) throw new Error("用法：run-python-tool.mjs <transcribe|board|check> [...args]");
+  if (!config) throw new Error("用法：run-python-tool.mjs <transcribe|board|board-test|check> [...args]");
   const python = resolvePython(config.imports);
   const result = runPython(python, [config.script, ...forwardedArgs]);
   if (result.error) throw result.error;

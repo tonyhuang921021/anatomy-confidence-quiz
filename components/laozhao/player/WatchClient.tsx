@@ -1,20 +1,24 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import {
   ArrowLeft,
   BookmarkPlus,
+  Captions,
   ChevronLeft,
   ChevronRight,
   Clock3,
+  ListVideo,
   Save,
   Trash2
 } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { ChapterList, formatTime } from "./ChapterList";
 import { useLaozhaoLearning } from "./learning";
-import type { LaoZhaoChapter, LaoZhaoVideo } from "./content-contract";
+import type { LaoZhaoCaption, LaoZhaoChapter, LaoZhaoVideo } from "./content-contract";
+import { TranscriptPanel } from "./TranscriptPanel";
 import { YouTubePlayer, type LaoZhaoPlayerHandle } from "./YouTubePlayer";
 import type { LaoZhaoWatchClientProps } from "./types";
 
@@ -37,6 +41,20 @@ function sortVideos(videos: readonly LaoZhaoVideo[]) {
   return [...videos].sort((a, b) => a.order - b.order || a.id.localeCompare(b.id));
 }
 
+function findCaptionAtTime(captions: readonly LaoZhaoCaption[], seconds: number) {
+  let low = 0;
+  let high = captions.length;
+  while (low < high) {
+    const middle = Math.floor((low + high) / 2);
+    if (captions[middle].startSec <= seconds) low = middle + 1;
+    else high = middle;
+  }
+  const candidate = captions[low - 1];
+  return candidate && seconds >= candidate.startSec && seconds < candidate.endSec
+    ? candidate
+    : null;
+}
+
 export function WatchClient({ video, playlist, learningAdapter }: LaoZhaoWatchClientProps) {
   const router = useRouter();
   const pathname = usePathname();
@@ -48,15 +66,20 @@ export function WatchClient({ video, playlist, learningAdapter }: LaoZhaoWatchCl
   const [draftNote, setDraftNote] = useState("");
   const [isSavingNote, setIsSavingNote] = useState(false);
   const [actionMessage, setActionMessage] = useState("");
+  const [sidePanel, setSidePanel] = useState<"chapters" | "captions">("chapters");
+  const [currentTimeSec, setCurrentTimeSec] = useState(0);
 
   const orderedPlaylist = useMemo(() => sortVideos(playlist), [playlist]);
   const currentIndex = orderedPlaylist.findIndex((item) => item.id === video.id);
   const previousVideo = currentIndex > 0 ? orderedPlaylist[currentIndex - 1] : null;
   const nextVideo = currentIndex >= 0 ? orderedPlaylist[currentIndex + 1] ?? null : null;
   const chapters = useMemo(
-    () => (video.chapters ?? []).filter((chapter) => chapter.reviewStatus === "reviewed"),
-    [video.chapters]
+    () => (video.chapters ?? []).filter(
+      (chapter) => chapter.reviewStatus === "reviewed" || video.previewMode === true
+    ),
+    [video.chapters, video.previewMode]
   );
+  const captions = video.captions ?? [];
   const selectedChapter = useMemo(
     () => chapters.find((chapter) => chapter.stableId === searchParams.get("chapter")) ?? null,
     [chapters, searchParams]
@@ -74,6 +97,18 @@ export function WatchClient({ video, playlist, learningAdapter }: LaoZhaoWatchCl
   const initialSeekSeconds = initialSeekRef.current?.videoId === video.id
     ? initialSeekRef.current.seconds
     : requestedSeekSeconds;
+  const currentCaption = useMemo(
+    () => findCaptionAtTime(captions, currentTimeSec),
+    [captions, currentTimeSec]
+  );
+  const currentChapter = useMemo(
+    () => chapters.find((chapter) => chapter.stableId === currentChapterId) ?? null,
+    [chapters, currentChapterId]
+  );
+
+  useEffect(() => {
+    setCurrentTimeSec(initialSeekSeconds);
+  }, [initialSeekSeconds, video.id]);
 
   useEffect(() => {
     setCurrentChapterId(selectedChapter?.stableId ?? null);
@@ -93,11 +128,17 @@ export function WatchClient({ video, playlist, learningAdapter }: LaoZhaoWatchCl
 
   function handleChapterSelect(chapter: LaoZhaoChapter) {
     playerRef.current?.seekTo(chapter.startSec);
+    setCurrentTimeSec(chapter.startSec);
     setCurrentChapterId(chapter.stableId);
     const nextParams = new URLSearchParams(searchParams.toString());
     nextParams.set("t", String(Math.floor(chapter.startSec)));
     nextParams.set("chapter", chapter.stableId);
     router.replace(`${pathname}?${nextParams.toString()}`, { scroll: false });
+  }
+
+  function handleSeek(seconds: number) {
+    playerRef.current?.seekTo(seconds);
+    setCurrentTimeSec(seconds);
   }
 
   async function handleAddBookmark() {
@@ -150,6 +191,11 @@ export function WatchClient({ video, playlist, learningAdapter }: LaoZhaoWatchCl
             <p className="text-xs font-bold text-[var(--brand-main)]">老趙解剖學</p>
             <h1 className="mt-2 text-3xl font-black leading-tight sm:text-4xl">{video.title}</h1>
             <p className="mt-3 text-sm font-semibold text-[var(--ink-soft)]">{formatDuration(video.durationSec)}</p>
+            {video.previewMode ? (
+              <p className="mt-4 border-l-2 border-[var(--brand-main)] pl-3 text-sm font-semibold leading-6 text-[var(--ink-soft)]" role="status">
+                測試內容：章節與字幕仍在人工校訂，不會出現在正式站。
+              </p>
+            ) : null}
           </div>
         </div>
       </header>
@@ -167,7 +213,10 @@ export function WatchClient({ video, playlist, learningAdapter }: LaoZhaoWatchCl
                 chapters={chapters}
                 initialSeekSeconds={initialSeekSeconds}
                 playable={video.status === "available"}
+                allowDrafts={video.previewMode === true}
+                captionText={currentCaption?.text ?? ""}
                 onChapterChange={(chapter) => setCurrentChapterId(chapter?.stableId ?? null)}
+                onTimeUpdate={setCurrentTimeSec}
                 onProgressCheckpoint={(seconds, duration, completed, watchedRanges) => {
                   void learning.saveProgress(seconds, duration, completed, watchedRanges);
                 }}
@@ -176,15 +225,119 @@ export function WatchClient({ video, playlist, learningAdapter }: LaoZhaoWatchCl
           </section>
 
           <aside className="min-w-0 border-t border-[var(--line-soft)] pt-5 lg:sticky lg:top-6 lg:border-t-0 lg:border-l lg:pl-6 lg:pt-0">
-            <div className="flex items-baseline justify-between gap-3">
-              <h2 className="text-xl font-black">影片章節</h2>
-              <span className="text-xs font-semibold text-[var(--ink-soft)]">{chapters.length} 個</span>
+            <div className="flex items-center justify-between gap-3">
+              <h2 className="text-xl font-black">章節與字幕</h2>
+              <span className="text-xs font-semibold tabular-nums text-[var(--ink-soft)]">
+                {sidePanel === "chapters" ? `${chapters.length} 章` : `${captions.length} 段`}
+              </span>
             </div>
-            <div className="mt-4 lg:max-h-[calc(100vh-8rem)] lg:overflow-y-auto lg:pr-1">
-              <ChapterList chapters={chapters} currentChapterId={currentChapterId} onSelect={handleChapterSelect} />
+            <div className="mt-4 grid grid-cols-2 border-b border-[var(--line-soft)]" role="tablist" aria-label="影片導覽">
+              <button
+                type="button"
+                role="tab"
+                aria-selected={sidePanel === "chapters"}
+                onClick={() => setSidePanel("chapters")}
+                className={`inline-flex min-h-11 items-center justify-center gap-2 border-b-2 px-2 text-sm font-bold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-main)] focus-visible:ring-inset ${
+                  sidePanel === "chapters"
+                    ? "border-[var(--brand-main)] text-[var(--brand-deep)]"
+                    : "border-transparent text-[var(--ink-soft)] hover:text-[var(--ink-main)]"
+                }`}
+              >
+                <ListVideo aria-hidden="true" size={17} strokeWidth={2} />
+                章節
+              </button>
+              <button
+                type="button"
+                role="tab"
+                aria-selected={sidePanel === "captions"}
+                onClick={() => setSidePanel("captions")}
+                disabled={captions.length === 0}
+                className={`inline-flex min-h-11 items-center justify-center gap-2 border-b-2 px-2 text-sm font-bold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-main)] focus-visible:ring-inset disabled:cursor-not-allowed disabled:opacity-45 ${
+                  sidePanel === "captions"
+                    ? "border-[var(--brand-main)] text-[var(--brand-deep)]"
+                    : "border-transparent text-[var(--ink-soft)] hover:text-[var(--ink-main)]"
+                }`}
+              >
+                <Captions aria-hidden="true" size={17} strokeWidth={2} />
+                字幕
+              </button>
+            </div>
+            <div
+              className="mt-4 max-h-[30rem] overflow-y-auto overscroll-contain pr-1 lg:max-h-[calc(100vh-11rem)]"
+              role="tabpanel"
+            >
+              {sidePanel === "chapters" ? (
+                <ChapterList
+                  chapters={chapters}
+                  currentChapterId={currentChapterId}
+                  onSelect={handleChapterSelect}
+                  allowDrafts={video.previewMode === true}
+                />
+              ) : (
+                <TranscriptPanel
+                  cues={captions}
+                  currentTimeSec={currentTimeSec}
+                  activeCueId={currentCaption?.id ?? null}
+                  chapterTitle={currentChapter?.title}
+                  onSeek={handleSeek}
+                />
+              )}
             </div>
           </aside>
         </div>
+
+        {video.previewMode && currentChapter ? (
+          <section className="mt-8 border-y border-[var(--line-soft)] py-6" aria-labelledby="current-chapter-heading">
+            <div className="flex flex-col gap-2 sm:flex-row sm:items-baseline sm:justify-between">
+              <div className="min-w-0">
+                <p className="font-mono text-xs font-bold tabular-nums text-[var(--brand-main)]">
+                  {formatTime(currentChapter.startSec)}–{formatTime(currentChapter.endSec ?? video.durationSec)}
+                </p>
+                <h2 id="current-chapter-heading" className="mt-1 text-xl font-black leading-8">
+                  {currentChapter.title}
+                </h2>
+              </div>
+              {currentChapter.tags && currentChapter.tags.length > 0 ? (
+                <p className="text-sm font-semibold leading-6 text-[var(--ink-soft)] sm:max-w-md sm:text-right">
+                  {currentChapter.tags.join("・")}
+                </p>
+              ) : null}
+            </div>
+            {currentChapter.summary ? (
+              <p className="mt-4 max-w-4xl text-sm leading-7 text-[var(--ink-soft)]">
+                {currentChapter.summary}
+              </p>
+            ) : null}
+            {currentChapter.boardFrames && currentChapter.boardFrames.length > 0 ? (
+              <div className="mt-6">
+                <h3 className="text-sm font-black">章節板書</h3>
+                <div className="mt-3 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                  {currentChapter.boardFrames.map((frame, frameIndex) => (
+                    <button
+                      key={frame.id}
+                      type="button"
+                      onClick={() => handleSeek(frame.timeSec)}
+                      className="min-w-0 overflow-hidden rounded-md border border-[var(--line-soft)] bg-white text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-main)]"
+                    >
+                      <Image
+                        src={frame.src}
+                        alt={frame.alt}
+                        width={1600}
+                        height={900}
+                        priority={frameIndex === 0}
+                        sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                        className="aspect-video h-auto w-full object-contain"
+                      />
+                      <span className="block px-3 py-2 font-mono text-xs font-bold tabular-nums text-[var(--brand-main)]">
+                        {formatTime(frame.timeSec)}
+                      </span>
+                    </button>
+                  ))}
+                </div>
+              </div>
+            ) : null}
+          </section>
+        ) : null}
 
         <section className="mt-10 border-t border-[var(--line-soft)] pt-7" aria-labelledby="learning-marks-heading">
           <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">

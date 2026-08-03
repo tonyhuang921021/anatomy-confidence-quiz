@@ -1,7 +1,11 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { WatchClient } from "@/components/laozhao/player/WatchClient";
-import { getLaozhaoContentRepository } from "@/components/laozhao/player/content-contract";
+import {
+  getLaozhaoContentRepository,
+  withLaozhaoPreviewContent
+} from "@/components/laozhao/player/content-contract";
+import { getLaoZhaoPreviewVideo } from "@/lib/laozhao/preview/repository";
 
 type WatchPageProps = {
   params: {
@@ -34,7 +38,12 @@ export default function LaoZhaoWatchPage({ params }: WatchPageProps) {
   const repository = getLaozhaoContentRepository();
   const video = repository.getVideo(params.videoId);
   if (!video) notFound();
+  const preview = getLaoZhaoPreviewVideo(video.id);
 
-  return <WatchClient video={video} playlist={repository.listVideos()} />;
+  return (
+    <WatchClient
+      video={withLaozhaoPreviewContent(video, preview)}
+      playlist={repository.listVideos()}
+    />
+  );
 }
-

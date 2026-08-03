@@ -26,7 +26,7 @@ export default function LaoZhaoPrivacyPage() {
             <section>
               <h2 className="text-lg font-black text-[var(--ink-main)]">影片來源</h2>
               <p className="mt-2">
-                影片由 YouTube 提供，本站只嵌入官方播放器，不下載、代理、重製或提供離線播放。瀏覽影片目錄時，縮圖會從 YouTube 圖片網域載入；點開影片後，瀏覽器會依 YouTube 的服務規則連線到 YouTube 播放器。
+                影片由 YouTube 官方播放器串流，本站不保存或重新散布影片檔，也不提供離線播放。受保護測試頁會顯示經授權、人工挑選的章節板書截圖；未公開逐字稿、OCR、投影片與參考筆記不會送到瀏覽器。瀏覽影片目錄時，縮圖會從 YouTube 圖片網域載入；點開影片後，瀏覽器會依 YouTube 的服務規則連線到 YouTube 播放器。
               </p>
               <div className="mt-3 flex flex-wrap gap-x-5 gap-y-2 text-sm font-bold text-[var(--brand-deep)]">
                 <a href="https://www.youtube.com/t/terms" target="_blank" rel="noopener" className="inline-flex items-center gap-1 hover:underline">

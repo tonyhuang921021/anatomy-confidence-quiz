@@ -118,10 +118,14 @@ function getStateLabel(state: LaoZhaoPlayerState) {
   return "播放器尚未載入";
 }
 
-function getChapterAtTime(chapters: readonly LaoZhaoChapter[], seconds: number) {
+function getChapterAtTime(
+  chapters: readonly LaoZhaoChapter[],
+  seconds: number,
+  allowDrafts: boolean
+) {
   let current: LaoZhaoChapter | null = null;
   for (const chapter of chapters) {
-    if (chapter.reviewStatus !== "reviewed") continue;
+    if (chapter.reviewStatus !== "reviewed" && !allowDrafts) continue;
     if (seconds >= chapter.startSec && (chapter.endSec === undefined || seconds < chapter.endSec)) {
       current = chapter;
     }
@@ -176,7 +180,10 @@ type YouTubePlayerProps = {
   initialSeekSeconds?: number;
   chapters?: readonly LaoZhaoChapter[];
   playable?: boolean;
+  allowDrafts?: boolean;
+  captionText?: string;
   onChapterChange?: (chapter: LaoZhaoChapter | null) => void;
+  onTimeUpdate?: (seconds: number) => void;
   onProgressCheckpoint?: (
     seconds: number,
     duration: number,
@@ -206,7 +213,10 @@ export const YouTubePlayer = forwardRef<LaoZhaoPlayerHandle, YouTubePlayerProps>
     initialSeekSeconds = 0,
     chapters = [],
     playable = true,
+    allowDrafts = false,
+    captionText = "",
     onChapterChange,
+    onTimeUpdate,
     onProgressCheckpoint
   },
   ref
@@ -222,6 +232,7 @@ export const YouTubePlayer = forwardRef<LaoZhaoPlayerHandle, YouTubePlayerProps>
   const pendingSeekRef = useRef<number | null>(null);
   const requestedSeekRef = useRef<number | null>(null);
   const onChapterChangeRef = useRef(onChapterChange);
+  const onTimeUpdateRef = useRef(onTimeUpdate);
   const onProgressCheckpointRef = useRef(onProgressCheckpoint);
   const [state, setState] = useState<LaoZhaoPlayerState>(playable ? "loading" : "error");
   const [error, setError] = useState<LaoZhaoPlayerError | null>(
@@ -233,6 +244,10 @@ export const YouTubePlayer = forwardRef<LaoZhaoPlayerHandle, YouTubePlayerProps>
   useEffect(() => {
     onChapterChangeRef.current = onChapterChange;
   }, [onChapterChange]);
+
+  useEffect(() => {
+    onTimeUpdateRef.current = onTimeUpdate;
+  }, [onTimeUpdate]);
 
   useEffect(() => {
     onProgressCheckpointRef.current = onProgressCheckpoint;
@@ -287,8 +302,9 @@ export const YouTubePlayer = forwardRef<LaoZhaoPlayerHandle, YouTubePlayerProps>
       }
       lastTimeRef.current = seconds;
       setTimeLabel(formatPlayerTime(seconds));
+      onTimeUpdateRef.current?.(seconds);
 
-      const chapter = getChapterAtTime(chapters, seconds);
+      const chapter = getChapterAtTime(chapters, seconds, allowDrafts);
       const chapterId = chapter?.stableId ?? null;
       if (chapterId !== lastChapterIdRef.current) {
         lastChapterIdRef.current = chapterId;
@@ -306,7 +322,7 @@ export const YouTubePlayer = forwardRef<LaoZhaoPlayerHandle, YouTubePlayerProps>
         lastCheckpointRef.current = seconds;
       }
     },
-    [chapters, readResolvedTime]
+    [allowDrafts, chapters, readResolvedTime]
   );
 
   const startPolling = useCallback(() => {
@@ -329,6 +345,7 @@ export const YouTubePlayer = forwardRef<LaoZhaoPlayerHandle, YouTubePlayerProps>
           lastTimeRef.current = safeSeconds;
           lastCheckpointRef.current = safeSeconds;
           setTimeLabel(formatPlayerTime(safeSeconds));
+          onTimeUpdateRef.current?.(safeSeconds);
           return;
         }
         pendingSeekRef.current = null;
@@ -337,13 +354,14 @@ export const YouTubePlayer = forwardRef<LaoZhaoPlayerHandle, YouTubePlayerProps>
         lastTimeRef.current = safeSeconds;
         lastCheckpointRef.current = safeSeconds;
         setTimeLabel(formatPlayerTime(safeSeconds));
-        const chapter = getChapterAtTime(chapters, safeSeconds);
+        onTimeUpdateRef.current?.(safeSeconds);
+        const chapter = getChapterAtTime(chapters, safeSeconds, allowDrafts);
         lastChapterIdRef.current = chapter?.stableId ?? null;
         onChapterChangeRef.current?.(chapter);
       },
       getCurrentTime: () => lastTimeRef.current || readPlayerTime(playerRef.current)
     }),
-    [chapters]
+    [allowDrafts, chapters]
   );
 
   useEffect(() => {
@@ -373,6 +391,7 @@ export const YouTubePlayer = forwardRef<LaoZhaoPlayerHandle, YouTubePlayerProps>
         if (cancelled || !containerRef.current) return;
         const playerVars: Record<string, string | number> = {
           autoplay: 0,
+          cc_load_policy: 0,
           controls: 1,
           enablejsapi: 1,
           modestbranding: 1,
@@ -494,8 +513,18 @@ export const YouTubePlayer = forwardRef<LaoZhaoPlayerHandle, YouTubePlayerProps>
 
   return (
     <div className="min-w-0">
-      <div className="aspect-video min-h-[200px] w-full overflow-hidden rounded-md bg-[#0c1713] ring-1 ring-black/10">
+      <div className="relative aspect-video min-h-[200px] w-full overflow-hidden rounded-md bg-[#0c1713] ring-1 ring-black/10">
         <div ref={containerRef} className="h-full w-full" aria-label={`YouTube 影片：${title}`} />
+        {captionText ? (
+          <div
+            aria-hidden="true"
+            className="pointer-events-none absolute inset-x-3 bottom-14 z-10 flex justify-center sm:inset-x-8"
+          >
+            <p className="max-w-3xl rounded bg-black/85 px-3 py-1.5 text-center text-sm font-semibold leading-6 text-white shadow-sm sm:text-base">
+              {captionText}
+            </p>
+          </div>
+        ) : null}
       </div>
       <div className="mt-3 flex min-h-6 flex-wrap items-center justify-between gap-x-3 gap-y-1 px-1 text-xs font-semibold text-[var(--ink-soft)]">
         <span aria-live="polite">{getStateLabel(state)}</span>

@@ -1,7 +1,9 @@
 import { expect, test, type Page } from "@playwright/test";
 import manifest from "../../data/laozhao/courseManifest.generated.json";
+import previewManifest from "../../data/laozhao/previewContent.generated.json";
 
 const [firstVideo, secondVideo] = manifest.videos;
+const firstVideoPreview = previewManifest.videos.find((video) => video.videoId === firstVideo.id);
 
 const fakeYouTubeApi = `
 (() => {
@@ -59,7 +61,55 @@ async function expectNoHorizontalOverflow(page: Page) {
 test.beforeEach(async ({ page }) => {
   expect(firstVideo).toBeTruthy();
   expect(secondVideo).toBeTruthy();
+  expect(firstVideoPreview).toBeTruthy();
   await mockYouTube(page);
+});
+
+test("第一支 Preview 有 24 章、同步字幕與人工選定板書", async ({ page }) => {
+  const targetChapter = firstVideoPreview?.chapters[13];
+  expect(targetChapter).toBeTruthy();
+  await page.goto(
+    `/courses/laozhao-anatomy/watch/${firstVideo.id}?t=${targetChapter?.startSec}&chapter=${targetChapter?.id}`
+  );
+
+  await expect(page.getByText("24 章", { exact: true })).toBeVisible();
+  await expect(page.getByRole("heading", { name: targetChapter?.title ?? "" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "章節板書" })).toBeVisible();
+  const boardButton = page.getByRole("button", { name: new RegExp(`${targetChapter?.title}板書`) }).first();
+  await expect(boardButton).toBeVisible();
+  await expect(boardButton.locator("img")).toHaveJSProperty("complete", true);
+  const iframe = page.locator('iframe[src*="youtube.com/embed/"]');
+  await expect(iframe).toHaveAttribute("src", /cc_load_policy=0/);
+  if ((page.viewportSize()?.width ?? 0) <= 400) {
+    const panelBox = await page.getByRole("tabpanel").boundingBox();
+    expect(panelBox?.height ?? Number.POSITIVE_INFINITY).toBeLessThanOrEqual(480);
+  }
+  await boardButton.click();
+  const selectedTime = await page.evaluate(() => (
+    window as typeof window & { __laozhaoFakePlayer?: { currentTime: number } }
+  ).__laozhaoFakePlayer?.currentTime);
+  expect(selectedTime).toBe(targetChapter?.boardFrames[0].timeSec);
+
+  await page.getByRole("tab", { name: "字幕" }).click();
+  await expect(page.getByText(`${firstVideoPreview?.captions.length} 段`, { exact: true }).first()).toBeVisible();
+  const renderedCues = page.locator('ol[aria-label$="字幕列表"] > li');
+  expect(await renderedCues.count()).toBeLessThanOrEqual(50);
+  await expectNoHorizontalOverflow(page);
+});
+
+test("章節點選會更新 deep link，重新整理後仍停在同章", async ({ page }) => {
+  const targetChapter = firstVideoPreview?.chapters[19];
+  expect(targetChapter).toBeTruthy();
+  await page.goto(`/courses/laozhao-anatomy/watch/${firstVideo.id}`);
+  await page.getByRole("button", { name: new RegExp(targetChapter?.title ?? "") }).click();
+  await expect(page).toHaveURL(new RegExp(`chapter=${encodeURIComponent(targetChapter?.id ?? "")}`));
+  await page.reload();
+  await expect(page.getByRole("heading", { name: targetChapter?.title ?? "" })).toBeVisible();
+  await expect(page.locator('iframe[src*="youtube.com/embed/"]')).toHaveAttribute(
+    "src",
+    new RegExp(`start=${Math.floor(targetChapter?.startSec ?? 0)}`)
+  );
+  await expectNoHorizontalOverflow(page);
 });
 
 test("完整清單可搜尋，課程頁不會呼叫網站 API", async ({ page }) => {

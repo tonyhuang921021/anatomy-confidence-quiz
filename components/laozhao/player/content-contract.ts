@@ -4,6 +4,7 @@ import {
   getReviewedChapters
 } from "@/lib/laozhao/content/repository";
 import type { Video } from "@/lib/laozhao/types";
+import type { LaoZhaoPreviewVideoContent } from "@/lib/laozhao/preview/types";
 
 export type LaoZhaoChapterReviewStatus = "reviewed" | "draft";
 
@@ -13,6 +14,23 @@ export type LaoZhaoChapter = {
   startSec: number;
   endSec?: number;
   reviewStatus: LaoZhaoChapterReviewStatus;
+  summary?: string;
+  tags?: readonly string[];
+  boardFrames?: readonly LaoZhaoBoardFrame[];
+};
+
+export type LaoZhaoBoardFrame = {
+  id: string;
+  src: string;
+  timeSec: number;
+  alt: string;
+};
+
+export type LaoZhaoCaption = {
+  id: string;
+  startSec: number;
+  endSec: number;
+  text: string;
 };
 
 export type LaoZhaoVideoStatus = "available" | "unavailable";
@@ -26,6 +44,8 @@ export type LaoZhaoVideo = {
   status: LaoZhaoVideoStatus;
   thumbnailUrl?: string;
   chapters?: readonly LaoZhaoChapter[];
+  captions?: readonly LaoZhaoCaption[];
+  previewMode?: boolean;
 };
 
 export type LaoZhaoContentRepository = {
@@ -48,6 +68,33 @@ function toPlayerVideo(video: Video, manifest: ReturnType<typeof getCourseManife
       endSec: chapter.endSec ?? undefined,
       reviewStatus: "reviewed"
     }))
+  };
+}
+
+export function withLaozhaoPreviewContent(
+  video: LaoZhaoVideo,
+  preview: LaoZhaoPreviewVideoContent | null
+): LaoZhaoVideo {
+  if (!preview || preview.videoId !== video.id) return video;
+  return {
+    ...video,
+    chapters: preview.chapters.map((chapter) => ({
+      stableId: chapter.id,
+      title: chapter.title,
+      startSec: chapter.startSec,
+      endSec: chapter.endSec,
+      reviewStatus: "draft",
+      summary: chapter.summary,
+      tags: chapter.tags,
+      boardFrames: chapter.boardFrames
+    })),
+    captions: preview.captions.map((caption) => ({
+      id: caption.id,
+      startSec: caption.startSec,
+      endSec: caption.endSec,
+      text: caption.text
+    })),
+    previewMode: true
   };
 }
 

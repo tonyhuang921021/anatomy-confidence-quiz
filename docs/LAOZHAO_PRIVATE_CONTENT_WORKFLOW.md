@@ -139,12 +139,78 @@ data/laozhao/staging/ATFBb25QRNw/review-package/board-candidates/
 
 `sceneResidualEstimate` 是畫面變動與局部殘差的估計，不是人體辨識結果，因此每張圖都必須人工確認。
 
-## 6. 交回 Codex
+## 6. 人工選定完整板書
+
+每章從 `contact-sheet.jpg` 與原始候選中挑出最完整的真實板書狀態，寫入：
+
+```text
+data/laozhao/staging/<videoId>/review-package/board-selection.preview.private.json
+```
+
+選圖原則：
+
+- 以老師擦除或改圖前的完整狀態為優先，不以單純「人影最少」取代完整性判斷。
+- 同一章若先後完成兩張不同圖，可保留多張；每章最多三張。
+- 沒有具辨識價值的板書時明確留空，不勉強發布老師遮住或未完成的圖。
+- candidate ID、來源相對路徑、時間碼與章節 ID 都要保留，之後才能回到原影片核對。
+
+## 7. 私人參考筆記對照
+
+若有其他筆記可協助確認板書完整性，另建私人對照檔：
+
+```text
+data/laozhao/staging/<videoId>/review-package/reference-notes.private.json
+```
+
+逐張記錄板書 ID、章節 ID、影片時間碼、來源 PDF 指紋、PDF 實際頁碼、頁內圖示位置與吻合構造。這份資料不只靠檔名，因此 PDF 或截圖重新命名後仍可核對。
+
+```bash
+npm run validate:laozhao-reference -- \
+  --reference data/laozhao/staging/<videoId>/review-package/reference-notes.private.json \
+  --board-selection data/laozhao/staging/<videoId>/review-package/board-selection.preview.private.json
+```
+
+若筆記公開授權尚未確認，只能拿來做私人完整性比對；不可把 PDF 頁面、裁圖或可還原原文的資料放進 Git、Vercel 或網站。
+
+未來若取得公開授權，網站必須以 `boardFrameId` 對應 `referenceImageId`，再讀取 PDF 頁碼與 `pageRegion`；不可依檔名、陣列順序或相近時間自行猜測。只有 `publicationPermission: confirmed` 且對照驗證完整時，才可建立並排或切換顯示所需的公開圖片資料。
+
+目前 Preview 不得直接 promote 到正式站。只要 `data/laozhao/previewContent.generated.json` 或 `public/laozhao-preview/` 仍含測試教材，production build 必須失敗；即使 Preview deployment 被誤 promote，middleware 也會依正式網域封鎖課程頁與板書靜態資產。正式公開前應另建經審核的 production 內容契約並重新建置。
+
+## 8. 單片可重跑流程
+
+每支影片都使用相同目錄與檔名。先執行不發布版本：
+
+```bash
+npm run process:laozhao-video -- --video-id ATFBb25QRNw
+```
+
+它會重新驗證章節、板書選擇與可選的私人筆記對照，並把目前閘門狀態寫到忽略的 `pipeline-status.private.json`。沒有明確確認時，不會產生網站素材。
+
+需要重新抽板書候選時才加：
+
+```bash
+npm run process:laozhao-video -- \
+  --video-id ATFBb25QRNw \
+  --extract-board
+```
+
+人工選圖完成、內容權利也再次確認後，才能建立受保護 Preview：
+
+```bash
+npm run process:laozhao-video -- \
+  --video-id ATFBb25QRNw \
+  --confirm-authorized-preview
+```
+
+流程只更新該 video ID 的 Preview 內容與專用圖片目錄，不會公開原始影片、逐字稿、未選候選圖或私人參考筆記。Production 另有環境閘門，不能靠這個指令開啟。
+
+## 9. 交回內容
 
 交回以下內容即可：
 
 1. Chat 原始回傳 JSON，或已驗證的 `chapters.validated.private.json`。
 2. `board-candidates/index.private.json`。
 3. 每章最後選定的 candidate ID；若某章都不理想，註明要重新擷取的時間範圍。
+4. 若有私人參考筆記，只交對照 JSON 與授權狀態，不交原始 PDF 給網站建置流程。
 
-Codex 會再次核對章節、時間、圖片與權利狀態。只有你明確確認、且改成 `reviewed` 的章節才會進公開 manifest；逐字稿、OCR、原始影片與未選板書不會公開。
+Codex 會再次核對章節、時間、圖片與權利狀態。受保護 Preview 可顯示仍標為 `draft` 的人工校訂內容；正式站只接受 `reviewed`。逐字稿來源資料、OCR、原始影片、未選板書與未獲公開授權的參考筆記都不會公開。

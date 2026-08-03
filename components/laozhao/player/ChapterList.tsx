@@ -4,6 +4,7 @@ type ChapterListProps = {
   chapters: readonly LaoZhaoChapter[];
   currentChapterId: string | null;
   onSelect: (chapter: LaoZhaoChapter) => void;
+  allowDrafts?: boolean;
 };
 
 function formatTime(seconds: number) {
@@ -13,10 +14,12 @@ function formatTime(seconds: number) {
   return `${minutes}:${String(remainder).padStart(2, "0")}`;
 }
 
-export function ChapterList({ chapters, currentChapterId, onSelect }: ChapterListProps) {
-  const reviewedChapters = chapters.filter((chapter) => chapter.reviewStatus === "reviewed");
+export function ChapterList({ chapters, currentChapterId, onSelect, allowDrafts = false }: ChapterListProps) {
+  const visibleChapters = chapters.filter(
+    (chapter) => chapter.reviewStatus === "reviewed" || allowDrafts
+  );
 
-  if (reviewedChapters.length === 0) {
+  if (visibleChapters.length === 0) {
     return (
       <p className="rounded-md bg-[var(--brand-tint)] px-4 py-3 text-sm leading-6 text-[var(--ink-soft)]">
         這支影片的章節整理完成後會顯示在這裡。
@@ -26,7 +29,7 @@ export function ChapterList({ chapters, currentChapterId, onSelect }: ChapterLis
 
   return (
     <ol className="divide-y divide-[var(--line-soft)] overflow-hidden rounded-md border border-[var(--line-soft)] bg-white/55">
-      {reviewedChapters.map((chapter) => {
+      {visibleChapters.map((chapter) => {
         const isCurrent = chapter.stableId === currentChapterId;
         return (
           <li key={chapter.stableId}>
