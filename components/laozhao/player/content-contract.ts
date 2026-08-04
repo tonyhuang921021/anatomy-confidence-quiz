@@ -4,7 +4,10 @@ import {
   getReviewedChapters
 } from "@/lib/laozhao/content/repository";
 import type { Video } from "@/lib/laozhao/types";
-import type { LaoZhaoPreviewVideoContent } from "@/lib/laozhao/preview/types";
+import type {
+  LaoZhaoPreviewLectureNotes,
+  LaoZhaoPreviewVideoContent
+} from "@/lib/laozhao/preview/types";
 
 export type LaoZhaoChapterReviewStatus = "reviewed" | "draft";
 
@@ -17,12 +20,24 @@ export type LaoZhaoChapter = {
   summary?: string;
   tags?: readonly string[];
   boardFrames?: readonly LaoZhaoBoardFrame[];
+  referenceNotes?: readonly LaoZhaoReferenceNote[];
 };
 
 export type LaoZhaoBoardFrame = {
   id: string;
   src: string;
   timeSec: number;
+  alt: string;
+  referenceNoteIds: readonly string[];
+};
+
+export type LaoZhaoReferenceNote = {
+  id: string;
+  src: string;
+  pdfPage: number;
+  sourceTitle: string;
+  pageRegions: readonly string[];
+  matchedStructures: readonly string[];
   alt: string;
 };
 
@@ -34,6 +49,7 @@ export type LaoZhaoCaption = {
 };
 
 export type LaoZhaoVideoStatus = "available" | "unavailable";
+export type LaoZhaoLectureNotes = LaoZhaoPreviewLectureNotes;
 
 export type LaoZhaoVideo = {
   id: string;
@@ -45,6 +61,7 @@ export type LaoZhaoVideo = {
   thumbnailUrl?: string;
   chapters?: readonly LaoZhaoChapter[];
   captions?: readonly LaoZhaoCaption[];
+  lectureNotes?: LaoZhaoLectureNotes;
   previewMode?: boolean;
 };
 
@@ -86,7 +103,8 @@ export function withLaozhaoPreviewContent(
       reviewStatus: "draft",
       summary: chapter.summary,
       tags: chapter.tags,
-      boardFrames: chapter.boardFrames
+      boardFrames: chapter.boardFrames,
+      referenceNotes: chapter.referenceNotes
     })),
     captions: preview.captions.map((caption) => ({
       id: caption.id,
@@ -94,6 +112,7 @@ export function withLaozhaoPreviewContent(
       endSec: caption.endSec,
       text: caption.text
     })),
+    lectureNotes: preview.lectureNotes,
     previewMode: true
   };
 }

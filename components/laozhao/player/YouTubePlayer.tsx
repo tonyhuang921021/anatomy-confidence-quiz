@@ -8,7 +8,7 @@ import {
   useRef,
   useState
 } from "react";
-import { ExternalLink, RotateCcw } from "lucide-react";
+import { ExternalLink, Maximize2, Minimize2, RotateCcw } from "lucide-react";
 import type { LaoZhaoChapter } from "./content-contract";
 import type { LaoZhaoPlayerError, LaoZhaoPlayerState } from "./types";
 
@@ -169,6 +169,42 @@ function destroyPlayer(player: YouTubePlayerInstance | null) {
   }
 }
 
+type WebkitFullscreenElement = HTMLElement & {
+  webkitRequestFullscreen?: () => Promise<void> | void;
+};
+
+type WebkitFullscreenDocument = Document & {
+  webkitExitFullscreen?: () => Promise<void> | void;
+  webkitFullscreenElement?: Element | null;
+};
+
+function readFullscreenElement() {
+  const fullscreenDocument = document as WebkitFullscreenDocument;
+  return document.fullscreenElement ?? fullscreenDocument.webkitFullscreenElement ?? null;
+}
+
+async function requestElementFullscreen(element: HTMLElement) {
+  if (typeof element.requestFullscreen === "function") {
+    await element.requestFullscreen();
+    return true;
+  }
+  const webkitElement = element as WebkitFullscreenElement;
+  if (typeof webkitElement.webkitRequestFullscreen === "function") {
+    await webkitElement.webkitRequestFullscreen();
+    return true;
+  }
+  return false;
+}
+
+async function exitElementFullscreen() {
+  if (typeof document.exitFullscreen === "function") {
+    await document.exitFullscreen();
+    return;
+  }
+  const fullscreenDocument = document as WebkitFullscreenDocument;
+  await fullscreenDocument.webkitExitFullscreen?.();
+}
+
 export type LaoZhaoPlayerHandle = {
   seekTo: (seconds: number) => void;
   getCurrentTime: () => number;
@@ -221,6 +257,7 @@ export const YouTubePlayer = forwardRef<LaoZhaoPlayerHandle, YouTubePlayerProps>
   },
   ref
 ) {
+  const frameRef = useRef<HTMLDivElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const playerRef = useRef<YouTubePlayerInstance | null>(null);
   const pollingRef = useRef<number | null>(null);
@@ -240,6 +277,9 @@ export const YouTubePlayer = forwardRef<LaoZhaoPlayerHandle, YouTubePlayerProps>
   );
   const [timeLabel, setTimeLabel] = useState("0:00");
   const [retryKey, setRetryKey] = useState(0);
+  const [nativeFullscreen, setNativeFullscreen] = useState(false);
+  const [fallbackFullscreen, setFallbackFullscreen] = useState(false);
+  const fullscreenActive = nativeFullscreen || fallbackFullscreen;
 
   useEffect(() => {
     onChapterChangeRef.current = onChapterChange;
@@ -252,6 +292,57 @@ export const YouTubePlayer = forwardRef<LaoZhaoPlayerHandle, YouTubePlayerProps>
   useEffect(() => {
     onProgressCheckpointRef.current = onProgressCheckpoint;
   }, [onProgressCheckpoint]);
+
+  useEffect(() => {
+    const syncFullscreenState = () => {
+      const active = readFullscreenElement() === frameRef.current;
+      setNativeFullscreen(active);
+      if (active) setFallbackFullscreen(false);
+    };
+    document.addEventListener("fullscreenchange", syncFullscreenState);
+    document.addEventListener("webkitfullscreenchange", syncFullscreenState);
+    return () => {
+      document.removeEventListener("fullscreenchange", syncFullscreenState);
+      document.removeEventListener("webkitfullscreenchange", syncFullscreenState);
+    };
+  }, []);
+
+  useEffect(() => {
+    if (!fallbackFullscreen) return;
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") setFallbackFullscreen(false);
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => {
+      window.removeEventListener("keydown", handleKeyDown);
+      document.body.style.overflow = previousOverflow;
+    };
+  }, [fallbackFullscreen]);
+
+  const handleFullscreenToggle = useCallback(async () => {
+    const frame = frameRef.current;
+    if (!frame) return;
+    if (readFullscreenElement() === frame) {
+      await exitElementFullscreen();
+      return;
+    }
+    if (fallbackFullscreen) {
+      setFallbackFullscreen(false);
+      return;
+    }
+    try {
+      const requested = await requestElementFullscreen(frame);
+      if (requested) {
+        setNativeFullscreen(true);
+        return;
+      }
+    } catch {
+      // iPhone Safari may expose the API but reject non-video elements.
+    }
+    setFallbackFullscreen(true);
+  }, [fallbackFullscreen]);
 
   const stopPolling = useCallback(() => {
     if (pollingRef.current !== null) {
@@ -394,6 +485,7 @@ export const YouTubePlayer = forwardRef<LaoZhaoPlayerHandle, YouTubePlayerProps>
           cc_load_policy: 0,
           controls: 1,
           enablejsapi: 1,
+          fs: 0,
           modestbranding: 1,
           origin: window.location.origin,
           playsinline: 1,
@@ -513,18 +605,46 @@ export const YouTubePlayer = forwardRef<LaoZhaoPlayerHandle, YouTubePlayerProps>
 
   return (
     <div className="min-w-0">
-      <div className="relative aspect-video min-h-[200px] w-full overflow-hidden rounded-md bg-[#0c1713] ring-1 ring-black/10">
+      <div
+        ref={frameRef}
+        data-fullscreen-active={fullscreenActive ? "true" : "false"}
+        className={`w-full overflow-hidden bg-[#0c1713] ring-1 ring-black/10 ${
+          fullscreenActive
+            ? "fixed inset-0 z-[100] h-[100dvh] min-h-0 rounded-none"
+            : "relative aspect-video min-h-[200px] rounded-md"
+        }`}
+      >
         <div ref={containerRef} className="h-full w-full" aria-label={`YouTube 影片：${title}`} />
         {captionText ? (
           <div
             aria-hidden="true"
-            className="pointer-events-none absolute inset-x-3 bottom-14 z-10 flex justify-center sm:inset-x-8"
+            data-caption-overlay="true"
+            className="pointer-events-none absolute inset-x-3 z-10 flex justify-center sm:inset-x-8"
+            style={{
+              bottom: fullscreenActive
+                ? "calc(env(safe-area-inset-bottom, 0px) + 6.5rem)"
+                : "4.25rem"
+            }}
           >
             <p className="max-w-3xl rounded bg-black/85 px-3 py-1.5 text-center text-sm font-semibold leading-6 text-white shadow-sm sm:text-base">
               {captionText}
             </p>
           </div>
         ) : null}
+        <button
+          type="button"
+          onClick={() => void handleFullscreenToggle()}
+          aria-label={fullscreenActive ? "離開影片與字幕全螢幕" : "影片與字幕全螢幕"}
+          aria-pressed={fullscreenActive}
+          title={fullscreenActive ? "離開全螢幕" : "影片與字幕全螢幕"}
+          className="absolute right-3 top-3 z-20 inline-flex h-10 w-10 items-center justify-center rounded-md bg-black/80 text-white shadow-sm transition hover:bg-black focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-black motion-reduce:transition-none"
+        >
+          {fullscreenActive ? (
+            <Minimize2 aria-hidden="true" size={19} strokeWidth={2} />
+          ) : (
+            <Maximize2 aria-hidden="true" size={19} strokeWidth={2} />
+          )}
+        </button>
       </div>
       <div className="mt-3 flex min-h-6 flex-wrap items-center justify-between gap-x-3 gap-y-1 px-1 text-xs font-semibold text-[var(--ink-soft)]">
         <span aria-live="polite">{getStateLabel(state)}</span>

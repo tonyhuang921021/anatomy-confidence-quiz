@@ -4,6 +4,9 @@ import previewManifest from "../../data/laozhao/previewContent.generated.json";
 
 const [firstVideo, secondVideo] = manifest.videos;
 const firstVideoPreview = previewManifest.videos.find((video) => video.videoId === firstVideo.id);
+const firstVideoLectureNotes = (firstVideoPreview as unknown as {
+  lectureNotes?: { blocks: readonly { provenance: "teacher" | "supplement" }[] };
+} | undefined)?.lectureNotes;
 
 const fakeYouTubeApi = `
 (() => {
@@ -65,7 +68,7 @@ test.beforeEach(async ({ page }) => {
   await mockYouTube(page);
 });
 
-test("第一支 Preview 有 24 章、同步字幕與人工選定板書", async ({ page }) => {
+test("第一支 Preview 有 24 章、同步字幕、板書與對照筆記", async ({ page }) => {
   const targetChapter = firstVideoPreview?.chapters[13];
   expect(targetChapter).toBeTruthy();
   await page.goto(
@@ -74,26 +77,138 @@ test("第一支 Preview 有 24 章、同步字幕與人工選定板書", async (
 
   await expect(page.getByText("24 章", { exact: true })).toBeVisible();
   await expect(page.getByRole("heading", { name: targetChapter?.title ?? "" })).toBeVisible();
-  await expect(page.getByRole("heading", { name: "章節板書" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "板書與對照筆記" })).toBeVisible();
   const boardButton = page.getByRole("button", { name: new RegExp(`${targetChapter?.title}板書`) }).first();
   await expect(boardButton).toBeVisible();
+  await boardButton.scrollIntoViewIfNeeded();
   await expect(boardButton.locator("img")).toHaveJSProperty("complete", true);
-  const iframe = page.locator('iframe[src*="youtube.com/embed/"]');
-  await expect(iframe).toHaveAttribute("src", /cc_load_policy=0/);
-  if ((page.viewportSize()?.width ?? 0) <= 400) {
-    const panelBox = await page.getByRole("tabpanel").boundingBox();
-    expect(panelBox?.height ?? Number.POSITIVE_INFINITY).toBeLessThanOrEqual(480);
-  }
   await boardButton.click();
   const selectedTime = await page.evaluate(() => (
     window as typeof window & { __laozhaoFakePlayer?: { currentTime: number } }
   ).__laozhaoFakePlayer?.currentTime);
   expect(selectedTime).toBe(targetChapter?.boardFrames[0].timeSec);
-
-  await page.getByRole("tab", { name: "字幕" }).click();
+  const referenceNote = targetChapter?.referenceNotes[0];
+  const materialPair = page.locator("[data-material-pair]").first();
+  await expect(materialPair.locator('[data-material-kind="board"]')).toBeVisible();
+  await expect(materialPair.getByRole("link", {
+    name: `放大查看${referenceNote?.sourceTitle}第 ${referenceNote?.pdfPage} 頁`
+  })).toBeVisible();
+  const iframe = page.locator('iframe[src*="youtube.com/embed/"]');
+  await expect(iframe).toHaveAttribute("src", /cc_load_policy=0/);
+  await expect(iframe).toHaveAttribute("src", /fs=0/);
+  if ((page.viewportSize()?.width ?? 0) <= 400) {
+    const panelBox = await page.locator('[data-side-panel-scroll="navigation"]').boundingBox();
+    expect(panelBox?.height ?? Number.POSITIVE_INFINITY).toBeLessThanOrEqual(480);
+  }
+  await page.getByRole("tab", { name: "字幕", exact: true }).click();
   await expect(page.getByText(`${firstVideoPreview?.captions.length} 段`, { exact: true }).first()).toBeVisible();
   const renderedCues = page.locator('ol[aria-label$="字幕列表"] > li');
   expect(await renderedCues.count()).toBeLessThanOrEqual(50);
+  await page.getByRole("tab", { name: "列點講義" }).click();
+  if (firstVideoLectureNotes) {
+    await expect(page.locator('[data-lecture-provenance="teacher"]').first()).toBeVisible();
+    const supplementCount = firstVideoLectureNotes.blocks.filter((block) => block.provenance === "supplement").length;
+    await expect(page.locator('[data-lecture-provenance="supplement"]')).toHaveCount(supplementCount);
+  } else {
+    await expect(
+      page.locator('[data-side-panel-scroll="lecture-notes"]').getByText("列點講義待校訂", { exact: true })
+    ).toBeVisible();
+  }
+  const lectureWorkspace = page.locator('[data-watch-layout="lectureNotes"]');
+  await lectureWorkspace.evaluate((element) => element.scrollIntoView({ block: "start" }));
+  const playerBox = await page.locator('section[aria-label="影片播放器"]').boundingBox();
+  const lectureBox = await page.locator('[data-side-panel-scroll="lecture-notes"]').boundingBox();
+  expect(playerBox).not.toBeNull();
+  expect(lectureBox).not.toBeNull();
+  if ((page.viewportSize()?.width ?? 0) >= 1024) {
+    expect(playerBox?.width ?? 0).toBeGreaterThan(700);
+    expect(lectureBox?.width ?? 0).toBeGreaterThan(400);
+    expect(lectureBox?.x ?? 0).toBeGreaterThan((playerBox?.x ?? 0) + (playerBox?.width ?? 0));
+    expect(lectureBox?.y ?? Number.POSITIVE_INFINITY).toBeLessThan((playerBox?.y ?? 0) + (playerBox?.height ?? 0));
+  } else {
+    expect(playerBox?.y ?? Number.POSITIVE_INFINITY).toBeLessThanOrEqual(8);
+    expect(lectureBox?.y ?? 0).toBeGreaterThan((playerBox?.y ?? 0) + (playerBox?.height ?? 0));
+    expect((lectureBox?.y ?? 0) + (lectureBox?.height ?? 0)).toBeLessThanOrEqual(page.viewportSize()?.height ?? 0);
+  }
+  await expectNoHorizontalOverflow(page);
+});
+
+test("影片與字幕會一起進入全螢幕，Safari 不支援時使用滿版模式", async ({ page }) => {
+  await page.addInitScript(() => {
+    Object.defineProperty(HTMLElement.prototype, "requestFullscreen", {
+      configurable: true,
+      value: undefined
+    });
+    Object.defineProperty(HTMLElement.prototype, "webkitRequestFullscreen", {
+      configurable: true,
+      value: undefined
+    });
+  });
+  const caption = firstVideoPreview?.captions[0];
+  expect(caption).toBeTruthy();
+  await page.goto(`/courses/laozhao-anatomy/watch/${firstVideo.id}?t=${caption?.startSec ?? 30}`);
+  const enterButton = page.getByRole("button", { name: "影片與字幕全螢幕" });
+  await expect(enterButton).toBeVisible();
+  await enterButton.click();
+
+  const fullscreenFrame = page.locator('[data-fullscreen-active="true"]');
+  await expect(fullscreenFrame).toBeVisible();
+  const captionOverlay = fullscreenFrame.locator('[data-caption-overlay="true"]');
+  await expect(captionOverlay).toBeVisible();
+  const frameBox = await fullscreenFrame.boundingBox();
+  const captionBox = await captionOverlay.boundingBox();
+  const viewport = page.viewportSize();
+  expect(frameBox?.width ?? 0).toBeGreaterThanOrEqual((viewport?.width ?? 0) - 1);
+  expect(frameBox?.height ?? 0).toBeGreaterThanOrEqual((viewport?.height ?? 0) - 1);
+  expect(
+    (frameBox?.y ?? 0) + (frameBox?.height ?? 0) - ((captionBox?.y ?? 0) + (captionBox?.height ?? 0))
+  ).toBeGreaterThanOrEqual(90);
+
+  await page.getByRole("button", { name: "離開影片與字幕全螢幕" }).click();
+  await expect(page.locator('[data-fullscreen-active="true"]')).toHaveCount(0);
+});
+
+test("桌機原生全螢幕仍保留網站字幕", async ({ page, browserName }) => {
+  test.skip(browserName !== "chromium", "原生 Fullscreen API 由桌機 Chromium 驗證");
+  const caption = firstVideoPreview?.captions[0];
+  expect(caption).toBeTruthy();
+  await page.goto(`/courses/laozhao-anatomy/watch/${firstVideo.id}?t=${caption?.startSec ?? 30}`);
+  await page.getByRole("button", { name: "影片與字幕全螢幕" }).click();
+
+  const fullscreenFrame = page.locator('[data-fullscreen-active="true"]');
+  await expect(fullscreenFrame).toBeVisible();
+  const captionOverlay = fullscreenFrame.locator('[data-caption-overlay="true"]');
+  await expect(captionOverlay).toBeVisible();
+  const frameBox = await fullscreenFrame.boundingBox();
+  const captionBox = await captionOverlay.boundingBox();
+  expect(
+    (frameBox?.y ?? 0) + (frameBox?.height ?? 0) - ((captionBox?.y ?? 0) + (captionBox?.height ?? 0))
+  ).toBeGreaterThanOrEqual(90);
+  await expect.poll(() => page.evaluate(() => (
+    document.fullscreenElement?.getAttribute("data-fullscreen-active") ?? null
+  ))).toBe("true");
+
+  await page.getByRole("button", { name: "離開影片與字幕全螢幕" }).click();
+  await expect.poll(() => page.evaluate(() => document.fullscreenElement)).toBeNull();
+});
+
+test("完整圖像總覽按章節一次列出全部板書與筆記", async ({ page }) => {
+  await page.goto(`/courses/laozhao-anatomy/watch/${firstVideo.id}/materials`);
+  await expect(page.getByRole("heading", { name: "板書與對照筆記", level: 1 })).toBeVisible();
+  await expect(page.getByText("19 個章節・22 組板書對照・7 頁筆記", { exact: true })).toBeVisible();
+  await expect(page.locator("[data-material-pair]")).toHaveCount(22);
+  const allPairsAreComplete = await page.locator("[data-material-pair]").evaluateAll((pairs) => pairs.every((pair) => (
+    Boolean(pair.querySelector('[data-material-kind="board"] img')) &&
+    Boolean(pair.querySelector('[data-material-kind="note"] img'))
+  )));
+  expect(allPairsAreComplete).toBe(true);
+  await expect(page.getByRole("heading", { name: firstVideoPreview?.chapters[2].title ?? "" })).toBeVisible();
+  await expect(page.getByRole("link", { name: /回到影片/ }).first()).toBeVisible();
+  const firstBoard = firstVideoPreview?.chapters.flatMap((chapter) => chapter.boardFrames)[0];
+  expect(firstBoard).toBeTruthy();
+  const firstBoardImage = page.getByRole("img", { name: firstBoard?.alt ?? "" }).first();
+  await firstBoardImage.scrollIntoViewIfNeeded();
+  await expect(firstBoardImage).toHaveJSProperty("complete", true);
   await expectNoHorizontalOverflow(page);
 });
 
@@ -155,6 +270,8 @@ test("本機書籤重新整理後仍保留，回首頁會恢復原網站外殼",
 
   await page.reload();
   await expect(page.getByRole("button", { name: /影片標記$/ }).first()).toBeVisible();
+  await page.request.get("/");
+  await page.waitForLoadState("networkidle");
   await page.goto("/");
   await expect(page.getByRole("link", { name: /老趙解剖學影片/ }).first()).toBeVisible();
   await expect(page.locator('iframe[src*="youtube.com/embed/"]')).toHaveCount(0);

@@ -1,9 +1,16 @@
-import { copyFile, mkdir, readFile, rename, rm, writeFile } from "node:fs/promises";
+import { createHash } from "node:crypto";
+import { execFile } from "node:child_process";
+import { createReadStream } from "node:fs";
+import { copyFile, mkdir, readFile, rename, rm, stat, writeFile } from "node:fs/promises";
 import { dirname, extname, relative, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
+import { promisify } from "node:util";
 import { compressCaptionSegments } from "./captions-core.mjs";
 import { parseCliArgs } from "./review-package-core.mjs";
 import { buildPreviewVideoContent, mergePreviewVideo } from "./preview-content-core.mjs";
+import { validateReferenceMap } from "./reference-map-core.mjs";
+
+const execFileAsync = promisify(execFile);
 
 const scriptDir = dirname(fileURLToPath(import.meta.url));
 const repoRoot = resolve(scriptDir, "../..");
@@ -26,9 +33,9 @@ async function readJson(pathname, label) {
   }
 }
 
-async function readOptionalJson(pathname, fallback) {
+async function readOptionalJson(pathname, fallback, label) {
   if (!pathname) return fallback;
-  return readJson(pathname, "板書選擇檔");
+  return readJson(pathname, label);
 }
 
 async function readExistingManifest(pathname) {
@@ -76,7 +83,49 @@ function destinationFor(root, chapterId, index) {
   return resolve(root, "boards", `${chapterId}-${String(index + 1).padStart(2, "0")}.png`);
 }
 
-async function copySelectedBoards(selection, video) {
+function referenceDestinationFor(root, pdfPage) {
+  return resolve(root, "notes", `page-${String(pdfPage).padStart(3, "0")}`);
+}
+
+async function sha256File(pathname) {
+  const hash = createHash("sha256");
+  await new Promise((accept, reject) => {
+    const stream = createReadStream(pathname);
+    stream.on("data", (chunk) => hash.update(chunk));
+    stream.on("error", reject);
+    stream.on("end", accept);
+  });
+  return hash.digest("hex");
+}
+
+async function renderReferenceNotes(referenceMap, referencePdfPath, video, temporaryRoot) {
+  if (!referenceMap) return;
+  const actualSha256 = await sha256File(referencePdfPath);
+  if (actualSha256 !== referenceMap.source?.sha256) {
+    throw new Error("參考筆記 PDF 與人工對照時使用的版本不同，停止建立 Preview。");
+  }
+  const pages = [...new Set(video.chapters.flatMap((chapter) => (
+    chapter.referenceNotes.map((note) => note.pdfPage)
+  )))].sort((left, right) => left - right);
+  await mkdir(resolve(temporaryRoot, "notes"), { recursive: true });
+  for (const pdfPage of pages) {
+    const destination = referenceDestinationFor(temporaryRoot, pdfPage);
+    assertInside(temporaryRoot, destination, "筆記 Preview 暫存輸出");
+    await execFileAsync("pdftoppm", [
+      "-f", String(pdfPage),
+      "-l", String(pdfPage),
+      "-singlefile",
+      "-jpeg",
+      "-jpegopt", "quality=88,optimize=y,progressive=y",
+      "-r", "144",
+      referencePdfPath,
+      destination
+    ]);
+    await stat(`${destination}.jpg`);
+  }
+}
+
+async function buildPublicMaterials(selection, video, referenceMap, referencePdfPath) {
   const candidateRoot = resolve(privateRoot, video.videoId, "review-package/board-candidates");
   const finalRoot = resolve(publicRoot, video.videoId);
   const temporaryRoot = resolve(publicRoot, `.tmp-${video.videoId}-${process.pid}-${Date.now()}`);
@@ -95,6 +144,7 @@ async function copySelectedBoards(selection, video) {
         await copyFile(source, destination);
       }
     }
+    await renderReferenceNotes(referenceMap, referencePdfPath, video, temporaryRoot);
     await rm(finalRoot, { recursive: true, force: true });
     await rename(temporaryRoot, finalRoot);
   } catch (error) {
@@ -109,8 +159,12 @@ function usage() {
     "  --transcript <transcript.private.json>",
     "  --chapters <chapters.candidate.private.json>",
     "  [--board-selection <board-selection.private.json>]",
+    "  [--reference-map <reference-notes.private.json>]",
+    "  [--reference-pdf <reference-notes.pdf>]",
+    "  [--lecture-notes <lecture-notes.validated.private.json>]",
     "  [--output data/laozhao/previewContent.generated.json]",
-    "  --confirm-authorized-preview"
+    "  --confirm-authorized-preview",
+    "  [--confirm-reference-preview]"
   ].join("\n");
 }
 
@@ -128,26 +182,59 @@ async function main() {
   const selectionPath = typeof args["board-selection"] === "string"
     ? resolve(args["board-selection"])
     : null;
+  const referenceMapPath = typeof args["reference-map"] === "string"
+    ? resolve(args["reference-map"])
+    : null;
+  const referencePdfPath = typeof args["reference-pdf"] === "string"
+    ? resolve(args["reference-pdf"])
+    : null;
+  const lectureNotesPath = typeof args["lecture-notes"] === "string"
+    ? resolve(args["lecture-notes"])
+    : null;
+  const includeReferenceNotes = Boolean(referenceMapPath || referencePdfPath || args["confirm-reference-preview"]);
+  if (
+    includeReferenceNotes &&
+    (!referenceMapPath || !referencePdfPath || args["confirm-reference-preview"] !== true)
+  ) {
+    throw new Error("加入筆記必須同時提供 --reference-map、--reference-pdf 與 --confirm-reference-preview。");
+  }
   const outputPath = typeof args.output === "string" ? resolve(args.output) : defaultOutput;
   assertInside(privateRoot, transcriptPath, "私人逐字稿");
   assertInside(privateRoot, chapterPath, "私人章節草稿");
   if (selectionPath) assertInside(privateRoot, selectionPath, "板書選擇檔");
+  if (referenceMapPath) assertInside(privateRoot, referenceMapPath, "私人筆記對照檔");
+  if (lectureNotesPath) assertInside(privateRoot, lectureNotesPath, "已驗證列點講義");
   assertInside(resolve(repoRoot, "data/laozhao"), outputPath, "Preview manifest");
 
-  const [transcript, chapterDraft, boardSelection, existingManifest] = await Promise.all([
+  const [transcript, chapterDraft, boardSelection, referenceMap, explicitLectureNotes, existingManifest] = await Promise.all([
     readJson(transcriptPath, "私人逐字稿"),
     readJson(chapterPath, "私人章節草稿"),
-    readOptionalJson(selectionPath, null),
+    readOptionalJson(selectionPath, null, "板書選擇檔"),
+    readOptionalJson(referenceMapPath, null, "私人筆記對照檔"),
+    readOptionalJson(lectureNotesPath, null, "已驗證列點講義"),
     readExistingManifest(outputPath)
   ]);
+  if (referenceMap) {
+    if (!boardSelection) throw new Error("加入筆記前必須提供板書選擇檔。");
+    const referenceValidation = validateReferenceMap(referenceMap, boardSelection);
+    if (!referenceValidation.valid) {
+      throw new Error(`筆記對照未通過驗證：${referenceValidation.errors.join("；")}`);
+    }
+  }
+  const existingLectureNotes = existingManifest.videos
+    ?.find((item) => item?.videoId === transcript.videoId)
+    ?.lectureNotes ?? null;
+  const lectureNotes = explicitLectureNotes ?? existingLectureNotes;
   const captions = buildCaptions(transcript);
   const video = buildPreviewVideoContent({
     transcript,
     chapterDraft,
     captions,
-    boardSelections: boardSelection
+    boardSelections: boardSelection,
+    referenceMap,
+    lectureNotes
   });
-  await copySelectedBoards(boardSelection, video);
+  await buildPublicMaterials(boardSelection, video, referenceMap, referencePdfPath);
   const merged = mergePreviewVideo(existingManifest, video);
   await writeAtomic(outputPath, `${JSON.stringify(merged, null, 2)}\n`);
 
@@ -155,6 +242,8 @@ async function main() {
   console.log(`章節：${video.chapters.length}`);
   console.log(`字幕：${transcript.segments.length} 段壓縮為 ${video.captions.length} 段`);
   console.log(`板書：${video.chapters.reduce((sum, chapter) => sum + chapter.boardFrames.length, 0)} 張`);
+  console.log(`筆記：${new Set(video.chapters.flatMap((chapter) => chapter.referenceNotes.map((note) => note.src))).size} 頁`);
+  console.log(`列點講義：${video.lectureNotes?.blocks.length ?? 0} 區塊`);
   console.log(`內容指紋：${video.contentFingerprint}`);
 }
 

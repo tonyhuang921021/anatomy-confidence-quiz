@@ -170,9 +170,24 @@ npm run validate:laozhao-reference -- \
   --board-selection data/laozhao/staging/<videoId>/review-package/board-selection.preview.private.json
 ```
 
-若筆記公開授權尚未確認，只能拿來做私人完整性比對；不可把 PDF 頁面、裁圖或可還原原文的資料放進 Git、Vercel 或網站。
+網站必須以 `boardFrameId` 對應 `referenceImageId`，再讀取 PDF 頁碼與 `pageRegion`；不可依檔名、陣列順序或相近時間自行猜測。
 
-未來若取得公開授權，網站必須以 `boardFrameId` 對應 `referenceImageId`，再讀取 PDF 頁碼與 `pageRegion`；不可依檔名、陣列順序或相近時間自行猜測。只有 `publicationPermission: confirmed` 且對照驗證完整時，才可建立並排或切換顯示所需的公開圖片資料。
+筆記尚未取得公開授權時，完整頁面只能放在管理員專用、受密碼保護的 Preview。建立時必須同時提供來源 PDF、讓 SHA-256 與私人對照檔完全吻合，並明確加入 `--confirm-reference-preview`；正式站與一般訪客仍然不可讀取。若未來要正式公開，仍須另外確認公開授權，不能把 Preview 的確認視為正式公開許可。
+
+建立含完整板書與筆記頁的受保護 Preview 資料：
+
+```bash
+npm run build:laozhao-preview -- \
+  --transcript data/laozhao/staging/<videoId>/review-package/transcript.private.json \
+  --chapters data/laozhao/staging/<videoId>/review-package/chapters.validated.preview.private.json \
+  --board-selection data/laozhao/staging/<videoId>/review-package/board-selection.preview.private.json \
+  --reference-map data/laozhao/staging/<videoId>/review-package/reference-notes.private.json \
+  --reference-pdf "/私人來源/參考筆記.pdf" \
+  --confirm-reference-preview \
+  --confirm-authorized-preview
+```
+
+產製器只輸出對照檔列出的完整頁面，不自動裁切或輸出整份 PDF；頁面與板書都受同一個 Preview 權限閘門保護。
 
 目前 Preview 不得直接 promote 到正式站。只要 `data/laozhao/previewContent.generated.json` 或 `public/laozhao-preview/` 仍含測試教材，production build 必須失敗；即使 Preview deployment 被誤 promote，middleware 也會依正式網域封鎖課程頁與板書靜態資產。正式公開前應另建經審核的 production 內容契約並重新建置。
 
@@ -199,18 +214,83 @@ npm run process:laozhao-video -- \
 ```bash
 npm run process:laozhao-video -- \
   --video-id ATFBb25QRNw \
+  --reference-pdf "/私人來源/參考筆記.pdf" \
+  --confirm-reference-preview \
   --confirm-authorized-preview
 ```
 
 流程只更新該 video ID 的 Preview 內容與專用圖片目錄，不會公開原始影片、逐字稿、未選候選圖或私人參考筆記。Production 另有環境閘門，不能靠這個指令開啟。
 
-## 9. 交回內容
+## 9. 校對完整字幕
+
+網站字幕一律使用臺灣繁體中文。Whisper 產出的簡體字、中文同音誤辨與英文醫學術語近音拼錯，不能直接靠字典全自動取代；先建立包含全部章節脈絡、時間碼與字幕 ID 的校對包：
+
+```bash
+npm run package:laozhao-subtitles -- --video-id ATFBb25QRNw
+```
+
+輸出位置：
+
+```text
+data/laozhao/staging/ATFBb25QRNw/review-package/subtitle-proofreading-package.private.md
+```
+
+把整份 Markdown 交給 ChatGPT Pro。它只能回傳需要修改的字幕 ID，不可改時間碼、重排、合併或拆分字幕；不確定的醫學英文要放進 `unresolved`，不可猜測。將回傳的純 JSON 存入私人 staging 後套用：
+
+```bash
+npm run apply:laozhao-subtitles -- \
+  --video-id ATFBb25QRNw \
+  --review data/laozhao/staging/ATFBb25QRNw/review-package/subtitle-proofreading.chat.private.json
+```
+
+最後執行：
+
+```bash
+npm run check:laozhao-subtitles
+```
+
+校對回覆的字幕指紋、video ID、修正 ID 或格式不一致時會拒絕套用；任何仍可轉成臺灣繁體的字幕也會阻擋 Preview build。`unresolved` 仍須人工看影片確認，不能把不確定術語直接發布。
+
+## 10. 整理可核對的列點講義
+
+字幕完成校對後，建立給 ChatGPT Pro 的完整列點講義工作包：
+
+```bash
+npm run package:laozhao-lecture-notes -- --video-id ATFBb25QRNw
+```
+
+輸出位置：
+
+```text
+data/laozhao/staging/ATFBb25QRNw/review-package/lecture-notes-package.private.md
+```
+
+工作包會附上全部章節與全部校對字幕。老師實際講授與必要補充分成兩種來源：
+
+- `provenance: "teacher"`：只能整理老師講過的內容。所有字幕必須從第一段到最後一段連續涵蓋，不能跳段、重疊或跨章；每個區塊最多涵蓋 14 段字幕，避免把整章過度濃縮。
+- `provenance: "supplement"`：可補上理解所需的背景、名詞或比較，但必須以 `afterBlockId` 接在特定老師講授區塊後，網站會明確顯示「補充」，不可冒充老師原話。
+
+Chat 應逐段確認老師講到的定義、數字、步驟、因果、比較、例子、口訣、例外、否定、提醒、自我修正與考試提示都已寫入。比較、分類或流程可使用表格；其他內容使用列點。任何無法確認的內容必須放進 `unresolved`，不能猜測。
+
+將 Chat 回傳的純 JSON 放入私人 staging，再執行：
+
+```bash
+npm run apply:laozhao-lecture-notes -- \
+  --video-id ATFBb25QRNw \
+  --review data/laozhao/staging/ATFBb25QRNw/review-package/lecture-notes.chat.private.json
+```
+
+驗證通過後會產生 `lecture-notes.validated.private.json` 並套入受保護 Preview。任何字幕缺口、重疊、跨章、過長區塊、無來源補充或未解疑點都會停止匯入。後續用單片流程重建時，會自動沿用這份已驗證講義；如果字幕版本變更，舊講義會因指紋不一致而被拒絕，必須重新校對。
+
+## 11. 交回內容
 
 交回以下內容即可：
 
 1. Chat 原始回傳 JSON，或已驗證的 `chapters.validated.private.json`。
 2. `board-candidates/index.private.json`。
 3. 每章最後選定的 candidate ID；若某章都不理想，註明要重新擷取的時間範圍。
-4. 若有私人參考筆記，只交對照 JSON 與授權狀態，不交原始 PDF 給網站建置流程。
+4. 私人參考筆記的對照 JSON、來源 PDF 指紋與授權狀態；原始 PDF 只在本機產製受保護頁面，不提交 Git。
+5. Chat 字幕校對回傳的純 JSON，以及仍需看影片確認的 `unresolved` 清單。
+6. Chat 列點講義回傳的純 JSON；若有補充內容，確認每一項都清楚標為 `supplement`。
 
 Codex 會再次核對章節、時間、圖片與權利狀態。受保護 Preview 可顯示仍標為 `draft` 的人工校訂內容；正式站只接受 `reviewed`。逐字稿來源資料、OCR、原始影片、未選板書與未獲公開授權的參考筆記都不會公開。

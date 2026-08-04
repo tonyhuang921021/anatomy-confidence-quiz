@@ -62,7 +62,7 @@ async function main() {
   const args = parseCliArgs(process.argv.slice(2));
   const videoId = typeof args["video-id"] === "string" ? args["video-id"] : "";
   if (!videoIdPattern.test(videoId)) {
-    throw new Error("用法：npm run process:laozhao-video -- --video-id <11 字元 YouTube ID> [--chapter-draft <私人 JSON>] [--extract-board] [--board-selection <私人 JSON>] [--reference-map <私人 JSON>] [--confirm-authorized-preview]");
+    throw new Error("用法：npm run process:laozhao-video -- --video-id <11 字元 YouTube ID> [--chapter-draft <私人 JSON>] [--extract-board] [--board-selection <私人 JSON>] [--reference-map <私人 JSON>] [--reference-pdf <PDF>] [--lecture-notes <已驗證私人 JSON>] [--confirm-reference-preview] [--confirm-authorized-preview]");
   }
 
   const videoRoot = resolve(privateRoot, videoId);
@@ -82,6 +82,12 @@ async function main() {
   const referencePath = typeof args["reference-map"] === "string"
     ? resolve(args["reference-map"])
     : resolve(reviewRoot, "reference-notes.private.json");
+  const referencePdfPath = typeof args["reference-pdf"] === "string"
+    ? resolve(args["reference-pdf"])
+    : null;
+  const lectureNotesPath = typeof args["lecture-notes"] === "string"
+    ? resolve(args["lecture-notes"])
+    : resolve(reviewRoot, "lecture-notes.validated.private.json");
   const statusPath = resolve(reviewRoot, "pipeline-status.private.json");
 
   for (const [pathname, label] of [
@@ -90,6 +96,7 @@ async function main() {
     [sourcePath, "來源影片"],
     [selectionPath, "板書選擇檔"],
     [referencePath, "筆記對照檔"],
+    [lectureNotesPath, "已驗證列點講義"],
     [statusPath, "流程狀態檔"]
   ]) assertInside(privateRoot, pathname, label);
 
@@ -121,12 +128,22 @@ async function main() {
 
   const hasSelection = await exists(selectionPath);
   const hasReferenceMap = await exists(referencePath);
+  const hasLectureNotes = await exists(lectureNotesPath);
   if (hasReferenceMap) {
     if (!hasSelection) throw new Error("已有筆記對照，但缺少其對應的板書選擇檔。");
     runNode(resolve(repoRoot, "scripts/laozhao/validate-reference-map.mjs"), [
       "--reference", referencePath,
       "--board-selection", selectionPath
     ]);
+  }
+
+  if (hasReferenceMap && args["confirm-authorized-preview"] === true) {
+    if (!referencePdfPath || !(await exists(referencePdfPath))) {
+      throw new Error("這支影片已有筆記對照；重建 Preview 時必須提供 --reference-pdf。");
+    }
+    if (args["confirm-reference-preview"] !== true) {
+      throw new Error("加入對照筆記必須明確提供 --confirm-reference-preview。");
+    }
   }
 
   if (args["confirm-authorized-preview"] !== true) {
@@ -142,12 +159,15 @@ async function main() {
         chapters: displayPath(validatedPath),
         boardCandidates: displayPath(resolve(reviewRoot, "board-candidates/index.private.json")),
         boardSelection: hasSelection ? displayPath(selectionPath) : null,
-        referenceMap: hasReferenceMap ? displayPath(referencePath) : null
+        referenceMap: hasReferenceMap ? displayPath(referencePath) : null,
+        lectureNotes: hasLectureNotes ? displayPath(lectureNotesPath) : null
       },
       gates: {
         chapterValidation: "passed",
         humanBoardSelection: hasSelection ? "passed" : "required",
         referenceMapping: hasReferenceMap ? "passed_private_only" : "not_provided",
+        lectureNotes: hasLectureNotes ? "validated" : "not_provided",
+        referencePreviewConfirmation: hasReferenceMap ? "required" : "not_required",
         authorizedPreviewConfirmation: "required"
       }
     });
@@ -158,12 +178,23 @@ async function main() {
   }
 
   if (!hasSelection) throw new Error("建立 Preview 前必須提供人工確認的板書選擇檔；沒有板書的章節可在檔案中明確留空。");
-  runNode(resolve(repoRoot, "scripts/laozhao/build-preview-content.mjs"), [
+  const buildArgs = [
     "--transcript", transcriptPath,
     "--chapters", validatedPath,
     "--board-selection", selectionPath,
     "--confirm-authorized-preview"
-  ]);
+  ];
+  if (hasReferenceMap && referencePdfPath) {
+    buildArgs.push(
+      "--reference-map", referencePath,
+      "--reference-pdf", referencePdfPath,
+      "--confirm-reference-preview"
+    );
+  }
+  if (hasLectureNotes) {
+    buildArgs.push("--lecture-notes", lectureNotesPath);
+  }
+  runNode(resolve(repoRoot, "scripts/laozhao/build-preview-content.mjs"), buildArgs);
   await writeAtomic(statusPath, {
     schemaVersion: "1.0.0",
     pipelineVersion: "laozhao-video-preview-v1",
@@ -175,13 +206,17 @@ async function main() {
       chapters: displayPath(validatedPath),
       boardSelection: displayPath(selectionPath),
       referenceMap: hasReferenceMap ? displayPath(referencePath) : null,
+      lectureNotes: hasLectureNotes ? displayPath(lectureNotesPath) : null,
       previewManifest: "data/laozhao/previewContent.generated.json",
-      publicBoards: `public/laozhao-preview/${videoId}/boards/`
+      publicBoards: `public/laozhao-preview/${videoId}/boards/`,
+      publicReferenceNotes: hasReferenceMap ? `public/laozhao-preview/${videoId}/notes/` : null
     },
     gates: {
       chapterValidation: "passed",
       humanBoardSelection: "passed",
       referenceMapping: hasReferenceMap ? "passed_private_only" : "not_provided",
+      lectureNotes: hasLectureNotes ? "validated" : "not_provided",
+      referencePreviewConfirmation: hasReferenceMap ? "passed" : "not_required",
       authorizedPreviewConfirmation: "passed",
       productionRelease: "blocked"
     }

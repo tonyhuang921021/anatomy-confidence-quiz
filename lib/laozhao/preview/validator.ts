@@ -1,12 +1,17 @@
+import { createHash } from "node:crypto";
 import type {
   LaoZhaoPreviewCaption,
   LaoZhaoPreviewChapter,
+  LaoZhaoPreviewLectureBlock,
+  LaoZhaoPreviewLectureNotes,
   LaoZhaoPreviewManifest,
+  LaoZhaoPreviewReferenceNote,
   LaoZhaoPreviewVideoContent
 } from "./types";
 
 const VIDEO_ID_PATTERN = /^[A-Za-z0-9_-]{11}$/;
 const SHA256_PATTERN = /^[a-f0-9]{64}$/;
+const MAX_TEACHER_CAPTION_SPAN = 14;
 
 function isRecord(value: unknown): value is Record<string, unknown> {
   return Boolean(value) && typeof value === "object" && !Array.isArray(value);
@@ -22,6 +27,136 @@ function assertSeconds(value: unknown, label: string, durationSec: number) {
   if (typeof value !== "number" || !Number.isFinite(value) || value < 0 || value > durationSec + 0.5) {
     throw new Error(`${label}不在影片範圍內。`);
   }
+}
+
+function captionFingerprint(captions: readonly LaoZhaoPreviewCaption[]) {
+  return createHash("sha256").update(JSON.stringify(captions.map((caption) => ({
+    id: caption.id,
+    startSec: caption.startSec,
+    endSec: caption.endSec,
+    text: caption.text
+  })))).digest("hex");
+}
+
+function assertSameSecond(value: unknown, expected: number, label: string) {
+  if (typeof value !== "number" || !Number.isFinite(value) || Math.abs(value - expected) > 0.001) {
+    throw new Error(`${label}與來源字幕不一致。`);
+  }
+}
+
+function validateLectureBlockContent(raw: Record<string, unknown>, label: string) {
+  if (raw.type === "bullets") {
+    if (!Array.isArray(raw.points) || raw.points.length < 1 || raw.points.length > 12) {
+      throw new Error(`${label}列點數量無效。`);
+    }
+    for (const [pointIndex, point] of raw.points.entries()) {
+      if (!isRecord(point)) throw new Error(`${label}第 ${pointIndex + 1} 點格式無效。`);
+      assertText(point.text, `${label}第 ${pointIndex + 1} 點`, 320);
+      if (!Array.isArray(point.details) || point.details.length > 8) {
+        throw new Error(`${label}第 ${pointIndex + 1} 點子項目格式無效。`);
+      }
+      point.details.forEach((detail, detailIndex) => (
+        assertText(detail, `${label}第 ${pointIndex + 1} 點子項目 ${detailIndex + 1}`, 260)
+      ));
+    }
+    return;
+  }
+  if (raw.type !== "table") throw new Error(`${label}類型無效。`);
+  if (!Array.isArray(raw.columns) || raw.columns.length < 2 || raw.columns.length > 6) {
+    throw new Error(`${label}表格欄數無效。`);
+  }
+  raw.columns.forEach((column, index) => assertText(column, `${label}第 ${index + 1} 欄`, 80));
+  if (!Array.isArray(raw.rows) || raw.rows.length < 1 || raw.rows.length > 24) {
+    throw new Error(`${label}表格列數無效。`);
+  }
+  for (const [rowIndex, row] of raw.rows.entries()) {
+    if (!Array.isArray(row) || row.length !== raw.columns.length) {
+      throw new Error(`${label}第 ${rowIndex + 1} 列欄數不一致。`);
+    }
+    row.forEach((cell, columnIndex) => (
+      assertText(cell, `${label}第 ${rowIndex + 1} 列第 ${columnIndex + 1} 欄`, 220)
+    ));
+  }
+}
+
+function validateLectureNotes(
+  raw: unknown,
+  videoId: string,
+  chapters: readonly LaoZhaoPreviewChapter[],
+  captions: readonly LaoZhaoPreviewCaption[]
+): LaoZhaoPreviewLectureNotes {
+  if (!isRecord(raw)) throw new Error("Preview 列點講義不是物件。");
+  if (raw.schemaVersion !== "1.0.0") throw new Error("Preview 列點講義 schemaVersion 無效。");
+  if (raw.videoId !== videoId) throw new Error("Preview 列點講義 videoId 不一致。");
+  if (raw.reviewStatus !== "draft") throw new Error("Preview 列點講義必須維持 draft。");
+  if (raw.captionFingerprint !== captionFingerprint(captions)) {
+    throw new Error("Preview 列點講義不是針對目前字幕版本。");
+  }
+  if (!Array.isArray(raw.blocks) || raw.blocks.length === 0) {
+    throw new Error("Preview 列點講義區塊不可為空。");
+  }
+
+  const captionIndex = new Map(captions.map((caption, index) => [caption.id, index]));
+  const chapterById = new Map(chapters.map((chapter) => [chapter.id, chapter]));
+  const blockIds = new Set<string>();
+  const teacherBlocks = new Map<string, LaoZhaoPreviewLectureBlock>();
+  let expectedTeacherStart = 0;
+
+  for (const [index, block] of raw.blocks.entries()) {
+    const label = `Preview 第 ${index + 1} 個講義區塊`;
+    if (!isRecord(block)) throw new Error(`${label}格式無效。`);
+    assertText(block.id, `${label} id`, 100);
+    if (blockIds.has(block.id as string)) throw new Error(`${label} id 重複。`);
+    blockIds.add(block.id as string);
+    assertText(block.chapterId, `${label} chapterId`, 100);
+    assertText(block.title, `${label}標題`, 120);
+    validateLectureBlockContent(block, label);
+    const chapter = chapterById.get(block.chapterId as string);
+    if (!chapter) throw new Error(`${label}找不到對應章節。`);
+
+    if (block.provenance === "teacher") {
+      assertText(block.sourceCaptionStart, `${label}來源起點`, 80);
+      assertText(block.sourceCaptionEnd, `${label}來源終點`, 80);
+      const startIndex = captionIndex.get(block.sourceCaptionStart as string);
+      const endIndex = captionIndex.get(block.sourceCaptionEnd as string);
+      if (startIndex === undefined || endIndex === undefined || endIndex < startIndex) {
+        throw new Error(`${label}字幕範圍無效。`);
+      }
+      if (startIndex !== expectedTeacherStart) {
+        throw new Error(`${label}前有字幕缺口、重疊或倒序。`);
+      }
+      const sourceCaptionCount = endIndex - startIndex + 1;
+      if (sourceCaptionCount > MAX_TEACHER_CAPTION_SPAN) {
+        throw new Error(`${label}超過 ${MAX_TEACHER_CAPTION_SPAN} 段字幕。`);
+      }
+      if (block.sourceCaptionCount !== sourceCaptionCount) {
+        throw new Error(`${label}來源字幕數量不一致。`);
+      }
+      const firstCaption = captions[startIndex];
+      const lastCaption = captions[endIndex];
+      assertSameSecond(block.startSec, firstCaption.startSec, `${label}起點`);
+      assertSameSecond(block.endSec, lastCaption.endSec, `${label}終點`);
+      if (firstCaption.startSec < chapter.startSec - 0.5 || lastCaption.endSec > chapter.endSec + 0.5) {
+        throw new Error(`${label}跨越章節。`);
+      }
+      teacherBlocks.set(block.id as string, block as unknown as LaoZhaoPreviewLectureBlock);
+      expectedTeacherStart = endIndex + 1;
+      continue;
+    }
+
+    if (block.provenance !== "supplement") throw new Error(`${label}來源標示無效。`);
+    assertText(block.afterBlockId, `${label}對應講授區塊`, 100);
+    const parent = teacherBlocks.get(block.afterBlockId as string);
+    if (!parent) throw new Error(`${label}沒有對應的前置老師講授區塊。`);
+    if (block.chapterId !== parent.chapterId) throw new Error(`${label}與對應講授區塊不在同章。`);
+    assertSameSecond(block.startSec, parent.startSec, `${label}起點`);
+    assertSameSecond(block.endSec, parent.endSec, `${label}終點`);
+  }
+
+  if (expectedTeacherStart !== captions.length) {
+    throw new Error(`Preview 列點講義未完整涵蓋 ${captions[expectedTeacherStart]?.id ?? "最後一段"} 之後的字幕。`);
+  }
+  return raw as unknown as LaoZhaoPreviewLectureNotes;
 }
 
 function validateCaption(
@@ -89,6 +224,40 @@ function validateChapter(
     throw new Error(`第 ${index + 1} 章代表畫面時間不在章節內。`);
   }
   if (!Array.isArray(raw.boardFrames)) throw new Error(`第 ${index + 1} 章板書圖片格式不正確。`);
+  if (!Array.isArray(raw.referenceNotes)) throw new Error(`第 ${index + 1} 章筆記圖片格式不正確。`);
+  const referenceNoteIds = new Set<string>();
+  const referenceNotes = raw.referenceNotes.map((note, noteIndex) => {
+    if (!isRecord(note)) throw new Error(`第 ${index + 1} 章第 ${noteIndex + 1} 頁筆記不是物件。`);
+    assertText(note.id, `第 ${index + 1} 章筆記 id`, 100);
+    assertText(note.src, `第 ${index + 1} 章筆記路徑`, 300);
+    assertText(note.sourceTitle, `第 ${index + 1} 章筆記來源`, 160);
+    assertText(note.alt, `第 ${index + 1} 章筆記替代文字`, 180);
+    if (!Number.isInteger(note.pdfPage) || (note.pdfPage as number) < 1) {
+      throw new Error(`第 ${index + 1} 章筆記頁碼無效。`);
+    }
+    if (!(note.src as string).startsWith("/laozhao-preview/") || !(note.src as string).endsWith(".jpg")) {
+      throw new Error(`第 ${index + 1} 章筆記必須位於專用 Preview JPG 路徑。`);
+    }
+    if (note.visibility !== "protected_preview") {
+      throw new Error(`第 ${index + 1} 章筆記必須維持 protected_preview。`);
+    }
+    for (const [key, label] of [
+      ["pageRegions", "頁內位置"],
+      ["matchedStructures", "吻合構造"]
+    ] as const) {
+      if (!Array.isArray(note[key]) || note[key].length === 0 || note[key].some((item) => (
+        typeof item !== "string" || !item.trim() || item.length > 80
+      ))) {
+        throw new Error(`第 ${index + 1} 章筆記${label}格式不正確。`);
+      }
+    }
+    if (referenceNoteIds.has(note.id as string)) {
+      throw new Error(`第 ${index + 1} 章筆記 id 重複：${note.id}`);
+    }
+    referenceNoteIds.add(note.id as string);
+    return note as unknown as LaoZhaoPreviewReferenceNote;
+  });
+  const referencedNoteIds = new Set<string>();
   for (const [frameIndex, frame] of raw.boardFrames.entries()) {
     if (!isRecord(frame)) throw new Error(`第 ${index + 1} 章第 ${frameIndex + 1} 張板書不是物件。`);
     assertText(frame.id, `第 ${index + 1} 章板書 id`, 100);
@@ -98,8 +267,22 @@ function validateChapter(
     if (!(frame.src as string).startsWith("/laozhao-preview/")) {
       throw new Error(`第 ${index + 1} 章板書必須位於專用 Preview 路徑。`);
     }
+    if (!Array.isArray(frame.referenceNoteIds) || frame.referenceNoteIds.some((noteId) => (
+      typeof noteId !== "string" || !referenceNoteIds.has(noteId)
+    ))) {
+      throw new Error(`第 ${index + 1} 章板書的筆記對照無效。`);
+    }
+    if (new Set(frame.referenceNoteIds).size !== frame.referenceNoteIds.length) {
+      throw new Error(`第 ${index + 1} 章第 ${frameIndex + 1} 張板書的筆記對照重複。`);
+    }
+    for (const noteId of frame.referenceNoteIds) referencedNoteIds.add(noteId);
   }
-  return raw as unknown as LaoZhaoPreviewChapter;
+  for (const note of referenceNotes) {
+    if (!referencedNoteIds.has(note.id)) {
+      throw new Error(`第 ${index + 1} 章筆記 ${note.id} 沒有對應板書。`);
+    }
+  }
+  return { ...raw, referenceNotes } as unknown as LaoZhaoPreviewChapter;
 }
 
 function validateVideo(raw: unknown): LaoZhaoPreviewVideoContent {
@@ -121,9 +304,12 @@ function validateVideo(raw: unknown): LaoZhaoPreviewVideoContent {
   const chapterIds = new Set<string>();
   const boardIds = new Set<string>();
   const boardPaths = new Set<string>();
+  const referenceNotePaths = new Map<string, string>();
   let previousChapter: LaoZhaoPreviewChapter | null = null;
+  const validatedChapters: LaoZhaoPreviewChapter[] = [];
   for (const [index, chapter] of raw.chapters.entries()) {
     previousChapter = validateChapter(chapter, index, raw.durationSec, previousChapter);
+    validatedChapters.push(previousChapter);
     if (chapterIds.has(previousChapter.id)) throw new Error(`Preview 章節 id 重複：${previousChapter.id}`);
     chapterIds.add(previousChapter.id);
     for (const frame of previousChapter.boardFrames) {
@@ -135,11 +321,20 @@ function validateVideo(raw: unknown): LaoZhaoPreviewVideoContent {
       boardIds.add(frame.id);
       boardPaths.add(frame.src);
     }
+    for (const note of previousChapter.referenceNotes) {
+      const existingPath = referenceNotePaths.get(note.id);
+      if (existingPath && existingPath !== note.src) {
+        throw new Error(`Preview 筆記 ${note.id} 對應到不同檔案。`);
+      }
+      referenceNotePaths.set(note.id, note.src);
+    }
   }
   const captionIds = new Set<string>();
   let previousCaption: LaoZhaoPreviewCaption | null = null;
+  const validatedCaptions: LaoZhaoPreviewCaption[] = [];
   for (const [index, caption] of raw.captions.entries()) {
     previousCaption = validateCaption(caption, index, raw.durationSec, previousCaption);
+    validatedCaptions.push(previousCaption);
     if (captionIds.has(previousCaption.id)) throw new Error(`Preview 字幕 id 重複：${previousCaption.id}`);
     captionIds.add(previousCaption.id);
   }
@@ -149,6 +344,9 @@ function validateVideo(raw: unknown): LaoZhaoPreviewVideoContent {
   }
   if (previousCaption?.sourceSegmentEnd !== raw.sourceSegmentTotal) {
     throw new Error("Preview 字幕未完整涵蓋原始逐字稿。");
+  }
+  if (raw.lectureNotes !== undefined) {
+    validateLectureNotes(raw.lectureNotes, raw.videoId as string, validatedChapters, validatedCaptions);
   }
   return raw as unknown as LaoZhaoPreviewVideoContent;
 }
