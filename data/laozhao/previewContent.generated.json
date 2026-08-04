@@ -31,7 +31,7 @@
           "title": "人體組成層次、四大基本組織與器官系統",
           "startSec": 194,
           "endSec": 451,
-          "summary": "內容由分子、胞器、細胞、四大基本組織、器官與十一個系統一路整理到完整有機體,並區分可興奮與不可興奮組織。後段以器官大小變化說明萎縮、肥大與增生,但逐字稿中的部分英文術語有自我更正,待人工確認。",
+          "summary": "內容由分子、胞器、細胞、四大基本組織、器官與十一個系統一路整理到完整有機體，並區分可興奮與不可興奮組織。後段以正常器官重量說明萎縮、增生與肥大，並以細胞數量或體積判斷。",
           "tags": [
             "人體組成層次",
             "基本組織",
@@ -343,7 +343,7 @@
           "title": "腎臟、呼吸消化道與神經系統的椎體高度",
           "startSec": 2652,
           "endSec": 3068,
-          "summary": "老師以第二張體表圖整理腎臟與腎門、喉、氣管、食道、胃賁門與幽門的椎體高度,並延伸到脊髓末端、蜘蛛膜下腔與硬腦膜的下界。後段標示直腸範圍、McBurney point與髂脊;逐字稿中另有一個淋巴構造名稱辨識不清,待人工確認。",
+          "summary": "老師以第二張體表圖整理腎臟與腎門、喉、氣管、食道、胃賁門與幽門的椎體高度，並延伸到脊髓末端、蜘蛛膜下腔、硬腦膜與乳糜池的下界。後段定位直腸、McBurney point與髂脊。",
           "tags": [
             "腎臟",
             "喉氣管食道",
@@ -389,7 +389,7 @@
           "title": "常用組織化學染色與目標物",
           "startSec": 3068,
           "endSec": 3209,
-          "summary": "內容列出肝糖、類澱粉、鐵、網狀纖維、彈性纖維、膠原纖維、脂肪與黏液蛋白所使用的染色方法及顏色。多個染劑英文名稱由語音辨識轉寫,待人工確認拼字。",
+          "summary": "內容整理肝糖、類澱粉、鐵、網狀纖維、彈性纖維、膠原纖維、脂肪與黏液蛋白所用的染色與顏色，包含PAS、Congo red、普魯士藍、銀染色、resorcin-fuchsin、Van Gieson、Masson trichrome、Sudan與mucicarmine。",
           "tags": [
             "組織化學",
             "染色",
@@ -469,7 +469,7 @@
           "title": "顱縫與顱縫早閉",
           "startSec": 3725,
           "endSec": 3881,
-          "summary": "老師整理矢狀縫、冠狀縫、人字縫與鱗狀縫的位置,並說明顱縫過早閉合會限制對應方向的生長。矢狀縫與冠狀縫早閉所造成的頭形及英文名稱在逐字稿中辨識不完整,待人工確認。",
+          "summary": "老師整理矢狀縫、冠狀縫、人字縫與鱗狀縫的位置，並說明顱縫過早閉合會限制對應方向的生長。矢狀縫早閉可形成舟狀頭，冠狀縫早閉則可形成尖狀頭。",
           "tags": [
             "顱縫",
             "矢狀縫",
@@ -514,7 +514,7 @@
           "title": "囟門位置、閉合後標誌與閉合時間",
           "startSec": 3881,
           "endSec": 4056,
-          "summary": "內容說明前囟、後囟、前外側囟與後外側囟的位置,並將閉合後的標誌對應到前囟點、人字點、翼點與星點。老師指出前囟約十八個月閉合、後囟約三個月閉合,另兩個囟門的月份對應因逐字稿辨識不清,待人工確認。",
+          "summary": "內容說明前囟、後囟、前外側囟與後外側囟的位置，並對應Bregma、Lambda、Pterion與Asterion。閉合時間依序整理為後囟約3個月、前外側囟約6個月、後外側囟約12個月、前囟約18個月。",
           "tags": [
             "囟門",
             "前囟",
@@ -652,7 +652,7 @@
           "title": "顳骨相關孔道、乳突氣室與顏面神經路徑",
           "startSec": 4809,
           "endSec": 5062,
-          "summary": "老師列出破裂孔、頸動脈孔、內聽孔與頸靜脈孔及其通過構造,並介紹乳突氣室、莖突與莖乳突孔。第七與第八對腦神經先經內聽孔進入,第七對再由莖乳突孔離開;破裂孔內容物的逐字稿辨識待人工確認。",
+          "summary": "老師整理破裂孔、頸動脈孔、內聽孔與頸靜脈孔及其通過構造，並介紹乳突氣室、莖突與莖乳突孔。第七與第八對腦神經先經內聽孔進入顳骨，第七對再由莖乳突孔離開。",
           "tags": [
             "顳骨孔道",
             "內聽孔",
@@ -831,7 +831,7 @@
           "title": "蝶骨大翼孔道、眶下裂與側面顱骨總圖",
           "startSec": 5629,
           "endSec": 5945,
-          "summary": "老師整理圓孔、卵圓孔、棘孔與破裂孔,分別連結三叉神經分支、中腦膜動脈及逐字稿所稱的大、小岩神經。後段說明蝶骨與上頜骨之間的眶下裂及其通過構造,並完成側面顱骨各骨位置總圖;部分神經名稱待人工確認。",
+          "summary": "老師整理圓孔、卵圓孔、棘孔與破裂孔，分別連結三叉神經分支、中腦膜動脈、大岩神經與小岩神經。後段說明蝶骨與上頜骨之間的眶下裂及其通過構造，並完成側面顱骨各骨位置總圖。",
           "tags": [
             "圓孔",
             "卵圓孔",
@@ -949,7 +949,7 @@
           "title": "篩骨三部分、嗅神經孔與雞冠",
           "startSec": 6455,
           "endSec": 6822,
-          "summary": "老師由正面與上方視角將篩骨分為水平板、垂直板與篩骨迷路,並說明水平板上有許多小孔供第一對腦神經通過。最後指出顱內向上突出的構造為雞冠;部分板名的逐字稿用詞待人工確認。",
+          "summary": "老師由正面與上方視角將篩骨分為水平板、垂直板與篩骨迷路，並說明水平板上有許多小篩孔供第一對腦神經通過。最後指出篩骨垂直板在顱內向上突出的部分為雞冠。",
           "tags": [
             "篩骨",
             "嗅神經孔",
@@ -2150,7 +2150,7 @@
           "id": "cue-00128",
           "startSec": 850.6,
           "endSec": 857.6,
-          "text": "上下講站著，然後呢，雙手下垂，手掌怎麼擺？一般是這樣擺。",
+          "text": "就是站著，然後雙手下垂。手掌怎麼擺？一般是這樣擺。",
           "sourceSegmentStart": 545,
           "sourceSegmentEnd": 548,
           "sourceSegmentCount": 4
@@ -3698,7 +3698,7 @@
           "id": "cue-00300",
           "startSec": 1986.98,
           "endSec": 1992.98,
-          "text": "左右都一樣，有看到？OK，再來我們的大腸，「搭到我們的大腸」，大腸來到這邊會變什麼？",
+          "text": "左右都一樣，有看到嗎？OK，再來談我們的大腸。大腸來到這邊會變什麼？",
           "sourceSegmentStart": 1443,
           "sourceSegmentEnd": 1448,
           "sourceSegmentCount": 6
@@ -4409,7 +4409,7 @@
           "id": "cue-00379",
           "startSec": 2516.98,
           "endSec": 2522.98,
-          "text": "肩胛骨的上角，這叫肩胛骨什麼角？下角。這叫肩胛骨……這個肩胛脊的外側端叫做肩峰。",
+          "text": "肩胛骨的上角，這叫肩胛骨什麼角？下角。這個肩胛脊的外側端叫做肩峰。",
           "sourceSegmentStart": 1801,
           "sourceSegmentEnd": 1806,
           "sourceSegmentCount": 6
@@ -4562,7 +4562,7 @@
           "id": "cue-00396",
           "startSec": 2631.98,
           "endSec": 2638.98,
-          "text": "可以嗎？這考古題是重點的「記憶器」。好，再回來，再回到我們的1-3，所以1-9頁。",
+          "text": "可以嗎？這考古題是重點的記憶題。好，再回來，再回到我們的 1-9 頁。",
           "sourceSegmentStart": 1884,
           "sourceSegmentEnd": 1889,
           "sourceSegmentCount": 6
@@ -4985,7 +4985,7 @@
           "id": "cue-00443",
           "startSec": 2952.98,
           "endSec": 2959.98,
-          "text": "OK，好，那麼第十二是「熱骨的」就不提。第十三點，McBurney point，就是 appendix。",
+          "text": "OK，好，那麼第十二就不提。第十三點，McBurney point，就是 appendix。",
           "sourceSegmentStart": 2134,
           "sourceSegmentEnd": 2140,
           "sourceSegmentCount": 7
@@ -5525,7 +5525,7 @@
           "id": "cue-00503",
           "startSec": 3356.98,
           "endSec": 3363.98,
-          "text": "「前乳骨、中乳骨、後乳骨」，這是我們的。我隨便畫的，OK，這是這樣，我的意思是，",
+          "text": "前顱窩、中顱窩、後顱窩，這是我們的。我隨便畫的，OK，這是這樣。我的意思是，",
           "sourceSegmentStart": 2410,
           "sourceSegmentEnd": 2415,
           "sourceSegmentCount": 6
@@ -6425,7 +6425,7 @@
           "id": "cue-00603",
           "startSec": 4022.98,
           "endSec": 4028.98,
-          "text": "有看到嗎？「Azari」呢？各位看一下，這是6個月，可以嗎？這個是",
+          "text": "有看到嗎？Pterion 呢？各位看一下，這是 6 個月，可以嗎？這個是",
           "sourceSegmentStart": 2947,
           "sourceSegmentEnd": 2952,
           "sourceSegmentCount": 6
@@ -6434,7 +6434,7 @@
           "id": "cue-00604",
           "startSec": 4028.98,
           "endSec": 4034.98,
-          "text": "6個月。「Azari」是一個什麼？「Sari」一個12個月，有看到嗎？基本上是這樣。",
+          "text": "6 個月。Asterion 呢？一個什麼？Asterion 一個 12 個月，有看到嗎？基本上是這樣。",
           "sourceSegmentStart": 2953,
           "sourceSegmentEnd": 2957,
           "sourceSegmentCount": 5
@@ -7118,7 +7118,7 @@
           "id": "cue-00680",
           "startSec": 4538.98,
           "endSec": 4545.98,
-          "text": "顴骨。這是我們的眼睛在這邊，眼眶在這邊，「DACE」在這邊，OK，那鼻子在這邊。",
+          "text": "顴骨。這是我們的眼睛在這邊，眼眶在這邊，teeth 在這邊，OK，那鼻子在這邊。",
           "sourceSegmentStart": 3343,
           "sourceSegmentEnd": 3349,
           "sourceSegmentCount": 7
@@ -7847,7 +7847,7 @@
           "id": "cue-00761",
           "startSec": 5095.98,
           "endSec": 5102.98,
-          "text": "好了，這兩個「小老鼠號」特別注意一下。這是什麼？這是骨，這是骨。",
+          "text": "好了，這兩個小突起特別注意一下。這是什麼？這是骨，這是骨。",
           "sourceSegmentStart": 3771,
           "sourceSegmentEnd": 3775,
           "sourceSegmentCount": 5
@@ -7910,7 +7910,7 @@
           "id": "cue-00768",
           "startSec": 5142.98,
           "endSec": 5149.98,
-          "text": "pterygopalatine fossa。我們大家會講。「骨圖很重要」，這下面裡面的構造很重要。",
+          "text": "pterygopalatine fossa。這裡面的構造很重要。",
           "sourceSegmentStart": 3806,
           "sourceSegmentEnd": 3811,
           "sourceSegmentCount": 6
@@ -7973,7 +7973,7 @@
           "id": "cue-00775",
           "startSec": 5192.98,
           "endSec": 5199.98,
-          "text": "就是顳骨跟下頜骨的顳顎關節，可以嗎？TM joint。所以「打牽到尾牌」是誰？就這個脫臼。",
+          "text": "就是顳骨跟下頜骨的顳顎關節，可以嗎？TM joint。所以像打哈欠造成的，就是這個脫臼。",
           "sourceSegmentStart": 3843,
           "sourceSegmentEnd": 3847,
           "sourceSegmentCount": 5
@@ -10157,7 +10157,2677 @@
           "sourceSegmentCount": 3
         }
       ],
-      "contentFingerprint": "bc4b8652937c1457323751dab6174eb9b453ed300d3a96fa55e327125e6ede5f"
+      "contentFingerprint": "e440b5d5e43096b7200318fcdb1e13a4927b355629faafbe7c370a4e9ef2fc26",
+      "lectureNotes": {
+        "schemaVersion": "1.0.0",
+        "videoId": "ATFBb25QRNw",
+        "captionFingerprint": "1d67fb7950c92686b5a0c68e97b9a634067f7bebc09169b465d0416c29673cd9",
+        "reviewStatus": "draft",
+        "blocks": [
+          {
+            "id": "ATFBb25QRNw-lecture-001",
+            "chapterId": "ATFBb25QRNw-ch-001",
+            "provenance": "teacher",
+            "title": "二八法則與各部分考題穩定度",
+            "sourceCaptionStart": "cue-00001",
+            "sourceCaptionEnd": "cue-00012",
+            "sourceCaptionCount": 12,
+            "startSec": 30,
+            "endSec": 104.1,
+            "type": "bullets",
+            "points": [
+              {
+                "text": "再怎麼抱怨考題也沒有用，實際的做法是思考如何準備，並採用二八法則：用20%的時間準備理想、核心的題目，理想狀況可掌握八成。",
+                "details": []
+              },
+              {
+                "text": "目前考題較刁鑽，因此實際成績可能約五成到六成；這一科的目標是不成為其他科目的負擔，也很難依靠它補足其他科目。",
+                "details": []
+              },
+              {
+                "text": "課程範圍包括大體解剖、神經解剖、胚胎學與組織學。組織學題目最正常，讀完後做題可達八、九成，甚至100%；大體解剖、神經解剖與胚胎學的成績波動較大，正常時可有八、九成，運氣不好時可能只有五成。",
+                "details": []
+              },
+              {
+                "text": "整科依二八法則準備，原則上可達五十分到六十分；再高需要一些運氣，再低通常也有限。這種準備方式可節省時間，因為解剖學內容本身相當凌亂。",
+                "details": []
+              }
+            ]
+          },
+          {
+            "id": "ATFBb25QRNw-lecture-002",
+            "chapterId": "ATFBb25QRNw-ch-001",
+            "provenance": "teacher",
+            "title": "建立系統知識主幹與課程準備原則",
+            "sourceCaptionStart": "cue-00013",
+            "sourceCaptionEnd": "cue-00026",
+            "sourceCaptionCount": 14,
+            "startSec": 104.1,
+            "endSec": 191.6,
+            "type": "bullets",
+            "points": [
+              {
+                "text": "資訊發達後，零碎知識很容易由網路查到，患者有時也能查得很清楚；真正需要建立的是知識的根幹、主幹與完整系統架構，而這不是短時間內即可建立的。",
+                "details": []
+              },
+              {
+                "text": "外行人可能知道許多零碎資訊，卻無法建立整體架構；學習時應先架起系統知識，之後再依個人需要開花結果、補充細節。",
+                "details": []
+              },
+              {
+                "text": "即使只先建立主幹，面對理想題目仍可掌握相當比例，例如組織學可掌握約80%的題目。這套二八法則以世界標準準備，也足以應付美國或其他國家的國家考試。",
+                "details": []
+              },
+              {
+                "text": "臺灣考題較偏、較刁，不必完全跟著偏題起舞，否則投入大量力氣後，結果可能仍只有五、六成；應先學習真正該學的內容。",
+                "details": []
+              },
+              {
+                "text": "課程時間緊湊，後續依既定進度進行；每年的配分大致相近，沒有太大意外，接著從第一章開始。",
+                "details": []
+              }
+            ]
+          },
+          {
+            "id": "ATFBb25QRNw-lecture-003",
+            "chapterId": "ATFBb25QRNw-ch-002",
+            "provenance": "teacher",
+            "title": "人體階層、七大分子、胞器與可興奮性",
+            "sourceCaptionStart": "cue-00027",
+            "sourceCaptionEnd": "cue-00038",
+            "sourceCaptionCount": 12,
+            "startSec": 194.6,
+            "endSec": 271.6,
+            "type": "bullets",
+            "points": [
+              {
+                "text": "解剖學內容零碎，因此仍以建立系統架構為優先。解剖學研究人體構造，而人體構造可由最小的分子到最大的有機體，依七個層次理解。",
+                "details": []
+              },
+              {
+                "text": "第一層是分子。體內七大類分子為糖類、蛋白質、脂肪、核酸、礦物質、維生素與水。",
+                "details": []
+              },
+              {
+                "text": "七大類分子組成胞器（organelle）；胞器是細胞內的器官，例如粒線體與細胞核。胞器再構成具有基本功能的單位——細胞（cell）。",
+                "details": []
+              },
+              {
+                "text": "老師提出人體約有60兆個細胞，並提醒記住此數據。細胞再組成四大基本組織：上皮、結締、肌肉與神經。",
+                "details": []
+              },
+              {
+                "text": "上皮與結締組織屬於不可興奮組織（non-excitable）；肌肉與神經屬於可興奮組織（excitable）。可興奮的意思是給予刺激（stimulation）後會產生反應。",
+                "details": []
+              }
+            ]
+          },
+          {
+            "id": "ATFBb25QRNw-lecture-004",
+            "chapterId": "ATFBb25QRNw-ch-002",
+            "provenance": "teacher",
+            "title": "四大基本組織、器官重量與肥大增生",
+            "sourceCaptionStart": "cue-00039",
+            "sourceCaptionEnd": "cue-00051",
+            "sourceCaptionCount": 13,
+            "startSec": 271.6,
+            "endSec": 361.6,
+            "type": "bullets",
+            "points": [
+              {
+                "text": "肌肉與神經是可興奮組織；上皮與結締是不可興奮組織。不可興奮表示給予刺激後沒有反應。",
+                "details": []
+              },
+              {
+                "text": "四大基本組織可進一步構成器官，例如心臟與肺臟。老師提醒器官的正常重量數據要背熟，並舉例腦約1400、心臟約320。",
+                "details": []
+              },
+              {
+                "text": "器官比正常小稱為萎縮（atrophy）。器官比正常大時，要區分增生與肥大。",
+                "details": []
+              },
+              {
+                "text": "若細胞數目增加，稱為增生（hyperplasia）。老師先誤說為 hypertrophy，隨即自我更正為 hyperplasia。",
+                "details": []
+              },
+              {
+                "text": "若細胞數目不變，而個別細胞體積變大，稱為肥大（hypertrophy）。",
+                "details": []
+              },
+              {
+                "text": "心臟正常約320，若增至400，因老師指出心臟不能再生，因此判定為肥大。前列腺正常約20克，若增至100克，則為前列腺增生。",
+                "details": []
+              }
+            ]
+          },
+          {
+            "id": "ATFBb25QRNw-lecture-005",
+            "chapterId": "ATFBb25QRNw-ch-002",
+            "provenance": "teacher",
+            "title": "萎縮判斷與十一個器官系統",
+            "sourceCaptionStart": "cue-00052",
+            "sourceCaptionEnd": "cue-00065",
+            "sourceCaptionCount": 14,
+            "startSec": 361.6,
+            "endSec": 450.6,
+            "type": "bullets",
+            "points": [
+              {
+                "text": "心臟由320克降至200克，或腦由約1400降至800，都屬於萎縮。判讀原則是先記正常值：比正常大可能是肥大或增生，比正常小一律稱為萎縮。",
+                "details": []
+              },
+              {
+                "text": "器官再組成十一個器官系統。循環、呼吸、消化與泌尿是四個維持生命的系統；這些系統失去功能時，人會死亡。",
+                "details": []
+              },
+              {
+                "text": "老師依序以心臟衰竭、呼吸衰竭、肝衰竭與腎衰竭說明四個維生系統的衰竭。無論原始原因是癌症、中風或車禍，最終至少會有一個以上的維生系統衰竭。",
+                "details": []
+              },
+              {
+                "text": "神經與內分泌屬於調節系統，負責使四個維生系統順利運作。骨骼與肌肉負責支持與運動，其他還包括生殖、皮膚等系統。",
+                "details": []
+              },
+              {
+                "text": "十一個系統最後組成完整有機體。接著進入人體區域，老師再次強調學習解剖時畫簡圖的重要性。",
+                "details": []
+              }
+            ]
+          },
+          {
+            "id": "ATFBb25QRNw-lecture-006",
+            "chapterId": "ATFBb25QRNw-ch-003",
+            "provenance": "teacher",
+            "title": "簡圖學習法與人體區域、體腔分區",
+            "sourceCaptionStart": "cue-00066",
+            "sourceCaptionEnd": "cue-00079",
+            "sourceCaptionCount": 14,
+            "startSec": 450.6,
+            "endSec": 539.6,
+            "type": "bullets",
+            "points": [
+              {
+                "text": "畫簡圖不僅有助於自己念書，未來也可能需要畫給病人看並進行說明。簡圖只要能表達結構、看起來相似即可，不必畫得漂亮，可像漫畫一樣簡化。",
+                "details": []
+              },
+              {
+                "text": "人體區域大方向分為頭頸、軀幹與四肢；四肢再包含左右上肢與左右下肢。學習時先抓大方向，再逐步細分。",
+                "details": []
+              },
+              {
+                "text": "軀幹以橫膈膜為界，上方是胸腔，下方是腹骨盆腔。",
+                "details": []
+              },
+              {
+                "text": "腹骨盆腔可想成一個碗：碗的上緣是骨盆緣，骨盆緣分隔腹腔與骨盆腔；碗底是骨盆底，其下為會陰部。",
+                "details": []
+              },
+              {
+                "text": "老師初步將軀幹前方整理為胸腔、腹腔、骨盆腔與會陰部，後方則為背部。",
+                "details": []
+              }
+            ]
+          },
+          {
+            "id": "ATFBb25QRNw-lecture-007",
+            "chapterId": "ATFBb25QRNw-ch-003",
+            "provenance": "teacher",
+            "title": "軀幹分區與橫膈三個主要裂孔",
+            "sourceCaptionStart": "cue-00080",
+            "sourceCaptionEnd": "cue-00087",
+            "sourceCaptionCount": 8,
+            "startSec": 539.6,
+            "endSec": 585.6,
+            "type": "bullets",
+            "points": [
+              {
+                "text": "軀幹前方分為胸腔、腹腔、骨盆腔與會陰部，後方為背部。",
+                "details": []
+              },
+              {
+                "text": "橫膈膜位於胸腔與腹骨盆腔之間。老師請學生參考講義15-20頁，並說明後續第三堂還會再談。",
+                "details": []
+              },
+              {
+                "text": "橫膈膜有三個主要裂孔：下腔靜脈裂孔、食道裂孔與主動脈裂孔。老師提醒這整頁題目很多。",
+                "details": []
+              }
+            ]
+          },
+          {
+            "id": "ATFBb25QRNw-lecture-008",
+            "chapterId": "ATFBb25QRNw-ch-003",
+            "provenance": "teacher",
+            "title": "骨盆緣、骨盆底與骨盆隔膜",
+            "sourceCaptionStart": "cue-00088",
+            "sourceCaptionEnd": "cue-00101",
+            "sourceCaptionCount": 14,
+            "startSec": 585.6,
+            "endSec": 672.6,
+            "type": "bullets",
+            "points": [
+              {
+                "text": "骨盆緣（pelvic brim）是腹腔與骨盆腔的交界，後方起於薦岬（promontory），前方到達恥骨聯合（pubic symphysis）。",
+                "details": []
+              },
+              {
+                "text": "骨盆緣上方是腹腔，下方是骨盆腔。若將骨盆想成碗，骨盆緣是碗的上緣，骨盆底是碗底。",
+                "details": []
+              },
+              {
+                "text": "骨盆底（pelvic floor）又稱骨盆隔膜。老師請學生參考講義15-27頁，並強調這是重要考題。",
+                "details": []
+              },
+              {
+                "text": "骨盆隔膜由提肛肌與尾骨肌構成。老師又將提肛肌分成前纖維、中纖維與後纖維。",
+                "details": []
+              }
+            ]
+          },
+          {
+            "id": "ATFBb25QRNw-lecture-009",
+            "chapterId": "ATFBb25QRNw-ch-003",
+            "provenance": "teacher",
+            "title": "胸腔、縱隔腔與肋膜腔內容",
+            "sourceCaptionStart": "cue-00102",
+            "sourceCaptionEnd": "cue-00114",
+            "sourceCaptionCount": 13,
+            "startSec": 672.6,
+            "endSec": 761.6,
+            "type": "bullets",
+            "points": [
+              {
+                "text": "胸腔細節參考講義5-1頁。老師仍以二八法則看待此處，認為這些內容在一般國家考試中屬於應掌握的核心範圍，臺灣考試可能稍偏。",
+                "details": []
+              },
+              {
+                "text": "胸腔大致分為兩部分：正中央是縱隔腔（mediastinum），兩側是肋膜腔（pleural cavity）。肋膜腔內為肺。",
+                "details": []
+              },
+              {
+                "text": "縱隔腔再分上縱隔腔與下縱隔腔。上縱隔腔最重要的器官是胸腺（thymus）。",
+                "details": []
+              },
+              {
+                "text": "下縱隔腔再分前、中、後：前方有脂肪，中間有心臟，後方有食道等構造。",
+                "details": []
+              }
+            ]
+          },
+          {
+            "id": "ATFBb25QRNw-lecture-010",
+            "chapterId": "ATFBb25QRNw-ch-003",
+            "provenance": "teacher",
+            "title": "四肢區域與體腔考點總整理",
+            "sourceCaptionStart": "cue-00115",
+            "sourceCaptionEnd": "cue-00126",
+            "sourceCaptionCount": 12,
+            "startSec": 761.6,
+            "endSec": 843.6,
+            "type": "bullets",
+            "points": [
+              {
+                "text": "上肢分六區：肩部、上臂、手肘、前臂、手腕與手。下肢也分六區：髖部、大腿、膝部、小腿、踝部與足。",
+                "details": []
+              },
+              {
+                "text": "胸腔常考定位：胸腺在上縱隔腔；心臟在下縱隔腔中部；肺臟在肋膜腔。",
+                "details": []
+              },
+              {
+                "text": "胸腔與腹骨盆腔的交界是橫膈膜；腹腔與骨盆腔的交界是骨盆緣。骨盆緣後方是薦岬，前方是恥骨聯合。",
+                "details": []
+              },
+              {
+                "text": "骨盆腔下方為會陰部（perineum），老師表示會陰部大部分是生殖器官相關內容。骨盆腔與會陰部的交界是骨盆隔膜，其重要肌肉為提肛肌與尾骨肌。",
+                "details": []
+              },
+              {
+                "text": "老師請學生接著看1-4頁，十一個系統可參考1-5頁，之後進入人體正常擺位。",
+                "details": []
+              }
+            ]
+          },
+          {
+            "id": "ATFBb25QRNw-lecture-011",
+            "chapterId": "ATFBb25QRNw-ch-004",
+            "provenance": "teacher",
+            "title": "標準解剖學姿勢與三大切面",
+            "sourceCaptionStart": "cue-00127",
+            "sourceCaptionEnd": "cue-00136",
+            "sourceCaptionCount": 10,
+            "startSec": 843.6,
+            "endSec": 911.6,
+            "type": "bullets",
+            "points": [
+              {
+                "text": "標準解剖學姿勢以站立、雙手下垂為基準；手背應朝後、手掌朝前。",
+                "details": []
+              },
+              {
+                "text": "上、下、前、後、左、右等方向術語，都以標準解剖學姿勢為基準。",
+                "details": []
+              },
+              {
+                "text": "矢狀切面可位於正中，也可位於旁側；正中者稱正中矢狀切面，旁側者稱旁矢狀切面。老師以MRI常見矢狀切面為例。",
+                "details": []
+              },
+              {
+                "text": "冠狀切面將人體切成前、後部分。水平或橫切面則是橫向切開；老師以電腦斷層掃描常見橫切面為例。",
+                "details": []
+              }
+            ]
+          },
+          {
+            "id": "ATFBb25QRNw-lecture-012",
+            "chapterId": "ATFBb25QRNw-ch-004",
+            "provenance": "teacher",
+            "title": "屈曲伸展與內收外展",
+            "sourceCaptionStart": "cue-00137",
+            "sourceCaptionEnd": "cue-00148",
+            "sourceCaptionCount": 12,
+            "startSec": 911.6,
+            "endSec": 993.6,
+            "type": "bullets",
+            "points": [
+              {
+                "text": "講義1-6頁的第7至12項基本運動術語都曾考過。",
+                "details": []
+              },
+              {
+                "text": "屈曲有兩個判斷方式：關節角度變小，例如肘關節由180度變成90度、45度；或肢體朝向腹側移動。伸展則與屈曲相反。",
+                "details": []
+              },
+              {
+                "text": "外展（abduction）是離開身體或指定中軸；內收（adduction）是靠近身體或指定中軸。",
+                "details": []
+              },
+              {
+                "text": "手指的內收、外展以第三指為中軸；腳趾的內收、外展以第二趾為中軸。老師提醒這是考點。",
+                "details": []
+              }
+            ]
+          },
+          {
+            "id": "ATFBb25QRNw-lecture-013",
+            "chapterId": "ATFBb25QRNw-ch-004",
+            "provenance": "teacher",
+            "title": "內外旋、旋上旋下與術語辨析",
+            "sourceCaptionStart": "cue-00149",
+            "sourceCaptionEnd": "cue-00162",
+            "sourceCaptionCount": 14,
+            "startSec": 993.6,
+            "endSec": 1085.6,
+            "type": "bullets",
+            "points": [
+              {
+                "text": "內旋（internal rotation）是將腹面轉向內側；外旋（external rotation）是將腹面轉向外側。",
+                "details": []
+              },
+              {
+                "text": "老師先提到內翻（inversion）與外翻（eversion），接著說明旋上與旋下。prone 表示趴著，supine 表示躺著；手術紀錄通常要先記載病人的手術姿勢，例如脊椎手術常採prone，胃腸手術則以躺姿為例。",
+                "details": []
+              },
+              {
+                "text": "掌面向下稱 pronation，老師稱為旋下；掌面向上稱 supination，老師稱為旋上。",
+                "details": []
+              },
+              {
+                "text": "老師認為將 pronation、supination 翻成旋前、旋後，是因誤把pro理解為「前」，並主張應翻成旋下、旋上。這是老師在課堂中的術語觀點。",
+                "details": []
+              }
+            ]
+          },
+          {
+            "id": "ATFBb25QRNw-lecture-014",
+            "chapterId": "ATFBb25QRNw-ch-004",
+            "provenance": "teacher",
+            "title": "內翻外翻、迴旋與考試提醒",
+            "sourceCaptionStart": "cue-00163",
+            "sourceCaptionEnd": "cue-00169",
+            "sourceCaptionCount": 7,
+            "startSec": 1085.6,
+            "endSec": 1134.6,
+            "type": "bullets",
+            "points": [
+              {
+                "text": "以右腳踝為例，內翻包含內收與腳底向上、旋上的動作；老師整理為「內收加旋上就是內翻」，外翻則相反。",
+                "details": []
+              },
+              {
+                "text": "迴旋（circumduction）是屈曲、外展、伸展、內收依序結合的環繞動作。",
+                "details": []
+              },
+              {
+                "text": "講義第7至12項運動都曾考過，其中老師指出第8項與第10項考得最多。",
+                "details": []
+              }
+            ]
+          },
+          {
+            "id": "ATFBb25QRNw-lecture-015",
+            "chapterId": "ATFBb25QRNw-ch-005",
+            "provenance": "teacher",
+            "title": "黃金體表總圖與胸椎腰椎起稿",
+            "sourceCaptionStart": "cue-00170",
+            "sourceCaptionEnd": "cue-00183",
+            "sourceCaptionCount": 14,
+            "startSec": 1134.6,
+            "endSec": 1235.6,
+            "type": "bullets",
+            "points": [
+              {
+                "text": "本章最重要的是講義1-9頁的體表解剖總圖。老師要求學生在考試前與進考場前，都能自己畫出這張圖；雖然花時間，但值得練習。",
+                "details": []
+              },
+              {
+                "text": "先由胸椎高度開始，從T2往下排列，並建立T1至T12的樓層概念。老師反覆提醒T3至T12中多個高度會出題。",
+                "details": []
+              },
+              {
+                "text": "胸椎之後接著畫腰椎L1、L2、L3與L4。",
+                "details": []
+              },
+              {
+                "text": "各節椎體間的高度與比例不要差太多，否則整張圖比例會失真；因相關題目很多，必須自行反覆練習。",
+                "details": []
+              }
+            ]
+          },
+          {
+            "id": "ATFBb25QRNw-lecture-016",
+            "chapterId": "ATFBb25QRNw-ch-005",
+            "provenance": "teacher",
+            "title": "胸腰椎、薦椎與恥骨聯合定位",
+            "sourceCaptionStart": "cue-00184",
+            "sourceCaptionEnd": "cue-00193",
+            "sourceCaptionCount": 10,
+            "startSec": 1235.6,
+            "endSec": 1299.56,
+            "type": "bullets",
+            "points": [
+              {
+                "text": "老師繼續補畫胸椎與腰椎，並再次要求學生自行練習這張樓層圖。",
+                "details": []
+              },
+              {
+                "text": "薦椎可先畫成上方像蝴蝶翅膀、下方逐漸縮成三角形的外觀，依序標示S1、S2、S3、S4與S5。",
+                "details": []
+              },
+              {
+                "text": "薦椎下方再標出恥骨聯合。完成脊柱、薦椎與恥骨聯合後，開始加入重要的水平線與其他骨性標誌。",
+                "details": []
+              }
+            ]
+          },
+          {
+            "id": "ATFBb25QRNw-lecture-017",
+            "chapterId": "ATFBb25QRNw-ch-005",
+            "provenance": "teacher",
+            "title": "胸骨三部分與重要椎體水平線",
+            "sourceCaptionStart": "cue-00194",
+            "sourceCaptionEnd": "cue-00206",
+            "sourceCaptionCount": 13,
+            "startSec": 1299.56,
+            "endSec": 1379.36,
+            "type": "bullets",
+            "points": [
+              {
+                "text": "在體表總圖中加入胸骨。胸骨由胸骨柄、胸骨體與劍突構成。",
+                "details": []
+              },
+              {
+                "text": "老師將胸骨上端放在T2與T3附近，胸骨柄與胸骨體的交界放在T4與T5附近。",
+                "details": []
+              },
+              {
+                "text": "胸骨體與劍突的交界位在T9與T10之間，劍突由此向下畫出。",
+                "details": []
+              },
+              {
+                "text": "接著畫出重要水平線：L3、L4、較次要的L5，以及S2。老師提醒這些高度後續都很重要。",
+                "details": []
+              }
+            ]
+          },
+          {
+            "id": "ATFBb25QRNw-lecture-018",
+            "chapterId": "ATFBb25QRNw-ch-005",
+            "provenance": "teacher",
+            "title": "肋骨與胸椎高度的對應畫法",
+            "sourceCaptionStart": "cue-00207",
+            "sourceCaptionEnd": "cue-00219",
+            "sourceCaptionCount": 13,
+            "startSec": 1379.36,
+            "endSec": 1460.7,
+            "type": "bullets",
+            "points": [
+              {
+                "text": "肋骨由上往下依序畫入體表總圖。第一肋骨R1大約對應T3與T4之間；第二肋骨R2接近T4與T5之間。",
+                "details": []
+              },
+              {
+                "text": "接著依序畫出R3、R4、R5、R6與R7，再接R8、R9與R10。",
+                "details": []
+              },
+              {
+                "text": "第十肋的下緣對到L3。老師反覆要求記住R10與L3的對應。",
+                "details": []
+              },
+              {
+                "text": "實際肋骨形狀可簡化為模型圖，但要保留由後方向前、向上連接的整體走向。",
+                "details": []
+              }
+            ]
+          },
+          {
+            "id": "ATFBb25QRNw-lecture-019",
+            "chapterId": "ATFBb25QRNw-ch-005",
+            "provenance": "teacher",
+            "title": "髂骨、骨盆緣與腹股溝韌帶",
+            "sourceCaptionStart": "cue-00220",
+            "sourceCaptionEnd": "cue-00226",
+            "sourceCaptionCount": 7,
+            "startSec": 1460.7,
+            "endSec": 1506.06,
+            "type": "bullets",
+            "points": [
+              {
+                "text": "在簡圖中加入骨盆緣與髂骨。髂骨由薦椎翅膀向上拉到L4，再沿外形向下至S2附近。",
+                "details": []
+              },
+              {
+                "text": "前方標示恥骨結節與髂前上棘。",
+                "details": []
+              },
+              {
+                "text": "髂前上棘與恥骨結節之間的連線是腹股溝韌帶，老師在圖上反覆標示此位置。",
+                "details": []
+              }
+            ]
+          },
+          {
+            "id": "ATFBb25QRNw-lecture-020",
+            "chapterId": "ATFBb25QRNw-ch-005",
+            "provenance": "teacher",
+            "title": "肚臍、腰身、腹股溝與身體輪廓",
+            "sourceCaptionStart": "cue-00227",
+            "sourceCaptionEnd": "cue-00239",
+            "sourceCaptionCount": 13,
+            "startSec": 1506.06,
+            "endSec": 1591.82,
+            "type": "bullets",
+            "points": [
+              {
+                "text": "肚臍位在L3與L4之間。",
+                "details": []
+              },
+              {
+                "text": "腰身最窄處約在L2。畫身體輪廓時，腰部在此內縮，再隨肋骨向上展開。",
+                "details": []
+              },
+              {
+                "text": "下方沿腹股溝向大腿延伸，左右腹股溝線與大腿輪廓都要納入總圖。",
+                "details": []
+              },
+              {
+                "text": "老師承認黑板圖比例偏短，但要求學生掌握相對位置並反覆練習。完成大方向後，接著對照講義文字逐項核對。",
+                "details": []
+              }
+            ]
+          },
+          {
+            "id": "ATFBb25QRNw-lecture-021",
+            "chapterId": "ATFBb25QRNw-ch-006",
+            "provenance": "teacher",
+            "title": "胸骨上切跡、胸骨角與劍突高度",
+            "sourceCaptionStart": "cue-00240",
+            "sourceCaptionEnd": "cue-00253",
+            "sourceCaptionCount": 14,
+            "startSec": 1591.82,
+            "endSec": 1679.98,
+            "type": "bullets",
+            "points": [
+              {
+                "text": "講義1-9頁前三個體表標誌依序為胸骨上切跡、胸骨角，以及胸骨體與劍突的交界。",
+                "details": []
+              },
+              {
+                "text": "胸骨上切跡位於T3上緣，也可描述為T2與T3椎間盤附近；若只能選一個椎體，老師多以T3回答。",
+                "details": []
+              },
+              {
+                "text": "胸骨角是胸骨柄與胸骨體形成的交角，位於T4下緣，或T4與T5椎間盤；若只能選一個椎體，老師多以T4回答。",
+                "details": []
+              },
+              {
+                "text": "胸骨體與劍突的交界位於T9與T10之間，也可答T9下緣；若只能選一個椎體，老師多以T9回答。",
+                "details": []
+              },
+              {
+                "text": "老師請學生轉看14-22頁的胸骨圖，進一步核對胸骨構造與歷屆考題。",
+                "details": []
+              }
+            ]
+          },
+          {
+            "id": "ATFBb25QRNw-lecture-022",
+            "chapterId": "ATFBb25QRNw-ch-006",
+            "provenance": "teacher",
+            "title": "胸骨柄、胸骨體、劍突與肋骨連接",
+            "sourceCaptionStart": "cue-00254",
+            "sourceCaptionEnd": "cue-00267",
+            "sourceCaptionCount": 14,
+            "startSec": 1679.98,
+            "endSec": 1775.98,
+            "type": "bullets",
+            "points": [
+              {
+                "text": "胸骨英文為sternum；胸骨柄為manubrium，胸骨體為body，劍突為xiphoid process。",
+                "details": []
+              },
+              {
+                "text": "胸骨柄與鎖骨、第一肋及第二肋相接；第二肋位於胸骨柄與胸骨體的交界，因此同時與兩者相關。老師以圖指出胸骨柄高度約在T3至T4。",
+                "details": []
+              },
+              {
+                "text": "胸骨體與第二至第七肋相接；第二肋位於柄體交界，第七肋位於胸骨體與劍突交界。胸骨體高度約自T5到T9。",
+                "details": []
+              },
+              {
+                "text": "劍突與第七肋相接，位於T9與T10交界，老師也以T10左右描述其高度。",
+                "details": []
+              }
+            ]
+          },
+          {
+            "id": "ATFBb25QRNw-lecture-023",
+            "chapterId": "ATFBb25QRNw-ch-006",
+            "provenance": "teacher",
+            "title": "胸骨角、縱隔分界與氣管分叉",
+            "sourceCaptionStart": "cue-00268",
+            "sourceCaptionEnd": "cue-00276",
+            "sourceCaptionCount": 9,
+            "startSec": 1775.98,
+            "endSec": 1836.98,
+            "type": "bullets",
+            "points": [
+              {
+                "text": "胸骨角是胸骨柄與胸骨體的交界，旁邊接第二肋，約位於T4下緣或T4與T5交界。",
+                "details": []
+              },
+              {
+                "text": "胸骨角也是上、下縱隔腔的分界。胸骨角上方是上縱隔腔，內有胸腺；下方是下縱隔腔，前方有脂肪、中間有心臟、後方有食道。",
+                "details": []
+              },
+              {
+                "text": "氣管分成左右支氣管的分叉高度，也位於胸骨角這條水平線。",
+                "details": []
+              }
+            ]
+          },
+          {
+            "id": "ATFBb25QRNw-lecture-024",
+            "chapterId": "ATFBb25QRNw-ch-006",
+            "provenance": "teacher",
+            "title": "真肋、假肋與浮肋",
+            "sourceCaptionStart": "cue-00277",
+            "sourceCaptionEnd": "cue-00283",
+            "sourceCaptionCount": 7,
+            "startSec": 1836.98,
+            "endSec": 1881.98,
+            "type": "bullets",
+            "points": [
+              {
+                "text": "肋骨共有12對。第1至第7對直接與胸骨相接，稱為真肋。",
+                "details": []
+              },
+              {
+                "text": "第1、2肋與胸骨柄相接；第2至第7肋與胸骨體相接。",
+                "details": []
+              },
+              {
+                "text": "沒有直接與胸骨相接者稱為假肋。第8、9、10肋各接在上一根肋骨：8接7、9接8、10接9。",
+                "details": []
+              },
+              {
+                "text": "第11、12肋後方與胸椎相接，前方懸浮，稱為浮肋。老師提醒這些都是歷屆考題。",
+                "details": []
+              }
+            ]
+          },
+          {
+            "id": "ATFBb25QRNw-lecture-025",
+            "chapterId": "ATFBb25QRNw-ch-007",
+            "provenance": "teacher",
+            "title": "跨幽門平面、幽門與胰頸",
+            "sourceCaptionStart": "cue-00284",
+            "sourceCaptionEnd": "cue-00297",
+            "sourceCaptionCount": 14,
+            "startSec": 1881.98,
+            "endSec": 1974.98,
+            "type": "bullets",
+            "points": [
+              {
+                "text": "接著的重要水平線是L1與L2交界，可描述為L1下緣或L1、L2椎間盤，稱為跨幽門橫線。",
+                "details": []
+              },
+              {
+                "text": "幽門是胃與十二指腸的交界，其高度正位於L1下緣或L1、L2交界。",
+                "details": []
+              },
+              {
+                "text": "胰臟分為胰頭、胰體與胰尾。胰頭與胰體的交界稱為胰頸（neck），胰頸也位於跨幽門平面。",
+                "details": []
+              },
+              {
+                "text": "老師在圖中同時畫出T12至L3範圍的左右腎臟，作為後續腎門定位的基礎。",
+                "details": []
+              }
+            ]
+          },
+          {
+            "id": "ATFBb25QRNw-lecture-026",
+            "chapterId": "ATFBb25QRNw-ch-007",
+            "provenance": "teacher",
+            "title": "腎門、脾彎曲與L1考點總結",
+            "sourceCaptionStart": "cue-00298",
+            "sourceCaptionEnd": "cue-00311",
+            "sourceCaptionCount": 14,
+            "startSec": 1974.98,
+            "endSec": 2067.98,
+            "type": "bullets",
+            "points": [
+              {
+                "text": "腎臟約由T12延伸至L3；血管與輸尿管進出的中間部位稱為腎門（hilum），左右腎門都位於跨幽門平面。",
+                "details": []
+              },
+              {
+                "text": "大腸由橫結腸轉為降結腸的彎曲稱為結腸脾彎曲。",
+                "details": []
+              },
+              {
+                "text": "老師整理L1或跨幽門平面的重要構造：幽門、腎門、胰頸，以及橫結腸轉為降結腸的脾彎曲。",
+                "details": []
+              },
+              {
+                "text": "跨幽門平面約位於胸骨上切跡至恥骨聯合連線的中點。老師特別提醒中點不是肚臍，並承認先前圖的比例未畫得完全準確。",
+                "details": []
+              }
+            ]
+          },
+          {
+            "id": "ATFBb25QRNw-lecture-027",
+            "chapterId": "ATFBb25QRNw-ch-008",
+            "provenance": "teacher",
+            "title": "第十肋下緣、肚臍與髂脊定義",
+            "sourceCaptionStart": "cue-00312",
+            "sourceCaptionEnd": "cue-00324",
+            "sourceCaptionCount": 13,
+            "startSec": 2067.98,
+            "endSec": 2156.98,
+            "type": "bullets",
+            "points": [
+              {
+                "text": "肋骨最下緣位於L3，且由第十肋R10形成。老師要求同時記住「R10」與「L3」。",
+                "details": []
+              },
+              {
+                "text": "肚臍位於L3與L4交界，即L3、L4椎間盤附近。",
+                "details": []
+              },
+              {
+                "text": "髂骨與薦椎交界形成薦髂關節；由薦髂關節附近沿髂骨上緣至髂前上棘的範圍，稱為髂脊（iliac crest）。",
+                "details": []
+              },
+              {
+                "text": "髂脊不是單一點，而是一段骨性範圍。",
+                "details": []
+              }
+            ]
+          },
+          {
+            "id": "ATFBb25QRNw-lecture-028",
+            "chapterId": "ATFBb25QRNw-ch-008",
+            "provenance": "teacher",
+            "title": "L4髂脊最高點、腹主動脈分叉與L5髂結節線",
+            "sourceCaptionStart": "cue-00325",
+            "sourceCaptionEnd": "cue-00337",
+            "sourceCaptionCount": 13,
+            "startSec": 2156.98,
+            "endSec": 2243.98,
+            "type": "bullets",
+            "points": [
+              {
+                "text": "髂脊最高點位於L4。以體表觸摸時，摸到髂脊最高處即對應L4；其位置與肚臍接近，但老師表示肚臍略低。",
+                "details": []
+              },
+              {
+                "text": "腹主動脈在L4分成左右總髂動脈。老師同時複習氣管在T4、T5交界附近分成支氣管。",
+                "details": []
+              },
+              {
+                "text": "髂結節（iliac tubercle）是髂脊外側突起的構造。左右髂結節間的連線稱intertubercular line，位於L5。",
+                "details": []
+              },
+              {
+                "text": "接著開始定位髂前上棘。",
+                "details": []
+              }
+            ]
+          },
+          {
+            "id": "ATFBb25QRNw-lecture-029",
+            "chapterId": "ATFBb25QRNw-ch-008",
+            "provenance": "teacher",
+            "title": "髂前上棘、S2連線與腹股溝韌帶",
+            "sourceCaptionStart": "cue-00338",
+            "sourceCaptionEnd": "cue-00347",
+            "sourceCaptionCount": 10,
+            "startSec": 2243.98,
+            "endSec": 2307.98,
+            "type": "bullets",
+            "points": [
+              {
+                "text": "觸摸髂前上棘時，可由後方向前沿髂脊摸，摸到最前方、骨頭將向下轉折的位置。",
+                "details": []
+              },
+              {
+                "text": "左右髂前上棘的連線位於S2。",
+                "details": []
+              },
+              {
+                "text": "第9點是髂前上棘，第10點是恥骨結節；兩者之間的連線稱腹股溝韌帶（inguinal ligament），老師也稱鼠蹊韌帶。",
+                "details": []
+              },
+              {
+                "text": "若對位置有疑問，可參考講義15-22頁。",
+                "details": []
+              }
+            ]
+          },
+          {
+            "id": "ATFBb25QRNw-lecture-030",
+            "chapterId": "ATFBb25QRNw-ch-008",
+            "provenance": "teacher",
+            "title": "Poupart韌帶與體表解剖考試提醒",
+            "sourceCaptionStart": "cue-00348",
+            "sourceCaptionEnd": "cue-00355",
+            "sourceCaptionCount": 8,
+            "startSec": 2307.98,
+            "endSec": 2362.98,
+            "type": "bullets",
+            "points": [
+              {
+                "text": "講義15-22頁的體表解剖題目很多，老師表示幾乎每年會考一題。",
+                "details": []
+              },
+              {
+                "text": "腹股溝韌帶（inguinal ligament）又稱Poupart ligament，範圍由髂前上棘至恥骨結節。",
+                "details": []
+              },
+              {
+                "text": "腹股溝的上緣是髂前上棘，下緣是恥骨結節。老師要求將前述第1至第10項體表標誌記熟。",
+                "details": []
+              },
+              {
+                "text": "接著轉入乳頭位置。",
+                "details": []
+              }
+            ]
+          },
+          {
+            "id": "ATFBb25QRNw-lecture-031",
+            "chapterId": "ATFBb25QRNw-ch-009",
+            "provenance": "teacher",
+            "title": "乳頭、心尖搏動與肩胛骨起稿",
+            "sourceCaptionStart": "cue-00356",
+            "sourceCaptionEnd": "cue-00369",
+            "sourceCaptionCount": 14,
+            "startSec": 2362.98,
+            "endSec": 2456.98,
+            "type": "bullets",
+            "points": [
+              {
+                "text": "乳頭（nipple）位於第四肋間。第四肋間在第四肋骨下方，也就是第四、第五肋骨之間；第一肋骨上方沒有肋間，因此第一肋間是在第一肋骨下方，後續依此類推。",
+                "details": []
+              },
+              {
+                "text": "心臟最大搏動點位於心尖（apex），其體表位置是第五肋間，即第五、六肋骨之間。",
+                "details": []
+              },
+              {
+                "text": "接著畫肩胛骨（scapula），先建立T2、T3與T7等高度。肩胛骨位於背面，背面可見肩胛脊。",
+                "details": []
+              },
+              {
+                "text": "老師提醒肩胛骨圖要多畫幾次。",
+                "details": []
+              }
+            ]
+          },
+          {
+            "id": "ATFBb25QRNw-lecture-032",
+            "chapterId": "ATFBb25QRNw-ch-009",
+            "provenance": "teacher",
+            "title": "肩胛骨模型、肩胛脊與四個標誌",
+            "sourceCaptionStart": "cue-00370",
+            "sourceCaptionEnd": "cue-00382",
+            "sourceCaptionCount": 13,
+            "startSec": 2456.98,
+            "endSec": 2541.98,
+            "type": "bullets",
+            "points": [
+              {
+                "text": "肩胛骨可簡化成三角形骨頭，參考講義14-23頁。",
+                "details": []
+              },
+              {
+                "text": "肩胛骨背面有向後突出的肩胛脊，老師以板擦與麥克風模擬其立體外形。",
+                "details": []
+              },
+              {
+                "text": "要辨認四個標誌：肩胛骨上角、肩胛骨下角、肩胛脊外側端的肩峰，以及肩胛脊內側端的肩胛根（root）。",
+                "details": []
+              },
+              {
+                "text": "老師表示這四個點曾多次出題。",
+                "details": []
+              }
+            ]
+          },
+          {
+            "id": "ATFBb25QRNw-lecture-033",
+            "chapterId": "ATFBb25QRNw-ch-009",
+            "provenance": "teacher",
+            "title": "肩胛骨三角模型與上角、下角、肩峰高度",
+            "sourceCaptionStart": "cue-00383",
+            "sourceCaptionEnd": "cue-00390",
+            "sourceCaptionCount": 8,
+            "startSec": 2541.98,
+            "endSec": 2598.98,
+            "type": "bullets",
+            "points": [
+              {
+                "text": "老師請學生看14-23頁倒數第六行，並再次將肩胛骨模型化成近似30度、60度、90度的三角形。",
+                "details": []
+              },
+              {
+                "text": "模型中背面的突起是肩胛脊。",
+                "details": []
+              },
+              {
+                "text": "肩胛骨上角位於T2；下角位於T7。",
+                "details": []
+              },
+              {
+                "text": "肩峰（acromion）也位於T2。",
+                "details": []
+              }
+            ]
+          },
+          {
+            "id": "ATFBb25QRNw-lecture-034",
+            "chapterId": "ATFBb25QRNw-ch-009",
+            "provenance": "teacher",
+            "title": "肩胛根高度與肩胛骨體表定位總結",
+            "sourceCaptionStart": "cue-00391",
+            "sourceCaptionEnd": "cue-00398",
+            "sourceCaptionCount": 8,
+            "startSec": 2598.98,
+            "endSec": 2652.98,
+            "type": "bullets",
+            "points": [
+              {
+                "text": "肩胛脊的內側端稱為肩胛根（scapular root），位於T3。",
+                "details": []
+              },
+              {
+                "text": "肩胛骨整體高度由T2延伸至T7；四個重點為上角T2、下角T7、肩峰T2與肩胛根T3。",
+                "details": []
+              },
+              {
+                "text": "老師提醒這類考古題的重點在記憶，四個位置都要記住。",
+                "details": []
+              },
+              {
+                "text": "老師表示1-9頁的surface anatomy幾乎每年都會考一題，雖然不容易記，仍須掌握。接著進入腎臟定位。",
+                "details": []
+              }
+            ]
+          },
+          {
+            "id": "ATFBb25QRNw-lecture-035",
+            "chapterId": "ATFBb25QRNw-ch-010",
+            "provenance": "teacher",
+            "title": "腎臟與咽喉、氣管、食道、胃的總圖",
+            "sourceCaptionStart": "cue-00399",
+            "sourceCaptionEnd": "cue-00412",
+            "sourceCaptionCount": 14,
+            "startSec": 2652.98,
+            "endSec": 2747.98,
+            "type": "bullets",
+            "points": [
+              {
+                "text": "腎臟高度約由T12到L3。腎臟中間血管與輸尿管進出的部位稱為腎門，腎門位於L1、L2交界的跨幽門平面。",
+                "details": []
+              },
+              {
+                "text": "第二張總圖由鼻部開始，依序畫出咽、喉、氣管與支氣管。",
+                "details": []
+              },
+              {
+                "text": "老師用燕尾服比喻咽的外形：前方較高，後方較低。",
+                "details": []
+              },
+              {
+                "text": "咽向下接食道，食道再接胃，胃後續接十二指腸。完成圖後，再以椎體水平線定位各構造。",
+                "details": []
+              }
+            ]
+          },
+          {
+            "id": "ATFBb25QRNw-lecture-036",
+            "chapterId": "ATFBb25QRNw-ch-010",
+            "provenance": "teacher",
+            "title": "喉、氣管、食道與胃的椎體高度",
+            "sourceCaptionStart": "cue-00413",
+            "sourceCaptionEnd": "cue-00426",
+            "sourceCaptionCount": 14,
+            "startSec": 2747.98,
+            "endSec": 2841.98,
+            "type": "bullets",
+            "points": [
+              {
+                "text": "總圖的重要水平線包括C4、C6、T4與T5交界、T10，以及L1與L2交界。",
+                "details": []
+              },
+              {
+                "text": "喉的高度為C4到C6。",
+                "details": []
+              },
+              {
+                "text": "氣管由C6延伸至T4、T5交界；末端也可答T4下緣或T5上緣。",
+                "details": []
+              },
+              {
+                "text": "食道由C6延伸至T10。",
+                "details": []
+              },
+              {
+                "text": "胃由賁門到幽門。賁門位於T10，英文為cardia；幽門位於L1、L2交界，英文為pylorus。",
+                "details": []
+              }
+            ]
+          },
+          {
+            "id": "ATFBb25QRNw-lecture-037",
+            "chapterId": "ATFBb25QRNw-ch-010",
+            "provenance": "teacher",
+            "title": "賁門幽門、脊髓末端、腦膜與乳糜池",
+            "sourceCaptionStart": "cue-00427",
+            "sourceCaptionEnd": "cue-00440",
+            "sourceCaptionCount": 14,
+            "startSec": 2841.98,
+            "endSec": 2938.98,
+            "type": "bullets",
+            "points": [
+              {
+                "text": "賁門（cardia）高度為T10；幽門高度為L1。老師提醒這一區幾乎每年必考一題。",
+                "details": []
+              },
+              {
+                "text": "腦與脊髓的下緣，以及脊髓末端、軟腦膜下界，位於L1、L2交界；因此答L1或L2都可理解為這條交界線。",
+                "details": []
+              },
+              {
+                "text": "蜘蛛膜下腔與硬腦膜向下到S2。",
+                "details": []
+              },
+              {
+                "text": "乳糜池是老師所稱全身最大的淋巴池，也位於L1、L2交界。",
+                "details": []
+              },
+              {
+                "text": "最後開始定位直腸，其位置朝薦椎與尾椎方向延伸。",
+                "details": []
+              }
+            ]
+          },
+          {
+            "id": "ATFBb25QRNw-lecture-038",
+            "chapterId": "ATFBb25QRNw-ch-010",
+            "provenance": "teacher",
+            "title": "直腸、McBurney點與髂脊",
+            "sourceCaptionStart": "cue-00441",
+            "sourceCaptionEnd": "cue-00454",
+            "sourceCaptionCount": 14,
+            "startSec": 2938.98,
+            "endSec": 3033.98,
+            "type": "bullets",
+            "points": [
+              {
+                "text": "直腸由S3延伸至尾椎。",
+                "details": []
+              },
+              {
+                "text": "McBurney point與闌尾位置相關。定位方式是連接肚臍與髂前上棘，取三等份後的外側三分之一點。",
+                "details": []
+              },
+              {
+                "text": "髂脊（iliac crest）是髂骨上緣，由薦髂關節附近連至髂前上棘；其最高點位於L4。",
+                "details": []
+              }
+            ]
+          },
+          {
+            "id": "ATFBb25QRNw-lecture-039",
+            "chapterId": "ATFBb25QRNw-ch-010",
+            "provenance": "teacher",
+            "title": "髂脊終點與體表觸摸方式",
+            "sourceCaptionStart": "cue-00455",
+            "sourceCaptionEnd": "cue-00459",
+            "sourceCaptionCount": 5,
+            "startSec": 3033.98,
+            "endSec": 3067.98,
+            "type": "bullets",
+            "points": [
+              {
+                "text": "髂脊的前方終點是髂前上棘。",
+                "details": []
+              },
+              {
+                "text": "體表觸摸時，沿髂脊摸至最高點，再往前會感覺骨頭開始垂直向下並內縮。",
+                "details": []
+              },
+              {
+                "text": "老師再次強調整張體表解剖圖的重要性，完成此段後結束第一章主要內容。",
+                "details": []
+              }
+            ]
+          },
+          {
+            "id": "ATFBb25QRNw-lecture-040",
+            "chapterId": "ATFBb25QRNw-ch-011",
+            "provenance": "teacher",
+            "title": "組織化學染色：肝糖、類澱粉、鐵、纖維與脂肪",
+            "sourceCaptionStart": "cue-00460",
+            "sourceCaptionEnd": "cue-00473",
+            "sourceCaptionCount": 14,
+            "startSec": 3067.98,
+            "endSec": 3160.98,
+            "type": "bullets",
+            "points": [
+              {
+                "text": "老師原準備進入第14章，但先補充第一章最後常考的染色題，參考1-10頁與第11頁。",
+                "details": []
+              },
+              {
+                "text": "肝糖用PAS、過碘酸相關染色，老師說染成紫紅色。",
+                "details": []
+              },
+              {
+                "text": "類澱粉用Congo red染色，老師在課堂中說呈綠色。鐵使用普魯士藍染色。",
+                "details": []
+              },
+              {
+                "text": "人體三大纖維為網狀纖維、彈性纖維與膠原纖維。網狀纖維以銀染色，呈黑色。",
+                "details": []
+              },
+              {
+                "text": "彈性纖維用resorcin-fuchsin；老師將resorcin解釋為間苯二酚、fuchsin解釋為紫色，並說染成紫色。",
+                "details": []
+              },
+              {
+                "text": "膠原纖維可用Van Gieson染成紅色，或用Masson trichrome染成藍色。老師將trichrome解釋為三種色素。",
+                "details": []
+              },
+              {
+                "text": "脂肪可用Sudan Black、Sudan IV或Oil Red O；老師說這些脂肪染色呈紅色。",
+                "details": []
+              }
+            ]
+          },
+          {
+            "id": "ATFBb25QRNw-lecture-041",
+            "chapterId": "ATFBb25QRNw-ch-011",
+            "provenance": "teacher",
+            "title": "黏液蛋白染色與第一章重點收束",
+            "sourceCaptionStart": "cue-00474",
+            "sourceCaptionEnd": "cue-00480",
+            "sourceCaptionCount": 7,
+            "startSec": 3160.98,
+            "endSec": 3209.98,
+            "type": "bullets",
+            "points": [
+              {
+                "text": "胃與呼吸道會產生黏液；黏液蛋白mucin可用mucicarmine染色，老師說呈紅色。",
+                "details": []
+              },
+              {
+                "text": "上述染色都是常考內容，需要背熟。",
+                "details": []
+              },
+              {
+                "text": "第一章最重要的仍是1-9頁的兩張體表圖；老師要求學生反覆畫，認為掌握後即可拿下相關考題。",
+                "details": []
+              },
+              {
+                "text": "接著轉入第14章，參考14-9頁。",
+                "details": []
+              }
+            ]
+          },
+          {
+            "id": "ATFBb25QRNw-lecture-042",
+            "chapterId": "ATFBb25QRNw-ch-012",
+            "provenance": "teacher",
+            "title": "206塊骨頭、中軸骨與肩帶骨盆帶",
+            "sourceCaptionStart": "cue-00481",
+            "sourceCaptionEnd": "cue-00493",
+            "sourceCaptionCount": 13,
+            "startSec": 3209.98,
+            "endSec": 3300.98,
+            "type": "bullets",
+            "points": [
+              {
+                "text": "人體共有206塊骨頭，分為中軸骨與附屬骨。老師補充組織學題目較容易掌握，可達八、九成以上；大體解剖把重要內容記住，約可落在50%至80%。",
+                "details": []
+              },
+              {
+                "text": "中軸骨位於中線，包括頭骨、脊椎骨、胸骨與肋骨。",
+                "details": []
+              },
+              {
+                "text": "容易漏掉的中軸骨還包括聽小骨與舌骨。三塊聽小骨左右各一組，共六塊；舌骨是老師所稱全身唯一沒有任何鄰接骨的骨頭。",
+                "details": []
+              },
+              {
+                "text": "附屬骨包括上肢與下肢，也包括肩帶與骨盆帶。肩帶將上肢固定到中軸骨，由鎖骨與肩胛骨構成。",
+                "details": []
+              },
+              {
+                "text": "骨盆帶將下肢固定到中軸骨，由髖骨構成；髖骨是三合一構造。",
+                "details": []
+              }
+            ]
+          },
+          {
+            "id": "ATFBb25QRNw-lecture-043",
+            "chapterId": "ATFBb25QRNw-ch-012",
+            "provenance": "teacher",
+            "title": "髖骨、附屬骨與最大最小骨",
+            "sourceCaptionStart": "cue-00494",
+            "sourceCaptionEnd": "cue-00499",
+            "sourceCaptionCount": 6,
+            "startSec": 3300.98,
+            "endSec": 3340.98,
+            "type": "bullets",
+            "points": [
+              {
+                "text": "髖骨由髂骨、坐骨與恥骨合成。老師表示在206塊骨頭的計數中，不會將髂骨單獨計為一塊，而是以三者合成的hip bone、髖骨計算。",
+                "details": []
+              },
+              {
+                "text": "肩帶與骨盆帶屬於附屬骨；聽小骨與舌骨屬於中軸骨，這些是老師提醒容易被刁的分類。",
+                "details": []
+              },
+              {
+                "text": "全身最大的骨頭是股骨；最小的骨頭是聽小骨中的鐙骨；唯一沒有鄰接骨的是舌骨。",
+                "details": []
+              }
+            ]
+          },
+          {
+            "id": "ATFBb25QRNw-lecture-044",
+            "chapterId": "ATFBb25QRNw-ch-013",
+            "provenance": "teacher",
+            "title": "頭骨、顱骨與顏面骨的關係",
+            "sourceCaptionStart": "cue-00500",
+            "sourceCaptionEnd": "cue-00513",
+            "sourceCaptionCount": 14,
+            "startSec": 3340.98,
+            "endSec": 3418.98,
+            "type": "bullets",
+            "points": [
+              {
+                "text": "頭部骨骼先分成顱骨與顏面骨。顱骨包覆腦，顏面骨構成臉部；兩者合稱頭骨。",
+                "details": []
+              },
+              {
+                "text": "老師引用講義14-9頁，說明head包含skull與facial bone；課堂接下來先介紹skull，也就是老師此處所稱顱骨。",
+                "details": []
+              },
+              {
+                "text": "老師先用前顱窩、中顱窩與後顱窩的輪廓建立顱骨簡圖。",
+                "details": []
+              },
+              {
+                "text": "顱骨上視圖是本段需要快速建立並熟練的簡圖。",
+                "details": []
+              }
+            ]
+          },
+          {
+            "id": "ATFBb25QRNw-lecture-045",
+            "chapterId": "ATFBb25QRNw-ch-013",
+            "provenance": "teacher",
+            "title": "顱骨上視圖與成對、不成對骨",
+            "sourceCaptionStart": "cue-00514",
+            "sourceCaptionEnd": "cue-00527",
+            "sourceCaptionCount": 14,
+            "startSec": 3420.98,
+            "endSec": 3517.98,
+            "type": "bullets",
+            "points": [
+              {
+                "text": "畫顱骨上視圖時，先建立中線、鼻子與鼻骨，再依位置填入各骨。",
+                "details": []
+              },
+              {
+                "text": "額骨為frontal bone，頂骨為parietal bone，顳骨為temporal bone，枕骨為occipital bone，蝶骨為sphenoid。老師以蝴蝶形比喻蝶骨。",
+                "details": []
+              },
+              {
+                "text": "此圖是從頭頂往下看的視角，鼻子位於圖的前方；老師也用自己躺下、學生由頭頂方向觀看作說明。",
+                "details": []
+              },
+              {
+                "text": "顱骨原則上多為單一、不成對，例如額骨、枕骨、蝶骨與篩骨。成對者只有頂骨與顳骨，這是考點。",
+                "details": []
+              }
+            ]
+          },
+          {
+            "id": "ATFBb25QRNw-lecture-046",
+            "chapterId": "ATFBb25QRNw-ch-013",
+            "provenance": "teacher",
+            "title": "蝶骨辨認、鼻根點、前囟點、翼點與星點",
+            "sourceCaptionStart": "cue-00528",
+            "sourceCaptionEnd": "cue-00541",
+            "sourceCaptionCount": 14,
+            "startSec": 3517.98,
+            "endSec": 3612.98,
+            "type": "bullets",
+            "points": [
+              {
+                "text": "蝶骨雖有左右兩個翅膀，但整體仍是一塊骨；成對的顱骨只有頂骨與顳骨。",
+                "details": []
+              },
+              {
+                "text": "鼻骨與額骨交界稱Nasion，即鼻根點。",
+                "details": []
+              },
+              {
+                "text": "額骨與頂骨交界稱Bregma，即前囟點。",
+                "details": []
+              },
+              {
+                "text": "額骨、頂骨、顳骨與蝶骨四塊骨頭的交界稱Pterion，即翼點。老師以蝶骨翅膀幫助記憶。",
+                "details": []
+              },
+              {
+                "text": "頂骨、顳骨與枕骨三塊骨頭的交界稱Asterion，即星點；老師以aster、star說明其名稱。",
+                "details": []
+              }
+            ]
+          },
+          {
+            "id": "ATFBb25QRNw-lecture-047",
+            "chapterId": "ATFBb25QRNw-ch-013",
+            "provenance": "teacher",
+            "title": "人字點、枕骨點與眉間點",
+            "sourceCaptionStart": "cue-00542",
+            "sourceCaptionEnd": "cue-00549",
+            "sourceCaptionCount": 8,
+            "startSec": 3612.98,
+            "endSec": 3666.98,
+            "type": "bullets",
+            "points": [
+              {
+                "text": "Lambda稱為人字點。",
+                "details": []
+              },
+              {
+                "text": "枕骨最後方的點稱Inion，即枕骨點。",
+                "details": []
+              },
+              {
+                "text": "兩眉之間、俗稱印堂的位置稱Glabella，即眉間點。",
+                "details": []
+              },
+              {
+                "text": "老師要求將Nasion、Bregma、Pterion、Asterion、Lambda、Inion與Glabella等顱表標誌記熟。",
+                "details": []
+              }
+            ]
+          },
+          {
+            "id": "ATFBb25QRNw-lecture-048",
+            "chapterId": "ATFBb25QRNw-ch-013",
+            "provenance": "teacher",
+            "title": "翼點、中腦膜動脈與硬腦膜上腔出血",
+            "sourceCaptionStart": "cue-00550",
+            "sourceCaptionEnd": "cue-00557",
+            "sourceCaptionCount": 8,
+            "startSec": 3666.98,
+            "endSec": 3720.98,
+            "type": "bullets",
+            "points": [
+              {
+                "text": "翼點Pterion是重要題組。第一項要記住它由額骨、頂骨、顳骨與蝶骨交會形成。",
+                "details": []
+              },
+              {
+                "text": "翼點下方有中腦膜動脈。",
+                "details": []
+              },
+              {
+                "text": "中腦膜動脈破裂可造成硬腦膜上腔出血。老師以頭部外傷、車禍撞擊為例，說明翼點容易受傷並導致中腦膜動脈破裂。",
+                "details": []
+              },
+              {
+                "text": "接著進入14-10頁的顱縫。",
+                "details": []
+              }
+            ]
+          },
+          {
+            "id": "ATFBb25QRNw-lecture-049",
+            "chapterId": "ATFBb25QRNw-ch-014",
+            "provenance": "teacher",
+            "title": "四大顱縫與顱縫早閉概念",
+            "sourceCaptionStart": "cue-00558",
+            "sourceCaptionEnd": "cue-00570",
+            "sourceCaptionCount": 13,
+            "startSec": 3724.98,
+            "endSec": 3809.98,
+            "type": "bullets",
+            "points": [
+              {
+                "text": "骨頭與骨頭的交界稱為骨縫（suture）。",
+                "details": []
+              },
+              {
+                "text": "矢狀縫像弓箭方向的直線；冠狀縫像皇冠，位於額骨與頂骨之間。",
+                "details": []
+              },
+              {
+                "text": "人字縫（lambdoid suture）位於頂骨與枕骨之間。鱗狀縫位於頂骨與顳骨之間。",
+                "details": []
+              },
+              {
+                "text": "老師要求以幾張簡圖記住四個骨縫。",
+                "details": []
+              },
+              {
+                "text": "骨縫過早閉合後，該方向不能繼續正常生長，頭顱會沿可生長方向代償延伸。",
+                "details": []
+              },
+              {
+                "text": "老師詢問最常發生早閉的顱縫，接著進入矢狀縫與冠狀縫的比較。",
+                "details": []
+              }
+            ]
+          },
+          {
+            "id": "ATFBb25QRNw-lecture-050",
+            "chapterId": "ATFBb25QRNw-ch-014",
+            "provenance": "teacher",
+            "title": "顱縫早閉比例、舟狀頭與尖狀頭",
+            "sourceCaptionStart": "cue-00571",
+            "sourceCaptionEnd": "cue-00581",
+            "sourceCaptionCount": 11,
+            "startSec": 3809.98,
+            "endSec": 3883.98,
+            "type": "bullets",
+            "points": [
+              {
+                "text": "矢狀縫早閉最常見，老師說約佔60%；冠狀縫早閉第二常見，約佔30%。",
+                "details": []
+              },
+              {
+                "text": "矢狀縫過早閉合後，側向生長受限，頭顱改以前後方向延長，外觀像船形帽，稱船狀頭或舟狀頭。",
+                "details": []
+              },
+              {
+                "text": "老師以scapho表示船、cephaly表示頭，將scaphocephaly解釋為舟狀頭，並對應矢狀縫早閉。",
+                "details": []
+              },
+              {
+                "text": "冠狀縫早閉後，老師描述頭顱向上變尖，稱turricephaly；turri被老師解釋為尖。",
+                "details": []
+              },
+              {
+                "text": "這些都是考古題，之後轉入囟門。",
+                "details": []
+              }
+            ]
+          },
+          {
+            "id": "ATFBb25QRNw-lecture-051",
+            "chapterId": "ATFBb25QRNw-ch-015",
+            "provenance": "teacher",
+            "title": "囟門功能、位置與前囟閉合後標誌",
+            "sourceCaptionStart": "cue-00582",
+            "sourceCaptionEnd": "cue-00591",
+            "sourceCaptionCount": 10,
+            "startSec": 3883.98,
+            "endSec": 3949.98,
+            "type": "bullets",
+            "points": [
+              {
+                "text": "新生兒共有六個囟門。頭骨屬膜狀骨化，出生時保留未閉合空間，使頭部能在通過產道時稍微受壓，也為腦比骨頭更快的發育保留空間。",
+                "details": []
+              },
+              {
+                "text": "前囟位於額骨與頂骨之間，也位於矢狀縫與冠狀縫交會處。",
+                "details": []
+              },
+              {
+                "text": "後囟位於頂骨與枕骨之間，也位於矢狀縫與人字縫交會處。",
+                "details": []
+              },
+              {
+                "text": "另有前外側囟與後外側囟。",
+                "details": []
+              },
+              {
+                "text": "前囟癒合後形成Bregma，即前囟點。",
+                "details": []
+              }
+            ]
+          },
+          {
+            "id": "ATFBb25QRNw-lecture-052",
+            "chapterId": "ATFBb25QRNw-ch-015",
+            "provenance": "teacher",
+            "title": "後囟與外側囟閉合後標誌",
+            "sourceCaptionStart": "cue-00592",
+            "sourceCaptionEnd": "cue-00600",
+            "sourceCaptionCount": 9,
+            "startSec": 3949.98,
+            "endSec": 4009.98,
+            "type": "bullets",
+            "points": [
+              {
+                "text": "後囟癒合後形成Lambda，即人字點。",
+                "details": []
+              },
+              {
+                "text": "前外側囟癒合後形成Pterion，即翼點。",
+                "details": []
+              },
+              {
+                "text": "後外側囟癒合後形成Asterion，即星點。",
+                "details": []
+              },
+              {
+                "text": "囟門在新生兒時尚未完全骨化，觸摸時較軟；最終會逐漸骨化、癒合，並形成上述顱表標誌。",
+                "details": []
+              },
+              {
+                "text": "老師再次總結：前囟對應Bregma、後囟對應Lambda、前外側囟對應Pterion、後外側囟對應Asterion，接著進入閉合時間。",
+                "details": []
+              }
+            ]
+          },
+          {
+            "id": "ATFBb25QRNw-lecture-053",
+            "chapterId": "ATFBb25QRNw-ch-015",
+            "provenance": "teacher",
+            "title": "囟門閉合時間",
+            "sourceCaptionStart": "cue-00601",
+            "sourceCaptionEnd": "cue-00607",
+            "sourceCaptionCount": 7,
+            "startSec": 4009.98,
+            "endSec": 4054.98,
+            "type": "bullets",
+            "points": [
+              {
+                "text": "最小、最早癒合的囟門是後囟，約3個月。",
+                "details": []
+              },
+              {
+                "text": "最大、最晚癒合的是前囟Bregma，約18個月，也就是一歲半。",
+                "details": []
+              },
+              {
+                "text": "前外側囟門（Pterion）約6個月閉合；後外側囟門（Asterion）約12個月閉合。",
+                "details": []
+              },
+              {
+                "text": "每個囟門的關閉時間都需要背熟。",
+                "details": []
+              }
+            ]
+          },
+          {
+            "id": "ATFBb25QRNw-lecture-054",
+            "chapterId": "ATFBb25QRNw-ch-016",
+            "provenance": "teacher",
+            "title": "打開顱蓋與顱底基本圖",
+            "sourceCaptionStart": "cue-00608",
+            "sourceCaptionEnd": "cue-00621",
+            "sourceCaptionCount": 14,
+            "startSec": 4054.98,
+            "endSec": 4140.98,
+            "type": "bullets",
+            "points": [
+              {
+                "text": "接著進入D、E、F等骨骼內容。老師要求把頭蓋骨打開，從上方觀察顱底，並強調這張圖一定要會畫。",
+                "details": []
+              },
+              {
+                "text": "可把頭蓋骨想成鍋蓋，掀開後觀察鍋底，也就是顱底；畫圖時要呈現一些厚度。",
+                "details": []
+              },
+              {
+                "text": "先在顱底中央畫出像蝴蝶的蝶骨，包括蝶骨小翼與蝶骨大翼。",
+                "details": []
+              }
+            ]
+          },
+          {
+            "id": "ATFBb25QRNw-lecture-055",
+            "chapterId": "ATFBb25QRNw-ch-016",
+            "provenance": "teacher",
+            "title": "顱底的枕骨、蝶骨、篩骨、額骨與顳骨",
+            "sourceCaptionStart": "cue-00622",
+            "sourceCaptionEnd": "cue-00633",
+            "sourceCaptionCount": 12,
+            "startSec": 4143.98,
+            "endSec": 4233.98,
+            "type": "bullets",
+            "points": [
+              {
+                "text": "蝶骨後方畫枕骨與枕骨大孔；老師用藍色代表位於後方的枕骨、黃色代表蝴蝶形的蝶骨。",
+                "details": []
+              },
+              {
+                "text": "有許多篩孔的中央骨頭是篩骨，位於正中附近；老師以紅色表示。",
+                "details": []
+              },
+              {
+                "text": "顱底前方加入額骨（frontal bone），老師以綠色表示。",
+                "details": []
+              },
+              {
+                "text": "兩側白色區域是顳骨（temporal bone）。",
+                "details": []
+              }
+            ]
+          },
+          {
+            "id": "ATFBb25QRNw-lecture-056",
+            "chapterId": "ATFBb25QRNw-ch-016",
+            "provenance": "teacher",
+            "title": "顱底骨骼總覽與顱窩界線起稿",
+            "sourceCaptionStart": "cue-00634",
+            "sourceCaptionEnd": "cue-00647",
+            "sourceCaptionCount": 14,
+            "startSec": 4236.98,
+            "endSec": 4325.98,
+            "type": "bullets",
+            "points": [
+              {
+                "text": "老師再次以顏色複習顱底骨骼：額骨、篩骨、蝶骨、顳骨與枕骨。",
+                "details": []
+              },
+              {
+                "text": "枕骨位於後方，旁邊接顳骨；蝶骨位於中央並呈蝴蝶形。",
+                "details": []
+              },
+              {
+                "text": "掌握骨骼後，開始畫前、中、後顱窩的分界線。",
+                "details": []
+              },
+              {
+                "text": "先以虛線標示前顱窩，再準備畫出中顱窩的範圍。",
+                "details": []
+              }
+            ]
+          },
+          {
+            "id": "ATFBb25QRNw-lecture-057",
+            "chapterId": "ATFBb25QRNw-ch-016",
+            "provenance": "teacher",
+            "title": "前中後顱窩界線與構成骨",
+            "sourceCaptionStart": "cue-00648",
+            "sourceCaptionEnd": "cue-00659",
+            "sourceCaptionCount": 12,
+            "startSec": 4327.98,
+            "endSec": 4404.98,
+            "type": "bullets",
+            "points": [
+              {
+                "text": "顱底依序分為前顱窩、中顱窩與後顱窩；老師要求學生先畫圖，再對照講義14-12頁的cranial fossa。",
+                "details": []
+              },
+              {
+                "text": "前顱窩由額骨與篩骨構成。",
+                "details": []
+              },
+              {
+                "text": "中顱窩由顳骨與蝶骨構成。",
+                "details": []
+              },
+              {
+                "text": "後顱窩由顳骨與枕骨構成。老師強調圖上有就列入，沒有就不要多背。",
+                "details": []
+              }
+            ]
+          },
+          {
+            "id": "ATFBb25QRNw-lecture-058",
+            "chapterId": "ATFBb25QRNw-ch-016",
+            "provenance": "teacher",
+            "title": "前中後顱窩內容物與易錯辨析",
+            "sourceCaptionStart": "cue-00660",
+            "sourceCaptionEnd": "cue-00671",
+            "sourceCaptionCount": 12,
+            "startSec": 4404.98,
+            "endSec": 4483.98,
+            "type": "bullets",
+            "points": [
+              {
+                "text": "前顱窩內為大腦額葉。",
+                "details": []
+              },
+              {
+                "text": "中顱窩內為大腦顳葉。",
+                "details": []
+              },
+              {
+                "text": "後顱窩不是裝大腦枕葉。老師指出後方中央是腦幹，兩側為小腦半球，因此後顱窩內容重點是小腦半球。",
+                "details": []
+              },
+              {
+                "text": "大腦枕葉位於較上方，不應誤答成後顱窩內容。",
+                "details": []
+              },
+              {
+                "text": "顱窩的構成骨與內容物都要背熟；完成此圖後，老師準備再畫側面圖。",
+                "details": []
+              }
+            ]
+          },
+          {
+            "id": "ATFBb25QRNw-lecture-059",
+            "chapterId": "ATFBb25QRNw-ch-017",
+            "provenance": "teacher",
+            "title": "以外耳道為基準建立顳骨側面圖",
+            "sourceCaptionStart": "cue-00672",
+            "sourceCaptionEnd": "cue-00685",
+            "sourceCaptionCount": 14,
+            "startSec": 4485.98,
+            "endSec": 4593.98,
+            "type": "bullets",
+            "points": [
+              {
+                "text": "側面圖以外耳道的孔為定位基準，從此向前、向上與向下建立顳骨輪廓。",
+                "details": []
+              },
+              {
+                "text": "老師先畫出顳骨，再加入顴骨、眼眶、鼻子、嘴巴與下巴的大致位置。",
+                "details": []
+              },
+              {
+                "text": "老師在側面顱骨圖中依序標示眼睛、眼眶、牙齒、鼻子與嘴巴的位置。",
+                "details": []
+              },
+              {
+                "text": "圖的目標是先掌握大方向；其他暫時不重要的構造可先用虛線表示。",
+                "details": []
+              }
+            ]
+          },
+          {
+            "id": "ATFBb25QRNw-lecture-060",
+            "chapterId": "ATFBb25QRNw-ch-017",
+            "provenance": "teacher",
+            "title": "顳骨鱗部、岩部與乳突部",
+            "sourceCaptionStart": "cue-00686",
+            "sourceCaptionEnd": "cue-00699",
+            "sourceCaptionCount": 14,
+            "startSec": 4593.98,
+            "endSec": 4685.98,
+            "type": "bullets",
+            "points": [
+              {
+                "text": "由側面可定位眼眶、淚骨、鼻子、嘴巴、下巴、外耳道與顴弓。參考講義14-10頁辨認顳骨（temporal bone）。",
+                "details": []
+              },
+              {
+                "text": "顳骨分四部分。第一部分為鱗部（squamous portion），範圍最大且很薄，像魚鱗片。",
+                "details": []
+              },
+              {
+                "text": "第二部分為岩部（petrous portion），位置向內繞入，形狀像岩石且不規則；由外側與內側觀看的外形不同。",
+                "details": []
+              },
+              {
+                "text": "第三部分為乳突部（mastoid portion）。",
+                "details": []
+              }
+            ]
+          },
+          {
+            "id": "ATFBb25QRNw-lecture-061",
+            "chapterId": "ATFBb25QRNw-ch-017",
+            "provenance": "teacher",
+            "title": "乳突名稱、鼓膜、鼓室與鼓部",
+            "sourceCaptionStart": "cue-00700",
+            "sourceCaptionEnd": "cue-00713",
+            "sourceCaptionCount": 14,
+            "startSec": 4685.98,
+            "endSec": 4778.98,
+            "type": "bullets",
+            "points": [
+              {
+                "text": "老師以mast表示乳房、-oid表示像，將mastoid解釋為乳房形、breast-like，因此稱乳突部或乳樣部。",
+                "details": []
+              },
+              {
+                "text": "第四部分參考講義14-11頁。外耳與中耳之間的膜是鼓膜，英文為tympanum。",
+                "details": []
+              },
+              {
+                "text": "鼓膜內側的空腔是中耳，稱鼓室（tympanic cavity）。",
+                "details": []
+              },
+              {
+                "text": "與鼓膜、鼓室及中耳相關的顳骨部分稱鼓部（tympanic part）。",
+                "details": []
+              },
+              {
+                "text": "老師複習鱗部是顳骨最大且最薄、像魚鱗的部分。",
+                "details": []
+              }
+            ]
+          },
+          {
+            "id": "ATFBb25QRNw-lecture-062",
+            "chapterId": "ATFBb25QRNw-ch-017",
+            "provenance": "teacher",
+            "title": "外耳中耳與內耳在顳骨的定位",
+            "sourceCaptionStart": "cue-00714",
+            "sourceCaptionEnd": "cue-00718",
+            "sourceCaptionCount": 5,
+            "startSec": 4778.98,
+            "endSec": 4810.98,
+            "type": "bullets",
+            "points": [
+              {
+                "text": "岩部是顳骨最複雜的部分，內耳位於岩部。",
+                "details": []
+              },
+              {
+                "text": "外耳與中耳位於鼓部。",
+                "details": []
+              },
+              {
+                "text": "外耳、中耳、內耳整體都位於顳骨內。接著進入顳骨相關孔道。",
+                "details": []
+              }
+            ]
+          },
+          {
+            "id": "ATFBb25QRNw-lecture-063",
+            "chapterId": "ATFBb25QRNw-ch-018",
+            "provenance": "teacher",
+            "title": "破裂孔、頸動脈孔、內聽孔與頸靜脈孔",
+            "sourceCaptionStart": "cue-00719",
+            "sourceCaptionEnd": "cue-00732",
+            "sourceCaptionCount": 14,
+            "startSec": 4810.98,
+            "endSec": 4907.98,
+            "type": "bullets",
+            "points": [
+              {
+                "text": "顳骨相關的四個重要孔道是破裂孔、頸動脈孔、內聽孔與頸靜脈孔。",
+                "details": []
+              },
+              {
+                "text": "破裂孔英文為lacerum，老師以laceration wound、撕裂傷協助記憶。",
+                "details": []
+              },
+              {
+                "text": "頸動脈孔以「動」記憶；內聽孔以「聽」記憶；頸靜脈孔以「靜」記憶。",
+                "details": []
+              },
+              {
+                "text": "頸動脈孔與內聽孔是老師所稱的專用孔。破裂孔由顳骨與蝶骨共同形成；頸靜脈孔由顳骨與枕骨共同形成。",
+                "details": []
+              },
+              {
+                "text": "老師接著要求背誦各孔通過的構造，並說破裂孔通過大岩神經。",
+                "details": []
+              }
+            ]
+          },
+          {
+            "id": "ATFBb25QRNw-lecture-064",
+            "chapterId": "ATFBb25QRNw-ch-018",
+            "provenance": "teacher",
+            "title": "四孔內容、乳突氣室、莖突與莖乳突孔",
+            "sourceCaptionStart": "cue-00733",
+            "sourceCaptionEnd": "cue-00746",
+            "sourceCaptionCount": 14,
+            "startSec": 4907.98,
+            "endSec": 5002.98,
+            "type": "bullets",
+            "points": [
+              {
+                "text": "老師整理四孔內容：破裂孔通過大岩神經；頸動脈孔通過頸動脈；內聽孔通過第七、第八對腦神經；頸靜脈孔通過第九、第十、第十一對腦神經。",
+                "details": []
+              },
+              {
+                "text": "乳突部內含空氣。裝有空氣的空間稱氣室，乳突氣室可在維持一定骨厚度與保護效果的同時減輕顳骨重量。",
+                "details": []
+              },
+              {
+                "text": "stylo表示針，styloid表示莖狀或針狀；styloid process即莖突。",
+                "details": []
+              },
+              {
+                "text": "莖突與乳突部之間的孔稱莖乳突孔（stylomastoid foramen），是第七對腦神經離開顳骨的位置。",
+                "details": []
+              }
+            ]
+          },
+          {
+            "id": "ATFBb25QRNw-lecture-065",
+            "chapterId": "ATFBb25QRNw-ch-018",
+            "provenance": "teacher",
+            "title": "第七與第八對腦神經在顳骨內的路徑",
+            "sourceCaptionStart": "cue-00747",
+            "sourceCaptionEnd": "cue-00755",
+            "sourceCaptionCount": 9,
+            "startSec": 5002.98,
+            "endSec": 5063.98,
+            "type": "bullets",
+            "points": [
+              {
+                "text": "第七與第八對腦神經一起由內聽孔進入顳骨。",
+                "details": []
+              },
+              {
+                "text": "第八對腦神經留在內耳，負責老師所說的聽覺與平衡，因此不再由另一孔離開。",
+                "details": []
+              },
+              {
+                "text": "第七對腦神經則單獨繼續行進，最後由莖乳突孔離開。",
+                "details": []
+              },
+              {
+                "text": "總結：第七對腦神經進入顳骨走內聽孔，離開顳骨走莖乳突孔；第八對腦神經由內聽孔進入後留在內耳。",
+                "details": []
+              }
+            ]
+          },
+          {
+            "id": "ATFBb25QRNw-lecture-066",
+            "chapterId": "ATFBb25QRNw-ch-019",
+            "provenance": "teacher",
+            "title": "鼓部、耳咽管、顴突顳突與顴弓",
+            "sourceCaptionStart": "cue-00756",
+            "sourceCaptionEnd": "cue-00769",
+            "sourceCaptionCount": 14,
+            "startSec": 5063.98,
+            "endSec": 5156.98,
+            "type": "bullets",
+            "points": [
+              {
+                "text": "鼓部包含鼓室，也可由鼓膜、鼓部的概念理解。外耳與中耳交界為鼓膜，鼓部包含外耳與中耳相關構造。",
+                "details": []
+              },
+              {
+                "text": "由中耳向外延伸的管道是耳咽管，老師將耳咽管也歸在鼓部相關內容。",
+                "details": []
+              },
+              {
+                "text": "老師特別提醒形成顴弓的兩個骨突起。",
+                "details": []
+              },
+              {
+                "text": "顳骨上突向顴骨的突起稱顴突；顴骨上突向顳骨的突起稱顳突。顴突屬於顳骨，顳突屬於顴骨。",
+                "details": []
+              },
+              {
+                "text": "顳骨顴突與顴骨顳突共同形成顴弓（zygomatic arch）。老師指出顴弓很脆弱，受拳擊可能骨折。",
+                "details": []
+              },
+              {
+                "text": "老師提到pterygopalatine fossa，並強調顴弓下方窩狀空間內的構造很重要。",
+                "details": []
+              }
+            ]
+          },
+          {
+            "id": "ATFBb25QRNw-lecture-067",
+            "chapterId": "ATFBb25QRNw-ch-019",
+            "provenance": "teacher",
+            "title": "下頜骨與顳顎關節",
+            "sourceCaptionStart": "cue-00770",
+            "sourceCaptionEnd": "cue-00775",
+            "sourceCaptionCount": 6,
+            "startSec": 5156.98,
+            "endSec": 5199.98,
+            "type": "bullets",
+            "points": [
+              {
+                "text": "顴弓下方的窩用來容納下頜骨相關構造，老師隨即簡化畫出下頜骨。",
+                "details": []
+              },
+              {
+                "text": "顳顎關節位於外耳道前下方，由顳骨與下頜骨形成。老師稱它是整顆頭唯一可以活動的關節。",
+                "details": []
+              },
+              {
+                "text": "老師以打哈欠造成顳顎關節脫臼的情境舉例。",
+                "details": []
+              }
+            ]
+          },
+          {
+            "id": "ATFBb25QRNw-lecture-068",
+            "chapterId": "ATFBb25QRNw-ch-020",
+            "provenance": "teacher",
+            "title": "枕骨大孔與副神經脊髓根",
+            "sourceCaptionStart": "cue-00776",
+            "sourceCaptionEnd": "cue-00788",
+            "sourceCaptionCount": 13,
+            "startSec": 5199.98,
+            "endSec": 5291.98,
+            "type": "bullets",
+            "points": [
+              {
+                "text": "接著辨認枕骨。枕骨上的最大孔稱枕骨大孔（foramen magnum）；magnum表示最大。",
+                "details": []
+              },
+              {
+                "text": "枕骨大孔是腦與脊髓的交界。老師以枕骨大孔上方的延腦（medulla）與下方脊髓說明。",
+                "details": []
+              },
+              {
+                "text": "第十一對腦神經副神經有顱根與脊髓根。脊髓根由脊髓、尤其老師所說的頸段發出，向上經枕骨大孔進入顱內，再與顱根匯合。",
+                "details": []
+              },
+              {
+                "text": "老師用講臺模擬枕骨大孔，上方代表腦、下方代表脊髓，反覆說明脊髓根向上進入顱內並形成副神經的路徑。",
+                "details": []
+              }
+            ]
+          },
+          {
+            "id": "ATFBb25QRNw-lecture-069",
+            "chapterId": "ATFBb25QRNw-ch-020",
+            "provenance": "teacher",
+            "title": "副神經路徑、枕髁、寰枕關節與舌下神經管",
+            "sourceCaptionStart": "cue-00789",
+            "sourceCaptionEnd": "cue-00802",
+            "sourceCaptionCount": 14,
+            "startSec": 5291.98,
+            "endSec": 5388.98,
+            "type": "bullets",
+            "points": [
+              {
+                "text": "副神經脊髓根由脊髓頸段發出，經枕骨大孔向上，與顱根匯合形成第十一對腦神經。",
+                "details": []
+              },
+              {
+                "text": "除中樞神經與副神經脊髓根外，老師列出通過枕骨大孔的動脈為椎動脈與脊髓動脈。",
+                "details": []
+              },
+              {
+                "text": "枕髁位於枕骨下方。condyle表示橢圓形突起，中文稱髁狀突；枕髁就是枕骨向下的兩個橢圓形突起。",
+                "details": []
+              },
+              {
+                "text": "枕髁與第一頸椎寰椎形成寰枕關節，負責老師示範的點頭動作。",
+                "details": []
+              },
+              {
+                "text": "枕骨另有舌下神經管，老師在圖上將它與枕骨大孔區分。",
+                "details": []
+              }
+            ]
+          },
+          {
+            "id": "ATFBb25QRNw-lecture-070",
+            "chapterId": "ATFBb25QRNw-ch-020",
+            "provenance": "teacher",
+            "title": "舌下神經管與枕骨大孔內容複習",
+            "sourceCaptionStart": "cue-00803",
+            "sourceCaptionEnd": "cue-00806",
+            "sourceCaptionCount": 4,
+            "startSec": 5388.98,
+            "endSec": 5415.98,
+            "type": "bullets",
+            "points": [
+              {
+                "text": "舌下神經管由第十二對腦神經、舌下神經通過。",
+                "details": []
+              },
+              {
+                "text": "老師再次複習枕骨大孔內容：中樞神經、第十一對腦神經副神經的脊髓根、脊髓動脈與椎動脈。",
+                "details": []
+              }
+            ]
+          },
+          {
+            "id": "ATFBb25QRNw-lecture-071",
+            "chapterId": "ATFBb25QRNw-ch-021",
+            "provenance": "teacher",
+            "title": "蝶骨體、蝶竇、蝶鞍與視神經孔",
+            "sourceCaptionStart": "cue-00807",
+            "sourceCaptionEnd": "cue-00820",
+            "sourceCaptionCount": 14,
+            "startSec": 5415.98,
+            "endSec": 5509.98,
+            "type": "bullets",
+            "points": [
+              {
+                "text": "蝶骨包括蝶骨體、小翼與大翼。",
+                "details": []
+              },
+              {
+                "text": "蝶骨體內的空腔稱蝶竇，是四大副鼻竇之一。老師以板擦模擬蝶骨體。",
+                "details": []
+              },
+              {
+                "text": "蝶骨體上方有馬鞍形構造，稱蝶鞍或土耳其鞍（sella turcica）；腦下垂體、腦下腺位於此處，老師也稱其為腦下垂體窩。",
+                "details": []
+              },
+              {
+                "text": "蝶骨小翼附近有視神經孔，左右對稱；老師畫圖時只畫一側。",
+                "details": []
+              },
+              {
+                "text": "視神經孔通過第二對腦神經視神經與眼動脈。老師提醒不要把視神經與眼神經混為一談。",
+                "details": []
+              }
+            ]
+          },
+          {
+            "id": "ATFBb25QRNw-lecture-072",
+            "chapterId": "ATFBb25QRNw-ch-021",
+            "provenance": "teacher",
+            "title": "眼神經與視神經辨析、眶上裂神經",
+            "sourceCaptionStart": "cue-00821",
+            "sourceCaptionEnd": "cue-00832",
+            "sourceCaptionCount": 12,
+            "startSec": 5509.98,
+            "endSec": 5582.98,
+            "type": "bullets",
+            "points": [
+              {
+                "text": "三叉神經有三支：眼支、上頜支與下頜支，也可稱眼神經、上頜神經、下頜神經。",
+                "details": []
+              },
+              {
+                "text": "眼神經是第五對腦神經三叉神經的第一支；視神經則是第二對腦神經，兩者不同。",
+                "details": []
+              },
+              {
+                "text": "因此視神經孔通過的是視神經與眼動脈。",
+                "details": []
+              },
+              {
+                "text": "蝶骨小翼與大翼之間的裂縫稱眶上裂。",
+                "details": []
+              },
+              {
+                "text": "眶上裂通過第三、第四、三叉神經第一支，以及第六對腦神經。",
+                "details": []
+              }
+            ]
+          },
+          {
+            "id": "ATFBb25QRNw-lecture-073",
+            "chapterId": "ATFBb25QRNw-ch-021",
+            "provenance": "teacher",
+            "title": "眶上裂與眼動脈、上下眼靜脈的孔道",
+            "sourceCaptionStart": "cue-00833",
+            "sourceCaptionEnd": "cue-00839",
+            "sourceCaptionCount": 7,
+            "startSec": 5586.98,
+            "endSec": 5630.98,
+            "type": "bullets",
+            "points": [
+              {
+                "text": "老師再次用「三、四、五一、六」記憶眶上裂通過的腦神經。",
+                "details": []
+              },
+              {
+                "text": "眼動脈只有一條，經視神經孔。眼靜脈則分上眼靜脈與下眼靜脈。",
+                "details": []
+              },
+              {
+                "text": "上眼靜脈通過眶上裂；下眼靜脈通過後續要談的眶下裂。老師特別提醒這三個孔道不同。",
+                "details": []
+              },
+              {
+                "text": "完成後轉入蝶骨大翼。",
+                "details": []
+              }
+            ]
+          },
+          {
+            "id": "ATFBb25QRNw-lecture-074",
+            "chapterId": "ATFBb25QRNw-ch-022",
+            "provenance": "teacher",
+            "title": "圓孔、卵圓孔、棘孔與大岩神經、小岩神經",
+            "sourceCaptionStart": "cue-00840",
+            "sourceCaptionEnd": "cue-00853",
+            "sourceCaptionCount": 14,
+            "startSec": 5630.98,
+            "endSec": 5723.98,
+            "type": "bullets",
+            "points": [
+              {
+                "text": "蝶骨大翼有三個重要孔，依序為圓孔、卵圓孔與棘孔。圓孔英文為rotundum，老師以round記憶；卵圓孔為ovale；棘孔為spinosum。",
+                "details": []
+              },
+              {
+                "text": "老師先口誤說卵圓孔通過三叉神經第二支，隨即更正：圓孔通過三叉神經第二支，卵圓孔通過三叉神經第三支。",
+                "details": []
+              },
+              {
+                "text": "棘孔通過中腦膜動脈，與前述翼點、中腦膜動脈題組相連。",
+                "details": []
+              },
+              {
+                "text": "老師另說卵圓孔還與小岩神經相關；破裂孔則通過大岩神經。大岩、小岩神經的細節留待後續再談。",
+                "details": []
+              }
+            ]
+          },
+          {
+            "id": "ATFBb25QRNw-lecture-075",
+            "chapterId": "ATFBb25QRNw-ch-022",
+            "provenance": "teacher",
+            "title": "破裂孔複習、眶下裂與側面顱骨起稿",
+            "sourceCaptionStart": "cue-00854",
+            "sourceCaptionEnd": "cue-00867",
+            "sourceCaptionCount": 14,
+            "startSec": 5723.98,
+            "endSec": 5816.98,
+            "type": "bullets",
+            "points": [
+              {
+                "text": "老師複習破裂孔與顳骨共同形成，並再次提到大岩神經通過。",
+                "details": []
+              },
+              {
+                "text": "眶下裂由正面較容易看清，由蝶骨與上頜骨之間形成。",
+                "details": []
+              },
+              {
+                "text": "眶下裂通過顴骨神經、眶下神經與下眼靜脈，這些內容需要記熟。",
+                "details": []
+              },
+              {
+                "text": "接著老師藉此完成側面顱骨總圖，依序標示枕骨、顳骨、蝶骨與上頜骨；圖的比例不必完全精細，但要掌握骨頭相對位置。",
+                "details": []
+              }
+            ]
+          },
+          {
+            "id": "ATFBb25QRNw-lecture-076",
+            "chapterId": "ATFBb25QRNw-ch-022",
+            "provenance": "teacher",
+            "title": "側面顱骨各骨位置",
+            "sourceCaptionStart": "cue-00868",
+            "sourceCaptionEnd": "cue-00881",
+            "sourceCaptionCount": 14,
+            "startSec": 5816.98,
+            "endSec": 5914.98,
+            "type": "bullets",
+            "points": [
+              {
+                "text": "側面顱骨圖繼續加入頂骨、額骨、淚骨與下頜骨。",
+                "details": []
+              },
+              {
+                "text": "頂骨位於上方，額骨位於前上方，枕骨位於後方；蝶骨與顳骨位於側面中央，上頜骨位於前下方。",
+                "details": []
+              },
+              {
+                "text": "老師在畫圖過程中多次調整線條與下頜骨比例，重點是形成各骨相對位置的概念，而非追求精細。",
+                "details": []
+              }
+            ]
+          },
+          {
+            "id": "ATFBb25QRNw-lecture-077",
+            "chapterId": "ATFBb25QRNw-ch-022",
+            "provenance": "teacher",
+            "title": "側面顱骨比例修正與正面圖轉場",
+            "sourceCaptionStart": "cue-00882",
+            "sourceCaptionEnd": "cue-00886",
+            "sourceCaptionCount": 5,
+            "startSec": 5914.98,
+            "endSec": 5942.98,
+            "type": "bullets",
+            "points": [
+              {
+                "text": "老師認為側面圖的下巴畫得太小，因此修正下頜骨比例與部分線條。",
+                "details": []
+              },
+              {
+                "text": "完成後再次確認側面顱骨基本外形，接著準備由正面觀察頭骨。",
+                "details": []
+              }
+            ]
+          },
+          {
+            "id": "ATFBb25QRNw-lecture-078",
+            "chapterId": "ATFBb25QRNw-ch-023",
+            "provenance": "teacher",
+            "title": "正面顱骨與眼眶起稿",
+            "sourceCaptionStart": "cue-00887",
+            "sourceCaptionEnd": "cue-00900",
+            "sourceCaptionCount": 14,
+            "startSec": 5942.98,
+            "endSec": 6023.98,
+            "type": "bullets",
+            "points": [
+              {
+                "text": "正面顱骨圖不必過度複雜，先抓大致比例；老師提到約為5比4比5，並再次表示自己先前把下巴畫得太小。",
+                "details": []
+              },
+              {
+                "text": "先畫正面骷髏頭，再標出左右眼眶、鼻腔、鼻骨與淚骨。",
+                "details": []
+              },
+              {
+                "text": "接著加入顴骨、上頜骨與下頜骨，建立正面顱骨大方向。",
+                "details": []
+              }
+            ]
+          },
+          {
+            "id": "ATFBb25QRNw-lecture-079",
+            "chapterId": "ATFBb25QRNw-ch-023",
+            "provenance": "teacher",
+            "title": "上頜骨、下頜骨與眼眶模型",
+            "sourceCaptionStart": "cue-00901",
+            "sourceCaptionEnd": "cue-00914",
+            "sourceCaptionCount": 14,
+            "startSec": 6023.98,
+            "endSec": 6118.98,
+            "type": "bullets",
+            "points": [
+              {
+                "text": "正面圖再次確認上頜骨、下頜骨與顴骨（zygoma）的位置，其他非重點構造可先省略。",
+                "details": []
+              },
+              {
+                "text": "畫正面圖的主要目的，是抽出眼眶模型。老師強調眼眶模型曾考過很多次，一定要會畫。",
+                "details": []
+              },
+              {
+                "text": "右眼眶可先用圈形輪廓表示，再加入十字交叉的輔助線：一條垂直線與兩條斜線。",
+                "details": []
+              },
+              {
+                "text": "黃色外圈代表眼眶外框；完成外框後，再把組成眼眶的骨頭依序填入，先由額骨開始。",
+                "details": []
+              }
+            ]
+          },
+          {
+            "id": "ATFBb25QRNw-lecture-080",
+            "chapterId": "ATFBb25QRNw-ch-023",
+            "provenance": "teacher",
+            "title": "顴骨、蝶骨、上頜骨、淚骨與篩骨",
+            "sourceCaptionStart": "cue-00915",
+            "sourceCaptionEnd": "cue-00928",
+            "sourceCaptionCount": 14,
+            "startSec": 6118.98,
+            "endSec": 6232.74,
+            "type": "bullets",
+            "points": [
+              {
+                "text": "眼眶外側可見顴骨（zygoma），內側與深部有蝶骨（sphenoid）；老師在模型中指出三個區塊都屬於蝶骨。",
+                "details": []
+              },
+              {
+                "text": "紅色區塊是上頜骨（maxilla）。",
+                "details": []
+              },
+              {
+                "text": "綠色區塊是淚骨（lacrimal bone）。",
+                "details": []
+              },
+              {
+                "text": "另一塊是篩骨（ethmoid）。",
+                "details": []
+              },
+              {
+                "text": "老師強調眼眶圖曾反覆出題，請學生參考講義14-14頁；畫圖比例不完美不影響用它掌握構造。",
+                "details": []
+              }
+            ]
+          },
+          {
+            "id": "ATFBb25QRNw-lecture-081",
+            "chapterId": "ATFBb25QRNw-ch-023",
+            "provenance": "teacher",
+            "title": "眼眶四壁與視神經孔",
+            "sourceCaptionStart": "cue-00929",
+            "sourceCaptionEnd": "cue-00942",
+            "sourceCaptionCount": 14,
+            "startSec": 6232.74,
+            "endSec": 6322.74,
+            "type": "bullets",
+            "points": [
+              {
+                "text": "眼眶上壁由額骨與蝶骨構成。",
+                "details": []
+              },
+              {
+                "text": "眼眶外側壁由顴骨與蝶骨構成。",
+                "details": []
+              },
+              {
+                "text": "眼眶底由上頜骨、顴骨與腭骨（palatine）構成。",
+                "details": []
+              },
+              {
+                "text": "眼眶內側壁由蝶骨、篩骨、淚骨與上頜骨構成。老師表示若只死背很困難，利用模型圖會較容易。",
+                "details": []
+              },
+              {
+                "text": "蝶骨體與蝶骨小翼之間有視神經孔；老師提醒先記住此位置。",
+                "details": []
+              },
+              {
+                "text": "小翼與大翼之間則形成眶上裂，接著進一步比較各孔裂。",
+                "details": []
+              }
+            ]
+          },
+          {
+            "id": "ATFBb25QRNw-lecture-082",
+            "chapterId": "ATFBb25QRNw-ch-023",
+            "provenance": "teacher",
+            "title": "眶上裂、眶下裂與眼血管通道",
+            "sourceCaptionStart": "cue-00943",
+            "sourceCaptionEnd": "cue-00956",
+            "sourceCaptionCount": 14,
+            "startSec": 6322.74,
+            "endSec": 6415.74,
+            "type": "bullets",
+            "points": [
+              {
+                "text": "蝶骨小翼與大翼之間的裂縫是眶上裂。",
+                "details": []
+              },
+              {
+                "text": "蝶骨大翼與上頜骨之間的裂縫是眶下裂。老師提醒這張圖之後仍會使用。",
+                "details": []
+              },
+              {
+                "text": "眼眶相關三個孔裂要分清楚：視神經孔、眶上裂與眶下裂。",
+                "details": []
+              },
+              {
+                "text": "眼動脈經視神經孔進入眼球；上眼靜脈經眶上裂離開；下眼靜脈經眶下裂離開。老師以「進入的是眼動脈，離開的是上、下眼靜脈」整理。",
+                "details": []
+              },
+              {
+                "text": "接著回到講義14-11頁，再核對眶下裂。",
+                "details": []
+              }
+            ]
+          },
+          {
+            "id": "ATFBb25QRNw-lecture-083",
+            "chapterId": "ATFBb25QRNw-ch-023",
+            "provenance": "teacher",
+            "title": "眶下裂構成與通過構造",
+            "sourceCaptionStart": "cue-00957",
+            "sourceCaptionEnd": "cue-00961",
+            "sourceCaptionCount": 5,
+            "startSec": 6415.74,
+            "endSec": 6448.74,
+            "type": "bullets",
+            "points": [
+              {
+                "text": "眶下裂位於蝶骨與上頜骨之間。",
+                "details": []
+              },
+              {
+                "text": "通過眶下裂的構造為兩條神經與一條靜脈：顴骨神經、眶下神經及下眼靜脈。",
+                "details": []
+              },
+              {
+                "text": "老師表示此處掌握這些即可，接著進入講義14-12頁的篩骨。",
+                "details": []
+              }
+            ]
+          },
+          {
+            "id": "ATFBb25QRNw-lecture-084",
+            "chapterId": "ATFBb25QRNw-ch-024",
+            "provenance": "teacher",
+            "title": "從鼻骨與眼眶定位篩骨",
+            "sourceCaptionStart": "cue-00962",
+            "sourceCaptionEnd": "cue-00975",
+            "sourceCaptionCount": 14,
+            "startSec": 6452.74,
+            "endSec": 6536.74,
+            "type": "bullets",
+            "points": [
+              {
+                "text": "篩骨英文為ethmoid。老師由正面顱骨圖定位篩骨，先確認構成鼻根、鼻樑的左右鼻骨。",
+                "details": []
+              },
+              {
+                "text": "篩骨位於鼻骨後方、較深處。老師將局部放大，用橫線、直線與虛線標示其相對位置。",
+                "details": []
+              },
+              {
+                "text": "左右眼眶位於篩骨兩側，可用眼眶與鼻腔的位置協助定位篩骨。",
+                "details": []
+              }
+            ]
+          },
+          {
+            "id": "ATFBb25QRNw-lecture-085",
+            "chapterId": "ATFBb25QRNw-ch-024",
+            "provenance": "teacher",
+            "title": "鼻腔、水平板、垂直板與篩骨迷路",
+            "sourceCaptionStart": "cue-00976",
+            "sourceCaptionEnd": "cue-00989",
+            "sourceCaptionCount": 14,
+            "startSec": 6536.74,
+            "endSec": 6636.74,
+            "type": "bullets",
+            "points": [
+              {
+                "text": "篩骨兩側有篩骨迷路。老師另外標出鼻中隔軟骨、鼻腔與眼眶，使正面圖的空間關係更清楚。",
+                "details": []
+              },
+              {
+                "text": "篩骨位於鼻腔深部。橫向骨板稱水平板，直向骨板稱垂直板。",
+                "details": []
+              },
+              {
+                "text": "老師用木頭做成木板作比喻，說明骨頭形成的板狀構造可稱骨板。",
+                "details": []
+              },
+              {
+                "text": "內含空腔與不規則通道的部分稱迷路；老師將「迷路」解釋為解剖上不規則通道的名稱。",
+                "details": []
+              }
+            ]
+          },
+          {
+            "id": "ATFBb25QRNw-lecture-086",
+            "chapterId": "ATFBb25QRNw-ch-024",
+            "provenance": "teacher",
+            "title": "篩骨三部分、觀察方向與篩孔",
+            "sourceCaptionStart": "cue-00990",
+            "sourceCaptionEnd": "cue-01003",
+            "sourceCaptionCount": 14,
+            "startSec": 6636.74,
+            "endSec": 6728.74,
+            "type": "bullets",
+            "points": [
+              {
+                "text": "篩骨分三部分：水平板、垂直板與篩骨迷路。",
+                "details": []
+              },
+              {
+                "text": "水平板含有嗅神經孔。老師在正面圖與由上往下看的顱底圖之間對照，指出垂直突出部與左右兩側區塊的對應。",
+                "details": []
+              },
+              {
+                "text": "同一篩骨構造由正面看與由上往下看，外觀與位置表現不同；老師要求學生能在兩個視角間對照。",
+                "details": []
+              },
+              {
+                "text": "篩骨上的嗅神經孔不是單一大孔，而是許多小篩孔。",
+                "details": []
+              }
+            ]
+          },
+          {
+            "id": "ATFBb25QRNw-lecture-087",
+            "chapterId": "ATFBb25QRNw-ch-024",
+            "provenance": "teacher",
+            "title": "嗅神經孔、第一對腦神經與雞冠",
+            "sourceCaptionStart": "cue-01004",
+            "sourceCaptionEnd": "cue-01017",
+            "sourceCaptionCount": 14,
+            "startSec": 6728.74,
+            "endSec": 6821.74,
+            "type": "bullets",
+            "points": [
+              {
+                "text": "嗅神經孔由許多小篩孔構成，老師將其比喻為過濾網或蓮蓬頭上的許多小孔，而不是單一孔洞。",
+                "details": []
+              },
+              {
+                "text": "第一對腦神經經這些篩孔通過，因此稱為嗅神經孔。水平板上可見許多這類小孔。",
+                "details": []
+              },
+              {
+                "text": "篩骨垂直板在顱內向上突出的部分稱雞冠，英文為crista galli。",
+                "details": []
+              },
+              {
+                "text": "老師將crista解釋為突起、嵴；並在課堂中說galli是人名，中文不直接譯為人名氏嵴，而以外形譯作像公雞雞冠的「雞冠」。",
+                "details": []
+              }
+            ]
+          }
+        ]
+      }
     }
   ]
 }

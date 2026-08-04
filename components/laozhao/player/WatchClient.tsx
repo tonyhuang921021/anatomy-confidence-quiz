@@ -19,7 +19,11 @@ import { ChapterMaterials } from "../materials/ChapterMaterials";
 import { ChapterList, formatTime } from "./ChapterList";
 import { LectureNotesPanel } from "./LectureNotesPanel";
 import { useLaozhaoLearning } from "./learning";
-import type { LaoZhaoCaption, LaoZhaoChapter, LaoZhaoVideo } from "./content-contract";
+import type { LaoZhaoChapter, LaoZhaoVideo } from "./content-contract";
+import {
+  buildCaptionSentences,
+  findCaptionSentenceAtTime
+} from "../../../lib/laozhao/preview/captionSentences";
 import { TranscriptPanel } from "./TranscriptPanel";
 import { YouTubePlayer, type LaoZhaoPlayerHandle } from "./YouTubePlayer";
 import type { LaoZhaoWatchClientProps } from "./types";
@@ -41,20 +45,6 @@ function buildWatchHref(videoId: string) {
 
 function sortVideos(videos: readonly LaoZhaoVideo[]) {
   return [...videos].sort((a, b) => a.order - b.order || a.id.localeCompare(b.id));
-}
-
-function findCaptionAtTime(captions: readonly LaoZhaoCaption[], seconds: number) {
-  let low = 0;
-  let high = captions.length;
-  while (low < high) {
-    const middle = Math.floor((low + high) / 2);
-    if (captions[middle].startSec <= seconds) low = middle + 1;
-    else high = middle;
-  }
-  const candidate = captions[low - 1];
-  return candidate && seconds >= candidate.startSec && seconds < candidate.endSec
-    ? candidate
-    : null;
 }
 
 export function WatchClient({ video, playlist, learningAdapter }: LaoZhaoWatchClientProps) {
@@ -83,6 +73,7 @@ export function WatchClient({ video, playlist, learningAdapter }: LaoZhaoWatchCl
     [video.chapters, video.previewMode]
   );
   const captions = video.captions ?? [];
+  const captionSentences = useMemo(() => buildCaptionSentences(captions), [captions]);
   const selectedChapter = useMemo(
     () => chapters.find((chapter) => chapter.stableId === searchParams.get("chapter")) ?? null,
     [chapters, searchParams]
@@ -102,9 +93,9 @@ export function WatchClient({ video, playlist, learningAdapter }: LaoZhaoWatchCl
   const initialSeekSeconds = initialSeekRef.current?.videoId === video.id
     ? initialSeekRef.current.seconds
     : requestedSeekSeconds;
-  const currentCaption = useMemo(
-    () => findCaptionAtTime(captions, currentTimeSec),
-    [captions, currentTimeSec]
+  const currentCaptionSentence = useMemo(
+    () => findCaptionSentenceAtTime(captionSentences, currentTimeSec),
+    [captionSentences, currentTimeSec]
   );
   const currentChapter = useMemo(
     () => chapters.find((chapter) => chapter.stableId === currentChapterId) ?? null,
@@ -235,7 +226,7 @@ export function WatchClient({ video, playlist, learningAdapter }: LaoZhaoWatchCl
                 initialSeekSeconds={initialSeekSeconds}
                 playable={video.status === "available"}
                 allowDrafts={video.previewMode === true}
-                captionText={currentCaption?.text ?? ""}
+                captionText={currentCaptionSentence?.text ?? ""}
                 onChapterChange={(chapter) => setCurrentChapterId(chapter?.stableId ?? null)}
                 onTimeUpdate={setCurrentTimeSec}
                 onProgressCheckpoint={(seconds, duration, completed, watchedRanges) => {
@@ -281,7 +272,7 @@ export function WatchClient({ video, playlist, learningAdapter }: LaoZhaoWatchCl
                 <div className="mt-5 flex items-center justify-between gap-3">
                   <h2 className="text-xl font-black">章節與字幕</h2>
                   <span className="text-xs font-semibold tabular-nums text-[var(--ink-soft)]">
-                    {sidePanel === "chapters" ? `${chapters.length} 章` : `${captions.length} 段`}
+                    {sidePanel === "chapters" ? `${chapters.length} 章` : `${captionSentences.length} 句`}
                   </span>
                 </div>
                 <div className="mt-3 grid grid-cols-2 border-b border-[var(--line-soft)]" role="tablist" aria-label="影片導覽">
@@ -328,9 +319,9 @@ export function WatchClient({ video, playlist, learningAdapter }: LaoZhaoWatchCl
                     />
                   ) : (
                     <TranscriptPanel
-                      cues={captions}
+                      cues={captionSentences}
                       currentTimeSec={currentTimeSec}
-                      activeCueId={currentCaption?.id ?? null}
+                      activeCueId={currentCaptionSentence?.id ?? null}
                       chapterTitle={currentChapter?.title}
                       onSeek={handleSeek}
                     />

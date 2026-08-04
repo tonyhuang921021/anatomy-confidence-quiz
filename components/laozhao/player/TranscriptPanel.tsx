@@ -117,7 +117,7 @@ export function TranscriptPanel({
             </h2>
           </div>
           <span className="shrink-0 text-xs font-semibold tabular-nums text-[var(--ink-soft)]">
-            {cues.length > 0 ? `${cues.length} 段` : "尚無字幕"}
+            {cues.length > 0 ? `${cues.length} 句` : "尚無字幕"}
           </span>
         </div>
 
@@ -171,9 +171,9 @@ export function TranscriptPanel({
           <p className="px-3 pb-2 pt-3 text-xs font-semibold text-[var(--ink-soft)] sm:px-4" role="status" aria-live="polite">
             {isSearching
               ? searchMatches.length > SEARCH_RESULT_LIMIT
-                ? `找到 ${searchMatches.length} 段，顯示前 ${SEARCH_RESULT_LIMIT} 段`
-                : `找到 ${searchMatches.length} 段字幕`
-              : `顯示目前時間附近字幕，共 ${cues.length} 段`}
+                ? `找到 ${searchMatches.length} 句，顯示前 ${SEARCH_RESULT_LIMIT} 句`
+                : `找到 ${searchMatches.length} 句字幕`
+              : `顯示目前時間附近字幕，共 ${cues.length} 句`}
           </p>
           <ol aria-label={`${heading}字幕列表`} className="min-w-0 divide-y divide-[var(--line-soft)]">
             {visibleCues.map((cue) => {

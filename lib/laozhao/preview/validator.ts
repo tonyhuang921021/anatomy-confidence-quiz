@@ -44,6 +44,45 @@ function assertSameSecond(value: unknown, expected: number, label: string) {
   }
 }
 
+function chapterForCaption(
+  chapters: readonly LaoZhaoPreviewChapter[],
+  caption: LaoZhaoPreviewCaption
+) {
+  const midpoint = (caption.startSec + caption.endSec) / 2;
+  const directMatch = chapters.find((chapter, index) => (
+    midpoint >= chapter.startSec
+      && (midpoint < chapter.endSec || (index === chapters.length - 1 && midpoint <= chapter.endSec))
+  ));
+  if (directMatch) return directMatch;
+
+  let bestMatch: LaoZhaoPreviewChapter | null = null;
+  let bestOverlap = 0;
+  for (const chapter of chapters) {
+    const overlap = Math.max(
+      0,
+      Math.min(caption.endSec, chapter.endSec) - Math.max(caption.startSec, chapter.startSec)
+    );
+    if (overlap > bestOverlap) {
+      bestMatch = chapter;
+      bestOverlap = overlap;
+    }
+  }
+  return bestMatch;
+}
+
+function captionsBelongToChapter(
+  chapters: readonly LaoZhaoPreviewChapter[],
+  captions: readonly LaoZhaoPreviewCaption[],
+  startIndex: number,
+  endIndex: number,
+  chapterId: string
+) {
+  for (let index = startIndex; index <= endIndex; index += 1) {
+    if (chapterForCaption(chapters, captions[index])?.id !== chapterId) return false;
+  }
+  return true;
+}
+
 function validateLectureBlockContent(raw: Record<string, unknown>, label: string) {
   if (raw.type === "bullets") {
     if (!Array.isArray(raw.points) || raw.points.length < 1 || raw.points.length > 12) {
@@ -136,7 +175,7 @@ function validateLectureNotes(
       const lastCaption = captions[endIndex];
       assertSameSecond(block.startSec, firstCaption.startSec, `${label}起點`);
       assertSameSecond(block.endSec, lastCaption.endSec, `${label}終點`);
-      if (firstCaption.startSec < chapter.startSec - 0.5 || lastCaption.endSec > chapter.endSec + 0.5) {
+      if (!captionsBelongToChapter(chapters, captions, startIndex, endIndex, chapter.id)) {
         throw new Error(`${label}跨越章節。`);
       }
       teacherBlocks.set(block.id as string, block as unknown as LaoZhaoPreviewLectureBlock);

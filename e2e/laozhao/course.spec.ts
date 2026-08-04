@@ -1,9 +1,11 @@
 import { expect, test, type Page } from "@playwright/test";
 import manifest from "../../data/laozhao/courseManifest.generated.json";
 import previewManifest from "../../data/laozhao/previewContent.generated.json";
+import { buildCaptionSentences } from "../../lib/laozhao/preview/captionSentences";
 
 const [firstVideo, secondVideo] = manifest.videos;
 const firstVideoPreview = previewManifest.videos.find((video) => video.videoId === firstVideo.id);
+const firstVideoCaptionSentences = buildCaptionSentences(firstVideoPreview?.captions ?? []);
 const firstVideoLectureNotes = (firstVideoPreview as unknown as {
   lectureNotes?: { blocks: readonly { provenance: "teacher" | "supplement" }[] };
 } | undefined)?.lectureNotes;
@@ -101,7 +103,7 @@ test("第一支 Preview 有 24 章、同步字幕、板書與對照筆記", asyn
     expect(panelBox?.height ?? Number.POSITIVE_INFINITY).toBeLessThanOrEqual(480);
   }
   await page.getByRole("tab", { name: "字幕", exact: true }).click();
-  await expect(page.getByText(`${firstVideoPreview?.captions.length} 段`, { exact: true }).first()).toBeVisible();
+  await expect(page.getByText(`${firstVideoCaptionSentences.length} 句`, { exact: true }).first()).toBeVisible();
   const renderedCues = page.locator('ol[aria-label$="字幕列表"] > li');
   expect(await renderedCues.count()).toBeLessThanOrEqual(50);
   await page.getByRole("tab", { name: "列點講義" }).click();
@@ -144,9 +146,9 @@ test("影片與字幕會一起進入全螢幕，Safari 不支援時使用滿版�
       value: undefined
     });
   });
-  const caption = firstVideoPreview?.captions[0];
+  const caption = firstVideoCaptionSentences.find((sentence) => sentence.sourceCueIds.length > 1);
   expect(caption).toBeTruthy();
-  await page.goto(`/courses/laozhao-anatomy/watch/${firstVideo.id}?t=${caption?.startSec ?? 30}`);
+  await page.goto(`/courses/laozhao-anatomy/watch/${firstVideo.id}?t=${(caption?.startSec ?? 30) + 0.1}`);
   const enterButton = page.getByRole("button", { name: "影片與字幕全螢幕" });
   await expect(enterButton).toBeVisible();
   await enterButton.click();
@@ -155,6 +157,7 @@ test("影片與字幕會一起進入全螢幕，Safari 不支援時使用滿版�
   await expect(fullscreenFrame).toBeVisible();
   const captionOverlay = fullscreenFrame.locator('[data-caption-overlay="true"]');
   await expect(captionOverlay).toBeVisible();
+  await expect(captionOverlay).toHaveText(caption?.text ?? "");
   const frameBox = await fullscreenFrame.boundingBox();
   const captionBox = await captionOverlay.boundingBox();
   const viewport = page.viewportSize();

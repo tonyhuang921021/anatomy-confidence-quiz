@@ -289,3 +289,128 @@ test("列點講義必須完整覆蓋老師字幕並明確綁定補充", () => {
     videos: [orphanSupplement]
   }), /沒有對應的前置老師講授區塊/);
 });
+
+test("章節時間切在字幕內時依字幕中點歸屬，真正跨章仍會阻擋", () => {
+  const captions = [
+    {
+      id: "cue-00001",
+      startSec: 0,
+      endSec: 9,
+      text: "第一章內容。",
+      sourceSegmentStart: 1,
+      sourceSegmentEnd: 1,
+      sourceSegmentCount: 1
+    },
+    {
+      id: "cue-00002",
+      startSec: 9,
+      endSec: 13,
+      text: "第二章開場。",
+      sourceSegmentStart: 2,
+      sourceSegmentEnd: 2,
+      sourceSegmentCount: 1
+    },
+    {
+      id: "cue-00003",
+      startSec: 13,
+      endSec: 19,
+      text: "第二章內容。",
+      sourceSegmentStart: 3,
+      sourceSegmentEnd: 3,
+      sourceSegmentCount: 1
+    }
+  ] as const;
+  const chapters = [
+    {
+      ...validVideo.chapters[0],
+      id: "ATFBb25QRNw-ch-001",
+      title: "第一章",
+      startSec: 0,
+      endSec: 8,
+      representativeFrameTargetSec: 4
+    },
+    {
+      ...validVideo.chapters[0],
+      id: "ATFBb25QRNw-ch-002",
+      title: "第二章",
+      startSec: 8,
+      endSec: 20,
+      representativeFrameTargetSec: 12
+    }
+  ] as const;
+  const teacherBlocks = [
+    {
+      id: "teacher-1",
+      chapterId: chapters[0].id,
+      provenance: "teacher",
+      type: "bullets",
+      title: "第一章",
+      sourceCaptionStart: "cue-00001",
+      sourceCaptionEnd: "cue-00001",
+      sourceCaptionCount: 1,
+      startSec: 0,
+      endSec: 9,
+      points: [{ text: "第一章內容。", details: [] }]
+    },
+    {
+      id: "teacher-2",
+      chapterId: chapters[1].id,
+      provenance: "teacher",
+      type: "bullets",
+      title: "第二章",
+      sourceCaptionStart: "cue-00002",
+      sourceCaptionEnd: "cue-00003",
+      sourceCaptionCount: 2,
+      startSec: 9,
+      endSec: 19,
+      points: [{ text: "第二章內容。", details: [] }]
+    }
+  ] as const;
+  const source = {
+    ...validVideo,
+    durationSec: 20,
+    sourceSegmentTotal: 3,
+    chapters,
+    captions,
+    lectureNotes: {
+      schemaVersion: "1.0.0",
+      videoId: validVideo.videoId,
+      captionFingerprint: previewCaptionFingerprint(captions),
+      reviewStatus: "draft",
+      blocks: teacherBlocks
+    }
+  } as const;
+
+  const parsed = parseLaoZhaoPreviewManifest({
+    schemaVersion: "1.0.0",
+    visibility: "preview",
+    videos: [source]
+  });
+  assert.equal(parsed.videos[0]?.lectureNotes?.blocks.length, 2);
+
+  const crossChapter = {
+    ...source,
+    lectureNotes: {
+      ...source.lectureNotes,
+      blocks: [
+        {
+          ...teacherBlocks[0],
+          sourceCaptionEnd: "cue-00002",
+          sourceCaptionCount: 2,
+          endSec: 13
+        },
+        {
+          ...teacherBlocks[1],
+          sourceCaptionStart: "cue-00003",
+          sourceCaptionCount: 1,
+          startSec: 13
+        }
+      ]
+    }
+  } as const;
+  assert.throws(() => parseLaoZhaoPreviewManifest({
+    schemaVersion: "1.0.0",
+    visibility: "preview",
+    videos: [crossChapter]
+  }), /跨越章節/);
+});

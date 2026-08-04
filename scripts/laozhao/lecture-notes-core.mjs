@@ -71,10 +71,53 @@ function normalizeBlockContent(raw, label) {
   return { type: "table", ...normalizeTable(raw, label) };
 }
 
-function chapterForRange(chapters, startSec, endSec) {
-  return chapters.find((chapter) => (
-    startSec >= chapter.startSec - 0.5 && endSec <= chapter.endSec + 0.5
-  )) ?? null;
+function chapterForCaption(chapters, caption) {
+  const midpoint = (caption.startSec + caption.endSec) / 2;
+  const directMatch = chapters.find((chapter, index) => (
+    midpoint >= chapter.startSec
+      && (midpoint < chapter.endSec || (index === chapters.length - 1 && midpoint <= chapter.endSec))
+  ));
+  if (directMatch) return directMatch;
+
+  let bestMatch = null;
+  let bestOverlap = 0;
+  for (const chapter of chapters) {
+    const overlap = Math.max(
+      0,
+      Math.min(caption.endSec, chapter.endSec) - Math.max(caption.startSec, chapter.startSec)
+    );
+    if (overlap > bestOverlap) {
+      bestMatch = chapter;
+      bestOverlap = overlap;
+    }
+  }
+  return bestMatch;
+}
+
+function chapterForRange(chapters, captions, startIndex, endIndex) {
+  const chapter = chapterForCaption(chapters, captions[startIndex]);
+  if (!chapter) return null;
+  const chapterId = chapter.id ?? chapter.stableId;
+  for (let index = startIndex + 1; index <= endIndex; index += 1) {
+    const candidate = chapterForCaption(chapters, captions[index]);
+    if (!candidate || (candidate.id ?? candidate.stableId) !== chapterId) return null;
+  }
+  return chapter;
+}
+
+function chapterCaptionBounds(chapters, captions) {
+  const bounds = new Map();
+  for (const caption of captions) {
+    const chapter = chapterForCaption(chapters, caption);
+    if (!chapter) continue;
+    const chapterId = chapter.id ?? chapter.stableId;
+    const current = bounds.get(chapterId);
+    bounds.set(chapterId, {
+      sourceCaptionStart: current?.sourceCaptionStart ?? caption.id,
+      sourceCaptionEnd: caption.id
+    });
+  }
+  return bounds;
 }
 
 export function lectureNotesFingerprint(notes) {
@@ -137,7 +180,7 @@ export function validateLectureNotesReview(video, review, { acceptedStatuses = [
       if (sourceCaptionCount > maxTeacherCaptionSpan) {
         throw new Error(`${label}涵蓋 ${sourceCaptionCount} 段字幕，最多只能涵蓋 ${maxTeacherCaptionSpan} 段；請拆小以便逐段核對。`);
       }
-      const chapter = chapterForRange(chapters, startSec, endSec);
+      const chapter = chapterForRange(chapters, captions, startIndex, endIndex);
       const chapterId = raw.chapterId;
       if (!chapter || !chapterIds.has(chapterId) || (chapter.id ?? chapter.stableId) !== chapterId) {
         throw new Error(`${label}跨越章節或 chapterId 不一致。`);
@@ -191,11 +234,13 @@ export function validateLectureNotesReview(video, review, { acceptedStatuses = [
 
 export function buildLectureNotesPackage(video) {
   const fingerprint = captionFingerprint(video.captions ?? []);
+  const captionBounds = chapterCaptionBounds(video.chapters ?? [], video.captions ?? []);
   const chapterContext = (video.chapters ?? []).map((chapter) => ({
     id: chapter.id ?? chapter.stableId,
     title: chapter.title,
     startSec: chapter.startSec,
     endSec: chapter.endSec,
+    ...captionBounds.get(chapter.id ?? chapter.stableId),
     summary: chapter.summary,
     tags: chapter.tags
   }));
@@ -242,7 +287,7 @@ export function buildLectureNotesPackage(video) {
     "嚴格規則：",
     "1. 先完整讀完所有章節與字幕，再開始輸出。老師講到的知識、定義、數字、步驟、因果、比較、例子、口訣、例外、否定、提醒、自我修正與考試提示都不可遺漏。",
     "2. 可以把語助詞、完全重複的措辭與不影響內容的口頭停頓併入相鄰區塊，但其字幕 ID 仍必須落在某個 teacher 區塊的來源範圍內。老師新講出的每一項資訊都必須實際寫進 points、details 或 table，不能只把字幕範圍標上去卻省略內容。",
-    `3. 所有 provenance=teacher 的區塊，sourceCaptionStart 到 sourceCaptionEnd 必須依原順序連續、不可重疊、不可跳號；第一個從第一段字幕開始，最後一個涵蓋最後一段字幕。每個 teacher 區塊不得跨越章節，且最多涵蓋 ${maxTeacherCaptionSpan} 段字幕；同一主題太長時請拆成連續小區塊，方便逐段核對。`,
+    `3. 所有 provenance=teacher 的區塊，sourceCaptionStart 到 sourceCaptionEnd 必須依原順序連續、不可重疊、不可跳號；第一個從第一段字幕開始，最後一個涵蓋最後一段字幕。每個 teacher 區塊不得超出章節脈絡列出的 sourceCaptionStart 與 sourceCaptionEnd，且最多涵蓋 ${maxTeacherCaptionSpan} 段字幕；同一主題太長時請拆成連續小區塊，方便逐段核對。`,
     "4. teacher 內容只能來自字幕。可重新組句成自然的臺灣繁體中文列點，但不可新增老師沒說過的結論，也不可改變原意。",
     "5. 若理解該段確實需要背景知識、名詞定義或比較，可新增 provenance=supplement 區塊；必須用 afterBlockId 指向前面的 teacher 區塊，不可填 sourceCaptionStart 或 sourceCaptionEnd。補充可以完整到足以協助理解，但不可取代、刪減或混入 teacher 內容，網站會把它明確標為『補充』。",
     "6. 比較、分類、流程、神經分支、構造關係或容易混淆的內容可用 type=table；其他內容用 type=bullets。表格每列欄數必須與 columns 相同。",
