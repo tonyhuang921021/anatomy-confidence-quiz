@@ -290,6 +290,138 @@ test("列點講義必須完整覆蓋老師字幕並明確綁定補充", () => {
   }), /沒有對應的前置老師講授區塊/);
 });
 
+test("Preview 接受四層共筆清單並阻擋錯誤標記與第五層", () => {
+  const source = videoWithLectureNotes();
+  const nestedBlocks = source.lectureNotes.blocks.map((block) => (
+    block.id === "teacher-1"
+      ? {
+          ...block,
+          points: [{
+            text: "第一層",
+            details: [],
+            children: [{
+              text: "第二層",
+              details: [],
+              children: [{
+                text: "第三層",
+                details: [],
+                children: [{
+                  text: "第四層",
+                  details: [],
+                  kind: "teacher_note"
+                }]
+              }]
+            }]
+          }]
+        }
+      : block
+  ));
+  const nested = {
+    ...source,
+    lectureNotes: {
+      ...source.lectureNotes,
+      blocks: nestedBlocks
+    }
+  } as const;
+  const parsed = parseLaoZhaoPreviewManifest({
+    schemaVersion: "1.0.0",
+    visibility: "preview",
+    videos: [nested]
+  });
+  const firstBlock = parsed.videos[0]?.lectureNotes?.blocks[0];
+  assert.equal(firstBlock?.type === "bullets" ? firstBlock.points[0]?.children?.[0]?.children?.[0]?.children?.[0]?.kind : null, "teacher_note");
+
+  const fifthLevel = {
+    ...nested,
+    lectureNotes: {
+      ...nested.lectureNotes,
+      blocks: nested.lectureNotes.blocks.map((block) => (
+        block.id === "teacher-1" && block.type === "bullets"
+          ? {
+              ...block,
+              points: [{
+                ...block.points[0],
+                children: [{
+                  text: "第二層",
+                  children: [{
+                    text: "第三層",
+                    children: [{
+                      text: "第四層",
+                      children: [{ text: "第五層" }]
+                    }]
+                  }]
+                }]
+              }]
+            }
+          : block
+      ))
+    }
+  };
+  assert.throws(() => parseLaoZhaoPreviewManifest({
+    schemaVersion: "1.0.0",
+    visibility: "preview",
+    videos: [fifthLevel]
+  }), /超過四層/);
+
+  const invalidKind = {
+    ...nested,
+    lectureNotes: {
+      ...nested.lectureNotes,
+      blocks: nested.lectureNotes.blocks.map((block) => (
+        block.id === "teacher-1" && block.type === "bullets"
+          ? { ...block, points: [{ text: "不合法標記", kind: "ai_summary" }] }
+          : block
+      ))
+    }
+  };
+  assert.throws(() => parseLaoZhaoPreviewManifest({
+    schemaVersion: "1.0.0",
+    visibility: "preview",
+    videos: [invalidKind]
+  }), /標記類型無效/);
+});
+
+test("Preview 可解析共筆條列內的比較表格", () => {
+  const source = videoWithLectureNotes();
+  const blocks = source.lectureNotes.blocks.map((block) => (
+    block.id === "teacher-1" && block.type === "bullets"
+      ? {
+          ...block,
+          sourceFormat: "timecoded_outline",
+          tables: [{
+            title: "概念比較",
+            columns: ["項目", "內容"],
+            rows: [["第一點", "建立概念"], ["例外", "補充辨析"]]
+          }]
+        }
+      : block
+  ));
+  const parsed = parseLaoZhaoPreviewManifest({
+    schemaVersion: "1.0.0",
+    visibility: "preview",
+    videos: [{
+      ...source,
+      lectureNotes: { ...source.lectureNotes, blocks }
+    }]
+  });
+  const firstBlock = parsed.videos[0]?.lectureNotes?.blocks[0];
+  assert.equal(firstBlock?.type === "bullets" ? firstBlock.tables?.[0]?.rows.length : 0, 2);
+
+  const invalidBlocks = blocks.map((block) => (
+    block.id === "teacher-1" && block.type === "bullets"
+      ? { ...block, tables: [{ title: "壞表格", columns: ["只有一欄"], rows: [["內容"]] }] }
+      : block
+  ));
+  assert.throws(() => parseLaoZhaoPreviewManifest({
+    schemaVersion: "1.0.0",
+    visibility: "preview",
+    videos: [{
+      ...source,
+      lectureNotes: { ...source.lectureNotes, blocks: invalidBlocks }
+    }]
+  }), /表格欄數無效/);
+});
+
 test("章節時間切在字幕內時依字幕中點歸屬，真正跨章仍會阻擋", () => {
   const captions = [
     {

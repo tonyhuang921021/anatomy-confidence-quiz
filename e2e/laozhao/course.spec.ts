@@ -108,9 +108,24 @@ test("第一支 Preview 有 24 章、同步字幕、板書與對照筆記", asyn
   expect(await renderedCues.count()).toBeLessThanOrEqual(50);
   await page.getByRole("tab", { name: "列點講義" }).click();
   if (firstVideoLectureNotes) {
+    await expect(page.locator("[data-lecture-chapter]")).toHaveCount(firstVideoPreview?.chapters.length ?? 0);
+    await expect(page.locator("[data-lecture-chapter]").first().getByRole("heading", { level: 2 })).toContainText("1.");
+    await expect(page.locator("[data-lecture-chapter]").first().getByRole("heading", { level: 3 }).first()).toContainText("一、");
     await expect(page.locator('[data-lecture-provenance="teacher"]').first()).toBeVisible();
     const supplementCount = firstVideoLectureNotes.blocks.filter((block) => block.provenance === "supplement").length;
     await expect(page.locator('[data-lecture-provenance="supplement"]')).toHaveCount(supplementCount);
+    if ((page.viewportSize()?.width ?? 0) <= 400) {
+      const twoColumnTable = page.locator('[data-lecture-table-columns="2"]').first();
+      const tableMetrics = await twoColumnTable.evaluate((figure) => {
+        const viewport = figure.querySelector("div");
+        const table = figure.querySelector("table");
+        return {
+          viewportWidth: viewport?.clientWidth ?? 0,
+          tableWidth: table?.scrollWidth ?? Number.POSITIVE_INFINITY
+        };
+      });
+      expect(tableMetrics.tableWidth).toBeLessThanOrEqual(tableMetrics.viewportWidth + 1);
+    }
   } else {
     await expect(
       page.locator('[data-side-panel-scroll="lecture-notes"]').getByText("列點講義待校訂", { exact: true })

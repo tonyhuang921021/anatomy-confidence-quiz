@@ -12,6 +12,11 @@ import type {
 const VIDEO_ID_PATTERN = /^[A-Za-z0-9_-]{11}$/;
 const SHA256_PATTERN = /^[a-f0-9]{64}$/;
 const MAX_TEACHER_CAPTION_SPAN = 14;
+const MAX_OUTLINE_CAPTION_SPAN = 32;
+const LECTURE_POINT_KINDS = new Set(["standard", "teacher_note", "exam_focus", "mnemonic", "warning"]);
+const MAX_LECTURE_POINT_DEPTH = 3;
+const MAX_LECTURE_POINT_CHILDREN = 10;
+const MAX_LECTURE_POINT_NODES = 80;
 
 function isRecord(value: unknown): value is Record<string, unknown> {
   return Boolean(value) && typeof value === "object" && !Array.isArray(value);
@@ -83,20 +88,62 @@ function captionsBelongToChapter(
   return true;
 }
 
+function validateLecturePoint(
+  raw: unknown,
+  label: string,
+  depth: number,
+  state: { count: number }
+) {
+  if (!isRecord(raw)) throw new Error(`${label}格式無效。`);
+  state.count += 1;
+  if (state.count > MAX_LECTURE_POINT_NODES) {
+    throw new Error(`${label}所屬區塊的條列節點過多。`);
+  }
+  assertText(raw.text, label, depth === 0 ? 320 : 260);
+  const kind = raw.kind ?? "standard";
+  if (typeof kind !== "string" || !LECTURE_POINT_KINDS.has(kind)) {
+    throw new Error(`${label}標記類型無效。`);
+  }
+  const details = raw.details ?? [];
+  if (!Array.isArray(details) || details.length > 8) {
+    throw new Error(`${label}舊式子項目格式無效。`);
+  }
+  details.forEach((detail, detailIndex) => (
+    assertText(detail, `${label}舊式子項目 ${detailIndex + 1}`, 260)
+  ));
+  const children = raw.children ?? [];
+  if (!Array.isArray(children) || children.length > MAX_LECTURE_POINT_CHILDREN) {
+    throw new Error(`${label}下層項目格式無效。`);
+  }
+  if (depth >= MAX_LECTURE_POINT_DEPTH && children.length > 0) {
+    throw new Error(`${label}超過四層共筆結構。`);
+  }
+  children.forEach((child, childIndex) => (
+    validateLecturePoint(child, `${label}下層項目 ${childIndex + 1}`, depth + 1, state)
+  ));
+}
+
 function validateLectureBlockContent(raw: Record<string, unknown>, label: string) {
   if (raw.type === "bullets") {
     if (!Array.isArray(raw.points) || raw.points.length < 1 || raw.points.length > 12) {
       throw new Error(`${label}列點數量無效。`);
     }
+    const state = { count: 0 };
     for (const [pointIndex, point] of raw.points.entries()) {
-      if (!isRecord(point)) throw new Error(`${label}第 ${pointIndex + 1} 點格式無效。`);
-      assertText(point.text, `${label}第 ${pointIndex + 1} 點`, 320);
-      if (!Array.isArray(point.details) || point.details.length > 8) {
-        throw new Error(`${label}第 ${pointIndex + 1} 點子項目格式無效。`);
-      }
-      point.details.forEach((detail, detailIndex) => (
-        assertText(detail, `${label}第 ${pointIndex + 1} 點子項目 ${detailIndex + 1}`, 260)
-      ));
+      validateLecturePoint(point, `${label}第 ${pointIndex + 1} 點`, 0, state);
+    }
+    const tables = raw.tables ?? [];
+    if (!Array.isArray(tables) || tables.length > 4) {
+      throw new Error(`${label}內嵌表格數量無效。`);
+    }
+    for (const [tableIndex, table] of tables.entries()) {
+      if (!isRecord(table)) throw new Error(`${label}第 ${tableIndex + 1} 張表格格式無效。`);
+      assertText(table.title, `${label}第 ${tableIndex + 1} 張表格標題`, 120);
+      validateLectureBlockContent({
+        type: "table",
+        columns: table.columns,
+        rows: table.rows
+      }, `${label}第 ${tableIndex + 1} 張表格`);
     }
     return;
   }
@@ -165,8 +212,14 @@ function validateLectureNotes(
         throw new Error(`${label}前有字幕缺口、重疊或倒序。`);
       }
       const sourceCaptionCount = endIndex - startIndex + 1;
-      if (sourceCaptionCount > MAX_TEACHER_CAPTION_SPAN) {
-        throw new Error(`${label}超過 ${MAX_TEACHER_CAPTION_SPAN} 段字幕。`);
+      if (block.sourceFormat !== undefined && block.sourceFormat !== "timecoded_outline") {
+        throw new Error(`${label}來源格式無效。`);
+      }
+      const captionSpanLimit = block.sourceFormat === "timecoded_outline"
+        ? MAX_OUTLINE_CAPTION_SPAN
+        : MAX_TEACHER_CAPTION_SPAN;
+      if (sourceCaptionCount > captionSpanLimit) {
+        throw new Error(`${label}超過 ${captionSpanLimit} 段字幕。`);
       }
       if (block.sourceCaptionCount !== sourceCaptionCount) {
         throw new Error(`${label}來源字幕數量不一致。`);

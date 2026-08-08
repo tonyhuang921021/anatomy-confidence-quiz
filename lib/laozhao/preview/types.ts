@@ -40,9 +40,24 @@ export type LaoZhaoPreviewCaption = {
   sourceSegmentCount: number;
 };
 
+export type LaoZhaoPreviewLecturePointKind =
+  | "standard"
+  | "teacher_note"
+  | "exam_focus"
+  | "mnemonic"
+  | "warning";
+
 export type LaoZhaoPreviewLecturePoint = {
   text: string;
   details: readonly string[];
+  children?: readonly LaoZhaoPreviewLecturePoint[];
+  kind?: LaoZhaoPreviewLecturePointKind;
+};
+
+export type LaoZhaoPreviewLectureTable = {
+  title: string;
+  columns: readonly string[];
+  rows: readonly (readonly string[])[];
 };
 
 type LaoZhaoPreviewLectureBlockBase = {
@@ -58,6 +73,7 @@ type LaoZhaoPreviewLectureTeacherSource = {
   sourceCaptionStart: string;
   sourceCaptionEnd: string;
   sourceCaptionCount: number;
+  sourceFormat?: "timecoded_outline";
 };
 
 type LaoZhaoPreviewLectureSupplementSource = {
@@ -68,6 +84,7 @@ type LaoZhaoPreviewLectureSupplementSource = {
 type LaoZhaoPreviewLectureBulletContent = {
   type: "bullets";
   points: readonly LaoZhaoPreviewLecturePoint[];
+  tables?: readonly LaoZhaoPreviewLectureTable[];
 };
 
 type LaoZhaoPreviewLectureTableContent = {
