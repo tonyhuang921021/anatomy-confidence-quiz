@@ -3,7 +3,7 @@ import { AuthPanel } from "@/components/AuthPanel";
 
 export default function ResetPasswordPage() {
   return (
-    <main className="shell">
+    <main id="main-content" className="shell workspace-page">
       <section className="surface-card p-6 sm:p-8">
         <p className="eyebrow">Password Reset</p>
         <h1 className="display-title mt-3 text-4xl sm:text-5xl">重設密碼</h1>

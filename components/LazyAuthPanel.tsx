@@ -54,10 +54,11 @@ const AuthPanel = dynamic(
   }
 );
 
-export function LazyAuthPanel() {
+export function LazyAuthPanel({ eager = false }: { eager?: boolean }) {
   const { ref, shouldLoad } = useNearViewport();
+  const shouldRender = eager || shouldLoad;
 
-  if (!shouldLoad) {
+  if (!shouldRender) {
     return (
       <div ref={ref}>
         <AuthPanelPlaceholder />

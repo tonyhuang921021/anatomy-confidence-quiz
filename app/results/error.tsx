@@ -15,7 +15,7 @@ export default function ResultsError({
   }, [error]);
 
   return (
-    <main className="shell">
+    <main id="main-content" className="shell workspace-page">
       <section className="rounded-[2rem] bg-white p-5 text-center shadow-card ring-1 ring-slate-100 sm:p-8">
         <h1 className="text-2xl font-semibold text-ink">這筆結果目前讀取失敗</h1>
         <p className="mt-3 text-sm leading-7 text-slate-500">

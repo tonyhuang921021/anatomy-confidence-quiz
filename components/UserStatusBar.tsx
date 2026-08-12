@@ -2,9 +2,105 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import {
+  BarChart3,
+  Bookmark,
+  BookOpenText,
+  ChevronDown,
+  Cloud,
+  FileClock,
+  Home,
+  Info,
+  Library,
+  LogOut,
+  Menu,
+  MessageSquareText,
+  MoreHorizontal,
+  NotebookTabs,
+  Pill,
+  Settings,
+  Trophy,
+  UserRound,
+  X
+} from "lucide-react";
+import type { LucideIcon } from "lucide-react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useAuth } from "@/components/AuthProvider";
+import { ClientSectionBoundary } from "@/components/ClientSectionBoundary";
+import { LazyAuthPanel } from "@/components/LazyAuthPanel";
+import { LazyFeedbackBoard } from "@/components/LazyFeedbackBoard";
 import { getSyncStatusText, getSyncStatusTone } from "@/components/syncStatusText";
 import { VisitorStatsPanel } from "@/components/VisitorStatsPanel";
+
+type NavItem = {
+  href: string;
+  label: string;
+  icon: LucideIcon;
+  matches?: (pathname: string) => boolean;
+};
+
+const PRIMARY_NAV: NavItem[] = [
+  {
+    href: "/",
+    label: "首頁",
+    icon: Home,
+    matches: (pathname) => pathname === "/"
+  },
+  {
+    href: "/progress",
+    label: "進度總覽",
+    icon: BarChart3,
+    matches: (pathname) => pathname.startsWith("/progress")
+  },
+  {
+    href: "/results",
+    label: "作答紀錄",
+    icon: FileClock,
+    matches: (pathname) =>
+      pathname === "/results" ||
+      pathname.startsWith("/simulation-results") ||
+      pathname.startsWith("/simulation-review")
+  },
+  {
+    href: "/saved-questions",
+    label: "儲存題目",
+    icon: Bookmark,
+    matches: (pathname) => pathname.startsWith("/saved-questions")
+  }
+];
+
+const MORE_LINKS: NavItem[] = [
+  { href: "/notes", label: "學習筆記", icon: NotebookTabs },
+  { href: "/resources", label: "資源分享", icon: Library },
+  { href: "/pharmacology-review", label: "藥理複習", icon: Pill },
+  { href: "/leaderboard", label: "刷題榜", icon: Trophy },
+  { href: "/post-exam", label: "考後回顧", icon: BookOpenText },
+  { href: "/courses/laozhao-anatomy", label: "老趙解剖學影片", icon: Library }
+];
+
+const FOCUS_PATHS = [
+  "/quiz",
+  "/owner/parasitology-review",
+  "/owner/bacteria-review",
+  "/owner/virus-review",
+  "/owner/biochemistry-review"
+];
+
+export function isAppFocusPath(pathname: string) {
+  return FOCUS_PATHS.some((path) => pathname === path || pathname.startsWith(`${path}/`));
+}
+
+function getAccountLabel(email?: string | null, nickname?: unknown) {
+  if (typeof nickname === "string" && nickname.trim()) return nickname.trim();
+  if (email) return email.split("@")[0] || email;
+  return "訪客模式";
+}
+
+function getInitials(label: string) {
+  const clean = label.trim();
+  if (!clean || clean === "訪客模式") return "訪";
+  return clean.slice(0, 2).toUpperCase();
+}
 
 export function UserStatusBar() {
   const pathname = usePathname();
@@ -14,60 +110,376 @@ export function UserStatusBar() {
     user,
     syncStatus,
     syncError,
-    pendingCompletedUploadCount
+    pendingCompletedUploadCount,
+    signOut
   } = useAuth();
-  const isOwnerReviewPage =
-    pathname === "/owner/parasitology-review" ||
-    pathname === "/owner/bacteria-review" ||
-    pathname === "/owner/virus-review" ||
-    pathname === "/owner/biochemistry-review";
+  const [navOpen, setNavOpen] = useState(false);
+  const [moreOpen, setMoreOpen] = useState(false);
+  const [accountOpen, setAccountOpen] = useState(false);
+  const [accountPanelOpen, setAccountPanelOpen] = useState(false);
+  const [feedbackOpen, setFeedbackOpen] = useState(false);
+  const accountRef = useRef<HTMLDivElement | null>(null);
+  const focusMode = isAppFocusPath(pathname);
+  const accountLabel = getAccountLabel(user?.email, user?.user_metadata?.display_name);
   const syncTone = getSyncStatusTone(
     syncStatus,
     Boolean(syncError),
     pendingCompletedUploadCount
   );
+  const syncLabel = getSyncStatusText(
+    syncStatus,
+    Boolean(syncError),
+    pendingCompletedUploadCount
+  );
+  const activePrimary = useMemo(
+    () => PRIMARY_NAV.find((item) => item.matches?.(pathname))?.href ?? "",
+    [pathname]
+  );
 
-  if (isOwnerReviewPage) {
-    return null;
-  }
+  useEffect(() => {
+    setNavOpen(false);
+    setMoreOpen(false);
+    setAccountOpen(false);
+  }, [pathname]);
+
+  useEffect(() => {
+    if (!accountOpen) return;
+
+    function handlePointerDown(event: PointerEvent) {
+      if (!accountRef.current?.contains(event.target as Node)) {
+        setAccountOpen(false);
+      }
+    }
+
+    document.addEventListener("pointerdown", handlePointerDown);
+    return () => document.removeEventListener("pointerdown", handlePointerDown);
+  }, [accountOpen]);
+
+  useEffect(() => {
+    const overlayOpen = navOpen || moreOpen || accountPanelOpen || feedbackOpen;
+    if (!overlayOpen) return;
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.body.style.overflow = previousOverflow;
+    };
+  }, [accountPanelOpen, feedbackOpen, moreOpen, navOpen]);
 
   return (
-    <div className="topbar-shell sticky top-0 z-50 backdrop-blur-xl">
-      <div className="shell flex min-w-0 items-center justify-between gap-3 py-2.5">
-        <Link
-          href="/"
-          className="min-w-0 font-serif text-base font-semibold tracking-[-0.02em] text-ink transition hover:text-brand-700 sm:text-lg"
-        >
-          一階醫師國考刷題測驗
-        </Link>
-        <div className="flex min-w-0 flex-wrap items-center justify-end gap-2 text-[11px] font-semibold">
-          {!configured ? <span className="stat-chip">Supabase 未設定</span> : null}
-          {configured ? <VisitorStatsPanel compact /> : null}
-          {!loading ? (
-            <span className="stat-chip max-w-full break-all">
-              {user?.email ?? "訪客模式"}
-            </span>
+    <>
+      <a href="#main-content" className="app-skip-link">
+        跳到主要內容
+      </a>
+
+      <header className={`app-topbar ${focusMode ? "app-topbar-focus" : ""}`}>
+        <div className="app-topbar-brand">
+          {!focusMode ? (
+            <button
+              type="button"
+              className="app-menu-trigger"
+              onClick={() => setNavOpen(true)}
+              aria-label="開啟導覽"
+            >
+              <Menu size={20} strokeWidth={1.8} />
+            </button>
           ) : null}
+          <Link href="/" className="app-brand-link">
+            一階醫師國考刷題測驗
+          </Link>
+        </div>
+
+        <div className="app-topbar-actions">
+          {!focusMode && configured ? <VisitorStatsPanel compact /> : null}
           {configured && user ? (
             <span
-              className={`rounded-full px-3 py-1 ring-1 ${
-                syncTone === "syncing"
-                  ? "bg-amber-50 text-amber-800 ring-amber-100"
-                  : syncTone === "fallback"
-                    ? "bg-slate-50 text-slate-600 ring-slate-200"
-                    : "bg-emerald-50 text-emerald-800 ring-emerald-100 dark-success-chip"
-              }`}
+              className={`app-sync-state app-sync-${syncTone}`}
               title={syncError || undefined}
             >
-              {getSyncStatusText(
-                syncStatus,
-                Boolean(syncError),
-                pendingCompletedUploadCount
-              )}
+              <Cloud size={15} strokeWidth={1.8} />
+              <span>{syncLabel}</span>
             </span>
           ) : null}
+          <div ref={accountRef} className="app-account-wrap">
+            <button
+              type="button"
+              className="app-account-trigger"
+              onClick={() => setAccountOpen((current) => !current)}
+              aria-expanded={accountOpen}
+              aria-label="開啟帳號選單"
+            >
+              <span className="app-account-avatar" aria-hidden="true">
+                {getInitials(accountLabel)}
+              </span>
+              <span className="app-account-name">{loading ? "讀取中" : accountLabel}</span>
+              <ChevronDown size={16} strokeWidth={1.8} />
+            </button>
+
+            {accountOpen ? (
+              <div className="app-account-popover">
+                <div className="app-account-summary">
+                  <span className="app-account-avatar app-account-avatar-large" aria-hidden="true">
+                    {getInitials(accountLabel)}
+                  </span>
+                  <div className="min-w-0">
+                    <p className="truncate text-sm font-semibold text-ink">{accountLabel}</p>
+                    <p className="mt-1 truncate text-xs text-slate-500">
+                      {user?.email ?? "本機訪客紀錄"}
+                    </p>
+                  </div>
+                </div>
+                {configured && user ? (
+                  <div className={`app-account-sync app-account-sync-${syncTone}`}>
+                    <Cloud size={15} strokeWidth={1.8} />
+                    <span>{syncLabel}</span>
+                  </div>
+                ) : null}
+                <div className="app-account-menu">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setAccountOpen(false);
+                      setAccountPanelOpen(true);
+                    }}
+                  >
+                    {user ? <Settings size={18} strokeWidth={1.8} /> : <UserRound size={18} strokeWidth={1.8} />}
+                    <span>{user ? "帳號與設定" : "登入與同步"}</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setAccountOpen(false);
+                      setMoreOpen(true);
+                    }}
+                  >
+                    <Info size={18} strokeWidth={1.8} />
+                    <span>關於本站</span>
+                  </button>
+                  {user ? (
+                    <button
+                      type="button"
+                      className="app-account-signout"
+                      onClick={() => {
+                        setAccountOpen(false);
+                        void signOut();
+                      }}
+                    >
+                      <LogOut size={18} strokeWidth={1.8} />
+                      <span>登出</span>
+                    </button>
+                  ) : null}
+                </div>
+              </div>
+            ) : null}
+          </div>
         </div>
-      </div>
-    </div>
+      </header>
+
+      {!focusMode ? (
+        <aside className="app-sidebar" aria-label="主要導覽">
+          <nav>
+            {PRIMARY_NAV.map((item) => {
+              const Icon = item.icon;
+              const active = activePrimary === item.href;
+              return (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  className={`app-nav-link ${active ? "is-active" : ""}`}
+                  aria-current={active ? "page" : undefined}
+                >
+                  <Icon size={21} strokeWidth={1.8} />
+                  <span>{item.label}</span>
+                </Link>
+              );
+            })}
+            <button
+              type="button"
+              className={`app-nav-link ${moreOpen ? "is-active" : ""}`}
+              onClick={() => setMoreOpen(true)}
+            >
+              <MoreHorizontal size={22} strokeWidth={1.8} />
+              <span>更多</span>
+            </button>
+          </nav>
+        </aside>
+      ) : null}
+
+      {!focusMode ? (
+        <nav className="app-mobile-nav" aria-label="手機主要導覽">
+          {PRIMARY_NAV.map((item) => {
+            const Icon = item.icon;
+            const active = activePrimary === item.href;
+            return (
+              <Link
+                key={item.href}
+                href={item.href}
+                className={active ? "is-active" : ""}
+                aria-current={active ? "page" : undefined}
+              >
+                <Icon size={20} strokeWidth={1.8} />
+                <span>{item.label.replace("總覽", "")}</span>
+              </Link>
+            );
+          })}
+          <button type="button" onClick={() => setMoreOpen(true)}>
+            <MoreHorizontal size={21} strokeWidth={1.8} />
+            <span>更多</span>
+          </button>
+        </nav>
+      ) : null}
+
+      {navOpen ? (
+        <div className="app-overlay app-mobile-drawer-overlay" role="presentation">
+          <button
+            type="button"
+            className="app-overlay-dismiss"
+            onClick={() => setNavOpen(false)}
+            aria-label="關閉導覽"
+          />
+          <aside className="app-mobile-drawer" aria-label="主要導覽">
+            <div className="app-drawer-header">
+              <p>前往</p>
+              <button type="button" onClick={() => setNavOpen(false)} aria-label="關閉導覽">
+                <X size={20} strokeWidth={1.8} />
+              </button>
+            </div>
+            <nav className="app-drawer-links">
+              {PRIMARY_NAV.map((item) => {
+                const Icon = item.icon;
+                return (
+                  <Link key={item.href} href={item.href}>
+                    <Icon size={20} strokeWidth={1.8} />
+                    <span>{item.label}</span>
+                  </Link>
+                );
+              })}
+              <button
+                type="button"
+                onClick={() => {
+                  setNavOpen(false);
+                  setMoreOpen(true);
+                }}
+              >
+                <MoreHorizontal size={21} strokeWidth={1.8} />
+                <span>更多</span>
+              </button>
+            </nav>
+          </aside>
+        </div>
+      ) : null}
+
+      {moreOpen ? (
+        <div className="app-overlay" role="presentation">
+          <button
+            type="button"
+            className="app-overlay-dismiss"
+            onClick={() => setMoreOpen(false)}
+            aria-label="關閉更多選單"
+          />
+          <aside className="app-side-sheet" aria-label="更多功能">
+            <div className="app-drawer-header">
+              <div>
+                <p>更多</p>
+                <span>學習資源與網站資訊</span>
+              </div>
+              <button type="button" onClick={() => setMoreOpen(false)} aria-label="關閉更多選單">
+                <X size={20} strokeWidth={1.8} />
+              </button>
+            </div>
+
+            <div className="app-more-grid">
+              {MORE_LINKS.map((item) => {
+                const Icon = item.icon;
+                return (
+                  <Link key={item.href} href={item.href}>
+                    <Icon size={20} strokeWidth={1.8} />
+                    <span>{item.label}</span>
+                  </Link>
+                );
+              })}
+              <button
+                type="button"
+                onClick={() => {
+                  setMoreOpen(false);
+                  setFeedbackOpen(true);
+                }}
+              >
+                <MessageSquareText size={20} strokeWidth={1.8} />
+                <span>留言板</span>
+              </button>
+            </div>
+
+            <section className="app-about-section">
+              <p className="app-sheet-label">關於本站</p>
+              <p>
+                這是一個整理醫師國考作答、錯題與複習進度的個人專案。網站維護與內容問題可以直接在留言板回報。
+              </p>
+              <a
+                href="https://www.instagram.com/yphe_uc?igsh=OWJqZjJqd2o2cGpi&utm_source=qr"
+                target="_blank"
+                rel="noreferrer"
+              >
+                聯絡 @yphe_uc
+              </a>
+            </section>
+          </aside>
+        </div>
+      ) : null}
+
+      {accountPanelOpen ? (
+        <div className="app-overlay app-modal-overlay" role="presentation">
+          <button
+            type="button"
+            className="app-overlay-dismiss"
+            onClick={() => setAccountPanelOpen(false)}
+            aria-label="關閉帳號設定"
+          />
+          <section className="app-modal-panel" role="dialog" aria-modal="true" aria-label="帳號與設定">
+            <div className="app-drawer-header">
+              <p>{user ? "帳號與設定" : "登入與同步"}</p>
+              <button
+                type="button"
+                onClick={() => setAccountPanelOpen(false)}
+                aria-label="關閉帳號設定"
+              >
+                <X size={20} strokeWidth={1.8} />
+              </button>
+            </div>
+            <div className="app-modal-content">
+              <ClientSectionBoundary title="帳號與設定">
+                <LazyAuthPanel eager />
+              </ClientSectionBoundary>
+            </div>
+          </section>
+        </div>
+      ) : null}
+
+      {feedbackOpen ? (
+        <div className="app-overlay app-modal-overlay" role="presentation">
+          <button
+            type="button"
+            className="app-overlay-dismiss"
+            onClick={() => setFeedbackOpen(false)}
+            aria-label="關閉留言板"
+          />
+          <section className="app-modal-panel app-feedback-panel" role="dialog" aria-modal="true" aria-label="留言板">
+            <div className="app-drawer-header">
+              <div>
+                <p>留言板</p>
+                <span>建議、問題與回覆都在這裡</span>
+              </div>
+              <button type="button" onClick={() => setFeedbackOpen(false)} aria-label="關閉留言板">
+                <X size={20} strokeWidth={1.8} />
+              </button>
+            </div>
+            <div className="app-modal-content">
+              <ClientSectionBoundary title="留言板">
+                <LazyFeedbackBoard eager showHeading={false} />
+              </ClientSectionBoundary>
+            </div>
+          </section>
+        </div>
+      ) : null}
+    </>
   );
 }

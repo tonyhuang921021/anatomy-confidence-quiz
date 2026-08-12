@@ -566,20 +566,14 @@ export default function SearchPage() {
   }
 
   return (
-    <main className="shell search-page">
-      <section className="min-w-0 max-w-full overflow-hidden rounded-2xl bg-white shadow-card ring-1 ring-slate-200/70">
+    <main id="main-content" className="shell workspace-page search-page">
+      <section className="surface-card workspace-page-panel min-w-0 max-w-full overflow-hidden">
         <div className="border-b border-slate-100 px-5 py-5 sm:px-7 sm:py-6">
           <div className="flex flex-wrap items-center justify-between gap-3">
             <div>
-              <p className="text-xs font-semibold uppercase tracking-[0.2em] text-brand-700">Question Search</p>
-              <h1 className="mt-1 text-2xl font-bold text-ink sm:text-3xl">題目搜尋</h1>
+              <p className="workspace-page-kicker">題庫</p>
+              <h1 className="workspace-page-title">題目搜尋</h1>
             </div>
-            <Link
-              href="/"
-              className="inline-flex min-h-11 items-center rounded-xl bg-slate-100 px-4 py-2 text-sm font-semibold text-slate-800 transition hover:bg-slate-200"
-            >
-              返回首頁
-            </Link>
           </div>
         </div>
 

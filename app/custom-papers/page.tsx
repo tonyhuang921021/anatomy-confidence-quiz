@@ -532,12 +532,12 @@ export default function CustomPapersPage() {
   }
 
   return (
-    <main className="shell">
-      <section className="surface-card p-5 sm:p-6">
+    <main id="main-content" className="shell workspace-page">
+      <section className="surface-card workspace-page-panel p-5 sm:p-6">
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div>
-            <p className="eyebrow">Custom Papers</p>
-            <h1 className="mt-1 text-3xl font-semibold text-ink sm:text-4xl">自訂卷</h1>
+            <p className="workspace-page-kicker">組卷</p>
+            <h1 className="workspace-page-title">自訂卷</h1>
           </div>
           <div className="flex flex-wrap gap-2">
             <Link
@@ -545,12 +545,6 @@ export default function CustomPapersPage() {
               className="inline-flex min-h-10 items-center justify-center rounded-lg bg-amber-100 px-4 py-2 text-sm font-semibold text-amber-900 transition hover:bg-amber-200"
             >
               錯題庫
-            </Link>
-            <Link
-              href="/"
-              className="inline-flex min-h-10 items-center justify-center rounded-lg bg-slate-100 px-4 py-2 text-sm font-semibold text-slate-700 transition hover:bg-slate-200"
-            >
-              返回首頁
             </Link>
           </div>
         </div>
@@ -655,7 +649,7 @@ export default function CustomPapersPage() {
                   <p className="mt-2 text-sm text-slate-600">輸入章節、疾病、機轉或關鍵字。</p>
                 </div>
                 <span className="rounded-full bg-white px-3 py-1.5 text-xs font-semibold text-slate-600 ring-1 ring-slate-200">
-                  {aiSelectedSubjects.length > 0 ? `${aiSelectedSubjects.length} 科` : "全部科目"}・{yearFrom}–{yearTo}
+                  {aiSelectedSubjects.length > 0 ? `${aiSelectedSubjects.length} 科` : "全部科目"}・{yearFrom}-{yearTo}
                 </span>
               </div>
               <textarea

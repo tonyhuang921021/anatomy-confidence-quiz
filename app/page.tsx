@@ -1,56 +1,61 @@
 import Link from "next/link";
-import type { CSSProperties } from "react";
+import {
+  ArrowRight,
+  FileSearch,
+  History,
+  NotebookPen,
+  PencilLine,
+  RotateCcw
+} from "lucide-react";
 import { ContinueQuizButton } from "@/components/ContinueQuizButton";
 import { ClientSectionBoundary } from "@/components/ClientSectionBoundary";
-import { ExamCountdown } from "@/components/ExamCountdown";
-import { LazyAuthPanel } from "@/components/LazyAuthPanel";
-import { LazyFeedbackBoard } from "@/components/LazyFeedbackBoard";
 import { HomeToneBanner } from "@/components/HomeToneBanner";
-import { OwnerOnlyNotesLink } from "@/components/OwnerOnlyNotesLink";
 import { isSupabaseRecoveryMode } from "@/lib/supabase/recoveryMode";
 
-type HomeAnimationStyle = CSSProperties & {
-  "--home-delay"?: string;
-};
-
-const HERO_ACTIONS = [
+const START_ACTIONS = [
   {
     href: "/start",
-    label: "開始測驗",
-    tone: "primary"
+    label: "開始散題",
+    description: "隨機抽題，自由練習",
+    icon: PencilLine,
+    primary: true
   },
   {
     href: "/simulation",
-    label: "開始一份考古題",
-    tone: "light"
-  },
-  {
-    href: "/results",
-    label: "查看結果",
-    tone: "light"
+    label: "開始考古題",
+    description: "歷屆試題，完整演練",
+    icon: History,
+    primary: false
   }
 ] as const;
 
-const QUICK_ENTRIES = [
+const REVIEW_ENTRIES = [
   {
     href: "/review",
-    title: "錯題複習"
+    title: "錯題複習",
+    description: "回顧錯誤題目，加強薄弱處",
+    icon: RotateCcw
   },
   {
     href: "/search",
-    title: "題目搜尋"
+    title: "題目搜尋",
+    description: "依關鍵字、章節或題號搜尋",
+    icon: FileSearch
   },
   {
     href: "/custom-papers",
-    title: "自訂卷模式"
-  },
-  {
-    href: "/leaderboard",
-    title: "刷題榜"
+    title: "自訂卷",
+    description: "依需求建立專屬試卷",
+    icon: NotebookPen
   }
 ] as const;
 
 const HOME_RELEASE_NOTES = [
+  {
+    time: "08/13",
+    title: "全站導覽重新整理",
+    body: "開始、複習、紀錄與資源各自歸位；帳號和留言板移到右上角與更多選單，手機也更好切換。"
+  },
   {
     time: "08/03",
     title: "老趙解剖學影片整理中",
@@ -114,7 +119,7 @@ const HOME_RELEASE_NOTES = [
   {
     time: "07/14",
     title: "沒做過的題目可以先刷",
-    body: "進度總覽與弱點分析可選做題順序；近年模式每 3–4 題穿插 1 題近年複習，其餘先排未做題，也能切成全部未做優先。"
+    body: "進度總覽與弱點分析可選做題順序；近年模式每 3-4 題穿插 1 題近年複習，其餘先排未做題，也能切成全部未做優先。"
   },
   {
     time: "07/13",
@@ -1043,38 +1048,32 @@ const HOME_RELEASE_NOTES = [
   }
 ] as const;
 
-const VISIBLE_HOME_RELEASE_NOTES = HOME_RELEASE_NOTES.slice(0, 4);
+const LATEST_HOME_RELEASE_NOTE = HOME_RELEASE_NOTES[0];
 
 export default function HomePage() {
   if (isSupabaseRecoveryMode()) {
     return (
-      <main className="shell home-shell">
-        <section className="surface-card overflow-hidden p-6 sm:p-8 lg:p-10">
-          <p className="eyebrow">Recovery Mode</p>
-          <h1 className="display-title mt-4 max-w-4xl text-[3rem] leading-[1] sm:text-6xl lg:text-[5rem]">
+      <main id="main-content" className="shell home-shell home-workspace">
+        <section className="home-recovery-panel">
+          <p className="eyebrow">維護模式</p>
+          <h1 className="display-title mt-3 text-3xl sm:text-4xl">
             雲端同步維護中
           </h1>
-          <p className="body-soft mt-5 max-w-3xl text-base leading-8 sm:text-lg">
+          <p className="body-soft mt-4 max-w-3xl text-sm leading-7 sm:text-base">
             目前先暫停登入、留言板、跨裝置同步與雲端筆記，讓作答頁維持順暢。你仍然可以用訪客模式刷題，本機紀錄會留在這台裝置。
           </p>
-          <div className="mt-8 grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
-            <Link href="/start" prefetch={false} className="home-action-card home-action-primary">
-              <span className="text-sm font-bold">開始測驗</span>
+          <div className="mt-6 grid gap-3 sm:grid-cols-3">
+            <Link href="/start" prefetch={false} className="home-start-card is-primary">
+              <span>開始散題</span>
             </Link>
-            <Link href="/simulation" prefetch={false} className="home-action-card">
-              <span className="text-sm font-bold">開始一份考古題</span>
+            <Link href="/simulation" prefetch={false} className="home-start-card">
+              <span>開始考古題</span>
             </Link>
-            <Link href="/results" prefetch={false} className="home-action-card">
-              <span className="text-sm font-bold">查看本機結果</span>
-            </Link>
-            <Link href="/search" prefetch={false} className="home-action-card">
-              <span className="text-sm font-bold">題目搜尋</span>
-            </Link>
-            <Link href="/courses/laozhao-anatomy" prefetch={false} className="home-action-card">
-              <span className="text-sm font-bold">老趙解剖學影片</span>
+            <Link href="/search" prefetch={false} className="home-start-card">
+              <span>題目搜尋</span>
             </Link>
           </div>
-          <div className="mt-8 rounded-[2rem] bg-amber-50/80 p-5 text-sm font-semibold leading-7 text-amber-900 ring-1 ring-amber-100">
+          <div className="mt-6 rounded-xl bg-amber-50/80 p-4 text-sm font-semibold leading-7 text-amber-900 ring-1 ring-amber-100">
             如果你原本已經開著舊分頁，那個分頁可能仍會嘗試連雲端；從這個首頁重新進入會使用新的維護模式。
           </div>
         </section>
@@ -1083,186 +1082,80 @@ export default function HomePage() {
   }
 
   return (
-    <main className="shell home-shell">
-      <section className="home-hero surface-card overflow-hidden p-5 sm:p-7 lg:p-10">
-        <div className="home-grain" />
+    <main id="main-content" className="shell home-shell home-workspace">
+      <header className="home-workspace-header">
+        <p className="home-kicker">今日練習</p>
+        <h1 className="display-title">接著做，或開始新的練習。</h1>
+        <ClientSectionBoundary title="首頁提示">
+          <HomeToneBanner />
+        </ClientSectionBoundary>
+      </header>
 
-        <div className="relative z-10 grid gap-8 xl:grid-cols-[minmax(0,1.08fr)_minmax(360px,0.92fr)] xl:items-stretch">
-          <div className="home-reveal flex min-w-0 flex-col justify-between">
-            <div>
-              <div className="flex flex-wrap items-center gap-2">
-                <p className="eyebrow">Board Prep Lab</p>
-                <span className="stat-chip home-chip">醫學一</span>
-                <span className="stat-chip home-chip">醫學二</span>
-                <span className="stat-chip home-chip">雲端紀錄</span>
-              </div>
-              <h1 className="display-title mt-4 max-w-4xl text-[3.4rem] leading-[0.95] sm:text-7xl lg:text-[5.8rem]">
-                一階醫師國考
-                <span className="home-title-accent block">刷題測驗</span>
-              </h1>
-              <p className="body-soft mt-6 max-w-2xl text-base leading-8 sm:text-lg">
-                用答題結果、信心程度與完成度，把模糊的焦慮拆成能處理的下一題。
-              </p>
-              <ClientSectionBoundary title="首頁提示">
-                <HomeToneBanner />
-              </ClientSectionBoundary>
+      <section className="home-work-section" aria-labelledby="home-continue-title">
+        <h2 id="home-continue-title" className="home-section-title">繼續上次測驗</h2>
+        <ClientSectionBoundary title="繼續測驗">
+          <ContinueQuizButton />
+        </ClientSectionBoundary>
+      </section>
 
-              <div className="mt-7 grid gap-3 sm:grid-cols-2">
-                <div className="grid gap-3">
-                  <Link
-                    href={HERO_ACTIONS[0].href}
-                    prefetch={false}
-                    className="home-action-card home-action-primary"
-                    style={{ "--home-delay": "120ms" } as HomeAnimationStyle}
-                  >
-                    <span className="home-action-mark" aria-hidden="true" />
-                    <span className="home-action-title">{HERO_ACTIONS[0].label}</span>
-                  </Link>
-                  <ClientSectionBoundary title="繼續測驗">
-                    <ContinueQuizButton />
-                  </ClientSectionBoundary>
-                </div>
-                <div className="grid gap-3">
-                  {HERO_ACTIONS.slice(1).map((action, index) => (
-                    <Link
-                      key={action.href}
-                      href={action.href}
-                      prefetch={false}
-                      className="home-action-card"
-                      style={{ "--home-delay": `${280 + index * 80}ms` } as HomeAnimationStyle}
-                    >
-                      <span className="home-action-mark" aria-hidden="true" />
-                      <span className="home-action-title">{action.label}</span>
-                    </Link>
-                  ))}
-                </div>
-              </div>
-            </div>
-
-            <section className="home-release-notes mt-5" aria-labelledby="home-release-title">
-              <div className="flex items-center justify-between gap-3">
-                <div>
-                  <p className="eyebrow text-[10px]">Updates</p>
-                  <h2 id="home-release-title" className="mt-1 text-sm font-black tracking-[-0.02em] text-ink">
-                    最近網站更新
-                  </h2>
-                </div>
-              </div>
-              <div className="home-release-scroll mt-3 space-y-2 pr-1">
-                {VISIBLE_HOME_RELEASE_NOTES.map((note) => (
-                  <article key={`${note.time}-${note.title}`} className="home-release-item">
-                    <time className="text-[11px] font-black text-brand-700">{note.time}</time>
-                    <div className="min-w-0">
-                      <h3 className="truncate text-sm font-black text-ink">{note.title}</h3>
-                      <p className="mt-0.5 text-xs font-semibold leading-5 text-slate-500">{note.body}</p>
-                    </div>
-                  </article>
-                ))}
-              </div>
-            </section>
-
-          </div>
-
-          <div className="home-reveal home-reveal-late grid min-w-0 content-start gap-4 self-start">
-            <div className="home-device-card">
-              <div className="home-device-top">
-                <span />
-                <span />
-                <span />
-              </div>
-              <div className="home-device-screen">
-                <div className="flex items-center justify-between gap-3">
-                  <div>
-                    <p className="eyebrow text-[10px]">Next Step</p>
-                    <h2 className="mt-2 text-2xl font-black tracking-[-0.04em] text-ink">今天直接進題目</h2>
-                  </div>
-                  <Link
-                    href="/post-exam"
-                    prefetch={false}
-                    className="pre-exam-survey-trigger post-exam-survey-trigger"
-                    aria-label="打開考後回顧與問卷"
-                  >
-                    <span className="pre-exam-survey-trigger-mark" aria-hidden="true">回</span>
-                    <span className="hidden sm:inline">考後回顧</span>
-                  </Link>
-                </div>
-                <div className="mt-6 grid gap-4">
-                  <ExamCountdown />
-                  <div className="grid auto-rows-max items-start gap-3 sm:grid-cols-2">
-                    {QUICK_ENTRIES.map((entry, index) => (
-                      <Link
-                        key={entry.href}
-                        href={entry.href}
-                        prefetch={false}
-                        className="home-entry-card"
-                        style={{ "--home-delay": `${220 + index * 70}ms` } as HomeAnimationStyle}
-                      >
-                        <span className="home-entry-icon" aria-hidden="true" />
-                        <span className="home-entry-title">{entry.title}</span>
-                      </Link>
-                    ))}
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <div className="grid auto-rows-max items-start gap-3 sm:grid-cols-2">
-              <div className="home-entry-card home-study-card sm:col-span-2">
-                <Link
-                  href="/courses/laozhao-anatomy"
-                  prefetch={false}
-                  className="secondary-pill home-study-link mb-3 w-full px-4"
-                >
-                  老趙解剖學影片
-                </Link>
-                <div className="grid gap-3 sm:grid-cols-2">
-                  <div className="grid gap-3">
-                    <ClientSectionBoundary title="學習筆記入口">
-                      <OwnerOnlyNotesLink />
-                    </ClientSectionBoundary>
-                    <Link href="/resources" prefetch={false} className="secondary-pill home-study-link px-4">
-                      資源分享
-                    </Link>
-                  </div>
-                  <div className="grid gap-3">
-                    <Link href="/pharmacology-review" prefetch={false} className="secondary-pill home-study-link px-4">
-                      藥理複習
-                    </Link>
-                    <Link href="/saved-questions" prefetch={false} className="secondary-pill home-study-link px-4">
-                      儲存題目
-                    </Link>
-                  </div>
-                </div>
-                <div className="home-exam-contact">
-                  <p className="home-exam-contact-copy">
-                    考前兩天，若有急或不急的事，或有什麼資料需要，都可以直接聯絡 IG。
-                  </p>
-                  <a
-                    href="https://www.instagram.com/yphe_uc?igsh=OWJqZjJqd2o2cGpi&utm_source=qr"
-                    target="_blank"
-                    rel="noreferrer"
-                    className="home-exam-contact-link"
-                    aria-label="前往 Instagram 聯絡 yphe_uc"
-                  >
-                    @yphe_uc
-                    <span aria-hidden="true">↗</span>
-                  </a>
-                </div>
-              </div>
-            </div>
-          </div>
+      <section className="home-work-section" aria-labelledby="home-start-title">
+        <h2 id="home-start-title" className="home-section-title">開始練習</h2>
+        <div className="home-start-grid">
+          {START_ACTIONS.map((action) => {
+            const Icon = action.icon;
+            return (
+              <Link
+                key={action.href}
+                href={action.href}
+                prefetch={false}
+                className={`home-start-card ${action.primary ? "is-primary" : ""}`}
+              >
+                <span className="home-start-icon" aria-hidden="true">
+                  <Icon size={25} strokeWidth={1.8} />
+                </span>
+                <span className="home-start-copy">
+                  <strong>{action.label}</strong>
+                  <small>{action.description}</small>
+                </span>
+                <ArrowRight size={20} strokeWidth={1.8} aria-hidden="true" />
+              </Link>
+            );
+          })}
         </div>
       </section>
 
-      <div className="home-reveal home-reveal-late mt-6 grid gap-6">
-        <ClientSectionBoundary title="帳號區塊">
-          <LazyAuthPanel />
-        </ClientSectionBoundary>
+      <section className="home-work-section" aria-labelledby="home-review-title">
+        <h2 id="home-review-title" className="home-section-title">複習與組卷</h2>
+        <div className="home-workflow-list">
+          {REVIEW_ENTRIES.map((entry) => {
+            const Icon = entry.icon;
+            return (
+              <Link key={entry.href} href={entry.href} prefetch={false}>
+                <span className="home-workflow-icon" aria-hidden="true">
+                  <Icon size={21} strokeWidth={1.8} />
+                </span>
+                <span className="home-workflow-copy">
+                  <strong>{entry.title}</strong>
+                  <small>{entry.description}</small>
+                </span>
+                <ArrowRight size={18} strokeWidth={1.8} aria-hidden="true" />
+              </Link>
+            );
+          })}
+        </div>
+      </section>
 
-        <ClientSectionBoundary title="留言板">
-          <LazyFeedbackBoard />
-        </ClientSectionBoundary>
-      </div>
+      {LATEST_HOME_RELEASE_NOTE ? (
+        <section className="home-update-row" aria-labelledby="home-release-title">
+          <h2 id="home-release-title">最近網站更新</h2>
+          <span className="home-update-dot" aria-hidden="true" />
+          <time>{LATEST_HOME_RELEASE_NOTE.time}</time>
+          <p>
+            <strong>{LATEST_HOME_RELEASE_NOTE.title}</strong>
+            <span>{LATEST_HOME_RELEASE_NOTE.body}</span>
+          </p>
+        </section>
+      ) : null}
     </main>
   );
 }

@@ -5,7 +5,7 @@ import dynamic from "next/dynamic";
 const QuizClient = dynamic(() => import("./QuizClient"), {
   ssr: false,
   loading: () => (
-    <main className="shell" aria-busy="true" aria-live="polite">
+    <main id="main-content" className="shell" aria-busy="true" aria-live="polite">
       <div className="rounded-[2rem] bg-white p-5 shadow-card ring-1 ring-slate-100 sm:p-7">
         <p className="text-base font-semibold text-ink">題目載入中...</p>
         <div className="mt-5 h-2 overflow-hidden rounded-full bg-slate-100">

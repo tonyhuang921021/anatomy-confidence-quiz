@@ -8,7 +8,7 @@ export const metadata = {
 
 export default function LaoZhaoPrivacyPage() {
   return (
-    <main className="min-h-screen bg-[var(--bg-base)] text-[var(--ink-main)]">
+    <main id="main-content" className="min-h-screen bg-[var(--bg-base)] text-[var(--ink-main)]">
       <div className="mx-auto max-w-3xl px-4 py-6 sm:px-6 sm:py-10">
         <Link
           href="/courses/laozhao-anatomy"

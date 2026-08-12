@@ -15,7 +15,7 @@ export default function QuizError({
   }, [error]);
 
   return (
-    <main className="shell">
+    <main id="main-content" className="shell workspace-page">
       <section className="rounded-[2rem] bg-white p-5 text-center shadow-card ring-1 ring-slate-100 sm:p-8">
         <h1 className="text-2xl font-semibold text-ink">這輪作答暫時出了點問題</h1>
         <p className="mt-3 text-sm leading-7 text-slate-500">

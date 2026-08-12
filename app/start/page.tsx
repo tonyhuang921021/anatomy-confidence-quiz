@@ -556,19 +556,13 @@ export default function StartPage() {
   }
 
   return (
-    <main className="shell">
-      <section className="surface-card p-6 sm:p-8">
+    <main id="main-content" className="shell workspace-page">
+      <section className="surface-card workspace-page-panel p-6 sm:p-8">
         <div className="flex items-start justify-between gap-4">
           <div className="min-w-0">
-            <p className="eyebrow">Start</p>
+            <p className="workspace-page-kicker">開始測驗</p>
             <div className="mt-2 flex items-start justify-between gap-3">
-              <h1 className="display-title text-4xl sm:text-5xl">先選抽哪些科</h1>
-              <Link
-                href="/"
-                className="secondary-pill min-h-10 shrink-0 px-3 py-2 sm:hidden"
-              >
-                返回首頁
-              </Link>
+              <h1 className="workspace-page-title">先選抽哪些科</h1>
             </div>
             <p className="body-soft mt-3 max-w-2xl text-sm leading-7 sm:text-base">
               可以只勾一科，也可以混著抽。年份範圍只會影響抽題池。
@@ -577,12 +571,6 @@ export default function StartPage() {
                 : ` 目前會從題池裡抽 ${practiceQuestionCount} 題開始測驗。`}
             </p>
           </div>
-          <Link
-            href="/"
-            className="secondary-pill hidden sm:inline-flex"
-          >
-            返回首頁
-          </Link>
         </div>
 
         <div className="mt-6 space-y-6">
@@ -591,7 +579,7 @@ export default function StartPage() {
           {seasonalAvailable ? (
             <section className="rounded-[2rem] border border-amber-200 bg-[rgba(255,247,232,0.9)] p-5">
               <div>
-                <h2 className="font-serif text-2xl font-semibold tracking-[-0.03em] text-ink">季節限定</h2>
+                <h2 className="text-2xl font-semibold text-ink">季節限定</h2>
               </div>
 
               <div className="mt-4">
@@ -629,7 +617,7 @@ export default function StartPage() {
               <details className="group relative">
                 <summary className="flex min-h-10 cursor-pointer list-none items-center gap-2 rounded-xl border border-slate-200 bg-white px-3 py-2 font-semibold text-ink shadow-sm transition hover:border-brand-300 hover:bg-brand-50/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-200 [&::-webkit-details-marker]:hidden">
                   <span className="text-xs font-semibold text-slate-500">年份</span>
-                  <span>{practiceYearRange.yearFrom}–{practiceYearRange.yearTo}</span>
+                  <span>{practiceYearRange.yearFrom}-{practiceYearRange.yearTo}</span>
                   <span className="text-xs text-slate-400 transition group-open:rotate-180" aria-hidden="true">⌄</span>
                 </summary>
                 <div className="absolute bottom-[calc(100%+0.55rem)] left-0 z-20 w-[min(19rem,calc(100vw-4rem))] rounded-2xl border border-slate-200 bg-white p-4 shadow-xl">

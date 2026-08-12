@@ -1246,7 +1246,7 @@ export default function SubjectNotesPage() {
   }
 
   return (
-    <main className="shell max-w-[1600px]">
+    <main id="main-content" className="shell workspace-page max-w-[1600px]">
       <section className="surface-card overflow-hidden p-6 sm:p-8">
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div className="min-w-0">

@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import { MessageCircle, Pin, Send, ThumbsDown, ThumbsUp } from "lucide-react";
 import { useAuth } from "@/components/AuthProvider";
 import { createFeedbackMessage, loadFeedbackMessagesResult, voteFeedbackMessage } from "@/lib/cloudSync";
 import type { FeedbackMessage, OpenAIBudgetStatus } from "@/types/quiz";
@@ -40,25 +41,23 @@ function BudgetPinnedMessage({ budget }: { budget: OpenAIBudgetStatus }) {
   if (!text) return null;
 
   return (
-    <div className="mt-5 rounded-3xl border border-emerald-100 bg-emerald-50/70 px-4 py-3 text-sm leading-6 text-emerald-950">
-      <div className="flex flex-wrap items-center gap-2">
-        <span className="rounded-full bg-white/80 px-2.5 py-1 text-[11px] font-bold uppercase tracking-[0.16em] text-emerald-700">
-          Pinned
-        </span>
-        <span className="font-semibold">{text}</span>
-      </div>
-      <p className="mt-1 text-xs leading-5 text-emerald-800/80">
+    <div className="feedback-pinned">
+      <Pin size={16} strokeWidth={1.8} aria-hidden="true" />
+      <div>
+        <p className="font-semibold">{text}</p>
+        <p className="mt-1 text-xs leading-5 text-emerald-800/80">
         小小透明一下，AI 詳解能穩穩開著就好，大家照自己的節奏用。
-      </p>
+        </p>
+      </div>
     </div>
   );
 }
 
 function FeedbackSkeleton() {
   return (
-    <div className="space-y-3">
+    <div className="feedback-skeleton-list">
       {Array.from({ length: 3 }, (_, index) => (
-        <div key={index} className="home-skeleton-card p-4">
+        <div key={index} className="feedback-skeleton-row">
           <div className="home-skeleton-line h-4 w-32" />
           <div className="home-skeleton-line mt-3 h-3 w-full" />
           <div className="home-skeleton-line mt-2 h-3 w-2/3" />
@@ -106,32 +105,28 @@ function FeedbackVoteControls({
   const dislikeActive = entry.myVote === -1;
 
   return (
-    <div className="flex items-center gap-2">
+    <div className="feedback-votes">
       <button
         type="button"
         onClick={() => onVote(entry, 1)}
         disabled={disabled}
         aria-pressed={likeActive}
-        className={`rounded-full px-3 py-1.5 text-xs font-semibold ring-1 transition disabled:cursor-not-allowed disabled:opacity-60 ${
-          likeActive
-            ? "bg-emerald-600 text-white ring-emerald-600"
-            : "bg-white text-slate-600 ring-slate-200 hover:bg-emerald-50 hover:text-emerald-700"
-        }`}
+        className={likeActive ? "is-active is-like" : ""}
+        title="按讚"
       >
-        讚 {entry.likeCount ?? 0}
+        <ThumbsUp size={15} strokeWidth={1.8} aria-hidden="true" />
+        <span>讚 {entry.likeCount ?? 0}</span>
       </button>
       <button
         type="button"
         onClick={() => onVote(entry, -1)}
         disabled={disabled}
         aria-pressed={dislikeActive}
-        className={`rounded-full px-3 py-1.5 text-xs font-semibold ring-1 transition disabled:cursor-not-allowed disabled:opacity-60 ${
-          dislikeActive
-            ? "bg-rose-600 text-white ring-rose-600"
-            : "bg-white text-slate-600 ring-slate-200 hover:bg-rose-50 hover:text-rose-700"
-        }`}
+        className={dislikeActive ? "is-active is-dislike" : ""}
+        title="倒讚"
       >
-        倒讚 {entry.dislikeCount ?? 0}
+        <ThumbsDown size={15} strokeWidth={1.8} aria-hidden="true" />
+        <span>倒讚 {entry.dislikeCount ?? 0}</span>
       </button>
     </div>
   );
@@ -143,7 +138,7 @@ function getFeedbackAuthorLabel(entry: FeedbackMessage) {
   return entry.isAnonymous ? "匿名使用者" : "已登入使用者";
 }
 
-export function FeedbackBoard() {
+export function FeedbackBoard({ showHeading = true }: { showHeading?: boolean }) {
   const { configured, session, user } = useAuth();
   const [messages, setMessages] = useState<FeedbackMessage[]>([]);
   const [budget, setBudget] = useState<OpenAIBudgetStatus | null>(null);
@@ -344,53 +339,45 @@ export function FeedbackBoard() {
   }
 
   return (
-    <section className="surface-card home-feedback-board p-6">
-      <div className="flex flex-wrap items-center justify-between gap-4">
-        <div>
-          <p className="eyebrow">Board</p>
-          <h2 className="display-title mt-2 text-3xl">留言板</h2>
+    <section className={`feedback-board${showHeading ? "" : " is-embedded"}`}>
+      {showHeading ? (
+        <div className="feedback-heading">
+          <div>
+            <h2>留言板</h2>
+            <p>建議、題目問題與網站狀況都可以留在這裡。</p>
+          </div>
+          <span className="feedback-count">{messages.length} 則</span>
         </div>
-        <div className="surface-card-muted px-4 py-3 text-sm body-soft">
-          最新 {messages.length} 則
-        </div>
-      </div>
+      ) : null}
 
       {!configured ? (
-        <div className="surface-card-muted mt-5 p-4 text-sm body-soft">
+        <div className="feedback-notice">
           目前尚未設定 Supabase，留言板暫時無法使用。
         </div>
       ) : (
         <>
           {budget ? <BudgetPinnedMessage budget={budget} /> : null}
 
-          <div className="surface-card-muted mt-5 p-4">
+          <div className="feedback-composer">
             {user ? (
-              <div className="mb-4 flex flex-wrap gap-2">
+              <div className="feedback-identity" aria-label="留言顯示方式">
                 <button
                   type="button"
                   onClick={() => setIsAnonymous(true)}
-                  className={`min-h-11 rounded-2xl px-4 py-3 text-sm font-semibold transition ${
-                    isAnonymous
-                      ? "bg-slate-900 text-white"
-                      : "bg-white text-slate-700 ring-1 ring-slate-200 hover:bg-slate-50"
-                  }`}
+                  className={isAnonymous ? "is-selected" : ""}
                 >
                   匿名留言
                 </button>
                 <button
                   type="button"
                   onClick={() => setIsAnonymous(false)}
-                  className={`min-h-11 rounded-2xl px-4 py-3 text-sm font-semibold transition ${
-                    !isAnonymous
-                      ? "bg-brand-600 text-white"
-                      : "bg-white text-slate-700 ring-1 ring-slate-200 hover:bg-slate-50"
-                  }`}
+                  className={!isAnonymous ? "is-selected" : ""}
                 >
                   用暱稱留言{nickname ? `（${nickname}）` : ""}
                 </button>
               </div>
             ) : (
-              <div className="surface-card-muted mb-4 px-4 py-3 text-sm body-soft">
+              <div className="feedback-guest-note">
                 目前未登入，送出後會以匿名顯示。
               </div>
             )}
@@ -400,54 +387,55 @@ export function FeedbackBoard() {
               onChange={(event) => setContent(event.target.value)}
               maxLength={1200}
               placeholder="例如：哪個頁面不夠順、哪種排版不舒服、還想新增什麼功能。"
-              className="min-h-32 w-full rounded-3xl border border-slate-200 bg-white p-4 text-sm leading-7 text-slate-800 outline-none"
+              className="feedback-textarea"
             />
-            <div className="mt-3 flex flex-wrap items-center justify-between gap-3">
-              <p className="text-xs text-slate-500">{content.length} / 1200</p>
+            <div className="feedback-compose-footer">
+              <p>{content.length} / 1200</p>
               <button
                 type="button"
                 onClick={() => void handleSubmit()}
                 disabled={submitting || !content.trim()}
-                className="primary-pill min-h-11 px-4 py-3 disabled:cursor-not-allowed disabled:bg-slate-300"
+                className="feedback-submit"
               >
+                <Send size={16} strokeWidth={1.8} aria-hidden="true" />
                 {submitting ? "送出中..." : "送出留言"}
               </button>
             </div>
 
             {message ? (
-              <div className="mt-4 rounded-2xl bg-emerald-50 p-4 text-sm text-emerald-900">{message}</div>
+              <div className="feedback-status is-success">{message}</div>
             ) : null}
             {error ? (
-              <div className="mt-4 rounded-2xl bg-rose-50 p-4 text-sm text-rose-900">{error}</div>
+              <div className="feedback-status is-error">{error}</div>
             ) : null}
           </div>
 
           {readNotice ? (
-            <div className="mt-4 rounded-2xl bg-amber-50 px-4 py-3 text-sm font-semibold text-amber-900">
+            <div className="feedback-status is-warning">
               {readNotice}
             </div>
           ) : null}
 
-          <div className="home-feedback-scroll mt-5 max-h-[32rem] space-y-3 overflow-y-auto pr-1 sm:max-h-[36rem]">
+          <div className="feedback-thread">
             {loading ? (
               <FeedbackSkeleton />
             ) : messages.length === 0 ? (
-              <div className="surface-card-muted p-4 text-sm body-soft">
+              <div className="feedback-empty">
                 還沒有留言，你可以成為第一個給建議的人。
               </div>
             ) : (
               messages.map((entry) => (
-                <article key={entry.id} className="surface-card-muted p-4">
-                  <div className="flex items-start justify-between gap-3">
+                <article key={entry.id} className="feedback-entry">
+                  <div className="feedback-entry-head">
                     <div>
-                      <p className="text-sm font-semibold text-ink">
+                      <p className="feedback-author">
                         {getFeedbackAuthorLabel(entry)}
                       </p>
-                      <p className="mt-1 text-xs text-slate-500">{formatCreatedAt(entry.createdAt)}</p>
+                      <p className="feedback-time">{formatCreatedAt(entry.createdAt)}</p>
                     </div>
                   </div>
-                  <p className="mt-3 whitespace-pre-wrap text-sm leading-7 text-slate-700">{entry.content}</p>
-                  <div className="mt-3 flex flex-wrap items-center gap-2">
+                  <p className="feedback-content">{entry.content}</p>
+                  <div className="feedback-entry-actions">
                     <FeedbackVoteControls
                       entry={entry}
                       disabled={votingMessageId === entry.id}
@@ -459,31 +447,32 @@ export function FeedbackBoard() {
                         setReplyTargetId((current) => (current === entry.id ? null : entry.id));
                         setReplyContent("");
                       }}
-                      className="rounded-full bg-white px-3 py-1.5 text-xs font-semibold text-slate-600 ring-1 ring-slate-200 transition hover:bg-slate-100"
+                      className="feedback-reply-trigger"
                     >
+                      <MessageCircle size={15} strokeWidth={1.8} aria-hidden="true" />
                       {replyTargetId === entry.id ? "收起回覆" : "回覆"}
                     </button>
                     {(entry.replies?.length ?? 0) > 0 ? (
-                      <span className="text-xs text-slate-500">{entry.replies?.length} 則回覆</span>
+                      <span className="feedback-reply-count">{entry.replies?.length} 則回覆</span>
                     ) : null}
                   </div>
 
                   {replyTargetId === entry.id ? (
-                    <div className="mt-3 rounded-2xl bg-white p-3 ring-1 ring-slate-200">
+                    <div className="feedback-reply-composer">
                       <textarea
                         value={replyContent}
                         onChange={(event) => setReplyContent(event.target.value)}
                         maxLength={800}
                         placeholder="回覆這則留言..."
-                        className="min-h-24 w-full rounded-2xl border border-slate-200 bg-white p-3 text-sm leading-7 text-slate-800 outline-none"
+                        className="feedback-textarea feedback-reply-textarea"
                       />
-                      <div className="mt-3 flex items-center justify-between gap-3">
-                        <p className="text-xs text-slate-500">{replyContent.length} / 800</p>
+                      <div className="feedback-compose-footer">
+                        <p>{replyContent.length} / 800</p>
                         <button
                           type="button"
                           onClick={() => void handleReply(entry.id)}
                           disabled={submitting || !replyContent.trim()}
-                          className="min-h-10 rounded-2xl bg-slate-900 px-4 py-2 text-sm font-semibold text-white transition hover:bg-slate-800 disabled:cursor-not-allowed disabled:bg-slate-300"
+                          className="feedback-submit"
                         >
                           {submitting ? "送出中..." : "送出回覆"}
                         </button>
@@ -492,17 +481,17 @@ export function FeedbackBoard() {
                   ) : null}
 
                   {(entry.replies?.length ?? 0) > 0 ? (
-                    <div className="mt-4 space-y-2 border-l border-slate-200 pl-3">
+                    <div className="feedback-replies">
                       {entry.replies?.map((reply) => (
-                        <div key={reply.id} className="rounded-2xl bg-white px-3 py-3 ring-1 ring-slate-200">
-                          <p className="text-sm font-semibold text-ink">
+                        <div key={reply.id} className="feedback-reply">
+                          <p className="feedback-author">
                             {getFeedbackAuthorLabel(reply)}
                           </p>
-                          <p className="mt-1 text-xs text-slate-500">{formatCreatedAt(reply.createdAt)}</p>
-                          <p className="mt-2 whitespace-pre-wrap text-sm leading-7 text-slate-700">
+                          <p className="feedback-time">{formatCreatedAt(reply.createdAt)}</p>
+                          <p className="feedback-content">
                             {reply.content}
                           </p>
-                          <div className="mt-3">
+                          <div className="feedback-entry-actions">
                             <FeedbackVoteControls
                               entry={reply}
                               disabled={votingMessageId === reply.id}

@@ -57,10 +57,17 @@ const FeedbackBoard = dynamic(
   }
 );
 
-export function LazyFeedbackBoard() {
+export function LazyFeedbackBoard({
+  eager = false,
+  showHeading = true
+}: {
+  eager?: boolean;
+  showHeading?: boolean;
+}) {
   const { ref, shouldLoad } = useNearViewport();
+  const shouldRender = eager || shouldLoad;
 
-  if (!shouldLoad) {
+  if (!shouldRender) {
     return (
       <div ref={ref}>
         <FeedbackBoardPlaceholder />
@@ -68,5 +75,5 @@ export function LazyFeedbackBoard() {
     );
   }
 
-  return <FeedbackBoard />;
+  return <FeedbackBoard showHeading={showHeading} />;
 }

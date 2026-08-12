@@ -47,7 +47,7 @@ export default function LaoZhaoMaterialsPage({ params }: MaterialsPageProps) {
   ))).size;
 
   return (
-    <main className="min-h-screen bg-[var(--bg-base)] text-[var(--ink-main)]">
+    <main id="main-content" className="min-h-screen bg-[var(--bg-base)] text-[var(--ink-main)]">
       <header className="border-b border-[var(--line-soft)] bg-white/55">
         <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 sm:py-9 lg:px-8">
           <Link

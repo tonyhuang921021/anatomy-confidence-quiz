@@ -1,6 +1,6 @@
 export default function Loading() {
   return (
-    <main className="min-h-screen bg-[var(--bg-base)] text-[var(--ink-main)]">
+    <main id="main-content" className="min-h-screen bg-[var(--bg-base)] text-[var(--ink-main)]">
       <div className="mx-auto max-w-6xl px-4 py-6 sm:px-6 sm:py-8 lg:px-8">
         <div className="h-5 w-24 animate-pulse rounded-[4px] bg-slate-200/80 motion-reduce:animate-none" />
         <div className="mt-12 max-w-2xl">

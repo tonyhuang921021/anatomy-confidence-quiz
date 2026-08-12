@@ -234,12 +234,12 @@ export default function SavedQuestionsPage() {
   }
 
   return (
-    <main className="shell">
-      <section className="rounded-[2rem] bg-white p-5 shadow-card ring-1 ring-slate-100 sm:p-7">
+    <main id="main-content" className="shell workspace-page">
+      <section className="surface-card workspace-page-panel p-5 sm:p-7">
         <div className="grid gap-4 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-center">
           <div className="min-w-0">
-            <p className="max-w-full break-words text-sm font-semibold uppercase tracking-[0.2em] text-brand-700">Saved Questions</p>
-            <h1 className="mt-2 text-3xl font-bold text-ink sm:text-4xl">儲存題目</h1>
+            <p className="workspace-page-kicker">題庫</p>
+            <h1 className="workspace-page-title">儲存題目</h1>
             <p className="mt-3 text-sm leading-7 text-slate-500">
               {activeRecordCount > 0
                 ? `還有 ${activeRecordCount} 題待練，${completedRecordCount} 題已答對兩次。`
@@ -248,13 +248,7 @@ export default function SavedQuestionsPage() {
                   : "看到想補的題目，就按書籤放進來。"}
             </p>
           </div>
-          <div className="grid w-full gap-3 sm:w-auto sm:grid-cols-2">
-            <Link
-              href="/"
-              className="min-h-12 w-full rounded-2xl bg-slate-100 px-5 py-4 text-center text-sm font-semibold text-slate-800 transition hover:bg-slate-200"
-            >
-              返回首頁
-            </Link>
+          <div className="flex w-full justify-end sm:w-auto">
             <Link
               href={savedQuestionReviewHref}
               onClick={(event) => {

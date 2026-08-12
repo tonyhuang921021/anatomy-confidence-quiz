@@ -844,7 +844,7 @@ function getMasteryBadgeClass(label: string) {
 }
 
 function formatNullablePercent(value: number | null) {
-  return value === null ? "—" : `${value}%`;
+  return value === null ? "-" : `${value}%`;
 }
 
 function formatExamScore(value: number) {
@@ -2010,7 +2010,7 @@ function ResultsPageContent() {
 
   if (!mounted) {
     return (
-      <main className="shell">
+      <main id="main-content" className="shell workspace-page">
         <div className="rounded-[2rem] bg-white p-4 shadow-card ring-1 ring-slate-100 sm:p-6">載入中...</div>
       </main>
     );
@@ -2018,7 +2018,7 @@ function ResultsPageContent() {
 
   if (!requestedSessionId) {
     return (
-      <main className="shell">
+      <main id="main-content" className="shell workspace-page">
         <section className="rounded-[2rem] bg-white p-5 text-center shadow-card ring-1 ring-slate-100 sm:p-8">
           <h1 className="text-2xl font-semibold text-ink">
             {resultsScope === "simulation" ? "模擬考作答紀錄" : "每次作答紀錄"}
@@ -2092,18 +2092,12 @@ function ResultsPageContent() {
             </div>
           ) : null}
 
-          <div className="mt-6 flex flex-col justify-center gap-3 sm:flex-row">
-            <Link
-              href={resultsScope === "simulation" ? "/simulation" : "/"}
-              className="min-h-12 rounded-2xl bg-slate-100 px-5 py-4 text-sm font-semibold text-slate-800 transition hover:bg-slate-200"
-            >
-              {resultsScope === "simulation" ? "返回模擬考專區" : "返回首頁"}
-            </Link>
+          <div className="mt-6 flex justify-center">
             <Link
               href={resultsScope === "simulation" ? "/simulation" : "/quiz"}
               className="min-h-12 rounded-2xl bg-brand-600 px-5 py-4 text-sm font-semibold text-white transition hover:bg-brand-700"
             >
-              {resultsScope === "simulation" ? "前往模擬考專區" : "開始測驗"}
+              {resultsScope === "simulation" ? "回到模擬考專區" : "開始測驗"}
             </Link>
           </div>
         </section>
@@ -2113,7 +2107,7 @@ function ResultsPageContent() {
 
   if (!state.session || !state.summary || !state.completionStats) {
     return (
-      <main className="shell">
+      <main id="main-content" className="shell workspace-page">
         <section className="rounded-[2rem] bg-white p-5 text-center shadow-card ring-1 ring-slate-100 sm:p-8">
           <h1 className="text-2xl font-semibold text-ink">找不到這次作答紀錄</h1>
           <p className="mt-3 text-slate-500">
@@ -2551,7 +2545,7 @@ function ResultsPageContent() {
                           {formatExamScore(examEstimate.expectedExamScore)} / 100
                         </p>
                         <p className="mt-1 text-xs font-semibold text-slate-500">
-                          80% 可能範圍：{examEstimate.scoreRange80[0]}–{examEstimate.scoreRange80[1]} 分
+                          80% 可能範圍：{examEstimate.scoreRange80[0]}-{examEstimate.scoreRange80[1]} 分
                         </p>
                       </div>
                       <div className="rounded-2xl bg-white px-4 py-3 ring-1 ring-slate-200">
@@ -2611,7 +2605,7 @@ function ResultsPageContent() {
                             <span className="min-w-0 flex-1">
                               <span className="block text-sm font-black">{item.categoryLabel}</span>
                               <span className="block truncate text-xs font-semibold opacity-75">
-                                第 {item.questionNumber ?? "—"} 題・信心 {item.confidence}
+                                第 {item.questionNumber ?? "-"} 題・信心 {item.confidence}
                               </span>
                             </span>
                             <span className="shrink-0 text-xs font-black">優先 {item.priority}</span>
@@ -3052,11 +3046,11 @@ function ResultsPageContent() {
   }
 
   return (
-    <main className="shell">
+    <main id="main-content" className="shell workspace-page">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
-          <p className="text-sm font-semibold uppercase tracking-[0.2em] text-brand-700">Results</p>
-          <h1 className="mt-2 text-3xl font-bold text-ink sm:text-4xl">
+          <p className="workspace-page-kicker">作答結果</p>
+          <h1 className="workspace-page-title">
             {getSessionSubjectLabel(state.session, reviewedAttempts)}
           </h1>
           <p className="mt-2 text-sm text-slate-500">
@@ -3365,7 +3359,7 @@ function ResultsPageContent() {
             <span className="text-[10px] tabular-nums">
               {activeReviewNavigationItem
                 ? `${activeReviewNavigationItem.sectionIndex + 1}/${activeReviewNavigationItem.sectionTotal}`
-                : "—"}
+                : "-"}
             </span>
           </span>
           <button
@@ -3432,7 +3426,7 @@ export default function ResultsPage() {
   return (
     <Suspense
       fallback={
-        <main className="shell">
+        <main id="main-content" className="shell workspace-page">
           <div className="rounded-[2rem] bg-white p-4 shadow-card ring-1 ring-slate-100 sm:p-6">
             載入中...
           </div>

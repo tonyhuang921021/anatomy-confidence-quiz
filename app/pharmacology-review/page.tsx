@@ -759,7 +759,7 @@ export default function PharmacologyReviewPage() {
   };
 
   return (
-    <main className="shell">
+    <main id="main-content" className="shell workspace-page">
       <section className="surface-card p-6 sm:p-8">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div>

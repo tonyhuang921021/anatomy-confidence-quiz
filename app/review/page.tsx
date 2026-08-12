@@ -320,23 +320,17 @@ export default function ReviewPage() {
   const lowConfidenceCount = unresolvedPracticeItems.filter((item) => item.history.lowConfidence > 0).length;
 
   return (
-    <main className="shell">
-      <section className="rounded-[2rem] bg-white p-6 shadow-card ring-1 ring-slate-100 sm:p-8">
+    <main id="main-content" className="shell workspace-page">
+      <section className="surface-card workspace-page-panel p-6 sm:p-8">
         <div className="flex flex-wrap items-center justify-between gap-4">
           <div>
-            <p className="text-sm font-semibold uppercase tracking-[0.2em] text-brand-700">Review</p>
-            <h1 className="mt-2 text-3xl font-bold text-ink sm:text-4xl">錯題複習與沒信心題</h1>
+            <p className="workspace-page-kicker">複習</p>
+            <h1 className="workspace-page-title">錯題複習與沒信心題</h1>
             <p className="mt-3 text-slate-500">
               這裡只整理平常散題刷題累積下來的錯題與低信心題；開始複習時可以一起帶進同一回合。
             </p>
           </div>
           <div className="flex flex-wrap gap-3">
-            <Link
-              href="/"
-              className="min-h-12 rounded-2xl bg-slate-100 px-5 py-4 text-sm font-semibold text-slate-800 transition hover:bg-slate-200"
-            >
-              返回首頁
-            </Link>
             <Link
               href={getPracticeReviewHref(unresolvedPracticeItems)}
               onClick={(event) => {

@@ -11,27 +11,27 @@ const config: Config = {
     extend: {
       colors: {
         brand: {
-          50: "#f4faf7",
-          100: "#dff2e8",
-          200: "#bfe5d2",
-          300: "#93d0b4",
-          400: "#62b78f",
-          500: "#3f9b73",
-          600: "#2d7d5b",
-          700: "#25644a",
-          800: "#21503d",
-          900: "#1d4334"
+          50: "#eef6f3",
+          100: "#d9ebe4",
+          200: "#b6d6ca",
+          300: "#88b9a8",
+          400: "#579680",
+          500: "#327861",
+          600: "#1f6652",
+          700: "#174d3e",
+          800: "#173e34",
+          900: "#14332b"
         },
-        ink: "#102a22",
-        cream: "#f7f6f1"
+        ink: "#182421",
+        cream: "#f7f8f6"
       },
       boxShadow: {
-        card: "0 22px 60px rgba(19, 38, 32, 0.08)",
-        float: "0 30px 80px rgba(19, 38, 32, 0.12)"
+        card: "0 10px 30px rgba(36, 61, 54, 0.07)",
+        float: "0 24px 70px rgba(36, 61, 54, 0.16)"
       },
       fontFamily: {
-        sans: ["'Noto Sans TC'", "'Segoe UI'", "sans-serif"],
-        serif: ["'Iowan Old Style'", "'Palatino Linotype'", "'Noto Serif TC'", "serif"]
+        sans: ["'PingFang TC'", "'Microsoft JhengHei'", "'Noto Sans TC'", "sans-serif"],
+        serif: ["'PingFang TC'", "'Microsoft JhengHei'", "'Noto Sans TC'", "sans-serif"]
       }
     }
   },

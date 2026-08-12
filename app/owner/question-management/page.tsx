@@ -246,7 +246,7 @@ export default function OwnerQuestionManagementPage() {
   }, [allowed, configured, selectedQuestionId, session?.access_token, user]);
 
   return (
-    <main className="shell">
+    <main id="main-content" className="shell workspace-page">
       <section className="rounded-[2rem] bg-white p-6 shadow-card ring-1 ring-slate-100 sm:p-8">
         <div className="flex flex-wrap items-center justify-between gap-4">
           <div>

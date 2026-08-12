@@ -2462,7 +2462,7 @@ export default function QuizPage() {
 
   if (!mounted) {
     return (
-      <main className="shell">
+      <main id="main-content" className="shell">
         <div className="rounded-[2rem] bg-white p-4 shadow-card ring-1 ring-slate-100 sm:p-6">
           載入中...
         </div>
@@ -2476,7 +2476,7 @@ export default function QuizPage() {
       "這台裝置保留的作答狀態暫時讀不到題目，回到選科目頁重新開一份就可以。";
 
     return (
-      <main className="shell">
+      <main id="main-content" className="shell">
         <section className="rounded-[2rem] bg-white p-6 shadow-card ring-1 ring-slate-100 sm:p-8">
           <p className="text-xs font-black uppercase tracking-[0.35em] text-emerald-700">
             QUIZ RECOVERY
@@ -2583,7 +2583,7 @@ export default function QuizPage() {
           : null;
 
   return (
-    <main className="shell">
+    <main id="main-content" className="shell">
       <div ref={questionTopRef} />
       <div className="mb-5 flex items-center justify-between gap-3">
         <Link href="/" className="text-sm font-semibold text-slate-600 transition hover:text-brand-700">

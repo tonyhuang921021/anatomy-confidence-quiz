@@ -518,7 +518,7 @@ export default function OwnerPage() {
   }, [allowed, configured, session?.access_token, user]);
 
   return (
-    <main className="shell">
+    <main id="main-content" className="shell workspace-page">
       <section className="rounded-[2rem] bg-white p-6 shadow-card ring-1 ring-slate-100 sm:p-8">
         <div className="flex flex-wrap items-center justify-between gap-4">
           <div>
@@ -839,7 +839,7 @@ export default function OwnerPage() {
                           <td className="px-3 py-3 font-medium text-ink">{entry.label}</td>
                           <td className="px-3 py-3 text-slate-700">{entry.attempts}</td>
                           <td className="px-3 py-3 text-slate-500">
-                            {entry.lastAttemptedAt ? formatUpdatedAt(entry.lastAttemptedAt) : "—"}
+                            {entry.lastAttemptedAt ? formatUpdatedAt(entry.lastAttemptedAt) : "-"}
                           </td>
                         </tr>
                       ))
@@ -981,7 +981,7 @@ export default function OwnerPage() {
                               {report.reporterLabel}
                             </td>
                             <td className="min-w-[180px] px-3 py-3 text-xs text-slate-400">
-                              {report.sourceLabel ?? report.sourceFile ?? "—"}
+                              {report.sourceLabel ?? report.sourceFile ?? "-"}
                             </td>
                             <td className="whitespace-nowrap px-3 py-3 text-slate-500">
                               {formatUpdatedAt(report.createdAt)}
@@ -1036,12 +1036,12 @@ export default function OwnerPage() {
                             <td className="px-3 py-3 text-slate-700">{entry.searchCountLastHour}</td>
                             <td className="px-3 py-3 text-slate-700">{entry.classificationCountLastHour}</td>
                             <td className="px-3 py-3 text-slate-500">
-                              {entry.lastUsedAt ? formatUpdatedAt(entry.lastUsedAt) : "—"}
+                              {entry.lastUsedAt ? formatUpdatedAt(entry.lastUsedAt) : "-"}
                             </td>
                             <td className="px-3 py-3">
                               {activeBan ? (
                                 <span className="rounded-full bg-rose-100 px-3 py-1 text-xs font-semibold text-rose-700">
-                                  冷凍到 {entry.bannedUntil ? formatUpdatedAt(entry.bannedUntil) : "—"}
+                                  冷凍到 {entry.bannedUntil ? formatUpdatedAt(entry.bannedUntil) : "-"}
                                 </span>
                               ) : (
                                 <span className="rounded-full bg-emerald-100 px-3 py-1 text-xs font-semibold text-emerald-700">
@@ -1115,7 +1115,7 @@ export default function OwnerPage() {
                             NT$ {estimateTwdFromTokens(entry.inputTokens, entry.outputTokens).toFixed(2)}
                           </td>
                           <td className="px-3 py-3 text-slate-500">
-                            {entry.lastUsedAt ? formatUpdatedAt(entry.lastUsedAt) : "—"}
+                            {entry.lastUsedAt ? formatUpdatedAt(entry.lastUsedAt) : "-"}
                           </td>
                         </tr>
                       ))
@@ -1164,7 +1164,7 @@ export default function OwnerPage() {
                             NT$ {estimateTwdFromTokens(entry.inputTokens, entry.outputTokens).toFixed(2)}
                           </td>
                           <td className="px-3 py-3 text-slate-500">
-                            {entry.lastUsedAt ? formatUpdatedAt(entry.lastUsedAt) : "—"}
+                            {entry.lastUsedAt ? formatUpdatedAt(entry.lastUsedAt) : "-"}
                           </td>
                         </tr>
                       ))

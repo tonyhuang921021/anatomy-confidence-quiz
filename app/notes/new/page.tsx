@@ -272,7 +272,7 @@ export default function NewStudyNotePage() {
   }
 
   return (
-    <main className="shell">
+    <main id="main-content" className="shell workspace-page">
       <section className="surface-card p-6 sm:p-8">
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div>

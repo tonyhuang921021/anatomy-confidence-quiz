@@ -7,7 +7,7 @@ export default async function ResourceSharePage({
 }) {
   const resolvedParams = await params;
   return (
-    <main className="shell min-w-0 max-w-full overflow-x-hidden">
+    <main id="main-content" className="shell workspace-page min-w-0 max-w-full overflow-x-hidden">
       <ResourceShareViewer resourceId={resolvedParams.id} />
     </main>
   );

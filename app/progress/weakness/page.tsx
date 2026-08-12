@@ -204,7 +204,7 @@ export default function WeaknessAnalysisPage() {
   }
 
   return (
-    <main className="shell pb-16">
+    <main id="main-content" className="shell workspace-page pb-16">
       <header className="flex flex-wrap items-start justify-between gap-4 border-b border-slate-200 pb-6">
         <div>
           <p className="text-sm font-semibold uppercase tracking-[0.2em] text-brand-700">Exam Focus</p>

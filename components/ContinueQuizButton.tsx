@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { createPortal } from "react-dom";
 import { useRouter } from "next/navigation";
+import { ChevronRight, Clock3, X } from "lucide-react";
 import { useAuth } from "@/components/AuthProvider";
 import {
   createResumableQuizSessionListItem,
@@ -210,7 +211,9 @@ export function ContinueQuizButton() {
             <h2 id="resume-dialog-title" className="text-xl font-semibold text-ink">可繼續的測驗</h2>
             <p aria-live="polite" className="mt-1 text-sm text-slate-500">{loading ? "正在整理..." : `${items.length} 份進行中`}</p>
           </div>
-          <button type="button" onClick={() => setOpen(false)} aria-label="關閉可繼續測驗" title="關閉" className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-xl text-slate-500 transition hover:bg-slate-100 hover:text-slate-900">×</button>
+          <button type="button" onClick={() => setOpen(false)} aria-label="關閉可繼續測驗" title="關閉" className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg text-slate-500 transition hover:bg-slate-100 hover:text-slate-900">
+            <X size={20} strokeWidth={1.8} />
+          </button>
         </header>
 
         <div className="overflow-y-auto px-5 py-2 sm:px-6">
@@ -275,6 +278,9 @@ export function ContinueQuizButton() {
   return (
     <>
       <button type="button" onClick={handleOpen} className="home-continue-button">
+        <span className="home-continue-icon" aria-hidden="true">
+          <Clock3 size={22} strokeWidth={1.8} />
+        </span>
         <span className="home-continue-label">繼續測驗</span>
         <span className="home-continue-meta">
           {localResumeMeta
@@ -283,7 +289,7 @@ export function ContinueQuizButton() {
               ? "正在檢查雲端紀錄"
               : "查看進行中的測驗"}
         </span>
-        <span aria-hidden="true" className="home-continue-arrow">›</span>
+        <ChevronRight aria-hidden="true" className="home-continue-arrow" size={21} strokeWidth={1.8} />
       </button>
       {dialog ? createPortal(dialog, document.body) : null}
     </>
