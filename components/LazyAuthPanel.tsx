@@ -54,7 +54,13 @@ const AuthPanel = dynamic(
   }
 );
 
-export function LazyAuthPanel({ eager = false }: { eager?: boolean }) {
+export function LazyAuthPanel({
+  eager = false,
+  compactHeader = false
+}: {
+  eager?: boolean;
+  compactHeader?: boolean;
+}) {
   const { ref, shouldLoad } = useNearViewport();
   const shouldRender = eager || shouldLoad;
 
@@ -66,5 +72,5 @@ export function LazyAuthPanel({ eager = false }: { eager?: boolean }) {
     );
   }
 
-  return <AuthPanel />;
+  return <AuthPanel compactHeader={compactHeader} />;
 }

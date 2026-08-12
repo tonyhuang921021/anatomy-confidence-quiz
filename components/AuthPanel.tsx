@@ -116,7 +116,7 @@ async function getRecoveredAuthSession() {
   }
 }
 
-export function AuthPanel() {
+export function AuthPanel({ compactHeader = false }: { compactHeader?: boolean } = {}) {
   const recoveryMode = isSupabaseRecoveryMode();
   const {
     configured,
@@ -711,35 +711,42 @@ export function AuthPanel() {
 
   if (user) {
     return (
-      <section className="surface-card p-6">
-        <p className="eyebrow">Account</p>
-        <div className="mt-2 flex flex-col gap-5 lg:flex-row lg:items-start lg:justify-between">
-          <div>
-            <h2 className="display-title text-3xl">目前使用者</h2>
-            <p className="mt-2 text-sm font-semibold text-slate-900 sm:text-base">{user.email}</p>
-          </div>
-          <div className="flex flex-wrap gap-2">
-            <div className="stat-chip">
-              {getSyncStatusText(
-                syncStatus,
-                Boolean(syncError),
-                pendingCompletedUploadCount
-              )}
+      <section className="surface-card account-settings-content p-6">
+        {!compactHeader ? (
+          <>
+            <p className="eyebrow">帳號資料</p>
+            <div className="account-settings-hero mt-2 flex flex-col gap-5 lg:flex-row lg:items-start lg:justify-between">
+              <div>
+                <h2 className="display-title text-3xl">目前使用者</h2>
+                <p className="mt-2 text-sm font-semibold text-slate-900 sm:text-base">{user.email}</p>
+              </div>
+              <div className="flex flex-wrap gap-2">
+                <div className="stat-chip">
+                  {getSyncStatusText(
+                    syncStatus,
+                    Boolean(syncError),
+                    pendingCompletedUploadCount
+                  )}
+                </div>
+                <div className="stat-chip">ID {user.id.slice(0, 8)}...</div>
+              </div>
             </div>
-            <div className="stat-chip">ID {user.id.slice(0, 8)}...</div>
-          </div>
-        </div>
-        <div className="mt-4 grid gap-3">
-          <input
-            type="text"
-            value={nickname}
-            onChange={(event) => setNickname(event.target.value)}
-            placeholder="排行榜暱稱"
-            maxLength={24}
-            className="min-h-12 rounded-2xl border border-slate-200 px-4 py-3 text-sm text-slate-800 outline-none"
-          />
-          <p className="text-xs text-slate-500">排行榜會顯示這個暱稱。</p>
-          <div className="rounded-2xl border border-slate-200">
+          </>
+        ) : null}
+        <div className="account-settings-body mt-4 grid gap-3">
+          <label className="account-settings-field">
+            <span>排行榜暱稱</span>
+            <input
+              type="text"
+              value={nickname}
+              onChange={(event) => setNickname(event.target.value)}
+              placeholder="輸入要顯示的名稱"
+              maxLength={24}
+              className="min-h-12 rounded-2xl border border-slate-200 px-4 py-3 text-sm text-slate-800 outline-none"
+            />
+            <small>排行榜與公開互動會顯示這個名稱。</small>
+          </label>
+          <div className="account-settings-preferences rounded-2xl border border-slate-200">
             <button
               type="button"
               onClick={() => setSettingsOpen((current) => !current)}
@@ -1034,7 +1041,7 @@ export function AuthPanel() {
         {error ? (
           <div className="mt-4 rounded-2xl bg-rose-50 p-4 text-sm text-rose-900">{error}</div>
         ) : null}
-        <div className="mt-5 flex flex-col gap-3 sm:flex-row">
+        <div className="account-settings-actions mt-5 flex flex-col gap-3 sm:flex-row">
           {canViewOwnerPage ? (
             <>
               <Link
@@ -1045,12 +1052,6 @@ export function AuthPanel() {
               </Link>
             </>
           ) : null}
-          <Link
-            href="/progress"
-            className="secondary-pill text-center"
-          >
-            進度總覽
-          </Link>
           <button
             type="button"
             onClick={() => void handleSaveNickname()}

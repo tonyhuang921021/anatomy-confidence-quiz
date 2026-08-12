@@ -275,36 +275,6 @@ export function UserStatusBar() {
       </header>
 
       {!focusMode ? (
-        <aside className="app-sidebar" aria-label="主要導覽">
-          <nav>
-            {PRIMARY_NAV.map((item) => {
-              const Icon = item.icon;
-              const active = activePrimary === item.href;
-              return (
-                <Link
-                  key={item.href}
-                  href={item.href}
-                  className={`app-nav-link ${active ? "is-active" : ""}`}
-                  aria-current={active ? "page" : undefined}
-                >
-                  <Icon size={21} strokeWidth={1.8} />
-                  <span>{item.label}</span>
-                </Link>
-              );
-            })}
-            <button
-              type="button"
-              className={`app-nav-link ${moreOpen ? "is-active" : ""}`}
-              onClick={() => setMoreOpen(true)}
-            >
-              <MoreHorizontal size={22} strokeWidth={1.8} />
-              <span>更多</span>
-            </button>
-          </nav>
-        </aside>
-      ) : null}
-
-      {!focusMode ? (
         <nav className="app-mobile-nav" aria-label="手機主要導覽">
           {PRIMARY_NAV.map((item) => {
             const Icon = item.icon;
@@ -338,7 +308,10 @@ export function UserStatusBar() {
           />
           <aside className="app-mobile-drawer" aria-label="主要導覽">
             <div className="app-drawer-header">
-              <p>前往</p>
+              <div>
+                <p>網站導覽</p>
+                <span>需要時再打開，不佔用閱讀空間</span>
+              </div>
               <button type="button" onClick={() => setNavOpen(false)} aria-label="關閉導覽">
                 <X size={20} strokeWidth={1.8} />
               </button>
@@ -346,13 +319,31 @@ export function UserStatusBar() {
             <nav className="app-drawer-links">
               {PRIMARY_NAV.map((item) => {
                 const Icon = item.icon;
+                const active = activePrimary === item.href;
                 return (
-                  <Link key={item.href} href={item.href}>
+                  <Link
+                    key={item.href}
+                    href={item.href}
+                    className={active ? "is-active" : undefined}
+                    aria-current={active ? "page" : undefined}
+                  >
                     <Icon size={20} strokeWidth={1.8} />
                     <span>{item.label}</span>
                   </Link>
                 );
               })}
+              <button
+                type="button"
+                className={feedbackOpen ? "is-active" : ""}
+                onClick={() => {
+                  setNavOpen(false);
+                  setFeedbackOpen(true);
+                }}
+              >
+                <MessageSquareText size={20} strokeWidth={1.8} />
+                <span>留言板</span>
+              </button>
+              <div className="app-drawer-divider" aria-hidden="true" />
               <button
                 type="button"
                 onClick={() => {
@@ -397,22 +388,12 @@ export function UserStatusBar() {
                   </Link>
                 );
               })}
-              <button
-                type="button"
-                onClick={() => {
-                  setMoreOpen(false);
-                  setFeedbackOpen(true);
-                }}
-              >
-                <MessageSquareText size={20} strokeWidth={1.8} />
-                <span>留言板</span>
-              </button>
             </div>
 
             <section className="app-about-section">
               <p className="app-sheet-label">關於本站</p>
               <p>
-                這是一個整理醫師國考作答、錯題與複習進度的個人專案。網站維護與內容問題可以直接在留言板回報。
+                這是一個整理醫師國考作答、錯題與複習進度的個人專案。
               </p>
               <a
                 href="https://www.instagram.com/yphe_uc?igsh=OWJqZjJqd2o2cGpi&utm_source=qr"
@@ -434,9 +415,17 @@ export function UserStatusBar() {
             onClick={() => setAccountPanelOpen(false)}
             aria-label="關閉帳號設定"
           />
-          <section className="app-modal-panel" role="dialog" aria-modal="true" aria-label="帳號與設定">
+          <section
+            className="app-modal-panel app-account-panel"
+            role="dialog"
+            aria-modal="true"
+            aria-label="帳號與設定"
+          >
             <div className="app-drawer-header">
-              <p>{user ? "帳號與設定" : "登入與同步"}</p>
+              <div>
+                <p>{user ? "帳號設定" : "登入與同步"}</p>
+                <span>{user ? "管理身分、同步與作答偏好" : "在不同裝置保留完整紀錄"}</span>
+              </div>
               <button
                 type="button"
                 onClick={() => setAccountPanelOpen(false)}
@@ -446,9 +435,40 @@ export function UserStatusBar() {
               </button>
             </div>
             <div className="app-modal-content">
-              <ClientSectionBoundary title="帳號與設定">
-                <LazyAuthPanel eager />
-              </ClientSectionBoundary>
+              <div className={`app-account-center ${user ? "" : "is-guest"}`}>
+                <aside className="app-account-center-summary">
+                  <span className="app-account-avatar app-account-center-avatar" aria-hidden="true">
+                    {getInitials(accountLabel)}
+                  </span>
+                  <p className="app-account-center-kicker">{user ? "已登入" : "訪客模式"}</p>
+                  <h2>{accountLabel}</h2>
+                  <p className="app-account-center-email">
+                    {user?.email ?? "目前紀錄只保存在這台裝置"}
+                  </p>
+                  <div className="app-account-center-status">
+                    <div>
+                      <Cloud size={17} strokeWidth={1.8} />
+                      <span>同步狀態</span>
+                      <strong>{configured && user ? syncLabel : "本機保存"}</strong>
+                    </div>
+                    {user ? (
+                      <div>
+                        <UserRound size={17} strokeWidth={1.8} />
+                        <span>帳號識別</span>
+                        <strong>{user.id.slice(0, 8)}</strong>
+                      </div>
+                    ) : null}
+                  </div>
+                  <p className="app-account-center-note">
+                    作答會先安全保存在目前裝置；登入後可再同步到其他裝置。
+                  </p>
+                </aside>
+                <div className="app-account-center-settings">
+                  <ClientSectionBoundary title="帳號與設定">
+                    <LazyAuthPanel eager compactHeader={Boolean(user)} />
+                  </ClientSectionBoundary>
+                </div>
+              </div>
             </div>
           </section>
         </div>
