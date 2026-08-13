@@ -765,7 +765,7 @@ export function YangmingExplanationPanel({
 
       {reportOpen ? (
         <div
-          className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/35 px-3 py-6 backdrop-blur-sm"
+          className="fixed inset-0 z-[140] flex items-center justify-center bg-slate-950/35 px-3 py-6 backdrop-blur-sm"
           onClick={() => {
             if (!reportLoading) setReportOpen(false);
           }}

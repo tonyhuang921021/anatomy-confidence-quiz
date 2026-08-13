@@ -3375,14 +3375,14 @@ function ResultsPageContent() {
         </nav>
       ) : null}
       {copyPromptNotice ? (
-        <div className="pointer-events-none fixed inset-0 z-50 flex items-center justify-center px-6">
+        <div className="pointer-events-none fixed inset-0 z-[140] flex items-center justify-center px-6">
           <div className="rounded-2xl bg-slate-950 px-5 py-3 text-base font-semibold text-white shadow-2xl ring-1 ring-white/10">
             已經複製，可以貼進自己的 AI
           </div>
         </div>
       ) : null}
       {confidenceOverviewDownloadNotice ? (
-        <div className="pointer-events-none fixed inset-0 z-50 flex items-center justify-center px-6">
+        <div className="pointer-events-none fixed inset-0 z-[140] flex items-center justify-center px-6">
           <div className="rounded-2xl bg-slate-950 px-5 py-3 text-base font-semibold text-white shadow-2xl ring-1 ring-white/10">
             已下載信心度總覽
           </div>
@@ -3390,7 +3390,7 @@ function ResultsPageContent() {
       ) : null}
       {isFullscreenReview ? (
         <div
-          className={`fixed inset-0 z-50 bg-[color:var(--bg-base)] transition-opacity duration-300 ease-out overscroll-none sm:hidden ${
+          className={`fixed inset-0 z-[140] bg-[color:var(--bg-base)] transition-opacity duration-300 ease-out overscroll-none sm:hidden ${
             isFullscreenReviewVisible ? "opacity-100" : "opacity-0"
           }`}
         >

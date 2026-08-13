@@ -671,6 +671,10 @@ export function ReviewNotebook({
     () => items.map((item) => item.question.id).join("|"),
     [items]
   );
+  const selectedSubjectsKey = useMemo(
+    () => selectedSubjects.join("|"),
+    [selectedSubjects]
+  );
   const renderedAllQuestions = useMemo(
     () =>
       allQuestions.map((question) =>
@@ -786,15 +790,30 @@ export function ReviewNotebook({
   }, [activeCategory, lowConfidenceItems.length, resolvedItems.length, wrongItems.length]);
 
   useEffect(() => {
-    setVisibleCountByCategory({
-      wrong: 40,
-      lowConfidence: 40,
-      resolved: 40
+    setVisibleCountByCategory((current) => {
+      if (
+        current.wrong === 40 &&
+        current.lowConfidence === 40 &&
+        current.resolved === 40
+      ) {
+        return current;
+      }
+
+      return {
+        wrong: 40,
+        lowConfidence: 40,
+        resolved: 40
+      };
     });
-  }, [questionIdsKey, selectedSubjects]);
+  }, [questionIdsKey, selectedSubjectsKey]);
 
   useEffect(() => {
-    setSelectedSubjects((current) => current.filter((subject) => availableSubjects.includes(subject)));
+    setSelectedSubjects((current) => {
+      const next = current.filter((subject) => availableSubjects.includes(subject));
+      const unchanged =
+        next.length === current.length && next.every((subject, index) => subject === current[index]);
+      return unchanged ? current : next;
+    });
   }, [availableSubjects]);
 
   function applyManualReviewCloudState(cloudState: ManualReviewState) {
@@ -1015,17 +1034,18 @@ export function ReviewNotebook({
     setExplanationOverrides((current) =>
       mergeQuestionExplanationOverrides(current, loadQuestionExplanationOverrides())
     );
-  }, [items, questionIdsKey]);
+  }, [questionIdsKey]);
 
   useEffect(() => {
-    if (items.length === 0) return;
+    if (!questionIdsKey) return;
+    const questionIds = questionIdsKey.split("|");
 
-    void loadConfirmedQuestionClassificationOverrides(items.map((item) => item.question.id))
+    void loadConfirmedQuestionClassificationOverrides(questionIds)
       .then((overrides) => setClassificationOverrides(overrides))
       .catch(() => {
         // keep static classification if override fetch fails
       });
-  }, [items, questionIdsKey]);
+  }, [questionIdsKey]);
 
   useEffect(() => {
     async function fetchSharedExplanationOverrides() {

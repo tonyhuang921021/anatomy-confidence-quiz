@@ -10,7 +10,6 @@ import {
   Cloud,
   FileClock,
   Home,
-  Info,
   Library,
   LogOut,
   Menu,
@@ -28,7 +27,6 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { useAuth } from "@/components/AuthProvider";
 import { ClientSectionBoundary } from "@/components/ClientSectionBoundary";
 import { LazyAuthPanel } from "@/components/LazyAuthPanel";
-import { LazyFeedbackBoard } from "@/components/LazyFeedbackBoard";
 import { getSyncStatusText, getSyncStatusTone } from "@/components/syncStatusText";
 import { VisitorStatsPanel } from "@/components/VisitorStatsPanel";
 
@@ -74,9 +72,17 @@ const MORE_LINKS: NavItem[] = [
   { href: "/resources", label: "資源分享", icon: Library },
   { href: "/pharmacology-review", label: "藥理複習", icon: Pill },
   { href: "/leaderboard", label: "刷題榜", icon: Trophy },
-  { href: "/post-exam", label: "考後回顧", icon: BookOpenText },
-  { href: "/courses/laozhao-anatomy", label: "老趙解剖學影片", icon: Library }
+  { href: "/post-exam", label: "考後回顧", icon: BookOpenText }
 ];
+
+const FEEDBACK_NAV: NavItem = {
+  href: "/feedback",
+  label: "留言板",
+  icon: MessageSquareText,
+  matches: (pathname) => pathname.startsWith("/feedback")
+};
+
+const DRAWER_NAV = [...PRIMARY_NAV, FEEDBACK_NAV];
 
 const FOCUS_PATHS = [
   "/quiz",
@@ -117,8 +123,12 @@ export function UserStatusBar() {
   const [moreOpen, setMoreOpen] = useState(false);
   const [accountOpen, setAccountOpen] = useState(false);
   const [accountPanelOpen, setAccountPanelOpen] = useState(false);
-  const [feedbackOpen, setFeedbackOpen] = useState(false);
+  const [shellReady, setShellReady] = useState(false);
   const accountRef = useRef<HTMLDivElement | null>(null);
+  const menuTriggerRef = useRef<HTMLButtonElement | null>(null);
+  const accountTriggerRef = useRef<HTMLButtonElement | null>(null);
+  const activePanelRef = useRef<HTMLElement | null>(null);
+  const previousFocusRef = useRef<HTMLElement | null>(null);
   const focusMode = isAppFocusPath(pathname);
   const accountLabel = getAccountLabel(user?.email, user?.user_metadata?.display_name);
   const syncTone = getSyncStatusTone(
@@ -135,11 +145,20 @@ export function UserStatusBar() {
     () => PRIMARY_NAV.find((item) => item.matches?.(pathname))?.href ?? "",
     [pathname]
   );
+  const secondaryNavigationActive = useMemo(
+    () => FEEDBACK_NAV.matches?.(pathname) || MORE_LINKS.some((item) => pathname.startsWith(item.href)),
+    [pathname]
+  );
+
+  useEffect(() => {
+    setShellReady(true);
+  }, []);
 
   useEffect(() => {
     setNavOpen(false);
     setMoreOpen(false);
     setAccountOpen(false);
+    setAccountPanelOpen(false);
   }, [pathname]);
 
   useEffect(() => {
@@ -156,14 +175,75 @@ export function UserStatusBar() {
   }, [accountOpen]);
 
   useEffect(() => {
-    const overlayOpen = navOpen || moreOpen || accountPanelOpen || feedbackOpen;
+    const overlayOpen = navOpen || moreOpen || accountPanelOpen;
     if (!overlayOpen) return;
+    previousFocusRef.current = accountPanelOpen
+      ? accountTriggerRef.current
+      : (document.activeElement as HTMLElement | null);
     const previousOverflow = document.body.style.overflow;
     document.body.style.overflow = "hidden";
+    const focusTimer = window.setTimeout(() => {
+      activePanelRef.current
+        ?.querySelector<HTMLElement>("button:not([disabled]), a[href], input:not([disabled]), select:not([disabled]), textarea:not([disabled])")
+        ?.focus();
+    }, 0);
+
+    function handleKeyDown(event: KeyboardEvent) {
+      if (event.key === "Escape") {
+        event.preventDefault();
+        setAccountPanelOpen(false);
+        setMoreOpen(false);
+        setNavOpen(false);
+        return;
+      }
+
+      if (event.key !== "Tab") return;
+      const panel = activePanelRef.current;
+      if (!panel) return;
+      const focusable = Array.from(
+        panel.querySelectorAll<HTMLElement>(
+          "button:not([disabled]), a[href], input:not([disabled]), select:not([disabled]), textarea:not([disabled])"
+        )
+      ).filter((element) => element.getClientRects().length > 0);
+      if (focusable.length === 0) return;
+      const first = focusable[0];
+      const last = focusable[focusable.length - 1];
+      if (event.shiftKey && document.activeElement === first) {
+        event.preventDefault();
+        last.focus();
+      } else if (!event.shiftKey && document.activeElement === last) {
+        event.preventDefault();
+        first.focus();
+      }
+    }
+
+    document.addEventListener("keydown", handleKeyDown);
     return () => {
+      window.clearTimeout(focusTimer);
+      document.removeEventListener("keydown", handleKeyDown);
       document.body.style.overflow = previousOverflow;
+      const focusTarget = previousFocusRef.current;
+      if (focusTarget?.isConnected) {
+        focusTarget.focus();
+      } else {
+        menuTriggerRef.current?.focus();
+      }
     };
-  }, [accountPanelOpen, feedbackOpen, moreOpen, navOpen]);
+  }, [accountPanelOpen, moreOpen, navOpen]);
+
+  useEffect(() => {
+    if (!accountOpen) return;
+
+    function handleKeyDown(event: KeyboardEvent) {
+      if (event.key !== "Escape") return;
+      event.preventDefault();
+      setAccountOpen(false);
+      accountTriggerRef.current?.focus();
+    }
+
+    document.addEventListener("keydown", handleKeyDown);
+    return () => document.removeEventListener("keydown", handleKeyDown);
+  }, [accountOpen]);
 
   return (
     <>
@@ -171,14 +251,20 @@ export function UserStatusBar() {
         跳到主要內容
       </a>
 
-      <header className={`app-topbar ${focusMode ? "app-topbar-focus" : ""}`}>
+      <header
+        className={`app-topbar ${focusMode ? "app-topbar-focus" : ""}`}
+        data-shell-ready={shellReady ? "true" : "false"}
+      >
         <div className="app-topbar-brand">
           {!focusMode ? (
             <button
+              ref={menuTriggerRef}
               type="button"
               className="app-menu-trigger"
               onClick={() => setNavOpen(true)}
               aria-label="開啟導覽"
+              aria-expanded={navOpen}
+              aria-controls="app-navigation-drawer"
             >
               <Menu size={20} strokeWidth={1.8} />
             </button>
@@ -201,10 +287,12 @@ export function UserStatusBar() {
           ) : null}
           <div ref={accountRef} className="app-account-wrap">
             <button
+              ref={accountTriggerRef}
               type="button"
               className="app-account-trigger"
               onClick={() => setAccountOpen((current) => !current)}
               aria-expanded={accountOpen}
+              aria-controls="app-account-popover"
               aria-label="開啟帳號選單"
             >
               <span className="app-account-avatar" aria-hidden="true">
@@ -215,7 +303,7 @@ export function UserStatusBar() {
             </button>
 
             {accountOpen ? (
-              <div className="app-account-popover">
+              <div id="app-account-popover" className="app-account-popover">
                 <div className="app-account-summary">
                   <span className="app-account-avatar app-account-avatar-large" aria-hidden="true">
                     {getInitials(accountLabel)}
@@ -243,16 +331,6 @@ export function UserStatusBar() {
                   >
                     {user ? <Settings size={18} strokeWidth={1.8} /> : <UserRound size={18} strokeWidth={1.8} />}
                     <span>{user ? "帳號與設定" : "登入與同步"}</span>
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setAccountOpen(false);
-                      setMoreOpen(true);
-                    }}
-                  >
-                    <Info size={18} strokeWidth={1.8} />
-                    <span>關於本站</span>
                   </button>
                   {user ? (
                     <button
@@ -285,13 +363,20 @@ export function UserStatusBar() {
                 href={item.href}
                 className={active ? "is-active" : ""}
                 aria-current={active ? "page" : undefined}
+                onClick={() => setMoreOpen(false)}
               >
                 <Icon size={20} strokeWidth={1.8} />
                 <span>{item.label.replace("總覽", "")}</span>
               </Link>
             );
           })}
-          <button type="button" onClick={() => setMoreOpen(true)}>
+          <button
+            type="button"
+            onClick={() => setMoreOpen(true)}
+            className={secondaryNavigationActive ? "is-active" : undefined}
+            aria-expanded={moreOpen}
+            aria-controls="app-more-sheet"
+          >
             <MoreHorizontal size={21} strokeWidth={1.8} />
             <span>更多</span>
           </button>
@@ -306,7 +391,14 @@ export function UserStatusBar() {
             onClick={() => setNavOpen(false)}
             aria-label="關閉導覽"
           />
-          <aside className="app-mobile-drawer" aria-label="主要導覽">
+          <aside
+            ref={activePanelRef}
+            id="app-navigation-drawer"
+            className="app-mobile-drawer"
+            role="dialog"
+            aria-modal="true"
+            aria-label="主要導覽"
+          >
             <div className="app-drawer-header">
               <div>
                 <p>網站導覽</p>
@@ -317,32 +409,22 @@ export function UserStatusBar() {
               </button>
             </div>
             <nav className="app-drawer-links">
-              {PRIMARY_NAV.map((item) => {
+              {DRAWER_NAV.map((item) => {
                 const Icon = item.icon;
-                const active = activePrimary === item.href;
+                const active = item.matches?.(pathname) ?? pathname.startsWith(item.href);
                 return (
                   <Link
                     key={item.href}
                     href={item.href}
                     className={active ? "is-active" : undefined}
                     aria-current={active ? "page" : undefined}
+                    onClick={() => setNavOpen(false)}
                   >
                     <Icon size={20} strokeWidth={1.8} />
                     <span>{item.label}</span>
                   </Link>
                 );
               })}
-              <button
-                type="button"
-                className={feedbackOpen ? "is-active" : ""}
-                onClick={() => {
-                  setNavOpen(false);
-                  setFeedbackOpen(true);
-                }}
-              >
-                <MessageSquareText size={20} strokeWidth={1.8} />
-                <span>留言板</span>
-              </button>
               <div className="app-drawer-divider" aria-hidden="true" />
               <button
                 type="button"
@@ -367,7 +449,14 @@ export function UserStatusBar() {
             onClick={() => setMoreOpen(false)}
             aria-label="關閉更多選單"
           />
-          <aside className="app-side-sheet" aria-label="更多功能">
+          <aside
+            ref={activePanelRef}
+            id="app-more-sheet"
+            className="app-side-sheet"
+            role="dialog"
+            aria-modal="true"
+            aria-label="更多功能"
+          >
             <div className="app-drawer-header">
               <div>
                 <p>更多</p>
@@ -382,7 +471,13 @@ export function UserStatusBar() {
               {MORE_LINKS.map((item) => {
                 const Icon = item.icon;
                 return (
-                  <Link key={item.href} href={item.href}>
+                  <Link
+                    key={item.href}
+                    href={item.href}
+                    className={pathname.startsWith(item.href) ? "is-active" : undefined}
+                    aria-current={pathname.startsWith(item.href) ? "page" : undefined}
+                    onClick={() => setMoreOpen(false)}
+                  >
                     <Icon size={20} strokeWidth={1.8} />
                     <span>{item.label}</span>
                   </Link>
@@ -402,6 +497,13 @@ export function UserStatusBar() {
               >
                 聯絡 @yphe_uc
               </a>
+              <Link
+                href="/courses/laozhao-anatomy"
+                className="app-secondary-course-link"
+                onClick={() => setMoreOpen(false)}
+              >
+                老趙解剖學整理預覽
+              </Link>
             </section>
           </aside>
         </div>
@@ -416,6 +518,7 @@ export function UserStatusBar() {
             aria-label="關閉帳號設定"
           />
           <section
+            ref={activePanelRef}
             className="app-modal-panel app-account-panel"
             role="dialog"
             aria-modal="true"
@@ -453,9 +556,9 @@ export function UserStatusBar() {
                     </div>
                     {user ? (
                       <div>
-                        <UserRound size={17} strokeWidth={1.8} />
-                        <span>帳號識別</span>
-                        <strong>{user.id.slice(0, 8)}</strong>
+                        <FileClock size={17} strokeWidth={1.8} />
+                        <span>紀錄保存</span>
+                        <strong>本機先存</strong>
                       </div>
                     ) : null}
                   </div>
@@ -474,32 +577,6 @@ export function UserStatusBar() {
         </div>
       ) : null}
 
-      {feedbackOpen ? (
-        <div className="app-overlay app-modal-overlay" role="presentation">
-          <button
-            type="button"
-            className="app-overlay-dismiss"
-            onClick={() => setFeedbackOpen(false)}
-            aria-label="關閉留言板"
-          />
-          <section className="app-modal-panel app-feedback-panel" role="dialog" aria-modal="true" aria-label="留言板">
-            <div className="app-drawer-header">
-              <div>
-                <p>留言板</p>
-                <span>建議、問題與回覆都在這裡</span>
-              </div>
-              <button type="button" onClick={() => setFeedbackOpen(false)} aria-label="關閉留言板">
-                <X size={20} strokeWidth={1.8} />
-              </button>
-            </div>
-            <div className="app-modal-content">
-              <ClientSectionBoundary title="留言板">
-                <LazyFeedbackBoard eager showHeading={false} />
-              </ClientSectionBoundary>
-            </div>
-          </section>
-        </div>
-      ) : null}
     </>
   );
 }

@@ -903,7 +903,7 @@ export default function SearchPage() {
 
       {favoriteBankOpen ? (
         <div
-          className="fixed inset-0 z-50 bg-slate-950/35 p-3 backdrop-blur-sm sm:p-5"
+          className="fixed inset-0 z-[140] bg-slate-950/35 p-3 backdrop-blur-sm sm:p-5"
           role="dialog"
           aria-modal="true"
           aria-label="搜尋儲存題目"

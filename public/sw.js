@@ -12,18 +12,6 @@ self.addEventListener("activate", (event) => {
         Promise.all(keys.filter((key) => key.startsWith("pwa-")).map((key) => caches.delete(key)))
       )
       .then(() => self.clients.claim())
-      .then(() =>
-        self.clients.matchAll({ type: "window", includeUncontrolled: true }).then((clients) =>
-          Promise.all(
-            clients.map((client) => {
-              if (!("navigate" in client) || typeof client.navigate !== "function") {
-                return Promise.resolve(null);
-              }
-              return client.navigate(client.url);
-            })
-          )
-        )
-      )
       .then(() => self.registration.unregister())
   );
 });

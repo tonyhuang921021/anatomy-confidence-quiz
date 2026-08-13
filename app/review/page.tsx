@@ -403,7 +403,7 @@ export default function ReviewPage() {
 
       {isFullscreenReview ? (
         <div
-          className={`fixed inset-0 z-50 bg-[color:var(--bg-base)] transition-opacity duration-300 ease-out overscroll-none sm:hidden ${
+          className={`fixed inset-0 z-[140] bg-[color:var(--bg-base)] transition-opacity duration-300 ease-out overscroll-none sm:hidden ${
             isFullscreenReviewVisible ? "opacity-100" : "opacity-0"
           }`}
         >

@@ -224,7 +224,7 @@ export function ResourceShareViewer({ resourceId }: { resourceId: string }) {
 
   if (hasAttachment && resource.fileKind === "html") {
     return (
-      <section className="fixed inset-0 z-50 h-[100dvh] w-full overflow-hidden bg-white">
+      <section className="fixed inset-0 z-[140] h-[100dvh] w-full overflow-hidden bg-white">
         <div className="pointer-events-none fixed inset-x-0 top-0 z-20 flex flex-wrap items-start justify-between gap-3 p-3 md:p-4">
           <div className="pointer-events-auto flex flex-wrap gap-2">
             <Link

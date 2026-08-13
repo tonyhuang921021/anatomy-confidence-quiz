@@ -1,16 +1,6 @@
 "use client";
 
 import { useEffect } from "react";
-import { isSupabaseRecoveryMode } from "@/lib/supabase/recoveryMode";
-
-const RECOVERY_SW_RELOAD_KEY = "pwa-recovery-sw-reload-v2";
-const SAFARI_SW_RELOAD_KEY = "pwa-safari-sw-reload-v1";
-
-function isSafariBrowser() {
-  if (typeof navigator === "undefined") return false;
-  const userAgent = navigator.userAgent;
-  return /Safari/i.test(userAgent) && !/Chrome|CriOS|FxiOS|EdgiOS/i.test(userAgent);
-}
 
 async function clearPwaCaches() {
   if (typeof window === "undefined" || !("caches" in window)) return;
@@ -28,11 +18,7 @@ export function PWARegistration({ cleanupOnly = false }: { cleanupOnly?: boolean
       return;
     }
 
-    const disableServiceWorker = async (
-      reloadControlledPage = false,
-      reloadKey = RECOVERY_SW_RELOAD_KEY
-    ) => {
-      const hasController = Boolean(navigator.serviceWorker.controller);
+    const disableServiceWorker = async () => {
       try {
         const registrations = await navigator.serviceWorker.getRegistrations();
         await Promise.all(registrations.map((registration) => registration.unregister()));
@@ -40,49 +26,23 @@ export function PWARegistration({ cleanupOnly = false }: { cleanupOnly?: boolean
         // Ignore unregister failures.
       }
       await clearPwaCaches();
-
-      if (!reloadControlledPage || !hasController) return;
-      try {
-        if (sessionStorage.getItem(reloadKey) === "done") return;
-        sessionStorage.setItem(reloadKey, "done");
-        window.location.reload();
-      } catch {
-        window.location.reload();
-      }
     };
 
-    const register = async () => {
+    const cleanup = async () => {
       try {
-        if (cleanupOnly) {
-          if (isSafariBrowser()) {
-            await disableServiceWorker(true, SAFARI_SW_RELOAD_KEY);
-          }
-          return;
-        }
-
-        if (isSupabaseRecoveryMode()) {
-          await disableServiceWorker(true);
-          return;
-        }
-
-        if (isSafariBrowser()) {
-          await disableServiceWorker(true, SAFARI_SW_RELOAD_KEY);
-          return;
-        }
-
-        await navigator.serviceWorker.register("/sw.js?v=5", { scope: "/" });
+        await disableServiceWorker();
       } catch (error) {
-        console.error("Service worker registration failed:", error);
+        console.error("Service worker cleanup failed:", error);
       }
     };
 
     if (document.readyState === "complete") {
-      void register();
+      void cleanup();
       return;
     }
 
     const onLoad = () => {
-      void register();
+      void cleanup();
     };
     window.addEventListener("load", onLoad);
     return () => window.removeEventListener("load", onLoad);

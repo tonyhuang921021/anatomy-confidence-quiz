@@ -435,7 +435,7 @@ export function ResourceShareHub() {
       </button>
 
       {composerOpen ? (
-        <div className="fixed inset-0 z-50 flex items-end overflow-hidden bg-slate-950/30 p-4 backdrop-blur-sm md:items-center md:justify-center">
+        <div className="fixed inset-0 z-[140] flex items-end overflow-hidden bg-slate-950/30 p-4 backdrop-blur-sm md:items-center md:justify-center">
           <div className="max-h-[calc(100dvh-2rem)] w-full max-w-[calc(100vw-2rem)] overflow-y-auto rounded-[2rem] border border-emerald-100 bg-white p-5 shadow-2xl md:max-w-2xl md:p-6">
             <div className="flex items-start justify-between gap-3">
               <div>

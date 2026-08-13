@@ -102,7 +102,7 @@ function isAllowedEmail(email?: string | null) {
 
 function FullPageMessage({ children }: { children: string }) {
   return (
-    <main className="flex min-h-screen items-center justify-center bg-white p-6 text-center text-sm font-semibold text-slate-600">
+    <main id="main-content" className="flex min-h-screen items-center justify-center bg-white p-6 text-center text-sm font-semibold text-slate-600">
       {children}
     </main>
   );
@@ -180,7 +180,7 @@ export function OwnerHtmlReviewFrame({
   }
 
   return (
-    <main className="min-h-screen bg-white">
+    <main id="main-content" className="min-h-screen bg-white">
       <iframe
         title={title}
         srcDoc={html}

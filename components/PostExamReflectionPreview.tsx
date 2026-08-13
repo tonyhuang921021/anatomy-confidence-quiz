@@ -531,7 +531,7 @@ export function PostExamReflectionPreview() {
 
   if (authLoading) {
     return (
-      <main className="mx-auto min-h-screen max-w-[1280px] px-4 py-16 sm:px-6">
+      <main id="main-content" className="mx-auto min-h-screen max-w-[1280px] px-4 py-16 sm:px-6">
         <p className="text-sm font-semibold text-slate-600">讀取登入狀態中...</p>
       </main>
     );
@@ -539,7 +539,7 @@ export function PostExamReflectionPreview() {
 
   if (!user) {
     return (
-      <main className="mx-auto min-h-screen max-w-[960px] px-4 py-16 sm:px-6">
+      <main id="main-content" className="mx-auto min-h-screen max-w-[960px] px-4 py-16 sm:px-6">
         <section className="rounded-lg border border-slate-200 bg-white p-6 sm:p-8">
           <p className="eyebrow">Post-exam recap</p>
           <h1 className="mt-3 text-3xl font-bold text-ink">請先登入</h1>
@@ -556,7 +556,7 @@ export function PostExamReflectionPreview() {
 
   if (!accessChecked) {
     return (
-      <main className="mx-auto min-h-screen max-w-[960px] px-4 py-16 sm:px-6">
+      <main id="main-content" className="mx-auto min-h-screen max-w-[960px] px-4 py-16 sm:px-6">
         <section className="rounded-lg border border-slate-200 bg-white p-6 sm:p-8">
           <p className="eyebrow">Post-exam recap</p>
           <h1 className="mt-3 text-3xl font-bold text-ink">正在整理你的考季</h1>
@@ -573,7 +573,7 @@ export function PostExamReflectionPreview() {
 
   if (!snapshot) {
     return (
-      <main className="mx-auto min-h-screen max-w-[960px] px-4 py-16 sm:px-6">
+      <main id="main-content" className="mx-auto min-h-screen max-w-[960px] px-4 py-16 sm:px-6">
         <section className="rounded-lg border border-amber-200 bg-amber-50 p-6 sm:p-8">
           <p className="eyebrow">Post-exam recap</p>
           <h1 className="mt-3 text-3xl font-bold text-ink">個人回顧暫時無法載入</h1>
@@ -590,7 +590,7 @@ export function PostExamReflectionPreview() {
 
   if (!isEligible) {
     return (
-      <main className="mx-auto min-h-screen max-w-[960px] px-4 py-16 sm:px-6">
+      <main id="main-content" className="mx-auto min-h-screen max-w-[960px] px-4 py-16 sm:px-6">
         <section className="rounded-lg border border-slate-200 bg-white p-6 sm:p-8">
           <p className="eyebrow">Post-exam recap</p>
           <h1 className="mt-3 text-3xl font-bold text-ink">這份回顧尚未開放</h1>
@@ -606,7 +606,7 @@ export function PostExamReflectionPreview() {
   }
 
   return (
-    <main className="mx-auto min-h-screen max-w-[1280px] px-4 pb-20 pt-10 sm:px-6 sm:pt-14">
+    <main id="main-content" className="mx-auto min-h-screen max-w-[1280px] px-4 pb-20 pt-10 sm:px-6 sm:pt-14">
       <header className="border-b border-slate-200 pb-8">
         <div className="flex flex-wrap items-start justify-between gap-5">
           <div className="max-w-3xl">
