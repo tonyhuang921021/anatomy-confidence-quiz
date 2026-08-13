@@ -10,6 +10,7 @@ import {
 import { ContinueQuizButton } from "@/components/ContinueQuizButton";
 import { ClientSectionBoundary } from "@/components/ClientSectionBoundary";
 import { HomeToneBanner } from "@/components/HomeToneBanner";
+import { LazyFeedbackBoard } from "@/components/LazyFeedbackBoard";
 import { isSupabaseRecoveryMode } from "@/lib/supabase/recoveryMode";
 
 const START_ACTIONS = [
@@ -54,7 +55,7 @@ const HOME_RELEASE_NOTES = [
   {
     time: "08/13",
     title: "全站導覽重新整理",
-    body: "帳號改放右上角，留言板固定在儲存題目下方；舊快取清理也不再打斷正在操作的頁面。"
+    body: "帳號與設定收進右上角，留言板固定在首頁下方；常用入口也重新整理，不用在重複按鈕之間找路。"
   },
   {
     time: "08/03",
@@ -1156,6 +1157,21 @@ export default function HomePage() {
           </p>
         </section>
       ) : null}
+
+      <section id="feedback" className="home-work-section home-feedback-section" aria-labelledby="home-feedback-title">
+        <header className="home-feedback-heading">
+          <div>
+            <p className="home-kicker">交流</p>
+            <h2 id="home-feedback-title" className="home-section-title">留言板</h2>
+            <p>題目問題、使用狀況或建議，都可以直接留在這裡。</p>
+          </div>
+        </header>
+        <div className="home-feedback-board">
+          <ClientSectionBoundary title="留言板">
+            <LazyFeedbackBoard showHeading={false} />
+          </ClientSectionBoundary>
+        </div>
+      </section>
     </main>
   );
 }

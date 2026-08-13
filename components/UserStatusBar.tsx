@@ -76,7 +76,7 @@ const MORE_LINKS: NavItem[] = [
 ];
 
 const FEEDBACK_NAV: NavItem = {
-  href: "/feedback",
+  href: "/#feedback",
   label: "留言板",
   icon: MessageSquareText,
   matches: (pathname) => pathname.startsWith("/feedback")

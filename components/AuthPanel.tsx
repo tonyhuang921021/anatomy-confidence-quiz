@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import type { ReactNode } from "react";
 import { useEffect, useMemo, useState } from "react";
 import { useAuth } from "@/components/AuthProvider";
 import { getSyncStatusText } from "@/components/syncStatusText";
@@ -101,6 +102,67 @@ function loadRememberAccountPreference() {
   return safeReadLocalStorage(REMEMBER_ACCOUNT_KEY) !== "false";
 }
 
+function PreferenceGroup({
+  title,
+  description,
+  children
+}: {
+  title: string;
+  description: string;
+  children: ReactNode;
+}) {
+  return (
+    <section className="account-preference-group">
+      <header className="account-preference-group-heading">
+        <h3>{title}</h3>
+        <p>{description}</p>
+      </header>
+      <div className="account-preference-list">{children}</div>
+    </section>
+  );
+}
+
+function PreferenceRow({
+  label,
+  description,
+  children
+}: {
+  label: string;
+  description: string;
+  children: ReactNode;
+}) {
+  return (
+    <div className="account-preference-row">
+      <div className="account-preference-copy">
+        <h4>{label}</h4>
+        <p>{description}</p>
+      </div>
+      <div className="account-preference-control">{children}</div>
+    </div>
+  );
+}
+
+function PreferenceChoice({
+  selected,
+  onClick,
+  children
+}: {
+  selected: boolean;
+  onClick: () => void;
+  children: ReactNode;
+}) {
+  return (
+    <button
+      type="button"
+      className={`account-preference-choice${selected ? " is-selected" : ""}`}
+      aria-pressed={selected}
+      onClick={onClick}
+    >
+      {children}
+    </button>
+  );
+}
+
 async function getRecoveredAuthSession() {
   try {
     const {
@@ -142,7 +204,6 @@ export function AuthPanel({ compactHeader = false }: { compactHeader?: boolean }
   const [signingOut, setSigningOut] = useState(false);
   const [homeToneMode, setHomeToneMode] = useState<HomeToneMode>("calm");
   const [themeMode, setThemeMode] = useState<ThemeMode>("light");
-  const [settingsOpen, setSettingsOpen] = useState(false);
   const ownerAllowedEmails = (process.env.NEXT_PUBLIC_ADMIN_EMAILS ?? "tonyhuang921021@gmail.com")
     .split(",")
     .map((item) => item.trim().toLowerCase())
@@ -746,290 +807,188 @@ export function AuthPanel({ compactHeader = false }: { compactHeader?: boolean }
             />
             <small>排行榜與公開互動會顯示這個名稱。</small>
           </label>
-          <div className="account-settings-preferences rounded-2xl border border-slate-200">
-            <button
-              type="button"
-              onClick={() => setSettingsOpen((current) => !current)}
-              className="flex min-h-12 w-full items-center justify-between px-4 py-3 text-left"
-            >
-              <div>
-                <p className="text-sm font-semibold text-ink">設定</p>
-                <p className="mt-1 text-xs text-slate-500">首頁、散題、模擬考與藥理複習設定</p>
-              </div>
-              <span className="text-sm font-semibold text-slate-500">{settingsOpen ? "收合" : "展開"}</span>
-            </button>
-            {settingsOpen ? (
-              <div className="border-t border-slate-200 px-4 py-4">
-                <div className="grid gap-5 lg:grid-cols-2">
-                  <div className="rounded-2xl bg-slate-50/80 p-4">
-                    <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">顯示與首頁</p>
-                    <div className="mt-3 flex flex-wrap items-center gap-2">
-                      <button
-                        type="button"
+          <div className="account-settings-preferences">
+            <header className="account-settings-preferences-heading">
+              <p>作答偏好</p>
+              <span>各項設定會保存在這台裝置，登入後也會帶到其他裝置。</span>
+            </header>
+            <div className="account-preference-sections">
+                <PreferenceGroup title="顯示" description="首頁文字與畫面模式">
+                  <PreferenceRow label="首頁提示" description="選擇首頁顯示的文字語氣。">
+                    <div className="account-preference-options" role="group" aria-label="首頁提示">
+                      <PreferenceChoice
+                        selected={homeToneMode === "calm"}
                         onClick={() => handleChangeHomeToneMode("calm")}
-                        className={`min-h-11 rounded-full px-4 py-2 text-sm font-semibold transition ${
-                          homeToneMode === "calm"
-                            ? "bg-emerald-100 text-emerald-950"
-                            : "bg-slate-100 text-slate-700 hover:bg-slate-200"
-                        }`}
                       >
                         抗焦慮版
-                      </button>
-                      <button
-                        type="button"
+                      </PreferenceChoice>
+                      <PreferenceChoice
+                        selected={homeToneMode === "anxious"}
                         onClick={() => handleChangeHomeToneMode("anxious")}
-                        className={`min-h-11 rounded-full px-4 py-2 text-sm font-semibold transition ${
-                          homeToneMode === "anxious"
-                            ? "bg-rose-100 text-rose-950"
-                            : "bg-slate-100 text-slate-700 hover:bg-slate-200"
-                        }`}
                       >
                         焦慮版
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => handleChangeThemeMode(themeMode === "dark" ? "light" : "dark")}
-                        className={`min-h-11 rounded-full px-4 py-2 text-sm font-semibold transition ${
-                          themeMode === "dark"
-                            ? "bg-slate-900 text-slate-100"
-                            : "bg-slate-100 text-slate-700 hover:bg-slate-200"
-                        }`}
-                      >
-                        暗夜模式
-                      </button>
+                      </PreferenceChoice>
                     </div>
-                  </div>
+                  </PreferenceRow>
+                  <PreferenceRow label="畫面模式" description="依閱讀環境切換明亮或暗色畫面。">
+                    <div className="account-preference-options" role="group" aria-label="畫面模式">
+                      <PreferenceChoice
+                        selected={themeMode === "light"}
+                        onClick={() => handleChangeThemeMode("light")}
+                      >
+                        明亮
+                      </PreferenceChoice>
+                      <PreferenceChoice
+                        selected={themeMode === "dark"}
+                        onClick={() => handleChangeThemeMode("dark")}
+                      >
+                        暗夜
+                      </PreferenceChoice>
+                    </div>
+                  </PreferenceRow>
+                </PreferenceGroup>
 
-                  <div className="rounded-2xl bg-slate-50/80 p-4">
-                    <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">散題作答</p>
-                    <div className="mt-3 flex flex-wrap gap-2">
-                      <button
-                        type="button"
+                <PreferenceGroup title="散題與複習" description="作答方式、每輪題數與完成條件">
+                  <PreferenceRow label="作答回合" description="完整做完一輪，或每題看完詳解後都能結束。">
+                    <div className="account-preference-options" role="group" aria-label="散題作答回合">
+                      <PreferenceChoice
+                        selected={!practiceStopAfterReview}
                         onClick={() => handleChangePracticeStopAfterReview(false)}
-                        className={`min-h-11 rounded-full px-4 py-2 text-sm font-semibold transition ${
-                          !practiceStopAfterReview
-                            ? "bg-brand-600 text-white"
-                            : "bg-slate-100 text-slate-700 hover:bg-slate-200"
-                        }`}
                       >
-                        正常做完整輪
-                      </button>
-                      <button
-                        type="button"
+                        完整一輪
+                      </PreferenceChoice>
+                      <PreferenceChoice
+                        selected={practiceStopAfterReview}
                         onClick={() => handleChangePracticeStopAfterReview(true)}
-                        className={`min-h-11 rounded-full px-4 py-2 text-sm font-semibold transition ${
-                          practiceStopAfterReview
-                            ? "bg-amber-100 text-amber-900 ring-1 ring-amber-300"
-                            : "bg-slate-100 text-slate-700 hover:bg-slate-200"
-                        }`}
                       >
-                        每題詳解後可結束
-                      </button>
+                        隨時可結束
+                      </PreferenceChoice>
                     </div>
-                    <div className="mt-3 flex flex-wrap gap-2">
-                      <button
-                        type="button"
-                        onClick={() => handleChangePracticeFastAnswerMode(false)}
-                        className={`min-h-11 rounded-full px-4 py-2 text-sm font-semibold transition ${
-                          !practiceFastAnswerMode
-                            ? "bg-brand-600 text-white"
-                            : "bg-slate-100 text-slate-700 hover:bg-slate-200"
-                        }`}
-                      >
-                        選完再送出
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => handleChangePracticeFastAnswerMode(true)}
-                        className={`min-h-11 rounded-full px-4 py-2 text-sm font-semibold transition ${
-                          practiceFastAnswerMode
-                            ? "bg-cyan-100 text-cyan-950 ring-1 ring-cyan-300"
-                            : "bg-slate-100 text-slate-700 hover:bg-slate-200"
-                        }`}
-                      >
-                        極速做題：點選即送出
-                      </button>
-                    </div>
-                    <p className="mt-2 text-xs leading-5 text-slate-500">
-                      極速模式會在點選選項後直接作答，作答後仍可看詳解。
-                    </p>
-                    <div className="mt-4 rounded-2xl border border-slate-200 bg-white/80 p-3">
-                      <p className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-500">
-                        複習完成條件
-                      </p>
-                      <div className="mt-3 flex flex-wrap gap-2">
-                        <button
-                          type="button"
-                          onClick={() => handleChangeReviewCompletionThreshold(1)}
-                          className={`min-h-11 rounded-full px-4 py-2 text-sm font-semibold transition ${
-                            reviewCompletionThreshold === 1
-                              ? "bg-emerald-100 text-emerald-950 ring-1 ring-emerald-300"
-                              : "bg-slate-100 text-slate-700 hover:bg-slate-200"
-                          }`}
-                        >
-                          答對 1 次就完成
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => handleChangeReviewCompletionThreshold(2)}
-                          className={`min-h-11 rounded-full px-4 py-2 text-sm font-semibold transition ${
-                            reviewCompletionThreshold === 2
-                              ? "bg-brand-600 text-white"
-                              : "bg-slate-100 text-slate-700 hover:bg-slate-200"
-                          }`}
-                        >
-                          答對 2 次才完成
-                        </button>
-                      </div>
-                      <p className="mt-2 text-xs leading-5 text-slate-500">
-                        同時影響錯題與沒信心題；手動移入或移回完成區仍會優先保留。
-                      </p>
-                    </div>
-                    <div className="mt-4 flex flex-wrap gap-2">
-                      <button
-                        type="button"
-                        onClick={() => handleChangeKeyboardQuestionNavigation(false)}
-                        className={`min-h-11 rounded-full px-4 py-2 text-sm font-semibold transition ${
-                          !keyboardQuestionNavigation
-                            ? "bg-brand-600 text-white"
-                            : "bg-slate-100 text-slate-700 hover:bg-slate-200"
-                        }`}
-                      >
-                        方向鍵關閉
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => handleChangeKeyboardQuestionNavigation(true)}
-                        className={`min-h-11 rounded-full px-4 py-2 text-sm font-semibold transition ${
-                          keyboardQuestionNavigation
-                            ? "bg-cyan-100 text-cyan-950 ring-1 ring-cyan-300"
-                            : "bg-slate-100 text-slate-700 hover:bg-slate-200"
-                        }`}
-                      >
-                        左右鍵切題
-                      </button>
-                    </div>
-                    <p className="mt-2 text-xs leading-5 text-slate-500">
-                      散題需先送出答案才能用右鍵下一題；方向鍵不會交卷或直接進結果。
-                    </p>
-                  </div>
-
-                  <div className="rounded-2xl bg-slate-50/80 p-4">
-                    <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">模擬考工具</p>
-                    <div className="mt-3 flex flex-wrap gap-2">
-                      <button
-                        type="button"
-                        onClick={() => handleChangeSimulationConfidenceCalibration(true)}
-                        className={`min-h-11 rounded-full px-4 py-2 text-sm font-semibold transition ${
-                          simulationConfidenceCalibration
-                            ? "bg-brand-600 text-white"
-                            : "bg-slate-100 text-slate-700 hover:bg-slate-200"
-                        }`}
-                      >
-                        開啟，保留校準分析
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => handleChangeSimulationConfidenceCalibration(false)}
-                        className={`min-h-11 rounded-full px-4 py-2 text-sm font-semibold transition ${
-                          !simulationConfidenceCalibration
-                            ? "bg-amber-100 text-amber-900 ring-1 ring-amber-300"
-                            : "bg-slate-100 text-slate-700 hover:bg-slate-200"
-                        }`}
-                      >
-                        關閉，只看答題結果
-                      </button>
-                    </div>
-                    <p className="mt-2 text-xs leading-5 text-slate-500">
-                      只影響模擬考校準分析；散題仍會詢問信心，低信心題會照常留到複習。
-                    </p>
-                    <div className="mt-4 flex flex-wrap gap-2">
-                      <button
-                        type="button"
-                        onClick={() => handleChangeSimulationOptionElimination(false)}
-                        className={`min-h-11 rounded-full px-4 py-2 text-sm font-semibold transition ${
-                          !simulationOptionElimination
-                            ? "bg-brand-600 text-white"
-                            : "bg-slate-100 text-slate-700 hover:bg-slate-200"
-                        }`}
-                      >
-                        選項打叉關閉
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => handleChangeSimulationOptionElimination(true)}
-                        className={`min-h-11 rounded-full px-4 py-2 text-sm font-semibold transition ${
-                          simulationOptionElimination
-                            ? "bg-rose-100 text-rose-950 ring-1 ring-rose-300"
-                            : "bg-slate-100 text-slate-700 hover:bg-slate-200"
-                        }`}
-                      >
-                        開啟選項打叉
-                      </button>
-                    </div>
-                    <p className="mt-2 text-xs leading-5 text-slate-500">
-                      只在模擬考選項右側顯示，可標記先排除的選項；結果與 AI Prompt 會一起帶出。
-                    </p>
-                  </div>
-
-                  <div className="rounded-2xl bg-slate-50/80 p-4">
-                    <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">藥理卡滑動方向</p>
-                    <div className="mt-3 flex flex-wrap gap-2">
-                      <button
-                        type="button"
-                        onClick={() => handleChangePharmacologyReverseSwipe(false)}
-                        className={`min-h-11 rounded-full px-4 py-2 text-sm font-semibold transition ${
-                          !pharmacologyReverseSwipe
-                            ? "bg-brand-600 text-white"
-                            : "bg-slate-100 text-slate-700 hover:bg-slate-200"
-                        }`}
-                      >
-                        預設：左會、右不會
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => handleChangePharmacologyReverseSwipe(true)}
-                        className={`min-h-11 rounded-full px-4 py-2 text-sm font-semibold transition ${
-                          pharmacologyReverseSwipe
-                            ? "bg-fuchsia-100 text-fuchsia-950 ring-1 ring-fuchsia-300"
-                            : "bg-slate-100 text-slate-700 hover:bg-slate-200"
-                        }`}
-                      >
-                        反向：左不會、右會
-                      </button>
-                    </div>
-                    <p className="mt-2 text-xs leading-5 text-slate-500">
-                      只影響藥理複習卡；抽卡權重仍照你的「會 / 不會」紀錄計算。
-                    </p>
-                  </div>
-
+                  </PreferenceRow>
                   {!practiceStopAfterReview ? (
-                    <div className="rounded-2xl bg-slate-50/80 p-4">
-                      <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">開始測驗題數</p>
-                      <p className="mt-2 text-sm text-slate-600">目前設定：每次 {practiceQuestionCount} 題</p>
-                      <label className="mt-3 grid gap-2 text-sm text-slate-700 sm:max-w-xs">
-                        選擇題數
-                        <select
-                          value={practiceQuestionCount}
-                          onChange={(event) =>
-                            handleChangePracticeQuestionCount(
-                              Number(event.target.value) as PracticeQuestionCount
-                            )
-                          }
-                          className="min-h-12 rounded-2xl border border-slate-200 px-4 py-3 text-sm text-slate-800 outline-none"
-                        >
-                          {[5, 10, 15, 20, 25, 30, 35, 40, 45, 50].map((count) => (
-                            <option key={count} value={count}>
-                              {count} 題
-                            </option>
-                          ))}
-                        </select>
-                      </label>
-                    </div>
+                    <PreferenceRow label="每輪題數" description={`目前每次 ${practiceQuestionCount} 題。`}>
+                      <select
+                        value={practiceQuestionCount}
+                        onChange={(event) =>
+                          handleChangePracticeQuestionCount(
+                            Number(event.target.value) as PracticeQuestionCount
+                          )
+                        }
+                        className="account-preference-select"
+                        aria-label="每輪題數"
+                      >
+                        {[5, 10, 15, 20, 25, 30, 35, 40, 45, 50].map((count) => (
+                          <option key={count} value={count}>
+                            {count} 題
+                          </option>
+                        ))}
+                      </select>
+                    </PreferenceRow>
                   ) : null}
-                </div>
-              </div>
-            ) : null}
+                  <PreferenceRow label="送出答案" description="極速模式會在點選選項後直接作答。">
+                    <div className="account-preference-options" role="group" aria-label="答案送出方式">
+                      <PreferenceChoice
+                        selected={!practiceFastAnswerMode}
+                        onClick={() => handleChangePracticeFastAnswerMode(false)}
+                      >
+                        按鈕送出
+                      </PreferenceChoice>
+                      <PreferenceChoice
+                        selected={practiceFastAnswerMode}
+                        onClick={() => handleChangePracticeFastAnswerMode(true)}
+                      >
+                        點選即送出
+                      </PreferenceChoice>
+                    </div>
+                  </PreferenceRow>
+                  <PreferenceRow label="複習完成" description="同時套用錯題與沒信心題；手動調整仍優先保留。">
+                    <div className="account-preference-options" role="group" aria-label="複習完成條件">
+                      <PreferenceChoice
+                        selected={reviewCompletionThreshold === 1}
+                        onClick={() => handleChangeReviewCompletionThreshold(1)}
+                      >
+                        答對 1 次
+                      </PreferenceChoice>
+                      <PreferenceChoice
+                        selected={reviewCompletionThreshold === 2}
+                        onClick={() => handleChangeReviewCompletionThreshold(2)}
+                      >
+                        答對 2 次
+                      </PreferenceChoice>
+                    </div>
+                  </PreferenceRow>
+                  <PreferenceRow label="方向鍵切題" description="散題送出答案後可用左右鍵切題，不會因此交卷。">
+                    <div className="account-preference-options" role="group" aria-label="方向鍵切題">
+                      <PreferenceChoice
+                        selected={!keyboardQuestionNavigation}
+                        onClick={() => handleChangeKeyboardQuestionNavigation(false)}
+                      >
+                        關閉
+                      </PreferenceChoice>
+                      <PreferenceChoice
+                        selected={keyboardQuestionNavigation}
+                        onClick={() => handleChangeKeyboardQuestionNavigation(true)}
+                      >
+                        開啟
+                      </PreferenceChoice>
+                    </div>
+                  </PreferenceRow>
+                </PreferenceGroup>
+
+                <PreferenceGroup title="模擬考" description="考試中使用的輔助工具">
+                  <PreferenceRow label="信心校準" description="關閉後只看答題結果；散題的低信心複習不受影響。">
+                    <div className="account-preference-options" role="group" aria-label="模擬考信心校準">
+                      <PreferenceChoice
+                        selected={simulationConfidenceCalibration}
+                        onClick={() => handleChangeSimulationConfidenceCalibration(true)}
+                      >
+                        開啟
+                      </PreferenceChoice>
+                      <PreferenceChoice
+                        selected={!simulationConfidenceCalibration}
+                        onClick={() => handleChangeSimulationConfidenceCalibration(false)}
+                      >
+                        關閉
+                      </PreferenceChoice>
+                    </div>
+                  </PreferenceRow>
+                  <PreferenceRow label="選項排除" description="在選項旁標記先排除的答案，結果頁會一起保留。">
+                    <div className="account-preference-options" role="group" aria-label="模擬考選項排除">
+                      <PreferenceChoice
+                        selected={!simulationOptionElimination}
+                        onClick={() => handleChangeSimulationOptionElimination(false)}
+                      >
+                        關閉
+                      </PreferenceChoice>
+                      <PreferenceChoice
+                        selected={simulationOptionElimination}
+                        onClick={() => handleChangeSimulationOptionElimination(true)}
+                      >
+                        開啟
+                      </PreferenceChoice>
+                    </div>
+                  </PreferenceRow>
+                </PreferenceGroup>
+
+                <PreferenceGroup title="藥理複習" description="卡片操作偏好">
+                  <PreferenceRow label="滑動方向" description="只改變卡片手勢，抽卡權重仍依會與不會的紀錄。">
+                    <div className="account-preference-options" role="group" aria-label="藥理卡滑動方向">
+                      <PreferenceChoice
+                        selected={!pharmacologyReverseSwipe}
+                        onClick={() => handleChangePharmacologyReverseSwipe(false)}
+                      >
+                        左會、右不會
+                      </PreferenceChoice>
+                      <PreferenceChoice
+                        selected={pharmacologyReverseSwipe}
+                        onClick={() => handleChangePharmacologyReverseSwipe(true)}
+                      >
+                        左不會、右會
+                      </PreferenceChoice>
+                    </div>
+                  </PreferenceRow>
+                </PreferenceGroup>
+            </div>
           </div>
         </div>
         {syncError ? (

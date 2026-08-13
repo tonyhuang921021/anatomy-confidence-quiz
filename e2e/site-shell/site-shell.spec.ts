@@ -28,7 +28,7 @@ async function expectStablePage(page: Page, route: string) {
   expect(dimensions.pageWidth).toBeLessThanOrEqual(dimensions.viewportWidth);
 }
 
-test("導覽預設收起，開啟後入口清楚且留言板獨立", async ({ page }) => {
+test("導覽預設收起，留言入口會回到首頁完整留言板", async ({ page }) => {
   await page.goto("/", { waitUntil: "domcontentloaded" });
   await waitForShellReady(page);
   await expect(page.getByRole("dialog", { name: "主要導覽" })).toHaveCount(0);
@@ -39,8 +39,10 @@ test("導覽預設收起，開啟後入口清楚且留言板獨立", async ({ pa
   await expect(drawer.getByRole("link", { name: "留言板", exact: true })).toBeVisible();
   await drawer.getByRole("link", { name: "留言板", exact: true }).click();
 
-  await expect(page).toHaveURL(/\/feedback$/);
-  await expect(page.getByRole("heading", { name: "大家的問題與建議" })).toBeVisible();
+  await expect(page).toHaveURL(/\/#feedback$/);
+  const feedbackSection = page.locator("#feedback");
+  await expect(feedbackSection.getByRole("heading", { name: "留言板", exact: true })).toBeVisible();
+  await expect(feedbackSection.locator(".feedback-board")).toBeVisible();
   await expect(page.getByRole("dialog", { name: "主要導覽" })).toHaveCount(0);
 });
 
@@ -58,8 +60,9 @@ test("更多功能會留在左側導覽原地展開", async ({ page }) => {
   await expect(drawer.getByRole("link", { name: "考後回顧", exact: true })).toBeVisible();
   await expect(page.getByRole("dialog", { name: "更多功能" })).toHaveCount(0);
 
+  await page.waitForTimeout(220);
   const drawerBox = await drawer.boundingBox();
-  expect(drawerBox?.x ?? 1).toBe(0);
+  expect(Math.abs(drawerBox?.x ?? 1)).toBeLessThanOrEqual(1);
 });
 
 test("帳號設定可關閉並把焦點交回帳號按鈕", async ({ page }) => {

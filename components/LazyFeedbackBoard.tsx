@@ -36,14 +36,18 @@ function useNearViewport(rootMargin = "900px") {
   return { ref, shouldLoad };
 }
 
-function FeedbackBoardPlaceholder() {
+function FeedbackBoardPlaceholder({ showHeading = true }: { showHeading?: boolean }) {
   return (
-    <section className="surface-card p-5">
-      <p className="eyebrow">Feedback</p>
-      <h2 className="display-title mt-2 text-3xl">留言板</h2>
+    <section className={`feedback-placeholder${showHeading ? "" : " is-embedded"}`}>
+      {showHeading ? (
+        <>
+          <p className="eyebrow">Feedback</p>
+          <h2 className="display-title mt-2 text-3xl">留言板</h2>
+        </>
+      ) : null}
       <div className="mt-5 space-y-2">
-        <div className="surface-card-muted h-10 p-3" />
-        <div className="surface-card-muted h-10 p-3" />
+        <div className="feedback-placeholder-row" />
+        <div className="feedback-placeholder-row" />
       </div>
     </section>
   );
@@ -53,7 +57,7 @@ const FeedbackBoard = dynamic(
   loadFeedbackBoard,
   {
     ssr: false,
-    loading: () => <FeedbackBoardPlaceholder />,
+    loading: () => <FeedbackBoardPlaceholder showHeading={false} />,
   }
 );
 
@@ -70,7 +74,7 @@ export function LazyFeedbackBoard({
   if (!shouldRender) {
     return (
       <div ref={ref}>
-        <FeedbackBoardPlaceholder />
+        <FeedbackBoardPlaceholder showHeading={showHeading} />
       </div>
     );
   }
