@@ -44,6 +44,24 @@ test("導覽預設收起，開啟後入口清楚且留言板獨立", async ({ pa
   await expect(page.getByRole("dialog", { name: "主要導覽" })).toHaveCount(0);
 });
 
+test("更多功能會留在左側導覽原地展開", async ({ page }) => {
+  await page.goto("/", { waitUntil: "domcontentloaded" });
+  await waitForShellReady(page);
+  await page.getByRole("button", { name: "開啟導覽" }).click();
+
+  const drawer = page.getByRole("dialog", { name: "主要導覽" });
+  const moreTrigger = drawer.getByRole("button", { name: "更多", exact: true });
+  await moreTrigger.click();
+
+  await expect(moreTrigger).toHaveAttribute("aria-expanded", "true");
+  await expect(drawer.getByRole("link", { name: "學習筆記", exact: true })).toBeVisible();
+  await expect(drawer.getByRole("link", { name: "考後回顧", exact: true })).toBeVisible();
+  await expect(page.getByRole("dialog", { name: "更多功能" })).toHaveCount(0);
+
+  const drawerBox = await drawer.boundingBox();
+  expect(drawerBox?.x ?? 1).toBe(0);
+});
+
 test("帳號設定可關閉並把焦點交回帳號按鈕", async ({ page }) => {
   await page.goto("/", { waitUntil: "domcontentloaded" });
   await waitForShellReady(page);

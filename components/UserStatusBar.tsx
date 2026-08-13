@@ -120,7 +120,7 @@ export function UserStatusBar() {
     signOut
   } = useAuth();
   const [navOpen, setNavOpen] = useState(false);
-  const [moreOpen, setMoreOpen] = useState(false);
+  const [moreExpanded, setMoreExpanded] = useState(false);
   const [accountOpen, setAccountOpen] = useState(false);
   const [accountPanelOpen, setAccountPanelOpen] = useState(false);
   const [shellReady, setShellReady] = useState(false);
@@ -156,7 +156,7 @@ export function UserStatusBar() {
 
   useEffect(() => {
     setNavOpen(false);
-    setMoreOpen(false);
+    setMoreExpanded(false);
     setAccountOpen(false);
     setAccountPanelOpen(false);
   }, [pathname]);
@@ -175,7 +175,7 @@ export function UserStatusBar() {
   }, [accountOpen]);
 
   useEffect(() => {
-    const overlayOpen = navOpen || moreOpen || accountPanelOpen;
+    const overlayOpen = navOpen || accountPanelOpen;
     if (!overlayOpen) return;
     previousFocusRef.current = accountPanelOpen
       ? accountTriggerRef.current
@@ -192,7 +192,7 @@ export function UserStatusBar() {
       if (event.key === "Escape") {
         event.preventDefault();
         setAccountPanelOpen(false);
-        setMoreOpen(false);
+        setMoreExpanded(false);
         setNavOpen(false);
         return;
       }
@@ -229,7 +229,7 @@ export function UserStatusBar() {
         menuTriggerRef.current?.focus();
       }
     };
-  }, [accountPanelOpen, moreOpen, navOpen]);
+  }, [accountPanelOpen, navOpen]);
 
   useEffect(() => {
     if (!accountOpen) return;
@@ -261,7 +261,10 @@ export function UserStatusBar() {
               ref={menuTriggerRef}
               type="button"
               className="app-menu-trigger"
-              onClick={() => setNavOpen(true)}
+              onClick={() => {
+                setMoreExpanded(secondaryNavigationActive);
+                setNavOpen(true);
+              }}
               aria-label="開啟導覽"
               aria-expanded={navOpen}
               aria-controls="app-navigation-drawer"
@@ -363,7 +366,6 @@ export function UserStatusBar() {
                 href={item.href}
                 className={active ? "is-active" : ""}
                 aria-current={active ? "page" : undefined}
-                onClick={() => setMoreOpen(false)}
               >
                 <Icon size={20} strokeWidth={1.8} />
                 <span>{item.label.replace("總覽", "")}</span>
@@ -372,10 +374,13 @@ export function UserStatusBar() {
           })}
           <button
             type="button"
-            onClick={() => setMoreOpen(true)}
+            onClick={() => {
+              setMoreExpanded(true);
+              setNavOpen(true);
+            }}
             className={secondaryNavigationActive ? "is-active" : undefined}
-            aria-expanded={moreOpen}
-            aria-controls="app-more-sheet"
+            aria-expanded={navOpen && moreExpanded}
+            aria-controls="app-navigation-drawer"
           >
             <MoreHorizontal size={21} strokeWidth={1.8} />
             <span>更多</span>
@@ -428,83 +433,64 @@ export function UserStatusBar() {
               <div className="app-drawer-divider" aria-hidden="true" />
               <button
                 type="button"
-                onClick={() => {
-                  setNavOpen(false);
-                  setMoreOpen(true);
-                }}
+                className="app-drawer-more-trigger"
+                onClick={() => setMoreExpanded((current) => !current)}
+                aria-expanded={moreExpanded}
+                aria-controls="app-drawer-more-content"
               >
                 <MoreHorizontal size={21} strokeWidth={1.8} />
                 <span>更多</span>
+                <ChevronDown
+                  className="app-drawer-more-chevron"
+                  size={17}
+                  strokeWidth={1.8}
+                  aria-hidden="true"
+                />
               </button>
+              {moreExpanded ? (
+                <div id="app-drawer-more-content" className="app-drawer-more-content">
+                  <div className="app-drawer-subnav">
+                    {MORE_LINKS.map((item) => {
+                      const Icon = item.icon;
+                      const active = pathname.startsWith(item.href);
+                      return (
+                        <Link
+                          key={item.href}
+                          href={item.href}
+                          className={active ? "is-active" : undefined}
+                          aria-current={active ? "page" : undefined}
+                          onClick={() => setNavOpen(false)}
+                        >
+                          <Icon size={19} strokeWidth={1.8} />
+                          <span>{item.label}</span>
+                        </Link>
+                      );
+                    })}
+                  </div>
+
+                  <section className="app-about-section">
+                    <p className="app-sheet-label">關於本站</p>
+                    <p>
+                      整理醫師國考作答、錯題與複習進度的個人專案。
+                    </p>
+                    <a
+                      href="https://www.instagram.com/yphe_uc?igsh=OWJqZjJqd2o2cGpi&utm_source=qr"
+                      target="_blank"
+                      rel="noreferrer"
+                    >
+                      聯絡 @yphe_uc
+                    </a>
+                    <Link
+                      href="/courses/laozhao-anatomy"
+                      className="app-secondary-course-link"
+                      onClick={() => setNavOpen(false)}
+                    >
+                      老趙解剖學整理預覽
+                    </Link>
+                  </section>
+                </div>
+              ) : null}
             </nav>
-          </aside>
-        </div>
-      ) : null}
-
-      {moreOpen ? (
-        <div className="app-overlay" role="presentation">
-          <button
-            type="button"
-            className="app-overlay-dismiss"
-            onClick={() => setMoreOpen(false)}
-            aria-label="關閉更多選單"
-          />
-          <aside
-            ref={activePanelRef}
-            id="app-more-sheet"
-            className="app-side-sheet"
-            role="dialog"
-            aria-modal="true"
-            aria-label="更多功能"
-          >
-            <div className="app-drawer-header">
-              <div>
-                <p>更多</p>
-                <span>學習資源與網站資訊</span>
-              </div>
-              <button type="button" onClick={() => setMoreOpen(false)} aria-label="關閉更多選單">
-                <X size={20} strokeWidth={1.8} />
-              </button>
-            </div>
-
-            <div className="app-more-grid">
-              {MORE_LINKS.map((item) => {
-                const Icon = item.icon;
-                return (
-                  <Link
-                    key={item.href}
-                    href={item.href}
-                    className={pathname.startsWith(item.href) ? "is-active" : undefined}
-                    aria-current={pathname.startsWith(item.href) ? "page" : undefined}
-                    onClick={() => setMoreOpen(false)}
-                  >
-                    <Icon size={20} strokeWidth={1.8} />
-                    <span>{item.label}</span>
-                  </Link>
-                );
-              })}
-            </div>
-
-            <section className="app-about-section">
-              <p className="app-sheet-label">關於本站</p>
-              <p>
-                這是一個整理醫師國考作答、錯題與複習進度的個人專案。
-              </p>
-              <a
-                href="https://www.instagram.com/yphe_uc?igsh=OWJqZjJqd2o2cGpi&utm_source=qr"
-                target="_blank"
-                rel="noreferrer"
-              >
-                聯絡 @yphe_uc
-              </a>
-              <Link
-                href="/courses/laozhao-anatomy"
-                className="app-secondary-course-link"
-                onClick={() => setMoreOpen(false)}
-              >
-                老趙解剖學整理預覽
-              </Link>
-            </section>
           </aside>
         </div>
       ) : null}

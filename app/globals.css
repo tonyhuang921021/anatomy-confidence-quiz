@@ -3177,7 +3177,6 @@ html[data-theme="dark"] .border-slate-100 {
 }
 
 .app-mobile-drawer,
-.app-side-sheet,
 .app-modal-panel {
   position: relative;
   z-index: 1;
@@ -3191,10 +3190,6 @@ html[data-theme="dark"] .border-slate-100 {
   width: min(21rem, 88vw);
   border-left: 0;
   border-right: 1px solid var(--line-soft);
-}
-
-.app-side-sheet {
-  width: min(26rem, 94vw);
 }
 
 .app-drawer-header {
@@ -3224,16 +3219,13 @@ html[data-theme="dark"] .border-slate-100 {
   font-size: 0.72rem;
 }
 
-.app-drawer-links,
-.app-more-grid {
+.app-drawer-links {
   display: grid;
   padding: 0.75rem;
 }
 
 .app-drawer-links a,
-.app-drawer-links button,
-.app-more-grid a,
-.app-more-grid button {
+.app-drawer-links button {
   display: flex;
   min-height: 52px;
   align-items: center;
@@ -3248,16 +3240,13 @@ html[data-theme="dark"] .border-slate-100 {
 }
 
 .app-drawer-links a:hover,
-.app-drawer-links button:hover,
-.app-more-grid a:hover,
-.app-more-grid button:hover {
+.app-drawer-links button:hover {
   background: var(--surface-muted);
   color: var(--brand-deep);
 }
 
 .app-drawer-links a.is-active,
-.app-drawer-links button.is-active,
-.app-more-grid a.is-active {
+.app-drawer-links button.is-active {
   background: color-mix(in srgb, var(--brand-tint) 58%, var(--surface-float));
   color: var(--brand-deep);
 }
@@ -3266,6 +3255,37 @@ html[data-theme="dark"] .border-slate-100 {
   height: 1px;
   margin: 0.65rem 0.75rem;
   background: var(--line-soft);
+}
+
+.app-drawer-more-trigger .app-drawer-more-chevron {
+  margin-left: auto;
+  transition: transform 160ms ease;
+}
+
+.app-drawer-more-trigger[aria-expanded="true"] .app-drawer-more-chevron {
+  transform: rotate(180deg);
+}
+
+.app-drawer-more-content {
+  margin: 0 0.35rem 0.75rem 1rem;
+  border-left: 1px solid var(--line-soft);
+  padding-left: 0.4rem;
+}
+
+.app-drawer-subnav {
+  display: grid;
+}
+
+.app-drawer-subnav a {
+  min-height: 46px;
+  padding-block: 0.62rem;
+  color: var(--ink-soft);
+  font-size: 0.82rem;
+}
+
+.app-drawer-more-content .app-about-section {
+  margin: 0.8rem 0.75rem 0.35rem;
+  padding-top: 1rem;
 }
 
 .app-about-section {
@@ -3460,7 +3480,6 @@ html[data-theme="dark"] .border-slate-100 {
 }
 
 .app-modal-panel,
-.app-side-sheet,
 .app-mobile-drawer {
   animation: app-panel-enter 180ms ease-out;
 }
@@ -4411,7 +4430,6 @@ html[data-theme="dark"] .border-slate-100 {
   }
 
   .app-modal-panel,
-  .app-side-sheet,
   .app-mobile-drawer {
     animation: none;
   }
