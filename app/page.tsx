@@ -1090,8 +1090,8 @@ export default function HomePage() {
   return (
     <main id="main-content" className="shell home-shell home-workspace">
       <header className="home-workspace-header">
-        <p className="home-kicker">今日練習</p>
-        <h1 className="display-title">接著做，或開始新的練習。</h1>
+        <p className="home-kicker">刷題</p>
+        <h1 className="display-title">今天從哪裡開始？</h1>
         <ClientSectionBoundary title="首頁提示">
           <HomeToneBanner />
         </ClientSectionBoundary>

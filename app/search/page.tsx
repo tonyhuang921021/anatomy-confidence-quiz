@@ -5,7 +5,11 @@ import { useDeferredValue, useEffect, useMemo, useState } from "react";
 import { useAuth } from "@/components/AuthProvider";
 import { CopyQuestionPromptButton } from "@/components/CopyQuestionPromptButton";
 import { QuestionExplanationTabs } from "@/components/QuestionExplanationTabs";
-import { QuestionOptionBlock, QuestionStemBlock } from "@/components/QuestionMediaBlock";
+import {
+  QuestionOptionBlock,
+  QuestionStemBlock,
+  QuestionStemMedia
+} from "@/components/QuestionMediaBlock";
 import { QuestionPrimaryTagBadge } from "@/components/QuestionPrimaryTagBadge";
 import { QuestionReportButton } from "@/components/QuestionIssueReportButton";
 import { SavedQuestionButton } from "@/components/SavedQuestionButton";
@@ -768,6 +772,8 @@ export default function SearchPage() {
                   </p>
                   <CopyQuestionPromptButton question={renderedQuestion} />
                 </div>
+
+                <QuestionStemMedia question={renderedQuestion} className="mb-5" />
 
                 <div className="search-result-options grid gap-3">
                   {OPTION_KEYS.filter((key) => typeof renderedQuestion.options[key] === "string").map((key) => (

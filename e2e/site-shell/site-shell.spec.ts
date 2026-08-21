@@ -31,6 +31,7 @@ async function expectStablePage(page: Page, route: string) {
 test("導覽預設收起，留言入口會回到首頁完整留言板", async ({ page }) => {
   await page.goto("/", { waitUntil: "domcontentloaded" });
   await waitForShellReady(page);
+  await expect(page.getByRole("heading", { name: "今天從哪裡開始？" })).toBeVisible();
   await expect(page.getByRole("dialog", { name: "主要導覽" })).toHaveCount(0);
 
   await page.getByRole("button", { name: "開啟導覽" }).click();
@@ -112,6 +113,23 @@ test("搜尋結果展開後不會重複題幹與分類", async ({ page }) => {
     window.getComputedStyle(element).gridTemplateColumns.split(" ").filter(Boolean).length
   );
   expect(optionColumnCount).toBe(viewportWidth >= 900 ? 2 : 1);
+});
+
+test("搜尋結果展開後會顯示題幹圖片", async ({ page }) => {
+  await page.goto("/search", { waitUntil: "networkidle" });
+  await waitForShellReady(page);
+
+  await page.getByRole("textbox", { name: "關鍵字" }).fill("MOEX-110101_2301-Q100");
+  const card = page.locator("details.search-result-card");
+  await expect(card).toHaveCount(1);
+  await card.locator("summary").click();
+
+  const image = card.getByRole("img", { name: "MOEX-110101_2301-Q100 題目圖片" });
+  await expect(image).toBeVisible();
+  await expect(image).toHaveAttribute(
+    "src",
+    "/question-media/MOEX-110101_2301-Q100.png"
+  );
 });
 
 test("結果頁展開後分類只顯示一次", async ({ page }) => {

@@ -7,6 +7,11 @@ type QuestionStemBlockProps = {
   className?: string;
 };
 
+type QuestionStemMediaProps = {
+  question: Question;
+  className?: string;
+};
+
 type QuestionOptionBlockProps = {
   question: Question;
   optionKey: OptionKey;
@@ -31,13 +36,23 @@ function renderImage(src: string, alt: string) {
   );
 }
 
+export function QuestionStemMedia({ question, className }: QuestionStemMediaProps) {
+  if (!question.stemImage) return null;
+
+  return (
+    <div className={`min-w-0 max-w-full ${className ?? ""}`}>
+      {renderImage(question.stemImage, `${question.id} 題目圖片`)}
+    </div>
+  );
+}
+
 export function QuestionStemBlock({ question, className }: QuestionStemBlockProps) {
   return (
     <div className={`min-w-0 max-w-full ${className ?? ""}`}>
       <p className="min-w-0 max-w-full font-semibold text-slate-900 [overflow-wrap:anywhere]">
         <FormattedQuestionText text={question.stem} />
       </p>
-      {question.stemImage ? renderImage(question.stemImage, `${question.id} 題目圖片`) : null}
+      <QuestionStemMedia question={question} />
     </div>
   );
 }

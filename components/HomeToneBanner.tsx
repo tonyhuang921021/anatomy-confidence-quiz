@@ -2,23 +2,8 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { useAuth } from "@/components/AuthProvider";
-import homeToneMessagesJson from "@/data/homeToneMessages.json";
 import { getHomeToneModePreference } from "@/lib/accountPreferences";
 import { loadHomeToneMode, type HomeToneMode } from "@/lib/storage";
-
-type HomeToneMessage = {
-  id: string;
-  text: string;
-  scene: string;
-};
-
-type HomeToneMessages = {
-  schemaVersion: string;
-  examCountdownDays: number;
-  anxietyMessages: HomeToneMessage[];
-  anxietyFallbackMessages: HomeToneMessage[];
-  calmMessages: HomeToneMessage[];
-};
 
 type CommunityStatsPoint = {
   date: string;
@@ -26,10 +11,9 @@ type CommunityStatsPoint = {
   correctRate: number;
 };
 
-const HOME_TONE_MESSAGES = homeToneMessagesJson as HomeToneMessages;
-const CALM_LINES = HOME_TONE_MESSAGES.calmMessages.map((message) => message.text);
-const ANXIOUS_LINES = HOME_TONE_MESSAGES.anxietyMessages.map((message) => message.text);
-const ANXIOUS_FALLBACK_LINES = HOME_TONE_MESSAGES.anxietyFallbackMessages.map((message) => message.text);
+const CALM_LINES = ["接著上次進度，或重新選一科。"];
+const ANXIOUS_LINES = ["今天全站已完成 {{todayQuestionCount}} 題。"];
+const ANXIOUS_FALLBACK_LINES = ["接著上次進度，或重新選一科。"];
 
 function pickLine(lines: string[], seed: number) {
   return lines[Math.abs(seed) % lines.length] ?? lines[0] ?? "";
