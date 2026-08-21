@@ -235,7 +235,7 @@ export default function SavedQuestionsPage() {
 
   return (
     <main id="main-content" className="shell workspace-page">
-      <section className="surface-card workspace-page-panel p-5 sm:p-7">
+      <section className="surface-card workspace-page-panel workspace-page-header p-5 sm:p-7">
         <div className="grid gap-4 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-center">
           <div className="min-w-0">
             <p className="workspace-page-kicker">題庫</p>
@@ -248,7 +248,7 @@ export default function SavedQuestionsPage() {
                   : "看到想補的題目，就按書籤放進來。"}
             </p>
           </div>
-          <div className="flex w-full justify-end sm:w-auto">
+          <div className="workspace-compact-actions w-full justify-end sm:w-auto">
             <Link
               href={savedQuestionReviewHref}
               onClick={(event) => {
@@ -259,7 +259,7 @@ export default function SavedQuestionsPage() {
                 saveQuizSettings(savedQuestionReviewSettings);
               }}
               aria-disabled={activeItems.length === 0 || savedAISimulationQuestionsLoading}
-              className={`min-h-12 w-full rounded-2xl px-5 py-4 text-center text-sm font-semibold transition ${
+              className={`w-full text-center text-sm font-semibold transition ${
                 activeItems.length === 0 || savedAISimulationQuestionsLoading
                   ? "pointer-events-none bg-slate-200 text-slate-500"
                   : "bg-brand-600 text-white hover:bg-brand-700"
@@ -271,31 +271,31 @@ export default function SavedQuestionsPage() {
         </div>
       </section>
 
-      <section className="mt-6 grid gap-4 sm:grid-cols-3">
-        <article className="rounded-3xl bg-white p-5 shadow-card ring-1 ring-slate-100">
+      <section className="saved-summary-strip mt-5">
+        <article className="saved-summary-item">
           <p className="text-sm font-semibold text-slate-500">全部儲存</p>
           <p className="mt-2 text-3xl font-bold text-ink">{savedRecordList.length}</p>
         </article>
-        <article className="rounded-3xl bg-amber-50 p-5 text-amber-900 ring-1 ring-amber-100">
+        <article className="saved-summary-item text-amber-900">
           <p className="text-sm font-semibold">待練題目</p>
           <p className="mt-2 text-3xl font-bold">{activeRecordCount}</p>
         </article>
-        <article className="rounded-3xl bg-emerald-50 p-5 text-emerald-900 ring-1 ring-emerald-100">
+        <article className="saved-summary-item text-emerald-900">
           <p className="text-sm font-semibold">已答對兩次</p>
           <p className="mt-2 text-3xl font-bold">{completedRecordCount}</p>
         </article>
       </section>
 
       {missingQuestionCount > 0 ? (
-        <section className="mt-6 rounded-[2rem] bg-amber-50 p-5 text-sm font-semibold text-amber-900 ring-1 ring-amber-100">
+        <section className="mt-5 rounded-[10px] border border-amber-200 bg-amber-50 px-4 py-3 text-sm font-semibold text-amber-900">
           有 {missingQuestionCount} 題暫時不在目前題庫版本裡，先保留儲存紀錄。
         </section>
       ) : null}
 
-      <section className="mt-8 grid gap-6 xl:grid-cols-[minmax(0,1fr)_380px]">
+      <section className="mt-5 grid gap-4 xl:grid-cols-[minmax(0,1fr)_340px]">
         <div className="min-w-0">
           {selectedItem ? (
-            <article className="rounded-[2rem] bg-white p-5 shadow-card ring-1 ring-slate-100 sm:p-7">
+            <article className="workspace-section saved-practice-panel">
               <div className="flex flex-wrap items-start justify-between gap-3">
                 <div className="min-w-0">
                   <div className="flex flex-wrap gap-2 text-xs font-semibold">
@@ -421,13 +421,13 @@ export default function SavedQuestionsPage() {
               ) : null}
             </article>
           ) : (
-            <section className="rounded-[2rem] bg-white p-7 text-sm font-semibold text-slate-500 shadow-card ring-1 ring-slate-100">
+            <section className="workspace-empty-state">
               目前還沒有儲存題目。
             </section>
           )}
         </div>
 
-        <aside className="h-fit rounded-[2rem] bg-white p-4 shadow-card ring-1 ring-slate-100 sm:p-5 xl:sticky xl:top-6">
+        <aside className="workspace-section saved-list-panel h-fit xl:sticky xl:top-6">
           <div className="flex items-center justify-between gap-3">
             <div>
               <h2 className="text-lg font-semibold text-ink">全部儲存</h2>
@@ -439,7 +439,7 @@ export default function SavedQuestionsPage() {
 
           <div className="mt-4 grid max-h-[70vh] gap-3 overflow-y-auto pr-1">
             {savedItems.length === 0 ? (
-              <div className="rounded-2xl bg-slate-50 p-4 text-sm font-medium text-slate-500">
+              <div className="workspace-empty-state">
                 儲存清單是空的。
               </div>
             ) : (
@@ -449,7 +449,7 @@ export default function SavedQuestionsPage() {
                 return (
                   <article
                     key={`saved-list-${question.id}`}
-                    className={`rounded-2xl border p-3 transition ${
+                    className={`saved-list-row border p-3 transition ${
                       selected
                         ? "border-slate-900 bg-white"
                         : completed

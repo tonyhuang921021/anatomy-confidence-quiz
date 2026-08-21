@@ -8,7 +8,6 @@ import { useCloudHistoryHydration } from "@/components/useCloudHistoryHydration"
 import { CopyQuestionPromptButton } from "@/components/CopyQuestionPromptButton";
 import { QuestionAiMetadataBadges } from "@/components/QuestionAiMetadataBadges";
 import { QuestionOptionBlock, QuestionStemBlock } from "@/components/QuestionMediaBlock";
-import { QuestionPrimaryTagBadge } from "@/components/QuestionPrimaryTagBadge";
 import { QuestionExplanationTabs } from "@/components/QuestionExplanationTabs";
 import { QuestionReportButton } from "@/components/QuestionIssueReportButton";
 import { RelatedQuestionsPanel } from "@/components/RelatedQuestionsPanel";
@@ -2011,7 +2010,7 @@ function ResultsPageContent() {
   if (!mounted) {
     return (
       <main id="main-content" className="shell workspace-page">
-        <div className="rounded-[2rem] bg-white p-4 shadow-card ring-1 ring-slate-100 sm:p-6">載入中...</div>
+        <div className="workspace-empty-state">載入中...</div>
       </main>
     );
   }
@@ -2019,19 +2018,24 @@ function ResultsPageContent() {
   if (!requestedSessionId) {
     return (
       <main id="main-content" className="shell workspace-page">
-        <section className="rounded-[2rem] bg-white p-5 text-center shadow-card ring-1 ring-slate-100 sm:p-8">
-          <h1 className="text-2xl font-semibold text-ink">
+        <section className="workspace-section results-history-shell">
+          <div className="workspace-section-header">
+            <div>
+          <p className="workspace-page-kicker">作答紀錄</p>
+          <h1 className="mt-1 text-2xl font-semibold text-ink">
             {resultsScope === "simulation" ? "模擬考作答紀錄" : "每次作答紀錄"}
           </h1>
-          <p className="mt-3 text-slate-500">
+          <p className="mt-2 text-sm text-slate-500">
             {resultsScope === "simulation"
               ? "這裡只顯示整份模擬考的結果，不會和平常散題刷題混在一起。"
               : "先選一筆紀錄，再進去看那一次的完整結果頁。"}
           </p>
+            </div>
+          </div>
 
-          <div className="mt-6 grid gap-3 text-left">
+          <div className="mt-2 text-left">
             {recentCompletedSessions.length === 0 ? (
-              <div className="rounded-2xl bg-slate-50 p-4 text-sm text-slate-600">
+              <div className="workspace-empty-state mt-4">
                 目前還沒有已完成的作答紀錄。
               </div>
             ) : (
@@ -2045,7 +2049,7 @@ function ResultsPageContent() {
                   <Link
                     key={sessionItem.id}
                     href={getSessionResultsHref(sessionItem)}
-                    className="rounded-3xl border border-slate-200 bg-slate-50 p-4 transition hover:border-brand-200 hover:bg-white"
+                    className="results-history-row block transition"
                   >
                     <div className="flex flex-wrap items-start justify-between gap-3">
                       <div>
@@ -2092,10 +2096,10 @@ function ResultsPageContent() {
             </div>
           ) : null}
 
-          <div className="mt-6 flex justify-center">
+          <div className="workspace-compact-actions mt-5 justify-end">
             <Link
               href={resultsScope === "simulation" ? "/simulation" : "/quiz"}
-              className="min-h-12 rounded-2xl bg-brand-600 px-5 py-4 text-sm font-semibold text-white transition hover:bg-brand-700"
+              className="bg-brand-600 text-sm font-semibold text-white transition hover:bg-brand-700"
             >
               {resultsScope === "simulation" ? "回到模擬考專區" : "開始測驗"}
             </Link>
@@ -2108,12 +2112,12 @@ function ResultsPageContent() {
   if (!state.session || !state.summary || !state.completionStats) {
     return (
       <main id="main-content" className="shell workspace-page">
-        <section className="rounded-[2rem] bg-white p-5 text-center shadow-card ring-1 ring-slate-100 sm:p-8">
+        <section className="workspace-section results-history-shell text-center">
           <h1 className="text-2xl font-semibold text-ink">找不到這次作答紀錄</h1>
           <p className="mt-3 text-slate-500">
             {resultRecordNotice || "這筆結果可能已被清除，或尚未完成作答。"}
           </p>
-          <div className="mt-6 flex flex-col justify-center gap-3 sm:flex-row">
+          <div className="workspace-compact-actions mt-5 justify-center">
             <Link
               href={resultsScope === "simulation" ? "/simulation-results" : "/results"}
               className="min-h-12 rounded-2xl bg-slate-100 px-5 py-4 text-sm font-semibold text-slate-800 transition hover:bg-slate-200"
@@ -2323,10 +2327,7 @@ function ResultsPageContent() {
     const displayEliminatedOptions = getResultAttemptEliminatedOptions(resultSession, attempt);
 
     return (
-      <div className="mt-2 min-w-0 space-y-3 overflow-hidden text-sm leading-7 text-slate-700 [overflow-wrap:anywhere]">
-        <div className="flex flex-wrap gap-2 text-xs font-semibold">
-          <QuestionPrimaryTagBadge question={question} />
-        </div>
+      <div className="result-review-details mt-2 min-w-0 space-y-3 overflow-hidden text-sm leading-7 text-slate-700 [overflow-wrap:anywhere]">
         <div className="flex min-w-0 items-start gap-3">
           <QuestionStemBlock question={question} className="flex-1" />
           <div className="flex shrink-0 flex-wrap items-center justify-end gap-2">
@@ -2471,7 +2472,7 @@ function ResultsPageContent() {
     const examBadgeLabel = examEstimate.sampleWarning ?? examEstimate.passBadgeLabel;
 
     return (
-      <section className="mt-4 rounded-[2rem] bg-white p-4 shadow-card ring-1 ring-slate-100 sm:p-5">
+      <section className="workspace-section mt-4 p-4 sm:p-5">
         <button
           type="button"
           onClick={() => setIsConfidenceCalibrationOpen((current) => !current)}
@@ -2754,7 +2755,7 @@ function ResultsPageContent() {
 
   function renderConfidenceOverviewSection() {
     return (
-      <section className="min-w-0 rounded-[2rem] bg-white p-4 shadow-card ring-1 ring-slate-100 sm:p-5">
+      <section className="workspace-section min-w-0 p-4 sm:p-5">
         <button
           type="button"
           onClick={() => {
@@ -2853,7 +2854,7 @@ function ResultsPageContent() {
         className={
           fullscreenMobile
             ? "bg-transparent p-0 shadow-none ring-0"
-            : "rounded-[2rem] bg-white p-4 shadow-card ring-1 ring-slate-100 sm:p-6"
+            : "workspace-section p-4 sm:p-5"
         }
       >
         <div className="flex flex-wrap items-center justify-between gap-3">
@@ -3174,7 +3175,7 @@ function ResultsPageContent() {
         ) : null}
         {renderConfidenceCalibrationSection()}
         {simulationSubjectScores.length > 0 ? (
-          <section className="mt-4 rounded-[2rem] bg-white p-4 shadow-card ring-1 ring-slate-100 sm:p-5">
+          <section className="workspace-section mt-4 p-4 sm:p-5">
             <div className="flex flex-wrap items-end justify-between gap-3">
               <div>
                 <h2 className="text-lg font-semibold text-ink">模擬考分科得分</h2>
@@ -3186,7 +3187,7 @@ function ResultsPageContent() {
             </div>
             <div className="mt-3 grid grid-cols-2 gap-2 lg:grid-cols-5">
               {simulationSubjectScores.map((item) => (
-                <article key={item.subject} className="rounded-2xl bg-slate-50 px-3 py-3 ring-1 ring-slate-200 last:col-span-2 lg:last:col-span-1">
+                <article key={item.subject} className="rounded-lg bg-slate-50 px-3 py-3 ring-1 ring-slate-200 last:col-span-2 lg:last:col-span-1">
                   <p className="text-sm font-medium text-slate-500">{item.subject}</p>
                   <p className="mt-1 text-xl font-bold text-ink">
                     {item.correct}
@@ -3211,7 +3212,7 @@ function ResultsPageContent() {
               : ""
           }`}
         >
-          <section className="min-w-0 rounded-[2rem] bg-white p-4 shadow-card ring-1 ring-slate-100 sm:p-5">
+          <section className="workspace-section min-w-0 p-4 sm:p-5">
             <button
               type="button"
               onClick={() => {
@@ -3240,13 +3241,13 @@ function ResultsPageContent() {
             {isStudyRecommendationsOpen ? (
               <div className="mt-4 border-t border-slate-100 pt-4">
                 <div className="grid gap-3 lg:grid-cols-3">
-              <div className="rounded-2xl bg-rose-50 px-4 py-3 text-sm leading-6 text-rose-900">
+              <div className="rounded-lg bg-rose-50 px-4 py-3 text-sm leading-6 text-rose-900">
                 最需要補弱的小節：{topWeakSections.map((section) => section.section).join("、") || "目前無資料"}
               </div>
-              <div className="rounded-2xl bg-sky-50 px-4 py-3 text-sm leading-6 text-sky-900">
+              <div className="rounded-lg bg-sky-50 px-4 py-3 text-sm leading-6 text-sky-900">
                 最需要補進度：{state.lowCompletion.map((section) => section.section).join("、") || "目前無資料"}
               </div>
-              <div className="rounded-2xl bg-amber-50 px-4 py-3 text-sm leading-6 text-amber-900">
+              <div className="rounded-lg bg-amber-50 px-4 py-3 text-sm leading-6 text-amber-900">
                 已完成但不穩：{state.unstableSections.map((section) => section.section).join("、") || "目前無資料"}
               </div>
                 </div>
@@ -3427,7 +3428,7 @@ export default function ResultsPage() {
     <Suspense
       fallback={
         <main id="main-content" className="shell workspace-page">
-          <div className="rounded-[2rem] bg-white p-4 shadow-card ring-1 ring-slate-100 sm:p-6">
+          <div className="workspace-empty-state">
             載入中...
           </div>
         </main>

@@ -86,6 +86,77 @@ test("主要頁面在桌機與 Safari 手機尺寸都不溢出", async ({ page }
   }
 });
 
+test("搜尋結果展開後不會重複題幹與分類", async ({ page }) => {
+  await page.goto("/search", { waitUntil: "networkidle" });
+  await waitForShellReady(page);
+
+  const card = page.locator("details.search-result-card").first();
+  await expect(card).toBeVisible();
+  const summary = card.locator("summary");
+  const stem = (await summary.locator("p").first().innerText()).trim();
+  const primaryTag = (await summary.locator("span.max-w-full.break-words").last().innerText()).trim();
+
+  await summary.click();
+  await expect(summary.getByText("收合", { exact: true })).toBeVisible();
+  await expect(card.getByText(stem, { exact: true })).toHaveCount(1);
+  await expect(card.getByText(primaryTag, { exact: true })).toHaveCount(1);
+
+  const details = card.locator(".search-result-details");
+  const options = details.locator(".search-result-options");
+  const toolbar = details.locator(".search-result-utility-actions");
+  await expect(details).toBeVisible();
+  await expect(toolbar).toBeVisible();
+
+  const viewportWidth = page.viewportSize()?.width ?? 0;
+  const optionColumnCount = await options.evaluate((element) =>
+    window.getComputedStyle(element).gridTemplateColumns.split(" ").filter(Boolean).length
+  );
+  expect(optionColumnCount).toBe(viewportWidth >= 900 ? 2 : 1);
+});
+
+test("結果頁展開後分類只顯示一次", async ({ page }) => {
+  const now = new Date().toISOString();
+  await page.addInitScript(({ completedAt }) => {
+    const session = {
+      id: "site-shell-result-session",
+      subject: "醫學（二）",
+      startedAt: completedAt,
+      completedAt,
+      settings: {
+        mode: "random",
+        questionCount: 1,
+        subjectFilter: "病理學"
+      },
+      questionOrder: ["MOEX-115020-2301-Q078"],
+      attempts: [
+        {
+          questionId: "MOEX-115020-2301-Q078",
+          selectedAnswer: "C",
+          correctAnswer: "A",
+          isCorrect: false,
+          confidence: 4,
+          answeredAt: completedAt
+        }
+      ]
+    };
+    window.localStorage.setItem("anatomy-confidence-active-user-id", "guest");
+    window.localStorage.setItem(
+      "anatomy-confidence-completed-sessions:guest",
+      JSON.stringify([session])
+    );
+  }, { completedAt: now });
+
+  await page.goto("/results?sessionId=site-shell-result-session", { waitUntil: "networkidle" });
+  await waitForShellReady(page);
+  const card = page.locator("details").first();
+  const label = "病理學－免疫與感染性疾病";
+
+  await expect(card.getByText(label, { exact: true })).toHaveCount(1);
+  await card.locator("summary").click();
+  await expect(card).toHaveAttribute("open", "");
+  await expect(card.getByText(label, { exact: true })).toHaveCount(1);
+});
+
 test("複習頁不會進入重複更新迴圈", async ({ page }) => {
   const updateDepthWarnings: string[] = [];
   page.on("console", (message) => {

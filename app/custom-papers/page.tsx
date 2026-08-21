@@ -533,7 +533,7 @@ export default function CustomPapersPage() {
 
   return (
     <main id="main-content" className="shell workspace-page">
-      <section className="surface-card workspace-page-panel p-5 sm:p-6">
+      <section className="surface-card workspace-page-panel workspace-page-header p-5 sm:p-6">
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div>
             <p className="workspace-page-kicker">組卷</p>
@@ -569,7 +569,7 @@ export default function CustomPapersPage() {
       </section>
 
       {tab === "generate" ? (
-        <section className="mt-6 overflow-hidden rounded-2xl bg-white shadow-card ring-1 ring-slate-100">
+        <section className="custom-paper-surface mt-5">
           <div className="border-b border-slate-200 p-5 sm:p-6">
             <div className="flex flex-wrap items-center justify-between gap-3">
               <div className="flex items-center gap-3">
@@ -640,9 +640,9 @@ export default function CustomPapersPage() {
           </div>
         </section>
       ) : tab === "ai_search" ? (
-        <section className="mt-6 rounded-[2rem] bg-white p-6 shadow-card ring-1 ring-slate-100 sm:p-8">
+        <section className="custom-paper-surface mt-5 p-5 sm:p-6">
           <div className="grid gap-6">
-            <div className="rounded-2xl bg-slate-50 p-5 ring-1 ring-slate-100">
+            <div className="custom-paper-subsection">
               <div className="flex flex-wrap items-start justify-between gap-3">
                 <div>
                   <h2 className="text-lg font-semibold text-ink">搜尋題目</h2>
@@ -674,7 +674,7 @@ export default function CustomPapersPage() {
               </div>
             </div>
 
-            <div className="rounded-2xl bg-slate-50 p-5 ring-1 ring-slate-100">
+            <div className="custom-paper-subsection">
               <div className="grid gap-4 lg:grid-cols-[auto_1fr] lg:items-end">
                 <div className="grid grid-cols-2 gap-2">
                   <label className="text-sm font-semibold text-ink">
@@ -795,7 +795,7 @@ export default function CustomPapersPage() {
           </div>
         </section>
       ) : tab === "import" ? (
-        <section className="mt-6 rounded-2xl bg-white p-5 shadow-card ring-1 ring-slate-100 sm:p-6">
+        <section className="custom-paper-surface mt-5 p-5 sm:p-6">
           <div className="grid gap-6">
             <div>
               <div className="mb-5">
@@ -873,7 +873,7 @@ export default function CustomPapersPage() {
           </div>
         </section>
       ) : tab === "lookup" ? (
-        <section className="mt-6 rounded-2xl bg-white p-5 shadow-card ring-1 ring-slate-100 sm:p-6">
+        <section className="custom-paper-surface mt-5 p-5 sm:p-6">
           <div className="mx-auto max-w-2xl">
             <h2 className="text-xl font-semibold text-ink">輸入題卷代碼</h2>
             <label className="mt-4 block text-sm font-semibold text-ink">五碼代碼</label>
@@ -905,7 +905,7 @@ export default function CustomPapersPage() {
 
         </section>
       ) : (
-        <section className="mt-6 rounded-2xl bg-white p-5 shadow-card ring-1 ring-slate-100 sm:p-6">
+        <section className="custom-paper-surface mt-5 p-5 sm:p-6">
           <div className="flex flex-wrap items-end justify-between gap-3">
             <div>
               <h2 className="text-xl font-semibold text-ink">公開題卷</h2>
@@ -969,7 +969,7 @@ export default function CustomPapersPage() {
       )}
 
       {tab === "lookup" && selectedPaper ? (
-        <section className="mt-6 rounded-[2rem] bg-white p-6 shadow-card ring-1 ring-slate-100 sm:p-8">
+        <section className="custom-paper-surface mt-5 p-5 sm:p-6">
           <div className="flex flex-wrap items-start justify-between gap-4">
             <div>
               <div className="flex flex-wrap items-center gap-2">
@@ -1072,7 +1072,7 @@ export default function CustomPapersPage() {
                 selectedPaper.participants.map((participant) => (
                   <article
                     key={participant.sessionId}
-                    className="rounded-3xl bg-slate-50 p-4"
+                    className="rounded-lg bg-slate-50 p-4"
                   >
                     <div className="flex flex-wrap items-center justify-between gap-3">
                       <div>

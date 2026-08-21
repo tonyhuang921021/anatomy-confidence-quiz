@@ -53,6 +53,11 @@ const REVIEW_ENTRIES = [
 
 const HOME_RELEASE_NOTES = [
   {
+    time: "08/21",
+    title: "全站排版收整",
+    body: "重複標籤、層層卡片和過長空白一起縮掉；同樣的資訊只出現一次，手機也少滑幾段。"
+  },
+  {
     time: "08/13",
     title: "全站導覽重新整理",
     body: "帳號與設定收進右上角，留言板固定在首頁下方；常用入口也重新整理，不用在重複按鈕之間找路。"
@@ -1099,52 +1104,54 @@ export default function HomePage() {
         </ClientSectionBoundary>
       </section>
 
-      <section className="home-work-section" aria-labelledby="home-start-title">
-        <h2 id="home-start-title" className="home-section-title">開始練習</h2>
-        <div className="home-start-grid">
-          {START_ACTIONS.map((action) => {
-            const Icon = action.icon;
-            return (
-              <Link
-                key={action.href}
-                href={action.href}
-                prefetch={false}
-                className={`home-start-card ${action.primary ? "is-primary" : ""}`}
-              >
-                <span className="home-start-icon" aria-hidden="true">
-                  <Icon size={25} strokeWidth={1.8} />
-                </span>
-                <span className="home-start-copy">
-                  <strong>{action.label}</strong>
-                  <small>{action.description}</small>
-                </span>
-                <ArrowRight size={20} strokeWidth={1.8} aria-hidden="true" />
-              </Link>
-            );
-          })}
-        </div>
-      </section>
+      <div className="home-action-layout">
+        <section className="home-work-section" aria-labelledby="home-start-title">
+          <h2 id="home-start-title" className="home-section-title">開始練習</h2>
+          <div className="home-start-grid">
+            {START_ACTIONS.map((action) => {
+              const Icon = action.icon;
+              return (
+                <Link
+                  key={action.href}
+                  href={action.href}
+                  prefetch={false}
+                  className={`home-start-card ${action.primary ? "is-primary" : ""}`}
+                >
+                  <span className="home-start-icon" aria-hidden="true">
+                    <Icon size={25} strokeWidth={1.8} />
+                  </span>
+                  <span className="home-start-copy">
+                    <strong>{action.label}</strong>
+                    <small>{action.description}</small>
+                  </span>
+                  <ArrowRight size={20} strokeWidth={1.8} aria-hidden="true" />
+                </Link>
+              );
+            })}
+          </div>
+        </section>
 
-      <section className="home-work-section" aria-labelledby="home-review-title">
-        <h2 id="home-review-title" className="home-section-title">複習與組卷</h2>
-        <div className="home-workflow-list">
-          {REVIEW_ENTRIES.map((entry) => {
-            const Icon = entry.icon;
-            return (
-              <Link key={entry.href} href={entry.href} prefetch={false}>
-                <span className="home-workflow-icon" aria-hidden="true">
-                  <Icon size={21} strokeWidth={1.8} />
-                </span>
-                <span className="home-workflow-copy">
-                  <strong>{entry.title}</strong>
-                  <small>{entry.description}</small>
-                </span>
-                <ArrowRight size={18} strokeWidth={1.8} aria-hidden="true" />
-              </Link>
-            );
-          })}
-        </div>
-      </section>
+        <section className="home-work-section" aria-labelledby="home-review-title">
+          <h2 id="home-review-title" className="home-section-title">複習與組卷</h2>
+          <div className="home-workflow-list">
+            {REVIEW_ENTRIES.map((entry) => {
+              const Icon = entry.icon;
+              return (
+                <Link key={entry.href} href={entry.href} prefetch={false}>
+                  <span className="home-workflow-icon" aria-hidden="true">
+                    <Icon size={21} strokeWidth={1.8} />
+                  </span>
+                  <span className="home-workflow-copy">
+                    <strong>{entry.title}</strong>
+                    <small>{entry.description}</small>
+                  </span>
+                  <ArrowRight size={18} strokeWidth={1.8} aria-hidden="true" />
+                </Link>
+              );
+            })}
+          </div>
+        </section>
+      </div>
 
       {LATEST_HOME_RELEASE_NOTE ? (
         <section className="home-update-row" aria-labelledby="home-release-title">

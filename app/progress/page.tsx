@@ -195,7 +195,7 @@ export default function ProgressPage() {
 
   return (
     <main id="main-content" className="shell workspace-page">
-      <section className="surface-card workspace-page-panel p-6 sm:p-8">
+      <section className="surface-card workspace-page-panel workspace-page-header p-6 sm:p-8">
         <div className="flex flex-wrap items-center justify-between gap-4">
           <div>
             <p className="workspace-page-kicker">進度</p>
@@ -204,10 +204,10 @@ export default function ProgressPage() {
               先看醫學一與醫學二，再往下看各科進度。
             </p>
           </div>
-          <div className="flex flex-wrap gap-3">
+          <div className="workspace-compact-actions">
             <Link
               href="/progress/weakness"
-              className="min-h-12 rounded-2xl bg-brand-600 px-5 py-4 text-sm font-semibold text-white transition hover:bg-brand-700"
+              className="bg-brand-600 text-sm font-semibold text-white transition hover:bg-brand-700"
             >
               弱點分析
             </Link>
@@ -221,13 +221,13 @@ export default function ProgressPage() {
         />
 
         {showHistoryLoading ? (
-          <div className="mt-6 rounded-3xl bg-slate-50 p-5 text-sm text-slate-700">
+          <div className="workspace-empty-state mt-5">
             正在讀取完整作答紀錄，完成後會更新進度總覽。
           </div>
         ) : (
           <div className="mt-6 grid gap-4 lg:grid-cols-2">
             {groups.map((group) => (
-              <article key={group.key} className="rounded-3xl bg-slate-50 p-5">
+              <article key={group.key} className="progress-summary-card">
                 <div className="flex items-start justify-between gap-4">
                   <div>
                     <p className="text-sm font-medium text-slate-500">{group.label}</p>
@@ -238,21 +238,17 @@ export default function ProgressPage() {
                     {getCompletionStatusLabel(group.status)}
                   </span>
                 </div>
-                <div className="mt-4 h-3 overflow-hidden rounded-full bg-white">
+                <div className="mt-4 h-2 overflow-hidden rounded-full bg-white">
                   <div
                     className="h-full rounded-full bg-gradient-to-r from-brand-500 to-emerald-400"
                     style={{ width: `${group.completionRate}%` }}
                   />
                 </div>
-                <div className="mt-4 grid gap-3 sm:grid-cols-2">
-                  <p className="rounded-2xl bg-white px-4 py-3 text-sm text-slate-700">
-                    已作答 <span className="font-semibold">{group.attemptedQuestions}</span> / {group.totalQuestionsInBank}
-                    <span className="mt-1 block text-xs text-slate-500">剩 {getRemainingQuestions(group)} 題</span>
-                  </p>
-                  <p className="rounded-2xl bg-white px-4 py-3 text-sm text-slate-700">
-                    答對率 <span className="font-semibold">{group.totalAttempts > 0 ? `${group.correctRate}%` : "尚未作答"}</span>
-                    <span className="mt-1 block text-xs text-slate-500">共 {group.totalAttempts} 次作答</span>
-                  </p>
+                <div className="progress-summary-metrics">
+                  <span>已作答 <strong className="text-ink">{group.attemptedQuestions} / {group.totalQuestionsInBank}</strong></span>
+                  <span>剩 <strong className="text-ink">{getRemainingQuestions(group)}</strong> 題</span>
+                  <span>答對率 <strong className="text-ink">{group.totalAttempts > 0 ? `${group.correctRate}%` : "尚未作答"}</strong></span>
+                  <span>共 <strong className="text-ink">{group.totalAttempts}</strong> 次作答</span>
                 </div>
               </article>
             ))}
@@ -262,11 +258,11 @@ export default function ProgressPage() {
 
       {showHistoryLoading ? null : (
         <>
-          <div className="mt-8 space-y-5">
+          <div className="mt-6 space-y-4">
             {groups.map((group) => {
               const isGroupOpen = openGroups[group.key];
               return (
-                <section key={group.key} className="rounded-[2rem] bg-white p-5 shadow-card ring-1 ring-slate-100">
+                <section key={group.key} className="workspace-section progress-subject-group">
                   <button
                     type="button"
                     onClick={() =>
@@ -287,11 +283,11 @@ export default function ProgressPage() {
                   </button>
 
                   {isGroupOpen ? (
-                    <div className="mt-5 space-y-4">
+                    <div className="progress-subject-list">
                       {group.subjects.map((subject) => {
                         const isSubjectOpen = Boolean(openSubjects[subject.subject]);
                         return (
-                          <article key={subject.subject} className="overflow-hidden rounded-3xl border border-slate-200 bg-slate-50">
+                          <article key={subject.subject} className="progress-subject-row">
                             <button
                               type="button"
                               onClick={() =>

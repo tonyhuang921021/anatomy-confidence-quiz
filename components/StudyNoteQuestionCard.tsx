@@ -118,7 +118,7 @@ export function StudyNoteQuestionCard({ question, link, title }: Props) {
         <span>
           <span className="block text-xs font-bold uppercase tracking-[0.18em] text-teal-700">Related Question</span>
           <span className="mt-1 block text-sm font-bold text-slate-950">
-            {title || question.stem || question.id}
+            {title || `相關題目 ${question.id}`}
           </span>
         </span>
         <span className="rounded-full bg-teal-100 px-3 py-1 text-xs font-bold text-teal-800">

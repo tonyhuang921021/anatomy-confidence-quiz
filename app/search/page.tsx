@@ -677,7 +677,7 @@ export default function SearchPage() {
 
       <section className="search-results-list mt-6 grid min-w-0 gap-4">
         {pageResults.length === 0 ? (
-          <div className="rounded-[2rem] bg-white p-6 text-sm text-slate-500 shadow-card ring-1 ring-slate-100">
+          <div className="workspace-empty-state">
             目前沒有符合條件的題目。
           </div>
         ) : (
@@ -693,6 +693,14 @@ export default function SearchPage() {
             const isFavorited = Boolean(favoriteRecord);
             const isExpanded = Boolean(expandedQuestionIds[renderedQuestion.id]);
             const ranking = rankingStats[renderedQuestion.id];
+            const correctAnswerLabel =
+              (renderedQuestion.answerCreditType === "multiple_accepted" ||
+                renderedQuestion.answerCreditType === "multiple_answers") &&
+              renderedQuestion.acceptedAnswers?.length
+                ? `${renderedQuestion.acceptedAnswers.join("/")} 皆可`
+                : renderedQuestion.answerCreditType === "all_credit"
+                  ? "ALL"
+                  : renderedQuestion.answer;
 
             return (
             <details
@@ -707,7 +715,7 @@ export default function SearchPage() {
                   };
                 });
               }}
-              className="search-result-card min-w-0 max-w-full overflow-hidden rounded-2xl bg-white shadow-card ring-1 ring-slate-200/70"
+              className="search-result-card workspace-section min-w-0 max-w-full overflow-hidden"
             >
               <summary className="min-w-0 cursor-pointer list-none px-4 py-4 transition hover:bg-slate-50/70 sm:px-5">
                 <div className="flex min-w-0 flex-wrap items-start justify-between gap-4">
@@ -752,38 +760,27 @@ export default function SearchPage() {
               </summary>
 
               {isExpanded ? (
-              <div className="min-w-0 max-w-full space-y-4 border-t border-slate-100 px-4 py-5 text-sm leading-7 text-slate-700 sm:px-5">
-                <QuestionStemBlock question={renderedQuestion} />
-                <div className="flex flex-wrap items-center gap-2">
+              <div className="search-result-details min-w-0 max-w-full border-t border-slate-100 px-4 py-4 text-sm leading-7 text-slate-700 sm:px-5 sm:py-5">
+                <div className="search-result-answer-bar">
+                  <p className="flex min-w-0 items-baseline gap-2">
+                    <span className="text-xs font-semibold text-slate-500">正確答案</span>
+                    <strong className="text-base font-black text-ink">{correctAnswerLabel}</strong>
+                  </p>
                   <CopyQuestionPromptButton question={renderedQuestion} />
                 </div>
 
-                <div className="grid gap-3">
+                <div className="search-result-options grid gap-3">
                   {OPTION_KEYS.filter((key) => typeof renderedQuestion.options[key] === "string").map((key) => (
                     <QuestionOptionBlock
                       key={`${renderedQuestion.id}-${key}`}
                       question={renderedQuestion}
                       optionKey={key}
-                      wrapperClassName="rounded-2xl border border-slate-200 bg-slate-50/90 px-3 py-3 sm:px-4"
+                      wrapperClassName="search-result-option rounded-xl border border-slate-200 bg-slate-50/90 px-3 py-3 sm:px-4"
                     />
                   ))}
                 </div>
 
-                <p>
-                  <span className="font-semibold">正確答案：</span>
-                  {(renderedQuestion.answerCreditType === "multiple_accepted" ||
-                    renderedQuestion.answerCreditType === "multiple_answers") &&
-                  renderedQuestion.acceptedAnswers?.length
-                    ? `${renderedQuestion.acceptedAnswers.join("/")} 皆可`
-                    : renderedQuestion.answerCreditType === "all_credit"
-                      ? "ALL"
-                      : renderedQuestion.answer}
-                </p>
-                <p className="flex flex-wrap items-center gap-2">
-                  <QuestionPrimaryTagBadge question={renderedQuestion} />
-                </p>
                 <StructuredExplanationText text={renderedQuestion.explanation} label="詳解" compact />
-                <QuestionExplanationTabs question={renderedQuestion} compact className="mt-3" />
                 {renderedQuestion.optionAnalysis ? (
                   <div className="space-y-2.5">
                     {OPTION_KEYS.map((key) => {
@@ -813,17 +810,21 @@ export default function SearchPage() {
                     {renderedQuestion.memoryTip}
                   </div>
                 ) : null}
-                <div className="space-y-3">
-                  <div className="flex flex-wrap items-center gap-2">
+                <div className="search-result-action-dock">
+                  <QuestionExplanationTabs
+                    question={renderedQuestion}
+                    compact
+                    className="search-result-source-tabs"
+                  />
+                  <div className="search-result-utility-actions">
                     <SavedQuestionButton questionId={renderedQuestion.id} source="search" showLabel />
                     {isFavorited ? (
                       <span className="text-xs font-semibold text-slate-500">
                         答對 {favoriteRecord.correctCount} / 2
                       </span>
                     ) : null}
-                  </div>
-                  {override ? (
-                    <div className="flex flex-wrap items-center gap-3">
+                    {override ? (
+                      <>
                       <span className="inline-flex rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-600">
                         已替換詳解・{override.model ?? "gpt-5.4-mini"}
                       </span>
@@ -831,28 +832,29 @@ export default function SearchPage() {
                         type="button"
                         onClick={() => void handleGenerateQuestionExplanation(question, override)}
                         disabled={loading}
-                        className="min-h-10 rounded-2xl bg-slate-900 px-4 py-2 text-sm font-semibold text-white transition hover:bg-black disabled:cursor-wait disabled:opacity-60"
+                        className="min-h-10 rounded-xl bg-slate-900 px-4 py-2 text-sm font-semibold text-white transition hover:bg-black disabled:cursor-wait disabled:opacity-60"
                       >
                         {loading ? "重新生成中..." : "重新替換詳解"}
                       </button>
-                    </div>
-                  ) : (
-                    <button
-                      type="button"
-                      onClick={() => void handleGenerateQuestionExplanation(renderedQuestion)}
-                      disabled={loading}
-                      className="min-h-10 rounded-2xl bg-slate-900 px-4 py-2 text-sm font-semibold text-white transition hover:bg-black disabled:cursor-wait disabled:opacity-60"
-                    >
-                      {loading ? "AI 生成中..." : "用 AI 補詳解"}
-                    </button>
-                  )}
-                  <QuestionReportButton
-                    question={renderedQuestion}
-                    disabled={classificationReportLoadingMap[renderedQuestion.id]}
-                    classificationLoading={classificationReportLoadingMap[renderedQuestion.id]}
-                    classificationMessage={classificationReportMessageMap[renderedQuestion.id]}
-                    onReportClassification={() => void handleReportClassification(renderedQuestion)}
-                  />
+                      </>
+                    ) : (
+                      <button
+                        type="button"
+                        onClick={() => void handleGenerateQuestionExplanation(renderedQuestion)}
+                        disabled={loading}
+                        className="min-h-10 rounded-xl bg-slate-900 px-4 py-2 text-sm font-semibold text-white transition hover:bg-black disabled:cursor-wait disabled:opacity-60"
+                      >
+                        {loading ? "AI 生成中..." : "用 AI 補詳解"}
+                      </button>
+                    )}
+                    <QuestionReportButton
+                      question={renderedQuestion}
+                      disabled={classificationReportLoadingMap[renderedQuestion.id]}
+                      classificationLoading={classificationReportLoadingMap[renderedQuestion.id]}
+                      classificationMessage={classificationReportMessageMap[renderedQuestion.id]}
+                      onReportClassification={() => void handleReportClassification(renderedQuestion)}
+                    />
+                  </div>
                   {error ? <p className="text-sm font-medium text-rose-700">{error}</p> : null}
                 </div>
               </div>
@@ -869,18 +871,18 @@ export default function SearchPage() {
             type="button"
             onClick={() => setCurrentPage((page) => Math.max(1, page - 1))}
             disabled={safeCurrentPage === 1}
-            className="min-h-12 rounded-2xl bg-slate-100 px-4 py-3 text-sm font-semibold text-slate-800 transition hover:bg-slate-200 disabled:cursor-not-allowed disabled:opacity-50"
+            className="min-h-10 rounded-lg bg-slate-100 px-4 py-2 text-sm font-semibold text-slate-800 transition hover:bg-slate-200 disabled:cursor-not-allowed disabled:opacity-50"
           >
             上一頁
           </button>
-          <span className="rounded-full bg-white px-4 py-2 text-sm font-semibold text-slate-700 shadow-card ring-1 ring-slate-100">
+          <span className="px-3 py-2 text-sm font-semibold text-slate-600">
             第 {safeCurrentPage} / {totalPages} 頁
           </span>
           <button
             type="button"
             onClick={() => setCurrentPage((page) => Math.min(totalPages, page + 1))}
             disabled={safeCurrentPage === totalPages}
-            className="min-h-12 rounded-2xl bg-slate-900 px-4 py-3 text-sm font-semibold text-white transition hover:bg-black disabled:cursor-not-allowed disabled:opacity-50"
+            className="min-h-10 rounded-lg bg-slate-900 px-4 py-2 text-sm font-semibold text-white transition hover:bg-black disabled:cursor-not-allowed disabled:opacity-50"
           >
             下一頁
           </button>
@@ -910,7 +912,7 @@ export default function SearchPage() {
           onClick={() => setFavoriteBankOpen(false)}
         >
           <section
-            className="ml-auto flex h-full w-full max-w-2xl flex-col overflow-hidden rounded-[2rem] bg-white shadow-2xl ring-1 ring-slate-200"
+            className="ml-auto flex h-full w-full max-w-2xl flex-col overflow-hidden rounded-xl bg-white shadow-2xl ring-1 ring-slate-200"
             onClick={(event) => event.stopPropagation()}
           >
             <div className="flex items-start justify-between gap-3 border-b border-slate-100 p-5">

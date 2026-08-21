@@ -344,14 +344,13 @@ export function QuizSetupPanel({
   }
 
   return (
-    <section className="rounded-[2rem] bg-white p-6 shadow-card ring-1 ring-slate-100">
+    <section className="workspace-section quiz-setup-panel">
       <div className="flex flex-wrap items-start justify-between gap-4">
         <div>
-          <p className="text-sm font-semibold uppercase tracking-[0.2em] text-brand-700">Version 2</p>
-          <h2 className="mt-2 text-2xl font-semibold text-ink">
+          <h2 className="text-xl font-semibold text-ink">
             {title ?? (simulationOnly ? "模擬考模式" : "智慧測驗設定")}
           </h2>
-          <p className="mt-2 text-sm leading-7 text-slate-500">
+          <p className="mt-2 max-w-4xl text-sm leading-6 text-slate-500">
             {description ??
               (simulationOnly
                 ? "模擬考模式會固定用整份考卷邏輯出題，所以不提供科目、題數、章節與小節篩選，避免把模考做成一般刷題模式。先選擇作答後顯示方式，再決定要做 AI 模擬卷、系統模擬卷、指定真實考古題，或隨機抽一份真實考古題。"
@@ -377,7 +376,7 @@ export function QuizSetupPanel({
             key={mode}
             type="button"
             onClick={() => updateSettings({ mode })}
-            className={`rounded-3xl border p-5 text-left transition ${
+            className={`quiz-setup-choice border text-left transition ${
               settings.mode === mode
                 ? "border-brand-500 bg-brand-50 ring-2 ring-brand-200"
                 : "border-slate-200 bg-slate-50 hover:bg-white"
@@ -392,7 +391,7 @@ export function QuizSetupPanel({
       <div className={`mt-6 grid gap-4 ${settings.mode === "simulation" ? "grid-cols-1" : "lg:grid-cols-[0.9fr_1.1fr]"}`}>
         {settings.mode !== "simulation" ? (
           <>
-            <div className="rounded-3xl bg-slate-50 p-5">
+            <div className="quiz-setup-group">
               <p className="text-sm font-medium text-slate-500">科目</p>
               <select
                 value={settings.subjectFilter ?? "解剖學"}
@@ -428,7 +427,7 @@ export function QuizSetupPanel({
               </div>
             </div>
 
-            <div className="rounded-3xl bg-slate-50 p-5">
+            <div className="quiz-setup-group">
               <p className="text-sm font-medium text-slate-500">聚焦章節 / 小節（選填）</p>
               <div className="mt-3 grid gap-3 sm:grid-cols-2">
                 <select
@@ -473,7 +472,7 @@ export function QuizSetupPanel({
             </div>
           </>
         ) : null}
-        <div className="rounded-3xl bg-slate-50 p-5">
+        <div className="quiz-setup-group">
           {settings.mode === "simulation" ? (
             <div className="mt-4 space-y-4">
               <div className="rounded-2xl bg-white p-4 ring-1 ring-slate-200">

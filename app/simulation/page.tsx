@@ -8,7 +8,7 @@ export default function SimulationPage() {
 
   return (
     <main id="main-content" className="shell workspace-page">
-      <section className="surface-card workspace-page-panel p-6 sm:p-8">
+      <section className="surface-card workspace-page-panel workspace-page-header p-6 sm:p-8">
         <div className="flex flex-wrap items-center justify-between gap-4">
           <div>
             <p className="workspace-page-kicker">考古題</p>
@@ -20,27 +20,24 @@ export default function SimulationPage() {
         </div>
       </section>
 
-      <section className="mt-6 rounded-[2rem] bg-white p-6 shadow-card ring-1 ring-slate-100">
+      <section className="workspace-section simulation-review-strip mt-5">
         <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
           <div>
-            <p className="text-sm font-semibold uppercase tracking-[0.2em] text-brand-700">
-              Simulation Review
-            </p>
-            <h2 className="mt-2 text-2xl font-semibold text-ink">模擬考錯題複習</h2>
-            <p className="mt-2 text-sm leading-7 text-slate-600">
-              這裡的錯題庫只整理整份模擬考做出來的錯題與低信心題，不會和平常散題刷題混在一起。
+            <h2 className="text-lg font-semibold text-ink">模擬考紀錄與複習</h2>
+            <p className="mt-1 text-sm leading-6 text-slate-600">
+              結果與待複習題維持獨立題池。
             </p>
           </div>
-          <div className="flex flex-wrap gap-3">
+          <div className="workspace-compact-actions">
             <Link
               href="/simulation-results"
-              className="min-h-12 rounded-2xl bg-emerald-600 px-5 py-4 text-sm font-semibold text-white transition hover:bg-emerald-700"
+              className="bg-brand-600 text-sm font-semibold text-white transition hover:bg-brand-700"
             >
               查看模擬考結果
             </Link>
             <Link
               href="/simulation-review"
-              className="min-h-12 rounded-2xl bg-amber-500 px-5 py-4 text-sm font-semibold text-white transition hover:bg-amber-600"
+              className="border border-slate-200 bg-white text-sm font-semibold text-slate-700 transition hover:bg-slate-50"
             >
               查看模擬考待複習題
             </Link>

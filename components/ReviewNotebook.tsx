@@ -1297,7 +1297,7 @@ export function ReviewNotebook({
       className={
         fullscreenMobile
           ? "bg-transparent p-0 shadow-none ring-0"
-          : "rounded-[2rem] bg-white p-4 shadow-card ring-1 ring-slate-100 sm:p-6"
+          : "workspace-section p-4 sm:p-5"
       }
     >
       {manualEditingEnabled && items.length > 0 ? (
@@ -1332,7 +1332,7 @@ export function ReviewNotebook({
               onStartReview?.(unresolvedItems);
             }}
             aria-disabled={unresolvedItems.length === 0}
-            className={`min-h-12 rounded-2xl px-4 py-3 text-sm font-semibold transition ${
+            className={`min-h-10 rounded-lg px-4 py-2 text-sm font-semibold transition ${
               unresolvedItems.length === 0
                 ? "pointer-events-none bg-slate-200 text-slate-500"
                 : "bg-brand-600 text-white hover:bg-brand-700"
@@ -1345,7 +1345,7 @@ export function ReviewNotebook({
 
       <div className={`${fullscreenMobile ? "mt-4" : "mt-6"} grid gap-8`}>
         {items.length === 0 ? (
-          <div className="rounded-3xl bg-slate-50 p-5 text-sm text-slate-500">
+          <div className="workspace-empty-state">
             {emptyMessage}
           </div>
         ) : (
@@ -1392,7 +1392,7 @@ export function ReviewNotebook({
               <button
                 type="button"
                 onClick={() => setActiveCategory("wrong")}
-                className={`min-h-12 rounded-2xl px-4 py-3 text-sm font-semibold transition ${
+                className={`min-h-10 rounded-lg px-4 py-2 text-sm font-semibold transition ${
                   activeCategory === "wrong"
                     ? "bg-rose-100 text-rose-900 ring-1 ring-rose-300"
                     : "bg-slate-100 text-slate-700 hover:bg-slate-200"
@@ -1406,7 +1406,7 @@ export function ReviewNotebook({
               <button
                 type="button"
                 onClick={() => setActiveCategory("lowConfidence")}
-                className={`min-h-12 rounded-2xl px-4 py-3 text-sm font-semibold transition ${
+                className={`min-h-10 rounded-lg px-4 py-2 text-sm font-semibold transition ${
                   activeCategory === "lowConfidence"
                     ? "bg-amber-100 text-amber-900 ring-1 ring-amber-300"
                     : "bg-slate-100 text-slate-700 hover:bg-slate-200"
@@ -1420,7 +1420,7 @@ export function ReviewNotebook({
               <button
                 type="button"
                 onClick={() => setActiveCategory("resolved")}
-                className={`min-h-12 rounded-2xl px-4 py-3 text-sm font-semibold transition ${
+                className={`min-h-10 rounded-lg px-4 py-2 text-sm font-semibold transition ${
                   activeCategory === "resolved"
                     ? "bg-emerald-100 text-emerald-900 ring-1 ring-emerald-300"
                     : "bg-slate-100 text-slate-700 hover:bg-slate-200"
@@ -1461,7 +1461,7 @@ export function ReviewNotebook({
               ) : null}
               <div className="mt-4 grid gap-3 sm:gap-4">
                 {activeItems.length === 0 ? (
-                  <div className="rounded-3xl bg-slate-50 p-5 text-sm text-slate-500">
+                  <div className="workspace-empty-state">
                     {activeCategory === "wrong"
                       ? "目前沒有符合篩選條件的錯題。"
                       : activeCategory === "lowConfidence"
@@ -1472,7 +1472,7 @@ export function ReviewNotebook({
                   visibleItems.map((item, index) => (
                     <article
                       key={`${activeCategory}-${item.question.id}`}
-                      className={`rounded-3xl border p-5 ${
+                      className={`rounded-[10px] border p-4 ${
                         activeCategory === "wrong"
                           ? "border-rose-200 bg-rose-50/60"
                           : activeCategory === "lowConfidence"

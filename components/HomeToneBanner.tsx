@@ -175,7 +175,7 @@ export function HomeToneBanner() {
   }, [anxiousLineBucket, calmLine, mode, stats]);
 
   return (
-    <div className="surface-card-muted home-data-fade mt-5 px-4 py-3">
+    <div className="home-tone-line home-data-fade mt-5">
       <p className="body-soft whitespace-pre-line text-sm leading-7 sm:text-[15px]">{body}</p>
     </div>
   );

@@ -121,19 +121,17 @@ export default function CustomPaperReviewPage() {
 
   return (
     <main id="main-content" className="shell workspace-page">
-      <section className="rounded-[2rem] bg-white p-6 shadow-card ring-1 ring-slate-100 sm:p-8">
+      <section className="surface-card workspace-page-panel workspace-page-header p-5 sm:p-6">
         <div className="flex flex-wrap items-center justify-between gap-4">
           <div>
-            <p className="text-sm font-semibold uppercase tracking-[0.2em] text-brand-700">Custom Paper Review</p>
-            <h1 className="mt-2 text-3xl font-bold text-ink sm:text-4xl">自訂卷錯題與沒信心題</h1>
-            <p className="mt-3 text-slate-500">
-              這裡只整理自訂卷模式累積下來的錯題與低信心題，不會和其他模式混在一起。
-            </p>
+            <p className="workspace-page-kicker">自訂卷複習</p>
+            <h1 className="workspace-page-title">自訂卷錯題與沒信心題</h1>
+            <p className="mt-2 text-sm text-slate-500">自訂卷題池獨立整理，不與其他模式混用。</p>
           </div>
           <div className="flex flex-wrap gap-3">
             <Link
               href="/custom-papers"
-              className="min-h-12 rounded-2xl bg-slate-100 px-5 py-4 text-sm font-semibold text-slate-800 transition hover:bg-slate-200"
+              className="min-h-11 rounded-lg bg-slate-100 px-4 py-2 text-sm font-semibold text-slate-800 transition hover:bg-slate-200"
             >
               返回自訂卷模式
             </Link>
@@ -147,7 +145,7 @@ export default function CustomPaperReviewPage() {
                 handleStartCustomPaperReview(unresolvedCustomPaperItems);
               }}
               aria-disabled={unresolvedCustomPaperItems.length === 0}
-              className={`min-h-12 rounded-2xl px-5 py-4 text-sm font-semibold transition ${
+              className={`min-h-11 rounded-lg px-4 py-2 text-sm font-semibold transition ${
                 unresolvedCustomPaperItems.length === 0
                   ? "pointer-events-none bg-slate-200 text-slate-500"
                   : "bg-brand-600 text-white hover:bg-brand-700"
@@ -159,14 +157,14 @@ export default function CustomPaperReviewPage() {
         </div>
       </section>
 
-      <section className="mt-8 grid gap-4 lg:grid-cols-2">
-        <article className="rounded-3xl bg-rose-50 p-5 text-rose-900">
-          <p className="text-sm font-medium">自訂卷錯題庫</p>
-          <p className="mt-2 text-3xl font-bold">{snapshot.total}</p>
+      <section className="saved-summary-strip mt-5" aria-label="自訂卷待複習摘要">
+        <article className="saved-summary-item">
+          <p className="text-xs font-semibold text-slate-500">待複習</p>
+          <p className="mt-1 text-xl font-semibold text-ink">{snapshot.total} 題</p>
         </article>
-        <article className="rounded-3xl bg-amber-50 p-5 text-amber-900">
-          <p className="text-sm font-medium">自訂卷低信心題</p>
-          <p className="mt-2 text-3xl font-bold">{snapshot.lowConfidence}</p>
+        <article className="saved-summary-item">
+          <p className="text-xs font-semibold text-slate-500">低信心</p>
+          <p className="mt-1 text-xl font-semibold text-ink">{snapshot.lowConfidence} 題</p>
         </article>
       </section>
 

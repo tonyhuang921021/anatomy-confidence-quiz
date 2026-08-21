@@ -76,14 +76,12 @@ export default function StudyNotesPage() {
 
   return (
     <main id="main-content" className="shell workspace-page">
-      <section className="surface-card p-6 sm:p-8">
+      <section className="surface-card workspace-page-panel workspace-page-header p-5 sm:p-6">
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div>
-            <p className="eyebrow">Study Library</p>
-            <h1 className="display-title mt-3 text-4xl sm:text-5xl">學習筆記</h1>
-            <p className="body-soft mt-4 max-w-3xl leading-7">
-              先選一科，進去後會像一份大文件：左邊是章節檢索，右邊是完整筆記、相關題目小卡與可編輯內容。
-            </p>
+            <p className="workspace-page-kicker">筆記</p>
+            <h1 className="workspace-page-title">學習筆記</h1>
+            <p className="body-soft mt-2 text-sm">依科目整理筆記與章節。</p>
           </div>
           <div className="flex flex-wrap gap-2">
             <a href={STUDY_NOTES_MANUAL_HREF} target="_blank" rel="noreferrer" className="secondary-pill">
@@ -96,16 +94,16 @@ export default function StudyNotesPage() {
         </div>
       </section>
 
-      <section className="surface-card mt-6 p-5 sm:p-6">
+      <section className="workspace-section mt-5 p-4 sm:p-5">
         {!configured ? (
-          <p className="body-soft">Supabase 尚未設定，學習筆記需要雲端儲存才能使用。</p>
+          <p className="workspace-empty-state">學習筆記目前無法連上雲端。</p>
         ) : !user ? (
-          <p className="body-soft">請先在首頁登入，登入後就能建立自己的學習筆記。</p>
+          <p className="workspace-empty-state">登入後即可查看與建立學習筆記。</p>
         ) : (
           <>
             {loading ? <p className="body-soft">正在整理十科筆記...</p> : null}
             {error ? <p className="rounded-2xl bg-rose-50 px-4 py-3 text-sm font-semibold text-rose-700">{error}</p> : null}
-            <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-5">
+            <div className="notes-subject-grid">
               {NOTE_SUBJECTS.map((subject) => {
                 const item = subjectRegistry[subject];
                 const stats = statsBySubject.get(subject);
@@ -117,19 +115,18 @@ export default function StudyNotesPage() {
                     subjectNotes.filter((note) => getMicrobiologyImmunologyCategory(note) === category.id).length
                   ])
                 );
-                const cardClassName =
-                  "group rounded-[2rem] border border-slate-200 bg-white p-5 text-left shadow-sm transition hover:-translate-y-1 hover:border-teal-300 hover:shadow-xl";
+                const cardClassName = "notes-subject-card group text-left";
                 const cardContent = (
                   <>
-                    <p className="text-xs font-bold uppercase tracking-[0.22em] text-teal-700">Subject</p>
-                    <h2 className="mt-3 text-2xl font-black text-slate-950">{item.label}</h2>
-                    <div className="mt-5 grid gap-2 text-sm font-semibold text-slate-600">
-                      <span>{stats?.count ?? 0} 篇筆記</span>
-                      <span>{stats?.chapters.size ?? 0} 個章節</span>
-                      <span>更新 {formatDate(stats?.updatedAt)}</span>
+                    <div className="flex items-start justify-between gap-3">
+                      <h2 className="text-lg font-semibold text-ink">{item.label}</h2>
+                      <span className="text-xs font-semibold text-slate-500">{stats?.count ?? 0} 篇</span>
                     </div>
-                    <span className="mt-5 inline-flex rounded-full bg-slate-950 px-4 py-2 text-sm font-bold text-white transition group-hover:bg-teal-700">
-                      {isMicrobiology ? "選擇分類" : "打開大文件"}
+                    <p className="mt-3 text-sm text-slate-500">
+                      {stats?.chapters.size ?? 0} 個章節・更新 {formatDate(stats?.updatedAt)}
+                    </p>
+                    <span className="mt-4 inline-flex text-sm font-semibold text-brand-700">
+                      {isMicrobiology ? "選擇分類" : "開啟筆記"} →
                     </span>
                   </>
                 );
@@ -145,18 +142,17 @@ export default function StudyNotesPage() {
                         {cardContent}
                       </button>
                       {expandedMicrobiology ? (
-                        <div className="grid gap-2 rounded-[1.5rem] border border-teal-100 bg-teal-50/70 p-3">
+                        <div className="grid gap-1 border-l-2 border-brand-200 pl-3">
                           {MICROBIOLOGY_IMMUNOLOGY_CATEGORIES.map((category) => (
                             <Link
                               key={category.id}
                               href={`/notes/subject/${encodeURIComponent(subject)}?category=${category.id}`}
-                              className="rounded-2xl bg-white px-4 py-3 text-sm font-bold text-slate-800 shadow-sm transition hover:bg-teal-700 hover:text-white"
+                              className="rounded-lg px-3 py-2 text-sm font-semibold text-slate-700 transition hover:bg-brand-50 hover:text-brand-800"
                             >
                               <span className="flex items-center justify-between gap-3">
                                 <span>{category.label}</span>
                                 <span>{microCategoryCounts.get(category.id) ?? 0} 篇</span>
                               </span>
-                              <span className="mt-1 block text-xs font-medium opacity-70">{category.description}</span>
                             </Link>
                           ))}
                         </div>
