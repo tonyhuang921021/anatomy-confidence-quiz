@@ -2562,9 +2562,7 @@ export default function QuizPage() {
       ? "本題多重給分：若你的答案在官方接受答案中，即算答對。"
       : submittedAttempt && currentQuestion.answerCreditType === "all_credit"
         ? "本題為官方送分題：本輪直接視為答對。"
-        : submittedAttempt && currentQuestion.needsHumanReview
-          ? "本題為人工複核題：目前依官方答案判定，請以官方最終公告為準。"
-          : null;
+        : null;
 
   return (
     <main id="main-content" className="shell">
