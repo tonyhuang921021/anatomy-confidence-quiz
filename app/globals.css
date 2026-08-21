@@ -2115,13 +2115,6 @@ select {
     backdrop-filter: none;
   }
 
-  .memory-tip-box {
-    @apply rounded-2xl border px-4 py-3 text-sm leading-7;
-    border-color: color-mix(in srgb, var(--accent-warm) 20%, var(--line-soft));
-    background: color-mix(in srgb, var(--accent-warm) 10%, var(--surface));
-    color: var(--ink-main);
-  }
-
   .podium-champion {
     background:
       radial-gradient(circle at top right, rgba(194, 158, 111, 0.16), rgba(255, 251, 235, 0.92) 45%, rgba(255, 255, 255, 1) 80%);
@@ -2308,21 +2301,11 @@ select {
 
   .search-result-source-tabs {
     min-width: 0;
-    flex: 1 1 28rem;
+    flex: 1 1 auto;
     border: 0;
     border-radius: 0;
     background: transparent;
     padding: 0;
-  }
-
-  .search-result-utility-actions {
-    display: flex;
-    min-width: 0;
-    flex: 0 1 auto;
-    flex-wrap: wrap;
-    align-items: center;
-    justify-content: flex-end;
-    gap: 0.5rem;
   }
 
   @media (min-width: 900px) {
@@ -2368,10 +2351,6 @@ select {
       align-items: flex-start;
     }
 
-    .search-result-utility-actions {
-      width: 100%;
-      justify-content: flex-start;
-    }
   }
 
   .note-markdown th {

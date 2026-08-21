@@ -2,6 +2,7 @@
 
 import type { ReactNode } from "react";
 import { useCallback, useEffect, useState } from "react";
+import { BookOpen, CircleOff, Layers3, MessageCircle, MoreHorizontal } from "lucide-react";
 import { useAuth } from "@/components/AuthProvider";
 import { QuestionSupplementCardsPanel } from "@/components/QuestionSupplementCardsPanel";
 import { YangmingExplanationPanel } from "@/components/YangmingExplanationPanel";
@@ -14,6 +15,7 @@ type QuestionExplanationTabsProps = {
   className?: string;
   aiExplanationContent?: ReactNode;
   relatedQuestionsContent?: () => ReactNode;
+  moreActionsContent?: ReactNode;
 };
 
 export function QuestionExplanationTabs({
@@ -21,7 +23,8 @@ export function QuestionExplanationTabs({
   compact = false,
   className = "",
   aiExplanationContent,
-  relatedQuestionsContent
+  relatedQuestionsContent,
+  moreActionsContent
 }: QuestionExplanationTabsProps) {
   const { session } = useAuth();
   const [activeTab, setActiveTab] = useState<"ai" | "yangming" | "supplement" | "related" | null>(null);
@@ -98,45 +101,52 @@ export function QuestionExplanationTabs({
   }
 
   return (
-    <section className={`rounded-3xl border border-slate-200 bg-white/70 p-3 ${className}`}>
-      <div className="flex flex-wrap gap-2">
+    <section className={`border-y border-slate-200/90 py-2.5 ${className}`}>
+      <div className="flex min-w-0 items-center gap-1.5">
+        <div className="flex min-w-0 flex-1 items-center gap-1.5 overflow-x-auto py-0.5">
         {hasAiExplanationContent ? (
           <button
             type="button"
             onClick={() => setActiveTab((current) => current === "ai" ? null : "ai")}
             aria-pressed={activeTab === "ai"}
-            className={`rounded-full px-3 py-1.5 text-xs font-black ring-1 transition ${
+            className={`inline-flex min-h-9 shrink-0 items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-xs font-bold ring-1 transition ${
               activeTab === "ai"
                 ? "bg-slate-900 text-white ring-slate-900"
                 : "bg-white text-slate-700 ring-slate-200 hover:bg-slate-50"
             }`}
+            title="AI 詳解"
           >
-            AI 詳解
+            <BookOpen aria-hidden="true" className="size-3.5" strokeWidth={1.8} />
+            AI
           </button>
         ) : null}
         <button
           type="button"
           onClick={() => setActiveTab((current) => current === "yangming" ? null : "yangming")}
           aria-pressed={activeTab === "yangming"}
-          className={`rounded-full px-3 py-1.5 text-xs font-black ring-1 transition ${
+          className={`inline-flex min-h-9 shrink-0 items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-xs font-bold ring-1 transition ${
             activeTab === "yangming"
               ? "bg-slate-900 text-white ring-slate-900"
               : "bg-white text-slate-700 ring-slate-200 hover:bg-slate-50"
           }`}
+          title="陽明詳解"
         >
-          陽明詳解
+          <BookOpen aria-hidden="true" className="size-3.5" strokeWidth={1.8} />
+          陽明
         </button>
         <button
           type="button"
           onClick={() => setActiveTab((current) => current === "supplement" ? null : "supplement")}
           aria-pressed={activeTab === "supplement"}
-          className={`rounded-full px-3 py-1.5 text-xs font-black ring-1 transition ${
+          className={`inline-flex min-h-9 shrink-0 items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-xs font-bold ring-1 transition ${
             activeTab === "supplement"
               ? "bg-teal-700 text-white ring-teal-700"
               : "bg-white text-slate-700 ring-slate-200 hover:bg-teal-50 hover:text-teal-800"
           }`}
+          title="同學補充"
         >
-          同學補充
+          <MessageCircle aria-hidden="true" className="size-3.5" strokeWidth={1.8} />
+          補充
           {supplementCount && supplementCount > 0 ? (
             <span
               className={`ml-1.5 rounded-full px-1.5 py-0.5 text-[10px] ${
@@ -147,41 +157,56 @@ export function QuestionExplanationTabs({
             </span>
           ) : null}
         </button>
-        <button
-          type="button"
-          onClick={() => void handleToggleReaction()}
-          disabled={reactionLoading}
-          aria-pressed={pureChaosReaction.active}
-          className={`rounded-full px-3 py-1.5 text-xs font-black ring-1 transition disabled:cursor-wait disabled:opacity-60 ${
-            pureChaosReaction.active
-              ? "bg-rose-600 text-white ring-rose-600"
-              : "bg-rose-50 text-rose-800 ring-rose-100 hover:bg-rose-100"
-          }`}
-        >
-          {pureChaosReaction.label}
-          {pureChaosReaction.count > 0 ? (
-            <span
-              className={`ml-1.5 rounded-full px-1.5 py-0.5 text-[10px] ${
-                pureChaosReaction.active ? "bg-white/20 text-white" : "bg-white text-rose-800"
-              }`}
-            >
-              {pureChaosReaction.count}
-            </span>
-          ) : null}
-        </button>
         {hasRelatedQuestionsContent ? (
           <button
             type="button"
             onClick={() => setActiveTab((current) => current === "related" ? null : "related")}
             aria-pressed={activeTab === "related"}
-            className={`rounded-full px-3 py-1.5 text-xs font-black ring-1 transition ${
+            className={`inline-flex min-h-9 shrink-0 items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-xs font-bold ring-1 transition ${
               activeTab === "related"
                 ? "bg-sky-700 text-white ring-sky-700"
                 : "bg-sky-50 text-sky-800 ring-sky-100 hover:bg-sky-100"
             }`}
+            title="相同觀念類似題"
           >
-            相同觀念類似題
+            <Layers3 aria-hidden="true" className="size-3.5" strokeWidth={1.8} />
+            類似題
           </button>
+        ) : null}
+          <button
+            type="button"
+            onClick={() => void handleToggleReaction()}
+            disabled={reactionLoading}
+            aria-pressed={pureChaosReaction.active}
+            aria-label={pureChaosReaction.label}
+            className={`inline-flex min-h-9 shrink-0 items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-xs font-bold ring-1 transition disabled:cursor-wait disabled:opacity-60 ${
+              pureChaosReaction.active
+                ? "bg-rose-600 text-white ring-rose-600"
+                : "bg-rose-50 text-rose-800 ring-rose-100 hover:bg-rose-100"
+            }`}
+            title={pureChaosReaction.label}
+          >
+            <CircleOff aria-hidden="true" className="size-3.5 shrink-0" strokeWidth={1.8} />
+            {pureChaosReaction.label}
+            {pureChaosReaction.count > 0 ? (
+              <span className={pureChaosReaction.active ? "text-rose-100" : "text-rose-600"}>
+                {pureChaosReaction.count}
+              </span>
+            ) : null}
+          </button>
+        </div>
+        {moreActionsContent ? (
+        <details className="group relative shrink-0">
+          <summary className="inline-flex min-h-9 cursor-pointer list-none items-center gap-1.5 rounded-lg bg-white px-2.5 py-1.5 text-xs font-bold text-slate-700 ring-1 ring-slate-200 transition hover:bg-slate-50 [&::-webkit-details-marker]:hidden">
+            <MoreHorizontal aria-hidden="true" className="size-4" strokeWidth={1.8} />
+            更多
+          </summary>
+          <div className="absolute right-0 z-30 mt-2 w-64 rounded-xl border border-slate-200 bg-white p-2 shadow-[0_16px_40px_rgba(15,23,42,0.14)]">
+            <div className="grid gap-1 [&_button]:w-full [&_button]:justify-start [&_button]:rounded-lg">
+              {moreActionsContent}
+            </div>
+          </div>
+        </details>
         ) : null}
       </div>
       {reactionError ? <p className="mt-2 text-xs font-semibold text-rose-700">{reactionError}</p> : null}

@@ -2792,6 +2792,48 @@ export default function QuizPage() {
                             savedQuestionSource="quiz"
                           />
                         )}
+                        moreActionsContent={(
+                          <>
+                            {currentExplanationOverride ? (
+                              <>
+                                <span className="px-3 py-1 text-xs font-semibold text-slate-500">
+                                  已替換詳解・{currentExplanationOverride.model ?? "gpt-5.4-mini"}
+                                </span>
+                                <button
+                                  type="button"
+                                  onClick={() =>
+                                    void handleGenerateQuestionExplanation(
+                                      currentQuestion,
+                                      submittedAttempt,
+                                      currentExplanationOverride
+                                    )
+                                  }
+                                  disabled={currentExplanationLoading}
+                                  className="flex min-h-10 items-center px-3 py-2 text-sm font-semibold text-slate-700 transition hover:bg-slate-50 disabled:cursor-wait disabled:opacity-60"
+                                >
+                                  {currentExplanationLoading ? "重新生成中..." : "重新替換詳解"}
+                                </button>
+                              </>
+                            ) : (
+                              <button
+                                type="button"
+                                onClick={() => void handleGenerateQuestionExplanation(currentQuestion, submittedAttempt)}
+                                disabled={currentExplanationLoading}
+                                className="flex min-h-10 items-center px-3 py-2 text-sm font-semibold text-slate-700 transition hover:bg-slate-50 disabled:cursor-wait disabled:opacity-60"
+                              >
+                                {currentExplanationLoading ? "AI 生成中..." : "用 AI 補詳解"}
+                              </button>
+                            )}
+                            <QuestionReportButton
+                              question={currentQuestion}
+                              disabled={currentClassificationReportLoading}
+                              classificationLoading={currentClassificationReportLoading}
+                              classificationMessage={currentClassificationReportMessage}
+                              onReportClassification={() => void handleReportClassification(currentQuestion)}
+                              buttonClassName="flex min-h-10 items-center px-3 py-2 text-sm font-semibold text-slate-700 transition hover:bg-amber-50 hover:text-amber-900 disabled:cursor-wait disabled:opacity-60"
+                            />
+                          </>
+                        )}
                       />
                     </>
                   ) : null}
@@ -2835,58 +2877,8 @@ export default function QuizPage() {
                   </div>
                 ) : null}
 
-                {shouldShowExplanation && shouldShowAiExplanationDetails && currentQuestion.memoryTip ? (
-                  <div className="memory-tip-box mt-5">
-                    <h3 className="text-sm font-semibold">快速記憶法</h3>
-                    <p className="mt-2 leading-7">{currentQuestion.memoryTip}</p>
-                  </div>
-                ) : null}
-
-                {shouldShowExplanation ? (
-                  <div className="mt-5 space-y-3">
-                    <div className="flex flex-wrap items-center gap-3">
-                      {currentExplanationOverride ? (
-                        <>
-                          <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-600">
-                            已替換詳解・{currentExplanationOverride.model ?? "gpt-5.4-mini"}
-                          </span>
-                          <button
-                            type="button"
-                            onClick={() =>
-                              void handleGenerateQuestionExplanation(
-                                currentQuestion,
-                                submittedAttempt,
-                                currentExplanationOverride
-                              )
-                            }
-                            disabled={currentExplanationLoading}
-                            className="min-h-10 rounded-2xl bg-slate-900 px-4 py-2 text-sm font-semibold text-white transition hover:bg-black disabled:cursor-wait disabled:opacity-60"
-                          >
-                            {currentExplanationLoading ? "重新生成中..." : "重新替換詳解"}
-                          </button>
-                        </>
-                      ) : (
-                        <button
-                          type="button"
-                          onClick={() => void handleGenerateQuestionExplanation(currentQuestion, submittedAttempt)}
-                          disabled={currentExplanationLoading}
-                          className="min-h-10 rounded-2xl bg-slate-900 px-4 py-2 text-sm font-semibold text-white transition hover:bg-black disabled:cursor-wait disabled:opacity-60"
-                        >
-                          {currentExplanationLoading ? "AI 生成中..." : "用 AI 補詳解"}
-                        </button>
-                      )}
-                      <QuestionReportButton
-                        question={currentQuestion}
-                        disabled={currentClassificationReportLoading}
-                        classificationLoading={currentClassificationReportLoading}
-                        classificationMessage={currentClassificationReportMessage}
-                        onReportClassification={() => void handleReportClassification(currentQuestion)}
-                      />
-                    </div>
-                    {currentExplanationError ? (
-                      <p className="text-sm font-medium text-rose-700">{currentExplanationError}</p>
-                    ) : null}
-                  </div>
+                {shouldShowExplanation && currentExplanationError ? (
+                  <p className="mt-3 text-sm font-medium text-rose-700">{currentExplanationError}</p>
                 ) : null}
               </div>
 

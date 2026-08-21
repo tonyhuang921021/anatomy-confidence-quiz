@@ -23,6 +23,7 @@ type QuestionReportButtonProps = QuestionIssueReportButtonProps & {
   classificationLoading?: boolean;
   classificationMessage?: string;
   onReportClassification?: () => void;
+  buttonClassName?: string;
 };
 
 export function QuestionReportButton({
@@ -30,7 +31,8 @@ export function QuestionReportButton({
   disabled = false,
   classificationLoading = false,
   classificationMessage = "",
-  onReportClassification
+  onReportClassification,
+  buttonClassName = "min-h-10 rounded-2xl bg-amber-50 px-4 py-2 text-sm font-semibold text-amber-900 ring-1 ring-amber-100 transition hover:bg-amber-100 disabled:cursor-wait disabled:opacity-60"
 }: QuestionReportButtonProps) {
   const { session } = useAuth();
   const [isOpen, setIsOpen] = useState(false);
@@ -82,7 +84,7 @@ export function QuestionReportButton({
           setError("");
         }}
         disabled={disabled || isSubmitting || classificationLoading}
-        className="min-h-10 rounded-2xl bg-amber-50 px-4 py-2 text-sm font-semibold text-amber-900 ring-1 ring-amber-100 transition hover:bg-amber-100 disabled:cursor-wait disabled:opacity-60"
+        className={buttonClassName}
       >
         {isSubmitting || classificationLoading ? "回報中..." : "回報"}
       </button>

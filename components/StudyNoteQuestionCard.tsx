@@ -45,7 +45,6 @@ export function StudyNoteQuestionCard({ question, link, title }: Props) {
   const primaryTag = getQuestionPrimaryTag(question);
   const explanation = explanationOverride?.explanation || question.explanation;
   const optionAnalysis = explanationOverride?.optionAnalysis ?? question.optionAnalysis;
-  const memoryTip = explanationOverride?.memoryTip ?? question.memoryTip;
 
   async function handleGenerateExplanation() {
     if (!question) return;
@@ -213,11 +212,6 @@ export function StudyNoteQuestionCard({ question, link, title }: Props) {
                     ) : null
                   )}
                 </div>
-              ) : null}
-              {memoryTip ? (
-                <p className="mt-3 rounded-2xl bg-teal-400/15 px-3 py-2 text-teal-50">
-                  快速記憶：{memoryTip}
-                </p>
               ) : null}
             </div>
           ) : null}

@@ -104,9 +104,25 @@ test("搜尋結果展開後不會重複題幹與分類", async ({ page }) => {
 
   const details = card.locator(".search-result-details");
   const options = details.locator(".search-result-options");
-  const toolbar = details.locator(".search-result-utility-actions");
+  const sourceToolbar = details.locator(".search-result-source-tabs");
   await expect(details).toBeVisible();
-  await expect(toolbar).toBeVisible();
+  await expect(sourceToolbar.getByText("陽明", { exact: true })).toBeVisible();
+  await expect(sourceToolbar.getByText("補充", { exact: true })).toBeVisible();
+  await expect(sourceToolbar.getByRole("button", { name: "這題我們不要了" })).toBeVisible();
+  await expect(sourceToolbar.getByText("更多", { exact: true })).toBeVisible();
+  await expect(details.getByText("快速記憶法", { exact: true })).toHaveCount(0);
+
+  const sourceButtonY = await Promise.all(
+    ["陽明", "補充", "這題我們不要了", "更多"].map(async (label) =>
+      (await sourceToolbar.getByText(label, { exact: true }).boundingBox())?.y ?? -1
+    )
+  );
+  expect(Math.max(...sourceButtonY) - Math.min(...sourceButtonY)).toBeLessThanOrEqual(2);
+
+  await sourceToolbar.locator("summary").filter({ hasText: "更多" }).click();
+  await expect(sourceToolbar.getByRole("button", { name: "儲存題目" })).toBeVisible();
+  await expect(sourceToolbar.getByRole("button", { name: "用 AI 補詳解" })).toBeVisible();
+  await expect(sourceToolbar.getByRole("button", { name: "回報" })).toBeVisible();
 
   const viewportWidth = page.viewportSize()?.width ?? 0;
   const optionColumnCount = await options.evaluate((element) =>
@@ -130,6 +146,65 @@ test("搜尋結果展開後會顯示題幹圖片", async ({ page }) => {
     "src",
     "/question-media/MOEX-110101_2301-Q100.png"
   );
+});
+
+test("正式作答詳解使用同一組精簡工具列", async ({ page }) => {
+  const now = new Date().toISOString();
+  await page.addInitScript(({ answeredAt }) => {
+    const session = {
+      id: "site-shell-quiz-session",
+      subject: "醫學（二）",
+      startedAt: answeredAt,
+      settings: {
+        mode: "random",
+        questionCount: 1,
+        subjectFilter: "病理學",
+        stopAfterReview: true,
+        feedbackMode: "full"
+      },
+      questionOrder: ["MOEX-115020-2301-Q078"],
+      currentQuestionIndex: 0,
+      isReviewingAnswer: true,
+      attempts: [
+        {
+          questionId: "MOEX-115020-2301-Q078",
+          selectedAnswer: "C",
+          correctAnswer: "A",
+          isCorrect: false,
+          confidence: 4,
+          answeredAt
+        }
+      ]
+    };
+    window.localStorage.setItem("anatomy-confidence-active-user-id", "guest");
+    window.localStorage.setItem(
+      "anatomy-confidence-current-session:guest",
+      JSON.stringify(session)
+    );
+  }, { answeredAt: now });
+
+  await page.goto("/quiz?resume=1&sessionId=site-shell-quiz-session", {
+    waitUntil: "networkidle"
+  });
+  await waitForShellReady(page);
+
+  const toolbar = page.locator("main#main-content section.border-y").filter({
+    has: page.getByRole("button", { name: "這題我們不要了" })
+  });
+  await expect(toolbar).toBeVisible();
+  await expect(toolbar.getByRole("button", { name: "這題我們不要了" })).toBeVisible();
+  await expect(page.getByText("快速記憶法", { exact: true })).toHaveCount(0);
+
+  const rowY = await Promise.all(
+    ["陽明", "補充", "類似題", "這題我們不要了", "更多"].map(async (label) =>
+      (await toolbar.getByText(label, { exact: true }).boundingBox())?.y ?? -1
+    )
+  );
+  expect(Math.max(...rowY) - Math.min(...rowY)).toBeLessThanOrEqual(2);
+
+  await toolbar.locator("summary").filter({ hasText: "更多" }).click();
+  await expect(toolbar.getByRole("button", { name: "用 AI 補詳解" })).toBeVisible();
+  await expect(toolbar.getByRole("button", { name: "回報" })).toBeVisible();
 });
 
 test("結果頁展開後分類只顯示一次", async ({ page }) => {

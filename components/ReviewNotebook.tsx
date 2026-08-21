@@ -600,8 +600,8 @@ function renderQuestionReview(
         className="mt-3"
         aiExplanationContent={aiExplanationContent}
         relatedQuestionsContent={relatedQuestionsContent}
+        moreActionsContent={footer}
       />
-      {footer}
     </div>
   );
 }
@@ -1253,10 +1253,10 @@ export function ReviewNotebook({
     const reportMessage = classificationReportMessageMap[question.id];
 
     return (
-      <div className="space-y-2 rounded-2xl bg-white/80 p-3 ring-1 ring-slate-100">
-        <div className="flex flex-wrap items-center gap-2">
+      <div className="grid gap-1">
+        <div className="grid gap-1">
           {override ? (
-            <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-600">
+            <span className="px-3 py-1 text-xs font-semibold text-slate-500">
               已替換詳解・{override.model ?? "gpt-5.4-mini"}
             </span>
           ) : null}
@@ -1265,7 +1265,7 @@ export function ReviewNotebook({
               type="button"
               onClick={() => void handleGenerateQuestionExplanation(question)}
               disabled={loading}
-              className="min-h-10 rounded-2xl bg-slate-900 px-4 py-2 text-sm font-semibold text-white transition hover:bg-black disabled:cursor-wait disabled:opacity-60"
+              className="flex min-h-10 items-center px-3 py-2 text-sm font-semibold text-slate-700 transition hover:bg-slate-50 disabled:cursor-wait disabled:opacity-60"
             >
               {loading ? "AI 生成中..." : "用 AI 補詳解"}
             </button>
@@ -1274,7 +1274,7 @@ export function ReviewNotebook({
               type="button"
               onClick={() => void handleGenerateQuestionExplanation(question, override)}
               disabled={loading}
-              className="min-h-10 rounded-2xl bg-slate-900 px-4 py-2 text-sm font-semibold text-white transition hover:bg-black disabled:cursor-wait disabled:opacity-60"
+              className="flex min-h-10 items-center px-3 py-2 text-sm font-semibold text-slate-700 transition hover:bg-slate-50 disabled:cursor-wait disabled:opacity-60"
             >
               {loading ? "重新生成中..." : "重新替換詳解"}
             </button>
@@ -1285,6 +1285,7 @@ export function ReviewNotebook({
             classificationLoading={reportLoading}
             classificationMessage={reportMessage}
             onReportClassification={() => void handleReportClassification(question)}
+            buttonClassName="flex min-h-10 items-center px-3 py-2 text-sm font-semibold text-slate-700 transition hover:bg-amber-50 hover:text-amber-900 disabled:cursor-wait disabled:opacity-60"
           />
         </div>
         {error ? <p className="text-sm font-medium text-rose-700">{error}</p> : null}

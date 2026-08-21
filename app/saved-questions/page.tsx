@@ -411,12 +411,6 @@ export default function SavedQuestionsPage() {
                   </p>
                   <StructuredExplanationText text={selectedItem.question.explanation} label="詳解" compact />
                   <QuestionExplanationTabs question={selectedItem.question} compact className="mt-3" />
-                  {selectedItem.question.memoryTip ? (
-                    <div className="memory-tip-box">
-                      <span className="font-semibold">快速記憶法：</span>
-                      {selectedItem.question.memoryTip}
-                    </div>
-                  ) : null}
                 </div>
               ) : null}
             </article>

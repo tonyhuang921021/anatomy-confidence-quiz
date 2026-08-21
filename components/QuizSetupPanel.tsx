@@ -48,7 +48,7 @@ const feedbackModeLabels: Record<SimulationFeedbackMode, string> = {
 };
 
 const feedbackModeDescriptions: Record<SimulationFeedbackMode, string> = {
-  full: "適合邊做邊學。每題送出後會顯示正解、詳解、各選項解析與記憶法。",
+  full: "適合邊做邊學。每題送出後會顯示正解、詳解與各選項解析。",
   answer_only: "適合先測自己，再快速確認對錯。每題送出後只顯示正確答案，不立刻看長詳解。",
   none: "最接近正式考試。作答當下不公布答案與詳解，但信心仍會照常記錄，最後再一起看結果。"
 };

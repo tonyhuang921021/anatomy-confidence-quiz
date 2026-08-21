@@ -1679,7 +1679,6 @@ export default function SubjectNotesPage() {
                   const override = explanationOverrides[question.id];
                   const explanation = override?.explanation || question.explanation;
                   const optionAnalysis = override?.optionAnalysis ?? question.optionAnalysis;
-                  const memoryTip = override?.memoryTip ?? question.memoryTip;
                   const explanationLoading = explanationLoadingMap[question.id];
                   const explanationError = explanationErrorMap[question.id];
 
@@ -1735,11 +1734,6 @@ export default function SubjectNotesPage() {
                                   ) : null
                                 )}
                               </div>
-                            ) : null}
-                            {memoryTip ? (
-                              <p className="mt-3 rounded-2xl bg-teal-400/15 px-3 py-2 text-teal-50">
-                                快速記憶：{memoryTip}
-                              </p>
                             ) : null}
                           </div>
                         </details>
