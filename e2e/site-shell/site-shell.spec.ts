@@ -194,6 +194,11 @@ test("正式作答詳解使用同一組精簡工具列", async ({ page }) => {
   await expect(toolbar).toBeVisible();
   await expect(toolbar.getByRole("button", { name: "這題我們不要了" })).toBeVisible();
   await expect(page.getByText("快速記憶法", { exact: true })).toHaveCount(0);
+  await expect(page.locator(".simulation-status-sidebar")).toHaveCount(0);
+  await expect(page.getByText("本輪狀態", { exact: true })).toHaveCount(0);
+  await expect(page.getByText("本地題庫模式", { exact: true })).toHaveCount(0);
+  await expect(page.getByText("本輪平均信心", { exact: false })).toHaveCount(0);
+  await expect(page.getByText("答錯", { exact: true })).toBeVisible();
 
   const rowY = await Promise.all(
     ["陽明", "補充", "類似題", "這題我們不要了", "更多"].map(async (label) =>

@@ -260,14 +260,6 @@ function shouldRevealAttemptFeedback(session?: QuizSession | null) {
   );
 }
 
-function getQuestionSourceBadge(question: Question) {
-  if (question.sourceType === "MOEX_PAST_EXAM") return "正式考古題";
-  if (question.sourceType === "AI_GENERATED") return "AI 題庫";
-  if (question.source === "ai-generated") return "GPT 新題";
-  if (question.source === "past-exam-inspired") return "考古題風格";
-  return "本地題庫";
-}
-
 function getDifficultyBadge(question: Question) {
   if (question.difficulty === "basic" || question.difficulty === "easy") {
     return { text: "易", className: "bg-emerald-100 text-emerald-900" };
@@ -1422,21 +1414,13 @@ export default function QuizPage() {
     targetCount === 0 ? 0 : ((currentIndex + (submittedAttempt ? 1 : 0)) / targetCount) * 100;
   const answeredCount = session?.attempts.length ?? 0;
   const correctCount = session?.attempts.filter((attempt) => attempt.isCorrect).length ?? 0;
+  const currentAccuracy =
+    answeredCount === 0 ? 0 : Math.round((correctCount / answeredCount) * 100);
   const attemptsByQuestionId = useMemo(
     () => new Map((session?.attempts ?? []).map((attempt) => [attempt.questionId, attempt] as const)),
     [session?.attempts]
   );
   const displayedConfidence = submittedAttempt?.confidence ?? confidence;
-  const averageConfidence =
-    answeredCount === 0
-      ? 0
-      : Number(
-          (
-            (session?.attempts.reduce((sum, attempt) => sum + attempt.confidence, 0) ?? 0) /
-            answeredCount
-          ).toFixed(1)
-        );
-
   useEffect(() => {
     if (!session || !currentQuestion || submittedAttempt) return;
     const restoreKey = `${session.id}:${currentQuestion.id}`;
@@ -2585,55 +2569,42 @@ export default function QuizPage() {
   return (
     <main id="main-content" className="shell">
       <div ref={questionTopRef} />
-      <div className="mb-5 flex items-center justify-between gap-3">
-        <Link href="/" className="text-sm font-semibold text-slate-600 transition hover:text-brand-700">
-          ← 返回首頁
-        </Link>
-        <p className="text-sm font-medium text-slate-500">
-          第 {currentIndex + 1} / {targetCount} 題
-        </p>
-      </div>
-
-      <div className="h-3 overflow-hidden rounded-full bg-white/70">
-        <div
-          className="h-full rounded-full bg-gradient-to-r from-brand-500 via-emerald-500 to-sky-400"
-          style={{ width: `${progress}%` }}
-        />
-      </div>
-
-      <div ref={contentTopRef} className="mt-6 grid min-w-0 gap-6 xl:grid-cols-[minmax(0,1fr)_340px]">
-        <div className="min-w-0 space-y-6">
-          <div className="flex flex-wrap gap-2 text-xs font-semibold">
-            {session.settings?.mode === "simulation" ? (
-              <>
-                <span className="rounded-full bg-brand-100 px-3 py-1 text-brand-800">
-                  {modeLabel}
-                </span>
-                <span className="rounded-full bg-slate-100 px-3 py-1 text-slate-700">
-                  {targetCount} 題
-                </span>
-              </>
-            ) : (
-              <>
-                <span className="rounded-full bg-brand-100 px-3 py-1 text-brand-800">
-                  {modeLabel}
-                </span>
-                <span className="rounded-full bg-slate-100 px-3 py-1 text-slate-700">
-                  {targetCount} 題
-                </span>
-                <span className="rounded-full bg-slate-100 px-3 py-1 text-slate-700">
-                  {session.subject}
-                </span>
-                <span className="rounded-full bg-slate-100 px-3 py-1 text-slate-700">
-                  {getQuestionSourceBadge(currentQuestion)}
-                </span>
-                <span className="rounded-full bg-slate-100 px-3 py-1 text-slate-700">
-                  本地題庫模式
-                </span>
-              </>
-            )}
+      <header className="mb-5 border-b border-slate-200/80 pb-3">
+        <div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-2">
+          <Link href="/" className="text-sm font-semibold text-slate-600 transition hover:text-brand-700">
+            ← 返回首頁
+          </Link>
+          <div className="flex min-w-0 flex-wrap items-center justify-end gap-x-3 gap-y-1 text-xs font-semibold text-slate-500 sm:text-sm">
+            <span className="rounded-md bg-brand-50 px-2 py-1 text-brand-800">
+              {modeLabel}
+            </span>
+            <span>第 {currentIndex + 1} / {targetCount} 題</span>
+            <span className="hidden text-slate-300 sm:inline" aria-hidden="true">
+              ·
+            </span>
+            <span className="hidden sm:inline">
+              已答 {answeredCount}
+              {!isBlindSimulation ? ` · ${currentAccuracy}%` : ""}
+            </span>
           </div>
+        </div>
+        <div className="mt-3 h-1.5 overflow-hidden rounded-full bg-white/80 ring-1 ring-slate-100">
+          <div
+            className="h-full rounded-full bg-brand-600 transition-[width] duration-300"
+            style={{ width: `${progress}%` }}
+          />
+        </div>
+      </header>
 
+      <div
+        ref={contentTopRef}
+        className={`grid min-w-0 gap-6 ${
+          session.settings?.mode === "simulation"
+            ? "xl:grid-cols-[minmax(0,1fr)_320px]"
+            : ""
+        }`}
+      >
+        <div className="min-w-0 space-y-6">
           <QuestionCard
             question={currentQuestion}
             selectedAnswer={selectedAnswer}
@@ -2667,77 +2638,60 @@ export default function QuizPage() {
                 />
               ) : null}
 
-              <div className="rounded-[2rem] bg-white p-4 shadow-card ring-1 ring-slate-100 sm:p-5">
-                <div className="grid gap-3 sm:grid-cols-3">
-                  <p className="rounded-2xl bg-slate-50 px-4 py-3 text-sm text-slate-700">
-                    已答題數 <span className="font-semibold">{answeredCount}</span>
-                  </p>
-                  {!isBlindSimulation ? (
-                    <p className="rounded-2xl bg-slate-50 px-4 py-3 text-sm text-slate-700">
-                      目前答對數 <span className="font-semibold">{correctCount}</span>
-                    </p>
-                  ) : null}
-                  {confidenceTrackingEnabled ? (
-                    <p className="rounded-2xl bg-slate-50 px-4 py-3 text-sm text-slate-700">
-                      本輪平均信心 <span className="font-semibold">{averageConfidence}</span>
-                    </p>
-                  ) : null}
-                </div>
-                <div className={`mt-5 grid gap-3 ${isBlindSimulationLastQuestion ? "sm:grid-cols-3" : "sm:grid-cols-2"}`}>
-                  {isBlindSimulation ? (
-                    <button
-                      type="button"
-                      onClick={handleBlindSimulationPrevious}
-                      disabled={currentIndex === 0 || isSubmittingAnswer}
-                      className="min-h-12 w-full rounded-2xl bg-slate-100 px-4 py-4 text-sm font-semibold text-slate-800 transition hover:bg-slate-200 disabled:cursor-not-allowed disabled:bg-slate-100 disabled:text-slate-400"
-                    >
-                      上一題
-                    </button>
-                  ) : null}
+              <div className={`grid gap-3 ${isBlindSimulationLastQuestion ? "sm:grid-cols-3" : "sm:grid-cols-2"}`}>
+                {isBlindSimulation ? (
                   <button
                     type="button"
-                    onClick={() => handleSubmit()}
-                    disabled={!selectedAnswer || isSubmittingAnswer}
-                    className={`min-h-12 w-full rounded-2xl bg-brand-600 px-4 py-4 text-sm font-semibold text-white transition hover:bg-brand-700 disabled:cursor-not-allowed disabled:bg-slate-300 ${
-                      isBlindSimulation ? "" : "sm:col-span-2"
-                    }`}
+                    onClick={handleBlindSimulationPrevious}
+                    disabled={currentIndex === 0 || isSubmittingAnswer}
+                    className="min-h-12 w-full rounded-2xl bg-slate-100 px-4 py-4 text-sm font-semibold text-slate-800 transition hover:bg-slate-200 disabled:cursor-not-allowed disabled:bg-slate-100 disabled:text-slate-400"
                   >
-                    {isSubmittingAnswer
-                      ? isBlindSimulationLastQuestion
-                        ? "儲存中..."
-                        : "送出中..."
-                      : isBlindSimulation
-                        ? isBlindSimulationLastQuestion
-                          ? "儲存"
-                          : "儲存並下一題"
-                        : "送出答案"}
+                    上一題
                   </button>
-                  {isBlindSimulationLastQuestion ? (
-                    <button
-                      type="button"
-                      onClick={handleFinishSimulationExam}
-                      disabled={isSubmittingAnswer}
-                      className="min-h-12 w-full rounded-2xl bg-ink px-4 py-4 text-sm font-semibold text-white transition hover:bg-slate-900 disabled:cursor-not-allowed disabled:bg-slate-300"
-                    >
-                      交卷
-                    </button>
-                  ) : null}
-                </div>
+                ) : null}
+                <button
+                  type="button"
+                  onClick={() => handleSubmit()}
+                  disabled={!selectedAnswer || isSubmittingAnswer}
+                  className={`min-h-12 w-full rounded-2xl bg-brand-600 px-4 py-4 text-sm font-semibold text-white transition hover:bg-brand-700 disabled:cursor-not-allowed disabled:bg-slate-300 ${
+                    isBlindSimulation ? "" : "sm:col-span-2"
+                  }`}
+                >
+                  {isSubmittingAnswer
+                    ? isBlindSimulationLastQuestion
+                      ? "儲存中..."
+                      : "送出中..."
+                    : isBlindSimulation
+                      ? isBlindSimulationLastQuestion
+                        ? "儲存"
+                        : "儲存並下一題"
+                      : "送出答案"}
+                </button>
+                {isBlindSimulationLastQuestion ? (
+                  <button
+                    type="button"
+                    onClick={handleFinishSimulationExam}
+                    disabled={isSubmittingAnswer}
+                    className="min-h-12 w-full rounded-2xl bg-ink px-4 py-4 text-sm font-semibold text-white transition hover:bg-slate-900 disabled:cursor-not-allowed disabled:bg-slate-300"
+                  >
+                    交卷
+                  </button>
+                ) : null}
               </div>
             </>
           ) : (
             <div className="space-y-4">
-              <div
-                className={`rounded-[2rem] p-4 shadow-card ring-1 sm:p-6 ${
-                  submittedAttempt.isCorrect
-                    ? "bg-emerald-50 text-emerald-900 ring-emerald-200"
-                    : "bg-rose-50 text-rose-900 ring-rose-200"
-                }`}
-              >
+              <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm sm:p-5">
                 <div className="flex flex-wrap items-center gap-3">
-                  <h2 className="text-2xl font-bold">
-                    {submittedAttempt.isCorrect ? "答對了" : "這題答錯了"}
-                  </h2>
+                  <span
+                    className={`rounded-md px-2.5 py-1 text-sm font-bold ${
+                      submittedAttempt.isCorrect
+                        ? "bg-emerald-100 text-emerald-800"
+                        : "bg-rose-100 text-rose-800"
+                    }`}
+                  >
+                    {submittedAttempt.isCorrect ? "答對" : "答錯"}
+                  </span>
                   {flag ? (
                     <span className={`rounded-full px-3 py-1 text-xs font-semibold ${flag.style}`}>
                       {flag.text}
@@ -2760,8 +2714,8 @@ export default function QuizPage() {
                     />
                   </div>
                 </div>
-                <div className="mt-4 space-y-3 text-sm leading-7">
-                  {shouldShowCorrectAnswer ? (
+                <div className="mt-4 space-y-3 text-sm leading-7 text-slate-700">
+                  {shouldShowCorrectAnswer && !submittedAttempt.isCorrect ? (
                     <p>
                       正確答案：
                       <span className="font-semibold">
@@ -2837,31 +2791,26 @@ export default function QuizPage() {
                       />
                     </>
                   ) : null}
-                  {confidenceTrackingEnabled ? (
-                    <p>
-                      本題信心：<span className="font-semibold">{getConfidenceLabel(submittedAttempt.confidence)}</span>
-                    </p>
-                  ) : null}
                   {specialScoringNote ? (
                     <p className="rounded-2xl bg-amber-100/70 px-4 py-3 text-amber-950">
                       {specialScoringNote}
                     </p>
                   ) : null}
                   {isSavedQuestionReview ? (
-                    <p className="rounded-2xl bg-white/70 px-4 py-3 font-semibold text-slate-700 ring-1 ring-white/70">
+                    <p className="rounded-xl bg-slate-50 px-4 py-3 font-semibold text-slate-700">
                       儲存題目進度：答對 {currentSavedQuestionRecord?.correctCount ?? 0} / 2
                     </p>
                   ) : null}
                 </div>
 
                 {shouldShowExplanation && shouldShowAiExplanationDetails && currentQuestion.optionAnalysis ? (
-                  <div className="mt-5 rounded-3xl bg-white/70 p-4 text-sm text-slate-800 ring-1 ring-white/70">
+                  <div className="mt-5 border-t border-slate-200 pt-4 text-sm text-slate-800">
                     <h3 className="text-sm font-semibold text-ink">各選項解析</h3>
-                    <div className="mt-3 space-y-2.5">
+                    <div className="mt-2">
                       {Object.entries(currentQuestion.optionAnalysis).map(([key, value]) => (
                         <div
                           key={key}
-                          className="rounded-2xl border border-slate-200 bg-white px-3 py-3 sm:px-4"
+                          className="border-b border-slate-100 py-3 last:border-b-0"
                         >
                           <div className="flex items-start gap-3">
                             <span className="mt-0.5 inline-flex min-w-8 justify-center rounded-full bg-slate-50 px-2 py-1 text-xs font-semibold text-slate-700 ring-1 ring-slate-200">
@@ -2915,28 +2864,11 @@ export default function QuizPage() {
               </div>
             </div>
           )}
-
-          <div className="rounded-[2rem] bg-white p-4 shadow-card ring-1 ring-slate-100 sm:p-5">
-            <div className="flex flex-col gap-3 sm:flex-row">
-              {session.settings?.mode === "simulation" ? (
-                <div className="flex min-h-12 items-center rounded-2xl bg-slate-50 px-4 py-3 text-sm text-slate-600">
-                  模擬考目前設定：{
-                    feedbackMode === "none"
-                      ? "全程只做題"
-                      : feedbackMode === "answer_only"
-                        ? "每題只看正確答案"
-                        : "每題看正確與詳解"
-                  }
-                </div>
-              ) : null}
-            </div>
-          </div>
         </div>
 
-        <aside className="simulation-status-sidebar h-fit min-w-0 rounded-[2rem] bg-white p-4 shadow-card ring-1 ring-slate-100 sm:p-5 xl:sticky xl:top-6">
-          <h2 className="text-lg font-semibold text-ink">本輪狀態</h2>
-          <div className="mt-4 grid gap-3">
-            {session.settings?.mode === "simulation" ? (
+        {session.settings?.mode === "simulation" ? (
+          <aside className="simulation-status-sidebar h-fit min-w-0 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm sm:p-5 xl:sticky xl:top-6">
+            <div className="grid gap-3">
               <div className="rounded-3xl border border-emerald-100 bg-gradient-to-br from-emerald-50/90 via-white to-sky-50/80 px-4 py-4 text-ink shadow-sm">
                 <div className="flex items-start justify-between gap-3">
                   <div className="min-w-0">
@@ -2971,44 +2903,10 @@ export default function QuizPage() {
                       : "只用來控時，不會自動交卷。"}
                 </p>
               </div>
-            ) : null}
-            <p className="rounded-2xl bg-slate-50 px-4 py-3 text-sm text-slate-700">
-              本輪進度 <span className="font-semibold">{currentIndex + 1} / {targetCount}</span>
-            </p>
-            {session.settings?.mode === "simulation" ? null : (
-              <>
-                <p className="rounded-2xl bg-slate-50 px-4 py-3 text-sm text-slate-700">
-                  目前章節 <span className="font-semibold">{currentQuestion.chapter}</span>
-                </p>
-                <p className="rounded-2xl bg-slate-50 px-4 py-3 text-sm text-slate-700">
-                  目前小節 <span className="font-semibold">{currentQuestion.section}</span>
-                </p>
-                {confidenceTrackingEnabled ? (
-                  <p className="rounded-2xl bg-slate-50 px-4 py-3 text-sm text-slate-700">
-                    目前信心 <span className="font-semibold">{getConfidenceLabel(displayedConfidence)}</span>
-                  </p>
-                ) : null}
-                <p className="rounded-2xl bg-slate-50 px-4 py-3 text-sm text-slate-700">
-                  已答題數 <span className="font-semibold">{answeredCount}</span>
-                </p>
-                <p className="rounded-2xl bg-slate-50 px-4 py-3 text-sm text-slate-700">
-                  本輪模式 <span className="font-semibold">{modeLabel}</span>
-                </p>
-              </>
-            )}
-            {!isBlindSimulation ? (
-              <p className="rounded-2xl bg-slate-50 px-4 py-3 text-sm text-slate-700">
-                暫時答對率{" "}
-                <span className="font-semibold">
-                  {answeredCount === 0 ? 0 : Math.round((correctCount / answeredCount) * 100)}%
-                </span>
-              </p>
-            ) : null}
-          </div>
+            </div>
 
-          {session.settings?.mode === "simulation" ? (
             <div className="mt-5 hidden xl:block">
-              <div className="rounded-[1.6rem] bg-slate-50 p-4">
+              <div className="rounded-xl bg-slate-50 p-4">
                 <p className="text-sm font-semibold text-ink">題號導覽</p>
                 <p className="mt-1 text-xs text-slate-500">可直接跳回前面檢查或修改答案。</p>
                 <SimulationQuestionNavigator
@@ -3020,8 +2918,8 @@ export default function QuizPage() {
                 />
               </div>
             </div>
-          ) : null}
-        </aside>
+          </aside>
+        ) : null}
       </div>
 
       {session.settings?.mode === "simulation" ? (
