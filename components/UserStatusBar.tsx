@@ -480,13 +480,6 @@ export function UserStatusBar() {
                     >
                       聯絡 @yphe_uc
                     </a>
-                    <Link
-                      href="/courses/laozhao-anatomy"
-                      className="app-secondary-course-link"
-                      onClick={() => setNavOpen(false)}
-                    >
-                      老趙解剖學整理預覽
-                    </Link>
                   </section>
                 </div>
               ) : null}

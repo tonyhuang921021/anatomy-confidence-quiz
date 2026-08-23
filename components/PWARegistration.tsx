@@ -12,7 +12,7 @@ async function clearPwaCaches() {
   }
 }
 
-export function PWARegistration({ cleanupOnly = false }: { cleanupOnly?: boolean } = {}) {
+export function PWARegistration() {
   useEffect(() => {
     if (typeof window === "undefined" || !("serviceWorker" in navigator)) {
       return;
@@ -46,7 +46,7 @@ export function PWARegistration({ cleanupOnly = false }: { cleanupOnly?: boolean
     };
     window.addEventListener("load", onLoad);
     return () => window.removeEventListener("load", onLoad);
-  }, [cleanupOnly]);
+  }, []);
 
   return null;
 }
