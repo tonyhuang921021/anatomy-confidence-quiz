@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Check, MessageCircle, Pin, RefreshCw, Send, ThumbsDown, ThumbsUp } from "lucide-react";
 import { useAuth } from "@/components/AuthProvider";
 import { createFeedbackMessage, loadFeedbackMessagesResult, voteFeedbackMessage } from "@/lib/cloudSync";
@@ -157,6 +157,7 @@ export function FeedbackBoard({ showHeading = true }: { showHeading?: boolean })
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
   const [readNotice, setReadNotice] = useState("");
+  const refreshRequestIdRef = useRef(0);
 
   const nickname = useMemo(() => {
     const displayName =
@@ -170,6 +171,9 @@ export function FeedbackBoard({ showHeading = true }: { showHeading?: boolean })
   const refreshMessages = useCallback(async (
     options: { fresh?: boolean; initial?: boolean } = {}
   ) => {
+    const requestId = refreshRequestIdRef.current + 1;
+    refreshRequestIdRef.current = requestId;
+
     if (!configured) {
       setLoading(false);
       return;
@@ -187,6 +191,7 @@ export function FeedbackBoard({ showHeading = true }: { showHeading?: boolean })
 
     try {
       const result = await loadFeedbackMessagesResult(20, { fresh: options.fresh });
+      if (requestId !== refreshRequestIdRef.current) return;
       if (result.messages.length > 0 || !result.degraded) {
         setMessages(result.messages);
         saveCachedFeedbackMessages(result.messages);
@@ -197,10 +202,13 @@ export function FeedbackBoard({ showHeading = true }: { showHeading?: boolean })
           : ""
       );
     } catch (fetchError) {
+      if (requestId !== refreshRequestIdRef.current) return;
       setReadNotice(fetchError instanceof Error ? fetchError.message : "留言稍後更新，先顯示稍早資料。");
     } finally {
-      setLoading(false);
-      setRefreshing(false);
+      if (requestId === refreshRequestIdRef.current) {
+        setLoading(false);
+        setRefreshing(false);
+      }
     }
   }, [configured]);
 
@@ -242,6 +250,7 @@ export function FeedbackBoard({ showHeading = true }: { showHeading?: boolean })
         accessToken: session?.access_token,
         user
       });
+      refreshRequestIdRef.current += 1;
       setMessages((current) => {
         const next = [created, ...current.filter((entry) => entry.id !== created.id)].slice(0, 40);
         saveCachedFeedbackMessages(next);
@@ -270,6 +279,7 @@ export function FeedbackBoard({ showHeading = true }: { showHeading?: boolean })
         user,
         parentId
       });
+      refreshRequestIdRef.current += 1;
       setMessages((current) => {
         const next = current.map((entry) =>
           entry.id === parentId
@@ -374,120 +384,122 @@ export function FeedbackBoard({ showHeading = true }: { showHeading?: boolean })
         <>
           {budget ? <BudgetPinnedMessage budget={budget} /> : null}
 
-          <div className="feedback-composer">
-            <div className="feedback-composer-header">
-              <span className="feedback-avatar" aria-hidden="true">
-                {getFeedbackAuthorInitial(composerLabel)}
-              </span>
-              <div>
-                <p>留下你的想法</p>
-                <span>送出後會直接出現在留言串，不用重複按。</span>
+          <div className="feedback-layout">
+            <div className="feedback-composer">
+              <div className="feedback-composer-header">
+                <span className="feedback-avatar" aria-hidden="true">
+                  {getFeedbackAuthorInitial(composerLabel)}
+                </span>
+                <div>
+                  <p>留下你的想法</p>
+                  <span>送出後會直接出現在留言串，不用重複按。</span>
+                </div>
               </div>
-            </div>
-            {user ? (
-              <div className="feedback-identity" aria-label="留言顯示方式">
-                <button
-                  type="button"
-                  onClick={() => setIsAnonymous(true)}
-                  className={isAnonymous ? "is-selected" : ""}
-                >
-                  <span className="feedback-identity-indicator" aria-hidden="true">
-                    {isAnonymous ? <Check size={14} strokeWidth={2.4} /> : null}
-                  </span>
-                  <span>匿名留言</span>
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setIsAnonymous(false)}
-                  className={!isAnonymous ? "is-selected" : ""}
-                >
-                  <span className="feedback-identity-indicator" aria-hidden="true">
-                    {!isAnonymous ? <Check size={14} strokeWidth={2.4} /> : null}
-                  </span>
-                  <span>用暱稱留言{nickname ? `（${nickname}）` : ""}</span>
-                </button>
-              </div>
-            ) : (
-              <div className="feedback-guest-note">
-                目前未登入，送出後會以匿名顯示。
-              </div>
-            )}
+              {user ? (
+                <div className="feedback-identity" aria-label="留言顯示方式">
+                  <button
+                    type="button"
+                    onClick={() => setIsAnonymous(true)}
+                    className={isAnonymous ? "is-selected" : ""}
+                  >
+                    <span className="feedback-identity-indicator" aria-hidden="true">
+                      {isAnonymous ? <Check size={14} strokeWidth={2.4} /> : null}
+                    </span>
+                    <span>匿名留言</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setIsAnonymous(false)}
+                    className={!isAnonymous ? "is-selected" : ""}
+                  >
+                    <span className="feedback-identity-indicator" aria-hidden="true">
+                      {!isAnonymous ? <Check size={14} strokeWidth={2.4} /> : null}
+                    </span>
+                    <span>用暱稱留言{nickname ? `（${nickname}）` : ""}</span>
+                  </button>
+                </div>
+              ) : (
+                <div className="feedback-guest-note">
+                  目前未登入，送出後會以匿名顯示。
+                </div>
+              )}
 
-            <textarea
-              value={content}
-              onChange={(event) => setContent(event.target.value)}
-              maxLength={1200}
-              placeholder="例如：哪個頁面不夠順、哪種排版不舒服、還想新增什麼功能。"
-              className="feedback-textarea"
-              disabled={submitting}
-              aria-busy={submitting}
-            />
-            <div className="feedback-compose-footer">
-              <p>{content.length} / 1200</p>
-              <button
-                type="button"
-                onClick={() => void handleSubmit()}
-                disabled={submitting || !content.trim()}
-                className="feedback-submit"
-              >
-                <Send size={16} strokeWidth={1.8} aria-hidden="true" />
-                {submitting ? "送出中..." : "送出留言"}
-              </button>
-            </div>
-
-            {message ? (
-              <div
-                className={`feedback-status ${submitting ? "is-pending" : "is-success"}`}
-                aria-live="polite"
-              >
-                {submitting ? (
-                  <RefreshCw className="animate-spin" size={15} strokeWidth={1.8} aria-hidden="true" />
-                ) : null}
-                {message}
-              </div>
-            ) : null}
-            {error ? (
-              <div className="feedback-status is-error" aria-live="assertive">{error}</div>
-            ) : null}
-          </div>
-
-          {readNotice ? (
-            <div className="feedback-status is-warning">
-              {readNotice}
-            </div>
-          ) : null}
-
-          <div className="feedback-list-toolbar">
-            <div>
-              <p>最新留言</p>
-              <span>{messages.length} 則</span>
-            </div>
-            <button
-              type="button"
-              onClick={() => void refreshMessages({ fresh: true })}
-              disabled={refreshing}
-              title="重新整理留言"
-              aria-label="重新整理留言"
-            >
-              <RefreshCw
-                size={17}
-                strokeWidth={1.8}
-                className={refreshing ? "animate-spin" : ""}
-                aria-hidden="true"
+              <textarea
+                value={content}
+                onChange={(event) => setContent(event.target.value)}
+                maxLength={1200}
+                placeholder="例如：哪個頁面不夠順、哪種排版不舒服、還想新增什麼功能。"
+                className="feedback-textarea"
+                disabled={submitting}
+                aria-busy={submitting}
               />
-            </button>
-          </div>
-
-          <div className="feedback-thread">
-            {loading ? (
-              <FeedbackSkeleton />
-            ) : messages.length === 0 ? (
-              <div className="feedback-empty">
-                還沒有留言，你可以成為第一個給建議的人。
+              <div className="feedback-compose-footer">
+                <p>{content.length} / 1200</p>
+                <button
+                  type="button"
+                  onClick={() => void handleSubmit()}
+                  disabled={submitting || !content.trim()}
+                  className="feedback-submit"
+                >
+                  <Send size={16} strokeWidth={1.8} aria-hidden="true" />
+                  {submitting ? "送出中..." : "送出留言"}
+                </button>
               </div>
-            ) : (
-              messages.map((entry) => (
-                <article key={entry.id} className="feedback-entry">
+
+              {message ? (
+                <div
+                  className={`feedback-status ${submitting ? "is-pending" : "is-success"}`}
+                  aria-live="polite"
+                >
+                  {submitting ? (
+                    <RefreshCw className="animate-spin" size={15} strokeWidth={1.8} aria-hidden="true" />
+                  ) : null}
+                  {message}
+                </div>
+              ) : null}
+              {error ? (
+                <div className="feedback-status is-error" aria-live="assertive">{error}</div>
+              ) : null}
+            </div>
+
+            <div className="feedback-stream">
+              {readNotice ? (
+                <div className="feedback-status is-warning">
+                  {readNotice}
+                </div>
+              ) : null}
+
+              <div className="feedback-list-toolbar">
+                <div>
+                  <p>最新留言</p>
+                  <span>{messages.length} 則</span>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => void refreshMessages({ fresh: true })}
+                  disabled={refreshing}
+                  title="重新整理留言"
+                  aria-label="重新整理留言"
+                >
+                  <RefreshCw
+                    size={17}
+                    strokeWidth={1.8}
+                    className={refreshing ? "animate-spin" : ""}
+                    aria-hidden="true"
+                  />
+                </button>
+              </div>
+
+              <div className="feedback-thread">
+                {loading ? (
+                  <FeedbackSkeleton />
+                ) : messages.length === 0 ? (
+                  <div className="feedback-empty">
+                    還沒有留言，你可以成為第一個給建議的人。
+                  </div>
+                ) : (
+                  messages.map((entry) => (
+                    <article key={entry.id} className="feedback-entry">
                   <div className="feedback-entry-head">
                     <div className="feedback-entry-identity">
                       <span className="feedback-avatar" aria-hidden="true">
@@ -578,9 +590,11 @@ export function FeedbackBoard({ showHeading = true }: { showHeading?: boolean })
                       ))}
                     </div>
                   ) : null}
-                </article>
-              ))
-            )}
+                    </article>
+                  ))
+                )}
+              </div>
+            </div>
           </div>
         </>
       )}

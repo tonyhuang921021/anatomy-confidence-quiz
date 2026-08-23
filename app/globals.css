@@ -3852,6 +3852,8 @@ html[data-theme="dark"] .border-slate-100 {
 .feedback-board {
   min-width: 0;
   color: var(--ink-main);
+  container-name: feedback-board;
+  container-type: inline-size;
 }
 
 .quiz-answer-summary {
@@ -4019,10 +4021,34 @@ html[data-theme="dark"] .border-slate-100 {
 .feedback-pinned {
   display: grid;
   grid-template-columns: auto minmax(0, 1fr);
+  align-items: start;
   gap: 0.7rem;
   border: 1px solid color-mix(in srgb, var(--brand-main) 24%, var(--line-soft));
   background: color-mix(in srgb, var(--brand-tint) 52%, var(--surface));
   color: var(--brand-deep);
+}
+
+.feedback-layout {
+  display: grid;
+  min-width: 0;
+  gap: 1.25rem;
+  margin-top: 1.25rem;
+}
+
+@container feedback-board (min-width: 48rem) {
+  .feedback-layout {
+    grid-template-columns: minmax(19rem, 24rem) minmax(0, 1fr);
+    align-items: start;
+    column-gap: clamp(1.25rem, 3vw, 2.5rem);
+  }
+}
+
+.feedback-stream {
+  min-width: 0;
+}
+
+.feedback-stream > .feedback-status:first-child {
+  margin: 0 0 0.7rem;
 }
 
 .feedback-notice,
@@ -4055,9 +4081,8 @@ html[data-theme="dark"] .border-slate-100 {
 }
 
 .feedback-composer {
-  margin-top: 1.25rem;
   border: 1px solid var(--line-soft);
-  border-radius: 12px;
+  border-radius: 10px;
   background: color-mix(in srgb, var(--surface-muted) 70%, var(--surface));
   padding: 1rem;
 }
@@ -4110,7 +4135,9 @@ html[data-theme="dark"] .border-slate-100 {
 }
 
 .feedback-identity {
-  display: inline-flex;
+  display: grid;
+  grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.35fr);
+  width: 100%;
   margin-bottom: 0.85rem;
   border: 1px solid var(--line-soft);
   border-radius: 10px;
@@ -4120,6 +4147,7 @@ html[data-theme="dark"] .border-slate-100 {
 
 .feedback-identity button {
   display: inline-flex;
+  min-width: 0;
   min-height: 38px;
   align-items: center;
   justify-content: center;
@@ -4130,6 +4158,13 @@ html[data-theme="dark"] .border-slate-100 {
   color: var(--ink-soft);
   font-size: 0.76rem;
   font-weight: 600;
+}
+
+.feedback-identity button > span:last-child {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .feedback-identity button.is-selected {
@@ -4220,7 +4255,7 @@ html[data-theme="dark"] .feedback-identity button.is-selected {
   gap: 0;
   max-height: min(56dvh, 42rem);
   overflow-y: auto;
-  border-top: 1px solid var(--line-soft);
+  scrollbar-gutter: stable;
 }
 
 .feedback-entry {
@@ -4239,7 +4274,7 @@ html[data-theme="dark"] .feedback-identity button.is-selected {
   justify-content: space-between;
   gap: 0.75rem;
   border-bottom: 1px solid var(--line-soft);
-  padding: 0 0 0.65rem;
+  padding: 0 0.1rem 0.65rem;
 }
 
 .feedback-list-toolbar > div {
@@ -4420,30 +4455,7 @@ html[data-theme="dark"] .feedback-identity button.is-selected {
 }
 
 @media (min-width: 768px) {
-  .feedback-page-body .feedback-board {
-    display: grid;
-    grid-template-columns: minmax(17rem, 0.78fr) minmax(0, 1.35fr);
-    column-gap: clamp(1.5rem, 4vw, 3rem);
-  }
-
-  .feedback-page-body .feedback-heading,
-  .feedback-page-body .feedback-pinned,
-  .feedback-page-body .feedback-notice,
-  .feedback-page-body .feedback-status.is-warning {
-    grid-column: 1 / -1;
-  }
-
-  .feedback-page-body .feedback-composer {
-    grid-column: 1;
-    align-self: start;
-  }
-
-  .feedback-page-body .feedback-list-toolbar {
-    grid-column: 2;
-  }
-
   .feedback-page-body .feedback-thread {
-    grid-column: 2;
     max-height: none;
     overflow-y: visible;
   }
@@ -5100,29 +5112,7 @@ html[data-theme="dark"] .feedback-identity button.is-selected {
     grid-template-columns: minmax(0, 1fr);
   }
 
-  .home-feedback-board .feedback-board {
-    display: grid;
-    grid-template-columns: minmax(16rem, 0.78fr) minmax(0, 1.25fr);
-    column-gap: clamp(1.25rem, 3vw, 2rem);
-  }
-
-  .home-feedback-board .feedback-pinned,
-  .home-feedback-board .feedback-notice,
-  .home-feedback-board .feedback-status.is-warning {
-    grid-column: 1 / -1;
-  }
-
-  .home-feedback-board .feedback-composer {
-    grid-column: 1;
-    align-self: start;
-  }
-
-  .home-feedback-board .feedback-list-toolbar {
-    grid-column: 2;
-  }
-
   .home-feedback-board .feedback-thread {
-    grid-column: 2;
     max-height: min(58dvh, 38rem);
     padding-right: 0.3rem;
   }
@@ -5209,38 +5199,16 @@ html[data-theme="dark"] .feedback-identity button.is-selected {
 
   .app-feedback-panel .app-modal-content {
     min-height: 0;
-    overflow: hidden;
+    overflow-y: auto;
   }
 
   .app-feedback-panel .feedback-board {
-    display: grid;
     min-height: 0;
-    height: 100%;
-    grid-template-columns: minmax(17rem, 0.82fr) minmax(0, 1.35fr);
-    grid-template-rows: auto auto minmax(0, 1fr);
-    column-gap: 1.6rem;
-  }
-
-  .app-feedback-panel .feedback-heading,
-  .app-feedback-panel .feedback-pinned,
-  .app-feedback-panel .feedback-notice,
-  .app-feedback-panel .feedback-status.is-warning {
-    grid-column: 1 / -1;
-  }
-
-  .app-feedback-panel .feedback-composer {
-    grid-column: 1;
-    grid-row: 3;
-    min-height: 0;
-    overflow-y: auto;
-    align-self: start;
+    height: auto;
   }
 
   .app-feedback-panel .feedback-thread {
-    grid-column: 2;
-    grid-row: 3;
-    min-height: 0;
-    max-height: none;
+    max-height: min(54dvh, 38rem);
     padding-right: 0.25rem;
   }
 }
