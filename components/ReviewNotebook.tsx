@@ -523,7 +523,7 @@ function renderQuestionReview(
   ) : undefined;
 
   return (
-    <div className="mt-4 space-y-3 leading-7">
+    <div className="mt-3 space-y-2.5 leading-7">
       <div className="flex flex-wrap gap-2 text-xs font-semibold">
         {!primaryTag || !primaryTagIncludesSubject(primaryTag, renderedQuestion.subject) ? (
           <span className="rounded-full bg-brand-100 px-3 py-1 text-brand-800">
@@ -532,34 +532,36 @@ function renderQuestionReview(
         ) : null}
         <QuestionPrimaryTagBadge question={renderedQuestion} />
       </div>
-      <div className="flex min-w-0 flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+      <div className="flex min-w-0 flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
         <QuestionStemBlock question={renderedQuestion} className="min-w-0 flex-1" />
         {headerActions}
       </div>
-      <p>
-        <span className="font-semibold">最後錯因：</span>
-        {item.history.latestErrorType ?? "未填"}
-      </p>
-      <div className="space-y-2.5">
+      <div className="space-y-2">
         {getOptionKeys(item).map((key) => (
           <QuestionOptionBlock
             key={`${item.question.id}-${key}`}
             question={renderedQuestion}
             optionKey={key}
-            wrapperClassName="rounded-2xl border border-slate-200 bg-slate-50/90 px-3 py-3 sm:px-4"
+            wrapperClassName="rounded-xl border border-slate-200 bg-slate-50/90 px-3 py-2.5 sm:px-4"
           />
         ))}
       </div>
-      <p>
-        <span className="font-semibold">正確答案：</span>
-        {(renderedQuestion.answerCreditType === "multiple_accepted" ||
-          renderedQuestion.answerCreditType === "multiple_answers") &&
-        renderedQuestion.acceptedAnswers?.length
-          ? `${renderedQuestion.acceptedAnswers.join("/")} 皆可`
-          : renderedQuestion.answerCreditType === "all_credit"
-            ? "本題一律給分"
-            : renderedQuestion.answer}
-      </p>
+      <div className="flex flex-wrap items-baseline justify-between gap-x-6 gap-y-1 border-t border-slate-200 pt-2.5">
+        <p className="shrink-0">
+          <span className="font-semibold">正確答案：</span>
+          {(renderedQuestion.answerCreditType === "multiple_accepted" ||
+            renderedQuestion.answerCreditType === "multiple_answers") &&
+          renderedQuestion.acceptedAnswers?.length
+            ? `${renderedQuestion.acceptedAnswers.join("/")} 皆可`
+            : renderedQuestion.answerCreditType === "all_credit"
+              ? "本題一律給分"
+              : renderedQuestion.answer}
+        </p>
+        <p className="ml-auto min-w-0 text-right text-sm text-slate-600">
+          <span className="font-semibold text-slate-700">最後錯因：</span>
+          {item.history.latestErrorType ?? "未填"}
+        </p>
+      </div>
       <QuestionAiMetadataBadges question={renderedQuestion} />
       <StructuredExplanationText
         text={renderedQuestion.explanation}
@@ -572,14 +574,14 @@ function renderQuestionReview(
         }
       />
       {renderedQuestion.optionAnalysis ? (
-        <div className="space-y-2.5">
+        <div className="space-y-2">
           {getOptionKeysFromQuestion(renderedQuestion).map((key) => {
             const text = renderedQuestion.optionAnalysis?.[key];
             if (!text) return null;
             return (
               <div
                 key={`${renderedQuestion.id}-analysis-${key}`}
-                className="rounded-2xl border border-slate-200 bg-slate-50/90 px-3 py-3 sm:px-4"
+                className="rounded-xl border border-slate-200 bg-slate-50/90 px-3 py-2.5 sm:px-4"
               >
                 <div className="flex items-start gap-3">
                   <span className="mt-0.5 inline-flex min-w-8 justify-center rounded-full bg-white px-2 py-1 text-xs font-semibold text-slate-700 ring-1 ring-slate-200">
@@ -1473,7 +1475,7 @@ export function ReviewNotebook({
                   visibleItems.map((item, index) => (
                     <article
                       key={`${activeCategory}-${item.question.id}`}
-                      className={`rounded-[10px] border p-4 ${
+                      className={`rounded-[10px] border p-3 sm:p-3.5 ${
                         activeCategory === "wrong"
                           ? "border-rose-200 bg-rose-50/60"
                           : activeCategory === "lowConfidence"
@@ -1489,7 +1491,7 @@ export function ReviewNotebook({
                         const isQuestionOpen = openQuestionIds.has(item.question.id);
                         return (
                           <>
-                            <div className="space-y-4">
+                            <div className="space-y-3">
                               {manualEditingEnabled && isManualEditMode ? (
                                 <div className="flex justify-end">
                                   {activeCategory === "resolved" ? (
@@ -1549,7 +1551,7 @@ export function ReviewNotebook({
                                   if (event.currentTarget !== event.target) return;
                                   setQuestionDetailsOpen(item.question.id, event.currentTarget.open);
                                 }}
-                                className="rounded-2xl bg-white p-3.5 text-sm text-slate-700 sm:p-4"
+                                className="rounded-2xl bg-white p-3 text-sm text-slate-700 sm:p-3.5"
                               >
                                 <summary className="cursor-pointer font-semibold text-ink">
                                   查看題目、選項與詳解
