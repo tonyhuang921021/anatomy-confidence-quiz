@@ -25,6 +25,7 @@ import {
 import {
   loadConfirmedQuestionClassificationOverrides,
   clearQuestionExplanationBackgroundCache,
+  loadQuestionCommunityStats,
   recordCustomPaperAttempt,
   pushCurrentSessionToSupabase,
   loadSharedQuestionExplanationOverrides,
@@ -92,6 +93,7 @@ import {
   OptionKey,
   Question,
   QuestionClassificationOverride,
+  QuestionCommunityStats,
   QuestionExplanationOverride,
   QuizSession,
   QuizSettings,
@@ -258,22 +260,6 @@ function shouldRevealAttemptFeedback(session?: QuizSession | null) {
     session?.settings?.mode === "simulation" &&
     getEffectiveFeedbackMode(session.settings) === "none"
   );
-}
-
-function getDifficultyBadge(question: Question) {
-  if (question.difficulty === "basic" || question.difficulty === "easy") {
-    return { text: "易", className: "bg-emerald-100 text-emerald-900" };
-  }
-
-  if (question.difficulty === "medium") {
-    return { text: "普", className: "bg-amber-100 text-amber-900" };
-  }
-
-  if (question.difficulty === "hard") {
-    return { text: "難", className: "bg-rose-100 text-rose-900" };
-  }
-
-  return null;
 }
 
 function getSimulationNavigatorButtonClass(confidenceLevel: ConfidenceLevel | null | undefined, isCurrent: boolean) {
@@ -858,6 +844,7 @@ export default function QuizPage() {
   const confidenceRef = useRef<ConfidenceLevel>(4);
   const restoredQuestionUiKeyRef = useRef<string | null>(null);
   const [submittedAttempt, setSubmittedAttempt] = useState<Attempt | null>(null);
+  const [communityStatsMap, setCommunityStatsMap] = useState<Record<string, QuestionCommunityStats>>({});
   const [errorType, setErrorType] = useState<ErrorType | undefined>();
   const isSavedQuestionReview = isSavedQuestionReviewSettings(session?.settings);
   const savedQuestionRecords = useSavedQuestionRecords(
@@ -1150,13 +1137,18 @@ export default function QuizPage() {
           (!shouldForceNewSession &&
             canReuseExisting &&
             !shouldInvalidateExistingSimulationSession);
+        const completedHistorySessions = loadCompletedHistorySessionsForUser(authSession?.user?.id);
+        const questionOrderHistory =
+          existing && existing.attempts.length > 0 && !existing.completedAt
+            ? [...completedHistorySessions, existing]
+            : completedHistorySessions;
         const nextSession = shouldReuseExisting
           ? existing
           : createSession(
               (savedSettings.subjectFilters?.length ?? 0) > 0
                 ? getQuestionBankBySubjects(savedSettings.subjectFilters ?? [], loadedOverrides)
                 : getQuestionBankBySubjectFilter(savedSettings.subjectFilter ?? "解剖學", loadedOverrides),
-              loadCompletedHistorySessionsForUser(authSession?.user?.id),
+              questionOrderHistory,
               savedSettings,
               loadedOverrides
             );
@@ -1421,6 +1413,34 @@ export default function QuizPage() {
     [session?.attempts]
   );
   const displayedConfidence = submittedAttempt?.confidence ?? confidence;
+  useEffect(() => {
+    if (!submittedAttempt || !currentQuestion) return;
+    if (
+      currentQuestion.sourceType === "AI_GENERATED" ||
+      currentQuestion.source === "ai-generated"
+    ) {
+      return;
+    }
+
+    let cancelled = false;
+    void loadQuestionCommunityStats([currentQuestion.id])
+      .then((stats) => {
+        if (cancelled || stats.length === 0) return;
+        setCommunityStatsMap((current) => {
+          const nextStat = stats[0];
+          if (!nextStat || current[nextStat.questionId] === nextStat) return current;
+          return { ...current, [nextStat.questionId]: nextStat };
+        });
+      })
+      .catch(() => {
+        // Community statistics are supplementary and must never block answering.
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [currentQuestion?.id, submittedAttempt?.questionId]);
+
   useEffect(() => {
     if (!session || !currentQuestion || submittedAttempt) return;
     const restoreKey = `${session.id}:${currentQuestion.id}`;
@@ -2505,10 +2525,10 @@ export default function QuizPage() {
   const isAiGeneratedQuestion =
     currentQuestion.sourceType === "AI_GENERATED" ||
     currentQuestion.source === "ai-generated";
-  const difficultyBadge =
+  const currentCommunityStats =
     submittedAttempt && !isAiGeneratedQuestion
-      ? getDifficultyBadge(currentQuestion)
-      : null;
+      ? communityStatsMap[currentQuestion.id]
+      : undefined;
   const feedbackMode = getEffectiveFeedbackMode(session.settings);
   const isBlindSimulation =
     session.settings?.mode === "simulation" && feedbackMode === "none";
@@ -2695,11 +2715,9 @@ export default function QuizPage() {
                       {flag.text}
                     </span>
                   ) : null}
-                  {difficultyBadge ? (
-                    <span
-                      className={`rounded-full px-3 py-1 text-xs font-semibold ${difficultyBadge.className}`}
-                    >
-                      難度 {difficultyBadge.text}
+                  {currentCommunityStats && currentCommunityStats.totalAttempts > 0 ? (
+                    <span className="rounded-md bg-sky-50 px-2.5 py-1 text-xs font-semibold text-sky-800">
+                      全站答對率 {currentCommunityStats.correctRate}% · {currentCommunityStats.totalAttempts} 次作答
                     </span>
                   ) : null}
                   <div className="ml-auto flex flex-wrap items-center gap-2">

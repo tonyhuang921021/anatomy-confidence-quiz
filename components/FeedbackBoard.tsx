@@ -1,7 +1,7 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
-import { MessageCircle, Pin, Send, ThumbsDown, ThumbsUp } from "lucide-react";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import { MessageCircle, Pin, RefreshCw, Send, ThumbsDown, ThumbsUp } from "lucide-react";
 import { useAuth } from "@/components/AuthProvider";
 import { createFeedbackMessage, loadFeedbackMessagesResult, voteFeedbackMessage } from "@/lib/cloudSync";
 import type { FeedbackMessage, OpenAIBudgetStatus } from "@/types/quiz";
@@ -147,6 +147,7 @@ export function FeedbackBoard({ showHeading = true }: { showHeading?: boolean })
   const [replyContent, setReplyContent] = useState("");
   const [isAnonymous, setIsAnonymous] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [votingMessageId, setVotingMessageId] = useState<string | null>(null);
   const [message, setMessage] = useState("");
@@ -161,40 +162,46 @@ export function FeedbackBoard({ showHeading = true }: { showHeading?: boolean })
     return "";
   }, [user]);
 
-  useEffect(() => {
-    async function fetchMessages() {
-      if (!configured) {
-        setLoading(false);
-        return;
-      }
+  const refreshMessages = useCallback(async (
+    options: { fresh?: boolean; initial?: boolean } = {}
+  ) => {
+    if (!configured) {
+      setLoading(false);
+      return;
+    }
 
+    if (options.initial) {
       const cachedRows = loadCachedFeedbackMessages();
       if (cachedRows.length > 0) {
         setMessages(cachedRows);
         setLoading(false);
         setReadNotice("留言正在更新，先顯示稍早資料。");
       }
-
-      try {
-        const result = await loadFeedbackMessagesResult();
-        if (result.messages.length > 0 || !result.degraded) {
-          setMessages(result.messages);
-          saveCachedFeedbackMessages(result.messages);
-        }
-        setReadNotice(
-          result.degraded
-            ? result.message || (result.stale ? "留言稍後更新，先顯示稍早資料。" : "留言稍後更新。")
-            : ""
-        );
-      } catch (fetchError) {
-        setReadNotice(fetchError instanceof Error ? fetchError.message : "留言稍後更新，先顯示稍早資料。");
-      } finally {
-        setLoading(false);
-      }
     }
+    if (options.fresh) setRefreshing(true);
 
-    void fetchMessages();
+    try {
+      const result = await loadFeedbackMessagesResult(20, { fresh: options.fresh });
+      if (result.messages.length > 0 || !result.degraded) {
+        setMessages(result.messages);
+        saveCachedFeedbackMessages(result.messages);
+      }
+      setReadNotice(
+        result.degraded
+          ? result.message || (result.stale ? "留言稍後更新，先顯示稍早資料。" : "留言稍後更新。")
+          : ""
+      );
+    } catch (fetchError) {
+      setReadNotice(fetchError instanceof Error ? fetchError.message : "留言稍後更新，先顯示稍早資料。");
+    } finally {
+      setLoading(false);
+      setRefreshing(false);
+    }
   }, [configured]);
+
+  useEffect(() => {
+    void refreshMessages({ initial: true });
+  }, [refreshMessages]);
 
   useEffect(() => {
     async function fetchBudget() {
@@ -221,7 +228,7 @@ export function FeedbackBoard({ showHeading = true }: { showHeading?: boolean })
   async function handleSubmit() {
     setSubmitting(true);
     setError("");
-    setMessage("");
+    setMessage("正在確認留言是否已送出…");
 
     try {
       const created = await createFeedbackMessage({
@@ -231,13 +238,14 @@ export function FeedbackBoard({ showHeading = true }: { showHeading?: boolean })
         user
       });
       setMessages((current) => {
-        const next = [created, ...current].slice(0, 40);
+        const next = [created, ...current.filter((entry) => entry.id !== created.id)].slice(0, 40);
         saveCachedFeedbackMessages(next);
         return next;
       });
       setContent("");
       setMessage("留言已送出，謝謝你的建議。");
     } catch (submitError) {
+      setMessage("");
       setError(submitError instanceof Error ? submitError.message : "留言送出失敗");
     } finally {
       setSubmitting(false);
@@ -247,7 +255,7 @@ export function FeedbackBoard({ showHeading = true }: { showHeading?: boolean })
   async function handleReply(parentId: string) {
     setSubmitting(true);
     setError("");
-    setMessage("");
+    setMessage("正在確認回覆是否已送出…");
 
     try {
       const created = await createFeedbackMessage({
@@ -262,7 +270,10 @@ export function FeedbackBoard({ showHeading = true }: { showHeading?: boolean })
           entry.id === parentId
             ? {
                 ...entry,
-                replies: [...(entry.replies ?? []), created]
+                replies: [
+                  ...(entry.replies ?? []).filter((reply) => reply.id !== created.id),
+                  created
+                ]
               }
             : entry
         );
@@ -273,6 +284,7 @@ export function FeedbackBoard({ showHeading = true }: { showHeading?: boolean })
       setReplyTargetId(null);
       setMessage("回覆已送出。");
     } catch (submitError) {
+      setMessage("");
       setError(submitError instanceof Error ? submitError.message : "回覆送出失敗");
     } finally {
       setSubmitting(false);
@@ -346,7 +358,6 @@ export function FeedbackBoard({ showHeading = true }: { showHeading?: boolean })
             <h2>留言板</h2>
             <p>建議、題目問題與網站狀況都可以留在這裡。</p>
           </div>
-          <span className="feedback-count">{messages.length} 則</span>
         </div>
       ) : null}
 
@@ -403,10 +414,15 @@ export function FeedbackBoard({ showHeading = true }: { showHeading?: boolean })
             </div>
 
             {message ? (
-              <div className="feedback-status is-success">{message}</div>
+              <div
+                className={`feedback-status ${submitting ? "is-pending" : "is-success"}`}
+                aria-live="polite"
+              >
+                {message}
+              </div>
             ) : null}
             {error ? (
-              <div className="feedback-status is-error">{error}</div>
+              <div className="feedback-status is-error" aria-live="assertive">{error}</div>
             ) : null}
           </div>
 
@@ -415,6 +431,27 @@ export function FeedbackBoard({ showHeading = true }: { showHeading?: boolean })
               {readNotice}
             </div>
           ) : null}
+
+          <div className="feedback-list-toolbar">
+            <div>
+              <p>最新留言</p>
+              <span>{messages.length} 則</span>
+            </div>
+            <button
+              type="button"
+              onClick={() => void refreshMessages({ fresh: true })}
+              disabled={refreshing}
+              title="重新整理留言"
+              aria-label="重新整理留言"
+            >
+              <RefreshCw
+                size={17}
+                strokeWidth={1.8}
+                className={refreshing ? "animate-spin" : ""}
+                aria-hidden="true"
+              />
+            </button>
+          </div>
 
           <div className="feedback-thread">
             {loading ? (

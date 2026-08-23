@@ -24,6 +24,7 @@ import {
   loadPracticeStopAfterReview,
   loadPracticeYearRange,
   loadCompletedHistorySessionsForUser,
+  loadCurrentSessionForUser,
   savePracticeYearRange,
   saveQuizSettings,
   type PracticeQuestionCount,
@@ -54,7 +55,7 @@ const selectableSubjects = enabledSubjects.filter(
 export default function StartPage() {
   const router = useRouter();
   const { user, syncVersion } = useAuth();
-  useCloudHistoryHydration();
+  const cloudHistoryHydrating = useCloudHistoryHydration();
   const med1Subjects = selectableSubjects.filter((item) => MED1_SUBJECTS.includes(item.subject));
   const med2Subjects = selectableSubjects.filter((item) => MED2_SUBJECTS.includes(item.subject));
   const [selectedSubjects, setSelectedSubjects] = useState<SubjectName[]>([]);
@@ -88,32 +89,40 @@ export default function StartPage() {
   const [practiceQuestionCount, setPracticeQuestionCount] = useState<PracticeQuestionCount>(10);
   const [practiceStopAfterReview, setPracticeStopAfterReview] = useState(false);
   const [attemptedQuestionIds, setAttemptedQuestionIds] = useState<Set<string>>(() => new Set());
+  const [historyOwnerKey, setHistoryOwnerKey] = useState<string | null>(null);
   const [classificationOverrides, setClassificationOverrides] = useState<Record<string, QuestionClassificationOverride>>({});
   const excludeAiGenerated = true;
   const seasonalDeadline = new Date("2026-05-15T09:00:00+08:00");
   const seasonalAvailable = new Date() < seasonalDeadline;
+  const activeHistoryOwnerKey = user?.id ?? "guest";
 
   useEffect(() => {
     const refreshAttemptedQuestionIds = () => {
+      const completedAttempts = loadCompletedHistorySessionsForUser(user?.id)
+        .flatMap((session) => session.attempts ?? []);
+      const currentSession = loadCurrentSessionForUser(activeHistoryOwnerKey);
+      const currentAttempts = currentSession?.completedAt ? [] : currentSession?.attempts ?? [];
       setAttemptedQuestionIds(
         new Set(
-          loadCompletedHistorySessionsForUser(user?.id)
-            .flatMap((session) => session.attempts ?? [])
+          [...completedAttempts, ...currentAttempts]
             .map((attempt) => attempt.questionId)
         )
       );
+      setHistoryOwnerKey(activeHistoryOwnerKey);
     };
 
     refreshAttemptedQuestionIds();
     window.addEventListener("completed-sessions-change", refreshAttemptedQuestionIds);
     window.addEventListener("completed-question-history-change", refreshAttemptedQuestionIds);
+    window.addEventListener("current-session-change", refreshAttemptedQuestionIds);
     window.addEventListener("storage", refreshAttemptedQuestionIds);
     return () => {
       window.removeEventListener("completed-sessions-change", refreshAttemptedQuestionIds);
       window.removeEventListener("completed-question-history-change", refreshAttemptedQuestionIds);
+      window.removeEventListener("current-session-change", refreshAttemptedQuestionIds);
       window.removeEventListener("storage", refreshAttemptedQuestionIds);
     };
-  }, [syncVersion, user?.id]);
+  }, [activeHistoryOwnerKey, syncVersion, user?.id]);
 
   useEffect(() => {
     const accountRange = user
@@ -224,6 +233,8 @@ export default function StartPage() {
     return ids;
   }, [attemptedQuestionIds, availableQuestions]);
   const unattemptedAvailableQuestionCount = unattemptedAvailableQuestionIds.length;
+  const practiceHistoryReady =
+    historyOwnerKey === activeHistoryOwnerKey && !cloudHistoryHydrating;
   const effectiveQuestionCount = practiceStopAfterReview
     ? availableQuestionCount
     : Math.min(practiceQuestionCount, availableQuestionCount);
@@ -502,7 +513,11 @@ export default function StartPage() {
   }
 
   function handleStart() {
-    if ((effectiveSelectedSubjects.length === 0 && !includeSeasonalLimited) || availableQuestionCount === 0) return;
+    if (
+      !practiceHistoryReady ||
+      (effectiveSelectedSubjects.length === 0 && !includeSeasonalLimited) ||
+      availableQuestionCount === 0
+    ) return;
 
     const hasMicrobiologyTrackFilter = selectedMicrobiologyTracks.length > 0;
     const selectedMicrobiologyLabels = getSubjectTrackLabels(MICROBIOLOGY_SUBJECT, selectedMicrobiologyTracks);
@@ -665,15 +680,19 @@ export default function StartPage() {
                 </div>
               </details>
               <span className="hidden h-5 w-px bg-slate-200 sm:block" aria-hidden="true" />
-              <span>
-                已選 <span className="font-semibold text-ink">{effectiveSelectedSubjects.length + (includeSeasonalLimited ? 1 : 0)}</span> 個範圍・
-                共 <span className="font-semibold text-ink">{availableQuestionCount}</span> 題・
-                未做 <span className="font-semibold text-ink">{unattemptedAvailableQuestionCount}</span> 題・
-                優先不重複已做題
-                {practiceStopAfterReview ? "・自由測驗・每題詳解後可結束" : `・每次抽 ${practiceQuestionCount} 題`}
-              </span>
+              {practiceHistoryReady ? (
+                <span>
+                  已選 <span className="font-semibold text-ink">{effectiveSelectedSubjects.length + (includeSeasonalLimited ? 1 : 0)}</span> 個範圍・
+                  共 <span className="font-semibold text-ink">{availableQuestionCount}</span> 題・
+                  未做 <span className="font-semibold text-ink">{unattemptedAvailableQuestionCount}</span> 題・
+                  先出沒做過的題，題池用完後才補最久沒做的題
+                  {practiceStopAfterReview ? "・自由測驗・每題詳解後可結束" : `・每次抽 ${practiceQuestionCount} 題`}
+                </span>
+              ) : (
+                <span className="font-semibold text-brand-800">正在整理完整作答紀錄，完成後即可開始抽題。</span>
+              )}
             </div>
-            {willFillWithSeenQuestions ? (
+            {practiceHistoryReady && willFillWithSeenQuestions ? (
               <p className="text-xs font-semibold text-amber-700">
                 {unattemptedAvailableQuestionCount === 0
                   ? "這個篩選範圍已沒有未做題，接下來會從最久以前做過的題目補題。"
@@ -692,10 +711,14 @@ export default function StartPage() {
             <button
               type="button"
               onClick={handleStart}
-              disabled={(effectiveSelectedSubjects.length === 0 && !includeSeasonalLimited) || availableQuestionCount === 0}
+              disabled={!practiceHistoryReady || (effectiveSelectedSubjects.length === 0 && !includeSeasonalLimited) || availableQuestionCount === 0}
               className="primary-pill disabled:cursor-not-allowed disabled:bg-slate-300"
             >
-              {practiceStopAfterReview ? "開始自由測驗" : `開始 ${effectiveQuestionCount} 題測驗`}
+              {!practiceHistoryReady
+                ? "整理作答紀錄中"
+                : practiceStopAfterReview
+                  ? "開始自由測驗"
+                  : `開始 ${effectiveQuestionCount} 題測驗`}
             </button>
           </div>
         </div>

@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
+import { Play } from "lucide-react";
 import { useAuth } from "@/components/AuthProvider";
 import {
   QuestionOrderModeControl,
@@ -187,7 +188,7 @@ export default function ProgressPage() {
           subject,
           primaryTag: practiceLabel,
           questionOrder,
-          customPoolLabel: `進度區塊：${practiceLabel}`
+          customPoolLabel: `進度章節：${practiceLabel}`
         })
       )
     );
@@ -201,7 +202,7 @@ export default function ProgressPage() {
             <p className="workspace-page-kicker">進度</p>
             <h1 className="workspace-page-title">醫學一／醫學二進度總覽</h1>
             <p className="mt-3 text-slate-500">
-              先看醫學一與醫學二，再往下看各科進度。
+              展開科目即可查看章節／考點、完成度、答對率，並直接開始練習。
             </p>
           </div>
           <div className="workspace-compact-actions">
@@ -306,7 +307,7 @@ export default function ProgressPage() {
                                   ・ 答對率 {subject.totalAttempts > 0 ? `${subject.correctRate}%` : "尚未作答"}
                                 </p>
                                 <p className="mt-1 text-xs font-medium text-brand-700">
-                                  {isSubjectOpen ? "收合區塊" : `查看 ${subject.blocks.length} 個區塊`}
+                                  {isSubjectOpen ? "收合章節／考點" : `展開 ${subject.blocks.length} 個章節／考點`}
                                 </p>
                               </div>
                               <span className={`shrink-0 rounded-full px-3 py-1 text-xs font-semibold ${completionStatusClasses[subject.status]}`}>
@@ -316,8 +317,8 @@ export default function ProgressPage() {
 
                             {isSubjectOpen ? (
                               <div className="border-t border-slate-200 bg-white px-4 pb-2">
-                                <div className="hidden grid-cols-[minmax(0,1fr)_9rem_7rem_7rem_3rem] gap-4 border-b border-slate-100 py-3 text-xs font-semibold text-slate-500 md:grid">
-                                  <span>區塊</span>
+                                <div className="hidden grid-cols-[minmax(0,1fr)_9rem_7rem_7rem_5.5rem] gap-4 border-b border-slate-100 py-3 text-xs font-semibold text-slate-500 md:grid">
+                                  <span>章節／考點</span>
                                   <span>已作答</span>
                                   <span>完成度</span>
                                   <span>答對率</span>
@@ -326,7 +327,7 @@ export default function ProgressPage() {
                                 {subject.blocks.map((block) => (
                                   <div
                                     key={block.key}
-                                    className="grid grid-cols-[minmax(0,1fr)_2.75rem] gap-2 border-b border-slate-100 py-4 last:border-b-0 md:grid-cols-[minmax(0,1fr)_9rem_7rem_7rem_3rem] md:items-center md:gap-4"
+                                    className="grid grid-cols-[minmax(0,1fr)_5rem] gap-2 border-b border-slate-100 py-4 last:border-b-0 md:grid-cols-[minmax(0,1fr)_9rem_7rem_7rem_5.5rem] md:items-center md:gap-4"
                                   >
                                     <p className="min-w-0 font-semibold text-ink">{block.label}</p>
                                     <p className="hidden text-sm text-slate-600 md:block">
@@ -346,11 +347,12 @@ export default function ProgressPage() {
                                     <button
                                       type="button"
                                       onClick={() => startBlockPractice(subject.subject, block)}
-                                      className="col-start-2 row-start-1 flex h-10 w-10 items-center justify-center rounded-full bg-brand-600 text-sm text-white transition hover:bg-brand-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-700 md:col-start-5"
+                                      className="col-start-2 row-start-1 inline-flex min-h-10 items-center justify-center gap-1.5 rounded-lg bg-brand-600 px-3 text-xs font-semibold text-white transition hover:bg-brand-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-700 md:col-start-5"
                                       aria-label={`開始做${subject.label}的${block.label}題目`}
-                                      title="開始做這個區塊"
+                                      title="開始練習這個章節／考點"
                                     >
-                                      <span aria-hidden="true">▶</span>
+                                      <Play size={14} fill="currentColor" aria-hidden="true" />
+                                      練習
                                     </button>
                                   </div>
                                 ))}

@@ -189,6 +189,8 @@ async function getVerifiedUser(supabase: any, accessToken?: string | null): Prom
 }
 
 export async function GET(request: NextRequest) {
+  const fresh = request.nextUrl.searchParams.get("fresh") === "1";
+  const responseCacheHeader = fresh ? "no-store" : FEEDBACK_READ_CACHE_HEADER;
   if (isSupabaseRecoveryMode()) {
     const cached = feedbackReadCache.get(20);
     return NextResponse.json(
@@ -209,7 +211,7 @@ export async function GET(request: NextRequest) {
   if (!supabase) {
     return NextResponse.json(
       { ok: true, messages: [] },
-      { headers: { "Cache-Control": FEEDBACK_READ_CACHE_HEADER } }
+      { headers: { "Cache-Control": responseCacheHeader } }
     );
   }
 
@@ -242,7 +244,7 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json(
       { ok: true, messages, updatedAt },
-      { headers: { "Cache-Control": FEEDBACK_READ_CACHE_HEADER } }
+      { headers: { "Cache-Control": responseCacheHeader } }
     );
   } catch (error) {
     const message = error instanceof Error ? error.message : "留言讀取失敗";
@@ -304,6 +306,38 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ ok: false, message: "目前無法識別留言來源，請稍後再試。" }, { status: 400 });
     }
 
+    const parentId = body?.parentId?.trim() || null;
+    const duplicateSince = new Date(Date.now() - 2 * 60 * 1000).toISOString();
+    try {
+      let duplicateQuery = supabase
+        .from("feedback_messages")
+        .select("id, content, parent_id, display_name, is_anonymous, created_at")
+        .eq(actorColumn, actorValue)
+        .eq("content", content)
+        .gte("created_at", duplicateSince)
+        .order("created_at", { ascending: false })
+        .limit(1);
+      duplicateQuery = parentId
+        ? duplicateQuery.eq("parent_id", parentId)
+        : duplicateQuery.is("parent_id", null);
+
+      const duplicateResult = await withServerTimeout(
+        duplicateQuery,
+        1200,
+        "重複留言確認逾時"
+      );
+      const duplicateRow = (duplicateResult.data ?? [])[0] as FeedbackMessageRow | undefined;
+      if (!duplicateResult.error && duplicateRow) {
+        feedbackReadCache.clear();
+        return NextResponse.json(
+          { ok: true, message: mapFeedbackMessageRow(duplicateRow), deduplicated: true },
+          { headers: { "Cache-Control": "no-store" } }
+        );
+      }
+    } catch {
+      // Duplicate protection is best-effort; a failed check must not block a new message.
+    }
+
     if (!isLoggedIn) {
       const now = Date.now();
       const dayAgo = new Date(now - 24 * 60 * 60 * 1000).toISOString();
@@ -336,7 +370,7 @@ export async function POST(request: NextRequest) {
         .from("feedback_messages")
         .insert({
           content,
-          parent_id: body?.parentId?.trim() || null,
+          parent_id: parentId,
           display_name: displayName,
           is_anonymous: isAnonymous,
           user_id: verifiedUser?.id ?? null,
@@ -350,10 +384,14 @@ export async function POST(request: NextRequest) {
 
     if (error) throw error;
 
-    return NextResponse.json({
-      ok: true,
-      message: mapFeedbackMessageRow(data as FeedbackMessageRow)
-    });
+    feedbackReadCache.clear();
+    return NextResponse.json(
+      {
+        ok: true,
+        message: mapFeedbackMessageRow(data as FeedbackMessageRow)
+      },
+      { headers: { "Cache-Control": "no-store" } }
+    );
   } catch (error) {
     if (error instanceof FeedbackAuthError) {
       return NextResponse.json(

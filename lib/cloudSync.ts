@@ -68,6 +68,7 @@ import {
 } from "@/lib/cloudHistorySync";
 import { normalizeQuestionExplanationOverride } from "@/lib/questionExplanationFormat";
 import {
+  findMatchingRecentFeedbackMessage,
   getFeedbackAuthorizationHeaders,
   getFeedbackIdentityIntent
 } from "@/lib/feedbackAuth";
@@ -4085,7 +4086,10 @@ export async function loadVisitorStats(options: { includeOnline?: boolean } = {}
   return payload.stats;
 }
 
-export async function loadFeedbackMessagesResult(limit = 20): Promise<{
+export async function loadFeedbackMessagesResult(
+  limit = 20,
+  options: { fresh?: boolean } = {}
+): Promise<{
   messages: FeedbackMessage[];
   degraded: boolean;
   stale: boolean;
@@ -4095,7 +4099,11 @@ export async function loadFeedbackMessagesResult(limit = 20): Promise<{
     return { messages: [], degraded: true, stale: false, message: "留言板暫時維護中。" };
   }
 
-  const response = await fetch(`/api/feedback?limit=${encodeURIComponent(String(limit))}`);
+  const freshQuery = options.fresh ? `&fresh=1&ts=${Date.now()}` : "";
+  const response = await fetch(
+    `/api/feedback?limit=${encodeURIComponent(String(limit))}${freshQuery}`,
+    options.fresh ? { cache: "no-store" } : undefined
+  );
   const payload = (await response.json().catch(() => null)) as
     | { ok?: boolean; degraded?: boolean; stale?: boolean; message?: string; messages?: FeedbackMessage[] }
     | null;
@@ -4115,6 +4123,29 @@ export async function loadFeedbackMessagesResult(limit = 20): Promise<{
 export async function loadFeedbackMessages(limit = 20): Promise<FeedbackMessage[]> {
   const result = await loadFeedbackMessagesResult(limit);
   return result.messages;
+}
+
+async function confirmRecentlyCreatedFeedbackMessage(input: {
+  content: string;
+  parentId?: string | null;
+  startedAt: number;
+}) {
+  for (const delayMs of [300, 900, 1500]) {
+    await new Promise((resolve) => window.setTimeout(resolve, delayMs));
+    try {
+      const result = await loadFeedbackMessagesResult(40, { fresh: true });
+      const match = findMatchingRecentFeedbackMessage(result.messages, {
+        content: input.content,
+        parentId: input.parentId,
+        createdAfter: input.startedAt - 5_000
+      });
+      if (match) return match;
+    } catch {
+      // A later retry may observe the committed row after the timed-out request finishes.
+    }
+  }
+
+  return null;
 }
 
 export async function createFeedbackMessage(input: {
@@ -4145,18 +4176,30 @@ export async function createFeedbackMessage(input: {
     throw new Error("登入狀態正在刷新，這則留言尚未送出，請稍後再試。");
   }
   const accessToken = identityIntent === "authenticated" ? input.accessToken : null;
+  const startedAt = Date.now();
+  let response: Response;
 
-  const response = await postFeedbackRequest(
-    "/api/feedback",
-    {
-      visitorId: getVisitorId(),
+  try {
+    response = await postFeedbackRequest(
+      "/api/feedback",
+      {
+        visitorId: getVisitorId(),
+        content,
+        isAnonymous: input.isAnonymous,
+        parentId: input.parentId ?? null
+      },
+      accessToken,
+      "留言送出逾時"
+    );
+  } catch {
+    const confirmed = await confirmRecentlyCreatedFeedbackMessage({
       content,
-      isAnonymous: input.isAnonymous,
-      parentId: input.parentId ?? null
-    },
-    accessToken,
-    "留言送出逾時，請稍後再試。"
-  );
+      parentId: input.parentId,
+      startedAt
+    });
+    if (confirmed) return confirmed;
+    throw new Error("留言送出狀態尚未確認，內容已保留；請先重新整理留言，不用再次送出。");
+  }
 
   const payload = (await response.json().catch(() => null)) as
     | {
@@ -4166,6 +4209,14 @@ export async function createFeedbackMessage(input: {
     | null;
 
   if (!response.ok || !payload?.ok || !payload.message || typeof payload.message === "string") {
+    if (response.status >= 500) {
+      const confirmed = await confirmRecentlyCreatedFeedbackMessage({
+        content,
+        parentId: input.parentId,
+        startedAt
+      });
+      if (confirmed) return confirmed;
+    }
     throw new Error(
       typeof payload?.message === "string" ? payload.message : "留言送出失敗"
     );
