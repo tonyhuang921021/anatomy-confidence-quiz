@@ -54,6 +54,22 @@ function getServiceSupabaseClient() {
   });
 }
 
+function getPublicStatsSupabaseClient() {
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const anonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+
+  if (!url || !anonKey) {
+    return null;
+  }
+
+  return createClient(url, anonKey, {
+    auth: {
+      persistSession: false,
+      autoRefreshToken: false
+    }
+  });
+}
+
 function getKind(value: string | null): BackgroundDataKind | null {
   if (value === "stats" || value === "explanations" || value === "classifications") {
     return value;
@@ -105,7 +121,9 @@ export async function GET(request: NextRequest) {
     return jsonWithCache(emptyPayload(kind), kind);
   }
 
-  const supabase = getServiceSupabaseClient();
+  const serviceSupabase = getServiceSupabaseClient();
+  // Public correctness stats already have read-only RLS; keep every other dataset service-only.
+  const supabase = serviceSupabase ?? (kind === "stats" ? getPublicStatsSupabaseClient() : null);
   if (!supabase) {
     return jsonNoStore(emptyPayload(kind), kind);
   }
