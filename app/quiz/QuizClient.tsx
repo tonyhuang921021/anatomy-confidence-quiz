@@ -2,6 +2,7 @@
 
 import dynamic from "next/dynamic";
 import Link from "next/link";
+import { CheckCircle2, XCircle } from "lucide-react";
 import { memo, useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/components/AuthProvider";
@@ -2699,28 +2700,57 @@ export default function QuizPage() {
             </>
           ) : (
             <div className="space-y-4">
-              <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm sm:p-5">
-                <div className="flex flex-wrap items-center gap-3">
-                  <span
-                    className={`rounded-md px-2.5 py-1 text-sm font-bold ${
-                      submittedAttempt.isCorrect
-                        ? "bg-emerald-100 text-emerald-800"
-                        : "bg-rose-100 text-rose-800"
-                    }`}
-                  >
-                    {submittedAttempt.isCorrect ? "答對" : "答錯"}
-                  </span>
-                  {flag ? (
-                    <span className={`rounded-full px-3 py-1 text-xs font-semibold ${flag.style}`}>
-                      {flag.text}
+              <div
+                className={`overflow-hidden rounded-2xl border bg-white shadow-sm ${
+                  submittedAttempt.isCorrect ? "border-emerald-200" : "border-rose-200"
+                }`}
+              >
+                <div
+                  className={`quiz-answer-summary ${
+                    submittedAttempt.isCorrect ? "is-correct" : "is-incorrect"
+                  }`}
+                  role="status"
+                  aria-live="polite"
+                >
+                  <div className="quiz-answer-status">
+                    <span className="quiz-answer-status-icon" aria-hidden="true">
+                      {submittedAttempt.isCorrect ? (
+                        <CheckCircle2 size={24} strokeWidth={2.2} />
+                      ) : (
+                        <XCircle size={24} strokeWidth={2.2} />
+                      )}
                     </span>
-                  ) : null}
-                  {currentCommunityStats && currentCommunityStats.totalAttempts > 0 ? (
-                    <span className="rounded-md bg-sky-50 px-2.5 py-1 text-xs font-semibold text-sky-800">
-                      全站答對率 {currentCommunityStats.correctRate}% · {currentCommunityStats.totalAttempts} 次作答
-                    </span>
-                  ) : null}
-                  <div className="ml-auto flex flex-wrap items-center gap-2">
+                    <div className="min-w-0">
+                      <p className="quiz-answer-status-title">
+                        {submittedAttempt.isCorrect ? "答對" : "答錯"}
+                      </p>
+                      {shouldShowCorrectAnswer && !submittedAttempt.isCorrect ? (
+                        <p className="quiz-answer-status-detail">
+                          正確答案
+                          <strong>
+                            {(currentQuestion.answerCreditType === "multiple_accepted" ||
+                              currentQuestion.answerCreditType === "multiple_answers") &&
+                            currentQuestion.acceptedAnswers?.length
+                              ? ` ${currentQuestion.acceptedAnswers.join("/")} 皆可`
+                              : ` ${submittedAttempt.correctAnswer}`}
+                          </strong>
+                        </p>
+                      ) : null}
+                    </div>
+                  </div>
+                  <div className="quiz-answer-summary-meta">
+                    {flag ? (
+                      <span className={`rounded-full px-3 py-1 text-xs font-semibold ${flag.style}`}>
+                        {flag.text}
+                      </span>
+                    ) : null}
+                    {currentCommunityStats && currentCommunityStats.totalAttempts > 0 ? (
+                      <span className="quiz-answer-community-stat">
+                        全站答對率 {currentCommunityStats.correctRate}% · {currentCommunityStats.totalAttempts} 次作答
+                      </span>
+                    ) : null}
+                  </div>
+                  <div className="quiz-answer-summary-actions">
                     <SavedQuestionButton questionId={currentQuestion.id} source="quiz" />
                     <CopyQuestionPromptButton
                       question={currentQuestion}
@@ -2730,19 +2760,7 @@ export default function QuizPage() {
                     />
                   </div>
                 </div>
-                <div className="mt-4 space-y-3 text-sm leading-7 text-slate-700">
-                  {shouldShowCorrectAnswer && !submittedAttempt.isCorrect ? (
-                    <p>
-                      正確答案：
-                      <span className="font-semibold">
-                        {(currentQuestion.answerCreditType === "multiple_accepted" ||
-                          currentQuestion.answerCreditType === "multiple_answers") &&
-                        currentQuestion.acceptedAnswers?.length
-                          ? `${currentQuestion.acceptedAnswers.join("/")} 皆可`
-                          : submittedAttempt.correctAnswer}
-                      </span>
-                    </p>
-                  ) : null}
+                <div className="space-y-3 p-4 text-sm leading-7 text-slate-700 sm:p-5">
                   {shouldShowExplanation ? (
                     <>
                       <QuestionAiMetadataBadges
@@ -2817,34 +2835,33 @@ export default function QuizPage() {
                       儲存題目進度：答對 {currentSavedQuestionRecord?.correctCount ?? 0} / 2
                     </p>
                   ) : null}
-                </div>
-
-                {shouldShowExplanation && shouldShowAiExplanationDetails && currentQuestion.optionAnalysis ? (
-                  <div className="mt-5 border-t border-slate-200 pt-4 text-sm text-slate-800">
-                    <h3 className="text-sm font-semibold text-ink">各選項解析</h3>
-                    <div className="mt-2">
-                      {Object.entries(currentQuestion.optionAnalysis).map(([key, value]) => (
-                        <div
-                          key={key}
-                          className="border-b border-slate-100 py-3 last:border-b-0"
-                        >
-                          <div className="flex items-start gap-3">
-                            <span className="mt-0.5 inline-flex min-w-8 justify-center rounded-full bg-slate-50 px-2 py-1 text-xs font-semibold text-slate-700 ring-1 ring-slate-200">
-                              {key}
-                            </span>
-                            <p className="min-w-0 flex-1 text-sm leading-6 text-slate-700 sm:text-[15px] sm:leading-7">
-                              {value}
-                            </p>
+                  {shouldShowExplanation && shouldShowAiExplanationDetails && currentQuestion.optionAnalysis ? (
+                    <div className="border-t border-slate-200 pt-4 text-sm text-slate-800">
+                      <h3 className="text-sm font-semibold text-ink">各選項解析</h3>
+                      <div className="mt-2">
+                        {Object.entries(currentQuestion.optionAnalysis).map(([key, value]) => (
+                          <div
+                            key={key}
+                            className="border-b border-slate-100 py-3 last:border-b-0"
+                          >
+                            <div className="flex items-start gap-3">
+                              <span className="mt-0.5 inline-flex min-w-8 justify-center rounded-full bg-slate-50 px-2 py-1 text-xs font-semibold text-slate-700 ring-1 ring-slate-200">
+                                {key}
+                              </span>
+                              <p className="min-w-0 flex-1 text-sm leading-6 text-slate-700 sm:text-[15px] sm:leading-7">
+                                {value}
+                              </p>
+                            </div>
                           </div>
-                        </div>
-                      ))}
+                        ))}
+                      </div>
                     </div>
-                  </div>
-                ) : null}
+                  ) : null}
 
-                {shouldShowExplanation && currentExplanationError ? (
-                  <p className="mt-3 text-sm font-medium text-rose-700">{currentExplanationError}</p>
-                ) : null}
+                  {shouldShowExplanation && currentExplanationError ? (
+                    <p className="text-sm font-medium text-rose-700">{currentExplanationError}</p>
+                  ) : null}
+                </div>
               </div>
 
               {confidenceTrackingEnabled ? (

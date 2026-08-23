@@ -68,7 +68,6 @@ import {
 } from "@/lib/cloudHistorySync";
 import { normalizeQuestionExplanationOverride } from "@/lib/questionExplanationFormat";
 import {
-  findMatchingRecentFeedbackMessage,
   getFeedbackAuthorizationHeaders,
   getFeedbackIdentityIntent
 } from "@/lib/feedbackAuth";
@@ -4125,29 +4124,6 @@ export async function loadFeedbackMessages(limit = 20): Promise<FeedbackMessage[
   return result.messages;
 }
 
-async function confirmRecentlyCreatedFeedbackMessage(input: {
-  content: string;
-  parentId?: string | null;
-  startedAt: number;
-}) {
-  for (const delayMs of [300, 900, 1500]) {
-    await new Promise((resolve) => window.setTimeout(resolve, delayMs));
-    try {
-      const result = await loadFeedbackMessagesResult(40, { fresh: true });
-      const match = findMatchingRecentFeedbackMessage(result.messages, {
-        content: input.content,
-        parentId: input.parentId,
-        createdAfter: input.startedAt - 5_000
-      });
-      if (match) return match;
-    } catch {
-      // A later retry may observe the committed row after the timed-out request finishes.
-    }
-  }
-
-  return null;
-}
-
 export async function createFeedbackMessage(input: {
   content: string;
   isAnonymous: boolean;
@@ -4176,7 +4152,6 @@ export async function createFeedbackMessage(input: {
     throw new Error("登入狀態正在刷新，這則留言尚未送出，請稍後再試。");
   }
   const accessToken = identityIntent === "authenticated" ? input.accessToken : null;
-  const startedAt = Date.now();
   let response: Response;
 
   try {
@@ -4192,13 +4167,7 @@ export async function createFeedbackMessage(input: {
       "留言送出逾時"
     );
   } catch {
-    const confirmed = await confirmRecentlyCreatedFeedbackMessage({
-      content,
-      parentId: input.parentId,
-      startedAt
-    });
-    if (confirmed) return confirmed;
-    throw new Error("留言送出狀態尚未確認，內容已保留；請先重新整理留言，不用再次送出。");
+    throw new Error("留言送出逾時，內容仍保留在輸入框；請先重新整理留言，不用再次送出。");
   }
 
   const payload = (await response.json().catch(() => null)) as
@@ -4209,14 +4178,6 @@ export async function createFeedbackMessage(input: {
     | null;
 
   if (!response.ok || !payload?.ok || !payload.message || typeof payload.message === "string") {
-    if (response.status >= 500) {
-      const confirmed = await confirmRecentlyCreatedFeedbackMessage({
-        content,
-        parentId: input.parentId,
-        startedAt
-      });
-      if (confirmed) return confirmed;
-    }
     throw new Error(
       typeof payload?.message === "string" ? payload.message : "留言送出失敗"
     );

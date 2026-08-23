@@ -73,6 +73,20 @@ test("隨機刷題快完成時，剩下的未做題要先全部排進下一輪",
   }
 });
 
+test("未做題用完後，做過的題目依距離上次作答最久者先補入", () => {
+  const questions = Array.from({ length: 5 }, (_, index) => makeQuestion(`q-${index + 1}`));
+  const order = createQuestionOrder(
+    questions,
+    [{ attempts: questions.slice(0, 4).map((question, index) => makeAttempt(question.id, index)) }],
+    {
+      ...baseSettings,
+      questionCount: 3
+    }
+  );
+
+  assert.deepEqual(order, ["q-5", "q-1", "q-2"]);
+});
+
 test("弱點補強快完成時，也要先抓未做題再用舊題補滿", () => {
   const questions = Array.from({ length: 20 }, (_, index) => makeQuestion(`q-${index + 1}`));
   const attemptedIds = questions.slice(0, 13).map((question) => question.id);

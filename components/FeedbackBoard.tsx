@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { MessageCircle, Pin, RefreshCw, Send, ThumbsDown, ThumbsUp } from "lucide-react";
+import { Check, MessageCircle, Pin, RefreshCw, Send, ThumbsDown, ThumbsUp } from "lucide-react";
 import { useAuth } from "@/components/AuthProvider";
 import { createFeedbackMessage, loadFeedbackMessagesResult, voteFeedbackMessage } from "@/lib/cloudSync";
 import type { FeedbackMessage, OpenAIBudgetStatus } from "@/types/quiz";
@@ -138,6 +138,10 @@ function getFeedbackAuthorLabel(entry: FeedbackMessage) {
   return entry.isAnonymous ? "匿名使用者" : "已登入使用者";
 }
 
+function getFeedbackAuthorInitial(label: string) {
+  return Array.from(label.trim())[0]?.toUpperCase() ?? "匿";
+}
+
 export function FeedbackBoard({ showHeading = true }: { showHeading?: boolean }) {
   const { configured, session, user } = useAuth();
   const [messages, setMessages] = useState<FeedbackMessage[]>([]);
@@ -161,6 +165,7 @@ export function FeedbackBoard({ showHeading = true }: { showHeading?: boolean })
     if (user?.email) return user.email.split("@")[0].slice(0, 24);
     return "";
   }, [user]);
+  const composerLabel = user && !isAnonymous ? nickname || "已登入使用者" : "匿名使用者";
 
   const refreshMessages = useCallback(async (
     options: { fresh?: boolean; initial?: boolean } = {}
@@ -228,7 +233,7 @@ export function FeedbackBoard({ showHeading = true }: { showHeading?: boolean })
   async function handleSubmit() {
     setSubmitting(true);
     setError("");
-    setMessage("正在確認留言是否已送出…");
+    setMessage("留言送出中…");
 
     try {
       const created = await createFeedbackMessage({
@@ -255,7 +260,7 @@ export function FeedbackBoard({ showHeading = true }: { showHeading?: boolean })
   async function handleReply(parentId: string) {
     setSubmitting(true);
     setError("");
-    setMessage("正在確認回覆是否已送出…");
+    setMessage("回覆送出中…");
 
     try {
       const created = await createFeedbackMessage({
@@ -370,6 +375,15 @@ export function FeedbackBoard({ showHeading = true }: { showHeading?: boolean })
           {budget ? <BudgetPinnedMessage budget={budget} /> : null}
 
           <div className="feedback-composer">
+            <div className="feedback-composer-header">
+              <span className="feedback-avatar" aria-hidden="true">
+                {getFeedbackAuthorInitial(composerLabel)}
+              </span>
+              <div>
+                <p>留下你的想法</p>
+                <span>送出後會直接出現在留言串，不用重複按。</span>
+              </div>
+            </div>
             {user ? (
               <div className="feedback-identity" aria-label="留言顯示方式">
                 <button
@@ -377,14 +391,20 @@ export function FeedbackBoard({ showHeading = true }: { showHeading?: boolean })
                   onClick={() => setIsAnonymous(true)}
                   className={isAnonymous ? "is-selected" : ""}
                 >
-                  匿名留言
+                  <span className="feedback-identity-indicator" aria-hidden="true">
+                    {isAnonymous ? <Check size={14} strokeWidth={2.4} /> : null}
+                  </span>
+                  <span>匿名留言</span>
                 </button>
                 <button
                   type="button"
                   onClick={() => setIsAnonymous(false)}
                   className={!isAnonymous ? "is-selected" : ""}
                 >
-                  用暱稱留言{nickname ? `（${nickname}）` : ""}
+                  <span className="feedback-identity-indicator" aria-hidden="true">
+                    {!isAnonymous ? <Check size={14} strokeWidth={2.4} /> : null}
+                  </span>
+                  <span>用暱稱留言{nickname ? `（${nickname}）` : ""}</span>
                 </button>
               </div>
             ) : (
@@ -399,6 +419,8 @@ export function FeedbackBoard({ showHeading = true }: { showHeading?: boolean })
               maxLength={1200}
               placeholder="例如：哪個頁面不夠順、哪種排版不舒服、還想新增什麼功能。"
               className="feedback-textarea"
+              disabled={submitting}
+              aria-busy={submitting}
             />
             <div className="feedback-compose-footer">
               <p>{content.length} / 1200</p>
@@ -418,6 +440,9 @@ export function FeedbackBoard({ showHeading = true }: { showHeading?: boolean })
                 className={`feedback-status ${submitting ? "is-pending" : "is-success"}`}
                 aria-live="polite"
               >
+                {submitting ? (
+                  <RefreshCw className="animate-spin" size={15} strokeWidth={1.8} aria-hidden="true" />
+                ) : null}
                 {message}
               </div>
             ) : null}
@@ -464,11 +489,16 @@ export function FeedbackBoard({ showHeading = true }: { showHeading?: boolean })
               messages.map((entry) => (
                 <article key={entry.id} className="feedback-entry">
                   <div className="feedback-entry-head">
-                    <div>
-                      <p className="feedback-author">
-                        {getFeedbackAuthorLabel(entry)}
-                      </p>
-                      <p className="feedback-time">{formatCreatedAt(entry.createdAt)}</p>
+                    <div className="feedback-entry-identity">
+                      <span className="feedback-avatar" aria-hidden="true">
+                        {getFeedbackAuthorInitial(getFeedbackAuthorLabel(entry))}
+                      </span>
+                      <div>
+                        <p className="feedback-author">
+                          {getFeedbackAuthorLabel(entry)}
+                        </p>
+                        <p className="feedback-time">{formatCreatedAt(entry.createdAt)}</p>
+                      </div>
                     </div>
                   </div>
                   <p className="feedback-content">{entry.content}</p>
@@ -502,6 +532,8 @@ export function FeedbackBoard({ showHeading = true }: { showHeading?: boolean })
                         maxLength={800}
                         placeholder="回覆這則留言..."
                         className="feedback-textarea feedback-reply-textarea"
+                        disabled={submitting}
+                        aria-busy={submitting}
                       />
                       <div className="feedback-compose-footer">
                         <p>{replyContent.length} / 800</p>
@@ -521,10 +553,17 @@ export function FeedbackBoard({ showHeading = true }: { showHeading?: boolean })
                     <div className="feedback-replies">
                       {entry.replies?.map((reply) => (
                         <div key={reply.id} className="feedback-reply">
-                          <p className="feedback-author">
-                            {getFeedbackAuthorLabel(reply)}
-                          </p>
-                          <p className="feedback-time">{formatCreatedAt(reply.createdAt)}</p>
+                          <div className="feedback-entry-identity">
+                            <span className="feedback-avatar is-reply" aria-hidden="true">
+                              {getFeedbackAuthorInitial(getFeedbackAuthorLabel(reply))}
+                            </span>
+                            <div>
+                              <p className="feedback-author">
+                                {getFeedbackAuthorLabel(reply)}
+                              </p>
+                              <p className="feedback-time">{formatCreatedAt(reply.createdAt)}</p>
+                            </div>
+                          </div>
                           <p className="feedback-content">
                             {reply.content}
                           </p>

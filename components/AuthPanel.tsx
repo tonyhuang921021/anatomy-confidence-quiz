@@ -3,6 +3,7 @@
 import Link from "next/link";
 import type { ReactNode } from "react";
 import { useEffect, useMemo, useState } from "react";
+import { Check } from "lucide-react";
 import { useAuth } from "@/components/AuthProvider";
 import { getSyncStatusText } from "@/components/syncStatusText";
 import { updateLeaderboardDisplayName } from "@/lib/cloudSync";
@@ -158,7 +159,10 @@ function PreferenceChoice({
       aria-pressed={selected}
       onClick={onClick}
     >
-      {children}
+      <span className="account-preference-choice-indicator" aria-hidden="true">
+        {selected ? <Check size={14} strokeWidth={2.4} /> : null}
+      </span>
+      <span>{children}</span>
     </button>
   );
 }
