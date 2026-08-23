@@ -15,6 +15,7 @@ import {
   loadRecentCompletedSessionHandoffForUser,
   loadQuestionExplanationOverride,
   loadCurrentSession,
+  loadCurrentSessionForUser,
   mergeCompletedQuestionHistoryEntries,
   mergeQuestionExplanationOverrides,
   queuePendingCompletedSessionUploadForUser,
@@ -247,6 +248,100 @@ test("儲存較短完成回合清單時，也不縮掉既有作答紀錄清單",
 
   assert.ok(loadedSessionIds.has("existing-session"));
   assert.ok(loadedSessionIds.has("new-session"));
+});
+
+test("同一回合較新的短副本不可覆蓋較早的完整作答紀錄", () => {
+  installBrowserStorage();
+  const userId = "user-same-session-fuller-local";
+  const fullSession = makeSession(
+    "same-session",
+    Array.from({ length: 100 }, (_, index) => `q-${index + 1}`)
+  );
+  const shorterCloudSession = {
+    ...makeSession(
+      "user-user-same-session-fuller-local:same-session",
+      Array.from({ length: 6 }, (_, index) => `q-${index + 1}`)
+    ),
+    completedAt: new Date(Date.UTC(2026, 0, 3)).toISOString()
+  };
+
+  setActiveStorageUser(userId);
+  saveCompletedSessionsForUser(userId, [fullSession]);
+  saveCloudCompletedSessionsForUser(userId, [shorterCloudSession]);
+
+  const loaded = loadCompletedSessionsForUser(userId, {
+    includeFullLocalHistory: true
+  });
+  const restored = loaded.find(
+    (session) => session.id.endsWith("same-session")
+  );
+
+  assert.ok(restored);
+  assert.equal(restored.attempts.length, 100);
+  assert.equal(restored.questionOrder?.length, 100);
+  assert.equal(restored.settings?.questionCount, 100);
+});
+
+test("同一回合不同副本的題目要取聯集，不可依最後寫入順序遺失", () => {
+  installBrowserStorage();
+  const userId = "user-same-session-union";
+  const firstCopy = makeSession("union-session", ["q-1", "q-2"]);
+  const secondCopy = {
+    ...makeSession("user-user-same-session-union:union-session", ["q-2", "q-3"]),
+    completedAt: new Date(Date.UTC(2026, 0, 4)).toISOString()
+  };
+
+  setActiveStorageUser(userId);
+  saveCompletedSessionsForUser(userId, [firstCopy]);
+  saveCloudCompletedSessionsForUser(userId, [secondCopy]);
+
+  const loaded = loadCompletedSessionsForUser(userId, {
+    includeFullLocalHistory: true
+  });
+  const restored = loaded.find((session) => session.id.endsWith("union-session"));
+  const restoredQuestionIds = new Set(
+    restored?.attempts.map((attempt) => attempt.questionId)
+  );
+
+  assert.ok(restored);
+  assert.equal(restored.attempts.length, 3);
+  assert.deepEqual(restoredQuestionIds, new Set(["q-1", "q-2", "q-3"]));
+});
+
+test("同一回合同題改答案時保留較新的答案，但不能縮掉其他題", () => {
+  installBrowserStorage();
+  const userId = "user-same-session-newer-answer";
+  const fullSession = makeSession("answer-session", ["q-1", "q-2"]);
+  const changedAttempt = {
+    ...makeAttempt("q-1", 10),
+    selectedAnswer: "B" as const,
+    isCorrect: false,
+    confidence: 2 as const,
+    errorType: "兩選項猶豫" as const
+  };
+  const newerCopy: QuizSession = {
+    ...makeSession("user-user-same-session-newer-answer:answer-session", ["q-1"]),
+    completedAt: new Date(Date.UTC(2026, 0, 5)).toISOString(),
+    attempts: [changedAttempt]
+  };
+
+  setActiveStorageUser(userId);
+  saveCompletedSessionsForUser(userId, [fullSession]);
+  saveCloudCompletedSessionsForUser(userId, [newerCopy]);
+
+  const restored = loadCompletedSessionsForUser(userId, {
+    includeFullLocalHistory: true
+  }).find((session) => session.id.endsWith("answer-session"));
+  const updatedAttempt = restored?.attempts.find(
+    (attempt) => attempt.questionId === "q-1"
+  );
+
+  assert.ok(restored);
+  assert.equal(restored.attempts.length, 2);
+  assert.equal(updatedAttempt?.selectedAnswer, "B");
+  assert.equal(updatedAttempt?.isCorrect, false);
+  assert.equal(updatedAttempt?.confidence, 2);
+  assert.equal(updatedAttempt?.errorType, "兩選項猶豫");
 });
 
 test("跨分頁 storage 事件要清掉完成回合記憶體快取", () => {
@@ -740,4 +835,65 @@ test("current session 無法寫入任何瀏覽器儲存時要回報失敗", () =
 
   assert.equal(saveCurrentSession(activeSession), false);
   assert.equal(loadCurrentSession(), null);
+});
+
+test("目前測驗同時存在本機與分頁副本時，較新的短副本不能縮掉完整進度", () => {
+  const { localStorage, sessionStorage } = installBrowserStorage();
+  const userId = "user-current-copy-merge";
+  const storageKey = `anatomy-confidence-current-session:${userId}`;
+  const fullSession: QuizSession = {
+    ...makeSession(
+      "current-copy-session",
+      Array.from({ length: 20 }, (_, index) => `q-${index + 1}`)
+    ),
+    completedAt: undefined,
+    attempts: Array.from({ length: 13 }, (_, index) =>
+      makeAttempt(`q-${index + 1}`, index + 1)
+    ),
+    currentQuestionIndex: 13
+  };
+  const shorterSession: QuizSession = {
+    ...fullSession,
+    attempts: Array.from({ length: 6 }, (_, index) => ({
+      ...makeAttempt(`q-${index + 1}`, index + 20),
+      answeredAt: new Date(Date.UTC(2026, 1, index + 1)).toISOString()
+    })),
+    currentQuestionIndex: 6
+  };
+
+  localStorage.setItem(storageKey, JSON.stringify(fullSession));
+  sessionStorage.setItem(storageKey, JSON.stringify(shorterSession));
+
+  const restored = loadCurrentSessionForUser(userId);
+
+  assert.ok(restored);
+  assert.equal(restored.attempts.length, 13);
+  assert.equal(restored.currentQuestionIndex, 13);
+});
+
+test("目前測驗儲存出現不同 session 時，仍以最後真正活動的測驗為準", () => {
+  const { localStorage, sessionStorage } = installBrowserStorage();
+  const userId = "user-current-different-session";
+  const storageKey = `anatomy-confidence-current-session:${userId}`;
+  const olderLargeSession: QuizSession = {
+    ...makeSession("older-large-session", ["old-1", "old-2", "old-3"]),
+    completedAt: undefined,
+    startedAt: "2026-01-01T00:00:00.000Z"
+  };
+  const newerSession: QuizSession = {
+    ...makeSession("newer-session", ["new-1"]),
+    completedAt: undefined,
+    startedAt: "2026-03-01T00:00:00.000Z",
+    attempts: [
+      {
+        ...makeAttempt("new-1", 1),
+        answeredAt: "2026-03-01T00:01:00.000Z"
+      }
+    ]
+  };
+
+  localStorage.setItem(storageKey, JSON.stringify(olderLargeSession));
+  sessionStorage.setItem(storageKey, JSON.stringify(newerSession));
+
+  assert.equal(loadCurrentSessionForUser(userId)?.id, "newer-session");
 });

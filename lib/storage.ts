@@ -1013,6 +1013,218 @@ export function normalizeSessions(sessions: QuizSession[]) {
   return sessions.map(normalizeSession);
 }
 
+function mergeSessionQuestionIds(
+  primary: string[] | undefined,
+  secondary: string[] | undefined
+) {
+  return Array.from(
+    new Set(
+      [...(primary ?? []), ...(secondary ?? [])].filter(
+        (questionId) => typeof questionId === "string" && questionId.trim().length > 0
+      )
+    )
+  );
+}
+
+function mergeSessionQuestions(
+  primary: Question[] | undefined,
+  secondary: Question[] | undefined
+) {
+  const merged = new Map<string, Question>();
+  for (const question of [...(secondary ?? []), ...(primary ?? [])]) {
+    merged.set(question.id, question);
+  }
+  return Array.from(merged.values());
+}
+
+function mergeAttemptCopies(
+  primary: QuizSession["attempts"][number],
+  secondary: QuizSession["attempts"][number]
+) {
+  const primaryIsNewer = primary.answeredAt >= secondary.answeredAt;
+  const newer = primaryIsNewer ? primary : secondary;
+  const older = primaryIsNewer ? secondary : primary;
+  const eliminatedOptions = normalizeOptionKeys([
+    ...(older.eliminatedOptions ?? []),
+    ...(newer.eliminatedOptions ?? [])
+  ]);
+
+  return {
+    ...older,
+    ...newer,
+    eliminatedOptions
+  };
+}
+
+function mergeSessionAttempts(
+  primary: QuizSession["attempts"],
+  secondary: QuizSession["attempts"]
+) {
+  const order = mergeSessionQuestionIds(
+    primary.map((attempt) => attempt.questionId),
+    secondary.map((attempt) => attempt.questionId)
+  );
+  const merged = new Map<string, QuizSession["attempts"][number]>();
+
+  for (const attempt of [...secondary, ...primary]) {
+    const current = merged.get(attempt.questionId);
+    merged.set(
+      attempt.questionId,
+      current ? mergeAttemptCopies(attempt, current) : attempt
+    );
+  }
+
+  return order
+    .map((questionId) => merged.get(questionId))
+    .filter(
+      (attempt): attempt is QuizSession["attempts"][number] => Boolean(attempt)
+    );
+}
+
+function mergeSessionOptionEliminationMaps(
+  primary: QuizSession["optionEliminationMap"],
+  secondary: QuizSession["optionEliminationMap"]
+) {
+  const questionIds = new Set([
+    ...Object.keys(secondary ?? {}),
+    ...Object.keys(primary ?? {})
+  ]);
+  const merged: NonNullable<QuizSession["optionEliminationMap"]> = {};
+
+  for (const questionId of questionIds) {
+    const options = normalizeOptionKeys([
+      ...(secondary?.[questionId] ?? []),
+      ...(primary?.[questionId] ?? [])
+    ]);
+    if (options) merged[questionId] = options;
+  }
+
+  return Object.keys(merged).length > 0 ? merged : undefined;
+}
+
+function getSessionQuestionCoverage(session: QuizSession) {
+  return new Set([
+    ...(session.questionOrder ?? []),
+    ...session.attempts.map((attempt) => attempt.questionId),
+    ...(session.generatedQuestions ?? []).map((question) => question.id),
+    ...(session.settings?.customQuestionIds ?? []),
+    ...(session.settings?.customQuestionPayload ?? []).map((question) => question.id)
+  ]).size;
+}
+
+function getSessionFreshness(session: QuizSession) {
+  return [
+    session.startedAt,
+    session.completedAt,
+    ...session.attempts.map((attempt) => attempt.answeredAt)
+  ]
+    .filter(Boolean)
+    .sort()
+    .at(-1) ?? session.startedAt;
+}
+
+function getSessionLatestActivity(session: QuizSession) {
+  return getSessionFreshness(session);
+}
+
+function isSessionMoreComplete(candidate: QuizSession, current: QuizSession) {
+  if (Boolean(candidate.completedAt) !== Boolean(current.completedAt)) {
+    return Boolean(candidate.completedAt);
+  }
+  if (candidate.attempts.length !== current.attempts.length) {
+    return candidate.attempts.length > current.attempts.length;
+  }
+
+  const candidateCoverage = getSessionQuestionCoverage(candidate);
+  const currentCoverage = getSessionQuestionCoverage(current);
+  if (candidateCoverage !== currentCoverage) {
+    return candidateCoverage > currentCoverage;
+  }
+
+  return getSessionFreshness(candidate) >= getSessionFreshness(current);
+}
+
+function mergeDuplicateSessions(primary: QuizSession, secondary: QuizSession) {
+  const primaryFreshness = getSessionFreshness(primary);
+  const secondaryFreshness = getSessionFreshness(secondary);
+  const freshest = primaryFreshness >= secondaryFreshness ? primary : secondary;
+  const questionOrder = mergeSessionQuestionIds(
+    primary.questionOrder,
+    secondary.questionOrder
+  );
+  const generatedQuestions = mergeSessionQuestions(
+    primary.generatedQuestions,
+    secondary.generatedQuestions
+  );
+  const customQuestionIds = mergeSessionQuestionIds(
+    primary.settings?.customQuestionIds,
+    secondary.settings?.customQuestionIds
+  );
+  const customQuestionPayload = mergeSessionQuestions(
+    primary.settings?.customQuestionPayload,
+    secondary.settings?.customQuestionPayload
+  );
+  const baseSettings = primary.settings ?? secondary.settings;
+  const settings = baseSettings
+    ? {
+        ...(secondary.settings ?? {}),
+        ...(primary.settings ?? {}),
+        mode: baseSettings.mode,
+        questionCount: Math.max(
+          primary.settings?.questionCount ?? 0,
+          secondary.settings?.questionCount ?? 0,
+          questionOrder.length
+        ),
+        customQuestionIds:
+          customQuestionIds.length > 0 ? customQuestionIds : undefined,
+        customQuestionPayload:
+          customQuestionPayload.length > 0 ? customQuestionPayload : undefined
+      }
+    : undefined;
+
+  return {
+    ...secondary,
+    ...primary,
+    completedAt:
+      primary.completedAt && secondary.completedAt
+        ? primary.completedAt >= secondary.completedAt
+          ? primary.completedAt
+          : secondary.completedAt
+        : primary.completedAt ?? secondary.completedAt,
+    settings,
+    questionOrder: questionOrder.length > 0 ? questionOrder : undefined,
+    generatedQuestions:
+      generatedQuestions.length > 0 ? generatedQuestions : undefined,
+    optionEliminationMap: mergeSessionOptionEliminationMaps(
+      primary.optionEliminationMap,
+      secondary.optionEliminationMap
+    ),
+    simulationElapsedSeconds: Math.max(
+      primary.simulationElapsedSeconds ?? 0,
+      secondary.simulationElapsedSeconds ?? 0
+    ) || undefined,
+    simulationTimerDurationSeconds: Math.max(
+      primary.simulationTimerDurationSeconds ?? 0,
+      secondary.simulationTimerDurationSeconds ?? 0
+    ) || undefined,
+    currentQuestionIndex: Math.max(
+      primary.currentQuestionIndex ?? 0,
+      secondary.currentQuestionIndex ?? 0
+    ),
+    isReviewingAnswer: freshest.isReviewingAnswer,
+    attempts: mergeSessionAttempts(primary.attempts, secondary.attempts)
+  } satisfies QuizSession;
+}
+
+export function mergeQuizSessionCopies(
+  primary: QuizSession,
+  secondary: QuizSession
+) {
+  return isSessionMoreComplete(primary, secondary)
+    ? mergeDuplicateSessions(primary, secondary)
+    : mergeDuplicateSessions(secondary, primary);
+}
+
 function dedupeSessionsByCanonicalId(sessions: QuizSession[]) {
   const dedupedBySession = new Map<string, QuizSession>();
   for (const session of sessions) {
@@ -1023,14 +1235,7 @@ function dedupeSessionsByCanonicalId(sessions: QuizSession[]) {
       continue;
     }
 
-    const currentFreshness = current.completedAt ?? current.startedAt;
-    const nextFreshness = session.completedAt ?? session.startedAt;
-    if (
-      nextFreshness > currentFreshness ||
-      (nextFreshness === currentFreshness && session.attempts.length >= current.attempts.length)
-    ) {
-      dedupedBySession.set(key, session);
-    }
+    dedupedBySession.set(key, mergeQuizSessionCopies(session, current));
   }
   return Array.from(dedupedBySession.values());
 }
@@ -1339,21 +1544,30 @@ export function loadCurrentSessionForUser(userId: string): QuizSession | null {
     userId === GUEST_USER_ID ? safeLocalStorageGetItem(CURRENT_SESSION_KEY) : null
   ].filter((raw): raw is string => Boolean(raw));
 
+  const candidates: QuizSession[] = [];
   for (const raw of Array.from(new Set(rawCandidates))) {
     try {
       const session = normalizeSession(JSON.parse(raw) as QuizSession);
       if (session && !session.completedAt && isCurrentSessionDiscarded(session.id, userId)) {
-        safeLocalStorageRemoveItem(scopedKey);
-        safeSessionStorageRemoveItem(scopedKey);
-        return null;
+        continue;
       }
-      return session;
+      candidates.push(session);
     } catch {
       // A malformed fallback must not hide a valid copy in the other storage.
     }
   }
 
-  return null;
+  const selected = dedupeSessionsByCanonicalId(candidates)
+    .sort((left, right) =>
+      getSessionLatestActivity(right).localeCompare(getSessionLatestActivity(left))
+    )[0] ?? null;
+
+  if (!selected && rawCandidates.length > 0) {
+    safeLocalStorageRemoveItem(scopedKey);
+    safeSessionStorageRemoveItem(scopedKey);
+  }
+
+  return selected;
 }
 
 export function clearCurrentSession() {

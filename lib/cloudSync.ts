@@ -35,6 +35,7 @@ import {
   loadCurrentSessionForUser,
   loadCompletedSessions,
   loadCompletedSessionsForUser,
+  mergeQuizSessionCopies,
   mergeCompletedQuestionHistoryFromSessionsForUser,
   normalizeSessions,
   isCurrentSessionDiscarded,
@@ -80,6 +81,7 @@ import {
   omitHeavySessionPayload,
   type QuizSessionProgressPayload
 } from "@/lib/quizSessionCheckpoint";
+import { doesAttemptListCover } from "@/lib/quizSessionSyncSafety";
 import {
   getQuizSessionNavigationIntent,
   shouldPreserveSelectedQuizSession
@@ -1272,26 +1274,6 @@ function mergeSimulationMetadata(primary: QuizSession, secondary: QuizSession) {
   };
 }
 
-function mergeQuestionListById(primary?: Question[], secondary?: Question[]) {
-  const merged = new Map<string, Question>();
-
-  for (const question of secondary ?? []) {
-    if (question?.id) merged.set(question.id, question);
-  }
-
-  for (const question of primary ?? []) {
-    if (question?.id) merged.set(question.id, question);
-  }
-
-  return Array.from(merged.values());
-}
-
-function mergeQuestionOrder(primary?: string[], secondary?: string[]) {
-  const base = (primary?.length ?? 0) >= (secondary?.length ?? 0) ? primary ?? [] : secondary ?? [];
-  const extra = base === primary ? secondary ?? [] : primary ?? [];
-  return Array.from(new Set([...base, ...extra].filter(Boolean)));
-}
-
 function normalizeAttemptEliminatedOptions(options?: Attempt["eliminatedOptions"]): NonNullable<Attempt["eliminatedOptions"]> {
   return Array.from(new Set((options ?? []).filter(Boolean))) as NonNullable<Attempt["eliminatedOptions"]>;
 }
@@ -1312,68 +1294,11 @@ function mergeAttemptListMetadata(primary: Attempt[], secondary: Attempt[]) {
   });
 }
 
-function mergeOptionEliminationMap(
-  primary?: QuizSession["optionEliminationMap"],
-  secondary?: QuizSession["optionEliminationMap"]
-) {
-  const merged = {
-    ...(secondary ?? {}),
-    ...(primary ?? {})
-  };
-
-  for (const [questionId, options] of Object.entries(merged)) {
-    const normalizedOptions = normalizeAttemptEliminatedOptions(options);
-    if (normalizedOptions.length > 0) {
-      merged[questionId] = normalizedOptions;
-    } else {
-      delete merged[questionId];
-    }
-  }
-
-  return Object.keys(merged).length > 0 ? merged : undefined;
-}
-
 function mergeSessionDetails(primary: QuizSession, secondary: QuizSession) {
-  const generatedQuestions = mergeQuestionListById(primary.generatedQuestions, secondary.generatedQuestions);
-  const customQuestionPayload = mergeQuestionListById(
-    primary.settings?.customQuestionPayload,
-    secondary.settings?.customQuestionPayload
+  return mergeSimulationMetadata(
+    mergeQuizSessionCopies(primary, secondary),
+    secondary
   );
-  const questionOrder = mergeQuestionOrder(primary.questionOrder, secondary.questionOrder);
-  const attempts =
-    primary.attempts.length >= secondary.attempts.length
-      ? mergeAttemptListMetadata(primary.attempts, secondary.attempts)
-      : mergeAttemptListMetadata(secondary.attempts, primary.attempts);
-  const optionEliminationMap = mergeOptionEliminationMap(
-    primary.optionEliminationMap,
-    secondary.optionEliminationMap
-  );
-  const baseSettings = primary.settings ?? secondary.settings;
-  const settings = baseSettings
-    ? {
-        ...(secondary.settings ?? {}),
-        ...(primary.settings ?? {}),
-        mode: baseSettings.mode,
-        questionCount: baseSettings.questionCount,
-        customQuestionIds: mergeQuestionOrder(
-          primary.settings?.customQuestionIds,
-          secondary.settings?.customQuestionIds
-        ),
-        customQuestionPayload: customQuestionPayload.length > 0 ? customQuestionPayload : undefined
-      }
-    : undefined;
-
-  const merged: QuizSession = {
-    ...secondary,
-    ...primary,
-    settings,
-    questionOrder: questionOrder.length > 0 ? questionOrder : undefined,
-    generatedQuestions: generatedQuestions.length > 0 ? generatedQuestions : undefined,
-    optionEliminationMap,
-    attempts
-  };
-
-  return mergeSimulationMetadata(merged, secondary);
 }
 
 function hasBetterSimulationMetadata(localSession: QuizSession, remoteSession: QuizSession) {
@@ -1450,16 +1375,12 @@ function getSessionsNeedingUpload(localSessions: QuizSession[], remoteSessions: 
     if (!remoteSession) return true;
     if (!isCompletedQuizSession(localSession) && isCompletedQuizSession(remoteSession)) return false;
     if (isCompletedQuizSession(localSession) && !isCompletedQuizSession(remoteSession)) return true;
-    if (localSession.attempts.length > remoteSession.attempts.length) return true;
-    if (localSession.attempts.length < remoteSession.attempts.length) return false;
-
-    const localFreshness = sessionFreshnessValue(localSession);
-    const remoteFreshness = sessionFreshnessValue(remoteSession);
-    if (localFreshness > remoteFreshness) return true;
-    if (localFreshness < remoteFreshness) return false;
+    if (!doesAttemptListCover(remoteSession.attempts, localSession.attempts)) {
+      return true;
+    }
     if (hasBetterSimulationMetadata(localSession, remoteSession)) return true;
 
-    return localSession.attempts.length > remoteSession.attempts.length;
+    return false;
   });
 }
 
@@ -1503,7 +1424,7 @@ function getConfirmedPendingSessions(
     const remoteSession = remoteById.get(getCanonicalSessionId(pendingSession.id));
     return Boolean(
       remoteSession?.completedAt &&
-        remoteSession.attempts.length >= pendingSession.attempts.length
+        doesAttemptListCover(remoteSession.attempts, pendingSession.attempts)
     );
   });
 }
@@ -2782,7 +2703,12 @@ export async function syncCompletedSessionsForCurrentUser(userId: string) {
     fetchedRemoteSessions.filter(isCompletedQuizSession)
   );
   const mergedSessions = mergeSessions(localCompletedSessions, remoteSessions).filter(isCompletedQuizSession);
-  const sessionsToUpload = getSessionsNeedingUpload(localSessionsToSync, remoteSessions);
+  const mergedSessionsToSync = [...mergedSessions]
+    .sort((left, right) =>
+      sessionFreshnessValue(right).localeCompare(sessionFreshnessValue(left))
+    )
+    .slice(0, CLOUD_COMPLETED_SESSION_UPLOAD_LIMIT);
+  const sessionsToUpload = getSessionsNeedingUpload(mergedSessionsToSync, remoteSessions);
   const sessionsToBackfill = canonicalizeSessionsForUser(
     userId,
     sessionsMissingAttemptRows.filter(isCompletedQuizSession)
@@ -2991,13 +2917,22 @@ export async function syncLocalCompletedSessionsForCurrentUser(
 
   const sessionsToUpload = uploadAllPending
     ? getSessionsNeedingUpload(
-        [...localCompletedSessions].sort((left, right) =>
+        [...mergedSessions].sort((left, right) =>
           sessionFreshnessValue(right).localeCompare(sessionFreshnessValue(left))
         ),
         remoteSessions
       ).slice(0, CLOUD_COMPLETED_SESSION_UPLOAD_LIMIT)
     : hydrateRemoteHistory
-      ? getSessionsNeedingUpload(localSessionsToSync, remoteSessions)
+      ? getSessionsNeedingUpload(
+          getRecentSessionsWithinUploadBudget(
+            [...mergedSessions].sort((left, right) =>
+              sessionFreshnessValue(right).localeCompare(sessionFreshnessValue(left))
+            ),
+            CLOUD_LIGHT_COMPLETED_SESSION_UPLOAD_LIMIT,
+            CLOUD_LIGHT_COMPLETED_ATTEMPT_UPLOAD_LIMIT
+          ),
+          remoteSessions
+        )
       : getRecentSessionsWithinUploadBudget(
           pendingCompletedSessionUploads,
           CLOUD_LIGHT_COMPLETED_SESSION_UPLOAD_LIMIT,
@@ -3034,9 +2969,7 @@ export async function syncCurrentSessionForCurrentUser(userId: string) {
   const guestSession = loadCurrentSessionForUser("guest");
   const localUserSession = loadCurrentSessionForUser(userId);
   let localCurrentSession: QuizSession | null =
-    [localUserSession, guestSession]
-      .filter((session): session is QuizSession => Boolean(session) && !session?.completedAt)
-      .sort((left, right) => sessionActivityValue(right).localeCompare(sessionActivityValue(left)))[0] ?? null;
+    mergeResumableQuizSessions([localUserSession, guestSession], [])[0] ?? null;
 
   if (localCurrentSession) {
     const completedSessionIds = new Set(
@@ -3146,9 +3079,7 @@ export async function syncLocalCurrentSessionForCurrentUser(userId: string) {
   const guestSession = loadCurrentSessionForUser("guest");
   const localUserSession = loadCurrentSessionForUser(userId);
   const localCurrentSession =
-    [localUserSession, guestSession]
-      .filter((session): session is QuizSession => Boolean(session) && !session?.completedAt)
-      .sort((left, right) => sessionActivityValue(right).localeCompare(sessionActivityValue(left)))[0] ?? null;
+    mergeResumableQuizSessions([localUserSession, guestSession], [])[0] ?? null;
 
   if (!localCurrentSession) return null;
 

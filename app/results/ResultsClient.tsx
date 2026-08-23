@@ -56,6 +56,7 @@ import {
   loadCompletedSessions,
   loadRecentCompletedSessionHandoffForUser,
   loadQuestionExplanationOverrides,
+  mergeQuizSessionCopies,
   mergeQuestionExplanationOverrides,
   saveCompletedSession,
   saveQuestionExplanationOverride,
@@ -262,40 +263,17 @@ function mergeResultAttemptEliminations(
 function mergeResultSessionMetadata(primary: QuizSession, secondary: QuizSession | null | undefined): QuizSession {
   if (!secondary) return primary;
 
-  const eliminationMap = mergeResultOptionEliminationMap(primary, secondary);
-  const primaryHasMoreAttempts = primary.attempts.length >= secondary.attempts.length;
-  const attemptBase = primaryHasMoreAttempts ? primary.attempts : secondary.attempts;
-  const attemptFallback = primaryHasMoreAttempts ? secondary.attempts : primary.attempts;
-  const settings =
-    primary.settings || secondary.settings
-      ? ({
-          ...(secondary.settings ?? {}),
-          ...(primary.settings ?? {})
-        } as QuizSession["settings"])
-      : undefined;
+  const mergedSession = mergeQuizSessionCopies(primary, secondary);
+  const eliminationMap = mergeResultOptionEliminationMap(mergedSession, secondary);
 
   return {
-    ...secondary,
-    ...primary,
-    settings,
-    questionOrder:
-      (primary.questionOrder?.length ?? 0) >= (secondary.questionOrder?.length ?? 0)
-        ? primary.questionOrder
-        : secondary.questionOrder,
-    generatedQuestions:
-      (primary.generatedQuestions?.length ?? 0) >= (secondary.generatedQuestions?.length ?? 0)
-        ? primary.generatedQuestions
-        : secondary.generatedQuestions,
+    ...mergedSession,
     optionEliminationMap: eliminationMap,
-    simulationElapsedSeconds:
-      normalizeResultTimerSeconds(primary.simulationElapsedSeconds) > 0
-        ? primary.simulationElapsedSeconds
-        : secondary.simulationElapsedSeconds,
-    simulationTimerDurationSeconds:
-      normalizeResultTimerSeconds(primary.simulationTimerDurationSeconds) > 0
-        ? primary.simulationTimerDurationSeconds
-        : secondary.simulationTimerDurationSeconds,
-    attempts: mergeResultAttemptEliminations(attemptBase, attemptFallback, eliminationMap)
+    attempts: mergeResultAttemptEliminations(
+      mergedSession.attempts,
+      [],
+      eliminationMap
+    )
   } satisfies QuizSession;
 }
 

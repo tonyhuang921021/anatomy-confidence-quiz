@@ -255,6 +255,111 @@ test("結果頁展開後分類只顯示一次", async ({ page }) => {
   await expect(card.getByText(label, { exact: true })).toHaveCount(1);
 });
 
+test("同一份進行中測驗會保留 13 題完整作答，不被較新的 6 題暫存覆蓋", async ({ page }) => {
+  const questionIds = Array.from(
+    { length: 13 },
+    (_, index) => `MOEX-100030-1101-Q${String(index + 1).padStart(3, "0")}`
+  );
+  await page.addInitScript(({ ids }) => {
+    const makeAttempts = (count: number, answeredAt: string) =>
+      ids.slice(0, count).map((questionId) => ({
+        questionId,
+        selectedAnswer: "A",
+        correctAnswer: "A",
+        isCorrect: true,
+        confidence: 3,
+        answeredAt
+      }));
+    const olderCompleteCopy = {
+      id: "site-shell-resume-union",
+      subject: "醫學（一）",
+      startedAt: "2026-08-24T00:00:00.000Z",
+      settings: {
+        mode: "random",
+        questionCount: ids.length,
+        subjectFilter: "解剖學",
+        stopAfterReview: true,
+        feedbackMode: "full"
+      },
+      questionOrder: ids,
+      currentQuestionIndex: ids.length - 1,
+      isReviewingAnswer: true,
+      attempts: makeAttempts(ids.length, "2026-08-24T00:13:00.000Z")
+    };
+    const newerShortCopy = {
+      ...olderCompleteCopy,
+      startedAt: "2026-08-24T00:20:00.000Z",
+      currentQuestionIndex: 5,
+      attempts: makeAttempts(6, "2026-08-24T00:26:00.000Z")
+    };
+
+    window.localStorage.setItem("anatomy-confidence-active-user-id", "guest");
+    window.localStorage.setItem(
+      "anatomy-confidence-current-session:guest",
+      JSON.stringify(olderCompleteCopy)
+    );
+    window.sessionStorage.setItem(
+      "anatomy-confidence-current-session:guest",
+      JSON.stringify(newerShortCopy)
+    );
+  }, { ids: questionIds });
+
+  await page.goto("/quiz?resume=1&sessionId=site-shell-resume-union", {
+    waitUntil: "networkidle"
+  });
+  await waitForShellReady(page);
+
+  await expect(page.getByText(/^已答 13/)).toHaveText(/^已答 13/);
+  await expect(page.getByText("第 13 / 13 題", { exact: true })).toBeVisible();
+});
+
+test("結果頁會合併同一 session 的本機 100 題與雲端短副本", async ({ page }) => {
+  const questionIds = Array.from(
+    { length: 100 },
+    (_, index) => `MOEX-100030-1101-Q${String(index + 1).padStart(3, "0")}`
+  );
+  await page.addInitScript(({ ids }) => {
+    const completedAt = "2026-08-24T01:40:00.000Z";
+    const makeSession = (count: number, answeredAt: string) => ({
+      id: "site-shell-result-union",
+      subject: "醫學（一）",
+      startedAt: "2026-08-24T00:00:00.000Z",
+      completedAt,
+      settings: {
+        mode: "random",
+        questionCount: ids.length,
+        subjectFilter: "解剖學"
+      },
+      questionOrder: ids,
+      currentQuestionIndex: count - 1,
+      attempts: ids.slice(0, count).map((questionId) => ({
+        questionId,
+        selectedAnswer: "A",
+        correctAnswer: "A",
+        isCorrect: true,
+        confidence: 3,
+        answeredAt
+      }))
+    });
+
+    window.localStorage.setItem("anatomy-confidence-active-user-id", "guest");
+    window.localStorage.setItem(
+      "anatomy-confidence-completed-sessions:guest",
+      JSON.stringify([makeSession(100, "2026-08-24T01:40:00.000Z")])
+    );
+    window.localStorage.setItem(
+      "anatomy-confidence-cloud-completed-sessions:guest",
+      JSON.stringify([makeSession(6, "2026-08-24T01:45:00.000Z")])
+    );
+  }, { ids: questionIds });
+
+  await page.goto("/results?sessionId=site-shell-result-union", { waitUntil: "networkidle" });
+  await waitForShellReady(page);
+
+  await expect(page.getByText("全部 100", { exact: true })).toBeVisible();
+  await expect(page.getByText("第 100 題：", { exact: false }).first()).toBeAttached();
+});
+
 test("複習頁不會進入重複更新迴圈", async ({ page }) => {
   const updateDepthWarnings: string[] = [];
   page.on("console", (message) => {
