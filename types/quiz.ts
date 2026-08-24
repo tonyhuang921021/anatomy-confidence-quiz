@@ -577,6 +577,17 @@ export type FeedbackMessage = {
   replies?: FeedbackMessage[];
 };
 
+export type FeedbackActivity = {
+  id: string;
+  type: "root" | "reply";
+  content: string;
+  parentId?: string;
+  displayName?: string;
+  isAnonymous: boolean;
+  isOwn?: boolean;
+  createdAt: string;
+};
+
 export type ResourceShareFileKind = "text" | "html" | "pdf" | "image" | "other";
 
 export type ResourceShareComment = {

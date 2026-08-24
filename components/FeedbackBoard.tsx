@@ -4,9 +4,23 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Check, MessageCircle, Pin, RefreshCw, Send, ThumbsDown, ThumbsUp } from "lucide-react";
 import { useAuth } from "@/components/AuthProvider";
 import { createFeedbackMessage, loadFeedbackMessagesResult, voteFeedbackMessage } from "@/lib/cloudSync";
+import { FEEDBACK_CREATED_EVENT } from "@/lib/feedbackActivity";
+import {
+  addFeedbackReply,
+  mergeFeedbackMessagePages,
+  sanitizeFeedbackMessagePrivacy,
+  shouldResetFeedbackPageCursor
+} from "@/lib/feedbackPagination";
 import type { FeedbackMessage, OpenAIBudgetStatus } from "@/types/quiz";
 
-const FEEDBACK_CACHE_KEY = "homeFeedbackLastGood";
+const FEEDBACK_CACHE_KEY = "homeFeedbackLastGood:v2";
+const FEEDBACK_PAGE_SIZE = 10;
+
+type CachedFeedbackPage = {
+  messages: FeedbackMessage[];
+  nextCursor: string | null;
+  hasMore: boolean;
+};
 
 function formatCreatedAt(value: string) {
   return new Date(value).toLocaleString("zh-TW", {
@@ -70,20 +84,34 @@ function FeedbackSkeleton() {
 function loadCachedFeedbackMessages() {
   try {
     const raw = window.localStorage.getItem(FEEDBACK_CACHE_KEY);
-    if (!raw) return [] as FeedbackMessage[];
-    const parsed = JSON.parse(raw) as { messages?: FeedbackMessage[] };
-    return Array.isArray(parsed.messages) ? parsed.messages : [];
+    if (!raw) return null;
+    const parsed = JSON.parse(raw) as Partial<CachedFeedbackPage>;
+    if (!Array.isArray(parsed.messages)) return null;
+    return {
+      messages: parsed.messages
+        .slice(0, FEEDBACK_PAGE_SIZE)
+        .map(sanitizeFeedbackMessagePrivacy),
+      nextCursor: typeof parsed.nextCursor === "string" ? parsed.nextCursor : null,
+      hasMore: Boolean(parsed.hasMore)
+    } satisfies CachedFeedbackPage;
   } catch {
-    return [] as FeedbackMessage[];
+    return null;
   }
 }
 
-function saveCachedFeedbackMessages(messages: FeedbackMessage[]) {
+function saveCachedFeedbackMessages(
+  messages: FeedbackMessage[],
+  nextCursor: string | null,
+  hasMore: boolean
+) {
   try {
+    const cachedMessages = messages.slice(0, FEEDBACK_PAGE_SIZE);
     window.localStorage.setItem(
       FEEDBACK_CACHE_KEY,
       JSON.stringify({
-        messages: messages.slice(0, 40),
+        messages: cachedMessages,
+        nextCursor,
+        hasMore,
         updatedAt: new Date().toISOString()
       })
     );
@@ -133,9 +161,10 @@ function FeedbackVoteControls({
 }
 
 function getFeedbackAuthorLabel(entry: FeedbackMessage) {
+  if (entry.isAnonymous) return "匿名使用者";
   const displayName = entry.displayName?.trim();
   if (displayName) return displayName;
-  return entry.isAnonymous ? "匿名使用者" : "已登入使用者";
+  return "已登入使用者";
 }
 
 function getFeedbackAuthorInitial(label: string) {
@@ -152,18 +181,44 @@ export function FeedbackBoard({ showHeading = true }: { showHeading?: boolean })
   const [isAnonymous, setIsAnonymous] = useState(false);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
+  const [loadingOlder, setLoadingOlder] = useState(false);
+  const [nextCursor, setNextCursor] = useState<string | null>(null);
+  const [hasMore, setHasMore] = useState(false);
+  const [loadOlderError, setLoadOlderError] = useState("");
+  const [loadAnnouncement, setLoadAnnouncement] = useState("");
   const [submitting, setSubmitting] = useState(false);
-  const [votingMessageId, setVotingMessageId] = useState<string | null>(null);
+  const [votingMessageIds, setVotingMessageIds] = useState<Set<string>>(() => new Set());
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
   const [readNotice, setReadNotice] = useState("");
   const refreshRequestIdRef = useRef(0);
+  const messagesRef = useRef<FeedbackMessage[]>([]);
+  const headPageRef = useRef<FeedbackMessage[]>([]);
+  const initialPageLoadedRef = useRef(false);
+  const loadingOlderRef = useRef(false);
+  const refreshingRef = useRef(false);
+  const submittingRef = useRef(false);
+  const pendingVoteIdsRef = useRef(new Set<string>());
+  const nextCursorRef = useRef<string | null>(null);
+  const hasMoreRef = useRef(false);
+  const feedbackThreadRef = useRef<HTMLDivElement | null>(null);
+  const loadSentinelRef = useRef<HTMLDivElement | null>(null);
+
+  const updateMessages = useCallback(
+    (updater: (current: FeedbackMessage[]) => FeedbackMessage[]) => {
+      setMessages((current) => {
+        const next = updater(current);
+        messagesRef.current = next;
+        return next;
+      });
+    },
+    []
+  );
 
   const nickname = useMemo(() => {
     const displayName =
       typeof user?.user_metadata?.display_name === "string" ? user.user_metadata.display_name.trim() : "";
     if (displayName) return displayName.slice(0, 24);
-    if (user?.email) return user.email.split("@")[0].slice(0, 24);
     return "";
   }, [user]);
   const composerLabel = user && !isAnonymous ? nickname || "已登入使用者" : "匿名使用者";
@@ -171,6 +226,7 @@ export function FeedbackBoard({ showHeading = true }: { showHeading?: boolean })
   const refreshMessages = useCallback(async (
     options: { fresh?: boolean; initial?: boolean } = {}
   ) => {
+    if (options.fresh && loadingOlderRef.current) return;
     const requestId = refreshRequestIdRef.current + 1;
     refreshRequestIdRef.current = requestId;
 
@@ -178,23 +234,53 @@ export function FeedbackBoard({ showHeading = true }: { showHeading?: boolean })
       setLoading(false);
       return;
     }
+    refreshingRef.current = true;
+    setRefreshing(true);
 
     if (options.initial) {
-      const cachedRows = loadCachedFeedbackMessages();
-      if (cachedRows.length > 0) {
-        setMessages(cachedRows);
+      const cachedPage = loadCachedFeedbackMessages();
+      if (cachedPage && cachedPage.messages.length > 0) {
+        messagesRef.current = cachedPage.messages;
+        headPageRef.current = cachedPage.messages;
+        setMessages(cachedPage.messages);
+        nextCursorRef.current = cachedPage.nextCursor;
+        hasMoreRef.current = cachedPage.hasMore;
+        setNextCursor(cachedPage.nextCursor);
+        setHasMore(cachedPage.hasMore);
         setLoading(false);
         setReadNotice("留言正在更新，先顯示稍早資料。");
       }
     }
-    if (options.fresh) setRefreshing(true);
-
     try {
-      const result = await loadFeedbackMessagesResult(20, { fresh: options.fresh });
+      const result = await loadFeedbackMessagesResult(FEEDBACK_PAGE_SIZE, {
+        fresh: options.fresh
+      });
       if (requestId !== refreshRequestIdRef.current) return;
+      const establishingPagination = !initialPageLoadedRef.current;
+      const shouldResetPagination = shouldResetFeedbackPageCursor(
+        headPageRef.current,
+        result.messages,
+        {
+          establishing: establishingPagination,
+          degraded: result.degraded
+        }
+      );
+      const shouldUpdatePagination = establishingPagination || shouldResetPagination;
       if (result.messages.length > 0 || !result.degraded) {
-        setMessages(result.messages);
-        saveCachedFeedbackMessages(result.messages);
+        updateMessages((current) => {
+          return mergeFeedbackMessagePages(current, result.messages);
+        });
+      }
+      if (!result.degraded || result.stale) {
+        headPageRef.current = result.messages;
+        saveCachedFeedbackMessages(result.messages, result.nextCursor, result.hasMore);
+        if (shouldUpdatePagination) {
+          nextCursorRef.current = result.nextCursor;
+          hasMoreRef.current = result.hasMore;
+          setNextCursor(result.nextCursor);
+          setHasMore(result.hasMore);
+        }
+        initialPageLoadedRef.current = true;
       }
       setReadNotice(
         result.degraded
@@ -207,14 +293,95 @@ export function FeedbackBoard({ showHeading = true }: { showHeading?: boolean })
     } finally {
       if (requestId === refreshRequestIdRef.current) {
         setLoading(false);
+        refreshingRef.current = false;
         setRefreshing(false);
       }
     }
-  }, [configured]);
+  }, [configured, updateMessages]);
 
   useEffect(() => {
     void refreshMessages({ initial: true });
   }, [refreshMessages]);
+
+  const loadOlderMessages = useCallback(async () => {
+    const cursor = nextCursorRef.current;
+    if (
+      !configured ||
+      !cursor ||
+      !hasMoreRef.current ||
+      loadingOlderRef.current ||
+      refreshingRef.current
+    ) {
+      return;
+    }
+
+    loadingOlderRef.current = true;
+    setLoadingOlder(true);
+    setLoadOlderError("");
+    setLoadAnnouncement("");
+
+    try {
+      const result = await loadFeedbackMessagesResult(FEEDBACK_PAGE_SIZE, { cursor });
+      if (result.degraded && !result.stale) {
+        throw new Error(result.message || "較早留言暫時讀不到，請稍後再試。");
+      }
+
+      updateMessages((current) => {
+        return mergeFeedbackMessagePages(current, result.messages);
+      });
+      nextCursorRef.current = result.nextCursor;
+      hasMoreRef.current = result.hasMore;
+      setNextCursor(result.nextCursor);
+      setHasMore(result.hasMore);
+      setLoadAnnouncement(
+        result.messages.length > 0
+          ? `已載入 ${result.messages.length} 則較早留言。`
+          : "已載入全部留言。"
+      );
+    } catch (loadError) {
+      setLoadOlderError(
+        loadError instanceof Error ? loadError.message : "較早留言暫時讀不到，請稍後再試。"
+      );
+    } finally {
+      loadingOlderRef.current = false;
+      setLoadingOlder(false);
+    }
+  }, [configured, updateMessages]);
+
+  useEffect(() => {
+    if (
+      !hasMore ||
+      !nextCursor ||
+      refreshing ||
+      loadOlderError ||
+      typeof IntersectionObserver === "undefined"
+    ) {
+      return;
+    }
+
+    const sentinel = loadSentinelRef.current;
+    const scrollContainer = feedbackThreadRef.current;
+    if (!sentinel || !scrollContainer) return;
+    const overflowY = window.getComputedStyle(scrollContainer).overflowY;
+    const observerRoot = /^(auto|scroll|overlay)$/.test(overflowY)
+      ? scrollContainer
+      : null;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries.some((entry) => entry.isIntersecting)) {
+          void loadOlderMessages();
+        }
+      },
+      {
+        root: observerRoot,
+        rootMargin: "0px 0px 120px",
+        threshold: 0.01
+      }
+    );
+    observer.observe(sentinel);
+    return () => observer.disconnect();
+  }, [hasMore, loadOlderError, loadOlderMessages, nextCursor, refreshing]);
 
   useEffect(() => {
     async function fetchBudget() {
@@ -239,6 +406,8 @@ export function FeedbackBoard({ showHeading = true }: { showHeading?: boolean })
   }, []);
 
   async function handleSubmit() {
+    if (submittingRef.current) return;
+    submittingRef.current = true;
     setSubmitting(true);
     setError("");
     setMessage("留言送出中…");
@@ -250,23 +419,27 @@ export function FeedbackBoard({ showHeading = true }: { showHeading?: boolean })
         accessToken: session?.access_token,
         user
       });
-      refreshRequestIdRef.current += 1;
-      setMessages((current) => {
-        const next = [created, ...current.filter((entry) => entry.id !== created.id)].slice(0, 40);
-        saveCachedFeedbackMessages(next);
-        return next;
+      setLoading(false);
+      updateMessages((current) => {
+        return mergeFeedbackMessagePages(current, [created]);
       });
+      window.dispatchEvent(
+        new CustomEvent(FEEDBACK_CREATED_EVENT, { detail: { id: created.id } })
+      );
       setContent("");
       setMessage("留言已送出，謝謝你的建議。");
     } catch (submitError) {
       setMessage("");
       setError(submitError instanceof Error ? submitError.message : "留言送出失敗");
     } finally {
+      submittingRef.current = false;
       setSubmitting(false);
     }
   }
 
   async function handleReply(parentId: string) {
+    if (submittingRef.current) return;
+    submittingRef.current = true;
     setSubmitting(true);
     setError("");
     setMessage("回覆送出中…");
@@ -279,22 +452,13 @@ export function FeedbackBoard({ showHeading = true }: { showHeading?: boolean })
         user,
         parentId
       });
-      refreshRequestIdRef.current += 1;
-      setMessages((current) => {
-        const next = current.map((entry) =>
-          entry.id === parentId
-            ? {
-                ...entry,
-                replies: [
-                  ...(entry.replies ?? []).filter((reply) => reply.id !== created.id),
-                  created
-                ]
-              }
-            : entry
-        );
-        saveCachedFeedbackMessages(next);
-        return next;
+      setLoading(false);
+      updateMessages((current) => {
+        return addFeedbackReply(current, parentId, created);
       });
+      window.dispatchEvent(
+        new CustomEvent(FEEDBACK_CREATED_EVENT, { detail: { id: created.id } })
+      );
       setReplyContent("");
       setReplyTargetId(null);
       setMessage("回覆已送出。");
@@ -302,6 +466,7 @@ export function FeedbackBoard({ showHeading = true }: { showHeading?: boolean })
       setMessage("");
       setError(submitError instanceof Error ? submitError.message : "回覆送出失敗");
     } finally {
+      submittingRef.current = false;
       setSubmitting(false);
     }
   }
@@ -324,16 +489,24 @@ export function FeedbackBoard({ showHeading = true }: { showHeading?: boolean })
   }
 
   async function handleVote(entry: FeedbackMessage, vote: 1 | -1) {
+    if (pendingVoteIdsRef.current.has(entry.id)) return;
+    pendingVoteIdsRef.current.add(entry.id);
+    setVotingMessageIds((current) => {
+      const next = new Set(current);
+      next.add(entry.id);
+      return next;
+    });
     const nextVote = entry.myVote === vote ? null : vote;
-    const previousMessages = messages;
+    const previousVote = entry.myVote ?? null;
+    const previousLikeCount = entry.likeCount ?? 0;
+    const previousDislikeCount = entry.dislikeCount ?? 0;
     const optimisticLikeDelta =
       (nextVote === 1 ? 1 : 0) - (entry.myVote === 1 ? 1 : 0);
     const optimisticDislikeDelta =
       (nextVote === -1 ? 1 : 0) - (entry.myVote === -1 ? 1 : 0);
-    setVotingMessageId(entry.id);
     setError("");
     setMessage("");
-    setMessages((current) =>
+    updateMessages((current) =>
       updateMessageVote(current, entry.id, (currentEntry) => ({
         ...currentEntry,
         myVote: nextVote,
@@ -349,19 +522,31 @@ export function FeedbackBoard({ showHeading = true }: { showHeading?: boolean })
         accessToken: session?.access_token,
         user
       });
-      setMessages((current) =>
-        updateMessageVote(current, result.messageId, (currentEntry) => ({
+      updateMessages((current) => {
+        return updateMessageVote(current, result.messageId, (currentEntry) => ({
           ...currentEntry,
           myVote: result.myVote,
           likeCount: result.likeCount,
           dislikeCount: result.dislikeCount
+        }));
+      });
+    } catch (voteError) {
+      updateMessages((current) =>
+        updateMessageVote(current, entry.id, (currentEntry) => ({
+          ...currentEntry,
+          myVote: previousVote,
+          likeCount: previousLikeCount,
+          dislikeCount: previousDislikeCount
         }))
       );
-    } catch (voteError) {
-      setMessages(previousMessages);
       setError(voteError instanceof Error ? voteError.message : "留言投票失敗");
     } finally {
-      setVotingMessageId(null);
+      pendingVoteIdsRef.current.delete(entry.id);
+      setVotingMessageIds((current) => {
+        const next = new Set(current);
+        next.delete(entry.id);
+        return next;
+      });
     }
   }
 
@@ -396,11 +581,12 @@ export function FeedbackBoard({ showHeading = true }: { showHeading?: boolean })
                 </div>
               </div>
               {user ? (
-                <div className="feedback-identity" aria-label="留言顯示方式">
+                <div className="feedback-identity" role="group" aria-label="留言顯示方式">
                   <button
                     type="button"
                     onClick={() => setIsAnonymous(true)}
                     className={isAnonymous ? "is-selected" : ""}
+                    aria-pressed={isAnonymous}
                   >
                     <span className="feedback-identity-indicator" aria-hidden="true">
                       {isAnonymous ? <Check size={14} strokeWidth={2.4} /> : null}
@@ -411,6 +597,7 @@ export function FeedbackBoard({ showHeading = true }: { showHeading?: boolean })
                     type="button"
                     onClick={() => setIsAnonymous(false)}
                     className={!isAnonymous ? "is-selected" : ""}
+                    aria-pressed={!isAnonymous}
                   >
                     <span className="feedback-identity-indicator" aria-hidden="true">
                       {!isAnonymous ? <Check size={14} strokeWidth={2.4} /> : null}
@@ -425,6 +612,7 @@ export function FeedbackBoard({ showHeading = true }: { showHeading?: boolean })
               )}
 
               <textarea
+                aria-label="留言內容"
                 value={content}
                 onChange={(event) => setContent(event.target.value)}
                 maxLength={1200}
@@ -472,12 +660,12 @@ export function FeedbackBoard({ showHeading = true }: { showHeading?: boolean })
               <div className="feedback-list-toolbar">
                 <div>
                   <p>最新留言</p>
-                  <span>{messages.length} 則</span>
+                  <span>{messages.length} 串</span>
                 </div>
                 <button
                   type="button"
                   onClick={() => void refreshMessages({ fresh: true })}
-                  disabled={refreshing}
+                  disabled={refreshing || loadingOlder}
                   title="重新整理留言"
                   aria-label="重新整理留言"
                 >
@@ -490,7 +678,7 @@ export function FeedbackBoard({ showHeading = true }: { showHeading?: boolean })
                 </button>
               </div>
 
-              <div className="feedback-thread">
+              <div ref={feedbackThreadRef} className="feedback-thread">
                 {loading ? (
                   <FeedbackSkeleton />
                 ) : messages.length === 0 ? (
@@ -498,7 +686,8 @@ export function FeedbackBoard({ showHeading = true }: { showHeading?: boolean })
                     還沒有留言，你可以成為第一個給建議的人。
                   </div>
                 ) : (
-                  messages.map((entry) => (
+                  <>
+                  {messages.map((entry) => (
                     <article key={entry.id} className="feedback-entry">
                   <div className="feedback-entry-head">
                     <div className="feedback-entry-identity">
@@ -517,7 +706,7 @@ export function FeedbackBoard({ showHeading = true }: { showHeading?: boolean })
                   <div className="feedback-entry-actions">
                     <FeedbackVoteControls
                       entry={entry}
-                      disabled={votingMessageId === entry.id}
+                      disabled={votingMessageIds.has(entry.id)}
                       onVote={(target, vote) => void handleVote(target, vote)}
                     />
                     <button
@@ -539,6 +728,7 @@ export function FeedbackBoard({ showHeading = true }: { showHeading?: boolean })
                   {replyTargetId === entry.id ? (
                     <div className="feedback-reply-composer">
                       <textarea
+                        aria-label={`回覆 ${getFeedbackAuthorLabel(entry)} 的留言`}
                         value={replyContent}
                         onChange={(event) => setReplyContent(event.target.value)}
                         maxLength={800}
@@ -582,7 +772,7 @@ export function FeedbackBoard({ showHeading = true }: { showHeading?: boolean })
                           <div className="feedback-entry-actions">
                             <FeedbackVoteControls
                               entry={reply}
-                              disabled={votingMessageId === reply.id}
+                              disabled={votingMessageIds.has(reply.id)}
                               onVote={(target, vote) => void handleVote(target, vote)}
                             />
                           </div>
@@ -591,7 +781,25 @@ export function FeedbackBoard({ showHeading = true }: { showHeading?: boolean })
                     </div>
                   ) : null}
                     </article>
-                  ))
+                  ))}
+                  <div ref={loadSentinelRef} className="feedback-load-sentinel" aria-hidden="true" />
+                  {hasMore ? (
+                    <div className="feedback-pagination">
+                      <button
+                        type="button"
+                        onClick={() => void loadOlderMessages()}
+                        disabled={loadingOlder || refreshing || !nextCursor}
+                      >
+                        {loadingOlder ? (
+                          <RefreshCw className="animate-spin" size={15} strokeWidth={1.8} aria-hidden="true" />
+                        ) : null}
+                        {loadOlderError ? "再試一次" : loadingOlder ? "載入中..." : "載入較早留言"}
+                      </button>
+                      {loadOlderError ? <p role="alert">{loadOlderError}</p> : null}
+                    </div>
+                  ) : null}
+                  <p className="sr-only" aria-live="polite">{loadAnnouncement}</p>
+                  </>
                 )}
               </div>
             </div>

@@ -2704,7 +2704,7 @@ html[data-browser="safari"] .home-shell .surface-card-muted {
   box-shadow: none;
 }
 
-html[data-browser="safari"] .home-feedback-scroll {
+html[data-browser="safari"] .home-feedback-board .feedback-thread {
   overscroll-behavior: contain;
   -webkit-overflow-scrolling: auto;
 }
@@ -3146,6 +3146,193 @@ html[data-theme="dark"] .border-slate-100 {
 .app-account-wrap {
   position: relative;
   min-width: 0;
+}
+
+.app-feedback-notification-wrap {
+  position: relative;
+  flex: 0 0 auto;
+}
+
+.app-feedback-notification-trigger {
+  position: relative;
+  display: inline-flex;
+  min-height: 44px;
+  min-width: 44px;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  color: var(--ink-soft);
+  transition: background-color 160ms ease, color 160ms ease, transform 120ms ease;
+}
+
+.app-feedback-notification-trigger:hover,
+.app-feedback-notification-trigger[aria-expanded="true"] {
+  background: var(--surface-muted);
+  color: var(--brand-deep);
+}
+
+.app-feedback-notification-trigger:active {
+  transform: scale(0.98);
+}
+
+.app-feedback-notification-badge {
+  position: absolute;
+  top: 4px;
+  right: 3px;
+  display: inline-flex;
+  min-height: 17px;
+  min-width: 17px;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid var(--topbar-bg);
+  border-radius: 999px;
+  background: var(--danger-main);
+  padding: 0 3px;
+  color: white;
+  font-size: 0.58rem;
+  font-weight: 750;
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+}
+
+.app-feedback-notification-popover {
+  position: absolute;
+  right: 0;
+  top: calc(100% + 0.55rem);
+  z-index: 112;
+  width: min(23rem, calc(100vw - 1.5rem));
+  max-height: min(42rem, calc(100dvh - 5rem));
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr) auto;
+  overflow: hidden;
+  border: 1px solid var(--line-soft);
+  border-radius: 14px;
+  background: var(--surface-float);
+  box-shadow: 0 22px 62px rgba(44, 68, 61, 0.18);
+}
+
+.app-feedback-notification-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  border-bottom: 1px solid var(--line-soft);
+  padding: 0.9rem 1rem;
+}
+
+.app-feedback-notification-head p {
+  color: var(--ink-main);
+  font-size: 0.9rem;
+  font-weight: 670;
+}
+
+.app-feedback-notification-head span {
+  display: block;
+  margin-top: 0.2rem;
+  color: var(--ink-soft);
+  font-size: 0.68rem;
+  line-height: 1.5;
+}
+
+.app-feedback-notification-head > svg {
+  flex: 0 0 auto;
+  color: var(--brand-main);
+}
+
+.app-feedback-notification-list {
+  min-height: 0;
+  max-height: min(24rem, 54dvh);
+  overflow-y: auto;
+}
+
+.app-feedback-notification-item {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 0.7rem;
+  border-bottom: 1px solid var(--line-soft);
+  padding: 0.8rem 1rem;
+  color: var(--ink-main);
+  transition: background-color 160ms ease;
+}
+
+.app-feedback-notification-item:hover {
+  background: var(--surface-muted);
+}
+
+.app-feedback-notification-item > span:first-child {
+  display: inline-flex;
+  height: 30px;
+  width: 30px;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  background: var(--brand-tint);
+  color: var(--brand-deep);
+}
+
+.app-feedback-notification-item strong,
+.app-feedback-notification-item small {
+  display: block;
+}
+
+.app-feedback-notification-item strong {
+  font-size: 0.76rem;
+  font-weight: 670;
+}
+
+.app-feedback-notification-item small {
+  margin-top: 0.15rem;
+  color: var(--ink-soft);
+  font-size: 0.64rem;
+  line-height: 1.45;
+}
+
+.app-feedback-notification-item p {
+  display: -webkit-box;
+  margin-top: 0.38rem;
+  overflow: hidden;
+  color: color-mix(in srgb, var(--ink-main) 82%, var(--ink-soft));
+  font-size: 0.72rem;
+  line-height: 1.55;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
+.app-feedback-notification-empty {
+  padding: 1.4rem 1rem;
+  color: var(--ink-soft);
+  font-size: 0.76rem;
+  text-align: center;
+}
+
+.app-feedback-notification-settings {
+  display: grid;
+  gap: 0.45rem;
+  border-top: 1px solid var(--line-soft);
+  background: color-mix(in srgb, var(--surface-muted) 62%, var(--surface-float));
+  padding: 0.75rem 1rem;
+}
+
+.app-feedback-notification-settings button {
+  justify-self: start;
+  min-height: 44px;
+  border: 1px solid var(--line-soft);
+  border-radius: 8px;
+  background: var(--surface-float);
+  padding: 0.4rem 0.65rem;
+  color: var(--brand-deep);
+  font-size: 0.7rem;
+  font-weight: 650;
+}
+
+.app-feedback-notification-settings p {
+  color: var(--ink-soft);
+  font-size: 0.66rem;
+  line-height: 1.55;
+}
+
+.app-feedback-notification-settings p.is-error {
+  color: var(--danger-main);
 }
 
 .app-account-trigger {
@@ -4425,6 +4612,50 @@ html[data-theme="dark"] .feedback-identity button.is-selected {
   font-size: 0.8rem;
 }
 
+.feedback-load-sentinel {
+  height: 1px;
+}
+
+.feedback-pagination {
+  display: grid;
+  justify-items: center;
+  gap: 0.5rem;
+  border-top: 1px solid var(--line-soft);
+  padding: 0.85rem 0.15rem 0.2rem;
+}
+
+.feedback-pagination button {
+  display: inline-flex;
+  min-height: 44px;
+  align-items: center;
+  justify-content: center;
+  gap: 0.45rem;
+  border: 1px solid var(--line-soft);
+  border-radius: 9px;
+  background: var(--surface-float);
+  padding: 0.55rem 0.9rem;
+  color: var(--brand-deep);
+  font-size: 0.76rem;
+  font-weight: 650;
+}
+
+.feedback-pagination button:hover:not(:disabled) {
+  border-color: color-mix(in srgb, var(--brand-main) 38%, var(--line-soft));
+  background: var(--surface-muted);
+}
+
+.feedback-pagination button:disabled {
+  cursor: wait;
+  opacity: 0.65;
+}
+
+.feedback-pagination p {
+  color: var(--danger-main);
+  font-size: 0.7rem;
+  line-height: 1.55;
+  text-align: center;
+}
+
 .feedback-page-shell {
   max-width: 74rem;
   padding-bottom: clamp(3rem, 7vw, 6rem);
@@ -5263,8 +5494,15 @@ html[data-theme="dark"] .feedback-identity button.is-selected {
   }
 
   .app-sync-state span,
-  .app-topbar-actions > div:not(.app-account-wrap) {
+  .app-topbar-actions > div:not(.app-account-wrap):not(.app-feedback-notification-wrap) {
     display: none;
+  }
+
+  .app-feedback-notification-popover {
+    position: fixed;
+    right: 0.75rem;
+    top: 3.7rem;
+    max-height: calc(100dvh - 4.45rem - env(safe-area-inset-bottom));
   }
 
   .app-account-trigger {

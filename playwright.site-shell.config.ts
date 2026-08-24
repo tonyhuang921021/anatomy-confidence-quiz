@@ -15,10 +15,18 @@ export default defineConfig({
     trace: "retain-on-failure"
   },
   webServer: {
-    command: "./node_modules/.bin/next start --hostname 127.0.0.1 --port 3004",
+    command: "./node_modules/.bin/next build && ./node_modules/.bin/next start --hostname 127.0.0.1 --port 3004",
     url: "http://127.0.0.1:3004/",
     reuseExistingServer: false,
-    timeout: 120_000
+    timeout: 180_000,
+    env: {
+      NEXT_PUBLIC_SUPABASE_URL: "https://e2e.invalid",
+      NEXT_PUBLIC_SUPABASE_ANON_KEY: "e2e-anon-key",
+      ADMIN_EMAILS: "e2e-owner@example.test",
+      NEXT_PUBLIC_SUPABASE_RECOVERY_MODE: "off",
+      SUPABASE_SERVICE_ROLE_KEY: "",
+      OPENAI_API_KEY: ""
+    }
   },
   projects: [
     {

@@ -1238,8 +1238,16 @@ alter table public.feedback_messages
 create index if not exists feedback_messages_created_at_idx
 on public.feedback_messages (created_at desc);
 
+create index if not exists feedback_messages_root_id_desc_idx
+on public.feedback_messages (id desc)
+where parent_id is null;
+
 create index if not exists feedback_messages_parent_id_created_at_idx
 on public.feedback_messages (parent_id, created_at asc);
+
+create index if not exists feedback_messages_parent_id_id_idx
+on public.feedback_messages (parent_id, id)
+where parent_id is not null;
 
 create index if not exists feedback_messages_user_id_created_at_idx
 on public.feedback_messages (user_id, created_at desc);
@@ -1247,13 +1255,21 @@ on public.feedback_messages (user_id, created_at desc);
 create index if not exists feedback_messages_visitor_id_created_at_idx
 on public.feedback_messages (visitor_id, created_at desc);
 
-grant select
-  on public.feedback_messages
-  to anon;
+update public.feedback_messages
+set display_name = null
+where is_anonymous = true
+  and display_name is not null;
 
-grant select
+alter table public.feedback_messages
+drop constraint if exists feedback_messages_anonymous_display_name_check;
+
+alter table public.feedback_messages
+add constraint feedback_messages_anonymous_display_name_check
+check (not is_anonymous or display_name is null);
+
+revoke all privileges
   on public.feedback_messages
-  to authenticated;
+  from public, anon, authenticated;
 
 grant select, insert, update, delete
   on public.feedback_messages
@@ -1264,11 +1280,6 @@ alter table public.feedback_messages enable row level security;
 drop policy if exists "Anyone can read feedback messages" on public.feedback_messages;
 drop policy if exists "Anyone can insert feedback messages" on public.feedback_messages;
 drop policy if exists "Service role can manage feedback messages" on public.feedback_messages;
-
-create policy "Anyone can read feedback messages"
-on public.feedback_messages
-for select
-using (true);
 
 create policy "Service role can manage feedback messages"
 on public.feedback_messages
@@ -1302,13 +1313,9 @@ on public.feedback_message_votes (message_id);
 create index if not exists feedback_message_votes_user_id_idx
 on public.feedback_message_votes (user_id);
 
-grant select
+revoke all privileges
   on public.feedback_message_votes
-  to anon;
-
-grant select
-  on public.feedback_message_votes
-  to authenticated;
+  from public, anon, authenticated;
 
 grant select, insert, update, delete
   on public.feedback_message_votes
@@ -1317,12 +1324,8 @@ grant select, insert, update, delete
 alter table public.feedback_message_votes enable row level security;
 
 drop policy if exists "Anyone can read feedback message votes" on public.feedback_message_votes;
+drop policy if exists "Anyone can insert feedback message votes" on public.feedback_message_votes;
 drop policy if exists "Service role can manage feedback message votes" on public.feedback_message_votes;
-
-create policy "Anyone can read feedback message votes"
-on public.feedback_message_votes
-for select
-using (true);
 
 create policy "Service role can manage feedback message votes"
 on public.feedback_message_votes
@@ -1330,6 +1333,14 @@ for all
 to service_role
 using (true)
 with check (true);
+
+revoke all privileges
+  on sequence public.feedback_messages_id_seq, public.feedback_message_votes_id_seq
+  from public, anon, authenticated;
+
+grant usage, select
+  on sequence public.feedback_messages_id_seq, public.feedback_message_votes_id_seq
+  to service_role;
 
 create table if not exists public.question_classification_reports (
   id bigint generated always as identity primary key,

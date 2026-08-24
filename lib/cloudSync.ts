@@ -5,6 +5,7 @@ import type {
   CustomPaperDifficulty,
   CustomPaperSearchPreview,
   CustomPaperSummary,
+  FeedbackActivity,
   FeedbackMessage,
   LeaderboardEntry,
   OwnerDailyPoint,
@@ -4017,25 +4018,49 @@ export async function loadVisitorStats(options: { includeOnline?: boolean } = {}
 }
 
 export async function loadFeedbackMessagesResult(
-  limit = 20,
-  options: { fresh?: boolean } = {}
+  limit = 10,
+  options: { fresh?: boolean; cursor?: string | null } = {}
 ): Promise<{
   messages: FeedbackMessage[];
+  nextCursor: string | null;
+  hasMore: boolean;
+  updatedAt?: string;
   degraded: boolean;
   stale: boolean;
   message?: string;
 }> {
   if (isSupabaseRecoveryMode() || !isSupabaseConfigured()) {
-    return { messages: [], degraded: true, stale: false, message: "留言板暫時維護中。" };
+    return {
+      messages: [],
+      nextCursor: null,
+      hasMore: false,
+      degraded: true,
+      stale: false,
+      message: "留言板暫時維護中。"
+    };
   }
 
-  const freshQuery = options.fresh ? `&fresh=1&ts=${Date.now()}` : "";
+  const query = new URLSearchParams({ limit: String(limit) });
+  if (options.cursor) query.set("cursor", options.cursor);
+  if (options.fresh) {
+    query.set("fresh", "1");
+    query.set("ts", String(Date.now()));
+  }
   const response = await fetch(
-    `/api/feedback?limit=${encodeURIComponent(String(limit))}${freshQuery}`,
+    `/api/feedback?${query.toString()}`,
     options.fresh ? { cache: "no-store" } : undefined
   );
   const payload = (await response.json().catch(() => null)) as
-    | { ok?: boolean; degraded?: boolean; stale?: boolean; message?: string; messages?: FeedbackMessage[] }
+    | {
+        ok?: boolean;
+        degraded?: boolean;
+        stale?: boolean;
+        message?: string;
+        messages?: FeedbackMessage[];
+        nextCursor?: string | null;
+        hasMore?: boolean;
+        updatedAt?: string;
+      }
     | null;
 
   if (!response.ok || !payload?.ok) {
@@ -4044,15 +4069,88 @@ export async function loadFeedbackMessagesResult(
 
   return {
     messages: payload.messages ?? [],
+    nextCursor: payload.nextCursor ?? null,
+    hasMore: Boolean(payload.hasMore),
+    updatedAt: payload.updatedAt,
     degraded: Boolean(payload.degraded),
     stale: Boolean(payload.stale),
     message: payload.message
   };
 }
 
-export async function loadFeedbackMessages(limit = 20): Promise<FeedbackMessage[]> {
+export async function loadFeedbackMessages(limit = 10): Promise<FeedbackMessage[]> {
   const result = await loadFeedbackMessagesResult(limit);
   return result.messages;
+}
+
+export async function loadFeedbackActivity(input: {
+  accessToken: string;
+  cursor?: string | null;
+  limit?: number;
+}): Promise<{
+  activities: FeedbackActivity[];
+  nextCursor: string | null;
+  hasMore: boolean;
+  authorized: boolean | null;
+  degraded: boolean;
+  message?: string;
+}> {
+  if (isSupabaseRecoveryMode() || !isSupabaseConfigured()) {
+    return {
+      activities: [],
+      nextCursor: input.cursor ?? null,
+      hasMore: false,
+      authorized: null,
+      degraded: true,
+      message: "留言通知暫停更新。"
+    };
+  }
+
+  const query = new URLSearchParams({ limit: String(input.limit ?? 20) });
+  if (input.cursor) query.set("after", input.cursor);
+  const response = await fetch(`/api/feedback/activity?${query.toString()}`, {
+    cache: "no-store",
+    headers: getFeedbackAuthorizationHeaders(input.accessToken)
+  });
+  const payload = (await response.json().catch(() => null)) as
+    | {
+        ok?: boolean;
+        activities?: FeedbackActivity[];
+        nextCursor?: string | null;
+        hasMore?: boolean;
+        authorized?: boolean;
+        degraded?: boolean;
+        message?: string;
+      }
+    | null;
+
+  if (response.status === 401 || response.status === 403) {
+    return {
+      activities: [],
+      nextCursor: input.cursor ?? null,
+      hasMore: false,
+      authorized: false,
+      degraded: false,
+      message: payload?.message
+    };
+  }
+  if (!response.ok || !payload?.ok) {
+    throw new Error(payload?.message || "留言通知讀取失敗");
+  }
+
+  return {
+    activities: payload.activities ?? [],
+    nextCursor: payload.nextCursor ?? input.cursor ?? null,
+    hasMore: Boolean(payload.hasMore),
+    authorized:
+      typeof payload.authorized === "boolean"
+        ? payload.authorized
+        : payload.degraded
+          ? null
+          : false,
+    degraded: Boolean(payload.degraded),
+    message: payload.message
+  };
 }
 
 export async function createFeedbackMessage(input: {
