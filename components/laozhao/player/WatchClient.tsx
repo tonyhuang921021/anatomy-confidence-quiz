@@ -10,6 +10,7 @@ import {
   ChevronRight,
   Clock3,
   BookOpenText,
+  Images,
   ListVideo,
   Save,
   Trash2
@@ -72,12 +73,17 @@ export function WatchClient({ video, playlist, learningAdapter }: LaoZhaoWatchCl
     ),
     [video.chapters, video.previewMode]
   );
+  const boardFrameCount = useMemo(
+    () => chapters.reduce((total, chapter) => total + (chapter.boardFrames?.length ?? 0), 0),
+    [chapters]
+  );
   const captions = video.captions ?? [];
   const captionSentences = useMemo(() => buildCaptionSentences(captions), [captions]);
   const selectedChapter = useMemo(
     () => chapters.find((chapter) => chapter.stableId === searchParams.get("chapter")) ?? null,
     [chapters, searchParams]
   );
+  const fallbackChapterId = chapters[0]?.stableId ?? null;
   const hasExplicitSeek = selectedChapter !== null || searchParams.has("t");
   const requestedSeekSeconds = searchParams.has("t")
     ? clampSeconds(searchParams.get("t"), video.durationSec)
@@ -107,7 +113,9 @@ export function WatchClient({ video, playlist, learningAdapter }: LaoZhaoWatchCl
   }, [initialSeekSeconds, video.id]);
 
   useEffect(() => {
-    setCurrentChapterId(selectedChapter?.stableId ?? null);
+    setCurrentChapterId(
+      selectedChapter?.stableId ?? (searchParams.has("chapter") ? null : fallbackChapterId)
+    );
     if (handledRouteSeekRef.current === null) {
       handledRouteSeekRef.current = routeSeekKey;
       return;
@@ -115,7 +123,7 @@ export function WatchClient({ video, playlist, learningAdapter }: LaoZhaoWatchCl
     if (handledRouteSeekRef.current === routeSeekKey) return;
     handledRouteSeekRef.current = routeSeekKey;
     if (hasExplicitSeek) playerRef.current?.seekTo(requestedSeekSeconds);
-  }, [hasExplicitSeek, requestedSeekSeconds, routeSeekKey, selectedChapter?.stableId]);
+  }, [fallbackChapterId, hasExplicitSeek, requestedSeekSeconds, routeSeekKey, searchParams, selectedChapter?.stableId]);
 
   function showMessage(message: string) {
     setActionMessage(message);
@@ -201,6 +209,15 @@ export function WatchClient({ video, playlist, learningAdapter }: LaoZhaoWatchCl
                 測試內容：章節與字幕仍在人工校訂，不會出現在正式站。
               </p>
             ) : null}
+            {video.previewMode && boardFrameCount > 0 ? (
+              <Link
+                href={`/courses/laozhao-anatomy/watch/${encodeURIComponent(video.id)}/materials`}
+                className="mt-4 inline-flex min-h-10 items-center gap-2 rounded-md border border-[var(--line-soft)] bg-white px-3 py-2 text-sm font-bold text-[var(--brand-deep)] hover:border-[var(--brand-main)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-main)]"
+              >
+                <Images aria-hidden="true" size={17} strokeWidth={2} />
+                查看全部板書與筆記・{boardFrameCount} 組對照
+              </Link>
+            ) : null}
           </div>
         </div>
       </header>
@@ -227,7 +244,7 @@ export function WatchClient({ video, playlist, learningAdapter }: LaoZhaoWatchCl
                 playable={video.status === "available"}
                 allowDrafts={video.previewMode === true}
                 captionText={currentCaptionSentence?.text ?? ""}
-                onChapterChange={(chapter) => setCurrentChapterId(chapter?.stableId ?? null)}
+                onChapterChange={(chapter) => setCurrentChapterId(chapter?.stableId ?? fallbackChapterId)}
                 onTimeUpdate={setCurrentTimeSec}
                 onProgressCheckpoint={(seconds, duration, completed, watchedRanges) => {
                   void learning.saveProgress(seconds, duration, completed, watchedRanges);
@@ -250,7 +267,7 @@ export function WatchClient({ video, playlist, learningAdapter }: LaoZhaoWatchCl
                 }`}
               >
                 <ListVideo aria-hidden="true" size={17} strokeWidth={2} />
-                章節與字幕
+                章節與逐字稿
               </button>
               <button
                 type="button"
@@ -268,9 +285,9 @@ export function WatchClient({ video, playlist, learningAdapter }: LaoZhaoWatchCl
               </button>
             </div>
             {contentPanel === "navigation" ? (
-              <div className="flex min-h-0 flex-1 flex-col" role="tabpanel" aria-label="章節與字幕">
+              <div className="flex min-h-0 flex-1 flex-col" role="tabpanel" aria-label="章節與逐字稿">
                 <div className="mt-5 flex items-center justify-between gap-3">
-                  <h2 className="text-xl font-black">章節與字幕</h2>
+                  <h2 className="text-xl font-black">章節與逐字稿</h2>
                   <span className="text-xs font-semibold tabular-nums text-[var(--ink-soft)]">
                     {sidePanel === "chapters" ? `${chapters.length} 章` : `${captionSentences.length} 句`}
                   </span>
@@ -303,7 +320,7 @@ export function WatchClient({ video, playlist, learningAdapter }: LaoZhaoWatchCl
                     }`}
                   >
                     <Captions aria-hidden="true" size={17} strokeWidth={2} />
-                    字幕
+                    逐字稿
                   </button>
                 </div>
                 <div
@@ -370,9 +387,12 @@ export function WatchClient({ video, playlist, learningAdapter }: LaoZhaoWatchCl
               ) : null}
             </div>
             {currentChapter.summary ? (
-              <p className="mt-4 max-w-4xl text-sm leading-7 text-[var(--ink-soft)]">
-                {currentChapter.summary}
-              </p>
+              <div className="mt-4 max-w-4xl border-l-2 border-[var(--brand-main)] pl-4">
+                <h3 className="text-sm font-black text-[var(--brand-deep)]">本章重點</h3>
+                <p className="mt-1 text-sm leading-7 text-[var(--ink-soft)]">
+                  {currentChapter.summary}
+                </p>
+              </div>
             ) : null}
             {(currentChapter.boardFrames?.length ?? 0) > 0 || (currentChapter.referenceNotes?.length ?? 0) > 0 ? (
               <div className="mt-6">

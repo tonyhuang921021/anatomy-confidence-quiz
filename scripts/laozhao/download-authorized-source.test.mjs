@@ -32,5 +32,6 @@ test("下載計畫固定輸出私人 staging 且限制最高畫質", () => {
   });
   assert.match(plan.outputTemplate, /data\/laozhao\/staging\/ATFBb25QRNw\/source/);
   assert.equal(plan.format, "bv*[height<=1080]+ba/b[height<=1080]");
+  assert.equal(plan.remoteComponent, "ejs:github");
   assert.equal(plan.watchUrl, "https://www.youtube.com/watch?v=ATFBb25QRNw");
 });

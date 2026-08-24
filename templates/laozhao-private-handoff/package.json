@@ -1,0 +1,15 @@
+{
+  "name": "laozhao-private-handoff",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=20 <23"
+  },
+  "scripts": {
+    "test": "node --test scripts/handoff-runtime.test.mjs",
+    "preflight": "node scripts/preflight-private-repo.mjs",
+    "draft": "node scripts/generate-chapter-draft.mjs",
+    "review": "node scripts/review-progress.mjs"
+  }
+}

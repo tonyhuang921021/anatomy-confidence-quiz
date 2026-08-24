@@ -2,6 +2,10 @@ import { createHash } from "node:crypto";
 
 const TIME_PATTERN = /^(?:(\d+):)?(\d{1,2}):(\d{1,2})(?:\.(\d+))?$/;
 const VIDEO_ID_PATTERN = /^[A-Za-z0-9_-]{11}$/;
+const KNOWN_WHISPER_HALLUCINATIONS = new Set([
+  "请不吝点赞订阅转发打赏支持明镜与点点栏目",
+  "請不吝點讚訂閱轉發打賞支持明鏡與點點欄目"
+]);
 
 export function parseCliArgs(argv) {
   const args = {};
@@ -65,14 +69,65 @@ export function isLikelyTranscriptLoop(text) {
   const compact = text.normalize("NFKC").replace(/[\s、，,。！？!?；;：:]+/gu, "");
   if (compact.length < 8) return false;
   const maxUnitLength = Math.min(32, Math.floor(compact.length / 4));
-  for (let unitLength = 2; unitLength <= maxUnitLength; unitLength += 1) {
-    if (compact.length % unitLength !== 0) continue;
-    const repeatCount = compact.length / unitLength;
-    if (repeatCount < 4) continue;
+  for (let unitLength = 1; unitLength <= maxUnitLength; unitLength += 1) {
     const unit = compact.slice(0, unitLength);
-    if (unit.repeat(repeatCount) === compact) return true;
+    const repeatCount = Math.floor(compact.length / unitLength);
+    const remainder = compact.length % unitLength;
+    const threshold = remainder === 0 ? 4 : 8;
+    if (repeatCount < threshold) continue;
+    if (`${unit.repeat(repeatCount)}${unit.slice(0, remainder)}` === compact) return true;
   }
   return false;
+}
+
+export function isKnownWhisperHallucination(text) {
+  if (typeof text !== "string") return false;
+  const compact = text.normalize("NFKC").replace(/[\s、，,。！？!?；;：:]+/gu, "");
+  return KNOWN_WHISPER_HALLUCINATIONS.has(compact);
+}
+
+function compactTranscriptText(text) {
+  return String(text ?? "").normalize("NFKC").replace(/[\s、，,。！？!?；;：:]+/gu, "");
+}
+
+function hasSuspiciousWhisperSignals(item) {
+  const avgLogprob = Number(item?.avg_logprob);
+  const compressionRatio = Number(item?.compression_ratio);
+  const temperature = Number(item?.temperature);
+  return (Number.isFinite(avgLogprob) && avgLogprob <= -1)
+    || (Number.isFinite(compressionRatio) && compressionRatio >= 5)
+    || (Number.isFinite(temperature) && temperature >= 0.8);
+}
+
+export function trimSuspiciousTerminalRepeatRun(segments, { durationSec = null } = {}) {
+  if (!Array.isArray(segments) || segments.length < 4 || !Number.isFinite(durationSec)) {
+    return { segments, removedCount: 0 };
+  }
+
+  const last = segments.at(-1);
+  const repeatedText = compactTranscriptText(last?.text);
+  if (!repeatedText || repeatedText.length > 8 || last.endSec < durationSec - 2) {
+    return { segments, removedCount: 0 };
+  }
+
+  let runStart = segments.length - 1;
+  while (
+    runStart > 0
+    && compactTranscriptText(segments[runStart - 1]?.text) === repeatedText
+  ) {
+    runStart -= 1;
+  }
+
+  const run = segments.slice(runStart);
+  if (
+    run.length < 4
+    || run[0].startSec < durationSec - 15
+    || !run.every((segment) => segment._whisperSuspicious === true)
+  ) {
+    return { segments, removedCount: 0 };
+  }
+
+  return { segments: segments.slice(0, runStart), removedCount: run.length };
 }
 
 export function normalizeTranscriptSegments(raw, { durationSec = null } = {}) {
@@ -99,6 +154,10 @@ export function normalizeTranscriptSegments(raw, { durationSec = null } = {}) {
       warnings.push(`第 ${sourceIndex + 1} 段疑似重複循環幻覺，已略過。`);
       return;
     }
+    if (isKnownWhisperHallucination(text)) {
+      warnings.push(`第 ${sourceIndex + 1} 段命中已知 Whisper 幻覺，已略過。`);
+      return;
+    }
     if (durationSec !== null && startSec >= durationSec + 1) {
       warnings.push(`第 ${sourceIndex + 1} 段起點超過影片長度，已略過。`);
       return;
@@ -117,12 +176,19 @@ export function normalizeTranscriptSegments(raw, { durationSec = null } = {}) {
       confidence: typeof item.confidence === "number" && Number.isFinite(item.confidence)
         ? Math.max(0, Math.min(1, item.confidence))
         : null,
-      reviewStatus: "unreviewed"
+      reviewStatus: "unreviewed",
+      _whisperSuspicious: hasSuspiciousWhisperSignals(item)
     });
   });
 
   segments.sort((left, right) => left.startSec - right.startSec || left.endSec - right.endSec);
+  const terminalTrim = trimSuspiciousTerminalRepeatRun(segments, { durationSec });
+  if (terminalTrim.removedCount > 0) {
+    warnings.push(`片尾 ${terminalTrim.removedCount} 段短句重複且 Whisper 訊號異常，已略過。`);
+    segments.splice(0, segments.length, ...terminalTrim.segments);
+  }
   segments.forEach((segment, index) => {
+    delete segment._whisperSuspicious;
     segment.id = `seg-${String(index + 1).padStart(5, "0")}`;
     const previous = segments[index - 1];
     if (previous && segment.startSec < previous.endSec) {

@@ -4,11 +4,48 @@
 
 所有中間產物預設放在 `data/laozhao/staging/`，該目錄已被 Git 忽略，不會進入 Vercel 或公開網站。
 
+## 日常操作只用這六個入口
+
+後續 30 支影片一律從統一入口執行；下方較細的舊指令仍保留作為內部除錯工具，不需要在一般處理時逐一操作。
+
+```bash
+npm run laozhao:prepare -- --video-id <videoId>
+npm run laozhao:import -- --video-id <videoId> --response "/Chat 回傳 ZIP 的完整路徑"
+npm run laozhao:repair -- --video-id <videoId>
+npm run laozhao:audit -- --video-id <videoId>
+npm run laozhao:status -- --all
+npm run laozhao:preview -- --video-id <videoId>
+```
+
+每個指令結束後都會直接顯示已完成的項目、目前是否有問題，以及 Chat 應回傳的正確檔名。`laozhao:preview` 只接受已通過完整驗證的影片，不會把待修資料帶進測試頁。
+
+### 固定命名規則
+
+| 用途 | 固定格式 | 範例 |
+| --- | --- | --- |
+| 第一次交給 Chat 的工作包 | `老趙解剖_第NN支_影片名稱_完整校對_v2_工作包.zip` | `老趙解剖_第05支_2016DF03-01_完整校對_v2_工作包.zip` |
+| Chat 第一次回傳 | `老趙解剖_第NN支_影片名稱_完整校對_v2_回傳包.zip` | `老趙解剖_第05支_2016DF03-01_完整校對_v2_回傳包.zip` |
+| 第 1 輪局部修補包 | `…_修補_r01_工作包.zip` | `老趙解剖_第05支_2016DF03-01_完整校對_v2_修補_r01_工作包.zip` |
+| Chat 第 1 輪修補回傳 | `…_修補_r01_回傳包.zip` | `老趙解剖_第05支_2016DF03-01_完整校對_v2_修補_r01_回傳包.zip` |
+| 後續修補 | 輪次依序為 `r02`、`r03` | 不再使用含糊的 `repaired`、`repaired-v2` |
+
+檔名中的 `v2` 是 Prompt／工作契約版本，不是人工加上的修訂次數。真正的修補輪次只看 `修補_rNN`。YouTube ID、來源指紋與內部 job ID 仍保存在 ZIP manifest 中供匯入器驗證，不再顯示於檔名。舊回傳檔可以繼續匯入；新工作一律使用上表名稱，讓人可以直接看出影片與輪次。
+
+每次匯入都會把完整回傳另存到該 job 的 `responses/import-rNN/`，每次修補也會保留先前輪次，不覆蓋上一份。只有字幕、章節、講義與 unresolved 全部通過後，才會原子替換可供 Preview 使用的正式私人產物。
+
+修補項目若需要音訊或板書，工作包會另外附該 cue 前後各四秒的單聲道短音訊、當下畫面與前後文。這些檔案只存在私人 staging 與修補 ZIP；證據仍不足時必須保留 `unresolved`，不能依常識猜詞。
+
+字幕若因刪除純贅詞、重複或起句失敗而縮短超過 45%，不能只靠字數比例反覆要求補字。Chat 必須逐段比對後，在 `captions.reviewed.json` 的 `compressionReviews` 留下 cue ID、處理理由及校訂前後文字 SHA-256；匯入器只接受與目前文字完全相符的憑證。任何定義、數字、方向、否定、例子、例外、醫學術語或老師強調仍有疑慮時，必須保留在 `unresolved.json`，審核憑證不能用來略過真正的不確定內容。
+
+來源檔若剛好在老師尚未講完的示範或句子中結束，只保留影片內可證實的字幕與講義，不補寫下一支才會出現的內容。最後 cue 已完整保留時，這屬於來源邊界，不是永久疑義，不應以 `continuation` 留在 `unresolved.json` 造成無限修補；只有無法確認是否漏轉或最後一段本身仍聽不清時才繼續阻擋匯入。
+
 本機可在 `.env.local` 設定既有工具位置，避免把私人電腦路徑寫進文件：
 
 ```bash
 LAOZHAO_PYTHON=/你的工具位置/.venv/bin/python3
+# 選填：只有需要沿用舊 transcribe_lecture_mlx.py 時才設定。
 LAOZHAO_TRANSCRIBE_TOOL=/你的工具位置/transcribe_lecture_mlx.py
+# 選填：沒有設定時使用專案內建的 OpenCV 板書抽取器。
 LAOZHAO_CAPTURE_TOOL=/你的工具位置/capture_slides.py
 ```
 
@@ -34,6 +71,8 @@ npm run check:laozhao-tools
 python3 -m venv .venv-laozhao
 .venv-laozhao/bin/python3 -m pip install -r scripts/laozhao/requirements.txt
 ```
+
+YouTube 目前會要求 JavaScript challenge solver。這份固定依賴已包含與 `yt-dlp` 版本相符的 `yt-dlp-ejs`，下載時並使用 Node.js 22 以上；若只安裝 `yt-dlp` 而漏裝 EJS，常見症狀是能讀到影片資訊與格式，但真正下載媒體時回傳 HTTP 403。
 
 ## 1. 準備一支授權原始影片
 
@@ -71,6 +110,8 @@ npm run transcribe:laozhao -- \
 
 這一步可能花較久時間，完成後會得到私人 Whisper JSON，並加入來源影片的 SHA-256、video ID、檔名與大小。程式不會下載 YouTube 影片，也不會修改既有轉錄工具。
 
+原始 Whisper 輸出請固定命名為 `whisper.raw.json`。轉錄工具會拒絕直接寫入 `transcript.private.json` 等正式內容檔名，避免原始模型輸出被誤認為已正規化、可交付的逐字稿。
+
 ## 3. 建立給 Chat 的分章工作包
 
 ```bash
@@ -92,6 +133,8 @@ data/laozhao/staging/ATFBb25QRNw/review-package/
 - `chat-chapter-package.md`：可直接交給 Chat，內含規則、JSON 格式與完整時間碼。
 - `chapter-draft.template.json`：空白格式參考。
 - `warnings.txt`：時間重疊或無效片段等提醒。
+
+正規化會排除無效時間、完整重複循環及精確命中的已知 Whisper 垃圾句。已知垃圾句只採完整片語白名單，不使用模糊關鍵字，以免誤刪老師真的講到的解剖內容；每個被排除的原始片段都會留在 `warnings.txt` 供追查。
 
 ## 4. 讓 Chat 整理章節
 
@@ -154,6 +197,17 @@ data/laozhao/staging/<videoId>/review-package/board-selection.preview.private.js
 - 沒有具辨識價值的板書時明確留空，不勉強發布老師遮住或未完成的圖。
 - candidate ID、來源相對路徑、時間碼與章節 ID 都要保留，之後才能回到原影片核對。
 
+若候選圖曾經重新擷取，新的 `frame-01`、`frame-02` 只代表新一輪的排列順序，不能拿來取代舊的人工選圖。此時以人工選擇檔保存的 `timeSec`、`sourcePath` 與章節 ID 為準，從同一支來源影片重新取出精確影格：
+
+```bash
+npm run hydrate:laozhao-board -- \
+  --source data/laozhao/staging/<videoId>/source/<videoId>.mp4 \
+  --selection data/laozhao/staging/<videoId>/review-package/board-selection.preview.private.json \
+  --index data/laozhao/staging/<videoId>/review-package/board-candidates/index.private.json
+```
+
+這一步會先核對影片 SHA-256、來源指紋、章節範圍、裁切區域與所有輸出路徑，再依保存時間碼產生真實 PNG。它不會重新評分或重選板書，也不會拼接、補畫或使用新一輪的候選序號猜測舊圖。成功後必須確認 `hydrated-selection.private.json` 的每張圖都是 `actualFrame: true` 且 `composite: false`，才可繼續做筆記對照或 Preview。
+
 ## 7. 私人參考筆記對照
 
 若有其他筆記可協助確認板書完整性，另建私人對照檔：
@@ -163,6 +217,20 @@ data/laozhao/staging/<videoId>/review-package/reference-notes.private.json
 ```
 
 逐張記錄板書 ID、章節 ID、影片時間碼、來源 PDF 指紋、PDF 實際頁碼、頁內圖示位置與吻合構造。這份資料不只靠檔名，因此 PDF 或截圖重新命名後仍可核對。
+
+若同一份參考筆記要供多支影片重複使用，先建立一份帶 PDF SHA-256、頁數與人工覆核狀態的私人頁面主題索引。只有明確章節名稱或足夠具體的構造詞可以自動配對；「神經、血管、上肢」等泛詞、OCR 單獨命中、摘要單獨命中及分數接近的多頁候選都必須拒絕，不可為了填滿畫面硬配。
+
+```bash
+python3 scripts/laozhao/reference-notes-index.py \
+  --pdf "/私人來源/參考筆記.pdf" \
+  --chapters data/laozhao/staging/<videoId>/review-package/chapters.validated.preview.private.json \
+  --cache-dir data/laozhao/staging/reference/<筆記代號>-ocr.private \
+  --catalog data/laozhao/staging/reference/<筆記代號>-page-catalog.private.json \
+  --output data/laozhao/staging/<videoId>/review-package/reference-notes.private.json \
+  --skip-ocr
+```
+
+`--skip-ocr` 表示正式配對只採人工覆核頁面索引。OCR 快取仍可用來提出待看頁面，但不能直接升級成網站對照。每次 PDF 內容、頁數或 SHA-256 改變時，舊索引必須失效並重新覆核。
 
 ```bash
 npm run validate:laozhao-reference -- \

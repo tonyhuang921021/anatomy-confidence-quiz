@@ -192,6 +192,208 @@ test("共筆條列可保留四層結構與少量師說標記", () => {
   assert.throws(() => validateLectureNotesReview(video, invalidKind), /標記類型無效/);
 });
 
+test("共筆條列允許對應單一區塊 14 段字幕但阻擋第 15 個子項", () => {
+  const accepted = review();
+  accepted.blocks[0].points = [{
+    text: "本區塊整理。",
+    children: Array.from({ length: 14 }, (_, index) => ({ text: `第 ${index + 1} 個子項。` }))
+  }];
+  assert.equal(validateLectureNotesReview(video, accepted).blocks[0].points[0].children.length, 14);
+
+  const rejected = review();
+  rejected.blocks[0].points = [{
+    text: "本區塊整理。",
+    children: Array.from({ length: 15 }, (_, index) => ({ text: `第 ${index + 1} 個子項。` }))
+  }];
+  assert.throws(() => validateLectureNotesReview(video, rejected), /下層項目格式無效/);
+});
+
+test("講義保留粗體、字幕證據與有來源的老師強調", () => {
+  const emphasizedVideo = {
+    ...video,
+    captions: video.captions.map((caption, index) => (
+      index === 0 ? { ...caption, text: "這很重要，一定要記住第一點。" } : caption
+    ))
+  };
+  const candidate = review();
+  candidate.captionFingerprint = captionFingerprint(emphasizedVideo.captions);
+  candidate.blocks[0].teacherEmphasis = [{
+    phrase: "這很重要",
+    evidenceStartCue: "cue-00001",
+    evidenceEndCue: "cue-00001"
+  }];
+  candidate.blocks[0].points = [{
+    text: "一定要記住第一點。",
+    textRuns: [
+      { text: "一定要記住", strong: true },
+      { text: "第一點。", strong: false }
+    ],
+    details: [],
+    evidenceStartCue: "cue-00001",
+    evidenceEndCue: "cue-00001",
+    teacherEmphasis: [{
+      phrase: "這很重要",
+      evidenceStartCue: "cue-00001",
+      evidenceEndCue: "cue-00001"
+    }]
+  }];
+
+  const result = validateLectureNotesReview(emphasizedVideo, candidate);
+  const point = result.blocks[0].points[0];
+  assert.deepEqual(point.textRuns, candidate.blocks[0].points[0].textRuns);
+  assert.equal(point.evidenceStartCue, "cue-00001");
+  assert.equal(point.teacherEmphasis[0].phrase, "這很重要");
+  assert.equal(result.blocks[0].teacherEmphasis[0].phrase, "這很重要");
+
+  const outside = structuredClone(candidate);
+  outside.blocks[0].points[0].evidenceStartCue = "cue-00003";
+  outside.blocks[0].points[0].evidenceEndCue = "cue-00003";
+  assert.throws(() => validateLectureNotesReview(emphasizedVideo, outside), /超出所屬講義區塊/);
+
+  const forged = structuredClone(candidate);
+  forged.blocks[0].points[0].teacherEmphasis[0].evidenceStartCue = "cue-00002";
+  forged.blocks[0].points[0].teacherEmphasis[0].evidenceEndCue = "cue-00002";
+  assert.throws(() => validateLectureNotesReview(emphasizedVideo, forged), /沒有字幕中的明確強調訊號/);
+
+  const forgedBlock = structuredClone(candidate);
+  forgedBlock.blocks[0].teacherEmphasis[0].evidenceStartCue = "cue-00002";
+  forgedBlock.blocks[0].teacherEmphasis[0].evidenceEndCue = "cue-00002";
+  assert.throws(() => validateLectureNotesReview(emphasizedVideo, forgedBlock), /沒有字幕中的明確強調訊號/);
+});
+
+test("補充內容的下層列點也不能冒充老師強調", () => {
+  const candidate = review();
+  candidate.blocks[1].points[0].teacherEmphasis = [{
+    phrase: "很重要",
+    evidenceStartCue: "cue-00001",
+    evidenceEndCue: "cue-00001"
+  }];
+  assert.throws(() => validateLectureNotesReview(video, candidate), /補充內容，不能標示為老師強調/);
+});
+
+test("老師說一定要完成某件事會被視為明確強調", () => {
+  const emphasizedVideo = {
+    ...video,
+    captions: video.captions.map((caption, index) => (
+      index === 0 ? { ...caption, text: "這三張圖一定要配好。" } : caption
+    ))
+  };
+  const candidate = review();
+  candidate.captionFingerprint = captionFingerprint(emphasizedVideo.captions);
+  candidate.blocks[0].points = [{
+    text: "三張圖要能互相配對。",
+    evidenceStartCue: "cue-00001",
+    evidenceEndCue: "cue-00001",
+    teacherEmphasis: [{
+      phrase: "一定要",
+      evidenceStartCue: "cue-00001",
+      evidenceEndCue: "cue-00001"
+    }]
+  }];
+
+  const result = validateLectureNotesReview(emphasizedVideo, candidate);
+  assert.equal(result.blocks[0].points[0].teacherEmphasis[0].phrase, "一定要");
+});
+
+test("混淆提醒、出題紀錄與星號標記都保留為老師強調", () => {
+  for (const [sourceText, phrase] of [
+    ["名稱不可混淆。", "不可混淆"],
+    ["此項曾出題。", "曾出題"],
+    ["講義上兩個星號就是這兩句。", "星號"]
+  ]) {
+    const emphasizedVideo = {
+      ...video,
+      captions: video.captions.map((caption, index) => (
+        index === 0 ? { ...caption, text: sourceText } : caption
+      ))
+    };
+    const candidate = review();
+    candidate.captionFingerprint = captionFingerprint(emphasizedVideo.captions);
+    candidate.blocks[0].points = [{
+      text: sourceText,
+      evidenceStartCue: "cue-00001",
+      evidenceEndCue: "cue-00001",
+      teacherEmphasis: [{
+        phrase,
+        evidenceStartCue: "cue-00001",
+        evidenceEndCue: "cue-00001"
+      }]
+    }];
+    const result = validateLectureNotesReview(emphasizedVideo, candidate);
+    assert.equal(result.blocks[0].points[0].teacherEmphasis[0].phrase, phrase);
+  }
+});
+
+test("老師說背好會被視為明確強調", () => {
+  const emphasizedVideo = {
+    ...video,
+    captions: video.captions.map((caption, index) => (
+      index === 0 ? { ...caption, text: "這個構造要背好。" } : caption
+    ))
+  };
+  const candidate = review();
+  candidate.captionFingerprint = captionFingerprint(emphasizedVideo.captions);
+  candidate.blocks[0].points = [{
+    text: "這個構造要背好。",
+    evidenceStartCue: "cue-00001",
+    evidenceEndCue: "cue-00001",
+    teacherEmphasis: [{
+      phrase: "背好",
+      evidenceStartCue: "cue-00001",
+      evidenceEndCue: "cue-00001"
+    }]
+  }];
+  const result = validateLectureNotesReview(emphasizedVideo, candidate);
+  assert.equal(result.blocks[0].points[0].teacherEmphasis[0].phrase, "背好");
+});
+
+test("老師說小心會被視為明確強調", () => {
+  const emphasizedVideo = {
+    ...video,
+    captions: video.captions.map((caption, index) => (
+      index === 0 ? { ...caption, text: "小心：這個構造不要混淆。" } : caption
+    ))
+  };
+  const candidate = review();
+  candidate.captionFingerprint = captionFingerprint(emphasizedVideo.captions);
+  candidate.blocks[0].points = [{
+    text: "這個構造不要混淆。",
+    evidenceStartCue: "cue-00001",
+    evidenceEndCue: "cue-00001",
+    teacherEmphasis: [{
+      phrase: "小心",
+      evidenceStartCue: "cue-00001",
+      evidenceEndCue: "cue-00001"
+    }]
+  }];
+  const result = validateLectureNotesReview(emphasizedVideo, candidate);
+  assert.equal(result.blocks[0].points[0].teacherEmphasis[0].phrase, "小心");
+});
+
+test("否定重要性、一般重要部位與很好背好比不會被誤認為強調", () => {
+  for (const text of ["這段比較不重要。", "請避開重要部位。", "這個很好背好比。"] ) {
+    const neutralVideo = {
+      ...video,
+      captions: video.captions.map((caption, index) => (
+        index === 0 ? { ...caption, text } : caption
+      ))
+    };
+    const candidate = review();
+    candidate.captionFingerprint = captionFingerprint(neutralVideo.captions);
+    candidate.blocks[0].points = [{
+      text,
+      evidenceStartCue: "cue-00001",
+      evidenceEndCue: "cue-00001",
+      teacherEmphasis: [{
+        phrase: "重要",
+        evidenceStartCue: "cue-00001",
+        evidenceEndCue: "cue-00001"
+      }]
+    }];
+    assert.throws(() => validateLectureNotesReview(neutralVideo, candidate), /沒有字幕中的明確強調訊號/);
+  }
+});
+
 test("字幕有缺口、跨章與未解疑點都會阻擋匯入", () => {
   const missing = review();
   missing.blocks[0].sourceCaptionEnd = "cue-00001";
@@ -216,6 +418,7 @@ test("講義整理包包含完整覆蓋、補充與表格規則", () => {
   assert.match(output, /type=table/);
   assert.match(output, /不能只標字幕範圍卻省略內容/);
   assert.match(output, /最多涵蓋 14 段字幕/);
+  assert.match(output, /每層最多 14 個子項/);
   assert.match(output, /共筆式列點講義/);
   assert.match(output, /不要反覆寫『老師說』/);
   assert.match(output, /children 依內容關係往下展開/);

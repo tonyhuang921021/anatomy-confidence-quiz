@@ -1,0 +1,98 @@
+name: Draft Lao Zhao chapters
+
+on:
+  workflow_dispatch:
+    inputs:
+      job_path:
+        description: jobs/<videoId>/<jobId>
+        required: true
+        type: string
+      force:
+        description: 重新產生既有草稿
+        required: false
+        default: false
+        type: boolean
+      confirm_paid_api:
+        description: 付費 API 確認字串（必須填 I_ACCEPT_OPENAI_API_CHARGES）
+        required: true
+        type: string
+
+permissions:
+  contents: write
+  pull-requests: write
+
+concurrency:
+  group: laozhao-draft-${{ inputs.job_path }}
+  cancel-in-progress: false
+
+jobs:
+  draft:
+    if: ${{ inputs.confirm_paid_api == 'I_ACCEPT_OPENAI_API_CHARGES' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      JOB_PATH: ${{ inputs.job_path }}
+      PRIVATE_REPOSITORY_CONFIRMED: ${{ github.event.repository.private }}
+      OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+      OPENAI_MODEL: ${{ vars.OPENAI_MODEL || 'gpt-5.6-sol' }}
+      OPENAI_REASONING_EFFORT: ${{ vars.OPENAI_REASONING_EFFORT || 'high' }}
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 20
+          package-manager-cache: false
+      - name: Verify private repository and tracked files
+        run: npm run preflight
+      - name: Read deterministic branch name
+        id: branch
+        run: node scripts/print-branch-name.mjs --job-dir "$JOB_PATH" >> "$GITHUB_OUTPUT"
+      - name: Switch to the job branch
+        env:
+          BRANCH: ${{ steps.branch.outputs.name }}
+        run: |
+          if git ls-remote --exit-code --heads origin "$BRANCH" >/dev/null 2>&1; then
+            git fetch origin "$BRANCH"
+            git switch --track "origin/$BRANCH"
+          else
+            git switch -c "$BRANCH"
+          fi
+      - name: Generate structured chapter draft
+        run: |
+          if [ "${{ inputs.force }}" = "true" ]; then
+            npm run draft -- --job-dir "$JOB_PATH" --force
+          else
+            npm run draft -- --job-dir "$JOB_PATH"
+          fi
+      - name: Run handoff tests
+        run: npm test
+      - name: Commit private draft evidence
+        env:
+          BRANCH: ${{ steps.branch.outputs.name }}
+        run: |
+          git config user.name "laozhao-handoff-bot"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add "$JOB_PATH/output" "$JOB_PATH/progress"
+          git commit -m "Draft chapters for $JOB_PATH"
+          git push --set-upstream origin "$BRANCH"
+      - name: Open or locate pull request
+        env:
+          GH_TOKEN: ${{ github.token }}
+          BRANCH: ${{ steps.branch.outputs.name }}
+          TITLE: ${{ steps.branch.outputs.title }}
+        run: |
+          EXISTING="$(gh pr list --head "$BRANCH" --json number --jq '.[0].number // empty')"
+          if [ -n "$EXISTING" ]; then
+            echo "Pull request already exists: #$EXISTING"
+          else
+            if ! gh pr create \
+              --base "$GITHUB_REF_NAME" \
+              --head "$BRANCH" \
+              --title "$TITLE" \
+              --body "私人章節草稿。仍須 Codex 驗證、Chat 監督審查與人工確認；不可直接公開。"; then
+              echo "::warning::草稿已安全推送到 $BRANCH，但 repository 未允許 GitHub Actions 建立 PR。請由 Codex 或管理員建立私人 PR。"
+              echo "草稿分支：$BRANCH" >> "$GITHUB_STEP_SUMMARY"
+            fi
+          fi

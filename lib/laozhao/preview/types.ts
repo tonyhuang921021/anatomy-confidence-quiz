@@ -47,11 +47,26 @@ export type LaoZhaoPreviewLecturePointKind =
   | "mnemonic"
   | "warning";
 
+export type LaoZhaoPreviewLectureTextRun = {
+  text: string;
+  strong: boolean;
+};
+
+export type LaoZhaoPreviewTeacherEmphasis = {
+  phrase: string;
+  evidenceStartCue: string;
+  evidenceEndCue: string;
+};
+
 export type LaoZhaoPreviewLecturePoint = {
   text: string;
+  textRuns?: readonly LaoZhaoPreviewLectureTextRun[];
   details: readonly string[];
   children?: readonly LaoZhaoPreviewLecturePoint[];
   kind?: LaoZhaoPreviewLecturePointKind;
+  evidenceStartCue?: string;
+  evidenceEndCue?: string;
+  teacherEmphasis?: readonly LaoZhaoPreviewTeacherEmphasis[];
 };
 
 export type LaoZhaoPreviewLectureTable = {
@@ -74,6 +89,7 @@ type LaoZhaoPreviewLectureTeacherSource = {
   sourceCaptionEnd: string;
   sourceCaptionCount: number;
   sourceFormat?: "timecoded_outline";
+  teacherEmphasis?: readonly LaoZhaoPreviewTeacherEmphasis[];
 };
 
 type LaoZhaoPreviewLectureSupplementSource = {

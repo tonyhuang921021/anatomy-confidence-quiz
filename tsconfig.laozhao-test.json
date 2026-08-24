@@ -12,7 +12,8 @@
   "include": [
     "next-env.d.ts",
     "data/laozhao/**/*.ts",
-    "data/laozhao/**/*.json",
+    "data/laozhao/courseManifest.generated.json",
+    "data/laozhao/previewContent.generated.json",
     "lib/laozhao/**/*.ts"
   ]
 }

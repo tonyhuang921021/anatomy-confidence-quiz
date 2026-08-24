@@ -7,7 +7,13 @@ import { fileURLToPath } from "node:url";
 import { promisify } from "node:util";
 import { compressCaptionSegments } from "./captions-core.mjs";
 import { parseCliArgs } from "./review-package-core.mjs";
-import { buildPreviewVideoContent, mergePreviewVideo } from "./preview-content-core.mjs";
+import { captionFingerprint } from "./subtitle-proofreading-core.mjs";
+import {
+  buildPreviewVideoContent,
+  deriveAutomaticPreviewMaterials,
+  mergePreviewVideo,
+  validateReviewedCaptionsForPreview
+} from "./preview-content-core.mjs";
 import { validateReferenceMap } from "./reference-map-core.mjs";
 
 const execFileAsync = promisify(execFile);
@@ -36,6 +42,16 @@ async function readJson(pathname, label) {
 async function readOptionalJson(pathname, fallback, label) {
   if (!pathname) return fallback;
   return readJson(pathname, label);
+}
+
+async function fileExists(pathname) {
+  try {
+    await stat(pathname);
+    return true;
+  } catch (error) {
+    if (error && typeof error === "object" && error.code === "ENOENT") return false;
+    throw error;
+  }
 }
 
 async function readExistingManifest(pathname) {
@@ -157,8 +173,10 @@ function usage() {
   return [
     "用法：node scripts/laozhao/build-preview-content.mjs",
     "  --transcript <transcript.private.json>",
+    "  [--captions <captions.reviewed.private.json>]",
     "  --chapters <chapters.candidate.private.json>",
     "  [--board-selection <board-selection.private.json>]",
+    "  [--board-candidates <board-candidates/index.private.json>]",
     "  [--reference-map <reference-notes.private.json>]",
     "  [--reference-pdf <reference-notes.pdf>]",
     "  [--lecture-notes <lecture-notes.validated.private.json>]",
@@ -178,10 +196,14 @@ async function main() {
     throw new Error(usage());
   }
   const transcriptPath = resolve(args.transcript);
+  const captionsPath = typeof args.captions === "string" ? resolve(args.captions) : null;
   const chapterPath = resolve(args.chapters);
   const selectionPath = typeof args["board-selection"] === "string"
     ? resolve(args["board-selection"])
     : null;
+  const boardCandidatesPath = typeof args["board-candidates"] === "string"
+    ? resolve(args["board-candidates"])
+    : resolve(dirname(chapterPath), "board-candidates/index.private.json");
   const referenceMapPath = typeof args["reference-map"] === "string"
     ? resolve(args["reference-map"])
     : null;
@@ -200,41 +222,66 @@ async function main() {
   }
   const outputPath = typeof args.output === "string" ? resolve(args.output) : defaultOutput;
   assertInside(privateRoot, transcriptPath, "私人逐字稿");
+  if (captionsPath) assertInside(privateRoot, captionsPath, "已驗證字幕");
   assertInside(privateRoot, chapterPath, "私人章節草稿");
   if (selectionPath) assertInside(privateRoot, selectionPath, "板書選擇檔");
+  assertInside(privateRoot, boardCandidatesPath, "板書候選檔");
   if (referenceMapPath) assertInside(privateRoot, referenceMapPath, "私人筆記對照檔");
   if (lectureNotesPath) assertInside(privateRoot, lectureNotesPath, "已驗證列點講義");
   assertInside(resolve(repoRoot, "data/laozhao"), outputPath, "Preview manifest");
 
-  const [transcript, chapterDraft, boardSelection, referenceMap, explicitLectureNotes, existingManifest] = await Promise.all([
+  const [transcript, reviewedCaptions, chapterDraft, boardSelection, boardCandidates, referenceMap, explicitLectureNotes, existingManifest] = await Promise.all([
     readJson(transcriptPath, "私人逐字稿"),
+    readOptionalJson(captionsPath, null, "已驗證字幕"),
     readJson(chapterPath, "私人章節草稿"),
     readOptionalJson(selectionPath, null, "板書選擇檔"),
+    fileExists(boardCandidatesPath)
+      .then((exists) => exists ? readJson(boardCandidatesPath, "板書候選檔") : null),
     readOptionalJson(referenceMapPath, null, "私人筆記對照檔"),
     readOptionalJson(lectureNotesPath, null, "已驗證列點講義"),
     readExistingManifest(outputPath)
   ]);
-  if (referenceMap) {
-    if (!boardSelection) throw new Error("加入筆記前必須提供板書選擇檔。");
-    const referenceValidation = validateReferenceMap(referenceMap, boardSelection);
+  const materialInputs = deriveAutomaticPreviewMaterials({
+    videoId: transcript.videoId,
+    sourceFingerprint: transcript.sourceFingerprint,
+    boardSelection,
+    boardCandidates,
+    referenceMap
+  });
+  const effectiveBoardSelection = materialInputs.boardSelection;
+  const effectiveReferenceMap = materialInputs.referenceMap;
+  if (effectiveReferenceMap) {
+    if (!effectiveBoardSelection) throw new Error("加入筆記前必須提供板書選擇檔或板書候選檔。");
+    const referenceValidation = validateReferenceMap(effectiveReferenceMap, effectiveBoardSelection);
     if (!referenceValidation.valid) {
       throw new Error(`筆記對照未通過驗證：${referenceValidation.errors.join("；")}`);
     }
   }
-  const existingLectureNotes = existingManifest.videos
+  const existingVideo = existingManifest.videos
     ?.find((item) => item?.videoId === transcript.videoId)
-    ?.lectureNotes ?? null;
+    ?? null;
+  const existingLectureNotes = existingVideo?.lectureNotes ?? null;
   const lectureNotes = explicitLectureNotes ?? existingLectureNotes;
-  const captions = buildCaptions(transcript);
+  const existingCaptions = Array.isArray(existingVideo?.captions) ? existingVideo.captions : null;
+  const captions = reviewedCaptions
+    ? validateReviewedCaptionsForPreview(transcript, reviewedCaptions)
+    : existingLectureNotes
+      && existingCaptions
+      && existingLectureNotes.captionFingerprint === captionFingerprint(existingCaptions)
+      ? existingCaptions
+      : buildCaptions(transcript);
+  if (lectureNotes && lectureNotes.captionFingerprint !== captionFingerprint(captions)) {
+    throw new Error("列點講義不是針對目前這版字幕；請提供相同版本的校訂字幕與講義。");
+  }
   const video = buildPreviewVideoContent({
     transcript,
     chapterDraft,
     captions,
-    boardSelections: boardSelection,
-    referenceMap,
+    boardSelections: effectiveBoardSelection,
+    referenceMap: effectiveReferenceMap,
     lectureNotes
   });
-  await buildPublicMaterials(boardSelection, video, referenceMap, referencePdfPath);
+  await buildPublicMaterials(effectiveBoardSelection, video, effectiveReferenceMap, referencePdfPath);
   const merged = mergePreviewVideo(existingManifest, video);
   await writeAtomic(outputPath, `${JSON.stringify(merged, null, 2)}\n`);
 
@@ -243,6 +290,9 @@ async function main() {
   console.log(`字幕：${transcript.segments.length} 段壓縮為 ${video.captions.length} 段`);
   console.log(`板書：${video.chapters.reduce((sum, chapter) => sum + chapter.boardFrames.length, 0)} 張`);
   console.log(`筆記：${new Set(video.chapters.flatMap((chapter) => chapter.referenceNotes.map((note) => note.src))).size} 頁`);
+  if (materialInputs.autoSelectedCount > 0 || materialInputs.autoMappedCount > 0) {
+    console.log(`自動補入：${materialInputs.autoSelectedCount} 張板書、${materialInputs.autoMappedCount} 組筆記對照`);
+  }
   console.log(`列點講義：${video.lectureNotes?.blocks.length ?? 0} 區塊`);
   console.log(`內容指紋：${video.contentFingerprint}`);
 }

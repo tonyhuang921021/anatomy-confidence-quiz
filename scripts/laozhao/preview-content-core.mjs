@@ -1,6 +1,7 @@
 import { createHash } from "node:crypto";
 import { validateLectureNotesReview } from "./lecture-notes-core.mjs";
 import { validateAndNormalizeChapterDraft } from "./review-package-core.mjs";
+import { captionFingerprint } from "./subtitle-proofreading-core.mjs";
 
 function sha256Json(value) {
   return createHash("sha256").update(JSON.stringify(value)).digest("hex");
@@ -46,6 +47,261 @@ function normalizeBoardSelections(raw, { videoId, sourceFingerprint }) {
     result.set(chapter.chapterId, frames);
   }
   return result;
+}
+
+function normalizeBoardCandidates(raw, { videoId, sourceFingerprint }) {
+  if (raw === null || raw === undefined) return new Map();
+  if (!raw || typeof raw !== "object" || Array.isArray(raw)) {
+    throw new Error("板書候選檔必須是 JSON 物件。");
+  }
+  if (raw.schemaVersion !== "1.0.0") throw new Error("板書候選檔 schemaVersion 必須是 1.0.0。");
+  if (raw.videoId !== videoId) throw new Error("板書候選檔 videoId 與影片不一致。");
+  if (raw.sourceFingerprint !== sourceFingerprint) throw new Error("板書候選檔來源指紋不一致。");
+  if (!Array.isArray(raw.chapters)) throw new Error("板書候選檔 chapters 格式無效。");
+
+  const result = new Map();
+  for (const chapter of raw.chapters) {
+    if (!chapter || typeof chapter !== "object" || Array.isArray(chapter)) {
+      throw new Error("板書候選檔含有無效章節。");
+    }
+    if (typeof chapter.chapterId !== "string" || !chapter.chapterId) {
+      throw new Error("板書候選檔缺少 chapterId。");
+    }
+    if (!Array.isArray(chapter.candidates)) {
+      throw new Error(`${chapter.chapterId} 的 candidates 格式無效。`);
+    }
+    const candidates = chapter.candidates.map((candidate, index) => {
+      if (!candidate || typeof candidate !== "object" || Array.isArray(candidate)) {
+        throw new Error(`${chapter.chapterId} 第 ${index + 1} 個板書候選格式無效。`);
+      }
+      if (typeof candidate.id !== "string" || !candidate.id) {
+        throw new Error(`${chapter.chapterId} 第 ${index + 1} 個板書候選缺少 id。`);
+      }
+      if (typeof candidate.imagePath !== "string" || !candidate.imagePath) {
+        throw new Error(`${chapter.chapterId} 第 ${index + 1} 個板書候選缺少 imagePath。`);
+      }
+      const timestampSec = Number(candidate.timestampSec);
+      if (!Number.isFinite(timestampSec) || timestampSec < 0) {
+        throw new Error(`${chapter.chapterId} 第 ${index + 1} 個板書候選時間無效。`);
+      }
+      return {
+        id: candidate.id,
+        imagePath: candidate.imagePath,
+        timestampSec,
+        selectionScore: Number.isFinite(Number(candidate.selectionScore))
+          ? Number(candidate.selectionScore)
+          : 0,
+        occlusionEstimate: Number.isFinite(Number(candidate.occlusionEstimate))
+          ? Number(candidate.occlusionEstimate)
+          : 1,
+        foregroundAreaEstimate: Number.isFinite(Number(candidate.foregroundAreaEstimate))
+          ? Number(candidate.foregroundAreaEstimate)
+          : 1,
+        motionEstimate: Number.isFinite(Number(candidate.motionEstimate))
+          ? Number(candidate.motionEstimate)
+          : 1,
+        contentEstimate: Number.isFinite(Number(candidate.content))
+          ? Number(candidate.content)
+          : null,
+        sharpness: Number.isFinite(Number(candidate.sharpness)) ? Number(candidate.sharpness) : 0,
+        actualFrame: candidate.actualFrame !== false,
+        composite: candidate.composite === true,
+        reviewStatus: candidate.reviewStatus
+      };
+    });
+    result.set(chapter.chapterId, candidates);
+  }
+  return result;
+}
+
+function compareBoardCandidates(left, right) {
+  const visibilityTier = (candidate) => {
+    if (candidate.occlusionEstimate <= 0.2) return 0;
+    if (candidate.occlusionEstimate <= 0.4) return 1;
+    if (candidate.occlusionEstimate <= 0.65) return 2;
+    return 3;
+  };
+  const quality = (candidate) => (
+    candidate.selectionScore * 100
+    - candidate.occlusionEstimate * 18
+    - candidate.foregroundAreaEstimate * 6
+    - candidate.motionEstimate * 2
+  );
+  return visibilityTier(left) - visibilityTier(right)
+    || quality(right) - quality(left)
+    || right.sharpness - left.sharpness
+    || left.timestampSec - right.timestampSec
+    || left.id.localeCompare(right.id);
+}
+
+function meaningfulBoardCandidates(candidates) {
+  const eligible = candidates.filter((item) => (
+    item.actualFrame
+    && !item.composite
+    && item.reviewStatus !== "rejected"
+  ));
+  const measuredContent = eligible
+    .map((item) => item.contentEstimate)
+    .filter((value) => Number.isFinite(value));
+  if (measuredContent.length === 0) return eligible;
+
+  const maximumContent = Math.max(...measuredContent);
+  const contentFloor = Math.min(0.08, Math.max(0.05, maximumContent * 0.55));
+  const meaningful = eligible.filter((item) => (
+    item.contentEstimate === null || item.contentEstimate >= contentFloor
+  ));
+  if (meaningful.length > 0) return meaningful;
+
+  // Extremely sparse chapters still need one real frame. Keep only the most
+  // informative measured frames instead of falling back to a blank target shot.
+  return eligible.filter((item) => (
+    item.contentEstimate === null || item.contentEstimate >= maximumContent * 0.9
+  ));
+}
+
+function chapterReferenceGroups(referenceMap, chapterId) {
+  if (!Array.isArray(referenceMap?.mappings)) return [];
+  return referenceMap.mappings.filter((mapping) => (
+    Array.isArray(mapping?.chapterIds)
+    && mapping.chapterIds.includes(chapterId)
+    && Array.isArray(mapping.pdfPages)
+    && mapping.pdfPages.length > 0
+  ));
+}
+
+function automaticReferenceImages({ videoId, frame, chapterId, referenceMap }) {
+  const groups = chapterReferenceGroups(referenceMap, chapterId);
+  const references = new Map();
+  for (const group of groups) {
+    for (const pdfPage of group.pdfPages) {
+      const page = Number(pdfPage);
+      if (!Number.isInteger(page) || page < 1) continue;
+      const id = `${videoId}-${frame.candidateId}-notes-p${String(page).padStart(3, "0")}`;
+      const existing = references.get(page) ?? {
+        referenceImageId: id,
+        pdfPage: page,
+        pageRegions: new Set(),
+        matchedStructures: new Set()
+      };
+      if (typeof group.pageRegion === "string" && group.pageRegion.trim()) {
+        existing.pageRegions.add(group.pageRegion.trim());
+      }
+      for (const structure of group.matchedStructures ?? []) {
+        if (typeof structure === "string" && structure.trim()) {
+          existing.matchedStructures.add(structure.trim());
+        }
+      }
+      references.set(page, existing);
+    }
+  }
+  return [...references.values()].map((reference) => ({
+    referenceImageId: reference.referenceImageId,
+    pdfPage: reference.pdfPage,
+    pageRegion: [...reference.pageRegions].join("；") || "本章相關內容",
+    matchedStructures: [...reference.matchedStructures]
+  }));
+}
+
+export function deriveAutomaticPreviewMaterials({
+  videoId,
+  sourceFingerprint,
+  boardSelection = null,
+  boardCandidates = null,
+  referenceMap = null
+}) {
+  const candidatesByChapter = normalizeBoardCandidates(boardCandidates, { videoId, sourceFingerprint });
+  if (candidatesByChapter.size === 0) {
+    return { boardSelection, referenceMap, autoSelectedCount: 0, autoMappedCount: 0 };
+  }
+
+  const effectiveSelection = boardSelection
+    ? {
+        ...boardSelection,
+        chapters: Array.isArray(boardSelection.chapters) ? boardSelection.chapters.map((chapter) => ({
+          ...chapter,
+          frames: Array.isArray(chapter.frames) ? [...chapter.frames] : chapter.frames
+        })) : boardSelection.chapters
+      }
+    : {
+        schemaVersion: "1.0.0",
+        videoId,
+        sourceFingerprint,
+        reviewStatus: "selected",
+        chapters: []
+      };
+  if (!Array.isArray(effectiveSelection.chapters)) {
+    return { boardSelection, referenceMap, autoSelectedCount: 0, autoMappedCount: 0 };
+  }
+
+  const chaptersById = new Map(effectiveSelection.chapters.map((chapter) => [chapter.chapterId, chapter]));
+  const usedFrameIds = new Set(effectiveSelection.chapters.flatMap((chapter) => (
+    Array.isArray(chapter.frames) ? chapter.frames.map((frame) => frame.candidateId) : []
+  )));
+  let autoSelectedCount = 0;
+  for (const [chapterId, candidates] of candidatesByChapter.entries()) {
+    const chapter = chaptersById.get(chapterId);
+    if (chapter && Array.isArray(chapter.frames) && chapter.frames.length > 0) continue;
+    if (referenceMap && chapterReferenceGroups(referenceMap, chapterId).length === 0) continue;
+    const candidate = meaningfulBoardCandidates(candidates)
+      .sort(compareBoardCandidates)[0];
+    if (!candidate || usedFrameIds.has(candidate.id)) continue;
+    const frame = {
+      candidateId: candidate.id,
+      sourcePath: candidate.imagePath,
+      timeSec: candidate.timestampSec,
+      selectionMode: "automatic_fallback"
+    };
+    if (chapter) {
+      chapter.frames = [frame];
+      chapter.selectionMode = "automatic_fallback";
+    } else {
+      effectiveSelection.chapters.push({
+        chapterId,
+        frames: [frame],
+        selectionMode: "automatic_fallback"
+      });
+    }
+    usedFrameIds.add(candidate.id);
+    autoSelectedCount += 1;
+  }
+
+  if (!referenceMap) {
+    return { boardSelection: effectiveSelection, referenceMap, autoSelectedCount, autoMappedCount: 0 };
+  }
+
+  const existingMappings = Array.isArray(referenceMap.boardFrameMappings)
+    ? [...referenceMap.boardFrameMappings]
+    : [];
+  const mappedFrameIds = new Set(existingMappings.map((mapping) => mapping?.boardFrameId));
+  let autoMappedCount = 0;
+  for (const chapter of effectiveSelection.chapters) {
+    for (const frame of Array.isArray(chapter.frames) ? chapter.frames : []) {
+      if (mappedFrameIds.has(frame.candidateId)) continue;
+      const referenceImages = automaticReferenceImages({
+        videoId,
+        frame,
+        chapterId: chapter.chapterId,
+        referenceMap
+      });
+      if (referenceImages.length === 0) continue;
+      existingMappings.push({
+        boardFrameId: frame.candidateId,
+        chapterId: chapter.chapterId,
+        videoTimeSec: Number(frame.timeSec),
+        referenceImages,
+        mappingMode: "automatic_chapter_fallback"
+      });
+      mappedFrameIds.add(frame.candidateId);
+      autoMappedCount += 1;
+    }
+  }
+
+  return {
+    boardSelection: effectiveSelection,
+    referenceMap: { ...referenceMap, boardFrameMappings: existingMappings },
+    autoSelectedCount,
+    autoMappedCount
+  };
 }
 
 function notePageId(videoId, pdfPage) {
@@ -152,7 +408,8 @@ function normalizeCaptions(captions, durationSec) {
     }
     const startSec = Number(cue.startSec);
     const endSec = Number(cue.endSec);
-    const text = typeof cue.text === "string" ? cue.text.normalize("NFKC").replace(/\s+/g, " ").trim() : "";
+    // 保留校訂字幕原本的臺灣中文標點；這些文字會參與講義的字幕指紋。
+    const text = typeof cue.text === "string" ? cue.text.replace(/\s+/g, " ").trim() : "";
     if (!Number.isFinite(startSec) || !Number.isFinite(endSec) || startSec < 0 || endSec <= startSec) {
       throw new Error(`第 ${index + 1} 段壓縮字幕時間無效。`);
     }
@@ -181,6 +438,29 @@ function normalizeCaptions(captions, durationSec) {
       sourceSegmentCount
     };
   });
+}
+
+export function validateReviewedCaptionsForPreview(transcript, reviewedPackage) {
+  if (!reviewedPackage || typeof reviewedPackage !== "object" || Array.isArray(reviewedPackage)) {
+    throw new Error("已驗證字幕格式無效。");
+  }
+  if (reviewedPackage.schemaVersion !== "1.0.0") {
+    throw new Error("已驗證字幕 schemaVersion 必須是 1.0.0。");
+  }
+  if (reviewedPackage.videoId !== transcript.videoId) {
+    throw new Error("已驗證字幕 videoId 與影片不一致。");
+  }
+  if (reviewedPackage.sourceFingerprint !== transcript.sourceFingerprint) {
+    throw new Error("已驗證字幕來源指紋與逐字稿不一致。");
+  }
+  if (reviewedPackage.reviewStatus !== "validated") {
+    throw new Error("字幕尚未通過完整驗證，不能建立 Preview。");
+  }
+  const captions = normalizeCaptions(reviewedPackage.captions, Number(transcript.durationSec));
+  if (reviewedPackage.captionFingerprint !== captionFingerprint(captions)) {
+    throw new Error("已驗證字幕內容指紋不一致。");
+  }
+  return captions;
 }
 
 export function buildPreviewVideoContent({

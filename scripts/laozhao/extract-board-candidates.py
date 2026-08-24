@@ -28,6 +28,7 @@ from PIL import Image, ImageDraw
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
 PRIVATE_ROOT = (REPO_ROOT / "data" / "laozhao" / "staging").resolve()
+NATIVE_CAPTURE_ADAPTER = Path(__file__).with_name("native-capture-adapter.py")
 
 
 @dataclass
@@ -67,6 +68,19 @@ def load_module(path: Path):
     sys.modules[spec.name] = module
     spec.loader.exec_module(module)
     return module
+
+
+def resolve_capture_tool(configured: str | None) -> Path:
+    """Prefer an explicitly configured adapter, otherwise use the built-in one."""
+
+    if configured:
+        path = Path(configured).expanduser().resolve()
+        if not path.is_file():
+            raise SystemExit(f"找不到指定的板書擷取工具：{path}")
+        return path
+    if not NATIVE_CAPTURE_ADAPTER.is_file():
+        raise SystemExit("找不到專案內建的 OpenCV 板書擷取工具。")
+    return NATIVE_CAPTURE_ADAPTER
 
 
 def assert_private_output(path: Path) -> None:
@@ -228,17 +242,53 @@ def estimate_foreground_occlusion(
     )
 
 
+def build_board_reference(images: list[np.ndarray]) -> np.ndarray:
+    """Build a real-observation board reference resistant to a static teacher.
+
+    A temporal median keeps whatever occupies a pixel in most samples. Instead,
+    this reference first estimates the board's dominant luminance, then picks
+    for each pixel the observed value closest to that board tone. No pixels are
+    synthesised: every output value comes from one sampled frame. A teacher may
+    therefore stand still for most of the window without becoming background,
+    as long as the board is visible in at least one sampled frame.
+    """
+
+    if not images:
+        raise ValueError("建立黑板參考至少需要一張影像。")
+    stack = np.stack([_uint8_gray(image) for image in images], axis=0)
+    quantized = np.clip(stack.astype(np.int16) // 8, 0, 31)
+    histogram = np.bincount(quantized.ravel(), minlength=32)
+    dominant_bin = int(np.argmax(histogram))
+    dominant_values = stack[quantized == dominant_bin]
+    board_level = (
+        float(np.median(dominant_values))
+        if dominant_values.size
+        else float(np.median(stack))
+    )
+    distance = np.abs(stack.astype(np.float32) - board_level)
+    closest = np.argmin(distance, axis=0)
+    return np.take_along_axis(stack, closest[None, :, :], axis=0)[0]
+
+
 def _absolute_quality(value: float, reference: float) -> float:
     return clamp_unit(value / reference) if reference > 0 else 0.0
 
 
 def score_samples(samples: list[Sample], target_sec: float | None) -> None:
+    chapter_reference = build_board_reference([sample.gray for sample in samples])
     for index, sample in enumerate(samples):
         left = max(0, index - 6)
         right = min(len(samples), index + 7)
-        neighborhood = np.stack([item.gray for item in samples[left:right]], axis=0)
-        median = np.median(neighborhood, axis=0).astype(np.uint8)
-        foreground = estimate_foreground_occlusion(sample.gray, median)
+        neighborhood_reference = build_board_reference(
+            [item.gray for item in samples[left:right]]
+        )
+        local_foreground = estimate_foreground_occlusion(sample.gray, neighborhood_reference)
+        chapter_foreground = estimate_foreground_occlusion(sample.gray, chapter_reference)
+        foreground = (
+            chapter_foreground
+            if chapter_foreground.occlusion >= local_foreground.occlusion
+            else local_foreground
+        )
         sample.occlusion = foreground.occlusion
         sample.foreground_area = foreground.foreground_area
         sample.largest_foreground_component = foreground.largest_component
@@ -270,18 +320,31 @@ def score_samples(samples: list[Sample], target_sec: float | None) -> None:
     clear_scores = [math.exp(-4.0 * clamp_unit(item.occlusion)) for item in samples]
     still_scores = [math.exp(-4.0 * clamp_unit(item.motion)) for item in samples]
     chapter_span = max(1.0, samples[-1].timestamp - samples[0].timestamp) if samples else 1.0
+    maximum_content = max((item.content for item in samples), default=0.0)
+    meaningful_content = max(0.012, maximum_content * 0.58)
+    content_retention_scores = [
+        clamp_unit(item.content / meaningful_content) if meaningful_content > 0 else 0.0
+        for item in samples
+    ]
 
     for index, sample in enumerate(samples):
         target_bonus = 0.0
         if target_sec is not None:
             target_bonus = max(0.0, 1.0 - abs(sample.timestamp - target_sec) / chapter_span)
+        sparse_content_penalty = 0.0
+        if maximum_content >= 0.018:
+            sparse_content_penalty = clamp_unit(
+                (maximum_content * 0.32 - sample.content) / (maximum_content * 0.32)
+            ) * 0.24
         sample.score = (
-            content_scores[index] * 0.25
-            + sharpness_scores[index] * 0.18
-            + contrast_scores[index] * 0.10
-            + clear_scores[index] * 0.32
-            + still_scores[index] * 0.10
-            + target_bonus * 0.05
+            content_scores[index] * 0.26
+            + content_retention_scores[index] * 0.12
+            + sharpness_scores[index] * 0.15
+            + contrast_scores[index] * 0.08
+            + clear_scores[index] * 0.28
+            + still_scores[index] * 0.07
+            + target_bonus * 0.04
+            - sparse_content_penalty
         )
 
 
@@ -361,7 +424,7 @@ def main() -> None:
     parser.add_argument(
         "--capture-tool",
         default=os.environ.get("LAOZHAO_CAPTURE_TOOL", ""),
-        help="既有 capture_slides.py 路徑",
+        help="選用的外部 capture_slides.py 路徑；留白時使用專案內建 OpenCV adapter",
     )
     parser.add_argument("--sample-every", type=float, default=1.0)
     parser.add_argument("--detect-width", type=int, default=640)
@@ -370,13 +433,11 @@ def main() -> None:
 
     source = Path(args.source).expanduser().resolve()
     chapter_path = Path(args.chapters).expanduser().resolve()
-    capture_tool = Path(args.capture_tool).expanduser().resolve() if args.capture_tool else None
+    capture_tool = resolve_capture_tool(args.capture_tool)
     if not source.is_file():
         raise SystemExit(f"找不到已授權影片：{source}")
     if not chapter_path.is_file():
         raise SystemExit(f"找不到已驗證章節：{chapter_path}")
-    if capture_tool is None or not capture_tool.is_file():
-        raise SystemExit("請用 --capture-tool 或 LAOZHAO_CAPTURE_TOOL 指定既有 capture_slides.py。")
     if args.sample_every < 0.5 or args.sample_every > 5:
         raise SystemExit("--sample-every 必須介於 0.5 到 5 秒。")
     if args.max_candidates < 1 or args.max_candidates > 12:

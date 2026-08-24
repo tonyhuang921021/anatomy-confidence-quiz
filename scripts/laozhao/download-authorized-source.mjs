@@ -37,7 +37,8 @@ export function buildDownloadPlan({ manifest, videoId, rightsConfirmed, maxHeigh
     outputDir,
     outputTemplate: resolve(outputDir, `${videoId}.%(ext)s`),
     watchUrl: `https://www.youtube.com/watch?v=${videoId}`,
-    format: `bv*[height<=${maxHeight}]+ba/b[height<=${maxHeight}]`
+    format: `bv*[height<=${maxHeight}]+ba/b[height<=${maxHeight}]`,
+    remoteComponent: "ejs:github"
   };
 }
 
@@ -68,6 +69,8 @@ async function main() {
     "--no-playlist",
     "--js-runtimes",
     `node:${process.execPath}`,
+    "--remote-components",
+    plan.remoteComponent,
     "--no-overwrites",
     "--newline",
     "--concurrent-fragments",

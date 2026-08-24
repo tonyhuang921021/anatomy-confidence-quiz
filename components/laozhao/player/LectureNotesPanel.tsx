@@ -59,6 +59,29 @@ function pointChildren(point: LaoZhaoPreviewLecturePoint) {
   return [...(point.children ?? []), ...legacyChildren];
 }
 
+function PointText({ point }: { point: LaoZhaoPreviewLecturePoint }) {
+  const runs = point.textRuns;
+  const emphasis = [...new Set((point.teacherEmphasis ?? []).map((item) => item.phrase))];
+  return (
+    <>
+      <span>
+        {runs && runs.length > 0
+          ? runs.map((run, index) => (
+              run.strong
+                ? <strong key={index} className="font-black text-[var(--ink-main)]">{run.text}</strong>
+                : <span key={index}>{run.text}</span>
+            ))
+          : point.text}
+      </span>
+      {emphasis.length > 0 ? (
+        <span className="ml-1.5 text-[0.86em] font-semibold text-rose-700">
+          （老師：{emphasis.join("、")}）
+        </span>
+      ) : null}
+    </>
+  );
+}
+
 function OutlineList({
   points,
   depth,
@@ -91,7 +114,7 @@ function OutlineList({
                 {label}
               </span>
             ) : null}
-            <span>{point.text}</span>
+            <PointText point={point} />
             {children.length > 0 ? (
               <OutlineList points={children} depth={depth + 1} blockId={blockId} />
             ) : null}
@@ -221,6 +244,9 @@ export function LectureNotesPanel({ notes, chapters, currentTimeSec, onSeek }: L
           <ol className="divide-y divide-[var(--line-soft)]">
             {chapterBlocks.map((block, blockIndex) => {
               const isSupplement = block.provenance === "supplement";
+              const blockEmphasis = block.provenance === "teacher"
+                ? [...new Set((block.teacherEmphasis ?? []).map((item) => item.phrase))]
+                : [];
               const isActive = !isSupplement && block.id === activeTeacherId;
               const sectionNumber = chapterBlocks
                 .slice(0, blockIndex + 1)
@@ -252,6 +278,11 @@ export function LectureNotesPanel({ notes, chapters, currentTimeSec, onSeek }: L
                           </span>
                           {block.title}
                         </h3>
+                        {blockEmphasis.length > 0 ? (
+                          <p className="mt-1 text-xs font-semibold leading-5 text-rose-700">
+                            老師：{blockEmphasis.join("、")}
+                          </p>
+                        ) : null}
                       </div>
                       <button
                         type="button"

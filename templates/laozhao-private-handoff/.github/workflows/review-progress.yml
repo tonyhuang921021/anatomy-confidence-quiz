@@ -1,0 +1,84 @@
+name: Review Lao Zhao progress
+
+on:
+  workflow_dispatch:
+    inputs:
+      job_path:
+        description: jobs/<videoId>/<jobId>
+        required: true
+        type: string
+      stage:
+        description: plan, chapter_validation, board_extraction, final
+        required: true
+        type: string
+      include_transcript:
+        description: 讓監督者同時核對完整逐字稿（成本較高）
+        required: false
+        default: false
+        type: boolean
+      confirm_paid_api:
+        description: 付費 API 確認字串（必須填 I_ACCEPT_OPENAI_API_CHARGES）
+        required: true
+        type: string
+
+permissions:
+  contents: write
+  pull-requests: write
+
+concurrency:
+  group: laozhao-review-${{ inputs.job_path }}-${{ inputs.stage }}
+  cancel-in-progress: false
+
+jobs:
+  review:
+    if: ${{ inputs.confirm_paid_api == 'I_ACCEPT_OPENAI_API_CHARGES' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      JOB_PATH: ${{ inputs.job_path }}
+      PRIVATE_REPOSITORY_CONFIRMED: ${{ github.event.repository.private }}
+      OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+      OPENAI_MODEL: ${{ vars.OPENAI_MODEL || 'gpt-5.6-sol' }}
+      OPENAI_REASONING_EFFORT: ${{ vars.OPENAI_REASONING_EFFORT || 'high' }}
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 20
+          package-manager-cache: false
+      - name: Verify private repository and tracked files
+        run: npm run preflight
+      - name: Run supervisor review
+        run: |
+          if [ "${{ inputs.include_transcript }}" = "true" ]; then
+            npm run review -- --job-dir "$JOB_PATH" --stage "${{ inputs.stage }}" --include-transcript
+          else
+            npm run review -- --job-dir "$JOB_PATH" --stage "${{ inputs.stage }}"
+          fi
+      - name: Run handoff tests
+        run: npm test
+      - name: Commit review report
+        run: |
+          git config user.name "laozhao-review-bot"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add "$JOB_PATH/reviews"
+          if git diff --cached --quiet; then
+            echo "Review already exists for this exact input digest."
+          else
+            git commit -m "Review ${{ inputs.stage }} for $JOB_PATH"
+            git push
+          fi
+      - name: Comment on the current pull request
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REVIEW_STAGE: ${{ inputs.stage }}
+        run: |
+          PR_NUMBER="$(gh pr list --head "$GITHUB_REF_NAME" --json number --jq '.[0].number // empty')"
+          REVIEW_FILE="$(find "$JOB_PATH/reviews" -name "${REVIEW_STAGE}-*.md" -type f -print | sort | tail -n 1)"
+          if [ -n "$PR_NUMBER" ] && [ -n "$REVIEW_FILE" ]; then
+            gh pr comment "$PR_NUMBER" --body-file "$REVIEW_FILE"
+          else
+            echo "No pull request found for $GITHUB_REF_NAME; review remains committed as an artifact."
+          fi

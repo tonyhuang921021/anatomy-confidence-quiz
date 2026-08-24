@@ -5,11 +5,36 @@ const toTaiwanTraditional = OpenCC.Converter({ from: "cn", to: "tw" });
 const approvedTaiwanTerms = [
   "大岩神經",
   "小岩神經",
+  "深岩神經",
   "大岩",
   "小岩",
+  "深岩",
   "岩部",
+  "家具",
+  "了解",
+  "咽縮肌",
+  "縱行咽肌",
+  "咽肌",
+  "咽縫",
+  "咽部",
+  "咽下方",
+  "咽神經叢",
+  "耳咽管咽肌",
+  "耳咽管",
+  "腭咽肌",
+  "莖突咽肌",
+  "腭",
   "腭骨",
-  "後面"
+  "關節面",
+  "游離",
+  "分布",
+  "公布",
+  "占",
+  "只",
+  "後面",
+  "回旋",
+  "念作",
+  "梁柱"
 ];
 const preferredTaiwanForms = [
   ["去念", "去唸"],
@@ -17,6 +42,14 @@ const preferredTaiwanForms = [
   ["鼻梁", "鼻樑"],
   ["齶骨", "腭骨"]
 ];
+export const TAIWAN_MEDICAL_TERMINOLOGY_GUIDE = Object.freeze({
+  schemaVersion: "1.0.0",
+  policy: "conservative_allowlist",
+  acceptedForms: ["腭", "關節面", "游離", "分布", "公布", "占", "只", "深岩神經", "回旋", "念作", "梁柱"],
+  safeAutomaticReplacements: preferredTaiwanForms.map(([from, to]) => ({ from, to })),
+  forbiddenBulkReplacements: ["腭→顎", "關節面→關節麵", "游離→遊離", "深岩→深巖"],
+  note: "OpenCC 只用來找候選差異，不可直接當作解剖學術語校正器。"
+});
 const correctionTypes = new Set([
   "traditional_chinese",
   "medical_english",
@@ -33,6 +66,17 @@ function normalizePreferredTaiwanForms(text) {
     (normalized, [source, target]) => normalized.replaceAll(source, target),
     text
   );
+}
+
+export function normalizeTaiwanMedicalText(value) {
+  const source = typeof value === "string"
+    ? value.normalize("NFC").replace(/\s+/g, " ").trim()
+    : "";
+  const text = normalizePreferredTaiwanForms(source);
+  const changes = preferredTaiwanForms
+    .filter(([from]) => source.includes(from))
+    .map(([from, to]) => ({ from, to }));
+  return { text, changes };
 }
 
 function convertForTaiwanCheck(text) {

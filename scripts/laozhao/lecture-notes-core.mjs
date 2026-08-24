@@ -7,8 +7,18 @@ const pointKinds = new Set(["standard", "teacher_note", "exam_focus", "mnemonic"
 const maxTeacherCaptionSpan = 14;
 const maxOutlineCaptionSpan = 32;
 const maxPointDepth = 3;
-const maxPointChildren = 10;
+const maxPointChildren = 14;
 const maxPointNodes = 80;
+const maxTextRuns = 24;
+const maxTeacherEmphasis = 8;
+const explicitTeacherEmphasisPattern = /(重要|會考|必考|考題|考點|考古題|出題|考過|重點|一定要|要記|記得|記住|背熟|要背|星星|星號|畫線|注意|小心|熟悉|常考|容易錯|混淆|不行|不能漏|不要忘|務必|必須|要會|要很清楚|要清楚)/;
+const negatedTeacherEmphasisPattern = /(比較不重要|不太重要|沒那麼重要|不是重點|不會考|不用考|不用記|不用背|無關緊要|重要部位)/g;
+const explicitMemorizeWellPattern = /背好(?!比)/;
+
+export function hasExplicitTeacherEmphasis(text) {
+  const source = String(text ?? "").replace(negatedTeacherEmphasisPattern, " ");
+  return explicitTeacherEmphasisPattern.test(source) || explicitMemorizeWellPattern.test(source);
+}
 
 function sha256Json(value) {
   return createHash("sha256").update(JSON.stringify(value)).digest("hex");
@@ -22,6 +32,57 @@ function normalizeText(value, label, maxLength) {
   const issues = findNonTaiwanCaptions([{ id: label, startSec: 0, endSec: 1, text }]);
   if (issues.length > 0) throw new Error(`${label}必須使用臺灣繁體中文。`);
   return text;
+}
+
+function normalizeEvidence(raw, label) {
+  const hasStart = raw.evidenceStartCue !== undefined;
+  const hasEnd = raw.evidenceEndCue !== undefined;
+  if (!hasStart && !hasEnd) return {};
+  if (!hasStart || !hasEnd) throw new Error(`${label}字幕證據範圍不完整。`);
+  return {
+    evidenceStartCue: normalizeText(raw.evidenceStartCue, `${label}字幕證據起點`, 80),
+    evidenceEndCue: normalizeText(raw.evidenceEndCue, `${label}字幕證據終點`, 80)
+  };
+}
+
+function normalizeTextRuns(raw, text, label) {
+  if (raw === undefined) return {};
+  if (!Array.isArray(raw) || raw.length < 1 || raw.length > maxTextRuns) {
+    throw new Error(`${label}粗體片語格式無效。`);
+  }
+  const textRuns = raw.map((run, index) => {
+    if (!run || typeof run !== "object" || Array.isArray(run)) {
+      throw new Error(`${label}第 ${index + 1} 個粗體片語格式無效。`);
+    }
+    if (typeof run.strong !== "boolean") {
+      throw new Error(`${label}第 ${index + 1} 個粗體片語 strong 必須是布林值。`);
+    }
+    return {
+      text: normalizeText(run.text, `${label}第 ${index + 1} 個粗體片語`, 320),
+      strong: run.strong
+    };
+  });
+  if (textRuns.map((run) => run.text).join("") !== text) {
+    throw new Error(`${label}粗體片語串接後必須完全等於原文。`);
+  }
+  return { textRuns };
+}
+
+function normalizeTeacherEmphasis(raw, label) {
+  if (raw === undefined) return {};
+  if (!Array.isArray(raw) || raw.length > maxTeacherEmphasis) {
+    throw new Error(`${label}老師強調格式無效。`);
+  }
+  const teacherEmphasis = raw.map((item, index) => {
+    if (!item || typeof item !== "object" || Array.isArray(item)) {
+      throw new Error(`${label}第 ${index + 1} 個老師強調格式無效。`);
+    }
+    return {
+      phrase: normalizeText(item.phrase, `${label}第 ${index + 1} 個老師強調`, 80),
+      ...normalizeEvidence(item, `${label}第 ${index + 1} 個老師強調`)
+    };
+  });
+  return teacherEmphasis.length > 0 ? { teacherEmphasis } : {};
 }
 
 function normalizePoint(raw, label, depth, state) {
@@ -47,17 +108,103 @@ function normalizePoint(raw, label, depth, state) {
   if (!pointKinds.has(kind)) {
     throw new Error(`${label}的標記類型無效。`);
   }
+  const text = normalizeText(raw.text, label, depth === 0 ? 320 : 260);
   const normalizedChildren = children.map((child, childIndex) => (
     normalizePoint(child, `${label}下層項目 ${childIndex + 1}`, depth + 1, state)
   ));
   return {
-    text: normalizeText(raw.text, label, depth === 0 ? 320 : 260),
+    text,
+    ...normalizeTextRuns(raw.textRuns, text, label),
     details: details.map((detail, detailIndex) => (
       normalizeText(detail, `${label}舊式子項目 ${detailIndex + 1}`, 260)
     )),
     ...(kind === "standard" ? {} : { kind }),
-    ...(normalizedChildren.length === 0 ? {} : { children: normalizedChildren })
+    ...(normalizedChildren.length === 0 ? {} : { children: normalizedChildren }),
+    ...normalizeEvidence(raw, label),
+    ...normalizeTeacherEmphasis(raw.teacherEmphasis, label)
   };
+}
+
+function validateEvidenceRange(raw, label, captionIndex, blockStartIndex, blockEndIndex) {
+  if (raw.evidenceStartCue === undefined && raw.evidenceEndCue === undefined) return null;
+  const startIndex = captionIndex.get(raw.evidenceStartCue);
+  const endIndex = captionIndex.get(raw.evidenceEndCue);
+  if (
+    startIndex === undefined ||
+    endIndex === undefined ||
+    endIndex < startIndex ||
+    startIndex < blockStartIndex ||
+    endIndex > blockEndIndex
+  ) {
+    throw new Error(`${label}字幕證據超出所屬講義區塊。`);
+  }
+  return { startIndex, endIndex };
+}
+
+function validatePointEvidenceTree(point, label, captions, captionIndex, blockStartIndex, blockEndIndex) {
+  validateEvidenceRange(point, label, captionIndex, blockStartIndex, blockEndIndex);
+  validateTeacherEmphasisEvidence(
+    point.teacherEmphasis ?? [],
+    label,
+    captions,
+    captionIndex,
+    blockStartIndex,
+    blockEndIndex
+  );
+  for (const [index, child] of (point.children ?? []).entries()) {
+    validatePointEvidenceTree(
+      child,
+      `${label}下層項目 ${index + 1}`,
+      captions,
+      captionIndex,
+      blockStartIndex,
+      blockEndIndex
+    );
+  }
+}
+
+function validateTeacherEmphasisEvidence(emphasisItems, label, captions, captionIndex, blockStartIndex, blockEndIndex) {
+  for (const [index, emphasis] of emphasisItems.entries()) {
+    const range = validateEvidenceRange(
+      emphasis,
+      `${label}第 ${index + 1} 個老師強調`,
+      captionIndex,
+      blockStartIndex,
+      blockEndIndex
+    );
+    if (!range) throw new Error(`${label}第 ${index + 1} 個老師強調缺少字幕證據。`);
+    const sourceText = captions
+      .slice(range.startIndex, range.endIndex + 1)
+      .map((caption) => caption.text)
+      .join(" ");
+    if (!hasExplicitTeacherEmphasis(sourceText)) {
+      throw new Error(
+        `${label}第 ${index + 1} 個老師強調沒有字幕中的明確強調訊號（目前證據 ${emphasis.evidenceStartCue}～${emphasis.evidenceEndCue}）。`
+      );
+    }
+  }
+}
+
+function contentHasTeacherEmphasis(content) {
+  if (content.type !== "bullets") return false;
+  const visit = (points) => points.some((point) => (
+    (point.teacherEmphasis?.length ?? 0) > 0 || visit(point.children ?? [])
+  ));
+  return visit(content.points);
+}
+
+function validateBlockEvidence(content, label, captions, captionIndex, blockStartIndex, blockEndIndex) {
+  if (content.type !== "bullets") return;
+  for (const [index, point] of content.points.entries()) {
+    validatePointEvidenceTree(
+      point,
+      `${label}第 ${index + 1} 點`,
+      captions,
+      captionIndex,
+      blockStartIndex,
+      blockEndIndex
+    );
+  }
 }
 
 function normalizePoints(raw, label) {
@@ -408,6 +555,7 @@ export function validateLectureNotesReview(video, review, { acceptedStatuses = [
     if (!provenances.has(raw.provenance)) throw new Error(`${label}來源標示無效。`);
     const title = normalizeText(raw.title, `${label}標題`, 120);
     const content = normalizeBlockContent(raw, label);
+    const blockTeacherEmphasis = normalizeTeacherEmphasis(raw.teacherEmphasis, label);
 
     if (raw.provenance === "teacher") {
       const startIndex = captionIndex.get(raw.sourceCaptionStart);
@@ -436,6 +584,15 @@ export function validateLectureNotesReview(video, review, { acceptedStatuses = [
       if (!chapter || !chapterIds.has(chapterId) || (chapter.id ?? chapter.stableId) !== chapterId) {
         throw new Error(`${label}跨越章節或 chapterId 不一致。`);
       }
+      validateBlockEvidence(content, label, captions, captionIndex, startIndex, endIndex);
+      validateTeacherEmphasisEvidence(
+        blockTeacherEmphasis.teacherEmphasis ?? [],
+        label,
+        captions,
+        captionIndex,
+        startIndex,
+        endIndex
+      );
       const normalized = {
         id,
         chapterId,
@@ -447,6 +604,7 @@ export function validateLectureNotesReview(video, review, { acceptedStatuses = [
         ...(raw.sourceFormat === "timecoded_outline" ? { sourceFormat: raw.sourceFormat } : {}),
         startSec,
         endSec,
+        ...blockTeacherEmphasis,
         ...content
       };
       normalizedBlocks.push(normalized);
@@ -456,6 +614,9 @@ export function validateLectureNotesReview(video, review, { acceptedStatuses = [
     }
 
     const afterBlockId = normalizeText(raw.afterBlockId, `${label}對應講授區塊`, 100);
+    if ((blockTeacherEmphasis.teacherEmphasis ?? []).length > 0 || contentHasTeacherEmphasis(content)) {
+      throw new Error(`${label}是補充內容，不能標示為老師強調。`);
+    }
     const parent = teacherBlocks.get(afterBlockId);
     if (!parent) throw new Error(`${label}必須接在已出現的老師講授區塊後。`);
     if (raw.chapterId !== parent.chapterId) throw new Error(`${label}chapterId 必須與對應講授區塊相同。`);
@@ -563,7 +724,7 @@ export function buildLectureNotesPackage(video) {
     "4. teacher 內容只能來自字幕。請把一般醫學事實直接寫成客觀敘述，不要反覆寫『老師說』『老師指出』『老師提到』。只有老師個人的考試提醒、口訣、臨床提醒、主觀經驗、特殊比喻或自我更正，才使用 kind=teacher_note、exam_focus、mnemonic 或 warning；網站會視情況顯示為〈師說〉、〈考點〉、〈口訣〉或〈注意〉。",
     "5. 若理解該段確實需要背景知識、名詞定義或比較，可新增 provenance=supplement 區塊；必須用 afterBlockId 指向前面的 teacher 區塊，不可填 sourceCaptionStart 或 sourceCaptionEnd。補充可以完整到足以協助理解，但不可取代、刪減或混入 teacher 內容，網站會把它明確標為『補充』。",
     "6. 比較、分類、流程、神經分支、構造關係或容易混淆的內容可用 type=table；其他內容用 type=bullets。表格每列欄數必須與 columns 相同。",
-    "7. bullets 必須呈現真正的多層共筆結構：points 是第一層，children 依內容關係往下展開，最多四層。定義下放條件、系統下放構成、機轉下放步驟、比較下放差異；不要把所有內容塞成同一層長段落，也不要為了層級而把一句話拆成零碎片語。details 僅保留相容舊資料，新回覆一律填空陣列並使用 children。",
+    "7. bullets 必須呈現真正的多層共筆結構：points 是第一層，children 依內容關係往下展開，最多四層、每層最多 14 個子項。定義下放條件、系統下放構成、機轉下放步驟、比較下放差異；不要把所有內容塞成同一層長段落，也不要為了層級而把一句話拆成零碎片語。details 僅保留相容舊資料，新回覆一律填空陣列並使用 children。",
     "8. 每個 chapterId 對應網站的一個章節標頭，每個 block.title 對應該章內的一個分節標題。標題要像共筆標題，簡短、具體，必要時可中英並列；不要寫『老師這段說明』『本段重點』等空泛標題。",
     "9. kind 只能使用 standard、teacher_note、exam_focus、mnemonic、warning。一般知識省略 kind 或填 standard；不要為了裝飾大量加標記。標記文字本身不要再重複加『老師說』。",
     "10. 所有中文一律使用臺灣繁體中文。醫學英文採常見正確拼字，數字、單位、方向與否定詞不得改動；不確定時不可猜，列入 unresolved。",

@@ -179,7 +179,7 @@ test("第一支影片鎖定完整章節、字幕來源與板書數量", () => {
   assert.equal(video.sourceSegmentTotal, 4946);
   assert.equal(video.captions[0]?.sourceSegmentStart, 1);
   assert.equal(video.captions.at(-1)?.sourceSegmentEnd, 4946);
-  assert.equal(video.chapters.reduce((total, chapter) => total + chapter.boardFrames.length, 0), 22);
+  assert.equal(video.chapters.reduce((total, chapter) => total + chapter.boardFrames.length, 0), 25);
   assert.equal(new Set(video.chapters.flatMap((chapter) => chapter.referenceNotes.map((note) => note.src))).size, 7);
   assert.equal(video.chapters.flatMap((chapter) => chapter.boardFrames).every((frame) => frame.referenceNoteIds.length > 0), true);
   assert.equal(video.chapters.every((chapter) => {
@@ -381,6 +381,37 @@ test("Preview 接受四層共筆清單並阻擋錯誤標記與第五層", () => 
   }), /標記類型無效/);
 });
 
+test("Preview 允許 14 個同層講義子項但阻擋第 15 個", () => {
+  const source = videoWithLectureNotes();
+  const withChildren = (count: number) => ({
+    ...source,
+    lectureNotes: {
+      ...source.lectureNotes,
+      blocks: source.lectureNotes.blocks.map((block) => (
+        block.id === "teacher-1" && block.type === "bullets"
+          ? {
+              ...block,
+              points: [{
+                text: "本區塊整理。",
+                children: Array.from({ length: count }, (_, index) => ({ text: `第 ${index + 1} 個子項。` }))
+              }]
+            }
+          : block
+      ))
+    }
+  });
+  assert.doesNotThrow(() => parseLaoZhaoPreviewManifest({
+    schemaVersion: "1.0.0",
+    visibility: "preview",
+    videos: [withChildren(14)]
+  }));
+  assert.throws(() => parseLaoZhaoPreviewManifest({
+    schemaVersion: "1.0.0",
+    visibility: "preview",
+    videos: [withChildren(15)]
+  }), /下層項目格式無效/);
+});
+
 test("Preview 可解析共筆條列內的比較表格", () => {
   const source = videoWithLectureNotes();
   const blocks = source.lectureNotes.blocks.map((block) => (
@@ -420,6 +451,156 @@ test("Preview 可解析共筆條列內的比較表格", () => {
       lectureNotes: { ...source.lectureNotes, blocks: invalidBlocks }
     }]
   }), /表格欄數無效/);
+});
+
+test("Preview 保留有字幕證據的粗體與老師強調，並阻擋偽造或補充強調", () => {
+  const source = videoWithLectureNotes();
+  const captions = source.captions.map((caption, index) => (
+    index === 0 ? { ...caption, text: "這很重要，一定要記住第一點。" } : caption
+  ));
+  const blocks = source.lectureNotes.blocks.map((block) => (
+    block.id === "teacher-1" && block.type === "bullets"
+      ? {
+          ...block,
+          teacherEmphasis: [{
+            phrase: "很重要",
+            evidenceStartCue: "cue-00001",
+            evidenceEndCue: "cue-00001"
+          }],
+          points: [{
+            text: "一定要記住第一點。",
+            textRuns: [
+              { text: "一定要記住", strong: true },
+              { text: "第一點。", strong: false }
+            ],
+            details: [],
+            evidenceStartCue: "cue-00001",
+            evidenceEndCue: "cue-00001",
+            teacherEmphasis: [{
+              phrase: "一定要記住",
+              evidenceStartCue: "cue-00001",
+              evidenceEndCue: "cue-00001"
+            }]
+          }]
+        }
+      : block
+  ));
+  const emphasized = {
+    ...source,
+    captions,
+    lectureNotes: {
+      ...source.lectureNotes,
+      captionFingerprint: previewCaptionFingerprint(captions),
+      blocks
+    }
+  };
+  const parsed = parseLaoZhaoPreviewManifest({
+    schemaVersion: "1.0.0",
+    visibility: "preview",
+    videos: [emphasized]
+  });
+  const firstBlock = parsed.videos[0]?.lectureNotes?.blocks[0];
+  assert.equal(firstBlock?.provenance === "teacher" ? firstBlock.teacherEmphasis?.[0]?.phrase : null, "很重要");
+  assert.equal(firstBlock?.type === "bullets" ? firstBlock.points[0]?.textRuns?.[0]?.strong : null, true);
+
+  const forged = structuredClone(emphasized);
+  const forgedCaptions = forged.captions.map((caption, index) => (
+    index === 0 ? { ...caption, text: "老師先講第一點。" } : caption
+  ));
+  Object.assign(forged, { captions: forgedCaptions });
+  Object.assign(forged.lectureNotes, {
+    captionFingerprint: previewCaptionFingerprint(forgedCaptions)
+  });
+  assert.throws(() => parseLaoZhaoPreviewManifest({
+    schemaVersion: "1.0.0",
+    visibility: "preview",
+    videos: [forged]
+  }), /沒有字幕中的明確強調訊號/);
+
+  const supplementEmphasis = structuredClone(emphasized);
+  const supplement = supplementEmphasis.lectureNotes.blocks[1];
+  if (supplement.type === "table") {
+    Object.assign(supplement, {
+      type: "bullets",
+      points: [{
+        text: "補充內容。",
+        teacherEmphasis: [{
+          phrase: "很重要",
+          evidenceStartCue: "cue-00001",
+          evidenceEndCue: "cue-00001"
+        }]
+      }]
+    });
+  }
+  assert.throws(() => parseLaoZhaoPreviewManifest({
+    schemaVersion: "1.0.0",
+    visibility: "preview",
+    videos: [supplementEmphasis]
+  }), /補充內容，不能標示為老師強調/);
+
+  const badRuns = structuredClone(emphasized);
+  const badRunsBlock = badRuns.lectureNotes.blocks[0];
+  if (badRunsBlock.type === "bullets") {
+    Object.assign(badRunsBlock.points[0], {
+      textRuns: [{ text: "沒有完整串回原文", strong: true }]
+    });
+  }
+  assert.throws(() => parseLaoZhaoPreviewManifest({
+    schemaVersion: "1.0.0",
+    visibility: "preview",
+    videos: [badRuns]
+  }), /粗體片語串接後與原文不一致/);
+});
+
+test("Preview 與講義匯入共用老師強調語意，接受背好並排除否定語境", () => {
+  const source = videoWithLectureNotes();
+
+  const withEmphasis = (captionText: string, phrase: string) => {
+    const captions = source.captions.map((caption, index) => (
+      index === 0 ? { ...caption, text: captionText } : caption
+    ));
+    const blocks = source.lectureNotes.blocks.map((block) => (
+      block.id === "teacher-1" && block.type === "bullets"
+        ? {
+            ...block,
+            points: [{
+              text: captionText,
+              details: [],
+              evidenceStartCue: "cue-00001",
+              evidenceEndCue: "cue-00001",
+              teacherEmphasis: [{
+                phrase,
+                evidenceStartCue: "cue-00001",
+                evidenceEndCue: "cue-00001"
+              }]
+            }]
+          }
+        : block
+    ));
+    return {
+      ...source,
+      captions,
+      lectureNotes: {
+        ...source.lectureNotes,
+        captionFingerprint: previewCaptionFingerprint(captions),
+        blocks
+      }
+    };
+  };
+
+  assert.doesNotThrow(() => parseLaoZhaoPreviewManifest({
+    schemaVersion: "1.0.0",
+    visibility: "preview",
+    videos: [withEmphasis("這個構造要背好。", "背好")]
+  }));
+
+  for (const captionText of ["這段比較不重要。", "請避開重要部位。", "這個很好背好比。"] ) {
+    assert.throws(() => parseLaoZhaoPreviewManifest({
+      schemaVersion: "1.0.0",
+      visibility: "preview",
+      videos: [withEmphasis(captionText, "老師強調")]
+    }), /沒有字幕中的明確強調訊號/);
+  }
 });
 
 test("章節時間切在字幕內時依字幕中點歸屬，真正跨章仍會阻擋", () => {

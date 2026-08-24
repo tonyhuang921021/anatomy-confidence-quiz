@@ -169,7 +169,13 @@ export function ChapterMaterials({
                 {formatTime(frame.timeSec)}
               </span>
             </div>
-            <div className="grid min-w-0 gap-4 md:grid-cols-[minmax(0,1.08fr)_minmax(18rem,0.92fr)] md:items-start">
+            <div
+              className={`grid min-w-0 gap-4 md:items-start ${
+                linkedNotes.length > 0
+                  ? "md:grid-cols-[minmax(0,1.08fr)_minmax(18rem,0.92fr)]"
+                  : "grid-cols-1"
+              }`}
+            >
               <div className="min-w-0" data-material-kind="board">
                 <p className="mb-2 inline-flex items-center gap-2 text-sm font-black">
                   <Images aria-hidden="true" size={17} strokeWidth={2} />
@@ -182,17 +188,19 @@ export function ChapterMaterials({
                   onSeek={onSeek}
                 />
               </div>
-              <div className="min-w-0">
-                <p className="mb-2 inline-flex items-center gap-2 text-sm font-black">
-                  <BookOpen aria-hidden="true" size={17} strokeWidth={2} />
-                  對照筆記
-                </p>
-                <div className="grid gap-4">
-                  {linkedNotes.map((note) => (
-                    <ReferenceNoteFigure key={note.id} note={note} pairNumber={pairIndex + 1} />
-                  ))}
+              {linkedNotes.length > 0 ? (
+                <div className="min-w-0">
+                  <p className="mb-2 inline-flex items-center gap-2 text-sm font-black">
+                    <BookOpen aria-hidden="true" size={17} strokeWidth={2} />
+                    對照筆記
+                  </p>
+                  <div className="grid gap-4">
+                    {linkedNotes.map((note) => (
+                      <ReferenceNoteFigure key={note.id} note={note} pairNumber={pairIndex + 1} />
+                    ))}
+                  </div>
                 </div>
-              </div>
+              ) : null}
             </div>
           </section>
         ))}

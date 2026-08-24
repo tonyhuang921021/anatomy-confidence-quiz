@@ -6,6 +6,16 @@ import { buildCaptionSentences } from "../../lib/laozhao/preview/captionSentence
 const [firstVideo, secondVideo] = manifest.videos;
 const firstVideoPreview = previewManifest.videos.find((video) => video.videoId === firstVideo.id);
 const firstVideoCaptionSentences = buildCaptionSentences(firstVideoPreview?.captions ?? []);
+const firstVideoMaterialChapters = (firstVideoPreview?.chapters ?? []).filter(
+  (chapter) => chapter.boardFrames.length > 0
+);
+const firstVideoBoardCount = firstVideoMaterialChapters.reduce(
+  (total, chapter) => total + chapter.boardFrames.length,
+  0
+);
+const firstVideoNoteCount = new Set(
+  firstVideoMaterialChapters.flatMap((chapter) => chapter.referenceNotes.map((note) => note.src))
+).size;
 const firstVideoLectureNotes = (firstVideoPreview as unknown as {
   lectureNotes?: { blocks: readonly { provenance: "teacher" | "supplement" }[] };
 } | undefined)?.lectureNotes;
@@ -102,7 +112,7 @@ test("第一支 Preview 有 24 章、同步字幕、板書與對照筆記", asyn
     const panelBox = await page.locator('[data-side-panel-scroll="navigation"]').boundingBox();
     expect(panelBox?.height ?? Number.POSITIVE_INFINITY).toBeLessThanOrEqual(480);
   }
-  await page.getByRole("tab", { name: "字幕", exact: true }).click();
+  await page.getByRole("tab", { name: "逐字稿", exact: true }).click();
   await expect(page.getByText(`${firstVideoCaptionSentences.length} 句`, { exact: true }).first()).toBeVisible();
   const renderedCues = page.locator('ol[aria-label$="字幕列表"] > li');
   expect(await renderedCues.count()).toBeLessThanOrEqual(50);
@@ -148,6 +158,15 @@ test("第一支 Preview 有 24 章、同步字幕、板書與對照筆記", asyn
     expect((lectureBox?.y ?? 0) + (lectureBox?.height ?? 0)).toBeLessThanOrEqual(page.viewportSize()?.height ?? 0);
   }
   await expectNoHorizontalOverflow(page);
+});
+
+test("未指定時間碼時直接顯示第一章重點", async ({ page }) => {
+  const firstChapter = firstVideoPreview?.chapters[0];
+  expect(firstChapter).toBeTruthy();
+  await page.goto(`/courses/laozhao-anatomy/watch/${firstVideo.id}`);
+
+  await expect(page.getByRole("heading", { name: "本章重點", exact: true })).toBeVisible();
+  await expect(page.getByText(firstChapter?.summary ?? "", { exact: true })).toBeVisible();
 });
 
 test("影片與字幕會一起進入全螢幕，Safari 不支援時使用滿版模式", async ({ page }) => {
@@ -213,8 +232,11 @@ test("桌機原生全螢幕仍保留網站字幕", async ({ page, browserName })
 test("完整圖像總覽按章節一次列出全部板書與筆記", async ({ page }) => {
   await page.goto(`/courses/laozhao-anatomy/watch/${firstVideo.id}/materials`);
   await expect(page.getByRole("heading", { name: "板書與對照筆記", level: 1 })).toBeVisible();
-  await expect(page.getByText("19 個章節・22 組板書對照・7 頁筆記", { exact: true })).toBeVisible();
-  await expect(page.locator("[data-material-pair]")).toHaveCount(22);
+  await expect(page.getByText(
+    `${firstVideoMaterialChapters.length} 個章節・${firstVideoBoardCount} 組板書對照・${firstVideoNoteCount} 頁筆記`,
+    { exact: true }
+  )).toBeVisible();
+  await expect(page.locator("[data-material-pair]")).toHaveCount(firstVideoBoardCount);
   const allPairsAreComplete = await page.locator("[data-material-pair]").evaluateAll((pairs) => pairs.every((pair) => (
     Boolean(pair.querySelector('[data-material-kind="board"] img')) &&
     Boolean(pair.querySelector('[data-material-kind="note"] img'))
@@ -281,13 +303,14 @@ test("跨影片不沿用前一支時間，且始終只有一個播放器", async
 });
 
 test("本機書籤重新整理後仍保留，回首頁會恢復原網站外殼", async ({ page }) => {
+  const defaultBookmarkName = new RegExp(`${firstVideoPreview?.chapters[0]?.title ?? "影片標記"}$`);
   await page.goto(`/courses/laozhao-anatomy/watch/${firstVideo.id}?t=45`);
   await expect(page.locator('iframe[src*="youtube.com/embed/"]')).toHaveCount(1);
   await page.getByRole("button", { name: "記下目前時間" }).click();
-  await expect(page.getByRole("button", { name: /影片標記$/ }).first()).toBeVisible();
+  await expect(page.getByRole("button", { name: defaultBookmarkName }).first()).toBeVisible();
 
   await page.reload();
-  await expect(page.getByRole("button", { name: /影片標記$/ }).first()).toBeVisible();
+  await expect(page.getByRole("button", { name: defaultBookmarkName }).first()).toBeVisible();
   await page.request.get("/");
   await page.waitForLoadState("networkidle");
   await page.goto("/");

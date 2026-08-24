@@ -15,8 +15,18 @@ const MAX_TEACHER_CAPTION_SPAN = 14;
 const MAX_OUTLINE_CAPTION_SPAN = 32;
 const LECTURE_POINT_KINDS = new Set(["standard", "teacher_note", "exam_focus", "mnemonic", "warning"]);
 const MAX_LECTURE_POINT_DEPTH = 3;
-const MAX_LECTURE_POINT_CHILDREN = 10;
+const MAX_LECTURE_POINT_CHILDREN = 14;
 const MAX_LECTURE_POINT_NODES = 80;
+const MAX_LECTURE_TEXT_RUNS = 24;
+const MAX_TEACHER_EMPHASIS = 8;
+const TEACHER_EMPHASIS_PATTERN = /(重要|會考|必考|考題|考點|考古題|出題|考過|重點|一定要|要記|記得|記住|背熟|要背|星星|星號|畫線|注意|小心|熟悉|常考|容易錯|混淆|不行|不能漏|不要忘|務必|必須|要會|要很清楚|要清楚)/;
+const NEGATED_TEACHER_EMPHASIS_PATTERN = /(比較不重要|不太重要|沒那麼重要|不是重點|不會考|不用考|不用記|不用背|無關緊要|重要部位)/g;
+const MEMORIZE_WELL_PATTERN = /背好(?!比)/;
+
+function hasExplicitTeacherEmphasis(text: string) {
+  const source = text.replace(NEGATED_TEACHER_EMPHASIS_PATTERN, " ");
+  return TEACHER_EMPHASIS_PATTERN.test(source) || MEMORIZE_WELL_PATTERN.test(source);
+}
 
 function isRecord(value: unknown): value is Record<string, unknown> {
   return Boolean(value) && typeof value === "object" && !Array.isArray(value);
@@ -100,6 +110,27 @@ function validateLecturePoint(
     throw new Error(`${label}所屬區塊的條列節點過多。`);
   }
   assertText(raw.text, label, depth === 0 ? 320 : 260);
+  if (raw.textRuns !== undefined) {
+    if (!Array.isArray(raw.textRuns) || raw.textRuns.length < 1 || raw.textRuns.length > MAX_LECTURE_TEXT_RUNS) {
+      throw new Error(`${label}粗體片語格式無效。`);
+    }
+    const joined = raw.textRuns.map((run, runIndex) => {
+      if (!isRecord(run) || typeof run.strong !== "boolean") {
+        throw new Error(`${label}第 ${runIndex + 1} 個粗體片語格式無效。`);
+      }
+      assertText(run.text, `${label}第 ${runIndex + 1} 個粗體片語`, 320);
+      return run.text as string;
+    }).join("");
+    if (joined !== raw.text) throw new Error(`${label}粗體片語串接後與原文不一致。`);
+  }
+  const hasEvidenceStart = raw.evidenceStartCue !== undefined;
+  const hasEvidenceEnd = raw.evidenceEndCue !== undefined;
+  if (hasEvidenceStart !== hasEvidenceEnd) throw new Error(`${label}字幕證據範圍不完整。`);
+  if (hasEvidenceStart) {
+    assertText(raw.evidenceStartCue, `${label}字幕證據起點`, 80);
+    assertText(raw.evidenceEndCue, `${label}字幕證據終點`, 80);
+  }
+  validateTeacherEmphasisShape(raw.teacherEmphasis, label);
   const kind = raw.kind ?? "standard";
   if (typeof kind !== "string" || !LECTURE_POINT_KINDS.has(kind)) {
     throw new Error(`${label}標記類型無效。`);
@@ -120,6 +151,117 @@ function validateLecturePoint(
   }
   children.forEach((child, childIndex) => (
     validateLecturePoint(child, `${label}下層項目 ${childIndex + 1}`, depth + 1, state)
+  ));
+}
+
+function validateTeacherEmphasisShape(raw: unknown, label: string) {
+  if (raw === undefined) return;
+  if (!Array.isArray(raw) || raw.length > MAX_TEACHER_EMPHASIS) {
+    throw new Error(`${label}老師強調格式無效。`);
+  }
+  raw.forEach((emphasis, emphasisIndex) => {
+    if (!isRecord(emphasis)) throw new Error(`${label}第 ${emphasisIndex + 1} 個老師強調格式無效。`);
+    assertText(emphasis.phrase, `${label}第 ${emphasisIndex + 1} 個老師強調`, 80);
+    assertText(emphasis.evidenceStartCue, `${label}第 ${emphasisIndex + 1} 個老師強調證據起點`, 80);
+    assertText(emphasis.evidenceEndCue, `${label}第 ${emphasisIndex + 1} 個老師強調證據終點`, 80);
+  });
+}
+
+function validateLectureEvidenceRange(
+  raw: Record<string, unknown>,
+  label: string,
+  captionIndex: ReadonlyMap<string, number>,
+  blockStartIndex: number,
+  blockEndIndex: number
+) {
+  if (raw.evidenceStartCue === undefined && raw.evidenceEndCue === undefined) return null;
+  const startIndex = captionIndex.get(raw.evidenceStartCue as string);
+  const endIndex = captionIndex.get(raw.evidenceEndCue as string);
+  if (
+    startIndex === undefined ||
+    endIndex === undefined ||
+    endIndex < startIndex ||
+    startIndex < blockStartIndex ||
+    endIndex > blockEndIndex
+  ) {
+    throw new Error(`${label}字幕證據超出所屬講義區塊。`);
+  }
+  return { startIndex, endIndex };
+}
+
+function validateLecturePointEvidence(
+  raw: unknown,
+  label: string,
+  captions: readonly LaoZhaoPreviewCaption[],
+  captionIndex: ReadonlyMap<string, number>,
+  blockStartIndex: number,
+  blockEndIndex: number
+) {
+  if (!isRecord(raw)) return;
+  validateLectureEvidenceRange(raw, label, captionIndex, blockStartIndex, blockEndIndex);
+  validateTeacherEmphasisEvidence(
+    raw.teacherEmphasis,
+    label,
+    captions,
+    captionIndex,
+    blockStartIndex,
+    blockEndIndex
+  );
+  if (Array.isArray(raw.children)) {
+    raw.children.forEach((child, index) => validateLecturePointEvidence(
+      child,
+      `${label}下層項目 ${index + 1}`,
+      captions,
+      captionIndex,
+      blockStartIndex,
+      blockEndIndex
+    ));
+  }
+}
+
+function validateTeacherEmphasisEvidence(
+  raw: unknown,
+  label: string,
+  captions: readonly LaoZhaoPreviewCaption[],
+  captionIndex: ReadonlyMap<string, number>,
+  blockStartIndex: number,
+  blockEndIndex: number
+) {
+  if (Array.isArray(raw)) {
+    raw.forEach((value, index) => {
+      if (!isRecord(value)) return;
+      const range = validateLectureEvidenceRange(
+        value,
+        `${label}第 ${index + 1} 個老師強調`,
+        captionIndex,
+        blockStartIndex,
+        blockEndIndex
+      );
+      if (!range) throw new Error(`${label}第 ${index + 1} 個老師強調缺少字幕證據。`);
+      const sourceText = captions.slice(range.startIndex, range.endIndex + 1).map((caption) => caption.text).join(" ");
+      if (!hasExplicitTeacherEmphasis(sourceText)) {
+        throw new Error(`${label}第 ${index + 1} 個老師強調沒有字幕中的明確強調訊號。`);
+      }
+    });
+  }
+}
+
+function validateLectureBlockEvidence(
+  raw: Record<string, unknown>,
+  label: string,
+  captions: readonly LaoZhaoPreviewCaption[],
+  captionIndex: ReadonlyMap<string, number>,
+  blockStartIndex: number,
+  blockEndIndex: number
+) {
+  if (raw.type !== "bullets" || !Array.isArray(raw.points)) return;
+  raw.points.forEach((point, index) => validateLecturePointEvidence(
+    point,
+    `${label}第 ${index + 1} 點`,
+    captions,
+    captionIndex,
+    blockStartIndex,
+    blockEndIndex
   ));
 }
 
@@ -165,6 +307,17 @@ function validateLectureBlockContent(raw: Record<string, unknown>, label: string
   }
 }
 
+function lectureBlockContentHasTeacherEmphasis(raw: Record<string, unknown>) {
+  if (raw.type !== "bullets" || !Array.isArray(raw.points)) return false;
+  const visit = (points: unknown[]): boolean => points.some((point) => (
+    isRecord(point) && (
+      (Array.isArray(point.teacherEmphasis) && point.teacherEmphasis.length > 0)
+      || (Array.isArray(point.children) && visit(point.children))
+    )
+  ));
+  return visit(raw.points);
+}
+
 function validateLectureNotes(
   raw: unknown,
   videoId: string,
@@ -196,6 +349,7 @@ function validateLectureNotes(
     blockIds.add(block.id as string);
     assertText(block.chapterId, `${label} chapterId`, 100);
     assertText(block.title, `${label}標題`, 120);
+    validateTeacherEmphasisShape(block.teacherEmphasis, label);
     validateLectureBlockContent(block, label);
     const chapter = chapterById.get(block.chapterId as string);
     if (!chapter) throw new Error(`${label}找不到對應章節。`);
@@ -231,12 +385,27 @@ function validateLectureNotes(
       if (!captionsBelongToChapter(chapters, captions, startIndex, endIndex, chapter.id)) {
         throw new Error(`${label}跨越章節。`);
       }
+      validateLectureBlockEvidence(block, label, captions, captionIndex, startIndex, endIndex);
+      validateTeacherEmphasisEvidence(
+        block.teacherEmphasis,
+        label,
+        captions,
+        captionIndex,
+        startIndex,
+        endIndex
+      );
       teacherBlocks.set(block.id as string, block as unknown as LaoZhaoPreviewLectureBlock);
       expectedTeacherStart = endIndex + 1;
       continue;
     }
 
     if (block.provenance !== "supplement") throw new Error(`${label}來源標示無效。`);
+    if (
+      (Array.isArray(block.teacherEmphasis) && block.teacherEmphasis.length > 0)
+      || lectureBlockContentHasTeacherEmphasis(block)
+    ) {
+      throw new Error(`${label}是補充內容，不能標示為老師強調。`);
+    }
     assertText(block.afterBlockId, `${label}對應講授區塊`, 100);
     const parent = teacherBlocks.get(block.afterBlockId as string);
     if (!parent) throw new Error(`${label}沒有對應的前置老師講授區塊。`);

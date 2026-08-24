@@ -41,6 +41,26 @@ test("臺灣醫學慣用字不會被誤判，偏好字形會正規化", () => {
   assert.equal(result[1].text, "講臺後面是腭骨與鼻樑，去唸這一段");
 });
 
+test("咽部解剖名詞不會被誤改成吞嚥的嚥", () => {
+  const anatomyCaptions = [{
+    id: "cue-00021",
+    startSec: 0,
+    endSec: 2,
+    text: "上中下咽縮肌、耳咽管咽肌、腭咽肌與莖突咽肌形成咽部構造。"
+  }];
+  assert.deepEqual(findNonTaiwanCaptions(anatomyCaptions), []);
+});
+
+test("合理臺灣用字回旋、念作與梁柱不會被誤判", () => {
+  const acceptedCaptions = [{
+    id: "cue-00031",
+    startSec: 0,
+    endSec: 2,
+    text: "circumflex 可念作回旋，並以梁柱比喻。"
+  }];
+  assert.deepEqual(findNonTaiwanCaptions(acceptedCaptions), []);
+});
+
 test("套用 Chat 校對時保留字幕 ID 與時間", () => {
   const result = applySubtitleProofreading(captions, {
     schemaVersion: "1.0.0",
