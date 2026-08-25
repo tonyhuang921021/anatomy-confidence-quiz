@@ -25,6 +25,7 @@ export default defineConfig({
       ADMIN_EMAILS: "e2e-owner@example.test",
       NEXT_PUBLIC_SUPABASE_RECOVERY_MODE: "off",
       SUPABASE_SERVICE_ROLE_KEY: "",
+      RESEND_API_KEY: "",
       OPENAI_API_KEY: ""
     }
   },

@@ -33,6 +33,8 @@
     "lib/feedbackPagination.test.ts",
     "lib/feedbackActivity.ts",
     "lib/feedbackActivity.test.ts",
+    "lib/feedbackEmail.ts",
+    "lib/feedbackEmail.test.ts",
     "lib/cloudSyncWriteGuard.ts",
     "lib/cloudSyncWriteGuard.test.ts",
     "lib/customPaperSearch.ts",

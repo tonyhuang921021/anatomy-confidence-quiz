@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
+import { waitUntil } from "@vercel/functions";
+import { sendFeedbackOwnerEmail } from "@/lib/feedbackEmail";
 import {
   buildFeedbackTree,
   getFeedbackPageCacheKey,
@@ -54,6 +56,24 @@ type FeedbackReadCacheEntry = {
 };
 
 const feedbackReadCache = new Map<string, FeedbackReadCacheEntry>();
+
+async function notifyFeedbackOwner(message: FeedbackMessage) {
+  try {
+    const notificationResult = await sendFeedbackOwnerEmail(message);
+    if (notificationResult.status === "failed") {
+      console.error("Feedback owner email notification failed:", {
+        reason: notificationResult.reason,
+        httpStatus: notificationResult.httpStatus
+      });
+    }
+  } catch {
+    console.error("Feedback owner email notification failed unexpectedly.");
+  }
+}
+
+function scheduleFeedbackOwnerNotification(message: FeedbackMessage) {
+  waitUntil(notifyFeedbackOwner(message));
+}
 
 class FeedbackAuthError extends Error {
   constructor(message: string, readonly status: 401 | 503) {
@@ -497,9 +517,11 @@ export async function POST(request: NextRequest) {
       );
       const duplicateRow = (duplicateResult.data ?? [])[0] as FeedbackMessageRow | undefined;
       if (!duplicateResult.error && duplicateRow) {
+        const duplicateMessage = mapFeedbackMessageRow(duplicateRow);
+        scheduleFeedbackOwnerNotification(duplicateMessage);
         feedbackReadCache.clear();
         return NextResponse.json(
-          { ok: true, message: mapFeedbackMessageRow(duplicateRow), deduplicated: true },
+          { ok: true, message: duplicateMessage, deduplicated: true },
           { headers: { "Cache-Control": "no-store" } }
         );
       }
@@ -553,11 +575,14 @@ export async function POST(request: NextRequest) {
 
     if (error) throw error;
 
+    const createdMessage = mapFeedbackMessageRow(data as FeedbackMessageRow);
+    scheduleFeedbackOwnerNotification(createdMessage);
+
     feedbackReadCache.clear();
     return NextResponse.json(
       {
         ok: true,
-        message: mapFeedbackMessageRow(data as FeedbackMessageRow)
+        message: createdMessage
       },
       { headers: { "Cache-Control": "no-store" } }
     );

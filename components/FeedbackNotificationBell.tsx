@@ -600,7 +600,7 @@ export function FeedbackNotificationBell({
             ) : (
               <button type="button" onClick={() => void enableBrowserAlerts()}>開啟瀏覽器提醒</button>
             )}
-            <p>提醒只在網站分頁開著時有效，不會建立背景推播。</p>
+            <p>Email 通知會在網站關閉時照常寄出；這裡的瀏覽器提醒只在分頁開著時有效。</p>
             {error ? <p className="is-error" role="status">{error}</p> : null}
           </div>
         </section>

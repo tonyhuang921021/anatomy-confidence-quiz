@@ -296,6 +296,11 @@ test("站長通知只計外部新動態，重播不重複且打開後標成已�
   await expect(panel.getByText("第一則外部留言", { exact: true })).toHaveCount(1);
   await expect(panel.getByText("第二則外部回覆", { exact: true })).toHaveCount(1);
   await expect(panel.getByText("站長自己的留言", { exact: true })).toHaveCount(0);
+  await expect(
+    panel.getByText("Email 通知會在網站關閉時照常寄出；這裡的瀏覽器提醒只在分頁開著時有效。", {
+      exact: true
+    })
+  ).toBeVisible();
   await expect(page.getByRole("button", { name: "留言通知，0 則未讀" })).toBeVisible();
 
   await page.getByRole("button", { name: "留言通知，0 則未讀" }).click();
