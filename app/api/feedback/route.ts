@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 import { waitUntil } from "@vercel/functions";
-import { sendFeedbackOwnerPush } from "@/lib/feedbackPushServer";
+import { sendFeedbackSubscriberPush } from "@/lib/feedbackPushServer";
 import {
   buildFeedbackTree,
   getFeedbackPageCacheKey,
@@ -59,31 +59,31 @@ type FeedbackReadCacheEntry = {
 
 const feedbackReadCache = new Map<string, FeedbackReadCacheEntry>();
 
-async function notifyFeedbackOwner(
+async function notifyFeedbackSubscribers(
   supabase: any,
   message: FeedbackMessage,
   excludeUserId?: string | null
 ) {
   try {
-    const notificationResult = await sendFeedbackOwnerPush(supabase, message, {
+    const notificationResult = await sendFeedbackSubscriberPush(supabase, message, {
       excludeUserId
     });
     if (notificationResult.status === "sent" && notificationResult.failed > 0) {
-      console.error("Some feedback owner push notifications failed:", {
+      console.error("Some feedback push notifications failed:", {
         failed: notificationResult.failed
       });
     }
   } catch {
-    console.error("Feedback owner push notification failed unexpectedly.");
+    console.error("Feedback push notification failed unexpectedly.");
   }
 }
 
-function scheduleFeedbackOwnerNotification(
+function scheduleFeedbackSubscriberNotification(
   supabase: any,
   message: FeedbackMessage,
   excludeUserId?: string | null
 ) {
-  waitUntil(notifyFeedbackOwner(supabase, message, excludeUserId));
+  waitUntil(notifyFeedbackSubscribers(supabase, message, excludeUserId));
 }
 
 class FeedbackAuthError extends Error {
@@ -586,7 +586,7 @@ export async function POST(request: NextRequest) {
     if (error) throw error;
 
     const createdMessage = mapFeedbackMessageRow(data as FeedbackMessageRow);
-    scheduleFeedbackOwnerNotification(supabase, createdMessage, verifiedUser?.id);
+    scheduleFeedbackSubscriberNotification(supabase, createdMessage, verifiedUser?.id);
 
     feedbackReadCache.clear();
     return NextResponse.json(

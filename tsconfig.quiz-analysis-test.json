@@ -50,6 +50,8 @@
     "lib/reviewQuestionOrder.test.ts",
     "lib/progressMetrics.ts",
     "lib/progressMetrics.test.ts",
+    "lib/progressPractice.ts",
+    "lib/progressPractice.test.ts",
     "lib/questionSearch.ts",
     "lib/questionSearch.test.ts",
     "lib/quizAnalysis.ts",

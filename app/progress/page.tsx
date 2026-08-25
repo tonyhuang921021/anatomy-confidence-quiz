@@ -1,14 +1,9 @@
 "use client";
 
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 import { Play } from "lucide-react";
 import { useAuth } from "@/components/AuthProvider";
-import {
-  QuestionOrderModeControl,
-  useQuestionOrderMode
-} from "@/components/QuestionOrderModeControl";
 import { useCloudHistoryHydration } from "@/components/useCloudHistoryHydration";
 import { MED1_SUBJECTS, MED2_SUBJECTS, subjectRegistry } from "@/data/subjectRegistry";
 import {
@@ -21,12 +16,8 @@ import {
   getProgressStatus,
   type ProgressBlock
 } from "@/lib/progressMetrics";
-import { buildNewQuizHref } from "@/lib/startSettingsUrl";
+import { buildProgressPracticeHref } from "@/lib/progressPractice";
 import { loadCompletedHistorySessionsForUser } from "@/lib/storage";
-import {
-  buildWeaknessPracticeSettings,
-  buildWeaknessQuestionOrder
-} from "@/lib/weaknessAnalysis";
 import type { Attempt, CompletionStatus, SubjectName } from "@/types/quiz";
 
 type ProgressHistorySession = {
@@ -115,15 +106,12 @@ function aggregateGroup(
 }
 
 export default function ProgressPage() {
-  const router = useRouter();
   const { user, syncVersion } = useAuth();
   const cloudHistoryHydrating = useCloudHistoryHydration();
   const [sessions, setSessions] = useState<ProgressHistorySession[]>([]);
   const [historyOwnerKey, setHistoryOwnerKey] = useState<string | null>(null);
   const [openGroups, setOpenGroups] = useState<Record<string, boolean>>({ med1: true, med2: true });
   const [openSubjects, setOpenSubjects] = useState<Record<string, boolean>>({});
-  const { mode: questionOrderMode, setMode: setQuestionOrderMode, prioritizeUnseen } =
-    useQuestionOrderMode();
   const activeHistoryOwnerKey = user?.id ?? "__guest__";
 
   useEffect(() => {
@@ -169,31 +157,6 @@ export default function ProgressPage() {
   const showHistoryLoading =
     !localHistoryReady || Boolean(user?.id && cloudHistoryHydrating && sessions.length === 0);
 
-  function startBlockPractice(subject: SubjectName, block: ProgressBlock) {
-    const practiceLabel =
-      block.fullLabel === subject ? `${subject}－尚未細分` : block.fullLabel;
-    const questionOrder = buildWeaknessQuestionOrder({
-      questions: subjectRegistry[subject].questions,
-      sessions,
-      subject,
-      primaryTag: practiceLabel,
-      questionIds: block.questionIds,
-      prioritizeUnseen
-    });
-    if (questionOrder.length === 0) return;
-
-    router.push(
-      buildNewQuizHref(
-        buildWeaknessPracticeSettings({
-          subject,
-          primaryTag: practiceLabel,
-          questionOrder,
-          customPoolLabel: `進度章節：${practiceLabel}`
-        })
-      )
-    );
-  }
-
   return (
     <main id="main-content" className="shell workspace-page">
       <section className="surface-card workspace-page-panel workspace-page-header p-6 sm:p-8">
@@ -202,7 +165,7 @@ export default function ProgressPage() {
             <p className="workspace-page-kicker">進度</p>
             <h1 className="workspace-page-title">醫學一／醫學二進度總覽</h1>
             <p className="mt-3 text-slate-500">
-              展開科目即可查看章節／考點、完成度、答對率，並直接開始練習。
+              展開科目查看章節進度；點「練習」會進入該章節的設定頁。
             </p>
           </div>
           <div className="workspace-compact-actions">
@@ -214,12 +177,6 @@ export default function ProgressPage() {
             </Link>
           </div>
         </div>
-
-        <QuestionOrderModeControl
-          mode={questionOrderMode}
-          onChange={setQuestionOrderMode}
-          className="mt-6 border-y border-slate-100 py-5"
-        />
 
         {showHistoryLoading ? (
           <div className="workspace-empty-state mt-5">
@@ -325,36 +282,35 @@ export default function ProgressPage() {
                                   <span className="sr-only">做題</span>
                                 </div>
                                 {subject.blocks.map((block) => (
-                                  <div
-                                    key={block.key}
-                                    className="grid grid-cols-[minmax(0,1fr)_5rem] gap-2 border-b border-slate-100 py-4 last:border-b-0 md:grid-cols-[minmax(0,1fr)_9rem_7rem_7rem_5.5rem] md:items-center md:gap-4"
-                                  >
-                                    <p className="min-w-0 font-semibold text-ink">{block.label}</p>
-                                    <p className="hidden text-sm text-slate-600 md:block">
-                                      {block.attemptedQuestions} / {block.totalQuestionsInBank}
-                                    </p>
-                                    <p className="hidden text-sm text-slate-600 md:block">
-                                      {block.completionRate}%
-                                    </p>
-                                    <p className="hidden text-sm text-slate-600 md:block">
-                                      {block.totalAttempts > 0 ? `${block.correctRate}%` : "尚未作答"}
-                                    </p>
-                                    <p className="col-span-2 text-sm leading-6 text-slate-600 md:hidden">
-                                      已作答 {block.attemptedQuestions} / {block.totalQuestionsInBank}
-                                      ・ 完成度 {block.completionRate}%
-                                      ・ 答對率 {block.totalAttempts > 0 ? `${block.correctRate}%` : "尚未作答"}
-                                    </p>
-                                    <button
-                                      type="button"
-                                      onClick={() => startBlockPractice(subject.subject, block)}
-                                      className="col-start-2 row-start-1 inline-flex min-h-10 items-center justify-center gap-1.5 rounded-lg bg-brand-600 px-3 text-xs font-semibold text-white transition hover:bg-brand-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-700 md:col-start-5"
-                                      aria-label={`開始做${subject.label}的${block.label}題目`}
-                                      title="開始練習這個章節／考點"
+                                    <div
+                                      key={block.key}
+                                      className="grid grid-cols-[minmax(0,1fr)_5rem] gap-2 border-b border-slate-100 py-4 last:border-b-0 md:grid-cols-[minmax(0,1fr)_9rem_7rem_7rem_5.5rem] md:items-center md:gap-4"
                                     >
-                                      <Play size={14} fill="currentColor" aria-hidden="true" />
-                                      練習
-                                    </button>
-                                  </div>
+                                      <p className="min-w-0 font-semibold text-ink">{block.label}</p>
+                                      <p className="hidden text-sm text-slate-600 md:block">
+                                        {block.attemptedQuestions} / {block.totalQuestionsInBank}
+                                      </p>
+                                      <p className="hidden text-sm text-slate-600 md:block">
+                                        {block.completionRate}%
+                                      </p>
+                                      <p className="hidden text-sm text-slate-600 md:block">
+                                        {block.totalAttempts > 0 ? `${block.correctRate}%` : "尚未作答"}
+                                      </p>
+                                      <p className="col-span-2 text-sm leading-6 text-slate-600 md:hidden">
+                                        已作答 {block.attemptedQuestions} / {block.totalQuestionsInBank}
+                                        ・ 完成度 {block.completionRate}%
+                                        ・ 答對率 {block.totalAttempts > 0 ? `${block.correctRate}%` : "尚未作答"}
+                                      </p>
+                                      <Link
+                                        href={buildProgressPracticeHref(subject.subject, block.fullLabel)}
+                                        className="col-start-2 row-start-1 inline-flex min-h-10 items-center justify-center gap-1.5 rounded-lg bg-brand-600 px-3 text-xs font-semibold text-white transition hover:bg-brand-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-700 md:col-start-5"
+                                        aria-label={`前往設定${subject.label}的${block.label}練習`}
+                                        title="前往設定這個章節的年份、題數與順序"
+                                      >
+                                        <Play size={14} fill="currentColor" aria-hidden="true" />
+                                        練習
+                                      </Link>
+                                    </div>
                                 ))}
                               </div>
                             ) : null}

@@ -11,8 +11,8 @@ import { withServerTimeout } from "@/lib/serverTimeout";
 export const runtime = "nodejs";
 
 const PUSH_CACHE_HEADER = "private, no-store";
-const OWNER_AUTH_TIMEOUT_MS = 4000;
-const MAX_SUBSCRIPTIONS_PER_OWNER = 5;
+const USER_AUTH_TIMEOUT_MS = 4000;
+const MAX_SUBSCRIPTIONS_PER_USER = 5;
 
 function response(body: Record<string, unknown>, status = 200) {
   return NextResponse.json(body, {
@@ -37,50 +37,38 @@ function getBearerToken(request: NextRequest) {
     : "";
 }
 
-function getAllowedEmails() {
-  return (
-    process.env.ADMIN_EMAILS ??
-    process.env.NEXT_PUBLIC_ADMIN_EMAILS ??
-    "tonyhuang921021@gmail.com"
-  )
-    .split(",")
-    .map((item) => item.trim().toLowerCase())
-    .filter(Boolean);
-}
-
 function isSameOriginRequest(request: NextRequest) {
   const origin = request.headers.get("origin");
   return !origin || origin === request.nextUrl.origin;
 }
 
-async function getVerifiedOwner(supabase: any, accessToken: string) {
+async function getVerifiedUser(supabase: any, accessToken: string) {
   const { data, error } = (await withServerTimeout(
     supabase.auth.getUser(accessToken),
-    OWNER_AUTH_TIMEOUT_MS,
+    USER_AUTH_TIMEOUT_MS,
     "手機推播登入驗證逾時"
   )) as {
-    data?: { user?: { id?: string; email?: string | null } | null };
+    data?: { user?: { id?: string } | null };
     error?: unknown;
   };
   const userId = data?.user?.id;
-  const email = data?.user?.email?.trim().toLowerCase();
-  if (error || !userId || !email || !getAllowedEmails().includes(email)) return null;
+  if (error || !userId) return null;
   return { id: userId };
 }
 
-async function authorizeOwner(request: NextRequest) {
+async function authorizeUser(request: NextRequest) {
   const supabase = getServiceSupabaseClient();
   if (!supabase) return { error: response({ ok: false, message: "手機推播尚未設定。" }, 503) };
   const accessToken = getBearerToken(request);
   if (!accessToken) return { error: response({ ok: false, message: "請先登入。" }, 401) };
-  const owner = await getVerifiedOwner(supabase, accessToken);
-  if (!owner) return { error: response({ ok: false, message: "沒有手機推播權限。" }, 403) };
-  return { supabase, owner };
+  const user = await getVerifiedUser(supabase, accessToken);
+  if (!user) return { error: response({ ok: false, message: "登入狀態已失效，請重新登入。" }, 401) };
+  return { supabase, user };
 }
 
 export async function GET(request: NextRequest) {
   try {
-    const authorization = await authorizeOwner(request);
+    const authorization = await authorizeUser(request);
     if (authorization.error) return authorization.error;
     const config = getFeedbackWebPushConfig(process.env);
     if (!config) {
@@ -98,8 +86,8 @@ export async function POST(request: NextRequest) {
   }
 
   try {
-    const authorization = await authorizeOwner(request);
-    if (authorization.error || !authorization.supabase || !authorization.owner) {
+    const authorization = await authorizeUser(request);
+    if (authorization.error || !authorization.supabase || !authorization.user) {
       return authorization.error;
     }
     if (!getFeedbackWebPushConfig(process.env)) {
@@ -130,7 +118,7 @@ export async function POST(request: NextRequest) {
       auth?: string;
     } | null;
     const unchanged =
-      existingRow?.user_id === authorization.owner.id &&
+      existingRow?.user_id === authorization.user.id &&
       existingRow.endpoint === subscription.endpoint &&
       existingRow.p256dh === subscription.keys.p256dh &&
       existingRow.auth === subscription.keys.auth;
@@ -141,7 +129,7 @@ export async function POST(request: NextRequest) {
           .from("feedback_push_subscriptions")
           .upsert(
             {
-              user_id: authorization.owner.id,
+              user_id: authorization.user.id,
               endpoint_hash: endpointHash,
               endpoint: subscription.endpoint,
               p256dh: subscription.keys.p256dh,
@@ -160,9 +148,9 @@ export async function POST(request: NextRequest) {
       authorization.supabase
         .from("feedback_push_subscriptions")
         .select("id")
-        .eq("user_id", authorization.owner.id)
+        .eq("user_id", authorization.user.id)
         .order("updated_at", { ascending: false })
-        .range(MAX_SUBSCRIPTIONS_PER_OWNER, 49),
+        .range(MAX_SUBSCRIPTIONS_PER_USER, 49),
       1200,
       "手機推播舊裝置整理逾時"
     );
@@ -192,8 +180,8 @@ export async function DELETE(request: NextRequest) {
   }
 
   try {
-    const authorization = await authorizeOwner(request);
-    if (authorization.error || !authorization.supabase || !authorization.owner) {
+    const authorization = await authorizeUser(request);
+    if (authorization.error || !authorization.supabase || !authorization.user) {
       return authorization.error;
     }
     const body = (await request.json().catch(() => null)) as { endpoint?: unknown } | null;
@@ -204,7 +192,7 @@ export async function DELETE(request: NextRequest) {
       authorization.supabase
         .from("feedback_push_subscriptions")
         .delete()
-        .eq("user_id", authorization.owner.id)
+        .eq("user_id", authorization.user.id)
         .eq("endpoint_hash", hashFeedbackPushEndpoint(endpoint)),
       1200,
       "手機推播取消逾時"

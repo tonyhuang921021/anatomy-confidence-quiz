@@ -5,6 +5,7 @@ const ROUTES = [
   "/progress",
   "/results",
   "/saved-questions",
+  "/settings",
   "/feedback",
   "/start",
   "/review",
@@ -58,6 +59,7 @@ test("更多功能會留在左側導覽原地展開", async ({ page }) => {
 
   await expect(moreTrigger).toHaveAttribute("aria-expanded", "true");
   await expect(drawer.getByRole("link", { name: "學習筆記", exact: true })).toBeVisible();
+  await expect(drawer.getByRole("link", { name: "設定", exact: true })).toBeVisible();
   await expect(drawer.getByRole("link", { name: "考後回顧", exact: true })).toBeVisible();
   await expect(page.getByRole("dialog", { name: "更多功能" })).toHaveCount(0);
 
@@ -115,6 +117,98 @@ test("開始測驗的科別標題不換行，抽題設定只留必要資訊", as
   await expect(settings.getByRole("button", { name: "請先選科目" })).toBeDisabled();
   await expect(page.getByText("先出沒做過的題", { exact: false })).toHaveCount(0);
   await expect(page.getByText("每題詳解後可結束", { exact: false })).toHaveCount(0);
+});
+
+test("進度總覽點章節後才進入獨立設定頁開始練習", async ({ page }) => {
+  await page.goto("/progress", { waitUntil: "domcontentloaded" });
+  await waitForShellReady(page);
+  await expect(page.getByRole("heading", { name: "醫學一／醫學二進度總覽" })).toBeVisible();
+  await expect(page.getByText("做題順序", { exact: true })).toHaveCount(0);
+  await expect(page.getByRole("group", { name: "選擇做題順序" })).toHaveCount(0);
+
+  const anatomyRow = page.locator(".progress-subject-row").filter({ hasText: "解剖學" }).first();
+  await anatomyRow.locator(":scope > button").click();
+
+  const practiceLink = anatomyRow.getByRole("link", { name: /前往設定解剖學的.+練習/ }).first();
+  await expect(practiceLink).toBeVisible();
+  await practiceLink.click();
+
+  await expect(page).toHaveURL(/\/progress\/practice\?subject=/);
+  await expect(page.getByRole("heading", { level: 1, name: /解剖學－.+/ })).toBeVisible();
+  const setup = page.getByRole("region", { name: /解剖學－.+練習設定/ }).first();
+  await expect(setup).toBeVisible();
+  await expect(setup.getByLabel("起始年份", { exact: true })).toBeVisible();
+  await expect(setup.getByLabel("結束年份", { exact: true })).toBeVisible();
+  await expect(setup.getByLabel("練習題數", { exact: true })).toBeVisible();
+  await expect(setup.getByRole("group", { name: "選擇做題順序" })).toBeVisible();
+
+  await setup.getByRole("button", { name: "未做優先" }).click();
+  await expect(setup.getByText("不分年份，先做完沒做過的題目，再複習做過的題目。", { exact: true })).toBeVisible();
+  await setup.getByLabel("練習題數", { exact: true }).selectOption("all");
+  await expect(setup.getByText(/\d+ 題符合/)).toBeVisible();
+  await expect(setup.getByRole("button", { name: /開始 \d+ 題|這段年份沒有題目/ })).toBeVisible();
+
+  await setup.getByLabel("練習題數", { exact: true }).selectOption("5");
+  await setup.getByRole("button", { name: "開始 5 題" }).click();
+  await expect(page).toHaveURL(/\/quiz\?/);
+  await expect(page.getByText("第 1 / 5 題", { exact: true })).toBeVisible();
+});
+
+test("手機通知與加入主畫面教學集中在設定頁", async ({ page, browserName }) => {
+  await page.route("https://e2e.invalid/**", (route) => route.abort());
+  await page.addInitScript(() => {
+    Object.defineProperty(window, "Notification", {
+      configurable: true,
+      value: { permission: "default" }
+    });
+  });
+  if (browserName === "webkit") {
+    await page.addInitScript(() => {
+      Object.defineProperty(window, "PushManager", {
+        configurable: true,
+        value: class MockPushManager {}
+      });
+    });
+  }
+  await page.addInitScript(() => {
+    const nowSeconds = Math.floor(Date.now() / 1000);
+    const session = {
+      access_token: "student-access-token",
+      refresh_token: "student-refresh-token",
+      expires_in: 3600,
+      expires_at: nowSeconds + 3600,
+      token_type: "bearer",
+      user: {
+        id: "student-user",
+        email: "student@example.test",
+        aud: "authenticated",
+        role: "authenticated",
+        app_metadata: {},
+        user_metadata: { display_name: "一般使用者" },
+        created_at: "2026-08-26T00:00:00.000Z"
+      }
+    };
+    window.localStorage.setItem("medQuizAuthSessionSnapshot", JSON.stringify(session));
+    window.localStorage.setItem("medQuizAutomaticCloudSync:student-user", String(Date.now()));
+    window.localStorage.setItem("quiz-visitor-presence-last-sent:student-user", String(Date.now()));
+  });
+  await page.goto("/settings", { waitUntil: "domcontentloaded" });
+  await waitForShellReady(page);
+
+  await expect(page.getByRole("heading", { name: "手機與通知" })).toBeVisible();
+  const pushSettings = page.getByRole("region", { name: "手機通知" });
+  await expect(pushSettings).toBeVisible();
+
+  if (browserName === "webkit") {
+    await expect(pushSettings.getByText("需先加入主畫面", { exact: true })).toBeVisible();
+    await expect(page.getByText("iPhone・Safari", { exact: true })).toBeVisible();
+    await expect(page.getByRole("img", { name: "iPhone 加入主畫面三步驟示意圖" })).toBeVisible();
+    await expect(page.getByText("用 Safari 點分享圖示。", { exact: false })).toBeVisible();
+  } else {
+    await expect(pushSettings.getByText("尚未開啟", { exact: true })).toBeVisible();
+    await expect(pushSettings.getByRole("button", { name: "開啟手機通知" })).toBeVisible();
+    await expect(page.getByText("請用 iPhone 或 Android 手機開啟這一頁", { exact: false })).toBeVisible();
+  }
 });
 
 test("搜尋結果展開後不會重複題幹與分類", async ({ page }) => {

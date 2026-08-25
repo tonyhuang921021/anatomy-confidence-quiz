@@ -52,28 +52,32 @@ type QuestionOrderModeControlProps = {
   mode: QuestionOrderMode;
   onChange: (mode: QuestionOrderMode) => void;
   className?: string;
+  compact?: boolean;
 };
 
 const MODE_DESCRIPTION: Record<QuestionOrderMode, string> = {
-  recent: "每 3–4 題穿插 1 題近年複習，其餘優先放沒做過的題目。",
-  unseen: "所有沒做過的題目跨年份排前，做過的題目排後。"
+  recent: "每 3–4 題穿插 1 題近年複習，其餘先出沒做過的題目。",
+  unseen: "不分年份，先做完沒做過的題目，再複習做過的題目。"
 };
 
 export function QuestionOrderModeControl({
   mode,
   onChange,
-  className = ""
+  className = "",
+  compact = false
 }: QuestionOrderModeControlProps) {
   return (
-    <div className={`flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between ${className}`}>
+    <div className={`${compact ? "grid content-start gap-2" : "flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between"} ${className}`}>
       <div className="min-w-0">
-        <p className="text-sm font-semibold text-ink">做題順序</p>
-        <p className="mt-1 text-sm leading-6 text-slate-500">{MODE_DESCRIPTION[mode]}</p>
+        <p className={compact ? "text-xs font-semibold text-slate-500" : "text-sm font-semibold text-ink"}>做題順序</p>
+        {compact ? null : (
+          <p className="mt-1 text-sm leading-6 text-slate-500">{MODE_DESCRIPTION[mode]}</p>
+        )}
       </div>
       <div
         role="group"
         aria-label="選擇做題順序"
-        className="grid w-full shrink-0 grid-cols-2 gap-1 rounded-lg bg-slate-100 p-1 sm:w-auto"
+        className={`grid w-full shrink-0 grid-cols-2 gap-1 rounded-lg bg-slate-100 p-1 ${compact ? "" : "sm:w-auto"}`}
       >
         <button
           type="button"
@@ -85,7 +89,7 @@ export function QuestionOrderModeControl({
               : "text-slate-600 hover:bg-white/70 hover:text-ink"
           }`}
         >
-          近年優先
+          近年穿插
         </button>
         <button
           type="button"
@@ -100,6 +104,9 @@ export function QuestionOrderModeControl({
           未做優先
         </button>
       </div>
+      {compact ? (
+        <p className="text-xs leading-5 text-slate-500">{MODE_DESCRIPTION[mode]}</p>
+      ) : null}
     </div>
   );
 }

@@ -15,15 +15,6 @@ import {
   type FeedbackActivityState
 } from "@/lib/feedbackActivity";
 import { loadFeedbackActivity } from "@/lib/cloudSync";
-import {
-  decodeVapidPublicKey,
-  ensureFeedbackPushWorker,
-  getBrowserFeedbackPushCapability,
-  loadFeedbackPushPublicKey,
-  removeFeedbackPushSubscription,
-  saveFeedbackPushSubscription,
-  type FeedbackPushClientState
-} from "@/lib/feedbackPushClient";
 import { compareFeedbackIds } from "@/lib/feedbackPagination";
 import type { FeedbackActivity } from "@/types/quiz";
 
@@ -151,11 +142,8 @@ export function FeedbackNotificationBell({
   const [activityState, setActivityState] = useState<FeedbackActivityState>(
     EMPTY_FEEDBACK_ACTIVITY_STATE
   );
-  const [pushState, setPushState] = useState<FeedbackPushClientState>("checking");
-  const [pushBusy, setPushBusy] = useState(false);
   const [authorizedUserId, setAuthorizedUserId] = useState<string | null>(null);
   const [error, setError] = useState("");
-  const [pushError, setPushError] = useState("");
   const wrapperRef = useRef<HTMLDivElement | null>(null);
   const triggerRef = useRef<HTMLButtonElement | null>(null);
   const activityStateRef = useRef<FeedbackActivityState>(EMPTY_FEEDBACK_ACTIVITY_STATE);
@@ -196,8 +184,6 @@ export function FeedbackNotificationBell({
       activityStateRef.current = EMPTY_FEEDBACK_ACTIVITY_STATE;
       setActivityState(EMPTY_FEEDBACK_ACTIVITY_STATE);
       setAuthorizedUserId(null);
-      setPushState("checking");
-      setPushBusy(false);
       return;
     }
     const ownerUserId: string = userId;
@@ -406,44 +392,6 @@ export function FeedbackNotificationBell({
     };
   }, [eligible, session?.access_token, user?.id]);
 
-  useEffect(() => {
-    const userId = user?.id;
-    if (!eligible || !userId || authorizedUserId !== userId) {
-      setPushState("checking");
-      return;
-    }
-
-    let cancelled = false;
-    const inspectSubscription = async () => {
-      const accessToken = session?.access_token;
-      if (!accessToken) return;
-      const capability = getBrowserFeedbackPushCapability();
-      if (capability !== "available") {
-        if (!cancelled) setPushState(capability);
-        return;
-      }
-      try {
-        const registration = await ensureFeedbackPushWorker();
-        const subscription = await registration.pushManager.getSubscription();
-        if (subscription) await saveFeedbackPushSubscription(accessToken, subscription);
-        if (!cancelled) {
-          setPushError("");
-          setPushState(subscription ? "subscribed" : "available");
-        }
-      } catch (pushError) {
-        if (!cancelled) {
-          const message = pushError instanceof Error ? pushError.message : "手機推播狀態確認失敗。";
-          setPushState(message.includes("尚未設定") || message.includes("金鑰") ? "unconfigured" : "available");
-          setPushError(message);
-        }
-      }
-    };
-    void inspectSubscription();
-    return () => {
-      cancelled = true;
-    };
-  }, [authorizedUserId, eligible, session?.access_token, user?.id]);
-
   const unreadCount = countUnreadFeedbackActivities(activityState);
   const previews = useMemo(() => activityState.activities.slice(0, 8), [activityState.activities]);
 
@@ -471,68 +419,6 @@ export function FeedbackNotificationBell({
       window.dispatchEvent(new Event(ACTIVITY_REFRESH_EVENT));
     }
     onOpenChange(nextOpen);
-  }
-
-  async function enableMobilePush() {
-    const accessToken = session?.access_token;
-    if (!user?.id || !accessToken) return;
-    const capability = getBrowserFeedbackPushCapability();
-    if (capability !== "available") {
-      setPushState(capability);
-      return;
-    }
-
-    setPushBusy(true);
-    setPushError("");
-    let createdSubscription: PushSubscription | null = null;
-    try {
-      const permission = await Notification.requestPermission();
-      if (permission !== "granted") {
-        setPushState(permission === "denied" ? "denied" : "available");
-        setPushError(permission === "denied" ? "手機已封鎖通知，請到系統設定開啟。" : "");
-        return;
-      }
-
-      const publicKey = await loadFeedbackPushPublicKey(accessToken);
-      const registration = await ensureFeedbackPushWorker();
-      let subscription = await registration.pushManager.getSubscription();
-      if (!subscription) {
-        subscription = await registration.pushManager.subscribe({
-          userVisibleOnly: true,
-          applicationServerKey: decodeVapidPublicKey(publicKey)
-        });
-        createdSubscription = subscription;
-      }
-      await saveFeedbackPushSubscription(accessToken, subscription);
-      setPushState("subscribed");
-    } catch (pushError) {
-      if (createdSubscription) await createdSubscription.unsubscribe().catch(() => false);
-      const message = pushError instanceof Error ? pushError.message : "手機推播開啟失敗。";
-      setPushState(message.includes("尚未設定") || message.includes("金鑰") ? "unconfigured" : "available");
-      setPushError(message);
-    } finally {
-      setPushBusy(false);
-    }
-  }
-
-  async function disableMobilePush() {
-    const accessToken = session?.access_token;
-    if (!user?.id || !accessToken) return;
-    setPushBusy(true);
-    setPushError("");
-    try {
-      const registration = await ensureFeedbackPushWorker();
-      const subscription = await registration.pushManager.getSubscription();
-      if (subscription) {
-        await removeFeedbackPushSubscription(accessToken, subscription);
-        await subscription.unsubscribe();
-      }
-      setPushState("available");
-    } catch (pushError) {
-      setPushError(pushError instanceof Error ? pushError.message : "手機推播取消失敗。");
-    } finally {
-      setPushBusy(false);
-    }
   }
 
   return (
@@ -602,31 +488,13 @@ export function FeedbackNotificationBell({
           </div>
 
           <div className="app-feedback-notification-settings">
-            {pushState === "checking" ? (
-              <p>正在確認手機推播狀態。</p>
-            ) : pushState === "unsupported" ? (
-              <p>這台裝置或瀏覽器不支援背景推播。</p>
-            ) : pushState === "install-required" ? (
-              <p>iPhone 請先用 Safari「分享 → 加入主畫面」，再從主畫面開啟網站。</p>
-            ) : pushState === "denied" ? (
-              <p>手機已封鎖通知，請到系統設定開啟。</p>
-            ) : pushState === "unconfigured" ? (
-              <p>手機推播尚未設定完成。</p>
-            ) : pushState === "subscribed" ? (
-              <button type="button" disabled={pushBusy} onClick={() => void disableMobilePush()}>
-                {pushBusy ? "正在關閉…" : "關閉手機推播"}
-              </button>
-            ) : (
-              <button type="button" disabled={pushBusy} onClick={() => void enableMobilePush()}>
-                {pushBusy ? "正在開啟…" : "開啟手機推播"}
-              </button>
-            )}
-            <p>
-              {pushState === "subscribed"
-                ? "手機推播已開啟，網站關閉時也會通知。"
-                : "開啟後，新留言與回覆會直接送到手機。"}
-            </p>
-            {pushError ? <p className="is-error" role="status">{pushError}</p> : null}
+            <Link
+              href="/settings"
+              onClick={() => onOpenChange(false)}
+              className="inline-flex min-h-11 items-center font-semibold text-brand-700"
+            >
+              手機通知設定
+            </Link>
             {error ? <p className="is-error" role="status">{error}</p> : null}
           </div>
         </section>

@@ -69,6 +69,7 @@ const PRIMARY_NAV: NavItem[] = [
 ];
 
 const MORE_LINKS: NavItem[] = [
+  { href: "/settings", label: "設定", icon: Settings },
   { href: "/notes", label: "學習筆記", icon: NotebookTabs },
   { href: "/resources", label: "資源分享", icon: Library },
   { href: "/pharmacology-review", label: "藥理複習", icon: Pill },
