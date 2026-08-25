@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect } from "react";
+import { ensureFeedbackPushWorker } from "@/lib/feedbackPushClient";
 
 async function clearPwaCaches() {
   if (typeof window === "undefined" || !("caches" in window)) return;
@@ -18,31 +19,24 @@ export function PWARegistration() {
       return;
     }
 
-    const disableServiceWorker = async () => {
+    const setup = async () => {
       try {
-        const registrations = await navigator.serviceWorker.getRegistrations();
-        await Promise.all(registrations.map((registration) => registration.unregister()));
-      } catch {
-        // Ignore unregister failures.
-      }
-      await clearPwaCaches();
-    };
-
-    const cleanup = async () => {
-      try {
-        await disableServiceWorker();
+        await clearPwaCaches();
+        const registration = await ensureFeedbackPushWorker();
+        await registration.update();
       } catch (error) {
-        console.error("Service worker cleanup failed:", error);
+        // The site remains usable when background push is unsupported or registration fails.
+        console.error("Push service worker setup failed:", error);
       }
     };
 
     if (document.readyState === "complete") {
-      void cleanup();
+      void setup();
       return;
     }
 
     const onLoad = () => {
-      void cleanup();
+      void setup();
     };
     window.addEventListener("load", onLoad);
     return () => window.removeEventListener("load", onLoad);

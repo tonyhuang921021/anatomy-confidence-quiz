@@ -8,7 +8,6 @@ import {
   markFeedbackActivitiesRead,
   mergeFeedbackActivityStates,
   reconcileOwnFeedbackActivities,
-  shouldShowFeedbackBrowserNotification,
   type FeedbackActivityState
 } from "./feedbackActivity";
 import type { FeedbackActivity } from "../types/quiz";
@@ -174,26 +173,4 @@ test("跨分頁合併舊狀態後仍會排除自己建立的事件", () => {
 
   assert.deepEqual(reconciled.activities.map((entry) => entry.id), ["102", "101"]);
   assert.equal(countUnreadFeedbackActivities(reconciled), 2);
-});
-
-test("瀏覽器提醒只在已初始化、使用者開啟且 permission granted 時觸發", () => {
-  const addedActivities = [activity("101")];
-  assert.equal(
-    shouldShowFeedbackBrowserNotification({
-      initialized: true,
-      enabled: true,
-      permission: "granted",
-      addedActivities
-    }),
-    true
-  );
-  for (const input of [
-    { initialized: false, enabled: true, permission: "granted" as const, addedActivities },
-    { initialized: true, enabled: false, permission: "granted" as const, addedActivities },
-    { initialized: true, enabled: true, permission: "denied" as const, addedActivities },
-    { initialized: true, enabled: true, permission: "unsupported" as const, addedActivities },
-    { initialized: true, enabled: true, permission: "granted" as const, addedActivities: [] }
-  ]) {
-    assert.equal(shouldShowFeedbackBrowserNotification(input), false);
-  }
 });

@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 import { waitUntil } from "@vercel/functions";
-import { sendFeedbackOwnerEmail } from "@/lib/feedbackEmail";
+import { sendFeedbackOwnerPush } from "@/lib/feedbackPushServer";
 import {
   buildFeedbackTree,
   getFeedbackPageCacheKey,
@@ -14,6 +14,8 @@ import {
 import { isSupabaseRecoveryMode } from "@/lib/supabase/recoveryMode";
 import { withServerTimeout } from "@/lib/serverTimeout";
 import type { FeedbackMessage } from "@/types/quiz";
+
+export const runtime = "nodejs";
 
 type FeedbackBody = {
   accessToken?: string | null;
@@ -57,22 +59,31 @@ type FeedbackReadCacheEntry = {
 
 const feedbackReadCache = new Map<string, FeedbackReadCacheEntry>();
 
-async function notifyFeedbackOwner(message: FeedbackMessage) {
+async function notifyFeedbackOwner(
+  supabase: any,
+  message: FeedbackMessage,
+  excludeUserId?: string | null
+) {
   try {
-    const notificationResult = await sendFeedbackOwnerEmail(message);
-    if (notificationResult.status === "failed") {
-      console.error("Feedback owner email notification failed:", {
-        reason: notificationResult.reason,
-        httpStatus: notificationResult.httpStatus
+    const notificationResult = await sendFeedbackOwnerPush(supabase, message, {
+      excludeUserId
+    });
+    if (notificationResult.status === "sent" && notificationResult.failed > 0) {
+      console.error("Some feedback owner push notifications failed:", {
+        failed: notificationResult.failed
       });
     }
   } catch {
-    console.error("Feedback owner email notification failed unexpectedly.");
+    console.error("Feedback owner push notification failed unexpectedly.");
   }
 }
 
-function scheduleFeedbackOwnerNotification(message: FeedbackMessage) {
-  waitUntil(notifyFeedbackOwner(message));
+function scheduleFeedbackOwnerNotification(
+  supabase: any,
+  message: FeedbackMessage,
+  excludeUserId?: string | null
+) {
+  waitUntil(notifyFeedbackOwner(supabase, message, excludeUserId));
 }
 
 class FeedbackAuthError extends Error {
@@ -518,7 +529,6 @@ export async function POST(request: NextRequest) {
       const duplicateRow = (duplicateResult.data ?? [])[0] as FeedbackMessageRow | undefined;
       if (!duplicateResult.error && duplicateRow) {
         const duplicateMessage = mapFeedbackMessageRow(duplicateRow);
-        scheduleFeedbackOwnerNotification(duplicateMessage);
         feedbackReadCache.clear();
         return NextResponse.json(
           { ok: true, message: duplicateMessage, deduplicated: true },
@@ -576,7 +586,7 @@ export async function POST(request: NextRequest) {
     if (error) throw error;
 
     const createdMessage = mapFeedbackMessageRow(data as FeedbackMessageRow);
-    scheduleFeedbackOwnerNotification(createdMessage);
+    scheduleFeedbackOwnerNotification(supabase, createdMessage, verifiedUser?.id);
 
     feedbackReadCache.clear();
     return NextResponse.json(

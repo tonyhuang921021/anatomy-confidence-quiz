@@ -12,52 +12,37 @@ import {
   markFeedbackActivitiesRead,
   mergeFeedbackActivityStates,
   reconcileOwnFeedbackActivities,
-  shouldShowFeedbackBrowserNotification,
   type FeedbackActivityState
 } from "@/lib/feedbackActivity";
 import { loadFeedbackActivity } from "@/lib/cloudSync";
+import {
+  decodeVapidPublicKey,
+  ensureFeedbackPushWorker,
+  getBrowserFeedbackPushCapability,
+  loadFeedbackPushPublicKey,
+  removeFeedbackPushSubscription,
+  saveFeedbackPushSubscription,
+  type FeedbackPushClientState
+} from "@/lib/feedbackPushClient";
 import { compareFeedbackIds } from "@/lib/feedbackPagination";
 import type { FeedbackActivity } from "@/types/quiz";
 
 const ACTIVITY_STATE_PREFIX = "feedbackActivity:v1:";
-const BROWSER_ALERT_PREFIX = "feedbackBrowserAlerts:v1:";
 const ACTIVITY_LEASE_PREFIX = "feedbackActivityLease:v1:";
 const OWN_CREATED_IDS_KEY = "feedbackOwnCreatedIds:v1";
 const ACTIVITY_REFRESH_EVENT = "feedback-activity-refresh";
 const VISIBLE_POLL_MS = 90 * 1000;
-const HIDDEN_ALERT_POLL_MS = 3 * 60 * 1000;
 const LEASE_MS = 4 * 60 * 1000;
 const OWN_ID_TTL_MS = 7 * 24 * 60 * 60 * 1000;
 
-type BrowserPermission = NotificationPermission | "unsupported";
 type OwnCreatedId = { id: string; createdAt: number };
 
 function activityStateKey(userId: string) {
   return `${ACTIVITY_STATE_PREFIX}${userId}`;
 }
 
-function browserAlertKey(userId: string) {
-  return `${BROWSER_ALERT_PREFIX}${userId}`;
-}
-
 function activityLeaseKey(userId: string) {
   return `${ACTIVITY_LEASE_PREFIX}${userId}`;
-}
-
-function loadBrowserAlertPreference(userId: string) {
-  try {
-    return window.localStorage.getItem(browserAlertKey(userId)) === "1";
-  } catch {
-    return false;
-  }
-}
-
-function saveBrowserAlertPreference(userId: string, enabled: boolean) {
-  try {
-    window.localStorage.setItem(browserAlertKey(userId), enabled ? "1" : "0");
-  } catch {
-    // The permission still applies to this tab when preference storage is blocked.
-  }
 }
 
 function loadStoredActivityState(userId: string): FeedbackActivityState {
@@ -140,10 +125,6 @@ function saveOwnCreatedIds(entries: OwnCreatedId[]) {
   }
 }
 
-function getBrowserPermission(): BrowserPermission {
-  return typeof Notification === "undefined" ? "unsupported" : Notification.permission;
-}
-
 function formatActivityTime(value: string) {
   return new Date(value).toLocaleString("zh-TW", {
     month: "2-digit",
@@ -159,23 +140,6 @@ function getActivityAuthor(activity: FeedbackActivity) {
   return "已登入使用者";
 }
 
-function showBrowserActivityNotification(activities: FeedbackActivity[]) {
-  if (typeof Notification === "undefined" || activities.length === 0) return;
-  try {
-    const notification = new Notification(
-      activities.length > 1 ? `留言板有 ${activities.length} 則新動態` : "留言板有新動態",
-      { body: "網站分頁開著時會提醒你，打開留言板查看內容。" }
-    );
-    notification.onclick = () => {
-      window.focus();
-      window.location.assign("/#feedback");
-      notification.close();
-    };
-  } catch {
-    // Safari and embedded browsers may expose Notification but still reject construction.
-  }
-}
-
 export function FeedbackNotificationBell({
   open,
   onOpenChange
@@ -187,26 +151,21 @@ export function FeedbackNotificationBell({
   const [activityState, setActivityState] = useState<FeedbackActivityState>(
     EMPTY_FEEDBACK_ACTIVITY_STATE
   );
-  const [browserPermission, setBrowserPermission] = useState<BrowserPermission>("unsupported");
-  const [browserAlertsEnabled, setBrowserAlertsEnabled] = useState(false);
+  const [pushState, setPushState] = useState<FeedbackPushClientState>("checking");
+  const [pushBusy, setPushBusy] = useState(false);
   const [authorizedUserId, setAuthorizedUserId] = useState<string | null>(null);
   const [error, setError] = useState("");
+  const [pushError, setPushError] = useState("");
   const wrapperRef = useRef<HTMLDivElement | null>(null);
   const triggerRef = useRef<HTMLButtonElement | null>(null);
   const activityStateRef = useRef<FeedbackActivityState>(EMPTY_FEEDBACK_ACTIVITY_STATE);
   const openRef = useRef(open);
-  const browserAlertsEnabledRef = useRef(false);
-  const initializedRef = useRef(false);
   const tabIdRef = useRef("");
   const eligible = Boolean(configured && user?.id && session?.access_token);
 
   useEffect(() => {
     openRef.current = open;
   }, [open]);
-
-  useEffect(() => {
-    browserAlertsEnabledRef.current = browserAlertsEnabled;
-  }, [browserAlertsEnabled]);
 
   useEffect(() => {
     if (!open) return;
@@ -237,7 +196,8 @@ export function FeedbackNotificationBell({
       activityStateRef.current = EMPTY_FEEDBACK_ACTIVITY_STATE;
       setActivityState(EMPTY_FEEDBACK_ACTIVITY_STATE);
       setAuthorizedUserId(null);
-      initializedRef.current = false;
+      setPushState("checking");
+      setPushBusy(false);
       return;
     }
     const ownerUserId: string = userId;
@@ -256,13 +216,6 @@ export function FeedbackNotificationBell({
     activityStateRef.current = stored;
     setActivityState(stored);
     saveStoredActivityState(ownerUserId, stored);
-    const permission = getBrowserPermission();
-    const storedAlertPreference = loadBrowserAlertPreference(ownerUserId);
-    const alertsEnabled = storedAlertPreference && permission === "granted";
-    setBrowserPermission(permission);
-    browserAlertsEnabledRef.current = alertsEnabled;
-    setBrowserAlertsEnabled(alertsEnabled);
-    initializedRef.current = false;
 
     let cancelled = false;
     let timerId: number | undefined;
@@ -338,7 +291,7 @@ export function FeedbackNotificationBell({
         schedule(VISIBLE_POLL_MS);
         return;
       }
-      if (document.hidden && !browserAlertsEnabledRef.current) {
+      if (document.hidden) {
         releasePollingLease();
         schedule(VISIBLE_POLL_MS);
         return;
@@ -378,26 +331,8 @@ export function FeedbackNotificationBell({
         commitState(nextState);
         setError(page.degraded ? page.message ?? "留言通知暫停更新。" : "");
 
-        if (
-          shouldShowFeedbackBrowserNotification({
-            initialized: initializedRef.current,
-            enabled: browserAlertsEnabledRef.current && document.hidden,
-            permission: getBrowserPermission(),
-            addedActivities: applied.addedActivities
-          })
-        ) {
-          showBrowserActivityNotification(applied.addedActivities);
-        }
-
-        initializedRef.current = true;
         failureCount = 0;
-        schedule(
-          page.hasMore
-            ? 1000
-            : document.hidden
-              ? HIDDEN_ALERT_POLL_MS
-              : VISIBLE_POLL_MS
-        );
+        schedule(page.hasMore ? 1000 : VISIBLE_POLL_MS);
       } catch (pollError) {
         if (!cancelled) {
           failureCount += 1;
@@ -412,10 +347,8 @@ export function FeedbackNotificationBell({
     function requestImmediatePoll() {
       if (document.hidden) {
         releasePollingLease();
-        if (!browserAlertsEnabledRef.current) {
-          schedule(VISIBLE_POLL_MS);
-          return;
-        }
+        schedule(VISIBLE_POLL_MS);
+        return;
       }
       schedule(250);
     }
@@ -473,6 +406,44 @@ export function FeedbackNotificationBell({
     };
   }, [eligible, session?.access_token, user?.id]);
 
+  useEffect(() => {
+    const userId = user?.id;
+    if (!eligible || !userId || authorizedUserId !== userId) {
+      setPushState("checking");
+      return;
+    }
+
+    let cancelled = false;
+    const inspectSubscription = async () => {
+      const accessToken = session?.access_token;
+      if (!accessToken) return;
+      const capability = getBrowserFeedbackPushCapability();
+      if (capability !== "available") {
+        if (!cancelled) setPushState(capability);
+        return;
+      }
+      try {
+        const registration = await ensureFeedbackPushWorker();
+        const subscription = await registration.pushManager.getSubscription();
+        if (subscription) await saveFeedbackPushSubscription(accessToken, subscription);
+        if (!cancelled) {
+          setPushError("");
+          setPushState(subscription ? "subscribed" : "available");
+        }
+      } catch (pushError) {
+        if (!cancelled) {
+          const message = pushError instanceof Error ? pushError.message : "手機推播狀態確認失敗。";
+          setPushState(message.includes("尚未設定") || message.includes("金鑰") ? "unconfigured" : "available");
+          setPushError(message);
+        }
+      }
+    };
+    void inspectSubscription();
+    return () => {
+      cancelled = true;
+    };
+  }, [authorizedUserId, eligible, session?.access_token, user?.id]);
+
   const unreadCount = countUnreadFeedbackActivities(activityState);
   const previews = useMemo(() => activityState.activities.slice(0, 8), [activityState.activities]);
 
@@ -502,26 +473,66 @@ export function FeedbackNotificationBell({
     onOpenChange(nextOpen);
   }
 
-  async function enableBrowserAlerts() {
-    if (!user?.id || typeof Notification === "undefined") return;
+  async function enableMobilePush() {
+    const accessToken = session?.access_token;
+    if (!user?.id || !accessToken) return;
+    const capability = getBrowserFeedbackPushCapability();
+    if (capability !== "available") {
+      setPushState(capability);
+      return;
+    }
+
+    setPushBusy(true);
+    setPushError("");
+    let createdSubscription: PushSubscription | null = null;
     try {
       const permission = await Notification.requestPermission();
-      setBrowserPermission(permission);
-      const enabled = permission === "granted";
-      browserAlertsEnabledRef.current = enabled;
-      setBrowserAlertsEnabled(enabled);
-      saveBrowserAlertPreference(user.id, enabled);
-      setError(permission === "denied" ? "瀏覽器已封鎖通知，可在網站權限設定中調整。" : "");
-    } catch {
-      setError("這個瀏覽器目前無法開啟通知。");
+      if (permission !== "granted") {
+        setPushState(permission === "denied" ? "denied" : "available");
+        setPushError(permission === "denied" ? "手機已封鎖通知，請到系統設定開啟。" : "");
+        return;
+      }
+
+      const publicKey = await loadFeedbackPushPublicKey(accessToken);
+      const registration = await ensureFeedbackPushWorker();
+      let subscription = await registration.pushManager.getSubscription();
+      if (!subscription) {
+        subscription = await registration.pushManager.subscribe({
+          userVisibleOnly: true,
+          applicationServerKey: decodeVapidPublicKey(publicKey)
+        });
+        createdSubscription = subscription;
+      }
+      await saveFeedbackPushSubscription(accessToken, subscription);
+      setPushState("subscribed");
+    } catch (pushError) {
+      if (createdSubscription) await createdSubscription.unsubscribe().catch(() => false);
+      const message = pushError instanceof Error ? pushError.message : "手機推播開啟失敗。";
+      setPushState(message.includes("尚未設定") || message.includes("金鑰") ? "unconfigured" : "available");
+      setPushError(message);
+    } finally {
+      setPushBusy(false);
     }
   }
 
-  function disableBrowserAlerts() {
-    if (!user?.id) return;
-    browserAlertsEnabledRef.current = false;
-    setBrowserAlertsEnabled(false);
-    saveBrowserAlertPreference(user.id, false);
+  async function disableMobilePush() {
+    const accessToken = session?.access_token;
+    if (!user?.id || !accessToken) return;
+    setPushBusy(true);
+    setPushError("");
+    try {
+      const registration = await ensureFeedbackPushWorker();
+      const subscription = await registration.pushManager.getSubscription();
+      if (subscription) {
+        await removeFeedbackPushSubscription(accessToken, subscription);
+        await subscription.unsubscribe();
+      }
+      setPushState("available");
+    } catch (pushError) {
+      setPushError(pushError instanceof Error ? pushError.message : "手機推播取消失敗。");
+    } finally {
+      setPushBusy(false);
+    }
   }
 
   return (
@@ -591,16 +602,31 @@ export function FeedbackNotificationBell({
           </div>
 
           <div className="app-feedback-notification-settings">
-            {browserPermission === "unsupported" ? (
-              <p>這個瀏覽器不支援頁面通知。</p>
-            ) : browserAlertsEnabled ? (
-              <button type="button" onClick={disableBrowserAlerts}>關閉瀏覽器提醒</button>
-            ) : browserPermission === "denied" ? (
-              <p>瀏覽器已封鎖通知，可到網站權限設定調整。</p>
+            {pushState === "checking" ? (
+              <p>正在確認手機推播狀態。</p>
+            ) : pushState === "unsupported" ? (
+              <p>這台裝置或瀏覽器不支援背景推播。</p>
+            ) : pushState === "install-required" ? (
+              <p>iPhone 請先用 Safari「分享 → 加入主畫面」，再從主畫面開啟網站。</p>
+            ) : pushState === "denied" ? (
+              <p>手機已封鎖通知，請到系統設定開啟。</p>
+            ) : pushState === "unconfigured" ? (
+              <p>手機推播尚未設定完成。</p>
+            ) : pushState === "subscribed" ? (
+              <button type="button" disabled={pushBusy} onClick={() => void disableMobilePush()}>
+                {pushBusy ? "正在關閉…" : "關閉手機推播"}
+              </button>
             ) : (
-              <button type="button" onClick={() => void enableBrowserAlerts()}>開啟瀏覽器提醒</button>
+              <button type="button" disabled={pushBusy} onClick={() => void enableMobilePush()}>
+                {pushBusy ? "正在開啟…" : "開啟手機推播"}
+              </button>
             )}
-            <p>Email 通知會在網站關閉時照常寄出；這裡的瀏覽器提醒只在分頁開著時有效。</p>
+            <p>
+              {pushState === "subscribed"
+                ? "手機推播已開啟，網站關閉時也會通知。"
+                : "開啟後，新留言與回覆會直接送到手機。"}
+            </p>
+            {pushError ? <p className="is-error" role="status">{pushError}</p> : null}
             {error ? <p className="is-error" role="status">{error}</p> : null}
           </div>
         </section>

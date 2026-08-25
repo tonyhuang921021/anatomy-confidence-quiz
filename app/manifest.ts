@@ -5,6 +5,7 @@ export default function manifest(): MetadataRoute.Manifest {
     name: "國考刷題測驗",
     short_name: "國考刷題",
     description: "用答題結果、信心程度與完成度，找出你的一階醫師國考弱點。",
+    id: "/",
     start_url: "/",
     scope: "/",
     display: "standalone",
@@ -14,15 +15,15 @@ export default function manifest(): MetadataRoute.Manifest {
     lang: "zh-Hant",
     icons: [
       {
-        src: "/icon.svg",
-        sizes: "any",
-        type: "image/svg+xml",
+        src: "/icon-192.png",
+        sizes: "192x192",
+        type: "image/png",
         purpose: "any"
       },
       {
-        src: "/apple-icon.svg",
-        sizes: "180x180",
-        type: "image/svg+xml",
+        src: "/icon-512.png",
+        sizes: "512x512",
+        type: "image/png",
         purpose: "any"
       }
     ]

@@ -1,5 +1,7 @@
 import { expect, test, type Page } from "@playwright/test";
 
+test.use({ serviceWorkers: "block" });
+
 type MockFeedbackMessage = {
   id: string;
   content: string;
@@ -203,8 +205,20 @@ test("較慢的首頁讀取不會蓋掉剛送出的留言", async ({ page }) => 
   await expect(feedbackSection.getByText("剛送出的留言", { exact: true })).toBeVisible();
 });
 
-test("站長通知只計外部新動態，重播不重複且打開後標成已讀", async ({ page }) => {
+test("站長通知只計外部新動態，重播不重複且提供手機背景推播", async ({ page, browserName }) => {
   await mockQuietShellApis(page);
+  if (browserName === "webkit") {
+    await page.addInitScript(() => {
+      Object.defineProperty(window, "PushManager", {
+        configurable: true,
+        value: class MockPushManager {}
+      });
+      Object.defineProperty(window, "Notification", {
+        configurable: true,
+        value: { permission: "default" }
+      });
+    });
+  }
   await page.addInitScript(() => {
     const nowSeconds = Math.floor(Date.now() / 1000);
     const session = {
@@ -296,11 +310,14 @@ test("站長通知只計外部新動態，重播不重複且打開後標成已�
   await expect(panel.getByText("第一則外部留言", { exact: true })).toHaveCount(1);
   await expect(panel.getByText("第二則外部回覆", { exact: true })).toHaveCount(1);
   await expect(panel.getByText("站長自己的留言", { exact: true })).toHaveCount(0);
-  await expect(
-    panel.getByText("Email 通知會在網站關閉時照常寄出；這裡的瀏覽器提醒只在分頁開著時有效。", {
-      exact: true
-    })
-  ).toBeVisible();
+  await expect(panel.getByText("開啟後，新留言與回覆會直接送到手機。", { exact: true })).toBeVisible();
+  if (browserName === "webkit") {
+    await expect(
+      panel.getByText("iPhone 請先用 Safari「分享 → 加入主畫面」，再從主畫面開啟網站。", {
+        exact: true
+      })
+    ).toBeVisible();
+  }
   await expect(page.getByRole("button", { name: "留言通知，0 則未讀" })).toBeVisible();
 
   await page.getByRole("button", { name: "留言通知，0 則未讀" }).click();

@@ -147,17 +147,3 @@ export function reconcileOwnFeedbackActivities(
   }
   return reconciled;
 }
-
-export function shouldShowFeedbackBrowserNotification(input: {
-  initialized: boolean;
-  enabled: boolean;
-  permission: NotificationPermission | "unsupported";
-  addedActivities: FeedbackActivity[];
-}) {
-  return (
-    input.initialized &&
-    input.enabled &&
-    input.permission === "granted" &&
-    input.addedActivities.length > 0
-  );
-}
