@@ -359,13 +359,15 @@ export default function StartPage() {
     const groupFullySelected = isSubjectGroupFullySelected(subjects);
 
     return (
-      <section className="quiz-setup-group p-4">
-        <div className="flex flex-wrap items-center justify-between gap-3">
-          <h2 className="font-serif text-2xl font-semibold tracking-[-0.03em] text-ink">{title}</h2>
+      <section className="quiz-setup-group">
+        <div className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3">
+          <h2 className="whitespace-nowrap font-serif text-xl font-semibold tracking-[-0.03em] text-ink sm:text-2xl">
+            {title}
+          </h2>
           <button
             type="button"
             onClick={() => toggleSubjectGroup(subjects)}
-            className={`min-h-10 rounded-lg px-3 py-2 text-sm font-semibold transition ${
+            className={`min-h-9 whitespace-nowrap rounded-lg px-3 py-2 text-xs font-semibold transition sm:min-h-10 sm:text-sm ${
               groupFullySelected
                 ? "bg-brand-600 text-white hover:bg-brand-700"
                 : "bg-white text-slate-700 ring-1 ring-slate-200 hover:bg-slate-50"
@@ -375,7 +377,7 @@ export default function StartPage() {
           </button>
         </div>
 
-        <div className="mt-4 grid grid-cols-2 gap-3 xl:grid-cols-3">
+        <div className="mt-3 grid grid-cols-2 gap-2.5 sm:mt-4 sm:gap-3 xl:grid-cols-3">
           {subjects.map((subject) => {
             const active = effectiveSelectedSubjects.includes(subject.subject);
             const trackedSubject = isTrackSubject(subject.subject) ? subject.subject : null;
@@ -399,7 +401,7 @@ export default function StartPage() {
               return (
                 <div
                   key={subject.subject}
-                  className={`col-span-2 rounded-lg border p-4 text-left transition xl:col-span-1 ${
+                  className={`col-span-2 rounded-lg border p-3 text-left transition sm:p-4 xl:col-span-1 ${
                     active
                       ? "border-brand-400 bg-white shadow-card ring-1 ring-brand-200"
                       : "border-slate-200/80 bg-white/80 hover:bg-white"
@@ -410,28 +412,29 @@ export default function StartPage() {
                     onClick={() => toggleSubject(subject.subject)}
                     className="w-full text-left"
                     aria-expanded={expanded}
+                    aria-pressed={active}
                   >
                     <div className="flex items-center justify-between gap-3">
-                      <div className="flex min-w-0 items-center gap-2">
+                      <div className="min-w-0">
                         <h3 className="truncate text-base font-semibold text-ink sm:text-lg">{subject.label}</h3>
-                        <span className="shrink-0 rounded-full bg-slate-100 px-2.5 py-1 text-[11px] font-semibold text-slate-600">
+                        <span className="mt-0.5 block text-xs font-medium tabular-nums text-slate-500">
                           {pastExamCount} 題
                         </span>
                       </div>
                       <span
-                        className={`shrink-0 rounded-full px-2.5 py-1 text-[11px] font-semibold ${
-                          active ? "bg-brand-600 text-white" : "bg-slate-100 text-slate-600"
+                        className={`shrink-0 text-xs font-semibold ${
+                          active ? "text-brand-700" : "text-slate-500"
                         }`}
                       >
                         {active ? "已選" : "全選"}
                       </span>
                     </div>
                     {active ? (
-                      <p className="mt-3 text-xs font-semibold text-brand-700">
+                      <p className="mt-2 text-xs font-semibold text-brand-700">
                         已選 {selectedLabels.length === tracks.length ? "全部" : selectedLabels.join("、")}
                       </p>
                     ) : (
-                      <p className="mt-3 text-xs text-slate-500">按科名全選，或展開後只選子分類。</p>
+                      <p className="mt-2 text-xs text-slate-500">點科名全選，也可單選分類。</p>
                     )}
                   </button>
                   <button
@@ -440,7 +443,7 @@ export default function StartPage() {
                       event.stopPropagation();
                       setTrackExpanded(trackedSubject, (current) => !current);
                     }}
-                    className="mt-3 rounded-full bg-slate-100 px-3 py-1.5 text-xs font-semibold text-slate-600 transition hover:bg-slate-200"
+                    className="mt-2 rounded-lg bg-slate-100 px-3 py-1.5 text-xs font-semibold text-slate-600 transition hover:bg-slate-200"
                     aria-expanded={expanded}
                   >
                     {expanded ? "收合分類" : "選分類"}
@@ -485,24 +488,25 @@ export default function StartPage() {
                 key={subject.subject}
                 type="button"
                 onClick={() => toggleSubject(subject.subject)}
-                className={`rounded-lg border p-4 text-left transition ${
+                aria-pressed={active}
+                className={`rounded-lg border p-3 text-left transition sm:p-4 ${
                   active
                     ? "border-brand-400 bg-white shadow-card ring-1 ring-brand-200"
                     : "border-slate-200/80 bg-white/80 hover:bg-white"
                 }`}
               >
-                <div className="flex min-h-14 flex-col items-start justify-between gap-2 sm:min-h-0 sm:flex-row sm:items-center sm:gap-3">
-                  <div className="flex min-w-0 flex-wrap items-center gap-2">
-                    <h3 className="text-sm font-semibold leading-snug text-ink sm:text-lg">{subject.label}</h3>
-                    <span className="shrink-0 rounded-full bg-slate-100 px-2.5 py-1 text-[11px] font-semibold text-slate-600">
+                <div className="flex min-h-12 flex-col justify-center gap-1 sm:min-h-14">
+                  <h3 className="whitespace-nowrap text-sm font-semibold leading-snug text-ink sm:text-lg">
+                    {subject.label}
+                  </h3>
+                  <div className="flex items-center justify-between gap-2">
+                    <span className="text-xs font-medium tabular-nums text-slate-500">
                       {pastExamCount} 題
                     </span>
+                    {active ? (
+                      <span className="shrink-0 text-xs font-semibold text-brand-700">已選</span>
+                    ) : null}
                   </div>
-                  {active ? (
-                    <span className="shrink-0 rounded-full bg-brand-600 px-2.5 py-1 text-[11px] font-semibold text-white">
-                      已選
-                    </span>
-                  ) : null}
                 </div>
               </button>
             );
@@ -626,9 +630,12 @@ export default function StartPage() {
           ) : null}
         </div>
 
-        <div className="surface-card-muted mt-6 flex flex-col gap-4 p-5 xl:flex-row xl:items-end xl:justify-between">
+        <section
+          aria-label="抽題設定"
+          className="surface-card-muted mt-5 grid gap-3 p-4 xl:grid-cols-[minmax(0,1fr)_auto] xl:items-end"
+        >
           <div className="min-w-0 space-y-2">
-            <div className="flex flex-wrap items-center gap-x-2 gap-y-2 text-sm text-slate-700">
+            <div className="flex flex-wrap items-center gap-x-3 gap-y-2 text-sm text-slate-700">
               <details className="group relative">
                 <summary className="flex min-h-10 cursor-pointer list-none items-center gap-2 rounded-xl border border-slate-200 bg-white px-3 py-2 font-semibold text-ink shadow-sm transition hover:border-brand-300 hover:bg-brand-50/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-200 [&::-webkit-details-marker]:hidden">
                   <span className="text-xs font-semibold text-slate-500">年份</span>
@@ -679,49 +686,53 @@ export default function StartPage() {
                   </div>
                 </div>
               </details>
-              <span className="hidden h-5 w-px bg-slate-200 sm:block" aria-hidden="true" />
               {practiceHistoryReady ? (
-                <span>
-                  已選 <span className="font-semibold text-ink">{effectiveSelectedSubjects.length + (includeSeasonalLimited ? 1 : 0)}</span> 個範圍・
-                  共 <span className="font-semibold text-ink">{availableQuestionCount}</span> 題・
-                  未做 <span className="font-semibold text-ink">{unattemptedAvailableQuestionCount}</span> 題・
-                  先出沒做過的題，題池用完後才補最久沒做的題
-                  {practiceStopAfterReview ? "・自由測驗・每題詳解後可結束" : `・每次抽 ${practiceQuestionCount} 題`}
+                <span className="font-medium" aria-live="polite">
+                  <span className="font-semibold tabular-nums text-ink">
+                    {effectiveSelectedSubjects.length + (includeSeasonalLimited ? 1 : 0)}
+                  </span>{" "}
+                  個範圍・
+                  <span className="font-semibold tabular-nums text-ink">{availableQuestionCount}</span>{" "}
+                  題可練
                 </span>
               ) : (
-                <span className="font-semibold text-brand-800">正在整理完整作答紀錄，完成後即可開始抽題。</span>
+                <span className="font-semibold text-brand-800">正在整理作答紀錄</span>
               )}
             </div>
             {practiceHistoryReady && willFillWithSeenQuestions ? (
               <p className="text-xs font-semibold text-amber-700">
                 {unattemptedAvailableQuestionCount === 0
-                  ? "這個篩選範圍已沒有未做題，接下來會從最久以前做過的題目補題。"
-                  : `未做題不足本輪題數，會先出完 ${unattemptedAvailableQuestionCount} 題未做，再用舊題補滿。`}
+                  ? "未做題已清空，接著會複習最久沒做的題。"
+                  : `先出 ${unattemptedAvailableQuestionCount} 題未做，再補舊題。`}
               </p>
             ) : null}
           </div>
-          <div className="flex flex-wrap gap-3">
+          <div className="grid grid-cols-[auto_minmax(0,1fr)] gap-2 xl:flex">
             <button
               type="button"
               onClick={selectAllSubjects}
-              className="secondary-pill bg-white px-4 py-3"
+              className="secondary-pill whitespace-nowrap bg-white px-4 py-3"
             >
-              全選
+              全選科目
             </button>
             <button
               type="button"
               onClick={handleStart}
               disabled={!practiceHistoryReady || (effectiveSelectedSubjects.length === 0 && !includeSeasonalLimited) || availableQuestionCount === 0}
-              className="primary-pill disabled:cursor-not-allowed disabled:bg-slate-300"
+              className="primary-pill min-w-0 disabled:cursor-not-allowed disabled:bg-slate-300"
             >
               {!practiceHistoryReady
-                ? "整理作答紀錄中"
-                : practiceStopAfterReview
-                  ? "開始自由測驗"
-                  : `開始 ${effectiveQuestionCount} 題測驗`}
+                ? "整理紀錄中"
+                : effectiveSelectedSubjects.length === 0 && !includeSeasonalLimited
+                  ? "請先選科目"
+                  : availableQuestionCount === 0
+                    ? "此年份無題"
+                    : practiceStopAfterReview
+                      ? "開始練習"
+                      : `開始 ${effectiveQuestionCount} 題`}
             </button>
           </div>
-        </div>
+        </section>
       </section>
     </main>
   );

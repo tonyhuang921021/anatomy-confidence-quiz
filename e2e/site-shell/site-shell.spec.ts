@@ -87,6 +87,36 @@ test("主要頁面在桌機與 Safari 手機尺寸都不溢出", async ({ page }
   }
 });
 
+test("開始測驗的科別標題不換行，抽題設定只留必要資訊", async ({ page }) => {
+  await page.goto("/start", { waitUntil: "domcontentloaded" });
+  await waitForShellReady(page);
+
+  const groupHeadings = page.locator(".quiz-setup-group > div:first-child > h2");
+  await expect(groupHeadings).toHaveCount(2);
+  const headingMetrics = await groupHeadings.evaluateAll((elements) =>
+    elements.map((element) => {
+      const style = window.getComputedStyle(element);
+      return {
+        height: element.getBoundingClientRect().height,
+        lineHeight: Number.parseFloat(style.lineHeight),
+        whiteSpace: style.whiteSpace
+      };
+    })
+  );
+  for (const metric of headingMetrics) {
+    expect(metric.whiteSpace).toBe("nowrap");
+    expect(metric.height).toBeLessThanOrEqual(metric.lineHeight * 1.15);
+  }
+
+  const settings = page.getByRole("region", { name: "抽題設定" });
+  await expect(settings).toBeVisible();
+  await expect(settings.getByText("0 個範圍・0 題可練", { exact: true })).toBeVisible();
+  await expect(settings.getByRole("button", { name: "全選科目" })).toBeVisible();
+  await expect(settings.getByRole("button", { name: "請先選科目" })).toBeDisabled();
+  await expect(page.getByText("先出沒做過的題", { exact: false })).toHaveCount(0);
+  await expect(page.getByText("每題詳解後可結束", { exact: false })).toHaveCount(0);
+});
+
 test("搜尋結果展開後不會重複題幹與分類", async ({ page }) => {
   await page.goto("/search", { waitUntil: "networkidle" });
   await waitForShellReady(page);
