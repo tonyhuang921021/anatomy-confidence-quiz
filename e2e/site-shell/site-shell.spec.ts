@@ -59,13 +59,18 @@ test("更多功能會留在左側導覽原地展開", async ({ page }) => {
 
   await expect(moreTrigger).toHaveAttribute("aria-expanded", "true");
   await expect(drawer.getByRole("link", { name: "學習筆記", exact: true })).toBeVisible();
-  await expect(drawer.getByRole("link", { name: "設定", exact: true })).toBeVisible();
+  const settingsButton = drawer.getByRole("button", { name: "設定", exact: true });
+  await expect(settingsButton).toBeVisible();
   await expect(drawer.getByRole("link", { name: "考後回顧", exact: true })).toBeVisible();
   await expect(page.getByRole("dialog", { name: "更多功能" })).toHaveCount(0);
 
   await page.waitForTimeout(220);
   const drawerBox = await drawer.boundingBox();
   expect(Math.abs(drawerBox?.x ?? 1)).toBeLessThanOrEqual(1);
+
+  await settingsButton.click();
+  await expect(page.getByRole("dialog", { name: "帳號與設定" })).toBeVisible();
+  await expect(drawer).toHaveCount(0);
 });
 
 test("帳號設定可關閉並把焦點交回帳號按鈕", async ({ page }) => {
@@ -195,20 +200,22 @@ test("設定頁收納通知與加入主畫面教學", async ({ page, browserName
   await page.goto("/settings", { waitUntil: "domcontentloaded" });
   await waitForShellReady(page);
 
-  await expect(page.getByRole("heading", { name: "設定", exact: true })).toBeVisible();
-  await expect(page.getByRole("heading", { name: "通知", exact: true })).toBeVisible();
-  const pushSettings = page.getByRole("region", { name: "手機通知" });
+  await expect(page).toHaveURL(/\/?settings=1$/);
+  const accountSettings = page.getByRole("dialog", { name: "帳號與設定" });
+  await expect(accountSettings).toBeVisible();
+  await expect(accountSettings.getByRole("heading", { name: "通知", exact: true })).toBeVisible();
+  const pushSettings = accountSettings.getByRole("region", { name: "手機通知" });
   await expect(pushSettings).toBeVisible();
 
   if (browserName === "webkit") {
     await expect(pushSettings.getByText("需先加入主畫面", { exact: true })).toBeVisible();
-    await expect(page.getByText("iPhone・Safari", { exact: true })).toBeVisible();
-    await expect(page.getByRole("img", { name: "iPhone 加入主畫面三步驟示意圖" })).toBeVisible();
-    await expect(page.getByText("用 Safari 點分享圖示。", { exact: false })).toBeVisible();
+    await expect(accountSettings.getByText("iPhone・Safari", { exact: true })).toBeVisible();
+    await expect(accountSettings.getByRole("img", { name: "iPhone 加入主畫面三步驟示意圖" })).toBeVisible();
+    await expect(accountSettings.getByText("用 Safari 點分享圖示。", { exact: false })).toBeVisible();
   } else {
     await expect(pushSettings.getByText("尚未開啟", { exact: true })).toBeVisible();
     await expect(pushSettings.getByRole("button", { name: "開啟手機通知" })).toBeVisible();
-    await expect(page.getByText("請用 iPhone 或 Android 手機開啟這一頁", { exact: false })).toBeVisible();
+    await expect(accountSettings.getByText("請用 iPhone 或 Android 手機開啟這一頁", { exact: false })).toBeVisible();
   }
 });
 

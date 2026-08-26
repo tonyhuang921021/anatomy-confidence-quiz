@@ -27,6 +27,8 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { useAuth } from "@/components/AuthProvider";
 import { ClientSectionBoundary } from "@/components/ClientSectionBoundary";
 import { LazyAuthPanel } from "@/components/LazyAuthPanel";
+import { MobileInstallGuide } from "@/components/MobileInstallGuide";
+import { SettingsNotificationSection } from "@/components/SettingsNotificationSection";
 import { getSyncStatusText, getSyncStatusTone } from "@/components/syncStatusText";
 import { VisitorStatsPanel } from "@/components/VisitorStatsPanel";
 
@@ -68,7 +70,6 @@ const PRIMARY_NAV: NavItem[] = [
 ];
 
 const MORE_LINKS: NavItem[] = [
-  { href: "/settings", label: "設定", icon: Settings },
   { href: "/notes", label: "學習筆記", icon: NotebookTabs },
   { href: "/resources", label: "資源分享", icon: Library },
   { href: "/pharmacology-review", label: "藥理複習", icon: Pill },
@@ -158,8 +159,19 @@ export function UserStatusBar() {
     setNavOpen(false);
     setMoreExpanded(false);
     setAccountOpen(false);
-    setAccountPanelOpen(false);
+    const settingsRequested =
+      pathname === "/" && new URLSearchParams(window.location.search).get("settings") === "1";
+    setAccountPanelOpen(settingsRequested);
   }, [pathname]);
+
+  function closeAccountPanel() {
+    setAccountPanelOpen(false);
+    const currentUrl = new URL(window.location.href);
+    if (currentUrl.searchParams.get("settings") === "1") {
+      currentUrl.searchParams.delete("settings");
+      window.history.replaceState(null, "", `${currentUrl.pathname}${currentUrl.search}${currentUrl.hash}`);
+    }
+  }
 
   useEffect(() => {
     if (!accountOpen) return;
@@ -452,6 +464,17 @@ export function UserStatusBar() {
               {moreExpanded ? (
                 <div id="app-drawer-more-content" className="app-drawer-more-content">
                   <div className="app-drawer-subnav">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setNavOpen(false);
+                        setMoreExpanded(false);
+                        setAccountPanelOpen(true);
+                      }}
+                    >
+                      <Settings size={19} strokeWidth={1.8} />
+                      <span>設定</span>
+                    </button>
                     {MORE_LINKS.map((item) => {
                       const Icon = item.icon;
                       const active = pathname.startsWith(item.href);
@@ -495,7 +518,7 @@ export function UserStatusBar() {
           <button
             type="button"
             className="app-overlay-dismiss"
-            onClick={() => setAccountPanelOpen(false)}
+            onClick={closeAccountPanel}
             aria-label="關閉帳號設定"
           />
           <section
@@ -508,11 +531,11 @@ export function UserStatusBar() {
             <div className="app-drawer-header">
               <div>
                 <p>{user ? "帳號設定" : "登入與同步"}</p>
-                <span>{user ? "管理身分、同步與作答偏好" : "在不同裝置保留完整紀錄"}</span>
+                <span>{user ? "管理身分、同步、通知與作答偏好" : "登入、通知與裝置設定"}</span>
               </div>
               <button
                 type="button"
-                onClick={() => setAccountPanelOpen(false)}
+                onClick={closeAccountPanel}
                 aria-label="關閉帳號設定"
               >
                 <X size={20} strokeWidth={1.8} />
@@ -548,6 +571,10 @@ export function UserStatusBar() {
                   </p>
                 </aside>
                 <div className="app-account-center-settings">
+                  <div className="app-account-settings-tools">
+                    <SettingsNotificationSection />
+                    <MobileInstallGuide />
+                  </div>
                   <ClientSectionBoundary title="帳號與設定">
                     <LazyAuthPanel eager compactHeader={Boolean(user)} />
                   </ClientSectionBoundary>

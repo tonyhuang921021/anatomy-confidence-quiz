@@ -3697,7 +3697,8 @@ html[data-theme="dark"] .border-slate-100 {
   display: grid;
 }
 
-.app-drawer-subnav a {
+.app-drawer-subnav a,
+.app-drawer-subnav button {
   min-height: 46px;
   padding-block: 0.62rem;
   color: var(--ink-soft);
@@ -3843,6 +3844,14 @@ html[data-theme="dark"] .border-slate-100 {
 
 .app-account-center-settings {
   min-width: 0;
+}
+
+.app-account-settings-tools {
+  display: grid;
+  gap: 1rem;
+  margin-bottom: 1rem;
+  border-bottom: 1px solid var(--line-soft);
+  padding-bottom: 1rem;
 }
 
 .app-account-center-settings .account-settings-content {
