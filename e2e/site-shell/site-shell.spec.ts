@@ -154,7 +154,7 @@ test("進度總覽點章節後才進入獨立設定頁開始練習", async ({ pa
   await expect(page.getByText("第 1 / 5 題", { exact: true })).toBeVisible();
 });
 
-test("手機通知與加入主畫面教學集中在設定頁", async ({ page, browserName }) => {
+test("設定頁收納通知與加入主畫面教學", async ({ page, browserName }) => {
   await page.route("https://e2e.invalid/**", (route) => route.abort());
   await page.addInitScript(() => {
     Object.defineProperty(window, "Notification", {
@@ -195,7 +195,8 @@ test("手機通知與加入主畫面教學集中在設定頁", async ({ page, br
   await page.goto("/settings", { waitUntil: "domcontentloaded" });
   await waitForShellReady(page);
 
-  await expect(page.getByRole("heading", { name: "手機與通知" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "設定", exact: true })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "通知", exact: true })).toBeVisible();
   const pushSettings = page.getByRole("region", { name: "手機通知" });
   await expect(pushSettings).toBeVisible();
 

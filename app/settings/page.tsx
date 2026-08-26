@@ -1,18 +1,18 @@
 import { ClientSectionBoundary } from "@/components/ClientSectionBoundary";
 import { LazyAuthPanel } from "@/components/LazyAuthPanel";
 import { MobileInstallGuide } from "@/components/MobileInstallGuide";
-import { MobilePushSettings } from "@/components/MobilePushSettings";
+import { SettingsNotificationSection } from "@/components/SettingsNotificationSection";
 
 export default function SettingsPage() {
   return (
     <main id="main-content" className="shell workspace-page">
       <section className="surface-card workspace-page-panel p-5 sm:p-7">
-        <p className="workspace-page-kicker">設定</p>
-        <h1 className="workspace-page-title">手機與通知</h1>
-        <p className="mt-3 text-slate-500">通知、主畫面安裝集中在這裡，需要時再調整。</p>
+        <p className="workspace-page-kicker">個人設定</p>
+        <h1 className="workspace-page-title">設定</h1>
+        <p className="mt-3 text-slate-500">通知、主畫面與作答偏好都從這裡調整。</p>
 
-        <div className="mt-6 grid gap-4">
-          <MobilePushSettings />
+        <div className="mt-6 grid gap-6">
+          <SettingsNotificationSection />
           <MobileInstallGuide />
         </div>
 

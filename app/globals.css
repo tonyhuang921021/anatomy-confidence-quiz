@@ -3153,6 +3153,10 @@ html[data-theme="dark"] .border-slate-100 {
   flex: 0 0 auto;
 }
 
+.app-feedback-notification-wrap-settings {
+  width: 100%;
+}
+
 .app-feedback-notification-trigger {
   position: relative;
   display: inline-flex;
@@ -3173,6 +3177,34 @@ html[data-theme="dark"] .border-slate-100 {
 
 .app-feedback-notification-trigger:active {
   transform: scale(0.98);
+}
+
+.app-feedback-notification-trigger-settings {
+  width: 100%;
+  justify-content: flex-start;
+  gap: 0.75rem;
+  border: 1px solid var(--line-soft);
+  background: var(--surface-float);
+  padding: 0.75rem 3rem 0.75rem 0.9rem;
+  text-align: left;
+}
+
+.app-feedback-notification-trigger-copy {
+  display: grid;
+  min-width: 0;
+  gap: 0.15rem;
+}
+
+.app-feedback-notification-trigger-copy strong {
+  color: var(--ink-main);
+  font-size: 0.85rem;
+  font-weight: 670;
+}
+
+.app-feedback-notification-trigger-copy small {
+  color: var(--ink-soft);
+  font-size: 0.72rem;
+  line-height: 1.45;
 }
 
 .app-feedback-notification-badge {
@@ -3209,6 +3241,18 @@ html[data-theme="dark"] .border-slate-100 {
   border-radius: 14px;
   background: var(--surface-float);
   box-shadow: 0 22px 62px rgba(44, 68, 61, 0.18);
+}
+
+.app-feedback-notification-popover-settings {
+  position: static;
+  width: 100%;
+  max-height: none;
+  margin-top: 0.5rem;
+  box-shadow: none;
+}
+
+.app-feedback-notification-popover-settings .app-feedback-notification-list {
+  max-height: 20rem;
 }
 
 .app-feedback-notification-head {
@@ -5503,6 +5547,13 @@ html[data-theme="dark"] .feedback-identity button.is-selected {
     right: 0.75rem;
     top: 3.7rem;
     max-height: calc(100dvh - 4.45rem - env(safe-area-inset-bottom));
+  }
+
+  .app-feedback-notification-popover-settings {
+    position: static;
+    right: auto;
+    top: auto;
+    max-height: none;
   }
 
   .app-account-trigger {

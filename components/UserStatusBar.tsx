@@ -23,10 +23,9 @@ import {
   X
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useAuth } from "@/components/AuthProvider";
 import { ClientSectionBoundary } from "@/components/ClientSectionBoundary";
-import { FeedbackNotificationBell } from "@/components/FeedbackNotificationBell";
 import { LazyAuthPanel } from "@/components/LazyAuthPanel";
 import { getSyncStatusText, getSyncStatusTone } from "@/components/syncStatusText";
 import { VisitorStatsPanel } from "@/components/VisitorStatsPanel";
@@ -125,7 +124,6 @@ export function UserStatusBar() {
   const [moreExpanded, setMoreExpanded] = useState(false);
   const [accountOpen, setAccountOpen] = useState(false);
   const [accountPanelOpen, setAccountPanelOpen] = useState(false);
-  const [feedbackNotificationsOpen, setFeedbackNotificationsOpen] = useState(false);
   const [shellReady, setShellReady] = useState(false);
   const accountRef = useRef<HTMLDivElement | null>(null);
   const menuTriggerRef = useRef<HTMLButtonElement | null>(null);
@@ -152,11 +150,6 @@ export function UserStatusBar() {
     () => FEEDBACK_NAV.matches?.(pathname) || MORE_LINKS.some((item) => pathname.startsWith(item.href)),
     [pathname]
   );
-  const handleFeedbackNotificationsOpenChange = useCallback((nextOpen: boolean) => {
-    setFeedbackNotificationsOpen(nextOpen);
-    if (nextOpen) setAccountOpen(false);
-  }, []);
-
   useEffect(() => {
     setShellReady(true);
   }, []);
@@ -166,7 +159,6 @@ export function UserStatusBar() {
     setMoreExpanded(false);
     setAccountOpen(false);
     setAccountPanelOpen(false);
-    setFeedbackNotificationsOpen(false);
   }, [pathname]);
 
   useEffect(() => {
@@ -270,7 +262,6 @@ export function UserStatusBar() {
               type="button"
               className="app-menu-trigger"
               onClick={() => {
-                setFeedbackNotificationsOpen(false);
                 setMoreExpanded(secondaryNavigationActive);
                 setNavOpen(true);
               }}
@@ -297,17 +288,12 @@ export function UserStatusBar() {
               <span>{syncLabel}</span>
             </span>
           ) : null}
-          <FeedbackNotificationBell
-            open={feedbackNotificationsOpen}
-            onOpenChange={handleFeedbackNotificationsOpenChange}
-          />
           <div ref={accountRef} className="app-account-wrap">
             <button
               ref={accountTriggerRef}
               type="button"
               className="app-account-trigger"
               onClick={() => {
-                setFeedbackNotificationsOpen(false);
                 setAccountOpen((current) => !current);
               }}
               aria-expanded={accountOpen}
@@ -391,7 +377,6 @@ export function UserStatusBar() {
           <button
             type="button"
             onClick={() => {
-              setFeedbackNotificationsOpen(false);
               setMoreExpanded(true);
               setNavOpen(true);
             }}

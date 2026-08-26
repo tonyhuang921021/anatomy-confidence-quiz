@@ -205,7 +205,7 @@ test("較慢的首頁讀取不會蓋掉剛送出的留言", async ({ page }) => 
   await expect(feedbackSection.getByText("剛送出的留言", { exact: true })).toBeVisible();
 });
 
-test("站長通知只計外部新動態，重播不重複且可前往手機設定", async ({ page, browserName }) => {
+test("站長通知鈴鐺收進設定且只計外部新動態", async ({ page, browserName }) => {
   await mockQuietShellApis(page);
   if (browserName === "webkit") {
     await page.addInitScript(() => {
@@ -296,7 +296,8 @@ test("站長通知只計外部新動態，重播不重複且可前往手機設�
     });
   });
 
-  await page.goto("/start", { waitUntil: "domcontentloaded" });
+  await page.goto("/settings", { waitUntil: "domcontentloaded" });
+  await expect(page.locator(".app-topbar .app-feedback-notification-trigger")).toHaveCount(0);
   const unreadBell = page.getByRole("button", { name: "留言通知，2 則未讀" });
   await expect(unreadBell).toBeVisible();
   await expect.poll(() => requestedAfter).toContain("100");
@@ -310,7 +311,7 @@ test("站長通知只計外部新動態，重播不重複且可前往手機設�
   await expect(panel.getByText("第一則外部留言", { exact: true })).toHaveCount(1);
   await expect(panel.getByText("第二則外部回覆", { exact: true })).toHaveCount(1);
   await expect(panel.getByText("站長自己的留言", { exact: true })).toHaveCount(0);
-  await expect(panel.getByRole("link", { name: "手機通知設定" })).toHaveAttribute("href", "/settings");
+  await expect(page.getByRole("region", { name: "手機通知" })).toBeVisible();
   await expect(page.getByRole("button", { name: "留言通知，0 則未讀" })).toBeVisible();
 
   await page.getByRole("button", { name: "留言通知，0 則未讀" }).click();

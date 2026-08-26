@@ -133,10 +133,12 @@ function getActivityAuthor(activity: FeedbackActivity) {
 
 export function FeedbackNotificationBell({
   open,
-  onOpenChange
+  onOpenChange,
+  placement = "topbar"
 }: {
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  placement?: "topbar" | "settings";
 }) {
   const { configured, session, user } = useAuth();
   const [activityState, setActivityState] = useState<FeedbackActivityState>(
@@ -394,6 +396,7 @@ export function FeedbackNotificationBell({
 
   const unreadCount = countUnreadFeedbackActivities(activityState);
   const previews = useMemo(() => activityState.activities.slice(0, 8), [activityState.activities]);
+  const inSettings = placement === "settings";
 
   if (!eligible || !user?.id || authorizedUserId !== user.id) return null;
 
@@ -422,11 +425,14 @@ export function FeedbackNotificationBell({
   }
 
   return (
-    <div ref={wrapperRef} className="app-feedback-notification-wrap">
+    <div
+      ref={wrapperRef}
+      className={`app-feedback-notification-wrap${inSettings ? " app-feedback-notification-wrap-settings" : ""}`}
+    >
       <button
         ref={triggerRef}
         type="button"
-        className="app-feedback-notification-trigger"
+        className={`app-feedback-notification-trigger${inSettings ? " app-feedback-notification-trigger-settings" : ""}`}
         onClick={toggleOpen}
         aria-label={`留言通知，${unreadCount} 則未讀`}
         aria-expanded={open}
@@ -434,6 +440,12 @@ export function FeedbackNotificationBell({
         aria-controls="app-feedback-notification-popover"
       >
         {unreadCount > 0 ? <BellRing size={19} strokeWidth={1.8} /> : <Bell size={19} strokeWidth={1.8} />}
+        {inSettings ? (
+          <span className="app-feedback-notification-trigger-copy">
+            <strong>留言通知</strong>
+            <small>{unreadCount > 0 ? `${unreadCount} 則未讀` : "查看最近的新留言與回覆"}</small>
+          </span>
+        ) : null}
         {unreadCount > 0 ? (
           <span className="app-feedback-notification-badge" aria-hidden="true">
             {unreadCount > 99 ? "99+" : unreadCount}
@@ -447,8 +459,8 @@ export function FeedbackNotificationBell({
       {open ? (
         <section
           id="app-feedback-notification-popover"
-          className="app-feedback-notification-popover"
-          role="dialog"
+          className={`app-feedback-notification-popover${inSettings ? " app-feedback-notification-popover-settings" : ""}`}
+          role={inSettings ? "region" : "dialog"}
           aria-labelledby="app-feedback-notification-title"
         >
           <div className="app-feedback-notification-head">
@@ -487,16 +499,22 @@ export function FeedbackNotificationBell({
             )}
           </div>
 
-          <div className="app-feedback-notification-settings">
-            <Link
-              href="/settings"
-              onClick={() => onOpenChange(false)}
-              className="inline-flex min-h-11 items-center font-semibold text-brand-700"
-            >
-              手機通知設定
-            </Link>
-            {error ? <p className="is-error" role="status">{error}</p> : null}
-          </div>
+          {!inSettings ? (
+            <div className="app-feedback-notification-settings">
+              <Link
+                href="/settings"
+                onClick={() => onOpenChange(false)}
+                className="inline-flex min-h-11 items-center font-semibold text-brand-700"
+              >
+                前往設定
+              </Link>
+              {error ? <p className="is-error" role="status">{error}</p> : null}
+            </div>
+          ) : error ? (
+            <div className="app-feedback-notification-settings">
+              <p className="is-error" role="status">{error}</p>
+            </div>
+          ) : null}
         </section>
       ) : null}
     </div>
