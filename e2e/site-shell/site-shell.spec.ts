@@ -231,6 +231,7 @@ test("搜尋結果展開後不會重複題幹與分類", async ({ page }) => {
 
   await summary.click();
   await expect(summary.getByText("收合", { exact: true })).toBeVisible();
+  await expect(card).toHaveCSS("overflow", "visible");
   await expect(card.getByText(stem, { exact: true })).toHaveCount(1);
   await expect(card.getByText(primaryTag, { exact: true })).toHaveCount(1);
 
@@ -253,7 +254,10 @@ test("搜尋結果展開後不會重複題幹與分類", async ({ page }) => {
   expect(Math.max(...sourceButtonY) - Math.min(...sourceButtonY)).toBeLessThanOrEqual(2);
 
   await sourceToolbar.locator("summary").filter({ hasText: "更多" }).click();
-  await expect(sourceToolbar.getByRole("button", { name: "儲存題目" })).toBeVisible();
+  const saveQuestionButton = sourceToolbar.getByRole("button", { name: "儲存題目" });
+  await expect(saveQuestionButton).toBeVisible();
+  await saveQuestionButton.click();
+  await expect(sourceToolbar.getByRole("button", { name: /取消儲存題目/ })).toBeVisible();
   await expect(sourceToolbar.getByRole("button", { name: "用 AI 補詳解" })).toBeVisible();
   await expect(sourceToolbar.getByRole("button", { name: "回報" })).toBeVisible();
 

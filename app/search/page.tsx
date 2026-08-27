@@ -790,7 +790,9 @@ export default function SearchPage() {
                   };
                 });
               }}
-              className="search-result-card workspace-section min-w-0 max-w-full overflow-hidden"
+              className={`search-result-card workspace-section min-w-0 max-w-full ${
+                isExpanded ? "overflow-visible" : "overflow-hidden"
+              }`}
             >
               <summary className="min-w-0 cursor-pointer list-none px-4 py-4 transition hover:bg-slate-50/70 sm:px-5">
                 <div className="flex min-w-0 flex-wrap items-start justify-between gap-4">
