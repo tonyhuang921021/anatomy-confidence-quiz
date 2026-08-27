@@ -81,6 +81,9 @@ const SEARCHABLE_SUBJECTS = Object.values(subjectRegistry)
 
 const OPTION_KEYS = ["A", "B", "C", "D", "E"] as const;
 const PAGE_SIZE = 30;
+const SEARCH_ANSWER_DISPLAY_STORAGE_KEY = "anatomy-confidence-search-answer-display:v1";
+
+type SearchAnswerDisplayMode = "practice" | "direct";
 
 type SearchFavoriteRecord = SavedQuestionRecord;
 
@@ -123,6 +126,16 @@ function useDebouncedValue<T>(value: T, delayMs: number) {
   return debouncedValue;
 }
 
+function readStoredAnswerDisplayMode(): SearchAnswerDisplayMode {
+  try {
+    return window.localStorage.getItem(SEARCH_ANSWER_DISPLAY_STORAGE_KEY) === "direct"
+      ? "direct"
+      : "practice";
+  } catch {
+    return "practice";
+  }
+}
+
 export default function SearchPage() {
   const { session } = useAuth();
   const [selectedSubject, setSelectedSubject] = useState("全部");
@@ -134,6 +147,8 @@ export default function SearchPage() {
   const [rankingStatsLoading, setRankingStatsLoading] = useState(false);
   const [rankingStatsError, setRankingStatsError] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
+  const [answerDisplayMode, setAnswerDisplayMode] = useState<SearchAnswerDisplayMode>("practice");
+  const [revealedAnswerIds, setRevealedAnswerIds] = useState<Record<string, boolean>>({});
   const [explanationOverrides, setExplanationOverrides] = useState<Record<string, QuestionExplanationOverride>>({});
   const [explanationLoadingMap, setExplanationLoadingMap] = useState<Record<string, boolean>>({});
   const [explanationErrorMap, setExplanationErrorMap] = useState<Record<string, string>>({});
@@ -157,6 +172,19 @@ export default function SearchPage() {
   const debouncedKeyword = useDebouncedValue(keyword, 220);
   const deferredKeyword = useDeferredValue(debouncedKeyword);
   const isKeywordPending = keyword !== debouncedKeyword || debouncedKeyword !== deferredKeyword;
+
+  useEffect(() => {
+    setAnswerDisplayMode(readStoredAnswerDisplayMode());
+
+    const handleStorage = (event: StorageEvent) => {
+      if (event.key !== SEARCH_ANSWER_DISPLAY_STORAGE_KEY) return;
+      setAnswerDisplayMode(event.newValue === "direct" ? "direct" : "practice");
+      if (event.newValue !== "direct") setRevealedAnswerIds({});
+    };
+
+    window.addEventListener("storage", handleStorage);
+    return () => window.removeEventListener("storage", handleStorage);
+  }, []);
 
   const canonicalQuestions = useMemo(
     () =>
@@ -569,6 +597,16 @@ export default function SearchPage() {
     setRankingStatsAttempted(false);
   }
 
+  function handleAnswerDisplayModeChange(nextMode: SearchAnswerDisplayMode) {
+    setAnswerDisplayMode(nextMode);
+    if (nextMode === "practice") setRevealedAnswerIds({});
+    try {
+      window.localStorage.setItem(SEARCH_ANSWER_DISPLAY_STORAGE_KEY, nextMode);
+    } catch {
+      // Keep the in-memory choice when browser storage is unavailable.
+    }
+  }
+
   return (
     <main id="main-content" className="shell workspace-page search-page">
       <section className="surface-card workspace-page-panel min-w-0 max-w-full overflow-hidden">
@@ -667,15 +705,46 @@ export default function SearchPage() {
               </span>
             ) : null}
           </div>
-          {hasActiveSearchFilters ? (
-            <button
-              type="button"
-              onClick={resetSearchFilters}
-              className="min-h-10 rounded-xl bg-white px-4 py-2 text-sm font-semibold text-slate-700 ring-1 ring-slate-200 transition hover:bg-slate-100"
-            >
-              清除篩選
-            </button>
-          ) : null}
+          <div className="flex w-full flex-wrap items-center justify-between gap-3 sm:w-auto sm:justify-end">
+            <div className="flex items-center gap-2" role="group" aria-label="展開題目後的答案顯示方式">
+              <span className="text-xs font-semibold text-slate-500">展開後</span>
+              <div className="grid grid-cols-2 gap-1 rounded-lg bg-slate-200/70 p-1">
+                <button
+                  type="button"
+                  aria-pressed={answerDisplayMode === "practice"}
+                  onClick={() => handleAnswerDisplayModeChange("practice")}
+                  className={`min-h-9 whitespace-nowrap rounded-md px-3 py-1.5 text-xs font-semibold transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 focus-visible:ring-offset-2 ${
+                    answerDisplayMode === "practice"
+                      ? "bg-white text-ink shadow-sm"
+                      : "text-slate-600 hover:bg-white/70 hover:text-ink"
+                  }`}
+                >
+                  先隱藏
+                </button>
+                <button
+                  type="button"
+                  aria-pressed={answerDisplayMode === "direct"}
+                  onClick={() => handleAnswerDisplayModeChange("direct")}
+                  className={`min-h-9 whitespace-nowrap rounded-md px-3 py-1.5 text-xs font-semibold transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 focus-visible:ring-offset-2 ${
+                    answerDisplayMode === "direct"
+                      ? "bg-white text-ink shadow-sm"
+                      : "text-slate-600 hover:bg-white/70 hover:text-ink"
+                  }`}
+                >
+                  直接顯示
+                </button>
+              </div>
+            </div>
+            {hasActiveSearchFilters ? (
+              <button
+                type="button"
+                onClick={resetSearchFilters}
+                className="min-h-10 rounded-xl bg-white px-4 py-2 text-sm font-semibold text-slate-700 ring-1 ring-slate-200 transition hover:bg-slate-100"
+              >
+                清除篩選
+              </button>
+            ) : null}
+          </div>
         </div>
       </section>
 
@@ -696,6 +765,8 @@ export default function SearchPage() {
             const favoriteRecord = searchFavorites[renderedQuestion.id];
             const isFavorited = Boolean(favoriteRecord);
             const isExpanded = Boolean(expandedQuestionIds[renderedQuestion.id]);
+            const isAnswerRevealed = Boolean(revealedAnswerIds[renderedQuestion.id]);
+            const shouldShowAnswer = answerDisplayMode === "direct" || isAnswerRevealed;
             const ranking = rankingStats[renderedQuestion.id];
             const correctAnswerLabel =
               (renderedQuestion.answerCreditType === "multiple_accepted" ||
@@ -765,13 +836,15 @@ export default function SearchPage() {
 
               {isExpanded ? (
               <div className="search-result-details min-w-0 max-w-full border-t border-slate-100 px-4 py-4 text-sm leading-7 text-slate-700 sm:px-5 sm:py-5">
-                <div className="search-result-answer-bar">
-                  <p className="flex min-w-0 items-baseline gap-2">
-                    <span className="text-xs font-semibold text-slate-500">正確答案</span>
-                    <strong className="text-base font-black text-ink">{correctAnswerLabel}</strong>
-                  </p>
-                  <CopyQuestionPromptButton question={renderedQuestion} />
-                </div>
+                {answerDisplayMode === "direct" ? (
+                  <div className="search-result-answer-bar">
+                    <p className="flex min-w-0 items-baseline gap-2">
+                      <span className="text-xs font-semibold text-slate-500">正確答案</span>
+                      <strong className="text-base font-black text-ink">{correctAnswerLabel}</strong>
+                    </p>
+                    <CopyQuestionPromptButton question={renderedQuestion} />
+                  </div>
+                ) : null}
 
                 <QuestionStemMedia question={renderedQuestion} className="mb-5" />
 
@@ -786,8 +859,35 @@ export default function SearchPage() {
                   ))}
                 </div>
 
-                <StructuredExplanationText text={renderedQuestion.explanation} label="詳解" compact />
-                {renderedQuestion.optionAnalysis ? (
+                {answerDisplayMode === "practice" ? (
+                  shouldShowAnswer ? (
+                    <div className="search-result-answer-bar mt-4">
+                      <p className="flex min-w-0 items-baseline gap-2">
+                        <span className="text-xs font-semibold text-slate-500">正確答案</span>
+                        <strong className="text-base font-black text-ink">{correctAnswerLabel}</strong>
+                      </p>
+                      <CopyQuestionPromptButton question={renderedQuestion} />
+                    </div>
+                  ) : (
+                    <div className="mt-4 flex justify-center">
+                      <button
+                        type="button"
+                        onClick={() => setRevealedAnswerIds((current) => ({
+                          ...current,
+                          [renderedQuestion.id]: true
+                        }))}
+                        className="min-h-11 rounded-xl bg-slate-900 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-slate-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 focus-visible:ring-offset-2"
+                      >
+                        顯示答案與詳解
+                      </button>
+                    </div>
+                  )
+                ) : null}
+
+                {shouldShowAnswer ? (
+                  <StructuredExplanationText text={renderedQuestion.explanation} label="詳解" compact />
+                ) : null}
+                {shouldShowAnswer && renderedQuestion.optionAnalysis ? (
                   <div className="space-y-2.5">
                     {OPTION_KEYS.map((key) => {
                       const text = renderedQuestion.optionAnalysis?.[key];
@@ -810,6 +910,7 @@ export default function SearchPage() {
                     })}
                   </div>
                 ) : null}
+                {shouldShowAnswer ? (
                 <div className="search-result-action-dock">
                   <QuestionExplanationTabs
                     question={renderedQuestion}
@@ -860,6 +961,7 @@ export default function SearchPage() {
                   />
                   {error ? <p className="text-sm font-medium text-rose-700">{error}</p> : null}
                 </div>
+                ) : null}
               </div>
               ) : null}
             </details>

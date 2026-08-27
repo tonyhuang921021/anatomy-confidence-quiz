@@ -238,6 +238,7 @@ test("搜尋結果展開後不會重複題幹與分類", async ({ page }) => {
   const options = details.locator(".search-result-options");
   const sourceToolbar = details.locator(".search-result-source-tabs");
   await expect(details).toBeVisible();
+  await details.getByRole("button", { name: "顯示答案與詳解" }).click();
   await expect(sourceToolbar.getByText("陽明", { exact: true })).toBeVisible();
   await expect(sourceToolbar.getByText("補充", { exact: true })).toBeVisible();
   await expect(sourceToolbar.getByRole("button", { name: "這題我們不要了" })).toBeVisible();
@@ -261,6 +262,35 @@ test("搜尋結果展開後不會重複題幹與分類", async ({ page }) => {
     window.getComputedStyle(element).gridTemplateColumns.split(" ").filter(Boolean).length
   );
   expect(optionColumnCount).toBe(viewportWidth >= 900 ? 2 : 1);
+});
+
+test("題目搜尋可以先隱藏答案或直接顯示", async ({ page }) => {
+  await page.goto("/search", { waitUntil: "networkidle" });
+  await waitForShellReady(page);
+
+  const displayMode = page.getByRole("group", { name: "展開題目後的答案顯示方式" });
+  const practiceMode = displayMode.getByRole("button", { name: "先隱藏" });
+  const directMode = displayMode.getByRole("button", { name: "直接顯示" });
+  await expect(practiceMode).toHaveAttribute("aria-pressed", "true");
+
+  const cards = page.locator("details.search-result-card");
+  const firstCard = cards.first();
+  await firstCard.locator("summary").click();
+  await expect(firstCard.locator(".search-result-options")).toBeVisible();
+  await expect(firstCard.getByText("正確答案", { exact: true })).toHaveCount(0);
+  await firstCard.getByRole("button", { name: "顯示答案與詳解" }).click();
+  await expect(firstCard.getByText("正確答案", { exact: true })).toBeVisible();
+
+  await directMode.click();
+  await expect(directMode).toHaveAttribute("aria-pressed", "true");
+  const secondCard = cards.nth(1);
+  await secondCard.locator("summary").click();
+  await expect(secondCard.getByText("正確答案", { exact: true })).toBeVisible();
+
+  await page.reload({ waitUntil: "networkidle" });
+  await expect(page.getByRole("group", { name: "展開題目後的答案顯示方式" })
+    .getByRole("button", { name: "直接顯示" }))
+    .toHaveAttribute("aria-pressed", "true");
 });
 
 test("搜尋結果展開後會顯示題幹圖片", async ({ page }) => {
