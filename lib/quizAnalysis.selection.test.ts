@@ -3,7 +3,7 @@ import test from "node:test";
 import { buildQuestionHistoryMap, createQuestionOrder, generateAIPrompt } from "./quizAnalysis";
 import type { Attempt, Question, QuizSettings } from "../types/quiz";
 
-function makeQuestion(id: string): Question {
+function makeQuestion(id: string, sourceYear?: number): Question {
   return {
     id,
     subject: "解剖學",
@@ -19,7 +19,8 @@ function makeQuestion(id: string): Question {
     answer: "A",
     explanation: "測試詳解",
     testedConcept: "測試概念",
-    sourceType: "MOEX_PAST_EXAM"
+    sourceType: "MOEX_PAST_EXAM",
+    sourceYear
   };
 }
 
@@ -85,6 +86,29 @@ test("未做題用完後，做過的題目依距離上次作答最久者先補�
   );
 
   assert.deepEqual(order, ["q-5", "q-1", "q-2"]);
+});
+
+test("近年穿插模式真的每兩到三題未做題插入一題近期複習", () => {
+  const unseenQuestions = Array.from({ length: 8 }, (_, index) =>
+    makeQuestion(`unseen-${index + 1}`, 2025 - (index % 2))
+  );
+  const recentSeen = makeQuestion("seen-recent", 2026);
+  const olderSeen = makeQuestion("seen-older", 2020);
+  const questions = [...unseenQuestions, recentSeen, olderSeen];
+  const order = createQuestionOrder(
+    questions,
+    [{ attempts: [makeAttempt(recentSeen.id, 0), makeAttempt(olderSeen.id, 1)] }],
+    {
+      ...baseSettings,
+      questionCount: questions.length,
+      questionOrderMode: "recent"
+    }
+  );
+
+  assert.equal(order[2], recentSeen.id);
+  assert.equal(order[6], olderSeen.id);
+  assert.ok(order.slice(0, 2).every((id) => id.startsWith("unseen-")));
+  assert.ok(order.slice(3, 6).every((id) => id.startsWith("unseen-")));
 });
 
 test("弱點補強快完成時，也要先抓未做題再用舊題補滿", () => {

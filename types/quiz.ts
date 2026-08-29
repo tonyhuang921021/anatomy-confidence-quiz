@@ -95,6 +95,7 @@ export type QuizMode =
   | "custom_paper";
 
 export type SubjectFilter = SubjectName | "全部";
+export type QuestionOrderMode = "recent" | "unseen";
 export type SimulationFeedbackMode = "full" | "answer_only" | "none";
 export type SimulationPaperMode = "random_set" | "past_paper" | "ai_paper" | "random_past_paper";
 
@@ -110,6 +111,7 @@ export type QuizSettings = {
   subjectTracks?: Partial<Record<SubjectName, string[]>>;
   excludeAiGenerated?: boolean;
   excludePreviouslyAnswered?: boolean;
+  questionOrderMode?: QuestionOrderMode;
   priorityQuestionIds?: string[];
   customQuestionIds?: string[];
   customQuestionPayload?: Question[];
@@ -117,6 +119,8 @@ export type QuizSettings = {
   strictCustomQuestionPool?: boolean;
   preserveCustomQuestionOrder?: boolean;
   enableConfidenceCalibration?: boolean;
+  enableFastAnswerMode?: boolean;
+  enableKeyboardNavigation?: boolean;
   chapter?: string;
   section?: string;
   feedbackMode?: SimulationFeedbackMode;

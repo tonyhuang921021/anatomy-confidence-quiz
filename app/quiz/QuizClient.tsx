@@ -66,8 +66,6 @@ import {
   getPendingQuestionExplanationOverrideSync,
   loadCompletedHistorySessionsForUser,
   loadCurrentSession,
-  loadKeyboardQuestionNavigation,
-  loadPracticeFastAnswerMode,
   loadQuestionExplanationOverrides,
   loadQuizSettings,
   loadSimulationOptionElimination,
@@ -836,8 +834,6 @@ export default function QuizPage() {
   const [classificationReportMessageMap, setClassificationReportMessageMap] = useState<Record<string, string>>({});
   const [isSubmittingAnswer, setIsSubmittingAnswer] = useState(false);
   const [loadIssue, setLoadIssue] = useState("");
-  const [fastAnswerMode, setFastAnswerMode] = useState(false);
-  const [keyboardNavigationEnabled, setKeyboardNavigationEnabled] = useState(false);
   const [simulationOptionEliminationEnabled, setSimulationOptionEliminationEnabled] = useState(false);
   const [simulationTimerElapsedSeconds, setSimulationTimerElapsedSeconds] = useState(0);
   const [simulationTimerPaused, setSimulationTimerPaused] = useState(false);
@@ -849,6 +845,12 @@ export default function QuizPage() {
   const [submittedAttempt, setSubmittedAttempt] = useState<Attempt | null>(null);
   const [communityStatsMap, setCommunityStatsMap] = useState<Record<string, QuestionCommunityStats>>({});
   const [errorType, setErrorType] = useState<ErrorType | undefined>();
+  const effectiveFastAnswerMode =
+    session?.settings?.mode === "random" &&
+    Boolean(session.settings.enableFastAnswerMode);
+  const effectiveKeyboardNavigationEnabled =
+    session?.settings?.mode === "random" &&
+    Boolean(session.settings.enableKeyboardNavigation);
   const isSavedQuestionReview = isSavedQuestionReviewSettings(session?.settings);
   const savedQuestionRecords = useSavedQuestionRecords(
     isSavedQuestionReview ? authSession?.access_token : null
@@ -946,32 +948,16 @@ export default function QuizPage() {
   }
 
   useEffect(() => {
-    setFastAnswerMode(loadPracticeFastAnswerMode(false));
-    setKeyboardNavigationEnabled(loadKeyboardQuestionNavigation(false));
     setSimulationOptionEliminationEnabled(loadSimulationOptionElimination(false));
-
-    function handleFastAnswerModeChange(event: Event) {
-      const customEvent = event as CustomEvent<boolean>;
-      setFastAnswerMode(Boolean(customEvent.detail));
-    }
-
-    function handleKeyboardNavigationChange(event: Event) {
-      const customEvent = event as CustomEvent<boolean>;
-      setKeyboardNavigationEnabled(Boolean(customEvent.detail));
-    }
 
     function handleSimulationOptionEliminationChange(event: Event) {
       const customEvent = event as CustomEvent<boolean>;
       setSimulationOptionEliminationEnabled(Boolean(customEvent.detail));
     }
 
-    window.addEventListener("practice-fast-answer-mode-change", handleFastAnswerModeChange);
-    window.addEventListener("keyboard-question-navigation-change", handleKeyboardNavigationChange);
     window.addEventListener("simulation-option-elimination-change", handleSimulationOptionEliminationChange);
 
     return () => {
-      window.removeEventListener("practice-fast-answer-mode-change", handleFastAnswerModeChange);
-      window.removeEventListener("keyboard-question-navigation-change", handleKeyboardNavigationChange);
       window.removeEventListener("simulation-option-elimination-change", handleSimulationOptionEliminationChange);
     };
   }, []);
@@ -1512,7 +1498,12 @@ export default function QuizPage() {
   ]);
 
   useEffect(() => {
-    if (!keyboardNavigationEnabled || !session || session.completedAt || !mounted) return;
+    if (
+      !effectiveKeyboardNavigationEnabled ||
+      !session ||
+      session.completedAt ||
+      !mounted
+    ) return;
 
     function handleKeyboardNavigation(event: KeyboardEvent) {
       if (event.key !== "ArrowLeft" && event.key !== "ArrowRight") return;
@@ -1524,24 +1515,12 @@ export default function QuizPage() {
 
       if (event.key === "ArrowRight") {
         event.preventDefault();
-        if (activeSession.settings?.mode === "simulation") {
-          if (currentIndex >= targetCount - 1) return;
-          navigateSimulationToQuestion(currentIndex + 1);
-          return;
-        }
-
         if (!submittedAttempt || currentIndex >= targetCount - 1) return;
         handleNext();
         return;
       }
 
       event.preventDefault();
-      if (activeSession.settings?.mode === "simulation") {
-        if (currentIndex <= 0) return;
-        navigateSimulationToQuestion(currentIndex - 1);
-        return;
-      }
-
       navigatePracticeToPreviousQuestion();
     }
 
@@ -1553,7 +1532,7 @@ export default function QuizPage() {
     currentIndex,
     errorType,
     isSubmittingAnswer,
-    keyboardNavigationEnabled,
+    effectiveKeyboardNavigationEnabled,
     mounted,
     selectedAnswer,
     session,
@@ -2121,7 +2100,7 @@ export default function QuizPage() {
   function handleSelectAnswer(value: OptionKey) {
     if (submittedAttempt || isSubmittingAnswer) return;
     setSelectedAnswer(value);
-    if (fastAnswerMode) {
+    if (effectiveFastAnswerMode) {
       handleSubmit(value);
     }
   }

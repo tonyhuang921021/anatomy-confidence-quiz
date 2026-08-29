@@ -6,31 +6,36 @@ export type QuestionOrderMode = "recent" | "unseen";
 
 const QUESTION_ORDER_MODE_STORAGE_KEY = "anatomy-confidence-practice-order-mode";
 
-function readStoredMode(): QuestionOrderMode {
+function readStoredMode(defaultMode: QuestionOrderMode): QuestionOrderMode {
   try {
-    return window.localStorage.getItem(QUESTION_ORDER_MODE_STORAGE_KEY) === "unseen"
-      ? "unseen"
-      : "recent";
+    const storedMode = window.localStorage.getItem(QUESTION_ORDER_MODE_STORAGE_KEY);
+    return storedMode === "recent" || storedMode === "unseen"
+      ? storedMode
+      : defaultMode;
   } catch {
-    return "recent";
+    return defaultMode;
   }
 }
 
-export function useQuestionOrderMode() {
-  const [mode, setModeState] = useState<QuestionOrderMode>("recent");
+export function useQuestionOrderMode(defaultMode: QuestionOrderMode = "recent") {
+  const [mode, setModeState] = useState<QuestionOrderMode>(defaultMode);
 
   useEffect(() => {
-    setModeState(readStoredMode());
+    setModeState(readStoredMode(defaultMode));
 
     const handleStorage = (event: StorageEvent) => {
       if (event.key === QUESTION_ORDER_MODE_STORAGE_KEY) {
-        setModeState(event.newValue === "unseen" ? "unseen" : "recent");
+        setModeState(
+          event.newValue === "recent" || event.newValue === "unseen"
+            ? event.newValue
+            : defaultMode
+        );
       }
     };
 
     window.addEventListener("storage", handleStorage);
     return () => window.removeEventListener("storage", handleStorage);
-  }, []);
+  }, [defaultMode]);
 
   const setMode = useCallback((nextMode: QuestionOrderMode) => {
     setModeState(nextMode);
@@ -81,18 +86,6 @@ export function QuestionOrderModeControl({
       >
         <button
           type="button"
-          aria-pressed={mode === "recent"}
-          onClick={() => onChange("recent")}
-          className={`min-h-10 whitespace-nowrap rounded-md px-4 py-2 text-sm font-semibold transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 focus-visible:ring-offset-2 ${
-            mode === "recent"
-              ? "bg-brand-600 text-white shadow-sm"
-              : "text-slate-600 hover:bg-white/70 hover:text-ink"
-          }`}
-        >
-          近年穿插
-        </button>
-        <button
-          type="button"
           aria-pressed={mode === "unseen"}
           onClick={() => onChange("unseen")}
           className={`min-h-10 whitespace-nowrap rounded-md px-4 py-2 text-sm font-semibold transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 focus-visible:ring-offset-2 ${
@@ -102,6 +95,18 @@ export function QuestionOrderModeControl({
           }`}
         >
           未做優先
+        </button>
+        <button
+          type="button"
+          aria-pressed={mode === "recent"}
+          onClick={() => onChange("recent")}
+          className={`min-h-10 whitespace-nowrap rounded-md px-4 py-2 text-sm font-semibold transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 focus-visible:ring-offset-2 ${
+            mode === "recent"
+              ? "bg-brand-600 text-white shadow-sm"
+              : "text-slate-600 hover:bg-white/70 hover:text-ink"
+          }`}
+        >
+          近年穿插
         </button>
       </div>
       {compact ? (

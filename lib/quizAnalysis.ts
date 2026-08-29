@@ -993,6 +993,52 @@ function getPrioritizedFreshPool(
   return [...unseen, ...seen];
 }
 
+function getRecentInterleavedPracticeIds(
+  questions: Question[],
+  allSessions: { attempts: Attempt[] }[],
+  questionMap: Map<string, Question>
+) {
+  const historyMap = buildQuestionHistoryMap(allSessions);
+  const byRecentYear = [...questions].sort(
+    (left, right) =>
+      (right.sourceYear ?? 0) - (left.sourceYear ?? 0) ||
+      (right.sourceRound ?? 0) - (left.sourceRound ?? 0) ||
+      (left.originalQuestionNumber ?? Number.MAX_SAFE_INTEGER) -
+        (right.originalQuestionNumber ?? Number.MAX_SAFE_INTEGER) ||
+      left.id.localeCompare(right.id)
+  );
+  const unseenIds = interleaveQuestionIdsByPaper(
+    byRecentYear.filter((question) => !historyMap.has(question.id)).map((question) => question.id),
+    questionMap
+  );
+  const seenIds = interleaveQuestionIdsByPaper(
+    byRecentYear.filter((question) => historyMap.has(question.id)).map((question) => question.id),
+    questionMap
+  );
+  const mixedIds: string[] = [];
+  const unseenBurstSizes = [2, 3];
+  let unseenIndex = 0;
+  let seenIndex = 0;
+  let burstIndex = 0;
+
+  while (unseenIndex < unseenIds.length && seenIndex < seenIds.length) {
+    const burstSize = unseenBurstSizes[burstIndex % unseenBurstSizes.length];
+    for (let index = 0; index < burstSize && unseenIndex < unseenIds.length; index += 1) {
+      mixedIds.push(unseenIds[unseenIndex]);
+      unseenIndex += 1;
+    }
+    mixedIds.push(seenIds[seenIndex]);
+    seenIndex += 1;
+    burstIndex += 1;
+  }
+
+  return [
+    ...mixedIds,
+    ...unseenIds.slice(unseenIndex),
+    ...seenIds.slice(seenIndex)
+  ];
+}
+
 function getRepeatAwarePool(
   questions: Question[],
   allSessions: { attempts: Attempt[] }[],
@@ -1198,10 +1244,18 @@ export function createQuestionOrder(
   if (sourcePool.length === 0) return [];
 
   const requestedCount = normalizeQuestionCount(settings.questionCount, sourcePool.length);
+  const allQuestionMap = new Map(questions.map((question) => [question.id, question] as const));
+  if (settings.mode === "random" && settings.questionOrderMode === "recent") {
+    return keepFollowUpQuestionsTogether(
+      getRecentInterleavedPracticeIds(sourcePool, allSessions, allQuestionMap),
+      allQuestionMap,
+      requestedCount
+    );
+  }
+
   const repeatAwarePool = getRepeatAwarePool(sourcePool, allSessions, settings, requestedCount);
   const count = normalizeQuestionCount(settings.questionCount, repeatAwarePool.length);
   const scored = buildQuestionScoreMap(repeatAwarePool, allSessions, settings);
-  const allQuestionMap = new Map(questions.map((question) => [question.id, question] as const));
 
   if (settings.mode === "random") {
     const priorityFreshIds = interleaveQuestionIdsByPaper(

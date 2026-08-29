@@ -128,7 +128,7 @@ test("320px 重排不會裁切主流程", async ({ page }) => {
   }
 });
 
-test("一般練習先選範圍，再進入獨立作答設定", async ({ page }) => {
+test("一般練習先選範圍，設定需要時再展開", async ({ page }) => {
   await page.goto("/start", { waitUntil: "domcontentloaded" });
   await waitForShellReady(page);
 
@@ -161,26 +161,110 @@ test("一般練習先選範圍，再進入獨立作答設定", async ({ page }) 
   await expect(selection.getByText("解剖學", { exact: true })).toBeVisible();
   await selection.getByRole("button", { name: "下一步" }).click();
 
-  await expect(page.getByRole("heading", { name: "設定這次練習" })).toBeFocused();
-  const settings = page.getByRole("region", { name: "解剖學練習設定" });
+  await expect(page.getByRole("heading", { name: "準備開始" })).toBeFocused();
+  const settings = page.getByRole("region", { name: "解剖學自由做題設定" });
   await expect(settings).toBeVisible();
-  await expect(settings.getByLabel("起始年份", { exact: true })).toBeVisible();
-  await expect(settings.getByLabel("結束年份", { exact: true })).toBeVisible();
-  await expect(settings.getByLabel("練習題數", { exact: true })).toBeVisible();
-  await expect(settings.getByRole("group", { name: "選擇做題順序" })).toBeVisible();
+  const settingsToggle = settings.getByRole("button", { name: "調整設定" });
+  await expect(settingsToggle).toHaveAttribute("aria-expanded", "false");
+  await expect(settings.getByRole("combobox", { name: "起始年份" })).toBeHidden();
+  await expect(settings.getByRole("button", { name: "開始 10 題" })).toBeVisible();
+
+  await settingsToggle.click();
+  await expect(settings.getByRole("button", { name: "收起設定" })).toHaveAttribute("aria-expanded", "true");
+  await expect(settings.getByRole("combobox", { name: "起始年份" })).toBeVisible();
+  await expect(settings.getByRole("combobox", { name: "結束年份" })).toBeVisible();
+  await expect(settings.getByRole("combobox", { name: "每輪題數" })).toBeVisible();
+  const orderButtons = settings.getByRole("group", { name: "選擇做題順序" }).getByRole("button");
+  await expect(orderButtons).toHaveCount(2);
+  await expect(orderButtons.nth(0)).toHaveText("未做優先");
+  await expect(orderButtons.nth(0)).toHaveAttribute("aria-pressed", "true");
+  await expect(orderButtons.nth(1)).toHaveText("近年穿插");
+  await expect(settings.getByRole("combobox", { name: "每輪題數" }).locator('option[value="all"]')).toHaveCount(0);
+
+  await settings.getByRole("button", { name: "不限題數" }).click();
+  await expect(settings.getByRole("combobox", { name: "每輪題數" })).toBeHidden();
+  await expect(settings.getByRole("button", { name: "開始自由做題" })).toBeVisible();
+  await settings.getByRole("button", { name: "固定題數" }).click();
 
   await page.getByRole("button", { name: "返回選科" }).click();
   await expect(page.getByRole("heading", { name: "這次想練什麼？" })).toBeFocused();
   await expect(anatomyButton).toHaveAttribute("aria-pressed", "true");
 
   await selection.getByRole("button", { name: "下一步" }).click();
-  await settings.getByLabel("練習題數", { exact: true }).selectOption("5");
+  await settings.getByRole("button", { name: "調整設定" }).click();
+  await settings.getByRole("combobox", { name: "每輪題數" }).selectOption("5");
   await settings.getByRole("button", { name: "開始 5 題" }).click();
   await expect(page).toHaveURL(/\/quiz\?resume=1&sessionId=/);
   await expect.poll(() => page.evaluate(() => {
     const raw = window.localStorage.getItem("anatomy-confidence-current-session:guest");
     return raw ? JSON.parse(raw).questionOrder?.length : null;
   })).toBe(5);
+  await expect.poll(() => page.evaluate(() => {
+    const raw = window.localStorage.getItem("anatomy-confidence-current-session:guest");
+    if (!raw) return null;
+    const session = JSON.parse(raw);
+    return {
+      questionCount: session.settings?.questionCount,
+      stopAfterReview: session.settings?.stopAfterReview,
+      questionOrderMode: session.settings?.questionOrderMode,
+      enableFastAnswerMode: session.settings?.enableFastAnswerMode,
+      enableKeyboardNavigation: session.settings?.enableKeyboardNavigation
+    };
+  })).toEqual({
+    questionCount: 5,
+    stopAfterReview: false,
+    questionOrderMode: "unseen",
+    enableFastAnswerMode: false,
+    enableKeyboardNavigation: false
+  });
+});
+
+test("自由做題會記住上次選擇", async ({ page }) => {
+  await page.goto("/start", { waitUntil: "domcontentloaded" });
+  await waitForShellReady(page);
+
+  const anatomyButton = page.locator(".quiz-setup-group button[aria-pressed]").filter({ hasText: "解剖學" }).first();
+  await anatomyButton.click();
+  await page.getByRole("region", { name: "已選範圍" }).getByRole("button", { name: "下一步" }).click();
+
+  let settings = page.getByRole("region", { name: "解剖學自由做題設定" });
+  await settings.getByRole("button", { name: "調整設定" }).click();
+  await settings.getByRole("combobox", { name: "每輪題數" }).selectOption("15");
+  await settings.getByRole("button", { name: "近年穿插" }).click();
+  await settings.getByRole("group", { name: "送出答案" }).getByRole("button", { name: "點選即送出" }).click();
+  await settings.getByRole("group", { name: "方向鍵切題" }).getByRole("button", { name: "開啟" }).click();
+
+  await page.reload({ waitUntil: "domcontentloaded" });
+  await waitForShellReady(page);
+  await page.locator(".quiz-setup-group button[aria-pressed]").filter({ hasText: "解剖學" }).first().click();
+  await page.getByRole("region", { name: "已選範圍" }).getByRole("button", { name: "下一步" }).click();
+
+  settings = page.getByRole("region", { name: "解剖學自由做題設定" });
+  await expect(settings.getByText(/15 題一輪・近年穿插/)).toBeVisible();
+  await settings.getByRole("button", { name: "調整設定" }).click();
+  await expect(settings.getByRole("combobox", { name: "每輪題數" })).toHaveValue("15");
+  await expect(settings.getByRole("button", { name: "近年穿插" })).toHaveAttribute("aria-pressed", "true");
+  await expect(settings.getByRole("group", { name: "送出答案" }).getByRole("button", { name: "點選即送出" })).toHaveAttribute("aria-pressed", "true");
+  await expect(settings.getByRole("group", { name: "方向鍵切題" }).getByRole("button", { name: "開啟" })).toHaveAttribute("aria-pressed", "true");
+});
+
+test("320px 展開自由做題設定不會產生水平溢出", async ({ page }) => {
+  await page.setViewportSize({ width: 320, height: 800 });
+  await page.goto("/start", { waitUntil: "domcontentloaded" });
+  await waitForShellReady(page);
+
+  await page.locator(".quiz-setup-group button[aria-pressed]").filter({ hasText: "解剖學" }).first().click();
+  await page.getByRole("region", { name: "已選範圍" }).getByRole("button", { name: "下一步" }).click();
+  const settings = page.getByRole("region", { name: "解剖學自由做題設定" });
+  await settings.getByRole("button", { name: "調整設定" }).click();
+
+  const overflow = await page.evaluate(() => ({
+    viewport: window.innerWidth,
+    documentWidth: document.documentElement.scrollWidth,
+    bodyWidth: document.body.scrollWidth
+  }));
+  expect(overflow.documentWidth).toBeLessThanOrEqual(overflow.viewport);
+  expect(overflow.bodyWidth).toBeLessThanOrEqual(overflow.viewport);
 });
 
 test("微生物單一分類在第二步仍會忠實顯示範圍", async ({ page }) => {
@@ -192,7 +276,7 @@ test("微生物單一分類在第二步仍會忠實顯示範圍", async ({ page 
   const selection = page.getByRole("region", { name: "已選範圍" });
   await expect(selection.getByText("微生物免疫學（細菌）", { exact: true })).toBeVisible();
   await selection.getByRole("button", { name: "下一步" }).click();
-  await expect(page.getByRole("region", { name: "微生物免疫學（細菌）練習設定" })).toBeVisible();
+  await expect(page.getByRole("region", { name: "微生物免疫學（細菌）自由做題設定" })).toBeVisible();
 });
 
 test("進度總覽點章節後才進入獨立設定頁開始練習", async ({ page }) => {

@@ -4,7 +4,7 @@ import { ArrowLeft, ArrowRight } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/components/AuthProvider";
-import { ProgressPracticeSetup } from "@/components/ProgressPracticeSetup";
+import { FreePracticeSetup } from "@/components/FreePracticeSetup";
 import { useQuestionOrderMode } from "@/components/QuestionOrderModeControl";
 import { useCloudHistoryHydration } from "@/components/useCloudHistoryHydration";
 import { enabledSubjects, MED1_SUBJECTS, MED2_SUBJECTS } from "@/data/subjectRegistry";
@@ -23,11 +23,15 @@ import {
 } from "@/lib/questionTrackFilters";
 import {
   loadPracticeQuestionCount,
+  loadKeyboardQuestionNavigation,
+  loadPracticeFastAnswerMode,
   loadPracticeStopAfterReview,
   loadPracticeYearRange,
   loadCompletedHistorySessionsForUser,
   loadCurrentSessionForUser,
   savePracticeQuestionCount,
+  saveKeyboardQuestionNavigation,
+  savePracticeFastAnswerMode,
   savePracticeStopAfterReview,
   savePracticeYearRange,
   saveQuizSettings,
@@ -35,9 +39,16 @@ import {
   type PracticeYearRange
 } from "@/lib/storage";
 import {
+  getKeyboardQuestionNavigationPreference,
+  getPracticeFastAnswerModePreference,
   getPracticeQuestionCountPreference,
   getPracticeStopAfterReviewPreference,
-  getPracticeYearRangePreference
+  getPracticeYearRangePreference,
+  hasKeyboardQuestionNavigationPreference,
+  hasPracticeFastAnswerModePreference,
+  hasPracticeQuestionCountPreference,
+  hasPracticeStopAfterReviewPreference,
+  type AccountPreferencePatch
 } from "@/lib/accountPreferences";
 import {
   MAX_PRACTICE_SOURCE_YEAR,
@@ -46,7 +57,6 @@ import {
 } from "@/lib/practiceYears";
 import { buildNewQuizHref } from "@/lib/startSettingsUrl";
 import { getSupabaseBrowserClient } from "@/lib/supabase/client";
-import type { ProgressPracticeQuestionCount } from "@/lib/progressPractice";
 import type { QuestionClassificationOverride, QuizSettings, SubjectName } from "@/types/quiz";
 
 const selectableSubjects = enabledSubjects.filter(
@@ -59,7 +69,7 @@ const selectableSubjects = enabledSubjects.filter(
 export default function StartPage() {
   const router = useRouter();
   const { user, syncVersion } = useAuth();
-  const { mode: orderMode, setMode: setOrderMode, prioritizeUnseen } = useQuestionOrderMode();
+  const { mode: orderMode, setMode: setOrderMode, prioritizeUnseen } = useQuestionOrderMode("unseen");
   const cloudHistoryHydrating = useCloudHistoryHydration();
   const stepHeadingRef = useRef<HTMLHeadingElement | null>(null);
   const med1Subjects = selectableSubjects.filter((item) => MED1_SUBJECTS.includes(item.subject));
@@ -94,6 +104,8 @@ export default function StartPage() {
   const [practiceYearRange, setPracticeYearRange] = useState<PracticeYearRange>(defaultPracticeYearRange);
   const [practiceQuestionCount, setPracticeQuestionCount] = useState<PracticeQuestionCount>(10);
   const [practiceStopAfterReview, setPracticeStopAfterReview] = useState(false);
+  const [practiceFastAnswerMode, setPracticeFastAnswerMode] = useState(false);
+  const [keyboardQuestionNavigation, setKeyboardQuestionNavigation] = useState(false);
   const [setupStep, setSetupStep] = useState<"subjects" | "settings">("subjects");
   const [attemptedQuestionIds, setAttemptedQuestionIds] = useState<Set<string>>(() => new Set());
   const [historyOwnerKey, setHistoryOwnerKey] = useState<string | null>(null);
@@ -136,18 +148,56 @@ export default function StartPage() {
       ? getPracticeYearRangePreference(user.user_metadata)
       : null;
     const nextRange = accountRange ?? loadPracticeYearRange(defaultPracticeYearRange) ?? defaultPracticeYearRange;
-    setPracticeYearRange(normalizePracticeYearRange(nextRange));
+    const normalizedRange = normalizePracticeYearRange(nextRange);
+    setPracticeYearRange(normalizedRange);
+    savePracticeYearRange(normalizedRange);
+    if (user && !accountRange) {
+      syncFreePracticePreferences({
+        practice_year_from: normalizedRange.yearFrom,
+        practice_year_to: normalizedRange.yearTo
+      });
+    }
   }, [defaultPracticeYearRange, user?.id, user?.user_metadata]);
 
   useEffect(() => {
-    const nextCount = user
+    const nextCount = user && hasPracticeQuestionCountPreference(user.user_metadata)
       ? getPracticeQuestionCountPreference(user?.user_metadata, 10)
       : loadPracticeQuestionCount(10);
-    const nextStopAfterReview = user
+    const nextStopAfterReview = user && hasPracticeStopAfterReviewPreference(user.user_metadata)
       ? getPracticeStopAfterReviewPreference(user?.user_metadata, false)
       : loadPracticeStopAfterReview(false);
+    const nextFastAnswerMode = user && hasPracticeFastAnswerModePreference(user.user_metadata)
+      ? getPracticeFastAnswerModePreference(user.user_metadata, false)
+      : loadPracticeFastAnswerMode(false);
+    const nextKeyboardQuestionNavigation = user && hasKeyboardQuestionNavigationPreference(user.user_metadata)
+      ? getKeyboardQuestionNavigationPreference(user.user_metadata, false)
+      : loadKeyboardQuestionNavigation(false);
     setPracticeQuestionCount(nextCount);
     setPracticeStopAfterReview(nextStopAfterReview);
+    setPracticeFastAnswerMode(nextFastAnswerMode);
+    setKeyboardQuestionNavigation(nextKeyboardQuestionNavigation);
+    savePracticeQuestionCount(nextCount);
+    savePracticeStopAfterReview(nextStopAfterReview);
+    savePracticeFastAnswerMode(nextFastAnswerMode);
+    saveKeyboardQuestionNavigation(nextKeyboardQuestionNavigation);
+    if (user) {
+      const missingPatch: AccountPreferencePatch = {};
+      if (!hasPracticeQuestionCountPreference(user.user_metadata)) {
+        missingPatch.practice_question_count = nextCount;
+      }
+      if (!hasPracticeStopAfterReviewPreference(user.user_metadata)) {
+        missingPatch.practice_stop_after_review = nextStopAfterReview;
+      }
+      if (!hasPracticeFastAnswerModePreference(user.user_metadata)) {
+        missingPatch.practice_fast_answer_mode = nextFastAnswerMode;
+      }
+      if (!hasKeyboardQuestionNavigationPreference(user.user_metadata)) {
+        missingPatch.keyboard_question_navigation = nextKeyboardQuestionNavigation;
+      }
+      if (Object.keys(missingPatch).length > 0) {
+        syncFreePracticePreferences(missingPatch);
+      }
+    }
   }, [user?.id, user?.user_metadata]);
 
   useEffect(() => {
@@ -368,46 +418,45 @@ export default function StartPage() {
     const normalized = normalizePracticeYearRange(nextRange);
     setPracticeYearRange(normalized);
     savePracticeYearRange(normalized);
-    if (!user) return;
-
-    void getSupabaseBrowserClient().auth.updateUser({
-      data: {
-        ...user.user_metadata,
-        practice_year_from: normalized.yearFrom,
-        practice_year_to: normalized.yearTo
-      }
-    }).then(({ error }) => {
-      if (error) console.error("Practice year preference sync skipped:", error);
-    }).catch((error) => {
-      console.error("Practice year preference sync skipped:", error);
+    syncFreePracticePreferences({
+      practice_year_from: normalized.yearFrom,
+      practice_year_to: normalized.yearTo
     });
   }
 
-  function handlePracticeQuestionCountChange(nextCount: ProgressPracticeQuestionCount) {
-    const stopAfterReview = nextCount === "all";
-    setPracticeStopAfterReview(stopAfterReview);
-    savePracticeStopAfterReview(stopAfterReview);
-
-    const metadataPatch: Record<string, boolean | number> = {
-      practice_stop_after_review: stopAfterReview
-    };
-    if (nextCount !== "all") {
-      setPracticeQuestionCount(nextCount);
-      savePracticeQuestionCount(nextCount);
-      metadataPatch.practice_question_count = nextCount;
-    }
-
+  function syncFreePracticePreferences(patch: AccountPreferencePatch) {
     if (!user) return;
     void getSupabaseBrowserClient().auth.updateUser({
-      data: {
-        ...user.user_metadata,
-        ...metadataPatch
-      }
+      data: patch
     }).then(({ error }) => {
-      if (error) console.error("Practice question count sync skipped:", error);
+      if (error) console.error("Free practice preference sync skipped:", error);
     }).catch((error) => {
-      console.error("Practice question count sync skipped:", error);
+      console.error("Free practice preference sync skipped:", error);
     });
+  }
+
+  function handlePracticeQuestionCountChange(nextCount: PracticeQuestionCount) {
+    setPracticeQuestionCount(nextCount);
+    savePracticeQuestionCount(nextCount);
+    syncFreePracticePreferences({ practice_question_count: nextCount });
+  }
+
+  function handlePracticeStopAfterReviewChange(enabled: boolean) {
+    setPracticeStopAfterReview(enabled);
+    savePracticeStopAfterReview(enabled);
+    syncFreePracticePreferences({ practice_stop_after_review: enabled });
+  }
+
+  function handlePracticeFastAnswerModeChange(enabled: boolean) {
+    setPracticeFastAnswerMode(enabled);
+    savePracticeFastAnswerMode(enabled);
+    syncFreePracticePreferences({ practice_fast_answer_mode: enabled });
+  }
+
+  function handleKeyboardQuestionNavigationChange(enabled: boolean) {
+    setKeyboardQuestionNavigation(enabled);
+    saveKeyboardQuestionNavigation(enabled);
+    syncFreePracticePreferences({ keyboard_question_navigation: enabled });
   }
 
   function renderSubjectGroup(
@@ -596,11 +645,11 @@ export default function StartPage() {
           .filter((question) => !excludeAiGenerated || question.sourceType !== "AI_GENERATED")
           .map((question) => question.id)
       : undefined;
-    const priorityQuestionIds = prioritizeUnseen
+    const priorityQuestionIds = prioritizeUnseen &&
+      unattemptedAvailableQuestionIds.length > 0 &&
+      unattemptedAvailableQuestionIds.length <= 80
       ? unattemptedAvailableQuestionIds
-      : unattemptedAvailableQuestionIds.length > 0 && unattemptedAvailableQuestionIds.length <= 80
-        ? unattemptedAvailableQuestionIds
-        : undefined;
+      : undefined;
 
     const nextSettings: QuizSettings = {
       ...DEFAULT_QUIZ_SETTINGS,
@@ -615,7 +664,10 @@ export default function StartPage() {
       subjectTracks: selectedSubjectTracks,
       excludeAiGenerated,
       excludePreviouslyAnswered: true,
+      questionOrderMode: orderMode,
       priorityQuestionIds,
+      enableFastAnswerMode: practiceFastAnswerMode,
+      enableKeyboardNavigation: keyboardQuestionNavigation,
       enableConfidenceCalibration: false,
       customQuestionIds: seasonalQuestionIds,
       strictCustomQuestionPool: false,
@@ -654,19 +706,19 @@ export default function StartPage() {
 
         <div className="min-w-0">
           <p className="workspace-page-kicker">
-            開始測驗・{setupStep === "subjects" ? "選範圍" : "作答設定"}
+            開始測驗・{setupStep === "subjects" ? "選範圍" : "確認"}
           </p>
           <h1
             ref={stepHeadingRef}
             tabIndex={-1}
             className="workspace-page-title focus:outline-none focus-visible:rounded-sm focus-visible:ring-2 focus-visible:ring-brand-500 focus-visible:ring-offset-2"
           >
-            {setupStep === "subjects" ? "這次想練什麼？" : "設定這次練習"}
+            {setupStep === "subjects" ? "這次想練什麼？" : "準備開始"}
           </h1>
           <p className="body-soft mt-2 max-w-2xl text-sm leading-6">
             {setupStep === "subjects"
-              ? "可選一科、多科或直接全選；選好再設定年份、題數與順序。"
-              : "確認範圍後再開刷，返回選科仍會保留剛才的選擇。"}
+              ? "可選一科、多科或直接全選；選好後可直接開始，也能再調整做題設定。"
+              : "沿用上次設定可直接開始，需要調整時再展開自由做題設定。"}
           </p>
         </div>
 
@@ -761,16 +813,22 @@ export default function StartPage() {
                 正在整理作答紀錄，完成後就能開始。
               </div>
             ) : (
-              <ProgressPracticeSetup
+              <FreePracticeSetup
                 idPrefix="general-practice"
                 label={selectedRangeLabel || "一般練習"}
                 availableQuestionCount={availableQuestionCount}
-                questionCount={practiceStopAfterReview ? "all" : practiceQuestionCount}
+                questionCount={practiceQuestionCount}
                 yearRange={practiceYearRange}
                 orderMode={orderMode}
+                stopAfterReview={practiceStopAfterReview}
+                fastAnswerMode={practiceFastAnswerMode}
+                keyboardNavigationEnabled={keyboardQuestionNavigation}
                 onQuestionCountChange={handlePracticeQuestionCountChange}
                 onYearRangeChange={handlePracticeYearRangeChange}
                 onOrderModeChange={setOrderMode}
+                onStopAfterReviewChange={handlePracticeStopAfterReviewChange}
+                onFastAnswerModeChange={handlePracticeFastAnswerModeChange}
+                onKeyboardNavigationChange={handleKeyboardQuestionNavigationChange}
                 onStart={handleStart}
               />
             )}

@@ -8,48 +8,31 @@ import { useAuth } from "@/components/AuthProvider";
 import { getSyncStatusText } from "@/components/syncStatusText";
 import { updateLeaderboardDisplayName } from "@/lib/cloudSync";
 import {
-  loadPracticeQuestionCount,
-  loadKeyboardQuestionNavigation,
   loadPharmacologyReverseSwipe,
   loadSimulationConfidenceCalibration,
   loadSimulationOptionElimination,
-  loadPracticeFastAnswerMode,
-  loadPracticeStopAfterReview,
   loadReviewCompletionThreshold,
   loadHomeToneMode,
   loadThemeMode,
-  savePracticeQuestionCount,
-  saveKeyboardQuestionNavigation,
   savePharmacologyReverseSwipe,
   saveSimulationConfidenceCalibration,
   saveSimulationOptionElimination,
-  savePracticeFastAnswerMode,
-  savePracticeStopAfterReview,
   saveReviewCompletionThreshold,
   saveHomeToneMode,
   saveThemeMode,
-  type PracticeQuestionCount,
   type ReviewCompletionThreshold,
   type HomeToneMode,
   type ThemeMode
 } from "@/lib/storage";
 import {
   getHomeToneModePreference,
-  getKeyboardQuestionNavigationPreference,
   getPharmacologyReverseSwipePreference,
-  hasPracticeQuestionCountPreference,
-  hasKeyboardQuestionNavigationPreference,
   hasPharmacologyReverseSwipePreference,
   hasSimulationConfidenceCalibrationPreference,
   hasSimulationOptionEliminationPreference,
-  hasPracticeFastAnswerModePreference,
-  hasPracticeStopAfterReviewPreference,
   hasReviewCompletionThresholdPreference,
   getSimulationConfidenceCalibrationPreference,
   getSimulationOptionEliminationPreference,
-  getPracticeFastAnswerModePreference,
-  getPracticeQuestionCountPreference,
-  getPracticeStopAfterReviewPreference,
   getReviewCompletionThresholdPreference,
   getThemeModePreference,
   type AccountPreferencePatch
@@ -217,13 +200,9 @@ export function AuthPanel({ compactHeader = false }: { compactHeader?: boolean }
   const canViewOwnerPage = user?.email
     ? ownerAllowedEmails.includes(user.email.trim().toLowerCase())
     : false;
-  const [practiceQuestionCount, setPracticeQuestionCount] = useState<PracticeQuestionCount>(10);
-  const [practiceStopAfterReview, setPracticeStopAfterReview] = useState(false);
-  const [practiceFastAnswerMode, setPracticeFastAnswerMode] = useState(false);
   const [reviewCompletionThreshold, setReviewCompletionThreshold] = useState<ReviewCompletionThreshold>(() =>
     loadReviewCompletionThreshold(2)
   );
-  const [keyboardQuestionNavigation, setKeyboardQuestionNavigation] = useState(false);
   const [simulationConfidenceCalibration, setSimulationConfidenceCalibration] = useState(() =>
     loadSimulationConfidenceCalibration(true)
   );
@@ -278,23 +257,13 @@ export function AuthPanel({ compactHeader = false }: { compactHeader?: boolean }
   }, [user?.id, user?.user_metadata]);
 
   useEffect(() => {
-    const accountCount = getPracticeQuestionCountPreference(user?.user_metadata, 10);
-    const accountStopAfterReview = getPracticeStopAfterReviewPreference(user?.user_metadata, false);
-    const accountFastAnswerMode = getPracticeFastAnswerModePreference(user?.user_metadata, false);
     const accountReviewCompletionThreshold = getReviewCompletionThresholdPreference(user?.user_metadata, 2);
-    const accountKeyboardQuestionNavigation = getKeyboardQuestionNavigationPreference(user?.user_metadata, false);
     const accountSimulationConfidenceCalibration = getSimulationConfidenceCalibrationPreference(user?.user_metadata, true);
     const accountSimulationOptionElimination = getSimulationOptionEliminationPreference(user?.user_metadata, false);
     const accountPharmacologyReverseSwipe = getPharmacologyReverseSwipePreference(user?.user_metadata, false);
-    const nextCount = user ? accountCount : loadPracticeQuestionCount(10);
-    const nextStopAfterReview = user ? accountStopAfterReview : loadPracticeStopAfterReview(false);
-    const nextFastAnswerMode = user ? accountFastAnswerMode : loadPracticeFastAnswerMode(false);
     const nextReviewCompletionThreshold = user
       ? accountReviewCompletionThreshold
       : loadReviewCompletionThreshold(2);
-    const nextKeyboardQuestionNavigation = user
-      ? accountKeyboardQuestionNavigation
-      : loadKeyboardQuestionNavigation(false);
     const nextSimulationConfidenceCalibration = user
       ? accountSimulationConfidenceCalibration
       : loadSimulationConfidenceCalibration(true);
@@ -304,58 +273,34 @@ export function AuthPanel({ compactHeader = false }: { compactHeader?: boolean }
     const nextPharmacologyReverseSwipe = user
       ? accountPharmacologyReverseSwipe
       : loadPharmacologyReverseSwipe(false);
-    setPracticeQuestionCount(nextCount);
-    setPracticeStopAfterReview(nextStopAfterReview);
-    setPracticeFastAnswerMode(nextFastAnswerMode);
     setReviewCompletionThreshold(nextReviewCompletionThreshold);
-    setKeyboardQuestionNavigation(nextKeyboardQuestionNavigation);
     setSimulationConfidenceCalibration(nextSimulationConfidenceCalibration);
     setSimulationOptionElimination(nextSimulationOptionElimination);
     setPharmacologyReverseSwipe(nextPharmacologyReverseSwipe);
     if (user) {
-      savePracticeQuestionCount(accountCount);
-      savePracticeStopAfterReview(accountStopAfterReview);
-      savePracticeFastAnswerMode(accountFastAnswerMode);
       saveReviewCompletionThreshold(accountReviewCompletionThreshold);
-      saveKeyboardQuestionNavigation(accountKeyboardQuestionNavigation);
       saveSimulationConfidenceCalibration(accountSimulationConfidenceCalibration);
       saveSimulationOptionElimination(accountSimulationOptionElimination);
       savePharmacologyReverseSwipe(accountPharmacologyReverseSwipe);
-      const missingQuestionCount = !hasPracticeQuestionCountPreference(user.user_metadata);
-      const missingStopAfterReview = !hasPracticeStopAfterReviewPreference(user.user_metadata);
-      const missingFastAnswerMode = !hasPracticeFastAnswerModePreference(user.user_metadata);
       const missingReviewCompletionThreshold = !hasReviewCompletionThresholdPreference(user.user_metadata);
-      const missingKeyboardQuestionNavigation = !hasKeyboardQuestionNavigationPreference(user.user_metadata);
       const missingSimulationConfidenceCalibration = !hasSimulationConfidenceCalibrationPreference(user.user_metadata);
       const missingSimulationOptionElimination = !hasSimulationOptionEliminationPreference(user.user_metadata);
       const missingPharmacologyReverseSwipe = !hasPharmacologyReverseSwipePreference(user.user_metadata);
       if (
-        missingQuestionCount ||
-        missingStopAfterReview ||
-        missingFastAnswerMode ||
         missingReviewCompletionThreshold ||
-        missingKeyboardQuestionNavigation ||
         missingSimulationConfidenceCalibration ||
         missingSimulationOptionElimination ||
         missingPharmacologyReverseSwipe
       ) {
         const patch: AccountPreferencePatch = {};
-        if (missingQuestionCount) patch.practice_question_count = 10;
-        if (missingStopAfterReview) patch.practice_stop_after_review = false;
-        if (missingFastAnswerMode) patch.practice_fast_answer_mode = false;
         if (missingReviewCompletionThreshold) patch.review_completion_threshold = 2;
-        if (missingKeyboardQuestionNavigation) patch.keyboard_question_navigation = false;
         if (missingSimulationConfidenceCalibration) patch.simulation_confidence_calibration = true;
         if (missingSimulationOptionElimination) patch.simulation_option_elimination = false;
         if (missingPharmacologyReverseSwipe) patch.pharmacology_reverse_swipe = false;
         void persistAccountPreferences(patch).catch(() => {});
       }
     } else {
-      savePracticeQuestionCount(nextCount);
-      savePracticeStopAfterReview(nextStopAfterReview);
-      savePracticeFastAnswerMode(nextFastAnswerMode);
       saveReviewCompletionThreshold(nextReviewCompletionThreshold);
-      saveKeyboardQuestionNavigation(nextKeyboardQuestionNavigation);
       saveSimulationConfidenceCalibration(nextSimulationConfidenceCalibration);
       saveSimulationOptionElimination(nextSimulationOptionElimination);
       savePharmacologyReverseSwipe(nextPharmacologyReverseSwipe);
@@ -397,42 +342,6 @@ export function AuthPanel({ compactHeader = false }: { compactHeader?: boolean }
     });
   }
 
-  function handleChangePracticeQuestionCount(next: PracticeQuestionCount) {
-    setPracticeQuestionCount(next);
-    savePracticeQuestionCount(next);
-    if (!user) return;
-    setError("");
-    void persistAccountPreferences({
-      practice_question_count: next
-    }).catch((persistError) => {
-      setError(persistError instanceof Error ? persistError.message : "題數設定同步失敗");
-    });
-  }
-
-  function handleChangePracticeStopAfterReview(enabled: boolean) {
-    setPracticeStopAfterReview(enabled);
-    savePracticeStopAfterReview(enabled);
-    if (!user) return;
-    setError("");
-    void persistAccountPreferences({
-      practice_stop_after_review: enabled
-    }).catch((persistError) => {
-      setError(persistError instanceof Error ? persistError.message : "結束作答設定同步失敗");
-    });
-  }
-
-  function handleChangePracticeFastAnswerMode(enabled: boolean) {
-    setPracticeFastAnswerMode(enabled);
-    savePracticeFastAnswerMode(enabled);
-    if (!user) return;
-    setError("");
-    void persistAccountPreferences({
-      practice_fast_answer_mode: enabled
-    }).catch((persistError) => {
-      setError(persistError instanceof Error ? persistError.message : "極速模式設定同步失敗");
-    });
-  }
-
   function handleChangeReviewCompletionThreshold(threshold: ReviewCompletionThreshold) {
     setReviewCompletionThreshold(threshold);
     saveReviewCompletionThreshold(threshold);
@@ -442,18 +351,6 @@ export function AuthPanel({ compactHeader = false }: { compactHeader?: boolean }
       review_completion_threshold: threshold
     }).catch((persistError) => {
       setError(persistError instanceof Error ? persistError.message : "複習完成條件同步失敗");
-    });
-  }
-
-  function handleChangeKeyboardQuestionNavigation(enabled: boolean) {
-    setKeyboardQuestionNavigation(enabled);
-    saveKeyboardQuestionNavigation(enabled);
-    if (!user) return;
-    setError("");
-    void persistAccountPreferences({
-      keyboard_question_navigation: enabled
-    }).catch((persistError) => {
-      setError(persistError instanceof Error ? persistError.message : "方向鍵設定同步失敗");
     });
   }
 
@@ -817,7 +714,7 @@ export function AuthPanel({ compactHeader = false }: { compactHeader?: boolean }
           </label>
           <div className="account-settings-preferences">
             <header className="account-settings-preferences-heading">
-              <p>作答偏好</p>
+              <p>偏好設定</p>
               <span>各項設定會保存在這台裝置，登入後也會帶到其他裝置。</span>
             </header>
             <div className="account-preference-sections">
@@ -856,59 +753,7 @@ export function AuthPanel({ compactHeader = false }: { compactHeader?: boolean }
                   </PreferenceRow>
                 </PreferenceGroup>
 
-                <PreferenceGroup title="散題與複習" description="作答方式、每輪題數與完成條件">
-                  <PreferenceRow label="作答回合" description="完整做完一輪，或每題看完詳解後都能結束。">
-                    <div className="account-preference-options" role="group" aria-label="散題作答回合">
-                      <PreferenceChoice
-                        selected={!practiceStopAfterReview}
-                        onClick={() => handleChangePracticeStopAfterReview(false)}
-                      >
-                        完整一輪
-                      </PreferenceChoice>
-                      <PreferenceChoice
-                        selected={practiceStopAfterReview}
-                        onClick={() => handleChangePracticeStopAfterReview(true)}
-                      >
-                        隨時可結束
-                      </PreferenceChoice>
-                    </div>
-                  </PreferenceRow>
-                  {!practiceStopAfterReview ? (
-                    <PreferenceRow label="每輪題數" description={`目前每次 ${practiceQuestionCount} 題。`}>
-                      <select
-                        value={practiceQuestionCount}
-                        onChange={(event) =>
-                          handleChangePracticeQuestionCount(
-                            Number(event.target.value) as PracticeQuestionCount
-                          )
-                        }
-                        className="account-preference-select"
-                        aria-label="每輪題數"
-                      >
-                        {[5, 10, 15, 20, 25, 30, 35, 40, 45, 50].map((count) => (
-                          <option key={count} value={count}>
-                            {count} 題
-                          </option>
-                        ))}
-                      </select>
-                    </PreferenceRow>
-                  ) : null}
-                  <PreferenceRow label="送出答案" description="極速模式會在點選選項後直接作答。">
-                    <div className="account-preference-options" role="group" aria-label="答案送出方式">
-                      <PreferenceChoice
-                        selected={!practiceFastAnswerMode}
-                        onClick={() => handleChangePracticeFastAnswerMode(false)}
-                      >
-                        按鈕送出
-                      </PreferenceChoice>
-                      <PreferenceChoice
-                        selected={practiceFastAnswerMode}
-                        onClick={() => handleChangePracticeFastAnswerMode(true)}
-                      >
-                        點選即送出
-                      </PreferenceChoice>
-                    </div>
-                  </PreferenceRow>
+                <PreferenceGroup title="複習" description="錯題與低信心題的完成條件">
                   <PreferenceRow label="複習完成" description="同時套用錯題與沒信心題；手動調整仍優先保留。">
                     <div className="account-preference-options" role="group" aria-label="複習完成條件">
                       <PreferenceChoice
@@ -922,22 +767,6 @@ export function AuthPanel({ compactHeader = false }: { compactHeader?: boolean }
                         onClick={() => handleChangeReviewCompletionThreshold(2)}
                       >
                         答對 2 次
-                      </PreferenceChoice>
-                    </div>
-                  </PreferenceRow>
-                  <PreferenceRow label="方向鍵切題" description="散題送出答案後可用左右鍵切題，不會因此交卷。">
-                    <div className="account-preference-options" role="group" aria-label="方向鍵切題">
-                      <PreferenceChoice
-                        selected={!keyboardQuestionNavigation}
-                        onClick={() => handleChangeKeyboardQuestionNavigation(false)}
-                      >
-                        關閉
-                      </PreferenceChoice>
-                      <PreferenceChoice
-                        selected={keyboardQuestionNavigation}
-                        onClick={() => handleChangeKeyboardQuestionNavigation(true)}
-                      >
-                        開啟
                       </PreferenceChoice>
                     </div>
                   </PreferenceRow>
