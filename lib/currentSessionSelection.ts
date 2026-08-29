@@ -14,6 +14,14 @@ function getQuestionOrderSignature(session: QuizSession) {
   return `${ids.length}:${head}:${tail}`;
 }
 
+function getExactCustomQuestionSignature(session: QuizSession) {
+  const ids = (session.settings?.customQuestionIds?.length
+    ? session.settings.customQuestionIds
+    : session.questionOrder ?? []
+  ).filter(Boolean);
+  return ids.length > 0 ? `${ids.length}:${ids.join(",")}` : "";
+}
+
 export function getCurrentSessionWorkKey(session: QuizSession) {
   const mode = compactText(session.settings?.mode);
   const subject = compactText(session.subject);
@@ -29,7 +37,15 @@ export function getCurrentSessionWorkKey(session: QuizSession) {
   }
 
   const customPoolLabel = compactText(session.settings?.customPoolLabel);
-  if (customPoolLabel) return `${mode}:pool:${subject}:${customPoolLabel}`;
+  if (customPoolLabel) {
+    if (mode === "search_practice") {
+      const exactQuestionSignature = getExactCustomQuestionSignature(session);
+      return exactQuestionSignature
+        ? `${mode}:pool:${subject}:${customPoolLabel}:questions:${exactQuestionSignature}`
+        : "";
+    }
+    return `${mode}:pool:${subject}:${customPoolLabel}`;
+  }
 
   const orderSignature = getQuestionOrderSignature(session);
   if (orderSignature && (mode === "simulation" || mode === "review" || mode === "custom_paper")) {

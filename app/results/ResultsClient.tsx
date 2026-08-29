@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { createPortal } from "react-dom";
 import { Suspense, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useAuth } from "@/components/AuthProvider";
@@ -106,6 +107,7 @@ import {
   buildResultReviewNavigation,
   getResultReviewNavigationTargetIndex
 } from "@/lib/resultReviewNavigation";
+import { getEmptyResultsPrimaryAction } from "@/lib/resumableSessions";
 
 const allQuestions = getCanonicalQuestionBank();
 
@@ -370,6 +372,8 @@ function getSessionModeLabel(session: QuizSession) {
       ? "自訂卷"
     : session.settings?.mode === "review"
       ? "錯題複習"
+      : session.settings?.mode === "search_practice"
+        ? "搜尋私人練習"
       : session.settings?.mode === "weakness"
         ? "弱點補強"
         : "隨機刷題";
@@ -478,6 +482,10 @@ function getSessionDisplayName(session: QuizSession) {
       : getDefaultSimulationSessionName(session) || "模擬考試卷";
   }
 
+  if (session.settings?.mode === "search_practice") {
+    return session.settings.sessionName?.trim() || "搜尋私人練習";
+  }
+
   return `${session.subject} ${getSessionModeLabel(session)}`;
 }
 
@@ -487,6 +495,10 @@ function getSessionSubjectLabel(
 ) {
   if (isSimulationSession(session)) {
     return `${getSessionDisplayName(session)}結果分析`;
+  }
+
+  if (session.settings?.mode === "search_practice") {
+    return "搜尋私人練習結果";
   }
 
   if (session.settings?.customPoolLabel?.startsWith("考前弱點：")) {
@@ -903,6 +915,12 @@ function ResultsPageContent() {
   const [activeReviewDetailKey, setActiveReviewDetailKey] = useState<string | null>(null);
   const reviewDetailElementMapRef = useRef<Record<string, HTMLDetailsElement | null>>({});
   const reviewSectionRef = useRef<HTMLElement | null>(null);
+  const fullscreenReviewTriggerButtonRef = useRef<HTMLButtonElement | null>(null);
+  const fullscreenReviewDialogRef = useRef<HTMLDivElement | null>(null);
+  const fullscreenReviewCloseButtonRef = useRef<HTMLButtonElement | null>(null);
+  const fullscreenReviewPreviouslyFocusedRef = useRef<HTMLElement | null>(null);
+  const fullscreenReviewCloseTimeoutRef = useRef<number | null>(null);
+  const fullscreenReviewReturnFocusFrameRef = useRef<number | null>(null);
   const pendingReviewScrollAnchorRef = useRef<{ key: string; top: number } | null>(null);
   const pendingReviewScrollTargetRef = useRef<string | null>(null);
   const resultCloudHandoffSessionKeysRef = useRef(new Set<string>());
@@ -1460,16 +1478,82 @@ function ResultsPageContent() {
   }, [state.session]);
 
   useEffect(() => {
-    if (typeof document === "undefined") return;
+    if (!isFullscreenReview || typeof document === "undefined") return;
 
-    if (isFullscreenReview) {
-      const previousOverflow = document.body.style.overflow;
-      document.body.style.overflow = "hidden";
-      return () => {
-        document.body.style.overflow = previousOverflow;
-      };
+    const previousOverflow = document.body.style.overflow;
+    const background = document.querySelector<HTMLElement>(".app-frame");
+    const previousAriaHidden = background?.getAttribute("aria-hidden") ?? null;
+    const backgroundWasInert = background?.hasAttribute("inert") ?? false;
+    document.body.style.overflow = "hidden";
+    background?.setAttribute("aria-hidden", "true");
+    background?.setAttribute("inert", "");
+
+    const focusFrame = window.requestAnimationFrame(() => {
+      fullscreenReviewCloseButtonRef.current?.focus();
+    });
+
+    function handleFullscreenDialogKeyDown(event: KeyboardEvent) {
+      if (event.key === "Escape") {
+        event.preventDefault();
+        handleCloseFullscreenReview();
+        return;
+      }
+
+      if (event.key !== "Tab") return;
+      const dialog = fullscreenReviewDialogRef.current;
+      if (!dialog) return;
+      const focusable = Array.from(
+        dialog.querySelectorAll<HTMLElement>(
+          'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), details > summary, [tabindex]:not([tabindex="-1"])'
+        )
+      ).filter((element) => element.getClientRects().length > 0);
+      if (focusable.length === 0) {
+        event.preventDefault();
+        dialog.focus();
+        return;
+      }
+
+      const first = focusable[0];
+      const last = focusable[focusable.length - 1];
+      if (event.shiftKey && document.activeElement === first) {
+        event.preventDefault();
+        last.focus();
+      } else if (!event.shiftKey && document.activeElement === last) {
+        event.preventDefault();
+        first.focus();
+      }
     }
+
+    document.addEventListener("keydown", handleFullscreenDialogKeyDown);
+    return () => {
+      window.cancelAnimationFrame(focusFrame);
+      document.removeEventListener("keydown", handleFullscreenDialogKeyDown);
+      document.body.style.overflow = previousOverflow;
+      if (background) {
+        if (previousAriaHidden === null) background.removeAttribute("aria-hidden");
+        else background.setAttribute("aria-hidden", previousAriaHidden);
+        if (!backgroundWasInert) background.removeAttribute("inert");
+      }
+      const previousFocus = fullscreenReviewPreviouslyFocusedRef.current;
+      fullscreenReviewPreviouslyFocusedRef.current = null;
+      if (previousFocus || fullscreenReviewTriggerButtonRef.current) {
+        fullscreenReviewReturnFocusFrameRef.current = window.requestAnimationFrame(() => {
+          fullscreenReviewReturnFocusFrameRef.current = null;
+          const focusTarget = fullscreenReviewTriggerButtonRef.current ?? previousFocus;
+          if (focusTarget?.isConnected) focusTarget.focus({ preventScroll: true });
+        });
+      }
+    };
   }, [isFullscreenReview]);
+
+  useEffect(() => () => {
+    if (fullscreenReviewCloseTimeoutRef.current !== null) {
+      window.clearTimeout(fullscreenReviewCloseTimeoutRef.current);
+    }
+    if (fullscreenReviewReturnFocusFrameRef.current !== null) {
+      window.cancelAnimationFrame(fullscreenReviewReturnFocusFrameRef.current);
+    }
+  }, []);
 
   useEffect(() => {
     async function fetchSharedExplanationOverrides() {
@@ -1517,6 +1601,10 @@ function ResultsPageContent() {
     () => recentCompletedSessions.slice(0, visibleHistoryCount),
     [recentCompletedSessions, visibleHistoryCount]
   );
+  const emptyResultsAction = getEmptyResultsPrimaryAction({
+    currentSession: mounted ? loadCurrentSession() : null,
+    scope: resultsScope
+  });
   const activeSession = state.session;
   const confidenceTrackingEnabled =
     activeSession !== null &&
@@ -1769,7 +1857,24 @@ function ResultsPageContent() {
     }
   }
 
-  function handleOpenFullscreenReview() {
+  function handleOpenFullscreenReview(opener?: HTMLElement | null) {
+    if (fullscreenReviewCloseTimeoutRef.current !== null) {
+      window.clearTimeout(fullscreenReviewCloseTimeoutRef.current);
+      fullscreenReviewCloseTimeoutRef.current = null;
+    }
+    if (fullscreenReviewReturnFocusFrameRef.current !== null) {
+      window.cancelAnimationFrame(fullscreenReviewReturnFocusFrameRef.current);
+      fullscreenReviewReturnFocusFrameRef.current = null;
+    }
+    if (opener?.isConnected) {
+      fullscreenReviewPreviouslyFocusedRef.current = opener;
+    } else if (
+      typeof document !== "undefined" &&
+      document.activeElement instanceof HTMLElement &&
+      document.activeElement !== document.body
+    ) {
+      fullscreenReviewPreviouslyFocusedRef.current = document.activeElement;
+    }
     setIsFullscreenReview(true);
     if (typeof window !== "undefined") {
       window.requestAnimationFrame(() => setIsFullscreenReviewVisible(true));
@@ -1781,7 +1886,13 @@ function ResultsPageContent() {
   function handleCloseFullscreenReview() {
     setIsFullscreenReviewVisible(false);
     if (typeof window !== "undefined") {
-      window.setTimeout(() => setIsFullscreenReview(false), 260);
+      if (fullscreenReviewCloseTimeoutRef.current !== null) {
+        window.clearTimeout(fullscreenReviewCloseTimeoutRef.current);
+      }
+      fullscreenReviewCloseTimeoutRef.current = window.setTimeout(() => {
+        fullscreenReviewCloseTimeoutRef.current = null;
+        setIsFullscreenReview(false);
+      }, 260);
     } else {
       setIsFullscreenReview(false);
     }
@@ -2013,8 +2124,13 @@ function ResultsPageContent() {
 
           <div className="mt-2 text-left">
             {recentCompletedSessions.length === 0 ? (
-              <div className="workspace-empty-state mt-4">
-                目前還沒有已完成的作答紀錄。
+              <div className="workspace-empty-state mt-4" role="status">
+                <p>目前還沒有已完成的作答紀錄。</p>
+                {emptyResultsAction.label === "繼續作答" ? (
+                  <p className="mt-2 text-sm text-slate-500">
+                    這台裝置另有一份未完成測驗，可以從原進度繼續。
+                  </p>
+                ) : null}
               </div>
             ) : (
               visibleCompletedSessions.map((sessionItem, index) => {
@@ -2034,7 +2150,9 @@ function ResultsPageContent() {
                         <p className="text-sm font-semibold text-ink">
                           {resultsScope === "simulation"
                             ? getSessionDisplayName(sessionItem)
-                            : `第 ${recentCompletedSessions.length - index} 筆・${sessionItem.subject}`}
+                            : sessionItem.settings?.mode === "search_practice"
+                              ? `第 ${recentCompletedSessions.length - index} 筆・${getSessionDisplayName(sessionItem)}`
+                              : `第 ${recentCompletedSessions.length - index} 筆・${sessionItem.subject}`}
                         </p>
                         <p className="mt-2 text-sm text-slate-500">
                           {getSessionModeLabel(sessionItem)} ・{" "}
@@ -2076,10 +2194,10 @@ function ResultsPageContent() {
 
           <div className="workspace-compact-actions mt-5 justify-end">
             <Link
-              href={resultsScope === "simulation" ? "/simulation" : "/quiz"}
+              href={emptyResultsAction.href}
               className="bg-brand-600 text-sm font-semibold text-white transition hover:bg-brand-700"
             >
-              {resultsScope === "simulation" ? "回到模擬考專區" : "開始測驗"}
+              {emptyResultsAction.label}
             </Link>
           </div>
         </section>
@@ -2092,7 +2210,7 @@ function ResultsPageContent() {
       <main id="main-content" className="shell workspace-page">
         <section className="workspace-section results-history-shell text-center">
           <h1 className="text-2xl font-semibold text-ink">找不到這次作答紀錄</h1>
-          <p className="mt-3 text-slate-500">
+          <p className="mt-3 text-slate-500" role={resultRecordNotice ? "alert" : undefined}>
             {resultRecordNotice || "這筆結果可能已被清除，或尚未完成作答。"}
           </p>
           <div className="workspace-compact-actions mt-5 justify-center">
@@ -2103,10 +2221,10 @@ function ResultsPageContent() {
               {resultsScope === "simulation" ? "回到模擬考作答紀錄" : "回到作答紀錄"}
             </Link>
             <Link
-              href={resultsScope === "simulation" ? "/simulation" : "/quiz"}
+              href={emptyResultsAction.href}
               className="min-h-12 rounded-2xl bg-brand-600 px-5 py-4 text-sm font-semibold text-white transition hover:bg-brand-700"
             >
-              {resultsScope === "simulation" ? "前往模擬考專區" : "開始測驗"}
+              {resultsScope === "simulation" ? "前往模擬考專區" : emptyResultsAction.label}
             </Link>
           </div>
         </section>
@@ -2161,7 +2279,7 @@ function ResultsPageContent() {
             buttonClassName="flex min-h-10 items-center px-3 py-2 text-sm font-semibold text-slate-700 transition hover:bg-amber-50 hover:text-amber-900 disabled:cursor-wait disabled:opacity-60"
           />
         </div>
-        {error ? <p className="text-sm font-medium text-rose-700">{error}</p> : null}
+        {error ? <p className="text-sm font-medium text-rose-700" role="alert">{error}</p> : null}
       </div>
     );
   }
@@ -2844,9 +2962,10 @@ function ResultsPageContent() {
           <div className="flex flex-wrap items-center gap-2 text-xs font-semibold">
             {!fullscreenMobile ? (
               <button
+                ref={fullscreenReviewTriggerButtonRef}
                 type="button"
-                onClick={handleOpenFullscreenReview}
-                className="inline-flex min-h-11 items-center justify-center rounded-2xl bg-slate-100 px-4 py-2 text-sm font-semibold text-slate-800 transition hover:bg-slate-200 sm:hidden"
+                onClick={(event) => handleOpenFullscreenReview(event.currentTarget)}
+                className="inline-flex min-h-11 items-center justify-center rounded-2xl bg-slate-100 px-4 py-2 text-sm font-semibold text-slate-800 transition hover:bg-slate-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 focus-visible:ring-offset-2 sm:hidden"
                 aria-label="開啟滿版題目回顧"
                 title="開啟滿版題目回顧"
               >
@@ -3058,7 +3177,7 @@ function ResultsPageContent() {
               <input
                 value={editableSessionName}
                 onChange={(event) => setEditableSessionName(event.target.value)}
-                className="min-h-12 flex-1 rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-800 outline-none"
+                className="min-h-12 flex-1 rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-800 outline-none focus-visible:border-brand-500 focus-visible:ring-2 focus-visible:ring-brand-200 focus-visible:ring-offset-1"
                 placeholder="替這份模擬考命名"
               />
               <button
@@ -3072,7 +3191,7 @@ function ResultsPageContent() {
             </div>
           ) : null}
           {sessionNameNotice ? (
-            <p className="mt-2 text-sm text-emerald-700">{sessionNameNotice}</p>
+            <p className="mt-2 text-sm text-emerald-700" role="status" aria-live="polite">{sessionNameNotice}</p>
           ) : null}
         </div>
         <div className="flex flex-wrap gap-3">
@@ -3308,7 +3427,7 @@ function ResultsPageContent() {
             : null}
         </div>
 
-        {renderReviewSection()}
+        {!isFullscreenReview ? renderReviewSection() : null}
         <WeaknessRanking
           sections={topWeakSections}
           onStartReview={handleStartWeaknessReview}
@@ -3356,38 +3475,44 @@ function ResultsPageContent() {
       ) : null}
       {copyPromptNotice ? (
         <div className="pointer-events-none fixed inset-0 z-[140] flex items-center justify-center px-6">
-          <div className="rounded-2xl bg-slate-950 px-5 py-3 text-base font-semibold text-white shadow-2xl ring-1 ring-white/10">
+          <div className="rounded-2xl bg-slate-950 px-5 py-3 text-base font-semibold text-white shadow-2xl ring-1 ring-white/10" role="status" aria-live="polite">
             已經複製，可以貼進自己的 AI
           </div>
         </div>
       ) : null}
       {confidenceOverviewDownloadNotice ? (
         <div className="pointer-events-none fixed inset-0 z-[140] flex items-center justify-center px-6">
-          <div className="rounded-2xl bg-slate-950 px-5 py-3 text-base font-semibold text-white shadow-2xl ring-1 ring-white/10">
+          <div className="rounded-2xl bg-slate-950 px-5 py-3 text-base font-semibold text-white shadow-2xl ring-1 ring-white/10" role="status" aria-live="polite">
             已下載信心度總覽
           </div>
         </div>
       ) : null}
-      {isFullscreenReview ? (
+      {isFullscreenReview && typeof document !== "undefined" ? createPortal(
         <div
-          className={`fixed inset-0 z-[140] bg-[color:var(--bg-base)] transition-opacity duration-300 ease-out overscroll-none sm:hidden ${
+          ref={fullscreenReviewDialogRef}
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="fullscreen-review-title"
+          tabIndex={-1}
+          className={`fixed inset-0 z-[140] bg-[color:var(--bg-base)] transition-opacity duration-300 ease-out overscroll-none motion-reduce:transition-none ${
             isFullscreenReviewVisible ? "opacity-100" : "opacity-0"
           }`}
         >
           <div
-            className={`flex h-full flex-col transition-transform duration-300 ease-out ${
+            className={`flex h-full flex-col transition-transform duration-300 ease-out motion-reduce:transition-none ${
               isFullscreenReviewVisible ? "translate-y-0" : "translate-y-full"
             }`}
           >
             <div className="flex items-center justify-between gap-3 border-b px-4 py-3 shadow-sm border-[color:var(--line-soft)] bg-[color:var(--surface)] backdrop-blur">
               <div>
                 <p className="text-xs font-semibold uppercase tracking-[0.18em] text-brand-700">Fullscreen Review</p>
-                <h2 className="text-lg font-bold text-ink">題目回顧</h2>
+                <h2 id="fullscreen-review-title" className="text-lg font-bold text-ink">題目回顧</h2>
               </div>
               <button
+                ref={fullscreenReviewCloseButtonRef}
                 type="button"
                 onClick={handleCloseFullscreenReview}
-                className="min-h-11 rounded-2xl bg-slate-100 px-4 py-2 text-sm font-semibold text-slate-800 transition hover:bg-slate-200"
+                className="min-h-11 rounded-2xl bg-slate-100 px-4 py-2 text-sm font-semibold text-slate-800 transition hover:bg-slate-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 focus-visible:ring-offset-2"
               >
                 返回頁面
               </button>
@@ -3396,7 +3521,8 @@ function ResultsPageContent() {
               {renderReviewSection(true)}
             </div>
           </div>
-        </div>
+        </div>,
+        document.body
       ) : null}
     </main>
   );

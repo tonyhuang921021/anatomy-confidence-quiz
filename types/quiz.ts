@@ -88,6 +88,7 @@ export type Attempt = {
 
 export type QuizMode =
   | "random"
+  | "search_practice"
   | "weakness"
   | "review"
   | "simulation"

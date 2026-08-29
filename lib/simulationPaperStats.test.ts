@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import test from "node:test";
 import {
   buildSimulationPaperScoreRow,
+  getSimulationTimerPresentation,
   inferSimulationPaperKey
 } from "./simulationPaperStats";
 import type { Attempt, QuizSession, QuizSettings } from "../types/quiz";
@@ -99,4 +100,38 @@ test("舊考古卷題號可還原 examCode 與 paperCode", () => {
   });
 
   assert.equal(inferSimulationPaperKey(session), "105100-5301");
+});
+
+test("模擬考倒數歸零後不再提供暫停控制", () => {
+  const presentation = getSimulationTimerPresentation({
+    durationSeconds: 7_200,
+    elapsedSeconds: 7_201,
+    paused: false
+  });
+
+  assert.equal(presentation.remainingSeconds, 0);
+  assert.equal(presentation.progressPercent, 100);
+  assert.equal(presentation.expired, true);
+  assert.equal(presentation.canTogglePause, false);
+  assert.equal(presentation.controlLabel, "計時已結束");
+  assert.match(presentation.statusMessage, /可以繼續寫完/);
+});
+
+test("模擬考倒數仍在進行時保留暫停與繼續語意", () => {
+  assert.equal(
+    getSimulationTimerPresentation({
+      durationSeconds: 7_200,
+      elapsedSeconds: 60,
+      paused: false
+    }).controlLabel,
+    "暫停"
+  );
+  assert.equal(
+    getSimulationTimerPresentation({
+      durationSeconds: 7_200,
+      elapsedSeconds: 60,
+      paused: true
+    }).controlLabel,
+    "繼續"
+  );
 });

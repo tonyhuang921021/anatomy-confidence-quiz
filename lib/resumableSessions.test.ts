@@ -3,6 +3,7 @@ import test from "node:test";
 import {
   chooseMoreCompleteResumableSessionItem,
   createResumableQuizSessionListItem,
+  getEmptyResultsPrimaryAction,
   isResumableSessionHydrationComplete,
   mergeResumableQuizSessionItems,
   mergeResumableQuizSessions
@@ -68,6 +69,54 @@ test("不同散題測驗不會因模式相同被錯誤合併", () => {
   const merged = mergeResumableQuizSessions([first], [second]);
 
   assert.equal(merged.length, 2);
+});
+
+test("兩份不同的搜尋私人練習都會留在續作清單", () => {
+  const first = makeSession("search-a", {
+    subject: "生理學",
+    settings: {
+      mode: "search_practice",
+      questionCount: 2,
+      customPoolLabel: "搜尋私人練習",
+      customQuestionIds: ["A1", "A2"]
+    },
+    questionOrder: ["A1", "A2"]
+  });
+  const second = makeSession("search-b", {
+    subject: "生理學",
+    settings: {
+      mode: "search_practice",
+      questionCount: 2,
+      customPoolLabel: "搜尋私人練習",
+      customQuestionIds: ["B1", "B2"]
+    },
+    questionOrder: ["B1", "B2"]
+  });
+
+  assert.equal(mergeResumableQuizSessions([first], [second]).length, 2);
+});
+
+test("同一搜尋題組的本機與雲端副本只保留較完整進度", () => {
+  const settings = {
+    mode: "search_practice" as const,
+    questionCount: 3,
+    customPoolLabel: "搜尋私人練習",
+    customQuestionIds: ["A1", "A2", "A3"]
+  };
+  const local = makeSession("search-local", {
+    settings,
+    questionOrder: ["A1", "A2", "A3"],
+    attempts: attempts(1)
+  });
+  const cloud = makeSession("search-cloud", {
+    settings,
+    questionOrder: ["A1", "A2", "A3"],
+    attempts: attempts(3)
+  });
+
+  const merged = mergeResumableQuizSessions([local], [cloud]);
+  assert.equal(merged.length, 1);
+  assert.equal(merged[0]?.id, "search-cloud");
 });
 
 test("已完成或沒有題目的 session 不會出現在繼續測驗", () => {
@@ -139,4 +188,28 @@ test("清單顯示 13 題但明細只有 6 題時不可視為完整續作紀錄"
 
   assert.equal(isResumableSessionHydrationComplete(partial, 13), false);
   assert.equal(isResumableSessionHydrationComplete(partial, 6), true);
+});
+
+test("作答紀錄空白時，有未完成測驗就顯示忠實的續作入口", () => {
+  assert.deepEqual(
+    getEmptyResultsPrimaryAction({
+      currentSession: makeSession("user-123:unfinished"),
+      scope: "default"
+    }),
+    {
+      href: "/quiz?resume=1&sessionId=unfinished",
+      label: "繼續作答"
+    }
+  );
+});
+
+test("沒有未完成測驗時，開始測驗會先回到設定流程", () => {
+  assert.deepEqual(
+    getEmptyResultsPrimaryAction({ currentSession: null, scope: "default" }),
+    { href: "/start", label: "開始測驗" }
+  );
+  assert.deepEqual(
+    getEmptyResultsPrimaryAction({ currentSession: null, scope: "simulation" }),
+    { href: "/simulation", label: "回到模擬考專區" }
+  );
 });

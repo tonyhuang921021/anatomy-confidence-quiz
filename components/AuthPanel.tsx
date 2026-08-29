@@ -62,6 +62,8 @@ const AUTH_SESSION_RECOVERY_TIMEOUT_MS = 2500;
 const REMEMBER_ACCOUNT_KEY = "medQuizRememberAccount";
 const REMEMBERED_EMAIL_KEY = "medQuizRememberedEmail";
 const RECOVERY_MODE_MESSAGE = "暫用本機，稍後補傳。雲端登入與同步維護中，目前紀錄會先留在本機。";
+const AUTH_INPUT_CLASS_NAME =
+  "min-h-12 rounded-2xl border border-slate-200 px-4 py-3 text-sm text-slate-800 outline-none transition focus-visible:border-brand-500 focus-visible:ring-2 focus-visible:ring-brand-200 focus-visible:ring-offset-1";
 function withTimeout<T>(promise: Promise<T>, timeoutMs: number, message: string) {
   return new Promise<T>((resolve, reject) => {
     const timeoutId = window.setTimeout(() => reject(new Error(message)), timeoutMs);
@@ -735,18 +737,19 @@ export function AuthPanel({ compactHeader = false }: { compactHeader?: boolean }
         <div className="mt-5 grid gap-3">
           <input
             type="password"
+            aria-label="新密碼"
             value={newPassword}
             onChange={(event) => setNewPassword(event.target.value)}
             placeholder="新密碼（至少 6 個字元）"
-            className="min-h-12 rounded-2xl border border-slate-200 px-4 py-3 text-sm text-slate-800 outline-none"
+            className={AUTH_INPUT_CLASS_NAME}
           />
         </div>
 
         {message ? (
-          <div className="mt-4 rounded-2xl bg-emerald-50 p-4 text-sm text-emerald-900">{message}</div>
+          <div className="mt-4 rounded-2xl bg-emerald-50 p-4 text-sm text-emerald-900" role="status" aria-live="polite">{message}</div>
         ) : null}
         {error ? (
-          <div className="mt-4 rounded-2xl bg-rose-50 p-4 text-sm text-rose-900">{error}</div>
+          <div className="mt-4 rounded-2xl bg-rose-50 p-4 text-sm text-rose-900" role="alert">{error}</div>
         ) : null}
 
         <div className="mt-5 flex flex-col gap-3 sm:flex-row">
@@ -786,7 +789,7 @@ export function AuthPanel({ compactHeader = false }: { compactHeader?: boolean }
                 <p className="mt-2 text-sm font-semibold text-slate-900 sm:text-base">{user.email}</p>
               </div>
               <div className="flex flex-wrap gap-2">
-                <div className="stat-chip">
+                <div className="stat-chip" role="status" aria-live="polite">
                   {getSyncStatusText(
                     syncStatus,
                     Boolean(syncError),
@@ -803,11 +806,12 @@ export function AuthPanel({ compactHeader = false }: { compactHeader?: boolean }
             <span>排行榜暱稱</span>
             <input
               type="text"
+              aria-label="排行榜暱稱"
               value={nickname}
               onChange={(event) => setNickname(event.target.value)}
               placeholder="輸入要顯示的名稱"
               maxLength={24}
-              className="min-h-12 rounded-2xl border border-slate-200 px-4 py-3 text-sm text-slate-800 outline-none"
+              className={AUTH_INPUT_CLASS_NAME}
             />
             <small>排行榜與公開互動會顯示這個名稱。</small>
           </label>
@@ -996,13 +1000,13 @@ export function AuthPanel({ compactHeader = false }: { compactHeader?: boolean }
           </div>
         </div>
         {syncError ? (
-          <div className="mt-4 rounded-2xl bg-amber-50 p-4 text-sm text-amber-900">{syncError}</div>
+          <div className="mt-4 rounded-2xl bg-amber-50 p-4 text-sm text-amber-900" role="status" aria-live="polite">{syncError}</div>
         ) : null}
         {message ? (
-          <div className="mt-4 rounded-2xl bg-emerald-50 p-4 text-sm text-emerald-900">{message}</div>
+          <div className="mt-4 rounded-2xl bg-emerald-50 p-4 text-sm text-emerald-900" role="status" aria-live="polite">{message}</div>
         ) : null}
         {error ? (
-          <div className="mt-4 rounded-2xl bg-rose-50 p-4 text-sm text-rose-900">{error}</div>
+          <div className="mt-4 rounded-2xl bg-rose-50 p-4 text-sm text-rose-900" role="alert">{error}</div>
         ) : null}
         <div className="account-settings-actions mt-5 flex flex-col gap-3 sm:flex-row">
           {canViewOwnerPage ? (
@@ -1053,25 +1057,28 @@ export function AuthPanel({ compactHeader = false }: { compactHeader?: boolean }
       <div className="mt-5 grid gap-3">
         <input
           type="text"
+          aria-label="排行榜暱稱"
           value={nickname}
           onChange={(event) => setNickname(event.target.value)}
           placeholder="排行榜暱稱"
           maxLength={24}
-          className="min-h-12 rounded-2xl border border-slate-200 px-4 py-3 text-sm text-slate-800 outline-none"
+          className={AUTH_INPUT_CLASS_NAME}
         />
         <input
           type="email"
+          aria-label="Email"
           value={email}
           onChange={(event) => setEmail(event.target.value)}
           placeholder="Email"
-          className="min-h-12 rounded-2xl border border-slate-200 px-4 py-3 text-sm text-slate-800 outline-none"
+          className={AUTH_INPUT_CLASS_NAME}
         />
         <input
           type="password"
+          aria-label="密碼"
           value={password}
           onChange={(event) => setPassword(event.target.value)}
           placeholder="Password"
-          className="min-h-12 rounded-2xl border border-slate-200 px-4 py-3 text-sm text-slate-800 outline-none"
+          className={AUTH_INPUT_CLASS_NAME}
         />
         <label className="flex items-start gap-3 rounded-2xl bg-slate-50 px-4 py-3 text-sm text-slate-700">
           <input
@@ -1087,7 +1094,7 @@ export function AuthPanel({ compactHeader = false }: { compactHeader?: boolean }
                 safeWriteLocalStorage(REMEMBERED_EMAIL_KEY, email.trim());
               }
             }}
-            className="mt-1 h-4 w-4 rounded border-slate-300 text-brand-600"
+            className="mt-1 h-4 w-4 rounded border-slate-300 text-brand-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 focus-visible:ring-offset-2"
           />
           <span>
             維持這台裝置的登入狀態
@@ -1099,13 +1106,13 @@ export function AuthPanel({ compactHeader = false }: { compactHeader?: boolean }
       </div>
 
       {message ? (
-        <div className="mt-4 rounded-2xl bg-emerald-50 p-4 text-sm text-emerald-900">{message}</div>
+        <div className="mt-4 rounded-2xl bg-emerald-50 p-4 text-sm text-emerald-900" role="status" aria-live="polite">{message}</div>
       ) : null}
       {syncError ? (
-        <div className="mt-4 rounded-2xl bg-amber-50 p-4 text-sm text-amber-900">{syncError}</div>
+        <div className="mt-4 rounded-2xl bg-amber-50 p-4 text-sm text-amber-900" role="status" aria-live="polite">{syncError}</div>
       ) : null}
       {error ? (
-        <div className="mt-4 rounded-2xl bg-rose-50 p-4 text-sm text-rose-900">{error}</div>
+        <div className="mt-4 rounded-2xl bg-rose-50 p-4 text-sm text-rose-900" role="alert">{error}</div>
       ) : null}
 
       <div className="mt-5 flex flex-col gap-3 sm:flex-row">

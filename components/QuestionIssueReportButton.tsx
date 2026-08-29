@@ -88,9 +88,15 @@ export function QuestionReportButton({
       >
         {isSubmitting || classificationLoading ? "回報中..." : "回報"}
       </button>
-      {message ? <p className="basis-full text-sm font-medium text-slate-600">{message}</p> : null}
+      {message ? (
+        <p className="basis-full text-sm font-medium text-slate-600" role="status" aria-live="polite">
+          {message}
+        </p>
+      ) : null}
       {classificationMessage ? (
-        <p className="basis-full text-sm font-medium text-slate-600">{classificationMessage}</p>
+        <p className="basis-full text-sm font-medium text-slate-600" role="status" aria-live="polite">
+          {classificationMessage}
+        </p>
       ) : null}
 
       {isOpen ? (
@@ -178,7 +184,7 @@ export function QuestionReportButton({
               </>
             )}
 
-            {error ? <p className="mt-3 text-sm font-medium text-rose-700">{error}</p> : null}
+            {error ? <p className="mt-3 text-sm font-medium text-rose-700" role="alert">{error}</p> : null}
 
             <div className="mt-5 flex flex-wrap justify-end gap-2">
               {activeFlow === "issue" ? (

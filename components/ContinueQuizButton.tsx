@@ -16,6 +16,7 @@ import type { QuizMode, QuizSession } from "@/types/quiz";
 
 const MODE_LABELS: Record<QuizMode, string> = {
   random: "自由測驗",
+  search_practice: "搜尋私人練習",
   weakness: "弱點補強",
   review: "複習題庫",
   simulation: "模擬考",

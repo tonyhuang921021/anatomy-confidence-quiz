@@ -209,7 +209,7 @@ export function QuestionExplanationTabs({
         </details>
         ) : null}
       </div>
-      {reactionError ? <p className="mt-2 text-xs font-semibold text-rose-700">{reactionError}</p> : null}
+      {reactionError ? <p className="mt-2 text-xs font-semibold text-rose-700" role="alert">{reactionError}</p> : null}
       {activeTab === "ai" && aiExplanationContent ? (
         <div className="mt-3">
           {aiExplanationContent}

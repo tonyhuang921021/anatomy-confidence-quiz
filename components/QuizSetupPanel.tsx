@@ -34,6 +34,7 @@ type QuizSetupPanelProps = {
 const modeDescriptions: Record<QuizMode, string> = {
   weakness: "優先抽你最弱、最不穩、最需要補進度的小節。",
   random: "平均刷題，適合維持手感與快速暖機。",
+  search_practice: "只練你從題目搜尋選取的題目，不會建立或公開自訂卷。",
   review: "優先抽歷史錯題、低信心題與高風險題。",
   simulation: "像正式考試一樣，可選真實考古卷、AI 模擬卷或電腦隨機整份卷。",
   custom_paper: "自訂卷模式會用專屬頁面產卷或輸入考卷碼。"

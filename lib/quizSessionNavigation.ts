@@ -13,6 +13,13 @@ export type RequestedResumeStatus =
   | "mismatch"
   | "unusable";
 
+const CONSUMED_QUIZ_LAUNCH_PARAMS = [
+  "new",
+  "startSettings",
+  "startSettingsToken",
+  "startSettingsError"
+] as const;
+
 function canonicalSessionId(sessionId: string) {
   return sessionId.replace(/^user-[^:]+:/, "");
 }
@@ -35,6 +42,17 @@ export function shouldPreserveSelectedQuizSession(
   intent: QuizSessionNavigationIntent
 ) {
   return intent.forceNew || intent.resumeRequested;
+}
+
+export function getQuizUrlAfterConsumingLaunchIntent(input: string, resumeSessionId?: string) {
+  const url = new URL(input, "https://quiz.local");
+  for (const key of CONSUMED_QUIZ_LAUNCH_PARAMS) url.searchParams.delete(key);
+  if (resumeSessionId) {
+    url.searchParams.set("resume", "1");
+    url.searchParams.set("sessionId", canonicalSessionId(resumeSessionId));
+  }
+  const query = url.searchParams.toString();
+  return `${url.pathname}${query ? `?${query}` : ""}${url.hash}`;
 }
 
 export function getRequestedResumeStatus(input: {

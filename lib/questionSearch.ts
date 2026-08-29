@@ -1,6 +1,6 @@
 import { getQuestionPrimaryTag } from "./analysisPrimaryTag";
 import { compactSearchText, normalizeSearchText } from "./searchTextNormalization";
-import type { Question } from "../types/quiz";
+import type { Question, QuizSettings } from "../types/quiz";
 
 export type QuestionSearchSort =
   | "recent"
@@ -72,6 +72,29 @@ export function buildQuestionSearchIndexEntry(question: Question): QuestionSearc
   };
 }
 
+function includesSearchTerm(value: string, term: string) {
+  if (!value || !term) return false;
+  if (!/^[a-z]{1,3}$/.test(term)) return value.includes(term);
+
+  let startIndex = value.indexOf(term);
+  while (startIndex >= 0) {
+    const before = value[startIndex - 1] ?? "";
+    const after = value[startIndex + term.length] ?? "";
+    const hasLetterBefore = /[a-z]/.test(before);
+    const hasLetterAfter = /[a-z]/.test(after);
+    if (!hasLetterBefore && !hasLetterAfter) return true;
+    startIndex = value.indexOf(term, startIndex + 1);
+  }
+
+  return false;
+}
+
+function includesSearchPhrase(value: string, keyword: string, tokens: string[]) {
+  return tokens.length === 1
+    ? includesSearchTerm(value, tokens[0])
+    : value.includes(keyword);
+}
+
 function getSearchScore(entry: QuestionSearchIndexEntry, keyword: string) {
   const normalizedKeyword = normalizeSearchText(keyword).trim();
   if (!normalizedKeyword) return 0;
@@ -80,35 +103,38 @@ function getSearchScore(entry: QuestionSearchIndexEntry, keyword: string) {
   const tokens = normalizedKeyword.split(/\s+/).filter(Boolean);
   const tokensMatch = tokens.every((token) => {
     if (
-      entry.normalizedIdentity.includes(token) ||
-      entry.normalizedStem.includes(token) ||
-      entry.normalizedOptions.includes(token) ||
-      entry.normalizedClassification.includes(token) ||
-      entry.normalizedSecondary.includes(token)
+      includesSearchTerm(entry.normalizedIdentity, token) ||
+      includesSearchTerm(entry.normalizedStem, token) ||
+      includesSearchTerm(entry.normalizedOptions, token) ||
+      includesSearchTerm(entry.normalizedClassification, token) ||
+      includesSearchTerm(entry.normalizedSecondary, token)
     ) {
       return true;
     }
     const compactToken = compactSearchText(token);
-    return compactToken.length > 0 && entry.compactAll.includes(compactToken);
+    return !/^[a-z]{1,3}$/.test(token) && compactToken.length > 0 && entry.compactAll.includes(compactToken);
   });
-  const compactPhraseMatches = compactKeyword.length > 0 && entry.compactAll.includes(compactKeyword);
+  const compactPhraseMatches =
+    tokens.every((token) => !/^[a-z]{1,3}$/.test(token)) &&
+    compactKeyword.length > 0 &&
+    entry.compactAll.includes(compactKeyword);
   if (!tokensMatch && !compactPhraseMatches) return null;
 
   let score = 0;
   if (entry.normalizedIdentity === normalizedKeyword) score += 2400;
-  else if (entry.normalizedIdentity.includes(normalizedKeyword)) score += 1200;
-  if (entry.normalizedStem.includes(normalizedKeyword)) score += 900;
-  if (entry.normalizedOptions.includes(normalizedKeyword)) score += 650;
-  if (entry.normalizedClassification.includes(normalizedKeyword)) score += 550;
-  if (entry.normalizedSecondary.includes(normalizedKeyword)) score += 120;
-  if (compactKeyword && entry.compactAll.includes(compactKeyword)) score += 80;
+  else if (includesSearchPhrase(entry.normalizedIdentity, normalizedKeyword, tokens)) score += 1200;
+  if (includesSearchPhrase(entry.normalizedStem, normalizedKeyword, tokens)) score += 900;
+  if (includesSearchPhrase(entry.normalizedOptions, normalizedKeyword, tokens)) score += 650;
+  if (includesSearchPhrase(entry.normalizedClassification, normalizedKeyword, tokens)) score += 550;
+  if (includesSearchPhrase(entry.normalizedSecondary, normalizedKeyword, tokens)) score += 120;
+  if (compactPhraseMatches) score += 80;
 
   for (const token of tokens) {
-    if (entry.normalizedStem.includes(token)) score += 90;
-    else if (entry.normalizedOptions.includes(token)) score += 70;
-    else if (entry.normalizedClassification.includes(token)) score += 60;
-    else if (entry.normalizedIdentity.includes(token)) score += 50;
-    else if (entry.normalizedSecondary.includes(token)) score += 10;
+    if (includesSearchTerm(entry.normalizedStem, token)) score += 90;
+    else if (includesSearchTerm(entry.normalizedOptions, token)) score += 70;
+    else if (includesSearchTerm(entry.normalizedClassification, token)) score += 60;
+    else if (includesSearchTerm(entry.normalizedIdentity, token)) score += 50;
+    else if (includesSearchTerm(entry.normalizedSecondary, token)) score += 10;
   }
 
   return score;
@@ -215,4 +241,58 @@ export function filterAndSortQuestionSearch(input: {
 
 export function isQuestionSearchStatsSort(sort: QuestionSearchSort) {
   return sort === "accuracy_asc" || sort === "accuracy_desc" || sort === "chaos_desc";
+}
+
+const QUESTION_SEARCH_SORT_LABELS: Record<QuestionSearchSort, string> = {
+  recent: "近年優先",
+  oldest: "早年優先",
+  accuracy_asc: "答對率低到高",
+  accuracy_desc: "答對率高到低",
+  chaos_desc: "最多人放棄"
+};
+
+export function buildSearchFilterSummary(input: {
+  keyword: string;
+  subject: string;
+  year: string;
+  sort: QuestionSearchSort;
+  browseAll?: boolean;
+}) {
+  const parts: string[] = [];
+  const keyword = input.keyword.trim();
+  if (keyword) parts.push(`「${keyword}」`);
+  if (input.subject !== "全部") parts.push(input.subject);
+  if (input.year !== "全部") parts.push(`${input.year} 年`);
+  if (parts.length === 0 && input.browseAll) parts.push("全部題庫");
+  parts.push(QUESTION_SEARCH_SORT_LABELS[input.sort]);
+  return parts.join(" · ");
+}
+
+export function buildSearchPracticeSettings(questions: Question[]): QuizSettings | null {
+  const uniqueQuestions = Array.from(
+    new Map(questions.filter(Boolean).map((question) => [question.id, question] as const)).values()
+  );
+  if (uniqueQuestions.length === 0) return null;
+
+  const subjectFilters = Array.from(
+    new Set(uniqueQuestions.map((question) => question.subject))
+  );
+  const subjectFilter = subjectFilters.length === 1 ? subjectFilters[0] : "全部";
+  const subjectLabel = subjectFilters.length === 1 ? subjectFilters[0] : "混合科目";
+
+  return {
+    mode: "search_practice",
+    questionCount: uniqueQuestions.length,
+    sessionName: `搜尋私人練習・${subjectLabel}（${uniqueQuestions.length} 題）`,
+    customPoolLabel: "搜尋私人練習",
+    subjectFilter,
+    subjectFilters,
+    excludeAiGenerated: true,
+    excludePreviouslyAnswered: false,
+    strictCustomQuestionPool: true,
+    preserveCustomQuestionOrder: true,
+    enableConfidenceCalibration: false,
+    feedbackMode: "full",
+    customQuestionIds: uniqueQuestions.map((question) => question.id)
+  };
 }

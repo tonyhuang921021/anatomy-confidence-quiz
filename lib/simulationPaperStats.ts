@@ -29,6 +29,42 @@ export type SimulationPaperScoreRow = {
   completed_at: string;
 };
 
+export type SimulationTimerPresentation = {
+  remainingSeconds: number;
+  progressPercent: number;
+  expired: boolean;
+  canTogglePause: boolean;
+  controlLabel: "暫停" | "繼續" | "計時已結束";
+  statusMessage: string;
+};
+
+export function getSimulationTimerPresentation({
+  durationSeconds,
+  elapsedSeconds,
+  paused
+}: {
+  durationSeconds: number;
+  elapsedSeconds: number;
+  paused: boolean;
+}): SimulationTimerPresentation {
+  const safeDuration = Math.max(1, Math.floor(durationSeconds));
+  const safeElapsed = Math.max(0, Math.floor(elapsedSeconds));
+  const expired = safeElapsed >= safeDuration;
+
+  return {
+    remainingSeconds: Math.max(0, safeDuration - safeElapsed),
+    progressPercent: Math.min(100, Math.max(0, (safeElapsed / safeDuration) * 100)),
+    expired,
+    canTogglePause: !expired,
+    controlLabel: expired ? "計時已結束" : paused ? "繼續" : "暫停",
+    statusMessage: expired
+      ? "計時已結束，不會自動交卷，可以繼續寫完。"
+      : paused
+        ? "已暫停，按繼續後才會接著計時。"
+        : "只用來控時，不會自動交卷。"
+  };
+}
+
 const SAFE_PAPER_KEY_PATTERN = /^[A-Z0-9-]{3,80}$/i;
 
 export function isSafeSimulationPaperKey(value: string) {

@@ -1,7 +1,8 @@
 "use client";
 
-import Link from "next/link";
-import { useDeferredValue, useEffect, useMemo, useState } from "react";
+import { useRouter } from "next/navigation";
+import { useDeferredValue, useEffect, useMemo, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import { useAuth } from "@/components/AuthProvider";
 import { CopyQuestionPromptButton } from "@/components/CopyQuestionPromptButton";
 import { QuestionExplanationTabs } from "@/components/QuestionExplanationTabs";
@@ -24,6 +25,7 @@ import {
 import {
   applyQuestionExplanationOverride,
   getPendingQuestionExplanationOverrideSync,
+  loadCurrentSession,
   loadQuestionExplanationOverrides,
   mergeQuestionExplanationOverrides,
   saveQuestionExplanationOverride,
@@ -37,6 +39,7 @@ import {
   useSavedQuestionRecords
 } from "@/lib/savedQuestions";
 import { getOrCreateVisitorId } from "@/lib/visitor";
+import { getCanonicalResumableSessionId } from "@/lib/resumableSessions";
 import {
   getQuestionPrimaryTag,
   shouldDisplaySubjectBesidePrimaryTag
@@ -55,12 +58,15 @@ import {
 } from "@/data/med1QuestionBank";
 import { subjectRegistry } from "@/data/subjectRegistry";
 import {
+  buildSearchFilterSummary,
+  buildSearchPracticeSettings,
   buildQuestionSearchIndexEntry,
   filterAndSortQuestionSearch,
   isQuestionSearchStatsSort,
   type QuestionSearchRanking,
   type QuestionSearchSort
 } from "@/lib/questionSearch";
+import { buildNewQuizHref } from "@/lib/startSettingsUrl";
 import { loadQuestionSearchRankings } from "@/lib/questionSearchRankings";
 import {
   OptionKey,
@@ -137,11 +143,17 @@ function readStoredAnswerDisplayMode(): SearchAnswerDisplayMode {
 }
 
 export default function SearchPage() {
+  const router = useRouter();
   const { session } = useAuth();
   const [selectedSubject, setSelectedSubject] = useState("全部");
   const [keyword, setKeyword] = useState("");
   const [selectedYear, setSelectedYear] = useState("全部");
   const [sortMode, setSortMode] = useState<QuestionSearchSort>("recent");
+  const [advancedFiltersOpen, setAdvancedFiltersOpen] = useState(false);
+  const [browseAllQuestions, setBrowseAllQuestions] = useState(false);
+  const [selectedQuestionIds, setSelectedQuestionIds] = useState<string[]>([]);
+  const [practiceStartError, setPracticeStartError] = useState("");
+  const [blockedResumeHref, setBlockedResumeHref] = useState("");
   const [rankingStats, setRankingStats] = useState<Record<string, QuestionSearchRanking>>({});
   const [rankingStatsAttempted, setRankingStatsAttempted] = useState(false);
   const [rankingStatsLoading, setRankingStatsLoading] = useState(false);
@@ -156,6 +168,10 @@ export default function SearchPage() {
   const [classificationReportMessageMap, setClassificationReportMessageMap] = useState<Record<string, string>>({});
   const [classificationOverrides, setClassificationOverrides] = useState<Record<string, QuestionClassificationOverride>>({});
   const [favoriteBankOpen, setFavoriteBankOpen] = useState(false);
+  const favoriteDialogRef = useRef<HTMLElement | null>(null);
+  const favoriteCloseButtonRef = useRef<HTMLButtonElement | null>(null);
+  const favoriteDialogPreviouslyFocusedRef = useRef<HTMLElement | null>(null);
+  const favoriteDialogReturnFocusFrameRef = useRef<number | null>(null);
   const searchFavorites = useSavedQuestionRecords(session?.access_token);
   const searchFavoriteIds = useMemo(
     () => Object.keys(searchFavorites),
@@ -185,6 +201,81 @@ export default function SearchPage() {
     window.addEventListener("storage", handleStorage);
     return () => window.removeEventListener("storage", handleStorage);
   }, []);
+
+  useEffect(() => {
+    if (!favoriteBankOpen) return;
+
+    if (
+      !favoriteDialogPreviouslyFocusedRef.current &&
+      document.activeElement instanceof HTMLElement &&
+      document.activeElement !== document.body
+    ) {
+      favoriteDialogPreviouslyFocusedRef.current = document.activeElement;
+    }
+    const previousOverflow = document.body.style.overflow;
+    const background = document.querySelector<HTMLElement>(".app-frame");
+    const previousAriaHidden = background?.getAttribute("aria-hidden") ?? null;
+    const backgroundWasInert = background?.hasAttribute("inert") ?? false;
+    document.body.style.overflow = "hidden";
+    background?.setAttribute("aria-hidden", "true");
+    background?.setAttribute("inert", "");
+
+    const focusFrame = window.requestAnimationFrame(() => {
+      favoriteCloseButtonRef.current?.focus();
+    });
+
+    function handleDialogKeyDown(event: KeyboardEvent) {
+      if (event.key === "Escape") {
+        event.preventDefault();
+        setFavoriteBankOpen(false);
+        return;
+      }
+      if (event.key !== "Tab") return;
+
+      const dialog = favoriteDialogRef.current;
+      if (!dialog) return;
+      const focusable = Array.from(
+        dialog.querySelectorAll<HTMLElement>(
+          'button:not([disabled]), [href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])'
+        )
+      ).filter((element) => !element.hasAttribute("hidden"));
+      if (focusable.length === 0) {
+        event.preventDefault();
+        dialog.focus();
+        return;
+      }
+
+      const first = focusable[0];
+      const last = focusable[focusable.length - 1];
+      if (event.shiftKey && document.activeElement === first) {
+        event.preventDefault();
+        last.focus();
+      } else if (!event.shiftKey && document.activeElement === last) {
+        event.preventDefault();
+        first.focus();
+      }
+    }
+
+    document.addEventListener("keydown", handleDialogKeyDown);
+    return () => {
+      window.cancelAnimationFrame(focusFrame);
+      document.removeEventListener("keydown", handleDialogKeyDown);
+      document.body.style.overflow = previousOverflow;
+      if (background) {
+        if (previousAriaHidden === null) background.removeAttribute("aria-hidden");
+        else background.setAttribute("aria-hidden", previousAriaHidden);
+        if (!backgroundWasInert) background.removeAttribute("inert");
+      }
+      const previousFocus = favoriteDialogPreviouslyFocusedRef.current;
+      favoriteDialogPreviouslyFocusedRef.current = null;
+      if (previousFocus?.isConnected) {
+        favoriteDialogReturnFocusFrameRef.current = window.requestAnimationFrame(() => {
+          favoriteDialogReturnFocusFrameRef.current = null;
+          if (previousFocus.isConnected) previousFocus.focus({ preventScroll: true });
+        });
+      }
+    };
+  }, [favoriteBankOpen]);
 
   const canonicalQuestions = useMemo(
     () =>
@@ -281,14 +372,31 @@ export default function SearchPage() {
     });
   }, [deferredKeyword, rankingStats, searchIndex, selectedSubject, selectedYear, sortMode]);
 
-  const totalMatches = filteredResults.length;
+  const hasSearchCriteria =
+    keyword.trim().length > 0 || selectedSubject !== "全部" || selectedYear !== "全部";
+  const shouldShowResults = browseAllQuestions || hasSearchCriteria;
+  const totalMatches = shouldShowResults ? filteredResults.length : 0;
   const totalPages = Math.max(1, Math.ceil(totalMatches / PAGE_SIZE));
   const safeCurrentPage = Math.min(currentPage, totalPages);
   const pageStart = (safeCurrentPage - 1) * PAGE_SIZE;
   const pageResults = useMemo(
-    () => filteredResults.slice(pageStart, pageStart + PAGE_SIZE),
-    [filteredResults, pageStart]
+    () => shouldShowResults ? filteredResults.slice(pageStart, pageStart + PAGE_SIZE) : [],
+    [filteredResults, pageStart, shouldShowResults]
   );
+  const selectedQuestionIdSet = useMemo(
+    () => new Set(selectedQuestionIds),
+    [selectedQuestionIds]
+  );
+  const selectedQuestionCount = selectedQuestionIds.length;
+  const allPageQuestionsSelected =
+    pageResults.length > 0 && pageResults.every((question) => selectedQuestionIdSet.has(question.id));
+  const searchFilterSummary = buildSearchFilterSummary({
+    keyword: deferredKeyword,
+    subject: selectedSubject,
+    year: selectedYear,
+    sort: sortMode,
+    browseAll: browseAllQuestions
+  });
   const expandedPageQuestionIds = useMemo(
     () => pageResults
       .filter((question) => expandedQuestionIds[question.id])
@@ -590,6 +698,76 @@ export default function SearchPage() {
     setSelectedSubject("全部");
     setSelectedYear("全部");
     setSortMode("recent");
+    setBrowseAllQuestions(false);
+  }
+
+  function toggleSelectedQuestion(questionId: string) {
+    setPracticeStartError("");
+    setBlockedResumeHref("");
+    setSelectedQuestionIds((current) =>
+      current.includes(questionId)
+        ? current.filter((id) => id !== questionId)
+        : [...current, questionId]
+    );
+  }
+
+  function toggleCurrentPageSelection() {
+    setPracticeStartError("");
+    setBlockedResumeHref("");
+    const pageIds = pageResults.map((question) => question.id);
+    const pageIdSet = new Set(pageIds);
+    setSelectedQuestionIds((current) => {
+      const currentSet = new Set(current);
+      const pageAlreadySelected = pageIds.every((id) => currentSet.has(id));
+      if (pageAlreadySelected) {
+        return current.filter((id) => !pageIdSet.has(id));
+      }
+      return [...current, ...pageIds.filter((id) => !currentSet.has(id))];
+    });
+  }
+
+  function handleStartPrivatePractice() {
+    const selectedQuestions = selectedQuestionIds
+      .map((questionId) => questionById.get(questionId))
+      .filter((question): question is Question => Boolean(question));
+    const settings = buildSearchPracticeSettings(selectedQuestions);
+    if (!settings) {
+      setPracticeStartError("請先選至少一題，再開始私人練習。");
+      return;
+    }
+
+    const currentSession = loadCurrentSession();
+    if (
+      currentSession &&
+      !currentSession.completedAt &&
+      (currentSession.questionOrder?.length ?? 0) > 0
+    ) {
+      const currentQuestionIds = currentSession.settings?.customQuestionIds?.length
+        ? currentSession.settings.customQuestionIds
+        : currentSession.questionOrder ?? [];
+      const nextQuestionIds = settings.customQuestionIds ?? [];
+      const isSameSearchPractice =
+        currentSession.settings?.mode === "search_practice" &&
+        currentQuestionIds.length === nextQuestionIds.length &&
+        currentQuestionIds.every((questionId, index) => questionId === nextQuestionIds[index]);
+      const resumeHref = `/quiz?resume=1&sessionId=${encodeURIComponent(
+        getCanonicalResumableSessionId(currentSession.id)
+      )}`;
+
+      if (isSameSearchPractice) {
+        router.push(resumeHref);
+        return;
+      }
+
+      setBlockedResumeHref(resumeHref);
+      setPracticeStartError(
+        "這台裝置還有一份未完成測驗。為避免覆蓋進度，請先繼續作答，或從首頁的進行中測驗刪除它。"
+      );
+      return;
+    }
+
+    setBlockedResumeHref("");
+    router.push(buildNewQuizHref(settings));
   }
 
   function retryRankingStats() {
@@ -619,137 +797,251 @@ export default function SearchPage() {
           </div>
         </div>
 
-        <div className="grid min-w-0 gap-4 px-5 py-5 sm:px-7 sm:py-6 lg:grid-cols-[minmax(16rem,1.45fr)_minmax(10rem,0.8fr)_minmax(9rem,0.62fr)_minmax(13rem,0.95fr)]">
-          <label className="min-w-0 space-y-2">
-            <span className="text-sm font-semibold text-slate-700">關鍵字</span>
-            <span className="relative block">
+        <div className="px-5 py-5 sm:px-7 sm:py-6">
+          <label htmlFor="question-search-keyword" className="text-sm font-semibold text-slate-700">
+            想找哪一題？
+          </label>
+          <div className="mt-2 flex min-w-0 flex-col gap-3 sm:flex-row">
+            <span className="relative min-w-0 flex-1">
               <input
+                id="question-search-keyword"
                 value={keyword}
                 onChange={(event) => setKeyword(event.target.value)}
-                placeholder="題幹、選項、章節或題號"
-                className="min-h-12 w-full rounded-xl border border-slate-200 bg-slate-50/70 px-4 py-3 pr-14 text-sm text-slate-800 outline-none transition focus:border-brand-400 focus:bg-white focus:ring-2 focus:ring-brand-100"
+                placeholder="輸入題幹、選項、章節或題號"
+                className="min-h-12 w-full rounded-xl border border-slate-200 bg-slate-50/70 px-4 py-3 pr-14 text-base text-slate-800 outline-none transition focus:border-brand-400 focus:bg-white focus:ring-2 focus:ring-brand-100"
               />
               {keyword ? (
                 <button
                   type="button"
                   onClick={() => setKeyword("")}
-                  className="absolute right-2 top-1/2 min-h-9 -translate-y-1/2 rounded-lg px-3 text-xs font-semibold text-slate-500 transition hover:bg-slate-200 hover:text-slate-800"
+                  className="absolute right-2 top-1/2 min-h-9 -translate-y-1/2 rounded-lg px-3 text-xs font-semibold text-slate-500 transition hover:bg-slate-200 hover:text-slate-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500"
                   aria-label="清除關鍵字"
                 >
                   清除
                 </button>
               ) : null}
             </span>
-          </label>
-
-          <label className="space-y-2">
-            <span className="text-sm font-semibold text-slate-700">科目</span>
-            <select
-              value={selectedSubject}
-              onChange={(event) => setSelectedSubject(event.target.value)}
-              className="min-h-12 w-full rounded-xl border border-slate-200 bg-slate-50/70 px-4 py-3 text-sm text-slate-800 outline-none transition focus:border-brand-400 focus:bg-white focus:ring-2 focus:ring-brand-100"
+            <button
+              type="button"
+              aria-expanded={advancedFiltersOpen}
+              aria-controls="question-search-advanced-filters"
+              onClick={() => setAdvancedFiltersOpen((open) => !open)}
+              className="min-h-12 shrink-0 rounded-xl bg-white px-4 py-3 text-sm font-semibold text-slate-700 ring-1 ring-slate-200 transition hover:bg-slate-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500"
             >
-              <option value="全部">全部科目</option>
-              {SEARCHABLE_SUBJECTS.map((subject) => (
-                <option key={subject.subject} value={subject.subject}>
-                  {subject.label}
-                </option>
-              ))}
-            </select>
-          </label>
+              進階篩選 {advancedFiltersOpen ? "收合" : "展開"}
+            </button>
+          </div>
 
-          <label className="space-y-2">
-            <span className="text-sm font-semibold text-slate-700">年份</span>
-            <select
-              value={selectedYear}
-              onChange={(event) => setSelectedYear(event.target.value)}
-              className="min-h-12 w-full rounded-xl border border-slate-200 bg-slate-50/70 px-4 py-3 text-sm text-slate-800 outline-none transition focus:border-brand-400 focus:bg-white focus:ring-2 focus:ring-brand-100"
-            >
-              <option value="全部">全部年份</option>
-              {yearOptions.map((year) => (
-                <option key={year} value={String(year)}>
-                  {year}
-                </option>
-              ))}
-            </select>
-          </label>
+          {advancedFiltersOpen ? (
+            <div id="question-search-advanced-filters" className="mt-4 grid min-w-0 gap-4 rounded-xl bg-slate-50 p-4 md:grid-cols-3">
+              <label className="space-y-2">
+                <span className="text-sm font-semibold text-slate-700">科目</span>
+                <select
+                  value={selectedSubject}
+                  onChange={(event) => setSelectedSubject(event.target.value)}
+                  className="min-h-12 w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-800 outline-none transition focus:border-brand-400 focus:ring-2 focus:ring-brand-100"
+                >
+                  <option value="全部">全部科目</option>
+                  {SEARCHABLE_SUBJECTS.map((subject) => (
+                    <option key={subject.subject} value={subject.subject}>
+                      {subject.label}
+                    </option>
+                  ))}
+                </select>
+              </label>
 
-          <label className="space-y-2">
-            <span className="text-sm font-semibold text-slate-700">排序</span>
-            <select
-              value={sortMode}
-              onChange={(event) => setSortMode(event.target.value as QuestionSearchSort)}
-              className="min-h-12 w-full rounded-xl border border-slate-200 bg-slate-50/70 px-4 py-3 text-sm text-slate-800 outline-none transition focus:border-brand-400 focus:bg-white focus:ring-2 focus:ring-brand-100"
-            >
-              <option value="recent">近年優先</option>
-              <option value="oldest">早年優先</option>
-              <option value="accuracy_asc">答對率低到高</option>
-              <option value="accuracy_desc">答對率高到低</option>
-              <option value="chaos_desc">最多人「這題我們不要了」</option>
-            </select>
-          </label>
+              <label className="space-y-2">
+                <span className="text-sm font-semibold text-slate-700">年份</span>
+                <select
+                  value={selectedYear}
+                  onChange={(event) => setSelectedYear(event.target.value)}
+                  className="min-h-12 w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-800 outline-none transition focus:border-brand-400 focus:ring-2 focus:ring-brand-100"
+                >
+                  <option value="全部">全部年份</option>
+                  {yearOptions.map((year) => (
+                    <option key={year} value={String(year)}>
+                      {year}
+                    </option>
+                  ))}
+                </select>
+              </label>
+
+              <label className="space-y-2">
+                <span className="text-sm font-semibold text-slate-700">排序</span>
+                <select
+                  value={sortMode}
+                  onChange={(event) => setSortMode(event.target.value as QuestionSearchSort)}
+                  className="min-h-12 w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-800 outline-none transition focus:border-brand-400 focus:ring-2 focus:ring-brand-100"
+                >
+                  <option value="recent">近年優先</option>
+                  <option value="oldest">早年優先</option>
+                  <option value="accuracy_asc">答對率低到高</option>
+                  <option value="accuracy_desc">答對率高到低</option>
+                  <option value="chaos_desc">最多人「這題我們不要了」</option>
+                </select>
+              </label>
+
+              <div className="md:col-span-2" role="group" aria-label="展開題目後的答案顯示方式">
+                <span className="text-sm font-semibold text-slate-700">展開答案</span>
+                <div className="mt-2 grid max-w-xs grid-cols-2 gap-1 rounded-lg bg-slate-200/70 p-1">
+                  <button
+                    type="button"
+                    aria-pressed={answerDisplayMode === "practice"}
+                    onClick={() => handleAnswerDisplayModeChange("practice")}
+                    className={`min-h-10 rounded-md px-3 py-2 text-xs font-semibold transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 ${
+                      answerDisplayMode === "practice"
+                        ? "bg-white text-ink shadow-sm"
+                        : "text-slate-600 hover:bg-white/70 hover:text-ink"
+                    }`}
+                  >
+                    先隱藏答案
+                  </button>
+                  <button
+                    type="button"
+                    aria-pressed={answerDisplayMode === "direct"}
+                    onClick={() => handleAnswerDisplayModeChange("direct")}
+                    className={`min-h-10 rounded-md px-3 py-2 text-xs font-semibold transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 ${
+                      answerDisplayMode === "direct"
+                        ? "bg-white text-ink shadow-sm"
+                        : "text-slate-600 hover:bg-white/70 hover:text-ink"
+                    }`}
+                  >
+                    直接顯示答案
+                  </button>
+                </div>
+              </div>
+
+              {hasActiveSearchFilters || browseAllQuestions ? (
+                <div className="flex items-end md:justify-end">
+                  <button
+                    type="button"
+                    onClick={resetSearchFilters}
+                    className="min-h-10 rounded-xl bg-white px-4 py-2 text-sm font-semibold text-slate-700 ring-1 ring-slate-200 transition hover:bg-slate-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500"
+                  >
+                    清除篩選
+                  </button>
+                </div>
+              ) : null}
+            </div>
+          ) : null}
         </div>
 
-        <div className="flex min-h-14 flex-wrap items-center justify-between gap-3 border-t border-slate-100 bg-slate-50/70 px-5 py-3 sm:px-7">
-          <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-sm">
-            <span className="font-semibold text-slate-800">找到 {totalMatches} 題</span>
-            <span className="text-slate-500">第 {safeCurrentPage} / {totalPages} 頁</span>
-            {isKeywordPending ? <span className="font-semibold text-amber-700">搜尋整理中</span> : null}
-            {rankingStatsLoading ? <span className="font-semibold text-brand-700">排行載入中</span> : null}
-            {rankingStatsError ? (
-              <span className="flex flex-wrap items-center gap-2 text-amber-800">
-                <span>{rankingStatsError}</span>
-                <button type="button" onClick={retryRankingStats} className="font-semibold underline underline-offset-2">
-                  重試
-                </button>
-              </span>
-            ) : null}
-          </div>
-          <div className="flex w-full flex-wrap items-center justify-between gap-3 sm:w-auto sm:justify-end">
-            <div className="flex items-center gap-2" role="group" aria-label="展開題目後的答案顯示方式">
-              <span className="text-xs font-semibold text-slate-500">展開後</span>
-              <div className="grid grid-cols-2 gap-1 rounded-lg bg-slate-200/70 p-1">
-                <button
-                  type="button"
-                  aria-pressed={answerDisplayMode === "practice"}
-                  onClick={() => handleAnswerDisplayModeChange("practice")}
-                  className={`min-h-9 whitespace-nowrap rounded-md px-3 py-1.5 text-xs font-semibold transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 focus-visible:ring-offset-2 ${
-                    answerDisplayMode === "practice"
-                      ? "bg-white text-ink shadow-sm"
-                      : "text-slate-600 hover:bg-white/70 hover:text-ink"
-                  }`}
-                >
-                  先隱藏
-                </button>
-                <button
-                  type="button"
-                  aria-pressed={answerDisplayMode === "direct"}
-                  onClick={() => handleAnswerDisplayModeChange("direct")}
-                  className={`min-h-9 whitespace-nowrap rounded-md px-3 py-1.5 text-xs font-semibold transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 focus-visible:ring-offset-2 ${
-                    answerDisplayMode === "direct"
-                      ? "bg-white text-ink shadow-sm"
-                      : "text-slate-600 hover:bg-white/70 hover:text-ink"
-                  }`}
-                >
-                  直接顯示
-                </button>
-              </div>
+        <div className="min-h-14 border-t border-slate-100 bg-slate-50/70 px-5 py-3 sm:px-7">
+          {shouldShowResults ? (
+            <div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-2 text-sm">
+              <p className="min-w-0 text-slate-600">
+                <span className="font-semibold text-slate-800">找到 {totalMatches} 題</span>
+                <span className="mx-2 text-slate-300" aria-hidden="true">·</span>
+                <span className="break-words">{searchFilterSummary}</span>
+                {totalMatches > 0 ? (
+                  <span className="ml-2 whitespace-nowrap text-slate-500">第 {safeCurrentPage} / {totalPages} 頁</span>
+                ) : null}
+              </p>
+              {isKeywordPending ? <span className="font-semibold text-amber-700">搜尋整理中</span> : null}
+              {rankingStatsLoading ? <span className="font-semibold text-brand-700">排行載入中</span> : null}
+              {rankingStatsError ? (
+                <span className="flex flex-wrap items-center gap-2 text-amber-800" role="alert">
+                  <span>{rankingStatsError}</span>
+                  <button type="button" onClick={retryRankingStats} className="font-semibold underline underline-offset-2">
+                    重試
+                  </button>
+                </span>
+              ) : null}
             </div>
-            {hasActiveSearchFilters ? (
+          ) : (
+            <div className="flex flex-wrap items-center justify-between gap-3 text-sm text-slate-600">
+              <span>輸入關鍵字，或用科目、年份縮小範圍。</span>
               <button
                 type="button"
-                onClick={resetSearchFilters}
-                className="min-h-10 rounded-xl bg-white px-4 py-2 text-sm font-semibold text-slate-700 ring-1 ring-slate-200 transition hover:bg-slate-100"
+                onClick={() => setBrowseAllQuestions(true)}
+                className="min-h-10 rounded-xl bg-white px-4 py-2 font-semibold text-slate-700 ring-1 ring-slate-200 transition hover:bg-slate-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500"
               >
-                清除篩選
+                瀏覽全部題目
               </button>
-            ) : null}
-          </div>
+            </div>
+          )}
+          <p className="sr-only" role="status" aria-live="polite" aria-atomic="true">
+            {isKeywordPending
+              ? "搜尋整理中"
+              : shouldShowResults
+                ? `搜尋完成，找到 ${totalMatches} 題`
+                : "尚未開始搜尋"}
+          </p>
         </div>
       </section>
 
+      {selectedQuestionCount > 0 || pageResults.length > 0 ? (
+        <section className={`mt-4 flex flex-col gap-3 rounded-xl border border-brand-100 bg-white px-4 py-3 shadow-sm sm:flex-row sm:items-center sm:justify-between ${
+          selectedQuestionCount > 0
+            ? "sticky top-[calc(4.5rem+env(safe-area-inset-top))] z-30"
+            : ""
+        }`}>
+          <div className="min-w-0">
+            <p className="text-sm font-semibold text-ink" role="status" aria-live="polite">
+              已選 {selectedQuestionCount} 題
+            </p>
+            <p className="mt-1 text-xs leading-5 text-slate-500">
+              直接開成私人練習，不會公開，也不會建立自訂卷。
+            </p>
+          </div>
+          <div className="flex flex-wrap gap-2">
+            {pageResults.length > 0 ? (
+              <button
+                type="button"
+                onClick={toggleCurrentPageSelection}
+                className="min-h-10 rounded-xl bg-white px-4 py-2 text-sm font-semibold text-slate-700 ring-1 ring-slate-200 transition hover:bg-slate-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500"
+              >
+                {allPageQuestionsSelected ? "取消本頁" : `選取本頁 ${pageResults.length} 題`}
+              </button>
+            ) : null}
+            {selectedQuestionCount > 0 ? (
+              <button
+                type="button"
+                onClick={() => {
+                  setSelectedQuestionIds([]);
+                  setPracticeStartError("");
+                  setBlockedResumeHref("");
+                }}
+                className="min-h-10 rounded-xl bg-white px-4 py-2 text-sm font-semibold text-slate-600 ring-1 ring-slate-200 transition hover:bg-slate-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500"
+              >
+                清除已選
+              </button>
+            ) : null}
+            <button
+              type="button"
+              onClick={handleStartPrivatePractice}
+              disabled={selectedQuestionCount === 0}
+              className="min-h-10 rounded-xl bg-slate-950 px-5 py-2 text-sm font-semibold text-white transition hover:bg-black focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-40"
+            >
+              開始私人練習
+            </button>
+          </div>
+          {practiceStartError ? (
+            <div className="flex flex-wrap items-center gap-2 text-sm font-semibold text-rose-700 sm:basis-full" role="alert">
+              <span>{practiceStartError}</span>
+              {blockedResumeHref ? (
+                <button
+                  type="button"
+                  onClick={() => router.push(blockedResumeHref)}
+                  className="min-h-10 rounded-xl bg-rose-50 px-4 py-2 text-rose-800 ring-1 ring-rose-200 transition hover:bg-rose-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rose-500"
+                >
+                  繼續原測驗
+                </button>
+              ) : null}
+            </div>
+          ) : null}
+        </section>
+      ) : null}
+
       <section className="search-results-list mt-6 grid min-w-0 gap-4">
-        {pageResults.length === 0 ? (
+        {!shouldShowResults ? (
+          <div className="workspace-empty-state">
+            <p className="font-semibold text-slate-700">先找出想練的題目</p>
+            <p className="mt-2 text-sm font-normal text-slate-500">
+              搜尋題幹、選項、章節或題號；也可以展開進階篩選依科目與年份找題。
+            </p>
+          </div>
+        ) : pageResults.length === 0 ? (
           <div className="workspace-empty-state">
             目前沒有符合條件的題目。
           </div>
@@ -765,6 +1057,8 @@ export default function SearchPage() {
             const favoriteRecord = searchFavorites[renderedQuestion.id];
             const isFavorited = Boolean(favoriteRecord);
             const isExpanded = Boolean(expandedQuestionIds[renderedQuestion.id]);
+            const isSelectedForPractice = selectedQuestionIdSet.has(renderedQuestion.id);
+            const detailsId = `search-result-details-${renderedQuestion.id.replace(/[^A-Za-z0-9_-]/g, "-")}`;
             const isAnswerRevealed = Boolean(revealedAnswerIds[renderedQuestion.id]);
             const shouldShowAnswer = answerDisplayMode === "direct" || isAnswerRevealed;
             const ranking = rankingStats[renderedQuestion.id];
@@ -778,24 +1072,24 @@ export default function SearchPage() {
                   : renderedQuestion.answer;
 
             return (
-            <details
+            <article
               key={renderedQuestion.id}
-              onToggle={(event) => {
-                const open = event.currentTarget.open;
-                setExpandedQuestionIds((current) => {
-                  if (current[renderedQuestion.id] === open) return current;
-                  return {
-                    ...current,
-                    [renderedQuestion.id]: open
-                  };
-                });
-              }}
               className={`search-result-card workspace-section min-w-0 max-w-full ${
                 isExpanded ? "overflow-visible" : "overflow-hidden"
               }`}
             >
-              <summary className="min-w-0 cursor-pointer list-none px-4 py-4 transition hover:bg-slate-50/70 sm:px-5">
-                <div className="flex min-w-0 flex-wrap items-start justify-between gap-4">
+              <div className="flex min-w-0 flex-col gap-3 px-4 py-4 sm:flex-row sm:items-start sm:px-5">
+                <button
+                  type="button"
+                  aria-expanded={isExpanded}
+                  aria-controls={detailsId}
+                  onClick={() => setExpandedQuestionIds((current) => ({
+                    ...current,
+                    [renderedQuestion.id]: !isExpanded
+                  }))}
+                  className="min-w-0 flex-1 rounded-lg text-left transition hover:bg-slate-50/70 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 focus-visible:ring-offset-2"
+                >
+                  <div className="flex min-w-0 flex-wrap items-start justify-between gap-4">
                   <div className="min-w-0 flex-1">
                     <div className="flex flex-wrap gap-2 text-xs font-semibold">
                       {shouldDisplaySubjectBesidePrimaryTag(renderedQuestion) ? (
@@ -834,10 +1128,23 @@ export default function SearchPage() {
                     </span>
                   </div>
                 </div>
-              </summary>
+                </button>
+                <button
+                  type="button"
+                  aria-pressed={isSelectedForPractice}
+                  onClick={() => toggleSelectedQuestion(renderedQuestion.id)}
+                  className={`min-h-10 shrink-0 rounded-xl px-4 py-2 text-sm font-semibold transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 focus-visible:ring-offset-2 ${
+                    isSelectedForPractice
+                      ? "bg-brand-700 text-white hover:bg-brand-800"
+                      : "bg-white text-slate-700 ring-1 ring-slate-200 hover:bg-brand-50 hover:text-brand-800"
+                  }`}
+                >
+                  {isSelectedForPractice ? "已選入練習" : "選入練習"}
+                </button>
+              </div>
 
               {isExpanded ? (
-              <div className="search-result-details min-w-0 max-w-full border-t border-slate-100 px-4 py-4 text-sm leading-7 text-slate-700 sm:px-5 sm:py-5">
+              <div id={detailsId} className="search-result-details min-w-0 max-w-full border-t border-slate-100 px-4 py-4 text-sm leading-7 text-slate-700 sm:px-5 sm:py-5">
                 {answerDisplayMode === "direct" ? (
                   <div className="search-result-answer-bar">
                     <p className="flex min-w-0 items-baseline gap-2">
@@ -961,12 +1268,14 @@ export default function SearchPage() {
                       </>
                     )}
                   />
-                  {error ? <p className="text-sm font-medium text-rose-700">{error}</p> : null}
+                  {error ? <p className="text-sm font-medium text-rose-700" role="alert">{error}</p> : null}
                 </div>
                 ) : null}
               </div>
-              ) : null}
-            </details>
+              ) : (
+                <span id={detailsId} hidden />
+              )}
+            </article>
           );
           })
         )}
@@ -998,8 +1307,15 @@ export default function SearchPage() {
 
       <button
         type="button"
-        onClick={() => setFavoriteBankOpen(true)}
-        className="fixed bottom-[max(1.25rem,env(safe-area-inset-bottom))] right-5 z-40 inline-flex h-14 w-14 items-center justify-center rounded-full bg-slate-950 text-white shadow-2xl ring-1 ring-white/40 transition hover:-translate-y-0.5 hover:bg-black focus:outline-none focus:ring-4 focus:ring-brand-100"
+        onClick={(event) => {
+          if (favoriteDialogReturnFocusFrameRef.current !== null) {
+            window.cancelAnimationFrame(favoriteDialogReturnFocusFrameRef.current);
+            favoriteDialogReturnFocusFrameRef.current = null;
+          }
+          favoriteDialogPreviouslyFocusedRef.current = event.currentTarget;
+          setFavoriteBankOpen(true);
+        }}
+        className="fixed bottom-[calc(5.75rem+env(safe-area-inset-bottom))] right-5 z-40 inline-flex h-14 w-14 items-center justify-center rounded-full bg-slate-950 text-white shadow-2xl ring-1 ring-white/40 transition hover:-translate-y-0.5 hover:bg-black focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-brand-100 md:bottom-[max(1.25rem,env(safe-area-inset-bottom))]"
         aria-label="開啟儲存題目"
       >
         <span className="text-xl leading-none">☆</span>
@@ -1010,23 +1326,26 @@ export default function SearchPage() {
         ) : null}
       </button>
 
-      {favoriteBankOpen ? (
+      {favoriteBankOpen && typeof document !== "undefined" ? createPortal(
         <div
           className="fixed inset-0 z-[140] bg-slate-950/35 p-3 backdrop-blur-sm sm:p-5"
           role="dialog"
           aria-modal="true"
-          aria-label="搜尋儲存題目"
+          aria-labelledby="search-favorite-dialog-title"
+          aria-describedby="search-favorite-dialog-description"
           onClick={() => setFavoriteBankOpen(false)}
         >
           <section
+            ref={favoriteDialogRef}
+            tabIndex={-1}
             className="ml-auto flex h-full w-full max-w-2xl flex-col overflow-hidden rounded-xl bg-white shadow-2xl ring-1 ring-slate-200"
             onClick={(event) => event.stopPropagation()}
           >
             <div className="flex items-start justify-between gap-3 border-b border-slate-100 p-5">
               <div>
                 <p className="text-xs font-semibold uppercase tracking-[0.2em] text-brand-700">Saved Bank</p>
-                <h2 className="mt-1 text-2xl font-bold text-ink">儲存題目</h2>
-                <p className="mt-2 text-sm text-slate-500">
+                <h2 id="search-favorite-dialog-title" className="mt-1 text-2xl font-bold text-ink">儲存題目</h2>
+                <p id="search-favorite-dialog-description" className="mt-2 text-sm text-slate-500">
                   {activeFavoriteCount > 0
                     ? `還有 ${activeFavoriteCount} 題待練，${completedFavoriteCount} 題已答對兩次。`
                     : searchFavoriteRecords.length > 0
@@ -1035,9 +1354,10 @@ export default function SearchPage() {
                 </p>
               </div>
               <button
+                ref={favoriteCloseButtonRef}
                 type="button"
                 onClick={() => setFavoriteBankOpen(false)}
-                className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-slate-100 text-xl font-bold text-slate-700 transition hover:bg-slate-200"
+                className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-slate-100 text-xl font-bold text-slate-700 transition hover:bg-slate-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 focus-visible:ring-offset-2"
                 aria-label="關閉儲存題目"
               >
                 ×
@@ -1146,6 +1466,8 @@ export default function SearchPage() {
                     </button>
                     {favoriteAnswerFeedback?.questionId === favoritePracticeItem.question.id ? (
                       <span
+                        role="status"
+                        aria-live="polite"
                         className={`rounded-full px-3 py-1 text-xs font-semibold ${
                           favoriteAnswerFeedback.isCorrect
                             ? "bg-emerald-100 text-emerald-800"
@@ -1158,7 +1480,11 @@ export default function SearchPage() {
                   </div>
                 </section>
               ) : (
-                <section className="rounded-[1.5rem] border border-dashed border-slate-200 bg-slate-50 p-5 text-sm font-medium text-slate-500">
+                <section
+                  className="rounded-[1.5rem] border border-dashed border-slate-200 bg-slate-50 p-5 text-sm font-medium text-slate-500"
+                  role="status"
+                  aria-live="polite"
+                >
                   {savedAISimulationQuestionsLoading
                     ? "正在整理儲存題目。"
                     : searchFavoriteRecords.length > 0
@@ -1234,7 +1560,8 @@ export default function SearchPage() {
               ) : null}
             </div>
           </section>
-        </div>
+        </div>,
+        document.body
       ) : null}
     </main>
   );

@@ -54,6 +54,7 @@ import {
   getModeLabel
 } from "@/lib/quizAnalysis";
 import {
+  getQuizUrlAfterConsumingLaunchIntent,
   getQuizSessionNavigationIntent,
   getRequestedResumeStatus
 } from "@/lib/quizSessionNavigation";
@@ -87,6 +88,7 @@ import {
 } from "@/lib/savedQuestions";
 import { getAISimulationPaperKeyFromQuestionId } from "@/lib/savedQuestionBank";
 import { isSavedQuestionReviewSettings } from "@/lib/savedQuestionReview";
+import { getSimulationTimerPresentation } from "@/lib/simulationPaperStats";
 import {
   Attempt,
   ConfidenceLevel,
@@ -1043,8 +1045,14 @@ export default function QuizPage() {
         const directSubject = params?.get("subject");
         const startSettingsResolution = resolveStartSettingsFromSearchParams(params);
         if (startSettingsResolution.error) {
-          clearCurrentSession();
           setSession(null);
+          if (typeof window !== "undefined") {
+            window.history.replaceState(
+              window.history.state,
+              "",
+              getQuizUrlAfterConsumingLaunchIntent(window.location.href)
+            );
+          }
           const message =
             startSettingsResolution.error === "too-large"
               ? "這次待複習題池太大，瀏覽器暫時無法交接到測驗頁；請回到錯題複習頁再按一次開始。"
@@ -1175,6 +1183,16 @@ export default function QuizPage() {
         setSession(nextSession);
         saveCurrentSession(nextSession);
         scheduleCurrentSessionCloudSync(nextSession);
+        if (
+          typeof window !== "undefined" &&
+          (navigationIntent.forceNew || startSettingsFromUrl)
+        ) {
+          window.history.replaceState(
+            window.history.state,
+            "",
+            getQuizUrlAfterConsumingLaunchIntent(window.location.href, nextSession.id)
+          );
+        }
 
         const currentQuestionId = nextSession.questionOrder?.[nextSession.currentQuestionIndex ?? 0];
         const currentAttempt =
@@ -1595,6 +1613,9 @@ export default function QuizPage() {
         ? simulationExamTimerStateRef.current
         : loadSimulationExamTimerState(session);
     const elapsedSeconds = getSimulationExamTimerElapsedSeconds(currentTimerState);
+    const durationSeconds =
+      currentTimerState?.durationSeconds ?? SIMULATION_EXAM_TIMER_DURATION_SECONDS;
+    if (elapsedSeconds >= durationSeconds) return;
     const nextTimerState: SimulationExamTimerState = currentTimerState?.paused
       ? {
           durationSeconds: currentTimerState.durationSeconds,
@@ -1604,8 +1625,7 @@ export default function QuizPage() {
           updatedAt: Date.now()
         }
       : {
-          durationSeconds:
-            currentTimerState?.durationSeconds ?? SIMULATION_EXAM_TIMER_DURATION_SECONDS,
+          durationSeconds,
           accumulatedSeconds: elapsedSeconds,
           runningSince: null,
           paused: true,
@@ -2487,7 +2507,7 @@ export default function QuizPage() {
             QUIZ RECOVERY
           </p>
           <h1 className="mt-3 text-3xl font-black text-slate-950">題目載入卡住了</h1>
-          <p className="mt-3 max-w-2xl text-base font-bold leading-8 text-slate-600">
+          <p className="mt-3 max-w-2xl text-base font-bold leading-8 text-slate-600" role="alert">
             {message}
           </p>
           <div className="mt-6 flex flex-wrap gap-3">
@@ -2538,17 +2558,15 @@ export default function QuizPage() {
   const shouldShowCorrectAnswer = feedbackMode === "full" || feedbackMode === "answer_only";
   const simulationTimerDurationSeconds =
     session.simulationTimerDurationSeconds ?? SIMULATION_EXAM_TIMER_DURATION_SECONDS;
-  const simulationTimerRemainingSeconds = Math.max(
-    0,
-    simulationTimerDurationSeconds - simulationTimerElapsedSeconds
-  );
-  const simulationTimerProgress = Math.min(
-    100,
-    Math.max(0, (simulationTimerElapsedSeconds / simulationTimerDurationSeconds) * 100)
-  );
+  const simulationTimerPresentation = getSimulationTimerPresentation({
+    durationSeconds: simulationTimerDurationSeconds,
+    elapsedSeconds: simulationTimerElapsedSeconds,
+    paused: simulationTimerPaused
+  });
+  const simulationTimerRemainingSeconds = simulationTimerPresentation.remainingSeconds;
+  const simulationTimerProgress = simulationTimerPresentation.progressPercent;
   const simulationTimerExpired =
-    session.settings?.mode === "simulation" &&
-    simulationTimerElapsedSeconds >= simulationTimerDurationSeconds;
+    session.settings?.mode === "simulation" && simulationTimerPresentation.expired;
   const canEndReviewPracticeAfterSubmitted =
     session.settings?.mode === "review" &&
     [
@@ -2912,13 +2930,19 @@ export default function QuizPage() {
                       {formatDurationClock(simulationTimerRemainingSeconds)}
                     </p>
                   </div>
-                  <button
-                    type="button"
-                    onClick={handleToggleSimulationTimerPaused}
-                    className="shrink-0 rounded-full bg-white px-3 py-2 text-xs font-black text-emerald-800 shadow-sm ring-1 ring-emerald-200 transition hover:bg-emerald-50"
-                  >
-                    {simulationTimerPaused ? "繼續" : "暫停"}
-                  </button>
+                  {simulationTimerPresentation.canTogglePause ? (
+                    <button
+                      type="button"
+                      onClick={handleToggleSimulationTimerPaused}
+                      className="shrink-0 rounded-full bg-white px-3 py-2 text-xs font-black text-emerald-800 shadow-sm ring-1 ring-emerald-200 transition hover:bg-emerald-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2"
+                    >
+                      {simulationTimerPresentation.controlLabel}
+                    </button>
+                  ) : (
+                    <span className="shrink-0 rounded-full bg-amber-50 px-3 py-2 text-xs font-black text-amber-800 ring-1 ring-amber-200">
+                      {simulationTimerPresentation.controlLabel}
+                    </span>
+                  )}
                 </div>
                 <div className="mt-4 h-2 overflow-hidden rounded-full bg-emerald-100">
                   <div
@@ -2928,12 +2952,12 @@ export default function QuizPage() {
                     style={{ width: `${simulationTimerProgress}%` }}
                   />
                 </div>
-                <p className="mt-3 text-xs font-semibold leading-5 text-slate-600">
-                  {simulationTimerExpired
-                    ? "時間到也不會自動交卷，可以繼續寫完。"
-                    : simulationTimerPaused
-                      ? "已暫停，按繼續後才會接著計時。"
-                      : "只用來控時，不會自動交卷。"}
+                <p
+                  className="mt-3 text-xs font-semibold leading-5 text-slate-600"
+                  role={simulationTimerExpired ? "status" : undefined}
+                  aria-live={simulationTimerExpired ? "polite" : undefined}
+                >
+                  {simulationTimerPresentation.statusMessage}
                 </p>
               </div>
             </div>

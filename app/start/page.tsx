@@ -1,9 +1,11 @@
 "use client";
 
-import Link from "next/link";
-import { useEffect, useMemo, useState } from "react";
+import { ArrowLeft, ArrowRight } from "lucide-react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/components/AuthProvider";
+import { ProgressPracticeSetup } from "@/components/ProgressPracticeSetup";
+import { useQuestionOrderMode } from "@/components/QuestionOrderModeControl";
 import { useCloudHistoryHydration } from "@/components/useCloudHistoryHydration";
 import { enabledSubjects, MED1_SUBJECTS, MED2_SUBJECTS } from "@/data/subjectRegistry";
 import { getQuestionBankBySubjects, getSeasonalLimitedQuestions } from "@/data/med1QuestionBank";
@@ -25,6 +27,8 @@ import {
   loadPracticeYearRange,
   loadCompletedHistorySessionsForUser,
   loadCurrentSessionForUser,
+  savePracticeQuestionCount,
+  savePracticeStopAfterReview,
   savePracticeYearRange,
   saveQuizSettings,
   type PracticeQuestionCount,
@@ -38,12 +42,12 @@ import {
 import {
   MAX_PRACTICE_SOURCE_YEAR,
   MIN_PRACTICE_SOURCE_YEAR,
-  PRACTICE_YEAR_OPTIONS,
   normalizePracticeYearRange
 } from "@/lib/practiceYears";
 import { buildNewQuizHref } from "@/lib/startSettingsUrl";
 import { getSupabaseBrowserClient } from "@/lib/supabase/client";
-import type { Question, QuestionClassificationOverride, QuizSettings, SubjectName } from "@/types/quiz";
+import type { ProgressPracticeQuestionCount } from "@/lib/progressPractice";
+import type { QuestionClassificationOverride, QuizSettings, SubjectName } from "@/types/quiz";
 
 const selectableSubjects = enabledSubjects.filter(
   (item) =>
@@ -55,7 +59,9 @@ const selectableSubjects = enabledSubjects.filter(
 export default function StartPage() {
   const router = useRouter();
   const { user, syncVersion } = useAuth();
+  const { mode: orderMode, setMode: setOrderMode, prioritizeUnseen } = useQuestionOrderMode();
   const cloudHistoryHydrating = useCloudHistoryHydration();
+  const stepHeadingRef = useRef<HTMLHeadingElement | null>(null);
   const med1Subjects = selectableSubjects.filter((item) => MED1_SUBJECTS.includes(item.subject));
   const med2Subjects = selectableSubjects.filter((item) => MED2_SUBJECTS.includes(item.subject));
   const [selectedSubjects, setSelectedSubjects] = useState<SubjectName[]>([]);
@@ -88,6 +94,7 @@ export default function StartPage() {
   const [practiceYearRange, setPracticeYearRange] = useState<PracticeYearRange>(defaultPracticeYearRange);
   const [practiceQuestionCount, setPracticeQuestionCount] = useState<PracticeQuestionCount>(10);
   const [practiceStopAfterReview, setPracticeStopAfterReview] = useState(false);
+  const [setupStep, setSetupStep] = useState<"subjects" | "settings">("subjects");
   const [attemptedQuestionIds, setAttemptedQuestionIds] = useState<Set<string>>(() => new Set());
   const [historyOwnerKey, setHistoryOwnerKey] = useState<string | null>(null);
   const [classificationOverrides, setClassificationOverrides] = useState<Record<string, QuestionClassificationOverride>>({});
@@ -170,6 +177,24 @@ export default function StartPage() {
       : baseSubjects;
   }, [selectedMicrobiologyTracks.length, selectedSubjects]);
 
+  const selectedRangeCount = effectiveSelectedSubjects.length + (includeSeasonalLimited ? 1 : 0);
+  const selectedRangeLabel = useMemo(() => {
+    const labels = effectiveSelectedSubjects.map(
+      (subject) => {
+        const subjectLabel = selectableSubjects.find((item) => item.subject === subject)?.label ?? subject;
+        if (subject !== MICROBIOLOGY_SUBJECT) return subjectLabel;
+        const trackLabels = getSubjectTrackLabels(MICROBIOLOGY_SUBJECT, selectedMicrobiologyTracks);
+        const allTrackCount = getAllSubjectTrackKeys(MICROBIOLOGY_SUBJECT).length;
+        return trackLabels.length > 0 && trackLabels.length < allTrackCount
+          ? `${subjectLabel}（${trackLabels.join("、")}）`
+          : subjectLabel;
+      }
+    );
+    if (includeSeasonalLimited) labels.push("季節限定生殖範圍");
+    if (labels.length <= 3) return labels.join("、");
+    return `${labels.slice(0, 2).join("、")}等 ${labels.length} 個範圍`;
+  }, [effectiveSelectedSubjects, includeSeasonalLimited, selectedMicrobiologyTracks]);
+
   const selectedSubjectQuestionPool = useMemo(() => {
     if (effectiveSelectedSubjects.length === 0) return [];
 
@@ -241,6 +266,12 @@ export default function StartPage() {
   const willFillWithSeenQuestions =
     availableQuestionCount > 0 &&
     unattemptedAvailableQuestionCount < effectiveQuestionCount;
+
+  function moveToStep(nextStep: "subjects" | "settings") {
+    setSetupStep(nextStep);
+    window.scrollTo({ top: 0, behavior: "auto" });
+    window.setTimeout(() => stepHeadingRef.current?.focus({ preventScroll: true }), 0);
+  }
 
   function toggleSubject(subject: SubjectName) {
     if (subject === MICROBIOLOGY_SUBJECT) {
@@ -352,6 +383,33 @@ export default function StartPage() {
     });
   }
 
+  function handlePracticeQuestionCountChange(nextCount: ProgressPracticeQuestionCount) {
+    const stopAfterReview = nextCount === "all";
+    setPracticeStopAfterReview(stopAfterReview);
+    savePracticeStopAfterReview(stopAfterReview);
+
+    const metadataPatch: Record<string, boolean | number> = {
+      practice_stop_after_review: stopAfterReview
+    };
+    if (nextCount !== "all") {
+      setPracticeQuestionCount(nextCount);
+      savePracticeQuestionCount(nextCount);
+      metadataPatch.practice_question_count = nextCount;
+    }
+
+    if (!user) return;
+    void getSupabaseBrowserClient().auth.updateUser({
+      data: {
+        ...user.user_metadata,
+        ...metadataPatch
+      }
+    }).then(({ error }) => {
+      if (error) console.error("Practice question count sync skipped:", error);
+    }).catch((error) => {
+      console.error("Practice question count sync skipped:", error);
+    });
+  }
+
   function renderSubjectGroup(
     title: string,
     subjects: typeof selectableSubjects
@@ -367,6 +425,7 @@ export default function StartPage() {
           <button
             type="button"
             onClick={() => toggleSubjectGroup(subjects)}
+            aria-pressed={groupFullySelected}
             className={`min-h-9 whitespace-nowrap rounded-lg px-3 py-2 text-xs font-semibold transition sm:min-h-10 sm:text-sm ${
               groupFullySelected
                 ? "bg-brand-600 text-white hover:bg-brand-700"
@@ -411,6 +470,7 @@ export default function StartPage() {
                     type="button"
                     onClick={() => toggleSubject(subject.subject)}
                     className="w-full text-left"
+                    aria-label={`全選${subject.label}`}
                     aria-expanded={expanded}
                     aria-pressed={active}
                   >
@@ -444,6 +504,7 @@ export default function StartPage() {
                       setTrackExpanded(trackedSubject, (current) => !current);
                     }}
                     className="mt-2 rounded-lg bg-slate-100 px-3 py-1.5 text-xs font-semibold text-slate-600 transition hover:bg-slate-200"
+                    aria-label={`${subject.label}${expanded ? "收合分類" : "選分類"}`}
                     aria-expanded={expanded}
                   >
                     {expanded ? "收合分類" : "選分類"}
@@ -464,6 +525,8 @@ export default function StartPage() {
                             key={track.key}
                             type="button"
                             onClick={() => toggleSubjectTrack(trackedSubject, track.key)}
+                            aria-pressed={trackActive}
+                            aria-label={`${subject.label}：${track.label}`}
                             className={`rounded-lg border px-3 py-3 text-center text-sm font-semibold transition ${
                               trackActive
                                 ? "border-brand-500 bg-brand-600 text-white shadow-sm"
@@ -489,14 +552,14 @@ export default function StartPage() {
                 type="button"
                 onClick={() => toggleSubject(subject.subject)}
                 aria-pressed={active}
-                className={`rounded-lg border p-3 text-left transition sm:p-4 ${
+                className={`min-w-0 rounded-lg border p-3 text-left transition sm:p-4 ${
                   active
                     ? "border-brand-400 bg-white shadow-card ring-1 ring-brand-200"
                     : "border-slate-200/80 bg-white/80 hover:bg-white"
                 }`}
               >
                 <div className="flex min-h-12 flex-col justify-center gap-1 sm:min-h-14">
-                  <h3 className="whitespace-nowrap text-sm font-semibold leading-snug text-ink sm:text-lg">
+                  <h3 className="min-w-0 break-words text-sm font-semibold leading-snug text-ink sm:text-lg">
                     {subject.label}
                   </h3>
                   <div className="flex items-center justify-between gap-2">
@@ -533,8 +596,9 @@ export default function StartPage() {
           .filter((question) => !excludeAiGenerated || question.sourceType !== "AI_GENERATED")
           .map((question) => question.id)
       : undefined;
-    const priorityQuestionIds =
-      unattemptedAvailableQuestionIds.length > 0 && unattemptedAvailableQuestionIds.length <= 80
+    const priorityQuestionIds = prioritizeUnseen
+      ? unattemptedAvailableQuestionIds
+      : unattemptedAvailableQuestionIds.length > 0 && unattemptedAvailableQuestionIds.length <= 80
         ? unattemptedAvailableQuestionIds
         : undefined;
 
@@ -577,162 +641,149 @@ export default function StartPage() {
   return (
     <main id="main-content" className="shell workspace-page">
       <section className="workspace-section workspace-page-panel p-5 sm:p-6">
-        <div className="flex items-start justify-between gap-4">
-          <div className="min-w-0">
-            <p className="workspace-page-kicker">開始測驗</p>
-            <div className="mt-2 flex items-start justify-between gap-3">
-              <h1 className="workspace-page-title">先選抽哪些科</h1>
-            </div>
-            <p className="body-soft mt-2 max-w-2xl text-sm leading-6">
-              選科目與年份後開始練習。
-              {practiceStopAfterReview
-                ? " 每題詳解後都可結束。"
-                : ` 本輪 ${practiceQuestionCount} 題。`}
-            </p>
-          </div>
+        {setupStep === "settings" ? (
+          <button
+            type="button"
+            onClick={() => moveToStep("subjects")}
+            className="mb-4 inline-flex min-h-10 items-center gap-2 rounded-lg px-2 text-sm font-semibold text-brand-700 transition hover:bg-brand-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500"
+          >
+            <ArrowLeft size={16} aria-hidden="true" />
+            返回選科
+          </button>
+        ) : null}
+
+        <div className="min-w-0">
+          <p className="workspace-page-kicker">
+            開始測驗・{setupStep === "subjects" ? "選範圍" : "作答設定"}
+          </p>
+          <h1
+            ref={stepHeadingRef}
+            tabIndex={-1}
+            className="workspace-page-title focus:outline-none focus-visible:rounded-sm focus-visible:ring-2 focus-visible:ring-brand-500 focus-visible:ring-offset-2"
+          >
+            {setupStep === "subjects" ? "這次想練什麼？" : "設定這次練習"}
+          </h1>
+          <p className="body-soft mt-2 max-w-2xl text-sm leading-6">
+            {setupStep === "subjects"
+              ? "可選一科、多科或直接全選；選好再設定年份、題數與順序。"
+              : "確認範圍後再開刷，返回選科仍會保留剛才的選擇。"}
+          </p>
         </div>
 
-        <div className="mt-6 space-y-6">
-          {renderSubjectGroup("醫學一", med1Subjects)}
-          {renderSubjectGroup("醫學二", med2Subjects)}
-          {seasonalAvailable ? (
-            <section className="custom-paper-subsection border-amber-200 bg-[rgba(255,247,232,0.9)]">
-              <div>
-                <h2 className="text-2xl font-semibold text-ink">季節限定</h2>
+        {setupStep === "subjects" ? (
+          <>
+            <section aria-label="已選範圍" className="start-selection-bar mt-5">
+              <div className="min-w-0" aria-live="polite">
+                <p className="text-xs font-semibold text-slate-500">已選範圍</p>
+                <p className="mt-1 truncate text-sm font-semibold text-ink">
+                  {selectedRangeCount > 0 ? selectedRangeLabel : "尚未選擇"}
+                </p>
               </div>
-
-              <div className="mt-4">
+              <div className="grid shrink-0 grid-cols-[auto_auto] gap-2">
                 <button
                   type="button"
-                  onClick={() => setIncludeSeasonalLimited((current) => !current)}
-                  className={`w-full rounded-lg border p-4 text-left transition ${
-                    includeSeasonalLimited
-                      ? "border-amber-500 bg-amber-100 ring-2 ring-amber-200"
-                      : "border-amber-200 bg-white hover:bg-amber-50"
-                  }`}
+                  onClick={selectAllSubjects}
+                  className="secondary-pill whitespace-nowrap bg-white px-3 py-2 text-sm"
                 >
-                  <div className="flex items-center justify-between gap-3">
-                    <h3 className="text-lg font-semibold text-ink">生理學・生殖範圍</h3>
-                    <span
-                      className={`rounded-full px-3 py-1 text-xs font-semibold ${
-                        includeSeasonalLimited
-                          ? "bg-amber-600 text-white"
-                          : "bg-white text-slate-500 ring-1 ring-slate-200"
-                      }`}
-                    >
-                      {includeSeasonalLimited ? "已選擇" : "未選"}
-                    </span>
-                  </div>
-                  <p className="mt-3 text-sm text-slate-600">{seasonalLimitedPastExamCount} 題</p>
+                  全選
+                </button>
+                <button
+                  type="button"
+                  onClick={() => moveToStep("settings")}
+                  disabled={selectedRangeCount === 0}
+                  className="primary-pill inline-flex min-h-10 items-center justify-center gap-1.5 whitespace-nowrap px-4 py-2 text-sm disabled:cursor-not-allowed disabled:bg-slate-300"
+                >
+                  下一步
+                  <ArrowRight size={15} aria-hidden="true" />
                 </button>
               </div>
             </section>
-          ) : null}
-        </div>
 
-        <section
-          aria-label="抽題設定"
-          className="surface-card-muted mt-5 grid gap-3 p-4 xl:grid-cols-[minmax(0,1fr)_auto] xl:items-end"
-        >
-          <div className="min-w-0 space-y-2">
-            <div className="flex flex-wrap items-center gap-x-3 gap-y-2 text-sm text-slate-700">
-              <details className="group relative">
-                <summary className="flex min-h-10 cursor-pointer list-none items-center gap-2 rounded-xl border border-slate-200 bg-white px-3 py-2 font-semibold text-ink shadow-sm transition hover:border-brand-300 hover:bg-brand-50/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-200 [&::-webkit-details-marker]:hidden">
-                  <span className="text-xs font-semibold text-slate-500">年份</span>
-                  <span>{practiceYearRange.yearFrom}-{practiceYearRange.yearTo}</span>
-                  <span className="text-xs text-slate-400 transition group-open:rotate-180" aria-hidden="true">⌄</span>
-                </summary>
-                <div className="absolute bottom-[calc(100%+0.55rem)] left-0 z-20 w-[min(19rem,calc(100vw-4rem))] rounded-2xl border border-slate-200 bg-white p-4 shadow-xl">
-                  <p className="text-sm font-semibold text-ink">抽題年份</p>
-                  <div className="mt-3 grid grid-cols-2 gap-3">
-                    <label className="grid gap-1.5 text-xs font-semibold text-slate-500" htmlFor="practice-year-from">
-                      起始年份
-                      <select
-                        id="practice-year-from"
-                        value={practiceYearRange.yearFrom}
-                        onChange={(event) => {
-                          const nextFrom = Number(event.target.value);
-                          handlePracticeYearRangeChange({
-                            yearFrom: nextFrom,
-                            yearTo: Math.max(nextFrom, practiceYearRange.yearTo)
-                          });
-                        }}
-                        className="min-h-11 rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm font-semibold text-ink outline-none transition focus:border-brand-500 focus:ring-2 focus:ring-brand-100"
-                      >
-                        {PRACTICE_YEAR_OPTIONS.map((year) => (
-                          <option key={`start-from-${year}`} value={year}>{year}</option>
-                        ))}
-                      </select>
-                    </label>
-                    <label className="grid gap-1.5 text-xs font-semibold text-slate-500" htmlFor="practice-year-to">
-                      結束年份
-                      <select
-                        id="practice-year-to"
-                        value={practiceYearRange.yearTo}
-                        onChange={(event) => {
-                          const nextTo = Number(event.target.value);
-                          handlePracticeYearRangeChange({
-                            yearFrom: Math.min(practiceYearRange.yearFrom, nextTo),
-                            yearTo: nextTo
-                          });
-                        }}
-                        className="min-h-11 rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm font-semibold text-ink outline-none transition focus:border-brand-500 focus:ring-2 focus:ring-brand-100"
-                      >
-                        {PRACTICE_YEAR_OPTIONS.map((year) => (
-                          <option key={`start-to-${year}`} value={year}>{year}</option>
-                        ))}
-                      </select>
-                    </label>
+            <div className="mt-6 space-y-6">
+              {renderSubjectGroup("醫學一", med1Subjects)}
+              {renderSubjectGroup("醫學二", med2Subjects)}
+              {seasonalAvailable ? (
+                <section className="custom-paper-subsection border-amber-200 bg-[rgba(255,247,232,0.9)]">
+                  <div>
+                    <h2 className="text-2xl font-semibold text-ink">季節限定</h2>
                   </div>
-                </div>
-              </details>
-              {practiceHistoryReady ? (
-                <span className="font-medium" aria-live="polite">
-                  <span className="font-semibold tabular-nums text-ink">
-                    {effectiveSelectedSubjects.length + (includeSeasonalLimited ? 1 : 0)}
-                  </span>{" "}
-                  個範圍・
-                  <span className="font-semibold tabular-nums text-ink">{availableQuestionCount}</span>{" "}
-                  題可練
-                </span>
-              ) : (
-                <span className="font-semibold text-brand-800">正在整理作答紀錄</span>
-              )}
+
+                  <div className="mt-4">
+                    <button
+                      type="button"
+                      onClick={() => setIncludeSeasonalLimited((current) => !current)}
+                      aria-pressed={includeSeasonalLimited}
+                      className={`w-full rounded-lg border p-4 text-left transition ${
+                        includeSeasonalLimited
+                          ? "border-amber-500 bg-amber-100 ring-2 ring-amber-200"
+                          : "border-amber-200 bg-white hover:bg-amber-50"
+                      }`}
+                    >
+                      <div className="flex items-center justify-between gap-3">
+                        <h3 className="text-lg font-semibold text-ink">生理學・生殖範圍</h3>
+                        <span
+                          className={`rounded-full px-3 py-1 text-xs font-semibold ${
+                            includeSeasonalLimited
+                              ? "bg-amber-600 text-white"
+                              : "bg-white text-slate-500 ring-1 ring-slate-200"
+                          }`}
+                        >
+                          {includeSeasonalLimited ? "已選擇" : "未選"}
+                        </span>
+                      </div>
+                      <p className="mt-3 text-sm text-slate-600">{seasonalLimitedPastExamCount} 題</p>
+                    </button>
+                  </div>
+                </section>
+              ) : null}
             </div>
+          </>
+        ) : (
+          <div className="mt-6 space-y-4">
+            <section className="rounded-lg border border-slate-200 bg-white px-4 py-3" aria-label="本次練習範圍">
+              <div className="flex items-center justify-between gap-4">
+                <div className="min-w-0">
+                  <p className="text-xs font-semibold text-slate-500">本次範圍</p>
+                  <p className="mt-1 text-sm font-semibold text-ink">{selectedRangeLabel}</p>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => moveToStep("subjects")}
+                  className="shrink-0 rounded-lg px-3 py-2 text-sm font-semibold text-brand-700 transition hover:bg-brand-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500"
+                >
+                  更改
+                </button>
+              </div>
+            </section>
+
+            {!practiceHistoryReady ? (
+              <div className="workspace-empty-state" aria-live="polite">
+                正在整理作答紀錄，完成後就能開始。
+              </div>
+            ) : (
+              <ProgressPracticeSetup
+                idPrefix="general-practice"
+                label={selectedRangeLabel || "一般練習"}
+                availableQuestionCount={availableQuestionCount}
+                questionCount={practiceStopAfterReview ? "all" : practiceQuestionCount}
+                yearRange={practiceYearRange}
+                orderMode={orderMode}
+                onQuestionCountChange={handlePracticeQuestionCountChange}
+                onYearRangeChange={handlePracticeYearRangeChange}
+                onOrderModeChange={setOrderMode}
+                onStart={handleStart}
+              />
+            )}
+
             {practiceHistoryReady && willFillWithSeenQuestions ? (
-              <p className="text-xs font-semibold text-amber-700">
+              <p className="rounded-lg bg-amber-50 px-4 py-3 text-xs font-semibold text-amber-800" aria-live="polite">
                 {unattemptedAvailableQuestionCount === 0
-                  ? "未做題已清空，接著會複習最久沒做的題。"
-                  : `先出 ${unattemptedAvailableQuestionCount} 題未做，再補舊題。`}
+                  ? "這個範圍的未做題已清空，接著會複習最久沒做的題。"
+                  : `會先出 ${unattemptedAvailableQuestionCount} 題未做，再補較久沒做的題。`}
               </p>
             ) : null}
           </div>
-          <div className="grid grid-cols-[auto_minmax(0,1fr)] gap-2 xl:flex">
-            <button
-              type="button"
-              onClick={selectAllSubjects}
-              className="secondary-pill whitespace-nowrap bg-white px-4 py-3"
-            >
-              全選科目
-            </button>
-            <button
-              type="button"
-              onClick={handleStart}
-              disabled={!practiceHistoryReady || (effectiveSelectedSubjects.length === 0 && !includeSeasonalLimited) || availableQuestionCount === 0}
-              className="primary-pill min-w-0 disabled:cursor-not-allowed disabled:bg-slate-300"
-            >
-              {!practiceHistoryReady
-                ? "整理紀錄中"
-                : effectiveSelectedSubjects.length === 0 && !includeSeasonalLimited
-                  ? "請先選科目"
-                  : availableQuestionCount === 0
-                    ? "此年份無題"
-                    : practiceStopAfterReview
-                      ? "開始練習"
-                      : `開始 ${effectiveQuestionCount} 題`}
-            </button>
-          </div>
-        </section>
+        )}
       </section>
     </main>
   );

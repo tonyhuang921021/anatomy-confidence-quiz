@@ -14,6 +14,11 @@ export type ResumableQuizSessionListItem = {
   needsCloudHydration: boolean;
 };
 
+export type EmptyResultsPrimaryAction = {
+  href: string;
+  label: "繼續作答" | "開始測驗" | "回到模擬考專區";
+};
+
 export function getCanonicalResumableSessionId(sessionId: string) {
   return sessionId.replace(/^user-[^:]+:/, "");
 }
@@ -34,6 +39,28 @@ export function isResumableQuizSession(session?: QuizSession | null): session is
       !session.completedAt &&
       (session.questionOrder?.length ?? session.generatedQuestions?.length ?? 0) > 0
   );
+}
+
+export function getEmptyResultsPrimaryAction({
+  currentSession,
+  scope
+}: {
+  currentSession?: QuizSession | null;
+  scope: "default" | "simulation";
+}): EmptyResultsPrimaryAction {
+  if (scope === "simulation") {
+    return { href: "/simulation", label: "回到模擬考專區" };
+  }
+
+  if (isResumableQuizSession(currentSession)) {
+    const sessionId = encodeURIComponent(getCanonicalResumableSessionId(currentSession.id));
+    return {
+      href: `/quiz?resume=1&sessionId=${sessionId}`,
+      label: "繼續作答"
+    };
+  }
+
+  return { href: "/start", label: "開始測驗" };
 }
 
 export function isResumableSessionHydrationComplete(

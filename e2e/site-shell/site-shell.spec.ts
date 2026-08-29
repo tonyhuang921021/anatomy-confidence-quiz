@@ -45,6 +45,7 @@ test("導覽預設收起，留言入口會回到首頁完整留言板", async ({
   const feedbackSection = page.locator("#feedback");
   await expect(feedbackSection.getByRole("heading", { name: "留言板", exact: true })).toBeVisible();
   await expect(feedbackSection.locator(".feedback-board")).toBeVisible();
+  await expect(feedbackSection).toBeFocused();
   await expect(page.getByRole("dialog", { name: "主要導覽" })).toHaveCount(0);
 });
 
@@ -73,6 +74,32 @@ test("更多功能會留在左側導覽原地展開", async ({ page }) => {
   await expect(drawer).toHaveCount(0);
 });
 
+test("手機底部的更多只放設定、留言板與次要工具", async ({ page }, testInfo) => {
+  test.skip(testInfo.project.name !== "webkit-mobile", "只檢查手機底部導覽");
+  await page.goto("/", { waitUntil: "domcontentloaded" });
+  await waitForShellReady(page);
+
+  const mobileMore = page.locator(".app-mobile-nav").getByRole("button", { name: "更多", exact: true });
+  await mobileMore.click();
+  const drawer = page.getByRole("dialog", { name: "更多功能" });
+  await expect(drawer).toBeVisible();
+  await expect(drawer.getByRole("button", { name: "設定", exact: true })).toBeVisible();
+  await expect(drawer.getByRole("link", { name: "留言板", exact: true })).toBeVisible();
+  await expect(drawer.getByText("學習工具", { exact: true })).toBeVisible();
+  await expect(drawer.getByText("整理與回顧", { exact: true })).toBeVisible();
+  await expect(drawer.getByRole("link", { name: "首頁", exact: true })).toHaveCount(0);
+  await expect(drawer.getByRole("link", { name: "進度總覽", exact: true })).toHaveCount(0);
+  await expect(drawer.getByRole("link", { name: "作答紀錄", exact: true })).toHaveCount(0);
+  await expect(drawer.getByRole("link", { name: "儲存題目", exact: true })).toHaveCount(0);
+
+  await drawer.getByRole("button", { name: "設定", exact: true }).click();
+  const settings = page.getByRole("dialog", { name: "帳號與設定" });
+  await expect(settings).toBeVisible();
+  await page.keyboard.press("Escape");
+  await expect(settings).toHaveCount(0);
+  await expect(mobileMore).toBeFocused();
+});
+
 test("帳號設定可關閉並把焦點交回帳號按鈕", async ({ page }) => {
   await page.goto("/", { waitUntil: "domcontentloaded" });
   await waitForShellReady(page);
@@ -94,7 +121,14 @@ test("主要頁面在桌機與 Safari 手機尺寸都不溢出", async ({ page }
   }
 });
 
-test("開始測驗的科別標題不換行，抽題設定只留必要資訊", async ({ page }) => {
+test("320px 重排不會裁切主流程", async ({ page }) => {
+  await page.setViewportSize({ width: 320, height: 800 });
+  for (const route of ["/start", "/search", "/progress", "/results"]) {
+    await expectStablePage(page, route);
+  }
+});
+
+test("一般練習先選範圍，再進入獨立作答設定", async ({ page }) => {
   await page.goto("/start", { waitUntil: "domcontentloaded" });
   await waitForShellReady(page);
 
@@ -115,13 +149,50 @@ test("開始測驗的科別標題不換行，抽題設定只留必要資訊", as
     expect(metric.height).toBeLessThanOrEqual(metric.lineHeight * 1.15);
   }
 
-  const settings = page.getByRole("region", { name: "抽題設定" });
+  const selection = page.getByRole("region", { name: "已選範圍" });
+  await expect(selection).toBeVisible();
+  await expect(selection.getByText("尚未選擇", { exact: true })).toBeVisible();
+  await expect(selection.getByRole("button", { name: "下一步" })).toBeDisabled();
+  await expect(page.getByRole("region", { name: /練習設定/ })).toHaveCount(0);
+
+  const anatomyButton = page.locator(".quiz-setup-group button[aria-pressed]").filter({ hasText: "解剖學" }).first();
+  await anatomyButton.click();
+  await expect(anatomyButton).toHaveAttribute("aria-pressed", "true");
+  await expect(selection.getByText("解剖學", { exact: true })).toBeVisible();
+  await selection.getByRole("button", { name: "下一步" }).click();
+
+  await expect(page.getByRole("heading", { name: "設定這次練習" })).toBeFocused();
+  const settings = page.getByRole("region", { name: "解剖學練習設定" });
   await expect(settings).toBeVisible();
-  await expect(settings.getByText("0 個範圍・0 題可練", { exact: true })).toBeVisible();
-  await expect(settings.getByRole("button", { name: "全選科目" })).toBeVisible();
-  await expect(settings.getByRole("button", { name: "請先選科目" })).toBeDisabled();
-  await expect(page.getByText("先出沒做過的題", { exact: false })).toHaveCount(0);
-  await expect(page.getByText("每題詳解後可結束", { exact: false })).toHaveCount(0);
+  await expect(settings.getByLabel("起始年份", { exact: true })).toBeVisible();
+  await expect(settings.getByLabel("結束年份", { exact: true })).toBeVisible();
+  await expect(settings.getByLabel("練習題數", { exact: true })).toBeVisible();
+  await expect(settings.getByRole("group", { name: "選擇做題順序" })).toBeVisible();
+
+  await page.getByRole("button", { name: "返回選科" }).click();
+  await expect(page.getByRole("heading", { name: "這次想練什麼？" })).toBeFocused();
+  await expect(anatomyButton).toHaveAttribute("aria-pressed", "true");
+
+  await selection.getByRole("button", { name: "下一步" }).click();
+  await settings.getByLabel("練習題數", { exact: true }).selectOption("5");
+  await settings.getByRole("button", { name: "開始 5 題" }).click();
+  await expect(page).toHaveURL(/\/quiz\?resume=1&sessionId=/);
+  await expect.poll(() => page.evaluate(() => {
+    const raw = window.localStorage.getItem("anatomy-confidence-current-session:guest");
+    return raw ? JSON.parse(raw).questionOrder?.length : null;
+  })).toBe(5);
+});
+
+test("微生物單一分類在第二步仍會忠實顯示範圍", async ({ page }) => {
+  await page.goto("/start", { waitUntil: "domcontentloaded" });
+  await waitForShellReady(page);
+
+  await page.getByRole("button", { name: "微生物免疫學選分類" }).click();
+  await page.getByRole("button", { name: "微生物免疫學：細菌" }).click();
+  const selection = page.getByRole("region", { name: "已選範圍" });
+  await expect(selection.getByText("微生物免疫學（細菌）", { exact: true })).toBeVisible();
+  await selection.getByRole("button", { name: "下一步" }).click();
+  await expect(page.getByRole("region", { name: "微生物免疫學（細菌）練習設定" })).toBeVisible();
 });
 
 test("進度總覽點章節後才進入獨立設定頁開始練習", async ({ page }) => {
@@ -130,6 +201,11 @@ test("進度總覽點章節後才進入獨立設定頁開始練習", async ({ pa
   await expect(page.getByRole("heading", { name: "醫學一／醫學二進度總覽" })).toBeVisible();
   await expect(page.getByText("做題順序", { exact: true })).toHaveCount(0);
   await expect(page.getByRole("group", { name: "選擇做題順序" })).toHaveCount(0);
+
+  const med1Group = page.locator(".progress-subject-group").filter({ hasText: "醫學（一）" }).first();
+  await expect(med1Group.locator(":scope > button")).toHaveAttribute("aria-expanded", "false");
+  await med1Group.locator(":scope > button").click();
+  await expect(med1Group.locator(":scope > button")).toHaveAttribute("aria-expanded", "true");
 
   const anatomyRow = page.locator(".progress-subject-row").filter({ hasText: "解剖學" }).first();
   await anatomyRow.locator(":scope > button").click();
@@ -155,8 +231,46 @@ test("進度總覽點章節後才進入獨立設定頁開始練習", async ({ pa
 
   await setup.getByLabel("練習題數", { exact: true }).selectOption("5");
   await setup.getByRole("button", { name: "開始 5 題" }).click();
-  await expect(page).toHaveURL(/\/quiz\?/);
+  await expect(page).toHaveURL(/\/quiz\?resume=1&sessionId=/);
   await expect(page.getByText("第 1 / 5 題", { exact: true })).toBeVisible();
+});
+
+test("弱點資料不足時不會把沒有紀錄顯示成 0%", async ({ page }) => {
+  await page.goto("/progress/weakness", { waitUntil: "networkidle" });
+  await waitForShellReady(page);
+
+  await expect(page.getByText("資料不足", { exact: true })).toBeVisible();
+  await expect(page.getByRole("progressbar", { name: /診斷進度 0 \/ 10 題/ })).toHaveAttribute("aria-valuenow", "0");
+  await expect(page.getByText("做題順序", { exact: true })).toHaveCount(0);
+  await expect(page.getByText("0%", { exact: true })).toHaveCount(0);
+});
+
+test("作答紀錄空白但有未完成測驗時會顯示續作", async ({ page }) => {
+  await page.addInitScript(() => {
+    const session = {
+      id: "site-shell-unfinished",
+      subject: "生理學",
+      startedAt: "2026-08-29T00:00:00.000Z",
+      settings: { mode: "random", questionCount: 1, subjectFilter: "生理學" },
+      questionOrder: ["MOEX-100030-1101-Q001"],
+      currentQuestionIndex: 0,
+      attempts: []
+    };
+    window.localStorage.setItem("anatomy-confidence-active-user-id", "guest");
+    window.localStorage.setItem(
+      "anatomy-confidence-current-session:guest",
+      JSON.stringify(session)
+    );
+  });
+
+  await page.goto("/results", { waitUntil: "networkidle" });
+  await waitForShellReady(page);
+  const resumeLink = page.getByRole("link", { name: "繼續作答" });
+  await expect(resumeLink).toBeVisible();
+  await expect(resumeLink).toHaveAttribute(
+    "href",
+    "/quiz?resume=1&sessionId=site-shell-unfinished"
+  );
 });
 
 test("設定頁收納通知與加入主畫面教學", async ({ page, browserName }) => {
@@ -222,15 +336,17 @@ test("設定頁收納通知與加入主畫面教學", async ({ page, browserName
 test("搜尋結果展開後不會重複題幹與分類", async ({ page }) => {
   await page.goto("/search", { waitUntil: "networkidle" });
   await waitForShellReady(page);
+  await page.getByRole("button", { name: "瀏覽全部題目" }).click();
 
-  const card = page.locator("details.search-result-card").first();
+  const card = page.locator("article.search-result-card").first();
   await expect(card).toBeVisible();
-  const summary = card.locator("summary");
-  const stem = (await summary.locator("p").first().innerText()).trim();
-  const primaryTag = (await summary.locator("span.max-w-full.break-words").last().innerText()).trim();
+  const disclosure = card.locator('button[aria-controls^="search-result-details-"]');
+  const stem = (await disclosure.locator("p").first().innerText()).trim();
+  const primaryTag = (await disclosure.locator("span.max-w-full.break-words").last().innerText()).trim();
 
-  await summary.click();
-  await expect(summary.getByText("收合", { exact: true })).toBeVisible();
+  await disclosure.click();
+  await expect(disclosure).toHaveAttribute("aria-expanded", "true");
+  await expect(disclosure.getByText("收合", { exact: true })).toBeVisible();
   await expect(card).toHaveCSS("overflow", "visible");
   await expect(card.getByText(stem, { exact: true })).toHaveCount(1);
   await expect(card.getByText(primaryTag, { exact: true })).toHaveCount(1);
@@ -271,15 +387,17 @@ test("搜尋結果展開後不會重複題幹與分類", async ({ page }) => {
 test("題目搜尋可以先隱藏答案或直接顯示", async ({ page }) => {
   await page.goto("/search", { waitUntil: "networkidle" });
   await waitForShellReady(page);
+  await page.getByRole("button", { name: "瀏覽全部題目" }).click();
+  await page.getByRole("button", { name: /進階篩選/ }).click();
 
   const displayMode = page.getByRole("group", { name: "展開題目後的答案顯示方式" });
   const practiceMode = displayMode.getByRole("button", { name: "先隱藏" });
   const directMode = displayMode.getByRole("button", { name: "直接顯示" });
   await expect(practiceMode).toHaveAttribute("aria-pressed", "true");
 
-  const cards = page.locator("details.search-result-card");
+  const cards = page.locator("article.search-result-card");
   const firstCard = cards.first();
-  await firstCard.locator("summary").click();
+  await firstCard.locator('button[aria-controls^="search-result-details-"]').click();
   await expect(firstCard.locator(".search-result-options")).toBeVisible();
   await expect(firstCard.getByText("正確答案", { exact: true })).toHaveCount(0);
   await firstCard.getByRole("button", { name: "顯示答案與詳解" }).click();
@@ -288,10 +406,11 @@ test("題目搜尋可以先隱藏答案或直接顯示", async ({ page }) => {
   await directMode.click();
   await expect(directMode).toHaveAttribute("aria-pressed", "true");
   const secondCard = cards.nth(1);
-  await secondCard.locator("summary").click();
+  await secondCard.locator('button[aria-controls^="search-result-details-"]').click();
   await expect(secondCard.getByText("正確答案", { exact: true })).toBeVisible();
 
   await page.reload({ waitUntil: "networkidle" });
+  await page.getByRole("button", { name: /進階篩選/ }).click();
   await expect(page.getByRole("group", { name: "展開題目後的答案顯示方式" })
     .getByRole("button", { name: "直接顯示" }))
     .toHaveAttribute("aria-pressed", "true");
@@ -301,10 +420,10 @@ test("搜尋結果展開後會顯示題幹圖片", async ({ page }) => {
   await page.goto("/search", { waitUntil: "networkidle" });
   await waitForShellReady(page);
 
-  await page.getByRole("textbox", { name: "關鍵字" }).fill("MOEX-110101_2301-Q100");
-  const card = page.locator("details.search-result-card");
+  await page.getByRole("textbox", { name: "想找哪一題？" }).fill("MOEX-110101_2301-Q100");
+  const card = page.locator("article.search-result-card");
   await expect(card).toHaveCount(1);
-  await card.locator("summary").click();
+  await card.locator('button[aria-controls^="search-result-details-"]').click();
 
   const image = card.getByRole("img", { name: "MOEX-110101_2301-Q100 題目圖片" });
   await expect(image).toBeVisible();
@@ -312,6 +431,112 @@ test("搜尋結果展開後會顯示題幹圖片", async ({ page }) => {
     "src",
     "/question-media/MOEX-110101_2301-Q100.png"
   );
+});
+
+test("題目搜尋可以多選並直接開始私人練習", async ({ page }) => {
+  await page.goto("/search", { waitUntil: "networkidle" });
+  await waitForShellReady(page);
+
+  await expect(page.getByText("先找出想練的題目", { exact: true })).toBeVisible();
+  await expect(page.locator("article.search-result-card")).toHaveCount(0);
+  await page.getByRole("button", { name: "瀏覽全部題目" }).click();
+
+  const cards = page.locator("article.search-result-card");
+  await expect(cards).toHaveCount(30);
+  await cards.nth(0).getByRole("button", { name: "選入練習" }).click();
+  await cards.nth(1).getByRole("button", { name: "選入練習" }).click();
+  await expect(page.getByText("已選 2 題", { exact: true })).toBeVisible();
+  await page.getByRole("button", { name: "開始私人練習" }).click();
+
+  await expect(page).toHaveURL(/\/quiz\?resume=1&sessionId=/);
+  await expect.poll(async () => page.evaluate(() => {
+    const raw = window.localStorage.getItem("anatomy-confidence-current-session:guest");
+    if (!raw) return null;
+    const session = JSON.parse(raw) as {
+      settings?: { mode?: string; strictCustomQuestionPool?: boolean };
+      questionOrder?: string[];
+    };
+    return {
+      mode: session.settings?.mode,
+      strict: session.settings?.strictCustomQuestionPool,
+      questionCount: session.questionOrder?.length
+    };
+  })).toEqual({ mode: "search_practice", strict: true, questionCount: 2 });
+
+  const sessionIdBeforeReload = new URL(page.url()).searchParams.get("sessionId");
+  await page.reload({ waitUntil: "networkidle" });
+  await expect(page).toHaveURL(new RegExp(`sessionId=${sessionIdBeforeReload}`));
+  await expect.poll(() => page.evaluate(() => {
+    const raw = window.localStorage.getItem("anatomy-confidence-current-session:guest");
+    return raw ? JSON.parse(raw).id : null;
+  })).toBe(sessionIdBeforeReload);
+});
+
+test("搜尋儲存題目視窗會圈限焦點、隔離背景並把焦點還回入口", async ({ page }) => {
+  await page.goto("/search", { waitUntil: "networkidle" });
+  await waitForShellReady(page);
+
+  const trigger = page.getByRole("button", { name: "開啟儲存題目" });
+  await trigger.click();
+  const dialog = page.getByRole("dialog", { name: "儲存題目" });
+  const closeButton = dialog.getByRole("button", { name: "關閉儲存題目" });
+  await expect(dialog).toBeVisible();
+  await expect(closeButton).toBeFocused();
+  await expect(page.locator(".app-frame")).toHaveAttribute("inert", "");
+  await expect(page.locator(".app-frame")).toHaveAttribute("aria-hidden", "true");
+
+  const lastFocusable = dialog.locator("button:not([disabled]), a[href], input:not([disabled]), select:not([disabled]), textarea:not([disabled])").last();
+  await page.keyboard.press("Shift+Tab");
+  await expect(lastFocusable).toBeFocused();
+  await page.keyboard.press("Tab");
+  await expect(closeButton).toBeFocused();
+  await page.keyboard.press("Escape");
+  await expect(dialog).toHaveCount(0);
+  await expect(trigger).toBeFocused();
+  await expect(page.locator(".app-frame")).not.toHaveAttribute("inert", "");
+  await expect(page.locator(".app-frame")).not.toHaveAttribute("aria-hidden", "true");
+});
+
+test("搜尋開新練習前不會靜默覆蓋既有進度", async ({ page }) => {
+  await page.addInitScript(() => {
+    const session = {
+      id: "site-shell-existing-practice",
+      subject: "解剖學",
+      startedAt: "2026-08-29T00:00:00.000Z",
+      settings: { mode: "random", questionCount: 2, subjectFilter: "解剖學" },
+      questionOrder: ["MOEX-100030-1101-Q001", "MOEX-100030-1101-Q002"],
+      currentQuestionIndex: 1,
+      attempts: [{
+        questionId: "MOEX-100030-1101-Q001",
+        selectedAnswer: "A",
+        correctAnswer: "A",
+        isCorrect: true,
+        confidence: 4,
+        answeredAt: "2026-08-29T00:01:00.000Z"
+      }]
+    };
+    window.localStorage.setItem("anatomy-confidence-active-user-id", "guest");
+    window.localStorage.setItem(
+      "anatomy-confidence-current-session:guest",
+      JSON.stringify(session)
+    );
+  });
+
+  await page.goto("/search", { waitUntil: "networkidle" });
+  await waitForShellReady(page);
+  await page.getByRole("button", { name: "瀏覽全部題目" }).click();
+  await page.locator("article.search-result-card").first().getByRole("button", { name: "選入練習" }).click();
+  await page.getByRole("button", { name: "開始私人練習" }).click();
+
+  await expect(page).toHaveURL(/\/search$/);
+  await expect(
+    page.getByRole("alert").filter({ hasText: "為避免覆蓋進度" })
+  ).toBeVisible();
+  await expect(page.getByRole("button", { name: "繼續原測驗" })).toBeVisible();
+  expect(await page.evaluate(() => {
+    const raw = window.localStorage.getItem("anatomy-confidence-current-session:guest");
+    return raw ? JSON.parse(raw).id : null;
+  })).toBe("site-shell-existing-practice");
 });
 
 test("正式作答詳解使用同一組精簡工具列", async ({ page }) => {
@@ -378,6 +603,47 @@ test("正式作答詳解使用同一組精簡工具列", async ({ page }) => {
   await expect(toolbar.getByRole("button", { name: "回報" })).toBeVisible();
 });
 
+test("模擬考倒數歸零後不再顯示可暫停按鈕", async ({ page }) => {
+  await page.addInitScript(() => {
+    const session = {
+      id: "site-shell-expired-timer",
+      subject: "醫學（二）",
+      startedAt: "2026-08-29T00:00:00.000Z",
+      settings: {
+        mode: "simulation",
+        questionCount: 1,
+        subjectFilter: "病理學",
+        paperMode: "past_paper"
+      },
+      questionOrder: ["MOEX-115020-2301-Q078"],
+      currentQuestionIndex: 0,
+      attempts: []
+    };
+    window.localStorage.setItem("anatomy-confidence-active-user-id", "guest");
+    window.localStorage.setItem(
+      "anatomy-confidence-current-session:guest",
+      JSON.stringify(session)
+    );
+    window.localStorage.setItem(
+      "simulation-exam-timer:site-shell-expired-timer",
+      JSON.stringify({
+        durationSeconds: 7200,
+        accumulatedSeconds: 7200,
+        runningSince: null,
+        paused: true,
+        updatedAt: Date.now()
+      })
+    );
+  });
+
+  await page.goto("/quiz?resume=1&sessionId=site-shell-expired-timer", {
+    waitUntil: "networkidle"
+  });
+  await waitForShellReady(page);
+  await expect(page.getByText("計時已結束", { exact: true }).first()).toBeVisible();
+  await expect(page.getByRole("button", { name: "暫停", exact: true })).toHaveCount(0);
+});
+
 test("結果頁展開後分類只顯示一次", async ({ page }) => {
   const now = new Date().toISOString();
   await page.addInitScript(({ completedAt }) => {
@@ -419,6 +685,52 @@ test("結果頁展開後分類只顯示一次", async ({ page }) => {
   await card.locator("summary").click();
   await expect(card).toHaveAttribute("open", "");
   await expect(card.getByText(label, { exact: true })).toHaveCount(1);
+});
+
+test("手機滿版回顧會圈限焦點、隔離背景並可用 Esc 返回", async ({ page }, testInfo) => {
+  test.skip(testInfo.project.name !== "webkit-mobile", "只檢查手機滿版回顧");
+  const completedAt = "2026-08-29T01:00:00.000Z";
+  await page.addInitScript(({ at }) => {
+    const session = {
+      id: "site-shell-fullscreen-result",
+      subject: "醫學（二）",
+      startedAt: at,
+      completedAt: at,
+      settings: { mode: "random", questionCount: 1, subjectFilter: "病理學" },
+      questionOrder: ["MOEX-115020-2301-Q078"],
+      attempts: [{
+        questionId: "MOEX-115020-2301-Q078",
+        selectedAnswer: "C",
+        correctAnswer: "A",
+        isCorrect: false,
+        confidence: 4,
+        answeredAt: at
+      }]
+    };
+    window.localStorage.setItem("anatomy-confidence-active-user-id", "guest");
+    window.localStorage.setItem(
+      "anatomy-confidence-completed-sessions:guest",
+      JSON.stringify([session])
+    );
+  }, { at: completedAt });
+
+  await page.goto("/results?sessionId=site-shell-fullscreen-result", { waitUntil: "networkidle" });
+  await waitForShellReady(page);
+  const trigger = page.getByRole("button", { name: "開啟滿版題目回顧" });
+  await trigger.click();
+  const dialog = page.getByRole("dialog", { name: "題目回顧" });
+  await expect(dialog).toBeVisible();
+  await expect(dialog.getByRole("button", { name: "返回頁面" })).toBeFocused();
+  await expect(page.locator(".app-frame")).toHaveAttribute("inert", "");
+  const lastFocusable = dialog.locator("a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), details > summary, [tabindex]:not([tabindex='-1'])").last();
+  await page.keyboard.press("Shift+Tab");
+  await expect(lastFocusable).toBeFocused();
+  await page.keyboard.press("Tab");
+  await expect(dialog.getByRole("button", { name: "返回頁面" })).toBeFocused();
+  await page.keyboard.press("Escape");
+  await expect(dialog).toHaveCount(0);
+  await expect(trigger).toBeFocused();
+  await expect(page.locator(".app-frame")).not.toHaveAttribute("inert", "");
 });
 
 test("同一份進行中測驗會保留 13 題完整作答，不被較新的 6 題暫存覆蓋", async ({ page }) => {

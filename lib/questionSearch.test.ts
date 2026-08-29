@@ -1,6 +1,8 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 import {
+  buildSearchFilterSummary,
+  buildSearchPracticeSettings,
   buildQuestionSearchIndexEntry,
   filterAndSortQuestionSearch,
   type QuestionSearchRanking
@@ -58,6 +60,15 @@ test("OCR 字縫不會讓從字首開始搜尋失敗", () => {
   assert.equal(result.length, 1);
 });
 
+test("短英文縮寫不會誤命中其他單字中間的相同字串", () => {
+  const iga = makeQuestion("q-1", "IgA 在黏膜免疫的作用", 2025);
+  const ligament = makeQuestion("q-2", "anterior cruciate ligament 受傷", 2024);
+  const ligand = makeQuestion("q-3", "ligand-gated ion channel", 2023);
+  const igaSubtype = makeQuestion("q-4", "IgA1 與 IgA2 的差異", 2022);
+
+  assert.deepEqual(search([ligament, ligand, igaSubtype, iga], "IgA").map((item) => item.id), ["q-1", "q-4"]);
+});
+
 test("答對率排序會把沒有統計的題目放最後", () => {
   const questions = [
     makeQuestion("q-1", "one", 2024),
@@ -92,4 +103,52 @@ test("最多人不要的題目依標記次數排序", () => {
     "q-2": { questionId: "q-2", totalAttempts: 10, correctRate: 70, chaosCount: 2 }
   };
   assert.deepEqual(search(questions, "", "chaos_desc", rankings).map((item) => item.id), ["q-1", "q-2"]);
+});
+
+test("搜尋條件摘要只留下使用者真正選過的條件", () => {
+  assert.equal(
+    buildSearchFilterSummary({
+      keyword: "  IgA 腎病  ",
+      subject: "病理學",
+      year: "2026",
+      sort: "accuracy_asc"
+    }),
+    "「IgA 腎病」 · 病理學 · 2026 年 · 答對率低到高"
+  );
+  assert.equal(
+    buildSearchFilterSummary({
+      keyword: "",
+      subject: "全部",
+      year: "全部",
+      sort: "recent",
+      browseAll: true
+    }),
+    "全部題庫 · 近年優先"
+  );
+});
+
+test("搜尋多選建立獨立私人練習並保留原題順序與科目", () => {
+  const physiology = makeQuestion("MOEX-TEST-2301-Q001", "腎臟生理", 2025);
+  const pathology: Question = {
+    ...makeQuestion("MOEX-TEST-2302-Q002", "腎臟病理", 2024),
+    subject: "病理學",
+    chapter: "腎臟病理"
+  };
+  const settings = buildSearchPracticeSettings([pathology, physiology, pathology]);
+
+  assert.ok(settings);
+  assert.equal(settings.mode, "search_practice");
+  assert.equal(settings.questionCount, 2);
+  assert.deepEqual(settings.customQuestionIds, [pathology.id, physiology.id]);
+  assert.deepEqual(settings.subjectFilters, ["病理學", "生理學"]);
+  assert.equal(settings.subjectFilter, "全部");
+  assert.equal(settings.sessionName, "搜尋私人練習・混合科目（2 題）");
+  assert.equal(settings.strictCustomQuestionPool, true);
+  assert.equal(settings.preserveCustomQuestionOrder, true);
+  assert.equal(settings.customPaperCode, undefined);
+  assert.equal(settings.customPaperIsPublic, undefined);
+});
+
+test("搜尋未選題時不會建立空白私人練習", () => {
+  assert.equal(buildSearchPracticeSettings([]), null);
 });

@@ -1,6 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 import {
+  getQuizUrlAfterConsumingLaunchIntent,
   getQuizSessionNavigationIntent,
   getRequestedResumeStatus,
   shouldPreserveSelectedQuizSession
@@ -85,4 +86,20 @@ test("new=1 優先於 resume 並維持明確新開測驗語意", () => {
   assert.equal(intent.forceNew, true);
   assert.equal(intent.resumeRequested, false);
   assert.equal(shouldPreserveSelectedQuizSession(intent), true);
+});
+
+test("建立測驗後會移除一次性參數，避免重新整理再次開新卷", () => {
+  assert.equal(
+    getQuizUrlAfterConsumingLaunchIntent(
+      "https://quiz.test/quiz?new=1&startSettings=abc&from=search#question"
+    ),
+    "/quiz?from=search#question"
+  );
+  assert.equal(
+    getQuizUrlAfterConsumingLaunchIntent(
+      "https://quiz.test/quiz?new=1&startSettings=abc",
+      "user-123:session-search"
+    ),
+    "/quiz?resume=1&sessionId=session-search"
+  );
 });

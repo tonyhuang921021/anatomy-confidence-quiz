@@ -130,3 +130,28 @@ test("只有摘要計數時也沿用相同的完整度門檻", () => {
   assert.equal(isMeaningfullyMoreCompleteProgress(12, 8), true);
   assert.equal(isMeaningfullyMoreCompleteProgress(87, 2), true);
 });
+
+test("不同搜尋題組不會被當成同一份私人練習", () => {
+  const first = makeSimulationSession({ id: "search-a", attemptCount: 1 });
+  first.subject = "醫學（一）";
+  first.settings = {
+    mode: "search_practice",
+    questionCount: 3,
+    customPoolLabel: "搜尋私人練習",
+    customQuestionIds: ["A1", "A2", "A3"]
+  };
+  first.questionOrder = ["A1", "A2", "A3"];
+
+  const second = makeSimulationSession({ id: "search-b", attemptCount: 3 });
+  second.subject = "醫學（一）";
+  second.settings = {
+    mode: "search_practice",
+    questionCount: 3,
+    customPoolLabel: "搜尋私人練習",
+    customQuestionIds: ["B1", "B2", "B3"]
+  };
+  second.questionOrder = ["B1", "B2", "B3"];
+
+  assert.notEqual(getCurrentSessionWorkKey(first), getCurrentSessionWorkKey(second));
+  assert.equal(chooseMoreCompleteSessionForSameWork(first, [second]), null);
+});

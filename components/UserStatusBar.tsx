@@ -69,13 +69,23 @@ const PRIMARY_NAV: NavItem[] = [
   }
 ];
 
-const MORE_LINKS: NavItem[] = [
+const STUDY_TOOL_LINKS: NavItem[] = [
   { href: "/notes", label: "學習筆記", icon: NotebookTabs },
   { href: "/resources", label: "資源分享", icon: Library },
-  { href: "/pharmacology-review", label: "藥理複習", icon: Pill },
+  { href: "/pharmacology-review", label: "藥理複習", icon: Pill }
+];
+
+const REVIEW_LINKS: NavItem[] = [
   { href: "/leaderboard", label: "刷題榜", icon: Trophy },
   { href: "/post-exam", label: "考後回顧", icon: BookOpenText }
 ];
+
+const MORE_LINK_GROUPS = [
+  { id: "study-tools", label: "學習工具", items: STUDY_TOOL_LINKS },
+  { id: "review-tools", label: "整理與回顧", items: REVIEW_LINKS }
+];
+
+const MORE_LINKS = [...STUDY_TOOL_LINKS, ...REVIEW_LINKS];
 
 const FEEDBACK_NAV: NavItem = {
   href: "/#feedback",
@@ -122,13 +132,16 @@ export function UserStatusBar() {
     signOut
   } = useAuth();
   const [navOpen, setNavOpen] = useState(false);
+  const [drawerView, setDrawerView] = useState<"navigation" | "more">("navigation");
   const [moreExpanded, setMoreExpanded] = useState(false);
   const [accountOpen, setAccountOpen] = useState(false);
   const [accountPanelOpen, setAccountPanelOpen] = useState(false);
   const [shellReady, setShellReady] = useState(false);
   const accountRef = useRef<HTMLDivElement | null>(null);
   const menuTriggerRef = useRef<HTMLButtonElement | null>(null);
+  const mobileMoreTriggerRef = useRef<HTMLButtonElement | null>(null);
   const accountTriggerRef = useRef<HTMLButtonElement | null>(null);
+  const settingsReturnFocusRef = useRef<HTMLElement | null>(null);
   const activePanelRef = useRef<HTMLElement | null>(null);
   const previousFocusRef = useRef<HTMLElement | null>(null);
   const focusMode = isAppFocusPath(pathname);
@@ -161,7 +174,21 @@ export function UserStatusBar() {
     setAccountOpen(false);
     const settingsRequested =
       pathname === "/" && new URLSearchParams(window.location.search).get("settings") === "1";
+    if (settingsRequested) settingsReturnFocusRef.current = accountTriggerRef.current;
     setAccountPanelOpen(settingsRequested);
+  }, [pathname]);
+
+  useEffect(() => {
+    function focusFeedbackSection() {
+      if (pathname !== "/" || window.location.hash !== "#feedback") return;
+      window.requestAnimationFrame(() => {
+        document.getElementById("feedback")?.focus({ preventScroll: true });
+      });
+    }
+
+    focusFeedbackSection();
+    window.addEventListener("hashchange", focusFeedbackSection);
+    return () => window.removeEventListener("hashchange", focusFeedbackSection);
   }, [pathname]);
 
   function closeAccountPanel() {
@@ -190,7 +217,7 @@ export function UserStatusBar() {
     const overlayOpen = navOpen || accountPanelOpen;
     if (!overlayOpen) return;
     previousFocusRef.current = accountPanelOpen
-      ? accountTriggerRef.current
+      ? settingsReturnFocusRef.current ?? accountTriggerRef.current
       : (document.activeElement as HTMLElement | null);
     const previousOverflow = document.body.style.overflow;
     document.body.style.overflow = "hidden";
@@ -240,6 +267,7 @@ export function UserStatusBar() {
       } else {
         menuTriggerRef.current?.focus();
       }
+      if (accountPanelOpen) settingsReturnFocusRef.current = null;
     };
   }, [accountPanelOpen, navOpen]);
 
@@ -256,6 +284,34 @@ export function UserStatusBar() {
     document.addEventListener("keydown", handleKeyDown);
     return () => document.removeEventListener("keydown", handleKeyDown);
   }, [accountOpen]);
+
+  const groupedToolLinks = MORE_LINK_GROUPS.map((group) => (
+    <section
+      key={group.id}
+      className="app-drawer-link-group"
+      aria-labelledby={`app-drawer-group-${group.id}`}
+    >
+      <p id={`app-drawer-group-${group.id}`} className="app-drawer-section-label">
+        {group.label}
+      </p>
+      {group.items.map((item) => {
+        const Icon = item.icon;
+        const active = pathname.startsWith(item.href);
+        return (
+          <Link
+            key={item.href}
+            href={item.href}
+            className={active ? "is-active" : undefined}
+            aria-current={active ? "page" : undefined}
+            onClick={() => setNavOpen(false)}
+          >
+            <Icon size={19} strokeWidth={1.8} />
+            <span>{item.label}</span>
+          </Link>
+        );
+      })}
+    </section>
+  ));
 
   return (
     <>
@@ -274,6 +330,7 @@ export function UserStatusBar() {
               type="button"
               className="app-menu-trigger"
               onClick={() => {
+                setDrawerView("navigation");
                 setMoreExpanded(secondaryNavigationActive);
                 setNavOpen(true);
               }}
@@ -343,6 +400,7 @@ export function UserStatusBar() {
                     type="button"
                     onClick={() => {
                       setAccountOpen(false);
+                      settingsReturnFocusRef.current = accountTriggerRef.current;
                       setAccountPanelOpen(true);
                     }}
                   >
@@ -387,13 +445,15 @@ export function UserStatusBar() {
             );
           })}
           <button
+            ref={mobileMoreTriggerRef}
             type="button"
             onClick={() => {
-              setMoreExpanded(true);
+              setDrawerView("more");
+              setMoreExpanded(false);
               setNavOpen(true);
             }}
             className={secondaryNavigationActive ? "is-active" : undefined}
-            aria-expanded={navOpen && moreExpanded}
+            aria-expanded={navOpen && drawerView === "more"}
             aria-controls="app-navigation-drawer"
           >
             <MoreHorizontal size={21} strokeWidth={1.8} />
@@ -416,57 +476,30 @@ export function UserStatusBar() {
             className="app-mobile-drawer"
             role="dialog"
             aria-modal="true"
-            aria-label="主要導覽"
+            aria-label={drawerView === "more" ? "更多功能" : "主要導覽"}
           >
             <div className="app-drawer-header">
               <div>
-                <p>網站導覽</p>
-                <span>需要時再打開，不佔用閱讀空間</span>
+                <p>{drawerView === "more" ? "更多" : "網站導覽"}</p>
+                <span>
+                  {drawerView === "more"
+                    ? "設定、留言板與其他工具"
+                    : "前往網站的主要頁面"}
+                </span>
               </div>
               <button type="button" onClick={() => setNavOpen(false)} aria-label="關閉導覽">
                 <X size={20} strokeWidth={1.8} />
               </button>
             </div>
             <nav className="app-drawer-links">
-              {DRAWER_NAV.map((item) => {
-                const Icon = item.icon;
-                const active = item.matches?.(pathname) ?? pathname.startsWith(item.href);
-                return (
-                  <Link
-                    key={item.href}
-                    href={item.href}
-                    className={active ? "is-active" : undefined}
-                    aria-current={active ? "page" : undefined}
-                    onClick={() => setNavOpen(false)}
-                  >
-                    <Icon size={20} strokeWidth={1.8} />
-                    <span>{item.label}</span>
-                  </Link>
-                );
-              })}
-              <div className="app-drawer-divider" aria-hidden="true" />
-              <button
-                type="button"
-                className="app-drawer-more-trigger"
-                onClick={() => setMoreExpanded((current) => !current)}
-                aria-expanded={moreExpanded}
-                aria-controls="app-drawer-more-content"
-              >
-                <MoreHorizontal size={21} strokeWidth={1.8} />
-                <span>更多</span>
-                <ChevronDown
-                  className="app-drawer-more-chevron"
-                  size={17}
-                  strokeWidth={1.8}
-                  aria-hidden="true"
-                />
-              </button>
-              {moreExpanded ? (
-                <div id="app-drawer-more-content" className="app-drawer-more-content">
-                  <div className="app-drawer-subnav">
+              {drawerView === "more" ? (
+                <>
+                  <section className="app-drawer-link-group" aria-labelledby="app-drawer-group-common">
+                    <p id="app-drawer-group-common" className="app-drawer-section-label">常用</p>
                     <button
                       type="button"
                       onClick={() => {
+                        settingsReturnFocusRef.current = mobileMoreTriggerRef.current;
                         setNavOpen(false);
                         setMoreExpanded(false);
                         setAccountPanelOpen(true);
@@ -475,29 +508,20 @@ export function UserStatusBar() {
                       <Settings size={19} strokeWidth={1.8} />
                       <span>設定</span>
                     </button>
-                    {MORE_LINKS.map((item) => {
-                      const Icon = item.icon;
-                      const active = pathname.startsWith(item.href);
-                      return (
-                        <Link
-                          key={item.href}
-                          href={item.href}
-                          className={active ? "is-active" : undefined}
-                          aria-current={active ? "page" : undefined}
-                          onClick={() => setNavOpen(false)}
-                        >
-                          <Icon size={19} strokeWidth={1.8} />
-                          <span>{item.label}</span>
-                        </Link>
-                      );
-                    })}
-                  </div>
-
+                    <Link
+                      href={FEEDBACK_NAV.href}
+                      className={FEEDBACK_NAV.matches?.(pathname) ? "is-active" : undefined}
+                      aria-current={FEEDBACK_NAV.matches?.(pathname) ? "page" : undefined}
+                      onClick={() => setNavOpen(false)}
+                    >
+                      <MessageSquareText size={19} strokeWidth={1.8} />
+                      <span>{FEEDBACK_NAV.label}</span>
+                    </Link>
+                  </section>
+                  {groupedToolLinks}
                   <section className="app-about-section">
                     <p className="app-sheet-label">關於本站</p>
-                    <p>
-                      整理醫師國考作答、錯題與複習進度的個人專案。
-                    </p>
+                    <p>整理醫師國考作答、錯題與複習進度的個人專案。</p>
                     <a
                       href="https://www.instagram.com/yphe_uc?igsh=OWJqZjJqd2o2cGpi&utm_source=qr"
                       target="_blank"
@@ -506,8 +530,92 @@ export function UserStatusBar() {
                       聯絡 @yphe_uc
                     </a>
                   </section>
-                </div>
-              ) : null}
+                </>
+              ) : (
+                <>
+                  {DRAWER_NAV.map((item) => {
+                    const Icon = item.icon;
+                    const active = item.matches?.(pathname) ?? pathname.startsWith(item.href);
+                    return (
+                      <Link
+                        key={item.href}
+                        href={item.href}
+                        className={active ? "is-active" : undefined}
+                        aria-current={active ? "page" : undefined}
+                        onClick={() => setNavOpen(false)}
+                      >
+                        <Icon size={20} strokeWidth={1.8} />
+                        <span>{item.label}</span>
+                      </Link>
+                    );
+                  })}
+                  <div className="app-drawer-divider" aria-hidden="true" />
+                  <button
+                    type="button"
+                    className="app-drawer-more-trigger"
+                    onClick={() => setMoreExpanded((current) => !current)}
+                    aria-expanded={moreExpanded}
+                    aria-controls="app-drawer-more-content"
+                  >
+                    <MoreHorizontal size={21} strokeWidth={1.8} />
+                    <span>更多</span>
+                    <ChevronDown
+                      className="app-drawer-more-chevron"
+                      size={17}
+                      strokeWidth={1.8}
+                      aria-hidden="true"
+                    />
+                  </button>
+                  {moreExpanded ? (
+                    <div id="app-drawer-more-content" className="app-drawer-more-content">
+                      <div className="app-drawer-subnav">
+                        <button
+                          type="button"
+                          onClick={() => {
+                            settingsReturnFocusRef.current = menuTriggerRef.current;
+                            setNavOpen(false);
+                            setMoreExpanded(false);
+                            setAccountPanelOpen(true);
+                          }}
+                        >
+                          <Settings size={19} strokeWidth={1.8} />
+                          <span>設定</span>
+                        </button>
+                        {MORE_LINKS.map((item) => {
+                          const Icon = item.icon;
+                          const active = pathname.startsWith(item.href);
+                          return (
+                            <Link
+                              key={item.href}
+                              href={item.href}
+                              className={active ? "is-active" : undefined}
+                              aria-current={active ? "page" : undefined}
+                              onClick={() => setNavOpen(false)}
+                            >
+                              <Icon size={19} strokeWidth={1.8} />
+                              <span>{item.label}</span>
+                            </Link>
+                          );
+                        })}
+                      </div>
+
+                      <section className="app-about-section">
+                        <p className="app-sheet-label">關於本站</p>
+                        <p>
+                          整理醫師國考作答、錯題與複習進度的個人專案。
+                        </p>
+                        <a
+                          href="https://www.instagram.com/yphe_uc?igsh=OWJqZjJqd2o2cGpi&utm_source=qr"
+                          target="_blank"
+                          rel="noreferrer"
+                        >
+                          聯絡 @yphe_uc
+                        </a>
+                      </section>
+                    </div>
+                  ) : null}
+                </>
+              )}
             </nav>
           </aside>
         </div>

@@ -720,6 +720,8 @@ export function getModeLabel(mode: QuizMode) {
   switch (mode) {
     case "random":
       return "隨機刷題";
+    case "search_practice":
+      return "搜尋私人練習";
     case "weakness":
       return "弱點補強";
     case "review":

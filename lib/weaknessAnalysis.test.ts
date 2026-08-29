@@ -130,7 +130,21 @@ test("少量或單一答錯不會硬湊成觀念群弱點", () => {
   });
 
   assert.equal(result.concepts.length, 0);
-  assert.equal(result.subjectSummaries[0].dataStatus, "資料有限");
+  assert.equal(result.subjectSummaries[0].dataStatus, "資料不足");
+  assert.equal(result.subjectSummaries[0].correctRate, null);
+});
+
+test("沒有近期作答時不會把資料不足誤算成 0%", () => {
+  const result = analyzeRecentWeakness({
+    questions: [makeQuestion("empty-1")],
+    sessions: [],
+    selectedSubjects: ["生理學"],
+    now: NOW
+  });
+
+  assert.equal(result.recentUniqueQuestions, 0);
+  assert.equal(result.subjectSummaries[0].dataStatus, "資料不足");
+  assert.equal(result.subjectSummaries[0].correctRate, null);
 });
 
 test("不同科目的可分析觀念不會被全站前五名截掉", () => {

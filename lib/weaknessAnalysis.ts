@@ -16,7 +16,7 @@ type QuestionHistory = {
   wrongCount: number;
 };
 
-export type WeaknessDataStatus = "尚無近期紀錄" | "資料有限" | "可分析" | "資料充足";
+export type WeaknessDataStatus = "資料不足" | "可分析" | "資料充足";
 export type WeaknessEvidence = "中" | "高";
 
 export type WeaknessSubjectSummary = {
@@ -24,7 +24,7 @@ export type WeaknessSubjectSummary = {
   uniqueQuestions: number;
   correct: number;
   wrong: number;
-  correctRate: number;
+  correctRate: number | null;
   certainWrong: number;
   uncertainCorrect: number;
   eligibleConceptCount: number;
@@ -93,8 +93,7 @@ function isExplicitCertain(attempt: Attempt) {
 }
 
 function getDataStatus(uniqueQuestions: number): WeaknessDataStatus {
-  if (uniqueQuestions === 0) return "尚無近期紀錄";
-  if (uniqueQuestions < 5) return "資料有限";
+  if (uniqueQuestions < 5) return "資料不足";
   if (uniqueQuestions < 12) return "可分析";
   return "資料充足";
 }
@@ -273,7 +272,8 @@ export function analyzeRecentWeakness({
       uniqueQuestions: items.length,
       correct: items.length - wrong,
       wrong,
-      correctRate: items.length === 0 ? 0 : round(((items.length - wrong) / items.length) * 100),
+      correctRate:
+        items.length < 5 ? null : round(((items.length - wrong) / items.length) * 100),
       certainWrong: items.filter(
         (item) => !item.attempt.isCorrect && isExplicitCertain(item.attempt)
       ).length,

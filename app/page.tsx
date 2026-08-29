@@ -53,6 +53,11 @@ const REVIEW_ENTRIES = [
 
 const HOME_RELEASE_NOTES = [
   {
+    time: "08/29",
+    title: "找題後直接開刷",
+    body: "搜尋可多選題目直接開成私人練習；一般選科也拆成範圍與設定兩步，弱點資料不足時不再硬顯示 0%。"
+  },
+  {
     time: "08/27",
     title: "搜題先別急著偷看",
     body: "題目搜尋可以先隱藏答案，展開後自己想完再看答案與詳解；想快速查答案，也能切回直接顯示。"
@@ -1180,7 +1185,7 @@ export default function HomePage() {
         </section>
       ) : null}
 
-      <section id="feedback" className="home-work-section home-feedback-section" aria-labelledby="home-feedback-title">
+      <section id="feedback" tabIndex={-1} className="home-work-section home-feedback-section focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 focus-visible:ring-offset-2" aria-labelledby="home-feedback-title">
         <header className="home-feedback-heading">
           <div>
             <p className="home-kicker">交流</p>

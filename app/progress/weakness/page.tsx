@@ -22,6 +22,7 @@ import {
 import type { Question, QuizSession, SubjectName } from "@/types/quiz";
 
 const ANALYSIS_SUBJECTS = [...MED1_SUBJECTS, ...MED2_SUBJECTS];
+const MIN_DIAGNOSTIC_QUESTIONS = 10;
 const ALL_ANALYSIS_QUESTIONS = ANALYSIS_SUBJECTS.flatMap(
   (subject) => subjectRegistry[subject].questions
 );
@@ -221,7 +222,13 @@ export default function WeaknessAnalysisPage() {
       {progress.stage !== "ready" ? (
         <section className="py-10">
           <div className="mx-auto max-w-2xl">
-            <p className="text-center text-base font-semibold text-ink">{progress.message}</p>
+            <p
+              className="text-center text-base font-semibold text-ink"
+              role={progress.stage === "failed" ? "alert" : "status"}
+              aria-live="polite"
+            >
+              {progress.message}
+            </p>
             <div
               role="progressbar"
               aria-label="弱點分析進度"
@@ -251,6 +258,43 @@ export default function WeaknessAnalysisPage() {
       ) : null}
 
       {result && progress.stage === "ready" ? (
+        result.recentUniqueQuestions < MIN_DIAGNOSTIC_QUESTIONS ? (
+          <section className="mx-auto max-w-2xl py-10 text-center" aria-labelledby="weakness-empty-title">
+            <p className="text-sm font-semibold text-brand-700">資料不足</p>
+            <h2 id="weakness-empty-title" className="mt-2 text-2xl font-bold text-ink">
+              先完成至少 {MIN_DIAGNOSTIC_QUESTIONS} 題，再開始判讀弱點
+            </h2>
+            <p className="mx-auto mt-3 max-w-xl text-sm leading-7 text-slate-600">
+              近 14 天目前有 {result.recentUniqueQuestions} 題不同題目的紀錄。題數還不夠時不顯示百分比，避免把沒有資料誤看成 0 分。
+            </p>
+            <div
+              className="mx-auto mt-5 max-w-md"
+              role="progressbar"
+              aria-label={`診斷進度 ${result.recentUniqueQuestions} / ${MIN_DIAGNOSTIC_QUESTIONS} 題`}
+              aria-valuemin={0}
+              aria-valuemax={MIN_DIAGNOSTIC_QUESTIONS}
+              aria-valuenow={result.recentUniqueQuestions}
+            >
+              <div className="h-2 overflow-hidden rounded-full bg-slate-200">
+                <div
+                  className="h-full rounded-full bg-brand-600"
+                  style={{
+                    width: `${Math.min(100, (result.recentUniqueQuestions / MIN_DIAGNOSTIC_QUESTIONS) * 100)}%`
+                  }}
+                />
+              </div>
+              <p className="mt-2 text-xs font-semibold text-slate-500">
+                {result.recentUniqueQuestions} / {MIN_DIAGNOSTIC_QUESTIONS} 題
+              </p>
+            </div>
+            <Link
+              href="/start"
+              className="mt-6 inline-flex min-h-12 items-center justify-center rounded-2xl bg-brand-600 px-5 py-3 text-sm font-semibold text-white transition hover:bg-brand-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 focus-visible:ring-offset-2"
+            >
+              前往選科開始作答
+            </Link>
+          </section>
+        ) : (
         <>
           <section className="border-b border-slate-200 py-7">
             <p className="text-sm text-slate-500">
@@ -290,10 +334,21 @@ export default function WeaknessAnalysisPage() {
                         {summary.dataStatus}
                       </span>
                     </div>
-                    <p className="mt-4 text-2xl font-bold text-ink">{summary.correctRate}%</p>
-                    <p className="mt-1 text-sm text-slate-600">
-                      {summary.uniqueQuestions} 題 ・ 答錯 {summary.wrong} 題
-                    </p>
+                    {summary.correctRate === null ? (
+                      <>
+                        <p className="mt-4 text-lg font-bold text-slate-600">資料不足</p>
+                        <p className="mt-1 text-sm text-slate-600">
+                          近 14 天 {summary.uniqueQuestions} 題
+                        </p>
+                      </>
+                    ) : (
+                      <>
+                        <p className="mt-4 text-2xl font-bold text-ink">{summary.correctRate}%</p>
+                        <p className="mt-1 text-sm text-slate-600">
+                          {summary.uniqueQuestions} 題 ・ 答錯 {summary.wrong} 題
+                        </p>
+                      </>
+                    )}
                     <div className="mt-3 flex items-end justify-between gap-3 text-xs">
                       <p className="text-slate-500">
                         可分析觀念群 {summary.eligibleConceptCount} 個
@@ -405,6 +460,7 @@ export default function WeaknessAnalysisPage() {
             </section>
           ) : null}
         </>
+        )
       ) : null}
     </main>
   );
