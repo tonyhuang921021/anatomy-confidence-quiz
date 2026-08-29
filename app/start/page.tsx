@@ -404,14 +404,19 @@ export default function StartPage() {
     }
   }
 
-  function selectAllSubjects() {
+  function toggleAllSubjects() {
+    const allSelected = isSubjectGroupFullySelected(selectableSubjects);
     setSelectedSubjects(
-      selectableSubjects
-        .map((item) => item.subject)
-        .filter((subject) => subject !== MICROBIOLOGY_SUBJECT)
+      allSelected
+        ? []
+        : selectableSubjects
+            .map((item) => item.subject)
+            .filter((subject) => subject !== MICROBIOLOGY_SUBJECT)
     );
-    setSelectedMicrobiologyTracks(getAllSubjectTrackKeys(MICROBIOLOGY_SUBJECT));
-    setMicrobiologyExpanded(true);
+    setSelectedMicrobiologyTracks(
+      allSelected ? [] : getAllSubjectTrackKeys(MICROBIOLOGY_SUBJECT)
+    );
+    setMicrobiologyExpanded(!allSelected);
   }
 
   function handlePracticeYearRangeChange(nextRange: PracticeYearRange) {
@@ -734,10 +739,11 @@ export default function StartPage() {
               <div className="grid shrink-0 grid-cols-[auto_auto] gap-2">
                 <button
                   type="button"
-                  onClick={selectAllSubjects}
+                  aria-pressed={isSubjectGroupFullySelected(selectableSubjects)}
+                  onClick={toggleAllSubjects}
                   className="secondary-pill whitespace-nowrap bg-white px-3 py-2 text-sm"
                 >
-                  全選
+                  {isSubjectGroupFullySelected(selectableSubjects) ? "取消全選" : "全選"}
                 </button>
                 <button
                   type="button"

@@ -155,6 +155,20 @@ test("一般練習先選範圍，設定需要時再展開", async ({ page }) => 
   await expect(selection.getByRole("button", { name: "下一步" })).toBeDisabled();
   await expect(page.getByRole("region", { name: /練習設定/ })).toHaveCount(0);
 
+  const selectAllButton = selection.getByRole("button", { name: "全選", exact: true });
+  await selectAllButton.click();
+  await expect(selection.getByRole("button", { name: "取消全選", exact: true })).toHaveAttribute(
+    "aria-pressed",
+    "true"
+  );
+  await selection.getByRole("button", { name: "取消全選", exact: true }).click();
+  await expect(selection.getByRole("button", { name: "全選", exact: true })).toHaveAttribute(
+    "aria-pressed",
+    "false"
+  );
+  await expect(selection.getByText("尚未選擇", { exact: true })).toBeVisible();
+  await expect(selection.getByRole("button", { name: "下一步" })).toBeDisabled();
+
   const anatomyButton = page.locator(".quiz-setup-group button[aria-pressed]").filter({ hasText: "解剖學" }).first();
   await anatomyButton.click();
   await expect(anatomyButton).toHaveAttribute("aria-pressed", "true");
