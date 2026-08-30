@@ -25,6 +25,9 @@
   --topbar-border: #cbd4d0;
   --selection-bg: rgba(31, 102, 82, 0.18);
   --grid-line: rgba(24, 36, 33, 0.025);
+  --app-topbar-height: 64px;
+  --app-mobile-nav-height: calc(4rem + env(safe-area-inset-bottom));
+  --app-mobile-nav-clearance: calc(5.75rem + env(safe-area-inset-bottom));
 }
 
 /* Keep older feature pages inside the same restrained visual system. */
@@ -5578,7 +5581,33 @@ html[data-theme="dark"] .feedback-identity button.is-selected {
 
 @media (max-width: 1023px) {
   .app-content {
-    padding-bottom: calc(64px + env(safe-area-inset-bottom));
+    padding-bottom: var(--app-mobile-nav-height);
+  }
+
+  /* Responsive bottom utilities are emitted after this component layer. */
+  .app-floating-above-mobile-nav {
+    bottom: var(--app-mobile-nav-clearance) !important;
+  }
+
+  .app-floating-panel-above-mobile-nav {
+    bottom: calc(var(--app-mobile-nav-clearance) + 3.75rem) !important;
+    max-height: calc(100vh - var(--app-topbar-height) - var(--app-mobile-nav-clearance) - 4.75rem) !important;
+    max-height: calc(100dvh - var(--app-topbar-height) - var(--app-mobile-nav-clearance) - 4.75rem) !important;
+  }
+
+  .app-floating-content-above-mobile-nav {
+    max-height: calc(100vh - var(--app-topbar-height) - var(--app-mobile-nav-clearance) - 4.5rem) !important;
+    max-height: calc(100dvh - var(--app-topbar-height) - var(--app-mobile-nav-clearance) - 4.5rem) !important;
+  }
+
+  .note-outline-drawer {
+    bottom: var(--app-mobile-nav-height);
+  }
+
+  .note-question-drawer,
+  .note-question-backdrop {
+    top: var(--app-topbar-height);
+    bottom: var(--app-mobile-nav-height);
   }
 
   .app-topbar-focus ~ .app-mobile-nav {
@@ -5587,6 +5616,10 @@ html[data-theme="dark"] .feedback-identity button.is-selected {
 }
 
 @media (max-width: 639px) {
+  :root {
+    --app-topbar-height: 58px;
+  }
+
   .app-topbar {
     min-height: 58px;
     padding: 0.4rem 0.75rem;

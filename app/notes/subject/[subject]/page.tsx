@@ -1559,7 +1559,7 @@ export default function SubjectNotesPage() {
               </button>
             ) : null}
 
-            <div className="fixed bottom-5 right-5 z-30 flex items-center gap-2 sm:bottom-6 sm:right-6">
+            <div className="app-floating-above-mobile-nav fixed bottom-5 right-5 z-30 flex items-center gap-2 sm:bottom-6 sm:right-6">
               <button
                 type="button"
                 onClick={() => void handleUndoNoteMark()}

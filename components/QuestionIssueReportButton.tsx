@@ -1,6 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import type { KeyboardEvent } from "react";
+import { useEffect, useId, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import { useAuth } from "@/components/AuthProvider";
 import { submitQuestionIssueReport } from "@/lib/questionIssueReport";
 import type { Question } from "@/types/quiz";
@@ -42,6 +44,67 @@ export function QuestionReportButton({
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
+  const triggerRef = useRef<HTMLButtonElement>(null);
+  const dialogRef = useRef<HTMLDivElement>(null);
+  const dialogTitleId = useId();
+  const dialogDescriptionId = useId();
+
+  useEffect(() => {
+    if (!isOpen) return;
+
+    const previousBodyOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+
+    const focusFrame = window.requestAnimationFrame(() => {
+      dialogRef.current
+        ?.querySelector<HTMLElement>(
+          'button:not([disabled]), textarea:not([disabled]), input:not([disabled]), select:not([disabled]), [tabindex]:not([tabindex="-1"])'
+        )
+        ?.focus();
+    });
+
+    return () => {
+      window.cancelAnimationFrame(focusFrame);
+      document.body.style.overflow = previousBodyOverflow;
+      window.requestAnimationFrame(() => triggerRef.current?.focus());
+    };
+  }, [isOpen]);
+
+  function handleDialogKeyDown(event: KeyboardEvent<HTMLDivElement>) {
+    event.stopPropagation();
+
+    if (event.key === "Escape") {
+      event.preventDefault();
+      if (!isSubmitting) setIsOpen(false);
+      return;
+    }
+
+    if (event.key !== "Tab" || !dialogRef.current) return;
+
+    const focusableElements = Array.from(
+      dialogRef.current.querySelectorAll<HTMLElement>(
+        'button:not([disabled]), textarea:not([disabled]), input:not([disabled]), select:not([disabled]), [tabindex]:not([tabindex="-1"])'
+      )
+    ).filter((element) => !element.hasAttribute("hidden"));
+
+    if (focusableElements.length === 0) {
+      event.preventDefault();
+      dialogRef.current.focus();
+      return;
+    }
+
+    const firstElement = focusableElements[0];
+    const lastElement = focusableElements[focusableElements.length - 1];
+    const activeElement = document.activeElement;
+
+    if (event.shiftKey && activeElement === firstElement) {
+      event.preventDefault();
+      lastElement.focus();
+    } else if (!event.shiftKey && activeElement === lastElement) {
+      event.preventDefault();
+      firstElement.focus();
+    }
+  }
 
   async function handleSubmit() {
     if (!session?.access_token) {
@@ -77,6 +140,7 @@ export function QuestionReportButton({
   return (
     <>
       <button
+        ref={triggerRef}
         type="button"
         onClick={() => {
           setIsOpen(true);
@@ -99,17 +163,28 @@ export function QuestionReportButton({
         </p>
       ) : null}
 
-      {isOpen ? (
-        <div className="fixed inset-0 z-[140] flex items-center justify-center overflow-y-auto bg-slate-950/40 px-4 py-6">
+      {isOpen && typeof document !== "undefined" ? createPortal(
+        <div
+          className="fixed inset-0 z-[140] flex items-center justify-center overflow-y-auto bg-slate-950/40 px-4 py-6"
+          onKeyDown={handleDialogKeyDown}
+          onMouseDown={(event) => {
+            if (event.target === event.currentTarget && !isSubmitting) {
+              setIsOpen(false);
+            }
+          }}
+        >
           <div
+            ref={dialogRef}
             role="dialog"
             aria-modal="true"
-            aria-label="回報題目問題"
+            aria-labelledby={dialogTitleId}
+            aria-describedby={dialogDescriptionId}
+            tabIndex={-1}
             className="max-h-[calc(100vh-3rem)] w-full max-w-lg overflow-y-auto rounded-3xl bg-white p-5 shadow-2xl ring-1 ring-slate-200"
           >
             <div className="space-y-2">
-              <h2 className="text-xl font-black text-slate-950">回報這題</h2>
-              <p className="text-sm leading-6 text-slate-600">
+              <h2 id={dialogTitleId} className="text-xl font-black text-slate-950">回報這題</h2>
+              <p id={dialogDescriptionId} className="text-sm leading-6 text-slate-600">
                 先選你看到的問題類型，我會把它送到對應的待修清單。
               </p>
             </div>
@@ -223,7 +298,8 @@ export function QuestionReportButton({
               ) : null}
             </div>
           </div>
-        </div>
+        </div>,
+        document.body
       ) : null}
     </>
   );

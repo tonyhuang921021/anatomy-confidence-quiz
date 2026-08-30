@@ -643,9 +643,9 @@ export default function StudyNoteDetailPage() {
       </section>
 
       {note ? (
-        <div className="fixed bottom-5 right-5 z-40">
+        <div className="app-floating-above-mobile-nav fixed bottom-5 right-5 z-40">
           {stickyDrawerOpen ? (
-            <div className="mb-3 max-h-[72vh] w-[min(92vw,420px)] overflow-hidden rounded-3xl border border-teal-100 bg-white shadow-2xl ring-1 ring-slate-100">
+            <div className="app-floating-content-above-mobile-nav mb-3 flex max-h-[72vh] w-[min(92vw,420px)] flex-col overflow-hidden rounded-3xl border border-teal-100 bg-white shadow-2xl ring-1 ring-slate-100">
               <div className="flex items-start justify-between gap-3 border-b border-slate-100 p-4">
                 <div>
                   <p className="text-sm font-black text-slate-950">題目便利貼</p>
@@ -661,7 +661,7 @@ export default function StudyNoteDetailPage() {
                   收起
                 </button>
               </div>
-              <div className="max-h-[58vh] overflow-auto p-3">
+              <div className="min-h-0 flex-1 overflow-auto p-3">
                 {recentSupplementLoading ? (
                   <p className="rounded-2xl bg-slate-50 p-4 text-sm text-slate-500">載入便利貼中...</p>
                 ) : recentSupplementCards.length === 0 ? (

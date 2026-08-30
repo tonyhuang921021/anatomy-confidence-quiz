@@ -3436,7 +3436,7 @@ function ResultsPageContent() {
       {confidenceOverviewItems.length > 0 && !isFullscreenReview && isReviewNavigatorVisible ? (
         <nav
           aria-label="題目回顧快速導覽"
-          className="fixed bottom-[calc(env(safe-area-inset-bottom)+1rem)] right-4 z-40 flex w-14 flex-col items-center gap-1.5 rounded-2xl bg-white p-1.5 shadow-2xl ring-1 ring-slate-200 sm:right-6"
+          className="app-floating-above-mobile-nav fixed bottom-[calc(env(safe-area-inset-bottom)+1rem)] right-4 z-40 flex w-14 flex-col items-center gap-1.5 rounded-2xl bg-white p-1.5 shadow-2xl ring-1 ring-slate-200 sm:right-6"
         >
           <button
             type="button"

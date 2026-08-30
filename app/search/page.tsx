@@ -1315,7 +1315,7 @@ export default function SearchPage() {
           favoriteDialogPreviouslyFocusedRef.current = event.currentTarget;
           setFavoriteBankOpen(true);
         }}
-        className="fixed bottom-[calc(5.75rem+env(safe-area-inset-bottom))] right-5 z-40 inline-flex h-14 w-14 items-center justify-center rounded-full bg-slate-950 text-white shadow-2xl ring-1 ring-white/40 transition hover:-translate-y-0.5 hover:bg-black focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-brand-100 md:bottom-[max(1.25rem,env(safe-area-inset-bottom))]"
+        className="app-floating-above-mobile-nav fixed bottom-[max(1.25rem,env(safe-area-inset-bottom))] right-5 z-40 inline-flex h-14 w-14 items-center justify-center rounded-full bg-slate-950 text-white shadow-2xl ring-1 ring-white/40 transition hover:-translate-y-0.5 hover:bg-black focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-brand-100"
         aria-label="開啟儲存題目"
       >
         <span className="text-xl leading-none">☆</span>

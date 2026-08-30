@@ -1,4 +1,4 @@
-import { expect, test, type Page } from "@playwright/test";
+import { expect, test, type Locator, type Page } from "@playwright/test";
 
 const ROUTES = [
   "/",
@@ -27,6 +27,74 @@ async function expectStablePage(page: Page, route: string) {
     pageWidth: document.documentElement.scrollWidth
   }));
   expect(dimensions.pageWidth).toBeLessThanOrEqual(dimensions.viewportWidth);
+}
+
+async function expectFullyInsideViewport(page: Page, locator: Locator) {
+  await expect(locator).toBeVisible();
+  const box = await locator.boundingBox();
+  const viewport = page.viewportSize();
+  if (!box || !viewport) throw new Error("無法取得元素或視窗的幾何資訊");
+
+  expect(box.x).toBeGreaterThanOrEqual(-1);
+  expect(box.y).toBeGreaterThanOrEqual(-1);
+  expect(box.x + box.width).toBeLessThanOrEqual(viewport.width + 1);
+  expect(box.y + box.height).toBeLessThanOrEqual(viewport.height + 1);
+}
+
+async function expectFullyInside(locator: Locator, boundary: Locator) {
+  await expect(locator).toBeVisible();
+  await expect(boundary).toBeVisible();
+  const box = await locator.boundingBox();
+  const boundaryBox = await boundary.boundingBox();
+  if (!box || !boundaryBox) throw new Error("無法取得元素或容器的幾何資訊");
+
+  expect(box.x).toBeGreaterThanOrEqual(boundaryBox.x - 1);
+  expect(box.y).toBeGreaterThanOrEqual(boundaryBox.y - 1);
+  expect(box.x + box.width).toBeLessThanOrEqual(boundaryBox.x + boundaryBox.width + 1);
+  expect(box.y + box.height).toBeLessThanOrEqual(boundaryBox.y + boundaryBox.height + 1);
+}
+
+async function expectCenterPointClickable(locator: Locator) {
+  await expect(locator).toBeVisible();
+  const topmost = await locator.evaluate((element) => {
+    const rect = element.getBoundingClientRect();
+    const centerX = rect.left + rect.width / 2;
+    const centerY = rect.top + rect.height / 2;
+    const hit = document.elementFromPoint(centerX, centerY);
+    return Boolean(hit && (hit === element || element.contains(hit)));
+  });
+
+  expect(topmost).toBe(true);
+  await locator.click({ trial: true });
+}
+
+async function expectMoreActionsPanelUsable({
+  page,
+  toolbar,
+  boundary
+}: {
+  page: Page;
+  toolbar: Locator;
+  boundary: Locator;
+}) {
+  const moreButton = toolbar.getByRole("button", { name: "更多", exact: true });
+  await moreButton.click();
+  await expect(moreButton).toHaveAttribute("aria-expanded", "true");
+
+  const panel = toolbar.getByRole("group", { name: "更多操作" });
+  await expect(panel).toBeVisible();
+  await panel.scrollIntoViewIfNeeded();
+  await expectFullyInsideViewport(page, panel);
+  await expectFullyInside(panel, boundary);
+
+  const actions = panel.locator("button:not([disabled]), a[href]");
+  const actionCount = await actions.count();
+  expect(actionCount).toBeGreaterThan(0);
+  for (let index = 0; index < actionCount; index += 1) {
+    await expectCenterPointClickable(actions.nth(index));
+  }
+
+  return { moreButton, panel };
 }
 
 test("導覽預設收起，留言入口會回到首頁完整留言板", async ({ page }) => {
@@ -467,13 +535,18 @@ test("搜尋結果展開後不會重複題幹與分類", async ({ page }) => {
   );
   expect(Math.max(...sourceButtonY) - Math.min(...sourceButtonY)).toBeLessThanOrEqual(2);
 
-  await sourceToolbar.locator("summary").filter({ hasText: "更多" }).click();
+  const { panel: moreActionsPanel } = await expectMoreActionsPanelUsable({
+    page,
+    toolbar: sourceToolbar,
+    boundary: card
+  });
   const saveQuestionButton = sourceToolbar.getByRole("button", { name: "儲存題目" });
   await expect(saveQuestionButton).toBeVisible();
   await saveQuestionButton.click();
   await expect(sourceToolbar.getByRole("button", { name: /取消儲存題目/ })).toBeVisible();
   await expect(sourceToolbar.getByRole("button", { name: "用 AI 補詳解" })).toBeVisible();
   await expect(sourceToolbar.getByRole("button", { name: "回報" })).toBeVisible();
+  await expectFullyInsideViewport(page, moreActionsPanel);
 
   const viewportWidth = page.viewportSize()?.width ?? 0;
   const optionColumnCount = await options.evaluate((element) =>
@@ -696,9 +769,36 @@ test("正式作答詳解使用同一組精簡工具列", async ({ page }) => {
   );
   expect(Math.max(...rowY) - Math.min(...rowY)).toBeLessThanOrEqual(2);
 
-  await toolbar.locator("summary").filter({ hasText: "更多" }).click();
-  await expect(toolbar.getByRole("button", { name: "用 AI 補詳解" })).toBeVisible();
-  await expect(toolbar.getByRole("button", { name: "回報" })).toBeVisible();
+  const answerCard = toolbar.locator("xpath=ancestor::div[.//*[@role='status']][1]");
+  const { moreButton, panel: moreActionsPanel } = await expectMoreActionsPanelUsable({
+    page,
+    toolbar,
+    boundary: answerCard
+  });
+  await expect(moreActionsPanel.getByRole("button", { name: "用 AI 補詳解" })).toBeVisible();
+  const reportButton = moreActionsPanel.getByRole("button", { name: "回報" });
+  await expect(reportButton).toBeVisible();
+
+  await reportButton.click();
+  const reportDialog = page.getByRole("dialog", { name: "回報這題" });
+  await expect(reportDialog).toBeVisible();
+  const classificationIssueButton = reportDialog.getByRole("button", { name: "分類錯誤" });
+  const cancelReportButton = reportDialog.getByRole("button", { name: "取消" });
+  await expect(classificationIssueButton).toBeFocused();
+  await page.keyboard.press("Shift+Tab");
+  await expect(cancelReportButton).toBeFocused();
+  await page.keyboard.press("Tab");
+  await expect(classificationIssueButton).toBeFocused();
+  await page.keyboard.press("Escape");
+  await expect(reportDialog).not.toBeVisible();
+  await expect(reportButton).toBeFocused();
+  await expect(moreActionsPanel).toBeVisible();
+  await expect(moreButton).toHaveAttribute("aria-expanded", "true");
+
+  await page.keyboard.press("Escape");
+  await expect(moreActionsPanel).not.toBeVisible();
+  await expect(moreButton).toHaveAttribute("aria-expanded", "false");
+  await expect(moreButton).toBeFocused();
 });
 
 test("模擬考倒數歸零後不再顯示可暫停按鈕", async ({ page }) => {
@@ -783,6 +883,70 @@ test("結果頁展開後分類只顯示一次", async ({ page }) => {
   await card.locator("summary").click();
   await expect(card).toHaveAttribute("open", "");
   await expect(card.getByText(label, { exact: true })).toHaveCount(1);
+});
+
+test("手機題目回顧快速導覽不會被底部導覽遮住", async ({ page }, testInfo) => {
+  test.skip(testInfo.project.name !== "webkit-mobile", "只檢查手機固定底部控制");
+  const completedAt = "2026-08-30T01:00:00.000Z";
+  await page.addInitScript(({ at }) => {
+    const session = {
+      id: "site-shell-mobile-review-navigator",
+      subject: "醫學（二）",
+      startedAt: at,
+      completedAt: at,
+      settings: { mode: "random", questionCount: 2, subjectFilter: "病理學" },
+      questionOrder: ["MOEX-115020-2301-Q078", "MOEX-115020-2301-Q079"],
+      attempts: [
+        {
+          questionId: "MOEX-115020-2301-Q078",
+          selectedAnswer: "C",
+          correctAnswer: "A",
+          isCorrect: false,
+          confidence: 4,
+          answeredAt: at
+        },
+        {
+          questionId: "MOEX-115020-2301-Q079",
+          selectedAnswer: "A",
+          correctAnswer: "B",
+          isCorrect: false,
+          confidence: 4,
+          answeredAt: at
+        }
+      ]
+    };
+    window.localStorage.setItem("anatomy-confidence-active-user-id", "guest");
+    window.localStorage.setItem(
+      "anatomy-confidence-completed-sessions:guest",
+      JSON.stringify([session])
+    );
+  }, { at: completedAt });
+
+  await page.goto("/results?sessionId=site-shell-mobile-review-navigator", {
+    waitUntil: "networkidle"
+  });
+  await waitForShellReady(page);
+  await page.getByRole("heading", { name: "題目回顧", level: 2 }).scrollIntoViewIfNeeded();
+
+  const quickNavigator = page.getByRole("navigation", { name: "題目回顧快速導覽" });
+  const mobileNavigation = page.locator(".app-mobile-nav");
+  await expect(quickNavigator).toBeVisible();
+  await expect(mobileNavigation).toBeVisible();
+  await expectFullyInsideViewport(page, quickNavigator);
+
+  const quickNavigatorBox = await quickNavigator.boundingBox();
+  const mobileNavigationBox = await mobileNavigation.boundingBox();
+  if (!quickNavigatorBox || !mobileNavigationBox) {
+    throw new Error("無法取得手機固定控制與底部導覽的幾何資訊");
+  }
+  expect(quickNavigatorBox.y + quickNavigatorBox.height)
+    .toBeLessThanOrEqual(mobileNavigationBox.y + 1);
+
+  const nextButton = quickNavigator.getByRole("button", { name: "展開下一題" });
+  await expectCenterPointClickable(nextButton);
+  await nextButton.click();
+  await expect(page.locator("#review-wrong-MOEX-115020-2301-Q078-0"))
+    .toHaveAttribute("open", "");
 });
 
 test("手機滿版回顧會圈限焦點、隔離背景並可用 Esc 返回", async ({ page }, testInfo) => {

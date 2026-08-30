@@ -420,7 +420,7 @@ export function ResourceShareHub() {
       <button
         type="button"
         onClick={() => setComposerOpen(true)}
-        className="fixed bottom-[max(1.5rem,env(safe-area-inset-bottom))] right-[max(1.5rem,env(safe-area-inset-right))] z-40 flex h-16 w-16 items-center justify-center rounded-full bg-emerald-700 text-3xl font-black text-white shadow-2xl shadow-emerald-900/20 transition hover:-translate-y-1 hover:bg-emerald-800"
+        className="app-floating-above-mobile-nav fixed bottom-[max(1.5rem,env(safe-area-inset-bottom))] right-[max(1.5rem,env(safe-area-inset-right))] z-40 flex h-16 w-16 items-center justify-center rounded-full bg-emerald-700 text-3xl font-black text-white shadow-2xl shadow-emerald-900/20 transition hover:-translate-y-1 hover:bg-emerald-800"
         aria-label="新增分享"
       >
         +

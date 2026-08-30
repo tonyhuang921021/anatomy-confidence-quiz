@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { getQuestionClassificationLabel } from "@/lib/analysisPrimaryTag";
 import { OptionKey, Question } from "@/types/quiz";
 
@@ -109,31 +109,44 @@ export function CopyQuestionPromptButton({
   compact = false
 }: CopyQuestionPromptButtonProps) {
   const [copied, setCopied] = useState(false);
+  const resetTimerRef = useRef<number | null>(null);
+
+  useEffect(() => {
+    return () => {
+      if (resetTimerRef.current !== null) {
+        window.clearTimeout(resetTimerRef.current);
+      }
+    };
+  }, []);
 
   async function handleCopy() {
     await copyToClipboard(buildQuestionPrompt({ question, selectedAnswer, correctAnswer, eliminatedOptions }));
     setCopied(true);
-    window.setTimeout(() => setCopied(false), 1400);
+    if (resetTimerRef.current !== null) {
+      window.clearTimeout(resetTimerRef.current);
+    }
+    resetTimerRef.current = window.setTimeout(() => {
+      setCopied(false);
+      resetTimerRef.current = null;
+    }, 1400);
   }
 
   return (
-    <span className={`relative inline-flex items-center ${className}`}>
+    <span className={`inline-flex items-center ${className}`}>
       <button
         type="button"
         onClick={() => void handleCopy()}
         className={`rounded-full bg-slate-900/90 text-xs font-semibold text-white shadow-sm transition hover:bg-slate-950 focus:outline-none focus:ring-2 focus:ring-slate-400 ${
           compact ? "inline-flex h-8 w-8 items-center justify-center p-0" : "min-h-9 px-3 py-1.5"
         }`}
-        aria-label="複製題目給 AI 詳解"
-        title="複製題目給 AI 詳解"
+        aria-label={copied ? "題目已複製" : "複製題目給 AI 詳解"}
+        title={copied ? "題目已複製" : "複製題目給 AI 詳解"}
       >
-        {compact ? "⧉" : "複製給 AI"}
+        {compact ? (copied ? "✓" : "⧉") : copied ? "已複製" : "複製給 AI"}
       </button>
-      {copied ? (
-        <span className="pointer-events-none absolute left-1/2 top-full z-20 mt-2 -translate-x-1/2 whitespace-nowrap rounded-full bg-black/75 px-3 py-1 text-[11px] font-semibold text-white shadow-lg">
-          已複製
-        </span>
-      ) : null}
+      <span className="sr-only" role="status" aria-live="polite">
+        {copied ? "題目已複製" : ""}
+      </span>
     </span>
   );
 }

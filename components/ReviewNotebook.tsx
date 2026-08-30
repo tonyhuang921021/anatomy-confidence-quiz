@@ -1307,7 +1307,7 @@ export function ReviewNotebook({
         <button
           type="button"
           onClick={() => setIsManualEditMode((current) => !current)}
-          className={`fixed bottom-[calc(1.25rem+env(safe-area-inset-bottom))] right-[calc(1.25rem+env(safe-area-inset-right))] z-[60] inline-flex h-14 w-14 items-center justify-center rounded-full shadow-xl ring-1 transition focus:outline-none focus:ring-4 ${
+          className={`${fullscreenMobile ? "" : "app-floating-above-mobile-nav"} fixed bottom-[calc(1.25rem+env(safe-area-inset-bottom))] right-[calc(1.25rem+env(safe-area-inset-right))] z-[60] inline-flex h-14 w-14 items-center justify-center rounded-full shadow-xl ring-1 transition focus:outline-none focus:ring-4 ${
             isManualEditMode
               ? "bg-emerald-600 text-white ring-emerald-200 hover:bg-emerald-700 focus:ring-emerald-200"
               : "bg-slate-950 text-white ring-slate-300 hover:bg-slate-800 focus:ring-slate-200"

@@ -1,7 +1,7 @@
 "use client";
 
-import type { ReactNode } from "react";
-import { useCallback, useEffect, useState } from "react";
+import type { KeyboardEvent, ReactNode } from "react";
+import { useCallback, useEffect, useId, useRef, useState } from "react";
 import { BookOpen, CircleOff, Layers3, MessageCircle, MoreHorizontal } from "lucide-react";
 import { useAuth } from "@/components/AuthProvider";
 import { QuestionSupplementCardsPanel } from "@/components/QuestionSupplementCardsPanel";
@@ -32,6 +32,9 @@ export function QuestionExplanationTabs({
   const [reactions, setReactions] = useState<QuestionSupplementReactionSummary[]>([]);
   const [reactionLoading, setReactionLoading] = useState(false);
   const [reactionError, setReactionError] = useState("");
+  const [isMoreActionsOpen, setIsMoreActionsOpen] = useState(false);
+  const moreActionsButtonRef = useRef<HTMLButtonElement>(null);
+  const moreActionsPanelId = useId();
   const hasAiExplanationContent = Boolean(aiExplanationContent);
   const hasRelatedQuestionsContent = Boolean(relatedQuestionsContent);
   const handleCountChange = useCallback((count: number) => setSupplementCount(count), []);
@@ -71,6 +74,19 @@ export function QuestionExplanationTabs({
     });
   }, [hasAiExplanationContent, hasRelatedQuestionsContent, question.id]);
 
+  useEffect(() => {
+    setIsMoreActionsOpen(false);
+  }, [question.id]);
+
+  function handleMoreActionsKeyDown(event: KeyboardEvent<HTMLElement>) {
+    if (event.key !== "Escape" || !isMoreActionsOpen) return;
+
+    event.preventDefault();
+    event.stopPropagation();
+    setIsMoreActionsOpen(false);
+    window.requestAnimationFrame(() => moreActionsButtonRef.current?.focus());
+  }
+
   const pureChaosReaction = reactions.find((reaction) => reaction.type === "pure_chaos") ?? {
     type: "pure_chaos" as const,
     label: "這題我們不要了",
@@ -101,7 +117,10 @@ export function QuestionExplanationTabs({
   }
 
   return (
-    <section className={`border-y border-slate-200/90 py-2.5 ${className}`}>
+    <section
+      className={`border-y border-slate-200/90 py-2.5 ${className}`}
+      onKeyDown={handleMoreActionsKeyDown}
+    >
       <div className="flex min-w-0 items-center gap-1.5">
         <div className="flex min-w-0 flex-1 items-center gap-1.5 overflow-x-auto py-0.5">
         {hasAiExplanationContent ? (
@@ -196,19 +215,32 @@ export function QuestionExplanationTabs({
           </button>
         </div>
         {moreActionsContent ? (
-        <details className="group relative shrink-0">
-          <summary className="inline-flex min-h-9 cursor-pointer list-none items-center gap-1.5 rounded-lg bg-white px-2.5 py-1.5 text-xs font-bold text-slate-700 ring-1 ring-slate-200 transition hover:bg-slate-50 [&::-webkit-details-marker]:hidden">
+          <button
+            ref={moreActionsButtonRef}
+            type="button"
+            onClick={() => setIsMoreActionsOpen((current) => !current)}
+            aria-expanded={isMoreActionsOpen}
+            aria-controls={moreActionsPanelId}
+            className="inline-flex min-h-9 shrink-0 items-center gap-1.5 rounded-lg bg-white px-2.5 py-1.5 text-xs font-bold text-slate-700 ring-1 ring-slate-200 transition hover:bg-slate-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500"
+          >
             <MoreHorizontal aria-hidden="true" className="size-4" strokeWidth={1.8} />
             更多
-          </summary>
-          <div className="absolute right-0 z-30 mt-2 w-64 rounded-xl border border-slate-200 bg-white p-2 shadow-[0_16px_40px_rgba(15,23,42,0.14)]">
-            <div className="grid gap-1 [&_button]:w-full [&_button]:justify-start [&_button]:rounded-lg">
-              {moreActionsContent}
-            </div>
-          </div>
-        </details>
+          </button>
         ) : null}
       </div>
+      {moreActionsContent ? (
+        <div
+          id={moreActionsPanelId}
+          role="group"
+          aria-label="更多操作"
+          hidden={!isMoreActionsOpen}
+          className="ml-auto mt-2 w-full rounded-xl border border-slate-200 bg-white p-2 shadow-[0_10px_28px_rgba(15,23,42,0.10)] sm:w-64"
+        >
+          <div className="grid gap-1 [&_button]:w-full [&_button]:justify-start [&_button]:rounded-lg">
+            {moreActionsContent}
+          </div>
+        </div>
+      ) : null}
       {reactionError ? <p className="mt-2 text-xs font-semibold text-rose-700" role="alert">{reactionError}</p> : null}
       {activeTab === "ai" && aiExplanationContent ? (
         <div className="mt-3">

@@ -985,13 +985,13 @@ export default function PharmacologyReviewPage() {
       <button
         type="button"
         onClick={() => setShowWeakList((value) => !value)}
-        className="fixed bottom-5 right-5 z-40 rounded-full bg-slate-950 px-4 py-3 text-sm font-black text-white shadow-2xl transition hover:-translate-y-0.5 sm:bottom-8 sm:right-8"
+        className="app-floating-above-mobile-nav fixed bottom-5 right-5 z-40 rounded-full bg-slate-950 px-4 py-3 text-sm font-black text-white shadow-2xl transition hover:-translate-y-0.5 sm:bottom-8 sm:right-8"
       >
         最不會的藥
       </button>
 
       {showWeakList ? (
-        <div className="fixed inset-x-3 bottom-20 z-40 mx-auto max-w-xl rounded-[1.6rem] border border-slate-200 bg-white/96 p-4 shadow-2xl backdrop-blur sm:bottom-24 sm:right-8 sm:left-auto sm:mx-0">
+        <div className="app-floating-panel-above-mobile-nav fixed inset-x-3 bottom-20 z-40 mx-auto flex max-w-xl flex-col overflow-hidden rounded-[1.6rem] border border-slate-200 bg-white/96 p-4 shadow-2xl backdrop-blur sm:bottom-24 sm:right-8 sm:left-auto sm:mx-0">
           <div className="flex items-start justify-between gap-3">
             <div>
               <p className="eyebrow text-[10px]">Weakest Drugs</p>
@@ -1006,7 +1006,7 @@ export default function PharmacologyReviewPage() {
               關閉
             </button>
           </div>
-          <div className="mt-4 max-h-[52vh] space-y-2 overflow-auto pr-1">
+          <div className="mt-4 min-h-0 max-h-[52vh] flex-1 space-y-2 overflow-auto pr-1">
             {weakestCards.length > 0 ? (
               weakestCards.map(({ item, index, stats, score }) => {
                 const itemLevelMeta = LEVEL_META[item.examLevel] ?? LEVEL_META.D;
