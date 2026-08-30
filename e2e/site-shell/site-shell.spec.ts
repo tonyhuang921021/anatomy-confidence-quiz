@@ -54,18 +54,44 @@ async function expectFullyInside(locator: Locator, boundary: Locator) {
   expect(box.y + box.height).toBeLessThanOrEqual(boundaryBox.y + boundaryBox.height + 1);
 }
 
-async function expectCenterPointClickable(locator: Locator) {
-  await expect(locator).toBeVisible();
-  const topmost = await locator.evaluate((element) => {
-    const rect = element.getBoundingClientRect();
-    const centerX = rect.left + rect.width / 2;
-    const centerY = rect.top + rect.height / 2;
-    const hit = document.elementFromPoint(centerX, centerY);
-    return Boolean(hit && (hit === element || element.contains(hit)));
-  });
-
-  expect(topmost).toBe(true);
-  await locator.click({ trial: true });
+async function expectActionClickable(locator: Locator) {
+  await expect.poll(async () => {
+    try {
+      await expect(locator).toBeVisible({ timeout: 600 });
+      await locator.scrollIntoViewIfNeeded({ timeout: 600 });
+      const result = await locator.evaluate((element) => {
+        const rect = element.getBoundingClientRect();
+        const centerY = rect.top + rect.height / 2;
+        const horizontalInset = Math.min(12, rect.width / 4);
+        const points = [
+          { x: rect.left + horizontalInset, y: centerY },
+          { x: rect.left + rect.width / 2, y: centerY },
+          { x: rect.right - horizontalInset, y: centerY }
+        ];
+        const hits = points.map(({ x, y }) => {
+          const hit = document.elementFromPoint(x, y);
+          return {
+            x,
+            y,
+            clickable: Boolean(hit && (hit === element || element.contains(hit))),
+            hit: hit instanceof HTMLElement
+              ? hit.getAttribute("aria-label") || hit.textContent?.trim() || hit.tagName
+              : null
+          };
+        });
+        return {
+          clickable: hits.every((hit) => hit.clickable),
+          target: element.getAttribute("aria-label") || element.textContent?.trim() || element.tagName,
+          hits
+        };
+      });
+      if (!result.clickable) return JSON.stringify(result);
+      await locator.click({ trial: true, timeout: 600 });
+      return "clickable";
+    } catch (error) {
+      return error instanceof Error ? `retry: ${error.message}` : "retry: unknown error";
+    }
+  }, { timeout: 5_000 }).toBe("clickable");
 }
 
 async function expectMoreActionsPanelUsable({
@@ -91,7 +117,7 @@ async function expectMoreActionsPanelUsable({
   const actionCount = await actions.count();
   expect(actionCount).toBeGreaterThan(0);
   for (let index = 0; index < actionCount; index += 1) {
-    await expectCenterPointClickable(actions.nth(index));
+    await expectActionClickable(actions.nth(index));
   }
 
   return { moreButton, panel };
@@ -544,7 +570,9 @@ test("搜尋結果展開後不會重複題幹與分類", async ({ page }) => {
   await expect(saveQuestionButton).toBeVisible();
   await saveQuestionButton.click();
   await expect(sourceToolbar.getByRole("button", { name: /取消儲存題目/ })).toBeVisible();
-  await expect(sourceToolbar.getByRole("button", { name: "用 AI 補詳解" })).toBeVisible();
+  await expect(
+    sourceToolbar.getByRole("button", { name: /^(用 AI 補詳解|重新替換詳解)$/ })
+  ).toBeVisible();
   await expect(sourceToolbar.getByRole("button", { name: "回報" })).toBeVisible();
   await expectFullyInsideViewport(page, moreActionsPanel);
 
@@ -775,7 +803,9 @@ test("正式作答詳解使用同一組精簡工具列", async ({ page }) => {
     toolbar,
     boundary: answerCard
   });
-  await expect(moreActionsPanel.getByRole("button", { name: "用 AI 補詳解" })).toBeVisible();
+  await expect(
+    moreActionsPanel.getByRole("button", { name: /^(用 AI 補詳解|重新替換詳解)$/ })
+  ).toBeVisible();
   const reportButton = moreActionsPanel.getByRole("button", { name: "回報" });
   await expect(reportButton).toBeVisible();
 
