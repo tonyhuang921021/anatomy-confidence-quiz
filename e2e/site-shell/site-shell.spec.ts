@@ -9,7 +9,8 @@ const ROUTES = [
   "/feedback",
   "/start",
   "/review",
-  "/search"
+  "/search",
+  "/pharmacology-review"
 ];
 
 async function waitForShellReady(page: Page) {
@@ -973,7 +974,7 @@ test("手機題目回顧快速導覽不會被底部導覽遮住", async ({ page 
     .toBeLessThanOrEqual(mobileNavigationBox.y + 1);
 
   const nextButton = quickNavigator.getByRole("button", { name: "展開下一題" });
-  await expectCenterPointClickable(nextButton);
+  await expectActionClickable(nextButton);
   await nextButton.click();
   await expect(page.locator("#review-wrong-MOEX-115020-2301-Q078-0"))
     .toHaveAttribute("open", "");

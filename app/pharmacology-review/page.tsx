@@ -6,9 +6,17 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useAuth } from "@/components/AuthProvider";
 import { PHARMACOLOGY_FLASHCARDS } from "@/data/pharmacologyFlashcards";
 import { getPharmacologyReverseSwipePreference } from "@/lib/accountPreferences";
+import {
+  ALL_PHARMACOLOGY_REVIEW_SCOPE,
+  PHARMACOLOGY_REVIEW_SCOPES,
+  getPharmacologyReviewCardIndexes,
+  normalizePharmacologyReviewScope,
+  type PharmacologyReviewScope
+} from "@/lib/pharmacologyReviewScope";
 import { loadPharmacologyReverseSwipe, savePharmacologyReverseSwipe } from "@/lib/storage";
 
 const REVIEW_STATS_STORAGE_KEY = "pharmacology-review-stats-v1";
+const REVIEW_SCOPE_STORAGE_KEY = "pharmacology-review-scope-v1";
 const CLOUD_SYNC_DEBOUNCE_MS = 1600;
 const DESKTOP_SWIPE_THRESHOLD = 128;
 const MIN_MOBILE_SWIPE_THRESHOLD = 92;
@@ -167,24 +175,50 @@ function getBackDrugNameSizeClass(name: string) {
   return "text-3xl";
 }
 
-function pickWeightedIndex(statsMap: DrugReviewStatsMap = {}, currentIndex?: number) {
-  const totalWeight = PHARMACOLOGY_FLASHCARDS.reduce((sum, item, index) => {
+function pickWeightedIndex(
+  statsMap: DrugReviewStatsMap = {},
+  candidateIndexes = PHARMACOLOGY_FLASHCARDS.map((_, index) => index),
+  currentIndex?: number
+) {
+  if (candidateIndexes.length === 0) return 0;
+
+  const totalWeight = candidateIndexes.reduce((sum, index) => {
+    const item = PHARMACOLOGY_FLASHCARDS[index];
+    if (!item) return sum;
     const weight = getReviewWeight(item, getReviewStats(statsMap, item));
-    return sum + (index === currentIndex && PHARMACOLOGY_FLASHCARDS.length > 1 ? weight * 0.12 : weight);
+    return sum + (index === currentIndex && candidateIndexes.length > 1 ? weight * 0.12 : weight);
   }, 0);
   let cursor = Math.random() * totalWeight;
 
-  for (let index = 0; index < PHARMACOLOGY_FLASHCARDS.length; index += 1) {
+  for (const index of candidateIndexes) {
     const item = PHARMACOLOGY_FLASHCARDS[index];
     if (!item) continue;
     const weight = getReviewWeight(item, getReviewStats(statsMap, item));
-    cursor -= index === currentIndex && PHARMACOLOGY_FLASHCARDS.length > 1 ? weight * 0.12 : weight;
+    cursor -= index === currentIndex && candidateIndexes.length > 1 ? weight * 0.12 : weight;
     if (cursor <= 0) {
       return index;
     }
   }
 
-  return Math.max(PHARMACOLOGY_FLASHCARDS.length - 1, 0);
+  return candidateIndexes.at(-1) ?? 0;
+}
+
+function loadReviewScope() {
+  if (typeof window === "undefined") return ALL_PHARMACOLOGY_REVIEW_SCOPE;
+
+  try {
+    return normalizePharmacologyReviewScope(window.localStorage.getItem(REVIEW_SCOPE_STORAGE_KEY));
+  } catch {
+    return ALL_PHARMACOLOGY_REVIEW_SCOPE;
+  }
+}
+
+function saveReviewScope(scope: PharmacologyReviewScope) {
+  try {
+    window.localStorage.setItem(REVIEW_SCOPE_STORAGE_KEY, scope);
+  } catch {
+    // Keep review usable when browser storage is full or blocked.
+  }
 }
 
 function loadReviewStats(): DrugReviewStatsMap {
@@ -374,6 +408,7 @@ export default function PharmacologyReviewPage() {
   const [hasRevealedClass, setHasRevealedClass] = useState(false);
   const [copied, setCopied] = useState(false);
   const [reviewStats, setReviewStats] = useState<DrugReviewStatsMap>({});
+  const [reviewScope, setReviewScope] = useState<PharmacologyReviewScope>(ALL_PHARMACOLOGY_REVIEW_SCOPE);
   const [reverseSwipe, setReverseSwipe] = useState(() => loadPharmacologyReverseSwipe(false));
   const [isDragging, setIsDragging] = useState(false);
   const [isLeaving, setIsLeaving] = useState(false);
@@ -393,6 +428,10 @@ export default function PharmacologyReviewPage() {
   const latestReviewStatsRef = useRef<DrugReviewStatsMap>({});
   const accessTokenRef = useRef<string>("");
 
+  const reviewCardIndexes = useMemo(
+    () => getPharmacologyReviewCardIndexes(PHARMACOLOGY_FLASHCARDS, reviewScope),
+    [reviewScope]
+  );
   const card = PHARMACOLOGY_FLASHCARDS[cardIndex] ?? PHARMACOLOGY_FLASHCARDS[0];
   const levelMeta = LEVEL_META[card.examLevel] ?? LEVEL_META.D;
   const leftSwipeDirection: ReviewDirection = reverseSwipe ? "unknown" : "known";
@@ -405,7 +444,8 @@ export default function PharmacologyReviewPage() {
   );
   const weakestCards = useMemo(
     () =>
-      PHARMACOLOGY_FLASHCARDS.map((item, index) => {
+      reviewCardIndexes.map((index) => {
+        const item = PHARMACOLOGY_FLASHCARDS[index]!;
         const stats = getReviewStats(reviewStats, item);
         return {
           item,
@@ -417,14 +457,17 @@ export default function PharmacologyReviewPage() {
         .filter(({ stats }) => stats.unknown > 0)
         .sort((first, second) => second.score - first.score || second.item.drawWeight - first.item.drawWeight)
         .slice(0, 12),
-    [reviewStats]
+    [reviewCardIndexes, reviewStats]
   );
 
   useEffect(() => {
     const storedStats = loadReviewStats();
+    const storedScope = loadReviewScope();
+    const storedScopeIndexes = getPharmacologyReviewCardIndexes(PHARMACOLOGY_FLASHCARDS, storedScope);
     latestReviewStatsRef.current = storedStats;
     setReviewStats(storedStats);
-    setCardIndex(pickWeightedIndex(storedStats));
+    setReviewScope(storedScope);
+    setCardIndex(pickWeightedIndex(storedStats, storedScopeIndexes));
 
     return () => {
       if (swipeTimerRef.current) {
@@ -578,6 +621,20 @@ export default function PharmacologyReviewPage() {
     setCopied(false);
   };
 
+  const changeReviewScope = (value: string) => {
+    const nextScope = normalizePharmacologyReviewScope(value);
+    const nextIndexes = getPharmacologyReviewCardIndexes(PHARMACOLOGY_FLASHCARDS, nextScope);
+    saveReviewScope(nextScope);
+    setReviewScope(nextScope);
+    resetCardState();
+    setCardIndex(pickWeightedIndex(reviewStats, nextIndexes, cardIndex));
+    setShowWeakList(false);
+    setSwipeResult(null);
+    dragXRef.current = 0;
+    pendingDragXRef.current = 0;
+    applyDragVisual(0);
+  };
+
   const flipCard = () => {
     if (isLeaving) return;
 
@@ -620,7 +677,7 @@ export default function PharmacologyReviewPage() {
 
     swipeTimerRef.current = window.setTimeout(() => {
       resetCardState();
-      setCardIndex(pickWeightedIndex(nextStats, cardIndex));
+      setCardIndex(pickWeightedIndex(nextStats, reviewCardIndexes, cardIndex));
       setIsLeaving(false);
       setSwipeResult(null);
       dragXRef.current = 0;
@@ -761,34 +818,39 @@ export default function PharmacologyReviewPage() {
   return (
     <main id="main-content" className="shell workspace-page">
       <section className="surface-card p-6 sm:p-8">
-        <div className="flex flex-wrap items-center justify-between gap-3">
+        <div className="flex flex-wrap items-start justify-between gap-3">
           <div>
             <p className="eyebrow">Pharmacology Cards</p>
             <h1 className="display-title mt-3 text-4xl sm:text-6xl">藥理複習</h1>
-            <p className="body-soft mt-3 max-w-2xl text-base leading-8">
-              隨機抽一個藥名，點卡片翻面看分類、機轉、適應症、國考考點、副作用禁忌、口訣和官方出現考期。拖到旁邊放手代表{swipeInstruction}，抽卡會依照重要度和你的不熟程度自動調整。
+            <p className="body-soft mt-3 max-w-2xl text-base leading-7">
+              抽一張，翻面看重點；左右滑記錄會不會。
             </p>
           </div>
           <Link href="/" className="secondary-pill">
             回首頁
           </Link>
         </div>
+        <div className="mt-5 flex flex-wrap items-center gap-3 border-t border-slate-200/80 pt-5">
+          <label htmlFor="pharmacology-review-scope" className="text-sm font-black text-ink">
+            複習範圍
+          </label>
+          <select
+            id="pharmacology-review-scope"
+            value={reviewScope}
+            onChange={(event) => changeReviewScope(event.target.value)}
+            className="min-h-11 min-w-[12rem] rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm font-black text-ink shadow-sm outline-none transition focus-visible:border-brand-600 focus-visible:ring-2 focus-visible:ring-brand-200"
+          >
+            <option value={ALL_PHARMACOLOGY_REVIEW_SCOPE}>{ALL_PHARMACOLOGY_REVIEW_SCOPE}</option>
+            {PHARMACOLOGY_REVIEW_SCOPES.map((scope) => (
+              <option key={scope} value={scope}>
+                {scope}
+              </option>
+            ))}
+          </select>
+        </div>
       </section>
 
       <section className="mt-6 space-y-5">
-        <div className="hidden gap-3 sm:grid sm:grid-cols-2">
-          <div className="surface-card-muted p-4">
-            <p className={`text-xs font-black ${leftSwipeMeta.eyebrowClassName}`}>左滑</p>
-            <p className="mt-2 text-lg font-black text-ink">{leftSwipeMeta.actionLabel}</p>
-            <p className="body-soft mt-1 text-sm leading-6">{leftSwipeMeta.helper}</p>
-          </div>
-          <div className="surface-card-muted p-4">
-            <p className={`text-xs font-black ${rightSwipeMeta.eyebrowClassName}`}>右滑</p>
-            <p className="mt-2 text-lg font-black text-ink">{rightSwipeMeta.actionLabel}</p>
-            <p className="body-soft mt-1 text-sm leading-6">{rightSwipeMeta.helper}</p>
-          </div>
-        </div>
-
         <div className="surface-card p-4 sm:p-6">
           <div className="mb-3 flex flex-wrap items-center justify-between gap-3">
             <p className="text-xs font-black uppercase tracking-[0.22em] text-brand-700">
@@ -995,7 +1057,9 @@ export default function PharmacologyReviewPage() {
           <div className="flex items-start justify-between gap-3">
             <div>
               <p className="eyebrow text-[10px]">Weakest Drugs</p>
-              <h2 className="mt-1 text-xl font-black tracking-[-0.03em] text-ink">最不會的藥</h2>
+              <h2 className="mt-1 text-xl font-black tracking-[-0.03em] text-ink">
+                {reviewScope === ALL_PHARMACOLOGY_REVIEW_SCOPE ? "最不會的藥" : `${reviewScope}裡最不會的藥`}
+              </h2>
               <p className="body-soft mt-1 text-xs font-semibold">依不會次數、不會比例和重要度排序。</p>
             </div>
             <button
@@ -1035,7 +1099,9 @@ export default function PharmacologyReviewPage() {
               })
             ) : (
               <div className="rounded-[1.2rem] bg-slate-50 p-4 text-sm font-bold leading-7 text-slate-600">
-                先滑幾張，這裡就會開始長出你的藥理黑名單。
+                {reviewScope === ALL_PHARMACOLOGY_REVIEW_SCOPE
+                  ? "先滑幾張，這裡就會開始長出你的藥理黑名單。"
+                  : `先滑幾張${reviewScope}藥卡，這裡就會開始整理。`}
               </div>
             )}
           </div>

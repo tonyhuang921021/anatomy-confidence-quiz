@@ -74,6 +74,9 @@
     "lib/savedQuestionBank.test.ts",
     "lib/startSettingsUrl.ts",
     "lib/startSettingsUrl.test.ts",
+    "data/pharmacologyFlashcards.ts",
+    "lib/pharmacologyReviewScope.ts",
+    "lib/pharmacologyReviewScope.test.ts",
     "lib/storage.ts",
     "lib/storage.completed-history.test.ts",
     "types/quiz.ts"
