@@ -28,11 +28,36 @@ test("藥理複習可直接切換範圍並記住上次選擇", async ({ page }) 
   await expect(page.locator(".drug-flip-card")).toHaveClass(/is-flipped/);
   await expect(page.locator(".drug-flip-front")).toHaveCSS("opacity", "0");
   await expect(page.locator(".drug-flip-back")).toHaveCSS("opacity", "1");
+  await expect(page.getByRole("list", { name: "同分類藥物列表" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "同分類藥物" }).locator("xpath=..//table")).toHaveCount(0);
   const cardBackText = await page.locator(".drug-flip-back").innerText();
   expect(cardBackText).toMatch(/腸胃科|自泌素\/腸胃/);
 
   await page.reload({ waitUntil: "domcontentloaded" });
   await expect(page.getByLabel("複習範圍")).toHaveValue("腸胃道");
+});
+
+test("藥理資料先顯示考期，點開題目後仍先隱藏答案", async ({ page }) => {
+  await blockExternalApis(page);
+  await page.goto("/pharmacology-review/library", { waitUntil: "domcontentloaded" });
+  await expect(page.getByText("1007 種藥", { exact: true })).toBeVisible();
+  await page.getByRole("searchbox", { name: "搜尋藥理資料" }).fill("Phenobarbital");
+
+  const drugButton = page.getByRole("button", { name: /Phenobarbital/ });
+  await expect(drugButton).toContainText("107-1");
+  await drugButton.click();
+
+  const examButton = page.getByRole("button", { name: /107-1.*第 72 題.*曾出現/ });
+  await expect(examButton).toBeVisible();
+  await examButton.click();
+  await expect(page.getByText("MOEX-107020-6301-Q072", { exact: true })).toBeVisible();
+  await expect(page.getByRole("button", { name: "顯示答案與詳解" })).toBeVisible();
+  await expect(page.getByText(/正確答案：/)).toHaveCount(0);
+  await expect(page.getByRole("link", { name: /官方答案/ })).toHaveCount(0);
+
+  await page.getByRole("button", { name: "顯示答案與詳解" }).click();
+  await expect(page.getByText(/正確答案：/)).toBeVisible();
+  await expect(page.getByRole("link", { name: /官方答案/ })).toBeVisible();
 });
 
 test("最不會的藥只顯示目前複習範圍", async ({ page }) => {

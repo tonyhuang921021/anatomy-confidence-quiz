@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import dynamic from "next/dynamic";
 import type { MouseEvent, PointerEvent, TouchEvent } from "react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useAuth } from "@/components/AuthProvider";
@@ -14,6 +15,18 @@ import {
   type PharmacologyReviewScope
 } from "@/lib/pharmacologyReviewScope";
 import { loadPharmacologyReverseSwipe, savePharmacologyReverseSwipe } from "@/lib/storage";
+
+const PharmacologySameClassList = dynamic(
+  () => import("@/components/PharmacologySameClassList").then((module) => module.PharmacologySameClassList),
+  {
+    ssr: false,
+    loading: () => (
+      <div className="surface-card-muted p-5 text-sm font-bold text-slate-500" role="status">
+        正在整理同分類藥物…
+      </div>
+    )
+  }
+);
 
 const REVIEW_STATS_STORAGE_KEY = "pharmacology-review-stats-v1";
 const REVIEW_SCOPE_STORAGE_KEY = "pharmacology-review-scope-v1";
@@ -103,6 +116,10 @@ const REVIEW_DIRECTION_META: Record<
 function getDrugKey(item: (typeof PHARMACOLOGY_FLASHCARDS)[number]) {
   return `${item.name}__${item.category}`;
 }
+
+const PHARMACOLOGY_FLASHCARD_INDEX_BY_KEY = new Map(
+  PHARMACOLOGY_FLASHCARDS.map((item, index) => [getDrugKey(item), index])
+);
 
 function getReviewStats(statsMap: DrugReviewStatsMap, item: (typeof PHARMACOLOGY_FLASHCARDS)[number]) {
   return normalizeReviewStats(statsMap[getDrugKey(item)]);
@@ -442,6 +459,10 @@ export default function PharmacologyReviewPage() {
   const sameCategoryCards = PHARMACOLOGY_FLASHCARDS.filter((item) => item.category === card.category).sort(
     (first, second) => second.drawWeight - first.drawWeight || first.name.localeCompare(second.name)
   );
+  const sameCategoryEntries = sameCategoryCards.map((item) => ({
+    card: item,
+    cardIndex: PHARMACOLOGY_FLASHCARD_INDEX_BY_KEY.get(getDrugKey(item)) ?? -1
+  }));
   const weakestCards = useMemo(
     () =>
       reviewCardIndexes.map((index) => {
@@ -993,60 +1014,12 @@ export default function PharmacologyReviewPage() {
         </div>
 
         {hasRevealedClass ? (
-          <aside className="surface-card-muted p-5">
-            <p className="eyebrow">Same Class</p>
-            <h2 className="mt-2 text-2xl font-black tracking-[-0.03em] text-ink">同分類藥物</h2>
-            <p className="body-soft mt-2 text-sm leading-6">{card.category}</p>
-            <div className="mt-5 max-h-[560px] overflow-auto rounded-[1.4rem] border border-slate-200 bg-white/72">
-              <table className="w-full min-w-[1320px] text-left text-sm">
-                <thead className="sticky top-0 bg-emerald-50 text-xs font-black text-brand-700">
-                  <tr>
-                    <th className="px-4 py-3">藥名</th>
-                    <th className="px-4 py-3">等級</th>
-                    <th className="px-4 py-3">機轉</th>
-                    <th className="px-4 py-3">適應症</th>
-                    <th className="px-4 py-3">作用 / 國考考點</th>
-                    <th className="px-4 py-3">副作用 / 禁忌（高頻）</th>
-                    <th className="px-4 py-3">口訣</th>
-                    <th className="px-4 py-3">官方出現考期</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {sameCategoryCards.map((item, index) => {
-                    const itemLevelMeta = LEVEL_META[item.examLevel] ?? LEVEL_META.D;
-                    const targetIndex = PHARMACOLOGY_FLASHCARDS.findIndex(
-                      (candidate) => getDrugKey(candidate) === getDrugKey(item)
-                    );
-
-                    return (
-                      <tr key={`${item.category}-${item.name}-${index}`} className="border-t border-slate-100 align-top">
-                        <td className="px-4 py-3">
-                          <button
-                            type="button"
-                            onClick={() => jumpToDrug(targetIndex >= 0 ? targetIndex : cardIndex)}
-                            className="text-left font-black text-ink underline decoration-brand-200 underline-offset-4 transition hover:text-brand-700"
-                          >
-                            {item.name}
-                          </button>
-                        </td>
-                        <td className="px-4 py-3">
-                          <span className={`inline-flex rounded-full border px-2.5 py-1 text-xs font-black ${itemLevelMeta.className}`}>
-                            {item.examLevel}
-                          </span>
-                        </td>
-                        <td className="px-4 py-3 font-semibold leading-6 text-slate-600">{item.mechanism}</td>
-                        <td className="px-4 py-3 font-semibold leading-6 text-slate-600">{item.indications}</td>
-                        <td className="px-4 py-3 font-semibold leading-6 text-slate-600">{item.effects}</td>
-                        <td className="px-4 py-3 font-semibold leading-6 text-slate-600">{item.adverseEffects}</td>
-                        <td className="whitespace-pre-line px-4 py-3 font-semibold leading-6 text-slate-600">{item.mnemonic}</td>
-                        <td className="px-4 py-3 font-semibold leading-6 text-slate-600">{item.officialExamPeriods}</td>
-                      </tr>
-                    );
-                  })}
-                </tbody>
-              </table>
-            </div>
-          </aside>
+          <PharmacologySameClassList
+            category={card.category}
+            entries={sameCategoryEntries}
+            currentDrugKey={getDrugKey(card)}
+            onJumpToDrug={(index) => jumpToDrug(index >= 0 ? index : cardIndex)}
+          />
         ) : null}
       </section>
 

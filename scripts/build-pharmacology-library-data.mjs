@@ -341,6 +341,12 @@ for (const { batch, drug } of allDrugs) {
     batch,
     directExamCount: directExams.length,
     mentionExamCount: mentionExams.length,
+    exams: publicDrug.exams.map((exam) => ({
+      id: exam.id,
+      period: exam.period,
+      questionNo: exam.questionNo,
+      verificationStatus: exam.verificationStatus
+    })),
     searchText: unique([
       publicDrug.name,
       ...publicDrug.aliases,

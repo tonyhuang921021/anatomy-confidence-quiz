@@ -1,8 +1,10 @@
 "use client";
 
 import { ChevronDown, Search } from "lucide-react";
+import dynamic from "next/dynamic";
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
+import { PharmacologyExamPeriodSummary } from "@/components/PharmacologyExamPeriodSummary";
 import {
   ALL_PHARMACOLOGY_LIBRARY_SCOPES,
   filterPharmacologyLibraryItems,
@@ -13,6 +15,14 @@ import {
   type PharmacologyLibrarySource,
   type PharmacologyLibraryStatement
 } from "@/lib/pharmacologyLibrary";
+
+const PharmacologyExamQuestions = dynamic(
+  () => import("@/components/PharmacologyExamQuestions").then((module) => module.PharmacologyExamQuestions),
+  {
+    ssr: false,
+    loading: () => <p className="text-sm font-bold text-slate-500" role="status">正在整理國考題目…</p>
+  }
+);
 
 const INDEX_URL = "/data/pharmacology-library/index.json";
 const INITIAL_RESULT_COUNT = 30;
@@ -67,40 +77,18 @@ function StatementList({
   );
 }
 
-function ExamLinks({ exam }: { exam: PharmacologyLibraryDrug["exams"][number] }) {
-  const links = [
-    exam.questionUrl ? { label: "題本", href: exam.questionUrl } : null,
-    exam.answerUrl ? { label: "答案", href: exam.answerUrl } : null,
-    exam.amendedAnswerUrl ? { label: "更正", href: exam.amendedAnswerUrl } : null
-  ].filter((link): link is { label: string; href: string } => Boolean(link));
-
-  return (
-    <span className="ml-2 inline-flex gap-2 text-[11px] font-bold text-brand-700">
-      {links.map((link) => (
-        <a
-          key={`${exam.id}-${link.label}`}
-          href={link.href}
-          target="_blank"
-          rel="noreferrer"
-          className="underline decoration-brand-300 underline-offset-2 focus-visible:rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-300"
-        >
-          {link.label}
-        </a>
-      ))}
-    </span>
-  );
-}
-
 function DrugDetails({ drug }: { drug: PharmacologyLibraryDrug }) {
   const sourceMap = useMemo(
     () => new Map(drug.sources.map((source) => [source.sourceId, source])),
     [drug.sources]
   );
-  const directExams = drug.exams.filter((exam) => exam.verificationStatus === "verified_exam_target");
-  const mentions = drug.exams.filter((exam) => exam.verificationStatus === "verified_mention");
 
   return (
     <div className="border-t border-slate-200 bg-[var(--surface-muted)] px-4 py-5 sm:px-6">
+      <div className="mb-6">
+        <PharmacologyExamQuestions exams={drug.exams} showEmpty />
+      </div>
+
       {drug.summarySections.length > 0 ? (
         <div className="grid gap-x-8 gap-y-5 lg:grid-cols-2">
           {drug.summarySections.map((section) => (
@@ -123,22 +111,6 @@ function DrugDetails({ drug }: { drug: PharmacologyLibraryDrug }) {
         </section>
       ) : null}
 
-      {directExams.length > 0 ? (
-        <section className="mt-5" aria-labelledby={`${drug.id}-exam`}>
-          <h3 id={`${drug.id}-exam`} className="mb-2 text-sm font-black text-brand-800">
-            國考紀錄
-          </h3>
-          <ul className="space-y-1 text-sm leading-6 text-ink">
-            {directExams.map((exam) => (
-              <li key={exam.id}>
-                {exam.period}　第 {exam.questionNo} 題 · {exam.subject}
-                <ExamLinks exam={exam} />
-              </li>
-            ))}
-          </ul>
-        </section>
-      ) : null}
-
       <details className="group mt-5 border-t border-slate-300/80 pt-4">
         <summary className="flex min-h-11 cursor-pointer list-none items-center justify-between gap-3 text-sm font-black text-ink focus-visible:rounded-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-300 [&::-webkit-details-marker]:hidden">
           查看完整資料
@@ -153,22 +125,6 @@ function DrugDetails({ drug }: { drug: PharmacologyLibraryDrug }) {
               <StatementList statements={group.statements} sourceMap={sourceMap} />
             </section>
           ))}
-
-          {mentions.length > 0 ? (
-            <details className="border-t border-slate-300/80 pt-3">
-              <summary className="min-h-11 cursor-pointer py-3 text-sm font-black text-ink focus-visible:rounded-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-300">
-                題幹或選項曾提及（{mentions.length}）
-              </summary>
-              <ul className="space-y-1 pt-2 text-sm leading-6 text-ink">
-                {mentions.map((exam) => (
-                  <li key={exam.id}>
-                    {exam.period}　第 {exam.questionNo} 題 · {exam.subject}
-                    <ExamLinks exam={exam} />
-                  </li>
-                ))}
-              </ul>
-            </details>
-          ) : null}
 
           {drug.categories.length > 0 ? (
             <section aria-labelledby={`${drug.id}-categories`}>
@@ -226,6 +182,7 @@ function ResultRow({
           <span className="mt-1 block truncate text-sm font-bold text-slate-500">
             {item.scopes.join(" · ") || item.categories[0] || "藥理資料"}
           </span>
+          <PharmacologyExamPeriodSummary exams={item.exams ?? []} />
         </span>
         <ChevronDown
           className={`h-5 w-5 shrink-0 text-slate-500 transition-transform ${expanded ? "rotate-180" : ""}`}
@@ -319,7 +276,7 @@ export function PharmacologyLibraryClient() {
             <p className="eyebrow">Pharmacology Library</p>
             <h1 className="display-title mt-3 text-4xl sm:text-5xl">藥理資料</h1>
             <p className="body-soft mt-3 max-w-2xl text-base leading-7">
-              搜藥名或考點；展開後可看完整資料，旁邊的小連結可直接核對來源。
+              搜藥名或考點；考期會先列出來，點開可直接看站內考題，答案預設隱藏。
             </p>
           </div>
           <Link href="/pharmacology-review" className="secondary-pill">
