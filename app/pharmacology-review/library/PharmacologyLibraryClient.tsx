@@ -77,7 +77,13 @@ function StatementList({
   );
 }
 
-function DrugDetails({ drug }: { drug: PharmacologyLibraryDrug }) {
+function DrugDetails({
+  drug,
+  showExams = true
+}: {
+  drug: PharmacologyLibraryDrug;
+  showExams?: boolean;
+}) {
   const sourceMap = useMemo(
     () => new Map(drug.sources.map((source) => [source.sourceId, source])),
     [drug.sources]
@@ -85,9 +91,11 @@ function DrugDetails({ drug }: { drug: PharmacologyLibraryDrug }) {
 
   return (
     <div className="border-t border-slate-200 bg-[var(--surface-muted)] px-4 py-5 sm:px-6">
-      <div className="mb-6">
-        <PharmacologyExamQuestions exams={drug.exams} showEmpty />
-      </div>
+      {showExams ? (
+        <div className="mb-6">
+          <PharmacologyExamQuestions exams={drug.exams} showEmpty />
+        </div>
+      ) : null}
 
       {drug.summarySections.length > 0 ? (
         <div className="grid gap-x-8 gap-y-5 lg:grid-cols-2">
@@ -191,16 +199,19 @@ function ResultRow({
       </button>
       {expanded ? (
         <div id={`drug-detail-${item.id}`}>
+          <div className="border-t border-slate-200 bg-[var(--surface-muted)] px-4 py-4 sm:px-6 sm:py-5">
+            <PharmacologyExamQuestions exams={drug?.exams ?? item.exams ?? []} showEmpty />
+          </div>
           {loading ? (
-            <p className="border-t border-slate-200 px-4 py-5 text-sm font-bold text-slate-500" role="status">
-              載入資料中…
+            <p className="border-t border-slate-200 px-4 py-4 text-sm font-bold text-slate-500" role="status">
+              其餘藥物資料載入中…
             </p>
           ) : error ? (
             <p className="border-t border-slate-200 px-4 py-5 text-sm font-bold text-rose-700" role="alert">
               {error}
             </p>
           ) : drug ? (
-            <DrugDetails drug={drug} />
+            <DrugDetails drug={drug} showExams={false} />
           ) : null}
         </div>
       ) : null}
