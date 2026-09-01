@@ -68,3 +68,44 @@ test("最不會的藥只顯示目前複習範圍", async ({ page }) => {
   await expect(page.getByRole("button", { name: /^Metronidazole A / })).toBeVisible();
   await expect(page.getByRole("button", { name: /^Amiodarone / })).toHaveCount(0);
 });
+
+test("藥理資料可搜尋、篩選、展開並核對來源", async ({ page }) => {
+  await blockExternalApis(page);
+  await page.goto("/pharmacology-review", { waitUntil: "domcontentloaded" });
+  await page.getByRole("link", { name: "查藥理資料" }).click();
+  await expect(page).toHaveURL(/\/pharmacology-review\/library$/);
+
+  const search = page.getByRole("searchbox", { name: "搜尋藥理資料" });
+  await expect(search).toBeVisible();
+  await search.fill("Amantadine");
+  await expect(page.getByText(/\d+ 種藥/, { exact: true })).toBeVisible();
+
+  const drugButton = page.getByRole("button", { name: /Amantadine/ });
+  await expect(drugButton).toBeVisible();
+  await drugButton.click();
+  await expect(page.getByRole("heading", { name: "機轉", exact: true })).toBeVisible();
+  await expect(page.getByText(/阻M2 ion channel/)).toBeVisible();
+  const sourceLink = page.getByRole("link", { name: /查看資料來源/ }).first();
+  await expect(sourceLink).toHaveAttribute("href", /^https:\/\//);
+
+  await page.getByText("查看完整資料", { exact: true }).click();
+  await expect(page.getByRole("heading", { name: "機轉與藥效" })).toBeVisible();
+
+  await page.getByLabel("複習範圍").selectOption("心臟");
+  await expect(page.getByText("找不到符合的藥物")).toBeVisible();
+});
+
+test("藥理資料手機版不會出現水平裁切", async ({ page }, testInfo) => {
+  test.skip(!testInfo.project.name.includes("mobile"), "僅檢查手機尺寸");
+  await blockExternalApis(page);
+  await page.goto("/pharmacology-review/library", { waitUntil: "domcontentloaded" });
+  await page.getByRole("searchbox", { name: "搜尋藥理資料" }).fill("Amiodarone");
+  await page.getByRole("button", { name: /Amiodarone/ }).click();
+  await expect(page.getByRole("heading", { name: "副作用", exact: true })).toBeVisible();
+
+  const widths = await page.evaluate(() => ({
+    innerWidth: window.innerWidth,
+    documentWidth: document.documentElement.scrollWidth
+  }));
+  expect(widths.documentWidth).toBeLessThanOrEqual(widths.innerWidth + 1);
+});

@@ -77,6 +77,8 @@
     "data/pharmacologyFlashcards.ts",
     "lib/pharmacologyReviewScope.ts",
     "lib/pharmacologyReviewScope.test.ts",
+    "lib/pharmacologyLibrary.ts",
+    "lib/pharmacologyLibrary.test.ts",
     "lib/storage.ts",
     "lib/storage.completed-history.test.ts",
     "types/quiz.ts"

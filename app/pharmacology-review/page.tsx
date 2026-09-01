@@ -847,6 +847,12 @@ export default function PharmacologyReviewPage() {
               </option>
             ))}
           </select>
+          <Link
+            href="/pharmacology-review/library"
+            className="min-h-11 rounded-xl px-3 py-3 text-sm font-black text-brand-700 underline decoration-brand-300 underline-offset-4 transition hover:text-brand-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-300"
+          >
+            查藥理資料
+          </Link>
         </div>
       </section>
 
