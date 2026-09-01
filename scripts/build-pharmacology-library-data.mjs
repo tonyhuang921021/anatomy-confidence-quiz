@@ -76,6 +76,14 @@ function unique(values) {
   return [...new Set(values.filter(Boolean))];
 }
 
+function cleanMnemonicDisplayText(value) {
+  return value
+    .replace(/\s*[<＜][^>＞]*(?:取自|改自|來自)[^>＞]*[>＞]/gu, "")
+    .replace(/\s*[（(][^（）()]*(?:取自|改自|來自)[^（）()]*[）)]\s*/gu, " ")
+    .replace(/\s{2,}/gu, " ")
+    .trim();
+}
+
 function collectStatements(value, pathLabel = "") {
   if (Array.isArray(value)) {
     return value.flatMap((item) => collectStatements(item, pathLabel));
@@ -164,7 +172,7 @@ for (const segment of mnemonicSegments) {
 
   const mnemonic = {
     segmentId: segment.segmentId,
-    text: segment.text,
+    text: cleanMnemonicDisplayText(segment.text),
     sourceIds: unique(segment.medicalClaimReview?.sourceIds ?? [])
   };
   const relations = (segment.placementReview?.relations ?? []).filter((relation) => relation.status === "verified");

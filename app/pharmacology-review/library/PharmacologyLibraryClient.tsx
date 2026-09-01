@@ -46,13 +46,21 @@ function SourceLinks({ sourceIds, sourceMap }: { sourceIds: string[]; sourceMap:
   );
 }
 
-function StatementList({ statements, sourceMap }: { statements: PharmacologyLibraryStatement[]; sourceMap: SourceMap }) {
+function StatementList({
+  statements,
+  sourceMap,
+  showSources = true
+}: {
+  statements: PharmacologyLibraryStatement[];
+  sourceMap: SourceMap;
+  showSources?: boolean;
+}) {
   return (
     <ul className="space-y-2 text-[15px] leading-7 text-ink sm:text-base">
       {statements.map((statement, index) => (
         <li key={`${statement.text}-${index}`} className="pl-4 before:-ml-4 before:mr-2 before:text-brand-600 before:content-['•']">
           {statement.text}
-          <SourceLinks sourceIds={statement.sourceIds} sourceMap={sourceMap} />
+          {showSources ? <SourceLinks sourceIds={statement.sourceIds} sourceMap={sourceMap} /> : null}
         </li>
       ))}
     </ul>
@@ -111,7 +119,7 @@ function DrugDetails({ drug }: { drug: PharmacologyLibraryDrug }) {
           <h3 id={`${drug.id}-mnemonic`} className="mb-2 text-sm font-black text-brand-800">
             口訣
           </h3>
-          <StatementList statements={drug.mnemonics} sourceMap={sourceMap} />
+          <StatementList statements={drug.mnemonics} sourceMap={sourceMap} showSources={false} />
         </section>
       ) : null}
 

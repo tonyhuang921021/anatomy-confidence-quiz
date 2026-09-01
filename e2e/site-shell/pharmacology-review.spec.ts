@@ -88,6 +88,12 @@ test("藥理資料可搜尋、篩選、展開並核對來源", async ({ page }) 
   const sourceLink = page.getByRole("link", { name: /查看資料來源/ }).first();
   await expect(sourceLink).toHaveAttribute("href", /^https:\/\//);
 
+  const mnemonicSection = page.getByRole("region", { name: "口訣", exact: true });
+  if ((await mnemonicSection.count()) > 0) {
+    await expect(mnemonicSection).not.toContainText(/取自|改自|來自/);
+    await expect(mnemonicSection.getByRole("link")).toHaveCount(0);
+  }
+
   await page.getByText("查看完整資料", { exact: true }).click();
   await expect(page.getByRole("heading", { name: "機轉與藥效" })).toBeVisible();
 
@@ -99,9 +105,14 @@ test("藥理資料手機版不會出現水平裁切", async ({ page }, testInfo)
   test.skip(!testInfo.project.name.includes("mobile"), "僅檢查手機尺寸");
   await blockExternalApis(page);
   await page.goto("/pharmacology-review/library", { waitUntil: "domcontentloaded" });
+  await expect(page.getByText("1007 種藥", { exact: true })).toBeVisible();
   await page.getByRole("searchbox", { name: "搜尋藥理資料" }).fill("Amiodarone");
   await page.getByRole("button", { name: /Amiodarone/ }).click();
   await expect(page.getByRole("heading", { name: "副作用", exact: true })).toBeVisible();
+  const mnemonicSection = page.getByRole("region", { name: "口訣", exact: true });
+  await expect(mnemonicSection).toBeVisible();
+  await expect(mnemonicSection).not.toContainText(/取自|改自|來自/);
+  await expect(mnemonicSection.getByRole("link")).toHaveCount(0);
 
   const widths = await page.evaluate(() => ({
     innerWidth: window.innerWidth,
