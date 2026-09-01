@@ -11,6 +11,7 @@ export type PharmacologyLibraryIndexItem = {
   directExamCount: number;
   mentionExamCount: number;
   exams: PharmacologyLibraryExam[];
+  examPoint?: string | null;
   searchText: string;
 };
 

@@ -1,4 +1,5 @@
 import { expect, test, type Page } from "@playwright/test";
+import type { PharmacologyLibraryIndex } from "@/lib/pharmacologyLibrary";
 
 test.use({ serviceWorkers: "block" });
 
@@ -58,6 +59,47 @@ test("藥理資料先顯示考期，點開題目後仍先隱藏答案", async ({
   await page.getByRole("button", { name: "顯示答案與詳解" }).click();
   await expect(page.getByText(/正確答案：/)).toBeVisible();
   await expect(page.getByRole("link", { name: /官方答案/ })).toBeVisible();
+});
+
+test("藥理資料的舊格式考題 ID 也能開啟站內題目", async ({ page }) => {
+  await blockExternalApis(page);
+  await page.goto("/pharmacology-review/library", { waitUntil: "domcontentloaded" });
+  await expect(page.getByText("1007 種藥", { exact: true })).toBeVisible();
+  await page.getByRole("searchbox", { name: "搜尋藥理資料" }).fill("Ganciclovir");
+
+  const drugButton = page.getByRole("button", { name: /Ganciclovir/ });
+  await expect(drugButton).toContainText("110-2");
+  await drugButton.click();
+  await page.getByRole("button", { name: /110-2.*第 53 題.*考點/ }).click();
+
+  await expect(page.getByText("MOEX-110101-2301-Q053", { exact: true })).toBeVisible();
+  await expect(page.getByRole("button", { name: "顯示答案與詳解" })).toBeVisible();
+  await expect(page.getByText("站內暫時找不到這題，請稍後再試。")).toHaveCount(0);
+});
+
+test("藥理資料列出的每一題都能對應站內題庫", async ({ request }, testInfo) => {
+  test.skip(testInfo.project.name !== "chromium-desktop", "資料完整性只需執行一次");
+
+  const indexResponse = await request.get("/data/pharmacology-library/index.json");
+  expect(indexResponse.ok()).toBeTruthy();
+  const index = (await indexResponse.json()) as PharmacologyLibraryIndex;
+  const ids = [...new Set(index.drugs.flatMap((drug) => drug.exams.map((exam) => exam.id)))];
+
+  for (let offset = 0; offset < ids.length; offset += 24) {
+    const requestedIds = ids.slice(offset, offset + 24);
+    const response = await request.get(
+      `/api/pharmacology-review/questions?ids=${encodeURIComponent(requestedIds.join(","))}`
+    );
+    expect(response.ok()).toBeTruthy();
+    const payload = (await response.json()) as { questions?: Array<{ id: string }> };
+    const returnedIds = new Set(
+      (payload.questions ?? []).map((question) =>
+        question.id.replace(/^(MOEX-\d{6})_(\d{4}-Q\d{3})$/, "$1-$2")
+      )
+    );
+
+    for (const id of requestedIds) expect(returnedIds.has(id), `站內找不到 ${id}`).toBeTruthy();
+  }
 });
 
 test("最不會的藥只顯示目前複習範圍", async ({ page }) => {

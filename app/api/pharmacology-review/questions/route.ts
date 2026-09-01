@@ -3,7 +3,18 @@ import { getCanonicalQuestionBank } from "@/data/med1QuestionBank";
 
 const MAX_QUESTION_IDS = 24;
 const QUESTION_ID_PATTERN = /^[A-Za-z0-9_-]{1,80}$/;
-const QUESTION_BY_ID = new Map(getCanonicalQuestionBank().map((question) => [question.id, question]));
+
+function toPharmacologyQuestionLookupId(id: string) {
+  return id.replace(/^(MOEX-\d{6})_(\d{4}-Q\d{3})$/, "$1-$2");
+}
+
+const QUESTION_BY_ID = new Map<string, ReturnType<typeof getCanonicalQuestionBank>[number]>();
+
+for (const question of getCanonicalQuestionBank()) {
+  QUESTION_BY_ID.set(question.id, question);
+  const lookupId = toPharmacologyQuestionLookupId(question.id);
+  if (!QUESTION_BY_ID.has(lookupId)) QUESTION_BY_ID.set(lookupId, question);
+}
 
 export function GET(request: NextRequest) {
   const ids = [...new Set(

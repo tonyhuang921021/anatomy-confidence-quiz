@@ -60,7 +60,7 @@ export function PharmacologyExamQuestions({
       const response = await fetch(`/api/pharmacology-review/questions?ids=${encodeURIComponent(exam.id)}`);
       if (!response.ok) throw new Error(`HTTP ${response.status}`);
       const payload = (await response.json()) as { questions?: Question[] };
-      const question = payload.questions?.find((candidate) => candidate.id === exam.id);
+      const question = payload.questions?.[0];
       if (!question) throw new Error("missing question");
       setQuestionCache((current) => ({ ...current, [exam.id]: question }));
     } catch {

@@ -84,6 +84,15 @@ function cleanMnemonicDisplayText(value) {
     .trim();
 }
 
+function cleanExamPointPreview(value, drugName) {
+  let text = typeof value === "string" ? value.trim() : "";
+  text = text.replace(/^考點[：:]\s*/u, "");
+  for (const prefix of [`${drugName}：`, `${drugName}:`]) {
+    if (text.startsWith(prefix)) text = text.slice(prefix.length).trim();
+  }
+  return text || null;
+}
+
 function collectStatements(value, pathLabel = "") {
   if (Array.isArray(value)) {
     return value.flatMap((item) => collectStatements(item, pathLabel));
@@ -327,6 +336,13 @@ for (const { batch, drug } of allDrugs) {
     sources
   };
 
+  const examPoint = cleanExamPointPreview(
+    summarySections.find((section) => section.key === "effects")?.items[0]?.text ??
+    summarySections.find((section) => section.key === "mechanism")?.items[0]?.text ??
+    "",
+    publicDrug.name
+  );
+
   const outputBatch = outputBatches.get(batch) ?? [];
   outputBatch.push(publicDrug);
   outputBatches.set(batch, outputBatch);
@@ -341,6 +357,7 @@ for (const { batch, drug } of allDrugs) {
     batch,
     directExamCount: directExams.length,
     mentionExamCount: mentionExams.length,
+    examPoint,
     exams: publicDrug.exams.map((exam) => ({
       id: exam.id,
       period: exam.period,
