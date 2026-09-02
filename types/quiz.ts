@@ -145,7 +145,16 @@ export type QuizSession = {
   simulationTimerDurationSeconds?: number;
   currentQuestionIndex?: number;
   isReviewingAnswer?: boolean;
+  scoreRevisions?: AnswerKeyScoreRevision[];
   attempts: Attempt[];
+};
+
+export type AnswerKeyScoreRevision = {
+  revisionId: string;
+  previousCorrectCount: number;
+  regradedCorrectCount: number;
+  totalCount: number;
+  appliedAt: string;
 };
 
 export type SectionStats = {

@@ -15,6 +15,8 @@
     "lib/questionExplanationFormat.ts",
     "lib/answerScoring.ts",
     "lib/answerScoring.test.ts",
+    "lib/answerKeyRevisions.ts",
+    "lib/answerKeyRevisions.test.ts",
     "lib/questionTextFormat.ts",
     "lib/questionTextFormat.test.ts",
     "lib/analysisPrimaryTag.ts",

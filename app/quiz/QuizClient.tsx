@@ -80,6 +80,7 @@ import {
 import { getOrCreateVisitorId } from "@/lib/visitor";
 import { getQuestionPrimaryTag } from "@/lib/analysisPrimaryTag";
 import { isQuestionAnswerCorrect } from "@/lib/answerScoring";
+import { hasAnswerKeyRevision } from "@/lib/answerKeyRevisions";
 import {
   queueSavedQuestionsCloudSync,
   recordSavedQuestionAnswer,
@@ -686,7 +687,11 @@ function getQuestionByOrder(
   );
 
   return ids
-    .map((id) => generatedMap.get(id) ?? fallbackMap.get(id))
+    .map((id) =>
+      hasAnswerKeyRevision(id)
+        ? fallbackMap.get(id) ?? generatedMap.get(id)
+        : generatedMap.get(id) ?? fallbackMap.get(id)
+    )
     .map((question) =>
       question
         ? (() => {

@@ -161,6 +161,37 @@ test("已做題壓縮紀錄要能合併後來完成的 session 題號", () => {
   assert.ok(mergedIds.has("q-2"));
 });
 
+test("申覆題重判後會取代同次數的舊壓縮統計", () => {
+  const common = {
+    questionId: "MOEX-115090-1301-Q063",
+    attempts: 1,
+    lowConfidence: 0,
+    overconfidence: 0,
+    lastAttemptedAt: "2026-09-01T00:00:00.000Z",
+    latestErrorType: undefined,
+    latestSelectedAnswer: "B" as const,
+    latestCorrectAnswer: "C" as const,
+    latestConfidence: 4 as const
+  };
+  const stale = {
+    ...common,
+    correct: 0,
+    wrong: 1,
+    lastAttemptCorrect: false
+  };
+  const regraded = {
+    ...common,
+    correct: 1,
+    wrong: 0,
+    lastAttemptCorrect: true
+  };
+
+  assert.deepEqual(
+    mergeCompletedQuestionHistoryEntries([stale], [regraded]),
+    [regraded]
+  );
+});
+
 test("登入帳號讀已做題時，也要合併同裝置 guest 暫存紀錄", () => {
   installBrowserStorage();
 

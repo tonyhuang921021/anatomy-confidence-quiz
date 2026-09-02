@@ -126,6 +126,7 @@ type QuestionAttemptLogRow = {
   session_id: string;
   question_id: string;
   visitor_id?: string | null;
+  selected_answer?: string | null;
   is_correct: boolean;
   answered_at: string;
   source_mode: string | null;
@@ -826,6 +827,7 @@ function buildSessionPayloadForCloud(
     optionEliminationMap: compacted.optionEliminationMap,
     simulationElapsedSeconds: compacted.simulationElapsedSeconds,
     simulationTimerDurationSeconds: compacted.simulationTimerDurationSeconds,
+    scoreRevisions: compacted.scoreRevisions,
     generatedQuestions: shouldRetainGeneratedQuestions ? generatedQuestions : undefined,
     currentQuestionIndex: session.completedAt ? undefined : compacted.currentQuestionIndex,
     isReviewingAnswer: session.completedAt ? undefined : compacted.isReviewingAnswer,
@@ -2049,6 +2051,7 @@ function buildQuestionAttemptLogRows(sessions: QuizSession[]): QuestionAttemptLo
       session_id: session.id,
       question_id: attempt.questionId,
       visitor_id: visitorId,
+      selected_answer: attempt.selectedAnswer,
       is_correct: attempt.isCorrect,
       answered_at: attempt.answeredAt,
       source_mode: session.settings?.mode ?? null
@@ -2086,15 +2089,17 @@ async function upsertQuestionAttemptLogs(sessions: QuizSession[]) {
     return;
   }
 
-  const missingVisitorColumn =
+  const missingOptionalColumn =
     typeof error.message === "string" &&
-    (error.message.includes("visitor_id") || error.message.includes("question_attempt_logs"));
+    (error.message.includes("visitor_id") ||
+      error.message.includes("selected_answer") ||
+      error.message.includes("question_attempt_logs"));
 
-  if (!missingVisitorColumn) {
+  if (!missingOptionalColumn) {
     throw error;
   }
 
-  const fallbackRows = rows.map(({ visitor_id, ...rest }) => rest);
+  const fallbackRows = rows.map(({ visitor_id, selected_answer, ...rest }) => rest);
   const { error: fallbackError } = await supabase
     .from("question_attempt_logs")
     .upsert(fallbackRows, { onConflict: "session_id,question_id" });

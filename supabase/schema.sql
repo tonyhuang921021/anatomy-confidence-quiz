@@ -83,6 +83,10 @@ create table if not exists public.quiz_session_attempts (
   primary key (session_id, question_order)
 );
 
+alter table public.quiz_session_attempts
+  add column if not exists answer_key_revision text,
+  add column if not exists is_correct_before_revision boolean;
+
 create index if not exists quiz_session_attempts_user_id_idx
 on public.quiz_session_attempts (user_id, answered_at desc);
 
@@ -266,7 +270,8 @@ create table if not exists public.question_attempt_logs (
 );
 
 alter table public.question_attempt_logs
-  add column if not exists visitor_id text;
+  add column if not exists visitor_id text,
+  add column if not exists selected_answer text;
 
 create index if not exists question_attempt_logs_question_id_idx
 on public.question_attempt_logs (question_id);

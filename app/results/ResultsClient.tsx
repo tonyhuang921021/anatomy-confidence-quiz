@@ -13,6 +13,7 @@ import { QuestionExplanationTabs } from "@/components/QuestionExplanationTabs";
 import { QuestionReportButton } from "@/components/QuestionIssueReportButton";
 import { RelatedQuestionsPanel } from "@/components/RelatedQuestionsPanel";
 import { ResultSummary } from "@/components/ResultSummary";
+import { CURRENT_ANSWER_KEY_REVISION } from "@/lib/answerKeyRevisions";
 import { SavedQuestionButton } from "@/components/SavedQuestionButton";
 import {
   StructuredExplanationText,
@@ -164,9 +165,9 @@ function getResultQuestionSources(session: QuizSession) {
   return Array.from(
     new Map(
       [
-        ...allQuestions,
+        ...(session.generatedQuestions ?? []),
         ...getAISimulationQuestionsForSession(session),
-        ...(session.generatedQuestions ?? [])
+        ...allQuestions
       ].map((question) => [question.id, question] as const)
     ).values()
   );
@@ -2138,6 +2139,9 @@ function ResultsPageContent() {
                 const correctCount = sessionItem.attempts.filter((attempt) => attempt.isCorrect).length;
                 const totalCount = sessionItem.attempts.length;
                 const correctRate = totalCount > 0 ? Math.round((correctCount / totalCount) * 100) : 0;
+                const scoreRevision = sessionItem.scoreRevisions?.find(
+                  (revision) => revision.revisionId === CURRENT_ANSWER_KEY_REVISION
+                );
 
                 return (
                   <Link
@@ -2166,6 +2170,11 @@ function ResultsPageContent() {
                       </div>
                       <div className="flex flex-wrap gap-2 text-xs font-semibold">
                         <span className="rounded-full bg-slate-200 px-3 py-1 text-slate-700">{totalCount} 題</span>
+                        {scoreRevision ? (
+                          <span className="rounded-full bg-amber-100 px-3 py-1 text-amber-900">
+                            申覆前 {scoreRevision.previousCorrectCount}/{scoreRevision.totalCount}・申覆後 {scoreRevision.regradedCorrectCount}/{scoreRevision.totalCount}
+                          </span>
+                        ) : null}
                         <span className={`rounded-full px-3 py-1 ${getAccuracyTone(correctRate)}`}>
                           答對率 {correctRate}%
                         </span>
@@ -3221,6 +3230,9 @@ function ResultsPageContent() {
         <ResultSummary
           summary={state.summary}
           masteryAnalysis={confidenceCalibrationEnabled ? masteryAnalysis : undefined}
+          scoreRevision={state.session?.scoreRevisions?.find(
+            (revision) => revision.revisionId === CURRENT_ANSWER_KEY_REVISION
+          )}
         />
         {weaknessPracticeFeedback ? (
           <section className="mt-4 border-y border-slate-200 py-5">

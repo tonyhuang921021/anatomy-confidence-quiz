@@ -2,6 +2,11 @@ import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 import { isSupabaseRecoveryMode } from "@/lib/supabase/recoveryMode";
 import { isServerTimeoutError, withServerTimeout } from "@/lib/serverTimeout";
+import {
+  getRegradedCorrectness,
+  hasAnswerKeyRevision
+} from "@/lib/answerKeyRevisions";
+import type { OptionKey } from "@/types/quiz";
 
 type StatsSyncBody = {
   questionIds?: string[];
@@ -10,6 +15,7 @@ type StatsSyncBody = {
     session_id: string;
     question_id: string;
     visitor_id?: string | null;
+    selected_answer?: string | null;
     is_correct: boolean;
     answered_at: string;
     source_mode?: string | null;
@@ -89,30 +95,59 @@ async function getNewAttemptRows(
   if (rows.length === 0) return [] as NormalizedAttemptRow[];
 
   const sessionIds = Array.from(new Set(rows.map((row) => normalizeAttemptSessionId(row.session_id))));
-  const existingKeys = new Set<string>();
+  const existingRows = new Map<string, { selected_answer?: string | null; is_correct?: boolean }>();
 
   for (let index = 0; index < sessionIds.length; index += MAX_DEVICE_IDS_PER_LOOKUP) {
     const chunk = sessionIds.slice(index, index + MAX_DEVICE_IDS_PER_LOOKUP);
-    const { data, error } = await supabase
+    let { data, error } = await supabase
       .from("question_attempt_logs")
-      .select("session_id, question_id")
+      .select("session_id, question_id, selected_answer, is_correct")
       .in("session_id", chunk);
+
+    if (error && String(error.message ?? "").includes("selected_answer")) {
+      ({ data, error } = await supabase
+        .from("question_attempt_logs")
+        .select("session_id, question_id, is_correct")
+        .in("session_id", chunk));
+    }
 
     if (error) throw error;
 
     for (const row of data ?? []) {
-      existingKeys.add(getAttemptKey(row));
+      existingRows.set(getAttemptKey(row), row);
     }
   }
 
-  return rows.filter((row) => !existingKeys.has(getAttemptKey(row)));
+  return rows.filter((row) => {
+    const existing = existingRows.get(getAttemptKey(row));
+    if (!existing) return true;
+    if (!hasAnswerKeyRevision(row.question_id)) return false;
+    return (
+      existing.is_correct !== row.is_correct ||
+      (row.selected_answer && existing.selected_answer !== row.selected_answer)
+    );
+  });
 }
 
 async function upsertAttemptRows(
   supabase: any,
   rows: NonNullable<StatsSyncBody["attemptRows"]>
 ) {
-  const normalizedRows = dedupeAttemptRows(rows);
+  const normalizedRows = dedupeAttemptRows(rows).map((row) => {
+    const selectedAnswer = row.selected_answer?.trim().toUpperCase();
+    const isValidOption = Boolean(selectedAnswer && /^[A-E]$/.test(selectedAnswer));
+    return {
+      ...row,
+      selected_answer: isValidOption ? selectedAnswer : null,
+      is_correct: isValidOption
+        ? getRegradedCorrectness(
+            row.question_id,
+            selectedAnswer as OptionKey,
+            row.is_correct
+          )
+        : row.is_correct
+    };
+  });
   if (normalizedRows.length === 0) return [] as NormalizedAttemptRow[];
 
   const newRows = await getNewAttemptRows(supabase, normalizedRows);
@@ -120,14 +155,14 @@ async function upsertAttemptRows(
 
   const { error } = await supabase
     .from("question_attempt_logs")
-    .upsert(newRows as any, { onConflict: "session_id,question_id", ignoreDuplicates: true });
+    .upsert(newRows as any, { onConflict: "session_id,question_id" });
 
   if (!error) return newRows;
 
-  const fallbackRows = newRows.map(({ visitor_id, ...rest }) => rest);
+  const fallbackRows = newRows.map(({ visitor_id, selected_answer, ...rest }) => rest);
   const { error: fallbackError } = await supabase
     .from("question_attempt_logs")
-    .upsert(fallbackRows as any, { onConflict: "session_id,question_id", ignoreDuplicates: true });
+    .upsert(fallbackRows as any, { onConflict: "session_id,question_id" });
 
   if (fallbackError) throw fallbackError;
   return newRows;

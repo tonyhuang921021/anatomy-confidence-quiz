@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { regradeSessionForCurrentAnswerKey } from "@/lib/answerKeyRevisions";
 import { createClient } from "@supabase/supabase-js";
 import { createOpenAIText, isOpenAIConfigured } from "@/lib/openai";
 import { getActiveAIAccountBan } from "@/lib/aiAccountBan";
@@ -1682,8 +1683,9 @@ export async function POST(request: NextRequest) {
     }
 
     const actor = await resolveActor(supabase, submitBody.accessToken, submitBody.visitorId);
-    const correctCount = submitBody.session.attempts.filter((attempt) => attempt.isCorrect).length;
-    const totalCount = submitBody.session.attempts.length;
+    const regradedSession = regradeSessionForCurrentAnswerKey(submitBody.session);
+    const correctCount = regradedSession.attempts.filter((attempt) => attempt.isCorrect).length;
+    const totalCount = regradedSession.attempts.length;
     const accuracyRate = totalCount > 0 ? Number(((correctCount / totalCount) * 100).toFixed(1)) : 0;
 
     const { error: upsertError } = await supabase.from("custom_paper_attempts").upsert(

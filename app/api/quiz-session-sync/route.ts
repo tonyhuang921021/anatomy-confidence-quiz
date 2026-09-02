@@ -138,6 +138,7 @@ function buildSessionPayloadForCloud(
     optionEliminationMap: compacted.optionEliminationMap,
     simulationElapsedSeconds: compacted.simulationElapsedSeconds,
     simulationTimerDurationSeconds: compacted.simulationTimerDurationSeconds,
+    scoreRevisions: compacted.scoreRevisions,
     generatedQuestions: shouldRetainGeneratedQuestions ? generatedQuestions : undefined,
     currentQuestionIndex: session.completedAt ? undefined : compacted.currentQuestionIndex,
     isReviewingAnswer: session.completedAt ? undefined : compacted.isReviewingAnswer,
@@ -240,8 +241,7 @@ async function storeSimulationPaperScores(
     const { error } = await supabase
       .from("simulation_paper_scores")
       .upsert(rows, {
-        onConflict: "session_id",
-        ignoreDuplicates: true
+        onConflict: "session_id"
       });
     if (error) throw error;
   } catch (error) {

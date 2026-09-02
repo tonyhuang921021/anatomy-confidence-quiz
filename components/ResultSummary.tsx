@@ -1,9 +1,11 @@
 import { SummaryStats } from "@/types/quiz";
+import type { AnswerKeyScoreRevision } from "@/types/quiz";
 import type { MasteryAnalysis } from "@/lib/masteryAnalysis";
 
 type ResultSummaryProps = {
   summary: SummaryStats;
   masteryAnalysis?: MasteryAnalysis;
+  scoreRevision?: AnswerKeyScoreRevision;
 };
 
 function formatExamScore(value: number) {
@@ -75,28 +77,50 @@ const toneClasses: Record<string, string> = {
   orange: "bg-orange-50 text-orange-800 ring-orange-200"
 };
 
-export function ResultSummary({ summary, masteryAnalysis }: ResultSummaryProps) {
+export function ResultSummary({ summary, masteryAnalysis, scoreRevision }: ResultSummaryProps) {
   return (
-    <section className={`grid gap-4 sm:grid-cols-2 ${masteryAnalysis ? "xl:grid-cols-3" : "xl:grid-cols-4"}`}>
-      {cards(summary, masteryAnalysis).map((card) => (
-        <article
-          key={card.label}
-          className={`rounded-3xl p-5 ring-1 ${toneClasses[card.tone]} shadow-sm ${
-            card.featured ? "shadow-emerald-100 ring-2" : ""
-          }`}
-        >
-          <div className="flex min-h-6 flex-wrap items-center justify-between gap-2">
-            <p className="text-sm font-medium opacity-80">{card.label}</p>
-            {"badge" in card && card.badge ? (
-              <span className="rounded-full bg-white/80 px-2.5 py-1 text-[11px] font-black shadow-sm ring-1 ring-current/10">
-                {card.badge}
-              </span>
-            ) : null}
+    <section>
+      {scoreRevision ? (
+        <div className="mb-4 border-y border-amber-200 bg-amber-50/70 px-4 py-4 text-amber-950">
+          <p className="text-xs font-semibold tracking-wide text-amber-800">115-2 申覆重算</p>
+          <div className="mt-2 grid grid-cols-2 divide-x divide-amber-200">
+            <div className="pr-4">
+              <p className="text-sm text-amber-800">申覆前成績</p>
+              <p className="mt-1 text-2xl font-bold">
+                {scoreRevision.previousCorrectCount} / {scoreRevision.totalCount}
+              </p>
+            </div>
+            <div className="pl-4">
+              <p className="text-sm text-amber-800">申覆後成績</p>
+              <p className="mt-1 text-2xl font-bold">
+                {scoreRevision.regradedCorrectCount} / {scoreRevision.totalCount}
+              </p>
+            </div>
           </div>
-          <p className="mt-3 text-3xl font-bold">{card.value}</p>
-          <p className="mt-2 text-xs font-semibold leading-5 opacity-75">{card.helper}</p>
-        </article>
-      ))}
+        </div>
+      ) : null}
+
+      <div className={`grid gap-4 sm:grid-cols-2 ${masteryAnalysis ? "xl:grid-cols-3" : "xl:grid-cols-4"}`}>
+        {cards(summary, masteryAnalysis).map((card) => (
+          <article
+            key={card.label}
+            className={`rounded-3xl p-5 ring-1 ${toneClasses[card.tone]} shadow-sm ${
+              card.featured ? "shadow-emerald-100 ring-2" : ""
+            }`}
+          >
+            <div className="flex min-h-6 flex-wrap items-center justify-between gap-2">
+              <p className="text-sm font-medium opacity-80">{card.label}</p>
+              {"badge" in card && card.badge ? (
+                <span className="rounded-full bg-white/80 px-2.5 py-1 text-[11px] font-black shadow-sm ring-1 ring-current/10">
+                  {card.badge}
+                </span>
+              ) : null}
+            </div>
+            <p className="mt-3 text-3xl font-bold">{card.value}</p>
+            <p className="mt-2 text-xs font-semibold leading-5 opacity-75">{card.helper}</p>
+          </article>
+        ))}
+      </div>
     </section>
   );
 }

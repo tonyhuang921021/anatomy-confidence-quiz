@@ -9,6 +9,10 @@ import {
 } from "../types/quiz";
 import { normalizeQuestionExplanationOverride as normalizeQuestionExplanationOverridePayload } from "./questionExplanationFormat";
 import { normalizePracticeYearRange } from "./practiceYears";
+import {
+  hasAnswerKeyRevision,
+  regradeSessionForCurrentAnswerKey
+} from "./answerKeyRevisions";
 
 const CURRENT_SESSION_KEY = "anatomy-confidence-current-session";
 const CURRENT_SESSION_DISCARDS_KEY = "anatomy-confidence-current-session-discards";
@@ -554,8 +558,12 @@ export function mergeCompletedQuestionHistoryEntries(
       continue;
     }
 
+    const shouldPreferRegradedEntry =
+      hasAnswerKeyRevision(entry.questionId) &&
+      entry.attempts === current.attempts &&
+      entry.lastAttemptedAt >= current.lastAttemptedAt;
     const aggregateSource =
-      entry.attempts > current.attempts ? entry : current;
+      entry.attempts > current.attempts || shouldPreferRegradedEntry ? entry : current;
     const latestSource =
       entry.lastAttemptedAt >= current.lastAttemptedAt ? entry : current;
 
@@ -969,7 +977,7 @@ function normalizeSession(session: QuizSession): QuizSession {
         .filter((attempt): attempt is NonNullable<ReturnType<typeof normalizeStoredAttempt>> => Boolean(attempt))
     : [];
 
-  return {
+  return regradeSessionForCurrentAnswerKey({
     ...session,
     subject: typeof session.subject === "string" && session.subject.trim()
       ? session.subject
@@ -1006,7 +1014,7 @@ function normalizeSession(session: QuizSession): QuizSession {
         ? session.currentQuestionIndex
         : 0,
     attempts: normalizedAttempts
-  };
+  });
 }
 
 export function normalizeSessions(sessions: QuizSession[]) {
@@ -1164,6 +1172,13 @@ function mergeDuplicateSessions(primary: QuizSession, secondary: QuizSession) {
     primary.settings?.customQuestionPayload,
     secondary.settings?.customQuestionPayload
   );
+  const scoreRevisions = Array.from(
+    new Map(
+      [...(secondary.scoreRevisions ?? []), ...(primary.scoreRevisions ?? [])].map(
+        (revision) => [revision.revisionId, revision] as const
+      )
+    ).values()
+  );
   const baseSettings = primary.settings ?? secondary.settings;
   const settings = baseSettings
     ? {
@@ -1212,6 +1227,7 @@ function mergeDuplicateSessions(primary: QuizSession, secondary: QuizSession) {
       secondary.currentQuestionIndex ?? 0
     ),
     isReviewingAnswer: freshest.isReviewingAnswer,
+    scoreRevisions: scoreRevisions.length > 0 ? scoreRevisions : undefined,
     attempts: mergeSessionAttempts(primary.attempts, secondary.attempts)
   } satisfies QuizSession;
 }
