@@ -79,6 +79,7 @@ import {
 } from "@/lib/storage";
 import { getOrCreateVisitorId } from "@/lib/visitor";
 import { getQuestionPrimaryTag } from "@/lib/analysisPrimaryTag";
+import { isQuestionAnswerCorrect } from "@/lib/answerScoring";
 import {
   queueSavedQuestionsCloudSync,
   recordSavedQuestionAnswer,
@@ -347,25 +348,6 @@ function withTimeoutFallback<T>(promise: Promise<T>, timeoutMs: number, fallback
       .catch(() => resolve(fallback))
       .finally(() => globalThis.clearTimeout(timeoutId));
   });
-}
-
-function evaluateAttempt(question: Question, selectedAnswer: OptionKey) {
-  if (question.answerCreditType === "all_credit") {
-    return true;
-  }
-
-  if (
-    question.answerCreditType === "multiple_accepted" ||
-    question.answerCreditType === "multiple_answers"
-  ) {
-    const acceptedAnswers =
-      question.acceptedAnswers && question.acceptedAnswers.length > 0
-        ? question.acceptedAnswers
-        : [question.answer];
-    return acceptedAnswers.includes(selectedAnswer);
-  }
-
-  return selectedAnswer === question.answer;
 }
 
 function normalizeEliminatedOptions(options?: OptionKey[]) {
@@ -1714,7 +1696,7 @@ export default function QuizPage() {
             questionId: currentQuestion.id,
             selectedAnswer,
             correctAnswer: currentQuestion.answer,
-            isCorrect: evaluateAttempt(currentQuestion, selectedAnswer),
+            isCorrect: isQuestionAnswerCorrect(currentQuestion, selectedAnswer),
             confidence: confidenceRef.current,
             errorType: errorType ?? existingAttempt?.errorType,
             answeredAt: existingAttempt?.answeredAt ?? new Date().toISOString(),
@@ -2033,7 +2015,7 @@ export default function QuizPage() {
       questionId: currentQuestion.id,
       selectedAnswer: answerToSubmit,
       correctAnswer: currentQuestion.answer,
-      isCorrect: evaluateAttempt(currentQuestion, answerToSubmit),
+      isCorrect: isQuestionAnswerCorrect(currentQuestion, answerToSubmit),
       confidence: confidenceRef.current,
       eliminatedOptions: eliminatedOptions.length > 0 ? eliminatedOptions : undefined,
       answeredAt: new Date().toISOString()

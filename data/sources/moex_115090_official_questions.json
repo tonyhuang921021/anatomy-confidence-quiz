@@ -5,7 +5,9 @@
     "year": 2026,
     "examRound": "第二次",
     "importedAt": "2026-07-20",
-    "notes": "官方題目與標準答案；詳解及細分 primaryTag 待後續補充。"
+    "notes": "官方題目與標準答案；詳解及細分 primaryTag 待後續補充。",
+    "answerCorrectionsUpdatedAt": "2026-09-02",
+    "answerCorrectionSource": "考選部 115年第二次專技高考醫師（一）測驗題標準答案更正"
   },
   "med1Questions": [
     {
@@ -2258,9 +2260,10 @@
       },
       "answer": "D",
       "correct_answers": [
+        "B",
         "D"
       ],
-      "answer_credit_type": "standard",
+      "answer_credit_type": "multiple_accepted",
       "explanation": "",
       "option_analysis": {},
       "exam_point": "生理學",
@@ -2270,11 +2273,17 @@
       },
       "review_flags": [
         "official_115_second_exam_import",
-        "primary_tag_pending_enrichment"
+        "primary_tag_pending_enrichment",
+        "official_answer_correction_or_credit"
       ],
       "detail_phase": "official_question_only",
       "source_question_pdf": "115090_1301.pdf",
-      "source_answer_pdf": "115090_ANS1301.pdf"
+      "source_answer_pdf": "115090_ANS1301.pdf",
+      "answer_note": "考選部申覆結果：第63題答B或D或BD者均給分。",
+      "corrected_answer": [
+        "B",
+        "D"
+      ]
     },
     {
       "id": "MOEX-115090-1301-Q064",
@@ -2366,9 +2375,12 @@
       },
       "answer": "B",
       "correct_answers": [
-        "B"
+        "A",
+        "B",
+        "C",
+        "D"
       ],
-      "answer_credit_type": "standard",
+      "answer_credit_type": "all_credit",
       "explanation": "",
       "option_analysis": {},
       "exam_point": "生理學",
@@ -2378,11 +2390,14 @@
       },
       "review_flags": [
         "official_115_second_exam_import",
-        "primary_tag_pending_enrichment"
+        "primary_tag_pending_enrichment",
+        "official_answer_correction_or_credit"
       ],
       "detail_phase": "official_question_only",
       "source_question_pdf": "115090_1301.pdf",
-      "source_answer_pdf": "115090_ANS1301.pdf"
+      "source_answer_pdf": "115090_ANS1301.pdf",
+      "answer_note": "考選部申覆結果：第66題一律給分。",
+      "corrected_answer": null
     },
     {
       "id": "MOEX-115090-1301-Q067",
@@ -4147,10 +4162,13 @@
       },
       "official_answer_raw": "B",
       "correct_answers": [
-        "B"
+        "A",
+        "B",
+        "C",
+        "D"
       ],
       "corrected_answer": null,
-      "answer_credit_type": "single",
+      "answer_credit_type": "all_credit",
       "classification_v1": {
         "primary_subject_exact": "微生物免疫學",
         "subtopic": "微生物免疫學",
@@ -4165,10 +4183,12 @@
       "clinical_link": "",
       "review_flags": [
         "official_115_second_exam_import",
-        "primary_tag_pending_enrichment"
+        "primary_tag_pending_enrichment",
+        "official_answer_correction_or_credit"
       ],
       "source_pdf": "115090_2301.pdf",
-      "answer_pdf": "115090_ANS2301.pdf"
+      "answer_pdf": "115090_ANS2301.pdf",
+      "answer_note": "考選部申覆結果：第14題一律給分。"
     },
     {
       "id": "MOEX-115090-2301-Q015",
@@ -4587,10 +4607,13 @@
       },
       "official_answer_raw": "D",
       "correct_answers": [
+        "A",
+        "B",
+        "C",
         "D"
       ],
       "corrected_answer": null,
-      "answer_credit_type": "single",
+      "answer_credit_type": "all_credit",
       "classification_v1": {
         "primary_subject_exact": "微生物免疫學",
         "subtopic": "微生物免疫學",
@@ -4605,10 +4628,12 @@
       "clinical_link": "",
       "review_flags": [
         "official_115_second_exam_import",
-        "primary_tag_pending_enrichment"
+        "primary_tag_pending_enrichment",
+        "official_answer_correction_or_credit"
       ],
       "source_pdf": "115090_2301.pdf",
-      "answer_pdf": "115090_ANS2301.pdf"
+      "answer_pdf": "115090_ANS2301.pdf",
+      "answer_note": "考選部申覆結果：第25題一律給分。"
     },
     {
       "id": "MOEX-115090-2301-Q026",
@@ -5787,10 +5812,13 @@
       },
       "official_answer_raw": "D",
       "correct_answers": [
+        "A",
+        "B",
+        "C",
         "D"
       ],
       "corrected_answer": null,
-      "answer_credit_type": "single",
+      "answer_credit_type": "all_credit",
       "classification_v1": {
         "primary_subject_exact": "藥理學",
         "subtopic": "藥理學",
@@ -5805,10 +5833,12 @@
       "clinical_link": "",
       "review_flags": [
         "official_115_second_exam_import",
-        "primary_tag_pending_enrichment"
+        "primary_tag_pending_enrichment",
+        "official_answer_correction_or_credit"
       ],
       "source_pdf": "115090_2301.pdf",
-      "answer_pdf": "115090_ANS2301.pdf"
+      "answer_pdf": "115090_ANS2301.pdf",
+      "answer_note": "考選部申覆結果：第55題一律給分。"
     },
     {
       "id": "MOEX-115090-2301-Q056",
@@ -6307,10 +6337,13 @@
       },
       "official_answer_raw": "B",
       "correct_answers": [
-        "B"
+        "A",
+        "B",
+        "C",
+        "D"
       ],
       "corrected_answer": null,
-      "answer_credit_type": "single",
+      "answer_credit_type": "all_credit",
       "classification_v1": {
         "primary_subject_exact": "藥理學",
         "subtopic": "藥理學",
@@ -6325,10 +6358,12 @@
       "clinical_link": "",
       "review_flags": [
         "official_115_second_exam_import",
-        "primary_tag_pending_enrichment"
+        "primary_tag_pending_enrichment",
+        "official_answer_correction_or_credit"
       ],
       "source_pdf": "115090_2301.pdf",
-      "answer_pdf": "115090_ANS2301.pdf"
+      "answer_pdf": "115090_ANS2301.pdf",
+      "answer_note": "考選部申覆結果：第68題一律給分。"
     },
     {
       "id": "MOEX-115090-2301-Q069",
@@ -7387,10 +7422,14 @@
       },
       "official_answer_raw": "A",
       "correct_answers": [
-        "A"
+        "A",
+        "D"
       ],
-      "corrected_answer": null,
-      "answer_credit_type": "single",
+      "corrected_answer": [
+        "A",
+        "D"
+      ],
+      "answer_credit_type": "multiple_accepted",
       "classification_v1": {
         "primary_subject_exact": "病理學",
         "subtopic": "病理學",
@@ -7405,10 +7444,12 @@
       "clinical_link": "",
       "review_flags": [
         "official_115_second_exam_import",
-        "primary_tag_pending_enrichment"
+        "primary_tag_pending_enrichment",
+        "official_answer_correction_or_credit"
       ],
       "source_pdf": "115090_2301.pdf",
-      "answer_pdf": "115090_ANS2301.pdf"
+      "answer_pdf": "115090_ANS2301.pdf",
+      "answer_note": "考選部申覆結果：第95題答A或D或AD者均給分。"
     },
     {
       "id": "MOEX-115090-2301-Q096",
@@ -7507,10 +7548,13 @@
       },
       "official_answer_raw": "D",
       "correct_answers": [
+        "A",
+        "B",
+        "C",
         "D"
       ],
       "corrected_answer": null,
-      "answer_credit_type": "single",
+      "answer_credit_type": "all_credit",
       "classification_v1": {
         "primary_subject_exact": "病理學",
         "subtopic": "病理學",
@@ -7525,10 +7569,12 @@
       "clinical_link": "",
       "review_flags": [
         "official_115_second_exam_import",
-        "primary_tag_pending_enrichment"
+        "primary_tag_pending_enrichment",
+        "official_answer_correction_or_credit"
       ],
       "source_pdf": "115090_2301.pdf",
-      "answer_pdf": "115090_ANS2301.pdf"
+      "answer_pdf": "115090_ANS2301.pdf",
+      "answer_note": "考選部申覆結果：第98題一律給分。"
     },
     {
       "id": "MOEX-115090-2301-Q099",

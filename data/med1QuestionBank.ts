@@ -34,6 +34,7 @@ type RawQuestion = {
   options: Readonly<Record<string, string>>;
   answer?: string;
   correct_answers?: readonly string[];
+  corrected_answer?: string | readonly string[] | null;
   answer_credit_type?: string;
   explanation?: string;
   option_analysis?: Readonly<Record<string, string>>;
@@ -569,15 +570,18 @@ function parseMoexQuestionId(id: string) {
 function toQuestion(raw: RawQuestion): Question | null {
   const answerCreditType = normalizeAnswerCreditType(raw.answer_credit_type);
   const acceptedAnswers = toOptionKeyArray(raw.correct_answers);
+  const correctedAnswers = toOptionKeyArray(raw.corrected_answer);
   const fallbackAnswer = toAnswerText(raw.answer);
   const resolvedAnswer = resolveImportedAnswerForQuestion(
     raw.id,
     raw.options,
     answerCreditType,
-    [
-      ...(fallbackAnswer && isOptionKey(fallbackAnswer) ? [fallbackAnswer] : []),
-      ...acceptedAnswers
-    ]
+    correctedAnswers.length > 0
+      ? correctedAnswers
+      : [
+          ...(fallbackAnswer && isOptionKey(fallbackAnswer) ? [fallbackAnswer] : []),
+          ...acceptedAnswers
+        ]
   );
   if (!resolvedAnswer) return null;
 

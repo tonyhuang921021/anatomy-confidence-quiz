@@ -13,6 +13,8 @@
     "next-env.d.ts",
     "data/anatomyQuestions.ts",
     "lib/questionExplanationFormat.ts",
+    "lib/answerScoring.ts",
+    "lib/answerScoring.test.ts",
     "lib/questionTextFormat.ts",
     "lib/questionTextFormat.test.ts",
     "lib/analysisPrimaryTag.ts",

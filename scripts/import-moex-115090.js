@@ -4,6 +4,7 @@ const os = require("os");
 const path = require("path");
 
 const { getMoexPrimarySubject } = require("./moex-primary-subject");
+const { apply115090AppealCorrections } = require("./moex-115090-appeal-corrections");
 
 const [
   med1QuestionPdf,
@@ -253,7 +254,7 @@ const med2Answers = parseAnswers(extractPdfText(med2AnswerPdf, "answers-2301"));
 validateQuestions(med1Questions, "1301");
 validateQuestions(med2Questions, "2301");
 
-const payload = {
+const payload = apply115090AppealCorrections({
   metadata: {
     examCode: "115090",
     rocYear: 115,
@@ -268,7 +269,7 @@ const payload = {
   med2Questions: med2Questions.map((question, index) =>
     buildMed2Question(question, med2Answers[index])
   )
-};
+});
 
 function countBy(items, getKey) {
   return items.reduce((counts, item) => {
