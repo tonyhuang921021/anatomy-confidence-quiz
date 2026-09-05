@@ -5624,10 +5624,12 @@ html[data-theme="dark"] .feedback-identity button.is-selected {
   gap: 1rem;
   border-bottom: 1px solid var(--line-soft);
   color: var(--ink-main);
+  font-family: "Iansui Home", "PingFang TC", "Microsoft JhengHei", sans-serif;
   font-size: clamp(1.8rem, 3.2vw, 2.9rem);
-  font-weight: 500;
-  letter-spacing: -0.045em;
+  font-weight: 400;
+  letter-spacing: 0;
   line-height: 1.05;
+  font-synthesis: none;
   transition: color 140ms ease;
 }
 
