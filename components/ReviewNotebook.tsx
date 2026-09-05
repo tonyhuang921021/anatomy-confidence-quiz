@@ -503,12 +503,53 @@ function getOptionKeysFromQuestion(question: Question) {
   );
 }
 
+type DeferredQuestionToolsProps = {
+  question: Question;
+  aiExplanationContent?: ReactNode;
+  relatedQuestionsContent?: () => ReactNode;
+  moreActionsContent?: ReactNode;
+};
+
+function DeferredQuestionTools({
+  question,
+  aiExplanationContent,
+  relatedQuestionsContent,
+  moreActionsContent
+}: DeferredQuestionToolsProps) {
+  const [isOpen, setIsOpen] = useState(false);
+
+  return (
+    <details
+      className="mt-3 rounded-xl border border-slate-200 bg-white px-3 py-2.5"
+      onToggle={(event) => {
+        if (event.currentTarget !== event.target) return;
+        setIsOpen(event.currentTarget.open);
+      }}
+    >
+      <summary className="cursor-pointer text-sm font-semibold text-slate-700">
+        更多詳解與工具
+      </summary>
+      {isOpen ? (
+        <QuestionExplanationTabs
+          question={question}
+          compact
+          className="mt-3"
+          aiExplanationContent={aiExplanationContent}
+          relatedQuestionsContent={relatedQuestionsContent}
+          moreActionsContent={moreActionsContent}
+        />
+      ) : null}
+    </details>
+  );
+}
+
 function renderQuestionReview(
   item: ReviewQuestionItem,
   renderedQuestion: Question,
   headerActions: ReactNode,
   footer: ReactNode,
-  relatedQuestionsContent?: () => ReactNode
+  relatedQuestionsContent?: () => ReactNode,
+  deferAdditionalTools = false
 ) {
   const primaryTag = getQuestionPrimaryTag(renderedQuestion);
   const shouldCollapseAiExplanation = hasCollapsibleStructuredExplanation(renderedQuestion.explanation);
@@ -521,6 +562,16 @@ function renderQuestionReview(
       fallbackToFullText={false}
     />
   ) : undefined;
+  const questionTools = (
+    <QuestionExplanationTabs
+      question={renderedQuestion}
+      compact
+      className="mt-3"
+      aiExplanationContent={aiExplanationContent}
+      relatedQuestionsContent={relatedQuestionsContent}
+      moreActionsContent={footer}
+    />
+  );
 
   return (
     <div className="mt-3 space-y-2.5 leading-7">
@@ -596,14 +647,14 @@ function renderQuestionReview(
           })}
         </div>
       ) : null}
-      <QuestionExplanationTabs
-        question={renderedQuestion}
-        compact
-        className="mt-3"
-        aiExplanationContent={aiExplanationContent}
-        relatedQuestionsContent={relatedQuestionsContent}
-        moreActionsContent={footer}
-      />
+      {deferAdditionalTools ? (
+        <DeferredQuestionTools
+          question={renderedQuestion}
+          aiExplanationContent={aiExplanationContent}
+          relatedQuestionsContent={relatedQuestionsContent}
+          moreActionsContent={footer}
+        />
+      ) : questionTools}
     </div>
   );
 }
@@ -618,6 +669,7 @@ type ReviewNotebookProps = {
   getStartHref?: (items: ReviewQuestionItem[]) => string;
   onStartReview?: (items: ReviewQuestionItem[]) => void;
   fullscreenMobile?: boolean;
+  inlineQuestionReview?: boolean;
   headerAction?: ReactNode;
   manualEditScope?: string;
   completionThreshold?: ReviewCompletionThreshold;
@@ -634,6 +686,7 @@ export function ReviewNotebook({
   getStartHref,
   onStartReview,
   fullscreenMobile = false,
+  inlineQuestionReview = false,
   headerAction,
   manualEditScope,
   completionThreshold,
@@ -1489,6 +1542,22 @@ export function ReviewNotebook({
                           explanationOverrides[item.question.id]
                         );
                         const isQuestionOpen = openQuestionIds.has(item.question.id);
+                        const questionReview = inlineQuestionReview || isQuestionOpen
+                          ? renderQuestionReview(
+                              item,
+                              renderedQuestion,
+                              renderQuestionTopActions(renderedQuestion),
+                              renderExplanationFooter(renderedQuestion),
+                              () => (
+                                <RelatedQuestionsPanel
+                                  question={renderedQuestion}
+                                  relatedQuestions={renderedAllQuestions}
+                                  savedQuestionSource="review"
+                                />
+                              ),
+                              inlineQuestionReview
+                            )
+                          : null;
                         return (
                           <>
                             <div className="space-y-3">
@@ -1515,7 +1584,7 @@ export function ReviewNotebook({
                               ) : null}
                               <div className="space-y-3">
                                 <div className="flex items-start justify-between gap-3">
-                                  <div className="flex min-w-0 flex-wrap items-center gap-3">
+                                  <div className={`flex min-w-0 items-center gap-3${inlineQuestionReview ? "" : " flex-wrap"}`}>
                                     <span
                                       className={`rounded-full px-3 py-1 text-xs font-semibold ${
                                         activeCategory === "wrong"
@@ -1531,47 +1600,39 @@ export function ReviewNotebook({
                                           ? `沒信心 ${index + 1}`
                                           : `完成 ${index + 1}`}
                                     </span>
-                                    <QuestionPrimaryTagBadge
-                                      question={renderedQuestion}
-                                      className="min-w-0 text-sm text-sky-700"
-                                    />
+                                    {!inlineQuestionReview ? (
+                                      <QuestionPrimaryTagBadge
+                                        question={renderedQuestion}
+                                        className="min-w-0 text-sm text-sky-700"
+                                      />
+                                    ) : null}
                                   </div>
                                   <span className="shrink-0 pt-0.5 text-[11px] font-medium text-slate-400 sm:text-xs">
                                     最近作答 {formatTime(item.history.lastAttemptedAt)}
                                   </span>
                                 </div>
-                                <h4 className="break-words text-base font-semibold leading-7 text-ink sm:text-lg sm:leading-8">
-                                  {renderedQuestion.stem}
-                                </h4>
+                                {!inlineQuestionReview ? (
+                                  <h4 className="break-words text-base font-semibold leading-7 text-ink sm:text-lg sm:leading-8">
+                                    {renderedQuestion.stem}
+                                  </h4>
+                                ) : null}
                               </div>
 
-                              <details
-                                open={isQuestionOpen}
-                                onToggle={(event) => {
-                                  if (event.currentTarget !== event.target) return;
-                                  setQuestionDetailsOpen(item.question.id, event.currentTarget.open);
-                                }}
-                                className="rounded-2xl bg-white p-3 text-sm text-slate-700 sm:p-3.5"
-                              >
-                                <summary className="cursor-pointer font-semibold text-ink">
-                                  查看題目、選項與詳解
-                                </summary>
-                                {isQuestionOpen
-                                  ? renderQuestionReview(
-                                      item,
-                                      renderedQuestion,
-                                      renderQuestionTopActions(renderedQuestion),
-                                      renderExplanationFooter(renderedQuestion),
-                                      () => (
-                                        <RelatedQuestionsPanel
-                                          question={renderedQuestion}
-                                          relatedQuestions={renderedAllQuestions}
-                                          savedQuestionSource="review"
-                                        />
-                                      )
-                                    )
-                                  : null}
-                              </details>
+                              {inlineQuestionReview ? questionReview : (
+                                <details
+                                  open={isQuestionOpen}
+                                  onToggle={(event) => {
+                                    if (event.currentTarget !== event.target) return;
+                                    setQuestionDetailsOpen(item.question.id, event.currentTarget.open);
+                                  }}
+                                  className="rounded-2xl bg-white p-3 text-sm text-slate-700 sm:p-3.5"
+                                >
+                                  <summary className="cursor-pointer font-semibold text-ink">
+                                    查看題目、選項與詳解
+                                  </summary>
+                                  {isQuestionOpen ? questionReview : null}
+                                </details>
+                              )}
                             </div>
                           </>
                         );

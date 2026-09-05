@@ -381,6 +381,7 @@ export default function ReviewPage() {
             onStartReview={handleStartPracticeReview}
             items={yearFilteredPracticeItems}
             allQuestions={allQuestions}
+            inlineQuestionReview
             manualEditScope="practice-review"
             completionThreshold={reviewCompletionThreshold}
             emptyMessage="這個年份區間目前沒有散題待複習題，可以調整上方年份。"
@@ -432,6 +433,7 @@ export default function ReviewPage() {
                 onStartReview={handleStartPracticeReview}
                 items={yearFilteredPracticeItems}
                 allQuestions={allQuestions}
+                inlineQuestionReview
                 manualEditScope="practice-review"
                 completionThreshold={reviewCompletionThreshold}
                 emptyMessage="這個年份區間目前沒有散題待複習題，可以返回頁面調整年份。"
