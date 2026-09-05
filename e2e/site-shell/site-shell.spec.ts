@@ -127,7 +127,7 @@ async function expectMoreActionsPanelUsable({
 test("導覽預設收起，留言入口會回到首頁完整留言板", async ({ page }) => {
   await page.goto("/", { waitUntil: "domcontentloaded" });
   await waitForShellReady(page);
-  await expect(page.getByRole("heading", { name: "今天從哪裡開始？" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "國考刷題" })).toBeVisible();
   await expect(page.getByRole("dialog", { name: "主要導覽" })).toHaveCount(0);
 
   await page.getByRole("button", { name: "開啟導覽" }).click();
@@ -1026,7 +1026,7 @@ test("手機滿版回顧會圈限焦點、隔離背景並可用 Esc 返回", asy
   await expect(page.locator(".app-frame")).not.toHaveAttribute("inert", "");
 });
 
-test("同一份進行中測驗會保留 13 題完整作答，不被較新的 6 題暫存覆蓋", async ({ page }) => {
+test("首頁續作會保留 13 題完整作答，不被較新的 6 題暫存覆蓋", async ({ page }) => {
   const questionIds = Array.from(
     { length: 13 },
     (_, index) => `MOEX-100030-1101-Q${String(index + 1).padStart(3, "0")}`
@@ -1075,10 +1075,16 @@ test("同一份進行中測驗會保留 13 題完整作答，不被較新的 6 �
     );
   }, { ids: questionIds });
 
-  await page.goto("/quiz?resume=1&sessionId=site-shell-resume-union", {
-    waitUntil: "networkidle"
-  });
+  await page.goto("/", { waitUntil: "domcontentloaded" });
   await waitForShellReady(page);
+
+  await page.getByRole("button", { name: "繼續作答" }).click();
+  const dialog = page.getByRole("dialog", { name: "可繼續的測驗" });
+  await expect(dialog).toBeVisible();
+  await expect(dialog.getByText(/^已答 13/)).toBeVisible();
+  await dialog.getByRole("button", { name: "繼續作答" }).click();
+
+  await expect(page).toHaveURL(/\/quiz\?resume=1&sessionId=site-shell-resume-union/);
 
   await expect(page.getByText(/^已答 13/)).toHaveText(/^已答 13/);
   await expect(page.getByText("第 13 / 13 題", { exact: true })).toBeVisible();

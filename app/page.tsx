@@ -2,9 +2,7 @@ import Link from "next/link";
 import {
   ArrowRight,
   FileSearch,
-  History,
   NotebookPen,
-  PencilLine,
   RotateCcw
 } from "lucide-react";
 import { ContinueQuizButton } from "@/components/ContinueQuizButton";
@@ -16,16 +14,12 @@ import { isSupabaseRecoveryMode } from "@/lib/supabase/recoveryMode";
 const START_ACTIONS = [
   {
     href: "/start",
-    label: "開始散題",
-    description: "隨機抽題，自由練習",
-    icon: PencilLine,
+    label: "散題練習",
     primary: true
   },
   {
     href: "/simulation",
-    label: "開始考古題",
-    description: "歷屆試題，完整演練",
-    icon: History,
+    label: "歷屆試題",
     primary: false
   }
 ] as const;
@@ -54,8 +48,8 @@ const REVIEW_ENTRIES = [
 const HOME_RELEASE_NOTES = [
   {
     time: "09/05",
-    title: "首頁先把下一題留給你",
-    body: "首頁換上暖白與深綠，續作和開新題更好找，複習入口也排整齊了。"
+    title: "首頁換了新樣子",
+    body: "題目還是一樣不客氣。"
   },
   {
     time: "09/02",
@@ -1139,74 +1133,63 @@ export default function HomePage() {
 
   return (
     <main id="main-content" className="shell home-shell home-workspace">
-      <header className="home-workspace-header">
-        <p className="home-kicker">刷題</p>
-        <h1 className="display-title">今天從哪裡開始？</h1>
-        <ClientSectionBoundary title="首頁提示">
-          <HomeToneBanner />
-        </ClientSectionBoundary>
-      </header>
+      <div className="home-study-photo" aria-hidden="true">
+        <img src="/images/home-study-desk.webp" alt="" />
+      </div>
 
-      <section className="home-work-section" aria-labelledby="home-continue-title">
-        <h2 id="home-continue-title" className="home-section-title">繼續上次測驗</h2>
-        <ClientSectionBoundary title="繼續測驗">
-          <ContinueQuizButton />
-        </ClientSectionBoundary>
-      </section>
+      <div className="home-study-desk">
+        <header className="home-study-intro">
+          <p className="home-study-program">一階醫師國考</p>
+          <h1>國考刷題</h1>
+          <ClientSectionBoundary title="首頁提示">
+            <HomeToneBanner />
+          </ClientSectionBoundary>
+        </header>
 
-      <div className="home-action-layout">
-        <section className="home-work-section" aria-labelledby="home-start-title">
-          <h2 id="home-start-title" className="home-section-title">開始練習</h2>
-          <div className="home-start-grid">
+        <section className="home-study-actions" aria-labelledby="home-work-title">
+          <h2 id="home-work-title" className="sr-only">開始作答</h2>
+          <div className="home-study-resume">
+            <ClientSectionBoundary title="繼續測驗">
+              <ContinueQuizButton />
+            </ClientSectionBoundary>
+          </div>
+
+          <div className="home-study-launches">
             {START_ACTIONS.map((action) => {
-              const Icon = action.icon;
               return (
                 <Link
                   key={action.href}
                   href={action.href}
                   prefetch={false}
-                  className={`home-start-card ${action.primary ? "is-primary" : ""}`}
+                  className={`home-study-launch ${action.primary ? "is-primary" : ""}`}
                 >
-                  <span className="home-start-icon" aria-hidden="true">
-                    <Icon size={25} strokeWidth={1.8} />
+                  <span>{action.label}</span>
+                  <span className="home-study-launch-arrow" aria-hidden="true">
+                    <ArrowRight size={30} strokeWidth={1.65} />
                   </span>
-                  <span className="home-start-copy">
-                    <strong>{action.label}</strong>
-                    <small>{action.description}</small>
-                  </span>
-                  <ArrowRight size={20} strokeWidth={1.8} aria-hidden="true" />
                 </Link>
               );
             })}
           </div>
-        </section>
 
-        <section className="home-work-section" aria-labelledby="home-review-title">
-          <h2 id="home-review-title" className="home-section-title">複習與組卷</h2>
-          <div className="home-workflow-list">
+          <nav className="home-study-tools" aria-label="複習與組卷工具">
             {REVIEW_ENTRIES.map((entry) => {
               const Icon = entry.icon;
               return (
                 <Link key={entry.href} href={entry.href} prefetch={false}>
-                  <span className="home-workflow-icon" aria-hidden="true">
-                    <Icon size={21} strokeWidth={1.8} />
-                  </span>
-                  <span className="home-workflow-copy">
-                    <strong>{entry.title}</strong>
-                    <small>{entry.description}</small>
-                  </span>
-                  <ArrowRight size={18} strokeWidth={1.8} aria-hidden="true" />
+                  <Icon size={18} strokeWidth={1.8} aria-hidden="true" />
+                  <span>{entry.title}</span>
+                  <ArrowRight size={17} strokeWidth={1.8} aria-hidden="true" />
                 </Link>
               );
             })}
-          </div>
+          </nav>
         </section>
       </div>
 
       {LATEST_HOME_RELEASE_NOTE ? (
-        <section className="home-update-row" aria-labelledby="home-release-title">
+        <section className="home-study-update" aria-labelledby="home-release-title">
           <h2 id="home-release-title">最近網站更新</h2>
-          <span className="home-update-dot" aria-hidden="true" />
           <time>{LATEST_HOME_RELEASE_NOTE.time}</time>
           <p>
             <strong>{LATEST_HOME_RELEASE_NOTE.title}</strong>
@@ -1218,8 +1201,7 @@ export default function HomePage() {
       <section id="feedback" tabIndex={-1} className="home-work-section home-feedback-section focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 focus-visible:ring-offset-2" aria-labelledby="home-feedback-title">
         <header className="home-feedback-heading">
           <div>
-            <p className="home-kicker">交流</p>
-            <h2 id="home-feedback-title" className="home-section-title">留言板</h2>
+            <h2 id="home-feedback-title">留言板</h2>
             <p>題目問題、使用狀況或建議，都可以直接留在這裡。</p>
           </div>
         </header>

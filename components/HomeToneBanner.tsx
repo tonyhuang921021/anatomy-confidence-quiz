@@ -11,9 +11,9 @@ type CommunityStatsPoint = {
   correctRate: number;
 };
 
-const CALM_LINES = ["接著上次進度，或重新選一科。"];
+const CALM_LINES = ["先寫幾題，看看還記得多少。"];
 const ANXIOUS_LINES = ["今天全站已完成 {{todayQuestionCount}} 題。"];
-const ANXIOUS_FALLBACK_LINES = ["接著上次進度，或重新選一科。"];
+const ANXIOUS_FALLBACK_LINES = ["先寫幾題，看看還記得多少。"];
 
 function pickLine(lines: string[], seed: number) {
   return lines[Math.abs(seed) % lines.length] ?? lines[0] ?? "";
@@ -160,7 +160,7 @@ export function HomeToneBanner() {
 
   return (
     <div className="home-tone-line home-data-fade mt-5">
-      <p className="body-soft whitespace-pre-line text-sm leading-7 sm:text-[15px]">{body}</p>
+      <p className={`body-soft whitespace-pre-line text-sm leading-7 sm:text-[15px]${mode === "calm" ? " home-tone-handwriting" : ""}`}>{body}</p>
     </div>
   );
 }

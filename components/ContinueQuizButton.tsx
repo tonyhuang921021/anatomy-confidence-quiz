@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { createPortal } from "react-dom";
 import { useRouter } from "next/navigation";
-import { ChevronRight, Clock3, X } from "lucide-react";
+import { ChevronRight, Play, X } from "lucide-react";
 import { useAuth } from "@/components/AuthProvider";
 import {
   createResumableQuizSessionListItem,
@@ -280,9 +280,9 @@ export function ContinueQuizButton() {
     <>
       <button type="button" onClick={handleOpen} className="home-continue-button">
         <span className="home-continue-icon" aria-hidden="true">
-          <Clock3 size={22} strokeWidth={1.8} />
+          <Play size={20} fill="currentColor" strokeWidth={1.7} />
         </span>
-        <span className="home-continue-label">繼續測驗</span>
+        <span className="home-continue-label">繼續作答</span>
         <span className="home-continue-meta">
           {localResumeMeta
             ? `這台裝置有 1 份・已答 ${localResumeMeta.answered} / ${localResumeMeta.total} 題`

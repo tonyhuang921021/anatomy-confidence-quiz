@@ -422,3 +422,10 @@
 - 已加診斷欄位：沒有 row 或 assets 被過濾空時，也會回 `activeVersionId`，方便判斷 API 是否讀到 active release。
 - 驗證：`npm run typecheck` 通過；`npm run build` 通過。
 - 下一步固定：只提交 `app/api/yangming-explanation/route.ts` 和 `.codex/CURRENT_WORK.md`，推上線後抽查正式 API 是否回 `activeVersionId: ym-boundary-full-20260615` 且 Q020 有 assets。
+
+### 首頁 Preview（2026-09-05）
+
+- worktree：`/private/tmp/anatomy-home-refinement-20260905`；branch：`codex/homepage-refinement-preview-20260905`。
+- 首頁改為芫荽小型子集與書桌照片的暖白、深綠版面；既有側欄、手機導覽、續作 modal、焦慮模式與留言板流程都保留。
+- 已通過 typecheck、quiz-analysis 231/231、site-shell 73 passed（5 skipped），以及 Chromium 360、WebKit tablet、dark layout smoke；首頁續作測試覆蓋 13 題完整 session 從首頁 modal 回到 quiz。
+- 本分支僅部署 Preview；由主代理完成提交與 Preview 狀態確認，禁止 production。
