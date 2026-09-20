@@ -38,17 +38,10 @@ import {
   getQuestionsForAISimulationPaper,
   getPastPaperOptions
 } from "@/data/med1QuestionBank";
-import { anatomyQuestions } from "@/data/anatomyQuestions";
 import {
-  calculateCompletionStats,
-  calculateSectionStats,
   calculateSummary,
   DEFAULT_QUIZ_SETTINGS,
-  generateAIPrompt,
   getModeLabel,
-  getLowCompletionSections,
-  getTopWeakSections,
-  getUnstableCompletedSections
 } from "@/lib/quizAnalysis";
 import {
   applyQuestionExplanationOverride,
@@ -78,7 +71,6 @@ import {
   QuestionExplanationOverride,
   QuizSettings,
   QuizSession,
-  SectionCompletionStats,
   SectionStats,
   SummaryStats
 } from "@/types/quiz";
@@ -109,6 +101,7 @@ import {
   buildResultReviewNavigation,
   getResultReviewNavigationTargetIndex
 } from "@/lib/resultReviewNavigation";
+import { buildResultRecommendations, formatResultRecommendationLabel } from "@/lib/resultRecommendations";
 import { getEmptyResultsPrimaryAction } from "@/lib/resumableSessions";
 
 const allQuestions = getCanonicalQuestionBank();
@@ -166,6 +159,7 @@ function getResultQuestionSources(session: QuizSession) {
   return Array.from(
     new Map(
       [
+        ...(session.settings?.customQuestionPayload ?? []),
         ...(session.generatedQuestions ?? []),
         ...getAISimulationQuestionsForSession(session),
         ...allQuestions
@@ -353,17 +347,8 @@ function getResultOptionState(question: Question, attempt: Attempt, optionKey: O
 type ResultState = {
   session: QuizSession | null;
   sessions: QuizSession[];
+  completedSessions: QuizSession[];
   summary: SummaryStats | null;
-  sectionStats: SectionStats[];
-  promptTexts: Record<"concise" | "detailed", string>;
-  lowCompletion: SectionCompletionStats[];
-  unstableSections: SectionCompletionStats[];
-  completionStats: ReturnType<typeof calculateCompletionStats> | null;
-};
-
-const EMPTY_PROMPT_TEXTS: ResultState["promptTexts"] = {
-  concise: "",
-  detailed: ""
 };
 
 function getSessionModeLabel(session: QuizSession) {
@@ -944,11 +929,7 @@ function ResultsPageContent() {
     session: null,
     sessions: [],
     summary: null,
-    sectionStats: [],
-    promptTexts: EMPTY_PROMPT_TEXTS,
-    lowCompletion: [],
-    unstableSections: [],
-    completionStats: null
+    completedSessions: []
   });
 
   function queueResultCloudHandoff(resultSession: QuizSession) {
@@ -1058,7 +1039,7 @@ function ResultsPageContent() {
   }, [state.session?.id]);
 
   async function handleCopyAIPrompt() {
-    const promptText = state.promptTexts[aiPromptDetailLevel];
+    const promptText = recommendations.promptTexts[aiPromptDetailLevel];
     if (!promptText) return;
 
     try {
@@ -1297,11 +1278,7 @@ function ResultsPageContent() {
           session: null,
           sessions: scopedSessions,
           summary: null,
-          sectionStats: [],
-          promptTexts: EMPTY_PROMPT_TEXTS,
-          lowCompletion: [],
-          unstableSections: [],
-          completionStats: null
+          completedSessions
         }));
         setMounted(true);
         return;
@@ -1317,75 +1294,18 @@ function ResultsPageContent() {
           session: null,
           sessions: scopedSessions,
           summary: null,
-          sectionStats: [],
-          promptTexts: EMPTY_PROMPT_TEXTS,
-          lowCompletion: [],
-          unstableSections: [],
-          completionStats: null
+          completedSessions
         }));
         setMounted(true);
         return;
       }
 
-      const aiSimulationQuestions = getAISimulationQuestionsForSession(resolvedTargetSession);
-      const currentQuestions =
-        resolvedTargetSession.generatedQuestions && resolvedTargetSession.generatedQuestions.length > 0
-          ? resolvedTargetSession.generatedQuestions
-          : aiSimulationQuestions.length > 0
-            ? aiSimulationQuestions
-            : anatomyQuestions;
-      const promptQuestions = Array.from(
-        new Map(
-          [
-            ...allQuestions,
-            ...aiSimulationQuestions,
-            ...currentQuestions,
-            ...(resolvedTargetSession.generatedQuestions ?? [])
-          ].map((question) => [question.id, question] as const)
-        ).values()
-      );
-      const promptQuestionMap = new Map(promptQuestions.map((question) => [question.id, question] as const));
-      const currentQuestionIds = new Set(currentQuestions.map((question) => question.id));
-      const hasAllAttemptQuestions = resolvedTargetSession.attempts.every((attempt) =>
-        currentQuestionIds.has(attempt.questionId)
-      );
-      const analysisQuestions = hasAllAttemptQuestions
-        ? currentQuestions
-        : resolvedTargetSession.attempts
-            .map((attempt) => promptQuestionMap.get(attempt.questionId))
-            .filter((question): question is Question => Boolean(question));
-      const resolvedAnalysisQuestions = analysisQuestions.length > 0 ? analysisQuestions : promptQuestions;
-      const progressQuestions = anatomyQuestions.filter((question) => question.sourceType !== "AI_GENERATED");
-      const completionStats = calculateCompletionStats(progressQuestions, completedSessions);
-      const sessionSectionStats = calculateSectionStats(
-        resolvedTargetSession.attempts,
-        resolvedAnalysisQuestions
-      );
-
+      const resolvedQuestions = getResultQuestionSources(resolvedTargetSession);
       setState({
         session: resolvedTargetSession,
         sessions: scopedSessions,
-        summary: calculateSummary(resolvedTargetSession.attempts, resolvedAnalysisQuestions),
-        sectionStats: sessionSectionStats,
-        promptTexts: {
-          concise: generateAIPrompt(
-            resolvedTargetSession.attempts,
-            resolvedAnalysisQuestions,
-            completedSessions,
-            promptQuestions,
-            { detailLevel: "concise" }
-          ),
-          detailed: generateAIPrompt(
-            resolvedTargetSession.attempts,
-            resolvedAnalysisQuestions,
-            completedSessions,
-            promptQuestions,
-            { detailLevel: "detailed" }
-          )
-        },
-        lowCompletion: getLowCompletionSections(completionStats.sections, 5),
-        unstableSections: getUnstableCompletedSections(completionStats.sections, 5),
-        completionStats
+        completedSessions,
+        summary: calculateSummary(resolvedTargetSession.attempts, resolvedQuestions)
       });
       setMounted(true);
       } catch {
@@ -1399,11 +1319,7 @@ function ResultsPageContent() {
           session: null,
           sessions: fallbackScopedSessions,
           summary: null,
-          sectionStats: [],
-          promptTexts: EMPTY_PROMPT_TEXTS,
-          lowCompletion: [],
-          unstableSections: [],
-          completionStats: null
+          completedSessions: fallbackSessions
         });
         setMounted(true);
       }
@@ -1682,22 +1598,17 @@ function ResultsPageContent() {
     () => orderedReviewedAttempts.filter((item) => !item.attempt.isCorrect),
     [orderedReviewedAttempts]
   );
-  const derivedSectionStats = useMemo(
-    () =>
-      activeSession
-        ? calculateSectionStats(
-            activeSession.attempts,
-            reviewedAttempts.map(({ question }) => {
-              const primaryTag = getQuestionPrimaryTag(question);
-              return primaryTag
-                ? { ...question, chapter: question.subject, section: primaryTag }
-                : question;
-            })
-          )
-        : [],
-    [activeSession, reviewedAttempts]
+  const recommendations = useMemo(
+    () => buildResultRecommendations({
+      session: activeSession,
+      questions: Array.from(questionMap.values()),
+      questionBank: allQuestions,
+      completedSessions: state.completedSessions,
+      classificationOverrides
+    }),
+    [activeSession, questionMap, state.completedSessions, classificationOverrides]
   );
-  const topWeakSections = useMemo(() => getTopWeakSections(derivedSectionStats, 3), [derivedSectionStats]);
+  const topWeakSections = recommendations.topWeakSections;
   const lowConfidenceAttempts = useMemo(() => {
     const wrongAttemptIds = new Set(wrongAttempts.map((item) => item.attempt.questionId));
     return orderedReviewedAttempts.filter(
@@ -1793,16 +1704,14 @@ function ResultsPageContent() {
   }
 
   function handleStartWeaknessReview(section: SectionStats) {
-    const sourceQuestion = allQuestions.find(
-      (question) =>
-        question.subject === section.chapter &&
-        getQuestionPrimaryTag(question) === section.section
+    const sourceQuestion = recommendations.questionBank.find(
+      (question) => question.chapter === section.chapter && question.section === section.section
     );
     if (!sourceQuestion) return;
 
     const questionOrder = buildWeaknessQuestionOrder({
-      questions: allQuestions,
-      sessions: state.sessions,
+      questions: recommendations.questionBank,
+      sessions: recommendations.completedSessions,
       subject: sourceQuestion.subject,
       primaryTag: section.section
     });
@@ -2215,7 +2124,7 @@ function ResultsPageContent() {
     );
   }
 
-  if (!state.session || !state.summary || !state.completionStats) {
+  if (!state.session || !state.summary) {
     return (
       <main id="main-content" className="shell workspace-page">
         <section className="workspace-section results-history-shell text-center">
@@ -3337,7 +3246,7 @@ function ResultsPageContent() {
               <div className="min-w-0">
                 <h2 className="text-lg font-semibold text-ink">補強建議</h2>
                 <p className="mt-1 truncate text-sm text-slate-500">
-                  優先補強：{topWeakSections[0]?.section ?? state.lowCompletion[0]?.section ?? "目前無資料"}
+                  本次補強：{topWeakSections[0] ? formatResultRecommendationLabel(topWeakSections[0]) : "沒有答錯或低信心弱項"}
                 </p>
               </div>
               <div className="flex shrink-0 items-center gap-2">
@@ -3352,15 +3261,18 @@ function ResultsPageContent() {
 
             {isStudyRecommendationsOpen ? (
               <div className="mt-4 border-t border-slate-100 pt-4">
+                <p className="mb-3 text-xs leading-5 text-slate-500">
+                  進度範圍：{recommendations.scopeLabel}，共 {recommendations.completionStats.overall.totalQuestionsInBank} 題；依已完成紀錄計算，已作答 {recommendations.completionStats.overall.attemptedQuestions} 題。
+                </p>
                 <div className="grid gap-3 lg:grid-cols-3">
               <div className="rounded-lg bg-rose-50 px-4 py-3 text-sm leading-6 text-rose-900">
-                最需要補弱的小節：{topWeakSections.map((section) => section.section).join("、") || "目前無資料"}
+                本次需補強：{topWeakSections.map(formatResultRecommendationLabel).join("、") || "沒有答錯或低信心弱項"}
               </div>
               <div className="rounded-lg bg-sky-50 px-4 py-3 text-sm leading-6 text-sky-900">
-                最需要補進度：{state.lowCompletion.map((section) => section.section).join("、") || "目前無資料"}
+                最需要補進度：{recommendations.lowCompletion.map(formatResultRecommendationLabel).join("、") || (recommendations.completionStats.overall.totalQuestionsInBank === 0 ? "目前沒有可對應的既有題庫" : "此範圍已完成")}
               </div>
               <div className="rounded-lg bg-amber-50 px-4 py-3 text-sm leading-6 text-amber-900">
-                已完成但不穩：{state.unstableSections.map((section) => section.section).join("、") || "目前無資料"}
+                已完成但不穩：{recommendations.unstableSections.map(formatResultRecommendationLabel).join("、") || "此範圍沒有已完成但不穩的分類"}
               </div>
                 </div>
                 <div className="mt-4 grid gap-2 md:grid-cols-2 xl:grid-cols-4">
@@ -3427,7 +3339,7 @@ function ResultsPageContent() {
               <button
                 type="button"
                 onClick={() => void handleCopyAIPrompt()}
-                disabled={!state.promptTexts[aiPromptDetailLevel]}
+                disabled={!recommendations.promptTexts[aiPromptDetailLevel]}
                 className="min-h-11 rounded-2xl bg-slate-900 px-4 py-3 text-center text-sm font-semibold text-white transition hover:bg-black disabled:cursor-not-allowed disabled:bg-slate-300"
               >
                 複製{aiPromptDetailLevel === "detailed" ? "詳細" : "簡略"}版 AI 補弱 Prompt

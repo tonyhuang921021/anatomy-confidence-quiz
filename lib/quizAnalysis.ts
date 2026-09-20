@@ -1,4 +1,3 @@
-import { anatomyOutline } from "../data/anatomyQuestions";
 import {
   Attempt,
   ChapterCompletionStats,
@@ -83,13 +82,14 @@ export function calculateSummary(attempts: Attempt[], questions: Question[]): Su
   };
 }
 
-export function calculateSectionStats(attempts: Attempt[], questions: Question[]): SectionStats[] {
+export function calculateSectionStats(attempts: Attempt[], questions: Question[], options: { confidenceEnabled?: boolean } = {}): SectionStats[] {
+  const confidenceEnabled = options.confidenceEnabled !== false;
   const questionMap = new Map(questions.map((question) => [question.id, question]));
   const sections = new Map<string, SectionStats>();
 
   attempts.forEach((attempt) => {
     const question = questionMap.get(attempt.questionId);
-    if (!question) return;
+    if (!question || !isAnsweredAttempt(attempt)) return;
     const key = `${question.chapter}__${question.section}`;
     const current =
       sections.get(key) ??
@@ -110,9 +110,9 @@ export function calculateSectionStats(attempts: Attempt[], questions: Question[]
     current.correct += attempt.isCorrect ? 1 : 0;
     current.wrong += attempt.isCorrect ? 0 : 1;
     current.averageConfidence += attempt.confidence;
-    current.lowConfidence += attempt.confidence <= 2 ? 1 : 0;
-    current.overconfidence += !attempt.isCorrect && attempt.confidence >= 4 ? 1 : 0;
-    current.guessRisk += attempt.isCorrect && attempt.confidence <= 2 ? 1 : 0;
+    current.lowConfidence += confidenceEnabled && attempt.confidence <= 3 ? 1 : 0;
+    current.overconfidence += confidenceEnabled && !attempt.isCorrect && attempt.confidence >= 4 ? 1 : 0;
+    current.guessRisk += confidenceEnabled && attempt.isCorrect && attempt.confidence <= 2 ? 1 : 0;
     current.priorityScore =
       current.wrong * 3 +
       current.lowConfidence * 2 +
@@ -131,7 +131,7 @@ export function calculateSectionStats(attempts: Attempt[], questions: Question[]
 }
 
 export function getTopWeakSections(sectionStats: SectionStats[], limit = 3) {
-  return [...sectionStats]
+  return sectionStats.filter((section) => section.priorityScore > 0)
     .sort((a, b) => b.priorityScore - a.priorityScore || b.wrong - a.wrong)
     .slice(0, limit);
 }
@@ -140,9 +140,10 @@ function buildSectionAggregates(questions: Question[], allAttempts: Attempt[]) {
   const questionMap = new Map(questions.map((question) => [question.id, question]));
   const sectionMap = new Map<string, SectionAggregate>();
 
-  anatomyOutline.forEach(({ chapter, sections }) => {
-    sections.forEach((section) => {
-      sectionMap.set(`${chapter}__${section}`, {
+  questions.forEach(({ chapter, section }) => {
+    const key = `${chapter}__${section}`;
+    if (!sectionMap.has(key)) {
+      sectionMap.set(key, {
         chapter,
         section,
         attempts: [],
@@ -150,7 +151,7 @@ function buildSectionAggregates(questions: Question[], allAttempts: Attempt[]) {
         correctCount: 0,
         confidenceTotal: 0
       });
-    });
+    }
   });
 
   allAttempts.forEach((attempt) => {
@@ -176,12 +177,6 @@ function toSectionCompletionStats(
   sectionMap: Map<string, SectionAggregate>
 ): SectionCompletionStats[] {
   const bankCount = new Map<string, number>();
-
-  anatomyOutline.forEach(({ chapter, sections }) => {
-    sections.forEach((section) => {
-      bankCount.set(`${chapter}__${section}`, 0);
-    });
-  });
 
   questions.forEach((question) => {
     const key = `${question.chapter}__${question.section}`;
@@ -223,7 +218,7 @@ function toSectionCompletionStats(
 }
 
 function calculateChapterStats(sections: SectionCompletionStats[]): ChapterCompletionStats[] {
-  return anatomyOutline.map(({ chapter }) => {
+  return Array.from(new Set(sections.map((section) => section.chapter))).map((chapter) => {
     const chapterSections = sections.filter((section) => section.chapter === chapter);
     const totalQuestionsInBank = chapterSections.reduce(
       (sum, section) => sum + section.totalQuestionsInBank,
@@ -268,11 +263,27 @@ function calculateChapterStats(sections: SectionCompletionStats[]): ChapterCompl
   });
 }
 
+type CompletionSession = { attempts: Attempt[]; completedAt?: string };
+
+function isAnsweredAttempt(attempt: Attempt) {
+  return (["A", "B", "C", "D", "E"] as string[]).includes(attempt.selectedAnswer) &&
+    typeof attempt.isCorrect === "boolean";
+}
+
+function getCompletionAttempts(questions: Question[], allSessions: CompletionSession[]) {
+  const questionIds = new Set(questions.map((question) => question.id));
+  return allSessions
+    .filter((session) => !("id" in session || "completedAt" in session) || Boolean(session.completedAt))
+    .flatMap((session) => session.attempts)
+    .filter((attempt) => questionIds.has(attempt.questionId) && isAnsweredAttempt(attempt));
+}
+
 export function calculateOverallCompletion(
   questions: Question[],
-  allSessions: { attempts: Attempt[] }[]
+  allSessions: CompletionSession[]
 ): OverallCompletionStats {
-  const allAttempts = allSessions.flatMap((session) => session.attempts);
+  const totalQuestionsInBank = new Set(questions.map((question) => question.id)).size;
+  const allAttempts = getCompletionAttempts(questions, allSessions);
   const uniqueAttempted = new Set(allAttempts.map((attempt) => attempt.questionId)).size;
   const correctRate =
     allAttempts.length === 0
@@ -283,12 +294,12 @@ export function calculateOverallCompletion(
       ? 0
       : round(allAttempts.reduce((sum, attempt) => sum + attempt.confidence, 0) / allAttempts.length);
   const completionRate =
-    questions.length === 0 ? 0 : round((uniqueAttempted / questions.length) * 100);
+    totalQuestionsInBank === 0 ? 0 : round((uniqueAttempted / totalQuestionsInBank) * 100);
   const normalizedConfidence = (averageConfidence / 5) * 100;
   const masteryScore = round(completionRate * 0.4 + correctRate * 0.4 + normalizedConfidence * 0.2);
 
   return {
-    totalQuestionsInBank: questions.length,
+    totalQuestionsInBank,
     attemptedQuestions: uniqueAttempted,
     completionRate,
     correctRate,
@@ -299,9 +310,10 @@ export function calculateOverallCompletion(
 
 export function calculateCompletionStats(
   questions: Question[],
-  allSessions: { attempts: Attempt[] }[]
+  allSessions: CompletionSession[]
 ): CompletionStatsBundle {
-  const allAttempts = allSessions.flatMap((session) => session.attempts);
+  questions = Array.from(new Map(questions.map((question) => [question.id, question])).values());
+  const allAttempts = getCompletionAttempts(questions, allSessions);
   const sectionMap = buildSectionAggregates(questions, allAttempts);
   const sections = toSectionCompletionStats(questions, sectionMap).sort(
     (a, b) => a.chapter.localeCompare(b.chapter) || a.section.localeCompare(b.section)
@@ -313,14 +325,14 @@ export function calculateCompletionStats(
 }
 
 export function getLowCompletionSections(sectionStats: SectionCompletionStats[], limit = 5) {
-  return [...sectionStats]
+  return sectionStats.filter((section) => section.totalQuestionsInBank > 0 && section.completionRate < 100)
     .sort((a, b) => a.completionRate - b.completionRate || a.masteryScore - b.masteryScore)
     .slice(0, limit);
 }
 
 export function getUnstableCompletedSections(sectionStats: SectionCompletionStats[], limit = 5) {
   return sectionStats
-    .filter((section) => section.completionRate >= 80 && section.masteryScore < 70)
+    .filter((section) => section.totalQuestionsInBank > 0 && section.attemptedQuestions > 0 && section.completionRate >= 80 && section.masteryScore < 70)
     .sort((a, b) => a.masteryScore - b.masteryScore)
     .slice(0, limit);
 }
@@ -353,6 +365,10 @@ export type AIPromptDetailLevel = "concise" | "detailed";
 
 type GenerateAIPromptOptions = {
   detailLevel?: AIPromptDetailLevel;
+  completionStats?: CompletionStatsBundle;
+  sectionStats?: SectionStats[];
+  completionScopeLabel?: string;
+  confidenceEnabled?: boolean;
 };
 
 const MEDICINE_ONE_SUBJECTS = new Set<SubjectName>([
@@ -406,14 +422,16 @@ export function generateAIPrompt(
   lookupQuestions: Question[] = questions,
   options: GenerateAIPromptOptions = {}
 ) {
+  attempts = attempts.filter(isAnsweredAttempt);
   const detailLevel = options.detailLevel ?? "detailed";
+  const confidenceEnabled = options.confidenceEnabled !== false;
   const questionMap = new Map([...lookupQuestions, ...questions].map((question) => [question.id, question]));
   const formatEliminatedOptions = (attempt: Attempt) =>
     attempt.eliminatedOptions?.length
       ? `作答時打叉排除：${attempt.eliminatedOptions.join("、")}`
       : "作答時打叉排除：未標記";
   const formatMissingQuestionAttempt = (attempt: Attempt, label: string) =>
-    `${label}｜題號 ${attempt.questionId}｜題目資料暫時未載入｜信心 ${attempt.confidence}｜我的答案 ${attempt.selectedAnswer}｜正解 ${attempt.correctAnswer}｜${formatEliminatedOptions(attempt)}｜錯因 ${attempt.errorType ?? "未填"}`;
+    `${label}｜題號 ${attempt.questionId}｜題目資料暫時未載入｜信心 ${confidenceEnabled ? attempt.confidence : "未記錄"}｜我的答案 ${attempt.selectedAnswer}｜正解 ${attempt.correctAnswer}｜${formatEliminatedOptions(attempt)}｜錯因 ${attempt.errorType ?? "未填"}`;
   const subjectLabel = (() => {
     const subjects = Array.from(
       new Set(
@@ -426,12 +444,13 @@ export function generateAIPrompt(
     return inferAIPromptSubjectLabel(subjects);
   })();
   const summary = calculateSummary(attempts, questions);
-  const sectionStats = calculateSectionStats(attempts, questions);
+  const sectionStats = options.sectionStats ?? calculateSectionStats(attempts, questions, { confidenceEnabled });
   const topWeakSections = getTopWeakSections(sectionStats, 3);
-  const completionStats = calculateCompletionStats(questions, allSessions);
+  const completionStats = options.completionStats ?? calculateCompletionStats(questions, allSessions);
+  const completionScopeLabel = options.completionScopeLabel ?? "提供的題庫範圍";
   const lowCompletionSections = getLowCompletionSections(completionStats.sections, 5);
   const unstableSections = getUnstableCompletedSections(completionStats.sections, 5);
-  const targetAttempts = attempts.filter((attempt) => !attempt.isCorrect || attempt.confidence <= 3);
+  const targetAttempts = attempts.filter((attempt) => !attempt.isCorrect || (confidenceEnabled && attempt.confidence <= 3));
   const attemptOrdinalMap = new Map(attempts.map((attempt, index) => [attempt.questionId, index + 1] as const));
 
   const formatAttemptKnowledgeSignal = (attempt: Attempt) => {
@@ -445,8 +464,8 @@ export function generateAIPrompt(
         `我的答案：${attempt.selectedAnswer}`,
         `正確答案：${attempt.correctAnswer}`,
         `是否答對：${attempt.isCorrect ? "答對" : "答錯"}`,
-        `confidence：${attempt.confidence}`,
-        `信心文字：${getConfidenceLabel(attempt.confidence)}`,
+        `confidence：${confidenceEnabled ? attempt.confidence : "未記錄"}`,
+        `信心文字：${confidenceEnabled ? getConfidenceLabel(attempt.confidence) : "未記錄"}`,
         formatEliminatedOptions(attempt),
         `errorType：${attempt.errorType ?? "未填"}`
       ].join("｜");
@@ -470,8 +489,8 @@ export function generateAIPrompt(
       `我的答案：${formatPromptOption(question, attempt.selectedAnswer)}`,
       `正確答案：${formatPromptOption(question, attempt.correctAnswer)}`,
       `是否答對：${attempt.isCorrect ? "答對" : "答錯"}`,
-      `confidence：${attempt.confidence}`,
-      `信心文字：${getConfidenceLabel(attempt.confidence)}`,
+      `confidence：${confidenceEnabled ? attempt.confidence : "未記錄"}`,
+      `信心文字：${confidenceEnabled ? getConfidenceLabel(attempt.confidence) : "未記錄"}`,
       formatEliminatedOptions(attempt),
       `errorType：${attempt.errorType ?? "未填"}`,
       `詳解線索：${compactPromptText(question.explanation, 220)}`,
@@ -497,54 +516,61 @@ export function generateAIPrompt(
   };
 
   const targetAttemptLines = targetAttempts.map(formatAttemptKnowledgeSignal);
+  const noWeaknessMessage = targetAttempts.length === 0
+    ? "本次沒有答錯或低信心題，不需建立弱項。"
+    : "目前沒有可辨識的分類。";
+  const formatSectionLabel = (section: { chapter: string; section: string }) =>
+    section.chapter === section.section
+      ? `${section.chapter}（科目整體，尚未細分）`
+      : `${section.chapter} / ${section.section}`;
 
   const chapterLines = completionStats.chapters.map((chapter) => {
     return `${chapter.chapter}：completionRate ${chapter.completionRate}%｜masteryScore ${chapter.masteryScore}｜status ${chapter.status}`;
   });
 
   const sectionLines = completionStats.sections.map((section) => {
-    return `${section.chapter} / ${section.section}：completionRate ${section.completionRate}%｜correctRate ${section.correctRate}%｜averageConfidence ${section.averageConfidence}｜masteryScore ${section.masteryScore}｜status ${section.status}`;
+    return `${formatSectionLabel(section)}：completionRate ${section.completionRate}%｜correctRate ${section.correctRate}%｜averageConfidence ${section.averageConfidence}｜masteryScore ${section.masteryScore}｜status ${section.status}`;
   });
 
   const weakLines = topWeakSections.map((section) => {
-    return `${section.chapter} / ${section.section}：priorityScore ${section.priorityScore}｜wrong ${section.wrong}｜averageConfidence ${section.averageConfidence}`;
+    return `${formatSectionLabel(section)}：priorityScore ${section.priorityScore}｜wrong ${section.wrong}｜averageConfidence ${section.averageConfidence}`;
   });
 
   const lowCompletionLines = lowCompletionSections.map((section) => {
-    return `${section.chapter} / ${section.section}：completionRate ${section.completionRate}%｜masteryScore ${section.masteryScore}`;
+    return `${formatSectionLabel(section)}：completionRate ${section.completionRate}%｜masteryScore ${section.masteryScore}`;
   });
 
   const unstableLines = unstableSections.map((section) => {
-    return `${section.chapter} / ${section.section}：completionRate ${section.completionRate}%｜masteryScore ${section.masteryScore}`;
+    return `${formatSectionLabel(section)}：completionRate ${section.completionRate}%｜masteryScore ${section.masteryScore}`;
   });
 
   const overconfidenceLines = attempts
-    .filter((attempt) => !attempt.isCorrect && attempt.confidence >= 4)
+    .filter((attempt) => confidenceEnabled && !attempt.isCorrect && attempt.confidence >= 4)
     .map((attempt) => {
-      return formatAttemptSummaryLine(attempt, `答錯但信心高（${attempt.confidence}）`);
+      return formatAttemptSummaryLine(attempt, `答錯但信心高（${confidenceEnabled ? attempt.confidence : "未記錄"}）`);
     })
     .filter(Boolean);
 
   const priorityWeaknessLines = attempts
-    .filter((attempt) => !attempt.isCorrect && attempt.confidence <= 2)
+    .filter((attempt) => confidenceEnabled && !attempt.isCorrect && attempt.confidence <= 2)
     .map((attempt) => {
-      return `${formatAttemptSummaryLine(attempt, `答錯且低信心（${attempt.confidence}）`)}｜錯因 ${attempt.errorType ?? "未填"}`;
+      return `${formatAttemptSummaryLine(attempt, `答錯且低信心（${confidenceEnabled ? attempt.confidence : "未記錄"}）`)}｜錯因 ${attempt.errorType ?? "未填"}`;
     })
     .filter(Boolean);
 
   const wrongLines = attempts
     .filter((attempt) => !attempt.isCorrect)
     .map((attempt) => {
-      return `${formatAttemptSummaryLine(attempt, `答錯｜信心 ${attempt.confidence}`)}｜錯因 ${attempt.errorType ?? "未填"}`;
+      return `${formatAttemptSummaryLine(attempt, `答錯｜信心 ${confidenceEnabled ? attempt.confidence : "未記錄"}`)}｜錯因 ${attempt.errorType ?? "未填"}`;
     })
     .filter(Boolean);
 
   const lowConfidenceLines = attempts
-    .filter((attempt) => attempt.confidence <= 3)
+    .filter((attempt) => confidenceEnabled && attempt.confidence <= 3)
     .map((attempt) => {
       return formatAttemptSummaryLine(
         attempt,
-        `${attempt.isCorrect ? "答對但沒信心" : "答錯且沒信心"}（${attempt.confidence}）`
+        `${attempt.isCorrect ? "答對但沒信心" : "答錯且沒信心"}（${confidenceEnabled ? attempt.confidence : "未記錄"}）`
       );
     })
     .filter(Boolean);
@@ -568,6 +594,10 @@ export function generateAIPrompt(
       .map((attempt) => `題序 ${attemptOrdinalMap.get(attempt.questionId) ?? "?"}`)
       .join("、");
 
+    if (!confidenceEnabled) {
+      return `${formatSectionLabel(section)}｜關聯題：${relatedQuestionRefs || "目前沒有資料"}｜補強依據：答錯；本次未記錄信心，不推論信心高低。`;
+    }
+
     let scopeInstruction = "請先從題幹、正解與錯選推論最直接的真實考點，再外加 1 個最容易混淆的相鄰考點。";
 
     if (lowestConfidence === 1 || lowConfidenceWrongCount >= 2) {
@@ -584,7 +614,7 @@ export function generateAIPrompt(
         "請聚焦在這題對應知識點，並補 1 到 2 個最常一起混淆的相鄰考點。";
     }
 
-    return `${section.chapter} / ${section.section}｜關聯題：${relatedQuestionRefs || "目前沒有資料"}｜建議補強層級：${scope}｜最低信心 ${lowestConfidence}｜低信心答錯 ${lowConfidenceWrongCount} 題｜補法：${scopeInstruction}`;
+    return `${formatSectionLabel(section)}｜關聯題：${relatedQuestionRefs || "目前沒有資料"}｜建議補強層級：${scope}｜最低信心 ${lowestConfidence}｜低信心答錯 ${lowConfidenceWrongCount} 題｜補法：${scopeInstruction}`;
   });
 
   if (detailLevel === "concise") {
@@ -603,10 +633,10 @@ export function generateAIPrompt(
 總題數：${summary.total}
 答對題數：${summary.correct}
 答對率：${summary.correctRate}%
-平均信心：${summary.averageConfidence}
-錯誤自信數：${summary.overconfidenceCount}
-猜對風險數：${summary.guessRiskCount}
-優先補弱數：${summary.priorityWeaknessCount}
+平均信心：${confidenceEnabled ? summary.averageConfidence : "未記錄"}
+錯誤自信數：${confidenceEnabled ? summary.overconfidenceCount : "未記錄"}
+猜對風險數：${confidenceEnabled ? summary.guessRiskCount : "未記錄"}
+優先補弱數：${confidenceEnabled ? summary.priorityWeaknessCount : "未記錄"}
 
 所有答錯題：
 ${wrongLines.join("\n") || "目前沒有資料"}
@@ -618,12 +648,17 @@ ${overconfidenceLines.join("\n") || "目前沒有資料"}
 ${lowConfidenceLines.join("\n") || "目前沒有資料"}
 
 依信心程度建議的補強範圍：
-${confidenceScopedWeaknessLines.join("\n") || "目前沒有資料"}
+${confidenceScopedWeaknessLines.join("\n") || noWeaknessMessage}
 
 答錯與低信心題的判讀資料：
 ${targetAttemptLines.join("\n") || "目前沒有資料"}
 
-請直接輸出簡略版弱點補強。`;
+進度參考（${completionScopeLabel}）：
+題庫 ${completionStats.overall.totalQuestionsInBank} 題，已作答 ${completionStats.overall.attemptedQuestions} 題，完成度 ${completionStats.overall.completionRate}%。
+待補進度：${lowCompletionLines.join("；") || "此範圍沒有待補進度的分類"}
+已完成但不穩：${unstableLines.join("；") || "此範圍沒有已完成但不穩的分類"}
+
+請直接輸出簡略版弱點補強；沒有錯題或低信心題時，請直接說明不需建立弱項。`;
   }
 
   return `以下是我的${subjectLabel}醫師國考測驗紀錄。請你只做「弱點知識補強」，不要稱讚我、不要總結我哪裡做得不錯、不要輸出太多與補弱無關的分析，也不要重複貼回原始統計。
@@ -660,10 +695,10 @@ ${targetAttemptLines.join("\n") || "目前沒有資料"}
 總題數：${summary.total}
 答對題數：${summary.correct}
 答對率：${summary.correctRate}%
-平均信心：${summary.averageConfidence}
-錯誤自信數：${summary.overconfidenceCount}
-猜對風險數：${summary.guessRiskCount}
-優先補弱數：${summary.priorityWeaknessCount}
+平均信心：${confidenceEnabled ? summary.averageConfidence : "未記錄"}
+錯誤自信數：${confidenceEnabled ? summary.overconfidenceCount : "未記錄"}
+猜對風險數：${confidenceEnabled ? summary.guessRiskCount : "未記錄"}
+優先補弱數：${confidenceEnabled ? summary.priorityWeaknessCount : "未記錄"}
 
 以下是答錯與低信心題的判讀資料：
 ${targetAttemptLines.join("\n") || "目前沒有資料"}
@@ -681,10 +716,11 @@ ${priorityWeaknessLines.join("\n") || "目前沒有資料"}
 ${lowConfidenceLines.join("\n") || "目前沒有資料"}
 
 以下是依信心程度建議的補強範圍：
-${confidenceScopedWeaknessLines.join("\n") || "目前沒有資料"}
+${confidenceScopedWeaknessLines.join("\n") || noWeaknessMessage}
 
-以下是目前完成度統計：
-整體 anatomy completionRate：${completionStats.overall.completionRate}%
+以下是目前完成度統計（${completionScopeLabel}）：
+題庫分母：${completionStats.overall.totalQuestionsInBank} 題；已作答 ${completionStats.overall.attemptedQuestions} 題。
+整體 completionRate：${completionStats.overall.completionRate}%
 整體 masteryScore：${completionStats.overall.masteryScore}
 
 各 chapter completion：
@@ -693,14 +729,14 @@ ${chapterLines.join("\n")}
 各 section completion：
 ${sectionLines.join("\n")}
 
-以下是最需要補弱的小節：
-${weakLines.join("\n") || "目前沒有資料"}
+以下是本次需要補強的科目／分類：
+${weakLines.join("\n") || noWeaknessMessage}
 
-以下是完成度最低的小節：
-${lowCompletionLines.join("\n") || "目前沒有資料"}
+以下是待補進度的科目／分類：
+${lowCompletionLines.join("\n") || "此範圍沒有待補進度的分類"}
 
-以下是已完成但不穩的小節：
-${unstableLines.join("\n") || "目前沒有資料"}
+以下是已完成但不穩的科目／分類：
+${unstableLines.join("\n") || "此範圍沒有已完成但不穩的分類"}
 
 請直接開始輸出「最需要補的知識」，不要先寫客套開場。`;
 }

@@ -21,6 +21,17 @@ export default function WrongQuestionPdfIntegrationPage({ searchParams }: { sear
         <p className="mt-2 text-xs leading-5 text-slate-500">畫面使用示範作答，匯出設定可直接操作，不會寫入作答紀錄。</p>
       </header>
       <IntegrationPreview questions={questions} currentSession={currentSession} sessions={sessions} initialContext={searchParams.view === "review" ? "review" : "results"} />
+      <section id="recommendations-preview" className="mt-10 scroll-mt-24 border-t border-slate-200 pt-6" aria-labelledby="recommendations-preview-title">
+        <h2 id="recommendations-preview-title" className="text-lg font-semibold text-ink">補強建議修正版</h2>
+        <p className="mt-2 text-sm leading-6 text-slate-600">醫學二示範作答：微生物免疫學、藥理學、病理學。建議依本次科目整理，進度以對應題庫與已完成作答計算。</p>
+        <figure className="mt-4 overflow-hidden rounded-xl border border-slate-200 bg-white">
+          <figcaption className="border-b border-slate-200 bg-[color:var(--surface)] px-4 py-3 text-xs text-slate-500">實際結果頁截圖 · 示範紀錄 · 圖中按鈕僅供展示</figcaption>
+          <picture>
+            <source media="(max-width: 639px)" srcSet="/pdf-preview/recommendations-mobile.jpg" />
+            <img src="/pdf-preview/recommendations-desktop.jpg" alt="修正後的補強建議，依醫學二示範作答顯示本次補強、題庫進度與已練過但不穩的項目。" className="block h-auto w-full" loading="lazy" />
+          </picture>
+        </figure>
+      </section>
     </main>
   );
 }
