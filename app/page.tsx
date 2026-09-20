@@ -47,6 +47,11 @@ const REVIEW_ENTRIES = [
 
 const HOME_RELEASE_NOTES = [
   {
+    time: "09/20",
+    title: "刷題與複習，少一點來回找",
+    body: "結果頁用錯題、沒信心與全部切換；複習入口標清範圍，PDF 也會沿用年份與選科。手機答後可直接前往下一題。"
+  },
+  {
     time: "09/05",
     title: "首頁換了新樣子",
     body: "題目還是一樣不客氣。"

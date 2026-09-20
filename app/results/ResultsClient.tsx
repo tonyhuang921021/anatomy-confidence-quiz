@@ -99,7 +99,12 @@ import {
 } from "@/lib/weaknessAnalysis";
 import {
   buildResultReviewNavigation,
-  getResultReviewNavigationTargetIndex
+  getResultReviewNavigationTargetIndex,
+  filterResultReviewItems,
+  getDefaultResultReviewFilter,
+  getResultReviewDetailKey,
+  getResultReviewHref,
+  type ResultReviewFilter
 } from "@/lib/resultReviewNavigation";
 import { buildResultRecommendations, formatResultRecommendationLabel } from "@/lib/resultRecommendations";
 import { getEmptyResultsPrimaryAction } from "@/lib/resumableSessions";
@@ -899,6 +904,7 @@ function ResultsPageContent() {
   const [isFullscreenReview, setIsFullscreenReview] = useState(false);
   const [isFullscreenReviewVisible, setIsFullscreenReviewVisible] = useState(false);
   const [openReviewDetailKeys, setOpenReviewDetailKeys] = useState<Set<string>>(() => new Set());
+  const [reviewFilter, setReviewFilter] = useState<ResultReviewFilter | null>(null);
   const [activeReviewDetailKey, setActiveReviewDetailKey] = useState<string | null>(null);
   const reviewDetailElementMapRef = useRef<Record<string, HTMLDetailsElement | null>>({});
   const reviewSectionRef = useRef<HTMLElement | null>(null);
@@ -1023,7 +1029,7 @@ function ResultsPageContent() {
     keepAnchorInPlace();
     const frameId = window.requestAnimationFrame(keepAnchorInPlace);
     return () => window.cancelAnimationFrame(frameId);
-  }, [openReviewDetailKeys]);
+  }, [openReviewDetailKeys, reviewFilter]);
 
   useEffect(() => {
     const element = reviewSectionRef.current;
@@ -1339,6 +1345,7 @@ function ResultsPageContent() {
   useEffect(() => {
     setOpenReviewDetailKeys(new Set());
     setActiveReviewDetailKey(null);
+    setReviewFilter(null);
   }, [requestedSessionId]);
 
   useEffect(() => {
@@ -1615,32 +1622,24 @@ function ResultsPageContent() {
       (item) => item.attempt.confidence <= 3 && !wrongAttemptIds.has(item.attempt.questionId)
     );
   }, [orderedReviewedAttempts, wrongAttempts]);
-  const reviewNavigationItems = useMemo(() => {
-    return buildResultReviewNavigation([
-      {
-        label: "錯題",
-        detailKeys: wrongAttempts.map(
-          ({ attempt }, index) => `wrong-${attempt.questionId}-${index}`
-        )
-      },
-      ...(confidenceTrackingEnabled
-        ? [
-            {
-              label: "沒信心",
-              detailKeys: lowConfidenceAttempts.map(
-                ({ attempt }, index) => `low-confidence-${attempt.questionId}-${index}`
-              )
-            }
-          ]
-        : []),
-      {
-        label: "全部",
-        detailKeys: confidenceOverviewItems.map(
-          ({ attempt, questionNumber }) => `all-${attempt.questionId}-${questionNumber}`
-        )
-      }
-    ]);
-  }, [confidenceOverviewItems, confidenceTrackingEnabled, lowConfidenceAttempts, wrongAttempts]);
+  const activeReviewFilter = reviewFilter ?? getDefaultResultReviewFilter(
+    confidenceOverviewItems,
+    confidenceTrackingEnabled
+  );
+  const visibleReviewItems = useMemo(
+    () => filterResultReviewItems(confidenceOverviewItems, activeReviewFilter),
+    [confidenceOverviewItems, activeReviewFilter]
+  );
+  const reviewFilterLabel = activeReviewFilter === "wrong"
+    ? "錯題"
+    : activeReviewFilter === "low-confidence" ? "沒信心" : "全部";
+  const reviewNavigationItems = useMemo(
+    () => buildResultReviewNavigation([{
+      label: reviewFilterLabel,
+      detailKeys: visibleReviewItems.map(getResultReviewDetailKey)
+    }]),
+    [visibleReviewItems, reviewFilterLabel]
+  );
   const reviewNavigationIndexMap = useMemo(
     () =>
       new Map(reviewNavigationItems.map((item, index) => [item.detailKey, index] as const)),
@@ -1875,6 +1874,8 @@ function ResultsPageContent() {
   }
 
   function openQuestionReviewDetail(detailKey: string) {
+    // Map and calibration entries can refer to questions outside the current filter.
+    setReviewFilter("all");
     pendingReviewScrollTargetRef.current = detailKey;
     setActiveReviewDetailKey(detailKey);
     setReviewDetailOpen(detailKey, true);
@@ -1899,7 +1900,7 @@ function ResultsPageContent() {
   function openMasteryQuestion(questionId: string) {
     const item = confidenceOverviewItems.find(({ attempt }) => attempt.questionId === questionId);
     if (!item) return;
-    openQuestionReviewDetail(`all-${item.attempt.questionId}-${item.questionNumber}`);
+    openQuestionReviewDetail(getResultReviewDetailKey(item));
   }
 
   function openMasteryCategory(categoryKey: MasteryCategoryKey) {
@@ -1908,10 +1909,11 @@ function ResultsPageContent() {
     const questionIds = new Set(category.questionIds);
     const detailKeys = confidenceOverviewItems
       .filter(({ attempt }) => questionIds.has(attempt.questionId))
-      .map(({ attempt, questionNumber }) => `all-${attempt.questionId}-${questionNumber}`);
+      .map(getResultReviewDetailKey);
     const firstDetailKey = detailKeys[0];
     if (!firstDetailKey) return;
 
+    setReviewFilter("all");
     pendingReviewScrollTargetRef.current = firstDetailKey;
     setOpenReviewDetailKeys(new Set(detailKeys.slice(0, MAX_OPEN_REVIEW_DETAILS)));
     setActiveReviewDetailKey(firstDetailKey);
@@ -2152,6 +2154,7 @@ function ResultsPageContent() {
   }
 
   const resultSession = state.session;
+  const resultReviewHref = getResultReviewHref(resultSession.settings);
   const simulationElapsedSeconds = getSimulationResultElapsedSeconds(resultSession);
 
   function renderQuestionExplanationControls(question: Question, attempt: Attempt) {
@@ -2493,6 +2496,7 @@ function ResultsPageContent() {
           type="button"
           onClick={() => setIsConfidenceCalibrationOpen((current) => !current)}
           aria-expanded={isConfidenceCalibrationOpen}
+          aria-controls="result-confidence-calibration"
           className="flex w-full flex-wrap items-center justify-between gap-3 text-left"
         >
           <div className="min-w-0">
@@ -2514,11 +2518,8 @@ function ResultsPageContent() {
           </div>
         </button>
 
-        <div
-          className={`grid transition-[grid-template-rows,opacity] duration-500 ease-out ${
-            isConfidenceCalibrationOpen ? "grid-rows-[1fr] opacity-100" : "grid-rows-[0fr] opacity-0"
-          }`}
-        >
+        {isConfidenceCalibrationOpen ? (
+        <div id="result-confidence-calibration">
           <div className="min-h-0 overflow-hidden">
             <div className="mt-4 space-y-4">
               <div className="grid gap-4 lg:grid-cols-[0.9fr_1.1fr] lg:items-start">
@@ -2765,6 +2766,7 @@ function ResultsPageContent() {
             </div>
           </div>
         </div>
+        ) : null}
       </section>
     );
   }
@@ -2782,7 +2784,7 @@ function ResultsPageContent() {
           className="flex w-full items-center justify-between gap-4 text-left"
         >
           <div className="min-w-0">
-            <h2 className="text-lg font-semibold text-ink">信心度總覽</h2>
+            <h2 className="text-lg font-semibold text-ink">題號與信心地圖</h2>
             <p className="mt-1 truncate text-sm text-slate-500">
               {confidenceOverviewItems.length} 題・答錯 {wrongAttempts.length} 題・依正式題號排列
             </p>
@@ -2831,7 +2833,7 @@ function ResultsPageContent() {
 
             <div className="mt-4 grid grid-cols-5 gap-2 sm:grid-cols-10">
               {confidenceOverviewItems.map(({ attempt, questionNumber }) => {
-                const detailKey = `all-${attempt.questionId}-${questionNumber}`;
+                const detailKey = getResultReviewDetailKey({ attempt, questionNumber });
                 return (
                   <button
                     key={detailKey}
@@ -2864,200 +2866,95 @@ function ResultsPageContent() {
   }
 
   function renderReviewSection(fullscreenMobile = false) {
+    const filters: { key: ResultReviewFilter; label: string; count: number }[] = [
+      { key: "wrong", label: "錯題", count: wrongAttempts.length },
+      ...(confidenceTrackingEnabled
+        ? [{ key: "low-confidence" as const, label: "沒信心", count: lowConfidenceAttempts.length }]
+        : []),
+      { key: "all", label: "全部", count: confidenceOverviewItems.length }
+    ];
     return (
       <section
         ref={fullscreenMobile ? undefined : reviewSectionRef}
-        className={
-          fullscreenMobile
-            ? "bg-transparent p-0 shadow-none ring-0"
-            : "workspace-section p-4 sm:p-5"
-        }
+        aria-label="題目回顧"
+        className={fullscreenMobile ? "bg-transparent p-4" : "workspace-section p-4 sm:p-5"}
       >
         <div className="flex flex-wrap items-center justify-between gap-3">
-          <div>
-            <h2 className="text-xl font-semibold text-ink">題目回顧</h2>
-            <p className="mt-2 text-sm text-slate-500">先看錯題，再往下展開全部題目做完整複盤。</p>
-          </div>
-          <div className="flex flex-wrap items-center gap-2 text-xs font-semibold">
-            {!fullscreenMobile ? (
-              <button
-                ref={fullscreenReviewTriggerButtonRef}
-                type="button"
-                onClick={(event) => handleOpenFullscreenReview(event.currentTarget)}
-                className="inline-flex min-h-11 items-center justify-center rounded-2xl bg-slate-100 px-4 py-2 text-sm font-semibold text-slate-800 transition hover:bg-slate-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 focus-visible:ring-offset-2 sm:hidden"
-                aria-label="開啟滿版題目回顧"
-                title="開啟滿版題目回顧"
-              >
-                ⛶ 滿版模式
-              </button>
-            ) : null}
-            <span className="rounded-full bg-slate-100 px-3 py-1 text-slate-600">最多展開 2 題</span>
-            <span className="rounded-full bg-rose-100 px-3 py-1 text-rose-900">錯題 {wrongAttempts.length}</span>
-            <span className="rounded-full bg-slate-100 px-3 py-1 text-slate-700">全部 {reviewedAttempts.length}</span>
-          </div>
-        </div>
-
-        <div className="mt-5 space-y-6">
-          <div>
-            <h3 className="text-base font-semibold text-ink">錯題回顧</h3>
-            <div className="mt-3 grid gap-3">
-              {wrongAttempts.length === 0 ? (
-                <div className="rounded-2xl bg-emerald-50 p-4 text-sm text-emerald-900">
-                  這輪沒有錯題，可以直接展開下方全部題目回顧。
-                </div>
-              ) : (
-                wrongAttempts.map(({ attempt, question }, index) => {
-                  const detailKey = `wrong-${attempt.questionId}-${index}`;
-                  const isOpen = openReviewDetailKeys.has(detailKey);
-                  const masteryLabel =
-                    masteryReviewItemMap.get(attempt.questionId)?.categoryLabel ??
-                    getMasteryCategoryLabelForAnswer(attempt);
-
-                  return (
-                    <details
-                      key={detailKey}
-                      id={`review-${detailKey}`}
-                      ref={(node) => {
-                        reviewDetailElementMapRef.current[detailKey] = node;
-                      }}
-                      open={isOpen}
-                      className="group overflow-hidden rounded-2xl bg-rose-50 p-3.5 sm:p-4"
-                    >
-                      <summary
-                        onClick={(event) => {
-                          event.preventDefault();
-                          toggleReviewDetailOpen(detailKey);
-                        }}
-                        className="cursor-pointer overflow-hidden text-sm font-semibold text-rose-950 list-none [&::-webkit-details-marker]:hidden"
-                      >
-                        {renderQuestionSummaryLine({
-                          prefix: `錯題 ${index + 1}：`,
-                          question,
-                          isCorrect: attempt.isCorrect,
-                          suffix: confidenceCalibrationEnabled ? masteryLabel : undefined
-                        })}
-                      </summary>
-                      {isOpen
-                        ? renderAttemptReviewDetails({
-                            attempt,
-                            question,
-                            resultSession,
-                            optionKeySuffix: "wrong"
-                          })
-                        : null}
-                    </details>
-                  );
-                })
-              )}
-            </div>
-          </div>
-
-          {confidenceTrackingEnabled ? (
-            <div>
-              <h3 className="text-base font-semibold text-ink">沒信心題目回顧</h3>
-              <div className="mt-3 grid gap-3">
-                {lowConfidenceAttempts.length === 0 ? (
-                  <div className="rounded-2xl bg-sky-50 p-4 text-sm text-sky-900">
-                    這輪沒有標記為低信心的題目。
-                  </div>
-                ) : (
-                  lowConfidenceAttempts.map(({ attempt, question }, index) => {
-                    const detailKey = `low-confidence-${attempt.questionId}-${index}`;
-                    const isOpen = openReviewDetailKeys.has(detailKey);
-                    const questionNumber = questionNumberMap.get(attempt.questionId) ?? index + 1;
-                    const masteryLabel =
-                      masteryReviewItemMap.get(attempt.questionId)?.categoryLabel ??
-                      getMasteryCategoryLabelForAnswer(attempt);
-
-                    return (
-                      <details
-                        key={detailKey}
-                        id={`review-${detailKey}`}
-                        ref={(node) => {
-                          reviewDetailElementMapRef.current[detailKey] = node;
-                        }}
-                        open={isOpen}
-                        className="group overflow-hidden rounded-2xl bg-amber-50 p-3.5 sm:p-4"
-                      >
-                        <summary
-                          onClick={(event) => {
-                            event.preventDefault();
-                            toggleReviewDetailOpen(detailKey);
-                          }}
-                          className="cursor-pointer overflow-hidden text-sm font-semibold text-amber-950 list-none [&::-webkit-details-marker]:hidden"
-                        >
-                          {renderQuestionSummaryLine({
-                            prefix: `第 ${questionNumber} 題：`,
-                            question,
-                            isCorrect: attempt.isCorrect,
-                            suffix: confidenceCalibrationEnabled ? masteryLabel : undefined
-                          })}
-                        </summary>
-                        {isOpen
-                          ? renderAttemptReviewDetails({
-                              attempt,
-                              question,
-                              resultSession,
-                              optionKeySuffix: "low"
-                            })
-                          : null}
-                      </details>
-                    );
-                  })
-                )}
-              </div>
-            </div>
+          <h2 className="text-xl font-semibold text-ink">題目回顧</h2>
+          {!fullscreenMobile ? (
+            <button
+              ref={fullscreenReviewTriggerButtonRef}
+              type="button"
+              onClick={(event) => handleOpenFullscreenReview(event.currentTarget)}
+              className="inline-flex min-h-11 items-center justify-center rounded-xl bg-slate-100 px-3 py-2 text-sm font-semibold text-slate-800 transition hover:bg-slate-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 sm:hidden"
+              aria-label="開啟滿版題目回顧"
+            >
+              ⛶ 滿版
+            </button>
           ) : null}
-
-          <div>
-            <h3 className="text-base font-semibold text-ink">全部題目回顧</h3>
-            <div className="mt-3 grid gap-3">
-              {confidenceOverviewItems.map(({ attempt, question, questionNumber }) => {
-                const detailKey = `all-${attempt.questionId}-${questionNumber}`;
-                const isOpen = openReviewDetailKeys.has(detailKey);
-                const masteryLabel =
-                  masteryReviewItemMap.get(attempt.questionId)?.categoryLabel ??
-                  getMasteryCategoryLabelForAnswer(attempt);
-
-                return (
-                  <details
-                    key={detailKey}
-                    id={`review-${detailKey}`}
-                    ref={(node) => {
-                      reviewDetailElementMapRef.current[detailKey] = node;
-                    }}
-                    open={isOpen}
-                    className="group overflow-hidden rounded-2xl bg-slate-50 p-3.5 sm:p-4"
-                  >
-                    <summary
-                      onClick={(event) => {
-                        event.preventDefault();
-                        toggleReviewDetailOpen(detailKey);
-                      }}
-                      className="cursor-pointer overflow-hidden text-sm font-semibold text-ink list-none [&::-webkit-details-marker]:hidden"
-                    >
-                      {renderQuestionSummaryLine({
-                        prefix: `第 ${questionNumber} 題：`,
-                        question,
-                        isCorrect: attempt.isCorrect,
-                        suffix: confidenceCalibrationEnabled
-                          ? `${masteryLabel}・${getConfidenceOverviewLabel(attempt.confidence)}`
-                          : undefined
-                      })}
-                    </summary>
-                    {isOpen
-                      ? renderAttemptReviewDetails({
-                          attempt,
-                          question,
-                          resultSession,
-                          optionKeySuffix: "all"
-                        })
-                      : null}
-                  </details>
-                );
-              })}
-            </div>
+        </div>
+        <div className="mt-4 flex flex-wrap items-center justify-between gap-3">
+          <div className="inline-flex max-w-full flex-wrap gap-1 rounded-xl bg-slate-100 p-1" role="group" aria-label="回顧題目篩選">
+            {filters.map((filter) => (
+              <button
+                key={filter.key}
+                type="button"
+                aria-pressed={activeReviewFilter === filter.key}
+                onClick={() => {
+                  setReviewFilter(filter.key);
+                  setOpenReviewDetailKeys(new Set());
+                  setActiveReviewDetailKey(null);
+                  pendingReviewScrollTargetRef.current = null;
+                  pendingReviewScrollAnchorRef.current = null;
+                }}
+                className={`min-h-11 rounded-lg px-3 py-2 text-sm font-semibold transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 ${
+                  activeReviewFilter === filter.key ? "bg-white text-brand-800 shadow-sm" : "text-slate-600 hover:text-ink"
+                }`}
+              >
+                {filter.label} <span className="ml-1 tabular-nums">{filter.count}</span>
+              </button>
+            ))}
           </div>
+          <span className="text-xs text-slate-500">依原題號排列 · 最多展開 2 題</span>
+        </div>
+        {activeReviewFilter === "low-confidence" ? (
+          <p className="mt-3 text-sm text-slate-500">答對但信心為 1–3 的題目；答錯的題目列在「錯題」。</p>
+        ) : null}
+        <div className="mt-4 grid gap-2">
+          {visibleReviewItems.length === 0 ? (
+            <p className="rounded-xl bg-slate-50 px-4 py-6 text-sm text-slate-600">
+              {activeReviewFilter === "wrong" ? "這次沒有錯題。" : activeReviewFilter === "low-confidence" ? "這次沒有答對但沒信心的題目。" : "目前沒有可回顧的題目。"}
+            </p>
+          ) : visibleReviewItems.map(({ attempt, question, questionNumber }) => {
+            const detailKey = getResultReviewDetailKey({ attempt, questionNumber });
+            const isOpen = openReviewDetailKeys.has(detailKey);
+            const masteryLabel = masteryReviewItemMap.get(attempt.questionId)?.categoryLabel ?? getMasteryCategoryLabelForAnswer(attempt);
+            return (
+              <details
+                key={detailKey}
+                id={`review-${detailKey}`}
+                ref={(node) => { reviewDetailElementMapRef.current[detailKey] = node; }}
+                open={isOpen}
+                className="group overflow-hidden rounded-xl border border-slate-200 bg-white p-3.5 sm:p-4"
+              >
+                <summary
+                  onClick={(event) => {
+                    event.preventDefault();
+                    toggleReviewDetailOpen(detailKey);
+                  }}
+                  className="cursor-pointer overflow-hidden text-sm font-semibold text-ink list-none [&::-webkit-details-marker]:hidden"
+                >
+                  {renderQuestionSummaryLine({
+                    prefix: `第 ${questionNumber} 題：`,
+                    question,
+                    isCorrect: attempt.isCorrect,
+                    suffix: confidenceCalibrationEnabled ? `${masteryLabel}・${getConfidenceOverviewLabel(attempt.confidence)}` : undefined
+                  })}
+                </summary>
+                {isOpen ? renderAttemptReviewDetails({ attempt, question, resultSession, optionKeySuffix: "review" }) : null}
+              </details>
+            );
+          })}
         </div>
       </section>
     );
@@ -3091,12 +2988,39 @@ function ResultsPageContent() {
               </span>
             </p>
           ) : null}
+        </div>
+        <div className="flex flex-wrap gap-3">
+          <WrongQuestionPdfExport currentSession={activeSession} questions={[...allQuestions, ...questionMap.values()]} />
+          <Link
+            href={resultsScope === "simulation" ? "/simulation-results" : "/results"}
+            className="min-h-12 rounded-2xl bg-slate-100 px-5 py-4 text-sm font-semibold text-slate-800 transition hover:bg-slate-200"
+          >
+            {resultsScope === "simulation" ? "回到模擬考作答紀錄" : "回到作答紀錄"}
+          </Link>
+          <details className="w-full border-t border-slate-200 pt-3">
+            <summary className="cursor-pointer py-2 text-sm font-semibold text-slate-600">其他操作</summary>
+            <div className="mt-2 flex flex-wrap gap-2">
+          <Link
+            href="/progress"
+            className="min-h-12 rounded-2xl bg-slate-100 px-5 py-4 text-sm font-semibold text-slate-800 transition hover:bg-slate-200"
+          >
+            進度總覽
+          </Link>
+          <button
+            type="button"
+            onClick={handleRestart}
+            className="min-h-12 rounded-2xl bg-brand-600 px-5 py-4 text-sm font-semibold text-white transition hover:bg-brand-700"
+          >
+            重新開始
+          </button>
+            </div>
           {isSimulationSession(state.session) ? (
             <div className="mt-4 flex flex-col gap-3 sm:max-w-xl sm:flex-row sm:items-center">
               <input
                 value={editableSessionName}
                 onChange={(event) => setEditableSessionName(event.target.value)}
                 className="min-h-12 flex-1 rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-800 outline-none focus-visible:border-brand-500 focus-visible:ring-2 focus-visible:ring-brand-200 focus-visible:ring-offset-1"
+                aria-label="模擬考名稱"
                 placeholder="替這份模擬考命名"
               />
               <button
@@ -3112,28 +3036,7 @@ function ResultsPageContent() {
           {sessionNameNotice ? (
             <p className="mt-2 text-sm text-emerald-700" role="status" aria-live="polite">{sessionNameNotice}</p>
           ) : null}
-        </div>
-        <div className="flex flex-wrap gap-3">
-          <WrongQuestionPdfExport currentSession={activeSession} questions={[...allQuestions, ...questionMap.values()]} />
-          <Link
-            href={resultsScope === "simulation" ? "/simulation-results" : "/results"}
-            className="min-h-12 rounded-2xl bg-slate-100 px-5 py-4 text-sm font-semibold text-slate-800 transition hover:bg-slate-200"
-          >
-            {resultsScope === "simulation" ? "回到模擬考作答紀錄" : "回到作答紀錄"}
-          </Link>
-          <Link
-            href="/progress"
-            className="min-h-12 rounded-2xl bg-slate-100 px-5 py-4 text-sm font-semibold text-slate-800 transition hover:bg-slate-200"
-          >
-            進度總覽
-          </Link>
-          <button
-            type="button"
-            onClick={handleRestart}
-            className="min-h-12 rounded-2xl bg-brand-600 px-5 py-4 text-sm font-semibold text-white transition hover:bg-brand-700"
-          >
-            重新開始
-          </button>
+          </details>
         </div>
       </div>
 
@@ -3194,7 +3097,6 @@ function ResultsPageContent() {
             ) : null}
           </section>
         ) : null}
-        {renderConfidenceCalibrationSection()}
         {simulationSubjectScores.length > 0 ? (
           <section className="workspace-section mt-4 p-4 sm:p-5">
             <div className="flex flex-wrap items-end justify-between gap-3">
@@ -3221,7 +3123,11 @@ function ResultsPageContent() {
         ) : null}
       </div>
 
-      <div className="mt-8 space-y-6">
+      <div className="mt-6 space-y-5">
+        <details className="workspace-section p-4 sm:p-5">
+          <summary className="cursor-pointer text-base font-semibold text-slate-700">補強與進階分析</summary>
+          <div className="mt-4 space-y-4">
+            {renderConfidenceCalibrationSection()}
         <div
           className={`grid gap-3 ${
             confidenceCalibrationEnabled &&
@@ -3275,6 +3181,11 @@ function ResultsPageContent() {
                 已完成但不穩：{recommendations.unstableSections.map(formatResultRecommendationLabel).join("、") || "此範圍沒有已完成但不穩的分類"}
               </div>
                 </div>
+                {topWeakSections.length > 0 ? (
+                  <div className="mt-4">
+                    <WeaknessRanking sections={topWeakSections} onStartReview={handleStartWeaknessReview} />
+                  </div>
+                ) : null}
                 <div className="mt-4 grid gap-2 md:grid-cols-2 xl:grid-cols-4">
               {isSavedQuestionReviewSettings(state.session.settings) ? (
                 <Link
@@ -3303,10 +3214,10 @@ function ResultsPageContent() {
                     用同一設定再刷一次
                   </Link>
                   <Link
-                    href="/review"
+                    href={resultReviewHref}
                     className="min-h-11 rounded-2xl bg-slate-100 px-4 py-3 text-center text-sm font-semibold text-slate-800 transition hover:bg-slate-200"
                   >
-                    先看錯題複習頁
+                    {resultReviewHref === "/simulation-review" ? "前往模考錯題複習" : resultReviewHref === "/custom-papers/review" ? "前往自訂卷錯題複習" : "前往散題錯題複習"}
                   </Link>
                 </>
               )}
@@ -3353,11 +3264,10 @@ function ResultsPageContent() {
             : null}
         </div>
 
+
+          </div>
+        </details>
         {!isFullscreenReview ? renderReviewSection() : null}
-        <WeaknessRanking
-          sections={topWeakSections}
-          onStartReview={handleStartWeaknessReview}
-        />
       </div>
       {confidenceOverviewItems.length > 0 && !isFullscreenReview && isReviewNavigatorVisible ? (
         <nav
@@ -3367,7 +3277,7 @@ function ResultsPageContent() {
           <button
             type="button"
             onClick={() => navigateReviewQuestion(-1)}
-            disabled={activeReviewQuestionIndex === 0}
+            disabled={reviewNavigationItems.length === 0 || activeReviewQuestionIndex === 0}
             aria-label="展開上一題"
             title="展開上一題"
             className="flex h-11 w-11 items-center justify-center rounded-xl bg-slate-100 text-xl font-black text-slate-800 transition hover:bg-slate-200 focus:outline-none focus:ring-2 focus:ring-slate-400 disabled:cursor-not-allowed disabled:opacity-35"
@@ -3390,7 +3300,7 @@ function ResultsPageContent() {
           <button
             type="button"
             onClick={() => navigateReviewQuestion(1)}
-            disabled={activeReviewQuestionIndex === reviewNavigationItems.length - 1}
+            disabled={reviewNavigationItems.length === 0 || activeReviewQuestionIndex === reviewNavigationItems.length - 1}
             aria-label="展開下一題"
             title="展開下一題"
             className="flex h-11 w-11 items-center justify-center rounded-xl bg-slate-900 text-xl font-black text-white transition hover:bg-black focus:outline-none focus:ring-2 focus:ring-slate-400 disabled:cursor-not-allowed disabled:opacity-35"

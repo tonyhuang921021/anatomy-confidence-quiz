@@ -20,6 +20,15 @@ export default function SimulationPage() {
         </div>
       </section>
 
+      <div className="mt-6">
+        <QuizSetupPanel
+          stats={stats}
+          simulationOnly
+          title="整份模擬考設定"
+          description="選擇卷別與考卷，即可開始；需要時再調整作答方式。"
+        />
+      </div>
+
       <section className="workspace-section simulation-review-strip mt-5">
         <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
           <div>
@@ -31,7 +40,7 @@ export default function SimulationPage() {
           <div className="workspace-compact-actions">
             <Link
               href="/simulation-results"
-              className="bg-brand-600 text-sm font-semibold text-white transition hover:bg-brand-700"
+              className="border border-slate-200 bg-white text-sm font-semibold text-slate-700 transition hover:bg-slate-50"
             >
               查看模擬考結果
             </Link>
@@ -44,15 +53,6 @@ export default function SimulationPage() {
           </div>
         </div>
       </section>
-
-      <div className="mt-6">
-        <QuizSetupPanel
-          stats={stats}
-          simulationOnly
-          title="整份模擬考設定"
-          description="可指定真實考古卷、AI 原創模擬卷、隨機抽一整份真實考古卷，或讓系統依真實卷分布模擬整份考卷。"
-        />
-      </div>
     </main>
   );
 }

@@ -632,14 +632,15 @@ export function UserStatusBar() {
           <section
             ref={activePanelRef}
             className="app-modal-panel app-account-panel"
+            style={user ? undefined : { maxWidth: "36rem" }}
             role="dialog"
             aria-modal="true"
             aria-label="帳號與設定"
           >
             <div className="app-drawer-header">
               <div>
-                <p>{user ? "帳號設定" : "登入與同步"}</p>
-                <span>{user ? "管理身分、同步、通知與作答偏好" : "登入、通知與裝置設定"}</span>
+                <p>{user ? "帳號設定" : "帳號"}</p>
+                <span>{user ? "管理身分、同步、通知與作答偏好" : "登入與註冊"}</span>
               </div>
               <button
                 type="button"
@@ -651,7 +652,7 @@ export function UserStatusBar() {
             </div>
             <div className="app-modal-content">
               <div className={`app-account-center ${user ? "" : "is-guest"}`}>
-                <aside className="app-account-center-summary">
+                {user ? <aside className="app-account-center-summary">
                   <span className="app-account-avatar app-account-center-avatar" aria-hidden="true">
                     {getInitials(accountLabel)}
                   </span>
@@ -677,15 +678,20 @@ export function UserStatusBar() {
                   <p className="app-account-center-note">
                     作答會先安全保存在目前裝置；登入後可再同步到其他裝置。
                   </p>
-                </aside>
+                </aside> : null}
                 <div className="app-account-center-settings">
-                  <div className="app-account-settings-tools">
-                    <SettingsNotificationSection />
-                    <MobileInstallGuide />
-                  </div>
                   <ClientSectionBoundary title="帳號與設定">
                     <LazyAuthPanel eager compactHeader={Boolean(user)} />
                   </ClientSectionBoundary>
+                  <details className="mt-5 border-t border-slate-200 pt-2">
+                    <summary className="cursor-pointer rounded-lg py-3 text-sm font-semibold text-slate-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500">
+                      通知與手機主畫面
+                    </summary>
+                    <div className="mt-3 grid gap-5">
+                      <SettingsNotificationSection />
+                      <MobileInstallGuide />
+                    </div>
+                  </details>
                 </div>
               </div>
             </div>

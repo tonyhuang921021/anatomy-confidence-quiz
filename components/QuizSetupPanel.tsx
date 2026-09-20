@@ -159,6 +159,7 @@ export function QuizSetupPanel({
         }
       : DEFAULT_QUIZ_SETTINGS
   );
+  const [paperStatsOpen, setPaperStatsOpen] = useState(false);
   const [completedPaperSummaries, setCompletedPaperSummaries] = useState<Record<string, CompletedPaperSummary>>({});
   const selectedSubject = (settings.subjectFilter ?? "解剖學") as SubjectFilter;
   const subjectItem =
@@ -354,7 +355,7 @@ export function QuizSetupPanel({
           <p className="mt-2 max-w-4xl text-sm leading-6 text-slate-500">
             {description ??
               (simulationOnly
-                ? "模擬考模式會固定用整份考卷邏輯出題，所以不提供科目、題數、章節與小節篩選，避免把模考做成一般刷題模式。先選擇作答後顯示方式，再決定要做 AI 模擬卷、系統模擬卷、指定真實考古題，或隨機抽一份真實考古題。"
+                ? "選擇卷別與考卷，即可開始 100 題模擬考。"
                 : "現在可切換單科刷題與醫學（一）多科模擬考，並選擇即時看詳解或整份做完再批改。")}
           </p>
         </div>
@@ -369,10 +370,8 @@ export function QuizSetupPanel({
         ) : null}
       </div>
 
-      <div className={`mt-5 grid gap-4 ${simulationOnly ? "lg:grid-cols-1" : "lg:grid-cols-3"}`}>
-        {((simulationOnly
-          ? ["simulation"]
-          : ["weakness", "random", "review"]) as QuizMode[]).map((mode) => (
+      {!simulationOnly ? <div className="mt-5 grid gap-4 lg:grid-cols-3">
+        {(["weakness", "random", "review"] as QuizMode[]).map((mode) => (
           <button
             key={mode}
             type="button"
@@ -387,7 +386,7 @@ export function QuizSetupPanel({
             <p className="mt-2 text-sm leading-7 text-slate-500">{modeDescriptions[mode]}</p>
           </button>
         ))}
-      </div>
+      </div> : null}
 
       <div className={`mt-6 grid gap-4 ${settings.mode === "simulation" ? "grid-cols-1" : "lg:grid-cols-[0.9fr_1.1fr]"}`}>
         {settings.mode !== "simulation" ? (
@@ -473,191 +472,140 @@ export function QuizSetupPanel({
             </div>
           </>
         ) : null}
-        <div className="quiz-setup-group">
-          {settings.mode === "simulation" ? (
-            <div className="mt-4 space-y-4">
-              <div className="rounded-2xl bg-white p-4 ring-1 ring-slate-200">
-                <p className="text-sm font-medium text-slate-500">模擬考卷別</p>
-                <div className="mt-3 grid gap-3 sm:grid-cols-2">
-                  {simulationSubjectOptions.map((item) => (
-                    <button
-                      key={item.subject}
-                      type="button"
-                      onClick={() => updateSettings({ subjectFilter: item.subject })}
-                      className={`rounded-2xl px-4 py-4 text-left transition ${
-                        (settings.subjectFilter ?? "醫學（一）") === item.subject
-                          ? "bg-brand-600 text-white"
-                          : "bg-slate-50 text-slate-700 hover:bg-slate-100"
-                      }`}
-                    >
-                      <span className="block text-sm font-semibold">{item.label}</span>
-                      <span
-                        className={`mt-2 block text-xs leading-6 ${
-                          (settings.subjectFilter ?? "醫學（一）") === item.subject
-                            ? "text-white/80"
-                            : "text-slate-500"
-                        }`}
-                      >
-                        {item.description}
-                      </span>
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              <div className="rounded-2xl bg-white p-4 ring-1 ring-slate-200">
-                <p className="text-sm font-medium text-slate-500">作答後顯示方式</p>
-                <div className="mt-3 grid gap-3">
-                  {(["full", "answer_only", "none"] as SimulationFeedbackMode[]).map((mode) => (
-                    <button
-                      key={mode}
-                      type="button"
-                      onClick={() => updateSettings({ feedbackMode: mode })}
-                      className={`rounded-2xl px-4 py-3 text-left text-sm font-semibold transition ${
-                        (settings.feedbackMode ?? "none") === mode
-                          ? "bg-brand-600 text-white"
-                          : "bg-slate-50 text-slate-700 hover:bg-slate-100"
-                      }`}
-                    >
-                      {feedbackModeLabels[mode]}
-                    </button>
-                  ))}
-                </div>
-                <div className="mt-3 rounded-2xl bg-brand-50 px-4 py-3 text-sm leading-7 text-slate-700">
-                  {feedbackModeDescriptions[settings.feedbackMode ?? "full"]}
-                </div>
-              </div>
-
-              <div className="rounded-2xl bg-white p-4 ring-1 ring-slate-200">
-                <p className="text-sm font-medium text-slate-500">模擬考卷來源</p>
-                <div className="mt-3 grid gap-3">
-                  {(["past_paper", "ai_paper", "random_past_paper", "random_set"] as SimulationPaperMode[]).map((mode) => (
-                    <button
-                      key={mode}
-                      type="button"
-                      onClick={() => updateSettings({ paperMode: mode })}
-                      className={`rounded-2xl px-4 py-3 text-left text-sm font-semibold transition ${
-                        (settings.paperMode ?? "random_set") === mode
-                          ? "bg-brand-600 text-white"
-                          : "bg-slate-50 text-slate-700 hover:bg-slate-100"
-                      }`}
-                    >
-                      {paperModeLabels[mode]}
-                    </button>
-                  ))}
-                </div>
-                <div className="mt-3 rounded-2xl bg-amber-50 px-4 py-3 text-sm leading-7 text-slate-700">
-                  {paperModeDescriptions[settings.paperMode ?? "random_set"]}
-                </div>
-              </div>
-
-              {isSelectablePaperMode ? (
-                <div className="space-y-4">
-                  <div className="rounded-2xl bg-slate-50 px-4 py-3 text-sm leading-7 text-slate-600">
-                    {activePaperMode === "ai_paper"
-                      ? "請選擇要做的 AI 原創模擬卷。做過的卷會標示上次分數，方便你挑想重刷的考卷。"
-                      : "請直接點選要做的卷別。已做過的卷會標示上次分數，方便你挑想重刷的考卷。"}
-                  </div>
-
-                  <div
-                    className={`grid gap-4 ${
-                      selectedPaper
-                        ? "lg:grid-cols-[minmax(0,0.95fr)_minmax(0,1.05fr)]"
-                        : "grid-cols-1"
+        {settings.mode === "simulation" ? (
+          <div className="space-y-5">
+            <div>
+              <p className="text-sm font-semibold text-ink">選擇卷別</p>
+              <div className="mt-2 grid grid-cols-2 gap-3" role="group" aria-label="模擬考卷別">
+                {simulationSubjectOptions.map((item) => (
+                  <button
+                    key={item.subject}
+                    type="button"
+                    aria-pressed={(settings.subjectFilter ?? "醫學（一）") === item.subject}
+                    onClick={() => updateSettings({ subjectFilter: item.subject })}
+                    className={`min-h-12 rounded-xl border px-4 py-3 text-left transition ${
+                      (settings.subjectFilter ?? "醫學（一）") === item.subject
+                        ? "border-brand-600 bg-brand-50 text-brand-800 ring-1 ring-brand-600"
+                        : "border-slate-200 bg-white text-slate-700 hover:bg-slate-50"
                     }`}
                   >
-                    {([
-                      settings.subjectFilter === "醫學（二）"
-                        ? { title: "醫學（二）", papers: selectedPaperOptions, accent: "sky" }
-                        : { title: "醫學（一）", papers: selectedPaperOptions, accent: "amber" }
-                    ] as const).map(({ title: groupTitle, papers, accent }) => (
-                      <div key={groupTitle} className="rounded-2xl bg-slate-50 p-4">
-                        <div className="flex items-center justify-between gap-3">
-                          <p className="text-sm font-semibold text-ink">{groupTitle}</p>
-                          <span className="text-xs text-slate-500">{papers.length} 份考卷</span>
-                        </div>
-                        <div className="mt-3 grid gap-3">
-                          {papers.length === 0 ? (
-                            <div className="rounded-2xl border border-dashed border-slate-200 bg-white px-4 py-6 text-sm leading-7 text-slate-500">
-                              目前還沒有{groupTitle}的{activePaperMode === "ai_paper" ? " AI 模擬卷" : "完整考古卷"}。
-                            </div>
-                          ) : (
-                            papers.map((paper) => {
-                              const isSelected = settings.selectedPaperKey === paper.key;
-                              const completedSummary = completedPaperSummaries[paper.key];
-                              const accentClasses =
-                                accent === "amber"
-                                  ? isSelected
-                                    ? "border-amber-400 bg-amber-50 ring-2 ring-amber-200"
-                                    : "border-slate-200 bg-white hover:border-amber-200 hover:bg-amber-50/60"
-                                  : isSelected
-                                    ? "border-sky-400 bg-sky-50 ring-2 ring-sky-200"
-                                    : "border-slate-200 bg-white hover:border-sky-200 hover:bg-sky-50/60";
-
-                              return (
-                                <button
-                                  key={paper.key}
-                                  type="button"
-                                  onClick={() => updateSettings({ selectedPaperKey: paper.key })}
-                                  className={`rounded-2xl border px-4 py-4 text-left transition ${accentClasses}`}
-                                >
-                                  <div className="flex flex-wrap items-start justify-between gap-3">
-                                    <div>
-                                      <p className="text-sm font-semibold text-ink">{paper.label}</p>
-                                      <p className="mt-1 text-xs text-slate-500">{paper.questionCount} 題完整考卷</p>
-                                    </div>
-                                    <div className="flex flex-wrap gap-2">
-                                      {completedSummary ? (
-                                        <span className="rounded-full bg-emerald-100 px-3 py-1 text-xs font-semibold text-emerald-700">
-                                          上次 {completedSummary.lastScore} 分
-                                        </span>
-                                      ) : (
-                                        <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-500">
-                                          尚未作答
-                                        </span>
-                                      )}
-                                      {isSelected ? (
-                                        <span className="rounded-full bg-brand-600 px-3 py-1 text-xs font-semibold text-white">
-                                          目前選取
-                                        </span>
-                                      ) : null}
-                                    </div>
-                                  </div>
-                                </button>
-                              );
-                            })
-                          )}
-                        </div>
-                      </div>
-                    ))}
-                    {selectedPaper ? (
-                      <SelectedSimulationPaperPanel
-                        key={selectedPaper.key}
-                        paper={selectedPaper}
-                        canViewDetailedStats={canViewSelectedPaperDetails}
-                      />
-                    ) : null}
-                  </div>
-                </div>
-              ) : null}
-              <p className="text-xs leading-6 text-slate-500">
-                信心校準目前{simulationConfidenceCalibration ? "開啟" : "關閉"}。想調整時可回首頁設定；散題仍會問信心，但不顯示校準分析。
-              </p>
+                    <span className="block text-sm font-semibold">{item.label}</span>
+                    <span className="mt-1 block text-xs leading-5 text-slate-500">{item.description}</span>
+                  </button>
+                ))}
+              </div>
             </div>
-          ) : null}
-        </div>
+
+            {isSelectablePaperMode ? (
+              <div>
+                <label htmlFor="simulation-paper" className="text-sm font-semibold text-ink">
+                  {activePaperMode === "ai_paper" ? "選擇 AI 模擬卷" : "選擇考古卷"}
+                </label>
+                <select
+                  id="simulation-paper"
+                  value={settings.selectedPaperKey ?? ""}
+                  onChange={(event) => updateSettings({ selectedPaperKey: event.target.value })}
+                  disabled={selectedPaperOptions.length === 0}
+                  className="mt-2 min-h-12 w-full rounded-xl border border-slate-200 bg-white px-3 py-3 text-sm text-ink outline-none focus-visible:ring-2 focus-visible:ring-brand-500 disabled:bg-slate-50"
+                >
+                  {selectedPaperOptions.length === 0 ? <option value="">目前沒有可用的完整考卷</option> : null}
+                  {selectedPaperOptions.map((paper) => (
+                    <option key={paper.key} value={paper.key}>
+                      {paper.label}{completedPaperSummaries[paper.key] ? ` · 上次 ${completedPaperSummaries[paper.key].lastScore} 分` : " · 尚未作答"}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            ) : (
+              <div className="border-l-2 border-brand-200 pl-3">
+                <p className="text-sm font-semibold text-ink">{paperModeLabels[activePaperMode]}</p>
+                <p className="mt-1 text-sm leading-6 text-slate-500">{paperModeDescriptions[activePaperMode]}</p>
+              </div>
+            )}
+
+            <div className="flex flex-col gap-3 border-y border-slate-200 py-4 sm:flex-row sm:items-center sm:justify-between">
+              <div className="min-w-0" aria-live="polite">
+                <p className="text-sm font-semibold leading-6 text-ink">
+                  {selectedPaper?.label ?? `${settings.subjectFilter === "醫學（二）" ? "醫學（二）" : "醫學（一）"} · ${paperModeLabels[activePaperMode]}`}
+                </p>
+                <p className="mt-1 text-xs leading-5 text-slate-500">
+                  100 題 · {feedbackModeLabels[settings.feedbackMode ?? "none"]}
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={handleStart}
+                disabled={!canStart}
+                className="min-h-12 shrink-0 rounded-xl bg-brand-600 px-5 py-3 text-sm font-semibold text-white transition hover:bg-brand-700 disabled:cursor-not-allowed disabled:bg-slate-300"
+              >
+                開始 100 題模擬考
+              </button>
+            </div>
+
+            <details>
+              <summary className="cursor-pointer rounded-lg py-2 text-sm font-semibold text-slate-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500">
+                調整考卷來源與作答方式
+              </summary>
+              <div className="mt-3 grid gap-5 sm:grid-cols-2">
+                <div>
+                  <label htmlFor="simulation-paper-mode" className="text-sm font-medium text-ink">考卷來源</label>
+                  <select
+                    id="simulation-paper-mode"
+                    value={activePaperMode}
+                    onChange={(event) => updateSettings({ paperMode: event.target.value as SimulationPaperMode })}
+                    className="mt-2 min-h-12 w-full rounded-xl border border-slate-200 bg-white px-3 py-3 text-sm text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500"
+                  >
+                    {(["past_paper", "ai_paper", "random_past_paper", "random_set"] as SimulationPaperMode[]).map((mode) => (
+                      <option key={mode} value={mode}>{paperModeLabels[mode]}</option>
+                    ))}
+                  </select>
+                  <p className="mt-2 text-xs leading-6 text-slate-500">{paperModeDescriptions[activePaperMode]}</p>
+                </div>
+                <div>
+                  <label htmlFor="simulation-feedback-mode" className="text-sm font-medium text-ink">作答後顯示方式</label>
+                  <select
+                    id="simulation-feedback-mode"
+                    value={settings.feedbackMode ?? "none"}
+                    onChange={(event) => updateSettings({ feedbackMode: event.target.value as SimulationFeedbackMode })}
+                    className="mt-2 min-h-12 w-full rounded-xl border border-slate-200 bg-white px-3 py-3 text-sm text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500"
+                  >
+                    {(["none", "answer_only", "full"] as SimulationFeedbackMode[]).map((mode) => (
+                      <option key={mode} value={mode}>{feedbackModeLabels[mode]}</option>
+                    ))}
+                  </select>
+                  <p className="mt-2 text-xs leading-6 text-slate-500">{feedbackModeDescriptions[settings.feedbackMode ?? "none"]}</p>
+                </div>
+                <p className="text-xs leading-6 text-slate-500 sm:col-span-2">
+                  信心校準目前{simulationConfidenceCalibration ? "開啟" : "關閉"}，可在帳號設定調整。
+                </p>
+              </div>
+            </details>
+
+            {selectedPaper ? (
+              <details open={paperStatsOpen} onToggle={(event) => setPaperStatsOpen(event.currentTarget.open)}>
+                <summary className="cursor-pointer rounded-lg py-2 text-sm font-semibold text-slate-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500">
+                  查看這份考卷的作答統計
+                </summary>
+                {paperStatsOpen ? <div className="mt-3">
+                  <SelectedSimulationPaperPanel
+                    key={selectedPaper.key}
+                    paper={selectedPaper}
+                    canViewDetailedStats={canViewSelectedPaperDetails}
+                  />
+                </div> : null}
+              </details>
+            ) : null}
+          </div>
+        ) : null}
       </div>
 
-      <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+      {settings.mode !== "simulation" ? <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <p className="text-sm text-slate-600">
           目前設定：
           <span className="font-semibold text-ink"> {getModeLabel(settings.mode)}</span>
-          {settings.mode === "simulation"
-            ? `・${settings.subjectFilter === "醫學（二）" ? "醫學（二）" : "醫學（一）"}・${paperModeLabels[settings.paperMode ?? "random_set"]}・100 題`
-            : `・${subjectItem?.label ?? settings.subjectFilter ?? "解剖學"}・${settings.questionCount} 題`}
-          {settings.mode !== "simulation" && settings.chapter ? `・${settings.chapter}` : ""}
-          {settings.mode !== "simulation" && settings.section ? ` / ${settings.section}` : ""}
-          {settings.mode === "simulation" ? (simulationConfidenceCalibration ? "・信心校準" : "・不記信心") : ""}
+          {`・${subjectItem?.label ?? settings.subjectFilter ?? "解剖學"}・${settings.questionCount} 題`}
+          {settings.chapter ? `・${settings.chapter}` : ""}
+          {settings.section ? ` / ${settings.section}` : ""}
         </p>
         <button
           type="button"
@@ -669,7 +617,7 @@ export function QuizSetupPanel({
         >
           用這個設定開始
         </button>
-      </div>
+      </div> : null}
     </section>
   );
 }

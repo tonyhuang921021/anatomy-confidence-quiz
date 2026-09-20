@@ -182,6 +182,7 @@ export function AuthPanel({ compactHeader = false }: { compactHeader?: boolean }
     refreshCloudData,
     signOut
   } = useAuth();
+  const [authMode, setAuthMode] = useState<"login" | "register" | "reset">("login");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [rememberAccount, setRememberAccount] = useState(true);
@@ -594,7 +595,8 @@ export function AuthPanel({ compactHeader = false }: { compactHeader?: boolean }
     return (
       <section className="surface-card p-6">
         <p className="eyebrow">Account</p>
-        <h2 className="display-title mt-2 text-3xl">Supabase 尚未設定</h2>
+        <h2 className="display-title mt-2 text-3xl">登入功能暫時無法使用</h2>
+        <p className="mt-3 text-sm leading-6 text-slate-600">你仍可繼續刷題，作答紀錄會保存在這台裝置。</p>
       </section>
     );
   }
@@ -698,6 +700,19 @@ export function AuthPanel({ compactHeader = false }: { compactHeader?: boolean }
             </div>
           </>
         ) : null}
+        <div className="mb-5 flex flex-wrap items-center justify-between gap-3 border-b border-slate-200 pb-4">
+          <p className="text-sm text-slate-600" role="status" aria-live="polite">
+            {getSyncStatusText(syncStatus, Boolean(syncError), pendingCompletedUploadCount)}
+          </p>
+          <button
+            type="button"
+            onClick={() => void refreshCloudData({ hydrateRemoteHistory: true, uploadAllPending: true })}
+            disabled={syncStatus === "syncing"}
+            className="primary-pill disabled:cursor-not-allowed disabled:opacity-60"
+          >
+            {syncStatus === "syncing" ? "同步中..." : "立即同步雲端紀錄"}
+          </button>
+        </div>
         <div className="account-settings-body mt-4 grid gap-3">
           <label className="account-settings-field">
             <span>排行榜暱稱</span>
@@ -858,14 +873,6 @@ export function AuthPanel({ compactHeader = false }: { compactHeader?: boolean }
           </button>
           <button
             type="button"
-            onClick={() => void refreshCloudData({ hydrateRemoteHistory: true, uploadAllPending: true })}
-            disabled={syncStatus === "syncing"}
-            className="primary-pill disabled:cursor-not-allowed disabled:opacity-60"
-          >
-            {syncStatus === "syncing" ? "同步中..." : "立即同步雲端紀錄"}
-          </button>
-          <button
-            type="button"
             onClick={() => void handleSignOutClick()}
             disabled={signingOut}
             className="secondary-pill disabled:cursor-not-allowed disabled:bg-slate-100"
@@ -877,98 +884,127 @@ export function AuthPanel({ compactHeader = false }: { compactHeader?: boolean }
     );
   }
 
+  function switchAuthMode(nextMode: "login" | "register" | "reset") {
+    setAuthMode(nextMode);
+    setMessage("");
+    setError("");
+  }
+
   return (
-    <section className="surface-card p-6">
-      <p className="eyebrow">Account</p>
-      <h2 className="display-title mt-2 text-3xl">建立個人雲端紀錄</h2>
-      <p className="body-soft mt-3 text-sm leading-7">登入後可以同步作答、錯題與自訂卷。</p>
+    <section className="min-w-0">
+      <h2 className="text-xl font-semibold text-ink">
+        {authMode === "login" ? "登入帳號" : authMode === "register" ? "註冊新帳號" : "重設密碼"}
+      </h2>
+      <p className="mt-2 text-sm leading-6 text-slate-500">
+        {authMode === "reset"
+          ? "輸入註冊時的 Email，我們會寄出重設密碼連結。"
+          : "目前作答保存在這台裝置；登入後可同步到其他裝置。"}
+      </p>
 
-      <div className="mt-5 grid gap-3">
-        <input
-          type="text"
-          aria-label="排行榜暱稱"
-          value={nickname}
-          onChange={(event) => setNickname(event.target.value)}
-          placeholder="排行榜暱稱"
-          maxLength={24}
-          className={AUTH_INPUT_CLASS_NAME}
-        />
-        <input
-          type="email"
-          aria-label="Email"
-          value={email}
-          onChange={(event) => setEmail(event.target.value)}
-          placeholder="Email"
-          className={AUTH_INPUT_CLASS_NAME}
-        />
-        <input
-          type="password"
-          aria-label="密碼"
-          value={password}
-          onChange={(event) => setPassword(event.target.value)}
-          placeholder="Password"
-          className={AUTH_INPUT_CLASS_NAME}
-        />
-        <label className="flex items-start gap-3 rounded-2xl bg-slate-50 px-4 py-3 text-sm text-slate-700">
-          <input
-            type="checkbox"
-            checked={rememberAccount}
-            onChange={(event) => {
-              const checked = event.target.checked;
-              setRememberAccount(checked);
-              safeWriteLocalStorage(REMEMBER_ACCOUNT_KEY, checked ? "true" : "false");
-              if (!checked) {
-                safeRemoveLocalStorage(REMEMBERED_EMAIL_KEY);
-              } else if (email.trim()) {
-                safeWriteLocalStorage(REMEMBERED_EMAIL_KEY, email.trim());
-              }
-            }}
-            className="mt-1 h-4 w-4 rounded border-slate-300 text-brand-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 focus-visible:ring-offset-2"
-          />
-          <span>
-            維持這台裝置的登入狀態
-            <span className="block text-xs leading-6 text-slate-500">
-              會記住 Email，並把登入狀態盡量存在可長期保留的位置；切回網站時也會主動刷新。
-            </span>
-          </span>
-        </label>
-      </div>
+      <form
+        className="mt-5"
+        onSubmit={(event) => {
+          event.preventDefault();
+          if (submitting || !email.trim() || (authMode !== "reset" && !password)) return;
+          if (authMode === "reset") void handleSendPasswordReset();
+          else if (authMode === "register") void handleSignUp();
+          else void handleSignIn();
+        }}
+      >
+        <div className="grid gap-4">
+          <label className="grid gap-2 text-sm font-medium text-ink">
+            Email
+            <input
+              type="email"
+              name="email"
+              autoComplete="email"
+              required
+              value={email}
+              onChange={(event) => setEmail(event.target.value)}
+              placeholder="name@example.com"
+              className={AUTH_INPUT_CLASS_NAME}
+            />
+          </label>
+          {authMode !== "reset" ? (
+            <label className="grid gap-2 text-sm font-medium text-ink">
+              密碼
+              <input
+                type="password"
+                name="password"
+                autoComplete={authMode === "register" ? "new-password" : "current-password"}
+                required
+                value={password}
+                onChange={(event) => setPassword(event.target.value)}
+                placeholder={authMode === "register" ? "至少 6 個字元" : "輸入密碼"}
+                className={AUTH_INPUT_CLASS_NAME}
+              />
+            </label>
+          ) : null}
+          {authMode === "register" ? (
+            <label className="grid gap-2 text-sm font-medium text-ink">
+              公開暱稱（選填）
+              <input
+                type="text"
+                aria-label="公開暱稱（選填）"
+                value={nickname}
+                onChange={(event) => setNickname(event.target.value)}
+                placeholder="排行榜與公開互動會顯示的名稱"
+                maxLength={24}
+                className={AUTH_INPUT_CLASS_NAME}
+              />
+            </label>
+          ) : null}
+          {authMode !== "reset" ? (
+            <label className="flex items-center gap-3 text-sm text-slate-600">
+              <input
+                type="checkbox"
+                checked={rememberAccount}
+                onChange={(event) => {
+                  const checked = event.target.checked;
+                  setRememberAccount(checked);
+                  safeWriteLocalStorage(REMEMBER_ACCOUNT_KEY, checked ? "true" : "false");
+                  if (!checked) safeRemoveLocalStorage(REMEMBERED_EMAIL_KEY);
+                  else if (email.trim()) safeWriteLocalStorage(REMEMBERED_EMAIL_KEY, email.trim());
+                }}
+                className="h-4 w-4 rounded border-slate-300 text-brand-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 focus-visible:ring-offset-2"
+              />
+              記住 Email 並保持登入
+            </label>
+          ) : null}
+        </div>
 
-      {message ? (
-        <div className="mt-4 rounded-2xl bg-emerald-50 p-4 text-sm text-emerald-900" role="status" aria-live="polite">{message}</div>
-      ) : null}
-      {syncError ? (
-        <div className="mt-4 rounded-2xl bg-amber-50 p-4 text-sm text-amber-900" role="status" aria-live="polite">{syncError}</div>
-      ) : null}
-      {error ? (
-        <div className="mt-4 rounded-2xl bg-rose-50 p-4 text-sm text-rose-900" role="alert">{error}</div>
-      ) : null}
+        {message ? <div className="mt-4 rounded-xl bg-emerald-50 p-3 text-sm text-emerald-900" role="status" aria-live="polite">{message}</div> : null}
+        {syncError ? <div className="mt-4 rounded-xl bg-amber-50 p-3 text-sm text-amber-900" role="status" aria-live="polite">{syncError}</div> : null}
+        {error ? <div className="mt-4 rounded-xl bg-rose-50 p-3 text-sm text-rose-900" role="alert">{error}</div> : null}
 
-      <div className="mt-5 flex flex-col gap-3 sm:flex-row">
+        <button
+          type="submit"
+          disabled={submitting || !email.trim() || (authMode !== "reset" && !password)}
+          className="mt-5 min-h-12 w-full rounded-xl bg-brand-600 px-5 py-3 text-sm font-semibold text-white transition hover:bg-brand-700 disabled:cursor-not-allowed disabled:bg-slate-300"
+        >
+          {submitting ? "處理中…" : authMode === "login" ? "以 Email 登入" : authMode === "register" ? "建立帳號" : "寄送重設密碼信"}
+        </button>
+      </form>
+
+      <div className="mt-2 flex flex-wrap items-center justify-between gap-x-4">
         <button
           type="button"
-          onClick={() => void handleSignIn()}
-          disabled={submitting || !email.trim() || !password}
-          className="primary-pill disabled:cursor-not-allowed disabled:bg-slate-300"
+          disabled={submitting}
+          onClick={() => switchAuthMode(authMode === "login" ? "register" : "login")}
+          className="min-h-11 rounded-lg py-2 text-sm font-semibold text-brand-700 underline-offset-4 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 disabled:opacity-50"
         >
-          以 Email 登入
+          {authMode === "login" ? "註冊新帳號" : "返回登入"}
         </button>
-        <button
-          type="button"
-          onClick={() => void handleSignUp()}
-          disabled={submitting || !email.trim() || !password}
-          className="secondary-pill disabled:cursor-not-allowed disabled:bg-slate-100"
-        >
-          註冊新帳號
-        </button>
-        <button
-          type="button"
-          onClick={() => void handleSendPasswordReset()}
-          disabled={submitting || !email.trim()}
-          className="secondary-pill disabled:cursor-not-allowed disabled:bg-slate-100"
-        >
-          忘記密碼
-        </button>
+        {authMode === "login" ? (
+          <button
+            type="button"
+            disabled={submitting}
+            onClick={() => switchAuthMode("reset")}
+            className="min-h-11 rounded-lg py-2 text-sm text-slate-600 underline-offset-4 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 disabled:opacity-50"
+          >
+            忘記密碼
+          </button>
+        ) : null}
       </div>
     </section>
   );

@@ -1,6 +1,7 @@
 import { MED1_SUBJECTS, MED2_SUBJECTS } from "../data/subjectOrder";
 import { getQuestionPrimaryTag } from "./analysisPrimaryTag";
 import { tokenizeQuestionText } from "./questionTextFormat";
+import { isFullReviewYearRange, normalizeReviewYearRange, type ReviewYearRange } from "./reviewYearFilter";
 import type { OptionKey, Question, QuizSession } from "../types/quiz";
 
 export type WrongQuestionPdfScope = "current" | "history";
@@ -11,6 +12,19 @@ export type WrongQuestionPdfFilters = {
   dateTo: string;
   recentCount?: number;
 };
+export type WrongQuestionPdfHistoryScope = {
+  label: string;
+  includesSession: (session: QuizSession) => boolean;
+  yearRange?: ReviewYearRange;
+  subjects?: readonly string[];
+};
+
+export function getWrongQuestionPdfYearLabel(range?: ReviewYearRange) {
+  if (!range || isFullReviewYearRange(range)) return "全部考題年份";
+  const { yearFrom, yearTo } = normalizeReviewYearRange(range);
+  return yearFrom === yearTo ? `${yearFrom} 年考題` : `${yearFrom}–${yearTo} 年考題`;
+}
+
 export type WrongQuestionPdfItem = { question: Question; chapter: string; answeredAt: string };
 export const EMPTY_PDF_FILTERS: WrongQuestionPdfFilters = {
   subject: "", chapter: "", dateFrom: "", dateTo: ""
@@ -69,10 +83,14 @@ export function taiwanAnswerDate(value: string) {
 export function collectWrongQuestionPdfItems(
   sessions: readonly QuizSession[],
   questions: readonly Question[],
-  filters: WrongQuestionPdfFilters = EMPTY_PDF_FILTERS
+  filters: WrongQuestionPdfFilters = EMPTY_PDF_FILTERS,
+  historyScope?: WrongQuestionPdfHistoryScope
 ) {
+  const sourceSessions = historyScope ? sessions.filter(historyScope.includesSession) : sessions;
+  const yearRange = historyScope?.yearRange ? normalizeReviewYearRange(historyScope.yearRange) : undefined;
+  const includeUnknownYears = !yearRange || isFullReviewYearRange(yearRange);
   const questionMap = new Map<string, Question>();
-  for (const session of sessions) {
+  for (const session of sourceSessions) {
     for (const question of [...(session.generatedQuestions ?? []), ...(session.settings?.customQuestionPayload ?? [])]) {
       questionMap.set(question.id, question);
     }
@@ -83,24 +101,35 @@ export function collectWrongQuestionPdfItems(
   const selected = new Map<string, WrongQuestionPdfItem>();
   const missingQuestionIds = new Set<string>();
   const unknownDateQuestionIds = new Set<string>();
-  for (const session of sessions) {
+  for (const session of sourceSessions) {
     if (!session.completedAt) continue;
     for (const attempt of session.attempts) {
       if (attempt.isCorrect !== false || !OPTION_KEYS.includes(attempt.selectedAnswer)) continue;
       const day = taiwanAnswerDate(attempt.answeredAt);
+      if (day && ((filters.dateFrom && day < filters.dateFrom) || (filters.dateTo && day > filters.dateTo))) continue;
+      const question = questionMap.get(attempt.questionId);
+      if (!question) {
+        if ((filters.dateFrom || filters.dateTo || recentCount) && !day) {
+          unknownDateQuestionIds.add(attempt.questionId);
+          continue;
+        }
+        missingQuestionIds.add(attempt.questionId);
+        continue;
+      }
+      if (historyScope?.subjects?.length && !historyScope.subjects.includes(question.subject)) continue;
+      // Match the review page: AI and undated questions belong only to the full year range.
+      const sourceYear = question.sourceType === "AI_GENERATED" || question.source === "ai-generated"
+        ? 0 : getPdfExamYear(question);
+      if (yearRange && (sourceYear
+        ? sourceYear < yearRange.yearFrom || sourceYear > yearRange.yearTo
+        : !includeUnknownYears)) continue;
+      const chapter = getPdfChapter(question);
+      if (filters.subject && question.subject !== filters.subject) continue;
+      if (filters.chapter && chapter !== filters.chapter) continue;
       if ((filters.dateFrom || filters.dateTo || recentCount) && !day) {
         unknownDateQuestionIds.add(attempt.questionId);
         continue;
       }
-      if ((filters.dateFrom && day < filters.dateFrom) || (filters.dateTo && day > filters.dateTo)) continue;
-      const question = questionMap.get(attempt.questionId);
-      if (!question) {
-        missingQuestionIds.add(attempt.questionId);
-        continue;
-      }
-      const chapter = getPdfChapter(question);
-      if (filters.subject && question.subject !== filters.subject) continue;
-      if (filters.chapter && chapter !== filters.chapter) continue;
       const previous = selected.get(question.id);
       if (!previous || (day && (!taiwanAnswerDate(previous.answeredAt) || Date.parse(attempt.answeredAt) > Date.parse(previous.answeredAt)))) {
         selected.set(question.id, { question, chapter, answeredAt: attempt.answeredAt });

@@ -674,6 +674,8 @@ type ReviewNotebookProps = {
   manualEditScope?: string;
   completionThreshold?: ReviewCompletionThreshold;
   emptyMessage?: string;
+  selectedSubjects?: SubjectName[];
+  onSelectedSubjectsChange?: (subjects: SubjectName[]) => void;
 };
 
 export function ReviewNotebook({
@@ -690,6 +692,8 @@ export function ReviewNotebook({
   headerAction,
   manualEditScope,
   completionThreshold,
+  selectedSubjects: controlledSelectedSubjects,
+  onSelectedSubjectsChange,
   emptyMessage = "目前還沒有累積錯題或低信心題，先去刷一輪題目吧。"
 }: ReviewNotebookProps) {
   const { session, user } = useAuth();
@@ -709,7 +713,12 @@ export function ReviewNotebook({
     lowConfidence: 40,
     resolved: 40
   });
-  const [selectedSubjects, setSelectedSubjects] = useState<SubjectName[]>([]);
+  const [localSelectedSubjects, setLocalSelectedSubjects] = useState<SubjectName[]>([]);
+  const selectedSubjects = controlledSelectedSubjects ?? localSelectedSubjects;
+  function setSelectedSubjects(next: SubjectName[]) {
+    if (onSelectedSubjectsChange) onSelectedSubjectsChange(next);
+    else setLocalSelectedSubjects(next);
+  }
   const [isManualEditMode, setIsManualEditMode] = useState(false);
   const [manualReviewPersistenceError, setManualReviewPersistenceError] = useState("");
   const [manualReviewState, setManualReviewState] = useState<ManualReviewState>(() =>
@@ -863,13 +872,14 @@ export function ReviewNotebook({
   }, [questionIdsKey, selectedSubjectsKey]);
 
   useEffect(() => {
-    setSelectedSubjects((current) => {
+    if (controlledSelectedSubjects !== undefined) return;
+    setLocalSelectedSubjects((current) => {
       const next = current.filter((subject) => availableSubjects.includes(subject));
       const unchanged =
         next.length === current.length && next.every((subject, index) => subject === current[index]);
       return unchanged ? current : next;
     });
-  }, [availableSubjects]);
+  }, [availableSubjects, controlledSelectedSubjects]);
 
   function applyManualReviewCloudState(cloudState: ManualReviewState) {
     if (!manualEditScope || !manualReviewStorageKey) return;
@@ -983,10 +993,10 @@ export function ReviewNotebook({
   }, [manualEditScope, manualReviewUserId]);
 
   function toggleSubject(subject: SubjectName) {
-    setSelectedSubjects((current) =>
-      current.includes(subject)
-        ? current.filter((item) => item !== subject)
-        : [...current, subject]
+    setSelectedSubjects(
+      selectedSubjects.includes(subject)
+        ? selectedSubjects.filter((item) => item !== subject)
+        : [...selectedSubjects, subject]
     );
   }
 
@@ -1376,27 +1386,7 @@ export function ReviewNotebook({
           <h2 className={`${fullscreenMobile ? "text-xl" : "text-2xl"} font-semibold text-ink`}>{title}</h2>
           <p className="mt-2 text-sm text-slate-500">{description}</p>
         </div>
-        <div className="flex flex-wrap items-center gap-3">
-          {headerAction}
-          <Link
-            href={effectiveStartHref}
-            onClick={(event) => {
-              if (unresolvedItems.length === 0) {
-                event.preventDefault();
-                return;
-              }
-              onStartReview?.(unresolvedItems);
-            }}
-            aria-disabled={unresolvedItems.length === 0}
-            className={`min-h-10 rounded-lg px-4 py-2 text-sm font-semibold transition ${
-              unresolvedItems.length === 0
-                ? "pointer-events-none bg-slate-200 text-slate-500"
-                : "bg-brand-600 text-white hover:bg-brand-700"
-            }`}
-          >
-            {startLabel}
-          </Link>
-        </div>
+        {headerAction ? <div className="flex flex-wrap items-center gap-3">{headerAction}</div> : null}
       </div>
 
       <div className={`${fullscreenMobile ? "mt-4" : "mt-6"} grid gap-8`}>
@@ -1412,6 +1402,7 @@ export function ReviewNotebook({
                 <button
                   type="button"
                   onClick={clearSubjectFilter}
+                  aria-pressed={selectedSubjects.length === 0}
                   className={`min-h-10 rounded-full px-3 py-2 text-xs font-semibold transition ${
                     selectedSubjects.length === 0
                       ? "bg-slate-900 text-white"
@@ -1420,13 +1411,14 @@ export function ReviewNotebook({
                 >
                   全部
                 </button>
-                {availableSubjects.map((subject) => {
+                {Array.from(new Set([...availableSubjects, ...selectedSubjects])).map((subject) => {
                   const active = selectedSubjects.includes(subject);
                   return (
                     <button
                       key={subject}
                       type="button"
                       onClick={() => toggleSubject(subject)}
+                      aria-pressed={active}
                       className={`min-h-10 rounded-full px-3 py-2 text-xs font-semibold transition ${
                         active
                           ? "bg-brand-100 text-brand-900 ring-1 ring-brand-300"
@@ -1438,11 +1430,31 @@ export function ReviewNotebook({
                   );
                 })}
               </div>
-              <p className="text-xs text-slate-500">
-                {selectedSubjects.length === 0
-                  ? "目前顯示全部科目的錯題與低信心題。"
-                  : `目前只顯示 ${selectedSubjects.join("、")}。`}
-              </p>
+              <div className="flex flex-wrap items-center justify-between gap-3">
+                <p className="text-xs text-slate-500">
+                  {selectedSubjects.length === 0
+                    ? "目前顯示全部科目的錯題與低信心題。"
+                    : `目前只顯示 ${selectedSubjects.join("、")}。`}
+                </p>
+                <Link
+                  href={effectiveStartHref}
+                  onClick={(event) => {
+                    if (unresolvedItems.length === 0) {
+                      event.preventDefault();
+                      return;
+                    }
+                    onStartReview?.(unresolvedItems);
+                  }}
+                  aria-disabled={unresolvedItems.length === 0}
+                  className={`min-h-10 rounded-lg px-4 py-2 text-sm font-semibold transition ${
+                    unresolvedItems.length === 0
+                      ? "pointer-events-none bg-slate-200 text-slate-500"
+                      : "bg-brand-600 text-white hover:bg-brand-700"
+                  }`}
+                >
+                  {startLabel} · {unresolvedItems.length} 題
+                </Link>
+              </div>
             </div>
             <div className="flex flex-wrap gap-3">
               <button

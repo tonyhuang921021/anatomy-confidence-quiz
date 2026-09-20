@@ -142,6 +142,7 @@ function loadReviewCompletedSessions() {
 
 export default function ReviewPage() {
   const [practiceItems, setPracticeItems] = useState<ReviewQuestionItem[]>([]);
+  const [selectedSubjects, setSelectedSubjects] = useState<SubjectName[]>([]);
   const [latestReviewAttemptByQuestionId, setLatestReviewAttemptByQuestionId] = useState<
     ReadonlyMap<string, string>
   >(() => new Map());
@@ -320,6 +321,13 @@ export default function ReviewPage() {
   const reviewCount = unresolvedPracticeItems.length;
   const lowConfidenceCount = unresolvedPracticeItems.filter((item) => item.history.lowConfidence > 0).length;
 
+  const pdfHistoryScope = useMemo(() => ({
+    label: "散題歷次錯題",
+    includesSession: isPracticeReviewSession,
+    yearRange: reviewYearRange,
+    subjects: selectedSubjects
+  }), [reviewYearRange, selectedSubjects]);
+
   return (
     <main id="main-content" className="shell workspace-page">
       <section className="surface-card workspace-page-panel workspace-page-header p-5 sm:p-6">
@@ -330,25 +338,7 @@ export default function ReviewPage() {
             <p className="mt-2 text-sm text-slate-500">散題錯題與低信心題，依複習狀態接續安排。</p>
           </div>
           <div className="flex flex-wrap gap-3">
-            <WrongQuestionPdfExport questions={allQuestions} />
-            <Link
-              href={getPracticeReviewHref(unresolvedPracticeItems)}
-              onClick={(event) => {
-                if (unresolvedPracticeItems.length === 0) {
-                  event.preventDefault();
-                  return;
-                }
-                handleStartPracticeReview(unresolvedPracticeItems);
-              }}
-              aria-disabled={unresolvedPracticeItems.length === 0}
-              className={`min-h-11 rounded-lg px-4 py-2 text-sm font-semibold transition ${
-                unresolvedPracticeItems.length === 0
-                  ? "pointer-events-none bg-slate-200 text-slate-500"
-                  : "bg-brand-600 text-white hover:bg-brand-700"
-              }`}
-            >
-              開始散題待複習
-            </Link>
+            <WrongQuestionPdfExport questions={allQuestions} historyScope={pdfHistoryScope} />
           </div>
         </div>
       </section>
@@ -360,6 +350,26 @@ export default function ReviewPage() {
         filteredCount={reviewCount}
         totalCount={allUnresolvedPracticeItems.length}
         poolLabel="散題待複習題庫"
+        startAction={
+          <Link
+            href={getPracticeReviewHref(unresolvedPracticeItems)}
+            onClick={(event) => {
+              if (unresolvedPracticeItems.length === 0) {
+                event.preventDefault();
+                return;
+              }
+              handleStartPracticeReview(unresolvedPracticeItems);
+            }}
+            aria-disabled={unresolvedPracticeItems.length === 0}
+            className={`min-h-11 rounded-lg px-4 py-2 text-sm font-semibold transition ${
+              unresolvedPracticeItems.length === 0
+                ? "pointer-events-none bg-slate-200 text-slate-500"
+                : "bg-brand-600 text-white hover:bg-brand-700"
+            }`}
+          >
+            複習全部科目 · {unresolvedPracticeItems.length} 題
+          </Link>
+        }
       />
 
       <section className="saved-summary-strip mt-5" aria-label="待複習摘要">
@@ -378,7 +388,9 @@ export default function ReviewPage() {
           <ReviewNotebook
             title="散題待複習題庫"
             description="錯題和沒信心題分開整理；按開始複習會一起帶進同一回合。"
-            startLabel="開始散題待複習"
+            startLabel={selectedSubjects.length ? "複習所選科目" : "複習全部科目"}
+            selectedSubjects={selectedSubjects}
+            onSelectedSubjectsChange={setSelectedSubjects}
             getStartHref={getPracticeReviewHref}
             onStartReview={handleStartPracticeReview}
             items={yearFilteredPracticeItems}
@@ -430,7 +442,9 @@ export default function ReviewPage() {
               <ReviewNotebook
                 title="散題待複習題庫"
                 description="手機滿版複習模式。看完可按右上角返回頁面。"
-                startLabel="開始散題待複習"
+                startLabel={selectedSubjects.length ? "複習所選科目" : "複習全部科目"}
+                selectedSubjects={selectedSubjects}
+                onSelectedSubjectsChange={setSelectedSubjects}
                 getStartHref={getPracticeReviewHref}
                 onStartReview={handleStartPracticeReview}
                 items={yearFilteredPracticeItems}

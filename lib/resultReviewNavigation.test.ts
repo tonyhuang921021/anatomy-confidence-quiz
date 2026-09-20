@@ -2,47 +2,62 @@ import assert from "node:assert/strict";
 import test from "node:test";
 import {
   buildResultReviewNavigation,
+  filterResultReviewItems,
+  getDefaultResultReviewFilter,
+  getResultReviewDetailKey,
+  getResultReviewHref,
   getResultReviewNavigationTargetIndex
 } from "./resultReviewNavigation";
 
-test("題目回顧依錯題、沒信心、全部題目的畫面順序串接", () => {
-  const items = buildResultReviewNavigation([
-    { label: "錯題", detailKeys: ["wrong-1", "wrong-2"] },
-    { label: "沒信心", detailKeys: ["low-41", "low-78"] },
-    { label: "全部", detailKeys: ["all-1", "all-2", "all-3"] }
-  ]);
+const items = [
+  { attempt: { questionId: "q1", isCorrect: false, confidence: 4 }, questionNumber: 1 },
+  { attempt: { questionId: "q2", isCorrect: true, confidence: 2 }, questionNumber: 2 },
+  { attempt: { questionId: "q3", isCorrect: true, confidence: 4 }, questionNumber: 3 },
+  { attempt: { questionId: "q4", isCorrect: false, confidence: 2 }, questionNumber: 4 }
+];
 
-  assert.deepEqual(
-    items.map(({ detailKey }) => detailKey),
-    ["wrong-1", "wrong-2", "low-41", "low-78", "all-1", "all-2", "all-3"]
-  );
-  assert.deepEqual(items[3], {
-    detailKey: "low-78",
-    sectionLabel: "沒信心",
-    sectionIndex: 1,
-    sectionTotal: 2
-  });
+test("回顧只列目前篩選，不重複錯題和答對但沒信心的題目", () => {
+  assert.deepEqual(filterResultReviewItems(items, "wrong").map((item) => item.questionNumber), [1, 4]);
+  assert.deepEqual(filterResultReviewItems(items, "low-confidence").map((item) => item.questionNumber), [2]);
+  assert.deepEqual(filterResultReviewItems(items, "all").map((item) => item.questionNumber), [1, 2, 3, 4]);
 });
 
-test("沒信心最後一題往下接全部第一題，往上可以回來", () => {
-  const items = buildResultReviewNavigation([
-    { label: "沒信心", detailKeys: ["low-41", "low-78"] },
-    { label: "全部", detailKeys: ["all-1", "all-2"] }
+test("篩選與信心地圖使用同一題目key且保留原題號", () => {
+  const wrongItems = filterResultReviewItems(items, "wrong");
+  assert.equal(getResultReviewDetailKey(wrongItems[1]), getResultReviewDetailKey(items[3]));
+  assert.equal(getResultReviewDetailKey(wrongItems[1]), "all-q4-4");
+  const navigation = buildResultReviewNavigation([{
+    label: "錯題", detailKeys: wrongItems.map(getResultReviewDetailKey)
+  }]);
+  assert.deepEqual(navigation, [
+    { detailKey: "all-q1-1", sectionLabel: "錯題", sectionIndex: 0, sectionTotal: 2 },
+    { detailKey: "all-q4-4", sectionLabel: "錯題", sectionIndex: 1, sectionTotal: 2 }
   ]);
-  const lastLowConfidenceIndex = items.findIndex(({ detailKey }) => detailKey === "low-78");
-  const firstAllIndex = items.findIndex(({ detailKey }) => detailKey === "all-1");
-
-  assert.equal(
-    getResultReviewNavigationTargetIndex(items.length, lastLowConfidenceIndex, 1),
-    firstAllIndex
-  );
-  assert.equal(
-    getResultReviewNavigationTargetIndex(items.length, firstAllIndex, -1),
-    lastLowConfidenceIndex
-  );
+  assert.equal(getResultReviewNavigationTargetIndex(navigation.length, 1, 1), 1);
 });
 
-test("尚未選題時，上下鍵分別從最後與第一個可見回顧項目開始", () => {
+test("預設先錯題，全對時先看沒信心，無待補強或關閉信心時看全部", () => {
+  assert.equal(getDefaultResultReviewFilter(items, true), "wrong");
+  const correct = items.filter(({ attempt }) => attempt.isCorrect);
+  assert.equal(getDefaultResultReviewFilter(correct, true), "low-confidence");
+  assert.equal(getDefaultResultReviewFilter(correct, false), "all");
+  assert.equal(getDefaultResultReviewFilter([items[2]], true), "all");
+  assert.equal(getDefaultResultReviewFilter([], true), "all");
+});
+
+test("結果複習入口保留模考、自訂卷與其複習來源", () => {
+  for (const settings of [{ mode: "simulation" }, { mode: "review", customPoolLabel: "模擬考錯題庫" }]) {
+    assert.equal(getResultReviewHref(settings), "/simulation-review");
+  }
+  for (const settings of [{ mode: "custom_paper" }, { mode: "review", customPoolLabel: "自訂卷錯題庫" }]) {
+    assert.equal(getResultReviewHref(settings), "/custom-papers/review");
+  }
+  assert.equal(getResultReviewHref({ mode: "random" }), "/review");
+  assert.equal(getResultReviewHref({ mode: "review", customPoolLabel: "散題待複習題庫" }), "/review");
+  assert.equal(getResultReviewHref(), "/review");
+});
+
+test("尚未選題時上下鍵從最後或第一個可見項目開始，空列表不可導覽", () => {
   assert.equal(getResultReviewNavigationTargetIndex(5, -1, 1), 0);
   assert.equal(getResultReviewNavigationTargetIndex(5, -1, -1), 4);
   assert.equal(getResultReviewNavigationTargetIndex(0, -1, 1), -1);

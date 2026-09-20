@@ -2570,7 +2570,7 @@ export default function QuizPage() {
         : null;
 
   return (
-    <main id="main-content" className="shell">
+    <main id="main-content" className={`shell ${submittedAttempt ? "pb-28 sm:pb-0" : ""}`}>
       <div ref={questionTopRef} />
       <header className="mb-5 border-b border-slate-200/80 pb-3">
         <div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-2">
@@ -2735,6 +2735,14 @@ export default function QuizPage() {
                     ) : null}
                   </div>
                   <div className="quiz-answer-summary-actions">
+                    <button
+                      type="button"
+                      onClick={handleNext}
+                      disabled={isSubmittingAnswer}
+                      className="hidden min-h-11 items-center justify-center rounded-xl bg-ink px-4 py-2 text-sm font-semibold text-white transition hover:bg-slate-900 disabled:opacity-50 sm:inline-flex"
+                    >
+                      {currentIndex === targetCount - 1 ? "查看結果" : "下一題"}
+                    </button>
                     <SavedQuestionButton questionId={currentQuestion.id} source="quiz" />
                     <CopyQuestionPromptButton
                       question={currentQuestion}
@@ -2858,13 +2866,24 @@ export default function QuizPage() {
                 />
               ) : null}
               {!submittedAttempt.isCorrect && shouldShowExplanation ? (
-                <ErrorTypeSelector value={errorType} onSelect={handleErrorTypeSelect} />
+                <details key={`error-type-${currentQuestion.id}`} className="rounded-xl border border-slate-200 bg-white p-4">
+                  <summary className="cursor-pointer text-sm font-semibold text-slate-600">
+                    記下錯因（選填）{errorType ? ` · ${errorType}` : ""}
+                  </summary>
+                  <div className="mt-3">
+                    <ErrorTypeSelector value={errorType} onSelect={handleErrorTypeSelect} />
+                  </div>
+                </details>
               ) : null}
 
-              <div className={`grid gap-3 ${canEndAfterSubmittedQuestion ? "sm:grid-cols-2" : ""}`}>
+              <div
+                aria-label="答後操作"
+                className={`fixed inset-x-3 bottom-[calc(env(safe-area-inset-bottom)+0.75rem)] z-40 grid gap-2 rounded-2xl border border-slate-200 bg-white/95 p-2 shadow-lg backdrop-blur sm:static sm:rounded-none sm:border-0 sm:bg-transparent sm:p-0 sm:shadow-none sm:backdrop-blur-none ${canEndAfterSubmittedQuestion ? "grid-cols-[minmax(0,1fr)_auto]" : ""}`}
+              >
                 <button
                   type="button"
                   onClick={handleNext}
+                  disabled={isSubmittingAnswer}
                   className="min-h-12 w-full rounded-2xl bg-ink px-4 py-4 text-sm font-semibold text-white transition hover:bg-slate-900"
                 >
                   {currentIndex === targetCount - 1 ? "查看結果" : "下一題"}
@@ -2873,6 +2892,7 @@ export default function QuizPage() {
                   <button
                     type="button"
                     onClick={handleEndAfterReview}
+                    disabled={isSubmittingAnswer}
                     className="min-h-12 w-full rounded-2xl bg-slate-100 px-4 py-4 text-sm font-semibold text-slate-800 transition hover:bg-slate-200"
                   >
                     結束測驗

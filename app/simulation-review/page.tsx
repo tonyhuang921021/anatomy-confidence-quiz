@@ -110,6 +110,10 @@ function isSimulationReviewCompletionSession(session: QuizSession) {
   );
 }
 
+function isSimulationHistorySession(session: QuizSession) {
+  return isSimulationSourceSession(session) || isSimulationReviewCompletionSession(session);
+}
+
 function buildSimulationReviewSettings(
   items: ReviewQuestionItem[],
   yearRange: ReviewYearRange,
@@ -154,6 +158,7 @@ function loadReviewCompletedSessions() {
 
 export default function SimulationReviewPage() {
   const [simulationItems, setSimulationItems] = useState<ReviewQuestionItem[]>([]);
+  const [selectedSubjects, setSelectedSubjects] = useState<SubjectName[]>([]);
   const [latestReviewAttemptByQuestionId, setLatestReviewAttemptByQuestionId] = useState<
     ReadonlyMap<string, string>
   >(() => new Map());
@@ -190,9 +195,7 @@ export default function SimulationReviewPage() {
   useEffect(() => {
     const sessions = loadReviewCompletedSessions();
     const simulationSourceSessions = sessions.filter(isSimulationSourceSession);
-    const historySessions = sessions.filter(
-      (session) => isSimulationSourceSession(session) || isSimulationReviewCompletionSession(session)
-    );
+    const historySessions = sessions.filter(isSimulationHistorySession);
     const reviewQuestions = mergeQuestionsWithSessionSnapshots(allQuestions, simulationSourceSessions);
     setSimulationItems(getReviewQuestionItems(reviewQuestions, historySessions, Number.MAX_SAFE_INTEGER));
     setLatestReviewAttemptByQuestionId(
@@ -265,6 +268,13 @@ export default function SimulationReviewPage() {
   );
   const simulationSnapshot = getReviewSnapshot(unresolvedSimulationItems);
 
+  const pdfHistoryScope = useMemo(() => ({
+    label: "模考歷次錯題",
+    includesSession: isSimulationHistorySession,
+    yearRange: reviewYearRange,
+    subjects: selectedSubjects
+  }), [reviewYearRange, selectedSubjects]);
+
   return (
     <main id="main-content" className="shell workspace-page">
       <section className="rounded-[2rem] bg-white p-6 shadow-card ring-1 ring-slate-100 sm:p-8">
@@ -277,30 +287,12 @@ export default function SimulationReviewPage() {
             </p>
           </div>
           <div className="flex flex-wrap gap-3">
-            <WrongQuestionPdfExport questions={allQuestions} />
+            <WrongQuestionPdfExport questions={allQuestions} historyScope={pdfHistoryScope} />
             <Link
               href="/simulation"
               className="min-h-12 rounded-2xl bg-slate-100 px-5 py-4 text-sm font-semibold text-slate-800 transition hover:bg-slate-200"
             >
               返回模擬考專區
-            </Link>
-            <Link
-              href={getSimulationReviewHref(unresolvedSimulationItems)}
-              onClick={(event) => {
-                if (unresolvedSimulationItems.length === 0) {
-                  event.preventDefault();
-                  return;
-                }
-                handleStartSimulationReview(unresolvedSimulationItems);
-              }}
-              aria-disabled={unresolvedSimulationItems.length === 0}
-              className={`min-h-12 rounded-2xl px-5 py-4 text-sm font-semibold transition ${
-                unresolvedSimulationItems.length === 0
-                  ? "pointer-events-none bg-slate-200 text-slate-500"
-                  : "bg-amber-500 text-white hover:bg-amber-600"
-              }`}
-            >
-              開始模擬考待複習
             </Link>
           </div>
         </div>
@@ -313,6 +305,26 @@ export default function SimulationReviewPage() {
         filteredCount={simulationSnapshot.total}
         totalCount={allUnresolvedSimulationItems.length}
         poolLabel="模擬考待複習題庫"
+        startAction={
+          <Link
+            href={getSimulationReviewHref(unresolvedSimulationItems)}
+            onClick={(event) => {
+              if (unresolvedSimulationItems.length === 0) {
+                event.preventDefault();
+                return;
+              }
+              handleStartSimulationReview(unresolvedSimulationItems);
+            }}
+            aria-disabled={unresolvedSimulationItems.length === 0}
+            className={`min-h-12 rounded-2xl px-5 py-4 text-sm font-semibold transition ${
+              unresolvedSimulationItems.length === 0
+                ? "pointer-events-none bg-slate-200 text-slate-500"
+                : "bg-amber-500 text-white hover:bg-amber-600"
+            }`}
+          >
+            複習全部科目 · {unresolvedSimulationItems.length} 題
+          </Link>
+        }
       />
 
       <section className="mt-8 grid gap-4 lg:grid-cols-2">
@@ -330,7 +342,9 @@ export default function SimulationReviewPage() {
         <ReviewNotebook
           title="模擬考待複習題庫"
           description="錯題和沒信心題分開整理；按開始複習會一起帶進同一回合。"
-          startLabel="開始模擬考待複習"
+          startLabel={selectedSubjects.length ? "複習所選科目" : "複習全部科目"}
+          selectedSubjects={selectedSubjects}
+          onSelectedSubjectsChange={setSelectedSubjects}
           getStartHref={getSimulationReviewHref}
           onStartReview={handleStartSimulationReview}
           items={yearFilteredSimulationItems}

@@ -437,7 +437,7 @@ export default function StudyNoteDetailPage() {
 
       <section className="mt-6 grid min-w-0 gap-6 xl:grid-cols-[minmax(0,1fr)_340px]">
         <article className="surface-card min-w-0 overflow-hidden p-5 sm:p-8 lg:p-10">
-          {!configured ? <p className="body-soft">Supabase 尚未設定，學習筆記需要雲端儲存才能使用。</p> : null}
+          {!configured ? <p className="body-soft">學習筆記暫時無法使用，請稍後再試。</p> : null}
           {configured && !user ? <p className="body-soft">請先登入，才能讀取自己的學習筆記。</p> : null}
           {loading ? <p className="body-soft">正在載入筆記...</p> : null}
           {error ? <p className="rounded-2xl bg-rose-50 px-4 py-3 text-sm font-semibold text-rose-700">{error}</p> : null}

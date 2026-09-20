@@ -510,6 +510,13 @@ test("設定頁收納通知與加入主畫面教學", async ({ page, browserName
   await expect(page).toHaveURL(/\/?settings=1$/);
   const accountSettings = page.getByRole("dialog", { name: "帳號與設定" });
   await expect(accountSettings).toBeVisible();
+  const notificationDisclosure = accountSettings.locator("details").filter({
+    has: page.locator("summary", { hasText: "通知與手機主畫面" })
+  });
+  await expect(notificationDisclosure).toHaveCount(1);
+  await expect(notificationDisclosure).not.toHaveAttribute("open", "");
+  await expect(accountSettings.getByRole("region", { name: "手機通知" })).toBeHidden();
+  await notificationDisclosure.locator("summary").click();
   await expect(accountSettings.getByRole("heading", { name: "通知", exact: true })).toBeVisible();
   const pushSettings = accountSettings.getByRole("region", { name: "手機通知" });
   await expect(pushSettings).toBeVisible();
@@ -907,13 +914,123 @@ test("結果頁展開後分類只顯示一次", async ({ page }) => {
 
   await page.goto("/results?sessionId=site-shell-result-session", { waitUntil: "networkidle" });
   await waitForShellReady(page);
-  const card = page.locator("details").first();
+  const review = page.getByRole("region", { name: "題目回顧", exact: true });
+  const card = review.locator('details[id^="review-all-"]').first();
+  await expect(review.locator('details[id^="review-all-"]')).toHaveCount(1);
+  await expect(review.getByRole("button", { name: "錯題 1", exact: true })).toHaveAttribute("aria-pressed", "true");
   const label = "病理學－免疫與感染性疾病";
 
   await expect(card.getByText(label, { exact: true })).toHaveCount(1);
   await card.locator("summary").click();
   await expect(card).toHaveAttribute("open", "");
   await expect(card.getByText(label, { exact: true })).toHaveCount(1);
+});
+
+test("結果單一篩選列表與信心地圖共用題號，收合校準不接收焦點", async ({ page, browserName }) => {
+  await page.addInitScript(() => {
+    const at = "2026-09-20T01:00:00.000Z";
+    const questions = [1, 2, 3].map((number) => ({
+      id: `site-shell-result-filter-q${number}`,
+      subject: "病理學",
+      chapter: "測試章節",
+      section: "測試單元",
+      primaryTag: "測試單元",
+      stem: `測試題幹 ${number}`,
+      options: { A: "測試選項 A", B: "測試選項 B", C: "測試選項 C", D: "測試選項 D" },
+      answer: "A",
+      explanation: "隔離測試詳解",
+      testedConcept: "測試單元"
+    }));
+    const resultSession = {
+      id: "site-shell-result-filters",
+      subject: "醫學（二）",
+      startedAt: at,
+      completedAt: at,
+      settings: {
+        mode: "simulation",
+        questionCount: 3,
+        subjectFilter: "醫學（二）",
+        enableConfidenceCalibration: true,
+        customQuestionPayload: questions
+      },
+      questionOrder: questions.map(({ id }) => id),
+      attempts: questions.map(({ id }, index) => ({
+        questionId: id,
+        selectedAnswer: index === 0 ? "B" : "A",
+        correctAnswer: "A",
+        isCorrect: index !== 0,
+        confidence: index === 1 ? 2 : 4,
+        answeredAt: at
+      }))
+    };
+    window.localStorage.setItem("anatomy-confidence-active-user-id", "guest");
+    window.localStorage.setItem("anatomy-confidence-simulation-confidence-calibration:guest", "true");
+    window.localStorage.setItem("anatomy-confidence-completed-sessions:guest", JSON.stringify([resultSession]));
+  });
+
+  await page.goto("/results?scope=simulation&sessionId=site-shell-result-filters", { waitUntil: "networkidle" });
+  await waitForShellReady(page);
+  const review = page.getByRole("region", { name: "題目回顧", exact: true });
+  const cards = review.locator('details[id^="review-all-"]');
+  const wrongFilter = review.getByRole("button", { name: "錯題 1", exact: true });
+  const lowFilter = review.getByRole("button", { name: "沒信心 1", exact: true });
+  const allFilter = review.getByRole("button", { name: "全部 3", exact: true });
+  await expect(wrongFilter).toHaveAttribute("aria-pressed", "true");
+  await expect(cards).toHaveCount(1);
+  await expect(cards.first()).toHaveAttribute("id", "review-all-site-shell-result-filter-q1-1");
+
+  await lowFilter.click();
+  await expect(lowFilter).toHaveAttribute("aria-pressed", "true");
+  await expect(cards).toHaveCount(1);
+  await expect(cards.first()).toHaveAttribute("id", "review-all-site-shell-result-filter-q2-2");
+  await allFilter.click();
+  await expect(cards).toHaveCount(3);
+  for (let index = 0; index < 3; index += 1) await cards.nth(index).locator("summary").click();
+  await expect(review.locator('details[id^="review-all-"][open]')).toHaveCount(2);
+  await wrongFilter.click();
+  await expect(review.locator('details[id^="review-all-"][open]')).toHaveCount(0);
+
+  await page.locator("summary", { hasText: "補強與進階分析" }).click();
+  const calibrationToggle = page.getByRole("button", { name: /^信心校準/ });
+  await expect(calibrationToggle).toHaveAttribute("aria-expanded", "false");
+  await expect(page.locator("#result-confidence-calibration")).toHaveCount(0);
+  await calibrationToggle.click();
+  await expect(page.locator("#result-confidence-calibration")).toBeVisible();
+  await calibrationToggle.click();
+  await expect(page.locator("#result-confidence-calibration")).toHaveCount(0);
+  await calibrationToggle.focus();
+  await page.keyboard.press("Tab");
+  if (browserName === "webkit") {
+    // Safari's default keyboard navigation may skip buttons; it must still never
+    // place focus inside the removed calibration panel or any hidden element.
+    const focusState = await page.evaluate(() => {
+      const active = document.activeElement;
+      if (!(active instanceof HTMLElement)) return { inCalibration: false, visible: false };
+      const rect = active.getBoundingClientRect();
+      let visible = rect.width > 0 && rect.height > 0;
+      for (let node: HTMLElement | null = active; node; node = node.parentElement) {
+        const style = window.getComputedStyle(node);
+        if (node.hidden || style.display === "none" || style.visibility === "hidden" || Number(style.opacity) === 0) {
+          visible = false;
+        }
+      }
+      return { inCalibration: Boolean(active.closest("#result-confidence-calibration")), visible };
+    });
+    expect(focusState).toEqual({ inCalibration: false, visible: true });
+  } else {
+    await expect(page.getByRole("button", { name: /^補強建議/ })).toBeFocused();
+  }
+
+  await page.getByRole("button", { name: /^題號與信心地圖/ }).click();
+  await page.getByRole("button", { name: /^第 3 題，答對，/ }).click();
+  await expect(allFilter).toHaveAttribute("aria-pressed", "true");
+  await expect(cards).toHaveCount(3);
+  const target = review.locator("#review-all-site-shell-result-filter-q3-3");
+  await expect(target).toHaveAttribute("open", "");
+  await expect(target.locator("summary")).toBeInViewport();
+
+  await page.getByRole("button", { name: /^補強建議/ }).click();
+  await expect(page.getByRole("link", { name: "前往模考錯題複習", exact: true })).toHaveAttribute("href", "/simulation-review");
 });
 
 test("手機題目回顧快速導覽不會被底部導覽遮住", async ({ page }, testInfo) => {
@@ -976,7 +1093,7 @@ test("手機題目回顧快速導覽不會被底部導覽遮住", async ({ page 
   const nextButton = quickNavigator.getByRole("button", { name: "展開下一題" });
   await expectActionClickable(nextButton);
   await nextButton.click();
-  await expect(page.locator("#review-wrong-MOEX-115020-2301-Q078-0"))
+  await expect(page.locator("#review-all-MOEX-115020-2301-Q078-1"))
     .toHaveAttribute("open", "");
 });
 
@@ -1133,8 +1250,13 @@ test("結果頁會合併同一 session 的本機 100 題與雲端短副本", asy
   await page.goto("/results?sessionId=site-shell-result-union", { waitUntil: "networkidle" });
   await waitForShellReady(page);
 
-  await expect(page.getByText("全部 100", { exact: true })).toBeVisible();
-  await expect(page.getByText("第 100 題：", { exact: false }).first()).toBeAttached();
+  const review = page.getByRole("region", { name: "題目回顧", exact: true });
+  const allFilter = review.getByRole("button", { name: "全部 100", exact: true });
+  await expect(allFilter).toBeVisible();
+  await allFilter.click();
+  await expect(allFilter).toHaveAttribute("aria-pressed", "true");
+  await expect(review.locator('details[id^="review-all-"]')).toHaveCount(100);
+  await expect(review.getByText("第 100 題：", { exact: false })).toBeAttached();
 });
 
 test("複習頁不會進入重複更新迴圈", async ({ page }) => {

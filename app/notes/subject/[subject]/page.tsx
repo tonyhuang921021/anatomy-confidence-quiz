@@ -1284,7 +1284,7 @@ export default function SubjectNotesPage() {
 
       <section className="mt-6">
         {!configured ? (
-          <div className="surface-card p-6"><p className="body-soft">Supabase 尚未設定，學習筆記需要雲端儲存才能使用。</p></div>
+          <div className="surface-card p-6"><p className="body-soft">學習筆記暫時無法使用，請稍後再試。</p></div>
         ) : !user ? (
           <div className="surface-card p-6"><p className="body-soft">請先在首頁登入，才能讀取自己的學習筆記。</p></div>
         ) : !validSubject ? (

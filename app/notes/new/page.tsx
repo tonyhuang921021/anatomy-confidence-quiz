@@ -290,7 +290,7 @@ export default function NewStudyNotePage() {
 
       <section className="surface-card mt-6 p-5 sm:p-6">
         {!configured ? (
-          <p className="body-soft">Supabase 尚未設定，學習筆記需要雲端儲存才能使用。</p>
+          <p className="body-soft">學習筆記暫時無法使用，請稍後再試。</p>
         ) : !user ? (
           <p className="body-soft">請先在首頁登入，登入後就能新增自己的學習筆記。</p>
         ) : (

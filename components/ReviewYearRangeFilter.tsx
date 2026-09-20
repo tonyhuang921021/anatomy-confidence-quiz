@@ -1,5 +1,6 @@
 "use client";
 
+import type { ReactNode } from "react";
 import {
   MAX_PRACTICE_SOURCE_YEAR,
   MIN_PRACTICE_SOURCE_YEAR,
@@ -17,6 +18,7 @@ type ReviewYearRangeFilterProps = {
   filteredCount: number;
   totalCount: number;
   poolLabel: string;
+  startAction?: ReactNode;
 };
 
 export function ReviewYearRangeFilter({
@@ -25,7 +27,8 @@ export function ReviewYearRangeFilter({
   onChange,
   filteredCount,
   totalCount,
-  poolLabel
+  poolLabel,
+  startAction
 }: ReviewYearRangeFilterProps) {
   const isFullRange = isFullReviewYearRange(value);
 
@@ -36,9 +39,9 @@ export function ReviewYearRangeFilter({
     >
       <div className="grid gap-5 px-5 py-5 sm:px-6 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-center">
         <div className="min-w-0">
-          <p className="text-sm font-semibold text-ink">複習年份</p>
+          <p className="text-sm font-semibold text-ink">考題年份</p>
           <p className="mt-1 text-sm text-slate-500">
-            只篩選{poolLabel}內的題目，不會和其他題池混在一起。
+            依題目出處年份篩選{poolLabel}，不是作答日期。
           </p>
         </div>
 
@@ -107,15 +110,18 @@ export function ReviewYearRangeFilter({
 
       <div
         aria-live="polite"
-        className="flex flex-wrap items-center gap-x-3 gap-y-1 border-t border-slate-100 bg-slate-50/70 px-5 py-3 text-sm sm:px-6"
+        className="flex flex-wrap items-center justify-between gap-3 border-t border-slate-100 bg-slate-50/70 px-5 py-3 text-sm sm:px-6"
       >
-        <strong className="tabular-nums text-ink">
-          {value.yearFrom}–{value.yearTo} 年
-        </strong>
-        <span className="text-slate-500">
-          這個範圍可開始 <strong className="font-semibold text-slate-700">{filteredCount}</strong> 題
-          {filteredCount !== totalCount ? `・全部年份共 ${totalCount} 題` : ""}
-        </span>
+        <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
+          <strong className="tabular-nums text-ink">
+            {value.yearFrom}–{value.yearTo} 年
+          </strong>
+          <span className="text-slate-500">
+            這個範圍可開始 <strong className="font-semibold text-slate-700">{filteredCount}</strong> 題
+            {filteredCount !== totalCount ? `・全部年份共 ${totalCount} 題` : ""}
+          </span>
+        </div>
+        {startAction}
       </div>
     </section>
   );

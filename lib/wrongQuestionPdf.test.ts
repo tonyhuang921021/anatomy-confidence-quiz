@@ -169,3 +169,95 @@ test("recent filter ties are deterministic, excludes unknown dates and accepts l
   assert.equal(unlimited.items.length, 3);
   assert.equal(collectWrongQuestionPdfItems([session(attempts)], fixtures, { ...filters, recentCount: 5 }).items.length, 2);
 });
+
+test("history scope isolates source attempts and snapshots before collecting ever-wrong questions", () => {
+  const modes = ["random", "simulation", "custom_paper"] as const;
+  const fixtures = modes.map((mode) => ({ ...question, id: mode, stem: `${mode} 題目` }));
+  const histories = modes.map((mode, index) => session([
+    attempt({ questionId: mode }),
+    attempt({ questionId: mode, isCorrect: true, answeredAt: "2026-09-21T01:00:00Z" })
+  ], { settings: { mode } as QuizSession["settings"], generatedQuestions: [fixtures[index]] }));
+  for (const mode of modes) {
+    const collected = collectWrongQuestionPdfItems(histories, [], EMPTY_PDF_FILTERS, {
+      label: mode,
+      includesSession: (entry) => entry.settings?.mode === mode
+    });
+    assert.deepEqual(collected.items.map((item) => item.question.id), [mode]);
+    assert.equal(collected.items[0].question.stem, `${mode} 題目`);
+  }
+  const conflictingSnapshot = session([], {
+    settings: { mode: "custom_paper" } as QuizSession["settings"],
+    generatedQuestions: [{ ...fixtures[1], stem: "其他來源的快照" }]
+  });
+  assert.equal(collectWrongQuestionPdfItems([...histories, conflictingSnapshot], [], EMPTY_PDF_FILTERS, {
+    label: "模考歷次錯題", includesSession: (entry) => entry.settings?.mode === "simulation"
+  }).items[0].question.stem, "simulation 題目");
+});
+
+test("history scope accepts the page's source and completion predicate without including other review pools", () => {
+  const source = session([attempt()], { settings: { mode: "simulation" } as QuizSession["settings"] });
+  const completion = session([attempt({ questionId: "review-wrong" })], { settings: { mode: "review", customPoolLabel: "模擬考錯題庫" } as QuizSession["settings"] });
+  const other = session([attempt({ questionId: "other-source" })], { settings: { mode: "review", customPoolLabel: "自訂卷錯題庫" } as QuizSession["settings"] });
+  const result = collectWrongQuestionPdfItems([source, completion, other], [question, { ...question, id: "review-wrong" }], EMPTY_PDF_FILTERS, {
+    label: "模考歷次錯題",
+    includesSession: (entry) => entry.settings?.mode === "simulation" || (entry.settings?.mode === "review" && entry.settings?.customPoolLabel === "模擬考錯題庫")
+  });
+  assert.deepEqual(result.items.map((item) => item.question.id), [question.id, "review-wrong"]);
+  assert.equal(result.missingQuestionCount, 0, "excluded sources do not leak missing-question warnings");
+});
+
+test("PDF source years match review years, including ROC years and unknown or AI years", () => {
+  const fixtures: Question[] = [
+    { ...question, id: "old", sourceYear: 2025 },
+    { ...question, id: "new", sourceYear: 2026 },
+    { ...question, id: "roc", sourceYear: 115 },
+    { ...question, id: "undated" },
+    { ...question, id: "ai", sourceYear: 2026, sourceType: "AI_GENERATED" }
+  ];
+  const histories = [session(fixtures.map(({ id }) => attempt({ questionId: id })))];
+  const baseScope = { label: "自訂卷歷次錯題", includesSession: () => true };
+  const narrow = collectWrongQuestionPdfItems(histories, fixtures, EMPTY_PDF_FILTERS, {
+    ...baseScope, yearRange: { yearFrom: 2026, yearTo: 2026 }
+  });
+  assert.deepEqual(narrow.items.map(({ question }) => question.id).sort(), ["new", "roc"]);
+  const full = collectWrongQuestionPdfItems(histories, fixtures, EMPTY_PDF_FILTERS, {
+    ...baseScope, yearRange: { yearFrom: 2011, yearTo: 2026 }
+  });
+  assert.equal(full.items.length, 5, "imported and AI questions remain available with the default full range");
+});
+
+test("page subjects and years bound extra filters before date, distinct recent limit and print sorting", () => {
+  const fixtures: Question[] = [
+    { ...question, id: "anatomy", sourceYear: 2026 },
+    { ...question, id: "physiology", subject: "生理學", sourceYear: 2026 },
+    { ...question, id: "pharmacology", subject: "藥理學", sourceYear: 2026 },
+    { ...question, id: "old-anatomy", sourceYear: 2025 },
+    { ...question, id: "outside-unknown-date", subject: "藥理學", sourceYear: 2026 }
+  ];
+  const attempts = [
+    attempt({ questionId: "anatomy", answeredAt: "2026-09-20T01:00:00Z" }),
+    attempt({ questionId: "anatomy", answeredAt: "2026-09-20T01:30:00Z" }),
+    attempt({ questionId: "physiology", answeredAt: "2026-09-20T02:00:00Z" }),
+    attempt({ questionId: "pharmacology", answeredAt: "2026-09-20T03:00:00Z" }),
+    attempt({ questionId: "old-anatomy", answeredAt: "2026-09-20T04:00:00Z" }),
+    attempt({ questionId: "outside-unknown-date", answeredAt: "invalid" })
+  ];
+  const historyScope = { label: "散題歷次錯題", includesSession: () => true, yearRange: { yearFrom: 2026, yearTo: 2026 }, subjects: ["解剖學", "生理學"] };
+  const filters = { ...EMPTY_PDF_FILTERS, dateFrom: "2026-09-20", dateTo: "2026-09-20", recentCount: 2 };
+  const original = JSON.stringify({ fixtures, attempts });
+  const result = collectWrongQuestionPdfItems([session(attempts)], fixtures, filters, historyScope);
+  assert.deepEqual(result.items.map(({ question }) => question.id), ["anatomy", "physiology"]);
+  assert.equal(result.unknownDateCount, 0);
+  assert.equal(collectWrongQuestionPdfItems([session(attempts)], fixtures, { ...filters, subject: "藥理學" }, historyScope).items.length, 0);
+  assert.deepEqual(collectWrongQuestionPdfItems([session(attempts)], fixtures, { ...filters, recentCount: 1 }, historyScope).items.map(({ question }) => question.id), ["physiology"]);
+  assert.equal(JSON.stringify({ fixtures, attempts }), original, "collection never mutates questions or answer records");
+});
+
+test("empty subject selection means all page subjects, while a selected subject with no year matches stays empty", () => {
+  const fixtures: Question[] = [{ ...question, sourceYear: 2026 }, { ...question, id: "old", subject: "生理學", sourceYear: 2025 }];
+  const histories = [session(fixtures.map(({ id }) => attempt({ questionId: id })))];
+  const historyScope = { label: "散題歷次錯題", includesSession: () => true, yearRange: { yearFrom: 2026, yearTo: 2026 }, subjects: [] as string[] };
+  assert.equal(collectWrongQuestionPdfItems(histories, fixtures, EMPTY_PDF_FILTERS, historyScope).items.length, 1);
+  assert.equal(collectWrongQuestionPdfItems(histories, fixtures, EMPTY_PDF_FILTERS, { ...historyScope, subjects: ["生理學"] }).items.length, 0);
+  assert.equal(collectWrongQuestionPdfItems(histories, fixtures).items.length, 2, "existing callers without a history scope remain compatible");
+});

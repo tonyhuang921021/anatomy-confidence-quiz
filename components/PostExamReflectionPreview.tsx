@@ -253,7 +253,7 @@ export function PostExamReflectionPreview() {
     setAccessChecked(false);
     if (!configured) {
       setRecapPhase("");
-      setRecapError("Supabase 尚未設定，無法建立個人固定快照。");
+      setRecapError("個人考後回顧暫時無法載入，請稍後再試。");
       setAccessChecked(true);
       return;
     }

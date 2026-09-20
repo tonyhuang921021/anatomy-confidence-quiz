@@ -62,9 +62,7 @@ export default function LeaderboardPage() {
         setError(
           isAbortError
             ? "刷題榜讀取逾時，請稍後再試一次。"
-            : fetchError instanceof Error
-              ? fetchError.message
-              : "刷題榜載入失敗"
+            : "目前無法讀取刷題榜，請稍後重試。"
         );
       } finally {
         if (isActive) {
@@ -135,7 +133,7 @@ export default function LeaderboardPage() {
           <section className="rounded-[2rem] bg-white p-6 shadow-card ring-1 ring-slate-100">
             <h2 className="text-2xl font-semibold text-ink">刷題榜尚未啟用</h2>
             <p className="mt-3 text-sm leading-7 text-slate-600">
-              請先設定 Supabase，並重新執行最新版 [supabase/schema.sql](/Users/huangguanlun/Documents/New%20project/supabase/schema.sql) 建立 leaderboard 資料表。
+              目前暫時無法查看排名，你仍可繼續刷題。
             </p>
           </section>
         ) : loading ? (
@@ -147,7 +145,7 @@ export default function LeaderboardPage() {
             <h2 className="text-2xl font-semibold text-ink">刷題榜載入失敗</h2>
             <p className="mt-3 text-sm leading-7 text-rose-700">{error}</p>
             <p className="mt-2 text-sm leading-7 text-slate-600">
-              如果你剛升級這版，請回 Supabase SQL Editor 重新執行一次 [supabase/schema.sql](/Users/huangguanlun/Documents/New%20project/supabase/schema.sql)。
+              這不影響本機作答紀錄，你可以稍後再查看排名。
             </p>
             <button
               type="button"

@@ -1,7 +1,7 @@
 "use client";
 
-import { useRouter } from "next/navigation";
-import { useDeferredValue, useEffect, useMemo, useRef, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { Suspense, useDeferredValue, useEffect, useMemo, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { useAuth } from "@/components/AuthProvider";
 import { CopyQuestionPromptButton } from "@/components/CopyQuestionPromptButton";
@@ -142,11 +142,13 @@ function readStoredAnswerDisplayMode(): SearchAnswerDisplayMode {
   }
 }
 
-export default function SearchPage() {
+function SearchPageContent() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const linkedQuery = searchParams.get("query") ?? "";
   const { session } = useAuth();
   const [selectedSubject, setSelectedSubject] = useState("全部");
-  const [keyword, setKeyword] = useState("");
+  const [keyword, setKeyword] = useState(linkedQuery);
   const [selectedYear, setSelectedYear] = useState("全部");
   const [sortMode, setSortMode] = useState<QuestionSearchSort>("recent");
   const [advancedFiltersOpen, setAdvancedFiltersOpen] = useState(false);
@@ -188,6 +190,16 @@ export default function SearchPage() {
   const debouncedKeyword = useDebouncedValue(keyword, 220);
   const deferredKeyword = useDeferredValue(debouncedKeyword);
   const isKeywordPending = keyword !== debouncedKeyword || debouncedKeyword !== deferredKeyword;
+
+  useEffect(() => {
+    // A linked question should not be hidden by filters from an earlier search.
+    // Only URL changes enter here; typing and the cross-filter selection stay local.
+    setKeyword(linkedQuery);
+    setSelectedSubject("全部");
+    setSelectedYear("全部");
+    setBrowseAllQuestions(false);
+    setCurrentPage(1);
+  }, [linkedQuery]);
 
   useEffect(() => {
     setAnswerDisplayMode(readStoredAnswerDisplayMode());
@@ -1564,5 +1576,13 @@ export default function SearchPage() {
         document.body
       ) : null}
     </main>
+  );
+}
+
+export default function SearchPage() {
+  return (
+    <Suspense fallback={<main id="main-content" className="shell workspace-page"><p className="py-8 text-sm text-slate-500">載入題目搜尋…</p></main>}>
+      <SearchPageContent />
+    </Suspense>
   );
 }
