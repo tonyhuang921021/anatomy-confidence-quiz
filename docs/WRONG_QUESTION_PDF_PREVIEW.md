@@ -16,3 +16,9 @@
 node node_modules/typescript/bin/tsc --target ES2022 --module commonjs --moduleResolution node --resolveJsonModule --esModuleInterop --skipLibCheck --strict --outDir /private/tmp/wrong-question-pdf-tests lib/wrongQuestionPdf.ts lib/wrongQuestionPdf.test.ts
 node --test /private/tmp/wrong-question-pdf-tests/lib/wrongQuestionPdf.test.js
 ```
+
+## 入口情境預覽
+
+`/wrong-question-pdf-preview/integration?view=results` 與 `?view=review` 展示真正結果頁／錯題頁的桌面及手機截圖。截圖中的匯出按鈕可操作，開啟同一個匯出元件；其他畫面是示範截圖。結果頁預設本次 6 題，錯題頁預設歷次 10 題並顯示日期篩選。共用 fixture 的本次作答為 10 題、4 對、6 錯。
+
+`demoSessions` 直接使用記憶體中的示範紀錄，不讀取匯出元件的個人歷史或訂閱歷史更新。已用另一份既有紀錄確認不混入匯出、操作前後儲存內容相同；桌面 Chromium／390px WebKit 的按鈕定位、預設範圍、日期篩選、關閉返回焦點及分頁鍵盤操作通過。正式頁面的按鈕位置與原有資料流程未再變更。

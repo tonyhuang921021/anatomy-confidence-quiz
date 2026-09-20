@@ -191,14 +191,20 @@ export function WrongQuestionPdfWorkspace({ questions, currentSession, sessions,
   );
 }
 
-export function WrongQuestionPdfExport({ questions, currentSession }: { questions: Question[]; currentSession?: QuizSession | null }) {
+export function WrongQuestionPdfExport({ questions, currentSession, demoSessions, demo = false, triggerClassName }: {
+  questions: Question[];
+  currentSession?: QuizSession | null;
+  demoSessions?: QuizSession[];
+  demo?: boolean;
+  triggerClassName?: string;
+}) {
   const dialogRef = useRef<HTMLDialogElement>(null);
   const triggerRef = useRef<HTMLButtonElement>(null);
   const titleId = useId();
   const [open, setOpen] = useState(false);
   const [sessions, setSessions] = useState<QuizSession[]>([]);
   useEffect(() => {
-    if (!open) return;
+    if (!open || demoSessions !== undefined) return;
     const refresh = () => setSessions(loadCompletedSessions({ includeFullLocalHistory: true }));
     refresh();
     window.addEventListener("completed-sessions-change", refresh);
@@ -207,13 +213,13 @@ export function WrongQuestionPdfExport({ questions, currentSession }: { question
       window.removeEventListener("completed-sessions-change", refresh);
       window.removeEventListener("completed-question-history-change", refresh);
     };
-  }, [open]);
+  }, [open, demoSessions]);
   function close() { dialogRef.current?.close(); setOpen(false); triggerRef.current?.focus(); }
   return <>
-    <button ref={triggerRef} type="button" onClick={() => { setOpen(true); dialogRef.current?.showModal(); }} className="inline-flex min-h-11 items-center justify-center gap-2 rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-semibold text-slate-700 transition hover:bg-slate-50"><Printer size={16} aria-hidden="true" />匯出錯題 PDF</button>
+    <button ref={triggerRef} type="button" onClick={() => { setOpen(true); dialogRef.current?.showModal(); }} className={triggerClassName ?? "inline-flex min-h-11 items-center justify-center gap-2 rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-semibold text-slate-700 transition hover:bg-slate-50"}><Printer size={16} aria-hidden="true" />匯出錯題 PDF</button>
     <dialog ref={dialogRef} aria-labelledby={titleId} onCancel={close} onClose={() => { setOpen(false); triggerRef.current?.focus(); }} className="m-auto max-h-[92dvh] w-[calc(100%_-_24px)] max-w-[1120px] overflow-y-auto rounded-xl border border-slate-200 bg-[color:var(--surface)] p-5 text-ink shadow-xl backdrop:bg-black/40 sm:p-7">
       <div className="mb-6 flex items-start justify-between gap-3"><div><h2 id={titleId} className="text-xl font-semibold">匯出錯題 PDF</h2><p className="mt-1 text-sm text-slate-500">把錯題整理成一份能手寫訂正的練習單。</p></div><button type="button" aria-label="關閉匯出設定" onClick={close} className="flex min-h-11 min-w-11 items-center justify-center rounded-lg hover:bg-slate-100"><X size={20} /></button></div>
-      {open ? <WrongQuestionPdfWorkspace questions={questions} currentSession={currentSession} sessions={sessions} initialScope={currentSession ? "current" : "history"} /> : null}
+      {open ? <WrongQuestionPdfWorkspace questions={questions} currentSession={currentSession} sessions={demoSessions ?? sessions} initialScope={currentSession ? "current" : "history"} demo={demo || demoSessions !== undefined} /> : null}
     </dialog>
   </>;
 }

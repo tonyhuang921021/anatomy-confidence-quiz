@@ -1,0 +1,46 @@
+{
+  "results": {
+    "desktop": {
+      "width": 1280,
+      "height": 886,
+      "button": {
+        "x": 701.3125,
+        "y": 73.65625,
+        "width": 148.75,
+        "height": 52
+      }
+    },
+    "mobile": {
+      "width": 390,
+      "height": 820,
+      "button": {
+        "x": 12,
+        "y": 129.1875,
+        "width": 148.75,
+        "height": 52
+      }
+    }
+  },
+  "review": {
+    "desktop": {
+      "width": 1280,
+      "height": 886,
+      "button": {
+        "x": 885.890625,
+        "y": 89.84375,
+        "width": 148.75,
+        "height": 44
+      }
+    },
+    "mobile": {
+      "width": 390,
+      "height": 820,
+      "button": {
+        "x": 31.390625,
+        "y": 126.765625,
+        "width": 148.75,
+        "height": 44
+      }
+    }
+  }
+}
