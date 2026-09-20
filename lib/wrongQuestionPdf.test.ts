@@ -57,3 +57,76 @@ test("untrusted media schemes are rejected and image-only options are preserved"
   const generic = { ...question, subject: "生理學" as const, chapter: "生理學", section: "生理學", primaryTag: "生理學" };
   assert.equal(getPdfChapter(generic), "未細分章節");
 });
+
+function sortedFixtureIds(questions: Question[]) {
+  return collectWrongQuestionPdfItems(
+    [session(questions.map((item) => attempt({ questionId: item.id })))],
+    questions
+  ).items.map((item) => item.question.id);
+}
+
+test("PDF uses the site's full subject order even when inputs and question years disagree", () => {
+  const subjects: Question["subject"][] = [
+    "解剖學", "組織學", "胚胎學", "生理學", "生物化學",
+    "微生物免疫學", "寄生蟲學", "公共衛生學", "藥理學", "病理學"
+  ];
+  const fixtures = subjects.map((subject, index) => ({
+    ...question, id: `subject-${index}`, subject, sourceYear: 2010 + index, originalQuestionNumber: 20 - index
+  }));
+  const scrambled = [9, 4, 2, 7, 0, 6, 3, 8, 1, 5].map((index) => fixtures[index]);
+  const unknown = { ...question, id: "unknown-subject", subject: "細胞生物學" as const, sourceYear: 2026, originalQuestionNumber: 1 };
+  assert.deepEqual(sortedFixtureIds([unknown, ...scrambled]), [...fixtures.map((item) => item.id), unknown.id]);
+});
+
+test("original question numbers stay ascending across alternating chapters in one paper", () => {
+  const fixtures = [
+    { ...question, id: "number-12", chapter: "上肢", originalQuestionNumber: 12 },
+    { ...question, id: "number-2", chapter: "胸腔", originalQuestionNumber: 2 },
+    { ...question, id: "number-8", chapter: "上肢", originalQuestionNumber: 8 },
+    { ...question, id: "number-20", chapter: "胸腔", originalQuestionNumber: 20 }
+  ].map((item) => ({ ...item, sourceYear: 2026, sourceRound: 1 as const, examCode: "115030", paperCode: "1101" }));
+  assert.deepEqual(sortedFixtureIds(fixtures), ["number-2", "number-8", "number-12", "number-20"]);
+  const collected = collectWrongQuestionPdfItems([session(fixtures.map((item) => attempt({ questionId: item.id })))], fixtures);
+  assert.deepEqual(collected.items.map((item) => item.chapter), ["胸腔", "上肢", "上肢", "胸腔"]);
+});
+
+test("newer years and rounds precede older papers, independent of chapter and low question numbers", () => {
+  const fixtures: Question[] = [
+    { ...question, id: "older-round2", sourceYear: 2025, sourceRound: 2, originalQuestionNumber: 1 },
+    { ...question, id: "new-round1", sourceYear: 2026, sourceRound: 1, originalQuestionNumber: 1 },
+    { ...question, id: "new-round2-number20", sourceYear: 2026, sourceRound: 2, originalQuestionNumber: 20 },
+    { ...question, id: "older-round1", sourceYear: 2025, sourceRound: 1, originalQuestionNumber: 1 },
+    { ...question, id: "new-round2-number3", sourceYear: 115, sourceRound: 2, originalQuestionNumber: 3 }
+  ];
+  assert.deepEqual(sortedFixtureIds(fixtures), [
+    "new-round2-number3", "new-round2-number20", "new-round1", "older-round2", "older-round1"
+  ]);
+});
+
+test("same-year papers remain contiguous and missing numbers sort after numbered questions in their paper", () => {
+  const source: Partial<Question> = { sourceYear: 2026, sourceRound: 1, examCode: "115030" };
+  const fixtures: Question[] = [
+    { ...question, ...source, id: "paper2-first", paperCode: "1301", originalQuestionNumber: 1 },
+    { ...question, ...source, id: "paper1-missing-b", paperCode: "1101" },
+    { ...question, ...source, id: "paper1-last", paperCode: "1101", originalQuestionNumber: 99 },
+    { ...question, ...source, id: "paper1-missing-a", paperCode: "1101" },
+    { ...question, ...source, id: "MOEX-115030-1101-Q002", paperCode: undefined, examCode: undefined, originalQuestionNumber: 2 }
+  ];
+  const expected = ["MOEX-115030-1101-Q002", "paper1-last", "paper1-missing-a", "paper1-missing-b", "paper2-first"];
+  assert.deepEqual(sortedFixtureIds(fixtures), expected);
+  assert.deepEqual(sortedFixtureIds([...fixtures].reverse()), expected);
+});
+
+test("duplicate or invalid numbers and missing source metadata have stable ID fallbacks", () => {
+  const fixtures: Question[] = [
+    { ...question, id: "fixture-10", originalQuestionNumber: 3 },
+    { ...question, id: "fixture-2", originalQuestionNumber: 3 },
+    { ...question, id: "missing-10", originalQuestionNumber: Number.NaN },
+    { ...question, id: "missing-2", originalQuestionNumber: 0 },
+    { ...question, id: "missing-3" },
+    { ...question, id: "dated", sourceYear: 2026 }
+  ];
+  const expected = ["dated", "fixture-2", "fixture-10", "missing-2", "missing-3", "missing-10"];
+  assert.deepEqual(sortedFixtureIds(fixtures), expected);
+  assert.deepEqual(sortedFixtureIds([...fixtures].reverse()), expected);
+});

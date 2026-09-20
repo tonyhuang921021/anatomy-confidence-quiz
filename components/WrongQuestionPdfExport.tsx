@@ -8,8 +8,7 @@ import {
   collectWrongQuestionPdfItems,
   EMPTY_PDF_FILTERS,
   type WrongQuestionPdfItem,
-  type WrongQuestionPdfFilters,
-  type WrongQuestionPdfScope
+  type WrongQuestionPdfFilters
 } from "@/lib/wrongQuestionPdf";
 import type { Question, QuizSession } from "@/types/quiz";
 
@@ -20,7 +19,6 @@ type WorkspaceProps = {
   questions: Question[];
   currentSession?: QuizSession | null;
   sessions: QuizSession[];
-  initialScope?: WrongQuestionPdfScope;
   demo?: boolean;
 };
 
@@ -71,9 +69,9 @@ async function preparePrintWindow(printWindow: Window) {
   await showReady();
 }
 
-export function WrongQuestionPdfWorkspace({ questions, currentSession, sessions, initialScope = "history", demo = false }: WorkspaceProps) {
+export function WrongQuestionPdfWorkspace({ questions, currentSession, sessions, demo = false }: WorkspaceProps) {
   const id = useId();
-  const [scope, setScope] = useState<WrongQuestionPdfScope>(currentSession ? initialScope : "history");
+  const scope = currentSession ? "current" : "history";
   const [filters, setFilters] = useState<WrongQuestionPdfFilters>({ ...EMPTY_PDF_FILTERS });
   const [spacing, setSpacing] = useState(2);
   const [notice, setNotice] = useState("");
@@ -88,10 +86,7 @@ export function WrongQuestionPdfWorkspace({ questions, currentSession, sessions,
     observer.observe(container);
     return () => observer.disconnect();
   }, []);
-  const sourceSessions = useMemo(() => scope === "current" && currentSession
-    ? [currentSession]
-    : currentSession ? [...sessions.filter((item) => item.id !== currentSession.id), currentSession] : sessions,
-  [scope, sessions, currentSession]);
+  const sourceSessions = useMemo(() => currentSession ? [currentSession] : sessions, [sessions, currentSession]);
   const available = useMemo(() => collectWrongQuestionPdfItems(sourceSessions, questions), [sourceSessions, questions]);
   const subjects = useMemo(() => [...new Set(available.items.map(({ question }) => question.subject))], [available]);
   const chapters = useMemo(() => [...new Set(available.items.filter(({ question }) => !filters.subject || question.subject === filters.subject).map((item) => item.chapter))].sort((a, b) => a.localeCompare(b, "zh-Hant")), [available, filters.subject]);
@@ -121,19 +116,6 @@ export function WrongQuestionPdfWorkspace({ questions, currentSession, sessions,
   return (
     <div className="grid min-w-0 gap-6 lg:grid-cols-[280px_minmax(0,1fr)]">
       <div className="min-w-0">
-        {currentSession ? (
-          <fieldset className="mb-5">
-            <legend className="mb-2 text-sm font-semibold text-ink">匯出範圍</legend>
-            <div className="flex rounded-lg bg-slate-100 p-1">
-              {([ ["current", "本次作答"], ["history", "歷次錯題"] ] as const).map(([value, label]) => (
-                <label key={value} className={`flex min-h-10 flex-1 cursor-pointer items-center justify-center rounded-md text-sm focus-within:ring-2 focus-within:ring-brand-500 focus-within:ring-offset-2 ${scope === value ? "bg-white font-semibold text-brand-700 shadow-sm" : "text-slate-500"}`}>
-                  <input type="radio" name={`${id}-scope`} value={value} checked={scope === value} onChange={() => { setScope(value); setFilters({ ...EMPTY_PDF_FILTERS }); }} className="sr-only" />
-                  {label}
-                </label>
-              ))}
-            </div>
-          </fieldset>
-        ) : null}
         <div className="space-y-4">
           <div><label className="block text-sm font-medium text-ink" htmlFor={`${id}-subject`}>科別</label>
             <span className="relative block"><select id={`${id}-subject`} className={FIELD_CLASS} value={filters.subject} onChange={(event) => updateFilter("subject", event.target.value)}>
@@ -171,7 +153,7 @@ export function WrongQuestionPdfWorkspace({ questions, currentSession, sessions,
         </div>
         <div className="mt-5 border-t border-slate-200 pt-4">
           <p className="text-sm font-semibold text-ink" aria-live="polite">共 {items.length} 題 · {subjectCount} 科</p>
-          <p className="mt-1 text-xs leading-5 text-slate-500">依科別、章節排列，同一題只收一次。保留題目與附圖，不附答案。</p>
+          <p className="mt-1 text-xs leading-5 text-slate-500">依預設科目順序排列，同卷按原題號排序，保留章節標示。同一題只收一次，含附圖、不附答案。</p>
           {scope === "history" ? <p className="mt-2 text-xs leading-5 text-slate-500">包含已完成的散題、模擬考及自訂卷。曾答錯即列入，即使後來答對。{!demo ? "依目前已載入的作答紀錄匯出。" : ""}</p> : null}
           {dateInvalid ? <p className="mt-3 text-sm text-rose-700" role="alert">結束日期需晚於或等於開始日期。</p> : null}
           {result.missingQuestionCount > 0 ? <p className="mt-3 text-sm text-amber-800" role="status">另有 {result.missingQuestionCount} 題找不到題目內容，未列入匯出。</p> : null}
@@ -204,7 +186,7 @@ export function WrongQuestionPdfExport({ questions, currentSession, demoSessions
   const [open, setOpen] = useState(false);
   const [sessions, setSessions] = useState<QuizSession[]>([]);
   useEffect(() => {
-    if (!open || demoSessions !== undefined) return;
+    if (!open || currentSession || demoSessions !== undefined) return;
     const refresh = () => setSessions(loadCompletedSessions({ includeFullLocalHistory: true }));
     refresh();
     window.addEventListener("completed-sessions-change", refresh);
@@ -213,13 +195,13 @@ export function WrongQuestionPdfExport({ questions, currentSession, demoSessions
       window.removeEventListener("completed-sessions-change", refresh);
       window.removeEventListener("completed-question-history-change", refresh);
     };
-  }, [open, demoSessions]);
+  }, [open, currentSession, demoSessions]);
   function close() { dialogRef.current?.close(); setOpen(false); triggerRef.current?.focus(); }
   return <>
     <button ref={triggerRef} type="button" onClick={() => { setOpen(true); dialogRef.current?.showModal(); }} className={triggerClassName ?? "inline-flex min-h-11 items-center justify-center gap-2 rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-semibold text-slate-700 transition hover:bg-slate-50"}><Printer size={16} aria-hidden="true" />匯出錯題 PDF</button>
     <dialog ref={dialogRef} aria-labelledby={titleId} onCancel={close} onClose={() => { setOpen(false); triggerRef.current?.focus(); }} className="m-auto max-h-[92dvh] w-[calc(100%_-_24px)] max-w-[1120px] overflow-y-auto rounded-xl border border-slate-200 bg-[color:var(--surface)] p-5 text-ink shadow-xl backdrop:bg-black/40 sm:p-7">
-      <div className="mb-6 flex items-start justify-between gap-3"><div><h2 id={titleId} className="text-xl font-semibold">匯出錯題 PDF</h2><p className="mt-1 text-sm text-slate-500">把錯題整理成一份能手寫訂正的練習單。</p></div><button type="button" aria-label="關閉匯出設定" onClick={close} className="flex min-h-11 min-w-11 items-center justify-center rounded-lg hover:bg-slate-100"><X size={20} /></button></div>
-      {open ? <WrongQuestionPdfWorkspace questions={questions} currentSession={currentSession} sessions={demoSessions ?? sessions} initialScope={currentSession ? "current" : "history"} demo={demo || demoSessions !== undefined} /> : null}
+      <div className="mb-6 flex items-start justify-between gap-3"><div><h2 id={titleId} className="text-xl font-semibold">匯出錯題 PDF</h2><p className="mt-1 text-sm text-slate-500">{currentSession ? "匯出本次錯題，留白手寫訂正。" : "依科別、章節與日期篩選歷次錯題。"}</p></div><button type="button" aria-label="關閉匯出設定" onClick={close} className="flex min-h-11 min-w-11 items-center justify-center rounded-lg hover:bg-slate-100"><X size={20} /></button></div>
+      {open ? <WrongQuestionPdfWorkspace questions={questions} currentSession={currentSession} sessions={demoSessions ?? sessions} demo={demo || demoSessions !== undefined} /> : null}
     </dialog>
   </>;
 }

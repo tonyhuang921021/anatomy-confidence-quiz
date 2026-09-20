@@ -16,11 +16,11 @@ function validPosition(position: EntryPosition | undefined): position is EntryPo
 const CONTEXTS = [
   {
     id: "results", label: "結果頁", title: "這次答錯的題目，直接整理成練習單。",
-    description: "入口放在作答結果上方的操作列。打開後預設「本次作答」，選好每題留白就能匯出。"
+    description: "入口放在作答結果上方的操作列。固定匯出本次錯題，選好每題留白就能匯出。"
   },
   {
     id: "review", label: "錯題複習頁", title: "挑好科別、章節與日期，整理歷次錯題。",
-    description: "入口放在「開始散題待複習」旁邊。打開後預設歷次錯題，可再選擇科別、章節及作答日期。"
+    description: "入口放在「開始散題待複習」旁邊。固定匯出歷次錯題，可選擇科別、章節及作答日期。"
   }
 ] as const;
 

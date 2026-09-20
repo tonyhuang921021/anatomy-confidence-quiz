@@ -1,3 +1,4 @@
+import { MED1_SUBJECTS, MED2_SUBJECTS } from "../data/subjectOrder";
 import { getQuestionPrimaryTag } from "./analysisPrimaryTag";
 import { tokenizeQuestionText } from "./questionTextFormat";
 import type { OptionKey, Question, QuizSession } from "../types/quiz";
@@ -14,6 +15,41 @@ export const EMPTY_PDF_FILTERS: WrongQuestionPdfFilters = {
   subject: "", chapter: "", dateFrom: "", dateTo: ""
 };
 const OPTION_KEYS: OptionKey[] = ["A", "B", "C", "D", "E"];
+const SUBJECT_ORDER = new Map([...MED1_SUBJECTS, ...MED2_SUBJECTS].map((subject, index) => [subject, index]));
+
+function getPdfExamYear(question: Question) {
+  const year = question.sourceYear;
+  if (!year || !Number.isFinite(year) || year < 0) return 0;
+  return year >= 1912 ? year : year + 1911;
+}
+
+function getPdfPaperKey(question: Question) {
+  const sourceId = question.id.match(/^MOEX-([^-]+)-([^-]+)-Q\d+/);
+  return [question.examCode || sourceId?.[1] || "", question.paperCode || sourceId?.[2] || ""].join("/");
+}
+
+function getPdfQuestionNumber(question: Question) {
+  const number = question.originalQuestionNumber;
+  return number !== undefined && Number.isInteger(number) && number > 0 ? number : Number.MAX_SAFE_INTEGER;
+}
+
+function comparePdfQuestions(left: Question, right: Question) {
+  const subjectComparison =
+    (SUBJECT_ORDER.get(left.subject) ?? Number.MAX_SAFE_INTEGER) - (SUBJECT_ORDER.get(right.subject) ?? Number.MAX_SAFE_INTEGER) ||
+    left.subject.localeCompare(right.subject, "zh-Hant");
+  if (subjectComparison) return subjectComparison;
+
+  const examComparison = getPdfExamYear(right) - getPdfExamYear(left) ||
+    (right.sourceRound ?? 0) - (left.sourceRound ?? 0);
+  if (examComparison) return examComparison;
+
+  const leftPaper = getPdfPaperKey(left);
+  const rightPaper = getPdfPaperKey(right);
+  const paperComparison = Number(leftPaper === "/") - Number(rightPaper === "/") ||
+    leftPaper.localeCompare(rightPaper, "en", { numeric: true });
+  return paperComparison || getPdfQuestionNumber(left) - getPdfQuestionNumber(right) ||
+    left.id.localeCompare(right.id, "en", { numeric: true });
+}
 
 export function getPdfChapter(question: Question) {
   // Use the same verified classification that the results analysis displays.
@@ -70,12 +106,7 @@ export function collectWrongQuestionPdfItems(
     }
   }
   const items = [...selected.values()].sort((left, right) =>
-    left.question.subject.localeCompare(right.question.subject, "zh-Hant") ||
-    left.chapter.localeCompare(right.chapter, "zh-Hant") ||
-    (right.question.sourceYear ?? 0) - (left.question.sourceYear ?? 0) ||
-    (right.question.sourceRound ?? 0) - (left.question.sourceRound ?? 0) ||
-    (left.question.originalQuestionNumber ?? 0) - (right.question.originalQuestionNumber ?? 0) ||
-    left.question.id.localeCompare(right.question.id)
+    comparePdfQuestions(left.question, right.question)
   );
   return { items, missingQuestionCount: missingQuestionIds.size, unknownDateCount: unknownDateQuestionIds.size };
 }
