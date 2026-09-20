@@ -4,3 +4,5 @@ reports
 .pycache
 *.log
 tsconfig.tsbuildinfo
+
+output/

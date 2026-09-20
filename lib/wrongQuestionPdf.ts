@@ -9,6 +9,7 @@ export type WrongQuestionPdfFilters = {
   chapter: string;
   dateFrom: string;
   dateTo: string;
+  recentCount?: number;
 };
 export type WrongQuestionPdfItem = { question: Question; chapter: string; answeredAt: string };
 export const EMPTY_PDF_FILTERS: WrongQuestionPdfFilters = {
@@ -78,6 +79,7 @@ export function collectWrongQuestionPdfItems(
   }
   // Canonical question data and current classification take priority over older snapshots.
   for (const question of questions) questionMap.set(question.id, question);
+  const recentCount = Number.isSafeInteger(filters.recentCount) && filters.recentCount! > 0 ? filters.recentCount : undefined;
   const selected = new Map<string, WrongQuestionPdfItem>();
   const missingQuestionIds = new Set<string>();
   const unknownDateQuestionIds = new Set<string>();
@@ -86,7 +88,7 @@ export function collectWrongQuestionPdfItems(
     for (const attempt of session.attempts) {
       if (attempt.isCorrect !== false || !OPTION_KEYS.includes(attempt.selectedAnswer)) continue;
       const day = taiwanAnswerDate(attempt.answeredAt);
-      if ((filters.dateFrom || filters.dateTo) && !day) {
+      if ((filters.dateFrom || filters.dateTo || recentCount) && !day) {
         unknownDateQuestionIds.add(attempt.questionId);
         continue;
       }
@@ -100,14 +102,19 @@ export function collectWrongQuestionPdfItems(
       if (filters.subject && question.subject !== filters.subject) continue;
       if (filters.chapter && chapter !== filters.chapter) continue;
       const previous = selected.get(question.id);
-      if (!previous || Date.parse(attempt.answeredAt) > Date.parse(previous.answeredAt)) {
+      if (!previous || (day && (!taiwanAnswerDate(previous.answeredAt) || Date.parse(attempt.answeredAt) > Date.parse(previous.answeredAt)))) {
         selected.set(question.id, { question, chapter, answeredAt: attempt.answeredAt });
       }
     }
   }
-  const items = [...selected.values()].sort((left, right) =>
-    comparePdfQuestions(left.question, right.question)
-  );
+  for (const id of selected.keys()) unknownDateQuestionIds.delete(id);
+  let items = [...selected.values()];
+  if (recentCount) {
+    items = items.sort((left, right) =>
+      Date.parse(right.answeredAt) - Date.parse(left.answeredAt) || comparePdfQuestions(left.question, right.question)
+    ).slice(0, recentCount);
+  }
+  items.sort((left, right) => comparePdfQuestions(left.question, right.question));
   return { items, missingQuestionCount: missingQuestionIds.size, unknownDateCount: unknownDateQuestionIds.size };
 }
 
@@ -176,14 +183,11 @@ img { display: block; max-width: 100%; max-height: 85mm; object-fit: contain; ob
 .note-space { margin-top: 3mm; border-top: .2mm solid #ddd; }
 sub, sup { line-height: 0; font-size: .75em; }
 .empty { padding: 25mm 0; text-align: center; color: #777; }
-.print-toolbar { font: 14px/1.5 system-ui,sans-serif; display: none; padding: 12px 20px; background: white; border-bottom: 1px solid #ddd; }
-.print-toolbar button { padding: 8px 16px; margin-right: 12px; font: inherit; cursor: pointer; }
 .image-error { color: #a00; }
 @media print {
   html, body { background: white; }
   .paper { width: auto; min-height: 0; padding: 0; margin: 0; }
-  .print-toolbar { display: none !important; }
   h1, h2, .source, .metadata { color: black; }
 }
-</style></head><body><div class="print-toolbar"><button type="button" id="print-button" disabled>列印／另存 PDF</button><span id="print-status">正在準備題目圖片…</span></div><main class="paper"><h1>錯題練習單</h1><p class="subtitle">國考刷題 · 自主練習</p><div class="metadata"><span>${escapeHtml(scopeLabel)} · 共 ${items.length} 題</span><span>${escapeHtml(dateLabel)}</span></div>${body || '<p class="empty">沒有符合條件的錯題</p>'}</main></body></html>`;
+</style></head><body><main class="paper"><h1>錯題練習單</h1><p class="subtitle">國考刷題 · 自主練習</p><div class="metadata"><span>${escapeHtml(scopeLabel)} · 共 ${items.length} 題</span><span>${escapeHtml(dateLabel)}</span></div>${body || '<p class="empty">沒有符合條件的錯題</p>'}</main></body></html>`;
 }

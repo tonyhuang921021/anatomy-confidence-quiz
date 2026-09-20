@@ -26,7 +26,7 @@ test("uses stored custom payload, canonical precedence, and surfaces unavailable
   assert.equal(result.items.find((item) => item.question.id === question.id)?.question.stem, question.stem);
   assert.equal(collectWrongQuestionPdfItems([session([attempt()])], [question], { ...EMPTY_PDF_FILTERS, subject: "生理學" }).items.length, 0);
 });
-test("print markup escapes question content, retains assets and omits private records and answers", () => {
+test("preview markup escapes question content, retains assets and omits private records and answers", () => {
   const items = collectWrongQuestionPdfItems([session([attempt()])], [question]).items;
   const html = buildWrongQuestionPdfHtml({ items, spacingCm: 4, scopeLabel: "本次作答", dateLabel: "全部日期", baseUrl: "https://quiz.example" });
   assert.match(html, /size: A4 portrait/);
@@ -129,4 +129,43 @@ test("duplicate or invalid numbers and missing source metadata have stable ID fa
   const expected = ["dated", "fixture-2", "fixture-10", "missing-2", "missing-3", "missing-10"];
   assert.deepEqual(sortedFixtureIds(fixtures), expected);
   assert.deepEqual(sortedFixtureIds([...fixtures].reverse()), expected);
+});
+
+
+test("recent limit takes distinct latest wrong attempts after filters, then restores subject and question order", () => {
+  const fixtures: Question[] = [
+    { ...question, id: "anatomy-2", originalQuestionNumber: 2 },
+    { ...question, id: "anatomy-1", originalQuestionNumber: 1 },
+    { ...question, id: "physiology", subject: "生理學" },
+    { ...question, id: "oldest" }
+  ];
+  const attempts = [
+    attempt({ questionId: "anatomy-2", answeredAt: "2026-09-20T04:00:00Z" }),
+    attempt({ questionId: "anatomy-1", answeredAt: "2026-09-20T01:00:00Z" }),
+    attempt({ questionId: "physiology", answeredAt: "2026-09-20T03:00:00Z" }),
+    attempt({ questionId: "oldest", answeredAt: "2026-09-19T01:00:00Z" }),
+    attempt({ questionId: "oldest", answeredAt: "2026-09-20T05:00:00Z", isCorrect: true }),
+    attempt({ questionId: "anatomy-1", answeredAt: "2026-09-20T02:00:00Z" })
+  ];
+  const collect = (filters: Partial<typeof EMPTY_PDF_FILTERS>) => collectWrongQuestionPdfItems([session(attempts)], fixtures, { ...EMPTY_PDF_FILTERS, ...filters }).items;
+  assert.deepEqual(collect({ recentCount: 2 }).map((item) => item.question.id), ["anatomy-2", "physiology"]);
+  assert.deepEqual(collect({ recentCount: 3 }).map((item) => item.question.id), ["anatomy-1", "anatomy-2", "physiology"]);
+  assert.deepEqual(collect({ subject: "解剖學", chapter: "腹部", recentCount: 2, dateFrom: "2026-09-20", dateTo: "2026-09-20" }).map((item) => item.question.id), ["anatomy-1", "anatomy-2"]);
+  assert.equal(collect({ recentCount: 50 }).length, 4);
+  assert.equal(collect({ recentCount: 3 })[0].answeredAt, "2026-09-20T02:00:00Z");
+});
+
+test("recent filter ties are deterministic, excludes unknown dates and accepts later valid dates", () => {
+  const fixtures = [question, { ...question, id: "unknown" }, { ...question, id: "same-time" }];
+  const attempts = [attempt({ answeredAt: "invalid" }), attempt(), attempt({ questionId: "unknown", answeredAt: "invalid" }), attempt({ questionId: "same-time" })];
+  const filters = { ...EMPTY_PDF_FILTERS, recentCount: 1 };
+  const first = collectWrongQuestionPdfItems([session(attempts)], fixtures, filters);
+  const reversed = collectWrongQuestionPdfItems([session([...attempts].reverse())], fixtures, filters);
+  assert.deepEqual(first.items, reversed.items);
+  assert.equal(first.unknownDateCount, 1);
+  assert.equal(first.items[0].answeredAt, attempt().answeredAt);
+  const unlimited = collectWrongQuestionPdfItems([session(attempts)], fixtures);
+  assert.equal(unlimited.items.find((item) => item.question.id === question.id)?.answeredAt, attempt().answeredAt);
+  assert.equal(unlimited.items.length, 3);
+  assert.equal(collectWrongQuestionPdfItems([session(attempts)], fixtures, { ...filters, recentCount: 5 }).items.length, 2);
 });
