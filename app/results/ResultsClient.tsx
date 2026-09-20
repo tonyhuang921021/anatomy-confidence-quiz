@@ -12,6 +12,7 @@ import { QuestionOptionBlock, QuestionStemBlock } from "@/components/QuestionMed
 import { QuestionExplanationTabs } from "@/components/QuestionExplanationTabs";
 import { QuestionReportButton } from "@/components/QuestionIssueReportButton";
 import { RelatedQuestionsPanel } from "@/components/RelatedQuestionsPanel";
+import { WrongQuestionPdfExport } from "@/components/WrongQuestionPdfExport";
 import { ResultSummary } from "@/components/ResultSummary";
 import { CURRENT_ANSWER_KEY_REVISION } from "@/lib/answerKeyRevisions";
 import { SavedQuestionButton } from "@/components/SavedQuestionButton";
@@ -3204,6 +3205,7 @@ function ResultsPageContent() {
           ) : null}
         </div>
         <div className="flex flex-wrap gap-3">
+          <WrongQuestionPdfExport currentSession={activeSession} questions={[...allQuestions, ...questionMap.values()]} />
           <Link
             href={resultsScope === "simulation" ? "/simulation-results" : "/results"}
             className="min-h-12 rounded-2xl bg-slate-100 px-5 py-4 text-sm font-semibold text-slate-800 transition hover:bg-slate-200"

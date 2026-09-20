@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useAuth } from "@/components/AuthProvider";
+import { WrongQuestionPdfExport } from "@/components/WrongQuestionPdfExport";
 import { ReviewYearRangeFilter } from "@/components/ReviewYearRangeFilter";
 import { useCloudHistoryHydration } from "@/components/useCloudHistoryHydration";
 import {
@@ -329,6 +330,7 @@ export default function ReviewPage() {
             <p className="mt-2 text-sm text-slate-500">散題錯題與低信心題，依複習狀態接續安排。</p>
           </div>
           <div className="flex flex-wrap gap-3">
+            <WrongQuestionPdfExport questions={allQuestions} />
             <Link
               href={getPracticeReviewHref(unresolvedPracticeItems)}
               onClick={(event) => {

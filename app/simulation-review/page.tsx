@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useAuth } from "@/components/AuthProvider";
+import { WrongQuestionPdfExport } from "@/components/WrongQuestionPdfExport";
 import { ReviewYearRangeFilter } from "@/components/ReviewYearRangeFilter";
 import { useCloudHistoryHydration } from "@/components/useCloudHistoryHydration";
 import {
@@ -276,6 +277,7 @@ export default function SimulationReviewPage() {
             </p>
           </div>
           <div className="flex flex-wrap gap-3">
+            <WrongQuestionPdfExport questions={allQuestions} />
             <Link
               href="/simulation"
               className="min-h-12 rounded-2xl bg-slate-100 px-5 py-4 text-sm font-semibold text-slate-800 transition hover:bg-slate-200"
