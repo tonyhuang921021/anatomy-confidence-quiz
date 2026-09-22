@@ -1,0 +1,461 @@
+{
+  "verifiedOn": "2026-09-22",
+  "questionCount": 19,
+  "fieldCount": 22,
+  "occurrenceCount": 26,
+  "scope": "PDF presentation only; exact question ID, field and original text must match.",
+  "patches": [
+    {
+      "question_id": "MOEX-100140-1101-Q003",
+      "field": "B",
+      "old_text": "伸長肌（extensor hallucis longus）",
+      "new_text": "伸踇長肌（extensor hallucis longus）",
+      "old_text_sha256": "123eb0aa42a422fda5c3a64fe258d132e70ad2d4ffedfb3c03c4ae3576545493",
+      "status": "original_pdf_glyph_verified",
+      "sources": [
+        {
+          "file": "100140_1101.pdf",
+          "sha256": "0ae63a7f34a8f246e91811f20ef4587d2a028c1bd441c94ba441e0d1c1debfd7",
+          "page": 1,
+          "code": "U+EEE7",
+          "glyphIds": [
+            3817
+          ]
+        }
+      ]
+    },
+    {
+      "question_id": "MOEX-100140-1101-Q004",
+      "field": "D",
+      "old_text": "屈（flex the great toe）",
+      "new_text": "踇屈（flex the great toe）",
+      "old_text_sha256": "34f0d3aadf20904a34939528f622a9b3186bf2f897b81c2489cf1f7e21ac1d86",
+      "status": "original_pdf_glyph_verified",
+      "sources": [
+        {
+          "file": "100140_1101.pdf",
+          "sha256": "0ae63a7f34a8f246e91811f20ef4587d2a028c1bd441c94ba441e0d1c1debfd7",
+          "page": 1,
+          "code": "U+EEE7",
+          "glyphIds": [
+            3817
+          ]
+        }
+      ]
+    },
+    {
+      "question_id": "moex-med1-supplement-v5-100140-1101-051",
+      "field": "B",
+      "old_text": "疹（herpes）",
+      "new_text": "疱疹（herpes）",
+      "old_text_sha256": "87dea1eb876588881aa196651c0a02562a602b661af71ea3931e0aeb5795b81e",
+      "status": "original_pdf_glyph_verified",
+      "sources": [
+        {
+          "file": "100140_1101.pdf",
+          "sha256": "0ae63a7f34a8f246e91811f20ef4587d2a028c1bd441c94ba441e0d1c1debfd7",
+          "page": 4,
+          "code": "U+E2CC",
+          "glyphIds": [
+            718
+          ]
+        }
+      ]
+    },
+    {
+      "question_id": "MOEX-112100-1301-Q030",
+      "field": "C",
+      "old_text": "屈長肌（flexor hallucis longus）",
+      "new_text": "屈踇長肌（flexor hallucis longus）",
+      "old_text_sha256": "98d3a5d1a54a715ef4f8eed95cff4209001e93cc9c68fb8d1280de856a35cacb",
+      "status": "original_pdf_glyph_verified",
+      "sources": [
+        {
+          "file": "112100_1301.pdf",
+          "sha256": "3455ab97f84450b066cac143cfc11a6e115d612f9ff5d546d1abf22f8ed33c15",
+          "page": 6,
+          "code": "U+EEE7",
+          "glyphIds": []
+        }
+      ]
+    },
+    {
+      "question_id": "MOEX-100140-1101-Q045",
+      "field": "A",
+      "old_text": "單純疹病毒（herpes simplex virus）",
+      "new_text": "單純疱疹病毒（herpes simplex virus）",
+      "old_text_sha256": "ecb860d7b72720d86519e606b42143f0a2eed993bccb78f5295032d2d7ad3b6f",
+      "status": "original_pdf_glyph_verified",
+      "sources": [
+        {
+          "file": "100140_1101.pdf",
+          "sha256": "0ae63a7f34a8f246e91811f20ef4587d2a028c1bd441c94ba441e0d1c1debfd7",
+          "page": 4,
+          "code": "U+E2CC",
+          "glyphIds": [
+            718
+          ]
+        }
+      ]
+    },
+    {
+      "question_id": "MOEX-100140-1101-Q048",
+      "field": "A",
+      "old_text": "疹性咽峽炎（herpangina）",
+      "new_text": "疱疹性咽峽炎（herpangina）",
+      "old_text_sha256": "5eeca7ce9f3e8f79859aa40783450b682e48f7339403a652c21bb79d08a1bd0c",
+      "status": "original_pdf_glyph_verified",
+      "sources": [
+        {
+          "file": "100140_1101.pdf",
+          "sha256": "0ae63a7f34a8f246e91811f20ef4587d2a028c1bd441c94ba441e0d1c1debfd7",
+          "page": 4,
+          "code": "U+E2CC",
+          "glyphIds": [
+            718
+          ]
+        }
+      ]
+    },
+    {
+      "question_id": "MOEX-100140-1101-Q070",
+      "field": "stem",
+      "old_text": "一位患有尋常天瘡（Pemphigus vulgaris）的孕婦，剛剛平安產下 3000 公克的小男嬰，但是隨即發現小男嬰身上及四肢分布有紅斑，有些紅斑上有小水，因此迅速被送入新生兒加護病房治療。他的病因為何？",
+      "new_text": "一位患有尋常天疱瘡（Pemphigus vulgaris）的孕婦，剛剛平安產下 3000 公克的小男嬰，但是隨即發現小男嬰身上及四肢分布有紅斑，有些紅斑上有小水疱，因此迅速被送入新生兒加護病房治療。他的病因為何？",
+      "old_text_sha256": "4511812938758901feb471f0521ad04845f24560e5b45f162ae7e2e3a120a0b6",
+      "status": "original_pdf_glyph_verified",
+      "sources": [
+        {
+          "file": "100140_1101.pdf",
+          "sha256": "0ae63a7f34a8f246e91811f20ef4587d2a028c1bd441c94ba441e0d1c1debfd7",
+          "page": 6,
+          "code": "U+E2CC",
+          "glyphIds": [
+            718
+          ]
+        },
+        {
+          "file": "100140_1101.pdf",
+          "sha256": "0ae63a7f34a8f246e91811f20ef4587d2a028c1bd441c94ba441e0d1c1debfd7",
+          "page": 6,
+          "code": "U+E2CC",
+          "glyphIds": [
+            718
+          ]
+        }
+      ]
+    },
+    {
+      "question_id": "MOEX-101030-1101-Q031",
+      "field": "stem",
+      "old_text": "下列何者與尾畸胎瘤（sacrococcygeal teratoma）的形成有關？",
+      "new_text": "下列何者與骶尾畸胎瘤（sacrococcygeal teratoma）的形成有關？",
+      "old_text_sha256": "e0c4ea4aa55264c846937f8c1be1457b0206d4d669197dcc99c0304edf225861",
+      "status": "original_pdf_glyph_verified",
+      "sources": [
+        {
+          "file": "101030_1101.pdf",
+          "sha256": "fd038ac5b4edc6634448ca10b96ada35dfbe40b0e13b4c5486c51bd505a80822",
+          "page": 3,
+          "code": "U+E2E2",
+          "glyphIds": [
+            740
+          ]
+        }
+      ]
+    },
+    {
+      "question_id": "MOEX-101030-1101-Q051",
+      "field": "stem",
+      "old_text": "單純疹病毒（Herpes simplex virus）之治療藥物樂威素（Acyclovir），其抑制病毒複製之機轉為何？",
+      "new_text": "單純疱疹病毒（Herpes simplex virus）之治療藥物樂威素（Acyclovir），其抑制病毒複製之機轉為何？",
+      "old_text_sha256": "1b6c368457924d9fc8e10de3ebc79da23696885405a3768bb08c21f009fb24a9",
+      "status": "original_pdf_glyph_verified",
+      "sources": [
+        {
+          "file": "101030_1101.pdf",
+          "sha256": "fd038ac5b4edc6634448ca10b96ada35dfbe40b0e13b4c5486c51bd505a80822",
+          "page": 4,
+          "code": "U+E2CC",
+          "glyphIds": [
+            718
+          ]
+        }
+      ]
+    },
+    {
+      "question_id": "MOEX-101030-1101-Q055",
+      "field": "A",
+      "old_text": "單純疹病毒（Herpes simplex virus）",
+      "new_text": "單純疱疹病毒（Herpes simplex virus）",
+      "old_text_sha256": "68a7af9c07c0b1996652e8b71d3cb7f456989407f37c019a7e7de4fcf0611461",
+      "status": "original_pdf_glyph_verified",
+      "sources": [
+        {
+          "file": "101030_1101.pdf",
+          "sha256": "fd038ac5b4edc6634448ca10b96ada35dfbe40b0e13b4c5486c51bd505a80822",
+          "page": 4,
+          "code": "U+E2CC",
+          "glyphIds": [
+            718
+          ]
+        }
+      ]
+    },
+    {
+      "question_id": "MOEX-100030-1101-Q039",
+      "field": "B",
+      "old_text": "硬（hard palate）",
+      "new_text": "硬腭（hard palate）",
+      "old_text_sha256": "3c9ba2b41ce34ece8042a46e40f131c3ec18fff4e916bd4b217354173fa423d6",
+      "status": "original_pdf_glyph_verified",
+      "sources": [
+        {
+          "file": "100030_1101.pdf",
+          "sha256": "6e64c0c8bb0a6ce41c7e02494c70cd925bba4c8a6e7f6a0f98b9f081580d000b",
+          "page": 3,
+          "code": "U+E2C8",
+          "glyphIds": [
+            714
+          ]
+        }
+      ]
+    },
+    {
+      "question_id": "MOEX-100030-1101-Q054",
+      "field": "stem",
+      "old_text": "抑制單純疹病毒之藥物acyclovir，其標的為何？",
+      "new_text": "抑制單純疱疹病毒之藥物acyclovir，其標的為何？",
+      "old_text_sha256": "706c205ac6a8671fe0244e1f856027baa1b297e6b4c0243ab0e8adb8a948def1",
+      "status": "original_pdf_glyph_verified",
+      "sources": [
+        {
+          "file": "100030_1101.pdf",
+          "sha256": "6e64c0c8bb0a6ce41c7e02494c70cd925bba4c8a6e7f6a0f98b9f081580d000b",
+          "page": 4,
+          "code": "U+EF43",
+          "glyphIds": [
+            3909
+          ]
+        }
+      ]
+    },
+    {
+      "question_id": "MOEX-100030-1101-Q055",
+      "field": "C",
+      "old_text": "單純疹病毒（Herpes simplex virus）",
+      "new_text": "單純疱疹病毒（Herpes simplex virus）",
+      "old_text_sha256": "1d0a29675ebd95d2dd2859f36a1e81f7b67cf56a9fc3ffdedd6adcee7066ef8e",
+      "status": "original_pdf_glyph_verified",
+      "sources": [
+        {
+          "file": "100030_1101.pdf",
+          "sha256": "6e64c0c8bb0a6ce41c7e02494c70cd925bba4c8a6e7f6a0f98b9f081580d000b",
+          "page": 5,
+          "code": "U+EF43",
+          "glyphIds": [
+            3909
+          ]
+        }
+      ]
+    },
+    {
+      "question_id": "MOEX-100030-1101-Q057",
+      "field": "stem",
+      "old_text": "下列有關疹病毒（Herpesvirus）之敘述，何者錯誤？",
+      "new_text": "下列有關疱疹病毒（Herpesvirus）之敘述，何者錯誤？",
+      "old_text_sha256": "b4a0275b411532b45a2922af1e5744f2083f883225505cf3d0781db6b66f34ba",
+      "status": "original_pdf_glyph_verified",
+      "sources": [
+        {
+          "file": "100030_1101.pdf",
+          "sha256": "6e64c0c8bb0a6ce41c7e02494c70cd925bba4c8a6e7f6a0f98b9f081580d000b",
+          "page": 5,
+          "code": "U+EF43",
+          "glyphIds": [
+            3909
+          ]
+        }
+      ]
+    },
+    {
+      "question_id": "MOEX-100030-1101-Q057",
+      "field": "B",
+      "old_text": "唇部疹（cold sore）主要由第一型單純疹病毒（HSV-1）所引起",
+      "new_text": "唇部疱疹（cold sore）主要由第一型單純疱疹病毒（HSV-1）所引起",
+      "old_text_sha256": "da6a1d7f42024dbe26ce1d46f6abbb41c20dcf76a39625cd02e0796d4d33df07",
+      "status": "original_pdf_glyph_verified",
+      "sources": [
+        {
+          "file": "100030_1101.pdf",
+          "sha256": "6e64c0c8bb0a6ce41c7e02494c70cd925bba4c8a6e7f6a0f98b9f081580d000b",
+          "page": 5,
+          "code": "U+EF43",
+          "glyphIds": [
+            3909
+          ]
+        },
+        {
+          "file": "100030_1101.pdf",
+          "sha256": "6e64c0c8bb0a6ce41c7e02494c70cd925bba4c8a6e7f6a0f98b9f081580d000b",
+          "page": 5,
+          "code": "U+EF43",
+          "glyphIds": [
+            3909
+          ]
+        }
+      ]
+    },
+    {
+      "question_id": "MOEX-100030-1101-Q057",
+      "field": "D",
+      "old_text": "人類疹病毒第八型（HHV-8）感染產生卡波西氏肉瘤（Kaposi’s sarcoma）",
+      "new_text": "人類疱疹病毒第八型（HHV-8）感染產生卡波西氏肉瘤（Kaposi’s sarcoma）",
+      "old_text_sha256": "f20a1b69554cf0acdafb319c15e8cb6e0bd84dbcb7cb7d877cac3b02de6d0aa3",
+      "status": "original_pdf_glyph_verified",
+      "sources": [
+        {
+          "file": "100030_1101.pdf",
+          "sha256": "6e64c0c8bb0a6ce41c7e02494c70cd925bba4c8a6e7f6a0f98b9f081580d000b",
+          "page": 5,
+          "code": "U+EF43",
+          "glyphIds": [
+            3909
+          ]
+        }
+      ]
+    },
+    {
+      "question_id": "MOEX-112020-1301-Q028",
+      "field": "C",
+      "old_text": "屈長肌（flexor hallucis longus）",
+      "new_text": "屈踇長肌（flexor hallucis longus）",
+      "old_text_sha256": "98d3a5d1a54a715ef4f8eed95cff4209001e93cc9c68fb8d1280de856a35cacb",
+      "status": "original_pdf_glyph_verified",
+      "sources": [
+        {
+          "file": "112020_1301.pdf",
+          "sha256": "863f6c5c87281915d816040aecf9c7398bafd6d89190c160e7375ded03f0ff0a",
+          "page": 6,
+          "code": "U+EEE7",
+          "glyphIds": [
+            3817
+          ]
+        }
+      ]
+    },
+    {
+      "question_id": "MOEX-101030-2101-Q029",
+      "field": "stem",
+      "old_text": "去氧（deoxyuridylate, dUMP）轉變為胸（thymidylate, dTMP）之反應需要何種輔參與？",
+      "new_text": "去氧尿苷（deoxyuridylate, dUMP）轉變為胸苷（thymidylate, dTMP）之反應需要何種輔參與？",
+      "old_text_sha256": "fd0d208ea71675c9e85116e95c1bd018b498fb97b0e1a197bed5b514c0d9a383",
+      "status": "original_pdf_glyph_verified",
+      "sources": [
+        {
+          "file": "101030_2101.pdf",
+          "sha256": "ac9336ebe3fae6c9d6202496147b2967be50b2470e85417ca1d2ccae547c07d1",
+          "page": 3,
+          "code": "U+EA86",
+          "glyphIds": [
+            2696
+          ]
+        },
+        {
+          "file": "101030_2101.pdf",
+          "sha256": "ac9336ebe3fae6c9d6202496147b2967be50b2470e85417ca1d2ccae547c07d1",
+          "page": 3,
+          "code": "U+EA86",
+          "glyphIds": [
+            744
+          ]
+        },
+        {
+          "file": "101030_2101.pdf",
+          "sha256": "ac9336ebe3fae6c9d6202496147b2967be50b2470e85417ca1d2ccae547c07d1",
+          "page": 3,
+          "code": "U+EA86",
+          "glyphIds": [
+            744
+          ]
+        }
+      ]
+    },
+    {
+      "question_id": "MOEX-101030-2101-Q038",
+      "field": "stem",
+      "old_text": "下列何種 RNA，具最多的修飾核酸？",
+      "new_text": "下列何種 RNA，具最多的修飾核苷酸？",
+      "old_text_sha256": "ad697035893baee6ca5e39f90553d3f42deabc3de450c51b452ed05d6612b826",
+      "status": "original_pdf_glyph_verified",
+      "sources": [
+        {
+          "file": "101030_2101.pdf",
+          "sha256": "ac9336ebe3fae6c9d6202496147b2967be50b2470e85417ca1d2ccae547c07d1",
+          "page": 3,
+          "code": "U+EA86",
+          "glyphIds": [
+            744
+          ]
+        }
+      ]
+    },
+    {
+      "question_id": "MOEX-101110-2101-Q034",
+      "field": "A",
+      "old_text": "遺傳密碼子是由二個核酸（nucleotides）所構成",
+      "new_text": "遺傳密碼子是由二個核苷酸（nucleotides）所構成",
+      "old_text_sha256": "07c87bedf3c59243e4128cbfc4d702c65426984ebf29c5c642b0a13fe110bff0",
+      "status": "original_pdf_glyph_verified",
+      "sources": [
+        {
+          "file": "101110_2101.pdf",
+          "sha256": "4295d524c82831117bad07511fcfd1c2428567f4d1f08483910c579186f863f2",
+          "page": 3,
+          "code": "U+E2E6",
+          "glyphIds": [
+            744
+          ]
+        }
+      ]
+    },
+    {
+      "question_id": "MOEX-101110-2101-Q034",
+      "field": "B",
+      "old_text": "遺傳密碼子是由核酸重複使用所構成",
+      "new_text": "遺傳密碼子是由核苷酸重複使用所構成",
+      "old_text_sha256": "bdf24340d3e773120983cf9df0703d12bac84bbb2944569e4d4a01e95d54e387",
+      "status": "original_pdf_glyph_verified",
+      "sources": [
+        {
+          "file": "101110_2101.pdf",
+          "sha256": "4295d524c82831117bad07511fcfd1c2428567f4d1f08483910c579186f863f2",
+          "page": 3,
+          "code": "U+E2E6",
+          "glyphIds": [
+            744
+          ]
+        }
+      ]
+    },
+    {
+      "question_id": "MOEX-101110-2101-Q035",
+      "field": "D",
+      "old_text": "細胞中過多的 dATP 會抑制核酸還原的作用，而無法產生其他的 dNTP",
+      "new_text": "細胞中過多的 dATP 會抑制核苷酸還原的作用，而無法產生其他的 dNTP",
+      "old_text_sha256": "64602d94aef220c884ee280fdf038127c2d1a3fb5e6d65e94ea8848789b204b5",
+      "status": "original_pdf_glyph_verified",
+      "sources": [
+        {
+          "file": "101110_2101.pdf",
+          "sha256": "4295d524c82831117bad07511fcfd1c2428567f4d1f08483910c579186f863f2",
+          "page": 3,
+          "code": "U+E2E6",
+          "glyphIds": [
+            744
+          ]
+        }
+      ]
+    }
+  ]
+}

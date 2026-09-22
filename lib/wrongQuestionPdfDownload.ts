@@ -1,7 +1,9 @@
 import type { WrongQuestionPdfItem } from "./wrongQuestionPdf";
 
 const FONT_URL = "/fonts/pdf/NotoSerifTC-Regular.otf";
+const FALLBACK_FONT_URL = "/fonts/pdf/NotoSerifCJKtc-Regular.otf";
 let cachedFont: Uint8Array | undefined;
+let cachedFallbackFont: Uint8Array | undefined;
 
 async function fetchAsset(url: string, signal: AbortSignal) {
   const controller = new AbortController();
@@ -71,6 +73,16 @@ export async function downloadWrongQuestionPdf({ items, spacingCm, scopeLabel, d
   checkCancelled();
   const bytes = await createWrongQuestionPdfDocument({
     items, spacingCm, scopeLabel, dateLabel, fontBytes: cachedFont,
+    loadFallbackFont: async () => {
+      checkCancelled();
+      if (!cachedFallbackFont) {
+        onProgress("正在載入補充中文字型…");
+        try { cachedFallbackFont = await fetchAsset(FALLBACK_FONT_URL, signal); }
+        catch { checkCancelled(); throw new Error("補充中文字型未能載入，PDF 尚未下載。請確認網路後重試。"); }
+      }
+      checkCancelled();
+      return cachedFallbackFont;
+    },
     loadImage: (source) => { checkCancelled(); return loadPdfImage(source, signal); },
     onProgress: (completed, total) => { checkCancelled(); onProgress(`正在整理題目 ${completed}／${total}…`); }
   });

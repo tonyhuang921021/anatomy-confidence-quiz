@@ -1,6 +1,7 @@
 import { MED1_SUBJECTS, MED2_SUBJECTS } from "../data/subjectOrder";
 import { getQuestionPrimaryTag } from "./analysisPrimaryTag";
-import { tokenizeQuestionText } from "./questionTextFormat";
+import { normalizeWrongQuestionPdfText, tokenizeWrongQuestionPdfText } from "./wrongQuestionPdfText";
+import { prepareWrongQuestionPdfQuestion } from "./wrongQuestionPdfSourceText";
 import { isFullReviewYearRange, normalizeReviewYearRange, type ReviewYearRange } from "./reviewYearFilter";
 import type { OptionKey, Question, QuizSession } from "../types/quiz";
 
@@ -148,13 +149,13 @@ export function collectWrongQuestionPdfItems(
 }
 
 function escapeHtml(value: string) {
-  return value.replace(/[&<>"']/g, (character) => ({
+  return normalizeWrongQuestionPdfText(value).replace(/[&<>"']/g, (character) => ({
     "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;"
   }[character]!));
 }
 
 function formatText(value: string) {
-  return tokenizeQuestionText(value).map((token) =>
+  return tokenizeWrongQuestionPdfText(value).map((token) =>
     escapeHtml(token.text) +
     (token.subscript ? `<sub>${escapeHtml(token.subscript)}</sub>` : "") +
     (token.superscript ? `<sup>${escapeHtml(token.superscript)}</sup>` : "")
@@ -181,7 +182,8 @@ export function buildWrongQuestionPdfHtml({ items, spacingCm, scopeLabel, dateLa
 }) {
   const spacing = [0, 2, 4, 6].includes(spacingCm) ? spacingCm : 2;
   let previousGroup = "";
-  const body = items.map(({ question, chapter }, index) => {
+  const body = items.map(({ question: originalQuestion, chapter }, index) => {
+    const question = prepareWrongQuestionPdfQuestion(originalQuestion);
     const group = `${question.subject}｜${chapter}`;
     const heading = group === previousGroup ? "" : `<h2>${escapeHtml(group)}</h2>`;
     previousGroup = group;
