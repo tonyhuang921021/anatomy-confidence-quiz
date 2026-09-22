@@ -65,7 +65,9 @@ test("download bytes reopen as A4 with selectable Chinese text, supplied order a
   assert.match(text, /H2O 與 PaCO2/);
   assert.doesNotMatch(text, /PRIVATE_QUESTION_ID|ANSWER_EXPLANATION_SECRET|CONCEPT_SECRET|正確答案|�/);
   assert.deepEqual(progress, [0, 1, 2]);
-  const descendants = document.context.lookup(document.getPage(0).node.Resources()!.lookup(PDFName.of("Font"), PDFDict).entries()[0][1], PDFDict).lookup(PDFName.of("DescendantFonts"), PDFArray);
+  const font = document.context.lookup(document.getPage(0).node.Resources()!.lookup(PDFName.of("Font"), PDFDict).entries()[0][1], PDFDict);
+  assert.equal(String(font.get(PDFName.of("Encoding"))), "/Identity-H");
+  const descendants = font.lookup(PDFName.of("DescendantFonts"), PDFArray);
   const descendant = descendants.lookup(0, PDFDict);
   const descriptor = descendant.lookup(PDFName.of("FontDescriptor"), PDFDict);
   assert.equal(String(descendant.get(PDFName.of("Subtype"))), "/CIDFontType0");
@@ -112,7 +114,7 @@ test("very long Chinese and English text wraps across pages without dropping or 
 });
 
 test("medical numeric runs and subscripts use the same glyph widths as PDF text positioning", async () => {
-  const question = item(77, "有關 vitamin D3 代謝和功能，下列敘述何者最適切？");
+  const question = item(77, "有關 vitamin D3 代謝和功能，下列敘述何者最適切？標點：、（）−，二羥基。");
   question.question.options.A = "1α,25-二羥基維生素 D3（1α,25-dihydroxyvitamin D3）可經由陽光紫外線在皮膚中形成膽鈣化醇（cholecalciferol）";
   question.question.options.B = "1α,25-二羥基維生素 D3（1α,25-dihydroxyvitamin D3）與特定核受體蛋白相互作用來調節基因表現";
   question.question.options.C = "O₂ CO2 HCO₃⁻ NH₄⁺ 10⁻⁶ Kₘ m²";
@@ -129,21 +131,15 @@ test("medical numeric runs and subscripts use the same glyph widths as PDF text 
     const start = (entries[index] as PDFNumber).asNumber();
     (entries[index + 1] as PDFArray).asArray().forEach((width, offset) => widths.set(start + offset, (width as PDFNumber).asNumber()));
   }
-  const encoding = decodeStream(font.lookup(PDFName.of("Encoding")) as PDFRawStream);
-  const glyphToCid = new Map<number, number>();
-  for (const block of encoding.matchAll(/begincidrange([\s\S]*?)endcidrange/g)) {
-    for (const match of block[1].matchAll(/<([a-f\d]+)>\s*<([a-f\d]+)>\s+(\d+)/gi)) {
-      const first = parseInt(match[1], 16), last = parseInt(match[2], 16), cid = Number(match[3]);
-      for (let glyph = first; glyph <= last; glyph += 1) glyphToCid.set(glyph, cid + glyph - first);
-    }
-  }
-  assert.notEqual(glyphToCid.get(16047), 16047, "the TC font's CIDs are not glyph indices");
+  assert.equal(String(font.get(PDFName.of("Encoding"))), "/Identity-H", "Apple readers must receive direct CIDs instead of a custom Encoding CMap");
   const sourceFont = fontkit.create(await fontBytes);
   const charset = (sourceFont as unknown as { "CFF ": { topDict: { charset: { ranges: { offset: number; first: number; nLeft: number }[] } } } })["CFF "].topDict.charset;
-  assert.equal(glyphToCid.get(0), 0);
+  const glyphToCid = new Map<number, number>([[0, 0]]);
   for (const range of charset.ranges) for (let offset = 0; offset <= range.nLeft; offset += 1) {
-    assert.equal(glyphToCid.get(range.offset + offset + 1), range.first + offset, "each PDF character code maps to the original CFF charset CID");
+    glyphToCid.set(range.offset + offset + 1, range.first + offset);
   }
+  assert.notEqual(glyphToCid.get(16047), 16047, "the TC font's CIDs are not glyph indices");
+  assert.ok(text.includes("標點：、（）−，二羥基。"), "ToUnicode must preserve the punctuation and Han characters affected in Apple readers");
   const runs = Array.from(commands.matchAll(/BT([\s\S]*?)ET/g)).map((block) => {
     const size = Number(block[1].match(/\S+ ([\d.]+) Tf/)![1]);
     const position = block[1].match(/1 0 0 1 ([\d.-]+) ([\d.-]+) Tm/)!;
@@ -151,7 +147,10 @@ test("medical numeric runs and subscripts use the same glyph widths as PDF text 
     const runText = codes.map((code) => glyphs.get(code.toUpperCase()) ?? "�").join("");
     let advance = 0;
     for (const code of codes) {
-      const width = widths.get(glyphToCid.get(parseInt(code, 16))!);
+      const cid = parseInt(code, 16);
+      const character = glyphs.get(code.toUpperCase())!;
+      assert.equal(cid, glyphToCid.get(sourceFont.glyphForCodePoint(character.codePointAt(0)!).id), "every text code and ToUnicode key must be the actual CFF charset CID");
+      const width = widths.get(cid);
       assert.notEqual(width, undefined, "every drawn glyph needs an explicit PDF width; no default-width fallback");
       advance += width! * size / 1000;
     }

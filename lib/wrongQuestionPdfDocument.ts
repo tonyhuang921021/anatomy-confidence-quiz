@@ -1,5 +1,5 @@
 import fontkit from "@pdf-lib/fontkit";
-import { PDFArray, PDFDict, PDFDocument, PDFName, PDFNumber, PDFRef, PDFString, PageSizes, rgb, type PDFFont, type PDFImage, type PDFPage } from "pdf-lib";
+import { PDFArray, PDFContentStream, PDFDict, PDFDocument, PDFName, PDFNumber, PDFRawStream, PDFRef, PDFString, PageSizes, decodePDFRawStream, rgb, type PDFFont, type PDFImage, type PDFPage } from "pdf-lib";
 import { tokenizeWrongQuestionPdfText } from "./wrongQuestionPdfText";
 import { prepareWrongQuestionPdfQuestion } from "./wrongQuestionPdfSourceText";
 import type { WrongQuestionPdfItem } from "./wrongQuestionPdf";
@@ -48,7 +48,8 @@ function sourceLabel(question: WrongQuestionPdfItem["question"]) {
 
 /** A CID-keyed CFF charset maps glyph indices to CIDs. They are not generally
  * interchangeable (the smaller Noto TC font retains sparse original CIDs).
- * Use an explicit PDF Encoding CMap while keeping text codes/ToUnicode as GIDs.
+ * Emit actual CIDs with Identity-H, including in ToUnicode. Apple readers can
+ * select wrong/missing glyphs through a custom GID-to-CID Encoding CMap.
  * Embed the original CFF table unchanged: readers disagree about the OpenType
  * wrapper's CID selection, whereas CIDFontType0C has one unambiguous mapping.
  */
@@ -84,24 +85,39 @@ function embedOriginalCidCff(document: PDFDocument, font: PDFFont, fontBytes: Ui
   const registry = PDFString.of(cff.string(registryId));
   const ordering = PDFString.of(cff.string(orderingId));
   const systemInfo = { Registry: registry, Ordering: ordering, Supplement: supplement };
-  const hex = (code: number) => `<${code.toString(16).padStart(4, "0")}>`;
-  const ranges: string[] = [];
-  for (let first = 0; first < glyphToCid.length;) {
-    let last = first;
-    while (last + 1 < glyphToCid.length && glyphToCid[last + 1] === glyphToCid[last] + 1) last += 1;
-    ranges.push(`${hex(first)} ${hex(last)} ${glyphToCid[first]}`);
-    first = last + 1;
+  const cidHex = (code: string) => {
+    const cid = glyphToCid[parseInt(code, 16)];
+    if (code.length !== 4 || cid === undefined) throw new Error("PDF 字型字碼對應不完整，未產生檔案。");
+    return cid.toString(16).padStart(4, "0").toUpperCase();
+  };
+  // This renderer uses one font and emits hex Tj text operators. Convert those
+  // codes after the final draw/flush, without modifying embedded image streams.
+  for (const page of document.getPages()) {
+    const contents = page.node.Contents();
+    const references = contents instanceof PDFArray ? contents.asArray() : [contents];
+    for (const reference of references) {
+      if (!(reference instanceof PDFRef)) throw new Error("PDF 文字編碼失敗，未產生檔案。");
+      const stream = document.context.lookup(reference);
+      const content = stream instanceof PDFContentStream ? stream.getContentsString()
+        : stream instanceof PDFRawStream ? new TextDecoder().decode(decodePDFRawStream(stream).decode()) : undefined;
+      if (content === undefined) throw new Error("PDF 文字編碼失敗，未產生檔案。");
+      const rewritten = content.replace(/<([a-f\d]+)>\s*Tj/gi, (_, codes: string) => {
+        if (codes.length % 4 !== 0) throw new Error("PDF 文字編碼失敗，未產生檔案。");
+        return `<${codes.match(/.{4}/g)!.map(cidHex).join("")}> Tj`;
+      });
+      document.context.assign(reference, document.context.flateStream(rewritten));
+    }
   }
-  const blocks: string[] = [];
-  for (let index = 0; index < ranges.length; index += 100) {
-    const block = ranges.slice(index, index + 100);
-    blocks.push(`${block.length} begincidrange\n${block.join("\n")}\nendcidrange`);
-  }
-  const encoding = `/CIDInit /ProcSet findresource begin\n12 dict begin\nbegincmap\n/CIDSystemInfo << /Registry ${registry} /Ordering ${ordering} /Supplement ${supplement} >> def\n/CMapName /QuizGlyphsToCID def\n/CMapType 1 def\n/WMode 0 def\n1 begincodespacerange\n<0000> <ffff>\nendcodespacerange\n${blocks.join("\n")}\nendcmap\nCMapName currentdict /CMap defineresource pop\nend\nend`;
   const fontDictionary = document.context.lookup(font.ref, PDFDict);
-  fontDictionary.set(PDFName.of("Encoding"), document.context.register(document.context.flateStream(encoding, {
-    Type: "CMap", CMapName: "QuizGlyphsToCID", CIDSystemInfo: document.context.obj(systemInfo), WMode: 0
-  })));
+  const unicodeReference = fontDictionary.get(PDFName.of("ToUnicode"));
+  if (!(unicodeReference instanceof PDFRef)) throw new Error("PDF 文字編碼失敗，未產生檔案。");
+  const unicodeStream = document.context.lookup(unicodeReference);
+  if (!(unicodeStream instanceof PDFRawStream)) throw new Error("PDF 文字編碼失敗，未產生檔案。");
+  const unicode = new TextDecoder().decode(decodePDFRawStream(unicodeStream).decode());
+  const rewrittenUnicode = unicode.replace(/beginbfchar([\s\S]*?)endbfchar/g, (_, block: string) =>
+    `beginbfchar${block.replace(/<([a-f\d]+)>\s*<([a-f\d]+)>/gi, (_, code: string, target: string) => `<${cidHex(code)}> <${target}>`)}endbfchar`);
+  document.context.assign(unicodeReference, document.context.flateStream(rewrittenUnicode));
+  fontDictionary.set(PDFName.of("Encoding"), PDFName.of("Identity-H"));
   const descendant = fontDictionary.lookup(PDFName.of("DescendantFonts"), PDFArray).lookup(0, PDFDict);
   const oldWidths = descendant.lookup(PDFName.of("W"), PDFArray).asArray();
   const widths: (number | number[])[] = [];

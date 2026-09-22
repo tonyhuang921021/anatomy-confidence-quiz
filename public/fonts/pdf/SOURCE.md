@@ -5,7 +5,7 @@ Noto Serif TC Regular, official Traditional Chinese subset OTF.
 Source: https://github.com/notofonts/noto-cjk/blob/main/Serif/SubsetOTF/TC/NotoSerifTC-Regular.otf
 License: SIL Open Font License 1.1; see OFL.txt.
 
-The unmodified font is served locally and loaded only when generating a PDF. The original CFF table is embedded without changing its bytes. An explicit PDF CMap preserves the font's glyph-index-to-CID mapping across PDF readers; the remaining OpenType container is not embedded. Ordinary exports retain the smaller TC font.
+The unmodified font is served locally and loaded only when generating a PDF. The original CFF table is embedded without changing its bytes. Text codes, widths, and ToUnicode use the font's actual CIDs with Identity-H, preserving glyph selection in Apple and other PDF readers; the remaining OpenType container is not embedded. Ordinary exports retain the smaller TC font.
 
 ## Supplemental CJK coverage
 
