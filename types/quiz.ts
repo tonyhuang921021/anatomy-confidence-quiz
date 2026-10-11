@@ -391,6 +391,13 @@ export type QuestionExplanationOverride = {
 
 export type YangmingExplanationContent = {
   body: string;
+  reviewedOriginal?: boolean;
+  pendingSource?: boolean;
+  releaseId?: string;
+  sourceNotes?: string[];
+  humanNotes?: { body: string; recordLayer?: string; updatedAt?: string }[];
+  previousHumanAssets?: YangmingExplanationContent["assets"];
+  humanNotesReadDegraded?: boolean;
   author?: string;
   reviewer?: string;
   sourceLabel?: string;

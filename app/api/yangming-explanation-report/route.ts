@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
+import { isReviewedYangmingQuestion } from "@/lib/yangmingReviewedRelease";
 import { isSupabaseRecoveryMode } from "@/lib/supabase/recoveryMode";
 
 type YangmingExplanationReportRequestBody = {
@@ -89,6 +90,9 @@ export async function POST(request: NextRequest) {
     const questionId = body.questionId?.trim() ?? "";
     const reason = body.reason?.trim() ?? "";
     const reportType = body.reportType === "correction" ? "correction" : "report";
+    if (reportType === "correction" && isReviewedYangmingQuestion(questionId)) {
+      return NextResponse.json({ ok: false, message: "驗收原稿保留原文；請用一般回報提出補稿、內容或署名調整。" }, { status: 409 });
+    }
     const hasProposedBody = Object.prototype.hasOwnProperty.call(body, "proposedBody");
     const proposedBody = typeof body.proposedBody === "string" ? body.proposedBody.trim() : "";
     const requestedKeptAssetIndexes = Array.isArray(body.keptAssetIndexes)

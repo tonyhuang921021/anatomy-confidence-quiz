@@ -377,10 +377,12 @@ function isAuthoritativeYangmingAsset(asset: NonNullable<YangmingExplanationCont
 }
 
 function YangmingExplanationContentBlock({
+  questionId,
   content,
   onReport,
   onCorrect
 }: {
+  questionId: string;
   content: YangmingExplanationContent;
   onReport: () => void;
   onCorrect: () => void;
@@ -419,19 +421,19 @@ function YangmingExplanationContentBlock({
     <div className="min-w-0 max-w-full overflow-hidden rounded-3xl bg-white/70 p-3 text-sm leading-7 text-slate-800 ring-1 ring-white/70 [overflow-wrap:anywhere] sm:p-4">
       <div className="mb-3 flex min-w-0 flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
         <div className="flex min-w-0 flex-wrap gap-2">
-          <button
+          {!content.reviewedOriginal ? <button
             type="button"
             onClick={onCorrect}
             className="rounded-full bg-teal-50 px-3 py-1 text-[11px] font-bold text-teal-800 ring-1 ring-teal-100 transition hover:bg-teal-100"
           >
             修正詳解
-          </button>
+          </button> : null}
           <button
             type="button"
             onClick={onReport}
             className="rounded-full bg-amber-50 px-3 py-1 text-[11px] font-bold text-amber-800 ring-1 ring-amber-100 transition hover:bg-amber-100"
           >
-            回報陽明詳解
+            {content.reviewedOriginal ? "回報原稿／調整署名或撤除" : "回報陽明詳解"}
           </button>
         </div>
         {content.author || content.reviewer ? (
@@ -442,6 +444,8 @@ function YangmingExplanationContentBlock({
           </p>
         ) : null}
       </div>
+      {content.reviewedOriginal ? <p className="mb-3 text-xs leading-6 text-slate-500">{content.pendingSource ? "原稿尚待補齊，既有 AI 詳解仍在獨立分頁。" : "原稿文字、圖表及可見作者署名完整保留；各卷作者以原圖為準。"} 需要補稿、內容調整或撤除，請用上方回報入口。</p> : null}
+      {content.sourceNotes?.length ? <aside className="mb-4 rounded-2xl bg-amber-50 p-3 text-xs leading-6 text-amber-900"><p className="font-bold">原稿差異提示</p>{content.sourceNotes.map((note, index) => <p key={index}>{note}</p>)}{questionId === "MOEX-106020-5301-Q036" ? <p><a className="underline" href="https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=301&code=106020&q=1&s=55&t=S" target="_blank" rel="noreferrer">考選部原始答案</a>　<a className="underline" href="https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=301&code=106020&q=1&s=55&t=M" target="_blank" rel="noreferrer">考選部更正答案</a></p> : null}</aside> : null}
       {primarySnapshotAssets.length ? (
         <section className="mb-4 min-w-0 max-w-full overflow-hidden">
           <div className="grid min-w-0 max-w-full gap-3 overflow-hidden">
@@ -495,6 +499,8 @@ function YangmingExplanationContentBlock({
         renderFormattedPlainText(content.body, "yangming-body")
       ) : null}
       {!hasPrimarySnapshots ? renderRawTextBackup(content.body) : null}
+      {content.humanNotes?.length ? <section className="mt-4 rounded-2xl bg-slate-50 p-3" data-testid="preserved-human-body"><p className="font-bold">既有人工補充</p>{content.humanNotes.map((note, index) => <pre key={index} className="mt-2 whitespace-pre-wrap break-words font-sans [overflow-wrap:anywhere]">{note.body}</pre>)}{content.humanNotesReadDegraded ? <p className="mt-2 text-xs text-slate-500">人工補充暫時無法同步，先顯示最近一次核對的內容。</p> : null}</section> : null}
+      {content.previousHumanAssets?.length ? <details className="mt-4 rounded-2xl bg-slate-50 p-3"><summary className="cursor-pointer font-bold">保留的人工整理圖片</summary>{content.previousHumanAssets.map((asset, index) => renderAssetFigure(asset, `human-image-${index}`))}</details> : null}
       {!hasPrimarySnapshots && unreferencedFallbackAssets.length ? (
         <details
           className="mt-4 min-w-0 max-w-full overflow-hidden rounded-2xl bg-amber-50/60 p-3 ring-1 ring-amber-100"
@@ -519,9 +525,9 @@ function YangmingExplanationContentBlock({
       ) : null}
       {content.sourceLabel || content.sourceFile ? (
         <p className="mt-4 break-words text-[11px] font-medium leading-5 text-slate-400 [overflow-wrap:anywhere]">
-          資料來源：{content.sourceLabel ?? content.sourceFile}
+          資料來源：{content.sourceLabel ?? content.sourceFile}{content.reviewedOriginal && content.sourceFile ? `｜${content.sourceFile}` : ""}
           {content.sourcePageStart
-            ? `，第 ${content.sourcePageStart}${content.sourcePageEnd && content.sourcePageEnd !== content.sourcePageStart ? `-${content.sourcePageEnd}` : ""} 頁`
+            ? `，PDF 第 ${content.sourcePageStart}${content.sourcePageEnd && content.sourcePageEnd !== content.sourcePageStart ? `-${content.sourcePageEnd}` : ""} 頁`
             : ""}
         </p>
       ) : null}
@@ -623,7 +629,7 @@ export function YangmingExplanationPanel({
   }
 
   function openCorrectionDialog() {
-    if (!content) return;
+    if (!content || content.reviewedOriginal) return;
     setReportMode("correction");
     setReportReason("修正陽明詳解內容");
     setCorrectionDraft(content.body ?? "");
@@ -733,6 +739,7 @@ export function YangmingExplanationPanel({
             </div>
           ) : content ? (
             <YangmingExplanationContentBlock
+              questionId={questionId}
               content={content}
               onReport={openReportDialog}
               onCorrect={openCorrectionDialog}

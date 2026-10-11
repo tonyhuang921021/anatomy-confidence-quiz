@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 import { isSupabaseRecoveryMode } from "@/lib/supabase/recoveryMode";
 import { withServerTimeout } from "@/lib/serverTimeout";
+import { findReviewedYangmingExplanation, mergeCurrentYangmingHumanContent } from "@/lib/yangmingReviewedRelease";
 
 type YangmingExplanationRequestBody = {
   accessToken?: string | null;
@@ -384,6 +385,28 @@ export async function POST(request: NextRequest) {
     const questionId = body.questionId?.trim();
     if (!questionId) {
       return NextResponse.json({ ok: false, message: "缺少題號。" }, { status: 400 });
+    }
+
+    const reviewed = findReviewedYangmingExplanation(questionId, process.env.NEXT_PUBLIC_SUPABASE_URL!);
+    if (reviewed) {
+      let explanation = reviewed.content;
+      try {
+        const activeVersionId = await getActiveYangmingVersion(supabase);
+        const ids = Array.from(new Set([reviewed.canonicalId, reviewed.sourceQuestionId]));
+        const columns = "question_id,body,assets,match_status,updated_at";
+        const results = await withServerTimeout(Promise.all([
+          supabase.from("yangming_question_explanations").select(columns).in("question_id", ids),
+          activeVersionId ? supabase.from("yangming_question_explanations_versioned").select(columns).eq("version_id", activeVersionId).in("question_id", ids) : Promise.resolve({ data: [], error: null })
+        ]), 2200, "人工補充讀取逾時");
+        if (results.some(result => result.error)) throw new Error("人工補充暫時讀不到");
+        explanation = mergeCurrentYangmingHumanContent(explanation,
+          results.map((result, index) => ({ layer: index === 0 ? "legacy" : "active", rows: result.data ?? [] })),
+          assets => normalizeAssets(supabase, assets, getQuestionNumberFromId(reviewed.sourceQuestionId)).assets);
+      } catch {
+        // Keep the last verified five notes if the live reader is unavailable; don't claim a fresh read.
+        explanation = { ...explanation, humanNotesReadDegraded: true };
+      }
+      return NextResponse.json({ ok: true, reviewedReleaseId: explanation.releaseId, explanation }, { headers: { "Cache-Control": "no-store" } });
     }
 
     const questionIdCandidates = getQuestionIdLookupCandidates(questionId);
