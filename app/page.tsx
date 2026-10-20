@@ -7,6 +7,7 @@ import {
 } from "lucide-react";
 import { ContinueQuizButton } from "@/components/ContinueQuizButton";
 import { ClientSectionBoundary } from "@/components/ClientSectionBoundary";
+import { HomePageMotion } from "@/components/HomePageMotion";
 import { HomeToneBanner } from "@/components/HomeToneBanner";
 import { LazyFeedbackBoard } from "@/components/LazyFeedbackBoard";
 import { isSupabaseRecoveryMode } from "@/lib/supabase/recoveryMode";
@@ -46,6 +47,11 @@ const REVIEW_ENTRIES = [
 ] as const;
 
 const HOME_RELEASE_NOTES = [
+  {
+    time: "10/20",
+    title: "刷題節奏順一點",
+    body: "首頁與刷題操作更順暢，也加入 112 年第二次醫學（一）、（二）的 200 題圖文詳解，可切換簡解與詳解閱讀。"
+  },
   {
     time: "10/11",
     title: "原稿詳解補上完整圖表",
@@ -1142,8 +1148,9 @@ export default function HomePage() {
   }
 
   return (
-    <main id="main-content" className="shell home-shell home-workspace">
-      <div className="home-study-photo" aria-hidden="true">
+    <main id="main-content" className="shell home-shell home-workspace home-motion">
+      <HomePageMotion />
+      <div data-home-enter="photo" className="home-study-photo" aria-hidden="true">
         <img src="/images/home-study-desk.webp" alt="" />
       </div>
 
@@ -1158,20 +1165,20 @@ export default function HomePage() {
 
         <section className="home-study-actions" aria-labelledby="home-work-title">
           <h2 id="home-work-title" className="sr-only">開始作答</h2>
-          <div className="home-study-resume">
+          <div data-home-enter="resume" className="home-study-resume">
             <ClientSectionBoundary title="繼續測驗">
               <ContinueQuizButton />
             </ClientSectionBoundary>
           </div>
 
-          <div className="home-study-launches">
+          <div data-home-enter="launches" className="home-study-launches">
             {START_ACTIONS.map((action) => {
               return (
                 <Link
                   key={action.href}
                   href={action.href}
                   prefetch={false}
-                  className={`home-study-launch ${action.primary ? "is-primary" : ""}`}
+                  className={`home-motion-control home-study-launch ${action.primary ? "is-primary" : ""}`}
                 >
                   <span>{action.label}</span>
                   <span className="home-study-launch-arrow" aria-hidden="true">
@@ -1182,11 +1189,11 @@ export default function HomePage() {
             })}
           </div>
 
-          <nav className="home-study-tools" aria-label="複習與組卷工具">
+          <nav data-home-enter="tools" className="home-study-tools" aria-label="複習與組卷工具">
             {REVIEW_ENTRIES.map((entry) => {
               const Icon = entry.icon;
               return (
-                <Link key={entry.href} href={entry.href} prefetch={false}>
+                <Link className="home-motion-control" key={entry.href} href={entry.href} prefetch={false}>
                   <Icon size={18} strokeWidth={1.8} aria-hidden="true" />
                   <span>{entry.title}</span>
                   <ArrowRight size={17} strokeWidth={1.8} aria-hidden="true" />
@@ -1198,7 +1205,7 @@ export default function HomePage() {
       </div>
 
       {LATEST_HOME_RELEASE_NOTE ? (
-        <section className="home-study-update" aria-labelledby="home-release-title">
+        <section data-home-reveal className="home-study-update" aria-labelledby="home-release-title">
           <h2 id="home-release-title">最近網站更新</h2>
           <time>{LATEST_HOME_RELEASE_NOTE.time}</time>
           <p>
@@ -1209,7 +1216,7 @@ export default function HomePage() {
       ) : null}
 
       <section id="feedback" tabIndex={-1} className="home-work-section home-feedback-section focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 focus-visible:ring-offset-2" aria-labelledby="home-feedback-title">
-        <header className="home-feedback-heading">
+        <header data-home-reveal className="home-feedback-heading">
           <div>
             <h2 id="home-feedback-title">留言板</h2>
             <p>題目問題、使用狀況或建議，都可以直接留在這裡。</p>

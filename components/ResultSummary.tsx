@@ -10,7 +10,7 @@ type ResultSummaryProps = {
 
 export function ResultSummary({ summary, masteryAnalysis, scoreRevision }: ResultSummaryProps) {
   return (
-    <section>
+    <section className="study-result-summary">
       {scoreRevision ? (
         <div className="mb-4 border-y border-amber-200 bg-amber-50/70 px-4 py-4 text-amber-950">
           <p className="text-xs font-semibold tracking-wide text-amber-800">115-2 申覆重算</p>

@@ -9,4 +9,8 @@ node_modules
 reports
 *.log
 tsconfig.tsbuildinfo
+test-results/
+playwright-report/
+evidence/motion/
 .env*
+evidence/explanations/

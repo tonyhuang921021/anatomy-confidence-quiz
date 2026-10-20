@@ -15,6 +15,7 @@ import { QuestionPrimaryTagBadge } from "@/components/QuestionPrimaryTagBadge";
 import { QuestionReportButton } from "@/components/QuestionIssueReportButton";
 import { SavedQuestionButton } from "@/components/SavedQuestionButton";
 import { StructuredExplanationText } from "@/components/StructuredExplanationText";
+import { hasReviewedExplanation } from "@/lib/reviewedExplanations";
 import { useSavedAISimulationQuestions } from "@/components/useSavedAISimulationQuestions";
 import {
   loadConfirmedQuestionClassificationOverrides,
@@ -1206,9 +1207,9 @@ function SearchPageContent() {
                 ) : null}
 
                 {shouldShowAnswer ? (
-                  <StructuredExplanationText text={renderedQuestion.explanation} label="詳解" compact />
+                  <StructuredExplanationText text={renderedQuestion.explanation} label="詳解" compact questionId={renderedQuestion.id} />
                 ) : null}
-                {shouldShowAnswer && renderedQuestion.optionAnalysis ? (
+                {shouldShowAnswer && !hasReviewedExplanation(renderedQuestion.id) && renderedQuestion.optionAnalysis ? (
                   <div className="space-y-2.5">
                     {OPTION_KEYS.map((key) => {
                       const text = renderedQuestion.optionAnalysis?.[key];
@@ -1245,7 +1246,7 @@ function SearchPageContent() {
                             答對 {favoriteRecord.correctCount} / 2
                           </span>
                         ) : null}
-                        {override ? (
+                        {!hasReviewedExplanation(renderedQuestion.id) && override ? (
                           <>
                             <span className="px-3 py-1 text-xs font-semibold text-slate-500">
                               已替換詳解・{override.model ?? "gpt-5.4-mini"}
@@ -1259,7 +1260,7 @@ function SearchPageContent() {
                               {loading ? "重新生成中..." : "重新替換詳解"}
                             </button>
                           </>
-                        ) : (
+                        ) : !hasReviewedExplanation(renderedQuestion.id) ? (
                           <button
                             type="button"
                             onClick={() => void handleGenerateQuestionExplanation(renderedQuestion)}
@@ -1268,7 +1269,7 @@ function SearchPageContent() {
                           >
                             {loading ? "AI 生成中..." : "用 AI 補詳解"}
                           </button>
-                        )}
+                        ) : null}
                         <QuestionReportButton
                           question={renderedQuestion}
                           disabled={classificationReportLoadingMap[renderedQuestion.id]}

@@ -35,6 +35,7 @@ export function QuestionExplanationTabs({
   const [isMoreActionsOpen, setIsMoreActionsOpen] = useState(false);
   const moreActionsButtonRef = useRef<HTMLButtonElement>(null);
   const moreActionsPanelId = useId();
+  const explanationPanelId = useId();
   const hasAiExplanationContent = Boolean(aiExplanationContent);
   const hasRelatedQuestionsContent = Boolean(relatedQuestionsContent);
   const handleCountChange = useCallback((count: number) => setSupplementCount(count), []);
@@ -128,6 +129,8 @@ export function QuestionExplanationTabs({
             type="button"
             onClick={() => setActiveTab((current) => current === "ai" ? null : "ai")}
             aria-pressed={activeTab === "ai"}
+            aria-expanded={activeTab === "ai"}
+            aria-controls={`${explanationPanelId}-ai`}
             className={`inline-flex min-h-9 shrink-0 items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-xs font-bold ring-1 transition ${
               activeTab === "ai"
                 ? "bg-slate-900 text-white ring-slate-900"
@@ -143,6 +146,8 @@ export function QuestionExplanationTabs({
           type="button"
           onClick={() => setActiveTab((current) => current === "yangming" ? null : "yangming")}
           aria-pressed={activeTab === "yangming"}
+          aria-expanded={activeTab === "yangming"}
+          aria-controls={`${explanationPanelId}-yangming`}
           className={`inline-flex min-h-9 shrink-0 items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-xs font-bold ring-1 transition ${
             activeTab === "yangming"
               ? "bg-slate-900 text-white ring-slate-900"
@@ -157,6 +162,8 @@ export function QuestionExplanationTabs({
           type="button"
           onClick={() => setActiveTab((current) => current === "supplement" ? null : "supplement")}
           aria-pressed={activeTab === "supplement"}
+          aria-expanded={activeTab === "supplement"}
+          aria-controls={`${explanationPanelId}-supplement`}
           className={`inline-flex min-h-9 shrink-0 items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-xs font-bold ring-1 transition ${
             activeTab === "supplement"
               ? "bg-teal-700 text-white ring-teal-700"
@@ -181,6 +188,8 @@ export function QuestionExplanationTabs({
             type="button"
             onClick={() => setActiveTab((current) => current === "related" ? null : "related")}
             aria-pressed={activeTab === "related"}
+            aria-expanded={activeTab === "related"}
+            aria-controls={`${explanationPanelId}-related`}
             className={`inline-flex min-h-9 shrink-0 items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-xs font-bold ring-1 transition ${
               activeTab === "related"
                 ? "bg-sky-700 text-white ring-sky-700"
@@ -243,17 +252,17 @@ export function QuestionExplanationTabs({
       ) : null}
       {reactionError ? <p className="mt-2 text-xs font-semibold text-rose-700" role="alert">{reactionError}</p> : null}
       {activeTab === "ai" && aiExplanationContent ? (
-        <div className="mt-3">
+        <div id={`${explanationPanelId}-ai`} role="region" aria-label="AI 詳解" className="study-disclosure mt-3">
           {aiExplanationContent}
         </div>
       ) : null}
       {activeTab === "yangming" ? (
-        <div className="mt-3">
+        <div id={`${explanationPanelId}-yangming`} role="region" aria-label="陽明詳解" className="study-disclosure mt-3">
           <YangmingExplanationPanel questionId={question.id} compact={compact} autoLoad hideButton />
         </div>
       ) : null}
       {activeTab === "supplement" ? (
-        <div className="mt-3">
+        <div id={`${explanationPanelId}-supplement`} role="region" aria-label="同學補充" className="study-disclosure mt-3">
           <QuestionSupplementCardsPanel
             question={question}
             compact={compact}
@@ -263,7 +272,7 @@ export function QuestionExplanationTabs({
         </div>
       ) : null}
       {activeTab === "related" && relatedQuestionsContent ? (
-        <div className="mt-3">
+        <div id={`${explanationPanelId}-related`} role="region" aria-label="類似題" className="study-disclosure mt-3">
           {relatedQuestionsContent()}
         </div>
       ) : null}

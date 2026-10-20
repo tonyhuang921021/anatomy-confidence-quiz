@@ -9,6 +9,7 @@ import { useAuth } from "@/components/AuthProvider";
 import { ConfidenceSelector } from "@/components/ConfidenceSelector";
 import { ErrorTypeSelector } from "@/components/ErrorTypeSelector";
 import { QuestionCard } from "@/components/QuestionCard";
+import { hasReviewedExplanation } from "@/lib/reviewedExplanations";
 import { QuestionAiMetadataBadges } from "@/components/QuestionAiMetadataBadges";
 import {
   applyQuestionClassificationOverride,
@@ -369,7 +370,9 @@ function isSafariBrowser() {
 }
 
 function getQuestionScrollBehavior(): ScrollBehavior {
-  return isSafariBrowser() ? "auto" : "smooth";
+  return isSafariBrowser() || window.matchMedia("(prefers-reduced-motion: reduce)").matches
+    ? "auto"
+    : "smooth";
 }
 
 function isGenericSimulationSessionName(name?: string | null) {
@@ -2570,7 +2573,7 @@ export default function QuizPage() {
         : null;
 
   return (
-    <main id="main-content" className={`shell ${submittedAttempt ? "pb-28 sm:pb-0" : ""}`}>
+    <main id="main-content" className={`study-quiz shell ${submittedAttempt ? "pb-28 sm:pb-0" : ""}`}>
       <div ref={questionTopRef} />
       <header className="mb-5 border-b border-slate-200/80 pb-3">
         <div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-2">
@@ -2591,10 +2594,10 @@ export default function QuizPage() {
             </span>
           </div>
         </div>
-        <div className="mt-3 h-1.5 overflow-hidden rounded-full bg-white/80 ring-1 ring-slate-100">
+        <div role="progressbar" aria-label="作答進度" aria-valuemin={0} aria-valuemax={100} aria-valuenow={Math.round(progress)} className="mt-3 h-1.5 overflow-hidden rounded-full bg-white/80 ring-1 ring-slate-100">
           <div
-            className="h-full rounded-full bg-brand-600 transition-[width] duration-300"
-            style={{ width: `${progress}%` }}
+            className="study-progress-value h-full w-full rounded-full bg-brand-600"
+            style={{ transform: `translateX(${progress - 100}%)` }}
           />
         </div>
       </header>
@@ -2609,6 +2612,7 @@ export default function QuizPage() {
       >
         <div className="min-w-0 space-y-6">
           <QuestionCard
+            animateQuestionChanges
             question={currentQuestion}
             selectedAnswer={selectedAnswer}
             submittedResult={submittedAttempt ?? undefined}
@@ -2690,7 +2694,7 @@ export default function QuizPage() {
                 }`}
               >
                 <div
-                  className={`quiz-answer-summary ${
+                  className={`study-feedback quiz-answer-summary ${
                     submittedAttempt.isCorrect ? "is-correct" : "is-incorrect"
                   }`}
                   role="status"
@@ -2760,7 +2764,7 @@ export default function QuizPage() {
                         className="mb-3"
                       />
                       {shouldShowAiExplanationDetails ? (
-                        <StructuredExplanationText text={currentQuestion.explanation} label="整題詳解" compact />
+                        <StructuredExplanationText text={currentQuestion.explanation} label="整題詳解" compact questionId={currentQuestion.id} />
                       ) : null}
                       <QuestionExplanationTabs
                         question={currentQuestion}
@@ -2774,7 +2778,7 @@ export default function QuizPage() {
                         )}
                         moreActionsContent={(
                           <>
-                            {currentExplanationOverride ? (
+                            {!hasReviewedExplanation(currentQuestion.id) && currentExplanationOverride ? (
                               <>
                                 <span className="px-3 py-1 text-xs font-semibold text-slate-500">
                                   已替換詳解・{currentExplanationOverride.model ?? "gpt-5.4-mini"}
@@ -2794,7 +2798,7 @@ export default function QuizPage() {
                                   {currentExplanationLoading ? "重新生成中..." : "重新替換詳解"}
                                 </button>
                               </>
-                            ) : (
+                            ) : !hasReviewedExplanation(currentQuestion.id) ? (
                               <button
                                 type="button"
                                 onClick={() => void handleGenerateQuestionExplanation(currentQuestion, submittedAttempt)}
@@ -2803,7 +2807,7 @@ export default function QuizPage() {
                               >
                                 {currentExplanationLoading ? "AI 生成中..." : "用 AI 補詳解"}
                               </button>
-                            )}
+                            ) : null}
                             <QuestionReportButton
                               question={currentQuestion}
                               disabled={currentClassificationReportLoading}
@@ -2827,7 +2831,7 @@ export default function QuizPage() {
                       儲存題目進度：答對 {currentSavedQuestionRecord?.correctCount ?? 0} / 2
                     </p>
                   ) : null}
-                  {shouldShowExplanation && shouldShowAiExplanationDetails && currentQuestion.optionAnalysis ? (
+                  {shouldShowExplanation && shouldShowAiExplanationDetails && !hasReviewedExplanation(currentQuestion.id) && currentQuestion.optionAnalysis ? (
                     <div className="border-t border-slate-200 pt-4 text-sm text-slate-800">
                       <h3 className="text-sm font-semibold text-ink">各選項解析</h3>
                       <div className="mt-2">

@@ -122,6 +122,7 @@ export function FreePracticeSetup({
 
       <div
         id={settingsPanelId}
+        data-study-disclosure
         hidden={!expanded}
         className="border-t border-brand-100 px-4 py-5 sm:px-5"
       >
@@ -281,7 +282,7 @@ export function FreePracticeSetup({
           type="button"
           onClick={onStart}
           disabled={effectiveQuestionCount === 0}
-          className="inline-flex min-h-11 items-center justify-center gap-2 rounded-lg bg-brand-600 px-5 text-sm font-semibold text-white transition hover:bg-brand-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:bg-slate-300"
+          className="study-control inline-flex min-h-11 items-center justify-center gap-2 rounded-lg bg-brand-600 px-5 text-sm font-semibold text-white transition hover:bg-brand-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:bg-slate-300"
         >
           <Play size={15} fill="currentColor" aria-hidden="true" />
           {effectiveQuestionCount === 0

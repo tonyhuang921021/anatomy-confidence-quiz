@@ -11,6 +11,7 @@ import { QuestionPrimaryTagBadge } from "@/components/QuestionPrimaryTagBadge";
 import { QuestionReportButton } from "@/components/QuestionIssueReportButton";
 import { RelatedQuestionsPanel } from "@/components/RelatedQuestionsPanel";
 import { SavedQuestionButton } from "@/components/SavedQuestionButton";
+import { hasReviewedExplanation } from "@/lib/reviewedExplanations";
 import {
   StructuredExplanationText,
   hasCollapsibleStructuredExplanation,
@@ -553,7 +554,7 @@ function renderQuestionReview(
 ) {
   const primaryTag = getQuestionPrimaryTag(renderedQuestion);
   const shouldCollapseAiExplanation = hasCollapsibleStructuredExplanation(renderedQuestion.explanation);
-  const aiExplanationContent = shouldCollapseAiExplanation ? (
+  const aiExplanationContent = shouldCollapseAiExplanation && !hasReviewedExplanation(renderedQuestion.id) ? (
     <StructuredExplanationText
       text={renderedQuestion.explanation}
       label=""
@@ -618,13 +619,14 @@ function renderQuestionReview(
         text={renderedQuestion.explanation}
         label="重點解析"
         compact
+        questionId={renderedQuestion.id}
         sectionFilter={
           shouldCollapseAiExplanation
             ? (section) => isDefaultInlineExplanationSectionTitle(section.title)
             : undefined
         }
       />
-      {renderedQuestion.optionAnalysis ? (
+      {!hasReviewedExplanation(renderedQuestion.id) && renderedQuestion.optionAnalysis ? (
         <div className="space-y-2">
           {getOptionKeysFromQuestion(renderedQuestion).map((key) => {
             const text = renderedQuestion.optionAnalysis?.[key];
@@ -1320,12 +1322,12 @@ export function ReviewNotebook({
     return (
       <div className="grid gap-1">
         <div className="grid gap-1">
-          {override ? (
+          {!hasReviewedExplanation(question.id) && override ? (
             <span className="px-3 py-1 text-xs font-semibold text-slate-500">
               已替換詳解・{override.model ?? "gpt-5.4-mini"}
             </span>
           ) : null}
-          {!override ? (
+          {!hasReviewedExplanation(question.id) && !override ? (
             <button
               type="button"
               onClick={() => void handleGenerateQuestionExplanation(question)}
@@ -1334,7 +1336,7 @@ export function ReviewNotebook({
             >
               {loading ? "AI 生成中..." : "用 AI 補詳解"}
             </button>
-          ) : (
+          ) : !hasReviewedExplanation(question.id) ? (
             <button
               type="button"
               onClick={() => void handleGenerateQuestionExplanation(question, override)}
@@ -1343,7 +1345,7 @@ export function ReviewNotebook({
             >
               {loading ? "重新生成中..." : "重新替換詳解"}
             </button>
-          )}
+          ) : null}
           <QuestionReportButton
             question={question}
             disabled={reportLoading}

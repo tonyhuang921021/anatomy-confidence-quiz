@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { useRouter } from "next/navigation";
 import { ChevronRight, Play, X } from "lucide-react";
@@ -60,6 +60,8 @@ function sessionProgress(item: ResumableQuizSessionListItem) {
 
 export function ContinueQuizButton() {
   const router = useRouter();
+  const dialogRef = useRef<HTMLElement>(null);
+  const closeRef = useRef<HTMLButtonElement>(null);
   const { configured, session: authSession, syncStatus, syncVersion } = useAuth();
   const [mounted, setMounted] = useState(false);
   const [open, setOpen] = useState(false);
@@ -120,15 +122,32 @@ export function ContinueQuizButton() {
 
   useEffect(() => {
     if (!open) return;
+    const previouslyFocused = document.activeElement instanceof HTMLElement ? document.activeElement : null;
+    closeRef.current?.focus({ preventScroll: true });
     const previousOverflow = document.body.style.overflow;
     document.body.style.overflow = "hidden";
     function handleKeyDown(event: KeyboardEvent) {
       if (event.key === "Escape") setOpen(false);
+      if (event.key !== "Tab") return;
+      const controls = Array.from(dialogRef.current?.querySelectorAll<HTMLElement>(
+        'button:not(:disabled), a[href], input:not(:disabled), [tabindex="0"]'
+      ) ?? []).filter((element) => element.getClientRects().length > 0);
+      const first = controls[0];
+      const last = controls[controls.length - 1];
+      if (!first || !last) return;
+      if (event.shiftKey && (document.activeElement === first || !dialogRef.current?.contains(document.activeElement))) {
+        event.preventDefault();
+        last.focus();
+      } else if (!event.shiftKey && (document.activeElement === last || !dialogRef.current?.contains(document.activeElement))) {
+        event.preventDefault();
+        first.focus();
+      }
     }
     window.addEventListener("keydown", handleKeyDown);
     return () => {
       document.body.style.overflow = previousOverflow;
       window.removeEventListener("keydown", handleKeyDown);
+      if (previouslyFocused?.isConnected) previouslyFocused.focus({ preventScroll: true });
     };
   }, [open]);
 
@@ -203,16 +222,16 @@ export function ContinueQuizButton() {
   }
 
   const dialog = open && mounted ? (
-    <div className="fixed inset-0 z-[100] flex items-end justify-center bg-slate-950/45 p-0 backdrop-blur-[2px] sm:items-center sm:p-5" role="presentation" onMouseDown={(event) => {
+    <div className="home-resume-overlay fixed inset-0 z-[100] flex items-end justify-center bg-slate-950/45 p-0 backdrop-blur-[2px] sm:items-center sm:p-5" role="presentation" onMouseDown={(event) => {
       if (event.currentTarget === event.target) setOpen(false);
     }}>
-      <section role="dialog" aria-modal="true" aria-labelledby="resume-dialog-title" aria-busy={loading} className="flex max-h-[88vh] w-full max-w-2xl flex-col overflow-hidden rounded-t-2xl bg-white shadow-2xl sm:rounded-2xl">
+      <section ref={dialogRef} role="dialog" aria-modal="true" aria-labelledby="resume-dialog-title" aria-busy={loading} className="home-resume-panel flex max-h-[88vh] w-full max-w-2xl flex-col overflow-hidden rounded-t-2xl bg-white shadow-2xl sm:rounded-2xl">
         <header className="flex items-start justify-between gap-4 border-b border-slate-200 px-5 py-4 sm:px-6">
           <div>
             <h2 id="resume-dialog-title" className="text-xl font-semibold text-ink">可繼續的測驗</h2>
             <p aria-live="polite" className="mt-1 text-sm text-slate-500">{loading ? "正在整理..." : `${items.length} 份進行中`}</p>
           </div>
-          <button type="button" onClick={() => setOpen(false)} aria-label="關閉可繼續測驗" title="關閉" className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg text-slate-500 transition hover:bg-slate-100 hover:text-slate-900">
+          <button ref={closeRef} type="button" onClick={() => setOpen(false)} aria-label="關閉可繼續測驗" title="關閉" className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg text-slate-500 transition hover:bg-slate-100 hover:text-slate-900">
             <X size={20} strokeWidth={1.8} />
           </button>
         </header>
@@ -278,7 +297,7 @@ export function ContinueQuizButton() {
 
   return (
     <>
-      <button type="button" onClick={handleOpen} className="home-continue-button">
+      <button type="button" onClick={handleOpen} aria-haspopup="dialog" aria-expanded={open} className="home-motion-control home-continue-button">
         <span className="home-continue-icon" aria-hidden="true">
           <Play size={20} fill="currentColor" strokeWidth={1.7} />
         </span>

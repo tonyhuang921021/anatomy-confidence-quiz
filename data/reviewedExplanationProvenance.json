@@ -1,0 +1,52 @@
+{
+  "release": "accepted-readers-20261020",
+  "scope": "112年第二次醫學（一）（二）Q1–100",
+  "questions": 200,
+  "displayImages": 191,
+  "sourceEditions": [
+    {
+      "batch": "112-2-med1-q1-50",
+      "version": "v4",
+      "sha256": "2e1eec3dc793b9779e55cc3f47bc6355ecb2cbf45c0eeb381e399556c99ca3d2",
+      "file": "112第二次醫學一_Q1-50_詳解_v4.html"
+    },
+    {
+      "batch": "112-2-med1-q51-100",
+      "version": "v4",
+      "sha256": "f85260e5cbcd7d3ee709b47fde5baa7d0b9b1a5b5ba65d5fba7b782f3b93e24e",
+      "file": "work.html"
+    },
+    {
+      "batch": "112-2-med2-q1-50",
+      "version": "v3",
+      "sha256": "c77d4e83a72458f365a661fbd0d50c0618ac3e3b75588bc41ff221de61f79d4b",
+      "file": "112第二次醫學二_Q1-50_詳解.html"
+    },
+    {
+      "batch": "112-2-med2-q51-100",
+      "version": "integration-v2 after accepted tone/teaching patches",
+      "sha256": "c5de8c0e3af4773e0acd1361654bb14a217102f090c6e3e4dddfcffab1615597",
+      "file": "112二醫二_Q51-100_圖文詳解_v1.html"
+    }
+  ],
+  "policy": "原圖位元組及逐圖圖說、署名、來源、授權與 Access for free 行保留。網站純非商業用途由使用者確認；各圖片仍依原授權。",
+  "uniqueImageFiles": 186,
+  "creditMetadataAdditions": {
+    "OpenStaxAccessForFree": [
+      "MOEX-112100-1301-Q007",
+      "MOEX-112100-1301-Q015",
+      "MOEX-112100-1301-Q018",
+      "MOEX-112100-1301-Q019",
+      "MOEX-112100-1301-Q021",
+      "MOEX-112100-1301-Q026",
+      "MOEX-112100-1301-Q040",
+      "MOEX-112100-1301-Q041"
+    ],
+    "unresolvedCCBYVersion": [
+      "MOEX-112100-1301-Q014",
+      "MOEX-112100-2301-Q009",
+      "MOEX-112100-2301-Q013",
+      "MOEX-112100-2301-Q022"
+    ]
+  }
+}

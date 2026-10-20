@@ -4,6 +4,7 @@ import { ArrowLeft, ArrowRight } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/components/AuthProvider";
+import { useSurfaceTransition } from "@/components/useSurfaceTransition";
 import { FreePracticeSetup } from "@/components/FreePracticeSetup";
 import { useQuestionOrderMode } from "@/components/QuestionOrderModeControl";
 import { useCloudHistoryHydration } from "@/components/useCloudHistoryHydration";
@@ -107,6 +108,7 @@ export default function StartPage() {
   const [practiceFastAnswerMode, setPracticeFastAnswerMode] = useState(false);
   const [keyboardQuestionNavigation, setKeyboardQuestionNavigation] = useState(false);
   const [setupStep, setSetupStep] = useState<"subjects" | "settings">("subjects");
+  const stepSurfaceRef = useSurfaceTransition(setupStep);
   const [attemptedQuestionIds, setAttemptedQuestionIds] = useState<Set<string>>(() => new Set());
   const [historyOwnerKey, setHistoryOwnerKey] = useState<string | null>(null);
   const [classificationOverrides, setClassificationOverrides] = useState<Record<string, QuestionClassificationOverride>>({});
@@ -698,6 +700,7 @@ export default function StartPage() {
   return (
     <main id="main-content" className="shell workspace-page">
       <section className="workspace-section workspace-page-panel p-5 sm:p-6">
+        <div ref={stepSurfaceRef} data-study-step={setupStep}>
         {setupStep === "settings" ? (
           <button
             type="button"
@@ -848,6 +851,7 @@ export default function StartPage() {
             ) : null}
           </div>
         )}
+        </div>
       </section>
     </main>
   );

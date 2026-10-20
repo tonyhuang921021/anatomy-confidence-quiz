@@ -5,6 +5,7 @@ import { CopyQuestionPromptButton } from "@/components/CopyQuestionPromptButton"
 import { FormattedQuestionText } from "@/components/FormattedQuestionText";
 import { QuestionPrimaryTagBadge } from "@/components/QuestionPrimaryTagBadge";
 import { StructuredExplanationText } from "@/components/StructuredExplanationText";
+import { hasReviewedExplanation } from "@/lib/reviewedExplanations";
 import { useAuth } from "@/components/AuthProvider";
 import { YangmingExplanationPanel } from "@/components/YangmingExplanationPanel";
 import { clearQuestionExplanationBackgroundCache } from "@/lib/cloudSync";
@@ -166,7 +167,7 @@ export function StudyNoteQuestionCard({ question, link, title }: Props) {
             compact
             className="ml-2 mt-4 align-middle"
           />
-          <button
+          {!hasReviewedExplanation(question.id) ? <button
             type="button"
             onClick={() => void handleGenerateExplanation()}
             disabled={explanationLoading}
@@ -179,7 +180,7 @@ export function StudyNoteQuestionCard({ question, link, title }: Props) {
               : explanationOverride
                 ? "重新替換詳解"
                 : "用 AI 補詳解"}
-          </button>
+          </button> : null}
           {explanationError ? (
             <p className="mt-3 rounded-2xl bg-rose-50 px-3 py-2 text-xs font-semibold leading-5 text-rose-700">
               {explanationError}
@@ -194,6 +195,7 @@ export function StudyNoteQuestionCard({ question, link, title }: Props) {
                 compact
                 tone="dark"
                 className="mt-3"
+                questionId={question.id}
               />
               <YangmingExplanationPanel
                 questionId={question.id}
@@ -201,7 +203,7 @@ export function StudyNoteQuestionCard({ question, link, title }: Props) {
                 className="mt-3"
                 buttonClassName="min-h-10 rounded-2xl bg-amber-100/15 px-4 py-2 text-sm font-semibold text-amber-50 ring-1 ring-amber-100/20 transition hover:bg-amber-100/25 disabled:cursor-wait disabled:opacity-60"
               />
-              {optionAnalysis && Object.keys(optionAnalysis).length > 0 ? (
+              {!hasReviewedExplanation(question.id) && optionAnalysis && Object.keys(optionAnalysis).length > 0 ? (
                 <div className="mt-3 grid gap-2">
                   {Object.entries(optionAnalysis).map(([key, value]) =>
                     value ? (

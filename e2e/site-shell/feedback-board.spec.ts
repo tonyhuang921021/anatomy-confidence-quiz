@@ -299,6 +299,8 @@ test("站長通知鈴鐺收進設定且只計外部新動態", async ({ page, br
   await page.goto("/settings", { waitUntil: "domcontentloaded" });
   await expect(page.locator(".app-topbar .app-feedback-notification-trigger")).toHaveCount(0);
   const unreadBell = page.getByRole("button", { name: "留言通知，2 則未讀" });
+  const accountSettings = page.getByRole("dialog", { name: "帳號與設定" });
+  await accountSettings.locator("summary").filter({ hasText: "通知與手機主畫面" }).click();
   await expect(unreadBell).toBeVisible();
   await expect.poll(() => requestedAfter).toContain("100");
   expect(requestedLimits).toContain("20");

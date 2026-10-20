@@ -15,7 +15,9 @@ export default defineConfig({
     trace: "retain-on-failure"
   },
   webServer: {
-    command: "./node_modules/.bin/next build && ./node_modules/.bin/next start --hostname 127.0.0.1 --port 3004",
+    command: process.env.SITE_SHELL_PREBUILT === "1"
+      ? "./node_modules/.bin/next start --hostname 127.0.0.1 --port 3004"
+      : "./node_modules/.bin/next build && ./node_modules/.bin/next start --hostname 127.0.0.1 --port 3004",
     url: "http://127.0.0.1:3004/",
     reuseExistingServer: false,
     timeout: 180_000,
@@ -23,6 +25,7 @@ export default defineConfig({
       NEXT_PUBLIC_SUPABASE_URL: "https://e2e.invalid",
       NEXT_PUBLIC_SUPABASE_ANON_KEY: "e2e-anon-key",
       ADMIN_EMAILS: "e2e-owner@example.test",
+      NEXT_PUBLIC_ADMIN_EMAILS: "e2e-owner@example.test",
       NEXT_PUBLIC_SUPABASE_RECOVERY_MODE: "off",
       SUPABASE_SERVICE_ROLE_KEY: "",
       WEB_PUSH_VAPID_PUBLIC_KEY: "",

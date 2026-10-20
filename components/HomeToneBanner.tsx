@@ -159,7 +159,7 @@ export function HomeToneBanner() {
   }, [anxiousLineBucket, calmLine, mode, stats]);
 
   return (
-    <div className="home-tone-line home-data-fade mt-5">
+    <div className="home-tone-line home-tone-motion mt-5">
       <p className={`body-soft whitespace-pre-line text-sm leading-7 sm:text-[15px]${mode === "calm" ? " home-tone-handwriting" : ""}`}>{body}</p>
     </div>
   );

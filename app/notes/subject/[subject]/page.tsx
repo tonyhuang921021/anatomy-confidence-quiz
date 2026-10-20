@@ -6,6 +6,7 @@ import { useParams, useSearchParams } from "next/navigation";
 import { useAuth } from "@/components/AuthProvider";
 import { StudyNoteMarkdown } from "@/components/StudyNoteMarkdown";
 import { StructuredExplanationText } from "@/components/StructuredExplanationText";
+import { hasReviewedExplanation } from "@/lib/reviewedExplanations";
 import { YangmingExplanationPanel } from "@/components/YangmingExplanationPanel";
 import { getCanonicalQuestionBank } from "@/data/med1QuestionBank";
 import { MED1_SUBJECTS, MED2_SUBJECTS, subjectRegistry } from "@/data/subjectRegistry";
@@ -1716,6 +1717,7 @@ export default function SubjectNotesPage() {
                               compact
                               tone="dark"
                               className="mt-3"
+                              questionId={question.id}
                             />
                             <YangmingExplanationPanel
                               questionId={question.id}
@@ -1723,7 +1725,7 @@ export default function SubjectNotesPage() {
                               className="mt-3"
                               buttonClassName="min-h-10 rounded-2xl bg-amber-100/15 px-4 py-2 text-sm font-semibold text-amber-50 ring-1 ring-amber-100/20 transition hover:bg-amber-100/25 disabled:cursor-wait disabled:opacity-60"
                             />
-                            {optionAnalysis && Object.keys(optionAnalysis).length > 0 ? (
+                            {!hasReviewedExplanation(question.id) && optionAnalysis && Object.keys(optionAnalysis).length > 0 ? (
                               <div className="mt-3 grid gap-2">
                                 {Object.entries(optionAnalysis).map(([key, value]) =>
                                   value ? (
@@ -1737,7 +1739,7 @@ export default function SubjectNotesPage() {
                             ) : null}
                           </div>
                         </details>
-                        {override ? (
+                        {!hasReviewedExplanation(question.id) && override ? (
                           <>
                             <span className="secondary-pill px-4 py-2 text-sm text-slate-600">
                               已替換詳解・{override.model ?? "gpt-5.4-mini"}
@@ -1751,7 +1753,7 @@ export default function SubjectNotesPage() {
                               {explanationLoading ? "重新生成中..." : "重新替換詳解"}
                             </button>
                           </>
-                        ) : (
+                        ) : !hasReviewedExplanation(question.id) ? (
                           <button
                             type="button"
                             onClick={() => void handleGenerateQuestionExplanation(question)}
@@ -1760,7 +1762,7 @@ export default function SubjectNotesPage() {
                           >
                             {explanationLoading ? "AI 生成中..." : "用 AI 補詳解"}
                           </button>
-                        )}
+                        ) : null}
                       </div>
                       {explanationError ? (
                         <p className="mt-3 rounded-2xl bg-rose-50 px-3 py-2 text-xs font-semibold leading-5 text-rose-700">

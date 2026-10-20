@@ -931,7 +931,7 @@ export default function PharmacologyReviewPage() {
             <span className="drug-flip-inner">
               <span className="drug-flip-face drug-flip-front">
                 <span className="rounded-full bg-white/70 px-4 py-2 text-xs font-black uppercase tracking-[0.2em] text-brand-700">
-                  Today's Random Drug
+                  Today&apos;s Random Drug
                 </span>
                 <span className={`mt-10 block max-w-full text-center font-serif font-bold leading-[1.04] tracking-normal text-ink [overflow-wrap:anywhere] [word-break:normal] ${getFrontDrugNameSizeClass(card.name)}`}>
                   {card.name}

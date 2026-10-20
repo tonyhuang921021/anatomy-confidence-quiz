@@ -4,9 +4,11 @@ import { type MouseEvent, type ReactNode, useMemo } from "react";
 import { QuestionOptionBlock, QuestionStemBlock } from "@/components/QuestionMediaBlock";
 import { QuestionPrimaryTagBadge } from "@/components/QuestionPrimaryTagBadge";
 import { getQuestionPrimaryTag, primaryTagIncludesSubject } from "@/lib/analysisPrimaryTag";
+import { useQuestionChangeFeedback } from "@/components/useQuestionChangeFeedback";
 import { OptionKey, Question } from "@/types/quiz";
 
 type QuestionCardProps = {
+  animateQuestionChanges?: boolean;
   question: Question;
   selectedAnswer?: OptionKey;
   submittedResult?: {
@@ -67,6 +69,7 @@ function getAcceptedAnswerSet(question: Question, fallbackAnswer: OptionKey) {
 }
 
 export function QuestionCard({
+  animateQuestionChanges = false,
   question,
   selectedAnswer,
   submittedResult,
@@ -78,6 +81,7 @@ export function QuestionCard({
   showMetadata = true,
   metadataExtra
 }: QuestionCardProps) {
+  const questionRef = useQuestionChangeFeedback(question.id, animateQuestionChanges);
   const primaryTag = getQuestionPrimaryTag(question);
   const availableOptionKeys = useMemo(
     () =>
@@ -91,7 +95,14 @@ export function QuestionCard({
   );
 
   return (
-    <div className="min-w-0 rounded-[2rem] bg-white p-5 shadow-card ring-1 ring-slate-100 sm:p-7">
+    <div
+      ref={questionRef}
+      data-question-id={question.id}
+      role={animateQuestionChanges ? "group" : undefined}
+      aria-label={animateQuestionChanges ? "作答題目" : undefined}
+      tabIndex={animateQuestionChanges ? -1 : undefined}
+      className="study-question min-w-0 rounded-[2rem] bg-white p-5 shadow-card ring-1 ring-slate-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-brand-500 sm:p-7"
+    >
       {showMetadata ? (
         <>
           <div className="flex flex-wrap gap-2 text-xs font-semibold">
@@ -160,7 +171,7 @@ export function QuestionCard({
                 : "border-slate-200 bg-white"
             : isSelected
               ? "border-brand-500 bg-brand-50 ring-2 ring-brand-200"
-              : "border-slate-200 bg-white hover:border-brand-300 hover:bg-brand-50/50";
+              : "study-option-idle border-slate-200 bg-white";
           const labelClassName = submittedResult
             ? reviewTone === "wrong"
               ? "bg-rose-600 text-white"
@@ -190,12 +201,13 @@ export function QuestionCard({
           return (
             <div
               key={key}
-              className={`flex min-h-12 min-w-0 max-w-full items-stretch overflow-hidden rounded-3xl border transition ${optionClassName}`}
+              className={`study-option flex min-h-12 min-w-0 max-w-full items-stretch overflow-hidden rounded-3xl border ${optionClassName}`}
             >
               <button
                 type="button"
                 onClick={() => onSelect(key)}
-                className="min-w-0 max-w-full flex-1 rounded-[inherit] px-4 py-4 text-left transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-400 focus-visible:ring-offset-2 sm:px-5"
+                aria-pressed={isSelected}
+                className="study-choice min-w-0 max-w-full flex-1 rounded-[inherit] px-4 py-4 text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-brand-400 sm:px-5"
               >
                 <QuestionOptionBlock
                   question={question}
@@ -207,7 +219,7 @@ export function QuestionCard({
                   trailingContent={
                     answerBadge ? (
                       <span
-                        className={`inline-flex shrink-0 rounded-full px-2.5 py-0.5 text-[11px] font-bold leading-5 ${
+                        className={`study-answer-badge inline-flex shrink-0 rounded-full px-2.5 py-0.5 text-[11px] font-bold leading-5 ${
                           reviewTone === "wrong"
                             ? "bg-rose-100 text-rose-800"
                             : "bg-emerald-100 text-emerald-800"

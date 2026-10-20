@@ -13,9 +13,11 @@ import { QuestionExplanationTabs } from "@/components/QuestionExplanationTabs";
 import { QuestionReportButton } from "@/components/QuestionIssueReportButton";
 import { RelatedQuestionsPanel } from "@/components/RelatedQuestionsPanel";
 import { WrongQuestionPdfExport } from "@/components/WrongQuestionPdfExport";
+import { useSurfaceTransition } from "@/components/useSurfaceTransition";
 import { ResultSummary } from "@/components/ResultSummary";
 import { CURRENT_ANSWER_KEY_REVISION } from "@/lib/answerKeyRevisions";
 import { SavedQuestionButton } from "@/components/SavedQuestionButton";
+import { hasReviewedExplanation } from "@/lib/reviewedExplanations";
 import {
   StructuredExplanationText,
   hasCollapsibleStructuredExplanation,
@@ -905,6 +907,8 @@ function ResultsPageContent() {
   const [isFullscreenReviewVisible, setIsFullscreenReviewVisible] = useState(false);
   const [openReviewDetailKeys, setOpenReviewDetailKeys] = useState<Set<string>>(() => new Set());
   const [reviewFilter, setReviewFilter] = useState<ResultReviewFilter | null>(null);
+  const reviewListRef = useSurfaceTransition(reviewFilter ?? "default");
+  const fullscreenListRef = useSurfaceTransition(reviewFilter ?? "default");
   const [activeReviewDetailKey, setActiveReviewDetailKey] = useState<string | null>(null);
   const reviewDetailElementMapRef = useRef<Record<string, HTMLDetailsElement | null>>({});
   const reviewSectionRef = useRef<HTMLElement | null>(null);
@@ -2167,7 +2171,7 @@ function ResultsPageContent() {
     return (
       <div className="grid gap-1">
         <div className="grid gap-1">
-          {!generated ? (
+          {!hasReviewedExplanation(question.id) && !generated ? (
             <button
               type="button"
               onClick={() => void handleGenerateQuestionExplanation(question, attempt)}
@@ -2177,7 +2181,7 @@ function ResultsPageContent() {
               {loading ? "AI 生成中..." : "用 AI 補詳解"}
             </button>
           ) : null}
-          {generated ? (
+          {!hasReviewedExplanation(question.id) && generated ? (
             <>
               <span className="px-3 py-1 text-xs font-semibold text-slate-500">
                 已替換詳解・{generated.model ?? "gpt-5.4-mini"}
@@ -2334,7 +2338,7 @@ function ResultsPageContent() {
       masteryReviewItemMap.get(attempt.questionId)?.categoryLabel ??
       getMasteryCategoryLabelForAnswer(attempt);
     const shouldCollapseAiExplanation = hasCollapsibleStructuredExplanation(question.explanation);
-    const aiExplanationContent = shouldCollapseAiExplanation ? (
+    const aiExplanationContent = shouldCollapseAiExplanation && !hasReviewedExplanation(question.id) ? (
       <StructuredExplanationText
         text={question.explanation}
         label=""
@@ -2454,13 +2458,14 @@ function ResultsPageContent() {
           text={question.explanation}
           label="詳解"
           compact
+          questionId={question.id}
           sectionFilter={
             shouldCollapseAiExplanation
               ? (section) => isDefaultInlineExplanationSectionTitle(section.title)
               : undefined
           }
         />
-        {renderOptionAnalysis(question)}
+        {!hasReviewedExplanation(question.id) ? renderOptionAnalysis(question) : null}
         <QuestionExplanationTabs
           question={question}
           compact
@@ -2920,7 +2925,7 @@ function ResultsPageContent() {
         {activeReviewFilter === "low-confidence" ? (
           <p className="mt-3 text-sm text-slate-500">答對但信心為 1–3 的題目；答錯的題目列在「錯題」。</p>
         ) : null}
-        <div className="mt-4 grid gap-2">
+        <div ref={fullscreenMobile ? fullscreenListRef : reviewListRef} className="study-result-list mt-4 grid gap-2">
           {visibleReviewItems.length === 0 ? (
             <p className="rounded-xl bg-slate-50 px-4 py-6 text-sm text-slate-600">
               {activeReviewFilter === "wrong" ? "這次沒有錯題。" : activeReviewFilter === "low-confidence" ? "這次沒有答對但沒信心的題目。" : "目前沒有可回顧的題目。"}

@@ -2,6 +2,78 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Animate UI skill e6cea6b: path C, subtle. Tween fallback keeps React 18 and
+   adds no animation runtime. No entrance hides the initial question text. */
+:root {
+  --study-motion-swap: 150ms cubic-bezier(0.23, 1, 0.32, 1);
+  --study-motion-color: 200ms ease;
+  --study-motion-menu: 220ms cubic-bezier(0.215, 0.61, 0.355, 1);
+  --study-choice-scale: 0.985;
+}
+
+.study-option {
+  transition: background-color var(--study-motion-color), border-color var(--study-motion-color);
+}
+
+.study-choice {
+  transition: transform var(--study-motion-swap);
+}
+
+.study-choice:active {
+  transform: scale(var(--study-choice-scale));
+}
+
+.study-option:has(:focus-visible) {
+  outline: 2px solid var(--brand-main);
+  outline-offset: 3px;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .study-option-idle:hover {
+    border-color: var(--brand-main);
+    background-color: var(--brand-tint);
+  }
+}
+
+.study-progress-value {
+  transition: transform var(--study-motion-menu);
+}
+
+/* A frequent disclosure takes its final layout immediately. Fade only: no
+   expanding long images, clipped focus rings, scroll compensation, or exit queue. */
+.study-disclosure,
+.study-feedback .quiz-answer-status,
+.study-answer-badge {
+  transition: opacity var(--study-motion-swap);
+}
+
+@starting-style {
+  .study-disclosure,
+  .study-feedback .quiz-answer-status,
+  .study-answer-badge {
+    opacity: 0.5;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --study-choice-scale: 1;
+  }
+
+  html:has(.study-quiz) {
+    scroll-behavior: auto;
+  }
+
+  .study-choice:active {
+    transform: none;
+  }
+
+  .study-choice,
+  .study-progress-value {
+    transition: none;
+  }
+}
+
 :root {
   color-scheme: light;
   --bg-base: #e9edeb;
@@ -5208,11 +5280,13 @@ html[data-theme="dark"] .feedback-identity button.is-selected {
   color: var(--brand-main);
 }
 
+@media (hover: hover) and (pointer: fine) {
 .home-continue-button:hover {
   border-color: color-mix(in srgb, var(--brand-main) 62%, var(--line-soft));
   background: #fffefa;
   box-shadow: 0 18px 42px rgba(29, 63, 51, 0.13);
   transform: translateY(-1px);
+}
 }
 
 .home-continue-button:active {
@@ -5571,11 +5645,13 @@ html[data-theme="dark"] .feedback-identity button.is-selected {
   transition: border-color 140ms ease, background-color 140ms ease;
 }
 
+@media (hover: hover) and (pointer: fine) {
 .home-study-resume .home-continue-button:hover {
   border-color: var(--brand-deep);
   background: rgba(255, 255, 255, 0.86);
   box-shadow: none;
   transform: none;
+}
 }
 
 .home-study-resume .home-continue-button:active {
@@ -5637,8 +5713,10 @@ html[data-theme="dark"] .feedback-identity button.is-selected {
   border-top: 1px solid var(--line-soft);
 }
 
+@media (hover: hover) and (pointer: fine) {
 .home-study-launch:hover {
   color: var(--brand-deep);
+}
 }
 
 .home-study-launch-arrow {
@@ -5659,12 +5737,16 @@ html[data-theme="dark"] .feedback-identity button.is-selected {
   color: #fff;
 }
 
+@media (hover: hover) and (pointer: fine) {
 .home-study-launch:hover .home-study-launch-arrow {
   border-color: var(--brand-deep);
 }
+}
 
+@media (hover: hover) and (pointer: fine) {
 .home-study-launch:not(.is-primary):hover .home-study-launch-arrow {
   background: color-mix(in srgb, var(--brand-tint) 48%, var(--surface-float));
+}
 }
 
 .home-study-tools {
@@ -5692,9 +5774,11 @@ html[data-theme="dark"] .feedback-identity button.is-selected {
   border-left: 1px solid var(--line-soft);
 }
 
+@media (hover: hover) and (pointer: fine) {
 .home-study-tools a:hover {
   background: color-mix(in srgb, var(--brand-tint) 35%, transparent);
   color: var(--brand-deep);
+}
 }
 
 .home-study-update {
@@ -7850,3 +7934,154 @@ html[data-theme="dark"] .pre-exam-survey-submit {
   background: rgba(138, 154, 184, 0.9);
   color: #101827;
 }
+
+/* Animate UI page/card recipes, subtle: reveal 300ms/ease.out, 80ms groups,
+   choice scale .985. Only these audited rules override the legacy Safari
+   homepage blanket disable. No blur, layout tween, hidden SSR text or loops. */
+.home-motion {
+  --home-reveal: 300ms cubic-bezier(0.23, 1, 0.32, 1);
+}
+@keyframes home-motion-arrive {
+  from { opacity: 0.75; transform: translateY(8px); }
+  to { opacity: 1; transform: none; }
+}
+@keyframes home-motion-fade {
+  from { opacity: 0.75; }
+  to { opacity: 1; }
+}
+html .home-motion [data-home-enter],
+html .home-motion [data-home-revealed="true"] {
+  animation: home-motion-arrive var(--home-reveal) both !important;
+}
+html .home-motion [data-home-enter="photo"] {
+  animation-name: home-motion-fade !important;
+}
+html .home-motion [data-home-enter="launches"] { animation-delay: 80ms !important; }
+html .home-motion [data-home-enter="tools"] { animation-delay: 160ms !important; }
+/* An early keyboard/pointer action takes precedence over the entrance. */
+html .home-motion [data-home-enter]:focus-within,
+html .home-motion [data-home-enter]:active,
+html .home-motion [data-home-reveal]:focus-within {
+  animation: none !important;
+}
+html .home-motion .home-motion-control {
+  transition: transform var(--study-motion-swap), color var(--study-motion-color),
+    background-color var(--study-motion-color), border-color var(--study-motion-color) !important;
+}
+html .home-motion .home-motion-control:active { transform: scale(0.985); }
+html .home-motion .home-motion-control:focus-visible {
+  outline: 2px solid var(--brand-main);
+  outline-offset: 4px;
+}
+html .home-motion .home-study-launch-arrow,
+html .home-motion .home-continue-arrow,
+html .home-motion .home-study-tools a > svg:last-child {
+  transition: transform var(--study-motion-menu), background-color var(--study-motion-color),
+    border-color var(--study-motion-color), color var(--study-motion-color) !important;
+}
+html .home-motion .home-motion-control:focus-visible .home-study-launch-arrow,
+html .home-motion .home-motion-control:focus-visible .home-continue-arrow,
+html .home-motion .home-study-tools a:focus-visible > svg:last-child {
+  transform: translateX(4px);
+}
+@media (hover: hover) and (pointer: fine) {
+  html .home-motion .home-motion-control:hover .home-study-launch-arrow,
+  html .home-motion .home-motion-control:hover .home-continue-arrow,
+  html .home-motion .home-study-tools a:hover > svg:last-child { transform: translateX(4px); }
+}
+.home-resume-overlay { animation: home-motion-fade var(--study-motion-swap) both; }
+.home-resume-panel { animation: home-motion-arrive var(--study-motion-menu) both; }
+.home-resume-panel button:focus-visible { outline: 2px solid var(--brand-main); outline-offset: 2px; }
+.home-resume-panel [aria-live] { transition: opacity var(--study-motion-swap); }
+@starting-style { .home-resume-panel [aria-live] { opacity: 0.75; } }
+@media (prefers-reduced-motion: reduce) {
+  html:has(.home-motion) { scroll-behavior: auto; }
+  html .home-motion [data-home-enter],
+  html .home-motion [data-home-revealed="true"] {
+    animation-name: home-motion-fade !important;
+    animation-delay: 0ms !important;
+  }
+  html .home-motion .home-motion-control,
+  html .home-motion .home-study-launch-arrow,
+  html .home-motion .home-continue-arrow,
+  html .home-motion .home-study-tools a > svg:last-child {
+    transform: none !important;
+    transition: color var(--study-motion-color), background-color var(--study-motion-color), border-color var(--study-motion-color) !important;
+  }
+  .home-resume-panel { animation-name: home-motion-fade; }
+}
+
+/* Shared study journey: immediate route/state fades; no page-exit queue.
+   Explicit public-screen scope leaves admin, authentication and print flows alone. */
+.study-flow .workspace-page,
+.study-result-summary,
+.study-flow [data-study-disclosure]:not([hidden]),
+.study-flow .workspace-page details[open] > :not(summary),
+.app-drawer-more-content {
+  animation: home-motion-fade var(--study-motion-swap) both;
+}
+.study-flow .workspace-page :is(.study-control, .primary-pill, .secondary-pill, .quiz-setup-choice, button[aria-pressed], button[aria-expanded]),
+.app-nav-link,
+.app-mobile-nav :is(a, button),
+.app-menu-trigger,
+.app-account-trigger,
+.app-drawer-links :is(a, button) {
+  transition: transform var(--study-motion-swap), background-color var(--study-motion-color),
+    border-color var(--study-motion-color), color var(--study-motion-color);
+}
+.study-flow .workspace-page :is(.study-control, .primary-pill, .secondary-pill, .quiz-setup-choice, button[aria-pressed], button[aria-expanded]):not(:disabled):active,
+.app-nav-link:active,
+.app-mobile-nav :is(a, button):active,
+.app-menu-trigger:active,
+.app-account-trigger:active,
+.app-drawer-links :is(a, button):active { transform: scale(0.985); }
+.study-flow [data-study-disclosure] + div,
+.study-flow [data-study-disclosure] { scroll-margin-top: 5rem; }
+.app-account-popover { animation: home-motion-arrive var(--study-motion-menu) both; transform-origin: top right; }
+.app-modal-panel { animation: app-panel-enter var(--study-motion-menu) both; }
+.app-mobile-drawer { animation: app-drawer-enter var(--study-motion-menu) both; }
+.app-drawer-more-chevron,
+.study-flow button[aria-expanded] > svg { transition: transform var(--study-motion-menu); }
+@media (prefers-reduced-motion: reduce) {
+  html:has(.study-flow) { scroll-behavior: auto; }
+  .study-flow .workspace-page :is(.study-control, .primary-pill, .secondary-pill, .quiz-setup-choice, button[aria-pressed], button[aria-expanded]),
+  .app-nav-link,
+  .app-mobile-nav :is(a, button),
+  .app-menu-trigger,
+  .app-account-trigger,
+  .app-drawer-links :is(a, button) {
+    transform: none !important;
+    transition: background-color var(--study-motion-color), border-color var(--study-motion-color), color var(--study-motion-color);
+  }
+  .app-account-popover,
+  .app-modal-panel,
+  .app-mobile-drawer { animation: home-motion-fade var(--study-motion-swap) both; }
+  .app-drawer-more-chevron,
+  .study-flow button[aria-expanded] > svg { transition: none; }
+}
+
+html .home-motion .home-tone-motion { animation: home-motion-fade var(--home-reveal) both !important; }
+
+/* Accepted reader editions: static prose, explicit reading modes, lazy original images. */
+.reviewed-explanation { min-width: 0; padding: 1rem; border: 1px solid #d9e4df; border-radius: 1rem; background: #fff; color: #263b32; }
+.reviewed-explanation-controls { display: flex; gap: .5rem; margin-bottom: 1rem; }
+.reviewed-explanation-controls button { min-height: 44px; padding: .45rem 1rem; border: 1px solid #bdd0c5; border-radius: .7rem; font-weight: 700; background: #f6f9f7; color: #284b3c; }
+.reviewed-explanation-controls button[aria-pressed="true"] { background: #285a45; color: white; }
+.reviewed-explanation button:focus-visible, .reviewed-reader a:focus-visible, .reviewed-reader summary:focus-visible { outline: 3px solid #b87914; outline-offset: 3px; }
+.reviewed-reader { min-width: 0; overflow-wrap: anywhere; line-height: 1.85; }
+.reviewed-reader h2 { margin: .7rem 0 1rem; font-size: 1.25rem; font-weight: 800; line-height: 1.5; }
+.reviewed-reader h3, .reviewed-reader h4 { margin: 1.25rem 0 .55rem; font-size: 1.05rem; font-weight: 800; line-height: 1.6; }
+.reviewed-reader p { margin: .7rem 0; }
+.reviewed-reader ol, .reviewed-reader ul { padding-left: 1.6rem; margin: .8rem 0; list-style: revert; }
+.reviewed-reader figure { margin: 1.3rem 0; }
+.reviewed-reader img { display: block; width: auto; max-width: 100%; height: auto; max-height: 900px; object-fit: contain; margin: .75rem auto; }
+.reviewed-reader figcaption { font-size: .85rem; line-height: 1.8; color: #52665b; }
+.reviewed-reader a { text-decoration: underline; text-underline-offset: 3px; color: #17633f; }
+.reviewed-table-scroll { max-width: 100%; overflow-x: auto; margin: 1rem 0; }
+.reviewed-reader table { width: 100%; border-collapse: collapse; font-size: .9rem; }
+.reviewed-reader th, .reviewed-reader td { padding: .65rem; border: 1px solid #d5e0da; vertical-align: top; min-width: 7rem; }
+.reviewed-reader th { background: #eef5f0; text-align: left; }
+.reviewed-reader details { margin-top: 1.2rem; padding: .75rem; background: #f4f7f5; border-radius: .7rem; }
+.reviewed-reader summary { cursor: pointer; font-weight: 700; min-height: 36px; }
+
+.reviewed-reader ol[type="A"] { list-style-type: upper-alpha; }

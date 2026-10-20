@@ -1,6 +1,10 @@
 "use client";
 
+import { hasReviewedExplanation } from "@/lib/reviewedExplanations";
+import { ReviewedExplanation } from "@/components/ReviewedExplanation";
+
 type StructuredExplanationTextProps = {
+  questionId?: string;
   text?: string | null;
   label?: string;
   compact?: boolean;
@@ -205,6 +209,7 @@ export function hasCollapsibleStructuredExplanation(text?: string | null) {
 }
 
 export function StructuredExplanationText({
+  questionId,
   text,
   label = "詳解",
   compact = false,
@@ -213,6 +218,7 @@ export function StructuredExplanationText({
   sectionFilter,
   fallbackToFullText = true
 }: StructuredExplanationTextProps) {
+  if (questionId && hasReviewedExplanation(questionId)) return <ReviewedExplanation questionId={questionId} />;
   const trimmedText = text?.trim();
   if (!trimmedText) return null;
 
