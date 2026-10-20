@@ -1,5 +1,7 @@
 "use client";
 
+import { getQuestionAnswerLabel } from "@/lib/answerScoring";
+
 import Link from "next/link";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useParams, useSearchParams } from "next/navigation";
@@ -1710,7 +1712,7 @@ export default function SubjectNotesPage() {
                             看答案與詳解
                           </summary>
                           <div className="mt-3 min-w-0 overflow-hidden break-words rounded-2xl bg-slate-950 px-4 py-3 text-sm leading-7 text-white">
-                            <p className="font-bold">答案：{question.answer}</p>
+                            <p className="font-bold">答案：{getQuestionAnswerLabel(question)}</p>
                             <StructuredExplanationText
                               text={explanation}
                               label="詳解"

@@ -10,6 +10,7 @@ import {
   hasCollapsibleStructuredExplanation,
   isDefaultInlineExplanationSectionTitle
 } from "@/components/StructuredExplanationText";
+import { hasReviewedExplanation } from "@/lib/reviewedExplanations";
 import { buildRelatedQuestionIndex, getRelatedQuestions } from "@/lib/relatedQuestions";
 import { isAcceptedSavedQuestionAnswer } from "@/lib/savedQuestions";
 import type { OptionKey, Question, SavedQuestionSource } from "@/types/quiz";
@@ -78,7 +79,7 @@ export function RelatedQuestionsPanel({
           ? isAcceptedSavedQuestionAnswer(relatedQuestion, submittedAnswer)
           : false;
         const shouldCollapseAiExplanation = hasCollapsibleStructuredExplanation(relatedQuestion.explanation);
-        const aiExplanationContent = shouldCollapseAiExplanation ? (
+        const aiExplanationContent = shouldCollapseAiExplanation && !hasReviewedExplanation(relatedQuestion.id) ? (
           <StructuredExplanationText
             text={relatedQuestion.explanation}
             label=""
@@ -178,6 +179,7 @@ export function RelatedQuestionsPanel({
                     text={relatedQuestion.explanation}
                     label="重點解析"
                     compact
+                    questionId={relatedQuestion.id}
                     sectionFilter={
                       shouldCollapseAiExplanation
                         ? (section) => isDefaultInlineExplanationSectionTitle(section.title)

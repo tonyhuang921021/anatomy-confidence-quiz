@@ -8068,14 +8068,26 @@ html .home-motion .home-tone-motion { animation: home-motion-fade var(--home-rev
 .reviewed-explanation-controls button { min-height: 44px; padding: .45rem 1rem; border: 1px solid #bdd0c5; border-radius: .7rem; font-weight: 700; background: #f6f9f7; color: #284b3c; }
 .reviewed-explanation-controls button[aria-pressed="true"] { background: #285a45; color: white; }
 .reviewed-explanation button:focus-visible, .reviewed-reader a:focus-visible, .reviewed-reader summary:focus-visible { outline: 3px solid #b87914; outline-offset: 3px; }
-.reviewed-reader { min-width: 0; overflow-wrap: anywhere; line-height: 1.85; }
+.reviewed-reader { --reviewed-image-max-height: 25rem; container: reviewed-reader / inline-size; min-width: 0; overflow-wrap: anywhere; line-height: 1.85; }
 .reviewed-reader h2 { margin: .7rem 0 1rem; font-size: 1.25rem; font-weight: 800; line-height: 1.5; }
 .reviewed-reader h3, .reviewed-reader h4 { margin: 1.25rem 0 .55rem; font-size: 1.05rem; font-weight: 800; line-height: 1.6; }
 .reviewed-reader p { margin: .7rem 0; }
 .reviewed-reader ol, .reviewed-reader ul { padding-left: 1.6rem; margin: .8rem 0; list-style: revert; }
-.reviewed-reader figure { margin: 1.3rem 0; }
-.reviewed-reader img { display: block; width: auto; max-width: 100%; height: auto; max-height: 900px; object-fit: contain; margin: .75rem auto; }
-.reviewed-reader figcaption { font-size: .85rem; line-height: 1.8; color: #52665b; }
+.reviewed-reader figure { width: 100%; max-width: 38rem; margin: 1.15rem auto; padding: .85rem; border: 1px solid #e0e9e4; border-radius: .8rem; background: #fafcfb; min-width: 0; }
+.reviewed-reader .reviewed-figure-group { display: grid; grid-template-columns: minmax(0, 1fr); gap: 1rem; max-width: 52rem; margin: 1.15rem auto; }
+.reviewed-reader .reviewed-figure-group > figure { margin: 0 auto; }
+.reviewed-reader .reviewed-image-link { display: block; width: fit-content; min-height: 36px; margin: .35rem 0 .4rem auto; padding: .3rem .55rem; font-size: .82rem; font-weight: 600; border: 1px solid #c9dacf; border-radius: .4rem; }
+.reviewed-reader .reviewed-official-answer { font-weight: 700; padding: .5rem .75rem; border-left: 3px solid #749985; background: #f0f6f2; }
+@container reviewed-reader (min-width: 44rem) {
+  .reviewed-reader .reviewed-figure-group { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .reviewed-reader .reviewed-figure-group { --reviewed-image-max-height: 21rem; }
+}
+.reviewed-image-frame { display: block; position: relative; width: min(100%, var(--reviewed-image-width), calc(var(--reviewed-image-max-height) * var(--reviewed-image-ratio))); aspect-ratio: var(--reviewed-image-ratio); margin: .75rem auto; background: #edf2ef; overflow: hidden; }
+.reviewed-reader .reviewed-image-frame img { display: block; width: 100%; height: 100%; max-width: 100%; object-fit: contain; margin: 0; }
+.reviewed-image-frame[data-image-state="loading"]::after, .reviewed-image-frame[data-image-state="error"]::after { position: absolute; inset: 0; display: grid; place-content: center; padding: .5rem; color: #52665b; font-size: .8rem; text-align: center; pointer-events: none; }
+.reviewed-image-frame[data-image-state="loading"]::after { content: "圖片載入中…"; }
+.reviewed-image-frame[data-image-state="error"]::after { content: "圖片暫時無法載入，可使用下方連結查看原圖。"; }
+.reviewed-reader figcaption { margin-top: .4rem; font-size: .85rem; line-height: 1.8; color: #52665b; }
 .reviewed-reader a { text-decoration: underline; text-underline-offset: 3px; color: #17633f; }
 .reviewed-table-scroll { max-width: 100%; overflow-x: auto; margin: 1rem 0; }
 .reviewed-reader table { width: 100%; border-collapse: collapse; font-size: .9rem; }
@@ -8085,3 +8097,9 @@ html .home-motion .home-tone-motion { animation: home-motion-fade var(--home-rev
 .reviewed-reader summary { cursor: pointer; font-weight: 700; min-height: 36px; }
 
 .reviewed-reader ol[type="A"] { list-style-type: upper-alpha; }
+
+@media (max-width: 600px) {
+  .reviewed-explanation { padding: .75rem; }
+  .reviewed-reader figure { padding: .65rem; }
+  .reviewed-reader { --reviewed-image-max-height: 20rem; }
+}

@@ -1,5 +1,7 @@
 "use client";
 
+import { getQuestionAnswerLabel } from "@/lib/answerScoring";
+
 import { useState } from "react";
 import { CopyQuestionPromptButton } from "@/components/CopyQuestionPromptButton";
 import { FormattedQuestionText } from "@/components/FormattedQuestionText";
@@ -188,7 +190,7 @@ export function StudyNoteQuestionCard({ question, link, title }: Props) {
           ) : null}
           {showAnswer ? (
             <div className="mt-3 min-w-0 overflow-hidden break-words rounded-2xl bg-slate-950 px-4 py-3 text-sm leading-7 text-white">
-              <p className="font-bold">答案：{question.answer}</p>
+              <p className="font-bold">答案：{getQuestionAnswerLabel(question)}</p>
               <StructuredExplanationText
                 text={explanation}
                 label="詳解"

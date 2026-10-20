@@ -1,5 +1,7 @@
 "use client";
 
+import { getQuestionAnswerLabel } from "@/lib/answerScoring";
+
 import Link from "next/link";
 import type { DragEvent } from "react";
 import { useDeferredValue, useEffect, useMemo, useRef, useState, useTransition } from "react";
@@ -702,12 +704,13 @@ export default function StudyNoteDetailPage() {
                             <div className="mt-3 rounded-2xl bg-white p-3 text-xs leading-5 text-slate-700">
                               <p className="font-bold text-slate-950">題幹</p>
                               <p className="mt-1">{question.stem}</p>
-                              <p className="mt-2 font-bold text-slate-950">答案：{question.answer}</p>
+                              <p className="mt-2 font-bold text-slate-950">答案：{getQuestionAnswerLabel(question)}</p>
                               <StructuredExplanationText
                                 text={question.explanation}
                                 label="詳解"
                                 compact
                                 className="mt-3"
+                                questionId={question.id}
                               />
                             </div>
                           ) : null}

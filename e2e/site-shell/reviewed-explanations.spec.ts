@@ -26,6 +26,7 @@ for (const batch of batches) {
   test(`完成版圖文逐題顯示與原圖載入 ${batch}`,async ({page},info) => {
     test.setTimeout(600_000);
     const ids=Object.entries(index).filter(([,v])=>v.batch===batch).map(([id])=>id);
+    await page.emulateMedia({reducedMotion:"reduce"});
     await fixture(page,ids);
     for (const [number,id] of ids.entries()) {
       const question=page.getByRole("group",{name:"作答題目",exact:true});
@@ -41,6 +42,10 @@ for (const batch of batches) {
       await expect(panel.locator('[data-reader-mode="detailed"]')).toBeVisible();
       const source=JSON.parse(readFileSync(`public/reviewed-explanations/${id}.json`,"utf8"));
       await expect(panel.locator("img")).toHaveCount(source.imageCount);
+      // Source-authored image disclosures must be opened before their lazy images load.
+      for (const disclosure of await panel.locator("details").filter({has: page.locator("img")}).all()) {
+        if (await disclosure.getAttribute("open") === null) await disclosure.locator(":scope > summary").click();
+      }
       for(const image of await panel.locator("img").all()) {
         await image.scrollIntoViewIfNeeded();
         await expect.poll(()=>image.evaluate((el:HTMLImageElement)=>el.complete&&el.naturalWidth>0)).toBe(true);

@@ -6,6 +6,7 @@ import { PharmacologyExamPeriodSummary } from "@/components/PharmacologyExamPeri
 import { QuestionOptionBlock, QuestionStemBlock } from "@/components/QuestionMediaBlock";
 import { SavedQuestionButton } from "@/components/SavedQuestionButton";
 import { StructuredExplanationText } from "@/components/StructuredExplanationText";
+import { hasReviewedExplanation } from "@/lib/reviewedExplanations";
 import {
   getPharmacologyExamPeriods,
   sortPharmacologyLibraryExams,
@@ -177,8 +178,8 @@ export function PharmacologyExamQuestions({
                       ) : null}
                     </div>
                   </div>
-                  <StructuredExplanationText text={openQuestion.explanation} label="詳解" compact />
-                  {openQuestion.optionAnalysis ? (
+                  <StructuredExplanationText text={openQuestion.explanation} label="詳解" compact questionId={openQuestion.id} />
+                  {!hasReviewedExplanation(openQuestion.id) && openQuestion.optionAnalysis ? (
                     <div className="grid gap-2.5">
                       {OPTION_KEYS.map((key) => {
                         const text = openQuestion.optionAnalysis?.[key as OptionKey];
