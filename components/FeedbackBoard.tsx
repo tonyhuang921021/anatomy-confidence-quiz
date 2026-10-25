@@ -1,5 +1,8 @@
 "use client";
 
+import { formatRocDate } from "@/lib/rocDate";
+
+
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Check, MessageCircle, Pin, RefreshCw, Send, ThumbsDown, ThumbsUp } from "lucide-react";
 import { useAuth } from "@/components/AuthProvider";
@@ -23,7 +26,7 @@ type CachedFeedbackPage = {
 };
 
 function formatCreatedAt(value: string) {
-  return new Date(value).toLocaleString("zh-TW", {
+  return formatRocDate(value, {
     month: "2-digit",
     day: "2-digit",
     hour: "2-digit",

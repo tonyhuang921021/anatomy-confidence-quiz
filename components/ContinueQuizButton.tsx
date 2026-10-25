@@ -1,4 +1,5 @@
 "use client";
+import { formatRocDate } from "@/lib/rocDate";
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { createPortal } from "react-dom";
@@ -40,7 +41,7 @@ function formatActivityTime(value: string) {
   if (!value) return "尚無作答時間";
   const date = new Date(value);
   if (Number.isNaN(date.getTime())) return "尚無作答時間";
-  return date.toLocaleString("zh-TW", {
+  return formatRocDate(date, {
     month: "numeric",
     day: "numeric",
     hour: "2-digit",

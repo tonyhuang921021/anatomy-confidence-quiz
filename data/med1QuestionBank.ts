@@ -1,3 +1,4 @@
+import { formatRocYear } from "@/lib/rocDate";
 import { anatomyOutline, anatomyQuestions } from "@/data/anatomyQuestions";
 import { moexMed1Missing22QuestionsDetailedV5 } from "@/data/sources/moex_med1_missing_22_questions_detailed_v5";
 import { moexMed1Requested71QuestionsDetailedPatchV5 } from "@/data/sources/moex_med1_requested_71_questions_detailed_patch_v5";
@@ -2521,7 +2522,7 @@ export function getPastPaperOptions(
 
     paperMap.set(key, {
       key,
-      label: `${question.officialSource && question.sourceYear ? `${question.sourceYear - 1911}年（${question.sourceYear}）` : question.sourceYear ?? ""} 第${question.sourceRound ?? (question.examSessionLabel?.includes("第二") ? 2 : 1)}次 ${examLabel} ${question.paperCode}`,
+      label: `${formatRocYear(question.sourceYear)} 第${question.sourceRound ?? (question.examSessionLabel?.includes("第二") ? 2 : 1)}次 ${examLabel} ${question.paperCode}`,
       subject: examLabel as SubjectFilter,
       questionCount: 1,
       sourceYear: question.sourceYear,

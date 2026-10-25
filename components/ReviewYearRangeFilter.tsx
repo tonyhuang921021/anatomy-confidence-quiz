@@ -1,5 +1,8 @@
 "use client";
 
+import { formatRocYear } from "@/lib/rocDate";
+
+
 import type { ReactNode } from "react";
 import {
   MAX_PRACTICE_SOURCE_YEAR,
@@ -63,7 +66,7 @@ export function ReviewYearRangeFilter({
               >
                 {PRACTICE_YEAR_OPTIONS.map((year) => (
                   <option key={`${idPrefix}-from-${year}`} value={year}>
-                    {year}
+                    {formatRocYear(year)}
                   </option>
                 ))}
               </select>
@@ -85,7 +88,7 @@ export function ReviewYearRangeFilter({
               >
                 {PRACTICE_YEAR_OPTIONS.map((year) => (
                   <option key={`${idPrefix}-to-${year}`} value={year}>
-                    {year}
+                    {formatRocYear(year)}
                   </option>
                 ))}
               </select>
@@ -114,7 +117,7 @@ export function ReviewYearRangeFilter({
       >
         <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
           <strong className="tabular-nums text-ink">
-            {value.yearFrom}–{value.yearTo} 年
+            {formatRocYear(value.yearFrom)}–{formatRocYear(value.yearTo)}
           </strong>
           <span className="text-slate-500">
             這個範圍可開始 <strong className="font-semibold text-slate-700">{filteredCount}</strong> 題

@@ -1,3 +1,4 @@
+import { formatRocExamLabel, createRocDateFormatter } from "@/lib/rocDate";
 import type { PostExamSeasonDailyPoint } from "@/data/postExamSeasonSnapshot";
 import type {
   PostExamCumulativePoint,
@@ -7,7 +8,7 @@ import type {
 import { groupPostExamSimulationsByYear } from "@/lib/postExamReflection";
 
 const numberFormatter = new Intl.NumberFormat("zh-TW");
-const dateFormatter = new Intl.DateTimeFormat("zh-TW", {
+const dateFormatter = createRocDateFormatter({
   timeZone: "Asia/Taipei",
   month: "numeric",
   day: "numeric"
@@ -148,7 +149,7 @@ export function SeasonActivityChart({
         </svg>
       </div>
       <p className="mt-2 text-xs leading-5 text-slate-500">
-        統計截止 2026/7/17 15:00（台灣時間）；7/17 為截至截止時間的部分日。
+        統計截止 115/7/17 15:00（台灣時間）；7/17 為截至截止時間的部分日。
       </p>
     </figure>
   );
@@ -247,9 +248,9 @@ function SimulationResultCard({ result }: { result: PostExamSimulationResult }) 
         <div className="min-w-0">
           <p
             className="line-clamp-2 break-words text-xs font-semibold leading-5 text-slate-800 sm:text-sm"
-            title={result.paperLabel}
+            title={formatRocExamLabel(result.paperLabel)}
           >
-            {result.paperLabel}
+            {formatRocExamLabel(result.paperLabel)}
           </p>
           <p className="mt-1 text-[11px] text-slate-500 sm:text-xs">{formatDate(result.completedAt)}</p>
         </div>
@@ -505,7 +506,7 @@ export async function downloadPostExamRecapPng({
   context.fillText("2026 一階醫師國考題庫回顧", 72, 88);
   context.fillStyle = "#64748b";
   context.font = '500 22px "Noto Sans TC", sans-serif';
-  context.fillText("統計截止 2026/7/17 15:00（台灣時間）", 72, 126);
+  context.fillText("統計截止 115/7/17 15:00（台灣時間）", 72, 126);
 
   context.fillStyle = "#ffffff";
   canvasRoundRect(context, 56, 168, width - 112, 350);

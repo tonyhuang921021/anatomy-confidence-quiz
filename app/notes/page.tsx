@@ -1,5 +1,8 @@
 "use client";
 
+import { createRocDateFormatter } from "@/lib/rocDate";
+
+
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import { useAuth } from "@/components/AuthProvider";
@@ -17,7 +20,7 @@ const STUDY_NOTES_MANUAL_HREF = "/manuals/學習筆記功能說明.html";
 
 function formatDate(value?: string) {
   if (!value) return "尚無筆記";
-  return new Intl.DateTimeFormat("zh-Hant", {
+  return createRocDateFormatter({
     month: "2-digit",
     day: "2-digit",
     hour: "2-digit",

@@ -1,3 +1,4 @@
+import { formatRocYear } from "./rocDate";
 import fontkit from "@pdf-lib/fontkit";
 import { PDFArray, PDFContentStream, PDFDict, PDFDocument, PDFName, PDFNumber, PDFRawStream, PDFRef, PDFString, PageSizes, decodePDFRawStream, rgb, type PDFFont, type PDFImage, type PDFPage } from "pdf-lib";
 import { tokenizeWrongQuestionPdfText } from "./wrongQuestionPdfText";
@@ -42,7 +43,7 @@ function unsupportedCharacterError(character: string) {
 
 function sourceLabel(question: WrongQuestionPdfItem["question"]) {
   return question.sourceYear
-    ? `${question.sourceYear >= 1912 ? question.sourceYear - 1911 : question.sourceYear} 年${question.sourceRound ? `第 ${question.sourceRound} 次` : ""}${question.originalQuestionNumber ? ` · 原第 ${question.originalQuestionNumber} 題` : ""}`
+    ? `${formatRocYear(question.sourceYear)}${question.sourceRound ? `第 ${question.sourceRound} 次` : ""}${question.originalQuestionNumber ? ` · 原第 ${question.originalQuestionNumber} 題` : ""}`
     : question.sourceType === "AI_GENERATED" ? "自訂練習題" : "練習題";
 }
 

@@ -1,5 +1,8 @@
 "use client";
 
+import { formatRocDate } from "@/lib/rocDate";
+
+
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import { useAuth } from "@/components/AuthProvider";
@@ -71,7 +74,7 @@ function getOptionKeys(question: Question) {
 
 function formatSavedDate(value?: string) {
   if (!value) return "尚未作答";
-  return new Date(value).toLocaleString("zh-TW", {
+  return formatRocDate(value, {
     month: "2-digit",
     day: "2-digit",
     hour: "2-digit",

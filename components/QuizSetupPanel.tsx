@@ -1,5 +1,8 @@
 "use client";
 
+import { formatRocYear } from "@/lib/rocDate";
+
+
 import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/components/AuthProvider";
@@ -520,7 +523,7 @@ export function QuizSetupPanel({
                 </select>
                 {selectedPaper?.sourceYear && selectedPaper.sourceYear >= 2009 && selectedPaper.sourceYear <= 2010 ? (
                   <p className="mt-3 rounded-xl bg-amber-50 px-3 py-2 text-xs leading-6 text-amber-900">
-                    {selectedPaper.sourceYear - 1911} 年舊制：{selectedPaper.subject === "醫學（一）"
+                    {formatRocYear(selectedPaper.sourceYear)}舊制：{selectedPaper.subject === "醫學（一）"
                       ? "醫學（一）含解剖、胚胎、組織、微生物免疫、寄生蟲及公共衛生。"
                       : "醫學（二）含生理、生化、藥理及病理。"}每卷 100 題，依官方最終答案及更正採分。
                   </p>

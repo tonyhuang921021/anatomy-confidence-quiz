@@ -1,5 +1,8 @@
 "use client";
 
+import { formatRocYear } from "@/lib/rocDate";
+
+
 import dynamic from "next/dynamic";
 import Link from "next/link";
 import { CheckCircle2, XCircle } from "lucide-react";
@@ -418,7 +421,7 @@ function buildSimulationSessionName(settings: QuizSettings, questions: Question[
       : firstQuestion.paperCode?.startsWith("2")
         ? "醫學（二）"
         : "醫學（一）";
-  return `${firstQuestion.sourceYear} 第${firstQuestion.sourceRound ?? 1}次 ${subjectLabel} ${firstQuestion.paperCode ?? ""}`.trim();
+  return `${formatRocYear(firstQuestion.sourceYear)} 第${firstQuestion.sourceRound ?? 1}次 ${subjectLabel} ${firstQuestion.paperCode ?? ""}`.trim();
 }
 
 function getSimulationSelectedPaperKey(settings: QuizSettings, questions: Question[]) {

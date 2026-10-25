@@ -1,3 +1,4 @@
+import { toGregorianPracticeYear } from "./practiceYears";
 import type { Question, StudyNoteQuestionLink, SubjectName } from "@/types/quiz";
 
 type ResolveStudyNoteQuestionLinksOptions = {
@@ -15,7 +16,7 @@ function normalizeQuestionNumber(value: string) {
 function normalizeYear(value: string) {
   const parsed = Number(value);
   if (!Number.isFinite(parsed)) return null;
-  if (parsed >= 100 && parsed <= 199) return parsed + 1911;
+  if (parsed >= 98 && parsed <= 199) return toGregorianPracticeYear(parsed);
   if (parsed >= 1900 && parsed <= 2100) return parsed;
   return null;
 }
@@ -23,7 +24,7 @@ function normalizeYear(value: string) {
 function inferRoundFromExamCode(examCode: string) {
   const suffix = examCode.slice(3);
   if (suffix === "020" || suffix === "010") return 1;
-  if (suffix === "110" || suffix === "120") return 2;
+  if (suffix === "090" || suffix === "110" || suffix === "120" || suffix === "130" || suffix === "140") return 2;
   return null;
 }
 
@@ -43,7 +44,7 @@ function parseQuestionReference(rawReference: string) {
   }
 
   const withPaperCodeMatch = reference.match(
-    /(\d{3,4})\s*[-_/年第\s]*(?:第?\s*)?([12一二])\s*(?:次|回|round)?\s*[-_/\s]+(\d{4})\s*[-_/題\s]*(?:Q|第)?\s*0*(\d{1,3})/i
+    /(\d{2,4})\s*[-_/年第\s]*(?:第?\s*)?([12一二])\s*(?:次|回|round)?\s*[-_/\s]+(\d{4})\s*[-_/題\s]*(?:Q|第)?\s*0*(\d{1,3})/i
   );
   if (withPaperCodeMatch) {
     const [, yearText, roundText, paperCode, questionNumberText] = withPaperCodeMatch;
@@ -56,7 +57,7 @@ function parseQuestionReference(rawReference: string) {
     };
   }
 
-  const compactMatch = reference.match(/(\d{3,4})\s*[-_/年第\s]*(?:第?\s*)?([12一二])\s*(?:次|回|round)?\s*[-_/題\s]*(?:Q|第)?\s*0*(\d{1,3})/i);
+  const compactMatch = reference.match(/(\d{2,4})\s*[-_/年第\s]*(?:第?\s*)?([12一二])\s*(?:次|回|round)?\s*[-_/題\s]*(?:Q|第)?\s*0*(\d{1,3})/i);
   if (compactMatch) {
     const [, yearText, roundText, questionNumberText] = compactMatch;
     return {
@@ -105,6 +106,8 @@ function findQuestionByReference(
     const exactParsed = questions.find((question) => question.id.toLowerCase() === parsed.exactId?.toLowerCase());
     if (exactParsed) return exactParsed;
   }
+
+  if (!parsed.year || !parsed.questionNumber) return null;
 
   const candidates = questions.filter((question) => {
     if (parsed.year && question.sourceYear !== parsed.year) return false;

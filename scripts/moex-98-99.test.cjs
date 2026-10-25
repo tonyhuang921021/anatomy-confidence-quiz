@@ -109,7 +109,7 @@ test('real runtime exposes the eight papers and preserves every existing questio
   for (const question of previous.canonicalQuestionBank) assert.deepEqual(currentById.get(question.id),question);
   const before=previous.getPastPaperOptions();
   const after=current.getPastPaperOptions();
-  assert.deepEqual(after.filter(p=>p.sourceYear>=2011),before);
+  assert.deepEqual(after.filter(p=>p.sourceYear>=2011),before.map(p=>({...p,label:require("../lib/rocDate.ts").formatRocYear(p.sourceYear)+p.label.slice(String(p.sourceYear).length)})));
   assert.equal(after.length,before.length+8);
   for (const paper of payload.papers) {
     const option=after.find(p=>p.key===paper.key);

@@ -1,5 +1,8 @@
 "use client";
 
+import { formatRocDate, formatRocYear } from "@/lib/rocDate";
+
+
 import Link from "next/link";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
@@ -116,7 +119,7 @@ const customPaperTabs = [
 type CustomPaperTab = (typeof customPaperTabs)[number]["id"];
 
 function formatPaperTime(value: string) {
-  return new Date(value).toLocaleString("zh-TW", {
+  return formatRocDate(value, {
     month: "2-digit",
     day: "2-digit",
     hour: "2-digit",
@@ -767,7 +770,7 @@ export default function CustomPapersPage() {
                         <span className="min-w-0">
                           <span className="block text-xs font-semibold text-slate-500">
                             {question.subject}・{question.chapter || question.section || "未分類"}
-                            {question.sourceYear ? `・${question.sourceYear} 第${question.sourceRound ?? 1}次 Q${question.originalQuestionNumber ?? ""}` : ""}
+                            {question.sourceYear ? `・${formatRocYear(question.sourceYear)} 第${question.sourceRound ?? 1}次 Q${question.originalQuestionNumber ?? ""}` : ""}
                           </span>
                           <span className="mt-1 block text-sm leading-6 text-ink">{question.stem}</span>
                         </span>

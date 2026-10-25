@@ -5807,13 +5807,13 @@ html[data-theme="dark"] .feedback-identity button.is-selected {
   font-variant-numeric: tabular-nums;
 }
 
-.home-study-update p {
+.home-study-update .home-update-summary-copy {
   display: flex;
   min-width: 0;
   gap: 0.55rem;
 }
 
-.home-study-update p span {
+.home-study-update .home-update-summary-copy > span {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -5946,7 +5946,7 @@ html[data-theme="dark"] .home-study-launch-arrow {
     font-size: 0.76rem;
   }
 
-  .home-study-update p span {
+  .home-study-update .home-update-summary-copy > span {
     display: none;
   }
 
@@ -8103,3 +8103,16 @@ html .home-motion .home-tone-motion { animation: home-motion-fade var(--home-rev
   .reviewed-reader figure { padding: .65rem; }
   .reviewed-reader { --reviewed-image-max-height: 20rem; }
 }
+
+/* Keep the existing single-line update summary; disclosure reveals real history. */
+.home-study-updates { max-width:72rem; margin:0 auto; }
+.home-study-updates > summary { cursor:pointer; list-style:none; }
+.home-study-updates > summary::-webkit-details-marker { display:none; }
+.home-study-updates > summary:focus-visible { outline:2px solid var(--brand-deep); outline-offset:5px; }
+.home-study-updates > summary > span:first-child::after { content:" ＋"; }
+.home-study-updates[open] > summary > span:first-child::after { content:" −"; }
+.home-release-history { margin:1rem 0 0; padding:0; list-style:none; color:var(--ink-soft); font-size:.85rem; line-height:1.8; }
+.home-release-history li { padding:1rem 0; border-bottom:1px solid var(--line-soft); }
+.home-release-history time { margin-right:.75rem; color:var(--brand-deep); }
+.home-release-history strong { color:var(--ink-main); font-weight:500; }
+.home-release-history p { margin:.35rem 0 0; }

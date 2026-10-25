@@ -1,3 +1,4 @@
+import { formatRocYear } from "./rocDate";
 import type { QuizSession } from "@/types/quiz";
 
 export const POST_EXAM_CUTOFF_AT = "2026-07-17T07:00:00.000Z";
@@ -151,7 +152,7 @@ export function groupPostExamSimulationsByYear(
     const key = year ? `year-${year}` : isAiPaper ? "ai" : "other";
     const group = groups.get(key) ?? {
       key,
-      label: year ? `${year} 年` : isAiPaper ? "AI 模擬卷" : "其他模擬卷",
+      label: year ? formatRocYear(year) : isAiPaper ? "AI 模擬卷" : "其他模擬卷",
       sortOrder: year ?? (isAiPaper ? -1 : -2),
       med1: [],
       med2: []

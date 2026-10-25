@@ -1,3 +1,4 @@
+import { formatRocDate } from "@/lib/rocDate";
 import { NextRequest, NextResponse } from "next/server";
 import { regradeSessionForCurrentAnswerKey } from "@/lib/answerKeyRevisions";
 import { createClient } from "@supabase/supabase-js";
@@ -1297,7 +1298,7 @@ export async function POST(request: NextRequest) {
         return NextResponse.json(
           {
             ok: false,
-            message: `這個帳號的 AI 功能已被暫停到 ${new Date(activeBan.banned_until).toLocaleString("zh-TW")} 。`
+            message: `這個帳號的 AI 功能已被暫停到 ${formatRocDate(activeBan.banned_until, {hour:"2-digit",minute:"2-digit"})} 。`
           },
           { status: 429 }
         );
@@ -1479,7 +1480,7 @@ export async function POST(request: NextRequest) {
         return NextResponse.json(
           {
             ok: false,
-            message: `這個帳號的 AI 功能已被暫停到 ${new Date(activeBan.banned_until).toLocaleString("zh-TW")} 。`
+            message: `這個帳號的 AI 功能已被暫停到 ${formatRocDate(activeBan.banned_until, {hour:"2-digit",minute:"2-digit"})} 。`
           },
           { status: 429 }
         );

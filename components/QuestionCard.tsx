@@ -1,5 +1,8 @@
 "use client";
 
+import { formatRocYear } from "@/lib/rocDate";
+
+
 import { type MouseEvent, type ReactNode, useMemo } from "react";
 import { QuestionOptionBlock, QuestionStemBlock } from "@/components/QuestionMediaBlock";
 import { QuestionPrimaryTagBadge } from "@/components/QuestionPrimaryTagBadge";
@@ -30,7 +33,7 @@ const optionKeys: OptionKey[] = ["A", "B", "C", "D", "E"];
 function getSourceLabel(question: Question) {
   if (question.sourceType === "MOEX_PAST_EXAM") {
     const meta = [
-      question.sourceYear,
+      question.sourceYear ? formatRocYear(question.sourceYear) : null,
       question.sourceRound && `第 ${question.sourceRound} 次`,
       question.originalQuestionNumber && `第 ${question.originalQuestionNumber} 題`
     ]
@@ -106,6 +109,9 @@ export function QuestionCard({
       {showMetadata ? (
         <>
           <div className="flex flex-wrap gap-2 text-xs font-semibold">
+            {question.officialSource && (question.subject === "醫學（一）" || question.subject === "醫學（二）") ? (
+              <span className="rounded-full bg-amber-50 px-3 py-1 text-amber-900">學科分類待核對</span>
+            ) : null}
             {!primaryTag || !primaryTagIncludesSubject(primaryTag, question.subject) ? (
               <span className="max-w-full break-words rounded-full bg-brand-100 px-3 py-1 text-brand-800">
                 {question.subject}

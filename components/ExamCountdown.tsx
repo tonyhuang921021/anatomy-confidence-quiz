@@ -1,76 +1,26 @@
 "use client";
-
-import { useEffect, useMemo, useState } from "react";
-
-const EXAM_DATE = new Date("2026-07-17T08:40:00+08:00");
-
-type CountdownParts = {
-  isPast: boolean;
-  days: number;
-  hours: number;
-  minutes: number;
-};
-
-function getCountdownParts(now: Date): CountdownParts {
-  const diffMs = EXAM_DATE.getTime() - now.getTime();
-
-  if (diffMs <= 0) {
-    return {
-      isPast: true,
-      days: 0,
-      hours: 0,
-      minutes: 0
-    };
-  }
-
-  const totalMinutes = Math.floor(diffMs / (1000 * 60));
-  const days = Math.floor(totalMinutes / (60 * 24));
-  const hours = Math.floor((totalMinutes % (60 * 24)) / 60);
-  const minutes = totalMinutes % 60;
-
-  return {
-    isPast: false,
-    days,
-    hours,
-    minutes
-  };
-}
+import { useEffect, useState } from "react";
+import { getExamCountdown } from "@/lib/examCountdown";
+import { formatRocDate } from "@/lib/rocDate";
 
 export function ExamCountdown() {
   const [now, setNow] = useState<Date | null>(null);
-
   useEffect(() => {
-    setNow(new Date());
-    const timer = window.setInterval(() => {
-      setNow(new Date());
-    }, 60 * 1000);
-
-    return () => window.clearInterval(timer);
+    const refresh = () => setNow(new Date());
+    refresh();
+    const timer = window.setInterval(refresh, 60000);
+    document.addEventListener("visibilitychange", refresh);
+    return () => { window.clearInterval(timer); document.removeEventListener("visibilitychange", refresh); };
   }, []);
-
-  const countdown = useMemo(() => (now ? getCountdownParts(now) : null), [now]);
-
+  const countdown = now ? getExamCountdown(now) : null;
   return (
-    <div className="surface-card-muted p-4">
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        <div>
-          <p className="eyebrow text-sm tracking-[0.16em]">Exam Countdown</p>
-          <p className="body-soft mt-2 text-sm">國考時間：7/17 早上 8:40</p>
-        </div>
-        {!countdown ? (
-          <span className="stat-chip px-3 py-2 text-sm">倒數整理中</span>
-        ) : countdown.isPast ? (
-          <span className="stat-chip px-3 py-2 text-sm">
-            國考時間已到
-          </span>
-        ) : (
-          <div className="flex flex-wrap items-center gap-2 text-sm font-semibold text-ink">
-            <span className="stat-chip px-3 py-2 text-sm">{countdown.days} 天</span>
-            <span className="stat-chip px-3 py-2 text-sm">{countdown.hours} 小時</span>
-            <span className="stat-chip px-3 py-2 text-sm">{countdown.minutes} 分鐘</span>
-          </div>
-        )}
-      </div>
-    </div>
+    <p className="mt-3 text-sm leading-7 text-slate-500" aria-label="醫師第一階段考試倒數">
+      {!countdown ? "考期確認中" : !countdown.exam ? "下一次醫師一階日期待官方公告" : <>
+        <a href={countdown.exam.sourceUrl} target="_blank" rel="noopener noreferrer" className="underline underline-offset-4">
+          {countdown.exam.label}：{formatRocDate(countdown.exam.date!)}
+        </a>
+        <span>・{countdown.status === "today" ? "今天考試，請依通知書時間應試" : `倒數 ${countdown.days} 天`}</span>
+      </>}
+    </p>
   );
 }

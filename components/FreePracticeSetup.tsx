@@ -1,5 +1,8 @@
 "use client";
 
+import { formatRocYear } from "@/lib/rocDate";
+
+
 import { Check, ChevronDown, Play } from "lucide-react";
 import { useState, type ReactNode } from "react";
 import {
@@ -101,7 +104,7 @@ export function FreePracticeSetup({
         <div className="min-w-0">
           <h2 className="text-base font-semibold text-ink">自由做題設定</h2>
           <p className="mt-1 text-sm leading-5 text-slate-500" aria-live="polite">
-            {yearRange.yearFrom}–{yearRange.yearTo} 年・{countSummary}・{orderSummary}
+            {formatRocYear(yearRange.yearFrom)}–{formatRocYear(yearRange.yearTo)}・{countSummary}・{orderSummary}
           </p>
         </div>
         <button
@@ -148,7 +151,7 @@ export function FreePracticeSetup({
                     className="min-h-10 min-w-0 rounded-lg border border-slate-200 bg-white px-3 text-sm font-semibold text-ink outline-none transition focus-visible:border-brand-500 focus-visible:ring-2 focus-visible:ring-brand-100"
                   >
                     {PRACTICE_YEAR_OPTIONS.map((year) => (
-                      <option key={`${idPrefix}-from-${year}`} value={year}>{year}</option>
+                      <option key={`${idPrefix}-from-${year}`} value={year}>{formatRocYear(year)}</option>
                     ))}
                   </select>
                 </label>
@@ -170,7 +173,7 @@ export function FreePracticeSetup({
                     className="min-h-10 min-w-0 rounded-lg border border-slate-200 bg-white px-3 text-sm font-semibold text-ink outline-none transition focus-visible:border-brand-500 focus-visible:ring-2 focus-visible:ring-brand-100"
                   >
                     {PRACTICE_YEAR_OPTIONS.map((year) => (
-                      <option key={`${idPrefix}-to-${year}`} value={year}>{year}</option>
+                      <option key={`${idPrefix}-to-${year}`} value={year}>{formatRocYear(year)}</option>
                     ))}
                   </select>
                 </label>

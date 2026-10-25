@@ -1,5 +1,8 @@
 "use client";
 
+import { formatRocYear } from "@/lib/rocDate";
+
+
 import { useDeferredValue, useMemo, useState, useTransition } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -98,7 +101,7 @@ function getQuestionLabel(question: Question) {
     ].filter(Boolean).join(" ");
   }
   if (question.sourceYear && question.sourceRound && question.originalQuestionNumber) {
-    return `${question.sourceYear} 第 ${question.sourceRound} 次第 ${question.originalQuestionNumber} 題`;
+    return `${formatRocYear(question.sourceYear)} 第 ${question.sourceRound} 次第 ${question.originalQuestionNumber} 題`;
   }
   return question.examSessionLabel ?? question.paperCode ?? question.examCode;
 }

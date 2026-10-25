@@ -1,5 +1,8 @@
 "use client";
 
+import { formatRocYear } from "@/lib/rocDate";
+
+
 import { Play } from "lucide-react";
 import {
   QuestionOrderModeControl,
@@ -75,7 +78,7 @@ export function ProgressPracticeSetup({
                 className="min-h-10 min-w-0 rounded-lg border border-slate-200 bg-white px-3 text-sm font-semibold text-ink outline-none transition focus:border-brand-500 focus:ring-2 focus:ring-brand-100"
               >
                 {PRACTICE_YEAR_OPTIONS.map((year) => (
-                  <option key={`${idPrefix}-from-${year}`} value={year}>{year}</option>
+                  <option key={`${idPrefix}-from-${year}`} value={year}>{formatRocYear(year)}</option>
                 ))}
               </select>
             </label>
@@ -95,7 +98,7 @@ export function ProgressPracticeSetup({
                 className="min-h-10 min-w-0 rounded-lg border border-slate-200 bg-white px-3 text-sm font-semibold text-ink outline-none transition focus:border-brand-500 focus:ring-2 focus:ring-brand-100"
               >
                 {PRACTICE_YEAR_OPTIONS.map((year) => (
-                  <option key={`${idPrefix}-to-${year}`} value={year}>{year}</option>
+                  <option key={`${idPrefix}-to-${year}`} value={year}>{formatRocYear(year)}</option>
                 ))}
               </select>
             </label>
@@ -133,7 +136,7 @@ export function ProgressPracticeSetup({
 
       <div className="mt-4 flex flex-col gap-3 border-t border-brand-100 pt-4 sm:flex-row sm:items-center sm:justify-between">
         <p className="text-sm text-slate-600" aria-live="polite">
-          {yearRange.yearFrom}–{yearRange.yearTo} 年・
+          {formatRocYear(yearRange.yearFrom)}–{formatRocYear(yearRange.yearTo)}・
           <strong className="font-semibold tabular-nums text-ink">{availableQuestionCount}</strong> 題符合
         </p>
         <button

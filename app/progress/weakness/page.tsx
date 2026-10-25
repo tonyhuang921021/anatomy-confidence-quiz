@@ -1,5 +1,8 @@
 "use client";
 
+import { formatRocDate } from "@/lib/rocDate";
+
+
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useRef, useState } from "react";
@@ -43,7 +46,7 @@ type AnalysisProgress = {
 
 function formatDateTime(value: string | null) {
   if (!value) return "尚無作答紀錄";
-  return new Date(value).toLocaleString("zh-TW", {
+  return formatRocDate(value, {
     month: "numeric",
     day: "numeric",
     hour: "2-digit",

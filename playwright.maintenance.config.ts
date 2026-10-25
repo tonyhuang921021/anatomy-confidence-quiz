@@ -1,0 +1,2 @@
+import {defineConfig,devices} from '@playwright/test';
+export default defineConfig({testDir:'./e2e/maintenance',workers:1,retries:0,timeout:90000,expect:{timeout:20000},reporter:[['list'],['json',{outputFile:'reports/maintenance-20261025/browser-results.json'}]],use:{baseURL:'http://127.0.0.1:3099',serviceWorkers:'block',actionTimeout:15000,trace:'retain-on-failure'},projects:[{name:'desktop',use:{...devices['Desktop Chrome'],viewport:{width:1280,height:900},timezoneId:'America/Los_Angeles'}},{name:'mobile',use:{...devices['iPhone 13'],timezoneId:'Asia/Taipei'}}]});

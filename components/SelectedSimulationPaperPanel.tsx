@@ -1,4 +1,5 @@
 "use client";
+import { formatRocExamLabel } from "@/lib/rocDate";
 
 import { useEffect, useState } from "react";
 import type { AISimulationPaperOption } from "@/data/aiSimulationPapers";
@@ -65,7 +66,7 @@ export function SelectedSimulationPaperPanel({
       <div className="flex flex-wrap items-start justify-between gap-3 border-b border-slate-100 pb-4">
         <div className="min-w-0">
           <p className="text-xs font-bold text-amber-700">已選模擬卷</p>
-          <h3 className="mt-1 text-base font-bold leading-7 text-ink">{paper.label}</h3>
+          <h3 className="mt-1 text-base font-bold leading-7 text-ink">{formatRocExamLabel(paper.label)}</h3>
         </div>
         <span className="rounded-full bg-amber-50 px-3 py-1 text-xs font-bold text-amber-800 ring-1 ring-amber-100">
           {paper.questionCount} 題

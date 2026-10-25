@@ -1,4 +1,5 @@
 "use client";
+import { formatRocDate } from "@/lib/rocDate";
 
 import Link from "next/link";
 import {
@@ -544,7 +545,7 @@ export function PostExamReflectionPreview() {
           <p className="eyebrow">Post-exam recap</p>
           <h1 className="mt-3 text-3xl font-bold text-ink">請先登入</h1>
           <p className="mt-3 text-sm leading-7 text-slate-600">
-            登入後會讀取固定到 2026/7/17 15:00 的個人回顧資料。
+            登入後會讀取固定到 115/7/17 15:00 的個人回顧資料。
           </p>
           <Link href="/" className="mt-6 inline-flex min-h-12 items-center rounded-lg bg-brand-600 px-5 font-semibold text-white">
             返回首頁登入
@@ -613,7 +614,7 @@ export function PostExamReflectionPreview() {
             <p className="eyebrow">Post-exam recap</p>
             <h1 className="mt-3 text-3xl font-bold text-ink sm:text-5xl">考後回顧與經驗傳承</h1>
             <p className="mt-4 text-sm leading-7 text-slate-600 sm:text-base">
-              圖表固定統計到 2026/7/17 15:00。問卷每個帳號限送一次，送出後仍可回來查看。
+              圖表固定統計到 115/7/17 15:00。問卷每個帳號限送一次，送出後仍可回來查看。
             </p>
           </div>
           <div className="flex flex-wrap gap-3">
@@ -768,7 +769,7 @@ export function PostExamReflectionPreview() {
                   : "每個帳號限送一次；送出前草稿會留在這台裝置，失敗時保留待補傳內容。"}
               </p>
               {surveySubmittedAt ? (
-                <p className="mt-1">送出時間：{new Date(surveySubmittedAt).toLocaleString("zh-TW")}</p>
+                <p className="mt-1">送出時間：{formatRocDate(surveySubmittedAt, {hour:"2-digit",minute:"2-digit"})}</p>
               ) : null}
               {surveyStatus ? <p className="mt-1 font-semibold text-slate-700">{surveyStatus}</p> : null}
             </div>

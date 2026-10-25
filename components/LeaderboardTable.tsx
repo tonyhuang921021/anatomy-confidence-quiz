@@ -1,10 +1,13 @@
 "use client";
 
+import { formatRocDate } from "@/lib/rocDate";
+
+
 import { LeaderboardEntry } from "@/types/quiz";
 
 function formatUpdatedAt(value?: string) {
   if (!value) return "尚未同步";
-  return new Date(value).toLocaleString("zh-TW", {
+  return formatRocDate(value, {
     month: "2-digit",
     day: "2-digit",
     hour: "2-digit",

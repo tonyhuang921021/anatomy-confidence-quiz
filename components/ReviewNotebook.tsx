@@ -1,5 +1,8 @@
 "use client";
 
+import { formatRocDate } from "@/lib/rocDate";
+
+
 import Link from "next/link";
 import { type ReactNode, useEffect, useMemo, useRef, useState } from "react";
 import { CopyQuestionPromptButton } from "@/components/CopyQuestionPromptButton";
@@ -347,7 +350,7 @@ async function syncManualReviewStateWithCloud(
 
 function formatTime(value?: string) {
   if (!value) return "尚未作答";
-  return new Date(value).toLocaleString("zh-TW", {
+  return formatRocDate(value, {
     month: "2-digit",
     day: "2-digit",
     hour: "2-digit",

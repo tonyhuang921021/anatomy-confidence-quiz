@@ -8,8 +8,9 @@ import { useSurfaceTransition } from "@/components/useSurfaceTransition";
 import { FreePracticeSetup } from "@/components/FreePracticeSetup";
 import { useQuestionOrderMode } from "@/components/QuestionOrderModeControl";
 import { useCloudHistoryHydration } from "@/components/useCloudHistoryHydration";
+import { getLegacyPaperPracticeQuestions } from "@/lib/legacyPaperPractice";
 import { enabledSubjects, MED1_SUBJECTS, MED2_SUBJECTS } from "@/data/subjectRegistry";
-import { getQuestionBankBySubjects, getSeasonalLimitedQuestions } from "@/data/med1QuestionBank";
+import { getCanonicalQuestionBank, getQuestionBankBySubjects, getSeasonalLimitedQuestions } from "@/data/med1QuestionBank";
 import { loadConfirmedQuestionClassificationOverrides } from "@/lib/cloudSync";
 import { DEFAULT_QUIZ_SETTINGS } from "@/lib/quizAnalysis";
 import {
@@ -67,6 +68,8 @@ const selectableSubjects = enabledSubjects.filter(
     (MED1_SUBJECTS.includes(item.subject) || MED2_SUBJECTS.includes(item.subject))
 );
 
+const legacyPaperQuestions = getLegacyPaperPracticeQuestions(getCanonicalQuestionBank());
+
 export default function StartPage() {
   const router = useRouter();
   const { user, syncVersion } = useAuth();
@@ -79,6 +82,7 @@ export default function StartPage() {
   const [microbiologyExpanded, setMicrobiologyExpanded] = useState(false);
   const [selectedMicrobiologyTracks, setSelectedMicrobiologyTracks] = useState<SubjectTrackKey<typeof MICROBIOLOGY_SUBJECT>[]>([]);
   const [includeSeasonalLimited, setIncludeSeasonalLimited] = useState(false);
+  const [includeLegacyPapers, setIncludeLegacyPapers] = useState(false);
   const seasonalLimitedQuestions = useMemo(() => getSeasonalLimitedQuestions(), []);
   const seasonalLimitedPastExamCount = useMemo(
     () => seasonalLimitedQuestions.filter((question) => question.sourceType !== "AI_GENERATED").length,
@@ -229,7 +233,7 @@ export default function StartPage() {
       : baseSubjects;
   }, [selectedMicrobiologyTracks.length, selectedSubjects]);
 
-  const selectedRangeCount = effectiveSelectedSubjects.length + (includeSeasonalLimited ? 1 : 0);
+  const selectedRangeCount = effectiveSelectedSubjects.length + (includeSeasonalLimited ? 1 : 0) + (includeLegacyPapers ? 1 : 0);
   const selectedRangeLabel = useMemo(() => {
     const labels = effectiveSelectedSubjects.map(
       (subject) => {
@@ -243,9 +247,10 @@ export default function StartPage() {
       }
     );
     if (includeSeasonalLimited) labels.push("季節限定生殖範圍");
+    if (includeLegacyPapers) labels.push("98、99 年舊制原卷（學科待審）");
     if (labels.length <= 3) return labels.join("、");
     return `${labels.slice(0, 2).join("、")}等 ${labels.length} 個範圍`;
-  }, [effectiveSelectedSubjects, includeSeasonalLimited, selectedMicrobiologyTracks]);
+  }, [effectiveSelectedSubjects, includeSeasonalLimited, includeLegacyPapers, selectedMicrobiologyTracks]);
 
   const selectedSubjectQuestionPool = useMemo(() => {
     if (effectiveSelectedSubjects.length === 0) return [];
@@ -291,11 +296,14 @@ export default function StartPage() {
       : [];
 
     return new Set(
-      [...filteredSubjectQuestions, ...seasonalQuestions].map((question) => question.id)
+      [...filteredSubjectQuestions, ...seasonalQuestions, ...(includeLegacyPapers ? legacyPaperQuestions.filter(question =>
+        question.sourceYear! >= practiceYearRange.yearFrom && question.sourceYear! <= practiceYearRange.yearTo
+      ) : [])].map((question) => question.id)
     );
   }, [
     excludeAiGenerated,
     includeSeasonalLimited,
+    includeLegacyPapers,
     practiceYearRange.yearFrom,
     practiceYearRange.yearTo,
     seasonalLimitedQuestions,
@@ -638,7 +646,7 @@ export default function StartPage() {
   function handleStart() {
     if (
       !practiceHistoryReady ||
-      (effectiveSelectedSubjects.length === 0 && !includeSeasonalLimited) ||
+      (effectiveSelectedSubjects.length === 0 && !includeSeasonalLimited && !includeLegacyPapers) ||
       availableQuestionCount === 0
     ) return;
 
@@ -666,7 +674,7 @@ export default function StartPage() {
       yearFrom: practiceYearRange.yearFrom,
       yearTo: practiceYearRange.yearTo,
       subjectFilter:
-        effectiveSelectedSubjects.length === 1 && !includeSeasonalLimited ? effectiveSelectedSubjects[0] : "全部",
+        effectiveSelectedSubjects.length === 1 && !includeSeasonalLimited && !includeLegacyPapers ? effectiveSelectedSubjects[0] : "全部",
       subjectFilters: effectiveSelectedSubjects,
       subjectTracks: selectedSubjectTracks,
       excludeAiGenerated,
@@ -676,9 +684,9 @@ export default function StartPage() {
       enableFastAnswerMode: practiceFastAnswerMode,
       enableKeyboardNavigation: keyboardQuestionNavigation,
       enableConfidenceCalibration: false,
-      customQuestionIds: seasonalQuestionIds,
-      strictCustomQuestionPool: false,
-      customPoolLabel: hasMicrobiologyTrackFilter
+      customQuestionIds: includeLegacyPapers ? Array.from(availableQuestions) : seasonalQuestionIds,
+      strictCustomQuestionPool: includeLegacyPapers,
+      customPoolLabel: includeLegacyPapers ? `開始測驗：${selectedRangeLabel}` : hasMicrobiologyTrackFilter
         ? `開始測驗：${[
             ...effectiveSelectedSubjects.filter((subject) => subject !== MICROBIOLOGY_SUBJECT),
             selectedMicrobiologyLabels.length > 0
@@ -763,6 +771,19 @@ export default function StartPage() {
             <div className="mt-6 space-y-6">
               {renderSubjectGroup("醫學一", med1Subjects)}
               {renderSubjectGroup("醫學二", med2Subjects)}
+              <section className="custom-paper-subsection">
+                <button type="button" aria-pressed={includeLegacyPapers}
+                  className="w-full rounded-lg border border-slate-200 p-4 text-left focus-visible:ring-2 focus-visible:ring-brand-500"
+                  onClick={() => {
+                    const next = !includeLegacyPapers;
+                    setIncludeLegacyPapers(next);
+                    if (next) setPracticeYearRange(range => ({yearFrom: Math.min(range.yearFrom, 2009), yearTo: Math.max(range.yearTo, 2010)}));
+                  }}>
+                  <span className="block font-semibold">98、99 年舊制原卷</span>
+                  <span className="mt-2 block text-sm text-slate-500">800 題・可散題練習；個別學科分類仍待逐題核對，不混入未確認的科目。</span>
+                  <span className="mt-2 block text-xs font-semibold text-brand-700">{includeLegacyPapers ? "已選" : "未選"}</span>
+                </button>
+              </section>
               {seasonalAvailable ? (
                 <section className="custom-paper-subsection border-amber-200 bg-[rgba(255,247,232,0.9)]">
                   <div>

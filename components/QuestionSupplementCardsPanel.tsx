@@ -1,5 +1,8 @@
 "use client";
 
+import { formatRocDate } from "@/lib/rocDate";
+
+
 import { useEffect, useMemo, useState } from "react";
 import { useAuth } from "@/components/AuthProvider";
 import { StudyNoteMarkdown } from "@/components/StudyNoteMarkdown";
@@ -24,7 +27,7 @@ type QuestionSupplementCardsPanelProps = {
 };
 
 function formatUpdatedAt(value: string) {
-  return new Date(value).toLocaleString("zh-TW", {
+  return formatRocDate(value, {
     month: "2-digit",
     day: "2-digit",
     hour: "2-digit",

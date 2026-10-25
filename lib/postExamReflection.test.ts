@@ -203,7 +203,7 @@ test("模擬考回顧依考題年份把醫學一與醫學二排在同一組", ()
     }
   ]);
 
-  assert.deepEqual(groups.map((group) => group.label), ["2024 年", "AI 模擬卷"]);
+  assert.deepEqual(groups.map((group) => group.label), ["民國 113 年", "AI 模擬卷"]);
   assert.equal(groups[0]?.med1[0]?.sessionId, "med1-2024");
   assert.equal(groups[0]?.med2[0]?.sessionId, "med2-2024");
 });

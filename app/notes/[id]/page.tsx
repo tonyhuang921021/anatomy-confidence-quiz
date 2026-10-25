@@ -1,5 +1,8 @@
 "use client";
 
+import { createRocDateFormatter } from "@/lib/rocDate";
+
+
 import { getQuestionAnswerLabel } from "@/lib/answerScoring";
 
 import Link from "next/link";
@@ -23,7 +26,7 @@ import { deleteStudyNote, loadStudyNote, parseStudyNoteMetadata, parseStudyNoteQ
 import type { Question, RecentQuestionSupplementCard, StudyNoteDetail, StudyNoteQuestionLink } from "@/types/quiz";
 
 function formatDate(value: string) {
-  return new Intl.DateTimeFormat("zh-Hant", {
+  return createRocDateFormatter({
     year: "numeric",
     month: "2-digit",
     day: "2-digit",

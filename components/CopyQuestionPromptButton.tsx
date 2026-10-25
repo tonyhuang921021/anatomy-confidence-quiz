@@ -1,5 +1,8 @@
 "use client";
 
+import { formatRocYear } from "@/lib/rocDate";
+
+
 import { useEffect, useRef, useState } from "react";
 import { getQuestionClassificationLabel } from "@/lib/analysisPrimaryTag";
 import { OptionKey, Question } from "@/types/quiz";
@@ -24,7 +27,7 @@ function getQuestionSourceLine(question: Question) {
   }
 
   const parts = [
-    question.sourceYear ? `${question.sourceYear} 年` : null,
+    question.sourceYear ? `${formatRocYear(question.sourceYear)}` : null,
     question.sourceRound ? `第 ${question.sourceRound} 次` : null,
     question.examSessionLabel,
     question.originalQuestionNumber ? `第 ${question.originalQuestionNumber} 題` : null

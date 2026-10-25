@@ -1,3 +1,4 @@
+import { formatRocYear } from "./rocDate";
 import { MED1_SUBJECTS, MED2_SUBJECTS } from "../data/subjectOrder";
 import { getQuestionPrimaryTag } from "./analysisPrimaryTag";
 import { normalizeWrongQuestionPdfText, tokenizeWrongQuestionPdfText } from "./wrongQuestionPdfText";
@@ -23,7 +24,7 @@ export type WrongQuestionPdfHistoryScope = {
 export function getWrongQuestionPdfYearLabel(range?: ReviewYearRange) {
   if (!range || isFullReviewYearRange(range)) return "全部考題年份";
   const { yearFrom, yearTo } = normalizeReviewYearRange(range);
-  return yearFrom === yearTo ? `${yearFrom} 年考題` : `${yearFrom}–${yearTo} 年考題`;
+  return yearFrom === yearTo ? `${formatRocYear(yearFrom)}考題` : `${formatRocYear(yearFrom)}–${formatRocYear(yearTo)}考題`;
 }
 
 export type WrongQuestionPdfItem = { question: Question; chapter: string; answeredAt: string };
@@ -188,7 +189,7 @@ export function buildWrongQuestionPdfHtml({ items, spacingCm, scopeLabel, dateLa
     const heading = group === previousGroup ? "" : `<h2>${escapeHtml(group)}</h2>`;
     previousGroup = group;
     const source = question.sourceYear
-      ? `${question.sourceYear >= 1912 ? question.sourceYear - 1911 : question.sourceYear} 年${question.sourceRound ? `第 ${question.sourceRound} 次` : ""}${question.originalQuestionNumber ? ` · 原第 ${question.originalQuestionNumber} 題` : ""}`
+      ? `${formatRocYear(question.sourceYear)}${question.sourceRound ? `第 ${question.sourceRound} 次` : ""}${question.originalQuestionNumber ? ` · 原第 ${question.originalQuestionNumber} 題` : ""}`
       : question.sourceType === "AI_GENERATED" ? "自訂練習題" : "練習題";
     return `${heading}<article class="question"><div class="source">${escapeHtml(source)}</div><div class="stem"><span class="number">${index + 1}.</span><div>${formatText(question.stem)}${imageMarkup(question.stemImage, `第 ${index + 1} 題附圖`, baseUrl)}</div></div><div class="options">${OPTION_KEYS.filter((key) => typeof question.options[key] === "string").map((key) => `<div class="option"><span>${key}.</span><div>${formatText(question.options[key]!)}${imageMarkup(question.optionImages?.[key], `第 ${index + 1} 題選項 ${key} 附圖`, baseUrl)}</div></div>`).join("")}</div>${spacing > 0 ? `<div class="note-space" style="height:${spacing}cm" aria-label="${spacing} 公分筆記空白"></div>` : ""}</article>`;
   }).join("");

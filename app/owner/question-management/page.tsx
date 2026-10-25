@@ -1,5 +1,8 @@
 "use client";
 
+import { formatRocYear } from "@/lib/rocDate";
+
+
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import { useAuth } from "@/components/AuthProvider";
@@ -331,7 +334,7 @@ export default function OwnerQuestionManagementPage() {
                         <span>{item.chapter}</span>
                         <span>／</span>
                         <span>{item.section}</span>
-                        {item.sourceYear ? <span>／ {item.sourceYear}</span> : null}
+                        {item.sourceYear ? <span>／ {formatRocYear(item.sourceYear)}</span> : null}
                       </div>
                       <p className="mt-2 line-clamp-3 text-sm font-semibold text-ink">{item.stem}</p>
                       <p className="mt-2 line-clamp-2 text-xs text-slate-500">{item.testedConcept}</p>
@@ -393,7 +396,7 @@ export default function OwnerQuestionManagementPage() {
                         {(inspectState.candidates ?? []).map((candidate) => (
                           <div key={candidate.id} className="rounded-2xl bg-white px-4 py-4 ring-1 ring-slate-100">
                             <div className="text-[11px] font-semibold text-slate-500">
-                              {candidate.section} · {candidate.sourceYear ?? "?"}
+                              {candidate.section} · {formatRocYear(candidate.sourceYear)}
                             </div>
                             <p className="mt-2 line-clamp-2 text-sm font-semibold text-ink">{candidate.stem}</p>
                             <p className="mt-2 line-clamp-2 text-xs text-slate-500">{candidate.testedConcept}</p>

@@ -1,3 +1,4 @@
+import { formatRocYear } from "./rocDate";
 import { MED1_SUBJECTS, MED2_SUBJECTS } from "../data/subjectOrder";
 import {
   applyClassificationOverrideWithPrimaryTagPriority,
@@ -91,7 +92,7 @@ export function buildResultRecommendations({ session, questions, questionBank, c
     }
     if (Number.isFinite(settings?.yearFrom) && Number.isFinite(settings?.yearTo)) {
       const range = normalizePracticeYearRange({ yearFrom: settings!.yearFrom!, yearTo: settings!.yearTo! });
-      applyKnownConstraint(`${range.yearFrom}–${range.yearTo} 年`, (question) =>
+      applyKnownConstraint(`${formatRocYear(range.yearFrom)}–${formatRocYear(range.yearTo)}`, (question) =>
         typeof question.sourceYear === "number" && toGregorianPracticeYear(question.sourceYear) >= range.yearFrom && toGregorianPracticeYear(question.sourceYear) <= range.yearTo
       );
     }

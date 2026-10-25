@@ -1,3 +1,4 @@
+import { formatRocYear } from "@/lib/rocDate";
 import { type ReactNode } from "react";
 import { OptionKey, Question } from "@/types/quiz";
 import { FormattedQuestionText } from "@/components/FormattedQuestionText";
@@ -64,7 +65,7 @@ export function QuestionStemBlock({ question, className }: QuestionStemBlockProp
       {question.officialSource ? (
         <details className="mt-4 rounded-2xl border border-slate-200 bg-white p-3 text-sm font-normal text-slate-600">
           <summary className="cursor-pointer font-semibold">查看官方原題（含圖表）</summary>
-          <p className="mt-2 text-xs leading-6">{question.sourceYear ? question.sourceYear - 1911 : ""} 年舊制：{question.officialSource.scope}</p>
+          <p className="mt-2 text-xs leading-6">{formatRocYear(question.sourceYear)}舊制：{question.officialSource.scope}</p>
           <img
             src={question.officialSource.image}
             alt={`${question.id} 官方原題完整圖，含原始選項及圖表`}

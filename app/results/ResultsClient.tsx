@@ -1,5 +1,8 @@
 "use client";
 
+import { formatRocDate, formatRocYear } from "@/lib/rocDate";
+
+
 import Link from "next/link";
 import { createPortal } from "react-dom";
 import { Suspense, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
@@ -465,7 +468,7 @@ function getDefaultSimulationSessionName(session: QuizSession) {
       : firstQuestion.paperCode?.startsWith("2")
         ? "醫學（二）"
         : "醫學（一）";
-  return `${firstQuestion.sourceYear} 第${firstQuestion.sourceRound ?? 1}次 ${subjectLabel} ${firstQuestion.paperCode ?? ""}`.trim();
+  return `${formatRocYear(firstQuestion.sourceYear)} 第${firstQuestion.sourceRound ?? 1}次 ${subjectLabel} ${firstQuestion.paperCode ?? ""}`.trim();
 }
 
 function getSessionDisplayName(session: QuizSession) {
@@ -563,10 +566,10 @@ function getQuestionSourceBadgeLabel(question: Question) {
     return question.originalQuestionNumber ? `AI 題 Q${question.originalQuestionNumber}` : "AI 題";
   }
   if (question.sourceYear && question.sourceRound && question.originalQuestionNumber) {
-    return `${question.sourceYear} 第${question.sourceRound}次 Q${question.originalQuestionNumber}`;
+    return `${formatRocYear(question.sourceYear)} 第${question.sourceRound}次 Q${question.originalQuestionNumber}`;
   }
   if (question.sourceYear && question.originalQuestionNumber) {
-    return `${question.sourceYear} Q${question.originalQuestionNumber}`;
+    return `${formatRocYear(question.sourceYear)} Q${question.originalQuestionNumber}`;
   }
   if (question.originalQuestionNumber) {
     return `Q${question.originalQuestionNumber}`;
@@ -2076,7 +2079,7 @@ function ResultsPageContent() {
                         </p>
                         <p className="mt-2 text-sm text-slate-500">
                           {getSessionModeLabel(sessionItem)} ・{" "}
-                          {new Date(completedAt).toLocaleString("zh-TW", {
+                          {formatRocDate(completedAt, {
                             month: "2-digit",
                             day: "2-digit",
                             hour: "2-digit",
@@ -2978,7 +2981,7 @@ function ResultsPageContent() {
           </p>
           <p className="mt-1 text-sm text-slate-500">
             完成時間：
-            {new Date(state.session.completedAt ?? state.session.startedAt).toLocaleString("zh-TW", {
+            {formatRocDate(state.session.completedAt ?? state.session.startedAt, {
               month: "2-digit",
               day: "2-digit",
               hour: "2-digit",

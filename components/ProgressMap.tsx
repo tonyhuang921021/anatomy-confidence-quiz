@@ -1,5 +1,8 @@
 "use client";
 
+import { formatRocDate } from "@/lib/rocDate";
+
+
 import { useState } from "react";
 import {
   completionStatusClasses,
@@ -13,7 +16,7 @@ type ProgressMapProps = {
 
 function formatTime(value?: string) {
   if (!value) return "尚未作答";
-  return new Date(value).toLocaleString("zh-TW", {
+  return formatRocDate(value, {
     year: "numeric",
     month: "2-digit",
     day: "2-digit",

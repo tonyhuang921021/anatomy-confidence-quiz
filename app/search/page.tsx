@@ -1,5 +1,8 @@
 "use client";
 
+import { formatRocYear } from "@/lib/rocDate";
+
+
 import { useRouter, useSearchParams } from "next/navigation";
 import { Suspense, useDeferredValue, useEffect, useMemo, useRef, useState } from "react";
 import { createPortal } from "react-dom";
@@ -873,7 +876,7 @@ function SearchPageContent() {
                   <option value="全部">全部年份</option>
                   {yearOptions.map((year) => (
                     <option key={year} value={String(year)}>
-                      {year}
+                      {formatRocYear(year)}
                     </option>
                   ))}
                 </select>
@@ -1111,7 +1114,7 @@ function SearchPageContent() {
                         </span>
                       ) : null}
                       <span className="rounded-full bg-slate-100 px-3 py-1 text-slate-700">
-                        {renderedQuestion.sourceYear ?? "未知年份"}
+                        {formatRocYear(renderedQuestion.sourceYear)}
                       </span>
                       <QuestionPrimaryTagBadge question={renderedQuestion} />
                     </div>
@@ -1535,7 +1538,7 @@ function SearchPageContent() {
                               <span className="text-slate-400">
                                 {question.sourceType === "AI_GENERATED" || question.source === "ai-generated"
                                   ? "AI 模擬卷"
-                                  : question.sourceYear ?? "未知年份"}
+                                  : formatRocYear(question.sourceYear)}
                               </span>
                               <span className="text-slate-400">{question.subject}</span>
                               <QuestionPrimaryTagBadge

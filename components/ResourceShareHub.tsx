@@ -1,4 +1,5 @@
 "use client";
+import { formatRocDate } from "@/lib/rocDate";
 
 import Link from "next/link";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
@@ -23,7 +24,7 @@ const formatFileSize = (bytes: number) => {
 const formatDate = (iso: string) => {
   const date = new Date(iso);
   if (Number.isNaN(date.getTime())) return "";
-  return date.toLocaleString("zh-TW", {
+  return formatRocDate(date, {
     month: "2-digit",
     day: "2-digit",
     hour: "2-digit",

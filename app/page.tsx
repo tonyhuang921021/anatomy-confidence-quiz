@@ -1,4 +1,6 @@
 import Link from "next/link";
+import { ExamCountdown } from "@/components/ExamCountdown";
+import { formatRocDate } from "@/lib/rocDate";
 import {
   ArrowRight,
   FileSearch,
@@ -47,6 +49,11 @@ const REVIEW_ENTRIES = [
 ] as const;
 
 const HOME_RELEASE_NOTES = [
+  {
+    time: "10/26",
+    title: "考期、年份與更新紀錄整理",
+    body: "考期與篩選年份改用民國年，倒數對準下一次醫師一階；首頁更新可展開看近期紀錄。98、99 年可選散題範圍，個別學科分類仍待核對。"
+  },
   {
     time: "10/25",
     title: "98、99 年考古題加入歷屆試題",
@@ -1165,6 +1172,7 @@ export default function HomePage() {
           <h1>國考刷題</h1>
           <ClientSectionBoundary title="首頁提示">
             <HomeToneBanner />
+            <ExamCountdown />
           </ClientSectionBoundary>
         </header>
 
@@ -1210,14 +1218,22 @@ export default function HomePage() {
       </div>
 
       {LATEST_HOME_RELEASE_NOTE ? (
-        <section data-home-reveal className="home-study-update" aria-labelledby="home-release-title">
-          <h2 id="home-release-title">最近網站更新</h2>
-          <time>{LATEST_HOME_RELEASE_NOTE.time}</time>
-          <p>
-            <strong>{LATEST_HOME_RELEASE_NOTE.title}</strong>
-            <span>{LATEST_HOME_RELEASE_NOTE.body}</span>
-          </p>
-        </section>
+        <details data-home-reveal className="home-study-updates">
+          <summary className="home-study-update" aria-label="最近網站更新，展開或收合近期紀錄">
+            <span id="home-release-title" role="heading" aria-level={2}>最近網站更新</span>
+            <time>{LATEST_HOME_RELEASE_NOTE.time}</time>
+            <span className="home-update-summary-copy"><strong>{LATEST_HOME_RELEASE_NOTE.title}</strong><span>{LATEST_HOME_RELEASE_NOTE.body}</span></span>
+          </summary>
+          <ol className="home-release-history" aria-label="近期更新紀錄">
+            {HOME_RELEASE_NOTES.slice(0, 8).map((note, index) => (
+              <li key={`${note.time}-${index}`}>
+                <time dateTime={`2026-${note.time.replace("/", "-")}`}>{formatRocDate(`2026-${note.time.replace("/", "-")}`)}</time>
+                <strong>{note.title}</strong>
+                <p>{note.body}</p>
+              </li>
+            ))}
+          </ol>
+        </details>
       ) : null}
 
       <section id="feedback" tabIndex={-1} className="home-work-section home-feedback-section focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 focus-visible:ring-offset-2" aria-labelledby="home-feedback-title">
