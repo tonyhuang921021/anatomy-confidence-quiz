@@ -1,6 +1,6 @@
 "use client";
 
-import { formatRocYear } from "@/lib/rocDate";
+import { formatRocExamLabel, formatRocYear } from "@/lib/rocDate";
 
 
 import { type MouseEvent, type ReactNode, useMemo } from "react";
@@ -124,9 +124,9 @@ export function QuestionCard({
                 <span className="max-w-full break-words rounded-full bg-slate-100 px-3 py-1 text-slate-700">
                   {question.chapter}
                 </span>
-                <span className="max-w-full break-words rounded-full bg-slate-100 px-3 py-1 text-slate-700">
+                {question.section ? <span className="max-w-full break-words rounded-full bg-slate-100 px-3 py-1 text-slate-700">
                   {question.section}
-                </span>
+                </span> : null}
               </>
             )}
             <span className="max-w-full break-words rounded-full bg-emerald-100 px-3 py-1 text-emerald-800">
@@ -136,7 +136,7 @@ export function QuestionCard({
           </div>
 
           {question.sourceCitation ? (
-            <p className="mt-3 break-words text-xs leading-6 text-slate-500">{question.sourceCitation}</p>
+            <p className="mt-3 break-words text-xs leading-6 text-slate-500">{formatRocExamLabel(question.sourceCitation)}</p>
           ) : null}
         </>
       ) : null}

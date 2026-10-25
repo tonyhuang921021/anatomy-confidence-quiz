@@ -74,6 +74,14 @@ function parseQuestionReference(rawReference: string) {
 function narrowCandidatesBySubject(candidates: Question[], subject?: SubjectName | "" | null) {
   if (!subject || candidates.length <= 1) return candidates;
 
+  // Historical references to 醫學一／二 name the original paper, not today's subject grouping.
+  if (subject === "醫學（一）" || subject === "醫學（二）") {
+    const originalPaperMatches = candidates.filter(question => question.officialSource &&
+      (question.sourceYear === 2009 || question.sourceYear === 2010) &&
+      question.sourceCitation?.includes(subject));
+    if (originalPaperMatches.length > 0) return originalPaperMatches;
+  }
+
   const exactSubjectMatches = candidates.filter((question) => question.subject === subject);
   if (exactSubjectMatches.length > 0) return exactSubjectMatches;
 

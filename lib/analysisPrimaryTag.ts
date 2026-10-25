@@ -1,4 +1,5 @@
 import primaryTagRuntimeMapJson from "../data/analysisPrimaryTagRuntimeMap.json";
+import legacyClassificationJson from "../data/sources/moex_98_99_classification_review.json";
 import type { Question, QuestionClassificationOverride, SubjectName } from "../types/quiz";
 
 type RuntimePrimaryTagAssignment = {
@@ -19,6 +20,9 @@ type RuntimePrimaryTagMap = {
 // The generator and its contract test guarantee the fixed three-item tuple shape.
 const runtimePrimaryTagMap = primaryTagRuntimeMapJson as unknown as RuntimePrimaryTagMap;
 const runtimeAssignments = runtimePrimaryTagMap.questions;
+// The source-bound contract test validates every subject, tag and tuple length.
+const legacyAssignments = legacyClassificationJson.questions as unknown as Record<string, [SubjectName, string | null]>;
+const legacyPendingIds = new Set<string>(legacyClassificationJson.pendingQuestionIds);
 const MICROBIOLOGY_TAG_PREFIXES = ["細菌學", "病毒學", "真菌學", "免疫學", "微生物免疫學"];
 const SUBJECT_BY_CODE = [
   "解剖學",
@@ -36,6 +40,8 @@ const SUBJECT_BY_CODE = [
 export const ANALYSIS_PRIMARY_TAG_CLASSIFIED_AT = runtimePrimaryTagMap.classifiedAt;
 
 export function getAnalysisPrimaryTagAssignment(questionId: string) {
+  const legacy = legacyAssignments[questionId];
+  if (legacy) return { subject: legacy[0], primaryTag: legacy[1] } satisfies RuntimePrimaryTagAssignment;
   const assignment = runtimeAssignments[questionId];
   if (!assignment) return null;
 
@@ -50,6 +56,8 @@ export function getQuestionPrimaryTag(
 ) {
   const assignment = getAnalysisPrimaryTagAssignment(question.id);
   if (assignment) {
+    // A reviewed broad subject does not imply an invented topic for a taxonomy gap.
+    if (Object.prototype.hasOwnProperty.call(legacyAssignments, question.id)) return assignment.primaryTag;
     return (
       assignment.primaryTag?.trim() ||
       formatClassificationOverridePrimaryTag(assignment.subject, question.section)
@@ -60,7 +68,12 @@ export function getQuestionPrimaryTag(
 }
 
 export function hasAnalysisPrimaryTagAssignment(questionId: string) {
-  return Object.prototype.hasOwnProperty.call(runtimeAssignments, questionId);
+  return Object.prototype.hasOwnProperty.call(runtimeAssignments, questionId) ||
+    Object.prototype.hasOwnProperty.call(legacyAssignments, questionId);
+}
+
+export function isLegacyQuestionClassificationPending(questionId: string) {
+  return legacyPendingIds.has(questionId);
 }
 
 export function applyAnalysisPrimaryTagClassification(question: Question): Question {
@@ -70,6 +83,10 @@ export function applyAnalysisPrimaryTagClassification(question: Question): Quest
   return {
     ...question,
     subject: assignment.subject,
+    ...(Object.prototype.hasOwnProperty.call(legacyAssignments, question.id) ? {
+      chapter: assignment.primaryTag ?? `${assignment.subject}－細分類待核對`,
+      section: assignment.primaryTag?.split("－").slice(1).join("－") ?? ""
+    } : {}),
     primaryTag: assignment.primaryTag ?? undefined
   };
 }
@@ -120,6 +137,9 @@ export function getQuestionClassificationLabel(
   question: Pick<Question, "id" | "subject" | "chapter" | "section" | "primaryTag">
 ) {
   const primaryTag = getQuestionPrimaryTag(question);
+  if (!primaryTag && Object.prototype.hasOwnProperty.call(legacyAssignments, question.id)) {
+    return `${question.subject}（細分類待核對）`;
+  }
   if (!primaryTag) return `${question.subject} / ${question.chapter} / ${question.section}`;
   return primaryTagIncludesSubject(primaryTag, question.subject)
     ? primaryTag

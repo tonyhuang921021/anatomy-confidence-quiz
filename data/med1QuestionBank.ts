@@ -2278,8 +2278,12 @@ export function applyQuestionClassificationOverrides(
 
 function buildRuntimeQuestionMap(questionBank: Question[]): Record<SubjectName, Question[]> {
   return {
-    "醫學（一）": questionBank.filter((question) => question.sourceCitation?.includes("醫學（一）")),
-    "醫學（二）": questionBank.filter((question) => question.sourceCitation?.includes("醫學（二）")),
+    "醫學（一）": questionBank.filter((question) => question.officialSource
+      ? MED1_CANONICAL_SUBJECTS.has(question.subject) || question.subject === "醫學（一）"
+      : question.sourceCitation?.includes("醫學（一）")),
+    "醫學（二）": questionBank.filter((question) => question.officialSource
+      ? MED2_CANONICAL_SUBJECTS.has(question.subject) || question.subject === "醫學（二）"
+      : question.sourceCitation?.includes("醫學（二）")),
     "解剖學": questionBank.filter((question) => question.subject === "解剖學"),
     "生理學": questionBank.filter((question) => question.subject === "生理學"),
     "生物化學": questionBank.filter((question) => question.subject === "生物化學"),

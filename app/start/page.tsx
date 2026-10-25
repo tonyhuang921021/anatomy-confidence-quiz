@@ -69,6 +69,9 @@ const selectableSubjects = enabledSubjects.filter(
 );
 
 const legacyPaperQuestions = getLegacyPaperPracticeQuestions(getCanonicalQuestionBank());
+const legacyPendingCount = legacyPaperQuestions.filter(question =>
+  question.subject === "醫學（一）" || question.subject === "醫學（二）"
+).length;
 
 export default function StartPage() {
   const router = useRouter();
@@ -247,7 +250,7 @@ export default function StartPage() {
       }
     );
     if (includeSeasonalLimited) labels.push("季節限定生殖範圍");
-    if (includeLegacyPapers) labels.push("98、99 年舊制原卷（學科待審）");
+    if (includeLegacyPapers) labels.push("98、99 年舊制原卷");
     if (labels.length <= 3) return labels.join("、");
     return `${labels.slice(0, 2).join("、")}等 ${labels.length} 個範圍`;
   }, [effectiveSelectedSubjects, includeSeasonalLimited, includeLegacyPapers, selectedMicrobiologyTracks]);
@@ -780,7 +783,7 @@ export default function StartPage() {
                     if (next) setPracticeYearRange(range => ({yearFrom: Math.min(range.yearFrom, 2009), yearTo: Math.max(range.yearTo, 2010)}));
                   }}>
                   <span className="block font-semibold">98、99 年舊制原卷</span>
-                  <span className="mt-2 block text-sm text-slate-500">800 題・可散題練習；個別學科分類仍待逐題核對，不混入未確認的科目。</span>
+                  <span className="mt-2 block text-sm text-slate-500">800 題・可散題練習；已確認學科的 {legacyPaperQuestions.length - legacyPendingCount} 題也可從科目篩選進入，另 {legacyPendingCount} 題學科待核對。</span>
                   <span className="mt-2 block text-xs font-semibold text-brand-700">{includeLegacyPapers ? "已選" : "未選"}</span>
                 </button>
               </section>

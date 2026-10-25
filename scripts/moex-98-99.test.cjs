@@ -115,7 +115,8 @@ test('real runtime exposes the eight papers and preserves every existing questio
     const option=after.find(p=>p.key===paper.key);
     assert.ok(option.isComplete);
     assert.equal(option.questionCount,paper.questionCount);
-    assert.deepEqual(current.getQuestionsForPastPaper(paper.key,paper.subject),payload.questions.filter(q=>`${q.examCode}-${q.paperCode}`===paper.key));
+    const omitClassification=({subject,chapter,section,primaryTag,...q})=>q;
+    assert.deepEqual(current.getQuestionsForPastPaper(paper.key,paper.subject).map(omitClassification),payload.questions.filter(q=>`${q.examCode}-${q.paperCode}`===paper.key).map(omitClassification));
   }
   const years=require('../lib/practiceYears.ts');
   assert.equal(years.toGregorianPracticeYear(98),2009);

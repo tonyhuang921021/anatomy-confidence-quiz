@@ -1,4 +1,5 @@
 import payload from '../../data/sources/moex_98_99_official_questions.json';
+import classification from '../../data/sources/moex_98_99_classification_review.json';
 import {test,expect} from '@playwright/test';
 async function localOnly(page:any){await page.route('**/*',async(route:any)=>{const u=new URL(route.request().url());if(u.hostname!=='127.0.0.1')return route.abort();if(u.pathname.startsWith('/api/'))return route.fulfill({json:{ok:true,stats:[],points:[],overrides:{},count:0,cards:[],reactions:[]}});return route.continue();});}
 test('Taiwan calendar countdown and compact real update history support mouse, keyboard and back',async({page},info)=>{
@@ -31,7 +32,9 @@ test('all 800 legacy IDs enter free practice and real answers survive results, s
  expect(session.settings.strictCustomQuestionPool).toBe(true);expect(new Set(session.settings.customQuestionIds)).toEqual(new Set(payload.questions.map(q=>q.id)));expect(session.questionOrder).toHaveLength(10);
  const byId=new Map(payload.questions.map(q=>[q.id,q]));let wrongId='';
  for(let index=0;index<10;index++){
-  const card=page.locator('[data-question-id]').first();const id=await card.getAttribute('data-question-id');const q=byId.get(id!)!;expect(q).toBeTruthy();await expect(card).toContainText('學科分類待核對');
+  const card=page.locator('[data-question-id]').first();const id=await card.getAttribute('data-question-id');const q=byId.get(id!)!;expect(q).toBeTruthy();
+  const assigned=(classification.questions as unknown as Record<string,[string,string|null]>)[id!];
+  await expect(card).toContainText(assigned?.[1] ?? assigned?.[0] ?? '學科分類待核對');
   const wrong=Object.keys(q.options).find(a=>!q.acceptedAnswers.includes(a));const answer=!wrongId&&wrong?wrong:q.acceptedAnswers[0];const wrongNow=!wrongId&&Boolean(wrong);if(wrongNow)wrongId=q.id;
   await card.getByRole('button').filter({has:page.locator('span',{hasText:new RegExp(`^${answer}$`)})}).first().click();await page.getByRole('button',{name:'送出答案',exact:true}).click();
   session=await page.evaluate(k=>JSON.parse(localStorage.getItem(k)!),storageKey);const attempt=session.attempts.find((a:any)=>a.questionId===q.id);expect(attempt.selectedAnswer).toBe(answer);expect(attempt.isCorrect).toBe(!wrongNow);
@@ -42,4 +45,20 @@ test('all 800 legacy IDs enter free practice and real answers survive results, s
  await page.goto('/saved-questions');await expect(page.locator('main')).toContainText(byId.get(wrongId)!.stem.slice(0,12));await page.reload();await expect(page.locator('main')).toContainText(byId.get(wrongId)!.stem.slice(0,12));
  await page.goto('/review');await expect(page.locator('main')).toContainText(byId.get(wrongId)!.stem.slice(0,12));expect(await page.evaluate(()=>localStorage.getItem('anatomy-confidence-completed-sessions:guest'))).toBe(history);
  await page.screenshot({path:`reports/maintenance-20261025/${info.project.name}-legacy-wrong-review.png`,fullPage:true});
+});
+
+test('reviewed historical questions are reachable by scientific subject while original paper stays intact',async({page},info)=>{
+ await localOnly(page);await page.goto('/start');await page.getByRole('button',{name:/^藥理學/}).click();await page.getByRole('button',{name:'下一步',exact:true}).click();await page.getByRole('button',{name:'調整設定',exact:true}).click();
+ await page.locator('#general-practice-year-from').selectOption('2009');await page.locator('#general-practice-year-to').selectOption('2010');await page.getByRole('button',{name:'收起設定',exact:true}).click();await page.getByRole('button',{name:'開始 10 題',exact:true}).click();
+ const key='anatomy-confidence-current-session:guest';await expect(page.locator('[data-question-id]').first()).toBeVisible();let s=await page.evaluate(k=>JSON.parse(localStorage.getItem(k)!),key);
+ expect(s.questionOrder).toHaveLength(10);const assignments=classification.questions as unknown as Record<string,[string,string|null]>;
+ for(const id of s.questionOrder)expect(assignments[id]?.[0]).toBe('藥理學');
+ const id=s.questionOrder[0],q=payload.questions.find(q=>q.id===id)!;const card=page.locator('[data-question-id]').first();await expect(card).toContainText(assignments[id][1]!);await expect(card).not.toContainText('學科分類待核對');
+ await card.getByText('查看官方原題（含圖表）',{exact:true}).click();
+ for(const img of await card.locator('img:visible').all()){await img.scrollIntoViewIfNeeded();await expect.poll(()=>img.evaluate((e:HTMLImageElement)=>e.complete&&e.naturalWidth>0)).toBe(true);}
+ const answer=q.acceptedAnswers[0];await card.getByRole('button').filter({has:page.locator('span',{hasText:new RegExp(`^${answer}$`)})}).first().click();await page.getByRole('button',{name:'送出答案',exact:true}).click();
+ s=await page.evaluate(k=>JSON.parse(localStorage.getItem(k)!),key);expect(s.attempts[0].isCorrect).toBe(true);const saved=JSON.stringify(s);await page.reload();await expect(card).toBeVisible();await expect(card).toContainText(assignments[id][1]!);expect(await page.evaluate(k=>JSON.stringify(JSON.parse(localStorage.getItem(k)!)),key)).toBe(saved);
+ await page.screenshot({path:`reports/maintenance-20261025/${info.project.name}-scientific-subject.png`,fullPage:true});
+ await page.goto('/simulation');await expect(page.locator('.app-topbar')).toHaveAttribute('data-shell-ready','true');await page.getByRole('button',{name:/^醫學（一）/}).click();await page.locator('#simulation-paper').selectOption('098020-1101');await page.getByRole('button',{name:'開始 100 題模擬考',exact:true}).click();await expect(page.locator('[data-question-id]').first()).toBeVisible();
+ s=await page.evaluate(k=>JSON.parse(localStorage.getItem(k)!),key);expect(new Set(s.questionOrder)).toEqual(new Set(payload.questions.filter(q=>q.examCode==='098020'&&q.paperCode==='1101').map(q=>q.id)));expect(s.questionOrder).toContain('MOEX-098020-1101-Q047');
 });
