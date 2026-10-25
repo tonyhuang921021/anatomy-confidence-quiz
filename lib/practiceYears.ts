@@ -1,4 +1,4 @@
-export const MIN_PRACTICE_SOURCE_YEAR = 2011;
+export const MIN_PRACTICE_SOURCE_YEAR = 2009;
 export const MAX_PRACTICE_SOURCE_YEAR = 2026;
 
 export const PRACTICE_YEAR_OPTIONS = Array.from(
@@ -13,7 +13,7 @@ type PracticeYearRangeLike = {
 
 export function toGregorianPracticeYear(year: number) {
   if (!Number.isFinite(year)) return year;
-  return year >= 100 && year <= 199 ? year + 1911 : year;
+  return year >= 98 && year <= 199 ? year + 1911 : year;
 }
 
 export function normalizePracticeYearRange(range: PracticeYearRangeLike): PracticeYearRangeLike {

@@ -30,6 +30,18 @@ export type Question = {
   section: string;
   stem: string;
   stemImage?: string;
+  sharedContext?: { sourceQuestionNumber?: number; questionNumbers?: number[]; stem: string };
+  officialSource?: {
+    questionUrl: string;
+    answerUrl: string;
+    page: number;
+    endPage: number;
+    image: string;
+    width: number;
+    height: number;
+    scope: string;
+    answerNote?: string | null;
+  };
   options: {
     A: string;
     B: string;

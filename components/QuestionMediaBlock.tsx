@@ -21,11 +21,13 @@ type QuestionOptionBlockProps = {
   trailingContent?: ReactNode;
 };
 
-function renderImage(src: string, alt: string) {
+function renderImage(src: string, alt: string, dimensions?: { width: number; height: number }) {
   return (
     <img
       src={src}
       alt={alt}
+      width={dimensions?.width}
+      height={dimensions?.height}
       className="mt-3 block h-auto max-h-[480px] max-w-full rounded-2xl border border-slate-200 bg-slate-50 object-contain"
       style={{
         width: "auto",
@@ -41,7 +43,7 @@ export function QuestionStemMedia({ question, className }: QuestionStemMediaProp
 
   return (
     <div className={`min-w-0 max-w-full ${className ?? ""}`}>
-      {renderImage(question.stemImage, `${question.id} 題目圖片`)}
+      {renderImage(question.stemImage, `${question.id} 題目圖片`, question.officialSource?.image === question.stemImage ? question.officialSource : undefined)}
     </div>
   );
 }
@@ -49,10 +51,34 @@ export function QuestionStemMedia({ question, className }: QuestionStemMediaProp
 export function QuestionStemBlock({ question, className }: QuestionStemBlockProps) {
   return (
     <div className={`min-w-0 max-w-full ${className ?? ""}`}>
+      {question.sharedContext ? (
+        <div className="mb-4 rounded-xl bg-slate-50 p-3 text-sm font-normal leading-7 text-slate-700">
+          <p className="font-semibold">共同情境{question.sharedContext.sourceQuestionNumber ? `（原第 ${question.sharedContext.sourceQuestionNumber} 題題幹）` : ""}</p>
+          <FormattedQuestionText text={question.sharedContext.stem} />
+        </div>
+      ) : null}
       <p className="min-w-0 max-w-full font-semibold text-slate-900 [overflow-wrap:anywhere]">
         <FormattedQuestionText text={question.stem} />
       </p>
       <QuestionStemMedia question={question} />
+      {question.officialSource ? (
+        <details className="mt-4 rounded-2xl border border-slate-200 bg-white p-3 text-sm font-normal text-slate-600">
+          <summary className="cursor-pointer font-semibold">查看官方原題（含圖表）</summary>
+          <p className="mt-2 text-xs leading-6">{question.sourceYear ? question.sourceYear - 1911 : ""} 年舊制：{question.officialSource.scope}</p>
+          <img
+            src={question.officialSource.image}
+            alt={`${question.id} 官方原題完整圖，含原始選項及圖表`}
+            width={question.officialSource.width}
+            height={question.officialSource.height}
+            loading="lazy"
+            className="mt-3 h-auto w-full rounded-lg border border-slate-100"
+          />
+          <div className="mt-3 flex flex-wrap gap-x-4 gap-y-2 text-xs">
+            <a href={`${question.officialSource.questionUrl}#page=${question.officialSource.page}`} target="_blank" rel="noopener noreferrer" className="underline">考選部題本第 {question.officialSource.page} 頁</a>
+            <a href={question.officialSource.answerUrl} target="_blank" rel="noopener noreferrer" className="underline">考選部最終更正答案</a>
+          </div>
+        </details>
+      ) : null}
     </div>
   );
 }

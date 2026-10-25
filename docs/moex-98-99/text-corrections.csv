@@ -1,0 +1,33 @@
+questionId,field,before,after,officialPdf,physicalPage,reason
+MOEX-098020-2101-Q035,stem,血紅蛋白（Hemoglobin）其構形由T 轉變成R 型是由於結合了下列那些物質所引起？ 3+,血紅蛋白（Hemoglobin）其構形由T 轉變成R 型是由於結合了下列那些物質所引起？,reports/moex-98-99/source-pdfs/098020-2101-Q.pdf,3,Fe 的上標 3+ 被錯分至題幹。
+MOEX-098020-2101-Q035,options.B,三價鐵（Fe ）,三價鐵（Fe³⁺）,reports/moex-98-99/source-pdfs/098020-2101-Q.pdf,3,Fe 的上標 3+ 被錯分至題幹。
+MOEX-098020-2101-Q048,stem,下列有關自由能變化（∆G）的敘述中何者正確？ o o,下列有關自由能變化（∆G）的敘述中何者正確？,reports/moex-98-99/source-pdfs/098020-2101-Q.pdf,4,A/B 選項的上標 o 被錯分至題幹；四選項統一保留上標拉丁小寫 o。
+MOEX-098020-2101-Q048,options.A,當K'eq 大於1 時，∆G' 小於0,當K'eq 大於1 時，∆G'ᵒ 小於0,reports/moex-98-99/source-pdfs/098020-2101-Q.pdf,4,A/B 選項的上標 o 被錯分至題幹；四選項統一保留上標拉丁小寫 o。
+MOEX-098020-2101-Q048,options.B,當K'eq 小於1 時，∆G' 小於0,當K'eq 小於1 時，∆G'ᵒ 小於0,reports/moex-98-99/source-pdfs/098020-2101-Q.pdf,4,A/B 選項的上標 o 被錯分至題幹；四選項統一保留上標拉丁小寫 o。
+MOEX-098020-2101-Q048,options.C,當K'eq 等於1 時，∆G'o 等於1,當K'eq 等於1 時，∆G'ᵒ 等於1,reports/moex-98-99/source-pdfs/098020-2101-Q.pdf,4,A/B 選項的上標 o 被錯分至題幹；四選項統一保留上標拉丁小寫 o。
+MOEX-098020-2101-Q048,options.D,對任一反應而言，∆G'o 為一常數,對任一反應而言，∆G'ᵒ 為一常數,reports/moex-98-99/source-pdfs/098020-2101-Q.pdf,4,A/B 選項的上標 o 被錯分至題幹；四選項統一保留上標拉丁小寫 o。
+MOEX-098140-2101-Q005,stem,一位60 歲的男性急性心肌梗塞發作，經急救人員施救後送來急診室。抽血檢驗發現：血中的pH 7.12， -為18 mEq/L，下列有關他體內酸鹼平衡的敘述，何者正確？ PCO2 58 mmHg，血中的HCO3,一位60 歲的男性急性心肌梗塞發作，經急救人員施救後送來急診室。抽血檢驗發現：血中的pH 7.12，PCO₂ 58 mmHg，血中的HCO₃⁻為18 mEq/L，下列有關他體內酸鹼平衡的敘述，何者正確？,reports/moex-98-99/source-pdfs/098140-2101-Q.pdf,1,HCO₃⁻ 的負號造成整行抽取順序錯亂，回復 pH、PCO₂、HCO₃⁻ 原始敘述順序。
+MOEX-098140-2101-Q030,stem,粒線體氧化磷酸化的過程所產生的·O2 -自由基，可由下列那一個酵素去除？ 30,粒線體氧化磷酸化的過程所產生的·O₂⁻自由基，可由下列那一個酵素去除？,reports/moex-98-99/source-pdfs/098140-2101-Q.pdf,3,超氧自由基上標造成題號 30 黏入題幹尾端；保留原式 ·O₂⁻。
+MOEX-098140-2101-Q042,options.A,A 股 Melting Peaks,A 股,reports/moex-98-99/source-pdfs/098140-2101-Q.pdf,4,解離曲線標題、軸與圖內 A/B 標記誤混入選項；圖完整保留，文字選項依原件獨立抄錄。
+MOEX-098140-2101-Q042,options.B,B 股 Ｂ 8.574 A,B 股,reports/moex-98-99/source-pdfs/098140-2101-Q.pdf,4,解離曲線標題、軸與圖內 A/B 標記誤混入選項；圖完整保留，文字選項依原件獨立抄錄。
+MOEX-098140-2101-Q042,options.C,A 股和B 股的甲基化程度一樣高 7.674,A 股和B 股的甲基化程度一樣高,reports/moex-98-99/source-pdfs/098140-2101-Q.pdf,4,解離曲線標題、軸與圖內 A/B 標記誤混入選項；圖完整保留，文字選項依原件獨立抄錄。
+MOEX-098140-2101-Q042,options.D,-(d/dT) Fluorescence (483-533) 資料不足，無法判讀 6.774 5.874 4.974 4.074 3.174 2.274 1.374 0.474 -0.426 76 78 80 82 84 Temperature (℃),資料不足，無法判讀,reports/moex-98-99/source-pdfs/098140-2101-Q.pdf,4,解離曲線標題、軸與圖內 A/B 標記誤混入選項；圖完整保留，文字選項依原件獨立抄錄。
+MOEX-099010-1101-Q083,options.B,34 / 8,√(34/8),reports/moex-98-99/source-pdfs/099010-1101-Q.pdf,7,向量平方根未被文字抽取、191.5 小數點順序錯亂；依原件回復各選項，B/D 官方採分不變。
+MOEX-099010-1101-Q083,options.C,191 5. / 7,√(191.5/7),reports/moex-98-99/source-pdfs/099010-1101-Q.pdf,7,向量平方根未被文字抽取、191.5 小數點順序錯亂；依原件回復各選項，B/D 官方採分不變。
+MOEX-099010-1101-Q083,options.D,34 / 7,√(34/7),reports/moex-98-99/source-pdfs/099010-1101-Q.pdf,7,向量平方根未被文字抽取、191.5 小數點順序錯亂；依原件回復各選項，B/D 官方採分不變。
+MOEX-099010-2101-Q014,stem,關於胃壁細胞（parietal cells）之敘述，下列何者錯誤？ + +,關於胃壁細胞（parietal cells）之敘述，下列何者錯誤？,reports/moex-98-99/source-pdfs/099010-2101-Q.pdf,2,H⁺/K⁺ 上標被錯分至題幹，D 的 HCO₃⁻ 被放到選項尾端。
+MOEX-099010-2101-Q014,options.A,H /K ATPase幫浦位於壁細胞頂端細胞膜（apical membrane）,H⁺/K⁺ ATPase幫浦位於壁細胞頂端細胞膜（apical membrane）,reports/moex-98-99/source-pdfs/099010-2101-Q.pdf,2,H⁺/K⁺ 上標被錯分至題幹，D 的 HCO₃⁻ 被放到選項尾端。
+MOEX-099010-2101-Q014,options.D,-與Cl-於壁細胞底側細胞膜（basolateral membrane）以共同運輸進入壁細胞 HCO3,HCO₃⁻與Cl⁻於壁細胞底側細胞膜（basolateral membrane）以共同運輸進入壁細胞,reports/moex-98-99/source-pdfs/099010-2101-Q.pdf,2,H⁺/K⁺ 上標被錯分至題幹，D 的 HCO₃⁻ 被放到選項尾端。
+MOEX-099010-2101-Q018,stem,& & 18 有關肺通氣量與血液灌流量比值不吻合（ VA / Q mismatch）之敘述，下列何者錯誤？,有關肺通氣量與血液灌流量比值不吻合（V̇A / Q̇ mismatch）之敘述，下列何者錯誤？,reports/moex-98-99/source-pdfs/099010-2101-Q.pdf,3,V/Q 上方的點被抽取成 &，並導致題號與文字行序錯亂；以結合上點 U+0307 回復。
+MOEX-099010-2101-Q018,options.B,肺泡無效腔（alveolar dead space）的形成，可增加 VA & / Q & mismatch,肺泡無效腔（alveolar dead space）的形成，可增加V̇A / Q̇ mismatch,reports/moex-98-99/source-pdfs/099010-2101-Q.pdf,3,V/Q 上方的點被抽取成 &，並導致題號與文字行序錯亂；以結合上點 U+0307 回復。
+MOEX-099010-2101-Q018,options.C,& & mismatch 相較於肺通氣量，太多或太少的血液灌流量，皆可導致 VA / Q,相較於肺通氣量，太多或太少的血液灌流量，皆可導致V̇A / Q̇ mismatch,reports/moex-98-99/source-pdfs/099010-2101-Q.pdf,3,V/Q 上方的點被抽取成 &，並導致題號與文字行序錯亂；以結合上點 U+0307 回復。
+MOEX-099010-2101-Q018,options.D,& & 慢性支氣管炎（chronic bronchitis）患者發生 VA / Q mismatch 之機率較大,慢性支氣管炎（chronic bronchitis）患者發生V̇A / Q̇ mismatch之機率較大,reports/moex-98-99/source-pdfs/099010-2101-Q.pdf,3,V/Q 上方的點被抽取成 &，並導致題號與文字行序錯亂；以結合上點 U+0307 回復。
+MOEX-099010-2101-Q046,stem,下表為某一酵素之受質（substrate）濃度與反應速率分析表，已知此酵素依據米凱利斯－門頓動力學 （Michaelis-Menten kinetics）運作，此酵素的KM值約為多少mM？ 受質濃度（substrate concentration） V0 （mmol/L） （µmol/min） 1.2 326 3 485 6 650 9 732 1500 970,下表為某一酵素之受質（substrate）濃度與反應速率分析表，已知此酵素依據米凱利斯－門頓動力學 （Michaelis-Menten kinetics）運作，此酵素的KM值約為多少mM？,reports/moex-98-99/source-pdfs/099010-2101-Q.pdf,5,無框線二欄數值表的數值均正確，但扁平文字失去欄位結構且經共用排版器會黏合相鄰數字；題幹只保留原提問，表格完整留在預設顯示的既有官方原圖，不重打或改數值。
+MOEX-099010-2101-Q046,stemImage,,/question-media/moex-98-99/MOEX-099010-2101-Q046.webp,reports/moex-98-99/source-pdfs/099010-2101-Q.pdf,5,無框線二欄數值表的數值均正確，但扁平文字失去欄位結構且經共用排版器會黏合相鄰數字；題幹只保留原提問，表格完整留在預設顯示的既有官方原圖，不重打或改數值。
+MOEX-099010-2101-Q067,stem,毛地黃的藥理和毒性作用是透過抑制下列何者而來的？ 2+,毛地黃的藥理和毒性作用是透過抑制下列何者而來的？,reports/moex-98-99/source-pdfs/099010-2101-Q.pdf,7,Ca²⁺ 的 2+ 被錯分至題幹。
+MOEX-099010-2101-Q067,options.A,Ca pump,Ca²⁺ pump,reports/moex-98-99/source-pdfs/099010-2101-Q.pdf,7,Ca²⁺ 的 2+ 被錯分至題幹。
+MOEX-099130-2101-Q012,stem,‧ ‧）與肺 12 一位健康者站立且平靜呼吸時，有關肺通氣量（ventilation; V A）、血液灌流量（perfusion; Q 順應性（lung compliance）之變化，下列敘述何者錯誤？,一位健康者站立且平靜呼吸時，有關肺通氣量（ventilation; V̇A）、血液灌流量（perfusion; Q̇）與肺順應性（lung compliance）之變化，下列敘述何者錯誤？,reports/moex-98-99/source-pdfs/099130-2101-Q.pdf,2,V/Q 上點、下標與兩行文字次序錯亂；依原件還原，不變更原選項「肺尖＜肺底」。
+MOEX-099130-2101-Q012,options.B,血液灌流量：肺尖＜肺底 ‧ ‧,血液灌流量：肺尖＜肺底,reports/moex-98-99/source-pdfs/099130-2101-Q.pdf,2,V/Q 上點、下標與兩行文字次序錯亂；依原件還原，不變更原選項「肺尖＜肺底」。
+MOEX-099130-2101-Q012,options.C,）：肺尖＜肺底 肺通氣量與血液灌流量之比值（V A/Q,肺通氣量與血液灌流量之比值（V̇A/Q̇）：肺尖＜肺底,reports/moex-98-99/source-pdfs/099130-2101-Q.pdf,2,V/Q 上點、下標與兩行文字次序錯亂；依原件還原，不變更原選項「肺尖＜肺底」。
+MOEX-099130-2101-Q033,stem,在下列何種情況下，acetyl-CoA 進入citric acid cycle 會減少？ +,在下列何種情況下，acetyl-CoA 進入citric acid cycle 會減少？,reports/moex-98-99/source-pdfs/099130-2101-Q.pdf,3,NAD⁺ 的 + 被錯分至題幹。
+MOEX-099130-2101-Q033,options.C,[NAD ]/[NADH]高,[NAD⁺]/[NADH]高,reports/moex-98-99/source-pdfs/099130-2101-Q.pdf,3,NAD⁺ 的 + 被錯分至題幹。

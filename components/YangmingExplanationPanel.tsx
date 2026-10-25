@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { useAuth } from "@/components/AuthProvider";
 import { getOrCreateVisitorId } from "@/lib/visitor";
+import { getYangmingLegacySourceLink } from "@/lib/yangmingLegacySourceLinks";
 import type { YangmingExplanationContent } from "@/types/quiz";
 
 type Props = {
@@ -535,7 +536,27 @@ function YangmingExplanationContentBlock({
   );
 }
 
-export function YangmingExplanationPanel({
+export function YangmingExplanationPanel(props: Props) {
+  const source = getYangmingLegacySourceLink(props.questionId);
+  if (!source) return <LoadedYangmingExplanationPanel {...props} />;
+
+  return (
+    <details open={props.autoLoad || props.hideButton || undefined} className={`min-w-0 rounded-2xl bg-amber-50 p-4 text-sm text-amber-950 ring-1 ring-amber-100 ${props.className ?? ""}`}>
+      <summary className="cursor-pointer font-semibold">陽明詳解原站</summary>
+      <p className="mt-3 font-semibold">{source.rocYear} 年第 {source.round} 次 {source.paper} 第 {source.questionNumber} 題</p>
+      <p className="mt-2 leading-6">請在「{source.book}」依年度、期別、卷別與題號查閱。本題尚未核實合輯頁碼。</p>
+      <div className="mt-3 flex flex-wrap gap-x-4 gap-y-3 font-semibold">
+        <a href={source.sourceUrl} target="_blank" rel="noopener noreferrer" className="underline underline-offset-4">陽明原站與使用說明</a>
+        <a href={source.bookUrl} target="_blank" rel="noopener noreferrer" className="underline underline-offset-4">96～100 年詳解原檔</a>
+        <a href={source.errataUrl} target="_blank" rel="noopener noreferrer" className="underline underline-offset-4">原站勘誤表</a>
+      </div>
+      {source.erratum ? <p className="mt-3 leading-6">陽明勘誤：本題詳解答案由 D 改為 A；本站判分依考選部最終答案。</p> : null}
+      <p className="mt-3 text-xs leading-5 text-amber-800">資料來源：陽明醫師國考交流平台。詳解由原作者提供供考生參考。</p>
+    </details>
+  );
+}
+
+function LoadedYangmingExplanationPanel({
   questionId,
   className = "",
   buttonClassName = "",

@@ -9,6 +9,7 @@ import moexMed1ReclassifiedV5 from "@/data/sources/moex_med1_100_115_reclassifie
 import moexMed1Requested149ReclassificationPatch from "@/data/sources/moex_med1_requested_149_reclassification_patch.json";
 import moexMedStage2Merged0013100 from "@/data/sources/moex_med_stage2_detailed_merged_001_3100_classified_v3.json";
 import moex115090OfficialQuestions from "@/data/sources/moex_115090_official_questions.json";
+import moex9899OfficialQuestions from "@/data/sources/moex_98_99_official_questions.json";
 import questionMediaManifest from "@/data/sources/question_media_manifest.json";
 import {
   applyAnalysisPrimaryTagClassification,
@@ -2051,6 +2052,7 @@ export const canonicalQuestionBank: Question[] = dedupeQuestionBank([
   ...medStage2Questions,
   ...moex115090Med1Questions,
   ...moex115090Med2Questions,
+  ...(moex9899OfficialQuestions.questions as Question[]),
   ...manualInjectedQuestions
 ]).map(applyAnalysisPrimaryTagClassification);
 
@@ -2078,6 +2080,10 @@ function buildQuestionsBySubject(questionBank: Question[]) {
   ) as Record<SubjectName, Question[]>;
 
   for (const question of questionBank) {
+    // Preserve the original old-system paper identity until subject-level review.
+    if (question.officialSource && (question.subject === "醫學（一）" || question.subject === "醫學（二）")) {
+      questionMap[question.subject].push(question);
+    }
     if (MED1_CANONICAL_SUBJECTS.has(question.subject)) {
       questionMap["醫學（一）"].push(question);
     }
@@ -2515,7 +2521,7 @@ export function getPastPaperOptions(
 
     paperMap.set(key, {
       key,
-      label: `${question.sourceYear ?? ""} 第${question.sourceRound ?? (question.examSessionLabel?.includes("第二") ? 2 : 1)}次 ${examLabel} ${question.paperCode}`,
+      label: `${question.officialSource && question.sourceYear ? `${question.sourceYear - 1911}年（${question.sourceYear}）` : question.sourceYear ?? ""} 第${question.sourceRound ?? (question.examSessionLabel?.includes("第二") ? 2 : 1)}次 ${examLabel} ${question.paperCode}`,
       subject: examLabel as SubjectFilter,
       questionCount: 1,
       sourceYear: question.sourceYear,
@@ -2531,7 +2537,8 @@ export function getPastPaperOptions(
           .map((question) => question.originalQuestionNumber)
           .filter((value): value is number => typeof value === "number")
       );
-      const missingNumbers = Array.from({ length: 100 }, (_, index) => index + 1).filter(
+      const expectedCount = moex9899OfficialQuestions.papers.find((source) => source.key === paper.key)?.questionCount ?? 100;
+      const missingNumbers = Array.from({ length: expectedCount }, (_, index) => index + 1).filter(
         (number) => !presentNumbers.has(number)
       );
 

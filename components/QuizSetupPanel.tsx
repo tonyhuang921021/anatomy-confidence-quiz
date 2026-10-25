@@ -454,6 +454,7 @@ export function QuizSetupPanel({
                     </option>
                   ))}
                 </select>
+
               </div>
               <label className="mt-4 flex cursor-pointer items-start gap-3 rounded-2xl bg-white p-4 text-sm text-slate-700 ring-1 ring-slate-200">
                 <input
@@ -490,7 +491,9 @@ export function QuizSetupPanel({
                     }`}
                   >
                     <span className="block text-sm font-semibold">{item.label}</span>
-                    <span className="mt-1 block text-xs leading-5 text-slate-500">{item.description}</span>
+                    <span className="mt-1 block text-xs leading-5 text-slate-500">{selectedPaper?.sourceYear && selectedPaper.sourceYear >= 2009 && selectedPaper.sourceYear <= 2010
+                      ? item.subject === "醫學（一）" ? "解剖、胚胎、組織、微免、寄生蟲、公衛" : "生理、生化、藥理、病理"
+                      : item.description}</span>
                   </button>
                 ))}
               </div>
@@ -515,6 +518,13 @@ export function QuizSetupPanel({
                     </option>
                   ))}
                 </select>
+                {selectedPaper?.sourceYear && selectedPaper.sourceYear >= 2009 && selectedPaper.sourceYear <= 2010 ? (
+                  <p className="mt-3 rounded-xl bg-amber-50 px-3 py-2 text-xs leading-6 text-amber-900">
+                    {selectedPaper.sourceYear - 1911} 年舊制：{selectedPaper.subject === "醫學（一）"
+                      ? "醫學（一）含解剖、胚胎、組織、微生物免疫、寄生蟲及公共衛生。"
+                      : "醫學（二）含生理、生化、藥理及病理。"}每卷 100 題，依官方最終答案及更正採分。
+                  </p>
+                ) : null}
               </div>
             ) : (
               <div className="border-l-2 border-brand-200 pl-3">

@@ -88,7 +88,7 @@ test("舊紀錄中的 AI 題即使帶 2026 也不會被當成正式考古年份"
 
 test("反向與超出範圍的年份會正規化到可選區間", () => {
   assert.deepEqual(normalizeReviewYearRange({ yearFrom: 2027, yearTo: 2010 }), {
-    yearFrom: 2011,
+    yearFrom: 2010,
     yearTo: 2026
   });
   assert.deepEqual(normalizeReviewYearRange({ yearFrom: 2027, yearTo: 2028 }), {

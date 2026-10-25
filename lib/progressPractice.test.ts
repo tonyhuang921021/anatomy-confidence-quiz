@@ -67,7 +67,7 @@ test("章節練習會依年份排除其他考古題，未知年份只保留在�
     getProgressPracticeQuestionIds({
       questions,
       questionIds,
-      yearRange: { yearFrom: 2011, yearTo: 2026 }
+      yearRange: { yearFrom: 2009, yearTo: 2026 }
     }),
     ["q-2024", "q-2025", "q-unknown"]
   );
@@ -76,7 +76,7 @@ test("章節練習會依年份排除其他考古題，未知年份只保留在�
 test("章節練習年份會交換反向範圍並限制在網站可選年份", () => {
   assert.deepEqual(
     normalizeProgressPracticeYearRange({ yearFrom: 2030, yearTo: 2010 }),
-    { yearFrom: 2011, yearTo: 2026 }
+    { yearFrom: 2010, yearTo: 2026 }
   );
 });
 

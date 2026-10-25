@@ -1,0 +1,463 @@
+{
+  "schemaVersion": 1,
+  "verifiedOn": "2026-10-23",
+  "method": "逐一實讀本機官方 PDF 裁切圖，修正文字擷取及原表顯示；不修訂官方題意、干擾選項或採分。",
+  "revisions": [
+    {
+      "id": "MOEX-098020-2101-Q035",
+      "expected": {
+        "options": {
+          "B": "三價鐵（Fe ）"
+        },
+        "stem": "血紅蛋白（Hemoglobin）其構形由T 轉變成R 型是由於結合了下列那些物質所引起？ 3+"
+      },
+      "replacement": {
+        "options": {
+          "B": "三價鐵（Fe³⁺）"
+        },
+        "stem": "血紅蛋白（Hemoglobin）其構形由T 轉變成R 型是由於結合了下列那些物質所引起？"
+      },
+      "showOriginal": false,
+      "reason": "Fe 的上標 3+ 被錯分至題幹。",
+      "source": {
+        "id": "MOEX-098020-2101-Q035",
+        "source": "reports/moex-98-99/source-pdfs/098020-2101-Q.pdf",
+        "url": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?t=Q&code=098020&c=103&s=c021&q=1",
+        "regions": [
+          {
+            "page": 3,
+            "rect": [
+              39.0,
+              489.8558349609375,
+              554.0,
+              534.2555908203125
+            ]
+          }
+        ],
+        "render": "reports/moex-98-99/quality-audit/source-renders/MOEX-098020-2101-Q035-official.png"
+      }
+    },
+    {
+      "id": "MOEX-098020-2101-Q048",
+      "expected": {
+        "options": {
+          "A": "當K'eq 大於1 時，∆G' 小於0",
+          "B": "當K'eq 小於1 時，∆G' 小於0",
+          "C": "當K'eq 等於1 時，∆G'o 等於1",
+          "D": "對任一反應而言，∆G'o 為一常數"
+        },
+        "stem": "下列有關自由能變化（∆G）的敘述中何者正確？ o o"
+      },
+      "replacement": {
+        "options": {
+          "A": "當K'eq 大於1 時，∆G'ᵒ 小於0",
+          "B": "當K'eq 小於1 時，∆G'ᵒ 小於0",
+          "C": "當K'eq 等於1 時，∆G'ᵒ 等於1",
+          "D": "對任一反應而言，∆G'ᵒ 為一常數"
+        },
+        "stem": "下列有關自由能變化（∆G）的敘述中何者正確？"
+      },
+      "showOriginal": false,
+      "reason": "A/B 選項的上標 o 被錯分至題幹；四選項統一保留上標拉丁小寫 o。",
+      "source": {
+        "id": "MOEX-098020-2101-Q048",
+        "source": "reports/moex-98-99/source-pdfs/098020-2101-Q.pdf",
+        "url": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?t=Q&code=098020&c=103&s=c021&q=1",
+        "regions": [
+          {
+            "page": 4,
+            "rect": [
+              39.0,
+              446.3556823730469,
+              554.0,
+              490.7558349609375
+            ]
+          }
+        ],
+        "render": "reports/moex-98-99/quality-audit/source-renders/MOEX-098020-2101-Q048-official.png"
+      }
+    },
+    {
+      "id": "MOEX-098140-2101-Q005",
+      "expected": {
+        "stem": "一位60 歲的男性急性心肌梗塞發作，經急救人員施救後送來急診室。抽血檢驗發現：血中的pH 7.12， -為18 mEq/L，下列有關他體內酸鹼平衡的敘述，何者正確？ PCO2 58 mmHg，血中的HCO3"
+      },
+      "replacement": {
+        "stem": "一位60 歲的男性急性心肌梗塞發作，經急救人員施救後送來急診室。抽血檢驗發現：血中的pH 7.12，PCO₂ 58 mmHg，血中的HCO₃⁻為18 mEq/L，下列有關他體內酸鹼平衡的敘述，何者正確？"
+      },
+      "showOriginal": false,
+      "reason": "HCO₃⁻ 的負號造成整行抽取順序錯亂，回復 pH、PCO₂、HCO₃⁻ 原始敘述順序。",
+      "source": {
+        "id": "MOEX-098140-2101-Q005",
+        "source": "reports/moex-98-99/source-pdfs/098140-2101-Q.pdf",
+        "url": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?t=Q&code=098140&c=103&s=c021&q=1",
+        "regions": [
+          {
+            "page": 1,
+            "rect": [
+              39.0,
+              478.3365478515625,
+              554.0,
+              564.436376953125
+            ]
+          }
+        ],
+        "render": "reports/moex-98-99/quality-audit/source-renders/MOEX-098140-2101-Q005-official.png"
+      }
+    },
+    {
+      "id": "MOEX-098140-2101-Q030",
+      "expected": {
+        "stem": "粒線體氧化磷酸化的過程所產生的·O2 -自由基，可由下列那一個酵素去除？ 30"
+      },
+      "replacement": {
+        "stem": "粒線體氧化磷酸化的過程所產生的·O₂⁻自由基，可由下列那一個酵素去除？"
+      },
+      "showOriginal": false,
+      "reason": "超氧自由基上標造成題號 30 黏入題幹尾端；保留原式 ·O₂⁻。",
+      "source": {
+        "id": "MOEX-098140-2101-Q030",
+        "source": "reports/moex-98-99/source-pdfs/098140-2101-Q.pdf",
+        "url": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?t=Q&code=098140&c=103&s=c021&q=1",
+        "regions": [
+          {
+            "page": 3,
+            "rect": [
+              39.0,
+              301.0363464355469,
+              554.0,
+              342.73578491210935
+            ]
+          }
+        ],
+        "render": "reports/moex-98-99/quality-audit/source-renders/MOEX-098140-2101-Q030-official.png"
+      }
+    },
+    {
+      "id": "MOEX-098140-2101-Q042",
+      "expected": {
+        "options": {
+          "A": "A 股 Melting Peaks",
+          "B": "B 股 Ｂ 8.574 A",
+          "C": "A 股和B 股的甲基化程度一樣高 7.674",
+          "D": "-(d/dT) Fluorescence (483-533) 資料不足，無法判讀 6.774 5.874 4.974 4.074 3.174 2.274 1.374 0.474 -0.426 76 78 80 82 84 Temperature (℃)"
+        }
+      },
+      "replacement": {
+        "options": {
+          "A": "A 股",
+          "B": "B 股",
+          "C": "A 股和B 股的甲基化程度一樣高",
+          "D": "資料不足，無法判讀"
+        }
+      },
+      "showOriginal": false,
+      "reason": "解離曲線標題、軸與圖內 A/B 標記誤混入選項；圖完整保留，文字選項依原件獨立抄錄。",
+      "source": {
+        "id": "MOEX-098140-2101-Q042",
+        "source": "reports/moex-98-99/source-pdfs/098140-2101-Q.pdf",
+        "url": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?t=Q&code=098140&c=103&s=c021&q=1",
+        "regions": [
+          {
+            "page": 4,
+            "rect": [
+              39.0,
+              231.97653198242188,
+              554.0,
+              462.2834167480469
+            ]
+          }
+        ],
+        "render": "reports/moex-98-99/quality-audit/source-renders/MOEX-098140-2101-Q042-official.png"
+      }
+    },
+    {
+      "id": "MOEX-099010-1101-Q083",
+      "expected": {
+        "options": {
+          "A": "34/7",
+          "B": "34 / 8",
+          "C": "191 5. / 7",
+          "D": "34 / 7"
+        }
+      },
+      "replacement": {
+        "options": {
+          "A": "34/7",
+          "B": "√(34/8)",
+          "C": "√(191.5/7)",
+          "D": "√(34/7)"
+        }
+      },
+      "showOriginal": false,
+      "reason": "向量平方根未被文字抽取、191.5 小數點順序錯亂；依原件回復各選項，B/D 官方採分不變。",
+      "source": {
+        "id": "MOEX-099010-1101-Q083",
+        "source": "reports/moex-98-99/source-pdfs/099010-1101-Q.pdf",
+        "url": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?t=Q&code=099010&c=101&s=100&q=1",
+        "regions": [
+          {
+            "page": 7,
+            "rect": [
+              39.0,
+              505.3955383300781,
+              554.0,
+              557.312744140625
+            ]
+          }
+        ],
+        "render": "reports/moex-98-99/quality-audit/source-renders/MOEX-099010-1101-Q083-official.png"
+      }
+    },
+    {
+      "id": "MOEX-099010-2101-Q014",
+      "expected": {
+        "options": {
+          "A": "H /K ATPase幫浦位於壁細胞頂端細胞膜（apical membrane）",
+          "D": "-與Cl-於壁細胞底側細胞膜（basolateral membrane）以共同運輸進入壁細胞 HCO3"
+        },
+        "stem": "關於胃壁細胞（parietal cells）之敘述，下列何者錯誤？ + +"
+      },
+      "replacement": {
+        "options": {
+          "A": "H⁺/K⁺ ATPase幫浦位於壁細胞頂端細胞膜（apical membrane）",
+          "D": "HCO₃⁻與Cl⁻於壁細胞底側細胞膜（basolateral membrane）以共同運輸進入壁細胞"
+        },
+        "stem": "關於胃壁細胞（parietal cells）之敘述，下列何者錯誤？"
+      },
+      "showOriginal": false,
+      "reason": "H⁺/K⁺ 上標被錯分至題幹，D 的 HCO₃⁻ 被放到選項尾端。",
+      "source": {
+        "id": "MOEX-099010-2101-Q014",
+        "source": "reports/moex-98-99/source-pdfs/099010-2101-Q.pdf",
+        "url": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?t=Q&code=099010&c=101&s=200&q=1",
+        "regions": [
+          {
+            "page": 2,
+            "rect": [
+              39.0,
+              535.0953979492188,
+              554.0,
+              620.7760009765625
+            ]
+          }
+        ],
+        "render": "reports/moex-98-99/quality-audit/source-renders/MOEX-099010-2101-Q014-official.png"
+      }
+    },
+    {
+      "id": "MOEX-099010-2101-Q018",
+      "expected": {
+        "stem": "& & 18 有關肺通氣量與血液灌流量比值不吻合（ VA / Q mismatch）之敘述，下列何者錯誤？",
+        "options": {
+          "B": "肺泡無效腔（alveolar dead space）的形成，可增加 VA & / Q & mismatch",
+          "C": "& & mismatch 相較於肺通氣量，太多或太少的血液灌流量，皆可導致 VA / Q",
+          "D": "& & 慢性支氣管炎（chronic bronchitis）患者發生 VA / Q mismatch 之機率較大"
+        }
+      },
+      "replacement": {
+        "stem": "有關肺通氣量與血液灌流量比值不吻合（V̇A / Q̇ mismatch）之敘述，下列何者錯誤？",
+        "options": {
+          "B": "肺泡無效腔（alveolar dead space）的形成，可增加V̇A / Q̇ mismatch",
+          "C": "相較於肺通氣量，太多或太少的血液灌流量，皆可導致V̇A / Q̇ mismatch",
+          "D": "慢性支氣管炎（chronic bronchitis）患者發生V̇A / Q̇ mismatch之機率較大"
+        }
+      },
+      "showOriginal": false,
+      "reason": "V/Q 上方的點被抽取成 &，並導致題號與文字行序錯亂；以結合上點 U+0307 回復。",
+      "source": {
+        "id": "MOEX-099010-2101-Q018",
+        "source": "reports/moex-98-99/source-pdfs/099010-2101-Q.pdf",
+        "url": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?t=Q&code=099010&c=101&s=200&q=1",
+        "regions": [
+          {
+            "page": 3,
+            "rect": [
+              39.0,
+              85.9365463256836,
+              554.0,
+              178.11570739746094
+            ]
+          }
+        ],
+        "render": "reports/moex-98-99/quality-audit/source-renders/MOEX-099010-2101-Q018-official.png"
+      }
+    },
+    {
+      "id": "MOEX-099010-2101-Q046",
+      "expected": {
+        "stem": "下表為某一酵素之受質（substrate）濃度與反應速率分析表，已知此酵素依據米凱利斯－門頓動力學 （Michaelis-Menten kinetics）運作，此酵素的KM值約為多少mM？ 受質濃度（substrate concentration） V0 （mmol/L） （µmol/min） 1.2 326 3 485 6 650 9 732 1500 970"
+      },
+      "replacement": {
+        "stem": "下表為某一酵素之受質（substrate）濃度與反應速率分析表，已知此酵素依據米凱利斯－門頓動力學 （Michaelis-Menten kinetics）運作，此酵素的KM值約為多少mM？"
+      },
+      "showOriginal": true,
+      "reason": "無框線二欄數值表的數值均正確，但扁平文字失去欄位結構且經共用排版器會黏合相鄰數字；題幹只保留原提問，表格完整留在預設顯示的既有官方原圖，不重打或改數值。",
+      "source": {
+        "id": "MOEX-099010-2101-Q046",
+        "source": "reports/moex-98-99/source-pdfs/099010-2101-Q.pdf",
+        "url": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?t=Q&code=099010&c=101&s=200&q=1",
+        "regions": [
+          {
+            "page": 5,
+            "rect": [
+              39.0,
+              506.7581787109375,
+              554.0,
+              689.2556762695312
+            ]
+          }
+        ],
+        "render": "reports/moex-98-99/quality-audit/source-renders/MOEX-099010-2101-Q046-official.png"
+      }
+    },
+    {
+      "id": "MOEX-099010-2101-Q067",
+      "expected": {
+        "options": {
+          "A": "Ca pump"
+        },
+        "stem": "毛地黃的藥理和毒性作用是透過抑制下列何者而來的？ 2+"
+      },
+      "replacement": {
+        "options": {
+          "A": "Ca²⁺ pump"
+        },
+        "stem": "毛地黃的藥理和毒性作用是透過抑制下列何者而來的？"
+      },
+      "showOriginal": false,
+      "reason": "Ca²⁺ 的 2+ 被錯分至題幹。",
+      "source": {
+        "id": "MOEX-099010-2101-Q067",
+        "source": "reports/moex-98-99/source-pdfs/099010-2101-Q.pdf",
+        "url": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?t=Q&code=099010&c=101&s=200&q=1",
+        "regions": [
+          {
+            "page": 7,
+            "rect": [
+              39.0,
+              547.1987915039062,
+              554.0,
+              597.335693359375
+            ]
+          }
+        ],
+        "render": "reports/moex-98-99/quality-audit/source-renders/MOEX-099010-2101-Q067-official.png"
+      }
+    },
+    {
+      "id": "MOEX-099130-2101-Q012",
+      "expected": {
+        "stem": "‧ ‧）與肺 12 一位健康者站立且平靜呼吸時，有關肺通氣量（ventilation; V A）、血液灌流量（perfusion; Q 順應性（lung compliance）之變化，下列敘述何者錯誤？",
+        "options": {
+          "B": "血液灌流量：肺尖＜肺底 ‧ ‧",
+          "C": "）：肺尖＜肺底 肺通氣量與血液灌流量之比值（V A/Q"
+        }
+      },
+      "replacement": {
+        "stem": "一位健康者站立且平靜呼吸時，有關肺通氣量（ventilation; V̇A）、血液灌流量（perfusion; Q̇）與肺順應性（lung compliance）之變化，下列敘述何者錯誤？",
+        "options": {
+          "B": "血液灌流量：肺尖＜肺底",
+          "C": "肺通氣量與血液灌流量之比值（V̇A/Q̇）：肺尖＜肺底"
+        }
+      },
+      "showOriginal": false,
+      "reason": "V/Q 上點、下標與兩行文字次序錯亂；依原件還原，不變更原選項「肺尖＜肺底」。",
+      "source": {
+        "id": "MOEX-099130-2101-Q012",
+        "source": "reports/moex-98-99/source-pdfs/099130-2101-Q.pdf",
+        "url": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?t=Q&code=099130&c=101&s=200&q=1",
+        "regions": [
+          {
+            "page": 2,
+            "rect": [
+              39.0,
+              83.1765365600586,
+              554.0,
+              162.07672729492188
+            ]
+          }
+        ],
+        "render": "reports/moex-98-99/quality-audit/source-renders/MOEX-099130-2101-Q012-official.png"
+      }
+    },
+    {
+      "id": "MOEX-099130-2101-Q033",
+      "expected": {
+        "options": {
+          "C": "[NAD ]/[NADH]高"
+        },
+        "stem": "在下列何種情況下，acetyl-CoA 進入citric acid cycle 會減少？ +"
+      },
+      "replacement": {
+        "options": {
+          "C": "[NAD⁺]/[NADH]高"
+        },
+        "stem": "在下列何種情況下，acetyl-CoA 進入citric acid cycle 會減少？"
+      },
+      "showOriginal": false,
+      "reason": "NAD⁺ 的 + 被錯分至題幹。",
+      "source": {
+        "id": "MOEX-099130-2101-Q033",
+        "source": "reports/moex-98-99/source-pdfs/099130-2101-Q.pdf",
+        "url": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?t=Q&code=099130&c=101&s=200&q=1",
+        "regions": [
+          {
+            "page": 3,
+            "rect": [
+              39.0,
+              413.23699951171875,
+              554.0,
+              440.5365966796875
+            ]
+          }
+        ],
+        "render": "reports/moex-98-99/quality-audit/source-renders/MOEX-099130-2101-Q033-official.png"
+      }
+    },
+    {
+      "id": "MOEX-098020-1101-Q086",
+      "expected": {
+        "stem": "某種疾病的篩選方法研究結果如下表，則該篩選方法的陽性預測值（positive predictive value）為何？ 疾病 篩檢 有 無 陽性 44 3 陰性 0 98"
+      },
+      "replacement": {
+        "stem": "某種疾病的篩選方法研究結果如下表，則該篩選方法的陽性預測值（positive predictive value）為何？"
+      },
+      "showOriginal": true,
+      "reason": "原表已以原圖完整呈現；移除文字擷取攤平的表格標頭與數字，避免陰性0與98被前端合併成098。",
+      "source": {
+        "id": "MOEX-098020-1101-Q086",
+        "source": "reports/moex-98-99/source-pdfs/098020-1101-Q.pdf",
+        "url": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?t=Q&code=098020&c=103&s=c011&q=1",
+        "regions": [
+          {
+            "page": 7
+          }
+        ],
+        "render": "reports/moex-98-99/full-visual-review-20261025/source-pages/098020-1101-p07.png"
+      }
+    },
+    {
+      "id": "MOEX-098140-1101-Q095",
+      "expected": {
+        "stem": "某一關於抽菸在一具人口代表性之世代中的前瞻式追蹤研究，5 年之後對於肺癌之調查結果如下表， 就得肺癌的危險性而言，抽菸比不抽菸的相對危險性（relative risk）為何？ 基線人數 肺癌病例數 抽菸者 70,000 70 不抽菸者 130,000 26"
+      },
+      "replacement": {
+        "stem": "某一關於抽菸在一具人口代表性之世代中的前瞻式追蹤研究，5 年之後對於肺癌之調查結果如下表， 就得肺癌的危險性而言，抽菸比不抽菸的相對危險性（relative risk）為何？"
+      },
+      "showOriginal": true,
+      "reason": "原表已以原圖完整呈現，移除題幹末端攤平的表頭及四格數值，避免重複且失去欄列關係。",
+      "source": {
+        "id": "MOEX-098140-1101-Q095",
+        "source": "reports/moex-98-99/source-pdfs/098140-1101-Q.pdf",
+        "url": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?t=Q&code=098140&c=103&s=c011&q=1",
+        "regions": [
+          {
+            "page": 8
+          }
+        ],
+        "render": "reports/moex-98-99/full-visual-review-20261025/source-pages/098140-1101-p08.png"
+      }
+    }
+  ]
+}
