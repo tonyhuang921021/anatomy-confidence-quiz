@@ -5796,6 +5796,7 @@ html[data-theme="dark"] .feedback-identity button.is-selected {
 }
 
 .home-study-update h2,
+.home-study-update [role="heading"],
 .home-study-update strong {
   color: var(--ink-main);
   font-size: inherit;
@@ -5814,6 +5815,14 @@ html[data-theme="dark"] .feedback-identity button.is-selected {
 }
 
 .home-study-update .home-update-summary-copy > span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.home-study-update .home-update-summary-copy > strong {
+  flex-shrink: 0;
+  max-width: 100%;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;

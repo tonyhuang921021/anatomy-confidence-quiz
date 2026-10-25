@@ -525,7 +525,7 @@ export function QuizSetupPanel({
                   <p className="mt-3 rounded-xl bg-amber-50 px-3 py-2 text-xs leading-6 text-amber-900">
                     {formatRocYear(selectedPaper.sourceYear)}舊制：{selectedPaper.subject === "醫學（一）"
                       ? "醫學（一）含解剖、胚胎、組織、微生物免疫、寄生蟲及公共衛生。"
-                      : "醫學（二）含生理、生化、藥理及病理。"}每卷 100 題，依官方最終答案及更正採分。
+                      : "醫學（二）含生理、生化、藥理及病理。"}每卷 100 題，依當年官方最終答案及更正採分；法規與醫學知識可能已有更新。
                   </p>
                 ) : null}
               </div>
