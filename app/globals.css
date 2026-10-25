@@ -195,6 +195,13 @@ select {
   padding: 20px 12px 52px;
 }
 
+@media (max-width: 639px) {
+  /* Reserve space below the last control for the fixed answer-action bar. */
+  .study-quiz.shell[data-answer-actions="true"] {
+    padding-bottom: calc(7rem + env(safe-area-inset-bottom, 0px));
+  }
+}
+
 img,
 picture,
 video,

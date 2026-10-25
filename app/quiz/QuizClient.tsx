@@ -2576,7 +2576,7 @@ export default function QuizPage() {
         : null;
 
   return (
-    <main id="main-content" className={`study-quiz shell ${submittedAttempt ? "pb-28 sm:pb-0" : ""}`}>
+    <main id="main-content" data-answer-actions={submittedAttempt ? "true" : undefined} className={`study-quiz shell ${submittedAttempt ? "pb-28 sm:pb-0" : ""}`}>
       <div ref={questionTopRef} />
       <header className="mb-5 border-b border-slate-200/80 pb-3">
         <div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-2">
