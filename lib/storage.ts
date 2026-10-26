@@ -9,6 +9,7 @@ import {
 } from "../types/quiz";
 import { normalizeQuestionExplanationOverride as normalizeQuestionExplanationOverridePayload } from "./questionExplanationFormat";
 import { normalizePracticeYearRange } from "./practiceYears";
+import { hasReviewedExplanation } from "./reviewedExplanations";
 import {
   hasAnswerKeyRevision,
   regradeSessionForCurrentAnswerKey
@@ -2429,6 +2430,7 @@ export function loadPracticeYearRange(defaultRange?: PracticeYearRange): Practic
 }
 
 export function applyQuestionExplanationOverride(question: Question): Question {
+  if (hasReviewedExplanation(question.id)) return question;
   const override = loadQuestionExplanationOverride(question.id);
   if (!override) return question;
 

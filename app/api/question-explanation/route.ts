@@ -1,4 +1,5 @@
 import { formatRocDate } from "@/lib/rocDate";
+import { hasReviewedExplanation } from "@/lib/reviewedExplanations";
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 import { createOpenAIText, getOpenAIModel, isOpenAIConfigured } from "@/lib/openai";
@@ -751,10 +752,29 @@ function parseExplanationPayload(text: string): ParsedExplanationPayload | null 
   };
 }
 
+/** Read-only configuration probe; never calls the model or exposes credentials. */
+export async function GET() {
+  return NextResponse.json({ model: QUESTION_EXPLANATION_MODEL, reviewedExplanationsProtected: true },
+    { headers: { "Cache-Control": "no-store" } });
+}
+
 export async function POST(request: NextRequest) {
   const body = (await request.json()) as QuestionExplanationRequestBody;
   const action = body.action ?? "generate";
   const startedAt = Date.now();
+
+  // The checked-in accepted-edition index is authoritative, never client flags.
+  // Guard sync as well as generation before authentication, model calls or writes.
+  const targetIds = action === "sync_override"
+    ? [body.override?.questionId]
+    : action === "sync_overrides"
+      ? (body.overrides ?? []).map(item => item.questionId)
+      : [body.question?.id];
+  if (targetIds.some(id => typeof id === "string" && hasReviewedExplanation(id.trim()))) {
+    return NextResponse.json({ ok: false, code: "reviewed_explanation_protected",
+      message: "此題已有已審核完整詳解，保留原文與圖片，不開放 AI 重新產生或替換。" },
+    { status: 409 });
+  }
 
   if (action === "sync_override" || action === "sync_overrides") {
     if (isSupabaseRecoveryMode()) {
