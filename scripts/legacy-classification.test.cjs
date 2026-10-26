@@ -11,7 +11,7 @@ test('review is pinned to unchanged official payload; all 800 subjects follow th
  assert.equal(crypto.createHash('sha256').update(fs.readFileSync(path.join(root,'data/sources/moex_98_99_official_questions.json'))).digest('hex'),review.sourceFileSha256);
  assert.equal(Object.keys(review.questions).length,800);assert.deepEqual(review.pendingQuestionIds,[]);
  assert.deepEqual(new Set([...Object.keys(review.questions),...review.pendingQuestionIds]),ids);
- assert.equal(Object.values(review.questions).filter(([,tag])=>tag===null).length,23);
+ assert.equal(Object.values(review.questions).filter(([,tag])=>tag===null).length,21);
  for(const [id,[subject,tag]] of Object.entries(review.questions)){assert.ok(ids.has(id));assert.equal(subject,ruleSubject(id));assert.equal(byId.get(id).subject,ruleSubject(id));if(tag)assert.ok(taxonomy.some(t=>t.name===tag&&t.subject===subject),id);}
 });
 test('all 800 stems, options, source/cases/images, identities and every official credit rule are immutable',()=>{

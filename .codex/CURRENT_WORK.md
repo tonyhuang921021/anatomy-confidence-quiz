@@ -2,7 +2,9 @@
 
 ## 民國116考期與98／99散題整合（2026-10-26，本機候選）
 
-- 工作分支 `maintenance/countdown-roc-years-20261025`，基準正式版 `c13852b35d3514fbff06a54ffec1f3e84488056a`；原內容判讀候選保留於 `archive/maintenance-content-classification-1472bfa`；本次維護尚未推送／部署，須取得本次發布確認。
+- 最新續核（115/10/26）：23題已逐題對照既有定義，2題解決（98-1醫二Q051臨床毒理、99-2醫一Q069血清學免疫原理）；779題細標籤、21題待核。章節仍未完整映射，不得把細標籤數當章節完成數。見`docs/moex-98-99/classification-chapter-gaps.md`與`classification-gap-recheck.json`。8項分類契約回歸通過。本輪未重跑全build／瀏覽器，未push／部署。使用者已批准先完成分類章節再發布，仍待完成條件而非重新批准同項發布。最新週用量41%，本週總上限75%，重置2026-11-01 07:04:27 UTC後不自行繼續消耗新週。
+
+- 工作分支 `maintenance/countdown-roc-years-20261025`，基準正式版 `c13852b35d3514fbff06a54ffec1f3e84488056a`；原內容判讀候選保留於 `archive/maintenance-content-classification-1472bfa`；本次維護尚未推送／部署，已獲先完成分類章節再發布的條件授權。
 - 具體範圍、來源、測試及缺口見 `docs/maintenance/20261026-local-candidate.md`。已核對醫師一階116/1/16考期，統一受控UI民國年，近期更新可展開，800個舊題ID可散題練習。
 - 撤回先前「799題學科確認」內容推論；800題大科全部依既有moex-primary-subject.js考期/卷別/題號規則鎖定，修復66跨科＋1待審。67題細分類重審：47題同科既有標籤、20題待核，連原3題共23題細分類待核，現有細標籤777題。`docs/moex-98-99/classification-review.csv`與生成程式綁定每題原文SHA-256；原題／採分／原圖／原卷身分未變。
 - 本機 `http://127.0.0.1:3099`；報告與實際截圖在 `reports/maintenance-20261025/`。不得把舊制原卷分組誤當現代學科分類，不重做已完成的800題官方圖文視讀。
