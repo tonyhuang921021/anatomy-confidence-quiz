@@ -1,0 +1,43 @@
+{
+  "approvedScope": "minimal necessary fine tags/definitions under original subjects; original names/IDs/hierarchy and old question assignments preserved",
+  "baseTaxonomySha256": "4b0fb9824dc5cf25c3d583c5f39730fe7abb7f95ebec8759b32ad9cd4e705ddc",
+  "newTagIds": [
+    "PUBH_MEDICAL_HISTORY",
+    "MIM_PATHOGEN_IMMUNE_EVASION",
+    "BIOC_CLINICAL_CHEMISTRY_MARKERS"
+  ],
+  "extendedExistingTagIds": [
+    "ANAT_HEAD_NECK",
+    "ANAT_PERIPHERAL_AUTONOMIC",
+    "HIST_REPRODUCTIVE",
+    "HIST_CELL_ULTRASTRUCTURE_MICROSCOPY",
+    "HIST_GI_HEPATOBILIARY_PANCREAS",
+    "HIST_CARDIOVASCULAR_RESPIRATORY",
+    "PHYS_SENSORY_SPECIAL_SENSES",
+    "PHYS_BLOOD_HEMOSTASIS",
+    "PHYS_GASTROINTESTINAL",
+    "BIOC_ENZYMES_VITAMINS_COFACTORS",
+    "BIOC_LIPID_LIPOPROTEIN_METABOLISM",
+    "PATH_IMMUNE_INFECTIOUS",
+    "PATH_CARDIOVASCULAR",
+    "PUBH_INFECTIOUS_EPI_OUTBREAK",
+    "PUBH_OCCUPATIONAL_HEALTH"
+  ],
+  "extensionRules": {
+    "ANAT_HEAD_NECK": "在舊制題號鎖定解剖學時，亦涵蓋內耳腔室、迷路與感受器的構造關係；不因此將大科移到組織或生理。",
+    "ANAT_PERIPHERAL_AUTONOMIC": "在舊制題號鎖定解剖學時，亦涵蓋交感／副交感的器官支配及正常作用；不包含具名自主神經藥物。",
+    "HIST_REPRODUCTIVE": "在舊制題號鎖定組織學時，亦涵蓋生殖器細胞與其分泌物及正常回饋的整合題；不更改名目大科。",
+    "HIST_CELL_ULTRASTRUCTURE_MICROSCOPY": "在舊制題號鎖定組織學時，亦涵蓋正常細胞週期與凋亡形態的基本細胞學辨識；不因此跨科到病理。",
+    "HIST_GI_HEPATOBILIARY_PANCREAS": "在舊制題號鎖定組織學時，亦涵蓋臨床情境中的消化道黏膜細胞組成及細胞數量變化，重點為細胞辨識。",
+    "HIST_CARDIOVASCULAR_RESPIRATORY": "在舊制題號鎖定組織學時，亦涵蓋呼吸道壁細胞組成與常見發炎浸潤的形態整合題；不更改名目大科。",
+    "PHYS_SENSORY_SPECIAL_SENSES": "在舊制題號鎖定生理學時，亦涵蓋視網膜細胞層次與視覺功能的基礎構造整合題。",
+    "PHYS_BLOOD_HEMOSTASIS": "在舊制題號鎖定生理學時，亦涵蓋正常血漿蛋白及免疫球蛋白的相對濃度；抗原辨識與活化機轉仍按免疫學定義處理。",
+    "PHYS_GASTROINTESTINAL": "在舊制題號鎖定生理學時，亦涵蓋胃黏膜保護、胃酸與感染造成消化性潰瘍的基礎整合題。",
+    "BIOC_ENZYMES_VITAMINS_COFACTORS": "在舊制題號鎖定生物化學時，亦涵蓋具名藥物的酵素標的、CYP生物轉化與酵素交互作用的生化基礎；不因此跨科改分藥理。",
+    "BIOC_LIPID_LIPOPROTEIN_METABOLISM": "在舊制題號鎖定生物化學時，亦涵蓋脂質衍生局部訊號分子eicosanoids的基本分類、作用及快速代謝特性。",
+    "PATH_IMMUNE_INFECTIOUS": "在舊制題號鎖定病理學時，亦涵蓋細菌內／外毒素與發燒、DIC及休克的致病機轉整合題；不更改名目大科。",
+    "PATH_CARDIOVASCULAR": "在舊制題號鎖定病理學時，亦涵蓋降脂酵素標的與動脈硬化機轉的整合題；藥物治療的劑量及臨床選藥不在此例外範圍。",
+    "PUBH_INFECTIOUS_EPI_OUTBREAK": "在舊制題號鎖定公共衛生學時，亦涵蓋食源性疾病特性與母嬰垂直傳染危險標誌的防疫基礎整合題。",
+    "PUBH_OCCUPATIONAL_HEALTH": "在舊制題號鎖定公共衛生學時，亦涵蓋腕隧道等常見職業相關肌骨疾病的臨床診斷基礎；不將單題未明示的職業暴露當成已知病史。"
+  }
+}

@@ -348,7 +348,12 @@
         "顱神經在顱外的區域走行若與頭頸手術或器官支配相關，可選本標籤；若重點是核團、腦幹病灶或多顱神經症候群，選顱神經與腦幹。",
         "若核心是咽弓、顏面裂或甲狀腺下降來源，選胚胎學。",
         "眼球或耳的顯微層次選組織學，感覺轉導選生理學。"
-      ]
+      ],
+      "legacyNominalSubjectExtension": {
+        "appliesWhen": "examCode < 106100 and existing question-number subject equals this subject",
+        "precedence": "This narrow same-subject integration exception applies before general cross-subject borderline exclusions; original definitions and assignments remain unchanged.",
+        "rule": "在舊制題號鎖定解剖學時，亦涵蓋內耳腔室、迷路與感受器的構造關係；不因此將大科移到組織或生理。"
+      }
     },
     {
       "id": "ANAT_LOWER_LIMB",
@@ -489,7 +494,12 @@
         "具名肢體神經若答案依賴其區域走行，選上肢或下肢；若考神經叢層級、根段或皮節原理，選本標籤。",
         "交感與副交感題若考節前節後路徑選本標籤；若考神經傳遞物與受器選生理或藥理。",
         "內臟痛轉移若需脊髓節段與自主路徑，選本標籤。"
-      ]
+      ],
+      "legacyNominalSubjectExtension": {
+        "appliesWhen": "examCode < 106100 and existing question-number subject equals this subject",
+        "precedence": "This narrow same-subject integration exception applies before general cross-subject borderline exclusions; original definitions and assignments remain unchanged.",
+        "rule": "在舊制題號鎖定解剖學時，亦涵蓋交感／副交感的器官支配及正常作用；不包含具名自主神經藥物。"
+      }
     },
     {
       "id": "ANAT_THORAX",
@@ -597,7 +607,12 @@
         "若題目比較血管壁或呼吸道不同層級的正常切片，選本標籤。",
         "肺泡第二型細胞若考表面張力生理選呼吸生理；若考形態辨識選本標籤。",
         "血管炎或動脈粥樣硬化選病理學。"
-      ]
+      ],
+      "legacyNominalSubjectExtension": {
+        "appliesWhen": "examCode < 106100 and existing question-number subject equals this subject",
+        "precedence": "This narrow same-subject integration exception applies before general cross-subject borderline exclusions; original definitions and assignments remain unchanged.",
+        "rule": "在舊制題號鎖定組織學時，亦涵蓋呼吸道壁細胞組成與常見發炎浸潤的形態整合題；不更改名目大科。"
+      }
     },
     {
       "id": "HIST_CELL_ULTRASTRUCTURE_MICROSCOPY",
@@ -624,7 +639,12 @@
         "題目以電子顯微圖或染色結果辨認正常構造時選本標籤。",
         "若答案依賴分子路徑或酵素反應，選生物化學；若依賴膜電位或運輸功能，選生理學。",
         "若影像顯示壞死、凋亡或腫瘤異型，選病理學。"
-      ]
+      ],
+      "legacyNominalSubjectExtension": {
+        "appliesWhen": "examCode < 106100 and existing question-number subject equals this subject",
+        "precedence": "This narrow same-subject integration exception applies before general cross-subject borderline exclusions; original definitions and assignments remain unchanged.",
+        "rule": "在舊制題號鎖定組織學時，亦涵蓋正常細胞週期與凋亡形態的基本細胞學辨識；不因此跨科到病理。"
+      }
     },
     {
       "id": "HIST_CONNECTIVE_CARTILAGE_BONE",
@@ -706,7 +726,12 @@
         "以絨毛、腺體、細胞型態辨認部位選本標籤。",
         "胰島若問細胞位置或染色選本標籤；若問激素作用選內分泌生理。",
         "消化道先天旋轉或憩室來源選胚胎學。"
-      ]
+      ],
+      "legacyNominalSubjectExtension": {
+        "appliesWhen": "examCode < 106100 and existing question-number subject equals this subject",
+        "precedence": "This narrow same-subject integration exception applies before general cross-subject borderline exclusions; original definitions and assignments remain unchanged.",
+        "rule": "在舊制題號鎖定組織學時，亦涵蓋臨床情境中的消化道黏膜細胞組成及細胞數量變化，重點為細胞辨識。"
+      }
     },
     {
       "id": "HIST_LYMPHOID_ORGANS",
@@ -789,7 +814,12 @@
         "若大科為組織學且核心是胎盤絨毛層次、滋養層或成熟形態，選本標籤；若考著床、胎膜形成或胚胎來源，選胚胎學。",
         "若需荷爾蒙濃度與回饋推理，選生殖生理。",
         "若考植入、胎膜形成或性別分化，選胚胎學。"
-      ]
+      ],
+      "legacyNominalSubjectExtension": {
+        "appliesWhen": "examCode < 106100 and existing question-number subject equals this subject",
+        "precedence": "This narrow same-subject integration exception applies before general cross-subject borderline exclusions; original definitions and assignments remain unchanged.",
+        "rule": "在舊制題號鎖定組織學時，亦涵蓋生殖器細胞與其分泌物及正常回饋的整合題；不更改名目大科。"
+      }
     },
     {
       "id": "HIST_SKIN_SPECIAL_SENSES",
@@ -1152,7 +1182,12 @@
         "若題目問正常凝血因子順序、血型相容或造血回饋，選本標籤。",
         "若問疾病的突變、形態或診斷，選病理學；若問藥物作用，選藥理學。",
         "免疫細胞的抗原辨識與效應機轉選免疫學。"
-      ]
+      ],
+      "legacyNominalSubjectExtension": {
+        "appliesWhen": "examCode < 106100 and existing question-number subject equals this subject",
+        "precedence": "This narrow same-subject integration exception applies before general cross-subject borderline exclusions; original definitions and assignments remain unchanged.",
+        "rule": "在舊制題號鎖定生理學時，亦涵蓋正常血漿蛋白及免疫球蛋白的相對濃度；抗原辨識與活化機轉仍按免疫學定義處理。"
+      }
     },
     {
       "id": "PHYS_CARDIOVASCULAR",
@@ -1362,7 +1397,12 @@
         "題目問餐後激素、分泌或吸收位置與功能時選本標籤。",
         "若核心是某營養素的細胞內代謝，選生物化學；若是藥物治療，選藥理學。",
         "肝臟合成、解毒與代謝若偏全身代謝路徑，依核心選生物化學。"
-      ]
+      ],
+      "legacyNominalSubjectExtension": {
+        "appliesWhen": "examCode < 106100 and existing question-number subject equals this subject",
+        "precedence": "This narrow same-subject integration exception applies before general cross-subject borderline exclusions; original definitions and assignments remain unchanged.",
+        "rule": "在舊制題號鎖定生理學時，亦涵蓋胃黏膜保護、胃酸與感染造成消化性潰瘍的基礎整合題。"
+      }
     },
     {
       "id": "PHYS_MOTOR_AUTONOMIC_HIGHER",
@@ -1553,7 +1593,12 @@
         "題目若需理解刺激如何轉為神經訊號，選本標籤；若只問路徑在哪裡交叉，選神經解剖。",
         "視野缺損若核心是視路病灶定位，可選神經解剖；若核心是光學、調焦或視網膜功能，選本標籤。",
         "疼痛治療藥物機轉選藥理學。"
-      ]
+      ],
+      "legacyNominalSubjectExtension": {
+        "appliesWhen": "examCode < 106100 and existing question-number subject equals this subject",
+        "precedence": "This narrow same-subject integration exception applies before general cross-subject borderline exclusions; original definitions and assignments remain unchanged.",
+        "rule": "在舊制題號鎖定生理學時，亦涵蓋視網膜細胞層次與視覺功能的基礎構造整合題。"
+      }
     },
     {
       "id": "PHYS_SEX_DIFFERENTIATION",
@@ -1818,7 +1863,12 @@
         "若答案取決於動力學曲線、抑制型態或輔因子，選本標籤。",
         "藥物抑制某酵素但題目問藥名、治療或毒性時選藥理學；若只考抑制型態，可選本標籤。",
         "維生素題以反應輔因子為核心選本標籤，以公共營養政策為核心選公共衛生。"
-      ]
+      ],
+      "legacyNominalSubjectExtension": {
+        "appliesWhen": "examCode < 106100 and existing question-number subject equals this subject",
+        "precedence": "This narrow same-subject integration exception applies before general cross-subject borderline exclusions; original definitions and assignments remain unchanged.",
+        "rule": "在舊制題號鎖定生物化學時，亦涵蓋具名藥物的酵素標的、CYP生物轉化與酵素交互作用的生化基礎；不因此跨科改分藥理。"
+      }
     },
     {
       "id": "BIOC_GLYCOBIOCHEMISTRY",
@@ -1915,7 +1965,12 @@
         "若題目問代謝酵素、載脂蛋白或顆粒運輸，選本標籤。",
         "若問 statin、fibrate、PCSK9 等治療，選藥理學。",
         "若題目核心是脂肪吸收與膽汁功能，可選消化生理；若核心是細胞內代謝，選本標籤。"
-      ]
+      ],
+      "legacyNominalSubjectExtension": {
+        "appliesWhen": "examCode < 106100 and existing question-number subject equals this subject",
+        "precedence": "This narrow same-subject integration exception applies before general cross-subject borderline exclusions; original definitions and assignments remain unchanged.",
+        "rule": "在舊制題號鎖定生物化學時，亦涵蓋脂質衍生局部訊號分子eicosanoids的基本分類、作用及快速代謝特性。"
+      }
     },
     {
       "id": "BIOC_MOLECULAR_BIOTECH_DIAGNOSTICS",
@@ -2464,7 +2519,12 @@
         "若題目需辨認心肌梗塞時序、瓣膜形態、心肌病或血管炎，選本標籤。",
         "若核心是一般 Virchow triad、栓塞或休克，選血流障礙、血栓與休克。",
         "先天心病若問形成缺陷選胚胎學；若問病理與血流後果選本標籤。"
-      ]
+      ],
+      "legacyNominalSubjectExtension": {
+        "appliesWhen": "examCode < 106100 and existing question-number subject equals this subject",
+        "precedence": "This narrow same-subject integration exception applies before general cross-subject borderline exclusions; original definitions and assignments remain unchanged.",
+        "rule": "在舊制題號鎖定病理學時，亦涵蓋降脂酵素標的與動脈硬化機轉的整合題；藥物治療的劑量及臨床選藥不在此例外範圍。"
+      }
     },
     {
       "id": "PATH_CELL_INJURY_ADAPTATION_DEATH",
@@ -2686,7 +2746,12 @@
         "若題目提供病原名稱但答案是組織反應、壞死型態或器官損傷，選本標籤。",
         "若需辨認病原、毒素或培養特性，選微生物／寄生蟲學；若需辨認 hypersensitivity 類型或免疫細胞機轉，選免疫學。",
         "器官特異性自體免疫病若考該器官典型形態，可選相應系統病理。"
-      ]
+      ],
+      "legacyNominalSubjectExtension": {
+        "appliesWhen": "examCode < 106100 and existing question-number subject equals this subject",
+        "precedence": "This narrow same-subject integration exception applies before general cross-subject borderline exclusions; original definitions and assignments remain unchanged.",
+        "rule": "在舊制題號鎖定病理學時，亦涵蓋細菌內／外毒素與發燒、DIC及休克的致病機轉整合題；不更改名目大科。"
+      }
     },
     {
       "id": "PATH_INFECTIOUS_PATHOGEN_DIAGNOSTICS",
@@ -3984,7 +4049,12 @@
         "若題目問疫情曲線、傳播鏈、群聚處理或族群疫苗效果，選本標籤。",
         "若問病原本身或檢驗特徵，選微生物／寄生蟲學；若問疫苗免疫機轉，選免疫學。",
         "醫療院所感染若核心是監測與感染管制策略，選本標籤；若核心是病原鑑定，選微生物學。"
-      ]
+      ],
+      "legacyNominalSubjectExtension": {
+        "appliesWhen": "examCode < 106100 and existing question-number subject equals this subject",
+        "precedence": "This narrow same-subject integration exception applies before general cross-subject borderline exclusions; original definitions and assignments remain unchanged.",
+        "rule": "在舊制題號鎖定公共衛生學時，亦涵蓋食源性疾病特性與母嬰垂直傳染危險標誌的防疫基礎整合題。"
+      }
     },
     {
       "id": "PUBH_MEDICAL_LAW_ETHICS",
@@ -4038,7 +4108,12 @@
         "若暴露與職務、工作流程、防護或職業病認定直接相關，選本標籤。",
         "若同一污染物來自一般環境而非職場，選環境衛生。",
         "若題目問中毒解毒劑或藥物動力，選藥理學。"
-      ]
+      ],
+      "legacyNominalSubjectExtension": {
+        "appliesWhen": "examCode < 106100 and existing question-number subject equals this subject",
+        "precedence": "This narrow same-subject integration exception applies before general cross-subject borderline exclusions; original definitions and assignments remain unchanged.",
+        "rule": "在舊制題號鎖定公共衛生學時，亦涵蓋腕隧道等常見職業相關肌骨疾病的臨床診斷基礎；不將單題未明示的職業暴露當成已知病史。"
+      }
     },
     {
       "id": "PUBH_PREVENTIVE_COMMUNITY_POPULATION",
@@ -4146,6 +4221,60 @@
         "若題目問最適研究型態、證據等級、偏差來源或控制方式，選本標籤。",
         "若主要是從 2×2 表計算 RR／OR，選疾病頻率與效果指標。",
         "臨床試驗期別若重點是藥物開發流程可選藥理學；若重點是設計與偏差，選本標籤。"
+      ]
+    },
+    {
+      "id": "PUBH_MEDICAL_HISTORY",
+      "name": "公共衛生學－醫學史與公共衛生史",
+      "subject": "公共衛生學",
+      "definition": "醫療與公共衛生發展史、重要人物、醫院及衛生制度的歷史沿革。",
+      "include": [
+        "臺灣醫療史、醫院創建與醫療傳教人物",
+        "公共衛生與醫療制度的歷史發展"
+      ],
+      "exclude": [
+        "現行醫療法規判讀",
+        "一般政策支付制度與經濟評估"
+      ],
+      "aliases": [],
+      "borderlineRules": [
+        "在已鎖定同科的大科內依核心考點選用；不以本標籤改變既有題號大科或舊題映射。"
+      ]
+    },
+    {
+      "id": "MIM_PATHOGEN_IMMUNE_EVASION",
+      "name": "微生物免疫學－病原與宿主免疫逃脫",
+      "subject": "微生物免疫學",
+      "definition": "跨類病原如何逃避或破壞宿主免疫防禦的共同策略及宿主互動。",
+      "include": [
+        "抗原變異、補體降解與免疫細胞攻擊",
+        "細菌及病毒免疫逃脫策略比較"
+      ],
+      "exclude": [
+        "單一菌種培養與生化鑑定",
+        "免疫抑制藥物的治療用途"
+      ],
+      "aliases": [],
+      "borderlineRules": [
+        "在已鎖定同科的大科內依核心考點選用；不以本標籤改變既有題號大科或舊題映射。"
+      ]
+    },
+    {
+      "id": "BIOC_CLINICAL_CHEMISTRY_MARKERS",
+      "name": "生物化學－臨床生化檢驗與疾病標誌",
+      "subject": "生物化學",
+      "definition": "臨床生化檢驗中蛋白、酵素、代謝物與腫瘤標誌的選擇及基本判讀。",
+      "include": [
+        "AFP等腫瘤標誌與臨床檢測目的",
+        "血中蛋白與酵素標誌之臨床生化意義"
+      ],
+      "exclude": [
+        "核酸定序、PCR或重組DNA工具本身",
+        "檢驗效度與篩檢政策的統計評估"
+      ],
+      "aliases": [],
+      "borderlineRules": [
+        "在已鎖定同科的大科內依核心考點選用；不以本標籤改變既有題號大科或舊題映射。"
       ]
     }
   ],
@@ -4310,5 +4439,6 @@
       "sourceId": "AI_GAP_EXPANSION_20260710",
       "statement": "gpt-5.4 compared 144 taxonomy-gap questions by official major subject; proposed chapter-level additions were schema-validated and manually reviewed before inclusion."
     }
-  ]
+  ],
+  "contentRevision": "1151026-legacy-integrated-topics"
 }
