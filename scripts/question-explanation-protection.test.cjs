@@ -42,8 +42,8 @@ const route=load('app/api/question-explanation/route.ts');
 const index=JSON.parse(fs.readFileSync(path.join(root,'data/reviewedExplanationIndex.json')));
 const before=JSON.stringify(index);
 async function post(body){return route.POST({json:async()=>body});}
-test('all 1401 accepted IDs reject forced generation before external work',async()=>{
- assert.equal(Object.keys(index).length,1401);
+test('all 1402 accepted IDs reject forced generation before external work',async()=>{
+ assert.equal(Object.keys(index).length,1402);
  for(const id of Object.keys(index)){
   const result=await post({action:'generate',force:true,reviewed:false,question:{id,stem:'forged',answer:'A',source:'unreviewed'}});
   assert.equal(result.status,409,id);assert.equal(result.body.code,'reviewed_explanation_protected');
