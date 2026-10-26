@@ -1015,6 +1015,10 @@ function applyQuestionMedia(question: Question): Question {
 }
 
 const questionTextOverrides: Record<string, QuestionTextOverride> = {
+  // Report #130: verified visually against official 106100/2301 PDF, page 7.
+  "MOEX-106100-2301-Q044": {
+    stem: "我國法令規定所稱之「日時量平均容許暴露濃度」係指工作多少小時之平均容許暴露濃度？"
+  },
   "MOEX-106100-2301-Q021": {
     options: {
       B: "IL-6 與 TGF-β 可以幫助 CD4+ T 細胞分化成第十七型輔助性 T 細胞（Th17）",

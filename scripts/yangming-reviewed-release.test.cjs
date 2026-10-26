@@ -56,8 +56,8 @@ async function request(id, options={}) {
  const response=await route.POST({json:async()=>({questionId:id,accessToken:'offline-token',reason:'調整原稿',reportType:options.report?'correction':undefined}),headers:{get:()=>null}});
  return {response,calls};
 }
-test('all 672 bindings: 636 complete originals, 36 explicit fallback, 1087 immutable images',()=>{
- assert.equal(release.rows.length,672);assert.equal(new Set(release.rows.map(r=>r.questionId)).size,672);
+test('all 673 bindings: 636 complete originals, 37 explicit fallback, 1087 immutable images',()=>{
+ assert.equal(release.rows.length,673);assert.equal(new Set(release.rows.map(r=>r.questionId)).size,673);
  let images=0;
  for(const row of release.rows){const result=helper.findReviewedYangmingExplanation(row.questionId,'https://offline.invalid');
  assert.equal(result.content.reviewedOriginal,true);assert.equal(result.sourceQuestionId,row.sourceQuestionId);
