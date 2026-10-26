@@ -4,12 +4,14 @@
     "target": "ES2022",
     "module": "commonjs",
     "moduleResolution": "node",
+    "allowJs": true,
     "noEmit": false,
     "outDir": "/private/tmp/anatomy-quiz-analysis-tests",
     "incremental": false,
     "isolatedModules": false
   },
   "include": [
+    "scripts/moex-primary-subject.js",
     "next-env.d.ts",
     "data/anatomyQuestions.ts",
     "lib/questionExplanationFormat.ts",

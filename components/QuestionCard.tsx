@@ -6,7 +6,7 @@ import { formatRocExamLabel, formatRocYear } from "@/lib/rocDate";
 import { type MouseEvent, type ReactNode, useMemo } from "react";
 import { QuestionOptionBlock, QuestionStemBlock } from "@/components/QuestionMediaBlock";
 import { QuestionPrimaryTagBadge } from "@/components/QuestionPrimaryTagBadge";
-import { getQuestionPrimaryTag, primaryTagIncludesSubject } from "@/lib/analysisPrimaryTag";
+import { getQuestionPrimaryTag, isLegacyQuestionPrimaryTagPending, primaryTagIncludesSubject } from "@/lib/analysisPrimaryTag";
 import { useQuestionChangeFeedback } from "@/components/useQuestionChangeFeedback";
 import { OptionKey, Question } from "@/types/quiz";
 
@@ -119,6 +119,8 @@ export function QuestionCard({
             ) : null}
             {primaryTag ? (
               <QuestionPrimaryTagBadge question={question} />
+            ) : isLegacyQuestionPrimaryTagPending(question.id) ? (
+              <span className="max-w-full break-words rounded-full bg-amber-50 px-3 py-1 text-amber-900">細分類待核對</span>
             ) : (
               <>
                 <span className="max-w-full break-words rounded-full bg-slate-100 px-3 py-1 text-slate-700">

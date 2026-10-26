@@ -54,12 +54,12 @@ test('reviewed historical questions are reachable by scientific subject while or
  const key='anatomy-confidence-current-session:guest';await expect(page.locator('[data-question-id]').first()).toBeVisible();let s=await page.evaluate(k=>JSON.parse(localStorage.getItem(k)!),key);
  expect(s.questionOrder).toHaveLength(10);const assignments=classification.questions as unknown as Record<string,[string,string|null]>;
  for(const id of s.questionOrder)expect(assignments[id]?.[0]).toBe('藥理學');
- const id=s.questionOrder[0],q=payload.questions.find(q=>q.id===id)!;const card=page.locator('[data-question-id]').first();await expect(card).toContainText(assignments[id][1]!);await expect(card).not.toContainText('學科分類待核對');
+ const id=s.questionOrder[0],q=payload.questions.find(q=>q.id===id)!;const card=page.locator('[data-question-id]').first();await expect(card).toContainText(assignments[id][1]??'細分類待核對');await expect(card).not.toContainText('學科分類待核對');
  await card.getByText('查看官方原題（含圖表）',{exact:true}).click();
  await expect(card).toContainText('歷史題依當年官方最終答案採分');
  for(const img of await card.locator('img:visible').all()){await img.scrollIntoViewIfNeeded();await expect.poll(()=>img.evaluate((e:HTMLImageElement)=>e.complete&&e.naturalWidth>0)).toBe(true);}
  const answer=q.acceptedAnswers[0];await card.getByRole('button').filter({has:page.locator('span',{hasText:new RegExp(`^${answer}$`)})}).first().click();await page.getByRole('button',{name:'送出答案',exact:true}).click();
- s=await page.evaluate(k=>JSON.parse(localStorage.getItem(k)!),key);expect(s.attempts[0].isCorrect).toBe(true);const saved=JSON.stringify(s);await page.reload();await expect(card).toBeVisible();await expect(card).toContainText(assignments[id][1]!);expect(await page.evaluate(k=>JSON.stringify(JSON.parse(localStorage.getItem(k)!)),key)).toBe(saved);
+ s=await page.evaluate(k=>JSON.parse(localStorage.getItem(k)!),key);expect(s.attempts[0].isCorrect).toBe(true);const saved=JSON.stringify(s);await page.reload();await expect(card).toBeVisible();await expect(card).toContainText(assignments[id][1]??'細分類待核對');expect(await page.evaluate(k=>JSON.stringify(JSON.parse(localStorage.getItem(k)!)),key)).toBe(saved);
  await page.screenshot({path:`reports/maintenance-20261025/${info.project.name}-scientific-subject.png`,fullPage:true});
  await page.goto('/simulation');await expect(page.locator('.app-topbar')).toHaveAttribute('data-shell-ready','true');await page.getByRole('button',{name:/^醫學（一）/}).click();await page.locator('#simulation-paper').selectOption('098020-1101');await page.getByRole('button',{name:'開始 100 題模擬考',exact:true}).click();await expect(page.locator('[data-question-id]').first()).toBeVisible();
  s=await page.evaluate(k=>JSON.parse(localStorage.getItem(k)!),key);expect(new Set(s.questionOrder)).toEqual(new Set(payload.questions.filter(q=>q.examCode==='098020'&&q.paperCode==='1101').map(q=>q.id)));expect(s.questionOrder).toContain('MOEX-098020-1101-Q047');

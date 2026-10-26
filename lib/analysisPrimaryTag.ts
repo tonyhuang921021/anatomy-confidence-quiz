@@ -1,5 +1,6 @@
 import primaryTagRuntimeMapJson from "../data/analysisPrimaryTagRuntimeMap.json";
 import legacyClassificationJson from "../data/sources/moex_98_99_classification_review.json";
+import { getMoexPrimarySubject } from "../scripts/moex-primary-subject";
 import type { Question, QuestionClassificationOverride, SubjectName } from "../types/quiz";
 
 type RuntimePrimaryTagAssignment = {
@@ -23,6 +24,7 @@ const runtimeAssignments = runtimePrimaryTagMap.questions;
 // The source-bound contract test validates every subject, tag and tuple length.
 const legacyAssignments = legacyClassificationJson.questions as unknown as Record<string, [SubjectName, string | null]>;
 const legacyPendingIds = new Set<string>(legacyClassificationJson.pendingQuestionIds);
+const legacyPendingPrimaryTagIds = new Set<string>(legacyClassificationJson.pendingPrimaryTagQuestionIds);
 const MICROBIOLOGY_TAG_PREFIXES = ["細菌學", "病毒學", "真菌學", "免疫學", "微生物免疫學"];
 const SUBJECT_BY_CODE = [
   "解剖學",
@@ -41,13 +43,23 @@ export const ANALYSIS_PRIMARY_TAG_CLASSIFIED_AT = runtimePrimaryTagMap.classifie
 
 export function getAnalysisPrimaryTagAssignment(questionId: string) {
   const legacy = legacyAssignments[questionId];
-  if (legacy) return { subject: legacy[0], primaryTag: legacy[1] } satisfies RuntimePrimaryTagAssignment;
+  if (legacy) return getLockedLegacyPrimaryTagAssignment(questionId, legacy[0], legacy[1]);
   const assignment = runtimeAssignments[questionId];
   if (!assignment) return null;
 
   return {
     primaryTag: assignment[0],
     subject: SUBJECT_BY_CODE[assignment[1]]
+  } satisfies RuntimePrimaryTagAssignment;
+}
+
+/** Nominal exam subject is fixed by the existing year/paper/question-number rule. */
+export function getLockedLegacyPrimaryTagAssignment(questionId: string, candidateSubject: SubjectName, primaryTag: string | null) {
+  const subject = getMoexPrimarySubject(questionId);
+  return {
+    subject,
+    primaryTag: candidateSubject === subject && primaryTag && primaryTagIncludesSubject(primaryTag, subject)
+      ? primaryTag : null
   } satisfies RuntimePrimaryTagAssignment;
 }
 
@@ -76,6 +88,10 @@ export function isLegacyQuestionClassificationPending(questionId: string) {
   return legacyPendingIds.has(questionId);
 }
 
+export function isLegacyQuestionPrimaryTagPending(questionId: string) {
+  return legacyPendingPrimaryTagIds.has(questionId);
+}
+
 export function applyAnalysisPrimaryTagClassification(question: Question): Question {
   const assignment = getAnalysisPrimaryTagAssignment(question.id);
   if (!assignment) return question;
@@ -83,10 +99,6 @@ export function applyAnalysisPrimaryTagClassification(question: Question): Quest
   return {
     ...question,
     subject: assignment.subject,
-    ...(Object.prototype.hasOwnProperty.call(legacyAssignments, question.id) ? {
-      chapter: assignment.primaryTag ?? `${assignment.subject}－細分類待核對`,
-      section: assignment.primaryTag?.split("－").slice(1).join("－") ?? ""
-    } : {}),
     primaryTag: assignment.primaryTag ?? undefined
   };
 }
