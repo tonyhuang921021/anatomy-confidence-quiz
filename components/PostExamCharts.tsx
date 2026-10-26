@@ -503,7 +503,7 @@ export async function downloadPostExamRecapPng({
   context.fillRect(0, 0, width, height);
   context.fillStyle = "#102a22";
   context.font = '700 46px "Noto Sans TC", sans-serif';
-  context.fillText("2026 一階醫師國考題庫回顧", 72, 88);
+  context.fillText("民國115年 一階醫師國考題庫回顧", 72, 88);
   context.fillStyle = "#64748b";
   context.font = '500 22px "Noto Sans TC", sans-serif';
   context.fillText("統計截止 115/7/17 15:00（台灣時間）", 72, 126);
@@ -609,7 +609,7 @@ export async function downloadPostExamRecapPng({
 
   const blob = await new Promise<Blob | null>((resolve) => canvas.toBlob(resolve, "image/png"));
   const anchor = document.createElement("a");
-  anchor.download = "2026-國考題庫回顧.png";
+  anchor.download = "民國115年-國考題庫回顧.png";
   if (blob) {
     const url = URL.createObjectURL(blob);
     anchor.href = url;

@@ -1,5 +1,10 @@
 # Codex Current Work
 
+## 最新：800分類與章節本機驗收完成，發布受阻
+
+使用者已允許重置後續作，新週總上限50%。800大科／細類／章節全部對應，原6730題完整SHA不變；3新增類＋15同科例外及章節見證另有審閱表。50項資料與日期／搜尋回歸、15個瀏覽器案例通過，build／typecheck成功，詳見docs/maintenance/20261026-local-candidate.md。尚未push或部署。git ls-remote productionSource refs/heads/main被自動審查拒絕（仍認定禁止外部網路），操作未執行；不換路徑、不重試，待父線處理最新授權落差。正式rollback仍dpl_HdbYfkAdEM3TdH83Hrk6VQTDEeQd/c13852b。下面重置停止與21題缺口為歷史紀錄，已被本段取代。
+
+
 ## 立即停止：週配額重置
 
 父線通知重置後不得自動續作。未驗收WIP已保存；細標籤資料填入800/800、章節映射仍0/800、尚未跑新回歸、未push／部署、無在途發布。見`docs/moex-98-99/RESET_CHECKPOINT-20261026.md`。原Library v3仍對應ad1b70a；不能冒稱本WIP已驗收。等待新使用者指示。

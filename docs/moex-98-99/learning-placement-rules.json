@@ -1,0 +1,1505 @@
+{
+  "baselineOldCanonicalCount": 6730,
+  "baselineOldCanonicalSha256": "ebc49d69a64ab40c0860f7e0e2e657d099fd8d27c8f59bba2e3b2aaae625e574",
+  "anatomyOriginalOutline": [
+    {
+      "chapter": "神經解剖",
+      "sections": [
+        "腦神經",
+        "腦幹核區",
+        "視覺路徑",
+        "聽覺與前庭路徑",
+        "丘腦與基底核",
+        "小腦",
+        "脊髓傳導路徑",
+        "自律神經"
+      ]
+    },
+    {
+      "chapter": "頭頸部",
+      "sections": [
+        "顏面神經與三叉神經",
+        "頸動脈鞘",
+        "咽喉解剖",
+        "舌與味覺",
+        "甲狀腺與副甲狀腺"
+      ]
+    },
+    {
+      "chapter": "胸腔",
+      "sections": [
+        "心臟與冠狀動脈",
+        "縱膈",
+        "肺與胸膜",
+        "橫膈"
+      ]
+    },
+    {
+      "chapter": "腹部",
+      "sections": [
+        "腹膜關係",
+        "胃腸道血管",
+        "肝膽胰脾",
+        "腎臟與後腹腔",
+        "門脈系統"
+      ]
+    },
+    {
+      "chapter": "骨盆與會陰",
+      "sections": [
+        "骨盆血管",
+        "泌尿生殖",
+        "直腸與肛管",
+        "會陰三角"
+      ]
+    },
+    {
+      "chapter": "上肢",
+      "sections": [
+        "臂神經叢",
+        "肩胛區",
+        "前臂屈伸肌",
+        "手部肌肉",
+        "上肢血管"
+      ]
+    },
+    {
+      "chapter": "下肢",
+      "sections": [
+        "腰薦神經叢",
+        "臀區",
+        "大腿前內後區",
+        "小腿肌群",
+        "足部",
+        "下肢血管"
+      ]
+    }
+  ],
+  "anatomyOutlineAdditions": [
+    {
+      "chapter": "神經解剖",
+      "sections": [
+        "腦膜、腦脊髓液與腦血管",
+        "大腦皮質與邊緣系統",
+        "下視丘",
+        "周邊神經組織"
+      ]
+    },
+    {
+      "chapter": "頭頸部",
+      "sections": [
+        "鼻腔與鼻竇",
+        "口腔與顳下頜關節",
+        "頭頸血管",
+        "耳部構造",
+        "眼球構造",
+        "顱骨與顱窩"
+      ]
+    },
+    {
+      "chapter": "胸腔",
+      "sections": [
+        "胸壁與乳房"
+      ]
+    },
+    {
+      "chapter": "腹部",
+      "sections": [
+        "腹壁與腹股溝",
+        "腸道構造與定位"
+      ]
+    },
+    {
+      "chapter": "上肢",
+      "sections": [
+        "上臂與肘"
+      ]
+    },
+    {
+      "chapter": "下肢",
+      "sections": [
+        "骨盆帶與髖關節"
+      ]
+    },
+    {
+      "chapter": "背部與脊柱",
+      "sections": [
+        "脊柱與椎管",
+        "體表定位與背肌"
+      ]
+    }
+  ],
+  "existingPairWitnesses": {
+    "胚胎學|胚胎學|胚胎總論": {
+      "existingQuestionId": "MOEX-108100-1301-Q034",
+      "newReason": null
+    },
+    "胚胎學|胚胎學|器官發生與胚層衍生": {
+      "existingQuestionId": "MOEX-109020-1301-Q033",
+      "newReason": null
+    },
+    "胚胎學|胚胎學|胚胎學／泌尿生殖": {
+      "existingQuestionId": "MOEX-105100-5301-Q032",
+      "newReason": null
+    },
+    "組織學|組織學|細胞與胞器": {
+      "existingQuestionId": "MOEX-110101-1301-Q038",
+      "newReason": null
+    },
+    "組織學|組織學|上皮組織": {
+      "existingQuestionId": "MOEX-107100-1301-Q043",
+      "newReason": null
+    },
+    "組織學|組織學|結締組織與軟骨骨": {
+      "existingQuestionId": "MOEX-100140-1101-Q040",
+      "newReason": null
+    },
+    "組織學|組織學|肌肉組織": {
+      "existingQuestionId": "MOEX-101110-1101-Q037",
+      "newReason": null
+    },
+    "組織學|組織學|血液與淋巴組織": {
+      "existingQuestionId": "MOEX-101030-1101-Q034",
+      "newReason": null
+    },
+    "組織學|組織學|淋巴與免疫組織": {
+      "existingQuestionId": "MOEX-100030-1101-Q036",
+      "newReason": null
+    },
+    "組織學|組織學|消化系統組織": {
+      "existingQuestionId": "MOEX-101030-1101-Q038",
+      "newReason": null
+    },
+    "組織學|組織學|器官組織學": {
+      "existingQuestionId": "MOEX-109020-1301-Q040",
+      "newReason": null
+    },
+    "組織學|組織學|男性生殖組織": {
+      "existingQuestionId": "MOEX-100030-1101-Q040",
+      "newReason": null
+    },
+    "組織學|組織學|特殊感覺組織": {
+      "existingQuestionId": "MOEX-100030-1101-Q041",
+      "newReason": null
+    },
+    "生理學|生理學|細胞生理": {
+      "existingQuestionId": "MOEX-109020-1301-Q047",
+      "newReason": null
+    },
+    "生理學|生理學|神經生理": {
+      "existingQuestionId": "MOEX-109100-1301-Q050",
+      "newReason": null
+    },
+    "生理學|生理學|肌肉生理": {
+      "existingQuestionId": "MOEX-110020-1301-Q047",
+      "newReason": null
+    },
+    "生理學|生理學|心血管生理": {
+      "existingQuestionId": "MOEX-109020-1301-Q058",
+      "newReason": null
+    },
+    "生理學|生理學|呼吸生理": {
+      "existingQuestionId": "MOEX-114090-1301-Q063",
+      "newReason": null
+    },
+    "生理學|生理學|消化生理": {
+      "existingQuestionId": "MOEX-112020-1301-Q064",
+      "newReason": null
+    },
+    "生理學|生理學|腎臟與體液生理": {
+      "existingQuestionId": "MOEX-100030-2101-Q016",
+      "newReason": null
+    },
+    "生理學|生理學|內分泌與生殖生理": {
+      "existingQuestionId": "MOEX-106100-1301-Q072",
+      "newReason": null
+    },
+    "生理學|生理學|血液生理": {
+      "existingQuestionId": "MOEX-109100-1301-Q056",
+      "newReason": null
+    },
+    "生物化學|生物化學|分子生物學與核酸代謝": {
+      "existingQuestionId": "MOEX-100030-2101-Q027",
+      "newReason": null
+    },
+    "生物化學|生物化學|胺基酸與氮代謝": {
+      "existingQuestionId": "MOEX-108030-1301-Q093",
+      "newReason": null
+    },
+    "生物化學|生物化學|代謝生化": {
+      "existingQuestionId": "MOEX-112020-1301-Q088",
+      "newReason": null
+    },
+    "生物化學|生物化學|細胞訊息與細胞生物學": {
+      "existingQuestionId": "MOEX-110101-1301-Q092",
+      "newReason": null
+    },
+    "生物化學|生物化學|蛋白質與酵素": {
+      "existingQuestionId": "MOEX-106100-1301-Q097",
+      "newReason": null
+    },
+    "生物化學|生物化學|醣類與醣脂生化": {
+      "existingQuestionId": "MOEX-106100-1301-Q089",
+      "newReason": null
+    },
+    "生物化學|生物化學|能量代謝與粒線體": {
+      "existingQuestionId": "MOEX-106100-1301-Q077",
+      "newReason": null
+    },
+    "生物化學|生物化學|臨床生化檢驗": {
+      "existingQuestionId": null,
+      "newReason": "配合已批准的新細類新增必要小節；保留原科目及既有節點"
+    },
+    "微生物免疫學|微生物免疫學|細菌學": {
+      "existingQuestionId": "MOEX-100030-1101-Q042",
+      "newReason": null
+    },
+    "微生物免疫學|微生物免疫學|病毒學": {
+      "existingQuestionId": "MOEX-100030-1101-Q053",
+      "newReason": null
+    },
+    "微生物免疫學|微生物免疫學|真菌學": {
+      "existingQuestionId": "MOEX-100030-1101-Q060",
+      "newReason": null
+    },
+    "微生物免疫學|微生物免疫學|免疫學": {
+      "existingQuestionId": "MOEX-100030-1101-Q062",
+      "newReason": null
+    },
+    "微生物免疫學|微生物免疫學|微生物學總論": {
+      "existingQuestionId": "MOEX-106100-2301-Q003",
+      "newReason": null
+    },
+    "寄生蟲學|寄生蟲學|線蟲學": {
+      "existingQuestionId": "MOEX-106100-2301-Q029",
+      "newReason": null
+    },
+    "寄生蟲學|寄生蟲學|吸蟲學": {
+      "existingQuestionId": "MOEX-106100-2301-Q031",
+      "newReason": null
+    },
+    "寄生蟲學|寄生蟲學|絛蟲學": {
+      "existingQuestionId": "MOEX-107100-2301-Q029",
+      "newReason": null
+    },
+    "寄生蟲學|寄生蟲學|原蟲學": {
+      "existingQuestionId": "MOEX-106100-2301-Q032",
+      "newReason": null
+    },
+    "寄生蟲學|寄生蟲學|節肢動物與病媒": {
+      "existingQuestionId": "MOEX-106100-2301-Q035",
+      "newReason": null
+    },
+    "寄生蟲學|寄生蟲學|寄生蟲生活史與診斷": {
+      "existingQuestionId": "MOEX-108030-2301-Q032",
+      "newReason": null
+    },
+    "公共衛生學|公共衛生學|生物統計": {
+      "existingQuestionId": "MOEX-105100-5301-Q083",
+      "newReason": null
+    },
+    "公共衛生學|公共衛生學|流行病學": {
+      "existingQuestionId": "MOEX-107100-2301-Q038",
+      "newReason": null
+    },
+    "公共衛生學|公共衛生學|健康促進與預防醫學": {
+      "existingQuestionId": "MOEX-105100-5301-Q095",
+      "newReason": null
+    },
+    "公共衛生學|公共衛生學|傳染病防治": {
+      "existingQuestionId": "MOEX-113020-2301-Q047",
+      "newReason": null
+    },
+    "公共衛生學|公共衛生學|職業與環境醫學": {
+      "existingQuestionId": "MOEX-106100-2301-Q041",
+      "newReason": null
+    },
+    "公共衛生學|公共衛生學|衛生行政與健康政策": {
+      "existingQuestionId": "MOEX-106100-2301-Q049",
+      "newReason": null
+    },
+    "公共衛生學|公共衛生學|公共衛生學總論": {
+      "existingQuestionId": "MOEX-106100-2301-Q039",
+      "newReason": null
+    },
+    "公共衛生學|公共衛生學|健康促進與行為科學": {
+      "existingQuestionId": "MOEX-106100-2301-Q046",
+      "newReason": null
+    },
+    "公共衛生學|公共衛生學|醫療品質": {
+      "existingQuestionId": "MOEX-105020-5301-Q099",
+      "newReason": null
+    },
+    "公共衛生學|公共衛生學|醫學史": {
+      "existingQuestionId": null,
+      "newReason": "配合已批准的新細類新增必要小節；保留原科目及既有節點"
+    },
+    "藥理學|藥理學|藥物動力學": {
+      "existingQuestionId": "MOEX-100030-2101-Q074",
+      "newReason": null
+    },
+    "藥理學|藥理學|抗凝血與抗血小板藥": {
+      "existingQuestionId": "MOEX-100030-2101-Q056",
+      "newReason": null
+    },
+    "藥理學|藥理學|內分泌與生殖藥理": {
+      "existingQuestionId": "MOEX-100030-2101-Q071",
+      "newReason": null
+    },
+    "藥理學|藥理學|心血管藥理": {
+      "existingQuestionId": "MOEX-100030-2101-Q053",
+      "newReason": null
+    },
+    "藥理學|藥理學|自律神經藥理": {
+      "existingQuestionId": "MOEX-100030-2101-Q068",
+      "newReason": null
+    },
+    "藥理學|藥理學|抗生素": {
+      "existingQuestionId": "MOEX-100030-2101-Q052",
+      "newReason": null
+    },
+    "藥理學|藥理學|中樞神經藥理": {
+      "existingQuestionId": "MOEX-100030-2101-Q062",
+      "newReason": null
+    },
+    "藥理學|藥理學|止痛、抗發炎與麻醉藥": {
+      "existingQuestionId": "MOEX-100030-2101-Q054",
+      "newReason": null
+    },
+    "藥理學|藥理學|免疫藥理": {
+      "existingQuestionId": "MOEX-101030-2101-Q057",
+      "newReason": null
+    },
+    "藥理學|藥理學|化學治療／抗癌藥": {
+      "existingQuestionId": "MOEX-100030-2101-Q059",
+      "newReason": null
+    },
+    "藥理學|藥理學|藥物機轉與臨床藥理": {
+      "existingQuestionId": "MOEX-100030-2101-Q051",
+      "newReason": null
+    },
+    "病理學|病理學|肺部病理": {
+      "existingQuestionId": "MOEX-100140-2101-Q091",
+      "newReason": null
+    },
+    "病理學|病理學|血液與免疫病理": {
+      "existingQuestionId": "MOEX-100030-2101-Q094",
+      "newReason": null
+    },
+    "病理學|病理學|心血管病理": {
+      "existingQuestionId": "MOEX-100030-2101-Q078",
+      "newReason": null
+    },
+    "病理學|病理學|腫瘤病理": {
+      "existingQuestionId": "MOEX-100030-2101-Q081",
+      "newReason": null
+    },
+    "病理學|病理學|生殖系統病理": {
+      "existingQuestionId": "MOEX-100030-2101-Q077",
+      "newReason": null
+    },
+    "病理學|病理學|神經、肌肉與骨骼病理": {
+      "existingQuestionId": "MOEX-106100-2301-Q098",
+      "newReason": null
+    },
+    "病理學|病理學|消化與肝膽病理": {
+      "existingQuestionId": "MOEX-100030-2101-Q076",
+      "newReason": null
+    },
+    "病理學|病理學|一般病理與發炎修復": {
+      "existingQuestionId": "MOEX-100030-2101-Q084",
+      "newReason": null
+    },
+    "病理學|病理學|腎臟與泌尿病理": {
+      "existingQuestionId": "MOEX-104090-6301-Q076",
+      "newReason": null
+    },
+    "病理學|病理學|內分泌病理": {
+      "existingQuestionId": "MOEX-108030-2301-Q094",
+      "newReason": null
+    },
+    "病理學|病理學|系統病理": {
+      "existingQuestionId": "MOEX-100030-2101-Q092",
+      "newReason": null
+    },
+    "藥理學|藥理學|毒物與解毒劑": {
+      "existingQuestionId": "MOEX-100030-2101-Q057",
+      "newReason": null
+    },
+    "藥理學|藥理學|降血脂藥": {
+      "existingQuestionId": "MOEX-100030-2101-Q055",
+      "newReason": null
+    },
+    "組織學|組織學|泌尿生殖系統組織": {
+      "existingQuestionId": "MOEX-101110-1101-Q041",
+      "newReason": null
+    },
+    "組織學|組織學|神經組織": {
+      "existingQuestionId": "MOEX-103100-1101-Q035",
+      "newReason": null
+    },
+    "藥理學|藥理學|造血藥物": {
+      "existingQuestionId": null,
+      "newReason": "原小節無法涵蓋血球生成刺激因子與貧血治療；追加同科必要小節，不改既有抗凝血或血脂小節。"
+    },
+    "藥理學|藥理學|抗感染與抗寄生蟲藥": {
+      "existingQuestionId": null,
+      "newReason": "涵蓋抗分枝桿菌、抗真菌、抗寄生蟲治療；不把瘧疾／絲蟲藥冒稱抗細菌抗生素。"
+    },
+    "藥理學|藥理學|胃腸與呼吸藥理": {
+      "existingQuestionId": null,
+      "newReason": "原有小節缺胃腸／呼吸藥物群；追加必要同科小節，保留所有舊節點。"
+    },
+    "生物化學|生物化學|維生素與輔酶": {
+      "existingQuestionId": "MOEX-109100-1301-Q077",
+      "newReason": null
+    },
+    "組織學|組織學|呼吸道組織病變": {
+      "existingQuestionId": "moex-med1-supplement-v5-106100-1301-043",
+      "newReason": null
+    }
+  },
+  "byPrimaryTagId": {
+    "EMBR_GERM_LAYERS_FOLDING_CAVITIES": [
+      "胚胎學",
+      "胚胎總論"
+    ],
+    "EMBR_TERATOLOGY_PRENATAL": [
+      "胚胎學",
+      "胚胎總論"
+    ],
+    "EMBR_IMPLANTATION_PLACENTA_MEMBRANES": [
+      "胚胎學",
+      "胚胎總論"
+    ],
+    "EMBR_NERVOUS_CRANIOFACIAL": [
+      "胚胎學",
+      "器官發生與胚層衍生"
+    ],
+    "EMBR_GI_RESPIRATORY": [
+      "胚胎學",
+      "器官發生與胚層衍生"
+    ],
+    "EMBR_MSK_LIMBS": [
+      "胚胎學",
+      "器官發生與胚層衍生"
+    ],
+    "EMBR_UROGENITAL": [
+      "胚胎學",
+      "胚胎學／泌尿生殖"
+    ],
+    "HIST_CELL_ULTRASTRUCTURE_MICROSCOPY": [
+      "組織學",
+      "細胞與胞器"
+    ],
+    "HIST_EPITHELIUM_GLANDS": [
+      "組織學",
+      "上皮組織"
+    ],
+    "HIST_CONNECTIVE_CARTILAGE_BONE": [
+      "組織學",
+      "結締組織與軟骨骨"
+    ],
+    "HIST_MUSCLE_NERVOUS_TISSUE": [
+      "組織學",
+      "肌肉組織"
+    ],
+    "HIST_BLOOD_BONE_MARROW": [
+      "組織學",
+      "血液與淋巴組織"
+    ],
+    "HIST_LYMPHOID_ORGANS": [
+      "組織學",
+      "淋巴與免疫組織"
+    ],
+    "HIST_GI_HEPATOBILIARY_PANCREAS": [
+      "組織學",
+      "消化系統組織"
+    ],
+    "HIST_CARDIOVASCULAR_RESPIRATORY": [
+      "組織學",
+      "器官組織學"
+    ],
+    "HIST_URINARY_ENDOCRINE": [
+      "組織學",
+      "器官組織學"
+    ],
+    "HIST_REPRODUCTIVE": [
+      "組織學",
+      "男性生殖組織"
+    ],
+    "HIST_SKIN_SPECIAL_SENSES": [
+      "組織學",
+      "特殊感覺組織"
+    ],
+    "PHYS_CELL_MEMBRANE_HOMEOSTASIS": [
+      "生理學",
+      "細胞生理"
+    ],
+    "PHYS_MOTOR_AUTONOMIC_HIGHER": [
+      "生理學",
+      "神經生理"
+    ],
+    "PHYS_SENSORY_SPECIAL_SENSES": [
+      "生理學",
+      "神經生理"
+    ],
+    "PHYS_NEURON_SYNAPSE": [
+      "生理學",
+      "神經生理"
+    ],
+    "PHYS_CNS_PATHWAYS_ORGANIZATION": [
+      "生理學",
+      "神經生理"
+    ],
+    "PHYS_MUSCLE": [
+      "生理學",
+      "肌肉生理"
+    ],
+    "PHYS_CARDIOVASCULAR": [
+      "生理學",
+      "心血管生理"
+    ],
+    "PHYS_RESPIRATORY": [
+      "生理學",
+      "呼吸生理"
+    ],
+    "PHYS_GASTROINTESTINAL": [
+      "生理學",
+      "消化生理"
+    ],
+    "PHYS_RENAL_ACID_BASE": [
+      "生理學",
+      "腎臟與體液生理"
+    ],
+    "PHYS_ENDOCRINE_METABOLISM": [
+      "生理學",
+      "內分泌與生殖生理"
+    ],
+    "PHYS_REPRODUCTIVE": [
+      "生理學",
+      "內分泌與生殖生理"
+    ],
+    "PHYS_BLOOD_HEMOSTASIS": [
+      "生理學",
+      "血液生理"
+    ],
+    "BIOC_DNA_REPLICATION_REPAIR": [
+      "生物化學",
+      "分子生物學與核酸代謝"
+    ],
+    "BIOC_TRANSCRIPTION_TRANSLATION_REGULATION": [
+      "生物化學",
+      "分子生物學與核酸代謝"
+    ],
+    "BIOC_MOLECULAR_BIOTECH_DIAGNOSTICS": [
+      "生物化學",
+      "分子生物學與核酸代謝"
+    ],
+    "BIOC_AMINO_NITROGEN_NUCLEOTIDE_METABOLISM": [
+      "生物化學",
+      "胺基酸與氮代謝"
+    ],
+    "BIOC_CARBOHYDRATE_METABOLISM": [
+      "生物化學",
+      "代謝生化"
+    ],
+    "BIOC_LIPID_LIPOPROTEIN_METABOLISM": [
+      "生物化學",
+      "代謝生化"
+    ],
+    "BIOC_SIGNALING_CELL_CYCLE_APOPTOSIS": [
+      "生物化學",
+      "細胞訊息與細胞生物學"
+    ],
+    "BIOC_ENZYMES_VITAMINS_COFACTORS": [
+      "生物化學",
+      "蛋白質與酵素"
+    ],
+    "BIOC_AMINO_ACIDS_PROTEINS": [
+      "生物化學",
+      "蛋白質與酵素"
+    ],
+    "BIOC_GLYCOBIOCHEMISTRY": [
+      "生物化學",
+      "醣類與醣脂生化"
+    ],
+    "BIOC_BIOENERGETICS_OXPHOS_ROS": [
+      "生物化學",
+      "能量代謝與粒線體"
+    ],
+    "BIOC_CLINICAL_CHEMISTRY_MARKERS": [
+      "生物化學",
+      "臨床生化檢驗"
+    ],
+    "BACT_GRAM_NEGATIVE": [
+      "微生物免疫學",
+      "細菌學"
+    ],
+    "BACT_GRAM_POSITIVE": [
+      "微生物免疫學",
+      "細菌學"
+    ],
+    "BACT_MYCOBACTERIA_ANAEROBES_ATYPICAL": [
+      "微生物免疫學",
+      "細菌學"
+    ],
+    "MIM_ANTIBACTERIAL_DRUGS": [
+      "微生物免疫學",
+      "細菌學"
+    ],
+    "VIRO_RNA_VIRUSES": [
+      "微生物免疫學",
+      "病毒學"
+    ],
+    "VIRO_DNA_VIRUSES": [
+      "微生物免疫學",
+      "病毒學"
+    ],
+    "VIRO_REPLICATION_PATHOGENESIS_DIAGNOSIS": [
+      "微生物免疫學",
+      "病毒學"
+    ],
+    "VIRO_RETRO_HEPATITIS_PRION": [
+      "微生物免疫學",
+      "病毒學"
+    ],
+    "MIM_ANTIVIRAL_DRUGS": [
+      "微生物免疫學",
+      "病毒學"
+    ],
+    "MYCO_MEDICAL_FUNGI": [
+      "微生物免疫學",
+      "真菌學"
+    ],
+    "MIM_ANTIFUNGAL_DRUGS": [
+      "微生物免疫學",
+      "真菌學"
+    ],
+    "IMMU_CELL_MEDIATED_REGULATION": [
+      "微生物免疫學",
+      "免疫學"
+    ],
+    "IMMU_HYPERSENSITIVITY_AUTOIMMUNITY": [
+      "微生物免疫學",
+      "免疫學"
+    ],
+    "IMMU_ANTIGEN_RECOGNITION_LYMPH_DEVELOPMENT": [
+      "微生物免疫學",
+      "免疫學"
+    ],
+    "IMMU_INNATE": [
+      "微生物免疫學",
+      "免疫學"
+    ],
+    "IMMU_HUMORAL": [
+      "微生物免疫學",
+      "免疫學"
+    ],
+    "IMMU_DEFICIENCY_TRANSPLANT_TUMOR_VACCINE": [
+      "微生物免疫學",
+      "免疫學"
+    ],
+    "MIM_IMMUNE_ORGANS_HEMATOPOIESIS": [
+      "微生物免疫學",
+      "免疫學"
+    ],
+    "MIM_IMMUNOMODULATORY_THERAPY": [
+      "微生物免疫學",
+      "免疫學"
+    ],
+    "MIM_PATHOGEN_IMMUNE_EVASION": [
+      "微生物免疫學",
+      "免疫學"
+    ],
+    "MIM_NORMAL_MICROBIOTA": [
+      "微生物免疫學",
+      "微生物學總論"
+    ],
+    "PARA_NEMATODES": [
+      "寄生蟲學",
+      "線蟲學"
+    ],
+    "PARA_TREMATODES": [
+      "寄生蟲學",
+      "吸蟲學"
+    ],
+    "PARA_CESTODES": [
+      "寄生蟲學",
+      "絛蟲學"
+    ],
+    "PARA_INTESTINAL_UROGENITAL_PROTOZOA": [
+      "寄生蟲學",
+      "原蟲學"
+    ],
+    "PARA_BLOOD_TISSUE_PROTOZOA": [
+      "寄生蟲學",
+      "原蟲學"
+    ],
+    "PARA_VECTOR_BORNE_INFECTIONS": [
+      "寄生蟲學",
+      "節肢動物與病媒"
+    ],
+    "PARA_ARTHROPODS_VECTORS": [
+      "寄生蟲學",
+      "節肢動物與病媒"
+    ],
+    "PARA_LIFECYCLE_DIAGNOSIS_CONTROL": [
+      "寄生蟲學",
+      "寄生蟲生活史與診斷"
+    ],
+    "PUBH_BIOSTATISTICS": [
+      "公共衛生學",
+      "生物統計"
+    ],
+    "PUBH_SCREENING_DIAGNOSTIC_EBM": [
+      "公共衛生學",
+      "流行病學"
+    ],
+    "PUBH_STUDY_DESIGN_CAUSAL_BIAS": [
+      "公共衛生學",
+      "流行病學"
+    ],
+    "PUBH_EPI_MEASURES_EFFECT": [
+      "公共衛生學",
+      "流行病學"
+    ],
+    "PUBH_PREVENTIVE_COMMUNITY_POPULATION": [
+      "公共衛生學",
+      "健康促進與預防醫學"
+    ],
+    "PUBH_INFECTIOUS_EPI_OUTBREAK": [
+      "公共衛生學",
+      "傳染病防治"
+    ],
+    "PUBH_ENVIRONMENTAL_HEALTH": [
+      "公共衛生學",
+      "職業與環境醫學"
+    ],
+    "PUBH_OCCUPATIONAL_HEALTH": [
+      "公共衛生學",
+      "職業與環境醫學"
+    ],
+    "PUBH_HEALTH_POLICY_ADMIN_ECONOMICS": [
+      "公共衛生學",
+      "衛生行政與健康政策"
+    ],
+    "PUBH_MEDICAL_LAW_ETHICS": [
+      "公共衛生學",
+      "衛生行政與健康政策"
+    ],
+    "PUBH_DEMOGRAPHY_VITAL_STATISTICS": [
+      "公共衛生學",
+      "公共衛生學總論"
+    ],
+    "PUBH_HEALTH_BEHAVIOR_PROMOTION": [
+      "公共衛生學",
+      "健康促進與行為科學"
+    ],
+    "PUBH_QUALITY_HOSPITAL_PATIENT_SAFETY": [
+      "公共衛生學",
+      "醫療品質"
+    ],
+    "PUBH_MEDICAL_HISTORY": [
+      "公共衛生學",
+      "醫學史"
+    ],
+    "PHAR_PHARMACOKINETICS_CLINICAL_TOX": [
+      "藥理學",
+      "藥物動力學"
+    ],
+    "PHAR_HEMATOLOGIC_LIPID": [
+      "藥理學",
+      "抗凝血與抗血小板藥"
+    ],
+    "PHAR_ENDOCRINE_METABOLIC": [
+      "藥理學",
+      "內分泌與生殖藥理"
+    ],
+    "PHAR_PITUITARY_HYPOTHALAMIC_HORMONES": [
+      "藥理學",
+      "內分泌與生殖藥理"
+    ],
+    "PHAR_CARDIOVASCULAR_RENAL": [
+      "藥理學",
+      "心血管藥理"
+    ],
+    "PHAR_AUTONOMIC": [
+      "藥理學",
+      "自律神經藥理"
+    ],
+    "PHAR_ANTIBACTERIAL": [
+      "藥理學",
+      "抗生素"
+    ],
+    "PHAR_ANTIMYCOBACTERIAL_ANTIFUNGAL_ANTIPARASITIC": [
+      "藥理學",
+      "抗感染與抗寄生蟲藥"
+    ],
+    "PHAR_CNS_NEUROPSYCH": [
+      "藥理學",
+      "中樞神經藥理"
+    ],
+    "PHAR_ANESTHESIA_ANALGESIA": [
+      "藥理學",
+      "止痛、抗發炎與麻醉藥"
+    ],
+    "PHAR_AUTACOIDS_INFLAMMATION": [
+      "藥理學",
+      "止痛、抗發炎與麻醉藥"
+    ],
+    "PHAR_IMMUNOMODULATORS_BIOLOGICS_GENE": [
+      "藥理學",
+      "免疫藥理"
+    ],
+    "PHAR_ANTINEOPLASTIC": [
+      "藥理學",
+      "化學治療／抗癌藥"
+    ],
+    "PHAR_GI_RESPIRATORY": [
+      "藥理學",
+      "胃腸與呼吸藥理"
+    ],
+    "PHAR_PHARMACODYNAMICS_RECEPTORS": [
+      "藥理學",
+      "藥物機轉與臨床藥理"
+    ],
+    "PATH_RESPIRATORY": [
+      "病理學",
+      "肺部病理"
+    ],
+    "PATH_HEMATOLYMPHOID": [
+      "病理學",
+      "血液與免疫病理"
+    ],
+    "PATH_INFECTIOUS_PATHOGEN_DIAGNOSTICS": [
+      "病理學",
+      "血液與免疫病理"
+    ],
+    "PATH_IMMUNE_INFECTIOUS": [
+      "病理學",
+      "血液與免疫病理"
+    ],
+    "PATH_CARDIOVASCULAR": [
+      "病理學",
+      "心血管病理"
+    ],
+    "PATH_HEMODYNAMIC_THROMBOSIS_SHOCK": [
+      "病理學",
+      "心血管病理"
+    ],
+    "PATH_NEOPLASIA": [
+      "病理學",
+      "腫瘤病理"
+    ],
+    "PATH_REPRODUCTIVE_BREAST": [
+      "病理學",
+      "生殖系統病理"
+    ],
+    "PATH_NERVOUS_SYSTEM": [
+      "病理學",
+      "神經、肌肉與骨骼病理"
+    ],
+    "PATH_MSK_SKIN_EYE": [
+      "病理學",
+      "神經、肌肉與骨骼病理"
+    ],
+    "PATH_GI_HEPATOBILIARY_PANCREAS": [
+      "病理學",
+      "消化與肝膽病理"
+    ],
+    "PATH_GENETIC_DEVELOPMENTAL_ENV_NUTRITION": [
+      "病理學",
+      "一般病理與發炎修復"
+    ],
+    "PATH_CELL_INJURY_ADAPTATION_DEATH": [
+      "病理學",
+      "一般病理與發炎修復"
+    ],
+    "PATH_RENAL_URINARY": [
+      "病理學",
+      "腎臟與泌尿病理"
+    ],
+    "PATH_ENDOCRINE": [
+      "病理學",
+      "內分泌病理"
+    ],
+    "PATH_HEAD_NECK_MEDIASTINUM": [
+      "病理學",
+      "系統病理"
+    ]
+  },
+  "anatomyByQuestionId": {
+    "MOEX-098020-1101-Q001": [
+      "頭頸部",
+      "鼻腔與鼻竇"
+    ],
+    "MOEX-098020-1101-Q002": [
+      "上肢",
+      "上臂與肘"
+    ],
+    "MOEX-098020-1101-Q003": [
+      "下肢",
+      "骨盆帶與髖關節"
+    ],
+    "MOEX-098020-1101-Q004": [
+      "下肢",
+      "腰薦神經叢"
+    ],
+    "MOEX-098020-1101-Q005": [
+      "神經解剖",
+      "腦膜、腦脊髓液與腦血管"
+    ],
+    "MOEX-098020-1101-Q006": [
+      "腹部",
+      "胃腸道血管"
+    ],
+    "MOEX-098020-1101-Q007": [
+      "上肢",
+      "上肢血管"
+    ],
+    "MOEX-098020-1101-Q008": [
+      "上肢",
+      "肩胛區"
+    ],
+    "MOEX-098020-1101-Q009": [
+      "下肢",
+      "大腿前內後區"
+    ],
+    "MOEX-098020-1101-Q010": [
+      "上肢",
+      "上臂與肘"
+    ],
+    "MOEX-098020-1101-Q011": [
+      "神經解剖",
+      "自律神經"
+    ],
+    "MOEX-098020-1101-Q012": [
+      "頭頸部",
+      "咽喉解剖"
+    ],
+    "MOEX-098020-1101-Q013": [
+      "骨盆與會陰",
+      "泌尿生殖"
+    ],
+    "MOEX-098020-1101-Q014": [
+      "骨盆與會陰",
+      "會陰三角"
+    ],
+    "MOEX-098020-1101-Q015": [
+      "骨盆與會陰",
+      "泌尿生殖"
+    ],
+    "MOEX-098020-1101-Q016": [
+      "胸腔",
+      "橫膈"
+    ],
+    "MOEX-098020-1101-Q017": [
+      "腹部",
+      "腹壁與腹股溝"
+    ],
+    "MOEX-098020-1101-Q018": [
+      "胸腔",
+      "心臟與冠狀動脈"
+    ],
+    "MOEX-098020-1101-Q019": [
+      "背部與脊柱",
+      "脊柱與椎管"
+    ],
+    "MOEX-098020-1101-Q020": [
+      "腹部",
+      "肝膽胰脾"
+    ],
+    "MOEX-098020-1101-Q021": [
+      "背部與脊柱",
+      "脊柱與椎管"
+    ],
+    "MOEX-098020-1101-Q022": [
+      "頭頸部",
+      "耳部構造"
+    ],
+    "MOEX-098020-1101-Q023": [
+      "神經解剖",
+      "腦神經"
+    ],
+    "MOEX-098020-1101-Q024": [
+      "頭頸部",
+      "口腔與顳下頜關節"
+    ],
+    "MOEX-098020-1101-Q025": [
+      "神經解剖",
+      "腦膜、腦脊髓液與腦血管"
+    ],
+    "MOEX-098020-1101-Q026": [
+      "神經解剖",
+      "腦膜、腦脊髓液與腦血管"
+    ],
+    "MOEX-098020-1101-Q027": [
+      "頭頸部",
+      "頭頸血管"
+    ],
+    "MOEX-098020-1101-Q028": [
+      "頭頸部",
+      "顏面神經與三叉神經"
+    ],
+    "MOEX-098140-1101-Q001": [
+      "腹部",
+      "腹壁與腹股溝"
+    ],
+    "MOEX-098140-1101-Q002": [
+      "神經解剖",
+      "腦膜、腦脊髓液與腦血管"
+    ],
+    "MOEX-098140-1101-Q003": [
+      "神經解剖",
+      "脊髓傳導路徑"
+    ],
+    "MOEX-098140-1101-Q004": [
+      "神經解剖",
+      "腦神經"
+    ],
+    "MOEX-098140-1101-Q005": [
+      "頭頸部",
+      "咽喉解剖"
+    ],
+    "MOEX-098140-1101-Q006": [
+      "下肢",
+      "腰薦神經叢"
+    ],
+    "MOEX-098140-1101-Q007": [
+      "胸腔",
+      "胸壁與乳房"
+    ],
+    "MOEX-098140-1101-Q008": [
+      "腹部",
+      "門脈系統"
+    ],
+    "MOEX-098140-1101-Q009": [
+      "神經解剖",
+      "脊髓傳導路徑"
+    ],
+    "MOEX-098140-1101-Q010": [
+      "骨盆與會陰",
+      "會陰三角"
+    ],
+    "MOEX-098140-1101-Q011": [
+      "神經解剖",
+      "自律神經"
+    ],
+    "MOEX-098140-1101-Q012": [
+      "骨盆與會陰",
+      "會陰三角"
+    ],
+    "MOEX-098140-1101-Q013": [
+      "背部與脊柱",
+      "體表定位與背肌"
+    ],
+    "MOEX-098140-1101-Q014": [
+      "上肢",
+      "前臂屈伸肌"
+    ],
+    "MOEX-098140-1101-Q015": [
+      "上肢",
+      "肩胛區"
+    ],
+    "MOEX-098140-1101-Q016": [
+      "下肢",
+      "骨盆帶與髖關節"
+    ],
+    "MOEX-098140-1101-Q017": [
+      "下肢",
+      "大腿前內後區"
+    ],
+    "MOEX-098140-1101-Q018": [
+      "胸腔",
+      "心臟與冠狀動脈"
+    ],
+    "MOEX-098140-1101-Q019": [
+      "腹部",
+      "腎臟與後腹腔"
+    ],
+    "MOEX-098140-1101-Q020": [
+      "胸腔",
+      "心臟與冠狀動脈"
+    ],
+    "MOEX-098140-1101-Q021": [
+      "腹部",
+      "腎臟與後腹腔"
+    ],
+    "MOEX-098140-1101-Q022": [
+      "頭頸部",
+      "頭頸血管"
+    ],
+    "MOEX-098140-1101-Q023": [
+      "神經解剖",
+      "腦神經"
+    ],
+    "MOEX-098140-1101-Q024": [
+      "頭頸部",
+      "舌與味覺"
+    ],
+    "MOEX-098140-1101-Q025": [
+      "神經解剖",
+      "自律神經"
+    ],
+    "MOEX-098140-1101-Q026": [
+      "神經解剖",
+      "小腦"
+    ],
+    "MOEX-098140-1101-Q027": [
+      "頭頸部",
+      "眼球構造"
+    ],
+    "MOEX-098140-1101-Q028": [
+      "神經解剖",
+      "大腦皮質與邊緣系統"
+    ],
+    "MOEX-099010-1101-Q001": [
+      "神經解剖",
+      "腦膜、腦脊髓液與腦血管"
+    ],
+    "MOEX-099010-1101-Q002": [
+      "頭頸部",
+      "顏面神經與三叉神經"
+    ],
+    "MOEX-099010-1101-Q003": [
+      "神經解剖",
+      "自律神經"
+    ],
+    "MOEX-099010-1101-Q004": [
+      "胸腔",
+      "肺與胸膜"
+    ],
+    "MOEX-099010-1101-Q005": [
+      "腹部",
+      "腸道構造與定位"
+    ],
+    "MOEX-099010-1101-Q006": [
+      "神經解剖",
+      "腦幹核區"
+    ],
+    "MOEX-099010-1101-Q007": [
+      "上肢",
+      "前臂屈伸肌"
+    ],
+    "MOEX-099010-1101-Q008": [
+      "骨盆與會陰",
+      "泌尿生殖"
+    ],
+    "MOEX-099010-1101-Q009": [
+      "下肢",
+      "大腿前內後區"
+    ],
+    "MOEX-099010-1101-Q010": [
+      "上肢",
+      "肩胛區"
+    ],
+    "MOEX-099010-1101-Q011": [
+      "下肢",
+      "足部"
+    ],
+    "MOEX-099010-1101-Q012": [
+      "下肢",
+      "大腿前內後區"
+    ],
+    "MOEX-099010-1101-Q013": [
+      "神經解剖",
+      "自律神經"
+    ],
+    "MOEX-099010-1101-Q014": [
+      "骨盆與會陰",
+      "泌尿生殖"
+    ],
+    "MOEX-099010-1101-Q015": [
+      "骨盆與會陰",
+      "泌尿生殖"
+    ],
+    "MOEX-099010-1101-Q016": [
+      "骨盆與會陰",
+      "會陰三角"
+    ],
+    "MOEX-099010-1101-Q017": [
+      "骨盆與會陰",
+      "泌尿生殖"
+    ],
+    "MOEX-099010-1101-Q018": [
+      "上肢",
+      "肩胛區"
+    ],
+    "MOEX-099010-1101-Q019": [
+      "胸腔",
+      "橫膈"
+    ],
+    "MOEX-099010-1101-Q020": [
+      "胸腔",
+      "縱膈"
+    ],
+    "MOEX-099010-1101-Q021": [
+      "腹部",
+      "腸道構造與定位"
+    ],
+    "MOEX-099010-1101-Q022": [
+      "神經解剖",
+      "自律神經"
+    ],
+    "MOEX-099010-1101-Q023": [
+      "背部與脊柱",
+      "體表定位與背肌"
+    ],
+    "MOEX-099010-1101-Q024": [
+      "頭頸部",
+      "耳部構造"
+    ],
+    "MOEX-099010-1101-Q025": [
+      "神經解剖",
+      "腦膜、腦脊髓液與腦血管"
+    ],
+    "MOEX-099010-1101-Q026": [
+      "神經解剖",
+      "視覺路徑"
+    ],
+    "MOEX-099010-1101-Q027": [
+      "神經解剖",
+      "腦膜、腦脊髓液與腦血管"
+    ],
+    "MOEX-099010-1101-Q028": [
+      "神經解剖",
+      "自律神經"
+    ],
+    "MOEX-099130-1101-Q001": [
+      "神經解剖",
+      "大腦皮質與邊緣系統"
+    ],
+    "MOEX-099130-1101-Q002": [
+      "神經解剖",
+      "腦神經"
+    ],
+    "MOEX-099130-1101-Q003": [
+      "骨盆與會陰",
+      "泌尿生殖"
+    ],
+    "MOEX-099130-1101-Q004": [
+      "腹部",
+      "腸道構造與定位"
+    ],
+    "MOEX-099130-1101-Q005": [
+      "上肢",
+      "肩胛區"
+    ],
+    "MOEX-099130-1101-Q006": [
+      "腹部",
+      "腸道構造與定位"
+    ],
+    "MOEX-099130-1101-Q007": [
+      "胸腔",
+      "縱膈"
+    ],
+    "MOEX-099130-1101-Q008": [
+      "下肢",
+      "腰薦神經叢"
+    ],
+    "MOEX-099130-1101-Q009": [
+      "頭頸部",
+      "顏面神經與三叉神經"
+    ],
+    "MOEX-099130-1101-Q010": [
+      "上肢",
+      "肩胛區"
+    ],
+    "MOEX-099130-1101-Q011": [
+      "下肢",
+      "臀區"
+    ],
+    "MOEX-099130-1101-Q012": [
+      "骨盆與會陰",
+      "直腸與肛管"
+    ],
+    "MOEX-099130-1101-Q013": [
+      "骨盆與會陰",
+      "會陰三角"
+    ],
+    "MOEX-099130-1101-Q014": [
+      "上肢",
+      "前臂屈伸肌"
+    ],
+    "MOEX-099130-1101-Q015": [
+      "上肢",
+      "上臂與肘"
+    ],
+    "MOEX-099130-1101-Q016": [
+      "下肢",
+      "下肢血管"
+    ],
+    "MOEX-099130-1101-Q017": [
+      "下肢",
+      "大腿前內後區"
+    ],
+    "MOEX-099130-1101-Q018": [
+      "下肢",
+      "大腿前內後區"
+    ],
+    "MOEX-099130-1101-Q019": [
+      "腹部",
+      "腎臟與後腹腔"
+    ],
+    "MOEX-099130-1101-Q020": [
+      "胸腔",
+      "心臟與冠狀動脈"
+    ],
+    "MOEX-099130-1101-Q021": [
+      "腹部",
+      "腹壁與腹股溝"
+    ],
+    "MOEX-099130-1101-Q022": [
+      "骨盆與會陰",
+      "泌尿生殖"
+    ],
+    "MOEX-099130-1101-Q023": [
+      "頭頸部",
+      "顏面神經與三叉神經"
+    ],
+    "MOEX-099130-1101-Q024": [
+      "頭頸部",
+      "顱骨與顱窩"
+    ],
+    "MOEX-099130-1101-Q025": [
+      "神經解剖",
+      "自律神經"
+    ],
+    "MOEX-099130-1101-Q026": [
+      "神經解剖",
+      "下視丘"
+    ],
+    "MOEX-099130-1101-Q027": [
+      "神經解剖",
+      "腦幹核區"
+    ],
+    "MOEX-099130-1101-Q028": [
+      "神經解剖",
+      "周邊神經組織"
+    ]
+  },
+  "questionExceptions": {
+    "MOEX-098020-1101-Q037": [
+      "組織學",
+      "男性生殖組織"
+    ],
+    "MOEX-098020-1101-Q038": [
+      "組織學",
+      "男性生殖組織"
+    ],
+    "MOEX-098020-2101-Q051": [
+      "藥理學",
+      "毒物與解毒劑"
+    ],
+    "MOEX-098020-2101-Q052": [
+      "藥理學",
+      "造血藥物"
+    ],
+    "MOEX-098020-2101-Q071": [
+      "藥理學",
+      "降血脂藥"
+    ],
+    "MOEX-098020-2101-Q072": [
+      "藥理學",
+      "降血脂藥"
+    ],
+    "MOEX-098140-1101-Q033": [
+      "組織學",
+      "泌尿生殖系統組織"
+    ],
+    "MOEX-098140-1101-Q038": [
+      "組織學",
+      "肌肉組織"
+    ],
+    "MOEX-098140-2101-Q057": [
+      "藥理學",
+      "造血藥物"
+    ],
+    "MOEX-098140-2101-Q075": [
+      "藥理學",
+      "降血脂藥"
+    ],
+    "MOEX-099010-1101-Q035": [
+      "組織學",
+      "肌肉組織"
+    ],
+    "MOEX-099010-1101-Q039": [
+      "組織學",
+      "男性生殖組織"
+    ],
+    "MOEX-099010-2101-Q073": [
+      "藥理學",
+      "抗凝血與抗血小板藥"
+    ],
+    "MOEX-099010-2101-Q074": [
+      "藥理學",
+      "降血脂藥"
+    ],
+    "MOEX-099010-2101-Q081": [
+      "病理學",
+      "系統病理"
+    ],
+    "MOEX-099130-1101-Q035": [
+      "組織學",
+      "肌肉組織"
+    ],
+    "MOEX-099130-1101-Q036": [
+      "組織學",
+      "神經組織"
+    ],
+    "MOEX-099130-1101-Q039": [
+      "組織學",
+      "泌尿生殖系統組織"
+    ],
+    "MOEX-099130-2101-Q058": [
+      "藥理學",
+      "造血藥物"
+    ],
+    "MOEX-099130-2101-Q059": [
+      "藥理學",
+      "造血藥物"
+    ],
+    "MOEX-099130-2101-Q067": [
+      "藥理學",
+      "抗凝血與抗血小板藥"
+    ],
+    "MOEX-098020-2101-Q036": [
+      "生物化學",
+      "維生素與輔酶"
+    ],
+    "MOEX-098140-2101-Q046": [
+      "生物化學",
+      "維生素與輔酶"
+    ],
+    "MOEX-098140-2101-Q047": [
+      "生物化學",
+      "維生素與輔酶"
+    ],
+    "MOEX-099010-2101-Q028": [
+      "生物化學",
+      "維生素與輔酶"
+    ],
+    "MOEX-099010-2101-Q033": [
+      "生物化學",
+      "維生素與輔酶"
+    ],
+    "MOEX-099130-2101-Q028": [
+      "生物化學",
+      "維生素與輔酶"
+    ],
+    "MOEX-099130-2101-Q029": [
+      "生物化學",
+      "維生素與輔酶"
+    ],
+    "MOEX-099130-1101-Q041": [
+      "組織學",
+      "呼吸道組織病變"
+    ],
+    "MOEX-099010-1101-Q040": [
+      "組織學",
+      "泌尿生殖系統組織"
+    ]
+  },
+  "method": "Content-reviewed grouping into exact existing pedagogical chapter/section pairs; fine tags remain separate. Anatomy mapped by each saved question; additions append only when old outline has no appropriate node."
+}

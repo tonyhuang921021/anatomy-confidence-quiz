@@ -1,5 +1,6 @@
 import primaryTagRuntimeMapJson from "../data/analysisPrimaryTagRuntimeMap.json";
 import legacyClassificationJson from "../data/sources/moex_98_99_classification_review.json";
+import legacyLearningPlacementJson from "../data/sources/moex_98_99_learning_placement.json";
 import { getMoexPrimarySubject } from "../scripts/moex-primary-subject";
 import type { Question, QuestionClassificationOverride, SubjectName } from "../types/quiz";
 
@@ -25,6 +26,8 @@ const runtimeAssignments = runtimePrimaryTagMap.questions;
 const legacyAssignments = legacyClassificationJson.questions as unknown as Record<string, [SubjectName, string | null]>;
 const legacyPendingIds = new Set<string>(legacyClassificationJson.pendingQuestionIds);
 const legacyPendingPrimaryTagIds = new Set<string>(legacyClassificationJson.pendingPrimaryTagQuestionIds);
+// The generator and contract tests validate the two-string tuple for all 800 IDs.
+const legacyLearningPlacements = legacyLearningPlacementJson.questions as unknown as Record<string, [string, string]>;
 const MICROBIOLOGY_TAG_PREFIXES = ["細菌學", "病毒學", "真菌學", "免疫學", "微生物免疫學"];
 const SUBJECT_BY_CODE = [
   "解剖學",
@@ -99,6 +102,10 @@ export function applyAnalysisPrimaryTagClassification(question: Question): Quest
   return {
     ...question,
     subject: assignment.subject,
+    ...(legacyLearningPlacements[question.id] ? {
+      chapter: legacyLearningPlacements[question.id][0],
+      section: legacyLearningPlacements[question.id][1]
+    } : {}),
     primaryTag: assignment.primaryTag ?? undefined
   };
 }

@@ -782,7 +782,7 @@ export default function StartPage() {
                     if (next) setPracticeYearRange(range => ({yearFrom: Math.min(range.yearFrom, 2009), yearTo: Math.max(range.yearTo, 2010)}));
                   }}>
                   <span className="block font-semibold">98、99 年舊制原卷</span>
-                  <span className="mt-2 block text-sm text-slate-500">800 題・依既有考期、卷別與題號區段分科，也可由科目入口練習；{legacyPendingTagCount} 題細分類待核對。</span>
+                  <span className="mt-2 block text-sm text-slate-500">800 題・依既有考期、卷別與題號區段分科，也可由科目入口練習；{legacyPendingTagCount > 0 ? `${legacyPendingTagCount} 題細分類待核對。` : "細分類與學習章節已對應。"}</span>
                   <span className="mt-2 block text-xs font-semibold text-brand-700">{includeLegacyPapers ? "已選" : "未選"}</span>
                 </button>
               </section>

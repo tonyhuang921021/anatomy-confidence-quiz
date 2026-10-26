@@ -11,6 +11,7 @@ import moexMed1Requested149ReclassificationPatch from "@/data/sources/moex_med1_
 import moexMedStage2Merged0013100 from "@/data/sources/moex_med_stage2_detailed_merged_001_3100_classified_v3.json";
 import moex115090OfficialQuestions from "@/data/sources/moex_115090_official_questions.json";
 import moex9899OfficialQuestions from "@/data/sources/moex_98_99_official_questions.json";
+import moex9899LearningPlacement from "@/data/sources/moex_98_99_learning_placement.json";
 import questionMediaManifest from "@/data/sources/question_media_manifest.json";
 import {
   applyAnalysisPrimaryTagClassification,
@@ -2132,15 +2133,26 @@ for (const subject of QUESTION_BANK_SUBJECTS) {
 
       const outline =
         subject === "解剖學"
-          ? anatomyOutline.map((item) => ({
-              chapter: item.chapter,
-              sections: [...item.sections]
-            }))
+          ? buildLegacyAnatomyOutline()
           : buildOutline(med1QuestionsBySubject[subject]);
       outlineCache.set(subject, outline);
       return outline;
     }
   });
+}
+
+/** Preserve existing anatomy nodes and order, appending necessary old-exam topics. */
+function buildLegacyAnatomyOutline(): SubjectOutlineEntry[] {
+  const outline: SubjectOutlineEntry[] = anatomyOutline.map(item => ({chapter: item.chapter, sections: [...item.sections]}));
+  for (const addition of moex9899LearningPlacement.anatomyOutlineAdditions) {
+    let chapter = outline.find(item => item.chapter === addition.chapter);
+    if (!chapter) {
+      chapter = {chapter: addition.chapter, sections: []};
+      outline.push(chapter);
+    }
+    for (const section of addition.sections) if (!chapter.sections.includes(section)) chapter.sections.push(section);
+  }
+  return outline;
 }
 
 export type PastPaperOption = {

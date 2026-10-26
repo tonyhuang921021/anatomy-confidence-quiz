@@ -3,7 +3,7 @@ import { PostExamReflectionPreview } from "@/components/PostExamReflectionPrevie
 
 export const metadata: Metadata = {
   title: "考後回顧與經驗傳承",
-  description: "2026 一階醫師國考題庫考後回顧與經驗傳承問卷。",
+  description: "民國115年 一階醫師國考題庫考後回顧與經驗傳承問卷。",
   robots: {
     index: false,
     follow: false
