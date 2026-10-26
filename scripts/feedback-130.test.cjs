@@ -18,3 +18,13 @@ test('report130 corrected text reaches canonical and medicine II pools without c
   assert.equal(q.answer,'C');assert.deepEqual(q.options,{A:'最高15分鐘',B:'每日4小時',C:'每日8小時',D:'每週40小時'});
  }
 });
+
+test('report133 restores actual options and original table while retaining accepted A/B scoring',()=>{
+ const q=bank.getCanonicalQuestionBank().find(q=>q.id==='MOEX-102030-1101-Q097');
+ assert.deepEqual(q.options,{A:'胎次愈高可能是人工受孕結果',B:'重男輕女的現象還是存在',C:'男嬰比女嬰存活高',D:'幾年下來都一樣表示是自然反應'});
+ const {isQuestionAnswerCorrect}=require('../lib/answerScoring.ts');
+ for(const a of ['A','B']) assert.equal(isQuestionAnswerCorrect(q,a),true);
+ for(const a of ['C','D']) assert.equal(isQuestionAnswerCorrect(q,a),false);
+ assert.deepEqual(q.acceptedAnswers,['A','B']);assert.equal(q.answerCreditType,'multiple_accepted');
+ assert.equal(q.stemImage,'/question-media/MOEX-102030-1101-Q097.png');assert.ok(fs.statSync(path.join(root,'public',q.stemImage)).size>1000);
+});

@@ -1015,6 +1015,18 @@ function applyQuestionMedia(question: Question): Question {
 }
 
 const questionTextOverrides: Record<string, QuestionTextOverride> = {
+  // Report #133: official 102030/1101 page8 table and options visually verified.
+  "MOEX-102030-1101-Q097": {
+    options: { A: "胎次愈高可能是人工受孕結果", B: "重男輕女的現象還是存在", C: "男嬰比女嬰存活高", D: "幾年下來都一樣表示是自然反應" },
+    explanation: "官方更正答案接受 A、B 或 AB，維持原採分。附表呈現不同年份、胎次的出生男女比值；表中高胎次的比值較大，但描述性資料本身不能證明單一成因。作答須依官方更正結果，不能把表頭誤當選項，也不能由出生性別比直接推論男女嬰存活率。",
+    optionAnalysis: {
+      A: "官方更正後列為可接受答案。附表本身沒有受孕方式資料，因此不能只靠這張表證實人工受孕的因果效果。",
+      B: "官方更正後列為可接受答案。高胎次男女性別比偏高可引出性別偏好與選擇行為的討論，但此表不能單獨完成因果證明。",
+      C: "本表列出生男女比值，沒有男女嬰追蹤存活資料，不能直接推論男嬰存活較高。",
+      D: "跨年反覆出現某種分布，不足以證明它必然是自然反應；官方未將此項列為給分答案。"
+    },
+    testedConcept: "出生性別比與胎次：描述資料及因果推論的界線"
+  },
   // Report #130: verified visually against official 106100/2301 PDF, page 7.
   "MOEX-106100-2301-Q044": {
     stem: "我國法令規定所稱之「日時量平均容許暴露濃度」係指工作多少小時之平均容許暴露濃度？"
