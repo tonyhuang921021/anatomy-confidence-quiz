@@ -158,6 +158,10 @@ html[data-theme="dark"] {
 html {
   scroll-behavior: smooth;
 }
+/* Pager focus must not leave an earlier smooth scroll competing with page changes. */
+html:has(.search-results-list) {
+  scroll-behavior: auto;
+}
 
 body {
   margin: 0;

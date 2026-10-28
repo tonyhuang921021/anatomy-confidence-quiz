@@ -165,6 +165,9 @@ function SearchPageContent() {
   const [rankingStatsLoading, setRankingStatsLoading] = useState(false);
   const [rankingStatsError, setRankingStatsError] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
+  const resultsHeadingRef = useRef<HTMLHeadingElement | null>(null);
+  const resultsToolbarRef = useRef<HTMLElement | null>(null);
+  const paginationFocusPendingRef = useRef(false);
   const [answerDisplayMode, setAnswerDisplayMode] = useState<SearchAnswerDisplayMode>("practice");
   const [revealedAnswerIds, setRevealedAnswerIds] = useState<Record<string, boolean>>({});
   const [explanationOverrides, setExplanationOverrides] = useState<Record<string, QuestionExplanationOverride>>({});
@@ -399,6 +402,36 @@ function SearchPageContent() {
     () => shouldShowResults ? filteredResults.slice(pageStart, pageStart + PAGE_SIZE) : [],
     [filteredResults, pageStart, shouldShowResults]
   );
+
+  function changeResultsPage(nextPage: number) {
+    const page = Math.max(1, Math.min(totalPages, nextPage));
+    if (page === safeCurrentPage) return;
+    paginationFocusPendingRef.current = true;
+    setCurrentPage(page);
+  }
+
+  useEffect(() => {
+    // Only explicit pagination moves the reading position. Filters, disclosures,
+    // asynchronous content and browser navigation retain their existing behavior.
+    if (!paginationFocusPendingRef.current) return;
+    paginationFocusPendingRef.current = false;
+    // Wait for the new result layout and the activating key's default scroll to
+    // settle before measuring; focusing the old pager can still be scrolling.
+    const frame = requestAnimationFrame(() => {
+      const heading = resultsHeadingRef.current;
+      if (!heading) return;
+      const topbar = document.querySelector<HTMLElement>(".app-topbar");
+      const toolbar = resultsToolbarRef.current;
+      const clearance = (topbar?.getBoundingClientRect().height ?? 64) +
+        (toolbar?.classList.contains("sticky") ? toolbar.getBoundingClientRect().height + 8 : 0) + 24;
+      heading.focus({ preventScroll: true });
+      window.scrollTo({
+        top: Math.max(0, window.scrollY + heading.getBoundingClientRect().top - clearance),
+        behavior: "instant"
+      });
+    });
+    return () => cancelAnimationFrame(frame);
+  }, [safeCurrentPage]);
   const selectedQuestionIdSet = useMemo(
     () => new Set(selectedQuestionIds),
     [selectedQuestionIds]
@@ -987,7 +1020,7 @@ function SearchPageContent() {
       </section>
 
       {selectedQuestionCount > 0 || pageResults.length > 0 ? (
-        <section className={`mt-4 flex flex-col gap-3 rounded-xl border border-brand-100 bg-white px-4 py-3 shadow-sm sm:flex-row sm:items-center sm:justify-between ${
+        <section ref={resultsToolbarRef} className={`mt-4 flex flex-col gap-3 rounded-xl border border-brand-100 bg-white px-4 py-3 shadow-sm sm:flex-row sm:items-center sm:justify-between ${
           selectedQuestionCount > 0
             ? "sticky top-[calc(4.5rem+env(safe-area-inset-top))] z-30"
             : ""
@@ -1049,7 +1082,15 @@ function SearchPageContent() {
         </section>
       ) : null}
 
-      <section className="search-results-list mt-6 grid min-w-0 gap-4">
+      <section className="search-results-list mt-6 grid min-w-0 gap-4" aria-labelledby="question-search-results-heading">
+        <h2
+          id="question-search-results-heading"
+          ref={resultsHeadingRef}
+          tabIndex={-1}
+          className="rounded-md text-sm font-semibold text-slate-600 focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 focus-visible:ring-offset-4"
+        >
+          搜尋結果{totalMatches > 0 ? ` · 第 ${safeCurrentPage} / ${totalPages} 頁` : ""}
+        </h2>
         {!shouldShowResults ? (
           <div className="workspace-empty-state">
             <p className="font-semibold text-slate-700">先找出想練的題目</p>
@@ -1301,7 +1342,7 @@ function SearchPageContent() {
         <section className="mt-6 flex flex-wrap items-center justify-center gap-3">
           <button
             type="button"
-            onClick={() => setCurrentPage((page) => Math.max(1, page - 1))}
+            onClick={() => changeResultsPage(safeCurrentPage - 1)}
             disabled={safeCurrentPage === 1}
             className="min-h-10 rounded-lg bg-slate-100 px-4 py-2 text-sm font-semibold text-slate-800 transition hover:bg-slate-200 disabled:cursor-not-allowed disabled:opacity-50"
           >
@@ -1312,7 +1353,7 @@ function SearchPageContent() {
           </span>
           <button
             type="button"
-            onClick={() => setCurrentPage((page) => Math.min(totalPages, page + 1))}
+            onClick={() => changeResultsPage(safeCurrentPage + 1)}
             disabled={safeCurrentPage === totalPages}
             className="min-h-10 rounded-lg bg-slate-900 px-4 py-2 text-sm font-semibold text-white transition hover:bg-black disabled:cursor-not-allowed disabled:opacity-50"
           >
