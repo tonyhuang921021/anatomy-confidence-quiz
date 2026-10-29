@@ -25,6 +25,7 @@ type QuestionOptionBlockProps = {
 function renderImage(src: string, alt: string, dimensions?: { width: number; height: number }) {
   return (
     <img
+      key={`${alt}:${src}`}
       src={src}
       alt={alt}
       width={dimensions?.width}
@@ -68,6 +69,7 @@ export function QuestionStemBlock({ question, className }: QuestionStemBlockProp
           <p className="mt-2 text-xs leading-6">{formatRocYear(question.sourceYear)}舊制：{question.officialSource.scope}</p>
           <p className="mt-1 text-xs leading-6">歷史題依當年官方最終答案採分；法規與醫學知識可能已有更新。</p>
           <img
+            key={`${question.id}:${question.officialSource.image}`}
             src={question.officialSource.image}
             alt={`${question.id} 官方原題完整圖，含原始選項及圖表`}
             width={question.officialSource.width}
