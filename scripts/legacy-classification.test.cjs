@@ -82,7 +82,8 @@ test('all 6730 pre-existing canonical questions retain their baseline except two
  const added95Ids=new Set([1,2].flatMap(r=>[1,2].flatMap(p=>require(`../data/sources/moex_95_${r}_med${p}_questions.json`).questions.map(q=>q.id)))); assert.equal(added95Ids.size,400);
  const added91Ids=new Set([1,2].flatMap(r=>[1,2].flatMap(p=>require(`../data/sources/moex_91_${r}_stage1_med${p}_questions.json`).questions.map(q=>q.id)))); assert.equal(added91Ids.size,320);
  const added90Ids=new Set([1,2].flatMap(r=>[1,2].flatMap(p=>require(`../data/sources/moex_90_${r}_stage1_med${p}_questions.json`).questions.map(q=>q.id)))); assert.equal(added90Ids.size,320);
- const old=bank.getCanonicalQuestionBank().filter(q=>!ids.has(q.id)&&!added97Ids.has(q.id)&&!added95Ids.has(q.id)&&!added91Ids.has(q.id)&&!added90Ids.has(q.id));assert.equal(old.length,placementRules.baselineOldCanonicalCount);
+ const added94Ids=new Set([1,2].flatMap(p=>require(`../data/sources/moex_94_1_stage1_med${p}_questions.json`).questions.map(q=>q.id)));assert.equal(added94Ids.size,160);
+ const old=bank.getCanonicalQuestionBank().filter(q=>!ids.has(q.id)&&!added97Ids.has(q.id)&&!added95Ids.has(q.id)&&!added91Ids.has(q.id)&&!added90Ids.has(q.id)&&!added94Ids.has(q.id));assert.equal(old.length,placementRules.baselineOldCanonicalCount);
  const revisions=require('../docs/moex-98-99/canonical-reviewed-corrections.json');
  assert.deepEqual(revisions.map(({id,fields})=>({id,fields})),[
   {id:'MOEX-102030-1101-Q097',fields:['explanation','optionAnalysis','options','stemImage','testedConcept']},

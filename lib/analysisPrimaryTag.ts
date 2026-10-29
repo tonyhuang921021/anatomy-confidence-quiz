@@ -8,6 +8,7 @@ import legacy96ContentClassificationCandidate from "../data/sources/moex_96_1_co
 import legacy96SecondContentClassificationCandidate from "../data/sources/moex_96_2_content_classification_candidate.json";
 import legacy95ContentClassificationCandidate from "../data/sources/moex_95_content_classification_candidate.json";
 import legacy91Stage1ClassificationCandidate from "../data/sources/moex_91_stage1_classification_candidate.json";
+import legacy94Stage1ClassificationCandidate from "../data/sources/moex_94_stage1_classification_candidate.json";
 import legacy90Stage1ClassificationCandidate from "../data/sources/moex_90_stage1_classification_candidate.json";
 import legacyLearningPlacementJson from "../data/sources/moex_98_99_learning_placement.json";
 import { getMoexPrimarySubject } from "../scripts/moex-primary-subject";
@@ -32,8 +33,8 @@ type RuntimePrimaryTagMap = {
 const runtimePrimaryTagMap = primaryTagRuntimeMapJson as unknown as RuntimePrimaryTagMap;
 const runtimeAssignments = runtimePrimaryTagMap.questions;
 // 96-1 content-reviewed candidates are keyed per question; no historical band inference.
-const legacy96ContentAssignments = { ...legacy96ContentClassificationCandidate.questions, ...legacy96SecondContentClassificationCandidate.questions, ...legacy95ContentClassificationCandidate.questions, ...legacy91Stage1ClassificationCandidate.questions, ...legacy90Stage1ClassificationCandidate.questions } as unknown as Record<string, [SubjectName, string | null, string | null, string | null]>;
-const legacy96QuarantinedIds = new Set<string>([...legacy96ContentClassificationCandidate.quarantined, ...legacy96SecondContentClassificationCandidate.quarantined, ...legacy95ContentClassificationCandidate.quarantined, ...legacy91Stage1ClassificationCandidate.quarantined, ...legacy90Stage1ClassificationCandidate.quarantined]);
+const legacy96ContentAssignments = { ...legacy96ContentClassificationCandidate.questions, ...legacy96SecondContentClassificationCandidate.questions, ...legacy95ContentClassificationCandidate.questions, ...legacy91Stage1ClassificationCandidate.questions, ...legacy90Stage1ClassificationCandidate.questions, ...legacy94Stage1ClassificationCandidate.questions } as unknown as Record<string, [SubjectName, string | null, string | null, string | null]>;
+const legacy96QuarantinedIds = new Set<string>([...legacy96ContentClassificationCandidate.quarantined, ...legacy96SecondContentClassificationCandidate.quarantined, ...legacy95ContentClassificationCandidate.quarantined, ...legacy91Stage1ClassificationCandidate.quarantined, ...legacy90Stage1ClassificationCandidate.quarantined, ...legacy94Stage1ClassificationCandidate.quarantined]);
 // The source-bound contract test validates every subject, tag and tuple length.
 const legacyAssignments = { ...legacyClassificationJson.questions, ...legacy97ClassificationJson.questions, ...legacy97Med2ClassificationJson.questions, ...legacy97SecondMed1ClassificationJson.questions, ...legacy97SecondMed2ClassificationJson.questions } as unknown as Record<string, [SubjectName, string | null]>;
 const legacyPendingIds = new Set<string>(legacyClassificationJson.pendingQuestionIds);

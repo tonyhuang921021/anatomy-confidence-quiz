@@ -28,6 +28,8 @@ import moex91FirstMed1 from "@/data/sources/moex_91_1_stage1_med1_questions.json
 import moex91FirstMed2 from "@/data/sources/moex_91_1_stage1_med2_questions.json";
 import moex91SecondMed1 from "@/data/sources/moex_91_2_stage1_med1_questions.json";
 import moex91SecondMed2 from "@/data/sources/moex_91_2_stage1_med2_questions.json";
+import moex94FirstMed1 from "@/data/sources/moex_94_1_stage1_med1_questions.json";
+import moex94FirstMed2 from "@/data/sources/moex_94_1_stage1_med2_questions.json";
 import moex90FirstMed1 from "@/data/sources/moex_90_1_stage1_med1_questions.json";
 import moex90FirstMed2 from "@/data/sources/moex_90_1_stage1_med2_questions.json";
 import moex90SecondMed1 from "@/data/sources/moex_90_2_stage1_med1_questions.json";
@@ -2108,6 +2110,8 @@ export const canonicalQuestionBank: Question[] = dedupeQuestionBank([
   ...(moex91FirstMed2.questions as Question[]),
   ...(moex91SecondMed1.questions as Question[]),
   ...(moex91SecondMed2.questions as Question[]),
+  ...(moex94FirstMed1.questions as Question[]),
+  ...(moex94FirstMed2.questions as Question[]),
   ...(moex90FirstMed1.questions as Question[]),
   ...(moex90FirstMed2.questions as Question[]),
   ...(moex90SecondMed1.questions as Question[]),

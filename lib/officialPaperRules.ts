@@ -1,5 +1,7 @@
 /** Explicitly verified paper contracts; unknown historical tracks stay unset. */
 const VERIFIED_EIGHTY_QUESTION_PAPERS = new Set([
+  "MOEX-C217-094042-S4001-STAGE1",
+  "MOEX-C217-094042-S5001-STAGE1",
   "MOEX-C002-090040-S4004-STAGE1",
   "MOEX-C002-090040-S5004-STAGE1",
   "MOEX-C002-090180-S4004-STAGE1",

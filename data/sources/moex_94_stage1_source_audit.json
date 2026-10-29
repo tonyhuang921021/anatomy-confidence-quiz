@@ -1,0 +1,3863 @@
+{
+  "status": "unpublished_candidate",
+  "sourceReviewZipSha256": "078d2a469c4624e3660fb72ab45c27d96bdc825849ca0d769e3aded7067e89c0",
+  "questions": [
+    {
+      "id": "MOEX-C217-094042-S4001-STAGE1-Q001",
+      "sourceId": "MOEX-094042-4217-Q001",
+      "sourceStemSha256": "ca71748428fef54f936feb7e283b7a1e4ce698fb5c123d34aeb65cc930eef775",
+      "options": {
+        "A": "較右主支氣管窄",
+        "B": "較右主支氣管垂直",
+        "C": "經行於主動脈弓下方",
+        "D": "經行於食道前方"
+      },
+      "score": {
+        "answer": "B",
+        "acceptedAnswers": [
+          "B"
+        ],
+        "answerCreditType": "standard",
+        "answer_fallback_is_official": true,
+        "displayAnswerLabel": "B"
+      },
+      "originalCropSha256": "e65971e946161860193b19a17253dc72a6316007a94a13b74650fd27b4528458",
+      "flags": [],
+      "original_required": false,
+      "officialScope": "解剖學、微生物與免疫學、病理學"
+    },
+    {
+      "id": "MOEX-C217-094042-S4001-STAGE1-Q002",
+      "sourceId": "MOEX-094042-4217-Q002",
+      "sourceStemSha256": "e9574ed260edc8f8e5a7342a9d5fe0b567310a794c952b0ca8612f264749c52d",
+      "options": {
+        "A": "頸夾肌（splenius cervicis）",
+        "B": "多裂肌（multifidus）",
+        "C": "半棘肌（semispinalis）",
+        "D": "轉肌（rotatores）"
+      },
+      "score": {
+        "answer": "A",
+        "acceptedAnswers": [
+          "A"
+        ],
+        "answerCreditType": "standard",
+        "answer_fallback_is_official": true,
+        "displayAnswerLabel": "A"
+      },
+      "originalCropSha256": "5a2fbea677eff6a936616043dff335705159760422e2ce2ec69057904a709ae1",
+      "flags": [],
+      "original_required": false,
+      "officialScope": "解剖學、微生物與免疫學、病理學"
+    },
+    {
+      "id": "MOEX-C217-094042-S4001-STAGE1-Q003",
+      "sourceId": "MOEX-094042-4217-Q003",
+      "sourceStemSha256": "44f6a825af637567f8b790b94241089982368f1751d2842735faef9a35dd8844",
+      "options": {
+        "A": "肝圓韌帶",
+        "B": "肝鐮韌帶",
+        "C": "冠狀韌帶",
+        "D": "三角韌帶"
+      },
+      "score": {
+        "answer": "A",
+        "acceptedAnswers": [
+          "A"
+        ],
+        "answerCreditType": "standard",
+        "answer_fallback_is_official": true,
+        "displayAnswerLabel": "A"
+      },
+      "originalCropSha256": "c36c411996513002fbeed7c391358d16ae56760067604d1b3301e0bbd9fa29f8",
+      "flags": [],
+      "original_required": false,
+      "officialScope": "解剖學、微生物與免疫學、病理學"
+    },
+    {
+      "id": "MOEX-C217-094042-S4001-STAGE1-Q004",
+      "sourceId": "MOEX-094042-4217-Q004",
+      "sourceStemSha256": "55e2cdf9cd9cd8d5207ecf7b89b16a610e666454a8b40ff56f8134ab4cf2e7c7",
+      "options": {
+        "A": "眼動脈",
+        "B": "眼靜脈",
+        "C": "第三對腦神經",
+        "D": "第六對腦神經"
+      },
+      "score": {
+        "answer": "B",
+        "acceptedAnswers": [
+          "B"
+        ],
+        "answerCreditType": "standard",
+        "answer_fallback_is_official": true,
+        "displayAnswerLabel": "B"
+      },
+      "originalCropSha256": "879ea3bdc7ee5909a236953fbbeb851846edfc581e03d410aed62910b1161957",
+      "flags": [],
+      "original_required": false,
+      "officialScope": "解剖學、微生物與免疫學、病理學"
+    },
+    {
+      "id": "MOEX-C217-094042-S4001-STAGE1-Q005",
+      "sourceId": "MOEX-094042-4217-Q005",
+      "sourceStemSha256": "1e0f301990c1260d23f9c45b2fdea1dd6009cf03719b8626fe43f78fff5bd4c3",
+      "options": {
+        "A": "鎖骨",
+        "B": "第一胸椎",
+        "C": "胸骨",
+        "D": "第一對肋骨及肋軟骨"
+      },
+      "score": {
+        "answer": "A",
+        "acceptedAnswers": [
+          "A"
+        ],
+        "answerCreditType": "standard",
+        "answer_fallback_is_official": true,
+        "displayAnswerLabel": "A"
+      },
+      "originalCropSha256": "b191ec6abcae227b3e7761972d43680dbfef0bfc8a8530a6f723d4b5edfd360a",
+      "flags": [],
+      "original_required": false,
+      "officialScope": "解剖學、微生物與免疫學、病理學"
+    },
+    {
+      "id": "MOEX-C217-094042-S4001-STAGE1-Q006",
+      "sourceId": "MOEX-094042-4217-Q006",
+      "sourceStemSha256": "fd91011ae46d9c6fe8e23f4cb65f2f80d103d9b85955990b950302237f5c2a0e",
+      "options": {
+        "A": "疑核（nucleus ambiguus）",
+        "B": "迷走神經背核（dorsal nucleus of vagus nerve）",
+        "C": "孤立核（solitary nucleus）",
+        "D": "唾液核（salivatory nucleus）"
+      },
+      "score": {
+        "answer": "B",
+        "acceptedAnswers": [
+          "B"
+        ],
+        "answerCreditType": "standard",
+        "answer_fallback_is_official": true,
+        "displayAnswerLabel": "B"
+      },
+      "originalCropSha256": "54fe46afedee777fc2ca64dd699925c73d0799be6e5c4ed7996bbe2a33bcc76c",
+      "flags": [],
+      "original_required": false,
+      "officialScope": "解剖學、微生物與免疫學、病理學"
+    },
+    {
+      "id": "MOEX-C217-094042-S4001-STAGE1-Q007",
+      "sourceId": "MOEX-094042-4217-Q007",
+      "sourceStemSha256": "b34dd120d959581e779f3d68dc5f75cce6eadbc9e0aa8458eb1833d24ab6b609",
+      "options": {
+        "A": "腎上腺髓質部",
+        "B": "頸動脈體",
+        "C": "主動脈體",
+        "D": "腎上腺皮質部"
+      },
+      "score": {
+        "answer": "D",
+        "acceptedAnswers": [
+          "D"
+        ],
+        "answerCreditType": "standard",
+        "answer_fallback_is_official": true,
+        "displayAnswerLabel": "D"
+      },
+      "originalCropSha256": "d306519fc9dd05ab3862e288db028c786f843975b767d88e94e731469a97a3d8",
+      "flags": [],
+      "original_required": false,
+      "officialScope": "解剖學、微生物與免疫學、病理學"
+    },
+    {
+      "id": "MOEX-C217-094042-S4001-STAGE1-Q008",
+      "sourceId": "MOEX-094042-4217-Q008",
+      "sourceStemSha256": "333d4cdfdacf1bccc471359de21f29570d5c2ef1614276886b5ef156c972bbf8",
+      "options": {
+        "A": "四疊體前核",
+        "B": "Edinger-Westphal 核",
+        "C": "睫狀神經節",
+        "D": "翼腭神經節"
+      },
+      "score": {
+        "answer": "D",
+        "acceptedAnswers": [
+          "D"
+        ],
+        "answerCreditType": "standard",
+        "answer_fallback_is_official": true,
+        "displayAnswerLabel": "D"
+      },
+      "originalCropSha256": "fc7b9fb03967470cb4d282ac3bf34cdefcfea388e23aefe7aea578abb7897509",
+      "flags": [],
+      "original_required": false,
+      "officialScope": "解剖學、微生物與免疫學、病理學"
+    },
+    {
+      "id": "MOEX-C217-094042-S4001-STAGE1-Q009",
+      "sourceId": "MOEX-094042-4217-Q009",
+      "sourceStemSha256": "67c31f409dad6b27a0d6911b6bd08e4e305607277661b6107b750a467f5d57f7",
+      "options": {
+        "A": "蒼白球（globus pallidus）",
+        "B": "紅核（red nucleus）",
+        "C": "黑質（substantia nigra）",
+        "D": "齒狀回（dentate gyrus）"
+      },
+      "score": {
+        "answer": "A",
+        "acceptedAnswers": [
+          "A"
+        ],
+        "answerCreditType": "standard",
+        "answer_fallback_is_official": true,
+        "displayAnswerLabel": "A"
+      },
+      "originalCropSha256": "b50310a6f2044ac255f577b11dc68e1e02e9448c4495e9632ab8ba530404fea7",
+      "flags": [],
+      "original_required": false,
+      "officialScope": "解剖學、微生物與免疫學、病理學"
+    },
+    {
+      "id": "MOEX-C217-094042-S4001-STAGE1-Q010",
+      "sourceId": "MOEX-094042-4217-Q010",
+      "sourceStemSha256": "e24bcfdc4b3fb13de63b224d3c69f353dade05c8c09f604ed130ee0969a02bca",
+      "options": {
+        "A": "普金氏細胞",
+        "B": "顆粒細胞",
+        "C": "攀附纖維",
+        "D": "高基氏細胞"
+      },
+      "score": {
+        "answer": "B",
+        "acceptedAnswers": [
+          "B"
+        ],
+        "answerCreditType": "standard",
+        "answer_fallback_is_official": true,
+        "displayAnswerLabel": "B"
+      },
+      "originalCropSha256": "2f86a22d8ce4c07091f453cbaeb279adb18fe58a436fbfe6d4503915b8222ee7",
+      "flags": [],
+      "original_required": false,
+      "officialScope": "解剖學、微生物與免疫學、病理學"
+    },
+    {
+      "id": "MOEX-C217-094042-S4001-STAGE1-Q011",
+      "sourceId": "MOEX-094042-4217-Q011",
+      "sourceStemSha256": "f07f8239326fea463dc032b5b12897fa88f156678aa3f80671f74c8999a73404",
+      "options": {
+        "A": "第41，42 區",
+        "B": "第17，18 區",
+        "C": "額葉",
+        "D": "枕葉"
+      },
+      "score": {
+        "answer": "A",
+        "acceptedAnswers": [
+          "A"
+        ],
+        "answerCreditType": "standard",
+        "answer_fallback_is_official": true,
+        "displayAnswerLabel": "A"
+      },
+      "originalCropSha256": "621e4c98e8600eca004be19cb66d250aa610e6732abe2b97545a79c30e7a2e5b",
+      "flags": [],
+      "original_required": false,
+      "officialScope": "解剖學、微生物與免疫學、病理學"
+    },
+    {
+      "id": "MOEX-C217-094042-S4001-STAGE1-Q012",
+      "sourceId": "MOEX-094042-4217-Q012",
+      "sourceStemSha256": "5757355b9af370ac92c5d762ba46fd92e143a866630c2a6213e25ac8b952a9d0",
+      "options": {
+        "A": "皮質脊髓徑",
+        "B": "外側前庭脊髓徑",
+        "C": "網狀脊髓徑",
+        "D": "紅核脊髓徑"
+      },
+      "score": {
+        "answer": "D",
+        "acceptedAnswers": [
+          "D"
+        ],
+        "answerCreditType": "standard",
+        "answer_fallback_is_official": true,
+        "displayAnswerLabel": "D"
+      },
+      "originalCropSha256": "27095b2256a434a08c5d3c0fe2479bbaba49f1059462cd74bfedc3394e04f4c5",
+      "flags": [],
+      "original_required": false,
+      "officialScope": "解剖學、微生物與免疫學、病理學"
+    },
+    {
+      "id": "MOEX-C217-094042-S4001-STAGE1-Q013",
+      "sourceId": "MOEX-094042-4217-Q013",
+      "sourceStemSha256": "4d54a8f95b86f6faa95b074b073f2a8b3dce1df068f39ad02c2bca500d2c9db1",
+      "options": {
+        "A": "內囊前肢",
+        "B": "大腦腳",
+        "C": "錐體",
+        "D": "脊髓側柱"
+      },
+      "score": {
+        "answer": "A",
+        "acceptedAnswers": [
+          "A"
+        ],
+        "answerCreditType": "standard",
+        "answer_fallback_is_official": true,
+        "displayAnswerLabel": "A"
+      },
+      "originalCropSha256": "294a85b05b12512d3ddcac2b0788c1ca353f41733035298bf21bbfbecf4a5a4e",
+      "flags": [],
+      "original_required": false,
+      "officialScope": "解剖學、微生物與免疫學、病理學"
+    },
+    {
+      "id": "MOEX-C217-094042-S4001-STAGE1-Q014",
+      "sourceId": "MOEX-094042-4217-Q014",
+      "sourceStemSha256": "c4d05a658c79bc6b90f25d938c3ca1c6004bc47fcdb48f422de47d6dc0df74dc",
+      "options": {
+        "A": "枕小神經（lesser occipital n.）",
+        "B": "耳大神經（great auricular n.）",
+        "C": "肩胛上神經（suprascapular n.）",
+        "D": "膈神經（phrenic n.）"
+      },
+      "score": {
+        "answer": "C",
+        "acceptedAnswers": [
+          "C"
+        ],
+        "answerCreditType": "standard",
+        "answer_fallback_is_official": true,
+        "displayAnswerLabel": "C"
+      },
+      "originalCropSha256": "907bd90e7128b2cfa6a8d65b59559c796a45911fc8bb3529e4ef06d4bbda4dde",
+      "flags": [],
+      "original_required": false,
+      "officialScope": "解剖學、微生物與免疫學、病理學"
+    },
+    {
+      "id": "MOEX-C217-094042-S4001-STAGE1-Q015",
+      "sourceId": "MOEX-094042-4217-Q015",
+      "sourceStemSha256": "707c310b578ba00bfdfe041b9c34d5d4af5aba4047da56ea5411e4b9e8199275",
+      "options": {
+        "A": "頸總動脈",
+        "B": "甲狀腺下動脈",
+        "C": "椎動脈",
+        "D": "頸橫動脈"
+      },
+      "score": {
+        "answer": "D",
+        "acceptedAnswers": [
+          "D"
+        ],
+        "answerCreditType": "standard",
+        "answer_fallback_is_official": true,
+        "displayAnswerLabel": "D"
+      },
+      "originalCropSha256": "55f903094e6859d9d57b1806820980d4c5f38b8280ef447412b5ade06a4a8792",
+      "flags": [],
+      "original_required": false,
+      "officialScope": "解剖學、微生物與免疫學、病理學"
+    },
+    {
+      "id": "MOEX-C217-094042-S4001-STAGE1-Q016",
+      "sourceId": "MOEX-094042-4217-Q016",
+      "sourceStemSha256": "fb061e91c249c55bb8a519ed6c143a211aaba5ad1b70bd7a83adca4e8c63fa33",
+      "options": {
+        "A": "環甲肌",
+        "B": "環杓肌",
+        "C": "甲杓肌",
+        "D": "杓橫肌"
+      },
+      "score": {
+        "answer": "D",
+        "acceptedAnswers": [
+          "D"
+        ],
+        "answerCreditType": "standard",
+        "answer_fallback_is_official": true,
+        "displayAnswerLabel": "D"
+      },
+      "originalCropSha256": "d0b4206d16554eaa3fa9b1449781f6f8321d74723af146801b1f33afb0688523",
+      "flags": [],
+      "original_required": false,
+      "officialScope": "解剖學、微生物與免疫學、病理學"
+    },
+    {
+      "id": "MOEX-C217-094042-S4001-STAGE1-Q017",
+      "sourceId": "MOEX-094042-4217-Q017",
+      "sourceStemSha256": "069c1ac94d81258b95a52a074a8db45a1947f29f6bf2f1f3b58ee1cb42e1e0f8",
+      "options": {
+        "A": "第1～2 趾間",
+        "B": "第2～3 趾間",
+        "C": "第3～4 趾間",
+        "D": "第4～5 趾間"
+      },
+      "score": {
+        "answer": "A",
+        "acceptedAnswers": [
+          "A"
+        ],
+        "answerCreditType": "standard",
+        "answer_fallback_is_official": true,
+        "displayAnswerLabel": "A"
+      },
+      "originalCropSha256": "c13c222be605b8f45373ab224d826b4f3c8aa0bb08c477b35e66d215f53efca2",
+      "flags": [],
+      "original_required": false,
+      "officialScope": "解剖學、微生物與免疫學、病理學"
+    },
+    {
+      "id": "MOEX-C217-094042-S4001-STAGE1-Q018",
+      "sourceId": "MOEX-094042-4217-Q018",
+      "sourceStemSha256": "aa445017ea1b990574c69f9f280a658e160b8d7cb230cbd6dfe7a955b88b380c",
+      "options": {
+        "A": "內縮長肌（adductor longus）",
+        "B": "內縮大肌（adductor magnus）",
+        "C": "縫匠肌（sartorius）",
+        "D": "股內側肌（vastus medialis）"
+      },
+      "score": {
+        "answer": "B",
+        "acceptedAnswers": [
+          "B"
+        ],
+        "answerCreditType": "standard",
+        "answer_fallback_is_official": true,
+        "displayAnswerLabel": "B"
+      },
+      "originalCropSha256": "6ae81e5f02c6103eca786a01567cab3de9d5c87952acd23c9507605316138de6",
+      "flags": [],
+      "original_required": false,
+      "officialScope": "解剖學、微生物與免疫學、病理學"
+    },
+    {
+      "id": "MOEX-C217-094042-S4001-STAGE1-Q019",
+      "sourceId": "MOEX-094042-4217-Q019",
+      "sourceStemSha256": "e57e5441f337c03a244c64755bffe8d0126e50644b925d237fe1bfbb449d31ea",
+      "options": {
+        "A": "杵臼關節",
+        "B": "屈戌（樞紐）關節",
+        "C": "車軸關節",
+        "D": "鞍狀關節"
+      },
+      "score": {
+        "answer": "D",
+        "acceptedAnswers": [
+          "D"
+        ],
+        "answerCreditType": "standard",
+        "answer_fallback_is_official": true,
+        "displayAnswerLabel": "D"
+      },
+      "originalCropSha256": "c77a1570d83b643f240f2d408aeb75c56e75e690f0cb47e5d72a8a1cb1d5d957",
+      "flags": [],
+      "original_required": false,
+      "officialScope": "解剖學、微生物與免疫學、病理學"
+    },
+    {
+      "id": "MOEX-C217-094042-S4001-STAGE1-Q020",
+      "sourceId": "MOEX-094042-4217-Q020",
+      "sourceStemSha256": "9df71030f7b3f3c760b3e6b94f218dc6d93f8d2f320bd9029eb9f94d71706783",
+      "options": {
+        "A": "關節軟骨板（atricular disc）",
+        "B": "顳下頜韌帶（temporomandibular ligament）",
+        "C": "蝶下頜韌帶（sphenomandibular ligament）",
+        "D": "莖突下頜韌帶（stylomandibular ligament）"
+      },
+      "score": {
+        "answer": "C",
+        "acceptedAnswers": [
+          "C"
+        ],
+        "answerCreditType": "standard",
+        "answer_fallback_is_official": true,
+        "displayAnswerLabel": "C"
+      },
+      "originalCropSha256": "e5ebaa82d4ced3db1efdd84de2a83dd23d85bc7f6c4cb92cc5c5ea5fe9d28606",
+      "flags": [],
+      "original_required": false,
+      "officialScope": "解剖學、微生物與免疫學、病理學"
+    },
+    {
+      "id": "MOEX-C217-094042-S4001-STAGE1-Q021",
+      "sourceId": "MOEX-094042-4217-Q021",
+      "sourceStemSha256": "3e13c83f85d77ab07cebf6b2ff76bfdfda4cfe76d309f40987ea7eb97b0b37b8",
+      "options": {
+        "A": "第一頸椎",
+        "B": "第二頸椎",
+        "C": "第六頸椎",
+        "D": "第七頸椎"
+      },
+      "score": {
+        "answer": "A",
+        "acceptedAnswers": [
+          "A"
+        ],
+        "answerCreditType": "standard",
+        "answer_fallback_is_official": true,
+        "displayAnswerLabel": "A"
+      },
+      "originalCropSha256": "ab99f9e52fcedb3aa1cb908a17dcdcdfe8e22461a8cde2ae8dc7e3ce59c18d4d",
+      "flags": [],
+      "original_required": false,
+      "officialScope": "解剖學、微生物與免疫學、病理學"
+    },
+    {
+      "id": "MOEX-C217-094042-S4001-STAGE1-Q022",
+      "sourceId": "MOEX-094042-4217-Q022",
+      "sourceStemSha256": "c845985571bd52424a3e3e6552f422dcd5a13cdcbc52db20ed13588958346533",
+      "options": {
+        "A": "顳骨，頂骨，蝶骨",
+        "B": "顳骨，頂骨，枕骨",
+        "C": "額骨，頂骨，蝶骨",
+        "D": "額骨，蝶骨，顴骨"
+      },
+      "score": {
+        "answer": "B",
+        "acceptedAnswers": [
+          "B"
+        ],
+        "answerCreditType": "standard",
+        "answer_fallback_is_official": true,
+        "displayAnswerLabel": "B"
+      },
+      "originalCropSha256": "4a23f57e5d4f8e2026bc74afe601356f7eca7be6b8e64668ea0f67b0467eb123",
+      "flags": [],
+      "original_required": false,
+      "officialScope": "解剖學、微生物與免疫學、病理學"
+    },
+    {
+      "id": "MOEX-C217-094042-S4001-STAGE1-Q023",
+      "sourceId": "MOEX-094042-4217-Q023",
+      "sourceStemSha256": "d39f40fe9aee713926987fd9e586c6536ca2b4d4d20fcdcbd2e87e4eff7ba32f",
+      "options": {
+        "A": "橫面動脈（transvese facial artery）",
+        "B": "中腦膜動脈（middle meningeal artery）",
+        "C": "枕動脈（occipital artery）",
+        "D": "眶上動脈（supraorbital artery）"
+      },
+      "score": {
+        "answer": "B",
+        "acceptedAnswers": [
+          "B"
+        ],
+        "answerCreditType": "standard",
+        "answer_fallback_is_official": true,
+        "displayAnswerLabel": "B"
+      },
+      "originalCropSha256": "cafedacf001ceb8398a1f3eaee8642fe2d9b508a0311d0a4a029f638bd9773d4",
+      "flags": [],
+      "original_required": false,
+      "officialScope": "解剖學、微生物與免疫學、病理學"
+    },
+    {
+      "id": "MOEX-C217-094042-S4001-STAGE1-Q024",
+      "sourceId": "MOEX-094042-4217-Q024",
+      "sourceStemSha256": "1138763b807e2f979d6a0ba2c0d25884225c9ac33ea2016dcc1a33d3f2233b13",
+      "options": {
+        "A": "錘骨（malleus）的頭部",
+        "B": "錘骨（malleus）的柄部",
+        "C": "鐙骨（stapes）的頭部",
+        "D": "鐙骨（stapes）的基部"
+      },
+      "score": {
+        "answer": "D",
+        "acceptedAnswers": [
+          "D"
+        ],
+        "answerCreditType": "standard",
+        "answer_fallback_is_official": true,
+        "displayAnswerLabel": "D"
+      },
+      "originalCropSha256": "aa11080046a6a8188c29447f87d991ab65b0c9b0a0b9dcca53cf5bebd48e067b",
+      "flags": [],
+      "original_required": false,
+      "officialScope": "解剖學、微生物與免疫學、病理學"
+    },
+    {
+      "id": "MOEX-C217-094042-S4001-STAGE1-Q025",
+      "sourceId": "MOEX-094042-4217-Q025",
+      "sourceStemSha256": "b8e8843dc4e8e150e72047df7ca27a53586cd24dad58d54c69f9b553dd27ca5a",
+      "options": {
+        "A": "陰蒂背神經",
+        "B": "尿道球腺",
+        "C": "會陰體",
+        "D": "尿道括約肌"
+      },
+      "score": {
+        "answer": "C",
+        "acceptedAnswers": [
+          "C"
+        ],
+        "answerCreditType": "standard",
+        "answer_fallback_is_official": true,
+        "displayAnswerLabel": "C"
+      },
+      "originalCropSha256": "8210353c0cd55ce5abc28f0739cf2282ccbbf8b445b4d6dc9a710d0d098ef73a",
+      "flags": [],
+      "original_required": false,
+      "officialScope": "解剖學、微生物與免疫學、病理學"
+    },
+    {
+      "id": "MOEX-C217-094042-S4001-STAGE1-Q026",
+      "sourceId": "MOEX-094042-4217-Q026",
+      "sourceStemSha256": "912bade0ab2ae6366f4f2a3f8fb13fd5b5029d2cfc9776f171d0a76408ec5162",
+      "options": {
+        "A": "枕小神經（lesser occipital n.）",
+        "B": "脊副神經（spinal accessory n.）",
+        "C": "枕動脈（occipital a.）",
+        "D": "椎動脈（vertebral a.）"
+      },
+      "score": {
+        "answer": "D",
+        "acceptedAnswers": [
+          "D"
+        ],
+        "answerCreditType": "standard",
+        "answer_fallback_is_official": true,
+        "displayAnswerLabel": "D"
+      },
+      "originalCropSha256": "f5e973e34781a9fa7b97b21291307043877a2f7822c3f102f1024cde0a530ff6",
+      "flags": [],
+      "original_required": false,
+      "officialScope": "解剖學、微生物與免疫學、病理學"
+    },
+    {
+      "id": "MOEX-C217-094042-S4001-STAGE1-Q027",
+      "sourceId": "MOEX-094042-4217-Q027",
+      "sourceStemSha256": "45d902addfb8584ed126181eced232a85bd3c2a821157a68bb502a94e1c492fb",
+      "options": {
+        "A": "精索",
+        "B": "子宮圓韌帶",
+        "C": "提睪肌",
+        "D": "鞘膜"
+      },
+      "score": {
+        "answer": "B",
+        "acceptedAnswers": [
+          "B"
+        ],
+        "answerCreditType": "standard",
+        "answer_fallback_is_official": true,
+        "displayAnswerLabel": "B"
+      },
+      "originalCropSha256": "016b0999c557a0b9a727c0343cfcf1d8b972c615a43aa80f22948f2a85e33156",
+      "flags": [],
+      "original_required": false,
+      "officialScope": "解剖學、微生物與免疫學、病理學"
+    },
+    {
+      "id": "MOEX-C217-094042-S4001-STAGE1-Q028",
+      "sourceId": "MOEX-094042-4217-Q028",
+      "sourceStemSha256": "30fe65df04b3cafd8ce54d66ed021b9844e961c09b3fc84b8ff025db1e07ee48",
+      "options": {
+        "A": "心大靜脈",
+        "B": "心前靜脈",
+        "C": "心小靜脈",
+        "D": "心中靜脈"
+      },
+      "score": {
+        "answer": "B",
+        "acceptedAnswers": [
+          "B"
+        ],
+        "answerCreditType": "standard",
+        "answer_fallback_is_official": true,
+        "displayAnswerLabel": "B"
+      },
+      "originalCropSha256": "8a52dea7bc8010ad44432e7de9a6cda73dffaa4edae9369734b4521d30252a4e",
+      "flags": [],
+      "original_required": false,
+      "officialScope": "解剖學、微生物與免疫學、病理學"
+    },
+    {
+      "id": "MOEX-C217-094042-S4001-STAGE1-Q029",
+      "sourceId": "MOEX-094042-4217-Q029",
+      "sourceStemSha256": "d3b024081401174b3786b81d13ef0392b536bd8b025a53551ac19e5dbed46235",
+      "options": {
+        "A": "迷走神經",
+        "B": "膈神經",
+        "C": "主動脈弓",
+        "D": "奇靜脈"
+      },
+      "score": {
+        "answer": "D",
+        "acceptedAnswers": [
+          "D"
+        ],
+        "answerCreditType": "standard",
+        "answer_fallback_is_official": true,
+        "displayAnswerLabel": "D"
+      },
+      "originalCropSha256": "be3bbc06664a232b90d7d2d875dabba336ca614850409d99136466e14c84a9f3",
+      "flags": [],
+      "original_required": false,
+      "officialScope": "解剖學、微生物與免疫學、病理學"
+    },
+    {
+      "id": "MOEX-C217-094042-S4001-STAGE1-Q030",
+      "sourceId": "MOEX-094042-4217-Q030",
+      "sourceStemSha256": "2ba41bfe073325c19963f47c3583e5458ee19a2daf362b6fe5d53c39d686e72d",
+      "options": {
+        "A": "嗜油脂",
+        "B": "嗜乾燥",
+        "C": "嗜角質蛋白",
+        "D": "嗜微細纖維"
+      },
+      "score": {
+        "answer": "C",
+        "acceptedAnswers": [
+          "C"
+        ],
+        "answerCreditType": "standard",
+        "answer_fallback_is_official": true,
+        "displayAnswerLabel": "C"
+      },
+      "originalCropSha256": "d28a14382dc1e8cf78ebf7c1f91a11e0d4d7df1b753931c9697c972db45cbaae",
+      "flags": [],
+      "original_required": false,
+      "officialScope": "解剖學、微生物與免疫學、病理學"
+    },
+    {
+      "id": "MOEX-C217-094042-S4001-STAGE1-Q031",
+      "sourceId": "MOEX-094042-4217-Q031",
+      "sourceStemSha256": "cb2f1e811aa53d684b2991dde5db6ac8a987ce412aa1476d1c0b96f9cff167e3",
+      "options": {
+        "A": "放線菌屬（Actinomyces）",
+        "B": "小孢子菌屬（Microsporum）",
+        "C": "麴菌（Aspergillus）",
+        "D": "表皮絲狀菌屬（Epidermophyton）"
+      },
+      "score": {
+        "answer": "A",
+        "acceptedAnswers": [
+          "A"
+        ],
+        "answerCreditType": "standard",
+        "answer_fallback_is_official": true,
+        "displayAnswerLabel": "A"
+      },
+      "originalCropSha256": "2d06702102eb2806716eb20290f765620c1d7daaca1ce70d5aeb9ecd00492f6a",
+      "flags": [],
+      "original_required": false,
+      "officialScope": "解剖學、微生物與免疫學、病理學"
+    },
+    {
+      "id": "MOEX-C217-094042-S4001-STAGE1-Q032",
+      "sourceId": "MOEX-094042-4217-Q032",
+      "sourceStemSha256": "49ca04f0fd1eaa08c54db07303a5e6410cd7822b9d8dee41dd4a9dfd0a91bb84",
+      "options": {
+        "A": "流行性感冒病毒（Influenza viruses）",
+        "B": "蛋白子（Prion）",
+        "C": "麻疹病毒變異型（Measles viruses variant）",
+        "D": "漢他病毒（Hantaviruses）"
+      },
+      "score": {
+        "answer": "B",
+        "acceptedAnswers": [
+          "B"
+        ],
+        "answerCreditType": "standard",
+        "answer_fallback_is_official": true,
+        "displayAnswerLabel": "B"
+      },
+      "originalCropSha256": "a2a7fd542401d1f245322dd75a8a7881ed9e9c937fa863884fbda9098f13629f",
+      "flags": [],
+      "original_required": false,
+      "officialScope": "解剖學、微生物與免疫學、病理學"
+    },
+    {
+      "id": "MOEX-C217-094042-S4001-STAGE1-Q033",
+      "sourceId": "MOEX-094042-4217-Q033",
+      "sourceStemSha256": "c51fa5a4caaed70a502217c1b90b8245d62313cef65db925fdc663fa16fa6dbf",
+      "options": {
+        "A": "目前的藥物主要針對病毒的脫殼（uncoating）及釋放（release）步驟",
+        "B": "其中有一類藥物主要針對膜蛋白質（M2）",
+        "C": "金剛安（Amantadine）可和膜蛋白質（M2）結合",
+        "D": "其中另一類藥物，可抑制神經胺酸酶（Neuraminidase），只對A 型流行性感冒有效"
+      },
+      "score": {
+        "answer": "D",
+        "acceptedAnswers": [
+          "D"
+        ],
+        "answerCreditType": "standard",
+        "answer_fallback_is_official": true,
+        "displayAnswerLabel": "D"
+      },
+      "originalCropSha256": "1906573411184923da69a97783386fc36406e26f05a67c0a078d1e5e103b32f1",
+      "flags": [],
+      "original_required": false,
+      "officialScope": "解剖學、微生物與免疫學、病理學"
+    },
+    {
+      "id": "MOEX-C217-094042-S4001-STAGE1-Q034",
+      "sourceId": "MOEX-094042-4217-Q034",
+      "sourceStemSha256": "a12ffdf6cebb99266c4b396434b23deeaf889926d3ae4b26eb2a1a8ce1f005ee",
+      "options": {
+        "A": "致病菌均為革蘭氏陰性菌",
+        "B": "多半由病人體內的正常菌叢（normal flora）細菌所引起",
+        "C": "所造成的疾病，以敗血症（sepsis）最常見",
+        "D": "通常藉由人與人直接接觸的方式傳播病菌"
+      },
+      "score": {
+        "answer": "B",
+        "acceptedAnswers": [
+          "B"
+        ],
+        "answerCreditType": "standard",
+        "answer_fallback_is_official": true,
+        "displayAnswerLabel": "B"
+      },
+      "originalCropSha256": "59eeb1fb30422fa559e29fb094d47b3cab15f0fc535459afdd803ca8837e2484",
+      "flags": [],
+      "original_required": false,
+      "officialScope": "解剖學、微生物與免疫學、病理學"
+    },
+    {
+      "id": "MOEX-C217-094042-S4001-STAGE1-Q035",
+      "sourceId": "MOEX-094042-4217-Q035",
+      "sourceStemSha256": "eb65facd890f7687ad085d3c0ca0536a18e53de27c46bca718ec8562a326b44c",
+      "options": {
+        "A": "加熱殺死的Mycobacterium tuberculosis",
+        "B": "加熱殺死的Mycobacterium bovis",
+        "C": "減毒的（活的）Mycobacterium tuberculosis",
+        "D": "減毒的（活的）Mycobacterium bovis"
+      },
+      "score": {
+        "answer": "D",
+        "acceptedAnswers": [
+          "D"
+        ],
+        "answerCreditType": "standard",
+        "answer_fallback_is_official": true,
+        "displayAnswerLabel": "D"
+      },
+      "originalCropSha256": "cb463518828811d560d029c7482e3c5258b8b472fdd90142b1e8dfef4eba91ff",
+      "flags": [],
+      "original_required": false,
+      "officialScope": "解剖學、微生物與免疫學、病理學"
+    },
+    {
+      "id": "MOEX-C217-094042-S4001-STAGE1-Q036",
+      "sourceId": "MOEX-094042-4217-Q036",
+      "sourceStemSha256": "aa3a888af758f5a083b311f2eaba87a086fd2304bf969439c4b93c66d4711fc8",
+      "options": {
+        "A": "鼠疫桿菌（Yersinia pestis）",
+        "B": "傷寒沙門氏菌（Salmonella typhi）",
+        "C": "志賀氏赤痢菌（Shigella dysteriae）",
+        "D": "克雷白氏肺炎菌（Klebsiella pneumoniae）"
+      },
+      "score": {
+        "answer": "A",
+        "acceptedAnswers": [
+          "A"
+        ],
+        "answerCreditType": "standard",
+        "answer_fallback_is_official": true,
+        "displayAnswerLabel": "A"
+      },
+      "originalCropSha256": "1dd7554396d7e23810bd8cd73921e04f7b233a240198ff1c6788dc72e9b38805",
+      "flags": [],
+      "original_required": false,
+      "officialScope": "解剖學、微生物與免疫學、病理學"
+    },
+    {
+      "id": "MOEX-C217-094042-S4001-STAGE1-Q037",
+      "sourceId": "MOEX-094042-4217-Q037",
+      "sourceStemSha256": "e9e16963424168c024fbcede1295b849d46f70df53c2b2a21858b22569cfa609",
+      "options": {
+        "A": "流行性感冒病毒（Influenza virus）",
+        "B": "呼吸道腸道病毒（Reovirus）",
+        "C": "EB 病毒（Epstein-Barr virus）",
+        "D": "腺病毒（Adenovirus）"
+      },
+      "score": {
+        "answer": "D",
+        "acceptedAnswers": [
+          "D"
+        ],
+        "answerCreditType": "standard",
+        "answer_fallback_is_official": true,
+        "displayAnswerLabel": "D"
+      },
+      "originalCropSha256": "b7cf0eda620f1c8ebd00ec013768677da523c27db37ed7f1d3fb360054bbc771",
+      "flags": [],
+      "original_required": false,
+      "officialScope": "解剖學、微生物與免疫學、病理學"
+    },
+    {
+      "id": "MOEX-C217-094042-S4001-STAGE1-Q038",
+      "sourceId": "MOEX-094042-4217-Q038",
+      "sourceStemSha256": "f409ec5946b1e0ad39839b7433cbed3e4ed3b2f120b71f20f559389dfdfc3d9a",
+      "options": {
+        "A": "臘腸毒桿菌（Clostridium botulinum）",
+        "B": "破傷風桿菌（Clostridium tetani）",
+        "C": "炭疽桿菌（Bacillus anthracis）",
+        "D": "金黃色葡萄球菌（Staphylococcus aureus）"
+      },
+      "score": {
+        "answer": "B",
+        "acceptedAnswers": [
+          "B"
+        ],
+        "answerCreditType": "standard",
+        "answer_fallback_is_official": true,
+        "displayAnswerLabel": "B"
+      },
+      "originalCropSha256": "342aa1c8b192355d345768a054f28494395cd4870ec46b57ecd202abeeda19fb",
+      "flags": [],
+      "original_required": false,
+      "officialScope": "解剖學、微生物與免疫學、病理學"
+    },
+    {
+      "id": "MOEX-C217-094042-S4001-STAGE1-Q039",
+      "sourceId": "MOEX-094042-4217-Q039",
+      "sourceStemSha256": "325a6fd3a9ff8e3de1950dde01f664477598dae43ff3f727de600987f5b771ca",
+      "options": {
+        "A": "腺病毒及腺病毒相關病毒（Adenovirus and adenoassociated virus）",
+        "B": "巨細胞病毒（CMV）",
+        "C": "乳頭瘤病毒（papillomavirus）",
+        "D": "EB 病毒"
+      },
+      "score": {
+        "answer": "D",
+        "acceptedAnswers": [
+          "D"
+        ],
+        "answerCreditType": "standard",
+        "answer_fallback_is_official": true,
+        "displayAnswerLabel": "D"
+      },
+      "originalCropSha256": "f3f949b5a577fc135d15c6cdc26c5f25817d54a7e16c543a2e23805ea2295029",
+      "flags": [],
+      "original_required": false,
+      "officialScope": "解剖學、微生物與免疫學、病理學"
+    },
+    {
+      "id": "MOEX-C217-094042-S4001-STAGE1-Q040",
+      "sourceId": "MOEX-094042-4217-Q040",
+      "sourceStemSha256": "cc5c2cbd5f794356635dd69a6606e360d864bb918c2475b76e17bd8e6e2b56bc",
+      "options": {
+        "A": "Carcinoembryonic antigen（CEA）",
+        "B": "Prostate specific antigen（PSA）",
+        "C": "Tyrosine kinase",
+        "D": "Serine phosphatase"
+      },
+      "score": {
+        "answer": "A",
+        "acceptedAnswers": [
+          "A"
+        ],
+        "answerCreditType": "standard",
+        "answer_fallback_is_official": true,
+        "displayAnswerLabel": "A"
+      },
+      "originalCropSha256": "c2c18c14c3fe153df03b34dbfc3eba2f70c31d0627cf73666036ea7ae17dd6ba",
+      "flags": [],
+      "original_required": false,
+      "officialScope": "解剖學、微生物與免疫學、病理學"
+    },
+    {
+      "id": "MOEX-C217-094042-S4001-STAGE1-Q041",
+      "sourceId": "MOEX-094042-4217-Q041",
+      "sourceStemSha256": "c4ed2cc19daa456426011f0023dcf2a4f4b6402ab2ac6f8992b828d616cb7bcd",
+      "options": {
+        "A": "胰島素依賴性糖尿病（IDDM）",
+        "B": "全身性紅斑狼瘡（SLE）",
+        "C": "硬皮症（Scleroderma）",
+        "D": "多發性硬化症（Multiple sclerosis）"
+      },
+      "score": {
+        "answer": "B",
+        "acceptedAnswers": [
+          "B"
+        ],
+        "answerCreditType": "standard",
+        "answer_fallback_is_official": true,
+        "displayAnswerLabel": "B"
+      },
+      "originalCropSha256": "aec94f2b545b67dab2ea70500141b47fdaaf1b11b072dfa337f56290633943f8",
+      "flags": [],
+      "original_required": false,
+      "officialScope": "解剖學、微生物與免疫學、病理學"
+    },
+    {
+      "id": "MOEX-C217-094042-S4001-STAGE1-Q042",
+      "sourceId": "MOEX-094042-4217-Q042",
+      "sourceStemSha256": "4012e7f005b996ba5ef4a098a653d06d916e4e0acc3a4d852e11437bfeb9a967",
+      "options": {
+        "A": "細胞激素IL-4 是導致接觸性皮膚炎的重要因子",
+        "B": "引起接觸性皮膚炎的抗原通常分子量都大於10 kDa",
+        "C": "角質細胞由於不會表現第二型MHC 分子所以在發病機轉上較不重要",
+        "D": "Dinitrochlorobenzene（DNCB）幾乎在所有白人身上都會導致接觸性皮膚炎"
+      },
+      "score": {
+        "answer": "D",
+        "acceptedAnswers": [
+          "D"
+        ],
+        "answerCreditType": "standard",
+        "answer_fallback_is_official": true,
+        "displayAnswerLabel": "D"
+      },
+      "originalCropSha256": "8eca006c9145cf32b0625cbe1c02536fde6c5889c57db75971b6ea539d79b9c3",
+      "flags": [],
+      "original_required": false,
+      "officialScope": "解剖學、微生物與免疫學、病理學"
+    },
+    {
+      "id": "MOEX-C217-094042-S4001-STAGE1-Q043",
+      "sourceId": "MOEX-094042-4217-Q043",
+      "sourceStemSha256": "0cdcaedffc9fdd118c82b28a23f53968aedf697df5e196b2fb134bc3a4001e01",
+      "options": {
+        "A": "降低感染細胞MHC ClassⅠ之表達",
+        "B": "產生類似IL-10 之物質（IL-10 homologue）",
+        "C": "產生IL-4",
+        "D": "產生可結合Fcr 之物質並阻礙其功能"
+      },
+      "score": {
+        "answer": "C",
+        "acceptedAnswers": [
+          "C"
+        ],
+        "answerCreditType": "standard",
+        "answer_fallback_is_official": true,
+        "displayAnswerLabel": "C"
+      },
+      "originalCropSha256": "8da37d709e32afcf9a421d3e3fac6a0e534f95c1809581d03cd0028c1d3dd3f3",
+      "flags": [],
+      "original_required": false,
+      "officialScope": "解剖學、微生物與免疫學、病理學"
+    },
+    {
+      "id": "MOEX-C217-094042-S4001-STAGE1-Q044",
+      "sourceId": "MOEX-094042-4217-Q044",
+      "sourceStemSha256": "c5f16fe4699c5b6991741d625ae485d70f0ab69a329286759a0f87bdb099e599",
+      "options": {
+        "A": "IgM",
+        "B": "IgG1",
+        "C": "IgG2a",
+        "D": "IgE"
+      },
+      "score": {
+        "answer": "C",
+        "acceptedAnswers": [
+          "C"
+        ],
+        "answerCreditType": "standard",
+        "answer_fallback_is_official": true,
+        "displayAnswerLabel": "C"
+      },
+      "originalCropSha256": "3dc018afbece3a2b3e7a24e818bac9182ae80a9cd418865c6f8ad48a655927d9",
+      "flags": [],
+      "original_required": false,
+      "officialScope": "解剖學、微生物與免疫學、病理學"
+    },
+    {
+      "id": "MOEX-C217-094042-S4001-STAGE1-Q045",
+      "sourceId": "MOEX-094042-4217-Q045",
+      "sourceStemSha256": "ea9538e06da39072f2443f2d827935d4fe04e06713750d1da11a41e6dcc80cab",
+      "options": {
+        "A": "是同一個基因經由differential splicing 過程所轉錄為功能相異之蛋白",
+        "B": "其訊息傳遞均會增強B 淋巴細胞的活化",
+        "C": "其訊息傳遞均會增強T 淋巴細胞的活化",
+        "D": "均可以和B7 結合"
+      },
+      "score": {
+        "answer": "D",
+        "acceptedAnswers": [
+          "D"
+        ],
+        "answerCreditType": "standard",
+        "answer_fallback_is_official": true,
+        "displayAnswerLabel": "D"
+      },
+      "originalCropSha256": "c82b1d2257a2225be258f98229f589651ecf8fb044aeb53178d1f9e6fd193adb",
+      "flags": [],
+      "original_required": false,
+      "officialScope": "解剖學、微生物與免疫學、病理學"
+    },
+    {
+      "id": "MOEX-C217-094042-S4001-STAGE1-Q046",
+      "sourceId": "MOEX-094042-4217-Q046",
+      "sourceStemSha256": "4248f02455261f8a60f529ba136bd66e5e617e648fc764f8536c83a591b33f30",
+      "options": {
+        "A": "IgA",
+        "B": "IgE",
+        "C": "IgG3",
+        "D": "IgG4"
+      },
+      "score": {
+        "answer": "C",
+        "acceptedAnswers": [
+          "C"
+        ],
+        "answerCreditType": "standard",
+        "answer_fallback_is_official": true,
+        "displayAnswerLabel": "C"
+      },
+      "originalCropSha256": "227a7f9c5532d9057fc51fe7401c285c10e0e1470e8497fc81af57a0c4e59f50",
+      "flags": [],
+      "original_required": false,
+      "officialScope": "解剖學、微生物與免疫學、病理學"
+    },
+    {
+      "id": "MOEX-C217-094042-S4001-STAGE1-Q047",
+      "sourceId": "MOEX-094042-4217-Q047",
+      "sourceStemSha256": "53476743cd097b88498b8b0b2c7bcd63be4eb916bd516cd8ed2891c7b99af728",
+      "options": {
+        "A": "可造成氣管收縮，又稱為anaphylatoxin",
+        "B": "可促進嗜中性白血球（neutrophil）的趨化性（chemotaxis）",
+        "C": "可抑制嗜中性白血球（neutrophil）表面黏著分子（adhesion molecule）的表現",
+        "D": "在血液中的半衰期非常的短"
+      },
+      "score": {
+        "answer": "C",
+        "acceptedAnswers": [
+          "C"
+        ],
+        "answerCreditType": "standard",
+        "answer_fallback_is_official": true,
+        "displayAnswerLabel": "C"
+      },
+      "originalCropSha256": "b01c0110c35154c6bbc20bf80afadeb2d25fd7a312dffc7d888ecde6fed007e7",
+      "flags": [],
+      "original_required": false,
+      "officialScope": "解剖學、微生物與免疫學、病理學"
+    },
+    {
+      "id": "MOEX-C217-094042-S4001-STAGE1-Q048",
+      "sourceId": "MOEX-094042-4217-Q048",
+      "sourceStemSha256": "d3ff773953ee83150ca11c607f5b9ede46d06a88c37904cc1fcc07d9f883a6ed",
+      "options": {
+        "A": "醣類及脂類",
+        "B": "分裂的速度",
+        "C": "蛋白質",
+        "D": "代謝的排出物"
+      },
+      "score": {
+        "answer": "A",
+        "acceptedAnswers": [
+          "A"
+        ],
+        "answerCreditType": "standard",
+        "answer_fallback_is_official": true,
+        "displayAnswerLabel": "A"
+      },
+      "originalCropSha256": "4d5a8b3cd3c28355adae808c21ec311d1b3cd1dbfd9ab31794b7e751382b20ae",
+      "flags": [],
+      "original_required": false,
+      "officialScope": "解剖學、微生物與免疫學、病理學"
+    },
+    {
+      "id": "MOEX-C217-094042-S4001-STAGE1-Q049",
+      "sourceId": "MOEX-094042-4217-Q049",
+      "sourceStemSha256": "4535de30bfad1d03d3235c07b23c59dbdb362910c701e92cb31d94938479f48f",
+      "options": {
+        "A": "鼠疫（Plague）",
+        "B": "鼠斑疹傷寒（Murine typhus）",
+        "C": "犬複殖器絛蟲病（Dipylidiasis）",
+        "D": "麥地那線蟲病（Dracunculiasis）"
+      },
+      "score": {
+        "answer": "D",
+        "acceptedAnswers": [
+          "D"
+        ],
+        "answerCreditType": "standard",
+        "answer_fallback_is_official": true,
+        "displayAnswerLabel": "D"
+      },
+      "originalCropSha256": "242e81f01b47c402c6e4029606a8a1e42fd7f0964b97601388c751e3cc7261e8",
+      "flags": [],
+      "original_required": false,
+      "officialScope": "解剖學、微生物與免疫學、病理學"
+    },
+    {
+      "id": "MOEX-C217-094042-S4001-STAGE1-Q050",
+      "sourceId": "MOEX-094042-4217-Q050",
+      "sourceStemSha256": "ef76d3394e715953f8a0fb79b3fe1847090645a36655f65e4510ad0cdd05ca09",
+      "options": {
+        "A": "埃及斑蚊（Aedes aegypti）",
+        "B": "瘧蚊（Anopheles spp.）",
+        "C": "熱帶家蚊（Culex quinquefasciatus）",
+        "D": "沼蚊（Mansonia spp.）"
+      },
+      "score": {
+        "answer": "B",
+        "acceptedAnswers": [
+          "B"
+        ],
+        "answerCreditType": "standard",
+        "answer_fallback_is_official": true,
+        "displayAnswerLabel": "B"
+      },
+      "originalCropSha256": "5f9145ade70ee4b6840e02fc41c3342f2fcc967d96fce18a88d2770d95308baf",
+      "flags": [],
+      "original_required": false,
+      "officialScope": "解剖學、微生物與免疫學、病理學"
+    },
+    {
+      "id": "MOEX-C217-094042-S4001-STAGE1-Q051",
+      "sourceId": "MOEX-094042-4217-Q051",
+      "sourceStemSha256": "945cf4d844f3eee0d3dd850a59b04219986435300039cc669325582d864ea478",
+      "options": {
+        "A": "曼森血吸蟲及日本血吸蟲",
+        "B": "日本血吸蟲及馬來血吸蟲",
+        "C": "馬來血吸蟲及埃及血吸蟲",
+        "D": "曼森血吸蟲及埃及血吸蟲"
+      },
+      "score": {
+        "answer": "A",
+        "acceptedAnswers": [
+          "A"
+        ],
+        "answerCreditType": "standard",
+        "answer_fallback_is_official": true,
+        "displayAnswerLabel": "A"
+      },
+      "originalCropSha256": "2123a4cfe3c3a9d6a1c7684102986a2de246c726476d3d6002e4c07264843770",
+      "flags": [],
+      "original_required": false,
+      "officialScope": "解剖學、微生物與免疫學、病理學"
+    },
+    {
+      "id": "MOEX-C217-094042-S4001-STAGE1-Q052",
+      "sourceId": "MOEX-094042-4217-Q052",
+      "sourceStemSha256": "2d1a61f4af00020871a391244b7b2fc48f9929ef6dda48adb9314b6f34bca0fb",
+      "options": {
+        "A": "痢疾阿米巴（Entamoeba histolytica）",
+        "B": "福氏耐格利阿米巴（Naegleria fowleri）",
+        "C": "棘阿米巴（Acanthamoeba spp.）",
+        "D": "杜氏利什曼原蟲（Leishmania donovani）"
+      },
+      "score": {
+        "answer": "B",
+        "acceptedAnswers": [
+          "B"
+        ],
+        "answerCreditType": "standard",
+        "answer_fallback_is_official": true,
+        "displayAnswerLabel": "B"
+      },
+      "originalCropSha256": "97de4a40e1a9483f9245f1e1c296c013a49e8dcd02052d7e56d1d97c5ddeb69d",
+      "flags": [],
+      "original_required": false,
+      "officialScope": "解剖學、微生物與免疫學、病理學"
+    },
+    {
+      "id": "MOEX-C217-094042-S4001-STAGE1-Q053",
+      "sourceId": "MOEX-094042-4217-Q053",
+      "sourceStemSha256": "40fe4c6dd9090af2f33a3c3d566f0c88fa206003f1e9bebfa8a8ef5fd0e61e42",
+      "options": {
+        "A": "Kernig’s sign",
+        "B": "Romaña’s sign",
+        "C": "Kerandel’s sign",
+        "D": "Winterbottom’s sign"
+      },
+      "score": {
+        "answer": "B",
+        "acceptedAnswers": [
+          "B"
+        ],
+        "answerCreditType": "standard",
+        "answer_fallback_is_official": true,
+        "displayAnswerLabel": "B"
+      },
+      "originalCropSha256": "7dd66f3823cb881fd94d044ba40a9a4ea490d88ca02132eb442b5b1596c2894a",
+      "flags": [],
+      "original_required": false,
+      "officialScope": "解剖學、微生物與免疫學、病理學"
+    },
+    {
+      "id": "MOEX-C217-094042-S4001-STAGE1-Q054",
+      "sourceId": "MOEX-094042-4217-Q054",
+      "sourceStemSha256": "5e04703b378f82b5737a0a12d222fc25edafb31716cd4a63eb9fd155c47a2ccf",
+      "options": {
+        "A": "有鉤絛蟲",
+        "B": "無鉤絛蟲",
+        "C": "縮小包膜絛蟲",
+        "D": "包生絛蟲"
+      },
+      "score": {
+        "answer": "A",
+        "acceptedAnswers": [
+          "A"
+        ],
+        "answerCreditType": "standard",
+        "answer_fallback_is_official": true,
+        "displayAnswerLabel": "A"
+      },
+      "originalCropSha256": "c59ced35e717aaafd4465b7e5955d3a4f07e1734bcc678a2319bd2f13287b111",
+      "flags": [],
+      "original_required": false,
+      "officialScope": "解剖學、微生物與免疫學、病理學"
+    },
+    {
+      "id": "MOEX-C217-094042-S4001-STAGE1-Q055",
+      "sourceId": "MOEX-094042-4217-Q055",
+      "sourceStemSha256": "d4c5832ef5343a46d48aa780a9c37280657fa7df4e9b982848a50850d5113ab3",
+      "options": {
+        "A": "飯前洗手",
+        "B": "不赤腳行走玩耍",
+        "C": "食物煮熟再吃",
+        "D": "上廁所後洗手"
+      },
+      "score": {
+        "answer": "B",
+        "acceptedAnswers": [
+          "B"
+        ],
+        "answerCreditType": "standard",
+        "answer_fallback_is_official": true,
+        "displayAnswerLabel": "B"
+      },
+      "originalCropSha256": "f7f9bb0876394ba203f9538fc93bfdc6557b5986244123c1c9bff1e023deea54",
+      "flags": [],
+      "original_required": false,
+      "officialScope": "解剖學、微生物與免疫學、病理學"
+    },
+    {
+      "id": "MOEX-C217-094042-S4001-STAGE1-Q056",
+      "sourceId": "MOEX-094042-4217-Q056",
+      "sourceStemSha256": "fa52a873e81b41f9876908d2dace4d14843f6eede69a5202f8e10b56e47b4cda",
+      "options": {
+        "A": "皮下切片（skin snip）於生理食鹽水中鏡檢微絲蟲（microfilariae）",
+        "B": "白天採血檢查微絲蟲",
+        "C": "夜間採血檢查微絲蟲",
+        "D": "根據臨床症狀"
+      },
+      "score": {
+        "answer": "A",
+        "acceptedAnswers": [
+          "A"
+        ],
+        "answerCreditType": "standard",
+        "answer_fallback_is_official": true,
+        "displayAnswerLabel": "A"
+      },
+      "originalCropSha256": "4734c5cce679f22787421ff1081535999b250a9ad743ca41c1f31eafd59ad2a1",
+      "flags": [],
+      "original_required": false,
+      "officialScope": "解剖學、微生物與免疫學、病理學"
+    },
+    {
+      "id": "MOEX-C217-094042-S4001-STAGE1-Q057",
+      "sourceId": "MOEX-094042-4217-Q057",
+      "sourceStemSha256": "70da6a4e863a3b2ae192ea6647bef4e5c0f1dce34c63d8acb0f47e5d73479771",
+      "options": {
+        "A": "Transitional cell carcinoma",
+        "B": "Adenocarcinoma",
+        "C": "Squamous cell carcinoma",
+        "D": "Adenoid cystic carcinoma"
+      },
+      "score": {
+        "answer": "B",
+        "acceptedAnswers": [
+          "B"
+        ],
+        "answerCreditType": "standard",
+        "answer_fallback_is_official": true,
+        "displayAnswerLabel": "B"
+      },
+      "originalCropSha256": "1fd55c7c7b46d09d84918f606c3614a685687638eb33def0a9ec21d69f719ff7",
+      "flags": [],
+      "original_required": false,
+      "officialScope": "解剖學、微生物與免疫學、病理學"
+    },
+    {
+      "id": "MOEX-C217-094042-S4001-STAGE1-Q058",
+      "sourceId": "MOEX-094042-4217-Q058",
+      "sourceStemSha256": "07fc9c03d0e2f55c95abaee2976f13b3a41993a1dad5e33d9d4f9dd7487128e2",
+      "options": {
+        "A": "precursor B-cell acute lymphoblastic leukemia（ALL）",
+        "B": "precursor T-cell ALL",
+        "C": "acute myeloblastic leukemia",
+        "D": "acute monoblastic leukemia"
+      },
+      "score": {
+        "answer": "B",
+        "acceptedAnswers": [
+          "B"
+        ],
+        "answerCreditType": "standard",
+        "answer_fallback_is_official": true,
+        "displayAnswerLabel": "B"
+      },
+      "originalCropSha256": "37b5add2f32037010a56dfa90de7f19a738680940176c8ad1161a42e9f0f9dfc",
+      "flags": [],
+      "original_required": false,
+      "officialScope": "解剖學、微生物與免疫學、病理學"
+    },
+    {
+      "id": "MOEX-C217-094042-S4001-STAGE1-Q059",
+      "sourceId": "MOEX-094042-4217-Q059",
+      "sourceStemSha256": "2b6cafd708912a5ef34214e9189f93aeb7622fabd28e3b4c8166946b1ad0e687",
+      "options": {
+        "A": "息肉",
+        "B": "反轉性乳頭瘤",
+        "C": "乳頭瘤",
+        "D": "結核結節"
+      },
+      "score": {
+        "answer": "A",
+        "acceptedAnswers": [
+          "A"
+        ],
+        "answerCreditType": "standard",
+        "answer_fallback_is_official": true,
+        "displayAnswerLabel": "A"
+      },
+      "originalCropSha256": "d223f72449f00d196f152f0de2cbd61fd6f73c6656543daac2bcb6055e98dd5b",
+      "flags": [],
+      "original_required": false,
+      "officialScope": "解剖學、微生物與免疫學、病理學"
+    },
+    {
+      "id": "MOEX-C217-094042-S4001-STAGE1-Q060",
+      "sourceId": "MOEX-094042-4217-Q060",
+      "sourceStemSha256": "9c9cf5573be0c2b53c8eab6a86951d34c69b6ac24806178b4ec670e192676889",
+      "options": {
+        "A": "1",
+        "B": "3",
+        "C": "5",
+        "D": "7"
+      },
+      "score": {
+        "answer": "A",
+        "acceptedAnswers": [
+          "A"
+        ],
+        "answerCreditType": "standard",
+        "answer_fallback_is_official": true,
+        "displayAnswerLabel": "A"
+      },
+      "originalCropSha256": "979aefad565fe19bcc90b163ec1679f0d8970f26fb9440c712443b48e6c4550e",
+      "flags": [],
+      "original_required": false,
+      "officialScope": "解剖學、微生物與免疫學、病理學"
+    },
+    {
+      "id": "MOEX-C217-094042-S4001-STAGE1-Q061",
+      "sourceId": "MOEX-094042-4217-Q061",
+      "sourceStemSha256": "e696e8310e58cbe3b59ff674df676dbdcd9e89cfa7a58b0ca56eef01797d23a4",
+      "options": {
+        "A": "近端",
+        "B": "中端",
+        "C": "遠端",
+        "D": "平均分布在以上之各部位"
+      },
+      "score": {
+        "answer": "C",
+        "acceptedAnswers": [
+          "C"
+        ],
+        "answerCreditType": "standard",
+        "answer_fallback_is_official": true,
+        "displayAnswerLabel": "C"
+      },
+      "originalCropSha256": "36bd210254e30f5a2792c9c81bcc6bfbd0a2bdb022ee62f6d939af2e43a29c7d",
+      "flags": [],
+      "original_required": false,
+      "officialScope": "解剖學、微生物與免疫學、病理學"
+    },
+    {
+      "id": "MOEX-C217-094042-S4001-STAGE1-Q062",
+      "sourceId": "MOEX-094042-4217-Q062",
+      "sourceStemSha256": "e61dfb2f481807821d6e250587bfb6e91e6f3b47af0cbff35af3f794fccade17",
+      "options": {
+        "A": "又稱胸腺淋巴濾泡增生",
+        "B": "增生細胞以T 細胞為主",
+        "C": "最常見於重症肌無力的病人",
+        "D": "可合併胸腺瘤"
+      },
+      "score": {
+        "answer": "B",
+        "acceptedAnswers": [
+          "B"
+        ],
+        "answerCreditType": "standard",
+        "answer_fallback_is_official": true,
+        "displayAnswerLabel": "B"
+      },
+      "originalCropSha256": "88802c4192a5bd749add29af873065f92b9dc3628d674b0ba13d330029563d13",
+      "flags": [],
+      "original_required": false,
+      "officialScope": "解剖學、微生物與免疫學、病理學"
+    },
+    {
+      "id": "MOEX-C217-094042-S4001-STAGE1-Q063",
+      "sourceId": "MOEX-094042-4217-Q063",
+      "sourceStemSha256": "41edabc6cdc4fcc7c9145f8569c0c677dda08c387f684483b6ca647413364fa1",
+      "options": {
+        "A": "K-ras",
+        "B": "p53",
+        "C": "APC",
+        "D": "β-catenin"
+      },
+      "score": {
+        "answer": "C",
+        "acceptedAnswers": [
+          "C"
+        ],
+        "answerCreditType": "standard",
+        "answer_fallback_is_official": true,
+        "displayAnswerLabel": "C"
+      },
+      "originalCropSha256": "f1b54016f5f0c2cab519acacc7f8492c7eef712b07156fd618302b3c54faf343",
+      "flags": [],
+      "original_required": false,
+      "officialScope": "解剖學、微生物與免疫學、病理學"
+    },
+    {
+      "id": "MOEX-C217-094042-S4001-STAGE1-Q064",
+      "sourceId": "MOEX-094042-4217-Q064",
+      "sourceStemSha256": "91f27c5f8e131f4817b44e0f4f08a8250d45d82b54f9395eebace1de2205b71b",
+      "options": {
+        "A": "Follicular carcinoma",
+        "B": "Papillary carcinoma",
+        "C": "Hürthle cell carcinoma",
+        "D": "Medullary carcinoma"
+      },
+      "score": {
+        "answer": "B",
+        "acceptedAnswers": [
+          "B"
+        ],
+        "answerCreditType": "standard",
+        "answer_fallback_is_official": true,
+        "displayAnswerLabel": "B"
+      },
+      "originalCropSha256": "b801394d860c091d49e998daddd3133d1421f892953935cc8fe2b25c4777a075",
+      "flags": [],
+      "original_required": false,
+      "officialScope": "解剖學、微生物與免疫學、病理學"
+    },
+    {
+      "id": "MOEX-C217-094042-S4001-STAGE1-Q065",
+      "sourceId": "MOEX-094042-4217-Q065",
+      "sourceStemSha256": "03ae9cfae4a5bdb9900011c087a14bec7859aae107e209c5daff703552e87d86",
+      "options": {
+        "A": "46XY",
+        "B": "46XX",
+        "C": "46XO",
+        "D": "Triploidy"
+      },
+      "score": {
+        "answer": "D",
+        "acceptedAnswers": [
+          "D"
+        ],
+        "answerCreditType": "standard",
+        "answer_fallback_is_official": true,
+        "displayAnswerLabel": "D"
+      },
+      "originalCropSha256": "be876c7a46852aa7d0c93a4e7b73a85d9e86a18a57c54319b9a82e78c778ef4e",
+      "flags": [],
+      "original_required": false,
+      "officialScope": "解剖學、微生物與免疫學、病理學"
+    },
+    {
+      "id": "MOEX-C217-094042-S4001-STAGE1-Q066",
+      "sourceId": "MOEX-094042-4217-Q066",
+      "sourceStemSha256": "de52f30183a9232a9097f0d72a160e824f6d3a654c244772f8ed05f123beedbc",
+      "options": {
+        "A": "17β-estradiol",
+        "B": "Prostaglandin",
+        "C": "Dihydrotestosterone",
+        "D": "Aldosterone"
+      },
+      "score": {
+        "answer": "C",
+        "acceptedAnswers": [
+          "C"
+        ],
+        "answerCreditType": "standard",
+        "answer_fallback_is_official": true,
+        "displayAnswerLabel": "C"
+      },
+      "originalCropSha256": "8f055317c60fafb06655bad3f1cea3b1b943309ab8e67bc695a175924ccb4b5b",
+      "flags": [],
+      "original_required": false,
+      "officialScope": "解剖學、微生物與免疫學、病理學"
+    },
+    {
+      "id": "MOEX-C217-094042-S4001-STAGE1-Q067",
+      "sourceId": "MOEX-094042-4217-Q067",
+      "sourceStemSha256": "0a45bff6f33d087736723ec779eb67e14897f6132b26c878b2e0a9239f2a8efe",
+      "options": {
+        "A": "膽紅素",
+        "B": "一氧化碳",
+        "C": "甲醇",
+        "D": "乙醇"
+      },
+      "score": {
+        "answer": "B",
+        "acceptedAnswers": [
+          "B"
+        ],
+        "answerCreditType": "standard",
+        "answer_fallback_is_official": true,
+        "displayAnswerLabel": "B"
+      },
+      "originalCropSha256": "5af843c80552bf8c3dada761cc118c5696e2d756832aa80d3cb1da52112a943f",
+      "flags": [],
+      "original_required": false,
+      "officialScope": "解剖學、微生物與免疫學、病理學"
+    },
+    {
+      "id": "MOEX-C217-094042-S4001-STAGE1-Q068",
+      "sourceId": "MOEX-094042-4217-Q068",
+      "sourceStemSha256": "b230ad3463186ae0bf1d3234f8d888568670c7a420487391e0bcfa53ccca3880",
+      "options": {
+        "A": "spinal muscular atrophy",
+        "B": "denervation atrophy",
+        "C": "Duchenne muscular dystrophy",
+        "D": "Becker muscular dystrophy"
+      },
+      "score": {
+        "answer": "B",
+        "acceptedAnswers": [
+          "B"
+        ],
+        "answerCreditType": "standard",
+        "answer_fallback_is_official": true,
+        "displayAnswerLabel": "B"
+      },
+      "originalCropSha256": "ba5c7461a60d98cc18adecc223fba64d87407389ab3383c29d73e94d572c1ee5",
+      "flags": [],
+      "original_required": false,
+      "officialScope": "解剖學、微生物與免疫學、病理學"
+    },
+    {
+      "id": "MOEX-C217-094042-S4001-STAGE1-Q069",
+      "sourceId": "MOEX-094042-4217-Q069",
+      "sourceStemSha256": "aaf73420170c78ebc282a809f2937cfb680f27c213166cc3852de9b76d0667d8",
+      "options": {
+        "A": "檳榔是直接致癌物（direct-acting carcinogen）",
+        "B": "cytochrome P-450-dependent mono-oxygenase 和化學性致癌無關",
+        "C": "大部分化療藥物（anticancer drug）是屬於前致癌物（procarcinogen）",
+        "D": "大部分化學致癌物是前致癌物（procarcinogen）"
+      },
+      "score": {
+        "answer": "D",
+        "acceptedAnswers": [
+          "D"
+        ],
+        "answerCreditType": "standard",
+        "answer_fallback_is_official": true,
+        "displayAnswerLabel": "D"
+      },
+      "originalCropSha256": "fa872cad785df6897242049d267ae39c33a320f2a1c55417943758556e139ed7",
+      "flags": [],
+      "original_required": false,
+      "officialScope": "解剖學、微生物與免疫學、病理學"
+    },
+    {
+      "id": "MOEX-C217-094042-S4001-STAGE1-Q070",
+      "sourceId": "MOEX-094042-4217-Q070",
+      "sourceStemSha256": "c864459e63fd881eb6d1e96a9ae314c7f1071755e6847a1a9606ce5d7a45fd23",
+      "options": {
+        "A": "卵巢癌（ovarian cancer）",
+        "B": "前列腺癌（prostate cancer）",
+        "C": "肝癌（liver cancer）",
+        "D": "肺癌（lung cancer）"
+      },
+      "score": {
+        "answer": "A",
+        "acceptedAnswers": [
+          "A"
+        ],
+        "answerCreditType": "standard",
+        "answer_fallback_is_official": true,
+        "displayAnswerLabel": "A"
+      },
+      "originalCropSha256": "fcaa5c5f65e2c1e153cc58f7bd28cf8e0322cec63d430becf001ab214b1aaab3",
+      "flags": [],
+      "original_required": false,
+      "officialScope": "解剖學、微生物與免疫學、病理學"
+    },
+    {
+      "id": "MOEX-C217-094042-S4001-STAGE1-Q071",
+      "sourceId": "MOEX-094042-4217-Q071",
+      "sourceStemSha256": "5b3d1f9dbaa241288380d89446069b9a325066db9995fad726b3da15471ec5c4",
+      "options": {
+        "A": "血栓栓塞",
+        "B": "感染性心內膜炎",
+        "C": "急性風濕熱",
+        "D": "病毒性心肌炎"
+      },
+      "score": {
+        "answer": "B",
+        "acceptedAnswers": [
+          "B"
+        ],
+        "answerCreditType": "standard",
+        "answer_fallback_is_official": true,
+        "displayAnswerLabel": "B"
+      },
+      "originalCropSha256": "41533493a51dbd85ed0a2f7c96d3b3604715aba90a080499832a98fe0f214cfb",
+      "flags": [],
+      "original_required": false,
+      "officialScope": "解剖學、微生物與免疫學、病理學"
+    },
+    {
+      "id": "MOEX-C217-094042-S4001-STAGE1-Q072",
+      "sourceId": "MOEX-094042-4217-Q072",
+      "sourceStemSha256": "3568e5e349c901a78c62931e4be5ac7b5fba14520716f0a586d9d2f65f374e05",
+      "options": {
+        "A": "Ⅰ",
+        "B": "Ⅱ",
+        "C": "Ⅲ",
+        "D": "Ⅳ"
+      },
+      "score": {
+        "answer": "D",
+        "acceptedAnswers": [
+          "D"
+        ],
+        "answerCreditType": "standard",
+        "answer_fallback_is_official": true,
+        "displayAnswerLabel": "D"
+      },
+      "originalCropSha256": "1fd0881e9c3b7ea3d9d53939519d0a553aaa8a9b044ac1b848f9b2ddcb02136f",
+      "flags": [],
+      "original_required": false,
+      "officialScope": "解剖學、微生物與免疫學、病理學"
+    },
+    {
+      "id": "MOEX-C217-094042-S4001-STAGE1-Q073",
+      "sourceId": "MOEX-094042-4217-Q073",
+      "sourceStemSha256": "1fffd75adcb95c5d13c53df7a2d0bed4586833e3d6adc3ea568daa2b579e1b0c",
+      "options": {
+        "A": "F6FR3",
+        "B": "TEL1",
+        "C": "TAL1",
+        "D": "BCL2"
+      },
+      "score": {
+        "answer": "D",
+        "acceptedAnswers": [
+          "D"
+        ],
+        "answerCreditType": "standard",
+        "answer_fallback_is_official": true,
+        "displayAnswerLabel": "D"
+      },
+      "originalCropSha256": "cd2e2541d1b6bf05f96363a1f3db0dcab9bbe2d4a73dcc41511f783abf7f1936",
+      "flags": [],
+      "original_required": false,
+      "officialScope": "解剖學、微生物與免疫學、病理學"
+    },
+    {
+      "id": "MOEX-C217-094042-S4001-STAGE1-Q074",
+      "sourceId": "MOEX-094042-4217-Q074",
+      "sourceStemSha256": "1d5584bd3f28483e0d86713b17c7e2727f6d488a299fb04d808c21374520b1a4",
+      "options": {
+        "A": "上皮細胞（Epithelial cell）",
+        "B": "內皮細胞（Endothelial cell）",
+        "C": "膈細胞（Mesangial cell）",
+        "D": "纖維母細胞（Fibroblast）"
+      },
+      "score": {
+        "answer": "B",
+        "acceptedAnswers": [
+          "B"
+        ],
+        "answerCreditType": "standard",
+        "answer_fallback_is_official": true,
+        "displayAnswerLabel": "B"
+      },
+      "originalCropSha256": "b78a859bce760d1c55b7d301be7bc24eadfe8c4516079ea6608fd18db5c6d555",
+      "flags": [],
+      "original_required": false,
+      "officialScope": "解剖學、微生物與免疫學、病理學"
+    },
+    {
+      "id": "MOEX-C217-094042-S4001-STAGE1-Q075",
+      "sourceId": "MOEX-094042-4217-Q075",
+      "sourceStemSha256": "5cf9945d84422421c065b53e9d702019dd82d90b11bafdc6b2d099193c4a92cb",
+      "options": {
+        "A": "腋窩部",
+        "B": "鼠蹊部",
+        "C": "腹部",
+        "D": "縱膈腔"
+      },
+      "score": {
+        "answer": "D",
+        "acceptedAnswers": [
+          "D"
+        ],
+        "answerCreditType": "standard",
+        "answer_fallback_is_official": true,
+        "displayAnswerLabel": "D"
+      },
+      "originalCropSha256": "e785d84f6db08095523ce558c3dfaa6c930b401a9039e61bf6617a83cf27b83f",
+      "flags": [],
+      "original_required": false,
+      "officialScope": "解剖學、微生物與免疫學、病理學"
+    },
+    {
+      "id": "MOEX-C217-094042-S4001-STAGE1-Q076",
+      "sourceId": "MOEX-094042-4217-Q076",
+      "sourceStemSha256": "239016e8fcfaf541605ed102de1033c11fbbcb613297f431f5dd04e78de56cf3",
+      "options": {
+        "A": "absence of neutrophil-specific granules",
+        "B": "defect in chemotaxis",
+        "C": "defect in adhesion",
+        "D": "defect in phagocytosis and microbicidal activity"
+      },
+      "score": {
+        "answer": "A",
+        "acceptedAnswers": [
+          "A"
+        ],
+        "answerCreditType": "standard",
+        "answer_fallback_is_official": true,
+        "displayAnswerLabel": "A"
+      },
+      "originalCropSha256": "59b1b0ae36572399b5738b3b8d3370e1d3fb5c1363488c8cd0083c2c3645e2e7",
+      "flags": [],
+      "original_required": false,
+      "officialScope": "解剖學、微生物與免疫學、病理學"
+    },
+    {
+      "id": "MOEX-C217-094042-S4001-STAGE1-Q077",
+      "sourceId": "MOEX-094042-4217-Q077",
+      "sourceStemSha256": "6ccb3f06e13660febe13bf67288aa9a62d9401ded0be3e2772e09602dcb5e3e7",
+      "options": {
+        "A": "感染的傷口，修復再生的過程也增長",
+        "B": "營養狀況良好，傷口癒合則快",
+        "C": "年齡越小其傷口癒合越快",
+        "D": "腎上腺皮質素可促使傷口癒合增快"
+      },
+      "score": {
+        "answer": "D",
+        "acceptedAnswers": [
+          "D"
+        ],
+        "answerCreditType": "standard",
+        "answer_fallback_is_official": true,
+        "displayAnswerLabel": "D"
+      },
+      "originalCropSha256": "ab7a4b64db7fee1da9b23c4b89a103b2072ec4f58117c421f89dc854eb8062ec",
+      "flags": [],
+      "original_required": false,
+      "officialScope": "解剖學、微生物與免疫學、病理學"
+    },
+    {
+      "id": "MOEX-C217-094042-S4001-STAGE1-Q078",
+      "sourceId": "MOEX-094042-4217-Q078",
+      "sourceStemSha256": "8251eb271cda52b6418c8b41c8ef692fdac94e7374d3768add2e7fe3910e01b1",
+      "options": {
+        "A": "右前方",
+        "B": "左前方",
+        "C": "右後方",
+        "D": "左後方"
+      },
+      "score": {
+        "answer": "A",
+        "acceptedAnswers": [
+          "A"
+        ],
+        "answerCreditType": "standard",
+        "answer_fallback_is_official": true,
+        "displayAnswerLabel": "A"
+      },
+      "originalCropSha256": "abec82df0db0b54d69dd1e5eaa2111eda12f65215df5d4f83be318b6df52c330",
+      "flags": [],
+      "original_required": false,
+      "officialScope": "解剖學、微生物與免疫學、病理學"
+    },
+    {
+      "id": "MOEX-C217-094042-S4001-STAGE1-Q079",
+      "sourceId": "MOEX-094042-4217-Q079",
+      "sourceStemSha256": "1fa5130083b6309ba3200d9030ebe2dbdd374950be42dcaf40a50ade5c230d07",
+      "options": {
+        "A": "主動脈狹窄（coarctation of aorta）",
+        "B": "嗜鉻細胞瘤（pheochromocytoma）",
+        "C": "極輕微變化腎病症候群（minimal change nephrotic syndrome）",
+        "D": "Graves 氏病（Graves’ disease）"
+      },
+      "score": {
+        "answer": "C",
+        "acceptedAnswers": [
+          "C"
+        ],
+        "answerCreditType": "standard",
+        "answer_fallback_is_official": true,
+        "displayAnswerLabel": "C"
+      },
+      "originalCropSha256": "a9ec145ad20a2b564c76b8e312f61e8390b34762cd17f4863f2788d0dbc84e3e",
+      "flags": [],
+      "original_required": false,
+      "officialScope": "解剖學、微生物與免疫學、病理學"
+    },
+    {
+      "id": "MOEX-C217-094042-S4001-STAGE1-Q080",
+      "sourceId": "MOEX-094042-4217-Q080",
+      "sourceStemSha256": "280178299033b52f06c021b53a458d5fb8142ff9c3bda8d3b3fefb4e82637d05",
+      "options": {
+        "A": "褐色硬結（brown induration）",
+        "B": "紅色肝變（red hepatization）",
+        "C": "灰色肝變（gray hepatization）",
+        "D": "黃色萎縮（yellow atrophy）"
+      },
+      "score": {
+        "answer": "A",
+        "acceptedAnswers": [
+          "A"
+        ],
+        "answerCreditType": "standard",
+        "answer_fallback_is_official": true,
+        "displayAnswerLabel": "A"
+      },
+      "originalCropSha256": "0194a48064f7ccad6a68de72ed72944e4b9779501210586b6e2b41f36bd53e28",
+      "flags": [],
+      "original_required": false,
+      "officialScope": "解剖學、微生物與免疫學、病理學"
+    },
+    {
+      "id": "MOEX-C217-094042-S5001-STAGE1-Q001",
+      "sourceId": "MOEX-094042-5217-Q001",
+      "sourceStemSha256": "143ea82cff8dc04c42e127a7f53d97b80fea63d8c7fc063058736923030bc562",
+      "options": {
+        "A": "前者在一開始幾秒鐘的收縮時，依靠磷酸肌酸當作 ATP 的來源，而後者則否",
+        "B": "前者的直徑較後者為小",
+        "C": "前者可以產生較後者更大的張力",
+        "D": "前者比後者產生較少的乳酸"
+      },
+      "score": {
+        "answer": "C",
+        "acceptedAnswers": [
+          "C"
+        ],
+        "answerCreditType": "standard",
+        "answer_fallback_is_official": true,
+        "displayAnswerLabel": "C"
+      },
+      "originalCropSha256": "86ae6f2c7ebca251db8076a55c6024ac543c163dcc379b1f5c42ac00a90b6199",
+      "flags": [],
+      "original_required": true,
+      "officialScope": "生理學、生物化學、藥理學及公共衛生學"
+    },
+    {
+      "id": "MOEX-C217-094042-S5001-STAGE1-Q002",
+      "sourceId": "MOEX-094042-5217-Q002",
+      "sourceStemSha256": "3b9312da925aaa1d7da7858c8a1ce5818c4cae9751da2d6dcfb4728cbd65042c",
+      "options": {
+        "A": "在拉張反射（ stretch reflex）時，梭肌（muscle spindle）所產生的張力會減弱",
+        "B": "每一次等長收縮的起始與結束均為等張收縮反應",
+        "C": "每一次的肌肉收縮，肌肉長度 都會改變",
+        "D": "每一次的肌肉收縮，肌肉皆會產生張力"
+      },
+      "score": {
+        "answer": "D",
+        "acceptedAnswers": [
+          "D"
+        ],
+        "answerCreditType": "standard",
+        "answer_fallback_is_official": true,
+        "displayAnswerLabel": "D"
+      },
+      "originalCropSha256": "4962fda6b141baec848cd3a1ae24eea77e0a879f7a13c8571ddba86f2a3f4ac4",
+      "flags": [],
+      "original_required": true,
+      "officialScope": "生理學、生物化學、藥理學及公共衛生學"
+    },
+    {
+      "id": "MOEX-C217-094042-S5001-STAGE1-Q003",
+      "sourceId": "MOEX-094042-5217-Q003",
+      "sourceStemSha256": "df58f484c51b0a0aea43bb72778f9326d334ce1abfc970f82c832530fe2defda",
+      "options": {
+        "A": "胰凝乳蛋白 酶 （ chymotrypsin）",
+        "B": "脂肪 酶 （ lipase）",
+        "C": "胃蛋白 酶 （ pepsin）",
+        "D": "蔗糖 酶 （ sucrase）"
+      },
+      "score": {
+        "answer": "A",
+        "acceptedAnswers": [
+          "A"
+        ],
+        "answerCreditType": "standard",
+        "answer_fallback_is_official": true,
+        "displayAnswerLabel": "A"
+      },
+      "originalCropSha256": "f265b200c0bc4d46d5561cbeb9b92aae75e94adab1e1c45c2031b1ef665275b7",
+      "flags": [],
+      "original_required": true,
+      "officialScope": "生理學、生物化學、藥理學及公共衛生學"
+    },
+    {
+      "id": "MOEX-C217-094042-S5001-STAGE1-Q004",
+      "sourceId": "MOEX-094042-5217-Q004",
+      "sourceStemSha256": "da14a5a368ea474b0918155e8adc433361cd4d878826036550e2e4d3966667be",
+      "options": {
+        "A": "鉀離子孔道（ K channels）通透性（conductance）突然減少時的膜電位",
+        "B": "鈉離子孔道（ Na channels）通透性突然增大時的膜電位",
+        "C": "流經鉀離子孔道向外之電流（outward K current）等於流經鈉離子孔道向內之電流（inward Na current） 時的膜電位",
+        "D": "流經鉀離子孔道向外之電流不等於流經鈉離子孔道向內之電流時的膜電位"
+      },
+      "score": {
+        "answer": "C",
+        "acceptedAnswers": [
+          "C"
+        ],
+        "answerCreditType": "standard",
+        "answer_fallback_is_official": true,
+        "displayAnswerLabel": "C"
+      },
+      "originalCropSha256": "aafcb1847b35f22cb24694fa75793497fb039524e36988831dd84004a0eb0b05",
+      "flags": [],
+      "original_required": true,
+      "officialScope": "生理學、生物化學、藥理學及公共衛生學"
+    },
+    {
+      "id": "MOEX-C217-094042-S5001-STAGE1-Q005",
+      "sourceId": "MOEX-094042-5217-Q005",
+      "sourceStemSha256": "150329d91ea0bf6c4bf30b55c490addf0988dfdee3b3f902627a1b8b0ca19216",
+      "options": {
+        "A": "Voltage-gated sodium channels 之inactivation",
+        "B": "Voltage-gated potassium channels 之inactivation",
+        "C": "此時期細胞膜對鉀離子通透度高於靜止狀態（ resting state）時期",
+        "D": "此時期細胞膜對鈉離子通透度高於靜止狀態時期"
+      },
+      "score": {
+        "answer": "C",
+        "acceptedAnswers": [
+          "C"
+        ],
+        "answerCreditType": "standard",
+        "answer_fallback_is_official": true,
+        "displayAnswerLabel": "C"
+      },
+      "originalCropSha256": "e1a2a31addacd50a2d953de948f5f5118d70b493039060ff44ac636e5e30d8bd",
+      "flags": [],
+      "original_required": true,
+      "officialScope": "生理學、生物化學、藥理學及公共衛生學"
+    },
+    {
+      "id": "MOEX-C217-094042-S5001-STAGE1-Q006",
+      "sourceId": "MOEX-094042-5217-Q006",
+      "sourceStemSha256": "1347323275d10c74881b998896c699ac81b180674e122213da460717f1def370",
+      "options": {
+        "A": "是化學性傳遞物質可活化 guanylate cyclase",
+        "B": "由 L-asparagine 與氧分子作用形成",
+        "C": "可導致血管壁舒張（ dilation of blood vessels）",
+        "D": "是極不安定且帶有電荷之氣體分子"
+      },
+      "score": {
+        "answer": "B",
+        "acceptedAnswers": [
+          "B"
+        ],
+        "answerCreditType": "standard",
+        "answer_fallback_is_official": true,
+        "displayAnswerLabel": "B"
+      },
+      "originalCropSha256": "d02de354277dff38917639315a4dba8ec81dac70fac9aa14d98d4d059e45d614",
+      "flags": [],
+      "original_required": true,
+      "officialScope": "生理學、生物化學、藥理學及公共衛生學"
+    },
+    {
+      "id": "MOEX-C217-094042-S5001-STAGE1-Q007",
+      "sourceId": "MOEX-094042-5217-Q007",
+      "sourceStemSha256": "77b2fdea64a082d5598cc8fc87dfb253f56715922b71abd429bdc6e2b868b22c",
+      "options": {
+        "A": "由 red nucleus 投射至spinal cord 的rubrospinal tract 與軀幹姿態維持有關",
+        "B": "由 medullary reticular formation 投射至spinal cord 的reticulospinal tract 與手指精細動作有關",
+        "C": "由 pontine reticular formation 投射至spinal cord 的reticulospinal tract 與強化維持身體對抗重力之姿 勢（例如站立）有關",
+        "D": "由 vestibular nuclei 投射至spinal cord 的vestibulospinal tract 與調節心血管功能有關"
+      },
+      "score": {
+        "answer": "C",
+        "acceptedAnswers": [
+          "C"
+        ],
+        "answerCreditType": "standard",
+        "answer_fallback_is_official": true,
+        "displayAnswerLabel": "C"
+      },
+      "originalCropSha256": "2bae14de6e9615ead237906e69674c620ad2937a26718173550b78453aa70ba0",
+      "flags": [],
+      "original_required": true,
+      "officialScope": "生理學、生物化學、藥理學及公共衛生學"
+    },
+    {
+      "id": "MOEX-C217-094042-S5001-STAGE1-Q008",
+      "sourceId": "MOEX-094042-5217-Q008",
+      "sourceStemSha256": "6c222b2ff11d9e5d57918d3551b9f8d7f4919ec07e241e13aaf0089c5981dee2",
+      "options": {
+        "A": "動作電位（ action potential）之傳導速度在A fiber 比A fiber 慢",
+        "B": "動作電位是一種 graded potential",
+        "C": "只有可興奮細胞（ excitable cells）具有膜電位",
+        "D": "Dendrites 不具有產生動作電位的能力"
+      },
+      "score": {
+        "answer": "D",
+        "acceptedAnswers": [
+          "D"
+        ],
+        "answerCreditType": "standard",
+        "answer_fallback_is_official": true,
+        "displayAnswerLabel": "D"
+      },
+      "originalCropSha256": "a36488e1f677dff63c6d39290ad8ded807e37001451ea942e27ba6c75ddf6dee",
+      "flags": [
+        {
+          "field": "options_extracted.A",
+          "span": "two A fiber indices/symbol slots",
+          "reason": "Actual local original Q2 at4x MuPDF and independent Poppler rendering both show A fiber versus A fiber with blank index positions; source does not visibly resolve intended subtype symbols. Do not invent alpha/delta/etc from physiology.",
+          "source_literal_verified": false,
+          "required_display": "original source image; blank slots not guessed"
+        }
+      ],
+      "original_required": true,
+      "officialScope": "生理學、生物化學、藥理學及公共衛生學"
+    },
+    {
+      "id": "MOEX-C217-094042-S5001-STAGE1-Q009",
+      "sourceId": "MOEX-094042-5217-Q009",
+      "sourceStemSha256": "d67599660e51c5a523bbb4492083a4fcd8fa3cbb817a55cfa06fa7f39612b968",
+      "options": {
+        "A": "Astrocytes 可調節神經組織之胞外鉀離子濃度",
+        "B": "在中樞神經系 統oligodendroglia 之細胞膜包裹axon，形成myelin sheath",
+        "C": "Microglia 主要功能為形成blood-brain barrier",
+        "D": "Ependymal cells 在腦室構成epithelium，隔開腦脊髓液與腦組織"
+      },
+      "score": {
+        "answer": "C",
+        "acceptedAnswers": [
+          "C"
+        ],
+        "answerCreditType": "standard",
+        "answer_fallback_is_official": true,
+        "displayAnswerLabel": "C"
+      },
+      "originalCropSha256": "244a4fb30274b2f89cbfe197a2afcbb41fe84d0291704a1397f2a2866227da67",
+      "flags": [],
+      "original_required": true,
+      "officialScope": "生理學、生物化學、藥理學及公共衛生學"
+    },
+    {
+      "id": "MOEX-C217-094042-S5001-STAGE1-Q010",
+      "sourceId": "MOEX-094042-5217-Q010",
+      "sourceStemSha256": "d9435630033d015bd84c9810ffc4c19823cdc7a97412ccfd17fb18fe446ea45d",
+      "options": {
+        "A": "左心室射血所作的功（ work）",
+        "B": "左心室之心搏出量（ stroke volume）",
+        "C": "左心室之收縮力（ contractility）的表徵",
+        "D": "左心室之射血比值（ ejection fraction）"
+      },
+      "score": {
+        "answer": "A",
+        "acceptedAnswers": [
+          "A"
+        ],
+        "answerCreditType": "standard",
+        "answer_fallback_is_official": true,
+        "displayAnswerLabel": "A"
+      },
+      "originalCropSha256": "7103482f435829168577a5a8fb2aa172595397935e3e8f61c1d492ea72d0fd96",
+      "flags": [],
+      "original_required": true,
+      "officialScope": "生理學、生物化學、藥理學及公共衛生學"
+    },
+    {
+      "id": "MOEX-C217-094042-S5001-STAGE1-Q011",
+      "sourceId": "MOEX-094042-5217-Q011",
+      "sourceStemSha256": "271b524c817dfa50716b50dd64487f051b4a19c713414c9d260fb1571cb2d03f",
+      "options": {
+        "A": "抑制維生素 K 的活化",
+        "B": "活化胞漿素（ plasmin）",
+        "C": "活化蛋白質 C（protein C）",
+        "D": "將纖維蛋白原（fibrinogen）切斷成纖維素（fibrin）"
+      },
+      "score": {
+        "answer": "D",
+        "acceptedAnswers": [
+          "D"
+        ],
+        "answerCreditType": "standard",
+        "answer_fallback_is_official": true,
+        "displayAnswerLabel": "D"
+      },
+      "originalCropSha256": "d91c1a6e5f3d363509f257d5a4d35d03ff17b8f089db8bf88e66e899f34168e1",
+      "flags": [],
+      "original_required": true,
+      "officialScope": "生理學、生物化學、藥理學及公共衛生學"
+    },
+    {
+      "id": "MOEX-C217-094042-S5001-STAGE1-Q012",
+      "sourceId": "MOEX-094042-5217-Q012",
+      "sourceStemSha256": "6c2aeff72fa6fb581959b14703cd52babb72e2bbc0d58343d052eb6f86536dff",
+      "options": {
+        "A": "動脈容積度（ compliance）增加",
+        "B": "動脈血量（ blood volume）降低",
+        "C": "動脈脈搏壓（ pulse pressure）增加",
+        "D": "動脈滲透壓（ osmotic pressure）降低"
+      },
+      "score": {
+        "answer": "C",
+        "acceptedAnswers": [
+          "C"
+        ],
+        "answerCreditType": "standard",
+        "answer_fallback_is_official": true,
+        "displayAnswerLabel": "C"
+      },
+      "originalCropSha256": "5df095f4c42fa4163613f7e4baf5fbe0e1d72c5e217d51ca5a5cd2671cf8ec35",
+      "flags": [],
+      "original_required": true,
+      "officialScope": "生理學、生物化學、藥理學及公共衛生學"
+    },
+    {
+      "id": "MOEX-C217-094042-S5001-STAGE1-Q013",
+      "sourceId": "MOEX-094042-5217-Q013",
+      "sourceStemSha256": "e5fe84b729e061f51c1df48b99722926652ae32c1b09275756c56094e6e52344",
+      "options": {
+        "A": "可刺激周邊化學感受器（ peripheral chemoreceptors）",
+        "B": "引發肺通氣量增加",
+        "C": "可刺激頸動脈體（ carotid bodies）與主動脈體（aortic bodies）",
+        "D": "動脈氧分壓只須些微下降，即可造成肺通氣量大量增加"
+      },
+      "score": {
+        "answer": "D",
+        "acceptedAnswers": [
+          "D"
+        ],
+        "answerCreditType": "standard",
+        "answer_fallback_is_official": true,
+        "displayAnswerLabel": "D"
+      },
+      "originalCropSha256": "82fb5bc51c8a04a217b1c054763581c46e2e5f3cd8b569d2b85e9daeafc38097",
+      "flags": [],
+      "original_required": true,
+      "officialScope": "生理學、生物化學、藥理學及公共衛生學"
+    },
+    {
+      "id": "MOEX-C217-094042-S5001-STAGE1-Q014",
+      "sourceId": "MOEX-094042-5217-Q014",
+      "sourceStemSha256": "f1d6744ebf88852aeaa1da79a7a74ecbe7a2dba9bf9ac91f90c6ffb008482965",
+      "options": {
+        "A": "總血漿量增加",
+        "B": "腎小管管腔液的流量增加",
+        "C": "飲食中的鉀離子減少",
+        "D": "急性酸中毒"
+      },
+      "score": {
+        "answer": "B",
+        "acceptedAnswers": [
+          "B"
+        ],
+        "answerCreditType": "standard",
+        "answer_fallback_is_official": true,
+        "displayAnswerLabel": "B"
+      },
+      "originalCropSha256": "bab1d1e10b0107cf2473945d16a652dd0d668c101cfaf59492d9492338c66ba5",
+      "flags": [],
+      "original_required": true,
+      "officialScope": "生理學、生物化學、藥理學及公共衛生學"
+    },
+    {
+      "id": "MOEX-C217-094042-S5001-STAGE1-Q015",
+      "sourceId": "MOEX-094042-5217-Q015",
+      "sourceStemSha256": "cf5619b28c5bfc40d51ad74f321ce010db16c3c3f5fda932d3025561db83d94c",
+      "options": {
+        "A": "藉由刺激腸 內神經系統（enteric nervous system）而產生",
+        "B": "當直腸充滿糞便時，造成胃的活動（ motility）降低",
+        "C": "當胃受到食物的擴張時，大腸的活動（ motility）增加",
+        "D": "藉由運動素（ motilin）的刺激而產生"
+      },
+      "score": {
+        "answer": "C",
+        "acceptedAnswers": [
+          "C"
+        ],
+        "answerCreditType": "standard",
+        "answer_fallback_is_official": true,
+        "displayAnswerLabel": "C"
+      },
+      "originalCropSha256": "112d4c050d311e963c21456bcb47f7a7d3a467a6be528702dc93e59654705a90",
+      "flags": [],
+      "original_required": true,
+      "officialScope": "生理學、生物化學、藥理學及公共衛生學"
+    },
+    {
+      "id": "MOEX-C217-094042-S5001-STAGE1-Q016",
+      "sourceId": "MOEX-094042-5217-Q016",
+      "sourceStemSha256": "db1034fa1c1168a23a3b69328fff59118fe0d79c8f240bb5c8b16724c411a9f7",
+      "options": {
+        "A": "近側曲小管（ proximal convoluted tubule）起始端",
+        "B": "遠側曲小管（ distal convoluted tubule）起始端",
+        "C": "亨利氏彎管的上行枝粗段（ thick ascending limb of Henle’s loop）起始端",
+        "D": "集尿管（ collecting duct）末端"
+      },
+      "score": {
+        "answer": "B",
+        "acceptedAnswers": [
+          "B"
+        ],
+        "answerCreditType": "standard",
+        "answer_fallback_is_official": true,
+        "displayAnswerLabel": "B"
+      },
+      "originalCropSha256": "c598b3aaddb617d4c8165486c5b9304c345a30f94175f437d80a743fe52f68bc",
+      "flags": [],
+      "original_required": true,
+      "officialScope": "生理學、生物化學、藥理學及公共衛生學"
+    },
+    {
+      "id": "MOEX-C217-094042-S5001-STAGE1-Q017",
+      "sourceId": "MOEX-094042-5217-Q017",
+      "sourceStemSha256": "b3b4c3d200d4bd8700c2ecded0a23f64c4c44326c4acbf9cc9ef79d6ac7097ca",
+      "options": {
+        "A": "直接溶解",
+        "B": "與血紅素結合",
+        "C": "與血漿蛋白結合",
+        "D": "形成重碳酸氫根離子"
+      },
+      "score": {
+        "answer": "D",
+        "acceptedAnswers": [
+          "D"
+        ],
+        "answerCreditType": "standard",
+        "answer_fallback_is_official": true,
+        "displayAnswerLabel": "D"
+      },
+      "originalCropSha256": "f939a09fc265d11ac8f6c6a461a3c197e72e57c204214b1b946dba1bb32c2103",
+      "flags": [],
+      "original_required": true,
+      "officialScope": "生理學、生物化學、藥理學及公共衛生學"
+    },
+    {
+      "id": "MOEX-C217-094042-S5001-STAGE1-Q018",
+      "sourceId": "MOEX-094042-5217-Q018",
+      "sourceStemSha256": "0605dfa81f331a7c9617681f68c45fb22992a0f4d047d9de2c36621a815ce3ef",
+      "options": {
+        "A": "吸氣動作（ inspiration movements）",
+        "B": "呼氣動作（ expiration movements）",
+        "C": "支配動脈管之交感神經活性的增加",
+        "D": "支配靜脈管之交感神經活性的降低"
+      },
+      "score": {
+        "answer": "A",
+        "acceptedAnswers": [
+          "A"
+        ],
+        "answerCreditType": "standard",
+        "answer_fallback_is_official": true,
+        "displayAnswerLabel": "A"
+      },
+      "originalCropSha256": "bd4c11e20a678785785974d2606f1dc456d72be8ed654ecf7a6bbd7a8b22a095",
+      "flags": [],
+      "original_required": true,
+      "officialScope": "生理學、生物化學、藥理學及公共衛生學"
+    },
+    {
+      "id": "MOEX-C217-094042-S5001-STAGE1-Q019",
+      "sourceId": "MOEX-094042-5217-Q019",
+      "sourceStemSha256": "b46b437d40bf97e88e3ff49849089708420f78c8b222a1fca7e376c4dc62cd4f",
+      "options": {
+        "A": "降 低心輸出量（cardiac output）",
+        "B": "增加肌肉量（ muscle mass）",
+        "C": "降低脂肪組織量",
+        "D": "降低食物攝取量"
+      },
+      "score": {
+        "answer": "C",
+        "acceptedAnswers": [
+          "C"
+        ],
+        "answerCreditType": "standard",
+        "answer_fallback_is_official": true,
+        "displayAnswerLabel": "C"
+      },
+      "originalCropSha256": "ad5bb6843d8ecfa08db27291b233bb91b91e2df642216b4a8d41d530685a2ca6",
+      "flags": [],
+      "original_required": true,
+      "officialScope": "生理學、生物化學、藥理學及公共衛生學"
+    },
+    {
+      "id": "MOEX-C217-094042-S5001-STAGE1-Q020",
+      "sourceId": "MOEX-094042-5217-Q020",
+      "sourceStemSha256": "a7b6bbbb3ff1a2ef13d06db8e999251cb502e2213645f6bbcef30288a98f12df",
+      "options": {
+        "A": "抑制子宮收縮",
+        "B": "刺激攝護腺素（ prostaglandin）的分泌",
+        "C": "刺激子宮對催產素（oxytocin）的敏感度",
+        "D": "抑制乳腺發育"
+      },
+      "score": {
+        "answer": "A",
+        "acceptedAnswers": [
+          "A"
+        ],
+        "answerCreditType": "standard",
+        "answer_fallback_is_official": true,
+        "displayAnswerLabel": "A"
+      },
+      "originalCropSha256": "8180e359e353afc7f797d8ce7e270185625c26a31430a72c1572261596c48fcf",
+      "flags": [],
+      "original_required": true,
+      "officialScope": "生理學、生物化學、藥理學及公共衛生學"
+    },
+    {
+      "id": "MOEX-C217-094042-S5001-STAGE1-Q021",
+      "sourceId": "MOEX-094042-5217-Q021",
+      "sourceStemSha256": "b0dd5a19a739aa90520d2399b8d8d0d5ae34208b0855626da2cd684a9a9acc8d",
+      "options": {
+        "A": "C-N-N-C",
+        "B": "C-C-N-C",
+        "C": "C-O-C-N",
+        "D": "N-C-C-C"
+      },
+      "score": {
+        "answer": "B",
+        "acceptedAnswers": [
+          "B"
+        ],
+        "answerCreditType": "standard",
+        "answer_fallback_is_official": true,
+        "displayAnswerLabel": "B"
+      },
+      "originalCropSha256": "fb054da769bade96c52228d258faf696ecb7b440c24f565d572015cbd44ef10f",
+      "flags": [],
+      "original_required": true,
+      "officialScope": "生理學、生物化學、藥理學及公共衛生學"
+    },
+    {
+      "id": "MOEX-C217-094042-S5001-STAGE1-Q022",
+      "sourceId": "MOEX-094042-5217-Q022",
+      "sourceStemSha256": "ac7e3b8eafb533013e08f7369b8131731879a5d3990fb42e2292fa784754ee2e",
+      "options": {
+        "A": "B 型DNA 是最常見且最穩定的構造",
+        "B": "相同數目的核 苷 酸， A 型DNA 比B 型短小",
+        "C": "Z 型DNA 只存在真核細胞中",
+        "D": "Z 型DNA 是呈左旋形式"
+      },
+      "score": {
+        "answer": "C",
+        "acceptedAnswers": [
+          "C"
+        ],
+        "answerCreditType": "standard",
+        "answer_fallback_is_official": true,
+        "displayAnswerLabel": "C"
+      },
+      "originalCropSha256": "e3f956950ad33e5143d6d35397219cc38bb8be068f6fb87376137d6522d8116d",
+      "flags": [],
+      "original_required": true,
+      "officialScope": "生理學、生物化學、藥理學及公共衛生學"
+    },
+    {
+      "id": "MOEX-C217-094042-S5001-STAGE1-Q023",
+      "sourceId": "MOEX-094042-5217-Q023",
+      "sourceStemSha256": "0c6a8ae40d8bd25007dd14cd347f49122bdb1d6a32b651f4bac6fe609fb8f4f9",
+      "options": {
+        "A": "弱化轉錄（ attenuation）",
+        "B": "依賴ρ因子型終止（ρ -dependent termination）",
+        "C": "非依賴因子型終止（ factor-independent termination）",
+        "D": "抗終止轉錄（ anti-termination）"
+      },
+      "score": {
+        "answer": "C",
+        "acceptedAnswers": [
+          "C"
+        ],
+        "answerCreditType": "standard",
+        "answer_fallback_is_official": true,
+        "displayAnswerLabel": "C"
+      },
+      "originalCropSha256": "61683eeec82f0876c784f2fdc71c5c9a6e4bc66621c0cc11f113d2e306a2a5ae",
+      "flags": [],
+      "original_required": true,
+      "officialScope": "生理學、生物化學、藥理學及公共衛生學"
+    },
+    {
+      "id": "MOEX-C217-094042-S5001-STAGE1-Q024",
+      "sourceId": "MOEX-094042-5217-Q024",
+      "sourceStemSha256": "ed4e07e5754b773367c7fcd651ea44faf2cb31a570f89bc18731c264f7a1d679",
+      "options": {
+        "A": "DNA 聚合 酶 的 5 ’－外切 酶 （ exonucleolytic）活性與核 苷 酸去除（ nucleotide excision）之修復作用",
+        "B": "DNA 聚合 酶 的 3 ’－外切 酶 （ exonucleolytic）活性與DNA 錯誤配對的修復機制（mismatch repair）",
+        "C": "DNA 的鹼基去除（base excision）和重組修復（recombination repair）的修復作用",
+        "D": "細胞的 SOS 反應與重組修復（recombination repair）作用"
+      },
+      "score": {
+        "answer": "B",
+        "acceptedAnswers": [
+          "B"
+        ],
+        "answerCreditType": "standard",
+        "answer_fallback_is_official": true,
+        "displayAnswerLabel": "B"
+      },
+      "originalCropSha256": "46f1340b941c41f77d5da59be0e3d827731c8f06b1c1cfae60c4e31bf3725093",
+      "flags": [],
+      "original_required": true,
+      "officialScope": "生理學、生物化學、藥理學及公共衛生學"
+    },
+    {
+      "id": "MOEX-C217-094042-S5001-STAGE1-Q025",
+      "sourceId": "MOEX-094042-5217-Q025",
+      "sourceStemSha256": "2ea11629ac83d9003c2109dc597b0fc600e603e4bfa27eda96de7ede193429ec",
+      "options": {
+        "A": "會形成 purine dimer",
+        "B": "會形成 pyrimidine dimer",
+        "C": "會造成 N-Glycosidic 鍵結裂解",
+        "D": "DNA 分子甲基化"
+      },
+      "score": {
+        "answer": "B",
+        "acceptedAnswers": [
+          "B"
+        ],
+        "answerCreditType": "standard",
+        "answer_fallback_is_official": true,
+        "displayAnswerLabel": "B"
+      },
+      "originalCropSha256": "49e46d309f5f2c3516b108c968b6fad2a1ce7762e932e9d279083312baae3d36",
+      "flags": [],
+      "original_required": true,
+      "officialScope": "生理學、生物化學、藥理學及公共衛生學"
+    },
+    {
+      "id": "MOEX-C217-094042-S5001-STAGE1-Q026",
+      "sourceId": "MOEX-094042-5217-Q026",
+      "sourceStemSha256": "067d8fa1015779ac4bd3bd376c9a4bee9db31992702bcc93bc1afc12993a3fe6",
+      "options": {
+        "A": "供給能量",
+        "B": "供給 NADH",
+        "C": "供給戊糖（ pentose）及NADPH",
+        "D": "提供代謝多餘胺基酸的途徑"
+      },
+      "score": {
+        "answer": "C",
+        "acceptedAnswers": [
+          "C"
+        ],
+        "answerCreditType": "standard",
+        "answer_fallback_is_official": true,
+        "displayAnswerLabel": "C"
+      },
+      "originalCropSha256": "7c27d330d019aaa23050d859e8f550fc4ebe8a2c07856e45d7e96bf4df9f74f1",
+      "flags": [],
+      "original_required": true,
+      "officialScope": "生理學、生物化學、藥理學及公共衛生學"
+    },
+    {
+      "id": "MOEX-C217-094042-S5001-STAGE1-Q027",
+      "sourceId": "MOEX-094042-5217-Q027",
+      "sourceStemSha256": "030085fb22e8e849c50c9d22825414d7099eea6f1bdf17bc9322687c02d0a04f",
+      "options": {
+        "A": "離子型（ ionic）",
+        "B": "共價型（ covalent）",
+        "C": "雙硫鍵型（ disulfide）",
+        "D": "疏水型（ hydrophobic）"
+      },
+      "score": {
+        "answer": "D",
+        "acceptedAnswers": [
+          "D"
+        ],
+        "answerCreditType": "standard",
+        "answer_fallback_is_official": true,
+        "displayAnswerLabel": "D"
+      },
+      "originalCropSha256": "6f7999aa0346c46634db842a929ec6a41f71dfbf099f4c0c8c93cd397616b29d",
+      "flags": [],
+      "original_required": true,
+      "officialScope": "生理學、生物化學、藥理學及公共衛生學"
+    },
+    {
+      "id": "MOEX-C217-094042-S5001-STAGE1-Q028",
+      "sourceId": "MOEX-094042-5217-Q028",
+      "sourceStemSha256": "b143dbe490d08bff54e1db78b9198e32749a36dc7ae9649380406003e6c7cb70",
+      "options": {
+        "A": "其調節子（ modulator）只會促進其活性",
+        "B": "當其與調節子（ modulator）結合時，其構形（conformation）會改變",
+        "C": "主要受共價修飾（ covalent modification）調節其活性",
+        "D": "異體性的調節子（ heterotropic modulator）會與受質（substrate）競爭其結合位置（binding site）"
+      },
+      "score": {
+        "answer": "B",
+        "acceptedAnswers": [
+          "B"
+        ],
+        "answerCreditType": "standard",
+        "answer_fallback_is_official": true,
+        "displayAnswerLabel": "B"
+      },
+      "originalCropSha256": "bcb47f5b0d4eb31b10051300689a5ded85f0c63f753f3e0387975e84efa9703a",
+      "flags": [],
+      "original_required": true,
+      "officialScope": "生理學、生物化學、藥理學及公共衛生學"
+    },
+    {
+      "id": "MOEX-C217-094042-S5001-STAGE1-Q029",
+      "sourceId": "MOEX-094042-5217-Q029",
+      "sourceStemSha256": "9e0010a0d1b92ff49d45654b1cfe98fa2c0d0f30e745290160c6898e4892900b",
+      "options": {
+        "A": "胺基（ -NH₂）與稱為α碳原子結合，因此稱為α-amino acid",
+        "B": "羧基（ -COOH）與稱為α碳原子結合，因此稱為α-amino acid",
+        "C": "α碳原子也可以與氫原子（ -H）和側鏈（-R）結合",
+        "D": "羧基上的碳原子稱為α碳原子"
+      },
+      "score": {
+        "answer": "D",
+        "acceptedAnswers": [
+          "D"
+        ],
+        "answerCreditType": "standard",
+        "answer_fallback_is_official": true,
+        "displayAnswerLabel": "D"
+      },
+      "originalCropSha256": "03568f180147f79b42e52628736f9888627577e74e7345c41de8c400fd2c67a5",
+      "flags": [],
+      "original_required": true,
+      "officialScope": "生理學、生物化學、藥理學及公共衛生學"
+    },
+    {
+      "id": "MOEX-C217-094042-S5001-STAGE1-Q030",
+      "sourceId": "MOEX-094042-5217-Q030",
+      "sourceStemSha256": "a41086c7b59bd7cb6e08e6f8c28e9c44a81deb286d98cb3239e3e12ebb11abde",
+      "options": {
+        "A": "glycogen synthase 活性增加",
+        "B": "glycogen phosphorylase 活性增加",
+        "C": "fructose 2,6-bisphosphatase 活性下降",
+        "D": "pyruvate kinase 活性增加"
+      },
+      "score": {
+        "answer": "B",
+        "acceptedAnswers": [
+          "B"
+        ],
+        "answerCreditType": "standard",
+        "answer_fallback_is_official": true,
+        "displayAnswerLabel": "B"
+      },
+      "originalCropSha256": "df2fdefb114b22ddf9f82bc3cf895b046941deca9401216774a43007978187a2",
+      "flags": [],
+      "original_required": true,
+      "officialScope": "生理學、生物化學、藥理學及公共衛生學"
+    },
+    {
+      "id": "MOEX-C217-094042-S5001-STAGE1-Q031",
+      "sourceId": "MOEX-094042-5217-Q031",
+      "sourceStemSha256": "25bafb16499450fa8b6e44aa4ae3394a0d583262adac4be31e1a38a114f14d8b",
+      "options": {
+        "A": "alpha-1,4-glucosidic bond",
+        "B": "beta-1,6-glucosidic bond",
+        "C": "beta-1,4-galactosidic bond",
+        "D": "alpha-1,6-galactosidic bond"
+      },
+      "score": {
+        "answer": "C",
+        "acceptedAnswers": [
+          "C"
+        ],
+        "answerCreditType": "standard",
+        "answer_fallback_is_official": true,
+        "displayAnswerLabel": "C"
+      },
+      "originalCropSha256": "d0c538281e38ae255f995857baa530c84910f937dff19c75d23e3d22e1934a94",
+      "flags": [],
+      "original_required": true,
+      "officialScope": "生理學、生物化學、藥理學及公共衛生學"
+    },
+    {
+      "id": "MOEX-C217-094042-S5001-STAGE1-Q032",
+      "sourceId": "MOEX-094042-5217-Q032",
+      "sourceStemSha256": "80c9eebc11da4fa3a2ab908d66bcd6993bd2d1e4f72814c1428994dd21a02436",
+      "options": {
+        "A": "磷酸烯醇式丙酮酸羧激 酶 （ Phosphoenolpyruvate carboxykinase）",
+        "B": "磷酸果糖激 酶 （ Phosphofructokinase）",
+        "C": "丙酮酸激 酶 （ Pyruvate kinase）",
+        "D": "丙酮酸脫氫 酶 （ Pyruvate dehydrogenase）"
+      },
+      "score": {
+        "answer": "A",
+        "acceptedAnswers": [
+          "A"
+        ],
+        "answerCreditType": "standard",
+        "answer_fallback_is_official": true,
+        "displayAnswerLabel": "A"
+      },
+      "originalCropSha256": "7492135dc5cb8f72c014640279414a72cfa6bd00dc587d36b446f1d34cceb0f9",
+      "flags": [],
+      "original_required": true,
+      "officialScope": "生理學、生物化學、藥理學及公共衛生學"
+    },
+    {
+      "id": "MOEX-C217-094042-S5001-STAGE1-Q033",
+      "sourceId": "MOEX-094042-5217-Q033",
+      "sourceStemSha256": "770e4e02b2c34b4f78db2cb226555994d21645c50aa39fd7bc500d72fc0dc0b4",
+      "options": {
+        "A": "由 Phenylalanine 代謝成Homogentisic acid",
+        "B": "由 Phenylalanine 代謝成Tyrosine",
+        "C": "由 Tyrosine 代謝成Epinephrine",
+        "D": "由 Tyrosine 代謝成Phenylalanine"
+      },
+      "score": {
+        "answer": "C",
+        "acceptedAnswers": [
+          "C"
+        ],
+        "answerCreditType": "standard",
+        "answer_fallback_is_official": true,
+        "displayAnswerLabel": "C"
+      },
+      "originalCropSha256": "64198ff39da305314e706c3535fba85e0b09fffed05a7d57f9da1aba72d51170",
+      "flags": [],
+      "original_required": true,
+      "officialScope": "生理學、生物化學、藥理學及公共衛生學"
+    },
+    {
+      "id": "MOEX-C217-094042-S5001-STAGE1-Q034",
+      "sourceId": "MOEX-094042-5217-Q034",
+      "sourceStemSha256": "49ba3292d06ff2412d73e7bfca946bc8d952477e2cbc0343fee33bde8017b527",
+      "options": {
+        "A": "arginine",
+        "B": "asparagine",
+        "C": "tryptophan",
+        "D": "methionine"
+      },
+      "score": {
+        "answer": "A",
+        "acceptedAnswers": [
+          "A"
+        ],
+        "answerCreditType": "standard",
+        "answer_fallback_is_official": true,
+        "displayAnswerLabel": "A"
+      },
+      "originalCropSha256": "9183b4f0e2becee5d6f72c402a25c039b30cfa4c879cf1af85243fcfc7890b93",
+      "flags": [],
+      "original_required": true,
+      "officialScope": "生理學、生物化學、藥理學及公共衛生學"
+    },
+    {
+      "id": "MOEX-C217-094042-S5001-STAGE1-Q035",
+      "sourceId": "MOEX-094042-5217-Q035",
+      "sourceStemSha256": "c85ebbd47b496a85c8ba16758cbfc3df56d1df9d9ff97bfa01695654e11729b0",
+      "options": {
+        "A": "結合細胞膜接受體（ receptor）後，活化接受體酪胺基酸激 酶 （ tyrosine kinase）",
+        "B": "和接受體（ receptor）形成複合物結合於DNA 上",
+        "C": "促使內質網釋放鈣離子活化鈣調素（ calmodulin）",
+        "D": "常可在數分鐘至半小時內迅即改變細胞之功能"
+      },
+      "score": {
+        "answer": "B",
+        "acceptedAnswers": [
+          "B"
+        ],
+        "answerCreditType": "standard",
+        "answer_fallback_is_official": true,
+        "displayAnswerLabel": "B"
+      },
+      "originalCropSha256": "c95666efccdace7a638b61f08e74d2e1fa3a469bd069da90d9aae03bbc3fdbd9",
+      "flags": [],
+      "original_required": true,
+      "officialScope": "生理學、生物化學、藥理學及公共衛生學"
+    },
+    {
+      "id": "MOEX-C217-094042-S5001-STAGE1-Q036",
+      "sourceId": "MOEX-094042-5217-Q036",
+      "sourceStemSha256": "6d571f1a11f98139625b744b8dc4a29b74f2c33eba09a0f794eb3aeb391da675",
+      "options": {
+        "A": "IMP 和GMP 都為HGPRTase 的反應產物",
+        "B": "它結合 GMP 形成guanine",
+        "C": "它結合 IMP 形成hypoxanthine",
+        "D": "它結合 AMP 形成adenine"
+      },
+      "score": {
+        "answer": "A",
+        "acceptedAnswers": [
+          "A"
+        ],
+        "answerCreditType": "standard",
+        "answer_fallback_is_official": true,
+        "displayAnswerLabel": "A"
+      },
+      "originalCropSha256": "4046785d2cff0bcbb0516b9682d8ff263010f07527ec0048025ac4eed03575f0",
+      "flags": [],
+      "original_required": true,
+      "officialScope": "生理學、生物化學、藥理學及公共衛生學"
+    },
+    {
+      "id": "MOEX-C217-094042-S5001-STAGE1-Q037",
+      "sourceId": "MOEX-094042-5217-Q037",
+      "sourceStemSha256": "1e3088e97602e9d480103e68b1ceb4cbf2f3ed150a0f20a35c972d8c4fc3ae34",
+      "options": {
+        "A": "是一種 X 性聯隱性遺傳性的神經退化",
+        "B": "這種異常基因會使細胞內醣類代謝異常",
+        "C": "ALD 遺傳模式是由母親遺傳給子女，發病者大都為男性",
+        "D": "這個病症的控制，除了透過飲食控制 ，亦可在症狀出現前進行骨髓移植治療"
+      },
+      "score": {
+        "answer": "B",
+        "acceptedAnswers": [
+          "B",
+          "D"
+        ],
+        "answerCreditType": "multiple_accepted",
+        "answer_fallback_is_official": false,
+        "displayAnswerLabel": "B、D"
+      },
+      "originalCropSha256": "b96e9e566b89995633111b1a22692289db4181d6b02045f0b9dfb352caf7a395",
+      "flags": [],
+      "original_required": true,
+      "officialScope": "生理學、生物化學、藥理學及公共衛生學"
+    },
+    {
+      "id": "MOEX-C217-094042-S5001-STAGE1-Q038",
+      "sourceId": "MOEX-094042-5217-Q038",
+      "sourceStemSha256": "7425f27a016375d273878d17fb792b4153917ac50747eafca0d661dbfb39985a",
+      "options": {
+        "A": "ATP",
+        "B": "ADP",
+        "C": "NADH",
+        "D": "O₂"
+      },
+      "score": {
+        "answer": "B",
+        "acceptedAnswers": [
+          "B"
+        ],
+        "answerCreditType": "standard",
+        "answer_fallback_is_official": true,
+        "displayAnswerLabel": "B"
+      },
+      "originalCropSha256": "03a314fe415c9b0112b2db654f8773bd143708a5053333993415769691ba1843",
+      "flags": [],
+      "original_required": true,
+      "officialScope": "生理學、生物化學、藥理學及公共衛生學"
+    },
+    {
+      "id": "MOEX-C217-094042-S5001-STAGE1-Q039",
+      "sourceId": "MOEX-094042-5217-Q039",
+      "sourceStemSha256": "6bf271c59b1499521ec1dfc1839f267981c53bce60938dd1d009cea7539b9f6a",
+      "options": {
+        "A": "藥物引起的溶血性貧血（ drug-induced hemolytic anemia）",
+        "B": "囊性纖維化（ cystic fibrosis）",
+        "C": "利伯式遺傳性視神經病變（ Leber’s hereditary optic neuropathy）",
+        "D": "楓糖尿病（ maple syrup urine disease）"
+      },
+      "score": {
+        "answer": "C",
+        "acceptedAnswers": [
+          "C"
+        ],
+        "answerCreditType": "standard",
+        "answer_fallback_is_official": true,
+        "displayAnswerLabel": "C"
+      },
+      "originalCropSha256": "743b290da9ac591fd38a72465f1309a2f0271bca9c98a27987cb1209360eb691",
+      "flags": [],
+      "original_required": true,
+      "officialScope": "生理學、生物化學、藥理學及公共衛生學"
+    },
+    {
+      "id": "MOEX-C217-094042-S5001-STAGE1-Q040",
+      "sourceId": "MOEX-094042-5217-Q040",
+      "sourceStemSha256": "8a49444218b724c6df9d60fdbfd694b49670a22c9b4e7d5daa2b026bf6871978",
+      "options": {
+        "A": "降低活化能（ ΔG）",
+        "B": "降低平衡常數（ K_eq）",
+        "C": "降低反應物自由能（G_s ）",
+        "D": "降低產物自由能（ G_p）"
+      },
+      "score": {
+        "answer": "A",
+        "acceptedAnswers": [
+          "A"
+        ],
+        "answerCreditType": "standard",
+        "answer_fallback_is_official": true,
+        "displayAnswerLabel": "A"
+      },
+      "originalCropSha256": "f7745cdbae805d3cab12b3738b921ca4f6c9a1babf3d0d9756f8e3550425603e",
+      "flags": [],
+      "original_required": true,
+      "officialScope": "生理學、生物化學、藥理學及公共衛生學"
+    },
+    {
+      "id": "MOEX-C217-094042-S5001-STAGE1-Q041",
+      "sourceId": "MOEX-094042-5217-Q041",
+      "sourceStemSha256": "e18fc29bfa07fdd66fa55b4cd1848a46726d3c4fd8a965c9022c8467c827f122",
+      "options": {
+        "A": "其又名 BAL",
+        "B": "要以肌肉注射給藥",
+        "C": "常用於治療慢性有機汞中毒",
+        "D": "會有高血壓之副作用"
+      },
+      "score": {
+        "answer": "C",
+        "acceptedAnswers": [
+          "C"
+        ],
+        "answerCreditType": "standard",
+        "answer_fallback_is_official": true,
+        "displayAnswerLabel": "C"
+      },
+      "originalCropSha256": "be2248a35c26790979f97dd9e8b21731288d4da9a3aea2b41122383ff9164a65",
+      "flags": [],
+      "original_required": true,
+      "officialScope": "生理學、生物化學、藥理學及公共衛生學"
+    },
+    {
+      "id": "MOEX-C217-094042-S5001-STAGE1-Q042",
+      "sourceId": "MOEX-094042-5217-Q042",
+      "sourceStemSha256": "7c420648592012986499f5014dcd3344a767371822749d137e8d045a502bc650",
+      "options": {
+        "A": "口服",
+        "B": "靜脈、肌肉注射",
+        "C": "栓劑",
+        "D": "皮膚貼片"
+      },
+      "score": {
+        "answer": "B",
+        "acceptedAnswers": [
+          "B"
+        ],
+        "answerCreditType": "standard",
+        "answer_fallback_is_official": true,
+        "displayAnswerLabel": "B"
+      },
+      "originalCropSha256": "4a54121329c252dcf1193504b6469e512ae76c534c09e5417fb4325c9b223c96",
+      "flags": [],
+      "original_required": true,
+      "officialScope": "生理學、生物化學、藥理學及公共衛生學"
+    },
+    {
+      "id": "MOEX-C217-094042-S5001-STAGE1-Q043",
+      "sourceId": "MOEX-094042-5217-Q043",
+      "sourceStemSha256": "066788463eb843b50767e3f3e1914d0ba1c155f227da3e6248ac7e35e413394b",
+      "options": {
+        "A": "deferoxamine",
+        "B": "antacids",
+        "C": "vitamin C",
+        "D": "tetracycline"
+      },
+      "score": {
+        "answer": "C",
+        "acceptedAnswers": [
+          "C"
+        ],
+        "answerCreditType": "standard",
+        "answer_fallback_is_official": true,
+        "displayAnswerLabel": "C"
+      },
+      "originalCropSha256": "8693c2758813fc0a3b1ddbf5810427f0983debfc5eb5e4d4841c85363785c8c5",
+      "flags": [],
+      "original_required": true,
+      "officialScope": "生理學、生物化學、藥理學及公共衛生學"
+    },
+    {
+      "id": "MOEX-C217-094042-S5001-STAGE1-Q044",
+      "sourceId": "MOEX-094042-5217-Q044",
+      "sourceStemSha256": "f3cc0132d79c4c2755cb61c8c47cdfbbb2729b1a34fa6dcb7752b0c029032376",
+      "options": {
+        "A": "昏迷",
+        "B": "呼吸加速",
+        "C": "針眼般瞳孔",
+        "D": "便秘"
+      },
+      "score": {
+        "answer": "B",
+        "acceptedAnswers": [
+          "B"
+        ],
+        "answerCreditType": "standard",
+        "answer_fallback_is_official": true,
+        "displayAnswerLabel": "B"
+      },
+      "originalCropSha256": "62a6e8fc85a3a647a6baa164b47740b423810b698cd4373f0cfe4295a1bde0ca",
+      "flags": [],
+      "original_required": true,
+      "officialScope": "生理學、生物化學、藥理學及公共衛生學"
+    },
+    {
+      "id": "MOEX-C217-094042-S5001-STAGE1-Q045",
+      "sourceId": "MOEX-094042-5217-Q045",
+      "sourceStemSha256": "174c9e55672c218fb9ee64f94fee02f292dc53a6af690c5efe5910556858d67e",
+      "options": {
+        "A": "glutamate / GABA",
+        "B": "acetylcholine / glutamate",
+        "C": "dopamine / acetylcholine",
+        "D": "acetylcholine / GABA"
+      },
+      "score": {
+        "answer": "C",
+        "acceptedAnswers": [
+          "C"
+        ],
+        "answerCreditType": "standard",
+        "answer_fallback_is_official": true,
+        "displayAnswerLabel": "C"
+      },
+      "originalCropSha256": "fb8da1240b27af3034a6f4a3686f7cbd5dfad4b4d3728bcda807292092a14e92",
+      "flags": [],
+      "original_required": true,
+      "officialScope": "生理學、生物化學、藥理學及公共衛生學"
+    },
+    {
+      "id": "MOEX-C217-094042-S5001-STAGE1-Q046",
+      "sourceId": "MOEX-094042-5217-Q046",
+      "sourceStemSha256": "705b3d6ad2f939f50685fc8bbc3e651f7afce6e41f9107b45a25f2a60c094ed3",
+      "options": {
+        "A": "codeine",
+        "B": "heroin",
+        "C": "methadone",
+        "D": "oxymorphone"
+      },
+      "score": {
+        "answer": "B",
+        "acceptedAnswers": [
+          "B"
+        ],
+        "answerCreditType": "standard",
+        "answer_fallback_is_official": true,
+        "displayAnswerLabel": "B"
+      },
+      "originalCropSha256": "58d5f4c8585c2737e61b9c395de8a1794ddff04cf09620283bb35c176b6dc46e",
+      "flags": [],
+      "original_required": true,
+      "officialScope": "生理學、生物化學、藥理學及公共衛生學"
+    },
+    {
+      "id": "MOEX-C217-094042-S5001-STAGE1-Q047",
+      "sourceId": "MOEX-094042-5217-Q047",
+      "sourceStemSha256": "89f58773bce8b96746536a5cc906e89400b7dd2f216d6cb0604ab0d772ff4d42",
+      "options": {
+        "A": "atropine",
+        "B": "cyproheptadine",
+        "C": "buspirone",
+        "D": "granisetron"
+      },
+      "score": {
+        "answer": "B",
+        "acceptedAnswers": [
+          "B"
+        ],
+        "answerCreditType": "standard",
+        "answer_fallback_is_official": true,
+        "displayAnswerLabel": "B"
+      },
+      "originalCropSha256": "65d4abc3d461d3eff1bee5aea98b3eae089e3de92d602386e65fa756d4f30b94",
+      "flags": [],
+      "original_required": true,
+      "officialScope": "生理學、生物化學、藥理學及公共衛生學"
+    },
+    {
+      "id": "MOEX-C217-094042-S5001-STAGE1-Q048",
+      "sourceId": "MOEX-094042-5217-Q048",
+      "sourceStemSha256": "9d6ad60ea7ed36c118e39cc5dfb8225791f2ef0aa429f46c1da2db86c40b6e13",
+      "options": {
+        "A": "可用於治療下瀉",
+        "B": "會增加肛門括約肌之張力（ tone）",
+        "C": "可用於二歲以下之小孩",
+        "D": "過量會有麻痺性腸隔（ ileus）"
+      },
+      "score": {
+        "answer": "C",
+        "acceptedAnswers": [
+          "C"
+        ],
+        "answerCreditType": "standard",
+        "answer_fallback_is_official": true,
+        "displayAnswerLabel": "C"
+      },
+      "originalCropSha256": "387b08c2c1ce332b0f37779d559f7c23af91b7b2c5c68a9b8e8d7a67c695d2a0",
+      "flags": [],
+      "original_required": true,
+      "officialScope": "生理學、生物化學、藥理學及公共衛生學"
+    },
+    {
+      "id": "MOEX-C217-094042-S5001-STAGE1-Q049",
+      "sourceId": "MOEX-094042-5217-Q049",
+      "sourceStemSha256": "41e9c8f28ac2c1714c11751dfa6957bedefadd301998b3abe1ba13e88398bac6",
+      "options": {
+        "A": "phenylephrine",
+        "B": "mephenterimine",
+        "C": "metaraminol",
+        "D": "methylphenidate"
+      },
+      "score": {
+        "answer": "A",
+        "acceptedAnswers": [
+          "A"
+        ],
+        "answerCreditType": "standard",
+        "answer_fallback_is_official": true,
+        "displayAnswerLabel": "A"
+      },
+      "originalCropSha256": "7dc3b49ad7a8d8239c73da224541a983d4357f683a005a017a74b44455c0e5ca",
+      "flags": [],
+      "original_required": true,
+      "officialScope": "生理學、生物化學、藥理學及公共衛生學"
+    },
+    {
+      "id": "MOEX-C217-094042-S5001-STAGE1-Q050",
+      "sourceId": "MOEX-094042-5217-Q050",
+      "sourceStemSha256": "726b9fed75027d3137b3d0cb42065e9ccca06c2727fcc30ec58fadc84c41c67e",
+      "options": {
+        "A": "prazosin",
+        "B": "hydralazine",
+        "C": "verapamil",
+        "D": "captopril"
+      },
+      "score": {
+        "answer": "D",
+        "acceptedAnswers": [
+          "D"
+        ],
+        "answerCreditType": "standard",
+        "answer_fallback_is_official": true,
+        "displayAnswerLabel": "D"
+      },
+      "originalCropSha256": "1b4bef55bc2344c2a243b7ddcdc6509e28d2612de2d57b060068be829628a1a7",
+      "flags": [],
+      "original_required": true,
+      "officialScope": "生理學、生物化學、藥理學及公共衛生學"
+    },
+    {
+      "id": "MOEX-C217-094042-S5001-STAGE1-Q051",
+      "sourceId": "MOEX-094042-5217-Q051",
+      "sourceStemSha256": "97d5b2267f7faa43a4577dc3fe136481e520584be2abe1f92ce6fc91a8254902",
+      "options": {
+        "A": "quinidine",
+        "B": "atenolol",
+        "C": "sotalol",
+        "D": "adenosine"
+      },
+      "score": {
+        "answer": "A",
+        "acceptedAnswers": [
+          "A"
+        ],
+        "answerCreditType": "standard",
+        "answer_fallback_is_official": true,
+        "displayAnswerLabel": "A"
+      },
+      "originalCropSha256": "87c2932d29d6307d4a9838e294ae0077f0d113c679dee4973e9738b8ed5e87e5",
+      "flags": [],
+      "original_required": true,
+      "officialScope": "生理學、生物化學、藥理學及公共衛生學"
+    },
+    {
+      "id": "MOEX-C217-094042-S5001-STAGE1-Q052",
+      "sourceId": "MOEX-094042-5217-Q052",
+      "sourceStemSha256": "86ce3e82293883b0f914bdd979aca7ed9ddd5d3b119f676dda85a6060bd9f1c1",
+      "options": {
+        "A": "acabose",
+        "B": "bismuth subsalicylate",
+        "C": "glucagon",
+        "D": "kaolin"
+      },
+      "score": {
+        "answer": "C",
+        "acceptedAnswers": [
+          "C"
+        ],
+        "answerCreditType": "standard",
+        "answer_fallback_is_official": true,
+        "displayAnswerLabel": "C"
+      },
+      "originalCropSha256": "54e2128bac2bd638a9990ac9cb25d567c3c33bcf27273629c3a6efd2e222ebd7",
+      "flags": [],
+      "original_required": true,
+      "officialScope": "生理學、生物化學、藥理學及公共衛生學"
+    },
+    {
+      "id": "MOEX-C217-094042-S5001-STAGE1-Q053",
+      "sourceId": "MOEX-094042-5217-Q053",
+      "sourceStemSha256": "dd4f0b3d73d8d7fdf06136dbea972e96db24bbfe8b95ea06c50818cb09790738",
+      "options": {
+        "A": "只有 ① ②",
+        "B": "只有 ① ③",
+        "C": "只有 ② ③",
+        "D": "① ② ③ 均是"
+      },
+      "score": {
+        "answer": "A",
+        "acceptedAnswers": [
+          "A"
+        ],
+        "answerCreditType": "standard",
+        "answer_fallback_is_official": true,
+        "displayAnswerLabel": "A"
+      },
+      "originalCropSha256": "2716a135dbe03bd0c2049a3d768c62f168ce6b0d8316fafda3e5d29f21513d71",
+      "flags": [],
+      "original_required": true,
+      "officialScope": "生理學、生物化學、藥理學及公共衛生學"
+    },
+    {
+      "id": "MOEX-C217-094042-S5001-STAGE1-Q054",
+      "sourceId": "MOEX-094042-5217-Q054",
+      "sourceStemSha256": "789bc3a39cac7eddcd5246b2062fa9274139c072a0b1d63302928e4f9883f1a2",
+      "options": {
+        "A": "ascorbic acid",
+        "B": "β -catechin",
+        "C": "homocysteine",
+        "D": "folic acid"
+      },
+      "score": {
+        "answer": "C",
+        "acceptedAnswers": [
+          "C"
+        ],
+        "answerCreditType": "standard",
+        "answer_fallback_is_official": true,
+        "displayAnswerLabel": "C"
+      },
+      "originalCropSha256": "14b169408178a0108d278a9cfce238b8c90c2ef818b6bbbb73994b2ecea41784",
+      "flags": [],
+      "original_required": true,
+      "officialScope": "生理學、生物化學、藥理學及公共衛生學"
+    },
+    {
+      "id": "MOEX-C217-094042-S5001-STAGE1-Q055",
+      "sourceId": "MOEX-094042-5217-Q055",
+      "sourceStemSha256": "4b8c1b870e2b3113876a41f00a1f5b83a18383a5e5e08415c0e1139a0b01d4d7",
+      "options": {
+        "A": "孕婦之安全用藥",
+        "B": "可使用於披衣菌（ chlamydia）感染之治療",
+        "C": "Staphylococci 感染時之最佳藥物",
+        "D": "使用於嬰兒安全無虞"
+      },
+      "score": {
+        "answer": "B",
+        "acceptedAnswers": [
+          "B"
+        ],
+        "answerCreditType": "standard",
+        "answer_fallback_is_official": true,
+        "displayAnswerLabel": "B"
+      },
+      "originalCropSha256": "afa0ab858386ef4ac6776b1197945e6b06fa69ef9ba8e38d3dfd69ca121ec39f",
+      "flags": [],
+      "original_required": true,
+      "officialScope": "生理學、生物化學、藥理學及公共衛生學"
+    },
+    {
+      "id": "MOEX-C217-094042-S5001-STAGE1-Q056",
+      "sourceId": "MOEX-094042-5217-Q056",
+      "sourceStemSha256": "a4a65699f5ce316135daeea46798de669046de68ef35d9b1c89b6040711b5238",
+      "options": {
+        "A": "可快速改善臨床症狀",
+        "B": "carbimazole 在體內形成methimazole",
+        "C": "methimazole 比propylthiouracil 作用強",
+        "D": "propylthiouracil 會抑制thyroxine 去碘化"
+      },
+      "score": {
+        "answer": "A",
+        "acceptedAnswers": [
+          "A"
+        ],
+        "answerCreditType": "standard",
+        "answer_fallback_is_official": true,
+        "displayAnswerLabel": "A"
+      },
+      "originalCropSha256": "34def23b4b67fb14611309923b9e517470b6823ab59a94a3a317bbc5158c3e31",
+      "flags": [],
+      "original_required": true,
+      "officialScope": "生理學、生物化學、藥理學及公共衛生學"
+    },
+    {
+      "id": "MOEX-C217-094042-S5001-STAGE1-Q057",
+      "sourceId": "MOEX-094042-5217-Q057",
+      "sourceStemSha256": "3ef4dd81f849beea249d0a469bf11ed25b49dbfd3d6933248ae2745f7c13b028",
+      "options": {
+        "A": "肝炎（ hepatitis）",
+        "B": "周邊神經病變（ peripheral neuropathy）",
+        "C": "胃腸不適（ GI discomfort）",
+        "D": "耳鳴（ tinnitus）"
+      },
+      "score": {
+        "answer": "B",
+        "acceptedAnswers": [
+          "B"
+        ],
+        "answerCreditType": "standard",
+        "answer_fallback_is_official": true,
+        "displayAnswerLabel": "B"
+      },
+      "originalCropSha256": "43f29ec5eed0aab044a6f1fae8620d8ecc0d684f5f4800d73b15f490881bf33d",
+      "flags": [],
+      "original_required": true,
+      "officialScope": "生理學、生物化學、藥理學及公共衛生學"
+    },
+    {
+      "id": "MOEX-C217-094042-S5001-STAGE1-Q058",
+      "sourceId": "MOEX-094042-5217-Q058",
+      "sourceStemSha256": "2af86aecac72f3f14bd8ac3b02a0ac12102a1a1081d8514ed0d23a72d9b89cf8",
+      "options": {
+        "A": "pKa ＝ 5.5 之弱酸藥物",
+        "B": "pKa ＝ 3.5 之弱鹼藥物",
+        "C": "pKa ＝ 7.5 之弱酸藥物",
+        "D": "pKa ＝ 6.5 之弱鹼藥物"
+      },
+      "score": {
+        "answer": "D",
+        "acceptedAnswers": [
+          "D"
+        ],
+        "answerCreditType": "standard",
+        "answer_fallback_is_official": true,
+        "displayAnswerLabel": "D"
+      },
+      "originalCropSha256": "e7e2e2ab7ed72262e67dc7ac0ac492752dd64bfe214549688b3d276ffae85efc",
+      "flags": [],
+      "original_required": true,
+      "officialScope": "生理學、生物化學、藥理學及公共衛生學"
+    },
+    {
+      "id": "MOEX-C217-094042-S5001-STAGE1-Q059",
+      "sourceId": "MOEX-094042-5217-Q059",
+      "sourceStemSha256": "0b51b0a5a64972b89cd5bd1ccbf4bbc97af15756487f42cb4be0494f8d432ad1",
+      "options": {
+        "A": "① ＞ ② ＞ ③",
+        "B": "② ＞ ③ ＞ ①",
+        "C": "③ ＞ ② ＞ ①",
+        "D": "① ＞ ③ ＞ ②"
+      },
+      "score": {
+        "answer": "C",
+        "acceptedAnswers": [
+          "C"
+        ],
+        "answerCreditType": "standard",
+        "answer_fallback_is_official": true,
+        "displayAnswerLabel": "C"
+      },
+      "originalCropSha256": "d650704ddb7d5fcaf262d960c52c7ffeec6308518a540e354ab72cbe45c9ac82",
+      "flags": [],
+      "original_required": true,
+      "officialScope": "生理學、生物化學、藥理學及公共衛生學"
+    },
+    {
+      "id": "MOEX-C217-094042-S5001-STAGE1-Q060",
+      "sourceId": "MOEX-094042-5217-Q060",
+      "sourceStemSha256": "b52f2a590fdc3ef41be62b6f76e6e56efd9e991626a14025f2a5de97293db1af",
+      "options": {
+        "A": "Chloral hydrate",
+        "B": "Aspirin",
+        "C": "Chlorpromazine",
+        "D": "Pentobarbital"
+      },
+      "score": {
+        "answer": "D",
+        "acceptedAnswers": [
+          "D"
+        ],
+        "answerCreditType": "standard",
+        "answer_fallback_is_official": true,
+        "displayAnswerLabel": "D"
+      },
+      "originalCropSha256": "5406eda652305e5f00e0500c131e455fd4f63b8247dd5f08b4ddb6bac75bd7c7",
+      "flags": [],
+      "original_required": true,
+      "officialScope": "生理學、生物化學、藥理學及公共衛生學"
+    },
+    {
+      "id": "MOEX-C217-094042-S5001-STAGE1-Q061",
+      "sourceId": "MOEX-094042-5217-Q061",
+      "sourceStemSha256": "7369004a81d8b14fd34cd57069740bcbaf8f4d049b9dcf889b74856b8720dbfe",
+      "options": {
+        "A": "0",
+        "B": "10",
+        "C": "20",
+        "D": "30"
+      },
+      "score": {
+        "answer": "A",
+        "acceptedAnswers": [
+          "A"
+        ],
+        "answerCreditType": "standard",
+        "answer_fallback_is_official": true,
+        "displayAnswerLabel": "A"
+      },
+      "originalCropSha256": "2d8cf43eabf2fd14863b872cbe8209d943684c40b6347a270c67af0d3682f3b2",
+      "flags": [],
+      "original_required": true,
+      "officialScope": "生理學、生物化學、藥理學及公共衛生學"
+    },
+    {
+      "id": "MOEX-C217-094042-S5001-STAGE1-Q062",
+      "sourceId": "MOEX-094042-5217-Q062",
+      "sourceStemSha256": "7870a95f73a976be3beb609cf614bbaa2347fd533997c18b6739385cd0dfa1dc",
+      "options": {
+        "A": "Good Manufacturing Practices（GMP）",
+        "B": "Good Clinical Practices（GCP）",
+        "C": "Good Laboratory Practices（GLP）",
+        "D": "Good Dispensing Practices（GDP）"
+      },
+      "score": {
+        "answer": "D",
+        "acceptedAnswers": [
+          "D"
+        ],
+        "answerCreditType": "standard",
+        "answer_fallback_is_official": true,
+        "displayAnswerLabel": "D"
+      },
+      "originalCropSha256": "8430574b1daa595cc29947f0a92e1e36b349091ff224172c8d9da226918f8d3f",
+      "flags": [],
+      "original_required": true,
+      "officialScope": "生理學、生物化學、藥理學及公共衛生學"
+    },
+    {
+      "id": "MOEX-C217-094042-S5001-STAGE1-Q063",
+      "sourceId": "MOEX-094042-5217-Q063",
+      "sourceStemSha256": "1867e36eaa7924a62ef47eb863fbfc32393e55abcfff4ad1d6658c55be5e5c63",
+      "options": {
+        "A": "論人計酬",
+        "B": "薪水制",
+        "C": "總額預算",
+        "D": "論病例計酬"
+      },
+      "score": {
+        "answer": "C",
+        "acceptedAnswers": [
+          "C"
+        ],
+        "answerCreditType": "standard",
+        "answer_fallback_is_official": true,
+        "displayAnswerLabel": "C"
+      },
+      "originalCropSha256": "9995c6f13846517fff0119e4d8462fe4228733b386a097d510e2946bfa0ffc94",
+      "flags": [],
+      "original_required": true,
+      "officialScope": "生理學、生物化學、藥理學及公共衛生學"
+    },
+    {
+      "id": "MOEX-C217-094042-S5001-STAGE1-Q064",
+      "sourceId": "MOEX-094042-5217-Q064",
+      "sourceStemSha256": "b008f99ff7a04eadd2ff4ebdf4beb3adae27b5cc7bddbac0d169af71350f7f8e",
+      "options": {
+        "A": "金門人和高血壓有關的真正腦中風危險比是 1.94 – 5.98",
+        "B": "腦中風的人比沒有中風的人有高血壓的機會小於 95%",
+        "C": "有不到 5%的機會腦中風的人沒有高血壓",
+        "D": "金門人經一再驗記後， 95%的機會高血壓罹患腦中風是沒有高血壓罹患腦中風的1.94 – 5.98 倍"
+      },
+      "score": {
+        "answer": "D",
+        "acceptedAnswers": [
+          "D"
+        ],
+        "answerCreditType": "standard",
+        "answer_fallback_is_official": true,
+        "displayAnswerLabel": "D"
+      },
+      "originalCropSha256": "fd708846dfdc3c132e9691ad66deec42519aec237e9206113bddd68dc9047dce",
+      "flags": [],
+      "original_required": true,
+      "officialScope": "生理學、生物化學、藥理學及公共衛生學"
+    },
+    {
+      "id": "MOEX-C217-094042-S5001-STAGE1-Q065",
+      "sourceId": "MOEX-094042-5217-Q065",
+      "sourceStemSha256": "eb4cfe95935e2262bbaf5d2259c700c43171f2e803bbedea4976810f43b15ee1",
+      "options": {
+        "A": "不可改變之前置因素",
+        "B": "可改變之前置因素",
+        "C": "促成因素",
+        "D": "強化因素"
+      },
+      "score": {
+        "answer": "B",
+        "acceptedAnswers": [
+          "B"
+        ],
+        "answerCreditType": "standard",
+        "answer_fallback_is_official": true,
+        "displayAnswerLabel": "B"
+      },
+      "originalCropSha256": "7c12b4152ca92ded1e1d98f132ea2a5078ad2997fd0dc88ab41b65682c3b239a",
+      "flags": [],
+      "original_required": true,
+      "officialScope": "生理學、生物化學、藥理學及公共衛生學"
+    },
+    {
+      "id": "MOEX-C217-094042-S5001-STAGE1-Q066",
+      "sourceId": "MOEX-094042-5217-Q066",
+      "sourceStemSha256": "7c320713080b1ad5d8f122154d9084169f75724019ed52131212fa547a5dd0fc",
+      "options": {
+        "A": "Good Manufacturing Practices（GMP）",
+        "B": "Good Clinical Practices（GCP）",
+        "C": "Good Laboratory Practices（GLP）",
+        "D": "Good Dispensing Practices（GDP）"
+      },
+      "score": {
+        "answer": "A",
+        "acceptedAnswers": [
+          "A"
+        ],
+        "answerCreditType": "standard",
+        "answer_fallback_is_official": true,
+        "displayAnswerLabel": "A"
+      },
+      "originalCropSha256": "dadd29661b431e85b6f9fd99d196949aad123f5557e8241821231302fd999617",
+      "flags": [],
+      "original_required": true,
+      "officialScope": "生理學、生物化學、藥理學及公共衛生學"
+    },
+    {
+      "id": "MOEX-C217-094042-S5001-STAGE1-Q067",
+      "sourceId": "MOEX-094042-5217-Q067",
+      "sourceStemSha256": "531d41828ff015f611a788dc76f8ed923ef6d350bf3cfa1e5e178974b9228966",
+      "options": {
+        "A": "外籍新娘",
+        "B": "殘障人士",
+        "C": "低收入戶",
+        "D": "高齡產婦"
+      },
+      "score": {
+        "answer": "D",
+        "acceptedAnswers": [
+          "D"
+        ],
+        "answerCreditType": "standard",
+        "answer_fallback_is_official": true,
+        "displayAnswerLabel": "D"
+      },
+      "originalCropSha256": "7149c900aacfb3502764b29cd10ed21dc442b5429d2a86f9d73b5cd8144634f5",
+      "flags": [],
+      "original_required": true,
+      "officialScope": "生理學、生物化學、藥理學及公共衛生學"
+    },
+    {
+      "id": "MOEX-C217-094042-S5001-STAGE1-Q068",
+      "sourceId": "MOEX-094042-5217-Q068",
+      "sourceStemSha256": "4f818af5483d05a8f835dc6ca66e7427b22497a985eff003b7a0e9195b535479",
+      "options": {
+        "A": "掌控者",
+        "B": "倡導者",
+        "C": "促成者",
+        "D": "協調者"
+      },
+      "score": {
+        "answer": "A",
+        "acceptedAnswers": [
+          "A"
+        ],
+        "answerCreditType": "standard",
+        "answer_fallback_is_official": true,
+        "displayAnswerLabel": "A"
+      },
+      "originalCropSha256": "484a850b8a000ccd8a29c7c3e994a73e2cacd7081af602850b2b77d32a873e17",
+      "flags": [],
+      "original_required": true,
+      "officialScope": "生理學、生物化學、藥理學及公共衛生學"
+    },
+    {
+      "id": "MOEX-C217-094042-S5001-STAGE1-Q069",
+      "sourceId": "MOEX-094042-5217-Q069",
+      "sourceStemSha256": "7b31440553c5f36d0d100298727c6cc2c4bda5b0015e995096062e4eda1e70d2",
+      "options": {
+        "A": "公共特約模式",
+        "B": "自願整合模式",
+        "C": "自願自費模式",
+        "D": "自願核退模式"
+      },
+      "score": {
+        "answer": "B",
+        "acceptedAnswers": [
+          "B"
+        ],
+        "answerCreditType": "standard",
+        "answer_fallback_is_official": true,
+        "displayAnswerLabel": "B"
+      },
+      "originalCropSha256": "947484c2e2f9d598b79d2ab020e171b761ef7ae5641663f2354c9a034b065f44",
+      "flags": [],
+      "original_required": true,
+      "officialScope": "生理學、生物化學、藥理學及公共衛生學"
+    },
+    {
+      "id": "MOEX-C217-094042-S5001-STAGE1-Q070",
+      "sourceId": "MOEX-094042-5217-Q070",
+      "sourceStemSha256": "19c224927a3d2ea483cc9e5146369a40e77676cd18dc9f3616a188e4a566ac00",
+      "options": {
+        "A": "正確",
+        "B": "不正確，因為未統計該火車站每日的進出旅客數",
+        "C": "不正確，因為統計中所使用的是分率而不是發生率",
+        "D": "不正確，因為統計中所使用的是盛行率而不是發生率"
+      },
+      "score": {
+        "answer": "C",
+        "acceptedAnswers": [
+          "C"
+        ],
+        "answerCreditType": "standard",
+        "answer_fallback_is_official": true,
+        "displayAnswerLabel": "C"
+      },
+      "originalCropSha256": "ce1c7cf766a7d50159066ce29c232663264d05037fc85bf67bd2bde178bf5bb5",
+      "flags": [],
+      "original_required": true,
+      "officialScope": "生理學、生物化學、藥理學及公共衛生學"
+    },
+    {
+      "id": "MOEX-C217-094042-S5001-STAGE1-Q071",
+      "sourceId": "MOEX-094042-5217-Q071",
+      "sourceStemSha256": "47106cbfe02190c8a4e311f05e277e2b3d5123022113230273b35780ba50f349",
+      "options": {
+        "A": "85%",
+        "B": "98%",
+        "C": "15%",
+        "D": "2%"
+      },
+      "score": {
+        "answer": "A",
+        "acceptedAnswers": [
+          "A"
+        ],
+        "answerCreditType": "standard",
+        "answer_fallback_is_official": true,
+        "displayAnswerLabel": "A"
+      },
+      "originalCropSha256": "c711e8dfe53ce66cd9316a61c1a7602fc4aae6c9404730d61612caf60499fbe0",
+      "flags": [],
+      "original_required": true,
+      "officialScope": "生理學、生物化學、藥理學及公共衛生學"
+    },
+    {
+      "id": "MOEX-C217-094042-S5001-STAGE1-Q072",
+      "sourceId": "MOEX-094042-5217-Q072",
+      "sourceStemSha256": "1b6a00146174d0efd674a9feae7bd1c5d25a4a53740796855e1667a8c7958fa5",
+      "options": {
+        "A": "等距抽樣（systematic sampling）",
+        "B": "分層抽樣（ stratified sampling）",
+        "C": "簡單隨機抽樣（ simple random sampling）",
+        "D": "集 束抽樣（cluster sampling）"
+      },
+      "score": {
+        "answer": "D",
+        "acceptedAnswers": [
+          "D"
+        ],
+        "answerCreditType": "standard",
+        "answer_fallback_is_official": true,
+        "displayAnswerLabel": "D"
+      },
+      "originalCropSha256": "ef5c903ffee089c2ecc22c8d6ba79b3f50cac7d73dce51531e80b34afb237c17",
+      "flags": [],
+      "original_required": true,
+      "officialScope": "生理學、生物化學、藥理學及公共衛生學"
+    },
+    {
+      "id": "MOEX-C217-094042-S5001-STAGE1-Q073",
+      "sourceId": "MOEX-094042-5217-Q073",
+      "sourceStemSha256": "9841e6154ffeafaaf6271bc7b1c4eacbbbc706e0b8773c1c9a2375694db225f1",
+      "options": {
+        "A": "抽樣誤差",
+        "B": "系統性誤差",
+        "C": "未回應誤差",
+        "D": "干擾誤差"
+      },
+      "score": {
+        "answer": "A",
+        "acceptedAnswers": [
+          "A"
+        ],
+        "answerCreditType": "standard",
+        "answer_fallback_is_official": true,
+        "displayAnswerLabel": "A"
+      },
+      "originalCropSha256": "c8815c4fc85dfd3d9327eee76957d782435780a9747cdd2bb550e64892665b17",
+      "flags": [],
+      "original_required": true,
+      "officialScope": "生理學、生物化學、藥理學及公共衛生學"
+    },
+    {
+      "id": "MOEX-C217-094042-S5001-STAGE1-Q074",
+      "sourceId": "MOEX-094042-5217-Q074",
+      "sourceStemSha256": "0ea48be6e7a9ba0f3282ae710ab3bd7e461c86778a997dac5270869c3f26c48c",
+      "options": {
+        "A": "是一種疾病盛行率的表示方法",
+        "B": "單位是：時間⁻¹",
+        "C": "可能範圍介於 0 – 1 之間",
+        "D": "與累積發生率是同義字"
+      },
+      "score": {
+        "answer": "B",
+        "acceptedAnswers": [
+          "B"
+        ],
+        "answerCreditType": "standard",
+        "answer_fallback_is_official": true,
+        "displayAnswerLabel": "B"
+      },
+      "originalCropSha256": "a36909fd1ddb70d3b76b17aa8cf9974fe0ccb80125c6b7a0edb0f4ddb0584db3",
+      "flags": [],
+      "original_required": true,
+      "officialScope": "生理學、生物化學、藥理學及公共衛生學"
+    },
+    {
+      "id": "MOEX-C217-094042-S5001-STAGE1-Q075",
+      "sourceId": "MOEX-094042-5217-Q075",
+      "sourceStemSha256": "1ea6e3ba6cf57028c52a0538cf91ce99e4b598c3b62ecd929a1cd68f2f1d6b58",
+      "options": {
+        "A": "住院病人年齡逐漸增大",
+        "B": "侵襲性的診斷與治療增加",
+        "C": "抗生素使用頻繁",
+        "D": "住院病人中因傳染病而住院的人數增加"
+      },
+      "score": {
+        "answer": "D",
+        "acceptedAnswers": [
+          "D"
+        ],
+        "answerCreditType": "standard",
+        "answer_fallback_is_official": true,
+        "displayAnswerLabel": "D"
+      },
+      "originalCropSha256": "ec3e9c5497b0e246ac68207fad0fa4640feea0ca30e8519f25d262f001c8ef7f",
+      "flags": [],
+      "original_required": true,
+      "officialScope": "生理學、生物化學、藥理學及公共衛生學"
+    },
+    {
+      "id": "MOEX-C217-094042-S5001-STAGE1-Q076",
+      "sourceId": "MOEX-094042-5217-Q076",
+      "sourceStemSha256": "b3001b56ea988c955dcd19408280e969a258584311f57be32fe6376fcdbb5d46",
+      "options": {
+        "A": "世代研究的樣品數小",
+        "B": "世代研究的危險比估計較準確",
+        "C": "世代研究的危險比估計高估了",
+        "D": "世代研究 較易發生錯誤分類問題"
+      },
+      "score": {
+        "answer": "B",
+        "acceptedAnswers": [
+          "B"
+        ],
+        "answerCreditType": "standard",
+        "answer_fallback_is_official": true,
+        "displayAnswerLabel": "B"
+      },
+      "originalCropSha256": "491405c9dd0166e0f22771305f1ba00981a7f76d8115928ff9317e4982067bb1",
+      "flags": [],
+      "original_required": true,
+      "officialScope": "生理學、生物化學、藥理學及公共衛生學"
+    },
+    {
+      "id": "MOEX-C217-094042-S5001-STAGE1-Q077",
+      "sourceId": "MOEX-094042-5217-Q077",
+      "sourceStemSha256": "dec8dcac4e6833db12dbb0ff5b61bf9cee83d4e6f1e5592a4b8e346254becb8f",
+      "options": {
+        "A": "配對 t 檢定（paired t test）",
+        "B": "獨立樣本 t 檢定（t test involving two independent samples）",
+        "C": "卡方檢定（ ² test）",
+        "D": "變異數分析（ ANOVA）"
+      },
+      "score": {
+        "answer": "D",
+        "acceptedAnswers": [
+          "D"
+        ],
+        "answerCreditType": "standard",
+        "answer_fallback_is_official": true,
+        "displayAnswerLabel": "D"
+      },
+      "originalCropSha256": "1bd3ffaac862f17f67bdb143b270513638673457545cc6ba9721e2c197d1e184",
+      "flags": [
+        {
+          "field": "options_extracted.C",
+          "span": "base symbol before superscript2 in parentheses",
+          "reason": "Actual source Q8 MuPDF4x and independent Poppler show a blank base with visible superscript2 before test; do not supply chi from statistical knowledge.",
+          "source_literal_verified": false,
+          "required_display": "original source image; absent base symbol not guessed"
+        }
+      ],
+      "original_required": true,
+      "officialScope": "生理學、生物化學、藥理學及公共衛生學"
+    },
+    {
+      "id": "MOEX-C217-094042-S5001-STAGE1-Q078",
+      "sourceId": "MOEX-094042-5217-Q078",
+      "sourceStemSha256": "fa1d50c352a26a61e02b8a96c7d471dd3f55869d54c5fb948bed24409ca01295",
+      "options": {
+        "A": "該統計檢定的檢力（ power）太低",
+        "B": "該臨床試驗樣本數太小",
+        "C": "新舊藥之療效本來就沒有差異",
+        "D": "受試病人對藥品反應的變異性很小"
+      },
+      "score": {
+        "answer": "D",
+        "acceptedAnswers": [
+          "D"
+        ],
+        "answerCreditType": "standard",
+        "answer_fallback_is_official": true,
+        "displayAnswerLabel": "D"
+      },
+      "originalCropSha256": "88fb38a5085ad184693154df92cdba1b9b12f3d12f179a77fc84620099e1eff1",
+      "flags": [],
+      "original_required": true,
+      "officialScope": "生理學、生物化學、藥理學及公共衛生學"
+    },
+    {
+      "id": "MOEX-C217-094042-S5001-STAGE1-Q079",
+      "sourceId": "MOEX-094042-5217-Q079",
+      "sourceStemSha256": "53a8790f45c48da89b36bd4c7c4adf08b1fc66d79226a01246bdc3614e7ec542",
+      "options": {
+        "A": "四種抗生素殺死細菌所需時間均不相同",
+        "B": "四種抗生素殺死細菌所需時間均相等",
+        "C": "至少有兩種抗生素殺死細菌所需時間不同",
+        "D": "有一種抗生素殺死細菌所需時間與其他抗生素不同"
+      },
+      "score": {
+        "answer": "C",
+        "acceptedAnswers": [
+          "C"
+        ],
+        "answerCreditType": "standard",
+        "answer_fallback_is_official": true,
+        "displayAnswerLabel": "C"
+      },
+      "originalCropSha256": "b5a9ec4cc49d1cf14b731063a874f15335a341f1bd18c2a5e9838f9645fd6fb4",
+      "flags": [],
+      "original_required": true,
+      "officialScope": "生理學、生物化學、藥理學及公共衛生學"
+    },
+    {
+      "id": "MOEX-C217-094042-S5001-STAGE1-Q080",
+      "sourceId": "MOEX-094042-5217-Q080",
+      "sourceStemSha256": "f09710816a7dc66d6f8aa8c7ccb3b5424517b2aacaf7ae03c48ad228c714c74b",
+      "options": {
+        "A": "此CI 提供了阻塞性心臟衰竭病人經某藥物治療後體重下降值之正常範圍",
+        "B": "與此 CI 相關之自由度為48",
+        "C": "此 CI 表示阻塞性心臟衰竭病人族群中有95 %的病人經某藥物治療後體重下降值會落於此範圍內",
+        "D": "此 CI 的計算錯了，因為該研究者錯將標準誤當標準差，因此正確的CI 應該是2 ± t（1.38）"
+      },
+      "score": {
+        "answer": "D",
+        "acceptedAnswers": [
+          "D"
+        ],
+        "answerCreditType": "standard",
+        "answer_fallback_is_official": true,
+        "displayAnswerLabel": "D"
+      },
+      "originalCropSha256": "499a7ee46c59e7a9fca6638db9d4ddd662670b4e5cca1dc65bfb1a8849c5e9f8",
+      "flags": [],
+      "original_required": true,
+      "officialScope": "生理學、生物化學、藥理學及公共衛生學"
+    }
+  ]
+}
