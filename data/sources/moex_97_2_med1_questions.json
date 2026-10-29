@@ -1,0 +1,4070 @@
+{
+  "sourceBundleSha256": "30e808d594c87cdcf7c93c2422a86ccdeec37a65748d2338a36c378378eee3eb",
+  "sources": {
+    "questionPdfSha256": "60e3175ba49c835c51bc4658c125e2af25bd14597ebe2455829758d66b5d1c66",
+    "answerPdfSha256": "cf37a64eb14c66d05072f53e31d982b31f3aa572823f98b7bd170aed9598dce0",
+    "officialAnswerSymbols": [
+      "B",
+      "C",
+      "#",
+      "A",
+      "A",
+      "B",
+      "B",
+      "B",
+      "C",
+      "C",
+      "C",
+      "A",
+      "C",
+      "C",
+      "B",
+      "C",
+      "A",
+      "C",
+      "D",
+      "B",
+      "C",
+      "C",
+      "D",
+      "C",
+      "#",
+      "D",
+      "D",
+      "A",
+      "B",
+      "C",
+      "A",
+      "A",
+      "B",
+      "C",
+      "D",
+      "C",
+      "A",
+      "D",
+      "B",
+      "A",
+      "C",
+      "#",
+      "B",
+      "B",
+      "A",
+      "B",
+      "C",
+      "B",
+      "B",
+      "#",
+      "B",
+      "C",
+      "C",
+      "A",
+      "A",
+      "B",
+      "#",
+      "C",
+      "B",
+      "A",
+      "#",
+      "A",
+      "C",
+      "D",
+      "C",
+      "C",
+      "A",
+      "A",
+      "A",
+      "D",
+      "A",
+      "D",
+      "C",
+      "A",
+      "B",
+      "#",
+      "D",
+      "B",
+      "D",
+      "C",
+      "B",
+      "B",
+      "D",
+      "C",
+      "#",
+      "D",
+      "A",
+      "D",
+      "B",
+      "B",
+      "A",
+      "C",
+      "B",
+      "B",
+      "C",
+      "B",
+      "#",
+      "C",
+      "A",
+      "D"
+    ],
+    "corrections": {
+      "3": [
+        "A",
+        "D"
+      ],
+      "25": [
+        "A",
+        "B",
+        "C",
+        "D"
+      ],
+      "42": [
+        "A",
+        "D"
+      ],
+      "50": [
+        "B",
+        "C"
+      ],
+      "57": [
+        "A",
+        "B",
+        "C",
+        "D"
+      ],
+      "61": [
+        "B",
+        "C"
+      ],
+      "76": [
+        "A",
+        "D"
+      ],
+      "85": [
+        "A",
+        "B",
+        "C",
+        "D"
+      ],
+      "97": [
+        "C",
+        "D"
+      ]
+    }
+  },
+  "questions": [
+    {
+      "id": "MOEX-097140-1101-Q001",
+      "subject": "醫學（一）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（一）",
+      "stem": "天幕脫疝（tentorial herniation）時，何種構造最易掉入天幕切跡（tentorial notch）？",
+      "options": {
+        "A": "間腦（diencephalon）",
+        "B": "顳葉（temporal lobe）",
+        "C": "嗅球（olfactory bulb）",
+        "D": "腦下垂體（pituitary gland）"
+      },
+      "answer": "B",
+      "acceptedAnswers": [
+        "B"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：B。",
+      "testedConcept": "醫學（一）（舊制原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國97年 第2次 醫師 醫學（一） 1101（舊制）",
+      "sourceYear": 2008,
+      "sourceRound": 2,
+      "originalQuestionNumber": 1,
+      "examCode": "097140",
+      "paperCode": "1101",
+      "examSessionLabel": "第二次",
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=101&code=097140&q=1&s=c011&t=Q",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=103&code=097140&q=1&s=c011&t=M",
+        "page": 1,
+        "endPage": 1,
+        "image": "/question-media/moex-97-2-med1/MOEX-097140-1101-Q001.webp",
+        "width": 1030,
+        "height": 98,
+        "scope": "解剖學、胚胎學、組織學、微生物免疫學、寄生蟲學及公共衛生學",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-097140-1101-Q002",
+      "subject": "醫學（一）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（一）",
+      "stem": "下列關於直接型腹股溝疝氣（direct inguinal hernia）的敘述何者錯誤？",
+      "options": {
+        "A": "發生於腹壁下動脈（inferior epigastric artery）內側區域",
+        "B": "發生於內側腹股溝窩（medial inguinal fossae）",
+        "C": "腹腔內構造常由腹股溝深環（deep inguinal ring）脫出",
+        "D": "發生於海氏三角（Hesselbach triangle）"
+      },
+      "answer": "C",
+      "acceptedAnswers": [
+        "C"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：C。",
+      "testedConcept": "醫學（一）（舊制原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國97年 第2次 醫師 醫學（一） 1101（舊制）",
+      "sourceYear": 2008,
+      "sourceRound": 2,
+      "originalQuestionNumber": 2,
+      "examCode": "097140",
+      "paperCode": "1101",
+      "examSessionLabel": "第二次",
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=101&code=097140&q=1&s=c011&t=Q",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=103&code=097140&q=1&s=c011&t=M",
+        "page": 1,
+        "endPage": 1,
+        "image": "/question-media/moex-97-2-med1/MOEX-097140-1101-Q002.webp",
+        "width": 1030,
+        "height": 163,
+        "scope": "解剖學、胚胎學、組織學、微生物免疫學、寄生蟲學及公共衛生學",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-097140-1101-Q003",
+      "subject": "醫學（一）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（一）",
+      "stem": "一中年女性手指麻且肌肉萎縮，診斷為腕隧道症候群，下列何者不通過腕隧道？",
+      "options": {
+        "A": "傳遞大拇指基部（掌面）的感覺神經分支",
+        "B": "支配外展拇短肌（abductor pollicis brevis）的運動神經",
+        "C": "傳遞第二指指尖（掌面）的感覺神經分支",
+        "D": "尺側屈腕肌（flexor carpi ulnaris）的肌腱"
+      },
+      "answer": "A",
+      "acceptedAnswers": [
+        "A",
+        "D"
+      ],
+      "answerCreditType": "multiple_accepted",
+      "explanation": "官方最終答案：A、D。",
+      "testedConcept": "醫學（一）（舊制原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國97年 第2次 醫師 醫學（一） 1101（舊制）",
+      "sourceYear": 2008,
+      "sourceRound": 2,
+      "originalQuestionNumber": 3,
+      "examCode": "097140",
+      "paperCode": "1101",
+      "examSessionLabel": "第二次",
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=101&code=097140&q=1&s=c011&t=Q",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=103&code=097140&q=1&s=c011&t=M",
+        "page": 1,
+        "endPage": 1,
+        "image": "/question-media/moex-97-2-med1/MOEX-097140-1101-Q003.webp",
+        "width": 1030,
+        "height": 163,
+        "scope": "解剖學、胚胎學、組織學、微生物免疫學、寄生蟲學及公共衛生學",
+        "answerNote": "第3題答A或D者均給分"
+      }
+    },
+    {
+      "id": "MOEX-097140-1101-Q004",
+      "subject": "醫學（一）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（一）",
+      "stem": "頸動脈竇（carotid sinus）與頸動脈體（carotid body）是一壓力接受器（baroreceptor）與化學接受器 （chemoreceptor）位在總頸動脈分叉處，其訊息經由那一條神經傳入頭部？",
+      "options": {
+        "A": "舌咽神經（Glossopharyngeal nerve）",
+        "B": "頸襻（Ansa cervicalis）",
+        "C": "副神經（Accessory nerve）",
+        "D": "舌下神經（Hypoglossal nerve）"
+      },
+      "answer": "A",
+      "acceptedAnswers": [
+        "A"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：A。",
+      "testedConcept": "醫學（一）（舊制原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國97年 第2次 醫師 醫學（一） 1101（舊制）",
+      "sourceYear": 2008,
+      "sourceRound": 2,
+      "originalQuestionNumber": 4,
+      "examCode": "097140",
+      "paperCode": "1101",
+      "examSessionLabel": "第二次",
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=101&code=097140&q=1&s=c011&t=Q",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=103&code=097140&q=1&s=c011&t=M",
+        "page": 1,
+        "endPage": 1,
+        "image": "/question-media/moex-97-2-med1/MOEX-097140-1101-Q004.webp",
+        "width": 1030,
+        "height": 131,
+        "scope": "解剖學、胚胎學、組織學、微生物免疫學、寄生蟲學及公共衛生學",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-097140-1101-Q005",
+      "subject": "醫學（一）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（一）",
+      "stem": "實施中心靜脈壓（CVP）注射時，須摸到股動脈脈搏，在何處下針？",
+      "options": {
+        "A": "脈搏處內側",
+        "B": "脈搏處外側",
+        "C": "脈搏處",
+        "D": "脈搏處下方"
+      },
+      "answer": "A",
+      "acceptedAnswers": [
+        "A"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：A。",
+      "testedConcept": "醫學（一）（舊制原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國97年 第2次 醫師 醫學（一） 1101（舊制）",
+      "sourceYear": 2008,
+      "sourceRound": 2,
+      "originalQuestionNumber": 5,
+      "examCode": "097140",
+      "paperCode": "1101",
+      "examSessionLabel": "第二次",
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=101&code=097140&q=1&s=c011&t=Q",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=103&code=097140&q=1&s=c011&t=M",
+        "page": 1,
+        "endPage": 1,
+        "image": "/question-media/moex-97-2-med1/MOEX-097140-1101-Q005.webp",
+        "width": 1030,
+        "height": 65,
+        "scope": "解剖學、胚胎學、組織學、微生物免疫學、寄生蟲學及公共衛生學",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-097140-1101-Q006",
+      "subject": "醫學（一）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（一）",
+      "stem": "下列上肢肌肉中，何者止（insertion）於皮膚？",
+      "options": {
+        "A": "掌長肌（palmaris longus）",
+        "B": "掌短肌（palmaris brevis）",
+        "C": "小魚際肌（hypothenar muscles）",
+        "D": "魚際肌（thenar muscles）"
+      },
+      "answer": "B",
+      "acceptedAnswers": [
+        "B"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：B。",
+      "testedConcept": "醫學（一）（舊制原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國97年 第2次 醫師 醫學（一） 1101（舊制）",
+      "sourceYear": 2008,
+      "sourceRound": 2,
+      "originalQuestionNumber": 6,
+      "examCode": "097140",
+      "paperCode": "1101",
+      "examSessionLabel": "第二次",
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=101&code=097140&q=1&s=c011&t=Q",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=103&code=097140&q=1&s=c011&t=M",
+        "page": 1,
+        "endPage": 1,
+        "image": "/question-media/moex-97-2-med1/MOEX-097140-1101-Q006.webp",
+        "width": 1030,
+        "height": 98,
+        "scope": "解剖學、胚胎學、組織學、微生物免疫學、寄生蟲學及公共衛生學",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-097140-1101-Q007",
+      "subject": "醫學（一）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（一）",
+      "stem": "下列何者的肌腱會從足底長韌帶（long plantar ligament）前端兩附著點間穿過？",
+      "options": {
+        "A": "腓短肌（peroneus brevis）",
+        "B": "腓長肌（peroneus longus）",
+        "C": "脛後肌（tibialis posterior）",
+        "D": "脛前肌（tibialis anterior）"
+      },
+      "answer": "B",
+      "acceptedAnswers": [
+        "B"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：B。",
+      "testedConcept": "醫學（一）（舊制原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國97年 第2次 醫師 醫學（一） 1101（舊制）",
+      "sourceYear": 2008,
+      "sourceRound": 2,
+      "originalQuestionNumber": 7,
+      "examCode": "097140",
+      "paperCode": "1101",
+      "examSessionLabel": "第二次",
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=101&code=097140&q=1&s=c011&t=Q",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=103&code=097140&q=1&s=c011&t=M",
+        "page": 1,
+        "endPage": 1,
+        "image": "/question-media/moex-97-2-med1/MOEX-097140-1101-Q007.webp",
+        "width": 1030,
+        "height": 98,
+        "scope": "解剖學、胚胎學、組織學、微生物免疫學、寄生蟲學及公共衛生學",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-097140-1101-Q008",
+      "subject": "醫學（一）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（一）",
+      "stem": "下列何者不屬於深筋膜（deep fascia）的構造？",
+      "options": {
+        "A": "闊筋膜（fascia lata）",
+        "B": "半月板（meniscus）",
+        "C": "髂脛束（iliotibial tract）",
+        "D": "足底筋膜（plantar aponeurosis）"
+      },
+      "answer": "B",
+      "acceptedAnswers": [
+        "B"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：B。",
+      "testedConcept": "醫學（一）（舊制原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國97年 第2次 醫師 醫學（一） 1101（舊制）",
+      "sourceYear": 2008,
+      "sourceRound": 2,
+      "originalQuestionNumber": 8,
+      "examCode": "097140",
+      "paperCode": "1101",
+      "examSessionLabel": "第二次",
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=101&code=097140&q=1&s=c011&t=Q",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=103&code=097140&q=1&s=c011&t=M",
+        "page": 1,
+        "endPage": 1,
+        "image": "/question-media/moex-97-2-med1/MOEX-097140-1101-Q008.webp",
+        "width": 1030,
+        "height": 98,
+        "scope": "解剖學、胚胎學、組織學、微生物免疫學、寄生蟲學及公共衛生學",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-097140-1101-Q009",
+      "subject": "醫學（一）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（一）",
+      "stem": "下列何者由尺側屈腕肌（flexor carpi ulnaris）的兩個頭之間穿過？",
+      "options": {
+        "A": "橈神經（radial nerve）",
+        "B": "正中神經（median nerve）",
+        "C": "尺神經（ulnar nerve）",
+        "D": "尺動脈（ulnar artery）"
+      },
+      "answer": "C",
+      "acceptedAnswers": [
+        "C"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：C。",
+      "testedConcept": "醫學（一）（舊制原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國97年 第2次 醫師 醫學（一） 1101（舊制）",
+      "sourceYear": 2008,
+      "sourceRound": 2,
+      "originalQuestionNumber": 9,
+      "examCode": "097140",
+      "paperCode": "1101",
+      "examSessionLabel": "第二次",
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=101&code=097140&q=1&s=c011&t=Q",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=103&code=097140&q=1&s=c011&t=M",
+        "page": 1,
+        "endPage": 1,
+        "image": "/question-media/moex-97-2-med1/MOEX-097140-1101-Q009.webp",
+        "width": 1030,
+        "height": 98,
+        "scope": "解剖學、胚胎學、組織學、微生物免疫學、寄生蟲學及公共衛生學",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-097140-1101-Q010",
+      "subject": "醫學（一）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（一）",
+      "stem": "下列何者發生阻塞而最不會影響臀部的血液供應？",
+      "options": {
+        "A": "臀上動脈",
+        "B": "臀下動脈",
+        "C": "陰部內動脈",
+        "D": "旋股內側動脈"
+      },
+      "answer": "C",
+      "acceptedAnswers": [
+        "C"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：C。",
+      "testedConcept": "醫學（一）（舊制原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國97年 第2次 醫師 醫學（一） 1101（舊制）",
+      "sourceYear": 2008,
+      "sourceRound": 2,
+      "originalQuestionNumber": 10,
+      "examCode": "097140",
+      "paperCode": "1101",
+      "examSessionLabel": "第二次",
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=101&code=097140&q=1&s=c011&t=Q",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=103&code=097140&q=1&s=c011&t=M",
+        "page": 1,
+        "endPage": 1,
+        "image": "/question-media/moex-97-2-med1/MOEX-097140-1101-Q010.webp",
+        "width": 1030,
+        "height": 65,
+        "scope": "解剖學、胚胎學、組織學、微生物免疫學、寄生蟲學及公共衛生學",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-097140-1101-Q011",
+      "subject": "醫學（一）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（一）",
+      "stem": "子宮向前傾主要由下列何者牽引所造成？",
+      "options": {
+        "A": "懸韌帶",
+        "B": "卵巢韌帶",
+        "C": "子宮圓韌帶",
+        "D": "子宮薦韌帶"
+      },
+      "answer": "C",
+      "acceptedAnswers": [
+        "C"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：C。",
+      "testedConcept": "醫學（一）（舊制原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國97年 第2次 醫師 醫學（一） 1101（舊制）",
+      "sourceYear": 2008,
+      "sourceRound": 2,
+      "originalQuestionNumber": 11,
+      "examCode": "097140",
+      "paperCode": "1101",
+      "examSessionLabel": "第二次",
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=101&code=097140&q=1&s=c011&t=Q",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=103&code=097140&q=1&s=c011&t=M",
+        "page": 2,
+        "endPage": 2,
+        "image": "/question-media/moex-97-2-med1/MOEX-097140-1101-Q011.webp",
+        "width": 1030,
+        "height": 66,
+        "scope": "解剖學、胚胎學、組織學、微生物免疫學、寄生蟲學及公共衛生學",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-097140-1101-Q012",
+      "subject": "醫學（一）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（一）",
+      "stem": "下列何者內含卵巢動脈？",
+      "options": {
+        "A": "懸韌帶",
+        "B": "樞紐韌帶",
+        "C": "卵巢圓韌帶",
+        "D": "薦結節韌帶"
+      },
+      "answer": "A",
+      "acceptedAnswers": [
+        "A"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：A。",
+      "testedConcept": "醫學（一）（舊制原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國97年 第2次 醫師 醫學（一） 1101（舊制）",
+      "sourceYear": 2008,
+      "sourceRound": 2,
+      "originalQuestionNumber": 12,
+      "examCode": "097140",
+      "paperCode": "1101",
+      "examSessionLabel": "第二次",
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=101&code=097140&q=1&s=c011&t=Q",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=103&code=097140&q=1&s=c011&t=M",
+        "page": 2,
+        "endPage": 2,
+        "image": "/question-media/moex-97-2-med1/MOEX-097140-1101-Q012.webp",
+        "width": 1030,
+        "height": 66,
+        "scope": "解剖學、胚胎學、組織學、微生物免疫學、寄生蟲學及公共衛生學",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-097140-1101-Q013",
+      "subject": "醫學（一）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（一）",
+      "stem": "下列何者為女性骨盆段輸尿管的主要血液供應來源？",
+      "options": {
+        "A": "卵巢動脈",
+        "B": "陰道動脈",
+        "C": "子宮動脈",
+        "D": "陰部內動脈"
+      },
+      "answer": "C",
+      "acceptedAnswers": [
+        "C"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：C。",
+      "testedConcept": "醫學（一）（舊制原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國97年 第2次 醫師 醫學（一） 1101（舊制）",
+      "sourceYear": 2008,
+      "sourceRound": 2,
+      "originalQuestionNumber": 13,
+      "examCode": "097140",
+      "paperCode": "1101",
+      "examSessionLabel": "第二次",
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=101&code=097140&q=1&s=c011&t=Q",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=103&code=097140&q=1&s=c011&t=M",
+        "page": 2,
+        "endPage": 2,
+        "image": "/question-media/moex-97-2-med1/MOEX-097140-1101-Q013.webp",
+        "width": 1030,
+        "height": 66,
+        "scope": "解剖學、胚胎學、組織學、微生物免疫學、寄生蟲學及公共衛生學",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-097140-1101-Q014",
+      "subject": "醫學（一）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（一）",
+      "stem": "下列何者會直接跨越輸尿管？",
+      "options": {
+        "A": "卵巢",
+        "B": "輸卵管",
+        "C": "輸精管",
+        "D": "儲精囊"
+      },
+      "answer": "C",
+      "acceptedAnswers": [
+        "C"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：C。",
+      "testedConcept": "醫學（一）（舊制原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國97年 第2次 醫師 醫學（一） 1101（舊制）",
+      "sourceYear": 2008,
+      "sourceRound": 2,
+      "originalQuestionNumber": 14,
+      "examCode": "097140",
+      "paperCode": "1101",
+      "examSessionLabel": "第二次",
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=101&code=097140&q=1&s=c011&t=Q",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=103&code=097140&q=1&s=c011&t=M",
+        "page": 2,
+        "endPage": 2,
+        "image": "/question-media/moex-97-2-med1/MOEX-097140-1101-Q014.webp",
+        "width": 1030,
+        "height": 66,
+        "scope": "解剖學、胚胎學、組織學、微生物免疫學、寄生蟲學及公共衛生學",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-097140-1101-Q015",
+      "subject": "醫學（一）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（一）",
+      "stem": "下列何者為尿道外括約肌（external urethral sphincter）所在處？",
+      "options": {
+        "A": "膀胱頸",
+        "B": "膜部尿道",
+        "C": "前列腺尿道",
+        "D": "陰莖部尿道"
+      },
+      "answer": "B",
+      "acceptedAnswers": [
+        "B"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：B。",
+      "testedConcept": "醫學（一）（舊制原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國97年 第2次 醫師 醫學（一） 1101（舊制）",
+      "sourceYear": 2008,
+      "sourceRound": 2,
+      "originalQuestionNumber": 15,
+      "examCode": "097140",
+      "paperCode": "1101",
+      "examSessionLabel": "第二次",
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=101&code=097140&q=1&s=c011&t=Q",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=103&code=097140&q=1&s=c011&t=M",
+        "page": 2,
+        "endPage": 2,
+        "image": "/question-media/moex-97-2-med1/MOEX-097140-1101-Q015.webp",
+        "width": 1030,
+        "height": 66,
+        "scope": "解剖學、胚胎學、組織學、微生物免疫學、寄生蟲學及公共衛生學",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-097140-1101-Q016",
+      "subject": "醫學（一）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（一）",
+      "stem": "下列何者傳遞心包膜及縱隔部壁層胸膜的知覺？",
+      "options": {
+        "A": "迷走神經",
+        "B": "大內臟神經",
+        "C": "膈神經",
+        "D": "肋間神經"
+      },
+      "answer": "C",
+      "acceptedAnswers": [
+        "C"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：C。",
+      "testedConcept": "醫學（一）（舊制原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國97年 第2次 醫師 醫學（一） 1101（舊制）",
+      "sourceYear": 2008,
+      "sourceRound": 2,
+      "originalQuestionNumber": 16,
+      "examCode": "097140",
+      "paperCode": "1101",
+      "examSessionLabel": "第二次",
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=101&code=097140&q=1&s=c011&t=Q",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=103&code=097140&q=1&s=c011&t=M",
+        "page": 2,
+        "endPage": 2,
+        "image": "/question-media/moex-97-2-med1/MOEX-097140-1101-Q016.webp",
+        "width": 1030,
+        "height": 66,
+        "scope": "解剖學、胚胎學、組織學、微生物免疫學、寄生蟲學及公共衛生學",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-097140-1101-Q017",
+      "subject": "醫學（一）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（一）",
+      "stem": "右心房的動脈供應主要來自下列何者？",
+      "options": {
+        "A": "右冠狀動脈",
+        "B": "右冠狀動脈的邊緣枝（marginal branch）",
+        "C": "左冠狀動脈的迴旋枝（circumflex branch）",
+        "D": "左冠狀動脈的前室間枝（anterior interventricular branch）"
+      },
+      "answer": "A",
+      "acceptedAnswers": [
+        "A"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：A。",
+      "testedConcept": "醫學（一）（舊制原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國97年 第2次 醫師 醫學（一） 1101（舊制）",
+      "sourceYear": 2008,
+      "sourceRound": 2,
+      "originalQuestionNumber": 17,
+      "examCode": "097140",
+      "paperCode": "1101",
+      "examSessionLabel": "第二次",
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=101&code=097140&q=1&s=c011&t=Q",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=103&code=097140&q=1&s=c011&t=M",
+        "page": 2,
+        "endPage": 2,
+        "image": "/question-media/moex-97-2-med1/MOEX-097140-1101-Q017.webp",
+        "width": 1030,
+        "height": 165,
+        "scope": "解剖學、胚胎學、組織學、微生物免疫學、寄生蟲學及公共衛生學",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-097140-1101-Q018",
+      "subject": "醫學（一）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（一）",
+      "stem": "腹主動脈（abdominal aorta）分枝為左右總腸骨動脈（common iliac artery）處，相當於下列那個 體表位置？",
+      "options": {
+        "A": "恥骨聯合上緣",
+        "B": "恥骨上緣與臍連線的中點",
+        "C": "臍",
+        "D": "橫幽門面（transpyloric plane）"
+      },
+      "answer": "C",
+      "acceptedAnswers": [
+        "C"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：C。",
+      "testedConcept": "醫學（一）（舊制原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國97年 第2次 醫師 醫學（一） 1101（舊制）",
+      "sourceYear": 2008,
+      "sourceRound": 2,
+      "originalQuestionNumber": 18,
+      "examCode": "097140",
+      "paperCode": "1101",
+      "examSessionLabel": "第二次",
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=101&code=097140&q=1&s=c011&t=Q",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=103&code=097140&q=1&s=c011&t=M",
+        "page": 2,
+        "endPage": 2,
+        "image": "/question-media/moex-97-2-med1/MOEX-097140-1101-Q018.webp",
+        "width": 1030,
+        "height": 132,
+        "scope": "解剖學、胚胎學、組織學、微生物免疫學、寄生蟲學及公共衛生學",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-097140-1101-Q019",
+      "subject": "醫學（一）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（一）",
+      "stem": "下列有關胸管的敘述，何者錯誤？",
+      "options": {
+        "A": "乳糜池（chyle cistern）的大小、外型是不固定的",
+        "B": "下六對肋間的淋巴亦下行匯入乳糜池（chyle cistern）",
+        "C": "胸管位在後縱隔腔（posterior mediastinum）",
+        "D": "胸管直接匯入上腔靜脈"
+      },
+      "answer": "D",
+      "acceptedAnswers": [
+        "D"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：D。",
+      "testedConcept": "醫學（一）（舊制原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國97年 第2次 醫師 醫學（一） 1101（舊制）",
+      "sourceYear": 2008,
+      "sourceRound": 2,
+      "originalQuestionNumber": 19,
+      "examCode": "097140",
+      "paperCode": "1101",
+      "examSessionLabel": "第二次",
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=101&code=097140&q=1&s=c011&t=Q",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=103&code=097140&q=1&s=c011&t=M",
+        "page": 2,
+        "endPage": 2,
+        "image": "/question-media/moex-97-2-med1/MOEX-097140-1101-Q019.webp",
+        "width": 1030,
+        "height": 165,
+        "scope": "解剖學、胚胎學、組織學、微生物免疫學、寄生蟲學及公共衛生學",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-097140-1101-Q020",
+      "subject": "醫學（一）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（一）",
+      "stem": "前脈絡叢動脈（anterior choroidal artery）直接起自：",
+      "options": {
+        "A": "前大腦動脈（anterior cerebral artery）",
+        "B": "頸內動脈（internal carotid artery）",
+        "C": "後大腦動脈（posterior cerebral artery）",
+        "D": "眼動脈（ophthalmic artery）"
+      },
+      "answer": "B",
+      "acceptedAnswers": [
+        "B"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：B。",
+      "testedConcept": "醫學（一）（舊制原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國97年 第2次 醫師 醫學（一） 1101（舊制）",
+      "sourceYear": 2008,
+      "sourceRound": 2,
+      "originalQuestionNumber": 20,
+      "examCode": "097140",
+      "paperCode": "1101",
+      "examSessionLabel": "第二次",
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=101&code=097140&q=1&s=c011&t=Q",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=103&code=097140&q=1&s=c011&t=M",
+        "page": 2,
+        "endPage": 2,
+        "image": "/question-media/moex-97-2-med1/MOEX-097140-1101-Q020.webp",
+        "width": 1030,
+        "height": 99,
+        "scope": "解剖學、胚胎學、組織學、微生物免疫學、寄生蟲學及公共衛生學",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-097140-1101-Q021",
+      "subject": "醫學（一）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（一）",
+      "stem": "下列中腦何結構由翼板（alar plate）所發育而來？",
+      "options": {
+        "A": "動眼神經核（oculomotor nucleus）",
+        "B": "大腦腳（cerebral peduncle）",
+        "C": "下丘（inferior colliculus）",
+        "D": "內縱束（medial longitudinal fasciculus）"
+      },
+      "answer": "C",
+      "acceptedAnswers": [
+        "C"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：C。",
+      "testedConcept": "醫學（一）（舊制原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國97年 第2次 醫師 醫學（一） 1101（舊制）",
+      "sourceYear": 2008,
+      "sourceRound": 2,
+      "originalQuestionNumber": 21,
+      "examCode": "097140",
+      "paperCode": "1101",
+      "examSessionLabel": "第二次",
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=101&code=097140&q=1&s=c011&t=Q",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=103&code=097140&q=1&s=c011&t=M",
+        "page": 2,
+        "endPage": 2,
+        "image": "/question-media/moex-97-2-med1/MOEX-097140-1101-Q021.webp",
+        "width": 1030,
+        "height": 99,
+        "scope": "解剖學、胚胎學、組織學、微生物免疫學、寄生蟲學及公共衛生學",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-097140-1101-Q022",
+      "subject": "醫學（一）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（一）",
+      "stem": "下列有關脊髓的內終絲（filum terminale internum）的敘述，何者正確？",
+      "options": {
+        "A": "附著在尾椎骨（coccyx）的內側面",
+        "B": "含有感覺及運動神經纖維",
+        "C": "起自脊髓圓錐（conus medullaris）尾端處",
+        "D": "由軟腦膜與蜘蛛網膜組織（pia-arachnoid tissue）所構成"
+      },
+      "answer": "C",
+      "acceptedAnswers": [
+        "C"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：C。",
+      "testedConcept": "醫學（一）（舊制原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國97年 第2次 醫師 醫學（一） 1101（舊制）",
+      "sourceYear": 2008,
+      "sourceRound": 2,
+      "originalQuestionNumber": 22,
+      "examCode": "097140",
+      "paperCode": "1101",
+      "examSessionLabel": "第二次",
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=101&code=097140&q=1&s=c011&t=Q",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=103&code=097140&q=1&s=c011&t=M",
+        "page": 2,
+        "endPage": 2,
+        "image": "/question-media/moex-97-2-med1/MOEX-097140-1101-Q022.webp",
+        "width": 1030,
+        "height": 165,
+        "scope": "解剖學、胚胎學、組織學、微生物免疫學、寄生蟲學及公共衛生學",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-097140-1101-Q023",
+      "subject": "醫學（一）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（一）",
+      "stem": "眼外肌中，其肌腱附著於眼球外後上方者為：",
+      "options": {
+        "A": "外直肌（lateral rectus）",
+        "B": "上直肌（superior rectus）",
+        "C": "下直肌（inferior rectus）",
+        "D": "上斜肌（superior oblique）"
+      },
+      "answer": "D",
+      "acceptedAnswers": [
+        "D"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：D。",
+      "testedConcept": "醫學（一）（舊制原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國97年 第2次 醫師 醫學（一） 1101（舊制）",
+      "sourceYear": 2008,
+      "sourceRound": 2,
+      "originalQuestionNumber": 23,
+      "examCode": "097140",
+      "paperCode": "1101",
+      "examSessionLabel": "第二次",
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=101&code=097140&q=1&s=c011&t=Q",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=103&code=097140&q=1&s=c011&t=M",
+        "page": 2,
+        "endPage": 2,
+        "image": "/question-media/moex-97-2-med1/MOEX-097140-1101-Q023.webp",
+        "width": 1030,
+        "height": 99,
+        "scope": "解剖學、胚胎學、組織學、微生物免疫學、寄生蟲學及公共衛生學",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-097140-1101-Q024",
+      "subject": "醫學（一）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（一）",
+      "stem": "腮腺（parotid gland）之分泌訊號藉由何神經傳遞？",
+      "options": {
+        "A": "面神經（facial nerve）",
+        "B": "上頜神經（maxillary nerve）",
+        "C": "舌咽神經（glossopharyngeal nerve）",
+        "D": "第八顱神經"
+      },
+      "answer": "C",
+      "acceptedAnswers": [
+        "C"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：C。",
+      "testedConcept": "醫學（一）（舊制原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國97年 第2次 醫師 醫學（一） 1101（舊制）",
+      "sourceYear": 2008,
+      "sourceRound": 2,
+      "originalQuestionNumber": 24,
+      "examCode": "097140",
+      "paperCode": "1101",
+      "examSessionLabel": "第二次",
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=101&code=097140&q=1&s=c011&t=Q",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=103&code=097140&q=1&s=c011&t=M",
+        "page": 2,
+        "endPage": 2,
+        "image": "/question-media/moex-97-2-med1/MOEX-097140-1101-Q024.webp",
+        "width": 1030,
+        "height": 99,
+        "scope": "解剖學、胚胎學、組織學、微生物免疫學、寄生蟲學及公共衛生學",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-097140-1101-Q025",
+      "subject": "醫學（一）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（一）",
+      "stem": "下列有關盲腸的敘述，何項錯誤？",
+      "options": {
+        "A": "盲腸沒有腸繫膜",
+        "B": "闌尾（appendix）附著在盲腸的後內方",
+        "C": "盲腸繫膜（mesoappendix）附著於後腹壁",
+        "D": "盲腸的血液供應來自迴結腸動脈（ileocolic artery）"
+      },
+      "answer": "A",
+      "acceptedAnswers": [
+        "A",
+        "B",
+        "C",
+        "D"
+      ],
+      "answerCreditType": "all_credit",
+      "explanation": "官方最終答案：一律給分。",
+      "testedConcept": "醫學（一）（舊制原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國97年 第2次 醫師 醫學（一） 1101（舊制）",
+      "sourceYear": 2008,
+      "sourceRound": 2,
+      "originalQuestionNumber": 25,
+      "examCode": "097140",
+      "paperCode": "1101",
+      "examSessionLabel": "第二次",
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=101&code=097140&q=1&s=c011&t=Q",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=103&code=097140&q=1&s=c011&t=M",
+        "page": 3,
+        "endPage": 3,
+        "image": "/question-media/moex-97-2-med1/MOEX-097140-1101-Q025.webp",
+        "width": 1030,
+        "height": 162,
+        "scope": "解剖學、胚胎學、組織學、微生物免疫學、寄生蟲學及公共衛生學",
+        "answerNote": "第25題一律給分"
+      }
+    },
+    {
+      "id": "MOEX-097140-1101-Q026",
+      "subject": "醫學（一）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（一）",
+      "stem": "下列有關頸襻（ansa cervicalis）之敘述，何者錯誤？",
+      "options": {
+        "A": "其分枝支配肩胛舌骨肌（omohyoid muscle）之上段",
+        "B": "其上根（superior root）源自於第一頸椎神經之腹側枝（ventral ramus）",
+        "C": "貼附於頸動脈鞘（carotid sheath）前外方",
+        "D": "其分枝鎖骨上神經（supraclavicular nerves）負責部分頸部皮膚之感覺"
+      },
+      "answer": "D",
+      "acceptedAnswers": [
+        "D"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：D。",
+      "testedConcept": "醫學（一）（舊制原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國97年 第2次 醫師 醫學（一） 1101（舊制）",
+      "sourceYear": 2008,
+      "sourceRound": 2,
+      "originalQuestionNumber": 26,
+      "examCode": "097140",
+      "paperCode": "1101",
+      "examSessionLabel": "第二次",
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=101&code=097140&q=1&s=c011&t=Q",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=103&code=097140&q=1&s=c011&t=M",
+        "page": 3,
+        "endPage": 3,
+        "image": "/question-media/moex-97-2-med1/MOEX-097140-1101-Q026.webp",
+        "width": 1030,
+        "height": 162,
+        "scope": "解剖學、胚胎學、組織學、微生物免疫學、寄生蟲學及公共衛生學",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-097140-1101-Q027",
+      "subject": "醫學（一）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（一）",
+      "stem": "包含於頸部包裹筋膜（investing fascia）之中的肌肉包括下列何者？",
+      "options": {
+        "A": "二腹肌（digastric muscle）",
+        "B": "頸闊肌（platysma muscle）",
+        "C": "胸骨舌骨肌（sternohyoid muscle）",
+        "D": "斜方肌（trapezius muscle）"
+      },
+      "answer": "D",
+      "acceptedAnswers": [
+        "D"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：D。",
+      "testedConcept": "醫學（一）（舊制原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國97年 第2次 醫師 醫學（一） 1101（舊制）",
+      "sourceYear": 2008,
+      "sourceRound": 2,
+      "originalQuestionNumber": 27,
+      "examCode": "097140",
+      "paperCode": "1101",
+      "examSessionLabel": "第二次",
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=101&code=097140&q=1&s=c011&t=Q",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=103&code=097140&q=1&s=c011&t=M",
+        "page": 3,
+        "endPage": 3,
+        "image": "/question-media/moex-97-2-med1/MOEX-097140-1101-Q027.webp",
+        "width": 1030,
+        "height": 97,
+        "scope": "解剖學、胚胎學、組織學、微生物免疫學、寄生蟲學及公共衛生學",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-097140-1101-Q028",
+      "subject": "醫學（一）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（一）",
+      "stem": "第六頸椎之水平層面，頸動脈鞘（carotid sheath）並不包裹下列何者？",
+      "options": {
+        "A": "頸內動脈（internal carotid artery）",
+        "B": "第十顱神經",
+        "C": "頸內靜脈（internal jugular vein）",
+        "D": "頸深淋巴結（deep cervical lymph nodes）"
+      },
+      "answer": "A",
+      "acceptedAnswers": [
+        "A"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：A。",
+      "testedConcept": "醫學（一）（舊制原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國97年 第2次 醫師 醫學（一） 1101（舊制）",
+      "sourceYear": 2008,
+      "sourceRound": 2,
+      "originalQuestionNumber": 28,
+      "examCode": "097140",
+      "paperCode": "1101",
+      "examSessionLabel": "第二次",
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=101&code=097140&q=1&s=c011&t=Q",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=103&code=097140&q=1&s=c011&t=M",
+        "page": 3,
+        "endPage": 3,
+        "image": "/question-media/moex-97-2-med1/MOEX-097140-1101-Q028.webp",
+        "width": 1030,
+        "height": 98,
+        "scope": "解剖學、胚胎學、組織學、微生物免疫學、寄生蟲學及公共衛生學",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-097140-1101-Q029",
+      "subject": "醫學（一）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（一）",
+      "stem": "下列何者不是由背部腸繫膜（dorsal mesenteries）發育形成？",
+      "options": {
+        "A": "大網膜（Greater omentum）",
+        "B": "小網膜（Lesser omentum）",
+        "C": "固有腸繫膜（Mesentery proper）",
+        "D": "結腸繫膜（Mesocolon）"
+      },
+      "answer": "B",
+      "acceptedAnswers": [
+        "B"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：B。",
+      "testedConcept": "醫學（一）（舊制原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國97年 第2次 醫師 醫學（一） 1101（舊制）",
+      "sourceYear": 2008,
+      "sourceRound": 2,
+      "originalQuestionNumber": 29,
+      "examCode": "097140",
+      "paperCode": "1101",
+      "examSessionLabel": "第二次",
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=101&code=097140&q=1&s=c011&t=Q",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=103&code=097140&q=1&s=c011&t=M",
+        "page": 3,
+        "endPage": 3,
+        "image": "/question-media/moex-97-2-med1/MOEX-097140-1101-Q029.webp",
+        "width": 1030,
+        "height": 98,
+        "scope": "解剖學、胚胎學、組織學、微生物免疫學、寄生蟲學及公共衛生學",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-097140-1101-Q030",
+      "subject": "醫學（一）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（一）",
+      "stem": "迴腸憩室（ileal diverticulum）為一殘留之指狀盲囊，其產生的原因為何？",
+      "options": {
+        "A": "卵黃囊（yolk sac）未退化",
+        "B": "尿囊（allantois）未退化",
+        "C": "卵黃柄（yolk stalk）退化不全",
+        "D": "臍帶閉合不全"
+      },
+      "answer": "C",
+      "acceptedAnswers": [
+        "C"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：C。",
+      "testedConcept": "醫學（一）（舊制原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國97年 第2次 醫師 醫學（一） 1101（舊制）",
+      "sourceYear": 2008,
+      "sourceRound": 2,
+      "originalQuestionNumber": 30,
+      "examCode": "097140",
+      "paperCode": "1101",
+      "examSessionLabel": "第二次",
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=101&code=097140&q=1&s=c011&t=Q",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=103&code=097140&q=1&s=c011&t=M",
+        "page": 3,
+        "endPage": 3,
+        "image": "/question-media/moex-97-2-med1/MOEX-097140-1101-Q030.webp",
+        "width": 1030,
+        "height": 97,
+        "scope": "解剖學、胚胎學、組織學、微生物免疫學、寄生蟲學及公共衛生學",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-097140-1101-Q031",
+      "subject": "醫學（一）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（一）",
+      "stem": "分娩時，從連接胎盤一端的臍帶切口流出的血液源自下列何者？",
+      "options": {
+        "A": "胎兒的動脈血及靜脈血",
+        "B": "母體的動脈血及胎兒的靜脈血",
+        "C": "胎兒的動脈血及母體的靜脈血",
+        "D": "胎兒和母體的動脈血及靜脈血"
+      },
+      "answer": "A",
+      "acceptedAnswers": [
+        "A"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：A。",
+      "testedConcept": "醫學（一）（舊制原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國97年 第2次 醫師 醫學（一） 1101（舊制）",
+      "sourceYear": 2008,
+      "sourceRound": 2,
+      "originalQuestionNumber": 31,
+      "examCode": "097140",
+      "paperCode": "1101",
+      "examSessionLabel": "第二次",
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=101&code=097140&q=1&s=c011&t=Q",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=103&code=097140&q=1&s=c011&t=M",
+        "page": 3,
+        "endPage": 3,
+        "image": "/question-media/moex-97-2-med1/MOEX-097140-1101-Q031.webp",
+        "width": 1030,
+        "height": 97,
+        "scope": "解剖學、胚胎學、組織學、微生物免疫學、寄生蟲學及公共衛生學",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-097140-1101-Q032",
+      "subject": "醫學（一）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（一）",
+      "stem": "腰椎 至骶椎 （sacrum）的脊柱弓在發育時期沒有癒合，會造成下列何種缺陷？",
+      "options": {
+        "A": "隱性脊柱裂（Spina bifida occulta）",
+        "B": "水腦（Hydranencephaly）",
+        "C": "Arnold-Chiari 氏畸形（Arnold-Chiari malformation）",
+        "D": "裂顱畸形（Cranium bifidum）"
+      },
+      "answer": "A",
+      "acceptedAnswers": [
+        "A"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：A。",
+      "testedConcept": "醫學（一）（舊制原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國97年 第2次 醫師 醫學（一） 1101（舊制）",
+      "sourceYear": 2008,
+      "sourceRound": 2,
+      "originalQuestionNumber": 32,
+      "examCode": "097140",
+      "paperCode": "1101",
+      "examSessionLabel": "第二次",
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=101&code=097140&q=1&s=c011&t=Q",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=103&code=097140&q=1&s=c011&t=M",
+        "page": 3,
+        "endPage": 3,
+        "image": "/question-media/moex-97-2-med1/MOEX-097140-1101-Q032.webp",
+        "width": 1030,
+        "height": 162,
+        "scope": "解剖學、胚胎學、組織學、微生物免疫學、寄生蟲學及公共衛生學",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-097140-1101-Q033",
+      "subject": "醫學（一）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（一）",
+      "stem": "在表皮（epidermis）中，含量最多的細胞是：",
+      "options": {
+        "A": "黑色素細胞（melanocytes）",
+        "B": "角質細胞（keratinocytes）",
+        "C": "蘭氏細胞（Langerhans cells）",
+        "D": "默氏細胞（Merkel cells）"
+      },
+      "answer": "B",
+      "acceptedAnswers": [
+        "B"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：B。",
+      "testedConcept": "醫學（一）（舊制原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國97年 第2次 醫師 醫學（一） 1101（舊制）",
+      "sourceYear": 2008,
+      "sourceRound": 2,
+      "originalQuestionNumber": 33,
+      "examCode": "097140",
+      "paperCode": "1101",
+      "examSessionLabel": "第二次",
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=101&code=097140&q=1&s=c011&t=Q",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=103&code=097140&q=1&s=c011&t=M",
+        "page": 3,
+        "endPage": 3,
+        "image": "/question-media/moex-97-2-med1/MOEX-097140-1101-Q033.webp",
+        "width": 1030,
+        "height": 98,
+        "scope": "解剖學、胚胎學、組織學、微生物免疫學、寄生蟲學及公共衛生學",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-097140-1101-Q034",
+      "subject": "醫學（一）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（一）",
+      "stem": "下列那一種組織結構不被外淋巴液（perilymph）所包圍？",
+      "options": {
+        "A": "橢圓囊（utricle）",
+        "B": "耳蝸管（cochlea duct）",
+        "C": "鎚骨（malleus）",
+        "D": "球囊（saccule）"
+      },
+      "answer": "C",
+      "acceptedAnswers": [
+        "C"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：C。",
+      "testedConcept": "醫學（一）（舊制原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國97年 第2次 醫師 醫學（一） 1101（舊制）",
+      "sourceYear": 2008,
+      "sourceRound": 2,
+      "originalQuestionNumber": 34,
+      "examCode": "097140",
+      "paperCode": "1101",
+      "examSessionLabel": "第二次",
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=101&code=097140&q=1&s=c011&t=Q",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=103&code=097140&q=1&s=c011&t=M",
+        "page": 3,
+        "endPage": 3,
+        "image": "/question-media/moex-97-2-med1/MOEX-097140-1101-Q034.webp",
+        "width": 1030,
+        "height": 98,
+        "scope": "解剖學、胚胎學、組織學、微生物免疫學、寄生蟲學及公共衛生學",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-097140-1101-Q035",
+      "subject": "醫學（一）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（一）",
+      "stem": "有關腦下垂體細胞（pituicytes），下列敘述何項正確？",
+      "options": {
+        "A": "此細胞位於腦下垂體前葉（pars distalis）",
+        "B": "此細胞分泌催產素（oxytocin）與抗利尿激素（ADH/vasopressin）",
+        "C": "此細胞具有Herring 小體（Herring bodies）",
+        "D": "此細胞屬神經膠細胞（neuroglial cell）"
+      },
+      "answer": "D",
+      "acceptedAnswers": [
+        "D"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：D。",
+      "testedConcept": "醫學（一）（舊制原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國97年 第2次 醫師 醫學（一） 1101（舊制）",
+      "sourceYear": 2008,
+      "sourceRound": 2,
+      "originalQuestionNumber": 35,
+      "examCode": "097140",
+      "paperCode": "1101",
+      "examSessionLabel": "第二次",
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=101&code=097140&q=1&s=c011&t=Q",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=103&code=097140&q=1&s=c011&t=M",
+        "page": 3,
+        "endPage": 3,
+        "image": "/question-media/moex-97-2-med1/MOEX-097140-1101-Q035.webp",
+        "width": 1030,
+        "height": 162,
+        "scope": "解剖學、胚胎學、組織學、微生物免疫學、寄生蟲學及公共衛生學",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-097140-1101-Q036",
+      "subject": "醫學（一）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（一）",
+      "stem": "下列何者不與肝血竇（hepatic sinusoids）直接相通？",
+      "options": {
+        "A": "門小靜脈（portal venule）",
+        "B": "中央靜脈（central vein）",
+        "C": "葉下靜脈（sublobular vein）",
+        "D": "肝小動脈（hepatic arteriole）"
+      },
+      "answer": "C",
+      "acceptedAnswers": [
+        "C"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：C。",
+      "testedConcept": "醫學（一）（舊制原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國97年 第2次 醫師 醫學（一） 1101（舊制）",
+      "sourceYear": 2008,
+      "sourceRound": 2,
+      "originalQuestionNumber": 36,
+      "examCode": "097140",
+      "paperCode": "1101",
+      "examSessionLabel": "第二次",
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=101&code=097140&q=1&s=c011&t=Q",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=103&code=097140&q=1&s=c011&t=M",
+        "page": 3,
+        "endPage": 3,
+        "image": "/question-media/moex-97-2-med1/MOEX-097140-1101-Q036.webp",
+        "width": 1030,
+        "height": 98,
+        "scope": "解剖學、胚胎學、組織學、微生物免疫學、寄生蟲學及公共衛生學",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-097140-1101-Q037",
+      "subject": "醫學（一）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（一）",
+      "stem": "下列何種細胞的分泌顆粒含溶菌酶（lysozyme）？",
+      "options": {
+        "A": "潘氏細胞（Paneth cells）",
+        "B": "杯狀細胞（goblet cells）",
+        "C": "腸內分泌細胞（enteroendocrine cells）",
+        "D": "黏液分泌細胞（mucus-secreting cells）"
+      },
+      "answer": "A",
+      "acceptedAnswers": [
+        "A"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：A。",
+      "testedConcept": "醫學（一）（舊制原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國97年 第2次 醫師 醫學（一） 1101（舊制）",
+      "sourceYear": 2008,
+      "sourceRound": 2,
+      "originalQuestionNumber": 37,
+      "examCode": "097140",
+      "paperCode": "1101",
+      "examSessionLabel": "第二次",
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=101&code=097140&q=1&s=c011&t=Q",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=103&code=097140&q=1&s=c011&t=M",
+        "page": 4,
+        "endPage": 4,
+        "image": "/question-media/moex-97-2-med1/MOEX-097140-1101-Q037.webp",
+        "width": 1030,
+        "height": 96,
+        "scope": "解剖學、胚胎學、組織學、微生物免疫學、寄生蟲學及公共衛生學",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-097140-1101-Q038",
+      "subject": "醫學（一）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（一）",
+      "stem": "中樞神經系統內，具有吞噬能力的細胞是：",
+      "options": {
+        "A": "原生質性星狀膠細胞（protoplasmic astrocyte）",
+        "B": "纖維性星狀膠細胞（fibrous astrocyte）",
+        "C": "寡突膠細胞（oligodendrocyte）",
+        "D": "微膠細胞（microglia）"
+      },
+      "answer": "D",
+      "acceptedAnswers": [
+        "D"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：D。",
+      "testedConcept": "醫學（一）（舊制原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國97年 第2次 醫師 醫學（一） 1101（舊制）",
+      "sourceYear": 2008,
+      "sourceRound": 2,
+      "originalQuestionNumber": 38,
+      "examCode": "097140",
+      "paperCode": "1101",
+      "examSessionLabel": "第二次",
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=101&code=097140&q=1&s=c011&t=Q",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=103&code=097140&q=1&s=c011&t=M",
+        "page": 4,
+        "endPage": 4,
+        "image": "/question-media/moex-97-2-med1/MOEX-097140-1101-Q038.webp",
+        "width": 1030,
+        "height": 96,
+        "scope": "解剖學、胚胎學、組織學、微生物免疫學、寄生蟲學及公共衛生學",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-097140-1101-Q039",
+      "subject": "醫學（一）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（一）",
+      "stem": "對於「胸腺（thymus）」之敘述，下列何者正確？",
+      "options": {
+        "A": "同時具有輸入和輸出淋巴管",
+        "B": "是T-淋巴球（T-lymphocyte）成熟位置",
+        "C": "主要功能為過濾淋巴液",
+        "D": "老年人具發達之胸腺"
+      },
+      "answer": "B",
+      "acceptedAnswers": [
+        "B"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：B。",
+      "testedConcept": "醫學（一）（舊制原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國97年 第2次 醫師 醫學（一） 1101（舊制）",
+      "sourceYear": 2008,
+      "sourceRound": 2,
+      "originalQuestionNumber": 39,
+      "examCode": "097140",
+      "paperCode": "1101",
+      "examSessionLabel": "第二次",
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=101&code=097140&q=1&s=c011&t=Q",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=103&code=097140&q=1&s=c011&t=M",
+        "page": 4,
+        "endPage": 4,
+        "image": "/question-media/moex-97-2-med1/MOEX-097140-1101-Q039.webp",
+        "width": 1030,
+        "height": 95,
+        "scope": "解剖學、胚胎學、組織學、微生物免疫學、寄生蟲學及公共衛生學",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-097140-1101-Q040",
+      "subject": "醫學（一）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（一）",
+      "stem": "鍍銀法（silver impregnation）可將下列何種纖維染成黑色？",
+      "options": {
+        "A": "網狀纖維",
+        "B": "彈性纖維",
+        "C": "骨骼肌纖維",
+        "D": "膠原纖維"
+      },
+      "answer": "A",
+      "acceptedAnswers": [
+        "A"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：A。",
+      "testedConcept": "醫學（一）（舊制原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國97年 第2次 醫師 醫學（一） 1101（舊制）",
+      "sourceYear": 2008,
+      "sourceRound": 2,
+      "originalQuestionNumber": 40,
+      "examCode": "097140",
+      "paperCode": "1101",
+      "examSessionLabel": "第二次",
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=101&code=097140&q=1&s=c011&t=Q",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=103&code=097140&q=1&s=c011&t=M",
+        "page": 4,
+        "endPage": 4,
+        "image": "/question-media/moex-97-2-med1/MOEX-097140-1101-Q040.webp",
+        "width": 1030,
+        "height": 64,
+        "scope": "解剖學、胚胎學、組織學、微生物免疫學、寄生蟲學及公共衛生學",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-097140-1101-Q041",
+      "subject": "醫學（一）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（一）",
+      "stem": "下列何段空氣通道變窄是肺氣腫（emphysema）之特徵？",
+      "options": {
+        "A": "氣管（trachea）",
+        "B": "支氣管（bronchus）",
+        "C": "細支氣管（bronchioles）",
+        "D": "肺泡囊（alveolar sac）"
+      },
+      "answer": "C",
+      "acceptedAnswers": [
+        "C"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：C。",
+      "testedConcept": "醫學（一）（舊制原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國97年 第2次 醫師 醫學（一） 1101（舊制）",
+      "sourceYear": 2008,
+      "sourceRound": 2,
+      "originalQuestionNumber": 41,
+      "examCode": "097140",
+      "paperCode": "1101",
+      "examSessionLabel": "第二次",
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=101&code=097140&q=1&s=c011&t=Q",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=103&code=097140&q=1&s=c011&t=M",
+        "page": 4,
+        "endPage": 4,
+        "image": "/question-media/moex-97-2-med1/MOEX-097140-1101-Q041.webp",
+        "width": 1030,
+        "height": 96,
+        "scope": "解剖學、胚胎學、組織學、微生物免疫學、寄生蟲學及公共衛生學",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-097140-1101-Q042",
+      "subject": "醫學（一）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（一）",
+      "stem": "會侵入腸壁細胞並進一步擴散至鄰近細胞，造成受侵犯細胞死亡而破壞大腸黏膜層的細菌屬於下列 何種菌屬？",
+      "options": {
+        "A": "志賀氏菌（Shigella）",
+        "B": "霍亂弧菌（Vibrio）",
+        "C": "幽門桿菌（Helicobacter）",
+        "D": "沙門氏菌（Salmonella）"
+      },
+      "answer": "A",
+      "acceptedAnswers": [
+        "A",
+        "D"
+      ],
+      "answerCreditType": "multiple_accepted",
+      "explanation": "官方最終答案：A、D。",
+      "testedConcept": "醫學（一）（舊制原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國97年 第2次 醫師 醫學（一） 1101（舊制）",
+      "sourceYear": 2008,
+      "sourceRound": 2,
+      "originalQuestionNumber": 42,
+      "examCode": "097140",
+      "paperCode": "1101",
+      "examSessionLabel": "第二次",
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=101&code=097140&q=1&s=c011&t=Q",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=103&code=097140&q=1&s=c011&t=M",
+        "page": 4,
+        "endPage": 4,
+        "image": "/question-media/moex-97-2-med1/MOEX-097140-1101-Q042.webp",
+        "width": 1030,
+        "height": 127,
+        "scope": "解剖學、胚胎學、組織學、微生物免疫學、寄生蟲學及公共衛生學",
+        "answerNote": "第42題答A或D者均給分"
+      }
+    },
+    {
+      "id": "MOEX-097140-1101-Q043",
+      "subject": "醫學（一）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（一）",
+      "stem": "下列梭狀芽胞桿菌中，會引起偽膜性結腸炎（pseudomembranous colitis）的是：",
+      "options": {
+        "A": "肉毒桿菌（Clostridium botulinum）",
+        "B": "困難梭狀桿菌（C. difficile）",
+        "C": "產氣莢膜桿菌（C. perfringens）",
+        "D": "破傷風桿菌（C. tetani）"
+      },
+      "answer": "B",
+      "acceptedAnswers": [
+        "B"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：B。",
+      "testedConcept": "醫學（一）（舊制原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國97年 第2次 醫師 醫學（一） 1101（舊制）",
+      "sourceYear": 2008,
+      "sourceRound": 2,
+      "originalQuestionNumber": 43,
+      "examCode": "097140",
+      "paperCode": "1101",
+      "examSessionLabel": "第二次",
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=101&code=097140&q=1&s=c011&t=Q",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=103&code=097140&q=1&s=c011&t=M",
+        "page": 4,
+        "endPage": 4,
+        "image": "/question-media/moex-97-2-med1/MOEX-097140-1101-Q043.webp",
+        "width": 1030,
+        "height": 96,
+        "scope": "解剖學、胚胎學、組織學、微生物免疫學、寄生蟲學及公共衛生學",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-097140-1101-Q044",
+      "subject": "醫學（一）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（一）",
+      "stem": "下列那一項物質存在革蘭氏陰性細菌中，而不存在革蘭氏陽性細菌中？",
+      "options": {
+        "A": "胜肽聚糖（peptidoglycan）",
+        "B": "脂質A（lipid A）",
+        "C": "莢膜（capsule）",
+        "D": "鞭毛（flagella）"
+      },
+      "answer": "B",
+      "acceptedAnswers": [
+        "B"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：B。",
+      "testedConcept": "醫學（一）（舊制原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國97年 第2次 醫師 醫學（一） 1101（舊制）",
+      "sourceYear": 2008,
+      "sourceRound": 2,
+      "originalQuestionNumber": 44,
+      "examCode": "097140",
+      "paperCode": "1101",
+      "examSessionLabel": "第二次",
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=101&code=097140&q=1&s=c011&t=Q",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=103&code=097140&q=1&s=c011&t=M",
+        "page": 4,
+        "endPage": 4,
+        "image": "/question-media/moex-97-2-med1/MOEX-097140-1101-Q044.webp",
+        "width": 1030,
+        "height": 96,
+        "scope": "解剖學、胚胎學、組織學、微生物免疫學、寄生蟲學及公共衛生學",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-097140-1101-Q045",
+      "subject": "醫學（一）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（一）",
+      "stem": "DNA 病毒之蛋白質可與調節細胞週期之p53 蛋白質作用者為：",
+      "options": {
+        "A": "人類乳頭瘤病毒第十六型（HPV16）之E6 蛋白質",
+        "B": "人類乳頭瘤病毒第十六型（HPV16）之E7 蛋白質",
+        "C": "腺病毒（Adenovirus）之E1A 蛋白質",
+        "D": "EB 病毒（Epstein-Barr virus）潛伏性膜蛋白質第一型（LMP1）"
+      },
+      "answer": "A",
+      "acceptedAnswers": [
+        "A"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：A。",
+      "testedConcept": "醫學（一）（舊制原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國97年 第2次 醫師 醫學（一） 1101（舊制）",
+      "sourceYear": 2008,
+      "sourceRound": 2,
+      "originalQuestionNumber": 45,
+      "examCode": "097140",
+      "paperCode": "1101",
+      "examSessionLabel": "第二次",
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=101&code=097140&q=1&s=c011&t=Q",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=103&code=097140&q=1&s=c011&t=M",
+        "page": 4,
+        "endPage": 4,
+        "image": "/question-media/moex-97-2-med1/MOEX-097140-1101-Q045.webp",
+        "width": 1030,
+        "height": 158,
+        "scope": "解剖學、胚胎學、組織學、微生物免疫學、寄生蟲學及公共衛生學",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-097140-1101-Q046",
+      "subject": "醫學（一）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（一）",
+      "stem": "分枝桿菌可抵抗酸性酒精脫色的耐酸性是和此菌細胞壁上的何種成分有關？",
+      "options": {
+        "A": "阿拉伯半乳聚糖（arabinogalactan）",
+        "B": "脂質（lipid）",
+        "C": "胜肽聚糖（peptidoglycan）",
+        "D": "蛋白質（protein）"
+      },
+      "answer": "B",
+      "acceptedAnswers": [
+        "B"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：B。",
+      "testedConcept": "醫學（一）（舊制原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國97年 第2次 醫師 醫學（一） 1101（舊制）",
+      "sourceYear": 2008,
+      "sourceRound": 2,
+      "originalQuestionNumber": 46,
+      "examCode": "097140",
+      "paperCode": "1101",
+      "examSessionLabel": "第二次",
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=101&code=097140&q=1&s=c011&t=Q",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=103&code=097140&q=1&s=c011&t=M",
+        "page": 4,
+        "endPage": 4,
+        "image": "/question-media/moex-97-2-med1/MOEX-097140-1101-Q046.webp",
+        "width": 1030,
+        "height": 96,
+        "scope": "解剖學、胚胎學、組織學、微生物免疫學、寄生蟲學及公共衛生學",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-097140-1101-Q047",
+      "subject": "醫學（一）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（一）",
+      "stem": "下列何種病毒結構可以抵抗酸及消毒劑（detergents）？",
+      "options": {
+        "A": "套膜（envelope）",
+        "B": "核酸蛋白質結合體",
+        "C": "蛋白殼（capsid）",
+        "D": "核酸（DNA 或RNA）"
+      },
+      "answer": "C",
+      "acceptedAnswers": [
+        "C"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：C。",
+      "testedConcept": "醫學（一）（舊制原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國97年 第2次 醫師 醫學（一） 1101（舊制）",
+      "sourceYear": 2008,
+      "sourceRound": 2,
+      "originalQuestionNumber": 47,
+      "examCode": "097140",
+      "paperCode": "1101",
+      "examSessionLabel": "第二次",
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=101&code=097140&q=1&s=c011&t=Q",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=103&code=097140&q=1&s=c011&t=M",
+        "page": 4,
+        "endPage": 4,
+        "image": "/question-media/moex-97-2-med1/MOEX-097140-1101-Q047.webp",
+        "width": 1030,
+        "height": 96,
+        "scope": "解剖學、胚胎學、組織學、微生物免疫學、寄生蟲學及公共衛生學",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-097140-1101-Q048",
+      "subject": "醫學（一）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（一）",
+      "stem": "肺炎鏈球菌（Streptococcus pneumoniae）可用下列何種方法鑑定？",
+      "options": {
+        "A": "尿素酶試驗（urease test）",
+        "B": "膽汁溶解試驗（bile solubility test）",
+        "C": "錫克氏試驗（Schick test）",
+        "D": "氧化酶試驗（oxidase test）"
+      },
+      "answer": "B",
+      "acceptedAnswers": [
+        "B"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：B。",
+      "testedConcept": "醫學（一）（舊制原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國97年 第2次 醫師 醫學（一） 1101（舊制）",
+      "sourceYear": 2008,
+      "sourceRound": 2,
+      "originalQuestionNumber": 48,
+      "examCode": "097140",
+      "paperCode": "1101",
+      "examSessionLabel": "第二次",
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=101&code=097140&q=1&s=c011&t=Q",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=103&code=097140&q=1&s=c011&t=M",
+        "page": 4,
+        "endPage": 4,
+        "image": "/question-media/moex-97-2-med1/MOEX-097140-1101-Q048.webp",
+        "width": 1030,
+        "height": 96,
+        "scope": "解剖學、胚胎學、組織學、微生物免疫學、寄生蟲學及公共衛生學",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-097140-1101-Q049",
+      "subject": "醫學（一）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（一）",
+      "stem": "下列何種細菌的特徵是初步判定為單核球增多性李斯特菌（Listeria monocytogenes）感染之重要依據？",
+      "options": {
+        "A": "溶血性",
+        "B": "運動性",
+        "C": "染色法",
+        "D": "血清型"
+      },
+      "answer": "B",
+      "acceptedAnswers": [
+        "B"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：B。",
+      "testedConcept": "醫學（一）（舊制原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國97年 第2次 醫師 醫學（一） 1101（舊制）",
+      "sourceYear": 2008,
+      "sourceRound": 2,
+      "originalQuestionNumber": 49,
+      "examCode": "097140",
+      "paperCode": "1101",
+      "examSessionLabel": "第二次",
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=101&code=097140&q=1&s=c011&t=Q",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=103&code=097140&q=1&s=c011&t=M",
+        "page": 4,
+        "endPage": 4,
+        "image": "/question-media/moex-97-2-med1/MOEX-097140-1101-Q049.webp",
+        "width": 1030,
+        "height": 64,
+        "scope": "解剖學、胚胎學、組織學、微生物免疫學、寄生蟲學及公共衛生學",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-097140-1101-Q050",
+      "subject": "醫學（一）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（一）",
+      "stem": "下列關於流行性感冒病毒（Influenza virus）的血球凝集素（hemagglutinin, HA）之敘述，何者為錯？",
+      "options": {
+        "A": "血清學上可區分為各種亞型（subtype），例如H1、H2、…H15 等，均存在於禽流感病毒（Avian flu virus）",
+        "B": "人類流行性感冒病毒包括H1、H2、H3 等三種亞型",
+        "C": "人類流行性感冒病毒的HA 和禽流感病毒的HA 和相同結構的唾液酸（sialic acid）結合",
+        "D": "是中和抗體的主要作用目標"
+      },
+      "answer": "B",
+      "acceptedAnswers": [
+        "B",
+        "C"
+      ],
+      "answerCreditType": "multiple_accepted",
+      "explanation": "官方最終答案：B、C。",
+      "testedConcept": "醫學（一）（舊制原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國97年 第2次 醫師 醫學（一） 1101（舊制）",
+      "sourceYear": 2008,
+      "sourceRound": 2,
+      "originalQuestionNumber": 50,
+      "examCode": "097140",
+      "paperCode": "1101",
+      "examSessionLabel": "第二次",
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=101&code=097140&q=1&s=c011&t=Q",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=103&code=097140&q=1&s=c011&t=M",
+        "page": 4,
+        "endPage": 4,
+        "image": "/question-media/moex-97-2-med1/MOEX-097140-1101-Q050.webp",
+        "width": 1030,
+        "height": 188,
+        "scope": "解剖學、胚胎學、組織學、微生物免疫學、寄生蟲學及公共衛生學",
+        "answerNote": "第50題答B或C者均給分"
+      }
+    },
+    {
+      "id": "MOEX-097140-1101-Q051",
+      "subject": "醫學（一）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（一）",
+      "stem": "有關狂犬病病毒（Rabies viruses）的敘述，下列何者錯誤？",
+      "options": {
+        "A": "產生Negri 小體（Negri body）",
+        "B": "不能被乙醚破壞",
+        "C": "是RNA 病毒",
+        "D": "主要侵犯神經組織"
+      },
+      "answer": "B",
+      "acceptedAnswers": [
+        "B"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：B。",
+      "testedConcept": "醫學（一）（舊制原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國97年 第2次 醫師 醫學（一） 1101（舊制）",
+      "sourceYear": 2008,
+      "sourceRound": 2,
+      "originalQuestionNumber": 51,
+      "examCode": "097140",
+      "paperCode": "1101",
+      "examSessionLabel": "第二次",
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=101&code=097140&q=1&s=c011&t=Q",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=103&code=097140&q=1&s=c011&t=M",
+        "page": 5,
+        "endPage": 5,
+        "image": "/question-media/moex-97-2-med1/MOEX-097140-1101-Q051.webp",
+        "width": 1030,
+        "height": 97,
+        "scope": "解剖學、胚胎學、組織學、微生物免疫學、寄生蟲學及公共衛生學",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-097140-1101-Q052",
+      "subject": "醫學（一）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（一）",
+      "stem": "下列第幾型乳頭瘤病毒常在子宮頸癌組織中出現？",
+      "options": {
+        "A": "六",
+        "B": "十一",
+        "C": "十八",
+        "D": "三十六"
+      },
+      "answer": "C",
+      "acceptedAnswers": [
+        "C"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：C。",
+      "testedConcept": "醫學（一）（舊制原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國97年 第2次 醫師 醫學（一） 1101（舊制）",
+      "sourceYear": 2008,
+      "sourceRound": 2,
+      "originalQuestionNumber": 52,
+      "examCode": "097140",
+      "paperCode": "1101",
+      "examSessionLabel": "第二次",
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=101&code=097140&q=1&s=c011&t=Q",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=103&code=097140&q=1&s=c011&t=M",
+        "page": 5,
+        "endPage": 5,
+        "image": "/question-media/moex-97-2-med1/MOEX-097140-1101-Q052.webp",
+        "width": 1030,
+        "height": 64,
+        "scope": "解剖學、胚胎學、組織學、微生物免疫學、寄生蟲學及公共衛生學",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-097140-1101-Q053",
+      "subject": "醫學（一）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（一）",
+      "stem": "下列關於病毒與其可引起之疾病的敘述，何者錯誤？",
+      "options": {
+        "A": "呼吸道融合病毒（Respiratory syncytial virus）可引起肺炎（pneumonia）",
+        "B": "副流行性感冒病毒（Parainfluenza virus）可引起哮喘（croup）",
+        "C": "鼻病毒（Rhinovirus）可引 起疱疹性 咽呷炎（herpangina）",
+        "D": "冠狀病毒（Human coronavirus）可引起感冒（common cold）"
+      },
+      "answer": "C",
+      "acceptedAnswers": [
+        "C"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：C。",
+      "testedConcept": "醫學（一）（舊制原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國97年 第2次 醫師 醫學（一） 1101（舊制）",
+      "sourceYear": 2008,
+      "sourceRound": 2,
+      "originalQuestionNumber": 53,
+      "examCode": "097140",
+      "paperCode": "1101",
+      "examSessionLabel": "第二次",
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=101&code=097140&q=1&s=c011&t=Q",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=103&code=097140&q=1&s=c011&t=M",
+        "page": 5,
+        "endPage": 5,
+        "image": "/question-media/moex-97-2-med1/MOEX-097140-1101-Q053.webp",
+        "width": 1030,
+        "height": 160,
+        "scope": "解剖學、胚胎學、組織學、微生物免疫學、寄生蟲學及公共衛生學",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-097140-1101-Q054",
+      "subject": "醫學（一）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（一）",
+      "stem": "下列何者不是人類免疫缺乏病毒（HIV）的傳染途徑？",
+      "options": {
+        "A": "日常生活接觸",
+        "B": "輸血",
+        "C": "紋身",
+        "D": "哺乳"
+      },
+      "answer": "A",
+      "acceptedAnswers": [
+        "A"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：A。",
+      "testedConcept": "醫學（一）（舊制原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國97年 第2次 醫師 醫學（一） 1101（舊制）",
+      "sourceYear": 2008,
+      "sourceRound": 2,
+      "originalQuestionNumber": 54,
+      "examCode": "097140",
+      "paperCode": "1101",
+      "examSessionLabel": "第二次",
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=101&code=097140&q=1&s=c011&t=Q",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=103&code=097140&q=1&s=c011&t=M",
+        "page": 5,
+        "endPage": 5,
+        "image": "/question-media/moex-97-2-med1/MOEX-097140-1101-Q054.webp",
+        "width": 1030,
+        "height": 64,
+        "scope": "解剖學、胚胎學、組織學、微生物免疫學、寄生蟲學及公共衛生學",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-097140-1101-Q055",
+      "subject": "醫學（一）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（一）",
+      "stem": "下列何種病毒之基因體為DNA，並可造成幼兒傳染性紅疹症（erythema infectiosum）？",
+      "options": {
+        "A": "人類細小病毒（parvovirus）B19",
+        "B": "德國麻疹病毒（Rubella virus）",
+        "C": "麻疹病毒（Measles virus）",
+        "D": "伊柯病毒（Echovirus）第十六型"
+      },
+      "answer": "A",
+      "acceptedAnswers": [
+        "A"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：A。",
+      "testedConcept": "醫學（一）（舊制原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國97年 第2次 醫師 醫學（一） 1101（舊制）",
+      "sourceYear": 2008,
+      "sourceRound": 2,
+      "originalQuestionNumber": 55,
+      "examCode": "097140",
+      "paperCode": "1101",
+      "examSessionLabel": "第二次",
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=101&code=097140&q=1&s=c011&t=Q",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=103&code=097140&q=1&s=c011&t=M",
+        "page": 5,
+        "endPage": 5,
+        "image": "/question-media/moex-97-2-med1/MOEX-097140-1101-Q055.webp",
+        "width": 1030,
+        "height": 97,
+        "scope": "解剖學、胚胎學、組織學、微生物免疫學、寄生蟲學及公共衛生學",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-097140-1101-Q056",
+      "subject": "醫學（一）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（一）",
+      "stem": "腺病毒之傳播方式為：",
+      "options": {
+        "A": "性行為",
+        "B": "接觸",
+        "C": "輸血",
+        "D": "母奶"
+      },
+      "answer": "B",
+      "acceptedAnswers": [
+        "B"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：B。",
+      "testedConcept": "醫學（一）（舊制原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國97年 第2次 醫師 醫學（一） 1101（舊制）",
+      "sourceYear": 2008,
+      "sourceRound": 2,
+      "originalQuestionNumber": 56,
+      "examCode": "097140",
+      "paperCode": "1101",
+      "examSessionLabel": "第二次",
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=101&code=097140&q=1&s=c011&t=Q",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=103&code=097140&q=1&s=c011&t=M",
+        "page": 5,
+        "endPage": 5,
+        "image": "/question-media/moex-97-2-med1/MOEX-097140-1101-Q056.webp",
+        "width": 1030,
+        "height": 64,
+        "scope": "解剖學、胚胎學、組織學、微生物免疫學、寄生蟲學及公共衛生學",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-097140-1101-Q057",
+      "subject": "醫學（一）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（一）",
+      "stem": "下列節肢動物媒介病毒（Arbovirus）中，那一種病毒不以節肢動物為傳播之媒介？",
+      "options": {
+        "A": "黃熱病病毒（Yellow fever virus）",
+        "B": "西尼羅河腦炎病毒（West Nile virus）",
+        "C": "拉薩病毒（Lassa virus）",
+        "D": "登革病毒（Dengue virus）"
+      },
+      "answer": "A",
+      "acceptedAnswers": [
+        "A",
+        "B",
+        "C",
+        "D"
+      ],
+      "answerCreditType": "all_credit",
+      "explanation": "官方最終答案：一律給分。",
+      "testedConcept": "醫學（一）（舊制原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國97年 第2次 醫師 醫學（一） 1101（舊制）",
+      "sourceYear": 2008,
+      "sourceRound": 2,
+      "originalQuestionNumber": 57,
+      "examCode": "097140",
+      "paperCode": "1101",
+      "examSessionLabel": "第二次",
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=101&code=097140&q=1&s=c011&t=Q",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=103&code=097140&q=1&s=c011&t=M",
+        "page": 5,
+        "endPage": 5,
+        "image": "/question-media/moex-97-2-med1/MOEX-097140-1101-Q057.webp",
+        "width": 1030,
+        "height": 96,
+        "scope": "解剖學、胚胎學、組織學、微生物免疫學、寄生蟲學及公共衛生學",
+        "answerNote": "第57題一律給分"
+      }
+    },
+    {
+      "id": "MOEX-097140-1101-Q058",
+      "subject": "醫學（一）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（一）",
+      "stem": "下列關於真菌的描述，何者錯誤？",
+      "options": {
+        "A": "大多數種類的真菌屬於多細胞生物",
+        "B": "能引起人類疾病的真菌在真菌中占少數",
+        "C": "大多數致病性真菌的繁殖方式是有性生殖",
+        "D": "菌絲和孢子可作為鑑別真菌的重要依據"
+      },
+      "answer": "C",
+      "acceptedAnswers": [
+        "C"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：C。",
+      "testedConcept": "醫學（一）（舊制原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國97年 第2次 醫師 醫學（一） 1101（舊制）",
+      "sourceYear": 2008,
+      "sourceRound": 2,
+      "originalQuestionNumber": 58,
+      "examCode": "097140",
+      "paperCode": "1101",
+      "examSessionLabel": "第二次",
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=101&code=097140&q=1&s=c011&t=Q",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=103&code=097140&q=1&s=c011&t=M",
+        "page": 5,
+        "endPage": 5,
+        "image": "/question-media/moex-97-2-med1/MOEX-097140-1101-Q058.webp",
+        "width": 1030,
+        "height": 96,
+        "scope": "解剖學、胚胎學、組織學、微生物免疫學、寄生蟲學及公共衛生學",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-097140-1101-Q059",
+      "subject": "醫學（一）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（一）",
+      "stem": "引起全身性感染的真菌大多數是何種真菌？",
+      "options": {
+        "A": "產毒素真菌",
+        "B": "條件致病性真菌",
+        "C": "具有變異原性真菌",
+        "D": "多細胞真菌"
+      },
+      "answer": "B",
+      "acceptedAnswers": [
+        "B"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：B。",
+      "testedConcept": "醫學（一）（舊制原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國97年 第2次 醫師 醫學（一） 1101（舊制）",
+      "sourceYear": 2008,
+      "sourceRound": 2,
+      "originalQuestionNumber": 59,
+      "examCode": "097140",
+      "paperCode": "1101",
+      "examSessionLabel": "第二次",
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=101&code=097140&q=1&s=c011&t=Q",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=103&code=097140&q=1&s=c011&t=M",
+        "page": 5,
+        "endPage": 5,
+        "image": "/question-media/moex-97-2-med1/MOEX-097140-1101-Q059.webp",
+        "width": 1030,
+        "height": 64,
+        "scope": "解剖學、胚胎學、組織學、微生物免疫學、寄生蟲學及公共衛生學",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-097140-1101-Q060",
+      "subject": "醫學（一）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（一）",
+      "stem": "下列那一種真菌是屬於內源性感染真菌？",
+      "options": {
+        "A": "念珠菌（Candida）",
+        "B": "麴菌（Aspergillus）",
+        "C": "表皮癬菌（Epidermophyton）",
+        "D": "新型隱球菌（Cryptococcus neoformans）"
+      },
+      "answer": "A",
+      "acceptedAnswers": [
+        "A"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：A。",
+      "testedConcept": "醫學（一）（舊制原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國97年 第2次 醫師 醫學（一） 1101（舊制）",
+      "sourceYear": 2008,
+      "sourceRound": 2,
+      "originalQuestionNumber": 60,
+      "examCode": "097140",
+      "paperCode": "1101",
+      "examSessionLabel": "第二次",
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=101&code=097140&q=1&s=c011&t=Q",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=103&code=097140&q=1&s=c011&t=M",
+        "page": 5,
+        "endPage": 5,
+        "image": "/question-media/moex-97-2-med1/MOEX-097140-1101-Q060.webp",
+        "width": 1030,
+        "height": 97,
+        "scope": "解剖學、胚胎學、組織學、微生物免疫學、寄生蟲學及公共衛生學",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-097140-1101-Q061",
+      "subject": "醫學（一）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（一）",
+      "stem": "表皮癬菌屬（Epidermophyton）可引起：",
+      "options": {
+        "A": "鵝口瘡",
+        "B": "頭癬",
+        "C": "甲癬",
+        "D": "汗斑"
+      },
+      "answer": "B",
+      "acceptedAnswers": [
+        "B",
+        "C"
+      ],
+      "answerCreditType": "multiple_accepted",
+      "explanation": "官方最終答案：B、C。",
+      "testedConcept": "醫學（一）（舊制原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國97年 第2次 醫師 醫學（一） 1101（舊制）",
+      "sourceYear": 2008,
+      "sourceRound": 2,
+      "originalQuestionNumber": 61,
+      "examCode": "097140",
+      "paperCode": "1101",
+      "examSessionLabel": "第二次",
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=101&code=097140&q=1&s=c011&t=Q",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=103&code=097140&q=1&s=c011&t=M",
+        "page": 5,
+        "endPage": 5,
+        "image": "/question-media/moex-97-2-med1/MOEX-097140-1101-Q061.webp",
+        "width": 1030,
+        "height": 64,
+        "scope": "解剖學、胚胎學、組織學、微生物免疫學、寄生蟲學及公共衛生學",
+        "answerNote": "第61題答B或C者均給分"
+      }
+    },
+    {
+      "id": "MOEX-097140-1101-Q062",
+      "subject": "醫學（一）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（一）",
+      "stem": "將豬的心臟代替人類衰竭的心臟之移植手術，最大的障礙是：",
+      "options": {
+        "A": "人類已經產生對別種哺乳動物細胞表面α-Gal 之抗體，因而有超急性排斥（hyperacute rejection）",
+        "B": "發炎性血管傷害（inflammatory vascular injury）導致之慢性排斥（chronic rejection）",
+        "C": "目前術後之抗排斥藥物使用尚未達成共識",
+        "D": "豬的病毒感染問題無法釐清"
+      },
+      "answer": "A",
+      "acceptedAnswers": [
+        "A"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：A。",
+      "testedConcept": "醫學（一）（舊制原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國97年 第2次 醫師 醫學（一） 1101（舊制）",
+      "sourceYear": 2008,
+      "sourceRound": 2,
+      "originalQuestionNumber": 62,
+      "examCode": "097140",
+      "paperCode": "1101",
+      "examSessionLabel": "第二次",
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=101&code=097140&q=1&s=c011&t=Q",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=103&code=097140&q=1&s=c011&t=M",
+        "page": 5,
+        "endPage": 5,
+        "image": "/question-media/moex-97-2-med1/MOEX-097140-1101-Q062.webp",
+        "width": 1030,
+        "height": 159,
+        "scope": "解剖學、胚胎學、組織學、微生物免疫學、寄生蟲學及公共衛生學",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-097140-1101-Q063",
+      "subject": "醫學（一）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（一）",
+      "stem": "自體抗原與致病微生物之抗原類似cross reactivity 可以引起疾病，但下列何者並非如此？",
+      "options": {
+        "A": "黴漿菌感染後之貧血症（anemia after mycoplasma infection）",
+        "B": "鏈球菌感染後之腎絲球腎炎（post-streptococcal glomerulonephritis）",
+        "C": "Grave 氏病（Graves’disease）",
+        "D": "風濕熱（rheumatic fever）"
+      },
+      "answer": "C",
+      "acceptedAnswers": [
+        "C"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：C。",
+      "testedConcept": "醫學（一）（舊制原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國97年 第2次 醫師 醫學（一） 1101（舊制）",
+      "sourceYear": 2008,
+      "sourceRound": 2,
+      "originalQuestionNumber": 63,
+      "examCode": "097140",
+      "paperCode": "1101",
+      "examSessionLabel": "第二次",
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=101&code=097140&q=1&s=c011&t=Q",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=103&code=097140&q=1&s=c011&t=M",
+        "page": 5,
+        "endPage": 5,
+        "image": "/question-media/moex-97-2-med1/MOEX-097140-1101-Q063.webp",
+        "width": 1030,
+        "height": 160,
+        "scope": "解剖學、胚胎學、組織學、微生物免疫學、寄生蟲學及公共衛生學",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-097140-1101-Q064",
+      "subject": "醫學（一）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（一）",
+      "stem": "導致因血型不符所引起的輸血反應（transfusion reaction）的機制是：",
+      "options": {
+        "A": "立即性過敏免疫反應（immediate hypersensitivity）",
+        "B": "T 細胞媒介的過敏反應（T cell-mediated hypersensitivity）",
+        "C": "免疫複合體媒介的過敏反應（immune complex-mediated hypersensitivity）",
+        "D": "抗體媒介的毒殺作用（antibody-mediated cytotoxicity）"
+      },
+      "answer": "D",
+      "acceptedAnswers": [
+        "D"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：D。",
+      "testedConcept": "醫學（一）（舊制原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國97年 第2次 醫師 醫學（一） 1101（舊制）",
+      "sourceYear": 2008,
+      "sourceRound": 2,
+      "originalQuestionNumber": 64,
+      "examCode": "097140",
+      "paperCode": "1101",
+      "examSessionLabel": "第二次",
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=101&code=097140&q=1&s=c011&t=Q",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=103&code=097140&q=1&s=c011&t=M",
+        "page": 5,
+        "endPage": 5,
+        "image": "/question-media/moex-97-2-med1/MOEX-097140-1101-Q064.webp",
+        "width": 1030,
+        "height": 160,
+        "scope": "解剖學、胚胎學、組織學、微生物免疫學、寄生蟲學及公共衛生學",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-097140-1101-Q065",
+      "subject": "醫學（一）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（一）",
+      "stem": "如果將兩個不同的inbred strain 老鼠，A 及B 品系交配而產生子代F1，接著再將F1 老鼠互相交配而得 到子代F2。此時如果將F1 老鼠的皮膚移植到任一隻F2 時，F1 老鼠的皮膚被F2 老鼠接受的比例 （%）為何？",
+      "options": {
+        "A": "100",
+        "B": "75",
+        "C": "50",
+        "D": "25"
+      },
+      "answer": "C",
+      "acceptedAnswers": [
+        "C"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：C。",
+      "testedConcept": "醫學（一）（舊制原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國97年 第2次 醫師 醫學（一） 1101（舊制）",
+      "sourceYear": 2008,
+      "sourceRound": 2,
+      "originalQuestionNumber": 65,
+      "examCode": "097140",
+      "paperCode": "1101",
+      "examSessionLabel": "第二次",
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=101&code=097140&q=1&s=c011&t=Q",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=103&code=097140&q=1&s=c011&t=M",
+        "page": 6,
+        "endPage": 6,
+        "image": "/question-media/moex-97-2-med1/MOEX-097140-1101-Q065.webp",
+        "width": 1030,
+        "height": 132,
+        "scope": "解剖學、胚胎學、組織學、微生物免疫學、寄生蟲學及公共衛生學",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-097140-1101-Q066",
+      "subject": "醫學（一）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（一）",
+      "stem": "下列有關新生兒免疫力的敘述，何者正確？",
+      "options": {
+        "A": "不具免疫保護能力",
+        "B": "透過胎盤獲得母親的IgM",
+        "C": "自身最早製造出來的是IgM",
+        "D": "具有成年人IgE 的量"
+      },
+      "answer": "C",
+      "acceptedAnswers": [
+        "C"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：C。",
+      "testedConcept": "醫學（一）（舊制原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國97年 第2次 醫師 醫學（一） 1101（舊制）",
+      "sourceYear": 2008,
+      "sourceRound": 2,
+      "originalQuestionNumber": 66,
+      "examCode": "097140",
+      "paperCode": "1101",
+      "examSessionLabel": "第二次",
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=101&code=097140&q=1&s=c011&t=Q",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=103&code=097140&q=1&s=c011&t=M",
+        "page": 6,
+        "endPage": 6,
+        "image": "/question-media/moex-97-2-med1/MOEX-097140-1101-Q066.webp",
+        "width": 1030,
+        "height": 99,
+        "scope": "解剖學、胚胎學、組織學、微生物免疫學、寄生蟲學及公共衛生學",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-097140-1101-Q067",
+      "subject": "醫學（一）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（一）",
+      "stem": "特異性免疫反應和非特異性免疫反應除了專一性外，下列何項也是二者的不同之處？",
+      "options": {
+        "A": "記憶性",
+        "B": "執行特異性免疫反應除了有細胞外，還有可溶性的蛋白質幫忙",
+        "C": "區別自我與非自我抗原的能力",
+        "D": "可保護宿主不被病原菌侵犯"
+      },
+      "answer": "A",
+      "acceptedAnswers": [
+        "A"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：A。",
+      "testedConcept": "醫學（一）（舊制原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國97年 第2次 醫師 醫學（一） 1101（舊制）",
+      "sourceYear": 2008,
+      "sourceRound": 2,
+      "originalQuestionNumber": 67,
+      "examCode": "097140",
+      "paperCode": "1101",
+      "examSessionLabel": "第二次",
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=101&code=097140&q=1&s=c011&t=Q",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=103&code=097140&q=1&s=c011&t=M",
+        "page": 6,
+        "endPage": 6,
+        "image": "/question-media/moex-97-2-med1/MOEX-097140-1101-Q067.webp",
+        "width": 1030,
+        "height": 165,
+        "scope": "解剖學、胚胎學、組織學、微生物免疫學、寄生蟲學及公共衛生學",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-097140-1101-Q068",
+      "subject": "醫學（一）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（一）",
+      "stem": "補體（complement）系統中的凝集路徑（lectin pathway），是細菌感染時，其表面的醣蛋白或碳水化 合物中的mannose 部分和mannose-binding lectin（MBL）結合所啟動的，則MBL 和補體系統中的那 一個分子功能相似？",
+      "options": {
+        "A": "C1q",
+        "B": "C2a",
+        "C": "C3b",
+        "D": "C4a"
+      },
+      "answer": "A",
+      "acceptedAnswers": [
+        "A"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：A。",
+      "testedConcept": "醫學（一）（舊制原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國97年 第2次 醫師 醫學（一） 1101（舊制）",
+      "sourceYear": 2008,
+      "sourceRound": 2,
+      "originalQuestionNumber": 68,
+      "examCode": "097140",
+      "paperCode": "1101",
+      "examSessionLabel": "第二次",
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=101&code=097140&q=1&s=c011&t=Q",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=103&code=097140&q=1&s=c011&t=M",
+        "page": 6,
+        "endPage": 6,
+        "image": "/question-media/moex-97-2-med1/MOEX-097140-1101-Q068.webp",
+        "width": 1030,
+        "height": 132,
+        "scope": "解剖學、胚胎學、組織學、微生物免疫學、寄生蟲學及公共衛生學",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-097140-1101-Q069",
+      "subject": "醫學（一）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（一）",
+      "stem": "下列何者不是細胞趨化激素？",
+      "options": {
+        "A": "IL-2",
+        "B": "IL-8",
+        "C": "Leukotriene B4（LTB4）",
+        "D": "MCP-1（CCL2）"
+      },
+      "answer": "A",
+      "acceptedAnswers": [
+        "A"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：A。",
+      "testedConcept": "醫學（一）（舊制原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國97年 第2次 醫師 醫學（一） 1101（舊制）",
+      "sourceYear": 2008,
+      "sourceRound": 2,
+      "originalQuestionNumber": 69,
+      "examCode": "097140",
+      "paperCode": "1101",
+      "examSessionLabel": "第二次",
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=101&code=097140&q=1&s=c011&t=Q",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=103&code=097140&q=1&s=c011&t=M",
+        "page": 6,
+        "endPage": 6,
+        "image": "/question-media/moex-97-2-med1/MOEX-097140-1101-Q069.webp",
+        "width": 1030,
+        "height": 99,
+        "scope": "解剖學、胚胎學、組織學、微生物免疫學、寄生蟲學及公共衛生學",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-097140-1101-Q070",
+      "subject": "醫學（一）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（一）",
+      "stem": "下列有關B 和T 細胞的敘述，那一項是B 細胞所特有？",
+      "options": {
+        "A": "表現特定的抗原受體（antigen-specific receptor）在細胞表面",
+        "B": "辨識與自身主要組織相容抗原（self MHC）結合的抗原分子",
+        "C": "在細胞發育過程會進行基因重組",
+        "D": "在細胞分化過程會進行類型轉換（isotype switching）"
+      },
+      "answer": "D",
+      "acceptedAnswers": [
+        "D"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：D。",
+      "testedConcept": "醫學（一）（舊制原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國97年 第2次 醫師 醫學（一） 1101（舊制）",
+      "sourceYear": 2008,
+      "sourceRound": 2,
+      "originalQuestionNumber": 70,
+      "examCode": "097140",
+      "paperCode": "1101",
+      "examSessionLabel": "第二次",
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=101&code=097140&q=1&s=c011&t=Q",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=103&code=097140&q=1&s=c011&t=M",
+        "page": 6,
+        "endPage": 6,
+        "image": "/question-media/moex-97-2-med1/MOEX-097140-1101-Q070.webp",
+        "width": 1030,
+        "height": 165,
+        "scope": "解剖學、胚胎學、組織學、微生物免疫學、寄生蟲學及公共衛生學",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-097140-1101-Q071",
+      "subject": "醫學（一）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（一）",
+      "stem": "IL-2 受體（receptor）由三條鏈構成，在T 細胞被活化時，那一條鏈大量表現而構成高親和力的IL-2 受體？",
+      "options": {
+        "A": "α 鏈",
+        "B": "β 鏈",
+        "C": "γ 鏈",
+        "D": "δ 鏈"
+      },
+      "answer": "A",
+      "acceptedAnswers": [
+        "A"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：A。",
+      "testedConcept": "醫學（一）（舊制原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國97年 第2次 醫師 醫學（一） 1101（舊制）",
+      "sourceYear": 2008,
+      "sourceRound": 2,
+      "originalQuestionNumber": 71,
+      "examCode": "097140",
+      "paperCode": "1101",
+      "examSessionLabel": "第二次",
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=101&code=097140&q=1&s=c011&t=Q",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=103&code=097140&q=1&s=c011&t=M",
+        "page": 6,
+        "endPage": 6,
+        "image": "/question-media/moex-97-2-med1/MOEX-097140-1101-Q071.webp",
+        "width": 1030,
+        "height": 99,
+        "scope": "解剖學、胚胎學、組織學、微生物免疫學、寄生蟲學及公共衛生學",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-097140-1101-Q072",
+      "subject": "醫學（一）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（一）",
+      "stem": "在胸腺器官內，T 細胞發育到那一階段，就可以離開胸腺到達周邊淋巴器官？",
+      "options": {
+        "A": "表現CD3",
+        "B": "T 細胞受器基因（T cell receptor genes）重組成功",
+        "C": "同時呈現CD4 以及CD8",
+        "D": "單獨呈現CD4 或CD8"
+      },
+      "answer": "D",
+      "acceptedAnswers": [
+        "D"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：D。",
+      "testedConcept": "醫學（一）（舊制原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國97年 第2次 醫師 醫學（一） 1101（舊制）",
+      "sourceYear": 2008,
+      "sourceRound": 2,
+      "originalQuestionNumber": 72,
+      "examCode": "097140",
+      "paperCode": "1101",
+      "examSessionLabel": "第二次",
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=101&code=097140&q=1&s=c011&t=Q",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=103&code=097140&q=1&s=c011&t=M",
+        "page": 6,
+        "endPage": 6,
+        "image": "/question-media/moex-97-2-med1/MOEX-097140-1101-Q072.webp",
+        "width": 1030,
+        "height": 165,
+        "scope": "解剖學、胚胎學、組織學、微生物免疫學、寄生蟲學及公共衛生學",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-097140-1101-Q073",
+      "subject": "醫學（一）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（一）",
+      "stem": "下列那一種抗體在血清中濃度最高？",
+      "options": {
+        "A": "IgA",
+        "B": "IgE",
+        "C": "IgG",
+        "D": "IgM"
+      },
+      "answer": "C",
+      "acceptedAnswers": [
+        "C"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：C。",
+      "testedConcept": "醫學（一）（舊制原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國97年 第2次 醫師 醫學（一） 1101（舊制）",
+      "sourceYear": 2008,
+      "sourceRound": 2,
+      "originalQuestionNumber": 73,
+      "examCode": "097140",
+      "paperCode": "1101",
+      "examSessionLabel": "第二次",
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=101&code=097140&q=1&s=c011&t=Q",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=103&code=097140&q=1&s=c011&t=M",
+        "page": 6,
+        "endPage": 6,
+        "image": "/question-media/moex-97-2-med1/MOEX-097140-1101-Q073.webp",
+        "width": 1030,
+        "height": 66,
+        "scope": "解剖學、胚胎學、組織學、微生物免疫學、寄生蟲學及公共衛生學",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-097140-1101-Q074",
+      "subject": "醫學（一）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（一）",
+      "stem": "下列有關產生抗體多樣化（diversity）的原理，那一項描述錯誤？",
+      "options": {
+        "A": "體細胞高度突變（somatic hyper-mutation）發生於基因重組（gene rearrangement）之前",
+        "B": "體細胞高度突變（somatic hyper-mutation）可以發生於抗體的重鏈（heavy chain）以及輕鏈（light chain）部位",
+        "C": "利用酵素將四種核苷酸（nucleotides）任意加入剪接部位，可以造成連接多樣化（junctional diversity）",
+        "D": "相同重鏈（heavy chain）與不同輕鏈（light chain）之組合亦可造成抗體多樣化（diversity）"
+      },
+      "answer": "A",
+      "acceptedAnswers": [
+        "A"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：A。",
+      "testedConcept": "醫學（一）（舊制原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國97年 第2次 醫師 醫學（一） 1101（舊制）",
+      "sourceYear": 2008,
+      "sourceRound": 2,
+      "originalQuestionNumber": 74,
+      "examCode": "097140",
+      "paperCode": "1101",
+      "examSessionLabel": "第二次",
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=101&code=097140&q=1&s=c011&t=Q",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=103&code=097140&q=1&s=c011&t=M",
+        "page": 6,
+        "endPage": 6,
+        "image": "/question-media/moex-97-2-med1/MOEX-097140-1101-Q074.webp",
+        "width": 1030,
+        "height": 198,
+        "scope": "解剖學、胚胎學、組織學、微生物免疫學、寄生蟲學及公共衛生學",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-097140-1101-Q075",
+      "subject": "醫學（一）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（一）",
+      "stem": "食用未熟之淡水魚類，會感染下列何種人體寄生蟲？",
+      "options": {
+        "A": "海獸胃線蟲（Anisakis simplex）",
+        "B": "菲律賓毛線蟲（Capillaria philippinensis）",
+        "C": "廣東住血線蟲（Angiostrongylus cantonensis）",
+        "D": "衛氏肺吸蟲（Paragonimus westermani）"
+      },
+      "answer": "B",
+      "acceptedAnswers": [
+        "B"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：B。",
+      "testedConcept": "醫學（一）（舊制原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國97年 第2次 醫師 醫學（一） 1101（舊制）",
+      "sourceYear": 2008,
+      "sourceRound": 2,
+      "originalQuestionNumber": 75,
+      "examCode": "097140",
+      "paperCode": "1101",
+      "examSessionLabel": "第二次",
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=101&code=097140&q=1&s=c011&t=Q",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=103&code=097140&q=1&s=c011&t=M",
+        "page": 6,
+        "endPage": 6,
+        "image": "/question-media/moex-97-2-med1/MOEX-097140-1101-Q075.webp",
+        "width": 1030,
+        "height": 99,
+        "scope": "解剖學、胚胎學、組織學、微生物免疫學、寄生蟲學及公共衛生學",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-097140-1101-Q076",
+      "subject": "醫學（一）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（一）",
+      "stem": "下列人體寄生蟲檢查法，何者錯誤？",
+      "options": {
+        "A": "惡性瘧原蟲（Plasmodium faiciparum）－血液厚片塗抹法（thick blood smear）",
+        "B": "蟯蟲（Enterobius vermicularis）－肛圍擦拭法（cellophane tape swab method）",
+        "C": "旋毛蟲（Trichinella spiralis）－肌肉活體採樣檢查（biopsy）",
+        "D": "蟠尾絲蟲（Onchocerca volvulus）－膜濾法（nuclear pore filtration）"
+      },
+      "answer": "A",
+      "acceptedAnswers": [
+        "A",
+        "D"
+      ],
+      "answerCreditType": "multiple_accepted",
+      "explanation": "官方最終答案：A、D。",
+      "testedConcept": "醫學（一）（舊制原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國97年 第2次 醫師 醫學（一） 1101（舊制）",
+      "sourceYear": 2008,
+      "sourceRound": 2,
+      "originalQuestionNumber": 76,
+      "examCode": "097140",
+      "paperCode": "1101",
+      "examSessionLabel": "第二次",
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=101&code=097140&q=1&s=c011&t=Q",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=103&code=097140&q=1&s=c011&t=M",
+        "page": 7,
+        "endPage": 7,
+        "image": "/question-media/moex-97-2-med1/MOEX-097140-1101-Q076.webp",
+        "width": 1030,
+        "height": 158,
+        "scope": "解剖學、胚胎學、組織學、微生物免疫學、寄生蟲學及公共衛生學",
+        "answerNote": "第76題答A或D者均給分"
+      }
+    },
+    {
+      "id": "MOEX-097140-1101-Q077",
+      "subject": "醫學（一）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（一）",
+      "stem": "下列何者是中華肝吸蟲（Clonorchis sinensis）的確認診斷？",
+      "options": {
+        "A": "有生食淡水魚的習慣",
+        "B": "周邊血的嗜酸性白血球增多",
+        "C": "有上腹疼痛、肝腫大、黃疸的現象",
+        "D": "自糞便中檢出蟲卵"
+      },
+      "answer": "D",
+      "acceptedAnswers": [
+        "D"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：D。",
+      "testedConcept": "醫學（一）（舊制原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國97年 第2次 醫師 醫學（一） 1101（舊制）",
+      "sourceYear": 2008,
+      "sourceRound": 2,
+      "originalQuestionNumber": 77,
+      "examCode": "097140",
+      "paperCode": "1101",
+      "examSessionLabel": "第二次",
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=101&code=097140&q=1&s=c011&t=Q",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=103&code=097140&q=1&s=c011&t=M",
+        "page": 7,
+        "endPage": 7,
+        "image": "/question-media/moex-97-2-med1/MOEX-097140-1101-Q077.webp",
+        "width": 1030,
+        "height": 95,
+        "scope": "解剖學、胚胎學、組織學、微生物免疫學、寄生蟲學及公共衛生學",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-097140-1101-Q078",
+      "subject": "醫學（一）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（一）",
+      "stem": "在人類，豬囊尾幼蟲（Cysticercus cellulosae）最常侵犯下列何處？",
+      "options": {
+        "A": "眼睛",
+        "B": "腦",
+        "C": "小腸",
+        "D": "肝臟"
+      },
+      "answer": "B",
+      "acceptedAnswers": [
+        "B"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：B。",
+      "testedConcept": "醫學（一）（舊制原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國97年 第2次 醫師 醫學（一） 1101（舊制）",
+      "sourceYear": 2008,
+      "sourceRound": 2,
+      "originalQuestionNumber": 78,
+      "examCode": "097140",
+      "paperCode": "1101",
+      "examSessionLabel": "第二次",
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=101&code=097140&q=1&s=c011&t=Q",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=103&code=097140&q=1&s=c011&t=M",
+        "page": 7,
+        "endPage": 7,
+        "image": "/question-media/moex-97-2-med1/MOEX-097140-1101-Q078.webp",
+        "width": 1030,
+        "height": 64,
+        "scope": "解剖學、胚胎學、組織學、微生物免疫學、寄生蟲學及公共衛生學",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-097140-1101-Q079",
+      "subject": "醫學（一）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（一）",
+      "stem": "若患者之新鮮糞便中含有感染型（infective form），則照顧患者之醫護人員較易受到感染的寄生 蟲是：",
+      "options": {
+        "A": "環孢子蟲（Cyclospora cayetanensis）",
+        "B": "人肉孢子蟲（Sarcocystis hominis）",
+        "C": "等孢子蟲（Isospora belli）",
+        "D": "隱孢子蟲（Cryptosporidium parvum）"
+      },
+      "answer": "D",
+      "acceptedAnswers": [
+        "D"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：D。",
+      "testedConcept": "醫學（一）（舊制原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國97年 第2次 醫師 醫學（一） 1101（舊制）",
+      "sourceYear": 2008,
+      "sourceRound": 2,
+      "originalQuestionNumber": 79,
+      "examCode": "097140",
+      "paperCode": "1101",
+      "examSessionLabel": "第二次",
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=101&code=097140&q=1&s=c011&t=Q",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=103&code=097140&q=1&s=c011&t=M",
+        "page": 7,
+        "endPage": 7,
+        "image": "/question-media/moex-97-2-med1/MOEX-097140-1101-Q079.webp",
+        "width": 1030,
+        "height": 127,
+        "scope": "解剖學、胚胎學、組織學、微生物免疫學、寄生蟲學及公共衛生學",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-097140-1101-Q080",
+      "subject": "醫學（一）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（一）",
+      "stem": "下列有關瘧疾的敘述，何者錯誤？",
+      "options": {
+        "A": "預防間日瘧之復發（relapse），宜用primaquine",
+        "B": "瘧疾發作（paroxysm）之過程依序為：惡寒（chill）、發燒（fever）、發汗（sweat）",
+        "C": "瘧疾的主要症狀為：發燒、貧血、肝腫大",
+        "D": "惡性瘧患者周邊血液中，通常較不易發現裂殖體（schizonts）"
+      },
+      "answer": "C",
+      "acceptedAnswers": [
+        "C"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：C。",
+      "testedConcept": "醫學（一）（舊制原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國97年 第2次 醫師 醫學（一） 1101（舊制）",
+      "sourceYear": 2008,
+      "sourceRound": 2,
+      "originalQuestionNumber": 80,
+      "examCode": "097140",
+      "paperCode": "1101",
+      "examSessionLabel": "第二次",
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=101&code=097140&q=1&s=c011&t=Q",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=103&code=097140&q=1&s=c011&t=M",
+        "page": 7,
+        "endPage": 7,
+        "image": "/question-media/moex-97-2-med1/MOEX-097140-1101-Q080.webp",
+        "width": 1030,
+        "height": 158,
+        "scope": "解剖學、胚胎學、組織學、微生物免疫學、寄生蟲學及公共衛生學",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-097140-1101-Q081",
+      "subject": "醫學（一）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（一）",
+      "stem": "某一高科技業者因家庭教育的關係，很少清洗肚臍，一日因肚皮奇癢難耐，並發現肚臍鑽出似蛆之 小蟲，請問有關此病例之敘述，下列何者錯誤？",
+      "options": {
+        "A": "此病人應是罹患蠅蛆症（myiasis）",
+        "B": "蠅蛆症之發生，一定是母蠅產卵於患者之傷口，因此本病人之肚臍已有病灶（lesion）",
+        "C": "蠅蛆症不只在皮膚病灶，腸道或生殖泌尿道也可能發生",
+        "D": "本病人之治療應清創和移除所有蠅蛆，並視情況給予適當抗生素治療，以防二次感染（secondary infection）"
+      },
+      "answer": "B",
+      "acceptedAnswers": [
+        "B"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：B。",
+      "testedConcept": "醫學（一）（舊制原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國97年 第2次 醫師 醫學（一） 1101（舊制）",
+      "sourceYear": 2008,
+      "sourceRound": 2,
+      "originalQuestionNumber": 81,
+      "examCode": "097140",
+      "paperCode": "1101",
+      "examSessionLabel": "第二次",
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=101&code=097140&q=1&s=c011&t=Q",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=103&code=097140&q=1&s=c011&t=M",
+        "page": 7,
+        "endPage": 7,
+        "image": "/question-media/moex-97-2-med1/MOEX-097140-1101-Q081.webp",
+        "width": 1030,
+        "height": 220,
+        "scope": "解剖學、胚胎學、組織學、微生物免疫學、寄生蟲學及公共衛生學",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-097140-1101-Q082",
+      "subject": "醫學（一）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（一）",
+      "stem": "下列何種細菌可作為微生物殺蟲劑，消滅病媒蚊之幼蟲，用以防治登革熱？",
+      "options": {
+        "A": "比菲德氏菌（Bifidus）",
+        "B": "蘇力菌（Bacillus thuringiensis）",
+        "C": "乳酸桿菌（Lactobacillus acidophilus）",
+        "D": "大腸桿菌（Escherichia coli）"
+      },
+      "answer": "B",
+      "acceptedAnswers": [
+        "B"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：B。",
+      "testedConcept": "醫學（一）（舊制原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國97年 第2次 醫師 醫學（一） 1101（舊制）",
+      "sourceYear": 2008,
+      "sourceRound": 2,
+      "originalQuestionNumber": 82,
+      "examCode": "097140",
+      "paperCode": "1101",
+      "examSessionLabel": "第二次",
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=101&code=097140&q=1&s=c011&t=Q",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=103&code=097140&q=1&s=c011&t=M",
+        "page": 7,
+        "endPage": 7,
+        "image": "/question-media/moex-97-2-med1/MOEX-097140-1101-Q082.webp",
+        "width": 1030,
+        "height": 96,
+        "scope": "解剖學、胚胎學、組織學、微生物免疫學、寄生蟲學及公共衛生學",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-097140-1101-Q083",
+      "subject": "醫學（一）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（一）",
+      "stem": "兩研究員分別探討吸菸與腦中風的相關性。兩人都得到勝算比（odds ratio）＝2.8 的結果，但是相對 應的95%信賴區間則不同：甲研究員得到（0.9, 8.7），乙研究員為（1.8, 4.4）。請問下列敘述何者 最可能正確？",
+      "options": {
+        "A": "兩者都有統計學上的意義（即P＜0.05）",
+        "B": "吸菸和腦中風沒有相關性",
+        "C": "甲研究員的樣本數（sample size）可能比較大",
+        "D": "乙研究員的數據變異性（variation）較小"
+      },
+      "answer": "D",
+      "acceptedAnswers": [
+        "D"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：D。",
+      "testedConcept": "醫學（一）（舊制原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國97年 第2次 醫師 醫學（一） 1101（舊制）",
+      "sourceYear": 2008,
+      "sourceRound": 2,
+      "originalQuestionNumber": 83,
+      "examCode": "097140",
+      "paperCode": "1101",
+      "examSessionLabel": "第二次",
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=101&code=097140&q=1&s=c011&t=Q",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=103&code=097140&q=1&s=c011&t=M",
+        "page": 7,
+        "endPage": 7,
+        "image": "/question-media/moex-97-2-med1/MOEX-097140-1101-Q083.webp",
+        "width": 1030,
+        "height": 158,
+        "scope": "解剖學、胚胎學、組織學、微生物免疫學、寄生蟲學及公共衛生學",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-097140-1101-Q084",
+      "subject": "醫學（一）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（一）",
+      "stem": "某班護理系學生50 名參加內外科護理及精神科護理兩科測驗，其中內外科護理的全班平均分數為78 分、標準差為8 分，精神科護理的全班平均分數為70 分、標準差為8 分。該兩科目測驗分數之變異 係數值（coefficient of variation）為：",
+      "options": {
+        "A": "內外科護理＝精神科護理",
+        "B": "內外科護理＞精神科護理",
+        "C": "內外科護理＜精神科護理",
+        "D": "資訊不足無法判定"
+      },
+      "answer": "C",
+      "acceptedAnswers": [
+        "C"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：C。",
+      "testedConcept": "醫學（一）（舊制原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國97年 第2次 醫師 醫學（一） 1101（舊制）",
+      "sourceYear": 2008,
+      "sourceRound": 2,
+      "originalQuestionNumber": 84,
+      "examCode": "097140",
+      "paperCode": "1101",
+      "examSessionLabel": "第二次",
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=101&code=097140&q=1&s=c011&t=Q",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=103&code=097140&q=1&s=c011&t=M",
+        "page": 7,
+        "endPage": 7,
+        "image": "/question-media/moex-97-2-med1/MOEX-097140-1101-Q084.webp",
+        "width": 1030,
+        "height": 157,
+        "scope": "解剖學、胚胎學、組織學、微生物免疫學、寄生蟲學及公共衛生學",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-097140-1101-Q085",
+      "subject": "醫學（一）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（一）",
+      "stem": "2000 名60 歲以上的男性在篩檢後發現有200 人已有疾病A；接下來10 年的追蹤又有300 人得到此 病。若10 年之間，這些男性均無人死亡，請問疾病A 在10 年內的累積發生率（cumulative incidence） 是多少？",
+      "options": {
+        "A": "15%",
+        "B": "16.7%",
+        "C": "25%",
+        "D": "27.8%"
+      },
+      "answer": "A",
+      "acceptedAnswers": [
+        "A",
+        "B",
+        "C",
+        "D"
+      ],
+      "answerCreditType": "all_credit",
+      "explanation": "官方最終答案：一律給分。",
+      "testedConcept": "醫學（一）（舊制原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國97年 第2次 醫師 醫學（一） 1101（舊制）",
+      "sourceYear": 2008,
+      "sourceRound": 2,
+      "originalQuestionNumber": 85,
+      "examCode": "097140",
+      "paperCode": "1101",
+      "examSessionLabel": "第二次",
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=101&code=097140&q=1&s=c011&t=Q",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=103&code=097140&q=1&s=c011&t=M",
+        "page": 7,
+        "endPage": 7,
+        "image": "/question-media/moex-97-2-med1/MOEX-097140-1101-Q085.webp",
+        "width": 1030,
+        "height": 127,
+        "scope": "解剖學、胚胎學、組織學、微生物免疫學、寄生蟲學及公共衛生學",
+        "answerNote": "第85題一律給分"
+      }
+    },
+    {
+      "id": "MOEX-097140-1101-Q086",
+      "subject": "醫學（一）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（一）",
+      "stem": "下列關於標準化死亡率比（standardized mortality ratio, SMR）之敘述，何者錯誤？",
+      "options": {
+        "A": "病例對照法也可計算SMR",
+        "B": "兩個SMR 無法直接相比",
+        "C": "是一種間接法之標準化方式",
+        "D": "兩個族群SMR 不同，必然是因分層死亡率不同"
+      },
+      "answer": "D",
+      "acceptedAnswers": [
+        "D"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：D。",
+      "testedConcept": "醫學（一）（舊制原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國97年 第2次 醫師 醫學（一） 1101（舊制）",
+      "sourceYear": 2008,
+      "sourceRound": 2,
+      "originalQuestionNumber": 86,
+      "examCode": "097140",
+      "paperCode": "1101",
+      "examSessionLabel": "第二次",
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=101&code=097140&q=1&s=c011&t=Q",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=103&code=097140&q=1&s=c011&t=M",
+        "page": 7,
+        "endPage": 7,
+        "image": "/question-media/moex-97-2-med1/MOEX-097140-1101-Q086.webp",
+        "width": 1030,
+        "height": 96,
+        "scope": "解剖學、胚胎學、組織學、微生物免疫學、寄生蟲學及公共衛生學",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-097140-1101-Q087",
+      "subject": "醫學（一）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（一）",
+      "stem": "下列何者是肺結核（Tuberculosis）之初段預防工作？",
+      "options": {
+        "A": "施打卡介苗",
+        "B": "做好個案發現工作",
+        "C": "及早給予正確診斷和處理",
+        "D": "發病個案登記管理"
+      },
+      "answer": "A",
+      "acceptedAnswers": [
+        "A"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：A。",
+      "testedConcept": "醫學（一）（舊制原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國97年 第2次 醫師 醫學（一） 1101（舊制）",
+      "sourceYear": 2008,
+      "sourceRound": 2,
+      "originalQuestionNumber": 87,
+      "examCode": "097140",
+      "paperCode": "1101",
+      "examSessionLabel": "第二次",
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=101&code=097140&q=1&s=c011&t=Q",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=103&code=097140&q=1&s=c011&t=M",
+        "page": 8,
+        "endPage": 8,
+        "image": "/question-media/moex-97-2-med1/MOEX-097140-1101-Q087.webp",
+        "width": 1030,
+        "height": 96,
+        "scope": "解剖學、胚胎學、組織學、微生物免疫學、寄生蟲學及公共衛生學",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-097140-1101-Q088",
+      "subject": "醫學（一）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（一）",
+      "stem": "2006 年台灣子宮頸癌全年發生率（incidence），分子是2006 年台灣新發生之子宮頸癌個案數，則其 分母是：",
+      "options": {
+        "A": "2006 年台灣全人口數",
+        "B": "2006 年台灣全部女性人口數",
+        "C": "2006 年台灣全部女性罹患癌症的個案數",
+        "D": "2006 年台灣女性有機會得到子宮頸癌，但尚未罹患的人口數"
+      },
+      "answer": "D",
+      "acceptedAnswers": [
+        "D"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：D。",
+      "testedConcept": "醫學（一）（舊制原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國97年 第2次 醫師 醫學（一） 1101（舊制）",
+      "sourceYear": 2008,
+      "sourceRound": 2,
+      "originalQuestionNumber": 88,
+      "examCode": "097140",
+      "paperCode": "1101",
+      "examSessionLabel": "第二次",
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=101&code=097140&q=1&s=c011&t=Q",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=103&code=097140&q=1&s=c011&t=M",
+        "page": 8,
+        "endPage": 8,
+        "image": "/question-media/moex-97-2-med1/MOEX-097140-1101-Q088.webp",
+        "width": 1030,
+        "height": 192,
+        "scope": "解剖學、胚胎學、組織學、微生物免疫學、寄生蟲學及公共衛生學",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-097140-1101-Q089",
+      "subject": "醫學（一）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（一）",
+      "stem": "惡性瘧原蟲對何種貧血者的侵襲危險性較正常人為低？",
+      "options": {
+        "A": "缺鐵性貧血",
+        "B": "鐮刀形血球性貧血",
+        "C": "維生素B12 缺乏性貧血",
+        "D": "葉酸缺乏性貧血"
+      },
+      "answer": "B",
+      "acceptedAnswers": [
+        "B"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：B。",
+      "testedConcept": "醫學（一）（舊制原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國97年 第2次 醫師 醫學（一） 1101（舊制）",
+      "sourceYear": 2008,
+      "sourceRound": 2,
+      "originalQuestionNumber": 89,
+      "examCode": "097140",
+      "paperCode": "1101",
+      "examSessionLabel": "第二次",
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=101&code=097140&q=1&s=c011&t=Q",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=103&code=097140&q=1&s=c011&t=M",
+        "page": 8,
+        "endPage": 8,
+        "image": "/question-media/moex-97-2-med1/MOEX-097140-1101-Q089.webp",
+        "width": 1030,
+        "height": 97,
+        "scope": "解剖學、胚胎學、組織學、微生物免疫學、寄生蟲學及公共衛生學",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-097140-1101-Q090",
+      "subject": "醫學（一）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（一）",
+      "stem": "下列何種流行病學團體層次的研究最適合探討疾病的遺傳與環境互動？",
+      "options": {
+        "A": "時地聚集研究",
+        "B": "移民比較研究",
+        "C": "生態相關研究",
+        "D": "時間序列研究"
+      },
+      "answer": "B",
+      "acceptedAnswers": [
+        "B"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：B。",
+      "testedConcept": "醫學（一）（舊制原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國97年 第2次 醫師 醫學（一） 1101（舊制）",
+      "sourceYear": 2008,
+      "sourceRound": 2,
+      "originalQuestionNumber": 90,
+      "examCode": "097140",
+      "paperCode": "1101",
+      "examSessionLabel": "第二次",
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=101&code=097140&q=1&s=c011&t=Q",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=103&code=097140&q=1&s=c011&t=M",
+        "page": 8,
+        "endPage": 8,
+        "image": "/question-media/moex-97-2-med1/MOEX-097140-1101-Q090.webp",
+        "width": 1030,
+        "height": 65,
+        "scope": "解剖學、胚胎學、組織學、微生物免疫學、寄生蟲學及公共衛生學",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-097140-1101-Q091",
+      "subject": "醫學（一）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（一）",
+      "stem": "與西方先進國家比較，下列何者非台灣醫療服務體系最重要的問題？",
+      "options": {
+        "A": "外科手術等候時間太久",
+        "B": "重醫療輕預防",
+        "C": "未落實分級醫療",
+        "D": "服務體系缺乏整合"
+      },
+      "answer": "A",
+      "acceptedAnswers": [
+        "A"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：A。",
+      "testedConcept": "醫學（一）（舊制原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國97年 第2次 醫師 醫學（一） 1101（舊制）",
+      "sourceYear": 2008,
+      "sourceRound": 2,
+      "originalQuestionNumber": 91,
+      "examCode": "097140",
+      "paperCode": "1101",
+      "examSessionLabel": "第二次",
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=101&code=097140&q=1&s=c011&t=Q",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=103&code=097140&q=1&s=c011&t=M",
+        "page": 8,
+        "endPage": 8,
+        "image": "/question-media/moex-97-2-med1/MOEX-097140-1101-Q091.webp",
+        "width": 1030,
+        "height": 95,
+        "scope": "解剖學、胚胎學、組織學、微生物免疫學、寄生蟲學及公共衛生學",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-097140-1101-Q092",
+      "subject": "醫學（一）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（一）",
+      "stem": "下列何者不符合健康促進應有之倫理守則？",
+      "options": {
+        "A": "價值明確開放",
+        "B": "尊重個人隱私",
+        "C": "專家主導決定",
+        "D": "注重成本效益"
+      },
+      "answer": "C",
+      "acceptedAnswers": [
+        "C"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：C。",
+      "testedConcept": "醫學（一）（舊制原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國97年 第2次 醫師 醫學（一） 1101（舊制）",
+      "sourceYear": 2008,
+      "sourceRound": 2,
+      "originalQuestionNumber": 92,
+      "examCode": "097140",
+      "paperCode": "1101",
+      "examSessionLabel": "第二次",
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=101&code=097140&q=1&s=c011&t=Q",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=103&code=097140&q=1&s=c011&t=M",
+        "page": 8,
+        "endPage": 8,
+        "image": "/question-media/moex-97-2-med1/MOEX-097140-1101-Q092.webp",
+        "width": 1030,
+        "height": 64,
+        "scope": "解剖學、胚胎學、組織學、微生物免疫學、寄生蟲學及公共衛生學",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-097140-1101-Q093",
+      "subject": "醫學（一）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（一）",
+      "stem": "使用個案對照研究（case-control）去探討大腸癌的危險因子，發現在控制各種因子後，時常食用黃 豆類的勝算比（OR）是0.6，其95%信賴區間是（0.4, 0.9）。由本研究結果，食用黃豆類對大腸癌 發生，其作用如何？",
+      "options": {
+        "A": "沒有作用",
+        "B": "傾向有保護作用（protective）",
+        "C": "傾向有危害作用（harmful）",
+        "D": "由此數據無法確定其作用"
+      },
+      "answer": "B",
+      "acceptedAnswers": [
+        "B"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：B。",
+      "testedConcept": "醫學（一）（舊制原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國97年 第2次 醫師 醫學（一） 1101（舊制）",
+      "sourceYear": 2008,
+      "sourceRound": 2,
+      "originalQuestionNumber": 93,
+      "examCode": "097140",
+      "paperCode": "1101",
+      "examSessionLabel": "第二次",
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=101&code=097140&q=1&s=c011&t=Q",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=103&code=097140&q=1&s=c011&t=M",
+        "page": 8,
+        "endPage": 8,
+        "image": "/question-media/moex-97-2-med1/MOEX-097140-1101-Q093.webp",
+        "width": 1030,
+        "height": 160,
+        "scope": "解剖學、胚胎學、組織學、微生物免疫學、寄生蟲學及公共衛生學",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-097140-1101-Q094",
+      "subject": "醫學（一）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（一）",
+      "stem": "職業引起的帕金森氏症（Parkinsonism）與以下何種物質之暴露最有關？",
+      "options": {
+        "A": "汞（Mercury）",
+        "B": "錳（Manganese）",
+        "C": "四氯化碳（Carbon tetrachloride）",
+        "D": "有機磷劑（Organophosphate）"
+      },
+      "answer": "B",
+      "acceptedAnswers": [
+        "B"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：B。",
+      "testedConcept": "醫學（一）（舊制原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國97年 第2次 醫師 醫學（一） 1101（舊制）",
+      "sourceYear": 2008,
+      "sourceRound": 2,
+      "originalQuestionNumber": 94,
+      "examCode": "097140",
+      "paperCode": "1101",
+      "examSessionLabel": "第二次",
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=101&code=097140&q=1&s=c011&t=Q",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=103&code=097140&q=1&s=c011&t=M",
+        "page": 8,
+        "endPage": 8,
+        "image": "/question-media/moex-97-2-med1/MOEX-097140-1101-Q094.webp",
+        "width": 1030,
+        "height": 96,
+        "scope": "解剖學、胚胎學、組織學、微生物免疫學、寄生蟲學及公共衛生學",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-097140-1101-Q095",
+      "subject": "醫學（一）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（一）",
+      "stem": "下列有關病毒性肝炎的敘述，何者正確？",
+      "options": {
+        "A": "A 型肝炎疾病為DNA 病毒",
+        "B": "A 型肝炎主要經輸血液或污染針頭傳染",
+        "C": "B 型肝炎曾被稱血清性肝炎",
+        "D": "母親為B 型肝炎e 抗原陽性者，則其嬰兒在出生1 週後應注射B 型肝炎免疫球蛋白"
+      },
+      "answer": "C",
+      "acceptedAnswers": [
+        "C"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：C。",
+      "testedConcept": "醫學（一）（舊制原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國97年 第2次 醫師 醫學（一） 1101（舊制）",
+      "sourceYear": 2008,
+      "sourceRound": 2,
+      "originalQuestionNumber": 95,
+      "examCode": "097140",
+      "paperCode": "1101",
+      "examSessionLabel": "第二次",
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=101&code=097140&q=1&s=c011&t=Q",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=103&code=097140&q=1&s=c011&t=M",
+        "page": 8,
+        "endPage": 8,
+        "image": "/question-media/moex-97-2-med1/MOEX-097140-1101-Q095.webp",
+        "width": 1030,
+        "height": 160,
+        "scope": "解剖學、胚胎學、組織學、微生物免疫學、寄生蟲學及公共衛生學",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-097140-1101-Q096",
+      "subject": "醫學（一）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（一）",
+      "stem": "一位在噴砂工作超過20 年的男性，若工作時未作適當的防護，他對以下那一項疾病，比一般人有較 高的罹患率？",
+      "options": {
+        "A": "職業氣喘症",
+        "B": "肺結核",
+        "C": "肺炎",
+        "D": "膀胱癌"
+      },
+      "answer": "B",
+      "acceptedAnswers": [
+        "B"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：B。",
+      "testedConcept": "醫學（一）（舊制原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國97年 第2次 醫師 醫學（一） 1101（舊制）",
+      "sourceYear": 2008,
+      "sourceRound": 2,
+      "originalQuestionNumber": 96,
+      "examCode": "097140",
+      "paperCode": "1101",
+      "examSessionLabel": "第二次",
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=101&code=097140&q=1&s=c011&t=Q",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=103&code=097140&q=1&s=c011&t=M",
+        "page": 8,
+        "endPage": 8,
+        "image": "/question-media/moex-97-2-med1/MOEX-097140-1101-Q096.webp",
+        "width": 1030,
+        "height": 95,
+        "scope": "解剖學、胚胎學、組織學、微生物免疫學、寄生蟲學及公共衛生學",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-097140-1101-Q097",
+      "subject": "醫學（一）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（一）",
+      "stem": "下列何種菌種可引起細菌性毒素之食物中毒？",
+      "options": {
+        "A": "沙門氏菌",
+        "B": "幽門螺旋桿菌",
+        "C": "金黃葡萄球菌",
+        "D": "腸炎弧菌"
+      },
+      "answer": "C",
+      "acceptedAnswers": [
+        "C",
+        "D"
+      ],
+      "answerCreditType": "multiple_accepted",
+      "explanation": "官方最終答案：C、D。",
+      "testedConcept": "醫學（一）（舊制原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國97年 第2次 醫師 醫學（一） 1101（舊制）",
+      "sourceYear": 2008,
+      "sourceRound": 2,
+      "originalQuestionNumber": 97,
+      "examCode": "097140",
+      "paperCode": "1101",
+      "examSessionLabel": "第二次",
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=101&code=097140&q=1&s=c011&t=Q",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=103&code=097140&q=1&s=c011&t=M",
+        "page": 8,
+        "endPage": 8,
+        "image": "/question-media/moex-97-2-med1/MOEX-097140-1101-Q097.webp",
+        "width": 1030,
+        "height": 64,
+        "scope": "解剖學、胚胎學、組織學、微生物免疫學、寄生蟲學及公共衛生學",
+        "answerNote": "第97題答C或D者均給分"
+      }
+    },
+    {
+      "id": "MOEX-097140-1101-Q098",
+      "subject": "醫學（一）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（一）",
+      "stem": "依據醫師法規定，醫師執行業務時應製作病歷。下列何者非醫師法明文列舉應包括之病歷內容？",
+      "options": {
+        "A": "病人之姓名",
+        "B": "診斷",
+        "C": "造成傷病之外因",
+        "D": "檢查結果"
+      },
+      "answer": "C",
+      "acceptedAnswers": [
+        "C"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：C。",
+      "testedConcept": "醫學（一）（舊制原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國97年 第2次 醫師 醫學（一） 1101（舊制）",
+      "sourceYear": 2008,
+      "sourceRound": 2,
+      "originalQuestionNumber": 98,
+      "examCode": "097140",
+      "paperCode": "1101",
+      "examSessionLabel": "第二次",
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=101&code=097140&q=1&s=c011&t=Q",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=103&code=097140&q=1&s=c011&t=M",
+        "page": 8,
+        "endPage": 8,
+        "image": "/question-media/moex-97-2-med1/MOEX-097140-1101-Q098.webp",
+        "width": 1030,
+        "height": 65,
+        "scope": "解剖學、胚胎學、組織學、微生物免疫學、寄生蟲學及公共衛生學",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-097140-1101-Q099",
+      "subject": "醫學（一）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（一）",
+      "stem": "下列何者不是全民健康保險之特性？",
+      "options": {
+        "A": "經驗費率",
+        "B": "風險分擔",
+        "C": "強制性",
+        "D": "社會保險"
+      },
+      "answer": "A",
+      "acceptedAnswers": [
+        "A"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：A。",
+      "testedConcept": "醫學（一）（舊制原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國97年 第2次 醫師 醫學（一） 1101（舊制）",
+      "sourceYear": 2008,
+      "sourceRound": 2,
+      "originalQuestionNumber": 99,
+      "examCode": "097140",
+      "paperCode": "1101",
+      "examSessionLabel": "第二次",
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=101&code=097140&q=1&s=c011&t=Q",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=103&code=097140&q=1&s=c011&t=M",
+        "page": 8,
+        "endPage": 8,
+        "image": "/question-media/moex-97-2-med1/MOEX-097140-1101-Q099.webp",
+        "width": 1030,
+        "height": 64,
+        "scope": "解剖學、胚胎學、組織學、微生物免疫學、寄生蟲學及公共衛生學",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-097140-1101-Q100",
+      "subject": "醫學（一）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（一）",
+      "stem": "醫院遇有危急病人，應先予適當之急救，若病人為路倒病人且負擔不起醫療費用時，依據醫療法的 規定，其費用應如何處理？",
+      "options": {
+        "A": "由醫院列為呆帳自行吸收",
+        "B": "由醫院提撥之社福基金補助",
+        "C": "由全民健保補助",
+        "D": "由直轄市或縣市政府社政單位補助"
+      },
+      "answer": "D",
+      "acceptedAnswers": [
+        "D"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：D。",
+      "testedConcept": "醫學（一）（舊制原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國97年 第2次 醫師 醫學（一） 1101（舊制）",
+      "sourceYear": 2008,
+      "sourceRound": 2,
+      "originalQuestionNumber": 100,
+      "examCode": "097140",
+      "paperCode": "1101",
+      "examSessionLabel": "第二次",
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=101&code=097140&q=1&s=c011&t=Q",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=103&code=097140&q=1&s=c011&t=M",
+        "page": 8,
+        "endPage": 8,
+        "image": "/question-media/moex-97-2-med1/MOEX-097140-1101-Q100.webp",
+        "width": 1030,
+        "height": 127,
+        "scope": "解剖學、胚胎學、組織學、微生物免疫學、寄生蟲學及公共衛生學",
+        "answerNote": null
+      }
+    }
+  ]
+}

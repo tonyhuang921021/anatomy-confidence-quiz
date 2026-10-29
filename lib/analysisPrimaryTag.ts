@@ -2,6 +2,8 @@ import primaryTagRuntimeMapJson from "../data/analysisPrimaryTagRuntimeMap.json"
 import legacyClassificationJson from "../data/sources/moex_98_99_classification_review.json";
 import legacy97ClassificationJson from "../data/sources/moex_97_1_med1_classification.json";
 import legacy97Med2ClassificationJson from "../data/sources/moex_97_1_med2_classification.json";
+import legacy97SecondMed1ClassificationJson from "../data/sources/moex_97_2_med1_classification.json";
+import legacy97SecondMed2ClassificationJson from "../data/sources/moex_97_2_med2_classification.json";
 import legacyLearningPlacementJson from "../data/sources/moex_98_99_learning_placement.json";
 import { getMoexPrimarySubject } from "../scripts/moex-primary-subject";
 import type { Question, QuestionClassificationOverride, SubjectName } from "../types/quiz";
@@ -25,11 +27,11 @@ type RuntimePrimaryTagMap = {
 const runtimePrimaryTagMap = primaryTagRuntimeMapJson as unknown as RuntimePrimaryTagMap;
 const runtimeAssignments = runtimePrimaryTagMap.questions;
 // The source-bound contract test validates every subject, tag and tuple length.
-const legacyAssignments = { ...legacyClassificationJson.questions, ...legacy97ClassificationJson.questions, ...legacy97Med2ClassificationJson.questions } as unknown as Record<string, [SubjectName, string | null]>;
+const legacyAssignments = { ...legacyClassificationJson.questions, ...legacy97ClassificationJson.questions, ...legacy97Med2ClassificationJson.questions, ...legacy97SecondMed1ClassificationJson.questions, ...legacy97SecondMed2ClassificationJson.questions } as unknown as Record<string, [SubjectName, string | null]>;
 const legacyPendingIds = new Set<string>(legacyClassificationJson.pendingQuestionIds);
-const legacyPendingPrimaryTagIds = new Set<string>([...legacyClassificationJson.pendingPrimaryTagQuestionIds, ...legacy97ClassificationJson.pendingPrimaryTagQuestionIds, ...legacy97Med2ClassificationJson.pendingPrimaryTagQuestionIds]);
+const legacyPendingPrimaryTagIds = new Set<string>([...legacyClassificationJson.pendingPrimaryTagQuestionIds, ...legacy97ClassificationJson.pendingPrimaryTagQuestionIds, ...legacy97Med2ClassificationJson.pendingPrimaryTagQuestionIds, ...legacy97SecondMed1ClassificationJson.pendingPrimaryTagQuestionIds, ...legacy97SecondMed2ClassificationJson.pendingPrimaryTagQuestionIds]);
 // The generator and contract tests validate the two-string tuple for all 800 IDs.
-const legacyLearningPlacements = { ...legacyLearningPlacementJson.questions, ...legacy97ClassificationJson.placements, ...legacy97Med2ClassificationJson.placements } as unknown as Record<string, [string, string]>;
+const legacyLearningPlacements = { ...legacyLearningPlacementJson.questions, ...legacy97ClassificationJson.placements, ...legacy97Med2ClassificationJson.placements, ...legacy97SecondMed1ClassificationJson.placements, ...legacy97SecondMed2ClassificationJson.placements } as unknown as Record<string, [string, string]>;
 const MICROBIOLOGY_TAG_PREFIXES = ["細菌學", "病毒學", "真菌學", "免疫學", "微生物免疫學"];
 const SUBJECT_BY_CODE = [
   "解剖學",
