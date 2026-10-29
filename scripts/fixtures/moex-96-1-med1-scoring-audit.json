@@ -1,0 +1,1052 @@
+{
+  "status": "focused_scoring_contract_not_full_repo_test",
+  "repositoryCommit": "fb08d3073ee090f5aa4f9c41fcabd6e1bb73bb47",
+  "module": "lib/answerScoring.ts",
+  "node": "v24.22.1",
+  "projectTargetNode": "22",
+  "questions": 100,
+  "assertions": 400,
+  "all_credit": [
+    53,
+    54,
+    79
+  ],
+  "multiple_accepted": [
+    5,
+    9,
+    10,
+    13,
+    37,
+    46,
+    49,
+    52,
+    61,
+    87,
+    96
+  ],
+  "all_credit_fallback_policy": "answer A only required-schema fallback; label 一律給分; accepted ABCD; original # retained; Q5 ABCD multiple not all_credit",
+  "audit": [
+    {
+      "id": "MOEX-096040-1101-Q001",
+      "qno": 1,
+      "type": "standard",
+      "accepted": [
+        "A"
+      ],
+      "label": "A",
+      "four_answers_passed": true
+    },
+    {
+      "id": "MOEX-096040-1101-Q002",
+      "qno": 2,
+      "type": "standard",
+      "accepted": [
+        "C"
+      ],
+      "label": "C",
+      "four_answers_passed": true
+    },
+    {
+      "id": "MOEX-096040-1101-Q003",
+      "qno": 3,
+      "type": "standard",
+      "accepted": [
+        "C"
+      ],
+      "label": "C",
+      "four_answers_passed": true
+    },
+    {
+      "id": "MOEX-096040-1101-Q004",
+      "qno": 4,
+      "type": "standard",
+      "accepted": [
+        "B"
+      ],
+      "label": "B",
+      "four_answers_passed": true
+    },
+    {
+      "id": "MOEX-096040-1101-Q005",
+      "qno": 5,
+      "type": "multiple_accepted",
+      "accepted": [
+        "A",
+        "B",
+        "C",
+        "D"
+      ],
+      "label": "A、B、C、D",
+      "four_answers_passed": true
+    },
+    {
+      "id": "MOEX-096040-1101-Q006",
+      "qno": 6,
+      "type": "standard",
+      "accepted": [
+        "D"
+      ],
+      "label": "D",
+      "four_answers_passed": true
+    },
+    {
+      "id": "MOEX-096040-1101-Q007",
+      "qno": 7,
+      "type": "standard",
+      "accepted": [
+        "A"
+      ],
+      "label": "A",
+      "four_answers_passed": true
+    },
+    {
+      "id": "MOEX-096040-1101-Q008",
+      "qno": 8,
+      "type": "standard",
+      "accepted": [
+        "B"
+      ],
+      "label": "B",
+      "four_answers_passed": true
+    },
+    {
+      "id": "MOEX-096040-1101-Q009",
+      "qno": 9,
+      "type": "multiple_accepted",
+      "accepted": [
+        "B",
+        "D"
+      ],
+      "label": "B、D",
+      "four_answers_passed": true
+    },
+    {
+      "id": "MOEX-096040-1101-Q010",
+      "qno": 10,
+      "type": "multiple_accepted",
+      "accepted": [
+        "A",
+        "D"
+      ],
+      "label": "A、D",
+      "four_answers_passed": true
+    },
+    {
+      "id": "MOEX-096040-1101-Q011",
+      "qno": 11,
+      "type": "standard",
+      "accepted": [
+        "B"
+      ],
+      "label": "B",
+      "four_answers_passed": true
+    },
+    {
+      "id": "MOEX-096040-1101-Q012",
+      "qno": 12,
+      "type": "standard",
+      "accepted": [
+        "B"
+      ],
+      "label": "B",
+      "four_answers_passed": true
+    },
+    {
+      "id": "MOEX-096040-1101-Q013",
+      "qno": 13,
+      "type": "multiple_accepted",
+      "accepted": [
+        "A",
+        "C"
+      ],
+      "label": "A、C",
+      "four_answers_passed": true
+    },
+    {
+      "id": "MOEX-096040-1101-Q014",
+      "qno": 14,
+      "type": "standard",
+      "accepted": [
+        "B"
+      ],
+      "label": "B",
+      "four_answers_passed": true
+    },
+    {
+      "id": "MOEX-096040-1101-Q015",
+      "qno": 15,
+      "type": "standard",
+      "accepted": [
+        "A"
+      ],
+      "label": "A",
+      "four_answers_passed": true
+    },
+    {
+      "id": "MOEX-096040-1101-Q016",
+      "qno": 16,
+      "type": "standard",
+      "accepted": [
+        "A"
+      ],
+      "label": "A",
+      "four_answers_passed": true
+    },
+    {
+      "id": "MOEX-096040-1101-Q017",
+      "qno": 17,
+      "type": "standard",
+      "accepted": [
+        "D"
+      ],
+      "label": "D",
+      "four_answers_passed": true
+    },
+    {
+      "id": "MOEX-096040-1101-Q018",
+      "qno": 18,
+      "type": "standard",
+      "accepted": [
+        "A"
+      ],
+      "label": "A",
+      "four_answers_passed": true
+    },
+    {
+      "id": "MOEX-096040-1101-Q019",
+      "qno": 19,
+      "type": "standard",
+      "accepted": [
+        "D"
+      ],
+      "label": "D",
+      "four_answers_passed": true
+    },
+    {
+      "id": "MOEX-096040-1101-Q020",
+      "qno": 20,
+      "type": "standard",
+      "accepted": [
+        "C"
+      ],
+      "label": "C",
+      "four_answers_passed": true
+    },
+    {
+      "id": "MOEX-096040-1101-Q021",
+      "qno": 21,
+      "type": "standard",
+      "accepted": [
+        "B"
+      ],
+      "label": "B",
+      "four_answers_passed": true
+    },
+    {
+      "id": "MOEX-096040-1101-Q022",
+      "qno": 22,
+      "type": "standard",
+      "accepted": [
+        "A"
+      ],
+      "label": "A",
+      "four_answers_passed": true
+    },
+    {
+      "id": "MOEX-096040-1101-Q023",
+      "qno": 23,
+      "type": "standard",
+      "accepted": [
+        "C"
+      ],
+      "label": "C",
+      "four_answers_passed": true
+    },
+    {
+      "id": "MOEX-096040-1101-Q024",
+      "qno": 24,
+      "type": "standard",
+      "accepted": [
+        "D"
+      ],
+      "label": "D",
+      "four_answers_passed": true
+    },
+    {
+      "id": "MOEX-096040-1101-Q025",
+      "qno": 25,
+      "type": "standard",
+      "accepted": [
+        "B"
+      ],
+      "label": "B",
+      "four_answers_passed": true
+    },
+    {
+      "id": "MOEX-096040-1101-Q026",
+      "qno": 26,
+      "type": "standard",
+      "accepted": [
+        "D"
+      ],
+      "label": "D",
+      "four_answers_passed": true
+    },
+    {
+      "id": "MOEX-096040-1101-Q027",
+      "qno": 27,
+      "type": "standard",
+      "accepted": [
+        "B"
+      ],
+      "label": "B",
+      "four_answers_passed": true
+    },
+    {
+      "id": "MOEX-096040-1101-Q028",
+      "qno": 28,
+      "type": "standard",
+      "accepted": [
+        "A"
+      ],
+      "label": "A",
+      "four_answers_passed": true
+    },
+    {
+      "id": "MOEX-096040-1101-Q029",
+      "qno": 29,
+      "type": "standard",
+      "accepted": [
+        "A"
+      ],
+      "label": "A",
+      "four_answers_passed": true
+    },
+    {
+      "id": "MOEX-096040-1101-Q030",
+      "qno": 30,
+      "type": "standard",
+      "accepted": [
+        "B"
+      ],
+      "label": "B",
+      "four_answers_passed": true
+    },
+    {
+      "id": "MOEX-096040-1101-Q031",
+      "qno": 31,
+      "type": "standard",
+      "accepted": [
+        "A"
+      ],
+      "label": "A",
+      "four_answers_passed": true
+    },
+    {
+      "id": "MOEX-096040-1101-Q032",
+      "qno": 32,
+      "type": "standard",
+      "accepted": [
+        "D"
+      ],
+      "label": "D",
+      "four_answers_passed": true
+    },
+    {
+      "id": "MOEX-096040-1101-Q033",
+      "qno": 33,
+      "type": "standard",
+      "accepted": [
+        "B"
+      ],
+      "label": "B",
+      "four_answers_passed": true
+    },
+    {
+      "id": "MOEX-096040-1101-Q034",
+      "qno": 34,
+      "type": "standard",
+      "accepted": [
+        "B"
+      ],
+      "label": "B",
+      "four_answers_passed": true
+    },
+    {
+      "id": "MOEX-096040-1101-Q035",
+      "qno": 35,
+      "type": "standard",
+      "accepted": [
+        "C"
+      ],
+      "label": "C",
+      "four_answers_passed": true
+    },
+    {
+      "id": "MOEX-096040-1101-Q036",
+      "qno": 36,
+      "type": "standard",
+      "accepted": [
+        "B"
+      ],
+      "label": "B",
+      "four_answers_passed": true
+    },
+    {
+      "id": "MOEX-096040-1101-Q037",
+      "qno": 37,
+      "type": "multiple_accepted",
+      "accepted": [
+        "A",
+        "B"
+      ],
+      "label": "A、B",
+      "four_answers_passed": true
+    },
+    {
+      "id": "MOEX-096040-1101-Q038",
+      "qno": 38,
+      "type": "standard",
+      "accepted": [
+        "C"
+      ],
+      "label": "C",
+      "four_answers_passed": true
+    },
+    {
+      "id": "MOEX-096040-1101-Q039",
+      "qno": 39,
+      "type": "standard",
+      "accepted": [
+        "B"
+      ],
+      "label": "B",
+      "four_answers_passed": true
+    },
+    {
+      "id": "MOEX-096040-1101-Q040",
+      "qno": 40,
+      "type": "standard",
+      "accepted": [
+        "D"
+      ],
+      "label": "D",
+      "four_answers_passed": true
+    },
+    {
+      "id": "MOEX-096040-1101-Q041",
+      "qno": 41,
+      "type": "standard",
+      "accepted": [
+        "A"
+      ],
+      "label": "A",
+      "four_answers_passed": true
+    },
+    {
+      "id": "MOEX-096040-1101-Q042",
+      "qno": 42,
+      "type": "standard",
+      "accepted": [
+        "A"
+      ],
+      "label": "A",
+      "four_answers_passed": true
+    },
+    {
+      "id": "MOEX-096040-1101-Q043",
+      "qno": 43,
+      "type": "standard",
+      "accepted": [
+        "B"
+      ],
+      "label": "B",
+      "four_answers_passed": true
+    },
+    {
+      "id": "MOEX-096040-1101-Q044",
+      "qno": 44,
+      "type": "standard",
+      "accepted": [
+        "C"
+      ],
+      "label": "C",
+      "four_answers_passed": true
+    },
+    {
+      "id": "MOEX-096040-1101-Q045",
+      "qno": 45,
+      "type": "standard",
+      "accepted": [
+        "D"
+      ],
+      "label": "D",
+      "four_answers_passed": true
+    },
+    {
+      "id": "MOEX-096040-1101-Q046",
+      "qno": 46,
+      "type": "multiple_accepted",
+      "accepted": [
+        "A",
+        "C"
+      ],
+      "label": "A、C",
+      "four_answers_passed": true
+    },
+    {
+      "id": "MOEX-096040-1101-Q047",
+      "qno": 47,
+      "type": "standard",
+      "accepted": [
+        "C"
+      ],
+      "label": "C",
+      "four_answers_passed": true
+    },
+    {
+      "id": "MOEX-096040-1101-Q048",
+      "qno": 48,
+      "type": "standard",
+      "accepted": [
+        "D"
+      ],
+      "label": "D",
+      "four_answers_passed": true
+    },
+    {
+      "id": "MOEX-096040-1101-Q049",
+      "qno": 49,
+      "type": "multiple_accepted",
+      "accepted": [
+        "B",
+        "C"
+      ],
+      "label": "B、C",
+      "four_answers_passed": true
+    },
+    {
+      "id": "MOEX-096040-1101-Q050",
+      "qno": 50,
+      "type": "standard",
+      "accepted": [
+        "C"
+      ],
+      "label": "C",
+      "four_answers_passed": true
+    },
+    {
+      "id": "MOEX-096040-1101-Q051",
+      "qno": 51,
+      "type": "standard",
+      "accepted": [
+        "A"
+      ],
+      "label": "A",
+      "four_answers_passed": true
+    },
+    {
+      "id": "MOEX-096040-1101-Q052",
+      "qno": 52,
+      "type": "multiple_accepted",
+      "accepted": [
+        "A",
+        "D"
+      ],
+      "label": "A、D",
+      "four_answers_passed": true
+    },
+    {
+      "id": "MOEX-096040-1101-Q053",
+      "qno": 53,
+      "type": "all_credit",
+      "accepted": [
+        "A",
+        "B",
+        "C",
+        "D"
+      ],
+      "label": "一律給分",
+      "four_answers_passed": true
+    },
+    {
+      "id": "MOEX-096040-1101-Q054",
+      "qno": 54,
+      "type": "all_credit",
+      "accepted": [
+        "A",
+        "B",
+        "C",
+        "D"
+      ],
+      "label": "一律給分",
+      "four_answers_passed": true
+    },
+    {
+      "id": "MOEX-096040-1101-Q055",
+      "qno": 55,
+      "type": "standard",
+      "accepted": [
+        "B"
+      ],
+      "label": "B",
+      "four_answers_passed": true
+    },
+    {
+      "id": "MOEX-096040-1101-Q056",
+      "qno": 56,
+      "type": "standard",
+      "accepted": [
+        "B"
+      ],
+      "label": "B",
+      "four_answers_passed": true
+    },
+    {
+      "id": "MOEX-096040-1101-Q057",
+      "qno": 57,
+      "type": "standard",
+      "accepted": [
+        "D"
+      ],
+      "label": "D",
+      "four_answers_passed": true
+    },
+    {
+      "id": "MOEX-096040-1101-Q058",
+      "qno": 58,
+      "type": "standard",
+      "accepted": [
+        "B"
+      ],
+      "label": "B",
+      "four_answers_passed": true
+    },
+    {
+      "id": "MOEX-096040-1101-Q059",
+      "qno": 59,
+      "type": "standard",
+      "accepted": [
+        "B"
+      ],
+      "label": "B",
+      "four_answers_passed": true
+    },
+    {
+      "id": "MOEX-096040-1101-Q060",
+      "qno": 60,
+      "type": "standard",
+      "accepted": [
+        "C"
+      ],
+      "label": "C",
+      "four_answers_passed": true
+    },
+    {
+      "id": "MOEX-096040-1101-Q061",
+      "qno": 61,
+      "type": "multiple_accepted",
+      "accepted": [
+        "A",
+        "B"
+      ],
+      "label": "A、B",
+      "four_answers_passed": true
+    },
+    {
+      "id": "MOEX-096040-1101-Q062",
+      "qno": 62,
+      "type": "standard",
+      "accepted": [
+        "C"
+      ],
+      "label": "C",
+      "four_answers_passed": true
+    },
+    {
+      "id": "MOEX-096040-1101-Q063",
+      "qno": 63,
+      "type": "standard",
+      "accepted": [
+        "B"
+      ],
+      "label": "B",
+      "four_answers_passed": true
+    },
+    {
+      "id": "MOEX-096040-1101-Q064",
+      "qno": 64,
+      "type": "standard",
+      "accepted": [
+        "B"
+      ],
+      "label": "B",
+      "four_answers_passed": true
+    },
+    {
+      "id": "MOEX-096040-1101-Q065",
+      "qno": 65,
+      "type": "standard",
+      "accepted": [
+        "D"
+      ],
+      "label": "D",
+      "four_answers_passed": true
+    },
+    {
+      "id": "MOEX-096040-1101-Q066",
+      "qno": 66,
+      "type": "standard",
+      "accepted": [
+        "C"
+      ],
+      "label": "C",
+      "four_answers_passed": true
+    },
+    {
+      "id": "MOEX-096040-1101-Q067",
+      "qno": 67,
+      "type": "standard",
+      "accepted": [
+        "C"
+      ],
+      "label": "C",
+      "four_answers_passed": true
+    },
+    {
+      "id": "MOEX-096040-1101-Q068",
+      "qno": 68,
+      "type": "standard",
+      "accepted": [
+        "B"
+      ],
+      "label": "B",
+      "four_answers_passed": true
+    },
+    {
+      "id": "MOEX-096040-1101-Q069",
+      "qno": 69,
+      "type": "standard",
+      "accepted": [
+        "C"
+      ],
+      "label": "C",
+      "four_answers_passed": true
+    },
+    {
+      "id": "MOEX-096040-1101-Q070",
+      "qno": 70,
+      "type": "standard",
+      "accepted": [
+        "C"
+      ],
+      "label": "C",
+      "four_answers_passed": true
+    },
+    {
+      "id": "MOEX-096040-1101-Q071",
+      "qno": 71,
+      "type": "standard",
+      "accepted": [
+        "A"
+      ],
+      "label": "A",
+      "four_answers_passed": true
+    },
+    {
+      "id": "MOEX-096040-1101-Q072",
+      "qno": 72,
+      "type": "standard",
+      "accepted": [
+        "C"
+      ],
+      "label": "C",
+      "four_answers_passed": true
+    },
+    {
+      "id": "MOEX-096040-1101-Q073",
+      "qno": 73,
+      "type": "standard",
+      "accepted": [
+        "B"
+      ],
+      "label": "B",
+      "four_answers_passed": true
+    },
+    {
+      "id": "MOEX-096040-1101-Q074",
+      "qno": 74,
+      "type": "standard",
+      "accepted": [
+        "B"
+      ],
+      "label": "B",
+      "four_answers_passed": true
+    },
+    {
+      "id": "MOEX-096040-1101-Q075",
+      "qno": 75,
+      "type": "standard",
+      "accepted": [
+        "A"
+      ],
+      "label": "A",
+      "four_answers_passed": true
+    },
+    {
+      "id": "MOEX-096040-1101-Q076",
+      "qno": 76,
+      "type": "standard",
+      "accepted": [
+        "A"
+      ],
+      "label": "A",
+      "four_answers_passed": true
+    },
+    {
+      "id": "MOEX-096040-1101-Q077",
+      "qno": 77,
+      "type": "standard",
+      "accepted": [
+        "B"
+      ],
+      "label": "B",
+      "four_answers_passed": true
+    },
+    {
+      "id": "MOEX-096040-1101-Q078",
+      "qno": 78,
+      "type": "standard",
+      "accepted": [
+        "A"
+      ],
+      "label": "A",
+      "four_answers_passed": true
+    },
+    {
+      "id": "MOEX-096040-1101-Q079",
+      "qno": 79,
+      "type": "all_credit",
+      "accepted": [
+        "A",
+        "B",
+        "C",
+        "D"
+      ],
+      "label": "一律給分",
+      "four_answers_passed": true
+    },
+    {
+      "id": "MOEX-096040-1101-Q080",
+      "qno": 80,
+      "type": "standard",
+      "accepted": [
+        "C"
+      ],
+      "label": "C",
+      "four_answers_passed": true
+    },
+    {
+      "id": "MOEX-096040-1101-Q081",
+      "qno": 81,
+      "type": "standard",
+      "accepted": [
+        "A"
+      ],
+      "label": "A",
+      "four_answers_passed": true
+    },
+    {
+      "id": "MOEX-096040-1101-Q082",
+      "qno": 82,
+      "type": "standard",
+      "accepted": [
+        "D"
+      ],
+      "label": "D",
+      "four_answers_passed": true
+    },
+    {
+      "id": "MOEX-096040-1101-Q083",
+      "qno": 83,
+      "type": "standard",
+      "accepted": [
+        "C"
+      ],
+      "label": "C",
+      "four_answers_passed": true
+    },
+    {
+      "id": "MOEX-096040-1101-Q084",
+      "qno": 84,
+      "type": "standard",
+      "accepted": [
+        "C"
+      ],
+      "label": "C",
+      "four_answers_passed": true
+    },
+    {
+      "id": "MOEX-096040-1101-Q085",
+      "qno": 85,
+      "type": "standard",
+      "accepted": [
+        "D"
+      ],
+      "label": "D",
+      "four_answers_passed": true
+    },
+    {
+      "id": "MOEX-096040-1101-Q086",
+      "qno": 86,
+      "type": "standard",
+      "accepted": [
+        "C"
+      ],
+      "label": "C",
+      "four_answers_passed": true
+    },
+    {
+      "id": "MOEX-096040-1101-Q087",
+      "qno": 87,
+      "type": "multiple_accepted",
+      "accepted": [
+        "A",
+        "C"
+      ],
+      "label": "A、C",
+      "four_answers_passed": true
+    },
+    {
+      "id": "MOEX-096040-1101-Q088",
+      "qno": 88,
+      "type": "standard",
+      "accepted": [
+        "A"
+      ],
+      "label": "A",
+      "four_answers_passed": true
+    },
+    {
+      "id": "MOEX-096040-1101-Q089",
+      "qno": 89,
+      "type": "standard",
+      "accepted": [
+        "C"
+      ],
+      "label": "C",
+      "four_answers_passed": true
+    },
+    {
+      "id": "MOEX-096040-1101-Q090",
+      "qno": 90,
+      "type": "standard",
+      "accepted": [
+        "C"
+      ],
+      "label": "C",
+      "four_answers_passed": true
+    },
+    {
+      "id": "MOEX-096040-1101-Q091",
+      "qno": 91,
+      "type": "standard",
+      "accepted": [
+        "D"
+      ],
+      "label": "D",
+      "four_answers_passed": true
+    },
+    {
+      "id": "MOEX-096040-1101-Q092",
+      "qno": 92,
+      "type": "standard",
+      "accepted": [
+        "C"
+      ],
+      "label": "C",
+      "four_answers_passed": true
+    },
+    {
+      "id": "MOEX-096040-1101-Q093",
+      "qno": 93,
+      "type": "standard",
+      "accepted": [
+        "B"
+      ],
+      "label": "B",
+      "four_answers_passed": true
+    },
+    {
+      "id": "MOEX-096040-1101-Q094",
+      "qno": 94,
+      "type": "standard",
+      "accepted": [
+        "D"
+      ],
+      "label": "D",
+      "four_answers_passed": true
+    },
+    {
+      "id": "MOEX-096040-1101-Q095",
+      "qno": 95,
+      "type": "standard",
+      "accepted": [
+        "D"
+      ],
+      "label": "D",
+      "four_answers_passed": true
+    },
+    {
+      "id": "MOEX-096040-1101-Q096",
+      "qno": 96,
+      "type": "multiple_accepted",
+      "accepted": [
+        "A",
+        "C"
+      ],
+      "label": "A、C",
+      "four_answers_passed": true
+    },
+    {
+      "id": "MOEX-096040-1101-Q097",
+      "qno": 97,
+      "type": "standard",
+      "accepted": [
+        "D"
+      ],
+      "label": "D",
+      "four_answers_passed": true
+    },
+    {
+      "id": "MOEX-096040-1101-Q098",
+      "qno": 98,
+      "type": "standard",
+      "accepted": [
+        "D"
+      ],
+      "label": "D",
+      "four_answers_passed": true
+    },
+    {
+      "id": "MOEX-096040-1101-Q099",
+      "qno": 99,
+      "type": "standard",
+      "accepted": [
+        "A"
+      ],
+      "label": "A",
+      "four_answers_passed": true
+    },
+    {
+      "id": "MOEX-096040-1101-Q100",
+      "qno": 100,
+      "type": "standard",
+      "accepted": [
+        "B"
+      ],
+      "label": "B",
+      "four_answers_passed": true
+    }
+  ]
+}

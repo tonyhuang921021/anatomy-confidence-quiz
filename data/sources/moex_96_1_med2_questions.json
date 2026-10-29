@@ -1,0 +1,4129 @@
+{
+  "sourceBundleSha256": "4cc7819a448ff2c170fc08cb7ae277b77859b736bffb206f26938e26f0332831",
+  "cropBundleSha256": "d19ab4d62d09c9d78d412b9815f3f68120977a9ae5aba5a9847f7a3ba6ae93da",
+  "sources": {
+    "questionPdfSha256": "53aa4102543872e3840ccc476a3ab8caa3d500b7bc4d67b6c652e64b55f60c09",
+    "answerPdfSha256": "93a0538d9e282629824f0d888c17036569f816ef9ddddcc9bd4b3abfaad81e45",
+    "officialAnswerSymbols": [
+      "B",
+      "#",
+      "D",
+      "#",
+      "D",
+      "D",
+      "#",
+      "A",
+      "C",
+      "B",
+      "#",
+      "D",
+      "C",
+      "#",
+      "B",
+      "B",
+      "B",
+      "A",
+      "#",
+      "A",
+      "B",
+      "#",
+      "B",
+      "C",
+      "#",
+      "D",
+      "A",
+      "#",
+      "C",
+      "#",
+      "B",
+      "D",
+      "D",
+      "C",
+      "A",
+      "A",
+      "C",
+      "A",
+      "D",
+      "D",
+      "D",
+      "A",
+      "C",
+      "D",
+      "D",
+      "A",
+      "D",
+      "#",
+      "D",
+      "B",
+      "B",
+      "A",
+      "B",
+      "C",
+      "D",
+      "#",
+      "D",
+      "#",
+      "B",
+      "C",
+      "B",
+      "C",
+      "D",
+      "B",
+      "B",
+      "B",
+      "B",
+      "#",
+      "B",
+      "#",
+      "B",
+      "C",
+      "D",
+      "C",
+      "B",
+      "B",
+      "B",
+      "D",
+      "D",
+      "B",
+      "C",
+      "B",
+      "A",
+      "D",
+      "C",
+      "D",
+      "B",
+      "C",
+      "A",
+      "B",
+      "A",
+      "#",
+      "D",
+      "B",
+      "D",
+      "B",
+      "D",
+      "A",
+      "B",
+      "B"
+    ],
+    "corrections": {
+      "2": [
+        "B",
+        "D"
+      ],
+      "4": [
+        "A",
+        "B",
+        "C",
+        "D"
+      ],
+      "7": [
+        "A",
+        "B",
+        "C",
+        "D"
+      ],
+      "11": [
+        "A",
+        "B",
+        "C",
+        "D"
+      ],
+      "14": [
+        "A",
+        "B",
+        "C",
+        "D"
+      ],
+      "19": [
+        "A",
+        "C"
+      ],
+      "22": [
+        "B",
+        "C"
+      ],
+      "25": [
+        "A",
+        "C",
+        "D"
+      ],
+      "28": [
+        "A",
+        "B",
+        "C",
+        "D"
+      ],
+      "30": [
+        "A",
+        "D"
+      ],
+      "48": [
+        "A",
+        "B",
+        "C",
+        "D"
+      ],
+      "56": [
+        "B",
+        "D"
+      ],
+      "58": [
+        "A",
+        "B",
+        "C",
+        "D"
+      ],
+      "68": [
+        "B",
+        "C"
+      ],
+      "70": [
+        "B",
+        "C"
+      ],
+      "92": [
+        "B",
+        "C"
+      ]
+    }
+  },
+  "questions": [
+    {
+      "id": "MOEX-096040-2101-Q001",
+      "subject": "醫學（二）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（二）",
+      "stem": "與細胞膜局部電位（local potential）有關的描述，下列何者錯誤？",
+      "options": {
+        "A": "局部電位與細胞膜之組成有關",
+        "B": "僅神經細胞才具有局部電位",
+        "C": "局部電位決定動作電位（action potential）發生（initiation）與傳遞（propagation）之性質",
+        "D": "局部電位無不反應期（refractory period）"
+      },
+      "answer": "B",
+      "acceptedAnswers": [
+        "B"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：B。",
+      "testedConcept": "醫學（二）（舊制原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國96年 第1次 醫師第一階段 醫學（二） 2101（舊制）",
+      "sourceYear": 2007,
+      "sourceRound": 1,
+      "originalQuestionNumber": 1,
+      "examCode": "096040",
+      "paperCode": "2101",
+      "examSessionLabel": "第一次",
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=122&code=096040&q=1&s=2001&t=Q",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=122&code=096040&q=1&s=2001&t=M",
+        "page": 1,
+        "endPage": 1,
+        "image": "/question-media/moex-96-1-med2/MOEX-096040-2101-Q001.webp",
+        "width": 1030,
+        "height": 132,
+        "scope": "生理學、生物化學、藥理學、病理學及臨床相關知識",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-096040-2101-Q002",
+      "subject": "醫學（二）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（二）",
+      "stem": "骨骼肌細胞（skeletal muscle cells）之靜止膜電位（resting membrane potential）主要受下列何種離子 孔道（ion channels）之啟閉狀態（gating status）所影響？",
+      "options": {
+        "A": "鈉",
+        "B": "鉀",
+        "C": "鈣",
+        "D": "氯"
+      },
+      "answer": "B",
+      "acceptedAnswers": [
+        "B",
+        "D"
+      ],
+      "answerCreditType": "multiple_accepted",
+      "explanation": "官方最終答案：B、D。",
+      "testedConcept": "醫學（二）（舊制原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國96年 第1次 醫師第一階段 醫學（二） 2101（舊制）",
+      "sourceYear": 2007,
+      "sourceRound": 1,
+      "originalQuestionNumber": 2,
+      "examCode": "096040",
+      "paperCode": "2101",
+      "examSessionLabel": "第一次",
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=122&code=096040&q=1&s=2001&t=Q",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=122&code=096040&q=1&s=2001&t=M",
+        "page": 1,
+        "endPage": 1,
+        "image": "/question-media/moex-96-1-med2/MOEX-096040-2101-Q002.webp",
+        "width": 1030,
+        "height": 78,
+        "scope": "生理學、生物化學、藥理學、病理學及臨床相關知識",
+        "answerNote": "第2題答B或D者均給分"
+      }
+    },
+    {
+      "id": "MOEX-096040-2101-Q003",
+      "subject": "醫學（二）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（二）",
+      "stem": "當胃內胃酸分泌pH 值＜3 時，會分泌下列何種胜肽至胃腔中，抑制胃泌素（gastrin）之分泌？",
+      "options": {
+        "A": "膽囊收縮素（cholecystokinin）",
+        "B": "胃抑素（gastric inhibitory polypeptide）",
+        "C": "胰泌素（secretin）",
+        "D": "體抑素（somatostatin）"
+      },
+      "answer": "D",
+      "acceptedAnswers": [
+        "D"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：D。",
+      "testedConcept": "醫學（二）（舊制原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國96年 第1次 醫師第一階段 醫學（二） 2101（舊制）",
+      "sourceYear": 2007,
+      "sourceRound": 1,
+      "originalQuestionNumber": 3,
+      "examCode": "096040",
+      "paperCode": "2101",
+      "examSessionLabel": "第一次",
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=122&code=096040&q=1&s=2001&t=Q",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=122&code=096040&q=1&s=2001&t=M",
+        "page": 1,
+        "endPage": 1,
+        "image": "/question-media/moex-96-1-med2/MOEX-096040-2101-Q003.webp",
+        "width": 1030,
+        "height": 78,
+        "scope": "生理學、生物化學、藥理學、病理學及臨床相關知識",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-096040-2101-Q004",
+      "subject": "醫學（二）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（二）",
+      "stem": "Nicotinic receptors 主要分布位置不包括下列何者？",
+      "options": {
+        "A": "副交感神經所支配的器官",
+        "B": "骨骼肌的終板",
+        "C": "交感神經節之節後神經細胞",
+        "D": "副交感神經節之節後神經細胞"
+      },
+      "answer": "A",
+      "acceptedAnswers": [
+        "A",
+        "B",
+        "C",
+        "D"
+      ],
+      "answerCreditType": "all_credit",
+      "explanation": "官方最終答案：一律給分。",
+      "testedConcept": "醫學（二）（舊制原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國96年 第1次 醫師第一階段 醫學（二） 2101（舊制）",
+      "sourceYear": 2007,
+      "sourceRound": 1,
+      "originalQuestionNumber": 4,
+      "examCode": "096040",
+      "paperCode": "2101",
+      "examSessionLabel": "第一次",
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=122&code=096040&q=1&s=2001&t=Q",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=122&code=096040&q=1&s=2001&t=M",
+        "page": 1,
+        "endPage": 1,
+        "image": "/question-media/moex-96-1-med2/MOEX-096040-2101-Q004.webp",
+        "width": 1030,
+        "height": 78,
+        "scope": "生理學、生物化學、藥理學、病理學及臨床相關知識",
+        "answerNote": "第4題一律給分"
+      }
+    },
+    {
+      "id": "MOEX-096040-2101-Q005",
+      "subject": "醫學（二）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（二）",
+      "stem": "癌症細胞常有過度分裂繁殖之現象。治療癌症之藥物也常針對此特性。下列何種藥物可以抑制微管 組合（microtubule assembly）進而妨礙有絲分裂？",
+      "options": {
+        "A": "methotrexate",
+        "B": "5-fluorouracil",
+        "C": "cyclophosphamide",
+        "D": "vinca alkaloids (vincristine)"
+      },
+      "answer": "D",
+      "acceptedAnswers": [
+        "D"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：D。",
+      "testedConcept": "醫學（二）（舊制原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國96年 第1次 醫師第一階段 醫學（二） 2101（舊制）",
+      "sourceYear": 2007,
+      "sourceRound": 1,
+      "originalQuestionNumber": 5,
+      "examCode": "096040",
+      "paperCode": "2101",
+      "examSessionLabel": "第一次",
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=122&code=096040&q=1&s=2001&t=Q",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=122&code=096040&q=1&s=2001&t=M",
+        "page": 1,
+        "endPage": 1,
+        "image": "/question-media/moex-96-1-med2/MOEX-096040-2101-Q005.webp",
+        "width": 1030,
+        "height": 104,
+        "scope": "生理學、生物化學、藥理學、病理學及臨床相關知識",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-096040-2101-Q006",
+      "subject": "醫學（二）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（二）",
+      "stem": "下列何種維他命缺乏時會造成疾病，但不直接在葡萄糖分解代謝產生ATP 中擔任co-enzyme？",
+      "options": {
+        "A": "Thiamine",
+        "B": "Riboflavin",
+        "C": "Niacin",
+        "D": "Vitamin D"
+      },
+      "answer": "D",
+      "acceptedAnswers": [
+        "D"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：D。",
+      "testedConcept": "醫學（二）（舊制原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國96年 第1次 醫師第一階段 醫學（二） 2101（舊制）",
+      "sourceYear": 2007,
+      "sourceRound": 1,
+      "originalQuestionNumber": 6,
+      "examCode": "096040",
+      "paperCode": "2101",
+      "examSessionLabel": "第一次",
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=122&code=096040&q=1&s=2001&t=Q",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=122&code=096040&q=1&s=2001&t=M",
+        "page": 1,
+        "endPage": 1,
+        "image": "/question-media/moex-96-1-med2/MOEX-096040-2101-Q006.webp",
+        "width": 1030,
+        "height": 52,
+        "scope": "生理學、生物化學、藥理學、病理學及臨床相關知識",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-096040-2101-Q007",
+      "subject": "醫學（二）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（二）",
+      "stem": "小孩子於出生後至青春期前，常需要接受疫苗注射。下列物質何者無法作為疫苗而產生免疫效果？",
+      "options": {
+        "A": "核糖核酸（RNA）",
+        "B": "去氧核糖核酸（DNA）",
+        "C": "純化之蛋白",
+        "D": "死亡或減弱毒性之病毒"
+      },
+      "answer": "A",
+      "acceptedAnswers": [
+        "A",
+        "B",
+        "C",
+        "D"
+      ],
+      "answerCreditType": "all_credit",
+      "explanation": "官方最終答案：一律給分。",
+      "testedConcept": "醫學（二）（舊制原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國96年 第1次 醫師第一階段 醫學（二） 2101（舊制）",
+      "sourceYear": 2007,
+      "sourceRound": 1,
+      "originalQuestionNumber": 7,
+      "examCode": "096040",
+      "paperCode": "2101",
+      "examSessionLabel": "第一次",
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=122&code=096040&q=1&s=2001&t=Q",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=122&code=096040&q=1&s=2001&t=M",
+        "page": 1,
+        "endPage": 1,
+        "image": "/question-media/moex-96-1-med2/MOEX-096040-2101-Q007.webp",
+        "width": 1030,
+        "height": 78,
+        "scope": "生理學、生物化學、藥理學、病理學及臨床相關知識",
+        "answerNote": "第7題一律給分"
+      }
+    },
+    {
+      "id": "MOEX-096040-2101-Q008",
+      "subject": "醫學（二）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（二）",
+      "stem": "下列那一個胺基酸在蛋白質的α螺旋（α-helix）結構中很少出現？",
+      "options": {
+        "A": "脯胺酸（proline）",
+        "B": "甲硫胺酸（methionine）",
+        "C": "色胺酸（tryptophan）",
+        "D": "組胺酸（histidine）"
+      },
+      "answer": "A",
+      "acceptedAnswers": [
+        "A"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：A。",
+      "testedConcept": "醫學（二）（舊制原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國96年 第1次 醫師第一階段 醫學（二） 2101（舊制）",
+      "sourceYear": 2007,
+      "sourceRound": 1,
+      "originalQuestionNumber": 8,
+      "examCode": "096040",
+      "paperCode": "2101",
+      "examSessionLabel": "第一次",
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=122&code=096040&q=1&s=2001&t=Q",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=122&code=096040&q=1&s=2001&t=M",
+        "page": 1,
+        "endPage": 1,
+        "image": "/question-media/moex-96-1-med2/MOEX-096040-2101-Q008.webp",
+        "width": 1030,
+        "height": 78,
+        "scope": "生理學、生物化學、藥理學、病理學及臨床相關知識",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-096040-2101-Q009",
+      "subject": "醫學（二）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（二）",
+      "stem": "雙鏈DNA 因加熱而變性（denature）時，在波長260nm 的照射下，其吸光度（absorbance）有增加 的現象，此現象稱為增色效應，其原因為何？",
+      "options": {
+        "A": "變性時其亂度增加而引起的反應",
+        "B": "變性時其體積增加，因而吸光度也隨之而增加",
+        "C": "因鹼基中的嘧啶與嘌呤外露而增加其吸光度",
+        "D": "因五碳糖和磷酸根外露而增加其吸光度"
+      },
+      "answer": "C",
+      "acceptedAnswers": [
+        "C"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：C。",
+      "testedConcept": "醫學（二）（舊制原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國96年 第1次 醫師第一階段 醫學（二） 2101（舊制）",
+      "sourceYear": 2007,
+      "sourceRound": 1,
+      "originalQuestionNumber": 9,
+      "examCode": "096040",
+      "paperCode": "2101",
+      "examSessionLabel": "第一次",
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=122&code=096040&q=1&s=2001&t=Q",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=122&code=096040&q=1&s=2001&t=M",
+        "page": 1,
+        "endPage": 1,
+        "image": "/question-media/moex-96-1-med2/MOEX-096040-2101-Q009.webp",
+        "width": 1030,
+        "height": 104,
+        "scope": "生理學、生物化學、藥理學、病理學及臨床相關知識",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-096040-2101-Q010",
+      "subject": "醫學（二）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（二）",
+      "stem": "cAMP 是真核細胞（eukaryotic cells）的第二信使（second messenger）之一，可直接調控下列何種蛋 白質之功能？",
+      "options": {
+        "A": "活化Adenylate cyclase",
+        "B": "活化Protein kinase A",
+        "C": "抑制G protein",
+        "D": "抑制Calmodulin"
+      },
+      "answer": "B",
+      "acceptedAnswers": [
+        "B"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：B。",
+      "testedConcept": "醫學（二）（舊制原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國96年 第1次 醫師第一階段 醫學（二） 2101（舊制）",
+      "sourceYear": 2007,
+      "sourceRound": 1,
+      "originalQuestionNumber": 10,
+      "examCode": "096040",
+      "paperCode": "2101",
+      "examSessionLabel": "第一次",
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=122&code=096040&q=1&s=2001&t=Q",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=122&code=096040&q=1&s=2001&t=M",
+        "page": 1,
+        "endPage": 1,
+        "image": "/question-media/moex-96-1-med2/MOEX-096040-2101-Q010.webp",
+        "width": 1030,
+        "height": 78,
+        "scope": "生理學、生物化學、藥理學、病理學及臨床相關知識",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-096040-2101-Q011",
+      "subject": "醫學（二）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（二）",
+      "stem": "在呼吸鏈中，下列何者電子的傳遞可被一氧化碳所抑制？",
+      "options": {
+        "A": "cytochrome（a＋a3）",
+        "B": "coenzyme Q",
+        "C": "cytochrome（b＋c1）",
+        "D": "cytochrome c"
+      },
+      "answer": "A",
+      "acceptedAnswers": [
+        "A",
+        "B",
+        "C",
+        "D"
+      ],
+      "answerCreditType": "multiple_accepted",
+      "explanation": "官方最終答案：A、B、C、D。",
+      "testedConcept": "醫學（二）（舊制原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國96年 第1次 醫師第一階段 醫學（二） 2101（舊制）",
+      "sourceYear": 2007,
+      "sourceRound": 1,
+      "originalQuestionNumber": 11,
+      "examCode": "096040",
+      "paperCode": "2101",
+      "examSessionLabel": "第一次",
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=122&code=096040&q=1&s=2001&t=Q",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=122&code=096040&q=1&s=2001&t=M",
+        "page": 1,
+        "endPage": 1,
+        "image": "/question-media/moex-96-1-med2/MOEX-096040-2101-Q011.webp",
+        "width": 1030,
+        "height": 52,
+        "scope": "生理學、生物化學、藥理學、病理學及臨床相關知識",
+        "answerNote": "第11題答A或B或C或D者給分"
+      }
+    },
+    {
+      "id": "MOEX-096040-2101-Q012",
+      "subject": "醫學（二）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（二）",
+      "stem": "膽固醇（cholesterol）是心血管疾病的重要危險因子，下列敘述何者錯誤？",
+      "options": {
+        "A": "身體內膽固醇一部分是經腸道吸收",
+        "B": "身體內也可以合成膽固醇，以acetyl-CoA 當原料",
+        "C": "膽固醇在肝臟是合成膽酸（bile acid）的原料",
+        "D": "降膽固醇藥物statin 是膽固醇合成反應的HMG-CoA synthase 之抑制劑"
+      },
+      "answer": "D",
+      "acceptedAnswers": [
+        "D"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：D。",
+      "testedConcept": "醫學（二）（舊制原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國96年 第1次 醫師第一階段 醫學（二） 2101（舊制）",
+      "sourceYear": 2007,
+      "sourceRound": 1,
+      "originalQuestionNumber": 12,
+      "examCode": "096040",
+      "paperCode": "2101",
+      "examSessionLabel": "第一次",
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=122&code=096040&q=1&s=2001&t=Q",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=122&code=096040&q=1&s=2001&t=M",
+        "page": 1,
+        "endPage": 1,
+        "image": "/question-media/moex-96-1-med2/MOEX-096040-2101-Q012.webp",
+        "width": 1030,
+        "height": 130,
+        "scope": "生理學、生物化學、藥理學、病理學及臨床相關知識",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-096040-2101-Q013",
+      "subject": "醫學（二）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（二）",
+      "stem": "18 歲少女未婚懷孕，未得良好產前照護，營養不足沒有補充綜合維他命或鐵劑，懷孕末期容易疲倦 體力衰弱，嬰兒在35 週出生，活動力較差，抽血檢查發現媽媽及嬰兒含鐵蛋白（ferritin）均較低。 下列何種情況最可能同時發生在媽媽及嬰兒？",
+      "options": {
+        "A": "周邊神經病變",
+        "B": "甲狀腺腫大",
+        "C": "小球性貧血",
+        "D": "維生素B12 缺乏"
+      },
+      "answer": "C",
+      "acceptedAnswers": [
+        "C"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：C。",
+      "testedConcept": "醫學（二）（舊制原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國96年 第1次 醫師第一階段 醫學（二） 2101（舊制）",
+      "sourceYear": 2007,
+      "sourceRound": 1,
+      "originalQuestionNumber": 13,
+      "examCode": "096040",
+      "paperCode": "2101",
+      "examSessionLabel": "第一次",
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=122&code=096040&q=1&s=2001&t=Q",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=122&code=096040&q=1&s=2001&t=M",
+        "page": 1,
+        "endPage": 1,
+        "image": "/question-media/moex-96-1-med2/MOEX-096040-2101-Q013.webp",
+        "width": 1030,
+        "height": 109,
+        "scope": "生理學、生物化學、藥理學、病理學及臨床相關知識",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-096040-2101-Q014",
+      "subject": "醫學（二）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（二）",
+      "stem": "下列何種病人在其周邊血液會有盔狀細胞（Helmet cell）？",
+      "options": {
+        "A": "乙型海洋性貧血病人",
+        "B": "大腸癌病人",
+        "C": "大腸桿菌菌血症",
+        "D": "脾腫大"
+      },
+      "answer": "A",
+      "acceptedAnswers": [
+        "A",
+        "B",
+        "C",
+        "D"
+      ],
+      "answerCreditType": "multiple_accepted",
+      "explanation": "官方最終答案：A、B、C、D。",
+      "testedConcept": "醫學（二）（舊制原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國96年 第1次 醫師第一階段 醫學（二） 2101（舊制）",
+      "sourceYear": 2007,
+      "sourceRound": 1,
+      "originalQuestionNumber": 14,
+      "examCode": "096040",
+      "paperCode": "2101",
+      "examSessionLabel": "第一次",
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=122&code=096040&q=1&s=2001&t=Q",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=122&code=096040&q=1&s=2001&t=M",
+        "page": 2,
+        "endPage": 2,
+        "image": "/question-media/moex-96-1-med2/MOEX-096040-2101-Q014.webp",
+        "width": 1030,
+        "height": 53,
+        "scope": "生理學、生物化學、藥理學、病理學及臨床相關知識",
+        "answerNote": "第14題答A或B或C或D者給分"
+      }
+    },
+    {
+      "id": "MOEX-096040-2101-Q015",
+      "subject": "醫學（二）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（二）",
+      "stem": "20 歲男性從孩童時代起就一再出現復發性深部靜脈血栓（deep vein thrombosis）。下列何者是最常造 成此類血栓的致病原因？",
+      "options": {
+        "A": "家族性高膽固醇血症（Familial hypercholesterolemia）",
+        "B": "遺傳性高凝血狀態（Inherited hypercoagulability）",
+        "C": "紅血球增多症（Polycythemia Vera）",
+        "D": "高血壓（Hypertension）"
+      },
+      "answer": "B",
+      "acceptedAnswers": [
+        "B"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：B。",
+      "testedConcept": "醫學（二）（舊制原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國96年 第1次 醫師第一階段 醫學（二） 2101（舊制）",
+      "sourceYear": 2007,
+      "sourceRound": 1,
+      "originalQuestionNumber": 15,
+      "examCode": "096040",
+      "paperCode": "2101",
+      "examSessionLabel": "第一次",
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=122&code=096040&q=1&s=2001&t=Q",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=122&code=096040&q=1&s=2001&t=M",
+        "page": 2,
+        "endPage": 2,
+        "image": "/question-media/moex-96-1-med2/MOEX-096040-2101-Q015.webp",
+        "width": 1030,
+        "height": 153,
+        "scope": "生理學、生物化學、藥理學、病理學及臨床相關知識",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-096040-2101-Q016",
+      "subject": "醫學（二）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（二）",
+      "stem": "以下何者不是cerebral cortex 之調節功能？",
+      "options": {
+        "A": "Language comprehension",
+        "B": "Respiration, circulation & digestion",
+        "C": "Final sensory perception",
+        "D": "Voluntary movement"
+      },
+      "answer": "B",
+      "acceptedAnswers": [
+        "B"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：B。",
+      "testedConcept": "醫學（二）（舊制原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國96年 第1次 醫師第一階段 醫學（二） 2101（舊制）",
+      "sourceYear": 2007,
+      "sourceRound": 1,
+      "originalQuestionNumber": 16,
+      "examCode": "096040",
+      "paperCode": "2101",
+      "examSessionLabel": "第一次",
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=122&code=096040&q=1&s=2001&t=Q",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=122&code=096040&q=1&s=2001&t=M",
+        "page": 2,
+        "endPage": 2,
+        "image": "/question-media/moex-96-1-med2/MOEX-096040-2101-Q016.webp",
+        "width": 1030,
+        "height": 77,
+        "scope": "生理學、生物化學、藥理學、病理學及臨床相關知識",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-096040-2101-Q017",
+      "subject": "醫學（二）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（二）",
+      "stem": "有關Long-term potentiation 的敘述，何者錯誤？",
+      "options": {
+        "A": "是一種與學習及記憶有關的機制",
+        "B": "會導致action potential 的amplitude 增大",
+        "C": "其機轉可能與NMDA receptor 有關",
+        "D": "會強化synaptic transmission"
+      },
+      "answer": "B",
+      "acceptedAnswers": [
+        "B"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：B。",
+      "testedConcept": "醫學（二）（舊制原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國96年 第1次 醫師第一階段 醫學（二） 2101（舊制）",
+      "sourceYear": 2007,
+      "sourceRound": 1,
+      "originalQuestionNumber": 17,
+      "examCode": "096040",
+      "paperCode": "2101",
+      "examSessionLabel": "第一次",
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=122&code=096040&q=1&s=2001&t=Q",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=122&code=096040&q=1&s=2001&t=M",
+        "page": 2,
+        "endPage": 2,
+        "image": "/question-media/moex-96-1-med2/MOEX-096040-2101-Q017.webp",
+        "width": 1030,
+        "height": 77,
+        "scope": "生理學、生物化學、藥理學、病理學及臨床相關知識",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-096040-2101-Q018",
+      "subject": "醫學（二）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（二）",
+      "stem": "「動作單位（motor unit）」指的是：",
+      "options": {
+        "A": "單一運動神經元加上它支配的所有肌肉纖維",
+        "B": "一條肌肉纖維加上所有支配它的動作神經元",
+        "C": "供應單一肌肉的所有動作神經元",
+        "D": "一組拮抗肌群"
+      },
+      "answer": "A",
+      "acceptedAnswers": [
+        "A"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：A。",
+      "testedConcept": "醫學（二）（舊制原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國96年 第1次 醫師第一階段 醫學（二） 2101（舊制）",
+      "sourceYear": 2007,
+      "sourceRound": 1,
+      "originalQuestionNumber": 18,
+      "examCode": "096040",
+      "paperCode": "2101",
+      "examSessionLabel": "第一次",
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=122&code=096040&q=1&s=2001&t=Q",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=122&code=096040&q=1&s=2001&t=M",
+        "page": 2,
+        "endPage": 2,
+        "image": "/question-media/moex-96-1-med2/MOEX-096040-2101-Q018.webp",
+        "width": 1030,
+        "height": 77,
+        "scope": "生理學、生物化學、藥理學、病理學及臨床相關知識",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-096040-2101-Q019",
+      "subject": "醫學（二）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（二）",
+      "stem": "延腦缺血但尚未發生中樞機能減低（central depression）時，其中樞化學反射的結果為何？",
+      "options": {
+        "A": "血管收縮",
+        "B": "動脈壓下降",
+        "C": "血管容積度（compliance）增加",
+        "D": "顱內壓（intracranial pressure）下降"
+      },
+      "answer": "A",
+      "acceptedAnswers": [
+        "A",
+        "C"
+      ],
+      "answerCreditType": "multiple_accepted",
+      "explanation": "官方最終答案：A、C。",
+      "testedConcept": "醫學（二）（舊制原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國96年 第1次 醫師第一階段 醫學（二） 2101（舊制）",
+      "sourceYear": 2007,
+      "sourceRound": 1,
+      "originalQuestionNumber": 19,
+      "examCode": "096040",
+      "paperCode": "2101",
+      "examSessionLabel": "第一次",
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=122&code=096040&q=1&s=2001&t=Q",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=122&code=096040&q=1&s=2001&t=M",
+        "page": 2,
+        "endPage": 2,
+        "image": "/question-media/moex-96-1-med2/MOEX-096040-2101-Q019.webp",
+        "width": 1030,
+        "height": 77,
+        "scope": "生理學、生物化學、藥理學、病理學及臨床相關知識",
+        "answerNote": "第19題答A或C者均給分"
+      }
+    },
+    {
+      "id": "MOEX-096040-2101-Q020",
+      "subject": "醫學（二）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（二）",
+      "stem": "若微循環動脈端之靜水壓為35 mmHg，靜脈端之靜水壓為15 mmHg，微血管滲透壓為22 mmHg，組 織間隙靜水壓為1 mmHg，組織間隙滲透壓為0 mmHg，則其再吸收壓（reabsorption pressure）為多 少mmHg？",
+      "options": {
+        "A": "8",
+        "B": "10",
+        "C": "14",
+        "D": "22"
+      },
+      "answer": "A",
+      "acceptedAnswers": [
+        "A"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：A。",
+      "testedConcept": "醫學（二）（舊制原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國96年 第1次 醫師第一階段 醫學（二） 2101（舊制）",
+      "sourceYear": 2007,
+      "sourceRound": 1,
+      "originalQuestionNumber": 20,
+      "examCode": "096040",
+      "paperCode": "2101",
+      "examSessionLabel": "第一次",
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=122&code=096040&q=1&s=2001&t=Q",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=122&code=096040&q=1&s=2001&t=M",
+        "page": 2,
+        "endPage": 2,
+        "image": "/question-media/moex-96-1-med2/MOEX-096040-2101-Q020.webp",
+        "width": 1030,
+        "height": 102,
+        "scope": "生理學、生物化學、藥理學、病理學及臨床相關知識",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-096040-2101-Q021",
+      "subject": "醫學（二）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（二）",
+      "stem": "有關肺泡（alveolus）的描述，下列何者錯誤？",
+      "options": {
+        "A": "為呼吸系統中氣體交換之區域",
+        "B": "末端細支氣管（terminal bronchioles）具有肺泡",
+        "C": "第一型細胞是一種連續扁平的上皮細胞",
+        "D": "第二型細胞可分泌表面作用素（surfactant）"
+      },
+      "answer": "B",
+      "acceptedAnswers": [
+        "B"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：B。",
+      "testedConcept": "醫學（二）（舊制原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國96年 第1次 醫師第一階段 醫學（二） 2101（舊制）",
+      "sourceYear": 2007,
+      "sourceRound": 1,
+      "originalQuestionNumber": 21,
+      "examCode": "096040",
+      "paperCode": "2101",
+      "examSessionLabel": "第一次",
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=122&code=096040&q=1&s=2001&t=Q",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=122&code=096040&q=1&s=2001&t=M",
+        "page": 2,
+        "endPage": 2,
+        "image": "/question-media/moex-96-1-med2/MOEX-096040-2101-Q021.webp",
+        "width": 1030,
+        "height": 77,
+        "scope": "生理學、生物化學、藥理學、病理學及臨床相關知識",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-096040-2101-Q022",
+      "subject": "醫學（二）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（二）",
+      "stem": "若潮氣容積為450 毫升，無效腔為150 毫升，每分鐘的呼吸頻率為12 次，則每分鐘的通氣量（minute ventilation）為多少毫升？",
+      "options": {
+        "A": "1800",
+        "B": "3600",
+        "C": "5400",
+        "D": "7200"
+      },
+      "answer": "B",
+      "acceptedAnswers": [
+        "B",
+        "C"
+      ],
+      "answerCreditType": "multiple_accepted",
+      "explanation": "官方最終答案：B、C。",
+      "testedConcept": "醫學（二）（舊制原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國96年 第1次 醫師第一階段 醫學（二） 2101（舊制）",
+      "sourceYear": 2007,
+      "sourceRound": 1,
+      "originalQuestionNumber": 22,
+      "examCode": "096040",
+      "paperCode": "2101",
+      "examSessionLabel": "第一次",
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=122&code=096040&q=1&s=2001&t=Q",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=122&code=096040&q=1&s=2001&t=M",
+        "page": 2,
+        "endPage": 2,
+        "image": "/question-media/moex-96-1-med2/MOEX-096040-2101-Q022.webp",
+        "width": 1030,
+        "height": 77,
+        "scope": "生理學、生物化學、藥理學、病理學及臨床相關知識",
+        "answerNote": "第22題答B或C者均給分"
+      }
+    },
+    {
+      "id": "MOEX-096040-2101-Q023",
+      "subject": "醫學（二）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（二）",
+      "stem": "下列何者最容易造成代謝性酸中毒（metabolic acidosis）？",
+      "options": {
+        "A": "嚴重嘔吐（severe vomiting）",
+        "B": "嚴重腹瀉（severe diarrhea）",
+        "C": "過度換氣（hyperventilation）",
+        "D": "消化性潰瘍（peptic ulcer）"
+      },
+      "answer": "B",
+      "acceptedAnswers": [
+        "B"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：B。",
+      "testedConcept": "醫學（二）（舊制原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國96年 第1次 醫師第一階段 醫學（二） 2101（舊制）",
+      "sourceYear": 2007,
+      "sourceRound": 1,
+      "originalQuestionNumber": 23,
+      "examCode": "096040",
+      "paperCode": "2101",
+      "examSessionLabel": "第一次",
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=122&code=096040&q=1&s=2001&t=Q",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=122&code=096040&q=1&s=2001&t=M",
+        "page": 2,
+        "endPage": 2,
+        "image": "/question-media/moex-96-1-med2/MOEX-096040-2101-Q023.webp",
+        "width": 1030,
+        "height": 77,
+        "scope": "生理學、生物化學、藥理學、病理學及臨床相關知識",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-096040-2101-Q024",
+      "subject": "醫學（二）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（二）",
+      "stem": "腎臟髓質的高滲透度環境主要是因為氯化鈉與下列那一種物質累積所造成？",
+      "options": {
+        "A": "尿酸",
+        "B": "銨離子",
+        "C": "尿素",
+        "D": "蛋白質"
+      },
+      "answer": "C",
+      "acceptedAnswers": [
+        "C"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：C。",
+      "testedConcept": "醫學（二）（舊制原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國96年 第1次 醫師第一階段 醫學（二） 2101（舊制）",
+      "sourceYear": 2007,
+      "sourceRound": 1,
+      "originalQuestionNumber": 24,
+      "examCode": "096040",
+      "paperCode": "2101",
+      "examSessionLabel": "第一次",
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=122&code=096040&q=1&s=2001&t=Q",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=122&code=096040&q=1&s=2001&t=M",
+        "page": 2,
+        "endPage": 2,
+        "image": "/question-media/moex-96-1-med2/MOEX-096040-2101-Q024.webp",
+        "width": 1030,
+        "height": 52,
+        "scope": "生理學、生物化學、藥理學、病理學及臨床相關知識",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-096040-2101-Q025",
+      "subject": "醫學（二）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（二）",
+      "stem": "當遠側腎小管管腔內溶質增加時，可引起下列何種反應？",
+      "options": {
+        "A": "入球小動脈收縮",
+        "B": "腎小球濾過率增加",
+        "C": "收集管再吸收鈉離子減少",
+        "D": "腎素分泌增加"
+      },
+      "answer": "A",
+      "acceptedAnswers": [
+        "A",
+        "C",
+        "D"
+      ],
+      "answerCreditType": "multiple_accepted",
+      "explanation": "官方最終答案：A、C、D。",
+      "testedConcept": "醫學（二）（舊制原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國96年 第1次 醫師第一階段 醫學（二） 2101（舊制）",
+      "sourceYear": 2007,
+      "sourceRound": 1,
+      "originalQuestionNumber": 25,
+      "examCode": "096040",
+      "paperCode": "2101",
+      "examSessionLabel": "第一次",
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=122&code=096040&q=1&s=2001&t=Q",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=122&code=096040&q=1&s=2001&t=M",
+        "page": 2,
+        "endPage": 2,
+        "image": "/question-media/moex-96-1-med2/MOEX-096040-2101-Q025.webp",
+        "width": 1030,
+        "height": 77,
+        "scope": "生理學、生物化學、藥理學、病理學及臨床相關知識",
+        "answerNote": "第25題答A或C或D者均給分"
+      }
+    },
+    {
+      "id": "MOEX-096040-2101-Q026",
+      "subject": "醫學（二）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（二）",
+      "stem": "壓力（stress）會促使內分泌系統那一個軸線（axis）活化？",
+      "options": {
+        "A": "下視丘－腦下腺－睪丸",
+        "B": "下視丘－腦下腺－卵巢",
+        "C": "下視丘－腦下腺－甲狀腺",
+        "D": "下視丘－腦下腺－腎上腺皮質"
+      },
+      "answer": "D",
+      "acceptedAnswers": [
+        "D"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：D。",
+      "testedConcept": "醫學（二）（舊制原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國96年 第1次 醫師第一階段 醫學（二） 2101（舊制）",
+      "sourceYear": 2007,
+      "sourceRound": 1,
+      "originalQuestionNumber": 26,
+      "examCode": "096040",
+      "paperCode": "2101",
+      "examSessionLabel": "第一次",
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=122&code=096040&q=1&s=2001&t=Q",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=122&code=096040&q=1&s=2001&t=M",
+        "page": 2,
+        "endPage": 2,
+        "image": "/question-media/moex-96-1-med2/MOEX-096040-2101-Q026.webp",
+        "width": 1030,
+        "height": 77,
+        "scope": "生理學、生物化學、藥理學、病理學及臨床相關知識",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-096040-2101-Q027",
+      "subject": "醫學（二）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（二）",
+      "stem": "碘與酪胺酸（tyrosine）的結合主要是靠：",
+      "options": {
+        "A": "甲狀腺過氧化酶（peroxidase）",
+        "B": "甲狀腺蛋白酶（protease）",
+        "C": "甲狀腺脫碘酶（deiodinase）",
+        "D": "甲狀腺脫氫酶（dehydrogenase）"
+      },
+      "answer": "A",
+      "acceptedAnswers": [
+        "A"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：A。",
+      "testedConcept": "醫學（二）（舊制原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國96年 第1次 醫師第一階段 醫學（二） 2101（舊制）",
+      "sourceYear": 2007,
+      "sourceRound": 1,
+      "originalQuestionNumber": 27,
+      "examCode": "096040",
+      "paperCode": "2101",
+      "examSessionLabel": "第一次",
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=122&code=096040&q=1&s=2001&t=Q",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=122&code=096040&q=1&s=2001&t=M",
+        "page": 2,
+        "endPage": 2,
+        "image": "/question-media/moex-96-1-med2/MOEX-096040-2101-Q027.webp",
+        "width": 1030,
+        "height": 77,
+        "scope": "生理學、生物化學、藥理學、病理學及臨床相關知識",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-096040-2101-Q028",
+      "subject": "醫學（二）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（二）",
+      "stem": "血管緊縮素-Ｉ（angiotensin I）轉變成血管緊縮素-Ⅱ發生在那一個器官？",
+      "options": {
+        "A": "肺",
+        "B": "肝",
+        "C": "腎",
+        "D": "心"
+      },
+      "answer": "A",
+      "acceptedAnswers": [
+        "A",
+        "B",
+        "C",
+        "D"
+      ],
+      "answerCreditType": "all_credit",
+      "explanation": "官方最終答案：一律給分。",
+      "testedConcept": "醫學（二）（舊制原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國96年 第1次 醫師第一階段 醫學（二） 2101（舊制）",
+      "sourceYear": 2007,
+      "sourceRound": 1,
+      "originalQuestionNumber": 28,
+      "examCode": "096040",
+      "paperCode": "2101",
+      "examSessionLabel": "第一次",
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=122&code=096040&q=1&s=2001&t=Q",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=122&code=096040&q=1&s=2001&t=M",
+        "page": 2,
+        "endPage": 2,
+        "image": "/question-media/moex-96-1-med2/MOEX-096040-2101-Q028.webp",
+        "width": 1030,
+        "height": 51,
+        "scope": "生理學、生物化學、藥理學、病理學及臨床相關知識",
+        "answerNote": "第28題一律給分"
+      }
+    },
+    {
+      "id": "MOEX-096040-2101-Q029",
+      "subject": "醫學（二）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（二）",
+      "stem": "精子（spermatozoa）形成後未射精前貯存於：",
+      "options": {
+        "A": "曲細精管（seminiferous tubules）",
+        "B": "貯精囊（seminal vesicle）",
+        "C": "副睪（epididymis）",
+        "D": "尿道球腺體（bulbourethral gland）"
+      },
+      "answer": "C",
+      "acceptedAnswers": [
+        "C"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：C。",
+      "testedConcept": "醫學（二）（舊制原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國96年 第1次 醫師第一階段 醫學（二） 2101（舊制）",
+      "sourceYear": 2007,
+      "sourceRound": 1,
+      "originalQuestionNumber": 29,
+      "examCode": "096040",
+      "paperCode": "2101",
+      "examSessionLabel": "第一次",
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=122&code=096040&q=1&s=2001&t=Q",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=122&code=096040&q=1&s=2001&t=M",
+        "page": 2,
+        "endPage": 2,
+        "image": "/question-media/moex-96-1-med2/MOEX-096040-2101-Q029.webp",
+        "width": 1030,
+        "height": 77,
+        "scope": "生理學、生物化學、藥理學、病理學及臨床相關知識",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-096040-2101-Q030",
+      "subject": "醫學（二）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（二）",
+      "stem": "臨床上，擬作用於中樞神經的藥物需考量能否順利通透血腦屏障（blood-brain barrier，簡稱BBB）。有 關BBB 之敘述，何者錯誤？",
+      "options": {
+        "A": "BBB 主要存在於choroid plexus 及腦組織之capillary membranes",
+        "B": "Pineal gland 及area postrema 附近缺乏BBB",
+        "C": "在BBB 處決定物質通透除了依據分子大小及osmolarity 變化外，也含有特定受器分子（receptor molecules）以利hormones 之運送",
+        "D": "多數血漿蛋白可自由通透BBB"
+      },
+      "answer": "A",
+      "acceptedAnswers": [
+        "A",
+        "D"
+      ],
+      "answerCreditType": "multiple_accepted",
+      "explanation": "官方最終答案：A、D。",
+      "testedConcept": "醫學（二）（舊制原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國96年 第1次 醫師第一階段 醫學（二） 2101（舊制）",
+      "sourceYear": 2007,
+      "sourceRound": 1,
+      "originalQuestionNumber": 30,
+      "examCode": "096040",
+      "paperCode": "2101",
+      "examSessionLabel": "第一次",
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=122&code=096040&q=1&s=2001&t=Q",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=122&code=096040&q=1&s=2001&t=M",
+        "page": 2,
+        "endPage": 2,
+        "image": "/question-media/moex-96-1-med2/MOEX-096040-2101-Q030.webp",
+        "width": 1030,
+        "height": 184,
+        "scope": "生理學、生物化學、藥理學、病理學及臨床相關知識",
+        "answerNote": "第30題答A或D者均給分"
+      }
+    },
+    {
+      "id": "MOEX-096040-2101-Q031",
+      "subject": "醫學（二）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（二）",
+      "stem": "右側視神經束（optic tract）受損的患者，下列有關其視野（visual field）檢查結果的敘述，何者正確？",
+      "options": {
+        "A": "左眼視覺功能缺失，而右眼正常",
+        "B": "患者無法偵測投射在右眼右半視網膜（retina）的物體影像",
+        "C": "患者可以偵測投射在左眼右半視網膜（retina）的物體影像",
+        "D": "兩眼均無法偵測右側視野（visual field）的物體"
+      },
+      "answer": "B",
+      "acceptedAnswers": [
+        "B"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：B。",
+      "testedConcept": "醫學（二）（舊制原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國96年 第1次 醫師第一階段 醫學（二） 2101（舊制）",
+      "sourceYear": 2007,
+      "sourceRound": 1,
+      "originalQuestionNumber": 31,
+      "examCode": "096040",
+      "paperCode": "2101",
+      "examSessionLabel": "第一次",
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=122&code=096040&q=1&s=2001&t=Q",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=122&code=096040&q=1&s=2001&t=M",
+        "page": 3,
+        "endPage": 3,
+        "image": "/question-media/moex-96-1-med2/MOEX-096040-2101-Q031.webp",
+        "width": 1030,
+        "height": 130,
+        "scope": "生理學、生物化學、藥理學、病理學及臨床相關知識",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-096040-2101-Q032",
+      "subject": "醫學（二）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（二）",
+      "stem": "60 歲男性，因胸痛冒冷汗被送到急診室，診斷為心肌梗塞，在急診室緊急給與t-PA（tissue plasminogen activator）藥物，以下敘述何者錯誤？",
+      "options": {
+        "A": "心肌無法從心房或心室的血液中得到養分，必須仰賴額外的冠狀動脈系統",
+        "B": "由膽固醇、不正常的平滑肌細胞和吞噬細胞等組成的動脈粥狀硬化（atherosclerosis）是造成梗塞 的主因",
+        "C": "給與血管擴張劑，因可以減少周邊阻力，降低afterload，可以減輕梗塞之心臟的負荷",
+        "D": "t-PA 主要可以抑制血小板聚集，阻礙後續血栓之形成，故用於心肌梗塞之治療"
+      },
+      "answer": "D",
+      "acceptedAnswers": [
+        "D"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：D。",
+      "testedConcept": "醫學（二）（舊制原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國96年 第1次 醫師第一階段 醫學（二） 2101（舊制）",
+      "sourceYear": 2007,
+      "sourceRound": 1,
+      "originalQuestionNumber": 32,
+      "examCode": "096040",
+      "paperCode": "2101",
+      "examSessionLabel": "第一次",
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=122&code=096040&q=1&s=2001&t=Q",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=122&code=096040&q=1&s=2001&t=M",
+        "page": 3,
+        "endPage": 3,
+        "image": "/question-media/moex-96-1-med2/MOEX-096040-2101-Q032.webp",
+        "width": 1030,
+        "height": 179,
+        "scope": "生理學、生物化學、藥理學、病理學及臨床相關知識",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-096040-2101-Q033",
+      "subject": "醫學（二）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（二）",
+      "stem": "23 歲女性，偶爾會有胸悶情形，聽診發現心臟左下側緣有一收縮期心雜音，以下敘述何者正確？",
+      "options": {
+        "A": "在心室開始舒張（ventricular filling）之前，心房會先行收縮以利將血流打入心室",
+        "B": "在心臟之收縮與舒張週期（cardiac cycle）中，收縮期（systolic phase）較舒張期（diastolic phase） 來得長",
+        "C": "心臟舒張時，主動脈及肺動脈瓣均保持開啟",
+        "D": "若二尖瓣（mitral valve）無法緊密關閉，則可能會有收縮期心雜音"
+      },
+      "answer": "D",
+      "acceptedAnswers": [
+        "D"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：D。",
+      "testedConcept": "醫學（二）（舊制原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國96年 第1次 醫師第一階段 醫學（二） 2101（舊制）",
+      "sourceYear": 2007,
+      "sourceRound": 1,
+      "originalQuestionNumber": 33,
+      "examCode": "096040",
+      "paperCode": "2101",
+      "examSessionLabel": "第一次",
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=122&code=096040&q=1&s=2001&t=Q",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=122&code=096040&q=1&s=2001&t=M",
+        "page": 3,
+        "endPage": 3,
+        "image": "/question-media/moex-96-1-med2/MOEX-096040-2101-Q033.webp",
+        "width": 1030,
+        "height": 153,
+        "scope": "生理學、生物化學、藥理學、病理學及臨床相關知識",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-096040-2101-Q034",
+      "subject": "醫學（二）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（二）",
+      "stem": "李小弟因吸入異物，導致區域性的呼吸道阻塞，10 分鐘後經由父母親陪同至急診室求診，以血氧 計（pulse oximeter）偵測體循環之動脈血氧飽和度（oxygen saturation）為90％，可推估此患者體循 環之動脈血氧分壓（PaO2）約為多少mmHg？",
+      "options": {
+        "A": "90",
+        "B": "80",
+        "C": "60",
+        "D": "40"
+      },
+      "answer": "C",
+      "acceptedAnswers": [
+        "C"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：C。",
+      "testedConcept": "醫學（二）（舊制原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國96年 第1次 醫師第一階段 醫學（二） 2101（舊制）",
+      "sourceYear": 2007,
+      "sourceRound": 1,
+      "originalQuestionNumber": 34,
+      "examCode": "096040",
+      "paperCode": "2101",
+      "examSessionLabel": "第一次",
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=122&code=096040&q=1&s=2001&t=Q",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=122&code=096040&q=1&s=2001&t=M",
+        "page": 3,
+        "endPage": 3,
+        "image": "/question-media/moex-96-1-med2/MOEX-096040-2101-Q034.webp",
+        "width": 1030,
+        "height": 102,
+        "scope": "生理學、生物化學、藥理學、病理學及臨床相關知識",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-096040-2101-Q035",
+      "subject": "醫學（二）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（二）",
+      "stem": "腎臟中腎素（renin）是由何種細胞分泌的？",
+      "options": {
+        "A": "近腎絲球細胞（jextaglomerular cells）",
+        "B": "緻密斑（macula densa）",
+        "C": "腎絲球間質細胞（mesangial cells）",
+        "D": "入球小動脈內皮細胞（endothelial cells of afferent arteriole）"
+      },
+      "answer": "A",
+      "acceptedAnswers": [
+        "A"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：A。",
+      "testedConcept": "醫學（二）（舊制原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國96年 第1次 醫師第一階段 醫學（二） 2101（舊制）",
+      "sourceYear": 2007,
+      "sourceRound": 1,
+      "originalQuestionNumber": 35,
+      "examCode": "096040",
+      "paperCode": "2101",
+      "examSessionLabel": "第一次",
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=122&code=096040&q=1&s=2001&t=Q",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=122&code=096040&q=1&s=2001&t=M",
+        "page": 3,
+        "endPage": 3,
+        "image": "/question-media/moex-96-1-med2/MOEX-096040-2101-Q035.webp",
+        "width": 1030,
+        "height": 128,
+        "scope": "生理學、生物化學、藥理學、病理學及臨床相關知識",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-096040-2101-Q036",
+      "subject": "醫學（二）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（二）",
+      "stem": "34 歲已婚女性，罹患腦下垂體泌乳激素瘤（prolactinoma），規則以藥物治療可維持正常生理週期。 最近病患主訴6 週無月經，合併噁心、嘔吐。則此時應建議先作那項荷爾蒙檢查？",
+      "options": {
+        "A": "尿液中之人體絨毛膜性促素（hCG）",
+        "B": "泌乳激素（prolactin）",
+        "C": "甲促素（TSH）",
+        "D": "收集24 小時尿液中之腎上腺皮質荷爾蒙（cortisol）"
+      },
+      "answer": "A",
+      "acceptedAnswers": [
+        "A"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：A。",
+      "testedConcept": "醫學（二）（舊制原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國96年 第1次 醫師第一階段 醫學（二） 2101（舊制）",
+      "sourceYear": 2007,
+      "sourceRound": 1,
+      "originalQuestionNumber": 36,
+      "examCode": "096040",
+      "paperCode": "2101",
+      "examSessionLabel": "第一次",
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=122&code=096040&q=1&s=2001&t=Q",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=122&code=096040&q=1&s=2001&t=M",
+        "page": 3,
+        "endPage": 3,
+        "image": "/question-media/moex-96-1-med2/MOEX-096040-2101-Q036.webp",
+        "width": 1030,
+        "height": 153,
+        "scope": "生理學、生物化學、藥理學、病理學及臨床相關知識",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-096040-2101-Q037",
+      "subject": "醫學（二）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（二）",
+      "stem": "用來治療陽萎的藥物「威而剛」（Viagra; Sildenafil citrate）會頗具選擇性地抑制在血管平滑肌內有 高度表現的一種cGMP phosphodiesterase，造成血管擴張、海綿體充血，海綿竇因此膨脹變大而達到 勃起的效果。下列關於威而剛作用之敘述，何者正確？",
+      "options": {
+        "A": "會增加cGMP 之新合成",
+        "B": "會抑制5’-GMP 轉化成cGMP",
+        "C": "會使血管平滑肌細胞內cGMP 增多",
+        "D": "會增加nitric oxide（NO）的釋放"
+      },
+      "answer": "C",
+      "acceptedAnswers": [
+        "C"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：C。",
+      "testedConcept": "醫學（二）（舊制原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國96年 第1次 醫師第一階段 醫學（二） 2101（舊制）",
+      "sourceYear": 2007,
+      "sourceRound": 1,
+      "originalQuestionNumber": 37,
+      "examCode": "096040",
+      "paperCode": "2101",
+      "examSessionLabel": "第一次",
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=122&code=096040&q=1&s=2001&t=Q",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=122&code=096040&q=1&s=2001&t=M",
+        "page": 3,
+        "endPage": 3,
+        "image": "/question-media/moex-96-1-med2/MOEX-096040-2101-Q037.webp",
+        "width": 1030,
+        "height": 127,
+        "scope": "生理學、生物化學、藥理學、病理學及臨床相關知識",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-096040-2101-Q038",
+      "subject": "醫學（二）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（二）",
+      "stem": "胰島素缺乏的第一型糖尿病（type I diabetes mellitus）病人，血糖控制極差時，可能發生酮酸中 毒（ketoacidosis），下列有關病人體內能量代謝之敘述，何者錯誤？",
+      "options": {
+        "A": "酮體（ketone body）主要是由葡萄糖代謝產生之acetyl-CoA 所轉化而成",
+        "B": "酮體可代替葡萄糖成為細胞能量來源",
+        "C": "Kreb’s cycle 之中間產物，如oxaloacetate 被移作糖質新生作用（gluconeogenesis）之材料，故血糖 會上升",
+        "D": "acetyl-CoA 因缺乏oxaloacetate，無法進行Kreb’s cycle，故轉化成酮體"
+      },
+      "answer": "A",
+      "acceptedAnswers": [
+        "A"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：A。",
+      "testedConcept": "醫學（二）（舊制原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國96年 第1次 醫師第一階段 醫學（二） 2101（舊制）",
+      "sourceYear": 2007,
+      "sourceRound": 1,
+      "originalQuestionNumber": 38,
+      "examCode": "096040",
+      "paperCode": "2101",
+      "examSessionLabel": "第一次",
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=122&code=096040&q=1&s=2001&t=Q",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=122&code=096040&q=1&s=2001&t=M",
+        "page": 3,
+        "endPage": 3,
+        "image": "/question-media/moex-96-1-med2/MOEX-096040-2101-Q038.webp",
+        "width": 1030,
+        "height": 178,
+        "scope": "生理學、生物化學、藥理學、病理學及臨床相關知識",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-096040-2101-Q039",
+      "subject": "醫學（二）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（二）",
+      "stem": "14 歲的小薇身材消瘦，因最近特別顯得病懨懨、並且抱怨口渴、頻尿、食慾變差及體重減輕而被媽 媽帶到醫院檢查，經一系列實驗室檢驗後，醫師診斷她患有第一型糖尿病（type I diabetes mellitus）。 第一型糖尿病是因為胰臟不能產生胰島素所致，治療必須每天注射多次的胰島素。下列關於胰島素 訊息傳導機制之敘述，何者錯誤？",
+      "options": {
+        "A": "胰島素與受體結合會引發受體蛋白之四級結構（quaternary structure）的變化",
+        "B": "胰島素與受體結合會活化一些protein kinase",
+        "C": "胰島素受體為一protein tyrosine kinase",
+        "D": "胰島素受體protein kinase 的受質均為transcription factor"
+      },
+      "answer": "D",
+      "acceptedAnswers": [
+        "D"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：D。",
+      "testedConcept": "醫學（二）（舊制原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國96年 第1次 醫師第一階段 醫學（二） 2101（舊制）",
+      "sourceYear": 2007,
+      "sourceRound": 1,
+      "originalQuestionNumber": 39,
+      "examCode": "096040",
+      "paperCode": "2101",
+      "examSessionLabel": "第一次",
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=122&code=096040&q=1&s=2001&t=Q",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=122&code=096040&q=1&s=2001&t=M",
+        "page": 3,
+        "endPage": 3,
+        "image": "/question-media/moex-96-1-med2/MOEX-096040-2101-Q039.webp",
+        "width": 1030,
+        "height": 204,
+        "scope": "生理學、生物化學、藥理學、病理學及臨床相關知識",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-096040-2101-Q040",
+      "subject": "醫學（二）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（二）",
+      "stem": "有一種特殊的血紅素基因病變來自於終止密碼子（termination codon）之突變而造成polypeptide 之延 長或縮短。下列何者不是終止密碼子？",
+      "options": {
+        "A": "UAG",
+        "B": "UAA",
+        "C": "UGA",
+        "D": "UGG"
+      },
+      "answer": "D",
+      "acceptedAnswers": [
+        "D"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：D。",
+      "testedConcept": "醫學（二）（舊制原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國96年 第1次 醫師第一階段 醫學（二） 2101（舊制）",
+      "sourceYear": 2007,
+      "sourceRound": 1,
+      "originalQuestionNumber": 40,
+      "examCode": "096040",
+      "paperCode": "2101",
+      "examSessionLabel": "第一次",
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=122&code=096040&q=1&s=2001&t=Q",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=122&code=096040&q=1&s=2001&t=M",
+        "page": 3,
+        "endPage": 3,
+        "image": "/question-media/moex-96-1-med2/MOEX-096040-2101-Q040.webp",
+        "width": 1030,
+        "height": 82,
+        "scope": "生理學、生物化學、藥理學、病理學及臨床相關知識",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-096040-2101-Q041",
+      "subject": "醫學（二）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（二）",
+      "stem": "丙酮酸羧化酶（Pyruvate carboxylase）其輔酶生物素（biotin）主要功能是傳遞：",
+      "options": {
+        "A": "胺基（amino group）",
+        "B": "電子（electrons）",
+        "C": "醯基（acyl groups）",
+        "D": "二氧化碳（CO2）"
+      },
+      "answer": "D",
+      "acceptedAnswers": [
+        "D"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：D。",
+      "testedConcept": "醫學（二）（舊制原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國96年 第1次 醫師第一階段 醫學（二） 2101（舊制）",
+      "sourceYear": 2007,
+      "sourceRound": 1,
+      "originalQuestionNumber": 41,
+      "examCode": "096040",
+      "paperCode": "2101",
+      "examSessionLabel": "第一次",
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=122&code=096040&q=1&s=2001&t=Q",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=122&code=096040&q=1&s=2001&t=M",
+        "page": 4,
+        "endPage": 4,
+        "image": "/question-media/moex-96-1-med2/MOEX-096040-2101-Q041.webp",
+        "width": 1030,
+        "height": 55,
+        "scope": "生理學、生物化學、藥理學、病理學及臨床相關知識",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-096040-2101-Q042",
+      "subject": "醫學（二）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（二）",
+      "stem": "人體主要胺基酸基本結構為：",
+      "options": {
+        "A": "L-α form",
+        "B": "L-β form",
+        "C": "D-α form",
+        "D": "D-β form"
+      },
+      "answer": "A",
+      "acceptedAnswers": [
+        "A"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：A。",
+      "testedConcept": "醫學（二）（舊制原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國96年 第1次 醫師第一階段 醫學（二） 2101（舊制）",
+      "sourceYear": 2007,
+      "sourceRound": 1,
+      "originalQuestionNumber": 42,
+      "examCode": "096040",
+      "paperCode": "2101",
+      "examSessionLabel": "第一次",
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=122&code=096040&q=1&s=2001&t=Q",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=122&code=096040&q=1&s=2001&t=M",
+        "page": 4,
+        "endPage": 4,
+        "image": "/question-media/moex-96-1-med2/MOEX-096040-2101-Q042.webp",
+        "width": 1030,
+        "height": 53,
+        "scope": "生理學、生物化學、藥理學、病理學及臨床相關知識",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-096040-2101-Q043",
+      "subject": "醫學（二）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（二）",
+      "stem": "下列那一項是DNA 和RNA 共同的特性？",
+      "options": {
+        "A": "都是雙股螺旋鏈",
+        "B": "合成過程都具有校正機制避免錯誤",
+        "C": "核酸中都含有磷酸根、醣及鹼基",
+        "D": "在五碳醣的第二個位置都是-OH 基"
+      },
+      "answer": "C",
+      "acceptedAnswers": [
+        "C"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：C。",
+      "testedConcept": "醫學（二）（舊制原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國96年 第1次 醫師第一階段 醫學（二） 2101（舊制）",
+      "sourceYear": 2007,
+      "sourceRound": 1,
+      "originalQuestionNumber": 43,
+      "examCode": "096040",
+      "paperCode": "2101",
+      "examSessionLabel": "第一次",
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=122&code=096040&q=1&s=2001&t=Q",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=122&code=096040&q=1&s=2001&t=M",
+        "page": 4,
+        "endPage": 4,
+        "image": "/question-media/moex-96-1-med2/MOEX-096040-2101-Q043.webp",
+        "width": 1030,
+        "height": 80,
+        "scope": "生理學、生物化學、藥理學、病理學及臨床相關知識",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-096040-2101-Q044",
+      "subject": "醫學（二）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（二）",
+      "stem": "一分子的丙酮酸（pyruvate）經由丙酮酸脫氫酶（pyruvate dehydrogenase）以及檸檬酸循環（citric acid cycle）代謝生成3 分子二氧化碳時，可以產生1 分子的FADH2，1 分子的ATP（或GTP），以及幾 分子的NADH？",
+      "options": {
+        "A": "1",
+        "B": "2",
+        "C": "3",
+        "D": "4"
+      },
+      "answer": "D",
+      "acceptedAnswers": [
+        "D"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：D。",
+      "testedConcept": "醫學（二）（舊制原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國96年 第1次 醫師第一階段 醫學（二） 2101（舊制）",
+      "sourceYear": 2007,
+      "sourceRound": 1,
+      "originalQuestionNumber": 44,
+      "examCode": "096040",
+      "paperCode": "2101",
+      "examSessionLabel": "第一次",
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=122&code=096040&q=1&s=2001&t=Q",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=122&code=096040&q=1&s=2001&t=M",
+        "page": 4,
+        "endPage": 4,
+        "image": "/question-media/moex-96-1-med2/MOEX-096040-2101-Q044.webp",
+        "width": 1030,
+        "height": 106,
+        "scope": "生理學、生物化學、藥理學、病理學及臨床相關知識",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-096040-2101-Q045",
+      "subject": "醫學（二）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（二）",
+      "stem": "Alanine 及2-oxoglutarate 在alanine aminotransferase 作用下會形成glutamate 及何者？",
+      "options": {
+        "A": "aspartate",
+        "B": "oxaloacetate",
+        "C": "ketobutyrate",
+        "D": "pyruvate"
+      },
+      "answer": "D",
+      "acceptedAnswers": [
+        "D"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：D。",
+      "testedConcept": "醫學（二）（舊制原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國96年 第1次 醫師第一階段 醫學（二） 2101（舊制）",
+      "sourceYear": 2007,
+      "sourceRound": 1,
+      "originalQuestionNumber": 45,
+      "examCode": "096040",
+      "paperCode": "2101",
+      "examSessionLabel": "第一次",
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=122&code=096040&q=1&s=2001&t=Q",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=122&code=096040&q=1&s=2001&t=M",
+        "page": 4,
+        "endPage": 4,
+        "image": "/question-media/moex-96-1-med2/MOEX-096040-2101-Q045.webp",
+        "width": 1030,
+        "height": 54,
+        "scope": "生理學、生物化學、藥理學、病理學及臨床相關知識",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-096040-2101-Q046",
+      "subject": "醫學（二）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（二）",
+      "stem": "Aspartate transaminase 又可稱為Glutamate:oxaloacetate transaminase 作用時需要下列何者當作輔助因 子？",
+      "options": {
+        "A": "pyridoxal phosphate",
+        "B": "thiamine",
+        "C": "FAD",
+        "D": "ATP"
+      },
+      "answer": "A",
+      "acceptedAnswers": [
+        "A"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：A。",
+      "testedConcept": "醫學（二）（舊制原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國96年 第1次 醫師第一階段 醫學（二） 2101（舊制）",
+      "sourceYear": 2007,
+      "sourceRound": 1,
+      "originalQuestionNumber": 46,
+      "examCode": "096040",
+      "paperCode": "2101",
+      "examSessionLabel": "第一次",
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=122&code=096040&q=1&s=2001&t=Q",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=122&code=096040&q=1&s=2001&t=M",
+        "page": 4,
+        "endPage": 4,
+        "image": "/question-media/moex-96-1-med2/MOEX-096040-2101-Q046.webp",
+        "width": 1030,
+        "height": 80,
+        "scope": "生理學、生物化學、藥理學、病理學及臨床相關知識",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-096040-2101-Q047",
+      "subject": "醫學（二）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（二）",
+      "stem": "Mevalonate 是膽固醇的前驅物，每形成一分子的膽固醇須多少分子的Mevalonate？",
+      "options": {
+        "A": "3",
+        "B": "4",
+        "C": "5",
+        "D": "6"
+      },
+      "answer": "D",
+      "acceptedAnswers": [
+        "D"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：D。",
+      "testedConcept": "醫學（二）（舊制原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國96年 第1次 醫師第一階段 醫學（二） 2101（舊制）",
+      "sourceYear": 2007,
+      "sourceRound": 1,
+      "originalQuestionNumber": 47,
+      "examCode": "096040",
+      "paperCode": "2101",
+      "examSessionLabel": "第一次",
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=122&code=096040&q=1&s=2001&t=Q",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=122&code=096040&q=1&s=2001&t=M",
+        "page": 4,
+        "endPage": 4,
+        "image": "/question-media/moex-96-1-med2/MOEX-096040-2101-Q047.webp",
+        "width": 1030,
+        "height": 53,
+        "scope": "生理學、生物化學、藥理學、病理學及臨床相關知識",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-096040-2101-Q048",
+      "subject": "醫學（二）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（二）",
+      "stem": "一個Palmitic acid 完全氧化後可以淨得多少ATP？",
+      "options": {
+        "A": "125",
+        "B": "129",
+        "C": "130",
+        "D": "140"
+      },
+      "answer": "A",
+      "acceptedAnswers": [
+        "A",
+        "B",
+        "C",
+        "D"
+      ],
+      "answerCreditType": "all_credit",
+      "explanation": "官方最終答案：一律給分。",
+      "testedConcept": "醫學（二）（舊制原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國96年 第1次 醫師第一階段 醫學（二） 2101（舊制）",
+      "sourceYear": 2007,
+      "sourceRound": 1,
+      "originalQuestionNumber": 48,
+      "examCode": "096040",
+      "paperCode": "2101",
+      "examSessionLabel": "第一次",
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=122&code=096040&q=1&s=2001&t=Q",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=122&code=096040&q=1&s=2001&t=M",
+        "page": 4,
+        "endPage": 4,
+        "image": "/question-media/moex-96-1-med2/MOEX-096040-2101-Q048.webp",
+        "width": 1030,
+        "height": 54,
+        "scope": "生理學、生物化學、藥理學、病理學及臨床相關知識",
+        "answerNote": "第48題一律給分"
+      }
+    },
+    {
+      "id": "MOEX-096040-2101-Q049",
+      "subject": "醫學（二）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（二）",
+      "stem": "下列何種酵素活性之抑制可以提升cAMP 濃度，以減緩氣喘症狀？",
+      "options": {
+        "A": "phospholipase C",
+        "B": "adenylate cyclase",
+        "C": "protein kinase A",
+        "D": "cAMP phosphodiesterase"
+      },
+      "answer": "D",
+      "acceptedAnswers": [
+        "D"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：D。",
+      "testedConcept": "醫學（二）（舊制原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國96年 第1次 醫師第一階段 醫學（二） 2101（舊制）",
+      "sourceYear": 2007,
+      "sourceRound": 1,
+      "originalQuestionNumber": 49,
+      "examCode": "096040",
+      "paperCode": "2101",
+      "examSessionLabel": "第一次",
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=122&code=096040&q=1&s=2001&t=Q",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=122&code=096040&q=1&s=2001&t=M",
+        "page": 4,
+        "endPage": 4,
+        "image": "/question-media/moex-96-1-med2/MOEX-096040-2101-Q049.webp",
+        "width": 1030,
+        "height": 80,
+        "scope": "生理學、生物化學、藥理學、病理學及臨床相關知識",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-096040-2101-Q050",
+      "subject": "醫學（二）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（二）",
+      "stem": "在標準條件下，下列何者在水解所釋出的自由能（free energy）最大？",
+      "options": {
+        "A": "creatine phosphate",
+        "B": "phosphoenolpyruvate",
+        "C": "ATP",
+        "D": "1,3-bisphosphoglycerate"
+      },
+      "answer": "B",
+      "acceptedAnswers": [
+        "B"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：B。",
+      "testedConcept": "醫學（二）（舊制原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國96年 第1次 醫師第一階段 醫學（二） 2101（舊制）",
+      "sourceYear": 2007,
+      "sourceRound": 1,
+      "originalQuestionNumber": 50,
+      "examCode": "096040",
+      "paperCode": "2101",
+      "examSessionLabel": "第一次",
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=122&code=096040&q=1&s=2001&t=Q",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=122&code=096040&q=1&s=2001&t=M",
+        "page": 4,
+        "endPage": 4,
+        "image": "/question-media/moex-96-1-med2/MOEX-096040-2101-Q050.webp",
+        "width": 1030,
+        "height": 80,
+        "scope": "生理學、生物化學、藥理學、病理學及臨床相關知識",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-096040-2101-Q051",
+      "subject": "醫學（二）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（二）",
+      "stem": "下列何者的分子內含有半縮酮（hemiketal）？",
+      "options": {
+        "A": "環式D-ribose",
+        "B": "環式D-fructose",
+        "C": "環式D-glucose",
+        "D": "6-phosphogluconolactone"
+      },
+      "answer": "B",
+      "acceptedAnswers": [
+        "B"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：B。",
+      "testedConcept": "醫學（二）（舊制原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國96年 第1次 醫師第一階段 醫學（二） 2101（舊制）",
+      "sourceYear": 2007,
+      "sourceRound": 1,
+      "originalQuestionNumber": 51,
+      "examCode": "096040",
+      "paperCode": "2101",
+      "examSessionLabel": "第一次",
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=122&code=096040&q=1&s=2001&t=Q",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=122&code=096040&q=1&s=2001&t=M",
+        "page": 4,
+        "endPage": 4,
+        "image": "/question-media/moex-96-1-med2/MOEX-096040-2101-Q051.webp",
+        "width": 1030,
+        "height": 78,
+        "scope": "生理學、生物化學、藥理學、病理學及臨床相關知識",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-096040-2101-Q052",
+      "subject": "醫學（二）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（二）",
+      "stem": "在E. coli 中修護較大之DNA 損壞如紫外線照射，是靠：",
+      "options": {
+        "A": "UvrA 及UvrB 蛋白尋找破壞之位置結合上去",
+        "B": "UvrC 切斷被破壞之鹼基",
+        "C": "Apunic endonuclease 切斷DNA 一股",
+        "D": "DNA 複製酶III 修補"
+      },
+      "answer": "A",
+      "acceptedAnswers": [
+        "A"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：A。",
+      "testedConcept": "醫學（二）（舊制原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國96年 第1次 醫師第一階段 醫學（二） 2101（舊制）",
+      "sourceYear": 2007,
+      "sourceRound": 1,
+      "originalQuestionNumber": 52,
+      "examCode": "096040",
+      "paperCode": "2101",
+      "examSessionLabel": "第一次",
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=122&code=096040&q=1&s=2001&t=Q",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=122&code=096040&q=1&s=2001&t=M",
+        "page": 4,
+        "endPage": 4,
+        "image": "/question-media/moex-96-1-med2/MOEX-096040-2101-Q052.webp",
+        "width": 1030,
+        "height": 78,
+        "scope": "生理學、生物化學、藥理學、病理學及臨床相關知識",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-096040-2101-Q053",
+      "subject": "醫學（二）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（二）",
+      "stem": "在雌激素受體呈陽性反應（estrogen receptor-positive）的乳癌中，雌激素（estrogen）能促進癌細胞的 生長；臨床上對這類病人常使用一種雌激素拮抗劑（estrogen antagonist）Tamoxifen 作為乳癌的輔助 治療。下圖是Estradiol 及Tamoxifen 的結構。下列敘述何者錯誤？",
+      "options": {
+        "A": "Estradiol 及Tamoxifen 均可藉simple diffusion 通過細胞膜而與胞內受體結合",
+        "B": "Estradiol 及Tamoxifen 與細胞表面受體結合後，均可透過調控轉錄作用改變基因表現",
+        "C": "Estradiol 與受體結合，使受體發生構型變化（conformational changes）",
+        "D": "Tamoxifen 所引發之轉錄作用遠不如Estradiol"
+      },
+      "answer": "B",
+      "acceptedAnswers": [
+        "B"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：B。",
+      "testedConcept": "醫學（二）（舊制原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國96年 第1次 醫師第一階段 醫學（二） 2101（舊制）",
+      "sourceYear": 2007,
+      "sourceRound": 1,
+      "originalQuestionNumber": 53,
+      "examCode": "096040",
+      "paperCode": "2101",
+      "examSessionLabel": "第一次",
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=122&code=096040&q=1&s=2001&t=Q",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=122&code=096040&q=1&s=2001&t=M",
+        "page": 4,
+        "endPage": 4,
+        "image": "/question-media/moex-96-1-med2/MOEX-096040-2101-Q053.webp",
+        "width": 1030,
+        "height": 528,
+        "scope": "生理學、生物化學、藥理學、病理學及臨床相關知識",
+        "answerNote": null
+      },
+      "stemImage": "/question-media/moex-96-1-med2/MOEX-096040-2101-Q053.webp"
+    },
+    {
+      "id": "MOEX-096040-2101-Q054",
+      "subject": "醫學（二）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（二）",
+      "stem": "下列貧血治療劑何者最適合用於自體免疫溶血性貧血（autoimmune hemolytic anemia）？",
+      "options": {
+        "A": "Vitamin B12",
+        "B": "Hydroxyurea",
+        "C": "Prednisone",
+        "D": "Pyridoxine"
+      },
+      "answer": "C",
+      "acceptedAnswers": [
+        "C"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：C。",
+      "testedConcept": "醫學（二）（舊制原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國96年 第1次 醫師第一階段 醫學（二） 2101（舊制）",
+      "sourceYear": 2007,
+      "sourceRound": 1,
+      "originalQuestionNumber": 54,
+      "examCode": "096040",
+      "paperCode": "2101",
+      "examSessionLabel": "第一次",
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=122&code=096040&q=1&s=2001&t=Q",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=122&code=096040&q=1&s=2001&t=M",
+        "page": 4,
+        "endPage": 4,
+        "image": "/question-media/moex-96-1-med2/MOEX-096040-2101-Q054.webp",
+        "width": 1030,
+        "height": 57,
+        "scope": "生理學、生物化學、藥理學、病理學及臨床相關知識",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-096040-2101-Q055",
+      "subject": "醫學（二）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（二）",
+      "stem": "下列對於Glucocorticoid 產生之臨床副作用，何者錯誤？",
+      "options": {
+        "A": "導致庫興氏症候群（Cushing’s syndrome）",
+        "B": "產生骨質疏鬆症",
+        "C": "產生消化性潰瘍",
+        "D": "使氣管收縮，引起氣喘之發作"
+      },
+      "answer": "D",
+      "acceptedAnswers": [
+        "D"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：D。",
+      "testedConcept": "醫學（二）（舊制原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國96年 第1次 醫師第一階段 醫學（二） 2101（舊制）",
+      "sourceYear": 2007,
+      "sourceRound": 1,
+      "originalQuestionNumber": 55,
+      "examCode": "096040",
+      "paperCode": "2101",
+      "examSessionLabel": "第一次",
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=122&code=096040&q=1&s=2001&t=Q",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=122&code=096040&q=1&s=2001&t=M",
+        "page": 5,
+        "endPage": 5,
+        "image": "/question-media/moex-96-1-med2/MOEX-096040-2101-Q055.webp",
+        "width": 1030,
+        "height": 74,
+        "scope": "生理學、生物化學、藥理學、病理學及臨床相關知識",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-096040-2101-Q056",
+      "subject": "醫學（二）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（二）",
+      "stem": "下列何種抗心律不整藥物最易引起torsades de pointes 的副作用？",
+      "options": {
+        "A": "Propranolol",
+        "B": "Procainamide",
+        "C": "Verapamil",
+        "D": "Ibutilide"
+      },
+      "answer": "B",
+      "acceptedAnswers": [
+        "B",
+        "D"
+      ],
+      "answerCreditType": "multiple_accepted",
+      "explanation": "官方最終答案：B、D。",
+      "testedConcept": "醫學（二）（舊制原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國96年 第1次 醫師第一階段 醫學（二） 2101（舊制）",
+      "sourceYear": 2007,
+      "sourceRound": 1,
+      "originalQuestionNumber": 56,
+      "examCode": "096040",
+      "paperCode": "2101",
+      "examSessionLabel": "第一次",
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=122&code=096040&q=1&s=2001&t=Q",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=122&code=096040&q=1&s=2001&t=M",
+        "page": 5,
+        "endPage": 5,
+        "image": "/question-media/moex-96-1-med2/MOEX-096040-2101-Q056.webp",
+        "width": 1030,
+        "height": 49,
+        "scope": "生理學、生物化學、藥理學、病理學及臨床相關知識",
+        "answerNote": "第56題答B或D者均給分"
+      }
+    },
+    {
+      "id": "MOEX-096040-2101-Q057",
+      "subject": "醫學（二）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（二）",
+      "stem": "患有氣喘或慢性肺阻塞的高血壓病人，不宜使用下列何種降血壓藥物？",
+      "options": {
+        "A": "Clonidine",
+        "B": "Terazosin",
+        "C": "Losartan",
+        "D": "Propranolol"
+      },
+      "answer": "D",
+      "acceptedAnswers": [
+        "D"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：D。",
+      "testedConcept": "醫學（二）（舊制原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國96年 第1次 醫師第一階段 醫學（二） 2101（舊制）",
+      "sourceYear": 2007,
+      "sourceRound": 1,
+      "originalQuestionNumber": 57,
+      "examCode": "096040",
+      "paperCode": "2101",
+      "examSessionLabel": "第一次",
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=122&code=096040&q=1&s=2001&t=Q",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=122&code=096040&q=1&s=2001&t=M",
+        "page": 5,
+        "endPage": 5,
+        "image": "/question-media/moex-96-1-med2/MOEX-096040-2101-Q057.webp",
+        "width": 1030,
+        "height": 49,
+        "scope": "生理學、生物化學、藥理學、病理學及臨床相關知識",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-096040-2101-Q058",
+      "subject": "醫學（二）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（二）",
+      "stem": "70 歲李先生是一個老菸槍，因為chronic obstructive pulmonary disease（COPD）長期在門診追蹤治療， 近來因眼睛不適被診斷為青光眼，下列那一種藥物不宜使用？",
+      "options": {
+        "A": "Aminophylline",
+        "B": "Ipratropium",
+        "C": "Albuterol",
+        "D": "Budesonide"
+      },
+      "answer": "A",
+      "acceptedAnswers": [
+        "A",
+        "B",
+        "C",
+        "D"
+      ],
+      "answerCreditType": "all_credit",
+      "explanation": "官方最終答案：一律給分。",
+      "testedConcept": "醫學（二）（舊制原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國96年 第1次 醫師第一階段 醫學（二） 2101（舊制）",
+      "sourceYear": 2007,
+      "sourceRound": 1,
+      "originalQuestionNumber": 58,
+      "examCode": "096040",
+      "paperCode": "2101",
+      "examSessionLabel": "第一次",
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=122&code=096040&q=1&s=2001&t=Q",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=122&code=096040&q=1&s=2001&t=M",
+        "page": 5,
+        "endPage": 5,
+        "image": "/question-media/moex-96-1-med2/MOEX-096040-2101-Q058.webp",
+        "width": 1030,
+        "height": 74,
+        "scope": "生理學、生物化學、藥理學、病理學及臨床相關知識",
+        "answerNote": "第58題一律給分"
+      }
+    },
+    {
+      "id": "MOEX-096040-2101-Q059",
+      "subject": "醫學（二）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（二）",
+      "stem": "下列有關治療巴金森氏症的藥物Carbidopa 的描述，何者正確？",
+      "options": {
+        "A": "會抑制單胺氧化酶（monoamine oxidase）B 的活性，進而減少dopamine 的代謝作用",
+        "B": "會減少levodopa 在周邊系統的代謝作用",
+        "C": "經常單獨使用來治療巴金森氏症的患者",
+        "D": "會通透血腦屏障（blood-brain barrier）"
+      },
+      "answer": "B",
+      "acceptedAnswers": [
+        "B"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：B。",
+      "testedConcept": "醫學（二）（舊制原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國96年 第1次 醫師第一階段 醫學（二） 2101（舊制）",
+      "sourceYear": 2007,
+      "sourceRound": 1,
+      "originalQuestionNumber": 59,
+      "examCode": "096040",
+      "paperCode": "2101",
+      "examSessionLabel": "第一次",
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=122&code=096040&q=1&s=2001&t=Q",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=122&code=096040&q=1&s=2001&t=M",
+        "page": 5,
+        "endPage": 5,
+        "image": "/question-media/moex-96-1-med2/MOEX-096040-2101-Q059.webp",
+        "width": 1030,
+        "height": 123,
+        "scope": "生理學、生物化學、藥理學、病理學及臨床相關知識",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-096040-2101-Q060",
+      "subject": "醫學（二）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（二）",
+      "stem": "下列有關靜脈注射型全身性麻醉劑的描述，何者錯誤？",
+      "options": {
+        "A": "靜脈注射型全身性麻醉劑在體內產生作用期間的長短，主要取決於其再分布（redistribution）與代 謝的速率",
+        "B": "靜脈注射Etomidate 時容易出現注射部位的疼痛及肌肉痙攣（myoclonus）",
+        "C": "Diazepam 的麻醉誘導速率較thiopental 快",
+        "D": "使用Ketamine 時，成人常會出現作惡夢（bad dream）的經驗"
+      },
+      "answer": "C",
+      "acceptedAnswers": [
+        "C"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：C。",
+      "testedConcept": "醫學（二）（舊制原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國96年 第1次 醫師第一階段 醫學（二） 2101（舊制）",
+      "sourceYear": 2007,
+      "sourceRound": 1,
+      "originalQuestionNumber": 60,
+      "examCode": "096040",
+      "paperCode": "2101",
+      "examSessionLabel": "第一次",
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=122&code=096040&q=1&s=2001&t=Q",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=122&code=096040&q=1&s=2001&t=M",
+        "page": 5,
+        "endPage": 5,
+        "image": "/question-media/moex-96-1-med2/MOEX-096040-2101-Q060.webp",
+        "width": 1030,
+        "height": 148,
+        "scope": "生理學、生物化學、藥理學、病理學及臨床相關知識",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-096040-2101-Q061",
+      "subject": "醫學（二）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（二）",
+      "stem": "抗高血壓藥物captopril 會引起乾咳的副作用主要與下列何種自泌素（autacoid）有關？",
+      "options": {
+        "A": "Angiotensin",
+        "B": "Bradykinin",
+        "C": "Serotonin",
+        "D": "Histamine"
+      },
+      "answer": "B",
+      "acceptedAnswers": [
+        "B"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：B。",
+      "testedConcept": "醫學（二）（舊制原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國96年 第1次 醫師第一階段 醫學（二） 2101（舊制）",
+      "sourceYear": 2007,
+      "sourceRound": 1,
+      "originalQuestionNumber": 61,
+      "examCode": "096040",
+      "paperCode": "2101",
+      "examSessionLabel": "第一次",
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=122&code=096040&q=1&s=2001&t=Q",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=122&code=096040&q=1&s=2001&t=M",
+        "page": 5,
+        "endPage": 5,
+        "image": "/question-media/moex-96-1-med2/MOEX-096040-2101-Q061.webp",
+        "width": 1030,
+        "height": 49,
+        "scope": "生理學、生物化學、藥理學、病理學及臨床相關知識",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-096040-2101-Q062",
+      "subject": "醫學（二）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（二）",
+      "stem": "下列那一種藥物為Benzodiazepines 類鎮靜-催眠（sedative-hypnotic）藥物的拮抗劑（antagonist），其 可以用來治療或診斷Benzodiazepines 的急性中毒現象？",
+      "options": {
+        "A": "Buspirone",
+        "B": "Zolpidem",
+        "C": "Flumazenil",
+        "D": "Zaleplon"
+      },
+      "answer": "C",
+      "acceptedAnswers": [
+        "C"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：C。",
+      "testedConcept": "醫學（二）（舊制原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國96年 第1次 醫師第一階段 醫學（二） 2101（舊制）",
+      "sourceYear": 2007,
+      "sourceRound": 1,
+      "originalQuestionNumber": 62,
+      "examCode": "096040",
+      "paperCode": "2101",
+      "examSessionLabel": "第一次",
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=122&code=096040&q=1&s=2001&t=Q",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=122&code=096040&q=1&s=2001&t=M",
+        "page": 5,
+        "endPage": 5,
+        "image": "/question-media/moex-96-1-med2/MOEX-096040-2101-Q062.webp",
+        "width": 1030,
+        "height": 74,
+        "scope": "生理學、生物化學、藥理學、病理學及臨床相關知識",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-096040-2101-Q063",
+      "subject": "醫學（二）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（二）",
+      "stem": "下列何種藥物用於治療慢性酒精中毒？",
+      "options": {
+        "A": "Dobutamine",
+        "B": "Carbidopa",
+        "C": "Reserpine",
+        "D": "Disulfiram"
+      },
+      "answer": "D",
+      "acceptedAnswers": [
+        "D"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：D。",
+      "testedConcept": "醫學（二）（舊制原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國96年 第1次 醫師第一階段 醫學（二） 2101（舊制）",
+      "sourceYear": 2007,
+      "sourceRound": 1,
+      "originalQuestionNumber": 63,
+      "examCode": "096040",
+      "paperCode": "2101",
+      "examSessionLabel": "第一次",
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=122&code=096040&q=1&s=2001&t=Q",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=122&code=096040&q=1&s=2001&t=M",
+        "page": 5,
+        "endPage": 5,
+        "image": "/question-media/moex-96-1-med2/MOEX-096040-2101-Q063.webp",
+        "width": 1030,
+        "height": 49,
+        "scope": "生理學、生物化學、藥理學、病理學及臨床相關知識",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-096040-2101-Q064",
+      "subject": "醫學（二）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（二）",
+      "stem": "下列對於痛風之治療，何者正確？",
+      "options": {
+        "A": "Aspirin 是治療痛風很好的抗發炎藥物",
+        "B": "Colchicine 用來治療急性痛風發作",
+        "C": "Probenecid 用來治療慢性痛風時，應少喝水以使藥物在腎臟局部濃度增加，增強效果",
+        "D": "Allopurinol 減少尿酸之形成是因為抑制了superoxide dismutase"
+      },
+      "answer": "B",
+      "acceptedAnswers": [
+        "B"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：B。",
+      "testedConcept": "醫學（二）（舊制原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國96年 第1次 醫師第一階段 醫學（二） 2101（舊制）",
+      "sourceYear": 2007,
+      "sourceRound": 1,
+      "originalQuestionNumber": 64,
+      "examCode": "096040",
+      "paperCode": "2101",
+      "examSessionLabel": "第一次",
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=122&code=096040&q=1&s=2001&t=Q",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=122&code=096040&q=1&s=2001&t=M",
+        "page": 5,
+        "endPage": 5,
+        "image": "/question-media/moex-96-1-med2/MOEX-096040-2101-Q064.webp",
+        "width": 1030,
+        "height": 123,
+        "scope": "生理學、生物化學、藥理學、病理學及臨床相關知識",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-096040-2101-Q065",
+      "subject": "醫學（二）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（二）",
+      "stem": "治療幽門桿菌引起之消化性潰瘍，下列敘述何者錯誤？",
+      "options": {
+        "A": "目前標準治療為proton pump inhibitor，加上clarithromycin 及amoxicillin",
+        "B": "Clarithromycin 於酸性環境相當穩定，所以單獨使用clarithromycin 之效果極佳",
+        "C": "若有抗藥性產生可以使用其他抗菌劑取代，如metronidazole 或tetracycline",
+        "D": "對於十二指腸潰瘍患者，將幽門桿菌清除，可以降低一年之潰瘍復發率"
+      },
+      "answer": "B",
+      "acceptedAnswers": [
+        "B"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：B。",
+      "testedConcept": "醫學（二）（舊制原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國96年 第1次 醫師第一階段 醫學（二） 2101（舊制）",
+      "sourceYear": 2007,
+      "sourceRound": 1,
+      "originalQuestionNumber": 65,
+      "examCode": "096040",
+      "paperCode": "2101",
+      "examSessionLabel": "第一次",
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=122&code=096040&q=1&s=2001&t=Q",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=122&code=096040&q=1&s=2001&t=M",
+        "page": 5,
+        "endPage": 5,
+        "image": "/question-media/moex-96-1-med2/MOEX-096040-2101-Q065.webp",
+        "width": 1030,
+        "height": 123,
+        "scope": "生理學、生物化學、藥理學、病理學及臨床相關知識",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-096040-2101-Q066",
+      "subject": "醫學（二）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（二）",
+      "stem": "下列何種藥物是經由阻斷nicotinic receptor 而可治療因手術所引起的惡性高血壓？",
+      "options": {
+        "A": "Atropine",
+        "B": "Trimethaphan",
+        "C": "Cyclopentolate",
+        "D": "Ipratropium"
+      },
+      "answer": "B",
+      "acceptedAnswers": [
+        "B"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：B。",
+      "testedConcept": "醫學（二）（舊制原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國96年 第1次 醫師第一階段 醫學（二） 2101（舊制）",
+      "sourceYear": 2007,
+      "sourceRound": 1,
+      "originalQuestionNumber": 66,
+      "examCode": "096040",
+      "paperCode": "2101",
+      "examSessionLabel": "第一次",
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=122&code=096040&q=1&s=2001&t=Q",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=122&code=096040&q=1&s=2001&t=M",
+        "page": 5,
+        "endPage": 5,
+        "image": "/question-media/moex-96-1-med2/MOEX-096040-2101-Q066.webp",
+        "width": 1030,
+        "height": 49,
+        "scope": "生理學、生物化學、藥理學、病理學及臨床相關知識",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-096040-2101-Q067",
+      "subject": "醫學（二）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（二）",
+      "stem": "下列前列腺素和其相關衍生物中，何者不具有收縮血管的作用？",
+      "options": {
+        "A": "TXA2",
+        "B": "PGI2",
+        "C": "PGF2α",
+        "D": "LTD4"
+      },
+      "answer": "B",
+      "acceptedAnswers": [
+        "B"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：B。",
+      "testedConcept": "醫學（二）（舊制原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國96年 第1次 醫師第一階段 醫學（二） 2101（舊制）",
+      "sourceYear": 2007,
+      "sourceRound": 1,
+      "originalQuestionNumber": 67,
+      "examCode": "096040",
+      "paperCode": "2101",
+      "examSessionLabel": "第一次",
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=122&code=096040&q=1&s=2001&t=Q",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=122&code=096040&q=1&s=2001&t=M",
+        "page": 5,
+        "endPage": 5,
+        "image": "/question-media/moex-96-1-med2/MOEX-096040-2101-Q067.webp",
+        "width": 1030,
+        "height": 49,
+        "scope": "生理學、生物化學、藥理學、病理學及臨床相關知識",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-096040-2101-Q068",
+      "subject": "醫學（二）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（二）",
+      "stem": "下列有關抗心律不整藥物lidocaine 的敘述，何者錯誤？",
+      "options": {
+        "A": "是一局部麻醉劑",
+        "B": "抑制K⁺ channel",
+        "C": "不影響心肌的傳導速率",
+        "D": "可以提高ventricular fibrillation threshold"
+      },
+      "answer": "B",
+      "acceptedAnswers": [
+        "B",
+        "C"
+      ],
+      "answerCreditType": "multiple_accepted",
+      "explanation": "官方最終答案：B、C。",
+      "testedConcept": "醫學（二）（舊制原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國96年 第1次 醫師第一階段 醫學（二） 2101（舊制）",
+      "sourceYear": 2007,
+      "sourceRound": 1,
+      "originalQuestionNumber": 68,
+      "examCode": "096040",
+      "paperCode": "2101",
+      "examSessionLabel": "第一次",
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=122&code=096040&q=1&s=2001&t=Q",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=122&code=096040&q=1&s=2001&t=M",
+        "page": 5,
+        "endPage": 5,
+        "image": "/question-media/moex-96-1-med2/MOEX-096040-2101-Q068.webp",
+        "width": 1030,
+        "height": 74,
+        "scope": "生理學、生物化學、藥理學、病理學及臨床相關知識",
+        "answerNote": "第68題答B或C者均給分"
+      }
+    },
+    {
+      "id": "MOEX-096040-2101-Q069",
+      "subject": "醫學（二）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（二）",
+      "stem": "人體內製造性荷爾蒙之原料為何？",
+      "options": {
+        "A": "Triglyceride",
+        "B": "Cholesterol",
+        "C": "Collagen",
+        "D": "Glycoprotein"
+      },
+      "answer": "B",
+      "acceptedAnswers": [
+        "B"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：B。",
+      "testedConcept": "醫學（二）（舊制原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國96年 第1次 醫師第一階段 醫學（二） 2101（舊制）",
+      "sourceYear": 2007,
+      "sourceRound": 1,
+      "originalQuestionNumber": 69,
+      "examCode": "096040",
+      "paperCode": "2101",
+      "examSessionLabel": "第一次",
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=122&code=096040&q=1&s=2001&t=Q",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=122&code=096040&q=1&s=2001&t=M",
+        "page": 5,
+        "endPage": 5,
+        "image": "/question-media/moex-96-1-med2/MOEX-096040-2101-Q069.webp",
+        "width": 1030,
+        "height": 49,
+        "scope": "生理學、生物化學、藥理學、病理學及臨床相關知識",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-096040-2101-Q070",
+      "subject": "醫學（二）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（二）",
+      "stem": "有關Somatostatin 之敘述，下列何者錯誤？",
+      "options": {
+        "A": "會抑制生長荷爾蒙（growth hormone）之分泌",
+        "B": "通常是以口服給藥（oral）",
+        "C": "可用來治療肢端肥大症（acromegaly）",
+        "D": "Somatostatin 主要受體為SSTR2 和SSTR5"
+      },
+      "answer": "B",
+      "acceptedAnswers": [
+        "B",
+        "C"
+      ],
+      "answerCreditType": "multiple_accepted",
+      "explanation": "官方最終答案：B、C。",
+      "testedConcept": "醫學（二）（舊制原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國96年 第1次 醫師第一階段 醫學（二） 2101（舊制）",
+      "sourceYear": 2007,
+      "sourceRound": 1,
+      "originalQuestionNumber": 70,
+      "examCode": "096040",
+      "paperCode": "2101",
+      "examSessionLabel": "第一次",
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=122&code=096040&q=1&s=2001&t=Q",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=122&code=096040&q=1&s=2001&t=M",
+        "page": 5,
+        "endPage": 5,
+        "image": "/question-media/moex-96-1-med2/MOEX-096040-2101-Q070.webp",
+        "width": 1030,
+        "height": 74,
+        "scope": "生理學、生物化學、藥理學、病理學及臨床相關知識",
+        "answerNote": "第70題答B或C者均給分"
+      }
+    },
+    {
+      "id": "MOEX-096040-2101-Q071",
+      "subject": "醫學（二）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（二）",
+      "stem": "下列何者可經由抑制5-lipoxygenase 的作用，用來當作治療氣喘的藥品？",
+      "options": {
+        "A": "Montelukast",
+        "B": "Zileuton",
+        "C": "Nedocromil",
+        "D": "Salmeterol"
+      },
+      "answer": "B",
+      "acceptedAnswers": [
+        "B"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：B。",
+      "testedConcept": "醫學（二）（舊制原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國96年 第1次 醫師第一階段 醫學（二） 2101（舊制）",
+      "sourceYear": 2007,
+      "sourceRound": 1,
+      "originalQuestionNumber": 71,
+      "examCode": "096040",
+      "paperCode": "2101",
+      "examSessionLabel": "第一次",
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=122&code=096040&q=1&s=2001&t=Q",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=122&code=096040&q=1&s=2001&t=M",
+        "page": 5,
+        "endPage": 5,
+        "image": "/question-media/moex-96-1-med2/MOEX-096040-2101-Q071.webp",
+        "width": 1030,
+        "height": 49,
+        "scope": "生理學、生物化學、藥理學、病理學及臨床相關知識",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-096040-2101-Q072",
+      "subject": "醫學（二）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（二）",
+      "stem": "何種免疫抑制劑主要機轉在於結合FK506-binding protein 以抑制磷酸水解酵素（calcineurin）活性， 進而減低免疫相關細胞激素（cytokine）之生成？",
+      "options": {
+        "A": "Cyclosporine",
+        "B": "Azathioprine",
+        "C": "Tacrolimus",
+        "D": "Methotrexate"
+      },
+      "answer": "C",
+      "acceptedAnswers": [
+        "C"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：C。",
+      "testedConcept": "醫學（二）（舊制原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國96年 第1次 醫師第一階段 醫學（二） 2101（舊制）",
+      "sourceYear": 2007,
+      "sourceRound": 1,
+      "originalQuestionNumber": 72,
+      "examCode": "096040",
+      "paperCode": "2101",
+      "examSessionLabel": "第一次",
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=122&code=096040&q=1&s=2001&t=Q",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=122&code=096040&q=1&s=2001&t=M",
+        "page": 5,
+        "endPage": 5,
+        "image": "/question-media/moex-96-1-med2/MOEX-096040-2101-Q072.webp",
+        "width": 1030,
+        "height": 74,
+        "scope": "生理學、生物化學、藥理學、病理學及臨床相關知識",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-096040-2101-Q073",
+      "subject": "醫學（二）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（二）",
+      "stem": "下列降血脂藥物，何者降低體內膽固醇（cholesterol）生合成之機轉為抑制3-hydroxy-3-methylglutaryl CoA reductase（HMG CoA reductase）？",
+      "options": {
+        "A": "Niacin",
+        "B": "Fenofibrate",
+        "C": "Cholestyramine",
+        "D": "Lovastatin"
+      },
+      "answer": "D",
+      "acceptedAnswers": [
+        "D"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：D。",
+      "testedConcept": "醫學（二）（舊制原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國96年 第1次 醫師第一階段 醫學（二） 2101（舊制）",
+      "sourceYear": 2007,
+      "sourceRound": 1,
+      "originalQuestionNumber": 73,
+      "examCode": "096040",
+      "paperCode": "2101",
+      "examSessionLabel": "第一次",
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=122&code=096040&q=1&s=2001&t=Q",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=122&code=096040&q=1&s=2001&t=M",
+        "page": 5,
+        "endPage": 5,
+        "image": "/question-media/moex-96-1-med2/MOEX-096040-2101-Q073.webp",
+        "width": 1030,
+        "height": 80,
+        "scope": "生理學、生物化學、藥理學、病理學及臨床相關知識",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-096040-2101-Q074",
+      "subject": "醫學（二）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（二）",
+      "stem": "下列何者是5-fluorouracil 的抗癌作用機轉？",
+      "options": {
+        "A": "與DNA 結合而抑制DNA 複製的功能",
+        "B": "抑制dihydrofolic acid 還原酵素",
+        "C": "其代謝物抑制thymidylate synthase 而毒殺細胞",
+        "D": "選擇性的抑制DNA polymerase"
+      },
+      "answer": "C",
+      "acceptedAnswers": [
+        "C"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：C。",
+      "testedConcept": "醫學（二）（舊制原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國96年 第1次 醫師第一階段 醫學（二） 2101（舊制）",
+      "sourceYear": 2007,
+      "sourceRound": 1,
+      "originalQuestionNumber": 74,
+      "examCode": "096040",
+      "paperCode": "2101",
+      "examSessionLabel": "第一次",
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=122&code=096040&q=1&s=2001&t=Q",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=122&code=096040&q=1&s=2001&t=M",
+        "page": 6,
+        "endPage": 6,
+        "image": "/question-media/moex-96-1-med2/MOEX-096040-2101-Q074.webp",
+        "width": 1030,
+        "height": 78,
+        "scope": "生理學、生物化學、藥理學、病理學及臨床相關知識",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-096040-2101-Q075",
+      "subject": "醫學（二）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（二）",
+      "stem": "有關Fluconazole，下列敘述何者正確？",
+      "options": {
+        "A": "有效治療Aspergillosis",
+        "B": "抑制lanosterol 的去甲基化",
+        "C": "無法通過腦部血管",
+        "D": "易誘發肝臟藥物代謝酵素的合成"
+      },
+      "answer": "B",
+      "acceptedAnswers": [
+        "B"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：B。",
+      "testedConcept": "醫學（二）（舊制原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國96年 第1次 醫師第一階段 醫學（二） 2101（舊制）",
+      "sourceYear": 2007,
+      "sourceRound": 1,
+      "originalQuestionNumber": 75,
+      "examCode": "096040",
+      "paperCode": "2101",
+      "examSessionLabel": "第一次",
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=122&code=096040&q=1&s=2001&t=Q",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=122&code=096040&q=1&s=2001&t=M",
+        "page": 6,
+        "endPage": 6,
+        "image": "/question-media/moex-96-1-med2/MOEX-096040-2101-Q075.webp",
+        "width": 1030,
+        "height": 78,
+        "scope": "生理學、生物化學、藥理學、病理學及臨床相關知識",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-096040-2101-Q076",
+      "subject": "醫學（二）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（二）",
+      "stem": "下列何種免疫調節藥物可以增加肉芽腫病患者體內巨噬細胞之吞噬作用？",
+      "options": {
+        "A": "Prednisone",
+        "B": "Interferon-γ",
+        "C": "Transtuzumab",
+        "D": "Aldesleukin"
+      },
+      "answer": "B",
+      "acceptedAnswers": [
+        "B"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：B。",
+      "testedConcept": "醫學（二）（舊制原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國96年 第1次 醫師第一階段 醫學（二） 2101（舊制）",
+      "sourceYear": 2007,
+      "sourceRound": 1,
+      "originalQuestionNumber": 76,
+      "examCode": "096040",
+      "paperCode": "2101",
+      "examSessionLabel": "第一次",
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=122&code=096040&q=1&s=2001&t=Q",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=122&code=096040&q=1&s=2001&t=M",
+        "page": 6,
+        "endPage": 6,
+        "image": "/question-media/moex-96-1-med2/MOEX-096040-2101-Q076.webp",
+        "width": 1030,
+        "height": 52,
+        "scope": "生理學、生物化學、藥理學、病理學及臨床相關知識",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-096040-2101-Q077",
+      "subject": "醫學（二）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（二）",
+      "stem": "Probenecid 延長Penicillin 療效的主要原因為何？",
+      "options": {
+        "A": "抑制肝臟代謝Penicillin",
+        "B": "阻斷Penicillin 在腎小管排出",
+        "C": "促進Penicillin 與白蛋白結合，延長在體內停留的時間",
+        "D": "與Penicillin 有相同且加成性的藥效"
+      },
+      "answer": "B",
+      "acceptedAnswers": [
+        "B"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：B。",
+      "testedConcept": "醫學（二）（舊制原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國96年 第1次 醫師第一階段 醫學（二） 2101（舊制）",
+      "sourceYear": 2007,
+      "sourceRound": 1,
+      "originalQuestionNumber": 77,
+      "examCode": "096040",
+      "paperCode": "2101",
+      "examSessionLabel": "第一次",
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=122&code=096040&q=1&s=2001&t=Q",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=122&code=096040&q=1&s=2001&t=M",
+        "page": 6,
+        "endPage": 6,
+        "image": "/question-media/moex-96-1-med2/MOEX-096040-2101-Q077.webp",
+        "width": 1030,
+        "height": 130,
+        "scope": "生理學、生物化學、藥理學、病理學及臨床相關知識",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-096040-2101-Q078",
+      "subject": "醫學（二）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（二）",
+      "stem": "下列何者最容易產生腎毒性及聽覺損傷的副作用？",
+      "options": {
+        "A": "Ethambutol",
+        "B": "Isoniazid",
+        "C": "Rifabutin",
+        "D": "Amikacin"
+      },
+      "answer": "D",
+      "acceptedAnswers": [
+        "D"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：D。",
+      "testedConcept": "醫學（二）（舊制原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國96年 第1次 醫師第一階段 醫學（二） 2101（舊制）",
+      "sourceYear": 2007,
+      "sourceRound": 1,
+      "originalQuestionNumber": 78,
+      "examCode": "096040",
+      "paperCode": "2101",
+      "examSessionLabel": "第一次",
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=122&code=096040&q=1&s=2001&t=Q",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=122&code=096040&q=1&s=2001&t=M",
+        "page": 6,
+        "endPage": 6,
+        "image": "/question-media/moex-96-1-med2/MOEX-096040-2101-Q078.webp",
+        "width": 1030,
+        "height": 52,
+        "scope": "生理學、生物化學、藥理學、病理學及臨床相關知識",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-096040-2101-Q079",
+      "subject": "醫學（二）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（二）",
+      "stem": "一位55 歲婦女因過去一個月來有陰道出血的情況而就醫。她最後一次月經是在四年前。身體檢查並 無特別異常。子宮內膜切片顯示有惡性腺體細胞存在。下列何種基因與此病的發生有最明顯的相關 性？",
+      "options": {
+        "A": "BRCA1",
+        "B": "E-cadherin",
+        "C": "KIT",
+        "D": "PTEN"
+      },
+      "answer": "D",
+      "acceptedAnswers": [
+        "D"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：D。",
+      "testedConcept": "醫學（二）（舊制原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國96年 第1次 醫師第一階段 醫學（二） 2101（舊制）",
+      "sourceYear": 2007,
+      "sourceRound": 1,
+      "originalQuestionNumber": 79,
+      "examCode": "096040",
+      "paperCode": "2101",
+      "examSessionLabel": "第一次",
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=122&code=096040&q=1&s=2001&t=Q",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=122&code=096040&q=1&s=2001&t=M",
+        "page": 6,
+        "endPage": 6,
+        "image": "/question-media/moex-96-1-med2/MOEX-096040-2101-Q079.webp",
+        "width": 1030,
+        "height": 104,
+        "scope": "生理學、生物化學、藥理學、病理學及臨床相關知識",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-096040-2101-Q080",
+      "subject": "醫學（二）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（二）",
+      "stem": "陳先生今年48 歲，常常覺得疲累，最近幾年愈來愈明顯。身體檢查發現有輕微黃疸外並無特別異常。 血清學檢查發現IgG anti-HCV 及HCV RNA 陽性，anti-HAV 及HBsAg 陰性。血清AST 及ALT 值升 高。他的情況追蹤幾個月並沒有明顯的變化。下列何者是肝臟最可能的病理變化？",
+      "options": {
+        "A": "毛玻璃樣肝細胞（ground-glass hepatocyte）",
+        "B": "門脈區旁肝細胞壞死（periportal necrosis）",
+        "C": "瀰漫性小泡性脂肪變性（diffuse microvesicular steatosis）",
+        "D": "次大塊性壞死（submassive necrosis）"
+      },
+      "answer": "B",
+      "acceptedAnswers": [
+        "B"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：B。",
+      "testedConcept": "醫學（二）（舊制原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國96年 第1次 醫師第一階段 醫學（二） 2101（舊制）",
+      "sourceYear": 2007,
+      "sourceRound": 1,
+      "originalQuestionNumber": 80,
+      "examCode": "096040",
+      "paperCode": "2101",
+      "examSessionLabel": "第一次",
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=122&code=096040&q=1&s=2001&t=Q",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=122&code=096040&q=1&s=2001&t=M",
+        "page": 6,
+        "endPage": 6,
+        "image": "/question-media/moex-96-1-med2/MOEX-096040-2101-Q080.webp",
+        "width": 1030,
+        "height": 182,
+        "scope": "生理學、生物化學、藥理學、病理學及臨床相關知識",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-096040-2101-Q081",
+      "subject": "醫學（二）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（二）",
+      "stem": "肺癌中的那一類型最有可能出現副腫瘤症候群（paraneoplastic syndrome），產生腎上腺皮質促素 （ACTH）？",
+      "options": {
+        "A": "腺癌",
+        "B": "鱗狀細胞癌",
+        "C": "小細胞癌",
+        "D": "惡性間皮瘤"
+      },
+      "answer": "C",
+      "acceptedAnswers": [
+        "C"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：C。",
+      "testedConcept": "醫學（二）（舊制原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國96年 第1次 醫師第一階段 醫學（二） 2101（舊制）",
+      "sourceYear": 2007,
+      "sourceRound": 1,
+      "originalQuestionNumber": 81,
+      "examCode": "096040",
+      "paperCode": "2101",
+      "examSessionLabel": "第一次",
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=122&code=096040&q=1&s=2001&t=Q",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=122&code=096040&q=1&s=2001&t=M",
+        "page": 6,
+        "endPage": 6,
+        "image": "/question-media/moex-96-1-med2/MOEX-096040-2101-Q081.webp",
+        "width": 1030,
+        "height": 78,
+        "scope": "生理學、生物化學、藥理學、病理學及臨床相關知識",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-096040-2101-Q082",
+      "subject": "醫學（二）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（二）",
+      "stem": "一位12 歲女孩主訴兩側頸部及腋下淋巴結腫大。淋巴結病理切片檢查顯示瀰漫性淋巴細胞增生，並破 壞原有淋巴結之結構。淋巴細胞表現CD3 及TdT，但並不具CD20、CD56 或CD30 之標記。此病人 之淋巴瘤（lymphoma）應屬何型？",
+      "options": {
+        "A": "小淋巴球淋巴瘤（Small lymphocytic lymphoma）",
+        "B": "T 淋巴母細胞淋巴瘤（T lymphoblastic lymphoma）",
+        "C": "套膜細胞淋巴瘤（Mantle cell lymphoma）",
+        "D": "鼻類NK/T 細胞淋巴瘤（Nasal NK/T cell lymphoma）"
+      },
+      "answer": "B",
+      "acceptedAnswers": [
+        "B"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：B。",
+      "testedConcept": "醫學（二）（舊制原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國96年 第1次 醫師第一階段 醫學（二） 2101（舊制）",
+      "sourceYear": 2007,
+      "sourceRound": 1,
+      "originalQuestionNumber": 82,
+      "examCode": "096040",
+      "paperCode": "2101",
+      "examSessionLabel": "第一次",
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=122&code=096040&q=1&s=2001&t=Q",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=122&code=096040&q=1&s=2001&t=M",
+        "page": 6,
+        "endPage": 6,
+        "image": "/question-media/moex-96-1-med2/MOEX-096040-2101-Q082.webp",
+        "width": 1030,
+        "height": 182,
+        "scope": "生理學、生物化學、藥理學、病理學及臨床相關知識",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-096040-2101-Q083",
+      "subject": "醫學（二）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（二）",
+      "stem": "罹患Alzheimer 氏病的病人，死後解剖時下列何者最符合腦的表現？",
+      "options": {
+        "A": "腦重1010 公克",
+        "B": "腦室縮小",
+        "C": "腦迴寬而扁平",
+        "D": "腦溝變窄"
+      },
+      "answer": "A",
+      "acceptedAnswers": [
+        "A"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：A。",
+      "testedConcept": "醫學（二）（舊制原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國96年 第1次 醫師第一階段 醫學（二） 2101（舊制）",
+      "sourceYear": 2007,
+      "sourceRound": 1,
+      "originalQuestionNumber": 83,
+      "examCode": "096040",
+      "paperCode": "2101",
+      "examSessionLabel": "第一次",
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=122&code=096040&q=1&s=2001&t=Q",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=122&code=096040&q=1&s=2001&t=M",
+        "page": 6,
+        "endPage": 6,
+        "image": "/question-media/moex-96-1-med2/MOEX-096040-2101-Q083.webp",
+        "width": 1030,
+        "height": 52,
+        "scope": "生理學、生物化學、藥理學、病理學及臨床相關知識",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-096040-2101-Q084",
+      "subject": "醫學（二）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（二）",
+      "stem": "一位50 歲女性，最近幾個月來她覺得下腹部有下墜感。子宮頸抹片檢查並無異常。她接受子宮切除 手術。下圖所示是手術所切除的標本。下列何者為最可能的診斷？",
+      "options": {
+        "A": "腺肌症（adenomyosis）",
+        "B": "子宮內膜癌（endometrial cancer）",
+        "C": "子宮內膜息肉（endometrial polyp）",
+        "D": "肌瘤（leiomyoma）"
+      },
+      "answer": "D",
+      "acceptedAnswers": [
+        "D"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：D。",
+      "testedConcept": "醫學（二）（舊制原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國96年 第1次 醫師第一階段 醫學（二） 2101（舊制）",
+      "sourceYear": 2007,
+      "sourceRound": 1,
+      "originalQuestionNumber": 84,
+      "examCode": "096040",
+      "paperCode": "2101",
+      "examSessionLabel": "第一次",
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=122&code=096040&q=1&s=2001&t=Q",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=122&code=096040&q=1&s=2001&t=M",
+        "page": 6,
+        "endPage": 6,
+        "image": "/question-media/moex-96-1-med2/MOEX-096040-2101-Q084.webp",
+        "width": 1030,
+        "height": 449,
+        "scope": "生理學、生物化學、藥理學、病理學及臨床相關知識",
+        "answerNote": null
+      },
+      "stemImage": "/question-media/moex-96-1-med2/MOEX-096040-2101-Q084.webp"
+    },
+    {
+      "id": "MOEX-096040-2101-Q085",
+      "subject": "醫學（二）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（二）",
+      "stem": "35 歲女性由於高血鈣而接受副甲狀腺的手術。病理檢查證實病變具有完整包被。顯微鏡下病變由chief cell 組成，細胞中沒有出現有絲分裂的形態。在包被外的邊緣尚可見殘存一圈正常副甲狀腺的組織。 下列副甲狀腺疾病中，何者最符合此病人的臨床及病理特徵？",
+      "options": {
+        "A": "Primary hyperplasia",
+        "B": "Secondary hyperplasia",
+        "C": "Adenoma",
+        "D": "Carcinoma"
+      },
+      "answer": "C",
+      "acceptedAnswers": [
+        "C"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：C。",
+      "testedConcept": "醫學（二）（舊制原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國96年 第1次 醫師第一階段 醫學（二） 2101（舊制）",
+      "sourceYear": 2007,
+      "sourceRound": 1,
+      "originalQuestionNumber": 85,
+      "examCode": "096040",
+      "paperCode": "2101",
+      "examSessionLabel": "第一次",
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=122&code=096040&q=1&s=2001&t=Q",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=122&code=096040&q=1&s=2001&t=M",
+        "page": 7,
+        "endPage": 7,
+        "image": "/question-media/moex-96-1-med2/MOEX-096040-2101-Q085.webp",
+        "width": 1030,
+        "height": 130,
+        "scope": "生理學、生物化學、藥理學、病理學及臨床相關知識",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-096040-2101-Q086",
+      "subject": "醫學（二）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（二）",
+      "stem": "一位56 歲男性，因頸部淋巴結腫大來求診，切片發現為「分泌多量黏液的腺癌轉移」，以下部位中， 最有可能的原發病灶為：",
+      "options": {
+        "A": "小腦",
+        "B": "攝護腺",
+        "C": "鼻咽部",
+        "D": "結腸"
+      },
+      "answer": "D",
+      "acceptedAnswers": [
+        "D"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：D。",
+      "testedConcept": "醫學（二）（舊制原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國96年 第1次 醫師第一階段 醫學（二） 2101（舊制）",
+      "sourceYear": 2007,
+      "sourceRound": 1,
+      "originalQuestionNumber": 86,
+      "examCode": "096040",
+      "paperCode": "2101",
+      "examSessionLabel": "第一次",
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=122&code=096040&q=1&s=2001&t=Q",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=122&code=096040&q=1&s=2001&t=M",
+        "page": 7,
+        "endPage": 7,
+        "image": "/question-media/moex-96-1-med2/MOEX-096040-2101-Q086.webp",
+        "width": 1030,
+        "height": 78,
+        "scope": "生理學、生物化學、藥理學、病理學及臨床相關知識",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-096040-2101-Q087",
+      "subject": "醫學（二）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（二）",
+      "stem": "過敏性氣喘，主要的組織變化發生在：",
+      "options": {
+        "A": "支氣管（major bronchi）",
+        "B": "小支氣管及細支氣管（small bronchi and bronchioles）",
+        "C": "肺泡（alveoli）",
+        "D": "肺微血管（capillaries）"
+      },
+      "answer": "B",
+      "acceptedAnswers": [
+        "B"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：B。",
+      "testedConcept": "醫學（二）（舊制原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國96年 第1次 醫師第一階段 醫學（二） 2101（舊制）",
+      "sourceYear": 2007,
+      "sourceRound": 1,
+      "originalQuestionNumber": 87,
+      "examCode": "096040",
+      "paperCode": "2101",
+      "examSessionLabel": "第一次",
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=122&code=096040&q=1&s=2001&t=Q",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=122&code=096040&q=1&s=2001&t=M",
+        "page": 7,
+        "endPage": 7,
+        "image": "/question-media/moex-96-1-med2/MOEX-096040-2101-Q087.webp",
+        "width": 1030,
+        "height": 130,
+        "scope": "生理學、生物化學、藥理學、病理學及臨床相關知識",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-096040-2101-Q088",
+      "subject": "醫學（二）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（二）",
+      "stem": "26 歲男性愛滋病患皮膚上發現一小結狀病變。切片顯示其中有多數中性球浸潤，血管增生，以及許 多革蘭氏陰性桿菌。下列病變中何者最符合上述病理變化？",
+      "options": {
+        "A": "Kaposi sarcoma",
+        "B": "Pyogenic granuloma",
+        "C": "Bacillary angiomatosis",
+        "D": "Mycobacterial granuloma"
+      },
+      "answer": "C",
+      "acceptedAnswers": [
+        "C"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：C。",
+      "testedConcept": "醫學（二）（舊制原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國96年 第1次 醫師第一階段 醫學（二） 2101（舊制）",
+      "sourceYear": 2007,
+      "sourceRound": 1,
+      "originalQuestionNumber": 88,
+      "examCode": "096040",
+      "paperCode": "2101",
+      "examSessionLabel": "第一次",
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=122&code=096040&q=1&s=2001&t=Q",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=122&code=096040&q=1&s=2001&t=M",
+        "page": 7,
+        "endPage": 7,
+        "image": "/question-media/moex-96-1-med2/MOEX-096040-2101-Q088.webp",
+        "width": 1030,
+        "height": 104,
+        "scope": "生理學、生物化學、藥理學、病理學及臨床相關知識",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-096040-2101-Q089",
+      "subject": "醫學（二）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（二）",
+      "stem": "下圖所示為腦脊髓液的顯微鏡下所見，則該圖最符合下列那一個情況？",
+      "options": {
+        "A": "急性化膿性腦膜炎",
+        "B": "慢性非化膿性腦膜炎",
+        "C": "腦膜瘤",
+        "D": "癌性腦膜炎"
+      },
+      "answer": "A",
+      "acceptedAnswers": [
+        "A"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：A。",
+      "testedConcept": "醫學（二）（舊制原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國96年 第1次 醫師第一階段 醫學（二） 2101（舊制）",
+      "sourceYear": 2007,
+      "sourceRound": 1,
+      "originalQuestionNumber": 89,
+      "examCode": "096040",
+      "paperCode": "2101",
+      "examSessionLabel": "第一次",
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=122&code=096040&q=1&s=2001&t=Q",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=122&code=096040&q=1&s=2001&t=M",
+        "page": 7,
+        "endPage": 7,
+        "image": "/question-media/moex-96-1-med2/MOEX-096040-2101-Q089.webp",
+        "width": 1030,
+        "height": 390,
+        "scope": "生理學、生物化學、藥理學、病理學及臨床相關知識",
+        "answerNote": null
+      },
+      "stemImage": "/question-media/moex-96-1-med2/MOEX-096040-2101-Q089.webp"
+    },
+    {
+      "id": "MOEX-096040-2101-Q090",
+      "subject": "醫學（二）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（二）",
+      "stem": "病人主訴慢性咳嗽，X 光顯示右肺有一圓形病灶。組織檢查顯示病變中央壞死，其周圍有巨噬細胞、 淋巴球及類上皮細胞，其最可能的診斷為：",
+      "options": {
+        "A": "膿瘍（abscess）",
+        "B": "肉芽腫（granuloma）",
+        "C": "栓塞（embolus）",
+        "D": "癌（cancer）"
+      },
+      "answer": "B",
+      "acceptedAnswers": [
+        "B"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：B。",
+      "testedConcept": "醫學（二）（舊制原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國96年 第1次 醫師第一階段 醫學（二） 2101（舊制）",
+      "sourceYear": 2007,
+      "sourceRound": 1,
+      "originalQuestionNumber": 90,
+      "examCode": "096040",
+      "paperCode": "2101",
+      "examSessionLabel": "第一次",
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=122&code=096040&q=1&s=2001&t=Q",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=122&code=096040&q=1&s=2001&t=M",
+        "page": 7,
+        "endPage": 7,
+        "image": "/question-media/moex-96-1-med2/MOEX-096040-2101-Q090.webp",
+        "width": 1030,
+        "height": 78,
+        "scope": "生理學、生物化學、藥理學、病理學及臨床相關知識",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-096040-2101-Q091",
+      "subject": "醫學（二）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（二）",
+      "stem": "第三、四腦室旁及乳頭體（mamillary body）點狀出血並出現神經學症狀，係因下列何者所造成？",
+      "options": {
+        "A": "thiamine 缺乏",
+        "B": "riboflavin 缺乏",
+        "C": "銅過量",
+        "D": "鐵過量"
+      },
+      "answer": "A",
+      "acceptedAnswers": [
+        "A"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：A。",
+      "testedConcept": "醫學（二）（舊制原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國96年 第1次 醫師第一階段 醫學（二） 2101（舊制）",
+      "sourceYear": 2007,
+      "sourceRound": 1,
+      "originalQuestionNumber": 91,
+      "examCode": "096040",
+      "paperCode": "2101",
+      "examSessionLabel": "第一次",
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=122&code=096040&q=1&s=2001&t=Q",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=122&code=096040&q=1&s=2001&t=M",
+        "page": 7,
+        "endPage": 7,
+        "image": "/question-media/moex-96-1-med2/MOEX-096040-2101-Q091.webp",
+        "width": 1030,
+        "height": 52,
+        "scope": "生理學、生物化學、藥理學、病理學及臨床相關知識",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-096040-2101-Q092",
+      "subject": "醫學（二）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（二）",
+      "stem": "40 歲女性發現自己左側乳房有數顆小團塊，經乳房超音波檢查發現右側乳房也有數顆小的腫塊，以 細針抽吸做腫瘤細胞學檢查結果為陽性，有惡性細胞存在。則下列何者為最可能之診斷？",
+      "options": {
+        "A": "侵襲性乳突狀癌（Invasive papillary carcinoma）",
+        "B": "浸潤性管狀癌（Infiltrating ductal carcinoma）",
+        "C": "浸潤性小葉癌（Infiltrating lobular carcinoma）",
+        "D": "髓樣癌（Medullary carcinoma）"
+      },
+      "answer": "B",
+      "acceptedAnswers": [
+        "B",
+        "C"
+      ],
+      "answerCreditType": "multiple_accepted",
+      "explanation": "官方最終答案：B、C。",
+      "testedConcept": "醫學（二）（舊制原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國96年 第1次 醫師第一階段 醫學（二） 2101（舊制）",
+      "sourceYear": 2007,
+      "sourceRound": 1,
+      "originalQuestionNumber": 92,
+      "examCode": "096040",
+      "paperCode": "2101",
+      "examSessionLabel": "第一次",
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=122&code=096040&q=1&s=2001&t=Q",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=122&code=096040&q=1&s=2001&t=M",
+        "page": 7,
+        "endPage": 7,
+        "image": "/question-media/moex-96-1-med2/MOEX-096040-2101-Q092.webp",
+        "width": 1030,
+        "height": 104,
+        "scope": "生理學、生物化學、藥理學、病理學及臨床相關知識",
+        "answerNote": "第92題答B或C者均給分"
+      }
+    },
+    {
+      "id": "MOEX-096040-2101-Q093",
+      "subject": "醫學（二）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（二）",
+      "stem": "醫師解剖一位50 歲的男性，發現其腹腔內有白粉筆樣的脂肪壞死、出血區及雞湯樣液體，此病理變 化最可能是下列那一項引起？",
+      "options": {
+        "A": "消化性潰瘍穿孔（Perforated peptic ulcer）",
+        "B": "缺血性結腸炎（Ischemic colitis）",
+        "C": "漿液性腺癌（Serous adenocarcinoma）",
+        "D": "急性出血性胰臟炎（Acute hemorrhagic pancreatitis）"
+      },
+      "answer": "D",
+      "acceptedAnswers": [
+        "D"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：D。",
+      "testedConcept": "醫學（二）（舊制原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國96年 第1次 醫師第一階段 醫學（二） 2101（舊制）",
+      "sourceYear": 2007,
+      "sourceRound": 1,
+      "originalQuestionNumber": 93,
+      "examCode": "096040",
+      "paperCode": "2101",
+      "examSessionLabel": "第一次",
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=122&code=096040&q=1&s=2001&t=Q",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=122&code=096040&q=1&s=2001&t=M",
+        "page": 7,
+        "endPage": 7,
+        "image": "/question-media/moex-96-1-med2/MOEX-096040-2101-Q093.webp",
+        "width": 1030,
+        "height": 156,
+        "scope": "生理學、生物化學、藥理學、病理學及臨床相關知識",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-096040-2101-Q094",
+      "subject": "醫學（二）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（二）",
+      "stem": "一位24 歲男性，最近幾個月來常有間歇性腹痛、發燒及輕微腹瀉，壓力大時更容易發作。身體檢查 發現有直腸旁瘻管存在。大腸鏡檢查可見有些區域的黏膜有水腫、潰瘍變化，有些則正常。在病變 區域切片檢查，顯微鏡下可見有潰瘍、急性與慢性發炎細胞浸潤，及非乾酪性肉芽腫（noncaseating granulomas）的變化。下列何者是最可能的診斷？",
+      "options": {
+        "A": "阿米巴蟲病（Amebiasis）",
+        "B": "克隆氏病（Crohn disease）",
+        "C": "偽膜性結腸炎（Pseudomembranous colitis）",
+        "D": "潰瘍性結腸炎（Ulcerative colitis）"
+      },
+      "answer": "B",
+      "acceptedAnswers": [
+        "B"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：B。",
+      "testedConcept": "醫學（二）（舊制原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國96年 第1次 醫師第一階段 醫學（二） 2101（舊制）",
+      "sourceYear": 2007,
+      "sourceRound": 1,
+      "originalQuestionNumber": 94,
+      "examCode": "096040",
+      "paperCode": "2101",
+      "examSessionLabel": "第一次",
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=122&code=096040&q=1&s=2001&t=Q",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=122&code=096040&q=1&s=2001&t=M",
+        "page": 7,
+        "endPage": 7,
+        "image": "/question-media/moex-96-1-med2/MOEX-096040-2101-Q094.webp",
+        "width": 1030,
+        "height": 156,
+        "scope": "生理學、生物化學、藥理學、病理學及臨床相關知識",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-096040-2101-Q095",
+      "subject": "醫學（二）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（二）",
+      "stem": "塵肺病中與惡性間皮瘤（malignant mesothelioma）最相關的物質是：",
+      "options": {
+        "A": "碳",
+        "B": "鉛",
+        "C": "矽",
+        "D": "石綿"
+      },
+      "answer": "D",
+      "acceptedAnswers": [
+        "D"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：D。",
+      "testedConcept": "醫學（二）（舊制原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國96年 第1次 醫師第一階段 醫學（二） 2101（舊制）",
+      "sourceYear": 2007,
+      "sourceRound": 1,
+      "originalQuestionNumber": 95,
+      "examCode": "096040",
+      "paperCode": "2101",
+      "examSessionLabel": "第一次",
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=122&code=096040&q=1&s=2001&t=Q",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=122&code=096040&q=1&s=2001&t=M",
+        "page": 7,
+        "endPage": 7,
+        "image": "/question-media/moex-96-1-med2/MOEX-096040-2101-Q095.webp",
+        "width": 1030,
+        "height": 55,
+        "scope": "生理學、生物化學、藥理學、病理學及臨床相關知識",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-096040-2101-Q096",
+      "subject": "醫學（二）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（二）",
+      "stem": "75 歲老先生有服用dihydrotestosterone（DHT）習慣，半年來有小便困難、夜尿次數增加等情形，因 感冒服用一些感冒成藥，隔天小便解不出來，急診就醫經導尿處理，病人接受攝護腺刮除術，病理 檢查如下圖所示。下列診斷敘述何者最適當？",
+      "options": {
+        "A": "分化良好的攝護腺癌",
+        "B": "良性攝護腺增生",
+        "C": "攝護腺發炎及纖維化",
+        "D": "與服用感冒成藥無關"
+      },
+      "answer": "B",
+      "acceptedAnswers": [
+        "B"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：B。",
+      "testedConcept": "醫學（二）（舊制原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國96年 第1次 醫師第一階段 醫學（二） 2101（舊制）",
+      "sourceYear": 2007,
+      "sourceRound": 1,
+      "originalQuestionNumber": 96,
+      "examCode": "096040",
+      "paperCode": "2101",
+      "examSessionLabel": "第一次",
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=122&code=096040&q=1&s=2001&t=Q",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=122&code=096040&q=1&s=2001&t=M",
+        "page": 8,
+        "endPage": 8,
+        "image": "/question-media/moex-96-1-med2/MOEX-096040-2101-Q096.webp",
+        "width": 1030,
+        "height": 597,
+        "scope": "生理學、生物化學、藥理學、病理學及臨床相關知識",
+        "answerNote": null
+      },
+      "stemImage": "/question-media/moex-96-1-med2/MOEX-096040-2101-Q096.webp"
+    },
+    {
+      "id": "MOEX-096040-2101-Q097",
+      "subject": "醫學（二）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（二）",
+      "stem": "一位10 歲小孩，自嬰兒以來即歷經多次肺炎及腦膜炎併發菌血症。小孩並無肝脾腫大或身體外觀之 缺陷。病人貧血，血小板及白血球數略高。血色素電泳結果為Hb A2 1%，Hb F 7%以及Hb S 92%。 病人容易經常感染的原因為何？",
+      "options": {
+        "A": "內皮細胞與紅血球間的黏附（adhesion）減少",
+        "B": "免疫球蛋白的製造減少",
+        "C": "嗜中性白血球的功能減少",
+        "D": "脾臟因多次缺血性壞死，造成功能喪失"
+      },
+      "answer": "D",
+      "acceptedAnswers": [
+        "D"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：D。",
+      "testedConcept": "醫學（二）（舊制原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國96年 第1次 醫師第一階段 醫學（二） 2101（舊制）",
+      "sourceYear": 2007,
+      "sourceRound": 1,
+      "originalQuestionNumber": 97,
+      "examCode": "096040",
+      "paperCode": "2101",
+      "examSessionLabel": "第一次",
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=122&code=096040&q=1&s=2001&t=Q",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=122&code=096040&q=1&s=2001&t=M",
+        "page": 8,
+        "endPage": 8,
+        "image": "/question-media/moex-96-1-med2/MOEX-096040-2101-Q097.webp",
+        "width": 1030,
+        "height": 135,
+        "scope": "生理學、生物化學、藥理學、病理學及臨床相關知識",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-096040-2101-Q098",
+      "subject": "醫學（二）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（二）",
+      "stem": "一男嬰足月出生活動力正常，但產後4 天發現臍帶結紮處有滲出血水，背部有局部瘀血斑，嬰兒最 有可能缺乏下列何種營養素？",
+      "options": {
+        "A": "維生素K",
+        "B": "維生素B12",
+        "C": "葉酸",
+        "D": "鐵"
+      },
+      "answer": "A",
+      "acceptedAnswers": [
+        "A"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：A。",
+      "testedConcept": "醫學（二）（舊制原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國96年 第1次 醫師第一階段 醫學（二） 2101（舊制）",
+      "sourceYear": 2007,
+      "sourceRound": 1,
+      "originalQuestionNumber": 98,
+      "examCode": "096040",
+      "paperCode": "2101",
+      "examSessionLabel": "第一次",
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=122&code=096040&q=1&s=2001&t=Q",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=122&code=096040&q=1&s=2001&t=M",
+        "page": 8,
+        "endPage": 8,
+        "image": "/question-media/moex-96-1-med2/MOEX-096040-2101-Q098.webp",
+        "width": 1030,
+        "height": 81,
+        "scope": "生理學、生物化學、藥理學、病理學及臨床相關知識",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-096040-2101-Q099",
+      "subject": "醫學（二）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（二）",
+      "stem": "一位61 歲男性主訴倦怠，四個月以來逐漸嚴重。病人血清肌酸酐及尿素氮明顯增加，尿液試紙檢驗， 無血尿、尿蛋白或尿糖情形，但本斯瓊司氏蛋白（Bence Jones proteins）測試陽性。腎切片檢查如下 圖所示。病人之基本病因為何？",
+      "options": {
+        "A": "風濕熱（Rheumatic fever）",
+        "B": "多發性骨髓瘤（Multiple myeloma）",
+        "C": "僵直性脊椎炎（Ankylosing spondylitis）",
+        "D": "系統性硬化症（Systemic sclerosis）"
+      },
+      "answer": "B",
+      "acceptedAnswers": [
+        "B"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：B。",
+      "testedConcept": "醫學（二）（舊制原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國96年 第1次 醫師第一階段 醫學（二） 2101（舊制）",
+      "sourceYear": 2007,
+      "sourceRound": 1,
+      "originalQuestionNumber": 99,
+      "examCode": "096040",
+      "paperCode": "2101",
+      "examSessionLabel": "第一次",
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=122&code=096040&q=1&s=2001&t=Q",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=122&code=096040&q=1&s=2001&t=M",
+        "page": 8,
+        "endPage": 8,
+        "image": "/question-media/moex-96-1-med2/MOEX-096040-2101-Q099.webp",
+        "width": 1030,
+        "height": 489,
+        "scope": "生理學、生物化學、藥理學、病理學及臨床相關知識",
+        "answerNote": null
+      },
+      "stemImage": "/question-media/moex-96-1-med2/MOEX-096040-2101-Q099.webp"
+    },
+    {
+      "id": "MOEX-096040-2101-Q100",
+      "subject": "醫學（二）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（二）",
+      "stem": "一位4 歲小孩因為反覆的細菌性感染就醫。周邊血液的白血球分析顯示其白血球缺乏myeloperoxidase。 下列何者最可以解釋這名小孩容易受到感染的原因？",
+      "options": {
+        "A": "白血球黏附（adhesion）的缺陷",
+        "B": "無法產生HOCl －",
+        "C": "無法產生H2O2",
+        "D": "嗜中性白血球去顆粒作用（degranulation）的缺陷"
+      },
+      "answer": "B",
+      "acceptedAnswers": [
+        "B"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：B。",
+      "testedConcept": "醫學（二）（舊制原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國96年 第1次 醫師第一階段 醫學（二） 2101（舊制）",
+      "sourceYear": 2007,
+      "sourceRound": 1,
+      "originalQuestionNumber": 100,
+      "examCode": "096040",
+      "paperCode": "2101",
+      "examSessionLabel": "第一次",
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=122&code=096040&q=1&s=2001&t=Q",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=122&code=096040&q=1&s=2001&t=M",
+        "page": 8,
+        "endPage": 8,
+        "image": "/question-media/moex-96-1-med2/MOEX-096040-2101-Q100.webp",
+        "width": 1030,
+        "height": 112,
+        "scope": "生理學、生物化學、藥理學、病理學及臨床相關知識",
+        "answerNote": null
+      }
+    }
+  ]
+}
