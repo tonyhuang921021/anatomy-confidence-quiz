@@ -1,5 +1,5 @@
 {
-  "status": "unpublished_candidate_original_images_pending_crop_review",
+  "status": "unpublished_candidate_first_display_reviewed_72_clean_88_original_retained",
   "sources": {
     "Q": {
       "url": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?t=Q&code=090040&c=002&s=4004&q=1",
@@ -21,7 +21,7 @@
       "chapter": "舊制官方原卷",
       "section": "醫學（一）",
       "stem": "脊髓丘腦徑(spinothalamic tract)之神經纖維終止於：",
-      "stemImage": "/question-media/moex-90-1-stage1-med1/MOEX-C002-090040-S4004-STAGE1-Q001.webp",
+      "stemImage": "/question-media/moex-90-1-stage1-med1-display/Q001.png",
       "options": {
         "A": "丘腦之腹後外核(ventral posterolateral nucleus, VPl)",
         "B": "丘腦之腹後內核(ventral posteromedial nucleus, VPm)",
@@ -72,7 +72,7 @@
       "chapter": "舊制官方原卷",
       "section": "醫學（一）",
       "stem": "內收肌管(adductor canal)內不包含下列何者？",
-      "stemImage": "/question-media/moex-90-1-stage1-med1/MOEX-C002-090040-S4004-STAGE1-Q002.webp",
+      "stemImage": "/question-media/moex-90-1-stage1-med1-display/Q002.png",
       "options": {
         "A": "股動脈",
         "B": "隱神經",
@@ -123,7 +123,7 @@
       "chapter": "舊制官方原卷",
       "section": "醫學（一）",
       "stem": "下列何者位於股鞘(femoral sheath)之外側區間(lateral compartment)內？",
-      "stemImage": "/question-media/moex-90-1-stage1-med1/MOEX-C002-090040-S4004-STAGE1-Q003.webp",
+      "stemImage": "/question-media/moex-90-1-stage1-med1-display/Q003.png",
       "options": {
         "A": "股動脈",
         "B": "股靜脈",
@@ -216,7 +216,8 @@
         "width": 1140,
         "height": 79,
         "scope": null,
-        "answerNote": null
+        "answerNote": null,
+        "displayNotice": "原圖以第 4 題題號為準。"
       }
     },
     {
@@ -225,7 +226,7 @@
       "chapter": "舊制官方原卷",
       "section": "醫學（一）",
       "stem": "下列何者收縮時無法造成小腿彎曲(flexion)與內旋(medial rotation)？",
-      "stemImage": "/question-media/moex-90-1-stage1-med1/MOEX-C002-090040-S4004-STAGE1-Q005.webp",
+      "stemImage": "/question-media/moex-90-1-stage1-med1-display/Q005.png",
       "options": {
         "A": "股二頭肌(biceps femoris)",
         "B": "半腱肌(semitendinosus)",
@@ -318,7 +319,8 @@
         "width": 1140,
         "height": 80,
         "scope": null,
-        "answerNote": null
+        "answerNote": null,
+        "displayNotice": "原圖以第 6 題題號為準。"
       }
     },
     {
@@ -369,7 +371,8 @@
         "width": 1140,
         "height": 82,
         "scope": null,
-        "answerNote": null
+        "answerNote": null,
+        "displayNotice": "原圖以第 7 題題號為準。"
       }
     },
     {
@@ -420,7 +423,8 @@
         "width": 1140,
         "height": 81,
         "scope": null,
-        "answerNote": null
+        "answerNote": null,
+        "displayNotice": "原圖以第 8 題題號為準。"
       }
     },
     {
@@ -429,7 +433,7 @@
       "chapter": "舊制官方原卷",
       "section": "醫學（一）",
       "stem": "下列有關外頸靜脈(external jugular v.)之敘述，何者錯誤？",
-      "stemImage": "/question-media/moex-90-1-stage1-med1/MOEX-C002-090040-S4004-STAGE1-Q009.webp",
+      "stemImage": "/question-media/moex-90-1-stage1-med1-display/Q009.png",
       "options": {
         "A": "由耳後靜脈(post. auricular v.)和下頜後靜脈(retromandibular v.)之後支組成",
         "B": "由上而下，它斜跨於胸鎖乳突肌表面至鎖骨上",
@@ -480,7 +484,7 @@
       "chapter": "舊制官方原卷",
       "section": "醫學（一）",
       "stem": "下列有關鎖骨下動脈(subclavian a.)之敘述，何者錯誤？",
-      "stemImage": "/question-media/moex-90-1-stage1-med1/MOEX-C002-090040-S4004-STAGE1-Q010.webp",
+      "stemImage": "/question-media/moex-90-1-stage1-med1-display/Q010.png",
       "options": {
         "A": "右頭臂動脈(brachiocephalic a.)於胸鎖關節後方分出右鎖骨下動脈",
         "B": "鎖骨下動脈被前斜角肌分成三段",
@@ -573,7 +577,8 @@
         "width": 1140,
         "height": 80,
         "scope": null,
-        "answerNote": null
+        "answerNote": null,
+        "displayNotice": "原圖以第 11 題題號為準。"
       }
     },
     {
@@ -582,7 +587,7 @@
       "chapter": "舊制官方原卷",
       "section": "醫學（一）",
       "stem": "下列何者經海綿竇(cavernous sinus)進入眼眶？",
-      "stemImage": "/question-media/moex-90-1-stage1-med1/MOEX-C002-090040-S4004-STAGE1-Q012.webp",
+      "stemImage": "/question-media/moex-90-1-stage1-med1-display/Q012.png",
       "options": {
         "A": "動眼神經",
         "B": "滑車神經",
@@ -635,7 +640,7 @@
       "chapter": "舊制官方原卷",
       "section": "醫學（一）",
       "stem": "下列何者支配眼球之睫狀肌(ciliary m.)？",
-      "stemImage": "/question-media/moex-90-1-stage1-med1/MOEX-C002-090040-S4004-STAGE1-Q013.webp",
+      "stemImage": "/question-media/moex-90-1-stage1-med1-display/Q013.png",
       "options": {
         "A": "交感神經",
         "B": "副交感神經",
@@ -686,7 +691,7 @@
       "chapter": "舊制官方原卷",
       "section": "醫學（一）",
       "stem": "下列何者支配鼓膜張肌(tensor tympani)？",
-      "stemImage": "/question-media/moex-90-1-stage1-med1/MOEX-C002-090040-S4004-STAGE1-Q014.webp",
+      "stemImage": "/question-media/moex-90-1-stage1-med1-display/Q014.png",
       "options": {
         "A": "三叉神經之下頜分支",
         "B": "顏面神經",
@@ -737,7 +742,7 @@
       "chapter": "舊制官方原卷",
       "section": "醫學（一）",
       "stem": "顏面神經所含之副交感節前神經纖維終止於：",
-      "stemImage": "/question-media/moex-90-1-stage1-med1/MOEX-C002-090040-S4004-STAGE1-Q015.webp",
+      "stemImage": "/question-media/moex-90-1-stage1-med1-display/Q015.png",
       "options": {
         "A": "膝狀神經節",
         "B": "頷下神經節",
@@ -789,7 +794,7 @@
       "chapter": "舊制官方原卷",
       "section": "醫學（一）",
       "stem": "下列何者收縮不能使上臂做外旋動作？",
-      "stemImage": "/question-media/moex-90-1-stage1-med1/MOEX-C002-090040-S4004-STAGE1-Q016.webp",
+      "stemImage": "/question-media/moex-90-1-stage1-med1-display/Q016.png",
       "options": {
         "A": "棘下肌(infraspinatus m.)",
         "B": "小圓肌(teres minor m.)",
@@ -882,7 +887,8 @@
         "width": 1140,
         "height": 80,
         "scope": null,
-        "answerNote": null
+        "answerNote": null,
+        "displayNotice": "原圖以第 17 題題號為準。"
       }
     },
     {
@@ -933,7 +939,8 @@
         "width": 1140,
         "height": 81,
         "scope": null,
-        "answerNote": null
+        "answerNote": null,
+        "displayNotice": "原圖以第 18 題題號為準。"
       }
     },
     {
@@ -984,7 +991,8 @@
         "width": 1140,
         "height": 78,
         "scope": null,
-        "answerNote": null
+        "answerNote": null,
+        "displayNotice": "原圖以第 19 題題號為準。"
       }
     },
     {
@@ -1035,7 +1043,8 @@
         "width": 1140,
         "height": 80,
         "scope": null,
-        "answerNote": null
+        "answerNote": null,
+        "displayNotice": "原圖以第 20 題題號為準。"
       }
     },
     {
@@ -1086,7 +1095,8 @@
         "width": 1140,
         "height": 57,
         "scope": null,
-        "answerNote": null
+        "answerNote": null,
+        "displayNotice": "原圖以第 21 題題號為準。"
       }
     },
     {
@@ -1137,7 +1147,8 @@
         "width": 1140,
         "height": 79,
         "scope": null,
-        "answerNote": null
+        "answerNote": null,
+        "displayNotice": "原圖以第 22 題題號為準。"
       }
     },
     {
@@ -1188,7 +1199,8 @@
         "width": 1140,
         "height": 56,
         "scope": null,
-        "answerNote": "第23題答C給分"
+        "answerNote": "第23題答C給分",
+        "displayNotice": "原圖以第 23 題題號為準。"
       }
     },
     {
@@ -1239,7 +1251,8 @@
         "width": 1140,
         "height": 57,
         "scope": null,
-        "answerNote": null
+        "answerNote": null,
+        "displayNotice": "原圖以第 24 題題號為準。"
       }
     },
     {
@@ -1290,7 +1303,8 @@
         "width": 1140,
         "height": 79,
         "scope": null,
-        "answerNote": null
+        "answerNote": null,
+        "displayNotice": "原圖以第 25 題題號為準。"
       }
     },
     {
@@ -1341,7 +1355,8 @@
         "width": 1140,
         "height": 126,
         "scope": null,
-        "answerNote": null
+        "answerNote": null,
+        "displayNotice": "原圖以第 26 題題號為準。"
       }
     },
     {
@@ -1393,7 +1408,8 @@
         "width": 1140,
         "height": 80,
         "scope": null,
-        "answerNote": "第27題答A或答B者均給分"
+        "answerNote": "第27題答A或答B者均給分",
+        "displayNotice": "原圖以第 27 題題號為準。"
       }
     },
     {
@@ -1444,7 +1460,8 @@
         "width": 1140,
         "height": 81,
         "scope": null,
-        "answerNote": null
+        "answerNote": null,
+        "displayNotice": "原圖以第 28 題題號為準。"
       }
     },
     {
@@ -1495,7 +1512,8 @@
         "width": 1140,
         "height": 55,
         "scope": null,
-        "answerNote": null
+        "answerNote": null,
+        "displayNotice": "原圖以第 29 題題號為準。"
       }
     },
     {
@@ -1546,7 +1564,8 @@
         "width": 1140,
         "height": 127,
         "scope": null,
-        "answerNote": null
+        "answerNote": null,
+        "displayNotice": "原圖以第 30 題題號為準。"
       }
     },
     {
@@ -1597,7 +1616,8 @@
         "width": 1140,
         "height": 56,
         "scope": null,
-        "answerNote": null
+        "answerNote": null,
+        "displayNotice": "原圖以第 31 題題號為準。"
       }
     },
     {
@@ -1648,7 +1668,8 @@
         "width": 1140,
         "height": 126,
         "scope": null,
-        "answerNote": null
+        "answerNote": null,
+        "displayNotice": "原圖以第 32 題題號為準。"
       }
     },
     {
@@ -1699,7 +1720,8 @@
         "width": 1140,
         "height": 57,
         "scope": null,
-        "answerNote": null
+        "answerNote": null,
+        "displayNotice": "原圖以第 33 題題號為準。"
       }
     },
     {
@@ -1750,7 +1772,8 @@
         "width": 1140,
         "height": 79,
         "scope": null,
-        "answerNote": null
+        "answerNote": null,
+        "displayNotice": "原圖以第 34 題題號為準。"
       }
     },
     {
@@ -1759,7 +1782,7 @@
       "chapter": "舊制官方原卷",
       "section": "醫學（一）",
       "stem": "下列有關“狂牛病”之敘述，何者正確？",
-      "stemImage": "/question-media/moex-90-1-stage1-med1/MOEX-C002-090040-S4004-STAGE1-Q035.webp",
+      "stemImage": "/question-media/moex-90-1-stage1-med1-display/Q035.png",
       "options": {
         "A": "由DNA病毒所引起",
         "B": "由RNA病毒所引起",
@@ -1852,7 +1875,8 @@
         "width": 1140,
         "height": 80,
         "scope": null,
-        "answerNote": null
+        "answerNote": null,
+        "displayNotice": "原圖以第 36 題題號為準。"
       }
     },
     {
@@ -1903,7 +1927,8 @@
         "width": 1140,
         "height": 120,
         "scope": null,
-        "answerNote": null
+        "answerNote": null,
+        "displayNotice": "原圖以第 37 題題號為準。"
       }
     },
     {
@@ -1912,7 +1937,7 @@
       "chapter": "舊制官方原卷",
       "section": "醫學（一）",
       "stem": "同源性基因重組(homologous recombination)之發生與以下何者有關？",
-      "stemImage": "/question-media/moex-90-1-stage1-med1/MOEX-C002-090040-S4004-STAGE1-Q038.webp",
+      "stemImage": "/question-media/moex-90-1-stage1-med1-display/Q038.png",
       "options": {
         "A": "限制酶(restriction enzyme)之參與",
         "B": "rec基因之參與",
@@ -1963,7 +1988,7 @@
       "chapter": "舊制官方原卷",
       "section": "醫學（一）",
       "stem": "幽門桿菌能產生下列何種酵素避免胃酸的破壞？",
-      "stemImage": "/question-media/moex-90-1-stage1-med1/MOEX-C002-090040-S4004-STAGE1-Q039.webp",
+      "stemImage": "/question-media/moex-90-1-stage1-med1-display/Q039.png",
       "options": {
         "A": "Urease",
         "B": "Alkaline phosphatase",
@@ -2056,7 +2081,8 @@
         "width": 1140,
         "height": 83,
         "scope": null,
-        "answerNote": null
+        "answerNote": null,
+        "displayNotice": "原圖以第 40 題題號為準。"
       }
     },
     {
@@ -2107,7 +2133,8 @@
         "width": 1140,
         "height": 57,
         "scope": null,
-        "answerNote": null
+        "answerNote": null,
+        "displayNotice": "原圖以第 41 題題號為準。"
       }
     },
     {
@@ -2116,7 +2143,7 @@
       "chapter": "舊制官方原卷",
       "section": "醫學（一）",
       "stem": "當B細胞表面的抗原接受器(B cell receptor)與特異性抗原(specific antigen)接觸時，以下何種分子負責訊息的傳遞而使細胞活化？",
-      "stemImage": "/question-media/moex-90-1-stage1-med1/MOEX-C002-090040-S4004-STAGE1-Q042.webp",
+      "stemImage": "/question-media/moex-90-1-stage1-med1-display/Q042.png",
       "options": {
         "A": "Ig heavy chain",
         "B": "Ig light chain",
@@ -2167,7 +2194,7 @@
       "chapter": "舊制官方原卷",
       "section": "醫學（一）",
       "stem": "以下何者不屬於immunologically privileged sites？",
-      "stemImage": "/question-media/moex-90-1-stage1-med1/MOEX-C002-090040-S4004-STAGE1-Q043.webp",
+      "stemImage": "/question-media/moex-90-1-stage1-med1-display/Q043.png",
       "options": {
         "A": "Brain",
         "B": "Testis",
@@ -2260,7 +2287,8 @@
         "width": 1140,
         "height": 81,
         "scope": null,
-        "answerNote": null
+        "answerNote": null,
+        "displayNotice": "原圖以第 44 題題號為準。"
       }
     },
     {
@@ -2269,7 +2297,7 @@
       "chapter": "舊制官方原卷",
       "section": "醫學（一）",
       "stem": "在眾多可以調節(regulate)補體活化的蛋白質中，何者可以直接阻礙membrane-attack complex的形成？",
-      "stemImage": "/question-media/moex-90-1-stage1-med1/MOEX-C002-090040-S4004-STAGE1-Q045.webp",
+      "stemImage": "/question-media/moex-90-1-stage1-med1-display/Q045.png",
       "options": {
         "A": "Complement-receptor 1(CR1)",
         "B": "Factor H",
@@ -2320,7 +2348,7 @@
       "chapter": "舊制官方原卷",
       "section": "醫學（一）",
       "stem": "在淋巴細胞(T lymphocyte)與抗原呈現細胞(antigen-presenting cell)接觸並活化時，CTLA-4這個分子主要接觸的分子是：",
-      "stemImage": "/question-media/moex-90-1-stage1-med1/MOEX-C002-090040-S4004-STAGE1-Q046.webp",
+      "stemImage": "/question-media/moex-90-1-stage1-med1-display/Q046.png",
       "options": {
         "A": "CD28",
         "B": "CD4",
@@ -2413,7 +2441,8 @@
         "width": 1140,
         "height": 129,
         "scope": null,
-        "answerNote": null
+        "answerNote": null,
+        "displayNotice": "原圖以第 47 題題號為準。"
       }
     },
     {
@@ -2464,7 +2493,8 @@
         "width": 1140,
         "height": 81,
         "scope": null,
-        "answerNote": null
+        "answerNote": null,
+        "displayNotice": "原圖以第 48 題題號為準。"
       }
     },
     {
@@ -2473,7 +2503,7 @@
       "chapter": "舊制官方原卷",
       "section": "醫學（一）",
       "stem": "斑疹傷寒(scrub typhus)係由下列何種病媒傳播？",
-      "stemImage": "/question-media/moex-90-1-stage1-med1/MOEX-C002-090040-S4004-STAGE1-Q049.webp",
+      "stemImage": "/question-media/moex-90-1-stage1-med1-display/Q049.png",
       "options": {
         "A": "熱帶家蚊",
         "B": "跳蚤",
@@ -2566,7 +2596,8 @@
         "width": 1140,
         "height": 57,
         "scope": null,
-        "answerNote": null
+        "answerNote": null,
+        "displayNotice": "原圖以第 50 題題號為準。"
       }
     },
     {
@@ -2617,7 +2648,8 @@
         "width": 1140,
         "height": 80,
         "scope": null,
-        "answerNote": null
+        "answerNote": null,
+        "displayNotice": "原圖以第 51 題題號為準。"
       }
     },
     {
@@ -2626,7 +2658,7 @@
       "chapter": "舊制官方原卷",
       "section": "醫學（一）",
       "stem": "下列何種吸蟲在人體會移行到正常寄生部位之外，造成病變？",
-      "stemImage": "/question-media/moex-90-1-stage1-med1/MOEX-C002-090040-S4004-STAGE1-Q052.webp",
+      "stemImage": "/question-media/moex-90-1-stage1-med1-display/Q052.png",
       "options": {
         "A": "衛氏肺吸蟲(Paragonimus westermani)",
         "B": "中華肝吸蟲(Clonorchis sinensis)",
@@ -2677,7 +2709,7 @@
       "chapter": "舊制官方原卷",
       "section": "醫學（一）",
       "stem": "神經性囊尾幼蟲症(neurocysticercosis)係由下列何種寄生蟲所致？",
-      "stemImage": "/question-media/moex-90-1-stage1-med1/MOEX-C002-090040-S4004-STAGE1-Q053.webp",
+      "stemImage": "/question-media/moex-90-1-stage1-med1-display/Q053.png",
       "options": {
         "A": "縮小包膜絛蟲(Hymenolepis diminuta)",
         "B": "有鉤絛蟲(Taenia solium)",
@@ -2770,7 +2802,8 @@
         "width": 1140,
         "height": 82,
         "scope": null,
-        "answerNote": null
+        "answerNote": null,
+        "displayNotice": "原圖以第 54 題題號為準。"
       }
     },
     {
@@ -2821,7 +2854,8 @@
         "width": 1140,
         "height": 80,
         "scope": null,
-        "answerNote": null
+        "answerNote": null,
+        "displayNotice": "原圖以第 55 題題號為準。"
       }
     },
     {
@@ -2830,7 +2864,7 @@
       "chapter": "舊制官方原卷",
       "section": "醫學（一）",
       "stem": "人類感染旋毛蟲(Trichinella spiralis)的確認診斷是依據：",
-      "stemImage": "/question-media/moex-90-1-stage1-med1/MOEX-C002-090040-S4004-STAGE1-Q056.webp",
+      "stemImage": "/question-media/moex-90-1-stage1-med1-display/Q056.png",
       "options": {
         "A": "血液抹片",
         "B": "肝臟活組織檢查法(liver biopsy)",
@@ -2881,7 +2915,7 @@
       "chapter": "舊制官方原卷",
       "section": "醫學（一）",
       "stem": "下列何種乳癌，具兩側乳房好發性",
-      "stemImage": "/question-media/moex-90-1-stage1-med1/MOEX-C002-090040-S4004-STAGE1-Q057.webp",
+      "stemImage": "/question-media/moex-90-1-stage1-med1-display/Q057.png",
       "options": {
         "A": "Medullary carcinoma",
         "B": "Ductal carcinoma",
@@ -2932,7 +2966,7 @@
       "chapter": "舊制官方原卷",
       "section": "醫學（一）",
       "stem": "細胞凋亡-(apoptosis)之形態學變化順序為：",
-      "stemImage": "/question-media/moex-90-1-stage1-med1/MOEX-C002-090040-S4004-STAGE1-Q058.webp",
+      "stemImage": "/question-media/moex-90-1-stage1-med1-display/Q058.png",
       "options": {
         "A": "細胞皺縮→DNA斷裂→染色質濃縮→凋亡小體",
         "B": "DNA斷裂→細胞皺縮→染色質濃縮→凋亡小體",
@@ -2983,7 +3017,7 @@
       "chapter": "舊制官方原卷",
       "section": "醫學（一）",
       "stem": "小腸華普耳化病(Whipple's disease)之病理顯微鏡特徵細胞為：",
-      "stemImage": "/question-media/moex-90-1-stage1-med1/MOEX-C002-090040-S4004-STAGE1-Q059.webp",
+      "stemImage": "/question-media/moex-90-1-stage1-med1-display/Q059.png",
       "options": {
         "A": "PAS-陽性吞噬細胞",
         "B": "Mucin-陽性吞噬細胞",
@@ -3035,7 +3069,7 @@
       "chapter": "舊制官方原卷",
       "section": "醫學（一）",
       "stem": "下列何者不是慢性發炎(chronic inflammation)病理變化特徵？",
-      "stemImage": "/question-media/moex-90-1-stage1-med1/MOEX-C002-090040-S4004-STAGE1-Q060.webp",
+      "stemImage": "/question-media/moex-90-1-stage1-med1-display/Q060.png",
       "options": {
         "A": "組織破壞",
         "B": "單核球浸潤",
@@ -3086,7 +3120,7 @@
       "chapter": "舊制官方原卷",
       "section": "醫學（一）",
       "stem": "Michaelis-Gutmann小體存在於下列何種病灶？",
-      "stemImage": "/question-media/moex-90-1-stage1-med1/MOEX-C002-090040-S4004-STAGE1-Q061.webp",
+      "stemImage": "/question-media/moex-90-1-stage1-med1-display/Q061.png",
       "options": {
         "A": "膀胱軟化症(malacoplakia)",
         "B": "腺體性膀胱炎(cystitis glandularis)",
@@ -3137,7 +3171,7 @@
       "chapter": "舊制官方原卷",
       "section": "醫學（一）",
       "stem": "甲狀腺組織切片顯示甲狀腺濾泡破壞、萎縮，有緻密淋巴球浸潤伴明顯生發中心(germinal center)形成，最可能的病理診斷為：",
-      "stemImage": "/question-media/moex-90-1-stage1-med1/MOEX-C002-090040-S4004-STAGE1-Q062.webp",
+      "stemImage": "/question-media/moex-90-1-stage1-med1-display/Q062.png",
       "options": {
         "A": "Granulomatous thyroiditis",
         "B": "Subacute thyroiditis",
@@ -3188,7 +3222,7 @@
       "chapter": "舊制官方原卷",
       "section": "醫學（一）",
       "stem": "Merkel氏細胞癌(Merkel cell carcinoma)好發於：",
-      "stemImage": "/question-media/moex-90-1-stage1-med1/MOEX-C002-090040-S4004-STAGE1-Q063.webp",
+      "stemImage": "/question-media/moex-90-1-stage1-med1-display/Q063.png",
       "options": {
         "A": "皮膚",
         "B": "腎上腺",
@@ -3239,7 +3273,7 @@
       "chapter": "舊制官方原卷",
       "section": "醫學（一）",
       "stem": "下列有關泌乳激素瘤(prolactinoma)之敘述，何者不正確？",
-      "stemImage": "/question-media/moex-90-1-stage1-med1/MOEX-C002-090040-S4004-STAGE1-Q064.webp",
+      "stemImage": "/question-media/moex-90-1-stage1-med1-display/Q064.png",
       "options": {
         "A": "為最常見的腦下垂腺瘤",
         "B": "大多為嗜鹼性細胞組成",
@@ -3290,7 +3324,7 @@
       "chapter": "舊制官方原卷",
       "section": "醫學（一）",
       "stem": "造成原發性副甲狀腺功能亢進(primary hyperparathyroidism)最常見的病因是：",
-      "stemImage": "/question-media/moex-90-1-stage1-med1/MOEX-C002-090040-S4004-STAGE1-Q065.webp",
+      "stemImage": "/question-media/moex-90-1-stage1-med1-display/Q065.png",
       "options": {
         "A": "腺瘤(adenoma)",
         "B": "瀰漫性增生(diffuse hyperplasia)",
@@ -3384,7 +3418,8 @@
         "width": 1140,
         "height": 86,
         "scope": null,
-        "answerNote": "第66題答B或答D者均給分"
+        "answerNote": "第66題答B或答D者均給分",
+        "displayNotice": "原圖以第 66 題題號為準。"
       }
     },
     {
@@ -3435,7 +3470,8 @@
         "width": 1140,
         "height": 85,
         "scope": null,
-        "answerNote": null
+        "answerNote": null,
+        "displayNotice": "原圖以第 67 題題號為準。"
       }
     },
     {
@@ -3486,7 +3522,8 @@
         "width": 1140,
         "height": 59,
         "scope": null,
-        "answerNote": null
+        "answerNote": null,
+        "displayNotice": "原圖以第 68 題題號為準。"
       }
     },
     {
@@ -3537,7 +3574,8 @@
         "width": 1140,
         "height": 88,
         "scope": null,
-        "answerNote": null
+        "answerNote": null,
+        "displayNotice": "原圖以第 69 題題號為準。"
       }
     },
     {
@@ -3546,7 +3584,7 @@
       "chapter": "舊制官方原卷",
       "section": "醫學（一）",
       "stem": "下列何種肺氣腫(emphysema)最容易造成年輕人自發性氣胸(spontaneous pneumothorax)？",
-      "stemImage": "/question-media/moex-90-1-stage1-med1/MOEX-C002-090040-S4004-STAGE1-Q070.webp",
+      "stemImage": "/question-media/moex-90-1-stage1-med1-display/Q070.png",
       "options": {
         "A": "Centrilobular emphysema",
         "B": "Paraseptal emphysema",
@@ -3597,7 +3635,7 @@
       "chapter": "舊制官方原卷",
       "section": "醫學（一）",
       "stem": "肺部疤痕癌(scar cancer)，大多病例為：",
-      "stemImage": "/question-media/moex-90-1-stage1-med1/MOEX-C002-090040-S4004-STAGE1-Q071.webp",
+      "stemImage": "/question-media/moex-90-1-stage1-med1-display/Q071.png",
       "options": {
         "A": "Squamous cell carcinoma",
         "B": "Small cell carcinoma",
@@ -3648,7 +3686,7 @@
       "chapter": "舊制官方原卷",
       "section": "醫學（一）",
       "stem": "急性心肌梗塞併發症造成心臟破裂，最常見類型為：",
-      "stemImage": "/question-media/moex-90-1-stage1-med1/MOEX-C002-090040-S4004-STAGE1-Q072.webp",
+      "stemImage": "/question-media/moex-90-1-stage1-med1-display/Q072.png",
       "options": {
         "A": "Papillary muscle破裂",
         "B": "Ventricular free wall破裂",
@@ -3699,7 +3737,7 @@
       "chapter": "舊制官方原卷",
       "section": "醫學（一）",
       "stem": "Takayasu血管炎，最常侵犯：",
-      "stemImage": "/question-media/moex-90-1-stage1-med1/MOEX-C002-090040-S4004-STAGE1-Q073.webp",
+      "stemImage": "/question-media/moex-90-1-stage1-med1-display/Q073.png",
       "options": {
         "A": "肺動脈",
         "B": "大腿動脈",
@@ -3750,7 +3788,7 @@
       "chapter": "舊制官方原卷",
       "section": "醫學（一）",
       "stem": "開刀後所造成的水腫(edema)，其致病機轉為：",
-      "stemImage": "/question-media/moex-90-1-stage1-med1/MOEX-C002-090040-S4004-STAGE1-Q074.webp",
+      "stemImage": "/question-media/moex-90-1-stage1-med1-display/Q074.png",
       "options": {
         "A": "靜水壓昇高",
         "B": "血漿滲透壓降低",
@@ -3801,7 +3839,7 @@
       "chapter": "舊制官方原卷",
       "section": "醫學（一）",
       "stem": "囊性纖維化骨炎(osteitis fibrosa cystica)常發生於下列何種疾病？",
-      "stemImage": "/question-media/moex-90-1-stage1-med1/MOEX-C002-090040-S4004-STAGE1-Q075.webp",
+      "stemImage": "/question-media/moex-90-1-stage1-med1-display/Q075.png",
       "options": {
         "A": "Paget氏病",
         "B": "類澱粉沈積症",
@@ -3852,7 +3890,7 @@
       "chapter": "舊制官方原卷",
       "section": "醫學（一）",
       "stem": "羊水栓塞症(amniotic fluid embolism)患者其肺組織病理診斷性變化為：",
-      "stemImage": "/question-media/moex-90-1-stage1-med1/MOEX-C002-090040-S4004-STAGE1-Q076.webp",
+      "stemImage": "/question-media/moex-90-1-stage1-med1-display/Q076.png",
       "options": {
         "A": "肺血管可見平滑肌顯著增生",
         "B": "肺血管可見脂肪及上皮組織",
@@ -3903,7 +3941,7 @@
       "chapter": "舊制官方原卷",
       "section": "醫學（一）",
       "stem": "慢性肉芽腫發炎中，類上皮細胞(epithelioid)屬於：",
-      "stemImage": "/question-media/moex-90-1-stage1-med1/MOEX-C002-090040-S4004-STAGE1-Q077.webp",
+      "stemImage": "/question-media/moex-90-1-stage1-med1-display/Q077.png",
       "options": {
         "A": "移行細胞",
         "B": "T-淋巴細胞",
@@ -3996,7 +4034,8 @@
         "width": 1140,
         "height": 84,
         "scope": null,
-        "answerNote": null
+        "answerNote": null,
+        "displayNotice": "原圖以第 78 題題號為準。"
       }
     },
     {
@@ -4047,7 +4086,8 @@
         "width": 1140,
         "height": 60,
         "scope": null,
-        "answerNote": null
+        "answerNote": null,
+        "displayNotice": "原圖以第 79 題題號為準。"
       }
     },
     {
@@ -4056,7 +4096,7 @@
       "chapter": "舊制官方原卷",
       "section": "醫學（一）",
       "stem": "下列有關何杰金氏病(Hodgkin's disease)之敘述何者為誤？",
-      "stemImage": "/question-media/moex-90-1-stage1-med1/MOEX-C002-090040-S4004-STAGE1-Q080.webp",
+      "stemImage": "/question-media/moex-90-1-stage1-med1-display/Q080.png",
       "options": {
         "A": "常合併B症狀",
         "B": "結節硬化型(nodular sclerosis)好發於年輕女性",

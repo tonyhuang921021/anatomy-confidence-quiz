@@ -1,5 +1,5 @@
 {
-  "status": "unpublished_candidate_first_crops_pending_second_display_reviewed",
+  "status": "unpublished_candidate_both_sittings_display_reviewed",
   "questions": [
     {
       "id": "MOEX-C002-090040-S4004-STAGE1-Q001",
@@ -23,7 +23,9 @@
       "originalCropSha256": "2994320db5f7c86ee18744f7b939fb3ba634ed534489abe22bc7067dcedb98bd",
       "flags": [],
       "officialScope": null,
-      "cropStatus": "original_pending_clean_crop_review"
+      "cropStatus": "derived_clean",
+      "displayAssetSha256": "c0614d21d1dde7093c8fead839bbba7d378b5e6e5d9c10f0df6a28ad64ca0c09",
+      "displayDecision": "cropped_clean"
     },
     {
       "id": "MOEX-C002-090040-S4004-STAGE1-Q002",
@@ -47,7 +49,9 @@
       "originalCropSha256": "4510221b825de2447dcf1ca422f58b253f3c7762bd0f1baff592b5c50c5b8ae0",
       "flags": [],
       "officialScope": null,
-      "cropStatus": "original_pending_clean_crop_review"
+      "cropStatus": "derived_clean",
+      "displayAssetSha256": "9dbf9f9628b81eca4e6d64345eeacf91bc6a13b5599785c6b9d7303cc8ff2a24",
+      "displayDecision": "cropped_clean"
     },
     {
       "id": "MOEX-C002-090040-S4004-STAGE1-Q003",
@@ -71,7 +75,9 @@
       "originalCropSha256": "f081ed44bc3b51beb7e4d93912871f41ce20f69725aa9f76441cdc0b48ae99b7",
       "flags": [],
       "officialScope": null,
-      "cropStatus": "original_pending_clean_crop_review"
+      "cropStatus": "derived_clean",
+      "displayAssetSha256": "c16485e8901ab4b89ee5ac7597ae6250905f75308a8f030049c899f4e2340c72",
+      "displayDecision": "cropped_clean"
     },
     {
       "id": "MOEX-C002-090040-S4004-STAGE1-Q004",
@@ -95,7 +101,9 @@
       "originalCropSha256": "70342d5db0cd6dc242b036319b7bfdffe024719f2a6f0770be6dd0e9dd6e5d36",
       "flags": [],
       "officialScope": null,
-      "cropStatus": "original_pending_clean_crop_review"
+      "cropStatus": "original_retained_residual",
+      "displayAssetSha256": "70342d5db0cd6dc242b036319b7bfdffe024719f2a6f0770be6dd0e9dd6e5d36",
+      "displayDecision": "unchanged_cannot_safely_clean"
     },
     {
       "id": "MOEX-C002-090040-S4004-STAGE1-Q005",
@@ -119,7 +127,9 @@
       "originalCropSha256": "2b3e8f5e812f53af7b0515a24ff7747710c7ee819a764834ceb0167fed8052d9",
       "flags": [],
       "officialScope": null,
-      "cropStatus": "original_pending_clean_crop_review"
+      "cropStatus": "derived_clean",
+      "displayAssetSha256": "be954d3e9ee1f0b73273bdabbbf545e8dc0f841baedcd9a0c113ca08d6152762",
+      "displayDecision": "cropped_clean"
     },
     {
       "id": "MOEX-C002-090040-S4004-STAGE1-Q006",
@@ -143,7 +153,9 @@
       "originalCropSha256": "17c5568efe957bcda260c30c9376af12f5d9eb91cb2730799fd0b563fad1dbba",
       "flags": [],
       "officialScope": null,
-      "cropStatus": "original_pending_clean_crop_review"
+      "cropStatus": "original_retained_residual",
+      "displayAssetSha256": "17c5568efe957bcda260c30c9376af12f5d9eb91cb2730799fd0b563fad1dbba",
+      "displayDecision": "unchanged_cannot_safely_clean"
     },
     {
       "id": "MOEX-C002-090040-S4004-STAGE1-Q007",
@@ -167,7 +179,9 @@
       "originalCropSha256": "a8d76ff1ef5b006911aed9290c94632da927e269367b7ee11d47e81b47e7741a",
       "flags": [],
       "officialScope": null,
-      "cropStatus": "original_pending_clean_crop_review"
+      "cropStatus": "original_retained_residual",
+      "displayAssetSha256": "a8d76ff1ef5b006911aed9290c94632da927e269367b7ee11d47e81b47e7741a",
+      "displayDecision": "unchanged_cannot_safely_clean"
     },
     {
       "id": "MOEX-C002-090040-S4004-STAGE1-Q008",
@@ -191,7 +205,9 @@
       "originalCropSha256": "6e3f8c9900c18c7c1ef7988910f42ec67cd2a2c1c2ae2aafe911372fc17140b7",
       "flags": [],
       "officialScope": null,
-      "cropStatus": "original_pending_clean_crop_review"
+      "cropStatus": "original_retained_residual",
+      "displayAssetSha256": "6e3f8c9900c18c7c1ef7988910f42ec67cd2a2c1c2ae2aafe911372fc17140b7",
+      "displayDecision": "unchanged_cannot_safely_clean"
     },
     {
       "id": "MOEX-C002-090040-S4004-STAGE1-Q009",
@@ -215,7 +231,9 @@
       "originalCropSha256": "97f161200bab7dd44e5c62a4d782b5869540559d1c8e8c2cbe9bd65c83b8aa0a",
       "flags": [],
       "officialScope": null,
-      "cropStatus": "original_pending_clean_crop_review"
+      "cropStatus": "derived_clean",
+      "displayAssetSha256": "607fa0c146011b7b4c175fc9243825c14c445adf1d7069410f4beb9fe4221f0b",
+      "displayDecision": "cropped_clean"
     },
     {
       "id": "MOEX-C002-090040-S4004-STAGE1-Q010",
@@ -239,7 +257,9 @@
       "originalCropSha256": "96d20101de980b4fb9b41d39bb5af9629f8af2333fb32beba0ebdd08aa34076e",
       "flags": [],
       "officialScope": null,
-      "cropStatus": "original_pending_clean_crop_review"
+      "cropStatus": "derived_clean",
+      "displayAssetSha256": "f973c47f57e0713fac8dcb0df510e05ac983908de947b51530ce9b09d9097519",
+      "displayDecision": "cropped_clean"
     },
     {
       "id": "MOEX-C002-090040-S4004-STAGE1-Q011",
@@ -263,7 +283,9 @@
       "originalCropSha256": "0af1edc9fd9e5114fbccb98f72c3bd3884d6064416fbe53294e142d37eb7fb8a",
       "flags": [],
       "officialScope": null,
-      "cropStatus": "original_pending_clean_crop_review"
+      "cropStatus": "original_retained_residual",
+      "displayAssetSha256": "0af1edc9fd9e5114fbccb98f72c3bd3884d6064416fbe53294e142d37eb7fb8a",
+      "displayDecision": "unchanged_cannot_safely_clean"
     },
     {
       "id": "MOEX-C002-090040-S4004-STAGE1-Q012",
@@ -289,7 +311,9 @@
       "originalCropSha256": "fc6710b0a9f9c0e0c547cf906b63440f0c65db5925704bf850f2b510edadcf89",
       "flags": [],
       "officialScope": null,
-      "cropStatus": "original_pending_clean_crop_review"
+      "cropStatus": "derived_clean",
+      "displayAssetSha256": "bcc1db419011aa301e0882b198e74fc152cf0f31b847c8b8b92a0ea5d948cd6e",
+      "displayDecision": "cropped_clean"
     },
     {
       "id": "MOEX-C002-090040-S4004-STAGE1-Q013",
@@ -313,7 +337,9 @@
       "originalCropSha256": "709b6ac6e4896e7ab61cfb40c477661af250b57db0c5d09c0e2eb118285e3b44",
       "flags": [],
       "officialScope": null,
-      "cropStatus": "original_pending_clean_crop_review"
+      "cropStatus": "derived_clean",
+      "displayAssetSha256": "d2390c8128ebbd68f3a8831fffd10c5135397db0792fb538fca7b423095f8653",
+      "displayDecision": "cropped_clean"
     },
     {
       "id": "MOEX-C002-090040-S4004-STAGE1-Q014",
@@ -337,7 +363,9 @@
       "originalCropSha256": "5132b95af09be7d766ed94e27264dedd151e61f3cd3a06f7d92718cacee6ef9d",
       "flags": [],
       "officialScope": null,
-      "cropStatus": "original_pending_clean_crop_review"
+      "cropStatus": "derived_clean",
+      "displayAssetSha256": "ea80abbe06780f055f8f7cccc392af2b92bf3800dd7d584014f9689554e63750",
+      "displayDecision": "cropped_clean"
     },
     {
       "id": "MOEX-C002-090040-S4004-STAGE1-Q015",
@@ -370,7 +398,9 @@
         }
       ],
       "officialScope": null,
-      "cropStatus": "original_pending_clean_crop_review"
+      "cropStatus": "derived_clean",
+      "displayAssetSha256": "c65b7c3418ec95e7a25ece381639349a81c43dbc0250e5b015ffca7bf16e1b22",
+      "displayDecision": "cropped_clean"
     },
     {
       "id": "MOEX-C002-090040-S4004-STAGE1-Q016",
@@ -394,7 +424,9 @@
       "originalCropSha256": "5c1819d9a9c1e72d94c4abddad24f69e89b14ada98bab334a75df1cee4b2f702",
       "flags": [],
       "officialScope": null,
-      "cropStatus": "original_pending_clean_crop_review"
+      "cropStatus": "derived_clean",
+      "displayAssetSha256": "8a066905adb43e88b2f286789be05d9028ecf2ce93abeb866313b40c08a55d2a",
+      "displayDecision": "cropped_clean"
     },
     {
       "id": "MOEX-C002-090040-S4004-STAGE1-Q017",
@@ -418,7 +450,9 @@
       "originalCropSha256": "7d1b1ca93e6d47e5106f6cc3c2dc6d63eaf8f542f5ed6fc3b95ee19388d8e968",
       "flags": [],
       "officialScope": null,
-      "cropStatus": "original_pending_clean_crop_review"
+      "cropStatus": "original_retained_residual",
+      "displayAssetSha256": "7d1b1ca93e6d47e5106f6cc3c2dc6d63eaf8f542f5ed6fc3b95ee19388d8e968",
+      "displayDecision": "unchanged_cannot_safely_clean"
     },
     {
       "id": "MOEX-C002-090040-S4004-STAGE1-Q018",
@@ -442,7 +476,9 @@
       "originalCropSha256": "79e716f13c40d30b2b0546b3e86a0408cff3c09e20f1c72e79c9f56cb406443b",
       "flags": [],
       "officialScope": null,
-      "cropStatus": "original_pending_clean_crop_review"
+      "cropStatus": "original_retained_residual",
+      "displayAssetSha256": "79e716f13c40d30b2b0546b3e86a0408cff3c09e20f1c72e79c9f56cb406443b",
+      "displayDecision": "unchanged_cannot_safely_clean"
     },
     {
       "id": "MOEX-C002-090040-S4004-STAGE1-Q019",
@@ -466,7 +502,9 @@
       "originalCropSha256": "a1d31b8c8e2d08b12b1f790ad207cc57c1ba0aec241a681a1a73954b4f45f3f8",
       "flags": [],
       "officialScope": null,
-      "cropStatus": "original_pending_clean_crop_review"
+      "cropStatus": "original_retained_residual",
+      "displayAssetSha256": "a1d31b8c8e2d08b12b1f790ad207cc57c1ba0aec241a681a1a73954b4f45f3f8",
+      "displayDecision": "unchanged_cannot_safely_clean"
     },
     {
       "id": "MOEX-C002-090040-S4004-STAGE1-Q020",
@@ -490,7 +528,9 @@
       "originalCropSha256": "f90787ecb25674f64c1dceafd8506f068aa70e96443dd880fa0eaf59931363df",
       "flags": [],
       "officialScope": null,
-      "cropStatus": "original_pending_clean_crop_review"
+      "cropStatus": "original_retained_residual",
+      "displayAssetSha256": "f90787ecb25674f64c1dceafd8506f068aa70e96443dd880fa0eaf59931363df",
+      "displayDecision": "unchanged_cannot_safely_clean"
     },
     {
       "id": "MOEX-C002-090040-S4004-STAGE1-Q021",
@@ -514,7 +554,9 @@
       "originalCropSha256": "0741526a16cdd0b96af619b8ab863c46d9dd29d9f06b86649f94ae4bdd82ce0b",
       "flags": [],
       "officialScope": null,
-      "cropStatus": "original_pending_clean_crop_review"
+      "cropStatus": "original_retained_residual",
+      "displayAssetSha256": "0741526a16cdd0b96af619b8ab863c46d9dd29d9f06b86649f94ae4bdd82ce0b",
+      "displayDecision": "unchanged_cannot_safely_clean"
     },
     {
       "id": "MOEX-C002-090040-S4004-STAGE1-Q022",
@@ -538,7 +580,9 @@
       "originalCropSha256": "65e2476f39bfa9ec053fe2d482a9c6a5b60ff450272a9394a3df44a1e7877c36",
       "flags": [],
       "officialScope": null,
-      "cropStatus": "original_pending_clean_crop_review"
+      "cropStatus": "original_retained_residual",
+      "displayAssetSha256": "65e2476f39bfa9ec053fe2d482a9c6a5b60ff450272a9394a3df44a1e7877c36",
+      "displayDecision": "unchanged_cannot_safely_clean"
     },
     {
       "id": "MOEX-C002-090040-S4004-STAGE1-Q023",
@@ -562,7 +606,9 @@
       "originalCropSha256": "f9838297d2024ecbdb72b0bb98c1ed1a3648354837d2b82401c43280a9deccfa",
       "flags": [],
       "officialScope": null,
-      "cropStatus": "original_pending_clean_crop_review"
+      "cropStatus": "original_retained_residual",
+      "displayAssetSha256": "f9838297d2024ecbdb72b0bb98c1ed1a3648354837d2b82401c43280a9deccfa",
+      "displayDecision": "unchanged_cannot_safely_clean"
     },
     {
       "id": "MOEX-C002-090040-S4004-STAGE1-Q024",
@@ -586,7 +632,9 @@
       "originalCropSha256": "42b0ba0be4b9aaba6de7dba1f02765593cb9d65c988d189d6dded82e9028f34e",
       "flags": [],
       "officialScope": null,
-      "cropStatus": "original_pending_clean_crop_review"
+      "cropStatus": "original_retained_residual",
+      "displayAssetSha256": "42b0ba0be4b9aaba6de7dba1f02765593cb9d65c988d189d6dded82e9028f34e",
+      "displayDecision": "unchanged_cannot_safely_clean"
     },
     {
       "id": "MOEX-C002-090040-S4004-STAGE1-Q025",
@@ -610,7 +658,9 @@
       "originalCropSha256": "2391832df41e94f371a6f5a278956be942fd9b6e361d560bbb89003de19ecdcd",
       "flags": [],
       "officialScope": null,
-      "cropStatus": "original_pending_clean_crop_review"
+      "cropStatus": "original_retained_residual",
+      "displayAssetSha256": "2391832df41e94f371a6f5a278956be942fd9b6e361d560bbb89003de19ecdcd",
+      "displayDecision": "unchanged_cannot_safely_clean"
     },
     {
       "id": "MOEX-C002-090040-S4004-STAGE1-Q026",
@@ -634,7 +684,9 @@
       "originalCropSha256": "dc9b4aacdaff9f66650e1a21a988c2144df6cad12278bd80b7b815bde1b92dd4",
       "flags": [],
       "officialScope": null,
-      "cropStatus": "original_pending_clean_crop_review"
+      "cropStatus": "original_retained_residual",
+      "displayAssetSha256": "dc9b4aacdaff9f66650e1a21a988c2144df6cad12278bd80b7b815bde1b92dd4",
+      "displayDecision": "unchanged_cannot_safely_clean"
     },
     {
       "id": "MOEX-C002-090040-S4004-STAGE1-Q027",
@@ -659,7 +711,9 @@
       "originalCropSha256": "8472754df5d200702c90de399b9a14eb7fe9e1a22a531417d448a9deb52aebeb",
       "flags": [],
       "officialScope": null,
-      "cropStatus": "original_pending_clean_crop_review"
+      "cropStatus": "original_retained_residual",
+      "displayAssetSha256": "8472754df5d200702c90de399b9a14eb7fe9e1a22a531417d448a9deb52aebeb",
+      "displayDecision": "unchanged_cannot_safely_clean"
     },
     {
       "id": "MOEX-C002-090040-S4004-STAGE1-Q028",
@@ -683,7 +737,9 @@
       "originalCropSha256": "de1345708e46cdd19c3624eb990daaca23636d12b29e0a4efb7f75c40073b8ff",
       "flags": [],
       "officialScope": null,
-      "cropStatus": "original_pending_clean_crop_review"
+      "cropStatus": "original_retained_residual",
+      "displayAssetSha256": "de1345708e46cdd19c3624eb990daaca23636d12b29e0a4efb7f75c40073b8ff",
+      "displayDecision": "unchanged_cannot_safely_clean"
     },
     {
       "id": "MOEX-C002-090040-S4004-STAGE1-Q029",
@@ -707,7 +763,9 @@
       "originalCropSha256": "265da5058c417e662bcca44d3a26891bb2b6f2d85bd880fe342fb62f26f53168",
       "flags": [],
       "officialScope": null,
-      "cropStatus": "original_pending_clean_crop_review"
+      "cropStatus": "original_retained_residual",
+      "displayAssetSha256": "265da5058c417e662bcca44d3a26891bb2b6f2d85bd880fe342fb62f26f53168",
+      "displayDecision": "unchanged_cannot_safely_clean"
     },
     {
       "id": "MOEX-C002-090040-S4004-STAGE1-Q030",
@@ -731,7 +789,9 @@
       "originalCropSha256": "75c86bf578525233ec6e986325f9d0aa2138b91dc19d9e7779420915f1dcfe71",
       "flags": [],
       "officialScope": null,
-      "cropStatus": "original_pending_clean_crop_review"
+      "cropStatus": "original_retained_residual",
+      "displayAssetSha256": "75c86bf578525233ec6e986325f9d0aa2138b91dc19d9e7779420915f1dcfe71",
+      "displayDecision": "unchanged_cannot_safely_clean"
     },
     {
       "id": "MOEX-C002-090040-S4004-STAGE1-Q031",
@@ -755,7 +815,9 @@
       "originalCropSha256": "b376d1a01d9c54d856aec4cc76695aed1c1e73b47050aea185b7ba227ab2cdc2",
       "flags": [],
       "officialScope": null,
-      "cropStatus": "original_pending_clean_crop_review"
+      "cropStatus": "original_retained_residual",
+      "displayAssetSha256": "b376d1a01d9c54d856aec4cc76695aed1c1e73b47050aea185b7ba227ab2cdc2",
+      "displayDecision": "unchanged_cannot_safely_clean"
     },
     {
       "id": "MOEX-C002-090040-S4004-STAGE1-Q032",
@@ -779,7 +841,9 @@
       "originalCropSha256": "e36e9506ab41eb6d77713b571ea5e57b20e1d104adbcc3e504106399c6e99716",
       "flags": [],
       "officialScope": null,
-      "cropStatus": "original_pending_clean_crop_review"
+      "cropStatus": "original_retained_residual",
+      "displayAssetSha256": "e36e9506ab41eb6d77713b571ea5e57b20e1d104adbcc3e504106399c6e99716",
+      "displayDecision": "unchanged_cannot_safely_clean"
     },
     {
       "id": "MOEX-C002-090040-S4004-STAGE1-Q033",
@@ -803,7 +867,9 @@
       "originalCropSha256": "8a789bc10c41bffd2c49a30e74f0a5a0ebb75b703ab8ecb6dab63b57153d8102",
       "flags": [],
       "officialScope": null,
-      "cropStatus": "original_pending_clean_crop_review"
+      "cropStatus": "original_retained_residual",
+      "displayAssetSha256": "8a789bc10c41bffd2c49a30e74f0a5a0ebb75b703ab8ecb6dab63b57153d8102",
+      "displayDecision": "unchanged_cannot_safely_clean"
     },
     {
       "id": "MOEX-C002-090040-S4004-STAGE1-Q034",
@@ -827,7 +893,9 @@
       "originalCropSha256": "e77526082fd249e74f57e927226cae769eec17e77adb069ca8e4e288814fb1ef",
       "flags": [],
       "officialScope": null,
-      "cropStatus": "original_pending_clean_crop_review"
+      "cropStatus": "original_retained_residual",
+      "displayAssetSha256": "e77526082fd249e74f57e927226cae769eec17e77adb069ca8e4e288814fb1ef",
+      "displayDecision": "unchanged_cannot_safely_clean"
     },
     {
       "id": "MOEX-C002-090040-S4004-STAGE1-Q035",
@@ -851,7 +919,9 @@
       "originalCropSha256": "3e0437e2ae200e733f02ae957c3f1de742db69dd593855cc30262433c44b92b9",
       "flags": [],
       "officialScope": null,
-      "cropStatus": "original_pending_clean_crop_review"
+      "cropStatus": "derived_clean",
+      "displayAssetSha256": "44f33c8496247e9fd7dd1a360fb4ca5736809a1890fb5f164a7bb692749d6683",
+      "displayDecision": "cropped_clean"
     },
     {
       "id": "MOEX-C002-090040-S4004-STAGE1-Q036",
@@ -875,7 +945,9 @@
       "originalCropSha256": "e5e605866941c9b878099283d9cc038e8113d805df1012911e746df7b6c46ee2",
       "flags": [],
       "officialScope": null,
-      "cropStatus": "original_pending_clean_crop_review"
+      "cropStatus": "original_retained_residual",
+      "displayAssetSha256": "e5e605866941c9b878099283d9cc038e8113d805df1012911e746df7b6c46ee2",
+      "displayDecision": "unchanged_cannot_safely_clean"
     },
     {
       "id": "MOEX-C002-090040-S4004-STAGE1-Q037",
@@ -899,7 +971,9 @@
       "originalCropSha256": "62c6f01e7144fa6d9b7311f2c909614c4544b5ccf79b6873780063a29585375e",
       "flags": [],
       "officialScope": null,
-      "cropStatus": "original_pending_clean_crop_review"
+      "cropStatus": "original_retained_residual",
+      "displayAssetSha256": "62c6f01e7144fa6d9b7311f2c909614c4544b5ccf79b6873780063a29585375e",
+      "displayDecision": "unchanged_cannot_safely_clean"
     },
     {
       "id": "MOEX-C002-090040-S4004-STAGE1-Q038",
@@ -923,7 +997,9 @@
       "originalCropSha256": "b96b1ee3b01c5a326c39c0ba37906c8828a0db970e50f1211b8c3a7fe51d0651",
       "flags": [],
       "officialScope": null,
-      "cropStatus": "original_pending_clean_crop_review"
+      "cropStatus": "derived_clean",
+      "displayAssetSha256": "57d0c8b63e937da3f660acb88efd4c0cad38be5c8dc7a61c15c175edf3666601",
+      "displayDecision": "cropped_clean"
     },
     {
       "id": "MOEX-C002-090040-S4004-STAGE1-Q039",
@@ -947,7 +1023,9 @@
       "originalCropSha256": "513a84814c350207146de6d185e6ad93eb73079a8385b12cf37d89e49c466d6d",
       "flags": [],
       "officialScope": null,
-      "cropStatus": "original_pending_clean_crop_review"
+      "cropStatus": "derived_clean",
+      "displayAssetSha256": "51c82168f6a4c6cdb3b3efe1373ea5f140535f942440d9cea328bbbb579df044",
+      "displayDecision": "cropped_clean"
     },
     {
       "id": "MOEX-C002-090040-S4004-STAGE1-Q040",
@@ -971,7 +1049,9 @@
       "originalCropSha256": "2f87684eee707bae363a833eb1c55df5332c30ee22be4ced447258cd7cc869d1",
       "flags": [],
       "officialScope": null,
-      "cropStatus": "original_pending_clean_crop_review"
+      "cropStatus": "original_retained_residual",
+      "displayAssetSha256": "2f87684eee707bae363a833eb1c55df5332c30ee22be4ced447258cd7cc869d1",
+      "displayDecision": "unchanged_cannot_safely_clean"
     },
     {
       "id": "MOEX-C002-090040-S4004-STAGE1-Q041",
@@ -995,7 +1075,9 @@
       "originalCropSha256": "994e03666022fe9b71928b98edc80cd48415882a78e4a17ed6425f3c94f3c030",
       "flags": [],
       "officialScope": null,
-      "cropStatus": "original_pending_clean_crop_review"
+      "cropStatus": "original_retained_residual",
+      "displayAssetSha256": "994e03666022fe9b71928b98edc80cd48415882a78e4a17ed6425f3c94f3c030",
+      "displayDecision": "unchanged_cannot_safely_clean"
     },
     {
       "id": "MOEX-C002-090040-S4004-STAGE1-Q042",
@@ -1019,7 +1101,9 @@
       "originalCropSha256": "ce8dc2a5bea0c765df2447340a012cf5ba1549ef7c1839898a23c805c27d54a0",
       "flags": [],
       "officialScope": null,
-      "cropStatus": "original_pending_clean_crop_review"
+      "cropStatus": "derived_clean",
+      "displayAssetSha256": "f2f2452736646ca6fa2551000cc6500f485f720bce4df0ed4f98b6cef4f96a69",
+      "displayDecision": "cropped_clean"
     },
     {
       "id": "MOEX-C002-090040-S4004-STAGE1-Q043",
@@ -1043,7 +1127,9 @@
       "originalCropSha256": "1289bce89dba392c28c9306901bd96dfbaff8642c162d27572cbe4be4a804fe2",
       "flags": [],
       "officialScope": null,
-      "cropStatus": "original_pending_clean_crop_review"
+      "cropStatus": "derived_clean",
+      "displayAssetSha256": "a5183140713d0083d3dff0fd99eed77ef015b112b0ecbd8dc4f01d7323ef6985",
+      "displayDecision": "cropped_clean"
     },
     {
       "id": "MOEX-C002-090040-S4004-STAGE1-Q044",
@@ -1067,7 +1153,9 @@
       "originalCropSha256": "8ee8e6e31915e78df30e4932ef606d281ffda7b1f083663c3f26bf4864ba2ef6",
       "flags": [],
       "officialScope": null,
-      "cropStatus": "original_pending_clean_crop_review"
+      "cropStatus": "original_retained_residual",
+      "displayAssetSha256": "8ee8e6e31915e78df30e4932ef606d281ffda7b1f083663c3f26bf4864ba2ef6",
+      "displayDecision": "unchanged_cannot_safely_clean"
     },
     {
       "id": "MOEX-C002-090040-S4004-STAGE1-Q045",
@@ -1091,7 +1179,9 @@
       "originalCropSha256": "883ca110fd64e5b3f88888e82f089dafc9c6d3545c88dcf5716b1ceaf52fb151",
       "flags": [],
       "officialScope": null,
-      "cropStatus": "original_pending_clean_crop_review"
+      "cropStatus": "derived_clean",
+      "displayAssetSha256": "f3cae9cebb53bb1ecf4c1c34b8016887d104044d44f154099cac29e0b40db17a",
+      "displayDecision": "cropped_clean"
     },
     {
       "id": "MOEX-C002-090040-S4004-STAGE1-Q046",
@@ -1115,7 +1205,9 @@
       "originalCropSha256": "fbb0cd1a59c89cccbaf3015204c690780233fdeef26faea69384a368d4d92f6b",
       "flags": [],
       "officialScope": null,
-      "cropStatus": "original_pending_clean_crop_review"
+      "cropStatus": "derived_clean",
+      "displayAssetSha256": "7f15b323c25b57733aace2ef9141c9c38a90eda3632dd71c1f6c6e8f06e8d5e3",
+      "displayDecision": "cropped_clean"
     },
     {
       "id": "MOEX-C002-090040-S4004-STAGE1-Q047",
@@ -1139,7 +1231,9 @@
       "originalCropSha256": "aa7780c55e26bab82c1007260c7df2f64ba61f53a6ae00dd5c5a8b9ce2bfeb8d",
       "flags": [],
       "officialScope": null,
-      "cropStatus": "original_pending_clean_crop_review"
+      "cropStatus": "original_retained_residual",
+      "displayAssetSha256": "aa7780c55e26bab82c1007260c7df2f64ba61f53a6ae00dd5c5a8b9ce2bfeb8d",
+      "displayDecision": "unchanged_cannot_safely_clean"
     },
     {
       "id": "MOEX-C002-090040-S4004-STAGE1-Q048",
@@ -1163,7 +1257,9 @@
       "originalCropSha256": "72a83a0abe4eb186a8b15a4320f0df96781a92dfda511569c3b79c10acec69ba",
       "flags": [],
       "officialScope": null,
-      "cropStatus": "original_pending_clean_crop_review"
+      "cropStatus": "original_retained_residual",
+      "displayAssetSha256": "72a83a0abe4eb186a8b15a4320f0df96781a92dfda511569c3b79c10acec69ba",
+      "displayDecision": "unchanged_cannot_safely_clean"
     },
     {
       "id": "MOEX-C002-090040-S4004-STAGE1-Q049",
@@ -1187,7 +1283,9 @@
       "originalCropSha256": "a1ce26e1f38f81bb17f1c2d73a96a5a97b8748d10544b3895f9ebec23dd9fac9",
       "flags": [],
       "officialScope": null,
-      "cropStatus": "original_pending_clean_crop_review"
+      "cropStatus": "derived_clean",
+      "displayAssetSha256": "a8c53a92f5c63f44f7786cf8ac965009d297f165e2835010de1357877abd7f30",
+      "displayDecision": "cropped_clean"
     },
     {
       "id": "MOEX-C002-090040-S4004-STAGE1-Q050",
@@ -1211,7 +1309,9 @@
       "originalCropSha256": "f0c3ad452a00e6bfd211f735d2a87e66996b9cc8eb00b9a109246c0eb6079a68",
       "flags": [],
       "officialScope": null,
-      "cropStatus": "original_pending_clean_crop_review"
+      "cropStatus": "original_retained_residual",
+      "displayAssetSha256": "f0c3ad452a00e6bfd211f735d2a87e66996b9cc8eb00b9a109246c0eb6079a68",
+      "displayDecision": "unchanged_cannot_safely_clean"
     },
     {
       "id": "MOEX-C002-090040-S4004-STAGE1-Q051",
@@ -1235,7 +1335,9 @@
       "originalCropSha256": "74cb4bbcd159ecfb0ebd9263538417d261a0ab058c867317089d3348d5cfee07",
       "flags": [],
       "officialScope": null,
-      "cropStatus": "original_pending_clean_crop_review"
+      "cropStatus": "original_retained_residual",
+      "displayAssetSha256": "74cb4bbcd159ecfb0ebd9263538417d261a0ab058c867317089d3348d5cfee07",
+      "displayDecision": "unchanged_cannot_safely_clean"
     },
     {
       "id": "MOEX-C002-090040-S4004-STAGE1-Q052",
@@ -1259,7 +1361,9 @@
       "originalCropSha256": "b75e5408e6c046a16f5e3549aed46ff8614bfa05c389f3fdb211c84cb9e58420",
       "flags": [],
       "officialScope": null,
-      "cropStatus": "original_pending_clean_crop_review"
+      "cropStatus": "derived_clean",
+      "displayAssetSha256": "185db72f91109ed61a31afd3289417ab130331458e1822f90740191de6b64504",
+      "displayDecision": "cropped_clean"
     },
     {
       "id": "MOEX-C002-090040-S4004-STAGE1-Q053",
@@ -1283,7 +1387,9 @@
       "originalCropSha256": "9ed01a0d5fe46efe47f2c13adb383ec3c036f722328351e73218160f9a6d942a",
       "flags": [],
       "officialScope": null,
-      "cropStatus": "original_pending_clean_crop_review"
+      "cropStatus": "derived_clean",
+      "displayAssetSha256": "4b2140ff29efedd15f45b36fd114283cc726d9de1429e9ccdae987daa7e06f54",
+      "displayDecision": "cropped_clean"
     },
     {
       "id": "MOEX-C002-090040-S4004-STAGE1-Q054",
@@ -1307,7 +1413,9 @@
       "originalCropSha256": "70d3bafcfcc85eb05aaa8260572efa8cc3597ab87ae93898dfe69228c0eb0a50",
       "flags": [],
       "officialScope": null,
-      "cropStatus": "original_pending_clean_crop_review"
+      "cropStatus": "original_retained_residual",
+      "displayAssetSha256": "70d3bafcfcc85eb05aaa8260572efa8cc3597ab87ae93898dfe69228c0eb0a50",
+      "displayDecision": "unchanged_cannot_safely_clean"
     },
     {
       "id": "MOEX-C002-090040-S4004-STAGE1-Q055",
@@ -1331,7 +1439,9 @@
       "originalCropSha256": "7bb1bfa2b0a9757ce496164056aeff8f430f9553e9eca486105689f257893fe3",
       "flags": [],
       "officialScope": null,
-      "cropStatus": "original_pending_clean_crop_review"
+      "cropStatus": "original_retained_residual",
+      "displayAssetSha256": "7bb1bfa2b0a9757ce496164056aeff8f430f9553e9eca486105689f257893fe3",
+      "displayDecision": "unchanged_cannot_safely_clean"
     },
     {
       "id": "MOEX-C002-090040-S4004-STAGE1-Q056",
@@ -1355,7 +1465,9 @@
       "originalCropSha256": "6f6651b798fd72e403d85248e6f043ddbe94af4c647e228faf586879df26bf19",
       "flags": [],
       "officialScope": null,
-      "cropStatus": "original_pending_clean_crop_review"
+      "cropStatus": "derived_clean",
+      "displayAssetSha256": "e5855272e6155077a13dc482253d1e4a60565331e3680be995ec32b71e80b0a6",
+      "displayDecision": "cropped_clean"
     },
     {
       "id": "MOEX-C002-090040-S4004-STAGE1-Q057",
@@ -1379,7 +1491,9 @@
       "originalCropSha256": "6838e187a9a3f5e9c14ddb88c9c6098696073a117b064848215b5cb2b7fbb136",
       "flags": [],
       "officialScope": null,
-      "cropStatus": "original_pending_clean_crop_review"
+      "cropStatus": "derived_clean",
+      "displayAssetSha256": "23059331ec2ba9a656e98034f17e4daedfaf9c1dea30542efc6ca6ed8019de07",
+      "displayDecision": "cropped_clean"
     },
     {
       "id": "MOEX-C002-090040-S4004-STAGE1-Q058",
@@ -1403,7 +1517,9 @@
       "originalCropSha256": "9dbb11736ad6e80b01e045756783ba1671a02e0c9566bab77389a09b9de3b0d9",
       "flags": [],
       "officialScope": null,
-      "cropStatus": "original_pending_clean_crop_review"
+      "cropStatus": "derived_clean",
+      "displayAssetSha256": "c40cc51e84f97a60030c86caafe1d33e5ac0999e9d923851bba103c30fd29b11",
+      "displayDecision": "cropped_clean"
     },
     {
       "id": "MOEX-C002-090040-S4004-STAGE1-Q059",
@@ -1436,7 +1552,9 @@
         }
       ],
       "officialScope": null,
-      "cropStatus": "original_pending_clean_crop_review"
+      "cropStatus": "derived_clean",
+      "displayAssetSha256": "0cbe2b8e3cf92d17ec731b8e02a0ef89a3d5baa1326abad92b295d347a6d44ce",
+      "displayDecision": "cropped_clean"
     },
     {
       "id": "MOEX-C002-090040-S4004-STAGE1-Q060",
@@ -1460,7 +1578,9 @@
       "originalCropSha256": "b26f96ec7e0e8834823fc486fcdb7d244a85a2d1a00fc6e881fd6988b8e71441",
       "flags": [],
       "officialScope": null,
-      "cropStatus": "original_pending_clean_crop_review"
+      "cropStatus": "derived_clean",
+      "displayAssetSha256": "5e4f9bb089d15588dcfe4c3760662871d85e55fcf7ef87410ff2c7d31e180213",
+      "displayDecision": "cropped_clean"
     },
     {
       "id": "MOEX-C002-090040-S4004-STAGE1-Q061",
@@ -1484,7 +1604,9 @@
       "originalCropSha256": "951e6cbea303c09b4f9de80e217f69928f0dfe95e115de363ef63dd66f21a8e8",
       "flags": [],
       "officialScope": null,
-      "cropStatus": "original_pending_clean_crop_review"
+      "cropStatus": "derived_clean",
+      "displayAssetSha256": "b360d3e892b3c7601e1680c9fc76d982558a7ff75bc9de8a25ae8a2d94f4ce40",
+      "displayDecision": "cropped_clean"
     },
     {
       "id": "MOEX-C002-090040-S4004-STAGE1-Q062",
@@ -1508,7 +1630,9 @@
       "originalCropSha256": "2fa28e34c444f14f5d889292c59869104ec098b2418c0107b9de2bc22897930c",
       "flags": [],
       "officialScope": null,
-      "cropStatus": "original_pending_clean_crop_review"
+      "cropStatus": "derived_clean",
+      "displayAssetSha256": "4daad632ddeca9d4fbd356e19d45479fd8d41ad172b19f6d016cea539b25620c",
+      "displayDecision": "cropped_clean"
     },
     {
       "id": "MOEX-C002-090040-S4004-STAGE1-Q063",
@@ -1532,7 +1656,9 @@
       "originalCropSha256": "ae6bf40ab7f0c768f2ba128583cdadfdea14f6894e74dcc90dfe69ae655e13ba",
       "flags": [],
       "officialScope": null,
-      "cropStatus": "original_pending_clean_crop_review"
+      "cropStatus": "derived_clean",
+      "displayAssetSha256": "276b582386e6e1fdeae1bd7fabe3e21856f57b17f0d60f9e4c688479d035ba15",
+      "displayDecision": "cropped_clean"
     },
     {
       "id": "MOEX-C002-090040-S4004-STAGE1-Q064",
@@ -1556,7 +1682,9 @@
       "originalCropSha256": "cc1ce067d47cda92dc138e7cbe4b823470a7143f30717a7f8072fb1b4995bc05",
       "flags": [],
       "officialScope": null,
-      "cropStatus": "original_pending_clean_crop_review"
+      "cropStatus": "derived_clean",
+      "displayAssetSha256": "8fcf332d2f9fad4d66600bf8f0859294b4d6a34d7d06dafcfb4321496a705266",
+      "displayDecision": "cropped_clean"
     },
     {
       "id": "MOEX-C002-090040-S4004-STAGE1-Q065",
@@ -1580,7 +1708,9 @@
       "originalCropSha256": "a61513e4b9f1dcaba9a87e834d5ae92acdaa8bfc330a43e8edc92aafc2e54a24",
       "flags": [],
       "officialScope": null,
-      "cropStatus": "original_pending_clean_crop_review"
+      "cropStatus": "derived_clean",
+      "displayAssetSha256": "d6f251c301f4ec373a64c2740dcdc083cf6ada00a9e7551a82148c63132a806e",
+      "displayDecision": "cropped_clean"
     },
     {
       "id": "MOEX-C002-090040-S4004-STAGE1-Q066",
@@ -1605,7 +1735,9 @@
       "originalCropSha256": "a056e39fb49ecc1c8135563345cded1a10a69aee30293047568a6790ba3e39d8",
       "flags": [],
       "officialScope": null,
-      "cropStatus": "original_pending_clean_crop_review"
+      "cropStatus": "original_retained_residual",
+      "displayAssetSha256": "a056e39fb49ecc1c8135563345cded1a10a69aee30293047568a6790ba3e39d8",
+      "displayDecision": "unchanged_cannot_safely_clean"
     },
     {
       "id": "MOEX-C002-090040-S4004-STAGE1-Q067",
@@ -1629,7 +1761,9 @@
       "originalCropSha256": "ad1fa4a517a253ad9153ecc5641a39a6bdba298315b2d9f0bc1356b079c768cb",
       "flags": [],
       "officialScope": null,
-      "cropStatus": "original_pending_clean_crop_review"
+      "cropStatus": "original_retained_residual",
+      "displayAssetSha256": "ad1fa4a517a253ad9153ecc5641a39a6bdba298315b2d9f0bc1356b079c768cb",
+      "displayDecision": "unchanged_cannot_safely_clean"
     },
     {
       "id": "MOEX-C002-090040-S4004-STAGE1-Q068",
@@ -1653,7 +1787,9 @@
       "originalCropSha256": "889b7064b3ccfbe497a8a43d58bbb94366f0aebaf28fad1edc2bfab9f6427b66",
       "flags": [],
       "officialScope": null,
-      "cropStatus": "original_pending_clean_crop_review"
+      "cropStatus": "original_retained_residual",
+      "displayAssetSha256": "889b7064b3ccfbe497a8a43d58bbb94366f0aebaf28fad1edc2bfab9f6427b66",
+      "displayDecision": "unchanged_cannot_safely_clean"
     },
     {
       "id": "MOEX-C002-090040-S4004-STAGE1-Q069",
@@ -1677,7 +1813,9 @@
       "originalCropSha256": "0c70d99f95ec66db3d8055ff668fe774805504c99b7d5338dfd978076ab73dee",
       "flags": [],
       "officialScope": null,
-      "cropStatus": "original_pending_clean_crop_review"
+      "cropStatus": "original_retained_residual",
+      "displayAssetSha256": "0c70d99f95ec66db3d8055ff668fe774805504c99b7d5338dfd978076ab73dee",
+      "displayDecision": "unchanged_cannot_safely_clean"
     },
     {
       "id": "MOEX-C002-090040-S4004-STAGE1-Q070",
@@ -1701,7 +1839,9 @@
       "originalCropSha256": "e573129179915ce8e311b94189be51c411df62414654a3ce6eb703dc2c3a873b",
       "flags": [],
       "officialScope": null,
-      "cropStatus": "original_pending_clean_crop_review"
+      "cropStatus": "derived_clean",
+      "displayAssetSha256": "8af1ad1723580cc73a4925a6f0811302679ca1164d3e5744dc576403bf9b56f8",
+      "displayDecision": "cropped_clean"
     },
     {
       "id": "MOEX-C002-090040-S4004-STAGE1-Q071",
@@ -1725,7 +1865,9 @@
       "originalCropSha256": "90ff40df0fa300c55c1c092b20def58a9ba64baaab0ace24717198e6bf5e1958",
       "flags": [],
       "officialScope": null,
-      "cropStatus": "original_pending_clean_crop_review"
+      "cropStatus": "derived_clean",
+      "displayAssetSha256": "746a6815ab34b597205cf76973059979136aefd38c419662dea1d5c6f315d9aa",
+      "displayDecision": "cropped_clean"
     },
     {
       "id": "MOEX-C002-090040-S4004-STAGE1-Q072",
@@ -1749,7 +1891,9 @@
       "originalCropSha256": "0a3ea0c4c08ad82d0686c0b0193d9765bacbb8ac4de849cfb29a2a61b78c18a8",
       "flags": [],
       "officialScope": null,
-      "cropStatus": "original_pending_clean_crop_review"
+      "cropStatus": "derived_clean",
+      "displayAssetSha256": "3e0be69bbe005826f17a638a94c3b99964990e25deb57be848f4bd8baee22ec0",
+      "displayDecision": "cropped_clean"
     },
     {
       "id": "MOEX-C002-090040-S4004-STAGE1-Q073",
@@ -1773,7 +1917,9 @@
       "originalCropSha256": "ee318930db0e5d1f1b127a355528e08d54d9bf48be579ff63b0658b3c611c852",
       "flags": [],
       "officialScope": null,
-      "cropStatus": "original_pending_clean_crop_review"
+      "cropStatus": "derived_clean",
+      "displayAssetSha256": "12d56fcdda6d1a333a852f9618de83942db4d07f6f9c30b7867c74dfa14d638e",
+      "displayDecision": "cropped_clean"
     },
     {
       "id": "MOEX-C002-090040-S4004-STAGE1-Q074",
@@ -1797,7 +1943,9 @@
       "originalCropSha256": "f2b5b7f07f70b29718529478a31a9f9b4031b1a0443d3198a42731eabae941f4",
       "flags": [],
       "officialScope": null,
-      "cropStatus": "original_pending_clean_crop_review"
+      "cropStatus": "derived_clean",
+      "displayAssetSha256": "94af482a1c8af40a910d901384d0d917efab6f588a12b24777e8408885778e7e",
+      "displayDecision": "cropped_clean"
     },
     {
       "id": "MOEX-C002-090040-S4004-STAGE1-Q075",
@@ -1821,7 +1969,9 @@
       "originalCropSha256": "eb5cf570d156e653e1b852e8eb92950c1505f5280638cee88f3eb6b1a08594aa",
       "flags": [],
       "officialScope": null,
-      "cropStatus": "original_pending_clean_crop_review"
+      "cropStatus": "derived_clean",
+      "displayAssetSha256": "b6d9f5c2e1aa157737fb1172e05b3a12dbab8590d6779796ede3568c5402d63c",
+      "displayDecision": "cropped_clean"
     },
     {
       "id": "MOEX-C002-090040-S4004-STAGE1-Q076",
@@ -1845,7 +1995,9 @@
       "originalCropSha256": "92c3bdfc7c1cf6abf175a4c3c776069945655bc6269ad86583b063269ee5600b",
       "flags": [],
       "officialScope": null,
-      "cropStatus": "original_pending_clean_crop_review"
+      "cropStatus": "derived_clean",
+      "displayAssetSha256": "69232488fb7bf2d5dc427712f21e5db300376d90dbeaca897428dc640a6bce8a",
+      "displayDecision": "cropped_clean"
     },
     {
       "id": "MOEX-C002-090040-S4004-STAGE1-Q077",
@@ -1869,7 +2021,9 @@
       "originalCropSha256": "fe43401cf872c709cbbaa8ef5693433917fbc3d8ca62fa4880e81b1d681e7bec",
       "flags": [],
       "officialScope": null,
-      "cropStatus": "original_pending_clean_crop_review"
+      "cropStatus": "derived_clean",
+      "displayAssetSha256": "0068a8c233f6a9f1aa2099e32864d6c43a6231c5595ea950f9f36de81598ff1d",
+      "displayDecision": "cropped_clean"
     },
     {
       "id": "MOEX-C002-090040-S4004-STAGE1-Q078",
@@ -1893,7 +2047,9 @@
       "originalCropSha256": "2cfb79639bfad9f1645205473d489e43704aa4bf1eccf49a4d32d8aef913f710",
       "flags": [],
       "officialScope": null,
-      "cropStatus": "original_pending_clean_crop_review"
+      "cropStatus": "original_retained_residual",
+      "displayAssetSha256": "2cfb79639bfad9f1645205473d489e43704aa4bf1eccf49a4d32d8aef913f710",
+      "displayDecision": "unchanged_cannot_safely_clean"
     },
     {
       "id": "MOEX-C002-090040-S4004-STAGE1-Q079",
@@ -1917,7 +2073,9 @@
       "originalCropSha256": "6a10286605e0ba0dd75a7da4d3d97ad74f541b47d88f0d3bd713ea896d24c610",
       "flags": [],
       "officialScope": null,
-      "cropStatus": "original_pending_clean_crop_review"
+      "cropStatus": "original_retained_residual",
+      "displayAssetSha256": "6a10286605e0ba0dd75a7da4d3d97ad74f541b47d88f0d3bd713ea896d24c610",
+      "displayDecision": "unchanged_cannot_safely_clean"
     },
     {
       "id": "MOEX-C002-090040-S4004-STAGE1-Q080",
@@ -1941,7 +2099,9 @@
       "originalCropSha256": "1d565498cd0e37fe3e84b3abc0f83e3a1c39d8e0c4d7946d5ca31f984bd2cac0",
       "flags": [],
       "officialScope": null,
-      "cropStatus": "original_pending_clean_crop_review"
+      "cropStatus": "derived_clean",
+      "displayAssetSha256": "8cae7d9a0a22dd336ff649f0b1ff4e8a1150864c86c5593cba7f834ca7d28d2f",
+      "displayDecision": "cropped_clean"
     },
     {
       "id": "MOEX-C002-090040-S5004-STAGE1-Q001",
@@ -1965,7 +2125,9 @@
       "originalCropSha256": "ae2fa2a5bac04287d1de931d934e719b166ac5344ba668d8463e88e81ada47ac",
       "flags": [],
       "officialScope": null,
-      "cropStatus": "original_pending_clean_crop_review"
+      "cropStatus": "original_retained_residual",
+      "displayAssetSha256": "ae2fa2a5bac04287d1de931d934e719b166ac5344ba668d8463e88e81ada47ac",
+      "displayDecision": "unchanged_cannot_safely_clean"
     },
     {
       "id": "MOEX-C002-090040-S5004-STAGE1-Q002",
@@ -1989,7 +2151,9 @@
       "originalCropSha256": "d3bd191125bfb88ae2c20d235f7e89bfd89fa6d23ba28b65cf0bbcc3ed94e18b",
       "flags": [],
       "officialScope": null,
-      "cropStatus": "original_pending_clean_crop_review"
+      "cropStatus": "original_retained_residual",
+      "displayAssetSha256": "d3bd191125bfb88ae2c20d235f7e89bfd89fa6d23ba28b65cf0bbcc3ed94e18b",
+      "displayDecision": "unchanged_cannot_safely_clean"
     },
     {
       "id": "MOEX-C002-090040-S5004-STAGE1-Q003",
@@ -2013,7 +2177,9 @@
       "originalCropSha256": "9ba2109a6e820d821580a11a00e4af6e15feb274a677a31d516ae1364b70417c",
       "flags": [],
       "officialScope": null,
-      "cropStatus": "original_pending_clean_crop_review"
+      "cropStatus": "derived_clean",
+      "displayAssetSha256": "87937f6bcb5427705f7ab2d9130cf46afca1c7bd43acf86276cefe35950100a2",
+      "displayDecision": "cropped_clean"
     },
     {
       "id": "MOEX-C002-090040-S5004-STAGE1-Q004",
@@ -2037,7 +2203,9 @@
       "originalCropSha256": "9a2fdacc97e1e5395bb267ac947bdd9df248a94b700b4b1c712e5e7d927bc197",
       "flags": [],
       "officialScope": null,
-      "cropStatus": "original_pending_clean_crop_review"
+      "cropStatus": "derived_clean",
+      "displayAssetSha256": "efebd2d6d047a84f6cd20feba54794ebc3f11d9215ca6543d805533240295336",
+      "displayDecision": "cropped_clean"
     },
     {
       "id": "MOEX-C002-090040-S5004-STAGE1-Q005",
@@ -2061,7 +2229,9 @@
       "originalCropSha256": "c443848b9f76397499d34619ad69f4efc5d0c455d6d9ee0ecce3ddf82583136c",
       "flags": [],
       "officialScope": null,
-      "cropStatus": "original_pending_clean_crop_review"
+      "cropStatus": "original_retained_residual",
+      "displayAssetSha256": "c443848b9f76397499d34619ad69f4efc5d0c455d6d9ee0ecce3ddf82583136c",
+      "displayDecision": "unchanged_cannot_safely_clean"
     },
     {
       "id": "MOEX-C002-090040-S5004-STAGE1-Q006",
@@ -2085,7 +2255,9 @@
       "originalCropSha256": "8fafe020133e274fc46ff38e2f1b86034c1d9071b979f00743d8b0fba866ccf4",
       "flags": [],
       "officialScope": null,
-      "cropStatus": "original_pending_clean_crop_review"
+      "cropStatus": "original_retained_residual",
+      "displayAssetSha256": "8fafe020133e274fc46ff38e2f1b86034c1d9071b979f00743d8b0fba866ccf4",
+      "displayDecision": "unchanged_cannot_safely_clean"
     },
     {
       "id": "MOEX-C002-090040-S5004-STAGE1-Q007",
@@ -2109,7 +2281,9 @@
       "originalCropSha256": "80998568cd814bf341ab12579d599abca0ec536c129d6686021722c41ed40100",
       "flags": [],
       "officialScope": null,
-      "cropStatus": "original_pending_clean_crop_review"
+      "cropStatus": "original_retained_residual",
+      "displayAssetSha256": "80998568cd814bf341ab12579d599abca0ec536c129d6686021722c41ed40100",
+      "displayDecision": "unchanged_cannot_safely_clean"
     },
     {
       "id": "MOEX-C002-090040-S5004-STAGE1-Q008",
@@ -2133,7 +2307,9 @@
       "originalCropSha256": "1ebcf087a88203d6e35a44d7b9dffa6fad068587fbc34463a4974bda6381284f",
       "flags": [],
       "officialScope": null,
-      "cropStatus": "original_pending_clean_crop_review"
+      "cropStatus": "original_retained_residual",
+      "displayAssetSha256": "1ebcf087a88203d6e35a44d7b9dffa6fad068587fbc34463a4974bda6381284f",
+      "displayDecision": "unchanged_cannot_safely_clean"
     },
     {
       "id": "MOEX-C002-090040-S5004-STAGE1-Q009",
@@ -2157,7 +2333,9 @@
       "originalCropSha256": "d0b998a964da4bf6aef41d9c0be5ee9dfae21035a9757479cec63b7ec77bcb24",
       "flags": [],
       "officialScope": null,
-      "cropStatus": "original_pending_clean_crop_review"
+      "cropStatus": "derived_clean",
+      "displayAssetSha256": "ca4c3e10e2d63a763d614b73a4a81268db93eda8978bcde959ae50ab1ae763a9",
+      "displayDecision": "cropped_clean"
     },
     {
       "id": "MOEX-C002-090040-S5004-STAGE1-Q010",
@@ -2181,7 +2359,9 @@
       "originalCropSha256": "d7e686e30b444d5daec9bc0600cd893dbcb5b2fd816caa1f5e17fe1e99ad2e07",
       "flags": [],
       "officialScope": null,
-      "cropStatus": "original_pending_clean_crop_review"
+      "cropStatus": "original_retained_residual",
+      "displayAssetSha256": "d7e686e30b444d5daec9bc0600cd893dbcb5b2fd816caa1f5e17fe1e99ad2e07",
+      "displayDecision": "unchanged_cannot_safely_clean"
     },
     {
       "id": "MOEX-C002-090040-S5004-STAGE1-Q011",
@@ -2205,7 +2385,9 @@
       "originalCropSha256": "2e8d5757c6aad83c0148674c2908a5af627af250d8a93c578e8e24b8fa10df91",
       "flags": [],
       "officialScope": null,
-      "cropStatus": "original_pending_clean_crop_review"
+      "cropStatus": "original_retained_residual",
+      "displayAssetSha256": "2e8d5757c6aad83c0148674c2908a5af627af250d8a93c578e8e24b8fa10df91",
+      "displayDecision": "unchanged_cannot_safely_clean"
     },
     {
       "id": "MOEX-C002-090040-S5004-STAGE1-Q012",
@@ -2229,7 +2411,9 @@
       "originalCropSha256": "23e7e108888a493be0536870937942cf16560a8dafcf038fafb90c08ef3aa663",
       "flags": [],
       "officialScope": null,
-      "cropStatus": "original_pending_clean_crop_review"
+      "cropStatus": "derived_clean",
+      "displayAssetSha256": "bf4e3889033a574f0f04b8171d539274083e24f8915a10c009bd92ff0c03931c",
+      "displayDecision": "cropped_clean"
     },
     {
       "id": "MOEX-C002-090040-S5004-STAGE1-Q013",
@@ -2253,7 +2437,9 @@
       "originalCropSha256": "f6f26ea407de6bf060cef74c355f34a58f1c8cef5678ca770a72c65477d73b32",
       "flags": [],
       "officialScope": null,
-      "cropStatus": "original_pending_clean_crop_review"
+      "cropStatus": "derived_clean",
+      "displayAssetSha256": "92003d081fc5168f4582a95a59093b09b8fd563baa4f6a1d3c47dffb3f462d40",
+      "displayDecision": "cropped_clean"
     },
     {
       "id": "MOEX-C002-090040-S5004-STAGE1-Q014",
@@ -2277,7 +2463,9 @@
       "originalCropSha256": "b6539249e7b034ff020bfaadce503e3ec0e9e4ae6cd420c40b104505be328080",
       "flags": [],
       "officialScope": null,
-      "cropStatus": "original_pending_clean_crop_review"
+      "cropStatus": "derived_clean",
+      "displayAssetSha256": "95396fc66156c9716b29f9d047da4164fb2fc6dd6186e366ce90803ece794738",
+      "displayDecision": "cropped_clean"
     },
     {
       "id": "MOEX-C002-090040-S5004-STAGE1-Q015",
@@ -2301,7 +2489,9 @@
       "originalCropSha256": "f4e9eaa6ce929c919bb00614ee16b1f2212906027ee602bc0aefab86d4041f95",
       "flags": [],
       "officialScope": null,
-      "cropStatus": "original_pending_clean_crop_review"
+      "cropStatus": "derived_clean",
+      "displayAssetSha256": "e307a534cdb61ca5248f346d3fb903860d9fed4a7bea80c867d7b603cb33d046",
+      "displayDecision": "cropped_clean"
     },
     {
       "id": "MOEX-C002-090040-S5004-STAGE1-Q016",
@@ -2325,7 +2515,9 @@
       "originalCropSha256": "019992c23ca95449ee59d42f8da26e1b6c02c6ad09643eb6b3cb562dddb5d624",
       "flags": [],
       "officialScope": null,
-      "cropStatus": "original_pending_clean_crop_review"
+      "cropStatus": "derived_clean",
+      "displayAssetSha256": "79f47bb6958e46760c22a663539e30572eca58aa03f3d8f1ee74affca34c64d5",
+      "displayDecision": "cropped_clean"
     },
     {
       "id": "MOEX-C002-090040-S5004-STAGE1-Q017",
@@ -2349,7 +2541,9 @@
       "originalCropSha256": "bc8d709da949e0e7ddd30f45b0f7249e129501117ecea485773a1cb0452f4ca7",
       "flags": [],
       "officialScope": null,
-      "cropStatus": "original_pending_clean_crop_review"
+      "cropStatus": "original_retained_residual",
+      "displayAssetSha256": "bc8d709da949e0e7ddd30f45b0f7249e129501117ecea485773a1cb0452f4ca7",
+      "displayDecision": "unchanged_cannot_safely_clean"
     },
     {
       "id": "MOEX-C002-090040-S5004-STAGE1-Q018",
@@ -2373,7 +2567,9 @@
       "originalCropSha256": "eb1c996c6a0257ef7fa0c0f53ba605c4107ddad08eafc54cfd2bc49196e3c51a",
       "flags": [],
       "officialScope": null,
-      "cropStatus": "original_pending_clean_crop_review"
+      "cropStatus": "original_retained_residual",
+      "displayAssetSha256": "eb1c996c6a0257ef7fa0c0f53ba605c4107ddad08eafc54cfd2bc49196e3c51a",
+      "displayDecision": "unchanged_cannot_safely_clean"
     },
     {
       "id": "MOEX-C002-090040-S5004-STAGE1-Q019",
@@ -2397,7 +2593,9 @@
       "originalCropSha256": "e7a0a899cd4d5a4d652288300434f5d07cfc1f070a53527819e3c05921795966",
       "flags": [],
       "officialScope": null,
-      "cropStatus": "original_pending_clean_crop_review"
+      "cropStatus": "original_retained_residual",
+      "displayAssetSha256": "e7a0a899cd4d5a4d652288300434f5d07cfc1f070a53527819e3c05921795966",
+      "displayDecision": "unchanged_cannot_safely_clean"
     },
     {
       "id": "MOEX-C002-090040-S5004-STAGE1-Q020",
@@ -2421,7 +2619,9 @@
       "originalCropSha256": "6befb7c7cb95761bda0c7c9983bf14f3a9b2537430c86fcdf6eafc400d8e8b07",
       "flags": [],
       "officialScope": null,
-      "cropStatus": "original_pending_clean_crop_review"
+      "cropStatus": "original_retained_residual",
+      "displayAssetSha256": "6befb7c7cb95761bda0c7c9983bf14f3a9b2537430c86fcdf6eafc400d8e8b07",
+      "displayDecision": "unchanged_cannot_safely_clean"
     },
     {
       "id": "MOEX-C002-090040-S5004-STAGE1-Q021",
@@ -2445,7 +2645,9 @@
       "originalCropSha256": "523d0434c15e5e1a8f5833609f47c61b7398908c6493725653292d6fb978ce27",
       "flags": [],
       "officialScope": null,
-      "cropStatus": "original_pending_clean_crop_review"
+      "cropStatus": "original_retained_residual",
+      "displayAssetSha256": "523d0434c15e5e1a8f5833609f47c61b7398908c6493725653292d6fb978ce27",
+      "displayDecision": "unchanged_cannot_safely_clean"
     },
     {
       "id": "MOEX-C002-090040-S5004-STAGE1-Q022",
@@ -2469,7 +2671,9 @@
       "originalCropSha256": "1514e79661ce790720893825e7b99383bf4bf5af983de10d3364d3df6c51a4cc",
       "flags": [],
       "officialScope": null,
-      "cropStatus": "original_pending_clean_crop_review"
+      "cropStatus": "original_retained_residual",
+      "displayAssetSha256": "1514e79661ce790720893825e7b99383bf4bf5af983de10d3364d3df6c51a4cc",
+      "displayDecision": "unchanged_cannot_safely_clean"
     },
     {
       "id": "MOEX-C002-090040-S5004-STAGE1-Q023",
@@ -2493,7 +2697,9 @@
       "originalCropSha256": "6c4da7ce2760f8da17d031afde46751b7751ee138f1ac8b48c88458d7a88de8d",
       "flags": [],
       "officialScope": null,
-      "cropStatus": "original_pending_clean_crop_review"
+      "cropStatus": "original_retained_residual",
+      "displayAssetSha256": "6c4da7ce2760f8da17d031afde46751b7751ee138f1ac8b48c88458d7a88de8d",
+      "displayDecision": "unchanged_cannot_safely_clean"
     },
     {
       "id": "MOEX-C002-090040-S5004-STAGE1-Q024",
@@ -2517,7 +2723,9 @@
       "originalCropSha256": "19ca57e1be92afda253388ccda9e9fc845c58b3efd6761d840a380f0dbbbbae0",
       "flags": [],
       "officialScope": null,
-      "cropStatus": "original_pending_clean_crop_review"
+      "cropStatus": "derived_clean",
+      "displayAssetSha256": "c4bc0606cbce2efc278f95f4fc44a0c67fbc6fa19457096e3da9a11d6ac5e4b1",
+      "displayDecision": "cropped_clean"
     },
     {
       "id": "MOEX-C002-090040-S5004-STAGE1-Q025",
@@ -2541,7 +2749,9 @@
       "originalCropSha256": "0d31aecbf380263ac2f782630ce72467dedd79897fba17c7edabee1063607d4e",
       "flags": [],
       "officialScope": null,
-      "cropStatus": "original_pending_clean_crop_review"
+      "cropStatus": "original_retained_residual",
+      "displayAssetSha256": "0d31aecbf380263ac2f782630ce72467dedd79897fba17c7edabee1063607d4e",
+      "displayDecision": "unchanged_cannot_safely_clean"
     },
     {
       "id": "MOEX-C002-090040-S5004-STAGE1-Q026",
@@ -2565,7 +2775,9 @@
       "originalCropSha256": "28c4201d77c0a48fbe465134df89146de3035a7ee31cb5c4cee0afdd96f09cfa",
       "flags": [],
       "officialScope": null,
-      "cropStatus": "original_pending_clean_crop_review"
+      "cropStatus": "original_retained_residual",
+      "displayAssetSha256": "28c4201d77c0a48fbe465134df89146de3035a7ee31cb5c4cee0afdd96f09cfa",
+      "displayDecision": "unchanged_cannot_safely_clean"
     },
     {
       "id": "MOEX-C002-090040-S5004-STAGE1-Q027",
@@ -2589,7 +2801,9 @@
       "originalCropSha256": "2aed9875e78fd4f2a1578bd9738b20ac12ea37a7b1e0723acce301ca32df8845",
       "flags": [],
       "officialScope": null,
-      "cropStatus": "original_pending_clean_crop_review"
+      "cropStatus": "original_retained_residual",
+      "displayAssetSha256": "2aed9875e78fd4f2a1578bd9738b20ac12ea37a7b1e0723acce301ca32df8845",
+      "displayDecision": "unchanged_cannot_safely_clean"
     },
     {
       "id": "MOEX-C002-090040-S5004-STAGE1-Q028",
@@ -2613,7 +2827,9 @@
       "originalCropSha256": "43b8f444ce0ba781bd334779ac89e9f168d18ea7c5097e3ede24c12b1d434a81",
       "flags": [],
       "officialScope": null,
-      "cropStatus": "original_pending_clean_crop_review"
+      "cropStatus": "derived_clean",
+      "displayAssetSha256": "9d571ccb034e5a87aad176d2b767b5a841051476b6ee0fc72785563188b2c4da",
+      "displayDecision": "cropped_clean"
     },
     {
       "id": "MOEX-C002-090040-S5004-STAGE1-Q029",
@@ -2637,7 +2853,9 @@
       "originalCropSha256": "ba39f1efeee559e969a6ea5c37c6c7016f4bb550a9f50eca1261a0c1f49cfe7b",
       "flags": [],
       "officialScope": null,
-      "cropStatus": "original_pending_clean_crop_review"
+      "cropStatus": "original_retained_residual",
+      "displayAssetSha256": "ba39f1efeee559e969a6ea5c37c6c7016f4bb550a9f50eca1261a0c1f49cfe7b",
+      "displayDecision": "unchanged_cannot_safely_clean"
     },
     {
       "id": "MOEX-C002-090040-S5004-STAGE1-Q030",
@@ -2661,7 +2879,9 @@
       "originalCropSha256": "283a2f59b3bbb28aafbb3bb619c26b5f1059226819f808ecf8e04ad0658489f5",
       "flags": [],
       "officialScope": null,
-      "cropStatus": "original_pending_clean_crop_review"
+      "cropStatus": "original_retained_residual",
+      "displayAssetSha256": "283a2f59b3bbb28aafbb3bb619c26b5f1059226819f808ecf8e04ad0658489f5",
+      "displayDecision": "unchanged_cannot_safely_clean"
     },
     {
       "id": "MOEX-C002-090040-S5004-STAGE1-Q031",
@@ -2685,7 +2905,9 @@
       "originalCropSha256": "7a512a9ae9d8e38633142c74a0741ed594c3b8d3ee3b068c56324e51b5e4896e",
       "flags": [],
       "officialScope": null,
-      "cropStatus": "original_pending_clean_crop_review"
+      "cropStatus": "original_retained_residual",
+      "displayAssetSha256": "7a512a9ae9d8e38633142c74a0741ed594c3b8d3ee3b068c56324e51b5e4896e",
+      "displayDecision": "unchanged_cannot_safely_clean"
     },
     {
       "id": "MOEX-C002-090040-S5004-STAGE1-Q032",
@@ -2709,7 +2931,9 @@
       "originalCropSha256": "2cc51af33fe0f84eb8ba45ae9dad2b7c9db9c88e98c9083d23d2dd2b3be2f3f6",
       "flags": [],
       "officialScope": null,
-      "cropStatus": "original_pending_clean_crop_review"
+      "cropStatus": "original_retained_residual",
+      "displayAssetSha256": "2cc51af33fe0f84eb8ba45ae9dad2b7c9db9c88e98c9083d23d2dd2b3be2f3f6",
+      "displayDecision": "unchanged_cannot_safely_clean"
     },
     {
       "id": "MOEX-C002-090040-S5004-STAGE1-Q033",
@@ -2733,7 +2957,9 @@
       "originalCropSha256": "7558caadfcfcec9481ab68ba3a87eb1b332ab48606cc4b57290ee8690bd1bd9e",
       "flags": [],
       "officialScope": null,
-      "cropStatus": "original_pending_clean_crop_review"
+      "cropStatus": "original_retained_residual",
+      "displayAssetSha256": "7558caadfcfcec9481ab68ba3a87eb1b332ab48606cc4b57290ee8690bd1bd9e",
+      "displayDecision": "unchanged_cannot_safely_clean"
     },
     {
       "id": "MOEX-C002-090040-S5004-STAGE1-Q034",
@@ -2757,7 +2983,9 @@
       "originalCropSha256": "f836ae3c902604690ecac96689d8dece51f7b202fa13d52070e57d4d518f8fe6",
       "flags": [],
       "officialScope": null,
-      "cropStatus": "original_pending_clean_crop_review"
+      "cropStatus": "original_retained_residual",
+      "displayAssetSha256": "f836ae3c902604690ecac96689d8dece51f7b202fa13d52070e57d4d518f8fe6",
+      "displayDecision": "unchanged_cannot_safely_clean"
     },
     {
       "id": "MOEX-C002-090040-S5004-STAGE1-Q035",
@@ -2781,7 +3009,9 @@
       "originalCropSha256": "1c9fbe140e6f7502d7751808262785ce1f1ca2531af71cb5dfb56b3981ad7b9a",
       "flags": [],
       "officialScope": null,
-      "cropStatus": "original_pending_clean_crop_review"
+      "cropStatus": "original_retained_residual",
+      "displayAssetSha256": "1c9fbe140e6f7502d7751808262785ce1f1ca2531af71cb5dfb56b3981ad7b9a",
+      "displayDecision": "unchanged_cannot_safely_clean"
     },
     {
       "id": "MOEX-C002-090040-S5004-STAGE1-Q036",
@@ -2805,7 +3035,9 @@
       "originalCropSha256": "b2fda7f3274fe7e47348f262942f1ff58cedafa0827a6e5a4bbceb6f6c9711b4",
       "flags": [],
       "officialScope": null,
-      "cropStatus": "original_pending_clean_crop_review"
+      "cropStatus": "original_retained_residual",
+      "displayAssetSha256": "b2fda7f3274fe7e47348f262942f1ff58cedafa0827a6e5a4bbceb6f6c9711b4",
+      "displayDecision": "unchanged_cannot_safely_clean"
     },
     {
       "id": "MOEX-C002-090040-S5004-STAGE1-Q037",
@@ -2829,7 +3061,9 @@
       "originalCropSha256": "0201fa91cca8bcce2f6231f1c3db48c090b0e5104049c784b18cdf8ae1f7fc61",
       "flags": [],
       "officialScope": null,
-      "cropStatus": "original_pending_clean_crop_review"
+      "cropStatus": "original_retained_residual",
+      "displayAssetSha256": "0201fa91cca8bcce2f6231f1c3db48c090b0e5104049c784b18cdf8ae1f7fc61",
+      "displayDecision": "unchanged_cannot_safely_clean"
     },
     {
       "id": "MOEX-C002-090040-S5004-STAGE1-Q038",
@@ -2863,7 +3097,9 @@
         }
       ],
       "officialScope": null,
-      "cropStatus": "original_pending_clean_crop_review"
+      "cropStatus": "original_retained_residual",
+      "displayAssetSha256": "8217dc68f1edc920aed7c88accdc05ea33dc762cb65f018659c237cd4096f661",
+      "displayDecision": "unchanged_cannot_safely_clean"
     },
     {
       "id": "MOEX-C002-090040-S5004-STAGE1-Q039",
@@ -2887,7 +3123,9 @@
       "originalCropSha256": "8114c808c0bd59fb853086fa0192603d0e1b89cd9bcfb9b9483e06b40cfbe8c9",
       "flags": [],
       "officialScope": null,
-      "cropStatus": "original_pending_clean_crop_review"
+      "cropStatus": "derived_clean",
+      "displayAssetSha256": "2f36f4f376b5e35a3e77a50e0bceb899002788226ca7a93b4772bf998b3fdf1d",
+      "displayDecision": "cropped_clean"
     },
     {
       "id": "MOEX-C002-090040-S5004-STAGE1-Q040",
@@ -2911,7 +3149,9 @@
       "originalCropSha256": "50e7f3f99b86b956d0f98e9e6d514eb8c7c778c3aa16676b2e7f667eae751421",
       "flags": [],
       "officialScope": null,
-      "cropStatus": "original_pending_clean_crop_review"
+      "cropStatus": "derived_clean",
+      "displayAssetSha256": "44c53dbaae7e36170aba178b96a3d09611793c5fd61b82e54fcb6af1bf00f24e",
+      "displayDecision": "cropped_clean"
     },
     {
       "id": "MOEX-C002-090040-S5004-STAGE1-Q041",
@@ -2935,7 +3175,9 @@
       "originalCropSha256": "c03f1a3a8f67afb7da3ac58d3dad69eca281ae5b1130c2f0834c13fa0d52348d",
       "flags": [],
       "officialScope": null,
-      "cropStatus": "original_pending_clean_crop_review"
+      "cropStatus": "original_retained_residual",
+      "displayAssetSha256": "c03f1a3a8f67afb7da3ac58d3dad69eca281ae5b1130c2f0834c13fa0d52348d",
+      "displayDecision": "unchanged_cannot_safely_clean"
     },
     {
       "id": "MOEX-C002-090040-S5004-STAGE1-Q042",
@@ -2959,7 +3201,9 @@
       "originalCropSha256": "864f9521c53eae79fc532380fb5f6030a1353f265bd45a85c49e36b3a5dc4ff0",
       "flags": [],
       "officialScope": null,
-      "cropStatus": "original_pending_clean_crop_review"
+      "cropStatus": "original_retained_residual",
+      "displayAssetSha256": "864f9521c53eae79fc532380fb5f6030a1353f265bd45a85c49e36b3a5dc4ff0",
+      "displayDecision": "unchanged_cannot_safely_clean"
     },
     {
       "id": "MOEX-C002-090040-S5004-STAGE1-Q043",
@@ -2983,7 +3227,9 @@
       "originalCropSha256": "3c489f7569129047575228a2d3c8461c761e5839cc37dfc39e53339081aeef66",
       "flags": [],
       "officialScope": null,
-      "cropStatus": "original_pending_clean_crop_review"
+      "cropStatus": "original_retained_residual",
+      "displayAssetSha256": "3c489f7569129047575228a2d3c8461c761e5839cc37dfc39e53339081aeef66",
+      "displayDecision": "unchanged_cannot_safely_clean"
     },
     {
       "id": "MOEX-C002-090040-S5004-STAGE1-Q044",
@@ -3007,7 +3253,9 @@
       "originalCropSha256": "d56d7187da1993dc13c121f967d37b211a21e5d28cd05ae67000d32c052b434c",
       "flags": [],
       "officialScope": null,
-      "cropStatus": "original_pending_clean_crop_review"
+      "cropStatus": "original_retained_residual",
+      "displayAssetSha256": "d56d7187da1993dc13c121f967d37b211a21e5d28cd05ae67000d32c052b434c",
+      "displayDecision": "unchanged_cannot_safely_clean"
     },
     {
       "id": "MOEX-C002-090040-S5004-STAGE1-Q045",
@@ -3031,7 +3279,9 @@
       "originalCropSha256": "9961f79ea594ca5131be8153893198a9bfa4d3973ee97ff09984b88af86b6130",
       "flags": [],
       "officialScope": null,
-      "cropStatus": "original_pending_clean_crop_review"
+      "cropStatus": "original_retained_residual",
+      "displayAssetSha256": "9961f79ea594ca5131be8153893198a9bfa4d3973ee97ff09984b88af86b6130",
+      "displayDecision": "unchanged_cannot_safely_clean"
     },
     {
       "id": "MOEX-C002-090040-S5004-STAGE1-Q046",
@@ -3055,7 +3305,9 @@
       "originalCropSha256": "bef782cca7c7bf8c555d0039cd066fe06bb77e02fcfc18f8fcb3d5b1229964be",
       "flags": [],
       "officialScope": null,
-      "cropStatus": "original_pending_clean_crop_review"
+      "cropStatus": "original_retained_residual",
+      "displayAssetSha256": "bef782cca7c7bf8c555d0039cd066fe06bb77e02fcfc18f8fcb3d5b1229964be",
+      "displayDecision": "unchanged_cannot_safely_clean"
     },
     {
       "id": "MOEX-C002-090040-S5004-STAGE1-Q047",
@@ -3079,7 +3331,9 @@
       "originalCropSha256": "99fd922e98b484ac2afe2a2d3a38aaa6ff1183e0adba97360300bab6e76b6201",
       "flags": [],
       "officialScope": null,
-      "cropStatus": "original_pending_clean_crop_review"
+      "cropStatus": "original_retained_residual",
+      "displayAssetSha256": "99fd922e98b484ac2afe2a2d3a38aaa6ff1183e0adba97360300bab6e76b6201",
+      "displayDecision": "unchanged_cannot_safely_clean"
     },
     {
       "id": "MOEX-C002-090040-S5004-STAGE1-Q048",
@@ -3103,7 +3357,9 @@
       "originalCropSha256": "26083c80bc8abfd3c8510a609d366824bb93d651190973290dcf20f434b1cbc8",
       "flags": [],
       "officialScope": null,
-      "cropStatus": "original_pending_clean_crop_review"
+      "cropStatus": "original_retained_residual",
+      "displayAssetSha256": "26083c80bc8abfd3c8510a609d366824bb93d651190973290dcf20f434b1cbc8",
+      "displayDecision": "unchanged_cannot_safely_clean"
     },
     {
       "id": "MOEX-C002-090040-S5004-STAGE1-Q049",
@@ -3127,7 +3383,9 @@
       "originalCropSha256": "9ed155e3e92464df10fa19dc5b6b2497ddbb318eebad376d7de43361f8b4d207",
       "flags": [],
       "officialScope": null,
-      "cropStatus": "original_pending_clean_crop_review"
+      "cropStatus": "original_retained_residual",
+      "displayAssetSha256": "9ed155e3e92464df10fa19dc5b6b2497ddbb318eebad376d7de43361f8b4d207",
+      "displayDecision": "unchanged_cannot_safely_clean"
     },
     {
       "id": "MOEX-C002-090040-S5004-STAGE1-Q050",
@@ -3151,7 +3409,9 @@
       "originalCropSha256": "26cd9c980b3c9313f7f3c0131244a967fb5d76e5015bfea78ef261c58c1a9298",
       "flags": [],
       "officialScope": null,
-      "cropStatus": "original_pending_clean_crop_review"
+      "cropStatus": "original_retained_residual",
+      "displayAssetSha256": "26cd9c980b3c9313f7f3c0131244a967fb5d76e5015bfea78ef261c58c1a9298",
+      "displayDecision": "unchanged_cannot_safely_clean"
     },
     {
       "id": "MOEX-C002-090040-S5004-STAGE1-Q051",
@@ -3175,7 +3435,9 @@
       "originalCropSha256": "e7bb270bb2a14792064fa51b7f4b73ac0815146329d571e672c966ea7e20914b",
       "flags": [],
       "officialScope": null,
-      "cropStatus": "original_pending_clean_crop_review"
+      "cropStatus": "original_retained_residual",
+      "displayAssetSha256": "e7bb270bb2a14792064fa51b7f4b73ac0815146329d571e672c966ea7e20914b",
+      "displayDecision": "unchanged_cannot_safely_clean"
     },
     {
       "id": "MOEX-C002-090040-S5004-STAGE1-Q052",
@@ -3199,7 +3461,9 @@
       "originalCropSha256": "c319c2204bfed0f2c59fa2a4582af2dee8f892176e27eb5b6e4a69eb0ac9ecec",
       "flags": [],
       "officialScope": null,
-      "cropStatus": "original_pending_clean_crop_review"
+      "cropStatus": "original_retained_residual",
+      "displayAssetSha256": "c319c2204bfed0f2c59fa2a4582af2dee8f892176e27eb5b6e4a69eb0ac9ecec",
+      "displayDecision": "unchanged_cannot_safely_clean"
     },
     {
       "id": "MOEX-C002-090040-S5004-STAGE1-Q053",
@@ -3223,7 +3487,9 @@
       "originalCropSha256": "8f4792114e094b3dbbe9e41dd6d9759c2536a8e2567e1e82dad824ef9f704994",
       "flags": [],
       "officialScope": null,
-      "cropStatus": "original_pending_clean_crop_review"
+      "cropStatus": "original_retained_residual",
+      "displayAssetSha256": "8f4792114e094b3dbbe9e41dd6d9759c2536a8e2567e1e82dad824ef9f704994",
+      "displayDecision": "unchanged_cannot_safely_clean"
     },
     {
       "id": "MOEX-C002-090040-S5004-STAGE1-Q054",
@@ -3247,7 +3513,9 @@
       "originalCropSha256": "981cac056b58a5eb8ddf8cadd7677d21b503151f7d9901034f3cad5f20de958b",
       "flags": [],
       "officialScope": null,
-      "cropStatus": "original_pending_clean_crop_review"
+      "cropStatus": "original_retained_residual",
+      "displayAssetSha256": "981cac056b58a5eb8ddf8cadd7677d21b503151f7d9901034f3cad5f20de958b",
+      "displayDecision": "unchanged_cannot_safely_clean"
     },
     {
       "id": "MOEX-C002-090040-S5004-STAGE1-Q055",
@@ -3271,7 +3539,9 @@
       "originalCropSha256": "852c4cce7bc07f2351ccacc996d13f0e19c358d8c0629a7d88f2c5e1dc5f3beb",
       "flags": [],
       "officialScope": null,
-      "cropStatus": "original_pending_clean_crop_review"
+      "cropStatus": "original_retained_residual",
+      "displayAssetSha256": "852c4cce7bc07f2351ccacc996d13f0e19c358d8c0629a7d88f2c5e1dc5f3beb",
+      "displayDecision": "unchanged_cannot_safely_clean"
     },
     {
       "id": "MOEX-C002-090040-S5004-STAGE1-Q056",
@@ -3295,7 +3565,9 @@
       "originalCropSha256": "599a6311847c7e3ca19da3f77f9f770d6c2c92760684ab60c9e778827588f3a9",
       "flags": [],
       "officialScope": null,
-      "cropStatus": "original_pending_clean_crop_review"
+      "cropStatus": "original_retained_residual",
+      "displayAssetSha256": "599a6311847c7e3ca19da3f77f9f770d6c2c92760684ab60c9e778827588f3a9",
+      "displayDecision": "unchanged_cannot_safely_clean"
     },
     {
       "id": "MOEX-C002-090040-S5004-STAGE1-Q057",
@@ -3319,7 +3591,9 @@
       "originalCropSha256": "feb2fc55bd3bccd844a2d0507d9eb7bdd98b012fdc197781f92369af9c99dbe7",
       "flags": [],
       "officialScope": null,
-      "cropStatus": "original_pending_clean_crop_review"
+      "cropStatus": "original_retained_residual",
+      "displayAssetSha256": "feb2fc55bd3bccd844a2d0507d9eb7bdd98b012fdc197781f92369af9c99dbe7",
+      "displayDecision": "unchanged_cannot_safely_clean"
     },
     {
       "id": "MOEX-C002-090040-S5004-STAGE1-Q058",
@@ -3343,7 +3617,9 @@
       "originalCropSha256": "77f5e84369d44a9a3873b58a5c640043e107f3ebcdc9094a57dbda6433201dfd",
       "flags": [],
       "officialScope": null,
-      "cropStatus": "original_pending_clean_crop_review"
+      "cropStatus": "original_retained_residual",
+      "displayAssetSha256": "77f5e84369d44a9a3873b58a5c640043e107f3ebcdc9094a57dbda6433201dfd",
+      "displayDecision": "unchanged_cannot_safely_clean"
     },
     {
       "id": "MOEX-C002-090040-S5004-STAGE1-Q059",
@@ -3367,7 +3643,9 @@
       "originalCropSha256": "5ecc93e55faa8c703d245fd0f51981fd66509cfc3d12287ca54b4d530c75e313",
       "flags": [],
       "officialScope": null,
-      "cropStatus": "original_pending_clean_crop_review"
+      "cropStatus": "original_retained_residual",
+      "displayAssetSha256": "5ecc93e55faa8c703d245fd0f51981fd66509cfc3d12287ca54b4d530c75e313",
+      "displayDecision": "unchanged_cannot_safely_clean"
     },
     {
       "id": "MOEX-C002-090040-S5004-STAGE1-Q060",
@@ -3400,7 +3678,9 @@
         }
       ],
       "officialScope": null,
-      "cropStatus": "original_pending_clean_crop_review"
+      "cropStatus": "original_retained_residual",
+      "displayAssetSha256": "9efdc587773efe67ca519b156e3de9b667e0e5c388e8188d32be4ad061b845e8",
+      "displayDecision": "unchanged_cannot_safely_clean"
     },
     {
       "id": "MOEX-C002-090040-S5004-STAGE1-Q061",
@@ -3424,7 +3704,9 @@
       "originalCropSha256": "2f05c87b3e8cbfe68422857f9f8220a8df7427a89561e51ceded65efe6485a49",
       "flags": [],
       "officialScope": null,
-      "cropStatus": "original_pending_clean_crop_review"
+      "cropStatus": "derived_clean",
+      "displayAssetSha256": "59a7dcba8344857794b9767731667336206d38c81e3d7525e4063ca92167fdfb",
+      "displayDecision": "cropped_clean"
     },
     {
       "id": "MOEX-C002-090040-S5004-STAGE1-Q062",
@@ -3448,7 +3730,9 @@
       "originalCropSha256": "b95304b0db3a5b49b9e29d6965744501f8e7df040c95c5bfd6ac86a79f7fa930",
       "flags": [],
       "officialScope": null,
-      "cropStatus": "original_pending_clean_crop_review"
+      "cropStatus": "derived_clean",
+      "displayAssetSha256": "c67d021163ab7e9e2214ef55c31a64f45cf1821bd9ad4cc30a31d16a65b0cfdd",
+      "displayDecision": "cropped_clean"
     },
     {
       "id": "MOEX-C002-090040-S5004-STAGE1-Q063",
@@ -3472,7 +3756,9 @@
       "originalCropSha256": "e32f3b7aa016226960ced331f16d85dd35898062cf9de1830edaa3f6da27e30d",
       "flags": [],
       "officialScope": null,
-      "cropStatus": "original_pending_clean_crop_review"
+      "cropStatus": "derived_clean",
+      "displayAssetSha256": "93615d1a3765ded3c64b2cd4bb7ceb71cb3e06d7263ffd7d0e05a233ec229658",
+      "displayDecision": "cropped_clean"
     },
     {
       "id": "MOEX-C002-090040-S5004-STAGE1-Q064",
@@ -3496,7 +3782,9 @@
       "originalCropSha256": "66bd55405102fac5eaed901cd8aa408c122d19f48d5ed9e1d7a9ad90b40efef5",
       "flags": [],
       "officialScope": null,
-      "cropStatus": "original_pending_clean_crop_review"
+      "cropStatus": "derived_clean",
+      "displayAssetSha256": "1904756eadbc8e12a9966cd8a4cce70bf9938ff611ebdb30cbef70d9faeb8d82",
+      "displayDecision": "cropped_clean"
     },
     {
       "id": "MOEX-C002-090040-S5004-STAGE1-Q065",
@@ -3530,7 +3818,9 @@
         }
       ],
       "officialScope": null,
-      "cropStatus": "original_pending_clean_crop_review"
+      "cropStatus": "derived_clean",
+      "displayAssetSha256": "8448b0e216352b7510b3444782c94d1a3cc3a13aeec34f12f2084d1a8cb97377",
+      "displayDecision": "cropped_clean"
     },
     {
       "id": "MOEX-C002-090040-S5004-STAGE1-Q066",
@@ -3554,7 +3844,9 @@
       "originalCropSha256": "8fd7fab3e7ce30af3e9d5f04f86cdf458f9d5ea7c862896b0ce53e411bffdd99",
       "flags": [],
       "officialScope": null,
-      "cropStatus": "original_pending_clean_crop_review"
+      "cropStatus": "derived_clean",
+      "displayAssetSha256": "5f6cb154f4026cfe8a97ae9138eee7a5349f2341dba770b1b0f0a3af73c3da7d",
+      "displayDecision": "cropped_clean"
     },
     {
       "id": "MOEX-C002-090040-S5004-STAGE1-Q067",
@@ -3578,7 +3870,9 @@
       "originalCropSha256": "44ef2dc02ac29cb394ae7592c1feb8123a1054edc50f7adbd524627d0bcd0931",
       "flags": [],
       "officialScope": null,
-      "cropStatus": "original_pending_clean_crop_review"
+      "cropStatus": "derived_clean",
+      "displayAssetSha256": "40ba031c06c910c57f417f33a5821a52c05cb4e297247a94d4176944a3dffa12",
+      "displayDecision": "cropped_clean"
     },
     {
       "id": "MOEX-C002-090040-S5004-STAGE1-Q068",
@@ -3602,7 +3896,9 @@
       "originalCropSha256": "621f3f9ce98ba34f768913018486f802dbeeee964bd3a85763a6ce6063adfed5",
       "flags": [],
       "officialScope": null,
-      "cropStatus": "original_pending_clean_crop_review"
+      "cropStatus": "derived_clean",
+      "displayAssetSha256": "e45a2db1b5669bf802fdd8e8905c49f68c3cfd5d39af74192cb65182a14571be",
+      "displayDecision": "cropped_clean"
     },
     {
       "id": "MOEX-C002-090040-S5004-STAGE1-Q069",
@@ -3626,7 +3922,9 @@
       "originalCropSha256": "38f314f706dedc3b6ff07076ee6e482cf75c7824238b65e7ef19962b3954aefb",
       "flags": [],
       "officialScope": null,
-      "cropStatus": "original_pending_clean_crop_review"
+      "cropStatus": "derived_clean",
+      "displayAssetSha256": "b9b7b4c99fd8831ff91d20c7ce92cf0f39856047d02bd6f646315d9687c15482",
+      "displayDecision": "cropped_clean"
     },
     {
       "id": "MOEX-C002-090040-S5004-STAGE1-Q070",
@@ -3659,7 +3957,9 @@
         }
       ],
       "officialScope": null,
-      "cropStatus": "original_pending_clean_crop_review"
+      "cropStatus": "derived_clean",
+      "displayAssetSha256": "4ee530b7a551237fb214203c122b57468fb73a30fe12026e4c0b13c2d876872c",
+      "displayDecision": "cropped_clean"
     },
     {
       "id": "MOEX-C002-090040-S5004-STAGE1-Q071",
@@ -3683,7 +3983,9 @@
       "originalCropSha256": "955fb9343430807a4807095b715b2ea6a58fc7c75de234b352d55b2f69c7c99c",
       "flags": [],
       "officialScope": null,
-      "cropStatus": "original_pending_clean_crop_review"
+      "cropStatus": "derived_clean",
+      "displayAssetSha256": "1d67a0a97ee225d443db90b7a29a0ec06a70d83e9569cd6ec1d02f1342a17b16",
+      "displayDecision": "cropped_clean"
     },
     {
       "id": "MOEX-C002-090040-S5004-STAGE1-Q072",
@@ -3707,7 +4009,9 @@
       "originalCropSha256": "dae5857282d8d77e313aac1621972ddfd639f6c84dad0186db52be1c0998d477",
       "flags": [],
       "officialScope": null,
-      "cropStatus": "original_pending_clean_crop_review"
+      "cropStatus": "derived_clean",
+      "displayAssetSha256": "2c538da75630e49c3b3ef4de8cc6b7adf7aa3ce93ffabac661e88f58a6d22b21",
+      "displayDecision": "cropped_clean"
     },
     {
       "id": "MOEX-C002-090040-S5004-STAGE1-Q073",
@@ -3731,7 +4035,9 @@
       "originalCropSha256": "50b2b6a4501bdac882c117ee02949e2cc08f4c415f2ea7a06d43209a091919c2",
       "flags": [],
       "officialScope": null,
-      "cropStatus": "original_pending_clean_crop_review"
+      "cropStatus": "derived_clean",
+      "displayAssetSha256": "602fc17fdf1c1ebc2f84c8a0cf14487101e5aadbde52a0ebb42188c11417fa6a",
+      "displayDecision": "cropped_clean"
     },
     {
       "id": "MOEX-C002-090040-S5004-STAGE1-Q074",
@@ -3755,7 +4061,9 @@
       "originalCropSha256": "6ad7e51707d599d54229145f79b14eb28d8a3811bfc7187e39b50dd63e316477",
       "flags": [],
       "officialScope": null,
-      "cropStatus": "original_pending_clean_crop_review"
+      "cropStatus": "derived_clean",
+      "displayAssetSha256": "9dac89feff0606ba75f5970f13526d98671145030111bdf03f98f0dd83018340",
+      "displayDecision": "cropped_clean"
     },
     {
       "id": "MOEX-C002-090040-S5004-STAGE1-Q075",
@@ -3779,7 +4087,9 @@
       "originalCropSha256": "c6055eddc4215a16356b940d7f7fc4a535e7141a9fd33b5a01b411f051cf6c82",
       "flags": [],
       "officialScope": null,
-      "cropStatus": "original_pending_clean_crop_review"
+      "cropStatus": "derived_clean",
+      "displayAssetSha256": "a3e65d706fff7f18ba7b6e4ac01c8d797ae27f495596e0eddd192f25b5d49590",
+      "displayDecision": "cropped_clean"
     },
     {
       "id": "MOEX-C002-090040-S5004-STAGE1-Q076",
@@ -3803,7 +4113,9 @@
       "originalCropSha256": "79a344a749e6e38b47d368b80548ddc34e47a727c14c28c74585b5ecd80254f6",
       "flags": [],
       "officialScope": null,
-      "cropStatus": "original_pending_clean_crop_review"
+      "cropStatus": "derived_clean",
+      "displayAssetSha256": "5cbc21484ed2494a5fae4b30f12004bf9f92410ad43caf2b1a4cabca564a259c",
+      "displayDecision": "cropped_clean"
     },
     {
       "id": "MOEX-C002-090040-S5004-STAGE1-Q077",
@@ -3827,7 +4139,9 @@
       "originalCropSha256": "c5decf41a1aa493c0b2bd536a18f11b2f021846a9a1179ba210dd7009082cc7a",
       "flags": [],
       "officialScope": null,
-      "cropStatus": "original_pending_clean_crop_review"
+      "cropStatus": "derived_clean",
+      "displayAssetSha256": "99932b72ab5451e76840e13608a316a33037589ab0efbed65b3db7c5093b8e39",
+      "displayDecision": "cropped_clean"
     },
     {
       "id": "MOEX-C002-090040-S5004-STAGE1-Q078",
@@ -3851,7 +4165,9 @@
       "originalCropSha256": "6f430e6a90aa3fe73db7949cc1e823e44857772a4c1107f76be13a610adf98f9",
       "flags": [],
       "officialScope": null,
-      "cropStatus": "original_pending_clean_crop_review"
+      "cropStatus": "derived_clean",
+      "displayAssetSha256": "5122176302a6f170157fc72698321c8b1aa7d6ae2ec9f7302a82eda4e92f4840",
+      "displayDecision": "cropped_clean"
     },
     {
       "id": "MOEX-C002-090040-S5004-STAGE1-Q079",
@@ -3875,7 +4191,9 @@
       "originalCropSha256": "f5ac550998e6bd4aac0582e26518ed74611f7a95f7429e1fe555a27e1eef80c1",
       "flags": [],
       "officialScope": null,
-      "cropStatus": "original_pending_clean_crop_review"
+      "cropStatus": "derived_clean",
+      "displayAssetSha256": "df9c276e0a9e9b668eccedb1dab001b52809a88bdb0f2fe8ea9ef7d6782a8914",
+      "displayDecision": "cropped_clean"
     },
     {
       "id": "MOEX-C002-090040-S5004-STAGE1-Q080",
@@ -3899,7 +4217,9 @@
       "originalCropSha256": "bf75a211cd020f0b94755344c96f19d06a789f7c9eb052f75f6887449db46a46",
       "flags": [],
       "officialScope": null,
-      "cropStatus": "original_pending_clean_crop_review"
+      "cropStatus": "derived_clean",
+      "displayAssetSha256": "7d9b1755fbcab1af8dec40d706cd84b849015b8b487f892c8c98466102f58182",
+      "displayDecision": "cropped_clean"
     },
     {
       "id": "MOEX-C002-090180-S4004-STAGE1-Q001",

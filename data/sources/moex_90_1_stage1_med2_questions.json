@@ -1,5 +1,5 @@
 {
-  "status": "unpublished_candidate_original_images_pending_crop_review",
+  "status": "unpublished_candidate_first_display_reviewed_72_clean_88_original_retained",
   "sources": {
     "Q": {
       "url": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?t=Q&code=090040&c=002&s=5004&q=1",
@@ -63,7 +63,8 @@
         "width": 1659,
         "height": 187,
         "scope": null,
-        "answerNote": null
+        "answerNote": null,
+        "displayNotice": "原圖以第 1 題題號為準。"
       }
     },
     {
@@ -114,7 +115,8 @@
         "width": 1659,
         "height": 121,
         "scope": null,
-        "answerNote": null
+        "answerNote": null,
+        "displayNotice": "原圖以第 2 題題號為準。"
       }
     },
     {
@@ -123,7 +125,7 @@
       "chapter": "舊制官方原卷",
       "section": "醫學（二）",
       "stem": "在動脈粥狀硬化的早期病灶當中所出現的foam cell是屬於下列何種細胞？",
-      "stemImage": "/question-media/moex-90-1-stage1-med2/MOEX-C002-090040-S5004-STAGE1-Q003.webp",
+      "stemImage": "/question-media/moex-90-1-stage1-med2-display/Q003.png",
       "options": {
         "A": "含大量LDL的巨噬細胞（macrophages）",
         "B": "含大量chylomicron的巨噬細胞",
@@ -174,7 +176,7 @@
       "chapter": "舊制官方原卷",
       "section": "醫學（二）",
       "stem": "若第一秒用力呼氣呼出的容積為FEV₁，用力呼氣全過程所呼出的氣量為FVC，相較於正常人，限制性肺病（restrictive lung disease）的病人會有：",
-      "stemImage": "/question-media/moex-90-1-stage1-med2/MOEX-C002-090040-S5004-STAGE1-Q004.webp",
+      "stemImage": "/question-media/moex-90-1-stage1-med2-display/Q004.png",
       "options": {
         "A": "較小的FVC與FEV₁/FVC比值",
         "B": "較大的FVC與FEV₁/FVC比值",
@@ -267,7 +269,8 @@
         "width": 1659,
         "height": 218,
         "scope": null,
-        "answerNote": null
+        "answerNote": null,
+        "displayNotice": "原圖以第 5 題題號為準。"
       }
     },
     {
@@ -318,7 +321,8 @@
         "width": 1659,
         "height": 184,
         "scope": null,
-        "answerNote": null
+        "answerNote": null,
+        "displayNotice": "原圖以第 6 題題號為準。"
       }
     },
     {
@@ -369,7 +373,8 @@
         "width": 1659,
         "height": 122,
         "scope": null,
-        "answerNote": null
+        "answerNote": null,
+        "displayNotice": "原圖以第 7 題題號為準。"
       }
     },
     {
@@ -420,7 +425,8 @@
         "width": 1659,
         "height": 186,
         "scope": null,
-        "answerNote": null
+        "answerNote": null,
+        "displayNotice": "原圖以第 8 題題號為準。"
       }
     },
     {
@@ -429,7 +435,7 @@
       "chapter": "舊制官方原卷",
       "section": "醫學（二）",
       "stem": "惡性貧血（pernicious anemia）的成因為何？",
-      "stemImage": "/question-media/moex-90-1-stage1-med2/MOEX-C002-090040-S5004-STAGE1-Q009.webp",
+      "stemImage": "/question-media/moex-90-1-stage1-med2-display/Q009.png",
       "options": {
         "A": "缺鐵",
         "B": "無法吸收維生素B₁₂",
@@ -522,7 +528,8 @@
         "width": 1659,
         "height": 121,
         "scope": null,
-        "answerNote": null
+        "answerNote": null,
+        "displayNotice": "原圖以第 10 題題號為準。"
       }
     },
     {
@@ -573,7 +580,8 @@
         "width": 1659,
         "height": 122,
         "scope": null,
-        "answerNote": null
+        "answerNote": null,
+        "displayNotice": "原圖以第 11 題題號為準。"
       }
     },
     {
@@ -582,7 +590,7 @@
       "chapter": "舊制官方原卷",
       "section": "醫學（二）",
       "stem": "食道之弛緩不能（achalasia）與食道下部缺乏何種神經元有關？",
-      "stemImage": "/question-media/moex-90-1-stage1-med2/MOEX-C002-090040-S5004-STAGE1-Q012.webp",
+      "stemImage": "/question-media/moex-90-1-stage1-med2-display/Q012.png",
       "options": {
         "A": "Substance P-containing neuron",
         "B": "Bombesin-containing neuron",
@@ -633,7 +641,7 @@
       "chapter": "舊制官方原卷",
       "section": "醫學（二）",
       "stem": "住在玉山頂一段期間後，會使氧與血紅素的解離曲線（oxygen dissociation curve）向右邊移動，這表示血紅素與氧結合的能力：",
-      "stemImage": "/question-media/moex-90-1-stage1-med2/MOEX-C002-090040-S5004-STAGE1-Q013.webp",
+      "stemImage": "/question-media/moex-90-1-stage1-med2-display/Q013.png",
       "options": {
         "A": "增加",
         "B": "降低",
@@ -684,7 +692,7 @@
       "chapter": "舊制官方原卷",
       "section": "醫學（二）",
       "stem": "下列何種激素的主要生理作用之一為促進胰臟分泌富含HCO₃的胰液？",
-      "stemImage": "/question-media/moex-90-1-stage1-med2/MOEX-C002-090040-S5004-STAGE1-Q014.webp",
+      "stemImage": "/question-media/moex-90-1-stage1-med2-display/Q014.png",
       "options": {
         "A": "胰泌素（secretin）",
         "B": "胃抑制肽（gastric inhibitory peptide）",
@@ -735,7 +743,7 @@
       "chapter": "舊制官方原卷",
       "section": "醫學（二）",
       "stem": "正常情況下，自小腸進入大腸的水分當中約有多少會被大腸吸收？",
-      "stemImage": "/question-media/moex-90-1-stage1-med2/MOEX-C002-090040-S5004-STAGE1-Q015.webp",
+      "stemImage": "/question-media/moex-90-1-stage1-med2-display/Q015.png",
       "options": {
         "A": "5%",
         "B": "10%",
@@ -786,7 +794,7 @@
       "chapter": "舊制官方原卷",
       "section": "醫學（二）",
       "stem": "病人因腦中風，發生失語症（aphasia），雖然對別人說的話都還聽得懂，但是自己卻很少說話。偶而說話，句子都很簡短，而且句中也常有文法錯誤之處（grammatical errors），此病人大腦最可能受傷之區域為：",
-      "stemImage": "/question-media/moex-90-1-stage1-med2/MOEX-C002-090040-S5004-STAGE1-Q016.webp",
+      "stemImage": "/question-media/moex-90-1-stage1-med2-display/Q016.png",
       "options": {
         "A": "Broca area",
         "B": "Wernicke area",
@@ -879,7 +887,8 @@
         "width": 1659,
         "height": 128,
         "scope": null,
-        "answerNote": null
+        "answerNote": null,
+        "displayNotice": "原圖以第 17 題題號為準。"
       }
     },
     {
@@ -930,7 +939,8 @@
         "width": 1659,
         "height": 89,
         "scope": null,
-        "answerNote": null
+        "answerNote": null,
+        "displayNotice": "原圖以第 18 題題號為準。"
       }
     },
     {
@@ -981,7 +991,8 @@
         "width": 1659,
         "height": 183,
         "scope": null,
-        "answerNote": null
+        "answerNote": null,
+        "displayNotice": "原圖以第 19 題題號為準。"
       }
     },
     {
@@ -1032,7 +1043,8 @@
         "width": 1659,
         "height": 124,
         "scope": null,
-        "answerNote": null
+        "answerNote": null,
+        "displayNotice": "原圖以第 20 題題號為準。"
       }
     },
     {
@@ -1083,7 +1095,8 @@
         "width": 1659,
         "height": 121,
         "scope": null,
-        "answerNote": null
+        "answerNote": null,
+        "displayNotice": "原圖以第 21 題題號為準。"
       }
     },
     {
@@ -1134,7 +1147,8 @@
         "width": 1659,
         "height": 87,
         "scope": null,
-        "answerNote": null
+        "answerNote": null,
+        "displayNotice": "原圖以第 22 題題號為準。"
       }
     },
     {
@@ -1185,7 +1199,8 @@
         "width": 1659,
         "height": 121,
         "scope": null,
-        "answerNote": null
+        "answerNote": null,
+        "displayNotice": "原圖以第 23 題題號為準。"
       }
     },
     {
@@ -1194,7 +1209,7 @@
       "chapter": "舊制官方原卷",
       "section": "醫學（二）",
       "stem": "當鈉鉀腺苷三磷酸酶（Na⁺, K⁺-ATPase）受到強心劑毛地黃素（digitalis）的抑制時，細胞內的那些離子濃度會增加？①鈉 ②鉀 ③鈣 ④鎂",
-      "stemImage": "/question-media/moex-90-1-stage1-med2/MOEX-C002-090040-S5004-STAGE1-Q024.webp",
+      "stemImage": "/question-media/moex-90-1-stage1-med2-display/Q024.png",
       "options": {
         "A": "①②",
         "B": "①③",
@@ -1287,7 +1302,8 @@
         "width": 1659,
         "height": 89,
         "scope": null,
-        "answerNote": null
+        "answerNote": null,
+        "displayNotice": "原圖以第 25 題題號為準。"
       }
     },
     {
@@ -1338,7 +1354,8 @@
         "width": 1659,
         "height": 121,
         "scope": null,
-        "answerNote": null
+        "answerNote": null,
+        "displayNotice": "原圖以第 26 題題號為準。"
       }
     },
     {
@@ -1389,7 +1406,8 @@
         "width": 1659,
         "height": 119,
         "scope": null,
-        "answerNote": null
+        "answerNote": null,
+        "displayNotice": "原圖以第 27 題題號為準。"
       }
     },
     {
@@ -1398,7 +1416,7 @@
       "chapter": "舊制官方原卷",
       "section": "醫學（二）",
       "stem": "當細胞內含有1mM ATP、0.4mM ADP和0.2mM AMP時，其能量載滿度（energy charge）之值為何？",
-      "stemImage": "/question-media/moex-90-1-stage1-med2/MOEX-C002-090040-S5004-STAGE1-Q028.webp",
+      "stemImage": "/question-media/moex-90-1-stage1-med2-display/Q028.png",
       "options": {
         "A": "0.875",
         "B": "0.750",
@@ -1491,7 +1509,8 @@
         "width": 1659,
         "height": 121,
         "scope": null,
-        "answerNote": null
+        "answerNote": null,
+        "displayNotice": "原圖以第 29 題題號為準。"
       }
     },
     {
@@ -1542,7 +1561,8 @@
         "width": 1659,
         "height": 121,
         "scope": null,
-        "answerNote": null
+        "answerNote": null,
+        "displayNotice": "原圖以第 30 題題號為準。"
       }
     },
     {
@@ -1593,7 +1613,8 @@
         "width": 1659,
         "height": 90,
         "scope": null,
-        "answerNote": null
+        "answerNote": null,
+        "displayNotice": "原圖以第 31 題題號為準。"
       }
     },
     {
@@ -1644,7 +1665,8 @@
         "width": 1659,
         "height": 89,
         "scope": null,
-        "answerNote": null
+        "answerNote": null,
+        "displayNotice": "原圖以第 32 題題號為準。"
       }
     },
     {
@@ -1695,7 +1717,8 @@
         "width": 1659,
         "height": 119,
         "scope": null,
-        "answerNote": null
+        "answerNote": null,
+        "displayNotice": "原圖以第 33 題題號為準。"
       }
     },
     {
@@ -1746,7 +1769,8 @@
         "width": 1659,
         "height": 89,
         "scope": null,
-        "answerNote": null
+        "answerNote": null,
+        "displayNotice": "原圖以第 34 題題號為準。"
       }
     },
     {
@@ -1797,7 +1821,8 @@
         "width": 1659,
         "height": 89,
         "scope": null,
-        "answerNote": null
+        "answerNote": null,
+        "displayNotice": "原圖以第 35 題題號為準。"
       }
     },
     {
@@ -1848,7 +1873,8 @@
         "width": 1659,
         "height": 89,
         "scope": null,
-        "answerNote": null
+        "answerNote": null,
+        "displayNotice": "原圖以第 36 題題號為準。"
       }
     },
     {
@@ -1899,7 +1925,8 @@
         "width": 1659,
         "height": 249,
         "scope": null,
-        "answerNote": null
+        "answerNote": null,
+        "displayNotice": "原圖以第 37 題題號為準。"
       }
     },
     {
@@ -1951,7 +1978,8 @@
         "height": 283,
         "scope": null,
         "answerNote": null,
-        "transcriptionNotice": "此題部分原文字形難以辨識，請參照上方原題圖。"
+        "transcriptionNotice": "此題部分原文字形難以辨識，請參照上方原題圖。",
+        "displayNotice": "原圖以第 38 題題號為準。"
       }
     },
     {
@@ -1960,7 +1988,7 @@
       "chapter": "舊制官方原卷",
       "section": "醫學（二）",
       "stem": "常吃生的蛋白容易導致下列何種維生素的缺乏？",
-      "stemImage": "/question-media/moex-90-1-stage1-med2/MOEX-C002-090040-S5004-STAGE1-Q039.webp",
+      "stemImage": "/question-media/moex-90-1-stage1-med2-display/Q039.png",
       "options": {
         "A": "Avidin",
         "B": "Biotin",
@@ -2011,7 +2039,7 @@
       "chapter": "舊制官方原卷",
       "section": "醫學（二）",
       "stem": "下列何者維生素不能當做抗氧化劑？",
-      "stemImage": "/question-media/moex-90-1-stage1-med2/MOEX-C002-090040-S5004-STAGE1-Q040.webp",
+      "stemImage": "/question-media/moex-90-1-stage1-med2-display/Q040.png",
       "options": {
         "A": "Ascorbic acid",
         "B": "Vitamin A",
@@ -2104,7 +2132,8 @@
         "width": 1659,
         "height": 122,
         "scope": null,
-        "answerNote": null
+        "answerNote": null,
+        "displayNotice": "原圖以第 41 題題號為準。"
       }
     },
     {
@@ -2155,7 +2184,8 @@
         "width": 1659,
         "height": 90,
         "scope": null,
-        "answerNote": null
+        "answerNote": null,
+        "displayNotice": "原圖以第 42 題題號為準。"
       }
     },
     {
@@ -2206,7 +2236,8 @@
         "width": 1659,
         "height": 90,
         "scope": null,
-        "answerNote": null
+        "answerNote": null,
+        "displayNotice": "原圖以第 43 題題號為準。"
       }
     },
     {
@@ -2257,7 +2288,8 @@
         "width": 1659,
         "height": 90,
         "scope": null,
-        "answerNote": null
+        "answerNote": null,
+        "displayNotice": "原圖以第 44 題題號為準。"
       }
     },
     {
@@ -2308,7 +2340,8 @@
         "width": 1659,
         "height": 122,
         "scope": null,
-        "answerNote": null
+        "answerNote": null,
+        "displayNotice": "原圖以第 45 題題號為準。"
       }
     },
     {
@@ -2359,7 +2392,8 @@
         "width": 1659,
         "height": 122,
         "scope": null,
-        "answerNote": null
+        "answerNote": null,
+        "displayNotice": "原圖以第 46 題題號為準。"
       }
     },
     {
@@ -2410,7 +2444,8 @@
         "width": 1659,
         "height": 90,
         "scope": null,
-        "answerNote": null
+        "answerNote": null,
+        "displayNotice": "原圖以第 47 題題號為準。"
       }
     },
     {
@@ -2461,7 +2496,8 @@
         "width": 1659,
         "height": 90,
         "scope": null,
-        "answerNote": null
+        "answerNote": null,
+        "displayNotice": "原圖以第 48 題題號為準。"
       }
     },
     {
@@ -2512,7 +2548,8 @@
         "width": 1659,
         "height": 187,
         "scope": null,
-        "answerNote": null
+        "answerNote": null,
+        "displayNotice": "原圖以第 49 題題號為準。"
       }
     },
     {
@@ -2563,7 +2600,8 @@
         "width": 1659,
         "height": 89,
         "scope": null,
-        "answerNote": null
+        "answerNote": null,
+        "displayNotice": "原圖以第 50 題題號為準。"
       }
     },
     {
@@ -2614,7 +2652,8 @@
         "width": 1659,
         "height": 90,
         "scope": null,
-        "answerNote": null
+        "answerNote": null,
+        "displayNotice": "原圖以第 51 題題號為準。"
       }
     },
     {
@@ -2665,7 +2704,8 @@
         "width": 1659,
         "height": 90,
         "scope": null,
-        "answerNote": null
+        "answerNote": null,
+        "displayNotice": "原圖以第 52 題題號為準。"
       }
     },
     {
@@ -2716,7 +2756,8 @@
         "width": 1659,
         "height": 90,
         "scope": null,
-        "answerNote": null
+        "answerNote": null,
+        "displayNotice": "原圖以第 53 題題號為準。"
       }
     },
     {
@@ -2767,7 +2808,8 @@
         "width": 1659,
         "height": 87,
         "scope": null,
-        "answerNote": null
+        "answerNote": null,
+        "displayNotice": "原圖以第 54 題題號為準。"
       }
     },
     {
@@ -2818,7 +2860,8 @@
         "width": 1659,
         "height": 123,
         "scope": null,
-        "answerNote": null
+        "answerNote": null,
+        "displayNotice": "原圖以第 55 題題號為準。"
       }
     },
     {
@@ -2869,7 +2912,8 @@
         "width": 1659,
         "height": 122,
         "scope": null,
-        "answerNote": null
+        "answerNote": null,
+        "displayNotice": "原圖以第 56 題題號為準。"
       }
     },
     {
@@ -2920,7 +2964,8 @@
         "width": 1659,
         "height": 120,
         "scope": null,
-        "answerNote": null
+        "answerNote": null,
+        "displayNotice": "原圖以第 57 題題號為準。"
       }
     },
     {
@@ -2971,7 +3016,8 @@
         "width": 1659,
         "height": 187,
         "scope": null,
-        "answerNote": null
+        "answerNote": null,
+        "displayNotice": "原圖以第 58 題題號為準。"
       }
     },
     {
@@ -3022,7 +3068,8 @@
         "width": 1659,
         "height": 122,
         "scope": null,
-        "answerNote": null
+        "answerNote": null,
+        "displayNotice": "原圖以第 59 題題號為準。"
       }
     },
     {
@@ -3074,7 +3121,8 @@
         "height": 185,
         "scope": null,
         "answerNote": null,
-        "transcriptionNotice": "此題部分原文字形難以辨識，請參照上方原題圖。"
+        "transcriptionNotice": "此題部分原文字形難以辨識，請參照上方原題圖。",
+        "displayNotice": "原圖以第 60 題題號為準。"
       }
     },
     {
@@ -3083,7 +3131,7 @@
       "chapter": "舊制官方原卷",
       "section": "醫學（二）",
       "stem": "有一研究欲探討三種降血壓藥物中，那一種對停經後的婦女較為有效。現找來90位已停經婦女，隨機指派到三組中之一，每組30人，測量每個人服藥前後血壓差值，請問以下何種分析較為適當？",
-      "stemImage": "/question-media/moex-90-1-stage1-med2/MOEX-C002-090040-S5004-STAGE1-Q061.webp",
+      "stemImage": "/question-media/moex-90-1-stage1-med2-display/Q061.png",
       "options": {
         "A": "變異數分析",
         "B": "每兩組做一次t檢定，共做三次",
@@ -3134,7 +3182,7 @@
       "chapter": "舊制官方原卷",
       "section": "醫學（二）",
       "stem": "以下有關迴歸分析（regression）的敘述何者為非？",
-      "stemImage": "/question-media/moex-90-1-stage1-med2/MOEX-C002-090040-S5004-STAGE1-Q062.webp",
+      "stemImage": "/question-media/moex-90-1-stage1-med2-display/Q062.png",
       "options": {
         "A": "可以用來檢測兩個變數之間的線性關係",
         "B": "迴歸分析是要找出能解釋所收集到資料的最好直線",
@@ -3185,7 +3233,7 @@
       "chapter": "舊制官方原卷",
       "section": "醫學（二）",
       "stem": "在檢定男女平均身高是否相同時，以下何者不會影響檢力？",
-      "stemImage": "/question-media/moex-90-1-stage1-med2/MOEX-C002-090040-S5004-STAGE1-Q063.webp",
+      "stemImage": "/question-media/moex-90-1-stage1-med2-display/Q063.png",
       "options": {
         "A": "P-值",
         "B": "男生樣本的變異數",
@@ -3236,7 +3284,7 @@
       "chapter": "舊制官方原卷",
       "section": "醫學（二）",
       "stem": "某研究調查17～18歲青少年的平均身高，抽樣100位青少年後初步分析得知樣本平均值為168，樣本變異數為64，請問以下何者最接近平均身高的95%信賴區間？",
-      "stemImage": "/question-media/moex-90-1-stage1-med2/MOEX-C002-090040-S5004-STAGE1-Q064.webp",
+      "stemImage": "/question-media/moex-90-1-stage1-med2-display/Q064.png",
       "options": {
         "A": "（160,176）",
         "B": "（152,184）",
@@ -3287,7 +3335,7 @@
       "chapter": "舊制官方原卷",
       "section": "醫學（二）",
       "stem": "有一新發明之化學療法，能在治療一週後使腫瘤縮小至少一半以上。現有20位病患接受此治療，並測量治療前後其腫瘤的變化大小，請問應使用以下何種分析？",
-      "stemImage": "/question-media/moex-90-1-stage1-med2/MOEX-C002-090040-S5004-STAGE1-Q065.webp",
+      "stemImage": "/question-media/moex-90-1-stage1-med2-display/Q065.png",
       "options": {
         "A": "兩個獨立樣本t檢定",
         "B": "成對t檢定",
@@ -3339,7 +3387,7 @@
       "chapter": "舊制官方原卷",
       "section": "醫學（二）",
       "stem": "定期職業健檢發現異常時，除治療外，應該立即：",
-      "stemImage": "/question-media/moex-90-1-stage1-med2/MOEX-C002-090040-S5004-STAGE1-Q066.webp",
+      "stemImage": "/question-media/moex-90-1-stage1-med2-display/Q066.png",
       "options": {
         "A": "要病人趕快回到工作崗位",
         "B": "將病人解僱",
@@ -3390,7 +3438,7 @@
       "chapter": "舊制官方原卷",
       "section": "醫學（二）",
       "stem": "民國84年起實施對汽油徵收空氣污染防制費，在空氣污染管制策略上，是屬於：",
-      "stemImage": "/question-media/moex-90-1-stage1-med2/MOEX-C002-090040-S5004-STAGE1-Q067.webp",
+      "stemImage": "/question-media/moex-90-1-stage1-med2-display/Q067.png",
       "options": {
         "A": "經濟誘因管制",
         "B": "命令及控制式管制",
@@ -3441,7 +3489,7 @@
       "chapter": "舊制官方原卷",
       "section": "醫學（二）",
       "stem": "有害事業廢棄物的處理，最佳的方法是：",
-      "stemImage": "/question-media/moex-90-1-stage1-med2/MOEX-C002-090040-S5004-STAGE1-Q068.webp",
+      "stemImage": "/question-media/moex-90-1-stage1-med2-display/Q068.png",
       "options": {
         "A": "物理處理",
         "B": "化學處理",
@@ -3492,7 +3540,7 @@
       "chapter": "舊制官方原卷",
       "section": "醫學（二）",
       "stem": "職業衛生與安全中，最後考慮的是：",
-      "stemImage": "/question-media/moex-90-1-stage1-med2/MOEX-C002-090040-S5004-STAGE1-Q069.webp",
+      "stemImage": "/question-media/moex-90-1-stage1-med2-display/Q069.png",
       "options": {
         "A": "取代原料、設備及製程",
         "B": "密閉、隔離、遮蔽",
@@ -3543,7 +3591,7 @@
       "chapter": "舊制官方原卷",
       "section": "醫學（二）",
       "stem": "強調「知覺」和「領悟」，不單以刺激反應聯結的學習，例如利用想像來澄清過去對刺激敏感而產生的恐懼，或運用合理性的思考方式代替非理性的想法來解除情緒困擾，是屬於：",
-      "stemImage": "/question-media/moex-90-1-stage1-med2/MOEX-C002-090040-S5004-STAGE1-Q070.webp",
+      "stemImage": "/question-media/moex-90-1-stage1-med2-display/Q070.png",
       "options": {
         "A": "反應性制約理論",
         "B": "操作性制約理論",
@@ -3595,7 +3643,7 @@
       "chapter": "舊制官方原卷",
       "section": "醫學（二）",
       "stem": "以下何者不是目前國內門診醫療的特色？",
-      "stemImage": "/question-media/moex-90-1-stage1-med2/MOEX-C002-090040-S5004-STAGE1-Q071.webp",
+      "stemImage": "/question-media/moex-90-1-stage1-med2-display/Q071.png",
       "options": {
         "A": "利用率高",
         "B": "病人教育多",
@@ -3646,7 +3694,7 @@
       "chapter": "舊制官方原卷",
       "section": "醫學（二）",
       "stem": "以下何種健康保險支付制度最難控制醫療費用的上漲？",
-      "stemImage": "/question-media/moex-90-1-stage1-med2/MOEX-C002-090040-S5004-STAGE1-Q072.webp",
+      "stemImage": "/question-media/moex-90-1-stage1-med2-display/Q072.png",
       "options": {
         "A": "論服務量計酬",
         "B": "論疾病計酬",
@@ -3697,7 +3745,7 @@
       "chapter": "舊制官方原卷",
       "section": "醫學（二）",
       "stem": "全民健康保險是一種社會保險，所以應該：",
-      "stemImage": "/question-media/moex-90-1-stage1-med2/MOEX-C002-090040-S5004-STAGE1-Q073.webp",
+      "stemImage": "/question-media/moex-90-1-stage1-med2-display/Q073.png",
       "options": {
         "A": "拒絕「帶病投保」",
         "B": "民眾自由納保，不予強制",
@@ -3748,7 +3796,7 @@
       "chapter": "舊制官方原卷",
       "section": "醫學（二）",
       "stem": "在1982年爆發台灣全島大流行，而於2000年終於和西太平洋地區同時宣布根除的傳染病是：",
-      "stemImage": "/question-media/moex-90-1-stage1-med2/MOEX-C002-090040-S5004-STAGE1-Q074.webp",
+      "stemImage": "/question-media/moex-90-1-stage1-med2-display/Q074.png",
       "options": {
         "A": "麻疹",
         "B": "德國麻疹",
@@ -3799,7 +3847,7 @@
       "chapter": "舊制官方原卷",
       "section": "醫學（二）",
       "stem": "若要用個案對照研究法，探討開車打行動電話是否容易造成車禍，個案是警察局汽車車禍報案的案例，對照組選擇：",
-      "stemImage": "/question-media/moex-90-1-stage1-med2/MOEX-C002-090040-S5004-STAGE1-Q075.webp",
+      "stemImage": "/question-media/moex-90-1-stage1-med2-display/Q075.png",
       "options": {
         "A": "警察局家庭暴力的案例",
         "B": "車禍隔週同一時間地點的駕車者",
@@ -3850,7 +3898,7 @@
       "chapter": "舊制官方原卷",
       "section": "醫學（二）",
       "stem": "做「肥胖症」的個案對照研究，發現喝紅茶是肥胖症的危險因子，後來發現，喝紅茶的人多喜歡加奶精和糖，調整這二個因子後，喝紅茶和肥胖症的關係就消失了。在這個例子中，奶精和糖扮演什麼角色？",
-      "stemImage": "/question-media/moex-90-1-stage1-med2/MOEX-C002-090040-S5004-STAGE1-Q076.webp",
+      "stemImage": "/question-media/moex-90-1-stage1-med2-display/Q076.png",
       "options": {
         "A": "干擾因子",
         "B": "修飾因子",
@@ -3901,7 +3949,7 @@
       "chapter": "舊制官方原卷",
       "section": "醫學（二）",
       "stem": "科學測量上的「信度」（reliability）好，是指：",
-      "stemImage": "/question-media/moex-90-1-stage1-med2/MOEX-C002-090040-S5004-STAGE1-Q077.webp",
+      "stemImage": "/question-media/moex-90-1-stage1-med2-display/Q077.png",
       "options": {
         "A": "真值與測量值的一致性高",
         "B": "系統性誤差高",
@@ -3952,7 +4000,7 @@
       "chapter": "舊制官方原卷",
       "section": "醫學（二）",
       "stem": "以下何者是「因果判定」的必要基準？",
-      "stemImage": "/question-media/moex-90-1-stage1-med2/MOEX-C002-090040-S5004-STAGE1-Q078.webp",
+      "stemImage": "/question-media/moex-90-1-stage1-med2-display/Q078.png",
       "options": {
         "A": "一致性",
         "B": "合理性",
@@ -4003,7 +4051,7 @@
       "chapter": "舊制官方原卷",
       "section": "醫學（二）",
       "stem": "科學的基本思考方式中，以下何項敘述符合「猜測與否證法」？",
-      "stemImage": "/question-media/moex-90-1-stage1-med2/MOEX-C002-090040-S5004-STAGE1-Q079.webp",
+      "stemImage": "/question-media/moex-90-1-stage1-med2-display/Q079.png",
       "options": {
         "A": "先有觀察才有假說",
         "B": "好的定理是經由多次否證而未被推翻的",
@@ -4054,7 +4102,7 @@
       "chapter": "舊制官方原卷",
       "section": "醫學（二）",
       "stem": "流行病學的研究和應用",
-      "stemImage": "/question-media/moex-90-1-stage1-med2/MOEX-C002-090040-S5004-STAGE1-Q080.webp",
+      "stemImage": "/question-media/moex-90-1-stage1-med2-display/Q080.png",
       "options": {
         "A": "須兼具「方法」和「實質知識」",
         "B": "只限於疾病的探討",
