@@ -77,9 +77,20 @@ test('all original taxonomy definitions/IDs/names/order survive additive approve
  assert.equal(crypto.createHash('sha256').update(JSON.stringify(original,null,2)+'\n').digest('hex'),extension.baseTaxonomySha256);
  assert.equal(new Set(current.primaryTags.map(t=>t.id)).size,current.primaryTags.length);
 });
-test('all 6730 pre-existing canonical questions retain every field and classification',()=>{
+test('all 6730 pre-existing canonical questions retain their baseline except two source-reviewed corrections',()=>{
  const old=bank.getCanonicalQuestionBank().filter(q=>!ids.has(q.id));assert.equal(old.length,placementRules.baselineOldCanonicalCount);
- assert.equal(crypto.createHash('sha256').update(JSON.stringify(old)).digest('hex'),placementRules.baselineOldCanonicalSha256);
+ const revisions=require('../docs/moex-98-99/canonical-reviewed-corrections.json');
+ assert.deepEqual(revisions.map(({id,fields})=>({id,fields})),[
+  {id:'MOEX-102030-1101-Q097',fields:['explanation','optionAnalysis','options','stemImage','testedConcept']},
+  {id:'MOEX-106100-2301-Q044',fields:['stem']},
+ ]);
+ for(const revision of revisions){
+  const matches=old.filter(q=>q.id===revision.id);assert.equal(matches.length,1,revision.id);
+  const current=matches[0], fields=Object.fromEntries(revision.fields.filter(k=>Object.hasOwn(current,k)).map(k=>[k,current[k]]));
+  assert.equal(crypto.createHash('sha256').update(JSON.stringify(fields)).digest('hex'),revision.revisedSha256,revision.id+' reviewed fields');
+ }
+ const historic=old.map(q=>{const revision=revisions.find(r=>r.id===q.id);if(!revision)return q;const restored={...q};for(const key of revision.fields){if(Object.hasOwn(revision.original,key))restored[key]=revision.original[key];else delete restored[key]}return restored});
+ assert.equal(crypto.createHash('sha256').update(JSON.stringify(historic)).digest('hex'),placementRules.baselineOldCanonicalSha256);
 });
 test('all 800 learning placements are exposed through their locked subject outline without source placeholders',()=>{
  assert.deepEqual(new Set(Object.keys(placements.questions)),ids);assert.equal(placements.sourceFileSha256,review.sourceFileSha256);
