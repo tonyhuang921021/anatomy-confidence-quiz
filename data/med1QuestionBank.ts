@@ -2593,7 +2593,7 @@ export function getPastPaperOptions(
     paperMap.set(key, {
       key,
       label: question.officialExam
-        ? `${formatRocYear(question.sourceYear)} 第${question.sourceRound ?? (question.examSessionLabel?.includes("第二") ? 2 : 1)}次 ${question.officialExam.trackLabel} ${question.officialExam.paperTitle} ${question.officialExam.subjectCode}`
+        ? `${formatRocYear(question.sourceYear)} 第${question.sourceRound ?? (question.examSessionLabel?.includes("第二") ? 2 : 1)}次 ${question.officialExam.trackCode === "HIGHGENERAL" ? "醫師國考（舊制）" : question.officialExam.trackLabel} ${question.officialExam.paperTitle} 卷面代號 ${question.paperCode}（科目索引 ${question.officialExam.subjectCode}）`
         : `${formatRocYear(question.sourceYear)} 第${question.sourceRound ?? (question.examSessionLabel?.includes("第二") ? 2 : 1)}次 ${examLabel} ${question.paperCode}`,
       subject: examLabel as SubjectFilter,
       questionCount: 1,
