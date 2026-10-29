@@ -4,6 +4,7 @@ import legacy97ClassificationJson from "../data/sources/moex_97_1_med1_classific
 import legacy97Med2ClassificationJson from "../data/sources/moex_97_1_med2_classification.json";
 import legacy97SecondMed1ClassificationJson from "../data/sources/moex_97_2_med1_classification.json";
 import legacy97SecondMed2ClassificationJson from "../data/sources/moex_97_2_med2_classification.json";
+import legacy96ContentClassificationCandidate from "../data/sources/moex_96_1_content_classification_candidate.json";
 import legacyLearningPlacementJson from "../data/sources/moex_98_99_learning_placement.json";
 import { getMoexPrimarySubject } from "../scripts/moex-primary-subject";
 import type { Question, QuestionClassificationOverride, SubjectName } from "../types/quiz";
@@ -26,6 +27,8 @@ type RuntimePrimaryTagMap = {
 // The generator and its contract test guarantee the fixed three-item tuple shape.
 const runtimePrimaryTagMap = primaryTagRuntimeMapJson as unknown as RuntimePrimaryTagMap;
 const runtimeAssignments = runtimePrimaryTagMap.questions;
+// 96-1 content-reviewed candidates are keyed per question; no historical band inference.
+const legacy96ContentAssignments = legacy96ContentClassificationCandidate.questions as unknown as Record<string, [SubjectName, string, string, string]>;
 // The source-bound contract test validates every subject, tag and tuple length.
 const legacyAssignments = { ...legacyClassificationJson.questions, ...legacy97ClassificationJson.questions, ...legacy97Med2ClassificationJson.questions, ...legacy97SecondMed1ClassificationJson.questions, ...legacy97SecondMed2ClassificationJson.questions } as unknown as Record<string, [SubjectName, string | null]>;
 const legacyPendingIds = new Set<string>(legacyClassificationJson.pendingQuestionIds);
@@ -49,6 +52,8 @@ const SUBJECT_BY_CODE = [
 export const ANALYSIS_PRIMARY_TAG_CLASSIFIED_AT = runtimePrimaryTagMap.classifiedAt;
 
 export function getAnalysisPrimaryTagAssignment(questionId: string) {
+  const contentReviewed = legacy96ContentAssignments[questionId];
+  if (contentReviewed) return { subject: contentReviewed[0], primaryTag: contentReviewed[1] } satisfies RuntimePrimaryTagAssignment;
   const legacy = legacyAssignments[questionId];
   if (legacy) return getLockedLegacyPrimaryTagAssignment(questionId, legacy[0], legacy[1]);
   const assignment = runtimeAssignments[questionId];
@@ -88,7 +93,8 @@ export function getQuestionPrimaryTag(
 
 export function hasAnalysisPrimaryTagAssignment(questionId: string) {
   return Object.prototype.hasOwnProperty.call(runtimeAssignments, questionId) ||
-    Object.prototype.hasOwnProperty.call(legacyAssignments, questionId);
+    Object.prototype.hasOwnProperty.call(legacyAssignments, questionId) ||
+    Object.prototype.hasOwnProperty.call(legacy96ContentAssignments, questionId);
 }
 
 export function isLegacyQuestionClassificationPending(questionId: string) {
@@ -103,9 +109,11 @@ export function applyAnalysisPrimaryTagClassification(question: Question): Quest
   const assignment = getAnalysisPrimaryTagAssignment(question.id);
   if (!assignment) return question;
 
+  const contentPlacement = legacy96ContentAssignments[question.id];
   return {
     ...question,
     subject: assignment.subject,
+    ...(contentPlacement ? { chapter: contentPlacement[2], section: contentPlacement[3] } : {}),
     ...(legacyLearningPlacements[question.id] ? {
       chapter: legacyLearningPlacements[question.id][0],
       section: legacyLearningPlacements[question.id][1]
