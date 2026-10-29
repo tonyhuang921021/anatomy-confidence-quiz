@@ -1,5 +1,6 @@
 import type { QuizSession } from "@/types/quiz";
 import { getOfficialPaperKeyFromQuestionId } from "./officialPaperIdentity";
+import { getVerifiedEightyQuestionPaper } from "./officialPaperRules";
 
 export const SIMULATION_PAPER_SCORE_BUCKETS = [
   { key: "score0To39", label: "0–39" },
@@ -26,6 +27,7 @@ export type SimulationPaperStats = {
 export type SimulationPaperScoreRow = {
   session_id: string;
   paper_key: string;
+  /** Integer full-paper answer accuracy percentage, not an official score. */
   score: number;
   completed_at: string;
 };
@@ -105,14 +107,27 @@ export function buildSimulationPaperScoreRow(
 ): SimulationPaperScoreRow | null {
   if (
     session.settings?.mode !== "simulation" ||
-    !session.completedAt ||
-    session.attempts.length !== 100
+    !session.completedAt
   ) {
     return null;
   }
 
   const paperKey = inferSimulationPaperKey(session);
   if (!paperKey) return null;
+
+  const historical = getVerifiedEightyQuestionPaper(paperKey);
+  if (historical) {
+    // Do not treat a partial or duplicated set as a completed paper. All
+    // 80 official identities must be represented, including all-credit items.
+    const answered = new Set(session.attempts.map((attempt) => attempt.questionId));
+    if (session.attempts.length !== historical.questionCount || answered.size !== historical.questionCount) return null;
+    if (session.attempts.some((attempt) => !["A", "B", "C", "D"].includes(attempt.selectedAnswer) || typeof attempt.isCorrect !== "boolean")) return null;
+    for (let number = 1; number <= historical.questionCount; number += 1) {
+      if (!answered.has(`${paperKey}-Q${String(number).padStart(3, "0")}`)) return null;
+    }
+  } else if (session.attempts.length !== 100) {
+    return null;
+  }
 
   const correctCount = session.attempts.filter((attempt) => attempt.isCorrect).length;
   const score = Math.round((correctCount / session.attempts.length) * 100);

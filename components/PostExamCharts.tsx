@@ -254,7 +254,7 @@ function SimulationResultCard({ result }: { result: PostExamSimulationResult }) 
           </p>
           <p className="mt-1 text-[11px] text-slate-500 sm:text-xs">{formatDate(result.completedAt)}</p>
         </div>
-        <p className="shrink-0 text-lg font-bold tabular-nums text-ink sm:text-xl">{result.score}</p>
+        <p className="shrink-0 text-lg font-bold tabular-nums text-ink sm:text-xl">{result.score}%</p>
       </div>
       <div className="mt-2 h-2 overflow-hidden rounded-full bg-slate-100" aria-hidden="true">
         <div className="h-full rounded-full bg-brand-600" style={{ width: `${result.score}%` }} />
@@ -272,9 +272,9 @@ export function SimulationScoreChart({ results }: { results: PostExamSimulationR
       <div className="mb-5 flex flex-wrap items-end justify-between gap-3">
         <div>
           <h2 id="simulation-score-title" className="text-xl font-bold text-ink sm:text-2xl">模擬考紀錄</h2>
-          <p className="mt-1 text-sm text-slate-500">完整 100 題且高於 3 分</p>
+          <p className="mt-1 text-sm text-slate-500">完整作答且正確率高於 3%</p>
         </div>
-        <span className="text-sm font-semibold text-slate-700">0–100 分</span>
+        <span className="text-sm font-semibold text-slate-700">正確率 0–100%</span>
       </div>
       <div className="grid grid-cols-2 gap-2 border-y border-slate-200 bg-slate-50 px-3 py-3 sm:gap-5 sm:px-5">
         <div className="flex min-w-0 items-center justify-between gap-2">
@@ -375,7 +375,7 @@ function drawCanvasSimulationResult(
   context.fillStyle = "#102a22";
   context.font = '700 18px "Noto Sans TC", sans-serif';
   context.textAlign = "right";
-  context.fillText(String(result.score), x + width - 16, y + 24);
+  context.fillText(`${result.score}%`, x + width - 16, y + 24);
   context.textAlign = "left";
 }
 
@@ -572,7 +572,7 @@ export async function downloadPostExamRecapPng({
   cursorY += 34;
   context.fillStyle = "#64748b";
   context.font = '500 18px "Noto Sans TC", sans-serif';
-  context.fillText("完整 100 題且高於 3 分", 72, cursorY);
+  context.fillText("完整作答且正確率高於 3%", 72, cursorY);
   cursorY += 24;
 
   const columnGap = 20;

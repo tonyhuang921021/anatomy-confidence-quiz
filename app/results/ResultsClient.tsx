@@ -1,6 +1,8 @@
 "use client";
 
 import { getOfficialPaperKeyFromQuestionId, getOfficialPaperKey } from "@/lib/officialPaperIdentity";
+import { getVerifiedEightyQuestionPaper } from "@/lib/officialPaperRules";
+import { inferSimulationPaperKey } from "@/lib/simulationPaperStats";
 
 import { formatRocDate, formatRocYear } from "@/lib/rocDate";
 
@@ -2492,8 +2494,8 @@ function ResultsPageContent() {
   function renderConfidenceCalibrationSection() {
     if (!confidenceCalibrationEnabled) return null;
     if (masteryAnalysis.total === 0) return null;
-    if (state.session?.generatedQuestions?.some((question) => question.officialExam?.questionCount === 80)) {
-      return <section className="workspace-section mt-4 p-4 text-sm leading-6 text-slate-600 sm:p-5">這份原卷共 80 題、每題 1.25 分。網站目前顯示已答題正確率，尚未計算此卷官方分數；現有 100 題考卷的成績預測與統計不適用於這份原卷。</section>;
+    if (state.session && getVerifiedEightyQuestionPaper(inferSimulationPaperKey(state.session))) {
+      return <section className="workspace-section mt-4 p-4 text-sm leading-6 text-slate-600 sm:p-5">這份原卷共 80 題、每題 1.25 分。網站目前顯示已答題正確率，尚未計算此卷官方分數；100 題考卷的成績預測不適用於這份原卷。</section>;
     }
     const priorityItems = masteryAnalysis.reviewItems.filter((item) => item.priority > 0).slice(0, 5);
     const visibleTopicStats = masteryAnalysis.topicStats.slice(0, 3);

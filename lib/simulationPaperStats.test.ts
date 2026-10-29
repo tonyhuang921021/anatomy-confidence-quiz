@@ -143,3 +143,15 @@ test("模擬考倒數仍在進行時保留暫停與繼續語意", () => {
     "繼續"
   );
 });
+
+test("已知 80 題原卷完整作答後統計正確率，缺題、重複或空白不算完整", () => {
+  const key = "MOEX-C217-091030-S4004-STAGE1";
+  const attempts = makeAttempts(80, 61, `${key}-Q`);
+  const session = makeSession({ attempts, questionOrder: attempts.map((a) => a.questionId), settings: { paperMode: "past_paper", selectedPaperKey: key, questionCount: 80 } });
+  assert.equal(buildSimulationPaperScoreRow(session)?.score, 76); // 61/80 = 76.25%, rounded to stored integer percentage.
+  assert.equal(buildSimulationPaperScoreRow({ ...session, attempts: attempts.slice(0, 79) }), null);
+  assert.equal(buildSimulationPaperScoreRow({ ...session, attempts: [...attempts.slice(0, 79), attempts[0]] }), null);
+  assert.equal(buildSimulationPaperScoreRow({ ...session, attempts: attempts.map((a, i) => i === 0 ? { ...a, selectedAnswer: "" as Attempt["selectedAnswer"] } : a) }), null);
+  assert.equal(buildSimulationPaperScoreRow({ ...session, settings: { ...session.settings!, selectedPaperKey: "MOEX-C101-091030-S4004-HIGHGENERAL" } }), null);
+  assert.equal(buildSimulationPaperScoreRow({ ...session, settings: { ...session.settings!, selectedPaperKey: undefined } })?.paper_key, key);
+});

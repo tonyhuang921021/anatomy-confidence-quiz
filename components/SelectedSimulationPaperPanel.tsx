@@ -77,7 +77,7 @@ export function SelectedSimulationPaperPanel({
         <div className="flex items-end justify-between gap-3">
           <div>
             <p className="text-sm font-bold text-ink">有效完成紀錄</p>
-            <p className="mt-1 text-xs text-slate-500">有效樣本，排除 3 分以下誤送</p>
+            <p className="mt-1 text-xs text-slate-500">完整作答正確率，排除不高於 3% 的誤送</p>
           </div>
           {statsState === "loading" ? (
             <div className="h-7 w-16 animate-pulse rounded bg-slate-200" />
@@ -94,11 +94,11 @@ export function SelectedSimulationPaperPanel({
         {canViewDetailedStats ? (
           <div className="mt-4 border-t border-slate-100 pt-4">
             <div className="mb-4 flex items-end justify-between gap-3">
-              <p className="text-sm font-bold text-ink">平均與級距</p>
+              <p className="text-sm font-bold text-ink">平均正確率與級距</p>
               {stats?.available && stats.averageScore !== null ? (
                 <p className="text-2xl font-black text-ink">
                   {stats.averageScore}
-                  <span className="ml-1 text-xs font-bold text-slate-500">分</span>
+                  <span className="ml-1 text-xs font-bold text-slate-500">%</span>
                 </p>
               ) : null}
             </div>
@@ -128,7 +128,7 @@ export function SelectedSimulationPaperPanel({
                         key={bucket.key}
                         className={BUCKET_COLORS[index]}
                         style={{ width: `${(count / stats.sampleCount) * 100}%` }}
-                        title={`${bucket.label} 分：${count} 份`}
+                        title={`${bucket.label}%：${count} 份`}
                       />
                     );
                   })}
@@ -153,7 +153,7 @@ export function SelectedSimulationPaperPanel({
           </div>
         ) : (
           <p className="mt-4 border-l-2 border-amber-300 pl-3 text-sm leading-6 text-slate-500">
-            完成這份考卷後，可查看全站平均與成績級距。
+            完成這份考卷後，可查看全站平均正確率與級距。
           </p>
         )}
       </section>

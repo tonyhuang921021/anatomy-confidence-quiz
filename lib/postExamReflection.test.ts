@@ -268,3 +268,20 @@ test("讀書建議與鼓勵保留段落換行並清除控制字元", () => {
   assert.equal(result.data.studyReflection, "第一段\n\n第二段");
   assert.equal(result.data.encouragement, "慢慢來\n你可以的");
 });
+
+test("混合舊 100 題與 80 題完整卷以正確率呈現並依正式卷號辨識", () => {
+  const old = makeSession();
+  const key = "MOEX-C217-091030-S5004-STAGE1";
+  const attempts = old.attempts.slice(0, 80).map((a, i) => ({ ...a, questionId: `${key}-Q${String(i + 1).padStart(3, "0")}`, isCorrect: i < 61 }));
+  const historical = { ...old, id: "historical-80", subject: "醫學（二）" as const, settings: { ...old.settings!, paperMode: "past_paper" as const, selectedPaperKey: key, questionCount: 80 }, attempts, questionOrder: attempts.map(a => a.questionId) };
+  const partial = { ...historical, id: "partial-80", attempts: attempts.slice(0, 79) };
+  const summarized = summarizeLocalPostExamSessions([old, historical, partial]);
+  assert.equal(summarized.sessions.find(x => x.sessionId === "partial-80")?.attempts, 79);
+  assert.equal(summarized.simulations.find(x => x.sessionId === "historical-80")?.score, 76);
+  assert.equal(summarized.simulations.find(x => x.sessionId === "historical-80")?.subject, "醫學（二）");
+  assert.equal(summarized.simulations.some(x => x.sessionId === "partial-80"), false);
+  assert.equal(summarized.simulations.find(x => x.sessionId === "local-session-1")?.score, 72);
+  assert.equal(inferPostExamSubject(key), "醫學（二）");
+  const grouped = groupPostExamSimulationsByYear(summarized.simulations);
+  assert.ok(grouped.some(x => x.key === "year-2002" && x.med2.some(y => y.paperKey === key)));
+});

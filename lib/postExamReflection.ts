@@ -1,4 +1,6 @@
 import { formatRocYear } from "./rocDate";
+import { getOfficialPaperKeyFromQuestionId } from "./officialPaperIdentity";
+import { buildSimulationPaperScoreRow } from "./simulationPaperStats";
 import type { QuizSession } from "@/types/quiz";
 
 export const POST_EXAM_CUTOFF_AT = "2026-07-17T07:00:00.000Z";
@@ -102,8 +104,7 @@ export function inferPostExamPaperKey(session: Pick<QuizSession, "settings" | "q
   const aiMatch = firstQuestionId.match(/^(AI-[A-Z0-9-]+)-Q\d+$/i);
   if (aiMatch) return aiMatch[1];
 
-  const moexMatch = firstQuestionId.match(/^MOEX-(.+)-Q\d+$/i);
-  return moexMatch?.[1] ?? "";
+  return getOfficialPaperKeyFromQuestionId(firstQuestionId) ?? "";
 }
 
 export function inferPostExamSubject(
@@ -117,6 +118,8 @@ export function inferPostExamSubject(
   const normalized = paperKey.trim().toUpperCase();
   if (/AI-MED1(?:-|$)/.test(normalized)) return "醫學（一）";
   if (/AI-MED2(?:-|$)/.test(normalized)) return "醫學（二）";
+  if (/^MOEX-C\d+-\d{6}-S(?:1001|4001|4004)-[A-Z0-9]+$/.test(normalized)) return "醫學（一）";
+  if (/^MOEX-C\d+-\d{6}-S(?:2001|5001|5004)-[A-Z0-9]+$/.test(normalized)) return "醫學（二）";
   if (/(?:^|-)(?:1301|1101|5301)$/.test(normalized)) return "醫學（一）";
   if (/(?:^|-)(?:2301|2101|6301)$/.test(normalized)) return "醫學（二）";
   return null;
@@ -130,6 +133,8 @@ export function formatPostExamPaperLabel(paperKey: string, sessionName?: string 
 }
 
 function getPostExamSimulationYear(result: PostExamSimulationResult) {
+  const compoundMatch = result.paperKey.match(/^MOEX-C\d+-(\d{3})\d{3}-S\d+-[A-Z0-9]+$/i);
+  if (compoundMatch) return Number(compoundMatch[1]) + 1911;
   const officialKeyMatch = result.paperKey.match(/^(?:MOEX-)?(\d{3})\d{3}-\d{4}$/i);
   if (officialKeyMatch) {
     const year = Number(officialKeyMatch[1]) + 1911;
@@ -335,10 +340,9 @@ export function summarizeLocalPostExamSessions(sessions: QuizSession[]) {
       completedAt
     });
 
-    if (session.settings?.mode !== "simulation" || attempts !== 100 || correctAttempts <= 3) {
-      continue;
-    }
-    const paperKey = inferPostExamPaperKey(session);
+    const fullPaper = buildSimulationPaperScoreRow(session);
+    if (!fullPaper) continue;
+    const paperKey = fullPaper.paper_key;
     const subject = inferPostExamSubject(paperKey, session.subject);
     if (!paperKey || !subject) continue;
     simulations.push({
@@ -346,7 +350,7 @@ export function summarizeLocalPostExamSessions(sessions: QuizSession[]) {
       subject,
       paperKey,
       paperLabel: formatPostExamPaperLabel(paperKey, session.settings?.sessionName),
-      score: correctAttempts,
+      score: fullPaper.score,
       completedAt
     });
   }
