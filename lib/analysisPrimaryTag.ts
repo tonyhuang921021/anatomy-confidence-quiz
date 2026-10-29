@@ -29,6 +29,7 @@ const runtimePrimaryTagMap = primaryTagRuntimeMapJson as unknown as RuntimePrima
 const runtimeAssignments = runtimePrimaryTagMap.questions;
 // 96-1 content-reviewed candidates are keyed per question; no historical band inference.
 const legacy96ContentAssignments = legacy96ContentClassificationCandidate.questions as unknown as Record<string, [SubjectName, string, string, string]>;
+const legacy96QuarantinedIds = new Set<string>(legacy96ContentClassificationCandidate.quarantined);
 // The source-bound contract test validates every subject, tag and tuple length.
 const legacyAssignments = { ...legacyClassificationJson.questions, ...legacy97ClassificationJson.questions, ...legacy97Med2ClassificationJson.questions, ...legacy97SecondMed1ClassificationJson.questions, ...legacy97SecondMed2ClassificationJson.questions } as unknown as Record<string, [SubjectName, string | null]>;
 const legacyPendingIds = new Set<string>(legacyClassificationJson.pendingQuestionIds);
@@ -78,6 +79,7 @@ export function getLockedLegacyPrimaryTagAssignment(questionId: string, candidat
 export function getQuestionPrimaryTag(
   question: Pick<Question, "id" | "section" | "primaryTag">
 ) {
+  if (legacy96QuarantinedIds.has(question.id)) return null;
   const assignment = getAnalysisPrimaryTagAssignment(question.id);
   if (assignment) {
     // A reviewed broad subject does not imply an invented topic for a taxonomy gap.
@@ -94,11 +96,12 @@ export function getQuestionPrimaryTag(
 export function hasAnalysisPrimaryTagAssignment(questionId: string) {
   return Object.prototype.hasOwnProperty.call(runtimeAssignments, questionId) ||
     Object.prototype.hasOwnProperty.call(legacyAssignments, questionId) ||
-    Object.prototype.hasOwnProperty.call(legacy96ContentAssignments, questionId);
+    Object.prototype.hasOwnProperty.call(legacy96ContentAssignments, questionId) ||
+    legacy96QuarantinedIds.has(questionId);
 }
 
 export function isLegacyQuestionClassificationPending(questionId: string) {
-  return legacyPendingIds.has(questionId);
+  return legacyPendingIds.has(questionId) || legacy96QuarantinedIds.has(questionId);
 }
 
 export function isLegacyQuestionPrimaryTagPending(questionId: string) {
@@ -168,7 +171,7 @@ export function getQuestionClassificationLabel(
   question: Pick<Question, "id" | "subject" | "chapter" | "section" | "primaryTag">
 ) {
   const primaryTag = getQuestionPrimaryTag(question);
-  if (!primaryTag && Object.prototype.hasOwnProperty.call(legacyAssignments, question.id)) {
+  if (!primaryTag && (Object.prototype.hasOwnProperty.call(legacyAssignments, question.id) || legacy96QuarantinedIds.has(question.id))) {
     return `${question.subject}（細分類待核對）`;
   }
   if (!primaryTag) return `${question.subject} / ${question.chapter} / ${question.section}`;

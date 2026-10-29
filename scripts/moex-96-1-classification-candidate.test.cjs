@@ -16,5 +16,5 @@ test('198 reviewed question-level assignments use existing subjects, tags and ex
 test('13 question-specific placements retain reviewed values; quarantined questions are not assigned',()=>{
  const ids=['MOEX-096040-1101-Q034',...[6,12,15,41,46,48,51,58,65,73,75,88].map(n=>`MOEX-096040-2101-Q${String(n).padStart(3,'0')}`)];assert.deepEqual(review.questionSpecificPlacementExceptions,ids);
  assert.deepEqual(review.questions[ids[0]],['組織學','組織學－皮膚與特殊感覺器官','組織學','器官組織學']);
- for(const id of review.quarantined){assert.equal(Object.hasOwn(review.questions,id),false);assert.equal(tags.getAnalysisPrimaryTagAssignment(id),null);}
+ for(const id of review.quarantined){assert.equal(Object.hasOwn(review.questions,id),false);assert.equal(tags.getAnalysisPrimaryTagAssignment(id),null);assert.equal(tags.isLegacyQuestionClassificationPending(id),true);const q={id,subject:'醫學（二）',chapter:'舊制官方原卷',section:'醫學（二）'};assert.equal(tags.getQuestionPrimaryTag(q),null);assert.match(tags.getQuestionClassificationLabel(q),/細分類待核對/);assert.deepEqual(tags.applyClassificationOverrideWithPrimaryTagPriority(q,{subject:'病理學',chapter:'bad',section:'bad'}),q);}
 });
