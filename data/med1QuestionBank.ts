@@ -2217,6 +2217,8 @@ export type PastPaperOption = {
   timeMinutes?: number;
   pointsPerQuestion?: number;
   officialScope?: string;
+  cardTrackLabel?: string;
+  cardPaperTitle?: string;
 };
 
 function shuffle<T>(items: T[]) {
@@ -2601,6 +2603,10 @@ export function getPastPaperOptions(
       timeMinutes: question.officialExam?.timeMinutes,
       pointsPerQuestion: question.officialExam?.pointsPerQuestion,
       officialScope: question.officialExam?.officialScope,
+      cardTrackLabel: question.officialExam?.trackCode === "HIGHGENERAL"
+        ? "醫師國考（舊制）"
+        : question.officialExam?.trackLabel ?? ((question.sourceYear ?? 9999) <= 2010 ? "醫師國考（舊制）" : "醫師國考"),
+      cardPaperTitle: question.officialExam?.paperTitle ?? examLabel,
       sourceYear: question.sourceYear,
       sourceRound: question.sourceRound ?? (question.examSessionLabel?.includes("第二") ? 2 : 1)
     });

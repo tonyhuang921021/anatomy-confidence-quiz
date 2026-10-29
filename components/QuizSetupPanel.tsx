@@ -17,13 +17,14 @@ import {
   DEFAULT_QUIZ_SETTINGS,
   getModeLabel
 } from "@/lib/quizAnalysis";
-import { loadCompletedSessions, loadSimulationConfidenceCalibration, saveQuizSettings } from "@/lib/storage";
+import { loadCompletedSessions, loadCurrentSession, loadSimulationConfidenceCalibration, saveQuizSettings } from "@/lib/storage";
 import { getSimulationConfidenceCalibrationPreference } from "@/lib/accountPreferences";
 import { buildNewQuizHref } from "@/lib/startSettingsUrl";
 import {
   CompletionStatsBundle,
   QuizMode,
   QuizSettings,
+  QuizSession,
   SimulationFeedbackMode,
   SimulationPaperMode,
   SubjectFilter
@@ -166,6 +167,8 @@ export function QuizSetupPanel({
       : DEFAULT_QUIZ_SETTINGS
   );
   const [paperStatsOpen, setPaperStatsOpen] = useState(false);
+  const [paperYear, setPaperYear] = useState<number | null>(null);
+  const [currentSession, setCurrentSession] = useState<QuizSession | null>(null);
   const [completedPaperSummaries, setCompletedPaperSummaries] = useState<Record<string, CompletedPaperSummary>>({});
   const selectedSubject = (settings.subjectFilter ?? "解剖學") as SubjectFilter;
   const subjectItem =
@@ -223,21 +226,35 @@ export function QuizSetupPanel({
   const selectedPaper = selectedPaperOptions.find(
     (paper) => paper.key === settings.selectedPaperKey
   );
-  const selectedCount = selectedPaper?.questionCount ?? 100;
-  const officialScope = selectedPaper && "officialScope" in selectedPaper ? selectedPaper.officialScope : undefined;
-  const officialTime = selectedPaper && "timeMinutes" in selectedPaper ? selectedPaper.timeMinutes : undefined;
-  const officialPoints = selectedPaper && "pointsPerQuestion" in selectedPaper ? selectedPaper.pointsPerQuestion : undefined;
+  const allPastPapers = useMemo(() => settings.mode === "simulation" && settings.paperMode !== "ai_paper" ? getPastPaperOptions("全部") : [], [settings.mode, settings.paperMode]);
+  const paperYears = useMemo(() => Array.from(new Set(allPastPapers.map((paper) => paper.sourceYear).filter((year): year is number => typeof year === "number"))).sort((a, b) => b - a), [allPastPapers]);
+  const visibleYear = paperYear ?? selectedPaper?.sourceYear ?? paperYears[0];
+  const activePaperMode = settings.paperMode ?? "random_set";
+  const visiblePaper = activePaperMode === "past_paper" && selectedPaper?.sourceYear !== visibleYear ? undefined : selectedPaper;
+  const selectedCount = visiblePaper?.questionCount ?? 100;
+  const officialScope = visiblePaper && "officialScope" in visiblePaper ? visiblePaper.officialScope : undefined;
+  const officialTime = visiblePaper && "timeMinutes" in visiblePaper ? visiblePaper.timeMinutes : undefined;
+  const officialPoints = visiblePaper && "pointsPerQuestion" in visiblePaper ? visiblePaper.pointsPerQuestion : undefined;
   const canViewSelectedPaperDetails = Boolean(
     selectedPaper &&
       (completedPaperSummaries[selectedPaper.key]?.hasAnswered || isAdminEmail(user?.email))
   );
-  const activePaperMode = settings.paperMode ?? "random_set";
   const isSelectablePaperMode = activePaperMode === "past_paper" || activePaperMode === "ai_paper";
-  const canStart = !isSelectablePaperMode || Boolean(settings.selectedPaperKey);
+  const canStart = !isSelectablePaperMode || Boolean(settings.selectedPaperKey && visiblePaper);
+  const currentPaperKey = currentSession?.settings?.mode === "simulation" && !currentSession.completedAt
+    ? currentSession.settings.selectedPaperKey ?? inferPastPaperKeyFromQuestionIds(currentSession.questionOrder ?? [])
+    : undefined;
 
   useEffect(() => {
     setCompletedPaperSummaries(buildCompletedPaperSummaries());
   }, [syncStatus, syncVersion]);
+
+  useEffect(() => {
+    const refresh = () => setCurrentSession(loadCurrentSession());
+    refresh();
+    window.addEventListener("current-session-change", refresh);
+    return () => window.removeEventListener("current-session-change", refresh);
+  }, [syncVersion]);
 
   useEffect(() => {
     const nextSimulationConfidenceCalibration = user
@@ -303,7 +320,7 @@ export function QuizSetupPanel({
         if (merged.mode === "simulation") {
           merged.paperMode = merged.paperMode ?? "past_paper";
           merged.questionCount = 100;
-          merged.selectedPaperKey = undefined;
+          merged.selectedPaperKey = next.selectedPaperKey;
         }
       }
       if (next.paperMode && next.paperMode !== current.paperMode) {
@@ -501,7 +518,7 @@ export function QuizSetupPanel({
                     }`}
                   >
                     <span className="block text-sm font-semibold">{item.label}</span>
-                    <span className="mt-1 block text-xs leading-5 text-slate-500">{officialScope ? item.subject === selectedPaper?.subject ? officialScope : "科目範圍依所選考卷為準" : selectedPaper?.sourceYear && selectedPaper.sourceYear >= 2009 && selectedPaper.sourceYear <= 2010
+                    <span className="mt-1 block text-xs leading-5 text-slate-500">{officialScope ? item.subject === selectedPaper?.subject ? officialScope : "科目範圍依所選考卷為準" : visiblePaper?.sourceYear && visiblePaper.sourceYear >= 2009 && visiblePaper.sourceYear <= 2010
                       ? item.subject === "醫學（一）" ? "解剖、胚胎、組織、微免、寄生蟲、公衛" : "生理、生化、藥理、病理"
                       : item.description}</span>
                   </button>
@@ -511,26 +528,39 @@ export function QuizSetupPanel({
 
             {isSelectablePaperMode ? (
               <div>
-                <label htmlFor="simulation-paper" className="text-sm font-semibold text-ink">
-                  {activePaperMode === "ai_paper" ? "選擇 AI 模擬卷" : "選擇考古卷"}
-                </label>
-                <select
-                  id="simulation-paper"
-                  value={settings.selectedPaperKey ?? ""}
-                  onChange={(event) => updateSettings({ selectedPaperKey: event.target.value })}
-                  disabled={selectedPaperOptions.length === 0}
-                  className="mt-2 min-h-12 w-full rounded-xl border border-slate-200 bg-white px-3 py-3 text-sm text-ink outline-none focus-visible:ring-2 focus-visible:ring-brand-500 disabled:bg-slate-50"
-                >
-                  {selectedPaperOptions.length === 0 ? <option value="">目前沒有可用的完整考卷</option> : null}
-                  {selectedPaperOptions.map((paper) => (
-                    <option key={paper.key} value={paper.key}>
-                      {paper.label}{completedPaperSummaries[paper.key] ? completedPaperSummaries[paper.key].lastScore === null ? " · 上次未作答" : ` · 上次已答題正確率 ${completedPaperSummaries[paper.key].lastScore}%` : " · 尚未作答"}
-                    </option>
-                  ))}
-                </select>
-                {selectedPaper?.sourceYear && selectedPaper.sourceYear >= 2009 && selectedPaper.sourceYear <= 2010 ? (
+                {activePaperMode === "ai_paper" ? (
+                  <>
+                    <label htmlFor="simulation-paper" className="text-sm font-semibold text-ink">選擇 AI 模擬卷</label>
+                    <select id="simulation-paper" value={settings.selectedPaperKey ?? ""} onChange={(event) => updateSettings({ selectedPaperKey: event.target.value })} disabled={selectedPaperOptions.length === 0} className="mt-2 min-h-12 w-full rounded-xl border border-slate-200 bg-white px-3 py-3 text-sm text-ink outline-none focus-visible:ring-2 focus-visible:ring-brand-500 disabled:bg-slate-50">
+                      {selectedPaperOptions.length === 0 ? <option value="">目前沒有可用的完整考卷</option> : null}
+                      {selectedPaperOptions.map((paper) => <option key={paper.key} value={paper.key}>{paper.label}{completedPaperSummaries[paper.key] ? completedPaperSummaries[paper.key].lastScore === null ? " · 上次未作答" : ` · 上次已答題正確率 ${completedPaperSummaries[paper.key].lastScore}%` : " · 尚未作答"}</option>)}
+                    </select>
+                  </>
+                ) : (
+                  <div>
+                    <p className="text-sm font-semibold text-ink">選擇考古卷</p>
+                    <div role="group" aria-label="考卷年份" className="mt-2 flex max-w-full gap-2 overflow-x-auto pb-2">
+                      {paperYears.map((year) => <button key={year} type="button" aria-pressed={visibleYear === year} onClick={() => setPaperYear(year)} className={`min-h-10 shrink-0 rounded-xl border px-3 py-2 text-sm font-semibold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 ${visibleYear === year ? "border-brand-600 bg-brand-50 text-brand-800" : "border-slate-200 bg-white text-slate-700"}`}>{formatRocYear(year)}</button>)}
+                    </div>
+                    <div role="group" aria-label={`${visibleYear ? formatRocYear(visibleYear) : "所選年份"}考卷`} className="mt-2 grid min-w-0 grid-cols-1 gap-2 sm:grid-cols-2">
+                      {allPastPapers.filter((paper) => paper.sourceYear === visibleYear).map((paper) => {
+                        const summary = completedPaperSummaries[paper.key];
+                        const progress = currentPaperKey === paper.key && currentSession ? currentSession.attempts.length : null;
+                        return <div key={paper.key} className="min-w-0 rounded-xl border border-slate-200 bg-white">
+                          <button type="button" aria-pressed={settings.selectedPaperKey === paper.key} onClick={() => updateSettings({ subjectFilter: paper.subject, selectedPaperKey: paper.key })} className={`w-full min-w-0 rounded-xl px-3 py-3 text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 ${settings.selectedPaperKey === paper.key ? "bg-brand-50 text-brand-800 ring-1 ring-brand-600" : "text-slate-700"}`}>
+                            <span className="block text-xs text-slate-500">{paper.cardTrackLabel}</span>
+                            <span className="mt-1 block text-sm font-semibold">第 {paper.sourceRound ?? 1} 次・{paper.cardPaperTitle ?? paper.subject}</span>
+                            <span className="mt-1 block text-xs text-slate-500">{paper.questionCount} 題・{summary ? summary.lastScore === null ? "上次未作答" : `上次已答題正確率 ${summary.lastScore}%` : "尚未作答"}</span>
+                          </button>
+                          {progress !== null && currentSession ? <div className="px-3 pb-3 text-xs text-slate-600">進行中，已答 {progress} / {currentSession.questionOrder?.length ?? paper.questionCount} 題・<a className="font-semibold text-brand-700 underline" href={`/quiz?resume=1&sessionId=${encodeURIComponent(currentSession.id)}`}>繼續作答</a></div> : null}
+                        </div>;
+                      })}
+                    </div>
+                  </div>
+                )}
+                {visiblePaper?.sourceYear && visiblePaper.sourceYear >= 2009 && visiblePaper.sourceYear <= 2010 ? (
                   <p className="mt-3 rounded-xl bg-amber-50 px-3 py-2 text-xs leading-6 text-amber-900">
-                    {formatRocYear(selectedPaper.sourceYear)}舊制：{selectedPaper.subject === "醫學（一）"
+                    {formatRocYear(visiblePaper.sourceYear)}舊制：{visiblePaper.subject === "醫學（一）"
                       ? "醫學（一）含解剖、胚胎、組織、微生物免疫、寄生蟲及公共衛生。"
                       : "醫學（二）含生理、生化、藥理及病理。"}每卷 100 題，依當年官方最終答案及更正採分；法規與醫學知識可能已有更新。
                   </p>
@@ -547,7 +577,7 @@ export function QuizSetupPanel({
             <div className="flex flex-col gap-3 border-y border-slate-200 py-4 sm:flex-row sm:items-center sm:justify-between">
               <div className="min-w-0" aria-live="polite">
                 <p className="text-sm font-semibold leading-6 text-ink">
-                  {selectedPaper?.label ?? `${settings.subjectFilter === "醫學（二）" ? "醫學（二）" : "醫學（一）"} · ${paperModeLabels[activePaperMode]}`}
+                  {visiblePaper?.label ?? (activePaperMode === "past_paper" ? "請選擇這一年的考卷" : `${settings.subjectFilter === "醫學（二）" ? "醫學（二）" : "醫學（一）"} · ${paperModeLabels[activePaperMode]}`)}
                 </p>
                 <p className="mt-1 text-xs leading-5 text-slate-500">
                   {activePaperMode === "random_past_paper" ? "題數依抽到的考卷" : `${selectedCount} 題`} · {feedbackModeLabels[settings.feedbackMode ?? "none"]}
