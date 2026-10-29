@@ -39,8 +39,9 @@ export type Question = {
     image: string;
     width: number;
     height: number;
-    scope: string;
+    scope: string | null;
     answerNote?: string | null;
+    transcriptionNotice?: string;
   };
   options: {
     A: string;
@@ -71,7 +72,7 @@ export type Question = {
   originalQuestionNumber?: number;
   examCode?: string;
   paperCode?: string;
-  officialExam?: { categoryCode: string; subjectCode: string; trackCode: string; trackLabel: string; paperTitle: string; questionCount?: number; timeMinutes?: number; pointsPerQuestion?: number; officialScope?: string };
+  officialExam?: { categoryCode: string; subjectCode: string; trackCode: string; trackLabel: string; paperTitle: string; questionCount?: number; timeMinutes?: number; pointsPerQuestion?: number; officialScope?: string | null };
   examSessionLabel?: string;
   difficulty?: DifficultyLevel;
   isDetailQuestion?: boolean;

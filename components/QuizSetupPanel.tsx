@@ -565,7 +565,7 @@ export function QuizSetupPanel({
                       : "醫學（二）含生理、生化、藥理及病理。"}每卷 100 題，依當年官方最終答案及更正採分；法規與醫學知識可能已有更新。
                   </p>
                 ) : null}
-                {officialScope ? <p className="mt-3 rounded-xl bg-amber-50 px-3 py-2 text-xs leading-6 text-amber-900">官方科目：{officialScope}。每卷 {selectedCount} 題，每題 {officialPoints} 分，考試時間 {officialTime} 分鐘；網站另依內容提供細分類。</p> : null}
+                {officialTime ? <p className="mt-3 rounded-xl bg-amber-50 px-3 py-2 text-xs leading-6 text-amber-900">{officialScope ? `官方科目：${officialScope}。` : "原卷未列科目組合。"}每卷 {selectedCount} 題，每題 {officialPoints} 分，考試時間 {officialTime} 分鐘；網站另依內容提供細分類。</p> : null}
               </div>
             ) : (
               <div className="border-l-2 border-brand-200 pl-3">

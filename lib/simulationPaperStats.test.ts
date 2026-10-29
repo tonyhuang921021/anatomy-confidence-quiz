@@ -155,3 +155,14 @@ test("已知 80 題原卷完整作答後統計正確率，缺題、重複或空�
   assert.equal(buildSimulationPaperScoreRow({ ...session, settings: { ...session.settings!, selectedPaperKey: "MOEX-C101-091030-S4004-HIGHGENERAL" } }), null);
   assert.equal(buildSimulationPaperScoreRow({ ...session, settings: { ...session.settings!, selectedPaperKey: undefined } })?.paper_key, key);
 });
+
+test("90 年兩場四卷保留 80 題契約並拒絕其他考試軌道", () => {
+  for (const code of ["090040", "090180"]) for (const selector of ["4004", "5004"]) {
+    const key = `MOEX-C002-${code}-S${selector}-STAGE1`;
+    const attempts = makeAttempts(80, 60, `${key}-Q`);
+    const session = makeSession({ attempts, questionOrder: attempts.map((a) => a.questionId), settings: { paperMode: "past_paper", selectedPaperKey: key, questionCount: 80 } });
+    assert.equal(buildSimulationPaperScoreRow(session)?.score, 75);
+    assert.equal(buildSimulationPaperScoreRow({ ...session, attempts: attempts.slice(0, 79) }), null);
+    assert.equal(buildSimulationPaperScoreRow({ ...session, settings: { ...session.settings!, selectedPaperKey: key.replace("C002", "C001") } }), null);
+  }
+});

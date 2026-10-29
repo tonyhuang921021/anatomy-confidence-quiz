@@ -28,6 +28,10 @@ import moex91FirstMed1 from "@/data/sources/moex_91_1_stage1_med1_questions.json
 import moex91FirstMed2 from "@/data/sources/moex_91_1_stage1_med2_questions.json";
 import moex91SecondMed1 from "@/data/sources/moex_91_2_stage1_med1_questions.json";
 import moex91SecondMed2 from "@/data/sources/moex_91_2_stage1_med2_questions.json";
+import moex90FirstMed1 from "@/data/sources/moex_90_1_stage1_med1_questions.json";
+import moex90FirstMed2 from "@/data/sources/moex_90_1_stage1_med2_questions.json";
+import moex90SecondMed1 from "@/data/sources/moex_90_2_stage1_med1_questions.json";
+import moex90SecondMed2 from "@/data/sources/moex_90_2_stage1_med2_questions.json";
 import moex9899LearningPlacement from "@/data/sources/moex_98_99_learning_placement.json";
 import questionMediaManifest from "@/data/sources/question_media_manifest.json";
 import {
@@ -2104,6 +2108,10 @@ export const canonicalQuestionBank: Question[] = dedupeQuestionBank([
   ...(moex91FirstMed2.questions as Question[]),
   ...(moex91SecondMed1.questions as Question[]),
   ...(moex91SecondMed2.questions as Question[]),
+  ...(moex90FirstMed1.questions as Question[]),
+  ...(moex90FirstMed2.questions as Question[]),
+  ...(moex90SecondMed1.questions as Question[]),
+  ...(moex90SecondMed2.questions as Question[]),
   ...manualInjectedQuestions
 ]).map(applyAnalysisPrimaryTagClassification);
 
@@ -2216,7 +2224,7 @@ export type PastPaperOption = {
   expectedQuestionCount?: number;
   timeMinutes?: number;
   pointsPerQuestion?: number;
-  officialScope?: string;
+  officialScope?: string | null;
   cardTrackLabel?: string;
   cardPaperTitle?: string;
 };
