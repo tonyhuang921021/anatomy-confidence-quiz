@@ -101,14 +101,14 @@ test('Yangming uses source-only references with explicit page gaps; no mirrored 
   assert.equal(links.questions.filter(q=>q.erratum).length,1);
 });
 
-test('real runtime retains 6730 baseline questions and exposes the eight 98–99, four 97 and two 96 papers', () => {
+test('real runtime retains 6730 baseline questions and exposes the eight 98–99, four 97 and four 96 papers', () => {
   const crypto=require('node:crypto');
   const current=require('../data/med1QuestionBank.ts');
   const additions97=[...require('../data/sources/moex_97_1_med1_questions.json').questions,...require('../data/sources/moex_97_1_med2_questions.json').questions,...require('../data/sources/moex_97_2_med1_questions.json').questions,...require('../data/sources/moex_97_2_med2_questions.json').questions];
-  const additions96=[...require('../data/sources/moex_96_1_med1_questions.json').questions,...require('../data/sources/moex_96_1_med2_questions.json').questions];
+  const additions96=[...require('../data/sources/moex_96_1_med1_questions.json').questions,...require('../data/sources/moex_96_1_med2_questions.json').questions,...require('../data/sources/moex_96_2_med1_questions.json').questions,...require('../data/sources/moex_96_2_med2_questions.json').questions];
   const oldIds=new Set(payload.questions.map(q=>q.id)),newIds=new Set([...additions97,...additions96].map(q=>q.id));
-  assert.equal(oldIds.size,800);assert.equal(newIds.size,600);assert.equal([...newIds].filter(id=>oldIds.has(id)).length,0);
-  assert.equal(current.canonicalQuestionBank.length,6730+800+400+200);
+  assert.equal(oldIds.size,800);assert.equal(newIds.size,800);assert.equal([...newIds].filter(id=>oldIds.has(id)).length,0);
+  assert.equal(current.canonicalQuestionBank.length,6730+800+400+400);
   const original=current.canonicalQuestionBank.filter(q=>!oldIds.has(q.id)&&!newIds.has(q.id));assert.equal(original.length,6730);
   const revisions=require('../docs/moex-98-99/canonical-reviewed-corrections.json');
   assert.deepEqual(revisions.map(({id,fields})=>({id,fields})),[
@@ -124,7 +124,7 @@ test('real runtime retains 6730 baseline questions and exposes the eight 98–99
     const omitClassification=({subject,chapter,section,primaryTag,...q})=>q;
     assert.deepEqual(current.getQuestionsForPastPaper(paper.key,paper.subject).map(omitClassification),payload.questions.filter(q=>`${q.examCode}-${q.paperCode}`===paper.key).map(omitClassification));
   }
-  for(const code of ['097050-1101','097050-2101','097140-1101','097140-2101','096040-1101','096040-2101']){const item=after.find(p=>p.key===code);assert.ok(item?.isComplete,code);assert.equal(item.questionCount,100);}
+  for(const code of ['097050-1101','097050-2101','097140-1101','097140-2101','096040-1101','096040-2101','096130-1101','096130-2101']){const item=after.find(p=>p.key===code);assert.ok(item?.isComplete,code);assert.equal(item.questionCount,100);}
   const years=require('../lib/practiceYears.ts');assert.equal(years.toGregorianPracticeYear(97),2008);assert.equal(years.toGregorianPracticeYear(98),2009);assert.equal(years.toGregorianPracticeYear(99),2010);
 });
 

@@ -17,6 +17,8 @@ import moex97SecondMed1Questions from "@/data/sources/moex_97_2_med1_questions.j
 import moex97SecondMed2Questions from "@/data/sources/moex_97_2_med2_questions.json";
 import moex96FirstMed1Questions from "@/data/sources/moex_96_1_med1_questions.json";
 import moex96FirstMed2Questions from "@/data/sources/moex_96_1_med2_questions.json";
+import moex96SecondMed1Questions from "@/data/sources/moex_96_2_med1_questions.json";
+import moex96SecondMed2Questions from "@/data/sources/moex_96_2_med2_questions.json";
 import moex9899LearningPlacement from "@/data/sources/moex_98_99_learning_placement.json";
 import questionMediaManifest from "@/data/sources/question_media_manifest.json";
 import {
@@ -2083,6 +2085,8 @@ export const canonicalQuestionBank: Question[] = dedupeQuestionBank([
   ...(moex97SecondMed2Questions.questions as Question[]),
   ...(moex96FirstMed1Questions.questions as Question[]),
   ...(moex96FirstMed2Questions.questions as Question[]),
+  ...(moex96SecondMed1Questions.questions as Question[]),
+  ...(moex96SecondMed2Questions.questions as Question[]),
   ...manualInjectedQuestions
 ]).map(applyAnalysisPrimaryTagClassification);
 

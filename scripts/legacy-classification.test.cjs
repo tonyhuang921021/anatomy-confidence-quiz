@@ -78,7 +78,7 @@ test('all original taxonomy definitions/IDs/names/order survive additive approve
  assert.equal(new Set(current.primaryTags.map(t=>t.id)).size,current.primaryTags.length);
 });
 test('all 6730 pre-existing canonical questions retain their baseline except two source-reviewed corrections',()=>{
- const added97Ids=new Set([...require('../data/sources/moex_97_1_med1_questions.json').questions,...require('../data/sources/moex_97_1_med2_questions.json').questions,...require('../data/sources/moex_97_2_med1_questions.json').questions,...require('../data/sources/moex_97_2_med2_questions.json').questions,...require('../data/sources/moex_96_1_med1_questions.json').questions,...require('../data/sources/moex_96_1_med2_questions.json').questions].map(q=>q.id));
+ const added97Ids=new Set([...require('../data/sources/moex_97_1_med1_questions.json').questions,...require('../data/sources/moex_97_1_med2_questions.json').questions,...require('../data/sources/moex_97_2_med1_questions.json').questions,...require('../data/sources/moex_97_2_med2_questions.json').questions,...require('../data/sources/moex_96_1_med1_questions.json').questions,...require('../data/sources/moex_96_1_med2_questions.json').questions,...require('../data/sources/moex_96_2_med1_questions.json').questions,...require('../data/sources/moex_96_2_med2_questions.json').questions].map(q=>q.id));
  const old=bank.getCanonicalQuestionBank().filter(q=>!ids.has(q.id)&&!added97Ids.has(q.id));assert.equal(old.length,placementRules.baselineOldCanonicalCount);
  const revisions=require('../docs/moex-98-99/canonical-reviewed-corrections.json');
  assert.deepEqual(revisions.map(({id,fields})=>({id,fields})),[

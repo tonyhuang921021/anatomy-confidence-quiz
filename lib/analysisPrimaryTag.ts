@@ -5,6 +5,7 @@ import legacy97Med2ClassificationJson from "../data/sources/moex_97_1_med2_class
 import legacy97SecondMed1ClassificationJson from "../data/sources/moex_97_2_med1_classification.json";
 import legacy97SecondMed2ClassificationJson from "../data/sources/moex_97_2_med2_classification.json";
 import legacy96ContentClassificationCandidate from "../data/sources/moex_96_1_content_classification_candidate.json";
+import legacy96SecondContentClassificationCandidate from "../data/sources/moex_96_2_content_classification_candidate.json";
 import legacyLearningPlacementJson from "../data/sources/moex_98_99_learning_placement.json";
 import { getMoexPrimarySubject } from "../scripts/moex-primary-subject";
 import type { Question, QuestionClassificationOverride, SubjectName } from "../types/quiz";
@@ -28,8 +29,8 @@ type RuntimePrimaryTagMap = {
 const runtimePrimaryTagMap = primaryTagRuntimeMapJson as unknown as RuntimePrimaryTagMap;
 const runtimeAssignments = runtimePrimaryTagMap.questions;
 // 96-1 content-reviewed candidates are keyed per question; no historical band inference.
-const legacy96ContentAssignments = legacy96ContentClassificationCandidate.questions as unknown as Record<string, [SubjectName, string, string, string]>;
-const legacy96QuarantinedIds = new Set<string>(legacy96ContentClassificationCandidate.quarantined);
+const legacy96ContentAssignments = { ...legacy96ContentClassificationCandidate.questions, ...legacy96SecondContentClassificationCandidate.questions } as unknown as Record<string, [SubjectName, string, string, string]>;
+const legacy96QuarantinedIds = new Set<string>([...legacy96ContentClassificationCandidate.quarantined, ...legacy96SecondContentClassificationCandidate.quarantined]);
 // The source-bound contract test validates every subject, tag and tuple length.
 const legacyAssignments = { ...legacyClassificationJson.questions, ...legacy97ClassificationJson.questions, ...legacy97Med2ClassificationJson.questions, ...legacy97SecondMed1ClassificationJson.questions, ...legacy97SecondMed2ClassificationJson.questions } as unknown as Record<string, [SubjectName, string | null]>;
 const legacyPendingIds = new Set<string>(legacyClassificationJson.pendingQuestionIds);
