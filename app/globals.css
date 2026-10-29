@@ -8088,7 +8088,7 @@ html .home-motion .home-tone-motion { animation: home-motion-fade var(--home-rev
 .reviewed-explanation-controls button { min-height: 44px; padding: .45rem 1rem; border: 1px solid #bdd0c5; border-radius: .7rem; font-weight: 700; background: #f6f9f7; color: #284b3c; }
 .reviewed-explanation-controls button[aria-pressed="true"] { background: #285a45; color: white; }
 .reviewed-explanation button:focus-visible, .reviewed-reader a:focus-visible, .reviewed-reader summary:focus-visible { outline: 3px solid #b87914; outline-offset: 3px; }
-.reviewed-reader { --reviewed-image-max-height: 25rem; container: reviewed-reader / inline-size; min-width: 0; overflow-wrap: anywhere; line-height: 1.85; }
+.reviewed-reader { --reviewed-image-max-height: 10rem; container: reviewed-reader / inline-size; min-width: 0; overflow-wrap: anywhere; line-height: 1.85; }
 .reviewed-reader h2 { margin: .7rem 0 1rem; font-size: 1.25rem; font-weight: 800; line-height: 1.5; }
 .reviewed-reader h3, .reviewed-reader h4 { margin: 1.25rem 0 .55rem; font-size: 1.05rem; font-weight: 800; line-height: 1.6; }
 .reviewed-reader p { margin: .7rem 0; }
@@ -8100,9 +8100,11 @@ html .home-motion .home-tone-motion { animation: home-motion-fade var(--home-rev
 .reviewed-reader .reviewed-official-answer { font-weight: 700; padding: .5rem .75rem; border-left: 3px solid #749985; background: #f0f6f2; }
 @container reviewed-reader (min-width: 44rem) {
   .reviewed-reader .reviewed-figure-group { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-  .reviewed-reader .reviewed-figure-group { --reviewed-image-max-height: 21rem; }
+  .reviewed-reader .reviewed-figure-group { --reviewed-image-max-height: 10rem; }
 }
 .reviewed-image-frame { display: block; position: relative; width: min(100%, var(--reviewed-image-width), calc(var(--reviewed-image-max-height) * var(--reviewed-image-ratio))); aspect-ratio: var(--reviewed-image-ratio); margin: .75rem auto; background: #edf2ef; overflow: hidden; }
+.reviewed-reader .reviewed-image-frame img[data-reviewed-zoom="true"] { cursor: zoom-in; }
+.reviewed-reader .reviewed-image-frame img[data-reviewed-zoom="true"]:focus-visible { outline: 3px solid #b87914; outline-offset: -3px; }
 .reviewed-reader .reviewed-image-frame img { display: block; width: 100%; height: 100%; max-width: 100%; object-fit: contain; margin: 0; }
 .reviewed-image-frame[data-image-state="loading"]::after, .reviewed-image-frame[data-image-state="error"]::after { position: absolute; inset: 0; display: grid; place-content: center; padding: .5rem; color: #52665b; font-size: .8rem; text-align: center; pointer-events: none; }
 .reviewed-image-frame[data-image-state="loading"]::after { content: "圖片載入中…"; }
@@ -8121,7 +8123,7 @@ html .home-motion .home-tone-motion { animation: home-motion-fade var(--home-rev
 @media (max-width: 600px) {
   .reviewed-explanation { padding: .75rem; }
   .reviewed-reader figure { padding: .65rem; }
-  .reviewed-reader { --reviewed-image-max-height: 20rem; }
+  .reviewed-reader { --reviewed-image-max-height: 10rem; }
 }
 
 /* Keep the existing single-line update summary; disclosure reveals real history. */
