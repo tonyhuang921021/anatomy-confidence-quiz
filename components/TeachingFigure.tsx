@@ -36,13 +36,14 @@ export function TeachingFigure({ src, alt, caption, credit, sourceUrl, originalI
   useEffect(() => {
     const element = dialog.current;
     if (!element || !open) return;
+    const origin = trigger.current;
     const priorOverflow = document.body.style.overflow;
     document.body.style.overflow = "hidden";
     element.showModal();
     return () => {
       if (element.open) element.close();
       document.body.style.overflow = priorOverflow;
-      trigger.current?.focus({ preventScroll: true });
+      if (origin?.isConnected) origin.focus({ preventScroll: true });
     };
   }, [open]);
 
