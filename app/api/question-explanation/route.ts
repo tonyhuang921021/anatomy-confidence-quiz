@@ -1,3 +1,7 @@
+import { createHash } from "node:crypto";
+import reviewedIndex from "@/data/reviewedExplanationIndex.json";
+import { handleExplanation, formatAcceptedAnswer } from "@/lib/explanation-orchestrator.cjs";
+import { resolveTrustedExplanationQuestion } from "@/lib/trustedQuestionLoader";
 import { formatRocDate } from "@/lib/rocDate";
 import { hasReviewedExplanation } from "@/lib/reviewedExplanations";
 import { NextRequest, NextResponse } from "next/server";
@@ -94,38 +98,17 @@ const MAX_SYNC_OVERRIDES_PER_REQUEST = 50;
 const GPT_5_MINI_MAX_OUTPUT_TOKENS = 2400;
 const QUESTION_EXPLANATION_MODEL = getOpenAIModel(process.env.QUESTION_EXPLANATION_MODEL);
 const QUESTION_EXPLANATION_PROMPT_PREFIX = [
-  "你是台灣醫學系國考家教，請用繁體中文寫一份好讀、精準、完整但不冗長的單題解析。",
-  "目標是讓學生看完這一題時，同時補起本題本來該知道的核心知識，以及最容易一起考、最容易混淆的一小圈相近概念。",
-  "請嚴格以本題為中心延伸；不要離題到整個章節，也不要空泛背誦課本。延伸內容必須能幫學生下次判斷相近題。",
-  "題庫提供的考點標籤可能不準，只能當參考。請優先相信題幹、選項、正確答案和判分方式，不要照抄或被錯誤標籤帶偏。",
-  "主詳解 explanation 請固定用四個段落標籤，且每個標籤另起一行：本題核心、判斷邏輯、觸類旁通、常見混淆。",
-  "本題核心：交代本題本來該知道的核心知識與正解為何成立。",
-  "判斷邏輯：說明如何從題幹線索走到答案，包含關鍵排除點。",
-  "觸類旁通：補 2-4 個高相關、會一起考或容易混在一起的相近概念。",
-  "常見混淆：點出學生最容易錯認的地方或考場提醒。",
-  "每個段落標籤請用「本題核心：」這種純文字小標，不要使用 HTML、code block 或編號清單。",
-  "如果鑑別診斷、藥物比較、菌種差異、胚胎發育順序、神經血管位置或檢驗數值用表格更清楚，可以在 explanation 字串內插入一個簡短 Markdown pipe table；表格最多 5 欄、6 列，欄位要短，不要為了湊表格而表格。",
-  "主詳解 explanation 欄位只能放一般文字，絕對不能放 JSON 字串、物件字串或 optionAnalysis 內容。",
-  "各選項的重要說明請放在 optionAnalysis；每個實際存在的選項都要說明為什麼對或為什麼不對，不要只寫「正確」或「錯誤」。",
-  "輸出順序固定為：先 explanation 整題詳解，再 optionAnalysis 各選項解析，最後 memoryTip。",
-  "不要根據任何單一使用者的作答情況來改變詳解內容。",
-  "請只輸出 JSON，不要在 JSON 外輸出 markdown，不要輸出 code block。JSON 字串內可以有換行與簡短 Markdown pipe table。",
-  "請務必為本題每一個實際存在的選項都提供 optionAnalysis，不能漏掉任何一個選項。",
-  "optionAnalysis 只能出現 A、B、C、D、E 這些選項鍵，不可以出現 explanation、summary、note 等額外 key。",
-  "如果本題是多重給分，請在主詳解中清楚說明任一個可接受答案都算對。",
-  "",
-  "JSON 格式：",
-  "{",
-  '  "explanation": "完整詳解",',
-  '  "optionAnalysis": {',
-  '    "A": "A 選項解析",',
-  '    "B": "B 選項解析",',
-  '    "C": "C 選項解析",',
-  '    "D": "D 選項解析",',
-  '    "E": "E 選項解析（若本題有 E）"',
-  "  },",
-  '  "memoryTip": "簡短記憶法，沒有就留空字串"',
-  "}"
+  "用自然、清楚的臺灣繁體中文，幫學習者理解這道國考題。",
+  "先說明正解及關鍵判斷，再依題目需要解釋機轉、相近概念與選項差異；篇幅和小標按內容需要安排，不設字數下限或固定延伸數量。",
+  "各選項的判斷與能區分的原因放在 optionAnalysis，每個實際存在的選項都要說明。",
+  "題庫標籤可能不準，以可信題幹、原始選項、官方答案與判分方式為準。若有一律給分或多個可接受答案，應依實際判分說明。",
+  "遇到足以影響判斷的爭議、歷史版本或資訊不足，以具體條件說清楚；不要補造原題缺失或虛構來源與連結。",
+  "直接說明知識與機轉，不評論模型、提示詞、寫作過程或稿件；不要根據任何單一使用者的作答情況改變內容。",
+  "若附有經核對的相關題資料，參考共同原理，補足理解所需但相關題未提到的內容；正文不以年份、卷別或出題次數決定篇幅。",
+  "相關題連結及圖片由網站根據已核對的資料提供，不要在生成內容中自行編造題號、圖片、引用或網址。",
+  "若比較表有助理解，可在 explanation 使用簡短 Markdown pipe table；不用為了格式湊表格。",
+  "只輸出 JSON，不要輸出 HTML、code block 或 JSON 外文字。explanation 為文字；optionAnalysis 僅包含實際存在的 A、B、C、D、E 選項鍵；memoryTip 沒有則留空字串。",
+  '{"explanation":"整題詳解","optionAnalysis":{"A":"A 選項解析","B":"B 選項解析"},"memoryTip":""}'
 ].join("\n");
 
 function logQuestionExplanationRoute(event: {
@@ -444,12 +427,7 @@ function buildQuestionExplanationPrompt(body: QuestionExplanationRequestBody) {
   const previousQuestion = body.previousQuestion;
   const previousOverride = body.previousOverride;
   const optionKeys = getRequiredOptionKeys(question?.options);
-  const correctAnswerText =
-    (question?.answerCreditType === "multiple_accepted" ||
-      question?.answerCreditType === "multiple_answers") &&
-    (question.acceptedAnswers?.length ?? 0) > 0
-      ? question.acceptedAnswers?.join(" / ")
-      : question?.answer ?? "";
+  const correctAnswerText = formatAcceptedAnswer(question);
 
   return [
     QUESTION_EXPLANATION_PROMPT_PREFIX,
@@ -616,12 +594,7 @@ function buildMissingOptionRetryPrompt(
 ) {
   const question = body.question;
   const previousQuestion = body.previousQuestion;
-  const correctAnswerText =
-    (question?.answerCreditType === "multiple_accepted" ||
-      question?.answerCreditType === "multiple_answers") &&
-    (question.acceptedAnswers?.length ?? 0) > 0
-      ? question.acceptedAnswers?.join(" / ")
-      : question?.answer ?? "";
+  const correctAnswerText = formatAcceptedAnswer(question);
 
   return [
     QUESTION_EXPLANATION_PROMPT_PREFIX,
@@ -759,359 +732,155 @@ export async function GET() {
 }
 
 export async function POST(request: NextRequest) {
-  const body = (await request.json()) as QuestionExplanationRequestBody;
-  const action = body.action ?? "generate";
-  const startedAt = Date.now();
-
-  // The checked-in accepted-edition index is authoritative, never client flags.
-  // Guard sync as well as generation before authentication, model calls or writes.
-  const targetIds = action === "sync_override"
-    ? [body.override?.questionId]
-    : action === "sync_overrides"
-      ? (body.overrides ?? []).map(item => item.questionId)
-      : [body.question?.id];
-  if (targetIds.some(id => typeof id === "string" && hasReviewedExplanation(id.trim()))) {
-    return NextResponse.json({ ok: false, code: "reviewed_explanation_protected",
-      message: "此題已有已審核完整詳解，保留原文與圖片，不開放 AI 重新產生或替換。" },
-    { status: 409 });
-  }
-
-  if (action === "sync_override" || action === "sync_overrides") {
-    if (isSupabaseRecoveryMode()) {
-      logQuestionExplanationRoute({
-        action,
-        status: 200,
-        durationMs: Date.now() - startedAt,
-        overrideCount: action === "sync_override" ? Number(Boolean(body.override)) : body.overrides?.length ?? 0,
-        syncedCount: 0
-      });
-      return NextResponse.json({
-        ok: true,
-        configured: true,
-        syncedCount: 0,
-        deferred: true
-      });
-    }
-
-    try {
-      const userEmail = await getVerifiedUserEmail(body.accessToken);
-      if (!userEmail) {
-        logQuestionExplanationRoute({
-          action,
-          status: 401,
-          durationMs: Date.now() - startedAt,
-          overrideCount: action === "sync_override" ? Number(Boolean(body.override)) : body.overrides?.length ?? 0,
-          hasUser: false
-        });
-        return NextResponse.json(
-          {
-            ok: false,
-            configured: true,
-            message: "請先登入帳號，才能同步共享詳解。"
-          },
-          { status: 401 }
-        );
-      }
-
-      const overrideList =
-        action === "sync_override"
-          ? body.override
-            ? [body.override]
-            : []
-          : (body.overrides ?? []);
-
-      if (overrideList.length > MAX_SYNC_OVERRIDES_PER_REQUEST) {
-        logQuestionExplanationRoute({
-          action,
-          status: 413,
-          durationMs: Date.now() - startedAt,
-          overrideCount: overrideList.length,
-          hasUser: true,
-          error: "sync_override_batch_too_large"
-        });
-        return NextResponse.json(
-          {
-            ok: false,
-            configured: true,
-            message: `一次最多同步 ${MAX_SYNC_OVERRIDES_PER_REQUEST} 筆共享詳解，請稍後再試。`
-          },
-          { status: 413 }
-        );
-      }
-
-      const syncedCount = await syncSharedExplanationOverrides(overrideList, body.accessToken);
-      logQuestionExplanationRoute({
-        action,
-        status: 200,
-        durationMs: Date.now() - startedAt,
-        overrideCount: overrideList.length,
-        syncedCount,
-        hasUser: true
-      });
-
-      return NextResponse.json({
-        ok: true,
-        configured: true,
-        syncedCount
-      });
-    } catch (error) {
-      logQuestionExplanationRoute({
-        action,
-        status: 500,
-        durationMs: Date.now() - startedAt,
-        overrideCount: action === "sync_override" ? Number(Boolean(body.override)) : body.overrides?.length ?? 0,
-        error: formatUnknownError(error)
-      });
-      return NextResponse.json(
-        {
-          ok: false,
-          configured: true,
-          message: formatUnknownError(error)
-        },
-        { status: 500 }
-      );
-    }
-  }
-
-  if (!body.question?.stem || !body.question?.answer) {
-    logQuestionExplanationRoute({
-      action,
-      status: 400,
-      durationMs: Date.now() - startedAt,
-      questionId: body.question?.id ?? null,
-      error: "missing_question_payload"
-    });
-    return NextResponse.json(
-      { ok: false, message: "題目資料不足，無法產生單題詳解。" },
-      { status: 400 }
-    );
-  }
-
-  if (!isOpenAIConfigured()) {
-    logQuestionExplanationRoute({
-      action,
-      status: 503,
-      durationMs: Date.now() - startedAt,
-      questionId: body.question.id ?? null,
-      error: "openai_not_configured"
-    });
-    return NextResponse.json(
-      {
-        ok: false,
-        configured: false,
-        message: "OPENAI_API_KEY 尚未設定，無法產生 AI 詳解。"
-      },
-      { status: 503 }
-    );
-  }
-
+  let body: QuestionExplanationRequestBody;
   try {
-    const userEmail = await getVerifiedUserEmail(body.accessToken);
-    const visitorId = body.visitorId?.trim() || null;
-
-    if (!userEmail) {
-      logQuestionExplanationRoute({
-        action,
-        status: 401,
-        durationMs: Date.now() - startedAt,
-        questionId: body.question.id ?? null,
-        hasUser: false
-      });
-      return NextResponse.json(
-        {
-          ok: false,
-          configured: true,
-          message: "請先登入帳號，才能使用 AI 補詳解。"
-        },
-        { status: 401 }
-      );
-    }
-
-    const activeBan = await checkAIAccountBan(userEmail);
-    if (activeBan && !isBypassEmail(userEmail)) {
-      logQuestionExplanationRoute({
-        action,
-        status: 429,
-        durationMs: Date.now() - startedAt,
-        questionId: body.question.id ?? null,
-        hasUser: true,
-        error: "ai_account_banned"
-      });
-      return NextResponse.json(
-        {
-          ok: false,
-          configured: true,
-          message: `這個帳號的 AI 功能已被暫停到 ${formatRocDate(activeBan.banned_until, {hour:"2-digit",minute:"2-digit"})} 。`
-        },
-        { status: 429 }
-      );
-    }
-
-    const fallbackKey = request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || "anonymous";
-    const rateKey = userEmail?.trim().toLowerCase() || visitorId || fallbackKey;
-
-    if (!isBypassEmail(userEmail)) {
-      const usageStatus = await checkUsageLimits(rateKey).catch((error) => {
-        if (isServerTimeoutError(error)) {
-          console.warn("AI explanation usage check skipped:", error.message);
-          return { blocked: false };
-        }
-        throw error;
-      });
-      if (usageStatus?.blocked) {
-        const blockedMessage =
-          "message" in usageStatus && usageStatus.message
-            ? usageStatus.message
-            : "這個裝置暫時無法使用 AI 詳解，請稍後再試。";
-        logQuestionExplanationRoute({
-          action,
-          status: 429,
-          durationMs: Date.now() - startedAt,
-          questionId: body.question.id ?? null,
-          hasUser: true,
-          error: "usage_limited"
-        });
-        return NextResponse.json(
-          {
-            ok: false,
-            configured: true,
-            message: blockedMessage
-          },
-          { status: 429 }
-        );
-      }
-    }
-
-    const prompt = buildQuestionExplanationPrompt(body);
-    let result = await createOpenAIText(prompt, GPT_5_MINI_MAX_OUTPUT_TOKENS, QUESTION_EXPLANATION_MODEL);
-    let parsed = parseExplanationPayload(result.text);
-
-    if (isTooSimilarToPrevious(parsed, body.previousOverride)) {
-      const retryPrompt = buildRegenerationRetryPrompt(body);
-      result = await createOpenAIText(
-        retryPrompt,
-        GPT_5_MINI_MAX_OUTPUT_TOKENS,
-        QUESTION_EXPLANATION_MODEL
-      );
-      parsed = parseExplanationPayload(result.text);
-    }
-
-    const missingOptionKeys = getMissingOptionKeys(parsed, body.question?.options);
-    if (parsed?.explanation && missingOptionKeys.length > 0) {
-      const retryPrompt = buildMissingOptionRetryPrompt(body, parsed, missingOptionKeys);
-      result = await createOpenAIText(
-        retryPrompt,
-        GPT_5_MINI_MAX_OUTPUT_TOKENS,
-        QUESTION_EXPLANATION_MODEL
-      );
-      parsed = parseExplanationPayload(result.text);
-    }
-
-    const depthIssues = getExplanationDepthIssues(parsed, body.question?.options);
-    if (parsed?.explanation && depthIssues.length > 0) {
-      const retryPrompt = buildExplanationDepthRetryPrompt(body, parsed, depthIssues);
-      const depthResult = await createOpenAIText(
-        retryPrompt,
-        GPT_5_MINI_MAX_OUTPUT_TOKENS,
-        QUESTION_EXPLANATION_MODEL
-      );
-      const depthParsed = parseExplanationPayload(depthResult.text);
-      if (depthParsed?.explanation) {
-        result = depthResult;
-        parsed = depthParsed;
-      }
-    }
-
-    const missingOptionKeysAfterDepthRetry = getMissingOptionKeys(parsed, body.question?.options);
-    if (parsed?.explanation && missingOptionKeysAfterDepthRetry.length > 0) {
-      const retryPrompt = buildMissingOptionRetryPrompt(body, parsed, missingOptionKeysAfterDepthRetry);
-      result = await createOpenAIText(
-        retryPrompt,
-        GPT_5_MINI_MAX_OUTPUT_TOKENS,
-        QUESTION_EXPLANATION_MODEL
-      );
-      parsed = parseExplanationPayload(result.text);
-    }
-
-    if (!parsed?.explanation) {
-      logQuestionExplanationRoute({
-        action,
-        status: 500,
-        durationMs: Date.now() - startedAt,
-        questionId: body.question.id ?? null,
-        hasUser: true,
-        error: "invalid_ai_payload"
-      });
-      return NextResponse.json(
-        {
-          ok: false,
-          configured: true,
-          message: "AI 回傳格式不正確，無法儲存單題詳解。"
-        },
-        { status: 500 }
-      );
-    }
-
-    await insertUsageLog({
-      rate_key: rateKey,
-      visitor_id: visitorId,
-      user_email: userEmail,
-      question_id: `${AI_EXPLANATION_USAGE_PREFIX}${body.question.id ?? body.question.stem.slice(0, 120)}`,
-      model: result.model,
-      input_tokens: result.usage.inputTokens,
-      output_tokens: result.usage.outputTokens,
-      total_tokens: result.usage.totalTokens,
-      used_at: new Date().toISOString()
-    }, body.accessToken);
-
-    let sharedSaved = true;
-    let sharedSaveMessage: string | undefined;
-    try {
-      await upsertSharedExplanationOverride(
-        body.question.id ?? body.question.stem.slice(0, 120),
-        parsed,
-        result.model,
-        body.accessToken
-      );
-    } catch (error) {
-      sharedSaved = false;
-      sharedSaveMessage = formatUnknownError(error);
-      console.error("AI explanation shared override save skipped:", error);
-    }
-
-    logQuestionExplanationRoute({
-      action,
-      status: 200,
-      durationMs: Date.now() - startedAt,
-      questionId: body.question.id ?? null,
-      hasUser: true
-    });
-
-    return NextResponse.json({
-      ok: true,
-      configured: true,
-      sharedSaved,
-      sharedSaveMessage,
-      model: result.model,
-      explanation: parsed.explanation,
-      optionAnalysis: parsed.optionAnalysis ?? {},
-      memoryTip: parsed.memoryTip ?? ""
-    });
-  } catch (error) {
-    logQuestionExplanationRoute({
-      action,
-      status: 500,
-      durationMs: Date.now() - startedAt,
-      questionId: body.question?.id ?? null,
-      error: formatUnknownError(error)
-    });
-    return NextResponse.json(
-      {
-        ok: false,
-        configured: true,
-        message: formatUnknownError(error)
+    const raw = await request.text();
+    if (Buffer.byteLength(raw,"utf8") > 65536) return NextResponse.json({ok:false,code:"request_too_large"},{status:413});
+    body = JSON.parse(raw) as QuestionExplanationRequestBody;
+    if (!body || typeof body !== "object" || Array.isArray(body)) throw new Error("invalid body");
+  }
+  catch { return NextResponse.json({ ok:false, code:"invalid_request", message:"請求格式不正確。" }, {status:400}); }
+  // Preserve protection before sync rejection and before any writes or calls.
+  const action = body.action ?? "generate";
+  const targetIds = action === "sync_override" ? [body.override?.questionId]
+    : action === "sync_overrides" && Array.isArray(body.overrides) ? body.overrides.map(x => x?.questionId)
+    : [body.question?.id];
+  if (targetIds.some(id => typeof id === "string" && hasReviewedExplanation(id.trim()))) {
+    return NextResponse.json({ok:false,code:"reviewed_explanation_protected",message:"此題已有已審核完整詳解，保留原文與圖片。"},{status:409});
+  }
+  if (action === "sync_override" || action === "sync_overrides") {
+    return NextResponse.json({ok:false,code:"shared_sync_paused",recoverable:true,message:"不接受客戶端詳解寫入共享資料；本機詳解與作答紀錄不會因此刪除。"},{status:409});
+  }
+  if (action !== "generate") return NextResponse.json({ok:false,code:"unsupported_action"},{status:400});
+  // Neither a missing service role, an unverified credit scope nor an absent
+  // price ceiling is permission to send a paid request.
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const serviceRole = process.env.SUPABASE_SERVICE_ROLE_KEY;
+  const anonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+  const promoVerified = process.env.QUESTION_EXPLANATION_PROMO_VERIFIED === "true";
+  const mode = process.env.QUESTION_EXPLANATION_REASONING_EFFORT || "default";
+  const model = process.env.QUESTION_EXPLANATION_MODEL;
+  const pricingRevision = process.env.QUESTION_EXPLANATION_PRICING_REVISION;
+  const inRate = Number(process.env.QUESTION_EXPLANATION_INPUT_MICROUSD_PER_MILLION);
+  const outRate = Number(process.env.QUESTION_EXPLANATION_OUTPUT_MICROUSD_PER_MILLION);
+  if (!url || !(serviceRole || anonKey)) {
+    return NextResponse.json({ok:false,code:"safe_configuration_missing",message:"AI 詳解暫時不可用，既有詳解不受影響。"},{status:503});
+  }
+  const db = createClient(url, serviceRole || anonKey!, {auth:{persistSession:false,autoRefreshToken:false}});
+  let actorId = "", verifiedEmail = "";
+  // Source commit identifies the reviewed index, independently of deployment commit.
+  // Keep it while the verified index is identical; change it only with an atomic,
+  // verified snapshot update before enabling the corresponding deployment.
+  const reviewedSourceCommit = "f379b49497467abc02d9203228d1956d13565eae";
+  const reviewedManifestSha = createHash("sha256").update(JSON.stringify(Object.keys(reviewedIndex).sort()),"utf8").digest("hex");
+  let canonicalPrompt = "";
+  try {
+    const outcome = await handleExplanation(body, {
+      isReviewed: async (id: string) => hasReviewedExplanation(id),
+      auth: async (token: string | undefined) => {
+        if (!token) return null;
+        const {data,error} = await withServerTimeout(db.auth.getUser(token),1600,"登入驗證逾時");
+        if (error || !data.user?.id || !data.user.email) return null;
+        actorId = data.user.id;
+        verifiedEmail = data.user.email.trim().toLowerCase();
+        return {id:actorId};
       },
-      { status: 500 }
-    );
+      resolveTrusted: async (id: string) => {
+        const found = resolveTrustedExplanationQuestion(id);
+        if (!found.ok) return null;
+        const q = found.question;
+        // Mark restrictions without blocking access to an existing shared row.
+        return {...q,trustedContext:found.sharedContext,requiresContext:found.requiresContext,
+          hasUnresolvedImage:Boolean(q.stemImage || (q.optionImages && Object.values(q.optionImages).some(Boolean)))};
+      },
+      prepare: async (q:any) => {
+        const trustedContext = q.trustedContext;
+        canonicalPrompt = buildQuestionExplanationPrompt({question:{...q,stem:trustedContext ? `${trustedContext}\n\n${q.stem}` : q.stem}});
+        return Buffer.byteLength(canonicalPrompt,"utf8") <= 16000;
+      },
+      readShared: async (id: string) => {
+        const {data,error} = await withServerTimeout(db.from("question_explanation_overrides")
+          .select("question_id,explanation,option_analysis,memory_tip,model,updated_at")
+          .eq("question_id",id).maybeSingle(),1600,"共享詳解讀取逾時");
+        if (error) throw error;
+        return data ? {explanation:data.explanation,optionAnalysis:data.option_analysis ?? {},memoryTip:data.memory_tip ?? "",model:data.model} : null;
+      },
+      reserve: async ({actorId: actor, questionId}: {actorId:string;questionId:string}) => {
+        if (!serviceRole || !isOpenAIConfigured() || !promoVerified || model !== "gpt-6.1-sol" ||
+            !["low","default"].includes(mode) || !pricingRevision || !Number.isSafeInteger(inRate) || inRate <= 0 ||
+            !Number.isSafeInteger(outRate) || outRate <= 0) return {ok:false,code:"safe_configuration_missing"};
+        // Do not use the legacy helper's missing-table fail-open behaviour.
+        const banQuery = await withServerTimeout(db.from("ai_account_bans").select("banned_until")
+          .eq("user_email",verifiedEmail).maybeSingle(),1600,"帳號限制查詢逾時");
+        if (banQuery.error) return {ok:false,code:"guard_unavailable"};
+        if (banQuery.data?.banned_until) {
+          const until = Date.parse(banQuery.data.banned_until);
+          if (!Number.isFinite(until)) return {ok:false,code:"guard_unavailable"};
+          if (until > Date.now() && !isBypassEmail(verifiedEmail)) return {ok:false,code:"account_banned"};
+        }
+        const id = crypto.randomUUID();
+        const {data,error} = await withServerTimeout(db.rpc("ai_guard_reserve",{p_id:id,p_actor:actor,p_question:questionId,p_manifest_sha256:reviewedManifestSha,p_source_commit:reviewedSourceCommit}),1600,"預算預留逾時");
+        if (error || data !== "reserved") return {ok:false,code:typeof data === "string" ? data : "reservation_unavailable"};
+        const fetched = await withServerTimeout(db.rpc("ai_guard_read_reservation",{p_id:id,p_actor:actor}),1600,"預留驗證逾時");
+        const row = Array.isArray(fetched.data) ? fetched.data[0] : fetched.data;
+        if (fetched.error || !row || row.model !== model || row.pricing_revision !== pricingRevision) return {ok:false,code:"reservation_unconfirmed_held"};
+        // Token count cannot exceed UTF-8 bytes for normal encoded text. The
+        // configured rates must be conservative for the actual provider tier.
+        const inputBound = 16000 * inRate, outputBound = 2400 * outRate;
+        if (!Number.isSafeInteger(inputBound) || !Number.isSafeInteger(outputBound) ||
+            !Number.isSafeInteger(inputBound + outputBound)) return {ok:false,code:"price_ceiling_unconfirmed_held"};
+        const worst = Math.ceil((inputBound + outputBound) / 1_000_000);
+        const ceiling = Number(row.per_call_ceiling_microusd);
+        if (!Number.isSafeInteger(worst) || !Number.isSafeInteger(ceiling) || ceiling < worst) return {ok:false,code:"price_ceiling_unconfirmed_held"};
+        return {ok:true,leaseId:id,fence:id,actorId:actor,model,mode,maxCalls:1,ceiling};
+      },
+      cancelIfShared: async (g:any) => {
+        const {data,error} = await withServerTimeout(db.rpc("ai_guard_cancel_if_cached",{p_id:g.leaseId,p_actor:actorId}),1600,"預留取消逾時");
+        return !error && data === "cancelled";
+      },
+      start: async (g:any, seq:number) => {
+        const {data,error} = await withServerTimeout(db.rpc("ai_guard_start_call",{p_id:g.leaseId,p_seq:seq}),1600,"預算啟動逾時");
+        return !error && data === "started";
+      },
+      callProvider: async (args:any) => {
+        const result = await createOpenAIText(canonicalPrompt,2400,args.model,args.mode);
+        return {usage:result.usageKnown ? result.usage : null,value:parseExplanationPayload(result.text)};
+      },
+      settle: async (g:any, seq:number, usage:any) => {
+        // A provider-side bound violation makes the estimate unsafe for every
+        // request. Disable further calls and hold this started call for reconciliation.
+        if (usage.inputTokens > 16000 || usage.outputTokens > 2400) {
+          const stopped = await withServerTimeout(db.rpc("ai_guard_disable",{p_reason:"usage_over_ceiling"}),1600,"安全停止逾時");
+          if (stopped.error || stopped.data !== "disabled") throw new Error("安全停止未確認，請立即人工停用並對帳。");
+          return false;
+        }
+        // Reserve and account full per-call ceiling, not a speculative discount.
+        const {data,error} = await withServerTimeout(db.rpc("ai_guard_settle_call",{p_id:g.leaseId,p_seq:seq,p_cost:g.ceiling,p_input:usage.inputTokens,p_output:usage.outputTokens}),1600,"用量結算逾時");
+        return !error && data === "settled";
+      },
+      insertIfAbsentFenced: async (g:any, id:string, result:any) => {
+        const {data,error} = await withServerTimeout(db.rpc("ai_guard_commit",{p_id:g.leaseId,p_actor:actorId,p_explanation:result.explanation,p_option_analysis:result.optionAnalysis,p_memory_tip:result.memoryTip ?? ""}),1600,"共享詳解寫入逾時");
+        const row = Array.isArray(data) ? data[0] : data;
+        if (error || !row || row.question_id !== id || !["inserted","existing"].includes(row.status)) return null;
+        return {inserted:row.status === "inserted",winner:{explanation:row.explanation,optionAnalysis:row.option_analysis ?? {},memoryTip:row.memory_tip ?? "",model:row.model}};
+      },
+      close: async (g:any) => {
+        const {data,error} = await withServerTimeout(db.rpc("ai_guard_close",{p_id:g.leaseId}),1600,"預留結束逾時");
+        if (error || data !== "closed") throw new Error("預留結束未確認，請稍後由管理員對帳。");
+      }
+    });
+    const messages: Record<string,string> = {
+      invalid_id:"題號不足，無法產生詳解。", authentication_required:"請登入後再使用。",
+      untrusted_question:"此題尚無可驗證的官方或站內來源，不會使用客戶端題文生成。",
+      trusted_context_missing:"此題缺少可驗證的承上題情境。", source_image_not_supported:"此題需要原圖判讀，請先使用原題及既有詳解。",
+      incomplete_explanation:"詳解未包含所有選項，未儲存，請稍後再試。",
+      budget:"本階段額度已用完，既有詳解仍可閱讀。", question_busy:"此題正在產生，請稍後再試。",
+      actor_busy:"此帳號已有請求進行中。", cooldown:"請稍後再試。", rate:"目前使用次數已達限制，請稍後再試。"
+    };
+    if (outcome.status === 200 && outcome.value) return NextResponse.json({ok:true,configured:true,sharedSaved:true,...outcome.value});
+    return NextResponse.json({ok:false,code:outcome.code,recoverable:true,message:messages[outcome.code] || "暫時無法產生詳解，既有詳解不受影響。"},{status:outcome.status});
+  } catch (error) {
+    console.error("question_explanation_safe_candidate_error",error instanceof Error ? error.message : "unknown");
+    return NextResponse.json({ok:false,code:"guard_unavailable",recoverable:true,message:"詳解暫時不可用，既有內容不受影響。"},{status:503});
   }
 }
