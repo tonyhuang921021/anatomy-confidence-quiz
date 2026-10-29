@@ -2,10 +2,13 @@ import type { Question } from "../types/quiz";
 
 type PaperQuestion = Pick<Question, "examCode" | "paperCode" | "officialExam">;
 
-/** Display the official selector when known, preserving labels for legacy data. */
+/** The printed paper code and the MOEX URL subject selector are distinct. */
 export function getOfficialPaperDisplayCode(question: PaperQuestion): string | undefined {
-  const subjectCode = question.officialExam?.subjectCode || question.paperCode;
-  return question.examCode && subjectCode ? `${question.examCode}-${subjectCode}` : undefined;
+  if (!question.examCode || !question.paperCode) return undefined;
+  const printed = `${question.examCode}-${question.paperCode}`;
+  return question.officialExam?.subjectCode
+    ? `${printed}（科目索引 ${question.officialExam.subjectCode}）`
+    : printed;
 }
 
 /** Preserve legacy paper keys while giving distinct official tracks distinct keys. */
