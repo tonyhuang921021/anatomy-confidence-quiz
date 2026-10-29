@@ -7008,5 +7008,65 @@
     "title": "出生性別比與胎次：依官方更正保留 A、B 採分",
     "version": "1",
     "batch": "feedback-133-20261026"
+  },
+  "MOEX-109100-1301-Q047": {
+    "title": "半規管如何感受頭部旋轉？",
+    "version": "v3",
+    "batch": "109-2-med1-reviewed-12"
+  },
+  "MOEX-109100-1301-Q049": {
+    "title": "鮮味如何從食物變成神經訊號？",
+    "version": "v3",
+    "batch": "109-2-med1-reviewed-12"
+  },
+  "MOEX-109100-1301-Q056": {
+    "title": "凝血、抗凝與纖溶如何合作？",
+    "version": "v3",
+    "batch": "109-2-med1-reviewed-12"
+  },
+  "MOEX-109100-1301-Q099": {
+    "title": "激素如何調控脂肪動員與能量利用？",
+    "version": "v3",
+    "batch": "109-2-med1-reviewed-12"
+  },
+  "MOEX-109100-1301-Q069": {
+    "title": "甲狀腺素：從血中載體到細胞作用",
+    "version": "v3",
+    "batch": "109-2-med1-reviewed-12"
+  },
+  "MOEX-109100-1301-Q070": {
+    "title": "男性生殖發育：訊號、細胞與靶構造",
+    "version": "v3",
+    "batch": "109-2-med1-reviewed-12"
+  },
+  "MOEX-109100-1301-Q088": {
+    "title": "Heparin：糖鏈結構如何連到抗凝作用",
+    "version": "v3",
+    "batch": "109-2-med1-reviewed-12"
+  },
+  "MOEX-109100-1301-Q090": {
+    "title": "膽固醇合成：碳骨架、區室與分流",
+    "version": "v3",
+    "batch": "109-2-med1-reviewed-12"
+  },
+  "MOEX-109100-1301-Q091": {
+    "title": "肉鹼穿梭：長鏈脂肪酸如何進入粒線體",
+    "version": "v3",
+    "batch": "109-2-med1-reviewed-12"
+  },
+  "MOEX-109100-1301-Q094": {
+    "title": "黑色素合成：酪胺酸、酵素與細胞區室",
+    "version": "v3",
+    "batch": "109-2-med1-reviewed-12"
+  },
+  "MOEX-109100-1301-Q095": {
+    "title": "Succinate如何把TCA接到呼吸鏈？",
+    "version": "v3",
+    "batch": "109-2-med1-reviewed-12"
+  },
+  "MOEX-109100-1301-Q096": {
+    "title": "Complex III之後，電子交給誰？",
+    "version": "v3",
+    "batch": "109-2-med1-reviewed-12"
   }
 }
