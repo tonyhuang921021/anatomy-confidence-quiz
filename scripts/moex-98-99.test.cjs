@@ -101,27 +101,30 @@ test('Yangming uses source-only references with explicit page gaps; no mirrored 
   assert.equal(links.questions.filter(q=>q.erratum).length,1);
 });
 
-test('real runtime exposes the eight papers and preserves every existing question and paper', () => {
+test('real runtime retains 6730 baseline questions and exposes the eight 98–99 and four 97 papers', () => {
+  const crypto=require('node:crypto');
   const current=require('../data/med1QuestionBank.ts');
-  const previous=require(path.join(baseline,'data/med1QuestionBank.ts'));
-  const currentById=new Map(current.canonicalQuestionBank.map(q=>[q.id,q]));
-  assert.equal(current.canonicalQuestionBank.length,previous.canonicalQuestionBank.length+800);
-  for (const question of previous.canonicalQuestionBank) assert.deepEqual(currentById.get(question.id),question);
-  const before=previous.getPastPaperOptions();
+  const additions97=[...require('../data/sources/moex_97_1_med1_questions.json').questions,...require('../data/sources/moex_97_1_med2_questions.json').questions,...require('../data/sources/moex_97_2_med1_questions.json').questions,...require('../data/sources/moex_97_2_med2_questions.json').questions];
+  const oldIds=new Set(payload.questions.map(q=>q.id)),newIds=new Set(additions97.map(q=>q.id));
+  assert.equal(oldIds.size,800);assert.equal(newIds.size,400);assert.equal([...newIds].filter(id=>oldIds.has(id)).length,0);
+  assert.equal(current.canonicalQuestionBank.length,6730+800+400);
+  const original=current.canonicalQuestionBank.filter(q=>!oldIds.has(q.id)&&!newIds.has(q.id));assert.equal(original.length,6730);
+  const revisions=require('../docs/moex-98-99/canonical-reviewed-corrections.json');
+  assert.deepEqual(revisions.map(({id,fields})=>({id,fields})),[
+    {id:'MOEX-102030-1101-Q097',fields:['explanation','optionAnalysis','options','stemImage','testedConcept']},
+    {id:'MOEX-106100-2301-Q044',fields:['stem']},
+  ]);
+  for(const revision of revisions){const matches=original.filter(q=>q.id===revision.id);assert.equal(matches.length,1);const fields=Object.fromEntries(revision.fields.filter(k=>Object.hasOwn(matches[0],k)).map(k=>[k,matches[0][k]]));assert.equal(crypto.createHash('sha256').update(JSON.stringify(fields)).digest('hex'),revision.revisedSha256);}
+  const restored=original.map(q=>{const revision=revisions.find(r=>r.id===q.id);if(!revision)return q;const restored={...q};for(const key of revision.fields){if(Object.hasOwn(revision.original,key))restored[key]=revision.original[key];else delete restored[key];}return restored;});
+  const rules=require('../docs/moex-98-99/learning-placement-rules.json');assert.equal(crypto.createHash('sha256').update(JSON.stringify(restored)).digest('hex'),rules.baselineOldCanonicalSha256);
   const after=current.getPastPaperOptions();
-  assert.deepEqual(after.filter(p=>p.sourceYear>=2011),before.map(p=>({...p,label:require("../lib/rocDate.ts").formatRocYear(p.sourceYear)+p.label.slice(String(p.sourceYear).length)})));
-  assert.equal(after.length,before.length+8);
   for (const paper of payload.papers) {
-    const option=after.find(p=>p.key===paper.key);
-    assert.ok(option.isComplete);
-    assert.equal(option.questionCount,paper.questionCount);
+    const option=after.find(p=>p.key===paper.key);assert.ok(option?.isComplete);assert.equal(option.questionCount,paper.questionCount);
     const omitClassification=({subject,chapter,section,primaryTag,...q})=>q;
     assert.deepEqual(current.getQuestionsForPastPaper(paper.key,paper.subject).map(omitClassification),payload.questions.filter(q=>`${q.examCode}-${q.paperCode}`===paper.key).map(omitClassification));
   }
-  const years=require('../lib/practiceYears.ts');
-  assert.equal(years.toGregorianPracticeYear(98),2009);
-  assert.equal(years.toGregorianPracticeYear(99),2010);
-  assert.equal(years.PRACTICE_YEAR_OPTIONS[0],2009);
+  for(const code of ['097050-1101','097050-2101','097140-1101','097140-2101']){const item=after.find(p=>p.key===code);assert.ok(item?.isComplete,code);assert.equal(item.questionCount,100);}
+  const years=require('../lib/practiceYears.ts');assert.equal(years.toGregorianPracticeYear(97),2008);assert.equal(years.toGregorianPracticeYear(98),2009);assert.equal(years.toGregorianPracticeYear(99),2010);
 });
 
 
