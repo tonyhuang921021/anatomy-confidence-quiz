@@ -101,31 +101,32 @@ function inferPastPaperKeyFromQuestionIds(questionIds: string[]) {
 }
 
 type CompletedPaperSummary = {
-  lastScore: number;
+  lastScore: number | null;
   lastCompletedAt: string;
+  hasAnswered: boolean;
 };
 
 function buildCompletedPaperSummaries() {
   const completedSessions = loadCompletedSessions();
   return completedSessions.reduce<Record<string, CompletedPaperSummary>>((accumulator, session) => {
+    const attempts = Array.isArray(session.attempts) ? session.attempts : [];
     const paperKey = session.settings?.mode === "simulation"
       ? session.settings?.selectedPaperKey ??
         inferPastPaperKeyFromQuestionIds([
           ...(session.questionOrder ?? []),
-          ...session.attempts.map((attempt) => attempt.questionId)
+          ...attempts.map((attempt) => attempt.questionId)
         ])
       : undefined;
 
     if (!paperKey) return accumulator;
-    const total = session.attempts.length;
-    if (total <= 0) return accumulator;
-
-    const correct = session.attempts.filter((attempt) => attempt.isCorrect).length;
+    const total = attempts.length;
+    const correct = attempts.filter((attempt) => attempt.isCorrect).length;
     const completedAt = session.completedAt ?? session.startedAt;
     const current = accumulator[paperKey];
-    const lastScore = Math.round((correct / total) * 100);
+    const lastScore = total > 0 ? Math.round((correct / total) * 100) : null;
 
     accumulator[paperKey] = {
+      hasAnswered: Boolean(current?.hasAnswered || total > 0),
       lastScore: !current || completedAt.localeCompare(current.lastCompletedAt) >= 0
         ? lastScore
         : current.lastScore,
@@ -222,7 +223,7 @@ export function QuizSetupPanel({
   );
   const canViewSelectedPaperDetails = Boolean(
     selectedPaper &&
-      (completedPaperSummaries[selectedPaper.key] || isAdminEmail(user?.email))
+      (completedPaperSummaries[selectedPaper.key]?.hasAnswered || isAdminEmail(user?.email))
   );
   const activePaperMode = settings.paperMode ?? "random_set";
   const isSelectablePaperMode = activePaperMode === "past_paper" || activePaperMode === "ai_paper";
@@ -517,7 +518,7 @@ export function QuizSetupPanel({
                   {selectedPaperOptions.length === 0 ? <option value="">目前沒有可用的完整考卷</option> : null}
                   {selectedPaperOptions.map((paper) => (
                     <option key={paper.key} value={paper.key}>
-                      {paper.label}{completedPaperSummaries[paper.key] ? ` · 上次 ${completedPaperSummaries[paper.key].lastScore} 分` : " · 尚未作答"}
+                      {paper.label}{completedPaperSummaries[paper.key] ? completedPaperSummaries[paper.key].lastScore === null ? " · 上次未作答" : ` · 上次已答題正確率 ${completedPaperSummaries[paper.key].lastScore}%` : " · 尚未作答"}
                     </option>
                   ))}
                 </select>
