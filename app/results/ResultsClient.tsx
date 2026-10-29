@@ -1,5 +1,7 @@
 "use client";
 
+import { getOfficialPaperKeyFromQuestionId, getOfficialPaperKey } from "@/lib/officialPaperIdentity";
+
 import { formatRocDate, formatRocYear } from "@/lib/rocDate";
 
 
@@ -423,7 +425,7 @@ function getPastPaperKeyFromSession(session: QuizSession) {
   if (session.settings?.selectedPaperKey) return session.settings.selectedPaperKey;
   const firstQuestion = session.generatedQuestions?.find((question) => question.examCode && question.paperCode);
   if (firstQuestion?.examCode && firstQuestion.paperCode) {
-    return `${firstQuestion.examCode}-${firstQuestion.paperCode}`;
+    return getOfficialPaperKey(firstQuestion);
   }
   const questionIds = [
     ...(session.questionOrder ?? []),
@@ -431,8 +433,8 @@ function getPastPaperKeyFromSession(session: QuizSession) {
   ];
   const paperKeys = new Set<string>();
   for (const questionId of questionIds) {
-    const match = questionId.match(/^MOEX-([^-]+)-([^-]+)-Q\d+/);
-    if (match) paperKeys.add(`${match[1]}-${match[2]}`);
+    const paperKey = getOfficialPaperKeyFromQuestionId(questionId);
+    if (paperKey) paperKeys.add(paperKey);
 
     const aiMatch = questionId.match(/^(AI-[A-Z0-9-]+)-Q\d+$/);
     if (aiMatch) paperKeys.add(aiMatch[1]);

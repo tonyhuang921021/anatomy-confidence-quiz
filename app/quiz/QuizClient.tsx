@@ -1,5 +1,7 @@
 "use client";
 
+import { getOfficialPaperKey } from "@/lib/officialPaperIdentity";
+
 import { formatRocYear } from "@/lib/rocDate";
 
 
@@ -430,7 +432,7 @@ function getSimulationSelectedPaperKey(settings: QuizSettings, questions: Questi
     (question) => question.examCode && question.paperCode
   );
   if (!firstQuestion?.examCode || !firstQuestion.paperCode) return undefined;
-  return `${firstQuestion.examCode}-${firstQuestion.paperCode}`;
+  return getOfficialPaperKey(firstQuestion);
 }
 
 function buildResultsHref(session: QuizSession) {

@@ -1366,6 +1366,7 @@ export function compactQuestionForStorage(question: Question): Question {
     sourceYear: question.sourceYear,
     sourceRound: question.sourceRound,
     paperCode: question.paperCode,
+    officialExam: question.officialExam,
     examCode: question.examCode,
     originalQuestionNumber: question.originalQuestionNumber,
     memoryTip: question.memoryTip,

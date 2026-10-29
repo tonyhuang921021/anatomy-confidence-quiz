@@ -1,5 +1,7 @@
 "use client";
 
+import { getOfficialPaperKeyFromQuestionId, getOfficialPaperKey } from "@/lib/officialPaperIdentity";
+
 import Link from "next/link";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useAuth } from "@/components/AuthProvider";
@@ -59,7 +61,7 @@ function getSessionPaperKeys(session: QuizSession) {
 
   for (const question of session.generatedQuestions ?? []) {
     if (question.examCode && question.paperCode) {
-      paperKeys.add(`${question.examCode}-${question.paperCode}`);
+      paperKeys.add(getOfficialPaperKey(question)!);
     }
   }
 
@@ -67,8 +69,8 @@ function getSessionPaperKeys(session: QuizSession) {
     ...(session.questionOrder ?? []),
     ...session.attempts.map((attempt) => attempt.questionId)
   ]) {
-    const moexMatch = questionId.match(/^MOEX-([^-]+)-([^-]+)-Q\d+/);
-    if (moexMatch) paperKeys.add(`${moexMatch[1]}-${moexMatch[2]}`);
+    const paperKey = getOfficialPaperKeyFromQuestionId(questionId);
+    if (paperKey) paperKeys.add(paperKey);
 
     const aiMatch = questionId.match(/^(AI-[A-Z0-9-]+)-Q\d+$/);
     if (aiMatch) paperKeys.add(aiMatch[1]);

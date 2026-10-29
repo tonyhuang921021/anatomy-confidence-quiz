@@ -71,6 +71,7 @@ export type Question = {
   originalQuestionNumber?: number;
   examCode?: string;
   paperCode?: string;
+  officialExam?: { categoryCode: string; subjectCode: string; trackCode: string; trackLabel: string; paperTitle: string };
   examSessionLabel?: string;
   difficulty?: DifficultyLevel;
   isDetailQuestion?: boolean;

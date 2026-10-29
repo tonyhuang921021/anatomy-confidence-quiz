@@ -1,4 +1,5 @@
 import type { QuizSession } from "@/types/quiz";
+import { getOfficialPaperKeyFromQuestionId } from "./officialPaperIdentity";
 
 export const SIMULATION_PAPER_SCORE_BUCKETS = [
   { key: "score0To39", label: "0–39" },
@@ -75,10 +76,8 @@ function inferPaperKeyFromQuestionIds(questionIds: string[]) {
   const paperKeys = new Set<string>();
 
   for (const questionId of questionIds) {
-    const pastPaperMatch = questionId.match(/^MOEX-([^-]+)-([^-]+)-Q\d+$/);
-    if (pastPaperMatch) {
-      paperKeys.add(`${pastPaperMatch[1]}-${pastPaperMatch[2]}`);
-    }
+    const pastPaperKey = getOfficialPaperKeyFromQuestionId(questionId);
+    if (pastPaperKey) paperKeys.add(pastPaperKey);
 
     const aiPaperMatch = questionId.match(/^(AI-[A-Z0-9-]+)-Q\d+$/);
     if (aiPaperMatch) {

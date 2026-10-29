@@ -17,6 +17,7 @@ import {
   SummaryStats
 } from "../types/quiz";
 import { normalizePracticeYearRange } from "./practiceYears";
+import { getOfficialPaperKey } from "./officialPaperIdentity";
 
 type SectionAggregate = {
   chapter: string;
@@ -851,9 +852,8 @@ function isFollowUpStem(stem: string) {
 }
 
 function getQuestionPaperKey(question: Question) {
-  if (question.examCode && question.paperCode) {
-    return `${question.examCode}-${question.paperCode}`;
-  }
+  const paperKey = getOfficialPaperKey(question);
+  if (paperKey) return paperKey;
   if (question.sourceYear && question.sourceRound) {
     return `${question.sourceYear}-${question.sourceRound}-${question.subject}`;
   }

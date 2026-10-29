@@ -102,6 +102,14 @@ test("舊考古卷題號可還原 examCode 與 paperCode", () => {
   assert.equal(inferSimulationPaperKey(session), "105100-5301");
 });
 
+test("官方不同考試軌道保留完整卷別識別", () => {
+  const attempts = makeAttempts(3, 2, "MOEX-C101-095030-S1001-HIGHGENERAL-Q");
+  const session = makeSession({ attempts, questionOrder: attempts.map((a) => a.questionId), settings: { selectedPaperKey: undefined } });
+  assert.equal(inferSimulationPaperKey(session), "MOEX-C101-095030-S1001-HIGHGENERAL");
+  session.questionOrder?.push("MOEX-C117-095030-S1001-STAGE1-Q001");
+  assert.equal(inferSimulationPaperKey(session), undefined);
+});
+
 test("模擬考倒數歸零後不再提供暫停控制", () => {
   const presentation = getSimulationTimerPresentation({
     durationSeconds: 7_200,

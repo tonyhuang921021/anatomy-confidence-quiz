@@ -106,9 +106,11 @@ test('real runtime retains 6730 baseline questions and exposes the eight 98–99
   const current=require('../data/med1QuestionBank.ts');
   const additions97=[...require('../data/sources/moex_97_1_med1_questions.json').questions,...require('../data/sources/moex_97_1_med2_questions.json').questions,...require('../data/sources/moex_97_2_med1_questions.json').questions,...require('../data/sources/moex_97_2_med2_questions.json').questions];
   const additions96=[...require('../data/sources/moex_96_1_med1_questions.json').questions,...require('../data/sources/moex_96_1_med2_questions.json').questions,...require('../data/sources/moex_96_2_med1_questions.json').questions,...require('../data/sources/moex_96_2_med2_questions.json').questions];
-  const oldIds=new Set(payload.questions.map(q=>q.id)),newIds=new Set([...additions97,...additions96].map(q=>q.id));
-  assert.equal(oldIds.size,800);assert.equal(newIds.size,800);assert.equal([...newIds].filter(id=>oldIds.has(id)).length,0);
-  assert.equal(current.canonicalQuestionBank.length,6730+800+400+400);
+  const additions95=[1,2].flatMap(r=>[1,2].flatMap(p=>require(`../data/sources/moex_95_${r}_med${p}_questions.json`).questions));
+  assert.equal(additions95.length,400);
+  const oldIds=new Set(payload.questions.map(q=>q.id)),newIds=new Set([...additions97,...additions96,...additions95].map(q=>q.id));
+  assert.equal(oldIds.size,800);assert.equal(newIds.size,1200);assert.equal([...newIds].filter(id=>oldIds.has(id)).length,0);
+  assert.equal(current.canonicalQuestionBank.length,6730+800+400+400+400);
   const original=current.canonicalQuestionBank.filter(q=>!oldIds.has(q.id)&&!newIds.has(q.id));assert.equal(original.length,6730);
   const revisions=require('../docs/moex-98-99/canonical-reviewed-corrections.json');
   assert.deepEqual(revisions.map(({id,fields})=>({id,fields})),[

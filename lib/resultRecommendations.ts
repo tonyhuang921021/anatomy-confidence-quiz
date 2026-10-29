@@ -1,4 +1,5 @@
 import { formatRocYear } from "./rocDate";
+import { getOfficialPaperKey } from "./officialPaperIdentity";
 import { MED1_SUBJECTS, MED2_SUBJECTS } from "../data/subjectOrder";
 import {
   applyClassificationOverrideWithPrimaryTagPriority,
@@ -87,7 +88,7 @@ export function buildResultRecommendations({ session, questions, questionBank, c
     if (paperKey && !paperKey.startsWith("AI-")) {
       applyKnownConstraint("所選考卷", (question) =>
         `${question.sourceYear}-${question.sourceRound}-${question.paperCode}` === paperKey ||
-        `${question.examCode}-${question.paperCode}` === paperKey
+        getOfficialPaperKey(question) === paperKey
       );
     }
     if (Number.isFinite(settings?.yearFrom) && Number.isFinite(settings?.yearTo)) {

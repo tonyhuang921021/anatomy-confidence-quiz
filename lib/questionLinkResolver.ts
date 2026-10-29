@@ -16,14 +16,14 @@ function normalizeQuestionNumber(value: string) {
 function normalizeYear(value: string) {
   const parsed = Number(value);
   if (!Number.isFinite(parsed)) return null;
-  if (parsed >= 98 && parsed <= 199) return toGregorianPracticeYear(parsed);
+  if (parsed >= 90 && parsed <= 199) return toGregorianPracticeYear(parsed);
   if (parsed >= 1900 && parsed <= 2100) return parsed;
   return null;
 }
 
 function inferRoundFromExamCode(examCode: string) {
   const suffix = examCode.slice(3);
-  if (suffix === "020" || suffix === "010") return 1;
+  if (suffix === "020" || suffix === "010" || suffix === "030") return 1;
   if (suffix === "090" || suffix === "110" || suffix === "120" || suffix === "130" || suffix === "140") return 2;
   return null;
 }
@@ -125,7 +125,9 @@ function findQuestionByReference(
   });
   const narrowedCandidates = parsed.hasPaperCode ? candidates : narrowCandidatesBySubject(candidates, options.subject);
 
-  if (!parsed.hasPaperCode && narrowedCandidates.length > 1) return null;
+  // Older shorthand lacks the official category/track: never pick one of
+  // several matching papers silently when distinct tracks share a year.
+  if (narrowedCandidates.length > 1) return null;
 
   return narrowedCandidates[0] ?? null;
 }

@@ -1,3 +1,4 @@
+import { getOfficialPaperKey } from "@/lib/officialPaperIdentity";
 import { formatRocYear } from "@/lib/rocDate";
 import { anatomyOutline, anatomyQuestions } from "@/data/anatomyQuestions";
 import { moexMed1Missing22QuestionsDetailedV5 } from "@/data/sources/moex_med1_missing_22_questions_detailed_v5";
@@ -19,6 +20,10 @@ import moex96FirstMed1Questions from "@/data/sources/moex_96_1_med1_questions.js
 import moex96FirstMed2Questions from "@/data/sources/moex_96_1_med2_questions.json";
 import moex96SecondMed1Questions from "@/data/sources/moex_96_2_med1_questions.json";
 import moex96SecondMed2Questions from "@/data/sources/moex_96_2_med2_questions.json";
+import moex95FirstMed1Questions from "@/data/sources/moex_95_1_med1_questions.json";
+import moex95FirstMed2Questions from "@/data/sources/moex_95_1_med2_questions.json";
+import moex95SecondMed1Questions from "@/data/sources/moex_95_2_med1_questions.json";
+import moex95SecondMed2Questions from "@/data/sources/moex_95_2_med2_questions.json";
 import moex9899LearningPlacement from "@/data/sources/moex_98_99_learning_placement.json";
 import questionMediaManifest from "@/data/sources/question_media_manifest.json";
 import {
@@ -2087,6 +2092,10 @@ export const canonicalQuestionBank: Question[] = dedupeQuestionBank([
   ...(moex96FirstMed2Questions.questions as Question[]),
   ...(moex96SecondMed1Questions.questions as Question[]),
   ...(moex96SecondMed2Questions.questions as Question[]),
+  ...(moex95FirstMed1Questions.questions as Question[]),
+  ...(moex95FirstMed2Questions.questions as Question[]),
+  ...(moex95SecondMed1Questions.questions as Question[]),
+  ...(moex95SecondMed2Questions.questions as Question[]),
   ...manualInjectedQuestions
 ]).map(applyAnalysisPrimaryTagClassification);
 
@@ -2219,10 +2228,10 @@ function dedupeQuestionBank(questions: Question[]) {
     .filter((question) => question.sourceType === "MOEX_PAST_EXAM")
     .map(fillPastPaperMetadata)
     .forEach((question) => {
-      const slotKey =
-        question.examCode && question.paperCode && question.originalQuestionNumber
-          ? `${question.examCode}-${question.paperCode}-${question.originalQuestionNumber}`
-          : question.id;
+      const paperKey = getOfficialPaperKey(question);
+      const slotKey = paperKey && question.originalQuestionNumber
+        ? `${paperKey}-${question.originalQuestionNumber}`
+        : question.id;
       const bucket = moexBuckets.get(slotKey) ?? [];
       bucket.push(question);
       moexBuckets.set(slotKey, bucket);
@@ -2284,7 +2293,7 @@ function buildWholePastPaperBankFromBank(questionBank: Question[]) {
 
   allMoexQuestions.forEach((question) => {
     if (!question.examCode || !question.paperCode || !question.originalQuestionNumber) return;
-    const key = `${question.examCode}-${question.paperCode}-${question.originalQuestionNumber}`;
+    const key = `${getOfficialPaperKey(question)}-${question.originalQuestionNumber}`;
     const bucket = grouped.get(key) ?? [];
     bucket.push(question);
     grouped.set(key, bucket);
@@ -2293,8 +2302,8 @@ function buildWholePastPaperBankFromBank(questionBank: Question[]) {
   return Array.from(grouped.values())
     .map(selectBestQuestionVariant)
     .sort((a, b) => {
-      const leftKey = `${a.examCode}-${a.paperCode}`;
-      const rightKey = `${b.examCode}-${b.paperCode}`;
+      const leftKey = getOfficialPaperKey(a) ?? "";
+      const rightKey = getOfficialPaperKey(b) ?? "";
       if (leftKey !== rightKey) return leftKey.localeCompare(rightKey);
       return (a.originalQuestionNumber ?? 0) - (b.originalQuestionNumber ?? 0);
     });
@@ -2561,7 +2570,8 @@ export function getPastPaperOptions(
       if (examLabel !== subjectFilter) return;
     }
 
-    const key = `${question.examCode}-${question.paperCode}`;
+    const key = getOfficialPaperKey(question);
+    if (!key) return;
     const current = paperMap.get(key);
     if (current) {
       current.questionCount += 1;
@@ -2570,7 +2580,9 @@ export function getPastPaperOptions(
 
     paperMap.set(key, {
       key,
-      label: `${formatRocYear(question.sourceYear)} 第${question.sourceRound ?? (question.examSessionLabel?.includes("第二") ? 2 : 1)}次 ${examLabel} ${question.paperCode}`,
+      label: question.officialExam
+        ? `${formatRocYear(question.sourceYear)} 第${question.sourceRound ?? (question.examSessionLabel?.includes("第二") ? 2 : 1)}次 ${question.officialExam.trackLabel} ${question.officialExam.paperTitle} ${question.officialExam.subjectCode}`
+        : `${formatRocYear(question.sourceYear)} 第${question.sourceRound ?? (question.examSessionLabel?.includes("第二") ? 2 : 1)}次 ${examLabel} ${question.paperCode}`,
       subject: examLabel as SubjectFilter,
       questionCount: 1,
       sourceYear: question.sourceYear,
@@ -2582,7 +2594,7 @@ export function getPastPaperOptions(
     .map((paper) => {
       const presentNumbers = new Set(
         bank
-          .filter((question) => `${question.examCode}-${question.paperCode}` === paper.key)
+          .filter((question) => getOfficialPaperKey(question) === paper.key)
           .map((question) => question.originalQuestionNumber)
           .filter((value): value is number => typeof value === "number")
       );
@@ -2614,7 +2626,7 @@ export function getQuestionsForPastPaper(
 ) {
   return getWholePastPaperBank(overrides)
     .filter((question) => {
-      if (`${question.examCode}-${question.paperCode}` !== paperKey) return false;
+      if (getOfficialPaperKey(question) !== paperKey) return false;
       if (
         subjectFilter === "醫學（一）" ||
         subjectFilter === "醫學（二）"

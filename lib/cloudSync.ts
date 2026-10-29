@@ -1,4 +1,5 @@
 import type { User } from "@supabase/supabase-js";
+import { getOfficialPaperKeyFromQuestionId } from "./officialPaperIdentity";
 import type {
   Attempt,
   CustomPaperDetail,
@@ -1180,10 +1181,8 @@ function getSinglePastPaperKeyFromQuestionIds(questionIds: string[]) {
   const paperKeys = new Set<string>();
 
   for (const questionId of questionIds) {
-    const match = questionId.match(/^MOEX-([^-]+)-([^-]+)-Q\d+/);
-    if (match) {
-      paperKeys.add(`${match[1]}-${match[2]}`);
-    }
+    const paperKey = getOfficialPaperKeyFromQuestionId(questionId);
+    if (paperKey) paperKeys.add(paperKey);
 
     const aiMatch = questionId.match(/^(AI-[A-Z0-9-]+)-Q\d+$/);
     if (aiMatch) {

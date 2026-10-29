@@ -1,0 +1,4621 @@
+{
+  "status": "reviewed_unpublished_candidate",
+  "sourceBundleSha256": "87054c178551a948cb7837270d9cd0fed009d238f865a16e3722b70ff673b3c0",
+  "sources": {
+    "Q": {
+      "url": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=101&code=095030&q=1&s=1001&t=Q",
+      "bytes": 278236,
+      "sha256": "b6640076cd3359cbafcfc4a46fb9ef55547192f91d77afc717d9ff3b02c14dc3",
+      "pages": 8
+    },
+    "S": {
+      "url": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=101&code=095030&q=1&s=1001&t=S",
+      "bytes": 63828,
+      "sha256": "08284589631e8557b42726957d136c3c8f8c138002eb9572630f44e2c2949eb7",
+      "pages": 1
+    }
+  },
+  "questions": [
+    {
+      "id": "MOEX-C101-095030-S1001-HIGHGENERAL-Q001",
+      "subject": "醫學（一）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（一）",
+      "stem": "情況：30 歲男性工人，在工作中被玻璃割傷前臂，傷口位在前臂尺側（ulnar side of forearm），距離手 腕3 公分，且在小指側，傷口長2 公分，患者被送到急診時，檢視其傷口可見血液噴出。請回答 第1～4 題：\n患者前臂那項構造最可能受損？",
+      "options": {
+        "A": "橈動脈",
+        "B": "尺動脈",
+        "C": "臂動脈",
+        "D": "指動脈"
+      },
+      "answer": "B",
+      "acceptedAnswers": [
+        "B"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：B。",
+      "testedConcept": "基礎醫學（一）（高普考原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國95年第1次 高普考 基礎醫學（一） 1001",
+      "sourceYear": 2006,
+      "sourceRound": 1,
+      "originalQuestionNumber": 1,
+      "examCode": "095030",
+      "paperCode": "1101",
+      "examSessionLabel": "第一次",
+      "officialExam": {
+        "categoryCode": "101",
+        "subjectCode": "1001",
+        "trackCode": "HIGHGENERAL",
+        "trackLabel": "高普考",
+        "paperTitle": "基礎醫學（一）"
+      },
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=101&code=095030&q=1&s=1001&t=Q",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=101&code=095030&q=1&s=1001&t=S",
+        "page": 1,
+        "endPage": 1,
+        "image": "/question-media/moex-95-1-med1/MOEX-C101-095030-S1001-HIGHGENERAL-Q001.webp",
+        "width": 1030,
+        "height": 154,
+        "scope": "基礎醫學（一）",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-C101-095030-S1001-HIGHGENERAL-Q002",
+      "subject": "醫學（一）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（一）",
+      "stem": "情況：30 歲男性工人，在工作中被玻璃割傷前臂，傷口位在前臂尺側（ulnar side of forearm），距離手 腕3 公分，且在小指側，傷口長2 公分，患者被送到急診時，檢視其傷口可見血液噴出。請回答 第1～4 題：\n患者前臂那項構造最可能同時受損？",
+      "options": {
+        "A": "尺神經",
+        "B": "橈神經",
+        "C": "正中神經",
+        "D": "指神經"
+      },
+      "answer": "A",
+      "acceptedAnswers": [
+        "A"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：A。",
+      "testedConcept": "基礎醫學（一）（高普考原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國95年第1次 高普考 基礎醫學（一） 1001",
+      "sourceYear": 2006,
+      "sourceRound": 1,
+      "originalQuestionNumber": 2,
+      "examCode": "095030",
+      "paperCode": "1101",
+      "examSessionLabel": "第一次",
+      "officialExam": {
+        "categoryCode": "101",
+        "subjectCode": "1001",
+        "trackCode": "HIGHGENERAL",
+        "trackLabel": "高普考",
+        "paperTitle": "基礎醫學（一）"
+      },
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=101&code=095030&q=1&s=1001&t=Q",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=101&code=095030&q=1&s=1001&t=S",
+        "page": 1,
+        "endPage": 1,
+        "image": "/question-media/moex-95-1-med1/MOEX-C101-095030-S1001-HIGHGENERAL-Q002.webp",
+        "width": 1030,
+        "height": 154,
+        "scope": "基礎醫學（一）",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-C101-095030-S1001-HIGHGENERAL-Q003",
+      "subject": "醫學（一）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（一）",
+      "stem": "情況：30 歲男性工人，在工作中被玻璃割傷前臂，傷口位在前臂尺側（ulnar side of forearm），距離手 腕3 公分，且在小指側，傷口長2 公分，患者被送到急診時，檢視其傷口可見血液噴出。請回答 第1～4 題：\n患者前臂肌腱中，下列何者最可能同時受損？",
+      "options": {
+        "A": "橈側屈腕肌（Flexor carpi radialis muscle）肌腱",
+        "B": "尺側屈腕肌（Flexor carpi ulnaris muscle）肌腱",
+        "C": "屈拇長肌（Flexor pollicis longus）肌腱",
+        "D": "食指屈指淺肌（Flexor digitorum superficialis）肌腱"
+      },
+      "answer": "B",
+      "acceptedAnswers": [
+        "B"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：B。",
+      "testedConcept": "基礎醫學（一）（高普考原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國95年第1次 高普考 基礎醫學（一） 1001",
+      "sourceYear": 2006,
+      "sourceRound": 1,
+      "originalQuestionNumber": 3,
+      "examCode": "095030",
+      "paperCode": "1101",
+      "examSessionLabel": "第一次",
+      "officialExam": {
+        "categoryCode": "101",
+        "subjectCode": "1001",
+        "trackCode": "HIGHGENERAL",
+        "trackLabel": "高普考",
+        "paperTitle": "基礎醫學（一）"
+      },
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=101&code=095030&q=1&s=1001&t=Q",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=101&code=095030&q=1&s=1001&t=S",
+        "page": 1,
+        "endPage": 1,
+        "image": "/question-media/moex-95-1-med1/MOEX-C101-095030-S1001-HIGHGENERAL-Q003.webp",
+        "width": 1030,
+        "height": 247,
+        "scope": "基礎醫學（一）",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-C101-095030-S1001-HIGHGENERAL-Q004",
+      "subject": "醫學（一）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（一）",
+      "stem": "情況：30 歲男性工人，在工作中被玻璃割傷前臂，傷口位在前臂尺側（ulnar side of forearm），距離手 腕3 公分，且在小指側，傷口長2 公分，患者被送到急診時，檢視其傷口可見血液噴出。請回答 第1～4 題：\n患者受損之構造經修補後，癒合良好，且經適當的復健，其手部功能可能還會有那種缺陷？",
+      "options": {
+        "A": "拇指腹面感覺異常",
+        "B": "食指近端指間關節（proximal interphalangeal joint）無法彎曲",
+        "C": "中指無法彎曲",
+        "D": "無名指無法完全伸直"
+      },
+      "answer": "D",
+      "acceptedAnswers": [
+        "D"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：D。",
+      "testedConcept": "基礎醫學（一）（高普考原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國95年第1次 高普考 基礎醫學（一） 1001",
+      "sourceYear": 2006,
+      "sourceRound": 1,
+      "originalQuestionNumber": 4,
+      "examCode": "095030",
+      "paperCode": "1101",
+      "examSessionLabel": "第一次",
+      "officialExam": {
+        "categoryCode": "101",
+        "subjectCode": "1001",
+        "trackCode": "HIGHGENERAL",
+        "trackLabel": "高普考",
+        "paperTitle": "基礎醫學（一）"
+      },
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=101&code=095030&q=1&s=1001&t=Q",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=101&code=095030&q=1&s=1001&t=S",
+        "page": 1,
+        "endPage": 1,
+        "image": "/question-media/moex-95-1-med1/MOEX-C101-095030-S1001-HIGHGENERAL-Q004.webp",
+        "width": 1030,
+        "height": 246,
+        "scope": "基礎醫學（一）",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-C101-095030-S1001-HIGHGENERAL-Q005",
+      "subject": "醫學（一）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（一）",
+      "stem": "下列何者不附著在中軸骨骼上？",
+      "options": {
+        "A": "胸大肌（Pectoralis major）",
+        "B": "胸小肌（Pectoralis minor）",
+        "C": "大圓肌（Teres major）",
+        "D": "前鋸肌（Serratus anterior）"
+      },
+      "answer": "C",
+      "acceptedAnswers": [
+        "C"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：C。",
+      "testedConcept": "基礎醫學（一）（高普考原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國95年第1次 高普考 基礎醫學（一） 1001",
+      "sourceYear": 2006,
+      "sourceRound": 1,
+      "originalQuestionNumber": 5,
+      "examCode": "095030",
+      "paperCode": "1101",
+      "examSessionLabel": "第一次",
+      "officialExam": {
+        "categoryCode": "101",
+        "subjectCode": "1001",
+        "trackCode": "HIGHGENERAL",
+        "trackLabel": "高普考",
+        "paperTitle": "基礎醫學（一）"
+      },
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=101&code=095030&q=1&s=1001&t=Q",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=101&code=095030&q=1&s=1001&t=S",
+        "page": 1,
+        "endPage": 1,
+        "image": "/question-media/moex-95-1-med1/MOEX-C101-095030-S1001-HIGHGENERAL-Q005.webp",
+        "width": 1030,
+        "height": 95,
+        "scope": "基礎醫學（一）",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-C101-095030-S1001-HIGHGENERAL-Q006",
+      "subject": "醫學（一）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（一）",
+      "stem": "下列何者的肌腱外側可測得橈動脈（radial artery）之脈動？",
+      "options": {
+        "A": "橈側伸腕長肌（Extensor carpi radialis longus）",
+        "B": "外展拇長肌（Abductor pollicis longus）",
+        "C": "肱橈肌（Brachioradialis）",
+        "D": "橈側屈腕肌（Flexor carpi radialis）"
+      },
+      "answer": "D",
+      "acceptedAnswers": [
+        "D"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：D。",
+      "testedConcept": "基礎醫學（一）（高普考原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國95年第1次 高普考 基礎醫學（一） 1001",
+      "sourceYear": 2006,
+      "sourceRound": 1,
+      "originalQuestionNumber": 6,
+      "examCode": "095030",
+      "paperCode": "1101",
+      "examSessionLabel": "第一次",
+      "officialExam": {
+        "categoryCode": "101",
+        "subjectCode": "1001",
+        "trackCode": "HIGHGENERAL",
+        "trackLabel": "高普考",
+        "paperTitle": "基礎醫學（一）"
+      },
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=101&code=095030&q=1&s=1001&t=Q",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=101&code=095030&q=1&s=1001&t=S",
+        "page": 1,
+        "endPage": 1,
+        "image": "/question-media/moex-95-1-med1/MOEX-C101-095030-S1001-HIGHGENERAL-Q006.webp",
+        "width": 1030,
+        "height": 94,
+        "scope": "基礎醫學（一）",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-C101-095030-S1001-HIGHGENERAL-Q007",
+      "subject": "醫學（一）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（一）",
+      "stem": "下列何者不屬於屈戌關節（hinge joint）？",
+      "options": {
+        "A": "掌指關節（Metacarpophalangeal joint）",
+        "B": "踝關節（Ankle joint）",
+        "C": "肘關節（Elbow joint）",
+        "D": "指間關節（Interphalangeal joint）"
+      },
+      "answer": "A",
+      "acceptedAnswers": [
+        "A"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：A。",
+      "testedConcept": "基礎醫學（一）（高普考原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國95年第1次 高普考 基礎醫學（一） 1001",
+      "sourceYear": 2006,
+      "sourceRound": 1,
+      "originalQuestionNumber": 7,
+      "examCode": "095030",
+      "paperCode": "1101",
+      "examSessionLabel": "第一次",
+      "officialExam": {
+        "categoryCode": "101",
+        "subjectCode": "1001",
+        "trackCode": "HIGHGENERAL",
+        "trackLabel": "高普考",
+        "paperTitle": "基礎醫學（一）"
+      },
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=101&code=095030&q=1&s=1001&t=Q",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=101&code=095030&q=1&s=1001&t=S",
+        "page": 1,
+        "endPage": 1,
+        "image": "/question-media/moex-95-1-med1/MOEX-C101-095030-S1001-HIGHGENERAL-Q007.webp",
+        "width": 1030,
+        "height": 94,
+        "scope": "基礎醫學（一）",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-C101-095030-S1001-HIGHGENERAL-Q008",
+      "subject": "醫學（一）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（一）",
+      "stem": "臀皺褶（Gluteal fold）附近的皮膚感覺主要由下列何者支配？",
+      "options": {
+        "A": "臀下神經（Inferior gluteal nerve）",
+        "B": "坐骨神經（Sciatic nerve）",
+        "C": "股外側皮神經（Lateral femoral cutaneous nerve）",
+        "D": "股後皮神經（Posterior femoral cutaneous nerve）"
+      },
+      "answer": "D",
+      "acceptedAnswers": [
+        "D"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：D。",
+      "testedConcept": "基礎醫學（一）（高普考原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國95年第1次 高普考 基礎醫學（一） 1001",
+      "sourceYear": 2006,
+      "sourceRound": 1,
+      "originalQuestionNumber": 8,
+      "examCode": "095030",
+      "paperCode": "1101",
+      "examSessionLabel": "第一次",
+      "officialExam": {
+        "categoryCode": "101",
+        "subjectCode": "1001",
+        "trackCode": "HIGHGENERAL",
+        "trackLabel": "高普考",
+        "paperTitle": "基礎醫學（一）"
+      },
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=101&code=095030&q=1&s=1001&t=Q",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=101&code=095030&q=1&s=1001&t=S",
+        "page": 1,
+        "endPage": 1,
+        "image": "/question-media/moex-95-1-med1/MOEX-C101-095030-S1001-HIGHGENERAL-Q008.webp",
+        "width": 1030,
+        "height": 155,
+        "scope": "基礎醫學（一）",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-C101-095030-S1001-HIGHGENERAL-Q009",
+      "subject": "醫學（一）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（一）",
+      "stem": "下列何者通行於肱二頭肌（biceps brachii）與肱肌（brachialis）之間？",
+      "options": {
+        "A": "橈神經（Radial nerve）",
+        "B": "肌皮神經（Musculocutaneous nerve）",
+        "C": "尺神經（Ulnar nerve）",
+        "D": "正中神經（Median nerve）"
+      },
+      "answer": "B",
+      "acceptedAnswers": [
+        "B"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：B。",
+      "testedConcept": "基礎醫學（一）（高普考原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國95年第1次 高普考 基礎醫學（一） 1001",
+      "sourceYear": 2006,
+      "sourceRound": 1,
+      "originalQuestionNumber": 9,
+      "examCode": "095030",
+      "paperCode": "1101",
+      "examSessionLabel": "第一次",
+      "officialExam": {
+        "categoryCode": "101",
+        "subjectCode": "1001",
+        "trackCode": "HIGHGENERAL",
+        "trackLabel": "高普考",
+        "paperTitle": "基礎醫學（一）"
+      },
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=101&code=095030&q=1&s=1001&t=Q",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=101&code=095030&q=1&s=1001&t=S",
+        "page": 1,
+        "endPage": 1,
+        "image": "/question-media/moex-95-1-med1/MOEX-C101-095030-S1001-HIGHGENERAL-Q009.webp",
+        "width": 1030,
+        "height": 94,
+        "scope": "基礎醫學（一）",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-C101-095030-S1001-HIGHGENERAL-Q010",
+      "subject": "醫學（一）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（一）",
+      "stem": "下列何者緊貼前列腺的底部（base）？",
+      "options": {
+        "A": "膀胱",
+        "B": "射精管",
+        "C": "骨盆橫膈",
+        "D": "泌尿生殖橫膈"
+      },
+      "answer": "A",
+      "acceptedAnswers": [
+        "A"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：A。",
+      "testedConcept": "基礎醫學（一）（高普考原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國95年第1次 高普考 基礎醫學（一） 1001",
+      "sourceYear": 2006,
+      "sourceRound": 1,
+      "originalQuestionNumber": 10,
+      "examCode": "095030",
+      "paperCode": "1101",
+      "examSessionLabel": "第一次",
+      "officialExam": {
+        "categoryCode": "101",
+        "subjectCode": "1001",
+        "trackCode": "HIGHGENERAL",
+        "trackLabel": "高普考",
+        "paperTitle": "基礎醫學（一）"
+      },
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=101&code=095030&q=1&s=1001&t=Q",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=101&code=095030&q=1&s=1001&t=S",
+        "page": 1,
+        "endPage": 1,
+        "image": "/question-media/moex-95-1-med1/MOEX-C101-095030-S1001-HIGHGENERAL-Q010.webp",
+        "width": 1030,
+        "height": 63,
+        "scope": "基礎醫學（一）",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-C101-095030-S1001-HIGHGENERAL-Q011",
+      "subject": "醫學（一）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（一）",
+      "stem": "腳趾的內收及外展動作以下列何者為其軸心？",
+      "options": {
+        "A": "腳𧿹趾",
+        "B": "第二趾",
+        "C": "第三趾",
+        "D": "第四趾"
+      },
+      "answer": "B",
+      "acceptedAnswers": [
+        "B"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：B。",
+      "testedConcept": "基礎醫學（一）（高普考原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國95年第1次 高普考 基礎醫學（一） 1001",
+      "sourceYear": 2006,
+      "sourceRound": 1,
+      "originalQuestionNumber": 11,
+      "examCode": "095030",
+      "paperCode": "1101",
+      "examSessionLabel": "第一次",
+      "officialExam": {
+        "categoryCode": "101",
+        "subjectCode": "1001",
+        "trackCode": "HIGHGENERAL",
+        "trackLabel": "高普考",
+        "paperTitle": "基礎醫學（一）"
+      },
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=101&code=095030&q=1&s=1001&t=Q",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=101&code=095030&q=1&s=1001&t=S",
+        "page": 2,
+        "endPage": 2,
+        "image": "/question-media/moex-95-1-med1/MOEX-C101-095030-S1001-HIGHGENERAL-Q011.webp",
+        "width": 1030,
+        "height": 63,
+        "scope": "基礎醫學（一）",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-C101-095030-S1001-HIGHGENERAL-Q012",
+      "subject": "醫學（一）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（一）",
+      "stem": "當尿液排空，下列何者最可能緊貼於膀胱的上方？",
+      "options": {
+        "A": "子宮",
+        "B": "陰道",
+        "C": "直腸",
+        "D": "輸精管"
+      },
+      "answer": "A",
+      "acceptedAnswers": [
+        "A"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：A。",
+      "testedConcept": "基礎醫學（一）（高普考原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國95年第1次 高普考 基礎醫學（一） 1001",
+      "sourceYear": 2006,
+      "sourceRound": 1,
+      "originalQuestionNumber": 12,
+      "examCode": "095030",
+      "paperCode": "1101",
+      "examSessionLabel": "第一次",
+      "officialExam": {
+        "categoryCode": "101",
+        "subjectCode": "1001",
+        "trackCode": "HIGHGENERAL",
+        "trackLabel": "高普考",
+        "paperTitle": "基礎醫學（一）"
+      },
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=101&code=095030&q=1&s=1001&t=Q",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=101&code=095030&q=1&s=1001&t=S",
+        "page": 2,
+        "endPage": 2,
+        "image": "/question-media/moex-95-1-med1/MOEX-C101-095030-S1001-HIGHGENERAL-Q012.webp",
+        "width": 1030,
+        "height": 63,
+        "scope": "基礎醫學（一）",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-C101-095030-S1001-HIGHGENERAL-Q013",
+      "subject": "醫學（一）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（一）",
+      "stem": "下列何者構成會陰膜（perineal membrane）？",
+      "options": {
+        "A": "骨盆橫膈（Pelvic diaphragm）",
+        "B": "會陰淺筋膜（Perineal superficial fascia）",
+        "C": "會陰深筋膜上層（Superior perineal deep fascia）",
+        "D": "會陰深筋膜下層（Inferior perineal deep fascia）"
+      },
+      "answer": "D",
+      "acceptedAnswers": [
+        "D"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：D。",
+      "testedConcept": "基礎醫學（一）（高普考原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國95年第1次 高普考 基礎醫學（一） 1001",
+      "sourceYear": 2006,
+      "sourceRound": 1,
+      "originalQuestionNumber": 13,
+      "examCode": "095030",
+      "paperCode": "1101",
+      "examSessionLabel": "第一次",
+      "officialExam": {
+        "categoryCode": "101",
+        "subjectCode": "1001",
+        "trackCode": "HIGHGENERAL",
+        "trackLabel": "高普考",
+        "paperTitle": "基礎醫學（一）"
+      },
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=101&code=095030&q=1&s=1001&t=Q",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=101&code=095030&q=1&s=1001&t=S",
+        "page": 2,
+        "endPage": 2,
+        "image": "/question-media/moex-95-1-med1/MOEX-C101-095030-S1001-HIGHGENERAL-Q013.webp",
+        "width": 1030,
+        "height": 155,
+        "scope": "基礎醫學（一）",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-C101-095030-S1001-HIGHGENERAL-Q014",
+      "subject": "醫學（一）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（一）",
+      "stem": "受外力造成股骨的大轉子（greater trochanter）破損，下列何者最不受影響？",
+      "options": {
+        "A": "臀大肌",
+        "B": "臀中肌",
+        "C": "臀小肌",
+        "D": "梨狀肌"
+      },
+      "answer": "A",
+      "acceptedAnswers": [
+        "A"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：A。",
+      "testedConcept": "基礎醫學（一）（高普考原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國95年第1次 高普考 基礎醫學（一） 1001",
+      "sourceYear": 2006,
+      "sourceRound": 1,
+      "originalQuestionNumber": 14,
+      "examCode": "095030",
+      "paperCode": "1101",
+      "examSessionLabel": "第一次",
+      "officialExam": {
+        "categoryCode": "101",
+        "subjectCode": "1001",
+        "trackCode": "HIGHGENERAL",
+        "trackLabel": "高普考",
+        "paperTitle": "基礎醫學（一）"
+      },
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=101&code=095030&q=1&s=1001&t=Q",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=101&code=095030&q=1&s=1001&t=S",
+        "page": 2,
+        "endPage": 2,
+        "image": "/question-media/moex-95-1-med1/MOEX-C101-095030-S1001-HIGHGENERAL-Q014.webp",
+        "width": 1030,
+        "height": 63,
+        "scope": "基礎醫學（一）",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-C101-095030-S1001-HIGHGENERAL-Q015",
+      "subject": "醫學（一）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（一）",
+      "stem": "下列有關脊椎之敘述，何者錯誤？",
+      "options": {
+        "A": "後縱韌帶（Posterior longitudinal ligament）位在椎管（vertebral canal）內",
+        "B": "棘突上韌帶（Supraspinous ligament）由第二頸椎棘突到薦椎",
+        "C": "環軸關節（Atlantoaxial joint）的主要動作是旋轉（rotation）",
+        "D": "脊柱可作屈（flexion）、伸（extension）及旋轉動作"
+      },
+      "answer": "B",
+      "acceptedAnswers": [
+        "B"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：B。",
+      "testedConcept": "基礎醫學（一）（高普考原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國95年第1次 高普考 基礎醫學（一） 1001",
+      "sourceYear": 2006,
+      "sourceRound": 1,
+      "originalQuestionNumber": 15,
+      "examCode": "095030",
+      "paperCode": "1101",
+      "examSessionLabel": "第一次",
+      "officialExam": {
+        "categoryCode": "101",
+        "subjectCode": "1001",
+        "trackCode": "HIGHGENERAL",
+        "trackLabel": "高普考",
+        "paperTitle": "基礎醫學（一）"
+      },
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=101&code=095030&q=1&s=1001&t=Q",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=101&code=095030&q=1&s=1001&t=S",
+        "page": 2,
+        "endPage": 2,
+        "image": "/question-media/moex-95-1-med1/MOEX-C101-095030-S1001-HIGHGENERAL-Q015.webp",
+        "width": 1030,
+        "height": 156,
+        "scope": "基礎醫學（一）",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-C101-095030-S1001-HIGHGENERAL-Q016",
+      "subject": "醫學（一）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（一）",
+      "stem": "下列關於腎上腺的敘述何者錯誤？",
+      "options": {
+        "A": "腎上腺與腎臟都位在腎筋膜（renal fascia）內",
+        "B": "左腎上腺呈半月狀",
+        "C": "供應腎上腺的動脈可直接源自腹主動脈",
+        "D": "左腎上腺靜脈匯入下腔靜脈"
+      },
+      "answer": "D",
+      "acceptedAnswers": [
+        "D"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：D。",
+      "testedConcept": "基礎醫學（一）（高普考原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國95年第1次 高普考 基礎醫學（一） 1001",
+      "sourceYear": 2006,
+      "sourceRound": 1,
+      "originalQuestionNumber": 16,
+      "examCode": "095030",
+      "paperCode": "1101",
+      "examSessionLabel": "第一次",
+      "officialExam": {
+        "categoryCode": "101",
+        "subjectCode": "1001",
+        "trackCode": "HIGHGENERAL",
+        "trackLabel": "高普考",
+        "paperTitle": "基礎醫學（一）"
+      },
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=101&code=095030&q=1&s=1001&t=Q",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=101&code=095030&q=1&s=1001&t=S",
+        "page": 2,
+        "endPage": 2,
+        "image": "/question-media/moex-95-1-med1/MOEX-C101-095030-S1001-HIGHGENERAL-Q016.webp",
+        "width": 1030,
+        "height": 93,
+        "scope": "基礎醫學（一）",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-C101-095030-S1001-HIGHGENERAL-Q017",
+      "subject": "醫學（一）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（一）",
+      "stem": "下列有關腹腔血液循環之敘述，何者錯誤？",
+      "options": {
+        "A": "腸繫膜上動脈穿行於小腸繫膜內",
+        "B": "直腸上動脈（Superior rectal artery）是腸繫膜下動脈的終末分支",
+        "C": "肝門靜脈與體靜脈間沒有吻合枝",
+        "D": "肝、脾的動脈供應來自腹腔動脈幹（celiac trunk）"
+      },
+      "answer": "C",
+      "acceptedAnswers": [
+        "C"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：C。",
+      "testedConcept": "基礎醫學（一）（高普考原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國95年第1次 高普考 基礎醫學（一） 1001",
+      "sourceYear": 2006,
+      "sourceRound": 1,
+      "originalQuestionNumber": 17,
+      "examCode": "095030",
+      "paperCode": "1101",
+      "examSessionLabel": "第一次",
+      "officialExam": {
+        "categoryCode": "101",
+        "subjectCode": "1001",
+        "trackCode": "HIGHGENERAL",
+        "trackLabel": "高普考",
+        "paperTitle": "基礎醫學（一）"
+      },
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=101&code=095030&q=1&s=1001&t=Q",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=101&code=095030&q=1&s=1001&t=S",
+        "page": 2,
+        "endPage": 2,
+        "image": "/question-media/moex-95-1-med1/MOEX-C101-095030-S1001-HIGHGENERAL-Q017.webp",
+        "width": 1030,
+        "height": 155,
+        "scope": "基礎醫學（一）",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-C101-095030-S1001-HIGHGENERAL-Q018",
+      "subject": "醫學（一）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（一）",
+      "stem": "下列何者不屬於椎前交感神經節？",
+      "options": {
+        "A": "腹腔神經節（Celiac ganglia）",
+        "B": "腸繫膜上神經節（Superior mesenteric ganglia）",
+        "C": "腸繫膜下神經節（Inferior mesenteric ganglia）",
+        "D": "腰交感神經節（Lumbar sympathetic ganglia）"
+      },
+      "answer": "D",
+      "acceptedAnswers": [
+        "D"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：D。",
+      "testedConcept": "基礎醫學（一）（高普考原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國95年第1次 高普考 基礎醫學（一） 1001",
+      "sourceYear": 2006,
+      "sourceRound": 1,
+      "originalQuestionNumber": 18,
+      "examCode": "095030",
+      "paperCode": "1101",
+      "examSessionLabel": "第一次",
+      "officialExam": {
+        "categoryCode": "101",
+        "subjectCode": "1001",
+        "trackCode": "HIGHGENERAL",
+        "trackLabel": "高普考",
+        "paperTitle": "基礎醫學（一）"
+      },
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=101&code=095030&q=1&s=1001&t=Q",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=101&code=095030&q=1&s=1001&t=S",
+        "page": 2,
+        "endPage": 2,
+        "image": "/question-media/moex-95-1-med1/MOEX-C101-095030-S1001-HIGHGENERAL-Q018.webp",
+        "width": 1030,
+        "height": 94,
+        "scope": "基礎醫學（一）",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-C101-095030-S1001-HIGHGENERAL-Q019",
+      "subject": "醫學（一）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（一）",
+      "stem": "關於心室調節帶（moderator band）的敘述，何者錯誤？",
+      "options": {
+        "A": "位於左心室",
+        "B": "位於右心室",
+        "C": "從心室中隔到前壁",
+        "D": "內含房室束的分枝"
+      },
+      "answer": "A",
+      "acceptedAnswers": [
+        "A"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：A。",
+      "testedConcept": "基礎醫學（一）（高普考原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國95年第1次 高普考 基礎醫學（一） 1001",
+      "sourceYear": 2006,
+      "sourceRound": 1,
+      "originalQuestionNumber": 19,
+      "examCode": "095030",
+      "paperCode": "1101",
+      "examSessionLabel": "第一次",
+      "officialExam": {
+        "categoryCode": "101",
+        "subjectCode": "1001",
+        "trackCode": "HIGHGENERAL",
+        "trackLabel": "高普考",
+        "paperTitle": "基礎醫學（一）"
+      },
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=101&code=095030&q=1&s=1001&t=Q",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=101&code=095030&q=1&s=1001&t=S",
+        "page": 2,
+        "endPage": 2,
+        "image": "/question-media/moex-95-1-med1/MOEX-C101-095030-S1001-HIGHGENERAL-Q019.webp",
+        "width": 1030,
+        "height": 63,
+        "scope": "基礎醫學（一）",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-C101-095030-S1001-HIGHGENERAL-Q020",
+      "subject": "醫學（一）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（一）",
+      "stem": "乳腺內側的淋巴主要匯入：",
+      "options": {
+        "A": "肩胛下淋巴結（Subscapular lymph nodes）",
+        "B": "前胸淋巴結（Anterior pectoral nodes）",
+        "C": "鎖骨下淋巴結（Subclavicular nodes）",
+        "D": "旁胸淋巴結（Para sternal nodes）"
+      },
+      "answer": "D",
+      "acceptedAnswers": [
+        "D"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：D。",
+      "testedConcept": "基礎醫學（一）（高普考原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國95年第1次 高普考 基礎醫學（一） 1001",
+      "sourceYear": 2006,
+      "sourceRound": 1,
+      "originalQuestionNumber": 20,
+      "examCode": "095030",
+      "paperCode": "1101",
+      "examSessionLabel": "第一次",
+      "officialExam": {
+        "categoryCode": "101",
+        "subjectCode": "1001",
+        "trackCode": "HIGHGENERAL",
+        "trackLabel": "高普考",
+        "paperTitle": "基礎醫學（一）"
+      },
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=101&code=095030&q=1&s=1001&t=Q",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=101&code=095030&q=1&s=1001&t=S",
+        "page": 2,
+        "endPage": 2,
+        "image": "/question-media/moex-95-1-med1/MOEX-C101-095030-S1001-HIGHGENERAL-Q020.webp",
+        "width": 1030,
+        "height": 94,
+        "scope": "基礎醫學（一）",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-C101-095030-S1001-HIGHGENERAL-Q021",
+      "subject": "醫學（一）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（一）",
+      "stem": "心臟上緣（superior border）主要由下列何者形成？",
+      "options": {
+        "A": "大脈管根部",
+        "B": "右心房",
+        "C": "左心室",
+        "D": "右心室"
+      },
+      "answer": "A",
+      "acceptedAnswers": [
+        "A"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：A。",
+      "testedConcept": "基礎醫學（一）（高普考原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國95年第1次 高普考 基礎醫學（一） 1001",
+      "sourceYear": 2006,
+      "sourceRound": 1,
+      "originalQuestionNumber": 21,
+      "examCode": "095030",
+      "paperCode": "1101",
+      "examSessionLabel": "第一次",
+      "officialExam": {
+        "categoryCode": "101",
+        "subjectCode": "1001",
+        "trackCode": "HIGHGENERAL",
+        "trackLabel": "高普考",
+        "paperTitle": "基礎醫學（一）"
+      },
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=101&code=095030&q=1&s=1001&t=Q",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=101&code=095030&q=1&s=1001&t=S",
+        "page": 2,
+        "endPage": 2,
+        "image": "/question-media/moex-95-1-med1/MOEX-C101-095030-S1001-HIGHGENERAL-Q021.webp",
+        "width": 1030,
+        "height": 63,
+        "scope": "基礎醫學（一）",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-C101-095030-S1001-HIGHGENERAL-Q022",
+      "subject": "醫學（一）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（一）",
+      "stem": "副交感神經之節後纖維與下列何者伴行？",
+      "options": {
+        "A": "岩小神經（Lesser petrosal nerve）",
+        "B": "腭大神經（Greater palatine nerve）",
+        "C": "岩大神經（Greater petrosal nerve）",
+        "D": "鼓索神經（Chorda tympani nerve）"
+      },
+      "answer": "B",
+      "acceptedAnswers": [
+        "B"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：B。",
+      "testedConcept": "基礎醫學（一）（高普考原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國95年第1次 高普考 基礎醫學（一） 1001",
+      "sourceYear": 2006,
+      "sourceRound": 1,
+      "originalQuestionNumber": 22,
+      "examCode": "095030",
+      "paperCode": "1101",
+      "examSessionLabel": "第一次",
+      "officialExam": {
+        "categoryCode": "101",
+        "subjectCode": "1001",
+        "trackCode": "HIGHGENERAL",
+        "trackLabel": "高普考",
+        "paperTitle": "基礎醫學（一）"
+      },
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=101&code=095030&q=1&s=1001&t=Q",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=101&code=095030&q=1&s=1001&t=S",
+        "page": 2,
+        "endPage": 2,
+        "image": "/question-media/moex-95-1-med1/MOEX-C101-095030-S1001-HIGHGENERAL-Q022.webp",
+        "width": 1030,
+        "height": 94,
+        "scope": "基礎醫學（一）",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-C101-095030-S1001-HIGHGENERAL-Q023",
+      "subject": "醫學（一）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（一）",
+      "stem": "下頜舌骨肌（Mylohyoid muscle）受何神經支配？",
+      "options": {
+        "A": "第五顱神經第三支",
+        "B": "舌咽神經（Glossopharyngeal nerve）",
+        "C": "第一頸椎神經",
+        "D": "舌下神經（Hypoglossal nerve）"
+      },
+      "answer": "A",
+      "acceptedAnswers": [
+        "A"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：A。",
+      "testedConcept": "基礎醫學（一）（高普考原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國95年第1次 高普考 基礎醫學（一） 1001",
+      "sourceYear": 2006,
+      "sourceRound": 1,
+      "originalQuestionNumber": 23,
+      "examCode": "095030",
+      "paperCode": "1101",
+      "examSessionLabel": "第一次",
+      "officialExam": {
+        "categoryCode": "101",
+        "subjectCode": "1001",
+        "trackCode": "HIGHGENERAL",
+        "trackLabel": "高普考",
+        "paperTitle": "基礎醫學（一）"
+      },
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=101&code=095030&q=1&s=1001&t=Q",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=101&code=095030&q=1&s=1001&t=S",
+        "page": 2,
+        "endPage": 2,
+        "image": "/question-media/moex-95-1-med1/MOEX-C101-095030-S1001-HIGHGENERAL-Q023.webp",
+        "width": 1030,
+        "height": 95,
+        "scope": "基礎醫學（一）",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-C101-095030-S1001-HIGHGENERAL-Q024",
+      "subject": "醫學（一）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（一）",
+      "stem": "頂骨（Parietal bone）、額骨（frontal bone）、顳骨（temporal bone）及顴骨（zygomatic bone）之 交界處稱為：",
+      "options": {
+        "A": "前囟點（Bregma）",
+        "B": "人字點（Lambda）",
+        "C": "枕外隆凸點（Inion）",
+        "D": "翼點（Pterion）"
+      },
+      "answer": "D",
+      "acceptedAnswers": [
+        "D"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：D。",
+      "testedConcept": "基礎醫學（一）（高普考原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國95年第1次 高普考 基礎醫學（一） 1001",
+      "sourceYear": 2006,
+      "sourceRound": 1,
+      "originalQuestionNumber": 24,
+      "examCode": "095030",
+      "paperCode": "1101",
+      "examSessionLabel": "第一次",
+      "officialExam": {
+        "categoryCode": "101",
+        "subjectCode": "1001",
+        "trackCode": "HIGHGENERAL",
+        "trackLabel": "高普考",
+        "paperTitle": "基礎醫學（一）"
+      },
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=101&code=095030&q=1&s=1001&t=Q",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=101&code=095030&q=1&s=1001&t=S",
+        "page": 2,
+        "endPage": 2,
+        "image": "/question-media/moex-95-1-med1/MOEX-C101-095030-S1001-HIGHGENERAL-Q024.webp",
+        "width": 1030,
+        "height": 95,
+        "scope": "基礎醫學（一）",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-C101-095030-S1001-HIGHGENERAL-Q025",
+      "subject": "醫學（一）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（一）",
+      "stem": "兩眼瞳孔同時移向右方須有健全之：",
+      "options": {
+        "A": "右第六顱神經及左第三顱神經",
+        "B": "右第三顱神經及左第六顱神經",
+        "C": "右第四顱神經及左第三顱神經",
+        "D": "右第六顱神經及左第四顱神經"
+      },
+      "answer": "A",
+      "acceptedAnswers": [
+        "A"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：A。",
+      "testedConcept": "基礎醫學（一）（高普考原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國95年第1次 高普考 基礎醫學（一） 1001",
+      "sourceYear": 2006,
+      "sourceRound": 1,
+      "originalQuestionNumber": 25,
+      "examCode": "095030",
+      "paperCode": "1101",
+      "examSessionLabel": "第一次",
+      "officialExam": {
+        "categoryCode": "101",
+        "subjectCode": "1001",
+        "trackCode": "HIGHGENERAL",
+        "trackLabel": "高普考",
+        "paperTitle": "基礎醫學（一）"
+      },
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=101&code=095030&q=1&s=1001&t=Q",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=101&code=095030&q=1&s=1001&t=S",
+        "page": 2,
+        "endPage": 2,
+        "image": "/question-media/moex-95-1-med1/MOEX-C101-095030-S1001-HIGHGENERAL-Q025.webp",
+        "width": 1030,
+        "height": 94,
+        "scope": "基礎醫學（一）",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-C101-095030-S1001-HIGHGENERAL-Q026",
+      "subject": "醫學（一）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（一）",
+      "stem": "第七顱神經所含之副交感神經節前纖維穿過何神經節，但不與該神經節內之神經元形成突觸？",
+      "options": {
+        "A": "翼腭神經節（Pterygopalatine ganglion）",
+        "B": "下頜神經節（Submandibular ganglion）",
+        "C": "耳神經節（Otic ganglion）",
+        "D": "膝狀神經節（Geniculate ganglion）"
+      },
+      "answer": "D",
+      "acceptedAnswers": [
+        "D"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：D。",
+      "testedConcept": "基礎醫學（一）（高普考原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國95年第1次 高普考 基礎醫學（一） 1001",
+      "sourceYear": 2006,
+      "sourceRound": 1,
+      "originalQuestionNumber": 26,
+      "examCode": "095030",
+      "paperCode": "1101",
+      "examSessionLabel": "第一次",
+      "officialExam": {
+        "categoryCode": "101",
+        "subjectCode": "1001",
+        "trackCode": "HIGHGENERAL",
+        "trackLabel": "高普考",
+        "paperTitle": "基礎醫學（一）"
+      },
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=101&code=095030&q=1&s=1001&t=Q",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=101&code=095030&q=1&s=1001&t=S",
+        "page": 3,
+        "endPage": 3,
+        "image": "/question-media/moex-95-1-med1/MOEX-C101-095030-S1001-HIGHGENERAL-Q026.webp",
+        "width": 1030,
+        "height": 94,
+        "scope": "基礎醫學（一）",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-C101-095030-S1001-HIGHGENERAL-Q027",
+      "subject": "醫學（一）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（一）",
+      "stem": "腹股溝管（Inguinal canal）的前壁由下列何者組成？",
+      "options": {
+        "A": "腹外斜肌腱膜（Aponeurosis）",
+        "B": "腹橫肌膜（Fascia transversalis）",
+        "C": "腹內斜肌",
+        "D": "腹橫肌"
+      },
+      "answer": "A",
+      "acceptedAnswers": [
+        "A"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：A。",
+      "testedConcept": "基礎醫學（一）（高普考原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國95年第1次 高普考 基礎醫學（一） 1001",
+      "sourceYear": 2006,
+      "sourceRound": 1,
+      "originalQuestionNumber": 27,
+      "examCode": "095030",
+      "paperCode": "1101",
+      "examSessionLabel": "第一次",
+      "officialExam": {
+        "categoryCode": "101",
+        "subjectCode": "1001",
+        "trackCode": "HIGHGENERAL",
+        "trackLabel": "高普考",
+        "paperTitle": "基礎醫學（一）"
+      },
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=101&code=095030&q=1&s=1001&t=Q",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=101&code=095030&q=1&s=1001&t=S",
+        "page": 3,
+        "endPage": 3,
+        "image": "/question-media/moex-95-1-med1/MOEX-C101-095030-S1001-HIGHGENERAL-Q027.webp",
+        "width": 1030,
+        "height": 93,
+        "scope": "基礎醫學（一）",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-C101-095030-S1001-HIGHGENERAL-Q028",
+      "subject": "醫學（一）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（一）",
+      "stem": "下列有關顳骨岩部（petrous portion of temporal bone）之敘述，何者錯誤？",
+      "options": {
+        "A": "岩大神經（Greater petrosal nerve）由膝狀神經節（geniculate ganglion）處分出",
+        "B": "岩小神經（Lesser petrosal nerve）內含之副交感神經節後纖維源自於第九顱神經",
+        "C": "岩深神經（Deep petrosal nerve）內含交感神經節後纖維",
+        "D": "岩大神經及岩深神經進入翼管形成翼管神經（nerve of pterygoid canal）"
+      },
+      "answer": "B",
+      "acceptedAnswers": [
+        "B"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：B。",
+      "testedConcept": "基礎醫學（一）（高普考原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國95年第1次 高普考 基礎醫學（一） 1001",
+      "sourceYear": 2006,
+      "sourceRound": 1,
+      "originalQuestionNumber": 28,
+      "examCode": "095030",
+      "paperCode": "1101",
+      "examSessionLabel": "第一次",
+      "officialExam": {
+        "categoryCode": "101",
+        "subjectCode": "1001",
+        "trackCode": "HIGHGENERAL",
+        "trackLabel": "高普考",
+        "paperTitle": "基礎醫學（一）"
+      },
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=101&code=095030&q=1&s=1001&t=Q",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=101&code=095030&q=1&s=1001&t=S",
+        "page": 3,
+        "endPage": 3,
+        "image": "/question-media/moex-95-1-med1/MOEX-C101-095030-S1001-HIGHGENERAL-Q028.webp",
+        "width": 1030,
+        "height": 154,
+        "scope": "基礎醫學（一）",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-C101-095030-S1001-HIGHGENERAL-Q029",
+      "subject": "醫學（一）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（一）",
+      "stem": "聯絡兩側大腦新皮質（neocortex）的構造為：",
+      "options": {
+        "A": "前連合（Anterior commissure）",
+        "B": "後連合（Posterior commissure）",
+        "C": "穹窿連合（Fornix commissure）",
+        "D": "胼胝體（Corpus callosum）"
+      },
+      "answer": "D",
+      "acceptedAnswers": [
+        "D"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：D。",
+      "testedConcept": "基礎醫學（一）（高普考原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國95年第1次 高普考 基礎醫學（一） 1001",
+      "sourceYear": 2006,
+      "sourceRound": 1,
+      "originalQuestionNumber": 29,
+      "examCode": "095030",
+      "paperCode": "1101",
+      "examSessionLabel": "第一次",
+      "officialExam": {
+        "categoryCode": "101",
+        "subjectCode": "1001",
+        "trackCode": "HIGHGENERAL",
+        "trackLabel": "高普考",
+        "paperTitle": "基礎醫學（一）"
+      },
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=101&code=095030&q=1&s=1001&t=Q",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=101&code=095030&q=1&s=1001&t=S",
+        "page": 3,
+        "endPage": 3,
+        "image": "/question-media/moex-95-1-med1/MOEX-C101-095030-S1001-HIGHGENERAL-Q029.webp",
+        "width": 1030,
+        "height": 94,
+        "scope": "基礎醫學（一）",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-C101-095030-S1001-HIGHGENERAL-Q030",
+      "subject": "醫學（一）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（一）",
+      "stem": "下列頸部肌肉與其支配神經之敘述，何者錯誤？",
+      "options": {
+        "A": "與第十二顱神經伴行之第一頸神經腹側枝（ventral ramus）支配頦舌骨肌（geniohyoid muscle）",
+        "B": "二腹肌（Digastric muscle）之前腹（anterior belly）受面神經之頸枝支配",
+        "C": "下頜舌骨肌（Mylohyoid muscle）受三叉神經（trigeminal nerve）支配",
+        "D": "肩胛舌骨肌（Omohyoid muscle）受頸襻（ansa cervicalis）支配"
+      },
+      "answer": "B",
+      "acceptedAnswers": [
+        "B"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：B。",
+      "testedConcept": "基礎醫學（一）（高普考原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國95年第1次 高普考 基礎醫學（一） 1001",
+      "sourceYear": 2006,
+      "sourceRound": 1,
+      "originalQuestionNumber": 30,
+      "examCode": "095030",
+      "paperCode": "1101",
+      "examSessionLabel": "第一次",
+      "officialExam": {
+        "categoryCode": "101",
+        "subjectCode": "1001",
+        "trackCode": "HIGHGENERAL",
+        "trackLabel": "高普考",
+        "paperTitle": "基礎醫學（一）"
+      },
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=101&code=095030&q=1&s=1001&t=Q",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=101&code=095030&q=1&s=1001&t=S",
+        "page": 3,
+        "endPage": 3,
+        "image": "/question-media/moex-95-1-med1/MOEX-C101-095030-S1001-HIGHGENERAL-Q030.webp",
+        "width": 1030,
+        "height": 154,
+        "scope": "基礎醫學（一）",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-C101-095030-S1001-HIGHGENERAL-Q031",
+      "subject": "醫學（一）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（一）",
+      "stem": "下列丘腦內之何結構跟邊緣系統沒有直接的聯繫？",
+      "options": {
+        "A": "背外側核（Lateral dorsal nucleus）",
+        "B": "前核（Anterior nucleus）",
+        "C": "中線核（Midline nucleus）",
+        "D": "前腹側核（Ventral anterior nucleus）"
+      },
+      "answer": "D",
+      "acceptedAnswers": [
+        "D"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：D。",
+      "testedConcept": "基礎醫學（一）（高普考原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國95年第1次 高普考 基礎醫學（一） 1001",
+      "sourceYear": 2006,
+      "sourceRound": 1,
+      "originalQuestionNumber": 31,
+      "examCode": "095030",
+      "paperCode": "1101",
+      "examSessionLabel": "第一次",
+      "officialExam": {
+        "categoryCode": "101",
+        "subjectCode": "1001",
+        "trackCode": "HIGHGENERAL",
+        "trackLabel": "高普考",
+        "paperTitle": "基礎醫學（一）"
+      },
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=101&code=095030&q=1&s=1001&t=Q",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=101&code=095030&q=1&s=1001&t=S",
+        "page": 3,
+        "endPage": 3,
+        "image": "/question-media/moex-95-1-med1/MOEX-C101-095030-S1001-HIGHGENERAL-Q031.webp",
+        "width": 1030,
+        "height": 94,
+        "scope": "基礎醫學（一）",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-C101-095030-S1001-HIGHGENERAL-Q032",
+      "subject": "醫學（一）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（一）",
+      "stem": "優勢大腦半球的角迴（angular gyrus）和緣上迴（supramarginal gyrus）損傷會造成：",
+      "options": {
+        "A": "接收性失語症（Receptive aphasia）",
+        "B": "空間辨識障礙",
+        "C": "輕微失聰",
+        "D": "眼球偏向損傷側"
+      },
+      "answer": "A",
+      "acceptedAnswers": [
+        "A"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：A。",
+      "testedConcept": "基礎醫學（一）（高普考原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國95年第1次 高普考 基礎醫學（一） 1001",
+      "sourceYear": 2006,
+      "sourceRound": 1,
+      "originalQuestionNumber": 32,
+      "examCode": "095030",
+      "paperCode": "1101",
+      "examSessionLabel": "第一次",
+      "officialExam": {
+        "categoryCode": "101",
+        "subjectCode": "1001",
+        "trackCode": "HIGHGENERAL",
+        "trackLabel": "高普考",
+        "paperTitle": "基礎醫學（一）"
+      },
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=101&code=095030&q=1&s=1001&t=Q",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=101&code=095030&q=1&s=1001&t=S",
+        "page": 3,
+        "endPage": 3,
+        "image": "/question-media/moex-95-1-med1/MOEX-C101-095030-S1001-HIGHGENERAL-Q032.webp",
+        "width": 1030,
+        "height": 93,
+        "scope": "基礎醫學（一）",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-C101-095030-S1001-HIGHGENERAL-Q033",
+      "subject": "醫學（一）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（一）",
+      "stem": "下列何者參與構成內弓狀纖維（internal arcuate fibers）？",
+      "options": {
+        "A": "源自弓狀核（arcuate nucleus）的纖維",
+        "B": "脊髓丘腦徑（Spinothalamic tract）",
+        "C": "脊髓四疊體徑（Spinotectal tract）",
+        "D": "源自薄核（gracile nucleus）的纖維"
+      },
+      "answer": "D",
+      "acceptedAnswers": [
+        "D"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：D。",
+      "testedConcept": "基礎醫學（一）（高普考原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國95年第1次 高普考 基礎醫學（一） 1001",
+      "sourceYear": 2006,
+      "sourceRound": 1,
+      "originalQuestionNumber": 33,
+      "examCode": "095030",
+      "paperCode": "1101",
+      "examSessionLabel": "第一次",
+      "officialExam": {
+        "categoryCode": "101",
+        "subjectCode": "1001",
+        "trackCode": "HIGHGENERAL",
+        "trackLabel": "高普考",
+        "paperTitle": "基礎醫學（一）"
+      },
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=101&code=095030&q=1&s=1001&t=Q",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=101&code=095030&q=1&s=1001&t=S",
+        "page": 3,
+        "endPage": 3,
+        "image": "/question-media/moex-95-1-med1/MOEX-C101-095030-S1001-HIGHGENERAL-Q033.webp",
+        "width": 1030,
+        "height": 94,
+        "scope": "基礎醫學（一）",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-C101-095030-S1001-HIGHGENERAL-Q034",
+      "subject": "醫學（一）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（一）",
+      "stem": "男性原始生殖細胞約於何時開始進行細胞分化（cell differentiation）？",
+      "options": {
+        "A": "胚胎發育之第五週",
+        "B": "胎兒發育之第三個月",
+        "C": "胎兒發育之第五個月",
+        "D": "青春期"
+      },
+      "answer": "D",
+      "acceptedAnswers": [
+        "D"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：D。",
+      "testedConcept": "基礎醫學（一）（高普考原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國95年第1次 高普考 基礎醫學（一） 1001",
+      "sourceYear": 2006,
+      "sourceRound": 1,
+      "originalQuestionNumber": 34,
+      "examCode": "095030",
+      "paperCode": "1101",
+      "examSessionLabel": "第一次",
+      "officialExam": {
+        "categoryCode": "101",
+        "subjectCode": "1001",
+        "trackCode": "HIGHGENERAL",
+        "trackLabel": "高普考",
+        "paperTitle": "基礎醫學（一）"
+      },
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=101&code=095030&q=1&s=1001&t=Q",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=101&code=095030&q=1&s=1001&t=S",
+        "page": 3,
+        "endPage": 3,
+        "image": "/question-media/moex-95-1-med1/MOEX-C101-095030-S1001-HIGHGENERAL-Q034.webp",
+        "width": 1030,
+        "height": 63,
+        "scope": "基礎醫學（一）",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-C101-095030-S1001-HIGHGENERAL-Q035",
+      "subject": "醫學（一）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（一）",
+      "stem": "心偏右症（Dextrocardia）為心臟變異的一種。此種症狀的心尖（apex）朝向右側。造成此種症狀 的原因是：",
+      "options": {
+        "A": "橫隔板（Septum transversum）的缺陷",
+        "B": "大動脈異位（Transposition of great arteries）",
+        "C": "心管（Heart tube）在摺疊時之向右方摺疊",
+        "D": "心室間隔（Interventricular septum）形成時之缺陷"
+      },
+      "answer": "C",
+      "acceptedAnswers": [
+        "C"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：C。",
+      "testedConcept": "基礎醫學（一）（高普考原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國95年第1次 高普考 基礎醫學（一） 1001",
+      "sourceYear": 2006,
+      "sourceRound": 1,
+      "originalQuestionNumber": 35,
+      "examCode": "095030",
+      "paperCode": "1101",
+      "examSessionLabel": "第一次",
+      "officialExam": {
+        "categoryCode": "101",
+        "subjectCode": "1001",
+        "trackCode": "HIGHGENERAL",
+        "trackLabel": "高普考",
+        "paperTitle": "基礎醫學（一）"
+      },
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=101&code=095030&q=1&s=1001&t=Q",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=101&code=095030&q=1&s=1001&t=S",
+        "page": 3,
+        "endPage": 3,
+        "image": "/question-media/moex-95-1-med1/MOEX-C101-095030-S1001-HIGHGENERAL-Q035.webp",
+        "width": 1030,
+        "height": 185,
+        "scope": "基礎醫學（一）",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-C101-095030-S1001-HIGHGENERAL-Q036",
+      "subject": "醫學（一）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（一）",
+      "stem": "下列關於扁桃腺的發育，何項正確？",
+      "options": {
+        "A": "腭扁桃腺源自第二對咽囊",
+        "B": "咽扁桃腺源自口咽之淋巴小結",
+        "C": "舌扁桃腺源自鼻咽之淋巴小結下降聚集而成",
+        "D": "管扁桃腺源自舌根之淋巴小結"
+      },
+      "answer": "A",
+      "acceptedAnswers": [
+        "A"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：A。",
+      "testedConcept": "基礎醫學（一）（高普考原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國95年第1次 高普考 基礎醫學（一） 1001",
+      "sourceYear": 2006,
+      "sourceRound": 1,
+      "originalQuestionNumber": 36,
+      "examCode": "095030",
+      "paperCode": "1101",
+      "examSessionLabel": "第一次",
+      "officialExam": {
+        "categoryCode": "101",
+        "subjectCode": "1001",
+        "trackCode": "HIGHGENERAL",
+        "trackLabel": "高普考",
+        "paperTitle": "基礎醫學（一）"
+      },
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=101&code=095030&q=1&s=1001&t=Q",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=101&code=095030&q=1&s=1001&t=S",
+        "page": 3,
+        "endPage": 3,
+        "image": "/question-media/moex-95-1-med1/MOEX-C101-095030-S1001-HIGHGENERAL-Q036.webp",
+        "width": 1030,
+        "height": 93,
+        "scope": "基礎醫學（一）",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-C101-095030-S1001-HIGHGENERAL-Q037",
+      "subject": "醫學（一）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（一）",
+      "stem": "先天性多囊腎（Congenital polycystic kidney）的致病原因可能是：",
+      "options": {
+        "A": "輸尿管芽退化",
+        "B": "收集管閉鎖",
+        "C": "輸尿管受到壓迫",
+        "D": "近曲腎小管發育不良"
+      },
+      "answer": "D",
+      "acceptedAnswers": [
+        "D"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：D。",
+      "testedConcept": "基礎醫學（一）（高普考原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國95年第1次 高普考 基礎醫學（一） 1001",
+      "sourceYear": 2006,
+      "sourceRound": 1,
+      "originalQuestionNumber": 37,
+      "examCode": "095030",
+      "paperCode": "1101",
+      "examSessionLabel": "第一次",
+      "officialExam": {
+        "categoryCode": "101",
+        "subjectCode": "1001",
+        "trackCode": "HIGHGENERAL",
+        "trackLabel": "高普考",
+        "paperTitle": "基礎醫學（一）"
+      },
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=101&code=095030&q=1&s=1001&t=Q",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=101&code=095030&q=1&s=1001&t=S",
+        "page": 3,
+        "endPage": 3,
+        "image": "/question-media/moex-95-1-med1/MOEX-C101-095030-S1001-HIGHGENERAL-Q037.webp",
+        "width": 1030,
+        "height": 93,
+        "scope": "基礎醫學（一）",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-C101-095030-S1001-HIGHGENERAL-Q038",
+      "subject": "醫學（一）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（一）",
+      "stem": "小腦（Cerebellum）的發育是源自：",
+      "options": {
+        "A": "髓腦（Myelencephalon）之翼板神經母細胞（neuroblasts of alar plates）",
+        "B": "髓腦之基板神經母細胞（neuroblasts of basal plates）",
+        "C": "後腦（Metencephalon）之翼板神經母細胞",
+        "D": "後腦之基板神經母細胞"
+      },
+      "answer": "C",
+      "acceptedAnswers": [
+        "C"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：C。",
+      "testedConcept": "基礎醫學（一）（高普考原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國95年第1次 高普考 基礎醫學（一） 1001",
+      "sourceYear": 2006,
+      "sourceRound": 1,
+      "originalQuestionNumber": 38,
+      "examCode": "095030",
+      "paperCode": "1101",
+      "examSessionLabel": "第一次",
+      "officialExam": {
+        "categoryCode": "101",
+        "subjectCode": "1001",
+        "trackCode": "HIGHGENERAL",
+        "trackLabel": "高普考",
+        "paperTitle": "基礎醫學（一）"
+      },
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=101&code=095030&q=1&s=1001&t=Q",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=101&code=095030&q=1&s=1001&t=S",
+        "page": 3,
+        "endPage": 3,
+        "image": "/question-media/moex-95-1-med1/MOEX-C101-095030-S1001-HIGHGENERAL-Q038.webp",
+        "width": 1030,
+        "height": 154,
+        "scope": "基礎醫學（一）",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-C101-095030-S1001-HIGHGENERAL-Q039",
+      "subject": "醫學（一）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（一）",
+      "stem": "下列何者是骨重新塑形過程後殘存的構造？",
+      "options": {
+        "A": "外環周骨板（Outer circum ferential lamellae）",
+        "B": "哈維氏管（Haversian canal）",
+        "C": "間骨板（Interstitial lamellae）",
+        "D": "內環周骨板（Inner circum ferential lamellae）"
+      },
+      "answer": "C",
+      "acceptedAnswers": [
+        "C"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：C。",
+      "testedConcept": "基礎醫學（一）（高普考原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國95年第1次 高普考 基礎醫學（一） 1001",
+      "sourceYear": 2006,
+      "sourceRound": 1,
+      "originalQuestionNumber": 39,
+      "examCode": "095030",
+      "paperCode": "1101",
+      "examSessionLabel": "第一次",
+      "officialExam": {
+        "categoryCode": "101",
+        "subjectCode": "1001",
+        "trackCode": "HIGHGENERAL",
+        "trackLabel": "高普考",
+        "paperTitle": "基礎醫學（一）"
+      },
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=101&code=095030&q=1&s=1001&t=Q",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=101&code=095030&q=1&s=1001&t=S",
+        "page": 4,
+        "endPage": 4,
+        "image": "/question-media/moex-95-1-med1/MOEX-C101-095030-S1001-HIGHGENERAL-Q039.webp",
+        "width": 1030,
+        "height": 95,
+        "scope": "基礎醫學（一）",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-C101-095030-S1001-HIGHGENERAL-Q040",
+      "subject": "醫學（一）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（一）",
+      "stem": "下列那一類型膠原蛋白（collagen）纖維是彈性（elastic）軟骨與透明（hyaline）軟骨的基質中都有的？",
+      "options": {
+        "A": "Type I",
+        "B": "Type II",
+        "C": "Type III",
+        "D": "Type IV"
+      },
+      "answer": "B",
+      "acceptedAnswers": [
+        "B"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：B。",
+      "testedConcept": "基礎醫學（一）（高普考原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國95年第1次 高普考 基礎醫學（一） 1001",
+      "sourceYear": 2006,
+      "sourceRound": 1,
+      "originalQuestionNumber": 40,
+      "examCode": "095030",
+      "paperCode": "1101",
+      "examSessionLabel": "第一次",
+      "officialExam": {
+        "categoryCode": "101",
+        "subjectCode": "1001",
+        "trackCode": "HIGHGENERAL",
+        "trackLabel": "高普考",
+        "paperTitle": "基礎醫學（一）"
+      },
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=101&code=095030&q=1&s=1001&t=Q",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=101&code=095030&q=1&s=1001&t=S",
+        "page": 4,
+        "endPage": 4,
+        "image": "/question-media/moex-95-1-med1/MOEX-C101-095030-S1001-HIGHGENERAL-Q040.webp",
+        "width": 1030,
+        "height": 64,
+        "scope": "基礎醫學（一）",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-C101-095030-S1001-HIGHGENERAL-Q041",
+      "subject": "醫學（一）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（一）",
+      "stem": "有關不規則緻密結締組織的敘述，下列何者錯誤？",
+      "options": {
+        "A": "形成韌帶（ligament）",
+        "B": "構成真皮（dermis）",
+        "C": "含較少量的細胞間基質",
+        "D": "纖維母細胞為大部分的組成細胞"
+      },
+      "answer": "A",
+      "acceptedAnswers": [
+        "A"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：A。",
+      "testedConcept": "基礎醫學（一）（高普考原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國95年第1次 高普考 基礎醫學（一） 1001",
+      "sourceYear": 2006,
+      "sourceRound": 1,
+      "originalQuestionNumber": 41,
+      "examCode": "095030",
+      "paperCode": "1101",
+      "examSessionLabel": "第一次",
+      "officialExam": {
+        "categoryCode": "101",
+        "subjectCode": "1001",
+        "trackCode": "HIGHGENERAL",
+        "trackLabel": "高普考",
+        "paperTitle": "基礎醫學（一）"
+      },
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=101&code=095030&q=1&s=1001&t=Q",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=101&code=095030&q=1&s=1001&t=S",
+        "page": 4,
+        "endPage": 4,
+        "image": "/question-media/moex-95-1-med1/MOEX-C101-095030-S1001-HIGHGENERAL-Q041.webp",
+        "width": 1030,
+        "height": 94,
+        "scope": "基礎醫學（一）",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-C101-095030-S1001-HIGHGENERAL-Q042",
+      "subject": "醫學（一）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（一）",
+      "stem": "右圖為何種胞器（organelle）？",
+      "options": {
+        "A": "高基氏體（Golgi apparatus）",
+        "B": "粗糙內質網（Rough endoplasmic reticulum）",
+        "C": "平滑內質網（Smooth endoplasmic reticulum）",
+        "D": "粒線體（Mitochondria）"
+      },
+      "answer": "B",
+      "acceptedAnswers": [
+        "B"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：B。",
+      "testedConcept": "基礎醫學（一）（高普考原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國95年第1次 高普考 基礎醫學（一） 1001",
+      "sourceYear": 2006,
+      "sourceRound": 1,
+      "originalQuestionNumber": 42,
+      "examCode": "095030",
+      "paperCode": "1101",
+      "examSessionLabel": "第一次",
+      "officialExam": {
+        "categoryCode": "101",
+        "subjectCode": "1001",
+        "trackCode": "HIGHGENERAL",
+        "trackLabel": "高普考",
+        "paperTitle": "基礎醫學（一）"
+      },
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=101&code=095030&q=1&s=1001&t=Q",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=101&code=095030&q=1&s=1001&t=S",
+        "page": 4,
+        "endPage": 4,
+        "image": "/question-media/moex-95-1-med1/MOEX-C101-095030-S1001-HIGHGENERAL-Q042.webp",
+        "width": 1030,
+        "height": 306,
+        "scope": "基礎醫學（一）",
+        "answerNote": null
+      },
+      "stemImage": "/question-media/moex-95-1-med1/MOEX-C101-095030-S1001-HIGHGENERAL-Q042.webp"
+    },
+    {
+      "id": "MOEX-C101-095030-S1001-HIGHGENERAL-Q043",
+      "subject": "醫學（一）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（一）",
+      "stem": "下列關於唾液腺（salivary gland）之敘述，何項錯誤？",
+      "options": {
+        "A": "腮腺/耳下腺（Parotid gland）由分泌黏液的細胞組成",
+        "B": "下頜下腺（Submandibular gland）分泌漿液為主",
+        "C": "舌下腺（Sublingual gland）分泌唾液的量比其它腺體少",
+        "D": "唇內、臉頰內及腭部均可找到小型唾液腺"
+      },
+      "answer": "A",
+      "acceptedAnswers": [
+        "A"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：A。",
+      "testedConcept": "基礎醫學（一）（高普考原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國95年第1次 高普考 基礎醫學（一） 1001",
+      "sourceYear": 2006,
+      "sourceRound": 1,
+      "originalQuestionNumber": 43,
+      "examCode": "095030",
+      "paperCode": "1101",
+      "examSessionLabel": "第一次",
+      "officialExam": {
+        "categoryCode": "101",
+        "subjectCode": "1001",
+        "trackCode": "HIGHGENERAL",
+        "trackLabel": "高普考",
+        "paperTitle": "基礎醫學（一）"
+      },
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=101&code=095030&q=1&s=1001&t=Q",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=101&code=095030&q=1&s=1001&t=S",
+        "page": 4,
+        "endPage": 4,
+        "image": "/question-media/moex-95-1-med1/MOEX-C101-095030-S1001-HIGHGENERAL-Q043.webp",
+        "width": 1030,
+        "height": 155,
+        "scope": "基礎醫學（一）",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-C101-095030-S1001-HIGHGENERAL-Q044",
+      "subject": "醫學（一）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（一）",
+      "stem": "下列關於舌頭的敘述，何者錯誤？",
+      "options": {
+        "A": "味蕾是位於舌頭上皮中的特化感覺器官",
+        "B": "絲狀乳頭（Filiform papillae）數量最多",
+        "C": "舌頭表面為複層鱗狀上皮所覆蓋",
+        "D": "舌頭肌肉為複合交錯的平滑肌纖維組成"
+      },
+      "answer": "D",
+      "acceptedAnswers": [
+        "D"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：D。",
+      "testedConcept": "基礎醫學（一）（高普考原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國95年第1次 高普考 基礎醫學（一） 1001",
+      "sourceYear": 2006,
+      "sourceRound": 1,
+      "originalQuestionNumber": 44,
+      "examCode": "095030",
+      "paperCode": "1101",
+      "examSessionLabel": "第一次",
+      "officialExam": {
+        "categoryCode": "101",
+        "subjectCode": "1001",
+        "trackCode": "HIGHGENERAL",
+        "trackLabel": "高普考",
+        "paperTitle": "基礎醫學（一）"
+      },
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=101&code=095030&q=1&s=1001&t=Q",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=101&code=095030&q=1&s=1001&t=S",
+        "page": 4,
+        "endPage": 4,
+        "image": "/question-media/moex-95-1-med1/MOEX-C101-095030-S1001-HIGHGENERAL-Q044.webp",
+        "width": 1030,
+        "height": 94,
+        "scope": "基礎醫學（一）",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-C101-095030-S1001-HIGHGENERAL-Q045",
+      "subject": "醫學（一）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（一）",
+      "stem": "血管滋養管（Vasa vasorum）位於：",
+      "options": {
+        "A": "內膜（Tunica intima）",
+        "B": "中膜（Tunica media）",
+        "C": "外膜（Tunica adventitia）",
+        "D": "內彈性板（Internal elastic lamina）"
+      },
+      "answer": "C",
+      "acceptedAnswers": [
+        "C"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：C。",
+      "testedConcept": "基礎醫學（一）（高普考原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國95年第1次 高普考 基礎醫學（一） 1001",
+      "sourceYear": 2006,
+      "sourceRound": 1,
+      "originalQuestionNumber": 45,
+      "examCode": "095030",
+      "paperCode": "1101",
+      "examSessionLabel": "第一次",
+      "officialExam": {
+        "categoryCode": "101",
+        "subjectCode": "1001",
+        "trackCode": "HIGHGENERAL",
+        "trackLabel": "高普考",
+        "paperTitle": "基礎醫學（一）"
+      },
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=101&code=095030&q=1&s=1001&t=Q",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=101&code=095030&q=1&s=1001&t=S",
+        "page": 4,
+        "endPage": 4,
+        "image": "/question-media/moex-95-1-med1/MOEX-C101-095030-S1001-HIGHGENERAL-Q045.webp",
+        "width": 1030,
+        "height": 94,
+        "scope": "基礎醫學（一）",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-C101-095030-S1001-HIGHGENERAL-Q046",
+      "subject": "醫學（一）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（一）",
+      "stem": "表皮（Epidermis）是屬於：",
+      "options": {
+        "A": "單層柱狀上皮（Simple columnar epithelium）",
+        "B": "移形上皮（Transitional epithelium）",
+        "C": "偽複層柱狀上皮（Pseudostratified columnar epithelium）",
+        "D": "角質化複層扁平上皮（Keratinized stratified squamous epithelium）"
+      },
+      "answer": "D",
+      "acceptedAnswers": [
+        "D"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：D。",
+      "testedConcept": "基礎醫學（一）（高普考原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國95年第1次 高普考 基礎醫學（一） 1001",
+      "sourceYear": 2006,
+      "sourceRound": 1,
+      "originalQuestionNumber": 46,
+      "examCode": "095030",
+      "paperCode": "1101",
+      "examSessionLabel": "第一次",
+      "officialExam": {
+        "categoryCode": "101",
+        "subjectCode": "1001",
+        "trackCode": "HIGHGENERAL",
+        "trackLabel": "高普考",
+        "paperTitle": "基礎醫學（一）"
+      },
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=101&code=095030&q=1&s=1001&t=Q",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=101&code=095030&q=1&s=1001&t=S",
+        "page": 4,
+        "endPage": 4,
+        "image": "/question-media/moex-95-1-med1/MOEX-C101-095030-S1001-HIGHGENERAL-Q046.webp",
+        "width": 1030,
+        "height": 155,
+        "scope": "基礎醫學（一）",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-C101-095030-S1001-HIGHGENERAL-Q047",
+      "subject": "醫學（一）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（一）",
+      "stem": "腎絲球過濾器（Glomerular filtration apparatus）主要是由下列那兩種細胞組成？①近絲球細胞 （Juxtaglomerular cell） ②環間膜細胞（mesangial cell） ③足細胞（podocyte） ④內皮細 胞（endothelial cell）",
+      "options": {
+        "A": "①和②",
+        "B": "②和③",
+        "C": "③和④",
+        "D": "①和④"
+      },
+      "answer": "C",
+      "acceptedAnswers": [
+        "C"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：C。",
+      "testedConcept": "基礎醫學（一）（高普考原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國95年第1次 高普考 基礎醫學（一） 1001",
+      "sourceYear": 2006,
+      "sourceRound": 1,
+      "originalQuestionNumber": 47,
+      "examCode": "095030",
+      "paperCode": "1101",
+      "examSessionLabel": "第一次",
+      "officialExam": {
+        "categoryCode": "101",
+        "subjectCode": "1001",
+        "trackCode": "HIGHGENERAL",
+        "trackLabel": "高普考",
+        "paperTitle": "基礎醫學（一）"
+      },
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=101&code=095030&q=1&s=1001&t=Q",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=101&code=095030&q=1&s=1001&t=S",
+        "page": 4,
+        "endPage": 4,
+        "image": "/question-media/moex-95-1-med1/MOEX-C101-095030-S1001-HIGHGENERAL-Q047.webp",
+        "width": 1030,
+        "height": 124,
+        "scope": "基礎醫學（一）",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-C101-095030-S1001-HIGHGENERAL-Q048",
+      "subject": "醫學（一）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（一）",
+      "stem": "下列何者不屬於血液-氣體障壁（blood-air barrier）的一部分？",
+      "options": {
+        "A": "I 型肺泡細胞（Type I alveolar cell）",
+        "B": "間隔細胞（Septal cell）",
+        "C": "內皮細胞（Endothelial cell）",
+        "D": "微血管的基板（Basal lamina）"
+      },
+      "answer": "B",
+      "acceptedAnswers": [
+        "B"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：B。",
+      "testedConcept": "基礎醫學（一）（高普考原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國95年第1次 高普考 基礎醫學（一） 1001",
+      "sourceYear": 2006,
+      "sourceRound": 1,
+      "originalQuestionNumber": 48,
+      "examCode": "095030",
+      "paperCode": "1101",
+      "examSessionLabel": "第一次",
+      "officialExam": {
+        "categoryCode": "101",
+        "subjectCode": "1001",
+        "trackCode": "HIGHGENERAL",
+        "trackLabel": "高普考",
+        "paperTitle": "基礎醫學（一）"
+      },
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=101&code=095030&q=1&s=1001&t=Q",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=101&code=095030&q=1&s=1001&t=S",
+        "page": 4,
+        "endPage": 4,
+        "image": "/question-media/moex-95-1-med1/MOEX-C101-095030-S1001-HIGHGENERAL-Q048.webp",
+        "width": 1030,
+        "height": 95,
+        "scope": "基礎醫學（一）",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-C101-095030-S1001-HIGHGENERAL-Q049",
+      "subject": "醫學（一）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（一）",
+      "stem": "子宮內膜（Endometrium）的發育，與卵泡的逐漸成熟相一致並受卵巢雌性素（estrogen）分泌影響 的是那一時期？",
+      "options": {
+        "A": "增殖期（Proliferative phase）",
+        "B": "分泌期（Secretory phase）",
+        "C": "缺血期（Ischemic phase）",
+        "D": "月經期（Menstrual phase）"
+      },
+      "answer": "A",
+      "acceptedAnswers": [
+        "A"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：A。",
+      "testedConcept": "基礎醫學（一）（高普考原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國95年第1次 高普考 基礎醫學（一） 1001",
+      "sourceYear": 2006,
+      "sourceRound": 1,
+      "originalQuestionNumber": 49,
+      "examCode": "095030",
+      "paperCode": "1101",
+      "examSessionLabel": "第一次",
+      "officialExam": {
+        "categoryCode": "101",
+        "subjectCode": "1001",
+        "trackCode": "HIGHGENERAL",
+        "trackLabel": "高普考",
+        "paperTitle": "基礎醫學（一）"
+      },
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=101&code=095030&q=1&s=1001&t=Q",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=101&code=095030&q=1&s=1001&t=S",
+        "page": 4,
+        "endPage": 4,
+        "image": "/question-media/moex-95-1-med1/MOEX-C101-095030-S1001-HIGHGENERAL-Q049.webp",
+        "width": 1030,
+        "height": 125,
+        "scope": "基礎醫學（一）",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-C101-095030-S1001-HIGHGENERAL-Q050",
+      "subject": "醫學（一）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（一）",
+      "stem": "下列有關貯精囊（seminal vesicle），何者錯誤？",
+      "options": {
+        "A": "俱內環外縱走向之平滑肌包被（smooth muscle coat）",
+        "B": "其分泌物中富含果糖（fructose）",
+        "C": "固有層中有許多彈性纖維（elastic fiber）",
+        "D": "內襯單層柱狀上皮細胞（simple columnar epithelium）"
+      },
+      "answer": "D",
+      "acceptedAnswers": [
+        "D"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：D。",
+      "testedConcept": "基礎醫學（一）（高普考原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國95年第1次 高普考 基礎醫學（一） 1001",
+      "sourceYear": 2006,
+      "sourceRound": 1,
+      "originalQuestionNumber": 50,
+      "examCode": "095030",
+      "paperCode": "1101",
+      "examSessionLabel": "第一次",
+      "officialExam": {
+        "categoryCode": "101",
+        "subjectCode": "1001",
+        "trackCode": "HIGHGENERAL",
+        "trackLabel": "高普考",
+        "paperTitle": "基礎醫學（一）"
+      },
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=101&code=095030&q=1&s=1001&t=Q",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=101&code=095030&q=1&s=1001&t=S",
+        "page": 5,
+        "endPage": 5,
+        "image": "/question-media/moex-95-1-med1/MOEX-C101-095030-S1001-HIGHGENERAL-Q050.webp",
+        "width": 1030,
+        "height": 156,
+        "scope": "基礎醫學（一）",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-C101-095030-S1001-HIGHGENERAL-Q051",
+      "subject": "醫學（一）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（一）",
+      "stem": "下列何種抗生素之作用機制與其他三者不同？",
+      "options": {
+        "A": "氨基糖苷類（Aminoglycoside）",
+        "B": "磺氨（Sulfonamide）",
+        "C": "大環內脂（Macrolide）",
+        "D": "氯黴素（Chloramphenicol）"
+      },
+      "answer": "B",
+      "acceptedAnswers": [
+        "B"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：B。",
+      "testedConcept": "基礎醫學（一）（高普考原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國95年第1次 高普考 基礎醫學（一） 1001",
+      "sourceYear": 2006,
+      "sourceRound": 1,
+      "originalQuestionNumber": 51,
+      "examCode": "095030",
+      "paperCode": "1101",
+      "examSessionLabel": "第一次",
+      "officialExam": {
+        "categoryCode": "101",
+        "subjectCode": "1001",
+        "trackCode": "HIGHGENERAL",
+        "trackLabel": "高普考",
+        "paperTitle": "基礎醫學（一）"
+      },
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=101&code=095030&q=1&s=1001&t=Q",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=101&code=095030&q=1&s=1001&t=S",
+        "page": 5,
+        "endPage": 5,
+        "image": "/question-media/moex-95-1-med1/MOEX-C101-095030-S1001-HIGHGENERAL-Q051.webp",
+        "width": 1030,
+        "height": 95,
+        "scope": "基礎醫學（一）",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-C101-095030-S1001-HIGHGENERAL-Q052",
+      "subject": "醫學（一）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（一）",
+      "stem": "黴漿菌（Mycoplasma）的體表抗原性，主要是由下列何種成分所決定？",
+      "options": {
+        "A": "莢膜多糖體（Capsular polysaccharides）",
+        "B": "鞭毛蛋白（Flagellin）",
+        "C": "細胞膜蛋白（Membrane proteins）",
+        "D": "脂多糖體（Lipopolysaccharides）"
+      },
+      "answer": "C",
+      "acceptedAnswers": [
+        "C"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：C。",
+      "testedConcept": "基礎醫學（一）（高普考原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國95年第1次 高普考 基礎醫學（一） 1001",
+      "sourceYear": 2006,
+      "sourceRound": 1,
+      "originalQuestionNumber": 52,
+      "examCode": "095030",
+      "paperCode": "1101",
+      "examSessionLabel": "第一次",
+      "officialExam": {
+        "categoryCode": "101",
+        "subjectCode": "1001",
+        "trackCode": "HIGHGENERAL",
+        "trackLabel": "高普考",
+        "paperTitle": "基礎醫學（一）"
+      },
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=101&code=095030&q=1&s=1001&t=Q",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=101&code=095030&q=1&s=1001&t=S",
+        "page": 5,
+        "endPage": 5,
+        "image": "/question-media/moex-95-1-med1/MOEX-C101-095030-S1001-HIGHGENERAL-Q052.webp",
+        "width": 1030,
+        "height": 95,
+        "scope": "基礎醫學（一）",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-C101-095030-S1001-HIGHGENERAL-Q053",
+      "subject": "醫學（一）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（一）",
+      "stem": "綠膿桿菌（Pseudomonas aeruginosa）所產生的外毒素A（exotoxin A）對細胞的毒性作用機制與下 列何者相似？",
+      "options": {
+        "A": "霍亂毒素（Cholera toxin）",
+        "B": "白喉毒素（Diphtheria toxin）",
+        "C": "破傷風毒素（Tetanospasmin）",
+        "D": "鏈球菌熱源外毒素（Pyrogenic exotoxin）"
+      },
+      "answer": "B",
+      "acceptedAnswers": [
+        "B"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：B。",
+      "testedConcept": "基礎醫學（一）（高普考原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國95年第1次 高普考 基礎醫學（一） 1001",
+      "sourceYear": 2006,
+      "sourceRound": 1,
+      "originalQuestionNumber": 53,
+      "examCode": "095030",
+      "paperCode": "1101",
+      "examSessionLabel": "第一次",
+      "officialExam": {
+        "categoryCode": "101",
+        "subjectCode": "1001",
+        "trackCode": "HIGHGENERAL",
+        "trackLabel": "高普考",
+        "paperTitle": "基礎醫學（一）"
+      },
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=101&code=095030&q=1&s=1001&t=Q",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=101&code=095030&q=1&s=1001&t=S",
+        "page": 5,
+        "endPage": 5,
+        "image": "/question-media/moex-95-1-med1/MOEX-C101-095030-S1001-HIGHGENERAL-Q053.webp",
+        "width": 1030,
+        "height": 125,
+        "scope": "基礎醫學（一）",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-C101-095030-S1001-HIGHGENERAL-Q054",
+      "subject": "醫學（一）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（一）",
+      "stem": "下列何者可以在吞噬細胞（phagocytes）內繁殖？",
+      "options": {
+        "A": "副溶血弧菌（Vibrio parahaemolyticus）",
+        "B": "綠膿桿菌（Pseudomonas aeruginosa）",
+        "C": "大腸桿菌（Escherichia coli）",
+        "D": "退伍軍人肺炎菌（Legionella pneumophila）"
+      },
+      "answer": "D",
+      "acceptedAnswers": [
+        "D"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：D。",
+      "testedConcept": "基礎醫學（一）（高普考原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國95年第1次 高普考 基礎醫學（一） 1001",
+      "sourceYear": 2006,
+      "sourceRound": 1,
+      "originalQuestionNumber": 54,
+      "examCode": "095030",
+      "paperCode": "1101",
+      "examSessionLabel": "第一次",
+      "officialExam": {
+        "categoryCode": "101",
+        "subjectCode": "1001",
+        "trackCode": "HIGHGENERAL",
+        "trackLabel": "高普考",
+        "paperTitle": "基礎醫學（一）"
+      },
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=101&code=095030&q=1&s=1001&t=Q",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=101&code=095030&q=1&s=1001&t=S",
+        "page": 5,
+        "endPage": 5,
+        "image": "/question-media/moex-95-1-med1/MOEX-C101-095030-S1001-HIGHGENERAL-Q054.webp",
+        "width": 1030,
+        "height": 95,
+        "scope": "基礎醫學（一）",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-C101-095030-S1001-HIGHGENERAL-Q055",
+      "subject": "醫學（一）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（一）",
+      "stem": "近年來發現分枝桿菌對異菸（isoniazid）、乙硫異菸胺（ethionamide）、乙胺丁酸（ethambutol）及 環絲胺酸（cycloserine）等四種抗生素產生抗藥性日漸增多，下列何者為對上述藥物產生抗藥性之 主要原因？",
+      "options": {
+        "A": "菌體內有質體",
+        "B": "菌體發生改變使藥物無法進入",
+        "C": "菌體分泌酵素使藥物分解",
+        "D": "菌體改變對此類藥物之代謝途徑"
+      },
+      "answer": "B",
+      "acceptedAnswers": [
+        "B"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：B。",
+      "testedConcept": "基礎醫學（一）（高普考原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國95年第1次 高普考 基礎醫學（一） 1001",
+      "sourceYear": 2006,
+      "sourceRound": 1,
+      "originalQuestionNumber": 55,
+      "examCode": "095030",
+      "paperCode": "1101",
+      "examSessionLabel": "第一次",
+      "officialExam": {
+        "categoryCode": "101",
+        "subjectCode": "1001",
+        "trackCode": "HIGHGENERAL",
+        "trackLabel": "高普考",
+        "paperTitle": "基礎醫學（一）"
+      },
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=101&code=095030&q=1&s=1001&t=Q",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=101&code=095030&q=1&s=1001&t=S",
+        "page": 5,
+        "endPage": 5,
+        "image": "/question-media/moex-95-1-med1/MOEX-C101-095030-S1001-HIGHGENERAL-Q055.webp",
+        "width": 1030,
+        "height": 155,
+        "scope": "基礎醫學（一）",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-C101-095030-S1001-HIGHGENERAL-Q056",
+      "subject": "醫學（一）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（一）",
+      "stem": "下列何者不是梅毒螺旋體（Treponema pallidum）的特徵？",
+      "options": {
+        "A": "無法在不含細胞的培養基中生長",
+        "B": "菌體為纖細螺旋狀",
+        "C": "為革蘭氏染色陽性細菌",
+        "D": "生長速率較一般細菌緩慢"
+      },
+      "answer": "C",
+      "acceptedAnswers": [
+        "C"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：C。",
+      "testedConcept": "基礎醫學（一）（高普考原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國95年第1次 高普考 基礎醫學（一） 1001",
+      "sourceYear": 2006,
+      "sourceRound": 1,
+      "originalQuestionNumber": 56,
+      "examCode": "095030",
+      "paperCode": "1101",
+      "examSessionLabel": "第一次",
+      "officialExam": {
+        "categoryCode": "101",
+        "subjectCode": "1001",
+        "trackCode": "HIGHGENERAL",
+        "trackLabel": "高普考",
+        "paperTitle": "基礎醫學（一）"
+      },
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=101&code=095030&q=1&s=1001&t=Q",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=101&code=095030&q=1&s=1001&t=S",
+        "page": 5,
+        "endPage": 5,
+        "image": "/question-media/moex-95-1-med1/MOEX-C101-095030-S1001-HIGHGENERAL-Q056.webp",
+        "width": 1030,
+        "height": 94,
+        "scope": "基礎醫學（一）",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-C101-095030-S1001-HIGHGENERAL-Q057",
+      "subject": "醫學（一）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（一）",
+      "stem": "杜克氏嗜血桿菌（Haemophilus ducreyi）主要感染人體的那個部位？",
+      "options": {
+        "A": "生殖器",
+        "B": "眼部",
+        "C": "鼻咽部",
+        "D": "胃腸道"
+      },
+      "answer": "A",
+      "acceptedAnswers": [
+        "A"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：A。",
+      "testedConcept": "基礎醫學（一）（高普考原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國95年第1次 高普考 基礎醫學（一） 1001",
+      "sourceYear": 2006,
+      "sourceRound": 1,
+      "originalQuestionNumber": 57,
+      "examCode": "095030",
+      "paperCode": "1101",
+      "examSessionLabel": "第一次",
+      "officialExam": {
+        "categoryCode": "101",
+        "subjectCode": "1001",
+        "trackCode": "HIGHGENERAL",
+        "trackLabel": "高普考",
+        "paperTitle": "基礎醫學（一）"
+      },
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=101&code=095030&q=1&s=1001&t=Q",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=101&code=095030&q=1&s=1001&t=S",
+        "page": 5,
+        "endPage": 5,
+        "image": "/question-media/moex-95-1-med1/MOEX-C101-095030-S1001-HIGHGENERAL-Q057.webp",
+        "width": 1030,
+        "height": 63,
+        "scope": "基礎醫學（一）",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-C101-095030-S1001-HIGHGENERAL-Q058",
+      "subject": "醫學（一）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（一）",
+      "stem": "破傷風毒素（Tetanospasmin）對神經細胞的作用為：",
+      "options": {
+        "A": "分解阻斷性突觸（synapse）之神經傳導物質",
+        "B": "抑制傳導物質乙醯膽鹼（acetylcholine）的釋出",
+        "C": "促進傳導物質乙醯膽鹼的合成",
+        "D": "抑制阻斷性突觸之神經傳導物質的釋出"
+      },
+      "answer": "D",
+      "acceptedAnswers": [
+        "D"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：D。",
+      "testedConcept": "基礎醫學（一）（高普考原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國95年第1次 高普考 基礎醫學（一） 1001",
+      "sourceYear": 2006,
+      "sourceRound": 1,
+      "originalQuestionNumber": 58,
+      "examCode": "095030",
+      "paperCode": "1101",
+      "examSessionLabel": "第一次",
+      "officialExam": {
+        "categoryCode": "101",
+        "subjectCode": "1001",
+        "trackCode": "HIGHGENERAL",
+        "trackLabel": "高普考",
+        "paperTitle": "基礎醫學（一）"
+      },
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=101&code=095030&q=1&s=1001&t=Q",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=101&code=095030&q=1&s=1001&t=S",
+        "page": 5,
+        "endPage": 5,
+        "image": "/question-media/moex-95-1-med1/MOEX-C101-095030-S1001-HIGHGENERAL-Q058.webp",
+        "width": 1030,
+        "height": 155,
+        "scope": "基礎醫學（一）",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-C101-095030-S1001-HIGHGENERAL-Q059",
+      "subject": "醫學（一）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（一）",
+      "stem": "下列有關幽門桿菌（Helicobacter pylori）的敘述，何者錯誤？",
+      "options": {
+        "A": "受其感染的人，大部分不會出現症狀",
+        "B": "是胃潰瘍、十二指腸潰瘍的主要致病因",
+        "C": "帶菌的動物是主要的感染來源",
+        "D": "目前尚無有效的疫苗可以預防其感染"
+      },
+      "answer": "C",
+      "acceptedAnswers": [
+        "C"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：C。",
+      "testedConcept": "基礎醫學（一）（高普考原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國95年第1次 高普考 基礎醫學（一） 1001",
+      "sourceYear": 2006,
+      "sourceRound": 1,
+      "originalQuestionNumber": 59,
+      "examCode": "095030",
+      "paperCode": "1101",
+      "examSessionLabel": "第一次",
+      "officialExam": {
+        "categoryCode": "101",
+        "subjectCode": "1001",
+        "trackCode": "HIGHGENERAL",
+        "trackLabel": "高普考",
+        "paperTitle": "基礎醫學（一）"
+      },
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=101&code=095030&q=1&s=1001&t=Q",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=101&code=095030&q=1&s=1001&t=S",
+        "page": 5,
+        "endPage": 5,
+        "image": "/question-media/moex-95-1-med1/MOEX-C101-095030-S1001-HIGHGENERAL-Q059.webp",
+        "width": 1030,
+        "height": 94,
+        "scope": "基礎醫學（一）",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-C101-095030-S1001-HIGHGENERAL-Q060",
+      "subject": "醫學（一）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（一）",
+      "stem": "下列關於流行性感冒病毒（Influenza virus）的抗原大變異（antigenic shift）之敘述，何者錯誤？",
+      "options": {
+        "A": "是指不同病毒株之各段RNA 基因體間的交換所造成的變異",
+        "B": "又稱為基因重組（genetic reassortment）",
+        "C": "是造成流行性感冒病毒世界性大流行（pandemic）的主要原因",
+        "D": "可見於A 型及B 型流行性感冒病毒"
+      },
+      "answer": "D",
+      "acceptedAnswers": [
+        "D"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：D。",
+      "testedConcept": "基礎醫學（一）（高普考原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國95年第1次 高普考 基礎醫學（一） 1001",
+      "sourceYear": 2006,
+      "sourceRound": 1,
+      "originalQuestionNumber": 60,
+      "examCode": "095030",
+      "paperCode": "1101",
+      "examSessionLabel": "第一次",
+      "officialExam": {
+        "categoryCode": "101",
+        "subjectCode": "1001",
+        "trackCode": "HIGHGENERAL",
+        "trackLabel": "高普考",
+        "paperTitle": "基礎醫學（一）"
+      },
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=101&code=095030&q=1&s=1001&t=Q",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=101&code=095030&q=1&s=1001&t=S",
+        "page": 5,
+        "endPage": 5,
+        "image": "/question-media/moex-95-1-med1/MOEX-C101-095030-S1001-HIGHGENERAL-Q060.webp",
+        "width": 1030,
+        "height": 156,
+        "scope": "基礎醫學（一）",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-C101-095030-S1001-HIGHGENERAL-Q061",
+      "subject": "醫學（一）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（一）",
+      "stem": "MMR 為混合疫苗，不能對抗下列何種病毒？",
+      "options": {
+        "A": "腮腺炎病毒（Mumps virus）",
+        "B": "麻疹病毒（Measles virus）",
+        "C": "輪狀病毒（Rotavirus）",
+        "D": "德國麻疹病毒（Rubella virus）"
+      },
+      "answer": "C",
+      "acceptedAnswers": [
+        "C"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：C。",
+      "testedConcept": "基礎醫學（一）（高普考原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國95年第1次 高普考 基礎醫學（一） 1001",
+      "sourceYear": 2006,
+      "sourceRound": 1,
+      "originalQuestionNumber": 61,
+      "examCode": "095030",
+      "paperCode": "1101",
+      "examSessionLabel": "第一次",
+      "officialExam": {
+        "categoryCode": "101",
+        "subjectCode": "1001",
+        "trackCode": "HIGHGENERAL",
+        "trackLabel": "高普考",
+        "paperTitle": "基礎醫學（一）"
+      },
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=101&code=095030&q=1&s=1001&t=Q",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=101&code=095030&q=1&s=1001&t=S",
+        "page": 5,
+        "endPage": 5,
+        "image": "/question-media/moex-95-1-med1/MOEX-C101-095030-S1001-HIGHGENERAL-Q061.webp",
+        "width": 1030,
+        "height": 94,
+        "scope": "基礎醫學（一）",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-C101-095030-S1001-HIGHGENERAL-Q062",
+      "subject": "醫學（一）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（一）",
+      "stem": "下列關於第一型人類免疫缺乏病毒（HIV-1）致病機轉之敘述，何者錯誤？",
+      "options": {
+        "A": "可引起CD4-T 淋巴細胞的減少",
+        "B": "可引起B 淋巴細胞的減少",
+        "C": "可引起體液性及細胞性免疫反應（humoral and cellular immune responses）降低",
+        "D": "可引起巨噬細胞（macrophage）功能變差"
+      },
+      "answer": "B",
+      "acceptedAnswers": [
+        "B"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：B。",
+      "testedConcept": "基礎醫學（一）（高普考原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國95年第1次 高普考 基礎醫學（一） 1001",
+      "sourceYear": 2006,
+      "sourceRound": 1,
+      "originalQuestionNumber": 62,
+      "examCode": "095030",
+      "paperCode": "1101",
+      "examSessionLabel": "第一次",
+      "officialExam": {
+        "categoryCode": "101",
+        "subjectCode": "1001",
+        "trackCode": "HIGHGENERAL",
+        "trackLabel": "高普考",
+        "paperTitle": "基礎醫學（一）"
+      },
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=101&code=095030&q=1&s=1001&t=Q",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=101&code=095030&q=1&s=1001&t=S",
+        "page": 6,
+        "endPage": 6,
+        "image": "/question-media/moex-95-1-med1/MOEX-C101-095030-S1001-HIGHGENERAL-Q062.webp",
+        "width": 1030,
+        "height": 155,
+        "scope": "基礎醫學（一）",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-C101-095030-S1001-HIGHGENERAL-Q063",
+      "subject": "醫學（一）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（一）",
+      "stem": "一位孕婦在懷孕第三十八週復發第二型疱疹病毒（HSV-2），處方藥為Acyclovir，此藥之作用原 理為：",
+      "options": {
+        "A": "抑制病毒基因之核醣核酸（RNA）轉錄（transcription）",
+        "B": "抑制病毒基因之核醣核酸（RNA）之轉譯（translation）",
+        "C": "抑制病毒基因之去氧核醣核酸（DNA）之複製",
+        "D": "抑制病毒與宿主之直接結合（attachment）"
+      },
+      "answer": "C",
+      "acceptedAnswers": [
+        "C"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：C。",
+      "testedConcept": "基礎醫學（一）（高普考原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國95年第1次 高普考 基礎醫學（一） 1001",
+      "sourceYear": 2006,
+      "sourceRound": 1,
+      "originalQuestionNumber": 63,
+      "examCode": "095030",
+      "paperCode": "1101",
+      "examSessionLabel": "第一次",
+      "officialExam": {
+        "categoryCode": "101",
+        "subjectCode": "1001",
+        "trackCode": "HIGHGENERAL",
+        "trackLabel": "高普考",
+        "paperTitle": "基礎醫學（一）"
+      },
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=101&code=095030&q=1&s=1001&t=Q",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=101&code=095030&q=1&s=1001&t=S",
+        "page": 6,
+        "endPage": 6,
+        "image": "/question-media/moex-95-1-med1/MOEX-C101-095030-S1001-HIGHGENERAL-Q063.webp",
+        "width": 1030,
+        "height": 185,
+        "scope": "基礎醫學（一）",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-C101-095030-S1001-HIGHGENERAL-Q064",
+      "subject": "醫學（一）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（一）",
+      "stem": "病毒複製的第一步為病毒蛋白質與感染細胞表面之接受器認識（recognition）；Rhinovirus 14 之細 胞接受器為：",
+      "options": {
+        "A": "細胞間黏附分子（Intracellular adhension molecule, ICAM-1）",
+        "B": "細胞表面之唾液酸（sialic acid）",
+        "C": "細胞表面之CD4 分子",
+        "D": "C3 補體受器"
+      },
+      "answer": "A",
+      "acceptedAnswers": [
+        "A"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：A。",
+      "testedConcept": "基礎醫學（一）（高普考原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國95年第1次 高普考 基礎醫學（一） 1001",
+      "sourceYear": 2006,
+      "sourceRound": 1,
+      "originalQuestionNumber": 64,
+      "examCode": "095030",
+      "paperCode": "1101",
+      "examSessionLabel": "第一次",
+      "officialExam": {
+        "categoryCode": "101",
+        "subjectCode": "1001",
+        "trackCode": "HIGHGENERAL",
+        "trackLabel": "高普考",
+        "paperTitle": "基礎醫學（一）"
+      },
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=101&code=095030&q=1&s=1001&t=Q",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=101&code=095030&q=1&s=1001&t=S",
+        "page": 6,
+        "endPage": 6,
+        "image": "/question-media/moex-95-1-med1/MOEX-C101-095030-S1001-HIGHGENERAL-Q064.webp",
+        "width": 1030,
+        "height": 186,
+        "scope": "基礎醫學（一）",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-C101-095030-S1001-HIGHGENERAL-Q065",
+      "subject": "醫學（一）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（一）",
+      "stem": "好發於中國人之鼻咽癌與下列何種病毒有密切關係？",
+      "options": {
+        "A": "單純疱疹病毒（Herpes simplex virus）",
+        "B": "B 型肝炎病毒（Hepatitis B virus）",
+        "C": "EB 病毒（Epstein-Barr virus）",
+        "D": "人類乳頭瘤病毒（Human papillomavirus）"
+      },
+      "answer": "C",
+      "acceptedAnswers": [
+        "C"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：C。",
+      "testedConcept": "基礎醫學（一）（高普考原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國95年第1次 高普考 基礎醫學（一） 1001",
+      "sourceYear": 2006,
+      "sourceRound": 1,
+      "originalQuestionNumber": 65,
+      "examCode": "095030",
+      "paperCode": "1101",
+      "examSessionLabel": "第一次",
+      "officialExam": {
+        "categoryCode": "101",
+        "subjectCode": "1001",
+        "trackCode": "HIGHGENERAL",
+        "trackLabel": "高普考",
+        "paperTitle": "基礎醫學（一）"
+      },
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=101&code=095030&q=1&s=1001&t=Q",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=101&code=095030&q=1&s=1001&t=S",
+        "page": 6,
+        "endPage": 6,
+        "image": "/question-media/moex-95-1-med1/MOEX-C101-095030-S1001-HIGHGENERAL-Q065.webp",
+        "width": 1030,
+        "height": 94,
+        "scope": "基礎醫學（一）",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-C101-095030-S1001-HIGHGENERAL-Q066",
+      "subject": "醫學（一）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（一）",
+      "stem": "目前國內接種的B 型肝炎疫苗是屬於：",
+      "options": {
+        "A": "死病毒（Killed virus）",
+        "B": "活減毒疫苗（Live attenuated virus）",
+        "C": "活病毒（Live virus）",
+        "D": "基因重組次單位疫苗（subunit vaccine）"
+      },
+      "answer": "D",
+      "acceptedAnswers": [
+        "D"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：D。",
+      "testedConcept": "基礎醫學（一）（高普考原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國95年第1次 高普考 基礎醫學（一） 1001",
+      "sourceYear": 2006,
+      "sourceRound": 1,
+      "originalQuestionNumber": 66,
+      "examCode": "095030",
+      "paperCode": "1101",
+      "examSessionLabel": "第一次",
+      "officialExam": {
+        "categoryCode": "101",
+        "subjectCode": "1001",
+        "trackCode": "HIGHGENERAL",
+        "trackLabel": "高普考",
+        "paperTitle": "基礎醫學（一）"
+      },
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=101&code=095030&q=1&s=1001&t=Q",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=101&code=095030&q=1&s=1001&t=S",
+        "page": 6,
+        "endPage": 6,
+        "image": "/question-media/moex-95-1-med1/MOEX-C101-095030-S1001-HIGHGENERAL-Q066.webp",
+        "width": 1030,
+        "height": 94,
+        "scope": "基礎醫學（一）",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-C101-095030-S1001-HIGHGENERAL-Q067",
+      "subject": "醫學（一）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（一）",
+      "stem": "Azidothymidine（AZT）是一種核苷類似物（nucleoside analogue），主要在抑制人類免疫缺乏病毒 （HIV）複製過程中的那一個步驟？",
+      "options": {
+        "A": "入侵（Entry）",
+        "B": "轉譯（Translation）",
+        "C": "反轉錄（Reverse transcription）",
+        "D": "成熟（Maturation）"
+      },
+      "answer": "C",
+      "acceptedAnswers": [
+        "C"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：C。",
+      "testedConcept": "基礎醫學（一）（高普考原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國95年第1次 高普考 基礎醫學（一） 1001",
+      "sourceYear": 2006,
+      "sourceRound": 1,
+      "originalQuestionNumber": 67,
+      "examCode": "095030",
+      "paperCode": "1101",
+      "examSessionLabel": "第一次",
+      "officialExam": {
+        "categoryCode": "101",
+        "subjectCode": "1001",
+        "trackCode": "HIGHGENERAL",
+        "trackLabel": "高普考",
+        "paperTitle": "基礎醫學（一）"
+      },
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=101&code=095030&q=1&s=1001&t=Q",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=101&code=095030&q=1&s=1001&t=S",
+        "page": 6,
+        "endPage": 6,
+        "image": "/question-media/moex-95-1-med1/MOEX-C101-095030-S1001-HIGHGENERAL-Q067.webp",
+        "width": 1030,
+        "height": 125,
+        "scope": "基礎醫學（一）",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-C101-095030-S1001-HIGHGENERAL-Q068",
+      "subject": "醫學（一）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（一）",
+      "stem": "日本腦炎病毒（Japanese encephalitis virus）藉由下列何者媒介傳播？",
+      "options": {
+        "A": "三斑家蚊",
+        "B": "采采蠅",
+        "C": "白蛉子",
+        "D": "老鼠"
+      },
+      "answer": "A",
+      "acceptedAnswers": [
+        "A"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：A。",
+      "testedConcept": "基礎醫學（一）（高普考原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國95年第1次 高普考 基礎醫學（一） 1001",
+      "sourceYear": 2006,
+      "sourceRound": 1,
+      "originalQuestionNumber": 68,
+      "examCode": "095030",
+      "paperCode": "1101",
+      "examSessionLabel": "第一次",
+      "officialExam": {
+        "categoryCode": "101",
+        "subjectCode": "1001",
+        "trackCode": "HIGHGENERAL",
+        "trackLabel": "高普考",
+        "paperTitle": "基礎醫學（一）"
+      },
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=101&code=095030&q=1&s=1001&t=Q",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=101&code=095030&q=1&s=1001&t=S",
+        "page": 6,
+        "endPage": 6,
+        "image": "/question-media/moex-95-1-med1/MOEX-C101-095030-S1001-HIGHGENERAL-Q068.webp",
+        "width": 1030,
+        "height": 63,
+        "scope": "基礎醫學（一）",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-C101-095030-S1001-HIGHGENERAL-Q069",
+      "subject": "醫學（一）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（一）",
+      "stem": "在嬰幼兒時感染下列何種病毒，於年長時會造成腦炎，其症狀是癡呆、智力退化、甚至死亡，此症 狀稱亞急性硬化泛腦炎（subacute sclerosing panencephalitis）？",
+      "options": {
+        "A": "感冒病毒",
+        "B": "腮腺炎病毒",
+        "C": "麻疹病毒",
+        "D": "小兒麻痺症病毒"
+      },
+      "answer": "C",
+      "acceptedAnswers": [
+        "C"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：C。",
+      "testedConcept": "基礎醫學（一）（高普考原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國95年第1次 高普考 基礎醫學（一） 1001",
+      "sourceYear": 2006,
+      "sourceRound": 1,
+      "originalQuestionNumber": 69,
+      "examCode": "095030",
+      "paperCode": "1101",
+      "examSessionLabel": "第一次",
+      "officialExam": {
+        "categoryCode": "101",
+        "subjectCode": "1001",
+        "trackCode": "HIGHGENERAL",
+        "trackLabel": "高普考",
+        "paperTitle": "基礎醫學（一）"
+      },
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=101&code=095030&q=1&s=1001&t=Q",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=101&code=095030&q=1&s=1001&t=S",
+        "page": 6,
+        "endPage": 6,
+        "image": "/question-media/moex-95-1-med1/MOEX-C101-095030-S1001-HIGHGENERAL-Q069.webp",
+        "width": 1030,
+        "height": 93,
+        "scope": "基礎醫學（一）",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-C101-095030-S1001-HIGHGENERAL-Q070",
+      "subject": "醫學（一）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（一）",
+      "stem": "造成肝疾病的病毒有很多種，下列那一種敘述符合這四種病毒HAV、HCV、HDV 及HEV 的共同 特徵？",
+      "options": {
+        "A": "含單股（single-stranded）RNA 基因體",
+        "B": "是糞-口（fecal-oral route）傳播路徑",
+        "C": "造成猛爆性肝炎",
+        "D": "在慢性感染時易造成宿主基因序列變異"
+      },
+      "answer": "A",
+      "acceptedAnswers": [
+        "A"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：A。",
+      "testedConcept": "基礎醫學（一）（高普考原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國95年第1次 高普考 基礎醫學（一） 1001",
+      "sourceYear": 2006,
+      "sourceRound": 1,
+      "originalQuestionNumber": 70,
+      "examCode": "095030",
+      "paperCode": "1101",
+      "examSessionLabel": "第一次",
+      "officialExam": {
+        "categoryCode": "101",
+        "subjectCode": "1001",
+        "trackCode": "HIGHGENERAL",
+        "trackLabel": "高普考",
+        "paperTitle": "基礎醫學（一）"
+      },
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=101&code=095030&q=1&s=1001&t=Q",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=101&code=095030&q=1&s=1001&t=S",
+        "page": 6,
+        "endPage": 6,
+        "image": "/question-media/moex-95-1-med1/MOEX-C101-095030-S1001-HIGHGENERAL-Q070.webp",
+        "width": 1030,
+        "height": 123,
+        "scope": "基礎醫學（一）",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-C101-095030-S1001-HIGHGENERAL-Q071",
+      "subject": "醫學（一）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（一）",
+      "stem": "下列那一種真菌屬於淺部皮膚感染真菌？",
+      "options": {
+        "A": "白色念珠菌（Candida albicans）",
+        "B": "新形隱球菌（Cryptococcus neoformans）",
+        "C": "白癬菌（Trichophyton tonsurans）",
+        "D": "申克氏孢絲菌（Sporothrix schenckii）"
+      },
+      "answer": "C",
+      "acceptedAnswers": [
+        "C"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：C。",
+      "testedConcept": "基礎醫學（一）（高普考原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國95年第1次 高普考 基礎醫學（一） 1001",
+      "sourceYear": 2006,
+      "sourceRound": 1,
+      "originalQuestionNumber": 71,
+      "examCode": "095030",
+      "paperCode": "1101",
+      "examSessionLabel": "第一次",
+      "officialExam": {
+        "categoryCode": "101",
+        "subjectCode": "1001",
+        "trackCode": "HIGHGENERAL",
+        "trackLabel": "高普考",
+        "paperTitle": "基礎醫學（一）"
+      },
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=101&code=095030&q=1&s=1001&t=Q",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=101&code=095030&q=1&s=1001&t=S",
+        "page": 6,
+        "endPage": 6,
+        "image": "/question-media/moex-95-1-med1/MOEX-C101-095030-S1001-HIGHGENERAL-Q071.webp",
+        "width": 1030,
+        "height": 94,
+        "scope": "基礎醫學（一）",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-C101-095030-S1001-HIGHGENERAL-Q072",
+      "subject": "醫學（一）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（一）",
+      "stem": "致病性黴菌在分類學上多屬於何種亞門？",
+      "options": {
+        "A": "不完全菌亞門",
+        "B": "擔子菌亞門",
+        "C": "子囊菌亞門",
+        "D": "接合菌亞門"
+      },
+      "answer": "A",
+      "acceptedAnswers": [
+        "A"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：A。",
+      "testedConcept": "基礎醫學（一）（高普考原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國95年第1次 高普考 基礎醫學（一） 1001",
+      "sourceYear": 2006,
+      "sourceRound": 1,
+      "originalQuestionNumber": 72,
+      "examCode": "095030",
+      "paperCode": "1101",
+      "examSessionLabel": "第一次",
+      "officialExam": {
+        "categoryCode": "101",
+        "subjectCode": "1001",
+        "trackCode": "HIGHGENERAL",
+        "trackLabel": "高普考",
+        "paperTitle": "基礎醫學（一）"
+      },
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=101&code=095030&q=1&s=1001&t=Q",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=101&code=095030&q=1&s=1001&t=S",
+        "page": 6,
+        "endPage": 6,
+        "image": "/question-media/moex-95-1-med1/MOEX-C101-095030-S1001-HIGHGENERAL-Q072.webp",
+        "width": 1030,
+        "height": 62,
+        "scope": "基礎醫學（一）",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-C101-095030-S1001-HIGHGENERAL-Q073",
+      "subject": "醫學（一）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（一）",
+      "stem": "Amphotericin B 破壞真菌細胞的主要標的是下列那一項？",
+      "options": {
+        "A": "細胞壁",
+        "B": "細胞膜",
+        "C": "核酸",
+        "D": "能量傳遞"
+      },
+      "answer": "B",
+      "acceptedAnswers": [
+        "B"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：B。",
+      "testedConcept": "基礎醫學（一）（高普考原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國95年第1次 高普考 基礎醫學（一） 1001",
+      "sourceYear": 2006,
+      "sourceRound": 1,
+      "originalQuestionNumber": 73,
+      "examCode": "095030",
+      "paperCode": "1101",
+      "examSessionLabel": "第一次",
+      "officialExam": {
+        "categoryCode": "101",
+        "subjectCode": "1001",
+        "trackCode": "HIGHGENERAL",
+        "trackLabel": "高普考",
+        "paperTitle": "基礎醫學（一）"
+      },
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=101&code=095030&q=1&s=1001&t=Q",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=101&code=095030&q=1&s=1001&t=S",
+        "page": 6,
+        "endPage": 6,
+        "image": "/question-media/moex-95-1-med1/MOEX-C101-095030-S1001-HIGHGENERAL-Q073.webp",
+        "width": 1030,
+        "height": 63,
+        "scope": "基礎醫學（一）",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-C101-095030-S1001-HIGHGENERAL-Q074",
+      "subject": "醫學（一）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（一）",
+      "stem": "目前在治療真菌感染症時，仍有許多問題存在且全球真菌性感染人口數亦呈上升趨勢，其相關因素 並不包括下列那一項？",
+      "options": {
+        "A": "真菌的菌種明顯增加",
+        "B": "抗藥性真菌的產生",
+        "C": "免疫抑制藥物的大量使用",
+        "D": "愛滋病感染者大幅增加"
+      },
+      "answer": "A",
+      "acceptedAnswers": [
+        "A"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：A。",
+      "testedConcept": "基礎醫學（一）（高普考原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國95年第1次 高普考 基礎醫學（一） 1001",
+      "sourceYear": 2006,
+      "sourceRound": 1,
+      "originalQuestionNumber": 74,
+      "examCode": "095030",
+      "paperCode": "1101",
+      "examSessionLabel": "第一次",
+      "officialExam": {
+        "categoryCode": "101",
+        "subjectCode": "1001",
+        "trackCode": "HIGHGENERAL",
+        "trackLabel": "高普考",
+        "paperTitle": "基礎醫學（一）"
+      },
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=101&code=095030&q=1&s=1001&t=Q",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=101&code=095030&q=1&s=1001&t=S",
+        "page": 6,
+        "endPage": 6,
+        "image": "/question-media/moex-95-1-med1/MOEX-C101-095030-S1001-HIGHGENERAL-Q074.webp",
+        "width": 1030,
+        "height": 124,
+        "scope": "基礎醫學（一）",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-C101-095030-S1001-HIGHGENERAL-Q075",
+      "subject": "醫學（一）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（一）",
+      "stem": "白色念珠菌（Candida albicans）可引起的感染不包括下列那一項？",
+      "options": {
+        "A": "黏膜感染",
+        "B": "皮膚感染",
+        "C": "產毒性感染",
+        "D": "臟器感染"
+      },
+      "answer": "C",
+      "acceptedAnswers": [
+        "C"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：C。",
+      "testedConcept": "基礎醫學（一）（高普考原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國95年第1次 高普考 基礎醫學（一） 1001",
+      "sourceYear": 2006,
+      "sourceRound": 1,
+      "originalQuestionNumber": 75,
+      "examCode": "095030",
+      "paperCode": "1101",
+      "examSessionLabel": "第一次",
+      "officialExam": {
+        "categoryCode": "101",
+        "subjectCode": "1001",
+        "trackCode": "HIGHGENERAL",
+        "trackLabel": "高普考",
+        "paperTitle": "基礎醫學（一）"
+      },
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=101&code=095030&q=1&s=1001&t=Q",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=101&code=095030&q=1&s=1001&t=S",
+        "page": 7,
+        "endPage": 7,
+        "image": "/question-media/moex-95-1-med1/MOEX-C101-095030-S1001-HIGHGENERAL-Q075.webp",
+        "width": 1030,
+        "height": 63,
+        "scope": "基礎醫學（一）",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-C101-095030-S1001-HIGHGENERAL-Q076",
+      "subject": "醫學（一）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（一）",
+      "stem": "下列有關細胞激素（cytokine）的敘述，何者錯誤？",
+      "options": {
+        "A": "所有的細胞激素都是蛋白質，有些則為醣蛋白",
+        "B": "細胞與細胞之間溝通的橋樑，有時一個細胞激素（cytokine）可作用二個以上的細胞",
+        "C": "每一個細胞激素（cytokine）要作用於該細胞，則該細胞表面須有接受器",
+        "D": "細胞激素IL-4 為B 淋巴細胞所分泌，可刺激漿細胞分泌大量抗體"
+      },
+      "answer": "D",
+      "acceptedAnswers": [
+        "D"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：D。",
+      "testedConcept": "基礎醫學（一）（高普考原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國95年第1次 高普考 基礎醫學（一） 1001",
+      "sourceYear": 2006,
+      "sourceRound": 1,
+      "originalQuestionNumber": 76,
+      "examCode": "095030",
+      "paperCode": "1101",
+      "examSessionLabel": "第一次",
+      "officialExam": {
+        "categoryCode": "101",
+        "subjectCode": "1001",
+        "trackCode": "HIGHGENERAL",
+        "trackLabel": "高普考",
+        "paperTitle": "基礎醫學（一）"
+      },
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=101&code=095030&q=1&s=1001&t=Q",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=101&code=095030&q=1&s=1001&t=S",
+        "page": 7,
+        "endPage": 7,
+        "image": "/question-media/moex-95-1-med1/MOEX-C101-095030-S1001-HIGHGENERAL-Q076.webp",
+        "width": 1030,
+        "height": 156,
+        "scope": "基礎醫學（一）",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-C101-095030-S1001-HIGHGENERAL-Q077",
+      "subject": "醫學（一）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（一）",
+      "stem": "當出生之後，B 淋巴細胞由下列那一器官製造？",
+      "options": {
+        "A": "骨髓",
+        "B": "脾臟",
+        "C": "肝臟",
+        "D": "胸腺"
+      },
+      "answer": "A",
+      "acceptedAnswers": [
+        "A"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：A。",
+      "testedConcept": "基礎醫學（一）（高普考原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國95年第1次 高普考 基礎醫學（一） 1001",
+      "sourceYear": 2006,
+      "sourceRound": 1,
+      "originalQuestionNumber": 77,
+      "examCode": "095030",
+      "paperCode": "1101",
+      "examSessionLabel": "第一次",
+      "officialExam": {
+        "categoryCode": "101",
+        "subjectCode": "1001",
+        "trackCode": "HIGHGENERAL",
+        "trackLabel": "高普考",
+        "paperTitle": "基礎醫學（一）"
+      },
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=101&code=095030&q=1&s=1001&t=Q",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=101&code=095030&q=1&s=1001&t=S",
+        "page": 7,
+        "endPage": 7,
+        "image": "/question-media/moex-95-1-med1/MOEX-C101-095030-S1001-HIGHGENERAL-Q077.webp",
+        "width": 1030,
+        "height": 63,
+        "scope": "基礎醫學（一）",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-C101-095030-S1001-HIGHGENERAL-Q078",
+      "subject": "醫學（一）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（一）",
+      "stem": "補體（Complement）是由肝細胞分泌再釋放至血液中，它包含C1~C9 九個小分子，當其活化後， 何者可在細菌表面打洞造成細菌瓦解？",
+      "options": {
+        "A": "C3",
+        "B": "C3a、C5a",
+        "C": "C4b2a",
+        "D": "C5b-9"
+      },
+      "answer": "D",
+      "acceptedAnswers": [
+        "D"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：D。",
+      "testedConcept": "基礎醫學（一）（高普考原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國95年第1次 高普考 基礎醫學（一） 1001",
+      "sourceYear": 2006,
+      "sourceRound": 1,
+      "originalQuestionNumber": 78,
+      "examCode": "095030",
+      "paperCode": "1101",
+      "examSessionLabel": "第一次",
+      "officialExam": {
+        "categoryCode": "101",
+        "subjectCode": "1001",
+        "trackCode": "HIGHGENERAL",
+        "trackLabel": "高普考",
+        "paperTitle": "基礎醫學（一）"
+      },
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=101&code=095030&q=1&s=1001&t=Q",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=101&code=095030&q=1&s=1001&t=S",
+        "page": 7,
+        "endPage": 7,
+        "image": "/question-media/moex-95-1-med1/MOEX-C101-095030-S1001-HIGHGENERAL-Q078.webp",
+        "width": 1030,
+        "height": 94,
+        "scope": "基礎醫學（一）",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-C101-095030-S1001-HIGHGENERAL-Q079",
+      "subject": "醫學（一）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（一）",
+      "stem": "人類白血球抗原（human leucocyte antigens, HLA）是：",
+      "options": {
+        "A": "黏附分子（adhesion molecules）",
+        "B": "歸家受器（homing receptors）",
+        "C": "主要組織相容複合體分子（major histocompatibility complex molecules）",
+        "D": "組織專一性抗原（tissue specific antigens）"
+      },
+      "answer": "C",
+      "acceptedAnswers": [
+        "C"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：C。",
+      "testedConcept": "基礎醫學（一）（高普考原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國95年第1次 高普考 基礎醫學（一） 1001",
+      "sourceYear": 2006,
+      "sourceRound": 1,
+      "originalQuestionNumber": 79,
+      "examCode": "095030",
+      "paperCode": "1101",
+      "examSessionLabel": "第一次",
+      "officialExam": {
+        "categoryCode": "101",
+        "subjectCode": "1001",
+        "trackCode": "HIGHGENERAL",
+        "trackLabel": "高普考",
+        "paperTitle": "基礎醫學（一）"
+      },
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=101&code=095030&q=1&s=1001&t=Q",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=101&code=095030&q=1&s=1001&t=S",
+        "page": 7,
+        "endPage": 7,
+        "image": "/question-media/moex-95-1-med1/MOEX-C101-095030-S1001-HIGHGENERAL-Q079.webp",
+        "width": 1030,
+        "height": 156,
+        "scope": "基礎醫學（一）",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-C101-095030-S1001-HIGHGENERAL-Q080",
+      "subject": "醫學（一）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（一）",
+      "stem": "下列何種細胞反應不會發生於骨髓（bone marrow）中？",
+      "options": {
+        "A": "細胞分裂（cell proliferation）",
+        "B": "細胞分化（cell differentiation）",
+        "C": "細胞和細胞間互相作用（cellular interaction）",
+        "D": "辨識外來抗原（recognition of foreign antigens）"
+      },
+      "answer": "D",
+      "acceptedAnswers": [
+        "D"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：D。",
+      "testedConcept": "基礎醫學（一）（高普考原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國95年第1次 高普考 基礎醫學（一） 1001",
+      "sourceYear": 2006,
+      "sourceRound": 1,
+      "originalQuestionNumber": 80,
+      "examCode": "095030",
+      "paperCode": "1101",
+      "examSessionLabel": "第一次",
+      "officialExam": {
+        "categoryCode": "101",
+        "subjectCode": "1001",
+        "trackCode": "HIGHGENERAL",
+        "trackLabel": "高普考",
+        "paperTitle": "基礎醫學（一）"
+      },
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=101&code=095030&q=1&s=1001&t=Q",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=101&code=095030&q=1&s=1001&t=S",
+        "page": 7,
+        "endPage": 7,
+        "image": "/question-media/moex-95-1-med1/MOEX-C101-095030-S1001-HIGHGENERAL-Q080.webp",
+        "width": 1030,
+        "height": 156,
+        "scope": "基礎醫學（一）",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-C101-095030-S1001-HIGHGENERAL-Q081",
+      "subject": "醫學（一）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（一）",
+      "stem": "αβ T 細胞之抗原受器（antigen receptor）的基因重組（gene rearrangement）發生於下列那一器官？",
+      "options": {
+        "A": "骨髓",
+        "B": "胸腺",
+        "C": "淋巴結",
+        "D": "脾臟"
+      },
+      "answer": "B",
+      "acceptedAnswers": [
+        "B"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：B。",
+      "testedConcept": "基礎醫學（一）（高普考原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國95年第1次 高普考 基礎醫學（一） 1001",
+      "sourceYear": 2006,
+      "sourceRound": 1,
+      "originalQuestionNumber": 81,
+      "examCode": "095030",
+      "paperCode": "1101",
+      "examSessionLabel": "第一次",
+      "officialExam": {
+        "categoryCode": "101",
+        "subjectCode": "1001",
+        "trackCode": "HIGHGENERAL",
+        "trackLabel": "高普考",
+        "paperTitle": "基礎醫學（一）"
+      },
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=101&code=095030&q=1&s=1001&t=Q",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=101&code=095030&q=1&s=1001&t=S",
+        "page": 7,
+        "endPage": 7,
+        "image": "/question-media/moex-95-1-med1/MOEX-C101-095030-S1001-HIGHGENERAL-Q081.webp",
+        "width": 1030,
+        "height": 63,
+        "scope": "基礎醫學（一）",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-C101-095030-S1001-HIGHGENERAL-Q082",
+      "subject": "醫學（一）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（一）",
+      "stem": "以生物活性物質（biological response modifiers）例如Bacille Calmette-Guerin（BCG）增強免疫反應 來對抗腫瘤，是屬於：",
+      "options": {
+        "A": "主動免疫，非抗原特異性",
+        "B": "主動免疫，具抗原特異性",
+        "C": "被動免疫，非抗原特異性",
+        "D": "被動免疫，具抗原特異性"
+      },
+      "answer": "A",
+      "acceptedAnswers": [
+        "A"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：A。",
+      "testedConcept": "基礎醫學（一）（高普考原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國95年第1次 高普考 基礎醫學（一） 1001",
+      "sourceYear": 2006,
+      "sourceRound": 1,
+      "originalQuestionNumber": 82,
+      "examCode": "095030",
+      "paperCode": "1101",
+      "examSessionLabel": "第一次",
+      "officialExam": {
+        "categoryCode": "101",
+        "subjectCode": "1001",
+        "trackCode": "HIGHGENERAL",
+        "trackLabel": "高普考",
+        "paperTitle": "基礎醫學（一）"
+      },
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=101&code=095030&q=1&s=1001&t=Q",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=101&code=095030&q=1&s=1001&t=S",
+        "page": 7,
+        "endPage": 7,
+        "image": "/question-media/moex-95-1-med1/MOEX-C101-095030-S1001-HIGHGENERAL-Q082.webp",
+        "width": 1030,
+        "height": 124,
+        "scope": "基礎醫學（一）",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-C101-095030-S1001-HIGHGENERAL-Q083",
+      "subject": "醫學（一）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（一）",
+      "stem": "下列那種分子組合屬於調節T 細胞（regulatory T cell）的標記？",
+      "options": {
+        "A": "CD3/CD28",
+        "B": "CD4/CD25",
+        "C": "CD3/CD8",
+        "D": "CD16/CD56"
+      },
+      "answer": "B",
+      "acceptedAnswers": [
+        "B"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：B。",
+      "testedConcept": "基礎醫學（一）（高普考原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國95年第1次 高普考 基礎醫學（一） 1001",
+      "sourceYear": 2006,
+      "sourceRound": 1,
+      "originalQuestionNumber": 83,
+      "examCode": "095030",
+      "paperCode": "1101",
+      "examSessionLabel": "第一次",
+      "officialExam": {
+        "categoryCode": "101",
+        "subjectCode": "1001",
+        "trackCode": "HIGHGENERAL",
+        "trackLabel": "高普考",
+        "paperTitle": "基礎醫學（一）"
+      },
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=101&code=095030&q=1&s=1001&t=Q",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=101&code=095030&q=1&s=1001&t=S",
+        "page": 7,
+        "endPage": 7,
+        "image": "/question-media/moex-95-1-med1/MOEX-C101-095030-S1001-HIGHGENERAL-Q083.webp",
+        "width": 1030,
+        "height": 64,
+        "scope": "基礎醫學（一）",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-C101-095030-S1001-HIGHGENERAL-Q084",
+      "subject": "醫學（一）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（一）",
+      "stem": "在個體是否比較會發作氣喘或過敏病的重要因素中，下列那一個敘述最恰當？",
+      "options": {
+        "A": "遺傳基因比較重要",
+        "B": "環境因子比較重要",
+        "C": "遺傳基因和環境因子都很重要",
+        "D": "遺傳體質和環境因子都不重要"
+      },
+      "answer": "C",
+      "acceptedAnswers": [
+        "C"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：C。",
+      "testedConcept": "基礎醫學（一）（高普考原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國95年第1次 高普考 基礎醫學（一） 1001",
+      "sourceYear": 2006,
+      "sourceRound": 1,
+      "originalQuestionNumber": 84,
+      "examCode": "095030",
+      "paperCode": "1101",
+      "examSessionLabel": "第一次",
+      "officialExam": {
+        "categoryCode": "101",
+        "subjectCode": "1001",
+        "trackCode": "HIGHGENERAL",
+        "trackLabel": "高普考",
+        "paperTitle": "基礎醫學（一）"
+      },
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=101&code=095030&q=1&s=1001&t=Q",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=101&code=095030&q=1&s=1001&t=S",
+        "page": 7,
+        "endPage": 7,
+        "image": "/question-media/moex-95-1-med1/MOEX-C101-095030-S1001-HIGHGENERAL-Q084.webp",
+        "width": 1030,
+        "height": 94,
+        "scope": "基礎醫學（一）",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-C101-095030-S1001-HIGHGENERAL-Q085",
+      "subject": "醫學（一）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（一）",
+      "stem": "下列有關初次和二次抗體反應，何者正確？",
+      "options": {
+        "A": "IgG 不會在初次反應中產生",
+        "B": "在針對T-依賴性抗原的反應，抗體親和力（affinity）在二次反應較高",
+        "C": "二次反應的遲滯期（lag phase）較長，高原期（plateau phase）也較長",
+        "D": "抗體效價（titer）在二次反應時會降低"
+      },
+      "answer": "B",
+      "acceptedAnswers": [
+        "B"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：B。",
+      "testedConcept": "基礎醫學（一）（高普考原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國95年第1次 高普考 基礎醫學（一） 1001",
+      "sourceYear": 2006,
+      "sourceRound": 1,
+      "originalQuestionNumber": 85,
+      "examCode": "095030",
+      "paperCode": "1101",
+      "examSessionLabel": "第一次",
+      "officialExam": {
+        "categoryCode": "101",
+        "subjectCode": "1001",
+        "trackCode": "HIGHGENERAL",
+        "trackLabel": "高普考",
+        "paperTitle": "基礎醫學（一）"
+      },
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=101&code=095030&q=1&s=1001&t=Q",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=101&code=095030&q=1&s=1001&t=S",
+        "page": 7,
+        "endPage": 7,
+        "image": "/question-media/moex-95-1-med1/MOEX-C101-095030-S1001-HIGHGENERAL-Q085.webp",
+        "width": 1030,
+        "height": 156,
+        "scope": "基礎醫學（一）",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-C101-095030-S1001-HIGHGENERAL-Q086",
+      "subject": "醫學（一）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（一）",
+      "stem": "下列有關Arthus 反應的描述，何者錯誤？",
+      "options": {
+        "A": "這種過敏免疫反應常是全身性反應",
+        "B": "抗體和補體系統活化都是重要的致病因子",
+        "C": "嗜鹼性球（basophils）的活化是重要的致病因子",
+        "D": "屬於第三型的過敏免疫（hypersensitivity）反應"
+      },
+      "answer": "A",
+      "acceptedAnswers": [
+        "A"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：A。",
+      "testedConcept": "基礎醫學（一）（高普考原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國95年第1次 高普考 基礎醫學（一） 1001",
+      "sourceYear": 2006,
+      "sourceRound": 1,
+      "originalQuestionNumber": 86,
+      "examCode": "095030",
+      "paperCode": "1101",
+      "examSessionLabel": "第一次",
+      "officialExam": {
+        "categoryCode": "101",
+        "subjectCode": "1001",
+        "trackCode": "HIGHGENERAL",
+        "trackLabel": "高普考",
+        "paperTitle": "基礎醫學（一）"
+      },
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=101&code=095030&q=1&s=1001&t=Q",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=101&code=095030&q=1&s=1001&t=S",
+        "page": 7,
+        "endPage": 7,
+        "image": "/question-media/moex-95-1-med1/MOEX-C101-095030-S1001-HIGHGENERAL-Q086.webp",
+        "width": 1030,
+        "height": 156,
+        "scope": "基礎醫學（一）",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-C101-095030-S1001-HIGHGENERAL-Q087",
+      "subject": "醫學（一）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（一）",
+      "stem": "細胞被病毒感染後，在短時間內會分泌何種物質，來防止病毒進一步感染其他細胞？",
+      "options": {
+        "A": "抗體（Antibodies）",
+        "B": "化學介質（Chemokines）",
+        "C": "干擾素（Interferons）",
+        "D": "腫瘤壞死因子（Tumor necrosis factor）"
+      },
+      "answer": "C",
+      "acceptedAnswers": [
+        "C"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：C。",
+      "testedConcept": "基礎醫學（一）（高普考原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國95年第1次 高普考 基礎醫學（一） 1001",
+      "sourceYear": 2006,
+      "sourceRound": 1,
+      "originalQuestionNumber": 87,
+      "examCode": "095030",
+      "paperCode": "1101",
+      "examSessionLabel": "第一次",
+      "officialExam": {
+        "categoryCode": "101",
+        "subjectCode": "1001",
+        "trackCode": "HIGHGENERAL",
+        "trackLabel": "高普考",
+        "paperTitle": "基礎醫學（一）"
+      },
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=101&code=095030&q=1&s=1001&t=Q",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=101&code=095030&q=1&s=1001&t=S",
+        "page": 7,
+        "endPage": 7,
+        "image": "/question-media/moex-95-1-med1/MOEX-C101-095030-S1001-HIGHGENERAL-Q087.webp",
+        "width": 1030,
+        "height": 95,
+        "scope": "基礎醫學（一）",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-C101-095030-S1001-HIGHGENERAL-Q088",
+      "subject": "醫學（一）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（一）",
+      "stem": "產生Graft-versus-host disease（GVHD）的原因為何？",
+      "options": {
+        "A": "移植的pancreas 釋出消化酵素引起組織損傷",
+        "B": "移植的liver 發生炎性反應引起內皮損傷",
+        "C": "移植的kidney 釋出廢物毒素引起內皮損傷",
+        "D": "移植的bone marrow中成熟的T細胞攻擊宿主"
+      },
+      "answer": "D",
+      "acceptedAnswers": [
+        "D"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：D。",
+      "testedConcept": "基礎醫學（一）（高普考原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國95年第1次 高普考 基礎醫學（一） 1001",
+      "sourceYear": 2006,
+      "sourceRound": 1,
+      "originalQuestionNumber": 88,
+      "examCode": "095030",
+      "paperCode": "1101",
+      "examSessionLabel": "第一次",
+      "officialExam": {
+        "categoryCode": "101",
+        "subjectCode": "1001",
+        "trackCode": "HIGHGENERAL",
+        "trackLabel": "高普考",
+        "paperTitle": "基礎醫學（一）"
+      },
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=101&code=095030&q=1&s=1001&t=Q",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=101&code=095030&q=1&s=1001&t=S",
+        "page": 8,
+        "endPage": 8,
+        "image": "/question-media/moex-95-1-med1/MOEX-C101-095030-S1001-HIGHGENERAL-Q088.webp",
+        "width": 1030,
+        "height": 94,
+        "scope": "基礎醫學（一）",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-C101-095030-S1001-HIGHGENERAL-Q089",
+      "subject": "醫學（一）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（一）",
+      "stem": "下列有關X-linked lymphoproliferative syndrome 的情況，何者正確？",
+      "options": {
+        "A": "是因Toll like receptor 2（TLR2）基因之缺陷所引起",
+        "B": "亦同時併有血小板凝血機能之障礙",
+        "C": "T 細胞之活化有缺陷，病人易因Epstein-Barr virus（EBV）之感染而死亡",
+        "D": "會引起IFNγ receptor 1 及IFNγ receptor 2 的功能低下，因此易有細胞內細菌如Mycobacterium avium 之感染"
+      },
+      "answer": "C",
+      "acceptedAnswers": [
+        "C"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：C。",
+      "testedConcept": "基礎醫學（一）（高普考原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國95年第1次 高普考 基礎醫學（一） 1001",
+      "sourceYear": 2006,
+      "sourceRound": 1,
+      "originalQuestionNumber": 89,
+      "examCode": "095030",
+      "paperCode": "1101",
+      "examSessionLabel": "第一次",
+      "officialExam": {
+        "categoryCode": "101",
+        "subjectCode": "1001",
+        "trackCode": "HIGHGENERAL",
+        "trackLabel": "高普考",
+        "paperTitle": "基礎醫學（一）"
+      },
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=101&code=095030&q=1&s=1001&t=Q",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=101&code=095030&q=1&s=1001&t=S",
+        "page": 8,
+        "endPage": 8,
+        "image": "/question-media/moex-95-1-med1/MOEX-C101-095030-S1001-HIGHGENERAL-Q089.webp",
+        "width": 1030,
+        "height": 186,
+        "scope": "基礎醫學（一）",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-C101-095030-S1001-HIGHGENERAL-Q090",
+      "subject": "醫學（一）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（一）",
+      "stem": "下列何者為非自體免疫疾病？",
+      "options": {
+        "A": "systemic lupus erythematosus",
+        "B": "Hashimoto’s thyroiditis",
+        "C": "type I diabetes mellitus",
+        "D": "chronic allergic rhinitis"
+      },
+      "answer": "D",
+      "acceptedAnswers": [
+        "D"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：D。",
+      "testedConcept": "基礎醫學（一）（高普考原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國95年第1次 高普考 基礎醫學（一） 1001",
+      "sourceYear": 2006,
+      "sourceRound": 1,
+      "originalQuestionNumber": 90,
+      "examCode": "095030",
+      "paperCode": "1101",
+      "examSessionLabel": "第一次",
+      "officialExam": {
+        "categoryCode": "101",
+        "subjectCode": "1001",
+        "trackCode": "HIGHGENERAL",
+        "trackLabel": "高普考",
+        "paperTitle": "基礎醫學（一）"
+      },
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=101&code=095030&q=1&s=1001&t=Q",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=101&code=095030&q=1&s=1001&t=S",
+        "page": 8,
+        "endPage": 8,
+        "image": "/question-media/moex-95-1-med1/MOEX-C101-095030-S1001-HIGHGENERAL-Q090.webp",
+        "width": 1030,
+        "height": 94,
+        "scope": "基礎醫學（一）",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-C101-095030-S1001-HIGHGENERAL-Q091",
+      "subject": "醫學（一）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（一）",
+      "stem": "一病患有非常嚴重的鞭蟲（Trichuris trichiura）感染。下列臨床症狀，何者最不可能發生？",
+      "options": {
+        "A": "腹痛",
+        "B": "貧血",
+        "C": "肺炎",
+        "D": "闌尾炎"
+      },
+      "answer": "C",
+      "acceptedAnswers": [
+        "C"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：C。",
+      "testedConcept": "基礎醫學（一）（高普考原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國95年第1次 高普考 基礎醫學（一） 1001",
+      "sourceYear": 2006,
+      "sourceRound": 1,
+      "originalQuestionNumber": 91,
+      "examCode": "095030",
+      "paperCode": "1101",
+      "examSessionLabel": "第一次",
+      "officialExam": {
+        "categoryCode": "101",
+        "subjectCode": "1001",
+        "trackCode": "HIGHGENERAL",
+        "trackLabel": "高普考",
+        "paperTitle": "基礎醫學（一）"
+      },
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=101&code=095030&q=1&s=1001&t=Q",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=101&code=095030&q=1&s=1001&t=S",
+        "page": 8,
+        "endPage": 8,
+        "image": "/question-media/moex-95-1-med1/MOEX-C101-095030-S1001-HIGHGENERAL-Q091.webp",
+        "width": 1030,
+        "height": 63,
+        "scope": "基礎醫學（一）",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-C101-095030-S1001-HIGHGENERAL-Q092",
+      "subject": "醫學（一）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（一）",
+      "stem": "有一病患胸部X-ray 檢查發現肺臟出現硬幣狀病灶（稱為“coin-like lesions＂），用犬心絲蟲 （Dirofilaria immitis）抗原檢查血清抗體呈陽性反應，下列敘述何者錯誤？",
+      "options": {
+        "A": "該病患可以被診斷為感染犬心絲蟲",
+        "B": "該病患在晚上採血可以檢查到微絲蟲（microfilariae）",
+        "C": "該病患居家附近可能有感染犬心絲蟲的狗",
+        "D": "該病患可能會有咳嗽、胸痛但很少咳血"
+      },
+      "answer": "B",
+      "acceptedAnswers": [
+        "B"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：B。",
+      "testedConcept": "基礎醫學（一）（高普考原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國95年第1次 高普考 基礎醫學（一） 1001",
+      "sourceYear": 2006,
+      "sourceRound": 1,
+      "originalQuestionNumber": 92,
+      "examCode": "095030",
+      "paperCode": "1101",
+      "examSessionLabel": "第一次",
+      "officialExam": {
+        "categoryCode": "101",
+        "subjectCode": "1001",
+        "trackCode": "HIGHGENERAL",
+        "trackLabel": "高普考",
+        "paperTitle": "基礎醫學（一）"
+      },
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=101&code=095030&q=1&s=1001&t=Q",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=101&code=095030&q=1&s=1001&t=S",
+        "page": 8,
+        "endPage": 8,
+        "image": "/question-media/moex-95-1-med1/MOEX-C101-095030-S1001-HIGHGENERAL-Q092.webp",
+        "width": 1030,
+        "height": 184,
+        "scope": "基礎醫學（一）",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-C101-095030-S1001-HIGHGENERAL-Q093",
+      "subject": "醫學（一）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（一）",
+      "stem": "抽取病人之痰中可能會出現之寄生蟲有那些？①衛氏肺吸蟲蟲卵 ②糞小桿線蟲幼蟲 ③蛔蟲蟲 卵 ④衛氏肺吸蟲幼蟲",
+      "options": {
+        "A": "①＋②",
+        "B": "②＋③",
+        "C": "③＋④",
+        "D": "①＋④"
+      },
+      "answer": "A",
+      "acceptedAnswers": [
+        "A"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：A。",
+      "testedConcept": "基礎醫學（一）（高普考原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國95年第1次 高普考 基礎醫學（一） 1001",
+      "sourceYear": 2006,
+      "sourceRound": 1,
+      "originalQuestionNumber": 93,
+      "examCode": "095030",
+      "paperCode": "1101",
+      "examSessionLabel": "第一次",
+      "officialExam": {
+        "categoryCode": "101",
+        "subjectCode": "1001",
+        "trackCode": "HIGHGENERAL",
+        "trackLabel": "高普考",
+        "paperTitle": "基礎醫學（一）"
+      },
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=101&code=095030&q=1&s=1001&t=Q",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=101&code=095030&q=1&s=1001&t=S",
+        "page": 8,
+        "endPage": 8,
+        "image": "/question-media/moex-95-1-med1/MOEX-C101-095030-S1001-HIGHGENERAL-Q093.webp",
+        "width": 1030,
+        "height": 93,
+        "scope": "基礎醫學（一）",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-C101-095030-S1001-HIGHGENERAL-Q094",
+      "subject": "醫學（一）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（一）",
+      "stem": "下列何種絛蟲，其成蟲蟲體長度小於1 公分：",
+      "options": {
+        "A": "縮小包膜絛蟲",
+        "B": "短小包膜絛蟲",
+        "C": "包生絛蟲",
+        "D": "犬複殖器絛蟲"
+      },
+      "answer": "C",
+      "acceptedAnswers": [
+        "C"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：C。",
+      "testedConcept": "基礎醫學（一）（高普考原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國95年第1次 高普考 基礎醫學（一） 1001",
+      "sourceYear": 2006,
+      "sourceRound": 1,
+      "originalQuestionNumber": 94,
+      "examCode": "095030",
+      "paperCode": "1101",
+      "examSessionLabel": "第一次",
+      "officialExam": {
+        "categoryCode": "101",
+        "subjectCode": "1001",
+        "trackCode": "HIGHGENERAL",
+        "trackLabel": "高普考",
+        "paperTitle": "基礎醫學（一）"
+      },
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=101&code=095030&q=1&s=1001&t=Q",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=101&code=095030&q=1&s=1001&t=S",
+        "page": 8,
+        "endPage": 8,
+        "image": "/question-media/moex-95-1-med1/MOEX-C101-095030-S1001-HIGHGENERAL-Q094.webp",
+        "width": 1030,
+        "height": 63,
+        "scope": "基礎醫學（一）",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-C101-095030-S1001-HIGHGENERAL-Q095",
+      "subject": "醫學（一）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（一）",
+      "stem": "下列那一種原蟲因具有變異性表面醣蛋白（variant surface glycoproteins, VSG）持續改變的機轉， 得以逃避宿主免疫系統之攻擊作用？",
+      "options": {
+        "A": "岡比亞錐蟲（Trypanosoma gambiense）",
+        "B": "枯西氏錐蟲（Trypanosoma cruzi）",
+        "C": "弓蟲（Toxoplasma gondii）",
+        "D": "杜氏利什曼原蟲（Leishmania donovani）"
+      },
+      "answer": "A",
+      "acceptedAnswers": [
+        "A"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：A。",
+      "testedConcept": "基礎醫學（一）（高普考原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國95年第1次 高普考 基礎醫學（一） 1001",
+      "sourceYear": 2006,
+      "sourceRound": 1,
+      "originalQuestionNumber": 95,
+      "examCode": "095030",
+      "paperCode": "1101",
+      "examSessionLabel": "第一次",
+      "officialExam": {
+        "categoryCode": "101",
+        "subjectCode": "1001",
+        "trackCode": "HIGHGENERAL",
+        "trackLabel": "高普考",
+        "paperTitle": "基礎醫學（一）"
+      },
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=101&code=095030&q=1&s=1001&t=Q",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=101&code=095030&q=1&s=1001&t=S",
+        "page": 8,
+        "endPage": 8,
+        "image": "/question-media/moex-95-1-med1/MOEX-C101-095030-S1001-HIGHGENERAL-Q095.webp",
+        "width": 1030,
+        "height": 124,
+        "scope": "基礎醫學（一）",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-C101-095030-S1001-HIGHGENERAL-Q096",
+      "subject": "醫學（一）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（一）",
+      "stem": "下列有關青蒿素（artemisinin）之敘述，何者錯誤？",
+      "options": {
+        "A": "青蒿素對於治療腦性瘧疾有很好的效果",
+        "B": "因為青蒿素對胎兒有毒性，所以不適合用於孕婦",
+        "C": "青蒿素毒殺血液中惡性瘧分裂體（schizonts）之效果比奎寧（quinine）好",
+        "D": "青蒿素單獨使用即可完全消滅惡性瘧原蟲，不會有再發作（recrudescence）"
+      },
+      "answer": "D",
+      "acceptedAnswers": [
+        "D"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：D。",
+      "testedConcept": "基礎醫學（一）（高普考原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國95年第1次 高普考 基礎醫學（一） 1001",
+      "sourceYear": 2006,
+      "sourceRound": 1,
+      "originalQuestionNumber": 96,
+      "examCode": "095030",
+      "paperCode": "1101",
+      "examSessionLabel": "第一次",
+      "officialExam": {
+        "categoryCode": "101",
+        "subjectCode": "1001",
+        "trackCode": "HIGHGENERAL",
+        "trackLabel": "高普考",
+        "paperTitle": "基礎醫學（一）"
+      },
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=101&code=095030&q=1&s=1001&t=Q",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=101&code=095030&q=1&s=1001&t=S",
+        "page": 8,
+        "endPage": 8,
+        "image": "/question-media/moex-95-1-med1/MOEX-C101-095030-S1001-HIGHGENERAL-Q096.webp",
+        "width": 1030,
+        "height": 154,
+        "scope": "基礎醫學（一）",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-C101-095030-S1001-HIGHGENERAL-Q097",
+      "subject": "醫學（一）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（一）",
+      "stem": "下列有關白蛉的敘述何者正確？",
+      "options": {
+        "A": "大部分雌雄均會吸血",
+        "B": "因個體小故可隨氣流飛行很遠",
+        "C": "喜歡夜間吸血",
+        "D": "台灣沒有白蛉"
+      },
+      "answer": "C",
+      "acceptedAnswers": [
+        "C"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：C。",
+      "testedConcept": "基礎醫學（一）（高普考原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國95年第1次 高普考 基礎醫學（一） 1001",
+      "sourceYear": 2006,
+      "sourceRound": 1,
+      "originalQuestionNumber": 97,
+      "examCode": "095030",
+      "paperCode": "1101",
+      "examSessionLabel": "第一次",
+      "officialExam": {
+        "categoryCode": "101",
+        "subjectCode": "1001",
+        "trackCode": "HIGHGENERAL",
+        "trackLabel": "高普考",
+        "paperTitle": "基礎醫學（一）"
+      },
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=101&code=095030&q=1&s=1001&t=Q",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=101&code=095030&q=1&s=1001&t=S",
+        "page": 8,
+        "endPage": 8,
+        "image": "/question-media/moex-95-1-med1/MOEX-C101-095030-S1001-HIGHGENERAL-Q097.webp",
+        "width": 1030,
+        "height": 93,
+        "scope": "基礎醫學（一）",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-C101-095030-S1001-HIGHGENERAL-Q098",
+      "subject": "醫學（一）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（一）",
+      "stem": "李太太為一家庭主婦，一個月前參加旅行團至大陸雲南等地旅遊，回國後身體略感不適，近日更因 高燒不退，倦怠及全身不適而求醫。實驗室檢查發現周邊血液有瘧原蟲，數目約60000/µl，紅血球 數為250 萬/µl，則病人之寄生蟲血症大約是：",
+      "options": {
+        "A": "小於0.5%",
+        "B": "0.5%~1%",
+        "C": "1%~2%",
+        "D": "大於2%"
+      },
+      "answer": "D",
+      "acceptedAnswers": [
+        "D"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：D。",
+      "testedConcept": "基礎醫學（一）（高普考原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國95年第1次 高普考 基礎醫學（一） 1001",
+      "sourceYear": 2006,
+      "sourceRound": 1,
+      "originalQuestionNumber": 98,
+      "examCode": "095030",
+      "paperCode": "1101",
+      "examSessionLabel": "第一次",
+      "officialExam": {
+        "categoryCode": "101",
+        "subjectCode": "1001",
+        "trackCode": "HIGHGENERAL",
+        "trackLabel": "高普考",
+        "paperTitle": "基礎醫學（一）"
+      },
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=101&code=095030&q=1&s=1001&t=Q",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=101&code=095030&q=1&s=1001&t=S",
+        "page": 8,
+        "endPage": 8,
+        "image": "/question-media/moex-95-1-med1/MOEX-C101-095030-S1001-HIGHGENERAL-Q098.webp",
+        "width": 1030,
+        "height": 124,
+        "scope": "基礎醫學（一）",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-C101-095030-S1001-HIGHGENERAL-Q099",
+      "subject": "醫學（一）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（一）",
+      "stem": "錐鼻蟲（kissing bug）可傳播下列何種寄生蟲病？",
+      "options": {
+        "A": "恰加斯氏病（Chagas’ disease）",
+        "B": "岡比亞錐蟲病（Gambian trypanosomiasis）",
+        "C": "羅德西亞錐蟲病（Rhodesian trypanosomiasis）",
+        "D": "利什曼蟲病（Leishmaniasis）"
+      },
+      "answer": "A",
+      "acceptedAnswers": [
+        "A"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：A。",
+      "testedConcept": "基礎醫學（一）（高普考原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國95年第1次 高普考 基礎醫學（一） 1001",
+      "sourceYear": 2006,
+      "sourceRound": 1,
+      "originalQuestionNumber": 99,
+      "examCode": "095030",
+      "paperCode": "1101",
+      "examSessionLabel": "第一次",
+      "officialExam": {
+        "categoryCode": "101",
+        "subjectCode": "1001",
+        "trackCode": "HIGHGENERAL",
+        "trackLabel": "高普考",
+        "paperTitle": "基礎醫學（一）"
+      },
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=101&code=095030&q=1&s=1001&t=Q",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=101&code=095030&q=1&s=1001&t=S",
+        "page": 8,
+        "endPage": 8,
+        "image": "/question-media/moex-95-1-med1/MOEX-C101-095030-S1001-HIGHGENERAL-Q099.webp",
+        "width": 1030,
+        "height": 94,
+        "scope": "基礎醫學（一）",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-C101-095030-S1001-HIGHGENERAL-Q100",
+      "subject": "醫學（一）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（一）",
+      "stem": "下列有關硬蜱（hard tick）的敘述何者正確？",
+      "options": {
+        "A": "雌蜱背板佔據整個背部",
+        "B": "成蟲一生只產一次卵",
+        "C": "稚蟲期（nymph）可分為三到七個時期",
+        "D": "成蟲期在宿主身上可重覆多次吸血"
+      },
+      "answer": "B",
+      "acceptedAnswers": [
+        "B"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：B。",
+      "testedConcept": "基礎醫學（一）（高普考原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國95年第1次 高普考 基礎醫學（一） 1001",
+      "sourceYear": 2006,
+      "sourceRound": 1,
+      "originalQuestionNumber": 100,
+      "examCode": "095030",
+      "paperCode": "1101",
+      "examSessionLabel": "第一次",
+      "officialExam": {
+        "categoryCode": "101",
+        "subjectCode": "1001",
+        "trackCode": "HIGHGENERAL",
+        "trackLabel": "高普考",
+        "paperTitle": "基礎醫學（一）"
+      },
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=101&code=095030&q=1&s=1001&t=Q",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=101&code=095030&q=1&s=1001&t=S",
+        "page": 8,
+        "endPage": 8,
+        "image": "/question-media/moex-95-1-med1/MOEX-C101-095030-S1001-HIGHGENERAL-Q100.webp",
+        "width": 1030,
+        "height": 94,
+        "scope": "基礎醫學（一）",
+        "answerNote": null
+      }
+    }
+  ]
+}
