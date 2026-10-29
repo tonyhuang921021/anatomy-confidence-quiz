@@ -1,10 +1,11 @@
 "use client";
 
 import Link from "next/link";
-import { useId, useState } from "react";
+import { useEffect, useId, useState } from "react";
 import { TeachingFigure } from "@/components/TeachingFigure";
 
 export type TeachingExplanationData = {
+  questionId: string;
   title: string;
   answerSummary: string;
   options: Array<{ key: string; text: string; explanation: string }>;
@@ -31,6 +32,7 @@ export type TeachingExplanationData = {
 export function TeachingExplanation({ data }: { data: TeachingExplanationData }) {
   const [detailed, setDetailed] = useState(false);
   const panelId = useId();
+  useEffect(() => { setDetailed(false); }, [data.questionId]);
   const related = data.related.filter(({ questionId }) => /^[A-Za-z0-9_-]{1,160}$/.test(questionId));
 
   return (
