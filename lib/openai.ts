@@ -79,10 +79,31 @@ export async function createOpenAIAnalysis(prompt: string) {
   };
 }
 
+export function buildOpenAITextRequest(
+  prompt: string,
+  maxOutputTokens: number,
+  model: string,
+  reasoningEffort: "low" | "default" = "default"
+) {
+  if (reasoningEffort !== "low" && reasoningEffort !== "default") {
+    throw new Error("Unsupported reasoning effort");
+  }
+  if (reasoningEffort === "low" && model !== "gpt-6.1-sol") {
+    throw new Error("Low-effort override is only enabled for gpt-6.1-sol");
+  }
+  return {
+    model,
+    input: prompt,
+    max_output_tokens: maxOutputTokens,
+    ...(reasoningEffort === "low" ? { reasoning: { effort: "low" } } : {})
+  };
+}
+
 export async function createOpenAIText(
   prompt: string,
   maxOutputTokens = 1800,
-  modelOverride?: string
+  modelOverride?: string,
+  reasoningEffort: "low" | "default" = "default"
 ) {
   const apiKey = process.env.OPENAI_API_KEY;
   if (!apiKey) {
@@ -97,11 +118,7 @@ export async function createOpenAIText(
       "Content-Type": "application/json",
       Authorization: `Bearer ${apiKey}`
     },
-    body: JSON.stringify({
-      model,
-      input: prompt,
-      max_output_tokens: maxOutputTokens
-    }),
+    body: JSON.stringify(buildOpenAITextRequest(prompt, maxOutputTokens, model, reasoningEffort)),
     cache: "no-store"
   });
 
@@ -114,6 +131,8 @@ export async function createOpenAIText(
   return {
     model,
     text: extractOutputText(payload),
+    usageKnown: Number.isSafeInteger(payload.usage?.input_tokens) && Number(payload.usage?.input_tokens) >= 0 &&
+      Number.isSafeInteger(payload.usage?.output_tokens) && Number(payload.usage?.output_tokens) >= 0,
     usage: {
       inputTokens: payload.usage?.input_tokens ?? 0,
       outputTokens: payload.usage?.output_tokens ?? 0,
