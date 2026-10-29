@@ -2,6 +2,12 @@ import type { Question } from "../types/quiz";
 
 type PaperQuestion = Pick<Question, "examCode" | "paperCode" | "officialExam">;
 
+/** Display the official selector when known, preserving labels for legacy data. */
+export function getOfficialPaperDisplayCode(question: PaperQuestion): string | undefined {
+  const subjectCode = question.officialExam?.subjectCode || question.paperCode;
+  return question.examCode && subjectCode ? `${question.examCode}-${subjectCode}` : undefined;
+}
+
 /** Preserve legacy paper keys while giving distinct official tracks distinct keys. */
 export function getOfficialPaperKey(question: PaperQuestion): string | undefined {
   if (!question.examCode || !question.paperCode) return undefined;

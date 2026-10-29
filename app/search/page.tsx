@@ -1,6 +1,7 @@
 "use client";
 
 import { formatRocYear } from "@/lib/rocDate";
+import { getOfficialPaperDisplayCode } from "@/lib/officialPaperIdentity";
 
 
 import { useRouter, useSearchParams } from "next/navigation";
@@ -1164,8 +1165,8 @@ function SearchPageContent() {
                     </p>
                     <p className="mt-2 text-xs text-slate-500">
                       {renderedQuestion.id}
-                      {renderedQuestion.examCode && renderedQuestion.paperCode
-                        ? ` ・ ${renderedQuestion.examCode}-${renderedQuestion.paperCode}`
+                      {getOfficialPaperDisplayCode(renderedQuestion)
+                        ? ` ・ ${getOfficialPaperDisplayCode(renderedQuestion)}`
                         : ""}
                     </p>
                   </div>
