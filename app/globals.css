@@ -8136,3 +8136,21 @@ html .home-motion .home-tone-motion { animation: home-motion-fade var(--home-rev
 .home-release-history time { margin-right:.75rem; color:var(--brand-deep); }
 .home-release-history strong { color:var(--ink-main); font-weight:500; }
 .home-release-history p { margin:.35rem 0 0; }
+/* Preserve the source character and accessible name while drawing its circle
+   without depending on a platform-specific circled-number font. */
+.question-circled-number {
+  display: inline-flex;
+  width: 1rem;
+  height: 1rem;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid currentColor;
+  border-radius: 50%;
+  vertical-align: -0.12em;
+  font-size: 0;
+}
+.question-circled-number::after {
+  content: attr(data-digit);
+  font-size: 0.7rem;
+  line-height: 1;
+}

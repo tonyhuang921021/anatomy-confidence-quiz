@@ -22,7 +22,9 @@ export function FormattedQuestionText({ text, preserveWords = false }: Formatted
 
         return (
           <span key={`${token.text}-${token.subscript ?? ""}-${token.superscript ?? ""}-${index}`} className={className}>
-            {token.text}
+            {preserveWords ? token.text.split(/([①-⑳])/u).map((part, partIndex) => /^[①-⑳]$/u.test(part) ? (
+              <span key={`${part}-${partIndex}`} className="question-circled-number" data-digit={part.codePointAt(0)! - 0x2460 + 1} role="img" aria-label={part}>{part}</span>
+            ) : part) : token.text}
             {token.subscript ? (
               <sub className="relative top-[0.22em] text-[0.68em] leading-none">{token.subscript}</sub>
             ) : null}
