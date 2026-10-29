@@ -36,7 +36,7 @@ export function QuestionReportButton({
   onReportClassification,
   buttonClassName = "min-h-10 rounded-2xl bg-amber-50 px-4 py-2 text-sm font-semibold text-amber-900 ring-1 ring-amber-100 transition hover:bg-amber-100 disabled:cursor-wait disabled:opacity-60"
 }: QuestionReportButtonProps) {
-  const { session } = useAuth();
+  const { session, loading: authLoading } = useAuth();
   const [isOpen, setIsOpen] = useState(false);
   const [activeFlow, setActiveFlow] = useState<"choice" | "issue">("choice");
   const [issueCategory, setIssueCategory] = useState<string>("");
@@ -258,6 +258,8 @@ export function QuestionReportButton({
                 />
               </>
             )}
+
+            {activeFlow === "issue" && !authLoading && !session?.access_token ? <p className="mt-3 text-sm text-slate-600">登入後才能送出題目瑕疵回報。</p> : null}
 
             {error ? <p className="mt-3 text-sm font-medium text-rose-700" role="alert">{error}</p> : null}
 
