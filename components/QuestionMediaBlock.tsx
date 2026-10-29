@@ -46,6 +46,7 @@ export function QuestionStemMedia({ question, className }: QuestionStemMediaProp
   return (
     <div className={`min-w-0 max-w-full ${className ?? ""}`}>
       {renderImage(question.stemImage, `${question.id} 題目圖片`, question.officialSource?.image === question.stemImage ? question.officialSource : undefined)}
+      {question.officialSource?.displayNotice ? <p className="mt-2 text-xs leading-5 text-slate-600">{question.officialSource.displayNotice}</p> : null}
     </div>
   );
 }

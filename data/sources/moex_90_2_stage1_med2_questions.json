@@ -1,5 +1,5 @@
 {
-  "status": "unpublished_candidate_original_images_pending_crop_review",
+  "status": "unpublished_candidate_second_display_reviewed_154_clean_6_original_retained",
   "sources": {
     "Q": {
       "url": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?t=Q&code=090180&c=002&s=5004&q=1",
@@ -21,7 +21,7 @@
       "chapter": "舊制官方原卷",
       "section": "醫學（二）",
       "stem": "在正常血液循環狀況下，微血管內所含血量為全身血量的多少？",
-      "stemImage": "/question-media/moex-90-2-stage1-med2/MOEX-C002-090180-S5004-STAGE1-Q001.webp",
+      "stemImage": "/question-media/moex-90-2-stage1-med2-display/Q001.png",
       "options": {
         "A": "75%",
         "B": "50%",
@@ -72,7 +72,7 @@
       "chapter": "舊制官方原卷",
       "section": "醫學（二）",
       "stem": "細胞外液的［Na⁺］和［K⁺］分別為：",
-      "stemImage": "/question-media/moex-90-2-stage1-med2/MOEX-C002-090180-S5004-STAGE1-Q002.webp",
+      "stemImage": "/question-media/moex-90-2-stage1-med2-display/Q002.png",
       "options": {
         "A": "140mM 和 140mM",
         "B": "140mM 和 5mM",
@@ -123,7 +123,7 @@
       "chapter": "舊制官方原卷",
       "section": "醫學（二）",
       "stem": "以下何種物質完全無需藉輸送蛋白質的參與即可自由進出細胞？",
-      "stemImage": "/question-media/moex-90-2-stage1-med2/MOEX-C002-090180-S5004-STAGE1-Q003.webp",
+      "stemImage": "/question-media/moex-90-2-stage1-med2-display/Q003.png",
       "options": {
         "A": "氯離子",
         "B": "鈉離子",
@@ -174,7 +174,7 @@
       "chapter": "舊制官方原卷",
       "section": "醫學（二）",
       "stem": "下列何種感覺的輸入途徑「不」經過視丘？",
-      "stemImage": "/question-media/moex-90-2-stage1-med2/MOEX-C002-090180-S5004-STAGE1-Q004.webp",
+      "stemImage": "/question-media/moex-90-2-stage1-med2-display/Q004.png",
       "options": {
         "A": "味覺",
         "B": "嗅覺",
@@ -225,7 +225,7 @@
       "chapter": "舊制官方原卷",
       "section": "醫學（二）",
       "stem": "體感覺區位在大腦皮質何處？",
-      "stemImage": "/question-media/moex-90-2-stage1-med2/MOEX-C002-090180-S5004-STAGE1-Q005.webp",
+      "stemImage": "/question-media/moex-90-2-stage1-med2-display/Q005.png",
       "options": {
         "A": "額葉(frontal lobe)",
         "B": "前中央腦回(precentral gyrus)",
@@ -276,7 +276,7 @@
       "chapter": "舊制官方原卷",
       "section": "醫學（二）",
       "stem": "從目視遠物轉到目視近物時，水晶體的形狀會作何改變？",
-      "stemImage": "/question-media/moex-90-2-stage1-med2/MOEX-C002-090180-S5004-STAGE1-Q006.webp",
+      "stemImage": "/question-media/moex-90-2-stage1-med2-display/Q006.png",
       "options": {
         "A": "由扁平狀變成圓球狀",
         "B": "由圓球狀變成扁平狀",
@@ -327,7 +327,7 @@
       "chapter": "舊制官方原卷",
       "section": "醫學（二）",
       "stem": "運動時下列何者的血流量不增反降？",
-      "stemImage": "/question-media/moex-90-2-stage1-med2/MOEX-C002-090180-S5004-STAGE1-Q007.webp",
+      "stemImage": "/question-media/moex-90-2-stage1-med2-display/Q007.png",
       "options": {
         "A": "心臟",
         "B": "骨骼肌",
@@ -378,7 +378,7 @@
       "chapter": "舊制官方原卷",
       "section": "醫學（二）",
       "stem": "頸動脈體(carotid bodies)是由第幾對腦神經支配？",
-      "stemImage": "/question-media/moex-90-2-stage1-med2/MOEX-C002-090180-S5004-STAGE1-Q008.webp",
+      "stemImage": "/question-media/moex-90-2-stage1-med2-display/Q008.png",
       "options": {
         "A": "第十一對",
         "B": "第十對",
@@ -429,7 +429,7 @@
       "chapter": "舊制官方原卷",
       "section": "醫學（二）",
       "stem": "下列何者不是紅血球生成所需？",
-      "stemImage": "/question-media/moex-90-2-stage1-med2/MOEX-C002-090180-S5004-STAGE1-Q009.webp",
+      "stemImage": "/question-media/moex-90-2-stage1-med2-display/Q009.png",
       "options": {
         "A": "鐵質(iron)",
         "B": "葉酸(folic acid)",
@@ -480,7 +480,7 @@
       "chapter": "舊制官方原卷",
       "section": "醫學（二）",
       "stem": "當呼吸空氣時，通氣量(ventilation)增加，肺泡中的二氧化碳分壓如何改變？",
-      "stemImage": "/question-media/moex-90-2-stage1-med2/MOEX-C002-090180-S5004-STAGE1-Q010.webp",
+      "stemImage": "/question-media/moex-90-2-stage1-med2-display/Q010.png",
       "options": {
         "A": "不變",
         "B": "增加",
@@ -531,7 +531,7 @@
       "chapter": "舊制官方原卷",
       "section": "醫學（二）",
       "stem": "甲小姐的肺的可容度(compliance)很高，這表示她的肺：",
-      "stemImage": "/question-media/moex-90-2-stage1-med2/MOEX-C002-090180-S5004-STAGE1-Q011.webp",
+      "stemImage": "/question-media/moex-90-2-stage1-med2-display/Q011.png",
       "options": {
         "A": "擴張容易",
         "B": "擴張困難",
@@ -582,7 +582,7 @@
       "chapter": "舊制官方原卷",
       "section": "醫學（二）",
       "stem": "下列何者為小腸最常見的運動方式？",
-      "stemImage": "/question-media/moex-90-2-stage1-med2/MOEX-C002-090180-S5004-STAGE1-Q012.webp",
+      "stemImage": "/question-media/moex-90-2-stage1-med2-display/Q012.png",
       "options": {
         "A": "蠕動(peristalsis)",
         "B": "分節式收縮(segmentation)",
@@ -633,7 +633,7 @@
       "chapter": "舊制官方原卷",
       "section": "醫學（二）",
       "stem": "膽汁是由下列何者所製造的？",
-      "stemImage": "/question-media/moex-90-2-stage1-med2/MOEX-C002-090180-S5004-STAGE1-Q013.webp",
+      "stemImage": "/question-media/moex-90-2-stage1-med2-display/Q013.png",
       "options": {
         "A": "膽囊",
         "B": "胰臟",
@@ -684,7 +684,7 @@
       "chapter": "舊制官方原卷",
       "section": "醫學（二）",
       "stem": "除了葡萄糖以外，腦細胞最主要的能量來源為下列何者？",
-      "stemImage": "/question-media/moex-90-2-stage1-med2/MOEX-C002-090180-S5004-STAGE1-Q014.webp",
+      "stemImage": "/question-media/moex-90-2-stage1-med2-display/Q014.png",
       "options": {
         "A": "脂肪酸(fatty acid)",
         "B": "酮體(ketone bodies)",
@@ -735,7 +735,7 @@
       "chapter": "舊制官方原卷",
       "section": "醫學（二）",
       "stem": "下列何種情況會增加鉀排泄？",
-      "stemImage": "/question-media/moex-90-2-stage1-med2/MOEX-C002-090180-S5004-STAGE1-Q015.webp",
+      "stemImage": "/question-media/moex-90-2-stage1-med2-display/Q015.png",
       "options": {
         "A": "滲透性利尿(osmotic diuresis)",
         "B": "急性的代謝性酸中毒(acute metabolic acidosis)",
@@ -786,7 +786,7 @@
       "chapter": "舊制官方原卷",
       "section": "醫學（二）",
       "stem": "下列有關高蛋白質飲食對腎臟功能的影響，何者正確？",
-      "stemImage": "/question-media/moex-90-2-stage1-med2/MOEX-C002-090180-S5004-STAGE1-Q016.webp",
+      "stemImage": "/question-media/moex-90-2-stage1-med2-display/Q016.png",
       "options": {
         "A": "可降低腎絲球毛細血管血壓",
         "B": "可降低腎血流量",
@@ -837,7 +837,7 @@
       "chapter": "舊制官方原卷",
       "section": "醫學（二）",
       "stem": "在生理情況下，血中生成乙型血管張力素(angiotensin II)的限制步驟(rate-limiting step)為何？",
-      "stemImage": "/question-media/moex-90-2-stage1-med2/MOEX-C002-090180-S5004-STAGE1-Q017.webp",
+      "stemImage": "/question-media/moex-90-2-stage1-med2-display/Q017.png",
       "options": {
         "A": "血管張力素原(angiotensinogen)的濃度",
         "B": "腎素(renin)的活性",
@@ -888,7 +888,7 @@
       "chapter": "舊制官方原卷",
       "section": "醫學（二）",
       "stem": "在下列諸症狀中，何者與腎上腺促糖皮質激素(glucocorticoid)分泌過多無關？",
-      "stemImage": "/question-media/moex-90-2-stage1-med2/MOEX-C002-090180-S5004-STAGE1-Q018.webp",
+      "stemImage": "/question-media/moex-90-2-stage1-med2-display/Q018.png",
       "options": {
         "A": "傷口癒合不良(poor wound healing)",
         "B": "骨質疏鬆症(osteoporosis)",
@@ -939,7 +939,7 @@
       "chapter": "舊制官方原卷",
       "section": "醫學（二）",
       "stem": "下列那一內分泌腺功能不足時，在注射葡萄糖液後，可能引發高燒(glucose fever)而導致死亡？",
-      "stemImage": "/question-media/moex-90-2-stage1-med2/MOEX-C002-090180-S5004-STAGE1-Q019.webp",
+      "stemImage": "/question-media/moex-90-2-stage1-med2-display/Q019.png",
       "options": {
         "A": "腎上腺(adrenal glands)",
         "B": "胰臟藍氏小島(islets of Langerhans)",
@@ -990,7 +990,7 @@
       "chapter": "舊制官方原卷",
       "section": "醫學（二）",
       "stem": "下列何者對葡萄糖的吸收不受胰島素的促進？",
-      "stemImage": "/question-media/moex-90-2-stage1-med2/MOEX-C002-090180-S5004-STAGE1-Q020.webp",
+      "stemImage": "/question-media/moex-90-2-stage1-med2-display/Q020.png",
       "options": {
         "A": "骨骼肌細胞",
         "B": "心肌細胞",
@@ -1041,7 +1041,7 @@
       "chapter": "舊制官方原卷",
       "section": "醫學（二）",
       "stem": "甲狀腺荷爾蒙(thyroid hormones)會調節腦下垂腺中，何種特異基因的表現：",
-      "stemImage": "/question-media/moex-90-2-stage1-med2/MOEX-C002-090180-S5004-STAGE1-Q021.webp",
+      "stemImage": "/question-media/moex-90-2-stage1-med2-display/Q021.png",
       "options": {
         "A": "malic enzyme",
         "B": "growth hormone",
@@ -1092,7 +1092,7 @@
       "chapter": "舊制官方原卷",
       "section": "醫學（二）",
       "stem": "糖新生途徑(gluconeogenesis)主要發生在何器官？",
-      "stemImage": "/question-media/moex-90-2-stage1-med2/MOEX-C002-090180-S5004-STAGE1-Q022.webp",
+      "stemImage": "/question-media/moex-90-2-stage1-med2-display/Q022.png",
       "options": {
         "A": "肌肉",
         "B": "心臟",
@@ -1143,7 +1143,7 @@
       "chapter": "舊制官方原卷",
       "section": "醫學（二）",
       "stem": "電子傳遞鏈中協助電子傳遞的分子，那個進行兩個電子的傳遞：",
-      "stemImage": "/question-media/moex-90-2-stage1-med2/MOEX-C002-090180-S5004-STAGE1-Q023.webp",
+      "stemImage": "/question-media/moex-90-2-stage1-med2-display/Q023.png",
       "options": {
         "A": "輔酶 Q(coenzyme Q)",
         "B": "銅離子(copper ions)",
@@ -1194,7 +1194,7 @@
       "chapter": "舊制官方原卷",
       "section": "醫學（二）",
       "stem": "真核生物 RNA polymerase II 的 carboxy-terminal domain(CTD)被磷酸化時，始進行：",
-      "stemImage": "/question-media/moex-90-2-stage1-med2/MOEX-C002-090180-S5004-STAGE1-Q024.webp",
+      "stemImage": "/question-media/moex-90-2-stage1-med2-display/Q024.png",
       "options": {
         "A": "initiation",
         "B": "elongation",
@@ -1245,7 +1245,7 @@
       "chapter": "舊制官方原卷",
       "section": "醫學（二）",
       "stem": "一分子蔗糖(sucrose)經蔗糖酶分解，再經糖解途徑，在無氧(anaerobic)狀態下，代謝成乳酸。請問可得多少 ATP：",
-      "stemImage": "/question-media/moex-90-2-stage1-med2/MOEX-C002-090180-S5004-STAGE1-Q025.webp",
+      "stemImage": "/question-media/moex-90-2-stage1-med2-display/Q025.png",
       "options": {
         "A": "72",
         "B": "38",
@@ -1296,7 +1296,7 @@
       "chapter": "舊制官方原卷",
       "section": "醫學（二）",
       "stem": "半乳醣血症(galactosemia)因為下列何酵素異常無法代謝，導致半乳醣累積在血液及組織中，造成精神遲滯、白內障、器官腫大等症狀：",
-      "stemImage": "/question-media/moex-90-2-stage1-med2/MOEX-C002-090180-S5004-STAGE1-Q026.webp",
+      "stemImage": "/question-media/moex-90-2-stage1-med2-display/Q026.png",
       "options": {
         "A": "galactokinase",
         "B": "galactose 1-phosphate uridyltransferase",
@@ -1347,7 +1347,7 @@
       "chapter": "舊制官方原卷",
       "section": "醫學（二）",
       "stem": "乳酸去氫酶(LDH)有五種同功酶(isozyme)，其中在肌肉主要為 M₄，在心臟主要為 H₄，何者同功酶最能促進 NAD⁺再生：",
-      "stemImage": "/question-media/moex-90-2-stage1-med2/MOEX-C002-090180-S5004-STAGE1-Q027.webp",
+      "stemImage": "/question-media/moex-90-2-stage1-med2-display/Q027.png",
       "options": {
         "A": "M₄",
         "B": "M₃H₁",
@@ -1398,7 +1398,7 @@
       "chapter": "舊制官方原卷",
       "section": "醫學（二）",
       "stem": "有關真核生物 mRNA splicing 之敘述何者錯誤：",
-      "stemImage": "/question-media/moex-90-2-stage1-med2/MOEX-C002-090180-S5004-STAGE1-Q028.webp",
+      "stemImage": "/question-media/moex-90-2-stage1-med2-display/Q028.png",
       "options": {
         "A": "splicing 過程需形成 spliceosome，轉變 primary transcript 為 mRNA",
         "B": "mRNA 與 spliceosome 結合為 small nucleoprotein (snRNP) complex",
@@ -1449,7 +1449,7 @@
       "chapter": "舊制官方原卷",
       "section": "醫學（二）",
       "stem": "會生成中間代謝物核醣五磷酸(ribose 5-phosphate)，做為 nucleotide 和 nucleic acid 生合成的 ribose 來源的途徑為：",
-      "stemImage": "/question-media/moex-90-2-stage1-med2/MOEX-C002-090180-S5004-STAGE1-Q029.webp",
+      "stemImage": "/question-media/moex-90-2-stage1-med2-display/Q029.png",
       "options": {
         "A": "糖解途徑(glycolysis)",
         "B": "糖新生途徑(gluconeogenesis)",
@@ -1500,7 +1500,7 @@
       "chapter": "舊制官方原卷",
       "section": "醫學（二）",
       "stem": "臨床上 Tay-Sachs disease 是下列何種物質，因 N-acetyl hexosaminidase A 缺乏而代謝不正常，累積在腦部造成：",
-      "stemImage": "/question-media/moex-90-2-stage1-med2/MOEX-C002-090180-S5004-STAGE1-Q030.webp",
+      "stemImage": "/question-media/moex-90-2-stage1-med2-display/Q030.png",
       "options": {
         "A": "sphingomyeline",
         "B": "ceramide",
@@ -1551,7 +1551,7 @@
       "chapter": "舊制官方原卷",
       "section": "醫學（二）",
       "stem": "檸檬酸循環（TCA cycle）在粒線體的基質（matrix）中進行，何者為與電子傳遞鏈結合在一起，吸附在內膜上的酵素：",
-      "stemImage": "/question-media/moex-90-2-stage1-med2/MOEX-C002-090180-S5004-STAGE1-Q031.webp",
+      "stemImage": "/question-media/moex-90-2-stage1-med2-display/Q031.png",
       "options": {
         "A": "succinate dehydrogenase",
         "B": "citrate synthase",
@@ -1602,7 +1602,7 @@
       "chapter": "舊制官方原卷",
       "section": "醫學（二）",
       "stem": "hypoxanthine-guanine phosphoribosyltransferase(HGPRT)缺乏，會導致：",
-      "stemImage": "/question-media/moex-90-2-stage1-med2/MOEX-C002-090180-S5004-STAGE1-Q032.webp",
+      "stemImage": "/question-media/moex-90-2-stage1-med2-display/Q032.png",
       "options": {
         "A": "albinism",
         "B": "alkaptonuria",
@@ -1653,7 +1653,7 @@
       "chapter": "舊制官方原卷",
       "section": "醫學（二）",
       "stem": "下列那一分子不起 protein kinase C (PKC) pathway 之 secondary messenger：",
-      "stemImage": "/question-media/moex-90-2-stage1-med2/MOEX-C002-090180-S5004-STAGE1-Q033.webp",
+      "stemImage": "/question-media/moex-90-2-stage1-med2-display/Q033.png",
       "options": {
         "A": "Ca²⁺",
         "B": "cAMP",
@@ -1704,7 +1704,7 @@
       "chapter": "舊制官方原卷",
       "section": "醫學（二）",
       "stem": "藥物對酵素作用為不可逆的抑制（irreversible inhibition）為：",
-      "stemImage": "/question-media/moex-90-2-stage1-med2/MOEX-C002-090180-S5004-STAGE1-Q034.webp",
+      "stemImage": "/question-media/moex-90-2-stage1-med2-display/Q034.png",
       "options": {
         "A": "penicillin 與 lysozyme 的 serine 結合",
         "B": "磺胺劑與 folate synthase 的 p-amino benzoic acid 結合位",
@@ -1755,7 +1755,7 @@
       "chapter": "舊制官方原卷",
       "section": "醫學（二）",
       "stem": "抗癌藥物 methotrexate 的標的酵素是：",
-      "stemImage": "/question-media/moex-90-2-stage1-med2/MOEX-C002-090180-S5004-STAGE1-Q035.webp",
+      "stemImage": "/question-media/moex-90-2-stage1-med2-display/Q035.png",
       "options": {
         "A": "thymidylate synthase",
         "B": "dihydrofolate reductase",
@@ -1806,7 +1806,7 @@
       "chapter": "舊制官方原卷",
       "section": "醫學（二）",
       "stem": "酵素動力學 substrate vs velocity 導出 Michaelis-Menten Equation，其中有關常數敘述如下，何者正確：",
-      "stemImage": "/question-media/moex-90-2-stage1-med2/MOEX-C002-090180-S5004-STAGE1-Q036.webp",
+      "stemImage": "/question-media/moex-90-2-stage1-med2-display/Q036.png",
       "options": {
         "A": "轉換數 kcat：是測量單位時間內一分子酵素催化多少反應物",
         "B": "Michaelis 常數 K_M：代表酵素與反應物的碰撞頻率",
@@ -1857,7 +1857,7 @@
       "chapter": "舊制官方原卷",
       "section": "醫學（二）",
       "stem": "根據 Ramachandran Plots，某一 peptide 之 backbone 中，φ=-60°、φ=-50°，其二級結構為：",
-      "stemImage": "/question-media/moex-90-2-stage1-med2/MOEX-C002-090180-S5004-STAGE1-Q037.webp",
+      "stemImage": "/question-media/moex-90-2-stage1-med2-display/Q037.png",
       "options": {
         "A": "β-turn",
         "B": "α-helix",
@@ -1909,7 +1909,7 @@
       "chapter": "舊制官方原卷",
       "section": "醫學（二）",
       "stem": "那一個氨基酸在人體內可轉變為 cysteine：",
-      "stemImage": "/question-media/moex-90-2-stage1-med2/MOEX-C002-090180-S5004-STAGE1-Q038.webp",
+      "stemImage": "/question-media/moex-90-2-stage1-med2-display/Q038.png",
       "options": {
         "A": "threonine",
         "B": "lysine",
@@ -1960,7 +1960,7 @@
       "chapter": "舊制官方原卷",
       "section": "醫學（二）",
       "stem": "眼鏡蛇(Indian cobra,Naja naja)蛇毒含有 phospholipase A₂，會分解 glycerophospholipids 的那一個位置：",
-      "stemImage": "/question-media/moex-90-2-stage1-med2/MOEX-C002-090180-S5004-STAGE1-Q039.webp",
+      "stemImage": "/question-media/moex-90-2-stage1-med2-display/Q039.png",
       "options": {
         "A": "C-1",
         "B": "C-2",
@@ -2011,7 +2011,7 @@
       "chapter": "舊制官方原卷",
       "section": "醫學（二）",
       "stem": "蜂蜜主成分為果糖，泡在熱水比較不甜，因為溫度會使：",
-      "stemImage": "/question-media/moex-90-2-stage1-med2/MOEX-C002-090180-S5004-STAGE1-Q040.webp",
+      "stemImage": "/question-media/moex-90-2-stage1-med2-display/Q040.png",
       "options": {
         "A": "果糖轉換成葡萄糖",
         "B": "吡喃糖(pyranose)轉換成呋喃糖(furanose)",
@@ -2062,7 +2062,7 @@
       "chapter": "舊制官方原卷",
       "section": "醫學（二）",
       "stem": "下列何者的急性中毒症狀先是精神運動失調、頭痛、意識混亂、心跳加快，最後昏迷、呼吸衰竭？",
-      "stemImage": "/question-media/moex-90-2-stage1-med2/MOEX-C002-090180-S5004-STAGE1-Q041.webp",
+      "stemImage": "/question-media/moex-90-2-stage1-med2-display/Q041.png",
       "options": {
         "A": "CO",
         "B": "SO₂",
@@ -2113,7 +2113,7 @@
       "chapter": "舊制官方原卷",
       "section": "醫學（二）",
       "stem": "下列何者有助於藥物分子被動運送穿過細胞膜？",
-      "stemImage": "/question-media/moex-90-2-stage1-med2/MOEX-C002-090180-S5004-STAGE1-Q042.webp",
+      "stemImage": "/question-media/moex-90-2-stage1-med2-display/Q042.png",
       "options": {
         "A": "極性",
         "B": "大分子量",
@@ -2164,7 +2164,7 @@
       "chapter": "舊制官方原卷",
       "section": "醫學（二）",
       "stem": "下列基因轉送常用之載體中，何者會有宿主免疫反應之缺點？",
-      "stemImage": "/question-media/moex-90-2-stage1-med2/MOEX-C002-090180-S5004-STAGE1-Q043.webp",
+      "stemImage": "/question-media/moex-90-2-stage1-med2-display/Q043.png",
       "options": {
         "A": "plasmid",
         "B": "liposome",
@@ -2215,7 +2215,7 @@
       "chapter": "舊制官方原卷",
       "section": "醫學（二）",
       "stem": "一病人罹患肺結核，醫師給予混合藥物治療：isoniazid+rifampin+ethambutol+pyrazinamide 以及 vit B₆，服藥不久，病人尿液帶點紅色，此為那種藥物之副作用？",
-      "stemImage": "/question-media/moex-90-2-stage1-med2/MOEX-C002-090180-S5004-STAGE1-Q044.webp",
+      "stemImage": "/question-media/moex-90-2-stage1-med2-display/Q044.png",
       "options": {
         "A": "rifampin",
         "B": "isoniazid",
@@ -2266,7 +2266,7 @@
       "chapter": "舊制官方原卷",
       "section": "醫學（二）",
       "stem": "對於 penicillin 過敏之病患，不適宜使用下列何種抗生素？",
-      "stemImage": "/question-media/moex-90-2-stage1-med2/MOEX-C002-090180-S5004-STAGE1-Q045.webp",
+      "stemImage": "/question-media/moex-90-2-stage1-med2-display/Q045.png",
       "options": {
         "A": "vancomycin",
         "B": "cephalosporins",
@@ -2317,7 +2317,7 @@
       "chapter": "舊制官方原卷",
       "section": "醫學（二）",
       "stem": "口服鐵劑治療貧血，最常見之副作用為何？",
-      "stemImage": "/question-media/moex-90-2-stage1-med2/MOEX-C002-090180-S5004-STAGE1-Q046.webp",
+      "stemImage": "/question-media/moex-90-2-stage1-med2-display/Q046.png",
       "options": {
         "A": "腸胃道刺激作用",
         "B": "低血鉀症",
@@ -2368,7 +2368,7 @@
       "chapter": "舊制官方原卷",
       "section": "醫學（二）",
       "stem": "下列何者非貧血治療劑？",
-      "stemImage": "/question-media/moex-90-2-stage1-med2/MOEX-C002-090180-S5004-STAGE1-Q047.webp",
+      "stemImage": "/question-media/moex-90-2-stage1-med2-display/Q047.png",
       "options": {
         "A": "vitamin B₁₂",
         "B": "erythropoietin",
@@ -2419,7 +2419,7 @@
       "chapter": "舊制官方原卷",
       "section": "醫學（二）",
       "stem": "腎上腺皮質之 zona glomerulosa 主要會合成：",
-      "stemImage": "/question-media/moex-90-2-stage1-med2/MOEX-C002-090180-S5004-STAGE1-Q048.webp",
+      "stemImage": "/question-media/moex-90-2-stage1-med2-display/Q048.png",
       "options": {
         "A": "aldosterone",
         "B": "androstenedione",
@@ -2470,7 +2470,7 @@
       "chapter": "舊制官方原卷",
       "section": "醫學（二）",
       "stem": "desmopressin 可增加血中何種因子之濃度？",
-      "stemImage": "/question-media/moex-90-2-stage1-med2/MOEX-C002-090180-S5004-STAGE1-Q049.webp",
+      "stemImage": "/question-media/moex-90-2-stage1-med2-display/Q049.png",
       "options": {
         "A": "Factor II",
         "B": "Factor VII",
@@ -2521,7 +2521,7 @@
       "chapter": "舊制官方原卷",
       "section": "醫學（二）",
       "stem": "下列何種 lipoprotein 與動脈粥狀硬化的產生最有相關？",
-      "stemImage": "/question-media/moex-90-2-stage1-med2/MOEX-C002-090180-S5004-STAGE1-Q050.webp",
+      "stemImage": "/question-media/moex-90-2-stage1-med2-display/Q050.png",
       "options": {
         "A": "VLDL",
         "B": "LDL",
@@ -2572,7 +2572,7 @@
       "chapter": "舊制官方原卷",
       "section": "醫學（二）",
       "stem": "用於治療因服用 digitalis 所引起的心律不整之首選藥物是：",
-      "stemImage": "/question-media/moex-90-2-stage1-med2/MOEX-C002-090180-S5004-STAGE1-Q051.webp",
+      "stemImage": "/question-media/moex-90-2-stage1-med2-display/Q051.png",
       "options": {
         "A": "lidocaine",
         "B": "propranolol",
@@ -2623,7 +2623,7 @@
       "chapter": "舊制官方原卷",
       "section": "醫學（二）",
       "stem": "下列何者可以抑制副交感神經刺激所引起心跳緩慢的作用？",
-      "stemImage": "/question-media/moex-90-2-stage1-med2/MOEX-C002-090180-S5004-STAGE1-Q052.webp",
+      "stemImage": "/question-media/moex-90-2-stage1-med2-display/Q052.png",
       "options": {
         "A": "propranolol",
         "B": "prazosin",
@@ -2674,7 +2674,7 @@
       "chapter": "舊制官方原卷",
       "section": "醫學（二）",
       "stem": "下列 acetylcholine 引起的作用何者不會被 atropine 與 scopolamine 抑制？",
-      "stemImage": "/question-media/moex-90-2-stage1-med2/MOEX-C002-090180-S5004-STAGE1-Q053.webp",
+      "stemImage": "/question-media/moex-90-2-stage1-med2-display/Q053.png",
       "options": {
         "A": "心跳變慢",
         "B": "唾液分泌",
@@ -2725,7 +2725,7 @@
       "chapter": "舊制官方原卷",
       "section": "醫學（二）",
       "stem": "下列何種瀉劑需與水一起服用，以避免食道阻塞？",
-      "stemImage": "/question-media/moex-90-2-stage1-med2/MOEX-C002-090180-S5004-STAGE1-Q054.webp",
+      "stemImage": "/question-media/moex-90-2-stage1-med2-display/Q054.png",
       "options": {
         "A": "danthron",
         "B": "methylcellulose",
@@ -2776,7 +2776,7 @@
       "chapter": "舊制官方原卷",
       "section": "醫學（二）",
       "stem": "患肺炎的老年人不宜使用下列何種瀉劑，因為抑制脂溶性維生素的吸收？",
-      "stemImage": "/question-media/moex-90-2-stage1-med2/MOEX-C002-090180-S5004-STAGE1-Q055.webp",
+      "stemImage": "/question-media/moex-90-2-stage1-med2-display/Q055.png",
       "options": {
         "A": "mineral oil",
         "B": "danthron",
@@ -2827,7 +2827,7 @@
       "chapter": "舊制官方原卷",
       "section": "醫學（二）",
       "stem": "下列何種 polypeptide 會增加微血管的通透性及水腫？",
-      "stemImage": "/question-media/moex-90-2-stage1-med2/MOEX-C002-090180-S5004-STAGE1-Q056.webp",
+      "stemImage": "/question-media/moex-90-2-stage1-med2-display/Q056.png",
       "options": {
         "A": "captopril",
         "B": "histamine",
@@ -2878,7 +2878,7 @@
       "chapter": "舊制官方原卷",
       "section": "醫學（二）",
       "stem": "誤飲含甲醇之假酒時，可用下列何者作為解毒劑，以減少甲醇所造成之傷害？",
-      "stemImage": "/question-media/moex-90-2-stage1-med2/MOEX-C002-090180-S5004-STAGE1-Q057.webp",
+      "stemImage": "/question-media/moex-90-2-stage1-med2-display/Q057.png",
       "options": {
         "A": "naloxone",
         "B": "ethanol",
@@ -2929,7 +2929,7 @@
       "chapter": "舊制官方原卷",
       "section": "醫學（二）",
       "stem": "下列何者長期使用會造成 retroperitoneal fibrosis？",
-      "stemImage": "/question-media/moex-90-2-stage1-med2/MOEX-C002-090180-S5004-STAGE1-Q058.webp",
+      "stemImage": "/question-media/moex-90-2-stage1-med2-display/Q058.png",
       "options": {
         "A": "penicillamine",
         "B": "cimetidine",
@@ -2980,7 +2980,7 @@
       "chapter": "舊制官方原卷",
       "section": "醫學（二）",
       "stem": "bromocriptine 可用於治療巴金森症，其作用機轉為何？",
-      "stemImage": "/question-media/moex-90-2-stage1-med2/MOEX-C002-090180-S5004-STAGE1-Q059.webp",
+      "stemImage": "/question-media/moex-90-2-stage1-med2-display/Q059.png",
       "options": {
         "A": "在腦中轉變成 dopamine，是 dopamine 之前驅物",
         "B": "是 amino acid decarboxylase 之抑制劑",
@@ -3031,7 +3031,7 @@
       "chapter": "舊制官方原卷",
       "section": "醫學（二）",
       "stem": "下列吸入性麻醉藥物，何者對血壓及心搏輸出量的抑制最強？",
-      "stemImage": "/question-media/moex-90-2-stage1-med2/MOEX-C002-090180-S5004-STAGE1-Q060.webp",
+      "stemImage": "/question-media/moex-90-2-stage1-med2-display/Q060.png",
       "options": {
         "A": "halothane",
         "B": "isoflurane",
@@ -3082,7 +3082,7 @@
       "chapter": "舊制官方原卷",
       "section": "醫學（二）",
       "stem": "有關職業健檢，以下何者正確？",
-      "stemImage": "/question-media/moex-90-2-stage1-med2/MOEX-C002-090180-S5004-STAGE1-Q061.webp",
+      "stemImage": "/question-media/moex-90-2-stage1-med2-display/Q061.png",
       "options": {
         "A": "通常針對環境暴露所可能造成的問題著手",
         "B": "只須顧及員工本人的健康安全",
@@ -3133,7 +3133,7 @@
       "chapter": "舊制官方原卷",
       "section": "醫學（二）",
       "stem": "存在於火腿、臘腸，以及殺菌不完全的罐裝食品中，主要症狀為神經麻痺的食物中毒為那一種細菌？",
-      "stemImage": "/question-media/moex-90-2-stage1-med2/MOEX-C002-090180-S5004-STAGE1-Q062.webp",
+      "stemImage": "/question-media/moex-90-2-stage1-med2-display/Q062.png",
       "options": {
         "A": "葡萄球菌",
         "B": "肉毒桿菌",
@@ -3184,7 +3184,7 @@
       "chapter": "舊制官方原卷",
       "section": "醫學（二）",
       "stem": "職業安全衛生最沒有效果，應列入最後考慮的方法是：",
-      "stemImage": "/question-media/moex-90-2-stage1-med2/MOEX-C002-090180-S5004-STAGE1-Q063.webp",
+      "stemImage": "/question-media/moex-90-2-stage1-med2-display/Q063.png",
       "options": {
         "A": "取代",
         "B": "隔離",
@@ -3235,7 +3235,7 @@
       "chapter": "舊制官方原卷",
       "section": "醫學（二）",
       "stem": "以下何者為次發性污染物(secondary pollutants)所造成之空氣污染必須具備，而為原發性污染物(primary pollutants)所造成之空氣污染不必具備之要件？",
-      "stemImage": "/question-media/moex-90-2-stage1-med2/MOEX-C002-090180-S5004-STAGE1-Q064.webp",
+      "stemImage": "/question-media/moex-90-2-stage1-med2-display/Q064.png",
       "options": {
         "A": "盆地地形",
         "B": "逆溫層",
@@ -3286,7 +3286,7 @@
       "chapter": "舊制官方原卷",
       "section": "醫學（二）",
       "stem": "溫室效應氣體對全球暖化貢獻最大的是：",
-      "stemImage": "/question-media/moex-90-2-stage1-med2/MOEX-C002-090180-S5004-STAGE1-Q065.webp",
+      "stemImage": "/question-media/moex-90-2-stage1-med2-display/Q065.png",
       "options": {
         "A": "CFCs",
         "B": "CH₄",
@@ -3337,7 +3337,7 @@
       "chapter": "舊制官方原卷",
       "section": "醫學（二）",
       "stem": "以下那一種流行病學的測量，分母是「人時」(person-time)？",
-      "stemImage": "/question-media/moex-90-2-stage1-med2/MOEX-C002-090180-S5004-STAGE1-Q066.webp",
+      "stemImage": "/question-media/moex-90-2-stage1-med2-display/Q066.png",
       "options": {
         "A": "盛行率",
         "B": "分率",
@@ -3388,7 +3388,7 @@
       "chapter": "舊制官方原卷",
       "section": "醫學（二）",
       "stem": "以下何種敘述符合科學的基本思考方法「猜測與否證法」？",
-      "stemImage": "/question-media/moex-90-2-stage1-med2/MOEX-C002-090180-S5004-STAGE1-Q067.webp",
+      "stemImage": "/question-media/moex-90-2-stage1-med2-display/Q067.png",
       "options": {
         "A": "先有觀察，後有假說",
         "B": "好的定理是被證實多次的",
@@ -3439,7 +3439,7 @@
       "chapter": "舊制官方原卷",
       "section": "醫學（二）",
       "stem": "測量上的「系統性誤差」(systemic error)：",
-      "stemImage": "/question-media/moex-90-2-stage1-med2/MOEX-C002-090180-S5004-STAGE1-Q068.webp",
+      "stemImage": "/question-media/moex-90-2-stage1-med2-display/Q068.png",
       "options": {
         "A": "是信度的指標",
         "B": "是測量值與真值的差距",
@@ -3490,7 +3490,7 @@
       "chapter": "舊制官方原卷",
       "section": "醫學（二）",
       "stem": "如果暴露組某種疾病的發生率是 30/10 萬人年，非暴露組該種疾病的發生率是 10/10 萬人年，則該暴露對該疾病的病因分率(etiologic fraction)或可歸因之危險百分率(attributable risk percent)為：",
-      "stemImage": "/question-media/moex-90-2-stage1-med2/MOEX-C002-090180-S5004-STAGE1-Q069.webp",
+      "stemImage": "/question-media/moex-90-2-stage1-med2-display/Q069.png",
       "options": {
         "A": "+66.7%",
         "B": "-66.7%",
@@ -3541,7 +3541,7 @@
       "chapter": "舊制官方原卷",
       "section": "醫學（二）",
       "stem": "欲測量一群高血壓病人在服用某一降血壓藥物之前與之後是否有較低的血壓，應用以下何種檢定？",
-      "stemImage": "/question-media/moex-90-2-stage1-med2/MOEX-C002-090180-S5004-STAGE1-Q070.webp",
+      "stemImage": "/question-media/moex-90-2-stage1-med2-display/Q070.png",
       "options": {
         "A": "變異數分析(ANOVA)",
         "B": "兩個獨立樣本之 t-檢定",
@@ -3592,7 +3592,7 @@
       "chapter": "舊制官方原卷",
       "section": "醫學（二）",
       "stem": "若要從事「肺氣腫」的個案對照研究，若個案是某「社區醫院」某段時期所有因「肺氣腫」來就醫的新病人，那麼對照組適合選取：",
-      "stemImage": "/question-media/moex-90-2-stage1-med2/MOEX-C002-090180-S5004-STAGE1-Q071.webp",
+      "stemImage": "/question-media/moex-90-2-stage1-med2-display/Q071.png",
       "options": {
         "A": "個案之鄰居",
         "B": "該院同時期因肺癌來就醫的新病人",
@@ -3643,7 +3643,7 @@
       "chapter": "舊制官方原卷",
       "section": "醫學（二）",
       "stem": "有一試驗欲檢定某利尿劑真的有效，試驗開始前必須決定樣本數大小，以便在同一群人身上觀察服藥前後尿量的差別。請問以下何者不會影響樣本數的大小？",
-      "stemImage": "/question-media/moex-90-2-stage1-med2/MOEX-C002-090180-S5004-STAGE1-Q072.webp",
+      "stemImage": "/question-media/moex-90-2-stage1-med2-display/Q072.png",
       "options": {
         "A": "服藥前後尿量的平均改變量",
         "B": "檢力(power)",
@@ -3694,7 +3694,7 @@
       "chapter": "舊制官方原卷",
       "section": "醫學（二）",
       "stem": "以下有關常態分配的敘述何者為非？",
-      "stemImage": "/question-media/moex-90-2-stage1-med2/MOEX-C002-090180-S5004-STAGE1-Q073.webp",
+      "stemImage": "/question-media/moex-90-2-stage1-med2-display/Q073.png",
       "options": {
         "A": "是對稱的分配",
         "B": "其期望值必為 0，變異數為 1",
@@ -3745,7 +3745,7 @@
       "chapter": "舊制官方原卷",
       "section": "醫學（二）",
       "stem": "為了測試某新製造之抗組織胺（A 藥）是否和原已上市之 B 藥同樣對一特定之過敏原有效，找來 30 對皆對該過敏原有反應之同卵雙胞胎，其中一人施以 A 藥，另一人施以 B 藥，然後測其效果。請問應該用以下何種檢定來比較 A 藥和 B 藥的效果？",
-      "stemImage": "/question-media/moex-90-2-stage1-med2/MOEX-C002-090180-S5004-STAGE1-Q074.webp",
+      "stemImage": "/question-media/moex-90-2-stage1-med2-display/Q074.png",
       "options": {
         "A": "兩個獨立樣本的 t 檢定",
         "B": "變異數分析",
@@ -3796,7 +3796,7 @@
       "chapter": "舊制官方原卷",
       "section": "醫學（二）",
       "stem": "強調「知覺」和「領悟」的重要性，認識某些行為是在個體瞭解情境，感受到刺激，並且清楚知道它的重要性之後才會發生，這種透過「內省」的思想過程去影響「外顯」行為的理論叫做：",
-      "stemImage": "/question-media/moex-90-2-stage1-med2/MOEX-C002-090180-S5004-STAGE1-Q075.webp",
+      "stemImage": "/question-media/moex-90-2-stage1-med2-display/Q075.png",
       "options": {
         "A": "認知學習理論",
         "B": "反應性制約理論",
@@ -3847,7 +3847,7 @@
       "chapter": "舊制官方原卷",
       "section": "醫學（二）",
       "stem": "有一全國性調查男女青少年抽煙的比例，抽完調查樣本之後，若想要檢定該樣本中男女的比例是否符合全國青少年男女比例，即應使用以下何種方法？",
-      "stemImage": "/question-media/moex-90-2-stage1-med2/MOEX-C002-090180-S5004-STAGE1-Q076.webp",
+      "stemImage": "/question-media/moex-90-2-stage1-med2-display/Q076.png",
       "options": {
         "A": "McNemar's test",
         "B": "Kruskal-Wallis test",
@@ -3898,7 +3898,7 @@
       "chapter": "舊制官方原卷",
       "section": "醫學（二）",
       "stem": "以下何種敘述合乎「健康教育」的精神？",
-      "stemImage": "/question-media/moex-90-2-stage1-med2/MOEX-C002-090180-S5004-STAGE1-Q077.webp",
+      "stemImage": "/question-media/moex-90-2-stage1-med2-display/Q077.png",
       "options": {
         "A": "單一方法，始終如一",
         "B": "不必計畫，隨機實施",
@@ -3949,7 +3949,7 @@
       "chapter": "舊制官方原卷",
       "section": "醫學（二）",
       "stem": "以下何者不是我國門診醫療的特色？",
-      "stemImage": "/question-media/moex-90-2-stage1-med2/MOEX-C002-090180-S5004-STAGE1-Q078.webp",
+      "stemImage": "/question-media/moex-90-2-stage1-med2-display/Q078.png",
       "options": {
         "A": "衛生教育多",
         "B": "處方率高",
@@ -4000,7 +4000,7 @@
       "chapter": "舊制官方原卷",
       "section": "醫學（二）",
       "stem": "以下何種健康保險支付制度理論上最能鼓勵醫院提供預防保健服務？",
-      "stemImage": "/question-media/moex-90-2-stage1-med2/MOEX-C002-090180-S5004-STAGE1-Q079.webp",
+      "stemImage": "/question-media/moex-90-2-stage1-med2-display/Q079.png",
       "options": {
         "A": "論服務量計酬(fee for service)",
         "B": "論人計酬(capitation)",
@@ -4051,7 +4051,7 @@
       "chapter": "舊制官方原卷",
       "section": "醫學（二）",
       "stem": "全民健保是一種社會保險，基於社會保險的精神，那些人應負擔較高的保費？",
-      "stemImage": "/question-media/moex-90-2-stage1-med2/MOEX-C002-090180-S5004-STAGE1-Q080.webp",
+      "stemImage": "/question-media/moex-90-2-stage1-med2-display/Q080.png",
       "options": {
         "A": "年輕的人",
         "B": "多病的人",

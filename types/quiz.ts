@@ -42,6 +42,7 @@ export type Question = {
     scope: string | null;
     answerNote?: string | null;
     transcriptionNotice?: string;
+    displayNotice?: string;
   };
   options: {
     A: string;
