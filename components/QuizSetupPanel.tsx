@@ -632,15 +632,15 @@ export function QuizSetupPanel({
               </div>
             </details>
 
-            {selectedPaper ? (
+            {visiblePaper ? (
               <details open={paperStatsOpen} onToggle={(event) => setPaperStatsOpen(event.currentTarget.open)}>
                 <summary className="cursor-pointer rounded-lg py-2 text-sm font-semibold text-slate-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500">
                   查看這份考卷的作答統計
                 </summary>
                 {paperStatsOpen ? <div className="mt-3">
                   <SelectedSimulationPaperPanel
-                    key={selectedPaper.key}
-                    paper={selectedPaper}
+                    key={visiblePaper.key}
+                    paper={visiblePaper}
                     canViewDetailedStats={canViewSelectedPaperDetails}
                   />
                 </div> : null}
