@@ -580,7 +580,7 @@ export function QuizSetupPanel({
                   {visiblePaper?.label ?? (activePaperMode === "past_paper" ? "請選擇這一年的考卷" : `${settings.subjectFilter === "醫學（二）" ? "醫學（二）" : "醫學（一）"} · ${paperModeLabels[activePaperMode]}`)}
                 </p>
                 <p className="mt-1 text-xs leading-5 text-slate-500">
-                  {activePaperMode === "random_past_paper" ? "題數依抽到的考卷" : `${selectedCount} 題`} · {feedbackModeLabels[settings.feedbackMode ?? "none"]}
+                  {activePaperMode === "random_past_paper" ? "題數依抽到的考卷" : activePaperMode === "past_paper" && !visiblePaper ? "請先選擇考卷" : `${selectedCount} 題`} · {feedbackModeLabels[settings.feedbackMode ?? "none"]}
                 </p>
               </div>
               <button
@@ -589,7 +589,7 @@ export function QuizSetupPanel({
                 disabled={!canStart}
                 className="min-h-12 shrink-0 rounded-xl bg-brand-600 px-5 py-3 text-sm font-semibold text-white transition hover:bg-brand-700 disabled:cursor-not-allowed disabled:bg-slate-300"
               >
-                {activePaperMode === "random_past_paper" ? "開始模擬考" : `開始 ${selectedCount} 題模擬考`}
+                {activePaperMode === "random_past_paper" ? "開始模擬考" : activePaperMode === "past_paper" && !visiblePaper ? "選擇考卷後開始" : `開始 ${selectedCount} 題模擬考`}
               </button>
             </div>
 
