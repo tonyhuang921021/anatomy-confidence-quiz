@@ -73,10 +73,10 @@ test("章節練習會依年份排除其他考古題，未知年份只保留在�
   );
 });
 
-test("章節練習年份會交換反向範圍並限制在網站可選年份", () => {
+test("章節練習年份會交換反向範圍而不截掉實際題庫年份", () => {
   assert.deepEqual(
     normalizeProgressPracticeYearRange({ yearFrom: 2030, yearTo: 2010 }),
-    { yearFrom: 2010, yearTo: 2026 }
+    { yearFrom: 2010, yearTo: 2030 }
   );
 });
 
@@ -119,4 +119,13 @@ test("章節練習設定同時保存年份、題數、題池與未做優先順�
   assert.deepEqual(settings.priorityQuestionIds, ["new-2025", "seen-2025"]);
   assert.equal(settings.strictCustomQuestionPool, true);
   assert.equal(settings.customPoolLabel, "進度章節：生理學－心臟與循環");
+});
+
+
+
+test("章節練習可選民國97年，並保留新加入的90年題", () => {
+  const questions = [makeQuestion("q-90", 2001), makeQuestion("q-97", 2008), makeQuestion("q-98", 2009)];
+  const questionIds = questions.map((question) => question.id);
+  assert.deepEqual(getProgressPracticeQuestionIds({ questions, questionIds, yearRange: { yearFrom: 97, yearTo: 97 } }), ["q-97"]);
+  assert.deepEqual(getProgressPracticeQuestionIds({ questions, questionIds, yearRange: { yearFrom: 90, yearTo: 90 } }), ["q-90"]);
 });

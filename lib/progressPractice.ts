@@ -43,20 +43,7 @@ type ProgressPracticeInput = {
 export function normalizeProgressPracticeYearRange(
   range: ProgressPracticeYearRange
 ): ProgressPracticeYearRange {
-  const normalized = normalizePracticeYearRange(range);
-  const yearFrom = Math.max(
-    MIN_PRACTICE_SOURCE_YEAR,
-    Math.min(MAX_PRACTICE_SOURCE_YEAR, normalized.yearFrom)
-  );
-  const yearTo = Math.max(
-    MIN_PRACTICE_SOURCE_YEAR,
-    Math.min(MAX_PRACTICE_SOURCE_YEAR, normalized.yearTo)
-  );
-
-  return {
-    yearFrom: Math.min(yearFrom, yearTo),
-    yearTo: Math.max(yearFrom, yearTo)
-  };
+  return normalizePracticeYearRange(range);
 }
 
 export function getProgressPracticeQuestionIds({
@@ -67,8 +54,8 @@ export function getProgressPracticeQuestionIds({
   const normalizedRange = normalizeProgressPracticeYearRange(yearRange);
   const explicitQuestionIds = new Set(questionIds);
   const includesUnknownYear =
-    normalizedRange.yearFrom === MIN_PRACTICE_SOURCE_YEAR &&
-    normalizedRange.yearTo === MAX_PRACTICE_SOURCE_YEAR;
+    normalizedRange.yearFrom <= MIN_PRACTICE_SOURCE_YEAR &&
+    normalizedRange.yearTo >= MAX_PRACTICE_SOURCE_YEAR;
 
   return questions
     .filter((question) => {

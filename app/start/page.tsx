@@ -54,6 +54,7 @@ import {
   type AccountPreferencePatch
 } from "@/lib/accountPreferences";
 import {
+  getPracticeYearOptions,
   MAX_PRACTICE_SOURCE_YEAR,
   MIN_PRACTICE_SOURCE_YEAR,
   normalizePracticeYearRange
@@ -271,6 +272,15 @@ export default function StartPage() {
       return questionMatchesSubjectTracks(question, MICROBIOLOGY_SUBJECT, selectedMicrobiologyTracks);
     });
   }, [classificationOverrides, effectiveSelectedSubjects, selectedMicrobiologyTracks]);
+
+  const practiceYearOptions = useMemo(() => getPracticeYearOptions(
+    [
+      ...selectedSubjectQuestionPool.filter((question) => !excludeAiGenerated || question.sourceType !== "AI_GENERATED").map((question) => question.sourceYear),
+      ...(includeSeasonalLimited ? seasonalLimitedQuestions.filter((question) => !excludeAiGenerated || question.sourceType !== "AI_GENERATED").map((question) => question.sourceYear) : []),
+      ...(includeLegacyPapers ? legacyPaperQuestions.map((question) => question.sourceYear) : [])
+    ],
+    practiceYearRange
+  ), [selectedSubjectQuestionPool, includeSeasonalLimited, seasonalLimitedQuestions, includeLegacyPapers, excludeAiGenerated, practiceYearRange]);
 
   const availableQuestions = useMemo(() => {
     const filteredSubjectQuestions = selectedSubjectQuestionPool.filter((question) => {
@@ -851,6 +861,7 @@ export default function StartPage() {
                 availableQuestionCount={availableQuestionCount}
                 questionCount={practiceQuestionCount}
                 yearRange={practiceYearRange}
+                yearOptions={practiceYearOptions}
                 orderMode={orderMode}
                 stopAfterReview={practiceStopAfterReview}
                 fastAnswerMode={practiceFastAnswerMode}

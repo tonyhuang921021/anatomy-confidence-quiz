@@ -14,13 +14,13 @@ import {
   type ProgressPracticeQuestionCount,
   type ProgressPracticeYearRange
 } from "@/lib/progressPractice";
-import { PRACTICE_YEAR_OPTIONS } from "@/lib/practiceYears";
 
 type ProgressPracticeSetupProps = {
   idPrefix: string;
   label: string;
   availableQuestionCount: number;
   questionCount: ProgressPracticeQuestionCount;
+  yearOptions: number[];
   yearRange: ProgressPracticeYearRange;
   orderMode: QuestionOrderMode;
   onQuestionCountChange: (count: ProgressPracticeQuestionCount) => void;
@@ -35,6 +35,7 @@ export function ProgressPracticeSetup({
   availableQuestionCount,
   questionCount,
   yearRange,
+  yearOptions,
   orderMode,
   onQuestionCountChange,
   onYearRangeChange,
@@ -77,7 +78,7 @@ export function ProgressPracticeSetup({
                 }}
                 className="min-h-10 min-w-0 rounded-lg border border-slate-200 bg-white px-3 text-sm font-semibold text-ink outline-none transition focus:border-brand-500 focus:ring-2 focus:ring-brand-100"
               >
-                {PRACTICE_YEAR_OPTIONS.map((year) => (
+                {yearOptions.map((year) => (
                   <option key={`${idPrefix}-from-${year}`} value={year}>{formatRocYear(year)}</option>
                 ))}
               </select>
@@ -97,7 +98,7 @@ export function ProgressPracticeSetup({
                 }}
                 className="min-h-10 min-w-0 rounded-lg border border-slate-200 bg-white px-3 text-sm font-semibold text-ink outline-none transition focus:border-brand-500 focus:ring-2 focus:ring-brand-100"
               >
-                {PRACTICE_YEAR_OPTIONS.map((year) => (
+                {yearOptions.map((year) => (
                   <option key={`${idPrefix}-to-${year}`} value={year}>{formatRocYear(year)}</option>
                 ))}
               </select>

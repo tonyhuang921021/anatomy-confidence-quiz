@@ -13,7 +13,15 @@ type PracticeYearRangeLike = {
 
 export function toGregorianPracticeYear(year: number) {
   if (!Number.isFinite(year)) return year;
-  return year >= 98 && year <= 199 ? year + 1911 : year;
+  return year >= 90 && year <= 199 ? year + 1911 : year;
+}
+
+// Keep stored range boundaries visible even when a selected pool has no questions
+// in that year; all other options come from the actual question pool.
+export function getPracticeYearOptions(years: Array<number | undefined>, range: PracticeYearRangeLike) {
+  return Array.from(new Set([...years, range.yearFrom, range.yearTo]
+    .filter((year): year is number => typeof year === "number" && Number.isFinite(year))))
+    .sort((a, b) => a - b);
 }
 
 export function normalizePracticeYearRange(range: PracticeYearRangeLike): PracticeYearRangeLike {

@@ -13,7 +13,6 @@ import {
   PROGRESS_PRACTICE_QUESTION_COUNTS,
   resolveProgressPracticeQuestionCount
 } from "@/lib/progressPractice";
-import { PRACTICE_YEAR_OPTIONS } from "@/lib/practiceYears";
 import type { PracticeQuestionCount, PracticeYearRange } from "@/lib/storage";
 
 type FreePracticeSetupProps = {
@@ -21,6 +20,7 @@ type FreePracticeSetupProps = {
   label: string;
   availableQuestionCount: number;
   questionCount: PracticeQuestionCount;
+  yearOptions: number[];
   yearRange: PracticeYearRange;
   orderMode: QuestionOrderMode;
   stopAfterReview: boolean;
@@ -67,6 +67,7 @@ export function FreePracticeSetup({
   availableQuestionCount,
   questionCount,
   yearRange,
+  yearOptions,
   orderMode,
   stopAfterReview,
   fastAnswerMode,
@@ -150,7 +151,7 @@ export function FreePracticeSetup({
                     }}
                     className="min-h-10 min-w-0 rounded-lg border border-slate-200 bg-white px-3 text-sm font-semibold text-ink outline-none transition focus-visible:border-brand-500 focus-visible:ring-2 focus-visible:ring-brand-100"
                   >
-                    {PRACTICE_YEAR_OPTIONS.map((year) => (
+                    {yearOptions.map((year) => (
                       <option key={`${idPrefix}-from-${year}`} value={year}>{formatRocYear(year)}</option>
                     ))}
                   </select>
@@ -172,7 +173,7 @@ export function FreePracticeSetup({
                     }}
                     className="min-h-10 min-w-0 rounded-lg border border-slate-200 bg-white px-3 text-sm font-semibold text-ink outline-none transition focus-visible:border-brand-500 focus-visible:ring-2 focus-visible:ring-brand-100"
                   >
-                    {PRACTICE_YEAR_OPTIONS.map((year) => (
+                    {yearOptions.map((year) => (
                       <option key={`${idPrefix}-to-${year}`} value={year}>{formatRocYear(year)}</option>
                     ))}
                   </select>

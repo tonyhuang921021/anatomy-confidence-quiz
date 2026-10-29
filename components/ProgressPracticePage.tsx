@@ -21,6 +21,7 @@ import {
   type ProgressPracticeYearRange
 } from "@/lib/progressPractice";
 import {
+  getPracticeYearOptions,
   MAX_PRACTICE_SOURCE_YEAR,
   MIN_PRACTICE_SOURCE_YEAR,
   normalizePracticeYearRange
@@ -64,9 +65,18 @@ export function ProgressPracticePage({
   const { mode: orderMode, setMode: setOrderMode, prioritizeUnseen } = useQuestionOrderMode();
   const [sessions, setSessions] = useState<ProgressPracticeHistorySession[]>([]);
   const [historyOwnerKey, setHistoryOwnerKey] = useState<string | null>(null);
-  const [yearRange, setYearRange] = useState<ProgressPracticeYearRange>(DEFAULT_YEAR_RANGE);
-  const [questionCount, setQuestionCount] = useState<ProgressPracticeQuestionCount>(10);
   const subject = resolveSubject(subjectParam);
+  const defaultYearRange = useMemo<ProgressPracticeYearRange>(() => {
+    const years = subject ? subjectRegistry[subject].questions
+      .filter((question) => question.sourceType !== "AI_GENERATED")
+      .map((question) => question.sourceYear)
+      .filter((year): year is number => typeof year === "number" && Number.isFinite(year)) : [];
+    return years.length
+      ? { yearFrom: Math.min(MIN_PRACTICE_SOURCE_YEAR, ...years), yearTo: Math.max(MAX_PRACTICE_SOURCE_YEAR, ...years) }
+      : DEFAULT_YEAR_RANGE;
+  }, [subject]);
+  const [yearRange, setYearRange] = useState<ProgressPracticeYearRange>(defaultYearRange);
+  const [questionCount, setQuestionCount] = useState<ProgressPracticeQuestionCount>(10);
   const activeHistoryOwnerKey = user?.id ?? "__guest__";
 
   useEffect(() => {
@@ -94,14 +104,14 @@ export function ProgressPracticePage({
   useEffect(() => {
     const storedRange = user
       ? getPracticeYearRangePreference(user.user_metadata)
-      : loadPracticeYearRange(DEFAULT_YEAR_RANGE);
+      : loadPracticeYearRange(defaultYearRange);
     const storedCount = user
       ? getPracticeQuestionCountPreference(user.user_metadata, 10)
       : loadPracticeQuestionCount(10);
 
-    setYearRange(normalizePracticeYearRange(storedRange ?? DEFAULT_YEAR_RANGE));
+    setYearRange(normalizePracticeYearRange(storedRange ?? defaultYearRange));
     setQuestionCount(storedCount);
-  }, [user?.id, user?.user_metadata]);
+  }, [user?.id, user?.user_metadata, defaultYearRange]);
 
   const trackableQuestions = useMemo(
     () => subject
@@ -123,6 +133,13 @@ export function ProgressPracticePage({
   );
   const block = blocks.find((item) => item.fullLabel === primaryTagParam) ?? null;
   const normalizedYearRange = useMemo(() => normalizePracticeYearRange(yearRange), [yearRange]);
+  const yearOptions = useMemo(() => {
+    const ids = new Set(block?.questionIds ?? []);
+    return getPracticeYearOptions(
+      trackableQuestions.filter((question) => ids.has(question.id)).map((question) => question.sourceYear),
+      normalizedYearRange
+    );
+  }, [block?.questionIds, trackableQuestions, normalizedYearRange]);
   const availableQuestionIds = useMemo(
     () => getProgressPracticeQuestionIds({
       questions: trackableQuestions,
@@ -223,6 +240,7 @@ export function ProgressPracticePage({
               availableQuestionCount={availableQuestionIds.length}
               questionCount={questionCount}
               yearRange={normalizedYearRange}
+              yearOptions={yearOptions}
               orderMode={orderMode}
               onQuestionCountChange={handleQuestionCountChange}
               onYearRangeChange={handleYearRangeChange}
