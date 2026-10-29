@@ -5,6 +5,8 @@ import { useEffect, useRef, useState } from "react";
 type TeachingFigureProps = {
   src: string;
   alt: string;
+  width?: number;
+  height?: number;
   caption: string;
   credit: string;
   sourceUrl: string;
@@ -21,7 +23,7 @@ function safeImageUrl(value: string): string | null {
 }
 
 /** The caller supplies a reviewed asset and its verified source and license. */
-export function TeachingFigure({ src, alt, caption, credit, sourceUrl, originalImageUrl, licenseName, licenseUrl }: TeachingFigureProps) {
+export function TeachingFigure({ src, alt, width, height, caption, credit, sourceUrl, originalImageUrl, licenseName, licenseUrl }: TeachingFigureProps) {
   const assetUrl = safeImageUrl(src);
   const originalUrl = safeHttpsUrl(originalImageUrl);
   const sourceLink = safeHttpsUrl(sourceUrl);
@@ -52,7 +54,7 @@ export function TeachingFigure({ src, alt, caption, credit, sourceUrl, originalI
   return (
     <figure className="my-4 min-w-0 max-w-full text-sm leading-6 text-slate-600">
       <button ref={trigger} type="button" aria-label={`放大圖片：${alt}`} onClick={() => { setZoom(1); setOpen(true); }} className="block max-w-full rounded-lg focus-visible:outline focus-visible:outline-2 focus-visible:outline-brand-600">
-        <img src={assetUrl} alt={alt} loading="lazy" style={{ display: "block", maxWidth: "100%", maxHeight: 160, width: "auto", height: "auto" }} />
+        <img src={assetUrl} alt={alt} width={width} height={height} loading="lazy" style={{ display: "block", maxWidth: "100%", maxHeight: 160, width: "auto", height: "auto" }} />
       </button>
       {originalUrl ? <a href={originalUrl} target="_blank" rel="noopener noreferrer" className="mt-1 inline-block underline">查看原圖</a> : null}
       <figcaption className="mt-2">{caption} {credit} {sourceLink ? <a href={sourceLink} target="_blank" rel="noopener noreferrer" className="underline">來源</a> : null} {licenseLink ? <>· <a href={licenseLink} target="_blank" rel="noopener noreferrer" className="underline">{licenseName}</a></> : null}</figcaption>
