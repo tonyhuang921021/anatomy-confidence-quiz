@@ -3111,11 +3111,11 @@ function ResultsPageContent() {
           <section className="workspace-section mt-4 p-4 sm:p-5">
             <div className="flex flex-wrap items-end justify-between gap-3">
               <div>
-                <h2 className="text-lg font-semibold text-ink">模擬考分科得分</h2>
-                <p className="mt-1 text-sm text-slate-500">本次各科答對題數 / 該科總題數。</p>
+                <h2 className="text-lg font-semibold text-ink">網站分類答題數</h2>
+                <p className="mt-1 text-sm text-slate-500">本次各分類答對題數 / 已答題數；分類依網站整理。</p>
               </div>
               <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-700">
-                總分 {state.summary.correct} / {state.summary.total}
+                答對 {state.summary.correct} / 已答 {state.summary.total} 題
               </span>
             </div>
             <div className="mt-3 grid grid-cols-2 gap-2 lg:grid-cols-5">

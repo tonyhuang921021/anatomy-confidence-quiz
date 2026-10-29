@@ -180,9 +180,10 @@ function formatDurationClock(totalSeconds: number) {
 
 function loadSimulationExamTimerState(session: QuizSession): SimulationExamTimerState {
   const fallbackElapsedSeconds = normalizeTimerSeconds(session.simulationElapsedSeconds);
+  const fallbackDurationSeconds = normalizeTimerSeconds(session.simulationTimerDurationSeconds) || SIMULATION_EXAM_TIMER_DURATION_SECONDS;
   if (typeof window === "undefined") {
     return {
-      durationSeconds: SIMULATION_EXAM_TIMER_DURATION_SECONDS,
+      durationSeconds: fallbackDurationSeconds,
       accumulatedSeconds: fallbackElapsedSeconds,
       runningSince: Date.now(),
       paused: false,
@@ -196,7 +197,7 @@ function loadSimulationExamTimerState(session: QuizSession): SimulationExamTimer
     if (raw) {
       const parsed = JSON.parse(raw) as Partial<SimulationExamTimerState>;
       const durationSeconds =
-        normalizeTimerSeconds(parsed.durationSeconds) || SIMULATION_EXAM_TIMER_DURATION_SECONDS;
+        normalizeTimerSeconds(parsed.durationSeconds) || fallbackDurationSeconds;
       const accumulatedSeconds = Math.max(
         fallbackElapsedSeconds,
         normalizeTimerSeconds(parsed.accumulatedSeconds)
@@ -225,7 +226,7 @@ function loadSimulationExamTimerState(session: QuizSession): SimulationExamTimer
   }
 
   return {
-    durationSeconds: SIMULATION_EXAM_TIMER_DURATION_SECONDS,
+    durationSeconds: fallbackDurationSeconds,
     accumulatedSeconds: fallbackElapsedSeconds,
     runningSince: Date.now(),
     paused: false,
@@ -527,6 +528,9 @@ function createSession(
           }
         : effectiveSettings,
     questionOrder,
+    simulationTimerDurationSeconds: effectiveSettings.mode === "simulation" && persistedQuestions[0]?.officialExam?.timeMinutes
+      ? persistedQuestions[0].officialExam.timeMinutes * 60
+      : undefined,
     generatedQuestions: persistedQuestions,
     currentQuestionIndex: 0,
     isReviewingAnswer: false,
@@ -2919,7 +2923,7 @@ export default function QuizPage() {
                 <div className="flex items-start justify-between gap-3">
                   <div className="min-w-0">
                     <p className="text-xs font-black tracking-[0.18em] text-emerald-700">
-                      2 小時倒數
+                      {simulationTimerDurationSeconds === 3600 ? "1 小時倒數" : "2 小時倒數"}
                     </p>
                     <p className="mt-2 font-mono text-3xl font-black leading-none text-slate-950 tabular-nums">
                       {formatDurationClock(simulationTimerRemainingSeconds)}

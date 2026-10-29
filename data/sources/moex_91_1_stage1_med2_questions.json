@@ -1,0 +1,4034 @@
+{
+  "sourceBundleSha256": "1cd1e1636ff6b9bd339b9dffd43e7cf2df329ab940200bea339387217f22f899",
+  "sources": {
+    "Q": {
+      "url": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?t=Q&code=091030&c=217&s=5004&q=1",
+      "bytes": 218128,
+      "sha256": "aa80cc01890b0d8444aba781109fc67f78f32289efa42dca74880ed60e728a65",
+      "pages": 4
+    },
+    "M": {
+      "url": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?t=M&code=091030&c=217&s=5004&q=1",
+      "bytes": 67274,
+      "sha256": "5e57ecb29a348b7adb9728164a4646f18a47c6fbaadf62a49041a941cfac5ee0",
+      "pages": 1
+    }
+  },
+  "questions": [
+    {
+      "id": "MOEX-C217-091030-S5004-STAGE1-Q001",
+      "subject": "醫學（二）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（二）",
+      "stem": "下列那些物質主由藉擴散而直接穿過細胞膜？ ① 氧 ② 氮 ③ 尿酸 葡萄糖",
+      "options": {
+        "A": "① ②",
+        "B": "① ③",
+        "C": "②",
+        "D": "③"
+      },
+      "answer": "A",
+      "acceptedAnswers": [
+        "A"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：A。",
+      "testedConcept": "基礎醫學（二）（醫師分階段原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國91年第1次 醫師（一）分階段 基礎醫學（二） 5004",
+      "sourceYear": 2002,
+      "sourceRound": 1,
+      "originalQuestionNumber": 1,
+      "examCode": "091030",
+      "paperCode": "5217",
+      "examSessionLabel": "第一次",
+      "officialExam": {
+        "categoryCode": "217",
+        "subjectCode": "5004",
+        "trackCode": "STAGE1",
+        "trackLabel": "醫師（一）分階段",
+        "paperTitle": "基礎醫學（二）",
+        "questionCount": 80,
+        "timeMinutes": 60,
+        "pointsPerQuestion": 1.25,
+        "officialScope": "生理學、生物化學、藥理學、公共衛生學"
+      },
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?t=Q&code=091030&c=217&s=5004&q=1",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?t=M&code=091030&c=217&s=5004&q=1",
+        "page": 1,
+        "endPage": 1,
+        "image": "/question-media/moex-91-1-stage1-med2/MOEX-C217-091030-S5004-STAGE1-Q001.webp",
+        "width": 1383,
+        "height": 64,
+        "scope": "生理學、生物化學、藥理學、公共衛生學",
+        "answerNote": null
+      },
+      "stemImage": "/question-media/moex-91-1-stage1-med2/MOEX-C217-091030-S5004-STAGE1-Q001.webp"
+    },
+    {
+      "id": "MOEX-C217-091030-S5004-STAGE1-Q002",
+      "subject": "醫學（二）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（二）",
+      "stem": "血流在肺內的分布情形為：",
+      "options": {
+        "A": "上部(top)者比下部(bottom)者多",
+        "B": "上部者比下部者少",
+        "C": "上部者和下部者相同",
+        "D": "中部(middle)者比上下部者多"
+      },
+      "answer": "B",
+      "acceptedAnswers": [
+        "B"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：B。",
+      "testedConcept": "基礎醫學（二）（醫師分階段原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國91年第1次 醫師（一）分階段 基礎醫學（二） 5004",
+      "sourceYear": 2002,
+      "sourceRound": 1,
+      "originalQuestionNumber": 2,
+      "examCode": "091030",
+      "paperCode": "5217",
+      "examSessionLabel": "第一次",
+      "officialExam": {
+        "categoryCode": "217",
+        "subjectCode": "5004",
+        "trackCode": "STAGE1",
+        "trackLabel": "醫師（一）分階段",
+        "paperTitle": "基礎醫學（二）",
+        "questionCount": 80,
+        "timeMinutes": 60,
+        "pointsPerQuestion": 1.25,
+        "officialScope": "生理學、生物化學、藥理學、公共衛生學"
+      },
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?t=Q&code=091030&c=217&s=5004&q=1",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?t=M&code=091030&c=217&s=5004&q=1",
+        "page": 1,
+        "endPage": 1,
+        "image": "/question-media/moex-91-1-stage1-med2/MOEX-C217-091030-S5004-STAGE1-Q002.webp",
+        "width": 1106,
+        "height": 73,
+        "scope": "生理學、生物化學、藥理學、公共衛生學",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-C217-091030-S5004-STAGE1-Q003",
+      "subject": "醫學（二）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（二）",
+      "stem": "下列有關白肌(white muscle)和紅肌(red muscle)的比較，何者不正確？",
+      "options": {
+        "A": "白肌細胞中含較多之肝醣分解 酶",
+        "B": "紅肌細胞中含較多之肌蛋白",
+        "C": "白肌細胞中含較多之粒線體",
+        "D": "紅肌比較不容易疲勞"
+      },
+      "answer": "C",
+      "acceptedAnswers": [
+        "C"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：C。",
+      "testedConcept": "基礎醫學（二）（醫師分階段原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國91年第1次 醫師（一）分階段 基礎醫學（二） 5004",
+      "sourceYear": 2002,
+      "sourceRound": 1,
+      "originalQuestionNumber": 3,
+      "examCode": "091030",
+      "paperCode": "5217",
+      "examSessionLabel": "第一次",
+      "officialExam": {
+        "categoryCode": "217",
+        "subjectCode": "5004",
+        "trackCode": "STAGE1",
+        "trackLabel": "醫師（一）分階段",
+        "paperTitle": "基礎醫學（二）",
+        "questionCount": 80,
+        "timeMinutes": 60,
+        "pointsPerQuestion": 1.25,
+        "officialScope": "生理學、生物化學、藥理學、公共衛生學"
+      },
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?t=Q&code=091030&c=217&s=5004&q=1",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?t=M&code=091030&c=217&s=5004&q=1",
+        "page": 1,
+        "endPage": 1,
+        "image": "/question-media/moex-91-1-stage1-med2/MOEX-C217-091030-S5004-STAGE1-Q003.webp",
+        "width": 1106,
+        "height": 74,
+        "scope": "生理學、生物化學、藥理學、公共衛生學",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-C217-091030-S5004-STAGE1-Q004",
+      "subject": "醫學（二）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（二）",
+      "stem": "哺乳動物之周邊神經纖維對壓力(pressure)及局部麻醉劑之敏感程度是：",
+      "options": {
+        "A": "越粗的纖維對壓力越敏感，而越細的纖維則對局部麻醉劑越敏感",
+        "B": "越粗的纖維對局部麻醉劑越敏感，而越細的纖維則對壓力越敏感",
+        "C": "對壓力及局部麻醉劑都是越粗的纖維越敏感",
+        "D": "對壓力及局部麻醉劑都是越細的纖維越敏感"
+      },
+      "answer": "A",
+      "acceptedAnswers": [
+        "A"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：A。",
+      "testedConcept": "基礎醫學（二）（醫師分階段原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國91年第1次 醫師（一）分階段 基礎醫學（二） 5004",
+      "sourceYear": 2002,
+      "sourceRound": 1,
+      "originalQuestionNumber": 4,
+      "examCode": "091030",
+      "paperCode": "5217",
+      "examSessionLabel": "第一次",
+      "officialExam": {
+        "categoryCode": "217",
+        "subjectCode": "5004",
+        "trackCode": "STAGE1",
+        "trackLabel": "醫師（一）分階段",
+        "paperTitle": "基礎醫學（二）",
+        "questionCount": 80,
+        "timeMinutes": 60,
+        "pointsPerQuestion": 1.25,
+        "officialScope": "生理學、生物化學、藥理學、公共衛生學"
+      },
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?t=Q&code=091030&c=217&s=5004&q=1",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?t=M&code=091030&c=217&s=5004&q=1",
+        "page": 1,
+        "endPage": 1,
+        "image": "/question-media/moex-91-1-stage1-med2/MOEX-C217-091030-S5004-STAGE1-Q004.webp",
+        "width": 1106,
+        "height": 122,
+        "scope": "生理學、生物化學、藥理學、公共衛生學",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-C217-091030-S5004-STAGE1-Q005",
+      "subject": "醫學（二）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（二）",
+      "stem": "呼吸道的阻力(airway resistance)之大小受下列那一種因素的影響最大？",
+      "options": {
+        "A": "氣流的速度",
+        "B": "呼吸道口徑的大小",
+        "C": "呼吸道的長短",
+        "D": "呼吸道的可容度(compliance)"
+      },
+      "answer": "B",
+      "acceptedAnswers": [
+        "B"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：B。",
+      "testedConcept": "基礎醫學（二）（醫師分階段原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國91年第1次 醫師（一）分階段 基礎醫學（二） 5004",
+      "sourceYear": 2002,
+      "sourceRound": 1,
+      "originalQuestionNumber": 5,
+      "examCode": "091030",
+      "paperCode": "5217",
+      "examSessionLabel": "第一次",
+      "officialExam": {
+        "categoryCode": "217",
+        "subjectCode": "5004",
+        "trackCode": "STAGE1",
+        "trackLabel": "醫師（一）分階段",
+        "paperTitle": "基礎醫學（二）",
+        "questionCount": 80,
+        "timeMinutes": 60,
+        "pointsPerQuestion": 1.25,
+        "officialScope": "生理學、生物化學、藥理學、公共衛生學"
+      },
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?t=Q&code=091030&c=217&s=5004&q=1",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?t=M&code=091030&c=217&s=5004&q=1",
+        "page": 1,
+        "endPage": 1,
+        "image": "/question-media/moex-91-1-stage1-med2/MOEX-C217-091030-S5004-STAGE1-Q005.webp",
+        "width": 1106,
+        "height": 73,
+        "scope": "生理學、生物化學、藥理學、公共衛生學",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-C217-091030-S5004-STAGE1-Q006",
+      "subject": "醫學（二）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（二）",
+      "stem": "下列有關語言功能的敘述何者正確？",
+      "options": {
+        "A": "當布氏區(Broca’s area)受損時，病人無法聽懂別人的話",
+        "B": "當威氏區(Wernicke’s area)受損時，病人無法說話",
+        "C": "失語症(aphasia)通指所有不能說話的病症",
+        "D": "在威氏區後的角形回(angular gyrus)受損時也會造成失語症"
+      },
+      "answer": "D",
+      "acceptedAnswers": [
+        "D"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：D。",
+      "testedConcept": "基礎醫學（二）（醫師分階段原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國91年第1次 醫師（一）分階段 基礎醫學（二） 5004",
+      "sourceYear": 2002,
+      "sourceRound": 1,
+      "originalQuestionNumber": 6,
+      "examCode": "091030",
+      "paperCode": "5217",
+      "examSessionLabel": "第一次",
+      "officialExam": {
+        "categoryCode": "217",
+        "subjectCode": "5004",
+        "trackCode": "STAGE1",
+        "trackLabel": "醫師（一）分階段",
+        "paperTitle": "基礎醫學（二）",
+        "questionCount": 80,
+        "timeMinutes": 60,
+        "pointsPerQuestion": 1.25,
+        "officialScope": "生理學、生物化學、藥理學、公共衛生學"
+      },
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?t=Q&code=091030&c=217&s=5004&q=1",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?t=M&code=091030&c=217&s=5004&q=1",
+        "page": 1,
+        "endPage": 1,
+        "image": "/question-media/moex-91-1-stage1-med2/MOEX-C217-091030-S5004-STAGE1-Q006.webp",
+        "width": 1106,
+        "height": 120,
+        "scope": "生理學、生物化學、藥理學、公共衛生學",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-C217-091030-S5004-STAGE1-Q007",
+      "subject": "醫學（二）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（二）",
+      "stem": "在動作電位的去極化階段時，細胞膜電位會趨向下列何種離子的平衡電位？",
+      "options": {
+        "A": "鉀離子",
+        "B": "鈉離子",
+        "C": "氯離子",
+        "D": "鉀、鈉、氯離子平衡電位的平均值"
+      },
+      "answer": "B",
+      "acceptedAnswers": [
+        "B"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：B。",
+      "testedConcept": "基礎醫學（二）（醫師分階段原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國91年第1次 醫師（一）分階段 基礎醫學（二） 5004",
+      "sourceYear": 2002,
+      "sourceRound": 1,
+      "originalQuestionNumber": 7,
+      "examCode": "091030",
+      "paperCode": "5217",
+      "examSessionLabel": "第一次",
+      "officialExam": {
+        "categoryCode": "217",
+        "subjectCode": "5004",
+        "trackCode": "STAGE1",
+        "trackLabel": "醫師（一）分階段",
+        "paperTitle": "基礎醫學（二）",
+        "questionCount": 80,
+        "timeMinutes": 60,
+        "pointsPerQuestion": 1.25,
+        "officialScope": "生理學、生物化學、藥理學、公共衛生學"
+      },
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?t=Q&code=091030&c=217&s=5004&q=1",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?t=M&code=091030&c=217&s=5004&q=1",
+        "page": 1,
+        "endPage": 1,
+        "image": "/question-media/moex-91-1-stage1-med2/MOEX-C217-091030-S5004-STAGE1-Q007.webp",
+        "width": 1106,
+        "height": 73,
+        "scope": "生理學、生物化學、藥理學、公共衛生學",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-C217-091030-S5004-STAGE1-Q008",
+      "subject": "醫學（二）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（二）",
+      "stem": "運動皮層中最大的部分是在控制下列那一部分？",
+      "options": {
+        "A": "軀幹",
+        "B": "手和手指",
+        "C": "腳",
+        "D": "舌頭"
+      },
+      "answer": "B",
+      "acceptedAnswers": [
+        "B"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：B。",
+      "testedConcept": "基礎醫學（二）（醫師分階段原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國91年第1次 醫師（一）分階段 基礎醫學（二） 5004",
+      "sourceYear": 2002,
+      "sourceRound": 1,
+      "originalQuestionNumber": 8,
+      "examCode": "091030",
+      "paperCode": "5217",
+      "examSessionLabel": "第一次",
+      "officialExam": {
+        "categoryCode": "217",
+        "subjectCode": "5004",
+        "trackCode": "STAGE1",
+        "trackLabel": "醫師（一）分階段",
+        "paperTitle": "基礎醫學（二）",
+        "questionCount": 80,
+        "timeMinutes": 60,
+        "pointsPerQuestion": 1.25,
+        "officialScope": "生理學、生物化學、藥理學、公共衛生學"
+      },
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?t=Q&code=091030&c=217&s=5004&q=1",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?t=M&code=091030&c=217&s=5004&q=1",
+        "page": 1,
+        "endPage": 1,
+        "image": "/question-media/moex-91-1-stage1-med2/MOEX-C217-091030-S5004-STAGE1-Q008.webp",
+        "width": 1106,
+        "height": 49,
+        "scope": "生理學、生物化學、藥理學、公共衛生學",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-C217-091030-S5004-STAGE1-Q009",
+      "subject": "醫學（二）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（二）",
+      "stem": "下列何者不是心縮期(systole)產生心雜音(murmur)的可能原因？",
+      "options": {
+        "A": "主動脈瓣狹窄(stenosis)",
+        "B": "肺動脈瓣狹窄",
+        "C": "僧帽瓣(mitral valve)閉鎖不全(insufficiency)",
+        "D": "三尖瓣(tricuspid valve) 狹窄"
+      },
+      "answer": "D",
+      "acceptedAnswers": [
+        "D"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：D。",
+      "testedConcept": "基礎醫學（二）（醫師分階段原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國91年第1次 醫師（一）分階段 基礎醫學（二） 5004",
+      "sourceYear": 2002,
+      "sourceRound": 1,
+      "originalQuestionNumber": 9,
+      "examCode": "091030",
+      "paperCode": "5217",
+      "examSessionLabel": "第一次",
+      "officialExam": {
+        "categoryCode": "217",
+        "subjectCode": "5004",
+        "trackCode": "STAGE1",
+        "trackLabel": "醫師（一）分階段",
+        "paperTitle": "基礎醫學（二）",
+        "questionCount": 80,
+        "timeMinutes": 60,
+        "pointsPerQuestion": 1.25,
+        "officialScope": "生理學、生物化學、藥理學、公共衛生學"
+      },
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?t=Q&code=091030&c=217&s=5004&q=1",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?t=M&code=091030&c=217&s=5004&q=1",
+        "page": 1,
+        "endPage": 1,
+        "image": "/question-media/moex-91-1-stage1-med2/MOEX-C217-091030-S5004-STAGE1-Q009.webp",
+        "width": 1106,
+        "height": 73,
+        "scope": "生理學、生物化學、藥理學、公共衛生學",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-C217-091030-S5004-STAGE1-Q010",
+      "subject": "醫學（二）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（二）",
+      "stem": "下列何者不是造成姿勢性低血壓(postural hypotension)的可能原因？",
+      "options": {
+        "A": "梅毒傷及交感神經系統",
+        "B": "多巴胺乙型羥基化 酶 (dopamine β-hydroxylase)先天不足",
+        "C": "使用副交感神經阻斷劑",
+        "D": "腎上腺素分泌不足"
+      },
+      "answer": "C",
+      "acceptedAnswers": [
+        "C"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：C。",
+      "testedConcept": "基礎醫學（二）（醫師分階段原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國91年第1次 醫師（一）分階段 基礎醫學（二） 5004",
+      "sourceYear": 2002,
+      "sourceRound": 1,
+      "originalQuestionNumber": 10,
+      "examCode": "091030",
+      "paperCode": "5217",
+      "examSessionLabel": "第一次",
+      "officialExam": {
+        "categoryCode": "217",
+        "subjectCode": "5004",
+        "trackCode": "STAGE1",
+        "trackLabel": "醫師（一）分階段",
+        "paperTitle": "基礎醫學（二）",
+        "questionCount": 80,
+        "timeMinutes": 60,
+        "pointsPerQuestion": 1.25,
+        "officialScope": "生理學、生物化學、藥理學、公共衛生學"
+      },
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?t=Q&code=091030&c=217&s=5004&q=1",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?t=M&code=091030&c=217&s=5004&q=1",
+        "page": 1,
+        "endPage": 1,
+        "image": "/question-media/moex-91-1-stage1-med2/MOEX-C217-091030-S5004-STAGE1-Q010.webp",
+        "width": 1106,
+        "height": 121,
+        "scope": "生理學、生物化學、藥理學、公共衛生學",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-C217-091030-S5004-STAGE1-Q011",
+      "subject": "醫學（二）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（二）",
+      "stem": "失血(hemorrhage)時，下列何項不會降低？",
+      "options": {
+        "A": "平均血壓",
+        "B": "靜脈血壓",
+        "C": "血漿中蛋白質濃度",
+        "D": "心跳速率"
+      },
+      "answer": "A",
+      "acceptedAnswers": [
+        "A",
+        "B",
+        "C",
+        "D"
+      ],
+      "answerCreditType": "multiple_accepted",
+      "explanation": "官方最終答案：A、B、C、D。",
+      "testedConcept": "基礎醫學（二）（醫師分階段原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國91年第1次 醫師（一）分階段 基礎醫學（二） 5004",
+      "sourceYear": 2002,
+      "sourceRound": 1,
+      "originalQuestionNumber": 11,
+      "examCode": "091030",
+      "paperCode": "5217",
+      "examSessionLabel": "第一次",
+      "officialExam": {
+        "categoryCode": "217",
+        "subjectCode": "5004",
+        "trackCode": "STAGE1",
+        "trackLabel": "醫師（一）分階段",
+        "paperTitle": "基礎醫學（二）",
+        "questionCount": 80,
+        "timeMinutes": 60,
+        "pointsPerQuestion": 1.25,
+        "officialScope": "生理學、生物化學、藥理學、公共衛生學"
+      },
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?t=Q&code=091030&c=217&s=5004&q=1",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?t=M&code=091030&c=217&s=5004&q=1",
+        "page": 1,
+        "endPage": 1,
+        "image": "/question-media/moex-91-1-stage1-med2/MOEX-C217-091030-S5004-STAGE1-Q011.webp",
+        "width": 1106,
+        "height": 49,
+        "scope": "生理學、生物化學、藥理學、公共衛生學",
+        "answerNote": "第11題答A或答B或答C或答D者均給分"
+      }
+    },
+    {
+      "id": "MOEX-C217-091030-S5004-STAGE1-Q012",
+      "subject": "醫學（二）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（二）",
+      "stem": "假設一個正常人在與心臟等高部位的平均動脈壓為100 mmHg，平均靜脈壓為10 mmHg。當直立時，下肢 距離心臟70 公分處，動靜脈壓力差約為多少？",
+      "options": {
+        "A": "40 mmHg",
+        "B": "90 mmHg",
+        "C": "140 mmHg",
+        "D": "160 mmHg"
+      },
+      "answer": "B",
+      "acceptedAnswers": [
+        "B"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：B。",
+      "testedConcept": "基礎醫學（二）（醫師分階段原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國91年第1次 醫師（一）分階段 基礎醫學（二） 5004",
+      "sourceYear": 2002,
+      "sourceRound": 1,
+      "originalQuestionNumber": 12,
+      "examCode": "091030",
+      "paperCode": "5217",
+      "examSessionLabel": "第一次",
+      "officialExam": {
+        "categoryCode": "217",
+        "subjectCode": "5004",
+        "trackCode": "STAGE1",
+        "trackLabel": "醫師（一）分階段",
+        "paperTitle": "基礎醫學（二）",
+        "questionCount": 80,
+        "timeMinutes": 60,
+        "pointsPerQuestion": 1.25,
+        "officialScope": "生理學、生物化學、藥理學、公共衛生學"
+      },
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?t=Q&code=091030&c=217&s=5004&q=1",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?t=M&code=091030&c=217&s=5004&q=1",
+        "page": 1,
+        "endPage": 1,
+        "image": "/question-media/moex-91-1-stage1-med2/MOEX-C217-091030-S5004-STAGE1-Q012.webp",
+        "width": 1106,
+        "height": 74,
+        "scope": "生理學、生物化學、藥理學、公共衛生學",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-C217-091030-S5004-STAGE1-Q013",
+      "subject": "醫學（二）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（二）",
+      "stem": "下列何種藥物或處理可以完全抑制胃酸在腦期(cephalic phase)之分泌？",
+      "options": {
+        "A": "anti-GRP antibody",
+        "B": "atropine",
+        "C": "prostaglandin",
+        "D": "truncal vagotomy"
+      },
+      "answer": "D",
+      "acceptedAnswers": [
+        "D"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：D。",
+      "testedConcept": "基礎醫學（二）（醫師分階段原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國91年第1次 醫師（一）分階段 基礎醫學（二） 5004",
+      "sourceYear": 2002,
+      "sourceRound": 1,
+      "originalQuestionNumber": 13,
+      "examCode": "091030",
+      "paperCode": "5217",
+      "examSessionLabel": "第一次",
+      "officialExam": {
+        "categoryCode": "217",
+        "subjectCode": "5004",
+        "trackCode": "STAGE1",
+        "trackLabel": "醫師（一）分階段",
+        "paperTitle": "基礎醫學（二）",
+        "questionCount": 80,
+        "timeMinutes": 60,
+        "pointsPerQuestion": 1.25,
+        "officialScope": "生理學、生物化學、藥理學、公共衛生學"
+      },
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?t=Q&code=091030&c=217&s=5004&q=1",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?t=M&code=091030&c=217&s=5004&q=1",
+        "page": 1,
+        "endPage": 1,
+        "image": "/question-media/moex-91-1-stage1-med2/MOEX-C217-091030-S5004-STAGE1-Q013.webp",
+        "width": 1106,
+        "height": 48,
+        "scope": "生理學、生物化學、藥理學、公共衛生學",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-C217-091030-S5004-STAGE1-Q014",
+      "subject": "醫學（二）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（二）",
+      "stem": "當換氣量(ventilation)不變時，無效腔(dead space)愈大，則肺泡的換氣量(alveolar ventilation)：",
+      "options": {
+        "A": "愈大",
+        "B": "愈小",
+        "C": "不變",
+        "D": "先變大後變小"
+      },
+      "answer": "B",
+      "acceptedAnswers": [
+        "B"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：B。",
+      "testedConcept": "基礎醫學（二）（醫師分階段原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國91年第1次 醫師（一）分階段 基礎醫學（二） 5004",
+      "sourceYear": 2002,
+      "sourceRound": 1,
+      "originalQuestionNumber": 14,
+      "examCode": "091030",
+      "paperCode": "5217",
+      "examSessionLabel": "第一次",
+      "officialExam": {
+        "categoryCode": "217",
+        "subjectCode": "5004",
+        "trackCode": "STAGE1",
+        "trackLabel": "醫師（一）分階段",
+        "paperTitle": "基礎醫學（二）",
+        "questionCount": 80,
+        "timeMinutes": 60,
+        "pointsPerQuestion": 1.25,
+        "officialScope": "生理學、生物化學、藥理學、公共衛生學"
+      },
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?t=Q&code=091030&c=217&s=5004&q=1",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?t=M&code=091030&c=217&s=5004&q=1",
+        "page": 1,
+        "endPage": 1,
+        "image": "/question-media/moex-91-1-stage1-med2/MOEX-C217-091030-S5004-STAGE1-Q014.webp",
+        "width": 1106,
+        "height": 48,
+        "scope": "生理學、生物化學、藥理學、公共衛生學",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-C217-091030-S5004-STAGE1-Q015",
+      "subject": "醫學（二）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（二）",
+      "stem": "膽紅素(bilirubin)與glucuronic acid 的共軛反應(conjugation)主要發生於下列何處？",
+      "options": {
+        "A": "血液",
+        "B": "小腸黏膜細胞",
+        "C": "膽管",
+        "D": "肝細胞"
+      },
+      "answer": "D",
+      "acceptedAnswers": [
+        "D"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：D。",
+      "testedConcept": "基礎醫學（二）（醫師分階段原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國91年第1次 醫師（一）分階段 基礎醫學（二） 5004",
+      "sourceYear": 2002,
+      "sourceRound": 1,
+      "originalQuestionNumber": 15,
+      "examCode": "091030",
+      "paperCode": "5217",
+      "examSessionLabel": "第一次",
+      "officialExam": {
+        "categoryCode": "217",
+        "subjectCode": "5004",
+        "trackCode": "STAGE1",
+        "trackLabel": "醫師（一）分階段",
+        "paperTitle": "基礎醫學（二）",
+        "questionCount": 80,
+        "timeMinutes": 60,
+        "pointsPerQuestion": 1.25,
+        "officialScope": "生理學、生物化學、藥理學、公共衛生學"
+      },
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?t=Q&code=091030&c=217&s=5004&q=1",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?t=M&code=091030&c=217&s=5004&q=1",
+        "page": 1,
+        "endPage": 1,
+        "image": "/question-media/moex-91-1-stage1-med2/MOEX-C217-091030-S5004-STAGE1-Q015.webp",
+        "width": 1106,
+        "height": 49,
+        "scope": "生理學、生物化學、藥理學、公共衛生學",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-C217-091030-S5004-STAGE1-Q016",
+      "subject": "醫學（二）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（二）",
+      "stem": "將肺內充滿生理食 塩 水後，與先前充滿空氣時做比較，其可容度(compliance) 會：",
+      "options": {
+        "A": "不變",
+        "B": "升高",
+        "C": "降低",
+        "D": "先升高後降低"
+      },
+      "answer": "B",
+      "acceptedAnswers": [
+        "B"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：B。",
+      "testedConcept": "基礎醫學（二）（醫師分階段原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國91年第1次 醫師（一）分階段 基礎醫學（二） 5004",
+      "sourceYear": 2002,
+      "sourceRound": 1,
+      "originalQuestionNumber": 16,
+      "examCode": "091030",
+      "paperCode": "5217",
+      "examSessionLabel": "第一次",
+      "officialExam": {
+        "categoryCode": "217",
+        "subjectCode": "5004",
+        "trackCode": "STAGE1",
+        "trackLabel": "醫師（一）分階段",
+        "paperTitle": "基礎醫學（二）",
+        "questionCount": 80,
+        "timeMinutes": 60,
+        "pointsPerQuestion": 1.25,
+        "officialScope": "生理學、生物化學、藥理學、公共衛生學"
+      },
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?t=Q&code=091030&c=217&s=5004&q=1",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?t=M&code=091030&c=217&s=5004&q=1",
+        "page": 1,
+        "endPage": 1,
+        "image": "/question-media/moex-91-1-stage1-med2/MOEX-C217-091030-S5004-STAGE1-Q016.webp",
+        "width": 1106,
+        "height": 50,
+        "scope": "生理學、生物化學、藥理學、公共衛生學",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-C217-091030-S5004-STAGE1-Q017",
+      "subject": "醫學（二）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（二）",
+      "stem": "以同等的化學濃度(mole for mole)而言，下列何者對血漿滲透度(osmolarity)的影響最大？",
+      "options": {
+        "A": "抗利尿激素(antidiuretic hormone)",
+        "B": "留鹽激素(aldosterone)",
+        "C": "氫基皮質酮(cortisol)",
+        "D": "黃體素(progesterone)"
+      },
+      "answer": "A",
+      "acceptedAnswers": [
+        "A"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：A。",
+      "testedConcept": "基礎醫學（二）（醫師分階段原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國91年第1次 醫師（一）分階段 基礎醫學（二） 5004",
+      "sourceYear": 2002,
+      "sourceRound": 1,
+      "originalQuestionNumber": 17,
+      "examCode": "091030",
+      "paperCode": "5217",
+      "examSessionLabel": "第一次",
+      "officialExam": {
+        "categoryCode": "217",
+        "subjectCode": "5004",
+        "trackCode": "STAGE1",
+        "trackLabel": "醫師（一）分階段",
+        "paperTitle": "基礎醫學（二）",
+        "questionCount": 80,
+        "timeMinutes": 60,
+        "pointsPerQuestion": 1.25,
+        "officialScope": "生理學、生物化學、藥理學、公共衛生學"
+      },
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?t=Q&code=091030&c=217&s=5004&q=1",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?t=M&code=091030&c=217&s=5004&q=1",
+        "page": 1,
+        "endPage": 1,
+        "image": "/question-media/moex-91-1-stage1-med2/MOEX-C217-091030-S5004-STAGE1-Q017.webp",
+        "width": 1106,
+        "height": 73,
+        "scope": "生理學、生物化學、藥理學、公共衛生學",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-C217-091030-S5004-STAGE1-Q018",
+      "subject": "醫學（二）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（二）",
+      "stem": "葡萄糖主要是以下列何種方式離開小腸細胞而進入組織間液？",
+      "options": {
+        "A": "單純擴散(simple diffusion)",
+        "B": "促進性擴散(facilitated diffusion)",
+        "C": "主動運輸(active transport)",
+        "D": "次級主動運輸(secondary active transport)"
+      },
+      "answer": "B",
+      "acceptedAnswers": [
+        "B"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：B。",
+      "testedConcept": "基礎醫學（二）（醫師分階段原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國91年第1次 醫師（一）分階段 基礎醫學（二） 5004",
+      "sourceYear": 2002,
+      "sourceRound": 1,
+      "originalQuestionNumber": 18,
+      "examCode": "091030",
+      "paperCode": "5217",
+      "examSessionLabel": "第一次",
+      "officialExam": {
+        "categoryCode": "217",
+        "subjectCode": "5004",
+        "trackCode": "STAGE1",
+        "trackLabel": "醫師（一）分階段",
+        "paperTitle": "基礎醫學（二）",
+        "questionCount": 80,
+        "timeMinutes": 60,
+        "pointsPerQuestion": 1.25,
+        "officialScope": "生理學、生物化學、藥理學、公共衛生學"
+      },
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?t=Q&code=091030&c=217&s=5004&q=1",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?t=M&code=091030&c=217&s=5004&q=1",
+        "page": 1,
+        "endPage": 1,
+        "image": "/question-media/moex-91-1-stage1-med2/MOEX-C217-091030-S5004-STAGE1-Q018.webp",
+        "width": 1106,
+        "height": 103,
+        "scope": "生理學、生物化學、藥理學、公共衛生學",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-C217-091030-S5004-STAGE1-Q019",
+      "subject": "醫學（二）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（二）",
+      "stem": "下列何種激素可增加腎臟集尿管對水分之通透性？",
+      "options": {
+        "A": "血管昇壓素(vasopressin)",
+        "B": "腎素(renin)",
+        "C": "甲型血管張力素(angiotensin Ⅰ)",
+        "D": "醛酮素(aldosterone)"
+      },
+      "answer": "A",
+      "acceptedAnswers": [
+        "A"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：A。",
+      "testedConcept": "基礎醫學（二）（醫師分階段原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國91年第1次 醫師（一）分階段 基礎醫學（二） 5004",
+      "sourceYear": 2002,
+      "sourceRound": 1,
+      "originalQuestionNumber": 19,
+      "examCode": "091030",
+      "paperCode": "5217",
+      "examSessionLabel": "第一次",
+      "officialExam": {
+        "categoryCode": "217",
+        "subjectCode": "5004",
+        "trackCode": "STAGE1",
+        "trackLabel": "醫師（一）分階段",
+        "paperTitle": "基礎醫學（二）",
+        "questionCount": 80,
+        "timeMinutes": 60,
+        "pointsPerQuestion": 1.25,
+        "officialScope": "生理學、生物化學、藥理學、公共衛生學"
+      },
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?t=Q&code=091030&c=217&s=5004&q=1",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?t=M&code=091030&c=217&s=5004&q=1",
+        "page": 2,
+        "endPage": 2,
+        "image": "/question-media/moex-91-1-stage1-med2/MOEX-C217-091030-S5004-STAGE1-Q019.webp",
+        "width": 1106,
+        "height": 76,
+        "scope": "生理學、生物化學、藥理學、公共衛生學",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-C217-091030-S5004-STAGE1-Q020",
+      "subject": "醫學（二）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（二）",
+      "stem": "以下何種感覺的感覺受器最不易適應？",
+      "options": {
+        "A": "嗅覺",
+        "B": "痛覺",
+        "C": "壓覺",
+        "D": "觸覺"
+      },
+      "answer": "B",
+      "acceptedAnswers": [
+        "B"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：B。",
+      "testedConcept": "基礎醫學（二）（醫師分階段原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國91年第1次 醫師（一）分階段 基礎醫學（二） 5004",
+      "sourceYear": 2002,
+      "sourceRound": 1,
+      "originalQuestionNumber": 20,
+      "examCode": "091030",
+      "paperCode": "5217",
+      "examSessionLabel": "第一次",
+      "officialExam": {
+        "categoryCode": "217",
+        "subjectCode": "5004",
+        "trackCode": "STAGE1",
+        "trackLabel": "醫師（一）分階段",
+        "paperTitle": "基礎醫學（二）",
+        "questionCount": 80,
+        "timeMinutes": 60,
+        "pointsPerQuestion": 1.25,
+        "officialScope": "生理學、生物化學、藥理學、公共衛生學"
+      },
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?t=Q&code=091030&c=217&s=5004&q=1",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?t=M&code=091030&c=217&s=5004&q=1",
+        "page": 2,
+        "endPage": 2,
+        "image": "/question-media/moex-91-1-stage1-med2/MOEX-C217-091030-S5004-STAGE1-Q020.webp",
+        "width": 1106,
+        "height": 50,
+        "scope": "生理學、生物化學、藥理學、公共衛生學",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-C217-091030-S5004-STAGE1-Q021",
+      "subject": "醫學（二）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（二）",
+      "stem": "下列何種荷爾蒙(hormone)是經由荷爾蒙與受器複合體(hormone-receptor complex)進入細胞核，結合至標的 基因的調節區，達到荷爾蒙的生理作用？",
+      "options": {
+        "A": "腎上腺素(epinephrine)",
+        "B": "甲狀腺荷爾蒙(thyroid hormone)",
+        "C": "升糖激素(glucagon)",
+        "D": "利尿抗激素(vasopressin)"
+      },
+      "answer": "B",
+      "acceptedAnswers": [
+        "B"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：B。",
+      "testedConcept": "基礎醫學（二）（醫師分階段原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國91年第1次 醫師（一）分階段 基礎醫學（二） 5004",
+      "sourceYear": 2002,
+      "sourceRound": 1,
+      "originalQuestionNumber": 21,
+      "examCode": "091030",
+      "paperCode": "5217",
+      "examSessionLabel": "第一次",
+      "officialExam": {
+        "categoryCode": "217",
+        "subjectCode": "5004",
+        "trackCode": "STAGE1",
+        "trackLabel": "醫師（一）分階段",
+        "paperTitle": "基礎醫學（二）",
+        "questionCount": 80,
+        "timeMinutes": 60,
+        "pointsPerQuestion": 1.25,
+        "officialScope": "生理學、生物化學、藥理學、公共衛生學"
+      },
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?t=Q&code=091030&c=217&s=5004&q=1",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?t=M&code=091030&c=217&s=5004&q=1",
+        "page": 2,
+        "endPage": 2,
+        "image": "/question-media/moex-91-1-stage1-med2/MOEX-C217-091030-S5004-STAGE1-Q021.webp",
+        "width": 1106,
+        "height": 99,
+        "scope": "生理學、生物化學、藥理學、公共衛生學",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-C217-091030-S5004-STAGE1-Q022",
+      "subject": "醫學（二）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（二）",
+      "stem": "化學滲透理論(chemosmotic theory)中，呼吸鏈的氧化作用與產生ATP 的磷酸化作用是經由下列那一項來聯 結？",
+      "options": {
+        "A": "高能的中間物質",
+        "B": "K⁺在粒線體內膜的移動",
+        "C": "H⁺在粒線體內膜的移動",
+        "D": "Ca²⁺的參與"
+      },
+      "answer": "C",
+      "acceptedAnswers": [
+        "C"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：C。",
+      "testedConcept": "基礎醫學（二）（醫師分階段原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國91年第1次 醫師（一）分階段 基礎醫學（二） 5004",
+      "sourceYear": 2002,
+      "sourceRound": 1,
+      "originalQuestionNumber": 22,
+      "examCode": "091030",
+      "paperCode": "5217",
+      "examSessionLabel": "第一次",
+      "officialExam": {
+        "categoryCode": "217",
+        "subjectCode": "5004",
+        "trackCode": "STAGE1",
+        "trackLabel": "醫師（一）分階段",
+        "paperTitle": "基礎醫學（二）",
+        "questionCount": 80,
+        "timeMinutes": 60,
+        "pointsPerQuestion": 1.25,
+        "officialScope": "生理學、生物化學、藥理學、公共衛生學"
+      },
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?t=Q&code=091030&c=217&s=5004&q=1",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?t=M&code=091030&c=217&s=5004&q=1",
+        "page": 2,
+        "endPage": 2,
+        "image": "/question-media/moex-91-1-stage1-med2/MOEX-C217-091030-S5004-STAGE1-Q022.webp",
+        "width": 1383,
+        "height": 92,
+        "scope": "生理學、生物化學、藥理學、公共衛生學",
+        "answerNote": null
+      },
+      "stemImage": "/question-media/moex-91-1-stage1-med2/MOEX-C217-091030-S5004-STAGE1-Q022.webp"
+    },
+    {
+      "id": "MOEX-C217-091030-S5004-STAGE1-Q023",
+      "subject": "醫學（二）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（二）",
+      "stem": "解熱鎮痛劑阿斯匹靈(aspirin)會抑制下列何種生理物質之合成？",
+      "options": {
+        "A": "白三烯素(leukotriene)",
+        "B": "前列腺素(prostaglandin)",
+        "C": "乙醯膽鹼(acetylcholine)",
+        "D": "腎上腺素(epinephrine)"
+      },
+      "answer": "B",
+      "acceptedAnswers": [
+        "B"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：B。",
+      "testedConcept": "基礎醫學（二）（醫師分階段原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國91年第1次 醫師（一）分階段 基礎醫學（二） 5004",
+      "sourceYear": 2002,
+      "sourceRound": 1,
+      "originalQuestionNumber": 23,
+      "examCode": "091030",
+      "paperCode": "5217",
+      "examSessionLabel": "第一次",
+      "officialExam": {
+        "categoryCode": "217",
+        "subjectCode": "5004",
+        "trackCode": "STAGE1",
+        "trackLabel": "醫師（一）分階段",
+        "paperTitle": "基礎醫學（二）",
+        "questionCount": 80,
+        "timeMinutes": 60,
+        "pointsPerQuestion": 1.25,
+        "officialScope": "生理學、生物化學、藥理學、公共衛生學"
+      },
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?t=Q&code=091030&c=217&s=5004&q=1",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?t=M&code=091030&c=217&s=5004&q=1",
+        "page": 2,
+        "endPage": 2,
+        "image": "/question-media/moex-91-1-stage1-med2/MOEX-C217-091030-S5004-STAGE1-Q023.webp",
+        "width": 1106,
+        "height": 50,
+        "scope": "生理學、生物化學、藥理學、公共衛生學",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-C217-091030-S5004-STAGE1-Q024",
+      "subject": "醫學（二）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（二）",
+      "stem": "下列那一種情形可達到抗粥狀動脈硬化的效果？",
+      "options": {
+        "A": "高血中三酸甘油脂(triacylglyceride)濃度",
+        "B": "食用含較高比例飽和脂肪酸(saturated fatty acid)的油脂",
+        "C": "補充維他命E 減少氧化態的低密度脂蛋白(oxidized LDL)的形成",
+        "D": "高血中低密度脂蛋白：高密度脂蛋白－膽固醇(LDL：HDL cholesterol)比值"
+      },
+      "answer": "C",
+      "acceptedAnswers": [
+        "C"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：C。",
+      "testedConcept": "基礎醫學（二）（醫師分階段原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國91年第1次 醫師（一）分階段 基礎醫學（二） 5004",
+      "sourceYear": 2002,
+      "sourceRound": 1,
+      "originalQuestionNumber": 24,
+      "examCode": "091030",
+      "paperCode": "5217",
+      "examSessionLabel": "第一次",
+      "officialExam": {
+        "categoryCode": "217",
+        "subjectCode": "5004",
+        "trackCode": "STAGE1",
+        "trackLabel": "醫師（一）分階段",
+        "paperTitle": "基礎醫學（二）",
+        "questionCount": 80,
+        "timeMinutes": 60,
+        "pointsPerQuestion": 1.25,
+        "officialScope": "生理學、生物化學、藥理學、公共衛生學"
+      },
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?t=Q&code=091030&c=217&s=5004&q=1",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?t=M&code=091030&c=217&s=5004&q=1",
+        "page": 2,
+        "endPage": 2,
+        "image": "/question-media/moex-91-1-stage1-med2/MOEX-C217-091030-S5004-STAGE1-Q024.webp",
+        "width": 1106,
+        "height": 123,
+        "scope": "生理學、生物化學、藥理學、公共衛生學",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-C217-091030-S5004-STAGE1-Q025",
+      "subject": "醫學（二）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（二）",
+      "stem": "下列有關原核細胞基因調控的敘述，何者正確？",
+      "options": {
+        "A": "葡萄糖濃度高時可促進Lac operon 的活化，達到正向調節作用",
+        "B": "細胞能合成完整序列的leader peptide 時，可以促進trp operon 活性",
+        "C": "一個基因調控區只能調節一種構造基因的活性",
+        "D": "在arabinose operon 中，Ara C 可因arabinose 存在與否作為正向及負向之調節劑"
+      },
+      "answer": "D",
+      "acceptedAnswers": [
+        "D"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：D。",
+      "testedConcept": "基礎醫學（二）（醫師分階段原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國91年第1次 醫師（一）分階段 基礎醫學（二） 5004",
+      "sourceYear": 2002,
+      "sourceRound": 1,
+      "originalQuestionNumber": 25,
+      "examCode": "091030",
+      "paperCode": "5217",
+      "examSessionLabel": "第一次",
+      "officialExam": {
+        "categoryCode": "217",
+        "subjectCode": "5004",
+        "trackCode": "STAGE1",
+        "trackLabel": "醫師（一）分階段",
+        "paperTitle": "基礎醫學（二）",
+        "questionCount": 80,
+        "timeMinutes": 60,
+        "pointsPerQuestion": 1.25,
+        "officialScope": "生理學、生物化學、藥理學、公共衛生學"
+      },
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?t=Q&code=091030&c=217&s=5004&q=1",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?t=M&code=091030&c=217&s=5004&q=1",
+        "page": 2,
+        "endPage": 2,
+        "image": "/question-media/moex-91-1-stage1-med2/MOEX-C217-091030-S5004-STAGE1-Q025.webp",
+        "width": 1106,
+        "height": 124,
+        "scope": "生理學、生物化學、藥理學、公共衛生學",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-C217-091030-S5004-STAGE1-Q026",
+      "subject": "醫學（二）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（二）",
+      "stem": "胰島素(insulin)缺乏的胰島素依賴型糖尿病病人，出現酮酸中毒(ketoacidosis)，下列何者是酮體(ketone bodies)過度合成的主因？",
+      "options": {
+        "A": "脂肪組織醣解作用(glycolysis)增快",
+        "B": "脂肪組織大量分解三酸甘油脂(triacylglyceride)",
+        "C": "肝臟合成大量脂肪酸(fatty acids)",
+        "D": "肝臟醣質新生作用(gluconeogenesis)速率增加"
+      },
+      "answer": "B",
+      "acceptedAnswers": [
+        "B"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：B。",
+      "testedConcept": "基礎醫學（二）（醫師分階段原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國91年第1次 醫師（一）分階段 基礎醫學（二） 5004",
+      "sourceYear": 2002,
+      "sourceRound": 1,
+      "originalQuestionNumber": 26,
+      "examCode": "091030",
+      "paperCode": "5217",
+      "examSessionLabel": "第一次",
+      "officialExam": {
+        "categoryCode": "217",
+        "subjectCode": "5004",
+        "trackCode": "STAGE1",
+        "trackLabel": "醫師（一）分階段",
+        "paperTitle": "基礎醫學（二）",
+        "questionCount": 80,
+        "timeMinutes": 60,
+        "pointsPerQuestion": 1.25,
+        "officialScope": "生理學、生物化學、藥理學、公共衛生學"
+      },
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?t=Q&code=091030&c=217&s=5004&q=1",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?t=M&code=091030&c=217&s=5004&q=1",
+        "page": 2,
+        "endPage": 2,
+        "image": "/question-media/moex-91-1-stage1-med2/MOEX-C217-091030-S5004-STAGE1-Q026.webp",
+        "width": 1106,
+        "height": 99,
+        "scope": "生理學、生物化學、藥理學、公共衛生學",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-C217-091030-S5004-STAGE1-Q027",
+      "subject": "醫學（二）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（二）",
+      "stem": "大腸桿菌之DNA 複製過程中，不需要下列何種酵素之參與？",
+      "options": {
+        "A": "primase",
+        "B": "topoisomerases",
+        "C": "DNA polymerase",
+        "D": "reverse transcriptase"
+      },
+      "answer": "D",
+      "acceptedAnswers": [
+        "D"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：D。",
+      "testedConcept": "基礎醫學（二）（醫師分階段原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國91年第1次 醫師（一）分階段 基礎醫學（二） 5004",
+      "sourceYear": 2002,
+      "sourceRound": 1,
+      "originalQuestionNumber": 27,
+      "examCode": "091030",
+      "paperCode": "5217",
+      "examSessionLabel": "第一次",
+      "officialExam": {
+        "categoryCode": "217",
+        "subjectCode": "5004",
+        "trackCode": "STAGE1",
+        "trackLabel": "醫師（一）分階段",
+        "paperTitle": "基礎醫學（二）",
+        "questionCount": 80,
+        "timeMinutes": 60,
+        "pointsPerQuestion": 1.25,
+        "officialScope": "生理學、生物化學、藥理學、公共衛生學"
+      },
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?t=Q&code=091030&c=217&s=5004&q=1",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?t=M&code=091030&c=217&s=5004&q=1",
+        "page": 2,
+        "endPage": 2,
+        "image": "/question-media/moex-91-1-stage1-med2/MOEX-C217-091030-S5004-STAGE1-Q027.webp",
+        "width": 1106,
+        "height": 50,
+        "scope": "生理學、生物化學、藥理學、公共衛生學",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-C217-091030-S5004-STAGE1-Q028",
+      "subject": "醫學（二）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（二）",
+      "stem": "聚合 酶 連鎖反應(Polymerase Chain Reaction, PCR)之反應試劑中不包含下列何種物質？",
+      "options": {
+        "A": "oligonucleotide primer(s)",
+        "B": "耐熱性DNA polymerase",
+        "C": "DNA ligase",
+        "D": "四種去氧核糖核 苷 三磷酸(deoxyribonucleoside triphosphates)"
+      },
+      "answer": "C",
+      "acceptedAnswers": [
+        "C"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：C。",
+      "testedConcept": "基礎醫學（二）（醫師分階段原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國91年第1次 醫師（一）分階段 基礎醫學（二） 5004",
+      "sourceYear": 2002,
+      "sourceRound": 1,
+      "originalQuestionNumber": 28,
+      "examCode": "091030",
+      "paperCode": "5217",
+      "examSessionLabel": "第一次",
+      "officialExam": {
+        "categoryCode": "217",
+        "subjectCode": "5004",
+        "trackCode": "STAGE1",
+        "trackLabel": "醫師（一）分階段",
+        "paperTitle": "基礎醫學（二）",
+        "questionCount": 80,
+        "timeMinutes": 60,
+        "pointsPerQuestion": 1.25,
+        "officialScope": "生理學、生物化學、藥理學、公共衛生學"
+      },
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?t=Q&code=091030&c=217&s=5004&q=1",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?t=M&code=091030&c=217&s=5004&q=1",
+        "page": 2,
+        "endPage": 2,
+        "image": "/question-media/moex-91-1-stage1-med2/MOEX-C217-091030-S5004-STAGE1-Q028.webp",
+        "width": 1106,
+        "height": 124,
+        "scope": "生理學、生物化學、藥理學、公共衛生學",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-C217-091030-S5004-STAGE1-Q029",
+      "subject": "醫學（二）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（二）",
+      "stem": "下列何者是紅血球(erythrocyte)的能量來源？",
+      "options": {
+        "A": "酮體(ketone bodies)",
+        "B": "葡萄糖(glucose)",
+        "C": "脂肪酸(fatty acid)",
+        "D": "乳酸(lactic acid)"
+      },
+      "answer": "B",
+      "acceptedAnswers": [
+        "B"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：B。",
+      "testedConcept": "基礎醫學（二）（醫師分階段原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國91年第1次 醫師（一）分階段 基礎醫學（二） 5004",
+      "sourceYear": 2002,
+      "sourceRound": 1,
+      "originalQuestionNumber": 29,
+      "examCode": "091030",
+      "paperCode": "5217",
+      "examSessionLabel": "第一次",
+      "officialExam": {
+        "categoryCode": "217",
+        "subjectCode": "5004",
+        "trackCode": "STAGE1",
+        "trackLabel": "醫師（一）分階段",
+        "paperTitle": "基礎醫學（二）",
+        "questionCount": 80,
+        "timeMinutes": 60,
+        "pointsPerQuestion": 1.25,
+        "officialScope": "生理學、生物化學、藥理學、公共衛生學"
+      },
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?t=Q&code=091030&c=217&s=5004&q=1",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?t=M&code=091030&c=217&s=5004&q=1",
+        "page": 2,
+        "endPage": 2,
+        "image": "/question-media/moex-91-1-stage1-med2/MOEX-C217-091030-S5004-STAGE1-Q029.webp",
+        "width": 1106,
+        "height": 50,
+        "scope": "生理學、生物化學、藥理學、公共衛生學",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-C217-091030-S5004-STAGE1-Q030",
+      "subject": "醫學（二）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（二）",
+      "stem": "用餐後，血中[insulin] / [glucagon]比值上升，下列那項代謝作用被活化？",
+      "options": {
+        "A": "脂肪組織的脂解作用(lipolysis)",
+        "B": "肝臟的肝醣水解作用(glycogenolysis)",
+        "C": "Cori cycle (lactic acid cycle)",
+        "D": "肝臟的脂質新生作用(lipogenesis)"
+      },
+      "answer": "D",
+      "acceptedAnswers": [
+        "D"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：D。",
+      "testedConcept": "基礎醫學（二）（醫師分階段原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國91年第1次 醫師（一）分階段 基礎醫學（二） 5004",
+      "sourceYear": 2002,
+      "sourceRound": 1,
+      "originalQuestionNumber": 30,
+      "examCode": "091030",
+      "paperCode": "5217",
+      "examSessionLabel": "第一次",
+      "officialExam": {
+        "categoryCode": "217",
+        "subjectCode": "5004",
+        "trackCode": "STAGE1",
+        "trackLabel": "醫師（一）分階段",
+        "paperTitle": "基礎醫學（二）",
+        "questionCount": 80,
+        "timeMinutes": 60,
+        "pointsPerQuestion": 1.25,
+        "officialScope": "生理學、生物化學、藥理學、公共衛生學"
+      },
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?t=Q&code=091030&c=217&s=5004&q=1",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?t=M&code=091030&c=217&s=5004&q=1",
+        "page": 2,
+        "endPage": 2,
+        "image": "/question-media/moex-91-1-stage1-med2/MOEX-C217-091030-S5004-STAGE1-Q030.webp",
+        "width": 1106,
+        "height": 75,
+        "scope": "生理學、生物化學、藥理學、公共衛生學",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-C217-091030-S5004-STAGE1-Q031",
+      "subject": "醫學（二）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（二）",
+      "stem": "下列何種醣類代謝作用是細胞內重要輔 酶 NADPH 的主要供給途徑？",
+      "options": {
+        "A": "醣解作用(glycolysis)",
+        "B": "五碳醣磷酸鹽途徑(pentose phosphate pathway)",
+        "C": "醣質新生作用(gluconeogenesis)",
+        "D": "肝醣分解作用(glycogenolysis)"
+      },
+      "answer": "B",
+      "acceptedAnswers": [
+        "B"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：B。",
+      "testedConcept": "基礎醫學（二）（醫師分階段原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國91年第1次 醫師（一）分階段 基礎醫學（二） 5004",
+      "sourceYear": 2002,
+      "sourceRound": 1,
+      "originalQuestionNumber": 31,
+      "examCode": "091030",
+      "paperCode": "5217",
+      "examSessionLabel": "第一次",
+      "officialExam": {
+        "categoryCode": "217",
+        "subjectCode": "5004",
+        "trackCode": "STAGE1",
+        "trackLabel": "醫師（一）分階段",
+        "paperTitle": "基礎醫學（二）",
+        "questionCount": 80,
+        "timeMinutes": 60,
+        "pointsPerQuestion": 1.25,
+        "officialScope": "生理學、生物化學、藥理學、公共衛生學"
+      },
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?t=Q&code=091030&c=217&s=5004&q=1",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?t=M&code=091030&c=217&s=5004&q=1",
+        "page": 2,
+        "endPage": 2,
+        "image": "/question-media/moex-91-1-stage1-med2/MOEX-C217-091030-S5004-STAGE1-Q031.webp",
+        "width": 1106,
+        "height": 74,
+        "scope": "生理學、生物化學、藥理學、公共衛生學",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-C217-091030-S5004-STAGE1-Q032",
+      "subject": "醫學（二）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（二）",
+      "stem": "下列何種物質之代謝異常可能會引起尿酸(uric acid)聚積於人體而造成痛風(gout)？",
+      "options": {
+        "A": "alanine",
+        "B": "cysteine",
+        "C": "UTP",
+        "D": "AMP"
+      },
+      "answer": "D",
+      "acceptedAnswers": [
+        "D"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：D。",
+      "testedConcept": "基礎醫學（二）（醫師分階段原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國91年第1次 醫師（一）分階段 基礎醫學（二） 5004",
+      "sourceYear": 2002,
+      "sourceRound": 1,
+      "originalQuestionNumber": 32,
+      "examCode": "091030",
+      "paperCode": "5217",
+      "examSessionLabel": "第一次",
+      "officialExam": {
+        "categoryCode": "217",
+        "subjectCode": "5004",
+        "trackCode": "STAGE1",
+        "trackLabel": "醫師（一）分階段",
+        "paperTitle": "基礎醫學（二）",
+        "questionCount": 80,
+        "timeMinutes": 60,
+        "pointsPerQuestion": 1.25,
+        "officialScope": "生理學、生物化學、藥理學、公共衛生學"
+      },
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?t=Q&code=091030&c=217&s=5004&q=1",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?t=M&code=091030&c=217&s=5004&q=1",
+        "page": 2,
+        "endPage": 2,
+        "image": "/question-media/moex-91-1-stage1-med2/MOEX-C217-091030-S5004-STAGE1-Q032.webp",
+        "width": 1106,
+        "height": 50,
+        "scope": "生理學、生物化學、藥理學、公共衛生學",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-C217-091030-S5004-STAGE1-Q033",
+      "subject": "醫學（二）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（二）",
+      "stem": "所謂好的膽固醇(good cholesterol)指的是何種物質？",
+      "options": {
+        "A": "極低密度脂蛋白－膽固醇(VLDL-cholesterol)",
+        "B": "乳糜微粒－膽固醇(chylomicron-cholesterol)",
+        "C": "高密度脂蛋白－膽固醇(HDL-cholesterol)",
+        "D": "低密度脂蛋白－膽固醇(LDL-cholesterol)"
+      },
+      "answer": "C",
+      "acceptedAnswers": [
+        "C"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：C。",
+      "testedConcept": "基礎醫學（二）（醫師分階段原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國91年第1次 醫師（一）分階段 基礎醫學（二） 5004",
+      "sourceYear": 2002,
+      "sourceRound": 1,
+      "originalQuestionNumber": 33,
+      "examCode": "091030",
+      "paperCode": "5217",
+      "examSessionLabel": "第一次",
+      "officialExam": {
+        "categoryCode": "217",
+        "subjectCode": "5004",
+        "trackCode": "STAGE1",
+        "trackLabel": "醫師（一）分階段",
+        "paperTitle": "基礎醫學（二）",
+        "questionCount": 80,
+        "timeMinutes": 60,
+        "pointsPerQuestion": 1.25,
+        "officialScope": "生理學、生物化學、藥理學、公共衛生學"
+      },
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?t=Q&code=091030&c=217&s=5004&q=1",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?t=M&code=091030&c=217&s=5004&q=1",
+        "page": 2,
+        "endPage": 2,
+        "image": "/question-media/moex-91-1-stage1-med2/MOEX-C217-091030-S5004-STAGE1-Q033.webp",
+        "width": 1106,
+        "height": 74,
+        "scope": "生理學、生物化學、藥理學、公共衛生學",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-C217-091030-S5004-STAGE1-Q034",
+      "subject": "醫學（二）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（二）",
+      "stem": "下列有關真核細胞之蛋白質的分泌與運送到標的位置的敘述，何者錯誤？",
+      "options": {
+        "A": "細胞質蛋白質(cytoplasmic protein)在粗內質網(rough endoplasmic reticulum)合成",
+        "B": "分泌性蛋白質及膜蛋白質初合成時含有signal peptide",
+        "C": "signal recognition particle (SRP)參與分泌性蛋白及膜蛋白質之運送",
+        "D": "高爾基體參與來自粗內質網的蛋白質之進一步修飾作用"
+      },
+      "answer": "A",
+      "acceptedAnswers": [
+        "A"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：A。",
+      "testedConcept": "基礎醫學（二）（醫師分階段原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國91年第1次 醫師（一）分階段 基礎醫學（二） 5004",
+      "sourceYear": 2002,
+      "sourceRound": 1,
+      "originalQuestionNumber": 34,
+      "examCode": "091030",
+      "paperCode": "5217",
+      "examSessionLabel": "第一次",
+      "officialExam": {
+        "categoryCode": "217",
+        "subjectCode": "5004",
+        "trackCode": "STAGE1",
+        "trackLabel": "醫師（一）分階段",
+        "paperTitle": "基礎醫學（二）",
+        "questionCount": 80,
+        "timeMinutes": 60,
+        "pointsPerQuestion": 1.25,
+        "officialScope": "生理學、生物化學、藥理學、公共衛生學"
+      },
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?t=Q&code=091030&c=217&s=5004&q=1",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?t=M&code=091030&c=217&s=5004&q=1",
+        "page": 2,
+        "endPage": 2,
+        "image": "/question-media/moex-91-1-stage1-med2/MOEX-C217-091030-S5004-STAGE1-Q034.webp",
+        "width": 1106,
+        "height": 123,
+        "scope": "生理學、生物化學、藥理學、公共衛生學",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-C217-091030-S5004-STAGE1-Q035",
+      "subject": "醫學（二）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（二）",
+      "stem": "嘌呤核 苷 酸(purine nucleotides)之分解過程中，何種酵素之先天性缺陷會造成dATP 貯積，傷害免疫細胞， 引起嚴重之免疫缺乏症(immunodeficiency)？",
+      "options": {
+        "A": "adenine phosphoribsyl transferase",
+        "B": "xanthine oxidase",
+        "C": "adenosine deaminase",
+        "D": "purine nucleoside phosphorylase"
+      },
+      "answer": "C",
+      "acceptedAnswers": [
+        "C"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：C。",
+      "testedConcept": "基礎醫學（二）（醫師分階段原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國91年第1次 醫師（一）分階段 基礎醫學（二） 5004",
+      "sourceYear": 2002,
+      "sourceRound": 1,
+      "originalQuestionNumber": 35,
+      "examCode": "091030",
+      "paperCode": "5217",
+      "examSessionLabel": "第一次",
+      "officialExam": {
+        "categoryCode": "217",
+        "subjectCode": "5004",
+        "trackCode": "STAGE1",
+        "trackLabel": "醫師（一）分階段",
+        "paperTitle": "基礎醫學（二）",
+        "questionCount": 80,
+        "timeMinutes": 60,
+        "pointsPerQuestion": 1.25,
+        "officialScope": "生理學、生物化學、藥理學、公共衛生學"
+      },
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?t=Q&code=091030&c=217&s=5004&q=1",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?t=M&code=091030&c=217&s=5004&q=1",
+        "page": 2,
+        "endPage": 2,
+        "image": "/question-media/moex-91-1-stage1-med2/MOEX-C217-091030-S5004-STAGE1-Q035.webp",
+        "width": 1106,
+        "height": 99,
+        "scope": "生理學、生物化學、藥理學、公共衛生學",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-C217-091030-S5004-STAGE1-Q036",
+      "subject": "醫學（二）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（二）",
+      "stem": "從酵素動力學之研究得知下列四種酵素之Km 值(mol/l)及Kcat 值(s⁻¹)分別為：凝乳胰蛋白 酶 (chymotrypsin)： 1.5×10⁻² , 0.14；胃蛋白 酶 (pepsin)：3×10⁻⁴ , 0.5；核醣核酸 酶 (ribonuclease)：7.9×10⁻³ , 7.9×10²；碳酸酐 酶 (carbonic anhydrase)：2.6×10⁻⁶ , 4×10⁵；試問何種酵素對其受質(substrate)有最大的反應效率(efficiency)？",
+      "options": {
+        "A": "chymotrypsin",
+        "B": "pepsin",
+        "C": "ribonuclease",
+        "D": "carbonic anhydrase"
+      },
+      "answer": "D",
+      "acceptedAnswers": [
+        "D"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：D。",
+      "testedConcept": "基礎醫學（二）（醫師分階段原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國91年第1次 醫師（一）分階段 基礎醫學（二） 5004",
+      "sourceYear": 2002,
+      "sourceRound": 1,
+      "originalQuestionNumber": 36,
+      "examCode": "091030",
+      "paperCode": "5217",
+      "examSessionLabel": "第一次",
+      "officialExam": {
+        "categoryCode": "217",
+        "subjectCode": "5004",
+        "trackCode": "STAGE1",
+        "trackLabel": "醫師（一）分階段",
+        "paperTitle": "基礎醫學（二）",
+        "questionCount": 80,
+        "timeMinutes": 60,
+        "pointsPerQuestion": 1.25,
+        "officialScope": "生理學、生物化學、藥理學、公共衛生學"
+      },
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?t=Q&code=091030&c=217&s=5004&q=1",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?t=M&code=091030&c=217&s=5004&q=1",
+        "page": 2,
+        "endPage": 2,
+        "image": "/question-media/moex-91-1-stage1-med2/MOEX-C217-091030-S5004-STAGE1-Q036.webp",
+        "width": 1383,
+        "height": 123,
+        "scope": "生理學、生物化學、藥理學、公共衛生學",
+        "answerNote": null
+      },
+      "stemImage": "/question-media/moex-91-1-stage1-med2/MOEX-C217-091030-S5004-STAGE1-Q036.webp"
+    },
+    {
+      "id": "MOEX-C217-091030-S5004-STAGE1-Q037",
+      "subject": "醫學（二）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（二）",
+      "stem": "蛋白質的一至四級結構中，常被用來鑑定分子演化上程度及功能上異同比對的是什麼？",
+      "options": {
+        "A": "一級(primary)結構",
+        "B": "二級(secondary)結構",
+        "C": "三級(tertiary)結構",
+        "D": "四級(quaternary)結構"
+      },
+      "answer": "A",
+      "acceptedAnswers": [
+        "A"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：A。",
+      "testedConcept": "基礎醫學（二）（醫師分階段原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國91年第1次 醫師（一）分階段 基礎醫學（二） 5004",
+      "sourceYear": 2002,
+      "sourceRound": 1,
+      "originalQuestionNumber": 37,
+      "examCode": "091030",
+      "paperCode": "5217",
+      "examSessionLabel": "第一次",
+      "officialExam": {
+        "categoryCode": "217",
+        "subjectCode": "5004",
+        "trackCode": "STAGE1",
+        "trackLabel": "醫師（一）分階段",
+        "paperTitle": "基礎醫學（二）",
+        "questionCount": 80,
+        "timeMinutes": 60,
+        "pointsPerQuestion": 1.25,
+        "officialScope": "生理學、生物化學、藥理學、公共衛生學"
+      },
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?t=Q&code=091030&c=217&s=5004&q=1",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?t=M&code=091030&c=217&s=5004&q=1",
+        "page": 3,
+        "endPage": 3,
+        "image": "/question-media/moex-91-1-stage1-med2/MOEX-C217-091030-S5004-STAGE1-Q037.webp",
+        "width": 1106,
+        "height": 52,
+        "scope": "生理學、生物化學、藥理學、公共衛生學",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-C217-091030-S5004-STAGE1-Q038",
+      "subject": "醫學（二）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（二）",
+      "stem": "當一mRNA 進行轉譯作用(translation)時，5’-UUC-3’位在核糖體的A site 時會和下列何種序列之反密碼 (anticodon)的aminoacyl-tRNA 結合？",
+      "options": {
+        "A": "5’-AAG-3’",
+        "B": "5’-IAA-3’",
+        "C": "5’-AAI-3’",
+        "D": "5’-CUI-3’"
+      },
+      "answer": "B",
+      "acceptedAnswers": [
+        "B"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：B。",
+      "testedConcept": "基礎醫學（二）（醫師分階段原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國91年第1次 醫師（一）分階段 基礎醫學（二） 5004",
+      "sourceYear": 2002,
+      "sourceRound": 1,
+      "originalQuestionNumber": 38,
+      "examCode": "091030",
+      "paperCode": "5217",
+      "examSessionLabel": "第一次",
+      "officialExam": {
+        "categoryCode": "217",
+        "subjectCode": "5004",
+        "trackCode": "STAGE1",
+        "trackLabel": "醫師（一）分階段",
+        "paperTitle": "基礎醫學（二）",
+        "questionCount": 80,
+        "timeMinutes": 60,
+        "pointsPerQuestion": 1.25,
+        "officialScope": "生理學、生物化學、藥理學、公共衛生學"
+      },
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?t=Q&code=091030&c=217&s=5004&q=1",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?t=M&code=091030&c=217&s=5004&q=1",
+        "page": 3,
+        "endPage": 3,
+        "image": "/question-media/moex-91-1-stage1-med2/MOEX-C217-091030-S5004-STAGE1-Q038.webp",
+        "width": 1383,
+        "height": 92,
+        "scope": "生理學、生物化學、藥理學、公共衛生學",
+        "answerNote": null
+      },
+      "stemImage": "/question-media/moex-91-1-stage1-med2/MOEX-C217-091030-S5004-STAGE1-Q038.webp"
+    },
+    {
+      "id": "MOEX-C217-091030-S5004-STAGE1-Q039",
+      "subject": "醫學（二）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（二）",
+      "stem": "大腸桿菌之Uvr ABC excinuclease 是下列何種DNA 修補(DNA repair)所需之酵素？",
+      "options": {
+        "A": "mismatch repair（不適當配對修補）",
+        "B": "base-excision repair（鹼基切除修補）",
+        "C": "nucleotide-excision repair（核 苷 酸切除修補）",
+        "D": "SOS repair（SOS 修補）"
+      },
+      "answer": "C",
+      "acceptedAnswers": [
+        "C"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：C。",
+      "testedConcept": "基礎醫學（二）（醫師分階段原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國91年第1次 醫師（一）分階段 基礎醫學（二） 5004",
+      "sourceYear": 2002,
+      "sourceRound": 1,
+      "originalQuestionNumber": 39,
+      "examCode": "091030",
+      "paperCode": "5217",
+      "examSessionLabel": "第一次",
+      "officialExam": {
+        "categoryCode": "217",
+        "subjectCode": "5004",
+        "trackCode": "STAGE1",
+        "trackLabel": "醫師（一）分階段",
+        "paperTitle": "基礎醫學（二）",
+        "questionCount": 80,
+        "timeMinutes": 60,
+        "pointsPerQuestion": 1.25,
+        "officialScope": "生理學、生物化學、藥理學、公共衛生學"
+      },
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?t=Q&code=091030&c=217&s=5004&q=1",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?t=M&code=091030&c=217&s=5004&q=1",
+        "page": 3,
+        "endPage": 3,
+        "image": "/question-media/moex-91-1-stage1-med2/MOEX-C217-091030-S5004-STAGE1-Q039.webp",
+        "width": 1106,
+        "height": 74,
+        "scope": "生理學、生物化學、藥理學、公共衛生學",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-C217-091030-S5004-STAGE1-Q040",
+      "subject": "醫學（二）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（二）",
+      "stem": "有關麩胱甘 肽 (glutathione)所扮演的角色，何者錯誤？",
+      "options": {
+        "A": "為有機過氧化物之還原劑",
+        "B": "去除自由基(free radicals)",
+        "C": "將血紅素(hemoglobin)轉變成高鐵血紅素(methemoglobin)",
+        "D": "與有毒物質形成硫複合物(sulfur conjugates)，以利解毒"
+      },
+      "answer": "C",
+      "acceptedAnswers": [
+        "C"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：C。",
+      "testedConcept": "基礎醫學（二）（醫師分階段原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國91年第1次 醫師（一）分階段 基礎醫學（二） 5004",
+      "sourceYear": 2002,
+      "sourceRound": 1,
+      "originalQuestionNumber": 40,
+      "examCode": "091030",
+      "paperCode": "5217",
+      "examSessionLabel": "第一次",
+      "officialExam": {
+        "categoryCode": "217",
+        "subjectCode": "5004",
+        "trackCode": "STAGE1",
+        "trackLabel": "醫師（一）分階段",
+        "paperTitle": "基礎醫學（二）",
+        "questionCount": 80,
+        "timeMinutes": 60,
+        "pointsPerQuestion": 1.25,
+        "officialScope": "生理學、生物化學、藥理學、公共衛生學"
+      },
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?t=Q&code=091030&c=217&s=5004&q=1",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?t=M&code=091030&c=217&s=5004&q=1",
+        "page": 3,
+        "endPage": 3,
+        "image": "/question-media/moex-91-1-stage1-med2/MOEX-C217-091030-S5004-STAGE1-Q040.webp",
+        "width": 1106,
+        "height": 123,
+        "scope": "生理學、生物化學、藥理學、公共衛生學",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-C217-091030-S5004-STAGE1-Q041",
+      "subject": "醫學（二）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（二）",
+      "stem": "Theophylline 在新生兒之藥物動力學有別於成人，下列何者不正確？",
+      "options": {
+        "A": "其代謝物caffeine 會累積在新生兒血中",
+        "B": "其與血漿蛋白質結合之比率在新生兒較大",
+        "C": "以較大量原型藥物排於新生兒尿中",
+        "D": "其半衰期(t1/2)在新生兒較長"
+      },
+      "answer": "B",
+      "acceptedAnswers": [
+        "B"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：B。",
+      "testedConcept": "基礎醫學（二）（醫師分階段原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國91年第1次 醫師（一）分階段 基礎醫學（二） 5004",
+      "sourceYear": 2002,
+      "sourceRound": 1,
+      "originalQuestionNumber": 41,
+      "examCode": "091030",
+      "paperCode": "5217",
+      "examSessionLabel": "第一次",
+      "officialExam": {
+        "categoryCode": "217",
+        "subjectCode": "5004",
+        "trackCode": "STAGE1",
+        "trackLabel": "醫師（一）分階段",
+        "paperTitle": "基礎醫學（二）",
+        "questionCount": 80,
+        "timeMinutes": 60,
+        "pointsPerQuestion": 1.25,
+        "officialScope": "生理學、生物化學、藥理學、公共衛生學"
+      },
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?t=Q&code=091030&c=217&s=5004&q=1",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?t=M&code=091030&c=217&s=5004&q=1",
+        "page": 3,
+        "endPage": 3,
+        "image": "/question-media/moex-91-1-stage1-med2/MOEX-C217-091030-S5004-STAGE1-Q041.webp",
+        "width": 1106,
+        "height": 74,
+        "scope": "生理學、生物化學、藥理學、公共衛生學",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-C217-091030-S5004-STAGE1-Q042",
+      "subject": "醫學（二）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（二）",
+      "stem": "腎臟排泄藥物牽涉之過程有那些？ ① 腎絲球過濾 ② 腎小管分泌 ③ 腎小管再吸收",
+      "options": {
+        "A": "①",
+        "B": "① ②",
+        "C": "① ③",
+        "D": "① ② ③"
+      },
+      "answer": "D",
+      "acceptedAnswers": [
+        "D"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：D。",
+      "testedConcept": "基礎醫學（二）（醫師分階段原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國91年第1次 醫師（一）分階段 基礎醫學（二） 5004",
+      "sourceYear": 2002,
+      "sourceRound": 1,
+      "originalQuestionNumber": 42,
+      "examCode": "091030",
+      "paperCode": "5217",
+      "examSessionLabel": "第一次",
+      "officialExam": {
+        "categoryCode": "217",
+        "subjectCode": "5004",
+        "trackCode": "STAGE1",
+        "trackLabel": "醫師（一）分階段",
+        "paperTitle": "基礎醫學（二）",
+        "questionCount": 80,
+        "timeMinutes": 60,
+        "pointsPerQuestion": 1.25,
+        "officialScope": "生理學、生物化學、藥理學、公共衛生學"
+      },
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?t=Q&code=091030&c=217&s=5004&q=1",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?t=M&code=091030&c=217&s=5004&q=1",
+        "page": 3,
+        "endPage": 3,
+        "image": "/question-media/moex-91-1-stage1-med2/MOEX-C217-091030-S5004-STAGE1-Q042.webp",
+        "width": 1106,
+        "height": 50,
+        "scope": "生理學、生物化學、藥理學、公共衛生學",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-C217-091030-S5004-STAGE1-Q043",
+      "subject": "醫學（二）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（二）",
+      "stem": "下列何種抗癌藥物之組合對Hodgkin’s disease 有不錯之療效？",
+      "options": {
+        "A": "ABVD (adriamycin, bleomycin, vinblastine, dacarbazine)",
+        "B": "CMF (cyclophosphamide, methotrexate, 5-fluorouracil)",
+        "C": "PVC (procarbazine, vincristine, CCNU)",
+        "D": "BEP (bleomycin, etoposide, cisplatin)"
+      },
+      "answer": "A",
+      "acceptedAnswers": [
+        "A"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：A。",
+      "testedConcept": "基礎醫學（二）（醫師分階段原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國91年第1次 醫師（一）分階段 基礎醫學（二） 5004",
+      "sourceYear": 2002,
+      "sourceRound": 1,
+      "originalQuestionNumber": 43,
+      "examCode": "091030",
+      "paperCode": "5217",
+      "examSessionLabel": "第一次",
+      "officialExam": {
+        "categoryCode": "217",
+        "subjectCode": "5004",
+        "trackCode": "STAGE1",
+        "trackLabel": "醫師（一）分階段",
+        "paperTitle": "基礎醫學（二）",
+        "questionCount": 80,
+        "timeMinutes": 60,
+        "pointsPerQuestion": 1.25,
+        "officialScope": "生理學、生物化學、藥理學、公共衛生學"
+      },
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?t=Q&code=091030&c=217&s=5004&q=1",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?t=M&code=091030&c=217&s=5004&q=1",
+        "page": 3,
+        "endPage": 3,
+        "image": "/question-media/moex-91-1-stage1-med2/MOEX-C217-091030-S5004-STAGE1-Q043.webp",
+        "width": 1106,
+        "height": 124,
+        "scope": "生理學、生物化學、藥理學、公共衛生學",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-C217-091030-S5004-STAGE1-Q044",
+      "subject": "醫學（二）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（二）",
+      "stem": "下列抗肺結核藥物中，何者對於肺結核桿菌只有抑制(bacteriostatic)，而無殺菌(bactericidal)作用？",
+      "options": {
+        "A": "Isoniazid",
+        "B": "Rifampin",
+        "C": "Ethambutol",
+        "D": "Pyrazinamide"
+      },
+      "answer": "C",
+      "acceptedAnswers": [
+        "C"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：C。",
+      "testedConcept": "基礎醫學（二）（醫師分階段原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國91年第1次 醫師（一）分階段 基礎醫學（二） 5004",
+      "sourceYear": 2002,
+      "sourceRound": 1,
+      "originalQuestionNumber": 44,
+      "examCode": "091030",
+      "paperCode": "5217",
+      "examSessionLabel": "第一次",
+      "officialExam": {
+        "categoryCode": "217",
+        "subjectCode": "5004",
+        "trackCode": "STAGE1",
+        "trackLabel": "醫師（一）分階段",
+        "paperTitle": "基礎醫學（二）",
+        "questionCount": 80,
+        "timeMinutes": 60,
+        "pointsPerQuestion": 1.25,
+        "officialScope": "生理學、生物化學、藥理學、公共衛生學"
+      },
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?t=Q&code=091030&c=217&s=5004&q=1",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?t=M&code=091030&c=217&s=5004&q=1",
+        "page": 3,
+        "endPage": 3,
+        "image": "/question-media/moex-91-1-stage1-med2/MOEX-C217-091030-S5004-STAGE1-Q044.webp",
+        "width": 1106,
+        "height": 50,
+        "scope": "生理學、生物化學、藥理學、公共衛生學",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-C217-091030-S5004-STAGE1-Q045",
+      "subject": "醫學（二）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（二）",
+      "stem": "Aspirin 不適用於治療下列何種疾病？",
+      "options": {
+        "A": "深層靜脈血栓",
+        "B": "中風",
+        "C": "不穩定心絞痛",
+        "D": "急性心肌梗塞"
+      },
+      "answer": "A",
+      "acceptedAnswers": [
+        "A",
+        "B"
+      ],
+      "answerCreditType": "multiple_accepted",
+      "explanation": "官方最終答案：A、B。",
+      "testedConcept": "基礎醫學（二）（醫師分階段原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國91年第1次 醫師（一）分階段 基礎醫學（二） 5004",
+      "sourceYear": 2002,
+      "sourceRound": 1,
+      "originalQuestionNumber": 45,
+      "examCode": "091030",
+      "paperCode": "5217",
+      "examSessionLabel": "第一次",
+      "officialExam": {
+        "categoryCode": "217",
+        "subjectCode": "5004",
+        "trackCode": "STAGE1",
+        "trackLabel": "醫師（一）分階段",
+        "paperTitle": "基礎醫學（二）",
+        "questionCount": 80,
+        "timeMinutes": 60,
+        "pointsPerQuestion": 1.25,
+        "officialScope": "生理學、生物化學、藥理學、公共衛生學"
+      },
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?t=Q&code=091030&c=217&s=5004&q=1",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?t=M&code=091030&c=217&s=5004&q=1",
+        "page": 3,
+        "endPage": 3,
+        "image": "/question-media/moex-91-1-stage1-med2/MOEX-C217-091030-S5004-STAGE1-Q045.webp",
+        "width": 1106,
+        "height": 50,
+        "scope": "生理學、生物化學、藥理學、公共衛生學",
+        "answerNote": "第45題答A或答B者均給分"
+      }
+    },
+    {
+      "id": "MOEX-C217-091030-S5004-STAGE1-Q046",
+      "subject": "醫學（二）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（二）",
+      "stem": "下列群落刺激素(CSF,colony-stimulating factor)中，何者目前最適用於骨髓移植（此重組成分又名 sargramostim）？",
+      "options": {
+        "A": "G-CSF",
+        "B": "GM-CSF",
+        "C": "Multi-CSF",
+        "D": "M-CSF"
+      },
+      "answer": "B",
+      "acceptedAnswers": [
+        "B"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：B。",
+      "testedConcept": "基礎醫學（二）（醫師分階段原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國91年第1次 醫師（一）分階段 基礎醫學（二） 5004",
+      "sourceYear": 2002,
+      "sourceRound": 1,
+      "originalQuestionNumber": 46,
+      "examCode": "091030",
+      "paperCode": "5217",
+      "examSessionLabel": "第一次",
+      "officialExam": {
+        "categoryCode": "217",
+        "subjectCode": "5004",
+        "trackCode": "STAGE1",
+        "trackLabel": "醫師（一）分階段",
+        "paperTitle": "基礎醫學（二）",
+        "questionCount": 80,
+        "timeMinutes": 60,
+        "pointsPerQuestion": 1.25,
+        "officialScope": "生理學、生物化學、藥理學、公共衛生學"
+      },
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?t=Q&code=091030&c=217&s=5004&q=1",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?t=M&code=091030&c=217&s=5004&q=1",
+        "page": 3,
+        "endPage": 3,
+        "image": "/question-media/moex-91-1-stage1-med2/MOEX-C217-091030-S5004-STAGE1-Q046.webp",
+        "width": 1106,
+        "height": 75,
+        "scope": "生理學、生物化學、藥理學、公共衛生學",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-C217-091030-S5004-STAGE1-Q047",
+      "subject": "醫學（二）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（二）",
+      "stem": "下列何者不是甲狀腺毒症(thyrotoxicosis)之症狀？",
+      "options": {
+        "A": "眼球突出",
+        "B": "骨質疏鬆症",
+        "C": "基礎代謝率增加",
+        "D": "周邊血管阻力增加"
+      },
+      "answer": "D",
+      "acceptedAnswers": [
+        "D"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：D。",
+      "testedConcept": "基礎醫學（二）（醫師分階段原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國91年第1次 醫師（一）分階段 基礎醫學（二） 5004",
+      "sourceYear": 2002,
+      "sourceRound": 1,
+      "originalQuestionNumber": 47,
+      "examCode": "091030",
+      "paperCode": "5217",
+      "examSessionLabel": "第一次",
+      "officialExam": {
+        "categoryCode": "217",
+        "subjectCode": "5004",
+        "trackCode": "STAGE1",
+        "trackLabel": "醫師（一）分階段",
+        "paperTitle": "基礎醫學（二）",
+        "questionCount": 80,
+        "timeMinutes": 60,
+        "pointsPerQuestion": 1.25,
+        "officialScope": "生理學、生物化學、藥理學、公共衛生學"
+      },
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?t=Q&code=091030&c=217&s=5004&q=1",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?t=M&code=091030&c=217&s=5004&q=1",
+        "page": 3,
+        "endPage": 3,
+        "image": "/question-media/moex-91-1-stage1-med2/MOEX-C217-091030-S5004-STAGE1-Q047.webp",
+        "width": 1106,
+        "height": 50,
+        "scope": "生理學、生物化學、藥理學、公共衛生學",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-C217-091030-S5004-STAGE1-Q048",
+      "subject": "醫學（二）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（二）",
+      "stem": "下列有關胰島素(insulin)之敘述中，何者不正確？",
+      "options": {
+        "A": "在肝臟抑制肝醣分解",
+        "B": "在肝臟促進胺基酸轉變成葡萄糖",
+        "C": "在肌肉促進葡萄糖回收(uptake)",
+        "D": "在脂肪組織抑制細胞內lipase"
+      },
+      "answer": "B",
+      "acceptedAnswers": [
+        "B"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：B。",
+      "testedConcept": "基礎醫學（二）（醫師分階段原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國91年第1次 醫師（一）分階段 基礎醫學（二） 5004",
+      "sourceYear": 2002,
+      "sourceRound": 1,
+      "originalQuestionNumber": 48,
+      "examCode": "091030",
+      "paperCode": "5217",
+      "examSessionLabel": "第一次",
+      "officialExam": {
+        "categoryCode": "217",
+        "subjectCode": "5004",
+        "trackCode": "STAGE1",
+        "trackLabel": "醫師（一）分階段",
+        "paperTitle": "基礎醫學（二）",
+        "questionCount": 80,
+        "timeMinutes": 60,
+        "pointsPerQuestion": 1.25,
+        "officialScope": "生理學、生物化學、藥理學、公共衛生學"
+      },
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?t=Q&code=091030&c=217&s=5004&q=1",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?t=M&code=091030&c=217&s=5004&q=1",
+        "page": 3,
+        "endPage": 3,
+        "image": "/question-media/moex-91-1-stage1-med2/MOEX-C217-091030-S5004-STAGE1-Q048.webp",
+        "width": 1106,
+        "height": 75,
+        "scope": "生理學、生物化學、藥理學、公共衛生學",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-C217-091030-S5004-STAGE1-Q049",
+      "subject": "醫學（二）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（二）",
+      "stem": "下列何種藥物不適合用於治療心衰竭的病人？",
+      "options": {
+        "A": "propranolol",
+        "B": "phosphodiesterase Ⅲ inhibitors",
+        "C": "dopamine",
+        "D": "digitoxin"
+      },
+      "answer": "A",
+      "acceptedAnswers": [
+        "A"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：A。",
+      "testedConcept": "基礎醫學（二）（醫師分階段原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國91年第1次 醫師（一）分階段 基礎醫學（二） 5004",
+      "sourceYear": 2002,
+      "sourceRound": 1,
+      "originalQuestionNumber": 49,
+      "examCode": "091030",
+      "paperCode": "5217",
+      "examSessionLabel": "第一次",
+      "officialExam": {
+        "categoryCode": "217",
+        "subjectCode": "5004",
+        "trackCode": "STAGE1",
+        "trackLabel": "醫師（一）分階段",
+        "paperTitle": "基礎醫學（二）",
+        "questionCount": 80,
+        "timeMinutes": 60,
+        "pointsPerQuestion": 1.25,
+        "officialScope": "生理學、生物化學、藥理學、公共衛生學"
+      },
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?t=Q&code=091030&c=217&s=5004&q=1",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?t=M&code=091030&c=217&s=5004&q=1",
+        "page": 3,
+        "endPage": 3,
+        "image": "/question-media/moex-91-1-stage1-med2/MOEX-C217-091030-S5004-STAGE1-Q049.webp",
+        "width": 1106,
+        "height": 74,
+        "scope": "生理學、生物化學、藥理學、公共衛生學",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-C217-091030-S5004-STAGE1-Q050",
+      "subject": "醫學（二）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（二）",
+      "stem": "長期服用下列何種抗心律不整藥物，易引起類似金雞鈉中毒(cinchonism)，而產生頭痛、暈眩和耳鳴的 症狀？",
+      "options": {
+        "A": "bretylium",
+        "B": "amiodarone",
+        "C": "quinidine",
+        "D": "lidocaine"
+      },
+      "answer": "C",
+      "acceptedAnswers": [
+        "C"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：C。",
+      "testedConcept": "基礎醫學（二）（醫師分階段原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國91年第1次 醫師（一）分階段 基礎醫學（二） 5004",
+      "sourceYear": 2002,
+      "sourceRound": 1,
+      "originalQuestionNumber": 50,
+      "examCode": "091030",
+      "paperCode": "5217",
+      "examSessionLabel": "第一次",
+      "officialExam": {
+        "categoryCode": "217",
+        "subjectCode": "5004",
+        "trackCode": "STAGE1",
+        "trackLabel": "醫師（一）分階段",
+        "paperTitle": "基礎醫學（二）",
+        "questionCount": 80,
+        "timeMinutes": 60,
+        "pointsPerQuestion": 1.25,
+        "officialScope": "生理學、生物化學、藥理學、公共衛生學"
+      },
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?t=Q&code=091030&c=217&s=5004&q=1",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?t=M&code=091030&c=217&s=5004&q=1",
+        "page": 3,
+        "endPage": 3,
+        "image": "/question-media/moex-91-1-stage1-med2/MOEX-C217-091030-S5004-STAGE1-Q050.webp",
+        "width": 1106,
+        "height": 74,
+        "scope": "生理學、生物化學、藥理學、公共衛生學",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-C217-091030-S5004-STAGE1-Q051",
+      "subject": "醫學（二）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（二）",
+      "stem": "下列何者為小孩誤食顛茄生物鹼(belladonna alkaloids)之主要副作用？",
+      "options": {
+        "A": "高血壓",
+        "B": "體溫過熱",
+        "C": "脫水",
+        "D": "抑制腸道收縮"
+      },
+      "answer": "B",
+      "acceptedAnswers": [
+        "B"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：B。",
+      "testedConcept": "基礎醫學（二）（醫師分階段原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國91年第1次 醫師（一）分階段 基礎醫學（二） 5004",
+      "sourceYear": 2002,
+      "sourceRound": 1,
+      "originalQuestionNumber": 51,
+      "examCode": "091030",
+      "paperCode": "5217",
+      "examSessionLabel": "第一次",
+      "officialExam": {
+        "categoryCode": "217",
+        "subjectCode": "5004",
+        "trackCode": "STAGE1",
+        "trackLabel": "醫師（一）分階段",
+        "paperTitle": "基礎醫學（二）",
+        "questionCount": 80,
+        "timeMinutes": 60,
+        "pointsPerQuestion": 1.25,
+        "officialScope": "生理學、生物化學、藥理學、公共衛生學"
+      },
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?t=Q&code=091030&c=217&s=5004&q=1",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?t=M&code=091030&c=217&s=5004&q=1",
+        "page": 3,
+        "endPage": 3,
+        "image": "/question-media/moex-91-1-stage1-med2/MOEX-C217-091030-S5004-STAGE1-Q051.webp",
+        "width": 1106,
+        "height": 50,
+        "scope": "生理學、生物化學、藥理學、公共衛生學",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-C217-091030-S5004-STAGE1-Q052",
+      "subject": "醫學（二）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（二）",
+      "stem": "下列何種瀉劑不應在睡前服用？",
+      "options": {
+        "A": "Cascara",
+        "B": "Danthron",
+        "C": "Methylcellulose",
+        "D": "Castor oil"
+      },
+      "answer": "D",
+      "acceptedAnswers": [
+        "D"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：D。",
+      "testedConcept": "基礎醫學（二）（醫師分階段原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國91年第1次 醫師（一）分階段 基礎醫學（二） 5004",
+      "sourceYear": 2002,
+      "sourceRound": 1,
+      "originalQuestionNumber": 52,
+      "examCode": "091030",
+      "paperCode": "5217",
+      "examSessionLabel": "第一次",
+      "officialExam": {
+        "categoryCode": "217",
+        "subjectCode": "5004",
+        "trackCode": "STAGE1",
+        "trackLabel": "醫師（一）分階段",
+        "paperTitle": "基礎醫學（二）",
+        "questionCount": 80,
+        "timeMinutes": 60,
+        "pointsPerQuestion": 1.25,
+        "officialScope": "生理學、生物化學、藥理學、公共衛生學"
+      },
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?t=Q&code=091030&c=217&s=5004&q=1",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?t=M&code=091030&c=217&s=5004&q=1",
+        "page": 3,
+        "endPage": 3,
+        "image": "/question-media/moex-91-1-stage1-med2/MOEX-C217-091030-S5004-STAGE1-Q052.webp",
+        "width": 1106,
+        "height": 50,
+        "scope": "生理學、生物化學、藥理學、公共衛生學",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-C217-091030-S5004-STAGE1-Q053",
+      "subject": "醫學（二）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（二）",
+      "stem": "下列何者為活化H2-受體的作用？",
+      "options": {
+        "A": "腸胃道收縮",
+        "B": "胃酸分泌",
+        "C": "刺激中樞神經",
+        "D": "氣管收縮"
+      },
+      "answer": "B",
+      "acceptedAnswers": [
+        "B"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：B。",
+      "testedConcept": "基礎醫學（二）（醫師分階段原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國91年第1次 醫師（一）分階段 基礎醫學（二） 5004",
+      "sourceYear": 2002,
+      "sourceRound": 1,
+      "originalQuestionNumber": 53,
+      "examCode": "091030",
+      "paperCode": "5217",
+      "examSessionLabel": "第一次",
+      "officialExam": {
+        "categoryCode": "217",
+        "subjectCode": "5004",
+        "trackCode": "STAGE1",
+        "trackLabel": "醫師（一）分階段",
+        "paperTitle": "基礎醫學（二）",
+        "questionCount": 80,
+        "timeMinutes": 60,
+        "pointsPerQuestion": 1.25,
+        "officialScope": "生理學、生物化學、藥理學、公共衛生學"
+      },
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?t=Q&code=091030&c=217&s=5004&q=1",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?t=M&code=091030&c=217&s=5004&q=1",
+        "page": 3,
+        "endPage": 3,
+        "image": "/question-media/moex-91-1-stage1-med2/MOEX-C217-091030-S5004-STAGE1-Q053.webp",
+        "width": 1106,
+        "height": 50,
+        "scope": "生理學、生物化學、藥理學、公共衛生學",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-C217-091030-S5004-STAGE1-Q054",
+      "subject": "醫學（二）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（二）",
+      "stem": "下列何者為安全解熱而沒有抗發炎的作用？",
+      "options": {
+        "A": "Aspirin",
+        "B": "Indomethacin",
+        "C": "Ibuprofen",
+        "D": "Acetaminophen"
+      },
+      "answer": "D",
+      "acceptedAnswers": [
+        "D"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：D。",
+      "testedConcept": "基礎醫學（二）（醫師分階段原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國91年第1次 醫師（一）分階段 基礎醫學（二） 5004",
+      "sourceYear": 2002,
+      "sourceRound": 1,
+      "originalQuestionNumber": 54,
+      "examCode": "091030",
+      "paperCode": "5217",
+      "examSessionLabel": "第一次",
+      "officialExam": {
+        "categoryCode": "217",
+        "subjectCode": "5004",
+        "trackCode": "STAGE1",
+        "trackLabel": "醫師（一）分階段",
+        "paperTitle": "基礎醫學（二）",
+        "questionCount": 80,
+        "timeMinutes": 60,
+        "pointsPerQuestion": 1.25,
+        "officialScope": "生理學、生物化學、藥理學、公共衛生學"
+      },
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?t=Q&code=091030&c=217&s=5004&q=1",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?t=M&code=091030&c=217&s=5004&q=1",
+        "page": 3,
+        "endPage": 3,
+        "image": "/question-media/moex-91-1-stage1-med2/MOEX-C217-091030-S5004-STAGE1-Q054.webp",
+        "width": 1106,
+        "height": 50,
+        "scope": "生理學、生物化學、藥理學、公共衛生學",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-C217-091030-S5004-STAGE1-Q055",
+      "subject": "醫學（二）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（二）",
+      "stem": "下列何者不能用來治療痛風？",
+      "options": {
+        "A": "Aspirin",
+        "B": "Indomethacin",
+        "C": "Colchicine",
+        "D": "Probenecid"
+      },
+      "answer": "A",
+      "acceptedAnswers": [
+        "A"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：A。",
+      "testedConcept": "基礎醫學（二）（醫師分階段原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國91年第1次 醫師（一）分階段 基礎醫學（二） 5004",
+      "sourceYear": 2002,
+      "sourceRound": 1,
+      "originalQuestionNumber": 55,
+      "examCode": "091030",
+      "paperCode": "5217",
+      "examSessionLabel": "第一次",
+      "officialExam": {
+        "categoryCode": "217",
+        "subjectCode": "5004",
+        "trackCode": "STAGE1",
+        "trackLabel": "醫師（一）分階段",
+        "paperTitle": "基礎醫學（二）",
+        "questionCount": 80,
+        "timeMinutes": 60,
+        "pointsPerQuestion": 1.25,
+        "officialScope": "生理學、生物化學、藥理學、公共衛生學"
+      },
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?t=Q&code=091030&c=217&s=5004&q=1",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?t=M&code=091030&c=217&s=5004&q=1",
+        "page": 3,
+        "endPage": 3,
+        "image": "/question-media/moex-91-1-stage1-med2/MOEX-C217-091030-S5004-STAGE1-Q055.webp",
+        "width": 1106,
+        "height": 49,
+        "scope": "生理學、生物化學、藥理學、公共衛生學",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-C217-091030-S5004-STAGE1-Q056",
+      "subject": "醫學（二）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（二）",
+      "stem": "腎上腺素阻斷劑所引起之副作用，下列敘述何者正確？",
+      "options": {
+        "A": "alpha-受體阻斷劑引起氣管痙攣",
+        "B": "beta-受體阻斷劑引起充血性心臟衰竭",
+        "C": "alpha-受體阻斷劑干擾睡眠",
+        "D": "beta-受體阻斷劑增高眼內壓"
+      },
+      "answer": "B",
+      "acceptedAnswers": [
+        "B"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：B。",
+      "testedConcept": "基礎醫學（二）（醫師分階段原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國91年第1次 醫師（一）分階段 基礎醫學（二） 5004",
+      "sourceYear": 2002,
+      "sourceRound": 1,
+      "originalQuestionNumber": 56,
+      "examCode": "091030",
+      "paperCode": "5217",
+      "examSessionLabel": "第一次",
+      "officialExam": {
+        "categoryCode": "217",
+        "subjectCode": "5004",
+        "trackCode": "STAGE1",
+        "trackLabel": "醫師（一）分階段",
+        "paperTitle": "基礎醫學（二）",
+        "questionCount": 80,
+        "timeMinutes": 60,
+        "pointsPerQuestion": 1.25,
+        "officialScope": "生理學、生物化學、藥理學、公共衛生學"
+      },
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?t=Q&code=091030&c=217&s=5004&q=1",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?t=M&code=091030&c=217&s=5004&q=1",
+        "page": 3,
+        "endPage": 3,
+        "image": "/question-media/moex-91-1-stage1-med2/MOEX-C217-091030-S5004-STAGE1-Q056.webp",
+        "width": 1106,
+        "height": 74,
+        "scope": "生理學、生物化學、藥理學、公共衛生學",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-C217-091030-S5004-STAGE1-Q057",
+      "subject": "醫學（二）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（二）",
+      "stem": "Ergotamine 臨床上應用於何種症狀的處理？",
+      "options": {
+        "A": "憂鬱症",
+        "B": "癲癇",
+        "C": "偏頭痛",
+        "D": "腦動脈硬化"
+      },
+      "answer": "C",
+      "acceptedAnswers": [
+        "C"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：C。",
+      "testedConcept": "基礎醫學（二）（醫師分階段原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國91年第1次 醫師（一）分階段 基礎醫學（二） 5004",
+      "sourceYear": 2002,
+      "sourceRound": 1,
+      "originalQuestionNumber": 57,
+      "examCode": "091030",
+      "paperCode": "5217",
+      "examSessionLabel": "第一次",
+      "officialExam": {
+        "categoryCode": "217",
+        "subjectCode": "5004",
+        "trackCode": "STAGE1",
+        "trackLabel": "醫師（一）分階段",
+        "paperTitle": "基礎醫學（二）",
+        "questionCount": 80,
+        "timeMinutes": 60,
+        "pointsPerQuestion": 1.25,
+        "officialScope": "生理學、生物化學、藥理學、公共衛生學"
+      },
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?t=Q&code=091030&c=217&s=5004&q=1",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?t=M&code=091030&c=217&s=5004&q=1",
+        "page": 3,
+        "endPage": 3,
+        "image": "/question-media/moex-91-1-stage1-med2/MOEX-C217-091030-S5004-STAGE1-Q057.webp",
+        "width": 1106,
+        "height": 114,
+        "scope": "生理學、生物化學、藥理學、公共衛生學",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-C217-091030-S5004-STAGE1-Q058",
+      "subject": "醫學（二）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（二）",
+      "stem": "下列藥品中，何者可引起嗎啡脫癮症狀，而作為嗎啡成癮患者之鑑別診斷？",
+      "options": {
+        "A": "Fentanyl",
+        "B": "Codeine",
+        "C": "Methadone",
+        "D": "Naloxone"
+      },
+      "answer": "D",
+      "acceptedAnswers": [
+        "D"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：D。",
+      "testedConcept": "基礎醫學（二）（醫師分階段原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國91年第1次 醫師（一）分階段 基礎醫學（二） 5004",
+      "sourceYear": 2002,
+      "sourceRound": 1,
+      "originalQuestionNumber": 58,
+      "examCode": "091030",
+      "paperCode": "5217",
+      "examSessionLabel": "第一次",
+      "officialExam": {
+        "categoryCode": "217",
+        "subjectCode": "5004",
+        "trackCode": "STAGE1",
+        "trackLabel": "醫師（一）分階段",
+        "paperTitle": "基礎醫學（二）",
+        "questionCount": 80,
+        "timeMinutes": 60,
+        "pointsPerQuestion": 1.25,
+        "officialScope": "生理學、生物化學、藥理學、公共衛生學"
+      },
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?t=Q&code=091030&c=217&s=5004&q=1",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?t=M&code=091030&c=217&s=5004&q=1",
+        "page": 4,
+        "endPage": 4,
+        "image": "/question-media/moex-91-1-stage1-med2/MOEX-C217-091030-S5004-STAGE1-Q058.webp",
+        "width": 1106,
+        "height": 52,
+        "scope": "生理學、生物化學、藥理學、公共衛生學",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-C217-091030-S5004-STAGE1-Q059",
+      "subject": "醫學（二）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（二）",
+      "stem": "下列吸入性麻醉藥物在與擬交感神經類藥物(sympathomimetics)同時使用時，何者易引發心室心律不整？",
+      "options": {
+        "A": "halothane",
+        "B": "isoflurane",
+        "C": "desflurane",
+        "D": "sevoflurane"
+      },
+      "answer": "A",
+      "acceptedAnswers": [
+        "A"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：A。",
+      "testedConcept": "基礎醫學（二）（醫師分階段原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國91年第1次 醫師（一）分階段 基礎醫學（二） 5004",
+      "sourceYear": 2002,
+      "sourceRound": 1,
+      "originalQuestionNumber": 59,
+      "examCode": "091030",
+      "paperCode": "5217",
+      "examSessionLabel": "第一次",
+      "officialExam": {
+        "categoryCode": "217",
+        "subjectCode": "5004",
+        "trackCode": "STAGE1",
+        "trackLabel": "醫師（一）分階段",
+        "paperTitle": "基礎醫學（二）",
+        "questionCount": 80,
+        "timeMinutes": 60,
+        "pointsPerQuestion": 1.25,
+        "officialScope": "生理學、生物化學、藥理學、公共衛生學"
+      },
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?t=Q&code=091030&c=217&s=5004&q=1",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?t=M&code=091030&c=217&s=5004&q=1",
+        "page": 4,
+        "endPage": 4,
+        "image": "/question-media/moex-91-1-stage1-med2/MOEX-C217-091030-S5004-STAGE1-Q059.webp",
+        "width": 1106,
+        "height": 50,
+        "scope": "生理學、生物化學、藥理學、公共衛生學",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-C217-091030-S5004-STAGE1-Q060",
+      "subject": "醫學（二）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（二）",
+      "stem": "下列何者不是aminoglycosides 抗生素之副作用？",
+      "options": {
+        "A": "聽力障礙",
+        "B": "腎臟毒性",
+        "C": "神經－肌阻斷",
+        "D": "溶血"
+      },
+      "answer": "D",
+      "acceptedAnswers": [
+        "D"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：D。",
+      "testedConcept": "基礎醫學（二）（醫師分階段原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國91年第1次 醫師（一）分階段 基礎醫學（二） 5004",
+      "sourceYear": 2002,
+      "sourceRound": 1,
+      "originalQuestionNumber": 60,
+      "examCode": "091030",
+      "paperCode": "5217",
+      "examSessionLabel": "第一次",
+      "officialExam": {
+        "categoryCode": "217",
+        "subjectCode": "5004",
+        "trackCode": "STAGE1",
+        "trackLabel": "醫師（一）分階段",
+        "paperTitle": "基礎醫學（二）",
+        "questionCount": 80,
+        "timeMinutes": 60,
+        "pointsPerQuestion": 1.25,
+        "officialScope": "生理學、生物化學、藥理學、公共衛生學"
+      },
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?t=Q&code=091030&c=217&s=5004&q=1",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?t=M&code=091030&c=217&s=5004&q=1",
+        "page": 4,
+        "endPage": 4,
+        "image": "/question-media/moex-91-1-stage1-med2/MOEX-C217-091030-S5004-STAGE1-Q060.webp",
+        "width": 1106,
+        "height": 50,
+        "scope": "生理學、生物化學、藥理學、公共衛生學",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-C217-091030-S5004-STAGE1-Q061",
+      "subject": "醫學（二）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（二）",
+      "stem": "下列四種率中，何者為判斷一個國家醫藥衛生水準之最佳指標？",
+      "options": {
+        "A": "粗死亡率",
+        "B": "粗出生率",
+        "C": "嬰兒死亡率",
+        "D": "結婚率"
+      },
+      "answer": "C",
+      "acceptedAnswers": [
+        "C"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：C。",
+      "testedConcept": "基礎醫學（二）（醫師分階段原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國91年第1次 醫師（一）分階段 基礎醫學（二） 5004",
+      "sourceYear": 2002,
+      "sourceRound": 1,
+      "originalQuestionNumber": 61,
+      "examCode": "091030",
+      "paperCode": "5217",
+      "examSessionLabel": "第一次",
+      "officialExam": {
+        "categoryCode": "217",
+        "subjectCode": "5004",
+        "trackCode": "STAGE1",
+        "trackLabel": "醫師（一）分階段",
+        "paperTitle": "基礎醫學（二）",
+        "questionCount": 80,
+        "timeMinutes": 60,
+        "pointsPerQuestion": 1.25,
+        "officialScope": "生理學、生物化學、藥理學、公共衛生學"
+      },
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?t=Q&code=091030&c=217&s=5004&q=1",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?t=M&code=091030&c=217&s=5004&q=1",
+        "page": 4,
+        "endPage": 4,
+        "image": "/question-media/moex-91-1-stage1-med2/MOEX-C217-091030-S5004-STAGE1-Q061.webp",
+        "width": 1106,
+        "height": 50,
+        "scope": "生理學、生物化學、藥理學、公共衛生學",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-C217-091030-S5004-STAGE1-Q062",
+      "subject": "醫學（二）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（二）",
+      "stem": "某項檢驗利用兩種化學物對一群癌症病人作皮膚接觸，試看接觸後病人身體有無被激起反應來評估其免疫 系統狀態。作完後分析兩種化學物之誘發免疫反應是否在此組病人身上相同，當用何種檢定？",
+      "options": {
+        "A": "t test",
+        "B": "paired t test",
+        "C": "X² test",
+        "D": "McNemar X² test"
+      },
+      "answer": "D",
+      "acceptedAnswers": [
+        "D"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：D。",
+      "testedConcept": "基礎醫學（二）（醫師分階段原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國91年第1次 醫師（一）分階段 基礎醫學（二） 5004",
+      "sourceYear": 2002,
+      "sourceRound": 1,
+      "originalQuestionNumber": 62,
+      "examCode": "091030",
+      "paperCode": "5217",
+      "examSessionLabel": "第一次",
+      "officialExam": {
+        "categoryCode": "217",
+        "subjectCode": "5004",
+        "trackCode": "STAGE1",
+        "trackLabel": "醫師（一）分階段",
+        "paperTitle": "基礎醫學（二）",
+        "questionCount": 80,
+        "timeMinutes": 60,
+        "pointsPerQuestion": 1.25,
+        "officialScope": "生理學、生物化學、藥理學、公共衛生學"
+      },
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?t=Q&code=091030&c=217&s=5004&q=1",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?t=M&code=091030&c=217&s=5004&q=1",
+        "page": 4,
+        "endPage": 4,
+        "image": "/question-media/moex-91-1-stage1-med2/MOEX-C217-091030-S5004-STAGE1-Q062.webp",
+        "width": 1383,
+        "height": 95,
+        "scope": "生理學、生物化學、藥理學、公共衛生學",
+        "answerNote": null
+      },
+      "stemImage": "/question-media/moex-91-1-stage1-med2/MOEX-C217-091030-S5004-STAGE1-Q062.webp"
+    },
+    {
+      "id": "MOEX-C217-091030-S5004-STAGE1-Q063",
+      "subject": "醫學（二）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（二）",
+      "stem": "有關疾病篩檢的敘述，下列何者為誤？",
+      "options": {
+        "A": "敏感度為有病者之中，篩檢為陽性的比率",
+        "B": "敏感度愈高，特異度也愈高",
+        "C": "盛行率愈高，陽性預測值愈高",
+        "D": "兩次篩檢結果可估計發生率"
+      },
+      "answer": "B",
+      "acceptedAnswers": [
+        "B"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：B。",
+      "testedConcept": "基礎醫學（二）（醫師分階段原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國91年第1次 醫師（一）分階段 基礎醫學（二） 5004",
+      "sourceYear": 2002,
+      "sourceRound": 1,
+      "originalQuestionNumber": 63,
+      "examCode": "091030",
+      "paperCode": "5217",
+      "examSessionLabel": "第一次",
+      "officialExam": {
+        "categoryCode": "217",
+        "subjectCode": "5004",
+        "trackCode": "STAGE1",
+        "trackLabel": "醫師（一）分階段",
+        "paperTitle": "基礎醫學（二）",
+        "questionCount": 80,
+        "timeMinutes": 60,
+        "pointsPerQuestion": 1.25,
+        "officialScope": "生理學、生物化學、藥理學、公共衛生學"
+      },
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?t=Q&code=091030&c=217&s=5004&q=1",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?t=M&code=091030&c=217&s=5004&q=1",
+        "page": 4,
+        "endPage": 4,
+        "image": "/question-media/moex-91-1-stage1-med2/MOEX-C217-091030-S5004-STAGE1-Q063.webp",
+        "width": 1106,
+        "height": 75,
+        "scope": "生理學、生物化學、藥理學、公共衛生學",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-C217-091030-S5004-STAGE1-Q064",
+      "subject": "醫學（二）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（二）",
+      "stem": "有關發生率的敘述下列何者為誤？",
+      "options": {
+        "A": "誘發期是發生率的一個重要決定因素",
+        "B": "累積發生率是假定一個人活到某個年齡不死於其他原因之危險性",
+        "C": "發生率是有單位的，1／時間",
+        "D": "發生率的分子可以是事件或狀態"
+      },
+      "answer": "D",
+      "acceptedAnswers": [
+        "D"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：D。",
+      "testedConcept": "基礎醫學（二）（醫師分階段原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國91年第1次 醫師（一）分階段 基礎醫學（二） 5004",
+      "sourceYear": 2002,
+      "sourceRound": 1,
+      "originalQuestionNumber": 64,
+      "examCode": "091030",
+      "paperCode": "5217",
+      "examSessionLabel": "第一次",
+      "officialExam": {
+        "categoryCode": "217",
+        "subjectCode": "5004",
+        "trackCode": "STAGE1",
+        "trackLabel": "醫師（一）分階段",
+        "paperTitle": "基礎醫學（二）",
+        "questionCount": 80,
+        "timeMinutes": 60,
+        "pointsPerQuestion": 1.25,
+        "officialScope": "生理學、生物化學、藥理學、公共衛生學"
+      },
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?t=Q&code=091030&c=217&s=5004&q=1",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?t=M&code=091030&c=217&s=5004&q=1",
+        "page": 4,
+        "endPage": 4,
+        "image": "/question-media/moex-91-1-stage1-med2/MOEX-C217-091030-S5004-STAGE1-Q064.webp",
+        "width": 1106,
+        "height": 124,
+        "scope": "生理學、生物化學、藥理學、公共衛生學",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-C217-091030-S5004-STAGE1-Q065",
+      "subject": "醫學（二）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（二）",
+      "stem": "重覆測量某生物檢體的一個臨床生化指標時，每次出現的數值相當接近，但偏離真值，此現象為下列 何者？",
+      "options": {
+        "A": "效度高，精密度高",
+        "B": "效度差，精密度高",
+        "C": "效度高，精密度差",
+        "D": "效度差，精密度差"
+      },
+      "answer": "B",
+      "acceptedAnswers": [
+        "B"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：B。",
+      "testedConcept": "基礎醫學（二）（醫師分階段原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國91年第1次 醫師（一）分階段 基礎醫學（二） 5004",
+      "sourceYear": 2002,
+      "sourceRound": 1,
+      "originalQuestionNumber": 65,
+      "examCode": "091030",
+      "paperCode": "5217",
+      "examSessionLabel": "第一次",
+      "officialExam": {
+        "categoryCode": "217",
+        "subjectCode": "5004",
+        "trackCode": "STAGE1",
+        "trackLabel": "醫師（一）分階段",
+        "paperTitle": "基礎醫學（二）",
+        "questionCount": 80,
+        "timeMinutes": 60,
+        "pointsPerQuestion": 1.25,
+        "officialScope": "生理學、生物化學、藥理學、公共衛生學"
+      },
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?t=Q&code=091030&c=217&s=5004&q=1",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?t=M&code=091030&c=217&s=5004&q=1",
+        "page": 4,
+        "endPage": 4,
+        "image": "/question-media/moex-91-1-stage1-med2/MOEX-C217-091030-S5004-STAGE1-Q065.webp",
+        "width": 1106,
+        "height": 75,
+        "scope": "生理學、生物化學、藥理學、公共衛生學",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-C217-091030-S5004-STAGE1-Q066",
+      "subject": "醫學（二）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（二）",
+      "stem": "有關抽樣方法的敘述，下列何者為誤？",
+      "options": {
+        "A": "醫學的研究幾乎都是隨機取樣",
+        "B": "隨機抽樣的好處是統計上易於推論",
+        "C": "分層抽樣時，是根據會影響結果的因素來分層",
+        "D": "集束抽樣方法之抽樣單位與研究單位不同"
+      },
+      "answer": "A",
+      "acceptedAnswers": [
+        "A"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：A。",
+      "testedConcept": "基礎醫學（二）（醫師分階段原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國91年第1次 醫師（一）分階段 基礎醫學（二） 5004",
+      "sourceYear": 2002,
+      "sourceRound": 1,
+      "originalQuestionNumber": 66,
+      "examCode": "091030",
+      "paperCode": "5217",
+      "examSessionLabel": "第一次",
+      "officialExam": {
+        "categoryCode": "217",
+        "subjectCode": "5004",
+        "trackCode": "STAGE1",
+        "trackLabel": "醫師（一）分階段",
+        "paperTitle": "基礎醫學（二）",
+        "questionCount": 80,
+        "timeMinutes": 60,
+        "pointsPerQuestion": 1.25,
+        "officialScope": "生理學、生物化學、藥理學、公共衛生學"
+      },
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?t=Q&code=091030&c=217&s=5004&q=1",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?t=M&code=091030&c=217&s=5004&q=1",
+        "page": 4,
+        "endPage": 4,
+        "image": "/question-media/moex-91-1-stage1-med2/MOEX-C217-091030-S5004-STAGE1-Q066.webp",
+        "width": 1106,
+        "height": 75,
+        "scope": "生理學、生物化學、藥理學、公共衛生學",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-C217-091030-S5004-STAGE1-Q067",
+      "subject": "醫學（二）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（二）",
+      "stem": "有關統計檢定之檢力敘述，下列何者為真？",
+      "options": {
+        "A": "α愈小，檢力愈大",
+        "B": "樣本數愈大，檢力愈大",
+        "C": "母群體變異數愈大，檢力愈大",
+        "D": "與對立假說無關"
+      },
+      "answer": "B",
+      "acceptedAnswers": [
+        "B"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：B。",
+      "testedConcept": "基礎醫學（二）（醫師分階段原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國91年第1次 醫師（一）分階段 基礎醫學（二） 5004",
+      "sourceYear": 2002,
+      "sourceRound": 1,
+      "originalQuestionNumber": 67,
+      "examCode": "091030",
+      "paperCode": "5217",
+      "examSessionLabel": "第一次",
+      "officialExam": {
+        "categoryCode": "217",
+        "subjectCode": "5004",
+        "trackCode": "STAGE1",
+        "trackLabel": "醫師（一）分階段",
+        "paperTitle": "基礎醫學（二）",
+        "questionCount": 80,
+        "timeMinutes": 60,
+        "pointsPerQuestion": 1.25,
+        "officialScope": "生理學、生物化學、藥理學、公共衛生學"
+      },
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?t=Q&code=091030&c=217&s=5004&q=1",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?t=M&code=091030&c=217&s=5004&q=1",
+        "page": 4,
+        "endPage": 4,
+        "image": "/question-media/moex-91-1-stage1-med2/MOEX-C217-091030-S5004-STAGE1-Q067.webp",
+        "width": 1106,
+        "height": 74,
+        "scope": "生理學、生物化學、藥理學、公共衛生學",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-C217-091030-S5004-STAGE1-Q068",
+      "subject": "醫學（二）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（二）",
+      "stem": "有關因果關係的判定，下列敘述何者為誤？",
+      "options": {
+        "A": "某個研究出現顯著的劑量－反應曲線，因可信其為因果關係",
+        "B": "P<0.01，仍不能肯定是因果關係",
+        "C": "時序性不合，是因果關係最強的一個否證",
+        "D": "若沒有引入錯誤的輔助假說，一致性應是必要的因果關係判定標準之一"
+      },
+      "answer": "A",
+      "acceptedAnswers": [
+        "A"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：A。",
+      "testedConcept": "基礎醫學（二）（醫師分階段原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國91年第1次 醫師（一）分階段 基礎醫學（二） 5004",
+      "sourceYear": 2002,
+      "sourceRound": 1,
+      "originalQuestionNumber": 68,
+      "examCode": "091030",
+      "paperCode": "5217",
+      "examSessionLabel": "第一次",
+      "officialExam": {
+        "categoryCode": "217",
+        "subjectCode": "5004",
+        "trackCode": "STAGE1",
+        "trackLabel": "醫師（一）分階段",
+        "paperTitle": "基礎醫學（二）",
+        "questionCount": 80,
+        "timeMinutes": 60,
+        "pointsPerQuestion": 1.25,
+        "officialScope": "生理學、生物化學、藥理學、公共衛生學"
+      },
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?t=Q&code=091030&c=217&s=5004&q=1",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?t=M&code=091030&c=217&s=5004&q=1",
+        "page": 4,
+        "endPage": 4,
+        "image": "/question-media/moex-91-1-stage1-med2/MOEX-C217-091030-S5004-STAGE1-Q068.webp",
+        "width": 1106,
+        "height": 123,
+        "scope": "生理學、生物化學、藥理學、公共衛生學",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-C217-091030-S5004-STAGE1-Q069",
+      "subject": "醫學（二）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（二）",
+      "stem": "某研究為探討抽菸與血小板功能的關係，利用一群人在抽一支香菸前後各抽一次血測定血小板凝聚程度。 應如何檢定抽菸前後血小板凝聚程度是否有改變？",
+      "options": {
+        "A": "t test",
+        "B": "paired t test",
+        "C": "X² test",
+        "D": "McNemar X² test"
+      },
+      "answer": "B",
+      "acceptedAnswers": [
+        "B"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：B。",
+      "testedConcept": "基礎醫學（二）（醫師分階段原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國91年第1次 醫師（一）分階段 基礎醫學（二） 5004",
+      "sourceYear": 2002,
+      "sourceRound": 1,
+      "originalQuestionNumber": 69,
+      "examCode": "091030",
+      "paperCode": "5217",
+      "examSessionLabel": "第一次",
+      "officialExam": {
+        "categoryCode": "217",
+        "subjectCode": "5004",
+        "trackCode": "STAGE1",
+        "trackLabel": "醫師（一）分階段",
+        "paperTitle": "基礎醫學（二）",
+        "questionCount": 80,
+        "timeMinutes": 60,
+        "pointsPerQuestion": 1.25,
+        "officialScope": "生理學、生物化學、藥理學、公共衛生學"
+      },
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?t=Q&code=091030&c=217&s=5004&q=1",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?t=M&code=091030&c=217&s=5004&q=1",
+        "page": 4,
+        "endPage": 4,
+        "image": "/question-media/moex-91-1-stage1-med2/MOEX-C217-091030-S5004-STAGE1-Q069.webp",
+        "width": 1383,
+        "height": 96,
+        "scope": "生理學、生物化學、藥理學、公共衛生學",
+        "answerNote": null
+      },
+      "stemImage": "/question-media/moex-91-1-stage1-med2/MOEX-C217-091030-S5004-STAGE1-Q069.webp"
+    },
+    {
+      "id": "MOEX-C217-091030-S5004-STAGE1-Q070",
+      "subject": "醫學（二）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（二）",
+      "stem": "檢定一群人中性別與教育程度有無相關時，應採用下列何種方法？",
+      "options": {
+        "A": "t test",
+        "B": "paired t test",
+        "C": "X² test",
+        "D": "McNemar X² test"
+      },
+      "answer": "C",
+      "acceptedAnswers": [
+        "C"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：C。",
+      "testedConcept": "基礎醫學（二）（醫師分階段原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國91年第1次 醫師（一）分階段 基礎醫學（二） 5004",
+      "sourceYear": 2002,
+      "sourceRound": 1,
+      "originalQuestionNumber": 70,
+      "examCode": "091030",
+      "paperCode": "5217",
+      "examSessionLabel": "第一次",
+      "officialExam": {
+        "categoryCode": "217",
+        "subjectCode": "5004",
+        "trackCode": "STAGE1",
+        "trackLabel": "醫師（一）分階段",
+        "paperTitle": "基礎醫學（二）",
+        "questionCount": 80,
+        "timeMinutes": 60,
+        "pointsPerQuestion": 1.25,
+        "officialScope": "生理學、生物化學、藥理學、公共衛生學"
+      },
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?t=Q&code=091030&c=217&s=5004&q=1",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?t=M&code=091030&c=217&s=5004&q=1",
+        "page": 4,
+        "endPage": 4,
+        "image": "/question-media/moex-91-1-stage1-med2/MOEX-C217-091030-S5004-STAGE1-Q070.webp",
+        "width": 1383,
+        "height": 64,
+        "scope": "生理學、生物化學、藥理學、公共衛生學",
+        "answerNote": null
+      },
+      "stemImage": "/question-media/moex-91-1-stage1-med2/MOEX-C217-091030-S5004-STAGE1-Q070.webp"
+    },
+    {
+      "id": "MOEX-C217-091030-S5004-STAGE1-Q071",
+      "subject": "醫學（二）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（二）",
+      "stem": "某研究利用阿斯匹靈預防腎臟血液透析病患發生栓塞。結果發現安慰劑組發生栓塞比率並未高於阿斯匹靈 組。請問下列何者可能為母群體間栓塞發生機率真正差值的95%信賴區間？",
+      "options": {
+        "A": "11%～69%",
+        "B": "-15%～40%",
+        "C": "-10%～-50%",
+        "D": "10%～30%"
+      },
+      "answer": "B",
+      "acceptedAnswers": [
+        "B"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：B。",
+      "testedConcept": "基礎醫學（二）（醫師分階段原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國91年第1次 醫師（一）分階段 基礎醫學（二） 5004",
+      "sourceYear": 2002,
+      "sourceRound": 1,
+      "originalQuestionNumber": 71,
+      "examCode": "091030",
+      "paperCode": "5217",
+      "examSessionLabel": "第一次",
+      "officialExam": {
+        "categoryCode": "217",
+        "subjectCode": "5004",
+        "trackCode": "STAGE1",
+        "trackLabel": "醫師（一）分階段",
+        "paperTitle": "基礎醫學（二）",
+        "questionCount": 80,
+        "timeMinutes": 60,
+        "pointsPerQuestion": 1.25,
+        "officialScope": "生理學、生物化學、藥理學、公共衛生學"
+      },
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?t=Q&code=091030&c=217&s=5004&q=1",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?t=M&code=091030&c=217&s=5004&q=1",
+        "page": 4,
+        "endPage": 4,
+        "image": "/question-media/moex-91-1-stage1-med2/MOEX-C217-091030-S5004-STAGE1-Q071.webp",
+        "width": 1383,
+        "height": 96,
+        "scope": "生理學、生物化學、藥理學、公共衛生學",
+        "answerNote": null
+      },
+      "stemImage": "/question-media/moex-91-1-stage1-med2/MOEX-C217-091030-S5004-STAGE1-Q071.webp"
+    },
+    {
+      "id": "MOEX-C217-091030-S5004-STAGE1-Q072",
+      "subject": "醫學（二）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（二）",
+      "stem": "檢定A 型，B 型，AB 型及O 型等四種不同血型收縮壓是否有差異時，應採用下列何種方法？",
+      "options": {
+        "A": "t test",
+        "B": "paired t test",
+        "C": "ANOVA",
+        "D": "X² test"
+      },
+      "answer": "C",
+      "acceptedAnswers": [
+        "C"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：C。",
+      "testedConcept": "基礎醫學（二）（醫師分階段原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國91年第1次 醫師（一）分階段 基礎醫學（二） 5004",
+      "sourceYear": 2002,
+      "sourceRound": 1,
+      "originalQuestionNumber": 72,
+      "examCode": "091030",
+      "paperCode": "5217",
+      "examSessionLabel": "第一次",
+      "officialExam": {
+        "categoryCode": "217",
+        "subjectCode": "5004",
+        "trackCode": "STAGE1",
+        "trackLabel": "醫師（一）分階段",
+        "paperTitle": "基礎醫學（二）",
+        "questionCount": 80,
+        "timeMinutes": 60,
+        "pointsPerQuestion": 1.25,
+        "officialScope": "生理學、生物化學、藥理學、公共衛生學"
+      },
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?t=Q&code=091030&c=217&s=5004&q=1",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?t=M&code=091030&c=217&s=5004&q=1",
+        "page": 4,
+        "endPage": 4,
+        "image": "/question-media/moex-91-1-stage1-med2/MOEX-C217-091030-S5004-STAGE1-Q072.webp",
+        "width": 1383,
+        "height": 65,
+        "scope": "生理學、生物化學、藥理學、公共衛生學",
+        "answerNote": null
+      },
+      "stemImage": "/question-media/moex-91-1-stage1-med2/MOEX-C217-091030-S5004-STAGE1-Q072.webp"
+    },
+    {
+      "id": "MOEX-C217-091030-S5004-STAGE1-Q073",
+      "subject": "醫學（二）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（二）",
+      "stem": "當檢定兩個連續性變項的相關趨勢時，結果無法拒絕虛無假設(null hypothesis)，其代表的意義為：",
+      "options": {
+        "A": "兩個變項沒有關係",
+        "B": "兩個變項沒有直線關係",
+        "C": "相關係數不等於零",
+        "D": "迴歸係數不等於零"
+      },
+      "answer": "B",
+      "acceptedAnswers": [
+        "B"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：B。",
+      "testedConcept": "基礎醫學（二）（醫師分階段原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國91年第1次 醫師（一）分階段 基礎醫學（二） 5004",
+      "sourceYear": 2002,
+      "sourceRound": 1,
+      "originalQuestionNumber": 73,
+      "examCode": "091030",
+      "paperCode": "5217",
+      "examSessionLabel": "第一次",
+      "officialExam": {
+        "categoryCode": "217",
+        "subjectCode": "5004",
+        "trackCode": "STAGE1",
+        "trackLabel": "醫師（一）分階段",
+        "paperTitle": "基礎醫學（二）",
+        "questionCount": 80,
+        "timeMinutes": 60,
+        "pointsPerQuestion": 1.25,
+        "officialScope": "生理學、生物化學、藥理學、公共衛生學"
+      },
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?t=Q&code=091030&c=217&s=5004&q=1",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?t=M&code=091030&c=217&s=5004&q=1",
+        "page": 4,
+        "endPage": 4,
+        "image": "/question-media/moex-91-1-stage1-med2/MOEX-C217-091030-S5004-STAGE1-Q073.webp",
+        "width": 1106,
+        "height": 50,
+        "scope": "生理學、生物化學、藥理學、公共衛生學",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-C217-091030-S5004-STAGE1-Q074",
+      "subject": "醫學（二）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（二）",
+      "stem": "追蹤研究法為探討病因的方法，下列敘述何者為誤？",
+      "options": {
+        "A": "適用於常有疾病",
+        "B": "因果時序性易辨明",
+        "C": "暴露資料易有回憶偏差",
+        "D": "追蹤個案漏失影響疾病率估計偏差"
+      },
+      "answer": "C",
+      "acceptedAnswers": [
+        "C"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：C。",
+      "testedConcept": "基礎醫學（二）（醫師分階段原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國91年第1次 醫師（一）分階段 基礎醫學（二） 5004",
+      "sourceYear": 2002,
+      "sourceRound": 1,
+      "originalQuestionNumber": 74,
+      "examCode": "091030",
+      "paperCode": "5217",
+      "examSessionLabel": "第一次",
+      "officialExam": {
+        "categoryCode": "217",
+        "subjectCode": "5004",
+        "trackCode": "STAGE1",
+        "trackLabel": "醫師（一）分階段",
+        "paperTitle": "基礎醫學（二）",
+        "questionCount": 80,
+        "timeMinutes": 60,
+        "pointsPerQuestion": 1.25,
+        "officialScope": "生理學、生物化學、藥理學、公共衛生學"
+      },
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?t=Q&code=091030&c=217&s=5004&q=1",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?t=M&code=091030&c=217&s=5004&q=1",
+        "page": 4,
+        "endPage": 4,
+        "image": "/question-media/moex-91-1-stage1-med2/MOEX-C217-091030-S5004-STAGE1-Q074.webp",
+        "width": 1106,
+        "height": 74,
+        "scope": "生理學、生物化學、藥理學、公共衛生學",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-C217-091030-S5004-STAGE1-Q075",
+      "subject": "醫學（二）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（二）",
+      "stem": "在控制醫療費用上漲，提升醫療服務微觀效率之措施，以下那一點效果可能最差？",
+      "options": {
+        "A": "明定藥品給付範圍，並訂定支付之參考價格",
+        "B": "增加病床之供給量以降低單位成本",
+        "C": "發展病人部分負擔制",
+        "D": "建立轉診制度"
+      },
+      "answer": "B",
+      "acceptedAnswers": [
+        "B"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：B。",
+      "testedConcept": "基礎醫學（二）（醫師分階段原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國91年第1次 醫師（一）分階段 基礎醫學（二） 5004",
+      "sourceYear": 2002,
+      "sourceRound": 1,
+      "originalQuestionNumber": 75,
+      "examCode": "091030",
+      "paperCode": "5217",
+      "examSessionLabel": "第一次",
+      "officialExam": {
+        "categoryCode": "217",
+        "subjectCode": "5004",
+        "trackCode": "STAGE1",
+        "trackLabel": "醫師（一）分階段",
+        "paperTitle": "基礎醫學（二）",
+        "questionCount": 80,
+        "timeMinutes": 60,
+        "pointsPerQuestion": 1.25,
+        "officialScope": "生理學、生物化學、藥理學、公共衛生學"
+      },
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?t=Q&code=091030&c=217&s=5004&q=1",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?t=M&code=091030&c=217&s=5004&q=1",
+        "page": 4,
+        "endPage": 4,
+        "image": "/question-media/moex-91-1-stage1-med2/MOEX-C217-091030-S5004-STAGE1-Q075.webp",
+        "width": 1106,
+        "height": 74,
+        "scope": "生理學、生物化學、藥理學、公共衛生學",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-C217-091030-S5004-STAGE1-Q076",
+      "subject": "醫學（二）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（二）",
+      "stem": "一般而言，血中鉛濃度成人常需達多少以上方有症狀？",
+      "options": {
+        "A": "10～20μg/dl",
+        "B": "20～40μg/dl",
+        "C": "40～60μg/dl",
+        "D": "60～80μg/dl"
+      },
+      "answer": "C",
+      "acceptedAnswers": [
+        "C"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：C。",
+      "testedConcept": "基礎醫學（二）（醫師分階段原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國91年第1次 醫師（一）分階段 基礎醫學（二） 5004",
+      "sourceYear": 2002,
+      "sourceRound": 1,
+      "originalQuestionNumber": 76,
+      "examCode": "091030",
+      "paperCode": "5217",
+      "examSessionLabel": "第一次",
+      "officialExam": {
+        "categoryCode": "217",
+        "subjectCode": "5004",
+        "trackCode": "STAGE1",
+        "trackLabel": "醫師（一）分階段",
+        "paperTitle": "基礎醫學（二）",
+        "questionCount": 80,
+        "timeMinutes": 60,
+        "pointsPerQuestion": 1.25,
+        "officialScope": "生理學、生物化學、藥理學、公共衛生學"
+      },
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?t=Q&code=091030&c=217&s=5004&q=1",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?t=M&code=091030&c=217&s=5004&q=1",
+        "page": 4,
+        "endPage": 4,
+        "image": "/question-media/moex-91-1-stage1-med2/MOEX-C217-091030-S5004-STAGE1-Q076.webp",
+        "width": 1383,
+        "height": 61,
+        "scope": "生理學、生物化學、藥理學、公共衛生學",
+        "answerNote": null
+      },
+      "stemImage": "/question-media/moex-91-1-stage1-med2/MOEX-C217-091030-S5004-STAGE1-Q076.webp"
+    },
+    {
+      "id": "MOEX-C217-091030-S5004-STAGE1-Q077",
+      "subject": "醫學（二）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（二）",
+      "stem": "每百萬工時所發生的職災事故的件數稱之：",
+      "options": {
+        "A": "失能傷害頻率",
+        "B": "失能傷害嚴重率",
+        "C": "安全頻率",
+        "D": "安全受損率"
+      },
+      "answer": "A",
+      "acceptedAnswers": [
+        "A"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：A。",
+      "testedConcept": "基礎醫學（二）（醫師分階段原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國91年第1次 醫師（一）分階段 基礎醫學（二） 5004",
+      "sourceYear": 2002,
+      "sourceRound": 1,
+      "originalQuestionNumber": 77,
+      "examCode": "091030",
+      "paperCode": "5217",
+      "examSessionLabel": "第一次",
+      "officialExam": {
+        "categoryCode": "217",
+        "subjectCode": "5004",
+        "trackCode": "STAGE1",
+        "trackLabel": "醫師（一）分階段",
+        "paperTitle": "基礎醫學（二）",
+        "questionCount": 80,
+        "timeMinutes": 60,
+        "pointsPerQuestion": 1.25,
+        "officialScope": "生理學、生物化學、藥理學、公共衛生學"
+      },
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?t=Q&code=091030&c=217&s=5004&q=1",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?t=M&code=091030&c=217&s=5004&q=1",
+        "page": 4,
+        "endPage": 4,
+        "image": "/question-media/moex-91-1-stage1-med2/MOEX-C217-091030-S5004-STAGE1-Q077.webp",
+        "width": 1106,
+        "height": 50,
+        "scope": "生理學、生物化學、藥理學、公共衛生學",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-C217-091030-S5004-STAGE1-Q078",
+      "subject": "醫學（二）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（二）",
+      "stem": "危害性（風險）評估之步驟中，那一步驟是最終末之步驟？",
+      "options": {
+        "A": "危害物之鑑定(hazard identification)",
+        "B": "劑量效應之評估(dose-response assessment)",
+        "C": "暴露程度之評估(exposure assessment)",
+        "D": "危害度之評估(risk characterization)"
+      },
+      "answer": "D",
+      "acceptedAnswers": [
+        "D"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：D。",
+      "testedConcept": "基礎醫學（二）（醫師分階段原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國91年第1次 醫師（一）分階段 基礎醫學（二） 5004",
+      "sourceYear": 2002,
+      "sourceRound": 1,
+      "originalQuestionNumber": 78,
+      "examCode": "091030",
+      "paperCode": "5217",
+      "examSessionLabel": "第一次",
+      "officialExam": {
+        "categoryCode": "217",
+        "subjectCode": "5004",
+        "trackCode": "STAGE1",
+        "trackLabel": "醫師（一）分階段",
+        "paperTitle": "基礎醫學（二）",
+        "questionCount": 80,
+        "timeMinutes": 60,
+        "pointsPerQuestion": 1.25,
+        "officialScope": "生理學、生物化學、藥理學、公共衛生學"
+      },
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?t=Q&code=091030&c=217&s=5004&q=1",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?t=M&code=091030&c=217&s=5004&q=1",
+        "page": 4,
+        "endPage": 4,
+        "image": "/question-media/moex-91-1-stage1-med2/MOEX-C217-091030-S5004-STAGE1-Q078.webp",
+        "width": 1106,
+        "height": 74,
+        "scope": "生理學、生物化學、藥理學、公共衛生學",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-C217-091030-S5004-STAGE1-Q079",
+      "subject": "醫學（二）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（二）",
+      "stem": "水中的氯可與飲水中有機物作用，可能產生鹵化有機物，其中以何者含量較多？",
+      "options": {
+        "A": "甲醛",
+        "B": "氯仿",
+        "C": "四氯乙烯",
+        "D": "甲苯"
+      },
+      "answer": "B",
+      "acceptedAnswers": [
+        "B"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：B。",
+      "testedConcept": "基礎醫學（二）（醫師分階段原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國91年第1次 醫師（一）分階段 基礎醫學（二） 5004",
+      "sourceYear": 2002,
+      "sourceRound": 1,
+      "originalQuestionNumber": 79,
+      "examCode": "091030",
+      "paperCode": "5217",
+      "examSessionLabel": "第一次",
+      "officialExam": {
+        "categoryCode": "217",
+        "subjectCode": "5004",
+        "trackCode": "STAGE1",
+        "trackLabel": "醫師（一）分階段",
+        "paperTitle": "基礎醫學（二）",
+        "questionCount": 80,
+        "timeMinutes": 60,
+        "pointsPerQuestion": 1.25,
+        "officialScope": "生理學、生物化學、藥理學、公共衛生學"
+      },
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?t=Q&code=091030&c=217&s=5004&q=1",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?t=M&code=091030&c=217&s=5004&q=1",
+        "page": 4,
+        "endPage": 4,
+        "image": "/question-media/moex-91-1-stage1-med2/MOEX-C217-091030-S5004-STAGE1-Q079.webp",
+        "width": 1106,
+        "height": 50,
+        "scope": "生理學、生物化學、藥理學、公共衛生學",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-C217-091030-S5004-STAGE1-Q080",
+      "subject": "醫學（二）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（二）",
+      "stem": "空氣污染物之懸浮微粒其粒徑小於多少微米(μm)者，對人體健康危害較重大，即指容易進入肺泡區？",
+      "options": {
+        "A": "10μm",
+        "B": "20μm",
+        "C": "30μm",
+        "D": "50μm"
+      },
+      "answer": "A",
+      "acceptedAnswers": [
+        "A"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：A。",
+      "testedConcept": "基礎醫學（二）（醫師分階段原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國91年第1次 醫師（一）分階段 基礎醫學（二） 5004",
+      "sourceYear": 2002,
+      "sourceRound": 1,
+      "originalQuestionNumber": 80,
+      "examCode": "091030",
+      "paperCode": "5217",
+      "examSessionLabel": "第一次",
+      "officialExam": {
+        "categoryCode": "217",
+        "subjectCode": "5004",
+        "trackCode": "STAGE1",
+        "trackLabel": "醫師（一）分階段",
+        "paperTitle": "基礎醫學（二）",
+        "questionCount": 80,
+        "timeMinutes": 60,
+        "pointsPerQuestion": 1.25,
+        "officialScope": "生理學、生物化學、藥理學、公共衛生學"
+      },
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?t=Q&code=091030&c=217&s=5004&q=1",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?t=M&code=091030&c=217&s=5004&q=1",
+        "page": 4,
+        "endPage": 4,
+        "image": "/question-media/moex-91-1-stage1-med2/MOEX-C217-091030-S5004-STAGE1-Q080.webp",
+        "width": 1383,
+        "height": 114,
+        "scope": "生理學、生物化學、藥理學、公共衛生學",
+        "answerNote": null
+      },
+      "stemImage": "/question-media/moex-91-1-stage1-med2/MOEX-C217-091030-S5004-STAGE1-Q080.webp"
+    }
+  ]
+}

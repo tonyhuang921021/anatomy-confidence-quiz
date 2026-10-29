@@ -223,6 +223,10 @@ export function QuizSetupPanel({
   const selectedPaper = selectedPaperOptions.find(
     (paper) => paper.key === settings.selectedPaperKey
   );
+  const selectedCount = selectedPaper?.questionCount ?? 100;
+  const officialScope = selectedPaper && "officialScope" in selectedPaper ? selectedPaper.officialScope : undefined;
+  const officialTime = selectedPaper && "timeMinutes" in selectedPaper ? selectedPaper.timeMinutes : undefined;
+  const officialPoints = selectedPaper && "pointsPerQuestion" in selectedPaper ? selectedPaper.pointsPerQuestion : undefined;
   const canViewSelectedPaperDetails = Boolean(
     selectedPaper &&
       (completedPaperSummaries[selectedPaper.key]?.hasAnswered || isAdminEmail(user?.email))
@@ -321,7 +325,7 @@ export function QuizSetupPanel({
         ? {
             ...settings,
             sessionName: undefined,
-            questionCount: 100,
+            questionCount: selectedCount,
             subjectFilter: simulationSubject,
             enableConfidenceCalibration: simulationConfidenceCalibration,
             selectedPaperKey:
@@ -361,7 +365,7 @@ export function QuizSetupPanel({
           <p className="mt-2 max-w-4xl text-sm leading-6 text-slate-500">
             {description ??
               (simulationOnly
-                ? "選擇卷別與考卷，即可開始 100 題模擬考。"
+                ? "選擇卷別與考卷，即可開始模擬考。"
                 : "現在可切換單科刷題與醫學（一）多科模擬考，並選擇即時看詳解或整份做完再批改。")}
           </p>
         </div>
@@ -497,7 +501,7 @@ export function QuizSetupPanel({
                     }`}
                   >
                     <span className="block text-sm font-semibold">{item.label}</span>
-                    <span className="mt-1 block text-xs leading-5 text-slate-500">{selectedPaper?.sourceYear && selectedPaper.sourceYear >= 2009 && selectedPaper.sourceYear <= 2010
+                    <span className="mt-1 block text-xs leading-5 text-slate-500">{officialScope ? item.subject === selectedPaper?.subject ? officialScope : "科目範圍依所選考卷為準" : selectedPaper?.sourceYear && selectedPaper.sourceYear >= 2009 && selectedPaper.sourceYear <= 2010
                       ? item.subject === "醫學（一）" ? "解剖、胚胎、組織、微免、寄生蟲、公衛" : "生理、生化、藥理、病理"
                       : item.description}</span>
                   </button>
@@ -531,6 +535,7 @@ export function QuizSetupPanel({
                       : "醫學（二）含生理、生化、藥理及病理。"}每卷 100 題，依當年官方最終答案及更正採分；法規與醫學知識可能已有更新。
                   </p>
                 ) : null}
+                {officialScope ? <p className="mt-3 rounded-xl bg-amber-50 px-3 py-2 text-xs leading-6 text-amber-900">官方科目：{officialScope}。每卷 {selectedCount} 題，每題 {officialPoints} 分，考試時間 {officialTime} 分鐘；網站另依內容提供細分類。</p> : null}
               </div>
             ) : (
               <div className="border-l-2 border-brand-200 pl-3">
@@ -545,7 +550,7 @@ export function QuizSetupPanel({
                   {selectedPaper?.label ?? `${settings.subjectFilter === "醫學（二）" ? "醫學（二）" : "醫學（一）"} · ${paperModeLabels[activePaperMode]}`}
                 </p>
                 <p className="mt-1 text-xs leading-5 text-slate-500">
-                  100 題 · {feedbackModeLabels[settings.feedbackMode ?? "none"]}
+                  {activePaperMode === "random_past_paper" ? "題數依抽到的考卷" : `${selectedCount} 題`} · {feedbackModeLabels[settings.feedbackMode ?? "none"]}
                 </p>
               </div>
               <button
@@ -554,7 +559,7 @@ export function QuizSetupPanel({
                 disabled={!canStart}
                 className="min-h-12 shrink-0 rounded-xl bg-brand-600 px-5 py-3 text-sm font-semibold text-white transition hover:bg-brand-700 disabled:cursor-not-allowed disabled:bg-slate-300"
               >
-                開始 100 題模擬考
+                {activePaperMode === "random_past_paper" ? "開始模擬考" : `開始 ${selectedCount} 題模擬考`}
               </button>
             </div>
 

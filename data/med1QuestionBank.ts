@@ -24,6 +24,10 @@ import moex95FirstMed1Questions from "@/data/sources/moex_95_1_med1_questions.js
 import moex95FirstMed2Questions from "@/data/sources/moex_95_1_med2_questions.json";
 import moex95SecondMed1Questions from "@/data/sources/moex_95_2_med1_questions.json";
 import moex95SecondMed2Questions from "@/data/sources/moex_95_2_med2_questions.json";
+import moex91FirstMed1 from "@/data/sources/moex_91_1_stage1_med1_questions.json";
+import moex91FirstMed2 from "@/data/sources/moex_91_1_stage1_med2_questions.json";
+import moex91SecondMed1 from "@/data/sources/moex_91_2_stage1_med1_questions.json";
+import moex91SecondMed2 from "@/data/sources/moex_91_2_stage1_med2_questions.json";
 import moex9899LearningPlacement from "@/data/sources/moex_98_99_learning_placement.json";
 import questionMediaManifest from "@/data/sources/question_media_manifest.json";
 import {
@@ -2096,6 +2100,10 @@ export const canonicalQuestionBank: Question[] = dedupeQuestionBank([
   ...(moex95FirstMed2Questions.questions as Question[]),
   ...(moex95SecondMed1Questions.questions as Question[]),
   ...(moex95SecondMed2Questions.questions as Question[]),
+  ...(moex91FirstMed1.questions as Question[]),
+  ...(moex91FirstMed2.questions as Question[]),
+  ...(moex91SecondMed1.questions as Question[]),
+  ...(moex91SecondMed2.questions as Question[]),
   ...manualInjectedQuestions
 ]).map(applyAnalysisPrimaryTagClassification);
 
@@ -2205,6 +2213,10 @@ export type PastPaperOption = {
   isComplete?: boolean;
   sourceYear?: number;
   sourceRound?: 1 | 2;
+  expectedQuestionCount?: number;
+  timeMinutes?: number;
+  pointsPerQuestion?: number;
+  officialScope?: string;
 };
 
 function shuffle<T>(items: T[]) {
@@ -2585,6 +2597,10 @@ export function getPastPaperOptions(
         : `${formatRocYear(question.sourceYear)} 第${question.sourceRound ?? (question.examSessionLabel?.includes("第二") ? 2 : 1)}次 ${examLabel} ${question.paperCode}`,
       subject: examLabel as SubjectFilter,
       questionCount: 1,
+      expectedQuestionCount: question.officialExam?.questionCount,
+      timeMinutes: question.officialExam?.timeMinutes,
+      pointsPerQuestion: question.officialExam?.pointsPerQuestion,
+      officialScope: question.officialExam?.officialScope,
       sourceYear: question.sourceYear,
       sourceRound: question.sourceRound ?? (question.examSessionLabel?.includes("第二") ? 2 : 1)
     });
@@ -2598,7 +2614,7 @@ export function getPastPaperOptions(
           .map((question) => question.originalQuestionNumber)
           .filter((value): value is number => typeof value === "number")
       );
-      const expectedCount = moex9899OfficialQuestions.papers.find((source) => source.key === paper.key)?.questionCount ?? 100;
+      const expectedCount = paper.expectedQuestionCount ?? moex9899OfficialQuestions.papers.find((source) => source.key === paper.key)?.questionCount ?? 100;
       const missingNumbers = Array.from({ length: expectedCount }, (_, index) => index + 1).filter(
         (number) => !presentNumbers.has(number)
       );

@@ -1,0 +1,4022 @@
+{
+  "sourceBundleSha256": "79554b4b64caebd8ba2dc253f8e0ffe882c45885366697ce76e8b6827f8dc2ad",
+  "sources": {
+    "Q": {
+      "url": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=217&code=091030&q=1&s=4004&t=Q",
+      "bytes": 260520,
+      "sha256": "f464375bc7f1f321a9c842aec624578a679298e93f06f038f2f6d9bf972b0a9e",
+      "pages": 4
+    },
+    "M": {
+      "url": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=217&code=091030&q=1&s=4004&t=M",
+      "bytes": 65858,
+      "sha256": "4d730e9466b49a921edd156d905d1209ee696079bb6bd7c9c7b7103931a566a0",
+      "pages": 1
+    }
+  },
+  "questions": [
+    {
+      "id": "MOEX-C217-091030-S4004-STAGE1-Q001",
+      "subject": "醫學（一）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（一）",
+      "stem": "臀關節的屈曲動作會使下肢：",
+      "options": {
+        "A": "離開身體冠狀切面中線",
+        "B": "朝向身體旁正中切面前方移動",
+        "C": "轉動讓其前表面朝向內側",
+        "D": "朝向正中矢狀切面移動"
+      },
+      "answer": "B",
+      "acceptedAnswers": [
+        "B"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：B。",
+      "testedConcept": "基礎醫學（一）（醫師分階段原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國91年第1次 醫師（一）分階段 基礎醫學（一） 4004",
+      "sourceYear": 2002,
+      "sourceRound": 1,
+      "originalQuestionNumber": 1,
+      "examCode": "091030",
+      "paperCode": "4217",
+      "examSessionLabel": "第一次",
+      "officialExam": {
+        "categoryCode": "217",
+        "subjectCode": "4004",
+        "trackCode": "STAGE1",
+        "trackLabel": "醫師（一）分階段",
+        "paperTitle": "基礎醫學（一）",
+        "questionCount": 80,
+        "timeMinutes": 60,
+        "pointsPerQuestion": 1.25,
+        "officialScope": "解剖學、微生物學及免疫學、病理學"
+      },
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=217&code=091030&q=1&s=4004&t=Q",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=217&code=091030&q=1&s=4004&t=M",
+        "page": 1,
+        "endPage": 1,
+        "image": "/question-media/moex-91-1-stage1-med1/MOEX-C217-091030-S4004-STAGE1-Q001.webp",
+        "width": 1659,
+        "height": 130,
+        "scope": "解剖學、微生物學及免疫學、病理學",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-C217-091030-S4004-STAGE1-Q002",
+      "subject": "醫學（一）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（一）",
+      "stem": "陽光照射下皮膚會變黑是由於：",
+      "options": {
+        "A": "角質層增加",
+        "B": "表皮層損壞",
+        "C": "黑色素細胞數量增加",
+        "D": "黑色素細胞內酵素活性增加"
+      },
+      "answer": "D",
+      "acceptedAnswers": [
+        "D"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：D。",
+      "testedConcept": "基礎醫學（一）（醫師分階段原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國91年第1次 醫師（一）分階段 基礎醫學（一） 4004",
+      "sourceYear": 2002,
+      "sourceRound": 1,
+      "originalQuestionNumber": 2,
+      "examCode": "091030",
+      "paperCode": "4217",
+      "examSessionLabel": "第一次",
+      "officialExam": {
+        "categoryCode": "217",
+        "subjectCode": "4004",
+        "trackCode": "STAGE1",
+        "trackLabel": "醫師（一）分階段",
+        "paperTitle": "基礎醫學（一）",
+        "questionCount": 80,
+        "timeMinutes": 60,
+        "pointsPerQuestion": 1.25,
+        "officialScope": "解剖學、微生物學及免疫學、病理學"
+      },
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=217&code=091030&q=1&s=4004&t=Q",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=217&code=091030&q=1&s=4004&t=M",
+        "page": 1,
+        "endPage": 1,
+        "image": "/question-media/moex-91-1-stage1-med1/MOEX-C217-091030-S4004-STAGE1-Q002.webp",
+        "width": 1659,
+        "height": 130,
+        "scope": "解剖學、微生物學及免疫學、病理學",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-C217-091030-S4004-STAGE1-Q003",
+      "subject": "醫學（一）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（一）",
+      "stem": "血液與淋巴屬於下列何種組織？",
+      "options": {
+        "A": "上皮組織",
+        "B": "結締組織",
+        "C": "肌肉組織",
+        "D": "神經組織"
+      },
+      "answer": "B",
+      "acceptedAnswers": [
+        "B"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：B。",
+      "testedConcept": "基礎醫學（一）（醫師分階段原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國91年第1次 醫師（一）分階段 基礎醫學（一） 4004",
+      "sourceYear": 2002,
+      "sourceRound": 1,
+      "originalQuestionNumber": 3,
+      "examCode": "091030",
+      "paperCode": "4217",
+      "examSessionLabel": "第一次",
+      "officialExam": {
+        "categoryCode": "217",
+        "subjectCode": "4004",
+        "trackCode": "STAGE1",
+        "trackLabel": "醫師（一）分階段",
+        "paperTitle": "基礎醫學（一）",
+        "questionCount": 80,
+        "timeMinutes": 60,
+        "pointsPerQuestion": 1.25,
+        "officialScope": "解剖學、微生物學及免疫學、病理學"
+      },
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=217&code=091030&q=1&s=4004&t=Q",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=217&code=091030&q=1&s=4004&t=M",
+        "page": 1,
+        "endPage": 1,
+        "image": "/question-media/moex-91-1-stage1-med1/MOEX-C217-091030-S4004-STAGE1-Q003.webp",
+        "width": 1659,
+        "height": 88,
+        "scope": "解剖學、微生物學及免疫學、病理學",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-C217-091030-S4004-STAGE1-Q004",
+      "subject": "醫學（一）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（一）",
+      "stem": "下列內分泌腺中何者含有外胚層來源的構造？",
+      "options": {
+        "A": "腎上腺",
+        "B": "胸腺",
+        "C": "甲狀腺",
+        "D": "副甲狀腺"
+      },
+      "answer": "A",
+      "acceptedAnswers": [
+        "A"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：A。",
+      "testedConcept": "基礎醫學（一）（醫師分階段原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國91年第1次 醫師（一）分階段 基礎醫學（一） 4004",
+      "sourceYear": 2002,
+      "sourceRound": 1,
+      "originalQuestionNumber": 4,
+      "examCode": "091030",
+      "paperCode": "4217",
+      "examSessionLabel": "第一次",
+      "officialExam": {
+        "categoryCode": "217",
+        "subjectCode": "4004",
+        "trackCode": "STAGE1",
+        "trackLabel": "醫師（一）分階段",
+        "paperTitle": "基礎醫學（一）",
+        "questionCount": 80,
+        "timeMinutes": 60,
+        "pointsPerQuestion": 1.25,
+        "officialScope": "解剖學、微生物學及免疫學、病理學"
+      },
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=217&code=091030&q=1&s=4004&t=Q",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=217&code=091030&q=1&s=4004&t=M",
+        "page": 1,
+        "endPage": 1,
+        "image": "/question-media/moex-91-1-stage1-med1/MOEX-C217-091030-S4004-STAGE1-Q004.webp",
+        "width": 1659,
+        "height": 88,
+        "scope": "解剖學、微生物學及免疫學、病理學",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-C217-091030-S4004-STAGE1-Q005",
+      "subject": "醫學（一）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（一）",
+      "stem": "胃腺細胞中，何者的分泌物與小腸吸收維生素有關？",
+      "options": {
+        "A": "頸黏液細胞（neck mucous cell）",
+        "B": "主細胞（chief cell）",
+        "C": "壁細胞（parietal cell）",
+        "D": "腸內分泌細胞（enteroendocrine cell）"
+      },
+      "answer": "C",
+      "acceptedAnswers": [
+        "C"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：C。",
+      "testedConcept": "基礎醫學（一）（醫師分階段原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國91年第1次 醫師（一）分階段 基礎醫學（一） 4004",
+      "sourceYear": 2002,
+      "sourceRound": 1,
+      "originalQuestionNumber": 5,
+      "examCode": "091030",
+      "paperCode": "4217",
+      "examSessionLabel": "第一次",
+      "officialExam": {
+        "categoryCode": "217",
+        "subjectCode": "4004",
+        "trackCode": "STAGE1",
+        "trackLabel": "醫師（一）分階段",
+        "paperTitle": "基礎醫學（一）",
+        "questionCount": 80,
+        "timeMinutes": 60,
+        "pointsPerQuestion": 1.25,
+        "officialScope": "解剖學、微生物學及免疫學、病理學"
+      },
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=217&code=091030&q=1&s=4004&t=Q",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=217&code=091030&q=1&s=4004&t=M",
+        "page": 1,
+        "endPage": 1,
+        "image": "/question-media/moex-91-1-stage1-med1/MOEX-C217-091030-S4004-STAGE1-Q005.webp",
+        "width": 1659,
+        "height": 130,
+        "scope": "解剖學、微生物學及免疫學、病理學",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-C217-091030-S4004-STAGE1-Q006",
+      "subject": "醫學（一）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（一）",
+      "stem": "站立時左胸膜腔內的液體會流入何處？",
+      "options": {
+        "A": "心切迹",
+        "B": "肋縱膈隱窩",
+        "C": "水平裂",
+        "D": "肋橫膈隱窩"
+      },
+      "answer": "D",
+      "acceptedAnswers": [
+        "D"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：D。",
+      "testedConcept": "基礎醫學（一）（醫師分階段原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國91年第1次 醫師（一）分階段 基礎醫學（一） 4004",
+      "sourceYear": 2002,
+      "sourceRound": 1,
+      "originalQuestionNumber": 6,
+      "examCode": "091030",
+      "paperCode": "4217",
+      "examSessionLabel": "第一次",
+      "officialExam": {
+        "categoryCode": "217",
+        "subjectCode": "4004",
+        "trackCode": "STAGE1",
+        "trackLabel": "醫師（一）分階段",
+        "paperTitle": "基礎醫學（一）",
+        "questionCount": 80,
+        "timeMinutes": 60,
+        "pointsPerQuestion": 1.25,
+        "officialScope": "解剖學、微生物學及免疫學、病理學"
+      },
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=217&code=091030&q=1&s=4004&t=Q",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=217&code=091030&q=1&s=4004&t=M",
+        "page": 1,
+        "endPage": 1,
+        "image": "/question-media/moex-91-1-stage1-med1/MOEX-C217-091030-S4004-STAGE1-Q006.webp",
+        "width": 1659,
+        "height": 88,
+        "scope": "解剖學、微生物學及免疫學、病理學",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-C217-091030-S4004-STAGE1-Q007",
+      "subject": "醫學（一）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（一）",
+      "stem": "下列何者通過橫膈的腔靜脈開口（caval opening）？",
+      "options": {
+        "A": "胸管",
+        "B": "上腹上動脈",
+        "C": "右膈神經",
+        "D": "左迷走神經"
+      },
+      "answer": "C",
+      "acceptedAnswers": [
+        "C"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：C。",
+      "testedConcept": "基礎醫學（一）（醫師分階段原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國91年第1次 醫師（一）分階段 基礎醫學（一） 4004",
+      "sourceYear": 2002,
+      "sourceRound": 1,
+      "originalQuestionNumber": 7,
+      "examCode": "091030",
+      "paperCode": "4217",
+      "examSessionLabel": "第一次",
+      "officialExam": {
+        "categoryCode": "217",
+        "subjectCode": "4004",
+        "trackCode": "STAGE1",
+        "trackLabel": "醫師（一）分階段",
+        "paperTitle": "基礎醫學（一）",
+        "questionCount": 80,
+        "timeMinutes": 60,
+        "pointsPerQuestion": 1.25,
+        "officialScope": "解剖學、微生物學及免疫學、病理學"
+      },
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=217&code=091030&q=1&s=4004&t=Q",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=217&code=091030&q=1&s=4004&t=M",
+        "page": 1,
+        "endPage": 1,
+        "image": "/question-media/moex-91-1-stage1-med1/MOEX-C217-091030-S4004-STAGE1-Q007.webp",
+        "width": 1659,
+        "height": 88,
+        "scope": "解剖學、微生物學及免疫學、病理學",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-C217-091030-S4004-STAGE1-Q008",
+      "subject": "醫學（一）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（一）",
+      "stem": "下列何者位於後縱膈？",
+      "options": {
+        "A": "降主動脈",
+        "B": "左頭臂靜脈",
+        "C": "右心室",
+        "D": "胸腺"
+      },
+      "answer": "A",
+      "acceptedAnswers": [
+        "A"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：A。",
+      "testedConcept": "基礎醫學（一）（醫師分階段原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國91年第1次 醫師（一）分階段 基礎醫學（一） 4004",
+      "sourceYear": 2002,
+      "sourceRound": 1,
+      "originalQuestionNumber": 8,
+      "examCode": "091030",
+      "paperCode": "4217",
+      "examSessionLabel": "第一次",
+      "officialExam": {
+        "categoryCode": "217",
+        "subjectCode": "4004",
+        "trackCode": "STAGE1",
+        "trackLabel": "醫師（一）分階段",
+        "paperTitle": "基礎醫學（一）",
+        "questionCount": 80,
+        "timeMinutes": 60,
+        "pointsPerQuestion": 1.25,
+        "officialScope": "解剖學、微生物學及免疫學、病理學"
+      },
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=217&code=091030&q=1&s=4004&t=Q",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=217&code=091030&q=1&s=4004&t=M",
+        "page": 1,
+        "endPage": 1,
+        "image": "/question-media/moex-91-1-stage1-med1/MOEX-C217-091030-S4004-STAGE1-Q008.webp",
+        "width": 1659,
+        "height": 88,
+        "scope": "解剖學、微生物學及免疫學、病理學",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-C217-091030-S4004-STAGE1-Q009",
+      "subject": "醫學（一）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（一）",
+      "stem": "在前上髂棘間連線以下的腹部，下列何者構成腹直肌鞘的後壁？",
+      "options": {
+        "A": "腹橫肌",
+        "B": "外斜肌",
+        "C": "內斜肌",
+        "D": "腹橫筋膜"
+      },
+      "answer": "A",
+      "acceptedAnswers": [
+        "A",
+        "B",
+        "C",
+        "D"
+      ],
+      "answerCreditType": "all_credit",
+      "explanation": "官方最終答案：一律給分。",
+      "testedConcept": "基礎醫學（一）（醫師分階段原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國91年第1次 醫師（一）分階段 基礎醫學（一） 4004",
+      "sourceYear": 2002,
+      "sourceRound": 1,
+      "originalQuestionNumber": 9,
+      "examCode": "091030",
+      "paperCode": "4217",
+      "examSessionLabel": "第一次",
+      "officialExam": {
+        "categoryCode": "217",
+        "subjectCode": "4004",
+        "trackCode": "STAGE1",
+        "trackLabel": "醫師（一）分階段",
+        "paperTitle": "基礎醫學（一）",
+        "questionCount": 80,
+        "timeMinutes": 60,
+        "pointsPerQuestion": 1.25,
+        "officialScope": "解剖學、微生物學及免疫學、病理學"
+      },
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=217&code=091030&q=1&s=4004&t=Q",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=217&code=091030&q=1&s=4004&t=M",
+        "page": 1,
+        "endPage": 1,
+        "image": "/question-media/moex-91-1-stage1-med1/MOEX-C217-091030-S4004-STAGE1-Q009.webp",
+        "width": 1659,
+        "height": 88,
+        "scope": "解剖學、微生物學及免疫學、病理學",
+        "answerNote": "第9題一律給分"
+      }
+    },
+    {
+      "id": "MOEX-C217-091030-S4004-STAGE1-Q010",
+      "subject": "醫學（一）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（一）",
+      "stem": "下列何者由腹內斜肌所構成？",
+      "options": {
+        "A": "精索外筋膜",
+        "B": "精索內筋膜",
+        "C": "提睪肌筋膜",
+        "D": "腹股溝管深環"
+      },
+      "answer": "C",
+      "acceptedAnswers": [
+        "C"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：C。",
+      "testedConcept": "基礎醫學（一）（醫師分階段原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國91年第1次 醫師（一）分階段 基礎醫學（一） 4004",
+      "sourceYear": 2002,
+      "sourceRound": 1,
+      "originalQuestionNumber": 10,
+      "examCode": "091030",
+      "paperCode": "4217",
+      "examSessionLabel": "第一次",
+      "officialExam": {
+        "categoryCode": "217",
+        "subjectCode": "4004",
+        "trackCode": "STAGE1",
+        "trackLabel": "醫師（一）分階段",
+        "paperTitle": "基礎醫學（一）",
+        "questionCount": 80,
+        "timeMinutes": 60,
+        "pointsPerQuestion": 1.25,
+        "officialScope": "解剖學、微生物學及免疫學、病理學"
+      },
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=217&code=091030&q=1&s=4004&t=Q",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=217&code=091030&q=1&s=4004&t=M",
+        "page": 1,
+        "endPage": 1,
+        "image": "/question-media/moex-91-1-stage1-med1/MOEX-C217-091030-S4004-STAGE1-Q010.webp",
+        "width": 1659,
+        "height": 88,
+        "scope": "解剖學、微生物學及免疫學、病理學",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-C217-091030-S4004-STAGE1-Q011",
+      "subject": "醫學（一）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（一）",
+      "stem": "下列何者通過女性腹股溝管？",
+      "options": {
+        "A": "生殖股神經的股分枝",
+        "B": "子宮圓韌帶",
+        "C": "下腹上動脈",
+        "D": "旋髂深動脈"
+      },
+      "answer": "B",
+      "acceptedAnswers": [
+        "B"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：B。",
+      "testedConcept": "基礎醫學（一）（醫師分階段原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國91年第1次 醫師（一）分階段 基礎醫學（一） 4004",
+      "sourceYear": 2002,
+      "sourceRound": 1,
+      "originalQuestionNumber": 11,
+      "examCode": "091030",
+      "paperCode": "4217",
+      "examSessionLabel": "第一次",
+      "officialExam": {
+        "categoryCode": "217",
+        "subjectCode": "4004",
+        "trackCode": "STAGE1",
+        "trackLabel": "醫師（一）分階段",
+        "paperTitle": "基礎醫學（一）",
+        "questionCount": 80,
+        "timeMinutes": 60,
+        "pointsPerQuestion": 1.25,
+        "officialScope": "解剖學、微生物學及免疫學、病理學"
+      },
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=217&code=091030&q=1&s=4004&t=Q",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=217&code=091030&q=1&s=4004&t=M",
+        "page": 1,
+        "endPage": 1,
+        "image": "/question-media/moex-91-1-stage1-med1/MOEX-C217-091030-S4004-STAGE1-Q011.webp",
+        "width": 1659,
+        "height": 88,
+        "scope": "解剖學、微生物學及免疫學、病理學",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-C217-091030-S4004-STAGE1-Q012",
+      "subject": "醫學（一）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（一）",
+      "stem": "下列何者匯集盲腸區域的淋巴？",
+      "options": {
+        "A": "上腸系淋巴結",
+        "B": "下腸系淋巴結",
+        "C": "腹腔幹淋巴結",
+        "D": "腹腔幹淋巴結與上腸系淋巴結"
+      },
+      "answer": "A",
+      "acceptedAnswers": [
+        "A"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：A。",
+      "testedConcept": "基礎醫學（一）（醫師分階段原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國91年第1次 醫師（一）分階段 基礎醫學（一） 4004",
+      "sourceYear": 2002,
+      "sourceRound": 1,
+      "originalQuestionNumber": 12,
+      "examCode": "091030",
+      "paperCode": "4217",
+      "examSessionLabel": "第一次",
+      "officialExam": {
+        "categoryCode": "217",
+        "subjectCode": "4004",
+        "trackCode": "STAGE1",
+        "trackLabel": "醫師（一）分階段",
+        "paperTitle": "基礎醫學（一）",
+        "questionCount": 80,
+        "timeMinutes": 60,
+        "pointsPerQuestion": 1.25,
+        "officialScope": "解剖學、微生物學及免疫學、病理學"
+      },
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=217&code=091030&q=1&s=4004&t=Q",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=217&code=091030&q=1&s=4004&t=M",
+        "page": 1,
+        "endPage": 1,
+        "image": "/question-media/moex-91-1-stage1-med1/MOEX-C217-091030-S4004-STAGE1-Q012.webp",
+        "width": 1659,
+        "height": 130,
+        "scope": "解剖學、微生物學及免疫學、病理學",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-C217-091030-S4004-STAGE1-Q013",
+      "subject": "醫學（一）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（一）",
+      "stem": "胃底部分由下列何者供輸血流？",
+      "options": {
+        "A": "左胃網膜動脈",
+        "B": "左胃動脈",
+        "C": "右胃動脈",
+        "D": "胃短動脈"
+      },
+      "answer": "D",
+      "acceptedAnswers": [
+        "D"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：D。",
+      "testedConcept": "基礎醫學（一）（醫師分階段原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國91年第1次 醫師（一）分階段 基礎醫學（一） 4004",
+      "sourceYear": 2002,
+      "sourceRound": 1,
+      "originalQuestionNumber": 13,
+      "examCode": "091030",
+      "paperCode": "4217",
+      "examSessionLabel": "第一次",
+      "officialExam": {
+        "categoryCode": "217",
+        "subjectCode": "4004",
+        "trackCode": "STAGE1",
+        "trackLabel": "醫師（一）分階段",
+        "paperTitle": "基礎醫學（一）",
+        "questionCount": 80,
+        "timeMinutes": 60,
+        "pointsPerQuestion": 1.25,
+        "officialScope": "解剖學、微生物學及免疫學、病理學"
+      },
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=217&code=091030&q=1&s=4004&t=Q",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=217&code=091030&q=1&s=4004&t=M",
+        "page": 1,
+        "endPage": 1,
+        "image": "/question-media/moex-91-1-stage1-med1/MOEX-C217-091030-S4004-STAGE1-Q013.webp",
+        "width": 1659,
+        "height": 88,
+        "scope": "解剖學、微生物學及免疫學、病理學",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-C217-091030-S4004-STAGE1-Q014",
+      "subject": "醫學（一）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（一）",
+      "stem": "下列何者包含於小網膜中？",
+      "options": {
+        "A": "膽管",
+        "B": "下腔靜脈",
+        "C": "胃十二指腸動脈",
+        "D": "肝總管"
+      },
+      "answer": "A",
+      "acceptedAnswers": [
+        "A"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：A。",
+      "testedConcept": "基礎醫學（一）（醫師分階段原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國91年第1次 醫師（一）分階段 基礎醫學（一） 4004",
+      "sourceYear": 2002,
+      "sourceRound": 1,
+      "originalQuestionNumber": 14,
+      "examCode": "091030",
+      "paperCode": "4217",
+      "examSessionLabel": "第一次",
+      "officialExam": {
+        "categoryCode": "217",
+        "subjectCode": "4004",
+        "trackCode": "STAGE1",
+        "trackLabel": "醫師（一）分階段",
+        "paperTitle": "基礎醫學（一）",
+        "questionCount": 80,
+        "timeMinutes": 60,
+        "pointsPerQuestion": 1.25,
+        "officialScope": "解剖學、微生物學及免疫學、病理學"
+      },
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=217&code=091030&q=1&s=4004&t=Q",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=217&code=091030&q=1&s=4004&t=M",
+        "page": 1,
+        "endPage": 1,
+        "image": "/question-media/moex-91-1-stage1-med1/MOEX-C217-091030-S4004-STAGE1-Q014.webp",
+        "width": 1659,
+        "height": 88,
+        "scope": "解剖學、微生物學及免疫學、病理學",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-C217-091030-S4004-STAGE1-Q015",
+      "subject": "醫學（一）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（一）",
+      "stem": "子宮動脈源自下列何者？",
+      "options": {
+        "A": "腎動脈",
+        "B": "下腸系動脈",
+        "C": "腹主動脈",
+        "D": "髂內動脈"
+      },
+      "answer": "D",
+      "acceptedAnswers": [
+        "D"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：D。",
+      "testedConcept": "基礎醫學（一）（醫師分階段原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國91年第1次 醫師（一）分階段 基礎醫學（一） 4004",
+      "sourceYear": 2002,
+      "sourceRound": 1,
+      "originalQuestionNumber": 15,
+      "examCode": "091030",
+      "paperCode": "4217",
+      "examSessionLabel": "第一次",
+      "officialExam": {
+        "categoryCode": "217",
+        "subjectCode": "4004",
+        "trackCode": "STAGE1",
+        "trackLabel": "醫師（一）分階段",
+        "paperTitle": "基礎醫學（一）",
+        "questionCount": 80,
+        "timeMinutes": 60,
+        "pointsPerQuestion": 1.25,
+        "officialScope": "解剖學、微生物學及免疫學、病理學"
+      },
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=217&code=091030&q=1&s=4004&t=Q",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=217&code=091030&q=1&s=4004&t=M",
+        "page": 1,
+        "endPage": 1,
+        "image": "/question-media/moex-91-1-stage1-med1/MOEX-C217-091030-S4004-STAGE1-Q015.webp",
+        "width": 1659,
+        "height": 88,
+        "scope": "解剖學、微生物學及免疫學、病理學",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-C217-091030-S4004-STAGE1-Q016",
+      "subject": "醫學（一）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（一）",
+      "stem": "前列腺的淋巴匯入下列何者？",
+      "options": {
+        "A": "髂內淋巴結",
+        "B": "髂內與髂外淋巴結",
+        "C": "腹股溝淺淋巴結",
+        "D": "主動脈旁淋巴結"
+      },
+      "answer": "A",
+      "acceptedAnswers": [
+        "A"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：A。",
+      "testedConcept": "基礎醫學（一）（醫師分階段原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國91年第1次 醫師（一）分階段 基礎醫學（一） 4004",
+      "sourceYear": 2002,
+      "sourceRound": 1,
+      "originalQuestionNumber": 16,
+      "examCode": "091030",
+      "paperCode": "4217",
+      "examSessionLabel": "第一次",
+      "officialExam": {
+        "categoryCode": "217",
+        "subjectCode": "4004",
+        "trackCode": "STAGE1",
+        "trackLabel": "醫師（一）分階段",
+        "paperTitle": "基礎醫學（一）",
+        "questionCount": 80,
+        "timeMinutes": 60,
+        "pointsPerQuestion": 1.25,
+        "officialScope": "解剖學、微生物學及免疫學、病理學"
+      },
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=217&code=091030&q=1&s=4004&t=Q",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=217&code=091030&q=1&s=4004&t=M",
+        "page": 1,
+        "endPage": 1,
+        "image": "/question-media/moex-91-1-stage1-med1/MOEX-C217-091030-S4004-STAGE1-Q016.webp",
+        "width": 1659,
+        "height": 88,
+        "scope": "解剖學、微生物學及免疫學、病理學",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-C217-091030-S4004-STAGE1-Q017",
+      "subject": "醫學（一）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（一）",
+      "stem": "支配球海綿體肌的神經源自下列何者？",
+      "options": {
+        "A": "骶神經叢",
+        "B": "下腹下神經叢",
+        "C": "會陰神經",
+        "D": "陰部神經"
+      },
+      "answer": "C",
+      "acceptedAnswers": [
+        "C"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：C。",
+      "testedConcept": "基礎醫學（一）（醫師分階段原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國91年第1次 醫師（一）分階段 基礎醫學（一） 4004",
+      "sourceYear": 2002,
+      "sourceRound": 1,
+      "originalQuestionNumber": 17,
+      "examCode": "091030",
+      "paperCode": "4217",
+      "examSessionLabel": "第一次",
+      "officialExam": {
+        "categoryCode": "217",
+        "subjectCode": "4004",
+        "trackCode": "STAGE1",
+        "trackLabel": "醫師（一）分階段",
+        "paperTitle": "基礎醫學（一）",
+        "questionCount": 80,
+        "timeMinutes": 60,
+        "pointsPerQuestion": 1.25,
+        "officialScope": "解剖學、微生物學及免疫學、病理學"
+      },
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=217&code=091030&q=1&s=4004&t=Q",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=217&code=091030&q=1&s=4004&t=M",
+        "page": 1,
+        "endPage": 1,
+        "image": "/question-media/moex-91-1-stage1-med1/MOEX-C217-091030-S4004-STAGE1-Q017.webp",
+        "width": 1659,
+        "height": 88,
+        "scope": "解剖學、微生物學及免疫學、病理學",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-C217-091030-S4004-STAGE1-Q018",
+      "subject": "醫學（一）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（一）",
+      "stem": "下列何者無法以陰道觸診摸到？",
+      "options": {
+        "A": "乙狀結腸",
+        "B": "會陰體",
+        "C": "坐骨棘",
+        "D": "髂恥線"
+      },
+      "answer": "D",
+      "acceptedAnswers": [
+        "D"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：D。",
+      "testedConcept": "基礎醫學（一）（醫師分階段原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國91年第1次 醫師（一）分階段 基礎醫學（一） 4004",
+      "sourceYear": 2002,
+      "sourceRound": 1,
+      "originalQuestionNumber": 18,
+      "examCode": "091030",
+      "paperCode": "4217",
+      "examSessionLabel": "第一次",
+      "officialExam": {
+        "categoryCode": "217",
+        "subjectCode": "4004",
+        "trackCode": "STAGE1",
+        "trackLabel": "醫師（一）分階段",
+        "paperTitle": "基礎醫學（一）",
+        "questionCount": 80,
+        "timeMinutes": 60,
+        "pointsPerQuestion": 1.25,
+        "officialScope": "解剖學、微生物學及免疫學、病理學"
+      },
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=217&code=091030&q=1&s=4004&t=Q",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=217&code=091030&q=1&s=4004&t=M",
+        "page": 1,
+        "endPage": 1,
+        "image": "/question-media/moex-91-1-stage1-med1/MOEX-C217-091030-S4004-STAGE1-Q018.webp",
+        "width": 1659,
+        "height": 88,
+        "scope": "解剖學、微生物學及免疫學、病理學",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-C217-091030-S4004-STAGE1-Q019",
+      "subject": "醫學（一）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（一）",
+      "stem": "手拇指與小指無法相對接觸，係下列何者受損？",
+      "options": {
+        "A": "正中神經",
+        "B": "尺神經",
+        "C": "橈神經",
+        "D": "腋神經"
+      },
+      "answer": "A",
+      "acceptedAnswers": [
+        "A"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：A。",
+      "testedConcept": "基礎醫學（一）（醫師分階段原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國91年第1次 醫師（一）分階段 基礎醫學（一） 4004",
+      "sourceYear": 2002,
+      "sourceRound": 1,
+      "originalQuestionNumber": 19,
+      "examCode": "091030",
+      "paperCode": "4217",
+      "examSessionLabel": "第一次",
+      "officialExam": {
+        "categoryCode": "217",
+        "subjectCode": "4004",
+        "trackCode": "STAGE1",
+        "trackLabel": "醫師（一）分階段",
+        "paperTitle": "基礎醫學（一）",
+        "questionCount": 80,
+        "timeMinutes": 60,
+        "pointsPerQuestion": 1.25,
+        "officialScope": "解剖學、微生物學及免疫學、病理學"
+      },
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=217&code=091030&q=1&s=4004&t=Q",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=217&code=091030&q=1&s=4004&t=M",
+        "page": 1,
+        "endPage": 1,
+        "image": "/question-media/moex-91-1-stage1-med1/MOEX-C217-091030-S4004-STAGE1-Q019.webp",
+        "width": 1659,
+        "height": 88,
+        "scope": "解剖學、微生物學及免疫學、病理學",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-C217-091030-S4004-STAGE1-Q020",
+      "subject": "醫學（一）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（一）",
+      "stem": "下列何者與肘關節的內側副韌帶（medial collateral ligament）有密切關聯？",
+      "options": {
+        "A": "肱動脈",
+        "B": "尺動脈",
+        "C": "橈神經",
+        "D": "尺神經"
+      },
+      "answer": "D",
+      "acceptedAnswers": [
+        "D"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：D。",
+      "testedConcept": "基礎醫學（一）（醫師分階段原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國91年第1次 醫師（一）分階段 基礎醫學（一） 4004",
+      "sourceYear": 2002,
+      "sourceRound": 1,
+      "originalQuestionNumber": 20,
+      "examCode": "091030",
+      "paperCode": "4217",
+      "examSessionLabel": "第一次",
+      "officialExam": {
+        "categoryCode": "217",
+        "subjectCode": "4004",
+        "trackCode": "STAGE1",
+        "trackLabel": "醫師（一）分階段",
+        "paperTitle": "基礎醫學（一）",
+        "questionCount": 80,
+        "timeMinutes": 60,
+        "pointsPerQuestion": 1.25,
+        "officialScope": "解剖學、微生物學及免疫學、病理學"
+      },
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=217&code=091030&q=1&s=4004&t=Q",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=217&code=091030&q=1&s=4004&t=M",
+        "page": 1,
+        "endPage": 1,
+        "image": "/question-media/moex-91-1-stage1-med1/MOEX-C217-091030-S4004-STAGE1-Q020.webp",
+        "width": 1659,
+        "height": 88,
+        "scope": "解剖學、微生物學及免疫學、病理學",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-C217-091030-S4004-STAGE1-Q021",
+      "subject": "醫學（一）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（一）",
+      "stem": "鎖骨與上肢其它部分的主要韌帶連合為：",
+      "options": {
+        "A": "喙鎖韌帶",
+        "B": "喙肩韌帶",
+        "C": "肋鎖韌帶",
+        "D": "胸鎖韌帶"
+      },
+      "answer": "A",
+      "acceptedAnswers": [
+        "A"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：A。",
+      "testedConcept": "基礎醫學（一）（醫師分階段原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國91年第1次 醫師（一）分階段 基礎醫學（一） 4004",
+      "sourceYear": 2002,
+      "sourceRound": 1,
+      "originalQuestionNumber": 21,
+      "examCode": "091030",
+      "paperCode": "4217",
+      "examSessionLabel": "第一次",
+      "officialExam": {
+        "categoryCode": "217",
+        "subjectCode": "4004",
+        "trackCode": "STAGE1",
+        "trackLabel": "醫師（一）分階段",
+        "paperTitle": "基礎醫學（一）",
+        "questionCount": 80,
+        "timeMinutes": 60,
+        "pointsPerQuestion": 1.25,
+        "officialScope": "解剖學、微生物學及免疫學、病理學"
+      },
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=217&code=091030&q=1&s=4004&t=Q",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=217&code=091030&q=1&s=4004&t=M",
+        "page": 1,
+        "endPage": 1,
+        "image": "/question-media/moex-91-1-stage1-med1/MOEX-C217-091030-S4004-STAGE1-Q021.webp",
+        "width": 1659,
+        "height": 90,
+        "scope": "解剖學、微生物學及免疫學、病理學",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-C217-091030-S4004-STAGE1-Q022",
+      "subject": "醫學（一）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（一）",
+      "stem": "下列何者參與足部內側與外側縱弓的形成？",
+      "options": {
+        "A": "距骨",
+        "B": "跟骨",
+        "C": "骰骨",
+        "D": "外側楔形骨"
+      },
+      "answer": "B",
+      "acceptedAnswers": [
+        "B"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：B。",
+      "testedConcept": "基礎醫學（一）（醫師分階段原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國91年第1次 醫師（一）分階段 基礎醫學（一） 4004",
+      "sourceYear": 2002,
+      "sourceRound": 1,
+      "originalQuestionNumber": 22,
+      "examCode": "091030",
+      "paperCode": "4217",
+      "examSessionLabel": "第一次",
+      "officialExam": {
+        "categoryCode": "217",
+        "subjectCode": "4004",
+        "trackCode": "STAGE1",
+        "trackLabel": "醫師（一）分階段",
+        "paperTitle": "基礎醫學（一）",
+        "questionCount": 80,
+        "timeMinutes": 60,
+        "pointsPerQuestion": 1.25,
+        "officialScope": "解剖學、微生物學及免疫學、病理學"
+      },
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=217&code=091030&q=1&s=4004&t=Q",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=217&code=091030&q=1&s=4004&t=M",
+        "page": 2,
+        "endPage": 2,
+        "image": "/question-media/moex-91-1-stage1-med1/MOEX-C217-091030-S4004-STAGE1-Q022.webp",
+        "width": 1659,
+        "height": 85,
+        "scope": "解剖學、微生物學及免疫學、病理學",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-C217-091030-S4004-STAGE1-Q023",
+      "subject": "醫學（一）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（一）",
+      "stem": "下列何者收縮可以鬆開膝關節產生屈曲動作？",
+      "options": {
+        "A": "股內側肌",
+        "B": "腓腸肌",
+        "C": "股二頭肌",
+        "D": "膕肌"
+      },
+      "answer": "D",
+      "acceptedAnswers": [
+        "D"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：D。",
+      "testedConcept": "基礎醫學（一）（醫師分階段原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國91年第1次 醫師（一）分階段 基礎醫學（一） 4004",
+      "sourceYear": 2002,
+      "sourceRound": 1,
+      "originalQuestionNumber": 23,
+      "examCode": "091030",
+      "paperCode": "4217",
+      "examSessionLabel": "第一次",
+      "officialExam": {
+        "categoryCode": "217",
+        "subjectCode": "4004",
+        "trackCode": "STAGE1",
+        "trackLabel": "醫師（一）分階段",
+        "paperTitle": "基礎醫學（一）",
+        "questionCount": 80,
+        "timeMinutes": 60,
+        "pointsPerQuestion": 1.25,
+        "officialScope": "解剖學、微生物學及免疫學、病理學"
+      },
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=217&code=091030&q=1&s=4004&t=Q",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=217&code=091030&q=1&s=4004&t=M",
+        "page": 2,
+        "endPage": 2,
+        "image": "/question-media/moex-91-1-stage1-med1/MOEX-C217-091030-S4004-STAGE1-Q023.webp",
+        "width": 1659,
+        "height": 85,
+        "scope": "解剖學、微生物學及免疫學、病理學",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-C217-091030-S4004-STAGE1-Q024",
+      "subject": "醫學（一）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（一）",
+      "stem": "張口發出「啊」聲時，發現懸雍垂往上拉向右邊，則可能是那一顱神經受損？",
+      "options": {
+        "A": "左舌咽神經",
+        "B": "右舌下神經",
+        "C": "左副神經",
+        "D": "右迷走神經"
+      },
+      "answer": "C",
+      "acceptedAnswers": [
+        "C"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：C。",
+      "testedConcept": "基礎醫學（一）（醫師分階段原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國91年第1次 醫師（一）分階段 基礎醫學（一） 4004",
+      "sourceYear": 2002,
+      "sourceRound": 1,
+      "originalQuestionNumber": 24,
+      "examCode": "091030",
+      "paperCode": "4217",
+      "examSessionLabel": "第一次",
+      "officialExam": {
+        "categoryCode": "217",
+        "subjectCode": "4004",
+        "trackCode": "STAGE1",
+        "trackLabel": "醫師（一）分階段",
+        "paperTitle": "基礎醫學（一）",
+        "questionCount": 80,
+        "timeMinutes": 60,
+        "pointsPerQuestion": 1.25,
+        "officialScope": "解剖學、微生物學及免疫學、病理學"
+      },
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=217&code=091030&q=1&s=4004&t=Q",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=217&code=091030&q=1&s=4004&t=M",
+        "page": 2,
+        "endPage": 2,
+        "image": "/question-media/moex-91-1-stage1-med1/MOEX-C217-091030-S4004-STAGE1-Q024.webp",
+        "width": 1659,
+        "height": 85,
+        "scope": "解剖學、微生物學及免疫學、病理學",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-C217-091030-S4004-STAGE1-Q025",
+      "subject": "醫學（一）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（一）",
+      "stem": "下列何者主責舌頭的前突（protrusion）動作？",
+      "options": {
+        "A": "莖突舌肌",
+        "B": "腭舌肌",
+        "C": "舌骨舌肌",
+        "D": "頦舌肌"
+      },
+      "answer": "D",
+      "acceptedAnswers": [
+        "D"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：D。",
+      "testedConcept": "基礎醫學（一）（醫師分階段原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國91年第1次 醫師（一）分階段 基礎醫學（一） 4004",
+      "sourceYear": 2002,
+      "sourceRound": 1,
+      "originalQuestionNumber": 25,
+      "examCode": "091030",
+      "paperCode": "4217",
+      "examSessionLabel": "第一次",
+      "officialExam": {
+        "categoryCode": "217",
+        "subjectCode": "4004",
+        "trackCode": "STAGE1",
+        "trackLabel": "醫師（一）分階段",
+        "paperTitle": "基礎醫學（一）",
+        "questionCount": 80,
+        "timeMinutes": 60,
+        "pointsPerQuestion": 1.25,
+        "officialScope": "解剖學、微生物學及免疫學、病理學"
+      },
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=217&code=091030&q=1&s=4004&t=Q",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=217&code=091030&q=1&s=4004&t=M",
+        "page": 2,
+        "endPage": 2,
+        "image": "/question-media/moex-91-1-stage1-med1/MOEX-C217-091030-S4004-STAGE1-Q025.webp",
+        "width": 1659,
+        "height": 85,
+        "scope": "解剖學、微生物學及免疫學、病理學",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-C217-091030-S4004-STAGE1-Q026",
+      "subject": "醫學（一）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（一）",
+      "stem": "下列何者一部分會終止於顳下頷關節的關節盤？",
+      "options": {
+        "A": "外翼肌",
+        "B": "內翼肌",
+        "C": "嚼肌",
+        "D": "顳肌"
+      },
+      "answer": "A",
+      "acceptedAnswers": [
+        "A"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：A。",
+      "testedConcept": "基礎醫學（一）（醫師分階段原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國91年第1次 醫師（一）分階段 基礎醫學（一） 4004",
+      "sourceYear": 2002,
+      "sourceRound": 1,
+      "originalQuestionNumber": 26,
+      "examCode": "091030",
+      "paperCode": "4217",
+      "examSessionLabel": "第一次",
+      "officialExam": {
+        "categoryCode": "217",
+        "subjectCode": "4004",
+        "trackCode": "STAGE1",
+        "trackLabel": "醫師（一）分階段",
+        "paperTitle": "基礎醫學（一）",
+        "questionCount": 80,
+        "timeMinutes": 60,
+        "pointsPerQuestion": 1.25,
+        "officialScope": "解剖學、微生物學及免疫學、病理學"
+      },
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=217&code=091030&q=1&s=4004&t=Q",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=217&code=091030&q=1&s=4004&t=M",
+        "page": 2,
+        "endPage": 2,
+        "image": "/question-media/moex-91-1-stage1-med1/MOEX-C217-091030-S4004-STAGE1-Q026.webp",
+        "width": 1659,
+        "height": 85,
+        "scope": "解剖學、微生物學及免疫學、病理學",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-C217-091030-S4004-STAGE1-Q027",
+      "subject": "醫學（一）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（一）",
+      "stem": "成人的蛛網膜下腔最下方終端位於椎管那一水平位置？",
+      "options": {
+        "A": "第一腰椎下緣",
+        "B": "骶骨岬",
+        "C": "第二、三薦椎之間",
+        "D": "第五薦椎上緣"
+      },
+      "answer": "C",
+      "acceptedAnswers": [
+        "C"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：C。",
+      "testedConcept": "基礎醫學（一）（醫師分階段原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國91年第1次 醫師（一）分階段 基礎醫學（一） 4004",
+      "sourceYear": 2002,
+      "sourceRound": 1,
+      "originalQuestionNumber": 27,
+      "examCode": "091030",
+      "paperCode": "4217",
+      "examSessionLabel": "第一次",
+      "officialExam": {
+        "categoryCode": "217",
+        "subjectCode": "4004",
+        "trackCode": "STAGE1",
+        "trackLabel": "醫師（一）分階段",
+        "paperTitle": "基礎醫學（一）",
+        "questionCount": 80,
+        "timeMinutes": 60,
+        "pointsPerQuestion": 1.25,
+        "officialScope": "解剖學、微生物學及免疫學、病理學"
+      },
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=217&code=091030&q=1&s=4004&t=Q",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=217&code=091030&q=1&s=4004&t=M",
+        "page": 2,
+        "endPage": 2,
+        "image": "/question-media/moex-91-1-stage1-med1/MOEX-C217-091030-S4004-STAGE1-Q027.webp",
+        "width": 1659,
+        "height": 85,
+        "scope": "解剖學、微生物學及免疫學、病理學",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-C217-091030-S4004-STAGE1-Q028",
+      "subject": "醫學（一）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（一）",
+      "stem": "吞嚥時下列何者會將軟腭上舉？",
+      "options": {
+        "A": "腭帆張肌",
+        "B": "腭舌肌",
+        "C": "腭咽肌",
+        "D": "腭帆提肌"
+      },
+      "answer": "D",
+      "acceptedAnswers": [
+        "D"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：D。",
+      "testedConcept": "基礎醫學（一）（醫師分階段原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國91年第1次 醫師（一）分階段 基礎醫學（一） 4004",
+      "sourceYear": 2002,
+      "sourceRound": 1,
+      "originalQuestionNumber": 28,
+      "examCode": "091030",
+      "paperCode": "4217",
+      "examSessionLabel": "第一次",
+      "officialExam": {
+        "categoryCode": "217",
+        "subjectCode": "4004",
+        "trackCode": "STAGE1",
+        "trackLabel": "醫師（一）分階段",
+        "paperTitle": "基礎醫學（一）",
+        "questionCount": 80,
+        "timeMinutes": 60,
+        "pointsPerQuestion": 1.25,
+        "officialScope": "解剖學、微生物學及免疫學、病理學"
+      },
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=217&code=091030&q=1&s=4004&t=Q",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=217&code=091030&q=1&s=4004&t=M",
+        "page": 2,
+        "endPage": 2,
+        "image": "/question-media/moex-91-1-stage1-med1/MOEX-C217-091030-S4004-STAGE1-Q028.webp",
+        "width": 1659,
+        "height": 85,
+        "scope": "解剖學、微生物學及免疫學、病理學",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-C217-091030-S4004-STAGE1-Q029",
+      "subject": "醫學（一）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（一）",
+      "stem": "頰肌係下列何者所支配？",
+      "options": {
+        "A": "頰神經",
+        "B": "面神經的頰分枝",
+        "C": "顴面神經",
+        "D": "眶下神經"
+      },
+      "answer": "B",
+      "acceptedAnswers": [
+        "B"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：B。",
+      "testedConcept": "基礎醫學（一）（醫師分階段原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國91年第1次 醫師（一）分階段 基礎醫學（一） 4004",
+      "sourceYear": 2002,
+      "sourceRound": 1,
+      "originalQuestionNumber": 29,
+      "examCode": "091030",
+      "paperCode": "4217",
+      "examSessionLabel": "第一次",
+      "officialExam": {
+        "categoryCode": "217",
+        "subjectCode": "4004",
+        "trackCode": "STAGE1",
+        "trackLabel": "醫師（一）分階段",
+        "paperTitle": "基礎醫學（一）",
+        "questionCount": 80,
+        "timeMinutes": 60,
+        "pointsPerQuestion": 1.25,
+        "officialScope": "解剖學、微生物學及免疫學、病理學"
+      },
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=217&code=091030&q=1&s=4004&t=Q",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=217&code=091030&q=1&s=4004&t=M",
+        "page": 2,
+        "endPage": 2,
+        "image": "/question-media/moex-91-1-stage1-med1/MOEX-C217-091030-S4004-STAGE1-Q029.webp",
+        "width": 1659,
+        "height": 85,
+        "scope": "解剖學、微生物學及免疫學、病理學",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-C217-091030-S4004-STAGE1-Q030",
+      "subject": "醫學（一）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（一）",
+      "stem": "以下有關prion 之敘述，何者不正確？",
+      "options": {
+        "A": "prion 含有核酸及蛋白質",
+        "B": "可引起中樞神經系統退化症",
+        "C": "具有感染性",
+        "D": "產生prion 之基因位於宿主之染色體DNA"
+      },
+      "answer": "A",
+      "acceptedAnswers": [
+        "A"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：A。",
+      "testedConcept": "基礎醫學（一）（醫師分階段原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國91年第1次 醫師（一）分階段 基礎醫學（一） 4004",
+      "sourceYear": 2002,
+      "sourceRound": 1,
+      "originalQuestionNumber": 30,
+      "examCode": "091030",
+      "paperCode": "4217",
+      "examSessionLabel": "第一次",
+      "officialExam": {
+        "categoryCode": "217",
+        "subjectCode": "4004",
+        "trackCode": "STAGE1",
+        "trackLabel": "醫師（一）分階段",
+        "paperTitle": "基礎醫學（一）",
+        "questionCount": 80,
+        "timeMinutes": 60,
+        "pointsPerQuestion": 1.25,
+        "officialScope": "解剖學、微生物學及免疫學、病理學"
+      },
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=217&code=091030&q=1&s=4004&t=Q",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=217&code=091030&q=1&s=4004&t=M",
+        "page": 2,
+        "endPage": 2,
+        "image": "/question-media/moex-91-1-stage1-med1/MOEX-C217-091030-S4004-STAGE1-Q030.webp",
+        "width": 1659,
+        "height": 125,
+        "scope": "解剖學、微生物學及免疫學、病理學",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-C217-091030-S4004-STAGE1-Q031",
+      "subject": "醫學（一）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（一）",
+      "stem": "以下有關細菌外毒素（exotoxin）之敘述，何者正確？",
+      "options": {
+        "A": "外毒素含對熱穩定之蛋白質，可由活菌釋出",
+        "B": "外毒素之毒性不強故可做成類毒素疫苗",
+        "C": "外毒素常藉由宿主之接受器進入宿主細胞",
+        "D": "所有外毒素的主要作用是殺死細胞"
+      },
+      "answer": "C",
+      "acceptedAnswers": [
+        "C"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：C。",
+      "testedConcept": "基礎醫學（一）（醫師分階段原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國91年第1次 醫師（一）分階段 基礎醫學（一） 4004",
+      "sourceYear": 2002,
+      "sourceRound": 1,
+      "originalQuestionNumber": 31,
+      "examCode": "091030",
+      "paperCode": "4217",
+      "examSessionLabel": "第一次",
+      "officialExam": {
+        "categoryCode": "217",
+        "subjectCode": "4004",
+        "trackCode": "STAGE1",
+        "trackLabel": "醫師（一）分階段",
+        "paperTitle": "基礎醫學（一）",
+        "questionCount": 80,
+        "timeMinutes": 60,
+        "pointsPerQuestion": 1.25,
+        "officialScope": "解剖學、微生物學及免疫學、病理學"
+      },
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=217&code=091030&q=1&s=4004&t=Q",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=217&code=091030&q=1&s=4004&t=M",
+        "page": 2,
+        "endPage": 2,
+        "image": "/question-media/moex-91-1-stage1-med1/MOEX-C217-091030-S4004-STAGE1-Q031.webp",
+        "width": 1659,
+        "height": 125,
+        "scope": "解剖學、微生物學及免疫學、病理學",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-C217-091030-S4004-STAGE1-Q032",
+      "subject": "醫學（一）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（一）",
+      "stem": "肺炎鏈球菌（Streptococcus pneumoniae）之致病性經常和細菌莢膜（Capsule）的存在有關。這是因為莢膜 可以：",
+      "options": {
+        "A": "抗吞噬（anti-phagocytosis）",
+        "B": "抗藥",
+        "C": "抗熱",
+        "D": "促使細菌快速生長"
+      },
+      "answer": "A",
+      "acceptedAnswers": [
+        "A"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：A。",
+      "testedConcept": "基礎醫學（一）（醫師分階段原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國91年第1次 醫師（一）分階段 基礎醫學（一） 4004",
+      "sourceYear": 2002,
+      "sourceRound": 1,
+      "originalQuestionNumber": 32,
+      "examCode": "091030",
+      "paperCode": "4217",
+      "examSessionLabel": "第一次",
+      "officialExam": {
+        "categoryCode": "217",
+        "subjectCode": "4004",
+        "trackCode": "STAGE1",
+        "trackLabel": "醫師（一）分階段",
+        "paperTitle": "基礎醫學（一）",
+        "questionCount": 80,
+        "timeMinutes": 60,
+        "pointsPerQuestion": 1.25,
+        "officialScope": "解剖學、微生物學及免疫學、病理學"
+      },
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=217&code=091030&q=1&s=4004&t=Q",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=217&code=091030&q=1&s=4004&t=M",
+        "page": 2,
+        "endPage": 2,
+        "image": "/question-media/moex-91-1-stage1-med1/MOEX-C217-091030-S4004-STAGE1-Q032.webp",
+        "width": 1659,
+        "height": 166,
+        "scope": "解剖學、微生物學及免疫學、病理學",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-C217-091030-S4004-STAGE1-Q033",
+      "subject": "醫學（一）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（一）",
+      "stem": "某病人經食物感染某病毒，其病徵為破壞運動神經元，引起肌肉疼痛，僵硬及上下肢麻痺等症狀。請問此 病毒為：",
+      "options": {
+        "A": "鼻病毒",
+        "B": "流行性感冒病毒",
+        "C": "狂犬病病毒",
+        "D": "脊髓灰白質炎病毒"
+      },
+      "answer": "D",
+      "acceptedAnswers": [
+        "D"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：D。",
+      "testedConcept": "基礎醫學（一）（醫師分階段原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國91年第1次 醫師（一）分階段 基礎醫學（一） 4004",
+      "sourceYear": 2002,
+      "sourceRound": 1,
+      "originalQuestionNumber": 33,
+      "examCode": "091030",
+      "paperCode": "4217",
+      "examSessionLabel": "第一次",
+      "officialExam": {
+        "categoryCode": "217",
+        "subjectCode": "4004",
+        "trackCode": "STAGE1",
+        "trackLabel": "醫師（一）分階段",
+        "paperTitle": "基礎醫學（一）",
+        "questionCount": 80,
+        "timeMinutes": 60,
+        "pointsPerQuestion": 1.25,
+        "officialScope": "解剖學、微生物學及免疫學、病理學"
+      },
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=217&code=091030&q=1&s=4004&t=Q",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=217&code=091030&q=1&s=4004&t=M",
+        "page": 2,
+        "endPage": 2,
+        "image": "/question-media/moex-91-1-stage1-med1/MOEX-C217-091030-S4004-STAGE1-Q033.webp",
+        "width": 1659,
+        "height": 125,
+        "scope": "解剖學、微生物學及免疫學、病理學",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-C217-091030-S4004-STAGE1-Q034",
+      "subject": "醫學（一）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（一）",
+      "stem": "有關鏈球菌（Streptococci）之生長特性下列何者為誤？",
+      "options": {
+        "A": "大部分為絕對需氧菌（obligate aerobes）",
+        "B": "可在一般血液培養基生長",
+        "C": "腸球菌可生長於15℃至45℃之間",
+        "D": "菌落形態的不同與M 蛋白量的多寡有關"
+      },
+      "answer": "A",
+      "acceptedAnswers": [
+        "A"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：A。",
+      "testedConcept": "基礎醫學（一）（醫師分階段原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國91年第1次 醫師（一）分階段 基礎醫學（一） 4004",
+      "sourceYear": 2002,
+      "sourceRound": 1,
+      "originalQuestionNumber": 34,
+      "examCode": "091030",
+      "paperCode": "4217",
+      "examSessionLabel": "第一次",
+      "officialExam": {
+        "categoryCode": "217",
+        "subjectCode": "4004",
+        "trackCode": "STAGE1",
+        "trackLabel": "醫師（一）分階段",
+        "paperTitle": "基礎醫學（一）",
+        "questionCount": 80,
+        "timeMinutes": 60,
+        "pointsPerQuestion": 1.25,
+        "officialScope": "解剖學、微生物學及免疫學、病理學"
+      },
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=217&code=091030&q=1&s=4004&t=Q",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=217&code=091030&q=1&s=4004&t=M",
+        "page": 2,
+        "endPage": 2,
+        "image": "/question-media/moex-91-1-stage1-med1/MOEX-C217-091030-S4004-STAGE1-Q034.webp",
+        "width": 1659,
+        "height": 125,
+        "scope": "解剖學、微生物學及免疫學、病理學",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-C217-091030-S4004-STAGE1-Q035",
+      "subject": "醫學（一）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（一）",
+      "stem": "下列何病毒因能穿透胎盤感染而易造成畸形兒，故最好以疫苗防治：",
+      "options": {
+        "A": "mumps virus",
+        "B": "rubella virus",
+        "C": "measles virus",
+        "D": "respiratory syncytial virus"
+      },
+      "answer": "B",
+      "acceptedAnswers": [
+        "B"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：B。",
+      "testedConcept": "基礎醫學（一）（醫師分階段原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國91年第1次 醫師（一）分階段 基礎醫學（一） 4004",
+      "sourceYear": 2002,
+      "sourceRound": 1,
+      "originalQuestionNumber": 35,
+      "examCode": "091030",
+      "paperCode": "4217",
+      "examSessionLabel": "第一次",
+      "officialExam": {
+        "categoryCode": "217",
+        "subjectCode": "4004",
+        "trackCode": "STAGE1",
+        "trackLabel": "醫師（一）分階段",
+        "paperTitle": "基礎醫學（一）",
+        "questionCount": 80,
+        "timeMinutes": 60,
+        "pointsPerQuestion": 1.25,
+        "officialScope": "解剖學、微生物學及免疫學、病理學"
+      },
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=217&code=091030&q=1&s=4004&t=Q",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=217&code=091030&q=1&s=4004&t=M",
+        "page": 2,
+        "endPage": 2,
+        "image": "/question-media/moex-91-1-stage1-med1/MOEX-C217-091030-S4004-STAGE1-Q035.webp",
+        "width": 1659,
+        "height": 125,
+        "scope": "解剖學、微生物學及免疫學、病理學",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-C217-091030-S4004-STAGE1-Q036",
+      "subject": "醫學（一）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（一）",
+      "stem": "下列有關日本腦炎病毒的敘述，何者錯誤？",
+      "options": {
+        "A": "經由蚊子傳染給人",
+        "B": "與登革熱病毒同科",
+        "C": "引起出血熱",
+        "D": "侵犯中樞神經系統，引起死亡"
+      },
+      "answer": "C",
+      "acceptedAnswers": [
+        "C"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：C。",
+      "testedConcept": "基礎醫學（一）（醫師分階段原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國91年第1次 醫師（一）分階段 基礎醫學（一） 4004",
+      "sourceYear": 2002,
+      "sourceRound": 1,
+      "originalQuestionNumber": 36,
+      "examCode": "091030",
+      "paperCode": "4217",
+      "examSessionLabel": "第一次",
+      "officialExam": {
+        "categoryCode": "217",
+        "subjectCode": "4004",
+        "trackCode": "STAGE1",
+        "trackLabel": "醫師（一）分階段",
+        "paperTitle": "基礎醫學（一）",
+        "questionCount": 80,
+        "timeMinutes": 60,
+        "pointsPerQuestion": 1.25,
+        "officialScope": "解剖學、微生物學及免疫學、病理學"
+      },
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=217&code=091030&q=1&s=4004&t=Q",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=217&code=091030&q=1&s=4004&t=M",
+        "page": 2,
+        "endPage": 2,
+        "image": "/question-media/moex-91-1-stage1-med1/MOEX-C217-091030-S4004-STAGE1-Q036.webp",
+        "width": 1659,
+        "height": 125,
+        "scope": "解剖學、微生物學及免疫學、病理學",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-C217-091030-S4004-STAGE1-Q037",
+      "subject": "醫學（一）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（一）",
+      "stem": "下列有關狂犬病之敘述，何者錯誤？",
+      "options": {
+        "A": "病獸咬傷而傳染",
+        "B": "主要侵犯免疫系統",
+        "C": "患者組織中可發現內格瑞體（Negri body）",
+        "D": "狂犬病病毒核酸為RNA"
+      },
+      "answer": "B",
+      "acceptedAnswers": [
+        "B"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：B。",
+      "testedConcept": "基礎醫學（一）（醫師分階段原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國91年第1次 醫師（一）分階段 基礎醫學（一） 4004",
+      "sourceYear": 2002,
+      "sourceRound": 1,
+      "originalQuestionNumber": 37,
+      "examCode": "091030",
+      "paperCode": "4217",
+      "examSessionLabel": "第一次",
+      "officialExam": {
+        "categoryCode": "217",
+        "subjectCode": "4004",
+        "trackCode": "STAGE1",
+        "trackLabel": "醫師（一）分階段",
+        "paperTitle": "基礎醫學（一）",
+        "questionCount": 80,
+        "timeMinutes": 60,
+        "pointsPerQuestion": 1.25,
+        "officialScope": "解剖學、微生物學及免疫學、病理學"
+      },
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=217&code=091030&q=1&s=4004&t=Q",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=217&code=091030&q=1&s=4004&t=M",
+        "page": 2,
+        "endPage": 2,
+        "image": "/question-media/moex-91-1-stage1-med1/MOEX-C217-091030-S4004-STAGE1-Q037.webp",
+        "width": 1659,
+        "height": 125,
+        "scope": "解剖學、微生物學及免疫學、病理學",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-C217-091030-S4004-STAGE1-Q038",
+      "subject": "醫學（一）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（一）",
+      "stem": "以下有關限制酵素（restriction enzyme）之敘述，何者正確？",
+      "options": {
+        "A": "可分解外來之蛋白質",
+        "B": "可切割外來之RNA",
+        "C": "可切割特定之DNA 序列",
+        "D": "以上皆不正確"
+      },
+      "answer": "C",
+      "acceptedAnswers": [
+        "C"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：C。",
+      "testedConcept": "基礎醫學（一）（醫師分階段原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國91年第1次 醫師（一）分階段 基礎醫學（一） 4004",
+      "sourceYear": 2002,
+      "sourceRound": 1,
+      "originalQuestionNumber": 38,
+      "examCode": "091030",
+      "paperCode": "4217",
+      "examSessionLabel": "第一次",
+      "officialExam": {
+        "categoryCode": "217",
+        "subjectCode": "4004",
+        "trackCode": "STAGE1",
+        "trackLabel": "醫師（一）分階段",
+        "paperTitle": "基礎醫學（一）",
+        "questionCount": 80,
+        "timeMinutes": 60,
+        "pointsPerQuestion": 1.25,
+        "officialScope": "解剖學、微生物學及免疫學、病理學"
+      },
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=217&code=091030&q=1&s=4004&t=Q",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=217&code=091030&q=1&s=4004&t=M",
+        "page": 2,
+        "endPage": 2,
+        "image": "/question-media/moex-91-1-stage1-med1/MOEX-C217-091030-S4004-STAGE1-Q038.webp",
+        "width": 1659,
+        "height": 84,
+        "scope": "解剖學、微生物學及免疫學、病理學",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-C217-091030-S4004-STAGE1-Q039",
+      "subject": "醫學（一）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（一）",
+      "stem": "愛滋病患者的免疫系統受到明顯抑制，故常發生嚴重的伺機性感染及何種腫瘤？",
+      "options": {
+        "A": "子宮頸癌",
+        "B": "卡波西氏肉瘤（Kaposi’s sarcoma）",
+        "C": "鼻咽癌",
+        "D": "肝癌"
+      },
+      "answer": "B",
+      "acceptedAnswers": [
+        "B"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：B。",
+      "testedConcept": "基礎醫學（一）（醫師分階段原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國91年第1次 醫師（一）分階段 基礎醫學（一） 4004",
+      "sourceYear": 2002,
+      "sourceRound": 1,
+      "originalQuestionNumber": 39,
+      "examCode": "091030",
+      "paperCode": "4217",
+      "examSessionLabel": "第一次",
+      "officialExam": {
+        "categoryCode": "217",
+        "subjectCode": "4004",
+        "trackCode": "STAGE1",
+        "trackLabel": "醫師（一）分階段",
+        "paperTitle": "基礎醫學（一）",
+        "questionCount": 80,
+        "timeMinutes": 60,
+        "pointsPerQuestion": 1.25,
+        "officialScope": "解剖學、微生物學及免疫學、病理學"
+      },
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=217&code=091030&q=1&s=4004&t=Q",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=217&code=091030&q=1&s=4004&t=M",
+        "page": 2,
+        "endPage": 2,
+        "image": "/question-media/moex-91-1-stage1-med1/MOEX-C217-091030-S4004-STAGE1-Q039.webp",
+        "width": 1659,
+        "height": 125,
+        "scope": "解剖學、微生物學及免疫學、病理學",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-C217-091030-S4004-STAGE1-Q040",
+      "subject": "醫學（一）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（一）",
+      "stem": "特異性免疫反應（specific immunity）和非特異性免疫反應（nonspecific immunity）除了專一性外，下列何 點也是二者的不同之處？",
+      "options": {
+        "A": "記憶性",
+        "B": "區分敵、我的能力",
+        "C": "可保護宿主不被病原菌侵犯",
+        "D": "除了有免疫細胞直接作用，還有可溶性的蛋白質幫忙"
+      },
+      "answer": "A",
+      "acceptedAnswers": [
+        "A"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：A。",
+      "testedConcept": "基礎醫學（一）（醫師分階段原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國91年第1次 醫師（一）分階段 基礎醫學（一） 4004",
+      "sourceYear": 2002,
+      "sourceRound": 1,
+      "originalQuestionNumber": 40,
+      "examCode": "091030",
+      "paperCode": "4217",
+      "examSessionLabel": "第一次",
+      "officialExam": {
+        "categoryCode": "217",
+        "subjectCode": "4004",
+        "trackCode": "STAGE1",
+        "trackLabel": "醫師（一）分階段",
+        "paperTitle": "基礎醫學（一）",
+        "questionCount": 80,
+        "timeMinutes": 60,
+        "pointsPerQuestion": 1.25,
+        "officialScope": "解剖學、微生物學及免疫學、病理學"
+      },
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=217&code=091030&q=1&s=4004&t=Q",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=217&code=091030&q=1&s=4004&t=M",
+        "page": 2,
+        "endPage": 2,
+        "image": "/question-media/moex-91-1-stage1-med1/MOEX-C217-091030-S4004-STAGE1-Q040.webp",
+        "width": 1659,
+        "height": 247,
+        "scope": "解剖學、微生物學及免疫學、病理學",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-C217-091030-S4004-STAGE1-Q041",
+      "subject": "醫學（一）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（一）",
+      "stem": "已知身體內活化補體（complement）的途徑有三種，三者雖然起始的方法不同，但均會經由一個共同的補 體成份，再開啟其後一連串相同的反應，請問該關鍵分子（a common junction point）為何？",
+      "options": {
+        "A": "C1",
+        "B": "C3",
+        "C": "C5",
+        "D": "C9"
+      },
+      "answer": "B",
+      "acceptedAnswers": [
+        "B"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：B。",
+      "testedConcept": "基礎醫學（一）（醫師分階段原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國91年第1次 醫師（一）分階段 基礎醫學（一） 4004",
+      "sourceYear": 2002,
+      "sourceRound": 1,
+      "originalQuestionNumber": 41,
+      "examCode": "091030",
+      "paperCode": "4217",
+      "examSessionLabel": "第一次",
+      "officialExam": {
+        "categoryCode": "217",
+        "subjectCode": "4004",
+        "trackCode": "STAGE1",
+        "trackLabel": "醫師（一）分階段",
+        "paperTitle": "基礎醫學（一）",
+        "questionCount": 80,
+        "timeMinutes": 60,
+        "pointsPerQuestion": 1.25,
+        "officialScope": "解剖學、微生物學及免疫學、病理學"
+      },
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=217&code=091030&q=1&s=4004&t=Q",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=217&code=091030&q=1&s=4004&t=M",
+        "page": 2,
+        "endPage": 2,
+        "image": "/question-media/moex-91-1-stage1-med1/MOEX-C217-091030-S4004-STAGE1-Q041.webp",
+        "width": 1659,
+        "height": 131,
+        "scope": "解剖學、微生物學及免疫學、病理學",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-C217-091030-S4004-STAGE1-Q042",
+      "subject": "醫學（一）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（一）",
+      "stem": "流行性感冒嗜血桿菌Ｂ型（Haemophilus influenzae B）疫苗是將此菌之莢膜多醣和白喉或破傷風類毒素 （toxoid）以化學方法相結合而成。請問結合其他細菌類毒素的主要目的為何？",
+      "options": {
+        "A": "以類毒素做為輔劑（adjuvant），讓多醣抗原緩慢釋出",
+        "B": "製造多價的（polyvalent）疫苗",
+        "C": "活化巨噬細胞（macrophage）",
+        "D": "活化輔助T 細胞（Th），可幫助B 細胞分化為可分泌IgG 的漿細胞（plasma cell）和記憶細胞"
+      },
+      "answer": "D",
+      "acceptedAnswers": [
+        "D"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：D。",
+      "testedConcept": "基礎醫學（一）（醫師分階段原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國91年第1次 醫師（一）分階段 基礎醫學（一） 4004",
+      "sourceYear": 2002,
+      "sourceRound": 1,
+      "originalQuestionNumber": 42,
+      "examCode": "091030",
+      "paperCode": "4217",
+      "examSessionLabel": "第一次",
+      "officialExam": {
+        "categoryCode": "217",
+        "subjectCode": "4004",
+        "trackCode": "STAGE1",
+        "trackLabel": "醫師（一）分階段",
+        "paperTitle": "基礎醫學（一）",
+        "questionCount": 80,
+        "timeMinutes": 60,
+        "pointsPerQuestion": 1.25,
+        "officialScope": "解剖學、微生物學及免疫學、病理學"
+      },
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=217&code=091030&q=1&s=4004&t=Q",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=217&code=091030&q=1&s=4004&t=M",
+        "page": 3,
+        "endPage": 3,
+        "image": "/question-media/moex-91-1-stage1-med1/MOEX-C217-091030-S4004-STAGE1-Q042.webp",
+        "width": 1659,
+        "height": 246,
+        "scope": "解剖學、微生物學及免疫學、病理學",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-C217-091030-S4004-STAGE1-Q043",
+      "subject": "醫學（一）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（一）",
+      "stem": "為避免發生強烈的第一型過敏反應，臨床醫師有時會對病人進行減敏的治療（desensitization），即多次少 量注射過敏原（allergen），目的是為了刺激該病人產生何種抗體？",
+      "options": {
+        "A": "IgG",
+        "B": "IgM",
+        "C": "IgA",
+        "D": "IgE"
+      },
+      "answer": "A",
+      "acceptedAnswers": [
+        "A"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：A。",
+      "testedConcept": "基礎醫學（一）（醫師分階段原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國91年第1次 醫師（一）分階段 基礎醫學（一） 4004",
+      "sourceYear": 2002,
+      "sourceRound": 1,
+      "originalQuestionNumber": 43,
+      "examCode": "091030",
+      "paperCode": "4217",
+      "examSessionLabel": "第一次",
+      "officialExam": {
+        "categoryCode": "217",
+        "subjectCode": "4004",
+        "trackCode": "STAGE1",
+        "trackLabel": "醫師（一）分階段",
+        "paperTitle": "基礎醫學（一）",
+        "questionCount": 80,
+        "timeMinutes": 60,
+        "pointsPerQuestion": 1.25,
+        "officialScope": "解剖學、微生物學及免疫學、病理學"
+      },
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=217&code=091030&q=1&s=4004&t=Q",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=217&code=091030&q=1&s=4004&t=M",
+        "page": 3,
+        "endPage": 3,
+        "image": "/question-media/moex-91-1-stage1-med1/MOEX-C217-091030-S4004-STAGE1-Q043.webp",
+        "width": 1659,
+        "height": 125,
+        "scope": "解剖學、微生物學及免疫學、病理學",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-C217-091030-S4004-STAGE1-Q044",
+      "subject": "醫學（一）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（一）",
+      "stem": "CD4-T 淋巴細胞可進一步區分為TH0，TH1，TH2 和TH3 亞型（subgroup），請問其分類的依據為何？",
+      "options": {
+        "A": "以不同的染料染血液抹片（blood smear），在顯微鏡下觀察",
+        "B": "依據不同T helper cell 細胞表面的CD markers",
+        "C": "依據其所分泌不同的細胞激素（cytokine）來分類",
+        "D": "用不同的分裂素（mitogen）刺激以區分何種T cell 會分裂"
+      },
+      "answer": "C",
+      "acceptedAnswers": [
+        "C"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：C。",
+      "testedConcept": "基礎醫學（一）（醫師分階段原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國91年第1次 醫師（一）分階段 基礎醫學（一） 4004",
+      "sourceYear": 2002,
+      "sourceRound": 1,
+      "originalQuestionNumber": 44,
+      "examCode": "091030",
+      "paperCode": "4217",
+      "examSessionLabel": "第一次",
+      "officialExam": {
+        "categoryCode": "217",
+        "subjectCode": "4004",
+        "trackCode": "STAGE1",
+        "trackLabel": "醫師（一）分階段",
+        "paperTitle": "基礎醫學（一）",
+        "questionCount": 80,
+        "timeMinutes": 60,
+        "pointsPerQuestion": 1.25,
+        "officialScope": "解剖學、微生物學及免疫學、病理學"
+      },
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=217&code=091030&q=1&s=4004&t=Q",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=217&code=091030&q=1&s=4004&t=M",
+        "page": 3,
+        "endPage": 3,
+        "image": "/question-media/moex-91-1-stage1-med1/MOEX-C217-091030-S4004-STAGE1-Q044.webp",
+        "width": 1659,
+        "height": 206,
+        "scope": "解剖學、微生物學及免疫學、病理學",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-C217-091030-S4004-STAGE1-Q045",
+      "subject": "醫學（一）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（一）",
+      "stem": "下列何種免疫細胞可負責連繫我們的天生防禦能力（Innate Immunity）和專一性的免疫反應（Adaptive Immunity），具有橋樑的功效（bridge）？",
+      "options": {
+        "A": "巨噬細胞（macrophage）",
+        "B": "NK 細胞",
+        "C": "B 淋巴細胞",
+        "D": "T 淋巴細胞"
+      },
+      "answer": "A",
+      "acceptedAnswers": [
+        "A"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：A。",
+      "testedConcept": "基礎醫學（一）（醫師分階段原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國91年第1次 醫師（一）分階段 基礎醫學（一） 4004",
+      "sourceYear": 2002,
+      "sourceRound": 1,
+      "originalQuestionNumber": 45,
+      "examCode": "091030",
+      "paperCode": "4217",
+      "examSessionLabel": "第一次",
+      "officialExam": {
+        "categoryCode": "217",
+        "subjectCode": "4004",
+        "trackCode": "STAGE1",
+        "trackLabel": "醫師（一）分階段",
+        "paperTitle": "基礎醫學（一）",
+        "questionCount": 80,
+        "timeMinutes": 60,
+        "pointsPerQuestion": 1.25,
+        "officialScope": "解剖學、微生物學及免疫學、病理學"
+      },
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=217&code=091030&q=1&s=4004&t=Q",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=217&code=091030&q=1&s=4004&t=M",
+        "page": 3,
+        "endPage": 3,
+        "image": "/question-media/moex-91-1-stage1-med1/MOEX-C217-091030-S4004-STAGE1-Q045.webp",
+        "width": 1659,
+        "height": 165,
+        "scope": "解剖學、微生物學及免疫學、病理學",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-C217-091030-S4004-STAGE1-Q046",
+      "subject": "醫學（一）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（一）",
+      "stem": "下列六種免疫細胞或產物，何者可幫助我們對抗金色葡萄球菌（staphylococcus aureus）的感染？①抗體 （antibody） ②干擾素（interferon） ③補體（complement） ④NK 細胞 ⑤巨噬細胞（macrophage） ⑥CD8-CTL（細胞毒殺性T 細胞）",
+      "options": {
+        "A": "①②③",
+        "B": "④⑤⑥",
+        "C": "①③⑤",
+        "D": "②④⑥"
+      },
+      "answer": "C",
+      "acceptedAnswers": [
+        "C"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：C。",
+      "testedConcept": "基礎醫學（一）（醫師分階段原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國91年第1次 醫師（一）分階段 基礎醫學（一） 4004",
+      "sourceYear": 2002,
+      "sourceRound": 1,
+      "originalQuestionNumber": 46,
+      "examCode": "091030",
+      "paperCode": "4217",
+      "examSessionLabel": "第一次",
+      "officialExam": {
+        "categoryCode": "217",
+        "subjectCode": "4004",
+        "trackCode": "STAGE1",
+        "trackLabel": "醫師（一）分階段",
+        "paperTitle": "基礎醫學（一）",
+        "questionCount": 80,
+        "timeMinutes": 60,
+        "pointsPerQuestion": 1.25,
+        "officialScope": "解剖學、微生物學及免疫學、病理學"
+      },
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=217&code=091030&q=1&s=4004&t=Q",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=217&code=091030&q=1&s=4004&t=M",
+        "page": 3,
+        "endPage": 3,
+        "image": "/question-media/moex-91-1-stage1-med1/MOEX-C217-091030-S4004-STAGE1-Q046.webp",
+        "width": 1659,
+        "height": 165,
+        "scope": "解剖學、微生物學及免疫學、病理學",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-C217-091030-S4004-STAGE1-Q047",
+      "subject": "醫學（一）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（一）",
+      "stem": "目前融合瘤（hybridoma）技術只有在老鼠的系統較成功，如果要利用老鼠的單源抗體（monoclonal Ab） 治療人類疾病，需要將其人類化（humanized），請問需要將免疫球蛋白的何部分改變為人類的特性，但仍 保留此單源抗體辨認原來抗原的能力？",
+      "options": {
+        "A": "Fab",
+        "B": "Fc",
+        "C": "重鏈（Heavy chain）",
+        "D": "輕鏈（Light chain）"
+      },
+      "answer": "B",
+      "acceptedAnswers": [
+        "B"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：B。",
+      "testedConcept": "基礎醫學（一）（醫師分階段原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國91年第1次 醫師（一）分階段 基礎醫學（一） 4004",
+      "sourceYear": 2002,
+      "sourceRound": 1,
+      "originalQuestionNumber": 47,
+      "examCode": "091030",
+      "paperCode": "4217",
+      "examSessionLabel": "第一次",
+      "officialExam": {
+        "categoryCode": "217",
+        "subjectCode": "4004",
+        "trackCode": "STAGE1",
+        "trackLabel": "醫師（一）分階段",
+        "paperTitle": "基礎醫學（一）",
+        "questionCount": 80,
+        "timeMinutes": 60,
+        "pointsPerQuestion": 1.25,
+        "officialScope": "解剖學、微生物學及免疫學、病理學"
+      },
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=217&code=091030&q=1&s=4004&t=Q",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=217&code=091030&q=1&s=4004&t=M",
+        "page": 3,
+        "endPage": 3,
+        "image": "/question-media/moex-91-1-stage1-med1/MOEX-C217-091030-S4004-STAGE1-Q047.webp",
+        "width": 1659,
+        "height": 165,
+        "scope": "解剖學、微生物學及免疫學、病理學",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-C217-091030-S4004-STAGE1-Q048",
+      "subject": "醫學（一）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（一）",
+      "stem": "如果用剔除基因（gene knockout）的方法將老鼠的β₂-microglobulin 基因踢除，實驗證實這種老鼠仍可存活 。你認為這種老鼠的免疫系統，會發生何種變化？",
+      "options": {
+        "A": "B 細胞不會分泌抗體",
+        "B": "老鼠胸腺萎縮，CD4-Th 細胞（輔助T 細胞）無法分化成熟",
+        "C": "CD8-CTL（細胞毒殺性T 淋巴細胞）無法分化成熟",
+        "D": "NK 細胞的活性大為降低"
+      },
+      "answer": "C",
+      "acceptedAnswers": [
+        "C"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：C。",
+      "testedConcept": "基礎醫學（一）（醫師分階段原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國91年第1次 醫師（一）分階段 基礎醫學（一） 4004",
+      "sourceYear": 2002,
+      "sourceRound": 1,
+      "originalQuestionNumber": 48,
+      "examCode": "091030",
+      "paperCode": "4217",
+      "examSessionLabel": "第一次",
+      "officialExam": {
+        "categoryCode": "217",
+        "subjectCode": "4004",
+        "trackCode": "STAGE1",
+        "trackLabel": "醫師（一）分階段",
+        "paperTitle": "基礎醫學（一）",
+        "questionCount": 80,
+        "timeMinutes": 60,
+        "pointsPerQuestion": 1.25,
+        "officialScope": "解剖學、微生物學及免疫學、病理學"
+      },
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=217&code=091030&q=1&s=4004&t=Q",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=217&code=091030&q=1&s=4004&t=M",
+        "page": 3,
+        "endPage": 3,
+        "image": "/question-media/moex-91-1-stage1-med1/MOEX-C217-091030-S4004-STAGE1-Q048.webp",
+        "width": 1659,
+        "height": 246,
+        "scope": "解剖學、微生物學及免疫學、病理學",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-C217-091030-S4004-STAGE1-Q049",
+      "subject": "醫學（一）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（一）",
+      "stem": "凋亡（apoptosis）常見於下列情況，除了那一項？",
+      "options": {
+        "A": "正常子宮內膜的後分泌期",
+        "B": "梗塞",
+        "C": "臉部基底細胞癌",
+        "D": "腸道上皮"
+      },
+      "answer": "B",
+      "acceptedAnswers": [
+        "B"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：B。",
+      "testedConcept": "基礎醫學（一）（醫師分階段原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國91年第1次 醫師（一）分階段 基礎醫學（一） 4004",
+      "sourceYear": 2002,
+      "sourceRound": 1,
+      "originalQuestionNumber": 49,
+      "examCode": "091030",
+      "paperCode": "4217",
+      "examSessionLabel": "第一次",
+      "officialExam": {
+        "categoryCode": "217",
+        "subjectCode": "4004",
+        "trackCode": "STAGE1",
+        "trackLabel": "醫師（一）分階段",
+        "paperTitle": "基礎醫學（一）",
+        "questionCount": 80,
+        "timeMinutes": 60,
+        "pointsPerQuestion": 1.25,
+        "officialScope": "解剖學、微生物學及免疫學、病理學"
+      },
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=217&code=091030&q=1&s=4004&t=Q",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=217&code=091030&q=1&s=4004&t=M",
+        "page": 3,
+        "endPage": 3,
+        "image": "/question-media/moex-91-1-stage1-med1/MOEX-C217-091030-S4004-STAGE1-Q049.webp",
+        "width": 1659,
+        "height": 125,
+        "scope": "解剖學、微生物學及免疫學、病理學",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-C217-091030-S4004-STAGE1-Q050",
+      "subject": "醫學（一）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（一）",
+      "stem": "缺乏神經節細胞（ganglion cells）是診斷下列那一項疾病的必要條件？",
+      "options": {
+        "A": "先天性幽門狹窄",
+        "B": "神經纖維瘤病",
+        "C": "麻痺性腸阻塞",
+        "D": "Hirschsprung 氏病"
+      },
+      "answer": "D",
+      "acceptedAnswers": [
+        "D"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：D。",
+      "testedConcept": "基礎醫學（一）（醫師分階段原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國91年第1次 醫師（一）分階段 基礎醫學（一） 4004",
+      "sourceYear": 2002,
+      "sourceRound": 1,
+      "originalQuestionNumber": 50,
+      "examCode": "091030",
+      "paperCode": "4217",
+      "examSessionLabel": "第一次",
+      "officialExam": {
+        "categoryCode": "217",
+        "subjectCode": "4004",
+        "trackCode": "STAGE1",
+        "trackLabel": "醫師（一）分階段",
+        "paperTitle": "基礎醫學（一）",
+        "questionCount": 80,
+        "timeMinutes": 60,
+        "pointsPerQuestion": 1.25,
+        "officialScope": "解剖學、微生物學及免疫學、病理學"
+      },
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=217&code=091030&q=1&s=4004&t=Q",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=217&code=091030&q=1&s=4004&t=M",
+        "page": 3,
+        "endPage": 3,
+        "image": "/question-media/moex-91-1-stage1-med1/MOEX-C217-091030-S4004-STAGE1-Q050.webp",
+        "width": 1659,
+        "height": 85,
+        "scope": "解剖學、微生物學及免疫學、病理學",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-C217-091030-S4004-STAGE1-Q051",
+      "subject": "醫學（一）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（一）",
+      "stem": "黃色瘤細胞（xanthoma cells）是一種特化的：",
+      "options": {
+        "A": "內色細胞",
+        "B": "壞死細胞",
+        "C": "巨噬細胞",
+        "D": "上皮細胞"
+      },
+      "answer": "C",
+      "acceptedAnswers": [
+        "C"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：C。",
+      "testedConcept": "基礎醫學（一）（醫師分階段原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國91年第1次 醫師（一）分階段 基礎醫學（一） 4004",
+      "sourceYear": 2002,
+      "sourceRound": 1,
+      "originalQuestionNumber": 51,
+      "examCode": "091030",
+      "paperCode": "4217",
+      "examSessionLabel": "第一次",
+      "officialExam": {
+        "categoryCode": "217",
+        "subjectCode": "4004",
+        "trackCode": "STAGE1",
+        "trackLabel": "醫師（一）分階段",
+        "paperTitle": "基礎醫學（一）",
+        "questionCount": 80,
+        "timeMinutes": 60,
+        "pointsPerQuestion": 1.25,
+        "officialScope": "解剖學、微生物學及免疫學、病理學"
+      },
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=217&code=091030&q=1&s=4004&t=Q",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=217&code=091030&q=1&s=4004&t=M",
+        "page": 3,
+        "endPage": 3,
+        "image": "/question-media/moex-91-1-stage1-med1/MOEX-C217-091030-S4004-STAGE1-Q051.webp",
+        "width": 1659,
+        "height": 85,
+        "scope": "解剖學、微生物學及免疫學、病理學",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-C217-091030-S4004-STAGE1-Q052",
+      "subject": "醫學（一）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（一）",
+      "stem": "蟹狀腫（keloid）是一種：",
+      "options": {
+        "A": "癌瘤",
+        "B": "細胞性增生",
+        "C": "梗塞",
+        "D": "疤痕"
+      },
+      "answer": "D",
+      "acceptedAnswers": [
+        "D"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：D。",
+      "testedConcept": "基礎醫學（一）（醫師分階段原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國91年第1次 醫師（一）分階段 基礎醫學（一） 4004",
+      "sourceYear": 2002,
+      "sourceRound": 1,
+      "originalQuestionNumber": 52,
+      "examCode": "091030",
+      "paperCode": "4217",
+      "examSessionLabel": "第一次",
+      "officialExam": {
+        "categoryCode": "217",
+        "subjectCode": "4004",
+        "trackCode": "STAGE1",
+        "trackLabel": "醫師（一）分階段",
+        "paperTitle": "基礎醫學（一）",
+        "questionCount": 80,
+        "timeMinutes": 60,
+        "pointsPerQuestion": 1.25,
+        "officialScope": "解剖學、微生物學及免疫學、病理學"
+      },
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=217&code=091030&q=1&s=4004&t=Q",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=217&code=091030&q=1&s=4004&t=M",
+        "page": 3,
+        "endPage": 3,
+        "image": "/question-media/moex-91-1-stage1-med1/MOEX-C217-091030-S4004-STAGE1-Q052.webp",
+        "width": 1659,
+        "height": 85,
+        "scope": "解剖學、微生物學及免疫學、病理學",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-C217-091030-S4004-STAGE1-Q053",
+      "subject": "醫學（一）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（一）",
+      "stem": "胰臟的偽囊腫（pseudocyst）與真性囊腫之區別，在於前者：",
+      "options": {
+        "A": "無上皮裡襯細胞",
+        "B": "不含液體",
+        "C": "不是真正封閉",
+        "D": "常為多腔室"
+      },
+      "answer": "A",
+      "acceptedAnswers": [
+        "A"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：A。",
+      "testedConcept": "基礎醫學（一）（醫師分階段原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國91年第1次 醫師（一）分階段 基礎醫學（一） 4004",
+      "sourceYear": 2002,
+      "sourceRound": 1,
+      "originalQuestionNumber": 53,
+      "examCode": "091030",
+      "paperCode": "4217",
+      "examSessionLabel": "第一次",
+      "officialExam": {
+        "categoryCode": "217",
+        "subjectCode": "4004",
+        "trackCode": "STAGE1",
+        "trackLabel": "醫師（一）分階段",
+        "paperTitle": "基礎醫學（一）",
+        "questionCount": 80,
+        "timeMinutes": 60,
+        "pointsPerQuestion": 1.25,
+        "officialScope": "解剖學、微生物學及免疫學、病理學"
+      },
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=217&code=091030&q=1&s=4004&t=Q",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=217&code=091030&q=1&s=4004&t=M",
+        "page": 3,
+        "endPage": 3,
+        "image": "/question-media/moex-91-1-stage1-med1/MOEX-C217-091030-S4004-STAGE1-Q053.webp",
+        "width": 1659,
+        "height": 85,
+        "scope": "解剖學、微生物學及免疫學、病理學",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-C217-091030-S4004-STAGE1-Q054",
+      "subject": "醫學（一）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（一）",
+      "stem": "Alpha-1-antitrypsin 缺乏會造成：",
+      "options": {
+        "A": "支氣管擴張",
+        "B": "肺氣腫",
+        "C": "肺間質纖維化",
+        "D": "新生兒呼吸窘迫症候群"
+      },
+      "answer": "B",
+      "acceptedAnswers": [
+        "B"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：B。",
+      "testedConcept": "基礎醫學（一）（醫師分階段原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國91年第1次 醫師（一）分階段 基礎醫學（一） 4004",
+      "sourceYear": 2002,
+      "sourceRound": 1,
+      "originalQuestionNumber": 54,
+      "examCode": "091030",
+      "paperCode": "4217",
+      "examSessionLabel": "第一次",
+      "officialExam": {
+        "categoryCode": "217",
+        "subjectCode": "4004",
+        "trackCode": "STAGE1",
+        "trackLabel": "醫師（一）分階段",
+        "paperTitle": "基礎醫學（一）",
+        "questionCount": 80,
+        "timeMinutes": 60,
+        "pointsPerQuestion": 1.25,
+        "officialScope": "解剖學、微生物學及免疫學、病理學"
+      },
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=217&code=091030&q=1&s=4004&t=Q",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=217&code=091030&q=1&s=4004&t=M",
+        "page": 3,
+        "endPage": 3,
+        "image": "/question-media/moex-91-1-stage1-med1/MOEX-C217-091030-S4004-STAGE1-Q054.webp",
+        "width": 1659,
+        "height": 125,
+        "scope": "解剖學、微生物學及免疫學、病理學",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-C217-091030-S4004-STAGE1-Q055",
+      "subject": "醫學（一）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（一）",
+      "stem": "腺肌症（adenomyosis）最好被視為：",
+      "options": {
+        "A": "良性腫瘤",
+        "B": "不完全流產的後遺症",
+        "C": "癌前子宮病變",
+        "D": "子宮內膜腺及基質往肌層延伸"
+      },
+      "answer": "D",
+      "acceptedAnswers": [
+        "D"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：D。",
+      "testedConcept": "基礎醫學（一）（醫師分階段原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國91年第1次 醫師（一）分階段 基礎醫學（一） 4004",
+      "sourceYear": 2002,
+      "sourceRound": 1,
+      "originalQuestionNumber": 55,
+      "examCode": "091030",
+      "paperCode": "4217",
+      "examSessionLabel": "第一次",
+      "officialExam": {
+        "categoryCode": "217",
+        "subjectCode": "4004",
+        "trackCode": "STAGE1",
+        "trackLabel": "醫師（一）分階段",
+        "paperTitle": "基礎醫學（一）",
+        "questionCount": 80,
+        "timeMinutes": 60,
+        "pointsPerQuestion": 1.25,
+        "officialScope": "解剖學、微生物學及免疫學、病理學"
+      },
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=217&code=091030&q=1&s=4004&t=Q",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=217&code=091030&q=1&s=4004&t=M",
+        "page": 3,
+        "endPage": 3,
+        "image": "/question-media/moex-91-1-stage1-med1/MOEX-C217-091030-S4004-STAGE1-Q055.webp",
+        "width": 1659,
+        "height": 125,
+        "scope": "解剖學、微生物學及免疫學、病理學",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-C217-091030-S4004-STAGE1-Q056",
+      "subject": "醫學（一）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（一）",
+      "stem": "多形性腺瘤（pleomorphic adenoma）的間質通常有點像：",
+      "options": {
+        "A": "軟骨",
+        "B": "平滑肌",
+        "C": "橫紋肌",
+        "D": "淋巴組織"
+      },
+      "answer": "A",
+      "acceptedAnswers": [
+        "A"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：A。",
+      "testedConcept": "基礎醫學（一）（醫師分階段原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國91年第1次 醫師（一）分階段 基礎醫學（一） 4004",
+      "sourceYear": 2002,
+      "sourceRound": 1,
+      "originalQuestionNumber": 56,
+      "examCode": "091030",
+      "paperCode": "4217",
+      "examSessionLabel": "第一次",
+      "officialExam": {
+        "categoryCode": "217",
+        "subjectCode": "4004",
+        "trackCode": "STAGE1",
+        "trackLabel": "醫師（一）分階段",
+        "paperTitle": "基礎醫學（一）",
+        "questionCount": 80,
+        "timeMinutes": 60,
+        "pointsPerQuestion": 1.25,
+        "officialScope": "解剖學、微生物學及免疫學、病理學"
+      },
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=217&code=091030&q=1&s=4004&t=Q",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=217&code=091030&q=1&s=4004&t=M",
+        "page": 3,
+        "endPage": 3,
+        "image": "/question-media/moex-91-1-stage1-med1/MOEX-C217-091030-S4004-STAGE1-Q056.webp",
+        "width": 1659,
+        "height": 85,
+        "scope": "解剖學、微生物學及免疫學、病理學",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-C217-091030-S4004-STAGE1-Q057",
+      "subject": "醫學（一）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（一）",
+      "stem": "Fallot 氏四重畸形之中，最易發生異常的瓣膜是：",
+      "options": {
+        "A": "主動脈瓣",
+        "B": "僧帽瓣",
+        "C": "肺動脈瓣",
+        "D": "三尖瓣"
+      },
+      "answer": "C",
+      "acceptedAnswers": [
+        "C"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：C。",
+      "testedConcept": "基礎醫學（一）（醫師分階段原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國91年第1次 醫師（一）分階段 基礎醫學（一） 4004",
+      "sourceYear": 2002,
+      "sourceRound": 1,
+      "originalQuestionNumber": 57,
+      "examCode": "091030",
+      "paperCode": "4217",
+      "examSessionLabel": "第一次",
+      "officialExam": {
+        "categoryCode": "217",
+        "subjectCode": "4004",
+        "trackCode": "STAGE1",
+        "trackLabel": "醫師（一）分階段",
+        "paperTitle": "基礎醫學（一）",
+        "questionCount": 80,
+        "timeMinutes": 60,
+        "pointsPerQuestion": 1.25,
+        "officialScope": "解剖學、微生物學及免疫學、病理學"
+      },
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=217&code=091030&q=1&s=4004&t=Q",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=217&code=091030&q=1&s=4004&t=M",
+        "page": 3,
+        "endPage": 3,
+        "image": "/question-media/moex-91-1-stage1-med1/MOEX-C217-091030-S4004-STAGE1-Q057.webp",
+        "width": 1659,
+        "height": 89,
+        "scope": "解剖學、微生物學及免疫學、病理學",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-C217-091030-S4004-STAGE1-Q058",
+      "subject": "醫學（一）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（一）",
+      "stem": "突然心臟死亡（sudden cardiac death），解剖的心肌會表現：",
+      "options": {
+        "A": "液化壞死",
+        "B": "脂肪壞死",
+        "C": "凝固壞死",
+        "D": "無壞死"
+      },
+      "answer": "D",
+      "acceptedAnswers": [
+        "D"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：D。",
+      "testedConcept": "基礎醫學（一）（醫師分階段原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國91年第1次 醫師（一）分階段 基礎醫學（一） 4004",
+      "sourceYear": 2002,
+      "sourceRound": 1,
+      "originalQuestionNumber": 58,
+      "examCode": "091030",
+      "paperCode": "4217",
+      "examSessionLabel": "第一次",
+      "officialExam": {
+        "categoryCode": "217",
+        "subjectCode": "4004",
+        "trackCode": "STAGE1",
+        "trackLabel": "醫師（一）分階段",
+        "paperTitle": "基礎醫學（一）",
+        "questionCount": 80,
+        "timeMinutes": 60,
+        "pointsPerQuestion": 1.25,
+        "officialScope": "解剖學、微生物學及免疫學、病理學"
+      },
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=217&code=091030&q=1&s=4004&t=Q",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=217&code=091030&q=1&s=4004&t=M",
+        "page": 4,
+        "endPage": 4,
+        "image": "/question-media/moex-91-1-stage1-med1/MOEX-C217-091030-S4004-STAGE1-Q058.webp",
+        "width": 1659,
+        "height": 85,
+        "scope": "解剖學、微生物學及免疫學、病理學",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-C217-091030-S4004-STAGE1-Q059",
+      "subject": "醫學（一）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（一）",
+      "stem": "下列那一項最不可能表現明顯的增生（hyperplasia）？",
+      "options": {
+        "A": "缺碘的甲狀腺",
+        "B": "運動員的心臟",
+        "C": "捐血後的骨髓",
+        "D": "良性前列腺肥大"
+      },
+      "answer": "B",
+      "acceptedAnswers": [
+        "B"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：B。",
+      "testedConcept": "基礎醫學（一）（醫師分階段原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國91年第1次 醫師（一）分階段 基礎醫學（一） 4004",
+      "sourceYear": 2002,
+      "sourceRound": 1,
+      "originalQuestionNumber": 59,
+      "examCode": "091030",
+      "paperCode": "4217",
+      "examSessionLabel": "第一次",
+      "officialExam": {
+        "categoryCode": "217",
+        "subjectCode": "4004",
+        "trackCode": "STAGE1",
+        "trackLabel": "醫師（一）分階段",
+        "paperTitle": "基礎醫學（一）",
+        "questionCount": 80,
+        "timeMinutes": 60,
+        "pointsPerQuestion": 1.25,
+        "officialScope": "解剖學、微生物學及免疫學、病理學"
+      },
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=217&code=091030&q=1&s=4004&t=Q",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=217&code=091030&q=1&s=4004&t=M",
+        "page": 4,
+        "endPage": 4,
+        "image": "/question-media/moex-91-1-stage1-med1/MOEX-C217-091030-S4004-STAGE1-Q059.webp",
+        "width": 1659,
+        "height": 85,
+        "scope": "解剖學、微生物學及免疫學、病理學",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-C217-091030-S4004-STAGE1-Q060",
+      "subject": "醫學（一）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（一）",
+      "stem": "中耳的膽脂瘤（cholesteatoma）在肉眼及鏡下觀察最像：",
+      "options": {
+        "A": "動脈粥腫（atheroma）",
+        "B": "黃色瘤（xanthoma）",
+        "C": "表面樣囊腫（epidermoid cyst）",
+        "D": "肉芽組織（granulation tissue）"
+      },
+      "answer": "C",
+      "acceptedAnswers": [
+        "C"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：C。",
+      "testedConcept": "基礎醫學（一）（醫師分階段原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國91年第1次 醫師（一）分階段 基礎醫學（一） 4004",
+      "sourceYear": 2002,
+      "sourceRound": 1,
+      "originalQuestionNumber": 60,
+      "examCode": "091030",
+      "paperCode": "4217",
+      "examSessionLabel": "第一次",
+      "officialExam": {
+        "categoryCode": "217",
+        "subjectCode": "4004",
+        "trackCode": "STAGE1",
+        "trackLabel": "醫師（一）分階段",
+        "paperTitle": "基礎醫學（一）",
+        "questionCount": 80,
+        "timeMinutes": 60,
+        "pointsPerQuestion": 1.25,
+        "officialScope": "解剖學、微生物學及免疫學、病理學"
+      },
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=217&code=091030&q=1&s=4004&t=Q",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=217&code=091030&q=1&s=4004&t=M",
+        "page": 4,
+        "endPage": 4,
+        "image": "/question-media/moex-91-1-stage1-med1/MOEX-C217-091030-S4004-STAGE1-Q060.webp",
+        "width": 1659,
+        "height": 125,
+        "scope": "解剖學、微生物學及免疫學、病理學",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-C217-091030-S4004-STAGE1-Q061",
+      "subject": "醫學（一）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（一）",
+      "stem": "下列器官中，血色病（hemochromatosis）病人最罕見到鐵沈積的部位是：",
+      "options": {
+        "A": "肝",
+        "B": "腦",
+        "C": "心",
+        "D": "胰"
+      },
+      "answer": "B",
+      "acceptedAnswers": [
+        "B"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：B。",
+      "testedConcept": "基礎醫學（一）（醫師分階段原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國91年第1次 醫師（一）分階段 基礎醫學（一） 4004",
+      "sourceYear": 2002,
+      "sourceRound": 1,
+      "originalQuestionNumber": 61,
+      "examCode": "091030",
+      "paperCode": "4217",
+      "examSessionLabel": "第一次",
+      "officialExam": {
+        "categoryCode": "217",
+        "subjectCode": "4004",
+        "trackCode": "STAGE1",
+        "trackLabel": "醫師（一）分階段",
+        "paperTitle": "基礎醫學（一）",
+        "questionCount": 80,
+        "timeMinutes": 60,
+        "pointsPerQuestion": 1.25,
+        "officialScope": "解剖學、微生物學及免疫學、病理學"
+      },
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=217&code=091030&q=1&s=4004&t=Q",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=217&code=091030&q=1&s=4004&t=M",
+        "page": 4,
+        "endPage": 4,
+        "image": "/question-media/moex-91-1-stage1-med1/MOEX-C217-091030-S4004-STAGE1-Q061.webp",
+        "width": 1659,
+        "height": 84,
+        "scope": "解剖學、微生物學及免疫學、病理學",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-C217-091030-S4004-STAGE1-Q062",
+      "subject": "醫學（一）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（一）",
+      "stem": "下列病變中最可能發現肉芽腫的是：",
+      "options": {
+        "A": "Crohn 氏病",
+        "B": "Helicobacter pylori 感染",
+        "C": "Barrett 氏食道",
+        "D": "Meckel 憩室"
+      },
+      "answer": "A",
+      "acceptedAnswers": [
+        "A"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：A。",
+      "testedConcept": "基礎醫學（一）（醫師分階段原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國91年第1次 醫師（一）分階段 基礎醫學（一） 4004",
+      "sourceYear": 2002,
+      "sourceRound": 1,
+      "originalQuestionNumber": 62,
+      "examCode": "091030",
+      "paperCode": "4217",
+      "examSessionLabel": "第一次",
+      "officialExam": {
+        "categoryCode": "217",
+        "subjectCode": "4004",
+        "trackCode": "STAGE1",
+        "trackLabel": "醫師（一）分階段",
+        "paperTitle": "基礎醫學（一）",
+        "questionCount": 80,
+        "timeMinutes": 60,
+        "pointsPerQuestion": 1.25,
+        "officialScope": "解剖學、微生物學及免疫學、病理學"
+      },
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=217&code=091030&q=1&s=4004&t=Q",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=217&code=091030&q=1&s=4004&t=M",
+        "page": 4,
+        "endPage": 4,
+        "image": "/question-media/moex-91-1-stage1-med1/MOEX-C217-091030-S4004-STAGE1-Q062.webp",
+        "width": 1659,
+        "height": 84,
+        "scope": "解剖學、微生物學及免疫學、病理學",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-C217-091030-S4004-STAGE1-Q063",
+      "subject": "醫學（一）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（一）",
+      "stem": "良性腎硬化（benign nephrosclerosis）的腎臟細動脈呈現：",
+      "options": {
+        "A": "洋蔥皮樣病變",
+        "B": "類纖維蛋白壞死",
+        "C": "玻璃質硬化",
+        "D": "壞死性炎症"
+      },
+      "answer": "C",
+      "acceptedAnswers": [
+        "C"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：C。",
+      "testedConcept": "基礎醫學（一）（醫師分階段原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國91年第1次 醫師（一）分階段 基礎醫學（一） 4004",
+      "sourceYear": 2002,
+      "sourceRound": 1,
+      "originalQuestionNumber": 63,
+      "examCode": "091030",
+      "paperCode": "4217",
+      "examSessionLabel": "第一次",
+      "officialExam": {
+        "categoryCode": "217",
+        "subjectCode": "4004",
+        "trackCode": "STAGE1",
+        "trackLabel": "醫師（一）分階段",
+        "paperTitle": "基礎醫學（一）",
+        "questionCount": 80,
+        "timeMinutes": 60,
+        "pointsPerQuestion": 1.25,
+        "officialScope": "解剖學、微生物學及免疫學、病理學"
+      },
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=217&code=091030&q=1&s=4004&t=Q",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=217&code=091030&q=1&s=4004&t=M",
+        "page": 4,
+        "endPage": 4,
+        "image": "/question-media/moex-91-1-stage1-med1/MOEX-C217-091030-S4004-STAGE1-Q063.webp",
+        "width": 1659,
+        "height": 84,
+        "scope": "解剖學、微生物學及免疫學、病理學",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-C217-091030-S4004-STAGE1-Q064",
+      "subject": "醫學（一）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（一）",
+      "stem": "下列那一項並非惡性腫瘤？",
+      "options": {
+        "A": "乳頭的Paget 氏病",
+        "B": "骨的Paget 氏病",
+        "C": "陰唇的Paget 氏病",
+        "D": "骨的多發骨髓瘤"
+      },
+      "answer": "B",
+      "acceptedAnswers": [
+        "B"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：B。",
+      "testedConcept": "基礎醫學（一）（醫師分階段原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國91年第1次 醫師（一）分階段 基礎醫學（一） 4004",
+      "sourceYear": 2002,
+      "sourceRound": 1,
+      "originalQuestionNumber": 64,
+      "examCode": "091030",
+      "paperCode": "4217",
+      "examSessionLabel": "第一次",
+      "officialExam": {
+        "categoryCode": "217",
+        "subjectCode": "4004",
+        "trackCode": "STAGE1",
+        "trackLabel": "醫師（一）分階段",
+        "paperTitle": "基礎醫學（一）",
+        "questionCount": 80,
+        "timeMinutes": 60,
+        "pointsPerQuestion": 1.25,
+        "officialScope": "解剖學、微生物學及免疫學、病理學"
+      },
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=217&code=091030&q=1&s=4004&t=Q",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=217&code=091030&q=1&s=4004&t=M",
+        "page": 4,
+        "endPage": 4,
+        "image": "/question-media/moex-91-1-stage1-med1/MOEX-C217-091030-S4004-STAGE1-Q064.webp",
+        "width": 1659,
+        "height": 84,
+        "scope": "解剖學、微生物學及免疫學、病理學",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-C217-091030-S4004-STAGE1-Q065",
+      "subject": "醫學（一）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（一）",
+      "stem": "一名50 歲女性在病理檢查時被發現罹患腹腔偽黏液瘤（pseudomyxoma peritonei），進一步應該檢查：",
+      "options": {
+        "A": "卵巢及盲腸",
+        "B": "子宮頸及子宮內膜",
+        "C": "心臟及四肢",
+        "D": "胃及腸"
+      },
+      "answer": "A",
+      "acceptedAnswers": [
+        "A"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：A。",
+      "testedConcept": "基礎醫學（一）（醫師分階段原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國91年第1次 醫師（一）分階段 基礎醫學（一） 4004",
+      "sourceYear": 2002,
+      "sourceRound": 1,
+      "originalQuestionNumber": 65,
+      "examCode": "091030",
+      "paperCode": "4217",
+      "examSessionLabel": "第一次",
+      "officialExam": {
+        "categoryCode": "217",
+        "subjectCode": "4004",
+        "trackCode": "STAGE1",
+        "trackLabel": "醫師（一）分階段",
+        "paperTitle": "基礎醫學（一）",
+        "questionCount": 80,
+        "timeMinutes": 60,
+        "pointsPerQuestion": 1.25,
+        "officialScope": "解剖學、微生物學及免疫學、病理學"
+      },
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=217&code=091030&q=1&s=4004&t=Q",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=217&code=091030&q=1&s=4004&t=M",
+        "page": 4,
+        "endPage": 4,
+        "image": "/question-media/moex-91-1-stage1-med1/MOEX-C217-091030-S4004-STAGE1-Q065.webp",
+        "width": 1659,
+        "height": 84,
+        "scope": "解剖學、微生物學及免疫學、病理學",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-C217-091030-S4004-STAGE1-Q066",
+      "subject": "醫學（一）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（一）",
+      "stem": "病人死於播散性血管內凝血（DIC），解剖時所見到的纖維蛋白微血栓典型地出現於：",
+      "options": {
+        "A": "冠狀動脈",
+        "B": "腎小球",
+        "C": "肝竇狀隙",
+        "D": "心臟瓣膜"
+      },
+      "answer": "B",
+      "acceptedAnswers": [
+        "B"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：B。",
+      "testedConcept": "基礎醫學（一）（醫師分階段原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國91年第1次 醫師（一）分階段 基礎醫學（一） 4004",
+      "sourceYear": 2002,
+      "sourceRound": 1,
+      "originalQuestionNumber": 66,
+      "examCode": "091030",
+      "paperCode": "4217",
+      "examSessionLabel": "第一次",
+      "officialExam": {
+        "categoryCode": "217",
+        "subjectCode": "4004",
+        "trackCode": "STAGE1",
+        "trackLabel": "醫師（一）分階段",
+        "paperTitle": "基礎醫學（一）",
+        "questionCount": 80,
+        "timeMinutes": 60,
+        "pointsPerQuestion": 1.25,
+        "officialScope": "解剖學、微生物學及免疫學、病理學"
+      },
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=217&code=091030&q=1&s=4004&t=Q",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=217&code=091030&q=1&s=4004&t=M",
+        "page": 4,
+        "endPage": 4,
+        "image": "/question-media/moex-91-1-stage1-med1/MOEX-C217-091030-S4004-STAGE1-Q066.webp",
+        "width": 1659,
+        "height": 84,
+        "scope": "解剖學、微生物學及免疫學、病理學",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-C217-091030-S4004-STAGE1-Q067",
+      "subject": "醫學（一）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（一）",
+      "stem": "細菌性心內膜炎（bacterial endocarditis）的一個常見的合併症是：",
+      "options": {
+        "A": "腦、腎、脾的膿瘍",
+        "B": "肺栓子",
+        "C": "慢性心囊炎",
+        "D": "紅斑狼瘡"
+      },
+      "answer": "A",
+      "acceptedAnswers": [
+        "A"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：A。",
+      "testedConcept": "基礎醫學（一）（醫師分階段原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國91年第1次 醫師（一）分階段 基礎醫學（一） 4004",
+      "sourceYear": 2002,
+      "sourceRound": 1,
+      "originalQuestionNumber": 67,
+      "examCode": "091030",
+      "paperCode": "4217",
+      "examSessionLabel": "第一次",
+      "officialExam": {
+        "categoryCode": "217",
+        "subjectCode": "4004",
+        "trackCode": "STAGE1",
+        "trackLabel": "醫師（一）分階段",
+        "paperTitle": "基礎醫學（一）",
+        "questionCount": 80,
+        "timeMinutes": 60,
+        "pointsPerQuestion": 1.25,
+        "officialScope": "解剖學、微生物學及免疫學、病理學"
+      },
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=217&code=091030&q=1&s=4004&t=Q",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=217&code=091030&q=1&s=4004&t=M",
+        "page": 4,
+        "endPage": 4,
+        "image": "/question-media/moex-91-1-stage1-med1/MOEX-C217-091030-S4004-STAGE1-Q067.webp",
+        "width": 1659,
+        "height": 84,
+        "scope": "解剖學、微生物學及免疫學、病理學",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-C217-091030-S4004-STAGE1-Q068",
+      "subject": "醫學（一）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（一）",
+      "stem": "核黃疸（kernicterus）是那一個部位的傷害？",
+      "options": {
+        "A": "肝",
+        "B": "腦",
+        "C": "紅血球",
+        "D": "血小板"
+      },
+      "answer": "B",
+      "acceptedAnswers": [
+        "B"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：B。",
+      "testedConcept": "基礎醫學（一）（醫師分階段原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國91年第1次 醫師（一）分階段 基礎醫學（一） 4004",
+      "sourceYear": 2002,
+      "sourceRound": 1,
+      "originalQuestionNumber": 68,
+      "examCode": "091030",
+      "paperCode": "4217",
+      "examSessionLabel": "第一次",
+      "officialExam": {
+        "categoryCode": "217",
+        "subjectCode": "4004",
+        "trackCode": "STAGE1",
+        "trackLabel": "醫師（一）分階段",
+        "paperTitle": "基礎醫學（一）",
+        "questionCount": 80,
+        "timeMinutes": 60,
+        "pointsPerQuestion": 1.25,
+        "officialScope": "解剖學、微生物學及免疫學、病理學"
+      },
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=217&code=091030&q=1&s=4004&t=Q",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=217&code=091030&q=1&s=4004&t=M",
+        "page": 4,
+        "endPage": 4,
+        "image": "/question-media/moex-91-1-stage1-med1/MOEX-C217-091030-S4004-STAGE1-Q068.webp",
+        "width": 1659,
+        "height": 84,
+        "scope": "解剖學、微生物學及免疫學、病理學",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-C217-091030-S4004-STAGE1-Q069",
+      "subject": "醫學（一）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（一）",
+      "stem": "蜂窩肺（honeycomb lung）常被用來形容：",
+      "options": {
+        "A": "末期肺臟纖維化",
+        "B": "小葉中心性肺氣腫",
+        "C": "泛小葉性肺氣腫",
+        "D": "支氣管擴張"
+      },
+      "answer": "A",
+      "acceptedAnswers": [
+        "A"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：A。",
+      "testedConcept": "基礎醫學（一）（醫師分階段原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國91年第1次 醫師（一）分階段 基礎醫學（一） 4004",
+      "sourceYear": 2002,
+      "sourceRound": 1,
+      "originalQuestionNumber": 69,
+      "examCode": "091030",
+      "paperCode": "4217",
+      "examSessionLabel": "第一次",
+      "officialExam": {
+        "categoryCode": "217",
+        "subjectCode": "4004",
+        "trackCode": "STAGE1",
+        "trackLabel": "醫師（一）分階段",
+        "paperTitle": "基礎醫學（一）",
+        "questionCount": 80,
+        "timeMinutes": 60,
+        "pointsPerQuestion": 1.25,
+        "officialScope": "解剖學、微生物學及免疫學、病理學"
+      },
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=217&code=091030&q=1&s=4004&t=Q",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=217&code=091030&q=1&s=4004&t=M",
+        "page": 4,
+        "endPage": 4,
+        "image": "/question-media/moex-91-1-stage1-med1/MOEX-C217-091030-S4004-STAGE1-Q069.webp",
+        "width": 1659,
+        "height": 84,
+        "scope": "解剖學、微生物學及免疫學、病理學",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-C217-091030-S4004-STAGE1-Q070",
+      "subject": "醫學（一）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（一）",
+      "stem": "下列那一項是進行心內膜心肌切片檢查（endomyocardial biopsy）的適應症？",
+      "options": {
+        "A": "心內膜炎",
+        "B": "冠狀動脈疾病",
+        "C": "主動脈狹窄",
+        "D": "移植之心臟"
+      },
+      "answer": "D",
+      "acceptedAnswers": [
+        "D"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：D。",
+      "testedConcept": "基礎醫學（一）（醫師分階段原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國91年第1次 醫師（一）分階段 基礎醫學（一） 4004",
+      "sourceYear": 2002,
+      "sourceRound": 1,
+      "originalQuestionNumber": 70,
+      "examCode": "091030",
+      "paperCode": "4217",
+      "examSessionLabel": "第一次",
+      "officialExam": {
+        "categoryCode": "217",
+        "subjectCode": "4004",
+        "trackCode": "STAGE1",
+        "trackLabel": "醫師（一）分階段",
+        "paperTitle": "基礎醫學（一）",
+        "questionCount": 80,
+        "timeMinutes": 60,
+        "pointsPerQuestion": 1.25,
+        "officialScope": "解剖學、微生物學及免疫學、病理學"
+      },
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=217&code=091030&q=1&s=4004&t=Q",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=217&code=091030&q=1&s=4004&t=M",
+        "page": 4,
+        "endPage": 4,
+        "image": "/question-media/moex-91-1-stage1-med1/MOEX-C217-091030-S4004-STAGE1-Q070.webp",
+        "width": 1659,
+        "height": 84,
+        "scope": "解剖學、微生物學及免疫學、病理學",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-C217-091030-S4004-STAGE1-Q071",
+      "subject": "醫學（一）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（一）",
+      "stem": "喝了巴拉刈（Paraquat），你會得到：",
+      "options": {
+        "A": "內生性脂質肺炎",
+        "B": "外來性脂質肺炎",
+        "C": "肺纖維化",
+        "D": "欣喜若狂"
+      },
+      "answer": "C",
+      "acceptedAnswers": [
+        "C"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：C。",
+      "testedConcept": "基礎醫學（一）（醫師分階段原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國91年第1次 醫師（一）分階段 基礎醫學（一） 4004",
+      "sourceYear": 2002,
+      "sourceRound": 1,
+      "originalQuestionNumber": 71,
+      "examCode": "091030",
+      "paperCode": "4217",
+      "examSessionLabel": "第一次",
+      "officialExam": {
+        "categoryCode": "217",
+        "subjectCode": "4004",
+        "trackCode": "STAGE1",
+        "trackLabel": "醫師（一）分階段",
+        "paperTitle": "基礎醫學（一）",
+        "questionCount": 80,
+        "timeMinutes": 60,
+        "pointsPerQuestion": 1.25,
+        "officialScope": "解剖學、微生物學及免疫學、病理學"
+      },
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=217&code=091030&q=1&s=4004&t=Q",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=217&code=091030&q=1&s=4004&t=M",
+        "page": 4,
+        "endPage": 4,
+        "image": "/question-media/moex-91-1-stage1-med1/MOEX-C217-091030-S4004-STAGE1-Q071.webp",
+        "width": 1659,
+        "height": 84,
+        "scope": "解剖學、微生物學及免疫學、病理學",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-C217-091030-S4004-STAGE1-Q072",
+      "subject": "醫學（一）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（一）",
+      "stem": "高鈣血症這一個出名的副贅瘤症候群最常見於肺臟的：",
+      "options": {
+        "A": "腺癌",
+        "B": "carcinoid",
+        "C": "燕麥細胞癌",
+        "D": "鱗狀細胞癌"
+      },
+      "answer": "D",
+      "acceptedAnswers": [
+        "D"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：D。",
+      "testedConcept": "基礎醫學（一）（醫師分階段原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國91年第1次 醫師（一）分階段 基礎醫學（一） 4004",
+      "sourceYear": 2002,
+      "sourceRound": 1,
+      "originalQuestionNumber": 72,
+      "examCode": "091030",
+      "paperCode": "4217",
+      "examSessionLabel": "第一次",
+      "officialExam": {
+        "categoryCode": "217",
+        "subjectCode": "4004",
+        "trackCode": "STAGE1",
+        "trackLabel": "醫師（一）分階段",
+        "paperTitle": "基礎醫學（一）",
+        "questionCount": 80,
+        "timeMinutes": 60,
+        "pointsPerQuestion": 1.25,
+        "officialScope": "解剖學、微生物學及免疫學、病理學"
+      },
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=217&code=091030&q=1&s=4004&t=Q",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=217&code=091030&q=1&s=4004&t=M",
+        "page": 4,
+        "endPage": 4,
+        "image": "/question-media/moex-91-1-stage1-med1/MOEX-C217-091030-S4004-STAGE1-Q072.webp",
+        "width": 1659,
+        "height": 84,
+        "scope": "解剖學、微生物學及免疫學、病理學",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-C217-091030-S4004-STAGE1-Q073",
+      "subject": "醫學（一）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（一）",
+      "stem": "下列何種寄生蟲會導致人畜共通寄生蟲病？",
+      "options": {
+        "A": "蟯蟲（Enterobius vermicularis）",
+        "B": "間日瘧原蟲（Plasmodium vivax）",
+        "C": "日本血吸蟲（Schistosoma japonicum）",
+        "D": "陰道滴蟲（Trichomonas vaginalis）"
+      },
+      "answer": "C",
+      "acceptedAnswers": [
+        "C"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：C。",
+      "testedConcept": "基礎醫學（一）（醫師分階段原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國91年第1次 醫師（一）分階段 基礎醫學（一） 4004",
+      "sourceYear": 2002,
+      "sourceRound": 1,
+      "originalQuestionNumber": 73,
+      "examCode": "091030",
+      "paperCode": "4217",
+      "examSessionLabel": "第一次",
+      "officialExam": {
+        "categoryCode": "217",
+        "subjectCode": "4004",
+        "trackCode": "STAGE1",
+        "trackLabel": "醫師（一）分階段",
+        "paperTitle": "基礎醫學（一）",
+        "questionCount": 80,
+        "timeMinutes": 60,
+        "pointsPerQuestion": 1.25,
+        "officialScope": "解剖學、微生物學及免疫學、病理學"
+      },
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=217&code=091030&q=1&s=4004&t=Q",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=217&code=091030&q=1&s=4004&t=M",
+        "page": 4,
+        "endPage": 4,
+        "image": "/question-media/moex-91-1-stage1-med1/MOEX-C217-091030-S4004-STAGE1-Q073.webp",
+        "width": 1659,
+        "height": 125,
+        "scope": "解剖學、微生物學及免疫學、病理學",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-C217-091030-S4004-STAGE1-Q074",
+      "subject": "醫學（一）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（一）",
+      "stem": "下列有關蜱的敘述何者為錯？",
+      "options": {
+        "A": "蜱之成蟲具八足，幼蟲（larva）則為六足",
+        "B": "蜱之幼蟲、稚蟲及雌雄成蟲均會吸血",
+        "C": "蜱亦稱壁蝨，屬蛛形綱（Arachnida）",
+        "D": "所有的蜱均具有堅硬之背板"
+      },
+      "answer": "D",
+      "acceptedAnswers": [
+        "D"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：D。",
+      "testedConcept": "基礎醫學（一）（醫師分階段原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國91年第1次 醫師（一）分階段 基礎醫學（一） 4004",
+      "sourceYear": 2002,
+      "sourceRound": 1,
+      "originalQuestionNumber": 74,
+      "examCode": "091030",
+      "paperCode": "4217",
+      "examSessionLabel": "第一次",
+      "officialExam": {
+        "categoryCode": "217",
+        "subjectCode": "4004",
+        "trackCode": "STAGE1",
+        "trackLabel": "醫師（一）分階段",
+        "paperTitle": "基礎醫學（一）",
+        "questionCount": 80,
+        "timeMinutes": 60,
+        "pointsPerQuestion": 1.25,
+        "officialScope": "解剖學、微生物學及免疫學、病理學"
+      },
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=217&code=091030&q=1&s=4004&t=Q",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=217&code=091030&q=1&s=4004&t=M",
+        "page": 4,
+        "endPage": 4,
+        "image": "/question-media/moex-91-1-stage1-med1/MOEX-C217-091030-S4004-STAGE1-Q074.webp",
+        "width": 1659,
+        "height": 125,
+        "scope": "解剖學、微生物學及免疫學、病理學",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-C217-091030-S4004-STAGE1-Q075",
+      "subject": "醫學（一）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（一）",
+      "stem": "感染下列何種瘧原蟲常會在一個紅血球中發現多重感染（multiple infection）的情形？",
+      "options": {
+        "A": "惡性瘧原蟲（Plasmodium falciparum）",
+        "B": "間日瘧原蟲（Plasmodium vivax）",
+        "C": "三日瘧原蟲（Plasmodium malariae）",
+        "D": "卵形瘧原蟲（Plasmodium ovale）"
+      },
+      "answer": "A",
+      "acceptedAnswers": [
+        "A"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：A。",
+      "testedConcept": "基礎醫學（一）（醫師分階段原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國91年第1次 醫師（一）分階段 基礎醫學（一） 4004",
+      "sourceYear": 2002,
+      "sourceRound": 1,
+      "originalQuestionNumber": 75,
+      "examCode": "091030",
+      "paperCode": "4217",
+      "examSessionLabel": "第一次",
+      "officialExam": {
+        "categoryCode": "217",
+        "subjectCode": "4004",
+        "trackCode": "STAGE1",
+        "trackLabel": "醫師（一）分階段",
+        "paperTitle": "基礎醫學（一）",
+        "questionCount": 80,
+        "timeMinutes": 60,
+        "pointsPerQuestion": 1.25,
+        "officialScope": "解剖學、微生物學及免疫學、病理學"
+      },
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=217&code=091030&q=1&s=4004&t=Q",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=217&code=091030&q=1&s=4004&t=M",
+        "page": 4,
+        "endPage": 4,
+        "image": "/question-media/moex-91-1-stage1-med1/MOEX-C217-091030-S4004-STAGE1-Q075.webp",
+        "width": 1659,
+        "height": 125,
+        "scope": "解剖學、微生物學及免疫學、病理學",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-C217-091030-S4004-STAGE1-Q076",
+      "subject": "醫學（一）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（一）",
+      "stem": "下列何種吸蟲之成蟲可能在患者腦部寄生？",
+      "options": {
+        "A": "日本血吸蟲（Schistosoma japonicum）",
+        "B": "槍狀肝吸蟲（Dicrocoelium dendriticum）",
+        "C": "衛氏肺吸蟲（Paragonimus westermani）",
+        "D": "橫川吸蟲（Metagonimus yokogawai）"
+      },
+      "answer": "C",
+      "acceptedAnswers": [
+        "C"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：C。",
+      "testedConcept": "基礎醫學（一）（醫師分階段原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國91年第1次 醫師（一）分階段 基礎醫學（一） 4004",
+      "sourceYear": 2002,
+      "sourceRound": 1,
+      "originalQuestionNumber": 76,
+      "examCode": "091030",
+      "paperCode": "4217",
+      "examSessionLabel": "第一次",
+      "officialExam": {
+        "categoryCode": "217",
+        "subjectCode": "4004",
+        "trackCode": "STAGE1",
+        "trackLabel": "醫師（一）分階段",
+        "paperTitle": "基礎醫學（一）",
+        "questionCount": 80,
+        "timeMinutes": 60,
+        "pointsPerQuestion": 1.25,
+        "officialScope": "解剖學、微生物學及免疫學、病理學"
+      },
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=217&code=091030&q=1&s=4004&t=Q",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=217&code=091030&q=1&s=4004&t=M",
+        "page": 4,
+        "endPage": 4,
+        "image": "/question-media/moex-91-1-stage1-med1/MOEX-C217-091030-S4004-STAGE1-Q076.webp",
+        "width": 1659,
+        "height": 125,
+        "scope": "解剖學、微生物學及免疫學、病理學",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-C217-091030-S4004-STAGE1-Q077",
+      "subject": "醫學（一）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（一）",
+      "stem": "最可能檢出痢疾阿米巴（Entamoeba histolytica）囊體（cyst）的檢體為何？",
+      "options": {
+        "A": "成形的糞便",
+        "B": "自肝膿瘍患者抽出的膿液",
+        "C": "含黏液的血便",
+        "D": "腸壁潰瘍處的穿刺檢體"
+      },
+      "answer": "A",
+      "acceptedAnswers": [
+        "A"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：A。",
+      "testedConcept": "基礎醫學（一）（醫師分階段原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國91年第1次 醫師（一）分階段 基礎醫學（一） 4004",
+      "sourceYear": 2002,
+      "sourceRound": 1,
+      "originalQuestionNumber": 77,
+      "examCode": "091030",
+      "paperCode": "4217",
+      "examSessionLabel": "第一次",
+      "officialExam": {
+        "categoryCode": "217",
+        "subjectCode": "4004",
+        "trackCode": "STAGE1",
+        "trackLabel": "醫師（一）分階段",
+        "paperTitle": "基礎醫學（一）",
+        "questionCount": 80,
+        "timeMinutes": 60,
+        "pointsPerQuestion": 1.25,
+        "officialScope": "解剖學、微生物學及免疫學、病理學"
+      },
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=217&code=091030&q=1&s=4004&t=Q",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=217&code=091030&q=1&s=4004&t=M",
+        "page": 4,
+        "endPage": 4,
+        "image": "/question-media/moex-91-1-stage1-med1/MOEX-C217-091030-S4004-STAGE1-Q077.webp",
+        "width": 1659,
+        "height": 125,
+        "scope": "解剖學、微生物學及免疫學、病理學",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-C217-091030-S4004-STAGE1-Q078",
+      "subject": "醫學（一）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（一）",
+      "stem": "下列何者有逆向感染（retrofection）現象？",
+      "options": {
+        "A": "牛肉絛蟲",
+        "B": "猪肉絛蟲",
+        "C": "蟯蟲",
+        "D": "鉤蟲"
+      },
+      "answer": "C",
+      "acceptedAnswers": [
+        "C"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：C。",
+      "testedConcept": "基礎醫學（一）（醫師分階段原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國91年第1次 醫師（一）分階段 基礎醫學（一） 4004",
+      "sourceYear": 2002,
+      "sourceRound": 1,
+      "originalQuestionNumber": 78,
+      "examCode": "091030",
+      "paperCode": "4217",
+      "examSessionLabel": "第一次",
+      "officialExam": {
+        "categoryCode": "217",
+        "subjectCode": "4004",
+        "trackCode": "STAGE1",
+        "trackLabel": "醫師（一）分階段",
+        "paperTitle": "基礎醫學（一）",
+        "questionCount": 80,
+        "timeMinutes": 60,
+        "pointsPerQuestion": 1.25,
+        "officialScope": "解剖學、微生物學及免疫學、病理學"
+      },
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=217&code=091030&q=1&s=4004&t=Q",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=217&code=091030&q=1&s=4004&t=M",
+        "page": 4,
+        "endPage": 4,
+        "image": "/question-media/moex-91-1-stage1-med1/MOEX-C217-091030-S4004-STAGE1-Q078.webp",
+        "width": 1659,
+        "height": 85,
+        "scope": "解剖學、微生物學及免疫學、病理學",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-C217-091030-S4004-STAGE1-Q079",
+      "subject": "醫學（一）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（一）",
+      "stem": "以夜間週期性（nocturnal periodicity）之班氏絲蟲病為例，其微絲蟲（microfilaria）在白天主要存在於人體 內何處？",
+      "options": {
+        "A": "淋巴結（lymph node）",
+        "B": "肺循環（pulmonary circulation）",
+        "C": "周邊循環（peripheral circulation）",
+        "D": "心臟（heart）"
+      },
+      "answer": "B",
+      "acceptedAnswers": [
+        "B"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：B。",
+      "testedConcept": "基礎醫學（一）（醫師分階段原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國91年第1次 醫師（一）分階段 基礎醫學（一） 4004",
+      "sourceYear": 2002,
+      "sourceRound": 1,
+      "originalQuestionNumber": 79,
+      "examCode": "091030",
+      "paperCode": "4217",
+      "examSessionLabel": "第一次",
+      "officialExam": {
+        "categoryCode": "217",
+        "subjectCode": "4004",
+        "trackCode": "STAGE1",
+        "trackLabel": "醫師（一）分階段",
+        "paperTitle": "基礎醫學（一）",
+        "questionCount": 80,
+        "timeMinutes": 60,
+        "pointsPerQuestion": 1.25,
+        "officialScope": "解剖學、微生物學及免疫學、病理學"
+      },
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=217&code=091030&q=1&s=4004&t=Q",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=217&code=091030&q=1&s=4004&t=M",
+        "page": 4,
+        "endPage": 4,
+        "image": "/question-media/moex-91-1-stage1-med1/MOEX-C217-091030-S4004-STAGE1-Q079.webp",
+        "width": 1659,
+        "height": 166,
+        "scope": "解剖學、微生物學及免疫學、病理學",
+        "answerNote": null
+      }
+    },
+    {
+      "id": "MOEX-C217-091030-S4004-STAGE1-Q080",
+      "subject": "醫學（一）",
+      "chapter": "舊制官方原卷",
+      "section": "醫學（一）",
+      "stem": "嗜食三分或五分熟牛排的人可能感染下列何種寄生蟲？",
+      "options": {
+        "A": "微小絛蟲（Hymenolepiasis nana）",
+        "B": "縮小絛蟲（Hymenolepiasis diminuta）",
+        "C": "有鉤絛蟲（Taenia solium）",
+        "D": "無鉤絛蟲（Taenia saginata）"
+      },
+      "answer": "D",
+      "acceptedAnswers": [
+        "D"
+      ],
+      "answerCreditType": "standard",
+      "explanation": "官方最終答案：D。",
+      "testedConcept": "基礎醫學（一）（醫師分階段原卷）",
+      "sourceType": "MOEX_PAST_EXAM",
+      "sourceCitation": "考選部 民國91年第1次 醫師（一）分階段 基礎醫學（一） 4004",
+      "sourceYear": 2002,
+      "sourceRound": 1,
+      "originalQuestionNumber": 80,
+      "examCode": "091030",
+      "paperCode": "4217",
+      "examSessionLabel": "第一次",
+      "officialExam": {
+        "categoryCode": "217",
+        "subjectCode": "4004",
+        "trackCode": "STAGE1",
+        "trackLabel": "醫師（一）分階段",
+        "paperTitle": "基礎醫學（一）",
+        "questionCount": 80,
+        "timeMinutes": 60,
+        "pointsPerQuestion": 1.25,
+        "officialScope": "解剖學、微生物學及免疫學、病理學"
+      },
+      "officialSource": {
+        "questionUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=217&code=091030&q=1&s=4004&t=Q",
+        "answerUrl": "https://wwwq.moex.gov.tw/exam/wHandExamQandA_File.ashx?c=217&code=091030&q=1&s=4004&t=M",
+        "page": 4,
+        "endPage": 4,
+        "image": "/question-media/moex-91-1-stage1-med1/MOEX-C217-091030-S4004-STAGE1-Q080.webp",
+        "width": 1659,
+        "height": 131,
+        "scope": "解剖學、微生物學及免疫學、病理學",
+        "answerNote": null
+      }
+    }
+  ]
+}
