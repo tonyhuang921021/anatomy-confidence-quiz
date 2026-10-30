@@ -8103,8 +8103,8 @@ html .home-motion .home-tone-motion { animation: home-motion-fade var(--home-rev
   .reviewed-reader .reviewed-figure-group { --reviewed-image-max-height: 10rem; }
 }
 .reviewed-image-frame { display: block; position: relative; width: min(100%, var(--reviewed-image-width), calc(var(--reviewed-image-max-height) * var(--reviewed-image-ratio))); aspect-ratio: var(--reviewed-image-ratio); margin: .75rem auto; background: #edf2ef; overflow: hidden; }
-.reviewed-reader .reviewed-image-frame img[data-reviewed-zoom="true"] { cursor: zoom-in; }
-.reviewed-reader .reviewed-image-frame img[data-reviewed-zoom="true"]:focus-visible { outline: 3px solid #b87914; outline-offset: -3px; }
+.reviewed-reader img[data-reviewed-zoom="true"] { cursor: zoom-in; }
+.reviewed-reader img[data-reviewed-zoom="true"]:focus-visible { outline: 3px solid #b87914; outline-offset: -3px; }
 .reviewed-reader .reviewed-image-frame img { display: block; width: 100%; height: 100%; max-width: 100%; object-fit: contain; margin: 0; }
 .reviewed-image-frame[data-image-state="loading"]::after, .reviewed-image-frame[data-image-state="error"]::after { position: absolute; inset: 0; display: grid; place-content: center; padding: .5rem; color: #52665b; font-size: .8rem; text-align: center; pointer-events: none; }
 .reviewed-image-frame[data-image-state="loading"]::after { content: "圖片載入中…"; }
@@ -8156,3 +8156,6 @@ html .home-motion .home-tone-motion { animation: home-motion-fade var(--home-rev
   font-size: 0.7rem;
   line-height: 1;
 }
+
+/* The thumbnail itself opens the viewer; retain the original link only as an image-load failure fallback. */
+.reviewed-reader .reviewed-image-frame:not([data-image-state="error"]) + .reviewed-image-link { display: none; }
