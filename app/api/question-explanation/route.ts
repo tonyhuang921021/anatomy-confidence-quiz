@@ -262,8 +262,9 @@ async function checkUsageLimits(rateKey: string) {
     throw errors[0];
   }
 
-  const hourlyCount = hourResult.count ?? 0;
-  const dailyCount = dayResult.count ?? 0;
+  if (hourResult.count == null || dayResult.count == null) throw new Error("AI 詳解用量資料不完整");
+  const hourlyCount = hourResult.count;
+  const dailyCount = dayResult.count;
 
   if (hourlyCount >= HOURLY_LIMIT) {
     return {
@@ -881,14 +882,10 @@ export async function POST(request: NextRequest) {
     const fallbackKey = request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || "anonymous";
     const rateKey = userEmail?.trim().toLowerCase() || visitorId || fallbackKey;
 
-    if (!isBypassEmail(userEmail)) {
-      const usageStatus = await checkUsageLimits(rateKey).catch((error) => {
-        if (isServerTimeoutError(error)) {
-          console.warn("AI explanation usage check skipped:", error.message);
-          return { blocked: false };
-        }
-        throw error;
-      });
+    {
+      let usageStatus: Awaited<ReturnType<typeof checkUsageLimits>>;
+      try { usageStatus = await checkUsageLimits(rateKey); } catch { usageStatus = null; }
+      if (!usageStatus) return NextResponse.json({ok:false,configured:true,message:"目前無法核實使用量，請稍後再試；已保存的詳解仍可閱讀。"},{status:503});
       if (usageStatus?.blocked) {
         const blockedMessage =
           "message" in usageStatus && usageStatus.message
@@ -914,40 +911,8 @@ export async function POST(request: NextRequest) {
     }
 
     const prompt = buildQuestionExplanationPrompt(body);
-    let result = await createOpenAIText(prompt, GPT_5_MINI_MAX_OUTPUT_TOKENS, QUESTION_EXPLANATION_MODEL);
-    let parsed = parseExplanationPayload(result.text);
-
-    if (isTooSimilarToPrevious(parsed, body.previousOverride)) {
-      const retryPrompt = buildRegenerationRetryPrompt(body);
-      result = await createOpenAIText(
-        retryPrompt,
-        GPT_5_MINI_MAX_OUTPUT_TOKENS,
-        QUESTION_EXPLANATION_MODEL
-      );
-      parsed = parseExplanationPayload(result.text);
-    }
-
-    const missingOptionKeys = getMissingOptionKeys(parsed, body.question?.options);
-    if (parsed?.explanation && missingOptionKeys.length > 0) {
-      const retryPrompt = buildMissingOptionRetryPrompt(body, parsed, missingOptionKeys);
-      result = await createOpenAIText(
-        retryPrompt,
-        GPT_5_MINI_MAX_OUTPUT_TOKENS,
-        QUESTION_EXPLANATION_MODEL
-      );
-      parsed = parseExplanationPayload(result.text);
-    }
-
-    const missingOptionKeysAfterDepthRetry = getMissingOptionKeys(parsed, body.question?.options);
-    if (parsed?.explanation && missingOptionKeysAfterDepthRetry.length > 0) {
-      const retryPrompt = buildMissingOptionRetryPrompt(body, parsed, missingOptionKeysAfterDepthRetry);
-      result = await createOpenAIText(
-        retryPrompt,
-        GPT_5_MINI_MAX_OUTPUT_TOKENS,
-        QUESTION_EXPLANATION_MODEL
-      );
-      parsed = parseExplanationPayload(result.text);
-    }
+    const result = await createOpenAIText(prompt, GPT_5_MINI_MAX_OUTPUT_TOKENS, QUESTION_EXPLANATION_MODEL);
+    const parsed = parseExplanationPayload(result.text);
 
     if (!parsed?.explanation) {
       logQuestionExplanationRoute({
