@@ -1,0 +1,12 @@
+import assert from 'node:assert/strict';
+import { splitInlineExplanationEmphasis as split } from '../lib/inlineExplanationEmphasis.ts';
+assert.deepEqual(split('正確答案是 **B．結締組織**。'), [{text:'正確答案是 ',strong:false},{text:'B．結締組織',strong:true},{text:'。',strong:false}]);
+assert.deepEqual(split('**<img src=x onerror=alert(1)>**'),[{text:'<img src=x onerror=alert(1)>',strong:true}]);
+assert.deepEqual(split('未閉合 **標記'),[{text:'未閉合 **標記',strong:false}]);
+assert.deepEqual(split(''),[]);
+console.log('PASS inline bold, literal HTML safety, incomplete markers and empty text');
+import React from 'react';
+import { renderToStaticMarkup } from 'react-dom/server';
+const markup=renderToStaticMarkup(React.createElement('p',null,...split('**<img src=x onerror=alert(1)>**').map((p,i)=>p.strong?React.createElement('strong',{key:i},p.text):p.text)));
+assert.equal(markup,'<p><strong>&lt;img src=x onerror=alert(1)&gt;</strong></p>');
+console.log('PASS React renders untrusted text as escaped text');

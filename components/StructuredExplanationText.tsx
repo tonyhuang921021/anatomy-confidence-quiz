@@ -2,6 +2,13 @@
 
 import { hasReviewedExplanation } from "@/lib/reviewedExplanations";
 import { ReviewedExplanation } from "@/components/ReviewedExplanation";
+import { splitInlineExplanationEmphasis } from "@/lib/inlineExplanationEmphasis";
+
+function InlineEmphasis({ text }: { text: string }) {
+  return <>{splitInlineExplanationEmphasis(text).map((part, index) =>
+    part.strong ? <strong key={index}>{part.text}</strong> : part.text
+  )}</>;
+}
 
 type StructuredExplanationTextProps = {
   questionId?: string;
@@ -291,7 +298,7 @@ export function StructuredExplanationText({
                                     key={`${header}-${headerIndex}`}
                                     className={`border-b px-3 py-2.5 font-black ${tableCellClassName} ${tableTextWrapClassName}`}
                                   >
-                                    {header}
+                                    <InlineEmphasis text={header} />
                                   </th>
                                 ))}
                               </tr>
@@ -304,7 +311,7 @@ export function StructuredExplanationText({
                                       key={`cell-${rowIndex}-${cellIndex}`}
                                       className={`border-t px-3 py-2.5 align-top font-medium ${tableCellClassName} ${tableTextWrapClassName}`}
                                     >
-                                      {row[cellIndex] ?? ""}
+                                      <InlineEmphasis text={row[cellIndex] ?? ""} />
                                     </td>
                                   ))}
                                 </tr>
@@ -320,7 +327,7 @@ export function StructuredExplanationText({
                         key={`${section.title ?? "paragraph"}-${blockIndex}`}
                         className={`${compact ? "text-[16px] leading-8" : "text-[17px] leading-9"} whitespace-pre-line font-medium ${paragraphClassName} [overflow-wrap:anywhere]`}
                       >
-                        {block.text}
+                        <InlineEmphasis text={block.text} />
                       </p>
                     );
                   })}
