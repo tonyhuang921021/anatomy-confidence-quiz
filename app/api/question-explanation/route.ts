@@ -777,7 +777,7 @@ export async function POST(request: NextRequest) {
         const related = resolveTrustedRelatedQuestions(q.id);
         for (const item of related) {
           const accepted = item.acceptedAnswers?.length ? item.acceptedAnswers.join(' / ') : item.answer;
-          const block = `\n\n經核對的相關題背景（只用以整合共同機制、鑑別與延伸；不要提年份或考題來源）：\n科目：${item.subject}；章節：${item.chapter} / ${item.section}\n題目：${item.stem}\n選項：${Object.entries(item.options).map(([key,value]) => `${key}. ${value ?? ''}`).join('；')}\n官方接受答案：${accepted}；判分方式：${item.answerCreditType ?? 'standard'}`;
+          const block = `\n\n經核對的相關題背景（只用以整合共同機制、鑑別與延伸；不要提年份或考題來源）：\n科目：${item.subject}；章節：${item.chapter} / ${item.section}\n題目：${item.stem}\n選項：${Object.entries(item.options).map(([key,value]) => `${key}. ${value ?? ''}`).join('；')}\n題庫登錄的官答：${accepted}；判分方式：${item.answerCreditType ?? 'standard'}；若與題文衝突請註明，不要強行解釋`;
           if (Buffer.byteLength(canonicalPrompt + block, 'utf8') <= 16000) canonicalPrompt += block;
         }
         return Buffer.byteLength(canonicalPrompt,"utf8") <= 16000;

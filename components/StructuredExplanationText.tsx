@@ -271,7 +271,7 @@ export function StructuredExplanationText({
           {label}
         </p>
       ) : null}
-      {questionId ? <VerifiedExplanationFigures questionId={questionId} /> : null}
+      {questionId ? <VerifiedExplanationFigures questionId={questionId} explanation={trimmedText} /> : null}
       <div className="w-full max-w-[52rem] min-w-0 space-y-4 sm:space-y-5">
         {sections.map((section, index) => (
           <section

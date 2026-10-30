@@ -7,6 +7,10 @@ const good={asset:'/reviewed-explanations/assets/a.png',alt:'清楚圖說',capti
 assert.equal(fig.validVerifiedFigure(good),true);
 for (const bad of [{...good,asset:'https://evil.example/a.png'},{...good,asset:'https://example.invalid/reviewed-explanations/assets/a.png'},{...good,asset:'/reviewed-explanations/assets/../outside.png'},{...good,sourceUrl:'javascript:alert(1)'},{...good,license:''}]) assert.equal(fig.validVerifiedFigure(bad),false);
 assert.equal(fig.getVerifiedExplanationFigures('unreviewed-question').length,0);
+assert.equal(fig.getVerifiedExplanationFigures('new-question','髖關節屈曲會使大腿向前').length,1);
+assert.equal(fig.getVerifiedExplanationFigures('new-question','黑色素由酪胺酸酶促進生成').length,1);
+assert.equal(fig.getVerifiedExplanationFigures('new-question','血球懸浮於血漿').length,1);
+assert.equal(fig.getVerifiedExplanationFigures('new-question','髖關節位於骨盆').length,0);
 for(const n of ['001','002','003']) assert.equal(fig.getVerifiedExplanationFigures('MOEX-C217-091030-S4004-STAGE1-Q'+n).length,1);
 const emphasis=load('lib/inlineExplanationEmphasis.ts',{});
 const view=load('components/StructuredExplanationText.tsx',{'@/lib/reviewedExplanations':{hasReviewedExplanation:()=>false},'@/components/ReviewedExplanation':{ReviewedExplanation:()=>null},'@/components/VerifiedExplanationFigures':{VerifiedExplanationFigures:()=>null},'@/components/ReviewedExplanationSupplement':{ReviewedExplanationSupplement:()=>null},'@/lib/inlineExplanationEmphasis':emphasis});
