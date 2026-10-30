@@ -17,6 +17,7 @@ function loader(globals = {}, mocks = {}) {
         if (!resolved) throw new Error(`Unresolved module ${name}`);
         return load(resolved);
       }
+      if (name === 'node:crypto') return crypto;
       if (name === 'react/jsx-runtime') return require(name);
       throw new Error(`External module blocked: ${name}`);
     };
@@ -33,6 +34,7 @@ function loader(globals = {}, mocks = {}) {
 let sideEffects=0;
 const forbidden=()=>{sideEffects++;throw new Error('Unexpected model/database operation');};
 const load=loader({}, {
+ '@/lib/trustedQuestionLoader':{resolveTrustedExplanationQuestion:forbidden,resolveTrustedRelatedQuestions:forbidden},
  'next/server':{NextResponse:{json:(body,options={})=>({body,status:options.status??200,headers:options.headers})}},
  '@supabase/supabase-js':{createClient:forbidden},
  '@/lib/openai':{getOpenAIModel:x=>x||'gpt-5.4-mini',isOpenAIConfigured:()=>true,createOpenAIText:forbidden},
@@ -41,7 +43,7 @@ const load=loader({}, {
 const route=load('app/api/question-explanation/route.ts');
 const index=JSON.parse(fs.readFileSync(path.join(root,'data/reviewedExplanationIndex.json')));
 const before=JSON.stringify(index);
-async function post(body){return route.POST({json:async()=>body});}
+async function post(body){return route.POST({text:async()=>JSON.stringify(body)});}
 test('all 1402 accepted IDs reject forced generation before external work',async()=>{
  assert.equal(Object.keys(index).length,1402);
  for(const id of Object.keys(index)){
@@ -61,7 +63,9 @@ test('single and mixed batch cache sync cannot overwrite accepted editions',asyn
 });
 test('client reviewed label does not protect ordinary AI questions',async()=>{
  const result=await post({question:{id:'MOEX-099130-2101-Q100'},reviewed:true});
- assert.equal(result.status,400); // ordinary validation, not protected
+ assert.equal(result.status,503); // Missing test configuration fails closed after protection check.
+ assert.equal(result.body.code,'safe_configuration_missing');
+ assert.equal(sideEffects,0);
 });
 test('read-only route resolves dedicated Luna override without generating',async()=>{
  const result=await route.GET();assert.equal(result.body.model,'gpt-6-luna');
