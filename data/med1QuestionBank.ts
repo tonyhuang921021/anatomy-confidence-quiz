@@ -11,6 +11,18 @@ import moexMed1ReclassifiedV5 from "@/data/sources/moex_med1_100_115_reclassifie
 import moexMed1Requested149ReclassificationPatch from "@/data/sources/moex_med1_requested_149_reclassification_patch.json";
 import moexMedStage2Merged0013100 from "@/data/sources/moex_med_stage2_detailed_merged_001_3100_classified_v3.json";
 import moex115090OfficialQuestions from "@/data/sources/moex_115090_official_questions.json";
+import moex92Stage1R1Med1 from "@/data/sources/moex_92_1_stage1_med1_questions.json";
+import moex92Stage1R1Med2 from "@/data/sources/moex_92_1_stage1_med2_questions.json";
+import moex92Stage1R2Med1 from "@/data/sources/moex_92_2_stage1_med1_questions.json";
+import moex92Stage1R2Med2 from "@/data/sources/moex_92_2_stage1_med2_questions.json";
+import moex93Stage1R1Med1 from "@/data/sources/moex_93_1_stage1_med1_questions.json";
+import moex93Stage1R1Med2 from "@/data/sources/moex_93_1_stage1_med2_questions.json";
+import moex93Stage1R2Med1 from "@/data/sources/moex_93_2_stage1_med1_questions.json";
+import moex93Stage1R2Med2 from "@/data/sources/moex_93_2_stage1_med2_questions.json";
+import moex94Stage1R1Med1 from "@/data/sources/moex_94_1_stage1_med1_questions.json";
+import moex94Stage1R1Med2 from "@/data/sources/moex_94_1_stage1_med2_questions.json";
+import moex94Stage1R2Med1 from "@/data/sources/moex_94_2_stage1_med1_questions.json";
+import moex94Stage1R2Med2 from "@/data/sources/moex_94_2_stage1_med2_questions.json";
 import moex9899OfficialQuestions from "@/data/sources/moex_98_99_official_questions.json";
 import moex97Med1Questions from "@/data/sources/moex_97_1_med1_questions.json";
 import moex97Med2Questions from "@/data/sources/moex_97_1_med2_questions.json";
@@ -2092,6 +2104,18 @@ export const canonicalQuestionBank: Question[] = dedupeQuestionBank([
   ...moex115090Med1Questions,
   ...moex115090Med2Questions,
   ...(moex9899OfficialQuestions.questions as Question[]),
+  ...(moex92Stage1R1Med1.questions as Question[]),
+  ...(moex92Stage1R1Med2.questions as Question[]),
+  ...(moex92Stage1R2Med1.questions as Question[]),
+  ...(moex92Stage1R2Med2.questions as Question[]),
+  ...(moex93Stage1R1Med1.questions as Question[]),
+  ...(moex93Stage1R1Med2.questions as Question[]),
+  ...(moex93Stage1R2Med1.questions as Question[]),
+  ...(moex93Stage1R2Med2.questions as Question[]),
+  ...(moex94Stage1R1Med1.questions as Question[]),
+  ...(moex94Stage1R1Med2.questions as Question[]),
+  ...(moex94Stage1R2Med1.questions as Question[]),
+  ...(moex94Stage1R2Med2.questions as Question[]),
   ...(moex97Med1Questions.questions as Question[]),
   ...(moex97Med2Questions.questions as Question[]),
   ...(moex97SecondMed1Questions.questions as Question[]),

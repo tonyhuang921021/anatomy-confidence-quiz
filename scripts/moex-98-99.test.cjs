@@ -112,9 +112,10 @@ test('real runtime retains 6730 baseline questions and exposes the eight 98–99
   assert.equal(additions91.length,320);
   const additions90=[1,2].flatMap(r=>[1,2].flatMap(p=>require(`../data/sources/moex_90_${r}_stage1_med${p}_questions.json`).questions));
   assert.equal(additions90.length,320);
-  const oldIds=new Set(payload.questions.map(q=>q.id)),newIds=new Set([...additions97,...additions96,...additions95,...additions91,...additions90].map(q=>q.id));
-  assert.equal(oldIds.size,800);assert.equal(newIds.size,1840);assert.equal([...newIds].filter(id=>oldIds.has(id)).length,0);
-  assert.equal(current.canonicalQuestionBank.length,6730+800+400+400+400+320+320);
+  const additions9294=[92,93,94].flatMap(y=>[1,2].flatMap(r=>[1,2].flatMap(p=>require(`../data/sources/moex_${y}_${r}_stage1_med${p}_questions.json`).questions))); assert.equal(additions9294.length,960);
+  const oldIds=new Set(payload.questions.map(q=>q.id)),newIds=new Set([...additions97,...additions96,...additions95,...additions91,...additions90,...additions9294].map(q=>q.id));
+  assert.equal(oldIds.size,800);assert.equal(newIds.size,2800);assert.equal([...newIds].filter(id=>oldIds.has(id)).length,0);
+  assert.equal(current.canonicalQuestionBank.length,6730+800+400+400+400+320+320+960);
   const original=current.canonicalQuestionBank.filter(q=>!oldIds.has(q.id)&&!newIds.has(q.id));assert.equal(original.length,6730);
   const revisions=require('../docs/moex-98-99/canonical-reviewed-corrections.json');
   assert.deepEqual(revisions.map(({id,fields})=>({id,fields})),[
