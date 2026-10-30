@@ -1011,6 +1011,7 @@ export default function QuizPage() {
 
     initializedSessionRef.current = true;
     let cancelled = false;
+    let initializationFinished = false;
 
     async function initializeSession() {
       try {
@@ -1020,6 +1021,8 @@ export default function QuizPage() {
           QUIZ_CLASSIFICATION_OVERRIDE_TIMEOUT_MS,
           {} as Record<string, QuestionClassificationOverride>
         );
+        // A cleaned-up effect no longer owns storage, launch intent, or UI state.
+        if (cancelled) return;
         setClassificationOverrides(loadedOverrides);
 
         const existing = loadCurrentSession();
@@ -1197,14 +1200,15 @@ export default function QuizPage() {
           resetQuestionUI();
         }
       } catch {
-        initializedSessionRef.current = false;
         if (cancelled) return;
+        initializedSessionRef.current = false;
         clearCurrentSession();
         setSession(null);
         setLoadIssue("題目載入時遇到本機狀態錯誤，請重新開始測驗。");
         resetQuestionUI();
       } finally {
         if (!cancelled) {
+          initializationFinished = true;
           setMounted(true);
         }
       }
@@ -1213,6 +1217,9 @@ export default function QuizPage() {
     void initializeSession();
     return () => {
       cancelled = true;
+      // StrictMode replay or an auth/sync change must be able to replace a
+      // pending run. A completed session must retain the duplicate-start guard.
+      if (!initializationFinished) initializedSessionRef.current = false;
     };
   }, [authLoading, authSession?.user?.id, syncVersion]);
 
