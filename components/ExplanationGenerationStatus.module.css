@@ -21,4 +21,4 @@
 @keyframes sleep { 0%,50%,76%,100% { opacity:0; transform:translateY(0); } 60% { opacity:.8; } 72% { opacity:0; transform:translateY(-7px); } }
 @keyframes happy { from { transform:translateY(3px) rotate(6deg); } to { transform:translateY(-2px) rotate(-3deg); } }
 @media (max-width:400px) { .status { gap:8px; padding-inline:8px; } .cat { width:84px; flex-basis:84px; } }
-@media (prefers-reduced-motion:reduce) { .status .head,.status .tail,.status .page,.status .eyes,.status .sleep { animation:none; transform:none; } .status .page,.status .sleep { display:none; } }
+@media (prefers-reduced-motion:reduce) { .status[data-phase] .head,.status[data-phase] .tail,.status[data-phase] .page,.status[data-phase] .eyes,.status[data-phase] .sleep { animation:none; transform:none; } .status .page,.status .sleep { display:none; } }
