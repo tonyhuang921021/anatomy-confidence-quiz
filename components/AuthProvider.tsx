@@ -404,6 +404,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     targetUser?: User | null,
     options: RefreshCloudDataOptions = {}
   ) => {
+    // Isolated preview QA must never upload real user progress.
+    if (typeof window !== "undefined" && window.location.pathname === "/internal-preview-guard-qa") return;
     if (recoveryMode) {
       setSyncStatus("ready");
       setSyncError(RECOVERY_MODE_MESSAGE);
