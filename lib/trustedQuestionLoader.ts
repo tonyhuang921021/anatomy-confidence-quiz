@@ -6,6 +6,7 @@ import { importedCustomPaperQuestions } from "@/data/importedCustomPaperQuestion
 import { getAISimulationPaperOptions, getQuestionsForAISimulationPaper } from "@/data/aiSimulationPapers";
 import { isContinuationQuestionStem } from "@/lib/questionContext";
 import type { Question } from "@/types/quiz";
+import { findTrustedRelatedQuestions } from "@/lib/trustedRelatedContext";
 
 type Resolution =
   | { ok: true; question: Question; sharedContext: string | null; requiresContext: boolean }
@@ -54,4 +55,12 @@ export function resolveTrustedExplanationQuestion(id: unknown): Resolution {
   const sharedContext = q.sharedContext?.stem?.trim() || null;
   const requiresContext = isContinuationQuestionStem(q.stem);
   return { ok: true, question: q, sharedContext, requiresContext };
+}
+
+/** Related content is resolved from the same conflict-checked, server-owned corpus. */
+export function resolveTrustedRelatedQuestions(id: string): Question[] {
+  const source = resolveTrustedExplanationQuestion(id);
+  if (!source.ok) return [];
+  const {index,conflicting} = cachedIndex!;
+  return findTrustedRelatedQuestions(source.question, [...index.values()], conflicting);
 }

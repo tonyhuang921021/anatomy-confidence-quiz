@@ -2,6 +2,7 @@
 
 import { hasReviewedExplanation } from "@/lib/reviewedExplanations";
 import { ReviewedExplanation } from "@/components/ReviewedExplanation";
+import { VerifiedExplanationFigures } from "@/components/VerifiedExplanationFigures";
 import { splitInlineExplanationEmphasis } from "@/lib/inlineExplanationEmphasis";
 
 function InlineEmphasis({ text }: { text: string }) {
@@ -269,6 +270,7 @@ export function StructuredExplanationText({
           {label}
         </p>
       ) : null}
+      {questionId ? <VerifiedExplanationFigures questionId={questionId} /> : null}
       <div className="w-full max-w-[52rem] min-w-0 space-y-4 sm:space-y-5">
         {sections.map((section, index) => (
           <section

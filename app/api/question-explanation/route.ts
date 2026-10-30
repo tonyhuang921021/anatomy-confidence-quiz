@@ -1,7 +1,7 @@
 import { createHash } from "node:crypto";
 import reviewedIndex from "@/data/reviewedExplanationIndex.json";
 import { handleExplanation, formatAcceptedAnswer } from "@/lib/explanation-orchestrator.cjs";
-import { resolveTrustedExplanationQuestion } from "@/lib/trustedQuestionLoader";
+import { resolveTrustedExplanationQuestion, resolveTrustedRelatedQuestions } from "@/lib/trustedQuestionLoader";
 import { formatRocDate } from "@/lib/rocDate";
 import { hasReviewedExplanation } from "@/lib/reviewedExplanations";
 import { NextRequest, NextResponse } from "next/server";
@@ -104,9 +104,9 @@ const QUESTION_EXPLANATION_PROMPT_PREFIX = [
   "題庫標籤可能不準，以可信題幹、原始選項、官方答案與判分方式為準。若有一律給分或多個可接受答案，應依實際判分說明。",
   "遇到足以影響判斷的爭議、歷史版本或資訊不足，以具體條件說清楚；不要補造原題缺失或虛構來源與連結。",
   "直接說明知識與機轉，不評論模型、提示詞、寫作過程或稿件；不要根據任何單一使用者的作答情況改變內容。",
-  "若附有經核對的相關題資料，參考共同原理，補足理解所需但相關題未提到的內容；正文不以年份、卷別或出題次數決定篇幅。",
+  "若附有經核對的相關題資料，將共通機制、易混鑑別、延伸概念及可能變化整合到本題教學，不要只列相關題，也不要提年份、卷別或出題次數；仍補足相關題未提到但理解需要的內容。",
   "相關題連結及圖片由網站根據已核對的資料提供，不要在生成內容中自行編造題號、圖片、引用或網址。",
-  "若比較表有助理解，可在 explanation 使用簡短 Markdown pipe table；不用為了格式湊表格。",
+  "在 explanation 中提供一個精簡 Markdown 比較表，整理本題有助理解的機轉、概念或選項差異；表格只寫能由題目與可靠知識支持的內容，不確定的地方直接註明，不為湊格式編造。",
   "只輸出 JSON，不要輸出 HTML、code block 或 JSON 外文字。explanation 為文字；optionAnalysis 僅包含實際存在的 A、B、C、D、E 選項鍵；memoryTip 沒有則留空字串。",
   '{"explanation":"整題詳解","optionAnalysis":{"A":"A 選項解析","B":"B 選項解析"},"memoryTip":""}'
 ].join("\n");
@@ -774,6 +774,12 @@ export async function POST(request: NextRequest) {
       prepare: async (q:any) => {
         const trustedContext = q.trustedContext;
         canonicalPrompt = buildQuestionExplanationPrompt({question:{...q,stem:trustedContext ? `${trustedContext}\n\n${q.stem}` : q.stem}});
+        const related = resolveTrustedRelatedQuestions(q.id);
+        for (const item of related) {
+          const accepted = item.acceptedAnswers?.length ? item.acceptedAnswers.join(' / ') : item.answer;
+          const block = `\n\n經核對的相關題背景（只用以整合共同機制、鑑別與延伸；不要提年份或考題來源）：\n科目：${item.subject}；章節：${item.chapter} / ${item.section}\n題目：${item.stem}\n選項：${Object.entries(item.options).map(([key,value]) => `${key}. ${value ?? ''}`).join('；')}\n官方接受答案：${accepted}；判分方式：${item.answerCreditType ?? 'standard'}`;
+          if (Buffer.byteLength(canonicalPrompt + block, 'utf8') <= 16000) canonicalPrompt += block;
+        }
         return Buffer.byteLength(canonicalPrompt,"utf8") <= 16000;
       },
       readShared: async (id: string) => {
