@@ -1,3 +1,4 @@
+import { LegacySourceThumbnail } from "@/components/LegacySourceThumbnail";
 import { formatRocYear } from "@/lib/rocDate";
 import { type ReactNode } from "react";
 import { OptionKey, Question } from "@/types/quiz";
@@ -42,6 +43,9 @@ function renderImage(src: string, alt: string, dimensions?: { width: number; hei
 
 export function QuestionStemMedia({ question, className }: QuestionStemMediaProps) {
   if (!question.stemImage) return null;
+  if (question.officialExam?.trackCode === "STAGE1" && ["092074", "092150", "093030", "093141", "094042", "094161"].includes(question.examCode ?? "")) {
+    return <div className={className}><LegacySourceThumbnail src={question.stemImage} alt={`${question.id} 官方原題`} /></div>;
+  }
 
   return (
     <div className={`min-w-0 max-w-full ${className ?? ""}`}>

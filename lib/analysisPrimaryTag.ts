@@ -1,3 +1,4 @@
+import legacy92to94Stage1ClassificationCandidate from "../data/sources/moex_92_94_stage1_classification_candidate.json";
 import primaryTagRuntimeMapJson from "../data/analysisPrimaryTagRuntimeMap.json";
 import legacyClassificationJson from "../data/sources/moex_98_99_classification_review.json";
 import legacy97ClassificationJson from "../data/sources/moex_97_1_med1_classification.json";
@@ -32,12 +33,12 @@ type RuntimePrimaryTagMap = {
 const runtimePrimaryTagMap = primaryTagRuntimeMapJson as unknown as RuntimePrimaryTagMap;
 const runtimeAssignments = runtimePrimaryTagMap.questions;
 // 96-1 content-reviewed candidates are keyed per question; no historical band inference.
-const legacy96ContentAssignments = { ...legacy96ContentClassificationCandidate.questions, ...legacy96SecondContentClassificationCandidate.questions, ...legacy95ContentClassificationCandidate.questions, ...legacy91Stage1ClassificationCandidate.questions, ...legacy90Stage1ClassificationCandidate.questions } as unknown as Record<string, [SubjectName, string | null, string | null, string | null]>;
+const legacy96ContentAssignments = { ...legacy96ContentClassificationCandidate.questions, ...legacy96SecondContentClassificationCandidate.questions, ...legacy95ContentClassificationCandidate.questions, ...legacy91Stage1ClassificationCandidate.questions, ...legacy90Stage1ClassificationCandidate.questions, ...legacy92to94Stage1ClassificationCandidate.questions } as unknown as Record<string, [SubjectName, string | null, string | null, string | null]>;
 const legacy96QuarantinedIds = new Set<string>([...legacy96ContentClassificationCandidate.quarantined, ...legacy96SecondContentClassificationCandidate.quarantined, ...legacy95ContentClassificationCandidate.quarantined, ...legacy91Stage1ClassificationCandidate.quarantined, ...legacy90Stage1ClassificationCandidate.quarantined]);
 // The source-bound contract test validates every subject, tag and tuple length.
 const legacyAssignments = { ...legacyClassificationJson.questions, ...legacy97ClassificationJson.questions, ...legacy97Med2ClassificationJson.questions, ...legacy97SecondMed1ClassificationJson.questions, ...legacy97SecondMed2ClassificationJson.questions } as unknown as Record<string, [SubjectName, string | null]>;
 const legacyPendingIds = new Set<string>(legacyClassificationJson.pendingQuestionIds);
-const legacyPendingPrimaryTagIds = new Set<string>([...legacyClassificationJson.pendingPrimaryTagQuestionIds, ...legacy97ClassificationJson.pendingPrimaryTagQuestionIds, ...legacy97Med2ClassificationJson.pendingPrimaryTagQuestionIds, ...legacy97SecondMed1ClassificationJson.pendingPrimaryTagQuestionIds, ...legacy97SecondMed2ClassificationJson.pendingPrimaryTagQuestionIds]);
+const legacyPendingPrimaryTagIds = new Set<string>([...legacy92to94Stage1ClassificationCandidate.pendingPrimaryTagQuestionIds, ...legacyClassificationJson.pendingPrimaryTagQuestionIds, ...legacy97ClassificationJson.pendingPrimaryTagQuestionIds, ...legacy97Med2ClassificationJson.pendingPrimaryTagQuestionIds, ...legacy97SecondMed1ClassificationJson.pendingPrimaryTagQuestionIds, ...legacy97SecondMed2ClassificationJson.pendingPrimaryTagQuestionIds]);
 // The generator and contract tests validate the two-string tuple for all 800 IDs.
 const legacyLearningPlacements = { ...legacyLearningPlacementJson.questions, ...legacy97ClassificationJson.placements, ...legacy97Med2ClassificationJson.placements, ...legacy97SecondMed1ClassificationJson.placements, ...legacy97SecondMed2ClassificationJson.placements } as unknown as Record<string, [string, string]>;
 const MICROBIOLOGY_TAG_PREFIXES = ["細菌學", "病毒學", "真菌學", "免疫學", "微生物免疫學"];
@@ -83,7 +84,7 @@ export function getLockedLegacyPrimaryTagAssignment(questionId: string, candidat
 export function getQuestionPrimaryTag(
   question: Pick<Question, "id" | "section" | "primaryTag">
 ) {
-  if (legacy96QuarantinedIds.has(question.id)) return null;
+  if (legacy96QuarantinedIds.has(question.id) || legacy92to94Stage1ClassificationCandidate.pendingPrimaryTagQuestionIds.includes(question.id)) return null;
   const assignment = getAnalysisPrimaryTagAssignment(question.id);
   if (assignment) {
     // A reviewed broad subject does not imply an invented topic for a taxonomy gap.
