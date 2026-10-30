@@ -5,6 +5,8 @@
 --      -v batch_review_evidence_sha256=... ; evidence hash requires external verification.
 \set ON_ERROR_STOP on
 BEGIN;
+-- Temporary management membership; inherits owner privileges without SET ROLE.
+GRANT ai_guard_owner TO CURRENT_USER WITH INHERIT TRUE, SET FALSE;
 SELECT set_config('ai_guard.promote_grant', :'verified_grant_microusd', true),
        set_config('ai_guard.promote_checked_at', :'verified_at_utc', true),
        set_config('ai_guard.promote_expiry', :'verified_expiry_utc', true),
@@ -30,4 +32,7 @@ begin
   verified_credit_expires_at=LEAST(expiry,checked_at+interval '15 minutes'),cap_microusd=next_cap where id=true;
  -- No enable, spend reset, liability change, or emergency-reason clearing here.
 end $$;
+-- Remove the grant issued by this transaction; creator's bootstrap ADMIN remains.
+REVOKE ai_guard_owner FROM CURRENT_USER;
+DO $$ BEGIN IF EXISTS (SELECT 1 FROM pg_auth_members m JOIN pg_roles r ON r.oid=m.roleid JOIN pg_roles u ON u.oid=m.member WHERE r.rolname='ai_guard_owner' AND u.rolname=current_user AND (m.set_option OR m.inherit_option)) THEN RAISE EXCEPTION 'temporary management membership remains'; END IF; END $$;
 COMMIT;

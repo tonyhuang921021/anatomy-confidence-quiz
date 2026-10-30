@@ -5,6 +5,8 @@
 -- Migration operator must be authorized to install trigger and access guard tables.
 \set ON_ERROR_STOP on
 BEGIN;
+-- Temporary management membership; inherits owner privileges without SET ROLE.
+GRANT ai_guard_owner TO CURRENT_USER WITH INHERIT TRUE, SET FALSE;
 SELECT set_config('ai_guard.seed_grant', :'verified_grant_microusd', true),
        set_config('ai_guard.seed_checked_at', :'verified_at_utc', true),
        set_config('ai_guard.seed_expiry', :'verified_expiry_utc', true),
@@ -1435,4 +1437,7 @@ SELECT public.ai_guard_install_reviewed_snapshot('9f189941805e235019cde11ce05fbc
     'moex-med1-supplement-v5-115020-1301-098'
 ]::text[]);
 -- Never enables ai_guard_budget.enabled; true-JWT/read/normal use and credit check precede resume.
+-- Remove the grant issued by this transaction; creator's bootstrap ADMIN remains.
+REVOKE ai_guard_owner FROM CURRENT_USER;
+DO $$ BEGIN IF EXISTS (SELECT 1 FROM pg_auth_members m JOIN pg_roles r ON r.oid=m.roleid JOIN pg_roles u ON u.oid=m.member WHERE r.rolname='ai_guard_owner' AND u.rolname=current_user AND (m.set_option OR m.inherit_option)) THEN RAISE EXCEPTION 'temporary management membership remains'; END IF; END $$;
 COMMIT;

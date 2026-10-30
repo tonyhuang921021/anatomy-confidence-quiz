@@ -3,6 +3,8 @@
 -- psql: -v expected_manifest=<64 lowercase hex> -v expected_source=<40 lowercase hex>
 -- No automatic recovery of cost_overflow / usage_over_ceiling / pricing_error.
 BEGIN;
+-- Temporary management membership; inherits owner privileges without SET ROLE.
+GRANT ai_guard_owner TO CURRENT_USER WITH INHERIT TRUE, SET FALSE;
 SELECT set_config('ai_guard.expected_manifest', :'expected_manifest', true),
        set_config('ai_guard.expected_source', :'expected_source', true);
 LOCK TABLE public.question_explanation_overrides IN SHARE ROW EXCLUSIVE MODE;
@@ -44,4 +46,7 @@ BEGIN
    RAISE EXCEPTION 'guard configuration insufficient'; END IF;
  UPDATE public.ai_guard_budget SET enabled=true,disabled_at=NULL WHERE id=true;
 END $$;
+-- Remove the grant issued by this transaction; creator's bootstrap ADMIN remains.
+REVOKE ai_guard_owner FROM CURRENT_USER;
+DO $$ BEGIN IF EXISTS (SELECT 1 FROM pg_auth_members m JOIN pg_roles r ON r.oid=m.roleid JOIN pg_roles u ON u.oid=m.member WHERE r.rolname='ai_guard_owner' AND u.rolname=current_user AND (m.set_option OR m.inherit_option)) THEN RAISE EXCEPTION 'temporary management membership remains'; END IF; END $$;
 COMMIT;
