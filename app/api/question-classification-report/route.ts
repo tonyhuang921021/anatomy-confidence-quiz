@@ -1,3 +1,4 @@
+import { shouldPauseNonLedgerPaidAction } from "@/lib/paid-ai-maintenance.cjs";
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 import { createOpenAIText, isOpenAIConfigured } from "@/lib/openai";
@@ -339,6 +340,7 @@ function buildClassificationPrompt(question: NonNullable<ClassificationReportReq
 }
 
 export async function POST(request: NextRequest) {
+  if (shouldPauseNonLedgerPaidAction()) return NextResponse.json({ok:false,code:"paid_ai_maintenance",message:"AI 重新分類暫時維護，其他功能仍可使用。"},{status:503,headers:{"Cache-Control":"no-store"}});
   if (isSupabaseRecoveryMode()) {
     return NextResponse.json(
       { ok: false, message: "分類回報暫時維護中，先讓登入與同步恢復。" },

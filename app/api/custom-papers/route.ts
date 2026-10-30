@@ -1,3 +1,4 @@
+import { shouldPauseNonLedgerPaidAction } from "@/lib/paid-ai-maintenance.cjs";
 import { formatRocDate } from "@/lib/rocDate";
 import { NextRequest, NextResponse } from "next/server";
 import { regradeSessionForCurrentAnswerKey } from "@/lib/answerKeyRevisions";
@@ -1154,7 +1155,6 @@ export async function POST(request: NextRequest) {
   }
 
   try {
-    await ensureBundledCustomPapersSeeded(supabase);
     const body = (await request.json().catch(() => null)) as
       | GenerateBody
       | GenerateAISearchBody
@@ -1167,6 +1167,8 @@ export async function POST(request: NextRequest) {
     if (!body?.action) {
       return NextResponse.json({ ok: false, message: "缺少操作類型。" }, { status: 400 });
     }
+    if ((body.action === "generate_ai_search" || body.action === "preview_ai_search") && shouldPauseNonLedgerPaidAction()) return NextResponse.json({ok:false,code:"paid_ai_maintenance",message:"此 AI 功能暫時維護，既有內容仍可使用。"},{status:503,headers:{"Cache-Control":"no-store"}});
+    await ensureBundledCustomPapersSeeded(supabase);
 
     if (body.action === "generate") {
       const selectedSubjects = getAllowedSubjectList(body.selectedSubjects);

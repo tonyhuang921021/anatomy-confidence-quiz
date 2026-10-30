@@ -1,3 +1,4 @@
+import { shouldPauseNonLedgerPaidAction } from "@/lib/paid-ai-maintenance.cjs";
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 import { getCanonicalQuestionBank } from "@/data/med1QuestionBank";
@@ -337,6 +338,7 @@ export async function POST(request: NextRequest) {
     }
 
     if (action === "generate_neuro_suggestions") {
+      if (shouldPauseNonLedgerPaidAction()) return NextResponse.json({ok:false,code:"paid_ai_maintenance",message:"此 AI 功能暫時維護，既有內容仍可使用。"},{status:503,headers:{"Cache-Control":"no-store"}});
       if (!isOpenAIConfigured()) {
         return NextResponse.json(
           { ok: false, message: "OPENAI_API_KEY 尚未設定，暫時無法生成 AI 題目連結。" },

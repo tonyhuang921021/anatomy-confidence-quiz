@@ -1,3 +1,4 @@
+import { shouldPauseNonLedgerPaidAction } from "@/lib/paid-ai-maintenance.cjs";
 import { formatRocDate } from "@/lib/rocDate";
 import { hasReviewedExplanation } from "@/lib/reviewedExplanations";
 import { NextRequest, NextResponse } from "next/server";
@@ -707,6 +708,10 @@ export async function POST(request: NextRequest) {
       message: "此題已有已審核完整詳解，保留原文與圖片，不開放 AI 重新產生或替換。" },
     { status: 409 });
   }
+
+  // Temporary deployable barrier: keep GET/previously stored explanations available.
+  // No runtime env switch; resuming requires a separately reviewed code change.
+  if (shouldPauseNonLedgerPaidAction()) return NextResponse.json({ok:false,code:"paid_ai_maintenance",message:"詳解生成與同步暫時維護，既有詳解仍可閱讀。"},{status:503,headers:{"Cache-Control":"no-store"}});
 
   if (action === "sync_override" || action === "sync_overrides") {
     if (isSupabaseRecoveryMode()) {
