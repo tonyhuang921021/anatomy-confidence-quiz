@@ -8159,3 +8159,19 @@ html .home-motion .home-tone-motion { animation: home-motion-fade var(--home-rev
 
 /* The thumbnail itself opens the viewer; retain the original link only as an image-load failure fallback. */
 .reviewed-reader .reviewed-image-frame:not([data-image-state="error"]) + .reviewed-image-link { display: none; }
+
+
+/* In-place enlargement: no overlay, dialog, new tab, or body scroll lock. */
+.reviewed-reader .reviewed-image-frame[data-reviewed-expanded="true"] {
+  width: min(100%, var(--reviewed-image-width));
+}
+.reviewed-reader img[data-reviewed-zoom="true"][aria-expanded="true"] {
+  width: 100%; max-width: 100%; height: auto; max-height: none; cursor: zoom-out;
+}
+.reviewed-reader .reviewed-image-frame[data-reviewed-expanded="true"]::before {
+  content: "點圖片縮小"; position: absolute; top: .25rem; right: .25rem;
+  z-index: 1; padding: .15rem .4rem; border-radius: .3rem;
+  color: #17633f; background: #fffffff0; font-size: .75rem; pointer-events: none;
+}
+
+.reviewed-reader img[data-reviewed-zoom="true"][aria-expanded="false"] { width: auto; height: auto; max-width: 100%; max-height: 10rem; object-fit: contain; margin-left: auto; margin-right: auto; }

@@ -33,23 +33,33 @@ for (const markup of ["imported-figure", "bare-html", "linked-image"] as const) 
     const thumb = reader.locator(".reviewed-reader img").first();
     await expect(thumb).toHaveAttribute("role", "button");
     await thumb.scrollIntoViewIfNeeded();
+    const before = await thumb.boundingBox();
+    const url = page.url();
+    const imageCount = await reader.locator("img").count();
     if (info.project.name.includes("mobile")) await thumb.tap(); else await thumb.click();
-    const dialog = reader.locator("dialog");
-    await expect(dialog).toBeVisible();
-    await expect(dialog.locator("img")).toHaveJSProperty("complete", true);
-    await expect.poll(() => dialog.locator("img").evaluate(image => {
-      const bounds = image.getBoundingClientRect();
-      return bounds.height > 0 && bounds.height <= innerHeight * .66 && bounds.width <= innerWidth;
-    })).toBe(true);
-    await page.screenshot({ path: `evidence/explanations/direct-${markup}-${info.project.name}.png` });
-    await page.keyboard.press("Escape");
-    await expect(dialog).not.toBeVisible();
+    await expect(thumb).toHaveAttribute("aria-expanded", "true");
+    await expect(reader.locator("dialog")).toHaveCount(0);
     await expect(thumb).toBeFocused();
+    await expect(thumb).toHaveAttribute("title", "點圖片縮小");
+    const expanded = await thumb.boundingBox();
+    expect(expanded!.height).toBeGreaterThan(before!.height);
+    expect(expanded!.width).toBeLessThanOrEqual(page.viewportSize()!.width);
+    expect(await reader.locator("img").count()).toBe(imageCount);
+    expect(page.url()).toBe(url);
+    expect(page.context().pages()).toHaveLength(1);
+    await page.screenshot({ path: `evidence/explanations/inline-${markup}-${info.project.name}.png` });
+    // Collapse after reading farther down a tall image.
+    await page.evaluate(() => window.scrollBy(0, 150));
     await thumb.press("Enter");
-    await expect(dialog).toBeVisible();
-    await page.mouse.click(1, 1);
-    await expect(dialog).not.toBeVisible();
+    await expect(thumb).toHaveAttribute("aria-expanded", "false");
     await expect(thumb).toBeFocused();
+    const collapsed = await thumb.boundingBox();
+    expect(Math.abs(collapsed!.height - before!.height)).toBeLessThanOrEqual(1);
+    expect(Math.abs(collapsed!.y - before!.y)).toBeLessThanOrEqual(2);
+    await thumb.press("Space");
+    await expect(thumb).toHaveAttribute("aria-expanded", "true");
+    await thumb.click();
+    await expect(thumb).toHaveAttribute("aria-expanded", "false");
     if (markup === "imported-figure") {
       await expect(reader.locator(".reviewed-image-link")).not.toBeVisible();
       const source = reader.getByRole("link", { name: "原圖及圖說", exact: true });
@@ -57,7 +67,7 @@ for (const markup of ["imported-figure", "bare-html", "linked-image"] as const) 
       // Prevent leaving the fixture, while still dispatching the real click through React.
       await source.evaluate(link => link.addEventListener("click", event => event.preventDefault(), { once: true }));
       await source.click();
-      await expect(dialog).not.toBeVisible();
+      await expect(thumb).toHaveAttribute("aria-expanded", "false");
     }
   });
 }
