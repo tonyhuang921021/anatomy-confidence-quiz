@@ -1,7 +1,9 @@
 const fs=require('node:fs'), vm=require('node:vm'),ts=require('typescript'),assert=require('node:assert/strict');
-const js=ts.transpileModule(fs.readFileSync('lib/trustedRelatedContext.ts','utf8'),{compilerOptions:{module:ts.ModuleKind.CommonJS,target:ts.ScriptTarget.ES2022}}).outputText;
-const m={exports:{}};vm.runInNewContext(js,{module:m,exports:m.exports,require,Set,URL});const {findTrustedRelatedQuestions:find}=m.exports;
-const question=(id,stem,answer,options,extra={})=>({id,stem,answer,options,sourceType:'MOEX_PAST_EXAM',...extra});
+const Module=require('node:module'),path=require('node:path');
+const resolve=Module._resolveFilename;Module._resolveFilename=function(name,parent,...rest){if(name.startsWith('@/'))name=path.join(process.cwd(),name.slice(2));return resolve.call(this,name,parent,...rest)};
+require.extensions['.ts']=function(mod,file){mod._compile(ts.transpileModule(fs.readFileSync(file,'utf8'),{compilerOptions:{module:ts.ModuleKind.CommonJS,target:ts.ScriptTarget.ES2022,esModuleInterop:true,resolveJsonModule:true}}).outputText,file)};
+const {findTrustedRelatedQuestions:find}=require('../lib/trustedRelatedContext.ts');
+const question=(id,stem,answer,options,extra={})=>({id,stem,answer,options,subject:'組織學',chapter:'組織',section:'細胞',sourceType:'MOEX_PAST_EXAM',...extra});
 const q=question('a','陽光照射下皮膚變黑？','D',{A:'其他',D:'黑色素細胞酵素活性增加'});
 const match=question('b','曬太陽仍不變黑的黑色素異常？','A',{A:'tyrosinase 缺乏',B:'其他'});
 const unrelated=question('c','腫瘤抗原與黑色素瘤？','A',{A:'tyrosinase',B:'其他'});

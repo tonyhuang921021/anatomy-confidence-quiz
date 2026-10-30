@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import test from "node:test";
 import { buildWrongQuestionPdfHtml, collectWrongQuestionPdfItems, EMPTY_PDF_FILTERS, getPdfChapter, taiwanAnswerDate } from "./wrongQuestionPdf";
 import type { Attempt, Question, QuizSession } from "../types/quiz";
+import { DEFAULT_REVIEW_YEAR_RANGE } from "./reviewYearFilter";
 const question: Question = { id: "pdf-fixture", subject: "解剖學", chapter: "腹部", section: "腹部", stem: "測試 <script>題目</script>", options: { A: "甲", B: "乙", C: "丙", D: "丁" }, answer: "A", explanation: "不可出現的詳解", testedConcept: "", stemImage: "/question-media/demo.png" };
 const attempt = (overrides: Partial<Attempt> = {}): Attempt => ({ questionId: question.id, selectedAnswer: "B", correctAnswer: "A", isCorrect: false, confidence: 3, answeredAt: "2026-09-19T16:00:00.000Z", ...overrides });
 const session = (attempts: Attempt[], overrides: Partial<QuizSession> = {}): QuizSession => ({ id: "private-session-id", subject: "解剖學", startedAt: "2026-09-19T15:00:00.000Z", completedAt: "2026-09-20T00:00:00.000Z", attempts, ...overrides });
@@ -221,7 +222,7 @@ test("PDF source years match review years, including ROC years and unknown or AI
   });
   assert.deepEqual(narrow.items.map(({ question }) => question.id).sort(), ["new", "roc"]);
   const full = collectWrongQuestionPdfItems(histories, fixtures, EMPTY_PDF_FILTERS, {
-    ...baseScope, yearRange: { yearFrom: 2011, yearTo: 2026 }
+    ...baseScope, yearRange: DEFAULT_REVIEW_YEAR_RANGE
   });
   assert.equal(full.items.length, 5, "imported and AI questions remain available with the default full range");
 });

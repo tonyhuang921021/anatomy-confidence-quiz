@@ -1,4 +1,4 @@
-export const MIN_PRACTICE_SOURCE_YEAR = 2009;
+export const MIN_PRACTICE_SOURCE_YEAR = 2001;
 export const MAX_PRACTICE_SOURCE_YEAR = 2026;
 
 export const PRACTICE_YEAR_OPTIONS = Array.from(

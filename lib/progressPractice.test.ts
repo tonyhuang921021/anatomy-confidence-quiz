@@ -8,6 +8,7 @@ import {
   resolveProgressPracticeQuestionCount
 } from "./progressPractice";
 import type { Attempt, Question, QuizSession } from "../types/quiz";
+import { MIN_PRACTICE_SOURCE_YEAR, MAX_PRACTICE_SOURCE_YEAR } from "./practiceYears";
 
 function makeQuestion(id: string, sourceYear?: number, sourceType: Question["sourceType"] = "MOEX_PAST_EXAM"): Question {
   return {
@@ -67,7 +68,7 @@ test("章節練習會依年份排除其他考古題，未知年份只保留在�
     getProgressPracticeQuestionIds({
       questions,
       questionIds,
-      yearRange: { yearFrom: 2009, yearTo: 2026 }
+      yearRange: { yearFrom: MIN_PRACTICE_SOURCE_YEAR, yearTo: MAX_PRACTICE_SOURCE_YEAR }
     }),
     ["q-2024", "q-2025", "q-unknown"]
   );

@@ -1,4 +1,5 @@
 import type { Question, OptionKey } from '@/types/quiz';
+import { buildRelatedQuestionIndex, getRelatedQuestions } from '@/lib/relatedQuestions';
 
 // High-precision anchors, not subject names or neighboring question numbers.
 // Extend only with independently reviewed clinical concept/synonym groups.
@@ -51,22 +52,30 @@ function isUsableOfficial(q: Question, conflictingIds: ReadonlySet<string>): boo
 export function findTrustedRelatedQuestions(current: Question, corpus: readonly Question[], conflictingIds: ReadonlySet<string>, limit=3): Question[] {
   const currentKeys=acceptedKeys(current); if (!currentKeys.length) return [];
   const curated=CURATED[current.id];
+  let reviewed: Question[] = [];
   if(curated) {
     if(currentKeys.length!==1 || currentKeys[0]!==curated.sourceAnswer || !normalize(current.stem).includes(normalize(curated.sourceFragment))) return [];
     const byId = new Map(corpus.map(q=>[q.id,q]));
-    return curated.links.flatMap(link=>{
+    reviewed = curated.links.flatMap(link=>{
       const q=byId.get(link.id); if(!q || !isUsableOfficial(q,conflictingIds)) return [];
       const keys=acceptedKeys(q);
       if(keys.length!==1 || keys[0]!==link.expectedAnswer || !link.stemFragments.every(fragment=>normalize(q.stem).includes(normalize(fragment)))) return [];
       return [q];
-    }).slice(0,Math.max(0,Math.min(limit,3)));
+    });
   }
+  const max = Math.max(0, Math.min(limit, 3));
+  if (reviewed.length >= max) return reviewed.slice(0,max);
   const stemConcepts=matchedConcepts(current.stem);
   const answerConcepts=matchedConcepts(currentKeys.map(k=>current.options[k]).join(' '));
-  const focus=matchedConcepts(focusedText(current,currentKeys)); if(focus.size<2 || !stemConcepts.size) return [];
+  const focus=matchedConcepts(focusedText(current,currentKeys)); if(focus.size<2 || !stemConcepts.size) return reviewed.slice(0,max);
   const seen=new Set<string>(), candidates:{q:Question;score:number}[]=[];
-  for(const q of corpus) {
-    if(q.id===current.id || !isUsableOfficial(q,conflictingIds)) continue;
+  // Reuse the website ranking, then apply the stricter server-side evidence checks.
+  const ranked = getRelatedQuestions(current, buildRelatedQuestionIndex(corpus as Question[]), corpus.length);
+  const rankedIds = new Set(ranked.map(item => item.id));
+  // Preserve existing high-precision concept fallback when the website ranking misses synonyms.
+  const candidatesInOrder = [...ranked, ...corpus.filter(item => !rankedIds.has(item.id))];
+  for(const q of candidatesInOrder) {
+    if(q.id===current.id || reviewed.some(item=>item.id===q.id) || !isUsableOfficial(q,conflictingIds)) continue;
     const keys=acceptedKeys(q);
     const concepts=matchedConcepts(focusedText(q,keys)); let score=0; for(const x of focus) if(concepts.has(x)) score++;
     const stemMatch=[...stemConcepts].some(x=>concepts.has(x));
@@ -75,5 +84,5 @@ export function findTrustedRelatedQuestions(current: Question, corpus: readonly 
     const fingerprint=normalize(q.stem)+'\u0000'+keys.map(k=>normalize(q.options[k]??'')).sort().join('\u0000');
     if(seen.has(fingerprint)) continue;seen.add(fingerprint); candidates.push({q,score});
   }
-  return candidates.sort((a,b)=>b.score-a.score || a.q.id.localeCompare(b.q.id)).slice(0,Math.max(0,Math.min(limit,3))).map(x=>x.q);
+  return [...reviewed, ...candidates.map(x=>x.q)].slice(0,max);
 }

@@ -40,7 +40,7 @@ function buildIndex() {
   for (const paper of getAISimulationPaperOptions("全部")) {
     for (const q of getQuestionsForAISimulationPaper(paper.key, "全部")) add(q);
   }
-  return { index, conflicting };
+  return { index, conflicting, corpus: [...index.values()] };
 }
 let cachedIndex: ReturnType<typeof buildIndex> | undefined;
 
@@ -61,6 +61,6 @@ export function resolveTrustedExplanationQuestion(id: unknown): Resolution {
 export function resolveTrustedRelatedQuestions(id: string): Question[] {
   const source = resolveTrustedExplanationQuestion(id);
   if (!source.ok) return [];
-  const {index,conflicting} = cachedIndex!;
-  return findTrustedRelatedQuestions(source.question, [...index.values()], conflicting);
+  const {corpus,conflicting} = cachedIndex!;
+  return findTrustedRelatedQuestions(source.question, corpus, conflicting);
 }
