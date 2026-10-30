@@ -1,6 +1,7 @@
 import { getQuestionPrimaryTag } from "./analysisPrimaryTag";
 import { normalizeSearchText } from "./searchTextNormalization";
 import type { Question } from "@/types/quiz";
+import { CURATED } from "./reviewedRelatedLinks";
 
 type RelatedQuestionCandidate = {
   question: Question;
@@ -15,6 +16,7 @@ type RelatedQuestionCandidate = {
 };
 
 export type RelatedQuestionIndex = {
+  allQuestions: Question[];
   candidatesByPrimaryTag: Map<string, RelatedQuestionCandidate[]>;
   candidatesBySection: Map<string, RelatedQuestionCandidate[]>;
   candidatesBySubject: Map<string, RelatedQuestionCandidate[]>;
@@ -527,6 +529,7 @@ export function buildRelatedQuestionIndex(allQuestions: Question[]): RelatedQues
   }
 
   const index = {
+    allQuestions,
     candidatesByPrimaryTag,
     candidatesBySection,
     candidatesBySubject,
@@ -554,7 +557,17 @@ export function getRelatedQuestions(currentQuestion: Question, index: RelatedQue
       return left.question.id.localeCompare(right.question.id);
     });
 
-  const strictMatches = ranked.slice(0, limit).map((item) => item.question);
+  const entry = CURATED[currentQuestion.id];
+  const norm = (s: string) => s.normalize("NFKC").toLowerCase();
+  const validSingle = (q: Question, answer: string) => q.sourceType === "MOEX_PAST_EXAM" && q.answerCreditType !== "all_credit" &&
+    (q.acceptedAnswers?.length ? q.acceptedAnswers.length === 1 && q.acceptedAnswers[0] === answer : q.answer === answer) && Boolean(q.options?.[answer as keyof typeof q.options]?.trim());
+  const reviewed = entry && validSingle(currentQuestion, entry.sourceAnswer) && norm(currentQuestion.stem).includes(norm(entry.sourceFragment)) ? entry.links.flatMap(link => {
+    const matches=index.allQuestions.filter(q=>q.id===link.id); const q=matches[0];
+    if (!q || matches.some(other=>JSON.stringify([other.stem,other.options,other.answer,other.acceptedAnswers,other.answerCreditType]) !== JSON.stringify([q.stem,q.options,q.answer,q.acceptedAnswers,q.answerCreditType])) || !validSingle(q,link.expectedAnswer) || !link.stemFragments.every(fragment=>norm(q.stem).includes(norm(fragment))) || q.stemImage || Object.values(q.optionImages??{}).some(Boolean)) return [];
+    return [q];
+  }) : [];
+  const curatedIds = new Set(entry?.links.map(link=>link.id) ?? []);
+  const strictMatches = [...reviewed, ...ranked.map(item=>item.question).filter(q=>!curatedIds.has(q.id))].slice(0, limit);
   if (currentQuestion.sourceType !== "AI_GENERATED" || strictMatches.length >= limit) {
     return strictMatches;
   }
