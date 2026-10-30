@@ -98,6 +98,7 @@ export function buildOpenAITextRequest(
     input: prompt,
     max_output_tokens: maxOutputTokens,
     service_tier: "default",
+    ...(model === "gpt-6.1-sol" ? { prompt_cache_options: { mode: "explicit" } } : {}),
     ...(reasoningEffort === "low" ? { reasoning: { effort: "low" } } : {})
   };
 }
