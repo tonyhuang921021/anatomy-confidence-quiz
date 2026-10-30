@@ -504,6 +504,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           writeHistoryCloudSyncMarker(userId);
           clearHistoryCloudSyncAttemptMarker(userId);
         }
+        setSyncError("");
         setSyncStatus("ready");
         setSyncVersion((value) => value + 1);
       } catch (error) {
