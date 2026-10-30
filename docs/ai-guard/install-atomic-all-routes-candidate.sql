@@ -328,7 +328,7 @@ create function public.ai_guard_reconcile(p_ticket uuid,p_request uuid,p_seq int
 returns text language plpgsql security definer set search_path=pg_catalog,public as $$
 declare b public.ai_guard_budget%rowtype; r public.ai_guard_requests%rowtype; c public.ai_guard_calls%rowtype; a public.ai_guard_reconcile_audit%rowtype; actual numeric;
 begin
- if auth.uid() is null or p_operator is distinct from auth.uid() or not exists(select 1 from public.ai_guard_reconcile_operators ao where ao.operator_id=auth.uid() and ao.enabled) then raise exception 'reconciliation unauthorized'; end if;
+ if (coalesce(nullif(current_setting('request.jwt.claim.sub', true), ''), (nullif(current_setting('request.jwt.claims', true), '')::jsonb ->> 'sub'))::uuid) is null or p_operator is distinct from (coalesce(nullif(current_setting('request.jwt.claim.sub', true), ''), (nullif(current_setting('request.jwt.claims', true), '')::jsonb ->> 'sub'))::uuid) or not exists(select 1 from public.ai_guard_reconcile_operators ao where ao.operator_id=(coalesce(nullif(current_setting('request.jwt.claim.sub', true), ''), (nullif(current_setting('request.jwt.claims', true), '')::jsonb ->> 'sub'))::uuid) and ao.enabled) then raise exception 'reconciliation unauthorized'; end if;
  select * into b from public.ai_guard_budget where id=true for update;
  if not found then return 'unavailable'; end if;
  select * into a from public.ai_guard_reconcile_audit where ticket=p_ticket;
@@ -372,7 +372,7 @@ create function public.ai_guard_reconcile_unstarted(p_ticket uuid,p_request uuid
 returns text language plpgsql security definer set search_path=pg_catalog,public as $$
 declare b public.ai_guard_budget%rowtype; r public.ai_guard_requests%rowtype; a public.ai_guard_reconcile_audit%rowtype;
 begin
- if auth.uid() is null or p_operator is distinct from auth.uid() or not exists(select 1 from public.ai_guard_reconcile_operators ao where ao.operator_id=auth.uid() and ao.enabled) then raise exception 'reconciliation unauthorized'; end if;
+ if (coalesce(nullif(current_setting('request.jwt.claim.sub', true), ''), (nullif(current_setting('request.jwt.claims', true), '')::jsonb ->> 'sub'))::uuid) is null or p_operator is distinct from (coalesce(nullif(current_setting('request.jwt.claim.sub', true), ''), (nullif(current_setting('request.jwt.claims', true), '')::jsonb ->> 'sub'))::uuid) or not exists(select 1 from public.ai_guard_reconcile_operators ao where ao.operator_id=(coalesce(nullif(current_setting('request.jwt.claim.sub', true), ''), (nullif(current_setting('request.jwt.claims', true), '')::jsonb ->> 'sub'))::uuid) and ao.enabled) then raise exception 'reconciliation unauthorized'; end if;
  select * into b from public.ai_guard_budget where id=true for update;
  if not found then return 'unavailable'; end if;
  select * into a from public.ai_guard_reconcile_audit where ticket=p_ticket;
@@ -564,6 +564,8 @@ BEGIN
  END IF;
  CREATE ROLE ai_guard_owner NOLOGIN NOSUPERUSER NOCREATEDB NOCREATEROLE NOINHERIT NOREPLICATION NOBYPASSRLS;
 END $$;
+-- Temporary installer membership: SET only, no inherited permissions; revoked before commit.
+GRANT ai_guard_owner TO CURRENT_USER WITH SET TRUE, INHERIT FALSE;
 -- Check inherited/PUBLIC schema CREATE before any temporary direct grant.
 -- A failure rolls the entire candidate transaction back, including the new role.
 DO $$
@@ -572,10 +574,8 @@ BEGIN
   RAISE EXCEPTION 'unsafe effective schema CREATE: inspect PUBLIC grants; separate approval required for narrowly scoped schema privilege adjustment';
  END IF;
 END $$;
--- No app, authenticated, service_role or login account receives membership.
+-- No app, authenticated, or service_role receives membership. The installer's creator ADMIN membership is explicitly checked before commit.
 GRANT USAGE, CREATE ON SCHEMA public TO ai_guard_owner;
-GRANT USAGE ON SCHEMA auth TO ai_guard_owner;
-GRANT EXECUTE ON FUNCTION auth.uid() TO ai_guard_owner;
 DO $$
 DECLARE n text; sig text;
 BEGIN
@@ -627,5 +627,15 @@ CREATE POLICY ai_guard_owner_insert_overrides ON public.question_explanation_ove
 -- reviewed SECURITY DEFINER functions. Existing reviewed-write trigger remains.
 -- Snapshot installation remains SECURITY INVOKER and has no app EXECUTE grant;
 -- the approved migration operator installs the trigger under existing privileges.
+
+-- Revoke the installer-issued SET membership. PostgreSQL also creates a separate
+-- creator ADMIN membership whose grantor is the cluster bootstrap role. It remains
+-- ADMIN true, SET false, INHERIT false and must be reviewed as a residual privilege.
+REVOKE ai_guard_owner FROM CURRENT_USER;
+DO $$ BEGIN
+ IF NOT EXISTS (SELECT 1 FROM pg_auth_members m JOIN pg_roles r ON r.oid=m.roleid JOIN pg_roles u ON u.oid=m.member WHERE r.rolname='ai_guard_owner' AND u.rolname=current_user AND m.admin_option AND NOT m.set_option AND NOT m.inherit_option) OR
+ EXISTS (SELECT 1 FROM pg_auth_members m JOIN pg_roles r ON r.oid=m.roleid JOIN pg_roles u ON u.oid=m.member WHERE r.rolname='ai_guard_owner' AND (u.rolname<>current_user OR m.set_option OR m.inherit_option)) THEN
+ RAISE EXCEPTION 'unexpected owner membership'; END IF;
+END $$;
 
 COMMIT;
