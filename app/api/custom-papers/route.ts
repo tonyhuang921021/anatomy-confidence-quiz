@@ -1,4 +1,4 @@
-import { shouldPauseNonLedgerPaidAction } from "@/lib/paid-ai-maintenance.cjs";
+import { sharedPaidGuardResponse, withSharedPaidGuard } from "@/lib/sharedPaidGuard";
 import { formatRocDate } from "@/lib/rocDate";
 import { NextRequest, NextResponse } from "next/server";
 import { regradeSessionForCurrentAnswerKey } from "@/lib/answerKeyRevisions";
@@ -1167,7 +1167,6 @@ export async function POST(request: NextRequest) {
     if (!body?.action) {
       return NextResponse.json({ ok: false, message: "缺少操作類型。" }, { status: 400 });
     }
-    if ((body.action === "generate_ai_search" || body.action === "preview_ai_search") && shouldPauseNonLedgerPaidAction()) return NextResponse.json({ok:false,code:"paid_ai_maintenance",message:"此 AI 功能暫時維護，既有內容仍可使用。"},{status:503,headers:{"Cache-Control":"no-store"}});
     await ensureBundledCustomPapersSeeded(supabase);
 
     if (body.action === "generate") {
@@ -1322,7 +1321,8 @@ export async function POST(request: NextRequest) {
         );
       }
 
-      const expansion = await createOpenAIText(
+      const guardedSearch = await withSharedPaidGuard({db:supabase,actorId:actor.userId,kind:"custom_search",actionIdentity:JSON.stringify({query,effectiveSubjects,yearFrom,yearTo}),work:async(call)=>{
+      const expansion = await call(
         buildAISearchExpansionPrompt(query, effectiveSubjects),
         500
       );
@@ -1350,7 +1350,7 @@ export async function POST(request: NextRequest) {
         );
       }
 
-      const rerank = await createOpenAIText(
+      const rerank = await call(
         buildAIRerankPrompt(query, plan, candidateQuestions),
         900
       );
@@ -1371,6 +1371,10 @@ export async function POST(request: NextRequest) {
       const subjectLabels = Array.from(
         new Set(finalQuestions.map((question) => question.subject))
       );
+      return {expansion,rerank,plan,relevant,finalQuestions,subjectLabels};
+      }});
+      if (guardedSearch instanceof NextResponse) return guardedSearch;
+      const {expansion,rerank,plan,relevant,finalQuestions,subjectLabels} = guardedSearch;
 
       if (body.action === "preview_ai_search") {
         await insertAIUsageLog(supabase, {
@@ -1711,6 +1715,8 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({ ok: true });
   } catch (error) {
+    const guarded = sharedPaidGuardResponse(error);
+    if (guarded) return guarded;
     const message = formatCustomPaperErrorMessage(error);
     return NextResponse.json({ ok: false, message }, { status: 500 });
   }

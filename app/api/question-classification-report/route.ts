@@ -1,4 +1,4 @@
-import { shouldPauseNonLedgerPaidAction } from "@/lib/paid-ai-maintenance.cjs";
+import { sharedPaidGuardResponse, withSharedPaidGuard } from "@/lib/sharedPaidGuard";
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 import { createOpenAIText, isOpenAIConfigured } from "@/lib/openai";
@@ -340,7 +340,6 @@ function buildClassificationPrompt(question: NonNullable<ClassificationReportReq
 }
 
 export async function POST(request: NextRequest) {
-  if (shouldPauseNonLedgerPaidAction()) return NextResponse.json({ok:false,code:"paid_ai_maintenance",message:"AI 重新分類暫時維護，其他功能仍可使用。"},{status:503,headers:{"Cache-Control":"no-store"}});
   if (isSupabaseRecoveryMode()) {
     return NextResponse.json(
       { ok: false, message: "分類回報暫時維護中，先讓登入與同步恢復。" },
@@ -429,7 +428,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const result = await createOpenAIText(buildClassificationPrompt(question), 600);
+    const result = await withSharedPaidGuard({db:supabase,actorId:verifiedUser.id,kind:"classification",actionIdentity:JSON.stringify(question),work:(call)=>call(buildClassificationPrompt(question),600)});
     const parsed = parseClassificationPayload(result.text);
     if (!parsed?.subject || !parsed.primaryTag) {
       throw new Error("AI 回傳的分類格式不完整，請再試一次。");
@@ -494,6 +493,8 @@ export async function POST(request: NextRequest) {
       message: "已回報並依 AI 建議自動套用分類。"
     });
   } catch (error) {
+    const guarded = sharedPaidGuardResponse(error);
+    if (guarded) return guarded;
     return NextResponse.json(
       {
         ok: false,

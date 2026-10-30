@@ -1,0 +1,5 @@
+const {test}=require('node:test'),assert=require('node:assert/strict'),fs=require('fs'),vm=require('vm'),ts=require(process.cwd()+'/node_modules/typescript');
+const src=fs.readFileSync(process.cwd()+'/lib/openai.ts','utf8');
+const js=ts.transpileModule(src,{compilerOptions:{module:ts.ModuleKind.CommonJS,target:ts.ScriptTarget.ES2022}}).outputText;
+function load(tier) {let body;const mod={exports:{}};const fetch=async (_url,init)=>{body=JSON.parse(init.body);return {ok:true,json:async()=>({service_tier:tier,output:[{content:[{type:'output_text',text:'ok'}]}],usage:{input_tokens:3,output_tokens:4}})}};vm.runInNewContext(js,{module:mod,exports:mod.exports,process:{env:{OPENAI_API_KEY:'synthetic'}},fetch});return {api:mod.exports,body:()=>body}}
+test('request explicitly uses standard and validates served tier',async()=>{for(const tier of ['default','priority',undefined]){let t=load(tier);let r=await t.api.createOpenAIText('prompt',600,'gpt-6.1-sol');assert.equal(t.body().service_tier,'default');assert.equal(r.usageKnown,tier==='default')}});

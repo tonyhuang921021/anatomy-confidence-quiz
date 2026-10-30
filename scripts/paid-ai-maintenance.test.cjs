@@ -1,6 +1,0 @@
-const {test}=require('node:test'),assert=require('node:assert/strict'),fs=require('node:fs');
-const {shouldPauseNonLedgerPaidAction}=require('../lib/paid-ai-maintenance.cjs');
-test('non-ledger paid functions stay paused',()=>assert.equal(shouldPauseNonLedgerPaidAction(),true));
-for(const [file,anchor] of [['app/api/owner/question-management/route.ts','if (action === "generate_neuro_suggestions") {'],['app/api/question-classification-report/route.ts','export async function POST(request: NextRequest) {']])test(file+' pauses before provider call',()=>{const s=fs.readFileSync(file,'utf8');const p=s.indexOf(anchor), stop=s.indexOf('if (shouldPauseNonLedgerPaidAction())',p),call=s.indexOf('await createOpenAIText(',p);assert.ok(p>=0&&stop>p&&call>stop);assert.match(s.slice(stop,call),/status:503/)});
-
-test('custom paid search pauses before data seed and either provider call',()=>{const s=fs.readFileSync('app/api/custom-papers/route.ts','utf8'),post=s.slice(s.indexOf('export async function POST('));const stop=post.indexOf('&& shouldPauseNonLedgerPaidAction())'),seed=post.indexOf('await ensureBundledCustomPapersSeeded'),call=post.indexOf('await createOpenAIText(');assert.ok(stop>0 && seed>stop && call>seed)});

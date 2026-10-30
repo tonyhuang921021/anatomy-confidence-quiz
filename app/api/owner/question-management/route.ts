@@ -1,4 +1,4 @@
-import { shouldPauseNonLedgerPaidAction } from "@/lib/paid-ai-maintenance.cjs";
+import { sharedPaidGuardResponse, withSharedPaidGuard } from "@/lib/sharedPaidGuard";
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 import { getCanonicalQuestionBank } from "@/data/med1QuestionBank";
@@ -338,7 +338,6 @@ export async function POST(request: NextRequest) {
     }
 
     if (action === "generate_neuro_suggestions") {
-      if (shouldPauseNonLedgerPaidAction()) return NextResponse.json({ok:false,code:"paid_ai_maintenance",message:"此 AI 功能暫時維護，既有內容仍可使用。"},{status:503,headers:{"Cache-Control":"no-store"}});
       if (!isOpenAIConfigured()) {
         return NextResponse.json(
           { ok: false, message: "OPENAI_API_KEY 尚未設定，暫時無法生成 AI 題目連結。" },
@@ -351,10 +350,7 @@ export async function POST(request: NextRequest) {
         return NextResponse.json({ ok: false, message: "這題目前找不到合適候選題。" }, { status: 400 });
       }
 
-      const completion = await createOpenAIText(
-        buildNeuroSuggestionPrompt(question, candidates),
-        1200
-      );
+      const completion = await withSharedPaidGuard({db:supabase,actorId:access.user.id,kind:"owner_neuro",actionIdentity:question.id,work:(call)=>call(buildNeuroSuggestionPrompt(question,candidates),1200)});
       const bundle = parseNeuroSuggestionResponse(completion.text);
       if (!bundle || bundle.questionId !== question.id) {
         return NextResponse.json(
@@ -474,6 +470,8 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({ ok: false, message: "不支援的題庫管理動作。" }, { status: 400 });
   } catch (error) {
+    const guarded = sharedPaidGuardResponse(error);
+    if (guarded) return guarded;
     const message = error instanceof Error ? error.message : "題庫管理操作失敗";
     return NextResponse.json({ ok: false, message }, { status: 500 });
   }
