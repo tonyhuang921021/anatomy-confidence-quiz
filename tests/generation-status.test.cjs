@@ -1,0 +1,16 @@
+const test = require('node:test');
+const assert = require('node:assert/strict');
+const { advanceGenerationStatus: step, INITIAL_GENERATION_STATUS: initial } = require('../test-output/explanationGenerationStatus.js');
+const signal = (overrides={}) => ({ questionId:'Q1', loading:false, resultVersion:'old', ...overrides });
+test('existing result is idle, never a fake success',()=>assert.equal(step(initial,signal()).phase,'idle'));
+test('only an actual new result after loading completes',()=>{let s=step(initial,signal({loading:true}));assert.equal(s.phase,'loading');s=step(s,signal({resultVersion:'new'}));assert.equal(s.phase,'complete');assert.equal(step(s,signal({resultVersion:'new'})).phase,'complete');});
+test('failure immediately stops animation even if loading flag still true',()=>{const s=step(initial,signal({loading:true}));assert.equal(step(s,signal({loading:true,error:'服務暫停',resultVersion:'new'})).phase,'idle');});
+test('cancel/stop without new result does not celebrate',()=>{const s=step(initial,signal({loading:true}));assert.equal(step(s,signal()).phase,'idle');});
+test('switching questions never carries a completion',()=>{let s=step(initial,signal({loading:true}));s=step(s,signal({resultVersion:'new'}));assert.equal(step(s,signal({questionId:'Q2',resultVersion:'new'})).phase,'idle');});
+test('retry captures new baseline, no repeated or automatic request',()=>{let s=step(initial,signal({loading:true}));s=step(s,signal({resultVersion:'new'}));s=step(s,signal({loading:true,resultVersion:'new'}));assert.equal(s.baseline,'new');assert.equal(step(s,signal({resultVersion:'new'})).phase,'idle');});
+test('fresh first result completes and a cleared result hides status',()=>{let s=step(initial,signal({loading:true,resultVersion:null}));s=step(s,signal({resultVersion:'first'}));assert.equal(s.phase,'complete');assert.equal(step(s,signal({resultVersion:null})).phase,'idle');});
+test('unrelated loading renders retain original baseline',()=>{let s=step(initial,signal({loading:true}));s=step(s,signal({loading:true,resultVersion:'new'}));assert.equal(s.baseline,'old');assert.equal(step(s,signal({resultVersion:'new'})).phase,'complete');});
+const fs = require('fs');
+const component=fs.readFileSync('components/ExplanationGenerationStatus.tsx','utf8');
+const css=fs.readFileSync('components/ExplanationGenerationStatus.module.css','utf8');
+test('decorative, reduced motion, accessible real lifecycle, no network/timers/progress fiction',()=>{assert.match(component,/aria-hidden="true"/);assert.match(component,/role="status"/);assert.match(component,/aria-busy/);assert.match(css,/prefers-reduced-motion:reduce/);assert.doesNotMatch(component,/fetch\(|setTimeout|setInterval|progressbar|百分|搜尋中|分析中/);});

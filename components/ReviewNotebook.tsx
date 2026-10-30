@@ -1,5 +1,7 @@
 "use client";
 
+import { ExplanationGenerationStatus } from "@/components/ExplanationGenerationStatus";
+
 import { formatRocDate } from "@/lib/rocDate";
 
 
@@ -1577,6 +1579,7 @@ export function ReviewNotebook({
                           : null;
                         return (
                           <>
+                            <ExplanationGenerationStatus key={renderedQuestion.id} questionId={renderedQuestion.id} loading={explanationLoadingMap[renderedQuestion.id]} error={explanationErrorMap[renderedQuestion.id]} resultVersion={explanationOverrides[renderedQuestion.id]?.updatedAt} />
                             <div className="space-y-3">
                               {manualEditingEnabled && isManualEditMode ? (
                                 <div className="flex justify-end">

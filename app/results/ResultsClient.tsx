@@ -1,5 +1,7 @@
 "use client";
 
+import { ExplanationGenerationStatus } from "@/components/ExplanationGenerationStatus";
+
 import { getOfficialPaperKeyFromQuestionId, getOfficialPaperKey } from "@/lib/officialPaperIdentity";
 import { getVerifiedEightyQuestionPaper } from "@/lib/officialPaperRules";
 import { inferSimulationPaperKey } from "@/lib/simulationPaperStats";
@@ -2460,6 +2462,7 @@ function ResultsPageContent() {
             </div>
           ) : null}
         </div>
+        <ExplanationGenerationStatus key={question.id} questionId={question.id} loading={explanationLoadingMap[question.id]} error={explanationErrorMap[question.id]} resultVersion={explanationOverrides[question.id]?.updatedAt} />
         <QuestionAiMetadataBadges question={question} className="mb-3" />
         <StructuredExplanationText
           text={question.explanation}

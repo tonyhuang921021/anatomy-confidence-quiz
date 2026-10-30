@@ -3,6 +3,7 @@
 import { hasReviewedExplanation } from "@/lib/reviewedExplanations";
 import { ReviewedExplanation } from "@/components/ReviewedExplanation";
 import { VerifiedExplanationFigures } from "@/components/VerifiedExplanationFigures";
+import { ReviewedExplanationSupplement } from "@/components/ReviewedExplanationSupplement";
 import { splitInlineExplanationEmphasis } from "@/lib/inlineExplanationEmphasis";
 
 function InlineEmphasis({ text }: { text: string }) {
@@ -339,6 +340,7 @@ export function StructuredExplanationText({
           </section>
         ))}
       </div>
+      {questionId ? <ReviewedExplanationSupplement questionId={questionId} /> : null}
     </div>
   );
 }

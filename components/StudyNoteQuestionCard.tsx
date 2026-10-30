@@ -1,5 +1,7 @@
 "use client";
 
+import { ExplanationGenerationStatus } from "@/components/ExplanationGenerationStatus";
+
 import { getQuestionAnswerLabel } from "@/lib/answerScoring";
 
 import { useState } from "react";
@@ -183,6 +185,7 @@ export function StudyNoteQuestionCard({ question, link, title }: Props) {
                 ? "重新替換詳解"
                 : "用 AI 補詳解"}
           </button> : null}
+          <ExplanationGenerationStatus key={question.id} questionId={question.id} loading={explanationLoading} error={explanationError} resultVersion={explanationOverride?.updatedAt} />
           {explanationError ? (
             <p className="mt-3 rounded-2xl bg-rose-50 px-3 py-2 text-xs font-semibold leading-5 text-rose-700">
               {explanationError}

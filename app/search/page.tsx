@@ -1,5 +1,7 @@
 "use client";
 
+import { ExplanationGenerationStatus } from "@/components/ExplanationGenerationStatus";
+
 import { formatRocYear } from "@/lib/rocDate";
 import { getOfficialPaperDisplayCode } from "@/lib/officialPaperIdentity";
 
@@ -1251,6 +1253,7 @@ function SearchPageContent() {
                   )
                 ) : null}
 
+                <ExplanationGenerationStatus key={renderedQuestion.id} questionId={renderedQuestion.id} loading={loading} error={error} resultVersion={override?.updatedAt} />
                 {shouldShowAnswer ? (
                   <StructuredExplanationText text={renderedQuestion.explanation} label="詳解" compact questionId={renderedQuestion.id} />
                 ) : null}

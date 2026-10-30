@@ -1,5 +1,7 @@
 "use client";
 
+import { ExplanationGenerationStatus } from "@/components/ExplanationGenerationStatus";
+
 import { getQuestionAnswerLabel } from "@/lib/answerScoring";
 
 import Link from "next/link";
@@ -1766,6 +1768,7 @@ export default function SubjectNotesPage() {
                           </button>
                         ) : null}
                       </div>
+                      <ExplanationGenerationStatus key={question.id} questionId={question.id} loading={explanationLoading} error={explanationError} resultVersion={override?.updatedAt} />
                       {explanationError ? (
                         <p className="mt-3 rounded-2xl bg-rose-50 px-3 py-2 text-xs font-semibold leading-5 text-rose-700">
                           {explanationError}
