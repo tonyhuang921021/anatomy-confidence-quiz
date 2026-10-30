@@ -15,6 +15,6 @@ function Figure({ figure }: {figure: VerifiedExplanationFigure}) {
     </figcaption>
   </figure>;
 }
-export function VerifiedExplanationFigures({questionId, explanation}:{questionId:string; explanation:string}) {
-  return <>{getVerifiedExplanationFigures(questionId, explanation).map((figure) => <Figure key={figure.asset} figure={figure}/>)}</>;
+export function VerifiedExplanationFigures({questionId}:{questionId:string}) {
+  return <>{getVerifiedExplanationFigures(questionId).map((figure) => <Figure key={figure.asset} figure={figure}/>)}</>;
 }

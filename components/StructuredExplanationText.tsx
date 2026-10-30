@@ -176,6 +176,15 @@ function parseExplanationBlocks(text: string): ExplanationBlock[] {
   return blocks.length > 0 ? blocks : [{ type: "paragraph", text }];
 }
 
+// Replace only this exact, already-reviewed Q1 comparison in presentation; stored text is untouched.
+function isOriginalHipDirectionTable(block: ExplanationBlock): boolean {
+  if (block.type !== "table") return false;
+  return JSON.stringify([block.headers, block.rows]) === JSON.stringify([
+    ["動作", "以解剖姿勢為基準的方向"],
+    [["屈曲", "大腿向前抬起"], ["伸展", "大腿向後移動"], ["外展", "大腿遠離正中矢狀面"], ["內收", "大腿靠近正中矢狀面"], ["內旋", "股骨繞長軸旋轉，使大腿前表面轉向內側"]]
+  ]);
+}
+
 function buildExplanationSections(blocks: ExplanationBlock[]): ExplanationSection[] {
   const sections: ExplanationSection[] = [];
 
@@ -231,7 +240,9 @@ export function StructuredExplanationText({
   const trimmedText = text?.trim();
   if (!trimmedText) return null;
 
-  const blocks = parseExplanationBlocks(trimmedText);
+  const blocks = parseExplanationBlocks(trimmedText).filter(block =>
+    questionId !== "MOEX-C217-091030-S4004-STAGE1-Q001" || !isOriginalHipDirectionTable(block)
+  );
   const allSections = buildExplanationSections(blocks);
   let sections = sectionFilter
     ? allSections.filter((section, index) => sectionFilter(section, index))
@@ -271,7 +282,7 @@ export function StructuredExplanationText({
           {label}
         </p>
       ) : null}
-      {questionId ? <VerifiedExplanationFigures questionId={questionId} explanation={trimmedText} /> : null}
+      {questionId ? <VerifiedExplanationFigures questionId={questionId} /> : null}
       <div className="w-full max-w-[52rem] min-w-0 space-y-4 sm:space-y-5">
         {sections.map((section, index) => (
           <section

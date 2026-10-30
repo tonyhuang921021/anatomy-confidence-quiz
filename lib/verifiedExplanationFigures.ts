@@ -43,13 +43,7 @@ export function validVerifiedFigure(figure: VerifiedExplanationFigure): boolean 
   catch { return false; }
 }
 
-export function getVerifiedExplanationFigures(questionId: string, explanation = ''): readonly VerifiedExplanationFigure[] {
-  const direct = verifiedFigures[questionId];
-  if (direct) return direct.filter(validVerifiedFigure);
-  // Reuse a reviewed figure only for a closely matching concept pair; never use a model-supplied URL.
-  const candidates: string[] = [];
-  if (/髖關節/.test(explanation) && /屈曲|伸展/.test(explanation)) candidates.push('MOEX-C217-091030-S4004-STAGE1-Q001');
-  if (/黑色素/.test(explanation) && /酪胺酸酶|黑色素體/.test(explanation)) candidates.push('MOEX-C217-091030-S4004-STAGE1-Q002');
-  if (/血漿/.test(explanation) && /血球|紅血球/.test(explanation)) candidates.push('MOEX-C217-091030-S4004-STAGE1-Q003');
-  return candidates.flatMap(id => verifiedFigures[id] ?? []).filter(validVerifiedFigure);
+export function getVerifiedExplanationFigures(questionId: string): readonly VerifiedExplanationFigure[] {
+  // Never infer image relevance from generated prose. Only independently reviewed question-ID mappings are shown.
+  return (verifiedFigures[questionId] ?? []).filter(validVerifiedFigure);
 }
