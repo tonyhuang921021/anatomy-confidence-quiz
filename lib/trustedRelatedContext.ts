@@ -37,6 +37,9 @@ const CURATED: Readonly<Record<string, {sourceFragment:string; sourceAnswer:Opti
   'MOEX-C217-091030-S4004-STAGE1-Q001': {sourceFragment:'臀關節的屈曲動作',sourceAnswer:'B',links:[
     {id:'MOEX-114090-1301-Q028',expectedAnswer:'D',stemFragments:['大腿前肌群','何動作']}
   ]},
+  'MOEX-114090-1301-Q028': {sourceFragment:'大腿前肌群',sourceAnswer:'D',links:[
+    {id:'MOEX-C217-091030-S4004-STAGE1-Q001',expectedAnswer:'B',stemFragments:['臀關節的屈曲動作']}
+  ]},
   'MOEX-C217-091030-S4004-STAGE1-Q002': {sourceFragment:'陽光照射下皮膚會變黑',sourceAnswer:'D',links:[
     {id:'MOEX-101030-2101-Q048',expectedAnswer:'A',stemFragments:['黑色素合成','曬太陽']}
   ]},

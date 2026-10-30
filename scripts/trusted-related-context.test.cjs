@@ -23,6 +23,8 @@ assert.equal(find(question('z','完全不相關？','A',{A:'其他'}),[match],ne
 const hip=question('MOEX-C217-091030-S4004-STAGE1-Q001','臀關節的屈曲動作會使下肢：','B',{A:'離開',B:'向前'});
 const thigh=question('MOEX-114090-1301-Q028','下列何動作不是大腿前肌群的作用？','D',{A:'彎曲髖關節',B:'外旋',C:'伸膝',D:'伸直髖關節'});
 assert.deepEqual(Array.from(find(hip,[thigh],new Set()).map(x=>x.id)),[thigh.id]);
+assert.deepEqual(Array.from(find(thigh,[hip],new Set()).map(x=>x.id)),[hip.id]);
+assert.equal(find(thigh,[{...hip,answer:'A'}],new Set()).length,0);
 assert.equal(find(hip,[{...thigh,answer:'A'}],new Set()).length,0);
 assert.equal(find(hip,[{...thigh,stem:'無關的大腿前肌群題'}],new Set()).length,0);
 assert.equal(find(hip,[thigh],new Set([thigh.id])).length,0);
