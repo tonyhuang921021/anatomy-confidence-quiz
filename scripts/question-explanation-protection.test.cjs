@@ -34,6 +34,7 @@ function loader(globals = {}, mocks = {}) {
 let sideEffects=0;
 const forbidden=()=>{sideEffects++;throw new Error('Unexpected model/database operation');};
 const load=loader({}, {
+ '@/lib/figureQueueRuntime.cjs':{captureEnabled:()=>false},
  '@/lib/trustedQuestionLoader':{resolveTrustedExplanationQuestion:forbidden,resolveTrustedRelatedQuestions:forbidden},
  'next/server':{NextResponse:{json:(body,options={})=>({body,status:options.status??200,headers:options.headers})}},
  '@supabase/supabase-js':{createClient:forbidden},

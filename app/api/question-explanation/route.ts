@@ -1,4 +1,5 @@
 import { createHash } from "node:crypto";
+import { captureEnabled } from "@/lib/figureQueueRuntime.cjs";
 import reviewedIndex from "@/data/reviewedExplanationIndex.json";
 import { handleExplanation, formatAcceptedAnswer } from "@/lib/explanation-orchestrator.cjs";
 import { resolveTrustedExplanationQuestion, resolveTrustedRelatedQuestions } from "@/lib/trustedQuestionLoader";
@@ -745,6 +746,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ok:false,code:"safe_configuration_missing",message:"AI 詳解暫時不可用，既有詳解不受影響。"},{status:503});
   }
   const db = createClient(url, serviceRole || anonKey!, {auth:{persistSession:false,autoRefreshToken:false}});
+  const figureQueue=captureEnabled(process.env,url);
   let actorId = "", verifiedEmail = "";
   // Source commit identifies the reviewed index, independently of deployment commit.
   // Keep it while the verified index is identical; change it only with an atomic,
@@ -803,7 +805,7 @@ export async function POST(request: NextRequest) {
           if (until > Date.now() && !isBypassEmail(verifiedEmail)) return {ok:false,code:"account_banned"};
         }
         const id = crypto.randomUUID();
-        const {data,error} = await withServerTimeout(db.rpc("ai_guard_reserve",{p_id:id,p_actor:actor,p_question:questionId,p_manifest_sha256:reviewedManifestSha,p_source_commit:reviewedSourceCommit}),1600,"預算預留逾時");
+        const {data,error} = await withServerTimeout(db.rpc(figureQueue ? "figure_guard_reserve" : "ai_guard_reserve",{p_id:id,p_actor:actor,p_question:questionId,p_manifest_sha256:reviewedManifestSha,p_source_commit:reviewedSourceCommit}),1600,"預算預留逾時");
         if (error || data !== "reserved") return {ok:false,code:typeof data === "string" ? data : "reservation_unavailable"};
         const fetched = await withServerTimeout(db.rpc("ai_guard_read_reservation",{p_id:id,p_actor:actor}),1600,"預留驗證逾時");
         const row = Array.isArray(fetched.data) ? fetched.data[0] : fetched.data;
@@ -819,7 +821,7 @@ export async function POST(request: NextRequest) {
         return {ok:true,leaseId:id,fence:id,actorId:actor,model,mode,maxCalls:1,ceiling};
       },
       cancelIfShared: async (g:any) => {
-        const {data,error} = await withServerTimeout(db.rpc("ai_guard_cancel_if_cached",{p_id:g.leaseId,p_actor:actorId}),1600,"預留取消逾時");
+        const {data,error} = await withServerTimeout(db.rpc(figureQueue ? "figure_guard_cancel_if_cached" : "ai_guard_cancel_if_cached",{p_id:g.leaseId,p_actor:actorId}),1600,"預留取消逾時");
         return !error && data === "cancelled";
       },
       start: async (g:any, seq:number) => {
@@ -847,13 +849,13 @@ export async function POST(request: NextRequest) {
         return !error && data === "settled";
       },
       insertIfAbsentFenced: async (g:any, id:string, result:any) => {
-        const {data,error} = await withServerTimeout(db.rpc("ai_guard_commit",{p_id:g.leaseId,p_actor:actorId,p_explanation:result.explanation,p_option_analysis:result.optionAnalysis,p_memory_tip:result.memoryTip ?? ""}),1600,"共享詳解寫入逾時");
+        const {data,error} = await withServerTimeout(db.rpc(figureQueue ? "figure_guard_commit" : "ai_guard_commit",{p_id:g.leaseId,p_actor:actorId,p_explanation:result.explanation,p_option_analysis:result.optionAnalysis,p_memory_tip:result.memoryTip ?? ""}),1600,"共享詳解寫入逾時");
         const row = Array.isArray(data) ? data[0] : data;
         if (error || !row || row.question_id !== id || !["inserted","existing"].includes(row.status)) return null;
         return {inserted:row.status === "inserted",winner:{explanation:row.explanation,optionAnalysis:row.option_analysis ?? {},memoryTip:row.memory_tip ?? "",model:row.model}};
       },
       close: async (g:any) => {
-        const {data,error} = await withServerTimeout(db.rpc("ai_guard_close",{p_id:g.leaseId}),1600,"預留結束逾時");
+        const {data,error} = await withServerTimeout(db.rpc(figureQueue ? "figure_guard_close" : "ai_guard_close",{p_id:g.leaseId}),1600,"預留結束逾時");
         if (error || data !== "closed") throw new Error("預留結束未確認，請稍後由管理員對帳。");
       }
     });
@@ -865,7 +867,11 @@ export async function POST(request: NextRequest) {
       budget:"本階段額度已用完，既有詳解仍可閱讀。", question_busy:"此題正在產生，請稍後再試。",
       actor_busy:"此帳號已有請求進行中。", cooldown:"請稍後再試。", rate:"目前使用次數已達限制，請稍後再試。"
     };
-    if (outcome.status === 200 && outcome.value) return NextResponse.json({ok:true,configured:true,sharedSaved:true,...outcome.value});
+    if (outcome.status === 200 && outcome.value) {
+      // The opt-in queue is written transactionally by figure_guard_commit;
+      // request completion never starts a best-effort background search.
+      return NextResponse.json({ok:true,configured:true,sharedSaved:true,...outcome.value});
+    }
     return NextResponse.json({ok:false,code:outcome.code,recoverable:true,message:messages[outcome.code] || "暫時無法產生詳解，既有詳解不受影響。"},{status:outcome.status});
   } catch (error) {
     console.error("question_explanation_safe_candidate_error",error instanceof Error ? error.message : "unknown");

@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { randomUUID } from "node:crypto";
 import { createClient } from "@supabase/supabase-js";
+import { waitUntil } from "@vercel/functions";
+import { scheduleFigureWorker } from "@/lib/figureQueueRuntime.cjs";
 import { isSupabaseRecoveryMode } from "@/lib/supabase/recoveryMode";
 import {
   isServerTimeoutError,
@@ -258,6 +260,10 @@ export async function GET(request: NextRequest) {
       { status: 503, headers: { "Cache-Control": "no-store" } }
     );
   }
+
+  // Existing cron authorization and recovery checks ran above. A disabled
+  // figure worker adds no calls; errors cannot alter the rollup response.
+  scheduleFigureWorker({env:process.env,db:supabase,waitUntil,report:message=>console.error(message)});
 
   const leaseOwner = randomUUID();
   let leaseAcquired = false;

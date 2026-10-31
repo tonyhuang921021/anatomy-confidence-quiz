@@ -1,5 +1,6 @@
 'use client';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import { safeApprovedMeta } from '@/lib/approvedFigureSecurity';
 import { getVerifiedExplanationFigures, type VerifiedExplanationFigure } from '@/lib/verifiedExplanationFigures';
 
 function Figure({ figure }: {figure: VerifiedExplanationFigure}) {
@@ -16,5 +17,9 @@ function Figure({ figure }: {figure: VerifiedExplanationFigure}) {
   </figure>;
 }
 export function VerifiedExplanationFigures({questionId}:{questionId:string}) {
-  return <>{getVerifiedExplanationFigures(questionId).map((figure) => <Figure key={figure.asset} figure={figure}/>)}</>;
+  const [approved,setApproved]=useState<VerifiedExplanationFigure[]>([]);
+  useEffect(()=>{setApproved([]);if(process.env.NEXT_PUBLIC_FIGURE_REVIEW_RENDER!=='1')return;let cancelled=false;
+    fetch(`/api/approved-figures?questionId=${encodeURIComponent(questionId)}`,{cache:'no-store'}).then(r=>r.ok?r.json():{figures:[]}).then(data=>{if(cancelled)return;const items=Array.isArray(data.figures)?data.figures.filter(safeApprovedMeta).slice(0,3):[];setApproved(items.map((x:any)=>({asset:`/api/approved-figures/${x.id}`,alt:x.section_title,caption:x.section_title,sourceUrl:x.source_url,licenseUrl:x.license_url,license:x.license,attribution:x.attribution})))}).catch(()=>{if(!cancelled)setApproved([])});return()=>{cancelled=true};
+  },[questionId]);
+  return <>{[...getVerifiedExplanationFigures(questionId),...approved].map((figure) => <Figure key={figure.asset} figure={figure}/>)}</>;
 }
