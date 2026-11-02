@@ -18,6 +18,14 @@ begin
  needs:=jsonb_set(needs,'{items,0,query}','"carotid sheath anatomy"');
  needs:=jsonb_set(needs,'{items,0,catalogRevision}','"carotid-sheath-v1"');
  if public.figure_image_review(req,repeat('a',64),needs,actor)<>'approved' then raise exception 'review failed'; end if;
+ update public.figure_queue_jobs set needs_state='awaiting' where request_id=req;
+ needs:=jsonb_set(needs,'{reviewMethod}','"schema_query"');
+ needs:=jsonb_set(needs,'{items,0,searchScope}','"general-medical"');
+ needs:=jsonb_set(needs,'{items,0,medicalDomain}','"physiology"');
+ needs:=jsonb_set(needs,'{items,0,query}','"renal countercurrent mechanism"');
+ needs:=jsonb_set(needs,'{items,0,proposedQuery}','"renal countercurrent mechanism"');
+ needs:=jsonb_set(needs,'{items,0,catalogRevision}','"schema-query-v1"');
+ if public.figure_image_review(req,repeat('a',64),needs,null,'schema_query')<>'approved' then raise exception 'automatic general query failed'; end if;
  if not exists(select 1 from public.figure_queue_claim(lease,60)) then raise exception 'reviewed job not claimed'; end if;
  update public.figure_image_limits set max_searches=1 where id=true;
  if not public.figure_image_reserve(req,lease,repeat('c',64),'search') then raise exception 'first reservation failed'; end if;
