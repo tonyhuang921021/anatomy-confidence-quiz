@@ -1,4 +1,5 @@
 "use client";
+import {requestExplanation} from "@/lib/explanationRequestClient";
 
 import { ExplanationGenerationStatus } from "@/components/ExplanationGenerationStatus";
 
@@ -829,6 +830,8 @@ export default function QuizPage() {
   const [session, setSession] = useState<QuizSession | null>(null);
   const [classificationOverrides, setClassificationOverrides] = useState<Record<string, QuestionClassificationOverride>>({});
   const [explanationOverrides, setExplanationOverrides] = useState<Record<string, QuestionExplanationOverride>>({});
+  useEffect(()=>{const recover=(event:Event)=>{const {id,saved}=(event as CustomEvent).detail;const override={...saved,updatedAt:new Date().toISOString()};saveQuestionExplanationOverride(id,override);setExplanationOverrides(current=>({...current,[id]:override}));setExplanationErrorMap(current=>({...current,[id]:''}));};window.addEventListener('explanation-recovered',recover);return()=>window.removeEventListener('explanation-recovered',recover)},[]);
+
   const [explanationLoadingMap, setExplanationLoadingMap] = useState<Record<string, boolean>>({});
   const [explanationErrorMap, setExplanationErrorMap] = useState<Record<string, string>>({});
   const [classificationReportLoadingMap, setClassificationReportLoadingMap] = useState<Record<string, boolean>>({});
@@ -2214,7 +2217,7 @@ export default function QuizPage() {
     if (!authSession?.access_token) {
       setExplanationErrorMap((current) => ({
         ...current,
-        [question.id]: "請先登入帳號，才能使用 AI 補詳解。"
+        [question.id]: "請先登入帳號，才能使產生圖文詳解。"
       }));
       return;
     }
@@ -2235,7 +2238,7 @@ export default function QuizPage() {
     const previousQuestion = findPreviousQuestionForContinuation(sourceQuestion, sourceQuestionSet);
 
     try {
-      const response = await fetch("/api/question-explanation", {
+      const response = await requestExplanation("/api/question-explanation", {
         method: "POST",
         headers: {
           "Content-Type": "application/json"
@@ -2782,6 +2785,7 @@ export default function QuizPage() {
                         question={currentQuestion}
                         className="mb-3"
                       />
+                      {!hasReviewedExplanation(currentQuestion.id)&&!currentExplanationOverride&&<button type="button" disabled={currentExplanationLoading} onClick={()=>void handleGenerateQuestionExplanation(currentQuestion,submittedAttempt)} className="mb-3 min-h-11 rounded-xl bg-brand-700 px-4 py-2 font-semibold text-white disabled:opacity-60">{currentExplanationLoading?'詳解生成中…':'產生圖文詳解'}</button>}
                       {shouldShowAiExplanationDetails ? (
                         <StructuredExplanationText text={currentQuestion.explanation} label="整題詳解" compact questionId={currentQuestion.id} />
                       ) : null}
@@ -2814,7 +2818,7 @@ export default function QuizPage() {
                                   disabled={currentExplanationLoading}
                                   className="flex min-h-10 items-center px-3 py-2 text-sm font-semibold text-slate-700 transition hover:bg-slate-50 disabled:cursor-wait disabled:opacity-60"
                                 >
-                                  {currentExplanationLoading ? "重新生成中..." : "重新替換詳解"}
+                                  {currentExplanationLoading ? "讀取中..." : "重新讀取詳解"}
                                 </button>
                               </>
                             ) : !hasReviewedExplanation(currentQuestion.id) ? (
@@ -2824,7 +2828,7 @@ export default function QuizPage() {
                                 disabled={currentExplanationLoading}
                                 className="flex min-h-10 items-center px-3 py-2 text-sm font-semibold text-slate-700 transition hover:bg-slate-50 disabled:cursor-wait disabled:opacity-60"
                               >
-                                {currentExplanationLoading ? "AI 生成中..." : "用 AI 補詳解"}
+                                {currentExplanationLoading ? "AI 生成中..." : "產生圖文詳解"}
                               </button>
                             ) : null}
                             <QuestionReportButton

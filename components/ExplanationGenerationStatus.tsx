@@ -1,5 +1,6 @@
 "use client";
 
+import {pendingExplanation,recoverPendingExplanation,explanationTiming} from "@/lib/explanationRequestClient";
 import { useEffect, useState } from "react";
 import {
   advanceGenerationStatus,
@@ -10,11 +11,15 @@ import styles from "./ExplanationGenerationStatus.module.css";
 
 export function ExplanationGenerationStatus({ questionId, loading, error, resultVersion }: GenerationSignal) {
   const [state, setState] = useState(INITIAL_GENERATION_STATUS);
-  const signal = { questionId, loading, error, resultVersion };
+  const [recovering,setRecovering]=useState(false);const [elapsed,setElapsed]=useState(0);
+  useEffect(()=>{if(loading||!pendingExplanation(questionId))return;let cancelled=false,timer:ReturnType<typeof setTimeout>;let checks=0;setRecovering(true);const check=async()=>{try{if(await recoverPendingExplanation(questionId)){if(!cancelled)setRecovering(false);return}}catch{}if(cancelled)return;if(++checks<24)timer=setTimeout(check,5000);else setRecovering(false)};void check();return()=>{cancelled=true;clearTimeout(timer)}},[questionId,loading]);
+  useEffect(()=>{if(!loading&&!recovering)return;const start=pendingExplanation(questionId)||Date.now();const tick=()=>setElapsed(Math.max(0,Math.floor((Date.now()-start)/1000)));tick();const timer=setInterval(tick,1000);return()=>clearInterval(timer)},[questionId,loading,recovering]);
+  const activeLoading=loading||recovering;
+  const signal = { questionId, loading:activeLoading, error, resultVersion };
   const next = advanceGenerationStatus(state, signal);
   useEffect(() => {
-    setState((previous) => advanceGenerationStatus(previous, { questionId, loading, error, resultVersion }));
-  }, [questionId, loading, error, resultVersion]);
+    setState((previous) => advanceGenerationStatus(previous, { questionId, loading:activeLoading, error, resultVersion }));
+  }, [questionId, activeLoading, error, resultVersion]);
 
   if (next.phase === "idle") return null;
   const complete = next.phase === "complete";
@@ -48,8 +53,8 @@ export function ExplanationGenerationStatus({ questionId, loading, error, result
         {complete && <path className={styles.sparkle} d="m96 20 2 5 5 2-5 2-2 5-2-5-5-2 5-2Z" fill="#dfb758" />}
       </svg>
       <div className={styles.copy}>
-        <span className={styles.label}>{complete ? "詳解完成" : "詳解生成中"}</span>
-        <span className={styles.caption}>{complete ? "可以開始看了" : "小貓陪你等一下"}</span>
+        <span className={styles.label}>{complete ? "詳解完成" : recovering ? "正在確認既有請求" : "詳解生成中"}</span>
+        <span className={styles.caption}>{complete ? `可開始閱讀${explanationTiming(questionId)?.textMs ? " · "+(explanationTiming(questionId).textMs/1000).toFixed(1)+" 秒" : ""}` : `${elapsed} 秒 · ${elapsed>=60?"仍在處理，可離開後返回查看":"文字完成後會先顯示，圖片另行核對"}`}</span>
       </div>
     </div>
   );

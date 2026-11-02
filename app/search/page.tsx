@@ -1,4 +1,5 @@
 "use client";
+import {requestExplanation} from "@/lib/explanationRequestClient";
 
 import { ExplanationGenerationStatus } from "@/components/ExplanationGenerationStatus";
 
@@ -174,6 +175,8 @@ function SearchPageContent() {
   const [answerDisplayMode, setAnswerDisplayMode] = useState<SearchAnswerDisplayMode>("practice");
   const [revealedAnswerIds, setRevealedAnswerIds] = useState<Record<string, boolean>>({});
   const [explanationOverrides, setExplanationOverrides] = useState<Record<string, QuestionExplanationOverride>>({});
+  useEffect(()=>{const recover=(event:Event)=>{const {id,saved}=(event as CustomEvent).detail;const override={...saved,updatedAt:new Date().toISOString()};saveQuestionExplanationOverride(id,override);setExplanationOverrides(current=>({...current,[id]:override}));setExplanationErrorMap(current=>({...current,[id]:''}));};window.addEventListener('explanation-recovered',recover);return()=>window.removeEventListener('explanation-recovered',recover)},[]);
+
   const [explanationLoadingMap, setExplanationLoadingMap] = useState<Record<string, boolean>>({});
   const [explanationErrorMap, setExplanationErrorMap] = useState<Record<string, string>>({});
   const [classificationReportLoadingMap, setClassificationReportLoadingMap] = useState<Record<string, boolean>>({});
@@ -591,7 +594,7 @@ function SearchPageContent() {
     if (!session?.access_token) {
       setExplanationErrorMap((current) => ({
         ...current,
-        [question.id]: "請先登入帳號，才能使用 AI 補詳解。"
+        [question.id]: "請先登入帳號，才能使產生圖文詳解。"
       }));
       return;
     }
@@ -603,7 +606,7 @@ function SearchPageContent() {
     const sourceQuestion = findQuestionSource(question, allQuestions);
 
     try {
-      const response = await fetch("/api/question-explanation", {
+      const response = await requestExplanation("/api/question-explanation", {
         method: "POST",
         headers: {
           "Content-Type": "application/json"
@@ -1241,10 +1244,7 @@ function SearchPageContent() {
                     <div className="mt-4 flex justify-center">
                       <button
                         type="button"
-                        onClick={() => setRevealedAnswerIds((current) => ({
-                          ...current,
-                          [renderedQuestion.id]: true
-                        }))}
+                        onClick={() => {setRevealedAnswerIds(current=>({...current,[renderedQuestion.id]:true}));if(!hasReviewedExplanation(renderedQuestion.id)&&!override)void handleGenerateQuestionExplanation(renderedQuestion);}}
                         className="min-h-11 rounded-xl bg-slate-900 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-slate-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 focus-visible:ring-offset-2"
                       >
                         顯示答案與詳解
@@ -1305,7 +1305,7 @@ function SearchPageContent() {
                               disabled={loading}
                               className="flex min-h-10 items-center px-3 py-2 text-sm font-semibold text-slate-700 transition hover:bg-slate-50 disabled:cursor-wait disabled:opacity-60"
                             >
-                              {loading ? "重新生成中..." : "重新替換詳解"}
+                              {loading ? "讀取中..." : "重新讀取詳解"}
                             </button>
                           </>
                         ) : !hasReviewedExplanation(renderedQuestion.id) ? (
@@ -1315,7 +1315,7 @@ function SearchPageContent() {
                             disabled={loading}
                             className="flex min-h-10 items-center px-3 py-2 text-sm font-semibold text-slate-700 transition hover:bg-slate-50 disabled:cursor-wait disabled:opacity-60"
                           >
-                            {loading ? "AI 生成中..." : "用 AI 補詳解"}
+                            {loading ? "AI 生成中..." : "產生圖文詳解"}
                           </button>
                         ) : null}
                         <QuestionReportButton

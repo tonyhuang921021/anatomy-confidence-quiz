@@ -1,10 +1,11 @@
 "use client";
+import {requestExplanation} from "@/lib/explanationRequestClient";
 
 import { ExplanationGenerationStatus } from "@/components/ExplanationGenerationStatus";
 
 import { getQuestionAnswerLabel } from "@/lib/answerScoring";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { CopyQuestionPromptButton } from "@/components/CopyQuestionPromptButton";
 import { FormattedQuestionText } from "@/components/FormattedQuestionText";
 import { QuestionPrimaryTagBadge } from "@/components/QuestionPrimaryTagBadge";
@@ -35,6 +36,7 @@ export function StudyNoteQuestionCard({ question, link, title }: Props) {
   const [explanationOverride, setExplanationOverride] = useState<QuestionExplanationOverride | null>(() =>
     question ? loadQuestionExplanationOverride(question.id) ?? null : null
   );
+  useEffect(()=>{const recover=(event:Event)=>{const {id,saved}=(event as CustomEvent).detail;if(id===question?.id)setExplanationOverride({...saved,updatedAt:new Date().toISOString()})};window.addEventListener('explanation-recovered',recover);return()=>window.removeEventListener('explanation-recovered',recover)},[question?.id]);
   const [explanationLoading, setExplanationLoading] = useState(false);
   const [explanationError, setExplanationError] = useState("");
 
@@ -54,7 +56,7 @@ export function StudyNoteQuestionCard({ question, link, title }: Props) {
   async function handleGenerateExplanation() {
     if (!question) return;
     if (!session?.access_token) {
-      setExplanationError("請先登入帳號，才能使用 AI 補詳解。");
+      setExplanationError("請先登入帳號，才能使產生圖文詳解。");
       return;
     }
 
@@ -62,7 +64,7 @@ export function StudyNoteQuestionCard({ question, link, title }: Props) {
     setExplanationError("");
 
     try {
-      const response = await fetch("/api/question-explanation", {
+      const response = await requestExplanation("/api/question-explanation", {
         method: "POST",
         headers: {
           "Content-Type": "application/json"
@@ -179,11 +181,11 @@ export function StudyNoteQuestionCard({ question, link, title }: Props) {
           >
             {explanationLoading
               ? explanationOverride
-                ? "重新生成中..."
+                ? "讀取中..."
                 : "AI 生成中..."
               : explanationOverride
-                ? "重新替換詳解"
-                : "用 AI 補詳解"}
+                ? "重新讀取詳解"
+                : "產生圖文詳解"}
           </button> : null}
           <ExplanationGenerationStatus key={question.id} questionId={question.id} loading={explanationLoading} error={explanationError} resultVersion={explanationOverride?.updatedAt} />
           {explanationError ? (

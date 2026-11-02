@@ -1,3 +1,4 @@
+import {waitUntil} from '@vercel/functions';
 import {commonsSearch,readBoundedImage} from '@/lib/commonsFigureSource.cjs';
 import { imageWindowOpen, buildNeedsWithFallback, IMAGE_PROMPT, processSavedImages } from "@/lib/newExplanationFigures.cjs";
 import { createHash } from "node:crypto";
@@ -759,6 +760,7 @@ export async function POST(request: NextRequest) {
   const reviewedSourceCommit = "f379b49497467abc02d9203228d1956d13565eae";
   const reviewedManifestSha = createHash("sha256").update(JSON.stringify(Object.keys(reviewedIndex).sort()),"utf8").digest("hex");
   let canonicalPrompt = "";
+  const requestStarted=Date.now();let delivery:any=null;
   try {
     const outcome = await handleExplanation(body, {
       isReviewed: async (id: string) => hasReviewedExplanation(id),
@@ -841,7 +843,9 @@ export async function POST(request: NextRequest) {
         return !error && data === "disabled_held";
       },
       callProvider: async (args:any) => {
+        const providerStart=Date.now();
         const result = await createOpenAIText(canonicalPrompt,2400,args.model,args.mode);
+        delivery={providerMs:Date.now()-providerStart,model:result.servedModel,inputTokens:result.usage.inputTokens,outputTokens:result.usage.outputTokens};
         return {usage:result.usageKnown && result.servedModel === args.model ? result.usage : null,value:parseExplanationPayload(result.text)};
       },
       settle: async (g:any, seq:number, usage:any) => {
@@ -861,7 +865,7 @@ export async function POST(request: NextRequest) {
         const row = Array.isArray(data) ? data[0] : data;
         if (error || !row || row.question_id !== id || !["inserted","existing"].includes(row.status)) return null;
         // Text is already durably saved. Image failure never retries paid generation.
-        if(row.status==='inserted'&&newFigures){const trusted=resolveTrustedExplanationQuestion(id);if(trusted.ok)await processSavedImages({db,question:trusted.question,actor:actorId,search:commonsSearch,loadImage:readBoundedImage,enabled:process.env.NEW_EXPLANATION_FIGURES_WORKER==='1'&&imageWindowOpen(process.env)});}
+        if(row.status==='inserted'&&newFigures){const trusted=resolveTrustedExplanationQuestion(id);if(trusted.ok)waitUntil(processSavedImages({db,question:trusted.question,actor:actorId,search:commonsSearch,loadImage:readBoundedImage,enabled:process.env.NEW_EXPLANATION_FIGURES_WORKER==='1'&&imageWindowOpen(process.env)}));}
         return {inserted:row.status === "inserted",winner:{explanation:row.explanation,optionAnalysis:row.option_analysis ?? {},memoryTip:row.memory_tip ?? "",model:row.model}};
       },
       close: async (g:any) => {
@@ -880,7 +884,7 @@ export async function POST(request: NextRequest) {
     if (outcome.status === 200 && outcome.value) {
       // The opt-in queue is written transactionally by figure_guard_commit;
       // request completion never starts a best-effort background search.
-      return NextResponse.json({ok:true,configured:true,sharedSaved:true,...outcome.value});
+      return NextResponse.json({ok:true,configured:true,sharedSaved:true,...outcome.value,delivery:{...delivery,responseMs:Date.now()-requestStarted,source:outcome.code}});
     }
     return NextResponse.json({ok:false,code:outcome.code,recoverable:true,message:messages[outcome.code] || "暫時無法產生詳解，既有詳解不受影響。"},{status:outcome.status});
   } catch (error) {
