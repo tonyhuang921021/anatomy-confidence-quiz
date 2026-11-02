@@ -20,9 +20,11 @@ export async function GET(request:NextRequest){
   const published=publishedTrialFigure(id,hash);
   if(published)return NextResponse.json({figures:[],sectionFigures:[published],explanationHash:hash,imageStatus:'approved',sections:[{sectionTitle:published.section_heading}]},{headers});
   const jobs=await db.from('figure_queue_jobs').select('figure_needs,image_status').eq('question_id',id).eq('explanation_sha256',hash).maybeSingle();
-  const bound=await db.from('explanation_figure_candidates').select('id,section_anchor,section_heading,section_sha256').eq('question_id',id).eq('explanation_sha256',hash).eq('status','approved');
+  const bound=await db.from('explanation_figure_candidates').select('id,section_anchor,section_heading,section_sha256,status').eq('question_id',id).eq('explanation_sha256',hash);
   if(jobs.error||bound.error)throw Error('unavailable');
-  const sectionFigures=figures.flatMap((x:any)=>{const m=bound.data?.find(y=>y.id===x.id&&y.section_anchor);return m?[{...x,...m}]:[]});
-  return NextResponse.json({figures:figures.filter((x:any)=>!sectionFigures.some(y=>y.id===x.id)),sectionFigures,explanationHash:hash,imageStatus:jobs.data?.image_status||saved.data.figure_status,sections:(jobs.data?.figure_needs?.items||[]).map((x:any)=>({sectionTitle:x.sectionTitle,sectionHash:x.sectionHash}))},{headers});
+  const sectionFigures=figures.flatMap((x:any)=>{const m=bound.data?.find(y=>y.id===x.id&&y.status==='approved'&&y.section_anchor);return m?[{...x,...m}]:[]});
+  let imageStatus=jobs.data?.image_status||saved.data.figure_status;
+  if(imageStatus==='pending_visual_review'&&!sectionFigures.length&&!bound.data?.some(x=>x.status==='pending'))imageStatus='awaiting_image';
+  return NextResponse.json({figures:figures.filter((x:any)=>!sectionFigures.some(y=>y.id===x.id)),sectionFigures,explanationHash:hash,imageStatus,sections:(jobs.data?.figure_needs?.items||[]).map((x:any)=>({sectionTitle:x.sectionTitle,sectionHash:x.sectionHash}))},{headers});
  }catch{return NextResponse.json({figures:[]},{status:503,headers})}
 }
