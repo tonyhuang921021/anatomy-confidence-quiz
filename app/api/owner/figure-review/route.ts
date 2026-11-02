@@ -28,7 +28,7 @@ export async function POST(request:NextRequest){
    const text=await repo.readCommitted(item.question_id);if(typeof text!=='string')return response({ok:false,code:'stale'},409);
    const checked=validate({questionId:item.question_id,explanation:text,bytes:item.image_bytes,mime:item.image_mime,sourceUrl:item.source_url,licenseUrl:item.license_url,license:item.license,attribution:item.attribution,sectionTitle:item.section_title});
    if(checked.explanation_sha256!==item.explanation_sha256||checked.image_sha256!==item.image_sha256||createHash('sha256').update(item.image_bytes).digest('hex')!==item.image_sha256)return response({ok:false,code:'stale'},409);
-   return response({ok:true,id:body.id,mime:item.image_mime,imageBase64:item.image_bytes.toString('base64'),sourceUrl:item.source_url,licenseUrl:item.license_url,license:item.license,attribution:item.attribution,sectionTitle:item.section_title});
+   return response({ok:true,id:body.id,mime:item.image_mime,imageBase64:item.image_bytes.toString('base64'),sourceUrl:item.source_url,licenseUrl:item.license_url,license:item.license,attribution:item.attribution,sectionTitle:item.section_title,pdmImageUrl:item.pdm_image_url||null,pdmEvidenceAt:item.pdm_evidence_at||null});
   }
   if(body.action==='review'){
    if(!['approved','rejected'].includes(body.decision))return response({ok:false,code:'invalid'},400);
