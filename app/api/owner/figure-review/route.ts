@@ -19,16 +19,22 @@ export async function POST(request:NextRequest){
   if(auth.error||!user?.id||!user.email)return response({ok:false,code:'unauthorized'},401);
   if(!allowed.includes(user.email.trim().toLowerCase()))return response({ok:false,code:'forbidden'},403);
   if(body.action==='list'){
-   const {data,error}=await db.from('explanation_figure_candidates').select('id,question_id,section_title,source_url,license_url,license,attribution,status,created_at').eq('status','pending').order('created_at',{ascending:true}).limit(30);
+   const {data,error}=await db.from('explanation_figure_candidates').select('id,question_id,section_title,source_url,license_url,license,attribution,status,created_at').in('status',['pending','approved']).order('created_at',{ascending:true}).limit(30);
    if(error)throw Error('unavailable');return response({ok:true,candidates:data});
   }
   if(typeof body.id!=='string'||!uuid.test(body.id))return response({ok:false,code:'invalid'},400);
-  const repo=createRepository(db),item=await repo.getPending(body.id);if(!item)return response({ok:false,code:'not_pending'},404);
+  const repo=createRepository(db),item=await repo.getPending(body.id)||await repo.getApproved(body.id);if(!item)return response({ok:false,code:'not_pending'},404);
   if(body.action==='preview'){
    const text=await repo.readCommitted(item.question_id);if(typeof text!=='string')return response({ok:false,code:'stale'},409);
    const checked=validate({questionId:item.question_id,explanation:text,bytes:item.image_bytes,mime:item.image_mime,sourceUrl:item.source_url,licenseUrl:item.license_url,license:item.license,attribution:item.attribution,sectionTitle:item.section_title});
    if(checked.explanation_sha256!==item.explanation_sha256||checked.image_sha256!==item.image_sha256||createHash('sha256').update(item.image_bytes).digest('hex')!==item.image_sha256)return response({ok:false,code:'stale'},409);
-   return response({ok:true,id:body.id,mime:item.image_mime,imageBase64:item.image_bytes.toString('base64'),sourceUrl:item.source_url,licenseUrl:item.license_url,license:item.license,attribution:item.attribution,sectionTitle:item.section_title,pdmImageUrl:item.pdm_image_url||null,pdmEvidenceAt:item.pdm_evidence_at||null});
+   return response({ok:true,id:body.id,status:item.status,mime:item.image_mime,imageBase64:item.image_bytes.toString('base64'),sourceUrl:item.source_url,licenseUrl:item.license_url,license:item.license,attribution:item.attribution,sectionTitle:item.section_title,pdmImageUrl:item.pdm_image_url||null,pdmEvidenceAt:item.pdm_evidence_at||null});
+  }
+  if(body.action==='revoke'){
+   if(item.status!=='approved'||body.confirmRevoke!==true||body.imageSha!==item.image_sha256)return response({ok:false,code:'invalid'},400);
+   const text=await repo.readCommitted(item.question_id);
+   const result=await db.rpc('review_explanation_figure',{p_id:item.id,p_decision:'rejected',p_reviewer:user.id,p_visual_confirmed:false,p_expected_explanation:text,p_expected_explanation_sha:item.explanation_sha256,p_expected_image_sha:item.image_sha256,p_expected_image:'\\x'+item.image_bytes.toString('hex')});
+   return response({ok:!result.error&&result.data==='rejected',status:result.data});
   }
   if(body.action==='review'){
    if(!['approved','rejected'].includes(body.decision))return response({ok:false,code:'invalid'},400);

@@ -1,6 +1,6 @@
 import {NextRequest,NextResponse} from 'next/server';
 import {createClient} from '@supabase/supabase-js';
-import {buildNeeds,approveConcepts,createStore,runOne,CATALOG} from '@/lib/newExplanationFigures.cjs';
+import {imageWindowOpen,buildNeeds,approveConcepts,createStore,runOne,CATALOG} from '@/lib/newExplanationFigures.cjs';
 import {commonsSearch,readBoundedImage} from '@/lib/commonsFigureSource.cjs';
 const reply=(x:any,status=200)=>NextResponse.json(x,{status,headers:{'Cache-Control':'no-store'}});
 export async function POST(request:NextRequest){
@@ -21,6 +21,7 @@ export async function POST(request:NextRequest){
    if(unplanned.error)throw unplanned.error;
    return reply({ok:true,jobs:data,catalog:CATALOG,unplanned:unplanned.data});
   }
+  if(body.action==='plan_saved'&&!imageWindowOpen(process.env))return reply({ok:false,code:'worker_disabled'},503);
   if(body.action==='plan_saved'){
    if(typeof body.questionId!=='string'||! /^[A-Za-z0-9_-]{1,200}$/.test(body.questionId))return reply({ok:false},400);
    const saved=await db.from('question_explanation_overrides').select('explanation,figure_status').eq('question_id',body.questionId).maybeSingle();
@@ -30,6 +31,7 @@ export async function POST(request:NextRequest){
    const result=await db.rpc('figure_image_plan_saved',{p_question:body.questionId,p_needs:needs});
    return reply({ok:!result.error&&['awaiting','existing'].includes(result.data)});
   }
+  if(['run_one','retry_image','plan_saved'].includes(body.action)&&!imageWindowOpen(process.env))return reply({ok:false,code:'worker_disabled'},503);
   if(body.action==='run_one'){
    if(process.env.NEW_EXPLANATION_FIGURES_WORKER!=='1')return reply({ok:false,code:'worker_disabled'},503);
    return reply({ok:true,...await runOne({store:createStore(db),search:commonsSearch,loadImage:readBoundedImage,enabled:true})});

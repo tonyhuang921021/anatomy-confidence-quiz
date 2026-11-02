@@ -1,5 +1,5 @@
 import {commonsSearch,readBoundedImage} from '@/lib/commonsFigureSource.cjs';
-import { buildNeeds, IMAGE_PROMPT, processSavedImages } from "@/lib/newExplanationFigures.cjs";
+import { imageWindowOpen, buildNeedsWithFallback, IMAGE_PROMPT, processSavedImages } from "@/lib/newExplanationFigures.cjs";
 import { createHash } from "node:crypto";
 import { captureEnabled } from "@/lib/figureQueueRuntime.cjs";
 import reviewedIndex from "@/data/reviewedExplanationIndex.json";
@@ -750,7 +750,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ok:false,code:"safe_configuration_missing",message:"AI 詳解暫時不可用，既有詳解不受影響。"},{status:503});
   }
   const db = createClient(url, serviceRole || anonKey!, {auth:{persistSession:false,autoRefreshToken:false}});
-  const newFigures=process.env.NEW_EXPLANATION_FIGURES_CAPTURE === "1";
+  const newFigures=process.env.NEW_EXPLANATION_FIGURES_CAPTURE === "1" && imageWindowOpen(process.env);
   const figureQueue=!newFigures && captureEnabled(process.env,url);
   let actorId = "", verifiedEmail = "";
   // Source commit identifies the reviewed index, independently of deployment commit.
@@ -857,11 +857,11 @@ export async function POST(request: NextRequest) {
         return !error && data === "settled";
       },
       insertIfAbsentFenced: async (g:any, id:string, result:any) => {
-        const {data,error} = await withServerTimeout(db.rpc(newFigures ? "figure_guard_commit_new_images" : figureQueue ? "figure_guard_commit" : "ai_guard_commit",{p_id:g.leaseId,p_actor:actorId,p_explanation:result.explanation,p_option_analysis:result.optionAnalysis,p_memory_tip:result.memoryTip ?? "",...(newFigures ? {p_needs:buildNeeds(result.explanation,result.figureNeeds)} : {})}),1600,"共享詳解寫入逾時");
+        const {data,error} = await withServerTimeout(db.rpc(newFigures ? "figure_guard_commit_new_images" : figureQueue ? "figure_guard_commit" : "ai_guard_commit",{p_id:g.leaseId,p_actor:actorId,p_explanation:result.explanation,p_option_analysis:result.optionAnalysis,p_memory_tip:result.memoryTip ?? "",...(newFigures ? {p_needs:buildNeedsWithFallback(result.explanation,result.figureNeeds,resolveTrustedExplanationQuestion(id).ok ? (resolveTrustedExplanationQuestion(id) as any).question : null)} : {})}),1600,"共享詳解寫入逾時");
         const row = Array.isArray(data) ? data[0] : data;
         if (error || !row || row.question_id !== id || !["inserted","existing"].includes(row.status)) return null;
         // Text is already durably saved. Image failure never retries paid generation.
-        if(row.status==='inserted'&&newFigures){const trusted=resolveTrustedExplanationQuestion(id);if(trusted.ok)await processSavedImages({db,question:trusted.question,actor:actorId,search:commonsSearch,loadImage:readBoundedImage,enabled:process.env.NEW_EXPLANATION_FIGURES_WORKER==='1'});}
+        if(row.status==='inserted'&&newFigures){const trusted=resolveTrustedExplanationQuestion(id);if(trusted.ok)await processSavedImages({db,question:trusted.question,actor:actorId,search:commonsSearch,loadImage:readBoundedImage,enabled:process.env.NEW_EXPLANATION_FIGURES_WORKER==='1'&&imageWindowOpen(process.env)});}
         return {inserted:row.status === "inserted",winner:{explanation:row.explanation,optionAnalysis:row.option_analysis ?? {},memoryTip:row.memory_tip ?? "",model:row.model}};
       },
       close: async (g:any) => {

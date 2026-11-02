@@ -7,3 +7,7 @@ export const IMAGE_PROMPT:string;
 
 export function approveKnownConcepts(needs:any,question:any):any;
 export function processSavedImages(args:any):Promise<any>;
+
+export function buildNeedsWithFallback(text:string,hints:unknown,question:any):any;
+
+export function imageWindowOpen(env:Record<string,string|undefined>,now?:number):boolean;
