@@ -42,6 +42,7 @@ function OnlineVisitorList({
 }) {
   return (
     <div
+      data-motion-surface
       className="fixed z-[120] max-h-[calc(100dvh-5rem)] w-[min(18rem,calc(100vw-2rem))] overflow-y-auto rounded-3xl border border-slate-200 bg-white p-3 text-left shadow-2xl shadow-slate-200/70"
       style={style}
     >

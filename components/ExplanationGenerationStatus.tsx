@@ -15,11 +15,12 @@ export function ExplanationGenerationStatus({ questionId, loading, error, result
   useEffect(()=>{if(loading||!pendingExplanation(questionId))return;let cancelled=false,timer:ReturnType<typeof setTimeout>;let checks=0;setRecovering(true);const check=async()=>{try{if(await recoverPendingExplanation(questionId)){if(!cancelled)setRecovering(false);return}}catch{}if(cancelled)return;if(++checks<24)timer=setTimeout(check,5000);else setRecovering(false)};void check();return()=>{cancelled=true;clearTimeout(timer)}},[questionId,loading]);
   useEffect(()=>{if(!loading&&!recovering)return;const start=pendingExplanation(questionId)||Date.now();const tick=()=>setElapsed(Math.max(0,Math.floor((Date.now()-start)/1000)));tick();const timer=setInterval(tick,1000);return()=>clearInterval(timer)},[questionId,loading,recovering]);
   const activeLoading=loading||recovering;
-  const signal = { questionId, loading:activeLoading, error, resultVersion };
+  const visibleError = recovering ? null : error;
+  const signal = { questionId, loading:activeLoading, error:visibleError, resultVersion };
   const next = advanceGenerationStatus(state, signal);
   useEffect(() => {
-    setState((previous) => advanceGenerationStatus(previous, { questionId, loading:activeLoading, error, resultVersion }));
-  }, [questionId, activeLoading, error, resultVersion]);
+    setState((previous) => advanceGenerationStatus(previous, { questionId, loading:activeLoading, error:visibleError, resultVersion }));
+  }, [questionId, activeLoading, visibleError, resultVersion]);
 
   if (next.phase === "idle") return null;
   const complete = next.phase === "complete";

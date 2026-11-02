@@ -1,0 +1,111 @@
+/* Animate UI e6cea6b, custom-components path C. Shared tween fallback for React
+   18: swap 150ms / out, menu 220ms / soft, color 200ms / ease, choice .985.
+   Never hide SSR content, animate reading geometry, or delay an action. */
+:root {
+  --motion-swap-ms: 150;
+  --motion-ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+  --motion-ease-soft: cubic-bezier(0.215, 0.61, 0.355, 1);
+  --study-motion-swap: 150ms var(--motion-ease-out);
+  --study-motion-color: 200ms ease;
+  --study-motion-menu: 220ms var(--motion-ease-soft);
+  --motion-press-scale: .985;
+}
+
+/* Native elements include settings, feedback, authentication and owner pages;
+   portal surfaces share the same rules. Focus outlines remain instantaneous.
+   Independent scale composes with positioning transforms (Tailwind 3). */
+html body :is(button, a[href], [role="button"], summary):not([data-motion-static]) {
+  transition-property: color, background-color, border-color, box-shadow, opacity, scale, transform !important;
+  transition-duration: 200ms, 200ms, 200ms, 200ms, 150ms, 150ms, 150ms !important;
+  transition-timing-function: ease, ease, ease, ease, var(--motion-ease-out), var(--motion-ease-out), var(--motion-ease-out) !important;
+}
+body :where(input, select, textarea) {
+  transition: background-color var(--study-motion-color), border-color var(--study-motion-color), color var(--study-motion-color);
+}
+body :where(button, a[href], [role="button"], summary):not(:disabled):not([aria-disabled="true"]):active {
+  scale: var(--motion-press-scale);
+}
+/* These legacy recipes already press via transform: use one scale only. */
+html .study-choice:active,
+html .home-motion .home-motion-control:active { transform: none !important; }
+html body :is(button, a[href], [role="button"], summary):not([data-motion-static]):focus-visible {
+  transition-property: color, background-color, border-color, opacity, scale, transform !important;
+}
+@media (hover: hover) and (pointer: fine) {
+  :is(a, button).surface-card:hover { box-shadow: 0 4px 14px #18392b12; }
+}
+
+@keyframes site-motion-fade { from { opacity: .75; } to { opacity: 1; } }
+@keyframes site-motion-image-open { from { opacity: .75; } to { opacity: 1; } }
+@keyframes site-motion-image-close { from { opacity: .75; } to { opacity: 1; } }
+
+/* Long prose and images take their final size immediately. No clip, height
+   tween, moving baseline or nested fixed-position containing block. */
+body :is(.study-disclosure, [data-study-disclosure], [data-motion-surface], .question-explanation-more-panel,
+  .app-feedback-notification-popover, [role="dialog"]),
+body details[open] > :not(summary) {
+  animation: site-motion-fade var(--study-motion-swap);
+}
+.reviewed-reader img[role="button"][aria-expanded="true"],
+figure button[aria-expanded="true"] img { animation: site-motion-image-open var(--study-motion-swap); }
+.reviewed-reader img[role="button"][aria-expanded="false"],
+figure button[aria-expanded="false"] img { animation: site-motion-image-close var(--study-motion-swap); }
+
+/* CSS transitions retarget the same retained surface. Closing is inert and
+   pointer-transparent immediately; focus is restored by the existing owner. */
+body [data-motion-presence] {
+  animation: none;
+  opacity: 1;
+  transition: opacity var(--study-motion-swap);
+}
+body [data-motion-presence] :is(.app-mobile-drawer, .app-modal-panel, .home-resume-panel) {
+  animation: none;
+  translate: none;
+  transition: translate var(--study-motion-menu);
+}
+@starting-style {
+  body [data-motion-presence][data-motion-state="open"] { opacity: .75; }
+  body [data-motion-presence][data-motion-state="open"] :is(.app-modal-panel, .home-resume-panel) { translate: 0 6px; }
+  body [data-motion-presence][data-motion-state="open"] .app-mobile-drawer { translate: -6px 0; }
+}
+body [data-motion-presence][data-motion-state="closed"] { opacity: 0; pointer-events: none; }
+body [data-motion-presence][data-motion-state="closed"] :is(.app-mobile-drawer, .app-modal-panel, .home-resume-panel) {
+  transition: translate var(--study-motion-swap);
+  translate: 0 6px;
+}
+
+html[data-motion-visibility="hidden"] *,
+html[data-motion-visibility="hidden"] *::before,
+html[data-motion-visibility="hidden"] *::after,
+[data-motion-paused="true"], [data-motion-paused="true"] * {
+  animation-play-state: paused !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto !important; }
+  :root { --motion-press-scale: 1; --study-choice-scale: 1; }
+  /* Override legacy loops and transform keyframes too, including SVG loaders.
+     Their existing status text stays readable; meaningful surfaces still fade. */
+  body *, body *::before, body *::after {
+    animation: none !important;
+    transition-property: opacity, color, background-color, border-color !important;
+    transition-delay: 0ms !important;
+    scroll-behavior: auto !important;
+  }
+  html body :is(button, a[href], [role="button"], summary):not([data-motion-static]) { transition-property: opacity, color, background-color, border-color !important; }
+  body [data-motion-presence] :is(.app-mobile-drawer, .app-modal-panel, .home-resume-panel) { translate: none !important; }
+  body :is(.study-disclosure, [data-study-disclosure], [data-motion-surface], .question-explanation-more-panel, [role="dialog"]),
+  body details[open] > :not(summary) { animation: site-motion-fade var(--study-motion-swap) !important; }
+  body [data-motion-presence], body [data-motion-presence] [role="dialog"] { animation: none !important; }
+}
+@media print {
+  body *, body *::before, body *::after { animation: none !important; transition: none !important; }
+  [data-motion-state="closed"] { display: none !important; }
+}
+
+/* The top-layer dialog keeps the paragraph geometry unchanged while zoomed. */
+.figure-lightbox { width: min(96vw, 1100px); max-width: 96vw; max-height: 94dvh; padding: 0; border: 0; border-radius: 1rem; color: #18392b; background: #fffdf6; }
+.figure-lightbox::backdrop { background: rgb(13 32 25 / .65); }
+.figure-lightbox-panel { padding: 1rem; }
+.figure-lightbox-close { display: block; margin: 0 0 .75rem auto; padding: .5rem .9rem; border-radius: .6rem; background: #e6eee8; font-weight: 600; }
+.figure-lightbox-image { display: block; width: 100%; max-height: 72dvh; object-fit: contain; background: white; }

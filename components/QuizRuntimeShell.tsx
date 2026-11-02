@@ -7,24 +7,22 @@ import { PWARegistration } from "@/components/PWARegistration";
 import { ThemeModeSync } from "@/components/ThemeModeSync";
 import { isAppFocusPath, UserStatusBar } from "@/components/UserStatusBar";
 import { VisitorPresenceTracker } from "@/components/VisitorPresenceTracker";
+import { SiteMotionRuntime } from "@/components/SiteMotionRuntime";
+import { useSurfaceTransition } from "@/components/useSurfaceTransition";
 
 export function QuizRuntimeShell({ children }: { children: ReactNode }) {
   const pathname = usePathname();
   const focusMode = isAppFocusPath(pathname);
-  // Public study screens share motion; admin, auth and print flows keep their behavior.
-  const studyFlow = ["/", "/start", "/quiz", "/simulation", "/results", "/simulation-results",
-    "/review", "/simulation-review", "/search", "/progress", "/saved-questions", "/custom-papers",
-    "/pharmacology-review", "/resources", "/notes"].some((route) =>
-      pathname === route || (route !== "/" && pathname.startsWith(`${route}/`))
-    );
+  const pageRef = useSurfaceTransition(pathname);
 
   return (
     <AuthProvider>
       <PWARegistration />
       <ThemeModeSync />
-      <div className={`app-frame ${studyFlow ? "study-flow" : ""} ${focusMode ? "app-frame-focus" : ""}`}>
+      <SiteMotionRuntime />
+      <div className={`app-frame study-flow site-motion ${focusMode ? "app-frame-focus" : ""}`}>
         <UserStatusBar />
-        <div className="app-content">
+        <div ref={pageRef} className="app-content" data-motion-page>
           <VisitorPresenceTracker />
           {children}
         </div>

@@ -10,6 +10,7 @@ import { getOfficialPaperDisplayCode } from "@/lib/officialPaperIdentity";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Suspense, useDeferredValue, useEffect, useMemo, useRef, useState } from "react";
 import { createPortal } from "react-dom";
+import { useSurfaceTransition } from "@/components/useSurfaceTransition";
 import { useAuth } from "@/components/AuthProvider";
 import { CopyQuestionPromptButton } from "@/components/CopyQuestionPromptButton";
 import { QuestionExplanationTabs } from "@/components/QuestionExplanationTabs";
@@ -408,6 +409,8 @@ function SearchPageContent() {
     () => shouldShowResults ? filteredResults.slice(pageStart, pageStart + PAGE_SIZE) : [],
     [filteredResults, pageStart, shouldShowResults]
   );
+
+  const resultsMotionRef = useSurfaceTransition(`${safeCurrentPage}:${pageResults.map((question) => question.id).join(",")}`);
 
   function changeResultsPage(nextPage: number) {
     const page = Math.max(1, Math.min(totalPages, nextPage));
@@ -1088,7 +1091,7 @@ function SearchPageContent() {
         </section>
       ) : null}
 
-      <section className="search-results-list mt-6 grid min-w-0 gap-4" aria-labelledby="question-search-results-heading">
+      <section ref={resultsMotionRef} className="search-results-list mt-6 grid min-w-0 gap-4" aria-labelledby="question-search-results-heading">
         <h2
           id="question-search-results-heading"
           ref={resultsHeadingRef}

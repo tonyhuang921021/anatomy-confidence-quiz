@@ -793,6 +793,7 @@ function LoadedYangmingExplanationPanel({
 
       {reportOpen ? (
         <div
+          data-motion-surface
           className="fixed inset-0 z-[140] flex items-center justify-center bg-slate-950/35 px-3 py-6 backdrop-blur-sm"
           onClick={() => {
             if (!reportLoading) setReportOpen(false);

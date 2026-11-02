@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import type { ReactNode } from "react";
 import { AppRuntimeBoundary } from "@/components/AppRuntimeBoundary";
 import "./globals.css";
+import "./motion.css";
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://anatomy-confidence-quiz.vercel.app"),

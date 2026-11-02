@@ -4,6 +4,7 @@ import type { KeyboardEvent, ReactNode } from "react";
 import { useCallback, useEffect, useId, useRef, useState } from "react";
 import { BookOpen, CircleOff, Layers3, MessageCircle, MoreHorizontal } from "lucide-react";
 import { useAuth } from "@/components/AuthProvider";
+import { useMotionPresence } from "@/components/useMotionPresence";
 import { QuestionSupplementCardsPanel } from "@/components/QuestionSupplementCardsPanel";
 import { YangmingExplanationPanel } from "@/components/YangmingExplanationPanel";
 import { loadQuestionSupplementMeta, toggleQuestionSupplementReaction } from "@/lib/questionSupplementCards";
@@ -33,6 +34,7 @@ export function QuestionExplanationTabs({
   const [reactionLoading, setReactionLoading] = useState(false);
   const [reactionError, setReactionError] = useState("");
   const [isMoreActionsOpen, setIsMoreActionsOpen] = useState(false);
+  const morePresence = useMotionPresence(isMoreActionsOpen);
   const moreActionsButtonRef = useRef<HTMLButtonElement>(null);
   const moreActionsPanelId = useId();
   const explanationPanelId = useId();
@@ -239,10 +241,11 @@ export function QuestionExplanationTabs({
       </div>
       {moreActionsContent ? (
         <div
+          {...morePresence.attributes}
           id={moreActionsPanelId}
           role="group"
           aria-label="更多操作"
-          hidden={!isMoreActionsOpen}
+          hidden={!morePresence.present}
           className="ml-auto mt-2 w-full rounded-xl border border-slate-200 bg-white p-2 shadow-[0_10px_28px_rgba(15,23,42,0.10)] sm:w-64"
         >
           <div className="grid gap-1 [&_button]:w-full [&_button]:justify-start [&_button]:rounded-lg">

@@ -2,6 +2,7 @@
 import { formatRocDate } from "@/lib/rocDate";
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useMotionPresence } from "@/components/useMotionPresence";
 import { createPortal } from "react-dom";
 import { useRouter } from "next/navigation";
 import { ChevronRight, Play, X } from "lucide-react";
@@ -66,6 +67,7 @@ export function ContinueQuizButton() {
   const { configured, session: authSession, syncStatus, syncVersion } = useAuth();
   const [mounted, setMounted] = useState(false);
   const [open, setOpen] = useState(false);
+  const presence = useMotionPresence(open);
   const [localSession, setLocalSession] = useState<QuizSession | null>(null);
   const [items, setItems] = useState<ResumableQuizSessionListItem[]>([]);
   const [loading, setLoading] = useState(false);
@@ -222,8 +224,8 @@ export function ContinueQuizButton() {
     }
   }
 
-  const dialog = open && mounted ? (
-    <div className="home-resume-overlay fixed inset-0 z-[100] flex items-end justify-center bg-slate-950/45 p-0 backdrop-blur-[2px] sm:items-center sm:p-5" role="presentation" onMouseDown={(event) => {
+  const dialog = presence.present && mounted ? (
+    <div {...presence.attributes} className="home-resume-overlay fixed inset-0 z-[100] flex items-end justify-center bg-slate-950/45 p-0 backdrop-blur-[2px] sm:items-center sm:p-5" role="presentation" onMouseDown={(event) => {
       if (event.currentTarget === event.target) setOpen(false);
     }}>
       <section ref={dialogRef} role="dialog" aria-modal="true" aria-labelledby="resume-dialog-title" aria-busy={loading} className="home-resume-panel flex max-h-[88vh] w-full max-w-2xl flex-col overflow-hidden rounded-t-2xl bg-white shadow-2xl sm:rounded-2xl">

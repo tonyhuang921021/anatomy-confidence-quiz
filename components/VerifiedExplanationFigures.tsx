@@ -1,19 +1,39 @@
 'use client';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { safeApprovedMeta } from '@/lib/approvedFigureSecurity';
 import { getVerifiedExplanationFigures, type VerifiedExplanationFigure } from '@/lib/verifiedExplanationFigures';
 
 export function Figure({ figure }: {figure: VerifiedExplanationFigure}) {
   const [expanded, setExpanded] = useState(false);
+  const trigger = useRef<HTMLButtonElement>(null);
+  const dialog = useRef<HTMLDialogElement>(null);
+  useEffect(() => {
+    const element = dialog.current;
+    if (!element) return;
+    if (expanded && !element.open) element.showModal();
+    if (!expanded && element.open) { element.close(); trigger.current?.focus({preventScroll:true}); }
+    if (!expanded) return;
+    const previous = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    return () => { document.body.style.overflow = previous; };
+  }, [expanded]);
   return <figure className="my-4 min-w-0 max-w-full">
-    <button type="button" onClick={() => setExpanded(!expanded)} aria-expanded={expanded}
-      aria-label={`${expanded ? '縮小' : '放大'}圖片：${figure.alt}`}
-      className={`block max-w-full rounded-xl focus-visible:outline focus-visible:outline-2 focus-visible:outline-teal-700 ${expanded ? 'w-full' : 'w-48 sm:w-80'}`}>
+    <button ref={trigger} type="button" onClick={() => setExpanded(true)} aria-expanded={expanded} aria-haspopup="dialog"
+      aria-label={`放大圖片：${figure.alt}`}
+      className="block w-48 max-w-full rounded-xl focus-visible:outline focus-visible:outline-2 focus-visible:outline-teal-700 sm:w-80">
       <img src={figure.asset} alt={figure.alt} className="h-auto w-full max-w-full rounded-xl bg-white" />
     </button>
     <figcaption className="mt-2 text-sm leading-6 text-slate-700">
       {figure.caption} · <a href={figure.sourceUrl} target="_blank" rel="noopener noreferrer" className="underline">{figure.attribution}</a> · <a href={figure.licenseUrl} target="_blank" rel="noopener noreferrer" className="underline">{figure.license}</a>
     </figcaption>
+    <dialog ref={dialog} className="figure-lightbox" aria-label={`圖片放大：${figure.alt}`} onCancel={event => {event.preventDefault();setExpanded(false);}}
+      onClick={event => {if(event.target===event.currentTarget)setExpanded(false);}}>
+      <div className="figure-lightbox-panel">
+        <button type="button" className="figure-lightbox-close" onClick={() => setExpanded(false)} autoFocus>關閉圖片</button>
+        <img src={figure.asset} alt={figure.alt} className="figure-lightbox-image" />
+        <p className="mt-3 text-sm leading-6">{figure.caption} · <a className="underline" href={figure.sourceUrl} target="_blank" rel="noopener noreferrer">{figure.attribution}</a> · <a className="underline" href={figure.licenseUrl} target="_blank" rel="noopener noreferrer">{figure.license}</a></p>
+      </div>
+    </dialog>
   </figure>;
 }
 export function VerifiedExplanationFigures({questionId}:{questionId:string}) {

@@ -24,6 +24,7 @@ import {
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
+import { useMotionPresence } from "@/components/useMotionPresence";
 import { useAuth } from "@/components/AuthProvider";
 import { ClientSectionBoundary } from "@/components/ClientSectionBoundary";
 import { LazyAuthPanel } from "@/components/LazyAuthPanel";
@@ -142,7 +143,11 @@ export function UserStatusBar() {
   const mobileMoreTriggerRef = useRef<HTMLButtonElement | null>(null);
   const accountTriggerRef = useRef<HTMLButtonElement | null>(null);
   const settingsReturnFocusRef = useRef<HTMLElement | null>(null);
-  const activePanelRef = useRef<HTMLElement | null>(null);
+  const navPanelRef = useRef<HTMLElement | null>(null);
+  const accountPanelRef = useRef<HTMLElement | null>(null);
+  const accountPresence = useMotionPresence(accountOpen);
+  const navPresence = useMotionPresence(navOpen);
+  const settingsPresence = useMotionPresence(accountPanelOpen);
   const previousFocusRef = useRef<HTMLElement | null>(null);
   const focusMode = isAppFocusPath(pathname);
   const accountLabel = getAccountLabel(user?.email, user?.user_metadata?.display_name);
@@ -222,7 +227,7 @@ export function UserStatusBar() {
     const previousOverflow = document.body.style.overflow;
     document.body.style.overflow = "hidden";
     const focusTimer = window.setTimeout(() => {
-      activePanelRef.current
+      (accountPanelOpen ? accountPanelRef.current : navPanelRef.current)
         ?.querySelector<HTMLElement>("button:not([disabled]), a[href], input:not([disabled]), select:not([disabled]), textarea:not([disabled])")
         ?.focus();
     }, 0);
@@ -237,7 +242,7 @@ export function UserStatusBar() {
       }
 
       if (event.key !== "Tab") return;
-      const panel = activePanelRef.current;
+      const panel = accountPanelOpen ? accountPanelRef.current : navPanelRef.current;
       if (!panel) return;
       const focusable = Array.from(
         panel.querySelectorAll<HTMLElement>(
@@ -376,8 +381,8 @@ export function UserStatusBar() {
               <ChevronDown size={16} strokeWidth={1.8} />
             </button>
 
-            {accountOpen ? (
-              <div id="app-account-popover" className="app-account-popover">
+            {accountPresence.present ? (
+              <div {...accountPresence.attributes} id="app-account-popover" className="app-account-popover">
                 <div className="app-account-summary">
                   <span className="app-account-avatar app-account-avatar-large" aria-hidden="true">
                     {getInitials(accountLabel)}
@@ -462,8 +467,8 @@ export function UserStatusBar() {
         </nav>
       ) : null}
 
-      {navOpen ? (
-        <div className="app-overlay app-mobile-drawer-overlay" role="presentation">
+      {navPresence.present ? (
+        <div {...navPresence.attributes} className="app-overlay app-mobile-drawer-overlay" role="presentation">
           <button
             type="button"
             className="app-overlay-dismiss"
@@ -471,7 +476,7 @@ export function UserStatusBar() {
             aria-label="關閉導覽"
           />
           <aside
-            ref={activePanelRef}
+            ref={navPanelRef}
             id="app-navigation-drawer"
             className="app-mobile-drawer"
             role="dialog"
@@ -621,8 +626,8 @@ export function UserStatusBar() {
         </div>
       ) : null}
 
-      {accountPanelOpen ? (
-        <div className="app-overlay app-modal-overlay" role="presentation">
+      {settingsPresence.present ? (
+        <div {...settingsPresence.attributes} className="app-overlay app-modal-overlay" role="presentation">
           <button
             type="button"
             className="app-overlay-dismiss"
@@ -630,7 +635,7 @@ export function UserStatusBar() {
             aria-label="關閉帳號設定"
           />
           <section
-            ref={activePanelRef}
+            ref={accountPanelRef}
             className="app-modal-panel app-account-panel"
             style={user ? undefined : { maxWidth: "36rem" }}
             role="dialog"

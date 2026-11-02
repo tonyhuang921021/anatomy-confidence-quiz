@@ -1,9 +1,7 @@
 "use client";
 
 import { useEffect, useRef } from "react";
-
-/** Animate UI transition.swap; opacity only, so reduced motion keeps the feedback. */
-const swapTiming = { duration: 150, easing: "cubic-bezier(0.23, 1, 0.32, 1)" };
+import { animateSurface } from "@/lib/siteMotion";
 
 export function useQuestionChangeFeedback(questionId: string, enabled: boolean) {
   const elementRef = useRef<HTMLDivElement>(null);
@@ -22,14 +20,9 @@ export function useQuestionChangeFeedback(questionId: string, enabled: boolean) 
 
     // Keep the same DOM and focus. A rapid change continues from the current opacity;
     // there is no exit queue, delayed state update, or second copy of the question.
-    const previous = animationRef.current;
-    const opacity = previous?.playState === "running"
-      ? Number(getComputedStyle(element).opacity)
-      : 0.75;
-    previous?.cancel();
-    const animation = element.animate([{ opacity }, { opacity: 1 }], swapTiming);
+    const animation = animateSurface(element, animationRef.current);
     animationRef.current = animation;
-    animation.onfinish = () => {
+    if (animation) animation.onfinish = () => {
       if (animationRef.current === animation) animationRef.current = null;
     };
   }, [enabled, questionId]);

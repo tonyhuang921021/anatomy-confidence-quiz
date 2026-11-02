@@ -12,5 +12,6 @@ tsconfig.tsbuildinfo
 test-results/
 playwright-report/
 evidence/motion/
+evidence/site-motion/
 .env*
 evidence/explanations/
