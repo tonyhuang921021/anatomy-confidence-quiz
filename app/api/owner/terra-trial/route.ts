@@ -9,12 +9,14 @@ import {TRIAL_FIGURES} from '@/lib/terraTrialFigures';
 export const maxDuration=120;
 const reply=(body:any,status=200)=>NextResponse.json(body,{status,headers:{'Cache-Control':'no-store'}});
 export async function POST(request:NextRequest){
- if(process.env.TERRA_FIVE_TRIAL_ENABLED!=='1')return reply({ok:false,code:'disabled'},503);
  const url=process.env.NEXT_PUBLIC_SUPABASE_URL,key=process.env.SUPABASE_SERVICE_ROLE_KEY;
  if(!url||!key)return reply({ok:false,code:'unavailable'},503);
  try{
   const raw=await request.text();if(Buffer.byteLength(raw)>8192)return reply({ok:false},413);
-  const body=JSON.parse(raw);if(typeof body.accessToken!=='string')return reply({ok:false},401);
+  const body=JSON.parse(raw);
+  // Stopping generation must never hide previously saved, owner-only results.
+  if(body.action!=='list'&&process.env.TERRA_FIVE_TRIAL_ENABLED!=='1')return reply({ok:false,code:'disabled'},503);
+  if(typeof body.accessToken!=='string')return reply({ok:false},401);
   const db=createClient(url,key,{auth:{persistSession:false,autoRefreshToken:false}});
   const auth=await db.auth.getUser(body.accessToken),user=auth.data?.user;
   if(auth.error||!user?.id||!user.email)return reply({ok:false},401);
