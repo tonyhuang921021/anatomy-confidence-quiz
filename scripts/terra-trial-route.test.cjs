@@ -1,0 +1,14 @@
+const {test}=require('node:test'),assert=require('node:assert/strict'),fs=require('fs'),vm=require('vm'),ts=require(process.cwd()+'/node_modules/typescript');
+const source=fs.readFileSync('app/api/owner/terra-trial/route.ts','utf8'),js=ts.transpileModule(source,{compilerOptions:{module:ts.ModuleKind.CommonJS,target:ts.ScriptTarget.ES2022}}).outputText;
+const {IDS}=require('../lib/terraTrial.cjs');
+function load({enabled=true,user={id:'owner',email:'owner@example.test'}}={}){
+ let calls=0;const mod={exports:{}},chain={select(){return this},eq(){return this},async maybeSingle(){return {data:{enabled:false,calls:0}}},then(resolve){return Promise.resolve({data:[]}).then(resolve)}};
+ const stubs={'next/server':{NextResponse:{json:(body,init)=>({body,status:init.status})}},'@supabase/supabase-js':{createClient:()=>({auth:{getUser:async()=>({data:{user}})},from:()=>chain})},'@/lib/terraTrial.cjs':{IDS,createStore:()=>({}),generate:async()=>{calls++;return {code:'complete'}}},'@/lib/trustedQuestionLoader':{resolveTrustedExplanationQuestion:()=>({ok:true,question:{stem:'fixture',options:{A:'a'},answer:'A'}})},'@/lib/reviewedExplanations':{hasReviewedExplanation:()=>false},'@/lib/openai':{isOpenAIConfigured:()=>true,createOpenAIText:()=>{throw Error('no network allowed')}},'@/lib/questionExplanationFormat':{normalizeQuestionExplanationPayload:x=>x},'@/lib/terraTrialFigures':{TRIAL_FIGURES:{}}};
+ vm.runInNewContext(js,{module:mod,exports:mod.exports,Buffer,process:{env:{TERRA_FIVE_TRIAL_ENABLED:enabled?'1':'0',NEXT_PUBLIC_SUPABASE_URL:'mock',SUPABASE_SERVICE_ROLE_KEY:'synthetic',NEXT_PUBLIC_ADMIN_EMAILS:'owner@example.test'}},require:n=>{if(!(n in stubs))throw Error(n);return stubs[n]}});
+ return {call:body=>mod.exports.POST({text:async()=>JSON.stringify(body)}),calls:()=>calls};
+}
+test('disabled, unauthenticated and non-owner requests never start generation',async()=>{
+ for(const [opts,status] of [[{enabled:false},503],[{user:null},401],[{user:{id:'u',email:'else@example.test'}},403]]){const t=load(opts),r=await t.call({accessToken:'synthetic',action:'generate',questionId:IDS[0]});assert.equal(r.status,status);assert.equal(t.calls(),0)}
+});
+test('owner list is read only and arbitrary IDs are rejected',async()=>{const t=load();assert.equal((await t.call({accessToken:'synthetic',action:'list'})).body.questions.length,5);assert.equal((await t.call({accessToken:'synthetic',action:'generate',questionId:'other'})).status,400);assert.equal(t.calls(),0)});
+test('owner may reach generation only for fixed trial item',async()=>{const t=load();assert.equal((await t.call({accessToken:'synthetic',action:'generate',questionId:IDS[0]})).body.code,'complete');assert.equal(t.calls(),1)});

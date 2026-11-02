@@ -1,0 +1,7 @@
+export type TrialFigure={asset:string;sourceUrl:string;license:string;licenseUrl:string;attribution:string;caption:string;sha256:string};
+const sheath:TrialFigure={asset:'/terra-trial/carotid-sheath.png',sourceUrl:'https://commons.wikimedia.org/wiki/File:Carotid_sheath.PNG',license:'PDM 1.0',licenseUrl:'https://creativecommons.org/publicdomain/mark/1.0/',attribution:'Mikael Häggström；Gray’s Anatomy',caption:'頸動脈鞘的橫切面：對照動脈、內頸靜脈與迷走神經；鞘外構造須另外判斷。原圖未修改。',sha256:'8ba98dd824b009e08d7cc0e95d5b7891bfe2b29eb7f84e6b083e374c42f3aace'};
+export const TRIAL_FIGURES:Record<string,TrialFigure>={
+ 'MOEX-111020-1301-Q010':sheath,'MOEX-C217-093030-S4001-STAGE1-Q019':sheath,'MOEX-097140-1101-Q028':sheath,
+ 'MOEX-097140-1101-Q004':{asset:'/terra-trial/common-carotid.jpg',sourceUrl:'https://commons.wikimedia.org/wiki/File:2122_Common_Carotid_Artery.jpg',license:'CC BY 3.0',licenseUrl:'https://creativecommons.org/licenses/by/3.0/',attribution:'OpenStax College',caption:'找出圖中的 Carotid sinus，定位頸動脈竇。此圖沒有畫出傳入神經，神經路徑請對照文字詳解。原圖未修改。',sha256:'9866779ec1978db52a10520f0cec0bd86774212a94e651b80c3bb4b413b10058'},
+ 'MOEX-108100-1301-Q018':{asset:'/terra-trial/brain-sinuses.jpg',sourceUrl:'https://commons.wikimedia.org/wiki/File:1315_Brain_Sinuses.jpg',license:'CC BY 4.0',licenseUrl:'https://creativecommons.org/licenses/by/4.0/',attribution:'OpenStax',caption:'依箭頭追蹤靜脈回流；圖右下標示經乙狀竇流向頸靜脈的位置。原圖未修改。',sha256:'5b5d7b8ec12ba5c3373355e697446f2cc994557a5f0ede70f9dd63e7be661065'}
+};

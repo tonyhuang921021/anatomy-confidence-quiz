@@ -9,6 +9,8 @@ type ResponseOutputItem = {
 };
 
 type OpenAIResponsePayload = {
+  id?: string;
+  model?: string;
   service_tier?: string;
   output?: ResponseOutputItem[];
   usage?: {
@@ -98,7 +100,7 @@ export function buildOpenAITextRequest(
     input: prompt,
     max_output_tokens: maxOutputTokens,
     service_tier: "default",
-    ...(model === "gpt-6.1-sol" ? { prompt_cache_options: { mode: "explicit" } } : {}),
+    ...(["gpt-6.1-sol", "gpt-6.1-terra"].includes(model) ? { prompt_cache_options: { mode: "explicit" } } : {}),
     ...(reasoningEffort === "low" ? { reasoning: { effort: "low" } } : {})
   };
 }
@@ -135,6 +137,9 @@ export async function createOpenAIText(
   return {
     model,
     text: extractOutputText(payload),
+    servedModel: payload.model ?? null,
+    requestId: response.headers.get("x-request-id"),
+    responseId: typeof payload.id === "string" ? payload.id : null,
     usageKnown: payload.service_tier === "default" && Number.isSafeInteger(payload.usage?.input_tokens) && Number(payload.usage?.input_tokens) >= 0 &&
       Number.isSafeInteger(payload.usage?.output_tokens) && Number(payload.usage?.output_tokens) >= 0,
     usage: {
