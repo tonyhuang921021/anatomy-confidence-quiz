@@ -798,6 +798,8 @@ export async function POST(request: NextRequest) {
         return data ? {explanation:data.explanation,optionAnalysis:data.option_analysis ?? {},memoryTip:data.memory_tip ?? "",model:data.model} : null;
       },
       reserve: async ({actorId: actor, questionId}: {actorId:string;questionId:string}) => {
+        const runUntil=Date.parse(process.env.QUESTION_EXPLANATION_RUN_UNTIL || "");
+        if(!Number.isFinite(runUntil)||Date.now()>=runUntil)return {ok:false,code:"budget"};
         if (!serviceRole || !isOpenAIConfigured() || !promoVerified || !["gpt-6.1-sol","gpt-6.1-terra"].includes(model || "") || (model === "gpt-6.1-terra" && mode !== "default") ||
             !["low","default"].includes(mode) || !pricingRevision || !Number.isSafeInteger(inRate) || inRate <= 0 ||
             !Number.isSafeInteger(outRate) || outRate <= 0) return {ok:false,code:"safe_configuration_missing"};
