@@ -1,4 +1,5 @@
 "use client";
+import { SectionFiguresProvider, SectionFigures } from "@/components/SectionExplanationFigures";
 
 import { hasReviewedExplanation } from "@/lib/reviewedExplanations";
 import { ReviewedExplanation } from "@/components/ReviewedExplanation";
@@ -276,7 +277,7 @@ export function StructuredExplanationText({
     "structured-explanation-table-cell min-w-[7.5rem] max-w-[16rem] whitespace-normal break-words [overflow-wrap:anywhere] [word-break:normal] sm:min-w-[8.5rem] sm:max-w-[18rem]";
 
   return (
-    <div className={`structured-explanation-text w-full max-w-full min-w-0 ${className}`}>
+    <SectionFiguresProvider questionId={questionId} text={text || ""}><div className={`structured-explanation-text w-full max-w-full min-w-0 ${className}`}>
       {label ? (
         <p className={`mb-3 text-[15px] font-black leading-6 ${labelClassName}`}>
           {label}
@@ -348,10 +349,12 @@ export function StructuredExplanationText({
                 </div>
               </div>
             ) : null}
+            <SectionFigures title={section.title} />
           </section>
         ))}
       </div>
+      <SectionFigures />
       {questionId ? <ReviewedExplanationSupplement questionId={questionId} /> : null}
-    </div>
+    </div></SectionFiguresProvider>
   );
 }

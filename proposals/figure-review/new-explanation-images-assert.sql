@@ -1,0 +1,30 @@
+do $$
+declare req uuid:=gen_random_uuid(); actor uuid:=gen_random_uuid(); txt text:=E'## Test\nSaved text'; h text; needs jsonb; r record; lease uuid:=gen_random_uuid();
+begin
+ if has_function_privilege('anon','public.figure_image_reserve(uuid,uuid,text,text)','execute') then raise exception 'anon can spend'; end if;
+ if has_function_privilege('authenticated','public.figure_guard_commit_new_images(uuid,uuid,text,jsonb,text,jsonb)','execute') then raise exception 'authenticated can commit'; end if;
+ update public.figure_image_limits set capture=true,max_new=1 where id=true;
+ h:=encode(sha256(convert_to(txt,'UTF8')),'hex');
+ needs:=jsonb_build_object('explanationHash',h,'revision',repeat('a',64),'status','awaiting_query_review','items',jsonb_build_array(jsonb_build_object('sectionTitle','Test','sectionHash',h,'sectionAnchor','section-0','conceptId','carotid-sheath','caption','Test')));
+ perform public.ai_guard_reserve(req,actor,'TEST-NEW',repeat('b',64),'test');
+ select * into r from public.figure_guard_commit_new_images(req,actor,txt,'{}','',needs);
+ if r.status<>'inserted' or (select count(*) from public.figure_queue_jobs)<>1 then raise exception 'atomic commit/queue failed'; end if;
+ if (select explanation from public.question_explanation_overrides where question_id='TEST-NEW')<>txt then raise exception 'text changed'; end if;
+ if exists(select 1 from public.figure_queue_claim(lease,60)) then raise exception 'disabled worker claimed'; end if;
+ update public.figure_image_limits set enabled=true where id=true;
+ update public.figure_queue_config set enabled=true where id=true;
+ if exists(select 1 from public.figure_queue_claim(lease,60)) then raise exception 'unreviewed claimed'; end if;
+ needs:=jsonb_set(needs,'{status}','"approved"');
+ needs:=jsonb_set(needs,'{items,0,query}','"carotid sheath anatomy"');
+ needs:=jsonb_set(needs,'{items,0,catalogRevision}','"carotid-sheath-v1"');
+ if public.figure_image_review(req,repeat('a',64),needs,actor)<>'approved' then raise exception 'review failed'; end if;
+ if not exists(select 1 from public.figure_queue_claim(lease,60)) then raise exception 'reviewed job not claimed'; end if;
+ update public.figure_image_limits set max_searches=1 where id=true;
+ if not public.figure_image_reserve(req,lease,repeat('c',64),'search') then raise exception 'first reservation failed'; end if;
+ if public.figure_image_reserve(req,lease,repeat('d',64),'search') then raise exception 'cap exceeded'; end if;
+ if public.figure_image_reserve(req,gen_random_uuid(),repeat('e',64),'download') then raise exception 'wrong lease spent'; end if;
+ if not public.figure_image_cache_put(req,lease,repeat('c',64),'[]') or public.figure_image_cache_get(repeat('c',64))<>'[]'::jsonb then raise exception 'empty cache failed'; end if;
+ if public.figure_image_finish(req,lease,'awaiting_image')<>'done' then raise exception 'finish failed'; end if;
+ if public.figure_image_retry(req)<>'pending' then raise exception 'image-only retry failed'; end if;
+ if (select explanation from public.question_explanation_overrides where question_id='TEST-NEW')<>txt then raise exception 'retry changed text'; end if;
+end $$;

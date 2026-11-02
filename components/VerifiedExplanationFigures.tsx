@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react';
 import { safeApprovedMeta } from '@/lib/approvedFigureSecurity';
 import { getVerifiedExplanationFigures, type VerifiedExplanationFigure } from '@/lib/verifiedExplanationFigures';
 
-function Figure({ figure }: {figure: VerifiedExplanationFigure}) {
+export function Figure({ figure }: {figure: VerifiedExplanationFigure}) {
   const [expanded, setExpanded] = useState(false);
   return <figure className="my-4 min-w-0 max-w-full">
     <button type="button" onClick={() => setExpanded(!expanded)} aria-expanded={expanded}

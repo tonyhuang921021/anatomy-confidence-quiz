@@ -1,3 +1,5 @@
+import {commonsSearch,readBoundedImage} from '@/lib/commonsFigureSource.cjs';
+import { buildNeeds, IMAGE_PROMPT, processSavedImages } from "@/lib/newExplanationFigures.cjs";
 import { createHash } from "node:crypto";
 import { captureEnabled } from "@/lib/figureQueueRuntime.cjs";
 import reviewedIndex from "@/data/reviewedExplanationIndex.json";
@@ -74,6 +76,7 @@ type QuestionExplanationRequestBody = {
 };
 
 type ParsedExplanationPayload = {
+  figureNeeds?: unknown;
   explanation?: string;
   optionAnalysis?: Record<string, string>;
   memoryTip?: string;
@@ -621,7 +624,8 @@ function hasCompleteOptionAnalysis(
 }
 
 function coerceParsedPayload(value: unknown): ParsedExplanationPayload | null {
-  return normalizeQuestionExplanationPayload(value);
+  const parsed = normalizeQuestionExplanationPayload(value);
+  return parsed ? {...parsed, figureNeeds: (value as Record<string, unknown>).figureNeeds} : parsed;
 }
 
 function parseExplanationPayload(text: string): ParsedExplanationPayload | null {
@@ -746,7 +750,8 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ok:false,code:"safe_configuration_missing",message:"AI 詳解暫時不可用，既有詳解不受影響。"},{status:503});
   }
   const db = createClient(url, serviceRole || anonKey!, {auth:{persistSession:false,autoRefreshToken:false}});
-  const figureQueue=captureEnabled(process.env,url);
+  const newFigures=process.env.NEW_EXPLANATION_FIGURES_CAPTURE === "1";
+  const figureQueue=!newFigures && captureEnabled(process.env,url);
   let actorId = "", verifiedEmail = "";
   // Source commit identifies the reviewed index, independently of deployment commit.
   // Keep it while the verified index is identical; change it only with an atomic,
@@ -776,6 +781,7 @@ export async function POST(request: NextRequest) {
       prepare: async (q:any) => {
         const trustedContext = q.trustedContext;
         canonicalPrompt = buildQuestionExplanationPrompt({question:{...q,stem:trustedContext ? `${trustedContext}\n\n${q.stem}` : q.stem}});
+        if (newFigures) canonicalPrompt += "\n" + IMAGE_PROMPT;
         const related = resolveTrustedRelatedQuestions(q.id);
         for (const item of related) {
           const accepted = item.acceptedAnswers?.length ? item.acceptedAnswers.join(' / ') : item.answer;
@@ -792,7 +798,7 @@ export async function POST(request: NextRequest) {
         return data ? {explanation:data.explanation,optionAnalysis:data.option_analysis ?? {},memoryTip:data.memory_tip ?? "",model:data.model} : null;
       },
       reserve: async ({actorId: actor, questionId}: {actorId:string;questionId:string}) => {
-        if (!serviceRole || !isOpenAIConfigured() || !promoVerified || model !== "gpt-6.1-sol" ||
+        if (!serviceRole || !isOpenAIConfigured() || !promoVerified || !["gpt-6.1-sol","gpt-6.1-terra"].includes(model || "") || (model === "gpt-6.1-terra" && mode !== "default") ||
             !["low","default"].includes(mode) || !pricingRevision || !Number.isSafeInteger(inRate) || inRate <= 0 ||
             !Number.isSafeInteger(outRate) || outRate <= 0) return {ok:false,code:"safe_configuration_missing"};
         // Do not use the legacy helper's missing-table fail-open behaviour.
@@ -834,7 +840,7 @@ export async function POST(request: NextRequest) {
       },
       callProvider: async (args:any) => {
         const result = await createOpenAIText(canonicalPrompt,2400,args.model,args.mode);
-        return {usage:result.usageKnown ? result.usage : null,value:parseExplanationPayload(result.text)};
+        return {usage:result.usageKnown && result.servedModel === args.model ? result.usage : null,value:parseExplanationPayload(result.text)};
       },
       settle: async (g:any, seq:number, usage:any) => {
         // A provider-side bound violation makes the estimate unsafe for every
@@ -849,9 +855,11 @@ export async function POST(request: NextRequest) {
         return !error && data === "settled";
       },
       insertIfAbsentFenced: async (g:any, id:string, result:any) => {
-        const {data,error} = await withServerTimeout(db.rpc(figureQueue ? "figure_guard_commit" : "ai_guard_commit",{p_id:g.leaseId,p_actor:actorId,p_explanation:result.explanation,p_option_analysis:result.optionAnalysis,p_memory_tip:result.memoryTip ?? ""}),1600,"共享詳解寫入逾時");
+        const {data,error} = await withServerTimeout(db.rpc(newFigures ? "figure_guard_commit_new_images" : figureQueue ? "figure_guard_commit" : "ai_guard_commit",{p_id:g.leaseId,p_actor:actorId,p_explanation:result.explanation,p_option_analysis:result.optionAnalysis,p_memory_tip:result.memoryTip ?? "",...(newFigures ? {p_needs:buildNeeds(result.explanation,result.figureNeeds)} : {})}),1600,"共享詳解寫入逾時");
         const row = Array.isArray(data) ? data[0] : data;
         if (error || !row || row.question_id !== id || !["inserted","existing"].includes(row.status)) return null;
+        // Text is already durably saved. Image failure never retries paid generation.
+        if(row.status==='inserted'&&newFigures){const trusted=resolveTrustedExplanationQuestion(id);if(trusted.ok)await processSavedImages({db,question:trusted.question,actor:actorId,search:commonsSearch,loadImage:readBoundedImage,enabled:process.env.NEW_EXPLANATION_FIGURES_WORKER==='1'});}
         return {inserted:row.status === "inserted",winner:{explanation:row.explanation,optionAnalysis:row.option_analysis ?? {},memoryTip:row.memory_tip ?? "",model:row.model}};
       },
       close: async (g:any) => {
@@ -878,3 +886,6 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ok:false,code:"guard_unavailable",recoverable:true,message:"詳解暫時不可用，既有內容不受影響。"},{status:503});
   }
 }
+
+// Bounds the synchronous, capped image lookup after durable text commit.
+export const maxDuration = 120;
