@@ -21,7 +21,7 @@ export function SectionFiguresProvider({questionId,text,children}:{questionId?:s
    if(cancelled||data.explanationHash!==hash)return;
    const figures=(Array.isArray(data.sectionFigures)?data.sectionFigures:[]).filter(safeApprovedMeta).slice(0,3);
    setDelivery({sectionFigures:figures,sections:(Array.isArray(data.sections)?data.sections:[]).filter((x:any)=>typeof x.sectionTitle==='string').slice(0,3),imageStatus:typeof data.imageStatus==='string'?data.imageStatus:null,refresh:()=>void read(false)});
-   if(loop&&figures.length===0&&data.imageStatus&&++reads<12)timer=setTimeout(()=>void read(),5000);
+   if(loop&&figures.length===0&&data.imageStatus&&++reads<60)timer=setTimeout(()=>void read(),reads<12?5000:15000);
   }catch{if(!cancelled)setDelivery({sectionFigures:[],sections:[],imageStatus:'unavailable',refresh:()=>void read(false)})}};
   const focus=()=>{if(document.visibilityState==='visible')void read(false)};
   void read();window.addEventListener('focus',focus);
