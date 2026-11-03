@@ -33,7 +33,5 @@ export function SectionFigures({title}:{title?:string}){
  const delivery=useContext(Context);if(!delivery)return null;
  const figures=title?delivery.sectionFigures.filter(x=>x.section_heading===title):[];
  if(figures.length)return <>{figures.map(x=><Figure key={x.id} figure={{asset:typeof x.asset==='string' && ['/terra-trial/carotid-sheath.png','/terra-trial/common-carotid.jpg','/terra-trial/brain-sinuses.jpg'].includes(x.asset) ? x.asset : process.env.NODE_ENV === "development" && typeof x.previewAsset === "string" && x.previewAsset.startsWith("data:image/png;base64,") ? x.previewAsset : `/api/approved-figures/${x.id}`,alt:x.section_title,caption:x.section_title,sourceUrl:x.source_url,licenseUrl:x.license_url,license:x.license,attribution:x.attribution}}/>)}</>;
- const planned=title?delivery.sections.some(x=>x.sectionTitle===title):delivery.sections.length===0;
- if(!planned||!delivery.imageStatus||delivery.imageStatus==='stale')return null;
- return <p className="mt-3 text-sm leading-6 text-slate-600" role="status">{delivery.imageStatus==='unavailable'?'圖片狀態暫時讀不到':delivery.imageStatus==='pending_visual_review'?'配圖核對中':delivery.imageStatus==='awaiting_image'?'本次尚未取得可用配圖':delivery.imageStatus==='awaiting_budget'?'本輪配圖額度已達上限':delivery.imageStatus==='awaiting_image_plan'?'圖片需求待補':'圖片待補'} · 詳解已保存，可先閱讀。{delivery.refresh&&<button type="button" className="ml-2 underline" onClick={delivery.refresh}>重新檢查圖片</button>}</p>;
+ return null;
 }

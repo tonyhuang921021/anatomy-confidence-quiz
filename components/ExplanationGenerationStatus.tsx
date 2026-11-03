@@ -1,15 +1,19 @@
 "use client";
 
-import {pendingExplanation,recoverPendingExplanation,explanationTiming} from "@/lib/explanationRequestClient";
-import { useEffect, useState } from "react";
+import {pendingExplanation,recoverPendingExplanation,explanationTiming,explanationDraft} from "@/lib/explanationRequestClient";
+import { useDeferredValue, useEffect, useState } from "react";
 import {
   advanceGenerationStatus,
   INITIAL_GENERATION_STATUS,
   type GenerationSignal
 } from "@/lib/explanationGenerationStatus";
+import {StructuredExplanationText} from "./StructuredExplanationText";
 import styles from "./ExplanationGenerationStatus.module.css";
 
 export function ExplanationGenerationStatus({ questionId, loading, error, resultVersion }: GenerationSignal) {
+  const [preview,setPreview]=useState({id:questionId,text:""});
+  const draft=useDeferredValue(preview.id===questionId?preview.text:"");
+  useEffect(()=>{setPreview({id:questionId,text:explanationDraft(questionId)});const update=(event:Event)=>{const d=(event as CustomEvent).detail;if(d.id===questionId)setPreview({id:questionId,text:d.text})};window.addEventListener('explanation-draft',update);return()=>window.removeEventListener('explanation-draft',update)},[questionId]);
   const [state, setState] = useState(INITIAL_GENERATION_STATUS);
   const [recovering,setRecovering]=useState(false);const [elapsed,setElapsed]=useState(0);
   useEffect(()=>{if(loading||!pendingExplanation(questionId))return;let cancelled=false,timer:ReturnType<typeof setTimeout>;let checks=0;setRecovering(true);const check=async()=>{try{if(await recoverPendingExplanation(questionId)){if(!cancelled)setRecovering(false);return}}catch{}if(cancelled)return;if(++checks<24)timer=setTimeout(check,5000);else setRecovering(false)};void check();return()=>{cancelled=true;clearTimeout(timer)}},[questionId,loading]);
@@ -25,6 +29,7 @@ export function ExplanationGenerationStatus({ questionId, loading, error, result
   if (next.phase === "idle") return null;
   const complete = next.phase === "complete";
   return (
+    <>
     <div className={styles.status} data-phase={next.phase} role="status" aria-live="polite" aria-atomic="true" aria-busy={!complete}>
       <svg className={styles.cat} viewBox="0 0 112 88" width="112" height="88" aria-hidden="true" focusable="false">
         <ellipse cx="54" cy="79" rx="43" ry="4" fill="#dfebe7" />
@@ -55,8 +60,10 @@ export function ExplanationGenerationStatus({ questionId, loading, error, result
       </svg>
       <div className={styles.copy}>
         <span className={styles.label}>{complete ? "詳解完成" : recovering ? "正在確認既有請求" : "詳解生成中"}</span>
-        <span className={styles.caption}>{complete ? `可開始閱讀${explanationTiming(questionId)?.textMs ? " · "+(explanationTiming(questionId).textMs/1000).toFixed(1)+" 秒" : ""}` : `${elapsed} 秒 · ${elapsed>=60?"仍在處理，可離開後返回查看":"文字完成後會先顯示，圖片另行核對"}`}</span>
+        <span className={styles.caption}>{complete ? `可開始閱讀${explanationTiming(questionId)?.textMs ? " · "+(explanationTiming(questionId).textMs/1000).toFixed(1)+" 秒" : ""}` : `${elapsed} 秒 · ${elapsed>=60?"仍在處理，可離開後返回查看":draft?"文字持續補上中，可先閱讀":"正在準備詳解"}`}</span>
       </div>
     </div>
+    {activeLoading&&draft&&<div className="space-y-3" aria-label="詳解生成中，內容尚未完成" aria-live="off"><StructuredExplanationText text={draft} label="詳解 · 生成中"/></div>}
+    </>
   );
 }

@@ -1,3 +1,4 @@
+import { readJsonEvents } from "./explanationStream";
 type ResponseContentItem = {
   type?: string;
   text?: string;
@@ -109,7 +110,8 @@ export async function createOpenAIText(
   prompt: string,
   maxOutputTokens = 1800,
   modelOverride?: string,
-  reasoningEffort: "low" | "default" = "default"
+  reasoningEffort: "low" | "default" = "default",
+  onDelta?: (delta: string) => void
 ) {
   const apiKey = process.env.OPENAI_API_KEY;
   if (!apiKey) {
@@ -124,11 +126,22 @@ export async function createOpenAIText(
       "Content-Type": "application/json",
       Authorization: `Bearer ${apiKey}`
     },
-    body: JSON.stringify(buildOpenAITextRequest(prompt, maxOutputTokens, model, reasoningEffort)),
+    body: JSON.stringify({...buildOpenAITextRequest(prompt, maxOutputTokens, model, reasoningEffort), ...(onDelta ? {stream:true} : {})}),
     cache: "no-store"
   });
 
-  const payload = (await response.json()) as OpenAIResponsePayload;
+  let payload: OpenAIResponsePayload;
+  if (onDelta && response.ok) {
+    if (!response.body) throw Error("Provider stream missing");
+    let completed: OpenAIResponsePayload | null = null;
+    await readJsonEvents(response.body, event => {
+      if (event.type === "response.output_text.delta" && typeof event.delta === "string") onDelta(event.delta);
+      if (event.type === "response.completed") completed = event.response;
+      if (["error", "response.failed", "response.incomplete"].includes(event.type)) throw Error("Provider stream incomplete");
+    });
+    if (!completed) throw Error("Provider stream completion unconfirmed");
+    payload = completed;
+  } else payload = (await response.json()) as OpenAIResponsePayload;
 
   if (!response.ok) {
     throw new Error(payload.error?.message || "OpenAI request failed.");

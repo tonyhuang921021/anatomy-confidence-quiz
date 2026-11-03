@@ -1,6 +1,10 @@
+import {readJsonEvents} from "./explanationStream";
 // One paid request per question in this browser. Navigation recovery only reads.
 function put(k:string,v:string){try{localStorage.setItem(k,v)}catch{}}
 function remove(k:string){try{localStorage.removeItem(k)}catch{}}
+const drafts=new Map<string,string>();
+export function explanationDraft(id:string){return drafts.get(id)||""}
+function draft(id:string,text:string){if(text)drafts.set(id,text);else drafts.delete(id);if(typeof window!=="undefined")window.dispatchEvent(new CustomEvent('explanation-draft',{detail:{id,text}}))}
 const active=new Map<string,Promise<Response>>();
 const key=(id:string)=>`anatomy-explanation-pending-v1:${id}`;
 const metricKey=(id:string)=>`anatomy-explanation-timing-v1:${id}`;
@@ -20,12 +24,23 @@ export async function requestExplanation(_url:string,init:RequestInit):Promise<R
   try{
    if(prior){const saved=await recoverExplanation(id);if(saved){remove(key(id));return Response.json(saved)}return Response.json({ok:false,code:'request_pending',message:'先前請求仍在確認中，請稍後查看；不會重複生成。'},{status:409})}
    put(key(id),String(started));
-   const response=await fetch(_url,init);const data=await response.clone().json();
-   if(data.ok&&data.explanation){remove(key(id));put(metricKey(id),JSON.stringify({startedAt:started,textMs:Date.now()-started,model:data.model,delivery:data.delivery||null}));}
+   let firstTextMs:number|null=null;
+   let response=await fetch(_url,{...init,headers:{...Object.fromEntries(new Headers(init.headers)),Accept:'text/event-stream'}});
+   if(response.headers.get('content-type')?.includes('text/event-stream')){
+    if(!response.body)throw Error('stream missing');let final:{status:number;data:any}|null=null;
+    await readJsonEvents(response.body,event=>{
+     if(event.type==='draft'&&typeof event.text==='string'&&event.text.length<=100000){firstTextMs ??= Date.now()-started;draft(id,event.text)}
+     if(event.type==='result'&&Number.isInteger(event.status)&&event.status>=200&&event.status<600&&event.data)final={status:event.status,data:event.data};
+    });
+    if(!final)throw Error('stream outcome unconfirmed');
+    const confirmed=final as {status:number;data:any};response=Response.json(confirmed.data,{status:confirmed.status});
+   }
+   const data=await response.clone().json();
+   if(data.ok&&data.explanation){remove(key(id));put(metricKey(id),JSON.stringify({startedAt:started,firstTextMs:firstTextMs??Date.now()-started,textMs:Date.now()-started,model:data.model,delivery:data.delivery||null}));}
    else if(response.status===401||['unavailable','busy','actor_busy','rate','cooldown','account_banned','guard_unavailable','budget','safe_configuration_missing','reviewed_explanation_protected','untrusted_question','authentication_required','trusted_context_missing','source_image_not_supported'].includes(data.code))remove(key(id));
    return response;
   }catch{throw Error('request outcome unconfirmed')}
  })();active.set(id,task);
- try{return (await task).clone()}finally{active.delete(id)}
+ try{return (await task).clone()}finally{active.delete(id);draft(id,"")}
 }
 export async function recoverPendingExplanation(id:string){const saved=await recoverExplanation(id);if(saved){const started=pendingExplanation(id);if(started)put(metricKey(id),JSON.stringify({startedAt:started,textMs:Date.now()-started,model:saved.model,source:'recovered'}));remove(key(id));const storage=await import('@/lib/storage');storage.saveQuestionExplanationOverride(id,{...saved,updatedAt:new Date().toISOString()});window.dispatchEvent(new CustomEvent('explanation-recovered',{detail:{id,saved}}))}return saved}

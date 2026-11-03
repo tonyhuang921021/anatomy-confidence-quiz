@@ -1,3 +1,4 @@
+import { explanationPrefix } from "@/lib/explanationStream";
 import {waitUntil} from '@vercel/functions';
 import {commonsSearch,readBoundedImage} from '@/lib/commonsFigureSource.cjs';
 import { imageWindowOpen, buildNeedsWithFallback, IMAGE_PROMPT, processSavedImages } from "@/lib/newExplanationFigures.cjs";
@@ -761,6 +762,9 @@ export async function POST(request: NextRequest) {
   const reviewedManifestSha = createHash("sha256").update(JSON.stringify(Object.keys(reviewedIndex).sort()),"utf8").digest("hex");
   let canonicalPrompt = "";
   const requestStarted=Date.now();let delivery:any=null;
+  const wantsStream=request.headers.get("accept")?.includes("text/event-stream");
+  let emit: (event:any)=>void = ()=>{};
+  const run=async()=>{
   try {
     const outcome = await handleExplanation(body, {
       isReviewed: async (id: string) => hasReviewedExplanation(id),
@@ -844,8 +848,13 @@ export async function POST(request: NextRequest) {
       },
       callProvider: async (args:any) => {
         const providerStart=Date.now();
-        const result = await createOpenAIText(canonicalPrompt,2400,args.model,args.mode);
-        delivery={providerMs:Date.now()-providerStart,model:result.servedModel,inputTokens:result.usage.inputTokens,outputTokens:result.usage.outputTokens};
+        let raw="",last="",firstTextMs:number|null=null;
+        const result = await createOpenAIText(canonicalPrompt,2400,args.model,args.mode,wantsStream ? delta=>{
+          raw+=delta;if(raw.length>100000)throw Error("Provider output too large");
+          const text=explanationPrefix(raw);
+          if(text && text!==last){last=text;firstTextMs ??= Date.now()-requestStarted;emit({type:"draft",text,firstTextMs});}
+        } : undefined);
+        delivery={firstTextMs,providerMs:Date.now()-providerStart,model:result.servedModel,inputTokens:result.usage.inputTokens,outputTokens:result.usage.outputTokens};
         return {usage:result.usageKnown && result.servedModel === args.model ? result.usage : null,value:parseExplanationPayload(result.text)};
       },
       settle: async (g:any, seq:number, usage:any) => {
@@ -882,8 +891,8 @@ export async function POST(request: NextRequest) {
       actor_busy:"此帳號已有請求進行中。", cooldown:"請稍後再試。", rate:"目前使用次數已達限制，請稍後再試。"
     };
     if (outcome.status === 200 && outcome.value) {
-      // The opt-in queue is written transactionally by figure_guard_commit;
-      // request completion never starts a best-effort background search.
+      // Final success is emitted only after usage settlement and durable text commit.
+      // Images continue independently via waitUntil above.
       return NextResponse.json({ok:true,configured:true,sharedSaved:true,...outcome.value,delivery:{...delivery,responseMs:Date.now()-requestStarted,source:outcome.code}});
     }
     return NextResponse.json({ok:false,code:outcome.code,recoverable:true,message:messages[outcome.code] || "暫時無法產生詳解，既有詳解不受影響。"},{status:outcome.status});
@@ -891,7 +900,18 @@ export async function POST(request: NextRequest) {
     console.error("question_explanation_safe_candidate_error",error instanceof Error ? error.message : "unknown");
     return NextResponse.json({ok:false,code:"guard_unavailable",recoverable:true,message:"詳解暫時不可用，既有內容不受影響。"},{status:503});
   }
+  };
+  if(!wantsStream)return run();
+  const encoder=new TextEncoder();
+  const stream=new ReadableStream<Uint8Array>({start(controller){
+    let connected=true;
+    emit=event=>{if(connected)try{controller.enqueue(encoder.encode(`data: ${JSON.stringify(event)}\n\n`))}catch{connected=false}};
+    // Continue accounting/commit if the reader leaves; never resend a paid call.
+    const work=(async()=>{try{const response=await run();emit({type:"result",status:response.status,data:await response.json()})}finally{if(connected)try{controller.close()}catch{}}})();
+    waitUntil(work);
+  }});
+  return new Response(stream,{headers:{"Content-Type":"text/event-stream; charset=utf-8","Cache-Control":"no-cache, no-transform","X-Accel-Buffering":"no"}});
 }
 
-// Bounds the synchronous, capped image lookup after durable text commit.
+// Bounds generation and the capped background image lookup.
 export const maxDuration = 120;
