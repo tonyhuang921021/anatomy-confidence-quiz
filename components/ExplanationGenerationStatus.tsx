@@ -66,7 +66,7 @@ export function ExplanationGenerationStatus({ questionId, loading, error, result
         <span className={styles.caption}>{complete ? timingCaption || "可開始閱讀" : `${elapsed} 秒 · ${elapsed>=60?"仍在處理，可離開後返回查看":draft?"文字持續補上中，可先閱讀":"正在準備詳解"}`}</span>
       </div>
     </div>
-    {activeLoading&&draft&&<div className="space-y-3" aria-label="詳解生成中，內容尚未完成" aria-live="off"><StructuredExplanationText text={draft} label="詳解 · 生成中"/></div>}
+    {activeLoading&&draft&&<div className="min-w-0 w-full max-w-full space-y-3" aria-label="詳解生成中，內容尚未完成" aria-live="off"><StructuredExplanationText text={draft} label="詳解 · 生成中"/></div>}
     </>
   );
 }
