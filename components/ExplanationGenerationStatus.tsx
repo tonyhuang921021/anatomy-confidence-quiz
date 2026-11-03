@@ -14,6 +14,9 @@ export function ExplanationGenerationStatus({ questionId, loading, error, result
   const [preview,setPreview]=useState({id:questionId,text:""});
   const draft=useDeferredValue(preview.id===questionId?preview.text:"");
   useEffect(()=>{setPreview({id:questionId,text:explanationDraft(questionId)});const update=(event:Event)=>{const d=(event as CustomEvent).detail;if(d.id===questionId)setPreview({id:questionId,text:d.text})};window.addEventListener('explanation-draft',update);return()=>window.removeEventListener('explanation-draft',update)},[questionId]);
+  const [timing,setTiming]=useState<any>(null);
+  useEffect(()=>{setTiming(!loading&&resultVersion?explanationTiming(questionId):null)},[questionId,loading,resultVersion]);
+  const timingCaption=timing?`開始顯示 ${(Number(timing.firstTextMs??timing.textMs)/1000).toFixed(1)} 秒 · 全文 ${(Number(timing.textMs)/1000).toFixed(1)} 秒`:"";
   const [state, setState] = useState(INITIAL_GENERATION_STATUS);
   const [recovering,setRecovering]=useState(false);const [elapsed,setElapsed]=useState(0);
   useEffect(()=>{if(loading||!pendingExplanation(questionId))return;let cancelled=false,timer:ReturnType<typeof setTimeout>;let checks=0;setRecovering(true);const check=async()=>{try{if(await recoverPendingExplanation(questionId)){if(!cancelled)setRecovering(false);return}}catch{}if(cancelled)return;if(++checks<24)timer=setTimeout(check,5000);else setRecovering(false)};void check();return()=>{cancelled=true;clearTimeout(timer)}},[questionId,loading]);
@@ -26,7 +29,7 @@ export function ExplanationGenerationStatus({ questionId, loading, error, result
     setState((previous) => advanceGenerationStatus(previous, { questionId, loading:activeLoading, error:visibleError, resultVersion }));
   }, [questionId, activeLoading, visibleError, resultVersion]);
 
-  if (next.phase === "idle") return null;
+  if (next.phase === "idle") return timingCaption&&resultVersion ? <p className="my-2 text-xs leading-6 text-slate-600" aria-label="最近一次詳解請求時間">{timingCaption}</p> : null;
   const complete = next.phase === "complete";
   return (
     <>
@@ -60,7 +63,7 @@ export function ExplanationGenerationStatus({ questionId, loading, error, result
       </svg>
       <div className={styles.copy}>
         <span className={styles.label}>{complete ? "詳解完成" : recovering ? "正在確認既有請求" : "詳解生成中"}</span>
-        <span className={styles.caption}>{complete ? `可開始閱讀${explanationTiming(questionId)?.textMs ? " · "+(explanationTiming(questionId).textMs/1000).toFixed(1)+" 秒" : ""}` : `${elapsed} 秒 · ${elapsed>=60?"仍在處理，可離開後返回查看":draft?"文字持續補上中，可先閱讀":"正在準備詳解"}`}</span>
+        <span className={styles.caption}>{complete ? timingCaption || "可開始閱讀" : `${elapsed} 秒 · ${elapsed>=60?"仍在處理，可離開後返回查看":draft?"文字持續補上中，可先閱讀":"正在準備詳解"}`}</span>
       </div>
     </div>
     {activeLoading&&draft&&<div className="space-y-3" aria-label="詳解生成中，內容尚未完成" aria-live="off"><StructuredExplanationText text={draft} label="詳解 · 生成中"/></div>}
