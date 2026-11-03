@@ -1,3 +1,5 @@
+import {scheduleNewImageContinuation} from "@/lib/newExplanationImageContinuation.cjs";
+import {commonsSearch,readBoundedImage} from "@/lib/commonsFigureSource.cjs";
 import { NextRequest, NextResponse } from "next/server";
 import { randomUUID } from "node:crypto";
 import { createClient } from "@supabase/supabase-js";
@@ -264,6 +266,7 @@ export async function GET(request: NextRequest) {
   // Existing cron authorization and recovery checks ran above. A disabled
   // figure worker adds no calls; errors cannot alter the rollup response.
   scheduleFigureWorker({env:process.env,db:supabase,waitUntil,report:message=>console.error(message)});
+  scheduleNewImageContinuation({env:process.env,db:supabase,waitUntil,search:commonsSearch,loadImage:readBoundedImage,report:(message:string)=>console.error(message)});
 
   const leaseOwner = randomUUID();
   let leaseAcquired = false;

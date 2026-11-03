@@ -1,3 +1,4 @@
+import {backgroundExplanationResponse} from "@/lib/explanationBackgroundResponse";
 import {createReservedReads} from "@/lib/explanationReservedReads";
 import { explanationPrefix } from "@/lib/explanationStream";
 import {waitUntil} from '@vercel/functions';
@@ -909,16 +910,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ok:false,code:"guard_unavailable",recoverable:true,message:"詳解暫時不可用，既有內容不受影響。"},{status:503});
   }
   };
-  if(!wantsStream)return run();
-  const encoder=new TextEncoder();
-  const stream=new ReadableStream<Uint8Array>({start(controller){
-    let connected=true;
-    emit=event=>{if(connected)try{controller.enqueue(encoder.encode(`data: ${JSON.stringify(event)}\n\n`))}catch{connected=false}};
-    // Continue accounting/commit if the reader leaves; never resend a paid call.
-    const work=(async()=>{try{const response=await run();emit({type:"result",status:response.status,data:await response.json()})}finally{if(connected)try{controller.close()}catch{}}})();
-    waitUntil(work);
-  }});
-  return new Response(stream,{headers:{"Content-Type":"text/event-stream; charset=utf-8","Cache-Control":"no-cache, no-transform","X-Accel-Buffering":"no"}});
+  return backgroundExplanationResponse(nextEmit=>{emit=nextEmit;return run()},waitUntil,Boolean(wantsStream));
 }
 
 // Bounds generation and the capped background image lookup.
