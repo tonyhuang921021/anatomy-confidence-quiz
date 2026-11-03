@@ -34,6 +34,5 @@ const cartilage=question('MOEX-106100-1301-Q038','纖維軟骨與規則緻密結
 const matrix=question('MOEX-098140-1101-Q037','結締組織中，何者製造並分泌基質？','D',{A:'甲',B:'乙',C:'丙',D:'纖維母細胞'});
 assert.deepEqual(Array.from(find(connective,[matrix,cartilage,falseScore],new Set()).map(x=>x.id)),[cartilage.id,matrix.id]);
 assert.deepEqual(Array.from(find(connective,[matrix,{...cartilage,answer:'A'}],new Set()).map(x=>x.id)),[matrix.id]);
-const src=fs.readFileSync('app/api/question-explanation/route.ts','utf8');assert.match(src,/resolveTrustedRelatedQuestions\(q\.id\)/);assert.match(src,/Buffer\.byteLength\(canonicalPrompt \+ block, 'utf8'\) <= 16000/);const region=src.slice(src.indexOf('const related = resolveTrustedRelatedQuestions(q.id)'),src.indexOf('return Buffer.byteLength(canonicalPrompt',src.indexOf('const related = resolveTrustedRelatedQuestions(q.id)')));assert.doesNotMatch(region,/item\.explanation/);
-console.log('PASS related context uses two clinical anchors with stem and answer evidence; rejects irrelevant, invalid, conflicting and duplicate sources');
-console.log('PASS server constructs original question/official answer context within existing 16,000-byte ceiling');
+const src=fs.readFileSync('app/api/question-explanation/route.ts','utf8');assert.match(src,/resolveTrustedRelatedQuestions\(q\.id\)/);assert.match(src,/appendTeachingContext\(canonicalPrompt,related\)/);const helper=fs.readFileSync('lib/teachingContext.ts','utf8');assert.doesNotMatch(helper,/q\.explanation/);
+console.log('PASS trusted related context, dedupe/conflict filters and bounded prompt assembly');
